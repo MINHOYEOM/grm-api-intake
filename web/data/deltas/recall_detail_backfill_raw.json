@@ -1,0 +1,3901 @@
+{
+ "D-0588-2026": {
+  "address_1": "619 River Dr",
+  "address_2": "",
+  "center_classification_date": "20260612",
+  "city": "Elmwood Park",
+  "classification": "Class II",
+  "code_info": "Lot #: 20240411, Exp: 6/30/2026; 20250252, Exp: 3/31/2027",
+  "country": "United States",
+  "distribution_pattern": "USA Nationwide.",
+  "event_id": "99101",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA091634"
+   ],
+   "brand_name": [
+    "ALYACEN 1/35"
+   ],
+   "generic_name": [
+    "NORETHINDRONE AND ETHINYL ESTRADIOL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Glenmark Pharmaceuticals Inc., USA"
+   ],
+   "package_ndc": [
+    "68462-556-84",
+    "68462-556-29",
+    "68462-394-84",
+    "68462-394-29"
+   ],
+   "product_ndc": [
+    "68462-394",
+    "68462-556"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "rxcui": [
+    "310463",
+    "312033",
+    "392662",
+    "748797",
+    "749852",
+    "749858",
+    "1242786",
+    "1242787"
+   ],
+   "spl_id": [
+    "9d4967e6-42df-4468-99a6-9b57499497d9"
+   ],
+   "spl_set_id": [
+    "5c02b4d3-1e2f-439a-ae45-02304ee190d1"
+   ],
+   "upc": [
+    "0368462394847",
+    "0368462394298",
+    "0368462556849"
+   ]
+  },
+  "postal_code": "07407-1317",
+  "product_description": "Alyacen 7/7/7, Norethindrone and Ethinyl Estradiol Tablets USP, 0.5mg/0.035mg, 0.75mg/0.035mg, 1 mg/0.0.35mg, 3 Blister Cards each containing 28 tablets, 28 day regimen, Rx only, Manufactured by: Glenmark Pharmaceuticals Ltd., Colvale-Bardez, Goa 403 513, India, Manufactured for: Glenmark Pharmaceuticals Inc., Mahwah, NJ 07430, NDC 68462-556-29",
+  "product_quantity": "",
+  "product_type": "Drugs",
+  "reason_for_recall": "Failed Impurities/Degradation Specifications: This recall is being initiated due to out-of-specification results total impurities.",
+  "recall_initiation_date": "20260527",
+  "recall_number": "D-0588-2026",
+  "recalling_firm": "Glenmark Pharmaceuticals Inc., USA",
+  "report_date": "20260624",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0589-2026": {
+  "address_1": "1700 Perimeter Rd",
+  "address_2": "",
+  "center_classification_date": "20260612",
+  "city": "Greenville",
+  "classification": "Class II",
+  "code_info": "Lot #: AE001, expires: 5/31/2026.",
+  "country": "United States",
+  "distribution_pattern": "U.S.A. Nationwide",
+  "event_id": "99000",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {},
+  "postal_code": "29605-5252",
+  "product_description": "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Activated Charcoal in 120 ml (4 fl oz), distributed by: VistaPharm, Inc., Largo. FL 33771, NDC 66689-202-04.",
+  "product_quantity": "",
+  "product_type": "Drugs",
+  "reason_for_recall": "Does Not Meet USP or OTC Monograph: Product did not meet the Over-the-Counter (OTC) Monograph M023",
+  "recall_initiation_date": "20260515",
+  "recall_number": "D-0589-2026",
+  "recalling_firm": "PAI Holdings LLC",
+  "report_date": "20260624",
+  "state": "SC",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0593-2026": {
+  "address_1": "3650 Victoria St N Ste 900",
+  "address_2": "",
+  "center_classification_date": "20260612",
+  "city": "Shoreview",
+  "classification": "Class II",
+  "code_info": "Lot#: 20260327VAS-3, BUD: 05/26/2026; 20260320VAS-3, BUD: 05/19/2026.",
+  "country": "United States",
+  "distribution_pattern": "U.S.A. Nationwide",
+  "event_id": "99014",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {},
+  "postal_code": "55126-2906",
+  "product_description": "Vasopressin 2 Units/2 mL in 0.9% Sodium Chloride, syringe, IntegraDose Compounding Services, LLC. 3650 Victoria St N, Suite 900, Shoreview, MN, NDC 71139-0190-1.",
+  "product_quantity": "287 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "Subpotent Drug",
+  "recall_initiation_date": "20260518",
+  "recall_number": "D-0593-2026",
+  "recalling_firm": "IntegraDose Compounding Services LLC",
+  "report_date": "20260624",
+  "state": "MN",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0594-2026": {
+  "address_1": "400 Crossing Blvd Ste 102",
+  "address_2": "",
+  "center_classification_date": "20260616",
+  "city": "Bridgewater",
+  "classification": "Class II",
+  "code_info": "Lot: PA00805, expires: 01/31/2029",
+  "country": "United States",
+  "distribution_pattern": "U.S. Nationwide",
+  "event_id": "99046",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA206174"
+   ],
+   "brand_name": [
+    "ARIPIPRAZOLE"
+   ],
+   "generic_name": [
+    "ARIPIPRAZOLE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Ajanta Pharma USA Inc."
+   ],
+   "nui": [
+    "N0000175430"
+   ],
+   "package_ndc": [
+    "27241-051-03",
+    "27241-051-08",
+    "27241-052-03",
+    "27241-052-08",
+    "27241-053-03",
+    "27241-053-08",
+    "27241-054-03",
+    "27241-054-08",
+    "27241-055-03",
+    "27241-055-08",
+    "27241-056-03",
+    "27241-056-08"
+   ],
+   "pharm_class_epc": [
+    "Atypical Antipsychotic [EPC]"
+   ],
+   "product_ndc": [
+    "27241-051",
+    "27241-052",
+    "27241-053",
+    "27241-054",
+    "27241-055",
+    "27241-056"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "349490",
+    "349545",
+    "349547",
+    "349553",
+    "402131",
+    "602964"
+   ],
+   "spl_id": [
+    "2a724a23-cf45-4d22-90f5-ebe68f9b7ab9"
+   ],
+   "spl_set_id": [
+    "d0f910b5-adef-4a93-9369-70f1ed541503"
+   ],
+   "substance_name": [
+    "ARIPIPRAZOLE"
+   ],
+   "unii": [
+    "82VFR53I78"
+   ],
+   "upc": [
+    "0327241051036",
+    "0327241055034",
+    "0327241053030",
+    "0327241056031",
+    "0327241054037",
+    "0327241052033"
+   ]
+  },
+  "postal_code": "08807-2863",
+  "product_description": "Aripiprazole Tablets USP, Rx only, 30 mg, 30 tablets, Marketed by: Ajanta Pharma USA Inc., Bridgewater, NJ 08807, Made in India, NDC 27241-056-03.",
+  "product_quantity": "6,143 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Product Mix-Up:  A bottle containing Voriconazole Tablets 50 mg was labelled and distributed as Aripiprazole Tablets USP 30 mg.",
+  "recall_initiation_date": "20260527",
+  "recall_number": "D-0594-2026",
+  "recalling_firm": "Ajanta Pharma USA Inc",
+  "report_date": "20260624",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0596-2026": {
+  "address_1": "870 Parkdale Rd",
+  "address_2": "",
+  "center_classification_date": "20260617",
+  "city": "Rochester",
+  "classification": "Class II",
+  "code_info": "Lot #:  82886, exp 09/30/2026; 89646, exp 05/31/2027",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA.",
+  "event_id": "99237",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA206586"
+   ],
+   "brand_name": [
+    "BUPRENORPHINE HYDROCHLORIDE"
+   ],
+   "generic_name": [
+    "BUPRENORPHINE HYDROCHLORIDE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Par Health USA, LLC"
+   ],
+   "package_ndc": [
+    "42023-179-05"
+   ],
+   "product_ndc": [
+    "42023-179"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "INTRAMUSCULAR",
+    "INTRAVENOUS"
+   ],
+   "rxcui": [
+    "238129"
+   ],
+   "spl_id": [
+    "32a7af7e-3f90-4881-9075-473644237017"
+   ],
+   "spl_set_id": [
+    "34767dda-ce52-4f98-a45f-bb5cee0cd5e6"
+   ],
+   "substance_name": [
+    "BUPRENORPHINE HYDROCHLORIDE"
+   ],
+   "unii": [
+    "56W8MW3EN1"
+   ]
+  },
+  "postal_code": "48307-1740",
+  "product_description": "Buprenorphine HCl, CIII, Injection, 0.3 mg/mL, 5 x 1 mL Single Dose Vials per Carton, Rx Only, For Intramuscular or Intravenous use, Manufactured for: Endo USA, Malvern, PA 19355,  NDC 42023-179-05",
+  "product_quantity": "46,334 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "Crystallization; identified as Buprenorphine free base",
+  "recall_initiation_date": "20260612",
+  "recall_number": "D-0596-2026",
+  "recalling_firm": "Par Health USA, LLC",
+  "report_date": "20260624",
+  "state": "MI",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0600-2026": {
+  "address_1": "480 S Democrat Rd",
+  "address_2": "",
+  "center_classification_date": "20260618",
+  "city": "Gibbstown",
+  "classification": "Class II",
+  "code_info": "BNZ-001917, Exp 04/01/2029",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA",
+  "event_id": "99076",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "M022"
+   ],
+   "brand_name": [
+    "PEARSON TOPICAL ANESTHETIC"
+   ],
+   "generic_name": [
+    "BENZOCAINE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Pearson Dental Supplies INC."
+   ],
+   "nui": [
+    "N0000185508",
+    "N0000175629",
+    "N0000184306",
+    "M0000728"
+   ],
+   "package_ndc": [
+    "43305-0009-3"
+   ],
+   "pharm_class_cs": [
+    "Allergens [CS]"
+   ],
+   "pharm_class_epc": [
+    "Standardized Chemical Allergen [EPC]"
+   ],
+   "pharm_class_pe": [
+    "Increased Histamine Release [PE]",
+    "Cell-mediated Immunity [PE]"
+   ],
+   "product_ndc": [
+    "43305-0009"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "DENTAL"
+   ],
+   "rxcui": [
+    "238910"
+   ],
+   "spl_id": [
+    "2bd9229b-d7cf-5a41-e063-6394a90a22a7"
+   ],
+   "spl_set_id": [
+    "1a8f5964-770a-4d14-a7b6-18b5da9159b0"
+   ],
+   "substance_name": [
+    "BENZOCAINE"
+   ],
+   "unii": [
+    "U3RSY48JW5"
+   ]
+  },
+  "postal_code": "08027-1239",
+  "product_description": "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Contents: 1 oz (3o g), Manufactured for: Pearson Dental Supply Inc., Sylmar, CA 91342 USA, NDC 43305-0009-3.",
+  "product_quantity": "900 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "Defective container:may contain bottles with incomplete seals",
+  "recall_initiation_date": "20260521",
+  "recall_number": "D-0600-2026",
+  "recalling_firm": "Keystone Industries",
+  "report_date": "20260624",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0609-2026": {
+  "address_1": "7000 Cardinal Pl",
+  "address_2": "N/A",
+  "center_classification_date": "20260622",
+  "city": "Dublin",
+  "classification": "Class II",
+  "code_info": "Lots: N02327, expires: 09/2026; N02740, expires: 12/2026; N03069, expires: 08/2027.",
+  "country": "United States",
+  "distribution_pattern": "U.S. Nationwide.",
+  "event_id": "99240",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA210424"
+   ],
+   "brand_name": [
+    "METHYLERGONOVINE MALEATE"
+   ],
+   "generic_name": [
+    "METHYLERGONOVINE MALEATE"
+   ],
+   "manufacturer_name": [
+    "Major Pharmaceuticals"
+   ],
+   "original_packager_product_ndc": [
+    "70010-786"
+   ],
+   "package_ndc": [
+    "0904-7282-10"
+   ],
+   "product_ndc": [
+    "0904-7282"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "996824"
+   ],
+   "spl_id": [
+    "27b7ce37-49f0-451f-b574-393564cd9435"
+   ],
+   "spl_set_id": [
+    "c7f19e89-8b52-4033-9914-f3b41fe0790d"
+   ],
+   "substance_name": [
+    "METHYLERGONOVINE MALEATE"
+   ],
+   "unii": [
+    "IR84JPZ1RK"
+   ]
+  },
+  "postal_code": "43017-1091",
+  "product_description": "Carton Label: MAJOR, Methylergonovine Maleate Tablets, USP, 0.2 mg, 20 TABLETS (2 x 10), Rx only, Packaged and Distributed by: MAJOR PHARMACEUTICALS, Indianapolis, in 46268, NDC 0904-7282-10.  Blister Label: Methylergonovine Maleate Tablets, 0.2 mg, USP, One Tablet, Major Pharm/Indianapolis, IN 46268, NDC 0904-7282-10.",
+  "product_quantity": "790 Cartons.",
+  "product_type": "Drugs",
+  "reason_for_recall": "Subpotent Drug",
+  "recall_initiation_date": "20260616",
+  "recall_number": "D-0609-2026",
+  "recalling_firm": "The Harvard Drug Group LLC",
+  "report_date": "20260701",
+  "state": "OH",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0610-2026": {
+  "address_1": "Additional Ambernath Midc",
+  "address_2": "Ambernath East; F1-F1/1-F75/1",
+  "center_classification_date": "20260622",
+  "city": "Kalyan",
+  "classification": "Class II",
+  "code_info": "[100 tablet bottle] Batch RISA24001; [1000 tablet bottle]  Batch RISB24002; Exp. 04/2027",
+  "country": "India",
+  "distribution_pattern": "U.S. Nationwide.",
+  "event_id": "99136",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA211320"
+   ],
+   "brand_name": [
+    "CHLORTHALIDONE"
+   ],
+   "generic_name": [
+    "CHLORTHALIDONE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Rising Pharma Holdings, Inc."
+   ],
+   "nui": [
+    "N0000175359",
+    "N0000175420"
+   ],
+   "package_ndc": [
+    "64980-599-01",
+    "64980-599-10",
+    "64980-600-01"
+   ],
+   "pharm_class_epc": [
+    "Thiazide-like Diuretic [EPC]"
+   ],
+   "pharm_class_pe": [
+    "Increased Diuresis [PE]"
+   ],
+   "product_ndc": [
+    "64980-599",
+    "64980-600"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "197499",
+    "197500"
+   ],
+   "spl_id": [
+    "6404aaa7-05c8-4f96-a091-3f07248ffbd5"
+   ],
+   "spl_set_id": [
+    "71b1d074-0521-4cd1-beb5-fedd61f52eca"
+   ],
+   "substance_name": [
+    "CHLORTHALIDONE"
+   ],
+   "unii": [
+    "Q0MQD1073Q"
+   ],
+   "upc": [
+    "0364980599108",
+    "0364980599016",
+    "0364980600019"
+   ]
+  },
+  "postal_code": "N/A",
+  "product_description": "Chlorthalidone Tablets, USP, 25 mg, [100 or 1000] Tablets pr bottle, Rx only, Manufactured by: Inventia Healthcare Limited, Additional Ambernath, M.I.D.C., Ambernath (East) - 421506, INDIA.  Distributed by: Risiong Pharma Holdings, Inc., East Brunswick, NJ 08816.  NDC 100-tablet bottle: 64980-599-01; NDC 1000-tablet bottle: 64980-599-10",
+  "product_quantity": "11,460 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Failed Dissolution Specifications",
+  "recall_initiation_date": "20260605",
+  "recall_number": "D-0610-2026",
+  "recalling_firm": "Inventia Healthcare Limited",
+  "report_date": "20260624",
+  "state": "",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0611-2026": {
+  "address_1": "400 Crossing Blvd Ste 102",
+  "address_2": "N/A",
+  "center_classification_date": "20260622",
+  "city": "Bridgewater",
+  "classification": "Class II",
+  "code_info": "Lot # PA02216; Exp. 12/2029",
+  "country": "United States",
+  "distribution_pattern": "U.S. Nationwide",
+  "event_id": "99130",
+  "initial_firm_notification": "N/A",
+  "openfda": {
+   "application_number": [
+    "ANDA210705"
+   ],
+   "brand_name": [
+    "FENOFIBRATE"
+   ],
+   "generic_name": [
+    "FENOFIBRATE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Ajanta Pharma USA Inc."
+   ],
+   "nui": [
+    "N0000175596",
+    "N0000175375",
+    "M0543661"
+   ],
+   "package_ndc": [
+    "27241-118-04",
+    "27241-118-05",
+    "27241-119-04",
+    "27241-119-05",
+    "27241-120-04",
+    "27241-120-05"
+   ],
+   "pharm_class_cs": [
+    "Fibric Acids [CS]"
+   ],
+   "pharm_class_epc": [
+    "Peroxisome Proliferator Receptor alpha Agonist [EPC]"
+   ],
+   "pharm_class_moa": [
+    "Peroxisome Proliferator-activated Receptor alpha Agonists [MoA]"
+   ],
+   "product_ndc": [
+    "27241-118",
+    "27241-119",
+    "27241-120"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "200311",
+    "310288",
+    "310289"
+   ],
+   "spl_id": [
+    "2dffe879-0f18-4961-b1a9-0d69565a04a6"
+   ],
+   "spl_set_id": [
+    "da2f0ba4-7c16-4fb0-bc1c-45540e8fefbf"
+   ],
+   "substance_name": [
+    "FENOFIBRATE"
+   ],
+   "unii": [
+    "U202363UOS"
+   ],
+   "upc": [
+    "0327241119040",
+    "0327241118043",
+    "0327241120046"
+   ]
+  },
+  "postal_code": "08807-2863",
+  "product_description": "Fenofibrate Capsules, USP 200 mg, Rx only, 100 Capsules, Manufactured by: Ajanta Pharma Limited, India, Marketed by: Ajanta Pharma USA Inc. Bridgewater, NJ 08807, NDC 27241-120-04.",
+  "product_quantity": "3648 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "CGMP Deviations",
+  "recall_initiation_date": "20260528",
+  "recall_number": "D-0611-2026",
+  "recalling_firm": "Ajanta Pharma USA Inc",
+  "report_date": "20260701",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0612-2026": {
+  "address_1": "1 Amgen Center Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260623",
+  "city": "Thousand Oaks",
+  "classification": "Class II",
+  "code_info": "a) Lot # 1138901, Exp. Date 08/31/2026; 1149846, Exp. Date 04/30/2027 b) Lot #1138201, 1138202,  08/31/2026, 1138900, 1141143, Exp. Date 08/31/2026; 1140280, 1140281, 1142063, Exp. Date 10/31/2026; 1142062, 1142942, 1142943, Exp. Date 11/30/2026; 1144081, 1144104, Exp. Date 12/31/2026; 1146373, 1146374, Exp. Date 01/31/2027; 1147491, 1147492, 1149843, Exp. Date 03/31/2027; 1151113, 1151890, 1153401, Exp. Date 07/31/2027; 1151114, 1151115, Exp. Date 09/30/2027; 1152412, 1153399, 1153400, Exp. Date 06/30/2027; 1155834, 1155835, Exp. Date 04/30/2027; 1155836, Exp. Date 09/30/2027; 1158480, 1158481, 1158482, Exp. Date 10/31/2027; 1160354, 1160355, Exp. Date 03/31/2028; 1161593, 1161594, 1161595, Exp. Date 04/30/2028; 1164097, 1164098, 1164099, Exp. Date 06/30/2028; 1165078, 1165079, Exp Date 07/31/2028; 1165080, Exp. Date 02/29/2028;1168005, 1168006, 1168007, Exp. Date 09/30/2028; 1169288, 1169289, Exp. Date 10/31/2028; 1172885, Exp. Date 12/31/2028.",
+  "country": "United States",
+  "distribution_pattern": "Nationwide within the United States",
+  "event_id": "99077",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "NDA206143"
+   ],
+   "brand_name": [
+    "CORLANOR"
+   ],
+   "generic_name": [
+    "IVABRADINE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Amgen Inc"
+   ],
+   "package_ndc": [
+    "55513-800-60",
+    "55513-800-99",
+    "55513-810-60",
+    "55513-813-01",
+    "55513-813-28"
+   ],
+   "product_ndc": [
+    "55513-800",
+    "55513-810",
+    "55513-813"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "1649485",
+    "1649491",
+    "1649493",
+    "1649495",
+    "2168592",
+    "2168596"
+   ],
+   "spl_id": [
+    "8ab000cd-0258-489a-b1bb-4cc1ca359d6c"
+   ],
+   "spl_set_id": [
+    "92018a65-38f6-45f7-91d4-a34921b81d0d"
+   ],
+   "substance_name": [
+    "IVABRADINE HYDROCHLORIDE"
+   ],
+   "unii": [
+    "TP19837BZK"
+   ],
+   "upc": [
+    "0355513800600",
+    "0355513810609"
+   ]
+  },
+  "postal_code": "91320-1730",
+  "product_description": "Corlanor (ivabradine) tablets, 5 mg, packaged in a) 14 tablets bottles (NDC 55513-800-99), and b) 60 tablet bottles (NDC 55513-800-60), Rx Only, Amgen Inc., Thousand Oaks, CA 92130 Made In Italy.",
+  "product_quantity": "934577 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of Foreign Substance.",
+  "recall_initiation_date": "20260604",
+  "recall_number": "D-0612-2026",
+  "recalling_firm": "Amgen, Inc.",
+  "report_date": "20260701",
+  "state": "CA",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0617-2026": {
+  "address_1": "94 Worldwide Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260623",
+  "city": "Dawsonville",
+  "classification": "Class II",
+  "code_info": "Lot: a) 09JA2530, 31JA2507, expires: 04/30/2027; b) Lot: 09DE2412, 09JA2528, 29JA2511, expires: 04/30/2027.",
+  "country": "United States",
+  "distribution_pattern": "U.S. Nationwide",
+  "event_id": "99269",
+  "initial_firm_notification": "Letter",
+  "openfda": {},
+  "postal_code": "30534-6828",
+  "product_description": "DULOXETINE D/R, a) 30 mg (NDC 61919-482-30), 30 Caps; b) 30 mg (NDC 61919-482-60), 60 Caps; CYMBALTA, Packaged and Distributed by Direct Rx.",
+  "product_quantity": "263 Bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "CGMP Deviations: Presence of N-nitroso-duloxetine impurity above FDA recommended interim limit",
+  "recall_initiation_date": "20260622",
+  "recall_number": "D-0617-2026",
+  "recalling_firm": "Direct Rx",
+  "report_date": "20260701",
+  "state": "GA",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0618-2026": {
+  "address_1": "55 6th Rd",
+  "address_2": "N/A",
+  "center_classification_date": "20260624",
+  "city": "Woburn",
+  "classification": "Class II",
+  "code_info": "24-1269856-0-1",
+  "country": "United States",
+  "distribution_pattern": "MA",
+  "event_id": "99265",
+  "initial_firm_notification": "N/A",
+  "openfda": {},
+  "postal_code": "01801-1767",
+  "product_description": "Total Parental Nutrition - Pediatric PN Patient-Specific TPN Bag, (patient specific), Rx# 24-1269856-0-1Compound Volume 1295 mL per bag, Rx only, Single Dose Injection, Refrigerated Injection, Central Admixture Pharmacy Services, Boston, 55 6th Rd Woburn, Massachusetts 01801-1767.",
+  "product_quantity": "One (1) patient-specific TPN prescription.",
+  "product_type": "Drugs",
+  "reason_for_recall": "Incorrect product formulation: bag did not contain copper and famotidine per label.",
+  "recall_initiation_date": "20260602",
+  "recall_number": "D-0618-2026",
+  "recalling_firm": "Central Admixture Pharmacy Services, Inc.",
+  "report_date": "20260701",
+  "state": "MA",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0621-2026": {
+  "address_1": "4855 Ward Rd",
+  "address_2": "N/A",
+  "center_classification_date": "20260624",
+  "city": "Wheat Ridge",
+  "classification": "Class II",
+  "code_info": "All lots within expiry",
+  "country": "United States",
+  "distribution_pattern": "CO",
+  "event_id": "99032",
+  "initial_firm_notification": "N/A",
+  "openfda": {},
+  "postal_code": "80033-1951",
+  "product_description": "PReye Vitamin See Antioxidant Preservative Free Eye Drops, Distributed by: PReye, LLC, Golden, CO",
+  "product_quantity": "approximate 50 to 60 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of Assurance of Sterility",
+  "recall_initiation_date": "20260518",
+  "recall_number": "D-0621-2026",
+  "recalling_firm": "PReye LLC",
+  "report_date": "20260701",
+  "state": "CO",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0622-2026": {
+  "address_1": "1550 Northwestern Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260625",
+  "city": "El Paso",
+  "classification": "Class II",
+  "code_info": "Lot # 3201277, Exp Date: 06/30/2026; Lot # 3213912, 3214206, 3214914, 3215710, 3227485, Exp Date: 07/31/2026; Lot # 3234036, 3234037, 3236460, 3237244, 3243095, 3263576, 3263580, 3264318, Exp Date: 08/31/2026; Lot # 3266655, 3266657, 3270586, 3278714, 3279949, 3282215, 3282956, Exp Date: 09/30/2026; Lot #  3299094, 3299684, 3302529, 3301463, 3309836, 3310556, 3312230, 3314562, Exp Date: 10/31/2026; Lot # 3321426, Exp Date: 11/30/2026; Lot # 3350974, 3352268, 3354120, 3354127, 3356911, 4003299, 4013168, Exp Date: 12/31/2026; Lot # 4023898, 4024208, 4024754, 4030686, 4031689, 4032182, 4032183, 4038825, 4038826, 4043641, 4045863, 4046559, Exp Date: 1/31/2027; Lot # 4049128, 4060484, 4061622, 4062534, Exp Date: 02/28/2027; Lot # 4072323, 4081465, 4092172, 4092053, 4092057, 4093448, 4096267, 4099351, Exp Date: 03/31/2027; Lot # 4106830, 4106833, 4106834, 4123769, 4123637, 4124547, 4123599, 4131749, Exp Date: 04/30/2027; Lot # 4137704, 4139447, Exp Date: 05/31/2027",
+  "country": "United States",
+  "distribution_pattern": "Nationwide inthe USA, as well as other foreign distribution.",
+  "event_id": "99114",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "NDA020832"
+   ],
+   "brand_name": [
+    "CHLORAPREP ONE-STEP"
+   ],
+   "generic_name": [
+    "CHLORHEXIDINE GLUCONATE AND ISOPROPYL ALCOHOL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "CareFusion 213, LLC"
+   ],
+   "package_ndc": [
+    "54365-400-31"
+   ],
+   "product_ndc": [
+    "54365-400"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "rxcui": [
+    "858726",
+    "998282"
+   ],
+   "spl_id": [
+    "42c769de-f1e0-b3a1-e063-6394a90ab2a1"
+   ],
+   "spl_set_id": [
+    "85291b2b-40b9-07fa-e053-2a91aa0a84e4"
+   ],
+   "substance_name": [
+    "CHLORHEXIDINE GLUCONATE",
+    "ISOPROPYL ALCOHOL"
+   ],
+   "unii": [
+    "MOR84MUD8E",
+    "ND2M416302"
+   ]
+  },
+  "postal_code": "79912-8000",
+  "product_description": "BD ChloraPrep Clear, (2% w/v chlorhexidine gluconate (CHG) and 70% v/v isopropyl alcohol (IPA) 1 mL Applicator, 60 Applicators, Sterile Solution, Care Fusion 213, LLC, El Paso, TX 79912, subsidiary of Beckton, Dickinson and Co., NDC 54365-400-31.",
+  "product_quantity": "N/A",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of Assurance of Sterility: Due to wrinkles in the paper lidding which may breach the seal   area.",
+  "recall_initiation_date": "20260528",
+  "recall_number": "D-0622-2026",
+  "recalling_firm": "CareFusion 213, LLC",
+  "report_date": "20260701",
+  "state": "TX",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0626-2026": {
+  "address_1": "Sy. No.261, Plot No. 13 And 14, Annaram Village, Gummadidal Mandal",
+  "address_2": "Jinnaram Mandal, Sangareddy District, Medak",
+  "center_classification_date": "20260625",
+  "city": "Hyderabad",
+  "classification": "Class II",
+  "code_info": "Lot: A253999, A254000, Expires: 09/30/2027.",
+  "country": "India",
+  "distribution_pattern": "Nationwide in the USA",
+  "event_id": "99200",
+  "initial_firm_notification": "E-Mail",
+  "openfda": {
+   "application_number": [
+    "ANDA204787"
+   ],
+   "brand_name": [
+    "LACOSAMIDE"
+   ],
+   "generic_name": [
+    "LACOSAMIDE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Camber Pharmaceuticals, Inc."
+   ],
+   "nui": [
+    "N0000008486"
+   ],
+   "package_ndc": [
+    "31722-812-60",
+    "31722-812-18",
+    "31722-812-05",
+    "31722-812-32",
+    "31722-813-60",
+    "31722-813-18",
+    "31722-813-05",
+    "31722-813-32",
+    "31722-814-60",
+    "31722-814-18",
+    "31722-814-05",
+    "31722-814-32",
+    "31722-815-60",
+    "31722-815-18",
+    "31722-815-05",
+    "31722-815-32"
+   ],
+   "pharm_class_pe": [
+    "Decreased Central Nervous System Disorganized Electrical Activity [PE]"
+   ],
+   "product_ndc": [
+    "31722-812",
+    "31722-813",
+    "31722-814",
+    "31722-815"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "809987",
+    "809992",
+    "809996",
+    "810000"
+   ],
+   "spl_id": [
+    "54d629b7-e234-69f1-e063-6294a90ab0e7"
+   ],
+   "spl_set_id": [
+    "c5b91128-f838-4e98-9684-5f477fc7af06"
+   ],
+   "substance_name": [
+    "LACOSAMIDE"
+   ],
+   "unii": [
+    "563KS2PQY5"
+   ],
+   "upc": [
+    "0331722815604",
+    "0331722813600",
+    "0331722814607",
+    "0331722812603"
+   ]
+  },
+  "postal_code": "N/A",
+  "product_description": "Lacosamide Tablets, USP, C V, 100mg, Rx only, 60-count bottle, By: Annora Pharma Pvt., Ltd, Sangareddy -502313, Telangana, India, Manufactured for: Camber Pharmaceuticals, Inc., Piscataway, NJ 08854, NDC 31722-813-60.",
+  "product_quantity": "31,392 60-count bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of a Foreign Tablets: Complaint received, possible mix-up of Selexipag 1000 mcg tablet in a bottle of Lacosamide Tablets USP, 100mg.",
+  "recall_initiation_date": "20260604",
+  "recall_number": "D-0626-2026",
+  "recalling_firm": "Annora Pharma Private Limited",
+  "report_date": "20260701",
+  "state": "N/A",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0627-2026": {
+  "address_1": "346 Pike Rd Ste 5",
+  "address_2": "Suite 1, 5, 13, & 23",
+  "center_classification_date": "20260625",
+  "city": "West Palm Beach",
+  "classification": "Class II",
+  "code_info": "Lots PO062402, Exp Date 6/30/2026, PO072401, Exp Date 7/30/2026, PO092401,    Exp Date 9/30/2026, PO102401,    Exp Date 10/31/2026 & PO102402, Exp Date 10/31/2026.",
+  "country": "United States",
+  "distribution_pattern": "Nationwide",
+  "event_id": "99191",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "M022"
+   ],
+   "brand_name": [
+    "POVI-ONE"
+   ],
+   "generic_name": [
+    "POVIDONE-IODINE 10% TOPICAL"
+   ],
+   "manufacturer_name": [
+    "Elevate Oral Care"
+   ],
+   "nui": [
+    "N0000175486",
+    "M0011640"
+   ],
+   "original_packager_product_ndc": [
+    "68599-3500"
+   ],
+   "package_ndc": [
+    "57511-0611-1"
+   ],
+   "pharm_class_cs": [
+    "Iodine [CS]"
+   ],
+   "pharm_class_epc": [
+    "Antiseptic [EPC]"
+   ],
+   "product_ndc": [
+    "57511-0611"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "spl_id": [
+    "3f1914a6-3095-23c3-e063-6294a90ac03a"
+   ],
+   "spl_set_id": [
+    "f5252b4f-5e14-509e-e053-2995a90a6db8"
+   ],
+   "substance_name": [
+    "POVIDONE-IODINE"
+   ],
+   "unii": [
+    "85H0HZU99M"
+   ]
+  },
+  "postal_code": "33411-3819",
+  "product_description": "Povi-One, 10% Povidone-Iodine Oral Antiseptic, Packaged by Elevate Oral Care, LLC, 346 Pike Road, Suite 6, West Palm Beach, FL 33411, NDC 57511-0611-1.",
+  "product_quantity": "8132 6-packs & 2262 2-packs",
+  "product_type": "Drugs",
+  "reason_for_recall": "sub potency",
+  "recall_initiation_date": "20260604",
+  "recall_number": "D-0627-2026",
+  "recalling_firm": "Elevate Oral Care",
+  "report_date": "20260701",
+  "state": "FL",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0628-2026": {
+  "address_1": "2 Independence Way",
+  "address_2": "N/A",
+  "center_classification_date": "20260626",
+  "city": "Princeton",
+  "classification": "Class II",
+  "code_info": "Lot AE01763, Expires 9/30/2027.",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA",
+  "event_id": "99256",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA209538"
+   ],
+   "brand_name": [
+    "PERAMPANEL"
+   ],
+   "generic_name": [
+    "PERAMPANEL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Sun Pharmaceutical Industries, Inc."
+   ],
+   "nui": [
+    "N0000186106",
+    "N0000020016",
+    "N0000191273",
+    "N0000191278",
+    "N0000182141",
+    "N0000187062"
+   ],
+   "package_ndc": [
+    "51672-4205-6",
+    "51672-4205-2",
+    "51672-4204-6",
+    "51672-4204-3",
+    "51672-4206-6",
+    "51672-4206-2",
+    "51672-4207-6",
+    "51672-4207-2",
+    "51672-4208-6",
+    "51672-4208-2",
+    "51672-4209-6",
+    "51672-4209-2"
+   ],
+   "pharm_class_epc": [
+    "Noncompetitive AMPA Glutamate Receptor Antagonist [EPC]"
+   ],
+   "pharm_class_moa": [
+    "AMPA Receptor Antagonists [MoA]",
+    "UGT2B7 Inhibitors [MoA]",
+    "UGT1A9 Inhibitors [MoA]",
+    "Cytochrome P450 3A4 Inhibitors [MoA]",
+    "Cytochrome P450 2C8 Inhibitors [MoA]"
+   ],
+   "product_ndc": [
+    "51672-4204",
+    "51672-4205",
+    "51672-4206",
+    "51672-4207",
+    "51672-4208",
+    "51672-4209"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "1356557",
+    "1356570",
+    "1356574",
+    "1356578",
+    "1356582",
+    "1356586"
+   ],
+   "spl_id": [
+    "4653e298-d84f-dc92-e063-6294a90a2d75"
+   ],
+   "spl_set_id": [
+    "1b0458ea-e718-4d48-ae55-ad9b4d863810"
+   ],
+   "substance_name": [
+    "PERAMPANEL"
+   ],
+   "unii": [
+    "H821664NPK"
+   ],
+   "upc": [
+    "0351672420567",
+    "0351672420666",
+    "0351672420765",
+    "0351672420963",
+    "0351672420468"
+   ]
+  },
+  "postal_code": "08540-6620",
+  "product_description": "Perampanel CIII Tablets, 6mg, Rx only, 30 Tablets, Mfd.by: Taro Pharmaceutical Industries Ltd., Haifa Bay, Israel 2624761, Dist. by: Sun Pharmaceutical Industries, Inc., Cranbury, NJ 08512, NDC 51672-4206-6",
+  "product_quantity": "3,456 30-count bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Labeling: Label Mix-up: 10mg Perampanel CIII tablet was found in a Perampanel CIII bottle labeled Perampanel 6 mg tablets.",
+  "recall_initiation_date": "20260617",
+  "recall_number": "D-0628-2026",
+  "recalling_firm": "SUN PHARMACEUTICAL INDUSTRIES INC",
+  "report_date": "20260701",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0629-2026": {
+  "address_1": "225 - 4 - 1 Saily Village",
+  "address_2": "Survey No",
+  "center_classification_date": "20260626",
+  "city": "Dadra And Nagar Haveli",
+  "classification": "Class II",
+  "code_info": "Lot# 0001, 0002, within expiry",
+  "country": "India",
+  "distribution_pattern": "US Nationwide.",
+  "event_id": "99137",
+  "initial_firm_notification": "E-Mail",
+  "more_code_info": "",
+  "openfda": {},
+  "postal_code": "N/A",
+  "product_description": "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt. 1.5 oz (42.5g) Tubes, Manufactured for Delta Brands Inc., 580 White Plains Rd., Tarrytown, NY 10591 USA, Made in India, UPC 8 08829 10461 5.",
+  "product_quantity": "1102 tubes",
+  "product_type": "Drugs",
+  "reason_for_recall": "CGMP Deviations; deficiencies observed during FDA inspection",
+  "recall_initiation_date": "20260602",
+  "recall_number": "D-0629-2026",
+  "recalling_firm": "Dabur India Limited",
+  "report_date": "20260624",
+  "state": "",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0643-2026": {
+  "address_1": "1550 Northwestern Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260629",
+  "city": "El Paso",
+  "classification": "Class II",
+  "code_info": "Lot: a) 3362296, expires: 12/31/2026, 4066870, expires: 02/28/2027, 4104107, expires: 03/31/2027, 4276125, expires: 09/30/2027; b) 4080695, expires: 03/31/2027, 4233300 expires: 08/31/2027.",
+  "country": "United States",
+  "distribution_pattern": "Distributed Nationwide in the USA",
+  "event_id": "99217",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "NDA020832"
+   ],
+   "brand_name": [
+    "CHLORAPREP ONE-STEP"
+   ],
+   "generic_name": [
+    "CHLORHEXIDINE GLUCONATE AND ISOPROPYL ALCOHOL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "CareFusion 213, LLC"
+   ],
+   "package_ndc": [
+    "54365-400-35"
+   ],
+   "product_ndc": [
+    "54365-400"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "rxcui": [
+    "858726",
+    "998282"
+   ],
+   "spl_id": [
+    "41ee78a5-45e8-b98d-e063-6394a90aa057"
+   ],
+   "spl_set_id": [
+    "8541f219-c060-399a-e053-2991aa0ab05c"
+   ],
+   "substance_name": [
+    "CHLORHEXIDINE GLUCONATE",
+    "ISOPROPYL ALCOHOL"
+   ],
+   "unii": [
+    "MOR84MUD8E",
+    "ND2M416302"
+   ]
+  },
+  "postal_code": "79912-8000",
+  "product_description": "BD ChloraPrep Hi-Lite Orange, (2% w/v chlorhexidine gluconate (CHG) and 70% v/v isopropyl alcohol (IPA)), packaged as a) 100 x 10.5 mL applicators/case, NDC 54365-400-35, Catalog Number: 930715NS; b) 100 x 10.5 mL applicators/case, Catalog Number bulk 930715NSB, NDC 54365-400-35; STERILE SOLUTION, CAREFUSION 213, LLC, EL PASO, TX 79912, subsidiary of Beckton, Dickson and Co.",
+  "product_quantity": "1,800 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of assurance of sterility: Unsterilized ChloraPrep & PurPrep Applicators, intended for further processing and sterilization were instead distributed to customers outside of the intended distribution channel",
+  "recall_initiation_date": "20260611",
+  "recall_number": "D-0643-2026",
+  "recalling_firm": "CareFusion 213, LLC",
+  "report_date": "20260708",
+  "state": "TX",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0653-2026": {
+  "address_1": "8041 Arco Corporate Dr Ste 200",
+  "address_2": "N/A",
+  "center_classification_date": "20260629",
+  "city": "Raleigh",
+  "classification": "Class II",
+  "code_info": "Lot # 004L24A, Exp Date: 02/19/2027.",
+  "country": "United States",
+  "distribution_pattern": "US Nationwide.",
+  "event_id": "99216",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "BLA761364"
+   ],
+   "brand_name": [
+    "IMULDOSA"
+   ],
+   "generic_name": [
+    "USTEKINUMAB-SRLF"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Accord BioPharma Inc."
+   ],
+   "package_ndc": [
+    "69448-018-63",
+    "69448-017-63",
+    "69448-019-26"
+   ],
+   "product_ndc": [
+    "69448-017",
+    "69448-018",
+    "69448-019"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "SUBCUTANEOUS"
+   ],
+   "rxcui": [
+    "2717067",
+    "2717074",
+    "2717078",
+    "2717083",
+    "2717085",
+    "2717086"
+   ],
+   "spl_id": [
+    "be75347b-ab5d-4104-b90e-7c7b1f46fbef"
+   ],
+   "spl_set_id": [
+    "2539a6cf-0fe5-1565-e063-6294a90a3618"
+   ],
+   "substance_name": [
+    "USTEKINUMAB-SRLF"
+   ],
+   "unii": [
+    "FU77B4U5Z0"
+   ],
+   "upc": [
+    "0369448017637",
+    "0369448018634"
+   ]
+  },
+  "postal_code": "27617-2091",
+  "product_description": "IMULDOSA, (ustekinumab-srlf) Injection, 130 mg/26 mL (5mg/mL), Rx only, Single dose vial, Manufactured by Accord BioPharma Inc., 8041 Arco corporate Drive, Suite 200, Raleigh, NC 27617, USA, Manufactured at: Catalent Indiana, LLC, 1300 S. Patterson Drive, Bloomington, IN 47403, USA, NDC 69448-019-26.",
+  "product_quantity": "326 vials",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of assurance of Sterility:",
+  "recall_initiation_date": "20260610",
+  "recall_number": "D-0653-2026",
+  "recalling_firm": "ACCORD BIOPHARMA INC",
+  "report_date": "20260708",
+  "state": "NC",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0655-2026": {
+  "address_1": "5801 Pelican Bay Blvd Ste 500",
+  "address_2": "N/A",
+  "center_classification_date": "20260630",
+  "city": "Naples",
+  "classification": "Class II",
+  "code_info": "Lots: a) HA00937, HA00939, HA00941, HA00971, H00973,  HA00975, Expires: 7/31/2026; HA00987, HA00989, HA00991, HA01010, HA01012, HA01014, HA01016, HA01048, Expires: 8/31/2026; HA01120, HA01137, HA01129, HA01138, HA01133, Expires: 9/30/2026; HA01148, HA01196, HA01198, HA01200, HA01206, HA01208, HA01210, HA01212, HA01214, HA01216, HA01218, HA01220, Expires: 10/31/2026; HA01236, HA01238, HA01240, HA01244, HA01246, HA01248, HA01261, HA01263, HA01265, HA01267, HA01278, HA01280, HA01282, HA01284, HA01288, HA01290, HA01292, HA01298, Expires: 11/30/2026; HB00002, HB00004, HB00006, HB00017, HB00019, HB00021, HB00023, HB00025, HB00031, HB00033, HB00035, HB00037, HB00039, HB00041, HB00043, Expires: 12/31/2026; HB00049, HB00051,  HB00076, HB00078, HB00080, HB00082, HB00084, Expires: 1/31/2027; HB00128, HB00130, HB00132, HB00134, HB00157, HB00159, HB00161, HB00196, HB00198, HB00200, Expires: 2/28/2027; HB00224, HB00226, HB00228, HB00230, HB00240, HB00242, Expires: 3/31/2027; HB00416, HB00417, HB00419, HB00439, HB00441, HB00443, HB00463, HB00465, Expires: 5/31/2027; HB00561, Expires: 6/30/2027; HB00569, HB00657, HB00659, HB00663, HB00671, HB00673, HB00675, HB00677, HB00679, Expires: 10/31/2027; HB00747, HB00749, HB00751, HB00753, Expires: 11/30/2027; HB00761, HB00763, HB00765, HB00783, HB00785, HC00002, HC00004, HC00006, HC00018, HC00020, HC00028, Expires: 12/31/2027; HC00030, HC00032, Expires: 1/31/2028; HC00056, HC00058, HC00062, HC00064, HC00073, HC00075, HC00079, HC00081, HC00083, Expires: 2/29/2028;  HC00091, Expires: 3/31/2028;  b) HA00945, HA00947, HA00949, Expires: 7/31/2026; HA01160, HA01162, HA01164, Expires: 10/31/2026; HA01234, HA01300, HA01302, Expires: 11/30/2026; HB00053, HB00055, HB00057, Expires: 1/31/2027; HB00107, HB00109, HB00111, HB00151, HB00153, HB00155, Expires: 2/28/2027; HB00386, HB00388, HB00390, HB00445, HB00447, Expires: 5/31/2027; HB00549, HB00551, HB00553, HB00555, Expires: 6/30/2027; HB00700, HB00702, Expires: 10/31/2027; HB00771, Expires: 11/30/2027; HC00008, HC00010, Expires: 12/31/2027; HC00034, HC00038, HC00054, HC00060, Expires: 1/31/2028;  c) HA00951, HA00953, HA00955, Expires: 7/31/2026; HA01188, HA01190, HA01192, Expires: 10/31/2026; HA01304, Expires: 11/30/2026; HB00113, HB00115, Expires: 1/31/2027; HB00166, HB00168, Expires: 2/28/2027; HB00392, HB00394, HB00396, Expires:5/31/2027; HB00545, HB00547, Expires: 6/30/2027; HB00704, Expires: 10/31/2027; HB00773, Expires: 11/30/2027; HC00012, HC00014, Expires: 12/31/2027; HC00066, HC00068, Expires: 2/29/2028.",
+  "country": "United States",
+  "distribution_pattern": "U.S. Nationwide",
+  "event_id": "99144",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA216935"
+   ],
+   "brand_name": [
+    "PREDNISOLONE ACETATE"
+   ],
+   "generic_name": [
+    "PREDNISOLONE ACETATE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Lupin Pharmaceuticals, Inc."
+   ],
+   "package_ndc": [
+    "70748-332-03",
+    "70748-332-02",
+    "70748-332-04"
+   ],
+   "product_ndc": [
+    "70748-332"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "OPHTHALMIC"
+   ],
+   "rxcui": [
+    "1376336"
+   ],
+   "spl_id": [
+    "8b7144d6-fff1-4afd-a80b-332ff7ed80a1"
+   ],
+   "spl_set_id": [
+    "75fbeab1-ce8d-4999-a875-472174be5cc6"
+   ],
+   "substance_name": [
+    "PREDNISOLONE ACETATE"
+   ],
+   "unii": [
+    "8B2807733D"
+   ]
+  },
+  "postal_code": "34108-2734",
+  "product_description": "prednisoLONE Acetate Ophthalmic Suspension, USP, 1%, Rx only, Sterile, a) 5 mL (NDC 70748-332-02); b) 10 mL (NDC 70748-332-03), c) 15 mL (70748-332-04), Manufactured by: Lupin Limited, Pithampur (M.P) 454 775, INDIA",
+  "product_quantity": "2,530,182 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of Foreign Substance",
+  "recall_initiation_date": "20260604",
+  "recall_number": "D-0655-2026",
+  "recalling_firm": "Lupin Pharmaceuticals Inc.",
+  "report_date": "20260708",
+  "state": "FL",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0656-2026": {
+  "address_1": "8041 Arco Corporate Dr Ste 200",
+  "address_2": "N/A",
+  "center_classification_date": "20260630",
+  "city": "Raleigh",
+  "classification": "Class II",
+  "code_info": "Lot # D2401522, Exp Date: 06/2026.",
+  "country": "United States",
+  "distribution_pattern": "US Nationwide.",
+  "event_id": "99194",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA212399"
+   ],
+   "brand_name": [
+    "LEVOTHYROXINE SODIUM"
+   ],
+   "generic_name": [
+    "LEVOTHYROXINE SODIUM"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Accord Healthcare Inc."
+   ],
+   "package_ndc": [
+    "16729-458-15",
+    "16729-458-17",
+    "16729-447-15",
+    "16729-447-17",
+    "16729-448-15",
+    "16729-448-17",
+    "16729-449-15",
+    "16729-449-17",
+    "16729-451-15",
+    "16729-451-17",
+    "16729-450-15",
+    "16729-450-17",
+    "16729-452-15",
+    "16729-452-17",
+    "16729-453-15",
+    "16729-453-17",
+    "16729-454-15",
+    "16729-454-17",
+    "16729-455-15",
+    "16729-455-17",
+    "16729-456-15",
+    "16729-456-17",
+    "16729-457-15",
+    "16729-457-17"
+   ],
+   "product_ndc": [
+    "16729-447",
+    "16729-458",
+    "16729-448",
+    "16729-449",
+    "16729-451",
+    "16729-450",
+    "16729-452",
+    "16729-453",
+    "16729-454",
+    "16729-455",
+    "16729-456",
+    "16729-457"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "892246",
+    "892251",
+    "892255",
+    "966220",
+    "966221",
+    "966222",
+    "966224",
+    "966225",
+    "966248",
+    "966249",
+    "966253",
+    "966270"
+   ],
+   "spl_id": [
+    "415fc774-31a5-124f-e063-6294a90a0e46"
+   ],
+   "spl_set_id": [
+    "a6233381-3043-4e9a-aaa6-a6b105e5142b"
+   ],
+   "substance_name": [
+    "LEVOTHYROXINE SODIUM"
+   ],
+   "unii": [
+    "9J765S329G"
+   ],
+   "upc": [
+    "0316729447157",
+    "0316729449151",
+    "0316729452151",
+    "0316729454155",
+    "0316729453158",
+    "0316729448154",
+    "0316729451154",
+    "0316729457156",
+    "0316729450157",
+    "0316729456159",
+    "0316729458153",
+    "0316729455152"
+   ]
+  },
+  "postal_code": "27617-2010",
+  "product_description": "Levothyroxine Sodium Tablets, USP, 300 mcg (0.3mg), 90 Tablets bottles, Rx only, Manufactured for: Accord Healthcare, Inc., Raleigh, NC 27617, Manufactured by: lntas Pharmaceuticals Limited, Camp Road, Selaqui, Dehradun-248 197, INDIA, NDC 16729-458-15.",
+  "product_quantity": "6432 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Subpotent Drug",
+  "recall_initiation_date": "20260608",
+  "recall_number": "D-0656-2026",
+  "recalling_firm": "ACCORD HEALTHCARE, INC.",
+  "report_date": "20260708",
+  "state": "NC",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0657-2026": {
+  "address_1": "900 Ridgebury Rd",
+  "address_2": "N/A",
+  "center_classification_date": "20260630",
+  "city": "Ridgefield",
+  "classification": "Class II",
+  "code_info": "Lot 3244413; Exp. 12/31/2028",
+  "country": "United States",
+  "distribution_pattern": "OH",
+  "event_id": "99233",
+  "initial_firm_notification": "Letter",
+  "openfda": {},
+  "postal_code": "06877-1058",
+  "product_description": "Synjardy XR Tablets (empagliflozin and metformin hydrochloride extended-release tablets), 12.5/1000 mg, 60 Tablets per Bottle, Rx only, Distributed by: Boehringer Ingelheim Pharmaceuticals, Inc., Ridgefield, CT 06877 USA.  NDC: 00597-0300-45",
+  "product_quantity": "560 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "CGMP Deviations: An incorrect detergent was used and the required swab sampling was not performed on a production hopper that had previously been used for a different product.",
+  "recall_initiation_date": "20260612",
+  "recall_number": "D-0657-2026",
+  "recalling_firm": "Boehringer Ingelheim Pharmaceuticals, Inc.",
+  "report_date": "20260708",
+  "state": "CT",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0658-2026": {
+  "address_1": "379 Van Ness Ave Ste 1403",
+  "address_2": "N/A",
+  "center_classification_date": "20260702",
+  "city": "Torrance",
+  "classification": "Class II",
+  "code_info": "Lot #: AE3102, 121924X2, 022525X4, 033125X1, 030426X2, 033125X2, 041725X3, 061225X1, 072225X3, 080525X6, 080525X7, 080525X8, 091225X1, 100225X2, 100625X1, 122225X4, 010626X3, 041326X4, Exp 11/30/2026; AE5052, 041426X2, 041726X1, 051826X2, Exp 04/30/2028.",
+  "country": "United States",
+  "distribution_pattern": "USA Nationwide",
+  "event_id": "99204",
+  "initial_firm_notification": "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit",
+  "openfda": {
+   "brand_name": [
+    "ACCUCAINE"
+   ],
+   "generic_name": [
+    "LIDOCAINE HYDROCHLORIDE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Asclemed USA, Inc."
+   ],
+   "package_ndc": [
+    "76420-715-01"
+   ],
+   "product_ndc": [
+    "76420-715"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "INFILTRATION"
+   ],
+   "spl_id": [
+    "02db6c14-f841-85bd-e063-6294a90a3bf9"
+   ],
+   "spl_set_id": [
+    "584642a8-9bed-4d86-bfaf-99018c180e34"
+   ],
+   "substance_name": [
+    "LIDOCAINE HYDROCHLORIDE"
+   ],
+   "unii": [
+    "V13007Z41A"
+   ]
+  },
+  "postal_code": "90501-7211",
+  "product_description": "Accucaine, Kit contains: Lidocaine HCl Injection USP, 1% (10 mg/mL), 5 mL single dose ampule, Rx Only, Distributed by Enovachem Pharmaceuticals, Torrance, CA 90501, NDC: 76420-715-01.",
+  "product_quantity": "N/A",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of Assurance of Sterility",
+  "recall_initiation_date": "20260608",
+  "recall_number": "D-0658-2026",
+  "recalling_firm": "Asclemed USA Inc.",
+  "report_date": "20260708",
+  "state": "CA",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0660-2026": {
+  "address_1": "1101 C Ave W",
+  "address_2": "N/A",
+  "center_classification_date": "20260702",
+  "city": "Seymour",
+  "classification": "Class II",
+  "code_info": "Lot#: 25285401A, Exp. Date: 04/2027",
+  "country": "United States",
+  "distribution_pattern": "US Nationwide.",
+  "event_id": "99319",
+  "initial_firm_notification": "Letter",
+  "openfda": {},
+  "postal_code": "47274-3342",
+  "product_description": "Dextroamphetamine Saccharate, Amphetamine Aspartate Monohydrate, Dextroamphetamine Sulfate and Amphetamine Sulfate Extended-Release Capsules, 5 mg, Rx Only, 100 capsules, Distributed by: Lannett Company, Inc., Philadelphia, PA 19136, NDC: 0527-0790-37.",
+  "product_quantity": "1392 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Labeling: Label Mix-up: Capsules contain only immediate-release (IR) pellets while labeled as ER capsules.",
+  "recall_initiation_date": "20260626",
+  "recall_number": "D-0660-2026",
+  "recalling_firm": "Lannett Company Inc.",
+  "report_date": "20260708",
+  "state": "IN",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0661-2026": {
+  "address_1": "10 Independence Blvd",
+  "address_2": "N/A",
+  "center_classification_date": "20260709",
+  "city": "Warren",
+  "classification": "Class II",
+  "code_info": "Lot #: 5PB0465, 5PB0466, 5PB0557, Exp 4/30/2027; 5PB0629, 5PB0630, 5PB0633, 5PB0637, 5PB0638, Exp 6/30/2027",
+  "country": "United States",
+  "distribution_pattern": "USA Nationwide",
+  "event_id": "99350",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA208915"
+   ],
+   "brand_name": [
+    "CINACALCET"
+   ],
+   "generic_name": [
+    "CINACALCET"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Cipla USA Inc."
+   ],
+   "package_ndc": [
+    "69097-410-02",
+    "69097-411-02",
+    "69097-412-02"
+   ],
+   "product_ndc": [
+    "69097-410",
+    "69097-411",
+    "69097-412"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "432400",
+    "432401",
+    "432402"
+   ],
+   "spl_id": [
+    "383a7dc8-b195-4868-8774-f16a5558771e"
+   ],
+   "spl_set_id": [
+    "02b8c11b-99e8-4039-b6fa-a9c38d2f48fa"
+   ],
+   "substance_name": [
+    "CINACALCET HYDROCHLORIDE"
+   ],
+   "unii": [
+    "1K860WSG25"
+   ]
+  },
+  "postal_code": "07059-2730",
+  "product_description": "Cinacalcet Hydrochloride Tablets, 30 mg, 30-count bottle, Rx Only, Manufactured by: Cipla Ltd., MIDC, Patalganga, India; Manufactured for: Cipla USA, Inc., 10 Independence Boulevard, Suite 300, Warren, NJ 07059, NDC 69097-410-02",
+  "product_quantity": "31,824 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "cGMP Deviations: presence of N-nitroso-cinacalcet, above the acceptable daily intake (ADI).",
+  "recall_initiation_date": "20260629",
+  "recall_number": "D-0661-2026",
+  "recalling_firm": "Cipla USA, Inc.",
+  "report_date": "20260708",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0677-2026": {
+  "address_1": "3940 Quebec Ave N",
+  "address_2": "",
+  "center_classification_date": "20260713",
+  "city": "Minneapolis",
+  "classification": "Class II",
+  "code_info": "Lot #: 205060, Exp 09/30/2027",
+  "country": "United States",
+  "distribution_pattern": "USA Nationwide",
+  "event_id": "99283",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA062225"
+   ],
+   "brand_name": [
+    "NYSTATIN"
+   ],
+   "generic_name": [
+    "NYSTATIN"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Padagis Israel Pharmaceuticals Ltd"
+   ],
+   "nui": [
+    "N0000175498",
+    "M0017172"
+   ],
+   "package_ndc": [
+    "45802-059-35",
+    "45802-059-11"
+   ],
+   "pharm_class_cs": [
+    "Polyenes [CS]"
+   ],
+   "pharm_class_epc": [
+    "Polyene Antifungal [EPC]"
+   ],
+   "product_ndc": [
+    "45802-059"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "rxcui": [
+    "543546"
+   ],
+   "spl_id": [
+    "e2839c50-5b8f-4e7b-9636-d22687038a89"
+   ],
+   "spl_set_id": [
+    "e630aa3d-11a6-4300-942a-cbdf2d016f77"
+   ],
+   "substance_name": [
+    "NYSTATIN"
+   ],
+   "unii": [
+    "BDF1O1C72E"
+   ]
+  },
+  "postal_code": "55427-1244",
+  "product_description": "Nystatin Cream USP, (100,000 USP Nystatin Units), NET WT 15 g, Rx only, 15 g tube, Manufactured by Padagis, Yeruham, Israel, NDC 45802-059-35",
+  "product_quantity": "180,936 tubes",
+  "product_type": "Drugs",
+  "reason_for_recall": "Subpotent Drug: Low out of specification assay results performed during long-term stability testing.",
+  "recall_initiation_date": "20260623",
+  "recall_number": "D-0677-2026",
+  "recalling_firm": "Padagis US LLC",
+  "report_date": "20260722",
+  "state": "MN",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0678-2026": {
+  "address_1": "200 W Beaver St",
+  "address_2": "",
+  "center_classification_date": "20260714",
+  "city": "Belle Plaine",
+  "classification": "Class II",
+  "code_info": "Lot: a) 1505121, 1504242, exp 2027-03; 1505132, 1505182, 1505191, 1505291, 1505331, exp 2027-04; b) 1504231, 1504311, exp 2027-03; 1505312, 1505321, exp 2027-04.",
+  "country": "United States",
+  "distribution_pattern": "U.S Nationwide",
+  "event_id": "99278",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "M014"
+   ],
+   "brand_name": [
+    "CVS HEALTH EARWAX REMOVAL DROPS EARWAX REMOVAL AID",
+    "CVS HEALTH EARWAX REMOVAL KIT"
+   ],
+   "generic_name": [
+    "CARBAMIDE PEROXIDE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "CVS Pharmacy, Inc."
+   ],
+   "package_ndc": [
+    "51316-822-00",
+    "51316-823-00"
+   ],
+   "product_ndc": [
+    "51316-822",
+    "51316-823"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "rxcui": [
+    "702050"
+   ],
+   "spl_id": [
+    "1ba4260c-f726-77de-e063-6294a90ab529",
+    "52f5c6f4-95ea-d093-e063-6394a90a037c"
+   ],
+   "spl_set_id": [
+    "42a22e06-1b66-4359-852c-7c39e1b3940a",
+    "f842534c-46dd-42c7-8386-9a03ce16da86"
+   ],
+   "substance_name": [
+    "CARBAMIDE PEROXIDE"
+   ],
+   "unii": [
+    "31PZ2VAU81"
+   ],
+   "upc": [
+    "0050428078273"
+   ]
+  },
+  "postal_code": "56011-1894",
+  "product_description": "CVS Health, Carbamide Peroxide, 6.5%, 0.5 FL Oz (15 mL), a) Bottle (NDC 51316-822-00.); b) Kit (1 BULB, Syringe & Drops- NDC 51316-823-00.), Distributed by: CVS Pharmacy., Inc. One CVS Drive, Woonsocket, RI 02895,",
+  "product_quantity": "106,301 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "SubPotent Drug: low pH and significantly reduced assay (~0.6% vs expected ~6 7%).",
+  "recall_initiation_date": "20260625",
+  "recall_number": "D-0678-2026",
+  "recalling_firm": "Bell Pharmaceuticals, Inc",
+  "report_date": "20260722",
+  "state": "MN",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0689-2026": {
+  "address_1": "175 Regency Woods Pl Ste 600",
+  "address_2": "",
+  "center_classification_date": "20260714",
+  "city": "Cary",
+  "classification": "Class II",
+  "code_info": "Lot #: 1239521, 1237454, Exp. Date 10/2027",
+  "country": "United States",
+  "distribution_pattern": "Nationwide within the United States",
+  "event_id": "99376",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "NDA022156"
+   ],
+   "brand_name": [
+    "CLEVIPREX"
+   ],
+   "generic_name": [
+    "CLEVIPIDINE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Chiesi USA, Inc."
+   ],
+   "nui": [
+    "N0000000069",
+    "N0000175421",
+    "M0006414"
+   ],
+   "package_ndc": [
+    "10122-611-01",
+    "10122-611-10",
+    "10122-610-01",
+    "10122-610-10"
+   ],
+   "pharm_class_cs": [
+    "Dihydropyridines [CS]"
+   ],
+   "pharm_class_epc": [
+    "Dihydropyridine Calcium Channel Blocker [EPC]"
+   ],
+   "pharm_class_moa": [
+    "Calcium Channel Antagonists [MoA]"
+   ],
+   "product_ndc": [
+    "10122-610",
+    "10122-611"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "INTRAVENOUS"
+   ],
+   "rxcui": [
+    "1790239",
+    "1790242",
+    "1790245",
+    "1790246"
+   ],
+   "spl_id": [
+    "e472cde4-d29e-44b2-b1ca-a6f4fcc01b1d"
+   ],
+   "spl_set_id": [
+    "f9290625-b723-4eda-bab8-a97bef6041f6"
+   ],
+   "substance_name": [
+    "CLEVIDIPINE"
+   ],
+   "unii": [
+    "19O2GP3B7Q"
+   ]
+  },
+  "postal_code": "27518-6007",
+  "product_description": "CLEVIPREX (clevidipine injectable emulsion) 50 mg/100 mL (0.5 mg/mL), 10 Single Use Vials, Rx Only, Manufactured for: Chiesi USA, Inc., Cary, NC 27518, by Fresenius Kabi, Graz, Austria, NDC 10122-611-10.",
+  "product_quantity": "44280 vials",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of Assurance of Sterility",
+  "recall_initiation_date": "20260706",
+  "recall_number": "D-0689-2026",
+  "recalling_firm": "Chiesi USA, Inc.",
+  "report_date": "20260722",
+  "state": "NC",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0690-2026": {
+  "address_1": "1550 Northwestern Dr",
+  "address_2": "",
+  "center_classification_date": "20260715",
+  "city": "El Paso",
+  "classification": "Class II",
+  "code_info": "Lots: 4062535, 4065201, 4066446, Exp. 2/28/2027; 4141090, Exp. 5/31/2027; 4180288, 4197695, 4197697, 4180291, Exp. 6/30/2027; 4219454, 4221945, 4221966, 4222853, 4224361, Exp. 7/31/2027; 4228482, 4248656, 4249026, 4248961, 4249818, 4250729, Exp. 8/31/2027; 5124984, 5127231, 5129058, 5126398, 5129488, Exp. 4/30/2028; 5130576, 5142947, 5147432, 5154673, 5154671, 5156442, 5157968, 5158031, 5150160, 5155824, Exp. 5/31/2028; 5176326, 5181676, 5181074, 5182660, 5188102, 5188103, Exp. 6/30/2028;  5195818, 5199118, 5209474, 5210853, 5211985, 5211907, 5211212, Exp. 7/31/2028;  5226576, 5227151, 5230531, 5241733, 5242057, 5243430, 5246952, 5248375, 5248189, Exp. 8/31/2028; 5254509, 5274692, 5276968, 5279226, 5280240, Exp. 9/30/2028; 5305661, 5307185, 5309623, 5310701, Exp. 10/31/2028; 5346128, 5350797, Exp. 12/31/2028; 6031034, 6031234, 6037918, Exp. 1/31/2029; 6051588, 6054213, 6062168, 6063361, Exp. 2/28/2029; 6069891, Exp. 3/31/2029; 6111107, Exp. 4/30/2029.",
+  "country": "United States",
+  "distribution_pattern": "U.S.A. Nationwide",
+  "event_id": "99377",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "NDA020832"
+   ],
+   "brand_name": [
+    "CHLORAPREP ONE-STEP"
+   ],
+   "generic_name": [
+    "CHLORHEXIDINE GLUCONATE AND ISOPROPYL ALCOHOL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "CareFusion 213, LLC"
+   ],
+   "package_ndc": [
+    "54365-400-31"
+   ],
+   "product_ndc": [
+    "54365-400"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "rxcui": [
+    "858726",
+    "998282"
+   ],
+   "spl_id": [
+    "42c769de-f1e0-b3a1-e063-6394a90ab2a1"
+   ],
+   "spl_set_id": [
+    "85291b2b-40b9-07fa-e053-2a91aa0a84e4"
+   ],
+   "substance_name": [
+    "CHLORHEXIDINE GLUCONATE",
+    "ISOPROPYL ALCOHOL"
+   ],
+   "unii": [
+    "MOR84MUD8E",
+    "ND2M416302"
+   ]
+  },
+  "postal_code": "79912-8000",
+  "product_description": "BD ChloraPrep Clear, (2% w/v chlorhexidine gluconate (CHG) and 70% v/v isopropyl alcohol), 60 x 1 mL applicators/carton, 0.03fl oz (1 mL) each, STERILE SOLUTION, CareFusion 123, LLC, El Paso, TX, subsidiary of Beckton, Dickson and Co. NDC 54365-400-31",
+  "product_quantity": "43,066,599 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of Assurance of Sterility: Affected product may exhibit an open or incomplete seal on the packaging of the applicator",
+  "recall_initiation_date": "20260709",
+  "recall_number": "D-0690-2026",
+  "recalling_firm": "CareFusion 213, LLC",
+  "report_date": "20260722",
+  "state": "TX",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0700-2026": {
+  "address_1": "7000 Cardinal Pl",
+  "address_2": "N/A",
+  "center_classification_date": "20260717",
+  "city": "Dublin",
+  "classification": "Class II",
+  "code_info": "Lot#: N02212, Exp. Date 07/2026",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA.",
+  "event_id": "99399",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA209713"
+   ],
+   "brand_name": [
+    "LEVOTHYROXINE SODIUM"
+   ],
+   "generic_name": [
+    "LEVOTHYROXINE SODIUM"
+   ],
+   "manufacturer_name": [
+    "Major Pharmaceuticals"
+   ],
+   "original_packager_product_ndc": [
+    "68180-965",
+    "68180-966",
+    "68180-967",
+    "68180-968",
+    "68180-969",
+    "68180-970",
+    "68180-971",
+    "68180-973",
+    "68180-974"
+   ],
+   "package_ndc": [
+    "0904-6949-61",
+    "0904-6950-61",
+    "0904-6951-61",
+    "0904-6952-61",
+    "0904-6953-61",
+    "0904-6954-61",
+    "0904-6955-61",
+    "0904-6956-61",
+    "0904-6957-61"
+   ],
+   "product_ndc": [
+    "0904-6949",
+    "0904-6950",
+    "0904-6951",
+    "0904-6952",
+    "0904-6953",
+    "0904-6954",
+    "0904-6955",
+    "0904-6956",
+    "0904-6957"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "892246",
+    "966220",
+    "966221",
+    "966222",
+    "966224",
+    "966225",
+    "966248",
+    "966249",
+    "966253"
+   ],
+   "spl_id": [
+    "942c00a3-b31c-48d5-a63d-6d394645ee1f"
+   ],
+   "spl_set_id": [
+    "333642fd-93ae-4dc0-9c83-6d6b163c1c74"
+   ],
+   "substance_name": [
+    "LEVOTHYROXINE SODIUM"
+   ],
+   "unii": [
+    "9J765S329G"
+   ]
+  },
+  "postal_code": "43017-1091",
+  "product_description": "Levothyroxine Sodium Tablets, USP, 25 mcg (0.025 mg), 100 Tablets (10 x 10 unit dose blisters) per carton, Rx only, Packaged and Distributed by: MAJOR PHARMACEUTICALS, Indianapolis, IN 46268 USA.  NDC: 0904-6949-61",
+  "product_quantity": "N/A",
+  "product_type": "Drugs",
+  "reason_for_recall": "Subpotent Drug",
+  "recall_initiation_date": "20260713",
+  "recall_number": "D-0700-2026",
+  "recalling_firm": "Major Pharmaceuticals",
+  "report_date": "20260729",
+  "state": "OH",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0712-2026": {
+  "address_1": "135 Us Highway 202 206 Ste 15",
+  "address_2": "N/A",
+  "center_classification_date": "20260720",
+  "city": "Bedminster",
+  "classification": "Class II",
+  "code_info": "Lot 25121311, expiry 3/31/2028",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA",
+  "event_id": "99385",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA209042"
+   ],
+   "brand_name": [
+    "AMLODIPINE AND OLMESARTAN MEDOXOMIL"
+   ],
+   "generic_name": [
+    "AMLODIPINE AND OLMESARTAN MEDOXOMIL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Ascend Laboratories, LLC"
+   ],
+   "package_ndc": [
+    "67877-499-30",
+    "67877-499-90",
+    "67877-500-30",
+    "67877-500-90",
+    "67877-501-30",
+    "67877-501-90",
+    "67877-502-30",
+    "67877-502-90"
+   ],
+   "product_ndc": [
+    "67877-499",
+    "67877-500",
+    "67877-501",
+    "67877-502"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "730861",
+    "730866",
+    "730869",
+    "730872"
+   ],
+   "spl_id": [
+    "32238052-6c4c-4b29-a59e-524c819c69f1"
+   ],
+   "spl_set_id": [
+    "c1204fbe-d086-43cf-bbaa-efec9cd0487c"
+   ],
+   "substance_name": [
+    "AMLODIPINE BESYLATE",
+    "OLMESARTAN MEDOXOMIL"
+   ],
+   "unii": [
+    "864V2Q084H",
+    "6M97XTV3HD"
+   ]
+  },
+  "postal_code": "07921-2608",
+  "product_description": "Amlodipine and Olmesartan Medoxomil Tablets, 10 mg/20 mg, 30 Tablets per bottle, Rx Only, Manufactured by: Alkem Laboratories Ltd., INDIA; Distributed by: Ascend Laboratories, LLC., Parsnippany, NJ 07054.  NDC: 67877-500-30",
+  "product_quantity": "6,192 bottles",
+  "product_type": "Drugs",
+  "reason_for_recall": "Failed Dissolution Specifications; Olmesartan Medoxomil content below specifications",
+  "recall_initiation_date": "20260708",
+  "recall_number": "D-0712-2026",
+  "recalling_firm": "Ascend Laboratories, LLC",
+  "report_date": "20260729",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0715-2026": {
+  "address_1": "No. 16 Vsip, Street No. 5",
+  "address_2": "Vietnam Singapore Industrial Park",
+  "center_classification_date": "20260723",
+  "city": "Ho Chi Minh",
+  "classification": "Class II",
+  "code_info": "Lot #: 3H1V, Exp. Date 2026/07; 3J1V, 3J2V, Exp. Date 2026/09; 3K1V, Exp. Date 2026/10;  4A1V, 4A2V, Exp. Date 2026/12; 4B1V, 4B2V, Exp. Date 2027/01; 4G1V, 4G2V, 4G3V, Exp. Date 2027/06; 4I1V, 4I2V, 4I2VA Exp. Date 2027/08; 4J1V, 4J2V, Exp. Date 2027/09; 4K2V, 4K3V, 4K4V Exp. Date2027/10; 5B1V, 5B2V, 5B3V, Exp. Date 2028/01; 5D1V, Exp. Date 2028/03; 5E1V, 5E2V, 5E3V, Exp. Date 2028/04; 5H1V, Exp. Date 2028/07; 5I1V, Exp. Date 2028/08; 5J1V, 5J2V, Exp. Date 2028/09; 5L1V, 5L1VA, 5L1VB, 5L1VC, 5L1VD, 5L2V,Exp. Date 2028/11; 6A1V,  6A2V, Exp. Date 2028/12; 6B1V, Exp. Date 2029/01 & Lot 6C1V, Exp. Date 2029/02.",
+  "country": "Vietnam",
+  "distribution_pattern": "Nationwide within the United States",
+  "event_id": "99440",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "M018"
+   ],
+   "brand_name": [
+    "ROHTO"
+   ],
+   "generic_name": [
+    "HYPROMELLOSE, TETRAHYDROZOLINE HYDROCHLORIDE, ZINC SULFATE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "The Mentholatum Company"
+   ],
+   "package_ndc": [
+    "10742-8146-1",
+    "3107420108"
+   ],
+   "product_ndc": [
+    "10742-8146"
+   ],
+   "product_type": [
+    "HUMAN OTC DRUG"
+   ],
+   "route": [
+    "OPHTHALMIC"
+   ],
+   "rxcui": [
+    "1098640"
+   ],
+   "spl_id": [
+    "53610d02-cacc-6819-e063-6294a90ab06e"
+   ],
+   "spl_set_id": [
+    "43e690e4-b381-46e3-838c-33aef5bdadde"
+   ],
+   "substance_name": [
+    "HYPROMELLOSE, UNSPECIFIED",
+    "TETRAHYDROZOLINE HYDROCHLORIDE",
+    "ZINC SULFATE, UNSPECIFIED FORM"
+   ],
+   "unii": [
+    "3NXW29V3WO",
+    "0YZT43HS7D",
+    "89DS0H96TB"
+   ],
+   "upc": [
+    "0310742010862",
+    "310742010862"
+   ]
+  },
+  "postal_code": "N/A",
+  "product_description": "Rohto Cooling Eye Drops ALL-IN-ONE (hypromellose 0.2%, tetrahydrozoline HCL 0.05%, zinc sulfate 0.25%), Sterile 0.4 FL OZ (13 mL), Distributed by: The Mentholatum Company, Orchard Park, NY 14127, Made in Vietnam UPC 310742010862, NDC 10742-8146-1",
+  "product_quantity": "1.033,266 cartons",
+  "product_type": "Drugs",
+  "reason_for_recall": "Lack of Assurance of Sterility",
+  "recall_initiation_date": "20260714",
+  "recall_number": "D-0715-2026",
+  "recalling_firm": "Rohto-Mentholatum (Vietnam) Co., Ltd.",
+  "report_date": "20260729",
+  "state": "N/A",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0724-2026": {
+  "address_1": "2 Tower Center Blvd Ste 1401",
+  "address_2": "N/A",
+  "center_classification_date": "20260723",
+  "city": "East Brunswick",
+  "classification": "Class II",
+  "code_info": "Lots: Batch # CR2518, Exp. 11/2027; Batch # CR2601, Exp. 12/2027; CR2602, CR2603, Exp. 01/2028; CR2604, CR2605, Exp. 02/2028.",
+  "country": "United States",
+  "distribution_pattern": "Nationwide U.S.A.",
+  "event_id": "99401",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA040668"
+   ],
+   "brand_name": [
+    "CYPROHEPTADINE HYDROCHLORIDE"
+   ],
+   "generic_name": [
+    "CYPROHEPTADINE HYDROCHLORIDE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Rising Pharma Holdings, Inc."
+   ],
+   "package_ndc": [
+    "64980-504-48"
+   ],
+   "product_ndc": [
+    "64980-504"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "866021"
+   ],
+   "spl_id": [
+    "9b4845c1-9b59-4809-9247-50565fc4b6fb"
+   ],
+   "spl_set_id": [
+    "e2bf4d46-6585-41d9-868c-98603b165d5b"
+   ],
+   "substance_name": [
+    "CYPROHEPTADINE HYDROCHLORIDE"
+   ],
+   "unii": [
+    "NJ82J0F8QC"
+   ],
+   "upc": [
+    "0364980504485"
+   ]
+  },
+  "postal_code": "08816-1149",
+  "product_description": "Rising, Cyproheptadine Hydrochloride Syrup, 2mg/5 mL, 473 mL (ONE PINT), Rx only, Manufactured for: Rising Pharma Holdings, Inc., East Brunswick, NJ, Manufactured by: Lyne Laboratories, Inc., Brockton, MA. NDC 64980-504-48.",
+  "product_quantity": "74208 units",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of Precipitate: medication was crystallizing and particles floating in the bottle",
+  "recall_initiation_date": "20260713",
+  "recall_number": "D-0724-2026",
+  "recalling_firm": "Rising Pharma Holding, Inc.",
+  "report_date": "20260729",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0725-2026": {
+  "address_1": "3 Corporate Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260723",
+  "city": "Lake Zurich",
+  "classification": "Class II",
+  "code_info": "Lot #: 6134349, 6134620 Exp. Date 11/2026",
+  "country": "United States",
+  "distribution_pattern": "Nationwide within in the USA",
+  "event_id": "99449",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA209328"
+   ],
+   "brand_name": [
+    "GLYCOPYRROLATE"
+   ],
+   "generic_name": [
+    "GLYCOPYRROLATE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Fresenius Kabi USA, LLC"
+   ],
+   "package_ndc": [
+    "63323-578-03",
+    "63323-578-01",
+    "63323-578-04",
+    "63323-578-02",
+    "63323-578-07",
+    "63323-578-05",
+    "63323-578-18",
+    "63323-578-20"
+   ],
+   "product_ndc": [
+    "63323-578"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "INTRAMUSCULAR",
+    "INTRAVENOUS"
+   ],
+   "rxcui": [
+    "238212",
+    "1731582",
+    "1731590"
+   ],
+   "spl_id": [
+    "779dc924-ecc3-41cc-8cf9-a7354db4f763"
+   ],
+   "spl_set_id": [
+    "54458620-d888-4df6-ae4b-78c3dfed3423"
+   ],
+   "substance_name": [
+    "GLYCOPYRROLATE"
+   ],
+   "unii": [
+    "V92SO9WP2I"
+   ],
+   "upc": [
+    "0363323578046",
+    "0363323578039",
+    "0363323578077"
+   ]
+  },
+  "postal_code": "60047-8930",
+  "product_description": "Glycopyrrolate Injection, USP, 1 mg per 5 mL (0.2 mg per mL), 25 x  5 mL fill in a 6.5 mL vial, Rx only, Multiple Dose Vials, Fresenius Kabi, Lake Zurich, IL 60047 NDC Tray: 63323-578-05; NDC Vial:  63323-578-07",
+  "product_quantity": "59,425 vials",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of Particulate Matter: Hair was found in product",
+  "recall_initiation_date": "20260716",
+  "recall_number": "D-0725-2026",
+  "recalling_firm": "Fresenius Kabi USA, LLC",
+  "report_date": "20260729",
+  "state": "IL",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0730-2026": {
+  "address_1": "220 Davidson Ave",
+  "address_2": "N/A",
+  "center_classification_date": "20260724",
+  "city": "Somerset",
+  "classification": "Class II",
+  "code_info": "Lot # DLHU0031, Exp Date: 06/30/2027.",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA.",
+  "event_id": "99481",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA204777"
+   ],
+   "brand_name": [
+    "DORZOLAMIDE HYDROCHLORIDE AND TIMOLOL MALEATE OPHTHALMIC SOLUTION"
+   ],
+   "generic_name": [
+    "DORZOLAMIDE HYDROCHLORIDE AND TIMOLOL MALEATE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Micro Labs Limited"
+   ],
+   "package_ndc": [
+    "42571-147-26"
+   ],
+   "product_ndc": [
+    "42571-147"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "OPHTHALMIC"
+   ],
+   "rxcui": [
+    "1923432"
+   ],
+   "spl_id": [
+    "22ff7483-50ec-42c6-e063-6394a90ae1fa"
+   ],
+   "spl_set_id": [
+    "f45cce05-fb47-4607-b68e-5a3d47e7235a"
+   ],
+   "substance_name": [
+    "DORZOLAMIDE HYDROCHLORIDE",
+    "TIMOLOL MALEATE"
+   ],
+   "unii": [
+    "QZO5366EW7",
+    "P8Y54F701R"
+   ],
+   "upc": [
+    "0342571147266"
+   ]
+  },
+  "postal_code": "08873-4149",
+  "product_description": "Dorzolamide HCl and Timolol Maleate Ophthalmic Solution, USP, 2%/0.5%, 10mL - bottle, Rx only, Manufactured by: Micro Labs Limited, India, Manufactured for: Micro Labs USA Inc., Somerset, NJ 08873. NDC 42571-147-26.",
+  "product_quantity": "N/A",
+  "product_type": "Drugs",
+  "reason_for_recall": "Defective Container: Firm received multiple complaints of broken cap spikes and undeliverable drops.",
+  "recall_initiation_date": "20260722",
+  "recall_number": "D-0730-2026",
+  "recalling_firm": "MICRO LABS USA INC",
+  "report_date": "20260805",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0731-2026": {
+  "address_1": "619 River Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260728",
+  "city": "Elmwood Park",
+  "classification": "Class II",
+  "code_info": "Lot #: 19260937A, Exp. Date February 2028; 19261225A, 19261185A, Exp. Date March 2028; 19261664A, 19261682A, Exp. Date April 2028.",
+  "country": "United States",
+  "distribution_pattern": "Nationwide within the United States.",
+  "event_id": "99490",
+  "initial_firm_notification": "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit",
+  "openfda": {
+   "application_number": [
+    "ANDA204637"
+   ],
+   "brand_name": [
+    "AZELAIC ACID"
+   ],
+   "generic_name": [
+    "AZELAIC ACID"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Glenmark Pharmaceuticals Inc., USA"
+   ],
+   "nui": [
+    "N0000008841",
+    "N0000009982"
+   ],
+   "package_ndc": [
+    "68462-626-52"
+   ],
+   "pharm_class_pe": [
+    "Decreased Protein Synthesis [PE]",
+    "Decreased Sebaceous Gland Activity [PE]"
+   ],
+   "product_ndc": [
+    "68462-626"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "TOPICAL"
+   ],
+   "rxcui": [
+    "1041518"
+   ],
+   "spl_id": [
+    "28cca0c1-2f38-4fa2-8aaf-d3c8978b0fc6"
+   ],
+   "spl_set_id": [
+    "0b5ab22e-c78a-4429-9a76-a4ba2d11fcde"
+   ],
+   "substance_name": [
+    "AZELAIC ACID"
+   ],
+   "unii": [
+    "F2VW3D43YT"
+   ],
+   "upc": [
+    "0368462626528"
+   ]
+  },
+  "postal_code": "07407-1317",
+  "product_description": "Azelaic Acid Gel, 15%, 50 gram tubes, For Topical Use only, Rx only, Distributed by: Glenmark Pharmaceuticals Inc., USA, Elmwood Park, NJ 07407, NDC 68462-626-52.",
+  "product_quantity": "N/A",
+  "product_type": "Drugs",
+  "reason_for_recall": "CGMP Deviations: Product quality complaints concerning abnormal texture or consistency (described as grainy, gritty, or sandy) were received.",
+  "recall_initiation_date": "20260723",
+  "recall_number": "D-0731-2026",
+  "recalling_firm": "Glenmark Pharmaceuticals Inc., USA",
+  "report_date": "20260805",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0733-2026": {
+  "address_1": "279 Princeton Hightstown Rd",
+  "address_2": "",
+  "center_classification_date": "20260804",
+  "city": "East Windsor",
+  "classification": "Class II",
+  "code_info": "Batch # DMC125018A, Exp Date: 07/2027.",
+  "country": "United States",
+  "distribution_pattern": "US Nationwide.",
+  "event_id": "99492",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA040319"
+   ],
+   "brand_name": [
+    "DICYCLOMINE HYDROCHLORIDE"
+   ],
+   "generic_name": [
+    "DICYCLOMINE HYDROCHLORIDE"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Aurobindo Pharma Limited"
+   ],
+   "package_ndc": [
+    "59651-719-01",
+    "59651-719-99"
+   ],
+   "product_ndc": [
+    "59651-719"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "991061"
+   ],
+   "spl_id": [
+    "ec746016-eed0-4e37-bb9c-cb430c8a7f07"
+   ],
+   "spl_set_id": [
+    "ec746016-eed0-4e37-bb9c-cb430c8a7f07"
+   ],
+   "substance_name": [
+    "DICYCLOMINE HYDROCHLORIDE"
+   ],
+   "unii": [
+    "CQ903KQA31"
+   ],
+   "upc": [
+    "0359651719015"
+   ]
+  },
+  "postal_code": "08520-1401",
+  "product_description": "Dicyclomine Hydrochloride Capsules, USP, 10mg, 1,000 bottles, Rx only, Distributed by: Aurobindo Pharma USA, Inc., 279 Princeton-Hightstown Road, East Windsor, NJ 08520, Made in India, NDC 59651-719-99",
+  "product_quantity": "6,408 bottles distributed to market",
+  "product_type": "Drugs",
+  "reason_for_recall": "shortfill; reports of empty capsules.",
+  "recall_initiation_date": "20260723",
+  "recall_number": "D-0733-2026",
+  "recalling_firm": "Aurobindo Pharma USA Inc",
+  "report_date": "20260812",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0734-2026": {
+  "address_1": "1311 Pineview Dr",
+  "address_2": "N/A",
+  "center_classification_date": "20260804",
+  "city": "Morgantown",
+  "classification": "Class II",
+  "code_info": "Lot #: 3241653, Exp 4/30/2027",
+  "country": "United States",
+  "distribution_pattern": "USA Nationwide",
+  "event_id": "99364",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA203859"
+   ],
+   "brand_name": [
+    "MYCOPHENOLATE MOFETIL"
+   ],
+   "generic_name": [
+    "MYCOPHENOLATE MOFETIL"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Mylan Institutional LLC"
+   ],
+   "package_ndc": [
+    "67457-386-00",
+    "67457-386-81"
+   ],
+   "product_ndc": [
+    "67457-386"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "INTRAVENOUS"
+   ],
+   "rxcui": [
+    "311881"
+   ],
+   "spl_id": [
+    "4c643876-2577-4197-ac9b-81bab65d1362"
+   ],
+   "spl_set_id": [
+    "da02b428-42a4-4007-b0b7-695f2db010f2"
+   ],
+   "substance_name": [
+    "MYCOPHENOLATE MOFETIL"
+   ],
+   "unii": [
+    "9242ECW6R0"
+   ]
+  },
+  "postal_code": "26505-3276",
+  "product_description": "Mycophenolate Mofetil for Injection USP, 500 mg/Vial, Single Dose Vial, 4 vials per carton, Rx only, Manufactured for: Mylan Institutional LLC, Morgantown, WV, 26505 USA, Made in India, NDC 67457-386-00.",
+  "product_quantity": "5688 vials",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of precipitate",
+  "recall_initiation_date": "20260702",
+  "recall_number": "D-0734-2026",
+  "recalling_firm": "MYLAN PHARMACEUTICALS INC",
+  "report_date": "20260805",
+  "state": "WV",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0743-2026": {
+  "address_1": "Hsinchu Science Park",
+  "address_2": "No. 255 Longyuan 1st Rd.; Longtan Dist.",
+  "center_classification_date": "20260807",
+  "city": "Taoyuan City",
+  "classification": "Class I",
+  "code_info": "Lot # C23019V1, Exp 10/31/2026; C24015V1, Exp 4/30/2027",
+  "country": "Taiwan",
+  "distribution_pattern": "USA Nationwide",
+  "event_id": "99437",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {},
+  "postal_code": "N/A",
+  "product_description": "Cyclophosphamide for Injection, USP, 1 gram/vial, One Single-Dose Vial, Rx only, Manufactured for: Long Grove Pharmaceuticals, LLC, Rosemont, IL 60018.  Manufactured in Taiwan, NDC 81298-8112-1",
+  "product_quantity": "4,077 vials",
+  "product_type": "Drugs",
+  "reason_for_recall": "Presence of Particulate Matter; identified as stainless steel",
+  "recall_initiation_date": "20260717",
+  "recall_number": "D-0743-2026",
+  "recalling_firm": "Sunny Pharmtech Inc.",
+  "report_date": "20260812",
+  "state": "",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "D-0745-2026": {
+  "address_1": "73 Route 31 N",
+  "address_2": "",
+  "center_classification_date": "20260807",
+  "city": "Pennington",
+  "classification": "Class II",
+  "code_info": "Lot # E408618, Expiry: 11/30/2026, NDC #: 70710-1159-3",
+  "country": "United States",
+  "distribution_pattern": "Nationwide in the USA",
+  "event_id": "99563",
+  "initial_firm_notification": "Letter",
+  "more_code_info": "",
+  "openfda": {
+   "application_number": [
+    "ANDA209488"
+   ],
+   "brand_name": [
+    "MIRABEGRON"
+   ],
+   "generic_name": [
+    "MIRABEGRON"
+   ],
+   "is_original_packager": [
+    true
+   ],
+   "manufacturer_name": [
+    "Zydus Pharmaceuticals (USA) Inc."
+   ],
+   "nui": [
+    "N0000185008",
+    "N0000185007",
+    "N0000182137",
+    "N0000190114",
+    "N0000185503"
+   ],
+   "package_ndc": [
+    "70710-1159-3",
+    "70710-1159-9",
+    "70710-1159-1",
+    "70710-1160-3",
+    "70710-1160-9",
+    "70710-1160-1"
+   ],
+   "pharm_class_epc": [
+    "beta3-Adrenergic Agonist [EPC]"
+   ],
+   "pharm_class_moa": [
+    "Adrenergic beta3-Agonists [MoA]",
+    "Cytochrome P450 2D6 Inhibitors [MoA]",
+    "Cytochrome P450 3A Inhibitors [MoA]",
+    "P-Glycoprotein Inhibitors [MoA]"
+   ],
+   "product_ndc": [
+    "70710-1159",
+    "70710-1160"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "1300791",
+    "1300801"
+   ],
+   "spl_id": [
+    "df34c0c9-8528-4fd6-a408-e1d44da0f156"
+   ],
+   "spl_set_id": [
+    "2e40eb74-3b2a-47f7-bf31-fe27484f9bd2"
+   ],
+   "substance_name": [
+    "MIRABEGRON"
+   ],
+   "unii": [
+    "MVR3JL3B2V"
+   ]
+  },
+  "postal_code": "08534-3601",
+  "product_description": "Mirabegron Extended-Release Tablets, 25 mg, 30-count bottle, Rx only, Manufactured by: Zydus Lifesciences Ltd., Matoda, Ahmedabad, India, Distributed by: Zydus Pharmaceuticals (USA) Inc., Pennington, NJ 08534, NDC 70710-1159-3.",
+  "product_quantity": "",
+  "product_type": "Drugs",
+  "reason_for_recall": "CGMP: Due to Out of Specification (OOS) result for N-Nitroso Mirabegron impurity.",
+  "recall_initiation_date": "20260805",
+  "recall_number": "D-0745-2026",
+  "recalling_firm": "Zydus Pharmaceuticals (USA) Inc",
+  "report_date": "20260812",
+  "state": "NJ",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "N/A": {
+  "address_1": "722 Progressive Ln",
+  "address_2": "N/A",
+  "city": "South Beloit",
+  "classification": "Not Yet Classified",
+  "code_info": "Lot # 506033, Exp Date: 11/30/2026.",
+  "country": "United States",
+  "distribution_pattern": "US Nationwide.",
+  "event_id": "99388",
+  "initial_firm_notification": "Letter",
+  "openfda": {
+   "application_number": [
+    "ANDA204438"
+   ],
+   "brand_name": [
+    "GLYCOPYRROLATE"
+   ],
+   "generic_name": [
+    "GLYCOPYRROLATE"
+   ],
+   "manufacturer_name": [
+    "Precision Dose, Inc."
+   ],
+   "original_packager_product_ndc": [
+    "49884-042"
+   ],
+   "package_ndc": [
+    "68094-073-01",
+    "68094-073-58"
+   ],
+   "product_ndc": [
+    "68094-073"
+   ],
+   "product_type": [
+    "HUMAN PRESCRIPTION DRUG"
+   ],
+   "route": [
+    "ORAL"
+   ],
+   "rxcui": [
+    "999961"
+   ],
+   "spl_id": [
+    "0a84301a-febc-4552-97d6-1fd16f191545"
+   ],
+   "spl_set_id": [
+    "e58f860b-e955-4d71-a128-93bd3812b08d"
+   ],
+   "substance_name": [
+    "GLYCOPYRROLATE"
+   ],
+   "unii": [
+    "V92SO9WP2I"
+   ]
+  },
+  "postal_code": "61080-2616",
+  "product_description": "Glycopyrrolate Oral Solution, 1 mg/5 mL, delivers 5 mL, Rx only, Pkg: Precision Dose, Inc, S. Beloil, IL 61080, unit-dose oral syringes, NDCs 68094-073-01 (oral syringe) and 68094-073-58 (case).",
+  "product_quantity": "N/A",
+  "product_type": "Drugs",
+  "reason_for_recall": "Due to an out-of-specification result for an unidentified impurity detected during routine stability testing.",
+  "recall_initiation_date": "20260714",
+  "recall_number": "N/A",
+  "recalling_firm": "Precision Dose Inc.",
+  "report_date": "20260729",
+  "state": "IL",
+  "status": "Ongoing",
+  "voluntary_mandated": "Voluntary: Firm initiated"
+ },
+ "hc-81925": {
+  "Archived": "0",
+  "Category": "Natural health products",
+  "Issue": "Contamination",
+  "Last updated": "2026-04-24",
+  "NID": "81925",
+  "Organization": "Drugs and health products",
+  "Product": "Sterile.H2O",
+  "Recall class": "Type II",
+  "Title": "H2O: Presence of particulate matter in affected lot",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/h2o-presence-particulate-matter-affected-lot",
+  "What you should do": " Verify if your product is affected. Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns. Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Liquid",
+  "medicinal_ingredient": "Water 100.0 %",
+  "nid": "81925",
+  "product_description": "Sterile.H2O",
+  "product_type": "Natural health products"
+ },
+ "hc-82001": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-04-29",
+  "NID": "82001",
+  "Organization": "Drugs and health products",
+  "Product": "PMS-BUSULFAN 6mg/mL",
+  "Recall class": "Type III",
+  "Title": "PMS-BUSULFAN 6mg/mL: impurity could be out of specification",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/pms-busulfan-6mgml-impurity-could-be-out-specification",
+  "What you should do": " Verify if your product is affected. Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns. Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Intravenous Solution",
+  "medicinal_ingredient": "Busulfan 6mg/mL",
+  "nid": "82001",
+  "product_description": "PMS-BUSULFAN 6mg/mL",
+  "product_type": "Drugs"
+ },
+ "hc-82272": {
+  "Archived": "0",
+  "Category": "Radiopharmaceuticals",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-02",
+  "NID": "82272",
+  "Organization": "Drugs and health products",
+  "Product": "Fludeoxyglucose (18F) Injection",
+  "Recall class": "Type III",
+  "Title": "Fludeoxyglucose (18F) Injection; Cracket vial",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/fludeoxyglucose-18f-injection-cracket-vial",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Solution",
+  "medicinal_ingredient": "Fludeoxyglucose 18F 0.5 GBq/vial",
+  "nid": "82272",
+  "product_description": "Fludeoxyglucose (18F) Injection",
+  "product_type": "Radiopharmaceuticals"
+ },
+ "hc-82286": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-06",
+  "NID": "82286",
+  "Organization": "Drugs and health products",
+  "Product": "JAMP Chlorthalidone 12.5 mg Tablets",
+  "Recall class": "Type III",
+  "Title": "JAMP Chlorthalidone 12.5 mg tablet: Out of specification (Dissolution)",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/jamp-chlorthalidone-125-mg-tablet-out-specification-dissolution",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Tablet",
+  "medicinal_ingredient": "Chlorthalidone 12.5 mg",
+  "nid": "82286",
+  "product_description": "JAMP Chlorthalidone 12.5 mg Tablets",
+  "product_type": "Drugs"
+ },
+ "hc-82324": {
+  "Archived": "0",
+  "Category": "Drugs - Natural health products",
+  "Issue": "Unauthorized product",
+  "Last updated": "2026-07-15",
+  "NID": "82324",
+  "Organization": "Drugs and health products",
+  "Product": "Supernova and Supreme Nicotine Film and Pouches",
+  "Recall class": "Type II",
+  "Title": "Supernova and Supreme Nicotine Film and Pouches Recall; No market authorization",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/supernova-and-supreme-nicotine-film-and-pouches-recall-no-market-authorization",
+  "What you should do": "Only use authorized nicotine replacement therapies as directed.Do not buy or use unauthorized nicotine replacement therapies. If you become aware of any unusual symptoms or side effects that may be associated with these products, contact your healthcare provider.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Film",
+  "medicinal_ingredient": "4 mg",
+  "nid": "82324",
+  "product_description": "Supernova and Supreme Nicotine Film and Pouches",
+  "product_type": "Drugs - Natural health products"
+ },
+ "hc-82325": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-13",
+  "NID": "82325",
+  "Organization": "Drugs and health products",
+  "Product": "Apo-Tiotropium 18 mcg Capsules",
+  "Recall class": "Type II",
+  "Title": "Apo-Tiotropium Capsules; Out-of-specification (particle size)",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/apo-tiotropium-capsules-out-specification-particle-size",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Capsule",
+  "medicinal_ingredient": "Tiotropium bromide monohydrate 18 mcg",
+  "nid": "82325",
+  "product_description": "Apo-Tiotropium 18 mcg Capsules",
+  "product_type": "Drugs"
+ },
+ "hc-82326": {
+  "Archived": "0",
+  "Category": "Natural health products",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-13",
+  "NID": "82326",
+  "Organization": "Drugs and health products",
+  "Product": "Oribe Serene Scalp Densifying Shampoo",
+  "Recall class": "Type II",
+  "Title": "Oribe Serene Scalp Densifying Shampoo; Presence of bacterial contamination",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/oribe-serene-scalp-densifying-shampoo-presence-bacterial-contamination",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Shampoo",
+  "medicinal_ingredient": "Not Applicable",
+  "nid": "82326",
+  "product_description": "Oribe Serene Scalp Densifying Shampoo",
+  "product_type": "Natural health products"
+ },
+ "hc-82327": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-13",
+  "NID": "82327",
+  "Organization": "Drugs and health products",
+  "Product": "BD ChloraPrep™ Clear - 1mL Applicator",
+  "Recall class": "Type II",
+  "Title": "BD ChloraPrep™ Clear - 1mL Applicator: Product sterility",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/bd-chlorapreptm-clear-1ml-applicator-product-sterility",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "dosage_form_detail": "Solution",
+  "medicinal_ingredient": "Chlorhexidine gluconate 2% w/v; Isopropyl alcohol 70% v/v",
+  "nid": "82327",
+  "product_description": "BD ChloraPrep™ Clear - 1mL Applicator",
+  "product_type": "Drugs"
+ },
+ "hc-82359": {
+  "Archived": "0",
+  "Category": "Natural health products",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-27",
+  "NID": "82359",
+  "Organization": "Drugs and health products",
+  "Product": "Holy Basil Tincture",
+  "Recall class": "Type III",
+  "Title": "Harmonic Arts Holy Basil Tincture; Out of Specification (total aerobic microbial count)",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/harmonic-arts-holy-basil-tincture-out-specification-total-aerobic-microbial-count",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints to Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Harmonic Arts",
+  "dosage_form_detail": "Tincture",
+  "medicinal_ingredient": "n/a",
+  "nid": "82359",
+  "product_description": "Holy Basil Tincture",
+  "product_type": "Natural health products"
+ },
+ "hc-82367": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Labelling",
+  "Last updated": "2026-07-20",
+  "NID": "82367",
+  "Organization": "Drugs and health products",
+  "Product": "ATTITUDE Bathroom Cleaner Disinfectant",
+  "Recall class": "Type III",
+  "Title": "ATTITUDE Bathroom Cleaner Disinfectant: Affected lot may be missing expiry date",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/attitude-bathroom-cleaner-disinfectant-affected-lot-may-be-missing-expiry-date",
+  "What you should do": "Discontinue use if you have the affected product.Contact the recalling firm if you have any questions about the recall.Report any health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "ATTITUDE",
+  "dosage_form_detail": "Spray",
+  "medicinal_ingredient": "Citric acid 2.4% / W/W Didecyl dimethyl ammonium chloride 0.01125% / W/W Dioctyl dimethyl ammonium chloride 0.01125% / W/W Octyl decyl dimethyl ammonium chloride 0.0225% / W/W",
+  "nid": "82367",
+  "product_description": "ATTITUDE Bathroom Cleaner Disinfectant",
+  "product_type": "Drugs"
+ },
+ "hc-82404": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-07-28",
+  "NID": "82404",
+  "Organization": "Drugs and health products",
+  "Product": "OXYGEN 100%",
+  "Recall class": "Type III",
+  "Title": "Oxygen 100%: Gas cylinders containing commercial grade oxygen",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/oxygen-100-gas-cylinders-containing-commercial-grade-oxygen",
+  "What you should do": "Consult your healthcare provider for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Air Liquide Canada Inc.",
+  "dosage_form_detail": "Gas",
+  "medicinal_ingredient": "100%",
+  "nid": "82404",
+  "product_description": "OXYGEN 100%",
+  "product_type": "Drugs"
+ },
+ "hc-82416": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Packaging",
+  "Last updated": "2026-07-30",
+  "NID": "82416",
+  "Organization": "Drugs and health products",
+  "Product": "Femyso Mifepristone 200mg / Misoprostol 200 mcg tablet",
+  "Recall class": "Type II",
+  "Title": "Femyso: Affected lot may contain two green Mifepristone cartons or two pink Misoprostol cartons instead of one of each.",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/femyso-affected-lot-may-contain-two-green-mifepristone-cartons-or-two-pink-misoprostol",
+  "What you should do": "Verify whether your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or if you have any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Lupin Pharma Canada Ltd.",
+  "dosage_form_detail": "Kit, Tablet",
+  "medicinal_ingredient": "Mifepristone 200 mg / Misoprostol 200 mcg",
+  "nid": "82416",
+  "product_description": "Femyso Mifepristone 200mg / Misoprostol 200 mcg tablet",
+  "product_type": "Drugs"
+ },
+ "hc-82429": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-08-05",
+  "NID": "82429",
+  "Organization": "Drugs and health products",
+  "Product": "JAMP Methotrexate 10 mg Tablets ",
+  "Recall class": "Type II",
+  "Title": "JAMP Methotrexate 10 mg Tablets: Affected lots may contain oversized tablets.",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/jamp-methotrexate-10-mg-tablets-affected-lots-may-contain-oversized-tablets",
+  "What you should do": "Verify whether your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or if you have any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "JAMP Pharma",
+  "dosage_form_detail": "Tablet",
+  "medicinal_ingredient": "10 mg",
+  "nid": "82429",
+  "product_description": "JAMP Methotrexate 10 mg Tablets",
+  "product_type": "Drugs"
+ },
+ "hc-82461": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Labelling",
+  "Last updated": "2026-08-07",
+  "NID": "82461",
+  "Organization": "Drugs and health products",
+  "Product": "TEVA-ECTOSONE 0.1% Cream",
+  "Recall class": "Type II",
+  "Title": "TEVA-ECTOSONE 0.1% Cream; Affected lot may be missing lot number and expiry date",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/teva-ectosone-01-cream-affected-lot-may-be-missing-lot-number-and-expiry-date",
+  "What you should do": "Verify if your product is affected. If the lot number and expiry date are missing, your product may be affected by this recall.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Teva Canada Limited",
+  "dosage_form_detail": "Cream",
+  "medicinal_ingredient": "0.10%",
+  "nid": "82461",
+  "product_description": "TEVA-ECTOSONE 0.1% Cream",
+  "product_type": "Drugs"
+ },
+ "hc-82477": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Packaging",
+  "Last updated": "2026-08-11",
+  "NID": "82477",
+  "Organization": "Drugs and health products",
+  "Product": "Semaglutide Injection",
+  "Recall class": "Type II",
+  "Title": "Semaglutide Injection: Incorrect Pen in Package",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/semaglutide-injection-incorrect-pen-package",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Dr. Reddy's Laboratories Canada Inc.",
+  "dosage_form_detail": "Solution",
+  "medicinal_ingredient": "1.34 mg/ml",
+  "nid": "82477",
+  "product_description": "Semaglutide Injection",
+  "product_type": "Drugs"
+ },
+ "hc-82479": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Contamination",
+  "Last updated": "2026-08-12",
+  "NID": "82479",
+  "Organization": "Drugs and health products",
+  "Product": "pms-IRBESARTAN 150 mg Tablet",
+  "Recall class": "Type II",
+  "Title": "pms-IRBESARTAN: Affected lot may contain pms-IRBESARTAN/HCTZ 150/12.5 mg tablets.",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/pms-irbesartan-affected-lot-may-contain-pms-irbesartanhctz-150125-mg-tablets",
+  "What you should do": "Verify whether your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or if you have any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Pharmascience Inc.",
+  "dosage_form_detail": "Tablet",
+  "medicinal_ingredient": "150 mg",
+  "nid": "82479",
+  "product_description": "pms-IRBESARTAN 150 mg Tablet",
+  "product_type": "Drugs"
+ },
+ "hc-82497": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-08-17",
+  "NID": "82497",
+  "Organization": "Drugs and health products",
+  "Product": "Lactated Ringer's Injection USP",
+  "Recall class": "Type I",
+  "Title": "Lactated Ringer's Injection USP: Presence of Particulate Matter",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/lactated-ringer-s-injection-usp-presence-particulate-matter",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "B. Braun Medical Inc.",
+  "dosage_form_detail": "Solution",
+  "medicinal_ingredient": "Calcium Chloride 20mg/100ml; Potassium Chloride 30mg/10ml; Sodium Chloride 600mg/100ml; Sodium Lactate 310mg/100ml",
+  "nid": "82497",
+  "product_description": "Lactated Ringer's Injection USP",
+  "product_type": "Drugs"
+ },
+ "hc-82501": {
+  "Archived": "0",
+  "Category": "Drugs",
+  "Issue": "Product quality",
+  "Last updated": "2026-08-19",
+  "NID": "82501",
+  "Organization": "Drugs and health products",
+  "Product": "CISATRACURIUM BESYLATE INJECTION USP MULTIDOSE",
+  "Recall class": "Type III",
+  "Title": "CISATRACURIUM BESYLATE INJECTION USP MULTIDOSE: The level of the degradation product Benzaldehyde may be out of specification in the affected lots.",
+  "URL": "https://recalls-rappels.canada.ca/en/alert-recall/cisatracurium-besylate-injection-usp-multidose-level-degradation-product-0",
+  "What you should do": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada.",
+  "api": "HC RSAM OpenData",
+  "company": "Omega Laboratories Limited",
+  "dosage_form_detail": "Solution",
+  "medicinal_ingredient": "Cisatracurium (Cisatracurium besilate) 2 mg/mL",
+  "nid": "82501",
+  "product_description": "CISATRACURIUM BESYLATE INJECTION USP MULTIDOSE",
+  "product_type": "Drugs"
+ },
+ "recall-014a35631d78": {
+  "BIZRNO": "1248601143",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)대웅제약",
+  "ITEM_SEQ": "201506800",
+  "PRDUCT": "크레젯정10/5밀리그램(에제티미브,로수바스타틴)",
+  "RECALL_COMMAND_DATE": "20260707",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "포장단위 표시사항 불일치(정제 수량 오기)",
+  "STD_CD": "8806416061503,8806416061510,8806416061527,8806416061534",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201506800"
+ },
+ "recall-0c507fba0be3": {
+  "BIZRNO": "1108100102",
+  "ENFRC_YN": "N",
+  "ENTRPS": "동화약품(주)",
+  "ITEM_SEQ": "202400388",
+  "PRDUCT": "리나디엠메트서방정2.5/1000밀리그램(리나글립틴,메트포르민)",
+  "RECALL_COMMAND_DATE": "20260702",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "불순물(N-nitroso-meglumine) 허용기준 초과 검출에 따른 영업자 회수",
+  "STD_CD": "8806427075605,8806427075612",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202400388"
+ },
+ "recall-10d86f490b95": {
+  "BIZRNO": "6178124930",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)휴온스메디텍",
+  "ITEM_SEQ": "201502928",
+  "PRDUCT": "휴니즈트라셋정",
+  "RECALL_COMMAND_DATE": "20260430",
+  "RTRVL_CMMND_DT": "20260504000000",
+  "RTRVL_RESN": "불순물(N-nitroso-desmethyl-tramadol) 허용기준 초과 검출",
+  "STD_CD": "8806704008906,8806704008913,8806704008920",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201502928"
+ },
+ "recall-117f512e15b2": {
+  "BIZRNO": "1078738943",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)옵투스제약",
+  "ITEM_SEQ": "201000241",
+  "PRDUCT": "옵살로신점안액(목시플록사신염산염)(1회용), 옵살로신점안액(목시플록사신염산염)",
+  "RECALL_COMMAND_DATE": "20260714",
+  "RTRVL_CMMND_DT": "20260715000000",
+  "RTRVL_RESN": "시판 후 안정성 시험에서 기타 개별 유연물질 기준 초과에 따른 영업자 회수",
+  "STD_CD": "8806741005005,8806741005012,8806741005029,8806741007702,8806741007719,8806741007726,8806741007801,8806741007818,8806741007825,8806741007832,8806741007900,8806741007917,8806741007924,8806741007931,8806741007948",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201000241"
+ },
+ "recall-11821a98ac66": {
+  "BIZRNO": "6828500435",
+  "ENFRC_YN": "N",
+  "ENTRPS": "일동제약(주)",
+  "ITEM_SEQ": "200907781",
+  "PRDUCT": "탁소젠주사\n(도세탁셀삼수화물)",
+  "RECALL_COMMAND_DATE": "20260723",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "시판후 안정성 시험에서 함량, 유연물질(개개유연물질, 총유연물질) 시험 기준 초과에 따른 영업자 회수",
+  "STD_CD": "8806429037809,8806429037816,8806429037908,8806429037915",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200907781"
+ },
+ "recall-12ea52aa8a64": {
+  "BIZRNO": "8638700270",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)휴온스",
+  "ITEM_SEQ": "200712587",
+  "PRDUCT": "휴트라돌세미정",
+  "RECALL_COMMAND_DATE": "20260430",
+  "RTRVL_CMMND_DT": "20260529000000",
+  "RTRVL_RESN": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과 검출",
+  "STD_CD": "8806706043103,8806706043110,8806706043127,8806706043134,8806706043141,8806706043158",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200712587"
+ },
+ "recall-28c806a97fb4": {
+  "BIZRNO": "1048124526",
+  "ENFRC_YN": "N",
+  "ENTRPS": "신원덴탈(주)",
+  "ITEM_SEQ": "200308019",
+  "PRDUCT": "셉타네스트주1/100,000",
+  "RECALL_COMMAND_DATE": "20260806",
+  "RTRVL_CMMND_DT": "20260806000000",
+  "RTRVL_RESN": "첨부문서 누락(사용상의 주의사항 일부)에 따른 영업자 회수",
+  "STD_CD": "8806583000206,8806583000213,8806583000220",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200308019"
+ },
+ "recall-293c444091c9": {
+  "BIZRNO": "1798801453",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)케이보은제약",
+  "ITEM_SEQ": "202101223",
+  "PRDUCT": "뷰카클래식구취케어치약",
+  "RECALL_COMMAND_DATE": "20260702",
+  "RTRVL_CMMND_DT": "20260707000000",
+  "RTRVL_RESN": "금속성 이물 혼입(뷰카클래식구취케어치약 1제품)",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202101223"
+ },
+ "recall-2efea6e09b3a": {
+  "BIZRNO": "6138163381",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "한국신텍스제약(주)",
+  "ITEM_SEQ": "201309541",
+  "PRDUCT": "네오코정",
+  "RECALL_COMMAND_DATE": "20260429",
+  "RTRVL_CMMND_DT": "20260518000000",
+  "RTRVL_RESN": "품질 부적합(확인시험 1), 함량시험(클로로르페니라민말레산염, 슈도에페드린염산염), 제제균일성시험)",
+  "STD_CD": "8806230033502,8806230033519",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201309541"
+ },
+ "recall-32d883703cb1": {
+  "BIZRNO": "4048600676",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)한국비엔씨",
+  "ITEM_SEQ": "202000204",
+  "PRDUCT": "비에녹스주(클로스트리디움보툴리눔독소A형)(수출용)",
+  "RECALL_COMMAND_DATE": "20260626",
+  "RTRVL_CMMND_DT": "20260701000000",
+  "RTRVL_RESN": "국가출하승인없이 수출전용 의약품을 국내에 판매",
+  "STD_CD": "8800593000102,8800593000119",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202000204"
+ },
+ "recall-4a9c35596017": {
+  "BIZRNO": "3078502513",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "애경산업(주)",
+  "ITEM_SEQ": "201501945",
+  "PRDUCT": "2080진지발리스가글스트롱",
+  "RECALL_COMMAND_DATE": "20260729",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "품질부적합(함량시험)(1제품)",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201501945"
+ },
+ "recall-4cdb22ee1daf": {
+  "BIZRNO": "1248136268",
+  "ENFRC_YN": "N",
+  "ENTRPS": "구주제약(주)",
+  "ITEM_SEQ": "201402890",
+  "PRDUCT": "트라마펜세미정",
+  "RECALL_COMMAND_DATE": "20260504",
+  "RTRVL_CMMND_DT": "20260520000000",
+  "RTRVL_RESN": "불순물(N-nitroso-desmethyl-tramadol) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+  "STD_CD": "8806698043709,8806698043716,8806698043723",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201402890"
+ },
+ "recall-5cb847f79512": {
+  "BIZRNO": "2048189192",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)현진제약",
+  "ITEM_SEQ": "200504683",
+  "PRDUCT": "현진종대황",
+  "RECALL_COMMAND_DATE": "20260629",
+  "RTRVL_CMMND_DT": "20260710000000",
+  "RTRVL_RESN": "회분",
+  "STD_CD": "8800648014603,8800648014610,8800648014627,8800648014634,8800648014641,8800648014658",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200504683"
+ },
+ "recall-5edc1a15853b": {
+  "BIZRNO": "1358102638",
+  "ENFRC_YN": "N",
+  "ENTRPS": "한림제약(주)",
+  "ITEM_SEQ": "202104294",
+  "PRDUCT": "로디엔티정40/5밀리그램(텔미사르탄, 에스암로디핀니코틴산염)",
+  "RECALL_COMMAND_DATE": "20260624",
+  "RTRVL_CMMND_DT": "20260721000000",
+  "RTRVL_RESN": "불순물(N-nitroso-meglumine) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+  "STD_CD": "8806453065700,8806453065717",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202104294"
+ },
+ "recall-6f749819c418": {
+  "BIZRNO": "1248177594",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)다림바이오텍",
+  "ITEM_SEQ": "201102762",
+  "PRDUCT": "레파넘정2밀리그람(레파글리니드)",
+  "RECALL_COMMAND_DATE": "20260819",
+  "RTRVL_CMMND_DT": "20260820000000",
+  "RTRVL_RESN": "불순물(N-nitroso-melumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+  "STD_CD": "8806646020202,8806646020219,8806646020226",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201102762"
+ },
+ "recall-73863335b83b": {
+  "BIZRNO": "3068507363",
+  "ENFRC_YN": "N",
+  "ENTRPS": "코오롱제약(주)",
+  "ITEM_SEQ": "201403819",
+  "PRDUCT": "코프라졸정20밀리그램(에스오메프라졸마그네슘삼수화물)",
+  "RECALL_COMMAND_DATE": "20260722",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "유통 중 정제 깨짐 우려에 따른 영업자 회수",
+  "STD_CD": "8806703038300,8806703038317",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201403819"
+ },
+ "recall-74aef91e1df5": {
+  "BIZRNO": "2828601283",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)나음제약",
+  "ITEM_SEQ": "201904854",
+  "PRDUCT": "나음당귀",
+  "RECALL_COMMAND_DATE": "20260629",
+  "RTRVL_CMMND_DT": "20260702000000",
+  "RTRVL_RESN": "중금속(카드뮴)",
+  "STD_CD": "8800645000807,8800645000814,8800645000821,8800645000838",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201904854"
+ },
+ "recall-7d0e60ca9008": {
+  "BIZRNO": "1358135444",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)와이에스생명과학",
+  "ITEM_SEQ": "202500644",
+  "PRDUCT": "자모다정(독시라민숙신산염)",
+  "RECALL_COMMAND_DATE": "20260707",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "성상부적합 우려로 인한 영업자 회수",
+  "STD_CD": "8800791000300,8800791000317",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202500644"
+ },
+ "recall-7debe6ac38b2": {
+  "BIZRNO": "2998102136",
+  "ENFRC_YN": "N",
+  "ENTRPS": "맥널티제약(주)",
+  "ITEM_SEQ": "200805388",
+  "PRDUCT": "울트라맥정",
+  "RECALL_COMMAND_DATE": "20260430",
+  "RTRVL_CMMND_DT": "20260527000000",
+  "RTRVL_RESN": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과 검출",
+  "STD_CD": "8806415008806,8806415008813,8806415008820,8806415008837,8806415008844",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200805388"
+ },
+ "recall-81a336d762e4": {
+  "BIZRNO": "6211974223",
+  "ENFRC_YN": "N",
+  "ENTRPS": "수성위생재료공업사",
+  "ITEM_SEQ": "202105344",
+  "PRDUCT": "수성멸균거즈-엔",
+  "RECALL_COMMAND_DATE": "20260819",
+  "RTRVL_CMMND_DT": "20260819000000",
+  "RTRVL_RESN": "이물질 혼입에 따른 영업자 회수",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202105344"
+ },
+ "recall-89ece30dcd58": {
+  "BIZRNO": "2048181939",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)푸른무약",
+  "ITEM_SEQ": "200901891",
+  "PRDUCT": "푸른무약건강",
+  "RECALL_COMMAND_DATE": "20260706",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "중금속(카드뮴)",
+  "STD_CD": "8800687000803,8800687000810,8800687000827,8800687000834,8800687000841",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200901891"
+ },
+ "recall-8a6da91bb7dc": {
+  "BIZRNO": "3018125427",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)넥스팜코리아",
+  "ITEM_SEQ": "202001275",
+  "PRDUCT": "글로틴듀오정2.5/850mg(리나글립틴, 메트포르민염산염)",
+  "RECALL_COMMAND_DATE": "20260624",
+  "RTRVL_CMMND_DT": "20260714000000",
+  "RTRVL_RESN": "불순물(N-nitroso-meglumine) 허용기준 초과 검출에 따른 영업자 회수",
+  "STD_CD": "8806625046001,8806625046018",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202001275"
+ },
+ "recall-8b39059b5cbc": {
+  "BIZRNO": "1108100102",
+  "ENFRC_YN": "N",
+  "ENTRPS": "동화약품(주)",
+  "ITEM_SEQ": "202400383",
+  "PRDUCT": "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)",
+  "RECALL_COMMAND_DATE": "20260702",
+  "RTRVL_CMMND_DT": "20260714000000",
+  "RTRVL_RESN": "불순물(N-nitroso-meglumine) 초과 검출 우려에 따른 사전예방적 조치로 시중 유통품에 대한 영업자 회수",
+  "STD_CD": "8806427075506,8806427075513",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202400383"
+ },
+ "recall-8bd9bd12b54d": {
+  "BIZRNO": "1248136268",
+  "ENFRC_YN": "N",
+  "ENTRPS": "구주제약(주)",
+  "ITEM_SEQ": "201403417",
+  "PRDUCT": "글리미드정2mg(글리메피리드)",
+  "RECALL_COMMAND_DATE": "20260813",
+  "RTRVL_CMMND_DT": "20260813000000",
+  "RTRVL_RESN": "이물 혼입 우려에 따른 영업자 회수",
+  "STD_CD": "8806698044003,8806698044010,8806698044027",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201403417"
+ },
+ "recall-97b0f904887d": {
+  "BIZRNO": "1248137632",
+  "ENFRC_YN": "N",
+  "ENTRPS": "하나제약(주)",
+  "ITEM_SEQ": "200502107",
+  "PRDUCT": "쿠파린정5밀리그램(와파린나트륨)",
+  "RECALL_COMMAND_DATE": "20260624",
+  "RTRVL_CMMND_DT": "20260720000000",
+  "RTRVL_RESN": "안정성 시험 부적합(용출)에 따른 영업자 회수",
+  "STD_CD": "8806578019107,8806578019114",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200502107"
+ },
+ "recall-a4ca19db4e52": {
+  "BIZRNO": "1108100102",
+  "ENFRC_YN": "N",
+  "ENTRPS": "동화약품(주)",
+  "ITEM_SEQ": "202400383",
+  "PRDUCT": "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)",
+  "RECALL_COMMAND_DATE": "20260702",
+  "RTRVL_CMMND_DT": "20260703000000",
+  "RTRVL_RESN": "불순물(N-nitroso-meglumine) 허용기준 초과 우려에 따른 영업자 회수",
+  "STD_CD": "8806427075506,8806427075513",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202400383"
+ },
+ "recall-ada7ac9cbd75": {
+  "BIZRNO": "6828500435",
+  "ENFRC_YN": "N",
+  "ENTRPS": "일동제약(주)",
+  "ITEM_SEQ": "199000353",
+  "PRDUCT": "일동아드리아마이신피.에프.에스.주사액10밀리그램(독소루비신염산염)",
+  "RECALL_COMMAND_DATE": "20260729",
+  "RTRVL_CMMND_DT": "20260729000000",
+  "RTRVL_RESN": "유통 중 포장불량 우려에 따른 영업자 회수",
+  "STD_CD": "8806429016903,8806429016910",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199000353"
+ },
+ "recall-b0b313a5979f": {
+  "BIZRNO": "1248601143",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)대웅제약",
+  "ITEM_SEQ": "201506800",
+  "PRDUCT": "크레젯정10/5밀리그램(에제티미브,로수바스타틴)",
+  "RECALL_COMMAND_DATE": "20260707",
+  "RTRVL_CMMND_DT": "20260714000000",
+  "RTRVL_RESN": "포장단위 표시사항 불일치(정제 수량 오기)에 따른 영업자 회수",
+  "STD_CD": "8806416061503,8806416061510,8806416061527,8806416061534",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201506800"
+ },
+ "recall-b6baa101018b": {
+  "BIZRNO": "3128614037",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "휴먼바이오(주)",
+  "ITEM_SEQ": "201601240",
+  "PRDUCT": "1.퓨어클액(폴리헥사메틸렌비구아니드염산염 액 20%)",
+  "RECALL_COMMAND_DATE": "20260629",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "수거검사(미생물한도)",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201601240"
+ },
+ "recall-b76f35d25486": {
+  "BIZRNO": "3128137170",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)농림생약",
+  "ITEM_SEQ": "201105333",
+  "PRDUCT": "농림해방풍",
+  "RECALL_COMMAND_DATE": "20260708",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "이산화황",
+  "STD_CD": "8800616029905,8800616029912,8800616029929",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201105333"
+ },
+ "recall-b8b6f96d9b57": {
+  "BIZRNO": "1248137632",
+  "ENFRC_YN": "N",
+  "ENTRPS": "하나제약(주)",
+  "ITEM_SEQ": "201602732",
+  "PRDUCT": "파록시주(팔로노세트론염산염)",
+  "RECALL_COMMAND_DATE": "20260819",
+  "RTRVL_CMMND_DT": "20260820000000",
+  "RTRVL_RESN": "시판 후 안정성시험 함량시험 결과 부적합에 따른 영업자 회수",
+  "STD_CD": "8806578060000,8806578060017,8806578060024,8806578060109,8806578060116",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201602732"
+ },
+ "recall-ba7175fce96b": {
+  "BIZRNO": "2048175757",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)성원제약",
+  "ITEM_SEQ": "202402280",
+  "PRDUCT": "리브러쉬화이트닝치아미백제",
+  "RECALL_COMMAND_DATE": "20260430",
+  "RTRVL_CMMND_DT": "20260604000000",
+  "RTRVL_RESN": "함량시험(과산화수소)",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202402280"
+ },
+ "recall-c5a24b0b2d9c": {
+  "BIZRNO": "2078100726",
+  "ENFRC_YN": "N",
+  "ENTRPS": "삼성제약(주)",
+  "ITEM_SEQ": "199900221",
+  "PRDUCT": "쓸기담액50밀리그람",
+  "RECALL_COMMAND_DATE": "20260713",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "안정성 시험 부적합(미생물한도)에 따른 영업자 회수",
+  "STD_CD": "8806423025307,8806423025314",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=199900221"
+ },
+ "recall-d3e479b8f155": {
+  "BIZRNO": "1798801453",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)케이보은제약",
+  "ITEM_SEQ": "202101223",
+  "PRDUCT": "1.케이보은프라그케어치약, 2.고스케어덴티플루치약, 3.투비짱충치케어치약, 4.쏘두위안티캐비티치약, 5.뷰카클래식구취케어치약, 6.에이카랩스닥터라이노치약(사과향), 7.뷰카클래식구취케어치약(스피아민트향), 8.뷰카클래식블랙차콜치약(허브민트향), 9.뷰카주니어마일드구취케어치약(포도향), 10.칸디데일사오공키즈치약(복숭아향), 11.아미덴클래식치약, 12.뷰카주니어마일드구취케어치약(딸기향), 13.아미덴일사오공키즈치약(딸기향), 14.크리오엑스퍼트브레스케어치약, 15.크리오엑스퍼트보타닉치약, 16.크리오엑스퍼트주니어치약(후르츠민트향), 17.네이쳐스영프로메가폴리스덴탈케어치약, 18.뷰카주니어마일드구취케어치약(사과향), 19.케이맘주니어구취케어치약(사과향), 20.앙오리지널구취케어치약, 21.러블리티스일사오공치약, 22.코튼하임덴탈에이지구취케어치약(쿨링아쿠아민트향), 23.뷰카주니어마일드구취케어치약(바나나향), 24.뷰카주니어마일드구취케어치약(복숭아향), 25.더블케이덴티에피소드치약, 26.안티프라그쎈스트롱치약, 27.하이안베이직치약(민트향), 28.치카포카주니어충치케어치약(포도향), 29.치카포카주니어충치케어치약(딸기향), 30.지그비주니어구취케어치약, 31.센토프라임블랙차콜구취케어치약, 32.센토프라임구취케어치약, 33.센토주니어세이프구취케어치약(딸기향), 34.센토주니어세이프구취케어치약(포도향), 35.센토주니어세이프구취케어치약(복숭아향), 36.센토주니어세이프구취케어치약(사과향), 37.지그비주니어구취케어치약(딸기향), 38.지그비주니어구취케어치약(사과향), 39.센토주니어세이프구취케어치약(트로피컬향), 40.케이맘베이비앤키즈일사오공퓨어치약",
+  "RECALL_COMMAND_DATE": "20260702",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "금속성 이물 혼입(뷰카클래식구취케어치약)",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202101223"
+ },
+ "recall-d47ac8f6d555": {
+  "BIZRNO": "1308100988",
+  "ENFRC_YN": "N",
+  "ENTRPS": "현대약품(주)",
+  "ITEM_SEQ": "200707219",
+  "PRDUCT": "펜큐어정",
+  "RECALL_COMMAND_DATE": "20260430",
+  "RTRVL_CMMND_DT": "20260528000000",
+  "RTRVL_RESN": "불순물(N-nitroso-N-desmethyl-tramadol) 허용기준 초과 검출",
+  "STD_CD": "8806420010801,8806420010818,8806420010825,8806420010832,8806420010849",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200707219"
+ },
+ "recall-df585a46d831": {
+  "BIZRNO": "6828500435",
+  "ENFRC_YN": "N",
+  "ENTRPS": "일동제약(주)",
+  "ITEM_SEQ": "202401612",
+  "PRDUCT": "콘센비타프리미엄800정",
+  "RECALL_COMMAND_DATE": "20260706",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "표시기재 사항 일부 누락으로 인한 영업자회수",
+  "STD_CD": "8806429068902,8806429068919",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202401612"
+ },
+ "recall-e9ddec302cf6": {
+  "BIZRNO": "1798801453",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)케이보은제약",
+  "ITEM_SEQ": "202101223",
+  "PRDUCT": "뷰카클래식구취케어치약",
+  "RECALL_COMMAND_DATE": "20260702",
+  "RTRVL_CMMND_DT": "20260707000000",
+  "RTRVL_RESN": "금속성 이물 혼입(뷰카클래식구취케어치약)1제품",
+  "STD_CD": "",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=202101223"
+ },
+ "recall-eba8d230d8c4": {
+  "BIZRNO": "2338107882",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)바른한방제약",
+  "ITEM_SEQ": "201606023",
+  "PRDUCT": "바른인진호",
+  "RECALL_COMMAND_DATE": "20260710",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": " 품질 부적합(회분, 산불용성회분)",
+  "STD_CD": "8800631014504,8800631014511,8800631014528,8800631014535,8800631014542,8800631014559,8800631014566",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201606023"
+ },
+ "recall-ecf1e2c8f79f": {
+  "BIZRNO": "1328101004",
+  "ENFRC_YN": "N",
+  "ENTRPS": "(주)일화",
+  "ITEM_SEQ": "201109893",
+  "PRDUCT": "펠라스시럽(펠라고니움시도이데스11%에탄올추출물(1→8~10)ㆍ글리세린혼합액(8:2))",
+  "RECALL_COMMAND_DATE": "20260622",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "품질부적합 우려(용기불량, 성상이상)에 따른 영업자 회수",
+  "STD_CD": "8806409023402,8806409023419",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201109893"
+ },
+ "recall-f6e0aa34a0c2": {
+  "BIZRNO": "2048189192",
+  "ENFRC_YN": "Y",
+  "ENTRPS": "(주)현진제약",
+  "ITEM_SEQ": "200504568",
+  "PRDUCT": "현진몰약",
+  "RECALL_COMMAND_DATE": "20260629",
+  "RTRVL_CMMND_DT": "20260710000000",
+  "RTRVL_RESN": "회분, 산불용성회분",
+  "STD_CD": "8800648004901,8800648004918,8800648004925,8800648004932",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=200504568"
+ },
+ "recall-f6fd433d744f": {
+  "BIZRNO": "2078100309",
+  "ENFRC_YN": "N",
+  "ENTRPS": "국제약품(주)",
+  "ITEM_SEQ": "201400174",
+  "PRDUCT": "큐알론점안액0.15%(히알루론산나트륨)(1회용)",
+  "RECALL_COMMAND_DATE": "20260706",
+  "RTRVL_CMMND_DT": null,
+  "RTRVL_RESN": "2차 포장(알루미늄 호일)  표시기재 오기에 따른 영업자 회수",
+  "STD_CD": "8806437037808,8806437037815,8806437037822,8806437042703,8806437042710,8806437042802,8806437042819,8806437042901,8806437042918,8806437042925,8806437042932,8806437043007,8806437043014,8806437043106,8806437043113,8806437043120,8806437050609,8806437050616,8806437050623",
+  "api": "data.go.kr 15059114",
+  "endpoint": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03",
+  "nedrug_item_candidate_note": "Routine 검증 후 인용 (미검증 후보 URL)",
+  "nedrug_item_candidate_url": "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=201400174"
+ }
+}

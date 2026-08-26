@@ -2399,6 +2399,13 @@
     "포장공정의 첨부문서 삽입 확인과 버전 검증 단계",
     "사용상의 주의사항 개정 시 인쇄물 반영 이력 대조"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "200308019",
+    "std_cd": "8806583000206,8806583000213,8806583000220",
+    "bizrno": "1048124526"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2467,6 +2474,12 @@
     "타정 공정의 중량·두께 공정관리 한계와 이탈 시 조치",
     "완제 육안검사에서 크기 이상 정제의 선별 기준"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "10 mg",
+    "dosage_form": "Tablet",
+    "action": "Verify whether your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or if you have any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2535,6 +2548,50 @@
     "협소 치료역 품목의 함량 균일성 공정관리 지표",
     "유효기간 내 함량 저하 추세 데이터 검토 주기"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "Nationwide in the USA.",
+    "code_info": "Lot#: N02212, Exp. Date 07/2026",
+    "firm_location": "Dublin, OH, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-13"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-17"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "LEVOTHYROXINE SODIUM"
+     },
+     {
+      "label": "성분명",
+      "value": "LEVOTHYROXINE SODIUM"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209713"
+     }
+    ]
+   },
    "merged_count": 12,
    "merged_items": [
     "Levothyroxine Sodium Tablets, USP, 25 mcg (0.025 mg), 100 Tablets (10 x 10 unit dose blisters) per carton, Rx only, Packaged and Distributed by: MAJOR PHARMACEUTICALS, Indianapolis, IN 46268 USA.  NDC: 0904-6949-61",
@@ -2616,6 +2673,55 @@
     "복합정 안정성 시험의 용출 항목 추세",
     "위탁 제조소의 공정 변경 통보와 영향평가 이력"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "6,192 bottles",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot 25121311, expiry 3/31/2028",
+    "firm_location": "Bedminster, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-08"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-20"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "AMLODIPINE AND OLMESARTAN MEDOXOMIL"
+     },
+     {
+      "label": "성분명",
+      "value": "AMLODIPINE AND OLMESARTAN MEDOXOMIL"
+     },
+     {
+      "label": "주성분",
+      "value": "AMLODIPINE BESYLATE, OLMESARTAN MEDOXOMIL"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209042"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2684,6 +2790,55 @@
     "무균공정 밸리데이션(배지충진)의 유효기간과 적용 범위",
     "용기밀봉완전성 시험 자료가 포괄하는 품목 범위"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "1.033,266 cartons",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lot #: 3H1V, Exp. Date 2026/07; 3J1V, 3J2V, Exp. Date 2026/09; 3K1V, Exp. Date 2026/10;  4A1V, 4A2V, Exp. Date 2026/12; 4B1V, 4B2V, Exp. Date 2027/01; 4G1V, 4G2V, 4G3V, Exp. Date 2027/06; 4I1V, 4I2V, 4I2VA Exp. Date 2027/08; 4J1V, 4J2V, Exp. Date 2027/09; 4K2V, 4K3V, 4K4V Exp. Date2027/10; 5B1V, 5B2V, 5B3V, Exp. Date 2028/01; 5D1V, Exp. Date 2028/03; 5E1V, 5E2V, 5E3V, Exp. Date 2028/04; 5H1V, Exp. Date 2028/07; 5I1V, Exp. Date 2028/08; 5J1V, 5J2V, Exp. Date 2028/09; 5L1V, 5L1VA, 5L1VB, 5L1VC, 5L1VD, 5L2V,Exp. Date 2028/11; 6A1V,  6A2V, Exp. Date 2028/12; 6B1V, Exp. Date 2029/01 & Lot 6C1V, Exp. Date 2029/02.",
+    "firm_location": "Ho Chi Minh, Vietnam",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-14"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ROHTO"
+     },
+     {
+      "label": "성분명",
+      "value": "HYPROMELLOSE, TETRAHYDROZOLINE HYDROCHLORIDE, ZINC SULFATE"
+     },
+     {
+      "label": "주성분",
+      "value": "HYPROMELLOSE, UNSPECIFIED, TETRAHYDROZOLINE HYDROCHLORIDE, ZINC SULFATE, UNSPECIFIED FORM"
+     },
+     {
+      "label": "투여경로",
+      "value": "OPHTHALMIC"
+     },
+     {
+      "label": "허가번호",
+      "value": "M018"
+     }
+    ]
+   },
    "merged_count": 8,
    "merged_items": [
     "Rohto Cooling Eye Drops ALL-IN-ONE (hypromellose 0.2%, tetrahydrozoline HCL 0.05%, zinc sulfate 0.25%), Sterile 0.4 FL OZ (13 mL), Distributed by: The Mentholatum Company, Orchard Park, NY 14127, Made in Vietnam UPC 310742010862, NDC 10742-8146-1",
@@ -2761,6 +2916,51 @@
     "시럽제 안정성 시험의 외관·석출 항목 설정 여부",
     "표시 보관조건 하한 온도에서의 석출 확인 자료"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "74208 units",
+    "distribution": "Nationwide U.S.A.",
+    "code_info": "Lots: Batch # CR2518, Exp. 11/2027; Batch # CR2601, Exp. 12/2027; CR2602, CR2603, Exp. 01/2028; CR2604, CR2605, Exp. 02/2028.",
+    "firm_location": "East Brunswick, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-13"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CYPROHEPTADINE HYDROCHLORIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "CYPROHEPTADINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA040668"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2829,6 +3029,51 @@
     "무균 충전 구역의 가운착의 절차와 인원 개입 기록",
     "최종 육안검사의 이물 검출 기준과 검사자 적격성"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "59,425 vials",
+    "distribution": "Nationwide within in the USA",
+    "code_info": "Lot #: 6134349, 6134620 Exp. Date 11/2026",
+    "firm_location": "Lake Zurich, IL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-16"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-23"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "GLYCOPYRROLATE"
+     },
+     {
+      "label": "성분명",
+      "value": "GLYCOPYRROLATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "INTRAMUSCULAR, INTRAVENOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209328"
+     }
+    ]
+   },
    "merged_count": 5,
    "merged_items": [
     "Glycopyrrolate Injection, USP, 1 mg per 5 mL (0.2 mg per mL), 25 x  5 mL fill in a 6.5 mL vial, Rx only, Multiple Dose Vials, Fresenius Kabi, Lake Zurich, IL 60047 NDC Tray: 63323-578-05; NDC Vial:  63323-578-07",
@@ -2903,6 +3148,46 @@
     "안정성 시험 규격의 미지 불순물 한도와 동정 임계값",
     "안정성 OOS 발생 시 유통 물량 회수 판단 절차"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "US Nationwide.",
+    "code_info": "Lot # 506033, Exp Date: 11/30/2026.",
+    "firm_location": "South Beloit, IL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-14"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-29"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "GLYCOPYRROLATE"
+     },
+     {
+      "label": "성분명",
+      "value": "GLYCOPYRROLATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA204438"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

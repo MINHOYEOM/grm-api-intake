@@ -5074,6 +5074,13 @@
     "유연물질 규격 및 시험법 적정성 확인",
     "동일 성분(목시플록사신) 함유 제품 모니터링"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201000241",
+    "std_cd": "8806741005005,8806741005012,8806741005029,8806741007702,8806741007719,8806741007726,8806741007801,8806741007818,8806741007825,8806741007832,8806741007900,8806741007917,8806741007924,8806741007931,8806741007948",
+    "bizrno": "1078738943"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5139,6 +5146,13 @@
     "안정성시험 미생물한도 결과 모니터링",
     "유사 제형 제품 전수 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "199900221",
+    "std_cd": "8806423025307,8806423025314",
+    "bizrno": "2078100726"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5208,6 +5222,55 @@
     "ADI 기준 대비 불순물 시험 결과 확인",
     "Class II 회수 대응절차(고객 통지 등) 점검"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "31,824 bottles",
+    "distribution": "USA Nationwide",
+    "code_info": "Lot #: 5PB0465, 5PB0466, 5PB0557, Exp 4/30/2027; 5PB0629, 5PB0630, 5PB0633, 5PB0637, 5PB0638, Exp 6/30/2027",
+    "firm_location": "Warren, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-29"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-09"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CINACALCET"
+     },
+     {
+      "label": "성분명",
+      "value": "CINACALCET"
+     },
+     {
+      "label": "주성분",
+      "value": "CINACALCET HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA208915"
+     }
+    ]
+   },
    "merged_count": 3,
    "merged_items": [
     "Cinacalcet Hydrochloride Tablets, 30 mg, 30-count bottle, Rx Only, Manufactured by: Cipla Ltd., MIDC, Patalganga, India; Manufactured for: Cipla USA, Inc., 10 Independence Boulevard, Suite 300, Warren, NJ 07059, NDC 69097-410-02",
@@ -5277,6 +5340,13 @@
     "정제 수량 표기 관련 QC 체크리스트 재확인",
     "유사 포장 오기 이력 사내 조사"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201506800",
+    "std_cd": "8806416061503,8806416061510,8806416061527,8806416061534",
+    "bizrno": "1248601143"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5342,6 +5412,13 @@
     "원료 공급처 및 제조공정 불순물 생성 위험요인 점검",
     "자사 회수 대응절차(CAPA) 재점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202400388",
+    "std_cd": "8806427075605,8806427075612",
+    "bizrno": "1108100102"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5407,6 +5484,13 @@
     "니트로소아민 예방적 모니터링 시험체계 구축",
     "관련 회수 사례 및 후속 원인 발표 모니터링"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202400383",
+    "std_cd": "8806427075506,8806427075513",
+    "bizrno": "1108100102"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5472,6 +5556,13 @@
     "원료 공급업체별 불순물 이력 비교",
     "일괄회수 대상 품목 재고 및 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202001275",
+    "std_cd": "8806625046001,8806625046018",
+    "bizrno": "3018125427"
+   },
    "merged_count": 3,
    "merged_items": [
     "글로틴듀오정2.5/850mg(리나글립틴, 메트포르민염산염)",
@@ -5543,6 +5634,12 @@
     "자사 제품의 캐나다 시장 허가 현황 확인",
     "미승인 병행유통 채널 모니터링"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "4 mg",
+    "dosage_form": "Film",
+    "action": "Only use authorized nicotine replacement therapies as directed.Do not buy or use unauthorized nicotine replacement therapies. If you become aware of any unusual symptoms or side effects that may be associated with these products, contact your healthcare provider.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5610,6 +5707,12 @@
     "자사 캡슐 제형 원료 입자크기 관리기준 점검",
     "티오트로피움 브로마이드 유사제제 규격 재확인"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Tiotropium bromide monohydrate 18 mcg",
+    "dosage_form": "Capsule",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5677,6 +5780,12 @@
     "자사 수계 제형 미생물 한도 관리 점검",
     "보존력시험(PET) 결과 재확인"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Not Applicable",
+    "dosage_form": "Shampoo",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5744,6 +5853,12 @@
     "자사 무균 액상제제 무균보증체계 점검",
     "완제품 무균시험 및 공정관리 기록 확인"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Chlorhexidine gluconate 2% w/v; Isopropyl alcohol 70% v/v",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5813,6 +5928,55 @@
     "유통 경로 이탈 방지 관리체계 점검",
     "해당 병합 품목(10개) 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "1,800 units",
+    "distribution": "Distributed Nationwide in the USA",
+    "code_info": "Lot: a) 3362296, expires: 12/31/2026, 4066870, expires: 02/28/2027, 4104107, expires: 03/31/2027, 4276125, expires: 09/30/2027; b) 4080695, expires: 03/31/2027, 4233300 expires: 08/31/2027.",
+    "firm_location": "El Paso, TX, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-11"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-29"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CHLORAPREP ONE-STEP"
+     },
+     {
+      "label": "성분명",
+      "value": "CHLORHEXIDINE GLUCONATE AND ISOPROPYL ALCOHOL"
+     },
+     {
+      "label": "주성분",
+      "value": "CHLORHEXIDINE GLUCONATE, ISOPROPYL ALCOHOL"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "NDA020832"
+     }
+    ]
+   },
    "merged_count": 10,
    "merged_items": [
     "BD ChloraPrep Hi-Lite Orange, (2% w/v chlorhexidine gluconate (CHG) and 70% v/v isopropyl alcohol (IPA)), packaged as a) 100 x 10.5 mL applicators/case, NDC 54365-400-35, Catalog Number: 930715NS; b) 100 x 10.5 mL applicators/case, Catalog Number bulk 930715NSB, NDC 54365-400-35; STERILE SOLUTION, CAREFUSION 213, LLC, EL PASO, TX 79912, subsidiary of Beckton, Dickson and Co.",
@@ -5893,6 +6057,51 @@
     "환경모니터링 결과 검토",
     "위탁제조업체(Catalent Indiana) 품질계약 점검"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "326 vials",
+    "distribution": "US Nationwide.",
+    "code_info": "Lot # 004L24A, Exp Date: 02/19/2027.",
+    "firm_location": "Raleigh, NC, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-10"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-29"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "IMULDOSA"
+     },
+     {
+      "label": "성분명",
+      "value": "USTEKINUMAB-SRLF"
+     },
+     {
+      "label": "투여경로",
+      "value": "SUBCUTANEOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "BLA761364"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5962,6 +6171,51 @@
     "원료·용기 입고검사 결과 검토",
     "해당 배치 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "2,530,182 bottles",
+    "distribution": "U.S. Nationwide",
+    "code_info": "Lots: a) HA00937, HA00939, HA00941, HA00971, H00973,  HA00975, Expires: 7/31/2026; HA00987, HA00989, HA00991, HA01010, HA01012, HA01014, HA01016, HA01048, Expires: 8/31/2026; HA01120, HA01137, HA01129, HA01138, HA01133, Expires: 9/30/2026; HA01148, HA01196, HA01198, HA01200, HA01206, HA01208, HA01210, HA01212, HA01214, HA01216, HA01218, HA01220, Expires: 10/31/2026; HA01236, HA01238, HA01240, HA01244, HA01246, HA01248, HA01261, HA01263, HA01265, HA01267, HA01278, HA01280, HA01282, HA01284, HA01288, HA01290, HA01292, HA01298, Expires: 11/30/2026; HB00002, HB00004, HB00006, HB00017, HB00019, HB00021, HB00023, HB00025, HB00031, HB00033, HB00035, HB00037, HB00039, HB00041, HB00043, Expires: 12/31/2026; HB00049, HB00051,  HB00076, HB00078, HB00080, HB00082, HB00084, Expires: 1/31/2027; HB00128, HB00130, HB00132, HB00134, HB00157, HB00159, HB00161, HB00196, HB00198, HB00200, Expires: 2/28/2027; HB00224, HB00226, HB00228, HB00230, HB00240, HB00242, Expires: 3/31/2027; HB00416, HB00417, HB00419, HB00439, HB00441, HB00443, HB00463, HB00465, Expires: 5/31/2027; HB00561, Expires: 6/30/2027; HB00569, HB00657, HB00659, HB00663, HB00671, HB00673, HB00675, HB00677, HB00679, Expires: 10/31/2027; HB00747, HB00749, HB00751, HB00753, Expires: 11/30/2027; HB00761, HB00763, HB00765, HB00783, HB00785, HC00002, HC00004, HC00006, HC00018, HC00020, HC00028, Expires: 12/31/2027; HC00030, HC00032, Expires: 1/31/2028; HC00056, HC00058, HC00062, HC00064, HC00073, HC00075, HC00079, HC00081, HC00083, Expires: 2/29/2028;  HC00091, Expires: 3/31/2028;  b) HA00945, HA00947, HA00949, Expires: 7/31/2026; HA01160, HA01162, HA01164, Expires: 10/31/2026; HA01234, HA01300, HA01302, Expires: 11/30/2026; HB00053, HB00055, HB00057, Expires: 1/31/2027; HB00107, HB00109, HB00111, HB00151, HB00153, HB00155, Expires: 2/28/2027; HB00386, HB00388, HB00390, HB00445, HB00447, Expires: 5/31/2027; HB00549, HB00551, HB00553, HB00555, Expires: 6/30/2027; HB00700, HB00702, Expires: 10/31/2027; HB00771, Expires: 11/30/2027; HC00008, HC00010, Expires: 12/31/2027; HC00034, HC00038, HC00054, HC00060, Expires: 1/31/2028;  c) HA00951, HA00953, HA00955, Expires: 7/31/2026; HA01188, HA01190, HA01192, Expires: 10/31/2026; HA01304, Expires: 11/30/2026; HB00113, HB00115, Expires: 1/31/2027; HB00166, HB00168, Expires: 2/28/2027; HB00392, HB00394, HB00396, Expires:5/31/2027; HB00545, HB00547, Expires: 6/30/2027; HB00704, Expires: 10/31/2027; HB00773, Expires: 11/30/2027; HC00012, HC00014, Expires: 12/31/2027; HC00066, HC00068, Expires: 2/29/2028.",
+    "firm_location": "Naples, FL, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-30"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "PREDNISOLONE ACETATE"
+     },
+     {
+      "label": "성분명",
+      "value": "PREDNISOLONE ACETATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "OPHTHALMIC"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA216935"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6031,6 +6285,51 @@
     "안정성 시험(역가 저하) 데이터 검토",
     "해당 로트 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "6432 bottles",
+    "distribution": "US Nationwide.",
+    "code_info": "Lot # D2401522, Exp Date: 06/2026.",
+    "firm_location": "Raleigh, NC, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-08"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-30"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "LEVOTHYROXINE SODIUM"
+     },
+     {
+      "label": "성분명",
+      "value": "LEVOTHYROXINE SODIUM"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA212399"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6100,6 +6399,33 @@
     "설비 전환 시 스왑 샘플링 기록 검토",
     "공용설비 교차오염 관리체계 점검"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "560 bottles",
+    "distribution": "OH",
+    "code_info": "Lot 3244413; Exp. 12/31/2028",
+    "firm_location": "Ridgefield, CT, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-12"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-30"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6169,6 +6495,46 @@
     "키트 조립공정 무균관리 절차 점검",
     "해당 병합 품목(2개) 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit",
+    "notification_ko": "2가지 이상 병행",
+    "distribution": "USA Nationwide",
+    "code_info": "Lot #: AE3102, 121924X2, 022525X4, 033125X1, 030426X2, 033125X2, 041725X3, 061225X1, 072225X3, 080525X6, 080525X7, 080525X8, 091225X1, 100225X2, 100625X1, 122225X4, 010626X3, 041326X4, Exp 11/30/2026; AE5052, 041426X2, 041726X1, 051826X2, Exp 04/30/2028.",
+    "firm_location": "Torrance, CA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-08"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-02"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ACCUCAINE"
+     },
+     {
+      "label": "성분명",
+      "value": "LIDOCAINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "INFILTRATION"
+     }
+    ]
+   },
    "merged_count": 2,
    "merged_items": [
     "Accucaine, Kit contains: Lidocaine HCl Injection USP, 1% (10 mg/mL), 5 mL single dose ampule, Rx Only, Distributed by Enovachem Pharmaceuticals, Torrance, CA 90501, NDC: 76420-715-01.",
@@ -6241,6 +6607,33 @@
     "펠릿 충전공정 품질관리 기록 검토",
     "해당 로트 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "1392 bottles",
+    "distribution": "US Nationwide.",
+    "code_info": "Lot#: 25285401A, Exp. Date: 04/2027",
+    "firm_location": "Seymour, IN, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-26"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-02"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-08"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

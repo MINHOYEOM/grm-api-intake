@@ -1862,6 +1862,13 @@
     "N-니트로소 불순물 관리계획 이행 여부",
     "동일 성분(리나글립틴·메트포르민) 타 함량 제품 연계 확인"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202400383",
+    "std_cd": "8806427075506,8806427075513",
+    "bizrno": "1108100102"
+   },
    "merged_count": 2,
    "merged_items": [
     "리나디엠메트서방정5/1000밀리그램(리나글립틴,메트포르민)",
@@ -1928,6 +1935,12 @@
     "생산라인 금속검출기 점검·교정 이력",
     "동일 라인 위탁생산 타 브랜드 제품 연계 확인"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202101223",
+    "bizrno": "1798801453"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1991,6 +2004,13 @@
     "원료 입고 시 회분 시험 실시 여부",
     "동일 원료 사용 타 품목 연계 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200504683",
+    "std_cd": "8800648014603,8800648014610,8800648014627,8800648014634,8800648014641,8800648014658",
+    "bizrno": "2048189192"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2054,6 +2074,13 @@
     "원료 산지별 중금속 시험 성적서 확인",
     "동일 원료(당귀) 사용 타 품목 연계 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201904854",
+    "std_cd": "8800645000807,8800645000814,8800645000821,8800645000838",
+    "bizrno": "2828601283"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2117,6 +2144,12 @@
     "완제품 보존력시험(PET) 이력 확인",
     "동일 성분 타 제품 미생물한도 재시험 여부"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201601240",
+    "bizrno": "3128614037"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2180,6 +2213,13 @@
     "원료 입고 시 회분·산불용성회분 시험 이력",
     "동일 제조소 타 생약 품목 연계 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200504568",
+    "std_cd": "8800648004901,8800648004918,8800648004925,8800648004932",
+    "bizrno": "2048189192"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2243,6 +2283,13 @@
     "수출전용품 국내 유통경로 분리 관리",
     "국가출하승인 대상 품목 출하 기록 점검"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "202000204",
+    "std_cd": "8800593000102,8800593000119",
+    "bizrno": "4048600676"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2373,6 +2420,12 @@
     "방사성의약품 품질관리 기준 재확인",
     "회수 대상 로트 유통 현황 확인"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Fludeoxyglucose 18F 0.5 GBq/vial",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2440,6 +2493,46 @@
     "분해산물·불순물 안정성 데이터 트렌드 점검",
     "회수 대상 로트 국내 유통 여부 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "USA Nationwide.",
+    "code_info": "Lot #: 20240411, Exp: 6/30/2026; 20250252, Exp: 3/31/2027",
+    "firm_location": "Elmwood Park, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-27"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-12"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ALYACEN 1/35"
+     },
+     {
+      "label": "성분명",
+      "value": "NORETHINDRONE AND ETHINYL ESTRADIOL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA091634"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2507,6 +2600,32 @@
     "OTC 모노그래프 대비 규격 적합성 검토",
     "동일 제형 타 용량·기제 제품 연계 점검"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "U.S.A. Nationwide",
+    "code_info": "Lot #: AE001, expires: 5/31/2026.",
+    "firm_location": "Greenville, SC, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-15"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-12"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ]
+   },
    "merged_count": 4,
    "merged_items": [
     "VistaPharm, KERR INSTA-CHAR IN AN AQUEOUS BASE WITH CHERRY FLAVOR, 25 Grams Acti…",
@@ -2579,6 +2698,33 @@
     "조제 주사제 함량 검증(assay) 절차 점검",
     "동일 로트 사용 의료기관 통보 여부 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "287 units",
+    "distribution": "U.S.A. Nationwide",
+    "code_info": "Lot#: 20260327VAS-3, BUD: 05/26/2026; 20260320VAS-3, BUD: 05/19/2026.",
+    "firm_location": "Shoreview, MN, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-18"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-12"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2646,6 +2792,51 @@
     "포장 라인 전환 시 line clearance 절차 점검",
     "표시(라벨) 검증 이중 확인 체계 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "6,143 bottles",
+    "distribution": "U.S. Nationwide",
+    "code_info": "Lot: PA00805, expires: 01/31/2029",
+    "firm_location": "Bridgewater, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-27"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-16"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ARIPIPRAZOLE"
+     },
+     {
+      "label": "성분명",
+      "value": "ARIPIPRAZOLE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA206174"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2713,6 +2904,51 @@
     "제형 안정성(용해도) 데이터 재검토",
     "보관조건별 결정화 발생 이력 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "46,334 units",
+    "distribution": "Nationwide in the USA.",
+    "code_info": "Lot #:  82886, exp 09/30/2026; 89646, exp 05/31/2027",
+    "firm_location": "Rochester, MI, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-12"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-17"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "BUPRENORPHINE HYDROCHLORIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "BUPRENORPHINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "INTRAMUSCULAR, INTRAVENOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA206586"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2780,6 +3016,51 @@
     "용기 밀봉 검사(leak test) 기록 점검",
     "동일 제조소의 타 브랜드 제품 연계 확인"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "900 units",
+    "distribution": "Nationwide in the USA",
+    "code_info": "BNZ-001917, Exp 04/01/2029",
+    "firm_location": "Gibbstown, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-21"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-18"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "PEARSON TOPICAL ANESTHETIC"
+     },
+     {
+      "label": "성분명",
+      "value": "BENZOCAINE"
+     },
+     {
+      "label": "투여경로",
+      "value": "DENTAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "M022"
+     }
+    ]
+   },
    "merged_count": 7,
    "merged_items": [
     "Pearson Quality Topical Anesthetic Gel (20% Benzocaine), Mint Flavor, Net Conten…",
@@ -2855,6 +3136,51 @@
     "배치별 용출 프로파일 트렌드 확인",
     "제형(정제) 처방·공정 변경 이력 검토"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "11,460 bottles",
+    "distribution": "U.S. Nationwide.",
+    "code_info": "[100 tablet bottle] Batch RISA24001; [1000 tablet bottle]  Batch RISB24002; Exp. 04/2027",
+    "firm_location": "Kalyan, India",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-05"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-22"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CHLORTHALIDONE"
+     },
+     {
+      "label": "성분명",
+      "value": "CHLORTHALIDONE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA211320"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2922,6 +3248,33 @@
     "위탁제조소(Dabur India) CGMP 실사 이력 확인",
     "동일 제조소 기반 타 브랜드 제품 연계 점검"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "E-Mail",
+    "notification_ko": "이메일",
+    "quantity": "1102 tubes",
+    "distribution": "US Nationwide.",
+    "code_info": "Lot# 0001, 0002, within expiry",
+    "firm_location": "Dadra And Nagar Haveli, India",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-02"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-26"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-24"
+     }
+    ]
+   },
    "merged_count": 14,
    "merged_items": [
     "Lucky Super Soft, Antifungal Athlete's Foot Cream, Clotrimazole 1% Cream, Net Wt…",

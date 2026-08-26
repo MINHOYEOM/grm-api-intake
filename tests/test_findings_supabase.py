@@ -36,6 +36,9 @@ _TAXONOMY_V5_MIGRATION_PATH = (
 _TAXONOMY_V9_MIGRATION_PATH = (
     Path(__file__).resolve().parent.parent / "web" / "migrations" / "050_findings_taxonomy_v9.sql"
 )
+_TAXONOMY_V10_MIGRATION_PATH = (
+    Path(__file__).resolve().parent.parent / "web" / "migrations" / "064_findings_taxonomy_v10.sql"
+)
 _TAXONOMY_V8_MIGRATION_PATH = (
     Path(__file__).resolve().parent.parent / "web" / "migrations" / "049_findings_taxonomy_v8.sql"
 )
@@ -157,7 +160,7 @@ class PostgresSchemaDdlTest(unittest.TestCase):
         self.assertIn(f"taxonomy_version in ({taxonomy_check})", self.ddl)
 
     def test_taxonomy_check_lists_all_versions(self) -> None:
-        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 9)
+        self.assertEqual(len(gf.TAXONOMY_VERSIONS), 10)
         for version in gf.TAXONOMY_VERSIONS:
             self.assertIn(f"'{version}'", self.ddl)
         # 002 is the fresh-install baseline (IN-list, both versions accepted from day one) --
@@ -748,11 +751,15 @@ class TaxonomyV9AlterMigrationTest(unittest.TestCase):
         self.assertIn("pg_constraint", self.sql)
 
     def test_adds_named_v1_through_v9_in_list_check(self) -> None:
+        """050 은 더 이상 현행이 아니다 -- v9 시점의 목록을 그대로 고정한다.
+
+        현행 목록(gf.TAXONOMY_VERSIONS) 대조는 아래 TaxonomyV10AlterMigrationTest 가
+        064 에 대해 이어받는다. 지난 마이그레이션에 미래 버전을 요구하면 그 파일이
+        영원히 고쳐져야 하고, 그건 provenance 를 무너뜨린다."""
         self.assertIn("findings_taxonomy_version_v1v2v3v4v5v6v7v8v9_check", self.sql)
-        # 050 은 **현행** 마이그레이션이라 gf.TAXONOMY_VERSIONS 와 일치해야 한다 --
-        # 코드가 v10 으로 올라가면 이 테스트가 새 ALTER 를 요구하며 깨진다(의도).
-        for version in gf.TAXONOMY_VERSIONS:
-            self.assertIn(f"'{version}'", self.sql)
+        for n in range(1, 10):
+            self.assertIn(f"'grm-finding-taxonomy/v{n}'", self.sql)
+        self.assertNotIn("'grm-finding-taxonomy/v10'", self.sql)
 
     def test_does_not_reclassify_existing_rows(self) -> None:
         self.assertNotIn("update public.findings", self.sql.lower())
@@ -768,6 +775,47 @@ class TaxonomyV9AlterMigrationTest(unittest.TestCase):
             self.assertIn(f"'{version}'", v8_sql)
             self.assertIn(f"'{version}'", self.sql)
         self.assertIn("'grm-finding-taxonomy/v9'", self.sql)
+
+
+class TaxonomyV10AlterMigrationTest(unittest.TestCase):
+    """064 는 **현행** taxonomy ALTER 다 -- gf.TAXONOMY_VERSIONS 와 일치해야 한다.
+
+    코드가 v11 으로 올라가면 이 테스트가 새 ALTER 를 요구하며 깨진다(의도). 050 이
+    v9 때 하던 역할을 그대로 물려받았고, 050 쪽은 그 시점 목록으로 얼렸다 --
+    지난 마이그레이션에 미래 버전을 요구하면 provenance 가 무너진다.
+    """
+
+    def setUp(self) -> None:
+        self.sql = _TAXONOMY_V10_MIGRATION_PATH.read_text(encoding="utf-8")
+
+    def test_migration_file_exists_without_crlf(self) -> None:
+        self.assertTrue(_TAXONOMY_V10_MIGRATION_PATH.is_file(),
+                        f"missing {_TAXONOMY_V10_MIGRATION_PATH}")
+        self.assertNotIn(b"\r\n", _TAXONOMY_V10_MIGRATION_PATH.read_bytes())
+
+    def test_targets_public_findings_taxonomy_version_column(self) -> None:
+        self.assertIn("public.findings", self.sql)
+        self.assertIn("taxonomy_version", self.sql)
+
+    def test_uses_do_block_and_pg_constraint_lookup(self) -> None:
+        self.assertIn("do $$", self.sql)
+        self.assertIn("pg_constraint", self.sql)
+
+    def test_named_check_lists_exactly_the_current_versions(self) -> None:
+        self.assertIn("findings_taxonomy_version_v1v2v3v4v5v6v7v8v9v10_check", self.sql)
+        for version in gf.TAXONOMY_VERSIONS:
+            self.assertIn(f"'{version}'", self.sql)
+
+    def test_does_not_reclassify_existing_rows(self) -> None:
+        """★CHECK 확장과 재분류는 다른 일이다 -- 이 파일은 기존 행을 건드리지 않는다.
+
+        (재분류는 findings_reclassify_service.py 를 사람이 dispatch 해서 한다.)"""
+        lowered = self.sql.lower()
+        self.assertNotIn("update public.findings", lowered)
+        self.assertNotIn("set category_code", lowered)
+
+    def test_does_not_touch_finding_text(self) -> None:
+        self.assertNotIn("set finding_text", self.sql.lower())
 
 
 class TranslationColumnsMigrationTest(unittest.TestCase):

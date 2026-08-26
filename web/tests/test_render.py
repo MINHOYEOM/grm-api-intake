@@ -3200,10 +3200,12 @@ class WebTrendsRenderTest(unittest.TestCase):
         # 보기 전환 3종의 읽는 법은 JS 가 보유한다(정적 문장이 아니다).
         js_src = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
         self.assertIn("function agencyReadText(view)", js_src)
-        for cue in ("문서에서만 셉니다.",
+        for cue in (# [2026-08-27] 분모가 "문서" 에서 "실사 지적" 으로 좁아졌다 —
+                    # 회수 공고·행정처분은 지적이 아니라 순위 모집단에서 뺐다.
+                    "실사 지적에서만 셉니다.",
                     # '전체'가 무엇을 합친 것인지 말한다 — 안 적으면 독자가 자기와
                     # 관련 있는 기관만 들어 있다고 가정한다(캐나다 실사가 32%다).
-                    "캐나다 실사와 EU·영국 GMP 비준수까지 합쳐 센 순위입니다.",
+                    "캐나다 실사와 EU·영국 GMP 비준수까지, 실사에서 나온 지적만 합쳐 센 순위입니다.",
                     "식약처와 FDA 는 상위 항목이 겹치지 않습니다"):
             self.assertIn(cue, js_src)
         # 조항 순위의 읽는 법도 기관에 따라 달라진다(식약처에게 21 CFR 은 다른 나라 규정).
@@ -4306,6 +4308,71 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("아직 세부 분류가 되지 않아 순위에서 뺐습니다", self.js_src)
         self.assertIn("분모에는 그대로 들어 있습니다", self.js_src)
 
+
+    # ── 순위의 모집단 = 실사 지적 ────────────────────────────────────────────
+    def test_ranking_population_is_inspection_findings_only(self):
+        """★순위 축은 "어떤 지적을 받는가"다. 회수 공고와 행정처분은 지적이 아니다.
+
+        053 이 식약처를 세 채널로 쪼개 두었는데(MFDS/gmp-inspection ·
+        MFDS/recall-quality · MFDS/admin-action) 기관 선택이 접두 하나로 셋을 도로
+        합치고 있었다. 실측(2026-08-26, 최근 12개월)으로 **1위가 통째로 바뀐다**:
+            합산      1위 불만/회수 187 · 2위 세척밸리 69 · 3위 문서화 67
+            실사만    1위 세척밸리 58 · 2위 밸리데이션 51 · 5위 데이터완전성 40
+        합산 1위 "불만/회수 187"은 규제 현상이 아니라 **회수 공고를 회수로 분류한
+        동어반복**이다 — 같은 959건이 본문에 '회수'가 있으면 불만/회수(418),
+        없으면 기타(456)로 갈렸다. 합산 3위 문서화 67 중 34 는 행정처분의 '재평가
+        자료 미제출'이라 기록관리 SOP 문제로 오독된다.
+        식약처 2,008건 중 1,105건(55%)이 실사 지적이 아니다."""
+        self.assertIn(
+            'var NON_INSPECTION_TYPES = { "recall-quality": 1, "admin-action": 1 };',
+            self.js_src)
+        fn = self._fn("isInspectionLane")
+        self.assertIn("indexOf(\"/\")", fn)
+        self.assertIn("if (i < 0) return true;", fn)          # 쪼개지 않은 레인은 통과
+        self.assertIn("return !NON_INSPECTION_TYPES[", fn)
+        kept = self._fn("agencyKept")
+        self.assertIn("if (isInspectionLane(lane)) kept[lane] = true;", kept)
+
+    def test_lane_rule_is_denylist_so_a_new_channel_is_not_silently_dropped(self):
+        """[음성 검사] 규칙을 "gmp-inspection 만 통과"로 적으면 안 된다.
+
+        그렇게 적으면 나중에 053 이 다른 소스를 쪼갤 때 그 소스가 **통째로 조용히**
+        순위에서 사라진다 — 이 저장소가 CI 허용목록에서 이미 겪은 실패다(손열거가
+        낡아 침묵 미실행). 그래서 아는 비실사 유형만 빼고 모르는 유형은 남긴다."""
+        fn = self._fn("isInspectionLane")
+        self.assertNotIn("gmp-inspection", fn,
+                         "판정이 허용목록으로 적혔다 — 새 채널이 조용히 사라진다")
+        self.assertNotIn("gmp-inspection", self._fn("agencyKept"))
+        self.assertIn("모르는 유형은 남긴다", self.js_src)
+
+    def test_agency_kept_still_returns_a_plain_lane_map(self):
+        """agencyKept 의 소비자는 둘이다(buildAgencyRanking · renderMovers).
+
+        renderMovers 는 이 값을 scope[lane] 으로 직접 찾으므로 반환 모양을
+        {kept, offCnt} 로 바꾸면 **문법은 통과한 채** 창 합계가 0이 되어 '달라진 점'이
+        영영 안 그려진다. 실제로 이 PR 작업 중 한 번 그렇게 만들었다 — 뺀 몫은
+        별도 함수로 센다."""
+        kept = self._fn("agencyKept")
+        self.assertIn("return kept;", kept)
+        self.assertNotIn("offCnt", kept)
+        self.assertIn("function agencyOffCount(grid, view)", self.js_src)
+        movers = self.js_src[self.js_src.index("function renderMovers(data, view)"):]
+        movers = movers[:movers.index("\n  }\n")]
+        self.assertIn("var scope = grid.length ? agencyKept(grid, v) : null;", movers)
+        self.assertIn("if (!scope[t.lane]) return;", movers)
+
+    def test_excluded_non_inspection_volume_is_disclosed_with_a_destination(self):
+        """조용히 빼면 "식약처 자료가 이것뿐"으로 읽힌다. 크기를 적고 갈 곳을 준다.
+
+        규율 2('분류 실패를 감추지 않는다')와 같은 자리·같은 방식이다 — 다만 이쪽은
+        분류 실패가 아니라 **모집단이 다른 문서**라 분모에서도 뺀다(기타는 분모에 남는다)."""
+        self.assertIn("회수 공고·행정처분 ", self.js_src)
+        self.assertIn("실사 지적이 아니라 이 순위에서 제외했습니다", self.js_src)
+        self.assertIn("찾아보기에서 전부 보실 수 있어요", self.js_src)
+        self.assertIn("offCnt: agencyOffCount(grid, view),", self.js_src)
+        # 읽는 법도 분모에 맞춰 다시 적혀 있어야 한다.
+        self.assertIn('" 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 "', self.js_src)
+        self.assertIn("실사에서 나온 지적만 합쳐 센 순위입니다", self.js_src)
 
     def test_new_elements_defensively_queried_not_in_hard_gate(self):
         """구버전 캐시 셸에 이 블록들이 없어도 페이지 전체가 죽으면 안 된다 — zone/heatmap

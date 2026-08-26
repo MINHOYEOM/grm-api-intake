@@ -297,7 +297,30 @@ FINDING_SCHEMA_VERSION = "grm-finding/v1"
 #      (container closure integrity 등 211.94 계열)은 조항 문맥 요구 덕에 걸리지 않는다.
 #   6) v1~v8-tagged records already on disk remain valid; TAXONOMY_VERSIONS now accepts all nine.
 #      Category codes/labels/count (20) are unchanged.
-TAXONOMY_VERSION = "grm-finding-taxonomy/v9"
+#
+# grm-finding-taxonomy/v10 change log (2026-08-26 · 공개 findings 전건 24,876행 대조):
+#   1) ★매칭 엔진: ASCII 키워드의 단어경계를 `\b` 에서 **ASCII 단어문자 전후방 탐색**으로
+#      바꾼다. 파이썬 `re` 는 한글도 `\w` 로 보므로 조사가 붙으면 뒤쪽 `\b` 가 성립하지
+#      않는다 — `audit trail` 은 v2 부터 등록된 키워드였는데 "Audit Trail과 사용 대장의
+#      일치 확인" 문장에서 **조용히 매칭되지 않고** 캐치올로 떨어져 있었다. 등록된 키워드가
+#      매칭 안 되는 것은 어휘 공백이 아니라 **엔진 결함**이라 어휘 보강으로는 영영 안 고쳐진다.
+#      영문 원문은 앞뒤가 공백·구두점이라 종전과 동일하게 동작한다(아래 비용 실측 참조).
+#   2) quality_unit_oversight: "제품품질평가" 키워드 추가 — v4 가 넣은 "annual product
+#      review" 의 국내 표기다. 영문 표기만 있어 식약처 지적서의 PQR 문장이 전부 캐치올로
+#      떨어졌다. **새 개념이 아니라 이미 있는 개념의 표기 누락**이라는 점이 채택 기준이다.
+#   3) ★기각한 후보 3종과 그 이유(전건 교차 측정 — 판정 기준은 "실질→다른 실질 이동",
+#      즉 **이미 맞게 분류된 행을 훔치는가**다. 분류기는 선언 순서대로 첫 매치를 쓰므로
+#      앞선 카테고리에 어휘를 더하면 뒤 카테고리의 행을 가져간다):
+#        후보                          기타→실질   훔침   판정
+#        "백업"→컴퓨터화시스템              6       10    기각(시설장비 지적을 대량 탈취)
+#        "제품표준서"→문서화                3        5    기각(회수·행정처분 보일러플레이트)
+#        "청정구역"→환경모니터링             6        7    기각("청정구역의 저울 관리"를 탈취)
+#      채택한 둘은 각각 (1) 훔침 0, (2) 훔침 4 인데 그 4 건은 전부 문장의 주어가
+#      제품품질평가라 **이동이 곧 개선**이다(설비/표시포장/시험실에서 잘못 걸려 있었다).
+#   4) 비용 실측: 전 24,876행 중 (1)이 1행, (2)가 13행을 캐치올에서 회수하고 4행을
+#      재배치한다. **캐치올로 역행하는 행 0 · FDA/캐나다 레인 이동 0.**
+#   5) 카테고리 코드·라벨·개수(20) 불변. v1~v9-tagged 레코드는 그대로 유효하다.
+TAXONOMY_VERSION = "grm-finding-taxonomy/v10"
 TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v1",
     "grm-finding-taxonomy/v2",
@@ -308,6 +331,7 @@ TAXONOMY_VERSIONS: tuple[str, ...] = (
     "grm-finding-taxonomy/v7",
     "grm-finding-taxonomy/v8",
     "grm-finding-taxonomy/v9",
+    "grm-finding-taxonomy/v10",
 )
 
 RAW_SIGNAL_REQUIRED_FIELDS = (
@@ -471,6 +495,9 @@ FINDING_TAXONOMY: tuple[FindingCategory, ...] = (
             "annual product review",
             "품질부서",
             "품질보증",
+            # v10: "annual product review" 의 국내 표기. 영문 표기만 있어서 식약처
+            # 지적서의 제품품질평가(PQR) 문장이 전부 캐치올로 떨어지고 있었다.
+            "제품품질평가",
         ),
         patterns=(
             # v4: known OCR corruption of "quality" -- audit case 0a1df74a ("quaJity unit",
@@ -769,7 +796,11 @@ def _ascii_keyword_pattern(keyword: str) -> "re.Pattern[str]":
     if pattern is None:
         words = keyword.split()
         body = r"\s+".join(re.escape(word) for word in words)
-        pattern = re.compile(rf"\b{body}s?\b", re.IGNORECASE)
+        # v10: 경계를 **ASCII 단어문자로만** 정의한다. 파이썬 `re` 의 `\b` 는 한글도
+        # `\w` 로 보므로 "Audit Trail과"처럼 조사가 붙으면 뒤쪽 경계가 성립하지 않아
+        # 등록해 둔 영문 키워드가 조용히 매칭되지 않았다(전건 대조로 확인).
+        pattern = re.compile(
+            rf"(?<![0-9A-Za-z_]){body}s?(?![0-9A-Za-z_])", re.IGNORECASE)
         _ASCII_KEYWORD_PATTERN_CACHE[keyword] = pattern
     return pattern
 

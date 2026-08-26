@@ -1,0 +1,181 @@
+name: GRM Findings Taxonomy Drift Monitor
+
+# [2026-08-27] 분류 표류 감시 — **읽기 전용**. findings 를 쓰지 않고 git 도 건드리지 않는다.
+#
+# ★왜 필요한가(실제로 일어난 일): grm-findings-reclassify 는 workflow_dispatch 전용·크론이
+# 없다. 2026-08-26 실측에서 마지막 실행이 08-02 였고, 그 사이 **233행의 category_code 가
+# 현행 분류기와 어긋나 있었다**(103행은 캐치올에 갇혀 있었다 — 더 나은 답이 이미 계산돼
+# 있는데 라이브에 닿지 않은 상태). 분류기를 고쳐도 적용이 안 되면 사용자 화면은 그대로다.
+# 이 저장소가 여러 번 적은 교훈 그대로다 — **"자동 갱신"의 난이도는 크론이 아니라 안
+# 돌았을 때 알아채기다.**
+#
+# ★적용은 자동화하지 않는다. 분류 변경은 공개 데이터의 의미를 바꾸므로 사람이 dispatch 한다.
+# 이 워크플로가 하는 일은 "지금 적용하면 몇 행이 바뀌는가"를 매주 재서, 0이 아니면 이슈로
+# 알리는 것뿐이다.
+#
+# ★임계는 `category_changes`(카테고리가 실제로 바뀌는 행)다. `changes_planned` 는 taxonomy
+# 버전 스탬프만 바뀌는 행까지 포함하는데, 버전을 올린 직후에는 그게 전건이라 알람이 영원히
+# 켜져 있게 된다 — **원인이 다른 사건을 한 카운터에 합치면 진단은 반드시 틀린다.**
+on:
+  schedule:
+    # 매주 화 22:00 UTC = 수 07:00 KST. 월요일 발행이 끝난 뒤 한 주 상태를 본다.
+    - cron: '0 22 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write        # 표류 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: findings-taxonomy-drift
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    name: Detect category drift against the current classifier
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 표류 감지(exit 1)는 job 하드 실패가 아니라 이슈로 처리한다 — outcome 을 뒤에서 분기.
+      # ★--dry-run 을 반드시 함께 준다. 이 워크플로는 PATCH 경로를 절대 타지 않는다.
+      - name: Plan reclassification (read-only, never PATCHes)
+        id: drift
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python findings_reclassify_service.py \
+            --dry-run \
+            --fail-on-category-drift 0 \
+            --output reclassify_report.json
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Taxonomy Drift Monitor"
+            echo ""
+            if [ -f reclassify_report.json ]; then
+              echo '```json'
+              cat reclassify_report.json
+              echo '```'
+            else
+              echo "reclassify_report.json 이 생성되지 않았습니다 (SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update drift issue
+        if: steps.drift.outcome == 'failure'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try { report = JSON.parse(fs.readFileSync('reclassify_report.json', 'utf8')); }
+            catch (e) { report = { errors: ['reclassify_report.json 파싱 실패'] }; }
+
+            const title = '[taxonomy-drift] 라이브 분류가 현행 분류기와 어긋나 있습니다';
+            const label = 'taxonomy-drift';
+
+            const matrix = report.category_migration_matrix || {};
+            const top = Object.entries(matrix).sort((a, b) => b[1] - a[1]).slice(0, 12);
+            const lines = [
+              `현행 분류기(\`${report.taxonomy_version || '?'}\`)를 라이브 findings 에 다시 돌리면`,
+              `**${report.category_changes ?? '?'}행의 category_code 가 바뀝니다**`,
+              `(스캔 ${report.rows_scanned ?? '?'}행 · 버전 스탬프만 바뀌는 행 ${report.version_only_stamps ?? '?'}).`,
+              '',
+              '분류기는 고쳐졌는데 라이브에 닿지 않은 상태입니다 — 사용자가 보는 카테고리는 옛 답입니다.',
+              '',
+              '**해소 방법**: Actions → `GRM Findings Reclassify (taxonomy)` → Run workflow →',
+              '`dry_run=false`. (읽기 + category PATCH 만; finding_text 는 건드리지 않습니다.)',
+              '',
+              '| 이동 | 행 수 |',
+              '|---|---|',
+              ...top.map(([k, v]) => `| \`${k}\` | ${v} |`),
+            ];
+            if (Object.keys(matrix).length > top.length) {
+              lines.push(`| … 그 외 ${Object.keys(matrix).length - top.length}종 | |`);
+            }
+            if ((report.errors || []).length) {
+              lines.push('', '**오류**', ...report.errors.map(e => `- ${e}`));
+            }
+            lines.push('', `_이 이슈는 표류가 해소되면 자동으로 닫힙니다._`);
+            const body = lines.join('\n');
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (e) {
+                if (e.status !== 404) throw e;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'B60205', '라이브 분류가 현행 분류기와 어긋남');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 50,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      # ★복귀 시 자동 종료는 **표류 검사가 실제로 성공했을 때만** 한다.
+      # 스크립트가 자격증명 부재(exit 2)로 죽어도 outcome 은 failure 라 위 분기로 가고,
+      # 여기로는 오지 않는다 — "0건인데 exit 0" 으로 알람을 스스로 끄는 사고를 막는다.
+      - name: Close drift issue on recovery
+        if: steps.drift.outcome == 'success'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            // 보고서가 없으면 "정상"이라고 단정하지 않는다(부재 어휘 규율).
+            let report = null;
+            try { report = JSON.parse(fs.readFileSync('reclassify_report.json', 'utf8')); }
+            catch (e) { core.notice('보고서를 읽지 못해 이슈를 닫지 않는다'); return; }
+            if ((report.category_changes ?? -1) !== 0) {
+              core.notice(`category_changes=${report.category_changes} — 닫지 않는다`);
+              return;
+            }
+            const title = '[taxonomy-drift] 라이브 분류가 현행 분류기와 어긋나 있습니다';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'taxonomy-drift', per_page: 50,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `표류가 해소되어 자동으로 닫습니다(스캔 ${report.rows_scanned}행 · category_changes 0).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 종료`);
+            }

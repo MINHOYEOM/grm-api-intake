@@ -311,6 +311,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Only PATCH the first N planned changes (default: all).",
     )
     parser.add_argument(
+        "--fail-on-category-drift",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Exit 1 when category_changes exceeds N (default: off). 표류 감시용 -- "
+        "--dry-run 과 함께 쓴다. 임계를 category_changes 에 거는 이유는 "
+        "changes_planned 가 taxonomy 버전 스탬프만 바뀌는 행까지 세기 때문이다: "
+        "버전을 올린 직후에는 그게 전건이라 알람이 영원히 켜져 있게 된다.",
+    )
+    parser.add_argument(
         "--supabase-url",
         help="Supabase project URL (falls back to $SUPABASE_URL)",
     )
@@ -335,6 +345,18 @@ def main(argv: list[str] | None = None) -> int:
     _write_report(args.output, report)
 
     if report["errors"]:
+        return 1
+    # ★표류 감시: 임계는 명시적으로 준 경우에만 적용한다(기본은 off -- 기존 dispatch
+    #   운용의 종료코드를 바꾸지 않는다). 자격증명 부재는 위에서 이미 2 로 갈라져 나가므로
+    #   여기 도달했다는 것은 "실제로 재어 봤다"는 뜻이다 -- 못 재고 조용히 0을 돌려주는
+    #   경로가 없어야 감시가 자기 알람을 끄지 않는다.
+    threshold = args.fail_on_category_drift
+    if threshold is not None and report["category_changes"] > threshold:
+        print(
+            "findings_reclassify_service: category drift %d > %d -- 라이브 분류가 현행 "
+            "분류기와 어긋나 있습니다" % (report["category_changes"], threshold),
+            file=sys.stderr,
+        )
         return 1
     return 0
 

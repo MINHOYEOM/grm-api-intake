@@ -150,8 +150,11 @@
         배너를 세로 나열 대신 반폭 카드 한 줄(.mini-ctas)로 압축한다(참여 존 꼬리 과밀 해소).
         계약 불변: ①자료실 수치는 render 가 카탈로그에서 계산(하드코딩 금지 — 손으로 적으면
         반드시 낡는다)·데이터 없으면 카드 미렌더 ②워치리스트는 회원 기능이라 reactions
-        게이트 안(/me 푸터 링크 선례 — env-off 빌드 골든 byte-diff 0)·CTA 는 검색 페이지로
-        (업체 프로파일은 key 없이 열면 막다른 화면) ③id=watchlist 는 뉴스레터 사다리
+        게이트 안(/me 푸터 링크 선례 — env-off 빌드 골든 byte-diff 0)·CTA 는 업체 조회로
+        (★[존 재편 2026-08-26] 여기 "업체 프로파일은 key 없이 열면 막다른 화면이라 검색
+        페이지로 보낸다"고 적혀 있었다. 그 전제가 사라졌다 — firm.html 이 ?key= 없이
+        들어오면 이름으로 찾는 랜딩을 보여준다. 검색 페이지를 한 번 거쳐 문서 카드에서
+        업체명을 찾아 누르라는 우회를 없앤다) ③id=watchlist 는 뉴스레터 사다리
         (newsletter.py)가 직링크하는 앵커(파일 간 계약) ④브리프행 CTA 불증가(자료실 CTA 는
         /library/ 행·워치리스트 CTA 는 /findings/ 행). §4 한글안전: letter-spacing/
         text-transform/mono 미사용. -#}
@@ -172,9 +175,9 @@
         <div class="quiz-cta-txt">
           <span class="kick">Firm Watchlist</span>
           <h3>관심 업체의 새 지적사항, 메일로 받아보세요.</h3>
-          <p>협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 지적사항 검색에서 바로 등록할 수 있어요.</p>
+          <p>협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 업체 이름을 넣어 찾은 뒤 그 업체 화면에서 바로 등록할 수 있어요.</p>
         </div>
-        <a class="btn" href="{{ rel_root }}findings/index.html">업체 검색하러 가기 <i class="ti ti-arrow-right"></i></a>
+        <a class="btn" href="{{ rel_root }}findings/firm/index.html">업체 조회하러 가기 <i class="ti ti-arrow-right"></i></a>
       </div>
       {% endif %}
     </div>

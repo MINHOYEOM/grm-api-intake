@@ -2139,7 +2139,13 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         " GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색",
         f"- [문서로 찾기]({base_url}/findings/docs/): 실사 문서 단위 한국어 정리"
         f" {n_docs:,}건 — 기관·연도별 색인",
-        f"- [트렌드]({base_url}/findings/trends/): 지적 영역·기관·연도별 자동 집계",
+        f"- [지적 경향]({base_url}/findings/trends/): 최근 12개월 지적 영역 순위 ·"
+        " 많이 인용된 조항",
+        f"- [FDA 실사 결과]({base_url}/findings/inspections/): FDA GMP 실사 등급"
+        "(NAI·VAI·OAI) 연도별·국가별 집계",
+        f"- [데이터 현황]({base_url}/findings/coverage/): 소스 구성 · 연도별 확보량 ·"
+        " 수집 범위와 한계",
+        f"- [업체 조회]({base_url}/findings/firm/): 업체명으로 그 업체의 지적 이력 조회",
         f"- [자가점검 체크리스트]({base_url}/findings/checklist/): 빈발 지적 기반 자가"
         " 점검 문항",
         "",
@@ -2174,6 +2180,10 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/trends/</loc><lastmod>{latest_pub}</lastmod></url>",
+        # [존 재편 2026-08-26] 트렌드 존 2·3면 — 조회 파라미터 없이 그 자체로 완결된
+        # 집계 페이지라 체크리스트와 같은 근거로 등록한다(개인·업체 식별 정보 없음).
+        f"  <url><loc>{base_url}/findings/inspections/</loc><lastmod>{latest_pub}</lastmod></url>",
+        f"  <url><loc>{base_url}/findings/coverage/</loc><lastmod>{latest_pub}</lastmod></url>",
         # 자가점검 체크리스트 — 조회 파라미터 없이 그 자체로 완결된 도구 페이지라 등록한다
         # (firm/inspector 와 달리 개인·업체 식별 정보가 URL 에 없다).
         f"  <url><loc>{base_url}/findings/checklist/</loc><lastmod>{latest_pub}</lastmod></url>",
@@ -2371,8 +2381,15 @@ ARCHIVE_DESCRIPTION = ("GRM 규제뉴스 아카이브 — 전 세계 제약 GMP�
                        "주차별로 모아 기관·기간으로 검색·필터.")
 FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
                         "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터.")
-TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항 "
-                      "전량 집계 통계 — 카테고리 순위·연도별 구성비·업체 랭킹으로 보는 규제 지적 트렌드.")
+# [존 재편 2026-08-26] 트렌드 존이 세 면으로 갈리면서 이 설명도 '지적 경향' 면만 가리킨다 —
+# 연도별 구성비·업체 랭킹은 데이터 현황 면으로 옮겼으므로 문안에서도 뺐다(설명이 실제
+# 페이지 내용과 어긋나면 검색결과 스니펫이 먼저 거짓말을 한다).
+TRENDS_DESCRIPTION = ("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수에서 "
+                      "지금 무엇이 지적되는지 — 최근 12개월 영역 순위와 많이 인용된 조항으로 보는 규제 지적 경향.")
+INSPECTIONS_DESCRIPTION = ("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
+                           "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
+COVERAGE_DESCRIPTION = ("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
+                        "연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다.")
 FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·캐나다 실사·식약처·EU/영국 GMP 비준수 지적사항 "
                     "누적 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
 CHECKLIST_DESCRIPTION = ("규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 "
@@ -2656,16 +2673,54 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 수 없다(집계는 Supabase RPC findings_stats/findings_firm_stats 를 trends.js 가 직접
     # fetch). 서버는 셸(로딩 상태)만 렌더 — findings/index.html 한 단계 더 깊은 경로라
     # rel_root 는 "../../"(브리프 상세와 동일 깊이).
+    # [존 재편 2026-08-26] 트렌드 존은 이제 세 면이다(지적 경향 / 실사 결과 / 데이터 현황).
+    # nav 탭은 '트렌드' 하나로 유지하고(저장소 'nav 과밀 금지' 원칙) 면 전환은
+    # partials/trends_seg.html 이 맡는다 — seg_active 가 그 파셜의 활성 탭을 정한다.
+    # 세 면 모두 trends.html 계열 셸이라 rel_root·nav_active 는 동일하고, 셸의
+    # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
     trends_html = env.get_template("trends.html").render(
         page_title="규제 지적사항 트렌드 · GRM",
         rel_root="../../",
         nav_active="trends",
+        seg_active="trends",
         latest_slug=latest_slug,
         description=TRENDS_DESCRIPTION,
         canonical=_abs_url("findings/trends/"),
     )
     _write(out_dir / "findings" / "trends" / "index.html", trends_html)
     written.append("findings/trends/index.html")
+
+    # 실사 결과(트렌드 존 2면) — 058/059 fda_inspection_stats() 전용. findings 계열과
+    # **단위가 다르다**(실사 건 vs 지적 문장). 재편 전에는 지적사항 페이지에 얹혀 있어
+    # "두 수치를 서로 나누지 마세요"라는 경고문이 필요했는데, 면을 가르면 그 경고가
+    # 필요 없어진다 — 분모가 다른 것을 같은 페이지에 두지 않는 것이 이 재편의 핵심이다.
+    inspections_html = env.get_template("inspections.html").render(
+        page_title="FDA 실사 결과 · GRM",
+        rel_root="../../",
+        nav_active="trends",
+        seg_active="inspections",
+        latest_slug=latest_slug,
+        description=INSPECTIONS_DESCRIPTION,
+        canonical=_abs_url("findings/inspections/"),
+    )
+    _write(out_dir / "findings" / "inspections" / "index.html", inspections_html)
+    written.append("findings/inspections/index.html")
+
+    # 데이터 현황(트렌드 존 3면) — 소스 구성·연도별 공개량·연도별 구성비·수집량 상위
+    # 업체. 재편 전 트렌드 페이지 12섹션 중 이 넷은 "규제가 어떻게 변하나"가 아니라
+    # "우리가 무엇을 얼마나 모았나"였고, 다른 두 면에 반복되던 커버리지 해설
+    # (실측 22개 2,589자 = 본문 글자의 32%)의 목적지이기도 하다.
+    coverage_html = env.get_template("coverage.html").render(
+        page_title="데이터 현황 · GRM",
+        rel_root="../../",
+        nav_active="trends",
+        seg_active="coverage",
+        latest_slug=latest_slug,
+        description=COVERAGE_DESCRIPTION,
+        canonical=_abs_url("findings/coverage/"),
+    )
+    _write(out_dir / "findings" / "coverage" / "index.html", coverage_html)
+    written.append("findings/coverage/index.html")
 
     # 업체 프로파일(FIND-FIRM-ALIAS 웹 절반) — findings/trends 와 동일 이유로 라이브
     # 데이터는 빌드시 고정할 수 없다(013_findings_firm_key.sql 의 findings_firm_profile

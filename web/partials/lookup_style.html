@@ -1,0 +1,41 @@
+{#- [존 재편 2026-08-26] 이름으로 조회하는 랜딩의 스코프 스타일 — firm.html /
+    inspector.html 공용.
+
+    두 프로파일 페이지는 ?key= 없이 들어오면 오류 화면만 띄웠고, 그래서 정적 인바운드
+    링크가 각각 0개였다(도달성 감사 실측). 키가 없을 때 '이름으로 찾는' 랜딩을 두어
+    페이지 자체를 진입로로 만든다 — 이 파셜은 그 랜딩의 스타일만 담는다.
+
+    grm.css 는 디자인 동결이라 손대지 않는다(README 불변식) — 마스코트·구독밴드·
+    반응 계층이 이미 쓰는 '스코프 인라인 스타일' 관례를 그대로 따른다.
+    §4 한글안전: 한글에 letter-spacing/uppercase/mono 를 걸지 않는다. -#}
+<style>
+/* 라벨은 화면에서 감추되 스크린리더에는 남긴다(placeholder 만으로는 접근성 미흡). */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* ── 이름으로 조회하는 랜딩(업체·실사관 공용) ─────────────────────────────
+   두 프로파일 페이지는 ?key= 없이 들어오면 오류 화면만 보여줬고, 그래서 정적
+   진입로가 아예 없었다(업체는 트렌드 7번째 블록의 폼, 실사관은 문서 상세뿐).
+   키가 없을 때 '이름으로 찾는' 랜딩을 두어 두 페이지 자체를 진입로로 만든다. */
+.tr-look{max-width:640px}
+.tr-look-form{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+.tr-look-input{
+  flex:1 1 240px;min-width:0;padding:12px 15px;font-family:var(--sans);font-size:15px;
+  color:var(--ink);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);
+}
+.tr-look-input:focus{outline:2px solid var(--coral);outline-offset:-1px;border-color:var(--coral)}
+.tr-look-btn{
+  flex:0 0 auto;padding:12px 22px;border:none;border-radius:var(--rad-s);
+  background:var(--ink);color:var(--canvas);font-size:14px;font-weight:600;transition:opacity var(--tr);
+}
+.tr-look-btn:hover{opacity:.86}
+.tr-look-btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.tr-look-hint{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.tr-look-res{margin:22px 0 0}
+.tr-look-row{
+  display:flex;align-items:baseline;gap:14px;padding:12px 10px;border-bottom:1px solid var(--line);
+  border-radius:6px;cursor:pointer;
+}
+.tr-look-row:hover,.tr-look-row:focus-visible{background:var(--strong);outline:none}
+.tr-look-name{flex:1 1 auto;min-width:0;font-size:14.5px;color:var(--body-s)}
+.tr-look-meta{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tr-look-empty{font-size:13.5px;color:var(--muted);margin:0}
+</style>

@@ -40,6 +40,12 @@
   var catEl = document.getElementById("ip-cat");
   var yearEl = document.getElementById("ip-year");
   var docsEl = document.getElementById("ip-docs");
+  // [존 재편 2026-08-26] ?key= 없이 들어왔을 때의 조회 랜딩(037 진입 경로 조항 개정 —
+  // 템플릿 주석에 근거를 적어 뒀다). 하드 게이트에는 넣지 않는다.
+  var lookupEl = document.getElementById("ip-lookup");
+  var lookFormEl = document.getElementById("ip-look-form");
+  var lookInputEl = document.getElementById("ip-look-input");
+  var lookResEl = document.getElementById("ip-look-res");
   if (!cfg || !loadingEl || !unavailableEl || !contentEl || !nameEl ||
       !statsEl || !catEl || !yearEl || !docsEl) return;
 
@@ -90,6 +96,7 @@
     loadingEl.hidden = which !== "loading";
     unavailableEl.hidden = which !== "unavailable";
     contentEl.hidden = which !== "content";
+    if (lookupEl) lookupEl.hidden = which !== "lookup";
   }
 
   function el(tag, className, text) {
@@ -382,13 +389,86 @@
     });
   }
 
+  // ── [이름으로 조회] 037/039 findings_inspector_index ─────────────────────────
+  // ★이 코드가 지켜야 하는 037 계약(어기면 이 기능은 '디렉터리'가 된다):
+  //   · **2글자 미만이면 아무것도 그리지 않는다.** 빈 입력에 전체 명단을 뿌리는 순간
+  //     이 화면은 사람을 훑어보는 목록이 된다 — 037 이 금지한 바로 그것이다.
+  //   · 결과는 **알파벳순**으로 최대 8명. 문서 수 내림차순으로 정렬하면 그 자체가
+  //     순위표라 037 의 "순위·비교 금지"를 어긴다. 건수는 맥락으로 병기만 한다.
+  //   · index RPC 는 세션당 1회만 받아 캐시한다(findings.js 의 동일 관례).
+  var idxCache = null;
+
+  function fetchInspectorIndex() {
+    if (idxCache) return idxCache;
+    idxCache = fetch(rpcEndpoint("findings_inspector_index"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: "{}",
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_inspector_index " + r.status);
+      return r.json();
+    });
+    return idxCache;
+  }
+
+  function buildLookupRow(item) {
+    var a = document.createElement("a");
+    a.className = "tr-look-row";
+    a.href = "?key=" + encodeURIComponent(item.inspector_key || "");
+    a.appendChild(el("span", "tr-look-name", item.display_name || item.inspector_key || ""));
+    a.appendChild(el("span", "tr-look-meta", "문서 " + (item.documents || 0) + "건"));
+    return a;
+  }
+
+  function runLookup() {
+    if (!lookInputEl || !lookResEl) return;
+    var q = (lookInputEl.value || "").trim().toLowerCase();
+    lookResEl.innerHTML = "";
+    if (q.length < 2) {
+      // 목록화 방지 게이트 — 이 분기에서 절대 결과를 그리지 않는다.
+      lookResEl.appendChild(el("p", "tr-look-empty", "두 글자 이상 입력해 주세요."));
+      return;
+    }
+    lookResEl.appendChild(el("p", "tr-look-empty", "찾는 중\u2026"));
+    fetchInspectorIndex().then(function (rows) {
+      if (!lookResEl) return;
+      lookResEl.innerHTML = "";
+      var hits = (rows || []).filter(function (r) {
+        return String(r.display_name || "").toLowerCase().indexOf(q) >= 0 ||
+               String(r.inspector_key || "").toLowerCase().indexOf(q) >= 0;
+      }).sort(function (a, b) {
+        return String(a.display_name || "").localeCompare(String(b.display_name || ""));
+      }).slice(0, 8);
+      if (!hits.length) {
+        lookResEl.appendChild(el("p", "tr-look-empty",
+          "찾은 실사관이 없습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다."));
+        return;
+      }
+      hits.forEach(function (it) { lookResEl.appendChild(buildLookupRow(it)); });
+    }).catch(function () {
+      if (!lookResEl) return;
+      lookResEl.innerHTML = "";
+      lookResEl.appendChild(el("p", "tr-look-empty", "실사관 조회를 불러오지 못했습니다."));
+    });
+  }
+
+  if (lookFormEl) {
+    lookFormEl.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      runLookup();
+    });
+  }
+
   var inspectorKeyParam = getInspectorKeyParam();
 
-  if (!url || !key || !inspectorKeyParam) {
-    // env(SUPABASE_URL/ANON_KEY) 미설정 또는 key 파라미터 자체가 없음 — fetch 를 시도할
-    // 이유가 없다. firm.js 와 달리 "준비 중"과 "찾을 수 없음"을 구분하지 않는다(★코호트
-    // 게이트 정보 누출 방지 — 파일 상단 주석 참조) — 곧장 단일 안내로 수렴.
+  if (!url || !key) {
+    // env 미설정 — 조회도 프로파일도 불가. 단일 안내로 수렴(코호트 게이트 정보 누출
+    // 방지 원칙은 그대로 — 파일 상단 주석 참조).
     showState("unavailable");
+  } else if (!inspectorKeyParam) {
+    // [존 재편] 키가 없으면 조회 랜딩. "제공하지 않습니다"로 막다르게 끝내지 않는다.
+    showState("lookup");
+    if (lookInputEl) lookInputEl.focus();
   } else {
     showState("loading");
     fetchInspectorProfile(inspectorKeyParam)

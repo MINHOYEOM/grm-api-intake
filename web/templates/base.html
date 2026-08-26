@@ -134,12 +134,16 @@
 </script>
 {% endif %}
 {% block ai_disclosure %}{% endblock %}
+{# [존 재편 2026-08-26] footer 열이 4개 → 5개가 되면서 grm.css 의 `.foot{grid-template-columns:1.6fr 1fr 1fr 1fr}` 로는 다섯째 열이 둘째 줄로 떨어진다(브랜드 열 아래에 홀로 붙어 어긋나 보인다). grm.css 는 디자인 동결이라 손대지 않고(README 불변식), 마스코트·구독밴드·반응 계층이 쓰는 '스코프 인라인 override' 관례를 그대로 따른다. 브랜드 열은 1.6fr→1.3fr 로 조금 줄여 링크 열 넷이 좁아지지 않게 한다. 반응형(≤1024px 2열 / ≤900px 1열)은 grm.css 의 미디어쿼리가 그대로 이긴다 — 겹치지 않는 min-width 로만 덮어 그 단계적 축소를 건드리지 않는다. #}
+<style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
     {# 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다(뉴스레터 밴드 선례 동형). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
     <div><h5>둘러보기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">모아보기</a><a href="{{ rel_root }}findings/index.html">찾아보기</a><a href="{{ rel_root }}findings/trends/index.html">트렌드</a><a href="{{ rel_root }}library/index.html">자료실</a><a href="{{ rel_root }}glossary/index.html">용어사전</a><a href="{{ rel_root }}quiz/index.html">주간 퀴즈</a><a href="{{ rel_root }}guide/index.html">이용안내</a>{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">마이페이지</a>{% endif %}</div>
+    {# [존 재편 2026-08-26] 조회·산출 도구 열 신설. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데(찾아보기 6,774 · 트렌드 3,517 · 자료실 3,518), 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙 — 마이페이지를 footer 에만 둔 것과 같은 판단)는 대신, footer 에 열을 하나 더해 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. #}
+    <div><h5>도구</h5><a href="{{ rel_root }}findings/checklist/index.html">자가점검 체크리스트</a><a href="{{ rel_root }}findings/firm/index.html">업체 조회</a><a href="{{ rel_root }}findings/inspector/index.html">실사관 조회</a><a href="{{ rel_root }}findings/inspections/index.html">FDA 실사 결과</a><a href="{{ rel_root }}findings/coverage/index.html">데이터 현황</a><a href="{{ rel_root }}findings/docs/index.html">문서로 찾기</a></div>
     {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — 여기엔 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나 있었다. WebSourceCopyConsistencyTest 가 두 목록의 집합 일치를 검사한다. 위 주석 경고대로 이 주석도 공백을 삼키지 않는 형태여야 한다(하이픈 변형 금지). #}
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
     <div><h5>안내</h5><a href="{{ notice_href }}">AI 자동 생성 고지</a><a href="{{ notice_href }}">원문 확인 안내</a></div>

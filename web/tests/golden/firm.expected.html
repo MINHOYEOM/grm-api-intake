@@ -55,6 +55,14 @@
     <div class="fp-state" id="fp-notfound" hidden>
       <p>해당 업체를 찾을 수 없습니다.</p>
       <a class="fp-search-link" href="../../findings/index.html">검색 페이지로 이동 →</a>
+    </div><div class="fp-state tr-look" id="fp-lookup" hidden>
+      <p class="tr-look-hint">거래처·수탁제조소 이름을 넣어 지적 이력을 확인해 보세요. 영문 상호의 일부만 넣어도 찾아집니다(예: Lupin, Catalent). 이름 표기가 조금씩 다른 사업장은 따로 나옵니다.</p>
+      <form class="tr-look-form" id="fp-look-form" role="search">
+        <label class="sr-only" for="fp-look-input">업체명</label>
+        <input class="tr-look-input" id="fp-look-input" type="search" name="q" placeholder="예: Lupin" autocomplete="off" spellcheck="false" />
+        <button class="tr-look-btn" id="fp-look-btn" type="submit">찾기</button>
+      </form>
+      <div id="fp-look-res" class="tr-look-res" aria-live="polite"></div>
     </div>
 
     <div id="fp-content" hidden>
@@ -77,10 +85,47 @@
       <section class="fp-block" aria-label="문서 이력">
         <h2 class="fp-h">문서 이력</h2>
         <div id="fp-docs" class="fp-docs"></div>
+      </section><section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>
+        <h2 class="fp-h">FDA GMP 실사 이력</h2>
+        <p class="fp-insp-read">위 지적 이력과는 <b>단위가 다릅니다</b> &mdash; 여기는 FDA 가 실사 한 건을 어떻게 판정했는지(NAI 적합 · VAI 경미 · OAI 중대)입니다. 사업장 표기는 FDA 공개 원문 그대로라 위 업체명과 다를 수 있습니다.</p>
+        <p class="fp-insp-sub" id="fp-insp-sub"></p>
+        <div id="fp-insp" class="fp-insp"></div>
+        <p class="fp-insp-note" id="fp-insp-note"></p>
       </section>
     </div>
   </div>
 </main>
+<style>
+/* 라벨은 화면에서 감추되 스크린리더에는 남긴다(placeholder 만으로는 접근성 미흡). */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* ── 이름으로 조회하는 랜딩(업체·실사관 공용) ─────────────────────────────
+   두 프로파일 페이지는 ?key= 없이 들어오면 오류 화면만 보여줬고, 그래서 정적
+   진입로가 아예 없었다(업체는 트렌드 7번째 블록의 폼, 실사관은 문서 상세뿐).
+   키가 없을 때 '이름으로 찾는' 랜딩을 두어 두 페이지 자체를 진입로로 만든다. */
+.tr-look{max-width:640px}
+.tr-look-form{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+.tr-look-input{
+  flex:1 1 240px;min-width:0;padding:12px 15px;font-family:var(--sans);font-size:15px;
+  color:var(--ink);background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad-s);
+}
+.tr-look-input:focus{outline:2px solid var(--coral);outline-offset:-1px;border-color:var(--coral)}
+.tr-look-btn{
+  flex:0 0 auto;padding:12px 22px;border:none;border-radius:var(--rad-s);
+  background:var(--ink);color:var(--canvas);font-size:14px;font-weight:600;transition:opacity var(--tr);
+}
+.tr-look-btn:hover{opacity:.86}
+.tr-look-btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.tr-look-hint{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.tr-look-res{margin:22px 0 0}
+.tr-look-row{
+  display:flex;align-items:baseline;gap:14px;padding:12px 10px;border-bottom:1px solid var(--line);
+  border-radius:6px;cursor:pointer;
+}
+.tr-look-row:hover,.tr-look-row:focus-visible{background:var(--strong);outline:none}
+.tr-look-name{flex:1 1 auto;min-width:0;font-size:14.5px;color:var(--body-s)}
+.tr-look-meta{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tr-look-empty{font-size:13.5px;color:var(--muted);margin:0}
+</style>
 <style>
 /* 한국어 어절 줄바꿈(§1 P0, findings/trends 페이지와 동일 스코프). */
 main{word-break:keep-all;overflow-wrap:anywhere}
@@ -169,6 +214,25 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fp-stat-num{font-size:22px}
   .fp-doc-date{flex-basis:76px}
 }
+
+/* ── [063] FDA GMP 실사 이력 ─────────────────────────────────────────────────
+   등급은 색이 아니라 **글자 배지**로 구분한다(색맹 안전 + 인쇄 안전). OAI 만
+   코럴로 무게를 주고 NAI/VAI 는 저채도 — 이 목록에서 눈이 멈춰야 하는 곳은
+   중대 지적 하나다. */
+.fp-insp-read{font-size:13px;line-height:1.65;color:var(--muted);margin:0 0 6px;text-wrap:pretty}
+.fp-insp-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+.fp-insp{display:flex;flex-direction:column;gap:0}
+.fp-insp-row{display:flex;align-items:baseline;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.fp-insp-date{flex:0 0 92px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.fp-insp-grade{flex:0 0 auto;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;border:1px solid var(--line-2);color:var(--muted)}
+.fp-insp-grade.oai{color:var(--on-coral);background:var(--coral);border-color:var(--coral)}
+.fp-insp-grade.vai{color:var(--coral-2);background:var(--coral-tint);border-color:var(--coral-tint)}
+.fp-insp-site{flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--body-s);line-height:1.5}
+.fp-insp-site .loc{color:var(--muted);font-size:12px}
+.fp-insp-cit{flex:0 0 auto;font-size:11.5px;color:var(--muted-2)}
+.fp-insp-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6;text-wrap:pretty}
+.fp-insp-note[hidden]{display:none}
+@media(max-width:640px){.fp-insp-cit{display:none}.fp-insp-date{flex-basis:78px}}
 </style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
   <span class="kick">AI Disclosure</span>
@@ -179,11 +243,13 @@ main{word-break:keep-all;overflow-wrap:anywhere}
     <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
   </div>
 </div></section>
+<style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
     <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
+    <div><h5>도구</h5><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/inspector/index.html">실사관 조회</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
     <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
   </div>
@@ -229,7 +295,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/firm.js?v=cad69cef" defer></script>
+<script src="../../assets/firm.js?v=e58ad179" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

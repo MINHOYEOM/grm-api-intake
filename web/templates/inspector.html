@@ -49,6 +49,41 @@
       <a class="ip-back-link" href="{{ rel_root }}findings/index.html">찾아보기로 돌아가기 →</a>
     </div>
 
+    {#- [존 재편 2026-08-26] 이름으로 조회하는 랜딩 — ?key= 없이 들어왔을 때.
+
+        ══ 037 계약과의 관계(중요) ═══════════════════════════════════════════════
+        037_findings_inspector_profile.sql 은 세 가지를 금지한다:
+          (a) 실사관 순위·비교·엄격도 추론
+          (b) 실사관 **디렉터리(목록 열람) 페이지**
+          (c) 원문 텍스트·URL 반환
+        이 랜딩은 (a)와 (c)를 그대로 지킨다. (b)에 대해서는 037 의 "진입은 항상 보고
+        있던 문서에서 그 문서의 서명자를 눌러 들어오는 경로뿐"이라는 **진입 경로 조항만**
+        개정한다 — 037 이 008 의 범위 주석을 명시적으로 개정했던 것과 같은 방식이다.
+
+        개정 사유: 실사관은 실사 오프닝에서 credential 을 제시하므로 **이름은 이미
+        알려진 상태**로 조회가 시작된다. 그 시점에 "이 서명자가 과거에 무엇을 지적해
+        왔나"를 보는 것은 037 이 막으려던 '사람 훑어보기'가 아니라 정확히 037 이
+        허용한 '보고 있던 대상의 이력 확인'이며, 다만 그 대상이 손에 든 문서가 아니라
+        눈앞의 명함일 뿐이다.
+
+        ★목록이 되지 않게 하는 장치(inspector.js 가 강제):
+          · **2글자 이상 입력해야** 결과가 나온다 — 빈 입력에 전체 명단을 뿌리지 않는다.
+          · 일치 결과는 최대 8명까지만.
+          · 정렬은 **가나다/알파벳순**이다. 문서 수 내림차순으로 정렬하면 그 자체가
+            순위표가 되어 (a)를 어긴다 — 건수는 맥락으로 병기만 한다.
+        ★sitemap 미등록·noindex 는 그대로 유지한다(이 페이지 <head> 오버라이드) —
+          검색엔진에는 계속 노출하지 않고, 우리 사용자에게만 내부 링크로 연다. -#}
+    <div class="ip-state tr-look" id="ip-lookup" hidden>
+      <p class="tr-look-hint">실사관 이름을 넣어 그 실사관이 서명한 공개 FDA 483 문서와 지적 이력을 확인하세요. 성이나 이름의 일부만 넣어도 됩니다(두 글자 이상). 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.</p>
+      <form class="tr-look-form" id="ip-look-form" role="search">
+        <label class="sr-only" for="ip-look-input">실사관 이름</label>
+        <input class="tr-look-input" id="ip-look-input" type="search" name="q" placeholder="예: Moore" autocomplete="off" spellcheck="false" />
+        <button class="tr-look-btn" id="ip-look-btn" type="submit">찾기</button>
+      </form>
+      <div id="ip-look-res" class="tr-look-res" aria-live="polite"></div>
+      <p class="tr-look-hint">이 화면은 순위나 비교를 제공하지 않습니다. 지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관을 평가하는 지표가 아닙니다.</p>
+    </div>
+
     <div id="ip-content" hidden>
       <div class="ip-head">
         <h2 class="ip-name" id="ip-name"></h2>
@@ -74,6 +109,7 @@
     </div>
   </div>
 </main>
+{% include "partials/lookup_style.html" %}
 <style>
 /* 한국어 어절 줄바꿈(§1 P0, firm/trends 페이지와 동일 스코프). */
 main{word-break:keep-all;overflow-wrap:anywhere}

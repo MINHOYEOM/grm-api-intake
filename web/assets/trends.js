@@ -55,7 +55,12 @@
  *      교란 요인인 소스 구성 변화는 화면에 적기만 하는 게 아니라 **계산에서 정렬한다** —
  *      052 by_category_source 로 두 창에서 견줄 수 있는 소스만 남겨 분자·분모를 함께
  *      좁히고, 뺀 소스는 구성 표기와 나란히 적는다(alignSourceMix).
- *   ③ 업체 찾기(runFirmFind) — 041 findings_firm_search. 이름으로 찾아 013 업체 프로파일
+ *   ③ 업체 찾기 — 041 findings_firm_search. [존 재편 2026-08-26] 이 폼은 firm.js 로
+ *      옮겼다. 통계 페이지 일곱 번째 블록에 있던 조회 도구를 **프로파일 페이지 자체**의
+ *      랜딩(/findings/firm/, ?key= 없이 들어왔을 때)으로 승격해, 그 페이지가 스스로
+ *      진입로가 되게 했다 — 재편 전에는 이 폼이 업체 프로파일에 닿는 유일한 경로였고
+ *      정적 링크는 사이트 어디에도 없었다. 남은 문장은 이력으로 둔다:
+ *      이름으로 찾아 013 업체 프로파일
  *      페이지로 보낸다. 그리고 최근 창 카테고리 행을 누르면 **실제 지적 문장**을 펼친다.
  *
  * ★③의 사례 문장은 위 "원문 텍스트를 절대 렌더하지 않는다"의 예외가 아니라 **다른 층**이다.
@@ -110,6 +115,16 @@
   var fdaYearEl = document.getElementById("tr-fda-year");
   var fdaCountryEl = document.getElementById("tr-fda-country");
   var fdaNoteEl = document.getElementById("tr-fda-note");
+  // [062] 실사일 축(by_quarter) · 한국 슬라이스(korea) — 다른 신규 블록과 같은 원칙으로
+  // 하드 게이트 밖에 둔다. 062 미적용 라이브에서 이 두 블록이 없어도(구버전 셸) 이 면의
+  // 주 데이터(등급 구성)는 그대로 그려져야 한다.
+  var fqBlockEl = document.getElementById("tr-fq-block");
+  var fqEl = document.getElementById("tr-fq");
+  var fqNoteEl = document.getElementById("tr-fq-note");
+  var krBlockEl = document.getElementById("tr-kr-block");
+  var krSubEl = document.getElementById("tr-kr-sub");
+  var krYearEl = document.getElementById("tr-kr-year");
+  var krNoteEl = document.getElementById("tr-kr-note");
   // [최근 12개월 · 달라진 점] 041_findings_recent_window 전용 엘리먼트. zone/heatmap 과
   // 동일하게 아래 하드 게이트에는 넣지 않는다 — 구버전 셸(캐시 스큐)을 만나도 실패
   // 반경이 이 패널들로만 한정되어야 한다.
@@ -118,9 +133,24 @@
   var recentMonthsEl = document.getElementById("tr-recent-months");
   var recentNoteEl = document.getElementById("tr-recent-note");
   var recentCatsEl = document.getElementById("tr-recent-cats");
-  var recentCatsHeadEl = document.getElementById("tr-recent-cats-h");
-  var recentCatsReadEl = document.getElementById("tr-recent-cats-read");
+  // [존 재편 2026-08-26] 순위 보기 전환 — 재편 전에는 같은 축(카테고리별 지적 순위)을
+  // 재는 표가 분모만 다른 채로 **세 개의 별개 섹션**으로 흩어져 있었다(최근 12개월 /
+  // 전 기간 누적 / 해외vs미국). 분모가 다른 표가 한 스크롤에 나란히 있으니 "왜 숫자가
+  // 다르냐"는 오독이 구조적으로 생겼고, 그걸 막으려고 섹션 사이에 구분선과 해설 문단을
+  // 두고 있었다. 같은 자리에서 보기를 바꾸면 두 수치가 동시에 보이지 않으므로 오독
+  // 자체가 사라진다 — **해설로 막던 것을 구조로 막는다.**
+  // ★데이터 모델은 합치지 않는다. 세 pane 은 기존 렌더러의 컨테이너를 그대로 쓰고,
+  //   전환은 표시 계층에서만 한다 — 세 RPC 의 분모를 하나로 뭉개는 순간 이 재편이
+  //   없애려던 바로 그 오독을 코드가 저지르게 된다.
+  var rankBlockEl = document.getElementById("tr-rank-block");
+  var rankReadEl = document.getElementById("tr-rank-read");
+  var rankTabEls = {
+    recent: document.getElementById("tr-rank-tab-recent"),
+    all: document.getElementById("tr-rank-tab-all"),
+    zone: document.getElementById("tr-rank-tab-zone"),
+  };
   var moveBlockEl = document.getElementById("tr-move-block");
+  var moveSummaryEl = document.getElementById("tr-move-summary");
   var moveUpEl = document.getElementById("tr-move-up");
   var moveDownEl = document.getElementById("tr-move-down");
   var moveSourceEl = document.getElementById("tr-move-source");
@@ -130,17 +160,22 @@
   var cfrSubEl = document.getElementById("tr-cfr-sub");
   var cfrEl = document.getElementById("tr-cfr");
   var cfrNoteEl = document.getElementById("tr-cfr-note");
-  // [업체 찾기] 041_findings_firm_search 전용.
-  var firmFindFormEl = document.getElementById("tr-ff-form");
-  var firmFindInputEl = document.getElementById("tr-ff-input");
-  var firmFindResultEl = document.getElementById("tr-ff-result");
-  if (!cfg || !loadingEl || !errorEl || !contentEl || !statsEl ||
-      !catEl || !heatmapBlockEl || !heatmapEl || !yearEl || !firmsEl || !firmDetailEl ||
-      !sourceEl) return;
+  // [존 재편 2026-08-26] 하드 게이트는 **셸 4개**로만 남긴다.
+  // 재편 전 이 게이트는 statsEl/catEl/heatmapEl/yearEl/firmsEl/sourceEl 까지 요구했다 —
+  // 한 페이지가 모든 섹션을 갖는다는 전제였고, 존을 세 면으로 나눈 지금 그 전제는 깨졌다
+  // (지적 경향 면엔 히트맵이 없고, 실사 결과 면엔 카테고리 순위가 없다). 섹션 엘리먼트를
+  // 게이트에 넣으면 자기 면에 없는 섹션 하나 때문에 **스크립트 전체가 조기 리턴**해
+  // 그 면이 통째로 죽는다 — 이미 zone/fda/recent 블록이 같은 이유로 게이트 밖에 있었다.
+  // 이제 그 원칙을 전 섹션으로 확장하고, 대신 각 렌더러가 자기 엘리먼트를 null 가드한다.
+  if (!cfg || !loadingEl || !errorEl || !contentEl) return;
 
   var url = (cfg.getAttribute("data-url") || "").trim();
   var key = (cfg.getAttribute("data-key") || "").trim();
   var root = (cfg.getAttribute("data-root") || "").trim();
+  // [존 재편] 이 면이 무엇을 그릴 수 있는가. 엘리먼트 유무만으로도 렌더는 안전하지만,
+  // **로딩 해제 시점**(어느 fetch 가 이 면의 주 데이터인가)은 엘리먼트로 정할 수 없다 —
+  // 그래서 면 이름을 셸에서 명시적으로 받는다. 미지정이면 기존 동작(지적 경향)이다.
+  var page = (cfg.getAttribute("data-page") || "trends").trim();
 
   // grm_findings.FINDING_TAXONOMY verbatim(code -> {ko, en}) — findings.js CATEGORY_LABELS
   // 와 동일 복제본(동기화 테스트로 드리프트 차단, 파일 상단 계약 참조).
@@ -343,6 +378,13 @@
   // 행과 그 사례 패널. 사례 패널은 비동기로 도착하므로 노드를 state 에 들고 있다가
   // renderRecentCats() 가 매번 같은 자리에 다시 끼워 넣는다(별도 저장소 난립 금지).
   var state = {
+    // [존 재편] 순위 보기 전환. rankView 는 **사용자가 탭을 눌러 고른 보기**이고
+    // 빈 값이 기본이다("아직 안 골랐다") — 여기에 초기 기본값을 박아 두면 fetch 도착
+    // 순서에 따라 fallback 이 이 값을 덮어써 기본 보기가 엉뚱하게 굳는다(activeRankView
+    // 주석의 실측 사고). 기본 보기는 값이 아니라 RANK_VIEWS 의 선언 순서가 정한다.
+    // rankReady 는 각 보기의 데이터 도착 여부(도착한 보기만 탭으로 노출한다).
+    rankView: "",
+    rankReady: {},
     openFirm: "", openFirmKey: "", lastFirms: [],
     openCat: "", recentCats: [], recentCurFindings: 0, exampleNode: null,
     openCfr: "", cfrItems: [], cfrExampleNode: null,
@@ -516,6 +558,7 @@
   }
 
   function renderStats(totals) {
+    if (!statsEl) return;   // [존 재편] 이 면에 스탯 스트립이 없으면 조용히 no-op
     statsEl.innerHTML = "";
     statsEl.appendChild(buildStat(fmtNum(totals.findings), "총 지적사항"));
     if (hasDocumentsCount(totals)) {
@@ -556,6 +599,86 @@
     coverageNoteEl.hidden = false;
   }
 
+  // ── [순위 보기 전환] 존 재편 2026-08-26 ──────────────────────────────────
+  // 세 보기는 **서로 다른 RPC·서로 다른 분모**다. 그래서 하나의 데이터 모델로 합치지
+  // 않고, 각 렌더러가 다 그린 뒤 "내 보기는 준비됐다"고 알리면(markRankReady) 그때
+  // 탭이 나타난다. 데이터가 오지 않은 보기는 탭 자체가 없다 — 041/038 미배포 라이브나
+  // fetch 실패에서 빈 탭을 누르는 일이 생기지 않는다.
+  //
+  // 각 보기가 무엇을 재는지는 탭 아래 한 줄(tr-rank-read)이 매번 다시 적는다. 이게
+  // 이 전환의 핵심이다 — 재편 전에는 분모 설명이 섹션마다 따로 붙은 고정 문장이라,
+  // 독자가 스크롤로 두 표를 오가는 동안 어느 설명이 어느 표의 것인지 흐려졌다.
+  var RANK_VIEWS = ["recent", "all", "zone"];
+  var RANK_PANES = {
+    recent: function () { return recentCatsEl; },
+    all: function () { return catEl; },
+    zone: function () { return zoneBlockEl; },
+  };
+  var RANK_READ = {
+    recent: "최근 12개월에 공개된 지적사항만 셉니다. 오른쪽 %는 그 기간 지적 전체 중 이 영역이 차지하는 비율이에요. 줄을 누르면 실제 지적 문장을 볼 수 있습니다.",
+    all: "2016년 이후 모아 둔 전량이 분모입니다. 연도마다 확보한 문서 양이 크게 달라 최근 12개월과는 다른 그림이 나오는 것이 정상이에요.",
+    zone: "FDA 483 만 대상으로, 미국 밖 실사와 미국 내 실사를 각자 안에서 100%로 놓고 견줍니다. 미국 쪽 건수가 훨씬 많아 절대 건수로는 비교가 안 되기 때문이에요.",
+  };
+
+  function readyRankViews() {
+    return RANK_VIEWS.filter(function (v) { return state.rankReady[v]; });
+  }
+
+  // 지금 보여줄 보기를 고른다.
+  // ★state.rankView 는 **사용자가 직접 고른 보기**이고, 여기서 절대 덮어쓰지 않는다.
+  //   처음엔 이 값을 초기 기본값("recent")으로 두고 fallback 이 이를 덮어쓰게 했는데,
+  //   세 fetch 가 **도착 순서가 제각각**이라 038(zone)이 041(recent)보다 먼저 오면
+  //   fallback 이 state.rankView 를 "zone" 으로 바꿔 버렸다 — 그 뒤 recent 가 도착해도
+  //   "이미 고른 보기가 준비돼 있으니 그대로"가 되어 **기본 보기가 해외vs미국으로 굳었다**
+  //   (로컬 프리뷰 실측으로 잡았다). 선택과 표시를 분리해 그 경로를 없앤다.
+  function activeRankView() {
+    if (state.rankView && state.rankReady[state.rankView]) return state.rankView;
+    // 아직 안 골랐거나 고른 보기가 준비 전이면 **선호 순서**(RANK_VIEWS 선언 순서 =
+    // 최근 12개월 > 전체 기간 > 해외vs미국)로 준비된 첫 보기를 쓴다. 도착 순서와 무관하다.
+    for (var i = 0; i < RANK_VIEWS.length; i += 1) {
+      if (state.rankReady[RANK_VIEWS[i]]) return RANK_VIEWS[i];
+    }
+    return "";
+  }
+
+  // 보기를 실제 화면에 반영한다. 탭 클릭·렌더 완료 양쪽에서 불린다(멱등).
+  function applyRankView() {
+    if (!rankBlockEl) return;
+    var ready = readyRankViews();
+    if (!ready.length) return;              // 아직 아무 보기도 못 그렸다 → 블록 숨김 유지
+    var active = activeRankView();
+    if (!active) return;
+    RANK_VIEWS.forEach(function (v) {
+      var pane = RANK_PANES[v]();
+      if (pane) pane.hidden = (v !== active) || !state.rankReady[v];
+      var tab = rankTabEls[v];
+      if (!tab) return;
+      tab.hidden = !state.rankReady[v];
+      tab.setAttribute("aria-selected", v === active ? "true" : "false");
+    });
+    if (rankReadEl) rankReadEl.textContent = RANK_READ[active] || "";
+    rankBlockEl.hidden = false;
+  }
+
+  function markRankReady(view) {
+    if (!rankBlockEl) return;               // 이 면엔 통합 순위 섹션이 없다(조용히 no-op)
+    state.rankReady[view] = true;
+    applyRankView();
+  }
+
+  function wireRankTabs() {
+    if (!rankBlockEl) return;
+    RANK_VIEWS.forEach(function (v) {
+      var tab = rankTabEls[v];
+      if (!tab) return;
+      tab.addEventListener("click", function () {
+        if (!state.rankReady[v]) return;
+        state.rankView = v;
+        applyRankView();
+      });
+    });
+  }
+
   // ── 카테고리 순위(메인 시각) — 상위 10, 순위별 opacity 100→40% 농도 단계 ─────────
   // 건수 옆에 전체 대비 구성비를 항상 병기한다(13차) — "2,405건"만으로는 그게 전체의
   // 3%인지 30%인지 알 수 없어, 순위표가 규모감 없는 숫자 나열로 읽혔다.
@@ -581,6 +704,7 @@
   }
 
   function renderCategoryRanking(byAgencyCategory) {
+    if (!catEl) return;     // [존 재편] 이 면에 전 기간 순위 pane 이 없으면 조용히 no-op
     catEl.innerHTML = "";
     var all = aggregateCategories(byAgencyCategory);
     var total = catTotal(all);              // 구성비 분모는 상위 10이 아니라 전체 카테고리
@@ -591,6 +715,7 @@
     }
     var maxCnt = cats[0].cnt || 1;
     cats.forEach(function (c, i) { catEl.appendChild(buildCatRow(c, i, maxCnt, total)); });
+    markRankReady("all");
   }
 
   // ── 연도별 구성비 히트맵(H1) ─────────────────────────────────────────────
@@ -620,6 +745,7 @@
   }
 
   function renderHeatmap(data) {
+    if (!heatmapEl || !heatmapBlockEl) return;   // [존 재편] 데이터 현황 면에만 있다
     heatmapEl.innerHTML = "";
     var allYears = data.years || [];
     var cats = (data.category_totals || []).slice(0, 12);
@@ -723,6 +849,7 @@
   // 우리가 확보한 자료의 양" 자체이기 때문이다(제목·읽는 법이 그렇게 못박는다). 대신 전체
   // 대비 비중을 병기해, 한 해가 전체의 몇 %를 차지하는지(=공개 배치 편중)를 드러낸다.
   function renderYearTrend(byMonth) {
+    if (!yearEl) return;    // [존 재편] 데이터 현황 면에만 있다
     yearEl.innerHTML = "";
     var years = aggregateYears(byMonth);
     if (!years.length) {
@@ -778,14 +905,23 @@
     return row;
   }
 
+  // [존 재편 2026-08-26] 30행 → 10행. 이 순위는 '품질이 나쁜 순'이 아니라 **우리가
+  // 확보한 문서가 많은 순**이고, 재편 전 화면은 그 사실을 자기 설명문에서 부인하면서
+  // 30행을 실었다. 순위를 지우지는 않는다 — 데이터 현황 면의 주제가 바로 "우리 데이터가
+  // 어느 쪽으로 기울어 있나"라 여기서는 그 기울기가 정보다. 다만 10행이면 기울기를
+  // 보여주기에 충분하고, 30행은 순위표로 오독될 여지만 키운다.
+  var FIRM_ROWS = 10;
+
   function renderFirmRanking(topFirms) {
+    if (!firmsEl) return;   // [존 재편] 데이터 현황 면에만 있다
     firmsEl.innerHTML = "";
     if (!topFirms.length) {
       firmsEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
       return;
     }
-    var maxCnt = topFirms[0].cnt || 1;
-    topFirms.forEach(function (f, i) { firmsEl.appendChild(buildFirmRow(f, i, maxCnt)); });
+    var rows = topFirms.slice(0, FIRM_ROWS);
+    var maxCnt = rows[0].cnt || 1;
+    rows.forEach(function (f, i) { firmsEl.appendChild(buildFirmRow(f, i, maxCnt)); });
   }
 
   function buildFirmDetailCatCol(byCategory) {
@@ -934,6 +1070,7 @@
   }
 
   function openFirm(name, firmKey) {
+    if (!firmDetailEl) return;   // [존 재편] 이 면엔 업체 상세 패널이 없다(딥링크 무시)
     state.openFirm = name;
     state.openFirmKey = firmKey || "";
     renderFirmRanking(state.lastFirms);
@@ -987,6 +1124,7 @@
   // 13차에 이 옆에 있던 "증거 등급 구성"(A/B/C 스택 바)은 삭제했다: 실데이터가 A 99% 이상
   // 단일값이라 분포 차트로서 정보가 0이고, 증거 등급 자체가 내부 QA 개념이다.
   function renderSource(bySource) {
+    if (!sourceEl) return;  // [존 재편] 데이터 현황 면에만 있다
     sourceEl.innerHTML = "";
     var sorted = (bySource || []).slice().sort(function (a, b) { return (b.cnt || 0) - (a.cnt || 0); });
     if (!sorted.length) {
@@ -1152,7 +1290,10 @@
       }
     }
 
-    zoneBlockEl.hidden = false;
+    // [존 재편] 재편 전에는 여기서 자기 섹션을 직접 폈다(zoneBlockEl.hidden = false).
+    // 이제 이 패널은 통합 순위의 세 번째 **보기**라, 자기를 펴는 대신 "준비됐다"만
+    // 알린다 — 실제로 보일지는 사용자가 고른 탭이 정한다.
+    markRankReady("zone");
   }
 
   // ── [FDA 의약품 GMP 실사 등급] 058_fda_inspections.sql fda_inspection_stats() ──────
@@ -1300,6 +1441,142 @@
     fdaBlockEl.hidden = false;
   }
 
+  // ── [062] 실사일 기준 분기 추이 ─────────────────────────────────────────────
+  // ★이 섹션이 재는 날짜는 위 by_year 와 **다르다**(회계연도 vs 실사 종료일). 같은
+  //   데이터인데 FY 축에서는 OAI 비율이 크게 출렁이는 것처럼 보이고 실사일 분기로
+  //   다시 재면 최근 2년이 안정이다 — 그래서 **비율을 주 축으로** 그린다.
+  //
+  // ★미완 분기 판정을 여기서 하는 이유: 서버(062)는 세기만 한다(임계는 반드시 낡는다는
+  //   007/038/058/059 공통 계약). 대신 059 가 이미 주는 scope.latest_inspection_end_date
+  //   = **데이터의 전선**에서 파생한다 — 전선보다 한 분기 이내에 끝난 분기는 FDA 등급
+  //   확정·공개가 아직 진행 중이라 낮게 보인다. 상수(예: "마지막 2개")를 박지 않는
+  //   이유가 이것이다. 데이터가 앞으로 나아가면 판정도 저절로 따라간다.
+  var FQ_ROWS = 12;                 // 최근 3년치. 28개 전부 그리면 훑을 수 없다.
+  var FQ_SCALE_MAX = 0.30;          // 막대 정규화 상한(OAI 30%) — 실측 최댓값 22% 여유.
+
+  function fqIsPartial(row, frontier) {
+    if (!frontier || !row.quarter_end) return false;
+    // 분기 종료일이 (전선 − 3개월)보다 뒤면 아직 채워지는 중으로 본다.
+    var f = new Date(frontier + "T00:00:00Z");
+    if (isNaN(f.getTime())) return false;
+    f.setUTCMonth(f.getUTCMonth() - 3);
+    return new Date(row.quarter_end + "T00:00:00Z") > f;
+  }
+
+  function buildFqRow(row, frontier) {
+    var total = row.total || 0;
+    var oai = row.oai || 0;
+    var partial = fqIsPartial(row, frontier);
+    var el_ = el("div", "tr-fq-row" + (partial ? " is-partial" : ""));
+    el_.appendChild(el("span", "tr-fq-label", row.quarter || ""));
+    var track = el("div", "tr-fq-track");
+    var bar = el("div", "tr-fq-bar");
+    var share = total > 0 ? oai / total : 0;
+    bar.style.width = Math.min(100, (share / FQ_SCALE_MAX) * 100) + "%";
+    track.appendChild(bar);
+    el_.appendChild(track);
+    el_.appendChild(el("span", "tr-fq-pct", pctText(oai, total)));
+    el_.appendChild(el("span", "tr-fq-total", fmtNum(total) + "건"));
+    el_.appendChild(el("span", "tr-fq-tag", partial ? "채워지는 중" : ""));
+    el_.title = row.quarter + " · 실사 " + fmtNum(total) + "건 · 중대 지적 " +
+      fmtNum(oai) + "건 · 지적서 공개 " + fmtNum(row.citations_posted) + "건";
+    return el_;
+  }
+
+  function renderFdaQuarters(data) {
+    if (!fqBlockEl || !fqEl) return;
+    var rows = (data && data.by_quarter) || [];
+    if (!rows.length) return;                       // 062 미적용 라이브 → 숨김 유지
+    var frontier = ((data.scope || {}).latest_inspection_end_date) || "";
+    var shown = rows.slice(-FQ_ROWS);
+    fqEl.innerHTML = "";
+    shown.forEach(function (r) { fqEl.appendChild(buildFqRow(r, frontier)); });
+    if (fqNoteEl) {
+      // 완결 분기만으로 범위를 적는다 — 미완 분기를 섞어 "최근 N%~M%" 라고 쓰면 그
+      // 폭이 공개 지연 때문에 벌어진 것을 규제 변화로 읽게 만든다.
+      var solid = shown.filter(function (r) {
+        return !fqIsPartial(r, frontier) && (r.total || 0) > 0;
+      });
+      var note = "막대는 그 분기 실사 중 중대 지적(OAI) 비율입니다(가로 축 최대 " +
+        Math.round(FQ_SCALE_MAX * 100) + "%).";
+      if (solid.length >= 2) {
+        var pcts = solid.map(function (r) { return (r.oai || 0) / r.total; });
+        var lo = Math.min.apply(null, pcts), hi = Math.max.apply(null, pcts);
+        note += " 표시된 분기 중 자료가 다 찬 " + solid.length + "개 분기는 " +
+          (lo * 100).toFixed(1) + "%~" + (hi * 100).toFixed(1) + "% 사이입니다.";
+      }
+      if (frontier) {
+        note += " ‘채워지는 중’으로 표시한 분기는 FDA 의 등급 확정·공개가 아직 끝나지 " +
+          "않아 낮게 보입니다 — 담긴 실사 중 가장 최근 종료일은 " + frontier + "입니다.";
+      }
+      fqNoteEl.textContent = note;
+    }
+    fqBlockEl.hidden = false;
+  }
+
+  // ── [062] 한국 소재 제조소 ──────────────────────────────────────────────────
+  // 연도별 등급 구성은 위 buildFdaYearRow 와 **같은 모양**이라 그 컴포넌트를 그대로
+  // 쓴다(라벨만 FY → 달력연도). 신규 CSS 0.
+  function buildKrYearRow(y) {
+    var nai = y.nai || 0, vai = y.vai || 0, oai = y.oai || 0;
+    var total = nai + vai + oai;
+    var row = el("div", "tr-fda-y-row");
+    row.appendChild(el("span", "tr-fda-y-label", String(y.year) + "년"));
+    var track = el("div", "tr-fda-y-track");
+    ["nai", "vai", "oai"].forEach(function (k) {
+      var seg = el("div", "tr-fda-y-seg " + k);
+      var cnt = k === "nai" ? nai : k === "vai" ? vai : oai;
+      seg.style.flex = "0 0 " + (total > 0 ? (cnt / total) * 100 : 0) + "%";
+      seg.title = y.year + "년 " + FDA_GRADE_LABELS[k] + " " + fmtNum(cnt) + "건";
+      track.appendChild(seg);
+    });
+    row.appendChild(track);
+    row.appendChild(el("span", "tr-fda-y-oai-pct", "OAI " + fmtNum(oai) + "건"));
+    row.appendChild(el("span", "tr-fda-y-total", fmtNum(total) + "건"));
+    return row;
+  }
+
+  function renderKorea(data) {
+    if (!krBlockEl || !krYearEl) return;
+    var kr = (data && data.korea) || null;
+    if (!kr) return;                                // 062 미적용 라이브 → 숨김 유지
+    var t = kr.totals || {};
+    var years = kr.by_year || [];
+    if (!(Number(t.inspections) > 0) || !years.length) return;
+    if (krSubEl) {
+      krSubEl.textContent = "누적 실사 " + fmtNum(t.inspections) + "건 · 사업장 " +
+        fmtNum(t.firms) + "곳 · 중대 지적 " + fmtNum(t.oai) + "건(" +
+        pctText(t.oai, t.inspections) + ")";
+    }
+    krYearEl.innerHTML = "";
+    years.forEach(function (y) { krYearEl.appendChild(buildKrYearRow(y)); });
+    if (krNoteEl) {
+      // ★표본이 작다는 사실을 화면이 먼저 말한다 — 연 2~22건에서 비율을 앞세우면
+      //   한두 건 차이가 큰 변화로 읽힌다(히트맵의 표본 하한 관례와 같은 취지).
+      var maxYear = years.reduce(function (m, y) { return Math.max(m, y.total || 0); }, 0);
+      var note = "연도별 실사 수가 " + fmtNum(maxYear) + "건 이하라 비율보다 건수로 보셔야 합니다 — " +
+        "한두 건 차이가 비율로는 크게 흔들립니다.";
+      // 같은 해에 두 번 실사받은 사업장이 있었는지는 세어서 그대로 말한다(해석 없이).
+      var repeated = years.filter(function (y) { return (y.total || 0) > (y.firms || 0); });
+      note += repeated.length
+        ? " 같은 해에 두 번 이상 실사받은 사업장이 있는 해: " +
+          repeated.map(function (y) { return y.year + "년"; }).join(" · ") + "."
+        : " 표시된 모든 해에서 실사 수와 사업장 수가 같습니다 — 같은 해에 두 번 실사받은 사업장은 없었습니다.";
+      // ★위 부제의 "누적 실사 N건 · 사업장 M곳"에서 N > M 이면 **해를 건너뛴 재실사**가
+      //   있었다는 뜻이다. 이 다리를 놓지 않으면 바로 위 문장("같은 해에 두 번은 없었다")과
+      //   부제가 서로 어긋나 보인다 — 두 수치가 다른 것을 세고 있다는 사실을 화면이
+      //   말해야 한다(계기판 합산 오진을 문장 층에서 되풀이하지 않는다).
+      var revisited = Number(t.inspections || 0) - Number(t.firms || 0);
+      if (revisited > 0) {
+        note += " 다만 누적으로는 실사 " + fmtNum(t.inspections) + "건이 사업장 " +
+          fmtNum(t.firms) + "곳에서 나왔습니다 — " + fmtNum(revisited) +
+          "건은 앞서 실사받았던 곳을 다른 해에 다시 실사한 것입니다.";
+      }
+      krNoteEl.textContent = note;
+    }
+    krBlockEl.hidden = false;
+  }
+
   // ── [최근 12개월] 041_findings_recent_window ─────────────────────────────
   // findings_stats/findings_category_matrix/findings_zone_category 와 독립된 별개 RPC.
   // 실패해도(041 미배포 라이브 포함) 이 섹션만 조용히 숨겨진 채로 남고 다른 섹션엔 전혀
@@ -1415,8 +1692,7 @@
         recentCatsEl.appendChild(state.exampleNode || el("p", "tr-empty", "불러오는 중…"));
       }
     });
-    if (recentCatsHeadEl) recentCatsHeadEl.hidden = false;
-    if (recentCatsReadEl) recentCatsReadEl.hidden = false;
+    markRankReady("recent");
   }
 
   function renderRecentWindow(data) {
@@ -1686,6 +1962,14 @@
       note += " 날짜는 자료가 공개된 날 기준이라 실사 시점과는 다릅니다.";
       moveNoteEl.textContent = note;
     }
+    // [존 재편] 이 섹션은 기본 접힘이다. 열기 전에 안에 뭐가 있는지 알 수 있어야
+    // 접힘이 은폐가 되지 않는다 — summary 에 실제 산출 행 수를 적는다(라이브 실측에서
+    // 이 값은 "커진 1 · 줄어든 0"이고, 그 사실 자체가 이 섹션을 접어 둔 근거다).
+    if (moveSummaryEl) {
+      moveSummaryEl.textContent = up.length || down.length
+        ? "비중이 커진 영역 " + up.length + "개 · 줄어든 영역 " + down.length + "개"
+        : "기준(1%p 이상)을 넘는 변화 없음";
+    }
     moveBlockEl.hidden = false;
   }
 
@@ -1760,63 +2044,6 @@
     state.openCat = "";
     state.exampleNode = null;
     renderRecentCats();
-  }
-
-  // ── [업체 찾기] 041 findings_firm_search ────────────────────────────────────
-  // 결과 행은 013 의 업체 프로파일 페이지(/findings/firm/?key=firm_key)로 직행한다 —
-  // 이미 존재하지만 Top 30 을 거치지 않으면 도달할 수 없던 페이지의 진입로다.
-  // 경로 계산은 buildFirmProfileLink 와 동일하게 형제 디렉터리 상대경로 하나면 된다.
-  function buildFirmFindRow(item) {
-    var a = document.createElement("a");
-    a.className = "tr-ff-row";
-    a.href = "../firm/index.html?key=" + encodeURIComponent(item.firm_key || "");
-    var name = el("span", "tr-ff-name", decodeFirmDisplay(item.firm_name));
-    var cat = CATEGORY_LABELS[item.top_category];
-    var subParts = [];
-    if (cat) subParts.push("최다 지적: " + cat.ko);
-    var sources = item.sources || [];
-    if (sources.length) subParts.push(sources.join(" · "));
-    if (subParts.length) name.appendChild(el("span", "tr-ff-sub", subParts.join("  |  ")));
-    a.appendChild(name);
-    var meta = el("span", "tr-ff-meta");
-    meta.appendChild(el("span", "",
-      "문서 " + fmtNum(item.documents) + "건 · 지적 " + fmtNum(item.findings) + "건"));
-    meta.appendChild(el("span", "tr-ff-span",
-      (item.first_seen || "?") + " ~ " + (item.last_seen || "?")));
-    a.appendChild(meta);
-    return a;
-  }
-
-  function renderFirmFindResult(payload, q) {
-    if (!firmFindResultEl) return;
-    firmFindResultEl.innerHTML = "";
-    var items = (payload && payload.items) || [];
-    if (!items.length) {
-      firmFindResultEl.appendChild(el("p", "tr-ff-msg",
-        "‘" + q + "’ (으)로 찾은 업체가 없습니다. 영문 상호의 일부만 넣어 보세요."));
-      return;
-    }
-    firmFindResultEl.appendChild(el("p", "tr-ff-msg",
-      "‘" + q + "’ 검색 결과 " + fmtNum(items.length) + "곳 — 이름을 누르면 업체 프로파일로 갑니다."));
-    items.forEach(function (it) { firmFindResultEl.appendChild(buildFirmFindRow(it)); });
-  }
-
-  function runFirmFind() {
-    if (!firmFindInputEl || !firmFindResultEl) return;
-    var q = (firmFindInputEl.value || "").trim();
-    if (q.length < 2) {
-      firmFindResultEl.innerHTML = "";
-      firmFindResultEl.appendChild(el("p", "tr-ff-msg", "두 글자 이상 입력해 주세요."));
-      return;
-    }
-    firmFindResultEl.innerHTML = "";
-    firmFindResultEl.appendChild(el("p", "tr-ff-msg", "찾는 중…"));
-    fetchFirmSearch(q).then(function (payload) {
-      renderFirmFindResult(payload, q);
-    }).catch(function () {
-      firmFindResultEl.innerHTML = "";
-      firmFindResultEl.appendChild(el("p", "tr-ff-msg", "업체 검색을 불러오지 못했습니다."));
-    });
   }
 
   // ── [인용 조항] 042_findings_cfr_ranking ────────────────────────────────
@@ -2054,18 +2281,6 @@
     });
   }
 
-  // 041_findings_recent_window.sql (B) — 업체명 부분일치 조회.
-  function fetchFirmSearch(q) {
-    return fetch(rpcEndpoint("findings_firm_search"), {
-      method: "POST",
-      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ p_q: q, p_limit: 20 }),
-    }).then(function (r) {
-      if (!r.ok) throw new Error("findings_firm_search " + r.status);
-      return r.json();
-    });
-  }
-
   // 026_findings_search.sql — 카테고리별 실제 지적 사례(공개 게이트 RLS 통과분만).
   // 이 페이지에서 유일하게 지적 **문장**을 가져오는 경로다(집계 RPC 아님, 위 §계약 참조).
   function fetchCategoryExamples(code) {
@@ -2121,75 +2336,99 @@
     });
   }
 
+  // ── [존 재편 2026-08-26] 면별 오케스트레이션 ─────────────────────────────
+  // 재편 전에는 한 페이지가 여섯 개 RPC 를 **전부** 병렬로 쳤다. 존을 세 면으로 나눈
+  // 지금 그대로 두면 각 면이 자기가 그릴 수 없는 데이터까지 받아 버린다(실사 결과 면이
+  // findings 누적 집계를 받는 식) — 낭비이기도 하지만, 더 나쁘게는 **그 면에 없는
+  // 섹션의 fetch 실패가 그 면의 오류로 보이게** 된다.
+  // 그래서 면마다 "무엇을 그릴 수 있는가"를 선언하고 그것만 친다.
+  //
+  // ★각 면의 **주 데이터**가 로딩 해제를 책임진다(revealContent). 부 데이터는 실패해도
+  //   자기 블록만 숨긴 채로 남는다 — 기존 "실패 반경은 자기 자신뿐" 원칙 그대로다.
+  var WANT = ({
+    trends: { stats: true, recent: true, cfr: true, zone: true },
+    inspections: { fda: true },
+    coverage: { stats: true, matrix: true },
+  })[page] || { stats: true, recent: true, cfr: true, zone: true };
+
+  function revealContent() {
+    loadingEl.hidden = true;
+    contentEl.hidden = false;
+  }
+
+  function failContent() {
+    loadingEl.hidden = true;
+    errorEl.hidden = false;
+  }
+
   if (!url || !key) {
-    loadingEl.textContent = "트렌드 서비스 준비 중입니다.";
+    // 안내 문구는 면마다 다르다(템플릿의 오류 div 가 정본) — 여기서 새로 짓지 않고
+    // 그 문장을 그대로 옮겨 쓴다. 비어 있으면 공통 문안으로 폴백한다.
+    loadingEl.textContent = (errorEl.textContent || "").trim() || "통계 서비스 준비 중입니다.";
     return;
   }
 
-  fetchStats()
-    .then(function (data) {
-      loadingEl.hidden = true;
-      renderAll(data);
-      contentEl.hidden = false;
-      maybeOpenFirmFromUrl();
-    })
-    .catch(function () {
-      loadingEl.hidden = true;
-      errorEl.hidden = false;
-    });
+  wireRankTabs();
 
-  // H1 히트맵 — findings_stats 와 독립적으로 병렬 fetch(위 fetchStats() 와 별개 promise
-  // 체인). 실패해도(008 미적용 라이브 포함) tr-heatmap-block 은 정적 셸의 기본값인
-  // hidden 상태 그대로 남는다 — 다른 섹션엔 전혀 영향이 없다.
-  fetchCategoryMatrix()
-    .then(function (data) {
-      renderHeatmap(data);
-    })
-    .catch(function () { /* 조용히 숨김 유지 */ });
+  // [주 데이터 · 지적 경향/데이터 현황] 007 findings_stats.
+  if (WANT.stats) {
+    fetchStats()
+      .then(function (data) {
+        revealContent();
+        renderAll(data);
+        maybeOpenFirmFromUrl();
+      })
+      .catch(failContent);
+  }
 
-  // [해외/미국 실사 비교] fetchStats()/fetchCategoryMatrix() 와 독립적으로 병렬
-  // fetch — 실패해도(038 미배포 라이브 포함) tr-zone-block 은 정적 셸의 기본값인
-  // hidden 상태 그대로 남고, 다른 섹션엔 전혀 영향이 없다.
-  fetchZoneCategory()
-    .then(function (data) {
-      renderZonePanel(data);
-    })
-    .catch(function () { /* 조용히 숨김 유지 */ });
+  // [주 데이터 · 실사 결과] 058/059 fda_inspection_stats — findings 계열과 완전히 다른
+  // 소스다. 이 면에서는 이것이 주 데이터라, 0건·구버전 응답으로 블록이 끝내 펴지지
+  // 않으면 빈 화면을 보여주는 대신 안내로 내린다(조용한 빈 페이지 금지).
+  if (WANT.fda) {
+    fetchFdaInspectionStats()
+      .then(function (data) {
+        renderFdaInspections(data);
+        // [062] 같은 응답에서 파생 — 추가 네트워크 호출 0. 062 미적용 라이브에서는
+        // 두 키가 없어 각 렌더러가 조용히 no-op 한다(주 데이터는 059 만으로 그려진다).
+        renderFdaQuarters(data);
+        renderKorea(data);
+        if (fdaBlockEl && !fdaBlockEl.hidden) revealContent();
+        else failContent();
+      })
+      .catch(failContent);
+  }
 
-  // [FDA 의약품 GMP 실사 등급] 위 체인들과 완전히 독립적으로 병렬 fetch(다른 소스 —
-  // fda_inspections 표) — 실패해도(058 미적용 라이브·0건 포함) tr-fda-block 은 정적
-  // 셸의 기본값인 hidden 상태 그대로 남고, 다른 섹션엔 전혀 영향이 없다.
-  fetchFdaInspectionStats()
-    .then(function (data) {
-      renderFdaInspections(data);
-    })
-    .catch(function () { /* 조용히 숨김 유지 */ });
+  // [부 데이터] 008 히트맵 — 실패해도(008 미적용 라이브 포함) tr-heatmap-block 은 정적
+  // 셸의 기본값인 hidden 상태 그대로 남는다. 다른 섹션엔 전혀 영향이 없다.
+  if (WANT.matrix) {
+    fetchCategoryMatrix()
+      .then(function (data) { renderHeatmap(data); })
+      .catch(function () { /* 조용히 숨김 유지 */ });
+  }
 
-  // [최근 12개월 · 달라진 점] 위 세 체인과 독립적으로 병렬 fetch — 실패해도(041 미배포
-  // 라이브 포함) tr-recent-block/tr-move-block 은 정적 셸의 기본값인 hidden 상태 그대로
-  // 남고, 다른 섹션엔 전혀 영향이 없다. 한 번의 응답으로 두 패널을 모두 그린다(추가
-  // 네트워크 호출 0) — 그래서 renderMovers 가 renderRecentWindow 와 같은 data 를 받는다.
-  fetchRecentWindow()
-    .then(function (data) {
-      renderRecentWindow(data);
-      renderMovers(data);
-    })
-    .catch(function () { /* 조용히 숨김 유지 */ });
+  // [부 데이터] 038 해외 vs 미국 — 통합 순위의 세 번째 보기. 실패하면 그 탭이 아예
+  // 나타나지 않는다(빈 탭 금지, applyRankView).
+  if (WANT.zone) {
+    fetchZoneCategory()
+      .then(function (data) { renderZonePanel(data); })
+      .catch(function () { /* 조용히 탭 미노출 */ });
+  }
 
-  // [인용 조항] 위 체인들과 독립적으로 병렬 fetch — 실패해도(042 미배포 라이브 포함)
-  // tr-cfr-block 은 정적 셸의 기본값인 hidden 상태 그대로 남는다.
-  fetchCfrRanking()
-    .then(function (data) {
-      renderCfrRanking(data);
-    })
-    .catch(function () { /* 조용히 숨김 유지 */ });
+  // [부 데이터] 041 최근 12개월 — 한 번의 응답으로 월별 막대·최근 순위 보기·달라진 점
+  // 셋을 모두 그린다(추가 네트워크 호출 0).
+  if (WANT.recent) {
+    fetchRecentWindow()
+      .then(function (data) {
+        renderRecentWindow(data);
+        renderMovers(data);
+      })
+      .catch(function () { /* 조용히 숨김 유지 */ });
+  }
 
-  // [업체 찾기] 폼 submit 가로채기 — action 이 없어 041 미배포 라이브에서 눌러도 페이지
-  // 이동은 일어나지 않고 안내 문구만 남는다(다른 섹션 영향 0).
-  if (firmFindFormEl) {
-    firmFindFormEl.addEventListener("submit", function (ev) {
-      ev.preventDefault();
-      runFirmFind();
-    });
+  // [부 데이터] 042 인용 조항 — 실패해도 tr-cfr-block 은 hidden 그대로.
+  if (WANT.cfr) {
+    fetchCfrRanking()
+      .then(function (data) { renderCfrRanking(data); })
+      .catch(function () { /* 조용히 숨김 유지 */ });
   }
 })();

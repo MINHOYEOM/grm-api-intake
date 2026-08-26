@@ -37,6 +37,18 @@
   var catEl = document.getElementById("fp-cat");
   var yearEl = document.getElementById("fp-year");
   var docsEl = document.getElementById("fp-docs");
+  // [존 재편 2026-08-26] ?key= 없이 들어왔을 때의 조회 랜딩. 하드 게이트에는 넣지
+  // 않는다 — 이 블록이 없는 구버전 셸(캐시 스큐)에서도 프로파일 본기능은 살아야 한다.
+  var lookupEl = document.getElementById("fp-lookup");
+  // [063] FDA 실사 이력 — 워치리스트와 같은 격리: 미적용 라이브·구버전 셸·fetch 실패
+  // 전부 이 블록만 hidden 으로 남고 프로파일 본기능은 무장애.
+  var inspBlockEl = document.getElementById("fp-insp-block");
+  var inspSubEl = document.getElementById("fp-insp-sub");
+  var inspEl = document.getElementById("fp-insp");
+  var inspNoteEl = document.getElementById("fp-insp-note");
+  var lookFormEl = document.getElementById("fp-look-form");
+  var lookInputEl = document.getElementById("fp-look-input");
+  var lookResEl = document.getElementById("fp-look-res");
   if (!cfg || !loadingEl || !errorEl || !notfoundEl || !contentEl || !nameEl ||
       !statsEl || !catEl || !yearEl || !docsEl) return;
 
@@ -74,6 +86,7 @@
     errorEl.hidden = which !== "error";
     notfoundEl.hidden = which !== "notfound";
     contentEl.hidden = which !== "content";
+    if (lookupEl) lookupEl.hidden = which !== "lookup";
   }
 
   function el(tag, className, text) {
@@ -461,6 +474,153 @@
     });
   }
 
+  // ── [이름으로 조회] 041 findings_firm_search ─────────────────────────────────
+  // trends.js 일곱 번째 블록에 있던 폼을 여기로 옮겼다. 통계 페이지 한가운데 있던
+  // 조회 도구를 **조회 대상 페이지 자체**의 랜딩으로 올린 것 — 그래야 이 URL 을 그냥
+  // 링크하는 것만으로 진입로가 생긴다(재편 전 정적 인바운드 링크 0개).
+  function buildLookupRow(item) {
+    var a = document.createElement("a");
+    a.className = "tr-look-row";
+    a.href = "?key=" + encodeURIComponent(item.firm_key || "");
+    var name = el("span", "tr-look-name", decodeFirmDisplay(item.firm_name));
+    a.appendChild(name);
+    var meta = el("span", "tr-look-meta",
+      "문서 " + fmtNum(item.documents) + " · 지적 " + fmtNum(item.findings));
+    a.appendChild(meta);
+    return a;
+  }
+
+  function renderLookupResult(payload, q) {
+    if (!lookResEl) return;
+    lookResEl.innerHTML = "";
+    var items = (payload && payload.items) || [];
+    if (!items.length) {
+      lookResEl.appendChild(el("p", "tr-look-empty",
+        "\u2018" + q + "\u2019 (으)로 찾은 업체가 없습니다. 영문 상호의 일부만 넣어 보세요."));
+      return;
+    }
+    lookResEl.appendChild(el("p", "tr-look-empty",
+      "\u2018" + q + "\u2019 검색 결과 " + fmtNum(items.length) + "곳 \u2014 이름을 누르면 그 업체의 이력으로 갑니다."));
+    items.forEach(function (it) { lookResEl.appendChild(buildLookupRow(it)); });
+  }
+
+  function runLookup() {
+    if (!lookInputEl || !lookResEl) return;
+    var q = (lookInputEl.value || "").trim();
+    if (q.length < 2) {
+      lookResEl.innerHTML = "";
+      lookResEl.appendChild(el("p", "tr-look-empty", "두 글자 이상 입력해 주세요."));
+      return;
+    }
+    lookResEl.innerHTML = "";
+    lookResEl.appendChild(el("p", "tr-look-empty", "찾는 중\u2026"));
+    fetch(rpcEndpoint("findings_firm_search"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_q: q, p_limit: 20 }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("findings_firm_search " + r.status);
+      return r.json();
+    }).then(function (payload) {
+      renderLookupResult(payload, q);
+    }).catch(function () {
+      lookResEl.innerHTML = "";
+      lookResEl.appendChild(el("p", "tr-look-empty", "업체 검색을 불러오지 못했습니다."));
+    });
+  }
+
+  if (lookFormEl) {
+    lookFormEl.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      runLookup();
+    });
+  }
+
+  // ── [063] FDA GMP 실사 이력 ─────────────────────────────────────────────────
+  // fda_inspection_firm(p_firm_key) — 지적 이력과 **단위가 다른**(실사 건의 등급)
+  // 별도 소스라 별도 섹션에 그린다. 서로 나누지 않는다.
+  var INSP_GRADE_KO = { NAI: "적합", VAI: "경미", OAI: "중대" };
+  var INSP_ROWS = 20;
+
+  function buildInspRow(r) {
+    var row = el("div", "fp-insp-row");
+    row.appendChild(el("span", "fp-insp-date", r.inspection_end_date || ""));
+    var code = String(r.classification_code || "");
+    var grade = el("span", "fp-insp-grade " + code.toLowerCase(),
+      code + (INSP_GRADE_KO[code] ? " " + INSP_GRADE_KO[code] : ""));
+    row.appendChild(grade);
+    var site = el("span", "fp-insp-site", r.legal_name || "");
+    var loc = [r.city, r.state, r.country_name].filter(Boolean).join(", ");
+    if (loc) {
+      site.appendChild(document.createTextNode(" "));
+      site.appendChild(el("span", "loc", loc));
+    }
+    row.appendChild(site);
+    if (r.citations_posted) row.appendChild(el("span", "fp-insp-cit", "지적서 공개"));
+    return row;
+  }
+
+  function renderInspections(data) {
+    if (!inspBlockEl || !inspEl) return;
+    var d = data || {};
+    var t = d.totals || {};
+    var scope = d.scope || {};
+    var total = Number(t.inspections || 0);
+    // 범위 문자열 — "없음"을 말할 때도 쓰므로 scope 에서만 만든다(하드코딩 금지).
+    var range = "";
+    if (scope.fiscal_year_min && scope.fiscal_year_max) {
+      range = "FY" + scope.fiscal_year_min + "~FY" + scope.fiscal_year_max +
+        " FDA 의약품 GMP 실사";
+    }
+    if (total === 0) {
+      // ★"실사 기록 없음"이 아니라 "**확인된** 기록 없음 + 범위"다. 이 표는 FY2020
+      //   이후 GMP 실사만 담으므로 범위 없는 부재 단정은 거짓이 된다(부재 어휘 규율).
+      //   범위 문자열조차 없으면(구버전 응답) 아예 그리지 않는다 — 좁힐 수 없는
+      //   부재 문장을 싣지 않는다.
+      if (!range) return;
+      inspEl.innerHTML = "";
+      if (inspSubEl) inspSubEl.textContent = "";
+      inspEl.appendChild(el("p", "fp-empty",
+        "확인된 " + range + " 기록이 없습니다. 그 이전 실사나 다른 유형의 실사는 이 표의 범위 밖입니다."));
+      if (inspNoteEl) inspNoteEl.textContent = "";
+      inspBlockEl.hidden = false;
+      return;
+    }
+    if (inspSubEl) {
+      var sub_ = "실사 " + total + "건";
+      if (Number(t.sites || 0) > 1) sub_ += " · 사업장 " + t.sites + "곳";
+      sub_ += " · 중대 지적(OAI) " + Number(t.oai || 0) + "건";
+      if (t.first_inspection_end_date && t.last_inspection_end_date) {
+        sub_ += " · " + t.first_inspection_end_date + " ~ " + t.last_inspection_end_date;
+      }
+      inspSubEl.textContent = sub_;
+    }
+    var rows = d.inspections || [];
+    inspEl.innerHTML = "";
+    rows.slice(0, INSP_ROWS).forEach(function (r) { inspEl.appendChild(buildInspRow(r)); });
+    if (inspNoteEl) {
+      var note = "";
+      if (rows.length > INSP_ROWS) {
+        note += "최근 " + INSP_ROWS + "건만 표시했습니다(전체 " + total + "건). ";
+      }
+      if (range) note += "범위: " + range + " — 그 이전 실사는 담겨 있지 않습니다.";
+      inspNoteEl.textContent = note;
+      inspNoteEl.hidden = !note;
+    }
+    inspBlockEl.hidden = false;
+  }
+
+  function fetchInspectionHistory(firmKey) {
+    return fetch(rpcEndpoint("fda_inspection_firm"), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_firm_key: firmKey }),
+    }).then(function (r) {
+      if (!r.ok) throw new Error("fda_inspection_firm " + r.status);
+      return r.json();
+    });
+  }
+
   var firmKeyParam = getFirmKeyParam();
 
   if (!url || !key) {
@@ -468,8 +628,10 @@
     showState("loading");
     loadingEl.textContent = "업체 프로파일 준비 중입니다.";
   } else if (!firmKeyParam) {
-    // key 파라미터 자체가 없으면 fetch 를 시도할 이유가 없다 — 바로 "찾을 수 없음".
-    showState("notfound");
+    // [존 재편] 키가 없으면 "찾을 수 없음"이 아니라 **조회 랜딩**이다. 재편 전에는
+    // 여기서 막다른 안내로 끝나 페이지가 스스로 진입로가 되지 못했다.
+    showState("lookup");
+    if (lookInputEl) lookInputEl.focus();
   } else {
     showState("loading");
     fetchFirmProfile(firmKeyParam)
@@ -485,6 +647,11 @@
         // 워치리스트는 프로파일 로드 성공 후에만 배선(실패해도 본기능 무장애 — 내부에서
         // env/lib/세션/015 미적용을 각각 방어하고 조용히 hidden 유지).
         initWatchlist(firmKeyParam, data.display_name || "");
+        // [063] FDA 실사 이력 — 본기능과 독립 promise 체인. 실패(미적용 라이브의
+        // 404 포함)해도 이 블록만 hidden 으로 남는다.
+        fetchInspectionHistory(firmKeyParam)
+          .then(function (insp) { renderInspections(insp); })
+          .catch(function () { /* 조용히 숨김 유지 */ });
       })
       .catch(function () {
         // RPC 404(013 미적용 라이브)·network 실패 — "찾을 수 없음"이 아니라 "준비 중".

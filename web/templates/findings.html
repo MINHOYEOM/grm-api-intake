@@ -117,6 +117,43 @@
 
         조건부인 이유: 해당 정본 데이터가 없으면 그 페이지도 없다 — 없는 페이지로 보내는
         링크는 무링크보다 나쁘다. -#}
+    {#- [존 재편 2026-08-26] 도구 카드.
+
+        도달성 감사(홈에서 링크만 따라가 세기) 실측: nav·footer 에 있는 라우트는 전부
+        3,500장 이상에서 링크되는데(이 페이지 6,774 · 트렌드 3,517), 완성돼 있는 도구
+        셋은 **자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장**이었다.
+        기능이 없었던 게 아니라 닿는 길이 없었다.
+
+        footer 에 '도구' 열을 더해 전 페이지에서 닿게 하는 것과 별개로, **찾는 행위가
+        일어나는 이 페이지**에도 카드로 둔다 — 검색창에 넣을 말이 떠오르지 않을 때
+        필요한 것이 대개 이 셋이기 때문이다(업체 이름은 아는데 지적 문장은 모른다,
+        실사관 이름표를 방금 받았다, 조항별 점검표가 필요하다).
+
+        ★신규 CSS 0 — 바로 아래 '다르게 찾아보기'의 .fnd-browse-* 컴포넌트를 그대로
+        재사용한다. 두 섹션은 성격이 같다("검색어가 아닌 다른 길"). -#}
+    <section class="fnd-browse" aria-label="도구">
+      <h2 class="fnd-browse-h">도구</h2>
+      <p class="fnd-browse-p">이름을 알고 있는 대상의 이력을 바로 조회하거나, 빈발 지적 조항을 점검표로 받아 갈 수 있습니다.</p>
+      <div class="fnd-browse-grid">
+        <a class="fnd-browse-card" href="{{ rel_root }}findings/firm/index.html">
+          <span class="fnd-browse-t">업체 조회</span>
+          <span class="fnd-browse-d">거래처·수탁제조소 이름으로 그 업체의 지적 이력을 한 곳에서 봅니다. 영문 상호 일부만 넣어도 됩니다.</span>
+        </a>
+        <a class="fnd-browse-card" href="{{ rel_root }}findings/inspector/index.html">
+          <span class="fnd-browse-t">실사관 조회</span>
+          <span class="fnd-browse-d">FDA 483에 서명한 실사관 이름으로 그 실사관이 확인한 지적 이력을 봅니다. 순위·비교는 제공하지 않습니다.</span>
+        </a>
+        <a class="fnd-browse-card" href="{{ rel_root }}findings/checklist/index.html">
+          <span class="fnd-browse-t">자가점검 체크리스트</span>
+          <span class="fnd-browse-d">많이 인용된 조항을 순서대로 뽑고 조항마다 실제 지적 문장을 붙인 점검표. 인쇄·CSV·엑셀 붙여넣기.</span>
+        </a>
+        <a class="fnd-browse-card" href="{{ rel_root }}findings/inspections/index.html">
+          <span class="fnd-browse-t">FDA 실사 결과</span>
+          <span class="fnd-browse-d">지적사항이 아니라 실사 한 건이 어떻게 끝났는지(NAI·VAI·OAI)를 연도별·국가별로 봅니다.</span>
+        </a>
+      </div>
+    </section>
+
     {% if browse_axes %}
     <section class="fnd-browse" aria-label="다르게 찾아보기">
       <h2 class="fnd-browse-h">다르게 찾아보기</h2>

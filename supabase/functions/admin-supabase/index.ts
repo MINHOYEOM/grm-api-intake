@@ -106,6 +106,17 @@ async function readReactions(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
   return { totals, topCards };
 }
 
+async function readFeedback(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
+  if ("error" in ctx) return [];
+  const { data, error } = await ctx.supabase
+    .from("user_feedback")
+    .select("id,created_at,category,message,email,contact_consent,page_path,user_agent,viewport,is_operator,status")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) return [];
+  return data || [];
+}
+
 async function health(ctx: Awaited<ReturnType<typeof requireAdmin>>) {
   if ("error" in ctx) return { ok: false };
   const checks = [];
@@ -202,12 +213,17 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ ok: true, reactions: await readReactions(ctx) });
     }
 
+    if (req.method === "GET" && action === "feedback") {
+      return jsonResponse({ ok: true, feedback: await readFeedback(ctx) });
+    }
+
     if (req.method === "GET" && action === "overview") {
-      const [users, dispatches, auditRows, reactions] = await Promise.all([
+      const [users, dispatches, auditRows, reactions, feedback] = await Promise.all([
         listUsers(ctx, limit),
         readDispatches(ctx),
         readAudit(ctx),
         readReactions(ctx),
+        readFeedback(ctx),
       ]);
       return jsonResponse({
         ok: true,
@@ -217,12 +233,29 @@ Deno.serve(async (req: Request) => {
         dispatches,
         audit: auditRows,
         reactions,
+        feedback,
       });
     }
 
     if (req.method === "POST") {
       const body = await readJsonBody(req);
       const postAction = String(body.action || "").trim();
+      // 피드백 상태 트리아지 — user_id 검증(회원 조치 전용)보다 앞에서 처리한다.
+      if (postAction === "feedback_status") {
+        const feedbackId = Number(body.id || 0);
+        const status = String(body.status || "").trim();
+        // 상태 어휘는 061 CHECK 와 같은 4종 — 여기만 늘리면 DB 제약에 걸린다.
+        if (!Number.isInteger(feedbackId) || feedbackId <= 0 || !["new", "in_progress", "done", "dismissed"].includes(status)) {
+          return jsonResponse({ error: "bad_feedback_status" }, 400);
+        }
+        const { error } = await ctx.supabase
+          .from("user_feedback")
+          .update({ status })
+          .eq("id", feedbackId);
+        if (error) return jsonResponse({ error: "feedback_action_failed", message: error.message }, 502);
+        await audit(ctx, "feedback.status", { status }, "user_feedback", String(feedbackId));
+        return jsonResponse({ ok: true });
+      }
       const userId = String(body.user_id || "").trim();
       if (!userId) return jsonResponse({ error: "missing_user_id" }, 400);
       if (await targetIsAdmin(ctx, userId)) return jsonResponse({ error: "cannot_manage_admin_user" }, 400);

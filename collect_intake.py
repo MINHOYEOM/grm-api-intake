@@ -2048,10 +2048,90 @@ def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | No
     return collect_rss_feed(_MHRA_FEED_SPEC, start, end)
 
 
+# ── [MHRA 회수 알림 본문 2026-08-26] ──────────────────────────────────────────
+# MHRA 회수는 카드 부가층이 **W3 인용 한 줄**뿐이었다 — Atom 피드가 주는 것이 제목·요약
+# 한 문장이라 결정론 상세를 배선할 원천이 없었기 때문이다(그래서 `mhra-recall` 만 회수
+# 4종 중 유일하게 `detail` 미배선이었다).
+#
+# 그런데 gov.uk 는 **Content API** 를 공개한다(`/api/content/<base_path>`) — HTML 스크래핑이
+# 아니라 발행 시스템이 직접 주는 JSON 이라 마크업 변경에 흔들리지 않는다. 실측(2026-08-26,
+# Zentiva Fingolimod 회수): `details.body` 에 DMRC 참조번호 · 판매허가권자(MAH) · 의약품
+# 상세(PL 번호·성분·SNOMED·GTIN) · **영향 배치/유효기한 표** · 배경(회수 사유)이 2,333자로
+# 들어 있다. 피드 요약 한 문장과 비교할 수 없는 정보량이다.
+#
+# 수집 빈도는 월 2건 수준(실측 2026-06~08 6건)이라 fetch 비용이 낮다. ECA/ISPE 기사 보강과
+# **같은 관용구**를 쓴다 — 플래그 게이트 · 실행당 상한 · per-item delay · 실패는 조용히 skip
+# (카드는 그대로 발행). 플래그가 꺼져 있으면 이 블록 자체가 실행되지 않아 산출물이 기존과
+# byte 동일하다.
+MHRA_ALERT_BODY_MAX_CHARS = 4000       # 상세 렌더 상한(카드 상세 블록에 싣는 범위)
+MHRA_ALERT_BODY_CAP = 10               # 실행당 fetch 상한(월 2건 수준이라 여유 있음)
+MHRA_ALERT_BODY_DELAY_SECONDS = 1.0
+MHRA_ALERT_BODY_TIMEOUT = 15
+_GOVUK_CONTENT_API = "https://www.gov.uk/api/content"
+_GOVUK_HOST_PREFIX = "https://www.gov.uk/"
+_MHRA_BODY_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _govuk_content_api_url(page_url: str) -> str:
+    """gov.uk 페이지 URL → Content API URL. gov.uk 가 아니면 ""(추측해 만들지 않는다)."""
+    url = (page_url or "").split("?", 1)[0].split("#", 1)[0]
+    if not url.startswith(_GOVUK_HOST_PREFIX):
+        return ""
+    path = url[len(_GOVUK_HOST_PREFIX):].strip("/")
+    return f"{_GOVUK_CONTENT_API}/{path}" if path else ""
+
+
+def _fetch_mhra_alert_body(page_url: str) -> str:
+    """gov.uk Content API 에서 알림 본문(`details.body`) 텍스트를 뽑는다. 실패는 ""(graceful).
+
+    HTML 태그만 걷어내고 **문장은 손대지 않는다** — 상세 블록이 원문 verbatim 이어야
+    카드가 근거를 보여줄 수 있다(생성 0)."""
+    api = _govuk_content_api_url(page_url)
+    if not api:
+        return ""
+    try:
+        resp = requests.get(api, timeout=MHRA_ALERT_BODY_TIMEOUT, headers={
+            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+            "Accept": "application/json",
+        })
+        resp.raise_for_status()
+        payload = resp.json()
+    except (requests.RequestException, ValueError) as e:  # noqa: BLE001
+        log("WARN", f"MHRA 알림 본문 fetch 실패(카드 그대로): {truncate(str(e), 120)}")
+        return ""
+    body = ((payload.get("details") or {}).get("body") or "") if isinstance(payload, dict) else ""
+    text = _html_unescape(_MHRA_BODY_TAG_RE.sub(" ", body))
+    text = " ".join(text.split())
+    if not text:
+        log("INFO", f"MHRA 알림 본문 비어 있음 — 카드 그대로: {truncate(page_url, 80)}")
+    return text[:MHRA_ALERT_BODY_MAX_CHARS]
+
+
 def collect_mhra_alerts(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """MHRA gov.uk 의약품 회수/결함(drug-device-alerts) 수집. 의료기기 FSN 은 제외.
-    item.source 는 "MHRA Inspectorate" 재사용(신규 Notion Source 옵션 불요)."""
-    return collect_rss_feed(_MHRA_ALERT_FEED_SPEC, start, end)
+    item.source 는 "MHRA Inspectorate" 재사용(신규 Notion Source 옵션 불요).
+
+    [알림 본문 2026-08-26] ENABLE_MHRA_ALERT_BODY=true 시 항목별 gov.uk **Content API** 를
+    추가 조회해 알림 전문을 `raw_payload["mhra_alert_body"]` 에 싣는다(cap 10건·delay 1s·
+    실패 조용히 skip). 기본 off — off 면 이 블록이 실행되지 않아 산출물 byte 동일.
+    """
+    items, err = collect_rss_feed(_MHRA_ALERT_FEED_SPEC, start, end)
+    if items and env_flag("ENABLE_MHRA_ALERT_BODY"):
+        capped = False
+        for i, item in enumerate(items):
+            if i >= MHRA_ALERT_BODY_CAP:
+                if not capped:
+                    log("WARN", f"MHRA 알림 본문 cap({MHRA_ALERT_BODY_CAP}) 도달 — "
+                                "나머지 항목은 본문 없이 유지")
+                    capped = True
+                break
+            if not item.official_url:
+                continue
+            time.sleep(MHRA_ALERT_BODY_DELAY_SECONDS)
+            body = _fetch_mhra_alert_body(item.official_url)
+            if body:
+                item.raw_payload["mhra_alert_body"] = body
+    return items, err
 
 
 def collect_pics_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:

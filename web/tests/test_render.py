@@ -6282,18 +6282,18 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn("MERGED PARENT", h)
         self.assertIn("전체 3품목", h)
 
-    def test_callout_binds_latest_brief(self):
-        # 코럴 콜아웃·히어로 이슈카드 호별 수치가 최신호(06-29) 파생값 반영(stale 아님).
+    def test_hero_issuecard_binds_latest_brief(self):
+        # 히어로 이슈카드 호별 수치가 최신호(06-29) 파생값 반영(stale 아님).
+        # 11차 정리로 콜아웃(#this-week)은 철거 — 랜딩의 수치 바인딩은 이슈카드가 유일하다.
         older = _minimal_brief("2026-06-22")
         latest = _minimal_brief("2026-06-29",
                                 coverage={"intake_total": 99, "rendered": 88,
                                           "evidence": {"A": 7, "B": 5, "C": 0}})
         out = self._render_site([older, latest])
         landing = (out / "index.html").read_text(encoding="utf-8")
-        self.assertIn("수집 99건", landing)
+        self.assertIn("수집 <b>99</b>", landing)
         self.assertIn("카드 88장", landing)
-        self.assertIn("Evidence A 7 · B 5", landing)   # §1-6 표기 일관성: '/' → '·'
-        self.assertIn("2026년 6월 5주차", landing)   # 06-29 → (29-1)//7+1 = 5
+        self.assertIn("A 7 · B 5", landing)            # §1-6 표기 일관성: '/' → '·'
         self.assertNotIn("수집 36건", landing)         # 옛 정적 수치 잔존 금지
 
     def test_duplicate_publish_date_rejected(self):
@@ -9894,9 +9894,10 @@ class WebGurumiPetTest(unittest.TestCase):
     grm-mascot 를 대체). 과거 랜딩 coverage 칩(8차 철거)은 되살리지 않고, 독립된 #grm-pet
     위젯과 로컬 성장 데이터만 제공하는 계약을 고정한다.
 
-    10차(사용자 확정 재배치)의 랜딩 섹션 순서·CTA 중복 가드도 이 클래스가 지킨다:
-    히어로 → #why → 기능 6종 → Card Anatomy → 참여 존(#engage) → This Week 콜아웃
-    (#this-week, 뉴스레터 직전) / 브리프행 CTA 는 히어로·하단 콜아웃 2개뿐."""
+    11차(2026-08-26, 사용자 요청 "홈 과밀 정리")의 랜딩 섹션 순서·CTA 가드도 이 클래스가
+    지킨다: 히어로 → 기능 3종(#why, soft) → Card Anatomy → 참여 존(#engage, 마지막 섹션)
+    → 뉴스레터 → AI 고지. 걷어낸 것: 단독 WHY 섹션·기능 03/05/06·This Week 콜아웃(수치
+    3중 반복). 브리프행 CTA 는 히어로("이번 주 소식 읽기") 1개뿐."""
 
     @classmethod
     def setUpClass(cls):
@@ -9951,19 +9952,28 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 
     def test_landing_section_order_final(self):
-        # 확정 재배치(10차, 2026-07-18 사용자 확정): 히어로 → #why → 기능 6종(soft) →
-        # Card Anatomy → 참여 존(#engage: 인기 카드 + 퀴즈 CTA) → This Week 콜아웃
-        # (#this-week: 마감 CTA, 뉴스레터 직전) → 뉴스레터 → AI 고지.
+        # 확정 재배치(11차, 2026-08-26 홈 과밀 정리): 히어로 → 기능 3종(soft, id=why —
+        # footer '소개' 앵커 승계) → Card Anatomy → 참여 존(#engage) → 뉴스레터 → AI 고지.
         order = [
             'class="wrap hero"',
-            '<section class="section" id="why">',
-            '<section class="section soft">',
+            '<section class="section soft" id="why">',
             ">Card Anatomy</span>",
             '<section class="section" id="engage">',
-            '<section class="section" id="this-week">',
         ]
         pos = [self.landing.index(m) for m in order]
         self.assertEqual(pos, sorted(pos), "랜딩 섹션 순서가 확정안과 다름")
+        # 걷어낸 섹션이 되살아나지 않는다 — 단독 WHY 섹션·This Week 콜아웃(수치 3중 반복).
+        self.assertNotIn('id="this-week"', self.landing)
+        self.assertNotIn("Why GRM", self.landing)
+        self.assertNotIn('class="callout"', self.landing)
+
+    def test_landing_features_are_exactly_three(self):
+        # 기능 6종 → 3종(11차) — 카드 차원 기능(원문 연결·번역 병기·체크리스트)은 바로
+        # 아래 Card Anatomy 범례·실카드가 보여주므로 기능 그리드에 되살리지 않는다.
+        self.assertEqual(self.landing.count('<div class="feat">'), 3)
+        self.assertNotIn("원문 대비 한국어 번역", self.landing)
+        self.assertNotIn("실무 맞춤형 점검 리스트", self.landing)
+        self.assertNotIn("원문·출처 직접 연결", self.landing)
 
     def test_engage_zone_popular_then_quiz(self):
         # 참여 존(#engage) — 인기 카드가 먼저, 퀴즈 CTA 가 뒤(한 섹션 응집).
@@ -9974,25 +9984,19 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn('class="quiz-cta"', zone)
         self.assertLess(zone.index('id="popular"'), zone.index('class="quiz-cta"'))
 
-    def test_this_week_callout_is_closing_cta(self):
-        # This Week 콜아웃(#this-week) — 콜아웃 단독 섹션(인기 카드는 #engage 로 분리),
-        # content 블록 마지막(=뉴스레터 직전). 수치 문구·CTA 는 유지.
-        zone = self.landing[self.landing.index('<section class="section" id="this-week">'):]
-        zone = zone[:zone.index("</section>")]
-        self.assertIn('class="callout"', zone)
-        self.assertIn("이번 주 소식 보기", zone)
-        self.assertNotIn('id="popular"', zone)
-        self.assertNotIn('id="grm-popular"', zone)
-        # #this-week 이후 </main> 까지 다른 섹션이 없다(마감 CTA).
-        tail = self.landing[self.landing.index('<section class="section" id="this-week">'):]
+    def test_engage_zone_is_the_closing_section(self):
+        # 11차 정리 — This Week 콜아웃 철거 후 참여 존(#engage)이 content 블록의 마지막
+        # 섹션(=뉴스레터 직전)이다. 새 최상위 섹션을 그 뒤에 덧붙이지 않는다.
+        tail = self.landing[self.landing.index('<section class="section" id="engage">'):]
         tail = tail[:tail.index("</main>")]
         self.assertEqual(tail.count("<section"), 1)
 
-    def test_brief_ctas_exactly_two(self):
-        # CTA 중복 정리(불가침) — 같은 브리프로 가는 버튼은 히어로("이번 주 소식 읽기")와
-        # 하단 콜아웃("이번 주 소식 보기") 2개만. 인기 카드 빈 상태의 이동 버튼은 제거.
+    def test_brief_cta_exactly_one(self):
+        # CTA 중복 정리(불가침 상한) — 같은 브리프로 가는 버튼은 히어로("이번 주 소식
+        # 읽기") 1개만(헤더 상시 '이번 주 소식' 버튼은 base 공통이라 별도). 구 하단
+        # 콜아웃 CTA("이번 주 소식 보기")·인기 카드 빈 상태의 이동 버튼은 되살리지 않는다.
         self.assertEqual(self.landing.count("이번 주 소식 읽기"), 1)
-        self.assertEqual(self.landing.count("이번 주 소식 보기"), 1)
+        self.assertNotIn("이번 주 소식 보기", self.landing)
         self.assertNotIn("이번 주 카드 보러 가기", self.landing)
 
 
@@ -10033,10 +10037,10 @@ class WebLandingLibraryCardTest(unittest.TestCase):
                          "템플릿에 수치를 하드코딩하면 카탈로그가 늘 때 낡는다")
 
     def test_cta_targets_the_library_not_a_brief(self):
-        """브리프행 CTA 2개 불가침 — 이 카드는 /library/ 로만 간다."""
+        """브리프행 CTA 1개 불가침(11차) — 이 카드는 /library/ 로만 간다."""
         self.assertIn('href="library/index.html">자료실 열기', self.landing)
         self.assertEqual(self.landing.count("이번 주 소식 읽기"), 1)
-        self.assertEqual(self.landing.count("이번 주 소식 보기"), 1)
+        self.assertNotIn("이번 주 소식 보기", self.landing)
 
     def test_card_is_omitted_when_there_is_no_library(self):
         """데이터가 없으면 빈 카드를 그리지 않는다(빈 상태 광고 금지).
@@ -10169,6 +10173,115 @@ class WebPopularCardsTest(unittest.TestCase):
         for cls in (".popular-list", ".popular-item", ".popular-rank",
                     ".popular-agency", ".popular-title", ".popular-count"):
             self.assertIn(cls.lstrip("."), self.popular_js)
+
+
+# ── 문의 및 제안 — env-gate·자산 배선·JS/마이그레이션 계약 ──────────────────────────
+class WebFeedbackTest(unittest.TestCase):
+    """'문의 및 제안' 피드백 계층(061 user_feedback) — 진입 링크(푸터 '안내' 열)·모달은
+    feedback.js 가 전부 런타임 주입(비골든·JS 미실행이면 흔적 0)이라 여기선 셸 배선·
+    env-gate·소스/마이그레이션 계약만 검증한다.
+
+    쓰기 경로 불가침: anon 은 RPC(feedback_submit)로만 쓴다(060 funnel_bump 관례 동형).
+    category·status 어휘는 061 CHECK 와 클라이언트가 같아야 한다 — 모르는 값은 RPC·DB 가
+    거부(폴백 금지)하므로 어긋나면 제출/트리아지가 조용히 전부 실패한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_feedback_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.feedback_js = (WEB_DIR / "assets" / "feedback.js").read_text(encoding="utf-8")
+        cls.admin_js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+        cls.migration = (WEB_DIR / "migrations" / "061_user_feedback.sql").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_env_gated_like_reactions(self):
+        # 기본(env-off) 빌드엔 무흔적 — 골든 byte-diff 0 계약(reactions 선례 동형).
+        self.assertNotIn("feedback.js", self.landing)
+        self.assertNotIn("grm-fb-", self.landing)
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_feedback_on_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            landing_on = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+        import re as _re
+        m = _re.search(r'assets/feedback\.js\?v=([0-9a-f]{8})"', landing_on)
+        self.assertIsNotNone(m, "feedback.js 캐시버스팅 해시 미발견(활성 렌더)")
+        # cfg 에 프로덕션 호스트가 실린다 — 비프로덕션(프리뷰) 제출을 운영자로 표식하는 근거.
+        self.assertIn('data-host="', landing_on)
+
+    def test_feedback_js_copied_to_dist(self):
+        built = (self.single / "assets" / "feedback.js").read_bytes()
+        src = (WEB_DIR / "assets" / "feedback.js").read_bytes()
+        self.assertEqual(built, src, "feedback.js 가 dist/assets 에 verbatim 복사되지 않음")
+
+    def test_feedback_js_writes_via_rpc_only(self):
+        self.assertIn("rest/v1/rpc/feedback_submit", self.feedback_js)
+        # 테이블 직접 REST/supabase-js 접근 금지 — RPC 단일 쓰기 경로.
+        self.assertNotIn("/rest/v1/user_feedback", self.feedback_js)
+        self.assertNotIn('from("user_feedback")', self.feedback_js)
+
+    def test_category_vocabulary_matches_migration(self):
+        cats = {"usability", "correction", "feature", "other"}
+        for c in cats:
+            self.assertIn('"%s"' % c, self.feedback_js)
+        import re as _re
+        m = _re.search(r"category in \(([^)]*)\)", self.migration)
+        self.assertIsNotNone(m, "061 CHECK 의 category 화이트리스트 미발견")
+        self.assertEqual(set(_re.findall(r"'([a-z]+)'", m.group(1))), cats)
+
+    def test_feedback_js_tags_operator(self):
+        # 운영자('grm-op')·비프로덕션 호스트(data-host 대조)는 p_operator 로 표식(#763 동형).
+        self.assertIn("grm-op", self.feedback_js)
+        self.assertIn("p_operator", self.feedback_js)
+        self.assertIn("data-host", self.feedback_js)
+
+    def test_email_requires_consent_in_both_layers(self):
+        """이메일은 회신 동의가 있을 때만 저장된다 — 폼이 막고 DB 가 최종 방어선.
+
+        폼만 막으면 계약이 클라이언트에 갇혀, 다른 호출 경로(직접 RPC)가 동의 없는
+        이메일을 그대로 넣을 수 있다. 두 층이 같이 있어야 한다."""
+        self.assertIn("p_consent", self.feedback_js)
+        self.assertIn("consent.checked", self.feedback_js)
+        # DB: 컬럼 제약(이메일이 있으면 동의도 참) + RPC 의 동의 없는 이메일 폐기.
+        self.assertIn("user_feedback_email_needs_consent", self.migration)
+        self.assertIn("check (email is null or contact_consent)", self.migration)
+        self.assertIn("not coalesce(p_consent, false)", self.migration)
+
+    def test_status_vocabulary_matches_migration(self):
+        """트리아지 상태 4종이 admin.js·마이그레이션에서 같아야 한다 — admin 만 늘리면
+        update 가 DB CHECK 에 걸려 조용히 실패한다."""
+        import re as _re
+        m = _re.search(r"status text not null default 'new'\s*check \(status in \(([^)]*)\)", self.migration)
+        self.assertIsNotNone(m, "061 CHECK 의 status 화이트리스트 미발견")
+        db = set(_re.findall(r"'([a-z_]+)'", m.group(1)))
+        self.assertEqual(db, {"new", "in_progress", "done", "dismissed"})
+        block = self.admin_js.split("var FEEDBACK_STATUS = {", 1)[1].split("};", 1)[0]
+        client = set(_re.findall(r'"?([a-z_]+)"?\s*:\s*\[', block))
+        self.assertEqual(client, db, "admin.js 상태 어휘가 061 CHECK 와 다름")
+
+    def test_ticket_number_is_returned_and_shown(self):
+        # RPC 가 접수번호(bigint)를 돌려주고 화면이 그 번호를 보여준다(접수 지칭 가능).
+        self.assertIn("returns bigint", self.migration)
+        self.assertIn("returning id into v_id", self.migration)
+        self.assertIn("grm-fb-ticket", self.feedback_js)
+        self.assertIn("접수번호", self.feedback_js)
+
+    def test_migration_write_path_is_locked(self):
+        self.assertIn("enable row level security", self.migration)
+        self.assertIn("revoke all on public.user_feedback from anon", self.migration)
+        self.assertIn("security definer", self.migration)
+        self.assertIn("grant execute on function public.feedback_submit", self.migration)
 
 
 # ── 구름이 성장 시스템 v1(9차 G2) — /quiz/ 자리표시자 + growth.js 배선 ──────────────

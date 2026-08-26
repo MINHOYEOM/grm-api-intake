@@ -64,6 +64,11 @@ WEBCARD_FIXTURES = [f for f in FIXTURES if f != "legislative_notice"] + [
     # WHOPIR 11장이 "세부 내용은 확보하지 못해"라는 거짓 문장을 달고 실제로 발행됐다.
     # web-card 전용(FIXTURES 미포함 → brief golden·intake_total 불변 — eu_gmp_ncr 선례 동형).
     "who_inspection_report", "warning_letter_violations",
+    # [MHRA 알림 본문 2026-08-26] gov.uk Content API 로 확보한 알림 전문을 실은 회수 카드.
+    # 피드 단독 골든(`mhra_recall_chemical`)은 그대로 두어 **상세 없는 종전 동작**도 계속
+    # 검사한다 — 둘이 쌍으로 있어야 "본문이 있을 때만 상세가 난다"가 고정된다.
+    # web-card 전용(FIXTURES 미포함 → brief golden·intake_total 불변 — eu_gmp_ncr 선례 동형).
+    "mhra_recall_alert_body",
 ]
 
 # assemble_web_brief golden 의 결정론 brief 메타(코드 소유 — LLM tldr 은 placeholder []).
@@ -1999,15 +2004,35 @@ class RecallDetailTest(unittest.TestCase):
             with self.subTest(producer=fn.__name__):
                 self.assertIsNone(fn({}, raw))
 
-    def test_mhra_recall_stays_unwired(self):
-        """MHRA 회수는 배선하지 않는다 — Atom 피드 5개 키를 카드가 이미 전부 쓴다.
+    def test_mhra_recall_detail_only_when_alert_body_collected(self):
+        """★[2026-08-26] MHRA 회수는 2026-08-25 시점엔 **의도적 미배선**이었다 — Atom 피드
+        5개 키를 카드가 이미 전부 써서 미사용 원천이 실재하지 않았기 때문이다.
 
-        늘리려면 gov.uk 알림 상세 페이지를 수집해야 한다(수집기 과제). 여기에 상세가
-        생겼다면 원천 없이 슬롯만 만든 것이므로 적색이어야 한다."""
-        self.assertIsNone(cs._REGISTRY["mhra-recall"].detail)
+        그 전제가 바뀌었다: gov.uk **Content API** 가 알림 전문을 준다(회수 배경·영향 배치·
+        판매허가권자). 수집기가 `mhra_alert_body` 를 실어 올 때만 상세가 난다 — 피드 단독
+        수집분(기존 골든 포함)은 종전대로 상세 없이 발행된다(additive)."""
         fx = _load_input("mhra_recall_chemical")
-        self.assertNotIn("deterministic_detail",
-                         cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({}))
+        card = cs.build_card_scaffold(fx["row"], fx["raw"]).to_web_card({})
+        self.assertNotIn("deterministic_detail", card)      # 피드 단독 = 종전 동작
+
+        body = ("DMRC reference number DMRC - 39754868 Marketing Authorisation Holder "
+                "Zentiva Pharma UK Limited Affected Lot Batch Numbers 4L01372H 11/2027 "
+                "Background recalling one batch as a precautionary measure.")
+        enriched = cs.build_card_scaffold(
+            fx["row"], {**fx["raw"], "mhra_alert_body": body}).to_web_card({})
+        detail = enriched["deterministic_detail"]
+        self.assertEqual(detail["type"], "mhra_recall_alert")
+        self.assertEqual(detail["body"], body)              # verbatim — 생성 0
+        self.assertNotIn("body_ko", detail)                 # 번역 없으면 키 미추가
+        self.assertTrue(enriched["source_body_captured"],
+                        "알림 전문을 확보했는데 원문 신호가 꺼져 있다")
+
+    def test_mhra_alert_body_ko_paired_only_when_present(self):
+        fx = _load_input("mhra_recall_chemical")
+        raw = {**fx["raw"], "mhra_alert_body": "Background: precautionary recall of one batch.",
+               "mhra_alert_body_ko": "배경: 한 개 배치의 예방적 회수."}
+        detail = cs.build_card_scaffold(fx["row"], raw).to_web_card({})["deterministic_detail"]
+        self.assertEqual(detail["body_ko"], "배경: 한 개 배치의 예방적 회수.")
 
     def test_merged_representative_carries_detail_of_one_record(self):
         """병합 대표의 상세는 **대표 레코드 1건**의 사실이고, 범위 표기의 입력은 최상위

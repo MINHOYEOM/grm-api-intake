@@ -113,6 +113,37 @@ class NoEmptyProseSlotsInPublishedBriefs(unittest.TestCase):
             self.assertTrue(empty, f"{name}: 이제 빈 카드가 없다 — KNOWN_EMPTY 에서 제거할 것")
 
 
+class DetailTypeClassificationIsComplete(unittest.TestCase):
+    """결정론 상세 유형이 새로 생기면 **분류하라고 여기서 실패한다**.
+
+    `_card_has_source_body` 는 유형별 분류(서사 본문 / 사실표)로 판정하고, 미분류 유형은
+    런타임에서 fail-open(막지 않음)이다 — 새 상세가 생겼다고 발행이 갑자기 멎으면 안 되기
+    때문이다. 그 대신 표류를 여기서 잡는다. 이 검사가 없으면 새 유형이 **조용히** 게이트
+    밖에 머문다(이번 결함이 정확히 그 모양이었다 — whopir/NCR 35장이 검사 대상 밖이었다).
+    """
+
+    def test_every_published_detail_type_is_classified(self):
+        seen: set[str] = set()
+        for path in BRIEFS:
+            brief = json.loads(path.read_text(encoding="utf-8"))
+            for card in brief.get("cards") or []:
+                dd = card.get("deterministic_detail")
+                if isinstance(dd, dict) and dd.get("type"):
+                    seen.add(dd["type"])
+        self.assertTrue(seen, "발행분에 결정론 상세가 하나도 없다 — 스윕이 무의미")
+        known = apb._BODY_DETAIL_TYPES | apb._FACTS_DETAIL_TYPES
+        unclassified = sorted(seen - known)
+        self.assertEqual(
+            unclassified, [],
+            "분류되지 않은 결정론 상세 유형이 발행분에 있다 — "
+            "assemble_publish_brief 의 _BODY_DETAIL_TYPES(원문 서사 보유) 또는 "
+            "_FACTS_DETAIL_TYPES(사실표만) 중 하나에 넣어라: %s" % unclassified)
+
+    def test_classification_sets_are_disjoint(self):
+        overlap = sorted(apb._BODY_DETAIL_TYPES & apb._FACTS_DETAIL_TYPES)
+        self.assertEqual(overlap, [], f"두 집합에 동시에 든 유형: {overlap}")
+
+
 DELTAS = sorted((ROOT / "web" / "data" / "deltas").glob("delta_*.json"))
 
 

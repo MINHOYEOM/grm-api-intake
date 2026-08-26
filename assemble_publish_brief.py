@@ -526,15 +526,29 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
             f"({'스캐폴드가 낡은 파서 산출' if before else '스캐폴드에 블록 없음 — 신설'})")
 
 
-# 결정론 상세 dict 에서 **본문이 아닌 메타 키** — 이것만 남으면 실린 본문이 없는 것이다.
-# 아래 판정은 "본문 키 목록"이 아니라 이 메타 목록의 여집합으로 쓴다(손목록 반전).
-# 발행분 전수의 상세 키 23종을 세어 정한다: `type`·`report_kind` 는 분류, `text_source` 는
-# 출처 표기(OCR 여부)라 셋 다 본문이 아니다. 나머지(observations·rows·violations·outcome·
-# sections·reliance·nature·action·operations·additional·inspectors·severity_summary·
-# product_scope·authority_country…)는 전부 원문에서 온 사실이다.
-# 여집합으로 쓰는 이유: 본문 키를 열거하면 새 상세 유형이 생길 때마다 **조용히** 검사에서
-# 빠진다 — 이번 결함이 정확히 그 모양이었다(whopir/NCR 35장이 검사 대상 밖).
-_DETAIL_META_KEYS = frozenset({"type", "report_kind", "text_source"})
+# ── 결정론 상세 유형 분류 — "원문 서사를 손에 쥐었는가" ────────────────────────
+# 판정 단위가 **키가 아니라 유형**인 이유: 같은 키 이름이 유형마다 다른 것을 뜻한다.
+# `action` 은 NCR 에서 당국 조치 **전문**이지만 hc_recall_detail 에서는 "이렇게 하세요" 한
+# 줄이다. 키로 판정하면 이 둘을 못 가른다.
+#
+# 서사 본문(원문 문장)을 싣는 유형 — 이 카드가 "원문에 없다"고 말하면 거짓이다.
+_BODY_DETAIL_TYPES = frozenset({
+    "fda_483_observations",      # observations[].deficiency/detail
+    "gmp_deficiencies",          # rows[] 지적 전문
+    "wl_violations",             # violations[] 조항별 위반 전문
+    "whopir_report",             # outcome + sections[].text
+    "eu_gmp_ncr_statement",      # nature/action/operations 전문
+    "mhra_gmp_ncr_statement",
+})
+# 구조화 **사실표**만 싣는 유형 — 로트·수량·유통범위·처리경과처럼 값이 짧은 통제어휘다.
+# 이런 카드는 상세를 싣고도 "당국이 세부 일탈 사유를 공개하지 않았다"가 **여전히 참**이라
+# 부재 서술을 막으면 안 된다(실측: 회수 카드 3장이 그렇게 잘못 걸렸다).
+_FACTS_DETAIL_TYPES = frozenset({
+    "openfda_recall_detail", "mfds_recall_detail", "hc_recall_detail",
+})
+# 미분류 유형은 **fail-open**(부재 서술을 막지 않는다) — 새 상세 유형이 생겼다고 발행이
+# 갑자기 막히면 안 된다. 대신 CI 가 `tests/test_published_briefs_integrity.py` 의
+# 완전성 검사로 "분류되지 않은 유형이 발행분에 있다"를 실패로 알린다(조용한 표류 차단).
 
 
 def _card_has_source_body(card: dict[str, Any]) -> bool:
@@ -548,13 +562,13 @@ def _card_has_source_body(card: dict[str, Any]) -> bool:
     실제 피해: 07-27 WHOPIR 11장이 결론(+항목별 요약)을 카드에 싣고서도 "실사 결과 세부
     내용은 확보하지 못해 원문 확인이 필요하다"고 적힌 채 발행됐다.
 
-    그래서 판정을 **본문 키 손목록이 아니라 메타 키의 여집합**으로 뒤집는다 — 상세 블록에
-    type/report_kind 말고 값이 하나라도 있으면 본문을 실은 것이다. 새 상세 유형이 생겨도
-    자동으로 포함된다(손목록은 반드시 낡는다).
+    ★ 첫 수리는 "메타 키 말고 값이 하나라도 있으면 본문"으로 넓혔는데 **과잉이었다** —
+    회수 상세(#796 로 발행분 102장에 추가)는 로트·수량·처리경과 같은 **사실표**라, 그 카드가
+    "당국이 세부 일탈 사유를 공개하지 않았다"고 적은 것은 여전히 참인데도 차단됐다(CI 가
+    잡았다·실측 3장). 그래서 판정 단위를 **유형**으로 바꾼다 — 위 두 집합 참조.
     """
     dd = card.get("deterministic_detail")
-    if isinstance(dd, dict) and any(v for k, v in dd.items()
-                                    if k not in _DETAIL_META_KEYS):
+    if isinstance(dd, dict) and dd.get("type") in _BODY_DETAIL_TYPES:
         return True
     return isinstance(card.get("deep_analysis"), dict) and bool(card["deep_analysis"])
 

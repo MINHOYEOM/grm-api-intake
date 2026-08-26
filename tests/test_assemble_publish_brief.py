@@ -636,12 +636,29 @@ class FalseAbsenceGateBlindSpotTest(unittest.TestCase):
                     apb._card_has_source_body({"id": "x", "deterministic_detail": dd}),
                     "%s 는 본문을 실었는데 미확보로 판정됐다" % name)
 
-    def test_meta_only_detail_is_not_source_body(self):
-        """음성 검사 — type/report_kind 뿐인 껍데기는 본문이 아니다(과잉 판정 방지)."""
+    def test_facts_table_detail_is_not_source_body(self):
+        """음성 검사 — **사실표**는 서사 본문이 아니다(과잉 차단 방지).
+
+        첫 수리는 "메타 키 말고 값이 있으면 본문"으로 넓혔다가 회수 상세(#796)까지 본문으로
+        판정했다. 회수 카드는 로트·수량·처리경과를 싣고도 "당국이 세부 일탈 사유를 공개하지
+        않았다"가 여전히 참이라, 그 서술을 막으면 **참인 문장을 못 쓰게 된다**. CI 가 이
+        과잉을 잡았다(실측 3장).
+        """
+        recall = {"type": "openfda_recall_detail", "status": "Ongoing",
+                  "code_info": "Lot 1234", "quantity": "1,200 bottles"}
         self.assertFalse(apb._card_has_source_body(
-            {"id": "x", "deterministic_detail": {"type": "whopir_report",
-                                                 "report_kind": "reliance"}}))
+            {"id": "D-1", "deterministic_detail": recall}))
         self.assertFalse(apb._card_has_source_body({"id": "x"}))
+
+    def test_unknown_detail_type_fails_open(self):
+        """미분류 유형은 발행을 막지 않는다 — 새 상세가 생겼다고 갑자기 차단되면 안 된다.
+
+        표류는 런타임이 아니라 CI 완전성 검사
+        (`test_published_briefs_integrity.DetailTypeClassificationIsComplete`)가 알린다.
+        """
+        self.assertFalse(apb._card_has_source_body(
+            {"id": "x", "deterministic_detail": {"type": "brand_new_detail_v9",
+                                                 "body": "…"}}))
 
     def test_live_defect_wording_is_caught(self):
         """라이브 문구 그대로 — 어미 `못해` 하나가 게이트를 통째로 빠져나갔다."""

@@ -63,6 +63,30 @@
         <p class="tr-note" id="tr-fda-note"></p>
       </section>
 
+      {#- [컨셉 재정의 2026-08-26] 한국 슬라이스를 이 면의 **두 번째**로 올렸다.
+          이전에는 국가별 표 아래 맨 끝이었다 — 국내 제약 실무자에게 가장 직접적인
+          슬라이스인데 가장 늦게 만나는 자리였다. 요약(등급 구성) 다음에 "그래서 한국은
+          어떤가"가 오는 것이 이 사이트 독자의 읽는 순서다. -#}
+      {#- ────────────────────────────────────────────────────────────────────
+          [한국 소재 제조소] 062 `korea`.
+
+          ★왜 한 나라만 따로 두는가: 이 사이트의 독자가 국내 제약 실무자이고, 바로 위
+          '국가별 등급 구성'이 이미 "한국은 목록 밖이어도 따로 표시"를 계약으로 갖고
+          있다(058). 여기서 답하는 질문은 다르다 — "FDA 가 한국 제조소를 **1년에 몇 곳**
+          실사하고, 그중 몇 곳이 중대 지적을 받나".
+          ★연도는 회계연도가 아니라 달력연도다(실사 종료일 기준) — 국내 독자에게 FY2024
+          는 즉시 읽히지 않는다.
+          ★표본이 작다(연 2~22건). 그래서 비율을 앞세우지 않고 **건수를 그대로** 보여
+          주고, 표본이 작다는 사실을 화면에 적는다(억지 해석 금지 — 히트맵 관례 동형). -#}
+      <section class="tr-block tr-kr-block" id="tr-kr-block" aria-label="한국 소재 제조소" hidden>
+        <h2 class="tr-h">한국 소재 제조소</h2>
+        <p class="tr-read">FDA가 한국에 있는 의약품 제조소를 실사한 기록만 따로 모았습니다. 연도는 실사가 끝난 날 기준이에요.</p>
+        <p class="tr-kr-sub" id="tr-kr-sub"></p>
+        <div id="tr-kr-year" class="tr-fda-year"></div>
+        <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
+        <p class="tr-note" id="tr-kr-note"></p>
+      </section>
+
       {#- ────────────────────────────────────────────────────────────────────
           [실사일 기준 분기 추이] 062 `by_quarter`.
 
@@ -82,26 +106,6 @@
         <p class="tr-read">위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 길이가 고르면 그 기간 동안 판정 강도가 안정적이었다는 뜻입니다.</p>
         <div id="tr-fq" class="tr-fq"></div>
         <p class="tr-note" id="tr-fq-note"></p>
-      </section>
-
-      {#- ────────────────────────────────────────────────────────────────────
-          [한국 소재 제조소] 062 `korea`.
-
-          ★왜 한 나라만 따로 두는가: 이 사이트의 독자가 국내 제약 실무자이고, 바로 위
-          '국가별 등급 구성'이 이미 "한국은 목록 밖이어도 따로 표시"를 계약으로 갖고
-          있다(058). 여기서 답하는 질문은 다르다 — "FDA 가 한국 제조소를 **1년에 몇 곳**
-          실사하고, 그중 몇 곳이 중대 지적을 받나".
-          ★연도는 회계연도가 아니라 달력연도다(실사 종료일 기준) — 국내 독자에게 FY2024
-          는 즉시 읽히지 않는다.
-          ★표본이 작다(연 2~22건). 그래서 비율을 앞세우지 않고 **건수를 그대로** 보여
-          주고, 표본이 작다는 사실을 화면에 적는다(억지 해석 금지 — 히트맵 관례 동형). -#}
-      <section class="tr-block tr-kr-block" id="tr-kr-block" aria-label="한국 소재 제조소" hidden>
-        <h2 class="tr-h">한국 소재 제조소</h2>
-        <p class="tr-read">FDA가 한국에 있는 의약품 제조소를 실사한 기록만 따로 모았습니다. 연도는 실사가 끝난 날 기준이에요.</p>
-        <p class="tr-kr-sub" id="tr-kr-sub"></p>
-        <div id="tr-kr-year" class="tr-fda-year"></div>
-        <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
-        <p class="tr-note" id="tr-kr-note"></p>
       </section>
 
       {#- [존 재편] 이 면에서 지적사항 면으로 되돌아가는 다리. 두 면의 단위가 다르다는

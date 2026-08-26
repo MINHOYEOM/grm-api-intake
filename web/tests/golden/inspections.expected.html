@@ -51,7 +51,6 @@
 <nav class="tr-seg" aria-label="트렌드 면 전환">
   <a href="../../findings/trends/index.html">지적 경향</a>
   <a href="../../findings/inspections/index.html" class="on" aria-current="page">실사 결과</a>
-  <a href="../../findings/coverage/index.html">데이터 현황</a>
 </nav>
     <div id="grm-findings-cfg" data-url="" data-key="" data-root="../../" data-page="inspections" hidden></div>
 
@@ -76,11 +75,6 @@
         <p class="tr-read">건수가 많은 국가 순입니다. 한국은 목록 밖이어도 따로 표시합니다.</p>
         <div id="tr-fda-country" class="tr-fda-country"></div>
         <p class="tr-note" id="tr-fda-note"></p>
-      </section><section class="tr-block tr-fq-block" id="tr-fq-block" aria-label="실사일 기준 분기 추이" hidden>
-        <h2 class="tr-h">실사일 기준 분기 추이</h2>
-        <p class="tr-read">위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 길이가 고르면 그 기간 동안 판정 강도가 안정적이었다는 뜻입니다.</p>
-        <div id="tr-fq" class="tr-fq"></div>
-        <p class="tr-note" id="tr-fq-note"></p>
       </section><section class="tr-block tr-kr-block" id="tr-kr-block" aria-label="한국 소재 제조소" hidden>
         <h2 class="tr-h">한국 소재 제조소</h2>
         <p class="tr-read">FDA가 한국에 있는 의약품 제조소를 실사한 기록만 따로 모았습니다. 연도는 실사가 끝난 날 기준이에요.</p>
@@ -88,6 +82,11 @@
         <div id="tr-kr-year" class="tr-fda-year"></div>
         <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
         <p class="tr-note" id="tr-kr-note"></p>
+      </section><section class="tr-block tr-fq-block" id="tr-fq-block" aria-label="실사일 기준 분기 추이" hidden>
+        <h2 class="tr-h">실사일 기준 분기 추이</h2>
+        <p class="tr-read">위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 길이가 고르면 그 기간 동안 판정 강도가 안정적이었다는 뜻입니다.</p>
+        <div id="tr-fq" class="tr-fq"></div>
+        <p class="tr-note" id="tr-fq-note"></p>
       </section><p class="tr-more">실사에서 실제로 어떤 항목이 지적됐는지는 단위가 다른 집계입니다 &mdash; <a href="../../findings/trends/index.html">지적 경향</a>에서 보세요. 특정 업체의 이력은 <a href="../../findings/firm/index.html">업체 조회</a>에서 찾을 수 있습니다.</p>
     </div>
   </div>
@@ -144,18 +143,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* ── [최근 12개월] 월별 문서 수 막대(24개월) ──────────────────────────────
    최근 12개월은 coral, 직전 12개월은 ink 저채도로 같은 축 위에 나란히 둔다 —
    신규 팔레트 없이 두 구간을 구분한다(zone 패널의 2시리즈 관례와 동형). */
-.tr-recent-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6}
-.tr-rm-bars{display:flex;align-items:flex-end;gap:4px}
-.tr-rm-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}
-.tr-rm-barwrap{height:96px;width:100%;display:flex;align-items:flex-end;border-radius:4px 4px 0 0;background:var(--coral-tint);overflow:hidden}
-.tr-rm-bar{width:100%;background:var(--coral)}
-.tr-rm-col.is-prev .tr-rm-bar{background:var(--ink);opacity:.28}
-.tr-rm-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted-2);white-space:nowrap}
-.tr-rm-col.is-year .tr-rm-lbl{color:var(--muted);font-weight:600}
-.tr-rm-legend{display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--muted)}
-.tr-rm-key{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-.tr-rm-key-cur{background:var(--coral)}
-.tr-rm-key-prev{background:var(--ink);opacity:.28}
 
 /* 최근 12개월 카테고리 순위 — 행 클릭 시 실제 지적 사례가 아래로 펼쳐진다. */
 .tr-recent-cats{display:flex;flex-direction:column;gap:0}
@@ -378,8 +365,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .tr-stats{gap:28px}
   .tr-stat-num{font-size:26px}
   /* 24개 막대는 좁은 화면에서 라벨이 겹친다 — 막대만 남기고 눈금은 범례·툴팁으로. */
-  .tr-rm-lbl{display:none}
-  .tr-rm-bars{gap:2px}
   /* 남은 폭이 20px 남짓이라 막대가 눈금 없는 조각이 된다 — 숫자만 남긴다. */
   .tr-rc-track{display:none}
   .tr-cf-track{display:none}
@@ -415,12 +400,6 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    보기를 바꾸게 하면 두 수치가 나란히 보이지 않으므로 오독 자체가 사라진다 —
    해설로 막던 것을 구조로 막는다. '해외 vs 미국'도 같은 축(카테고리 순위)이라
    세 번째 보기로 흡수했다. */
-.tr-rank-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
-.tr-rank-tab{padding:7px 14px;font-size:13px;color:var(--muted);background:transparent;border:1px solid var(--line-2);border-radius:var(--pill);transition:all var(--tr)}
-.tr-rank-tab:hover{color:var(--ink);border-color:var(--muted)}
-.tr-rank-tab[aria-selected="true"]{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
-.tr-rank-tab[hidden]{display:none}
-.tr-pane[hidden]{display:none}
 .tr-rank-read{margin-top:12px}
 
 /* ── 달라진 점 — 접힘 ─────────────────────────────────────────────────────
@@ -478,6 +457,27 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 
 /* 한국 슬라이스 — 연도별 막대는 .tr-fda-y-* 를 그대로 재사용한다(신규 컴포넌트 0). */
 .tr-kr-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
+
+/* ── [컨셉 재정의 2026-08-26] 기관 선택 ───────────────────────────────────────
+   아래 모든 수치의 **분모를 정하는** 컨트롤이라 화면 맨 위에 서고, 라벨이 질문
+   형태다("어느 기관 기준으로 볼까요?") — 통계 필터가 아니라 시작 질문이라는 뜻을
+   모양으로도 전한다. 선택은 aria-pressed 로 표현한다(탭이 아니라 토글 버튼 묶음 —
+   URL 을 바꾸지 않고 같은 페이지의 보기를 바꾸므로 tablist 가 아니다). */
+.tr-agency{margin:0 0 30px;padding:18px 20px;border:1px solid var(--line-2);border-radius:var(--rad);background:var(--soft)}
+.tr-agency[hidden]{display:none}
+.tr-agency-lab{display:block;font-size:13px;color:var(--muted);margin-bottom:11px}
+.tr-agency-btns{display:flex;flex-wrap:wrap;gap:8px}
+.tr-agency-btn{
+  padding:9px 20px;font-family:var(--sans);font-size:14px;color:var(--body-s);
+  background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--pill);
+  transition:all var(--tr);
+}
+.tr-agency-btn:hover{border-color:var(--muted);color:var(--ink)}
+.tr-agency-btn[aria-pressed="true"]{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
+.tr-agency-btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+
+/* 순위 섹션의 창·분모 한 줄 — 어느 기관 몇 건이 분모인지 항상 보인다. */
+.tr-rank-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
 </style>
 <style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
 <footer class="site"><div class="wrap">
@@ -531,7 +531,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/trends.js?v=8ecd9557" defer></script>
+<script src="../../assets/trends.js?v=7c9c64ae" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

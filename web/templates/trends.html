@@ -1,56 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
-{#- FIND-1 F3b — 규제 지적사항 트렌드(라이브 집계, Supabase RPC 직접 fetch).
-    findings/index.html 과 동일한 이유로 빌드시 수치를 고정할 수 없다 → 서버는 셸(로딩
-    스켈레톤)만 렌더하고, trends.js 가 fetch 성공 시 결과를 채운다. env(SUPABASE_URL/
-    ANON_KEY) 미설정이면 cfg data 속성이 빈 문자열 → JS 가 "준비 중" 안내로 조용히
-    종료한다(오류 아님, 골든 결정론 — env 값과 무관하게 이 템플릿 출력 byte 는 항상 동일).
+{#- FIND-1 F3b — 지적 경향(라이브 집계, Supabase RPC 직접 fetch). findings/index.html 과
+    동일한 이유로 빌드시 수치를 고정할 수 없다 → 서버는 셸(로딩 스켈레톤)만 렌더하고,
+    trends.js 가 fetch 성공 시 결과를 채운다. env(SUPABASE_URL/ANON_KEY) 미설정이면 cfg
+    data 속성이 빈 문자열 → JS 가 "준비 중" 안내로 조용히 종료한다(골든 결정론 — env 값과
+    무관하게 이 템플릿 출력 byte 는 항상 동일).
 
-    ══ [존 재편 2026-08-26] 한 페이지 12섹션 → 세 면 ═══════════════════════════════
-    이 페이지는 섹션 12개·데스크톱 10.9화면(9,770px)·모바일 15.9화면까지 자라 있었고,
-    본문 글자의 32%(2,589자)가 차트를 오독하지 말라는 주석이었다. 원인은 분량이 아니라
-    **한 페이지가 분모가 다른 세 질문에 동시에 답하고 있었다는 것**이다 —
-      · 실사 6,417건(실사 단위)
-      · 최근 12개월 지적 4,557건(12개월 창)
-      · 누적 지적 24,884건(전 기간)
-    서로 나누면 안 되는 수치가 한 스크롤에 이어져 있으니 섹션마다 경고문이 붙었고, 그
-    경고문이 다시 페이지를 늘렸다. 주석 32%는 증상이지 원인이 아니었다.
+    ══ [컨셉 재정의 2026-08-26] 통계 페이지 → 이번 달 점검 브리핑 ═════════════════════
+    존 재편(#807)이 12섹션·10.9화면을 3섹션·3.9화면으로 줄였지만, **분량을 줄였을 뿐
+    목적은 그대로였다.** 사용자 자리에서 블록마다 "보고 나서 무엇을 하나"를 물으면
+    여섯 중 하나(조항 순위 → 체크리스트)만 답이 있었다.
 
-    그래서 분모를 **페이지 단위로** 갈랐다(면 전환은 partials/trends_seg.html):
-      · 이 파일 /findings/trends/      — 지적 경향   "지금 무엇이 지적되나"
-      · inspections.html               — 실사 결과   "실사는 어떻게 끝나고 있나"
-      · coverage.html                  — 데이터 현황 "이 숫자를 어디까지 믿나"
+    ── 실측 셋(2026-08-26 라이브) ──────────────────────────────────────────────
+    ① **합산 순위는 어느 기관의 현실도 아니다.** '기타'를 빼고 기관별로 최근 12개월
+       상위 5를 다시 세면 **FDA 와 식약처가 하나도 겹치지 않는다** —
+         FDA   : 무균보증 319 · 설비/시설 204 · 시험실 199 · 표시/포장 174 · 품질부서 167
+         식약처: 불만/회수 187 · 세척밸리 69 · 문서화 68 · 밸리데이션 51 · 안정성 50
+         캐나다: 설비/시설 221 · 일탈CAPA 123 · 시험실 115 · 안정성 103 · CSV 86
+       식약처 실사를 준비하는 사람이 합산 순위를 보면 **틀린 우선순위**를 받아 간다.
+       이 저장소가 052/053/054 에서 세 번 겪은 "성격이 다른 모집단을 한 축에 합치면
+       진단이 반드시 틀린다"를 **표시 계층에서 그대로** 반복하고 있었다(서버는 이미
+       갈라 두었다 — by_category_source 가 레인 8종을 브라우저까지 보낸다).
+    ② **1위가 '기타'인데 그건 우리 분류 실패다.** 946건(21%)의 출처: 식약처 36.7% ·
+       캐나다 26.7% · FDA 483 9.1% · FDA 경고서한 3.4%. FDA 문서에서 3~9%인 값이
+       한국어·캐나다 문서에서 27~37%로 뛴다 = 규제 현상이 아니라 분류기 상태다.
+    ③ **국내 축이 없었다.** 식약처가 최근 12개월의 26%(국내 업체 490곳)인데 좁혀 볼
+       길이 없고, 국내 실무자와 가장 무관한 캐나다 실사가 분모의 32%를 차지했다.
 
-    이 면에서 나간 것: FDA 실사 등급(→실사 결과) · 연도별 구성비/연도별 공개량/
-    수집량 상위 업체/소스 구성(→데이터 현황) · 업체 찾기(→/findings/firm/ 랜딩).
-    이 면에서 합친 것: '카테고리 순위(누적)'와 '해외 vs 미국'을 최근 12개월 순위와
-    **같은 자리의 보기 전환**으로 흡수했다 — 분모가 다른 두 표가 한 화면에 나란히
-    보이지 않으면 그 오독은 애초에 생기지 않는다(해설로 막던 것을 구조로 막는다).
+    ── 이 파일이 지키는 규율 셋 ────────────────────────────────────────────────
+    1. **기관을 먼저 고르게 한다** — 합산을 기본값으로 두지 않는다(①). 기본 선택은
+       식약처다: 이 사이트의 독자가 국내 제약 실무자이고, FDA 는 수출하는 사람에게만
+       걸리지만 식약처는 전원에게 걸린다. 고른 값은 브라우저에 기억된다.
+    2. **분류 실패를 순위에 올리지 않는다** — '기타 품질시스템'은 순위에서 빼되 **분모
+       에는 남기고**(비율이 부풀지 않게) 그 크기를 각주에 적는다(②). 감추는 것이
+       아니라 순위라는 잘못된 자리에서 내리는 것이다. 근본 수리는 분류기 쪽 별건이다.
+    3. **모든 블록이 산출물로 끝난다** — 영역 순위 → 실제 지적 문장, 조항 순위 →
+       체크리스트. **보고 끝나는 블록은 싣지 않는다.** 이 규율로 걷어낸 것:
+         · 핵심 통계 5개(누적 총량 — 우리가 얼마나 모았는지의 자랑)
+         · 최근 12개월 월별 막대(문서 공개 행정 리듬이지 규제 신호가 아니다 —
+           "마지막 막대는 진행 중" 주석이 그 사실을 이미 인정하고 있었다)
+         · 전 기간 누적 순위 · 해외vs미국(둘 다 우리 코퍼스 이야기 → 데이터 현황 면)
 
-    ★trends.js 는 세 면이 공유하는 단일 스크립트다. 각 렌더러는 자기 엘리먼트가 이
-      면에 없으면 조용히 no-op 하고, fetch 도 그 면이 그릴 수 있는 것만 호출한다
-      (cfg data-page). 그래서 이 파일에서 섹션을 빼도 스크립트는 손대지 않아도 된다.
-
-    [13차 정직화] 이 페이지의 날짜(published_date)는 **실사 발생일이 아니라 공개일**이고
-    외부 백필이 진행 중이다. 그래서 연도 간 비교는 절대 건수가 아니라 **구성비(%)** 를
-    기본 축으로 삼고, 데이터가 결론을 지지하지 못하는 차트는 렌더하지 않는다.
     ※ 이 근거는 jinja 주석이라 렌더 출력에 실리지 않는다 — 스코프 <style> 안의 CSS 주석은
       사용자에게 그대로 전달되므로 제거된 UI 이야기를 거기 남기지 않는다. -#}
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
     <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1>
-    {#- [줄맞춤] 문장마다 span 을 씌워 블록으로 흘리면 줄바꿈 지점이 **문장 경계**로
-        고정된다 — 좁은 뷰포트에서는 각 span 이 자기 안에서 다시 접히므로 반응형도
-        그대로다(고정 <br> 이 아니다). -#}
-    <p class="reveal" style="animation-delay:.14s"><span class="ln">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 비준수에서 확인된 지적사항을 매일 자동으로 모아 집계합니다.</span> <span class="ln">날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b> 기준입니다.</span></p>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">기관을 고르면 최근 12개월 동안 그 기관이 가장 많이 지적한 영역과 조항을 보여드립니다.</span> <span class="ln">줄을 누르면 실제 지적 문장으로, 마지막에는 자가점검 체크리스트로 이어집니다.</span></p>
   </div>
   <div class="wrap">
     {% include "partials/trends_seg.html" %}
-    {#- data-root 는 카테고리 순위 바 클릭 시 이동할 검색 페이지(findings/index.html) 상대
-        경로 계산용(reactions.js 의 data-root 관례와 동형). data-page 는 [존 재편]이 더한
-        속성으로, 세 면이 공유하는 trends.js 가 **이 면이 그릴 수 있는 것만 fetch** 하도록
-        분기하는 데 쓴다(엘리먼트 유무만으로 판정하면 로딩 해제 시점을 정할 수 없다). -#}
+    {#- data-root 는 순위 행 클릭 시 이동할 검색 페이지(findings/index.html) 상대경로
+        계산용. data-page 는 세 면이 공유하는 trends.js 가 이 면이 그릴 수 있는 것만
+        fetch 하도록 분기하는 데 쓴다. -#}
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-page="trends" hidden></div>
 
     <div class="tr-state" id="tr-loading" role="status" aria-live="polite">
@@ -61,101 +64,40 @@
     <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
 
     <div id="tr-content" hidden>
-      <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section>
+      {#- ────────────────────────────────────────────────────────────────────
+          [기관 선택] 규율 1. 화면 **맨 위**여야 한다 — 아래 모든 수치의 분모를 정하는
+          선택이라, 수치를 보고 난 뒤에 고르게 하면 이미 잘못 읽은 뒤다.
 
-      {#- [먼저 알아두세요] 이 페이지를 오독하게 만드는 것(날짜=공개일)을 본문 위에서 먼저
-          밝힌다. 첫 줄은 데이터와 무관한 사실이라 정적 텍스트로 두고(골든에 남아 리뷰
-          가능), 둘째 줄만 trends.js 가 이미 보유한 fetchStats() 응답(totals)으로 채운다
-          (추가 네트워크 호출 0). [존 재편] 세 번째 줄로 '데이터 현황' 면 링크를 둔다 —
-          섹션마다 반복하던 커버리지 해설의 목적지다. -#}
-      <div class="imp" id="tr-coverage-note" hidden>
-        <span class="lab">먼저 알아두세요</span>
-        <p>날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.</p>
-        <p id="tr-coverage-text"></p>
-        <p class="tr-more">소스별로 어디까지 거슬러 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="{{ rel_root }}findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
+          ★052/053 미적용 라이브에서는 by_category_source 가 없어 레인을 가를 수 없다.
+            그때 trends.js 가 이 블록을 숨긴 채 종전처럼 합산 순위를 그린다(기능 후퇴는
+            하되 페이지는 살아 있다) — 셸의 기본값이 hidden 인 이유다.
+          ★버튼은 <button> 이다. 링크가 아니라 같은 페이지의 보기 전환이라 URL 을 바꾸지
+            않는다(선택은 브라우저에 기억된다). -#}
+      <div class="tr-agency" id="tr-agency" role="group" aria-label="기관 선택" hidden>
+        <span class="tr-agency-lab">어느 기관 기준으로 볼까요?</span>
+        <div class="tr-agency-btns" id="tr-agency-btns"></div>
       </div>
 
       {#- ────────────────────────────────────────────────────────────────────
-          [최근 12개월] 041_findings_recent_window.sql 전용 섹션.
+          [가장 많이 지적된 영역] 041 findings_recent_window + 053 by_category_source.
 
-          ★왜 이 섹션이 페이지 맨 앞인가: 누적 분모는 2016년부터의 전량인데 특정 연도의
-          대량 공개 배치에 크게 치우쳐 있다. 그래서 "카테고리 순위"는 사실상 그 배치의
-          그림자였고, 정작 "지금 무엇이 지적되는가"는 페이지 어디에서도 답하지 않았다.
-          최근 12개월 창을 앞에 두어 그 질문을 먼저 답한다.
-
-          [존 재편] 이 블록은 이제 **월별 막대까지만** 담는다 — 카테고리 순위는 아래
-          통합 섹션(tr-rank-block)의 첫 번째 보기로 옮겼다.
-
-          041 미적용 라이브·fetch 실패 시 trends.js 가 이 블록만 조용히 숨긴 채로 두고
-          나머지 섹션엔 손대지 않는다(골든 결정론 — env/RPC 존재 여부와 무관하게 이
-          마크업 자체의 byte 는 항상 동일). -#}
-      <section class="tr-block tr-recent-block" id="tr-recent-block" aria-label="최근 12개월" hidden>
-        <h2 class="tr-h">최근 12개월</h2>
-        <p class="tr-read">막대는 그 달에 공개된 문서 수입니다. 진한 막대가 최근 12개월, 옅은 막대가 그 직전 12개월이에요.</p>
-        <p class="tr-recent-sub" id="tr-recent-sub"></p>
-        <div id="tr-recent-months" class="tr-recent-months"></div>
-        <p class="tr-note" id="tr-recent-note"></p>
-      </section>
-
-      {#- ────────────────────────────────────────────────────────────────────
-          [가장 많이 지적된 영역] — 존 재편 2026-08-26 신설 통합 섹션.
-
-          재편 전에는 같은 축(카테고리별 지적 순위)을 재는 표가 이 페이지에 **셋**
-          있었고, 서로 멀리 떨어진 별개 섹션이었다:
-            · 최근 12개월 순위      (분모 = 최근 12개월 창)
-            · 카테고리 순위          (분모 = 전 기간 누적)
-            · 해외 vs 미국 내 실사   (분모 = FDA 483 의 zone 별 합)
-          분모가 다른 표 셋이 한 스크롤에 이어져 있으니 "왜 숫자가 다르냐"는 오독이
-          구조적으로 생겼고, 그걸 막으려고 두 섹션 사이에 구분선 + 해설 문단(.tr-divider)
-          까지 두고 있었다. **같은 자리에서 보기를 바꾸면 두 수치가 나란히 보이지 않으므로
-          오독 자체가 사라진다** — 그래서 셋을 탭 하나로 합치고 구분선은 삭제했다.
-
-          ★세 pane 은 기존 렌더러의 컨테이너를 **그대로** 옮겨 온 것이다(tr-recent-cats /
-          tr-cat / tr-zone-block). 렌더러를 다시 쓰지 않았다 — 데이터 모델을 합치는
-          리팩터는 세 RPC 의 분모를 하나로 뭉개려는 유혹을 낳는데, 그건 정확히 이 재편이
-          없애려는 오독이다. 보기 전환은 표시 계층에서만 한다.
-          ★탭은 데이터가 실제로 도착한 보기만 노출한다(trends.js applyRankView) —
-          041/038 미배포 라이브에서 빈 탭이 남지 않는다. -#}
+          ★읽는 법(.tr-read)을 정적 문장으로 두지 않는다 — 기관을 바꾸면 분모가 바뀌므로
+            설명도 함께 바뀌어야 한다. trends.js 가 고른 기관에 맞춰 다시 적는다.
+          ★행 클릭 → 026 findings_search 로 그 영역의 **실제 지적 문장**(규율 3).
+            집계 RPC 가 아니라 공개 게이트(010)를 통과한 행만 나오는 다른 층이다. -#}
       <section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
         <h2 class="tr-h">가장 많이 지적된 영역</h2>
-        <div class="tr-rank-tabs" id="tr-rank-tabs" role="tablist" aria-label="순위 기간 선택">
-          <button class="tr-rank-tab" id="tr-rank-tab-recent" type="button" role="tab" aria-selected="true" aria-controls="tr-recent-cats" hidden>최근 12개월</button>
-          <button class="tr-rank-tab" id="tr-rank-tab-all" type="button" role="tab" aria-selected="false" aria-controls="tr-cat" hidden>전체 기간</button>
-          <button class="tr-rank-tab" id="tr-rank-tab-zone" type="button" role="tab" aria-selected="false" aria-controls="tr-zone-block" hidden>해외 vs 미국</button>
-        </div>
-        <p class="tr-read tr-rank-read" id="tr-rank-read"></p>
-
-        {#- pane ①: 최근 12개월(041). 행을 누르면 실제 지적 문장이 아래로 펼쳐진다
-            (026 findings_search — 집계 RPC 가 아니라 공개 게이트를 통과한 행). -#}
-        <div class="tr-pane tr-recent-cats" id="tr-recent-cats" role="tabpanel" aria-labelledby="tr-rank-tab-recent" hidden></div>
-
-        {#- pane ②: 전 기간 누적(007 findings_stats.by_agency_category). -#}
-        <div class="tr-pane tr-cat" id="tr-cat" role="tabpanel" aria-labelledby="tr-rank-tab-all" hidden></div>
-
-        {#- pane ③: 해외 vs 미국(038 findings_zone_category, FDA 483 한정 — site_country 가
-            실제로 채워지는 소스가 483 뿐이다). 부제·국가 구성은 RPC 응답에서 채운다
-            (하드코딩 금지). 038 미배포·빈 응답이면 이 pane 과 탭이 함께 숨은 채로 남는다. -#}
-        <div class="tr-pane tr-zone-block" id="tr-zone-block" role="tabpanel" aria-labelledby="tr-rank-tab-zone" hidden>
-          <p class="tr-zone-sub" id="tr-zone-sub"></p>
-          <div id="tr-zone" class="tr-zone"></div>
-          <p class="tr-note" id="tr-zone-countries"></p>
-          <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
-        </div>
+        <p class="tr-read" id="tr-rank-read"></p>
+        <p class="tr-rank-sub" id="tr-rank-sub"></p>
+        <div class="tr-recent-cats" id="tr-recent-cats"></div>
+        <p class="tr-note" id="tr-rank-note"></p>
       </section>
 
-      {#- [달라진 점] 같은 041 응답(by_category 의 cur/prev)에서 파생 — 추가 fetch 0.
-          최근 12개월과 직전 12개월의 **구성비** 차이(%p)를 잰다.
-          · 처음엔 "문서 등장률"로 만들었다가 되돌렸다 — 합이 100%로 닫히지 않아 창마다
-            문서당 지적 수가 달라지면 전 영역이 한 방향으로 쏠렸다.
-          · 최대 교란 요인인 **소스 구성 변화**는 적기만 하지 않고 **계산에서 정렬한다**
-            (052). 052 by_category_source 로 두 창에서 견줄 수 있는 소스만 남기고, 뺀
-            소스는 이름·건수·사유를 tr-move-source 에 적는다(alignSourceMix).
-
-          [존 재편] **기본 접힘**으로 바꿨다. 라이브 실측에서 이 섹션이 산출하는 행은
-          증가 1행·감소 0행이다(비교 가능한 소스만 남기느라 세 소스를 제외한 결과).
-          정직한 설계지만 한 화면을 상시 차지할 근거는 없다 — 삭제하지 않고 접어 두어,
-          변화가 실제로 생기면 그때 펼쳐 보게 한다. summary 의 요약 수치는 trends.js 가
-          채우므로 열기 전에 내용의 유무를 알 수 있다. -#}
+      {#- [달라진 점] 같은 041 응답에서 파생 — 추가 fetch 0. 고른 기관 안에서 최근 12개월과
+          직전 12개월의 **구성비** 차이(%p)를 잰다.
+          ★기본 접힘 — 라이브 산출이 얇다(합산 기준 증가 1행·감소 0행). 삭제하지 않는
+            이유는 기관별로 다시 계산하면 산출이 늘어날 여지가 있기 때문이고, 열기 전에
+            내용의 유무를 알 수 있도록 summary 를 trends.js 가 채운다. -#}
       <section class="tr-block tr-move-block" id="tr-move-block" aria-label="달라진 점" hidden>
         <details class="tr-fold" id="tr-move-fold">
           <summary>
@@ -181,24 +123,19 @@
         </details>
       </section>
 
-      {#- [인용 조항] 042_findings_cfr_ranking.sql 전용 섹션.
-
-          ★왜 이 섹션이 필요한가: 카테고리("무균보증/무균공정")는 우리가 붙인 분류라
-          그 자체로는 자가점검 항목이 되지 못한다. 규제기관이 실제로 인용한 **조항**은
-          사내 SOP 와 1:1로 붙는 단위라, "무엇을 확인해야 하는가"에 가장 가깝다.
-
-          보일러플레이트 제외 근거·범위 한계(사실상 Warning Letter 전용)는 전부 042
-          응답(scope)에서 채운다 — 하드코딩 금지. 042 미적용 라이브·fetch 실패 시
-          trends.js 가 이 블록만 조용히 숨긴 채로 둔다(다른 섹션 영향 0). -#}
+      {#- [인용 조항] 042 findings_cfr_ranking.
+          ★왜 이 섹션이 이 면의 마지막인가: 카테고리("무균보증/무균공정")는 우리가 붙인
+          분류라 그 자체로는 점검 항목이 되지 못한다. 규제기관이 실제로 인용한 **조항**은
+          사내 SOP 와 1:1로 붙는 단위라, 읽기에서 산출물로 넘어가는 지점이 여기다.
+          ★범위 한계(사실상 Warning Letter 전용)는 042 응답 scope 에서 채운다 —
+            하드코딩 금지. 042 미적용·fetch 실패면 이 블록만 조용히 숨긴 채로 둔다.
+          ★식약처를 고른 사용자에게 21 CFR 조항 순위는 다른 나라 규정이다 — trends.js 가
+            그 사실을 읽는 법에 적는다(식약처 조항 축은 별건). -#}
       <section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="많이 인용된 조항" hidden>
         <h2 class="tr-h">많이 인용된 조항</h2>
-        <p class="tr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 — 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
+        <p class="tr-read" id="tr-cfr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 &mdash; 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
         <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
         <div id="tr-cfr" class="tr-cfr"></div>
-        {#- [존 재편] 이 순위를 받아 쓰는 산출물로 넘어가는 진입로. 재편 전에는 이것이
-            체크리스트로 가는 **유일한** 링크였고(nav·footer 어디에도 없었다) 텍스트 한
-            줄이라 사실상 보이지 않았다. 카드로 키우고, 동시에 footer 둘러보기와
-            /findings/ 도구 카드에도 링크를 두어 진입로를 셋으로 늘렸다. -#}
         <div class="tr-cta">
           <span class="tr-cta-b">
             <span class="tr-cta-t">자가점검 체크리스트 만들기</span>
@@ -208,6 +145,12 @@
         </div>
         <p class="tr-note" id="tr-cfr-note"></p>
       </section>
+
+      {#- 꼬리 각주 — 이 면에서 유일하게 남긴 고지. 재편 전에는 같은 취지의 문장이 본문
+          위쪽 '먼저 알아두세요' 블록에 세 줄로 있었는데, 아직 아무것도 못 본 사람에게
+          주의사항부터 읽히는 자리였다. 데이터 현황 면으로 가는 링크가 여기 있다
+          (세그먼트에서 내린 대신 각주가 그 목적지를 연다). -#}
+      <p class="tr-more">모으는 곳은 FDA 483 · Warning Letter · 식약처 · 캐나다 실사 · EU·영국 GMP 비준수입니다 &mdash; &lsquo;전체&rsquo;는 이 다섯을 합친 값이에요. 날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다. 어느 기관에서 얼마나 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="{{ rel_root }}findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
     </div>
   </div>
 </main>

@@ -4242,7 +4242,7 @@
    "deterministic_detail": {
     "type": "whopir_report",
     "report_kind": "findings",
-    "outcome": "FINAL CONCLUSION – INSPECTION OUTCOME Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Lupin Ltd (Chikalthana) located at A-28/1 MIDC Industrial Area, Chikalthana, Chhatrapati Sambhajinagar, 431210, India was considered to be operating at an acceptable level of the WHO guideline on Good Manufacturing Practices (GMP) for finished pharmaceutical products. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
+    "outcome": "Based on the areas inspected, the people met and the documents reviewed, and considering the findings of the inspection, including the observations listed in the Inspection Report, Lupin Ltd (Chikalthana) located at A-28/1 MIDC Industrial Area, Chikalthana, Chhatrapati Sambhajinagar, 431210, India was considered to be operating at an acceptable level of the WHO guideline on Good Manufacturing Practices (GMP) for finished pharmaceutical products. All the non-compliances observed during the inspection that were listed in the full report as well as those reflected in the WHOPIR, were addressed by the manufacturer, to a satisfactory level, prior to the publication of the WHOPIR. This WHOPIR will remain valid for 3 years, provided that the outcome of any inspection conducted during this period is positive.",
     "sections": [
      {
       "no": 1,
@@ -4364,7 +4364,7 @@
       "title_ko": "품질관리 우수 실무"
      }
     ],
-    "outcome_ko": "최종 결론 — 실사 결과: 실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서에 열거된 관찰사항 포함)을 종합할 때, 인도 Chhatrapati Sambhajinagar 시 Chikalthana 소재 Lupin Ltd(Chikalthana)는 WHO 완제의약품 GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 비준수 사항은 전체 보고서에 열거된 것과 WHOPIR 에 반영된 것 모두 WHOPIR 발행 전에 제조업체가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
+    "outcome_ko": "실사 구역, 면담 인원, 검토 문서와 실사에서 확인된 사항(실사보고서에 열거된 관찰사항 포함)을 종합할 때, 인도 Chhatrapati Sambhajinagar 시 Chikalthana 소재 Lupin Ltd(Chikalthana)는 WHO 완제의약품 GMP 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판정됐다. 실사 중 관찰된 비준수 사항은 전체 보고서에 열거된 것과 WHOPIR 에 반영된 것 모두 WHOPIR 발행 전에 제조업체가 만족스러운 수준으로 시정을 완료했다. 이 WHOPIR 은 유효기간 중 수행되는 실사의 결과가 긍정적이라는 전제하에 3년간 유효하다."
    },
    "merged_count": 1,
    "merged_items": [],
@@ -4564,7 +4564,7 @@
    "type_tag": "WHO",
    "headline_target": "Zhejiang Xianju Pharmaceutical Co., Ltd.",
    "title_issue": "WHO 공개 실사보고서 게시",
-   "summary": "WHO 가 Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site) 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 실사 결과로 게시했다.",
+   "summary": "WHO 가 Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site) 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 서면평가(desk assessment) 결과로 게시했다.",
    "facts": [
     {
      "label": "발행일",
@@ -4590,7 +4590,7 @@
     "대상: Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site)",
     "확인 상태: 결론·인용 실사(TGA·USFDA) 수록 — SRA 실사증거 기반 평가"
    ],
-   "implication": "이 보고서는 기업 단위가 아니라 특정 사업장(site) 단위로 실사가 이뤄지고 공개된다는 점을 보여준다. 복수 사업장을 가진 공급처를 평가할 때는 실제 공급 사업장이 실사 대상과 일치하는지 확인해 둘 필요가 있다.",
+   "implication": "이 보고서는 기업 단위가 아니라 특정 사업장(site) 단위로 평가가 이뤄지고 공개된다는 점을 보여준다. 복수 사업장을 가진 공급처를 평가할 때는 실제 공급 사업장이 평가 대상과 일치하는지 확인해 둘 필요가 있다.",
    "checks": [
     "공급 사업장과 실사 대상 사업장의 일치 여부",
     "사업장별 실사 이력 관리"
@@ -4639,7 +4639,7 @@
    "type_tag": "WHO",
    "headline_target": "Strides Pharma Science Limited",
    "title_issue": "WHO 공개 실사보고서 게시",
-   "summary": "WHO 가 Strides Pharma Science Limited 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 실사 결과로 게시했다.",
+   "summary": "WHO 가 Strides Pharma Science Limited 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 서면평가(desk assessment) 결과로 게시했다.",
    "facts": [
     {
      "label": "발행일",
@@ -4665,7 +4665,7 @@
     "대상: Strides Pharma Science Limited",
     "확인 상태: 결론·인용 실사(IGJ Netherlands·Anvisa) 수록 — SRA 실사증거 기반 평가"
    ],
-   "implication": "국제조달용 공급처에 대한 실사 결과가 공개 문서로 계속 축적되고 있다. 국제조달·수출용 품목을 위탁 생산한다면 위탁처의 WHOPIR 공개 여부와 최신 판을 정기적으로 확인해 둘 필요가 있다.",
+   "implication": "국제조달용 공급처에 대한 평가 결과가 공개 문서로 계속 축적되고 있다. 국제조달·수출용 품목을 위탁 생산한다면 위탁처의 WHOPIR 공개 여부와 최신 판을 정기적으로 확인해 둘 필요가 있다.",
    "checks": [
     "위탁처 WHOPIR 최신 판 확인",
     "국제조달용 품목의 위탁처 실사 이력 정리"

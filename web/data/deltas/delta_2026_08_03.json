@@ -832,13 +832,13 @@
   },
   "who-whopir-c66e2b205d7e": {
    "title_issue": "WHO 공개 실사보고서 게시",
-   "summary": "WHO 가 Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site) 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 실사 결과로 게시했다.",
+   "summary": "WHO 가 Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site) 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 서면평가(desk assessment) 결과로 게시했다.",
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Zhejiang Xianju Pharmaceutical Co., Ltd. (Taizhou Xianju Site)",
     "확인 상태: 발행일과 실사 결과 요약은 원문 확인이 필요하다"
    ],
-   "implication": "이 보고서는 기업 단위가 아니라 특정 사업장(site) 단위로 실사가 이뤄지고 공개된다는 점을 보여준다. 복수 사업장을 가진 공급처를 평가할 때는 실제 공급 사업장이 실사 대상과 일치하는지 확인해 둘 필요가 있다.",
+   "implication": "이 보고서는 기업 단위가 아니라 특정 사업장(site) 단위로 평가가 이뤄지고 공개된다는 점을 보여준다. 복수 사업장을 가진 공급처를 평가할 때는 실제 공급 사업장이 평가 대상과 일치하는지 확인해 둘 필요가 있다.",
    "checks": [
     "공급 사업장과 실사 대상 사업장의 일치 여부",
     "사업장별 실사 이력 관리"
@@ -846,13 +846,13 @@
   },
   "who-whopir-e3c903996e33": {
    "title_issue": "WHO 공개 실사보고서 게시",
-   "summary": "WHO 가 Strides Pharma Science Limited 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 실사 결과로 게시했다.",
+   "summary": "WHO 가 Strides Pharma Science Limited 에 대한 공개 실사보고서(WHOPIR)를 사전적격성 서면평가(desk assessment) 결과로 게시했다.",
    "key_facts": [
     "문서: WHO 공개 실사보고서(WHOPIR) — 제조소·CRO·품질관리시험실 GMP 실사",
     "대상: Strides Pharma Science Limited",
     "확인 상태: 발행일과 실사 결과 요약은 원문 확인이 필요하다"
    ],
-   "implication": "국제조달용 공급처에 대한 실사 결과가 공개 문서로 계속 축적되고 있다. 국제조달·수출용 품목을 위탁 생산한다면 위탁처의 WHOPIR 공개 여부와 최신 판을 정기적으로 확인해 둘 필요가 있다.",
+   "implication": "국제조달용 공급처에 대한 평가 결과가 공개 문서로 계속 축적되고 있다. 국제조달·수출용 품목을 위탁 생산한다면 위탁처의 WHOPIR 공개 여부와 최신 판을 정기적으로 확인해 둘 필요가 있다.",
    "checks": [
     "위탁처 WHOPIR 최신 판 확인",
     "국제조달용 품목의 위탁처 실사 이력 정리"

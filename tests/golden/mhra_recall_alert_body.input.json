@@ -1,0 +1,22 @@
+{
+  "raw": {
+    "category": "Class 2 Medicines Recall",
+    "id": "el26a34",
+    "mhra_alert_body": "DMRC reference number DMRC - 39754868 Marketing Authorisation Holder Example Pharma UK Ltd Medicine Details Cutaneous solution 1mL applicator PL: 17780/0858 Active Ingredient: Chlorhexidine Affected Lot Batch Numbers Batch No. 4L01372H Expiry Date 11/2027 Pack Size 28 Background The company is recalling one batch as a precautionary measure due to a potential breach of sterility in the packaging process. Advice for healthcare professionals: stop supplying the affected batch immediately and quarantine remaining stock.",
+    "published": "2026-07-13",
+    "summary": "A manufacturer is recalling batches of a 2% w/v / 70% v/v cutaneous solution 1mL applicator due to a potential breach of sterility in the packaging process.",
+    "title": "Class 2 Medicines Recall: Example Pharma UK Ltd, Cutaneous solution 1mL applicator, EL(26)A/34"
+  },
+  "row": {
+    "date": "2026-07-13",
+    "document_id": "el26a34-body",
+    "headline": "Cutaneous solution applicator recall",
+    "language": "",
+    "modality": "",
+    "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-el-26-a-34",
+    "raw_fetch_ok": true,
+    "signal_tier": "Tier 2",
+    "source": "MHRA Inspectorate",
+    "type_or_class": "Class 2 Medicines Recall"
+  }
+}

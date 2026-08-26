@@ -6372,6 +6372,22 @@
     "제품 노출 공정 구간의 식별 및 문서화",
     "구간별 복장·위생 기준의 구체성 확인"
    ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 1,
+    "severity_summary": {
+     "기타": 1
+    },
+    "rows": [
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 제9호",
+      "summary": "노출된 제조공정에 대한 마스크 착용 기준 및 작업자 위생관리 기준을 명확히 할 것",
+      "followup": ""
+     }
+    ]
+   },
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],

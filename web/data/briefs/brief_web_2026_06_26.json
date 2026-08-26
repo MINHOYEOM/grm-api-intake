@@ -569,6 +569,29 @@
     "원료 공급업체 보관소 온습도 모니터링 기록 정기 검토 체계",
     "공급업체 제조설비 세척 후 유지시간 검증(세척 밸리데이션) 현황"
    ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 2,
+    "severity_summary": {
+     "기타": 2
+    },
+    "rows": [
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 제4호",
+      "summary": "보관소 온습도 모니터링을 적절히 수행할 것",
+      "followup": ""
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 제12호",
+      "summary": "제조장비 세척 후 유지 시간을 적절히 검증할 것",
+      "followup": ""
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

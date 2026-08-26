@@ -128,9 +128,31 @@ jobs:
         run: supabase link --project-ref "${{ steps.ref.outputs.project_ref }}" --password "$SUPABASE_DB_PASSWORD"
 
       - name: Push database migrations
+        id: dbpush
         if: steps.ref.outputs.ready == 'true'
         shell: bash
-        run: printf 'y\n' | supabase db push --password "$SUPABASE_DB_PASSWORD"
+        run: |
+          # ★이 저장소는 마이그레이션 채널이 둘이다:
+          #   ⓐ supabase/migrations/<timestamp>_*.sql — CLI 가 관리(이 스텝이 미는 대상)
+          #   ⓑ web/migrations/NNN_*.sql            — 사람이 SQL 에디터로 직접 적용
+          # ⓑ 를 적용하면 원격 이력 테이블에 CLI 가 모르는 버전이 남는다. 그러면 db push 가
+          # "Remote migration versions not found in local migrations directory" 로 **거부**한다
+          # — 밀 것이 하나도 없어도 그렇다. 그건 배포 실패가 아니라 설계상 당연한 상태다.
+          # 2026-08-26 에 실제로 여기서 막혔다: 07-13 이후 처음 도는 supabase/** 푸시였는데
+          # 그 사이 ⓑ 로 쌓인 60여 버전 때문에 **Edge Function 배포가 통째로 취소**됐다
+          # (함수와 아무 상관 없는 이유로). 그래서 이 드리프트만 경고로 통과시키고,
+          # 그 밖의 실패(SQL 오류·인증·네트워크)는 종전대로 배포를 막는다.
+          set -uo pipefail
+          out="$(printf 'y\n' | supabase db push --password "$SUPABASE_DB_PASSWORD" 2>&1)" && rc=0 || rc=$?
+          printf '%s\n' "$out"
+          if [ "$rc" -eq 0 ]; then
+            exit 0
+          fi
+          if printf '%s' "$out" | grep -qF 'Remote migration versions not found in local migrations directory'; then
+            printf '::warning::원격 이력에 CLI 가 모르는 버전이 있습니다(web/migrations 수동 적용분). 마이그레이션 push 는 건너뛰고 Edge Function 배포를 계속합니다.\n'
+            exit 0
+          fi
+          exit "$rc"
 
       - name: Set Edge Function secrets
         if: steps.ref.outputs.ready == 'true'

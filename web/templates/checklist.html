@@ -80,6 +80,11 @@
       <div id="cl-items" class="cl-items"></div>
       <p class="cl-doc-foot" id="cl-doc-foot"></p>
     </div>
+
+    {#- [발견 허브 2026-08-26] 종착지 탈출 링크 — 이 페이지는 존 안에서 유일하게 나가는
+        링크가 0개인 막다른 화면이었다. 점검표의 근거(빈발 조항 순위·실제 지적 문장)로
+        이어지는 화면 두 곳만 조용히 잇는다. 인쇄물에는 싣지 않는다(cl-screen-only). -#}
+    <p class="cl-links cl-screen-only">점검표가 어떤 근거로 만들어졌는지 보시려면 — <a href="{{ rel_root }}findings/trends/index.html">많이 인용된 조항(지적 경향)</a> · <a href="{{ rel_root }}findings/index.html">규제 지적사항 전체</a></p>
   </div>
 </main>
 <style>
@@ -88,6 +93,10 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* 히어로 설명 — 트렌드와 동일하게 문장 경계에서만 줄바꿈(줄맞춤 관례). */
 .page-head p{max-width:none;text-wrap:pretty}
 .page-head p .ln{display:block}
+/* [발견 허브] 종착지 탈출 링크 — 화면 전용(cl-screen-only 는 인쇄에서 숨김). */
+.cl-links{margin:26px 0 0;font-size:13px;color:var(--muted);word-break:keep-all}
+.cl-links a{color:var(--coral-2);font-weight:500}
+.cl-links a:hover{color:var(--coral)}
 
 .cl-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .cl-state-error{color:var(--coral-2)}

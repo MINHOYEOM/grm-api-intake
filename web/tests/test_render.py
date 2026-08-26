@@ -1191,13 +1191,16 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertLess(self.html.index('id="fnd-results"'), self.html.index('id="ai-notice"'))
 
     def test_page_head_description_is_one_sentence(self):
-        """첫 화면 밀도(보조) — page-head 설명문단이 압축된 한 문장(마침표 1개로 종결)인지 확인."""
+        """첫 화면 밀도(보조) — page-head 설명문단이 압축된 한 문장(마침표 1개로 종결)인지 확인.
+
+        [발견 허브] 허브 재배열로 문안이 '검색합니다'에서 '모았습니다'(수집·조회 성격)로
+        바뀌고 정본 파생 건수가 문장 **안에** 들어갔다 — 한 문장 계약(M15)은 그대로다."""
         import re as _re
         m = _re.search(r'<p class="reveal"[^>]*>([^<]*)</p>', self.html)
         self.assertIsNotNone(m)
         text = m.group(1)
         self.assertEqual(text.count("."), 1, f"한 문장이 아닌 것으로 보임: {text!r}")
-        self.assertTrue(text.endswith("검색합니다."), text)
+        self.assertTrue(text.endswith("모았습니다."), text)
 
     def test_review_card_boundary_markers_present(self):
         """[M14] 검토 필요(needs_review) 카드는 article 에 fnd-card--review 클래스가 붙는다.
@@ -10029,24 +10032,31 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 
     def test_landing_section_order_final(self):
-        # 확정 재배치(11차, 2026-08-26 홈 과밀 정리): 히어로 → 기능 3종(soft, id=why —
-        # footer '소개' 앵커 승계) → Card Anatomy → 참여 존(#engage) → 뉴스레터 → AI 고지.
+        # 확정 재배치(12차, 2026-08-27 — 발견 허브): 히어로 → 기능 3종(soft, id=why —
+        # footer '소개' 앵커 승계) → 데이터 존(#records) → 참여 존(#engage) → 뉴스레터
+        # → AI 고지. Card Anatomy 는 12차에서 걷어냈다 — 홈 실측 최대 블록(1,000px)이며
+        # 유일한 무CTA 순수 설명이었고, 히어로 라이브 이슈 카드·#why 미리보기 칩·실제
+        # 브리프가 같은 내용을 이미 보여준다(3회 설명 → 1회).
         order = [
             'class="wrap hero"',
             '<section class="section soft" id="why">',
-            ">Card Anatomy</span>",
+            '<section class="section" id="records">',
             '<section class="section" id="engage">',
         ]
         pos = [self.landing.index(m) for m in order]
         self.assertEqual(pos, sorted(pos), "랜딩 섹션 순서가 확정안과 다름")
-        # 걷어낸 섹션이 되살아나지 않는다 — 단독 WHY 섹션·This Week 콜아웃(수치 3중 반복).
+        # 걷어낸 섹션이 되살아나지 않는다 — 단독 WHY 섹션·This Week 콜아웃(수치 3중
+        # 반복)·Card Anatomy 쇼케이스(12차).
         self.assertNotIn('id="this-week"', self.landing)
         self.assertNotIn("Why GRM", self.landing)
         self.assertNotIn('class="callout"', self.landing)
+        self.assertNotIn(">Card Anatomy</span>", self.landing)
+        self.assertNotIn('class="showcase"', self.landing)
 
     def test_landing_features_are_exactly_three(self):
-        # 기능 6종 → 3종(11차) — 카드 차원 기능(원문 연결·번역 병기·체크리스트)은 바로
-        # 아래 Card Anatomy 범례·실카드가 보여주므로 기능 그리드에 되살리지 않는다.
+        # 기능 6종 → 3종(11차) — 카드 차원 기능(원문 연결·번역 병기·체크리스트)은 히어로
+        # 라이브 이슈 카드와 실제 브리프 본문이 보여주므로 기능 그리드에 되살리지 않는다
+        # (12차에서 Card Anatomy 를 걷어낸 뒤에도 같은 판단 — 홈은 설명이 아니라 실물로).
         self.assertEqual(self.landing.count('<div class="feat">'), 3)
         self.assertNotIn("원문 대비 한국어 번역", self.landing)
         self.assertNotIn("실무 맞춤형 점검 리스트", self.landing)
@@ -11497,6 +11507,124 @@ class WebZoneIaTest(unittest.TestCase):
         block = landing[landing.index("watch-cta"):]
         block = block[:block.index("</div></section>")]
         self.assertIn('href="findings/firm/index.html"', block)
+
+    def test_doc_pages_link_firm_profile(self):
+        """[발견 허브] firm_key 있는 문서 상세는 업체 프로파일 간선을 갖는다(nofollow).
+
+        firm_key 는 처음부터 데이터에 있었는데 링크가 없어 3,145장이 업체 이력으로
+        이어지지 못했다 — 간선 존재를 렌더 결과에서 확인한다(템플릿 소스가 아니라)."""
+        docs = json.loads((WEB_DIR / "data" / "findings_docs.json")
+                          .read_text(encoding="utf-8"))["documents"]
+        with_key = [d for d in docs if d.get("firm_key")]
+        self.assertTrue(with_key, "정본에 firm_key 문서가 하나도 없다 — 전제 확인 필요")
+        sample = with_key[0]
+        html = self.pages[f"findings/doc/{sample['slug']}/index.html"]
+        self.assertIn("firm/index.html?key=", html)
+        self.assertIn('rel="nofollow"', html)
+
+
+# ── 발견 허브 (2026-08-26 — findings 첫 화면 재배열 + 랜딩 데이터 존 진입) ──────
+class WebDiscoveryHubTest(unittest.TestCase):
+    """/findings/ 첫 화면이 '목적 카드 → 최근 공개 문서 → 축 → 상세 검색' 순서로
+    재배열됐는지, 랜딩 #records 수치가 정본(findings_facets.json)에서 파생되는지,
+    프로파일 카테고리 링크가 맥락(q=이름)을 싣는지 검증한다. 검색 블록 내부 계약
+    (툴바가 대시보드보다 앞·sticky)은 기존 WebFindingsRenderTest 가 계속 지킨다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_hub_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── findings 허브 ────────────────────────────────────────────────────────
+    def test_hub_sections_precede_search(self):
+        # 순서 가드 — 검색을 없앤 게 아니라 순서만 뒤로 보냈다는 계약 그 자체.
+        i_purpose = self.html.index('id="fnd-purpose"')
+        i_recent = self.html.index('id="fnd-recent"')
+        i_search = self.html.index('id="fnd-search"')
+        i_tools = self.html.index('id="fnd-tools"')
+        self.assertLess(i_purpose, i_recent, "목적 카드가 최근 문서보다 앞이어야")
+        self.assertLess(i_recent, i_search, "최근 문서가 상세 검색보다 앞이어야")
+        self.assertLess(i_search, i_tools, "검색 툴바는 #fnd-search 래퍼 안이어야")
+
+    def test_purpose_cards_link_every_tool_route(self):
+        # 옛 '도구' 섹션을 흡수했으므로 상시 도구 라우트가 전부 카드 안에 남아야 한다
+        # (하나라도 빠지면 이 페이지 기준 도달성이 #807 이전으로 후퇴한다).
+        for path in ("findings/checklist/index.html", "findings/firm/index.html",
+                     "findings/inspector/index.html", "findings/inspections/index.html",
+                     "findings/coverage/index.html", "findings/trends/index.html"):
+            self.assertIn(f'href="../{path}"', self.html, path)
+
+    def test_inspector_card_keeps_no_ranking_copy(self):
+        # 037 정책(순위·비교 금지) 문안이 카드 개편 후에도 살아 있어야 한다.
+        self.assertIn("순위·비교는 제공하지 않습니다", self.html)
+
+    def test_recent_docs_from_canon_newest_first(self):
+        # 최근 공개 문서 5건 — 정본과 같은 정렬(공개일 desc, slug 로 결정론 타이브레이크).
+        docs = json.loads(render.FINDINGS_DOCS_FILE.read_text(encoding="utf-8"))["documents"]
+        ordered = sorted(docs, key=lambda d: (d["published_date"], d["slug"]),
+                         reverse=True)[:5]
+        hrefs = re.findall(r'class="fnd-rc-row" href="\.\./findings/doc/([^/"]+)/"',
+                           self.html)
+        self.assertEqual(hrefs, [d["slug"] for d in ordered])
+        self.assertIn(ordered[0]["published_date"], self.html)
+
+    def test_recent_section_states_date_semantics(self):
+        # 공개일≠실사일 — 트렌드 면과 같은 정직성 문안이 섹션에 있어야 한다.
+        self.assertIn("문서가 공개된 날", self.html)
+
+    # ── 랜딩 #records ────────────────────────────────────────────────────────
+    def test_landing_records_counts_derived_not_hardcoded(self):
+        facets = json.loads(render.FINDINGS_FACETS_FILE.read_text(encoding="utf-8"))
+        docs_fmt = f"{facets['totals']['documents']:,}"
+        find_fmt = f"{facets['totals']['findings']:,}"
+        self.assertIn('id="records"', self.landing)
+        self.assertIn(f"문서 {docs_fmt}건", self.landing)
+        self.assertIn(f"지적사항 {find_fmt}건", self.landing)
+        # 수치 파생 계약(자료실 카드 동형) — 템플릿 소스에 '건' 단위 콤마 수치를 박지
+        # 않는다. ('건' 접미로 좁히는 이유: CSS 주석의 픽셀 수치("1,180px")까지 잡으면
+        # 가드가 무관한 대상에 발화한다 — 위험은 건수 하드코딩이다.)
+        for tpl in ("landing.html", "findings.html"):
+            src = (WEB_DIR / "templates" / tpl).read_text(encoding="utf-8")
+            self.assertIsNone(re.search(r"\d{1,3},\d{3}\s*건", src),
+                              f"{tpl}: 건수 하드코딩 금지 — render 가 정본에서 계산해야")
+
+    def test_landing_records_between_why_and_engage(self):
+        # 12차 정리 후 순서: #why → #records → #engage (Card Anatomy 는 제거됨).
+        self.assertLess(self.landing.index('id="why"'),
+                        self.landing.index('id="records"'))
+        self.assertLess(self.landing.index('id="records"'),
+                        self.landing.index('id="engage"'))
+
+    def test_landing_records_question_entries(self):
+        # 진입은 기능명이 아니라 질문형 — 링크 대상 4개 + 전체 화면 링크.
+        for path in ("findings/firm/index.html", "findings/inspector/index.html",
+                     "findings/checklist/index.html", "findings/trends/index.html",
+                     "findings/index.html"):
+            self.assertIn(f'href="{path}"', self.landing, path)
+        self.assertIn("이 거래처, 과거에 무엇을 지적받았나요?", self.landing)
+
+    # ── 프로파일 맥락 유지(소스 계약 — firm/inspector.js 는 비골든 런타임 파일) ──
+    def test_profile_category_links_carry_context(self):
+        # 카테고리 클릭이 프로파일 조건을 버리지 않는다 — q=이름을 함께 싣는 계약.
+        for name in ("inspector.js", "firm.js"):
+            src = (WEB_DIR / "assets" / name).read_text(encoding="utf-8")
+            self.assertIn('href += "&q=" + encodeURIComponent(qValue)', src, name)
+            self.assertRegex(src, r"buildCatRow\(c, maxCnt, \w+Name\)", name)
+
+    def test_findings_js_lands_on_search_for_deep_links(self):
+        # 검색 파라미터를 들고 온 방문은 하단 검색 섹션으로 착지해야 한다(허브 재배열의
+        # 딥링크 보정) — finding_id 딥링크는 자체 착지 로직이 있어 제외.
+        src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn('document.getElementById("fnd-search")', src)
+        self.assertIn("searchSection.scrollIntoView()", src)
+        self.assertIn("!deepLinkPending", src)
 
 
 if __name__ == "__main__":

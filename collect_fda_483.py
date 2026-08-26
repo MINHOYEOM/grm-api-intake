@@ -1210,6 +1210,42 @@ def strip_leading_observation_noise(deficiency: str) -> str:
     return text
 
 
+# ── [페이지 경계 관찰 회수 2026-08-25] ────────────────────────────────────────
+# `_clean_observation_chunk` 는 "가장 이른 푸터 마커에서 자른다" — 관찰이 페이지 **하단에서
+# 끝날** 때는 맞다. 그런데 관찰 **표제**가 페이지 맨 아래에 걸리면 그 직후가 곧 페이지 경계라
+# 서명블록·양식 헤더가 먼저 오고 진짜 본문은 다음 페이지에서 시작한다. 그러면 chunk 가 위치
+# 0~1 에서 잘려 **통째로 비고** 관찰이 사라진다(실측 15건 전부 푸터 위치 = 1).
+#
+# 판정은 양성 신호 하나다 — **푸터가 표제 바로 뒤에서 시작하면** 그것은 관찰의 끝이 아니라
+# 페이지 경계다. 정상 관찰은 표제 뒤에 곧바로 산문이 오므로 이 경로에 아예 들어오지 않는다.
+#
+# 본문 시작점은 양식 블록과 산문의 **줄 모양 차이**로 찾는다: 양식 블록은 라벨·이름·날짜라
+# 짧고(실측 최장 49자 `NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED`) 대문자거나
+# 소문자가 거의 없다. 산문은 길고 소문자가 많다. 두 조건을 **함께** 걸어야 안전하다 —
+# 길이만 보면 긴 주소·이름줄에, 소문자만 보면 `Eileen A. Liu, Investigator` 에 걸린다.
+# 경계를 못 찾으면 원본을 그대로 돌려준다(= 종전 동작 · 회귀 0).
+_PAGEBREAK_FOOTER_HEAD = 8     # 표제 직후 이 범위 안에서 푸터가 시작하면 페이지 경계로 본다
+_PROSE_LINE_MIN_LEN = 60       # 실측 양식 줄 최장 49자 < 이 값 < 실측 산문 첫 줄 최단 86자
+_PROSE_LINE_MIN_LOWER = 15     # ALL-CAPS 라벨은 0, 이름줄(`…, Investigator`)은 길이에서 탈락
+
+
+def _skip_pagebreak_block(chunk: str) -> str:
+    """관찰 표제 **직후**에 온 페이지 경계 양식 블록을 건너뛴 본문을 돌려준다(순수 함수).
+
+    푸터가 표제 바로 뒤가 아니면(= 관찰 끝의 정상 푸터) 입력을 그대로 돌려준다."""
+    m = _FDA483_FOOTER_RE.search(chunk or "")
+    if not m or m.start() > _PAGEBREAK_FOOTER_HEAD:
+        return chunk
+    offset = 0
+    for line in (chunk or "").splitlines(keepends=True):
+        stripped = line.strip()
+        if (len(stripped) >= _PROSE_LINE_MIN_LEN
+                and sum(1 for c in stripped if c.islower()) >= _PROSE_LINE_MIN_LOWER):
+            return chunk[offset:]
+        offset += len(line)
+    return chunk                # 경계 미확정 — 지어내지 않고 종전 동작을 유지한다
+
+
 def _clean_observation_chunk(chunk: str) -> str:
     """Observation 본문 chunk 에서 페이지 하단 서명/양식 푸터 블록을 제거(가장 이른 마커에서 절단)."""
     text = re.sub(r"[\r\f]+", "\n", chunk or "")
@@ -1670,7 +1706,7 @@ def _observations_from_anchors(
     for i, obs in enumerate(matches):
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
-        chunk = _clean_observation_chunk(body[start:end])
+        chunk = _clean_observation_chunk(_skip_pagebreak_block(body[start:end]))
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
         # [표제 선행 잡음] **모든 경로**에 적용한다(회수 경로 전용 게이트와 달리) — OCR 로

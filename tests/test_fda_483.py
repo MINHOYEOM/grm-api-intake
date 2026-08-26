@@ -1478,6 +1478,77 @@ class ObservationRecoveryRegressionTest(unittest.TestCase):
         self.assertEqual(self._numbers(text), ["1"])   # 중복 번호가 생기지 않는다
 
 
+class ObservationPageBreakTest(unittest.TestCase):
+    """★[페이지 경계 관찰 회수 2026-08-25] 관찰 **표제**가 페이지 맨 아래에 걸리면 그 직후가
+    곧 페이지 경계라, 서명블록·양식 헤더가 먼저 오고 진짜 본문은 다음 페이지에서 시작한다.
+    `_clean_observation_chunk` 는 "가장 이른 푸터 마커에서 자른다"라서 chunk 가 위치 0~1 에서
+    잘려 **통째로 비고** 그 관찰이 사라졌다(실측 15건 전부 푸터 위치 = 1 · 회수 대조군 112문서
+    기준 10문서 13관찰).
+
+    판정 신호는 하나다 — **푸터가 표제 바로 뒤에서 시작하면** 관찰의 끝이 아니라 페이지 경계다.
+    정상 관찰은 표제 뒤에 곧바로 산문이 오므로 이 경로에 들어오지 않는다."""
+
+    # 실측 형태 축약(fda483-193545 obs 8): 표제 직후 서명블록 → 양식 헤더 → 진짜 본문.
+    _FORM_BLOCK = (
+        "\nEMPLOYEE(S) SIGNATURE\nDATE ISSUED\n"
+        "SEE REVERSE| Margaret M Annes,\nCSO\n3/20/2026\n"
+        "OF THIS PAGE |} Oluwasefunm Agbanigo,\nInvestigator\n\n"
+        "FOOD AND DRUG ADMINISTRATION\nDISTRICT ADDRESS AND PHONE NUMBER\n"
+        "DATE(S) OF INSPECTION\n1201 Main Street,\nSuite 7200\n"
+        "3/16/2026-3/20/2026\nDallas,\nTX 75202\n"
+    )
+    _PROSE = ("Individual equipment logs do not show time, date, product and lot number "
+              "of each batch processed.\n"
+              "Specifically, your firm fails to record the actual cleaning date in the "
+              "equipment cleaning documentation for equipment used in manufacture.\n")
+
+    def test_observation_after_page_break_is_recovered(self):
+        text = ("I/WE OBSERVED:\n\n"
+                "OBSERVATION 1: Written records of investigations do not include conclusions.\n"
+                "Specifically, the batch failure investigation was closed without a conclusion.\n\n"
+                "OBSERVATION 8:" + self._FORM_BLOCK + self._PROSE)
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "8"])
+        obs8 = rows[1]
+        self.assertTrue(obs8["deficiency"].startswith("Individual equipment logs"),
+                        obs8["deficiency"][:80])
+        self.assertNotIn("EMPLOYEE", obs8["deficiency"])
+        self.assertNotIn("Margaret M Annes", obs8["deficiency"] + obs8["detail"])
+
+    def test_trailing_footer_is_still_cut_not_skipped(self):
+        """★음성: 푸터가 관찰 **끝**에 오는 정상 배치는 종전대로 잘라낸다(건너뛰지 않는다).
+
+        이 구분이 무너지면 서명블록이 본문으로 실린다 — 이 수리가 만들 수 있는 유일한 사고다."""
+        text = ("I/WE OBSERVED:\n\n"
+                "OBSERVATION 1: Written records of investigations do not include conclusions.\n"
+                "Specifically, the batch failure investigation was closed without a conclusion.\n"
+                + self._FORM_BLOCK)
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1"])
+        joined = rows[0]["deficiency"] + rows[0]["detail"]
+        self.assertNotIn("EMPLOYEE", joined)
+        self.assertNotIn("Margaret M Annes", joined)
+        self.assertIn("batch failure investigation", joined)
+
+    def test_skip_helper_leaves_normal_chunk_untouched(self):
+        """푸터가 없는 평범한 chunk 는 입력 그대로 — 순수 함수 항등."""
+        chunk = "\nThe quality control unit did not follow its written responsibilities."
+        self.assertIs(f._skip_pagebreak_block(chunk), chunk)
+
+    def test_skip_helper_gives_up_when_no_prose_line_found(self):
+        """★경계를 못 찾으면 원본을 그대로 돌려준다 — 지어내지 않고 종전 동작을 유지한다."""
+        chunk = "\nEMPLOYEE(S) SIGNATURE\nDATE ISSUED\nCSO\n3/20/2026\n"
+        self.assertIs(f._skip_pagebreak_block(chunk), chunk)
+
+    def test_short_uppercase_form_lines_are_not_mistaken_for_prose(self):
+        """양식 라벨 최장 실측치(49자)가 산문 판정 하한(60자)을 넘지 않는지 고정한다."""
+        label = "NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED"
+        self.assertLess(len(label), f._PROSE_LINE_MIN_LEN)
+        chunk = f"\nEMPLOYEE(S) SIGNATURE\n{label}\n" + self._PROSE
+        got = f._skip_pagebreak_block(chunk)
+        self.assertTrue(got.lstrip().startswith("Individual equipment logs"), got[:70])
+
+
 class ObservationLegibilityTest(unittest.TestCase):
     """[OCR 판독 잡음 2026-07-27] 스캔 여백 파편이 관찰 1건으로 발행되던 구멍.
 

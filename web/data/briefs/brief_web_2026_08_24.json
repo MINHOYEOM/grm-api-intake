@@ -2274,6 +2274,13 @@
     "원료·완제 니트로소 불순물 시험법 및 관리기준 설정",
     "위해평가 결과에 따른 후속 시험 이행 상태"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201102762",
+    "std_cd": "8806646020202,8806646020219,8806646020226",
+    "bizrno": "1248177594"
+   },
    "merged_count": 3,
    "merged_items": [
     "레파넘정2밀리그람(레파글리니드)",
@@ -2341,6 +2348,12 @@
     "포장공정 내 이물 유입 경로 점검 기록",
     "멸균 제품의 육안검사 기준 및 불량 판정 사례 정의"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "202105344",
+    "bizrno": "6211974223"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2404,6 +2417,13 @@
     "시판 후 안정성시험 부적합 시 회수 판단 기준",
     "안정성시험 시점별 함량 추세 검토 및 경향 이탈 기준"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201602732",
+    "std_cd": "8806578060000,8806578060017,8806578060024,8806578060109,8806578060116",
+    "bizrno": "1248137632"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2472,6 +2492,12 @@
     "대용량 주사제 이물 육안검사 기준 및 표본 설계",
     "수액제 용기·마개 유래 이물 유입 경로 점검"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Calcium Chloride 20mg/100ml; Potassium Chloride 30mg/10ml; Sodium Chloride 600mg/100ml; Sodium Lactate 310mg/100ml",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2541,6 +2567,33 @@
     "충전 공정 이물 유입 지점 위험평가",
     "무균 주사제 외관검사의 이물 결함 분류 기준"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "4,077 vials",
+    "distribution": "USA Nationwide",
+    "code_info": "Lot # C23019V1, Exp 10/31/2026; C24015V1, Exp 4/30/2027",
+    "firm_location": "Taoyuan City, Taiwan",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-17"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-08-07"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-08-12"
+     }
+    ]
+   },
    "merged_count": 2,
    "merged_items": [
     "Cyclophosphamide for Injection, USP, 1 gram/vial, One Single-Dose Vial, Rx only, Manufactured for: Long Grove Pharmaceuticals, LLC, Rosemont, IL 60018.  Manufactured in Taiwan, NDC 81298-8112-1",
@@ -2613,6 +2666,50 @@
     "완제 단계 니트로소 불순물 시험 주기 및 관리기준",
     "해외 제조 위탁 품목의 불순물 시험 결과 수령 체계"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot # E408618, Expiry: 11/30/2026, NDC #: 70710-1159-3",
+    "firm_location": "Pennington, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-08-05"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-08-07"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-08-12"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "MIRABEGRON"
+     },
+     {
+      "label": "성분명",
+      "value": "MIRABEGRON"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA209488"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2740,6 +2837,12 @@
     "다회용 주사제 분해생성물 규격 및 시험 항목 설정 근거",
     "유효기간 내 분해생성물 추세 모니터링 기록"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Cisatracurium (Cisatracurium besilate) 2 mg/mL",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2808,6 +2911,51 @@
     "캡슐 충전 공정의 중량 편차 관리 기준 및 모니터링 주기",
     "완제 중량 선별기의 검출 성능 검증 기록"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "6,408 bottles distributed to market",
+    "distribution": "US Nationwide.",
+    "code_info": "Batch # DMC125018A, Exp Date: 07/2027.",
+    "firm_location": "East Windsor, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-23"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-08-04"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-08-12"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "DICYCLOMINE HYDROCHLORIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "DICYCLOMINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA040319"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

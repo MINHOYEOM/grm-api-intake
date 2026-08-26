@@ -1902,6 +1902,13 @@
     "타정·포장 구간 이물 유입 경로 관리",
     "최종 외관검사 판정 기준과 기록"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201403417",
+    "std_cd": "8806698044003,8806698044010,8806698044027",
+    "bizrno": "1248136268"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1970,6 +1977,12 @@
     "유사 외관 품목의 라인 클리어런스 절차",
     "포장 공정의 제품 식별·검증 수단"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "150 mg",
+    "dosage_form": "Tablet",
+    "action": "Verify whether your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or if you have any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2038,6 +2051,12 @@
     "펜·키트 구성품 대조 검증 방법",
     "포장 라인 구성품 전환 시 클리어런스 기록"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "1.34 mg/ml",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2106,6 +2125,12 @@
     "튜브 인쇄(제조번호·유효기한) 검증 수단",
     "미인쇄·불량 인쇄 검출 및 격리 절차"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "0.10%",
+    "dosage_form": "Cream",
+    "action": "Verify if your product is affected. If the lot number and expiry date are missing, your product may be affected by this recall.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2173,6 +2198,54 @@
     "점안제 용기·마개 시스템 사용적합성 검증",
     "동일 유형 불만 누적 시 회수 검토 기준"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "Nationwide in the USA.",
+    "code_info": "Lot # DLHU0031, Exp Date: 06/30/2027.",
+    "firm_location": "Somerset, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-22"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-24"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-08-05"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "DORZOLAMIDE HYDROCHLORIDE AND TIMOLOL MALEATE OPHTHALMIC SOLUTION"
+     },
+     {
+      "label": "성분명",
+      "value": "DORZOLAMIDE HYDROCHLORIDE AND TIMOLOL MALEATE"
+     },
+     {
+      "label": "주성분",
+      "value": "DORZOLAMIDE HYDROCHLORIDE, TIMOLOL MALEATE"
+     },
+     {
+      "label": "투여경로",
+      "value": "OPHTHALMIC"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA204777"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2240,6 +2313,50 @@
     "반고형제 성상·입도 시험 판정 기준",
     "혼합·냉각 공정 파라미터 편차 관리"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Two or more of the following: Email, Fax, Letter, Press Release, Telephone, Visit",
+    "notification_ko": "2가지 이상 병행",
+    "distribution": "Nationwide within the United States.",
+    "code_info": "Lot #: 19260937A, Exp. Date February 2028; 19261225A, 19261185A, Exp. Date March 2028; 19261664A, 19261682A, Exp. Date April 2028.",
+    "firm_location": "Elmwood Park, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-23"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-28"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-08-05"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "AZELAIC ACID"
+     },
+     {
+      "label": "성분명",
+      "value": "AZELAIC ACID"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA204637"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -2307,6 +2424,51 @@
     "주사제 안정성 시험의 성상·불용성이물 항목",
     "보관·유통 온도 일탈 시 재평가 기준"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "5688 vials",
+    "distribution": "USA Nationwide",
+    "code_info": "Lot #: 3241653, Exp 4/30/2027",
+    "firm_location": "Morgantown, WV, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-02"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-08-04"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-08-05"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "MYCOPHENOLATE MOFETIL"
+     },
+     {
+      "label": "성분명",
+      "value": "MYCOPHENOLATE MOFETIL"
+     },
+     {
+      "label": "투여경로",
+      "value": "INTRAVENOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA203859"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

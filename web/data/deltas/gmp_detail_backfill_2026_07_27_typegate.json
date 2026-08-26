@@ -1,0 +1,22 @@
+{
+ "cards": {
+  "gmpinspect-1Pzzvm8pprt": {
+   "recovered_from": "nedrug 첨부 PDF 재수집(운영 파서 재추출)",
+   "rows": [
+    {
+     "area": "시설장비",
+     "followup": "",
+     "legal_basis": "[별표 1] 제9호",
+     "severity": "기타",
+     "summary": "노출된 제조공정에 대한 마스크 착용 기준 및 작업자 위생관리 기준을 명확히 할 것"
+    }
+   ]
+  }
+ },
+ "provenance": {
+  "recovered_at": "2026-08-26",
+  "recovered_from": "nedrug.mfds.go.kr 첨부 PDF 재수집 → collect_mfds_gmp_inspection._parse_deficiency_table",
+  "why": "유형 게이트가 해외 현지실사 표제를 인식 못해 skipped-type 으로 표 추출을 시도조차 안 했던 발행분. 게이트 기본값 반전(08-12) 이후 현행 코드는 시도하므로 첨부만 재수집해 재추출했다. excerpt 실재 건수와 대조 일치한 문서만 담는다."
+ },
+ "schema_version": "grm-gmp-detail-backfill/v1"
+}

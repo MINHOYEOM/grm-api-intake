@@ -525,6 +525,8 @@ grm-api-intake/
 | RECALL-BACKFILL | 회수 결정론 상세 **과거분 소급**(06-22~08-24 발행 114장). 발행 브리프 JSON 에 raw 가 없어 다음 조립분부터만 실린다. 소급 경로는 재조립이 아니라 **표적 병합 CLI** — 문서번호로 원천을 되받아 상세만 얹는다(OpenFDA 는 `recall_number` 로 공개 API 재조회 가능·HC 는 `nid`·**식약처는 egress 프록시 필요**[[grm-mfds-ip-block]]) | 🔲 후보 |
 | RECALL-MHRA-BODY | MHRA 회수(소스 3~6)는 Atom 피드 5개 키를 카드가 전부 써 미사용 원천이 없다 — 상세를 실으려면 gov.uk 알림 **상세 페이지 수집**이 필요(수집기 변경). 10주 1장이라 우선순위 낮음 | 🔲 후보 |
 | FDA483-PAGEBREAK | 483 관찰 잔여 소실 15개(12문서) — 앵커 바로 뒤가 페이지 경계 양식 헤더 블록이라 본문이 분리된다. `grm_findings.strip_fda483_page_header` 의 라벨 목록이 OCR 변형을 못 잡는 것이 원인(findings 파이프라인 공유 함수 = 블라스트 반경 주의). 회귀 대조군은 이미 있다(112문서) | 🔲 후보 |
+| GMP-TABLE-PAGEBREAK | GMP실사 지적 표가 **페이지에 걸쳐** 이어지면 `find_tables()` 가 인식하지 못해 0행을 낸다 — 별개로 보이던 두 결손이 같은 뿌리였다(`gmpinspect-1Pz0eO3IuUQ` Guangdong 5건 실재·0행 / `gmpinspect-1PxzwRCkCdX` 서울대병원 4건+ 실재·0행). 첨부 재수집으로는 안 되고 **표 추출기 보강**이 필요하다. 대조 자료는 확보돼 있다(PDF·excerpt 실재 건수) | 🔲 후보 |
+| GMP-HWPX | GMP실사 첨부가 HWPX 인 문서(`gmpinspect-1P_rAodwYSY`)는 PDF 전제 추출기가 시도조차 못 한다 — 추출 경로 신설 필요 | 🔲 후보 |
 | EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
 | GAP-2 | 브랜드-only 생물주사제 모달리티 오분류 해소 | 🔲 후보 |
 | WHY-1 | 결함 내용 표출 감사(FDA 483/WHOPIR/WL/MFDS GMP로 사실상 확보, 지속 관찰) | 🟡 진행 |

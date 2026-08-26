@@ -39,7 +39,15 @@ jobs:
   reclassify:
     name: Reclassify findings.category_code under current taxonomy
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # ★[2026-08-27] 45 -> 180. v10 적용에서 실제로 timeout 에 걸려 **40%(10,732/26,581)만
+    # 적용된 채 잘렸다.** 이 상한은 코퍼스가 작을 때 정해진 값이고 findings 는 계속 자란다.
+    #   · PATCH 는 행마다 왕복 1회라 네트워크 바운드다 — 실측 약 250행/분.
+    #   · 버전을 올리는 실행은 카테고리가 안 바뀌는 행까지 **전건**을 찍는다(provenance).
+    #     26,581행 = 약 106분. 45분으로는 구조적으로 못 끝낸다.
+    # 잘려도 데이터는 깨지지 않는다(행 단위 멱등 + race-safe 필터) — 다시 돌리면 남은 것만
+    # 집는다. 그래도 "성공처럼 보이는 부분 적용"은 다음 사람이 못 알아채므로 상한을 올린다.
+    # 180분은 현재 크기의 약 1.7배까지 여유가 있다. 더 커지면 `limit` 입력으로 나눠 돌린다.
+    timeout-minutes: 180
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2

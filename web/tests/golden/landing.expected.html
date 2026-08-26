@@ -143,7 +143,19 @@
         </div>
       </article>
     </div>
-  </div></section><section class="section" id="engage"><div class="wrap">
+  </div></section>  <section class="section soft" id="records"><div class="wrap">
+    <span class="kick">Findings Database</span>
+    <h2 class="sec-title">주간 브리프의 원천 — 실사에서 실제 지적된 문장들</h2>
+    <p class="records-sub">브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 6,147건 · 지적사항 24,876건이 쌓여 있습니다.</p>
+    <div class="records-grid">
+      <a class="records-card" href="findings/firm/index.html"><b>이 거래처, 과거에 무엇을 지적받았나요?</b><span>업체 이름으로 지적 이력 조회</span></a>
+      <a class="records-card" href="findings/inspector/index.html"><b>이 실사관이 서명한 문서에는 무엇이 있었나요?</b><span>실사관 이름으로 공개 문서 조회</span></a>
+      <a class="records-card" href="findings/checklist/index.html"><b>실사 준비, 무엇부터 점검할까요?</b><span>실제 지적 문장이 붙은 자가점검표</span></a>
+      <a class="records-card" href="findings/trends/index.html"><b>요즘 어떤 지적이 늘고 있나요?</b><span>최근 12개월 지적 경향</span></a>
+    </div>
+    <a class="records-all" href="findings/index.html">규제 지적사항 전체 화면 →</a>
+  </div></section>
+<section class="section" id="engage"><div class="wrap">
     <div id="popular">
       <span class="kick">Weekly Reactions</span>
       <h2 class="sec-title">이번 주 반응이 모인 카드</h2>
@@ -174,6 +186,16 @@
   </div></section>
 </main>
 <style>
+/* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
+.records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
+.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.records-card{display:flex;flex-direction:column;gap:6px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
+.records-card:hover{border-color:var(--coral)}
+.records-card b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.45;word-break:keep-all}
+.records-card:hover b{color:var(--coral-2)}
+.records-card span{font-size:12.5px;color:var(--muted);word-break:keep-all}
+.records-all{display:inline-block;margin-top:16px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.records-all:hover{color:var(--coral)}
 /* 참여 존(#engage) — grm.css 토큰만(프리즈 보존). 스코프 한정. 퀴즈 배너는 인기 카드와
    28px 로 근접 배치해 한 존으로 읽히게 한다. */
 .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}

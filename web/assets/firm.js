@@ -123,8 +123,15 @@
 
   // 카테고리 바 클릭 → 검색 페이지 필터 링크(trends.js findingsHref 와 동일 계약 —
   // findings.js 의 URL_KEYS.category_code="cat" 을 그대로 따른다).
-  function findingsHref(paramKey, value) {
-    return root + "findings/index.html?" + paramKey + "=" + encodeURIComponent(value);
+  // [맥락 유지 2026-08-26] 카테고리만 넘기면 업체 조건이 사라져 전체 코퍼스로 떨어진다
+  // (검색 RPC 엔 구조적 업체 필터가 없다 — firm_name 은 자유 검색 blob 에만 있다).
+  // q=업체명을 함께 실어 "이 업체 + 이 카테고리"로 착지시킨다 — findings.js 대시보드
+  // 업체 행(state.q=업체명)이 쓰는 것과 같은 관용구다. q 값은 **원문 display_name**
+  // (엔티티 미해제)이어야 DB blob 과 부분일치가 성립한다(decodeFirmDisplay 금지).
+  function findingsHref(paramKey, value, qValue) {
+    var href = root + "findings/index.html?" + paramKey + "=" + encodeURIComponent(value);
+    if (qValue) href += "&q=" + encodeURIComponent(qValue);
+    return href;
   }
 
   function getFirmKeyParam() {
@@ -150,10 +157,10 @@
   }
 
   // ── 카테고리 구성(상위 카테고리 코럴 농도 바) ────────────────────────────────
-  function buildCatRow(entry, maxCnt) {
+  function buildCatRow(entry, maxCnt, firmName) {
     var a = document.createElement("a");
     a.className = "fp-cat-row";
-    a.href = findingsHref("cat", entry.category_code);
+    a.href = findingsHref("cat", entry.category_code, firmName);
     var label = CATEGORY_LABELS[entry.category_code];
     a.appendChild(el("span", "fp-cat-label", label ? label.ko : entry.category_code));
     var track = document.createElement("div");
@@ -168,7 +175,7 @@
     return a;
   }
 
-  function renderCategories(byCategory) {
+  function renderCategories(byCategory, firmName) {
     catEl.innerHTML = "";
     if (!byCategory.length) {
       catEl.appendChild(el("p", "fp-empty", "표시할 데이터가 없습니다."));
@@ -176,7 +183,7 @@
     }
     // RPC 가 이미 cnt desc 로 정렬해 반환한다(013 by_category 계약) — 재정렬 없음.
     var maxCnt = byCategory[0].cnt || 1;
-    byCategory.forEach(function (c) { catEl.appendChild(buildCatRow(c, maxCnt)); });
+    byCategory.forEach(function (c) { catEl.appendChild(buildCatRow(c, maxCnt, firmName)); });
   }
 
   // ── 연도 추이(간단 막대) ─────────────────────────────────────────────────
@@ -454,7 +461,8 @@
   function renderAll(data) {
     nameEl.textContent = decodeFirmDisplay(data.display_name || "");
     renderStats(data.totals || {});
-    renderCategories(data.by_category || []);
+    // [맥락 유지] q 값은 원문 display_name — DB blob 과 부분일치해야 하므로 decode 금지.
+    renderCategories(data.by_category || [], data.display_name || "");
     renderYears(data.by_year || []);
     renderDocuments(data.documents || []);
   }

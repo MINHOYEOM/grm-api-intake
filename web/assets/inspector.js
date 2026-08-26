@@ -133,8 +133,16 @@
 
   // 카테고리 바 클릭 → 검색 페이지 필터 링크(firm.js findingsHref 와 동일 계약 —
   // findings.js 의 URL_KEYS.category_code="cat" 을 그대로 따른다).
-  function findingsHref(paramKey, value) {
-    return root + "findings/index.html?" + paramKey + "=" + encodeURIComponent(value);
+  // [맥락 유지 2026-08-26] 카테고리만 넘기면 실사관 조건이 사라져 전체 코퍼스로 떨어진다
+  // (검색 RPC 엔 실사관 필터가 없어 구조적으로 표현 불가). 대신 검색 blob 에 실사관
+  // 이름이 들어 있으므로(마이그 040) q=이름을 함께 실어 "이 실사관 + 이 카테고리"로
+  // 착지시킨다 — findings.js 대시보드 업체 행이 쓰는 것과 같은 관용구(자유 검색 경유)다.
+  // 한계: 표기 변형(별칭)으로 서명한 문서는 q 부분일치에서 빠질 수 있다 — 전수는 이
+  // 프로파일 화면이 정본이고, 검색 착지 화면엔 q·카테고리 칩이 떠 조건이 그대로 보인다.
+  function findingsHref(paramKey, value, qValue) {
+    var href = root + "findings/index.html?" + paramKey + "=" + encodeURIComponent(value);
+    if (qValue) href += "&q=" + encodeURIComponent(qValue);
+    return href;
   }
 
   function getInspectorKeyParam() {
@@ -160,10 +168,10 @@
   }
 
   // ── 카테고리 구성(상위 카테고리 코럴 농도 바) ────────────────────────────────
-  function buildCatRow(entry, maxCnt) {
+  function buildCatRow(entry, maxCnt, personName) {
     var a = document.createElement("a");
     a.className = "ip-cat-row";
-    a.href = findingsHref("cat", entry.category_code);
+    a.href = findingsHref("cat", entry.category_code, personName);
     var label = CATEGORY_LABELS[entry.category_code];
     a.appendChild(el("span", "ip-cat-label", label ? label.ko : entry.category_code));
     var track = document.createElement("div");
@@ -178,7 +186,7 @@
     return a;
   }
 
-  function renderCategories(byCategory) {
+  function renderCategories(byCategory, personName) {
     catEl.innerHTML = "";
     if (!byCategory.length) {
       catEl.appendChild(el("p", "ip-empty", "표시할 데이터가 없습니다."));
@@ -187,7 +195,7 @@
     // RPC 가 이미 cnt desc 로 정렬해 반환한다(findings_firm_profile by_category 와 동일
     // 계약) — 재정렬 없음.
     var maxCnt = byCategory[0].cnt || 1;
-    byCategory.forEach(function (c) { catEl.appendChild(buildCatRow(c, maxCnt)); });
+    byCategory.forEach(function (c) { catEl.appendChild(buildCatRow(c, maxCnt, personName)); });
   }
 
   // ── 연도 추이(간단 막대) ─────────────────────────────────────────────────
@@ -369,7 +377,7 @@
   function renderAll(data) {
     nameEl.textContent = data.display_name || "";
     renderStats(data.totals || {});
-    renderCategories(data.by_category || []);
+    renderCategories(data.by_category || [], data.display_name || "");
     renderYears(data.by_year || []);
     renderDocuments(data.documents || []);
   }

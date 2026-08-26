@@ -9,14 +9,14 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
-<title>규제 지적사항 검색 · GRM</title>
-<meta name="description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터." />
+<title>규제 지적사항 검색·조회 · GRM</title>
+<meta name="description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. 검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다." />
 <link rel="canonical" href="https://grm-solutions.com/findings/" /><link rel="alternate" type="application/rss+xml" title="GRM 주간 브리프" href="/rss.xml" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
-<meta property="og:title" content="규제 지적사항 검색 · GRM" />
-<meta property="og:description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터." />
+<meta property="og:title" content="규제 지적사항 검색·조회 · GRM" />
+<meta property="og:description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. 검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다." />
 <meta property="og:url" content="https://grm-solutions.com/findings/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
@@ -41,15 +41,75 @@
   <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
 </div></header>
 
-<main>
-  <div class="wrap page-head">
-    <span class="kick reveal" style="animation-delay:.02s">Findings Search</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 검색</h1>
-    <p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문에서 추출해 검색합니다.</p>
-    <a class="fnd-trends-link reveal" style="animation-delay:.18s" href="../findings/trends/index.html">전체 트렌드 보기 →</a>
+<main><div class="wrap page-head">
+    <span class="kick reveal" style="animation-delay:.02s">Findings</span>
+    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항</h1><p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 6,147건에서 추출한 지적사항 24,876건을 원문 문장 단위로 모았습니다.</p>
+    <div class="fnd-hd-links reveal" style="animation-delay:.18s">
+      <a class="fnd-trends-link" href="#fnd-search">바로 검색하기 ↓</a>
+      <a class="fnd-trends-link" href="../findings/trends/index.html">전체 트렌드 보기 →</a>
+    </div>
   </div>
   <div class="wrap">
-    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div><section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
+    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div><section class="fnd-browse fnd-purpose" id="fnd-purpose" aria-label="목적별 진입">
+      <h2 class="fnd-browse-h">어떤 일로 오셨나요?</h2>
+      <p class="fnd-browse-p">쓰임새별로 바로 가는 길입니다. 찾을 업체명이나 문구가 이미 있으시면 <a href="#fnd-search">아래 상세 검색</a>으로 바로 내려가셔도 됩니다.</p>
+      <div class="fnd-pp-grid">
+        <div class="fnd-pp-card">
+          <span class="fnd-pp-t">실사를 준비하고 있다면</span>
+          <span class="fnd-pp-d">무엇이 자주 지적되는지에서 출발하세요.</span>
+          <a class="fnd-pp-link" href="../findings/checklist/index.html">자가점검 체크리스트<em>실제 지적 문장이 근거로 붙은 점검표</em></a>
+          <a class="fnd-pp-link" href="../findings/trends/index.html">많이 지적된 영역<em>최근 12개월 지적 경향</em></a>
+          <a class="fnd-pp-link" href="../findings/inspections/index.html">FDA 실사 결과<em>실사가 NAI·VAI·OAI 중 어떻게 끝났나</em></a>
+        </div>
+        <div class="fnd-pp-card">
+          <span class="fnd-pp-t">거래처·수탁제조소를 검토한다면</span>
+          <span class="fnd-pp-d">업체 이름만 알면 됩니다.</span>
+          <a class="fnd-pp-link" href="../findings/firm/index.html">업체 조회<em>그 업체의 과거 지적 이력을 한 화면에</em></a>
+          <a class="fnd-pp-link" href="../findings/inspections/index.html">FDA 실사 결과<em>연도별·국가별 최종 등급 구성</em></a>
+        </div>
+        <div class="fnd-pp-card">
+          <span class="fnd-pp-t">최근 경향이 궁금하다면</span>
+          <span class="fnd-pp-d">누적 합계가 아니라 최근 변화부터 보여드립니다.</span>
+          <a class="fnd-pp-link" href="../findings/trends/index.html">지적 경향<em>무엇이 늘고 무엇이 줄었나</em></a>
+          <a class="fnd-pp-link" href="../findings/coverage/index.html">데이터 현황<em>수치를 어디까지 믿어도 되는지</em></a>
+<a class="fnd-pp-link" href="#fnd-recent">최근 공개된 문서<em>이 페이지 아래에 바로 있습니다 ↓</em></a>        </div>
+        <div class="fnd-pp-card">
+          <span class="fnd-pp-t">실사관 이름을 받았다면</span>
+          <span class="fnd-pp-d">그 실사관이 서명한 공개 문서를 모아 보여드립니다. 순위·비교는 제공하지 않습니다.</span>
+          <a class="fnd-pp-link" href="../findings/inspector/index.html">실사관 조회<em>서명한 문서·반복 확인된 영역</em></a>
+<a class="fnd-pp-link" href="../findings/docs/index.html">문서로 찾기<em>기관·연도별 실사 문서 목록</em></a>        </div>
+      </div>
+    </section>    <section class="fnd-browse" id="fnd-recent" aria-label="최근 공개된 문서">
+      <h2 class="fnd-browse-h">최근 공개된 문서</h2>
+      <p class="fnd-browse-p">2026-08-22 수집 기준, 상세 페이지가 있는 문서(지적 3건 이상) 가운데 최신 5건입니다. 날짜는 실사한 날이 아니라 문서가 공개된 날입니다.</p>
+      <div class="fnd-rc-list">        <a class="fnd-rc-row" href="../findings/doc/gmpinspect-1Q0I8CiIsRn/">
+          <span class="fnd-rc-head"><span class="fnd-rc-date">2026-08-18</span><span class="fnd-rc-src">식품의약품안전처</span><span class="fnd-rc-firm">(주)카이바이오텍</span><span class="fnd-rc-cats">기타 품질시스템 · 무균보증/무균공정</span></span><span class="fnd-rc-snippet">[별표 1] 제2.3호 가목 관련 &#39;기타&#39; 등급 지적사항이다. 청정구역(critical area) 관리 기준과 환경 및 작업원 모니터링에 관한 기준서의 현행화가 미흡…</span>        </a>        <a class="fnd-rc-row" href="../findings/doc/gmpinspect-1Q0I8CiIr0X/">
+          <span class="fnd-rc-head"><span class="fnd-rc-date">2026-08-18</span><span class="fnd-rc-src">식품의약품안전처</span><span class="fnd-rc-firm">제주대학교병원</span><span class="fnd-rc-cats">기타 품질시스템 · 설비/시설</span></span><span class="fnd-rc-snippet">[별표 1] 제2.3호 가목 관련 &#39;기타&#39; 등급 지적사항이다. 청정구역(critical area) 관리 기준과 환경 및 작업원 모니터링에 관한 기준서의 현행화가 미흡…</span>        </a>        <a class="fnd-rc-row" href="../findings/doc/gmpinspect-1Q0I8CiIUNN/">
+          <span class="fnd-rc-head"><span class="fnd-rc-date">2026-08-18</span><span class="fnd-rc-src">식품의약품안전처</span><span class="fnd-rc-firm">나주신일가스주식회사</span><span class="fnd-rc-cats">기타 품질시스템 · 데이터 완전성</span></span><span class="fnd-rc-snippet">[별표 1] 제5.1호 마목 관련 &#39;중요&#39; 등급 지적사항이다. 기준서 및 SOP에 대한 정기점검을 실시하지 않았다.</span>        </a>        <a class="fnd-rc-row" href="../findings/doc/c0f3b8ff757d/">
+          <span class="fnd-rc-head"><span class="fnd-rc-date">2026-08-18</span><span class="fnd-rc-src">FDA Warning Letter</span><span class="fnd-rc-firm">K.C. Pharmaceuticals, Inc.</span><span class="fnd-rc-cats">불만/회수 · 공정밸리데이션</span></span><span class="fnd-rc-snippet">귀사는 품질관리부서에 적용되는 적절한 책임과 절차를 문서로 확립하지 않았고, 품질관리부서에 적용되는 문서화된 절차를 따르지 않았다(21 CFR 211.22(d)).…</span>        </a>        <a class="fnd-rc-row" href="../findings/doc/98b0ec48f22e/">
+          <span class="fnd-rc-head"><span class="fnd-rc-date">2026-08-18</span><span class="fnd-rc-src">FDA Warning Letter</span><span class="fnd-rc-firm">Tianjin Kilo Pharmaceutical Sci-tech Co., Ltd.</span><span class="fnd-rc-cats">안정성/보관 · 문서화/기록관리</span></span><span class="fnd-rc-snippet">원료의약품(API)의 안정성 특성을 모니터링하고 그 결과를 적절한 보관조건 및 재시험일 또는 유효기간을 확인하는 데 사용하기 위한, 문서화된 지속적 안정성시험 프로그…</span>        </a>      </div>
+    </section>
+
+    <section class="fnd-browse" aria-label="다르게 찾아보기">
+      <h2 class="fnd-browse-h">다르게 찾아보기</h2>
+      <p class="fnd-browse-p">검색어가 떠오르지 않으면 축을 골라 둘러보실 수 있습니다. 각 페이지는 실제 지적 문장과 함께 정리돼 있습니다.</p>
+      <div class="fnd-browse-grid">        <a class="fnd-browse-card" href="../findings/c/">
+          <span class="fnd-browse-t">분류별 지적사항</span>
+          <span class="fnd-browse-d">무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다.</span>
+        </a>        <a class="fnd-browse-card" href="../findings/country/">
+          <span class="fnd-browse-t">국가별 지적사항</span>
+          <span class="fnd-browse-d">제조소가 어느 나라에 있는지로 묶어 봅니다.</span>
+        </a>        <a class="fnd-browse-card" href="../findings/agency/">
+          <span class="fnd-browse-t">규제기관별 지적사항</span>
+          <span class="fnd-browse-d">FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다.</span>
+        </a>        <a class="fnd-browse-card" href="../findings/docs/">
+          <span class="fnd-browse-t">문서로 찾기</span>
+          <span class="fnd-browse-d">실사 문서 3,145건을 기관·연도로 묶어 봅니다.</span>
+        </a>      </div>
+    </section>
+<div id="fnd-search">
+    <h2 class="fnd-browse-h">상세 검색</h2>
+    <p class="fnd-browse-p">업체명·문서번호·조항·본문 문구로 찾고, 소스·카테고리·기간·국가로 좁힙니다.</p><section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
         <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
@@ -95,46 +155,8 @@
       <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div><nav class="fnd-pager" id="fnd-pager-top" aria-label="검색 결과 페이지 이동" hidden></nav>
       <div id="fnd-results" class="fnd-results"></div>
       <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="검색 결과 페이지 이동" hidden></nav>
-    </section><section class="fnd-browse" aria-label="도구">
-      <h2 class="fnd-browse-h">도구</h2>
-      <p class="fnd-browse-p">이름을 알고 있는 대상의 이력을 바로 조회하거나, 빈발 지적 조항을 점검표로 받아 갈 수 있습니다.</p>
-      <div class="fnd-browse-grid">
-        <a class="fnd-browse-card" href="../findings/firm/index.html">
-          <span class="fnd-browse-t">업체 조회</span>
-          <span class="fnd-browse-d">거래처·수탁제조소 이름으로 그 업체의 지적 이력을 한 곳에서 봅니다. 영문 상호 일부만 넣어도 됩니다.</span>
-        </a>
-        <a class="fnd-browse-card" href="../findings/inspector/index.html">
-          <span class="fnd-browse-t">실사관 조회</span>
-          <span class="fnd-browse-d">FDA 483에 서명한 실사관 이름으로 그 실사관이 확인한 지적 이력을 봅니다. 순위·비교는 제공하지 않습니다.</span>
-        </a>
-        <a class="fnd-browse-card" href="../findings/checklist/index.html">
-          <span class="fnd-browse-t">자가점검 체크리스트</span>
-          <span class="fnd-browse-d">많이 인용된 조항을 순서대로 뽑고 조항마다 실제 지적 문장을 붙인 점검표. 인쇄·CSV·엑셀 붙여넣기.</span>
-        </a>
-        <a class="fnd-browse-card" href="../findings/inspections/index.html">
-          <span class="fnd-browse-t">FDA 실사 결과</span>
-          <span class="fnd-browse-d">지적사항이 아니라 실사 한 건이 어떻게 끝났는지(NAI·VAI·OAI)를 연도별·국가별로 봅니다.</span>
-        </a>
-      </div>
     </section>
-
-    <section class="fnd-browse" aria-label="다르게 찾아보기">
-      <h2 class="fnd-browse-h">다르게 찾아보기</h2>
-      <p class="fnd-browse-p">검색어가 떠오르지 않으면 축을 골라 둘러보실 수 있습니다. 각 페이지는 실제 지적 문장과 함께 정리돼 있습니다.</p>
-      <div class="fnd-browse-grid">        <a class="fnd-browse-card" href="../findings/c/">
-          <span class="fnd-browse-t">분류별 지적사항</span>
-          <span class="fnd-browse-d">무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다.</span>
-        </a>        <a class="fnd-browse-card" href="../findings/country/">
-          <span class="fnd-browse-t">국가별 지적사항</span>
-          <span class="fnd-browse-d">제조소가 어느 나라에 있는지로 묶어 봅니다.</span>
-        </a>        <a class="fnd-browse-card" href="../findings/agency/">
-          <span class="fnd-browse-t">규제기관별 지적사항</span>
-          <span class="fnd-browse-d">FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다.</span>
-        </a>        <a class="fnd-browse-card" href="../findings/docs/">
-          <span class="fnd-browse-t">문서로 찾기</span>
-          <span class="fnd-browse-d">실사 문서 3,145건을 기관·연도로 묶어 봅니다.</span>
-        </a>      </div>
-    </section>
+    </div>
   </div>
 </main>
 <style>
@@ -160,6 +182,31 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-browse-t{font-family:var(--serif);font-size:16.5px;color:var(--ink)}
 .fnd-browse-card:hover .fnd-browse-t{color:var(--coral)}
 .fnd-browse-d{font-size:13px;line-height:1.6;color:var(--muted);word-break:keep-all}
+/* [발견 허브] 머리 링크 줄 — 기존 .fnd-trends-link 컴포넌트 2개를 한 줄에. */
+.fnd-hd-links{display:flex;gap:22px;flex-wrap:wrap}
+/* [발견 허브] 목적 카드 — 첫 섹션이라 상단 구분선 없이 page-head 에 바로 잇는다. */
+.fnd-purpose{margin-top:6px;border-top:0;padding-top:0}
+.fnd-pp-grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.fnd-pp-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px}
+.fnd-pp-t{font-family:var(--serif);font-size:17px;color:var(--ink)}
+.fnd-pp-d{font-size:12.5px;line-height:1.6;color:var(--muted);margin:5px 0 10px;word-break:keep-all}
+.fnd-pp-link{display:block;padding:8px 0 7px;border-top:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--body);text-decoration:none}
+.fnd-pp-link:hover{color:var(--coral-2)}
+.fnd-pp-link em{display:block;font-style:normal;font-weight:400;font-size:12px;line-height:1.55;color:var(--muted);margin-top:2px;word-break:keep-all}
+/* [발견 허브] 최근 공개 문서 — 문서 카드(.fnd-doc)보다 가벼운 목록 톤. */
+.fnd-rc-list{margin-top:16px;display:flex;flex-direction:column}
+.fnd-rc-row{display:block;padding:12px 4px;border-top:1px solid var(--line);text-decoration:none}
+.fnd-rc-row:last-child{border-bottom:1px solid var(--line)}
+.fnd-rc-row:hover .fnd-rc-firm{color:var(--coral-2)}
+.fnd-rc-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.fnd-rc-date{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.fnd-rc-src{font-size:11.5px;font-weight:600;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:2px 7px}
+.fnd-rc-firm{font-family:var(--serif);font-size:15.5px;color:var(--ink)}
+.fnd-rc-cats{font-size:12px;color:var(--muted);word-break:keep-all}
+.fnd-rc-snippet{display:block;margin-top:5px;font-size:13px;line-height:1.65;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
+/* [발견 허브] 상세 검색 래퍼 — 위 섹션들과 같은 구분 리듬(.fnd-browse 동형). */
+#fnd-search{margin:40px 0 0;border-top:1px solid var(--line);padding-top:26px}
+#fnd-search>.fnd-browse-p{margin-bottom:20px}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */
@@ -456,7 +503,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../assets/findings.js?v=af77ca43" defer></script>
+<script src="../assets/findings.js?v=40ec5abd" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

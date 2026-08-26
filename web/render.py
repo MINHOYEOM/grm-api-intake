@@ -2380,7 +2380,8 @@ SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 소식을 매주 한�
 ARCHIVE_DESCRIPTION = ("GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
                        "주차별로 모아 기관·기간으로 검색·필터.")
 FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
-                        "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출해 검색·필터.")
+                        "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. "
+                        "검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다.")
 # [존 재편 2026-08-26] 트렌드 존이 세 면으로 갈리면서 이 설명도 '지적 경향' 면만 가리킨다 —
 # 연도별 구성비·업체 랭킹은 데이터 현황 면으로 옮겼으므로 문안에서도 뺐다(설명이 실제
 # 페이지 내용과 어긋나면 검색결과 스니펫이 먼저 거짓말을 한다).
@@ -2588,6 +2589,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         "item_count": sum(v["count"] for v in catalogs),
     }
 
+    # [검색 유입] findings 정본을 랜딩보다 먼저 읽는다 — 랜딩 '데이터 존' 섹션과 findings
+    # 허브 셸이 같은 스냅샷(문서·지적 건수, 최근 공개 문서)을 쓰기 때문이다. 정적 표면으로
+    # 가는 **유일한 진입 간선**(홈 BFS 도달 28/3,520 이던 고립을 메운 경로)도 이 데이터로
+    # 렌더한다. 파일 로드일 뿐이라 렌더 비용이 아니다.
+    facets = load_findings_facets()
+    docs_data = load_findings_docs()
+    doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
+    # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
+    # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
+    # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).
+    findings_zone = None
+    if facets:
+        findings_zone = {
+            "documents": f"{facets['totals']['documents']:,}",
+            "findings": f"{facets['totals']['findings']:,}",
+        }
+
     # 랜딩.
     landing_html = env.get_template("landing.html").render(
         page_title="GRM · Global Regulatory Monitor",
@@ -2599,6 +2617,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         json_ld=build_json_ld(),
         cover=_cover_context(latest_brief, latest_issue_no),
         library=library_summary,
+        findings_zone=findings_zone,
     )
     _write(out_dir / "index.html", landing_html)
     written.append("index.html")
@@ -2622,13 +2641,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "archive" / "index.html", archive_html)
     written.append("archive/index.html")
 
-    # [검색 유입] 정본을 여기서 미리 읽는다 — 아래 findings 셸이 정적 표면으로 가는
-    # **유일한 진입 간선**을 렌더해야 하고(홈 BFS 도달 28/3,520 이던 고립을 메운다),
-    # 모음 페이지의 사례가 문서 페이지로 이어지려면 "그 문서에 페이지가 있는가"도 알아야
-    # 하기 때문이다. 파일 로드일 뿐이라 렌더 비용이 아니다.
-    facets = load_findings_facets()
-    docs_data = load_findings_docs()
-    doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
+    # facets/docs_data/doc_slugs 는 랜딩 직전에 이미 로드됐다(랜딩 '데이터 존' 섹션과
+    # 공용). 모음 페이지의 사례가 문서 페이지로 이어지려면 "그 문서에 페이지가 있는가"
+    # (doc_slugs)도 필요하다.
 
     # 진입 카드는 **데이터가 있는 축만** 만든다 — 없는 페이지로 보내는 링크는 무링크보다
     # 나쁘다. 문서 축은 렌더 스위치가 꺼진 테스트 빌드에서 페이지가 없으므로 함께 건다.
@@ -2655,12 +2670,42 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                       " 묶어 봅니다."),
         })
 
+    # [발견 허브] 최근 공개 문서 — 문서 페이지 정본(findings_docs.json)에서 공개일
+    # 내림차순 5건(동일 날짜는 slug 로 갈라 결정론 유지). 검색 결과와 달리 fetch 없이
+    # 첫 화면에서 바로 보이는 정적 미리보기라, 스냅샷 기준일(measured_on)을 함께 적는다.
+    recent_docs = []
+    if docs_data:
+        for d in sorted(docs_data.get("documents", []),
+                        key=lambda x: (x.get("published_date", ""), x.get("slug", "")),
+                        reverse=True)[:5]:
+            first = (d.get("findings") or [{}])[0]
+            snippet = " ".join(str(first.get("text_ko", "")).split())
+            if len(snippet) > 92:
+                snippet = snippet[:92].rstrip() + "…"
+            agency = d.get("agency", "")
+            agency_label = ((facets or {}).get("agency_labels") or {}).get(agency, agency)
+            recent_docs.append({
+                "date": d.get("published_date", ""),
+                "src_label": doc_source_label(d) or agency_label,
+                "firm": d.get("firm_name", ""),
+                "slug": d.get("slug", ""),
+                "cats": (d.get("categories") or [])[:2],
+                "snippet": snippet,
+            })
+
     # 지적사항 검색(FIND-1 M3c) — 라이브 데이터(Supabase PostgREST)라 빌드시 목록을 고정할
     # 수 없다. 서버는 셸(로딩 상태)만 렌더 — env 미설정이면 findings.js 가 "준비 중" 안내로
     # 조용히 종료한다(cfg data 속성은 위 reactions_enabled 와 무관하게 항상 주입).
+    # [발견 허브 2026-08-26] 검색만 있던 첫 화면을 목적 카드·최근 공개 문서가 앞서는
+    # 허브로 재배열 — 검색 블록 자체는 그대로 두고 순서만 뒤로 보낸다(findings.html 참조).
     findings_html = env.get_template("findings.html").render(
         browse_axes=browse_axes,
-        page_title="규제 지적사항 검색 · GRM",
+        zone_totals=findings_zone,
+        recent_docs=recent_docs,
+        recent_asof=(docs_data or {}).get("measured_on", ""),
+        recent_min=(docs_data or {}).get("min_findings"),
+        has_docs=bool(docs_data and docs_data.get("documents")),
+        page_title="규제 지적사항 검색·조회 · GRM",
         rel_root="../",
         nav_active="findings",
         latest_slug=latest_slug,

@@ -115,6 +115,28 @@
     </div>
   </div></section>
 
+  {#- [발견 허브 2026-08-26] 데이터 존 진입 섹션 — 홈의 findings 진입은 워치리스트 CTA
+      1개뿐이었고 그마저 reactions 게이트 뒤였다(#807 도달성 감사의 다음 층: 링크를 놓은
+      뒤에도 존의 존재 자체가 홈에서 안 보였다). 브리프(요약)와 지적사항 DB(원천)의 관계를
+      한 문장으로 말하고, 기능명이 아니라 **사용자의 질문**으로 진입로를 놓는다. 수치는
+      render 가 findings_facets.json 에서 계산해 넘긴다(자료실 카드와 같은 계약 — 손으로
+      적은 수치는 반드시 낡는다). 데이터 없으면 섹션 미렌더. 실사관 문안은 037 정책
+      (순위·비교 금지) 준수 — "서명한 문서" 어휘만 쓴다. -#}
+  {% if findings_zone %}
+  <section class="section soft" id="records"><div class="wrap">
+    <span class="kick">Findings Database</span>
+    <h2 class="sec-title">주간 브리프의 원천 — 실사에서 실제 지적된 문장들</h2>
+    <p class="records-sub">브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 {{ findings_zone.documents }}건 · 지적사항 {{ findings_zone.findings }}건이 쌓여 있습니다.</p>
+    <div class="records-grid">
+      <a class="records-card" href="{{ rel_root }}findings/firm/index.html"><b>이 거래처, 과거에 무엇을 지적받았나요?</b><span>업체 이름으로 지적 이력 조회</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/inspector/index.html"><b>이 실사관이 서명한 문서에는 무엇이 있었나요?</b><span>실사관 이름으로 공개 문서 조회</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/checklist/index.html"><b>실사 준비, 무엇부터 점검할까요?</b><span>실제 지적 문장이 붙은 자가점검표</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/trends/index.html"><b>요즘 어떤 지적이 늘고 있나요?</b><span>최근 12개월 지적 경향</span></a>
+    </div>
+    <a class="records-all" href="{{ rel_root }}findings/index.html">규제 지적사항 전체 화면 →</a>
+  </div></section>
+  {% endif %}
+
   {#- 참여 존(#engage, 확정 재배치 2026-07-18 — 10차) — 인기 카드(Weekly Reactions)와 주간
       퀴즈 CTA 를 한 섹션으로 응집(인기 카드 먼저). 인기 카드 계약 불변: 게이트 없이 항상
       정적 렌더(빈 상태 = 골든 정본). popular.js(비골든)가 런타임에 031 RPC
@@ -185,6 +207,16 @@
   </div></section>
 </main>
 <style>
+/* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
+.records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
+.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.records-card{display:flex;flex-direction:column;gap:6px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
+.records-card:hover{border-color:var(--coral)}
+.records-card b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.45;word-break:keep-all}
+.records-card:hover b{color:var(--coral-2)}
+.records-card span{font-size:12.5px;color:var(--muted);word-break:keep-all}
+.records-all{display:inline-block;margin-top:16px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
+.records-all:hover{color:var(--coral)}
 /* 참여 존(#engage) — grm.css 토큰만(프리즈 보존). 스코프 한정. 퀴즈 배너는 인기 카드와
    28px 로 근접 배치해 한 존으로 읽히게 한다. */
 .popular-sub{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:10px 0 0;word-break:keep-all}

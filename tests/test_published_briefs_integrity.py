@@ -113,5 +113,99 @@ class NoEmptyProseSlotsInPublishedBriefs(unittest.TestCase):
             self.assertTrue(empty, f"{name}: 이제 빈 카드가 없다 — KNOWN_EMPTY 에서 제거할 것")
 
 
+class DetailTypeClassificationIsComplete(unittest.TestCase):
+    """결정론 상세 유형이 새로 생기면 **분류하라고 여기서 실패한다**.
+
+    `_card_has_source_body` 는 유형별 분류(서사 본문 / 사실표)로 판정하고, 미분류 유형은
+    런타임에서 fail-open(막지 않음)이다 — 새 상세가 생겼다고 발행이 갑자기 멎으면 안 되기
+    때문이다. 그 대신 표류를 여기서 잡는다. 이 검사가 없으면 새 유형이 **조용히** 게이트
+    밖에 머문다(이번 결함이 정확히 그 모양이었다 — whopir/NCR 35장이 검사 대상 밖이었다).
+    """
+
+    def test_every_published_detail_type_is_classified(self):
+        seen: set[str] = set()
+        for path in BRIEFS:
+            brief = json.loads(path.read_text(encoding="utf-8"))
+            for card in brief.get("cards") or []:
+                dd = card.get("deterministic_detail")
+                if isinstance(dd, dict) and dd.get("type"):
+                    seen.add(dd["type"])
+        self.assertTrue(seen, "발행분에 결정론 상세가 하나도 없다 — 스윕이 무의미")
+        known = apb._BODY_DETAIL_TYPES | apb._FACTS_DETAIL_TYPES
+        unclassified = sorted(seen - known)
+        self.assertEqual(
+            unclassified, [],
+            "분류되지 않은 결정론 상세 유형이 발행분에 있다 — "
+            "assemble_publish_brief 의 _BODY_DETAIL_TYPES(원문 서사 보유) 또는 "
+            "_FACTS_DETAIL_TYPES(사실표만) 중 하나에 넣어라: %s" % unclassified)
+
+    def test_classification_sets_are_disjoint(self):
+        overlap = sorted(apb._BODY_DETAIL_TYPES & apb._FACTS_DETAIL_TYPES)
+        self.assertEqual(overlap, [], f"두 집합에 동시에 든 유형: {overlap}")
+
+
+DELTAS = sorted((ROOT / "web" / "data" / "deltas").glob("delta_*.json"))
+
+
+def _delta_cards(delta: dict) -> dict:
+    """델타의 카드 맵 — 브리프와 **서식이 다르다**.
+
+    브리프 `cards` 는 리스트이고 카드 안에 `id` 가 있는데, 델타 `cards` 는
+    `{카드id: 카드}` **dict** 이고 카드 안에는 `id` 필드가 없다.
+    """
+    cards = delta.get("cards")
+    return cards if isinstance(cards, dict) else {}
+
+
+class NoFalseAbsenceInPublishedDeltas(unittest.TestCase):
+    """같은 산문이 델타에도 실린다 — 그런데 델타 카드에는 `deterministic_detail` 이 없다.
+
+    [2026-08-26] #795 는 브리프 3파일과 함께 **델타 3파일**도 손으로 고쳐야 했다. 즉 같은
+    거짓 부재가 델타에도 그대로 실려 있었는데, 위 브리프 스윕은 델타를 보지 않는다.
+
+    그렇다고 델타 카드를 `lint_false_absence_claims` 에 그냥 넣으면 안 된다 —
+    `_card_has_source_body` 가 전부 False 라 **조용한 0**이 된다(실측: 결함 11건이 실재하던
+    e346a2a 에서도 순진한 스윕은 0건, 브리프 조인은 11건). 본문 보유 여부는 같은 id 의
+    브리프 카드가 알고 있으므로 조인해서 판정한다.
+    """
+
+    @staticmethod
+    def _pairs():
+        for dpath in DELTAS:
+            bpath = ROOT / "web" / "data" / "briefs" / dpath.name.replace(
+                "delta_", "brief_web_")
+            if bpath.exists():
+                yield dpath, bpath
+
+    def test_join_actually_matches_cards(self):
+        """침묵 구멍 방지 — 조인이 0건을 훑고 통과하면 이 스윕은 없는 것과 같다."""
+        matched = 0
+        for dpath, bpath in self._pairs():
+            delta = json.loads(dpath.read_text(encoding="utf-8"))
+            brief = json.loads(bpath.read_text(encoding="utf-8"))
+            bmap = {c.get("id"): c for c in (brief.get("cards") or [])}
+            matched += sum(1 for cid in _delta_cards(delta) if cid in bmap)
+        self.assertGreater(matched, 0,
+                           "델타↔브리프 id 조인이 0건 — 서식이 바뀌었는지 확인하라")
+
+    def test_no_false_absence_claims_in_deltas(self):
+        for dpath, bpath in self._pairs():
+            delta = json.loads(dpath.read_text(encoding="utf-8"))
+            brief = json.loads(bpath.read_text(encoding="utf-8"))
+            bmap = {c.get("id"): c for c in (brief.get("cards") or [])}
+            errs = []
+            for cid, dcard in _delta_cards(delta).items():
+                bcard = bmap.get(cid)
+                if not (bcard and apb._card_has_source_body(bcard)):
+                    continue          # 본문을 못 받은 카드는 부재를 말해도 된다
+                probe = dict(dcard)
+                probe["id"] = cid
+                probe["deterministic_detail"] = bcard.get("deterministic_detail")
+                errs.extend(apb.lint_false_absence_claims([probe]))
+            with self.subTest(delta=dpath.name):
+                self.assertEqual(errs, [], f"{dpath.name}: 거짓 부재 서술\n  - "
+                                           + "\n  - ".join(errs))
+
+
 if __name__ == "__main__":
     unittest.main()

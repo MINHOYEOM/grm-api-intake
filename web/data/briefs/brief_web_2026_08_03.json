@@ -5827,6 +5827,12 @@
     "출하시험 함량 결과의 배치 간 편차 추이",
     "회수 대상 유통 물량 파악"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201501945",
+    "bizrno": "3078502513"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5891,6 +5897,13 @@
     "주사제 포장·밀봉 공정의 공정 중 검사",
     "회수 대상 로트의 유통 추적"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "199000353",
+    "std_cd": "8806429016903,8806429016910",
+    "bizrno": "6828500435"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -5959,6 +5972,12 @@
     "구성품 색상·표시 차이를 이용한 오포장 검출",
     "회수 등급 판단 근거 문서화"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Mifepristone 200 mg / Misoprostol 200 mcg",
+    "dosage_form": "Kit, Tablet",
+    "action": "Verify whether your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or if you have any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6027,6 +6046,12 @@
     "충전 전 용기 식별·라벨 검증",
     "등급 혼입 확인 시 유통 추적 방법"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "100%",
+    "dosage_form": "Gas",
+    "action": "Consult your healthcare provider for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6095,6 +6120,12 @@
     "완제 미생물한도 시험 주기와 규격",
     "액상 제품의 보존 효력 확인"
    ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "n/a",
+    "dosage_form": "Tincture",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product(s), or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints to Health Canada."
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6163,6 +6194,51 @@
     "안정성 OOS 발생 시 시판 배치 영향평가 절차",
     "반고형제 함량 균일성 관리"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "180,936 tubes",
+    "distribution": "USA Nationwide",
+    "code_info": "Lot #: 205060, Exp 09/30/2027",
+    "firm_location": "Minneapolis, MN, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-23"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-13"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-22"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "NYSTATIN"
+     },
+     {
+      "label": "성분명",
+      "value": "NYSTATIN"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA062225"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6231,6 +6307,51 @@
     "함량·pH 이탈 시 근본원인 조사 범위",
     "회수 시 브랜드별 통지 경로"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "106,301 units",
+    "distribution": "U.S Nationwide",
+    "code_info": "Lot: a) 1505121, 1504242, exp 2027-03; 1505132, 1505182, 1505191, 1505291, 1505331, exp 2027-04; b) 1504231, 1504311, exp 2027-03; 1505312, 1505321, exp 2027-04.",
+    "firm_location": "Belle Plaine, MN, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-25"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-14"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-22"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CVS HEALTH EARWAX REMOVAL DROPS EARWAX REMOVAL AID, CVS HEALTH EARWAX REMOVAL KIT"
+     },
+     {
+      "label": "성분명",
+      "value": "CARBAMIDE PEROXIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "M014"
+     }
+    ]
+   },
    "merged_count": 11,
    "merged_items": [
     "CVS Health, Carbamide Peroxide, 6.5%, 0.5 FL Oz (15 mL), a) Bottle (NDC 51316-822-00.); b) Kit (1 BULB, Syringe & Drops- NDC 51316-823-00.), Distributed by: CVS Pharmacy., Inc. One CVS Drive, Woonsocket, RI 02895,",
@@ -6311,6 +6432,55 @@
     "배지충진 실패 시 조사·CAPA 기록",
     "무균 보증 관련 일탈의 회수 판단 기준"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "44280 vials",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lot #: 1239521, 1237454, Exp. Date 10/2027",
+    "firm_location": "Cary, NC, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-06"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-14"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-22"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CLEVIPREX"
+     },
+     {
+      "label": "성분명",
+      "value": "CLEVIPIDINE"
+     },
+     {
+      "label": "주성분",
+      "value": "CLEVIDIPINE"
+     },
+     {
+      "label": "투여경로",
+      "value": "INTRAVENOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "NDA022156"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -6379,6 +6549,55 @@
     "실링 공정 파라미터 모니터링",
     "포장 결함 확인 시 로트 확대 조사 기준"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "43,066,599 units",
+    "distribution": "U.S.A. Nationwide",
+    "code_info": "Lots: 4062535, 4065201, 4066446, Exp. 2/28/2027; 4141090, Exp. 5/31/2027; 4180288, 4197695, 4197697, 4180291, Exp. 6/30/2027; 4219454, 4221945, 4221966, 4222853, 4224361, Exp. 7/31/2027; 4228482, 4248656, 4249026, 4248961, 4249818, 4250729, Exp. 8/31/2027; 5124984, 5127231, 5129058, 5126398, 5129488, Exp. 4/30/2028; 5130576, 5142947, 5147432, 5154673, 5154671, 5156442, 5157968, 5158031, 5150160, 5155824, Exp. 5/31/2028; 5176326, 5181676, 5181074, 5182660, 5188102, 5188103, Exp. 6/30/2028;  5195818, 5199118, 5209474, 5210853, 5211985, 5211907, 5211212, Exp. 7/31/2028;  5226576, 5227151, 5230531, 5241733, 5242057, 5243430, 5246952, 5248375, 5248189, Exp. 8/31/2028; 5254509, 5274692, 5276968, 5279226, 5280240, Exp. 9/30/2028; 5305661, 5307185, 5309623, 5310701, Exp. 10/31/2028; 5346128, 5350797, Exp. 12/31/2028; 6031034, 6031234, 6037918, Exp. 1/31/2029; 6051588, 6054213, 6062168, 6063361, Exp. 2/28/2029; 6069891, Exp. 3/31/2029; 6111107, Exp. 4/30/2029.",
+    "firm_location": "El Paso, TX, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-07-09"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-07-15"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-07-22"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "CHLORAPREP ONE-STEP"
+     },
+     {
+      "label": "성분명",
+      "value": "CHLORHEXIDINE GLUCONATE AND ISOPROPYL ALCOHOL"
+     },
+     {
+      "label": "주성분",
+      "value": "CHLORHEXIDINE GLUCONATE, ISOPROPYL ALCOHOL"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "NDA020832"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

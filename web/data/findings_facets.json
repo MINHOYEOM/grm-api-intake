@@ -1,10 +1,10 @@
 {
   "schema_version": "grm-findings-facets/v2",
-  "measured_on": "2026-08-19",
+  "measured_on": "2026-08-26",
   "min_findings": 20,
   "totals": {
-    "findings": 24850,
-    "documents": 6136
+    "findings": 24876,
+    "documents": 6147
   },
   "agency_labels": {
     "FDA": "미국 FDA",
@@ -21,8 +21,8 @@
           "key": "other_quality_system",
           "slug": "other-quality-system",
           "label_ko": "기타 품질시스템",
-          "findings": 4361,
-          "documents": 2667,
+          "findings": 4364,
+          "documents": 2670,
           "by_agency": [
             {
               "v": "HC",
@@ -34,7 +34,7 @@
             },
             {
               "v": "MFDS",
-              "c": 800
+              "c": 803
             },
             {
               "v": "EMA",
@@ -130,8 +130,8 @@
           "key": "aseptic_sterility_assurance",
           "slug": "aseptic-sterility-assurance",
           "label_ko": "무균보증/무균공정",
-          "findings": 3614,
-          "documents": 1363,
+          "findings": 3615,
+          "documents": 1364,
           "by_agency": [
             {
               "v": "FDA",
@@ -143,7 +143,7 @@
             },
             {
               "v": "MFDS",
-              "c": 41
+              "c": 42
             },
             {
               "v": "EMA",
@@ -243,8 +243,8 @@
           "key": "equipment_facility",
           "slug": "equipment-facility",
           "label_ko": "설비/시설",
-          "findings": 2872,
-          "documents": 1930,
+          "findings": 2876,
+          "documents": 1932,
           "by_agency": [
             {
               "v": "HC",
@@ -256,7 +256,7 @@
             },
             {
               "v": "MFDS",
-              "c": 42
+              "c": 46
             }
           ],
           "top_firms": [
@@ -348,8 +348,8 @@
           "key": "qc_lab_controls",
           "slug": "qc-lab-controls",
           "label_ko": "시험실/품질관리",
-          "findings": 2080,
-          "documents": 1546,
+          "findings": 2081,
+          "documents": 1547,
           "by_agency": [
             {
               "v": "FDA",
@@ -361,7 +361,7 @@
             },
             {
               "v": "MFDS",
-              "c": 46
+              "c": 47
             },
             {
               "v": "EMA",
@@ -570,8 +570,8 @@
           "key": "stability_storage",
           "slug": "stability-storage",
           "label_ko": "안정성/보관",
-          "findings": 1372,
-          "documents": 1203,
+          "findings": 1375,
+          "documents": 1205,
           "by_agency": [
             {
               "v": "HC",
@@ -583,7 +583,7 @@
             },
             {
               "v": "MFDS",
-              "c": 66
+              "c": 69
             }
           ],
           "top_firms": [
@@ -780,8 +780,8 @@
           "key": "complaint_recall",
           "slug": "complaint-recall",
           "label_ko": "불만/회수",
-          "findings": 1159,
-          "documents": 1065,
+          "findings": 1164,
+          "documents": 1070,
           "by_agency": [
             {
               "v": "HC",
@@ -789,7 +789,7 @@
             },
             {
               "v": "MFDS",
-              "c": 434
+              "c": 439
             },
             {
               "v": "FDA",
@@ -828,6 +828,56 @@
           ],
           "samples": [
             {
+              "finding_id": "finding-10e4e6eb434af9852ff89e50",
+              "text_ko": "레파넘정0.5밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+              "agency": "MFDS",
+              "firm_name": "(주)다림바이오텍",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-8f73bb8c848e"
+            },
+            {
+              "finding_id": "finding-6d17616142919c0ac08e38cd",
+              "text_ko": "레파넘정2밀리그람(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+              "agency": "MFDS",
+              "firm_name": "(주)다림바이오텍",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-6f749819c418"
+            },
+            {
+              "finding_id": "finding-7bfb26267c0be045927b0f34",
+              "text_ko": "레파넘정1밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+              "agency": "MFDS",
+              "firm_name": "(주)다림바이오텍",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-cb097b4e7a48"
+            },
+            {
+              "finding_id": "finding-aa060d47757cf7e79eb8ca45",
+              "text_ko": "파록시주(주성분 팔로노세트론염산염)의 시판 후 안정성시험 중 함량시험 결과가 부적합으로 확인됨에 따라, 영업자 회수를 실시하였다.",
+              "agency": "MFDS",
+              "firm_name": "하나제약(주)",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-b8b6f96d9b57"
+            },
+            {
+              "finding_id": "finding-b5ca8772b0ae29bf44c3d09f",
+              "text_ko": "「수성멸균거즈-엔」 제품에서 이물질 혼입이 확인되어 영업자 회수가 실시되었다.",
+              "agency": "MFDS",
+              "firm_name": "수성위생재료공업사",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-81a336d762e4"
+            },
+            {
               "finding_id": "finding-0880b9f515ed4c6594284337",
               "text_ko": "귀사는 품질관리부서에 적용되는 적절한 책임과 절차를 문서로 확립하지 않았고, 품질관리부서에 적용되는 문서화된 절차를 따르지 않았다(21 CFR 211.22(d)).\n\n불만 처리(Complaint Handling). 귀사의 품질부서(QU)는 절차가 확립되고 준수되도록 적절히 보장하지 않았다. 예를 들어 고객 불만 및 문의에 관한 절차가 부적절하다. 중대성과 이상반응을 판정하는 귀사의 접근방식은 조사의 지연과 불완전한 조사로 이어졌다. 또한 조사는 불만의 중대성이 아니라 거래처를 기준으로 이루어졌다. 아울러 적절한 불만 조사가 적시에 완료되지 않았다. 답변에서 귀사는 절차를 개정하고 과거 불만을 검토하여 중대한 사안이 적절히 조사되도록 하겠다고 약속했다. 귀사의 답변은 부적절하다. 귀사는 진행 중인 불만 조사의 현황이나 실사 종료 이후 추가 불만이 접수되었는지 여부를 제출하지 않았다.\n\n안정성 프로그램(Stability Program). 귀사의 QU 는 안정성시험이 프로그램 절차에 따라 수행되도록 보장하지 못했다. 귀사는 안정성 프로그램에 편입된 배치에 대해 안정성 시점을 누락하거나, 안정성 시험을 누락하거나, 잘못된 시험을 수행했다. 답변에서 귀사는 안정성 프로그램에 대한 적절한 QU 감독이 부족했음을 인정했다. 귀사는 외부 컨설턴트의 지원을 받아 영향평가를 수행하고 안정성 프로그램 절차를 개정하겠다고 약속했다. 귀사의 답변은 부적절하다. 미국 시장으로 유통된 제품 배치에 대해 불완전한 안정성시험의 영향을 어떻게 평가할 것인지에 관한 세부 내용을 제출하지 않았다.\n\n본 서한에 대한 답변으로 다음을 제출하라. 실사 최초일로부터 최근 3년간의 모든 불만에 대한 소급 검토를 포함하여, 전반적 불만처리 시스템에 대한 포괄적이고 독립적인 검토. 이 평가에는 다음이 포함되어야 하며 이에 국한되지 않는다. 불만의 성격 및 관련 잠재 위험. 최초 통지일 및 불만 제기자와의 후속 연락. 사진과 불만 검체를 확보하고 추가적인 맥락 정보를 얻기 위한 불만 제기자 후속조치의 시기와 충분성. 관련 불만 검체가 확보 가능했는지와 검체 확보 노력의 정도를 판정하라. 시도가 불충분했다면 검체 반환을 적절히 추진하지 않은 근본원인을 규명하라. 유사하거나 동일한 결함에 대한 장기 이력 검토. 불만으로 이어진 결함의 잠재적 원인 규명. 여기에는 규명된 근본원인과 관련한 과학적 정당성 및 근거가 적절히 문서화되었는지에 대한 평가가 포함된다. 불만이 회사 통제 밖의 요인(예: 사용자 오류)에 기인한 것으로 판단된 경우, 그 판단의 타당성과 그것이 결정적 정보에 근거한 것인지 아니면 결정적이지 않은 정보에 근거한 것인지를 평가하라. 제조/품질 개선(예: 제조 작업, 원자재, 공급업체, 품질관리)뿐 아니라 회수 또는 강화된 품질 감시(추가 시험/검사, 안정성 프로그램에 배치 추가)를 포함한 CAPA 조치. 소급 검토 결과 근본원인 또는 CAPA 가 불충분하여 미흡한 것으로 확인된 모든 불만 조사에 대해서는 제조 부문에 대한 철저한 분석(예: 배치 제조기록서, 제조 단계의 적절성, 설비·시설의 적합성, 원자재의 변동성, 공정능력, 일탈 이력, 불만 이력, 규격이탈(OOS) 이력, 배치 부적합 이력)을 수행하라. 이 독립적 검토를 토대로 모든 미비점과 필요한 개선사항을 규명하는 불만처리 시스템에 대한 포괄적 평가를 제출하라. 진행 중인 불만 조사의 검토 현황과 절차 개정 이후 추가 불만이 접수되었는지 여부.\n\n안정성 프로그램의 적절성을 보장하기 위한 포괄적이고 독립적인 평가 및 CAPA 계획. 개선된 프로그램에는 다음이 포함되어야 하며 이에 국한되지 않는다. 안정성지시(stability indicating) 시험법. 유통을 허용하기 전, 판매 용기·마개 시스템에 담긴 각 완제의약품에 대한 안정성 연구. 각 제품의 대표 배치를 매년 프로그램에 추가하여 유효기간 주장이 유효하게 유지되는지 판정하는 지속적 프로그램. 제품 유효기간 동안 변할 수 있는 각 품질특성을 포괄하는 프로그램의 일부로서, 각 시점(station, timepoint)에서 시험할 구체적 특성의 상세한 정의. 개선된 안정성 프로그램의 이러한 요소 및 기타 요소를 기술한 모든 절차.\n\n귀사의 품질시스템은 부적절하다. CGMP 규정 21 CFR 210부 및 211부의 요건을 충족하기 위한 품질시스템 및 위험관리 접근법 실행에 도움이 되는 FDA 가이던스 Quality Systems Approach to Pharmaceutical CGMP Regulations(https://www.fda.gov/media/71023/download)를 참조하라.\n\n품질부서의 권한(Quality Unit Authority). 귀사의 실사 이력은 QU 가 그 권한 및/또는 책임을 온전히 행사하지 못하고 있음을 보여준다. 귀사는 QU 가 그 책임을 수행하고 의약품 품질을 일관되게 보장할 수 있도록 적절한 권한과 충분한 자원을 제공해야 한다.\n\n의약품 생산 중단(Drug Production Suspended). 귀사가 본 시설에서 모든 OTC (b)(4) 의약품의 생산을 중단하기로 한 약속을 확인했다. FD&C Act 의 규제를 받는 제조 작업을 재개할 계획이라면, 의약품 제조 작업을 재개하기 전에 본 부서에 통지하라. 귀사가 지속적인 CGMP 준수 능력을 갖추도록 모든 미비점과 시스템적 결함을 해소할 책임은 귀사에 있다. FDA 에 대한 통지 시, 모든 CAPA 를 적절히 완료했음을 입증하는 개선조치 요약을 제출하라.",
               "agency": "FDA",
@@ -836,56 +886,6 @@
               "category_label_ko": "불만/회수",
               "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/kc-pharmaceuticals-inc-729870-08122026",
               "document_id": "c0f3b8ff757d"
-            },
-            {
-              "finding_id": "finding-c80384045a42ececc3a0bde6",
-              "text_ko": "글리미드정2mg(글리메피리드)에 대하여 이물 혼입 우려에 따라 영업자 회수가 실시되었다.",
-              "agency": "MFDS",
-              "firm_name": "구주제약(주)",
-              "published_date": "2026-08-13",
-              "category_label_ko": "불만/회수",
-              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
-              "document_id": "recall-8bd9bd12b54d"
-            },
-            {
-              "finding_id": "finding-b5e42ad7bf7eaff9b3998428",
-              "text_ko": "2026년 1월 29일 및 2026년 2월 26일에 정기 GMP 실사가 실시되었다. 치명적(critical) 2건, 중대(major) 4건, 기타(other) 3건의 결함이 확인되었다. 2건의 치명적 결함은 다음과 같다. 1. 진행 중인 안정성시험(ongoing stability study) 결과와 관련하여 인증된 동물용의약품의 품질을 보증할 수 없다. 진행 중인 안정성시험에서 다수의 규격외(out of specification) 결과가 보고되었으며, 그중 최소 4건은 Belgica de Weerd의 내부 규격을 벗어났다. 그럼에도 해당 배치를 회수하지 않고 당국에 보고하지 않은 근거는 불충분하였다. 진행 중인 안정성시험 배치의 규격외 결과를 수용한 근거는 항생제의 항균 범위(spectrum of action), 안전성, 치료역(therapeutic window), 서로 다른 유효성분의 상승작용, 항균제 내성(antimicrobial resistance)의 발현을 고려하지 않았다. 이는 동물의 안전과 공중보건에 위험을 초래한다. 또한 Belgica de Weerd는 진행 중인 안정성시험에서 유효성분 함량 규격으로 표시량(label claim)의 90%~110%를 사용하고 있다. 이 기준의 설정 근거에서도 항생제의 항균 범위, 안전성, 치료역, 상승작용, 항균제 내성의 발현이 고려되지 않았다. 이 기준은 제품별 조성의 차이를 고려한 근거 없이 모든 제품에 대하여 동일하게 설정되어 있다. 진행 중인 안정성시험의 규격외 결과에 대한 위험평가에서는 해당 결과가 시장에 유통된 배치에는 적용되지 않는다고 기술하고 있으나, 안정성시험 배치는 시장에 유통된 배치를 대표한다. 이는 시장에서 동물의 안전과 공중보건에 위험을 초래한다. 2. Belgica de Weerd는 GMP annex 16을 준수하지 않으며, 시장에 유통된 인증 제품의 품질을 충분히 보증할 수 없다. QP(품질책임자)는 허가 서류(registration dossier)에 접근할 수 없었으므로, 허가 서류상의 어떤 규격에 따라 배치를 인증하였는지 명확히 하지 못하였다. 이는 치명적인 규정 준수 위험을 초래한다. 여러 제품에서 배치 문서가 허가 서류상의 출하 규격에 부합하지 않았고, 위탁제조업체(CMO) 변경에 대한 변경허가(variation)가 관할 당국에 제출되지 않았음에도 새로운 위탁제조업체가 생산한 배치가 시장에 출하되었다. 위탁제조업체의 GMP 증명서가 취소된 이후에도 QP는 생산된 배치를 계속 출하하였다. 관할 당국(NCA)이 취하였거나 제안한 조치: 현재 유효한 GMP 증명서 No. NL/V 23/0006 의 취소. 관할 당국은 2026년 2월 실사에서 네덜란드 실사기관이 확인한 GMP 부적합(GMP NC)을 이유로 새로운 GMP 증명서를 발급하지 않는다. 이 결정은 2026년 7월 29일 공식 결정문으로 해당 업체에 통보되었다. 이 결정에 따라 네덜란드 관할 당국이 EudraGMDP에 부적합 보고서(NCS)를 등재하며, 이로써 현재의 GMP 증명서는 EudraGMDP에서 삭제된다. 이미 출하된 배치의 회수: 해당 제품들은 네덜란드(NL)와 루마니아(RO)에만 국가별로 허가되어 있다. 해당 의약품이 잠재적으로 필수(critical) 의약품인 경우, 판매허가권자(MAH)는 이를 관할 당국에 보고하여야 한다. 관할 당국은 특정 동물용의약품(VMP)이 해당 시장에 필수적인지 판단할 수 있으며, 위험평가에 근거하여 공급부족이 발생하는 경우 시장에 출하되도록 할 수 있다. 네덜란드 시장에 대해서는 이 정보가 아직 확보되지 않았다. 해당 동물용의약품이 필수 의약품으로 평가되는 경우 회수는 개시되지 않는다.",
-              "agency": "EMA",
-              "firm_name": "Belgica De Weerd B.V.",
-              "published_date": "2026-08-11",
-              "category_label_ko": "불만/회수",
-              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186968.pdf",
-              "document_id": "186968"
-            },
-            {
-              "finding_id": "finding-3a6b780be192e78c88176b15",
-              "text_ko": "셉타네스트주1/100,000 제품에서 첨부문서 일부(사용상의 주의사항)가 누락되어 영업자 회수를 실시하였다.",
-              "agency": "MFDS",
-              "firm_name": "신원덴탈(주)",
-              "published_date": "2026-08-06",
-              "category_label_ko": "불만/회수",
-              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
-              "document_id": "recall-28c806a97fb4"
-            },
-            {
-              "finding_id": "finding-82bbe044903729dbc1effc73",
-              "text_ko": "의약품과 관련된 서면 및 구두 불만(complaint)의 처리를 규정한 절차가 문서화되어 있지 않거나 준수되지 않았다.",
-              "agency": "FDA",
-              "firm_name": "Emcure Pharmaceuticals Limited",
-              "published_date": "2026-08-05",
-              "category_label_ko": "불만/회수",
-              "evidence_url": "https://www.fda.gov/media/194060/download",
-              "document_id": "fda483-194060"
-            },
-            {
-              "finding_id": "finding-945ec2643619375d6c7240dc",
-              "text_ko": "기타 [별표1] 11. 불만처리 규정과 관련하여 불만(complaint) 등급을 부여하고, 등급에 따른 처리기한을 설정하여 관리할 것을 지적했다.",
-              "agency": "MFDS",
-              "firm_name": "(주)킵스바이오파마",
-              "published_date": "2026-07-31",
-              "category_label_ko": "불만/회수",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l",
-              "document_id": "gmpinspect-1P_rHLDTS7l"
             }
           ]
         },
@@ -1002,8 +1002,8 @@
           "key": "contamination_control",
           "slug": "contamination-control",
           "label_ko": "오염/교차오염 관리",
-          "findings": 721,
-          "documents": 611,
+          "findings": 722,
+          "documents": 612,
           "by_agency": [
             {
               "v": "FDA",
@@ -1015,7 +1015,7 @@
             },
             {
               "v": "MFDS",
-              "c": 47
+              "c": 48
             },
             {
               "v": "EMA",
@@ -1640,8 +1640,8 @@
           "key": "documentation_records",
           "slug": "documentation-records",
           "label_ko": "문서화/기록관리",
-          "findings": 435,
-          "documents": 389,
+          "findings": 437,
+          "documents": 391,
           "by_agency": [
             {
               "v": "FDA",
@@ -1649,7 +1649,7 @@
             },
             {
               "v": "MFDS",
-              "c": 84
+              "c": 86
             },
             {
               "v": "HC",
@@ -1749,8 +1749,8 @@
           "key": "cleaning_validation",
           "slug": "cleaning-validation",
           "label_ko": "세척밸리데이션",
-          "findings": 380,
-          "documents": 348,
+          "findings": 382,
+          "documents": 350,
           "by_agency": [
             {
               "v": "HC",
@@ -1758,7 +1758,7 @@
             },
             {
               "v": "MFDS",
-              "c": 102
+              "c": 104
             },
             {
               "v": "FDA",
@@ -1858,8 +1858,8 @@
           "key": "validation_qualification",
           "slug": "validation-qualification",
           "label_ko": "밸리데이션/적격성평가",
-          "findings": 250,
-          "documents": 226,
+          "findings": 251,
+          "documents": 227,
           "by_agency": [
             {
               "v": "FDA",
@@ -1871,7 +1871,7 @@
             },
             {
               "v": "MFDS",
-              "c": 56
+              "c": 57
             },
             {
               "v": "MHRA",
@@ -2076,12 +2076,12 @@
           "key": "data_integrity",
           "slug": "data-integrity",
           "label_ko": "데이터 완전성",
-          "findings": 123,
-          "documents": 113,
+          "findings": 126,
+          "documents": 116,
           "by_agency": [
             {
               "v": "MFDS",
-              "c": 63
+              "c": 65
             },
             {
               "v": "FDA",
@@ -2089,7 +2089,7 @@
             },
             {
               "v": "EMA",
-              "c": 25
+              "c": 26
             },
             {
               "v": "MHRA",
@@ -2119,6 +2119,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-85c9f8fc374614d7bafb1a57",
+              "text_ko": "EDQM 실사 프로그램의 일환으로 제조소를 실사한 결과, EU GMP에 대한 지적사항 21건이 확인되었다. 이 중 1건은 공용 시설에서의 오염 및 교차오염 위험 관리가 미흡하여 critical(치명적)로 분류되었다. Workshop 2 및 칭량·분배구역(dispensing area)에 대한 위험평가와 오염관리전략(contamination control strategy)은 충분히 견고하지 않았고, 구체적이지 않았으며, 정당한 근거가 부족하고 실효적으로 이행되지 않았다. 특히 제품이 노출되는 작업, 갱의(gowning), 구역 및 설비 청결도, 자재 반입, 칭량·분배 작업, 잠재적 고역가(highly potent) 제품에 대한 공용 설비 사용에서 그러하였다. 또한 공용 시설에서 제조되는 원료의약품(API) 간 병용금기(contraindications)의 부재 여부가 일관되게 평가되지 않았다. 이는 환자 안전에 대한 잠재적 위험에 해당한다. 5건은 major(중대)로 분류되었으며 다음 영역과 관련되었다: 세척밸리데이션 및 세척 절차, 예방정비 및 설비 상태, 데이터 완전성(data integrity), 변경관리(change control), 배치 출하 및 CEP 적합성. 이 외에 15건의 기타 지적사항이 확인되었다(기록, 품질시스템, 인력 교육훈련, 교정, 표시기재 관리, 설비 적격성평가 등).\n\nNCA가 취했거나 제안한 조치: 품목허가 변경 요청 — LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.의 Workshop 2에서 제조된 API를 함유한 의약품에 대해서는, 해당 원료의약품 및 중간체 제조원을 삭제하거나 대체하기 위한 품목허가 평가를 검토하여야 한다. 아울러 본 GMP 부적합 확인서(statement of non-compliance)가 유효한 동안에는 해당 API 공급원에 의존하는 제품에 대해 신규 품목허가를 부여해서는 안 된다. 이미 출하된 배치의 회수 — 대체 공급원이 있고 공급부족 위험이 없는 경우, 관련 NCA는 MAH와 공동으로 수행한 평가에 따라 해당 의약품의 회수를 검토하여야 한다. 공급 금지 — 부적합의 성격을 고려할 때, 대체 공급원이 없고 공급부족 위험이 있는 경우를 제외하고는 공급 금지를 권고한다. CEP의 정지 또는 무효화(EDQM이 취할 조치) — EDQM은 LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.에 부여된 모든 CEP를 정지하기로 결정하였다. CEP 2013-019 Atracurium besilate, CEP 2021-236 Cisatracurium besilate, CEP 2017-271 Entecavir monohydrate (중간체).",
+              "agency": "EMA",
+              "firm_name": "Lianyungang Guike Pharmaceutical Co. Ltd.",
+              "published_date": "2026-08-21",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/187127.pdf",
+              "document_id": "187127"
+            },
             {
               "finding_id": "finding-3d710f617cf898e697e82b94",
               "text_ko": "[별표 1] 제1의2호 관련 '기타' 등급 지적사항이다. 데이터 완전성(data integrity) 전담 조직의 독립성이 확보되지 않았고, 전담 조직 구성도 미흡했다.",
@@ -2168,16 +2178,6 @@
               "category_label_ko": "데이터 완전성",
               "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l",
               "document_id": "gmpinspect-1P_rHLDTS7l"
-            },
-            {
-              "finding_id": "finding-27d36fca5040c74ebf84d4a1",
-              "text_ko": "품질경영 분야 기타 지적사항으로, [별표 1] 제1의2호에 따른 데이터 완전성(data integrity) 보증 절차에 대하여 추가설명자료를 제출할 것을 요구했다.",
-              "agency": "MFDS",
-              "firm_name": "에스피씨(주)",
-              "published_date": "2026-07-30",
-              "category_label_ko": "데이터 완전성",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H",
-              "document_id": "gmpinspect-1P_mcuE4K6H"
             }
           ]
         }
@@ -2515,12 +2515,12 @@
           "key": "KR",
           "slug": "kr",
           "label_ko": "대한민국",
-          "findings": 780,
-          "documents": 184,
+          "findings": 799,
+          "documents": 188,
           "by_agency": [
             {
               "v": "MFDS",
-              "c": 731
+              "c": 750
             },
             {
               "v": "FDA",
@@ -2717,8 +2717,8 @@
           "key": "CN",
           "slug": "cn",
           "label_ko": "중국",
-          "findings": 150,
-          "documents": 48,
+          "findings": 151,
+          "documents": 49,
           "by_agency": [
             {
               "v": "FDA",
@@ -2730,7 +2730,7 @@
             },
             {
               "v": "EMA",
-              "c": 8
+              "c": 9
             },
             {
               "v": "MHRA",
@@ -2760,6 +2760,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-85c9f8fc374614d7bafb1a57",
+              "text_ko": "EDQM 실사 프로그램의 일환으로 제조소를 실사한 결과, EU GMP에 대한 지적사항 21건이 확인되었다. 이 중 1건은 공용 시설에서의 오염 및 교차오염 위험 관리가 미흡하여 critical(치명적)로 분류되었다. Workshop 2 및 칭량·분배구역(dispensing area)에 대한 위험평가와 오염관리전략(contamination control strategy)은 충분히 견고하지 않았고, 구체적이지 않았으며, 정당한 근거가 부족하고 실효적으로 이행되지 않았다. 특히 제품이 노출되는 작업, 갱의(gowning), 구역 및 설비 청결도, 자재 반입, 칭량·분배 작업, 잠재적 고역가(highly potent) 제품에 대한 공용 설비 사용에서 그러하였다. 또한 공용 시설에서 제조되는 원료의약품(API) 간 병용금기(contraindications)의 부재 여부가 일관되게 평가되지 않았다. 이는 환자 안전에 대한 잠재적 위험에 해당한다. 5건은 major(중대)로 분류되었으며 다음 영역과 관련되었다: 세척밸리데이션 및 세척 절차, 예방정비 및 설비 상태, 데이터 완전성(data integrity), 변경관리(change control), 배치 출하 및 CEP 적합성. 이 외에 15건의 기타 지적사항이 확인되었다(기록, 품질시스템, 인력 교육훈련, 교정, 표시기재 관리, 설비 적격성평가 등).\n\nNCA가 취했거나 제안한 조치: 품목허가 변경 요청 — LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.의 Workshop 2에서 제조된 API를 함유한 의약품에 대해서는, 해당 원료의약품 및 중간체 제조원을 삭제하거나 대체하기 위한 품목허가 평가를 검토하여야 한다. 아울러 본 GMP 부적합 확인서(statement of non-compliance)가 유효한 동안에는 해당 API 공급원에 의존하는 제품에 대해 신규 품목허가를 부여해서는 안 된다. 이미 출하된 배치의 회수 — 대체 공급원이 있고 공급부족 위험이 없는 경우, 관련 NCA는 MAH와 공동으로 수행한 평가에 따라 해당 의약품의 회수를 검토하여야 한다. 공급 금지 — 부적합의 성격을 고려할 때, 대체 공급원이 없고 공급부족 위험이 있는 경우를 제외하고는 공급 금지를 권고한다. CEP의 정지 또는 무효화(EDQM이 취할 조치) — EDQM은 LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.에 부여된 모든 CEP를 정지하기로 결정하였다. CEP 2013-019 Atracurium besilate, CEP 2021-236 Cisatracurium besilate, CEP 2017-271 Entecavir monohydrate (중간체).",
+              "agency": "EMA",
+              "firm_name": "Lianyungang Guike Pharmaceutical Co. Ltd.",
+              "published_date": "2026-08-21",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/187127.pdf",
+              "document_id": "187127"
+            },
             {
               "finding_id": "finding-43251caa869ec06faa317218",
               "text_ko": "평가 결과 지적(보완)사항(Deficiencies)이 있었다. 제조 분야에서는 「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제6.1호와 관련하여 제조기록서를 작업과 동시에 작성하지 않았다(보완완료). 시험실 분야에서는 「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제11.1호와 관련하여 품질관리기록서에 시험 근거자료를 첨부하고 있지 않았으며(보완완료), 같은 규칙 [별표 1의2] 제6.2호와 관련하여 시약의 보관조건 관련 규정이 확인되지 않았다(보완완료). 담당 부서는 한약정책과이다.",
@@ -2807,16 +2817,6 @@
               "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
               "published_date": "2026-07-13",
               "category_label_ko": "시험실/품질관리",
-              "evidence_url": "https://www.fda.gov/media/193577/download",
-              "document_id": "fda483-193577"
-            },
-            {
-              "finding_id": "finding-6b4d49a5a5a43aab59665b0d",
-              "text_ko": "모든 주요 공정 파라미터가 관리되고 절차로부터의 모든 일탈이 정당화됨을 보장하고 문서화하기 위한 문서화된 절차 및 공정 관리 절차가 없다.",
-              "agency": "FDA",
-              "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
-              "published_date": "2026-07-13",
-              "category_label_ko": "일탈/CAPA/조사",
               "evidence_url": "https://www.fda.gov/media/193577/download",
               "document_id": "fda483-193577"
             }
@@ -3456,7 +3456,7 @@
       "excluded": [
         {
           "key": "",
-          "findings": 5291,
+          "findings": 5296,
           "reason": "국가 미상(원문에 표기 없음)"
         },
         {
@@ -3596,6 +3596,11 @@
         },
         {
           "key": "SK",
+          "findings": 1,
+          "reason": "표본 미달(<20)"
+        },
+        {
+          "key": "VN",
           "findings": 1,
           "reason": "표본 미달(<20)"
         }
@@ -3803,12 +3808,12 @@
           "key": "MFDS",
           "slug": "mfds",
           "label_ko": "식품의약품안전처",
-          "findings": 1983,
-          "documents": 1323,
+          "findings": 2008,
+          "documents": 1333,
           "by_agency": [
             {
               "v": "MFDS",
-              "c": 1983
+              "c": 2008
             }
           ],
           "top_firms": [
@@ -3835,64 +3840,54 @@
           ],
           "samples": [
             {
-              "finding_id": "finding-094fc3cfcdb11f59c8eaa56a",
-              "text_ko": "[별표 1] 제5.1호 마목 관련 '중요' 등급 지적사항이다. 기준서 및 SOP에 대한 정기점검을 실시하지 않았다.",
+              "finding_id": "finding-10e4e6eb434af9852ff89e50",
+              "text_ko": "레파넘정0.5밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
               "agency": "MFDS",
-              "firm_name": "나주신일가스주식회사",
-              "published_date": "2026-08-18",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIUNN",
-              "document_id": "gmpinspect-1Q0I8CiIUNN"
+              "firm_name": "(주)다림바이오텍",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-8f73bb8c848e"
             },
             {
-              "finding_id": "finding-3d710f617cf898e697e82b94",
-              "text_ko": "[별표 1] 제1의2호 관련 '기타' 등급 지적사항이다. 데이터 완전성(data integrity) 전담 조직의 독립성이 확보되지 않았고, 전담 조직 구성도 미흡했다.",
+              "finding_id": "finding-6d17616142919c0ac08e38cd",
+              "text_ko": "레파넘정2밀리그람(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
               "agency": "MFDS",
-              "firm_name": "나주신일가스주식회사",
-              "published_date": "2026-08-18",
-              "category_label_ko": "데이터 완전성",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIUNN",
-              "document_id": "gmpinspect-1Q0I8CiIUNN"
+              "firm_name": "(주)다림바이오텍",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-6f749819c418"
             },
             {
-              "finding_id": "finding-51abc32ad798c31b7843125e",
-              "text_ko": "품질 분야의 '중요' 등급 지적사항으로 [별표 1] 제3.4호에 해당한다. GMP 위원회의 정기회의를 실시하지 않았고 그 기록도 관리하지 않았다.",
+              "finding_id": "finding-7bfb26267c0be045927b0f34",
+              "text_ko": "레파넘정1밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
               "agency": "MFDS",
-              "firm_name": "나주신일가스주식회사",
-              "published_date": "2026-08-18",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIUNN",
-              "document_id": "gmpinspect-1Q0I8CiIUNN"
+              "firm_name": "(주)다림바이오텍",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-cb097b4e7a48"
             },
             {
-              "finding_id": "finding-a037e5ad923291f652bed5ec",
-              "text_ko": "[별표 1] 제3.2호 관련 '기타' 등급 지적사항이다. 제조부서책임자가 위임할 수 없는 업무에 대한 대행자 지정이 미흡했다.",
+              "finding_id": "finding-aa060d47757cf7e79eb8ca45",
+              "text_ko": "파록시주(주성분 팔로노세트론염산염)의 시판 후 안정성시험 중 함량시험 결과가 부적합으로 확인됨에 따라, 영업자 회수를 실시하였다.",
               "agency": "MFDS",
-              "firm_name": "나주신일가스주식회사",
-              "published_date": "2026-08-18",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIUNN",
-              "document_id": "gmpinspect-1Q0I8CiIUNN"
+              "firm_name": "하나제약(주)",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-b8b6f96d9b57"
             },
             {
-              "finding_id": "finding-df30115d4427fa7d4ae973ae",
-              "text_ko": "[별표 1] 제3.2호 다목 관련 '기타' 등급 지적사항이다. 의료용 가스 제품의 선입선출 및 재고 관리가 미흡했다.",
+              "finding_id": "finding-b5ca8772b0ae29bf44c3d09f",
+              "text_ko": "「수성멸균거즈-엔」 제품에서 이물질 혼입이 확인되어 영업자 회수가 실시되었다.",
               "agency": "MFDS",
-              "firm_name": "나주신일가스주식회사",
-              "published_date": "2026-08-18",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIUNN",
-              "document_id": "gmpinspect-1Q0I8CiIUNN"
-            },
-            {
-              "finding_id": "finding-18d958c1b33c14c27beee8c1",
-              "text_ko": "[별표 1] 제2.3호 가목 관련 '기타' 등급 지적사항이다. 청정구역(critical area) 관리 기준과 환경 및 작업원 모니터링에 관한 기준서의 현행화가 미흡했다.",
-              "agency": "MFDS",
-              "firm_name": "(주)카이바이오텍",
-              "published_date": "2026-08-18",
-              "category_label_ko": "기타 품질시스템",
-              "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIsRn",
-              "document_id": "gmpinspect-1Q0I8CiIsRn"
+              "firm_name": "수성위생재료공업사",
+              "published_date": "2026-08-19",
+              "category_label_ko": "불만/회수",
+              "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+              "document_id": "recall-81a336d762e4"
             }
           ]
         },
@@ -3900,12 +3895,12 @@
           "key": "EMA",
           "slug": "ema",
           "label_ko": "유럽 EMA",
-          "findings": 76,
-          "documents": 76,
+          "findings": 77,
+          "documents": 77,
           "by_agency": [
             {
               "v": "EMA",
-              "c": 76
+              "c": 77
             }
           ],
           "top_firms": [
@@ -3931,6 +3926,16 @@
             }
           ],
           "samples": [
+            {
+              "finding_id": "finding-85c9f8fc374614d7bafb1a57",
+              "text_ko": "EDQM 실사 프로그램의 일환으로 제조소를 실사한 결과, EU GMP에 대한 지적사항 21건이 확인되었다. 이 중 1건은 공용 시설에서의 오염 및 교차오염 위험 관리가 미흡하여 critical(치명적)로 분류되었다. Workshop 2 및 칭량·분배구역(dispensing area)에 대한 위험평가와 오염관리전략(contamination control strategy)은 충분히 견고하지 않았고, 구체적이지 않았으며, 정당한 근거가 부족하고 실효적으로 이행되지 않았다. 특히 제품이 노출되는 작업, 갱의(gowning), 구역 및 설비 청결도, 자재 반입, 칭량·분배 작업, 잠재적 고역가(highly potent) 제품에 대한 공용 설비 사용에서 그러하였다. 또한 공용 시설에서 제조되는 원료의약품(API) 간 병용금기(contraindications)의 부재 여부가 일관되게 평가되지 않았다. 이는 환자 안전에 대한 잠재적 위험에 해당한다. 5건은 major(중대)로 분류되었으며 다음 영역과 관련되었다: 세척밸리데이션 및 세척 절차, 예방정비 및 설비 상태, 데이터 완전성(data integrity), 변경관리(change control), 배치 출하 및 CEP 적합성. 이 외에 15건의 기타 지적사항이 확인되었다(기록, 품질시스템, 인력 교육훈련, 교정, 표시기재 관리, 설비 적격성평가 등).\n\nNCA가 취했거나 제안한 조치: 품목허가 변경 요청 — LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.의 Workshop 2에서 제조된 API를 함유한 의약품에 대해서는, 해당 원료의약품 및 중간체 제조원을 삭제하거나 대체하기 위한 품목허가 평가를 검토하여야 한다. 아울러 본 GMP 부적합 확인서(statement of non-compliance)가 유효한 동안에는 해당 API 공급원에 의존하는 제품에 대해 신규 품목허가를 부여해서는 안 된다. 이미 출하된 배치의 회수 — 대체 공급원이 있고 공급부족 위험이 없는 경우, 관련 NCA는 MAH와 공동으로 수행한 평가에 따라 해당 의약품의 회수를 검토하여야 한다. 공급 금지 — 부적합의 성격을 고려할 때, 대체 공급원이 없고 공급부족 위험이 있는 경우를 제외하고는 공급 금지를 권고한다. CEP의 정지 또는 무효화(EDQM이 취할 조치) — EDQM은 LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.에 부여된 모든 CEP를 정지하기로 결정하였다. CEP 2013-019 Atracurium besilate, CEP 2021-236 Cisatracurium besilate, CEP 2017-271 Entecavir monohydrate (중간체).",
+              "agency": "EMA",
+              "firm_name": "Lianyungang Guike Pharmaceutical Co. Ltd.",
+              "published_date": "2026-08-21",
+              "category_label_ko": "데이터 완전성",
+              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/187127.pdf",
+              "document_id": "187127"
+            },
             {
               "finding_id": "finding-b5e42ad7bf7eaff9b3998428",
               "text_ko": "2026년 1월 29일 및 2026년 2월 26일에 정기 GMP 실사가 실시되었다. 치명적(critical) 2건, 중대(major) 4건, 기타(other) 3건의 결함이 확인되었다. 2건의 치명적 결함은 다음과 같다. 1. 진행 중인 안정성시험(ongoing stability study) 결과와 관련하여 인증된 동물용의약품의 품질을 보증할 수 없다. 진행 중인 안정성시험에서 다수의 규격외(out of specification) 결과가 보고되었으며, 그중 최소 4건은 Belgica de Weerd의 내부 규격을 벗어났다. 그럼에도 해당 배치를 회수하지 않고 당국에 보고하지 않은 근거는 불충분하였다. 진행 중인 안정성시험 배치의 규격외 결과를 수용한 근거는 항생제의 항균 범위(spectrum of action), 안전성, 치료역(therapeutic window), 서로 다른 유효성분의 상승작용, 항균제 내성(antimicrobial resistance)의 발현을 고려하지 않았다. 이는 동물의 안전과 공중보건에 위험을 초래한다. 또한 Belgica de Weerd는 진행 중인 안정성시험에서 유효성분 함량 규격으로 표시량(label claim)의 90%~110%를 사용하고 있다. 이 기준의 설정 근거에서도 항생제의 항균 범위, 안전성, 치료역, 상승작용, 항균제 내성의 발현이 고려되지 않았다. 이 기준은 제품별 조성의 차이를 고려한 근거 없이 모든 제품에 대하여 동일하게 설정되어 있다. 진행 중인 안정성시험의 규격외 결과에 대한 위험평가에서는 해당 결과가 시장에 유통된 배치에는 적용되지 않는다고 기술하고 있으나, 안정성시험 배치는 시장에 유통된 배치를 대표한다. 이는 시장에서 동물의 안전과 공중보건에 위험을 초래한다. 2. Belgica de Weerd는 GMP annex 16을 준수하지 않으며, 시장에 유통된 인증 제품의 품질을 충분히 보증할 수 없다. QP(품질책임자)는 허가 서류(registration dossier)에 접근할 수 없었으므로, 허가 서류상의 어떤 규격에 따라 배치를 인증하였는지 명확히 하지 못하였다. 이는 치명적인 규정 준수 위험을 초래한다. 여러 제품에서 배치 문서가 허가 서류상의 출하 규격에 부합하지 않았고, 위탁제조업체(CMO) 변경에 대한 변경허가(variation)가 관할 당국에 제출되지 않았음에도 새로운 위탁제조업체가 생산한 배치가 시장에 출하되었다. 위탁제조업체의 GMP 증명서가 취소된 이후에도 QP는 생산된 배치를 계속 출하하였다. 관할 당국(NCA)이 취하였거나 제안한 조치: 현재 유효한 GMP 증명서 No. NL/V 23/0006 의 취소. 관할 당국은 2026년 2월 실사에서 네덜란드 실사기관이 확인한 GMP 부적합(GMP NC)을 이유로 새로운 GMP 증명서를 발급하지 않는다. 이 결정은 2026년 7월 29일 공식 결정문으로 해당 업체에 통보되었다. 이 결정에 따라 네덜란드 관할 당국이 EudraGMDP에 부적합 보고서(NCS)를 등재하며, 이로써 현재의 GMP 증명서는 EudraGMDP에서 삭제된다. 이미 출하된 배치의 회수: 해당 제품들은 네덜란드(NL)와 루마니아(RO)에만 국가별로 허가되어 있다. 해당 의약품이 잠재적으로 필수(critical) 의약품인 경우, 판매허가권자(MAH)는 이를 관할 당국에 보고하여야 한다. 관할 당국은 특정 동물용의약품(VMP)이 해당 시장에 필수적인지 판단할 수 있으며, 위험평가에 근거하여 공급부족이 발생하는 경우 시장에 출하되도록 할 수 있다. 네덜란드 시장에 대해서는 이 정보가 아직 확보되지 않았다. 해당 동물용의약품이 필수 의약품으로 평가되는 경우 회수는 개시되지 않는다.",
@@ -3980,16 +3985,6 @@
               "category_label_ko": "컴퓨터화시스템",
               "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186348.pdf",
               "document_id": "186348"
-            },
-            {
-              "finding_id": "finding-5fdc11a0e469dc7edb5f8e92",
-              "text_ko": "2026년 4월, 원료의약품(API) Diosmin 제조에 대해 최초로 현장 GMP 실사가 수행되었다. 이는 Part II EU GMP 가이드라인 및 승인된 CEP 문서(CEP 2016-173)의 준수 여부를 평가하기 위한 EDQM 실사 프로그램의 일환이었다. 조사관들은 중대(critical) 1건, 주요(major) 8건, 기타(other) 17건의 결함 및 CEP 문서/CEP 소유자 책임 위반 4건을 확인하였다. 중대 결함은 HPLC 시스템을 사용해 QC 실험실에서 생성된 데이터의 유효성 및 완전성과 관련되었다. 유연물질(related substances) 및 함량(assay) 시험이 회사 내부 분석법이나 CEP 문서에 따라 항상 수행되지 않아 Diosmin API의 최종 출하 결과를 항상 신뢰할 수 없었다. 구체적으로, 다수 배치 분석의 시퀀스에 시스템적합성(system suitability) 및 표준품(reference standard (a)) 주입이 포함되지 않았다. 2023년 초 이후 유럽에 출하된 30개 배치 중 24개 배치가 시료 분석과 동일한 시퀀스 내 시스템적합성 및 표준품(a) 주입 없이 시험되었다. 이러한 분석은 시료 분석 전(예: 최대 14일 전) 또는 후(예: 최대 12일 후)에 수행된 다른 시퀀스의 시스템적합성 및 표준품 주입을 참조하였다. 따라서 이 데이터가 도출된 시퀀스는 제품 출하를 뒷받침할 유효한 것으로 볼 수 없었다. 누락된 시스템적합성 시험, 부재하거나 불완전한 시료 접수 기록, 특정 배치에 대한 추적성 결여 등 HPLC 관리에 상당한 공백이 확인되었다. 문서가 배치 분류(예: R&D 대 생산)를 뒷받침하지 못했고, 동일 배치의 중복 분석이 명확히 구분되지 않아 시료 혼동 위험을 초래하였다. 또한 데이터 백업 절차가 불완전했고, 시스템 접근 권한이 SOP에 따라 관리되지 않아 QP에게 부적절한 권한이 부여되었다. 주요 결함 8건은 자재 및 회수자재의 부적합 판정·재사용, 품질경영, 공정 장비, 문서 및 기록, 생산 및 공정중관리, 원료의약품 및 중간체의 포장·표시와 관련하여 확인되었다.\n\n당국(NCA)이 취한/제안한 조치: 시판허가 정지. 이미 출하된 배치의 회수. 2023~2025년 EU에 출하된 Diosmin 배치 목록: PXC03231109, PXC03231110, PXC03240438, PXC03240439, PXC03240440, PXC03240441, PXC03240442, PXC03240821, PXC03241219, PXC03250401, PXC03250508, PXC03250524, PXC03250624, PXC03250625, PXC03250809, PXC03250810, PXC03251023, PXC03251024, PXC03251025, PXC03251026, PXC03251027, PXC03251223, PXC03251224, PXC03251225. API Diosmin 공급 금지. CEP의 정지 또는 무효화(EDQM이 취할 조치): CEP 2016-173/Diosmin 및 CEP 2024-194/Diosmin, micronized; 두 CEP 모두 2026년 6월 11일 EDQM에 의해 정지되었다.",
-              "agency": "EMA",
-              "firm_name": "Sichuan New Hawk Biotechnology Co. Ltd.",
-              "published_date": "2026-07-03",
-              "category_label_ko": "컴퓨터화시스템",
-              "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/186143.pdf",
-              "document_id": "186143"
             }
           ]
         }
@@ -4965,8 +4960,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 800,
-        "documents": 625,
+        "findings": 803,
+        "documents": 628,
         "top_firms": [
           {
             "firm_name": "미래바이오제약(주)",
@@ -5820,8 +5815,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 434,
-        "documents": 434,
+        "findings": 439,
+        "documents": 439,
         "top_firms": [
           {
             "firm_name": "환인제약(주)",
@@ -5846,6 +5841,56 @@
         ],
         "samples": [
           {
+            "finding_id": "finding-10e4e6eb434af9852ff89e50",
+            "text_ko": "레파넘정0.5밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+            "agency": "MFDS",
+            "firm_name": "(주)다림바이오텍",
+            "published_date": "2026-08-19",
+            "category_label_ko": "불만/회수",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+            "document_id": "recall-8f73bb8c848e"
+          },
+          {
+            "finding_id": "finding-6d17616142919c0ac08e38cd",
+            "text_ko": "레파넘정2밀리그람(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+            "agency": "MFDS",
+            "firm_name": "(주)다림바이오텍",
+            "published_date": "2026-08-19",
+            "category_label_ko": "불만/회수",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+            "document_id": "recall-6f749819c418"
+          },
+          {
+            "finding_id": "finding-7bfb26267c0be045927b0f34",
+            "text_ko": "레파넘정1밀리그램(주성분 레파글리니드)에서 불순물 N-nitroso-melumine이 기준을 초과하여 검출됨에 따라, 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+            "agency": "MFDS",
+            "firm_name": "(주)다림바이오텍",
+            "published_date": "2026-08-19",
+            "category_label_ko": "불만/회수",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+            "document_id": "recall-cb097b4e7a48"
+          },
+          {
+            "finding_id": "finding-aa060d47757cf7e79eb8ca45",
+            "text_ko": "파록시주(주성분 팔로노세트론염산염)의 시판 후 안정성시험 중 함량시험 결과가 부적합으로 확인됨에 따라, 영업자 회수를 실시하였다.",
+            "agency": "MFDS",
+            "firm_name": "하나제약(주)",
+            "published_date": "2026-08-19",
+            "category_label_ko": "불만/회수",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+            "document_id": "recall-b8b6f96d9b57"
+          },
+          {
+            "finding_id": "finding-b5ca8772b0ae29bf44c3d09f",
+            "text_ko": "「수성멸균거즈-엔」 제품에서 이물질 혼입이 확인되어 영업자 회수가 실시되었다.",
+            "agency": "MFDS",
+            "firm_name": "수성위생재료공업사",
+            "published_date": "2026-08-19",
+            "category_label_ko": "불만/회수",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+            "document_id": "recall-81a336d762e4"
+          },
+          {
             "finding_id": "finding-c80384045a42ececc3a0bde6",
             "text_ko": "글리미드정2mg(글리메피리드)에 대하여 이물 혼입 우려에 따라 영업자 회수가 실시되었다.",
             "agency": "MFDS",
@@ -5854,56 +5899,6 @@
             "category_label_ko": "불만/회수",
             "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
             "document_id": "recall-8bd9bd12b54d"
-          },
-          {
-            "finding_id": "finding-3a6b780be192e78c88176b15",
-            "text_ko": "셉타네스트주1/100,000 제품에서 첨부문서 일부(사용상의 주의사항)가 누락되어 영업자 회수를 실시하였다.",
-            "agency": "MFDS",
-            "firm_name": "신원덴탈(주)",
-            "published_date": "2026-08-06",
-            "category_label_ko": "불만/회수",
-            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
-            "document_id": "recall-28c806a97fb4"
-          },
-          {
-            "finding_id": "finding-945ec2643619375d6c7240dc",
-            "text_ko": "기타 [별표1] 11. 불만처리 규정과 관련하여 불만(complaint) 등급을 부여하고, 등급에 따른 처리기한을 설정하여 관리할 것을 지적했다.",
-            "agency": "MFDS",
-            "firm_name": "(주)킵스바이오파마",
-            "published_date": "2026-07-31",
-            "category_label_ko": "불만/회수",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rHLDTS7l",
-            "document_id": "gmpinspect-1P_rHLDTS7l"
-          },
-          {
-            "finding_id": "finding-d18d2df4fa6c3e7e98940d74",
-            "text_ko": "일동제약(주)의 '일동아드리아마이신피.에프.에스.주사액10밀리그램(독소루비신염산염)'에 대해 유통 중 포장불량 우려가 확인되어 영업자 회수가 실시되었다.",
-            "agency": "MFDS",
-            "firm_name": "일동제약(주)",
-            "published_date": "2026-07-29",
-            "category_label_ko": "불만/회수",
-            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
-            "document_id": "recall-ada7ac9cbd75"
-          },
-          {
-            "finding_id": "finding-5bb36e190773722fb0c1294d",
-            "text_ko": "탁소젠주사(도세탁셀삼수화물)는 시판 후 안정성 시험에서 함량 및 유연물질(개개유연물질, 총유연물질) 시험 기준을 초과함에 따라 영업자 회수가 이루어졌다.",
-            "agency": "MFDS",
-            "firm_name": "일동제약(주)",
-            "published_date": "2026-07-23",
-            "category_label_ko": "불만/회수",
-            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
-            "document_id": "recall-11821a98ac66"
-          },
-          {
-            "finding_id": "finding-8e8610e61e22c70f5286bb5c",
-            "text_ko": "코프라졸정20밀리그램(에스오메프라졸마그네슘삼수화물)은 유통 중 정제 깨짐 우려에 따라 영업자 회수가 이루어졌다.",
-            "agency": "MFDS",
-            "firm_name": "코오롱제약(주)",
-            "published_date": "2026-07-22",
-            "category_label_ko": "불만/회수",
-            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
-            "document_id": "recall-73863335b83b"
           }
         ]
       },
@@ -7150,8 +7145,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 102,
-        "documents": 79,
+        "findings": 104,
+        "documents": 81,
         "top_firms": [
           {
             "firm_name": "(주)엔탭허브",
@@ -7340,8 +7335,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 84,
-        "documents": 80,
+        "findings": 86,
+        "documents": 82,
         "top_firms": [
           {
             "firm_name": "(주)듀켐바이오",
@@ -7625,8 +7620,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 66,
-        "documents": 54,
+        "findings": 69,
+        "documents": 56,
         "top_firms": [
           {
             "firm_name": "일양약품(주)",
@@ -7720,8 +7715,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 63,
-        "documents": 56,
+        "findings": 65,
+        "documents": 58,
         "top_firms": [
           {
             "firm_name": "(주)킵스바이오파마",
@@ -7910,8 +7905,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 56,
-        "documents": 42,
+        "findings": 57,
+        "documents": 43,
         "top_firms": [
           {
             "firm_name": "(주)휴메딕스",
@@ -8005,8 +8000,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 47,
-        "documents": 43,
+        "findings": 48,
+        "documents": 44,
         "top_firms": [
           {
             "firm_name": "주식회사 케이앤제이씨",
@@ -8089,6 +8084,196 @@
             "category_label_ko": "오염/교차오염 관리",
             "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026003016",
             "document_id": "admin-2026003016"
+          }
+        ]
+      },
+      {
+        "key": "qc_lab_controls|MFDS",
+        "category_key": "qc_lab_controls",
+        "category_slug": "qc-lab-controls",
+        "category_label_ko": "시험실/품질관리",
+        "agency_key": "MFDS",
+        "agency_label_ko": "식품의약품안전처",
+        "slug": "mfds",
+        "findings": 47,
+        "documents": 43,
+        "top_firms": [
+          {
+            "firm_name": "(주)인트로바이오파마",
+            "c": 2
+          },
+          {
+            "firm_name": "EN Otsuka Pharmaceutical Co., Ltd.",
+            "c": 2
+          },
+          {
+            "firm_name": "에스티팜주식회사",
+            "c": 2
+          },
+          {
+            "firm_name": "이연제약(주)",
+            "c": 2
+          },
+          {
+            "firm_name": "한국코러스(주)",
+            "c": 2
+          }
+        ],
+        "samples": [
+          {
+            "finding_id": "finding-ad6dc50403e1cdce6318947d",
+            "text_ko": "시험실 분야 기타 지적사항으로, [별표 1] 제4.2호에 따른 불순물 전주기 안전관리 체계에 대하여 추가설명자료를 제출할 것을 요구했다.",
+            "agency": "MFDS",
+            "firm_name": "에스피씨(주)",
+            "published_date": "2026-07-30",
+            "category_label_ko": "시험실/품질관리",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H",
+            "document_id": "gmpinspect-1P_mcuE4K6H"
+          },
+          {
+            "finding_id": "finding-d785f46b232148097050bca3",
+            "text_ko": "기타 지적사항으로, [별표 1] 제3.1호 다목에 따라 품질관리 업무를 적절히 수행할 수 있도록 관련 추가 설명 자료(충분한 인원 확보 등)를 제출할 것을 요구했다.",
+            "agency": "MFDS",
+            "firm_name": "(주)유케이케미팜",
+            "published_date": "2026-07-30",
+            "category_label_ko": "시험실/품질관리",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE47q1",
+            "document_id": "gmpinspect-1P_mcuE47q1"
+          },
+          {
+            "finding_id": "finding-cf639b206f1ebad46fcb3262",
+            "text_ko": "「기준서 미준수」 ○ 의약품 제조업자는 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제9호가목 [별표1] 의약품 제조 및 품질관리기준을 준수하여, 자사 기준서 ‘변경관리 규정(문서번호: HS-G-04D01)’에 따라 방법 및 절차의 변경 시 근거 및 필요한 정보를 포함한 변경요청서를 작성하고 변경을 요청하여야 한다. 그러나 ① 동 업체는 ‘한신감치원액(갈근탕), 한신평장환, 한신안티캄캡슐(은교산)’의 기준 및 시험방법에서 함량시험(감초 중 글리시리진산의 정량) 방법을 「대한민국약전 외 한약(생약)규격 생약시험법」 제1법에서 제2법으로 변경하였음에도 이를 변경요청하지 않았다. ② 또한 ‘한신궁하탕연조엑스(단미엑스혼합제), 한신오적산연조엑스(단미엑스혼합제)’의 기준 및 시험방법 중 함량시험(감초연조엑스 중 글리시리진산) 방법을 「대한민국약전 외 한약(생약)규격 생약시험법」 제1법에서 제2법으로 변경하였음에도 이를 변경요청하지 않았다. ※ 상기 제품은 기준 및 시험방법을 ‘대한민국약전 외 한약(생약)규격 생약시험법 중 감초의 함량시험법에 따라 시험한다’로 허가받은 제품이다. 「변경 미신고」 ○ 「약사법」 제31조제9항 및 「의약품안전규칙」 제8조제1항에 따라 의약품 제조업자가 신고한 사항을 변경하려는 경우 변경신고를 하여야 하나, 동 업체는 ‘메시마엑스산(상황)’의 허가받은 기준 및 시험방법 중 함량시험(상황균사체엑스)의 조작조건을 변경하였음에도 이를 변경신고하지 않았다.",
+            "agency": "MFDS",
+            "firm_name": "(주)한국신약",
+            "published_date": "2026-07-23",
+            "category_label_ko": "시험실/품질관리",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005814",
+            "document_id": "admin-2026005814"
+          },
+          {
+            "finding_id": "finding-aa8aac6940d4ae80161b1107",
+            "text_ko": "알파제약(주)는 적합판정 취소 제도가 시행된 '22.12.11. 이후부터 점검일('26.4.8.~4.10.)까지, 히드록시프로필셀룰로오스, 스테아르산마그네슘, 에탄올, 로얄젤리, 메틸렌클로라이드, 소르비톨액, 농글리세린, 저치환도히드록시프로필셀룰로오스, 폴리에틸렌글리콜4000, 히프로멜로오스 등 10개 원료에 대하여 반복적으로 해당 원료의 시험항목 중 일부 시험을 실시하지 않은 채 거짓으로 시험성적서를 작성하였다. 그리고 이를 근거로 적합판정한 후 완제의약품 '트리페린정' 등 16개 품목의 제조에 사용하여 판매한 사실이 확인되었다.",
+            "agency": "MFDS",
+            "firm_name": "알파제약(주)",
+            "published_date": "2026-07-22",
+            "category_label_ko": "시험실/품질관리",
+            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005894",
+            "document_id": "admin-2026005894"
+          },
+          {
+            "finding_id": "finding-2094f3a1d8647177a450c29c",
+            "text_ko": "시험실 기타 [별표 1] 제7.1호 검체채취 관리에 대한 추가 설명자료를 제출해야 한다.",
+            "agency": "MFDS",
+            "firm_name": "(주)아이월드제약",
+            "published_date": "2026-07-14",
+            "category_label_ko": "시험실/품질관리",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-NZn",
+            "document_id": "gmpinspect-1PzTi7L-NZn"
+          },
+          {
+            "finding_id": "finding-35a8913d93eee4c738bbdf87",
+            "text_ko": "시험실 기타 [별표 1] 제7.1호 시험기록(예: 시액 조제 등) 관리에 대한 추가 자료를 제출해야 한다.",
+            "agency": "MFDS",
+            "firm_name": "석전의료공업(주)",
+            "published_date": "2026-07-14",
+            "category_label_ko": "시험실/품질관리",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-ORx",
+            "document_id": "gmpinspect-1PzTi7L-ORx"
+          }
+        ]
+      },
+      {
+        "key": "equipment_facility|MFDS",
+        "category_key": "equipment_facility",
+        "category_slug": "equipment-facility",
+        "category_label_ko": "설비/시설",
+        "agency_key": "MFDS",
+        "agency_label_ko": "식품의약품안전처",
+        "slug": "mfds",
+        "findings": 46,
+        "documents": 36,
+        "top_firms": [
+          {
+            "firm_name": "(주)퍼슨",
+            "c": 3
+          },
+          {
+            "firm_name": "에이치케이이노엔(주)",
+            "c": 3
+          },
+          {
+            "firm_name": "지에이치(주) 응봉공장",
+            "c": 3
+          },
+          {
+            "firm_name": "천우신약(주)",
+            "c": 3
+          },
+          {
+            "firm_name": "(주)휴메딕스",
+            "c": 2
+          }
+        ],
+        "samples": [
+          {
+            "finding_id": "finding-442dab74d4c2e6687aa342a8",
+            "text_ko": "시설·장비 분야의 '기타' 등급 지적사항으로 [별표 1] 제2.1호 아목에 해당한다. 제조 및 시험 설비의 시간 관리 절차가 미흡했다.",
+            "agency": "MFDS",
+            "firm_name": "제주대학교병원",
+            "published_date": "2026-08-18",
+            "category_label_ko": "설비/시설",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIr0X",
+            "document_id": "gmpinspect-1Q0I8CiIr0X"
+          },
+          {
+            "finding_id": "finding-65da26e837baca93e6b197be",
+            "text_ko": "기타 [별표 1] 제2.1호 아목 교정 관리와 관련한 추가 설명자료를 제출해야 한다.",
+            "agency": "MFDS",
+            "firm_name": "에어코리아(주)",
+            "published_date": "2026-07-14",
+            "category_label_ko": "설비/시설",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-SxA",
+            "document_id": "gmpinspect-1PzTi7L-SxA"
+          },
+          {
+            "finding_id": "finding-98978377a28bef5f4019f505",
+            "text_ko": "시설 장비 기타 [별표 3의3] 제4.1호 보관소 시설 관리 절차에 대한 추가 설명자료를 제출해야 한다.",
+            "agency": "MFDS",
+            "firm_name": "에어코리아(주)",
+            "published_date": "2026-07-14",
+            "category_label_ko": "설비/시설",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-SxA",
+            "document_id": "gmpinspect-1PzTi7L-SxA"
+          },
+          {
+            "finding_id": "finding-7dbd4d5c2b3c78757788b9b1",
+            "text_ko": "시설장비 기타 [별표 1] 제2.1호 시설관리(예: 선광계, HPLC)에 대한 추가 설명자료를 제출해야 한다.",
+            "agency": "MFDS",
+            "firm_name": "(주)아이월드제약",
+            "published_date": "2026-07-14",
+            "category_label_ko": "설비/시설",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-NZn",
+            "document_id": "gmpinspect-1PzTi7L-NZn"
+          },
+          {
+            "finding_id": "finding-386afd5b0eda6bdb29640e2e",
+            "text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제4.3호 나목에 따라 시설 및 기기에 대한 정기적인 점검방법 등을 마련하도록 요구되었다.",
+            "agency": "MFDS",
+            "firm_name": "(주)퍼슨",
+            "published_date": "2026-06-30",
+            "category_label_ko": "설비/시설",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
+            "document_id": "gmpinspect-1PyJBfLEtwC"
+          },
+          {
+            "finding_id": "finding-8bace3b4209b33c43fa7ced9",
+            "text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.1호 아목에 따라 설비(계측기)의 교정 관리 절차와 재적격성 평가 주기 설정의 타당성을 마련하도록 요구되었다.",
+            "agency": "MFDS",
+            "firm_name": "(주)퍼슨",
+            "published_date": "2026-06-30",
+            "category_label_ko": "설비/시설",
+            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
+            "document_id": "gmpinspect-1PyJBfLEtwC"
           }
         ]
       },
@@ -8188,196 +8373,6 @@
         ]
       },
       {
-        "key": "qc_lab_controls|MFDS",
-        "category_key": "qc_lab_controls",
-        "category_slug": "qc-lab-controls",
-        "category_label_ko": "시험실/품질관리",
-        "agency_key": "MFDS",
-        "agency_label_ko": "식품의약품안전처",
-        "slug": "mfds",
-        "findings": 46,
-        "documents": 42,
-        "top_firms": [
-          {
-            "firm_name": "(주)인트로바이오파마",
-            "c": 2
-          },
-          {
-            "firm_name": "EN Otsuka Pharmaceutical Co., Ltd.",
-            "c": 2
-          },
-          {
-            "firm_name": "에스티팜주식회사",
-            "c": 2
-          },
-          {
-            "firm_name": "이연제약(주)",
-            "c": 2
-          },
-          {
-            "firm_name": "한국코러스(주)",
-            "c": 2
-          }
-        ],
-        "samples": [
-          {
-            "finding_id": "finding-ad6dc50403e1cdce6318947d",
-            "text_ko": "시험실 분야 기타 지적사항으로, [별표 1] 제4.2호에 따른 불순물 전주기 안전관리 체계에 대하여 추가설명자료를 제출할 것을 요구했다.",
-            "agency": "MFDS",
-            "firm_name": "에스피씨(주)",
-            "published_date": "2026-07-30",
-            "category_label_ko": "시험실/품질관리",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE4K6H",
-            "document_id": "gmpinspect-1P_mcuE4K6H"
-          },
-          {
-            "finding_id": "finding-d785f46b232148097050bca3",
-            "text_ko": "기타 지적사항으로, [별표 1] 제3.1호 다목에 따라 품질관리 업무를 적절히 수행할 수 있도록 관련 추가 설명 자료(충분한 인원 확보 등)를 제출할 것을 요구했다.",
-            "agency": "MFDS",
-            "firm_name": "(주)유케이케미팜",
-            "published_date": "2026-07-30",
-            "category_label_ko": "시험실/품질관리",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_mcuE47q1",
-            "document_id": "gmpinspect-1P_mcuE47q1"
-          },
-          {
-            "finding_id": "finding-cf639b206f1ebad46fcb3262",
-            "text_ko": "「기준서 미준수」 ○ 의약품 제조업자는 「약사법」 제38조제1항 및 「의약품안전규칙」 제48조제9호가목 [별표1] 의약품 제조 및 품질관리기준을 준수하여, 자사 기준서 ‘변경관리 규정(문서번호: HS-G-04D01)’에 따라 방법 및 절차의 변경 시 근거 및 필요한 정보를 포함한 변경요청서를 작성하고 변경을 요청하여야 한다. 그러나 ① 동 업체는 ‘한신감치원액(갈근탕), 한신평장환, 한신안티캄캡슐(은교산)’의 기준 및 시험방법에서 함량시험(감초 중 글리시리진산의 정량) 방법을 「대한민국약전 외 한약(생약)규격 생약시험법」 제1법에서 제2법으로 변경하였음에도 이를 변경요청하지 않았다. ② 또한 ‘한신궁하탕연조엑스(단미엑스혼합제), 한신오적산연조엑스(단미엑스혼합제)’의 기준 및 시험방법 중 함량시험(감초연조엑스 중 글리시리진산) 방법을 「대한민국약전 외 한약(생약)규격 생약시험법」 제1법에서 제2법으로 변경하였음에도 이를 변경요청하지 않았다. ※ 상기 제품은 기준 및 시험방법을 ‘대한민국약전 외 한약(생약)규격 생약시험법 중 감초의 함량시험법에 따라 시험한다’로 허가받은 제품이다. 「변경 미신고」 ○ 「약사법」 제31조제9항 및 「의약품안전규칙」 제8조제1항에 따라 의약품 제조업자가 신고한 사항을 변경하려는 경우 변경신고를 하여야 하나, 동 업체는 ‘메시마엑스산(상황)’의 허가받은 기준 및 시험방법 중 함량시험(상황균사체엑스)의 조작조건을 변경하였음에도 이를 변경신고하지 않았다.",
-            "agency": "MFDS",
-            "firm_name": "(주)한국신약",
-            "published_date": "2026-07-23",
-            "category_label_ko": "시험실/품질관리",
-            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005814",
-            "document_id": "admin-2026005814"
-          },
-          {
-            "finding_id": "finding-aa8aac6940d4ae80161b1107",
-            "text_ko": "알파제약(주)는 적합판정 취소 제도가 시행된 '22.12.11. 이후부터 점검일('26.4.8.~4.10.)까지, 히드록시프로필셀룰로오스, 스테아르산마그네슘, 에탄올, 로얄젤리, 메틸렌클로라이드, 소르비톨액, 농글리세린, 저치환도히드록시프로필셀룰로오스, 폴리에틸렌글리콜4000, 히프로멜로오스 등 10개 원료에 대하여 반복적으로 해당 원료의 시험항목 중 일부 시험을 실시하지 않은 채 거짓으로 시험성적서를 작성하였다. 그리고 이를 근거로 적합판정한 후 완제의약품 '트리페린정' 등 16개 품목의 제조에 사용하여 판매한 사실이 확인되었다.",
-            "agency": "MFDS",
-            "firm_name": "알파제약(주)",
-            "published_date": "2026-07-22",
-            "category_label_ko": "시험실/품질관리",
-            "evidence_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026005894",
-            "document_id": "admin-2026005894"
-          },
-          {
-            "finding_id": "finding-2094f3a1d8647177a450c29c",
-            "text_ko": "시험실 기타 [별표 1] 제7.1호 검체채취 관리에 대한 추가 설명자료를 제출해야 한다.",
-            "agency": "MFDS",
-            "firm_name": "(주)아이월드제약",
-            "published_date": "2026-07-14",
-            "category_label_ko": "시험실/품질관리",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-NZn",
-            "document_id": "gmpinspect-1PzTi7L-NZn"
-          },
-          {
-            "finding_id": "finding-35a8913d93eee4c738bbdf87",
-            "text_ko": "시험실 기타 [별표 1] 제7.1호 시험기록(예: 시액 조제 등) 관리에 대한 추가 자료를 제출해야 한다.",
-            "agency": "MFDS",
-            "firm_name": "석전의료공업(주)",
-            "published_date": "2026-07-14",
-            "category_label_ko": "시험실/품질관리",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-ORx",
-            "document_id": "gmpinspect-1PzTi7L-ORx"
-          }
-        ]
-      },
-      {
-        "key": "equipment_facility|MFDS",
-        "category_key": "equipment_facility",
-        "category_slug": "equipment-facility",
-        "category_label_ko": "설비/시설",
-        "agency_key": "MFDS",
-        "agency_label_ko": "식품의약품안전처",
-        "slug": "mfds",
-        "findings": 42,
-        "documents": 34,
-        "top_firms": [
-          {
-            "firm_name": "(주)퍼슨",
-            "c": 3
-          },
-          {
-            "firm_name": "에이치케이이노엔(주)",
-            "c": 3
-          },
-          {
-            "firm_name": "천우신약(주)",
-            "c": 3
-          },
-          {
-            "firm_name": "(주)휴메딕스",
-            "c": 2
-          },
-          {
-            "firm_name": "에어코리아(주)",
-            "c": 2
-          }
-        ],
-        "samples": [
-          {
-            "finding_id": "finding-442dab74d4c2e6687aa342a8",
-            "text_ko": "시설·장비 분야의 '기타' 등급 지적사항으로 [별표 1] 제2.1호 아목에 해당한다. 제조 및 시험 설비의 시간 관리 절차가 미흡했다.",
-            "agency": "MFDS",
-            "firm_name": "제주대학교병원",
-            "published_date": "2026-08-18",
-            "category_label_ko": "설비/시설",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0I8CiIr0X",
-            "document_id": "gmpinspect-1Q0I8CiIr0X"
-          },
-          {
-            "finding_id": "finding-65da26e837baca93e6b197be",
-            "text_ko": "기타 [별표 1] 제2.1호 아목 교정 관리와 관련한 추가 설명자료를 제출해야 한다.",
-            "agency": "MFDS",
-            "firm_name": "에어코리아(주)",
-            "published_date": "2026-07-14",
-            "category_label_ko": "설비/시설",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-SxA",
-            "document_id": "gmpinspect-1PzTi7L-SxA"
-          },
-          {
-            "finding_id": "finding-98978377a28bef5f4019f505",
-            "text_ko": "시설 장비 기타 [별표 3의3] 제4.1호 보관소 시설 관리 절차에 대한 추가 설명자료를 제출해야 한다.",
-            "agency": "MFDS",
-            "firm_name": "에어코리아(주)",
-            "published_date": "2026-07-14",
-            "category_label_ko": "설비/시설",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-SxA",
-            "document_id": "gmpinspect-1PzTi7L-SxA"
-          },
-          {
-            "finding_id": "finding-7dbd4d5c2b3c78757788b9b1",
-            "text_ko": "시설장비 기타 [별표 1] 제2.1호 시설관리(예: 선광계, HPLC)에 대한 추가 설명자료를 제출해야 한다.",
-            "agency": "MFDS",
-            "firm_name": "(주)아이월드제약",
-            "published_date": "2026-07-14",
-            "category_label_ko": "설비/시설",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PzTi7L-NZn",
-            "document_id": "gmpinspect-1PzTi7L-NZn"
-          },
-          {
-            "finding_id": "finding-386afd5b0eda6bdb29640e2e",
-            "text_ko": "제조 분야 기타 지적사항으로, [별표 1] 제4.3호 나목에 따라 시설 및 기기에 대한 정기적인 점검방법 등을 마련하도록 요구되었다.",
-            "agency": "MFDS",
-            "firm_name": "(주)퍼슨",
-            "published_date": "2026-06-30",
-            "category_label_ko": "설비/시설",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
-            "document_id": "gmpinspect-1PyJBfLEtwC"
-          },
-          {
-            "finding_id": "finding-8bace3b4209b33c43fa7ced9",
-            "text_ko": "시설·장비 분야 기타 지적사항으로, [별표 1] 제2.1호 아목에 따라 설비(계측기)의 교정 관리 절차와 재적격성 평가 주기 설정의 타당성을 마련하도록 요구되었다.",
-            "agency": "MFDS",
-            "firm_name": "(주)퍼슨",
-            "published_date": "2026-06-30",
-            "category_label_ko": "설비/시설",
-            "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1PyJBfLEtwC",
-            "document_id": "gmpinspect-1PyJBfLEtwC"
-          }
-        ]
-      },
-      {
         "key": "aseptic_sterility_assurance|MFDS",
         "category_key": "aseptic_sterility_assurance",
         "category_slug": "aseptic-sterility-assurance",
@@ -8385,8 +8380,8 @@
         "agency_key": "MFDS",
         "agency_label_ko": "식품의약품안전처",
         "slug": "mfds",
-        "findings": 41,
-        "documents": 33,
+        "findings": 42,
+        "documents": 34,
         "top_firms": [
           {
             "firm_name": "(주)휴메딕스",
@@ -8670,8 +8665,8 @@
         "agency_key": "EMA",
         "agency_label_ko": "유럽 EMA",
         "slug": "ema",
-        "findings": 25,
-        "documents": 25,
+        "findings": 26,
+        "documents": 26,
         "top_firms": [
           {
             "firm_name": "Akriti Pharmaceuticals Private Limited",
@@ -8695,6 +8690,16 @@
           }
         ],
         "samples": [
+          {
+            "finding_id": "finding-85c9f8fc374614d7bafb1a57",
+            "text_ko": "EDQM 실사 프로그램의 일환으로 제조소를 실사한 결과, EU GMP에 대한 지적사항 21건이 확인되었다. 이 중 1건은 공용 시설에서의 오염 및 교차오염 위험 관리가 미흡하여 critical(치명적)로 분류되었다. Workshop 2 및 칭량·분배구역(dispensing area)에 대한 위험평가와 오염관리전략(contamination control strategy)은 충분히 견고하지 않았고, 구체적이지 않았으며, 정당한 근거가 부족하고 실효적으로 이행되지 않았다. 특히 제품이 노출되는 작업, 갱의(gowning), 구역 및 설비 청결도, 자재 반입, 칭량·분배 작업, 잠재적 고역가(highly potent) 제품에 대한 공용 설비 사용에서 그러하였다. 또한 공용 시설에서 제조되는 원료의약품(API) 간 병용금기(contraindications)의 부재 여부가 일관되게 평가되지 않았다. 이는 환자 안전에 대한 잠재적 위험에 해당한다. 5건은 major(중대)로 분류되었으며 다음 영역과 관련되었다: 세척밸리데이션 및 세척 절차, 예방정비 및 설비 상태, 데이터 완전성(data integrity), 변경관리(change control), 배치 출하 및 CEP 적합성. 이 외에 15건의 기타 지적사항이 확인되었다(기록, 품질시스템, 인력 교육훈련, 교정, 표시기재 관리, 설비 적격성평가 등).\n\nNCA가 취했거나 제안한 조치: 품목허가 변경 요청 — LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.의 Workshop 2에서 제조된 API를 함유한 의약품에 대해서는, 해당 원료의약품 및 중간체 제조원을 삭제하거나 대체하기 위한 품목허가 평가를 검토하여야 한다. 아울러 본 GMP 부적합 확인서(statement of non-compliance)가 유효한 동안에는 해당 API 공급원에 의존하는 제품에 대해 신규 품목허가를 부여해서는 안 된다. 이미 출하된 배치의 회수 — 대체 공급원이 있고 공급부족 위험이 없는 경우, 관련 NCA는 MAH와 공동으로 수행한 평가에 따라 해당 의약품의 회수를 검토하여야 한다. 공급 금지 — 부적합의 성격을 고려할 때, 대체 공급원이 없고 공급부족 위험이 있는 경우를 제외하고는 공급 금지를 권고한다. CEP의 정지 또는 무효화(EDQM이 취할 조치) — EDQM은 LIANYUNGANG GUIKE PHARMACEUTICAL CO. LTD.에 부여된 모든 CEP를 정지하기로 결정하였다. CEP 2013-019 Atracurium besilate, CEP 2021-236 Cisatracurium besilate, CEP 2017-271 Entecavir monohydrate (중간체).",
+            "agency": "EMA",
+            "firm_name": "Lianyungang Guike Pharmaceutical Co. Ltd.",
+            "published_date": "2026-08-21",
+            "category_label_ko": "데이터 완전성",
+            "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/187127.pdf",
+            "document_id": "187127"
+          },
           {
             "finding_id": "finding-fb3273208760f76a38ce6905",
             "text_ko": "실사 기간 중 해당 시설 전반에서, 특히 의약품의 무균제조(aseptic manufacture)와 직접 관련된 영역에서 다수의 치명적(critical) 및 중대(major) 결함이 확인되었다. 이러한 결함의 성격과 범위는 오염관리, 무균 행위(aseptic behaviour), 설비 완전성, 데이터 거버넌스 및 품질관리 실무 전반의 시스템적 취약성을 보여주며, 이는 종합적으로 Block A에서 제조되는 제품의 무균성, 안전성 및 전반적 품질에 중대한 위험을 초래한다. 시설 설계 및 차압 체계(pressure cascade) 유지에서 치명적 결함이 관찰되었으며, 여기에는 청정등급 구역과 비청정등급 구역 간 차압 부족, 역전된 압력 구배, 그리고 무균 원료의약품(API)이 Grade B에서 노출되는 결과를 초래한 배치(layout) 제약이 포함된다. 이러한 문제는 무균공정(aseptic processing)에 요구되는 기본적인 환경관리를 저해한다. 작업자의 행위 및 무균 실무와 관련해서도 심각한 우려가 확인되었는데, 작업자들이 갱의(gowning) 요건, 무균 규율, RABS 취급 절차 및 환경 보호 조치를 준수하지 않았다. 이러한 행위는 무균성 보증을 직접적으로 훼손하며 교육훈련과 감독이 불충분함을 시사한다. 실사에서는 또한 녹슨 패스박스, 청결하지 않은 저울과 발판 사다리 등 상태가 불량한 설비와, Grade B 내에서 불합격 자재 및 IPC 검체에 개방형 용기를 사용하는 사례가 확인되었다. 이러한 결함은 중요 제조구역 내에서 허용될 수 없는 오염 위험에 해당한다. 자재 및 GMP 문서의 정리와 관리에서도 중대한 취약성이 발견되었으며, 여기에는 운영 문서, 미생물 기록, 페트리 접시 및 기타 자재가 증축구역(expansion zone) 등 관리되지 않는 구역에 보관되어 있던 사례가 포함된다. 무균 충전에 사용되는 배관에 연결된, 노후화되고 식별되지 않은 가스 실린더가 발견되어 관리되지 않는 물질이 제품과 접촉할 가능성에 대한 우려가 더욱 커졌다. 기록 누락, 일관성 없는 기재, 불명확한 용어 사용, 그리고 수행되지 않았음에도 보고된 분석 활동 등 치명적인 데이터 완전성(data integrity) 결함이 확인되었다. 이러한 문제는 GMP 문서의 신뢰성을 저해하고 배치 출하 결정의 정확성에 대한 우려를 야기한다. 품질관리 실험실에서는 원료의약품(API)에 대한 필수 시험이 제조업자에 의해 수행되지 않았고, 보관용 검체가 부적절하게 보관되었으며, 완제의약품 검체에 적절한 식별표시가 없었고, 무균시험이 부적합한 장비를 사용하여 수행되었다. 이러한 결함은 분석 결과의 타당성과 제품 품질 보증에 치명적인 영향을 미친다. 오염관리전략(CCS, Contamination Control Strategy)에서도 중대한 미비점이 확인되었는데, CCS는 뒤늦게 시행되었고 Grade B에서의 API 노출, 환경모니터링 취약성, 인원 제한, HEPA 필터 교체 근거, 소독제 승인 등 여러 오염 위험을 다루지 못하였다. 마지막으로, 배치 문서에는 요구되는 검체채취에 대한 증빙이 없고 라인 클리어런스(line clearance) 검증이 불완전하여 배치 추적성과 무균 작업 준비 상태가 훼손되었다.\n\nNCA가 취하였거나 제안한 조치: 기타. 해당 제조소가 시장에 출시한 의약품이 없고, 동일한 유효성분 및 함량을 함유한 의약품을 보유한 대체 제조소가 포르투갈에서 허가되어 있으므로 포르투갈 시장에는 영향이 없다. 해당 제조소에 대해서는 모든 치명적 및 중대 결함이 적절히 조치되고 그 이행이 후속 실사를 통해 확인될 때까지 비준수 보고서(NCR, Non-Compliance Report)를 발행하기로 결정되었다.",
@@ -8744,16 +8749,6 @@
             "category_label_ko": "데이터 완전성",
             "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/184816.pdf",
             "document_id": "184816"
-          },
-          {
-            "finding_id": "finding-2c763eec66ef16af44428370",
-            "text_ko": "메로페넴 원료를 생산하는 제조 유닛의 이전 실사 시정조치 이행을 검증하고 현재 GMP 준수 상태를 평가하기 위해 2026년 2월 25–27일 후속 실사가 수행되었다. 이전에 확인된 여러 중대 결함이 시정되지 않은 채 남아 있었고, 추가적인 중대 및 주요 결함이 관찰되어, 종합적으로 원료의 품질이 저해되었음을 입증하며 본 NCR 발행으로 이어졌다. 이전 실사의 중대 결함이 지속되었다. 이동식 LAF(PB/LAF23)의 장갑 완전성 점검이, 간헐적 검증을 보여주는 영상 증거에도 불구하고 작업 중 일관되게 수행되지 않았다. PB032 실의 LAF 및 RABS 문에 열화와 파손이 나타나 청정실 등급 간 격리를 보장하지 못했다. 아울러 압력계가 송풍기-필터 압력만 측정해 등급 A와 등급 B 간 차압 모니터링이 없어, 이 중대 구역의 적절한 환경관리 증거가 없었다. 추가 중대 결함이 확인되었다. 위험평가 QRM/EU2/061/2025가 신규 RABS 설치 및 충전라인 배치 변경 후 메로페넴 API 제조공정의 재밸리데이션 필요성을 평가하지 않았다. 등급 A/B 구역으로의 자재 및 부품 이송이 단방향·연속 공정을 따름을 입증하지 못했는데, 이동식 LAF가 추가 용기 회수를 위해 작업 도중 제거되어 업체의 이전 CAPA 약속에 배치되었다. PB032의 충전라인 통 세척이 실 내부에서 비밀폐·비자동 공정으로 수행되었고 잉여수가 RABS 앞에 놓인 양동이로 배수되어 상당한 오염 위험을 초래했다. 여러 주요 결함도 확인되었다. 변경관리가, 이전에 중대로 간주된 것을 포함해 중대성에 따라 분류되지 않았다. 변경관리 SOP 및 지문 출입 승인 관리 SOP를 포함해 절차가 정의·책임·운영 단계에 관한 명확성을 결여했다. 위험평가가 배치제조기록(BMR) 갱신 필요 여부를 명확히 결정하지 않았다. 품질관리에서 완전하고 최신인 분석자 적격성 매트릭스가 없었다. LIMS에서 한 분석자에게 배정된 분석이 다른 분석자에 의해 수행되어 업무 배정 미준수를 나타냈다. QC 로그북이 추적성과 순차적 문서화를 결여했고 주요 활동에 대한 감사추적이 누락되었다. 장비 상태 식별이 LIMS 기록과 불일치했고, 교정 책임이 정의된 절차와 일치하지 않았다. 미생물 시험실에서 환경 모니터링 검체가 적시에 제공되지 않았고, 인큐베이터의 중대 온도 모니터링 지점이 식별되지 않았다. 기술구역 및 유틸리티의 유지보수가 부적절했다. 교체 필터가 손상되고 오염된 상자에 보관되었고, AHU28 관련 덕트 및 단열재가 열화되었으며, 프리필터 세척 스테이션 및 RO수 배관에 오염과 부식이 나타났고, PB32에 공급하는 AHU028 내 프리필터가 세척 기록에도 불구하고 오염된 것으로 보였다. 전반적으로, 미해결 중대 결함의 지속과 새로 확인된 중대·주요 지적이 결합되어, 무균 API 제조에 요구되는 관리 수준을 보장하지 못했음을 입증한다. 이 결함들은 이 유닛에서 생산된 메로페넴 원료의 품질을 저해하며 본 NCR 발행을 정당화한다.\n\n당국(NCA)이 취한/제안한 조치: 공급 금지(Prohibition of supply) — 확인된 결함의 수와 심각성으로 인해, Eugia Unit II에서 생산된 메로페넴 원료로 제조된 완제품의 공급을 금지해야 한다. 포르투갈은 이 유닛에서 제조된 메로페넴 API를 함유한 모든 의약품 배치를 완전히 식별해 회수를 진행할 것이다.",
-            "agency": "EMA",
-            "firm_name": "Eugia Pharma Specialities Limited",
-            "published_date": "2026-03-27",
-            "category_label_ko": "데이터 완전성",
-            "evidence_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/184031.pdf",
-            "document_id": "184031"
           }
         ]
       },

@@ -2,7 +2,7 @@
 """용어사전 "사례 건수" 주간 재측정 — `web/data/glossary_cases.json` 의 findings/documents
 **숫자만** 다시 센다.
 
-배경: 용어사전 각 용어 카드 아래 "이 용어로 찾은 지적사례 N건 보기 →" 링크가 달린다(C1/C2).
+배경: 용어사전 각 용어 카드 아래 "이 용어로 검색되는 지적사례 N건 보기 →" 링크가 달린다(C1/C2).
 그 숫자는 `public.findings_search` RPC(030, `/findings/?q=...` 화면이 쓰는 것과 **동일 함수**)를
 호출해 얻는다. 지적사례는 매일 늘어나므로 화면 숫자가 몇 달 전 것이면 거짓말이 된다 — 자료실
 (`library_staging_build.py` + `grm-library-staging.yml`)은 이미 주 1회 자동 갱신되는데 용어사전

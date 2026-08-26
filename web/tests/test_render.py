@@ -8798,7 +8798,7 @@ _GLOSSARY_CASE_LINK_JARGON_TERMS = ("tier", "qa", "scope_status", "raw_signal", 
 
 
 class WebGlossaryCaseLinkGuardTest(unittest.TestCase):
-    """[C2] 용어사전→사례 링크(glossary_cases.json → /glossary/ "이 용어로 찾은 지적사례
+    """[C2] 용어사전→사례 링크(glossary_cases.json → /glossary/ "이 용어로 검색되는 지적사례
     N건 보기" 링크) 가 거짓말하거나 조용히 사라지는 걸 막는 가드.
 
     이 링크는 화면에 건수를 적는다("1,468건"). 링크를 눌렀을 때 다른 검색어로 가면 그

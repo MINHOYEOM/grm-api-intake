@@ -270,6 +270,7 @@
     subscribers: [],
     dispatches: [],
     audit: [],
+    feedback: [],
     reactions: { totals: {}, topCards: [] },
     runs: [],
     ops: null,
@@ -483,6 +484,8 @@
       state.adminUsers = data.admin_users || [];
       state.dispatches = data.dispatches || [];
       state.audit = data.audit || [];
+      // Edge Function 이 아직 구버전이면 feedback 키가 없다 — 빈 목록으로 우아하게(배포 순서 무결합).
+      state.feedback = data.feedback || [];
       state.reactions = data.reactions || { totals: {}, topCards: [] };
       txt("grm-kpi-users", number((data.counts || {}).users || state.users.length));
       txt("grm-kpi-hearts", number((state.reactions.totals || {}).heart || 0));
@@ -491,6 +494,7 @@
       renderUsers();
       renderDispatches();
       renderAudit();
+      renderFeedback();
       renderInsights();
       renderSystemChecks();
     }).catch(function (error) {
@@ -507,6 +511,14 @@
       renderUsers();
       setStatus(byId("grm-users-status"), "일반 회원 목록을 갱신했습니다." + (state.adminUsers.length ? " Admin 계정 " + state.adminUsers.length + "개는 제외됩니다." : ""), "ok");
     }).catch(function (error) { setStatus(byId("grm-users-status"), errText(error), "err"); });
+  }
+  function loadFeedbackOnly() {
+    setStatus(byId("grm-feedback-status"), "피드백 목록을 새로 불러오는 중", "");
+    return api("admin-supabase?action=feedback").then(function (data) {
+      state.feedback = data.feedback || [];
+      renderFeedback();
+      setStatus(byId("grm-feedback-status"), "피드백 목록을 갱신했습니다.", "ok");
+    }).catch(function (error) { setStatus(byId("grm-feedback-status"), errText(error), "err"); });
   }
   function loadSubscribers() {
     return api("admin-brevo?action=subscribers&limit=100").then(function (data) {
@@ -1058,6 +1070,73 @@
     }).join("");
   }
 
+  // ── 문의 및 제안(061 user_feedback) — 목록·상태 트리아지 ──────────────────────
+  // 상태 어휘는 061 CHECK 와 같은 4종(new·in_progress·done·dismissed) — 여기만 늘리면
+  // update 가 DB 제약에 걸려 조용히 실패한다(마이그레이션과 같이 바꿀 것).
+  var FEEDBACK_CATEGORY = { usability: "이용 불편", correction: "오류·수정", feature: "기능 제안", other: "기타" };
+  var FEEDBACK_STATUS = {
+    "new": ["신규", "warn"], in_progress: ["처리 중", ""],
+    done: ["완료", "ok"], dismissed: ["보류", ""]
+  };
+  var FEEDBACK_OPEN = { "new": 1, in_progress: 1 };
+  function renderFeedback() {
+    var body = byId("grm-feedback-body");
+    if (!body) return;
+    var all = state.feedback || [];
+    var openCount = all.filter(function (f) { return FEEDBACK_OPEN[f.status]; }).length;
+    var pill = byId("grm-feedback-new");
+    if (pill) {
+      pill.className = "admin-pill " + (openCount ? "warn" : "ok");
+      pill.textContent = openCount ? "미처리 " + openCount + "건" : "미처리 없음";
+    }
+    var q = ((byId("grm-feedback-filter") && byId("grm-feedback-filter").value) || "").toLowerCase();
+    var openOnly = !!(byId("grm-feedback-open-only") && byId("grm-feedback-open-only").checked);
+    var rows = all.filter(function (f) {
+      if (openOnly && !FEEDBACK_OPEN[f.status]) return false;
+      if (!q) return true;
+      return (String(f.message || "") + " " + String(f.email || "")).toLowerCase().indexOf(q) >= 0;
+    });
+    if (!rows.length) {
+      body.innerHTML = emptyRow(7, all.length ? "조건에 맞는 문의가 없습니다." : "접수된 문의가 없습니다.");
+      return;
+    }
+    body.innerHTML = rows.map(function (f) {
+      var st = FEEDBACK_STATUS[f.status] || [f.status || "-", ""];
+      // message 는 자유 텍스트 — esc 후에만 줄바꿈을 <br> 로 되살린다(마크업 주입 봉쇄).
+      var msg = '<span class="admin-fb-msg">' + esc(f.message || "").replace(/\n/g, "<br>") + "</span>";
+      var cat = esc(FEEDBACK_CATEGORY[f.category] || f.category || "-");
+      if (f.is_operator) cat += " " + badge("운영자", "warn");
+      // 회신 이메일은 mailto 로 — 답장이 한 번에 열린다(동의받은 주소만 저장돼 있다).
+      var mail = f.email
+        ? '<a href="mailto:' + esc(f.email) + "?subject=" + encodeURIComponent("[GRM] 문의 " + f.id + "번 회신") + '">' + esc(f.email) + "</a>"
+        : '<span class="admin-fb-mail">회신 미요청</span>';
+      var page = f.page_path && String(f.page_path).indexOf("/") === 0
+        ? '<a href="' + esc(f.page_path) + '" target="_blank" rel="noopener">' + esc(f.page_path) + "</a>"
+        : esc(f.page_path || "-");
+      var actions = "";
+      if (f.status === "new") {
+        actions += '<button class="admin-mini" type="button" data-feedback-status="in_progress" data-feedback-id="' + esc(f.id) + '">처리 시작</button>';
+      }
+      if (FEEDBACK_OPEN[f.status]) {
+        actions += '<button class="admin-mini" type="button" data-feedback-status="done" data-feedback-id="' + esc(f.id) + '">완료</button>' +
+          '<button class="admin-mini" type="button" data-feedback-status="dismissed" data-feedback-id="' + esc(f.id) + '">보류</button>';
+      } else {
+        actions += '<button class="admin-mini" type="button" data-feedback-status="new" data-feedback-id="' + esc(f.id) + '">다시 열기</button>';
+      }
+      return "<tr><td>#" + esc(f.id) + "<br>" + esc(fmtDate(f.created_at)) + "</td><td>" + cat + "</td><td>" + msg +
+        "</td><td>" + mail + "</td><td>" + page + "</td><td>" + badge(st[0], st[1]) +
+        '</td><td><div class="admin-row-actions">' + actions + "</div></td></tr>";
+    }).join("");
+  }
+  function feedbackAction(id, status) {
+    if (!id || !status) return Promise.resolve();
+    setStatus(byId("grm-feedback-status"), "문의 상태를 갱신하는 중", "");
+    return api("admin-supabase", { method: "POST", json: { action: "feedback_status", id: id, status: status } }).then(function () {
+      toast("문의 상태를 갱신했습니다.");
+      return loadFeedbackOnly();
+    }).catch(function (error) { setStatus(byId("grm-feedback-status"), errText(error), "err"); });
+  }
+
   function confirmDispatch(action, publishDate) {
     if (action === "newsletter_send") {
       return window.confirm("구독자 전체에게 최신 뉴스레터" + (publishDate ? " (" + publishDate + ")" : "") + "를 실제 발송합니다. 계속할까요?");
@@ -1191,6 +1270,13 @@
   byId("grm-system-refresh").addEventListener("click", refreshAll);
   byId("grm-subscribers-refresh").addEventListener("click", loadSubscribers);
   byId("grm-users-refresh").addEventListener("click", loadUsersOnly);
+  byId("grm-feedback-refresh").addEventListener("click", loadFeedbackOnly);
+  byId("grm-feedback-filter").addEventListener("input", renderFeedback);
+  byId("grm-feedback-open-only").addEventListener("change", renderFeedback);
+  byId("grm-feedback-body").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-feedback-status]");
+    if (b) feedbackAction(b.getAttribute("data-feedback-id"), b.getAttribute("data-feedback-status"));
+  });
   byId("grm-newsletter-send").addEventListener("click", function (e) { dispatch("newsletter_send", e.currentTarget); });
   byId("grm-web-publish-form").addEventListener("submit", function (e) {
     e.preventDefault();

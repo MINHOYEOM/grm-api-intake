@@ -397,5 +397,59 @@ class CredentialsTest(unittest.TestCase):
         self.assertEqual(rc, 0)
 
 
+class CategoryDriftExitCodeTest(unittest.TestCase):
+    """[2026-08-27] 표류 감시용 종료코드.
+
+    ★왜 필요했나(실제로 일어난 일): 이 서비스는 workflow_dispatch 전용·크론이 없다.
+    2026-08-26 실측에서 마지막 실행이 08-02 였고 그 사이 233행의 category_code 가 현행
+    분류기와 어긋나 있었다 — 103행은 더 나은 답이 이미 계산돼 있는데도 캐치올에 갇혀
+    있었다. **분류기를 고쳐도 적용이 안 되면 사용자 화면은 그대로다.**
+
+    ★임계를 changes_planned 가 아니라 category_changes 에 거는 이유: 전자는 taxonomy
+    버전 스탬프만 바뀌는 행까지 세므로, 버전을 올린 직후에는 그게 전건이라 알람이 영원히
+    켜져 있게 된다. 원인이 다른 사건을 한 카운터에 합치면 진단은 반드시 틀린다."""
+
+    def _main(self, rows, argv):
+        with _mock_get_all(rows):
+            with mock.patch("findings_reclassify_service.requests.patch") as patch:
+                with mock.patch.dict(os.environ, {
+                    "SUPABASE_URL": _BASE_URL,
+                    "SUPABASE_SERVICE_ROLE_KEY": _SERVICE_KEY,
+                }, clear=False):
+                    rc = svc.main(argv)
+        patch.assert_not_called()
+        return rc
+
+    _STALE = "Your firm failed to establish adequate written procedures for production and process controls."
+    _CURRENT = "The stability program is deficient."
+
+    def test_drift_above_threshold_exits_1(self) -> None:
+        rows = [_row("f-1", self._STALE, "documentation_records", gf.TAXONOMY_VERSION)]
+        self.assertEqual(self._main(rows, ["--dry-run", "--fail-on-category-drift", "0"]), 1)
+
+    def test_no_drift_exits_0(self) -> None:
+        rows = [_row("f-1", self._CURRENT, "stability_storage", gf.TAXONOMY_VERSION)]
+        self.assertEqual(self._main(rows, ["--dry-run", "--fail-on-category-drift", "0"]), 0)
+
+    def test_version_only_stamps_do_not_trip_the_alarm(self) -> None:
+        """[음성 검사] 버전만 낡은 행은 표류가 아니다 — 카테고리는 이미 맞다.
+
+        여기서 changes_planned 는 1이지만 category_changes 는 0이다. 이 구분이 없으면
+        버전을 올린 직후 전건이 알람을 켜서 감시가 쓸모없어진다."""
+        rows = [_row("f-1", self._CURRENT, "stability_storage", "grm-finding-taxonomy/v2")]
+        self.assertEqual(self._main(rows, ["--dry-run", "--fail-on-category-drift", "0"]), 0)
+
+    def test_flag_is_off_by_default_so_existing_dispatch_keeps_exit_0(self) -> None:
+        """[음성 검사] 기본이 off 여야 기존 운용(dry_run dispatch)의 종료코드가 안 바뀐다."""
+        rows = [_row("f-1", self._STALE, "documentation_records", gf.TAXONOMY_VERSION)]
+        self.assertEqual(self._main(rows, ["--dry-run"]), 0)
+
+    def test_missing_credentials_exit_2_not_a_silent_clean_bill(self) -> None:
+        """못 재고 조용히 0을 돌려주면 감시가 자기 알람을 끈다 — 자격증명 부재는 2다."""
+        with mock.patch.dict(os.environ, {"SUPABASE_URL": "", "SUPABASE_SERVICE_ROLE_KEY": ""},
+                             clear=False):
+            self.assertEqual(svc.main(["--dry-run", "--fail-on-category-drift", "0"]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

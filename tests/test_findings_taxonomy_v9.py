@@ -129,12 +129,16 @@ class DesignContractTest(unittest.TestCase):
         self.assertNotIn("container", vocab)
         self.assertNotIn("containers", vocab)
 
-    def test_taxonomy_v9_is_current_and_v1_through_v8_still_valid(self) -> None:
-        self.assertEqual(gf.TAXONOMY_VERSION, "grm-finding-taxonomy/v9")
-        self.assertEqual(
-            gf.TAXONOMY_VERSIONS,
-            tuple(f"grm-finding-taxonomy/v{n}" for n in range(1, 10)),
-        )
+    def test_v9_rules_survive_and_v1_through_v9_still_valid(self) -> None:
+        """v9 는 더 이상 현행이 아니다(v10 이 현행) -- 이 파일이 지키는 것은
+        "v9 가 세운 규칙이 살아 있는가"이지 "v9 가 최신인가"가 아니다.
+
+        v3 파일이 이미 세운 관례다: 살아 있는 classify_finding_category() 는 하나뿐이라
+        버전 단언은 현행을 따라가고, 각 파일은 자기 버전이 도입한 **행동**을 고정한다.
+        (현행 버전 자체의 단언은 tests/test_findings_taxonomy_v10.py 가 갖는다.)"""
+        for n in range(1, 10):
+            self.assertIn(f"grm-finding-taxonomy/v{n}", gf.TAXONOMY_VERSIONS)
+        self.assertEqual(gf.TAXONOMY_VERSION, gf.TAXONOMY_VERSIONS[-1])
         self.assertEqual(len(gf.FINDING_TAXONOMY), 20)
 
     def test_v9_introduces_no_new_category_and_no_reorder(self) -> None:

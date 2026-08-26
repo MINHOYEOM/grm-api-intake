@@ -611,6 +611,31 @@
   // ★레인 매칭은 **접두 문자열**이다(정규식 아님) — 053 의 lane 은
   //   'MFDS/gmp-inspection' 처럼 채널까지 쪼개져 있고, 새 채널이 생겨도 접두가 같으면
   //   자동으로 편입된다. 반대로 정규식을 쓰면 이스케이프 실수 하나가 조용히 0건을 만든다.
+  // ★순위의 모집단은 **실사 지적**이다 — 회수 공고와 행정처분은 지적이 아니다.
+  //   053 이 식약처를 세 채널로 쪼개 두었는데(MFDS/gmp-inspection · MFDS/recall-quality ·
+  //   MFDS/admin-action) 기관 선택이 접두 하나로 셋을 도로 합치고 있었다. 그 결과(실측
+  //   2026-08-26, 최근 12개월):
+  //     지금 화면(합산) 1위 불만/회수 187 · 2위 세척밸리 69 · 3위 문서화 67
+  //     실사 지적만     1위 세척밸리 58 · 2위 밸리데이션 51 · 3위 안정성 48 · 5위 데이터완전성 40
+  //   **1위가 통째로 바뀐다.** 합산 1위 "불만/회수 187"의 정체는 회수 공고 170건을
+  //   '회수'로 분류한 동어반복이고(본문에 '회수'가 있으면 불만/회수, 없으면 기타로 가
+  //   같은 959건이 418/456 으로 갈렸다), 합산 3위 문서화 67 중 34 는 행정처분의
+  //   '재평가 자료 미제출' — 기록관리 SOP 문제로 읽히지만 제출 기한 문제다.
+  //   식약처 2,008건 중 1,105건(55%)이 실사 지적이 아니다.
+  //
+  // ★손목록이 아니라 **판정 규칙**이다. 레인은 `{소스}/{document_type}` 이거나 소스
+  //   그대로다. 쪼개지 않은 레인은 소스 자체가 실사 유래라 전부 통과시키고, 쪼갠
+  //   레인은 **아는 비실사 유형만** 뺀다 — 새 채널이 생기면 남는다(fail-open).
+  //   반대로 "gmp-inspection 만 통과"로 적으면 나중에 쪼개진 소스가 통째로 조용히
+  //   사라진다. 이 저장소가 CI 허용목록에서 이미 겪은 실패다.
+  var NON_INSPECTION_TYPES = { "recall-quality": 1, "admin-action": 1 };
+
+  function isInspectionLane(lane) {
+    var i = String(lane || "").indexOf("/");
+    if (i < 0) return true;                                  // 쪼개지 않은 레인 = 실사 유래
+    return !NON_INSPECTION_TYPES[String(lane).slice(i + 1)];  // 모르는 유형은 남긴다
+  }
+
   var AGENCY_VIEWS = [
     { key: "mfds", label: "식약처", prefix: "MFDS" },
     { key: "fda", label: "FDA", prefix: "FDA" },
@@ -637,15 +662,31 @@
     try { window.localStorage.setItem(AGENCY_STORE_KEY, key); } catch (e) { /* 무시 */ }
   }
 
-  // 교차표에서 이 기관에 속하는 레인만 골라 kept 맵을 만든다(foldCategorySource 입력).
+  // 교차표에서 이 기관에 속하는 **실사 레인**만 골라 kept 맵을 만든다.
+  // ★반환은 맵 그대로다 — 이 함수의 소비자가 둘이고(buildAgencyRanking·renderMovers)
+  //   renderMovers 는 이것을 scope[lane] 으로 직접 찾는다. 모양을 바꾸면 문법은
+  //   통과한 채 '달라진 점'이 조용히 0건이 된다. 뺀 몫은 아래 별도 함수로 센다.
   function agencyKept(grid, view) {
     var kept = {};
     (grid || []).forEach(function (r) {
       var lane = r.lane || r.source;      // 053 미적용 응답은 lane 이 없다 → 소스 축 폴백
       if (!lane) return;
-      if (!view.prefix || lane.indexOf(view.prefix) === 0) kept[lane] = true;
+      if (view.prefix && lane.indexOf(view.prefix) !== 0) return;
+      if (isInspectionLane(lane)) kept[lane] = true;
     });
     return kept;
+  }
+
+  // 이 기관에서 **실사가 아니라서 뺀** 건수. 감추지 않고 크기를 밝히기 위해서만 쓴다.
+  function agencyOffCount(grid, view) {
+    var n = 0;
+    (grid || []).forEach(function (r) {
+      var lane = r.lane || r.source;
+      if (!lane) return;
+      if (view.prefix && lane.indexOf(view.prefix) !== 0) return;
+      if (!isInspectionLane(lane)) n += Number(r.cur_cnt) || 0;
+    });
+    return n;
   }
 
   // 고른 기관의 순위 행을 만든다.
@@ -678,7 +719,10 @@
     }).sort(function (a, b) {
       return b.cnt - a.cnt || a.code.localeCompare(b.code);
     }).slice(0, RECENT_CAT_ROWS);
-    return { rows: rows, total: total, excluded: excluded, lanes: Object.keys(kept) };
+    return {
+      rows: rows, total: total, excluded: excluded, lanes: Object.keys(kept),
+      offCnt: agencyOffCount(grid, view),
+    };
   }
 
   // 읽는 법은 **고른 기관에 맞춰 다시 적는다** — 분모가 바뀌면 설명도 바뀌어야 한다.
@@ -686,12 +730,12 @@
     if (view.key === "all")
       // ★"전체"가 무엇을 합친 것인지 말한다 — 안 적으면 독자가 자기와 관련 있는 기관만
       //   들어 있다고 가정한다(실제로는 캐나다 실사가 이 창의 32%를 차지한다).
-      return "식약처·FDA 에 캐나다 실사와 EU·영국 GMP 비준수까지 합쳐 센 순위입니다. " +
+      return "식약처·FDA 에 캐나다 실사와 EU·영국 GMP 비준수까지, 실사에서 나온 지적만 합쳐 센 순위입니다. " +
         "기관마다 많이 지적하는 영역이 크게 달라(식약처와 FDA 는 상위 항목이 겹치지 않습니다) " +
         "실사를 준비하신다면 해당 기관을 골라 보세요.";
     // ★기관명에 한국어 조사를 붙이지 않는다 — 조사는 앞말의 받침으로 갈리는데 기관명엔
     //   영문 약어(FDA)가 섞여 규칙이 성립하지 않는다("FDA이(가)"). 명사구로만 잇는다.
-    return "최근 12개월 " + view.label + " 문서에서만 셉니다. 오른쪽 %는 그 기간 " +
+    return "최근 12개월 " + view.label + " 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 " +
       view.label + " 지적 전체 중 이 영역이 차지하는 비율이에요. 줄을 누르면 실제 지적 문장을 볼 수 있습니다.";
   }
 
@@ -735,6 +779,12 @@
           "(" + fmtNum(built.excluded) + "건)는 아직 세부 분류가 되지 않아 순위에서 뺐습니다 — " +
           "위 비율의 분모에는 그대로 들어 있습니다.";
       }
+      // 실사가 아닌 문서를 뺐다면 **뺐다는 사실과 크기와 갈 곳**을 같이 적는다.
+      // 조용히 빼면 "식약처 자료가 이것뿐"으로 읽힌다.
+      if (built.offCnt > 0) {
+        note += (note ? " " : "") + "회수 공고·행정처분 " + fmtNum(built.offCnt) +
+          "건은 실사 지적이 아니라 이 순위에서 제외했습니다 — 찾아보기에서 전부 보실 수 있어요.";
+      }
       rankNoteEl.textContent = note;
       rankNoteEl.hidden = !note;
     }
@@ -774,7 +824,7 @@
     }).filter(function (c) { return c.cnt > 0; })
       .sort(function (a, b) { return b.cnt - a.cnt || a.code.localeCompare(b.code); })
       .slice(0, RECENT_CAT_ROWS);
-    return { rows: rows, total: Number(cur.findings) || 0, excluded: 0, lanes: [] };
+    return { rows: rows, total: Number(cur.findings) || 0, excluded: 0, lanes: [], offCnt: 0 };
   }
 
   function wireAgency() {

@@ -607,3 +607,69 @@ class FalseAbsenceOurSideVocabularyTest(unittest.TestCase):
         errs = apb.lint_false_absence_claims(
             [self._card(key_facts=["관찰 1: 부적격 사유 미기재"])])
         self.assertEqual(errs, [])
+
+
+class FalseAbsenceGateBlindSpotTest(unittest.TestCase):
+    """[2026-08-25] 게이트 3 이 라이브 결함을 못 잡은 이유 두 가지 — **둘 다** 있어야 발화한다.
+
+    07-27 WHOPIR 11장이 결론(+항목별 요약)을 카드에 싣고서도 "실사 결과 세부 내용은
+    확보하지 못해 원문 확인이 필요하다"고 적힌 채 발행됐다. 이 게이트는 정확히 그런 문장을
+    막으려고 만든 것인데 두 곳에서 각각 빠져나갔다:
+      ① `_card_has_source_body` 가 `count` 만 봐서 whopir/NCR 상세를 **검사조차 안 했다**
+      ② `_FALSE_ABSENCE_RE` 어미 목록에 `못해` 가 없어 문구가 **매치되지 않았다**
+    하나만 고치면 여전히 통과한다 — 그래서 둘을 각각 고정한다.
+    """
+
+    _WHOPIR = {"type": "whopir_report", "report_kind": "findings",
+               "outcome": "Based on the areas inspected…",
+               "sections": [{"no": "1", "title": "Quality", "text": "…"}]}
+    _NCR = {"type": "eu_gmp_ncr_statement",
+            "nature": "Critical deficiency in sterility assurance.",
+            "action": "Suspension of the GMP certificate."}
+
+    def test_count_less_detail_still_counts_as_source_body(self):
+        """count 를 쓰는 상세는 표 형태 셋뿐 — 본문을 싣고도 count 가 없는 유형이 있다."""
+        for name, dd in (("whopir_report", self._WHOPIR),
+                         ("eu_gmp_ncr_statement", self._NCR)):
+            with self.subTest(detail=name):
+                self.assertTrue(
+                    apb._card_has_source_body({"id": "x", "deterministic_detail": dd}),
+                    "%s 는 본문을 실었는데 미확보로 판정됐다" % name)
+
+    def test_meta_only_detail_is_not_source_body(self):
+        """음성 검사 — type/report_kind 뿐인 껍데기는 본문이 아니다(과잉 판정 방지)."""
+        self.assertFalse(apb._card_has_source_body(
+            {"id": "x", "deterministic_detail": {"type": "whopir_report",
+                                                 "report_kind": "reliance"}}))
+        self.assertFalse(apb._card_has_source_body({"id": "x"}))
+
+    def test_live_defect_wording_is_caught(self):
+        """라이브 문구 그대로 — 어미 `못해` 하나가 게이트를 통째로 빠져나갔다."""
+        card = {"id": "who-whopir-1", "deterministic_detail": self._WHOPIR,
+                "key_facts": ["대상 제조소: X",
+                              "상세: 실사 결과 세부 내용은 확보하지 못해 원문 확인이 필요하다"]}
+        errs = apb.lint_false_absence_claims([card])
+        self.assertTrue(errs, "발행 11장을 낸 그 문구가 여전히 통과한다")
+        self.assertIn("key_facts[1]", errs[0])
+
+    def test_absence_conjugations_are_covered(self):
+        """활용형은 추측이 아니라 발행 코퍼스 474장 실측 분포로 넓혔다."""
+        for tail in ("못했다", "못한 채", "못해 원문 확인이 필요하다", "못하고 있다"):
+            with self.subTest(tail=tail):
+                card = {"id": "c", "deterministic_detail": self._WHOPIR,
+                        "key_facts": ["상세: 세부 내용은 확보하지 " + tail]}
+                self.assertTrue(apb.lint_false_absence_claims([card]))
+
+    def test_substantive_finding_using_the_same_word_is_not_flagged(self):
+        """음성 검사 — `미확보` 가 **업체의 지적사항**을 뜻할 때는 건드리면 안 된다.
+
+        실측 오탐: "수탁 미생물시험소 적격성 미확보"(FDA 483 카드의 진짜 지적 요약)를
+        소급 대상으로 올릴 뻔했다. 앵커어 없이 `미확보` 만 잡으면 멀쩡한 카드가 걸린다.
+        """
+        card = {"id": "fda483-193886",
+                "deterministic_detail": {"type": "fda_483_observations", "count": 5,
+                                         "observations": [{"number": "1"}]},
+                "title_issue": "수탁 미생물시험소 적격성 미확보",
+                "summary": "FDA 가 원료의약품 제조소 실사에서 미생물시험 수탁기관의 적격성 "
+                           "미확보와 품질부서 감독 미흡을 지적했다."}
+        self.assertEqual(apb.lint_false_absence_claims([card]), [])

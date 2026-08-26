@@ -77,7 +77,11 @@ _FALSE_ABSENCE_RE = re.compile(
     r"(?:미기재|미공개|명시되(?:어\s*있)?지\s*않|기재되(?:어\s*있)?지\s*않|"
     r"공개되(?:어\s*있)?지\s*않|나와\s*있지\s*않|없)"
     r"|"                                        # ↓ 우리 쪽 결손 어휘
-    r"(?:확보|확인|수집|추출)[^.\n]{0,6}?(?:못했|못한|않았|않은|불가|실패)"
+    # ★ `못해` 가 빠져 있었다 — 라이브 결함 문구가 "확보하지 **못해** 원문 확인이 필요하다"
+    # 였고, 어미 하나 차이로 이 게이트를 통째로 빠져나갔다(발행 11장). 활용형은 추측이 아니라
+    # 발행 코퍼스 474장 실측 분포로 넓혔다: 못했·못한·못해 가 실제로 쓰였다. `못하` 는 그
+    # 어간이라 못하고/못하여/못하는 을 함께 덮는다(모두 부정형이라 오탐이 없다).
+    r"(?:확보|확인|수집|추출)[^.\n]{0,6}?(?:못했|못한|못해|못하|않았|않은|불가|실패)"
     r"|미확보|미확인"
     r")")
 # 검사 대상 산문 슬롯(코드 verbatim 필드인 facts 는 제외 — 거기서의 "원문 미기재"는
@@ -522,10 +526,35 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
             f"({'스캐폴드가 낡은 파서 산출' if before else '스캐폴드에 블록 없음 — 신설'})")
 
 
+# 결정론 상세 dict 에서 **본문이 아닌 메타 키** — 이것만 남으면 실린 본문이 없는 것이다.
+# 아래 판정은 "본문 키 목록"이 아니라 이 메타 목록의 여집합으로 쓴다(손목록 반전).
+# 발행분 전수의 상세 키 23종을 세어 정한다: `type`·`report_kind` 는 분류, `text_source` 는
+# 출처 표기(OCR 여부)라 셋 다 본문이 아니다. 나머지(observations·rows·violations·outcome·
+# sections·reliance·nature·action·operations·additional·inspectors·severity_summary·
+# product_scope·authority_country…)는 전부 원문에서 온 사실이다.
+# 여집합으로 쓰는 이유: 본문 키를 열거하면 새 상세 유형이 생길 때마다 **조용히** 검사에서
+# 빠진다 — 이번 결함이 정확히 그 모양이었다(whopir/NCR 35장이 검사 대상 밖).
+_DETAIL_META_KEYS = frozenset({"type", "report_kind", "text_source"})
+
+
 def _card_has_source_body(card: dict[str, Any]) -> bool:
-    """이 카드가 원문 본문을 실제로 확보했는가(결정론 상세 블록 또는 심층분석 보유)."""
+    """이 카드가 원문 본문을 실제로 확보했는가(결정론 상세 블록 또는 심층분석 보유).
+
+    [2026-08-26] 종전 판정은 `deterministic_detail.count` **하나만** 봤다. 그런데 count 를
+    쓰는 상세는 표 형태 셋뿐(fda_483_observations·gmp_deficiencies·wl_violations)이고,
+    **본문 전문을 싣고도 count 가 없는** 유형이 있다 — whopir_report(outcome·sections·
+    reliance) · eu/mhra_gmp_ncr_statement(nature·action). 발행분 실측으로 그런 카드가 35장
+    이었고, 그 결과 게이트 3(`lint_false_absence_claims`)이 이들을 **아예 검사하지 않았다**.
+    실제 피해: 07-27 WHOPIR 11장이 결론(+항목별 요약)을 카드에 싣고서도 "실사 결과 세부
+    내용은 확보하지 못해 원문 확인이 필요하다"고 적힌 채 발행됐다.
+
+    그래서 판정을 **본문 키 손목록이 아니라 메타 키의 여집합**으로 뒤집는다 — 상세 블록에
+    type/report_kind 말고 값이 하나라도 있으면 본문을 실은 것이다. 새 상세 유형이 생겨도
+    자동으로 포함된다(손목록은 반드시 낡는다).
+    """
     dd = card.get("deterministic_detail")
-    if isinstance(dd, dict) and dd.get("count"):
+    if isinstance(dd, dict) and any(v for k, v in dd.items()
+                                    if k not in _DETAIL_META_KEYS):
         return True
     return isinstance(card.get("deep_analysis"), dict) and bool(card["deep_analysis"])
 

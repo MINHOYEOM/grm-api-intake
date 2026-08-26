@@ -25,7 +25,16 @@ DEFAULT_JSON_HEADERS = {
     "User-Agent": DEFAULT_USER_AGENT,
     "Accept": "application/json",
 }
-MFDS_EGRESS_HOSTS = {"www.mfds.go.kr", "nedrug.mfds.go.kr", "www.law.go.kr"}
+# ★`apis.data.go.kr`(공공데이터포털 오픈API — 1471000 식약처·1170000 법제처)도 KR egress 로
+#   보낸다. 이 호스트는 2026-08-24 까지 러너에서 직접 열렸으나, 해외 IP 를 며칠 단위로
+#   조용히 떨어뜨린다(연결 자체가 timeout — 08-02~08-05 4연속, 08-24~08-26 3연속 실측).
+#   www.mfds.go.kr 이 2026-08-10 에 보인 것과 같은 양상이다.
+MFDS_EGRESS_HOSTS = {
+    "www.mfds.go.kr",
+    "nedrug.mfds.go.kr",
+    "www.law.go.kr",
+    "apis.data.go.kr",
+}
 
 
 class HTTPClientError(RuntimeError):

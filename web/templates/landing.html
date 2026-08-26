@@ -84,37 +84,12 @@
     </div>
   </div></section>
 
-  <section class="section"><div class="wrap">
-    <span class="kick">Card Anatomy</span>
-    <div class="showcase">
-      <div class="copy"><h2>복잡한 규제 이슈를<br>단 한 장의 카드로 요약합니다.</h2>
-        <p>제목과 배지로 직관성을 높이고, 팩트와 해석을 엄격하게 분리했습니다. 사안별 핵심 배경부터 실무 액션 플랜까지, 복잡한 내용을 한 장으로 완벽하게 파악할 수 있습니다.</p>
-        <ul class="legend">
-          <li><i class="ti ti-bookmark"></i><div><b>제목 · 배지</b> <span>— 유형·기관·핵심 이슈 및 시그널, 대상 제품군 직관적 분류</span></div></li>
-          <li><i class="ti ti-table"></i><div><b>사실 표 · 원문 인용</b> <span>— 수치와 코드는 원문 그대로, 주요 영문은 한국어 번역 병기</span></div></li>
-          <li><i class="ti ti-bulb"></i><div><b>시사점 · 편집 해석</b> <span>— 객관적 사실과 분리된 전문 분석, 공식 견해와 색상 구분</span></div></li>
-          <li><i class="ti ti-checklist"></i><div><b>점검 항목</b> <span>— 실무 현장에서 즉시 확인하고 적용해야 할 실행 리스트(Checklist)</span></div></li>
-        </ul>
-      </div>
-      <article class="card evA" style="margin-top:0">
-        <div class="c-title"><span class="pre">[행정처분 · MFDS]</span>경방신약(주) — <b>기준서 미준수로 제조정지</b></div>
-        <div class="badges"><span class="b code ev">Evidence A</span><span class="b ag">MFDS</span><span class="b sig code"><span class="d" style="background:var(--hi)"></span>Signal High · T3</span><span class="b mod">💊 합성의약품</span></div>
-        <p class="summary">식약처가 제조관리기준서 미준수를 적발해, 해당 품목에 제조업무정지 1개월을 처분했다.</p>
-        <table class="facts">
-          <tr><td class="k">발행일</td><td class="v"><span class="mono">2026-06-17</span></td></tr>
-          <tr><td class="k">업체</td><td class="v">경방신약(주)</td></tr>
-          <tr><td class="k">처분</td><td class="v">제조업무정지 1개월(2026.7.1~7.31) · 2품목</td></tr>
-        </table>
-        <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>시사점 <span class="sub">· 편집 해석</span></div><p>기준서·지시서 준수와 원료 칭량 관리 기록의 정합성을 재정비해야 한다. 동일 칭량 공정을 쓰는 자사 품목의 기록 일치도 함께 점검할 가치가 있다.</p></div>
-        <div class="chk"><div class="lab"><i class="ti ti-checklist"></i>점검 사항</div><ul><li>제조관리기준서 준수 여부 자가 점검</li><li>원료 칭량 관리 기록과 실제 작업의 일치 확인</li></ul></div>
-        <div class="src">
-          <a href="{{ rel_root }}briefs/{{ cover.slug }}/index.html"><span class="t">정보출처</span><i class="ti ti-database"></i> data source</a>
-          <a href="{{ rel_root }}briefs/{{ cover.slug }}/index.html"><span class="t">공식원본</span><i class="ti ti-file-text"></i> 공식 페이지</a>
-        </div>
-      </article>
-    </div>
-  </div></section>
-
+  {#- [홈 12차 정리 2026-08-27] Card Anatomy 섹션 제거 — 홈 실측(@1280w)에서 단일 최대
+      블록(1,000px / 본문 3,317px)이면서 유일하게 CTA 없는 순수 설명이었다. 그 내용
+      (사실/해석 분리·등급 배지·실물 카드)은 히어로의 라이브 이슈 카드, #why 기능
+      미리보기 칩(사실/시사점·Evidence/Signal), 클릭 한 번 거리의 실제 브리프가 이미
+      보여준다 — 같은 설명 3회를 1회로. 아래 데이터 존 신설(#records)로 늘어난 만큼
+      여기서 걷어 홈 총량은 재편 전보다 오히려 줄어든다. -#}
   {#- [발견 허브 2026-08-26] 데이터 존 진입 섹션 — 홈의 findings 진입은 워치리스트 CTA
       1개뿐이었고 그마저 reactions 게이트 뒤였다(#807 도달성 감사의 다음 층: 링크를 놓은
       뒤에도 존의 존재 자체가 홈에서 안 보였다). 브리프(요약)와 지적사항 DB(원천)의 관계를
@@ -123,7 +98,7 @@
       적은 수치는 반드시 낡는다). 데이터 없으면 섹션 미렌더. 실사관 문안은 037 정책
       (순위·비교 금지) 준수 — "서명한 문서" 어휘만 쓴다. -#}
   {% if findings_zone %}
-  <section class="section soft" id="records"><div class="wrap">
+  <section class="section" id="records"><div class="wrap">
     <span class="kick">Findings Database</span>
     <h2 class="sec-title">주간 브리프의 원천 — 실사에서 실제 지적된 문장들</h2>
     <p class="records-sub">브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 {{ findings_zone.documents }}건 · 지적사항 {{ findings_zone.findings }}건이 쌓여 있습니다.</p>

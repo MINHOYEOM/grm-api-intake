@@ -10032,24 +10032,31 @@ class WebGurumiPetTest(unittest.TestCase):
         self.assertIn("prefers-reduced-motion:reduce", self.pet_css)
 
     def test_landing_section_order_final(self):
-        # 확정 재배치(11차, 2026-08-26 홈 과밀 정리): 히어로 → 기능 3종(soft, id=why —
-        # footer '소개' 앵커 승계) → Card Anatomy → 참여 존(#engage) → 뉴스레터 → AI 고지.
+        # 확정 재배치(12차, 2026-08-27 — 발견 허브): 히어로 → 기능 3종(soft, id=why —
+        # footer '소개' 앵커 승계) → 데이터 존(#records) → 참여 존(#engage) → 뉴스레터
+        # → AI 고지. Card Anatomy 는 12차에서 걷어냈다 — 홈 실측 최대 블록(1,000px)이며
+        # 유일한 무CTA 순수 설명이었고, 히어로 라이브 이슈 카드·#why 미리보기 칩·실제
+        # 브리프가 같은 내용을 이미 보여준다(3회 설명 → 1회).
         order = [
             'class="wrap hero"',
             '<section class="section soft" id="why">',
-            ">Card Anatomy</span>",
+            '<section class="section" id="records">',
             '<section class="section" id="engage">',
         ]
         pos = [self.landing.index(m) for m in order]
         self.assertEqual(pos, sorted(pos), "랜딩 섹션 순서가 확정안과 다름")
-        # 걷어낸 섹션이 되살아나지 않는다 — 단독 WHY 섹션·This Week 콜아웃(수치 3중 반복).
+        # 걷어낸 섹션이 되살아나지 않는다 — 단독 WHY 섹션·This Week 콜아웃(수치 3중
+        # 반복)·Card Anatomy 쇼케이스(12차).
         self.assertNotIn('id="this-week"', self.landing)
         self.assertNotIn("Why GRM", self.landing)
         self.assertNotIn('class="callout"', self.landing)
+        self.assertNotIn(">Card Anatomy</span>", self.landing)
+        self.assertNotIn('class="showcase"', self.landing)
 
     def test_landing_features_are_exactly_three(self):
-        # 기능 6종 → 3종(11차) — 카드 차원 기능(원문 연결·번역 병기·체크리스트)은 바로
-        # 아래 Card Anatomy 범례·실카드가 보여주므로 기능 그리드에 되살리지 않는다.
+        # 기능 6종 → 3종(11차) — 카드 차원 기능(원문 연결·번역 병기·체크리스트)은 히어로
+        # 라이브 이슈 카드와 실제 브리프 본문이 보여주므로 기능 그리드에 되살리지 않는다
+        # (12차에서 Card Anatomy 를 걷어낸 뒤에도 같은 판단 — 홈은 설명이 아니라 실물로).
         self.assertEqual(self.landing.count('<div class="feat">'), 3)
         self.assertNotIn("원문 대비 한국어 번역", self.landing)
         self.assertNotIn("실무 맞춤형 점검 리스트", self.landing)
@@ -11588,8 +11595,9 @@ class WebDiscoveryHubTest(unittest.TestCase):
             self.assertIsNone(re.search(r"\d{1,3},\d{3}\s*건", src),
                               f"{tpl}: 건수 하드코딩 금지 — render 가 정본에서 계산해야")
 
-    def test_landing_records_between_anatomy_and_engage(self):
-        self.assertLess(self.landing.index(">Card Anatomy</span>"),
+    def test_landing_records_between_why_and_engage(self):
+        # 12차 정리 후 순서: #why → #records → #engage (Card Anatomy 는 제거됨).
+        self.assertLess(self.landing.index('id="why"'),
                         self.landing.index('id="records"'))
         self.assertLess(self.landing.index('id="records"'),
                         self.landing.index('id="engage"'))

@@ -3428,7 +3428,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             siblings = [s for s in by_firm.get(doc.get("firm_key") or "", [])
                         if s["slug"] != doc["slug"]]
             siblings.sort(key=lambda x: (x["published_date"], x["slug"]), reverse=True)
-            same_firm = [{"slug": s["slug"], "published_date": s["published_date"],
+            # 형제 링크의 날짜는 **그 링크가 여는 페이지의 제목과 같은 날짜**여야 한다 —
+            # 목록에서 "2024-01-17"을 보고 눌렀는데 도착한 문서 제목이 "(2015-07-10)"이면
+            # 같은 문서인지 의심하게 된다. 그래서 doc_display_date 를 그대로 쓴다.
+            # (문서 목록 페이지 `/findings/docs/{기관}/{연도}/` 는 반대다 — 거기는 공개
+            #  연도로 묶인 축이라 공개일이 맞고, 페이지 문구도 "…년에 공개한"이다.)
+            same_firm = [{"slug": s["slug"], "published_date": doc_display_date(s),
                           "agency": s["agency"], "count": len(s["findings"])}
                          for s in siblings[:6]]
             # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라 같은

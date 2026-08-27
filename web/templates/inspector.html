@@ -45,8 +45,10 @@
 
     <div class="ip-state" id="ip-loading" role="status" aria-live="polite">불러오는 중…</div>
     <div class="ip-state" id="ip-unavailable" hidden>
-      <p>해당 실사관의 프로파일을 제공하지 않습니다.</p>
-      <a class="ip-back-link" href="{{ rel_root }}findings/index.html">찾아보기로 돌아가기 →</a>
+      {#- [워딩 2026-08-27] 다섯 실패 경로 단일 수렴(정보 누출 방지)은 불변 — 문구만
+          중립형으로. '제공하지 않습니다'는 기능 거부 선언으로 읽힌다(사용자 피드백). -#}
+      <p>해당 실사관의 프로파일을 표시할 수 없습니다.</p>
+      <a class="ip-back-link" href="{{ rel_root }}findings/index.html">지적사항 검색으로 돌아가기 →</a>
     </div>
 
     {#- [존 재편 2026-08-26] 이름으로 조회하는 랜딩 — ?key= 없이 들어왔을 때.
@@ -81,7 +83,9 @@
         <button class="tr-look-btn" id="ip-look-btn" type="submit">찾기</button>
       </form>
       <div id="ip-look-res" class="tr-look-res" aria-live="polite"></div>
-      <p class="tr-look-hint">이 화면은 순위나 비교를 제공하지 않습니다. 지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관을 평가하는 지표가 아닙니다.</p>
+      {#- [워딩 2026-08-27] 기능 부재를 광고하던 앞 문장은 제거, 측정 정직성(건수의
+          의미)은 유지 — 037 순위 금지 정책 자체는 RPC 게이트가 지킨다. -#}
+      <p class="tr-look-hint">지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관에 대한 평가 지표가 아닙니다.</p>
     </div>
 
     <div id="ip-content" hidden>

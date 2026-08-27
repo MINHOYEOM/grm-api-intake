@@ -8,11 +8,21 @@
 싣는다 — 나머지 본문은 여전히 어디에도 정적으로 존재하지 않는다. 실사 보고서 한 건을
 통째로 담는 문서 페이지가 그 구멍을 메운다.
 
-## 무엇을 페이지로 만드나 — 지적 3건 이상
+## 무엇을 페이지로 만드나 — 지적 3건 이상(단, 소스를 통째로 지우는 임계는 면제)
 
 지적 1~2건짜리 문서는 본문이 얇아 저품질 대량 페이지로 읽힌다(사이트 전체 평가에 손해).
-3건 이상이면 실사 보고서로서 최소한의 서술이 성립한다. 뺀 것은 침묵시키지 않고 건수를
-표준출력과 화면(축 색인)에 남긴다.
+3건 이상이면 실사 보고서로서 최소한의 서술이 성립한다.
+
+**[2026-08-27] 다만 그 임계가 어떤 소스의 문서를 하나도 남기지 못한다면, 그 임계는 그
+소스에 대해 '얇음'이 아니라 '존재'를 재고 있는 것이다.** 실측 문서당 지적 1건 비율:
+EMA(EU GMP NCR) 100% · MHRA 100% · MFDS 89% · FDA 28% · HC 16%. EU 비준수 보고서는
+지적 1건이 곧 보고서 전체라 얇은 게 아니라 그 문서의 전부이고, 실제로 두 기관이
+'문서로 찾기'에서 통째로 사라져 있었다(사용자 피드백: "다른 정보도 있는데 왜 뺐는지").
+그래서 **그 소스의 최대 지적 수가 임계 미만이면 면제**한다 — 판정은 손목록이 아니라
+수집한 데이터에서 파생하므로 새 소스가 들어와도 자동이다. 임계가 실제로 얇은 문서를
+거르는 소스(FDA·HC·MFDS)에서는 종전과 똑같이 동작한다.
+
+뺀 것은 침묵시키지 않고 건수를 표준출력과 화면(축 색인)에 남긴다.
 
 ## 이 페이지가 다루는 것은 실명 업체의 규제 기록이다
 
@@ -45,6 +55,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import hashlib
 import re
 import sys
 from collections import Counter
@@ -66,6 +77,29 @@ MAX_FAILURE_RATIO = 0.20
 
 # document_id 가 그대로 URL 경로가 된다 — 안전하지 않은 값은 페이지를 만들지 않는다.
 _SLUG_OK = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
+_SLUG_UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
+
+
+def _safe_slug(doc_id: str) -> "str | None":
+    """URL 안전 슬러그. 안전한 id 는 그대로(기존 URL 불변), 아니면 결정론 변환.
+
+    [2026-08-27] 종전에는 안전하지 않은 id 를 통째로 기각했는데, 그 규칙이 MHRA 를
+    **전량** 침묵 소실시켰다 — MHRA 문서 id 는 기관 원문 형식이 "Insp GMP/GDP/IMP
+    322/14798-0032[I]" 라 공백·슬래시·대괄호가 항상 들어 있다. id 형식은 기관이 정하는
+    것이라 우리 기각 규칙이 곧 기관 차별이 된다. 변환 규칙:
+      · 안전하지 않은 문자 연쇄 → '-' 하나 (읽을 수 있는 몸통 유지)
+      · 원본 id 의 sha1 앞 8자를 접미 (몸통 축약·문자 치환으로 인한 충돌 차단)
+    같은 id 는 언제나 같은 슬러그다(재실행 안정). 빈 id 만 None."""
+    if not doc_id:
+        return None
+    if _SLUG_OK.match(doc_id):
+        return doc_id
+    body = _SLUG_UNSAFE.sub("-", doc_id).strip("-")[:80].rstrip("-")
+    tail = hashlib.sha1(doc_id.encode("utf-8")).hexdigest()[:8]
+    slug = f"{body}-{tail}" if body else f"doc-{tail}"
+    return slug if _SLUG_OK.match(slug) else None
+
+
 _DATE_OK = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -85,7 +119,8 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
                   reject: Counter) -> "dict[str, Any] | None":
     """문서 1건의 표시용 투영. 규율을 못 지키면 None(사유를 세어 침묵을 막는다)."""
     doc_id = (doc.get("document_id") or "").strip()
-    if not _SLUG_OK.match(doc_id):
+    slug = _safe_slug(doc_id)
+    if slug is None:
         reject["URL 로 쓸 수 없는 문서 id"] += 1
         return None
 
@@ -121,8 +156,9 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
             "text_ko": text,                              # 무변형 — 자르지 않는다
             "category_label_ko": f.get("category_label_ko") or "",
         })
-    if len(findings) < min_findings:
-        reject[f"국문 지적 {min_findings}건 미만"] += 1
+    if not findings:
+        # 국문 본문이 하나도 없으면 페이지를 만들 수 없다(임계와 무관한 절대 조건).
+        reject["국문 지적 0건"] += 1
         return None
 
     seen: list[str] = []
@@ -133,7 +169,7 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
 
     return {
         "document_id": doc_id,
-        "slug": doc_id,
+        "slug": slug,
         "agency": doc.get("agency") or "",
         "source": doc.get("source") or "",
         "firm_name": firm,
@@ -148,6 +184,41 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
     }
 
 
+def apply_thickness_gate(docs: list[dict[str, Any]], *, min_findings: int,
+                         reject: Counter, log=None) -> list[dict[str, Any]]:
+    """얇은 문서를 거르되, **임계가 소스를 통째로 지우는 경우는 면제**한다.
+
+    판정은 수집한 데이터에서 파생한다 — 그 소스의 최대 지적 수가 임계 미만이면 임계는
+    그 소스에 대해 얇음이 아니라 존재를 재고 있는 것이다(파일 상단 docstring 참조).
+    손열거가 아니라 규칙이라 새 소스가 들어와도 자동으로 판정된다.
+    """
+    peak: dict[str, int] = {}
+    for d in docs:
+        a = d.get("agency") or ""
+        peak[a] = max(peak.get(a, 0), len(d["findings"]))
+    exempt = {a for a, mx in peak.items() if mx < min_findings}
+    # ★안전장치 — 면제가 **과반**이면 그건 소스의 성질이 아니라 데이터 모양이 바뀐 것이다.
+    #   상류가 findings 배열을 잘라 보내면 모든 소스가 얇아져 전량 면제되고, 두께 게이트가
+    #   통째로 사라진 채 문서가 배로 불어난 스냅샷이 조용히 커밋된다(축소 게이트는 증가를
+    #   못 잡는다). 그 상태를 기준선으로 남기지 않는다.
+    if peak and len(exempt) * 2 > len(peak):
+        raise SystemExit(
+            f"임계 면제가 과반입니다({len(exempt)}/{len(peak)} 소스) — 소스 성질이 아니라 "
+            f"상류 데이터 모양이 바뀐 것으로 봅니다. 아무것도 쓰지 않습니다. "
+            f"소스별 최대 지적 수: {dict(sorted(peak.items()))}")
+    if exempt and log:
+        for a in sorted(exempt):
+            log(f"  · 임계 면제: {a} — 최대 지적 {peak[a]}건 < {min_findings}"
+                f"(임계가 이 소스를 통째로 지운다)")
+    kept = []
+    for d in docs:
+        if len(d["findings"]) >= min_findings or (d.get("agency") or "") in exempt:
+            kept.append(d)
+        else:
+            reject[f"국문 지적 {min_findings}건 미만"] += 1
+    return kept
+
+
 def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
                       page_size: int, log) -> tuple[list[dict[str, Any]], Counter]:
     first = post_search(base_url, anon_key,
@@ -159,7 +230,8 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
 
     def absorb(resp: dict[str, Any]) -> None:
         for doc in resp.get("documents") or []:
-            view = document_view(doc, min_findings=min_findings, reject=reject)
+            # ★임계는 여기서 걸지 않는다 — 소스 전체의 분포를 봐야 판정할 수 있다.
+            view = document_view(doc, min_findings=1, reject=reject)
             if view:
                 out.append(view)
 
@@ -176,6 +248,8 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
             reject[f"페이지 조회 실패(문서 최대 {page_size}건 누락)"] += 1
         if page % 10 == 0:
             log(f"  · {page}/{pages} 페이지 · 채택 {len(out)}건")
+
+    out = apply_thickness_gate(out, min_findings=min_findings, reject=reject, log=log)
 
     if pages and failures / pages > MAX_FAILURE_RATIO:
         raise SystemExit(

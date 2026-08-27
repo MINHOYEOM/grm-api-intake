@@ -217,12 +217,22 @@ class CommittedDataParityTest(unittest.TestCase):
         self.assertEqual(self.data["agency_labels"], ffr.AGENCY_LABELS_KO)
 
     def test_every_item_meets_threshold_and_has_samples(self):
+        # [2026-08-27] 기관 축은 표본 미달 게이트 면제(완전성 우선 — MHRA 8건이 근거).
+        # 임계는 분류·국가·조합 축의 얇은 페이지 방벽으로만 남는다. 사례는 전 축 필수.
         floor = self.data["min_findings"]
         for axis in self.data["axes"]:
             for item in axis["items"]:
-                self.assertGreaterEqual(item["findings"], floor,
-                                        f'{axis["axis"]}/{item["key"]}')
+                if axis["axis"] != "agency":
+                    self.assertGreaterEqual(item["findings"], floor,
+                                            f'{axis["axis"]}/{item["key"]}')
                 self.assertTrue(item["samples"], f'사례 0건: {item["key"]}')
+
+    def test_agency_axis_is_complete(self):
+        """수집 중인 기관 5곳이 전부 축에 있어야 한다 — 임계가 기관을 침묵 소실시키던
+        결함(MHRA 8 < 20)의 재발 가드."""
+        ag = next(a for a in self.data["axes"] if a["axis"] == "agency")
+        self.assertLessEqual({"FDA", "HC", "MFDS", "EMA", "MHRA"},
+                             {i["key"] for i in ag["items"]})
 
     def test_slugs_are_unique_and_url_safe(self):
         import re

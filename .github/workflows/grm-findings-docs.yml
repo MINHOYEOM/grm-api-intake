@@ -17,6 +17,9 @@ on:
   workflow_dispatch:
     inputs:
       min_findings:
+        # [2026-08-27] 임계는 3 유지. 이 임계가 어떤 소스를 통째로 지우면(그 소스의
+        # 최대 지적 수 < 임계) 스크립트가 그 소스만 자동 면제한다 — EU NCR·MHRA 는
+        # 문서당 지적이 100% 1건이라 임계가 얇음이 아니라 존재를 재고 있었다.
         description: '페이지를 만들 최소 지적 건수(미만은 제외·사유 기록)'
         required: true
         default: '3'

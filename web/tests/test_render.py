@@ -220,6 +220,8 @@ SINGLE_GOLDENS = [
     ("index.html", "landing.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
+    # [2면 분리 2026-08-27] 둘러보기 면 — 위 주석 그대로: 손열거라 여기 없으면 골든 없이 산다.
+    ("findings/browse/index.html", "findings_browse.expected.html"),
     ("findings/trends/index.html", "trends.expected.html"),
     # [존 재편 2026-08-26] 트렌드 존 신설 2면. ★이 목록은 손열거라 새 라우트를 넣는 걸
     #   잊으면 그 페이지는 **골든 없이 살게 된다**(초록인데 미검증). WebZoneIaTest 가
@@ -907,7 +909,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_page_generated(self):
-        self.assertIn("규제 지적사항 검색", self.html)
+        # [네이밍 2026-08-27] h1/title = "지적사항 검색"(면 이름 그대로).
+        self.assertIn("지적사항 검색", self.html)
         # [M15] 상단 슬림 고지(#findings-notice)는 제거되고, 하단 기존 AI Disclosure 디자인
         # (id="ai-notice")으로 이전됐다.
         self.assertNotIn('id="findings-notice"', self.html)
@@ -933,11 +936,16 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/</loc>", self.sitemap)
 
     def test_nav_link_present_and_active_state(self):
-        # [M15] "지적사항" → "찾아보기" 로 이름 변경, findings 페이지에서만 nav 'on' 클래스가 붙는다.
-        self.assertIn('href="../findings/index.html" class="on">찾아보기</a>', self.html)
-        self.assertIn('href="findings/index.html">찾아보기</a>', self.landing)
-        self.assertNotIn('href="../findings/index.html" class="on">찾아보기</a>', self.archive)
-        self.assertIn('href="../findings/index.html">찾아보기</a>', self.archive)
+        # [네이밍 2026-08-27] M15 의 "지적사항"→"찾아보기"(캐주얼 대구)를 사용자 피드백
+        # ("전문성이 보이는 워딩")이 뒤집었다 — 내용을 그대로 이름으로: "지적사항".
+        self.assertIn('href="../findings/index.html" class="on">지적사항</a>', self.html)
+        self.assertIn('href="findings/index.html">지적사항</a>', self.landing)
+        self.assertNotIn('href="../findings/index.html" class="on">지적사항</a>', self.archive)
+        self.assertIn('href="../findings/index.html">지적사항</a>', self.archive)
+        # 옛 라벨이 어디에도 안 남았는지 — 라벨 교체는 전 표면 동시가 계약이다.
+        for page in (self.html, self.landing, self.archive):
+            self.assertNotIn(">찾아보기</a>", page)
+            self.assertNotIn(">모아보기</a>", page)
 
     def test_nav_this_week_tab_removed_but_cta_kept(self):
         # [M15] nav 탭에서 "이번 주" 링크는 제거됐다(CTA "이번 주 소식" 버튼과 중복) —
@@ -946,11 +954,11 @@ class WebFindingsRenderTest(unittest.TestCase):
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
         self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내 6개여야 함")
+        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내 6개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
-        self.assertIn('<a href="../findings/index.html">찾아보기</a>', self.html)
+        self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
         self.assertNotIn(">이번 주</a>", self.html)
 
     def test_canonical_and_description(self):
@@ -3056,19 +3064,23 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn('href="findings/trends/index.html">트렌드</a>', self.landing)
         self.assertIn('href="../findings/trends/index.html">트렌드</a>', self.archive)
         self.assertIn('href="../findings/trends/index.html">트렌드</a>', self.findings_html)
-        # 트렌드 페이지 자체에서만 '찾아보기'는 on 이 아니고, '트렌드'만 on.
+        # 트렌드 페이지 자체에서만 '지적사항'은 on 이 아니고, '트렌드'만 on.
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertNotIn('class="on">찾아보기', nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
+        self.assertNotIn('class="on">지적사항', nav_m.group(1))
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
 
-    def test_findings_page_links_to_trends(self):
-        # findings/index.html 헤더 근처에 트렌드 대시보드로 가는 절제된 텍스트 링크 1개.
-        self.assertIn('href="../findings/trends/index.html">전체 트렌드 보기', self.findings_html)
+    def test_findings_zone_links_to_trends(self):
+        """[2면 분리 2026-08-27] 검색 면의 히어로 링크 행("전체 트렌드 보기")은 세그와
+        함께 정리됐다 — 트렌드 진입은 nav 탭 + 둘러보기 면의 업무별 카드가 승계한다.
+        존 안에서 트렌드로 가는 길이 있는지를 지키는 것이 이 테스트의 본래 목적이다."""
+        browse = (self.single / "findings" / "browse" / "index.html"
+                  ).read_text(encoding="utf-8")
+        self.assertIn('href="../../findings/trends/index.html"', browse)
 
     def test_canonical_and_description(self):
         self.assertIn(
@@ -4371,7 +4383,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         분류 실패가 아니라 **모집단이 다른 문서**라 분모에서도 뺀다(기타는 분모에 남는다)."""
         self.assertIn("회수 공고·행정처분 ", self.js_src)
         self.assertIn("실사 지적이 아니라 이 순위에서 제외했습니다", self.js_src)
-        self.assertIn("찾아보기에서 전부 보실 수 있어요", self.js_src)
+        self.assertIn("지적사항 검색에서 모두 확인하실 수 있습니다", self.js_src)
         self.assertIn("offCnt: agencyOffCount(grid, view),", self.js_src)
         # 읽는 법도 분모에 맞춰 다시 적혀 있어야 한다.
         self.assertIn('" 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 "', self.js_src)
@@ -5591,7 +5603,7 @@ class WebFirmRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
         self.assertNotIn("findings/firm", nav_m.group(1))
 
     def test_canonical_and_description(self):
@@ -5780,7 +5792,7 @@ class WebInspectorRenderTest(unittest.TestCase):
     def test_nav_not_added_entry_only_via_link(self):
         nav_m = re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 모아보기·찾아보기·트렌드·자료실·용어사전·이용안내
+        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
         self.assertNotIn("findings/inspector", nav_m.group(1))
 
     def test_canonical_and_description(self):
@@ -11493,8 +11505,9 @@ class WebZoneIaTest(unittest.TestCase):
         # ③ 정렬은 이름순이어야 한다 — 건수 내림차순이면 그 자체가 순위표다
         self.assertIn("localeCompare", src)
         self.assertNotIn("b.documents - a.documents", src)
-        # 화면에도 순위가 아님을 적는다
-        self.assertIn("순위나 비교를 제공하지 않습니다", html)
+        # 화면에는 [워딩 2026-08-27] 이후 **측정 정직성**만 적는다 — 기능 부재 광고는
+        # 사용자 피드백으로 걷어냈고, 037 정책 자체는 위 세 장치 + RPC 게이트가 지킨다.
+        self.assertIn("실사관에 대한 평가 지표가 아닙니다", html)
 
     def test_landing_watchlist_cta_points_at_firm_lookup(self):
         """랜딩 워치리스트 CTA 는 조회 페이지로 직행한다.
@@ -11525,9 +11538,12 @@ class WebZoneIaTest(unittest.TestCase):
 
 # ── 발견 허브 (2026-08-26 — findings 첫 화면 재배열 + 랜딩 데이터 존 진입) ──────
 class WebDiscoveryHubTest(unittest.TestCase):
-    """/findings/ 첫 화면이 '목적 카드 → 최근 공개 문서 → 축 → 상세 검색' 순서로
-    재배열됐는지, 랜딩 #records 수치가 정본(findings_facets.json)에서 파생되는지,
-    프로파일 카테고리 링크가 맥락(q=이름)을 싣는지 검증한다. 검색 블록 내부 계약
+    """[2면 분리 2026-08-27] 지적사항 존 — 검색 면(/findings/)과 둘러보기 면
+    (/findings/browse/)의 분업·세그 전환·워딩 규율을 검증한다.
+
+    ★왜 갈랐나(사용자 피드백): #811 발견 허브가 목적 카드·최근 문서·축 탐색·상세 검색을
+    한 페이지에 쌓아 "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다"는 피드백을 받았다.
+    허브의 발견성은 둘러보기 면이 전담하고 검색 면은 도구 전용이다. 검색 블록 내부 계약
     (툴바가 대시보드보다 앞·sticky)은 기존 WebFindingsRenderTest 가 계속 지킨다."""
 
     @classmethod
@@ -11536,50 +11552,138 @@ class WebDiscoveryHubTest(unittest.TestCase):
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.browse = (cls.single / "findings" / "browse" / "index.html").read_text(encoding="utf-8")
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
+        cls.llms = (cls.single / "llms.txt").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    # ── findings 허브 ────────────────────────────────────────────────────────
-    def test_hub_sections_precede_search(self):
-        # 순서 가드 — 검색을 없앤 게 아니라 순서만 뒤로 보냈다는 계약 그 자체.
-        i_purpose = self.html.index('id="fnd-purpose"')
-        i_recent = self.html.index('id="fnd-recent"')
-        i_search = self.html.index('id="fnd-search"')
-        i_tools = self.html.index('id="fnd-tools"')
-        self.assertLess(i_purpose, i_recent, "목적 카드가 최근 문서보다 앞이어야")
-        self.assertLess(i_recent, i_search, "최근 문서가 상세 검색보다 앞이어야")
-        self.assertLess(i_search, i_tools, "검색 툴바는 #fnd-search 래퍼 안이어야")
+    # ── 면 분업 ──────────────────────────────────────────────────────────────
+    def test_search_face_is_tool_only(self):
+        """검색 면 첫 화면 = 검색 도구. 허브 섹션이 되돌아오면 분리가 무효가 된다."""
+        self.assertIn('id="fnd-tools"', self.html)
+        for hub_id in ('id="fnd-purpose"', 'id="fnd-recent"'):
+            self.assertNotIn(hub_id, self.html,
+                             "허브 섹션이 검색 면으로 되돌아왔다 — 2면 분리 회귀")
+        # 세그가 툴바보다 앞(면 전환 장치가 첫 화면에 보인다).
+        self.assertLess(self.html.index('class="fnd-seg"'),
+                        self.html.index('id="fnd-tools"'))
+
+    def test_browse_face_carries_the_hub(self):
+        """둘러보기 면 = 업무별 바로가기 → 최근 공개 문서 → 축별 탐색."""
+        i_purpose = self.browse.index('id="fnd-purpose"')
+        i_recent = self.browse.index('id="fnd-recent"')
+        self.assertLess(i_purpose, i_recent)
+        self.assertIn("축별 탐색", self.browse)
+        self.assertNotIn('id="fnd-tools"', self.browse,
+                         "둘러보기 면에 검색 툴바가 있으면 다시 한 페이지 과밀로 돌아간다")
+
+    def test_seg_nav_on_both_faces_with_correct_active(self):
+        for page, face in ((self.html, "검색"), (self.browse, "둘러보기")):
+            self.assertIn('class="fnd-seg"', page)
+        self.assertIn('class="on" aria-current="page">검색</a>', self.html)
+        self.assertIn('class="on" aria-current="page">둘러보기</a>', self.browse)
 
     def test_purpose_cards_link_every_tool_route(self):
-        # 옛 '도구' 섹션을 흡수했으므로 상시 도구 라우트가 전부 카드 안에 남아야 한다
-        # (하나라도 빠지면 이 페이지 기준 도달성이 #807 이전으로 후퇴한다).
+        # 도달성 — 상시 도구 라우트가 전부 카드 안에 남아야 한다(#807 이전으로 후퇴 금지).
         for path in ("findings/checklist/index.html", "findings/firm/index.html",
                      "findings/inspector/index.html", "findings/inspections/index.html",
                      "findings/coverage/index.html", "findings/trends/index.html"):
-            self.assertIn(f'href="../{path}"', self.html, path)
+            self.assertIn(f'href="../../{path}"', self.browse, path)
 
-    def test_inspector_card_keeps_no_ranking_copy(self):
-        # 037 정책(순위·비교 금지) 문안이 카드 개편 후에도 살아 있어야 한다.
-        self.assertIn("순위·비교는 제공하지 않습니다", self.html)
+    def test_browse_face_registered_in_sitemap_and_llms(self):
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/browse/</loc>", self.sitemap)
+        self.assertIn("/findings/browse/", self.llms)
+
+    # ── 워딩 규율(사용자 피드백 2026-08-27) ─────────────────────────────────
+    def test_no_feature_absence_advertisement(self):
+        """기능 부재를 광고하지 않는다 — "순위·비교는 제공하지 않습니다" 류.
+
+        ★정책(037 순위 금지)과 그 부재의 광고는 다르다 — 정책은 RPC 게이트가 지키고,
+        화면 문구는 있는 것을 설명한다. 측정 정직성 문구(건수의 의미)는 별개로 유지된다
+        (inspector 면 가드가 따로 검증)."""
+        for page in (self.html, self.browse):
+            self.assertNotIn("제공하지 않습니다", page)
+        insp = (WEB_DIR / "templates" / "inspector.html").read_text(encoding="utf-8")
+        self.assertNotIn("순위나 비교를 제공하지 않습니다", insp)
+        # 측정 정직성은 유지 — 건수를 평가 지표로 오독하는 것을 막는 문구.
+        self.assertIn("실사관에 대한 평가 지표가 아닙니다", insp)
+
+    def test_hub_copy_is_professional_not_conversational(self):
+        """구어투 제목이 돌아오지 않는다 — "어떤 일로 오셨나요?" → "업무별 바로가기"."""
+        self.assertIn("업무별 바로가기", self.browse)
+        for casual in ("어떤 일로 오셨나요", "알면 됩니다", "내려가셔도 됩니다"):
+            self.assertNotIn(casual, self.browse)
 
     def test_recent_docs_from_canon_newest_first(self):
         # 최근 공개 문서 5건 — 정본과 같은 정렬(공개일 desc, slug 로 결정론 타이브레이크).
         docs = json.loads(render.FINDINGS_DOCS_FILE.read_text(encoding="utf-8"))["documents"]
         ordered = sorted(docs, key=lambda d: (d["published_date"], d["slug"]),
                          reverse=True)[:5]
-        hrefs = re.findall(r'class="fnd-rc-row" href="\.\./findings/doc/([^/"]+)/"',
-                           self.html)
+        hrefs = re.findall(r'class="fnd-rc-row" href="\.\./\.\./findings/doc/([^/"]+)/"',
+                           self.browse)
         self.assertEqual(hrefs, [d["slug"] for d in ordered])
-        self.assertIn(ordered[0]["published_date"], self.html)
 
     def test_recent_section_states_date_semantics(self):
-        # 공개일≠실사일 — 트렌드 면과 같은 정직성 문안이 섹션에 있어야 한다.
-        self.assertIn("문서가 공개된 날", self.html)
+        # 공개일≠실사일 — 숫자 해석에 필요한 정직성 고지는 워딩 스윕에서도 살아남는다.
+        self.assertIn("문서가 공개된 날", self.browse)
 
-    # ── 랜딩 #records ────────────────────────────────────────────────────────
+    # ── 소스 완전성(사용자 피드백 — "다른 정보도 있는데 왜 뺐는지") ─────────
+    def test_docs_snapshot_covers_every_agency(self):
+        """문서로 찾기의 정본에 **수집 중인 5개 기관이 전부** 있어야 한다.
+
+        ★실제로 일어난 일: min_findings=3 게이트(483 기준의 얇은 페이지 방지)가 문서당
+        지적 1~2건인 EU NCR·MHRA 를 전량 기각 → 기관 자체가 목록에서 침묵 소실.
+        MHRA 는 문서 id 의 공백·슬래시("Insp GMP/GDP/IMP …")가 슬러그 검사에서 추가로
+        전량 기각. 임계는 1로, 슬러그는 결정론 변환으로 고쳤다 — 이 가드는 그 재발을
+        스냅샷 층에서 막는다(어떤 게이트가 원인이든 기관이 사라지면 여기서 터진다)."""
+        docs = json.loads(render.FINDINGS_DOCS_FILE.read_text(encoding="utf-8"))["documents"]
+        agencies = {d.get("agency") for d in docs}
+        self.assertLessEqual({"FDA", "HC", "MFDS", "EMA", "MHRA"}, agencies)
+
+    def test_thickness_gate_exempts_sources_it_would_erase(self):
+        """임계(3)는 유지하되, **그 임계가 소스를 통째로 지우면 면제**한다.
+
+        실측 문서당 지적 1건 비율: EMA 100% · MHRA 100% · MFDS 89% · FDA 28% · HC 16%.
+        EU 비준수 보고서는 지적 1건이 곧 보고서 전체라 임계가 '얇음'이 아니라 '존재'를
+        재고 있었다 — 두 사건을 한 숫자로 다루면 반드시 한쪽이 틀린다. 판정은 손목록이
+        아니라 수집 데이터에서 파생한다(새 소스 자동 편입)."""
+        import findings_docs_refresh as fdr
+        self.assertEqual(fdr.DEFAULT_MIN_FINDINGS, 3)
+        reject = collections.Counter()
+        docs = ([{"agency": "FDA", "findings": [0] * 5}] * 2
+                + [{"agency": "FDA", "findings": [0]}] * 3       # 얇음 → 걸러진다
+                + [{"agency": "NCR", "findings": [0]}] * 4)      # 소스 전체가 1건 → 면제
+        kept = fdr.apply_thickness_gate(docs, min_findings=3, reject=reject)
+        self.assertEqual(sum(1 for d in kept if d["agency"] == "FDA"), 2,
+                         "임계가 실제로 얇은 문서를 거르는 소스에서는 종전대로 동작해야")
+        self.assertEqual(sum(1 for d in kept if d["agency"] == "NCR"), 4,
+                         "임계가 통째로 지우는 소스는 전량 남아야")
+        self.assertEqual(reject["국문 지적 3건 미만"], 3)
+
+    def test_unsafe_doc_id_becomes_deterministic_slug(self):
+        import findings_docs_refresh as fdr
+        raw = "Insp GMP/GDP/IMP 322/14798-0032[I]"
+        slug = fdr._safe_slug(raw)
+        self.assertRegex(slug, r"^[A-Za-z0-9._-]{1,120}$")
+        self.assertEqual(slug, fdr._safe_slug(raw), "같은 id 는 언제나 같은 슬러그")
+        self.assertEqual(fdr._safe_slug("normal-id_1.2"), "normal-id_1.2",
+                         "안전한 id 는 무변형 — 기존 URL 이 바뀌면 안 된다")
+
+    def test_facets_agency_axis_exempt_from_min_gate(self):
+        """기관 축은 표본 미달로 항목을 빼지 않는다(완전성 우선) — MHRA 8건이 근거."""
+        facets = json.loads(render.FINDINGS_FACETS_FILE.read_text(encoding="utf-8"))
+        ag = next(a for a in facets["axes"] if a["axis"] == "agency")
+        slugs = {v["slug"] for v in ag["items"]}
+        self.assertLessEqual({"fda", "hc", "mfds", "ema", "mhra"}, slugs)
+        src = pathlib.Path(render.__file__).resolve().parent.parent / "findings_facets_refresh.py"
+        self.assertIn('if n < min_findings and axis != "agency":',
+                      src.read_text(encoding="utf-8"))
+
+    # ── 랜딩 #records(기존 계약 유지) ────────────────────────────────────────
     def test_landing_records_counts_derived_not_hardcoded(self):
         facets = json.loads(render.FINDINGS_FACETS_FILE.read_text(encoding="utf-8"))
         docs_fmt = f"{facets['totals']['documents']:,}"
@@ -11587,23 +11691,18 @@ class WebDiscoveryHubTest(unittest.TestCase):
         self.assertIn('id="records"', self.landing)
         self.assertIn(f"문서 {docs_fmt}건", self.landing)
         self.assertIn(f"지적사항 {find_fmt}건", self.landing)
-        # 수치 파생 계약(자료실 카드 동형) — 템플릿 소스에 '건' 단위 콤마 수치를 박지
-        # 않는다. ('건' 접미로 좁히는 이유: CSS 주석의 픽셀 수치("1,180px")까지 잡으면
-        # 가드가 무관한 대상에 발화한다 — 위험은 건수 하드코딩이다.)
-        for tpl in ("landing.html", "findings.html"):
+        for tpl in ("landing.html", "findings.html", "findings_browse.html"):
             src = (WEB_DIR / "templates" / tpl).read_text(encoding="utf-8")
             self.assertIsNone(re.search(r"\d{1,3},\d{3}\s*건", src),
                               f"{tpl}: 건수 하드코딩 금지 — render 가 정본에서 계산해야")
 
     def test_landing_records_between_why_and_engage(self):
-        # 12차 정리 후 순서: #why → #records → #engage (Card Anatomy 는 제거됨).
         self.assertLess(self.landing.index('id="why"'),
                         self.landing.index('id="records"'))
         self.assertLess(self.landing.index('id="records"'),
                         self.landing.index('id="engage"'))
 
     def test_landing_records_question_entries(self):
-        # 진입은 기능명이 아니라 질문형 — 링크 대상 4개 + 전체 화면 링크.
         for path in ("findings/firm/index.html", "findings/inspector/index.html",
                      "findings/checklist/index.html", "findings/trends/index.html",
                      "findings/index.html"):
@@ -11612,19 +11711,20 @@ class WebDiscoveryHubTest(unittest.TestCase):
 
     # ── 프로파일 맥락 유지(소스 계약 — firm/inspector.js 는 비골든 런타임 파일) ──
     def test_profile_category_links_carry_context(self):
-        # 카테고리 클릭이 프로파일 조건을 버리지 않는다 — q=이름을 함께 싣는 계약.
         for name in ("inspector.js", "firm.js"):
             src = (WEB_DIR / "assets" / name).read_text(encoding="utf-8")
             self.assertIn('href += "&q=" + encodeURIComponent(qValue)', src, name)
             self.assertRegex(src, r"buildCatRow\(c, maxCnt, \w+Name\)", name)
 
-    def test_findings_js_lands_on_search_for_deep_links(self):
-        # 검색 파라미터를 들고 온 방문은 하단 검색 섹션으로 착지해야 한다(허브 재배열의
-        # 딥링크 보정) — finding_id 딥링크는 자체 착지 로직이 있어 제외.
+    def test_deep_link_landing_scroll_removed_with_its_reason(self):
+        """허브 착지 스크롤은 존재 이유(허브가 검색을 밀어내림)와 함께 사라져야 한다.
+
+        검색 툴바가 다시 첫 화면에 있으므로 보정할 거리가 없다 — 남겨두면 파라미터를
+        들고 온 방문마다 화면이 이유 없이 튄다."""
         src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('document.getElementById("fnd-search")', src)
-        self.assertIn("searchSection.scrollIntoView()", src)
-        self.assertIn("!deepLinkPending", src)
+        self.assertNotIn('document.getElementById("fnd-search")', src)
+        self.assertNotIn("searchSection.scrollIntoView()", src)
+
 
 
 if __name__ == "__main__":

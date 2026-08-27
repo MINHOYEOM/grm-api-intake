@@ -783,7 +783,7 @@
       // 조용히 빼면 "식약처 자료가 이것뿐"으로 읽힌다.
       if (built.offCnt > 0) {
         note += (note ? " " : "") + "회수 공고·행정처분 " + fmtNum(built.offCnt) +
-          "건은 실사 지적이 아니라 이 순위에서 제외했습니다 — 찾아보기에서 전부 보실 수 있어요.";
+          "건은 실사 지적이 아니라 이 순위에서 제외했습니다 — 지적사항 검색에서 모두 확인하실 수 있습니다.";
       }
       rankNoteEl.textContent = note;
       rankNoteEl.hidden = !note;

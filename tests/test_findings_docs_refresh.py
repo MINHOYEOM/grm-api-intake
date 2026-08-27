@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import io
+import collections
 import json
 import shutil
 import sys
@@ -78,11 +79,28 @@ class DocumentViewGateTest(unittest.TestCase):
         self.assertIsNone(self._view(_doc(evidence_url="javascript:alert(1)")))
         self.assertEqual(self.reject["원문 링크 없음"], 1)
 
-    def test_rejects_unsafe_document_id(self):
-        for bad in ("a/b", "a b", "../etc", "한글아이디", ""):
+    def test_unsafe_document_id_transforms_instead_of_rejecting(self):
+        """[2026-08-27] 기각 → 결정론 변환. 종전 기각 규칙이 MHRA 를 전량 침묵
+        소실시켰다(문서 id 가 기관 원문 형식 "Insp GMP/GDP/IMP …" 라 공백·슬래시가
+        항상 들어 있다) — id 형식은 기관이 정하므로 기각 규칙이 곧 기관 차별이 된다."""
+        import re as _re
+        for raw in ("a/b", "a b", "../etc", "한글아이디"):
             self.reject.clear()
-            self.assertIsNone(self._view(_doc(doc_id=bad)), bad)
-            self.assertEqual(self.reject["URL 로 쓸 수 없는 문서 id"], 1, bad)
+            view = self._view(_doc(doc_id=raw))
+            self.assertIsNotNone(view, raw)
+            self.assertRegex(view["slug"], r"^[A-Za-z0-9._-]{1,120}$")
+            self.assertEqual(view["document_id"], raw, "원본 id 는 무변형 보존")
+            # 같은 id 는 언제나 같은 슬러그(재실행 안정) — 해시 접미가 그 근거다.
+            self.assertEqual(view["slug"], fdr._safe_slug(raw))
+        # 빈 id 만 기각으로 남는다.
+        self.reject.clear()
+        self.assertIsNone(self._view(_doc(doc_id="")))
+        self.assertEqual(self.reject["URL 로 쓸 수 없는 문서 id"], 1)
+
+    def test_safe_document_id_slug_is_unchanged(self):
+        """안전한 기존 id 는 무변형 — 기존 문서 URL 이 바뀌면 안 된다(링크 파손)."""
+        view = self._view(_doc(doc_id="3015467542.20240119"))
+        self.assertEqual(view["slug"], "3015467542.20240119")
 
 
     def test_rejects_numeric_or_empty_firm_name(self):
@@ -99,16 +117,24 @@ class DocumentViewGateTest(unittest.TestCase):
     def test_keeps_names_that_merely_contain_digits(self):
         self.assertIsNotNone(self._view(_doc(firm_name="3M Health Care")))
 
-    def test_rejects_below_threshold(self):
-        self.assertIsNone(self._view(_doc(n=2)))
-        self.assertEqual(self.reject["국문 지적 3건 미만"], 1)
+    def test_view_rejects_only_zero_korean_findings(self):
+        """[2026-08-27] 두께 판정은 document_view 를 떠났다.
+
+        그 소스가 임계를 넘는 문서를 하나라도 갖는지는 **소스 전체 분포**를 봐야 알 수
+        있으므로 수집이 끝난 뒤 apply_thickness_gate 가 판정한다. 여기서는 임계와 무관한
+        절대 조건(국문 본문 0건)만 남는다."""
+        self.assertIsNone(self._view(_doc(n=0)))
+        self.assertEqual(self.reject["국문 지적 0건"], 1)
+        # 1~2건 문서도 이 단계는 통과한다(두께는 뒤에서 판정).
+        self.assertIsNotNone(self._view(_doc(n=2)))
+        self.assertEqual(fdr.DEFAULT_MIN_FINDINGS, 3,
+                         "임계는 3 유지 — 소스를 통째로 지우는 경우만 게이트가 면제한다")
 
     def test_findings_without_korean_text_do_not_count(self):
         doc = _doc(n=0)
-        doc["findings"] = [_finding("a"), _finding("b", text_ko=""),
-                           _finding("c", text_ko="  ")]
+        doc["findings"] = [_finding("b", text_ko=""), _finding("c", text_ko="  ")]
         self.assertIsNone(self._view(doc))
-        self.assertEqual(self.reject["국문 지적 3건 미만"], 1)
+        self.assertEqual(self.reject["국문 지적 0건"], 1)
 
     def test_text_is_verbatim(self):
         long_text = "무균공정 " * 400
@@ -141,11 +167,28 @@ class CollectDocumentsTest(unittest.TestCase):
         fdr.post_search = fake
 
     def test_zero_documents_aborts(self):
-        """RPC 장애를 '문서가 없다'로 커밋하면 다음 렌더가 페이지 수천 장을 지운다."""
-        self._stub(1, {1: [_doc(n=1)]})
+        """RPC 장애를 '문서가 없다'로 커밋하면 다음 렌더가 페이지 수천 장을 지운다.
+
+        [2026-08-27] 두께 미달로는 0건을 만들 수 없다 — 그 소스가 통째로 지워지는
+        상황이면 면제되기 때문이다. 그래서 두께와 무관한 사유(국문 본문 0건)로 0건을
+        만든다. 가드가 재는 것은 그대로다."""
+        self._stub(1, {1: [_doc(n=0)]})
         with self.assertRaises(SystemExit):
             fdr.collect_documents("u", "k", min_findings=3, page_size=10,
                                   log=lambda m: None)
+
+    def test_majority_exemption_aborts(self):
+        """면제가 과반이면 소스 성질이 아니라 상류 데이터 모양이 바뀐 것이다.
+
+        이 안전장치가 없으면, 상류가 findings 배열을 잘라 보낼 때 모든 소스가 얇아져
+        전량 면제되고 두께 게이트가 사라진 스냅샷이 조용히 커밋된다(주간 축소 게이트는
+        **증가**를 못 잡는다)."""
+        reject = collections.Counter()
+        docs = ([{"agency": "A", "findings": [0]}] * 3
+                + [{"agency": "B", "findings": [0]}] * 3
+                + [{"agency": "C", "findings": [0] * 5}] * 3)
+        with self.assertRaises(SystemExit):
+            fdr.apply_thickness_gate(docs, min_findings=3, reject=reject)
 
     def test_sorted_by_document_id_for_small_diffs(self):
         self._stub(1, {1: [_doc("zzz"), _doc("aaa"), _doc("mmm")]})
@@ -185,13 +228,23 @@ class CommittedDataTest(unittest.TestCase):
 
     def test_every_document_meets_the_gates(self):
         floor = self.data["min_findings"]
+        # [2026-08-27] 임계가 통째로 지우는 소스는 면제된다 — 그 소스는 최대 지적 수가
+        # 임계 미만이라는 사실 자체가 면제 근거다(파일 상단 docstring). 여기서도 같은
+        # 규칙으로 판정한다: 손열거를 두면 새 소스가 들어올 때 이 가드가 먼저 낡는다.
+        peak = collections.Counter()
+        for d in self.data["documents"]:
+            peak[d["agency"]] = max(peak[d["agency"]], len(d["findings"]))
+        exempt = {a for a, mx in peak.items() if mx < floor}
+        self.assertLess(len(exempt) * 2, len(peak),
+                        f"면제가 과반이다({exempt}) — 데이터 모양이 바뀌었을 수 있다")
         for d in self.data["documents"]:
             self.assertFalse(d["firm_name"].strip().isdigit(),
                              f'업체명이 숫자뿐: {d["slug"]}')
             self.assertRegex(d["slug"], r"^[A-Za-z0-9._-]{1,120}$")
             self.assertRegex(d["published_date"], r"^\d{4}-\d{2}-\d{2}$")
             self.assertTrue(d["evidence_url"].startswith(("http://", "https://")))
-            self.assertGreaterEqual(len(d["findings"]), floor, d["slug"])
+            if d["agency"] not in exempt:
+                self.assertGreaterEqual(len(d["findings"]), floor, d["slug"])
             self.assertTrue(d["firm_name"].strip(), d["slug"])
 
     def test_slugs_unique_and_sorted(self):
@@ -217,7 +270,9 @@ class CommittedDataTest(unittest.TestCase):
     # 여기서 0 을 요구하면 이 PR 이 남의 결함에 발목 잡히고, 검사를 지우면 그 결함이 다시
     # 조용해진다. 그래서 **기준선으로 고정해 표면화**한다 — 늘면 실패하고, 상류가 고쳐지면
     # 이 숫자를 내리라고 알려준다.
-    BASELINE_UPSTREAM_TRUNCATED = 1337
+    # [2026-08-27] 1337 → 1338. EU·영국 GMP 비준수 86건이 면제로 편입되며 1건 늘었다
+    # (모집단 정의가 넓어진 만큼의 정직한 증가 — 상류 절단 자체는 그대로다).
+    BASELINE_UPSTREAM_TRUNCATED = 1338
 
     def test_upstream_truncation_does_not_grow(self):
         bad = [f["finding_id"] for d in self.data["documents"] for f in d["findings"]

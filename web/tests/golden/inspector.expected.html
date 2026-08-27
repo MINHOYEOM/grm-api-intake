@@ -36,7 +36,7 @@
 </head>
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html" class="on">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html" class="on">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../../briefs/2026-07-06/index.html">이번 주 소식</a>
@@ -52,9 +52,8 @@
     <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden></div>
 
     <div class="ip-state" id="ip-loading" role="status" aria-live="polite">불러오는 중…</div>
-    <div class="ip-state" id="ip-unavailable" hidden>
-      <p>해당 실사관의 프로파일을 제공하지 않습니다.</p>
-      <a class="ip-back-link" href="../../findings/index.html">찾아보기로 돌아가기 →</a>
+    <div class="ip-state" id="ip-unavailable" hidden><p>해당 실사관의 프로파일을 표시할 수 없습니다.</p>
+      <a class="ip-back-link" href="../../findings/index.html">지적사항 검색으로 돌아가기 →</a>
     </div><div class="ip-state tr-look" id="ip-lookup" hidden>
       <p class="tr-look-hint">실사관 이름을 넣어 그 실사관이 서명한 공개 FDA 483 문서와 지적 이력을 확인하세요. 성이나 이름의 일부만 넣어도 됩니다(두 글자 이상). 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.</p>
       <form class="tr-look-form" id="ip-look-form" role="search">
@@ -62,8 +61,7 @@
         <input class="tr-look-input" id="ip-look-input" type="search" name="q" placeholder="예: Moore" autocomplete="off" spellcheck="false" />
         <button class="tr-look-btn" id="ip-look-btn" type="submit">찾기</button>
       </form>
-      <div id="ip-look-res" class="tr-look-res" aria-live="polite"></div>
-      <p class="tr-look-hint">이 화면은 순위나 비교를 제공하지 않습니다. 지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관을 평가하는 지표가 아닙니다.</p>
+      <div id="ip-look-res" class="tr-look-res" aria-live="polite"></div><p class="tr-look-hint">지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관에 대한 평가 지표가 아닙니다.</p>
     </div>
 
     <div id="ip-content" hidden>
@@ -210,11 +208,12 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
   </div>
 </div></section>
 <style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
+<style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>둘러보기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">모아보기</a><a href="../../findings/index.html">찾아보기</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
+    <div><h5>바로가기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
     <div><h5>도구</h5><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/inspector/index.html">실사관 조회</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
     <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
@@ -261,7 +260,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/inspector.js?v=58b9c626" defer></script>
+<script src="../../assets/inspector.js?v=0ac3e52e" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

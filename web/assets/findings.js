@@ -393,6 +393,43 @@
   // 누적시킨다. 이미 존재하는 값은 건너뛰므로 중복 <option> 이 생기지 않고, 사라진 값의
   // 옵션은 지우지 않는다(refreshFacetUI 가 건수 0 + disabled 로 표시 — 선택지가 눈앞에서
   // 사라져 사용자가 방금 본 항목을 다시 찾지 못하는 것보다 낫다).
+  // [P1.5-2 2026-08-27] 발행월 옵션의 연도 optgroup. 2016년까지 월 단위로 100개가
+  // 넘게 한 줄로 나열돼 "고르기 어렵다"는 피드백을 받았다 — 값·URL(?month=)·서버 계약은
+  // 그대로 두고 표시만 연도로 묶는다(select.options 는 optgroup 을 투과하는 평탄 목록이라
+  // refreshFacetUI/syncControlsFromState 는 무수정으로 동작한다).
+  // 그룹은 최신 연도 우선, 그룹 안 월도 최신 우선 — collectFacetValues 의 월 역순 정렬과
+  // 같은 방향이다. 뒤늦게 나타나는 월(파셋은 필터에 따라 변한다)도 제 연도 그룹의 제
+  // 자리에 끼워 넣는다(그룹 끝에 붙이면 한 그룹 안에서 순서가 섞여 보인다).
+  function monthYearGroup(sel, year) {
+    var label = year + "\ub144";
+    var groups = sel.getElementsByTagName("optgroup");
+    for (var i = 0; i < groups.length; i += 1) {
+      if (groups[i].label === label) return groups[i];
+      if (groups[i].label < label) {           // 연도 내림차순 유지 지점
+        var g = document.createElement("optgroup");
+        g.label = label;
+        sel.insertBefore(g, groups[i]);
+        return g;
+      }
+    }
+    var tail = document.createElement("optgroup");
+    tail.label = label;
+    sel.appendChild(tail);
+    return tail;
+  }
+
+  function insertMonthOption(sel, opt) {
+    var group = monthYearGroup(sel, opt.value.slice(0, 4));
+    var kids = group.children;
+    for (var i = 0; i < kids.length; i += 1) {
+      if (kids[i].value < opt.value) {          // 월 내림차순 유지 지점
+        group.insertBefore(opt, kids[i]);
+        return;
+      }
+    }
+    group.appendChild(opt);
+  }
+
   function buildFacetSkeleton() {
     SELECT_FACETS.forEach(function (def) {
       var selId = def[0], key2 = def[1];
@@ -408,6 +445,7 @@
         opt.value = v;
         opt.dataset.label = selectOptionLabel(key2, v);
         opt.textContent = opt.dataset.label; // 초기 라벨(건수는 첫 render()가 바로 병기)
+        if (key2 === "month") { insertMonthOption(sel, opt); return; }
         sel.appendChild(opt);
       });
     });

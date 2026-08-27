@@ -263,6 +263,10 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
             "by_agency": [{"v": a.get("v"), "c": int(a.get("c") or 0)}
                           for a in (dash.get("by_agency") or [])],
             "top_firms": [{"firm_name": f.get("firm_name") or f.get("firm_key") or "",
+                           # [P1.5-1 2026-08-27] RPC 가 주는 firm_key 를 그대로 싣는다 —
+                           # 이게 없어서 축 페이지의 업체명이 평문이었다(업체 조회
+                           # ?key= 계약의 키). 빈 키는 템플릿이 무링크로 남긴다.
+                           "firm_key": f.get("firm_key") or "",
                            "c": int(f.get("c") or 0)}
                           for f in (dash.get("top_firms") or [])[:5]],
             "samples": collect_samples(resp, samples, skipped_absence),
@@ -369,6 +373,7 @@ def build_category_agency_combos(base_url: str, anon_key: str, *,
                 "findings": got,
                 "documents": int(totals.get("documents") or 0),
                 "top_firms": [{"firm_name": f.get("firm_name") or f.get("firm_key") or "",
+                               "firm_key": f.get("firm_key") or "",
                                "c": int(f.get("c") or 0)}
                               for f in (dash.get("top_firms") or [])[:5]],
                 "samples": collect_samples(resp, samples, skipped_absence),

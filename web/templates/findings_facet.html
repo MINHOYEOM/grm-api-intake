@@ -32,8 +32,10 @@
   .fx-mix-t span{display:block;height:100%;background:var(--coral);border-radius:99px}
   .fx-mix-v{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-align:right}
   .fx-firms{display:flex;flex-wrap:wrap;gap:8px}
-  .fx-firms span{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:5px 14px}
-  .fx-firms span b{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+  .fx-firms span,.fx-firms a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:5px 14px}
+  .fx-firms a{text-decoration:none}
+  .fx-firms a:hover{border-color:var(--coral);color:var(--coral-2)}
+  .fx-firms span b,.fx-firms a b{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
   .fx-cases{display:flex;flex-direction:column;gap:16px}
   .fx-case{background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;display:flex;flex-direction:column;gap:10px}
   .fx-case-m{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
@@ -81,8 +83,13 @@
     {% if item.top_firms %}
     <section class="fx-sec">
       <h2 class="fx-sec-h">지적이 많았던 업체</h2>
+      {#- [P1.5-1 2026-08-27] 업체명이 평문이라 축 → 업체 경로가 여기서 끊겼다(막다른
+          지점). firm_key 가 있으면 업체 조회(?key= 계약)로 잇고, 키 없는 구 스냅샷
+          항목은 종전 그대로 무링크 — 폴백이 있어야 스냅샷 재생성 전에도 페이지가 산다.
+          rel="nofollow" 는 문서 상세의 업체 프로파일 간선과 같은 정책(동적 조회 페이지를
+          크롤 예산에서 뺀다). -#}
       <div class="fx-firms">
-        {%- for f in item.top_firms %}<span>{{ f.firm_name }}<b>{{ f.c }}</b></span>{% endfor %}
+        {%- for f in item.top_firms %}{% if f.firm_key %}<a href="{{ rel_root }}findings/firm/?key={{ f.firm_key | urlencode }}" rel="nofollow">{{ f.firm_name }}<b>{{ f.c }}</b></a>{% else %}<span>{{ f.firm_name }}<b>{{ f.c }}</b></span>{% endif %}{% endfor %}
       </div>
     </section>
     {% endif %}

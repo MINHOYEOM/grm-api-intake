@@ -8019,6 +8019,52 @@ class WebFindingsFacetPageTest(unittest.TestCase):
                 self.assertIn(f'{render.SITE_BASE_URL}/findings/{meta["path"]}/{item["slug"]}/',
                               html, f'canonical 누락: {item["slug"]}')
 
+    def test_top_firms_link_to_firm_profile(self):
+        """[P1.5-1 2026-08-27] 축 페이지의 업체명은 업체 조회로 이어져야 한다.
+
+        종전에는 스냅샷에 firm_key 가 없어 평문 <span> 이었고, 축 → 업체 → 문서 경로가
+        여기서 끊겼다(로드맵의 '막다른 지점' 1번). RPC 는 키를 원래 주고 있었다 —
+        refresh 스크립트가 버리고 있었을 뿐이다. 키 없는 항목은 종전대로 무링크
+        (구 스냅샷 폴백 — 재생성 전에도 페이지가 살아야 한다)."""
+        import urllib.parse as _u
+        checked = 0
+        for axis, meta in self._axes():
+            for item in axis["items"]:
+                firms = item.get("top_firms") or []
+                if not firms:
+                    continue
+                html = self._page(meta["path"], item["slug"])
+                for f in firms:
+                    if not f.get("firm_key"):
+                        continue
+                    # Jinja urlencode 는 '/' 를 보존한다(쿼리 값에서 합법 —
+                    # URLSearchParams 도 %2F 와 동일 해석). quote 기본 safe='/' 가 그 계약.
+                    self.assertIn(
+                        'findings/firm/?key=' + _u.quote(f["firm_key"], safe="/"),
+                        html, item["slug"] + ": " + f["firm_name"])
+                    checked += 1
+        self.assertGreater(checked, 50, "표본이 너무 적다 — 스냅샷에 firm_key 가 없다")
+        # 커밋된 스냅샷 자체도 전건 키를 가져야 한다(생성기 회귀 가드).
+        total = sum(1 for a in self.data["axes"] for it in a["items"]
+                    for f in it.get("top_firms") or [])
+        keyed = sum(1 for a in self.data["axes"] for it in a["items"]
+                    for f in it.get("top_firms") or [] if f.get("firm_key"))
+        self.assertEqual(keyed, total, "refresh 가 firm_key 를 다시 버리기 시작했다")
+
+    def test_firm_links_carry_nofollow(self):
+        """동적 조회 페이지(?key=)는 크롤 예산에서 뺀다 — 문서 상세의 업체 프로파일
+        간선과 같은 정책. 링크가 있는 페이지 하나에서 확인한다."""
+        import re as _re
+        for axis, meta in self._axes():
+            for item in axis["items"]:
+                if any(f.get("firm_key") for f in item.get("top_firms") or []):
+                    html = self._page(meta["path"], item["slug"])
+                    m = _re.search(r'<a href="[^"]*findings/firm/\?key=[^"]*"[^>]*>', html)
+                    self.assertIsNotNone(m)
+                    self.assertIn('rel="nofollow"', m.group(0))
+                    return
+        self.fail("firm_key 있는 축 항목이 하나도 없다")
+
     def test_sample_text_is_not_truncated(self):
         """지적 본문은 자르지 않는다 — 이 문장이 그 페이지의 색인 대상 본문이다.
 
@@ -8680,7 +8726,10 @@ class WebFindingsDocPageTest(unittest.TestCase):
                         f"§4 위반(한글에 모노): {slug} .{cls} → {m.group(1)[:30]!r}")
 
     def test_facet_samples_link_only_to_existing_doc_pages(self):
-        """지적 3건 미만 문서는 페이지가 없다 — 그런 사례에는 링크를 만들면 안 된다."""
+        """페이지가 없는 문서(두께 임계 미달 — 면제 소스 제외)에는 링크를 만들면 안 된다.
+
+        판정은 문구가 아니라 **정본의 slug 집합**이라 임계·면제 규칙이 바뀌어도 이
+        테스트는 그대로 옳다(스냅샷에 있으면 페이지가 있고, 없으면 링크도 없어야 한다)."""
         import re as _re
         facets = render.load_findings_facets()
         if not facets:

@@ -49,6 +49,7 @@ FINDING_SQLITE_COLUMNS = (
     "document_type",
     "document_id",
     "published_date",
+    "inspection_date",
     "firm_name",
     "entity_id",
     "site_name",

@@ -1841,7 +1841,7 @@ def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
         src = title_source_label(d)
         firm = title_firm_name(d["firm_name"])
         head = f"{firm} {src}".strip() if src else firm
-        return f"{head} ({d['published_date']}) 지적사항"
+        return f"{head} ({doc_display_date(d)}) 지적사항"
 
     counts: dict[str, int] = {}
     for d in documents:
@@ -1869,17 +1869,44 @@ def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
     return out
 
 
+def doc_display_date(doc: dict[str, Any]) -> str:
+    """제목·목록에 쓰는 날짜 — **문서가 다루는 날**을 우선한다.
+
+    ★[실사일 2026-08-27] 여태 쓰던 `published_date` 는 우리가 그 문서를 확보한 날이지
+    규제기관이 실사한 날이 아니다. 대개는 며칠 차이라 문제가 없는데 FDA 483 에서는
+    무너진다 — FOIA 일괄 공개분 941건이 공개일 `2024-01-17` 하나를 공유하고 그 실사는
+    **2015~2019년**이다(전수 평균 격차 1,524일 · 최대 6,143일). 2015년 지적이 2024년
+    것으로 읽히는 건 실명 업체 페이지에서 사실 왜곡이다.
+
+    그래서 실사일이 있으면 그걸 쓴다. 없으면(캐나다 실사·경고서한 등) 종전대로 공개일.
+    ★어느 쪽인지는 **설명문이 밝힌다**(`doc_page_description`) — 제목에 "실사" 라벨을
+    붙이는 안도 쟀는데 폭 5 를 먹어 제목 276장을 절단선 밖으로 밀었다. 검색 결과에서는
+    제목과 설명이 함께 보이므로, 폭이 비싼 제목 대신 여유 있는 설명에서 밝히는 쪽이 낫다.
+    """
+    return (doc.get("inspection_date") or "").strip() or doc["published_date"]
+
+
 def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> str:
     """meta description — 누가·언제·몇 건·어떤 주제. 데이터 조립뿐(문구 생성 0).
 
     ★날짜를 반드시 넣는다. 검색 결과 스니펫에 연도가 없으면 몇 년 전 지적이 현재 상태로
     읽힌다 — 실명 업체 페이지에서 그건 사실 왜곡이다.
+
+    ★그리고 **어느 날짜인지 밝힌다.** 실사일이 있으면 그걸 앞세우고(문서가 다루는 날)
+    공개일은 괄호로 함께 적는다 — 제목이 맨몸 날짜를 쓰기 때문에, 그 날짜의 정체를
+    말해 주는 자리가 여기다. 실측 비용: 이 한 줄 때문에 문서 148장이 "주요 분류" 시작을
+    절단선 밖으로 밀지만, 1,524장이 평균 4.2년 어긋난 날짜를 그만 보여준다.
     """
     agency = agency_labels.get(doc["agency"], doc["agency"])
     cats = " · ".join(doc.get("categories") or [])
     tail = f" 주요 분류: {cats}." if cats else ""
     src = doc_source_label(doc)
     subject = f"{doc['firm_name']} {src}".strip() if src else doc["firm_name"]
+    inspected = (doc.get("inspection_date") or "").strip()
+    if inspected:
+        return (f"{agency}가 {inspected} 실사에서 확인한 {subject} "
+                f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다"
+                f"({doc['published_date']} 공개).{tail}")
     return (f"{agency}가 {doc['published_date']}에 공개한 {subject} "
             f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
 
@@ -3401,7 +3428,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             siblings = [s for s in by_firm.get(doc.get("firm_key") or "", [])
                         if s["slug"] != doc["slug"]]
             siblings.sort(key=lambda x: (x["published_date"], x["slug"]), reverse=True)
-            same_firm = [{"slug": s["slug"], "published_date": s["published_date"],
+            # 형제 링크의 날짜는 **그 링크가 여는 페이지의 제목과 같은 날짜**여야 한다 —
+            # 목록에서 "2024-01-17"을 보고 눌렀는데 도착한 문서 제목이 "(2015-07-10)"이면
+            # 같은 문서인지 의심하게 된다. 그래서 doc_display_date 를 그대로 쓴다.
+            # (문서 목록 페이지 `/findings/docs/{기관}/{연도}/` 는 반대다 — 거기는 공개
+            #  연도로 묶인 축이라 공개일이 맞고, 페이지 문구도 "…년에 공개한"이다.)
+            same_firm = [{"slug": s["slug"], "published_date": doc_display_date(s),
                           "agency": s["agency"], "count": len(s["findings"])}
                          for s in siblings[:6]]
             # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라 같은

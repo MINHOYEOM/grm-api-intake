@@ -8705,6 +8705,103 @@ class WebFirmPageTest(unittest.TestCase):
         self.assertNotIn(f"{render.SITE_BASE_URL}/findings/inspector/", self.sitemap)
 
 
+class WebInspectionDateTest(unittest.TestCase):
+    """[실사일 2026-08-27] 화면이 보여주는 날짜가 **문서가 다루는 날**인가.
+
+    여태 쓰던 `published_date` 는 우리가 그 문서를 확보한 날이다. 대개는 며칠 차이라
+    문제가 없었는데 FDA 483 에서 무너졌다 — FOIA 일괄 공개분 941건이 공개일
+    `2024-01-17` 하나를 공유하고 그 실사는 2015~2019년이다(raw_signals 전수 평균 격차
+    1,524일 · 최대 6,143일). 2015년 지적이 2024년 것으로 읽히는 건 실명 업체 페이지에서
+    사실 왜곡이다.
+
+    ★이 클래스는 **합성 문서**로 잰다. 커밋된 `findings_docs.json` 은 워크플로가 다시
+    만들어야 실사일이 들어오는데(로컬에서 재생성 불가 — 러너만 자격증명을 갖는다),
+    그때까지 렌더 계층이 검사 없이 남으면 '배선 없는 슬롯'이 된다. 순수 함수라 데이터
+    파일 없이도 전부 잴 수 있다.
+    """
+
+    FDA_483 = {
+        "slug": "fda483-1", "document_id": "fda483-1", "agency": "FDA",
+        "source": "FDA 483", "firm_name": "Acme Pharma Inc.",
+        "published_date": "2024-01-17", "inspection_date": "2015-07-10",
+        "categories": ["무균보증/무균공정"],
+        "findings": [{"x": 1}, {"x": 2}, {"x": 3}],
+    }
+    HC = {
+        "slug": "hc-1", "document_id": "hc-insp-1", "agency": "HC",
+        "source": "Health Canada Inspection", "firm_name": "Maple Labs Ltd.",
+        "published_date": "2021-01-13", "inspection_date": "",
+        "categories": ["시험실/품질관리"],
+        "findings": [{"x": 1}, {"x": 2}, {"x": 3}],
+    }
+
+    def test_display_date_prefers_the_day_the_document_is_about(self):
+        self.assertEqual(render.doc_display_date(self.FDA_483), "2015-07-10")
+
+    def test_display_date_falls_back_when_the_source_gives_none(self):
+        """캐나다 실사는 원천이 실사일을 안 주고, 경고서한은 실사 문서가 아니다.
+
+        부재를 지어내지 않고 종전 값(공개일)으로 물러선다 — 빈 날짜를 화면에 내보내는
+        것이 가장 나쁘다."""
+        self.assertEqual(render.doc_display_date(self.HC), "2021-01-13")
+        no_key = {k: v for k, v in self.HC.items() if k != "inspection_date"}
+        self.assertEqual(render.doc_display_date(no_key), "2021-01-13")
+
+    def test_title_uses_the_inspection_date(self):
+        titles = render.build_doc_page_titles([self.FDA_483, self.HC])
+        self.assertIn("(2015-07-10)", titles["fda483-1"])
+        self.assertNotIn("2024-01-17", titles["fda483-1"])
+        self.assertIn("(2021-01-13)", titles["hc-1"])
+
+    def test_title_pays_no_width_for_this(self):
+        """★제목에 "실사" 라벨을 붙이는 안은 **실측으로 기각**했다 — 폭 5 를 먹어 제목
+        276장을 절단선 밖으로 밀었다. 검색 결과에서는 제목과 설명이 함께 보이므로 폭이
+        비싼 제목 대신 설명에서 밝힌다. 라벨이 되살아나면 이 검사가 잡는다."""
+        titles = render.build_doc_page_titles([self.FDA_483, self.HC])
+        self.assertNotIn("실사", titles["fda483-1"])
+        was = dict(self.FDA_483, inspection_date="")
+        self.assertEqual(
+            render.serp_width(render.build_doc_page_titles([was])["fda483-1"]),
+            render.serp_width(titles["fda483-1"]),
+            "실사일 표기가 제목 폭을 바꾸면 B2 에서 얻은 절단 개선을 깎는다")
+
+    def test_description_says_which_date_is_which(self):
+        """제목이 맨몸 날짜를 쓰므로 **설명이 그 날짜의 정체를 말해야** 한다.
+
+        두 날짜가 다 나오고 각각 무엇인지 적혀 있어야 한다 — 하나만 적거나 라벨 없이
+        나열하면 종전 결함(어느 날짜인지 모름)이 그대로 남는다."""
+        d = render.doc_page_description(self.FDA_483, {"FDA": "미국 FDA"})
+        self.assertIn("2015-07-10 실사", d)
+        self.assertIn("2024-01-17 공개", d)
+        self.assertLess(d.index("2015-07-10"), d.index("2024-01-17"),
+                        "문서가 다루는 날이 앞에 와야 한다")
+
+    def test_description_unchanged_when_there_is_no_inspection_date(self):
+        """실사일이 없는 소스의 문구는 **한 글자도 건드리지 않는다**(불필요한 골든 churn)."""
+        d = render.doc_page_description(self.HC, {"HC": "캐나다 보건부"})
+        self.assertEqual(
+            d,
+            "캐나다 보건부가 2021-01-13에 공개한 Maple Labs Ltd. Health Canada Inspection"
+            " 지적사항 3건을 우리말로 정리했습니다. 주요 분류: 시험실/품질관리.")
+
+    def test_published_date_is_never_replaced_in_the_data(self):
+        """실사일은 **새 축**이지 옛 축의 대체가 아니다 — dedup 키·수집 창·발행 축이
+        전부 `published_date` 위에 서 있다. 표시만 고르고 값은 둘 다 남는다."""
+        self.assertEqual(self.FDA_483["published_date"], "2024-01-17")
+        d = render.doc_page_description(self.FDA_483, {"FDA": "미국 FDA"})
+        self.assertIn("2024-01-17", d)
+
+    def test_page_labels_both_dates_and_omits_the_empty_one(self):
+        """화면 칩 — 뜻이 다른 두 날짜를 나란히 두므로 **종류를 반드시 적는다**
+        (업체 이력 타임라인과 같은 규율). 없는 날짜는 칩 자체를 만들지 않는다."""
+        tpl = (pathlib.Path(render.__file__).parent / "templates"
+               / "findings_doc.html").read_text(encoding="utf-8")
+        self.assertIn("{%- if doc.inspection_date %}", tpl,
+                      "실사일 칩이 조건 없이 그려지면 빈 칩이 나간다")
+        self.assertIn("</b> 실사</span>", tpl)
+        self.assertIn("</b> 공개</span>", tpl)
+
+
 class WebFindingsDocPageTest(unittest.TestCase):
     """[검색 유입] /findings/doc/{document_id}/ 문서 단위 페이지.
 

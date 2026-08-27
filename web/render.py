@@ -36,6 +36,7 @@ import os
 import re
 import shutil
 import sys
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -1748,6 +1749,64 @@ def doc_source_label(doc: dict[str, Any]) -> str:
     return src
 
 
+def serp_width(text: str) -> int:
+    """검색 결과 표시폭 근사 — 한글·CJK 는 라틴의 약 두 배 자리를 차지한다.
+
+    구글은 제목을 글자 수가 아니라 **픽셀 폭**으로 자른다. 글자 수로 재면 한글이 섞인
+    제목이 실제보다 짧아 보여 잘림을 놓친다. 라틴 1·CJK 2 로 세고 데스크톱 절단선을
+    라틴 60자 상당(= 60폭)으로 본다.
+    """
+    return sum(2 if unicodedata.east_asian_width(c) in "WF" else 1 for c in text)
+
+
+def title_firm_name(name: str) -> str:
+    """`<title>` 에 쓰는 업체명 — 화면·본문의 업체명은 **무변형**이고 여기만 손본다.
+
+    [B2 2026-08-27] 처음에는 폭 상한을 걸어 기계 절단하려 했는데 **실측이 그 가설을
+    반증했다**: 업체명 폭은 중앙값 23 으로 애초에 병목이 아니었다. 이름을 뭉개면 사람이
+    검색창에 치는 바로 그 말이 잘리므로 폭 절단은 **하지 않는다**.
+
+    남기는 것은 의미가 보존되는 트림 하나 — `X dba Y`(상호 별칭·실측 227건) → 법인명만.
+    규제 기록에 실리는 이름이 법인명이고, 덤으로 같은 법인의 표기 변종 26군이 한 이름으로
+    모인다(예: `Right Value Drug Stores, LLC` 에 별칭 표기 3종이 붙어 있었다).
+    `D/B/A`·`O/A` 는 같은 뜻의 다른 표기라 함께 본다(실측 8건).
+
+    ★`A / B` 이중언어 병기(캐나다 문서)도 후보였는데 **뺐다**. 전수 9건 중 1건이
+    `Brookfield Medical / Surgical Supply, Inc.` — 병기가 아니라 이름 자체에 사선이 든
+    경우라, 앞쪽만 취하면 실재하지 않는 회사명이 된다. 쌍둥이 감소분은 4장뿐이라
+    (340 → 336) 회사명을 틀릴 값이 없다.
+
+    같은 이름은 언제나 같은 결과다(재실행 안정). 줄인 결과가 서로 겹치면 호출부의
+    유일성 로직(분류 → 문서번호)이 그대로 받아 해소한다.
+    """
+    s = re.split(r"\s+(?:dba|d/b/a|o/a)\s+", name or "",
+                 flags=re.IGNORECASE)[0].strip().rstrip(",")
+    return s or (name or "")
+
+
+# 제목 전용 문서종류 라벨. **화면(h1)은 원문 라벨 그대로**이고 여기만 짧게 쓴다.
+# 근거는 실측이다 — 문서 제목의 82%가 SERP 폭을 넘었는데 그 원인이 업체명이 아니라
+# `Health Canada Inspection`(24폭·문서의 40%)·`EU GMP NCR (EudraGMDP)`(22폭)이었다.
+# ★새 어휘를 지어내지 않는다 — 사이트가 이미 쓰는 말로만 바꾼다(`trends.js` 순위 각주와
+# `/findings/coverage/` 가 "캐나다 실사", `card_scaffold` 카드 라벨이 "EU GMP 비준수").
+# ★FDA 계열은 **줄이지 않는다**: "483"·"Warning Letter" 는 사람들이 검색창에 그대로
+# 치는 말이라, 짧게 만드는 이득보다 그 말이 사라지는 손해가 크다(실측 — 이 둘까지 줄여
+# 뒤로 미는 배치는 쌍둥이를 336→197 로 더 줄이지만 "Warning Letter" 노출을 346→126장으로
+# 잃었다. 쌍둥이 139장 값으로 220장의 검색어를 파는 거래라 기각).
+#
+# ★저장된 `source` 문자열은 여전히 불가침이다(`raw_signal_id`/`finding_id` 해시 입력).
+# 여기서 바꾸는 건 표시용 사본뿐이고 `doc_source_label` 은 손대지 않는다.
+TITLE_SOURCE_SHORT = {
+    "Health Canada Inspection": "캐나다 실사",
+    "EU GMP NCR (EudraGMDP)": "EU GMP 비준수",
+}
+
+
+def title_source_label(doc: dict[str, Any]) -> str:
+    """`<title>` 에 쓰는 문서종류 — 표에 있으면 짧은 말로, 없으면 화면과 같은 값."""
+    return TITLE_SOURCE_SHORT.get(doc_source_label(doc), doc_source_label(doc))
+
+
 def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
     """문서 페이지 `<title>` — 슬러그별로 **유일**하게 만든다.
 
@@ -1758,11 +1817,31 @@ def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
 
     그래서 겹칠 때만 단계적으로 넓힌다 — ①분류(사람이 읽어 뜻이 있는 구분) → ②문서번호
     (마지막 수단, 반드시 유일). 겹치지 않는 문서의 제목은 건드리지 않는다.
+
+    ★★[B2 2026-08-27] **문자열이 유일한 것과 화면에서 구별되는 것은 다르다.** 위 확장은
+    전체 문자열이 겹칠 때만 돌고, 넓히는 방식이 꼬리에 덧붙이기다. 그런데 구글이 보여주는
+    건 앞 60폭뿐이라, 문자열은 유일해졌는데 **보이는 글자는 그대로 같았다** — 수리가 되레
+    변별 요소를 절단선 밖으로 밀고 있었다. 실측(전수 3,301장): 절단선까지 보이는 제목이
+    다른 URL 과 똑같은 문서가 **853장**이었고, 최대 군집은 `Air Liquide Canada Inc.` 30장이
+    「… Health Canada Inspection 지적사항 (2」에서 잘려 **날짜가 통째로 안 보였다**.
+
+    그래서 날짜와 "지적사항"의 자리를 맞바꾼다 — 변별 요소를 8폭 앞으로 당기는 최소 변경.
+    문서종류는 자리를 지킨다(위 TITLE_SOURCE_SHORT 주석의 거래 참조).
+    덤으로 한국어 어순이 오히려 자연스러워진다 — 수식어가 머리명사 앞에 오므로
+    "(2021-01-13) 지적사항"이 "지적사항 (2021-01-13)"보다 제 자리다.
+    전수 재측정: 쌍둥이 853 → 336 · 날짜가 온전히 보이는 문서 1,333 → 2,852 ·
+    문서종류가 온전히 보이는 문서 2,938 → 3,168. 세 축 모두 개선이고 퇴행이 없다.
+
+    잔여 336장은 제목으로는 더 못 가른다 — 업체명 자체가 60폭을 먹거나(`Isologic
+    Innovative Radiopharmaceuticals of Ontario Limited` 59폭) 같은 업체·같은 날 문서가
+    여럿인 경우다. 후자의 상당수는 FDA FOIA 일괄 공개분이라 날짜가 변별력을 못 낸다
+    (문서 619장이 `2024-01-17` 하나를 공유 — 실사는 2015~2019년).
     """
     def base(d: dict[str, Any]) -> str:
-        src = doc_source_label(d)
-        head = f"{d['firm_name']} {src}".strip() if src else d["firm_name"]
-        return f"{head} 지적사항 ({d['published_date']})"
+        src = title_source_label(d)
+        firm = title_firm_name(d["firm_name"])
+        head = f"{firm} {src}".strip() if src else firm
+        return f"{head} ({d['published_date']}) 지적사항"
 
     counts: dict[str, int] = {}
     for d in documents:
@@ -2469,6 +2548,34 @@ def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
     return json.dumps(nodes, ensure_ascii=False, indent=1).replace("<", "\\u003c")
 
 
+def build_breadcrumb_json_ld(trail: "list[tuple[str, str]]",
+                             base_url: str = SITE_BASE_URL) -> str:
+    """schema.org BreadcrumbList — 검색 결과의 **URL 자리**를 읽을 수 있는 경로로 바꾼다.
+
+    [B2 2026-08-27] 문서·업체·모음 약 4천 장은 구조화 데이터가 하나도 없었고, 그래서
+    검색 결과에 `grm-solutions.com/findings/doc/hc-insp-89240/` 같은 **날 슬러그**가
+    그대로 노출됐다(우리 슬러그는 기관 원문 id 라 사람이 읽을 수 없다). 화면에는 이미
+    빵부스러기가 있는데 마크업만 없었다 — 제목을 흔들지 않고 SERP 표시를 고치는 자리다.
+
+    ★구글 요건: 마크업은 **화면에 보이는 빵부스러기와 같은 순서·같은 이름**이어야 한다.
+    그래서 이 함수는 문자열을 지어내지 않고 템플릿이 그리는 것과 같은 trail 을 받는다.
+    마지막 항목은 현재 페이지라 `item` 을 붙이지 않는다(자기 자신 링크 금지 관례).
+
+    trail 은 (이름, 사이트 루트 기준 상대경로) 목록이고, 마지막 항목의 경로는 빈 문자열.
+    build_json_ld 와 동일한 직렬화 계약('<' 치환으로 </script> 조기종료 차단).
+    """
+    items = []
+    for i, (name, path) in enumerate(trail, start=1):
+        node: dict[str, Any] = {"@type": "ListItem", "position": i, "name": name}
+        if path:
+            node["item"] = f"{base_url}/{path.lstrip('/')}"
+        items.append(node)
+    return json.dumps({"@context": "https://schema.org",
+                       "@type": "BreadcrumbList",
+                       "itemListElement": items},
+                      ensure_ascii=False, indent=1).replace("<", "\\u003c")
+
+
 def build_site_webmanifest() -> str:
     """site.webmanifest — 정적·결정론(PWA 아이콘 메타). dict 삽입순 보존."""
     manifest = {
@@ -2997,6 +3104,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=meta["index_lede"],
                 canonical=_abs_url(f"findings/{meta['path']}/"),
                 axis=meta, items=items, excluded=axis.get("excluded") or [],
+                # [B2] 화면 빵부스러기와 동일한 순서·이름(findings_facet_index.html 참조).
+                json_ld=build_breadcrumb_json_ld([
+                    ("홈", "/"), ("지적사항 검색", "findings/"), (meta["title"], "")]),
                 # 문서 목록 입구 — 문서 정본이 없으면 링크를 만들지 않는다(없는 페이지로
                 # 보내는 링크는 무링크보다 나쁘다).
                 doc_index_total=((docs_data or {}).get("totals") or {}).get("documents", 0)
@@ -3030,6 +3140,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     crumb_mid=[{"href": f"findings/{meta['path']}/",
                                 "label": meta["title"]}],
                     crumb_last=item["label_ko"],
+                    # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
+                    json_ld=build_breadcrumb_json_ld([
+                        ("홈", "/"), ("지적사항 검색", "findings/"),
+                        (meta["title"], f"findings/{meta['path']}/"),
+                        (item["label_ko"], "")]),
                     headline=f"{item['label_ko']} {meta['headline_suffix']}",
                     lede_prefix=meta["lede_prefix"],
                     # 값 인코딩은 템플릿의 `| urlencode` 가 한다 — 렌더러는 urllib 을
@@ -3077,6 +3192,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                 "label": cat_meta["title"]},
                                {"href": base, "label": combo["category_label_ko"]}],
                     crumb_last=combo["agency_label_ko"],
+                    # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
+                    json_ld=build_breadcrumb_json_ld([
+                        ("홈", "/"), ("지적사항 검색", "findings/"),
+                        (cat_meta["title"], f"findings/{cat_meta['path']}/"),
+                        (combo["category_label_ko"], base),
+                        (combo["agency_label_ko"], "")]),
                     headline=f"{label} 지적사항",
                     # 기관명에 조사를 붙이지 않는다 — 한국어 조사는 앞말의 받침에
                     # 따라 갈리는데 기관명은 영문 약어가 섞여 있어(FDA·EMA·MHRA)
@@ -3225,6 +3346,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                 "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
                                 " 우리말로 볼 수 있습니다."),
                    canonical=_abs_url("findings/docs/"),
+                   # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
+                   json_ld=build_breadcrumb_json_ld([
+                       ("홈", "/"), ("지적사항 검색", "findings/"), ("문서로 찾기", "")]),
                    mode="index", heading="문서로 찾기",
                    lede=(f"규제기관이 공개한 실사 문서 "
                          f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
@@ -3246,6 +3370,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                         " 정리했습니다."),
                            canonical=_abs_url(
                                f"findings/docs/{g['slug']}/{y['year']}/"),
+                           # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
+                           json_ld=build_breadcrumb_json_ld([
+                               ("홈", "/"), ("지적사항 검색", "findings/"),
+                               ("문서로 찾기", "findings/docs/"),
+                               (f"{g['label_ko']} · {y['year']}년", "")]),
                            mode="list",
                            heading=f"{g['label_ko']} · {y['year']}년",
                            lede=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사 문서"
@@ -3291,6 +3420,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 latest_slug=latest_slug,
                 description=doc_page_description(doc, doc_agency_labels),
                 canonical=_abs_url(f"findings/doc/{doc['slug']}/"),
+                # [B2] 화면 빵부스러기와 동일(findings_doc.html: 홈 › 지적사항 검색 ›
+                # 규제기관별 › 업체명). 이 4천 장이 SERP 에서 날 슬러그를 보이던 자리다.
+                json_ld=build_breadcrumb_json_ld([
+                    ("홈", "/"), ("지적사항 검색", "findings/"),
+                    ("규제기관별", "findings/agency/"), (doc["firm_name"], "")]),
                 doc=doc, agency_labels=doc_agency_labels,
                 source_label=doc_source_label(doc),
                 related_categories=related, same_firm=same_firm,
@@ -3320,6 +3454,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                f" 확인된 지적 {fp['finding_count']:,}건을 우리말로"
                                f" 정리했습니다({fp['first_seen'][:4]}~{fp['last_seen'][:4]})."),
                            canonical=_abs_url(f"findings/firm/{fp['slug']}/"),
+                           # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
+                           json_ld=build_breadcrumb_json_ld([
+                               ("홈", "/"), ("지적사항", "findings/"),
+                               ("문서로 찾기", "findings/docs/"), (fp["name"], "")]),
                            firm=fp, agency_labels=doc_agency_labels,
                            measured_on=docs_data.get("measured_on", ""),
                            min_findings=docs_data.get("min_findings")))

@@ -40,6 +40,12 @@
   var catEl = document.getElementById("ip-cat");
   var yearEl = document.getElementById("ip-year");
   var docsEl = document.getElementById("ip-docs");
+  // [P1 해석층] 신설 셸 — 구버전 셸에서도 무해하도록 전부 null 가드로 쓴다.
+  var catNoteEl = document.getElementById("ip-cat-note");
+  var repBlockEl = document.getElementById("ip-rep-block");
+  var repNoteEl = document.getElementById("ip-rep-note");
+  var repEl = document.getElementById("ip-rep");
+  var filterEl = document.getElementById("ip-filter");
   // [존 재편 2026-08-26] ?key= 없이 들어왔을 때의 조회 랜딩(037 진입 경로 조항 개정 —
   // 템플릿 주석에 근거를 적어 뒀다). 하드 게이트에는 넣지 않는다.
   var lookupEl = document.getElementById("ip-lookup");
@@ -158,6 +164,11 @@
     return block;
   }
 
+  // ★[P1 해석층 — 의도적 비대칭] 업체 프로파일에는 "문서당 지적"(밀도)을 넣었지만 여기엔
+  // 넣지 않는다. 업체에서는 실사를 많이 받은 곳이 커 보이는 착시를 걷어내는 정규화지만,
+  // 실사관에게 같은 값을 붙이면 **"한 번에 몇 건을 적는 사람인가" = 까다로움 지표**가 되어
+  // 037 정책(순위·비교·위험도 표기 금지)이 막으려는 바로 그 읽기를 만든다. 두 화면을
+  // '일관성' 때문에 맞추지 말 것 — 다른 것이 맞다.
   function renderStats(totals) {
     statsEl.innerHTML = "";
     statsEl.appendChild(buildStat(fmtNum(totals.documents), "실사 문서"));
@@ -167,13 +178,67 @@
     statsEl.appendChild(buildStat(period, "기간"));
   }
 
-  // ── 카테고리 구성(상위 카테고리 코럴 농도 바) ────────────────────────────────
-  function buildCatRow(entry, maxCnt, personName) {
-    var a = document.createElement("a");
-    a.className = "ip-cat-row";
-    a.href = findingsHref("cat", entry.category_code, personName);
-    var label = CATEGORY_LABELS[entry.category_code];
-    a.appendChild(el("span", "ip-cat-label", label ? label.ko : entry.category_code));
+  // ── [P1 해석층] 프로파일 안 좁히기 상태 (firm.js 와 동일 계약) ────────────────
+  // 065 가 documents[].categories 를 주면 이 화면 안에서 좁히고, 없으면(미적용·구버전
+  // 캐시) 종전처럼 검색으로 내보낸다. 037 정책(순위·비교 금지)은 그대로 — 다른 실사관과
+  // 견주는 값은 어디에도 만들지 않고, 이 사람의 공개 이력 안에서만 상대화한다.
+  var activeCat = null;
+  var LAST_DOCS = [];
+  var LAST_NAME = "";
+  var LAST_CATS = [];
+  var filterable = false;
+
+  function catLabel(code) {
+    var label = CATEGORY_LABELS[code];
+    return label ? label.ko : code;
+  }
+
+  function docHasCat(doc, code) {
+    var cats = doc && doc.categories;
+    return !!(cats && cats.length && cats.indexOf(code) !== -1);
+  }
+
+  function setActiveCat(code) {
+    activeCat = activeCat === code ? null : code;
+    renderCategories(LAST_CATS, LAST_NAME);
+    renderFilter();
+    renderDocuments(LAST_DOCS);
+    if (docsEl && activeCat && docsEl.scrollIntoView) docsEl.scrollIntoView({ block: "nearest" });
+  }
+
+  function renderFilter() {
+    if (!filterEl) return;
+    filterEl.innerHTML = "";
+    if (!activeCat) { filterEl.hidden = true; return; }
+    filterEl.hidden = false;
+    var shown = LAST_DOCS.filter(function (d) { return docHasCat(d, activeCat); }).length;
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "ip-filter-chip";
+    chip.appendChild(el("span", null, catLabel(activeCat) + " · 문서 " + fmtNum(shown) + "건"));
+    chip.appendChild(el("span", "x", "×"));
+    chip.setAttribute("aria-label", catLabel(activeCat) + " 필터 해제");
+    chip.addEventListener("click", function () { setActiveCat(activeCat); });
+    filterEl.appendChild(chip);
+    var out = document.createElement("a");
+    out.className = "ip-filter-out";
+    out.href = findingsHref("cat", activeCat, LAST_NAME);
+    out.textContent = "전체 지적사항에서 보기 →";
+    filterEl.appendChild(out);
+  }
+
+  // ── 분류 구성(상위 분류 코럴 농도 바) ────────────────────────────────────────
+  function buildCatRow(entry, maxCnt, personName, total) {
+    var row = document.createElement(filterable ? "button" : "a");
+    row.className = "ip-cat-row";
+    if (filterable) {
+      row.type = "button";
+      row.setAttribute("aria-pressed", activeCat === entry.category_code ? "true" : "false");
+      row.addEventListener("click", function () { setActiveCat(entry.category_code); });
+    } else {
+      row.href = findingsHref("cat", entry.category_code, personName);
+    }
+    row.appendChild(el("span", "ip-cat-label", catLabel(entry.category_code)));
     var track = document.createElement("div");
     track.className = "ip-cat-track";
     var bar = document.createElement("div");
@@ -181,21 +246,68 @@
     var ratio = maxCnt > 0 ? entry.cnt / maxCnt : 0;
     bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
     track.appendChild(bar);
-    a.appendChild(track);
-    a.appendChild(el("span", "ip-cat-count", fmtNum(entry.cnt) + "건"));
-    return a;
+    row.appendChild(track);
+    row.appendChild(el("span", "ip-cat-count", fmtNum(entry.cnt) + "건"));
+    if (total > 0) {
+      row.appendChild(el("span", "ip-cat-share", Math.round((entry.cnt / total) * 100) + "%"));
+    }
+    return row;
+  }
+
+  // [P1 해석층] 숫자 위의 한 문장. 어휘 주의 — "가장 많이 지적한"이 아니라 "공개 문서에서
+  // 가장 많이 확인된"이다(귀속 금지: 483 은 여러 실사관이 함께 서명할 수 있다).
+  function renderCatNote(cats, total) {
+    if (!catNoteEl) return;
+    if (!cats.length || !total) { catNoteEl.textContent = ""; return; }
+    var top = cats[0];
+    catNoteEl.innerHTML = "";
+    catNoteEl.appendChild(document.createTextNode("이 실사관이 서명한 공개 문서에서 가장 많이 확인된 영역은 "));
+    catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
+    catNoteEl.appendChild(document.createTextNode(
+      "입니다(" + fmtNum(top.cnt) + "건 · 이 이력 안에서 " + Math.round((top.cnt / total) * 100) + "%). " +
+      (filterable ? "줄을 누르면 아래 문서 목록이 그 분류로 좁혀집니다." : "")
+    ));
+  }
+
+  // ── [P1 해석층] 반복 확인된 영역(065 repeats) ────────────────────────────────
+  function renderRepeats(repeats) {
+    if (!repBlockEl || !repEl) return;
+    var rows = repeats || [];
+    if (!rows.length) { repBlockEl.hidden = true; return; }
+    repBlockEl.hidden = false;
+    if (repNoteEl) {
+      repNoteEl.textContent =
+        "이 실사관이 서명한 서로 다른 문서 2건 이상에서 다시 확인된 영역입니다. " +
+        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않으며, 다른 실사관과 비교한 값이 아닙니다.";
+    }
+    repEl.innerHTML = "";
+    rows.forEach(function (r) {
+      var row = el("div", "ip-rep-row");
+      row.appendChild(el("span", "ip-rep-name", catLabel(r.category_code)));
+      row.appendChild(el("span", "ip-rep-docs", "문서 " + fmtNum(r.documents) + "건"));
+      var years = document.createElement("span");
+      years.className = "ip-rep-years";
+      (r.years || []).forEach(function (y) { years.appendChild(el("span", "ip-rep-year", y)); });
+      row.appendChild(years);
+      repEl.appendChild(row);
+    });
   }
 
   function renderCategories(byCategory, personName) {
+    LAST_CATS = byCategory || [];
     catEl.innerHTML = "";
-    if (!byCategory.length) {
+    if (!LAST_CATS.length) {
       catEl.appendChild(el("p", "ip-empty", "표시할 데이터가 없습니다."));
       return;
     }
     // RPC 가 이미 cnt desc 로 정렬해 반환한다(findings_firm_profile by_category 와 동일
     // 계약) — 재정렬 없음.
-    var maxCnt = byCategory[0].cnt || 1;
-    byCategory.forEach(function (c) { catEl.appendChild(buildCatRow(c, maxCnt, personName)); });
+    var maxCnt = LAST_CATS[0].cnt || 1;
+    var total = LAST_CATS.reduce(function (s, c) { return s + (Number(c.cnt) || 0); }, 0);
+    LAST_CATS.forEach(function (c) {
+      catEl.appendChild(buildCatRow(c, maxCnt, personName, total));
+    });
+    renderCatNote(LAST_CATS, total);
   }
 
   // ── 연도 추이(간단 막대) ─────────────────────────────────────────────────
@@ -368,18 +480,36 @@
       docsEl.appendChild(el("p", "ip-empty", "표시할 문서가 없습니다."));
       return;
     }
+    // [P1 해석층] 활성 분류가 있으면 그 분류가 붙은 문서만 — 프로파일을 벗어나지 않는다.
+    var rows = activeCat
+      ? documents.filter(function (d) { return docHasCat(d, activeCat); })
+      : documents;
+    if (!rows.length) {
+      docsEl.appendChild(el("p", "ip-empty",
+        catLabel(activeCat) + " 분류가 붙은 문서가 목록에 없습니다."));
+      return;
+    }
     // RPC 가 이미 published_date desc 로 정렬해 반환한다(findings_firm_profile documents
     // 와 동일 계약) — 재정렬 없음.
-    documents.forEach(function (doc) { docsEl.appendChild(buildDocRow(doc)); });
+    rows.forEach(function (doc) { docsEl.appendChild(buildDocRow(doc)); });
   }
 
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     nameEl.textContent = data.display_name || "";
+    LAST_NAME = data.display_name || "";
+    LAST_DOCS = data.documents || [];
+    activeCat = null;
+    // [P1 해석층] 065 적용 여부를 응답에서 판정(배포 순서가 어긋나도 화면은 안 깨진다).
+    filterable = LAST_DOCS.some(function (d) {
+      return d && d.categories && d.categories.length;
+    });
     renderStats(data.totals || {});
-    renderCategories(data.by_category || [], data.display_name || "");
+    renderCategories(data.by_category || [], LAST_NAME);
+    renderRepeats(data.repeats || []);
     renderYears(data.by_year || []);
-    renderDocuments(data.documents || []);
+    renderFilter();
+    renderDocuments(LAST_DOCS);
   }
 
   function rpcEndpoint(name) {

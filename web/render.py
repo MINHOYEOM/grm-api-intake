@@ -56,7 +56,7 @@ GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
 FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
-FINDINGS_DOCS_FILE = WEB_DIR / "data" / "findings_docs.json"      # [검색 유입] 문서 단위 페이지 정본(findings_docs_refresh.py · 지적 3건 이상)
+FINDINGS_DOCS_FILE = WEB_DIR / "data" / "findings_docs.json"      # [검색 유입] 문서 단위 페이지 정본(findings_docs_refresh.py · 임계 3 + 소스 소거 면제)
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
 DIST_DIR = WEB_DIR / "dist"
@@ -2381,7 +2381,7 @@ SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "").strip()
 SITE_NAME = "Global Regulatory Monitor"
 SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 소식을 매주 한자리에 모아 "
                     "기관별 정렬·시사점·점검까지 정리하는 규제뉴스.")
-ARCHIVE_DESCRIPTION = ("GRM 규제뉴스 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
+ARCHIVE_DESCRIPTION = ("GRM 주간 브리프 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
                        "주차별로 모아 기관·기간으로 검색·필터.")
 FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
                         "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. "
@@ -2636,7 +2636,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         key=lambda r: r["date"], reverse=True,
     )
     archive_html = env.get_template("archive.html").render(
-        page_title="규제뉴스 · GRM",
+        # [네이밍 2026-08-27] nav 탭·h1(주간 브리프 아카이브)과 정합 — 제목만 옛
+        # 이름이면 검색 결과와 탭 사이에서 페이지 정체가 갈라진다.
+        page_title="주간 브리프 아카이브 · GRM",
         rel_root="../",
         nav_active="board",
         latest_slug=latest_slug,
@@ -3074,7 +3076,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                  for s in view.get("samples") or []), default="")
                 facet_paths.append((f"{base}{combo['slug']}/", combo_mod))
 
-    # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(지적 3건 이상).
+    # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지
     # 않는다. 여기가 그 구멍을 메운다.
     #   ★분류 라벨 → 모음 페이지 슬러그는 **facets 데이터에서 파생**한다(사본 금지). facets
@@ -3148,10 +3150,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                env.get_template("findings_doc_list.html").render(
                    page_title="문서로 찾기 · GRM",
                    rel_root="../../", nav_active="findings", latest_slug=latest_slug,
-                   description=("규제기관이 공개한 실사 문서를 기관과 연도로 묶어"
-                                " 찾아보실 수 있습니다. 지적 3건 이상이 우리말로"
-                                " 정리된 문서 "
-                                f"{docs_data['totals']['documents']:,}건입니다."),
+                   # [P1.5 잔재 수리 2026-08-27] "지적 3건 이상" 임계 문구는 면제
+                   # 규칙 도입으로 더 이상 사실이 아니다 — 화면 고지는 고쳤는데
+                   # meta description 이 낡은 채 남아 있었다(검색 스니펫이 먼저 거짓말).
+                   description=("규제기관이 공개한 실사 문서 "
+                                f"{docs_data['totals']['documents']:,}건을 기관·연도로"
+                                " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
+                                "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
+                                " 우리말로 볼 수 있습니다."),
                    canonical=_abs_url("findings/docs/"),
                    mode="index", heading="문서로 찾기",
                    lede=(f"규제기관이 공개한 실사 문서 "

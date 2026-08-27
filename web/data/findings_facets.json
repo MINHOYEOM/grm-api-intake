@@ -44,22 +44,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 64
             },
             {
               "firm_name": "American National Red Cross/Biomedical Services",
+              "firm_key": "american national red cross/biomedical services",
               "c": 46
             },
             {
               "firm_name": "미래바이오제약(주)",
+              "firm_key": "미래바이오제약(주)",
               "c": 45
             },
             {
               "firm_name": "H & P Industries, Inc.",
+              "firm_key": "h & p industries",
               "c": 35
             },
             {
               "firm_name": "(주)현진제약",
+              "firm_key": "(주)현진제약",
               "c": 32
             }
           ],
@@ -157,22 +162,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 61
             },
             {
               "firm_name": "PharMEDium Services, LLC",
+              "firm_key": "pharmedium services",
               "c": 37
             },
             {
               "firm_name": "ProRx, LLC",
+              "firm_key": "prorx",
               "c": 30
             },
             {
               "firm_name": "US Specialty Formulations, LLC",
+              "firm_key": "us specialty formulations",
               "c": 26
             },
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc. (CAPS)",
+              "firm_key": "central admixture pharmacy services (caps)",
               "c": 25
             }
           ],
@@ -262,22 +272,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 41
             },
             {
               "firm_name": "H & P Industries, Inc.",
+              "firm_key": "h & p industries",
               "c": 29
             },
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 25
             },
             {
               "firm_name": "Sun Pharmaceutical Industries Ltd.",
+              "firm_key": "sun pharmaceutical industries",
               "c": 18
             },
             {
               "firm_name": "Delta Pharma Inc.",
+              "firm_key": "delta pharma",
               "c": 17
             }
           ],
@@ -371,22 +386,27 @@
           "top_firms": [
             {
               "firm_name": "PharMEDium Services, LLC",
+              "firm_key": "pharmedium services",
               "c": 23
             },
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 19
             },
             {
               "firm_name": "Chief Medical Supplies Ltd",
+              "firm_key": "chief medical supplies",
               "c": 18
             },
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 17
             },
             {
               "firm_name": "US Specialty Formulations LLC",
+              "firm_key": "us specialty formulations",
               "c": 13
             }
           ],
@@ -484,22 +504,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 20
             },
             {
               "firm_name": "American National Red Cross/Biomedical Services",
+              "firm_key": "american national red cross/biomedical services",
               "c": 17
             },
             {
               "firm_name": "Care-Tech Labs Inc.",
+              "firm_key": "care-tech labs",
               "c": 14
             },
             {
               "firm_name": "H & P Industries, Inc.",
+              "firm_key": "h & p industries",
               "c": 13
             },
             {
               "firm_name": "Lupin Limited",
+              "firm_key": "lupin",
               "c": 13
             }
           ],
@@ -589,22 +614,27 @@
           "top_firms": [
             {
               "firm_name": "Voyant Beauty, Inc.",
+              "firm_key": "voyant beauty",
               "c": 11
             },
             {
               "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+              "firm_key": "isologic innovative radiopharmaceuticals of ontario",
               "c": 8
             },
             {
               "firm_name": "Kohl & Frisch Limited",
+              "firm_key": "kohl & frisch",
               "c": 8
             },
             {
               "firm_name": "West Penetone Inc.",
+              "firm_key": "west penetone",
               "c": 8
             },
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 7
             }
           ],
@@ -694,22 +724,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 11
             },
             {
               "firm_name": "Chief Medical Supplies Ltd",
+              "firm_key": "chief medical supplies",
               "c": 10
             },
             {
               "firm_name": "Dr. Reddy&#039;s Laboratories Ltd.",
+              "firm_key": "dr reddy's laboratories",
               "c": 10
             },
             {
               "firm_name": "TJP Labs Inc.",
+              "firm_key": "tjp labs",
               "c": 8
             },
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 7
             }
           ],
@@ -807,22 +842,27 @@
           "top_firms": [
             {
               "firm_name": "환인제약(주)",
+              "firm_key": "환인제약(주)",
               "c": 16
             },
             {
               "firm_name": "British Columbia Centre for Disease Control and Prevention Society Branch",
+              "firm_key": "british columbia centre for disease control and prevention society branch",
               "c": 9
             },
             {
               "firm_name": "L. Perrigo Co",
+              "firm_key": "l perrigo",
               "c": 9
             },
             {
               "firm_name": "동화약품(주)",
+              "firm_key": "동화약품(주)",
               "c": 9
             },
             {
               "firm_name": "(주)유유제약",
+              "firm_key": "(주)유유제약",
               "c": 8
             }
           ],
@@ -916,22 +956,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 11
             },
             {
               "firm_name": "Linde Canada Inc.",
+              "firm_key": "linde canada",
               "c": 9
             },
             {
               "firm_name": "Akorn, Inc.",
+              "firm_key": "akorn",
               "c": 8
             },
             {
               "firm_name": "Care-Tech Labs Inc.",
+              "firm_key": "care-tech labs",
               "c": 8
             },
             {
               "firm_name": "Dabur India Limited",
+              "firm_key": "dabur india",
               "c": 8
             }
           ],
@@ -1021,22 +1066,27 @@
           "top_firms": [
             {
               "firm_name": "Dr Sankunni’s Ayurvedic Research Foundation Private Ltd.",
+              "firm_key": "dr sankunni’s ayurvedic research foundation",
               "c": 9
             },
             {
               "firm_name": "PharMEDium Services, LLC.",
+              "firm_key": "pharmedium services",
               "c": 8
             },
             {
               "firm_name": "Delta Pharma Inc.",
+              "firm_key": "delta pharma",
               "c": 6
             },
             {
               "firm_name": "QuVa Pharma, Inc.",
+              "firm_key": "quva pharma",
               "c": 6
             },
             {
               "firm_name": "Cantrell Drug Company",
+              "firm_key": "cantrell drug",
               "c": 5
             }
           ],
@@ -1130,22 +1180,27 @@
           "top_firms": [
             {
               "firm_name": "주식회사 케이앤제이씨",
+              "firm_key": "주식회사 케이앤제이씨",
               "c": 13
             },
             {
               "firm_name": "제이케이제약(주)",
+              "firm_key": "제이케이제약(주)",
               "c": 12
             },
             {
               "firm_name": "Natco Pharma Limited",
+              "firm_key": "natco pharma",
               "c": 11
             },
             {
               "firm_name": "Unico Holdings, Inc.",
+              "firm_key": "unico holdings",
               "c": 6
             },
             {
               "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+              "firm_key": "omega laboratories (now juno pharma canada )",
               "c": 5
             }
           ],
@@ -1239,22 +1294,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 8
             },
             {
               "firm_name": "Eurofins CDMO Alphora Incorporated",
+              "firm_key": "eurofins cdmo alphora incorporated",
               "c": 6
             },
             {
               "firm_name": "Isologic Innovative Radiopharmaceuticals Ltd.",
+              "firm_key": "isologic innovative radiopharmaceuticals",
               "c": 6
             },
             {
               "firm_name": "Apotex Inc",
+              "firm_key": "apotex",
               "c": 5
             },
             {
               "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+              "firm_key": "omega laboratories (now juno pharma canada )",
               "c": 5
             }
           ],
@@ -1344,22 +1404,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 6
             },
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 6
             },
             {
               "firm_name": "AnazaoHealth Corporation",
+              "firm_key": "anazaohealth",
               "c": 5
             },
             {
               "firm_name": "Delta Pharma Inc.",
+              "firm_key": "delta pharma",
               "c": 5
             },
             {
               "firm_name": "Eli Lilly and Company",
+              "firm_key": "eli lilly and",
               "c": 5
             }
           ],
@@ -1449,22 +1514,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 15
             },
             {
               "firm_name": "Voyant Beauty, Inc.",
+              "firm_key": "voyant beauty",
               "c": 9
             },
             {
               "firm_name": "(주)엔엠제약",
+              "firm_key": "(주)엔엠제약",
               "c": 6
             },
             {
               "firm_name": "한국신텍스제약(주)",
+              "firm_key": "한국신텍스제약(주)",
               "c": 6
             },
             {
               "firm_name": "(주)삼화바이오팜",
+              "firm_key": "(주)삼화바이오팜",
               "c": 4
             }
           ],
@@ -1554,22 +1624,27 @@
           "top_firms": [
             {
               "firm_name": "Care-Tech Labs Inc.",
+              "firm_key": "care-tech labs",
               "c": 12
             },
             {
               "firm_name": "Hospira Inc.",
+              "firm_key": "hospira",
               "c": 11
             },
             {
               "firm_name": "H & P Industries, Inc.",
+              "firm_key": "h & p industries",
               "c": 10
             },
             {
               "firm_name": "Lupin Limited",
+              "firm_key": "lupin",
               "c": 7
             },
             {
               "firm_name": "McNeil Consumer Healthcare",
+              "firm_key": "mcneil consumer healthcare",
               "c": 7
             }
           ],
@@ -1663,22 +1738,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 9
             },
             {
               "firm_name": "Care-Tech Labs Inc.",
+              "firm_key": "care-tech labs",
               "c": 5
             },
             {
               "firm_name": "Qualgen LLC",
+              "firm_key": "qualgen",
               "c": 5
             },
             {
               "firm_name": "QuVa Pharma, Inc.",
+              "firm_key": "quva pharma",
               "c": 5
             },
             {
               "firm_name": "Right Value Drug Stores, Inc.",
+              "firm_key": "right value drug stores",
               "c": 5
             }
           ],
@@ -1772,22 +1852,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 8
             },
             {
               "firm_name": "(주)엔탭허브",
+              "firm_key": "(주)엔탭허브",
               "c": 6
             },
             {
               "firm_name": "Delta Pharma Inc.",
+              "firm_key": "delta pharma",
               "c": 5
             },
             {
               "firm_name": "에이치케이이노엔(주)",
+              "firm_key": "에이치케이이노엔(주)",
               "c": 5
             },
             {
               "firm_name": "(주)현진제약",
+              "firm_key": "(주)현진제약",
               "c": 4
             }
           ],
@@ -1881,22 +1966,27 @@
           "top_firms": [
             {
               "firm_name": "(주)휴메딕스",
+              "firm_key": "(주)휴메딕스",
               "c": 4
             },
             {
               "firm_name": "Schering-Plough Products, LLC",
+              "firm_key": "schering-plough products",
               "c": 4
             },
             {
               "firm_name": "Carolina Infusion",
+              "firm_key": "carolina infusion",
               "c": 3
             },
             {
               "firm_name": "Inotiv Inc.",
+              "firm_key": "inotiv",
               "c": 3
             },
             {
               "firm_name": "(주)시어스제약",
+              "firm_key": "(주)시어스제약",
               "c": 2
             }
           ],
@@ -1990,22 +2080,27 @@
           "top_firms": [
             {
               "firm_name": "Vita Pharmacy, LLC dba Talon Pharmacy of Boerne",
+              "firm_key": "vita pharmacy talon pharmacy of boerne",
               "c": 5
             },
             {
               "firm_name": "ProRx, LLC",
+              "firm_key": "prorx",
               "c": 3
             },
             {
               "firm_name": "Revive Rx LLC",
+              "firm_key": "revive rx",
               "c": 3
             },
             {
               "firm_name": "Advanced Nutriceuticals, LLC dba The Guyer Institute of Molecular Medicine",
+              "firm_key": "advanced nutriceuticals the guyer institute of molecular medicine",
               "c": 2
             },
             {
               "firm_name": "Allergy Laboratories, Inc.",
+              "firm_key": "allergy laboratories",
               "c": 2
             }
           ],
@@ -2099,22 +2194,27 @@
           "top_firms": [
             {
               "firm_name": "Intas Pharmaceuticals Limited",
+              "firm_key": "intas pharmaceuticals",
               "c": 5
             },
             {
               "firm_name": "(주)킵스바이오파마",
+              "firm_key": "(주)킵스바이오파마",
               "c": 3
             },
             {
               "firm_name": "(주)대유코아",
+              "firm_key": "(주)대유코아",
               "c": 2
             },
             {
               "firm_name": "(주)씨티씨바이오",
+              "firm_key": "(주)씨티씨바이오",
               "c": 2
             },
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 2
             }
           ],
@@ -2215,22 +2315,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 189
             },
             {
               "firm_name": "Chief Medical Supplies Ltd",
+              "firm_key": "chief medical supplies",
               "c": 96
             },
             {
               "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+              "firm_key": "isologic innovative radiopharmaceuticals of ontario",
               "c": 91
             },
             {
               "firm_name": "Apotex Inc",
+              "firm_key": "apotex",
               "c": 77
             },
             {
               "firm_name": "Voyant Beauty, Inc.",
+              "firm_key": "voyant beauty",
               "c": 75
             }
           ],
@@ -2320,22 +2425,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 150
             },
             {
               "firm_name": "H & P Industries, Inc.",
+              "firm_key": "h & p industries",
               "c": 137
             },
             {
               "firm_name": "PharMEDium Services, LLC",
+              "firm_key": "pharmedium services",
               "c": 134
             },
             {
               "firm_name": "Hospira, Inc.",
+              "firm_key": "hospira",
               "c": 88
             },
             {
               "firm_name": "American National Red Cross/Biomedical Services",
+              "firm_key": "american national red cross/biomedical services",
               "c": 83
             }
           ],
@@ -2429,22 +2539,27 @@
           "top_firms": [
             {
               "firm_name": "Lupin Limited",
+              "firm_key": "lupin",
               "c": 66
             },
             {
               "firm_name": "Sun Pharmaceutical Industries Ltd.",
+              "firm_key": "sun pharmaceutical industries",
               "c": 63
             },
             {
               "firm_name": "Dr. Reddy's Laboratories Ltd.",
+              "firm_key": "dr reddy's laboratories",
               "c": 58
             },
             {
               "firm_name": "Cipla Limited",
+              "firm_key": "cipla",
               "c": 49
             },
             {
               "firm_name": "Intas Pharmaceuticals Limited",
+              "firm_key": "intas pharmaceuticals",
               "c": 34
             }
           ],
@@ -2530,22 +2645,27 @@
           "top_firms": [
             {
               "firm_name": "이연제약(주)",
+              "firm_key": "이연제약(주)",
               "c": 27
             },
             {
               "firm_name": "(주)휴메딕스",
+              "firm_key": "(주)휴메딕스",
               "c": 21
             },
             {
               "firm_name": "(주)퍼슨",
+              "firm_key": "(주)퍼슨",
               "c": 20
             },
             {
               "firm_name": "에이치케이이노엔(주)",
+              "firm_key": "에이치케이이노엔(주)",
               "c": 19
             },
             {
               "firm_name": "일양약품(주)",
+              "firm_key": "일양약품(주)",
               "c": 18
             }
           ],
@@ -2631,22 +2751,27 @@
           "top_firms": [
             {
               "firm_name": "Ohara Pharmaceutical Co., Ltd., Kami Factory,",
+              "firm_key": "ohara pharmaceutical kami factory",
               "c": 11
             },
             {
               "firm_name": "Takeda Pharmaceutical Company Limited",
+              "firm_key": "takeda pharmaceutical",
               "c": 11
             },
             {
               "firm_name": "Toyobo Co.",
+              "firm_key": "toyobo",
               "c": 11
             },
             {
               "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+              "firm_key": "kaigen pharma okusawa factory",
               "c": 10
             },
             {
               "firm_name": "OPHTECS Manufacturing Ltd.",
+              "firm_key": "ophtecs manufacturing",
               "c": 10
             }
           ],
@@ -2740,22 +2865,27 @@
           "top_firms": [
             {
               "firm_name": "Zhejiang Huahai Pharmaceutical Co., Ltd.",
+              "firm_key": "zhejiang huahai pharmaceutical",
               "c": 25
             },
             {
               "firm_name": "Wuxi Biologics",
+              "firm_key": "wuxi biologics",
               "c": 15
             },
             {
               "firm_name": "Nanchang Anobri Pharmaceutical Co., Ltd.",
+              "firm_key": "nanchang anobri pharmaceutical",
               "c": 10
             },
             {
               "firm_name": "Hubei Guangchen Pharmaceutical Co., Ltd",
+              "firm_key": "hubei guangchen pharmaceutical",
               "c": 8
             },
             {
               "firm_name": "Jiangsu Hengrui Pharmceuticals Co., Ltd",
+              "firm_key": "jiangsu hengrui pharmceuticals",
               "c": 8
             }
           ],
@@ -2845,22 +2975,27 @@
           "top_firms": [
             {
               "firm_name": "Baxter Oncology GmbH",
+              "firm_key": "baxter oncology",
               "c": 16
             },
             {
               "firm_name": "Rentschler Biopharma SE",
+              "firm_key": "rentschler biopharma se",
               "c": 10
             },
             {
               "firm_name": "Bayer AG Pharma",
+              "firm_key": "bayer ag pharma",
               "c": 9
             },
             {
               "firm_name": "CSL Behring GmbH",
+              "firm_key": "csl behring",
               "c": 6
             },
             {
               "firm_name": "Bayer Bitterfeld GmbH",
+              "firm_key": "bayer bitterfeld",
               "c": 5
             }
           ],
@@ -2950,22 +3085,27 @@
           "top_firms": [
             {
               "firm_name": "CP Pharmaceuticals",
+              "firm_key": "cp pharmaceuticals",
               "c": 13
             },
             {
               "firm_name": "Dr. Reddy&#039;s Laboratories",
+              "firm_key": "dr reddy's laboratories",
               "c": 7
             },
             {
               "firm_name": "Aptuit Ltd",
+              "firm_key": "aptuit",
               "c": 6
             },
             {
               "firm_name": "Symbiosis Pharmaceutical Services Limited",
+              "firm_key": "symbiosis pharmaceutical services",
               "c": 6
             },
             {
               "firm_name": "A. Nelson & Co. Ltd.",
+              "firm_key": "a nelson &",
               "c": 4
             }
           ],
@@ -3055,22 +3195,27 @@
           "top_firms": [
             {
               "firm_name": "Cosma SpA",
+              "firm_key": "cosma spa",
               "c": 11
             },
             {
               "firm_name": "Patheon Italia S.p.A.",
+              "firm_key": "patheon italia spa",
               "c": 9
             },
             {
               "firm_name": "NerPharMa S.r.l.",
+              "firm_key": "nerpharma",
               "c": 8
             },
             {
               "firm_name": "Bracco Imaging S.p.A.",
+              "firm_key": "bracco imaging spa",
               "c": 5
             },
             {
               "firm_name": "Valpharma International S.p.A.",
+              "firm_key": "valpharma international spa",
               "c": 2
             }
           ],
@@ -3160,22 +3305,27 @@
           "top_firms": [
             {
               "firm_name": "Excel Vision",
+              "firm_key": "excel vision",
               "c": 13
             },
             {
               "firm_name": "Sanofi Winthrop Industrie",
+              "firm_key": "sanofi winthrop industrie",
               "c": 11
             },
             {
               "firm_name": "Fareva Amboise",
+              "firm_key": "fareva amboise",
               "c": 9
             },
             {
               "firm_name": "Astrea Fontaine",
+              "firm_key": "astrea fontaine",
               "c": 2
             },
             {
               "firm_name": "Septodont",
+              "firm_key": "septodont",
               "c": 2
             }
           ],
@@ -3261,22 +3411,27 @@
           "top_firms": [
             {
               "firm_name": "Laboratorios Farmaceuticos Rovi S. A.",
+              "firm_key": "laboratorios farmaceuticos rovi s a",
               "c": 10
             },
             {
               "firm_name": "Gadea Biopharma S.L.",
+              "firm_key": "gadea biopharma sl",
               "c": 6
             },
             {
               "firm_name": "Bioiberica, S.A.U",
+              "firm_key": "bioiberica sau",
               "c": 5
             },
             {
               "firm_name": "Rovi Pharma Industrial Services S.A.",
+              "firm_key": "rovi pharma industrial services",
               "c": 2
             },
             {
               "firm_name": "Laboratorios Eurisko S.L.",
+              "firm_key": "laboratorios eurisko sl",
               "c": 1
             }
           ],
@@ -3370,22 +3525,27 @@
           "top_firms": [
             {
               "firm_name": "PharmaEssentia Corp.",
+              "firm_key": "pharmaessentia",
               "c": 9
             },
             {
               "firm_name": "TEH SENG PHARMACEUTICAL MFG, CO., Ltd. Second factory",
+              "firm_key": "teh seng pharmaceutical mfg second factory",
               "c": 5
             },
             {
               "firm_name": "UBI Pharma Inc.",
+              "firm_key": "ubi pharma",
               "c": 5
             },
             {
               "firm_name": "Chunghwa Chemical Synthesis &amp; Biotech Co., Ltd.",
+              "firm_key": "chunghwa chemical synthesis & biotech",
               "c": 1
             },
             {
               "firm_name": "Genovior Biotech Corporation",
+              "firm_key": "genovior biotech",
               "c": 1
             }
           ],
@@ -3625,22 +3785,27 @@
           "top_firms": [
             {
               "firm_name": "Central Admixture Pharmacy Services, Inc.",
+              "firm_key": "central admixture pharmacy services",
               "c": 200
             },
             {
               "firm_name": "H & P Industries, Inc.",
+              "firm_key": "h & p industries",
               "c": 137
             },
             {
               "firm_name": "PharMEDium Services, LLC",
+              "firm_key": "pharmedium services",
               "c": 134
             },
             {
               "firm_name": "Hospira, Inc.",
+              "firm_key": "hospira",
               "c": 88
             },
             {
               "firm_name": "American National Red Cross/Biomedical Services",
+              "firm_key": "american national red cross/biomedical services",
               "c": 83
             }
           ],
@@ -3722,22 +3887,27 @@
           "top_firms": [
             {
               "firm_name": "Air Liquide Canada Inc.",
+              "firm_key": "air liquide canada",
               "c": 189
             },
             {
               "firm_name": "Chief Medical Supplies Ltd",
+              "firm_key": "chief medical supplies",
               "c": 96
             },
             {
               "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+              "firm_key": "isologic innovative radiopharmaceuticals of ontario",
               "c": 91
             },
             {
               "firm_name": "Voyant Beauty, Inc.",
+              "firm_key": "voyant beauty",
               "c": 75
             },
             {
               "firm_name": "Linde Canada Inc.",
+              "firm_key": "linde canada",
               "c": 74
             }
           ],
@@ -3819,22 +3989,27 @@
           "top_firms": [
             {
               "firm_name": "미래바이오제약(주)",
+              "firm_key": "미래바이오제약(주)",
               "c": 48
             },
             {
               "firm_name": "(주)현진제약",
+              "firm_key": "(주)현진제약",
               "c": 36
             },
             {
               "firm_name": "(주)엔탭허브",
+              "firm_key": "(주)엔탭허브",
               "c": 31
             },
             {
               "firm_name": "이연제약(주)",
+              "firm_key": "이연제약(주)",
               "c": 30
             },
             {
               "firm_name": "씨케이(주)",
+              "firm_key": "씨케이(주)",
               "c": 25
             }
           ],
@@ -3916,22 +4091,27 @@
           "top_firms": [
             {
               "firm_name": "Przedsiebiorstwo Farmaceutyczne Okoniewscy Vetos Farma Sp. z o.o.",
+              "firm_key": "przedsiebiorstwo farmaceutyczne okoniewscy vetos farma sp z oo",
               "c": 3
             },
             {
               "firm_name": "Fagofarma s.r.o.",
+              "firm_key": "fagofarma sro",
               "c": 2
             },
             {
               "firm_name": "Swiss Parenterals Limited",
+              "firm_key": "swiss parenterals",
               "c": 2
             },
             {
               "firm_name": "VAKOS XT a.s.",
+              "firm_key": "vakos xt as",
               "c": 2
             },
             {
               "firm_name": "Valpharma International S.p.A.",
+              "firm_key": "valpharma international spa",
               "c": 2
             }
           ],
@@ -4013,22 +4193,27 @@
           "top_firms": [
             {
               "firm_name": "NORGINE LIMITED",
+              "firm_key": "norgine",
               "c": 2
             },
             {
               "firm_name": "BIOPLUS LIFE SCIENCES PRIVATE LIMITED",
+              "firm_key": "bioplus life sciences",
               "c": 1
             },
             {
               "firm_name": "Bristol Laboratories Limited",
+              "firm_key": "bristol laboratories",
               "c": 1
             },
             {
               "firm_name": "Geno Pharmaceuticals Private Limited",
+              "firm_key": "geno pharmaceuticals",
               "c": 1
             },
             {
               "firm_name": "Genovior Biotech Corporation",
+              "firm_key": "genovior biotech",
               "c": 1
             }
           ],
@@ -4116,22 +4301,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 61
           },
           {
             "firm_name": "PharMEDium Services, LLC",
+            "firm_key": "pharmedium services",
             "c": 37
           },
           {
             "firm_name": "ProRx, LLC",
+            "firm_key": "prorx",
             "c": 30
           },
           {
             "firm_name": "US Specialty Formulations, LLC",
+            "firm_key": "us specialty formulations",
             "c": 26
           },
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc. (CAPS)",
+            "firm_key": "central admixture pharmacy services (caps)",
             "c": 25
           }
         ],
@@ -4211,22 +4401,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 64
           },
           {
             "firm_name": "Chief Medical Supplies Ltd",
+            "firm_key": "chief medical supplies",
             "c": 24
           },
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+            "firm_key": "isologic innovative radiopharmaceuticals of ontario",
             "c": 21
           },
           {
             "firm_name": "Apotex Inc",
+            "firm_key": "apotex",
             "c": 18
           },
           {
             "firm_name": "Linde Canada Inc.",
+            "firm_key": "linde canada",
             "c": 18
           }
         ],
@@ -4306,22 +4501,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 41
           },
           {
             "firm_name": "Linde Canada Inc.",
+            "firm_key": "linde canada",
             "c": 17
           },
           {
             "firm_name": "Voyant Beauty, Inc.",
+            "firm_key": "voyant beauty",
             "c": 13
           },
           {
             "firm_name": "Apotex Inc",
+            "firm_key": "apotex",
             "c": 12
           },
           {
             "firm_name": "Chief Medical Supplies Ltd",
+            "firm_key": "chief medical supplies",
             "c": 12
           }
         ],
@@ -4401,22 +4601,27 @@
         "top_firms": [
           {
             "firm_name": "H & P Industries, Inc.",
+            "firm_key": "h & p industries",
             "c": 29
           },
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 25
           },
           {
             "firm_name": "Hospira, Inc.",
+            "firm_key": "hospira",
             "c": 15
           },
           {
             "firm_name": "Care-Tech Labs Inc.",
+            "firm_key": "care-tech labs",
             "c": 12
           },
           {
             "firm_name": "PharMEDium Services, LLC",
+            "firm_key": "pharmedium services",
             "c": 12
           }
         ],
@@ -4496,22 +4701,27 @@
         "top_firms": [
           {
             "firm_name": "PharMEDium Services, LLC",
+            "firm_key": "pharmedium services",
             "c": 23
           },
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 17
           },
           {
             "firm_name": "US Specialty Formulations LLC",
+            "firm_key": "us specialty formulations",
             "c": 13
           },
           {
             "firm_name": "RC Outsourcing LLC",
+            "firm_key": "rc outsourcing",
             "c": 12
           },
           {
             "firm_name": "McNeil Consumer Healthcare",
+            "firm_key": "mcneil consumer healthcare",
             "c": 11
           }
         ],
@@ -4591,22 +4801,27 @@
         "top_firms": [
           {
             "firm_name": "American National Red Cross/Biomedical Services",
+            "firm_key": "american national red cross/biomedical services",
             "c": 46
           },
           {
             "firm_name": "H & P Industries, Inc.",
+            "firm_key": "h & p industries",
             "c": 35
           },
           {
             "firm_name": "American Red Cross Blood Services",
+            "firm_key": "american red cross blood services",
             "c": 17
           },
           {
             "firm_name": "Schering-Plough Products, LLC",
+            "firm_key": "schering-plough products",
             "c": 15
           },
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 13
           }
         ],
@@ -4686,22 +4901,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 20
           },
           {
             "firm_name": "American National Red Cross/Biomedical Services",
+            "firm_key": "american national red cross/biomedical services",
             "c": 17
           },
           {
             "firm_name": "Care-Tech Labs Inc.",
+            "firm_key": "care-tech labs",
             "c": 14
           },
           {
             "firm_name": "H & P Industries, Inc.",
+            "firm_key": "h & p industries",
             "c": 13
           },
           {
             "firm_name": "Lupin Limited",
+            "firm_key": "lupin",
             "c": 12
           }
         ],
@@ -4781,22 +5001,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 11
           },
           {
             "firm_name": "Dr. Reddy&#039;s Laboratories Ltd.",
+            "firm_key": "dr reddy's laboratories",
             "c": 7
           },
           {
             "firm_name": "H & P Industries, Inc.",
+            "firm_key": "h & p industries",
             "c": 7
           },
           {
             "firm_name": "QuVa Pharma, Inc",
+            "firm_key": "quva pharma",
             "c": 7
           },
           {
             "firm_name": "American Red Cross Blood Services",
+            "firm_key": "american red cross blood services",
             "c": 6
           }
         ],
@@ -4876,22 +5101,27 @@
         "top_firms": [
           {
             "firm_name": "Voyant Beauty, Inc.",
+            "firm_key": "voyant beauty",
             "c": 12
           },
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+            "firm_key": "isologic innovative radiopharmaceuticals of ontario",
             "c": 10
           },
           {
             "firm_name": "Apotex Inc",
+            "firm_key": "apotex",
             "c": 9
           },
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 8
           },
           {
             "firm_name": "Linde Canada Inc.",
+            "firm_key": "linde canada",
             "c": 8
           }
         ],
@@ -4971,22 +5201,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 11
           },
           {
             "firm_name": "Akorn, Inc.",
+            "firm_key": "akorn",
             "c": 8
           },
           {
             "firm_name": "Care-Tech Labs Inc.",
+            "firm_key": "care-tech labs",
             "c": 8
           },
           {
             "firm_name": "Dabur India Limited",
+            "firm_key": "dabur india",
             "c": 8
           },
           {
             "firm_name": "Dr. Reddy&#039;s Laboratories",
+            "firm_key": "dr reddy's laboratories",
             "c": 8
           }
         ],
@@ -5066,22 +5301,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 19
           },
           {
             "firm_name": "Chief Medical Supplies Ltd",
+            "firm_key": "chief medical supplies",
             "c": 18
           },
           {
             "firm_name": "Groupe Dissan Inc.",
+            "firm_key": "groupe dissan",
             "c": 11
           },
           {
             "firm_name": "Biolyse Pharma Corporation",
+            "firm_key": "biolyse pharma",
             "c": 9
           },
           {
             "firm_name": "Eurofins CDMO Alphora Incorporated",
+            "firm_key": "eurofins cdmo alphora incorporated",
             "c": 9
           }
         ],
@@ -5161,22 +5401,27 @@
         "top_firms": [
           {
             "firm_name": "Voyant Beauty, Inc.",
+            "firm_key": "voyant beauty",
             "c": 11
           },
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+            "firm_key": "isologic innovative radiopharmaceuticals of ontario",
             "c": 8
           },
           {
             "firm_name": "Kohl & Frisch Limited",
+            "firm_key": "kohl & frisch",
             "c": 8
           },
           {
             "firm_name": "West Penetone Inc.",
+            "firm_key": "west penetone",
             "c": 8
           },
           {
             "firm_name": "TJP Labs Inc.",
+            "firm_key": "tjp labs",
             "c": 7
           }
         ],
@@ -5256,22 +5501,27 @@
         "top_firms": [
           {
             "firm_name": "미래바이오제약(주)",
+            "firm_key": "미래바이오제약(주)",
             "c": 45
           },
           {
             "firm_name": "(주)현진제약",
+            "firm_key": "(주)현진제약",
             "c": 32
           },
           {
             "firm_name": "(주)엔탭허브",
+            "firm_key": "(주)엔탭허브",
             "c": 25
           },
           {
             "firm_name": "씨케이(주)",
+            "firm_key": "씨케이(주)",
             "c": 25
           },
           {
             "firm_name": "(주)나음제약",
+            "firm_key": "(주)나음제약",
             "c": 15
           }
         ],
@@ -5351,22 +5601,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 7
           },
           {
             "firm_name": "Auro Pharmacies, Inc.",
+            "firm_key": "auro pharmacies",
             "c": 6
           },
           {
             "firm_name": "Cantrell Drug Company",
+            "firm_key": "cantrell drug",
             "c": 5
           },
           {
             "firm_name": "PharMEDium Services LLC",
+            "firm_key": "pharmedium services",
             "c": 5
           },
           {
             "firm_name": "Care-Tech Labs Inc.",
+            "firm_key": "care-tech labs",
             "c": 4
           }
         ],
@@ -5446,22 +5701,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 8
           },
           {
             "firm_name": "Eurofins CDMO Alphora Incorporated",
+            "firm_key": "eurofins cdmo alphora incorporated",
             "c": 6
           },
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals Ltd.",
+            "firm_key": "isologic innovative radiopharmaceuticals",
             "c": 6
           },
           {
             "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+            "firm_key": "omega laboratories (now juno pharma canada )",
             "c": 5
           },
           {
             "firm_name": "Apotex Inc",
+            "firm_key": "apotex",
             "c": 4
           }
         ],
@@ -5541,22 +5801,27 @@
         "top_firms": [
           {
             "firm_name": "Unico Holdings, Inc.",
+            "firm_key": "unico holdings",
             "c": 6
           },
           {
             "firm_name": "Unique Pharmaceutical, Ltd",
+            "firm_key": "unique pharmaceutical",
             "c": 5
           },
           {
             "firm_name": "Auro Pharmacies, Inc.",
+            "firm_key": "auro pharmacies",
             "c": 4
           },
           {
             "firm_name": "Expert Compounding Pharmacy",
+            "firm_key": "expert compounding pharmacy",
             "c": 4
           },
           {
             "firm_name": "Family Dollar Distribution Inc.",
+            "firm_key": "family dollar distribution",
             "c": 4
           }
         ],
@@ -5636,22 +5901,27 @@
         "top_firms": [
           {
             "firm_name": "British Columbia Centre for Disease Control and Prevention Society Branch",
+            "firm_key": "british columbia centre for disease control and prevention society branch",
             "c": 9
           },
           {
             "firm_name": "Linde Canada Inc.",
+            "firm_key": "linde canada",
             "c": 6
           },
           {
             "firm_name": "Voyant Beauty, Inc.",
+            "firm_key": "voyant beauty",
             "c": 5
           },
           {
             "firm_name": "Accel Pharma Inc",
+            "firm_key": "accel pharma",
             "c": 4
           },
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 4
           }
         ],
@@ -5731,22 +6001,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 15
           },
           {
             "firm_name": "Voyant Beauty, Inc.",
+            "firm_key": "voyant beauty",
             "c": 9
           },
           {
             "firm_name": "Kohl & Frisch Limited",
+            "firm_key": "kohl & frisch",
             "c": 4
           },
           {
             "firm_name": "Linde Canada Inc.",
+            "firm_key": "linde canada",
             "c": 4
           },
           {
             "firm_name": "Messer Canada Inc.",
+            "firm_key": "messer canada",
             "c": 4
           }
         ],
@@ -5826,22 +6101,27 @@
         "top_firms": [
           {
             "firm_name": "Dr Sankunni’s Ayurvedic Research Foundation Private Ltd.",
+            "firm_key": "dr sankunni’s ayurvedic research foundation",
             "c": 9
           },
           {
             "firm_name": "PharMEDium Services, LLC.",
+            "firm_key": "pharmedium services",
             "c": 8
           },
           {
             "firm_name": "QuVa Pharma, Inc.",
+            "firm_key": "quva pharma",
             "c": 6
           },
           {
             "firm_name": "Cantrell Drug Company",
+            "firm_key": "cantrell drug",
             "c": 5
           },
           {
             "firm_name": "Fusion IV Pharmaceuticals, Inc. dba Axia Pharmaceutical",
+            "firm_key": "fusion iv pharmaceuticals axia pharmaceutical",
             "c": 5
           }
         ],
@@ -5921,22 +6201,27 @@
         "top_firms": [
           {
             "firm_name": "환인제약(주)",
+            "firm_key": "환인제약(주)",
             "c": 16
           },
           {
             "firm_name": "동화약품(주)",
+            "firm_key": "동화약품(주)",
             "c": 9
           },
           {
             "firm_name": "(주)유유제약",
+            "firm_key": "(주)유유제약",
             "c": 8
           },
           {
             "firm_name": "구주제약(주)",
+            "firm_key": "구주제약(주)",
             "c": 8
           },
           {
             "firm_name": "일동제약(주)",
+            "firm_key": "일동제약(주)",
             "c": 8
           }
         ],
@@ -6016,22 +6301,27 @@
         "top_firms": [
           {
             "firm_name": "Chief Medical Supplies Ltd",
+            "firm_key": "chief medical supplies",
             "c": 10
           },
           {
             "firm_name": "TJP Labs Inc.",
+            "firm_key": "tjp labs",
             "c": 8
           },
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 7
           },
           {
             "firm_name": "HYTN Cannabis Inc.",
+            "firm_key": "hytn cannabis",
             "c": 7
           },
           {
             "firm_name": "Apotex Inc",
+            "firm_key": "apotex",
             "c": 6
           }
         ],
@@ -6111,22 +6401,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 6
           },
           {
             "firm_name": "AnazaoHealth Corporation",
+            "firm_key": "anazaohealth",
             "c": 5
           },
           {
             "firm_name": "Eli Lilly and Company",
+            "firm_key": "eli lilly and",
             "c": 5
           },
           {
             "firm_name": "QuVa Pharma, Inc.",
+            "firm_key": "quva pharma",
             "c": 5
           },
           {
             "firm_name": "American Pharmacy of Illinois Inc. dba Alwan’s Pharmacy",
+            "firm_key": "american pharmacy of illinois alwan’s pharmacy",
             "c": 4
           }
         ],
@@ -6206,22 +6501,27 @@
         "top_firms": [
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 9
           },
           {
             "firm_name": "Care-Tech Labs Inc.",
+            "firm_key": "care-tech labs",
             "c": 5
           },
           {
             "firm_name": "Qualgen LLC",
+            "firm_key": "qualgen",
             "c": 5
           },
           {
             "firm_name": "QuVa Pharma, Inc.",
+            "firm_key": "quva pharma",
             "c": 5
           },
           {
             "firm_name": "Right Value Drug Stores, Inc.",
+            "firm_key": "right value drug stores",
             "c": 5
           }
         ],
@@ -6301,22 +6601,27 @@
         "top_firms": [
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+            "firm_key": "isologic innovative radiopharmaceuticals of ontario",
             "c": 15
           },
           {
             "firm_name": "Dalton Chemical Laboratories Inc. O/A Dalton Pharma Services",
+            "firm_key": "dalton chemical laboratories o/a dalton pharma services",
             "c": 13
           },
           {
             "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+            "firm_key": "omega laboratories (now juno pharma canada )",
             "c": 12
           },
           {
             "firm_name": "Steri-Med Pharma Inc.",
+            "firm_key": "steri-med pharma",
             "c": 12
           },
           {
             "firm_name": "Serum Institute of India Pvt. Ltd.",
+            "firm_key": "serum institute of india",
             "c": 10
           }
         ],
@@ -6396,22 +6701,27 @@
         "top_firms": [
           {
             "firm_name": "L. Perrigo Co",
+            "firm_key": "l perrigo",
             "c": 9
           },
           {
             "firm_name": "Novartis Consumer Health,",
+            "firm_key": "novartis consumer health",
             "c": 7
           },
           {
             "firm_name": "Akorn, Inc.",
+            "firm_key": "akorn",
             "c": 5
           },
           {
             "firm_name": "Hospira Inc. A Pfizer Company",
+            "firm_key": "hospira a pfizer",
             "c": 5
           },
           {
             "firm_name": "McNeil Consumer Healthcare",
+            "firm_key": "mcneil consumer healthcare",
             "c": 5
           }
         ],
@@ -6491,22 +6801,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 6
           },
           {
             "firm_name": "British Columbia Centre for Disease Control and Prevention Society Branch",
+            "firm_key": "british columbia centre for disease control and prevention society branch",
             "c": 4
           },
           {
             "firm_name": "Chief Medical Supplies Ltd",
+            "firm_key": "chief medical supplies",
             "c": 4
           },
           {
             "firm_name": "Kohl & Frisch Limited",
+            "firm_key": "kohl & frisch",
             "c": 4
           },
           {
             "firm_name": "Estée Lauder Cosmetics Ltd.",
+            "firm_key": "estée lauder cosmetics",
             "c": 3
           }
         ],
@@ -6586,22 +6901,27 @@
         "top_firms": [
           {
             "firm_name": "Beauty Mark Solutions Inc",
+            "firm_key": "beauty mark solutions",
             "c": 4
           },
           {
             "firm_name": "Estée Lauder Cosmetics Ltd.",
+            "firm_key": "estée lauder cosmetics",
             "c": 4
           },
           {
             "firm_name": "Accord Healthcare Inc.",
+            "firm_key": "accord healthcare",
             "c": 3
           },
           {
             "firm_name": "Capcium Inc.",
+            "firm_key": "capcium",
             "c": 3
           },
           {
             "firm_name": "Delta Pharma Inc.",
+            "firm_key": "delta pharma",
             "c": 3
           }
         ],
@@ -6681,22 +7001,27 @@
         "top_firms": [
           {
             "firm_name": "Natco Pharma Limited",
+            "firm_key": "natco pharma",
             "c": 11
           },
           {
             "firm_name": "Omega Laboratories Ltd. (now Juno Pharma Canada Inc.)",
+            "firm_key": "omega laboratories (now juno pharma canada )",
             "c": 5
           },
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+            "firm_key": "isologic innovative radiopharmaceuticals of ontario",
             "c": 4
           },
           {
             "firm_name": "Sun Pharmaceutical Industries Limited",
+            "firm_key": "sun pharmaceutical industries",
             "c": 4
           },
           {
             "firm_name": "Apotex Inc",
+            "firm_key": "apotex",
             "c": 3
           }
         ],
@@ -6776,22 +7101,27 @@
         "top_firms": [
           {
             "firm_name": "Linde Canada Inc.",
+            "firm_key": "linde canada",
             "c": 9
           },
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 6
           },
           {
             "firm_name": "Messer Canada Inc.",
+            "firm_key": "messer canada",
             "c": 4
           },
           {
             "firm_name": "B. Braun of Canada Ltd.",
+            "firm_key": "b braun of canada",
             "c": 2
           },
           {
             "firm_name": "Barentz Canada ULC",
+            "firm_key": "barentz canada ulc",
             "c": 2
           }
         ],
@@ -6871,22 +7201,27 @@
         "top_firms": [
           {
             "firm_name": "Air Liquide Canada Inc.",
+            "firm_key": "air liquide canada",
             "c": 8
           },
           {
             "firm_name": "Delta Pharma Inc.",
+            "firm_key": "delta pharma",
             "c": 5
           },
           {
             "firm_name": "Cosmaceutical Research Lab Inc.",
+            "firm_key": "cosmaceutical research lab",
             "c": 3
           },
           {
             "firm_name": "Eurofins CDMO Alphora Incorporated",
+            "firm_key": "eurofins cdmo alphora incorporated",
             "c": 3
           },
           {
             "firm_name": "HYTN Cannabis Inc.",
+            "firm_key": "hytn cannabis",
             "c": 3
           }
         ],
@@ -6966,22 +7301,27 @@
         "top_firms": [
           {
             "firm_name": "Lupin Limited",
+            "firm_key": "lupin",
             "c": 4
           },
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 3
           },
           {
             "firm_name": "Cipla Limited",
+            "firm_key": "cipla",
             "c": 3
           },
           {
             "firm_name": "Dr. Reddy&#039;s Laboratories Limited",
+            "firm_key": "dr reddy's laboratories",
             "c": 3
           },
           {
             "firm_name": "Intas Pharmaceuticals Limited",
+            "firm_key": "intas pharmaceuticals",
             "c": 3
           }
         ],
@@ -7061,22 +7401,27 @@
         "top_firms": [
           {
             "firm_name": "Vita Pharmacy, LLC dba Talon Pharmacy of Boerne",
+            "firm_key": "vita pharmacy talon pharmacy of boerne",
             "c": 5
           },
           {
             "firm_name": "ProRx, LLC",
+            "firm_key": "prorx",
             "c": 3
           },
           {
             "firm_name": "Revive Rx LLC",
+            "firm_key": "revive rx",
             "c": 3
           },
           {
             "firm_name": "Advanced Nutriceuticals, LLC dba The Guyer Institute of Molecular Medicine",
+            "firm_key": "advanced nutriceuticals the guyer institute of molecular medicine",
             "c": 2
           },
           {
             "firm_name": "Allergy Laboratories, Inc.",
+            "firm_key": "allergy laboratories",
             "c": 2
           }
         ],
@@ -7156,22 +7501,27 @@
         "top_firms": [
           {
             "firm_name": "Schering-Plough Products, LLC",
+            "firm_key": "schering-plough products",
             "c": 4
           },
           {
             "firm_name": "Carolina Infusion",
+            "firm_key": "carolina infusion",
             "c": 3
           },
           {
             "firm_name": "Inotiv Inc.",
+            "firm_key": "inotiv",
             "c": 3
           },
           {
             "firm_name": "ECI Pharmaceuticals, LLC",
+            "firm_key": "eci pharmaceuticals",
             "c": 2
           },
           {
             "firm_name": "Front Door Pharmacy, LLC dba Pure Pharmacy",
+            "firm_key": "front door pharmacy pure pharmacy",
             "c": 2
           }
         ],
@@ -7251,22 +7601,27 @@
         "top_firms": [
           {
             "firm_name": "(주)엔탭허브",
+            "firm_key": "(주)엔탭허브",
             "c": 6
           },
           {
             "firm_name": "에이치케이이노엔(주)",
+            "firm_key": "에이치케이이노엔(주)",
             "c": 5
           },
           {
             "firm_name": "(주)현진제약",
+            "firm_key": "(주)현진제약",
             "c": 4
           },
           {
             "firm_name": "동화약품(주)",
+            "firm_key": "동화약품(주)",
             "c": 4
           },
           {
             "firm_name": "(주)퍼슨",
+            "firm_key": "(주)퍼슨",
             "c": 3
           }
         ],
@@ -7346,22 +7701,27 @@
         "top_firms": [
           {
             "firm_name": "한솔신약(주)",
+            "firm_key": "한솔신약(주)",
             "c": 4
           },
           {
             "firm_name": "Kaigen Pharma Co., Ltd. Okusawa Factory",
+            "firm_key": "kaigen pharma okusawa factory",
             "c": 3
           },
           {
             "firm_name": "맥널티제약(주)",
+            "firm_key": "맥널티제약(주)",
             "c": 3
           },
           {
             "firm_name": "오스템파마주식회사",
+            "firm_key": "오스템파마주식회사",
             "c": 3
           },
           {
             "firm_name": "천우신약(주)",
+            "firm_key": "천우신약(주)",
             "c": 3
           }
         ],
@@ -7441,22 +7801,27 @@
         "top_firms": [
           {
             "firm_name": "(주)퍼슨",
+            "firm_key": "(주)퍼슨",
             "c": 9
           },
           {
             "firm_name": "한국넬슨제약(주)",
+            "firm_key": "한국넬슨제약(주)",
             "c": 5
           },
           {
             "firm_name": "(주)휴메딕스",
+            "firm_key": "(주)휴메딕스",
             "c": 3
           },
           {
             "firm_name": "Nandu Chemical Industries",
+            "firm_key": "nandu chemical industries",
             "c": 3
           },
           {
             "firm_name": "에이치케이이노엔(주)",
+            "firm_key": "에이치케이이노엔(주)",
             "c": 3
           }
         ],
@@ -7536,22 +7901,27 @@
         "top_firms": [
           {
             "firm_name": "Curexa – East, LLC dba Curexa",
+            "firm_key": "curexa – east curexa",
             "c": 4
           },
           {
             "firm_name": "Centaur Pharmaceuticals Private Ltd.",
+            "firm_key": "centaur pharmaceuticals",
             "c": 2
           },
           {
             "firm_name": "Dental Technologies Inc.",
+            "firm_key": "dental technologies",
             "c": 2
           },
           {
             "firm_name": "Galaxy Surfactants Ltd.",
+            "firm_key": "galaxy surfactants",
             "c": 2
           },
           {
             "firm_name": "Indiana Chem-Port",
+            "firm_key": "indiana chem-port",
             "c": 2
           }
         ],
@@ -7631,22 +8001,27 @@
         "top_firms": [
           {
             "firm_name": "(주)듀켐바이오",
+            "firm_key": "(주)듀켐바이오",
             "c": 3
           },
           {
             "firm_name": "(주)바이넥스",
+            "firm_key": "(주)바이넥스",
             "c": 3
           },
           {
             "firm_name": "대한약품공업(주)",
+            "firm_key": "대한약품공업(주)",
             "c": 3
           },
           {
             "firm_name": "(주)삼화바이오팜",
+            "firm_key": "(주)삼화바이오팜",
             "c": 2
           },
           {
             "firm_name": "(주)아이월드제약",
+            "firm_key": "(주)아이월드제약",
             "c": 2
           }
         ],
@@ -7726,22 +8101,27 @@
         "top_firms": [
           {
             "firm_name": "AnazaoHealth Corporation",
+            "firm_key": "anazaohealth",
             "c": 4
           },
           {
             "firm_name": "Fusion IV Pharmaceuticals, Inc. dba Axia Pharmaceutical",
+            "firm_key": "fusion iv pharmaceuticals axia pharmaceutical",
             "c": 3
           },
           {
             "firm_name": "Hybrid Pharma LLC",
+            "firm_key": "hybrid pharma",
             "c": 3
           },
           {
             "firm_name": "Olympia Compounding Pharmacy dba Olympia Pharmacy",
+            "firm_key": "olympia compounding pharmacy olympia pharmacy",
             "c": 3
           },
           {
             "firm_name": "Empower Clinic Services LLC dba Empower Pharmacy",
+            "firm_key": "empower clinic services empower pharmacy",
             "c": 2
           }
         ],
@@ -7821,22 +8201,27 @@
         "top_firms": [
           {
             "firm_name": "Centre C3i Inc.",
+            "firm_key": "centre c3i",
             "c": 2
           },
           {
             "firm_name": "Edmonton Radiopharmaceutical Centre (Alberta Health Services)",
+            "firm_key": "edmonton radiopharmaceutical centre (alberta health services)",
             "c": 2
           },
           {
             "firm_name": "Galenova Inc.",
+            "firm_key": "galenova",
             "c": 2
           },
           {
             "firm_name": "Isologic Innovative Radiopharmaceuticals of Ontario Limited",
+            "firm_key": "isologic innovative radiopharmaceuticals of ontario",
             "c": 2
           },
           {
             "firm_name": "Novocol Pharmaceutical of Canada Inc.",
+            "firm_key": "novocol pharmaceutical of canada",
             "c": 2
           }
         ],
@@ -7916,22 +8301,27 @@
         "top_firms": [
           {
             "firm_name": "(주)킵스바이오파마",
+            "firm_key": "(주)킵스바이오파마",
             "c": 3
           },
           {
             "firm_name": "(주)대유코아",
+            "firm_key": "(주)대유코아",
             "c": 2
           },
           {
             "firm_name": "(주)씨티씨바이오",
+            "firm_key": "(주)씨티씨바이오",
             "c": 2
           },
           {
             "firm_name": "Hubei Guangchen Pharmaceutical Co., Ltd",
+            "firm_key": "hubei guangchen pharmaceutical",
             "c": 2
           },
           {
             "firm_name": "신풍제약(주)",
+            "firm_key": "신풍제약(주)",
             "c": 2
           }
         ],
@@ -8011,22 +8401,27 @@
         "top_firms": [
           {
             "firm_name": "(주)엔엠제약",
+            "firm_key": "(주)엔엠제약",
             "c": 6
           },
           {
             "firm_name": "한국신텍스제약(주)",
+            "firm_key": "한국신텍스제약(주)",
             "c": 6
           },
           {
             "firm_name": "(주)삼화바이오팜",
+            "firm_key": "(주)삼화바이오팜",
             "c": 4
           },
           {
             "firm_name": "(주)동구바이오제약",
+            "firm_key": "(주)동구바이오제약",
             "c": 2
           },
           {
             "firm_name": "EN Otsuka Pharmaceutical Co., Ltd.",
+            "firm_key": "en otsuka pharmaceutical",
             "c": 2
           }
         ],
@@ -8106,22 +8501,27 @@
         "top_firms": [
           {
             "firm_name": "(주)휴메딕스",
+            "firm_key": "(주)휴메딕스",
             "c": 4
           },
           {
             "firm_name": "동아에스티(주)",
+            "firm_key": "동아에스티(주)",
             "c": 4
           },
           {
             "firm_name": "(주)경보제약",
+            "firm_key": "(주)경보제약",
             "c": 2
           },
           {
             "firm_name": "(주)녹십자웰빙",
+            "firm_key": "(주)녹십자웰빙",
             "c": 2
           },
           {
             "firm_name": "신풍제약(주)",
+            "firm_key": "신풍제약(주)",
             "c": 2
           }
         ],
@@ -8201,22 +8601,27 @@
         "top_firms": [
           {
             "firm_name": "대우제약(주)",
+            "firm_key": "대우제약(주)",
             "c": 2
           },
           {
             "firm_name": "에이치디엑스(주)",
+            "firm_key": "에이치디엑스(주)",
             "c": 2
           },
           {
             "firm_name": "주신제약(주)",
+            "firm_key": "주신제약(주)",
             "c": 2
           },
           {
             "firm_name": "한국신텍스제약(주)",
+            "firm_key": "한국신텍스제약(주)",
             "c": 2
           },
           {
             "firm_name": "(주)글락소스미스클라인",
+            "firm_key": "(주)글락소스미스클라인",
             "c": 1
           }
         ],
@@ -8296,22 +8701,27 @@
         "top_firms": [
           {
             "firm_name": "Ursapharm Arzeimittel GmbH",
+            "firm_key": "ursapharm arzeimittel",
             "c": 2
           },
           {
             "firm_name": "삼성산소(주)",
+            "firm_key": "삼성산소(주)",
             "c": 2
           },
           {
             "firm_name": "(주)그린제약",
+            "firm_key": "(주)그린제약",
             "c": 1
           },
           {
             "firm_name": "(주)나이벡",
+            "firm_key": "(주)나이벡",
             "c": 1
           },
           {
             "firm_name": "(주)에이프로젠바이오로직스",
+            "firm_key": "(주)에이프로젠바이오로직스",
             "c": 1
           }
         ],
@@ -8391,22 +8801,27 @@
         "top_firms": [
           {
             "firm_name": "(주)휴메딕스",
+            "firm_key": "(주)휴메딕스",
             "c": 4
           },
           {
             "firm_name": "(주)시어스제약",
+            "firm_key": "(주)시어스제약",
             "c": 2
           },
           {
             "firm_name": "삼양화학공업(주)",
+            "firm_key": "삼양화학공업(주)",
             "c": 2
           },
           {
             "firm_name": "에스피씨(주)",
+            "firm_key": "에스피씨(주)",
             "c": 2
           },
           {
             "firm_name": "에이치케이이노엔(주)",
+            "firm_key": "에이치케이이노엔(주)",
             "c": 2
           }
         ],
@@ -8486,22 +8901,27 @@
         "top_firms": [
           {
             "firm_name": "Intas Pharmaceuticals Limited",
+            "firm_key": "intas pharmaceuticals",
             "c": 5
           },
           {
             "firm_name": "Central Admixture Pharmacy Services, Inc.",
+            "firm_key": "central admixture pharmacy services",
             "c": 2
           },
           {
             "firm_name": "Immunomedics, Inc.",
+            "firm_key": "immunomedics",
             "c": 2
           },
           {
             "firm_name": "Lico Industries, LLC., d.b.a. American Towelette Company",
+            "firm_key": "lico industries american towelette",
             "c": 2
           },
           {
             "firm_name": "Aspen Biopharma Labs Private Limited",
+            "firm_key": "aspen biopharma labs",
             "c": 1
           }
         ],
@@ -8581,22 +9001,27 @@
         "top_firms": [
           {
             "firm_name": "일양약품(주)",
+            "firm_key": "일양약품(주)",
             "c": 3
           },
           {
             "firm_name": "(주)녹십자웰빙",
+            "firm_key": "(주)녹십자웰빙",
             "c": 2
           },
           {
             "firm_name": "Ohara Pharmaceutical Co., Ltd., Kami Factory,",
+            "firm_key": "ohara pharmaceutical kami factory",
             "c": 2
           },
           {
             "firm_name": "(주)루텍",
+            "firm_key": "(주)루텍",
             "c": 1
           },
           {
             "firm_name": "(주)보령",
+            "firm_key": "(주)보령",
             "c": 1
           }
         ],
@@ -8676,22 +9101,27 @@
         "top_firms": [
           {
             "firm_name": "주식회사 케이앤제이씨",
+            "firm_key": "주식회사 케이앤제이씨",
             "c": 13
           },
           {
             "firm_name": "제이케이제약(주)",
+            "firm_key": "제이케이제약(주)",
             "c": 12
           },
           {
             "firm_name": "(주)경보제약",
+            "firm_key": "(주)경보제약",
             "c": 1
           },
           {
             "firm_name": "삼성제약(주)",
+            "firm_key": "삼성제약(주)",
             "c": 1
           },
           {
             "firm_name": "에이치디엑스(주)",
+            "firm_key": "에이치디엑스(주)",
             "c": 1
           }
         ],
@@ -8771,22 +9201,27 @@
         "top_firms": [
           {
             "firm_name": "(주)보령",
+            "firm_key": "(주)보령",
             "c": 2
           },
           {
             "firm_name": "(주)제뉴파마",
+            "firm_key": "(주)제뉴파마",
             "c": 2
           },
           {
             "firm_name": "동화약품(주)",
+            "firm_key": "동화약품(주)",
             "c": 2
           },
           {
             "firm_name": "(주)녹십자웰빙",
+            "firm_key": "(주)녹십자웰빙",
             "c": 1
           },
           {
             "firm_name": "(주)보락",
+            "firm_key": "(주)보락",
             "c": 1
           }
         ],
@@ -8866,22 +9301,27 @@
         "top_firms": [
           {
             "firm_name": "Akriti Pharmaceuticals Private Limited",
+            "firm_key": "akriti pharmaceuticals",
             "c": 1
           },
           {
             "firm_name": "Ananta Medicare Limited",
+            "firm_key": "ananta medicare",
             "c": 1
           },
           {
             "firm_name": "Avlab S.r.l.",
+            "firm_key": "avlab",
             "c": 1
           },
           {
             "firm_name": "Bda Health Care Private Limited",
+            "firm_key": "bda health care",
             "c": 1
           },
           {
             "firm_name": "Beximco Pharmaceuticals Limited",
+            "firm_key": "beximco pharmaceuticals",
             "c": 1
           }
         ],
@@ -8961,22 +9401,27 @@
         "top_firms": [
           {
             "firm_name": "에이치디엑스(주)",
+            "firm_key": "에이치디엑스(주)",
             "c": 3
           },
           {
             "firm_name": "(주)그린제약",
+            "firm_key": "(주)그린제약",
             "c": 1
           },
           {
             "firm_name": "(주)라이트팜텍",
+            "firm_key": "(주)라이트팜텍",
             "c": 1
           },
           {
             "firm_name": "(주)보령",
+            "firm_key": "(주)보령",
             "c": 1
           },
           {
             "firm_name": "(주)제뉴파마",
+            "firm_key": "(주)제뉴파마",
             "c": 1
           }
         ],

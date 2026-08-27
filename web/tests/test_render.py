@@ -5591,11 +5591,34 @@ class WebFirmRenderTest(unittest.TestCase):
         src = (WEB_DIR / "assets" / "firm.js").read_bytes()
         self.assertEqual(built, src, "firm.js 가 dist 에 verbatim 복사되지 않음")
 
-    def test_sitemap_includes_firm_base_path_only(self):
-        # 쿼리스트링 기반 동적 조회 페이지라 베이스 경로 1건만 등록(개별 업체 URL 미등록).
+    def test_sitemap_lists_static_firm_pages_but_never_query_urls(self):
+        """[B1 2026-08-27] 종전 이름은 `..._firm_base_path_only` 였고 베이스 1건만 세었다.
+
+        그 근거는 "개별 업체 URL 은 쿼리스트링 기반 **동적** 조회 페이지"였는데, 그
+        전제가 사라졌다 — 문서 2건 이상 업체는 이제 진짜 정적 HTML 을 갖는다
+        (`/findings/firm/{slug}/`, WebFirmPageTest 가 전수 검증). 그래서 세는 대상을
+        바꾸되 **이 가드가 실제로 지키던 것은 그대로 남긴다**: 크롤러에게 빈 껍데기를
+        광고하는 `?key=` URL 은 sitemap 에 절대 들어가지 않는다.
+
+        개수는 매직 넘버로 박지 않고 **정본에서 파생**한다 — 데이터가 늘면 함께 는다."""
         self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/firm/</loc>", self.sitemap)
-        self.assertEqual(self.sitemap.count("/findings/firm/"), 1)
+        # ★불변: 쿼리스트링 URL 은 어떤 형태로도 sitemap 에 없다.
         self.assertNotIn("/findings/firm/?", self.sitemap)
+        self.assertNotIn("?key=", self.sitemap)
+        docs = render.load_findings_docs()
+        if not docs:
+            self.skipTest("findings_docs.json 미존재")
+        by_firm: dict[str, int] = {}
+        for d in docs["documents"]:
+            k = d.get("firm_key") or ""
+            if k:
+                by_firm[k] = by_firm.get(k, 0) + 1
+        expected = sum(1 for n in by_firm.values() if n >= 2)
+        listed = len(re.findall(
+            rf"<loc>{re.escape(render.SITE_BASE_URL)}/findings/firm/[^/<]+/</loc>",
+            self.sitemap))
+        self.assertEqual(listed, expected,
+                         "정적 업체 페이지 수와 sitemap 등록 수가 다르다")
 
     def test_nav_not_added_entry_only_via_link(self):
         # 요구사항: base.html nav 에 신규 탭을 추가하지 않는다(진입은 findings.js 의 문서

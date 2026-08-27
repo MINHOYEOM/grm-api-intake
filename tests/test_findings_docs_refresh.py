@@ -201,6 +201,29 @@ class CollectDocumentsTest(unittest.TestCase):
                          "회복된 페이지를 실패로 세면 안 된다")
         self.assertTrue(self.slept, "재시도 사이에 물러서지 않았다")
 
+    def test_first_page_is_retried_too(self):
+        """★첫 장도 재시도 대상이다 — 처음엔 2페이지부터만 걸었다가 바로 다음 실행에서
+        **첫 장이 500 으로 죽어 런 전체가 중단**됐다(pages 를 못 얻으니 진행 불가).
+
+        실패는 페이지 번호를 가리지 않는다 — 부하성이기 때문이다. 한 곳(fetch_page)으로
+        모아 모든 호출이 같은 보호를 받게 했고, 이 검사가 그 사실을 고정한다."""
+        self._stub(2, {1: [_doc("doc1")], 2: [_doc("doc2")]}, fail_times={1: 2})
+        docs, reject = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                             log=lambda m: None)
+        self.assertEqual(len(docs), 2, "첫 장 재시도로 런이 살아남지 못했다")
+        self.assertEqual(self.calls[1], 3)
+
+    def test_first_page_permanent_failure_writes_nothing(self):
+        """첫 장이 끝내 안 되면 예외를 올려 **아무것도 쓰지 않는다**.
+
+        빈 정본을 커밋하면 다음 렌더가 문서 페이지 수천 장을 지운다 — 0건 가드와 같은
+        취지이고, 여기서는 그 앞단에서 막는다."""
+        self._stub(2, {1: [_doc("doc1")], 2: [_doc("doc2")]}, fail_pages={1})
+        with self.assertRaises(RuntimeError):
+            fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                  log=lambda m: None)
+        self.assertEqual(self.calls[1], fdr.PAGE_ATTEMPTS)
+
     def test_permanent_failure_still_counted_after_retries(self):
         """항구적 실패는 재시도 뒤에도 **반드시 사유로 센다** — 조용히 사라지면 축소
         게이트만이 마지막 방어선이 되고, 그 게이트는 10% 미만을 못 잡는다.

@@ -944,9 +944,10 @@ def _detail_whopir_report(row: dict[str, Any], raw: dict[str, Any]) -> dict[str,
 # 부분은 전부 이미 구조화된 사실(진행상태·자진/명령·로트·수량·유통범위·처리 타임라인)이라
 # 생성할 것이 없다. 생성 0 → 환각 0 → 근거대조 게이트 불필요.
 #
-# `mhra-recall` 은 배선하지 않는다 — gov.uk Atom 피드가 주는 5개 키(title·summary·
-# category·id·published)를 카드가 이미 전부 쓰고 있어 **미사용 원천이 실제로 없다**.
-# 늘리려면 알림 상세 페이지를 수집해야 하므로 수집기 변경 과제로 남긴다(10주 1장).
+# `mhra-recall` 은 **#806(2026-08-26)에 배선됐다**. 위 판단("미사용 원천이 실제로 없다")은
+# Atom 피드만 보고 내린 것이라 절반만 맞았다 — 피드가 주는 5개 키는 카드가 이미 다 쓰고
+# 있었지만, 같은 URL 을 gov.uk **Content API** 로 부르면 알림 전문이 JSON 으로 나온다.
+# 원천이 없었던 게 아니라 **다른 문에 있었다**. `_detail_mhra_recall` 참조.
 
 _OPENFDA_ABSENT = {"", "N/A"}        # 원천이 "값 없음"을 적는 방식 — 필드 자체를 안 싣는다
 

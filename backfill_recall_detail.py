@@ -43,7 +43,19 @@ _PRODUCERS = {
     "Recall": cs._detail_openfda_recall,
     "회수·판매중지": cs._detail_recall_quality,
     "Recall(HC)": cs._detail_hc_recall,
+    # [MHRA 소급 2026-08-27] #806 이 회수 4종의 마지막 하나를 배선하면서 이 CLI 의 대상이
+    # 늘었다 — 위 주석이 요구하는 "의도적 결정"이 여기다. 다른 3종과 달리 원천이 DB 에 없어
+    # (본문 필드는 #806 이후 수집분부터 생긴다) gov.uk Content API 로 따로 확보해 먹인다.
+    "Recall(UK)": cs._detail_mhra_recall,
 }
+
+# ★card_type 이 "규제 소식"인 MHRA 회수 2장 — 분류 결함이 아니라 **시점 산물**이다.
+# `mhra-recall` kind 는 #399(2026-07-22)에 신설됐고, 2026-07-20 브리프의 이 두 장은 그보다
+# 이틀 앞서 발행돼 당시 규칙대로 rss-news → "규제 소식"으로 나갔다. 원천은 동일한 gov.uk
+# 의약품 회수 공고이므로 상세를 싣는 것이 맞다. 다만 "규제 소식"을 _PRODUCERS 에 넣으면
+# 무관한 뉴스 카드까지 회수 producer 를 타므로, **문서번호로 못박아** 대상을 고정한다
+# (1회성 소급이라 목록이 낡을 자리가 없다 — 새 발행분은 전부 Recall(UK) 로 나온다).
+_PRE_399_MHRA_RECALL_IDS = {"93f98fe39f5c", "625fc2215ae3"}
 
 
 def build_details(brief: dict[str, Any], raws: dict[str, Any]) -> tuple[dict, list, list]:
@@ -57,10 +69,12 @@ def build_details(brief: dict[str, Any], raws: dict[str, Any]) -> tuple[dict, li
     for card in (brief.get("cards") or []):
         if not isinstance(card, dict):
             continue
+        doc_id = card.get("id")
         fn = _PRODUCERS.get(card.get("card_type"))
+        if fn is None and doc_id in _PRE_399_MHRA_RECALL_IDS:
+            fn = cs._detail_mhra_recall
         if fn is None or card.get("deterministic_detail"):
             continue
-        doc_id = card.get("id")
         raw = raws.get(doc_id)
         if not isinstance(raw, dict):
             no_raw.append(doc_id)

@@ -14,6 +14,12 @@ name: GRM GMP Redaction Guard Verify (corpus)
 #   프록시 없이 돌리면 전건 download 실패로 "0건 통과"처럼 보이므로, 아래 0건 가드가 막는다.
 # ★git 쓰기 없음 · Notion 무접촉 · DB 는 읽기만(발행 파이프라인 무간섭).
 on:
+  # ⛔ 임시 — 머지 전에 반드시 지운다.
+  # `workflow_dispatch` 는 **기본 브랜치에 있는 워크플로만** 디스패치할 수 있어서(HTTP 404)
+  # 새 워크플로는 머지 전에 돌려 볼 방법이 이것뿐이다. 채택 근거(코퍼스 실측)를 머지 전에
+  # 확보하기 위한 일시 트리거이고, 머지 후에는 dispatch 로만 돈다.
+  push:
+    branches: ['fix/gmp-deficiency-redaction-guard']
   workflow_dispatch:
     inputs:
       group:
@@ -81,10 +87,14 @@ jobs:
           MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
         run: |
           set -o pipefail
-          ARGS="--group ${{ inputs.group }} --json gmp-redaction-verify.json"
+          # `inputs.*` 는 dispatch 에서만 채워진다 — 기본값을 표현식에서 못박지 않으면
+          # push 트리거에서 빈 문자열이 인자 자리에 들어가 argparse 가 죽는다.
+          GROUP="${{ inputs.group || 'CONTROL' }}"
+          LIMIT="${{ inputs.limit || '0' }}"
+          ARGS="--group $GROUP --json gmp-redaction-verify.json"
           ARGS="$ARGS --summary $GITHUB_STEP_SUMMARY --cache-dir .pdf-cache"
-          if [ "${{ inputs.limit }}" != "0" ]; then
-            ARGS="$ARGS --limit ${{ inputs.limit }}"
+          if [ "$LIMIT" != "0" ]; then
+            ARGS="$ARGS --limit $LIMIT"
           fi
           python verify_gmp_redaction_guard.py $ARGS
 

@@ -1,0 +1,97 @@
+name: GRM GMP Redaction Guard Verify (corpus)
+
+# 지적 표 **가림막 가드** 회귀 코퍼스 실측 — 수동 dispatch 전용.
+#
+# 배경: 식약처는 일부 GMP 실사 PDF 에서 지적사항을 검은 막대로 가려 배포하는데, 그 막대는
+# 글자를 지우지 않고 **살아 있는 텍스트 위에 덧그려져** 있어 `get_text()` 가 아래를 읽는다.
+# 가드(2026-08-27)가 그 행을 버린다 — `collect_mfds_gmp_inspection` 상단 상수 블록 참조.
+#
+# 이 잡이 증명하는 것: **가려지지 않은 문서의 산출이 바이트 불변**이라는 것. 같은 PDF
+# 바이트에 대해 가드를 켜고/끈 두 산출의 sha256 을 대조한다(판정 기준은 스크립트 docstring).
+#
+# ★이 잡을 러너에서 돌리려면 `MFDS_HTTP_PROXY` 가 **반드시** 필요하다 — nedrug 는 해외
+#   클라우드 IP 의 TCP 연결을 네트워크 단에서 폐기한다(2026-08-10 실측 100% 차단).
+#   프록시 없이 돌리면 전건 download 실패로 "0건 통과"처럼 보이므로, 아래 0건 가드가 막는다.
+# ★git 쓰기 없음 · Notion 무접촉 · DB 는 읽기만(발행 파이프라인 무간섭).
+on:
+  workflow_dispatch:
+    inputs:
+      group:
+        description: '검증 대상 코퍼스 그룹'
+        type: choice
+        options: ['CONTROL', 'TARGET', 'ALL']
+        default: 'CONTROL'
+      limit:
+        description: '앞에서 N건만(0 = 전건). 스모크용.'
+        type: string
+        default: '0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-gmp-redaction-verify
+  cancel-in-progress: false
+
+jobs:
+  suites:
+    name: Test suites (root + web)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 의존성
+        run: pip install -r requirements.txt
+      # 두 스위트를 **각각** 돌린다 — web/ 은 루트 discover 에 안 잡힌다(별도 트리).
+      - name: unittest (repo root)
+        run: python -m unittest discover -s tests -v
+      - name: unittest (web)
+        working-directory: web
+        run: python -m unittest discover -s tests -v
+
+  corpus:
+    name: Redaction guard byte-invariance over the regression corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 의존성
+        run: pip install -r requirements.txt
+
+      - name: 프록시 도달성 선점검
+        env:
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+        run: |
+          if [ -z "$MFDS_HTTP_PROXY" ]; then
+            echo "::error::MFDS_HTTP_PROXY 미설정 — nedrug 는 러너 IP 를 차단하므로 전건 실패한다"
+            exit 1
+          fi
+          python probe_mfds_egress.py
+
+      - name: 코퍼스 실측
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+        run: |
+          set -o pipefail
+          ARGS="--group ${{ inputs.group }} --json gmp-redaction-verify.json"
+          ARGS="$ARGS --summary $GITHUB_STEP_SUMMARY --cache-dir .pdf-cache"
+          if [ "${{ inputs.limit }}" != "0" ]; then
+            ARGS="$ARGS --limit ${{ inputs.limit }}"
+          fi
+          python verify_gmp_redaction_guard.py $ARGS
+
+      - name: 결과 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmp-redaction-verify
+          path: gmp-redaction-verify.json
+          if-no-files-found: warn

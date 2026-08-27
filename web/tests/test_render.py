@@ -8388,6 +8388,222 @@ class WebFindingsComboPageTest(unittest.TestCase):
                          (out2 / rel / "index.html").read_bytes(), "비결정론 렌더")
 
 
+class WebSerpCtrTest(unittest.TestCase):
+    """[B2 클릭률] 검색 결과에 우리가 무엇을 보여주는가.
+
+    노출은 나는데(구글 발견 3,517) 클릭률이 1.3% 였다. 이 클래스가 지키는 것 둘:
+      ① **URL 자리** — 문서·업체·모음 약 4천 장은 구조화 데이터가 하나도 없어 SERP 에
+         날 슬러그(`/findings/doc/hc-insp-89240/`)가 그대로 보였다. 화면에는 이미
+         빵부스러기가 있었으므로 마크업만 붙였다(제목 무관·순위 위험 0).
+      ② **제목 잘림** — 문서 제목의 82%가 표시폭을 넘겼는데, 원인은 업체명이 아니라
+         (중앙값 23폭) `Health Canada Inspection`(24폭·문서의 40%) 같은 긴 영문
+         라벨이었다. 화면은 그대로 두고 제목에서만 사이트가 이미 쓰는 짧은 말로 바꾼다.
+      ③ **보이는 제목의 변별력** — ②만으로는 부족했다. 잘린 게 브랜드 꼬리(` · GRM`)면
+         손해가 아니고, 진짜 손해는 **절단선까지 보이는 글자가 다른 결과와 똑같을 때**다.
+         실측 853장이 그랬다(최대 군집 30장). 종전 유일성 검사가 이걸 못 잡은 이유는
+         그 검사가 **전체 문자열**을 보기 때문이다 — 문자열은 유일한데 화면은 같았다.
+         그래서 아래 `test_visible_titles_are_distinct_in_serp` 를 둔다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        if not render.load_findings_docs():
+            raise unittest.SkipTest("findings_docs.json 미존재")
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_ctr_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out, doc_pages=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── ① 빵부스러기 구조화 데이터 ───────────────────────────────────────────
+    def test_breadcrumbs_on_every_static_findings_surface(self):
+        groups = {
+            "문서 상세": self.out / "findings" / "doc",
+            "업체": self.out / "findings" / "firm",
+            "분류 모음": self.out / "findings" / "c",
+            "국가 모음": self.out / "findings" / "country",
+            "기관 모음": self.out / "findings" / "agency",
+        }
+        for label, root in groups.items():
+            pages = [p for p in root.glob("*/index.html")]
+            self.assertTrue(pages, f"{label}: 페이지가 없다(전제 확인)")
+            missing = [p.parent.name for p in pages
+                       if "BreadcrumbList" not in p.read_text(encoding="utf-8")]
+            self.assertEqual(missing[:5], [], f"{label}: 빵부스러기 없음 {len(missing)}장")
+
+    def test_breadcrumb_matches_visible_trail(self):
+        """구글 요건 — 마크업은 **화면에 보이는 것과 같은 순서·같은 이름**이어야 한다.
+
+        지어낸 경로를 심으면 리치 결과가 거부되거나(최선) 잘못된 경로가 노출된다(최악).
+
+        ★페이지 종류마다 따로 배선했으므로 **종류마다** 대조한다. 한 종류만 보면 나머지의
+        어긋남을 못 잡는다 — 실제로 문서 페이지는 `/findings/` 를 "지적사항 검색"이라
+        부르고 업체 페이지는 "지적사항"이라 부른다(화면이 그렇게 갈려 있고, 마크업은
+        화면을 따라야 하므로 이 차이는 그대로 두는 것이 맞다)."""
+        for label, sub, cls in (("문서", "doc", "fd-crumb"),
+                                ("업체", "firm", "ff-crumb"),
+                                ("분류 항목", "c", "fx-crumb")):
+            with self.subTest(page=label):
+                pages = sorted((self.out / "findings" / sub).glob("*/index.html"))
+                self.assertTrue(pages, f"{label}: 페이지가 없다(전제 확인)")
+                html = pages[0].read_text(encoding="utf-8")
+                crumb = re.search(rf'<nav class="{cls}".*?</nav>', html, re.S).group(0)
+                visible = [re.sub(r"<[^>]+>", "", x).strip()
+                           for x in re.findall(
+                               r"<a [^>]*>.*?</a>|<span>.*?</span>", crumb, re.S)]
+                ld = json.loads(re.search(
+                    r'<script type="application/ld\+json">(.*?)</script>',
+                    html, re.S).group(1))
+                marked = [i["name"] for i in ld["itemListElement"]]
+                self.assertEqual(marked, visible)
+                # 마지막(현재 페이지)은 자기 자신을 링크하지 않는다.
+                self.assertNotIn("item", ld["itemListElement"][-1])
+                self.assertEqual([i["position"] for i in ld["itemListElement"]],
+                                 list(range(1, len(marked) + 1)))
+
+    def test_breadcrumb_urls_are_absolute_and_real(self):
+        p = sorted((self.out / "findings" / "firm").glob("*/index.html"))[0]
+        ld = json.loads(re.search(
+            r'<script type="application/ld\+json">(.*?)</script>',
+            p.read_text(encoding="utf-8"), re.S).group(1))
+        for node in ld["itemListElement"]:
+            if "item" not in node:
+                continue
+            self.assertTrue(node["item"].startswith(render.SITE_BASE_URL + "/"), node)
+            rel = node["item"][len(render.SITE_BASE_URL) + 1:]
+            target = self.out / (rel + "index.html" if rel.endswith("/") or not rel
+                                 else rel)
+            self.assertTrue(target.exists(), f"빵부스러기가 없는 페이지를 가리킨다: {rel}")
+
+    # ── ② 제목 폭 ────────────────────────────────────────────────────────────
+    def test_title_width_helper_counts_hangul_as_double(self):
+        self.assertEqual(render.serp_width("abc"), 3)
+        self.assertEqual(render.serp_width("한글"), 4)
+
+    def test_long_english_source_labels_are_shortened_in_title_only(self):
+        """화면(h1)은 원문 라벨, 제목만 사이트가 이미 쓰는 짧은 말."""
+        docs = render.load_findings_docs()["documents"]
+        hc = next(d for d in docs if d.get("source") == "Health Canada Inspection")
+        html = (self.out / "findings" / "doc" / hc["slug"] / "index.html").read_text(
+            encoding="utf-8")
+        title = re.search(r"<title>(.*?)</title>", html, re.S).group(1)
+        self.assertIn("캐나다 실사", title)
+        self.assertNotIn("Health Canada Inspection", title)
+        h1 = re.search(r'<h1 class="fd-h1">(.*?)</h1>', html, re.S).group(1)
+        self.assertIn("Health Canada Inspection", h1)  # 화면은 무변형
+
+    def test_fda_search_terms_are_never_shortened(self):
+        """'483'·'Warning Letter' 는 사람들이 검색창에 그대로 치는 말이라 줄이지 않는다."""
+        for src in ("FDA 483", "FDA Warning Letter"):
+            self.assertNotIn(src, render.TITLE_SOURCE_SHORT, src)
+
+    def test_firm_name_is_trimmed_by_meaning_not_by_width(self):
+        """실측이 반증한 가설 — 업체명 폭 절단은 하지 않는다(중앙값 23폭·문제가 아니었다).
+
+        의미가 보존되는 트림 하나(상호 별칭)만 남긴다. 폭 상한을 되살리면 사람이 검색창에
+        치는 바로 그 말이 잘리므로 이 음성 검사로 막는다."""
+        self.assertEqual(render.title_firm_name("Front Door Pharmacy, LLC dba FDP"),
+                         "Front Door Pharmacy, LLC")
+        # 같은 뜻의 다른 표기(실측 8건)
+        self.assertEqual(render.title_firm_name("OPS International Inc D/B/A Olympia"),
+                         "OPS International Inc")
+        self.assertEqual(render.title_firm_name("2179267 Ontario Ltd. O/A Britman"),
+                         "2179267 Ontario Ltd.")
+        long_name = "Stanley Specialty Pharmacy Compounding and Wellness Center"
+        self.assertEqual(render.title_firm_name(long_name), long_name)  # 자르지 않는다
+        self.assertNotIn("…", render.title_firm_name(long_name))
+
+    def test_slash_in_firm_name_is_never_treated_as_bilingual_pair(self):
+        """사선이 병기 구분자라는 보장이 없다 — 이름 자체에 든 경우가 실재한다.
+
+        `A / B` 앞쪽만 취하는 트림을 후보로 쟀다가 뺐다: 전수 9건 중 1건이 아래 경우라
+        실재하지 않는 회사명이 된다. 얻는 건 쌍둥이 4장뿐이라 값을 못 한다."""
+        self.assertEqual(
+            render.title_firm_name("Brookfield Medical / Surgical Supply, Inc."),
+            "Brookfield Medical / Surgical Supply, Inc.")
+
+    def test_titles_stay_unique_after_shortening(self):
+        """제목을 짧게 만드는 과정이 유일성을 깨면 구글이 중복으로 떨어뜨린다.
+
+        ★이 검사만으로는 부족하다 — 아래 `test_visible_titles_are_distinct_in_serp` 참조."""
+        docs = render.load_findings_docs()["documents"]
+        titles = render.build_doc_page_titles(docs)
+        self.assertEqual(len(titles), len(docs))
+        self.assertEqual(len(set(titles.values())), len(titles))
+
+    def test_visible_titles_are_distinct_in_serp(self):
+        """★검색 결과에서 **보이는 글자**가 다른 결과와 구별되는가.
+
+        위 유일성 검사는 전체 문자열을 본다. 구글은 앞 60폭만 보여준다. 이 간극 때문에
+        853장이 초록불 아래에서 같은 글자로 보이고 있었다 — 유일성 보강이 변별 요소를
+        꼬리(= 잘리는 자리)에 붙였기 때문이다. 그래서 **자른 뒤**에 센다.
+
+        0 을 요구하지는 않는다. 업체명 자체가 60폭을 먹는 문서가 실재하고(최장 59폭),
+        FDA FOIA 일괄 공개분은 619장이 날짜 하나를 공유해 제목으로는 못 가른다.
+
+        ★상한은 **비율**이다. 문서는 매주 늘어나는데 절대값을 박아 두면 결함이 아니라
+        성장 때문에 빨간불이 된다. 실측 기준선 336/3,301 = 10.2%, 상한 15%.
+        ★이 상한은 **큰 퇴행**만 잡는다(예: 배치 수리 이전의 853장 = 26%). 배치만 되돌린
+        정도(436장 = 13.2%)는 아래 `test_publication_date_survives_the_truncation_line`
+        가 훨씬 날카롭게 잡는다(86% → 68%). 두 검사가 같은 축을 겹쳐 재지 않게 나눠 둔다."""
+        docs = render.load_findings_docs()["documents"]
+        titles = render.build_doc_page_titles(docs)
+
+        def visible(text: str) -> str:
+            w = 0
+            for i, ch in enumerate(text):
+                w += render.serp_width(ch)
+                if w > 60:
+                    return text[:i]
+            return text
+
+        seen: dict[str, list[str]] = {}
+        for slug, t in titles.items():
+            seen.setdefault(visible(f"{t} · GRM"), []).append(slug)
+        twins = {v: s for v, s in seen.items() if len(s) > 1}
+        n = sum(len(s) for s in twins.values())
+        worst = max(twins.values(), key=len, default=[])
+        self.assertLessEqual(
+            n, int(len(docs) * 0.15),
+            f"보이는 제목이 겹치는 문서 {n}/{len(docs)}장(기준선 10.2%) — "
+            f"최대 군집 {len(worst)}장 {worst[:3]}. "
+            "변별 요소가 절단선 밖으로 밀렸는지 확인하라.")
+
+    def test_median_doc_title_fits_serp(self):
+        """중앙값이 표시폭 안에 들어와야 한다 — 개별 최장값은 유일성 보강 때문에 넘을 수 있다."""
+        docs = render.load_findings_docs()["documents"]
+        widths = sorted(render.serp_width(f"{t} · GRM")
+                        for t in render.build_doc_page_titles(docs).values())
+        self.assertLessEqual(widths[len(widths) // 2], 66,
+                             "문서 제목 중앙값이 SERP 표시폭을 넘는다")
+
+    def test_publication_date_survives_the_truncation_line(self):
+        """날짜는 같은 업체 문서들을 가르는 유일한 값이라 **보이는 자리**에 있어야 한다.
+
+        종전 배치는 날짜를 "지적사항" 뒤에 뒀고, 그 8폭 때문에 3,301장 중 1,333장에서만
+        날짜가 온전히 보였다. 자리를 맞바꾼 뒤 2,852장. 되돌리면 이 검사가 잡는다."""
+        docs = render.load_findings_docs()["documents"]
+        titles = render.build_doc_page_titles(docs)
+        by_slug = {d["slug"]: d for d in docs}
+
+        def visible(text: str) -> str:
+            w = 0
+            for i, ch in enumerate(text):
+                w += render.serp_width(ch)
+                if w > 60:
+                    return text[:i]
+            return text
+
+        shown = sum(1 for slug, t in titles.items()
+                    if by_slug[slug]["published_date"] in visible(f"{t} · GRM"))
+        self.assertGreaterEqual(
+            shown, int(len(docs) * 0.78),
+            f"날짜가 절단선 안에 보이는 문서 {shown}/{len(docs)}장(실측 2,852) — "
+            "제목에서 날짜가 뒤로 밀렸는지 확인하라.")
+
+
 class WebFirmPageTest(unittest.TestCase):
     """[B1 색인 표면] /findings/firm/{slug}/ 업체 단위 정적 페이지.
 
@@ -8839,6 +9055,13 @@ class WebFindingsDocPageTest(unittest.TestCase):
         식약처 문서 121장은 `source` 가 기관 코드 그대로 `"MFDS"` 라, 그대로 쓰면 제목이
         "(주)태준제약 — MFDS 지적사항"이 되어 실재하지 않는 문서종류를 주장하게 된다.
         지어내지도(예: "GMP 실사 보고서") 코드를 노출하지도 않는 유일한 답은 생략이다.
+
+        ★[B2 2026-08-27] 종전에는 `"{업체} 지적사항"` 이 제목에 그대로 들어있는지로 쟀다.
+        그건 **그때의 배치**(업체 바로 뒤가 문서종류 자리)에 묶인 표현이라, 날짜를
+        "지적사항" 앞으로 옮기자 지키던 뜻은 멀쩡한데 검사만 깨졌다. 그래서 뜻을 직접
+        잰다 — **업체명과 "지적사항" 사이에 날짜 말고는 아무것도 없다.** 이 형태는 옛
+        배치에서도 참이라(그때는 사이가 빈 문자열) 배치를 또 바꿔도 살아남고, 문서종류를
+        슬쩍 끼워 넣는 변경은 그대로 잡는다.
         """
         checked = 0
         for doc in self.data["documents"]:
@@ -8850,7 +9073,13 @@ class WebFindingsDocPageTest(unittest.TestCase):
             title = html.split("<title>", 1)[1].split("</title>", 1)[0]
             self.assertNotIn(doc["agency"], title,
                              f'제목이 기관 코드를 문서종류로 쓴다: {doc["slug"]}')
-            self.assertIn(f'{doc["firm_name"]} 지적사항', title, doc["slug"])
+            firm = render.title_firm_name(doc["firm_name"])
+            self.assertIn(firm, title, doc["slug"])
+            between = title.split(firm, 1)[1].split(" 지적사항", 1)[0].strip()
+            self.assertRegex(
+                between, r"^(\(\d{4}-\d{2}-\d{2}\))?$",
+                f'업체명과 "지적사항" 사이에 문서종류가 끼어들었다: '
+                f'{doc["slug"]} — {between!r}')
         self.assertGreater(checked, 0, "기관 코드가 source 인 문서가 없다(배선 확인)")
 
     def test_real_document_types_are_kept(self):

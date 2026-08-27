@@ -144,6 +144,10 @@ _DEFICIENCY_COLUMN_TOKENS = {
     "followup": ("비고", "후속", "조치"),
 }
 _DEFICIENCY_TABLE_MAX_ROWS = 200  # 폭주 방어(정상 최대 수십 행)
+# 지적 표로 채택하려면 서로 다른 열이 최소 이만큼 매핑돼야 한다(붕괴 colmap 가드).
+_DEFICIENCY_MIN_COLUMNS = 3
+# 지적 표 추출을 시도하는 첨부 포맷. hwp-ole(구형 바이너리)은 여전히 제외한다.
+_DEFICIENCY_TABLE_FORMATS = ("pdf", "hwpx")
 
 # 의료용 고압가스 제조소는 GMP 공개 대상이지만, 경구 고형제 QA 다이제스트에서는
 # 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
@@ -427,6 +431,15 @@ def _match_deficiency_header(rows: list[list[str | None]]) -> tuple[int | None, 
                         idx = ci
                         break
                 colmap[field_name] = idx
+            # ★[붕괴 colmap 가드 2026-08-27] 헤더 토큰 3개가 **한 셀 안에** 다 들어 있으면
+            # (병합 셀 하나에 페이지 전체 텍스트가 담긴 경우) 모든 필드가 같은 열을 가리킨다.
+            # 그 표를 채택하면 데이터행 한 칸이 다섯 필드에 그대로 복제돼 `분야=근거법령=
+            # 지적내용='한약정책과'` 같은 **가짜 행**이 나온다(HWPX 실측: 문서당 1행씩 6건).
+            # 진짜 지적 표는 열이 갈린다(area=0·severity=1·legal_basis=2·summary=3).
+            # ★PDF 경로에도 함께 적용된다 — 채택 전 회귀 코퍼스 194문서/934행 전건에 대해
+            # 산출 지문이 **바이트 불변**임을 실측했다(불일치 0건).
+            if len({v for v in colmap.values() if v is not None}) < _DEFICIENCY_MIN_COLUMNS:
+                continue
             return i, colmap
     return None, {}
 
@@ -458,6 +471,53 @@ def _normalize_deficiency_table(rows: list[list[str | None]]) -> list[dict[str, 
         out.append(rec)
         if len(out) >= _DEFICIENCY_TABLE_MAX_ROWS:
             break
+    return out
+
+
+def _extract_hwpx_deficiency_table(data: bytes) -> list[dict[str, str]]:
+    """HWPX 첨부에서 지적 표를 결정론 추출. 없으면 [].
+
+    ★PDF 와 상황이 정반대다 — HWPX 는 표가 **명시 마크업**(hp:tbl / hp:tr / hp:tc)이라
+    좌표 추정도 어휘 휴리스틱도 필요 없다. 셀을 그대로 읽어 PDF 경로와 **같은 정규화기**
+    (`_normalize_deficiency_table`)에 넘긴다 — 산출 모양이 갈릴 자리가 없다.
+
+    여태 배선이 없어 hwpx 문서 16건은 `gmp_deficiency_table_status` 가 통째로 비어 있었다
+    (본문 텍스트는 `_extract_hwpx_text` 로 이미 뽑고 있었으므로 첨부 자체는 읽히고 있었다).
+    실측(2026-08-27 전건 16): 지적 present 7건에서 23행 회수 · 지적 none 6건에서 0행
+    (오탐 0) · unknown 3건은 표는 있으나 데이터행이 전부 비어 있어 0행이 정답이다.
+    """
+    tables: list[list[list[str]]] = []
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            names = sorted(
+                name
+                for name in zf.namelist()
+                if name.startswith("Contents/section") and name.endswith(".xml")
+            )
+            for name in names:
+                try:
+                    root = ET.fromstring(zf.read(name))
+                except ET.ParseError:
+                    continue                       # 섹션 하나가 깨져도 나머지는 살린다
+                for tbl in root.iter():
+                    if tbl.tag.rsplit("}", 1)[-1] != "tbl":
+                        continue
+                    rows: list[list[str]] = []
+                    for tr in tbl:
+                        if tr.tag.rsplit("}", 1)[-1] != "tr":
+                            continue
+                        rows.append([
+                            " ".join(e.text for e in tc.iter()
+                                     if e.tag.rsplit("}", 1)[-1] == "t" and e.text).strip()
+                            for tc in tr if tc.tag.rsplit("}", 1)[-1] == "tc"
+                        ])
+                    if rows:
+                        tables.append(rows)
+    except (zipfile.BadZipFile, Exception):        # noqa: B014 — 첨부 붕괴는 degrade
+        return []
+    out: list[dict[str, str]] = []
+    for rows in tables:
+        out.extend(_normalize_deficiency_table(rows))
     return out
 
 
@@ -626,7 +686,8 @@ def _parse_deficiency_table(
     플래그 off·비PDF·본문없음 → ("", "") 로 완전 무영향(현행 플로우 불변). periodic PDF 만
     시도하고, 추출 실패·유형 unknown·플래그 off = 조용히 요약카드 유지(degrade 우선).
     """
-    if not (_deficiency_table_enabled() and file_format == "pdf" and text):
+    if not (_deficiency_table_enabled() and text
+            and file_format in _DEFICIENCY_TABLE_FORMATS):
         return [], ""
     itype = _detect_inspection_type(text)
     # ★[유형 게이트 기본값 반전 2026-08-12] 종전엔 `itype != "periodic"` 이라 **표제를 아는
@@ -642,8 +703,14 @@ def _parse_deficiency_table(
     # 비용은 문서당 find_tables 호출 한 번뿐이다.
     if itype == "pre_market":
         return [], "skipped-type"  # 사전평가 B형은 판정만 있고 지적 표가 없다(설계)
+    # [HWPX 배선 2026-08-27] hwpx 는 표가 **명시 마크업**이라 PDF 의 좌표 추정 문제가
+    # 아예 없다 — 셀을 그대로 읽어 **같은 정규화기**에 넘기므로 산출 모양이 갈리지 않는다.
+    # 여태 이 게이트가 `file_format == "pdf"` 였던 탓에 hwpx 16건은
+    # `gmp_deficiency_table_status` 가 통째로 비어 있었다(본문 텍스트는 이미 뽑고 있었다).
+    extract = (_extract_hwpx_deficiency_table if file_format == "hwpx"
+               else _extract_deficiency_table)
     try:
-        rows = _extract_deficiency_table(data)
+        rows = extract(data)
     except Exception as e:  # noqa: BLE001 — 파싱 붕괴는 degrade(요약카드 유지)
         log("WARN", f"MFDS GMP 지적 표 추출 실패({type(e).__name__}) — 요약카드 유지: {doc_id}")
         return [], "parse-fail"

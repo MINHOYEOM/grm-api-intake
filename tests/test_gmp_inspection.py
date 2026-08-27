@@ -579,10 +579,15 @@ class TestParseDeficiencyTableGate(unittest.TestCase):
                                           "none", "doc4"),
                 ([], "empty"))
 
-    def test_non_pdf_or_empty_text_no_extraction(self):
+    def test_unsupported_format_or_empty_text_no_extraction(self):
+        """비지원 포맷·본문 없음 → 추출 시도 자체를 안 한다.
+
+        ★2026-08-27 정정 — 종전엔 이 예시가 `hwpx` 였다. hwpx 는 표가 명시 마크업이라
+        추출 경로가 신설되면서 **지원 포맷이 됐다**(`_DEFICIENCY_TABLE_FORMATS`).
+        읽을 경로가 없는 구형 바이너리 `hwp-ole` 로 예시를 옮긴다."""
         with _FlagCtx("true"):
             self.assertEqual(
-                g._parse_deficiency_table(b"", "hwpx", "정기실태조사", "present", "d"),
+                g._parse_deficiency_table(b"", "hwp-ole", "정기실태조사", "present", "d"),
                 ([], ""))
             self.assertEqual(
                 g._parse_deficiency_table(b"%PDF", "pdf", "", "present", "d"),
@@ -674,6 +679,121 @@ class TestAnchorColonForm(unittest.TestCase):
         ex = g._extract_deficiency_excerpt(text)
         self.assertTrue(ex.startswith("평가 결과: 지적(보완)사항"))
         self.assertNotIn("제조소명", ex)
+
+
+def _hwpx_bytes(tables):
+    """hp:tbl/hp:tr/hp:tc 마크업을 가진 최소 HWPX(zip) 생성 — 바이너리 픽스처 불요."""
+    import io as _io
+    import zipfile as _zip
+    ns = 'xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph"'
+    body = []
+    for rows in tables:
+        trs = []
+        for row in rows:
+            tcs = "".join(
+                f"<hp:tc><hp:subList><hp:p><hp:run><hp:t>{c}</hp:t>"
+                f"</hp:run></hp:p></hp:subList></hp:tc>" for c in row)
+            trs.append(f"<hp:tr>{tcs}</hp:tr>")
+        body.append(f"<hp:tbl>{''.join(trs)}</hp:tbl>")
+    xml = f"<?xml version='1.0' encoding='UTF-8'?><hp:sec {ns}>{''.join(body)}</hp:sec>"
+    buf = _io.BytesIO()
+    with _zip.ZipFile(buf, "w") as zf:
+        zf.writestr("Contents/section0.xml", xml.encode("utf-8"))
+    return buf.getvalue()
+
+
+class TestHwpxDeficiencyTable(unittest.TestCase):
+    """HWPX 지적 표 추출 — PDF 와 달리 표가 **명시 마크업**이라 추정이 필요 없다.
+
+    실측 계기: hwpx 16건은 게이트가 `file_format == "pdf"` 라 표 추출이 시도조차 되지 않아
+    `gmp_deficiency_table_status` 가 통째로 비어 있었다(본문 텍스트는 이미 뽑고 있었다).
+    전건 실측(2026-08-27): 지적 present 7건 → 23행 · none 6건 → 0행(오탐 0)."""
+
+    HEADER = ["분야", "구분", "근거 법령", "지적(보완)사항 요약", "비고"]
+
+    def test_extracts_rows_from_markup(self):
+        data = _hwpx_bytes([[
+            self.HEADER,
+            ["제조", "기타", "[별표 1의2] 제6.4호", "제조기록서를 작업과 동시에 작성하지 않았음",
+             "보완완료"],
+            ["시험실", "기타", "[별표 1의2] 제11.1호", "품질관리기록서에 근거자료 미첨부",
+             "보완완료"],
+        ]])
+        rows = g._extract_hwpx_deficiency_table(data)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["area"], "제조")
+        self.assertEqual(rows[0]["legal_basis"], "[별표 1의2] 제6.4호")
+        self.assertEqual(rows[1]["summary"], "품질관리기록서에 근거자료 미첨부")
+
+    def test_non_deficiency_table_is_ignored(self):
+        """제조소 현황 표 등은 헤더 토큰이 없어 채택되지 않는다(오탐 0 실측과 동형)."""
+        data = _hwpx_bytes([[["제조소명", "소재지"], ["A사", "서울"]]])
+        self.assertEqual(g._extract_hwpx_deficiency_table(data), [])
+
+    def test_broken_zip_degrades_quietly(self):
+        """첨부 붕괴는 요약카드 유지로 degrade — 수집을 죽이지 않는다."""
+        self.assertEqual(g._extract_hwpx_deficiency_table(b"not a zip"), [])
+
+    def test_shares_the_pdf_normalizer(self):
+        """별도 정규화기를 두면 산출 모양이 갈린다 — 같은 함수를 쓰는지 못박는다."""
+        import inspect
+        src = inspect.getsource(g._extract_hwpx_deficiency_table)
+        self.assertIn("_normalize_deficiency_table", src)
+
+
+class TestCollapsedColmapGuard(unittest.TestCase):
+    """★병합 셀 하나에 페이지 전체 텍스트가 담기면 헤더 토큰 3개가 우연히 다 들어간다.
+
+    그대로 채택하면 모든 필드가 같은 열을 가리켜 데이터행 한 칸이 다섯 필드에 복제된
+    **가짜 행**(`분야=근거법령=지적내용='한약정책과'`)이 나온다 — HWPX 실측 6건에서 발생했다.
+    PDF 경로도 같은 정규화기를 쓰므로, 채택 전 회귀 코퍼스 194문서/934행이 **바이트 불변**
+    임을 실측했다."""
+
+    def test_merged_single_cell_header_is_rejected(self):
+        merged = [["실사 결과 분야 구분 근거 법령 지적(보완)사항 요약 비고 기타 안내문"],
+                  ["한약정책과"]]
+        idx, colmap = g._match_deficiency_header(merged)
+        self.assertIsNone(idx)
+        self.assertEqual(colmap, {})
+        self.assertEqual(g._normalize_deficiency_table(merged), [])
+
+    def test_real_multi_column_header_still_matches(self):
+        """음성 검사 — 가드가 정상 표를 훔치면 안 된다."""
+        real = [["분야", "구분", "근거 법령", "지적(보완)사항 요약"],
+                ["제조", "기타", "[별표 1] 제6호", "기록 미비"]]
+        idx, colmap = g._match_deficiency_header(real)
+        self.assertEqual(idx, 0)
+        self.assertGreaterEqual(
+            len({v for v in colmap.values() if v is not None}),
+            g._DEFICIENCY_MIN_COLUMNS)
+        self.assertEqual(len(g._normalize_deficiency_table(real)), 1)
+
+
+class TestDeficiencyTableFormats(unittest.TestCase):
+    def test_pdf_and_hwpx_only(self):
+        self.assertEqual(set(g._DEFICIENCY_TABLE_FORMATS), {"pdf", "hwpx"})
+
+    def test_hwp_ole_still_excluded(self):
+        """구형 바이너리 hwp 는 읽을 경로가 없다 — 늘리지 않는다."""
+        self.assertNotIn("hwp-ole", g._DEFICIENCY_TABLE_FORMATS)
+
+    def test_gate_routes_hwpx_to_hwpx_extractor(self):
+        data = _hwpx_bytes([[
+            ["분야", "구분", "근거 법령", "지적(보완)사항 요약"],
+            ["제조", "기타", "[별표 1] 제6호", "기록 미비"],
+        ]])
+        with mock.patch.object(g, "_deficiency_table_enabled", return_value=True), \
+             mock.patch.object(g, "_detect_inspection_type", return_value="periodic"):
+            rows, status = g._parse_deficiency_table(
+                data, "hwpx", "정기 실태조사 결과", "present", "doc-1")
+        self.assertEqual(status, "extracted")
+        self.assertEqual(len(rows), 1)
+
+    def test_gate_still_skips_unsupported_format(self):
+        with mock.patch.object(g, "_deficiency_table_enabled", return_value=True):
+            rows, status = g._parse_deficiency_table(
+                b"x", "hwp-ole", "text", "present", "doc-2")
+        self.assertEqual((rows, status), ([], ""))
 
 
 if __name__ == "__main__":

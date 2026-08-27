@@ -7,7 +7,7 @@
  * 반환한다. firm.js 는 "013 미적용(RPC 404·network 실패)"과 "key 없음/빈 프로파일"을 서로
  * 다른 상태(준비 중 vs 찾을 수 없음)로 구분해 보여주지만, 이 페이지는 **구분하지 않는다** —
  * 코호트 미달 여부 자체가 특정 실사관에 대한 신호가 되는 정보 누출을 막기 위해 key 파라미터
- * 없음/RPC null/fetch 실패를 전부 하나의 "제공하지 않습니다" 안내로 수렴시킨다(showState
+ * 없음/RPC null/fetch 실패를 전부 하나의 "표시할 수 없습니다" 안내로 수렴시킨다(showState
  * 상태가 loading/unavailable/content 세 가지뿐인 이유).
  *
  * ★안전 계약 — findings_inspector_profile RPC 는 집계(count)와 서지 메타만 반환하고
@@ -474,7 +474,7 @@
     // 방지 원칙은 그대로 — 파일 상단 주석 참조).
     showState("unavailable");
   } else if (!inspectorKeyParam) {
-    // [존 재편] 키가 없으면 조회 랜딩. "제공하지 않습니다"로 막다르게 끝내지 않는다.
+    // [존 재편] 키가 없으면 조회 랜딩. 막다른 안내로 끝내지 않는다.
     showState("lookup");
     if (lookInputEl) lookInputEl.focus();
   } else {
@@ -482,7 +482,7 @@
     fetchInspectorProfile(inspectorKeyParam)
       .then(function (data) {
         // 코호트 미달·미존재·키 형식 오류는 전부 null(계약, findings_inspector_profile
-        // 참조) — display_name 이 없으면 무조건 "제공하지 않습니다"로 수렴한다.
+        // 참조) — display_name 이 없으면 무조건 "표시할 수 없습니다"로 수렴한다.
         if (!data || typeof data !== "object" || !(data.display_name || "")) {
           showState("unavailable");
           return;

@@ -2132,11 +2132,13 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         lines.append(f"- [최신 브리프]({base_url}/briefs/{latest_pub}/): "
                      "이번 주 글로벌·국내 규제 동향 (매주 월요일 발행)")
     lines += [
-        f"- [모아보기]({base_url}/archive/): 지금까지 발행한 주간 브리프 {len(pubs)}건",
+        f"- [브리프 아카이브]({base_url}/archive/): 지금까지 발행한 주간 브리프 {len(pubs)}건",
         "",
         "## 규제 지적사항 데이터",
         f"- [지적사항 검색]({base_url}/findings/): FDA 483 · Warning Letter · EU/영국"
         " GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색",
+        f"- [지적사항 둘러보기]({base_url}/findings/browse/): 업무별 바로가기 ·"
+        " 최근 공개 문서 · 분류·국가·기관 축별 탐색",
         f"- [문서로 찾기]({base_url}/findings/docs/): 실사 문서 단위 한국어 정리"
         f" {n_docs:,}건 — 기관·연도별 색인",
         f"- [지적 경향]({base_url}/findings/trends/): 최근 12개월 지적 영역 순위 ·"
@@ -2179,6 +2181,8 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         f"  <url><loc>{base_url}/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/archive/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/</loc><lastmod>{latest_pub}</lastmod></url>",
+        # [2면 분리 2026-08-27] 둘러보기 면 — 정적 콘텐츠 면이라 등록한다.
+        f"  <url><loc>{base_url}/findings/browse/</loc><lastmod>{latest_pub}</lastmod></url>",
         f"  <url><loc>{base_url}/findings/trends/</loc><lastmod>{latest_pub}</lastmod></url>",
         # [존 재편 2026-08-26] 트렌드 존 2·3면 — 조회 파라미터 없이 그 자체로 완결된
         # 집계 페이지라 체크리스트와 같은 근거로 등록한다(개인·업체 식별 정보 없음).
@@ -2382,6 +2386,9 @@ ARCHIVE_DESCRIPTION = ("GRM 규제뉴스 아카이브 — 전 세계 제약 GMP�
 FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
                         "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. "
                         "검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다.")
+# [2면 분리 2026-08-27] 둘러보기 면 — 업무별 진입·최근 공개 문서·축별 탐색.
+FINDINGS_BROWSE_DESCRIPTION = ("규제 지적사항 데이터 둘러보기 — 업무별 바로가기, "
+                               "최근 공개된 실사 문서, 분류·국가·기관 축별 탐색.")
 # [존 재편 2026-08-26] 트렌드 존이 세 면으로 갈리면서 이 설명도 '지적 경향' 면만 가리킨다 —
 # 연도별 구성비·업체 랭킹은 데이터 현황 면으로 옮겼으므로 문안에서도 뺐다(설명이 실제
 # 페이지 내용과 어긋나면 검색결과 스니펫이 먼저 거짓말을 한다).
@@ -2696,16 +2703,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 지적사항 검색(FIND-1 M3c) — 라이브 데이터(Supabase PostgREST)라 빌드시 목록을 고정할
     # 수 없다. 서버는 셸(로딩 상태)만 렌더 — env 미설정이면 findings.js 가 "준비 중" 안내로
     # 조용히 종료한다(cfg data 속성은 위 reactions_enabled 와 무관하게 항상 주입).
-    # [발견 허브 2026-08-26] 검색만 있던 첫 화면을 목적 카드·최근 공개 문서가 앞서는
-    # 허브로 재배열 — 검색 블록 자체는 그대로 두고 순서만 뒤로 보낸다(findings.html 참조).
+    # [2면 분리 2026-08-27] 발견 허브(#811)가 쌓은 세 섹션은 둘러보기 면으로 이동 —
+    # 사용자 피드백("너무 많은 정보가 한 페이지에"). 이 면은 검색 도구 전용이다.
     findings_html = env.get_template("findings.html").render(
-        browse_axes=browse_axes,
         zone_totals=findings_zone,
-        recent_docs=recent_docs,
-        recent_asof=(docs_data or {}).get("measured_on", ""),
-        recent_min=(docs_data or {}).get("min_findings"),
-        has_docs=bool(docs_data and docs_data.get("documents")),
-        page_title="규제 지적사항 검색·조회 · GRM",
+        page_title="지적사항 검색 · GRM",
         rel_root="../",
         nav_active="findings",
         latest_slug=latest_slug,
@@ -2714,6 +2716,24 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     _write(out_dir / "findings" / "index.html", findings_html)
     written.append("findings/index.html")
+
+    # [2면 분리] 둘러보기 면 — 정적 렌더 전용(fetch 0, 커밋된 스냅샷에서 나옴).
+    # 한 단계 깊은 경로라 rel_root 는 "../../".
+    browse_html = env.get_template("findings_browse.html").render(
+        browse_axes=browse_axes,
+        zone_totals=findings_zone,
+        recent_docs=recent_docs,
+        recent_asof=(docs_data or {}).get("measured_on", ""),
+        has_docs=bool(docs_data and docs_data.get("documents")),
+        page_title="지적사항 둘러보기 · GRM",
+        rel_root="../../",
+        nav_active="findings",
+        latest_slug=latest_slug,
+        description=FINDINGS_BROWSE_DESCRIPTION,
+        canonical=_abs_url("findings/browse/"),
+    )
+    _write(out_dir / "findings" / "browse" / "index.html", browse_html)
+    written.append("findings/browse/index.html")
 
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
     # 수 없다(집계는 Supabase RPC findings_stats/findings_firm_stats 를 trends.js 가 직접

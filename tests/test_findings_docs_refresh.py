@@ -78,11 +78,28 @@ class DocumentViewGateTest(unittest.TestCase):
         self.assertIsNone(self._view(_doc(evidence_url="javascript:alert(1)")))
         self.assertEqual(self.reject["원문 링크 없음"], 1)
 
-    def test_rejects_unsafe_document_id(self):
-        for bad in ("a/b", "a b", "../etc", "한글아이디", ""):
+    def test_unsafe_document_id_transforms_instead_of_rejecting(self):
+        """[2026-08-27] 기각 → 결정론 변환. 종전 기각 규칙이 MHRA 를 전량 침묵
+        소실시켰다(문서 id 가 기관 원문 형식 "Insp GMP/GDP/IMP …" 라 공백·슬래시가
+        항상 들어 있다) — id 형식은 기관이 정하므로 기각 규칙이 곧 기관 차별이 된다."""
+        import re as _re
+        for raw in ("a/b", "a b", "../etc", "한글아이디"):
             self.reject.clear()
-            self.assertIsNone(self._view(_doc(doc_id=bad)), bad)
-            self.assertEqual(self.reject["URL 로 쓸 수 없는 문서 id"], 1, bad)
+            view = self._view(_doc(doc_id=raw))
+            self.assertIsNotNone(view, raw)
+            self.assertRegex(view["slug"], r"^[A-Za-z0-9._-]{1,120}$")
+            self.assertEqual(view["document_id"], raw, "원본 id 는 무변형 보존")
+            # 같은 id 는 언제나 같은 슬러그(재실행 안정) — 해시 접미가 그 근거다.
+            self.assertEqual(view["slug"], fdr._safe_slug(raw))
+        # 빈 id 만 기각으로 남는다.
+        self.reject.clear()
+        self.assertIsNone(self._view(_doc(doc_id="")))
+        self.assertEqual(self.reject["URL 로 쓸 수 없는 문서 id"], 1)
+
+    def test_safe_document_id_slug_is_unchanged(self):
+        """안전한 기존 id 는 무변형 — 기존 문서 URL 이 바뀌면 안 된다(링크 파손)."""
+        view = self._view(_doc(doc_id="3015467542.20240119"))
+        self.assertEqual(view["slug"], "3015467542.20240119")
 
 
     def test_rejects_numeric_or_empty_firm_name(self):
@@ -100,8 +117,16 @@ class DocumentViewGateTest(unittest.TestCase):
         self.assertIsNotNone(self._view(_doc(firm_name="3M Health Care")))
 
     def test_rejects_below_threshold(self):
+        # 기본 임계는 1(2026-08-27 — 기관 완전성이 페이지 두께보다 우선). 명시 임계도
+        # 여전히 동작한다(_view 기본 min_findings=3 은 이 게이트 자체의 검사용).
         self.assertIsNone(self._view(_doc(n=2)))
         self.assertEqual(self.reject["국문 지적 3건 미만"], 1)
+        self.assertEqual(fdr.DEFAULT_MIN_FINDINGS, 1,
+                         "임계를 올리면 문서당 지적이 적은 기관(EU NCR·MHRA)이 통째로 사라진다")
+        one = _doc(n=0)
+        one["findings"] = [_finding("only")]
+        self.assertIsNotNone(fdr.document_view(one, min_findings=fdr.DEFAULT_MIN_FINDINGS,
+                                               reject=self.reject))
 
     def test_findings_without_korean_text_do_not_count(self):
         doc = _doc(n=0)
@@ -217,7 +242,10 @@ class CommittedDataTest(unittest.TestCase):
     # 여기서 0 을 요구하면 이 PR 이 남의 결함에 발목 잡히고, 검사를 지우면 그 결함이 다시
     # 조용해진다. 그래서 **기준선으로 고정해 표면화**한다 — 늘면 실패하고, 상류가 고쳐지면
     # 이 숫자를 내리라고 알려준다.
-    BASELINE_UPSTREAM_TRUNCATED = 1337
+    # [2026-08-27] 1337 → 1630. 절단이 늘어난 게 아니라 **모집단이 늘었다** —
+    # min_findings 3→1 로 문서 3,145 → 6,156(지적 1~2건 문서 편입). 지적당 절단
+    # 비율은 오히려 내려갔다. 이 기준선은 같은 모집단 정의 안에서의 증가만 잡는다.
+    BASELINE_UPSTREAM_TRUNCATED = 1630
 
     def test_upstream_truncation_does_not_grow(self):
         bad = [f["finding_id"] for d in self.data["documents"] for f in d["findings"]

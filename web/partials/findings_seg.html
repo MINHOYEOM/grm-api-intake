@@ -1,0 +1,24 @@
+{#- [지적사항 존 면 전환 2026-08-27] 검색 · 둘러보기 — **2면**.
+
+    ★왜 갈랐나(사용자 피드백): 발견 허브(#811)가 목적 카드·최근 문서·축 탐색·상세 검색을
+    한 페이지에 쌓아 "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다"는 피드백을 받았다.
+    허브의 발견성 가치는 유지하되(둘러보기 면), 검색이라는 핵심 도구는 첫 화면에서 바로
+    쓸 수 있어야 한다(검색 면 기본). 트렌드 존의 세그먼트(#810 trends_seg)와 같은 패턴 —
+    실제 <a> 라 JS 없이도 오갈 수 있고, 크롤러가 두 면을 발견하는 경로이기도 하다.
+
+    스타일은 이 파셜이 자체 보유(.fnd-seg — grm.css 불가침, tr-seg 는 trends_style 스코프라
+    재사용 불가). 페이지당 1회 include 라 <style> 중복 없음. -#}
+<nav class="fnd-seg" aria-label="지적사항 면 전환">
+  <a href="{{ rel_root }}findings/index.html"{% if seg_active == 'search' %} class="on" aria-current="page"{% endif %}>검색</a>
+  <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>둘러보기</a>
+</nav>
+{#- 시각 언어는 트렌드 존 세그(.tr-seg)와 동형 — 같은 사이트에서 "면 전환"이 두 가지
+    모양이면 사용자가 같은 장치임을 알아보지 못한다. 셀렉터만 존 스코프로 다르다. -#}
+<style>
+.fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
+.fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
+.fnd-seg a:hover{color:var(--ink)}
+.fnd-seg a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--coral)}
+.fnd-seg a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
+@media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
+</style>

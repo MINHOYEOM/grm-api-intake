@@ -8,11 +8,12 @@
 싣는다 — 나머지 본문은 여전히 어디에도 정적으로 존재하지 않는다. 실사 보고서 한 건을
 통째로 담는 문서 페이지가 그 구멍을 메운다.
 
-## 무엇을 페이지로 만드나 — 지적 3건 이상
+## 무엇을 페이지로 만드나 — 국문 지적 1건 이상
 
-지적 1~2건짜리 문서는 본문이 얇아 저품질 대량 페이지로 읽힌다(사이트 전체 평가에 손해).
-3건 이상이면 실사 보고서로서 최소한의 서술이 성립한다. 뺀 것은 침묵시키지 않고 건수를
-표준출력과 화면(축 색인)에 남긴다.
+[2026-08-27] 종전 임계는 3건이었는데("얇은 페이지 방지"), 문서당 지적이 1~2건인
+소스(EU GMP NCR·MHRA)를 전량 기각해 기관 자체가 목록에서 침묵 소실됐다. 기관 완전성이
+페이지 두께보다 우선한다 — 이제 국문 본문이 하나도 없는 문서만 뺀다. 뺀 것은
+침묵시키지 않고 건수를 표준출력과 화면(축 색인)에 남긴다.
 
 ## 이 페이지가 다루는 것은 실명 업체의 규제 기록이다
 
@@ -45,6 +46,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import hashlib
 import re
 import sys
 from collections import Counter
@@ -60,12 +62,41 @@ SCHEMA_VERSION = "grm-findings-docs/v1"
 RPC_NAME = "findings_search"
 DEFAULT_OUT = Path(__file__).resolve().parent / "web" / "data" / "findings_docs.json"
 
-DEFAULT_MIN_FINDINGS = 3
+# [2026-08-27 사용자 피드백] 3 → 1. 이 임계는 "얇은 문서 페이지 방지"용으로 483(문서당
+# 평균 6건) 기준에서 정해졌는데, 문서당 지적이 1~2건인 소스(EU GMP NCR·MHRA GMP NCR)를
+# **전량 기각**해 기관 자체가 '문서로 찾기'에서 침묵 소실됐다(실측: 스냅샷 기관 분포가
+# FDA·HC·MFDS 셋뿐 — EU 77건·MHRA 8건이 라이브에 있는데 목록엔 0건). EU NCR 는 지적
+# 1건이 곧 비준수 보고서 전체라 얇은 게 아니라 그 문서의 전부다.
+# ★기관 완전성이 페이지 두께보다 우선한다 — 0건(미번역)만 거른다.
+DEFAULT_MIN_FINDINGS = 1
 DEFAULT_PAGE_SIZE = 100
 MAX_FAILURE_RATIO = 0.20
 
 # document_id 가 그대로 URL 경로가 된다 — 안전하지 않은 값은 페이지를 만들지 않는다.
 _SLUG_OK = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
+_SLUG_UNSAFE = re.compile(r"[^A-Za-z0-9._-]+")
+
+
+def _safe_slug(doc_id: str) -> "str | None":
+    """URL 안전 슬러그. 안전한 id 는 그대로(기존 URL 불변), 아니면 결정론 변환.
+
+    [2026-08-27] 종전에는 안전하지 않은 id 를 통째로 기각했는데, 그 규칙이 MHRA 를
+    **전량** 침묵 소실시켰다 — MHRA 문서 id 는 기관 원문 형식이 "Insp GMP/GDP/IMP
+    322/14798-0032[I]" 라 공백·슬래시·대괄호가 항상 들어 있다. id 형식은 기관이 정하는
+    것이라 우리 기각 규칙이 곧 기관 차별이 된다. 변환 규칙:
+      · 안전하지 않은 문자 연쇄 → '-' 하나 (읽을 수 있는 몸통 유지)
+      · 원본 id 의 sha1 앞 8자를 접미 (몸통 축약·문자 치환으로 인한 충돌 차단)
+    같은 id 는 언제나 같은 슬러그다(재실행 안정). 빈 id 만 None."""
+    if not doc_id:
+        return None
+    if _SLUG_OK.match(doc_id):
+        return doc_id
+    body = _SLUG_UNSAFE.sub("-", doc_id).strip("-")[:80].rstrip("-")
+    tail = hashlib.sha1(doc_id.encode("utf-8")).hexdigest()[:8]
+    slug = f"{body}-{tail}" if body else f"doc-{tail}"
+    return slug if _SLUG_OK.match(slug) else None
+
+
 _DATE_OK = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -85,7 +116,8 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
                   reject: Counter) -> "dict[str, Any] | None":
     """문서 1건의 표시용 투영. 규율을 못 지키면 None(사유를 세어 침묵을 막는다)."""
     doc_id = (doc.get("document_id") or "").strip()
-    if not _SLUG_OK.match(doc_id):
+    slug = _safe_slug(doc_id)
+    if slug is None:
         reject["URL 로 쓸 수 없는 문서 id"] += 1
         return None
 
@@ -133,7 +165,7 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
 
     return {
         "document_id": doc_id,
-        "slug": doc_id,
+        "slug": slug,
         "agency": doc.get("agency") or "",
         "source": doc.get("source") or "",
         "firm_name": firm,

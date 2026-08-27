@@ -10,11 +10,12 @@
 
 ## 주간 브리프
 - [최신 브리프](https://grm-solutions.com/briefs/2026-07-06/): 이번 주 글로벌·국내 규제 동향 (매주 월요일 발행)
-- [모아보기](https://grm-solutions.com/archive/): 지금까지 발행한 주간 브리프 3건
+- [브리프 아카이브](https://grm-solutions.com/archive/): 지금까지 발행한 주간 브리프 3건
 
 ## 규제 지적사항 데이터
 - [지적사항 검색](https://grm-solutions.com/findings/): FDA 483 · Warning Letter · EU/영국 GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색
-- [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 3,145건 — 기관·연도별 색인
+- [지적사항 둘러보기](https://grm-solutions.com/findings/browse/): 업무별 바로가기 · 최근 공개 문서 · 분류·국가·기관 축별 탐색
+- [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 6,156건 — 기관·연도별 색인
 - [지적 경향](https://grm-solutions.com/findings/trends/): 최근 12개월 지적 영역 순위 · 많이 인용된 조항
 - [FDA 실사 결과](https://grm-solutions.com/findings/inspections/): FDA GMP 실사 등급(NAI·VAI·OAI) 연도별·국가별 집계
 - [데이터 현황](https://grm-solutions.com/findings/coverage/): 소스 구성 · 연도별 확보량 · 수집 범위와 한계

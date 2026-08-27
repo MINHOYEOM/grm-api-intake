@@ -2345,22 +2345,8 @@
   // 값을 대입하면 조용히 무시된다(종전에도 같은 순서였다).
   readStateFromUrl();
   currentPage = readPageFromUrl();
-  // [발견 허브] 딥링크 착지 보정 — 첫 화면이 목적 카드·최근 문서로 재배열되면서 검색
-  // 블록(#fnd-search)이 페이지 하단으로 내려갔다. 검색 파라미터를 들고 온 방문(모음
-  // 페이지 CTA ?cat=, 북마크, 2페이지 이상)은 검색을 보러 온 것이므로 그 지점으로 즉시
-  // 이동한다(스크롤 위치만 바꾼다 — 상태·URL 무변형). finding_id 딥링크는 자체 착지
-  // 로직이 있어 제외(이중 점프 방지). 파라미터 없는 첫 방문은 허브 머리부터 본다.
-  if (!deepLinkPending && typeof URLSearchParams !== "undefined") {
-    var landParams = new URLSearchParams(location.search);
-    var wantsSearch = Object.keys(URL_KEYS).some(function (k) {
-      var lv = landParams.get(URL_KEYS[k]);
-      return lv !== null && lv !== "";
-    }) || landParams.get("page") !== null;
-    var searchSection = document.getElementById("fnd-search");
-    if (wantsSearch && searchSection && typeof searchSection.scrollIntoView === "function") {
-      searchSection.scrollIntoView();
-    }
-  }
+  // [2면 분리 2026-08-27] 발견 허브의 딥링크 착지 스크롤을 제거 — 허브 섹션이
+  // 둘러보기 면으로 옮겨져 검색 툴바가 다시 첫 화면에 있다(보정할 거리 소멸).
   navToken += 1;
   var initToken = navToken;
   fetchSearch(currentPage)

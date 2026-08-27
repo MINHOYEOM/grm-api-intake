@@ -224,7 +224,12 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
                 f"모르는 기관 코드: {key!r} — AGENCY_LABELS_KO 에 한국어 표기를 추가하세요."
                 " 코드로 폴백하지 않습니다(새 기관이 조용히 영문 코드로 노출되는 것을 막습니다).")
 
-        if n < min_findings:
+        # [2026-08-27 사용자 피드백] 기관 축은 표본 미달 게이트를 적용하지 않는다.
+        # 이 게이트는 얇은 조합 페이지 수십 장을 막는 방벽인데(그 목적은 유지), 기관 축에
+        # 그대로 적용하면 신규·소량 기관이 임계를 넘을 때까지 **기관 자체가 침묵 소실**된다
+        # (실측: MHRA 8건 < 20 이라 기관 목록이 넷뿐이었다). 기관 축은 항목이 소수·유한하고
+        # 완전성이 곧 신뢰라, 1건이라도 수집했으면 보여준다. 분류·국가·조합 축은 종전대로.
+        if n < min_findings and axis != "agency":
             excluded.append({"key": key, "findings": n,
                              "reason": f"표본 미달(<{min_findings})"})
             continue

@@ -6,104 +6,22 @@
     env(SUPABASE_URL/ANON_KEY) 미설정이면 cfg data 속성이 빈 문자열 → JS 가 "준비 중" 안내로
     조용히 종료(오류 아님, 골든 결정론 — env 값과 무관하게 이 템플릿 출력 byte 는 항상 동일). -#}
 <main>
-  {#- [발견 허브 2026-08-26] 첫 화면 재배열. 존 재편(#807)이 도구 카드를 만들었지만
-      **검색 결과 아래**에 있어 스크롤 없이는 존재를 알 수 없었다 — 처음 온 사용자는
-      검색할 업체명·조항을 모른 채 들어오므로, 순서를 "목적 → 최근 사례 → 축 → 검색"으로
-      뒤집는다. 검색 블록 자체는 그대로다(#fnd-search 래퍼로 감싸 앵커만 부여) — 딥링크
-      (?cat= 등)로 오는 기존 사용자는 findings.js 가 검색 섹션으로 자동 스크롤한다. -#}
+  {#- [2면 분리 2026-08-27] 이 페이지는 **검색 면**이다. 발견 허브(#811)의 세 섹션
+      (업무별 진입·최근 공개 문서·축 탐색)은 둘러보기 면(findings_browse.html)으로 옮겼다 —
+      사용자 피드백: "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다." 화면당 일은 하나:
+      이 면은 조회 도구다. 면 전환은 findings_seg.html(트렌드 존 세그와 동형). -#}
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항</h1>
+    <h1 class="reveal" style="animation-delay:.08s">지적사항 검색</h1>
     {#- 설명문은 한 문장(M15 사용자 피드백 — 첫 화면 밀도) — 건수는 별도 문장이 아니라
         문장 안에 녹인다. 수치는 render 가 정본에서 계산(하드코딩 금지). -#}
     <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {{ zone_totals.documents }}건에서 추출한 지적사항 {{ zone_totals.findings }}건을 원문 문장 단위로 모았습니다.{% else %}FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.{% endif %}</p>
-    <div class="fnd-hd-links reveal" style="animation-delay:.18s">
-      <a class="fnd-trends-link" href="#fnd-search">바로 검색하기 ↓</a>
-      <a class="fnd-trends-link" href="{{ rel_root }}findings/trends/index.html">전체 트렌드 보기 →</a>
-    </div>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
+    {% with seg_active = "search" %}{% include "partials/findings_seg.html" %}{% endwith %}
 
-    {#- [발견 허브] 목적별 진입 — 존 재편(#807)의 도구 카드 4장을 흡수한 자리다.
-        기능 이름("업체 조회")이 아니라 **업무 상황**("거래처를 검토한다면")에서 출발한다 —
-        처음 온 사용자는 기능 명칭으로는 자기 일과 연결하지 못한다(도달성 감사의 다음 층:
-        닿는 길을 놓은 뒤에도, 그 길이 무엇인지 몰라 안 눌렀다). 링크는 전부 상시 라우트
-        (nav·footer 와 동일)라 무조건 렌더 — 문서로 찾기만 데이터 게이트(has_docs, 없는
-        페이지로 보내는 링크는 무링크보다 나쁘다). 실사관 카드의 "순위·비교 없음" 문안은
-        037 정책(순위 금지) 유지 조항이다. -#}
-    <section class="fnd-browse fnd-purpose" id="fnd-purpose" aria-label="목적별 진입">
-      <h2 class="fnd-browse-h">어떤 일로 오셨나요?</h2>
-      <p class="fnd-browse-p">쓰임새별로 바로 가는 길입니다. 찾을 업체명이나 문구가 이미 있으시면 <a href="#fnd-search">아래 상세 검색</a>으로 바로 내려가셔도 됩니다.</p>
-      <div class="fnd-pp-grid">
-        <div class="fnd-pp-card">
-          <span class="fnd-pp-t">실사를 준비하고 있다면</span>
-          <span class="fnd-pp-d">무엇이 자주 지적되는지에서 출발하세요.</span>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/checklist/index.html">자가점검 체크리스트<em>실제 지적 문장이 근거로 붙은 점검표</em></a>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/trends/index.html">많이 지적된 영역<em>최근 12개월 지적 경향</em></a>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/inspections/index.html">FDA 실사 결과<em>실사가 NAI·VAI·OAI 중 어떻게 끝났나</em></a>
-        </div>
-        <div class="fnd-pp-card">
-          <span class="fnd-pp-t">거래처·수탁제조소를 검토한다면</span>
-          <span class="fnd-pp-d">업체 이름만 알면 됩니다.</span>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/firm/index.html">업체 조회<em>그 업체의 과거 지적 이력을 한 화면에</em></a>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/inspections/index.html">FDA 실사 결과<em>연도별·국가별 최종 등급 구성</em></a>
-        </div>
-        <div class="fnd-pp-card">
-          <span class="fnd-pp-t">최근 경향이 궁금하다면</span>
-          <span class="fnd-pp-d">누적 합계가 아니라 최근 변화부터 보여드립니다.</span>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/trends/index.html">지적 경향<em>무엇이 늘고 무엇이 줄었나</em></a>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/coverage/index.html">데이터 현황<em>수치를 어디까지 믿어도 되는지</em></a>
-          {% if recent_docs %}<a class="fnd-pp-link" href="#fnd-recent">최근 공개된 문서<em>이 페이지 아래에 바로 있습니다 ↓</em></a>{% endif %}
-        </div>
-        <div class="fnd-pp-card">
-          <span class="fnd-pp-t">실사관 이름을 받았다면</span>
-          <span class="fnd-pp-d">그 실사관이 서명한 공개 문서를 모아 보여드립니다. 순위·비교는 제공하지 않습니다.</span>
-          <a class="fnd-pp-link" href="{{ rel_root }}findings/inspector/index.html">실사관 조회<em>서명한 문서·반복 확인된 영역</em></a>
-          {% if has_docs %}<a class="fnd-pp-link" href="{{ rel_root }}findings/docs/index.html">문서로 찾기<em>기관·연도별 실사 문서 목록</em></a>{% endif %}
-        </div>
-      </div>
-    </section>
-
-    {#- [발견 허브] 최근 공개 문서 — 검색하기 전에도 데이터의 실물이 보이게 한다.
-        findings_docs.json(커밋된 스냅샷)에서 공개일 내림차순 정적 렌더 — fetch 0,
-        골든 결정론 유지(픽스처 데이터 기준). 날짜 의미(공개일≠실사일)와 스냅샷 기준일을
-        같이 적는다 — 트렌드 면의 날짜 주의 문안과 같은 취지. -#}
-    {% if recent_docs %}
-    <section class="fnd-browse" id="fnd-recent" aria-label="최근 공개된 문서">
-      <h2 class="fnd-browse-h">최근 공개된 문서</h2>
-      <p class="fnd-browse-p">{{ recent_asof }} 수집 기준, 상세 페이지가 있는 문서{% if recent_min %}(지적 {{ recent_min }}건 이상){% endif %} 가운데 최신 {{ recent_docs | length }}건입니다. 날짜는 실사한 날이 아니라 문서가 공개된 날입니다.</p>
-      <div class="fnd-rc-list">
-        {%- for d in recent_docs %}
-        <a class="fnd-rc-row" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
-          <span class="fnd-rc-head"><span class="fnd-rc-date">{{ d.date }}</span><span class="fnd-rc-src">{{ d.src_label }}</span><span class="fnd-rc-firm">{{ d.firm }}</span>{% if d.cats %}<span class="fnd-rc-cats">{{ d.cats | join(" · ") }}</span>{% endif %}</span>
-          {%- if d.snippet %}<span class="fnd-rc-snippet">{{ d.snippet }}</span>{% endif %}
-        </a>
-        {%- endfor %}
-      </div>
-    </section>
-    {% endif %}
-
-    {% if browse_axes %}
-    <section class="fnd-browse" aria-label="다르게 찾아보기">
-      <h2 class="fnd-browse-h">다르게 찾아보기</h2>
-      <p class="fnd-browse-p">검색어가 떠오르지 않으면 축을 골라 둘러보실 수 있습니다. 각 페이지는 실제 지적 문장과 함께 정리돼 있습니다.</p>
-      <div class="fnd-browse-grid">
-        {%- for b in browse_axes %}
-        <a class="fnd-browse-card" href="{{ rel_root }}{{ b.href }}">
-          <span class="fnd-browse-t">{{ b.title }}</span>
-          <span class="fnd-browse-d">{{ b.blurb }}</span>
-        </a>
-        {%- endfor %}
-      </div>
-    </section>
-    {% endif %}
-
-    {#- [발견 허브] 상세 검색 — 기존 검색 블록(툴바·대시보드·결과)을 그대로 감싼 래퍼.
-        내부 구조·id·sticky 계약(top:66px, z-index<50, 툴바가 대시보드보다 앞)은 불변. -#}
-    <div id="fnd-search">
-    <h2 class="fnd-browse-h">상세 검색</h2>
-    <p class="fnd-browse-p">업체명·문서번호·조항·본문 문구로 찾고, 소스·카테고리·기간·국가로 좁힙니다.</p>
+    <p class="fnd-lead">업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.</p>
 
     {#- [M15] 툴바(검색+필터+정렬)를 대시보드보다 위로(검색이 최우선 도구), sticky
         컴팩트화. §4 전면 재설계 — 소스/증거등급/검토상태 칩 그룹을 카테고리·발행월과
@@ -196,7 +114,6 @@
       <div id="fnd-results" class="fnd-results"></div>
       <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="검색 결과 페이지 이동" hidden></nav>
     </section>
-    </div>
   </div>
 </main>
 <style>
@@ -209,44 +126,8 @@ main{word-break:keep-all;overflow-wrap:anywhere}
    balance 가 아니라 pretty: balance 는 두 줄 길이를 맞추려고 한 줄로 들어갈 문장도 굳이
    쪼갠다. */
 .page-head p{max-width:none;text-wrap:pretty}
-/* [F3b] 트렌드 대시보드로 가는 절제된 텍스트 링크(page-head 하단, 새 버튼/박스 0). */
-.fnd-trends-link{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
-.fnd-trends-link:hover{color:var(--coral)}
-/* [검색 유입] 정적 표면 진입 블록 — 검색 도구를 밀어내지 않도록 결과 아래에 둔다. */
-.fnd-browse{margin:40px 0 0;border-top:1px solid var(--line);padding-top:26px}
-.fnd-browse-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
-.fnd-browse-p{font-size:14px;line-height:1.7;color:var(--muted);margin:8px 0 0;max-width:760px;word-break:keep-all}
-.fnd-browse-grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:12px}
-.fnd-browse-card{display:flex;flex-direction:column;gap:5px;background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:16px 18px;text-decoration:none}
-.fnd-browse-card:hover{border-color:var(--coral)}
-.fnd-browse-t{font-family:var(--serif);font-size:16.5px;color:var(--ink)}
-.fnd-browse-card:hover .fnd-browse-t{color:var(--coral)}
-.fnd-browse-d{font-size:13px;line-height:1.6;color:var(--muted);word-break:keep-all}
-/* [발견 허브] 머리 링크 줄 — 기존 .fnd-trends-link 컴포넌트 2개를 한 줄에. */
-.fnd-hd-links{display:flex;gap:22px;flex-wrap:wrap}
-/* [발견 허브] 목적 카드 — 첫 섹션이라 상단 구분선 없이 page-head 에 바로 잇는다. */
-.fnd-purpose{margin-top:6px;border-top:0;padding-top:0}
-.fnd-pp-grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.fnd-pp-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px}
-.fnd-pp-t{font-family:var(--serif);font-size:17px;color:var(--ink)}
-.fnd-pp-d{font-size:12.5px;line-height:1.6;color:var(--muted);margin:5px 0 10px;word-break:keep-all}
-.fnd-pp-link{display:block;padding:8px 0 7px;border-top:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--body);text-decoration:none}
-.fnd-pp-link:hover{color:var(--coral-2)}
-.fnd-pp-link em{display:block;font-style:normal;font-weight:400;font-size:12px;line-height:1.55;color:var(--muted);margin-top:2px;word-break:keep-all}
-/* [발견 허브] 최근 공개 문서 — 문서 카드(.fnd-doc)보다 가벼운 목록 톤. */
-.fnd-rc-list{margin-top:16px;display:flex;flex-direction:column}
-.fnd-rc-row{display:block;padding:12px 4px;border-top:1px solid var(--line);text-decoration:none}
-.fnd-rc-row:last-child{border-bottom:1px solid var(--line)}
-.fnd-rc-row:hover .fnd-rc-firm{color:var(--coral-2)}
-.fnd-rc-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
-.fnd-rc-date{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.fnd-rc-src{font-size:11.5px;font-weight:600;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:2px 7px}
-.fnd-rc-firm{font-family:var(--serif);font-size:15.5px;color:var(--ink)}
-.fnd-rc-cats{font-size:12px;color:var(--muted);word-break:keep-all}
-.fnd-rc-snippet{display:block;margin-top:5px;font-size:13px;line-height:1.65;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
-/* [발견 허브] 상세 검색 래퍼 — 위 섹션들과 같은 구분 리듬(.fnd-browse 동형). */
-#fnd-search{margin:40px 0 0;border-top:1px solid var(--line);padding-top:26px}
-#fnd-search>.fnd-browse-p{margin-bottom:20px}
+/* 검색 리드 한 줄 — 세그 아래·툴바 위. */
+.fnd-lead{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 20px;max-width:760px;word-break:keep-all}
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */

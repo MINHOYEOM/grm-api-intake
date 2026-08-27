@@ -17,9 +17,11 @@ on:
   workflow_dispatch:
     inputs:
       min_findings:
+        # [2026-08-27] 3 -> 1. 문서당 지적 1~2건인 소스(EU NCR·MHRA)가 전량 기각돼
+        # 기관이 목록에서 침묵 소실됐다 — 기관 완전성이 페이지 두께보다 우선한다.
         description: '페이지를 만들 최소 지적 건수(미만은 제외·사유 기록)'
         required: true
-        default: '3'
+        default: '1'
       shrink_review_percent:
         description: '문서 수가 이 비율(%) 이상 줄면 자동 머지 대신 사람 검토'
         required: true
@@ -39,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      MIN_FINDINGS: ${{ inputs.min_findings || '3' }}
+      MIN_FINDINGS: ${{ inputs.min_findings || '1' }}
       SHRINK_PCT: ${{ inputs.shrink_review_percent || '10' }}
       BRANCH: automation/findings-docs-auto-${{ github.run_id }}
       GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}

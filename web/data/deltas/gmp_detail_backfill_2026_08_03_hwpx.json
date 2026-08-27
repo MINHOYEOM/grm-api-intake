@@ -1,0 +1,37 @@
+{
+  "cards": {
+    "gmpinspect-1P_rAodwYSY": {
+      "recovered_from": "nedrug 첨부 HWPX 재수집(운영 추출기 재추출)",
+      "rows": [
+        {
+          "area": "제조",
+          "followup": "보완완료",
+          "legal_basis": "의약품 등의 안전에 관한 규칙 [별표 1의2] 제 6.1호",
+          "severity": "기타",
+          "summary": "제조기록서를 작업과 동시에 작성하지 않았음"
+        },
+        {
+          "area": "시험실",
+          "followup": "보완완료",
+          "legal_basis": "「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제 11.1호",
+          "severity": "기타",
+          "summary": "품질관리기록서에 시험 근거자료를 첨부하고 있지 않았음"
+        },
+        {
+          "area": "시험실",
+          "followup": "보완완료",
+          "legal_basis": "「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제 6.2호",
+          "severity": "기타",
+          "summary": "시약의 보관조건 관련 규정이 확인되지 않음"
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "download_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1P_rAodwYSY",
+    "note": "#826 이 hwpx 추출 경로를 신설했으나 발행분에는 다음 조립분부터 적용된다. 이미 나간 08-03 카드에 상세 한 층만 소급 병합한다.",
+    "recovered_at": "2026-08-27",
+    "source": "nedrug 첨부 HWPX 재수집 → 운영 추출기 collect_mfds_gmp_inspection._extract_hwpx_deficiency_table"
+  },
+  "schema_version": "gmp-detail-backfill/1"
+}

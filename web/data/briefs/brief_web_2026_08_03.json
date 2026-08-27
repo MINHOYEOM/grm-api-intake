@@ -4751,6 +4751,36 @@
     "품질관리기록서의 시험 근거자료 첨부 상태",
     "시약 보관조건 규정 문서화"
    ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 3,
+    "severity_summary": {
+     "기타": 3
+    },
+    "rows": [
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "의약품 등의 안전에 관한 규칙 [별표 1의2] 제 6.1호",
+      "summary": "제조기록서를 작업과 동시에 작성하지 않았음",
+      "followup": "보완완료"
+     },
+     {
+      "area": "시험실",
+      "severity": "기타",
+      "legal_basis": "「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제 11.1호",
+      "summary": "품질관리기록서에 시험 근거자료를 첨부하고 있지 않았음",
+      "followup": "보완완료"
+     },
+     {
+      "area": "시험실",
+      "severity": "기타",
+      "legal_basis": "「의약품 등의 안전에 관한 규칙」 [별표 1의2] 제 6.2호",
+      "summary": "시약의 보관조건 관련 규정이 확인되지 않음",
+      "followup": "보완완료"
+     }
+    ]
+   },
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],

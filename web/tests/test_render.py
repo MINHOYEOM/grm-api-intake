@@ -11845,6 +11845,23 @@ class WebProfileInterpretationTest(unittest.TestCase):
                       self.insp_js)
         self.assertNotIn("가장 많이 지적한", self._js_code(self.insp_js))
 
+    def test_catch_all_excluded_from_ranking_but_kept_in_denominator(self):
+        """캐치올 분류는 순위 문장·반복 목록에서 빼되 분모·막대에는 남긴다(#810 규율).
+
+        "이 업체에서 가장 많이 확인된 영역 = 기타 품질시스템"은 그 업체의 성질이 아니라
+        분류기 상태라 조치로 이어지지 않는다. 라이브 프리뷰에서 업체·실사관 **양쪽 다**
+        1위가 기타로 나와 잡은 결함이라 게이트로 박는다."""
+        for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
+            code = self._js_code(src)
+            self.assertIn('var CATCH_ALL = "other_quality_system";', code, name)
+            # 순위 문장과 반복 목록 두 곳에서 걸러야 한다.
+            self.assertEqual(
+                len(re.findall(r"category_code !== CATCH_ALL", code)), 2, name)
+            # 뺐다는 사실을 화면에 적는다(조용히 빼지 않는다).
+            self.assertIn("세부 분류 전이라", code, name)
+            # 막대(buildCatRow 루프)는 전량을 그대로 그린다 — 여기서 거르면 안 된다.
+            self.assertIn("LAST_CATS.forEach(function (c) {", code, name)
+
     # ── 037 정책: 의도적 비대칭 ──────────────────────────────────────────────
     def test_density_metric_is_firm_only(self):
         """문서당 지적(밀도)은 업체에만 붙는다.

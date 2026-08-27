@@ -254,31 +254,55 @@
     return row;
   }
 
+  // ★[P1 해석층] 캐치올 분류는 순위 문장·반복 목록에서 뺀다(막대와 분모에는 남긴다).
+  // "1위 = 기타 품질시스템"은 분류기 상태를 말하는 문장이라 조치로 이어지지 않는다 —
+  // 트렌드 면(#810)이 세운 규율을 그대로 따르고, 뺐다는 사실은 화면에 적는다.
+  var CATCH_ALL = "other_quality_system";
+
   // [P1 해석층] 숫자 위의 한 문장. 어휘 주의 — "가장 많이 지적한"이 아니라 "공개 문서에서
   // 가장 많이 확인된"이다(귀속 금지: 483 은 여러 실사관이 함께 서명할 수 있다).
   function renderCatNote(cats, total) {
     if (!catNoteEl) return;
-    if (!cats.length || !total) { catNoteEl.textContent = ""; return; }
-    var top = cats[0];
     catNoteEl.innerHTML = "";
-    catNoteEl.appendChild(document.createTextNode("이 실사관이 서명한 공개 문서에서 가장 많이 확인된 영역은 "));
-    catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
-    catNoteEl.appendChild(document.createTextNode(
-      "입니다(" + fmtNum(top.cnt) + "건 · 이 이력 안에서 " + Math.round((top.cnt / total) * 100) + "%). " +
-      (filterable ? "줄을 누르면 아래 문서 목록이 그 분류로 좁혀집니다." : "")
-    ));
+    if (!cats.length || !total) return;
+    var ranked = cats.filter(function (c) { return c.category_code !== CATCH_ALL; });
+    var other = cats.filter(function (c) { return c.category_code === CATCH_ALL; })[0];
+    if (ranked.length) {
+      var top = ranked[0];
+      catNoteEl.appendChild(document.createTextNode("이 실사관이 서명한 공개 문서에서 가장 많이 확인된 영역은 "));
+      catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
+      catNoteEl.appendChild(document.createTextNode(
+        "입니다(" + fmtNum(top.cnt) + "건 · 이 이력 안에서 " +
+        Math.round((top.cnt / total) * 100) + "%)."
+      ));
+    }
+    if (other) {
+      catNoteEl.appendChild(document.createTextNode(
+        " " + catLabel(CATCH_ALL) + " " + fmtNum(other.cnt) + "건은 세부 분류 전이라 이 문장에서 " +
+        "뺐습니다 — 위 비율의 분모와 아래 막대에는 그대로 들어 있습니다."
+      ));
+    }
+    if (filterable) {
+      catNoteEl.appendChild(document.createTextNode(
+        " 줄을 누르면 아래 문서 목록이 그 분류로 좁혀집니다."
+      ));
+    }
   }
 
   // ── [P1 해석층] 반복 확인된 영역(065 repeats) ────────────────────────────────
   function renderRepeats(repeats) {
     if (!repBlockEl || !repEl) return;
-    var rows = repeats || [];
+    var all = repeats || [];
+    var rows = all.filter(function (r) { return r.category_code !== CATCH_ALL; });
+    var dropped = all.filter(function (r) { return r.category_code === CATCH_ALL; })[0];
     if (!rows.length) { repBlockEl.hidden = true; return; }
     repBlockEl.hidden = false;
     if (repNoteEl) {
       repNoteEl.textContent =
         "이 실사관이 서명한 서로 다른 문서 2건 이상에서 다시 확인된 영역입니다. " +
-        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않으며, 다른 실사관과 비교한 값이 아닙니다.";
+        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않으며, 다른 실사관과 비교한 값이 아닙니다." +
+        (dropped ? " " + catLabel(CATCH_ALL) + "(문서 " + fmtNum(dropped.documents) +
+                   "건)은 세부 분류 전이라 뺐습니다." : "");
     }
     repEl.innerHTML = "";
     rows.forEach(function (r) {

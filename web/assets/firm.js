@@ -268,18 +268,39 @@
     renderCatNote(LAST_CATS, total);
   }
 
+  // ★[P1 해석층] 캐치올 분류는 **순위 문장과 반복 목록에서 뺀다**(막대와 분모에는 남긴다).
+  // "이 업체에서 가장 많이 확인된 영역 = 기타 품질시스템"은 그 업체의 성질이 아니라
+  // **분류기 상태**를 말하는 문장이라 조치로 이어지지 않는다. 트렌드 면(#810)이 이미 세운
+  // 규율을 프로파일에도 그대로 적용한다 — 빼되 **뺐다는 사실을 적는다**(축을 조용히
+  // 바꾸지 않는다). 라이브 프리뷰에서 두 프로파일 모두 1위가 기타로 나와 잡았다.
+  var CATCH_ALL = "other_quality_system";
+
   // [P1 해석층] 숫자 위의 한 문장 — 가장 많이 확인된 영역과 그 비중을 말로 적는다.
   function renderCatNote(cats, total) {
     if (!catNoteEl) return;
-    if (!cats.length || !total) { catNoteEl.textContent = ""; return; }
-    var top = cats[0];
     catNoteEl.innerHTML = "";
-    catNoteEl.appendChild(document.createTextNode("공개된 문서에서 가장 많이 확인된 영역은 "));
-    catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
-    catNoteEl.appendChild(document.createTextNode(
-      "입니다(" + fmtNum(top.cnt) + "건 · 전체의 " + Math.round((top.cnt / total) * 100) + "%). " +
-      (filterable ? "줄을 누르면 아래 문서 이력이 그 분류로 좁혀집니다." : "")
-    ));
+    if (!cats.length || !total) return;
+    var ranked = cats.filter(function (c) { return c.category_code !== CATCH_ALL; });
+    var other = cats.filter(function (c) { return c.category_code === CATCH_ALL; })[0];
+    if (ranked.length) {
+      var top = ranked[0];
+      catNoteEl.appendChild(document.createTextNode("공개된 문서에서 가장 많이 확인된 영역은 "));
+      catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
+      catNoteEl.appendChild(document.createTextNode(
+        "입니다(" + fmtNum(top.cnt) + "건 · 전체의 " + Math.round((top.cnt / total) * 100) + "%)."
+      ));
+    }
+    if (other) {
+      catNoteEl.appendChild(document.createTextNode(
+        " " + catLabel(CATCH_ALL) + " " + fmtNum(other.cnt) + "건은 세부 분류 전이라 이 문장에서 " +
+        "뺐습니다 — 위 비율의 분모와 아래 막대에는 그대로 들어 있습니다."
+      ));
+    }
+    if (filterable) {
+      catNoteEl.appendChild(document.createTextNode(
+        " 줄을 누르면 아래 문서 이력이 그 분류로 좁혀집니다."
+      ));
+    }
   }
 
   // ── [P1 해석층] 반복 확인된 영역(065 repeats) ────────────────────────────────
@@ -287,13 +308,18 @@
   // 서로 다른 문서 수로 세므로, 같은 문서 안의 다건은 반복이 아니다.
   function renderRepeats(repeats) {
     if (!repBlockEl || !repEl) return;
-    var rows = repeats || [];
+    var all = repeats || [];
+    // 캐치올은 목록에서 뺀다(위 renderCatNote 와 같은 이유) — 대신 뺐다는 사실을 적는다.
+    var rows = all.filter(function (r) { return r.category_code !== CATCH_ALL; });
+    var dropped = all.filter(function (r) { return r.category_code === CATCH_ALL; })[0];
     if (!rows.length) { repBlockEl.hidden = true; return; }
     repBlockEl.hidden = false;
     if (repNoteEl) {
       repNoteEl.textContent =
-        "서로 다른 문서 " + fmtNum(2) + "건 이상에서 다시 확인된 영역입니다. " +
-        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않습니다.";
+        "서로 다른 문서 2건 이상에서 다시 확인된 영역입니다. " +
+        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않습니다." +
+        (dropped ? " " + catLabel(CATCH_ALL) + "(문서 " + fmtNum(dropped.documents) +
+                   "건)은 세부 분류 전이라 뺐습니다." : "");
     }
     repEl.innerHTML = "";
     rows.forEach(function (r) {

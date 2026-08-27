@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""067_findings_search_perf.sql — findings_search 성능 수리가 **동작을 안 바꿨는지**.
+"""068_findings_search_perf.sql — findings_search 성능 수리가 **동작을 안 바꿨는지**.
 
 이 마이그레이션은 순수 리팩터다. 실 Postgres 없이 소스텍스트만 보는 검사라 "정말 같은
 값을 내는가"는 여기서 못 잰다 — 그건 적용 전후 md5 대조로 증명했다(20개 파라미터 조합
@@ -18,7 +18,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SQL_PATH = ROOT / "web" / "migrations" / "067_findings_search_perf.sql"
+SQL_PATH = ROOT / "web" / "migrations" / "068_findings_search_perf.sql"
 
 
 class FindingsSearchPerfMigrationTest(unittest.TestCase):

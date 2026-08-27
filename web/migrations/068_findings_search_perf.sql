@@ -1,5 +1,5 @@
 -- ============================================================================
--- 067 — findings_search 성능 수리 (동작 무변경 · 순수 리팩터)
+-- 068 — findings_search 성능 수리 (동작 무변경 · 순수 리팩터)
 --
 -- 왜: 이 함수는 anon 역할의 statement_timeout **3초** 안에서 돌아야 하는데 한 호출이
 -- **758ms** 였다. 여유가 4배뿐이라, 정본 재생성(62페이지를 연달아 호출)이 부하가 몰리는
@@ -150,7 +150,7 @@ page_docs as (
     and o.rn <= p.page * p.per
 ),
 page_rows as (
-  -- [067] page_docs(한 페이지분)를 축으로 raw_signal_id 인덱스를 타 넓은 행을 문서당 한
+  -- [068] page_docs(한 페이지분)를 축으로 raw_signal_id 인덱스를 타 넓은 행을 문서당 한
   -- 번에 집는다. 범위 판정은 filtered 와의 조인이 하므로 검색 술어를 복제하지 않는다.
   select
     pd.rn,
@@ -268,7 +268,7 @@ dash_country as (
   from filtered f
   group by f.country_key
 ),
--- [067] (firm_key, firm_name) 을 한 번만 집계한다. 종전 lateral 은 상위 10개마다
+-- [068] (firm_key, firm_name) 을 한 번만 집계한다. 종전 lateral 은 상위 10개마다
 -- filtered 전체를 다시 훑었다(10 × 26,594행 · 81ms).
 firm_counts as (
   select f.firm_key, f.firm_name, count(*)::int as nc

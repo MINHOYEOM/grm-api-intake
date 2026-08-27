@@ -889,13 +889,15 @@ class TestRedactedRowIndexPlumbing(unittest.TestCase):
     def test_index_is_matrix_relative_not_slice_relative(self):
         """★헤더 앞에 표지행이 있으면 슬라이스 기준 인덱스는 통째로 밀린다.
 
-        여기서 행렬 인덱스 3 = `_ROW_B`. 슬라이스(헤더+1) 기준이면 3 은 존재하지 않는
-        위치라 **아무것도 안 버려지고** 가려진 행이 그대로 나간다 — 조용한 통과다.
+        행렬: 0=표지 · 1=단위 · 2=헤더 · **3=`_ROW_A`** · 4=`_ROW_B`.
+        인덱스 3 을 가리면 `_ROW_A` 가 빠지고 `_ROW_B` 만 남아야 한다. 슬라이스(헤더+1)
+        기준으로 셌다면 3 은 그 슬라이스의 범위 밖이라 **아무것도 안 버려지고** 두 행이
+        다 나간다 — 가드가 조용히 통과되는 형태라 이 테스트가 그걸 못박는다.
         """
         rows = [["의약품 제조소 실태조사 결과"], ["(단위: 건)"],
                 self._HEADER, self._ROW_A, self._ROW_B]
         out = g._normalize_deficiency_table(rows, redacted_rows=frozenset({3}))
-        self.assertEqual([r["summary"] for r in out], ["제조기록서 미작성"])
+        self.assertEqual([r["summary"] for r in out], ["근거자료 미첨부"])
 
     def test_all_rows_marked_yields_nothing(self):
         rows = [self._HEADER, self._ROW_A, self._ROW_B]

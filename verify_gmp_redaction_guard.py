@@ -53,9 +53,13 @@ import sys
 import time
 from typing import Any
 
-import requests
-
 import collect_mfds_gmp_inspection as g
+# ★`requests` 를 직접 잡지 않는다 — 이 모듈은 MFDS 호스트(nedrug)를 치는 경로이고,
+#   저장소 규칙상 그런 모듈의 HTTP 는 전부 `grm_common` 헬퍼(=`proxies_for` 경유)를
+#   거쳐야 한다. Supabase 조회는 프록시 대상이 아니지만 헬퍼가 호스트를 보고 알아서
+#   판단하므로 예외를 둘 이유가 없고, 재시도·429 처리도 함께 얻는다.
+#   (`tests/test_mfds_egress_wiring.py` ②층이 이 규칙을 저장소 전수로 강제한다.)
+from grm_common import http_get_json
 
 SOURCE = "MFDS"
 SOURCE_KIND = "gmp-inspection"
@@ -99,10 +103,13 @@ def fetch_corpus(base: str, key: str) -> list[dict[str, Any]]:
             "order": "document_id.asc",
             "limit": str(_PAGE), "offset": str(offset),
         }
-        resp = requests.get(url, params=params, headers=headers, timeout=_TIMEOUT)
-        if resp.status_code >= 400:
-            raise SystemExit(f"raw_signals 조회 HTTP {resp.status_code}")
-        batch = resp.json() or []
+        try:
+            batch = http_get_json(url, params=params, headers=headers,
+                                  timeout=_TIMEOUT) or []
+        except Exception as exc:          # noqa: BLE001 — 서비스키를 예외에 싣지 않는다
+            raise SystemExit(f"raw_signals 조회 실패: {type(exc).__name__}") from None
+        if not isinstance(batch, list):   # PostgREST 는 배열을 준다 — 아니면 계약 위반
+            raise SystemExit("raw_signals 조회 응답이 배열이 아니다(조회 조건 붕괴)")
         rows.extend(batch)
         if len(batch) < _PAGE:
             break

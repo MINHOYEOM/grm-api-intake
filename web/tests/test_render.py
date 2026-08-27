@@ -3223,9 +3223,18 @@ class WebTrendsRenderTest(unittest.TestCase):
                     "캐나다 실사와 EU·영국 GMP 비준수까지, 실사에서 나온 지적만 합쳐 센 순위입니다.",
                     "식약처와 FDA 는 상위 항목이 겹치지 않습니다"):
             self.assertIn(cue, js_src)
-        # 조항 순위의 읽는 법도 기관에 따라 달라진다(식약처에게 21 CFR 은 다른 나라 규정).
+        # 조항 순위의 읽는 법도 기관에 따라 달라진다(고른 기관에게 21 CFR 이 다른 나라
+        # 규정이면 그 사실을 먼저 말한다).
+        # ★[2026-08-28] 종전에는 `"식약처 지적서에는 …"` 이라는 **기관 이름이 박힌
+        #   문자열**을 요구했다. 캐나다를 넣으면서 그 하드코딩을 없앴으므로 검사도 뜻으로
+        #   옮긴다 — 지키려던 것은 "안내가 기관에 따라 달라진다"이지 "식약처라는 글자가
+        #   있다"가 아니었다. 캐나다 지적 9,505건 중 21 CFR 인용은 0건이라, 이름으로
+        #   가르는 분기는 기관이 늘 때마다 거짓을 말하게 된다.
         self.assertIn("function applyAgencyToCfr(view)", js_src)
-        self.assertIn("식약처 지적서에는 이 조항이 인용되지 않습니다", js_src)
+        self.assertIn("지적서에는 이 조항이 인용되지 않습니다", js_src)
+        self.assertIn("function agencyCitesCfr(", js_src)
+        self.assertNotIn('view.key === "mfds"', js_src,
+                         "CFR 안내가 기관 이름으로 분기하고 있다(데이터로 판정해야 한다)")
         for cue in ("한국은 목록 밖이어도 따로 표시합니다.",
                     "<b>NAI</b>는 지적사항 없음"):
             self.assertIn(cue, self.inspections)

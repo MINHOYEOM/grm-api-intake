@@ -58,6 +58,7 @@ import os
 import hashlib
 import re
 import sys
+import time
 from collections import Counter
 from datetime import date
 from pathlib import Path
@@ -74,6 +75,11 @@ DEFAULT_OUT = Path(__file__).resolve().parent / "web" / "data" / "findings_docs.
 DEFAULT_MIN_FINDINGS = 3
 DEFAULT_PAGE_SIZE = 100
 MAX_FAILURE_RATIO = 0.20
+
+# 페이지 한 장을 몇 번까지 쳐 보는가. 실패 원인은 대개 statement timeout 이고 일시적이다
+# — 재시도가 없으면 한 번의 실패가 그 페이지의 문서 100건을 영구히 지운다.
+PAGE_ATTEMPTS = 4
+PAGE_RETRY_BACKOFF_SEC = 2.0
 
 # document_id 가 그대로 URL 경로가 된다 — 안전하지 않은 값은 페이지를 만들지 않는다.
 _SLUG_OK = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
@@ -242,12 +248,27 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
 
     absorb(first)
     for page in range(2, pages + 1):
-        try:
-            absorb(post_search(base_url, anon_key,
-                               {"p_q": "", "p_page": page, "p_docs_per_page": page_size}))
-        except Exception as exc:                          # noqa: BLE001 — 페이지별 격리
+        payload = {"p_q": "", "p_page": page, "p_docs_per_page": page_size}
+        last_exc: "Exception | None" = None
+        for attempt in range(1, PAGE_ATTEMPTS + 1):
+            try:
+                absorb(post_search(base_url, anon_key, payload))
+                last_exc = None
+                break
+            except Exception as exc:                      # noqa: BLE001 — 페이지별 격리
+                last_exc = exc
+                if attempt < PAGE_ATTEMPTS:
+                    # 실패 원인은 대개 statement timeout 이고 **일시적**이다(실측: 이
+                    # 호출의 평상시 소요는 약 0.75초라 한계와 여유가 있는데, 62번을
+                    # 연달아 때리는 동안 부하가 몰리면 몇 페이지가 넘어간다).
+                    # 그래서 물러섰다가 다시 친다 — 재시도 없이 한 번 실패하면 그
+                    # 페이지의 문서 100건이 영구히 빠진다(08-22 실행이 실제로 그랬고
+                    # 축소 게이트를 안 넘겨 그대로 머지됐다).
+                    log(f"  · page {page}/{pages} 재시도 {attempt}/{PAGE_ATTEMPTS - 1}: {exc}")
+                    time.sleep(PAGE_RETRY_BACKOFF_SEC * attempt)
+        if last_exc is not None:
             failures += 1
-            log(f"  ! page {page}/{pages} 실패: {exc}")
+            log(f"  ! page {page}/{pages} 실패({PAGE_ATTEMPTS}회 시도): {last_exc}")
             # ★실패도 사유로 센다. log 로만 흘리면 그 페이지에 있던 문서 100건이 조용히
             # 사라지고, 축소 게이트(10%)를 넘지 않으면 그대로 자동 머지된다.
             reject[f"페이지 조회 실패(문서 최대 {page_size}건 누락)"] += 1

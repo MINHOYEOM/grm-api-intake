@@ -154,17 +154,62 @@ class DocumentViewGateTest(unittest.TestCase):
 class CollectDocumentsTest(unittest.TestCase):
     def setUp(self):
         self._real = fdr.post_search
+        # 재시도 백오프는 실제로 자면 스위트가 그만큼 느려진다(영구 실패 한 페이지당
+        # 12초). 대기 **여부**가 아니라 재시도 **결과**를 재는 것이 이 클래스의 목적이라
+        # 잠은 무력화하고, 호출 횟수만 기록해 둔다.
+        self._real_sleep = fdr.time.sleep
+        self.slept = []
+        fdr.time.sleep = self.slept.append
 
     def tearDown(self):
         fdr.post_search = self._real
+        fdr.time.sleep = self._real_sleep
 
-    def _stub(self, pages, docs_by_page, fail_pages=()):
+    def _stub(self, pages, docs_by_page, fail_pages=(), fail_times=None):
+        """fail_pages = 영구 실패. fail_times = {페이지: 실패 횟수}(그 뒤엔 성공)."""
+        remaining = dict(fail_times or {})
+        self.calls = collections.Counter()
+
         def fake(base_url, anon_key, payload, timeout=120):
             page = payload["p_page"]
+            self.calls[page] += 1
             if page in fail_pages:
                 raise RuntimeError("boom")
+            if remaining.get(page, 0) > 0:
+                remaining[page] -= 1
+                raise RuntimeError("500 Server Error: statement timeout")
             return {"pages": pages, "documents": docs_by_page.get(page, [])}
         fdr.post_search = fake
+
+    def test_transient_page_failure_is_retried_not_dropped(self):
+        """★일시적 실패로 문서 100건이 사라지면 안 된다.
+
+        실측(08-27 실행): `findings_search` 가 statement timeout 으로 62페이지 중 9장을
+        토했고, 재시도가 없어 그 페이지들의 문서가 통째로 빠졌다 — 문서 3,301 → 2,718
+        (-17.7%). 축소 게이트가 막아 사고는 안 났지만, 직전 08-22 실행은 1페이지만
+        실패해 게이트를 안 넘겼고 **문서 약 100건을 흘린 채 그대로 머지됐다**.
+
+        원인은 항구적이지 않다 — 이 호출의 평상시 소요는 약 0.75초로 한계와 여유가 있고,
+        62번 연달아 칠 때 부하가 몰리는 구간에서만 넘어간다. 그러니 물러섰다 다시 친다."""
+        self._stub(3, {p: [_doc(f"doc{p}")] for p in range(1, 4)},
+                   fail_times={2: 2})   # 2페이지가 두 번 실패한 뒤 성공
+        docs, reject = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                             log=lambda m: None)
+        self.assertEqual(len(docs), 3, "재시도로 회복된 페이지의 문서가 빠졌다")
+        self.assertEqual(self.calls[2], 3, "2페이지를 세 번 쳤어야 한다")
+        self.assertEqual([k for k in reject if "페이지 조회 실패" in k], [],
+                         "회복된 페이지를 실패로 세면 안 된다")
+        self.assertTrue(self.slept, "재시도 사이에 물러서지 않았다")
+
+    def test_permanent_failure_still_counted_after_retries(self):
+        """항구적 실패는 재시도 뒤에도 **반드시 사유로 센다** — 조용히 사라지면 축소
+        게이트만이 마지막 방어선이 되고, 그 게이트는 10% 미만을 못 잡는다."""
+        self._stub(3, {p: [_doc(f"doc{p}")] for p in range(1, 4)}, fail_pages={2})
+        docs, reject = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
+                                             log=lambda m: None)
+        self.assertEqual(len(docs), 2)
+        self.assertEqual(self.calls[2], fdr.PAGE_ATTEMPTS)
+        self.assertEqual(sum(v for k, v in reject.items() if "페이지 조회 실패" in k), 1)
 
     def test_zero_documents_aborts(self):
         """RPC 장애를 '문서가 없다'로 커밋하면 다음 렌더가 페이지 수천 장을 지운다.

@@ -203,11 +203,16 @@ class CollectDocumentsTest(unittest.TestCase):
 
     def test_permanent_failure_still_counted_after_retries(self):
         """항구적 실패는 재시도 뒤에도 **반드시 사유로 센다** — 조용히 사라지면 축소
-        게이트만이 마지막 방어선이 되고, 그 게이트는 10% 미만을 못 잡는다."""
-        self._stub(3, {p: [_doc(f"doc{p}")] for p in range(1, 4)}, fail_pages={2})
+        게이트만이 마지막 방어선이 되고, 그 게이트는 10% 미만을 못 잡는다.
+
+        ★페이지를 6장 쓰는 이유: 실패율이 MAX_FAILURE_RATIO(20%)를 넘으면 그 위의
+        하드스톱이 먼저 걸려 아무것도 반환하지 않는다. 여기서 재려는 것은 '세는가'이지
+        '중단하는가'가 아니므로(그건 아래 test_too_many_page_failures_aborts 의 몫)
+        1/6 = 16.7% 로 상한 아래에 둔다."""
+        self._stub(6, {p: [_doc(f"doc{p}")] for p in range(1, 7)}, fail_pages={2})
         docs, reject = fdr.collect_documents("u", "k", min_findings=3, page_size=10,
                                              log=lambda m: None)
-        self.assertEqual(len(docs), 2)
+        self.assertEqual(len(docs), 5)
         self.assertEqual(self.calls[2], fdr.PAGE_ATTEMPTS)
         self.assertEqual(sum(v for k, v in reject.items() if "페이지 조회 실패" in k), 1)
 

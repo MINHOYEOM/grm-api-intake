@@ -2353,6 +2353,12 @@
     "시판 후 안전관리 정보 모니터링 체계 확인",
     "동일 사유 재공지 여부(문서번호 중복) 확인"
    ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "200407515",
+    "bizrno": "1358153118"
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

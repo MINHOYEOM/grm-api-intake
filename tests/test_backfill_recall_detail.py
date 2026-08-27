@@ -32,7 +32,7 @@ class MhraRetroScopeTest(unittest.TestCase):
 
     def test_recall_uk_card_gets_detail(self):
         brief = {"cards": [_card("aaa111", "Recall(UK)")]}
-        details, no_raw, no_detail = b.build_details(
+        details, no_raw, no_detail, multi = b.build_details(
             brief, {"aaa111": {"mhra_alert_body": _BODY}})
         self.assertEqual(list(details), ["aaa111"])
         self.assertEqual(details["aaa111"]["type"], "mhra_recall_alert")
@@ -43,7 +43,7 @@ class MhraRetroScopeTest(unittest.TestCase):
         """#399(2026-07-22) 이전 발행분은 card_type 이 규제 소식이다 — 문서번호로 구제."""
         cid = sorted(b._PRE_399_MHRA_RECALL_IDS)[0]
         brief = {"cards": [_card(cid, "규제 소식")]}
-        details, _, _ = b.build_details(brief, {cid: {"mhra_alert_body": _BODY}})
+        details, _, _, _ = b.build_details(brief, {cid: {"mhra_alert_body": _BODY}})
         self.assertEqual(list(details), [cid])
 
     def test_other_news_card_never_gets_recall_detail(self):
@@ -51,7 +51,7 @@ class MhraRetroScopeTest(unittest.TestCase):
 
         '규제 소식'을 _PRODUCERS 에 넣었다면 이 테스트가 빨개진다(무관한 뉴스 카드 오염)."""
         brief = {"cards": [_card("zzz999", "규제 소식")]}
-        details, no_raw, no_detail = b.build_details(
+        details, no_raw, no_detail, multi = b.build_details(
             brief, {"zzz999": {"mhra_alert_body": _BODY}})
         self.assertEqual(details, {})
         self.assertEqual((no_raw, no_detail), ([], []))
@@ -59,18 +59,18 @@ class MhraRetroScopeTest(unittest.TestCase):
     def test_existing_detail_is_not_overwritten(self):
         brief = {"cards": [_card("aaa111", "Recall(UK)",
                                  deterministic_detail={"type": "already", "body": "keep"})]}
-        details, _, _ = b.build_details(brief, {"aaa111": {"mhra_alert_body": _BODY}})
+        details, _, _, _ = b.build_details(brief, {"aaa111": {"mhra_alert_body": _BODY}})
         self.assertEqual(details, {})
 
     def test_missing_body_yields_no_empty_block(self):
         brief = {"cards": [_card("aaa111", "Recall(UK)")]}
-        details, no_raw, no_detail = b.build_details(brief, {"aaa111": {"title": "no body"}})
+        details, no_raw, no_detail, multi = b.build_details(brief, {"aaa111": {"title": "no body"}})
         self.assertEqual(details, {})
         self.assertEqual(no_detail, ["aaa111"])
 
     def test_detail_lands_right_after_checks(self):
         brief = {"cards": [_card("aaa111", "Recall(UK)", sources={"official_url": "u"})]}
-        details, _, _ = b.build_details(brief, {"aaa111": {"mhra_alert_body": _BODY}})
+        details, _, _, _ = b.build_details(brief, {"aaa111": {"mhra_alert_body": _BODY}})
         self.assertEqual(b.apply_details(brief, details), 1)
         keys = list(brief["cards"][0])
         self.assertEqual(keys[keys.index("checks") + 1], "deterministic_detail")
@@ -125,6 +125,49 @@ class MhraDetailTypeClassificationTest(unittest.TestCase):
         facts = {"id": "bbb222",
                  "deterministic_detail": {"type": "hc_recall_detail", "action": "quarantine"}}
         self.assertFalse(apb._card_has_source_body(facts))
+
+
+class MultiItemCardGuardTest(unittest.TestCase):
+    """★한 장이 여러 품목을 덮는 카드에 단일 레코드 상세를 붙이지 않는다.
+
+    식약처 상세는 "품목·업체 식별코드"(ITEM_SEQ·STD_CD)라는 품목 단위 주장을 화면에 낸다.
+    실측: 카드 recall-709cff0f6b75 는 글로틴듀오정 3용량을 한 장으로 덮는데 원천은 품목마다
+    별개 행이고 코드가 전부 다르다 — 하나를 붙이면 나머지 두 품목은 그 코드로 조회되지 않는다.
+    카드 최상위 merged_count 는 1 이라 그것으로는 못 거른다(병합이 상류에서 일어났다)."""
+
+    _RAW = {"ENFRC_YN": "N", "ITEM_SEQ": "202001274", "STD_CD": "8806625045509",
+            "BIZRNO": "3018125427"}
+
+    def test_multi_item_card_is_skipped_and_reported(self):
+        brief = {"cards": [_card("multi1", "회수·판매중지",
+                                 headline_target="글로틴듀오정2.5/500mg 외 2품목",
+                                 merged_count=1)]}
+        details, no_raw, no_detail, multi = b.build_details(brief, {"multi1": self._RAW})
+        self.assertEqual(details, {})
+        self.assertEqual(multi, ["multi1"])          # ★침묵 skip 금지
+        self.assertEqual((no_raw, no_detail), ([], []))
+
+    def test_multi_item_detected_from_product_fact_too(self):
+        brief = {"cards": [_card("multi2", "회수·판매중지", headline_target="(주)넥스팜코리아",
+                                 facts=[{"label": "제품", "value": "글로틴듀오정 외 2품목"}])]}
+        _, _, _, multi = b.build_details(brief, {"multi2": self._RAW})
+        self.assertEqual(multi, ["multi2"])
+
+    def test_single_item_card_still_gets_detail(self):
+        """음성 검사 — 가드가 정상 카드를 훔치지 않는가(과잉 차단 방지)."""
+        brief = {"cards": [_card("solo1", "회수·판매중지",
+                                 headline_target="클린방수밴드(1회용)",
+                                 facts=[{"label": "제품", "value": "클린방수밴드(1회용)"}])]}
+        details, _, _, multi = b.build_details(brief, {"solo1": self._RAW})
+        self.assertEqual(multi, [])
+        self.assertEqual(details["solo1"]["type"], "mfds_recall_detail")
+
+    def test_plain_number_in_title_is_not_multi(self):
+        """'외 N품목' 어형만 잡는다 — 용량 숫자(2.5/500mg)에 걸리면 안 된다."""
+        brief = {"cards": [_card("solo2", "회수·판매중지",
+                                 headline_target="글로틴듀오정2.5/500mg(리나글립틴)")]}
+        _, _, _, multi = b.build_details(brief, {"solo2": self._RAW})
+        self.assertEqual(multi, [])
 
 
 if __name__ == "__main__":

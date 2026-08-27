@@ -1387,6 +1387,51 @@
     "주사제 1차 용기(유리 바이알) 이물 검사 및 100% AVI(자동 이물검사) 운용 여부",
     "유리 이물 발생 위험 공정(충전·봉함) CCP 관리 적정성"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "E-Mail",
+    "notification_ko": "이메일",
+    "quantity": "675 vials",
+    "distribution": "U.S. Nationwide",
+    "code_info": "Lot HAG2581B, expires: 05/31/2027",
+    "firm_location": "Princeton, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-12"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-05"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "DOXORUBICIN HYDROCHLORIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "DOXORUBICIN HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "INTRAVENOUS"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA203263"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1455,6 +1500,51 @@
     "둘록세틴 등 아민 계열 API 제제의 N-nitroso 불순물 위험평가 현행화 여부",
     "FDA 권고 N-nitrosamine 임시 한도 적용 현황 및 출하시험 기준 검토"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "14,729 bottles.",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lot: 241180C, Exp. Date April 2027.",
+    "firm_location": "Berkeley Heights, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-08"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "DULOXETINE"
+     },
+     {
+      "label": "성분명",
+      "value": "DULOXETINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA203088"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1523,6 +1613,51 @@
     "동일 원료/공정을 공유하는 다강도 품목의 N-nitroso 불순물 일괄 재평가 여부",
     "CAPA의 근본 원인 대응 범위가 개별 LOT을 넘어 공정·원료 레벨까지 포함하는지 여부"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "359,676 bottles",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lot: a) 241074C, Exp. Date May 2027; 240317, 240318, 240315C, 240373C, 240370C, 240375C, 240413C, Exp. Date February 2027; 240316,Exp. Date January 2027; 232311, Exp. Date November 2026; b) 240978C, 241052C, Exp. Date April 2027.",
+    "firm_location": "Berkeley Heights, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-08"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "DULOXETINE"
+     },
+     {
+      "label": "성분명",
+      "value": "DULOXETINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA203088"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1591,6 +1726,33 @@
     "포장 설비 냉각·윤활 시스템의 정기 점검 및 누출 감지 절차",
     "설비 유지보수 이력 기록과 제품 오염 위험 평가 연계 체계"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Press Release",
+    "notification_ko": "보도자료",
+    "quantity": "35,883 boxes/carton",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lots: a) TL8K, YH9X, YH9Y, Exp. Date. 30Nov2028; b) X78N, Exp. Date 30Nov2028.",
+    "firm_location": "Warren, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-04"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-17"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1659,6 +1821,55 @@
     "제조 환경 소독제(알코올, IPA 등) 구매·입고 시 미생물 한도 시험 실시 여부",
     "무균 제조 구역 사용 소독제 공급업체 품질 자격 검증 체계"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "5 drums",
+    "distribution": "US Nationwide.",
+    "code_info": "Batch # E2612116, Exp Date: April 2029.",
+    "firm_location": "Emerson, GA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-22"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-10"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "ZEP ALCOHOL SANITIZER"
+     },
+     {
+      "label": "성분명",
+      "value": "ETHANOL"
+     },
+     {
+      "label": "주성분",
+      "value": "ALCOHOL"
+     },
+     {
+      "label": "투여경로",
+      "value": "TOPICAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "505G(a)(3)"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1727,6 +1938,51 @@
     "Extended-Release 제형 안정성 시험 용출 규격 및 OOS 처리 절차",
     "장기안정성 중간 시점 OOS 발생 시 시장 조치 기준 및 의사결정 체계"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "E-Mail",
+    "notification_ko": "이메일",
+    "quantity": "2,961 bottles",
+    "distribution": "Within the U.S Market.",
+    "code_info": "Lots: GS065128, GS065844, GS066695, GS067432, GS067993, expires: 01/31/2027.",
+    "firm_location": "Camarillo, CA, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-29"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-11"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "NIACIN"
+     },
+     {
+      "label": "성분명",
+      "value": "NIACIN"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA203899"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1795,6 +2051,51 @@
     "ER 항생제 제형 안정성 시험 중간 시점별 용출 추이 모니터링 및 OOS 대응 절차",
     "OOS 발생 시 시장 조치 결정 기한 및 규제 보고 절차 적정성"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "quantity": "360 30-count bottles",
+    "distribution": "Nationwide in the USA",
+    "code_info": "Lot#  25141635, Exp 4/30/2028",
+    "firm_location": "Bedminster, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-06-01"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-17"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "MINOCYCLINE HYDROCHLORIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "MINOCYCLINE HYDROCHLORIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "ORAL"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA204453"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {
@@ -1863,6 +2164,50 @@
     "흡입 현탁액(착색) 제형의 이물 검사 방법론 및 감도 타당성",
     "무균 앰풀 충전·봉함 공정의 이물 위험 관리 절차"
    ],
+   "deterministic_detail": {
+    "type": "openfda_recall_detail",
+    "status": "Ongoing",
+    "status_ko": "진행 중",
+    "initiation": "Voluntary: Firm initiated",
+    "initiation_ko": "자진회수 (업체 착수)",
+    "notification": "Letter",
+    "notification_ko": "서한",
+    "distribution": "Nationwide within the United States",
+    "code_info": "Lot #: BAG0074A, Exp. Date: 1/31/2027.",
+    "firm_location": "Princeton, NJ, United States",
+    "timeline": [
+     {
+      "label": "회수 착수",
+      "date": "2026-05-29"
+     },
+     {
+      "label": "FDA 등급 확정",
+      "date": "2026-06-18"
+     },
+     {
+      "label": "FDA 공표",
+      "date": "2026-06-17"
+     }
+    ],
+    "product": [
+     {
+      "label": "브랜드명",
+      "value": "BUDESONIDE"
+     },
+     {
+      "label": "성분명",
+      "value": "BUDESONIDE"
+     },
+     {
+      "label": "투여경로",
+      "value": "RESPIRATORY (INHALATION)"
+     },
+     {
+      "label": "허가번호",
+      "value": "ANDA211922"
+     }
+    ]
+   },
    "merged_count": 1,
    "merged_items": [],
    "sources": {

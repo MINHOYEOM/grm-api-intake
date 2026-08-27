@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from typing import Any
 
@@ -57,15 +58,38 @@ _PRODUCERS = {
 # (1회성 소급이라 목록이 낡을 자리가 없다 — 새 발행분은 전부 Recall(UK) 로 나온다).
 _PRE_399_MHRA_RECALL_IDS = {"93f98fe39f5c", "625fc2215ae3"}
 
+# ★한 장이 여러 품목을 덮는 카드에는 **단일 레코드 상세를 붙이지 않는다.**
+# 식약처 상세는 "품목·업체 식별코드"(ITEM_SEQ·STD_CD) 라는 **품목 단위 주장**을 화면에 낸다.
+# 실측 사례(2026-08-27): 카드 `recall-709cff0f6b75` 는 글로틴듀오정 2.5/500·850·1000mg
+# 3품목을 한 장으로 덮는데, 원천은 품목마다 별개 행이고 ITEM_SEQ/STD_CD 가 전부 다르다
+# (202001274/5/6). 그중 하나를 붙이면 읽는 사람은 그 코드를 카드 전체의 것으로 받는다 —
+# 나머지 두 품목은 그 코드로 조회되지 않는다. ENFRC_YN·BIZRNO 는 3건 동일하지만, 공통분만
+# 골라 싣는 것은 **운영 producer 가 결코 만들지 않는 산출**이라 이 CLI 의 원칙(운영 producer
+# 를 그대로 호출)에 어긋난다. 그래서 붙이지 않고 **건너뛴 사실을 보고**한다.
+#
+# 카드 최상위 `merged_count` 로는 못 거른다 — 이 병합은 카드 병합 기계가 아니라 상류에서
+# 일어나 값이 1 이다(그래서 렌더러의 "대표 품목 1건 기준" 안내도 뜨지 않는다).
+_MULTI_ITEM_RE = re.compile(r"외\s*\d+\s*품목")
 
-def build_details(brief: dict[str, Any], raws: dict[str, Any]) -> tuple[dict, list, list]:
-    """카드별 결정론 상세 산출. 반환 = (id→detail, 원천없음, 상세없음).
+
+def _covers_multiple_items(card: dict[str, Any]) -> bool:
+    """카드가 제목/제품 표기로 복수 품목을 덮는다고 말하고 있는가."""
+    parts = [str(card.get("headline_target") or "")]
+    for fact in (card.get("facts") or []):
+        if isinstance(fact, dict) and fact.get("label") in ("제품", "품목"):
+            parts.append(str(fact.get("value") or ""))
+    return any(_MULTI_ITEM_RE.search(t) for t in parts)
+
+
+def build_details(brief: dict[str, Any], raws: dict[str, Any]) -> tuple[dict, list, list, list]:
+    """카드별 결정론 상세 산출. 반환 = (id→detail, 원천없음, 상세없음, 복수품목).
 
     이미 `deterministic_detail` 이 있는 카드는 건드리지 않는다(덮어쓰기는 이 도구의 일이 아니다).
     원천이 없거나 producer 가 None 을 돌려주면 그 카드는 그대로 둔다 — 빈 블록을 만들지 않는다."""
     details: dict[str, Any] = {}
     no_raw: list[str] = []
     no_detail: list[str] = []
+    multi_item: list[str] = []
     for card in (brief.get("cards") or []):
         if not isinstance(card, dict):
             continue
@@ -79,12 +103,15 @@ def build_details(brief: dict[str, Any], raws: dict[str, Any]) -> tuple[dict, li
         if not isinstance(raw, dict):
             no_raw.append(doc_id)
             continue
+        if _covers_multiple_items(card):          # 위 주석 — 단일 레코드로 못 덮는다
+            multi_item.append(doc_id)
+            continue
         detail = fn({}, raw)
         if not detail:
             no_detail.append(doc_id)
             continue
         details[doc_id] = detail
-    return details, no_raw, no_detail
+    return details, no_raw, no_detail, multi_item
 
 
 def apply_details(brief: dict[str, Any], details: dict[str, Any]) -> int:
@@ -130,20 +157,24 @@ def main(argv: "list[str] | None" = None) -> int:
     with open(args.raw, encoding="utf-8") as fh:
         raws = json.load(fh)
 
-    details, no_raw, no_detail = build_details(brief, raws)
+    details, no_raw, no_detail, multi_item = build_details(brief, raws)
     total = sum(1 for c in (brief.get("cards") or [])
                 if isinstance(c, dict) and c.get("card_type") in _PRODUCERS)
     if not details:
         print(f"[FAIL] 병합 대상 0건(회수 카드 {total} · 원천없음 {len(no_raw)} · "
-              f"상세없음 {len(no_detail)})")
+              f"상세없음 {len(no_detail)} · 복수품목 {len(multi_item)})")
         return 1
     applied = apply_details(brief, details)
     print(f"회수 카드 {total} · 상세 생성 {len(details)} · 병합 {applied} · "
-          f"원천없음 {len(no_raw)} · 상세없음 {len(no_detail)}")
+          f"원천없음 {len(no_raw)} · 상세없음 {len(no_detail)} · "
+          f"복수품목 {len(multi_item)}")
     if no_raw:
         print(f"   원천없음: {no_raw[:8]}{' ...' if len(no_raw) > 8 else ''}")
     if no_detail:
         print(f"   상세없음: {no_detail[:8]}{' ...' if len(no_detail) > 8 else ''}")
+    if multi_item:                      # 침묵 skip 금지 — 건너뛴 사실을 반드시 말한다
+        print(f"   복수품목 skip(단일 레코드로 못 덮음): {multi_item[:8]}"
+              f"{' ...' if len(multi_item) > 8 else ''}")
     if not args.apply:
         print("(dry-run — 기록하지 않았다. 반영하려면 --apply)")
         return 0

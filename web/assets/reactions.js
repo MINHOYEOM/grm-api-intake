@@ -50,6 +50,13 @@
     document.querySelectorAll(".grm-card-actions[data-anchor]"));
   var myScrapsEl = document.getElementById("grm-my-scraps");   // /me 페이지 컨테이너(있으면 마이페이지)
   var myFirmsEl = document.getElementById("grm-my-firms");     // /me 관심 업체 컨테이너(015 워치리스트)
+  // [P2 관심 범위 · 067] /me 관심 범위 컨테이너 + 어휘(render 가 facets 정본에서 심음).
+  var myIntEl = document.getElementById("grm-my-interests");
+  var intVocabEl = document.getElementById("grm-interest-vocab");
+  // [P2 개인화] 둘러보기 첫 화면의 '내 범위의 최근 공개'(기본 hidden).
+  var mineEl = document.getElementById("fnd-mine");
+  var mineSubEl = document.getElementById("fnd-mine-sub");
+  var mineListEl = document.getElementById("fnd-mine-list");
   // 로그인/계정 UI(renderAuth)는 카드 유무와 무관하게 모든 페이지 헤더에 필요하므로 조기 종료하지 않는다.
   // (카드 반응·집계는 rows, 마이페이지는 myScrapsEl 로 각각 개별 가드된다.)
   var ids = rows.map(function (r) { return r.getAttribute("data-anchor"); }).filter(Boolean);
@@ -716,6 +723,122 @@
       });
   }
 
+  // ── [P2 관심 범위 · 067] /me 에서 축을 고르고 해제한다 ────────────────────
+  // 015 워치리스트와 같은 계약: 로그인 상태에서만 동작하고, 067 미적용(테이블 부재 →
+  // PostgREST 오류)·네트워크 실패는 오류처럼 보이지 않는 노트로 조용히 폴백한다.
+  var INT_KIND_LABEL = { agency: "규제기관", category: "지적 분류", country: "제조소 국가" };
+
+  function intVocab() {
+    if (!intVocabEl) return [];
+    return Array.prototype.map.call(intVocabEl.querySelectorAll("span"), function (el) {
+      return { kind: el.getAttribute("data-kind"), value: el.getAttribute("data-value"),
+               label: el.textContent || "" };
+    });
+  }
+
+  function renderMyInterests() {
+    if (!myIntEl) return;
+    if (!session || !session.user) {
+      myIntEl.innerHTML = '<p class="grm-my-note">로그인하면 관심 범위를 저장할 수 있어요.</p>';
+      return;
+    }
+    var vocab = intVocab();
+    if (!vocab.length) {
+      myIntEl.innerHTML = '<p class="grm-my-note">관심 범위 준비 중입니다.</p>';
+      return;
+    }
+    myIntEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
+    sb.from("user_interest").select("kind,value")
+      .then(function (res) {
+        if (res && res.error) {
+          myIntEl.innerHTML = '<p class="grm-my-note">관심 범위 준비 중입니다.</p>';
+          return;
+        }
+        var on = {};
+        (res && res.data ? res.data : []).forEach(function (r) { on[r.kind + "|" + r.value] = 1; });
+        myIntEl.innerHTML = "";
+        ["agency", "category", "country"].forEach(function (kind) {
+          var items = vocab.filter(function (v) { return v.kind === kind; });
+          if (!items.length) return;
+          var grp = document.createElement("div"); grp.className = "grm-int-grp";
+          var h = document.createElement("p"); h.className = "grm-int-h";
+          h.textContent = INT_KIND_LABEL[kind] || kind;
+          grp.appendChild(h);
+          var wrap = document.createElement("div"); wrap.className = "grm-int-chips";
+          items.forEach(function (v) {
+            var b = document.createElement("button");
+            b.type = "button"; b.className = "grm-int-chip";
+            b.textContent = v.label;
+            var key = v.kind + "|" + v.value;
+            b.setAttribute("aria-pressed", on[key] ? "true" : "false");
+            b.addEventListener("click", function () { toggleInterest(b, v, !!on[key], on); });
+            wrap.appendChild(b);
+          });
+          grp.appendChild(wrap); myIntEl.appendChild(grp);
+        });
+      })
+      .catch(function () {
+        myIntEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>';
+      });
+  }
+
+  function toggleInterest(btn, v, isOn, onMap) {
+    if (!session || !session.user) return;
+    btn.disabled = true;
+    var key = v.kind + "|" + v.value;
+    var q = isOn
+      ? sb.from("user_interest").delete().match({ user_id: session.user.id, kind: v.kind, value: v.value })
+      : sb.from("user_interest").insert({ user_id: session.user.id, kind: v.kind, value: v.value });
+    q.then(function (res) {
+      btn.disabled = false;
+      // 상한 초과(067 트리거)·중복 등 서버가 거절하면 상태를 바꾸지 않는다.
+      if (res && res.error) return;
+      if (isOn) { delete onMap[key]; } else { onMap[key] = 1; }
+      btn.setAttribute("aria-pressed", isOn ? "false" : "true");
+    }).catch(function () { btn.disabled = false; });
+  }
+
+  // ── [P2 개인화] 둘러보기 첫 화면 — 내 범위의 최근 공개 ────────────────────
+  // 기본은 **없는 것처럼** 동작한다. 로그인 + 등록된 범위가 있고 실제로 걸린 문서가
+  // 있을 때만 펼친다 — 게스트·미등록·067 미적용·RPC 실패는 전부 hidden 유지다.
+  function renderMineRecent() {
+    if (!mineEl || !mineListEl) return;
+    if (!session || !session.user) { mineEl.hidden = true; return; }
+    sb.rpc("findings_my_recent", { p_limit: 6 })
+      .then(function (res) {
+        if (!res || res.error || !res.data || !res.data.length) { mineEl.hidden = true; return; }
+        mineListEl.innerHTML = "";
+        res.data.forEach(function (d) {
+          var a = document.createElement("a");
+          a.className = "fnd-rc-row";
+          a.href = cfgRoot + "findings/index.html?q=" + encodeURIComponent(d.firm_name || "");
+          var head = document.createElement("span"); head.className = "fnd-rc-head";
+          var dt = document.createElement("span"); dt.className = "fnd-rc-date";
+          dt.textContent = String(d.published_date || "").slice(0, 10);
+          var src = document.createElement("span"); src.className = "fnd-rc-src";
+          src.textContent = d.source || d.agency || "";
+          var fm = document.createElement("span"); fm.className = "fnd-rc-firm";
+          fm.textContent = decodeFirmDisplay(d.firm_name || "");
+          head.appendChild(dt); head.appendChild(src); head.appendChild(fm);
+          var cats = (d.categories || []).filter(Boolean);
+          if (cats.length) {
+            var c = document.createElement("span"); c.className = "fnd-rc-cats";
+            c.textContent = "지적 " + (d.obs_cnt || 0) + "건";
+            head.appendChild(c);
+          }
+          a.appendChild(head);
+          mineListEl.appendChild(a);
+        });
+        if (mineSubEl) {
+          mineSubEl.textContent =
+            "마이페이지에서 고른 관심 범위와 관심 업체에 걸린 최근 공개입니다. " +
+            "날짜는 실사한 날이 아니라 문서가 공개된 날입니다.";
+        }
+        mineEl.hidden = false;
+      })
+      .catch(function () { mineEl.hidden = true; });
+  }
+
   // ── 배선 ─────────────────────────────────────────────────────────────────
   document.body.classList.add("grm-reactions-on");
   rows.forEach(function (row) {
@@ -725,10 +848,10 @@
   });
   sb.auth.getSession().then(function (res) {
     session = (res && res.data) ? res.data.session : null;
-    renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms();
-  }).catch(function () { renderAuth(); renderMyScraps(); renderMyFirms(); });
+    renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
+  }).catch(function () { renderAuth(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
-    session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms();
+    session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
     if (s && s.user) { clearSignupProgress(); closeLogin(); }   // 세션 성립 = 가입 흐름 종료
   });
   if (rows.length) loadCounts();

@@ -41,6 +41,22 @@
   {#- 관심 업체(015_firm_watchlist.sql) — 스크랩 목록과 동일 관례: 셸은 로딩 노트만,
       목록은 reactions.js(renderMyFirms)가 런타임 렌더. 015 미적용/비로그인 방어도
       스크랩 섹션과 동형(오류처럼 보이지 않는 노트로 조용히 폴백). -#}
+  {#- [P2 관심 범위 · 067] 업체보다 넓은 축(기관·분류·국가). 워치리스트와 같은 관례 —
+      셸은 로딩 노트만이고 목록·추가·해제는 reactions.js(renderMyInterests)가 런타임에
+      그린다. 067 미적용/비로그인이면 오류처럼 보이지 않는 노트로 조용히 폴백한다.
+      ★여기서 고른 축은 둘러보기 첫 화면의 '내 범위의 최근 공개'가 읽는 입력이다. -#}
+  <h2 class="grm-my-h2">관심 범위</h2>
+  <p class="grm-my-sub">기관·분류·국가를 골라 두면 둘러보기 첫 화면이 그 범위의 최근 공개부터 보여줍니다.</p>
+  <div id="grm-my-interests">
+    <p class="grm-my-note">불러오는 중…</p>
+  </div>
+  {#- 선택지 어휘 — render 가 facets 정본에서 심는다(JS 사전 복제 0). reactions.js 가
+      이 블록을 읽어 토글을 만든다. 어휘가 없으면(정본 부재) 블록 자체가 비고, JS 는
+      "준비 중" 노트로 조용히 폴백한다. -#}
+  <div id="grm-interest-vocab" hidden>
+    {%- for v in interest_vocab | default([]) %}<span data-kind="{{ v.kind }}" data-value="{{ v.value }}">{{ v.label }}</span>{% endfor %}
+  </div>
+
   <h2 class="grm-my-h2">관심 업체</h2>
   <p class="grm-my-sub">등록한 업체의 새 규제 이력을 프로파일에서 확인할 수 있습니다.</p>
   <div id="grm-my-firms">
@@ -60,6 +76,14 @@
 .me-growth-go{margin:12px 0 0}
 .me-growth-go a{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
 .me-growth-go a:hover{color:var(--coral)}
+/* [P2 관심 범위] 축별 토글 칩 — grm.css 토큰만(프리즈 보존)·자간/대문자/mono 미사용(§4). */
+.grm-int-grp{margin:0 0 14px}
+.grm-int-h{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 7px}
+.grm-int-chips{display:flex;flex-wrap:wrap;gap:7px}
+.grm-int-chip{font:inherit;font-size:12.5px;line-height:1;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill,999px);padding:7px 13px;cursor:pointer}
+.grm-int-chip:hover{border-color:var(--coral)}
+.grm-int-chip[aria-pressed="true"]{color:var(--on-coral,#fff);background:var(--coral);border-color:var(--coral);font-weight:600}
+.grm-int-chip:disabled{opacity:.55;cursor:default}
 /* 게스트 계정 카드 — 로그인 카드(.grm-me-card)와 같은 골격에 안내문 + CTA 2개. */
 .grm-me-guest-s{font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);margin:6px 0 0}
 .grm-me-guest .grm-me-metaline{flex-wrap:wrap;margin-top:10px}

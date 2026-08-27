@@ -14,12 +14,10 @@ name: GRM GMP Redaction Guard Verify (corpus)
 #   프록시 없이 돌리면 전건 download 실패로 "0건 통과"처럼 보이므로, 아래 0건 가드가 막는다.
 # ★git 쓰기 없음 · Notion 무접촉 · DB 는 읽기만(발행 파이프라인 무간섭).
 on:
-  # ⛔ 임시 — 머지 전에 반드시 지운다.
-  # `workflow_dispatch` 는 **기본 브랜치에 있는 워크플로만** 디스패치할 수 있어서(HTTP 404)
-  # 새 워크플로는 머지 전에 돌려 볼 방법이 이것뿐이다. 채택 근거(코퍼스 실측)를 머지 전에
-  # 확보하기 위한 일시 트리거이고, 머지 후에는 dispatch 로만 돈다.
-  push:
-    branches: ['fix/gmp-deficiency-redaction-guard']
+  # ★머지 전 실측은 이 브랜치 한정 `push` 트리거를 임시로 달아 돌렸다(2026-08-27,
+  #   run 33063283255) — `workflow_dispatch` 는 **기본 브랜치에 있는 워크플로만**
+  #   디스패치할 수 있어(HTTP 404) 새 워크플로는 그 방법밖에 없다. 근거를 확보한 뒤
+  #   트리거는 도로 뺐다. 이후에는 dispatch 로만 돈다(전건 194문서 다운로드가 9분).
   workflow_dispatch:
     inputs:
       group:

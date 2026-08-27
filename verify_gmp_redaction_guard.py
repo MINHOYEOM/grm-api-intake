@@ -142,19 +142,49 @@ def _fingerprint(rows: list[dict[str, str]]) -> str:
     ).hexdigest()
 
 
-def _extract_both(data: bytes) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
-    """(baseline, guarded) — 같은 바이트·같은 프로세스에서 가드만 켜고 끈다."""
-    guarded = g._extract_deficiency_table(data)
+# 가드는 두 규칙의 합이다(벡터 막대 / 텍스트층 `0000…`). 네 조합을 다 뽑아야 **어느
+# 규칙이 어느 행을 먹었는지** 귀속된다 — 합계만 세면 "13문서냐 14문서냐" 같은 물음에
+# 답할 수 없고, 이 저장소에서 같은 결손을 세 번 다르게 센 전례가 있다.
+_VARIANTS = (("baseline", False, False), ("bars_only", True, False),
+             ("zero_only", False, True), ("guarded", True, True))
 
-    bars, masked = g._pdf_redaction_bars, g._is_zero_masked
+
+def _extract_variants(data: bytes) -> dict[str, list[dict[str, str]]]:
+    """규칙 조합별 산출 — 같은 바이트·같은 프로세스에서 규칙만 켜고 끈다."""
+    real_bars, real_masked = g._pdf_redaction_bars, g._is_zero_masked
+    out: dict[str, list[dict[str, str]]] = {}
     try:
-        g._pdf_redaction_bars = lambda _page: []      # type: ignore[assignment]
-        g._is_zero_masked = lambda _value: False      # type: ignore[assignment]
-        baseline = g._extract_deficiency_table(data)
+        for name, bars_on, zero_on in _VARIANTS:
+            g._pdf_redaction_bars = (                 # type: ignore[assignment]
+                real_bars if bars_on else (lambda _page: []))
+            g._is_zero_masked = (                     # type: ignore[assignment]
+                real_masked if zero_on else (lambda _value: False))
+            out[name] = g._extract_deficiency_table(data)
     finally:
-        g._pdf_redaction_bars = bars                  # type: ignore[assignment]
-        g._is_zero_masked = masked                    # type: ignore[assignment]
-    return baseline, guarded
+        g._pdf_redaction_bars = real_bars             # type: ignore[assignment]
+        g._is_zero_masked = real_masked               # type: ignore[assignment]
+    return out
+
+
+def _redaction_census(data: bytes) -> dict[str, int]:
+    """원문 사실 그대로의 가림막 통계 — 표 산출과 무관하게 **전 페이지**를 센다.
+
+    "가려진 단어를 가진 문서 수"의 분모는 표가 잡힌 페이지가 아니라 문서 전체다
+    (`_extract_deficiency_table` 은 비용 때문에 표가 있는 페이지만 본다).
+    """
+    import fitz  # type: ignore[import-not-found]
+    pages, bars, covered = 0, 0, 0
+    with fitz.open(stream=data, filetype="pdf") as doc:
+        if doc.needs_pass or doc.is_encrypted:
+            return {"pages_with_bars": 0, "bars": 0, "covered_words": 0}
+        for page in doc:
+            page_bars = g._pdf_redaction_bars(page)
+            if not page_bars:
+                continue
+            pages += 1
+            bars += len(page_bars)
+            covered += len(g._pdf_covered_word_rects(page, page_bars))
+    return {"pages_with_bars": pages, "bars": bars, "covered_words": covered}
 
 
 def _is_subsequence(small: list[dict[str, str]], big: list[dict[str, str]]) -> bool:
@@ -189,11 +219,13 @@ def verify_document(entry: dict[str, Any], *, delay: float,
         return result
 
     try:
-        baseline, guarded = _extract_both(data)
+        variants = _extract_variants(data)
+        census = _redaction_census(data)
     except Exception as exc:                          # noqa: BLE001
         result["error"] = f"extract:{type(exc).__name__}"
         return result
 
+    baseline, guarded = variants["baseline"], variants["guarded"]
     result.update({
         "baseline_rows": len(baseline),
         "guarded_rows": len(guarded),
@@ -205,6 +237,10 @@ def verify_document(entry: dict[str, Any], *, delay: float,
             [{k: str(row.get(k, "")) for k in g._DEFICIENCY_FIELDS}
              for row in entry["stored"] if isinstance(row, dict)]),
         "dropped": [row for row in baseline if row not in guarded],
+        # 규칙별 귀속 — 한 행이 두 규칙에 다 걸릴 수 있으므로 합계가 total 과 다를 수 있다.
+        "dropped_by_bars": len(baseline) - len(variants["bars_only"]),
+        "dropped_by_zero": len(baseline) - len(variants["zero_only"]),
+        **census,
     })
     return result
 
@@ -219,6 +255,10 @@ def render(results: list[dict[str, Any]]) -> tuple[str, bool]:
     drifted = [r for r in ok if r["group"] == "CONTROL" and not r["reproduces_stored"]]
     dropped_rows = sum(len(r["dropped"]) for r in changed)
 
+    with_bars = [r for r in ok if r.get("covered_words", 0) > 0]
+    by_bars = [r for r in ok if r.get("dropped_by_bars", 0) > 0]
+    by_zero = [r for r in ok if r.get("dropped_by_zero", 0) > 0]
+
     lines = [
         "## GMP 지적 표 가림막 가드 — 회귀 코퍼스 실측",
         "",
@@ -227,13 +267,24 @@ def render(results: list[dict[str, Any]]) -> tuple[str, bool]:
         f"- **산출 불변**: {len(ok) - len(changed)}문서 지문 동일",
         f"- **가드 발동**: {len(changed)}문서에서 {dropped_rows}행 제외",
         "",
+        "### 규칙별 귀속 (한 행이 두 규칙에 다 걸릴 수 있어 합계는 총계와 다르다)",
+        "",
+        f"- 가려진 단어를 **가진** 문서(표 산출과 무관·전 페이지): **{len(with_bars)}**",
+        f"- 벡터 막대 규칙이 행을 먹은 문서: **{len(by_bars)}** "
+        f"({sum(r['dropped_by_bars'] for r in by_bars)}행)",
+        f"- 텍스트층 `0000…` 규칙이 행을 먹은 문서: **{len(by_zero)}** "
+        f"({sum(r['dropped_by_zero'] for r in by_zero)}행)",
+        "",
     ]
     if changed:
         lines += ["### 가드가 행을 제외한 문서", "",
-                  "| document_id | baseline | guarded | 제외 |", "|---|---|---|---|"]
+                  "| document_id | baseline | guarded | 제외 | 막대 | 0마스크 | 가려진 단어 |",
+                  "|---|---|---|---|---|---|---|"]
         for r in sorted(changed, key=lambda x: x["document_id"]):
             lines.append(f"| {r['document_id']} | {r['baseline_rows']} | "
-                         f"{r['guarded_rows']} | {len(r['dropped'])} |")
+                         f"{r['guarded_rows']} | {len(r['dropped'])} | "
+                         f"{r['dropped_by_bars']} | {r['dropped_by_zero']} | "
+                         f"{r.get('covered_words', 0)} |")
         lines.append("")
     if broken:
         lines += ["### ❌ 부분수열 위반 — 가드가 행을 **고쳤다**(버리기만 해야 한다)", ""]

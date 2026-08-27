@@ -70,11 +70,14 @@
         <h2 class="fp-firm-name" id="fp-firm-name"></h2><div class="fp-watch" id="fp-watch" hidden></div>
       </div>
 
-      <section class="fp-stats" id="fp-stats" aria-label="핵심 통계"></section>
-
-      <section class="fp-block" aria-label="카테고리 구성">
-        <h2 class="fp-h">카테고리 구성</h2>
+      <section class="fp-stats" id="fp-stats" aria-label="핵심 통계"></section><section class="fp-block" aria-label="분류 구성">
+        <h2 class="fp-h">분류 구성</h2>
+        <p class="fp-note" id="fp-cat-note"></p>
         <div id="fp-cat" class="fp-cat"></div>
+      </section><section class="fp-block" id="fp-rep-block" aria-label="반복 확인된 영역" hidden>
+        <h2 class="fp-h">반복 확인된 영역</h2>
+        <p class="fp-note" id="fp-rep-note"></p>
+        <div id="fp-rep" class="fp-rep"></div>
       </section>
 
       <section class="fp-block" aria-label="연도 추이">
@@ -84,6 +87,7 @@
 
       <section class="fp-block" aria-label="문서 이력">
         <h2 class="fp-h">문서 이력</h2>
+        <div class="fp-filter" id="fp-filter" hidden></div>
         <div id="fp-docs" class="fp-docs"></div>
       </section><section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>
         <h2 class="fp-h">FDA GMP 실사 이력</h2>
@@ -171,6 +175,33 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fp-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
 .fp-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
 .fp-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+/* [P1 해석층] 행 옆 구성비 — 건수와 같은 트랙에 두되 한 단계 죽여 "몇 건"이 먼저 읽히게. */
+.fp-cat-share{flex:0 0 auto;min-width:42px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted-2)}
+/* [P1 해석층] 블록 머리 해석 문장 — 제목(.fp-h)과 본문 사이. */
+.fp-note{font-size:13px;line-height:1.7;color:var(--muted);margin:-8px 0 16px;word-break:keep-all}
+.fp-note b{color:var(--body-s);font-weight:600}
+/* [P1 해석층] 분류 행이 링크에서 **프로파일 안 필터 버튼**으로 바뀐다(신규 컴포넌트 0 —
+   .fp-cat-row 를 button 에 그대로 적용하기 위한 초기화만). */
+button.fp-cat-row{width:100%;font:inherit;text-align:left;background:transparent;border:0;cursor:pointer}
+button.fp-cat-row[aria-pressed="true"]{background:var(--coral-tint)}
+button.fp-cat-row[aria-pressed="true"] .fp-cat-label{color:var(--coral-2);font-weight:600}
+/* [P1 해석층] 반복 확인된 영역 — 분류명 + 문서 수 + 연도 알약. */
+.fp-rep{display:flex;flex-direction:column;gap:10px}
+.fp-rep-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;padding:11px 6px;border-top:1px solid var(--line)}
+.fp-rep-row:first-child{border-top:0}
+.fp-rep-name{font-size:14px;color:var(--ink);font-weight:600}
+.fp-rep-docs{font-family:var(--mono);font-size:12px;color:var(--coral-2)}
+.fp-rep-years{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
+.fp-rep-year{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:999px;padding:2px 8px}
+/* [P1 해석층] 활성 필터 칩 — findings.js .fnd-active-chip 의 어휘를 그대로 따른다. */
+.fp-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
+.fp-filter[hidden]{display:none}
+.fp-filter-chip{display:inline-flex;align-items:center;gap:6px;height:26px;font:inherit;font-size:12px;color:var(--ink);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;cursor:pointer;line-height:1}
+.fp-filter-chip:hover{border-color:var(--coral)}
+.fp-filter-chip .x{color:var(--muted);font-size:13px}
+.fp-filter-chip:hover .x{color:var(--coral)}
+.fp-filter-out{font-size:12.5px;color:var(--coral-2);font-weight:500}
+.fp-filter-out:hover{color:var(--coral)}
 
 /* 연도 추이 — trends.js 연도별 추이 관례 재사용(세로 미니 바). */
 .fp-year-bars{display:flex;align-items:flex-end;gap:8px}
@@ -296,7 +327,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/firm.js?v=6f3dafa3" defer></script>
+<script src="../../assets/firm.js?v=f70377b5" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

@@ -11760,10 +11760,13 @@ class WebDiscoveryHubTest(unittest.TestCase):
 
     # ── 프로파일 맥락 유지(소스 계약 — firm/inspector.js 는 비골든 런타임 파일) ──
     def test_profile_category_links_carry_context(self):
+        """맥락 유지 계약. q 병기는 **폴백 경로로 남는다** — 065 가 적용된 라이브에서는
+        프로파일 안에서 좁히고(WebProfileInterpretationTest), 065 미적용·구버전 응답에서만
+        이 링크로 내려간다. 두 경로 모두 프로파일 조건을 버리지 않는 것이 계약이다."""
         for name in ("inspector.js", "firm.js"):
             src = (WEB_DIR / "assets" / name).read_text(encoding="utf-8")
             self.assertIn('href += "&q=" + encodeURIComponent(qValue)', src, name)
-            self.assertRegex(src, r"buildCatRow\(c, maxCnt, \w+Name\)", name)
+            self.assertRegex(src, r"buildCatRow\(c, maxCnt, \w+Name, total\)", name)
 
     def test_deep_link_landing_scroll_removed_with_its_reason(self):
         """허브 착지 스크롤은 존재 이유(허브가 검색을 밀어내림)와 함께 사라져야 한다.
@@ -11774,6 +11777,163 @@ class WebDiscoveryHubTest(unittest.TestCase):
         self.assertNotIn('document.getElementById("fnd-search")', src)
         self.assertNotIn("searchSection.scrollIntoView()", src)
 
+
+# ── P1 해석층 (2026-08-27 — 마이그 065 + 프로파일 3종 개편) ─────────────────────
+class WebProfileInterpretationTest(unittest.TestCase):
+    """업체·실사관 프로파일이 원시 건수에서 **해석**으로 넘어갔는지 검증한다.
+
+    화면은 런타임 RPC 라 골든이 값을 고정하지 못한다 — 그래서 ①셸(신설 컨테이너)은 렌더
+    산출물에서, ②동작 계약은 JS 소스에서, ③마이그는 파일에서 각각 검사한다(037 정책
+    준수 여부는 음성 검사로 박는다)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_p1_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.firm = (cls.single / "findings" / "firm" / "index.html").read_text(encoding="utf-8")
+        cls.insp = (cls.single / "findings" / "inspector" / "index.html").read_text(encoding="utf-8")
+        cls.firm_js = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        cls.insp_js = (WEB_DIR / "assets" / "inspector.js").read_text(encoding="utf-8")
+        cls.mig = (WEB_DIR / "migrations" /
+                   "065_profile_categories_and_repeats.sql").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ★금지 어휘·유무 검사는 **주석을 걷어낸 코드**에서 해야 한다. 처음 이 클래스를 짤 때
+    #   원본 전체를 훑었더니 4건이 빨갛게 떴는데, 전부 "이 어휘를 쓰지 않는다"고 적어 둔
+    #   주석 자신이었다 — 그대로 뒀으면 **가드가 문서화를 처벌**해서, 다음 사람이 금지
+    #   이유를 지워야 초록이 되는 구조가 된다(정확히 반대로 가는 유인).
+    @staticmethod
+    def _js_code(src):
+        out = re.sub(r"/\*.*?\*/", "", src, flags=re.S)   # 블록 주석
+        return re.sub(r"^\s*//.*$", "", out, flags=re.M)  # 줄머리 주석(URL 의 // 는 보존)
+
+    @staticmethod
+    def _sql_code(sql):
+        return re.sub(r"--.*$", "", sql, flags=re.M)
+
+    @staticmethod
+    def _fn_body(src, header):
+        i = src.index(header)
+        return src[i:src.index("\n  }", i)]
+
+    # ── 셸 ──────────────────────────────────────────────────────────────────
+    def test_new_shells_rendered(self):
+        for html, prefix in ((self.firm, "fp"), (self.insp, "ip")):
+            self.assertIn(f'id="{prefix}-cat-note"', html)
+            self.assertIn(f'id="{prefix}-rep-block"', html)
+            self.assertIn(f'id="{prefix}-rep"', html)
+            self.assertIn(f'id="{prefix}-filter"', html)
+            # 빈 셸은 hidden 으로 나가야 한다(데이터 없으면 빈 껍데기 금지 관례).
+            self.assertIn(f'id="{prefix}-rep-block" aria-label="반복 확인된 영역" hidden', html)
+            self.assertIn(f'id="{prefix}-filter" hidden', html)
+
+    def test_shell_stays_deterministic(self):
+        """신설 셸에 실데이터가 새어 들어가지 않는다(런타임 주입 계약)."""
+        for html in (self.firm, self.insp):
+            self.assertRegex(html, r'id="[fi]p-rep"[^>]*></div>')
+            self.assertRegex(html, r'id="[fi]p-cat-note"[^>]*></p>')
+
+    # ── 마이그 065: 순수 가산 ────────────────────────────────────────────────
+    def test_migration_is_additive_only(self):
+        # 시그니처 무변경 — 인자가 하나만 달라도 PostgREST 가 404 를 준다(#681).
+        self.assertIn("findings_firm_profile(p_firm_key text)", self.mig)
+        self.assertIn("findings_inspector_profile(p_inspector_key text)", self.mig)
+        # 기존 키가 전부 재현돼 있어야 한다(create or replace 는 통짜 교체다).
+        for k in ("'totals'", "'by_category'", "'by_year'", "'by_source'", "'documents'",
+                  "'display_name'", "'firm_key'", "'inspector_key'"):
+            self.assertIn(k, self.mig, k)
+        # 신설 2키 — 두 함수에 하나씩(검증용 주석의 언급은 세지 않는다).
+        code = self._sql_code(self.mig)
+        self.assertEqual(code.count("'repeats'"), 2)
+        # 실사관 쪽은 주변 정렬에 맞춰 공백을 넓게 쓴다 — 공백에 관대하게 센다.
+        self.assertEqual(len(re.findall(r"'categories',\s+categories", code)), 2)
+        # 코호트 게이트(실사관 5문서 미만 null)는 그대로.
+        self.assertIn("< 5 then 'null'::jsonb", code)
+
+    def test_repeat_is_counted_by_documents_not_findings(self):
+        """반복의 정의가 **서로 다른 문서 수**여야 한다.
+
+        건수로 세면 한 문서 안에서 같은 분류로 5건이 잡힌 것이 '5회 반복'이 되어 버린다 —
+        그건 반복이 아니라 한 번의 실사다. 이 한 줄이 이 마이그레이션의 핵심이라 게이트로
+        박는다(누가 having count(*) 로 바꾸면 즉시 빨강)."""
+        code = self._sql_code(self.mig)
+        self.assertEqual(code.count("having count(distinct raw_signal_id) >= 2"), 2)
+        self.assertNotIn("having count(*) >= 2", code)
+        # 빈 분류는 조치로 이어지지 않으므로 반복에서 제외한다.
+        self.assertEqual(code.count("coalesce(category_code, '') <> ''"), 2)
+
+    # ── 동작 계약 ────────────────────────────────────────────────────────────
+    def test_in_profile_filter_replaces_leaving_the_page(self):
+        for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
+            self.assertIn("function docHasCat(", src, name)
+            self.assertIn("function setActiveCat(", src, name)
+            self.assertIn("activeCat", src, name)
+            # 문서 목록이 활성 분류로 걸러진다.
+            self.assertIn("documents.filter(function (d) { return docHasCat(d, activeCat); })",
+                          src, name)
+
+    def test_degrades_when_065_absent(self):
+        """065 미적용·구버전 응답이면 종전 링크 동작으로 조용히 내려간다.
+
+        배포 순서(마이그 먼저)가 어긋나도 화면이 깨지지 않아야 한다 — 응답에서 판정하지
+        빌드 시점 플래그로 판정하지 않는다."""
+        for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
+            self.assertIn("filterable = LAST_DOCS.some(", src, name)
+            self.assertIn('document.createElement(filterable ? "button" : "a")', src, name)
+
+    def test_interpretation_sentence_precedes_numbers(self):
+        for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
+            self.assertIn("function renderCatNote(", src, name)
+            self.assertIn("가장 많이 확인된 영역", src, name)
+        # 귀속 금지 어휘 — 483 은 공동 서명이 가능하므로 "지적한"으로 쓰지 않는다.
+        self.assertIn("이 실사관이 서명한 공개 문서에서 가장 많이 확인된 영역",
+                      self.insp_js)
+        self.assertNotIn("가장 많이 지적한", self._js_code(self.insp_js))
+
+    def test_catch_all_excluded_from_ranking_but_kept_in_denominator(self):
+        """캐치올 분류는 순위 문장·반복 목록에서 빼되 분모·막대에는 남긴다(#810 규율).
+
+        "이 업체에서 가장 많이 확인된 영역 = 기타 품질시스템"은 그 업체의 성질이 아니라
+        분류기 상태라 조치로 이어지지 않는다. 라이브 프리뷰에서 업체·실사관 **양쪽 다**
+        1위가 기타로 나와 잡은 결함이라 게이트로 박는다."""
+        for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
+            code = self._js_code(src)
+            self.assertIn('var CATCH_ALL = "other_quality_system";', code, name)
+            # 순위 문장과 반복 목록 두 곳에서 걸러야 한다.
+            self.assertEqual(
+                len(re.findall(r"category_code !== CATCH_ALL", code)), 2, name)
+            # 뺐다는 사실을 화면에 적는다(조용히 빼지 않는다).
+            self.assertIn("세부 분류 전이라", code, name)
+            # 막대(buildCatRow 루프)는 전량을 그대로 그린다 — 여기서 거르면 안 된다.
+            self.assertIn("LAST_CATS.forEach(function (c) {", code, name)
+
+    # ── 037 정책: 의도적 비대칭 ──────────────────────────────────────────────
+    def test_density_metric_is_firm_only(self):
+        """문서당 지적(밀도)은 업체에만 붙는다.
+
+        업체에서는 '실사를 많이 받은 곳이 커 보이는' 착시를 걷어내는 정규화지만, 실사관에
+        같은 값을 붙이면 '한 번에 몇 건 적는 사람인가' = **까다로움 지표**가 되어 037 이
+        막으려는 읽기를 정확히 만든다. 두 화면을 일관성 때문에 맞추는 '수리'를 막는 음성
+        검사다."""
+        self.assertIn('"문서당 지적"', self._fn_body(self.firm_js, "function renderStats("))
+        self.assertNotIn('"문서당 지적"', self._fn_body(self.insp_js, "function renderStats("))
+        # 비대칭의 **이유**가 코드 옆에 남아 있어야 한다(주석은 원본에서 확인).
+        self.assertIn("의도적 비대칭", self.insp_js)
+
+    def test_no_ranking_vocabulary_leaked(self):
+        """화면에 나가는 문자열에 순위·평가 어휘가 없어야 한다(037).
+
+        검사 대상은 주석을 걷어낸 코드와 렌더 산출물이다 — 금지 이유를 적어 둔 주석까지
+        훑으면 그 주석을 지워야 초록이 되는, 정확히 거꾸로 된 가드가 된다."""
+        banned = ("까다로운", "까다롭", "위험도", "실사관 순위", "엄격도")
+        code = self._js_code(self.insp_js)
+        for word in banned:
+            self.assertNotIn(word, code, word)
+            self.assertNotIn(word, self.insp, word)
 
 
 if __name__ == "__main__":

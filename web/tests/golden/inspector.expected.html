@@ -70,11 +70,14 @@
         <p class="ip-sub">FDA 483 서명 실사관</p>
       </div>
 
-      <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section>
-
-      <section class="ip-block" aria-label="지적 카테고리 분포">
+      <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section><section class="ip-block" aria-label="지적 카테고리 분포">
         <h2 class="ip-h">지적 카테고리 분포</h2>
+        <p class="ip-note" id="ip-cat-note"></p>
         <div id="ip-cat" class="ip-cat"></div>
+      </section><section class="ip-block" id="ip-rep-block" aria-label="반복 확인된 영역" hidden>
+        <h2 class="ip-h">반복 확인된 영역</h2>
+        <p class="ip-note" id="ip-rep-note"></p>
+        <div id="ip-rep" class="ip-rep"></div>
       </section>
 
       <section class="ip-block" aria-label="연도별 추이">
@@ -84,6 +87,7 @@
 
       <section class="ip-block" aria-label="실사 문서 목록">
         <h2 class="ip-h">실사 문서 목록</h2>
+        <div class="ip-filter" id="ip-filter" hidden></div>
         <div id="ip-docs" class="ip-docs"></div>
       </section>
     </div>
@@ -151,6 +155,28 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .ip-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
 .ip-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
 .ip-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+/* [P1 해석층] firm.html 과 동일 컴포넌트 계약(클래스 접두만 ip-). */
+.ip-cat-share{flex:0 0 auto;min-width:42px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted-2)}
+.ip-note{font-size:13px;line-height:1.7;color:var(--muted);margin:-8px 0 16px;word-break:keep-all}
+.ip-note b{color:var(--body-s);font-weight:600}
+button.ip-cat-row{width:100%;font:inherit;text-align:left;background:transparent;border:0;cursor:pointer}
+button.ip-cat-row[aria-pressed="true"]{background:var(--coral-tint)}
+button.ip-cat-row[aria-pressed="true"] .ip-cat-label{color:var(--coral-2);font-weight:600}
+.ip-rep{display:flex;flex-direction:column;gap:10px}
+.ip-rep-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;padding:11px 6px;border-top:1px solid var(--line)}
+.ip-rep-row:first-child{border-top:0}
+.ip-rep-name{font-size:14px;color:var(--ink);font-weight:600}
+.ip-rep-docs{font-family:var(--mono);font-size:12px;color:var(--coral-2)}
+.ip-rep-years{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
+.ip-rep-year{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:999px;padding:2px 8px}
+.ip-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
+.ip-filter[hidden]{display:none}
+.ip-filter-chip{display:inline-flex;align-items:center;gap:6px;height:26px;font:inherit;font-size:12px;color:var(--ink);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;cursor:pointer;line-height:1}
+.ip-filter-chip:hover{border-color:var(--coral)}
+.ip-filter-chip .x{color:var(--muted);font-size:13px}
+.ip-filter-chip:hover .x{color:var(--coral)}
+.ip-filter-out{font-size:12.5px;color:var(--coral-2);font-weight:500}
+.ip-filter-out:hover{color:var(--coral)}
 
 /* 연도 추이 — firm.html fp-year 관례 재사용(세로 미니 바). */
 .ip-year-bars{display:flex;align-items:flex-end;gap:8px}
@@ -260,7 +286,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/inspector.js?v=0ac3e52e" defer></script>
+<script src="../../assets/inspector.js?v=e35a19f2" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

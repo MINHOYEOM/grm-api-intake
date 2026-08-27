@@ -37,6 +37,13 @@
   var catEl = document.getElementById("fp-cat");
   var yearEl = document.getElementById("fp-year");
   var docsEl = document.getElementById("fp-docs");
+  // [P1 해석층] 신설 셸 — 구버전 셸(이 id 들이 없는 캐시 HTML)에서도 무해하도록 전부
+  // null 가드를 두고 쓴다(findings.js hasDash 관례 동형).
+  var catNoteEl = document.getElementById("fp-cat-note");
+  var repBlockEl = document.getElementById("fp-rep-block");
+  var repNoteEl = document.getElementById("fp-rep-note");
+  var repEl = document.getElementById("fp-rep");
+  var filterEl = document.getElementById("fp-filter");
   // [존 재편 2026-08-26] ?key= 없이 들어왔을 때의 조회 랜딩. 하드 게이트에는 넣지
   // 않는다 — 이 블록이 없는 구버전 셸(캐시 스큐)에서도 프로파일 본기능은 살아야 한다.
   var lookupEl = document.getElementById("fp-lookup");
@@ -151,18 +158,82 @@
     statsEl.innerHTML = "";
     statsEl.appendChild(buildStat(fmtNum(totals.findings), "총 지적"));
     statsEl.appendChild(buildStat(fmtNum(totals.documents), "문서"));
+    // [P1 해석층] 문서당 지적 — 원시 건수만 보면 **실사를 많이 받은 곳이 무조건 커 보인다**.
+    // 문서 수로 나눈 값을 나란히 둬 규모와 밀도를 갈라 읽게 한다(반올림 소수 1자리).
+    var docs = Number(totals.documents) || 0;
+    var finds = Number(totals.findings) || 0;
+    if (docs > 0) {
+      statsEl.appendChild(buildStat((Math.round((finds / docs) * 10) / 10).toFixed(1), "문서당 지적"));
+    }
     var period = (totals.first_seen || "?") + " ~ " + (totals.last_seen || "?");
     statsEl.appendChild(buildStat(period, "기간"));
     statsEl.appendChild(buildStat(fmtNum(totals.public_findings), "국문 열람 가능"));
   }
 
-  // ── 카테고리 구성(상위 카테고리 코럴 농도 바) ────────────────────────────────
-  function buildCatRow(entry, maxCnt, firmName) {
-    var a = document.createElement("a");
-    a.className = "fp-cat-row";
-    a.href = findingsHref("cat", entry.category_code, firmName);
-    var label = CATEGORY_LABELS[entry.category_code];
-    a.appendChild(el("span", "fp-cat-label", label ? label.ko : entry.category_code));
+  // ── [P1 해석층] 프로파일 안 좁히기 상태 ──────────────────────────────────────
+  // 065 가 documents[].categories 를 주기 전에는 이 프로파일을 벗어나 검색으로 나가야
+  // 했다(?cat=&q=이름 — 표기 변형 문서를 놓치는 우회). 이제 같은 화면에서 좁힌다.
+  // 065 미적용 라이브·구버전 응답이면 categories 가 없으므로 filterable=false 로 떨어져
+  // 종전 링크 동작을 그대로 유지한다(조용한 하위호환 — 프로파일 본기능 무장애).
+  var activeCat = null;
+  var LAST_DOCS = [];
+  var LAST_NAME = "";
+  var filterable = false;
+
+  function catLabel(code) {
+    var label = CATEGORY_LABELS[code];
+    return label ? label.ko : code;
+  }
+
+  function docHasCat(doc, code) {
+    var cats = doc && doc.categories;
+    return !!(cats && cats.length && cats.indexOf(code) !== -1);
+  }
+
+  function setActiveCat(code) {
+    activeCat = activeCat === code ? null : code;
+    renderCategories(LAST_CATS, LAST_NAME);
+    renderFilter();
+    renderDocuments(LAST_DOCS);
+    if (docsEl && activeCat && docsEl.scrollIntoView) docsEl.scrollIntoView({ block: "nearest" });
+  }
+
+  // 활성 필터 칩 — 해제(×)와 "검색에서 보기"(종전 우회 경로)를 함께 둔다. 프로파일 안
+  // 좁히기가 기본이고, 전체 코퍼스에서 같은 분류를 보고 싶을 때만 밖으로 나간다.
+  function renderFilter() {
+    if (!filterEl) return;
+    filterEl.innerHTML = "";
+    if (!activeCat) { filterEl.hidden = true; return; }
+    filterEl.hidden = false;
+    var shown = LAST_DOCS.filter(function (d) { return docHasCat(d, activeCat); }).length;
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "fp-filter-chip";
+    chip.appendChild(el("span", null, catLabel(activeCat) + " · 문서 " + fmtNum(shown) + "건"));
+    chip.appendChild(el("span", "x", "×"));
+    chip.setAttribute("aria-label", catLabel(activeCat) + " 필터 해제");
+    chip.addEventListener("click", function () { setActiveCat(activeCat); });
+    filterEl.appendChild(chip);
+    var out = document.createElement("a");
+    out.className = "fp-filter-out";
+    out.href = findingsHref("cat", activeCat, LAST_NAME);
+    out.textContent = "전체 지적사항에서 보기 →";
+    filterEl.appendChild(out);
+  }
+
+  // ── 분류 구성(상위 분류 코럴 농도 바) ────────────────────────────────────────
+  // filterable 이면 <button>(프로파일 안 좁히기), 아니면 종전 <a>(검색으로).
+  function buildCatRow(entry, maxCnt, firmName, total) {
+    var row = document.createElement(filterable ? "button" : "a");
+    row.className = "fp-cat-row";
+    if (filterable) {
+      row.type = "button";
+      row.setAttribute("aria-pressed", activeCat === entry.category_code ? "true" : "false");
+      row.addEventListener("click", function () { setActiveCat(entry.category_code); });
+    } else {
+      row.href = findingsHref("cat", entry.category_code, firmName);
+    }
+    row.appendChild(el("span", "fp-cat-label", catLabel(entry.category_code)));
     var track = document.createElement("div");
     track.className = "fp-cat-track";
     var bar = document.createElement("div");
@@ -170,20 +241,97 @@
     var ratio = maxCnt > 0 ? entry.cnt / maxCnt : 0;
     bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
     track.appendChild(bar);
-    a.appendChild(track);
-    a.appendChild(el("span", "fp-cat-count", fmtNum(entry.cnt) + "건"));
-    return a;
+    row.appendChild(track);
+    row.appendChild(el("span", "fp-cat-count", fmtNum(entry.cnt) + "건"));
+    // [P1 해석층] 구성비 — "51건"이 이 업체 안에서 어느 정도인지를 같이 적는다.
+    if (total > 0) {
+      row.appendChild(el("span", "fp-cat-share", Math.round((entry.cnt / total) * 100) + "%"));
+    }
+    return row;
   }
 
+  var LAST_CATS = [];
+
   function renderCategories(byCategory, firmName) {
+    LAST_CATS = byCategory || [];
     catEl.innerHTML = "";
-    if (!byCategory.length) {
+    if (!LAST_CATS.length) {
       catEl.appendChild(el("p", "fp-empty", "표시할 데이터가 없습니다."));
       return;
     }
     // RPC 가 이미 cnt desc 로 정렬해 반환한다(013 by_category 계약) — 재정렬 없음.
-    var maxCnt = byCategory[0].cnt || 1;
-    byCategory.forEach(function (c) { catEl.appendChild(buildCatRow(c, maxCnt, firmName)); });
+    var maxCnt = LAST_CATS[0].cnt || 1;
+    var total = LAST_CATS.reduce(function (s, c) { return s + (Number(c.cnt) || 0); }, 0);
+    LAST_CATS.forEach(function (c) {
+      catEl.appendChild(buildCatRow(c, maxCnt, firmName, total));
+    });
+    renderCatNote(LAST_CATS, total);
+  }
+
+  // ★[P1 해석층] 캐치올 분류는 **순위 문장과 반복 목록에서 뺀다**(막대와 분모에는 남긴다).
+  // "이 업체에서 가장 많이 확인된 영역 = 기타 품질시스템"은 그 업체의 성질이 아니라
+  // **분류기 상태**를 말하는 문장이라 조치로 이어지지 않는다. 트렌드 면(#810)이 이미 세운
+  // 규율을 프로파일에도 그대로 적용한다 — 빼되 **뺐다는 사실을 적는다**(축을 조용히
+  // 바꾸지 않는다). 라이브 프리뷰에서 두 프로파일 모두 1위가 기타로 나와 잡았다.
+  var CATCH_ALL = "other_quality_system";
+
+  // [P1 해석층] 숫자 위의 한 문장 — 가장 많이 확인된 영역과 그 비중을 말로 적는다.
+  function renderCatNote(cats, total) {
+    if (!catNoteEl) return;
+    catNoteEl.innerHTML = "";
+    if (!cats.length || !total) return;
+    var ranked = cats.filter(function (c) { return c.category_code !== CATCH_ALL; });
+    var other = cats.filter(function (c) { return c.category_code === CATCH_ALL; })[0];
+    if (ranked.length) {
+      var top = ranked[0];
+      catNoteEl.appendChild(document.createTextNode("공개된 문서에서 가장 많이 확인된 영역은 "));
+      catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
+      catNoteEl.appendChild(document.createTextNode(
+        "입니다(" + fmtNum(top.cnt) + "건 · 전체의 " + Math.round((top.cnt / total) * 100) + "%)."
+      ));
+    }
+    if (other) {
+      catNoteEl.appendChild(document.createTextNode(
+        " " + catLabel(CATCH_ALL) + " " + fmtNum(other.cnt) + "건은 세부 분류 전이라 이 문장에서 " +
+        "뺐습니다 — 위 비율의 분모와 아래 막대에는 그대로 들어 있습니다."
+      ));
+    }
+    if (filterable) {
+      catNoteEl.appendChild(document.createTextNode(
+        " 줄을 누르면 아래 문서 이력이 그 분류로 좁혀집니다."
+      ));
+    }
+  }
+
+  // ── [P1 해석층] 반복 확인된 영역(065 repeats) ────────────────────────────────
+  // 누적 합계로는 "한 번에 몰린 것"과 "여러 번 되풀이된 것"이 구분되지 않는다. 여기서는
+  // 서로 다른 문서 수로 세므로, 같은 문서 안의 다건은 반복이 아니다.
+  function renderRepeats(repeats) {
+    if (!repBlockEl || !repEl) return;
+    var all = repeats || [];
+    // 캐치올은 목록에서 뺀다(위 renderCatNote 와 같은 이유) — 대신 뺐다는 사실을 적는다.
+    var rows = all.filter(function (r) { return r.category_code !== CATCH_ALL; });
+    var dropped = all.filter(function (r) { return r.category_code === CATCH_ALL; })[0];
+    if (!rows.length) { repBlockEl.hidden = true; return; }
+    repBlockEl.hidden = false;
+    if (repNoteEl) {
+      repNoteEl.textContent =
+        "서로 다른 문서 2건 이상에서 다시 확인된 영역입니다. " +
+        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않습니다." +
+        (dropped ? " " + catLabel(CATCH_ALL) + "(문서 " + fmtNum(dropped.documents) +
+                   "건)은 세부 분류 전이라 뺐습니다." : "");
+    }
+    repEl.innerHTML = "";
+    rows.forEach(function (r) {
+      var row = el("div", "fp-rep-row");
+      row.appendChild(el("span", "fp-rep-name", catLabel(r.category_code)));
+      row.appendChild(el("span", "fp-rep-docs", "문서 " + fmtNum(r.documents) + "건"));
+      var years = document.createElement("span");
+      years.className = "fp-rep-years";
+      (r.years || []).forEach(function (y) { years.appendChild(el("span", "fp-rep-year", y)); });
+      row.appendChild(years);
+      repEl.appendChild(row);
+    });
   }
 
   // ── 연도 추이(간단 막대) ─────────────────────────────────────────────────
@@ -337,8 +485,17 @@
       docsEl.appendChild(el("p", "fp-empty", "표시할 문서가 없습니다."));
       return;
     }
+    // [P1 해석층] 활성 분류가 있으면 그 분류가 붙은 문서만 — 프로파일을 벗어나지 않는다.
+    var rows = activeCat
+      ? documents.filter(function (d) { return docHasCat(d, activeCat); })
+      : documents;
+    if (!rows.length) {
+      docsEl.appendChild(el("p", "fp-empty",
+        catLabel(activeCat) + " 분류가 붙은 문서가 목록에 없습니다."));
+      return;
+    }
     // RPC 가 이미 published_date desc 로 정렬해 반환한다(013 documents 계약) — 재정렬 없음.
-    documents.forEach(function (doc) { docsEl.appendChild(buildDocRow(doc)); });
+    rows.forEach(function (doc) { docsEl.appendChild(buildDocRow(doc)); });
   }
 
   // ── 관심 업체 워치리스트(015_firm_watchlist.sql — 등록/해제 토글) ────────────
@@ -460,11 +617,21 @@
   // ── 오케스트레이션 ───────────────────────────────────────────────────────
   function renderAll(data) {
     nameEl.textContent = decodeFirmDisplay(data.display_name || "");
-    renderStats(data.totals || {});
     // [맥락 유지] q 값은 원문 display_name — DB blob 과 부분일치해야 하므로 decode 금지.
-    renderCategories(data.by_category || [], data.display_name || "");
+    LAST_NAME = data.display_name || "";
+    LAST_DOCS = data.documents || [];
+    activeCat = null;
+    // [P1 해석층] 065 적용 여부를 **응답에서** 판정한다 — 배포 순서(마이그 먼저)가
+    // 어긋나거나 구버전 캐시가 남아도 화면이 깨지지 않고 종전 링크 동작으로 내려간다.
+    filterable = LAST_DOCS.some(function (d) {
+      return d && d.categories && d.categories.length;
+    });
+    renderStats(data.totals || {});
+    renderCategories(data.by_category || [], LAST_NAME);
+    renderRepeats(data.repeats || []);
     renderYears(data.by_year || []);
-    renderDocuments(data.documents || []);
+    renderFilter();
+    renderDocuments(LAST_DOCS);
   }
 
   function rpcEndpoint(name) {

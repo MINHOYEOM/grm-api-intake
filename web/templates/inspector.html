@@ -96,9 +96,23 @@
 
       <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section>
 
+      {#- [P1 해석층 2026-08-27] 분류 분포 — 해석 한 줄 + 행별 구성비. 줄을 누르면 검색으로
+          나가지 않고 아래 문서 목록이 그 분류로 좁혀진다(065 documents[].categories).
+          어휘 주의: "가장 많이 지적한"이 아니라 "공개 문서에서 가장 많이 확인된" — 483 은
+          여러 실사관이 함께 서명할 수 있어 개별 지적을 한 사람에게 귀속시키지 않는다. -#}
       <section class="ip-block" aria-label="지적 카테고리 분포">
         <h2 class="ip-h">지적 카테고리 분포</h2>
+        <p class="ip-note" id="ip-cat-note"></p>
         <div id="ip-cat" class="ip-cat"></div>
+      </section>
+
+      {#- [P1 해석층] 반복 확인된 영역(065 repeats) — 037 정책과 무충돌이다. 다른 실사관과
+          견주지 않고 이 사람의 공개 이력 안에서 재등장 여부만 말한다("공개 문서에서 반복
+          확인된 영역"은 권장 표현 목록에 있는 어휘다). 데이터 없으면 섹션째 숨긴다. -#}
+      <section class="ip-block" id="ip-rep-block" aria-label="반복 확인된 영역" hidden>
+        <h2 class="ip-h">반복 확인된 영역</h2>
+        <p class="ip-note" id="ip-rep-note"></p>
+        <div id="ip-rep" class="ip-rep"></div>
       </section>
 
       <section class="ip-block" aria-label="연도별 추이">
@@ -108,6 +122,7 @@
 
       <section class="ip-block" aria-label="실사 문서 목록">
         <h2 class="ip-h">실사 문서 목록</h2>
+        <div class="ip-filter" id="ip-filter" hidden></div>
         <div id="ip-docs" class="ip-docs"></div>
       </section>
     </div>
@@ -145,6 +160,28 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .ip-cat-track{flex:1 1 auto;height:10px;border-radius:99px;background:var(--coral-tint);overflow:hidden}
 .ip-cat-bar{height:100%;width:100%;border-radius:99px;background:var(--coral);transform-origin:left}
 .ip-cat-count{flex:0 0 auto;min-width:56px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+/* [P1 해석층] firm.html 과 동일 컴포넌트 계약(클래스 접두만 ip-). */
+.ip-cat-share{flex:0 0 auto;min-width:42px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--muted-2)}
+.ip-note{font-size:13px;line-height:1.7;color:var(--muted);margin:-8px 0 16px;word-break:keep-all}
+.ip-note b{color:var(--body-s);font-weight:600}
+button.ip-cat-row{width:100%;font:inherit;text-align:left;background:transparent;border:0;cursor:pointer}
+button.ip-cat-row[aria-pressed="true"]{background:var(--coral-tint)}
+button.ip-cat-row[aria-pressed="true"] .ip-cat-label{color:var(--coral-2);font-weight:600}
+.ip-rep{display:flex;flex-direction:column;gap:10px}
+.ip-rep-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;padding:11px 6px;border-top:1px solid var(--line)}
+.ip-rep-row:first-child{border-top:0}
+.ip-rep-name{font-size:14px;color:var(--ink);font-weight:600}
+.ip-rep-docs{font-family:var(--mono);font-size:12px;color:var(--coral-2)}
+.ip-rep-years{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
+.ip-rep-year{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:999px;padding:2px 8px}
+.ip-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
+.ip-filter[hidden]{display:none}
+.ip-filter-chip{display:inline-flex;align-items:center;gap:6px;height:26px;font:inherit;font-size:12px;color:var(--ink);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;cursor:pointer;line-height:1}
+.ip-filter-chip:hover{border-color:var(--coral)}
+.ip-filter-chip .x{color:var(--muted);font-size:13px}
+.ip-filter-chip:hover .x{color:var(--coral)}
+.ip-filter-out{font-size:12.5px;color:var(--coral-2);font-weight:500}
+.ip-filter-out:hover{color:var(--coral)}
 
 /* 연도 추이 — firm.html fp-year 관례 재사용(세로 미니 바). */
 .ip-year-bars{display:flex;align-items:flex-end;gap:8px}

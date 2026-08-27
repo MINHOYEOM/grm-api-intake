@@ -8735,10 +8735,20 @@ class WebInspectionDateTest(unittest.TestCase):
         "categories": ["무균보증/무균공정"],
         "findings": [{"x": 1}, {"x": 2}, {"x": 3}],
     }
+    # 경고서한 — 실사 문서가 아니라 실사일이 없다(대상에서 뺐다).
+    WL = {
+        "slug": "wl-1", "document_id": "wl-1", "agency": "FDA",
+        "source": "FDA Warning Letter", "firm_name": "Beta Labs LLC",
+        "published_date": "2025-09-16", "inspection_date": "",
+        "categories": ["품질부서 관리감독"],
+        "findings": [{"x": 1}, {"x": 2}, {"x": 3}],
+    }
+    # 캐나다 실사 — 두 날짜가 **같다**. 원천이 공개일을 주지 않아 수집기가 실사 시작일을
+    # published_date 에 넣기 때문이다(mig 069).
     HC = {
         "slug": "hc-1", "document_id": "hc-insp-1", "agency": "HC",
         "source": "Health Canada Inspection", "firm_name": "Maple Labs Ltd.",
-        "published_date": "2021-01-13", "inspection_date": "",
+        "published_date": "2021-01-13", "inspection_date": "2021-01-13",
         "categories": ["시험실/품질관리"],
         "findings": [{"x": 1}, {"x": 2}, {"x": 3}],
     }
@@ -8747,13 +8757,40 @@ class WebInspectionDateTest(unittest.TestCase):
         self.assertEqual(render.doc_display_date(self.FDA_483), "2015-07-10")
 
     def test_display_date_falls_back_when_the_source_gives_none(self):
-        """캐나다 실사는 원천이 실사일을 안 주고, 경고서한은 실사 문서가 아니다.
+        """경고서한은 실사 문서가 아니라 실사일이 없다.
 
         부재를 지어내지 않고 종전 값(공개일)으로 물러선다 — 빈 날짜를 화면에 내보내는
         것이 가장 나쁘다."""
-        self.assertEqual(render.doc_display_date(self.HC), "2021-01-13")
-        no_key = {k: v for k, v in self.HC.items() if k != "inspection_date"}
-        self.assertEqual(render.doc_display_date(no_key), "2021-01-13")
+        self.assertEqual(render.doc_display_date(self.WL), "2025-09-16")
+        no_key = {k: v for k, v in self.WL.items() if k != "inspection_date"}
+        self.assertEqual(render.doc_display_date(no_key), "2025-09-16")
+
+    def test_one_date_is_stated_once_and_called_what_it_is(self):
+        """★두 값이 같으면 **날짜가 하나뿐**이라는 뜻이다 — 캐나다 실사가 그렇다.
+
+        처음에는 "캐나다는 원천이 실사일을 안 준다"고 판단했는데 **틀렸다.** 원천은
+        `inspectionStartDate` 를 전 행에 주고 수집기가 그걸 `published_date` 에 넣고
+        있었다(종료일 `inspectionEndDate` 는 전 행 null). 즉 결손이 아니라 **표기**가
+        틀린 것이었다 — 실사일에 "공개"라고 적고 있었다(문서 1,824건).
+
+        같은 날짜를 두 번 적으면서 한쪽을 '공개'라고 부르면 그게 고치려던 거짓말이다.
+        ★판정은 소스 이름이 아니라 **값**으로 한다 — 다른 소스에서 우연히 같아져도
+        (실측 FDA 483 에 1건) 알아서 옳게 나온다."""
+        d = render.doc_page_description(self.HC, {"HC": "캐나다 보건부"})
+        self.assertIn("2021-01-13 실사에서 확인한", d)
+        self.assertNotIn("공개", d)
+        self.assertEqual(d.count("2021-01-13"), 1, "같은 날짜를 두 번 적었다")
+
+    def test_date_axis_verb_is_derived_from_the_data(self):
+        """연도별 목록의 '공개한/실사한'은 **기관 이름이 아니라 값**에서 나온다.
+
+        손목록으로 기관을 분기하면 새 소스에서 조용히 낡는다."""
+        self.assertEqual(render.date_axis_verb([self.HC, dict(self.HC, slug="hc-2")]),
+                         "실사한")
+        self.assertEqual(render.date_axis_verb([self.FDA_483]), "공개한")
+        # 섞여 있으면 단정하지 않고 종전 표현을 쓴다.
+        self.assertEqual(render.date_axis_verb([self.HC, self.FDA_483]), "공개한")
+        self.assertEqual(render.date_axis_verb([]), "공개한")
 
     def test_title_uses_the_inspection_date(self):
         titles = render.build_doc_page_titles([self.FDA_483, self.HC])
@@ -8786,11 +8823,11 @@ class WebInspectionDateTest(unittest.TestCase):
 
     def test_description_unchanged_when_there_is_no_inspection_date(self):
         """실사일이 없는 소스의 문구는 **한 글자도 건드리지 않는다**(불필요한 골든 churn)."""
-        d = render.doc_page_description(self.HC, {"HC": "캐나다 보건부"})
+        d = render.doc_page_description(self.WL, {"FDA": "미국 FDA"})
         self.assertEqual(
             d,
-            "캐나다 보건부가 2021-01-13에 공개한 Maple Labs Ltd. Health Canada Inspection"
-            " 지적사항 3건을 우리말로 정리했습니다. 주요 분류: 시험실/품질관리.")
+            "미국 FDA가 2025-09-16에 공개한 Beta Labs LLC FDA Warning Letter"
+            " 지적사항 3건을 우리말로 정리했습니다. 주요 분류: 품질부서 관리감독.")
 
     def test_published_date_is_never_replaced_in_the_data(self):
         """실사일은 **새 축**이지 옛 축의 대체가 아니다 — dedup 키·수집 창·발행 축이
@@ -8808,6 +8845,13 @@ class WebInspectionDateTest(unittest.TestCase):
                       "실사일 칩이 조건 없이 그려지면 빈 칩이 나간다")
         self.assertIn("</b> 실사</span>", tpl)
         self.assertIn("</b> 공개</span>", tpl)
+        # ★같은 날짜면 '공개' 칩을 만들지 않는다 — 캐나다 실사가 그렇다(mig 069).
+        #   두 번 적으면서 한쪽을 '공개'라고 부르면 그게 고치려던 거짓말이다.
+        self.assertIn("{%- if doc.published_date != doc.inspection_date %}", tpl,
+                      "같은 날짜가 '실사'와 '공개'로 두 번 나간다")
+        # 본문의 출처 문장도 같은 규칙을 따라야 한다.
+        self.assertIn("{% if doc.published_date == doc.inspection_date %}실사한"
+                      "{% else %}공개한{% endif %}", tpl)
 
 
 class WebFindingsDocPageTest(unittest.TestCase):

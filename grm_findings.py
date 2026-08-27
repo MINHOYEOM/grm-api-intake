@@ -1190,14 +1190,20 @@ def _choose_evidence_url(evidence_url: str, raw_signal: dict[str, Any]) -> str:
 # 실사일이 들어 있는 raw_json 키를 **이름으로** 훑는다. 소스별 하드코딩 표를 만들지
 # 않는 이유는 표가 새 소스에서 조용히 낡기 때문이다(같은 이름을 쓰는 새 소스는 배선 없이
 # 잡힌다). 실측(2026-08-27) 기준 세 이름이 각각 한 소스에만 있어 충돌이 없다:
-#   record_date          → FDA 483 (483 발부일 = 실사 종료일) · MM/DD/YYYY
-#   inspection_end_date  → EU GMP NCR (EudraGMDP) · MHRA GMP NCR · YYYY-MM-DD
-#   inspection_end       → MFDS GMP 실사 · YYYY-MM-DD
+#   record_date            → FDA 483 (483 발부일 = 실사 종료일) · MM/DD/YYYY
+#   inspection_end_date    → EU GMP NCR (EudraGMDP) · MHRA GMP NCR · YYYY-MM-DD
+#   inspection_end         → MFDS GMP 실사 · YYYY-MM-DD
+#   inspection_start_date  → 캐나다 실사 · YYYY-MM-DD
+# ★종료일 계열을 먼저 훑고 **시작일은 맨 뒤**다 — 둘 다 있으면 종료일이 이긴다. 캐나다만
+#   시작일인 이유는 원천이 `inspectionEndDate` 를 **전 행 null** 로 주기 때문이고(실측
+#   1,528/1,528), 없는 값을 지어내지 않는다. 실사 하나의 시작과 끝은 며칠 차이라 "언제
+#   실사받았나"에는 시작일로 충분하고, 그 차이는 칼럼 코멘트와 mig 069 에 적어 뒀다.
 # ★FDA Warning Letter 의 `letter_date` 는 **넣지 않는다** — 서한일은 실사일이 아니고,
 #   `published_date`(게시일)와 차이도 7~14일(정상 발행 지연)이라 고칠 결함이 없다.
 # ★web/migrations/066 의 SQL 이 **같은 순서·같은 파싱**을 쓴다. 두 곳이 갈리면 백필분과
 #   신규 적재분이 다른 값을 갖게 되므로 테스트가 두 구현의 일치를 잰다.
-INSPECTION_DATE_KEYS = ("record_date", "inspection_end_date", "inspection_end")
+INSPECTION_DATE_KEYS = ("record_date", "inspection_end_date", "inspection_end",
+                        "inspection_start_date")
 
 
 def inspection_date_from_raw(raw_signal: dict[str, Any]) -> str:

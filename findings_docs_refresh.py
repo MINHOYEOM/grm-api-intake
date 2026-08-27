@@ -189,8 +189,10 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
         "published_date": published,
         # 규제기관이 실사한 날. `published_date`(우리가 문서를 확보한 날)를 **대체하지
         # 않고** 나란히 싣는다 — 둘은 다른 축이라 화면이 어느 쪽인지 밝힐 수 있어야 한다.
-        # 없는 소스가 있다: 캐나다 실사는 원천이 날짜를 안 주고, 경고서한은 실사 문서가
-        # 아니라 대상에서 뺐다(web/migrations/066 의 범위 주석 참조).
+        # 경고서한은 실사 문서가 아니라 대상에서 뺐다(mig 066 의 범위 주석 참조).
+        # ★캐나다 실사는 두 값이 **같다** — 원천이 공개일을 주지 않아 수집기가 실사
+        #   시작일을 published_date 에 넣기 때문이다(mig 069). 화면은 같으면 한 번만
+        #   적는다(render.doc_page_description).
         "inspection_date": (doc.get("inspection_date") or "").strip(),
         "evidence_url": evidence,
         "categories": seen,

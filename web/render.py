@@ -1886,6 +1886,25 @@ def doc_display_date(doc: dict[str, Any]) -> str:
     return (doc.get("inspection_date") or "").strip() or doc["published_date"]
 
 
+def date_axis_verb(documents: "list[dict[str, Any]]") -> str:
+    """연도별 목록의 축이 '공개'인가 '실사'인가 — **데이터에서 파생한다.**
+
+    `/findings/docs/{기관}/{연도}/` 는 `published_date` 의 연도로 묶는다. 대개 그건
+    우리가 문서를 확보한 날이라 "공개한"이 맞는데, **캐나다 실사는 아니다** — 수집기가
+    `inspectionStartDate` 를 `published_date` 에 넣기 때문에 그 축은 실사 연도다.
+    거기에 "공개한"이라고 적으면 1,330장이 거짓을 말한다.
+
+    기관 이름으로 분기하지 않는다(손목록은 새 소스에서 조용히 낡는다). 그 묶음의 문서가
+    **전부** 두 날짜가 같으면 축은 실사일이다 — 값으로만 판정하므로 원천이 바뀌면 문구도
+    저절로 따라온다. 비어 있으면 종전 표현을 쓴다(없는 것을 단정하지 않는다).
+    """
+    if not documents:
+        return "공개한"
+    same = all((d.get("inspection_date") or "") == (d.get("published_date") or "")
+               for d in documents)
+    return "실사한" if same else "공개한"
+
+
 def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> str:
     """meta description — 누가·언제·몇 건·어떤 주제. 데이터 조립뿐(문구 생성 0).
 
@@ -1903,10 +1922,18 @@ def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> 
     src = doc_source_label(doc)
     subject = f"{doc['firm_name']} {src}".strip() if src else doc["firm_name"]
     inspected = (doc.get("inspection_date") or "").strip()
-    if inspected:
+    if inspected and inspected != doc["published_date"]:
         return (f"{agency}가 {inspected} 실사에서 확인한 {subject} "
                 f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다"
                 f"({doc['published_date']} 공개).{tail}")
+    if inspected:
+        # ★두 값이 같으면 **날짜가 하나뿐**이라는 뜻이다 — 캐나다 실사가 그렇다
+        #   (수집기가 `inspectionStartDate` 를 published_date 에 넣는다). 한 날짜를
+        #   두 번 적으면서 한쪽을 "공개"라고 부르면 그게 바로 고치려던 거짓말이다.
+        #   소스 이름이 아니라 **값**으로 판정하므로 다른 소스에서 우연히 같아져도
+        #   (실측 FDA 483 에 1건) 알아서 옳게 나온다.
+        return (f"{agency}가 {inspected} 실사에서 확인한 {subject} "
+                f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
     return (f"{agency}가 {doc['published_date']}에 공개한 {subject} "
             f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
 
@@ -3392,7 +3419,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                            page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
                            rel_root="../../../../", nav_active="findings",
                            latest_slug=latest_slug,
-                           description=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사"
+                           description=(f"{g['label_ko']}가 {y['year']}년에"
+                                        f" {date_axis_verb(bucket)} 실사"
                                         f" 문서 {y['count']:,}건의 지적사항을 우리말로"
                                         " 정리했습니다."),
                            canonical=_abs_url(
@@ -3404,7 +3432,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                (f"{g['label_ko']} · {y['year']}년", "")]),
                            mode="list",
                            heading=f"{g['label_ko']} · {y['year']}년",
-                           lede=(f"{g['label_ko']}가 {y['year']}년에 공개한 실사 문서"
+                           lede=(f"{g['label_ko']}가 {y['year']}년에"
+                                 f" {date_axis_verb(bucket)} 실사 문서"
                                  f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
                                  " 지적을 모두 보실 수 있습니다."),
                            documents=bucket, agency_slug=g["slug"],

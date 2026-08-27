@@ -328,6 +328,12 @@ def build_item(row: dict[str, Any], card: dict[str, Any], published_date: str) -
         "list_query_url": HC_LIST_URL,
         # site_country 를 왜 그렇게 정했는지 데이터에 남긴다(_site_country 주석 참조).
         "site_country_basis": "insType",
+        # ★실사 시작일. 이 값은 `published_date` 에도 들어가지만(이 소스는 공개일을 주지
+        #   않아 실사일을 그 칸에 쓴다) **여기에도 남긴다** — findings 의 `inspection_date`
+        #   는 raw_json 에서 파생되므로(grm_findings.inspection_date_from_raw), 여기 없으면
+        #   신규 문서의 실사일이 다시 빈 값이 된다(mig 069 는 과거분만 채웠다).
+        #   원천은 종료일(`inspectionEndDate`)을 **전 행 null 로** 주므로 시작일뿐이다.
+        "inspection_start_date": published_date,
     }
 
     return IntakeItem(

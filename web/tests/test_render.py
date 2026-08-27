@@ -5659,32 +5659,86 @@ class WebFirmRenderTest(unittest.TestCase):
 
 # ── 실사관 프로파일 (FDA 483 서명 실사관 집계 — firm.html/firm.js 의 미러링) ────────
 
-    # ── [063] FDA GMP 실사 이력 ──────────────────────────────────────────────
-    def test_inspection_history_shell_present_hidden(self):
-        """063 미적용 라이브·fetch 실패에서 firm.js 가 그대로 두는 상태(hidden)가 정적
-        셸의 기본값이어야 한다 — 프로파일 본기능(지적 이력)은 063 없이도 온전하다."""
-        self.assertIn(
-            '<section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>',
-            self.html)
+    # ── [P1.5-3] 규제 이력 — 문서 + 실사를 한 시간축에 ────────────────────────
+    def test_regulatory_timeline_is_one_axis(self):
+        """[P1.5-3 2026-08-27] 두 블록(문서 이력 · FDA 실사 이력)을 하나로 합쳤다.
+
+        종전에는 나란한 두 목록이라 "이 업체에 무슨 일이 순서대로 있었나"를 읽는 사람이
+        머릿속에서 맞춰야 했다. ★종전 주석의 '합치지 마라'가 금지한 것은 **서로 나누는
+        것**(지적 문장 ÷ 실사 건수 같은 비율)이지 시간순 배열이 아니다 — 타임라인은
+        분모를 만들지 않는다. 그 주석이 지키려던 단위 경고는 섹션 머리로 옮겨 유지한다."""
+        self.assertIn('<section class="fp-block" aria-label="규제 이력">', self.html)
+        self.assertNotIn('id="fp-insp-block"', self.html,
+                         "실사 전용 블록이 되살아났다 — 시간축 병합 회귀")
+        self.assertNotIn('<div id="fp-insp" class="fp-insp"></div>', self.html)
+        # 요약·각주 자리는 남는다(타임라인이 표현 못 하는 것: 등급 구성·수집 범위).
         for frag in ('<p class="fp-insp-sub" id="fp-insp-sub"></p>',
-                     '<div id="fp-insp" class="fp-insp"></div>',
-                     '<p class="fp-insp-note" id="fp-insp-note"></p>'):
+                     '<p class="fp-insp-note" id="fp-insp-note"></p>',
+                     '<div id="fp-docs" class="fp-docs"></div>'):
             self.assertIn(frag, self.html)
-        # 단위가 다르다는 사실을 화면이 말한다(실사 존을 면으로 가른 것과 같은 규율).
+        # 단위 경고는 없애지 않고 섹션 머리로 옮긴다.
         self.assertIn("단위가 다릅니다", self.html)
+        # ★인과를 만들지 않는다 — 실사와 문서를 잇는 조인 키가 없다.
+        self.assertIn("서로의 원인·결과인 것은 아닙니다", self.html)
+
+    def test_timeline_rows_carry_date_meaning(self):
+        """★한 축에 두 종류가 섞이는 순간 **날짜 의미 차이**가 새 거짓말이 된다 —
+        문서는 공개일(published_date), 실사는 실사 종료일(inspection_end_date).
+        행마다 무엇이고 그 날짜가 무슨 날인지 적는다."""
+        src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        self.assertIn('el("span", "fp-tl-when", "공개")', src)
+        self.assertIn('el("span", "fp-tl-when", "실사 종료")', src)
+        self.assertIn('el("span", "fp-tl-kind", "문서")', src)
+        self.assertIn('el("span", "fp-tl-kind insp", "실사")', src)
+
+    def test_timeline_sorts_desc_and_parks_undated_last(self):
+        """정렬 계약 — 날짜 내림차순, 날짜가 빈 행은 맨 뒤.
+
+        빈 날짜를 0000 으로 채워 맨 앞에 두면 가장 오래된 사건처럼 보인다."""
+        src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        fn = src[src.index("function timelineEntries()"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (!a.at) return 1;", fn)
+        self.assertIn("if (!b.at) return -1;", fn)
+        self.assertIn("a.at < b.at ? 1 : (a.at > b.at ? -1 : 0)", fn)
+
+    def test_category_filter_scope_is_disclosed(self):
+        """분류 필터는 문서에만 걸린다(실사에는 분류가 없다). 실사가 **조용히** 빠지면
+        "이 업체는 실사 기록이 없다"로 오독된다 — 그 사실을 말한다(부재 어휘 규율).
+        실사가 없는 업체에서는 아무 말도 하지 않는다(없는 것을 설명하지 않는다)."""
+        src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
+        fn = src[src.index("function timelineEntries()"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("if (activeCat && !docHasCat(d, activeCat)) return;", fn)
+        self.assertIn("if (!activeCat) {", fn)   # 실사는 필터 없을 때만
+        self.assertIn("분류가 없어 이 필터에서 제외됩니다", src)
+        self.assertIn("if (inspN > 0)", src)
 
     def test_inspection_history_isolated_chain(self):
         """워치리스트와 같은 격리 — 본기능 로드 성공 **후에만** 별도 체인으로 fetch 하고,
-        실패해도 이 블록만 hidden 으로 남는다."""
+        실패해도 문서 타임라인은 그대로 남는다.
+
+        ★병합 뒤에도 이 성질이 더 중요해졌다: 실사가 같은 목록에 들어가므로, 실사 fetch
+        실패가 문서 목록까지 지우면 본기능이 무너진다. 실사는 **나중에 도착해 같은 목록을
+        다시 그리는** 구조라 도착 전·실패 시에는 문서만 그려진 상태로 남는다."""
         src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
         self.assertIn('rpcEndpoint("fda_inspection_firm")', src)
         self.assertIn("JSON.stringify({ p_firm_key: firmKey })", src)
         chain = src[src.index("fetchInspectionHistory(firmKeyParam)"):]
         self.assertIn("조용히 숨김 유지", chain[:300])
+        # 실사 도착 전에도 문서는 그려진다 — renderAll 이 타임라인을 먼저 부른다.
+        ra = src[src.index("function renderAll(data)"):]
+        ra = ra[:ra.index("\n  }\n")]
+        self.assertIn("renderTimeline();", ra)
+        self.assertNotIn("LAST_INSP =", ra, "renderAll 이 실사 상태를 건드리면 안 된다")
+        # 실사 응답이 오면 같은 목록을 다시 그린다.
+        ri = src[src.index("function renderInspections(data)"):]
+        self.assertIn("LAST_INSP = {", ri[:900])
+        self.assertIn("renderTimeline();", ri[:900])
         # 하드 게이트 밖.
         gate = src[src.index("if (!cfg || !loadingEl"):]
         gate = gate[:gate.index("return;") + len("return;")]
-        self.assertNotIn("inspBlockEl", gate)
+        self.assertNotIn("LAST_INSP", gate)
 
     def test_absence_is_scoped_never_bare(self):
         """★부재 어휘 규율 — "실사 기록 없음"을 **범위 없이** 말하면 거짓이 된다.
@@ -5697,7 +5751,8 @@ class WebFirmRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("scope.fiscal_year_min", fn)
         self.assertIn('"확인된 " + range +', fn)
-        self.assertIn("if (!range) return;", fn)
+        # 범위를 만들 수 없으면 부재 문장 자체를 싣지 않는다(빈 문자열로 남긴다).
+        self.assertIn('inspSubEl.textContent = range', fn)
         # 템플릿·JS 어디에도 좁히지 않은 부재 단정이 없어야 한다.
         for text in (self.html, src):
             self.assertNotIn("실사 기록이 없습니다", text.replace("FDA 의약품 GMP 실사 기록이 없습니다", ""))
@@ -11868,13 +11923,24 @@ class WebProfileInterpretationTest(unittest.TestCase):
 
     # ── 동작 계약 ────────────────────────────────────────────────────────────
     def test_in_profile_filter_replaces_leaving_the_page(self):
+        """분류 클릭이 **페이지를 떠나지 않고** 목록을 좁힌다.
+
+        ★재는 것은 **성질**이지 구현 모양이 아니다 — 종전엔 특정 한 줄
+        (`documents.filter(...)`)을 박아 뒀는데, P1.5-3 이 firm.js 의 목록을 문서+실사
+        병합 타임라인으로 바꾸자 성질은 그대로인데 가드만 터졌다(의미 없는 실패).
+        이 저장소가 이미 적은 관례를 따른다 — 이름이 아니라 성질을 고정한다."""
         for name, src in (("firm.js", self.firm_js), ("inspector.js", self.insp_js)):
             self.assertIn("function docHasCat(", src, name)
             self.assertIn("function setActiveCat(", src, name)
-            self.assertIn("activeCat", src, name)
-            # 문서 목록이 활성 분류로 걸러진다.
-            self.assertIn("documents.filter(function (d) { return docHasCat(d, activeCat); })",
-                          src, name)
+            # ① 활성 분류가 문서 렌더링을 게이트한다(모양 무관 — filter 든 forEach 든).
+            self.assertIn("docHasCat(d, activeCat)", src, name)
+            # ② 클릭이 페이지를 떠나지 않는다 — 이 테스트 이름의 본체다.
+            fn = src[src.index("function setActiveCat("):]
+            fn = fn[:fn.index(chr(10) + "  }" + chr(10))]
+            for leaving in ("location.href", "location.assign", "window.open"):
+                self.assertNotIn(leaving, fn, name + ": " + leaving)
+            # ③ 대신 같은 화면을 다시 그린다.
+            self.assertRegex(fn, r"render(Timeline|Documents)\(")
 
     def test_degrades_when_065_absent(self):
         """065 미적용·구버전 응답이면 종전 링크 동작으로 조용히 내려간다.

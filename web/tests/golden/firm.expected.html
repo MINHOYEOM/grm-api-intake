@@ -83,17 +83,12 @@
       <section class="fp-block" aria-label="연도 추이">
         <h2 class="fp-h">연도 추이</h2>
         <div id="fp-year" class="fp-year"></div>
-      </section>
-
-      <section class="fp-block" aria-label="문서 이력">
-        <h2 class="fp-h">문서 이력</h2>
+      </section><section class="fp-block" aria-label="규제 이력">
+        <h2 class="fp-h">규제 이력</h2>
+        <p class="fp-tl-read">공개 문서와 FDA 실사 판정을 시간순으로 놓았습니다. <b>둘은 단위가 다릅니다</b> &mdash; 문서는 그 안의 지적 문장 수, 실사는 그 실사 한 건의 판정(NAI 적합 · VAI 경미 · OAI 중대)입니다. 날짜의 뜻도 달라 행마다 표시했고, 나란히 있다고 해서 서로의 원인·결과인 것은 아닙니다.</p>
         <div class="fp-filter" id="fp-filter" hidden></div>
-        <div id="fp-docs" class="fp-docs"></div>
-      </section><section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>
-        <h2 class="fp-h">FDA GMP 실사 이력</h2>
-        <p class="fp-insp-read">위 지적 이력과는 <b>단위가 다릅니다</b> &mdash; 여기는 FDA 가 실사 한 건을 어떻게 판정했는지(NAI 적합 · VAI 경미 · OAI 중대)입니다. 사업장 표기는 FDA 공개 원문 그대로라 위 업체명과 다를 수 있습니다.</p>
         <p class="fp-insp-sub" id="fp-insp-sub"></p>
-        <div id="fp-insp" class="fp-insp"></div>
+        <div id="fp-docs" class="fp-docs"></div>
         <p class="fp-insp-note" id="fp-insp-note"></p>
       </section>
     </div>
@@ -211,6 +206,17 @@ button.fp-cat-row[aria-pressed="true"] .fp-cat-label{color:var(--coral-2);font-w
 .fp-year-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
 .fp-year-count{font-family:var(--mono);font-size:10.5px;color:var(--body-s)}
 
+/* [P1.5-3] 규제 이력 머리 해설 — .fp-insp-read 를 섹션 머리로 옮긴 자리. */
+.fp-tl-read{font-size:13px;line-height:1.7;color:var(--muted);margin:-8px 0 14px;word-break:keep-all;max-width:760px}
+.fp-tl-read b{color:var(--body-s);font-weight:600}
+/* [P1.5-3] 유형 배지 + 날짜 종류 — 한 축에 두 종류가 섞이므로 무엇이고 언제인지를
+   행마다 말한다. mono 는 ASCII(날짜)에만, 한국어 라벨은 sans(§4 한글안전). */
+.fp-tl-kind{flex:0 0 auto;font-size:11px;font-weight:600;border-radius:var(--rad-s);padding:2px 7px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+.fp-tl-kind.insp{border-color:var(--coral);color:var(--coral-2);background:var(--coral-tint)}
+.fp-tl-when{font-size:11px;color:var(--muted-2)}
+/* [P1.5-3] 필터 칩 옆 보조 문장 — 실사가 이 필터에서 빠진다는 고지. */
+.fp-filter-side{font-size:12px;color:var(--muted);word-break:keep-all}
+
 /* 문서 이력 — 최신순 리스트, public_obs_cnt>0 인 문서만 클릭 시 인라인 확장. */
 .fp-docs{display:flex;flex-direction:column;gap:0}
 .fp-doc-row{border-bottom:1px solid var(--line)}
@@ -327,7 +333,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/firm.js?v=f70377b5" defer></script>
+<script src="../../assets/firm.js?v=d778c9b6" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

@@ -98,28 +98,30 @@
         <div id="fp-year" class="fp-year"></div>
       </section>
 
-      <section class="fp-block" aria-label="문서 이력">
-        <h2 class="fp-h">문서 이력</h2>
+      {#- [P1.5-3 2026-08-27] 규제 이력 — 공개 문서와 FDA 실사 판정을 **하나의 시간축**에.
+
+          종전에는 두 블록이 나란히 있어 "이 업체에 무슨 일이 순서대로 있었나"를 읽는
+          사람이 머릿속에서 두 목록을 번갈아 맞춰야 했다(로드맵 P1.5 '막다른 지점' 3번).
+
+          ★종전 주석이 "단위가 다르니 합치지 마라"라고 못박았고, 그 규율은 그대로 옳다 —
+            다만 그것이 금지한 것은 **서로 나누는 것**(지적 문장 수 ÷ 실사 건수 같은 비율)
+            이지 시간순 배열이 아니다. 타임라인은 분모를 만들지 않는다. 대신 그 주석이
+            지키려던 경고를 이 섹션 머리로 옮겨 더 눈에 띄게 둔다.
+          ★진짜 위험은 **날짜 의미 차이**다 — 문서는 공개일(published_date), 실사는 실사
+            종료일(inspection_end_date). 한 축에 놓으면서 이걸 안 밝히면 그 자체가 새
+            거짓말이 되므로 **행마다 날짜 종류**를 적는다(firm.js buildTimeline).
+          ★인과를 만들지 않는다. 실사와 문서를 잇는 조인 키가 없어("이 실사의 결과로
+            경고서한") 같은 연결은 데이터가 뒷받침하지 못한다 — 나란히 놓기만 한다.
+          ★실사는 별도 RPC 로 **나중에** 도착한다(063). 도착 전에는 문서만 그리고,
+            도착하면 같은 목록을 다시 그린다. 실패·미적용이면 문서만 남는다(종전과 동일).
+          ★"기록 없음"에는 반드시 범위를 함께 적는다 — 이 표는 FY2020 이후 Drug Quality
+            Assurance 실사만 담으므로 범위 없는 부재 단정은 거짓이다(부재 어휘 규율). -#}
+      <section class="fp-block" aria-label="규제 이력">
+        <h2 class="fp-h">규제 이력</h2>
+        <p class="fp-tl-read">공개 문서와 FDA 실사 판정을 시간순으로 놓았습니다. <b>둘은 단위가 다릅니다</b> &mdash; 문서는 그 안의 지적 문장 수, 실사는 그 실사 한 건의 판정(NAI 적합 · VAI 경미 · OAI 중대)입니다. 날짜의 뜻도 달라 행마다 표시했고, 나란히 있다고 해서 서로의 원인·결과인 것은 아닙니다.</p>
         <div class="fp-filter" id="fp-filter" hidden></div>
-        <div id="fp-docs" class="fp-docs"></div>
-      </section>
-
-      {#- [063] FDA GMP 실사 이력 — fda_inspection_firm(p_firm_key).
-
-          위 지적 이력과 **단위가 다르다**(지적 문장 vs 실사 건의 등급). 그래서 별도
-          섹션으로 두고 서로 나누지 않는다 — 실사 존을 세 면으로 가른 것과 같은 규율을
-          한 페이지 안에서는 섹션 경계로 지킨다.
-
-          ★"기록 없음"에는 반드시 범위를 함께 적는다(firm.js 가 RPC scope 에서 채움) —
-          이 표는 FY2020 이후 Drug Quality Assurance 실사만 담으므로, 범위 없는
-          "실사 기록 없음"은 거짓이 된다(부재 어휘 규율).
-          063 미적용 라이브·fetch 실패면 이 블록만 조용히 숨긴 채로 남는다(프로파일
-          본기능 무장애 — 워치리스트와 같은 격리). -#}
-      <section class="fp-block" id="fp-insp-block" aria-label="FDA GMP 실사 이력" hidden>
-        <h2 class="fp-h">FDA GMP 실사 이력</h2>
-        <p class="fp-insp-read">위 지적 이력과는 <b>단위가 다릅니다</b> &mdash; 여기는 FDA 가 실사 한 건을 어떻게 판정했는지(NAI 적합 · VAI 경미 · OAI 중대)입니다. 사업장 표기는 FDA 공개 원문 그대로라 위 업체명과 다를 수 있습니다.</p>
         <p class="fp-insp-sub" id="fp-insp-sub"></p>
-        <div id="fp-insp" class="fp-insp"></div>
+        <div id="fp-docs" class="fp-docs"></div>
         <p class="fp-insp-note" id="fp-insp-note"></p>
       </section>
     </div>
@@ -206,6 +208,17 @@ button.fp-cat-row[aria-pressed="true"] .fp-cat-label{color:var(--coral-2);font-w
 .fp-year-bar{width:100%;background:var(--coral)}
 .fp-year-lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
 .fp-year-count{font-family:var(--mono);font-size:10.5px;color:var(--body-s)}
+
+/* [P1.5-3] 규제 이력 머리 해설 — .fp-insp-read 를 섹션 머리로 옮긴 자리. */
+.fp-tl-read{font-size:13px;line-height:1.7;color:var(--muted);margin:-8px 0 14px;word-break:keep-all;max-width:760px}
+.fp-tl-read b{color:var(--body-s);font-weight:600}
+/* [P1.5-3] 유형 배지 + 날짜 종류 — 한 축에 두 종류가 섞이므로 무엇이고 언제인지를
+   행마다 말한다. mono 는 ASCII(날짜)에만, 한국어 라벨은 sans(§4 한글안전). */
+.fp-tl-kind{flex:0 0 auto;font-size:11px;font-weight:600;border-radius:var(--rad-s);padding:2px 7px;border:1px solid var(--line-2);background:var(--strong);color:var(--body-s)}
+.fp-tl-kind.insp{border-color:var(--coral);color:var(--coral-2);background:var(--coral-tint)}
+.fp-tl-when{font-size:11px;color:var(--muted-2)}
+/* [P1.5-3] 필터 칩 옆 보조 문장 — 실사가 이 필터에서 빠진다는 고지. */
+.fp-filter-side{font-size:12px;color:var(--muted);word-break:keep-all}
 
 /* 문서 이력 — 최신순 리스트, public_obs_cnt>0 인 문서만 클릭 시 인라인 확장. */
 .fp-docs{display:flex;flex-direction:column;gap:0}

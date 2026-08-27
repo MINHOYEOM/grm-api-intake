@@ -49,9 +49,7 @@
   var lookupEl = document.getElementById("fp-lookup");
   // [063] FDA 실사 이력 — 워치리스트와 같은 격리: 미적용 라이브·구버전 셸·fetch 실패
   // 전부 이 블록만 hidden 으로 남고 프로파일 본기능은 무장애.
-  var inspBlockEl = document.getElementById("fp-insp-block");
   var inspSubEl = document.getElementById("fp-insp-sub");
-  var inspEl = document.getElementById("fp-insp");
   var inspNoteEl = document.getElementById("fp-insp-note");
   var lookFormEl = document.getElementById("fp-look-form");
   var lookInputEl = document.getElementById("fp-look-input");
@@ -177,6 +175,10 @@
   // 종전 링크 동작을 그대로 유지한다(조용한 하위호환 — 프로파일 본기능 무장애).
   var activeCat = null;
   var LAST_DOCS = [];
+  // [P1.5-3] 실사 응답은 프로파일 렌더 **뒤에** 별도 RPC 로 도착한다(063).
+  // 도착 전에는 문서만 그리고, 도착하면 같은 목록을 다시 그린다. null = 아직
+  // 모름(또는 실패) — 0건과 구분해야 "확인된 기록 없음" 문장을 언제 쓸지 갈린다.
+  var LAST_INSP = null;
   var LAST_NAME = "";
   var filterable = false;
 
@@ -194,7 +196,7 @@
     activeCat = activeCat === code ? null : code;
     renderCategories(LAST_CATS, LAST_NAME);
     renderFilter();
-    renderDocuments(LAST_DOCS);
+    renderTimeline();
     if (docsEl && activeCat && docsEl.scrollIntoView) docsEl.scrollIntoView({ block: "nearest" });
   }
 
@@ -219,6 +221,14 @@
     out.href = findingsHref("cat", activeCat, LAST_NAME);
     out.textContent = "전체 지적사항에서 보기 →";
     filterEl.appendChild(out);
+    // [P1.5-3] 분류 필터는 문서에만 적용된다 — 실사에는 분류가 없어
+    // 시간축에서 빠진다. 그 사실을 말하지 않으면 "이 업체는 실사 기록이 없다"로
+    // 오독된다(부재 어휘 규율). 실사가 없는 업체에서는 아무 말도 하지 않는다.
+    var inspN = ((LAST_INSP && LAST_INSP.inspections) || []).length;
+    if (inspN > 0) {
+      filterEl.appendChild(el("span", "fp-filter-side",
+        "실사 " + fmtNum(inspN) + "건은 분류가 없어 이 필터에서 제외됩니다"));
+    }
   }
 
   // ── 분류 구성(상위 분류 코럴 농도 바) ────────────────────────────────────────
@@ -438,6 +448,8 @@
     var main = document.createElement("div");
     main.className = "fp-doc-row-main";
     main.appendChild(el("span", "fp-doc-date", doc.published_date || ""));
+    main.appendChild(el("span", "fp-tl-when", "공개"));      // [P1.5-3] 날짜 종류
+    main.appendChild(el("span", "fp-tl-kind", "문서"));
     if (doc.source) main.appendChild(el("span", "fp-b", doc.source));
 
     var canExpand = (doc.public_obs_cnt || 0) > 0;
@@ -479,23 +491,45 @@
     return row;
   }
 
-  function renderDocuments(documents) {
+  // [P1.5-3] 규제 이력 — 문서(공개일)와 실사(실사 종료일)를 한 시간축에 내림차순으로.
+  // ★분류 필터는 **문서에만** 적용된다. 실사에는 분류가 없으므로, 필터가 걸리면 실사
+  //   행은 빠지고 그 사실을 칩 옆 문장이 말한다 — 조용히 빠지면 "이 업체는 실사 기록이
+  //   없다"로 오독된다(부재 어휘 규율).
+  // ★정렬은 날짜 문자열(YYYY-MM-DD) 사전순 = 시간순. 날짜가 빈 행은 맨 뒤로 보낸다
+  //   (없는 날짜를 0000 으로 채워 맨 앞에 두면 가장 오래된 사건처럼 보인다).
+  function timelineEntries() {
+    var out = [];
+    (LAST_DOCS || []).forEach(function (d) {
+      if (activeCat && !docHasCat(d, activeCat)) return;
+      out.push({ at: d.published_date || "", build: function () { return buildDocRow(d); } });
+    });
+    if (!activeCat) {
+      ((LAST_INSP && LAST_INSP.inspections) || []).forEach(function (r) {
+        out.push({
+          at: r.inspection_end_date || "",
+          build: function () { return buildInspRow(r); },
+        });
+      });
+    }
+    out.sort(function (a, b) {
+      if (!a.at) return 1;
+      if (!b.at) return -1;
+      return a.at < b.at ? 1 : (a.at > b.at ? -1 : 0);
+    });
+    return out;
+  }
+
+  function renderTimeline() {
+    if (!docsEl) return;
     docsEl.innerHTML = "";
-    if (!documents.length) {
-      docsEl.appendChild(el("p", "fp-empty", "표시할 문서가 없습니다."));
-      return;
-    }
-    // [P1 해석층] 활성 분류가 있으면 그 분류가 붙은 문서만 — 프로파일을 벗어나지 않는다.
-    var rows = activeCat
-      ? documents.filter(function (d) { return docHasCat(d, activeCat); })
-      : documents;
+    var rows = timelineEntries();
     if (!rows.length) {
-      docsEl.appendChild(el("p", "fp-empty",
-        catLabel(activeCat) + " 분류가 붙은 문서가 목록에 없습니다."));
+      docsEl.appendChild(el("p", "fp-empty", activeCat
+        ? catLabel(activeCat) + " 분류가 붙은 문서가 목록에 없습니다."
+        : "표시할 기록이 없습니다."));
       return;
     }
-    // RPC 가 이미 published_date desc 로 정렬해 반환한다(013 documents 계약) — 재정렬 없음.
-    rows.forEach(function (doc) { docsEl.appendChild(buildDocRow(doc)); });
+    rows.forEach(function (e) { docsEl.appendChild(e.build()); });
   }
 
   // ── 관심 업체 워치리스트(015_firm_watchlist.sql — 등록/해제 토글) ────────────
@@ -631,7 +665,7 @@
     renderRepeats(data.repeats || []);
     renderYears(data.by_year || []);
     renderFilter();
-    renderDocuments(LAST_DOCS);
+    renderTimeline();
   }
 
   function rpcEndpoint(name) {
@@ -720,6 +754,10 @@
   function buildInspRow(r) {
     var row = el("div", "fp-insp-row");
     row.appendChild(el("span", "fp-insp-date", r.inspection_end_date || ""));
+    // [P1.5-3] 한 축에 문서와 실사가 섞이므로 **무엇이고 그 날짜가 무슨 날인지**를
+    // 행마다 말한다 — 문서는 공개일, 실사는 실사 종료일이라 의미가 다르다.
+    row.appendChild(el("span", "fp-tl-when", "실사 종료"));
+    row.appendChild(el("span", "fp-tl-kind insp", "실사"));
     var code = String(r.classification_code || "");
     var grade = el("span", "fp-insp-grade " + code.toLowerCase(),
       code + (INSP_GRADE_KO[code] ? " " + INSP_GRADE_KO[code] : ""));
@@ -735,8 +773,10 @@
     return row;
   }
 
+  // [P1.5-3] 실사 응답이 도착했다 — 목록 그리기는 타임라인이 맡고, 여기서는
+  // **타임라인이 표현할 수 없는 것**만 문장으로 남긴다: 등급 구성 요약과 수집 범위.
+  // (누적 합계·OAI 건수는 시간축 위에서는 읽히지 않는다.)
   function renderInspections(data) {
-    if (!inspBlockEl || !inspEl) return;
     var d = data || {};
     var t = d.totals || {};
     var scope = d.scope || {};
@@ -747,18 +787,22 @@
       range = "FY" + scope.fiscal_year_min + "~FY" + scope.fiscal_year_max +
         " FDA 의약품 GMP 실사";
     }
+    // ★상한을 넘는 분은 타임라인에서도 자른다 — 요약이 말하는 건수와 목록의 줄 수가
+    //   어긋나면 어느 쪽이 맞는지 알 수 없게 된다. 자른 사실은 아래 각주가 밝힌다.
+    LAST_INSP = { inspections: (d.inspections || []).slice(0, INSP_ROWS) };
+    renderTimeline();
+
     if (total === 0) {
       // ★"실사 기록 없음"이 아니라 "**확인된** 기록 없음 + 범위"다. 이 표는 FY2020
       //   이후 GMP 실사만 담으므로 범위 없는 부재 단정은 거짓이 된다(부재 어휘 규율).
-      //   범위 문자열조차 없으면(구버전 응답) 아예 그리지 않는다 — 좁힐 수 없는
+      //   범위 문자열조차 없으면(구버전 응답) 아무 말도 하지 않는다 — 좁힐 수 없는
       //   부재 문장을 싣지 않는다.
-      if (!range) return;
-      inspEl.innerHTML = "";
-      if (inspSubEl) inspSubEl.textContent = "";
-      inspEl.appendChild(el("p", "fp-empty",
-        "확인된 " + range + " 기록이 없습니다. 그 이전 실사나 다른 유형의 실사는 이 표의 범위 밖입니다."));
-      if (inspNoteEl) inspNoteEl.textContent = "";
-      inspBlockEl.hidden = false;
+      if (inspSubEl) {
+        inspSubEl.textContent = range
+          ? "확인된 " + range + " 기록이 없습니다. 그 이전 실사나 다른 유형의 실사는 이 범위 밖입니다."
+          : "";
+      }
+      if (inspNoteEl) { inspNoteEl.textContent = ""; inspNoteEl.hidden = true; }
       return;
     }
     if (inspSubEl) {
@@ -770,19 +814,15 @@
       }
       inspSubEl.textContent = sub_;
     }
-    var rows = d.inspections || [];
-    inspEl.innerHTML = "";
-    rows.slice(0, INSP_ROWS).forEach(function (r) { inspEl.appendChild(buildInspRow(r)); });
     if (inspNoteEl) {
       var note = "";
-      if (rows.length > INSP_ROWS) {
-        note += "최근 " + INSP_ROWS + "건만 표시했습니다(전체 " + total + "건). ";
+      if (total > INSP_ROWS) {
+        note += "실사는 최근 " + INSP_ROWS + "건만 시간축에 올렸습니다(전체 " + total + "건). ";
       }
-      if (range) note += "범위: " + range + " — 그 이전 실사는 담겨 있지 않습니다.";
+      if (range) note += "실사 범위: " + range + " — 그 이전 실사는 담겨 있지 않습니다.";
       inspNoteEl.textContent = note;
       inspNoteEl.hidden = !note;
     }
-    inspBlockEl.hidden = false;
   }
 
   function fetchInspectionHistory(firmKey) {

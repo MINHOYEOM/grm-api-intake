@@ -8579,11 +8579,19 @@ class WebSerpCtrTest(unittest.TestCase):
         self.assertLessEqual(widths[len(widths) // 2], 66,
                              "문서 제목 중앙값이 SERP 표시폭을 넘는다")
 
-    def test_publication_date_survives_the_truncation_line(self):
+    def test_title_date_survives_the_truncation_line(self):
         """날짜는 같은 업체 문서들을 가르는 유일한 값이라 **보이는 자리**에 있어야 한다.
 
         종전 배치는 날짜를 "지적사항" 뒤에 뒀고, 그 8폭 때문에 3,301장 중 1,333장에서만
-        날짜가 온전히 보였다. 자리를 맞바꾼 뒤 2,852장. 되돌리면 이 검사가 잡는다."""
+        날짜가 온전히 보였다. 자리를 맞바꾼 뒤 2,852장. 되돌리면 이 검사가 잡는다.
+
+        ★[실사일 2026-08-27] 이 검사는 **내가 낡게 만들었다.** 원래 `published_date` 가
+        제목에 보이는지로 쟀는데, 제목이 실사일을 쓰게 되면서 1,524장에서 공개일이
+        제목에 없어졌다 — 결함이 아니라 설계 변경인데 검사만 남아 빨간불이 됐다
+        (3,301 중 1,440 으로 떨어졌다). 지키려던 뜻은 "날짜가 절단선 안에 보이는가"이지
+        "공개일이 보이는가"가 아니었으므로, **제목이 실제로 싣는 날짜**로 잰다.
+        이 형태는 어느 날짜를 고르든 살아남고, 날짜가 뒤로 밀리는 변경은 그대로 잡는다.
+        """
         docs = render.load_findings_docs()["documents"]
         titles = render.build_doc_page_titles(docs)
         by_slug = {d["slug"]: d for d in docs}
@@ -8597,10 +8605,10 @@ class WebSerpCtrTest(unittest.TestCase):
             return text
 
         shown = sum(1 for slug, t in titles.items()
-                    if by_slug[slug]["published_date"] in visible(f"{t} · GRM"))
+                    if render.doc_display_date(by_slug[slug]) in visible(f"{t} · GRM"))
         self.assertGreaterEqual(
             shown, int(len(docs) * 0.78),
-            f"날짜가 절단선 안에 보이는 문서 {shown}/{len(docs)}장(실측 2,852) — "
+            f"제목이 싣는 날짜가 절단선 안에 보이는 문서 {shown}/{len(docs)}장 — "
             "제목에서 날짜가 뒤로 밀렸는지 확인하라.")
 
 

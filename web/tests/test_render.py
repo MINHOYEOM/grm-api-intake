@@ -9055,6 +9055,13 @@ class WebFindingsDocPageTest(unittest.TestCase):
         식약처 문서 121장은 `source` 가 기관 코드 그대로 `"MFDS"` 라, 그대로 쓰면 제목이
         "(주)태준제약 — MFDS 지적사항"이 되어 실재하지 않는 문서종류를 주장하게 된다.
         지어내지도(예: "GMP 실사 보고서") 코드를 노출하지도 않는 유일한 답은 생략이다.
+
+        ★[B2 2026-08-27] 종전에는 `"{업체} 지적사항"` 이 제목에 그대로 들어있는지로 쟀다.
+        그건 **그때의 배치**(업체 바로 뒤가 문서종류 자리)에 묶인 표현이라, 날짜를
+        "지적사항" 앞으로 옮기자 지키던 뜻은 멀쩡한데 검사만 깨졌다. 그래서 뜻을 직접
+        잰다 — **업체명과 "지적사항" 사이에 날짜 말고는 아무것도 없다.** 이 형태는 옛
+        배치에서도 참이라(그때는 사이가 빈 문자열) 배치를 또 바꿔도 살아남고, 문서종류를
+        슬쩍 끼워 넣는 변경은 그대로 잡는다.
         """
         checked = 0
         for doc in self.data["documents"]:
@@ -9066,7 +9073,13 @@ class WebFindingsDocPageTest(unittest.TestCase):
             title = html.split("<title>", 1)[1].split("</title>", 1)[0]
             self.assertNotIn(doc["agency"], title,
                              f'제목이 기관 코드를 문서종류로 쓴다: {doc["slug"]}')
-            self.assertIn(f'{doc["firm_name"]} 지적사항', title, doc["slug"])
+            firm = render.title_firm_name(doc["firm_name"])
+            self.assertIn(firm, title, doc["slug"])
+            between = title.split(firm, 1)[1].split(" 지적사항", 1)[0].strip()
+            self.assertRegex(
+                between, r"^(\(\d{4}-\d{2}-\d{2}\))?$",
+                f'업체명과 "지적사항" 사이에 문서종류가 끼어들었다: '
+                f'{doc["slug"]} — {between!r}')
         self.assertGreater(checked, 0, "기관 코드가 source 인 문서가 없다(배선 확인)")
 
     def test_real_document_types_are_kept(self):

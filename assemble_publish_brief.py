@@ -539,6 +539,12 @@ _BODY_DETAIL_TYPES = frozenset({
     "whopir_report",             # outcome + sections[].text
     "eu_gmp_ncr_statement",      # nature/action/operations 전문
     "mhra_gmp_ncr_statement",
+    # [2026-08-27] 회수 4종 중 **이것만 서사층**이다 — 형제 3종(openfda/mfds/hc)은 로트·수량
+    # 같은 사실표라 아래 _FACTS 로 가지만, MHRA 알림은 gov.uk Content API 가 주는 공고 전문
+    # 이라 `Background` 에 회수 사유 서술이 그대로 들어 있다(발행 3장 전건 확인: 포장공정
+    # 무균성 결함 / 외부 카톤 표시 오류 / 금속 입자 오염 가능성). 즉 이 카드가 "세부 사유를
+    # 확보하지 못했다"고 적으면 거짓이므로 부재 서술 게이트가 검사해야 한다.
+    "mhra_recall_alert",
 })
 # 구조화 **사실표**만 싣는 유형 — 로트·수량·유통범위·처리경과처럼 값이 짧은 통제어휘다.
 # 이런 카드는 상세를 싣고도 "당국이 세부 일탈 사유를 공개하지 않았다"가 **여전히 참**이라

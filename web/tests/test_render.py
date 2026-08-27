@@ -11644,11 +11644,25 @@ class WebDiscoveryHubTest(unittest.TestCase):
         agencies = {d.get("agency") for d in docs}
         self.assertLessEqual({"FDA", "HC", "MFDS", "EMA", "MHRA"}, agencies)
 
-    def test_docs_min_findings_gate_is_one(self):
+    def test_thickness_gate_exempts_sources_it_would_erase(self):
+        """임계(3)는 유지하되, **그 임계가 소스를 통째로 지우면 면제**한다.
+
+        실측 문서당 지적 1건 비율: EMA 100% · MHRA 100% · MFDS 89% · FDA 28% · HC 16%.
+        EU 비준수 보고서는 지적 1건이 곧 보고서 전체라 임계가 '얇음'이 아니라 '존재'를
+        재고 있었다 — 두 사건을 한 숫자로 다루면 반드시 한쪽이 틀린다. 판정은 손목록이
+        아니라 수집 데이터에서 파생한다(새 소스 자동 편입)."""
         import findings_docs_refresh as fdr
-        self.assertEqual(fdr.DEFAULT_MIN_FINDINGS, 1,
-                         "임계를 올리면 문서당 지적이 적은 기관이 통째로 사라진다 — "
-                         "올리려면 기관별 분포를 먼저 실측할 것")
+        self.assertEqual(fdr.DEFAULT_MIN_FINDINGS, 3)
+        reject = collections.Counter()
+        docs = ([{"agency": "FDA", "findings": [0] * 5}] * 2
+                + [{"agency": "FDA", "findings": [0]}] * 3       # 얇음 → 걸러진다
+                + [{"agency": "NCR", "findings": [0]}] * 4)      # 소스 전체가 1건 → 면제
+        kept = fdr.apply_thickness_gate(docs, min_findings=3, reject=reject)
+        self.assertEqual(sum(1 for d in kept if d["agency"] == "FDA"), 2,
+                         "임계가 실제로 얇은 문서를 거르는 소스에서는 종전대로 동작해야")
+        self.assertEqual(sum(1 for d in kept if d["agency"] == "NCR"), 4,
+                         "임계가 통째로 지우는 소스는 전량 남아야")
+        self.assertEqual(reject["국문 지적 3건 미만"], 3)
 
     def test_unsafe_doc_id_becomes_deterministic_slug(self):
         import findings_docs_refresh as fdr

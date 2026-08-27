@@ -1714,6 +1714,26 @@ def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | Non
     return obj
 
 
+_FIRM_SLUG_KEEP = re.compile(r"[^a-z0-9]+")
+
+
+def _firm_slug(firm_key: str) -> "str | None":
+    """업체 정규화 키 → URL 안전 슬러그. 같은 키는 언제나 같은 슬러그(재실행 안정).
+
+    `findings_docs_refresh._safe_slug` 와 같은 계약이다 — 읽을 수 있는 몸통을 남기되
+    원본의 sha1 앞 8자를 접미해 충돌을 막는다. 접미가 **항상** 붙는 것이 문서 슬러그와
+    다른 점인데, 업체 키는 한글·괄호가 흔해 몸통만으로는 서로 다른 업체가 같은 슬러그로
+    뭉갤 수 있기 때문이다("(주)한국콜마" 와 "한국콜마" 는 다른 키다). 몸통이 통째로
+    비는 한글 상호는 접미만으로 식별된다 — 읽기 좋진 않지만 **틀리지 않는다**.
+    """
+    key = (firm_key or "").strip().lower()
+    if not key:
+        return None
+    body = _FIRM_SLUG_KEEP.sub("-", key).strip("-")[:60].rstrip("-")
+    tail = hashlib.sha1(key.encode("utf-8")).hexdigest()[:8]
+    return f"{body}-{tail}" if body else f"firm-{tail}"
+
+
 def doc_source_label(doc: dict[str, Any]) -> str:
     """문서종류 표시값 — 문서종류가 아닌 값이면 **빈 문자열**(= 표기 생략).
 
@@ -3114,6 +3134,52 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             if key:
                 by_firm.setdefault(key, []).append(d)
 
+        # ── [B1 색인 표면] 업체별 정적 페이지 ────────────────────────────────
+        # 사람들이 실제로 검색창에 치는 말은 "업체명 + 483" 인데, 그 질문에 답하는 화면
+        # (/findings/firm/?key=)은 **실행 시점에 데이터를 불러오는 페이지**라 검색엔진에
+        # 잡히지 않는다. 반면 문서 상세는 이미 업체 실명으로 색인되고 있으므로, 같은
+        # 정본에서 업체 단위 정적 페이지를 내는 것은 공개 범위를 넓히는 게 아니라
+        # **이미 공개된 것에 닿는 길을 내는 것**이다(실사관 면은 사람에 대한 페이지라
+        # 정책이 달라 noindex 유지 — 여기 대상이 아니다).
+        #
+        # 문서 2건 이상만 만든다. 1건짜리는 그 문서 상세와 내용이 사실상 겹쳐(얇은
+        # 중복 페이지) 색인에 해롭다 — 2건부터는 문서 상세 어디에도 없는 것(여러 실사에
+        # 걸친 구성·기간)이 생긴다. 임계는 조합 페이지의 복제본 방벽과 같은 취지다.
+        FIRM_PAGE_MIN_DOCS = 2
+        firm_pages: list[dict[str, Any]] = []
+        firm_page_slug_by_key: dict[str, str] = {}
+        for key in sorted(by_firm):
+            group = by_firm[key]
+            if len(group) < FIRM_PAGE_MIN_DOCS:
+                continue
+            slug = _firm_slug(key)
+            if not slug or slug in firm_page_slug_by_key.values():
+                continue  # 슬러그를 못 만들거나 충돌하면 페이지를 만들지 않는다
+            rows = sorted(group, key=lambda x: (x["published_date"], x["slug"]),
+                          reverse=True)
+            cat_counts: dict[str, int] = {}
+            for d in rows:
+                for label in (d.get("categories") or []):
+                    cat_counts[label] = cat_counts.get(label, 0) + 1
+            firm_page_slug_by_key[key] = slug
+            firm_pages.append({
+                "key": key, "slug": slug,
+                # 표시명은 그 업체의 문서에서 가장 많이 쓰인 표기(동률이면 긴 쪽) —
+                # firm_key 는 정규화값이라 화면에 그대로 쓰면 "(주)" 가 사라진 형태가 된다.
+                "name": max(
+                    sorted({d.get("firm_name", "") for d in rows if d.get("firm_name")}),
+                    key=lambda n: (sum(1 for d in rows if d.get("firm_name") == n), len(n)),
+                    default=key),
+                "documents": rows,
+                "doc_count": len(rows),
+                "finding_count": sum(len(d.get("findings") or []) for d in rows),
+                "first_seen": min(d["published_date"] for d in rows),
+                "last_seen": max(d["published_date"] for d in rows),
+                "agencies": sorted({d["agency"] for d in rows}),
+                "categories": [c for c, _ in sorted(cat_counts.items(),
+                                                    key=lambda kv: (-kv[1], kv[0]))],
+            })
+
         # 기관×연도 그룹. 정렬은 전부 결정론(연도 내림차순·같은 연도 안은 날짜 내림차순).
         by_ay: dict[tuple[str, str], list[dict[str, Any]]] = {}
         for d in documents:
@@ -3229,9 +3295,35 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 source_label=doc_source_label(doc),
                 related_categories=related, same_firm=same_firm,
                 finding_bodies=finding_bodies,
+                # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
+                # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
+                firm_page_slug=firm_page_slug_by_key.get(doc.get("firm_key") or ""),
             )
             _write(out_dir / "findings" / "doc" / doc["slug"] / "index.html", doc_html)
             written.append(f"findings/doc/{doc['slug']}/index.html")
+
+        # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),
+        # 실제 렌더는 문서 페이지와 같은 스위치를 탄다 — 이 페이지로 들어오는 링크가
+        # 문서 상세에 있으므로, 문서 페이지를 끈 빌드에서 이것만 쓰면 고아가 된다.
+        for fp in firm_pages:
+            facet_paths.append((f"findings/firm/{fp['slug']}/", fp["last_seen"]))
+        if render_doc_pages:
+            for fp in firm_pages:
+                _write(out_dir / "findings" / "firm" / fp["slug"] / "index.html",
+                       env.get_template("findings_firm_page.html").render(
+                           page_title=f"{fp['name']} 지적사항 이력 · GRM",
+                           rel_root="../../../",
+                           nav_active="findings",
+                           latest_slug=latest_slug,
+                           description=(
+                               f"{fp['name']}의 공개 실사 문서 {fp['doc_count']:,}건에서"
+                               f" 확인된 지적 {fp['finding_count']:,}건을 우리말로"
+                               f" 정리했습니다({fp['first_seen'][:4]}~{fp['last_seen'][:4]})."),
+                           canonical=_abs_url(f"findings/firm/{fp['slug']}/"),
+                           firm=fp, agency_labels=doc_agency_labels,
+                           measured_on=docs_data.get("measured_on", ""),
+                           min_findings=docs_data.get("min_findings")))
+                written.append(f"findings/firm/{fp['slug']}/index.html")
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

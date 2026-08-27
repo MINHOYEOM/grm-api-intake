@@ -309,11 +309,20 @@ def _has_fitz() -> bool:
         return False
 
 
-def _build_pdf(title: str, table_rows=None, extra_text: str = "") -> bytes:
+def _build_pdf(title: str, table_rows=None, extra_text: str = "",
+               redact_cells=()) -> bytes:
     """지적 표 회귀용 합성 PDF. 내장 CJK 폰트 'korea' 사용 — 외부 폰트 불요·CI 이식성.
 
     table_rows=None → 표 없는 문서(사전평가/적합). 리스트면 5컬럼 ruled 표를 그린다
     (find_tables 는 벡터 선 격자를 결정론으로 인식 — 실측 PDF 와 동형 구조).
+
+    redact_cells = [(데이터행 인덱스, 컬럼 인덱스), …] — 그 칸에 **검은 가림막**을 덧그린다.
+    ★핵심: 글자를 지우지 않는다. 실측 문서와 같은 구조로 **살아 있는 텍스트 위에** 채워진
+    사각형을 얹을 뿐이라, 가드가 없으면 `get_text()` 가 막대 아래 글자를 그대로 돌려준다
+    (그 사실 자체를 `test_defect_reintroduced_leaks_hidden_text` 가 못박는다).
+    ★막대는 칸 경계에 **정확히** 맞춰 그린다 — 칸 안쪽에 그리면 그 네 변이 새 격자선으로
+    보여 find_tables 가 열/행을 더 쪼갤 수 있고, 그러면 픽스처가 가드가 아니라 표 검출을
+    시험하게 된다.
     """
     import fitz
     doc = fitz.open()
@@ -333,6 +342,12 @@ def _build_pdf(title: str, table_rows=None, extra_text: str = "") -> bytes:
         for r, row in enumerate([header] + table_rows):
             for c, cell in enumerate(row):
                 page.insert_text((cols_x[c] + 2, rows_y[r] + 18), cell, fontsize=7, **kw)
+        for data_row, col in redact_cells:
+            r = data_row + 1                       # 0 = 헤더행
+            page.draw_rect(
+                fitz.Rect(cols_x[col], rows_y[r], cols_x[col + 1], rows_y[r + 1]),
+                color=(0, 0, 0), fill=(0, 0, 0),
+            )
     return doc.tobytes()
 
 
@@ -794,6 +809,314 @@ class TestDeficiencyTableFormats(unittest.TestCase):
             rows, status = g._parse_deficiency_table(
                 b"x", "hwp-ole", "text", "present", "doc-2")
         self.assertEqual((rows, status), ([], ""))
+
+
+# ── [가림막 가드 2026-08-27 · docs/specs/GMP_지적표_추출불가_실측_2026-08-27.md] ──────
+# 식약처가 지적사항 일부를 검은 막대로 가려 배포하는데, 그 막대는 글자를 지우지 않고
+# **살아 있는 텍스트 위에 덧그려져** 있어 `get_text()` 가 아래를 읽는다. 우리 파서는
+# 원천이 의도적으로 감춘 문장을 추출하고 있었다(CONTROL 194문서 중 13문서/35행).
+# 행 단위로 버리는 근거는 collect_mfds_gmp_inspection.py 상단 상수 블록 주석 참조.
+
+class TestZeroMaskGuard(unittest.TestCase):
+    """텍스트층 가림(`0000…`) — 좌표가 없어 **PDF·HWPX 두 경로 공통**으로 걸린다."""
+
+    _HEADER = ["분야", "구분", "근거 법령", "지적(보완)사항 요약", "비고"]
+
+    def test_is_zero_masked_predicate(self):
+        for masked in ("0000", "00000000", "0000 0000 0000", " 0000\n0000 "):
+            with self.subTest(value=masked):
+                self.assertTrue(g._is_zero_masked(masked))
+        for clean in ("", "0", "000", "제0000호", "[별표 1] 제6.4호",
+                      "2026-08-27", "밸리데이션 실시할 것"):
+            with self.subTest(value=clean):
+                self.assertFalse(g._is_zero_masked(clean))
+
+    def test_fully_masked_row_dropped(self):
+        rows = [self._HEADER,
+                ["0000", "0000", "0000 0000", "0000 0000 0000", "0000"],
+                ["제조", "기타", "[별표 1] 제6호", "기록 미비", "보완완료"]]
+        out = g._normalize_deficiency_table(rows)
+        self.assertEqual([r["summary"] for r in out], ["기록 미비"])
+
+    def test_single_masked_field_drops_the_whole_row(self):
+        """근거법령이 살아 있어도 지적내용이 가려졌으면 그 행은 나가면 안 된다 —
+        남은 칸만 실으면 '근거법령만 있고 지적은 없다'는 거짓 진술이 된다."""
+        rows = [self._HEADER,
+                ["제조", "기타", "[별표 1] 제6호", "000000000000", "보완완료"]]
+        self.assertEqual(g._normalize_deficiency_table(rows), [])
+
+    def test_masked_legal_basis_drops_the_row(self):
+        rows = [self._HEADER,
+                ["제조", "기타", "0000 0000", "제조기록서 미작성", "보완완료"]]
+        self.assertEqual(g._normalize_deficiency_table(rows), [])
+
+    def test_legitimate_zero_bearing_citation_survives(self):
+        """`제0000호` 처럼 0 이 넷 박힌 정상 표기는 살아야 한다(과잉 차단 방지)."""
+        rows = [self._HEADER,
+                ["제조", "기타", "고시 제0000호", "기록 미비", "0"]]
+        out = g._normalize_deficiency_table(rows)
+        self.assertEqual(len(out), 1)
+        self.assertEqual(out[0]["legal_basis"], "고시 제0000호")
+
+    def test_hwpx_path_shares_the_guard(self):
+        """HWPX 는 좌표가 없지만 같은 정규화기를 쓰므로 이 가드가 자동으로 걸린다."""
+        data = _hwpx_bytes([[
+            self._HEADER,
+            ["0000", "0000", "0000 0000", "0000 0000 0000", "0000"],
+            ["시험실", "기타", "[별표 1의2] 제11.1호", "근거자료 미첨부", "보완완료"],
+        ]])
+        rows = g._extract_hwpx_deficiency_table(data)
+        self.assertEqual([r["summary"] for r in rows], ["근거자료 미첨부"])
+
+
+class TestRedactedRowIndexPlumbing(unittest.TestCase):
+    """`redacted_rows` 인덱스는 **원본 표 행렬 기준**이다(헤더 뒤 슬라이스 기준이 아니다)."""
+
+    _HEADER = ["분야", "구분", "근거 법령", "지적(보완)사항 요약", "비고"]
+    _ROW_A = ["제조", "기타", "[별표 1] 제6호", "제조기록서 미작성", "보완완료"]
+    _ROW_B = ["시험실", "중요", "[별표 1] 제11호", "근거자료 미첨부", "행정처분"]
+
+    def test_default_is_a_no_op(self):
+        rows = [self._HEADER, self._ROW_A, self._ROW_B]
+        self.assertEqual(g._normalize_deficiency_table(rows),
+                         g._normalize_deficiency_table(rows, redacted_rows=frozenset()))
+
+    def test_marked_row_is_dropped(self):
+        rows = [self._HEADER, self._ROW_A, self._ROW_B]
+        out = g._normalize_deficiency_table(rows, redacted_rows=frozenset({1}))
+        self.assertEqual([r["summary"] for r in out], ["근거자료 미첨부"])
+
+    def test_index_is_matrix_relative_not_slice_relative(self):
+        """★헤더 앞에 표지행이 있으면 슬라이스 기준 인덱스는 통째로 밀린다.
+
+        행렬: 0=표지 · 1=단위 · 2=헤더 · **3=`_ROW_A`** · 4=`_ROW_B`.
+        인덱스 3 을 가리면 `_ROW_A` 가 빠지고 `_ROW_B` 만 남아야 한다. 슬라이스(헤더+1)
+        기준으로 셌다면 3 은 그 슬라이스의 범위 밖이라 **아무것도 안 버려지고** 두 행이
+        다 나간다 — 가드가 조용히 통과되는 형태라 이 테스트가 그걸 못박는다.
+        """
+        rows = [["의약품 제조소 실태조사 결과"], ["(단위: 건)"],
+                self._HEADER, self._ROW_A, self._ROW_B]
+        out = g._normalize_deficiency_table(rows, redacted_rows=frozenset({3}))
+        self.assertEqual([r["summary"] for r in out], ["근거자료 미첨부"])
+
+    def test_all_rows_marked_yields_nothing(self):
+        rows = [self._HEADER, self._ROW_A, self._ROW_B]
+        self.assertEqual(
+            g._normalize_deficiency_table(rows, redacted_rows=frozenset({0, 1, 2})), [])
+
+
+class _StubRow:
+    def __init__(self, cells):
+        self.cells = cells
+
+
+class _StubTable:
+    def __init__(self, rows, bbox):
+        self.rows = rows
+        self.bbox = bbox
+
+
+@unittest.skipUnless(_has_fitz(), "PyMuPDF(fitz) 필요")
+class TestRedactionBarDetection(unittest.TestCase):
+    """막대 판별 하한 — 표 괘선·밑줄을 막대로 오인하면 멀쩡한 표가 통째로 사라진다."""
+
+    def _bars(self, drawings):
+        class _Page:
+            def get_drawings(self_inner):
+                return drawings
+        return g._pdf_redaction_bars(_Page())
+
+    def _rect(self, x0, y0, x1, y1):
+        import fitz
+        return fitz.Rect(x0, y0, x1, y1)
+
+    def test_black_bar_detected(self):
+        bars = self._bars([{"fill": (0.0, 0.0, 0.0),
+                            "items": [("re", self._rect(100, 100, 300, 118))]}])
+        self.assertEqual(len(bars), 1)
+
+    def test_scalar_grayscale_black_fill_detected(self):
+        """★회색조 단일 채널 `0.0` 은 falsy 다 — `if not fill` 로 걸러 내면 진짜 검은
+        막대를 통째로 놓친다(가드가 조용히 무력화되는 형태)."""
+        bars = self._bars([{"fill": 0.0,
+                            "items": [("re", self._rect(100, 100, 300, 118))]}])
+        self.assertEqual(len(bars), 1)
+
+    def test_table_rule_is_not_a_bar(self):
+        """괘선은 세로 두께가 사실상 0 — 이걸 막대로 보면 모든 표가 가려진 게 된다."""
+        bars = self._bars([{"fill": (0.0, 0.0, 0.0),
+                            "items": [("re", self._rect(40, 110, 555, 110.4))]}])
+        self.assertEqual(bars, [])
+
+    def test_short_mark_is_not_a_bar(self):
+        bars = self._bars([{"fill": (0.0, 0.0, 0.0),
+                            "items": [("re", self._rect(100, 100, 112, 118))]}])
+        self.assertEqual(bars, [])
+
+    def test_light_fill_is_not_a_bar(self):
+        """셀 음영(연회색 배경)은 가림막이 아니다."""
+        bars = self._bars([{"fill": (0.9, 0.9, 0.9),
+                            "items": [("re", self._rect(100, 100, 300, 118))]}])
+        self.assertEqual(bars, [])
+
+    def test_unfilled_rect_is_not_a_bar(self):
+        bars = self._bars([{"fill": None,
+                            "items": [("re", self._rect(100, 100, 300, 118))]}])
+        self.assertEqual(bars, [])
+
+    def test_non_rect_item_ignored(self):
+        bars = self._bars([{"fill": (0.0, 0.0, 0.0),
+                            "items": [("l", self._rect(100, 100, 300, 118))]}])
+        self.assertEqual(bars, [])
+
+    def test_unreadable_drawings_degrade_to_no_bars(self):
+        """`get_drawings()` 붕괴는 [] — 여기서 fail-closed 로 가면 가림막 없는 194문서
+        전부가 영향을 받아 '안 가려진 문서는 바이트 불변'이라는 대전제가 깨진다."""
+        class _Page:
+            def get_drawings(self_inner):
+                raise RuntimeError("broken")
+        self.assertEqual(g._pdf_redaction_bars(_Page()), [])
+
+    def test_no_bars_never_touches_the_text_layer(self):
+        """막대가 없으면 단어 추출 자체를 하지 않는다 — 기존 문서 산출 불변의 근거이자
+        비용 근거. page 로 None 을 줘도 통과한다는 것이 곧 '건드리지 않았다'는 증거다."""
+        self.assertEqual(g._pdf_covered_word_rects(None, []), [])
+
+
+@unittest.skipUnless(_has_fitz(), "PyMuPDF(fitz) 필요")
+class TestRedactedRowIndicesFailClosed(unittest.TestCase):
+    """좌표를 행에 대응 못 시키면 '안 가려졌다'가 아니라 '모른다' → 표 전체를 버린다."""
+
+    def _rect(self, x0, y0, x1, y1):
+        import fitz
+        return fitz.Rect(x0, y0, x1, y1)
+
+    def test_no_covered_words_is_a_no_op(self):
+        table = _StubTable([_StubRow([(0, 0, 10, 10)])], (0, 0, 100, 100))
+        self.assertEqual(g._pdf_redacted_row_indices(table, 1, []), frozenset())
+
+    def test_row_count_mismatch_drops_whole_table(self):
+        table = _StubTable([_StubRow([(0, 0, 10, 10)])], (0, 0, 100, 100))
+        self.assertEqual(g._pdf_redacted_row_indices(table, 3, [self._rect(1, 1, 5, 5)]),
+                         frozenset({0, 1, 2}))
+
+    def test_missing_geometry_drops_whole_table(self):
+        class _Broken:
+            @property
+            def rows(self):
+                raise RuntimeError("no geometry")
+            bbox = (0, 0, 100, 100)
+        self.assertEqual(g._pdf_redacted_row_indices(_Broken(), 2, [self._rect(1, 1, 5, 5)]),
+                         frozenset({0, 1}))
+
+    def test_word_inside_table_but_outside_every_cell_drops_whole_table(self):
+        """병합 셀·좌표 누락으로 어느 행인지 말할 수 없으면 통째로 버린다."""
+        table = _StubTable([_StubRow([(0, 0, 10, 10)]), _StubRow([(0, 20, 10, 30)])],
+                           (0, 0, 100, 100))
+        # (50,50)-(60,60) 은 표 안이지만 어느 칸에도 안 들어간다.
+        self.assertEqual(
+            g._pdf_redacted_row_indices(table, 2, [self._rect(50, 50, 60, 60)]),
+            frozenset({0, 1}))
+
+    def test_word_outside_the_table_is_ignored(self):
+        """다른 곳(표지·머리말)의 가림막은 이 표와 무관하다."""
+        table = _StubTable([_StubRow([(0, 0, 10, 10)]), _StubRow([(0, 20, 10, 30)])],
+                           (0, 0, 100, 100))
+        self.assertEqual(
+            g._pdf_redacted_row_indices(table, 2, [self._rect(500, 500, 520, 520)]),
+            frozenset())
+
+    def test_only_the_covered_row_is_marked(self):
+        table = _StubTable([_StubRow([(0, 0, 10, 10)]), _StubRow([(0, 20, 10, 30)])],
+                           (0, 0, 100, 100))
+        self.assertEqual(
+            g._pdf_redacted_row_indices(table, 2, [self._rect(2, 22, 8, 28)]),
+            frozenset({1}))
+
+
+@unittest.skipUnless(_has_fitz(), "PyMuPDF(fitz) 필요")
+class TestRedactionGuardPDF(unittest.TestCase):
+    """PDF 경로 통합 — 실측 문서와 같은 구조(살아 있는 글자 위 검은 막대)로 재현."""
+
+    _ROWS = [["시설장비", "기타", "[별표 1] 제2.1호", "교차오염 방지시설 미비", "이행 인정"],
+             ["제조", "중요", "[별표 1] 제6.1호", "밸리데이션 미실시", "행정처분 예정"]]
+    _TITLE = "의약품 제조소 GMP 정기실태조사(정기실사) 결과"
+    _HIDDEN = "밸리데이션 미실시"
+    _VISIBLE = "교차오염 방지시설 미비"
+
+    def _redacted_pdf(self):
+        # 데이터행 1(두 번째 지적)의 '지적(보완)사항 요약' 칸(컬럼 3)을 가린다.
+        return _build_pdf(self._TITLE, self._ROWS, redact_cells=[(1, 3)])
+
+    def test_fixture_really_hides_live_text(self):
+        """★픽스처 자신을 assert — 막대 아래 글자가 텍스트층에 **살아 있어야** 이 테스트가
+        의미를 갖는다. 글자가 지워진 픽스처였다면 가드가 없어도 초록이라 무의미하다."""
+        import fitz
+        with fitz.open(stream=self._redacted_pdf(), filetype="pdf") as doc:
+            text = doc[0].get_text()
+        self.assertIn("밸리데이션", text)
+
+    def test_defect_reintroduced_leaks_hidden_text(self):
+        """★네거티브 — 막대 탐지를 꺼서(가드 도입 직전 상태) 결함을 되살리면 가려진
+        문장이 그대로 추출된다. 이 테스트가 빨갛지 않으면 가드가 아니라 픽스처가
+        일하고 있는 것이다."""
+        data = self._redacted_pdf()
+        with mock.patch.object(g, "_pdf_redaction_bars", return_value=[]):
+            leaked = g._extract_deficiency_table(data)
+        self.assertIn(self._HIDDEN, [r["summary"] for r in leaked])
+
+    def test_covered_row_is_dropped(self):
+        rows = g._extract_deficiency_table(self._redacted_pdf())
+        summaries = [r["summary"] for r in rows]
+        self.assertNotIn(self._HIDDEN, summaries)
+        self.assertIn(self._VISIBLE, summaries)          # 안 가려진 행은 살아남는다
+
+    def test_hidden_text_absent_from_every_field(self):
+        """지적사항 칸만 보고 넘어가면 다른 칸으로 새는 것을 놓친다."""
+        rows = g._extract_deficiency_table(self._redacted_pdf())
+        for row in rows:
+            for value in row.values():
+                self.assertNotIn("밸리데이션", value)
+
+    def test_unredacted_table_is_untouched(self):
+        """가림막이 없는 문서는 가드가 있으나 없으나 **같은 산출**이어야 한다 —
+        회귀 코퍼스 194문서 바이트 불변 주장의 최소 재현."""
+        data = _build_pdf(self._TITLE, self._ROWS)
+        guarded = g._extract_deficiency_table(data)
+        with mock.patch.object(g, "_pdf_redaction_bars", return_value=[]):
+            baseline = g._extract_deficiency_table(data)
+        self.assertEqual(guarded, baseline)
+        self.assertEqual(len(guarded), 2)
+
+    def test_guard_logs_when_it_fires(self):
+        """조용한 가드는 '표가 없는 문서'와 구분이 안 된다 — 발동은 반드시 남는다."""
+        with mock.patch.object(g, "log") as logged:
+            g._extract_deficiency_table(self._redacted_pdf(), "gmpinspect-TEST")
+        messages = [" ".join(str(a) for a in call.args) for call in logged.call_args_list]
+        self.assertTrue(any("가림막" in m and "gmpinspect-TEST" in m for m in messages),
+                        f"가드 발동 로그 없음: {messages}")
+
+    def test_no_log_when_nothing_is_redacted(self):
+        with mock.patch.object(g, "log") as logged:
+            g._extract_deficiency_table(_build_pdf(self._TITLE, self._ROWS))
+        self.assertEqual(logged.call_args_list, [])
+
+    def test_gate_still_reports_extracted_for_surviving_rows(self):
+        """가드가 일부 행만 먹으면 나머지는 정상 발행 경로로 간다(전면 강등 금지)."""
+        data = self._redacted_pdf()
+        with mock.patch.object(g, "_deficiency_table_enabled", return_value=True):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._TITLE, "present", "gmpinspect-TEST")
+        self.assertEqual(status, "extracted")
+        self.assertEqual([r["summary"] for r in rows], [self._VISIBLE])
+
+    def test_fully_redacted_table_degrades_to_summary_card(self):
+        """모든 지적행이 가려지면 표 없음과 같은 강등 경로로 간다(요약카드 유지)."""
+        data = _build_pdf(self._TITLE, self._ROWS, redact_cells=[(0, 3), (1, 3)])
+        with mock.patch.object(g, "_deficiency_table_enabled", return_value=True):
+            rows, status = g._parse_deficiency_table(
+                data, "pdf", self._TITLE, "present", "gmpinspect-TEST")
+        self.assertEqual((rows, status), ([], "gate-degraded"))
 
 
 if __name__ == "__main__":

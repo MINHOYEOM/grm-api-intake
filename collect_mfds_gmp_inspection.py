@@ -143,11 +143,52 @@ _DEFICIENCY_COLUMN_TOKENS = {
     "summary": ("지적", "보완"),
     "followup": ("비고", "후속", "조치"),
 }
+_DEFICIENCY_FIELDS = ("area", "severity", "legal_basis", "summary", "followup")
 _DEFICIENCY_TABLE_MAX_ROWS = 200  # 폭주 방어(정상 최대 수십 행)
 # 지적 표로 채택하려면 서로 다른 열이 최소 이만큼 매핑돼야 한다(붕괴 colmap 가드).
 _DEFICIENCY_MIN_COLUMNS = 3
 # 지적 표 추출을 시도하는 첨부 포맷. hwp-ole(구형 바이너리)은 여전히 제외한다.
 _DEFICIENCY_TABLE_FORMATS = ("pdf", "hwpx")
+
+# ── [가림막 가드 2026-08-27 · docs/specs/GMP_지적표_추출불가_실측_2026-08-27.md] ──────
+# 식약처는 일부 GMP 실사 결과 PDF 에서 **지적(보완)사항 요약·근거법령 칸의 일부를 검은
+# 막대로 가려** 배포한다. 그런데 그 막대는 글자를 지운 게 아니라 **살아 있는 텍스트 위에
+# 덧그린 벡터 사각형**이라 `page.get_text()` 는 막대 **아래 글자를 그대로 돌려준다**.
+# 즉 파서가 원천이 의도적으로 감춘 문장을 읽어 낸다 — 추출이 안 되는 문제가 아니라
+# **추출해도 되는 것인가**의 문제다.
+#
+# 실측(2026-08-27 · CONTROL 194문서/934행): 17문서에 가려진 단어가 있고, 그중 13문서가
+# 가려진 단어를 포함한 35행을 낸다. ★그 13문서 중 **발행 브리프 카드에 도달한 것은 0건**
+# 이므로 현재 실사고는 아니다. 다만 그 문서가 발행되거나 소급되는 순간 그대로 실현되는
+# 잠복 결함이라 지금 막는다.
+#
+# ★막대 판별(조사 단계에서 검증된 기준 그대로): `fill` 이 어두운(채널 평균 < 0.25)
+#   drawing 의 `re`(사각형) 항목 중 **가로 20pt·세로 5pt 이상**. 이 하한이 표 괘선·밑줄을
+#   가른다(괘선은 세로 두께가 사실상 0, 밑줄은 낮다). 스펙 §3 이 실측했듯 이 문서들의
+#   벡터 도형 수는 페이지당 1,000개대라, 하한 없이 모으면 표 전체가 가려진 것이 된다.
+# ★단어가 "가려졌다"의 정의: 단어 rect 면적의 **절반 넘게** 한 막대와 겹칠 때.
+#
+# ★★★행을 통째로 버린다 — 가려진 칸만 비우지 않는다.
+#   지적 한 행은 「분야·근거법령·지적사항」이 묶여 하나의 규제 진술이 된다. 가려진 칸만
+#   비우면 **남은 칸이 온전한 진술처럼 읽히는** 행이 카드에 실린다: 근거법령이 가려진
+#   행은 "근거 없이 지적받았다"로, 지적내용이 가려진 행은 "근거법령만 있고 지적은 없다"로
+#   읽힌다. 규정에 대한 거짓 진술이 되므로 **없는 것보다 나쁘다**(위 스펙 §5 가 줄 파싱
+#   산출물을 기각한 것과 같은 기준). 행을 버리면 기존 강등 경로(요약카드 유지)로 조용히
+#   떨어지고, 이 트랙의 전제인 "생성 0 → 환각 0" 이 유지된다.
+_REDACTION_BAR_MIN_WIDTH_PT = 20.0
+_REDACTION_BAR_MIN_HEIGHT_PT = 5.0
+_REDACTION_BAR_MAX_FILL_LEVEL = 0.25
+_REDACTION_WORD_COVER_RATIO = 0.5
+
+# 같은 가림을 **텍스트층에서** 하는 문서도 있다 — 지운 자리에 `0000…` 런이 들어간다
+# (스펙 §4: TARGET 71건 중 10건이 이 형태). 그런 행은 `0000 0000 0000` 같은 쓰레기로
+# 나오므로 같은 가드에서 함께 버린다. 이쪽은 좌표가 필요 없어 **PDF·HWPX 두 경로 공통**
+# 으로 `_normalize_deficiency_table` 에 둔다.
+# 판정: 공백을 걷어낸 칸이 통째로 0 넷 이상이거나(`0000`, `0000 0000 0000`), 0 이 여덟 개
+# 이상 연달아 박혀 있을 때. 후자는 문장 안에 박힌 마스크를 잡되 `제0000호` 같은 정상
+# 표기(0 넷)는 살린다 — 실제 법령 인용에 0 이 여덟 개 연달아 오는 표기는 없다.
+_ZERO_MASK_WHOLE_RE = re.compile(r"^0{4,}$")
+_ZERO_MASK_RUN_RE = re.compile(r"0{8,}")
 
 # 의료용 고압가스 제조소는 GMP 공개 대상이지만, 경구 고형제 QA 다이제스트에서는
 # 반복 노이즈가 컸다. 명시적 가스 업체/제품 단서만 Intake에서 제외한다.
@@ -412,6 +453,133 @@ def _clean_deficiency_cell(value: str | None) -> str:
     return re.sub(r"\s+", " ", (value or "").replace("\n", " ")).strip()
 
 
+def _is_zero_masked(value: str) -> bool:
+    """텍스트층 가림(`0000…`)이 낀 칸이면 True. 순수 함수 — PDF·HWPX 공통 판정."""
+    compact = re.sub(r"\s+", "", value or "")
+    if not compact:
+        return False
+    return bool(_ZERO_MASK_WHOLE_RE.match(compact) or _ZERO_MASK_RUN_RE.search(compact))
+
+
+def _rect_mostly_inside(outer: Any, inner: Any) -> bool:
+    """`inner` 면적의 절반 넘게 `outer` 와 겹치면 True(빈/역전 rect 는 False)."""
+    try:
+        area = abs(inner)
+        if area <= 0:
+            return False
+        overlap = outer & inner
+        return (not overlap.is_empty) and abs(overlap) > _REDACTION_WORD_COVER_RATIO * area
+    except Exception:      # noqa: BLE001 — rect 연산 붕괴는 "판정 불능"이지 "안 가려짐"이 아니다
+        return True
+
+
+def _pdf_redaction_bars(page: Any) -> list[Any]:
+    """페이지 위에 덧그려진 가림막(어두운 벡터 사각형) rect 목록. 없으면 [].
+
+    drawing 을 못 읽으면 [] — 그 경우 이 페이지에는 가드가 걸리지 않는다. 가림막이 있는
+    문서에서 `get_drawings()` 가 통째로 실패하는 일은 실측되지 않았고, 여기서 fail-closed
+    로 가면 **가림막이 없는 194문서 전부**가 영향을 받아 산출이 흔들린다(가드의 대전제가
+    "안 가려진 문서는 바이트 불변"이다). 판정 불능의 fail-closed 는 좌표를 실제로 다루는
+    `_pdf_redacted_row_indices` 쪽에서 진다.
+    """
+    try:
+        drawings = page.get_drawings()
+    except Exception:      # noqa: BLE001
+        return []
+    bars: list[Any] = []
+    for drawing in drawings or ():
+        if not isinstance(drawing, dict):      # 예상 밖 모양이면 조용히 건너뛴다 —
+            continue                           # 여기서 터지면 멀쩡한 표까지 parse-fail 된다
+        fill = drawing.get("fill")
+        # ★`if not fill` 로 쓰면 안 된다 — 회색조 단일 채널 검정 `0.0` 은 falsy 라
+        #   **진짜 검은 막대를 놓친다**(가드가 조용히 무력화되는 형태).
+        if fill is None:                       # 테두리만 있는 도형 = 가림막이 아니다
+            continue
+        if isinstance(fill, (int, float)):
+            channels = [float(fill)]
+        else:
+            try:
+                channels = [float(c) for c in fill]
+            except (TypeError, ValueError):
+                continue
+        if not channels:
+            continue
+        if sum(channels) / len(channels) >= _REDACTION_BAR_MAX_FILL_LEVEL:
+            continue
+        for item in drawing.get("items") or ():
+            if not item or item[0] != "re":
+                continue
+            rect = item[1]
+            try:
+                wide_enough = rect.width >= _REDACTION_BAR_MIN_WIDTH_PT
+                tall_enough = rect.height >= _REDACTION_BAR_MIN_HEIGHT_PT
+            except AttributeError:
+                continue
+            if wide_enough and tall_enough:
+                bars.append(rect)
+    return bars
+
+
+def _pdf_covered_word_rects(page: Any, bars: list[Any]) -> list[Any]:
+    """가림막에 절반 넘게 덮인 단어들의 rect 목록. 막대가 없으면 [](추출 비용 0)."""
+    if not bars:
+        return []
+    try:
+        import fitz  # type: ignore[import-not-found]
+        words = page.get_text("words")
+    except Exception:      # noqa: BLE001
+        return []
+    covered: list[Any] = []
+    for word in words or ():
+        if len(word) < 4:
+            continue
+        rect = fitz.Rect(word[0], word[1], word[2], word[3])
+        # 막대 **하나** 기준으로 잰다 — 여러 막대의 겹침을 더하면 인접 막대가 같은 단어를
+        # 스칠 때 실제보다 크게 덮인 것으로 계산된다(경계 단어 오탐).
+        if any(_rect_mostly_inside(bar, rect) for bar in bars):
+            covered.append(rect)
+    return covered
+
+
+def _pdf_redacted_row_indices(
+    table: Any, row_count: int, covered: list[Any],
+) -> frozenset[int]:
+    """가려진 단어가 걸린 표 행 인덱스 집합. 행을 특정 못 하면 **표 전체**를 반환.
+
+    ★fail-closed 다. 가림막이 있는 페이지에서 좌표를 행에 대응시키지 못하면 그건
+    "안 가려졌다"가 아니라 "모른다"이고, 모르는 채로 내보내면 가드가 없는 것과 같다.
+    가림막이 **없는** 페이지는 `covered` 가 비어 있어 여기 오기 전에 빠진다.
+    """
+    if not covered:
+        return frozenset()
+    everything = frozenset(range(row_count))
+    try:
+        import fitz  # type: ignore[import-not-found]
+        table_rows = list(table.rows)
+        table_rect = fitz.Rect(table.bbox)
+    except Exception:      # noqa: BLE001 — 기하 정보 없음 = 판정 불능
+        return everything
+    if len(table_rows) != row_count:           # extract() 와 행 수가 어긋나면 대응 불가
+        return everything
+    hit: set[int] = set()
+    attributed: set[int] = set()
+    for row_index, table_row in enumerate(table_rows):
+        for cell in getattr(table_row, "cells", None) or ():
+            if not cell:
+                continue
+            cell_rect = fitz.Rect(cell)
+            for word_index, word_rect in enumerate(covered):
+                if _rect_mostly_inside(cell_rect, word_rect):
+                    hit.add(row_index)
+                    attributed.add(word_index)
+    # 완결성 검사 — 표 안에 있는데 **어느 칸에도** 안 붙은 가려진 단어가 남으면(병합 셀·
+    # 좌표 누락) 어느 행이 오염됐는지 말할 수 없다 → 표 전체를 버린다.
+    for word_index, word_rect in enumerate(covered):
+        if word_index not in attributed and _rect_mostly_inside(table_rect, word_rect):
+            return everything
+    return frozenset(hit)
+
+
 def _match_deficiency_header(rows: list[list[str | None]]) -> tuple[int | None, dict[str, int | None]]:
     """지적 표 헤더행 인덱스 + 컬럼→필드 인덱스 매핑 반환(없으면 (None, {})).
 
@@ -444,11 +612,21 @@ def _match_deficiency_header(rows: list[list[str | None]]) -> tuple[int | None, 
     return None, {}
 
 
-def _normalize_deficiency_table(rows: list[list[str | None]]) -> list[dict[str, str]]:
+def _normalize_deficiency_table(
+    rows: list[list[str | None]],
+    *,
+    redacted_rows: frozenset[int] = frozenset(),
+) -> list[dict[str, str]]:
     """`Table.extract()` 표(행=셀 리스트)를 지적사항 dict 목록으로 정규화(순수·결정론).
 
     헤더행·주석행(구조 컬럼 전무)·빈행·반복 헤더 제외. 각 행은 근거법령 또는 지적내용이
     비어있지 않아야 유효(품질 게이트). LLM·fetch 없음.
+
+    `redacted_rows` = 가림막에 덮인 **원본 표 행 인덱스**(PDF 경로만 채운다 — 좌표가 있는
+    쪽이 계산한다). 인덱스는 `rows` 기준이므로 이 함수는 헤더 뒤를 슬라이스하지 않고
+    전체를 훑으며 건너뛴다 — 슬라이스하면 인덱스가 헤더 위치만큼 밀린다.
+    HWPX 경로는 좌표가 없어 항상 비어 있지만, 텍스트층 `0000…` 가림은 아래에서 두 경로가
+    함께 걸러 낸다. 두 가드 모두 **행을 통째로 버린다**(근거는 상단 상수 블록 주석).
     """
     if not rows:
         return []
@@ -456,9 +634,11 @@ def _normalize_deficiency_table(rows: list[list[str | None]]) -> list[dict[str, 
     if header_idx is None:
         return []
     out: list[dict[str, str]] = []
-    for row in rows[header_idx + 1:]:
+    for row_index, row in enumerate(rows):
+        if row_index <= header_idx or row_index in redacted_rows:
+            continue
         rec: dict[str, str] = {}
-        for field_name in ("area", "severity", "legal_basis", "summary", "followup"):
+        for field_name in _DEFICIENCY_FIELDS:
             ci = colmap.get(field_name)
             rec[field_name] = (_clean_deficiency_cell(row[ci])
                                if ci is not None and ci < len(row) else "")
@@ -467,6 +647,11 @@ def _normalize_deficiency_table(rows: list[list[str | None]]) -> list[dict[str, 
             continue
         # 페이지 걸친 반복 헤더행 방어.
         if rec["area"] == "분야" or rec["legal_basis"].replace(" ", "") == "근거법령":
+            continue
+        # [가림막 가드] 텍스트층 `0000…` 마스크가 **어느 칸에든** 끼면 버린다. 한 칸만
+        # 마스크여도 그 행은 원천이 일부를 감춘 행이고, 남은 칸만 실으면 온전한 진술로
+        # 읽힌다. 정상 칸이 통째로 0 넷 이상인 경우는 없으므로 오탐 여지가 없다.
+        if any(_is_zero_masked(rec[field_name]) for field_name in _DEFICIENCY_FIELDS):
             continue
         out.append(rec)
         if len(out) >= _DEFICIENCY_TABLE_MAX_ROWS:
@@ -485,6 +670,14 @@ def _extract_hwpx_deficiency_table(data: bytes) -> list[dict[str, str]]:
     (본문 텍스트는 `_extract_hwpx_text` 로 이미 뽑고 있었으므로 첨부 자체는 읽히고 있었다).
     실측(2026-08-27 전건 16): 지적 present 7건에서 23행 회수 · 지적 none 6건에서 0행
     (오탐 0) · unknown 3건은 표는 있으나 데이터행이 전부 비어 있어 0행이 정답이다.
+
+    ★[가림막 가드 2026-08-27] 두 가드 중 **텍스트층 `0000…` 쪽만** 이 경로에 걸린다 —
+    같은 정규화기를 쓰므로 자동이다. 벡터 막대 가드는 걸리지 않고, 걸릴 필요도 없다:
+    hwpx 는 표가 명시 마크업이고 우리는 셀 텍스트만 읽으므로 "글자 위에 도형을 덧그려
+    가린다"는 상황 자체가 이 리더에 존재하지 않는다(PDF 는 그리기 명령이 텍스트와 같은
+    페이지에 섞여 있어 발생한다). ★단, 그건 **우리가 도형을 안 읽기 때문**이지 hwpx 원문에
+    도형이 없다는 뜻은 아니다 — hwpx 셀 위에 도형을 덧그린 문서가 나오면 이 경로에도
+    같은 계열의 가드가 필요해진다(현재 16문서 전건에서는 미관측).
     """
     tables: list[list[list[str]]] = []
     try:
@@ -521,31 +714,51 @@ def _extract_hwpx_deficiency_table(data: bytes) -> list[dict[str, str]]:
     return out
 
 
-def _extract_deficiency_table(data: bytes) -> list[dict[str, str]]:
+def _extract_deficiency_table(data: bytes, doc_id: str = "") -> list[dict[str, str]]:
     """PDF 바이트에서 지적사항 표를 결정론 추출(PyMuPDF find_tables). 없으면 [].
 
     페이지 걸친 다중 표를 누적. 개별 표/페이지 파싱 예외는 건너뛰되(부분 성공 우선),
     문서 열기 실패는 상위로 전파(호출부가 parse-fail 로 강등). OCR·LLM 없음.
+
+    ★[가림막 가드 2026-08-27] 검은 막대에 덮인 단어가 든 행은 산출에서 제외한다. 막대는
+    글자를 지운 게 아니라 위에 덧그린 벡터라 `get_text()` 가 아래를 읽어 버리기 때문이다
+    (근거·기준·행 단위로 버리는 이유는 상단 상수 블록 주석).
+    ★탐지는 **표가 잡힌 페이지에서만** 돈다 — 표 없는 페이지는 `get_drawings()` 호출조차
+    없다. 가림막이 없는 페이지는 `covered` 가 비어 정규화기에 빈 집합이 가므로 기존 문서의
+    산출은 바이트 불변이다(회귀 코퍼스 실측으로 확인: `verify_gmp_redaction_guard.py`).
     """
     try:
         import fitz  # type: ignore[import-not-found]
     except ImportError:
         return []
     out: list[dict[str, str]] = []
+    guarded_rows = 0
     with fitz.open(stream=data, filetype="pdf") as doc:
         if doc.needs_pass or doc.is_encrypted:
             return []
         for page in doc:
             try:
                 finder = page.find_tables()
+                tables = list(finder.tables)
             except Exception:
                 continue
-            for table in finder.tables:
+            if not tables:
+                continue
+            covered = _pdf_covered_word_rects(page, _pdf_redaction_bars(page))
+            for table in tables:
                 try:
                     extracted = table.extract()
                 except Exception:
                     continue
-                out.extend(_normalize_deficiency_table(extracted))
+                redacted = _pdf_redacted_row_indices(table, len(extracted), covered)
+                guarded_rows += len(redacted)
+                out.extend(_normalize_deficiency_table(extracted, redacted_rows=redacted))
+    # 가드가 조용히 먹으면 "표가 없는 문서"와 구분이 안 된다 — 원천이 감춘 것과 우리가
+    # 못 읽은 것은 다른 값이다. status/raw_payload 는 바이트 불변으로 두고(발행 계약 유지)
+    # 로그로만 남긴다. status 어휘 신설은 별건이다(GRM_SYSTEM.md §6.2).
+    if guarded_rows:
+        log("WARN", f"MFDS GMP 지적 표 가림막 가드 — 가려진 표 행 {guarded_rows}개 제외"
+                    f"{f': {doc_id}' if doc_id else ''}")
     return out
 
 
@@ -707,10 +920,11 @@ def _parse_deficiency_table(
     # 아예 없다 — 셀을 그대로 읽어 **같은 정규화기**에 넘기므로 산출 모양이 갈리지 않는다.
     # 여태 이 게이트가 `file_format == "pdf"` 였던 탓에 hwpx 16건은
     # `gmp_deficiency_table_status` 가 통째로 비어 있었다(본문 텍스트는 이미 뽑고 있었다).
-    extract = (_extract_hwpx_deficiency_table if file_format == "hwpx"
-               else _extract_deficiency_table)
     try:
-        rows = extract(data)
+        # PDF 경로에만 doc_id 를 넘긴다 — 가림막 가드가 발동하면 어느 문서인지 로그로
+        # 남아야 한다(hwpx 경로는 좌표 가드가 없어 넘길 것이 없다).
+        rows = (_extract_hwpx_deficiency_table(data) if file_format == "hwpx"
+                else _extract_deficiency_table(data, doc_id))
     except Exception as e:  # noqa: BLE001 — 파싱 붕괴는 degrade(요약카드 유지)
         log("WARN", f"MFDS GMP 지적 표 추출 실패({type(e).__name__}) — 요약카드 유지: {doc_id}")
         return [], "parse-fail"

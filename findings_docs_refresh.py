@@ -80,6 +80,9 @@ MAX_FAILURE_RATIO = 0.20
 # — 재시도가 없으면 한 번의 실패가 그 페이지의 문서 100건을 영구히 지운다.
 PAGE_ATTEMPTS = 4
 PAGE_RETRY_BACKOFF_SEC = 2.0
+# 호출 사이 간격. RPC 한 장이 약 0.76초인데 anon 역할의 statement_timeout 은 3초라
+# 여유가 4배뿐이다 — 62장을 쉼 없이 몰아치는 것이 타임아웃의 직접 원인이었다.
+PAGE_PACING_SEC = 0.3
 
 # document_id 가 그대로 URL 경로가 된다 — 안전하지 않은 값은 페이지를 만들지 않는다.
 _SLUG_OK = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
@@ -230,10 +233,39 @@ def apply_thickness_gate(docs: list[dict[str, Any]], *, min_findings: int,
     return kept
 
 
+def fetch_page(base_url: str, anon_key: str, page: int, page_size: int, log,
+               *, total: "int | None" = None) -> dict[str, Any]:
+    """페이지 한 장. 실패하면 물러섰다 다시 친다. 끝내 안 되면 마지막 예외를 올린다.
+
+    ★첫 장도 여기를 지난다. 처음에는 2페이지부터만 재시도를 걸었는데, 바로 그 다음
+    실행에서 **첫 장이 500 으로 죽어 런 전체가 중단**됐다 — 실패는 페이지 번호를 가리지
+    않는다(부하성이다). 한 곳으로 모아 모든 호출이 같은 보호를 받게 한다.
+
+    실측 근거: `findings_search` 한 장의 소요는 약 0.76초인데 anon 역할의
+    statement_timeout 은 **3초**다. 여유가 4배뿐이라, 62장을 쉼 없이 몰아치면 몇 장이
+    넘어간다. 그래서 재시도와 함께 호출 사이에 짧게 쉰다.
+    """
+    where = f"{page}/{total}" if total else str(page)
+    payload = {"p_q": "", "p_page": page, "p_docs_per_page": page_size}
+    last_exc: "Exception | None" = None
+    for attempt in range(1, PAGE_ATTEMPTS + 1):
+        try:
+            return post_search(base_url, anon_key, payload)
+        except Exception as exc:                          # noqa: BLE001 — 재시도 대상
+            last_exc = exc
+            if attempt < PAGE_ATTEMPTS:
+                log(f"  · page {where} 재시도 {attempt}/{PAGE_ATTEMPTS - 1}: {exc}")
+                time.sleep(PAGE_RETRY_BACKOFF_SEC * attempt)
+    assert last_exc is not None
+    raise last_exc
+
+
 def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
                       page_size: int, log) -> tuple[list[dict[str, Any]], Counter]:
-    first = post_search(base_url, anon_key,
-                        {"p_q": "", "p_page": 1, "p_docs_per_page": page_size})
+    # 첫 장이 죽으면 pages 를 모르니 런 자체가 불가능하다 — 그래서 여기도 재시도를 거치고,
+    # 그래도 안 되면 예외를 그대로 올려 **아무것도 쓰지 않는다**(빈 정본은 페이지 수천
+    # 장을 지운다).
+    first = fetch_page(base_url, anon_key, 1, page_size, log)
     pages = int(first.get("pages") or 1)
     reject: Counter = Counter()
     out: list[dict[str, Any]] = []
@@ -248,27 +280,14 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
 
     absorb(first)
     for page in range(2, pages + 1):
-        payload = {"p_q": "", "p_page": page, "p_docs_per_page": page_size}
-        last_exc: "Exception | None" = None
-        for attempt in range(1, PAGE_ATTEMPTS + 1):
-            try:
-                absorb(post_search(base_url, anon_key, payload))
-                last_exc = None
-                break
-            except Exception as exc:                      # noqa: BLE001 — 페이지별 격리
-                last_exc = exc
-                if attempt < PAGE_ATTEMPTS:
-                    # 실패 원인은 대개 statement timeout 이고 **일시적**이다(실측: 이
-                    # 호출의 평상시 소요는 약 0.75초라 한계와 여유가 있는데, 62번을
-                    # 연달아 때리는 동안 부하가 몰리면 몇 페이지가 넘어간다).
-                    # 그래서 물러섰다가 다시 친다 — 재시도 없이 한 번 실패하면 그
-                    # 페이지의 문서 100건이 영구히 빠진다(08-22 실행이 실제로 그랬고
-                    # 축소 게이트를 안 넘겨 그대로 머지됐다).
-                    log(f"  · page {page}/{pages} 재시도 {attempt}/{PAGE_ATTEMPTS - 1}: {exc}")
-                    time.sleep(PAGE_RETRY_BACKOFF_SEC * attempt)
-        if last_exc is not None:
+        # 호출 사이에 짧게 쉰다 — 62장을 쉼 없이 몰아치는 것이 타임아웃의 직접 원인이다
+        # (한 장 0.76초 / anon 한계 3초). 전체로는 20초 남짓이라 값싼 보험이다.
+        time.sleep(PAGE_PACING_SEC)
+        try:
+            absorb(fetch_page(base_url, anon_key, page, page_size, log, total=pages))
+        except Exception as exc:                          # noqa: BLE001 — 페이지별 격리
             failures += 1
-            log(f"  ! page {page}/{pages} 실패({PAGE_ATTEMPTS}회 시도): {last_exc}")
+            log(f"  ! page {page}/{pages} 실패({PAGE_ATTEMPTS}회 시도): {exc}")
             # ★실패도 사유로 센다. log 로만 흘리면 그 페이지에 있던 문서 100건이 조용히
             # 사라지고, 축소 게이트(10%)를 넘지 않으면 그대로 자동 머지된다.
             reject[f"페이지 조회 실패(문서 최대 {page_size}건 누락)"] += 1

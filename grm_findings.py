@@ -8,6 +8,7 @@ must satisfy.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import re
@@ -1186,6 +1187,68 @@ def _choose_evidence_url(evidence_url: str, raw_signal: dict[str, Any]) -> str:
     return next((c for c in candidates if c and not evidence_url_quality_error(c)), "")
 
 
+# 실사일이 들어 있는 raw_json 키를 **이름으로** 훑는다. 소스별 하드코딩 표를 만들지
+# 않는 이유는 표가 새 소스에서 조용히 낡기 때문이다(같은 이름을 쓰는 새 소스는 배선 없이
+# 잡힌다). 실측(2026-08-27) 기준 세 이름이 각각 한 소스에만 있어 충돌이 없다:
+#   record_date          → FDA 483 (483 발부일 = 실사 종료일) · MM/DD/YYYY
+#   inspection_end_date  → EU GMP NCR (EudraGMDP) · MHRA GMP NCR · YYYY-MM-DD
+#   inspection_end       → MFDS GMP 실사 · YYYY-MM-DD
+# ★FDA Warning Letter 의 `letter_date` 는 **넣지 않는다** — 서한일은 실사일이 아니고,
+#   `published_date`(게시일)와 차이도 7~14일(정상 발행 지연)이라 고칠 결함이 없다.
+# ★web/migrations/066 의 SQL 이 **같은 순서·같은 파싱**을 쓴다. 두 곳이 갈리면 백필분과
+#   신규 적재분이 다른 값을 갖게 되므로 테스트가 두 구현의 일치를 잰다.
+INSPECTION_DATE_KEYS = ("record_date", "inspection_end_date", "inspection_end")
+
+
+def inspection_date_from_raw(raw_signal: dict[str, Any]) -> str:
+    """규제기관이 실사한 날. 없으면 빈 문자열(부재를 지어내지 않는다).
+
+    `published_date` 를 대체하지 않는다 — 그건 우리가 문서를 확보한 날이고 dedup 키·
+    수집 창·발행 축이 전부 그 위에 서 있다. 실사일은 **다른 축**이다.
+
+    왜 필요한가(실측 raw_signals 전수): FDA 483 은 1,994건이 공개일과 다르고 평균 격차가
+    1,524일(4.2년)이다. FOIA 일괄 공개분 941건은 공개일이 `2024-01-17` 하나인데 실사는
+    2015~2019년이다 — 화면이 2015년 지적을 2024년 것으로 보이게 하고 있었다.
+    """
+    raw = raw_signal.get("raw_json")
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw) if raw else {}
+        except (TypeError, ValueError):
+            return ""
+    if not isinstance(raw, dict):
+        return ""
+    for key in INSPECTION_DATE_KEYS:
+        value = _text(raw.get(key)).strip()
+        if not value:
+            continue
+        parsed = _normalize_inspection_date(value)
+        if parsed:
+            return parsed
+    return ""
+
+
+def _normalize_inspection_date(value: str) -> str:
+    """MM/DD/YYYY 또는 YYYY-MM-DD(뒤에 시각이 붙어도 됨) → YYYY-MM-DD. 아니면 ''.
+
+    ★달력상 없는 날짜는 버린다 — `datetime` 없이 문자열만 보면 `02/30/2015` 가 통과해
+    조용히 3월 2일이 된다(SQL 쪽 `to_date` 도 같은 성질이라 왕복 대조로 확인했다).
+    """
+    m = re.fullmatch(r"(\d{2})/(\d{2})/(\d{4})", value)
+    if m:
+        mm, dd, yyyy = m.group(1), m.group(2), m.group(3)
+        iso = f"{yyyy}-{mm}-{dd}"
+    elif re.match(r"^\d{4}-\d{2}-\d{2}", value):
+        iso = value[:10]
+    else:
+        return ""
+    try:
+        datetime.date.fromisoformat(iso)
+    except ValueError:
+        return ""
+    return iso
+
+
 def finding_from_raw_signal(
     raw_signal: dict[str, Any],
     *,
@@ -1223,6 +1286,8 @@ def finding_from_raw_signal(
         "document_type": _text(raw_signal.get("source_kind")),
         "document_id": _text(raw_signal.get("document_id")),
         "published_date": _text(raw_signal.get("published_date")),
+        # 우리가 확보한 날(위)과 규제기관이 실사한 날(아래)은 다른 축이다.
+        "inspection_date": inspection_date_from_raw(raw_signal),
         "firm_name": _text(raw_signal.get("firm_name")),
         "entity_id": "",
         "site_name": _text(raw_signal.get("site_name")),
@@ -1609,6 +1674,7 @@ CREATE TABLE IF NOT EXISTS findings (
   document_type TEXT NOT NULL,
   document_id TEXT NOT NULL,
   published_date TEXT NOT NULL,
+  inspection_date TEXT NOT NULL DEFAULT '',
   firm_name TEXT NOT NULL,
   entity_id TEXT,
   site_name TEXT,

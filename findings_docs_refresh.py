@@ -178,6 +178,11 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
         # 같은 업체이고, 그 정규화는 이미 FIND-FIRM-ALIAS 가 `firm_key` 로 해 두었다.
         "firm_key": doc.get("firm_key") or "",
         "published_date": published,
+        # 규제기관이 실사한 날. `published_date`(우리가 문서를 확보한 날)를 **대체하지
+        # 않고** 나란히 싣는다 — 둘은 다른 축이라 화면이 어느 쪽인지 밝힐 수 있어야 한다.
+        # 없는 소스가 있다: 캐나다 실사는 원천이 날짜를 안 주고, 경고서한은 실사 문서가
+        # 아니라 대상에서 뺐다(web/migrations/066 의 범위 주석 참조).
+        "inspection_date": (doc.get("inspection_date") or "").strip(),
         "evidence_url": evidence,
         "categories": seen,
         "findings": findings,

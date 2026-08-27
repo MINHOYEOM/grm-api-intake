@@ -1364,6 +1364,30 @@ def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: st
     # Recall classification — 단어 경계로 Class I / II / III 정확히 구분
     is_class_i = source == SOURCE_RECALL and re.search(r"\bclass i\b", type_lc) is not None
     is_class_ii = source == SOURCE_RECALL and re.search(r"\bclass ii\b", type_lc) is not None
+    # [MHRA 등급 배선 2026-08-27] MHRA 의약품 알림도 제목에 심각도 등급(Class 1~4)을 명시하는데
+    # 위 두 분기가 `source == SOURCE_RECALL`(openFDA 전용)로 막혀 있어 **키워드 매칭에만
+    # 의존**했다. 그게 왜 위험한지는 이 코퍼스 자신이 보여준다 —
+    #
+    #   · 2026-07-07~23 수집분 Class 4 세 건은 T2 키워드에 아무것도 안 걸려 **Tier 1** 로 저장됐다.
+    #   · 2026-08-03 `#629`(Tier 1 사각지대 회수)가 어휘에 "defect notification"·"medicines
+    #     defect" 를 추가하자, **같은 문서·같은 제목이 지금 코드에서는 Tier 2** 가 된다.
+    #
+    # 문서도 등급도 안 변했는데 **어휘 목록이 변해서 tier 가 움직였다.** 반대 방향도 똑같이
+    # 성립한다 — 어휘가 빠지거나 문구가 바뀌면 Class 2 회수가 조용히 Tier 1 로 떨어진다.
+    # Tier 1 은 판단이 아니라 폴스루 기본값이라(카드화 안 됨) 떨어져도 아무 소리가 안 난다.
+    #
+    # ★순수 가산이다 — `or` 로만 붙여 기존 승격을 **낮추지 않는다**. 배치도 openFDA 형제와
+    # 동일하게 둔다(Class 1 은 qa_unrelated 클램프보다 앞 = 강제 예외, Class 2 는 뒤).
+    # MHRA 는 **아라비아 숫자**를 쓴다 — 위 로마자 정규식에는 구조적으로 안 걸린다.
+    #
+    # ★Class 3/4 는 **바닥을 깔지 않는다.** 등급으로 tier 를 *내리는* 것은 지금 동작을 바꾸는
+    # 일이고(위 #629 어휘로 현재 Tier 2 로 올라간다), "주의사용" 등급을 카드에서 뺄지는
+    # 규제 판단이지 배선 결함이 아니다. 여기서 조용히 결정하지 않고 GRM_SYSTEM.md §6.2 에
+    # 별건(MHRA-CLASS34-POLICY)으로 남긴다.
+    if source == SOURCE_MHRA:
+        mhra_class = _mhra_alert_class_number(type_or_class)
+        is_class_i = is_class_i or mhra_class == 1
+        is_class_ii = is_class_ii or mhra_class == 2
     is_fr_rule = source == SOURCE_FR and "rule" in type_lc
 
     t3_matches = _tier_kw_match(blob, SIGNAL_TIER3_KEYWORDS)
@@ -1849,14 +1873,48 @@ def _is_mhra_medicines_alert(f: "_RssItemFields") -> bool:
     return False
 
 
+# MHRA 알림 제목은 "Class N Medicines Recall/Defect Notification: <업체>, <제품>, <참조>" 형식이
+# 안정적이다("UPDATE: " 접두가 붙는 경우도 있어 제목 처음에 고정하지 않는다).
+_MHRA_ALERT_CLASS_RE = re.compile(
+    r"\bClass\s+(\d+)\s+(Medicines?\s+(?:Recall|Defect\s+Notification))", re.I)
+
+
+def _mhra_alert_type_or_class(title: str, category: str = "") -> str:
+    """MHRA 알림의 `type_or_class` — **심각도 등급을 담아서** 돌려준다.
+
+    ★2026-08-27 정정 — 원래 이 자리는 `category or "Medicines Recall"` 이었고 주석은
+    category 가 "Class 2 Medicines Recall" 이라고 적어 뒀다. 그런데 gov.uk drug-device-alerts
+    Atom 은 **`<category>` 자체를 내보내지 않는다**(전건 실측: 의약품 엔트리 7건 모두 없음).
+    즉 등급은 늘 리터럴 폴백에 덮여 사라졌고, 그 여파가 두 곳이었다:
+      ① tier 엔진이 등급을 못 읽어 **키워드 매칭에만 의존**했다(openFDA 는 Class I/II 를 직접
+         본다). 실측 6건은 Class 2→Tier 2 · Class 4→Tier 1 로 결과가 타당해 보였지만 그건
+         본문 어휘가 우연히 갈라준 것이라, 어휘가 바뀌면 Class 2 가 조용히 Tier 1 로 떨어진다.
+      ② `card_scaffold._w2_extra_mhra_recall` 이 여기서 `Class N` 을 뽑아 카드 W2 표에 "Class"
+         행을 넣게 돼 있는데, 값이 없어 **그 행이 한 번도 렌더되지 않았다**.
+    등급은 제목에 늘 있으므로 제목에서 뽑는다. 못 뽑으면 종전 리터럴로 폴백(behavior 불변)."""
+    if category:
+        return category
+    m = _MHRA_ALERT_CLASS_RE.search(title or "")
+    if m:
+        return f"Class {m.group(1)} {m.group(2)}"
+    return "Medicines Recall"
+
+
+def _mhra_alert_class_number(type_or_class: str) -> int:
+    """MHRA 알림 등급(1~4). 없으면 0. ★MHRA 는 **아라비아 숫자**를 쓴다 — openFDA 의 로마자
+    정규식(`\bclass i\b`)에는 구조적으로 걸리지 않으므로 별도 파서가 필요하다."""
+    m = re.search(r"\bclass\s+(\d+)\b", (type_or_class or ""), re.I)
+    return int(m.group(1)) if m else 0
+
+
 def _extract_mhra_alert(entry: ET.Element, feed_name: str, feed_url: str) -> _RssItemFields:
     # gov.uk finder Atom 은 MHRA Inspectorate 블로그와 동일한 Atom 구조라 _extract_mhra 를
-    # 재사용하되, type_or_class 를 category(예 "Class 2 Medicines Recall")로 남겨 Recall 성격을
-    # 신호한다(블로그의 "Blog" fallback 과 구분).
+    # 재사용하되, type_or_class 에 등급을 담아 Recall 성격을 신호한다(블로그의 "Blog" 과 구분).
     f = _extract_mhra(entry, feed_name, feed_url)
     return _RssItemFields(
         title=f.title, link=f.link, date_iso=f.date_iso, description=f.description,
-        category=f.category, type_or_class=f.category or "Medicines Recall",
+        category=f.category,
+        type_or_class=_mhra_alert_type_or_class(f.title, f.category),
         guid=f.guid, raw_payload=f.raw_payload,
     )
 

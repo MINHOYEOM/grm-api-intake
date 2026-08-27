@@ -636,9 +636,24 @@
     return !NON_INSPECTION_TYPES[String(lane).slice(i + 1)];  // 모르는 유형은 남긴다
   }
 
+  // ★[캐나다 편입 2026-08-28] 이 목록에 **캐나다가 빠져 있었다.** 근거가 적혀 있지
+  //   않았는데(위 주석은 '기본값이 왜 식약처인가'만 설명한다) 실측해 보니 빠진 기관이
+  //   그 창의 **최대 소스**였다 — 최근 12개월 실사 지적:
+  //     캐나다 실사 1,480건(322문서) · FDA 483 1,142건(245문서) · 식약처 실사 698건(146문서)
+  //   즉 "다른 기관은 데이터가 얇아서"가 아니라 그냥 목록이 낡아 있었다.
+  //
+  // ★EMA·MHRA 는 **넣지 않는다** — 같은 창에서 34건/3건이다. 상위 5 순위는 그 정도
+  //   모수에서 순위가 아니라 잡음이고, 이 저장소가 tier·퀴즈에서 이미 겪은 실패다.
+  //   빠진 이유를 여기 적어 두고, 그 판단이 낡으면 알아채도록 아래 검사가 지킨다:
+  //   `tests/test_trends_agency_views.py` 가 커밋된 문서 정본에서 기관별 규모를 세어
+  //   **문턱을 넘긴 기관에 버튼이 없으면 실패**한다(손목록이 조용히 낡는 것을 막는다).
+  //
+  // ★순서는 크기순이 아니다 — 기본값(식약처)이 맨 앞이어야 하고 그 이유는 위 주석에
+  //   있다. '전체'는 합산이라 언제나 맨 뒤다.
   var AGENCY_VIEWS = [
     { key: "mfds", label: "식약처", prefix: "MFDS" },
     { key: "fda", label: "FDA", prefix: "FDA" },
+    { key: "hc", label: "캐나다", prefix: "Health Canada" },
     { key: "all", label: "전체", prefix: "" },
   ];
   var AGENCY_STORE_KEY = "grm-trends-agency";
@@ -796,13 +811,29 @@
   // 조항 순위는 042 가 21 CFR 만 센다(식약처 조항 축은 아직 없다). 식약처를 고른
   // 사용자에게 이 순위는 **다른 나라 규정**이므로, 그 사실을 읽는 법이 먼저 말한다 —
   // 말없이 그대로 두면 "식약처 기준"으로 읽히고, 그게 이 재정의가 없애려는 오독이다.
+  // 고른 기관이 21 CFR 을 실제로 인용하는가 — **데이터에서 판정한다.**
+  // ★종전에는 `key === "mfds"` 하나로 갈랐다. 캐나다를 넣는 순간 그 분기는 거짓을
+  //   말한다 — 캐나다 지적 9,505건 중 21 CFR 인용은 **0건**이다(EMA·MHRA 도 0).
+  //   기관 이름을 하나 더 적는 대신, CFR 순위가 자기 scope 에 싣고 오는 소스 목록으로
+  //   판정한다. 새 기관이 들어오거나 어느 기관이 조항을 인용하기 시작해도 저절로 맞다.
+  function agencyCitesCfr(view) {
+    if (!view || !view.prefix) return true;              // '전체'는 FDA 를 포함한다
+    var sources = ((state.cfrScope || {}).sources) || [];
+    for (var i = 0; i < sources.length; i += 1) {
+      if (String(sources[i].source || "").indexOf(view.prefix) === 0) return true;
+    }
+    return false;
+  }
+
   function applyAgencyToCfr(view) {
     if (!cfrReadEl) return;
     var tail = "줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.";
-    cfrReadEl.textContent = view && view.key === "mfds"
-      // 식약처를 고른 사람에게 21 CFR 은 다른 나라 규정이다. 말없이 두면 "식약처 기준"으로
-      // 읽히므로 그 사실을 먼저 말하되, 버리라는 뜻이 아니라는 것도 함께 말한다.
-      ? "아래는 미국 21 CFR 조항 순위입니다 — 식약처 지적서에는 이 조항이 인용되지 않습니다. " +
+    var v = view || agencyView(state.agency);
+    cfrReadEl.textContent = !agencyCitesCfr(v)
+      // 그 기관을 고른 사람에게 21 CFR 은 다른 나라 규정이다. 말없이 두면 "그 기관 기준"
+      // 으로 읽히므로 그 사실을 먼저 말하되, 버리라는 뜻이 아니라는 것도 함께 말한다.
+      ? "아래는 미국 21 CFR 조항 순위입니다 — " + (v.label || "이 기관") +
+        " 지적서에는 이 조항이 인용되지 않습니다. " +
         "다만 요구사항 자체는 GMP 공통이라 무엇을 확인해야 하는지의 목록으로는 그대로 쓸 수 있어요. " + tail
       : "규제기관이 지적서에 실제로 적은 조항 순위입니다. 카테고리보다 한 단계 구체적이라 " +
         "사내 절차서와 바로 맞대어 볼 수 있어요 — " + tail;
@@ -2298,7 +2329,13 @@
     if (!items.length) return;                    // 빈 응답 → 숨김 유지
 
     state.cfrItems = items.slice(0, CFR_ROWS);
+    // 어느 소스가 조항을 인용하는지는 이 응답만 안다 — 읽는 법 문장이 그걸 보고
+    // 판정하므로(agencyCitesCfr) 여기서 담아 두고, 도착 시점에 문장을 다시 맞춘다.
+    // ★applyAgency 는 이 fetch 보다 먼저 돌 수 있다. 그때는 scope 가 비어 있어
+    //   "인용되지 않습니다"로 시작하는데, 데이터가 오면 아래에서 바로잡힌다.
+    state.cfrScope = scope;
     renderCfrRows();
+    applyAgencyToCfr(agencyView(state.agency));
 
     if (cfrSubEl) {
       var sources = (scope.sources || []).map(function (s) {

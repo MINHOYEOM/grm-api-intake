@@ -1384,10 +1384,31 @@ def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: st
     # 일이고(위 #629 어휘로 현재 Tier 2 로 올라간다), "주의사용" 등급을 카드에서 뺄지는
     # 규제 판단이지 배선 결함이 아니다. 여기서 조용히 결정하지 않고 GRM_SYSTEM.md §6.2 에
     # 별건(MHRA-CLASS34-POLICY)으로 남긴다.
+    is_mhra_medicines_alert = False
     if source == SOURCE_MHRA:
         mhra_class = _mhra_alert_class_number(type_or_class)
         is_class_i = is_class_i or mhra_class == 1
         is_class_ii = is_class_ii or mhra_class == 2
+        # [MHRA-CLASS34-POLICY 2026-08-27] 나머지 의약품 알림(Class 3·4 와 **등급표기가
+        # 없는 company-led 회수**)도 Tier 2 바닥을 깐다. `#821` 이 남겨 둔 규제 판단이다.
+        #
+        # 전수 실측(gov.uk search API 1,437건 중 의약품 427건):
+        #   Class 1 = 6(1.4%) · Class 2 = 166(38.9%) · Class 3 = 68(15.9%)
+        #   Class 4 = 165(38.6%) · 등급표기 없음 = 22(5.2%, 전부 "Company led medicines
+        #   recall" — 수집기 keep 필터가 이미 받아들이는 진짜 회수다)
+        #
+        # ★내리지 않고 올린 이유 — **MHRA 등급은 환자 위해의 긴급도지 GMP 관련성이 아니다.**
+        #   Class 3 실측: 잘못된 PIL 동봉 · GMP 일탈에 따른 예방적 회수 · 불순물 기준초과
+        #   Class 4 실측: 병 속 이물 관찰 · 정제 수량 오류 · PIL/SmPC 안전정보 누락
+        # 전부 제조·품질 일탈이다. 이 사이트의 독자(제약 GMP/품질 실무)에게는 바로 그
+        # 제조 결함 정보가 목적물이므로, 환자위해 등급으로 낮추면 **목적과 정반대로**
+        # 제조 결함 신호를 체계적으로 가리게 된다.
+        #
+        # ★현행 동작과 델타 0 이다 — 이들은 지금도 "recall"·"defect notification" 어휘로
+        # Tier 2 에 닿는다. 바뀌는 것은 **어휘 의존이 사라지는 것**뿐이다(#629 가 어휘를
+        # 바꾸자 같은 문서의 tier 가 움직였던 그 취약성).
+        # 분량도 감당 범위다 — 2026년 실측 C2=15·C3=7·C4=15 로 월 2~3건 수준.
+        is_mhra_medicines_alert = _MHRA_ALERT_KEEP_RE.search(type_or_class or "") is not None
     is_fr_rule = source == SOURCE_FR and "rule" in type_lc
 
     t3_matches = _tier_kw_match(blob, SIGNAL_TIER3_KEYWORDS)
@@ -1427,6 +1448,10 @@ def compute_signal_tier_detail(source: str, type_or_class: str, qa_relevance: st
         return _d("Tier 2", "qa_likely")
     if is_class_ii:
         return _d("Tier 2", "recall_class_ii")
+    # Class 3/4·등급표기 없는 MHRA 의약품 알림. ★라벨을 `recall_class_ii` 와 **분리**한다 —
+    # 원인이 다른 사건을 한 카운터에 합치면 나중에 지표가 움직였을 때 진단이 틀린다.
+    if is_mhra_medicines_alert:
+        return _d("Tier 2", "mhra_medicines_alert")
     if t2_matches >= 1:
         return _d("Tier 2", "t2_keywords")
     if osd_relevance == "Direct":

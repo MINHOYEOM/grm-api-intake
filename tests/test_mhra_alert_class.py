@@ -86,16 +86,52 @@ class ClassDrivesTierTest(unittest.TestCase):
         self.assertEqual(self._decide("Class 2 Medicines Recall", qa="Unrelated").tier,
                          "Tier 1")
 
-    def test_class_3_and_4_get_no_floor(self):
-        """★의도적 미결정 — 등급으로 tier 를 내리는 것은 규제 판단이라 여기서 안 한다.
-        어휘가 없으면 기본값 Tier 1 로 남는다(현행 어휘에서는 T2 로 올라간다)."""
+    def test_class_3_and_4_reach_tier_2(self):
+        """★`#821` 이 미룬 규제 판단의 결론(MHRA-CLASS34-POLICY) — 내리지 않고 올린다.
+
+        MHRA 등급은 **환자 위해의 긴급도**지 GMP 관련성이 아니다. 전수 실측에서 Class 3 은
+        잘못된 PIL·GMP 일탈·불순물 기준초과, Class 4 는 병 속 이물·정제 수량 오류·PIL 안전
+        정보 누락이었다 — 전부 제조·품질 일탈이라 이 사이트 독자에게는 목적물 그 자체다.
+        환자위해 등급으로 낮추면 제조 결함 신호를 체계적으로 가리게 된다."""
         for toc in ("Class 3 Medicines Recall", "Class 4 Medicines Defect Notification"):
             with self.subTest(toc=toc):
-                self.assertEqual(self._decide(toc).tier, "Tier 1")
+                d = self._decide(toc)
+                self.assertEqual((d.tier, d.reason), ("Tier 2", "mhra_medicines_alert"))
+
+    def test_unclassed_company_led_recall_reaches_tier_2(self):
+        """등급표기가 아예 없는 회수도 있다 — 전수 427건 중 22건(5.2%)이 "Company led
+        medicines recall" 이고 수집기 keep 필터가 이미 받아들이는 진짜 회수다."""
+        d = self._decide(ci._mhra_alert_type_or_class(
+            "Company led medicines recall: Sun Pharma UK Ltd, Gemcitabine 10mg/ml"))
+        self.assertEqual((d.tier, d.reason), ("Tier 2", "mhra_medicines_alert"))
+
+    def test_reason_label_is_separate_from_class_ii(self):
+        """★계기 분리 — 원인이 다른 사건을 한 카운터에 합치면 나중 진단이 반드시 틀린다."""
+        self.assertEqual(self._decide("Class 2 Medicines Recall").reason, "recall_class_ii")
+        self.assertEqual(self._decide("Class 3 Medicines Recall").reason,
+                         "mhra_medicines_alert")
+
+    def test_class_3_4_respect_unrelated_clamp(self):
+        """Class 2 와 동형 — 클램프 뒤라 Unrelated 는 Tier 1 로 고정된다."""
+        self.assertEqual(
+            self._decide("Class 4 Medicines Defect Notification", qa="Unrelated").tier,
+            "Tier 1")
+
+    def test_mhra_non_medicines_gets_no_floor(self):
+        """음성 검사 — 의약품 알림이 아닌 MHRA 항목(블로그)까지 올리면 안 된다."""
+        self.assertEqual(self._decide("Blog").tier, "Tier 1")
 
 
 class NoSpilloverTest(unittest.TestCase):
     """★음성 검사 — 이 배선이 MHRA 밖으로 새지 않는가."""
+
+    def test_other_sources_ignore_medicines_recall_label(self):
+        """MHRA 바닥은 SOURCE_MHRA 안에서만 선다 — 같은 문자열이 타 소스에 있어도 무관."""
+        for src in (ci.SOURCE_EMA, ci.SOURCE_PICS, ci.SOURCE_ECA, ci.SOURCE_ISPE):
+            with self.subTest(src=src):
+                d = ci.compute_signal_tier_detail(src, "Class 3 Medicines Recall",
+                                                  "Unknown", "N/A", NEUTRAL)
+                self.assertEqual(d.tier, "Tier 1")
 
     def test_other_sources_ignore_arabic_class(self):
         """같은 문자열이라도 MHRA 가 아니면 등급 분기를 타면 안 된다."""

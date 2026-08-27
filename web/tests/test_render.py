@@ -8310,6 +8310,107 @@ class WebFindingsComboPageTest(unittest.TestCase):
                          (out2 / rel / "index.html").read_bytes(), "비결정론 렌더")
 
 
+class WebFirmPageTest(unittest.TestCase):
+    """[B1 색인 표면] /findings/firm/{slug}/ 업체 단위 정적 페이지.
+
+    문서 페이지와 같은 이유로 **켠 채로** 짓는다 — 렌더 스위치 뒤에 사각지대를 만들지
+    않는다. 핵심 검사는 셋이다: ①sitemap ↔ 파일 대조(유령 URL 금지) ②얇은 중복 방벽
+    (문서 1건 업체는 페이지를 만들지 않는다 — 그 문서 상세와 내용이 겹친다) ③범위 고지
+    (이 페이지는 상세 페이지가 있는 문서만 담으므로 그 사실을 반드시 적는다)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.data = render.load_findings_docs()
+        if not cls.data:
+            raise unittest.SkipTest("findings_docs.json 미존재")
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_firmpg_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out, doc_pages=True)
+        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.root = cls.out / "findings" / "firm"
+        cls.by_firm = {}
+        for d in cls.data["documents"]:
+            k = d.get("firm_key") or ""
+            if k:
+                cls.by_firm.setdefault(k, []).append(d)
+        cls.expected = {k: v for k, v in cls.by_firm.items() if len(v) >= 2}
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _built_slugs(self):
+        return {p.parent.name for p in self.root.glob("*/index.html")}
+
+    def test_one_page_per_multi_document_firm(self):
+        built = self._built_slugs()
+        self.assertEqual(len(built), len(self.expected),
+                         "문서 2건 이상 업체 수와 생성 페이지 수가 다르다")
+        self.assertTrue(built, "업체 페이지가 하나도 만들어지지 않았다")
+
+    def test_single_document_firms_get_no_page(self):
+        """얇은 중복 방벽 — 문서 1건 업체 페이지는 그 문서 상세의 복제본이 된다."""
+        singles = [k for k, v in self.by_firm.items() if len(v) == 1]
+        self.assertTrue(singles, "전제 확인 필요: 1건짜리 업체가 없다")
+        built = self._built_slugs()
+        for k in singles[:50]:
+            self.assertNotIn(render._firm_slug(k), built, k)
+
+    def test_sitemap_matches_files(self):
+        """sitemap 은 데이터에서, HTML 은 렌더에서 나온다 — 갈라지면 유령 URL 이 된다."""
+        in_sitemap = set(re.findall(
+            rf"<loc>{re.escape(render.SITE_BASE_URL)}/findings/firm/([^/<]+)/</loc>",
+            self.sitemap))
+        self.assertEqual(in_sitemap, self._built_slugs())
+
+    def test_slug_is_deterministic_and_unique(self):
+        slugs = [render._firm_slug(k) for k in self.expected]
+        self.assertEqual(len(slugs), len(set(slugs)), "슬러그 충돌")
+        for s in slugs:
+            self.assertRegex(s, r"^[a-z0-9][a-z0-9-]*-[0-9a-f]{8}$", s)
+        # 같은 키는 언제나 같은 슬러그(재실행 안정) — URL 이 흔들리면 색인이 리셋된다.
+        for k in list(self.expected)[:20]:
+            self.assertEqual(render._firm_slug(k), render._firm_slug(k))
+
+    def test_page_states_its_scope_and_date_meaning(self):
+        """부재 어휘 — 담긴 범위와 날짜의 뜻을 적지 않으면 이 페이지가 거짓말을 한다."""
+        p = sorted(self.root.glob("*/index.html"))[0]
+        html = p.read_text(encoding="utf-8")
+        self.assertIn("담긴 범위", html)
+        self.assertIn("상세 페이지가 있는 문서", html)
+        self.assertIn("문서가 공개된 날", html)          # 실사일 아님
+        self.assertIn("이것은 그 시점의 기록입니다", html)  # 후속 시정 고지
+        self.assertIn(self.data.get("measured_on", ""), html)
+
+    def test_doc_page_links_static_when_it_exists_else_lookup(self):
+        """문서 상세 → 업체. 정적 페이지가 있으면 팔로우, 없으면 조회(nofollow)."""
+        multi = next(v[0] for v in self.by_firm.values() if len(v) >= 2)
+        single = next(v[0] for v in self.by_firm.values() if len(v) == 1)
+        m = (self.out / "findings" / "doc" / multi["slug"] / "index.html").read_text(encoding="utf-8")
+        s = (self.out / "findings" / "doc" / single["slug"] / "index.html").read_text(encoding="utf-8")
+        self.assertIn(f"findings/firm/{render._firm_slug(multi['firm_key'])}/", m)
+        self.assertNotIn("findings/firm/index.html?key=", m)
+        self.assertIn("findings/firm/index.html?key=", s)
+        self.assertIn('rel="nofollow"', s)
+
+    def test_firm_page_is_not_a_clone_of_its_document_page(self):
+        """조합 페이지 복제본 가드와 같은 취지 — 업체 페이지는 문서 상세보다 더 말해야 한다.
+
+        문서 2건 이상만 만드는 이유가 여기 있다(2건이면 어느 한 문서 상세에도 없는
+        '여러 실사에 걸친 구성'이 생긴다). 텍스트 유사도가 아니라 **구조로** 잰다."""
+        slug = sorted(self._built_slugs())[0]
+        html = (self.root / slug / "index.html").read_text(encoding="utf-8")
+        rows = html.count('class="ff-doc"')
+        self.assertGreaterEqual(rows, 2, "업체 페이지가 문서 1건만 담고 있다")
+        # 각 문서 행은 그 문서 상세로 이어져야 한다(막다른 요약 금지).
+        self.assertGreaterEqual(html.count("findings/doc/"), rows)
+
+    def test_inspector_pages_are_not_created_by_this_track(self):
+        """B1 은 업체만이다 — 사람에 대한 페이지는 정책이 다르다(037 · noindex 유지)."""
+        self.assertFalse(list((self.out / "findings" / "inspector").glob("*/index.html")))
+        self.assertNotIn(f"{render.SITE_BASE_URL}/findings/inspector/", self.sitemap)
+
+
 class WebFindingsDocPageTest(unittest.TestCase):
     """[검색 유입] /findings/doc/{document_id}/ 문서 단위 페이지.
 

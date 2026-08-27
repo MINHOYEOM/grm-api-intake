@@ -111,7 +111,11 @@
           없어 3,145장이 업체 이력으로 이어지지 못했다. 프로파일은 런타임 RPC 화면이라
           크롤 예산을 아끼려 nofollow(실사관 조회 링크와 같은 관례) — 내부 사용자에게만
           연다. -#}
-      {% if doc.firm_key %}<a href="{{ rel_root }}findings/firm/index.html?key={{ doc.firm_key | urlencode }}" rel="nofollow">{{ doc.firm_name }} 업체 프로파일 — 전체 이력 조회</a>{% endif %}
+      {#- [B1] 이 업체의 정적 페이지가 있으면 그리로 보낸다(색인 가능·팔로우 — 크롤러가
+          업체 단위 표면에 닿는 유일한 간선이다). 문서가 1건뿐이라 정적 페이지를 만들지
+          않은 업체는 종전대로 조회 화면으로(런타임 RPC 라 nofollow). -#}
+      {% if firm_page_slug %}<a href="{{ rel_root }}findings/firm/{{ firm_page_slug }}/">{{ doc.firm_name }} 지적사항 이력 — 이 업체의 다른 문서까지</a>
+      {%- elif doc.firm_key %}<a href="{{ rel_root }}findings/firm/index.html?key={{ doc.firm_key | urlencode }}" rel="nofollow">{{ doc.firm_name }} 업체 프로파일 — 전체 이력 조회</a>{% endif %}
       <a href="{{ rel_root }}findings/agency/{{ doc.agency | lower }}/">{{ agency_labels.get(doc.agency, doc.agency) }} 지적사항 전체</a>
       <a href="{{ rel_root }}findings/docs/{{ doc.agency | lower }}/{{ doc.published_date[:4] }}/">{{ doc.published_date[:4] }}년 {{ agency_labels.get(doc.agency, doc.agency) }} 문서 목록</a>
       {%- for c in related_categories %}<a href="{{ rel_root }}findings/c/{{ c.slug }}/">{{ c.label_ko }} 지적사항</a>{% endfor %}

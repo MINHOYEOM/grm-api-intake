@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [B1 색인 표면] 업체 단위 정적 페이지 — /findings/firm/{slug}/.
+
+    왜 만드나: 사람들이 검색창에 치는 말은 "업체명 + 483" 인데, 그 질문에 답하는 화면
+    (/findings/firm/?key=)은 실행 시점에 데이터를 불러오는 페이지라 검색엔진에 잡히지
+    않는다. 문서 상세는 이미 실명으로 색인되고 있으므로, 같은 정본에서 업체 단위 표면을
+    내는 것은 공개 범위를 넓히는 게 아니라 **이미 공개된 것에 닿는 길을 내는 것**이다.
+    (실사관은 사람에 대한 페이지라 정책이 다르다 — noindex 유지, 여기 대상 아님.)
+
+    ★문구 규율은 문서 상세(findings_doc.html)와 동일하게 못박는다:
+      · 원문이 권위다 — 문서마다 규제기관 원문으로 가는 길을 남긴다(문서 상세 경유).
+      · 날짜는 **공개일**이지 실사일이 아니다. 지적은 시점의 기록이라 현재 상태로 읽히면 안 된다.
+      · 후속 시정 가능성을 밝힌다 — 우리가 그 결과를 모른다는 사실까지 적는다.
+      · **범위를 반드시 함께 적는다** — 이 페이지는 상세 페이지가 있는 문서만 담는다
+        (지적 N건 이상). 전량은 조회 화면이 정본이므로 그리로 가는 길을 남긴다.
+      · 우리 판단·논평 슬롯 없음(데이터에도 없다).
+
+    grm.css 프리즈 보존을 위해 스코프 <style>, 클래스 공간 .ff-*.
+    §4 한글 안전: 인라인 letter-spacing/text-transform 금지 · 한글에 모노 금지. -#}
+<style>
+  .ff-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ff-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .ff-crumb a:hover{color:var(--coral)}
+  .ff-crumb i{font-style:normal;color:var(--line-2)}
+  .ff-h1{font-family:var(--serif);font-size:clamp(25px,3.6vw,37px);line-height:1.26;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .ff-lede{font-family:var(--sans);font-size:15.5px;line-height:1.8;color:var(--body);margin:14px 0 0;max-width:780px;word-break:keep-all}
+  .ff-lede b{color:var(--ink);font-weight:600}
+  .ff-meta{margin:16px 0 0;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+  .ff-chip{font-family:var(--sans);font-size:12.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:4px 12px}
+  .ff-chip.ag{color:var(--on-coral);background:var(--coral);border-color:var(--coral)}
+  .ff-chip.dt{font-size:12px;color:var(--muted)}
+  .ff-chip.dt b{font-family:var(--mono);font-weight:400;font-variant-numeric:tabular-nums}
+  .ff-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
+  .ff-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
+  /* 문서 목록 — 한 줄이 문서 하나(공개일·기관·건수·분류). */
+  .ff-docs{display:flex;flex-direction:column;margin-top:14px}
+  .ff-doc{display:block;padding:14px 6px;border-top:1px solid var(--line);text-decoration:none}
+  .ff-doc:last-child{border-bottom:1px solid var(--line)}
+  .ff-doc-h{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+  .ff-doc-dt{font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .ff-doc-ag{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--body-s)}
+  .ff-doc-n{font-family:var(--sans);font-size:12.5px;color:var(--coral-2)}
+  .ff-doc-cats{font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
+  .ff-doc-ex{display:block;margin-top:6px;font-family:var(--sans);font-size:14px;line-height:1.75;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
+  .ff-doc:hover .ff-doc-ex{color:var(--ink)}
+  .ff-doc:hover .ff-doc-ag{color:var(--coral-2)}
+  /* 분류 구성 — 알약 나열(막대는 조회 화면이 그린다·여긴 정적 요약). */
+  .ff-cats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .ff-cat{font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:5px 13px}
+  .ff-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
+  .ff-about p{font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--muted);margin:0;max-width:780px;word-break:keep-all}
+  .ff-about b{color:var(--body);font-weight:500}
+  .ff-rel{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+  .ff-rel a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
+  .ff-rel a:hover{border-color:var(--coral);color:var(--coral)}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="ff-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/docs/">문서로 찾기</a><i>&rsaquo;</i><span>{{ firm.name }}</span>
+    </nav>
+    <p class="kick">Firm Record</p>
+    <h1 class="ff-h1">{{ firm.name }} 지적사항 이력</h1>
+    <p class="ff-lede">규제기관이 공개한 실사 문서 <b>{{ firm.doc_count }}건</b>에서 확인된 지적 <b>{{ firm.finding_count }}건</b>입니다. 아래 날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b>입니다.</p>
+    <p class="ff-meta">
+      {%- for a in firm.agencies %}<span class="ff-chip ag">{{ agency_labels.get(a, a) }}</span>{% endfor %}
+      <span class="ff-chip dt"><b>{{ firm.first_seen }}</b> ~ <b>{{ firm.last_seen }}</b></span>
+      <span class="ff-chip">문서 {{ firm.doc_count }}건</span>
+      <span class="ff-chip">지적 {{ firm.finding_count }}건</span>
+    </p>
+  </div>
+
+  <div class="wrap ff-body">
+    {% if firm.categories %}
+    <section>
+      <h2 class="ff-sec-h">지적된 영역</h2>
+      <div class="ff-cats">
+        {%- for c in firm.categories %}<span class="ff-cat">{{ c }}</span>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <section>
+      <h2 class="ff-sec-h">공개된 실사 문서</h2>
+      <div class="ff-docs">
+        {%- for d in firm.documents %}
+        <a class="ff-doc" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
+          <span class="ff-doc-h">
+            <span class="ff-doc-dt">{{ d.published_date }}</span>
+            <span class="ff-doc-ag">{{ agency_labels.get(d.agency, d.agency) }}</span>
+            <span class="ff-doc-n">지적 {{ d.findings | length }}건</span>
+            {%- if d.categories %}<span class="ff-doc-cats">{{ d.categories | join(" · ") }}</span>{% endif %}
+          </span>
+          {#- 대표 지적 한 문장 — 목록이 날짜 나열로 끝나지 않게 실물을 보여준다.
+              원문 무변형(잘림 없이 그대로) — 우리 요약을 만들지 않는다. -#}
+          {%- if d.findings %}<span class="ff-doc-ex">{{ d.findings[0].text_ko }}</span>{% endif %}
+        </a>
+        {%- endfor %}
+      </div>
+    </section>
+
+    <section class="ff-about">
+      <h2 class="ff-sec-h">이 페이지에 대하여</h2>
+      <p><b>이것은 그 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만, 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다. 현재 상태로 읽지 마시고, 최신 현황은 해당 규제기관의 공식 발표를 확인하세요.</p>
+      {#- ★범위 고지(부재 어휘) — 이 페이지는 정본 스냅샷 중 **상세 페이지가 있는 문서**만
+          담는다. 전량은 조회 화면이 정본이므로 그 사실과 경로를 함께 적는다. -#}
+      <p><b>담긴 범위.</b> {{ measured_on }} 수집 기준으로, 상세 페이지가 있는 문서{% if min_findings %}(지적 {{ min_findings }}건 이상){% endif %}만 실었습니다. 같은 업체의 문서가 더 있을 수 있으며, 전체는 아래 업체 조회에서 확인하실 수 있습니다.</p>
+      <p>업체를 묶는 기준은 표시명이 아니라 정규화 키입니다 &mdash; &ldquo;… Limited&rdquo;와 &ldquo;… Ltd.&rdquo;처럼 표기가 달라도 같은 업체로 봅니다. 번역과 분류는 기계로 처리한 것이라 원문과 뉘앙스가 다를 수 있고, 판단의 근거는 언제나 각 문서의 규제기관 공개 원문입니다.</p>
+    </section>
+
+    <section class="ff-rel">
+      <a href="{{ rel_root }}findings/firm/index.html?key={{ firm.key | urlencode }}" rel="nofollow">{{ firm.name }} 전체 이력 조회 &mdash; 실사 등급까지</a>
+      {%- for a in firm.agencies %}<a href="{{ rel_root }}findings/agency/{{ a | lower }}/">{{ agency_labels.get(a, a) }} 지적사항 전체</a>{% endfor %}
+      <a href="{{ rel_root }}findings/docs/">문서로 찾기</a>
+      <a href="{{ rel_root }}findings/">지적사항 검색으로</a>
+    </section>
+  </div>
+</main>
+{% endblock %}

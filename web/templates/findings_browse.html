@@ -22,6 +22,19 @@
   <div class="wrap">
     {% with seg_active = "browse" %}{% include "partials/findings_seg.html" %}{% endwith %}
 
+    {#- [P2 개인화 · 067] 내 범위의 최근 공개. **기본은 없는 것처럼 동작한다** —
+        정적 셸은 hidden 이고, 로그인 + 관심 범위(기관·분류·국가) 또는 관심 업체가
+        하나라도 있을 때만 reactions.js 가 채워 펼친다. 게스트·미등록 사용자에게는
+        이 자리가 존재하지 않으므로 아래 '업무별 바로가기'가 그대로 첫 화면이다
+        (볼 사람이 적은 단계에서 빈 껍데기를 얹지 않는다는 판단 — 빈 상태 유도 문구도
+        두지 않는다. 관심 범위는 마이페이지에서 고른다).
+        067 미적용·RPC 실패도 같은 자리에서 조용히 숨긴 채로 남는다(워치리스트 관례). -#}
+    <section class="fnd-browse" id="fnd-mine" aria-label="내 범위의 최근 공개" hidden>
+      <h2 class="fnd-browse-h">내 범위의 최근 공개</h2>
+      <p class="fnd-browse-p" id="fnd-mine-sub"></p>
+      <div class="fnd-rc-list" id="fnd-mine-list"></div>
+    </section>
+
     <section class="fnd-browse fnd-purpose" id="fnd-purpose" aria-label="업무별 바로가기">
       <h2 class="fnd-browse-h">업무별 바로가기</h2>
       <p class="fnd-browse-p">자주 쓰이는 업무 상황별 진입 경로입니다. 업체명·문구·조항으로 직접 조회하시려면 <a href="{{ rel_root }}findings/index.html">검색</a>을 이용하세요.</p>

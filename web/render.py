@@ -3523,11 +3523,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # nav_active="me" — nav 6탭 중 어느 것도 이 페이지를 대표하지 않으므로 아무 탭도 켜지
     # 않는다(13차 이전엔 "board"라 무관한 '모아보기'가 활성으로 보였다).
     if env.globals.get("reactions_enabled"):
+        # [P2 관심 범위 · 067] 선택지 어휘는 **렌더가 정본에서 심는다**. reactions.js 는
+        # 전 페이지에 실리는 전역 스크립트라 20개짜리 분류 사전을 복제하면 사이트 전체가
+        # 무거워지고, 사본이 하나 더 늘면 파리티 검사도 하나 더 필요해진다(firm.js·
+        # inspector.js 가 이미 그 값을 치르고 있다). 여기서는 facets 정본을 그대로 심어
+        # JS 가 읽게 한다 — 사본 0·전역 무게 0·정본과 어긋날 자리 0.
+        interest_vocab = []
+        for _axis in (facets.get("axes") if facets else []) or []:
+            for _item in _axis.get("items") or []:
+                interest_vocab.append({"kind": _axis["axis"],
+                                       "value": _item["key"],
+                                       "label": _item["label_ko"]})
         me_html = env.get_template("me.html").render(
             page_title="마이페이지 · GRM",
             rel_root="../",
             nav_active="me",
             latest_slug=latest_slug,
+            interest_vocab=interest_vocab,
         )
         _write(out_dir / "me" / "index.html", me_html)
         written.append("me/index.html")

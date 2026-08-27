@@ -2063,7 +2063,13 @@ def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | No
 # **같은 관용구**를 쓴다 — 플래그 게이트 · 실행당 상한 · per-item delay · 실패는 조용히 skip
 # (카드는 그대로 발행). 플래그가 꺼져 있으면 이 블록 자체가 실행되지 않아 산출물이 기존과
 # byte 동일하다.
-MHRA_ALERT_BODY_MAX_CHARS = 4000       # 상세 렌더 상한(카드 상세 블록에 싣는 범위)
+# [상한 정정 2026-08-27] 4000 은 **발췌 상한의 숫자**였다 — 이 필드는 알림 전문(全文)을
+# verbatim 으로 싣는 자리이므로 발췌가 아니라 전문 계열 상한을 써야 한다(WL_BODY_FULL 형제).
+# 소급 실측(2026-08-27, 전건 6장): 2333 / 2663 / 4408 / 4604 / 5088 / 5222 자 — 4000 에서
+# **4장이 잘렸고 그중 2장은 단어 중간**에서 끊겼다(환자 조치 안내 문장이 소실). 상세 블록은
+# details 로 접혀 있어 길이가 화면을 밀지 않으므로 렌더상의 이유도 없었다. 30000 은 관측
+# 최대치의 약 6배로, 자르기 위한 값이 아니라 폭주 방어용 상한이다.
+MHRA_ALERT_BODY_MAX_CHARS = WL_BODY_FULL_MAX_CHARS   # 30000 — 전문 계열 상한(형제와 동일)
 MHRA_ALERT_BODY_CAP = 10               # 실행당 fetch 상한(월 2건 수준이라 여유 있음)
 MHRA_ALERT_BODY_DELAY_SECONDS = 1.0
 MHRA_ALERT_BODY_TIMEOUT = 15

@@ -3266,10 +3266,17 @@ class WebTrendsRenderTest(unittest.TestCase):
     def test_publication_date_semantics_still_disclosed(self):
         """[컨셉 재정의] 오독의 근원(날짜=공개일)은 여전히 정적 텍스트로 밝힌다 —
         다만 자리가 본문 위쪽 박스에서 **꼬리 각주**로 옮겼다. 고지를 없앤 것이
-        아니라, 아직 아무것도 못 본 사람에게 주의사항부터 읽히지 않게 한 것이다."""
-        self.assertIn("날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.", self.html)
-        # 데이터 현황 면에는 더 긴 형태가 그대로 있다(자세히 보려는 사람의 목적지).
-        self.assertIn("실사한 날이 아니라 자료가 공개된 날", self.coverage)
+        아니라, 아직 아무것도 못 본 사람에게 주의사항부터 읽히지 않게 한 것이다.
+
+        ★[2026-08-28] 문장이 바뀌었다. 종전 단정("실사한 날이 **아니라** 공개된 날")은
+        캐나다 실사가 들어오면서 거짓이 됐다 — 그 소스는 원천이 공개일을 주지 않아
+        `published_date` 자리에 실사 시작일이 들어간다(mig 069). 고지를 없앤 것이
+        아니라 **예외를 이름으로 밝히도록** 바꾼 것이므로, 검사도 그 뜻으로 옮긴다."""
+        for surface, name in ((self.html, "지적 경향"), (self.coverage, "데이터 현황")):
+            self.assertIn("자료가 공개된 날", surface, f"{name}: 날짜 고지가 사라졌다")
+            self.assertIn("캐나다", surface, f"{name}: 예외를 밝히지 않는다")
+            self.assertNotIn("실사한 날이 아니라", surface,
+                             f"{name}: 캐나다에서 거짓인 단정이 되살아났다")
 
     def test_source_mix_skew_disclosed(self):
         """소스 구성 편중은 이 페이지 전체 해석의 전제 — 숨기지 않고 소스 구성 섹션에서
@@ -3411,7 +3418,9 @@ class WebTrendsRenderTest(unittest.TestCase):
                          "'먼저 알아두세요' 블록이 지적 경향 면으로 되돌아왔다")
         self.assertIn('<div class="imp" id="tr-coverage-note" hidden>', self.coverage)
         self.assertIn('<p id="tr-coverage-text"></p>', self.coverage)
-        self.assertIn("날짜는 실사한 날이 아니라 <b>자료가 공개된 날</b>입니다.", self.html)
+        # 날짜 고지는 각주로 남아 있다(문구는 test_publication_date_semantics_still_disclosed
+        # 가 뜻으로 잰다 — 캐나다 예외 때문에 단정형이 아니다).
+        self.assertIn("자료가 공개된 날", self.html)
         self.assertIn("findings/coverage/index.html", self.html)
 
 
@@ -8689,7 +8698,15 @@ class WebFirmPageTest(unittest.TestCase):
         html = p.read_text(encoding="utf-8")
         self.assertIn("담긴 범위", html)
         self.assertIn("상세 페이지가 있는 문서", html)
-        self.assertIn("문서가 공개된 날", html)          # 실사일 아님
+        # ★[2026-08-28] 종전에는 `"문서가 공개된 날"` 이라는 **단정 문장**을 요구했다.
+        #   그 단정은 이제 거짓이다 — 캐나다 실사는 그 자리에 실사일이 들어가고(mig 069),
+        #   게다가 이 페이지의 타임라인은 **행마다** '공개'/'실사 종료'를 적고 있어서
+        #   머리글의 단정과 자기 화면이 어긋나 있었다.
+        #   지키려던 뜻은 "날짜의 정체를 말한다"이지 "그 문장이 있다"가 아니었으므로,
+        #   행 라벨이 실제로 붙어 있는지로 잰다 — 화면이 스스로 말하는 편이 더 정확하다.
+        self.assertIn("행마다 그 날짜가 무엇인지", html)
+        for label in ("공개", "실사"):
+            self.assertIn(label, html, f"타임라인 행이 날짜 종류('{label}')를 적지 않는다")
         self.assertIn("이것은 그 시점의 기록입니다", html)  # 후속 시정 고지
         self.assertIn(self.data.get("measured_on", ""), html)
 

@@ -214,6 +214,7 @@ def build_visual_html(visual: "dict[str, Any] | None") -> str:
     지금은 `kind="rename"`(이전 → 지금 두 칸) 하나만 그린다. 모르는 kind 는 조용히
     빈 문자열 — 데이터가 앞서 가도 메일이 깨지지 않는다(부재 어휘 관례).
     """
+    e = _html.escape
     if not isinstance(visual, dict) or visual.get("kind") != "rename":
         return ""
     rows = [r for r in (visual.get("rows") or [])

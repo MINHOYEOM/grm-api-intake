@@ -655,14 +655,22 @@
   // ★그래서 이제 어떤 기관도 화면에서 빠지지 않는다. `prefixes` 가 배열인 이유가
   //   이것이다 — 한 버튼이 여러 레인을 덮을 수 있어야 '합쳐서 보여주기'가 가능하다.
   //
-  // ★순서는 크기순이 아니다 — 기본값(식약처)이 맨 앞이어야 하고 그 이유는 위 주석에
-  //   있다. '전체'는 합산이라 언제나 맨 뒤다.
+  // ★순서와 기본값은 **다른 문제**다. 원래 설계가 말한 것은 "합산을 기본값으로 두지
+  //   마라"였지 위치가 아니었는데(위 주석), 내가 그걸 "맨 뒤"로 옮겨 적었다가 화면에서
+  //   식약처가 맨 앞에 서는 어색한 줄이 됐다.
+  //   지금은 넓은 것에서 좁은 것으로 읽힌다 — **전체 → 기관들**. 필터 줄의 흔한 관례이고
+  //   눈이 왼쪽부터 훑을 때 "무엇을 고를 수 있나"가 먼저 보인다.
+  // ★그래도 **기본값은 여전히 식약처**다(state.agency 초기화 참조). 위치가 앞이라고
+  //   기본이 되는 것은 아니다 — 합산을 기본으로 두면 어느 기관의 현실도 아닌 화면이
+  //   첫 화면이 되고, 그 이유는 위 주석의 실측(FDA·식약처 상위 5가 하나도 안 겹친다)에
+  //   있다. 새 방문자에게는 두 번째 칩이 켜진 채로 열린다.
+  // ★기관 사이 순서도 크기순이 아니다 — 독자가 국내 실무자라 식약처가 기관 중 처음이다.
   var AGENCY_VIEWS = [
+    { key: "all", label: "전체", prefixes: [] },
     { key: "mfds", label: "식약처", prefixes: ["MFDS"] },
     { key: "fda", label: "FDA", prefixes: ["FDA"] },
     { key: "hc", label: "캐나다", prefixes: ["Health Canada"] },
     { key: "eu", label: "EU·영국", prefixes: ["EU GMP NCR", "MHRA"] },
-    { key: "all", label: "전체", prefixes: [] },
   ];
 
   // 한 버튼이 여러 레인을 덮는다. 접두 목록이 비면 '전체'다.
@@ -676,11 +684,20 @@
   }
   var AGENCY_STORE_KEY = "grm-trends-agency";
 
+  // 기본 보기의 key. ★이름으로 적는다 — 종전에는 `AGENCY_VIEWS[0]` 으로 물러섰는데,
+  //   그건 "목록 맨 앞 = 기본값"이라는 **숨은 결합**이었다. '전체'를 맨 앞으로 옮기는
+  //   순간 모르는 key(옛 저장값·손으로 고친 URL)가 전부 합산 화면으로 떨어졌을 자리다 —
+  //   설계가 막으려던 바로 그 상태다. 위치와 기본값을 갈라 둔다.
+  var DEFAULT_AGENCY_KEY = "mfds";
+
   function agencyView(key) {
     for (var i = 0; i < AGENCY_VIEWS.length; i += 1) {
       if (AGENCY_VIEWS[i].key === key) return AGENCY_VIEWS[i];
     }
-    return AGENCY_VIEWS[0];
+    for (var j = 0; j < AGENCY_VIEWS.length; j += 1) {
+      if (AGENCY_VIEWS[j].key === DEFAULT_AGENCY_KEY) return AGENCY_VIEWS[j];
+    }
+    return AGENCY_VIEWS[0];                 // 기본 key 가 목록에서 사라진 경우의 최후 폴백
   }
 
   // 저장된 선택 읽기 — 사생활 모드·저장 차단 브라우저에서 접근 자체가 던지므로 감싼다.
@@ -2553,7 +2570,7 @@
   // [컨셉 재정의] 기관 선택 초기값 — 저장된 값이 있으면 그것, 없으면 식약처.
   // ★기본이 '전체'가 아닌 이유는 AGENCY_VIEWS 위 주석 참조(합산은 어느 기관의
   //   현실도 아니라, 그것을 기본 화면으로 두면 오답을 기본값으로 두는 것이 된다).
-  state.agency = readStoredAgency() || "mfds";
+  state.agency = readStoredAgency() || DEFAULT_AGENCY_KEY;
   wireAgency();
 
   // [주 데이터 · 데이터 현황] 007 findings_stats.

@@ -97,11 +97,31 @@ class TrendsAgencyViewsTest(unittest.TestCase):
             f"문서 {MIN_DOCS_FOR_BUTTON}건 이상인데 전용 버튼이 없다: {missing}. "
             "데이터가 자란 것이므로 버튼을 더하거나, 합칠 이유를 AGENCY_VIEWS 주석에 적어라.")
 
-    def test_all_view_is_last_and_default_is_first(self) -> None:
-        """순서는 크기순이 아니다 — 기본값이 맨 앞, 합산이 맨 뒤다(그 이유는 주석에 있다)."""
+    def test_reading_order_is_broad_to_narrow(self) -> None:
+        """줄은 넓은 것에서 좁은 것으로 읽힌다 — '전체'가 맨 앞, 기관 중엔 식약처가 처음.
+
+        크기순이 아니다(캐나다가 FDA 483 보다 큰 창에서도 순서는 그대로다). 독자가 국내
+        실무자라 기관 중에서는 식약처가 먼저다."""
         keys = [k for k, _ in self.views]
-        self.assertEqual(keys[0], "mfds", "기본값(식약처)이 맨 앞이 아니다")
-        self.assertEqual(keys[-1], "all", "'전체'(합산)가 맨 뒤가 아니다")
+        self.assertEqual(keys[0], "all", "'전체'가 맨 앞이 아니다")
+        self.assertEqual(keys[1], "mfds", "기관 중 식약처가 처음이 아니다")
+
+    def test_default_is_not_the_position_but_a_name(self) -> None:
+        """★위치와 기본값을 갈라 둔다.
+
+        종전 `agencyView` 는 모르는 key 에 대해 `AGENCY_VIEWS[0]` 으로 물러섰다 —
+        "목록 맨 앞 = 기본값"이라는 숨은 결합이다. '전체'를 맨 앞으로 옮기는 순간
+        옛 저장값·손으로 고친 URL 이 전부 **합산 화면**으로 떨어졌을 자리이고, 그건
+        설계가 막으려던 상태다(합산은 어느 기관의 현실도 아니다).
+
+        기본값은 이름으로 적혀 있어야 하고, 그 이름이 '전체'면 안 된다."""
+        self.assertIn('var DEFAULT_AGENCY_KEY = "mfds";', self.js)
+        self.assertNotIn('readStoredAgency() || "mfds"', self.js,
+                         "기본값이 두 곳에 따로 적혀 있다(한쪽만 고치면 갈린다)")
+        # 폴백이 위치로 돌아가면 이 검사가 잡는다.
+        view_fn = self.js.split("function agencyView(key)", 1)[1].split("\n  }", 1)[0]
+        self.assertIn("DEFAULT_AGENCY_KEY", view_fn,
+                      "agencyView 가 기본값을 이름이 아니라 위치로 고르고 있다")
 
     def test_every_prefix_matches_a_real_source_string(self) -> None:
         """접두는 실제 `source` 문자열의 앞부분이어야 한다 — 오타 하나면 그 버튼이 0건이 된다.

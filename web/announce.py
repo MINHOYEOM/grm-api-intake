@@ -203,6 +203,50 @@ def render_weekly_block(ann: dict[str, Any], *, site_base_url: str) -> str:
 
 
 # ── 별도 공지 메일 빌더(순수·결정론) ──────────────────────────────────────────
+def build_visual_html(visual: "dict[str, Any] | None") -> str:
+    """공지 안에 넣는 시각 블록 — **이미지가 아니라 표**다. 없으면 빈 문자열(바이트 불변).
+
+    왜 이미지를 쓰지 않나: 메일 앱마다 원격 이미지 정책이 다르다(지메일은 프록시로
+    기본 표시하지만 아웃룩 데스크톱 계열은 기본 차단이 흔하다). 이름이 바뀐 것처럼
+    **반드시 전달돼야 하는 사실**을 이미지에 얹으면 일부 수신자에게는 통째로 사라진다.
+    표는 어디서나 뜨고, 이미지를 못 받는 환경에서도 글자로 남는다.
+
+    지금은 `kind="rename"`(이전 → 지금 두 칸) 하나만 그린다. 모르는 kind 는 조용히
+    빈 문자열 — 데이터가 앞서 가도 메일이 깨지지 않는다(부재 어휘 관례).
+    """
+    e = _html.escape
+    if not isinstance(visual, dict) or visual.get("kind") != "rename":
+        return ""
+    rows = [r for r in (visual.get("rows") or [])
+            if isinstance(r, (list, tuple)) and len(r) == 2 and str(r[0]).strip()]
+    if not rows:
+        return ""
+    out = ['<div style="border:1px solid #E6DFD8;border-radius:8px;padding:14px 16px;'
+           'margin:0 0 26px;background:#FFFFFF">']
+    caption = (visual.get("caption") or "").strip()
+    if caption:
+        out.append('<div style="font-size:12px;font-weight:600;letter-spacing:.04em;'
+                   f'color:#A14B30;margin-bottom:10px">{e(caption)}</div>')
+    out.append('<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
+               'style="width:100%;border-collapse:collapse">')
+    for before, after in rows:
+        out.append(
+            '<tr>'
+            '<td style="padding:5px 0;font-size:15px;color:#6C6A64;'
+            'text-decoration:line-through">' + e(str(before)) + '</td>'
+            '<td style="padding:5px 8px;font-size:14px;color:#A14B30;width:28px">&rarr;</td>'
+            '<td style="padding:5px 0;font-size:15px;font-weight:600;color:#141413">'
+            + e(str(after)) + '</td>'
+            '</tr>')
+    out.append('</table>')
+    note = (visual.get("note") or "").strip()
+    if note:
+        out.append('<div style="font-size:13px;line-height:1.6;color:#6C6A64;'
+                   f'margin-top:10px">{e(note)}</div>')
+    out.append('</div>')
+    return "".join(out)
+
+
 def build_announcement(ann: dict[str, Any], *, site_base_url: str,
                        unsubscribe_html: str = "") -> dict[str, Any]:
     """공지 1건 → 독립 메일(subject + HTML). 순수.
@@ -231,6 +275,7 @@ def build_announcement(ann: dict[str, Any], *, site_base_url: str,
     ]
     if lede:
         parts.append(f'<p style="margin:0 0 24px;color:#141413">{e(lede)}</p>')
+    parts.append(build_visual_html(ann.get("visual")))
     for it in (ann.get("items") or []):
         href = announce_href(base, it["path"])
         parts.append(

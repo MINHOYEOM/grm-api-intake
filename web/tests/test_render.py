@@ -4313,7 +4313,18 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         i_cfr = self.html.index('id="tr-cfr-block"')
         self.assertTrue(i_agency < i_rank < i_move < i_cfr)
         # 합산을 기본값으로 두지 않는다.
-        self.assertIn('state.agency = readStoredAgency() || "mfds";', self.js_src)
+        # ★[2026-08-28] 종전에는 `readStoredAgency() || "mfds"` 라는 **구현 문자열**을
+        #   요구했다. 기본값을 상수로 뽑으면서(DEFAULT_AGENCY_KEY) 그 줄이 사라졌고,
+        #   `tests/test_trends_agency_views.py` 는 오히려 그 문자열이 **없어야** 한다고
+        #   잰다 — 두 검사가 정면으로 부딪혔다. 지키려던 뜻은 "기본값이 합산이 아니다"
+        #   하나뿐이므로 그것만 잰다.
+        #   상수를 쓰는 이유: 종전엔 초기화와 폴백 두 곳에 기본값이 따로 적혀 있어
+        #   한쪽만 고치면 갈렸다(그리고 폴백은 `AGENCY_VIEWS[0]` 이라 목록 순서에
+        #   묶여 있었다 — '전체'를 앞으로 옮기는 순간 합산이 기본이 됐을 자리다).
+        self.assertIn('var DEFAULT_AGENCY_KEY = "mfds";', self.js_src)
+        self.assertIn("readStoredAgency() || DEFAULT_AGENCY_KEY", self.js_src)
+        self.assertNotIn('DEFAULT_AGENCY_KEY = "all"', self.js_src,
+                         "합산이 기본값이 됐다")
 
     def test_other_category_excluded_from_ranking_but_kept_in_denominator(self):
         """[컨셉 재정의 규율 2] '기타 품질시스템'은 규제 현상이 아니라 **분류기가 그

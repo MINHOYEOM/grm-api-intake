@@ -73,7 +73,9 @@
     {% if recent_docs %}
     <section class="fnd-browse" id="fnd-recent" aria-label="최근 공개된 문서">
       <h2 class="fnd-browse-h">최근 공개된 문서</h2>
-      <p class="fnd-browse-p">{{ recent_asof }} 수집 기준 최신 {{ recent_docs | length }}건입니다. 날짜는 실사한 날이 아니라 문서가 공개된 날입니다.</p>
+      {#- 날짜의 정체는 소스마다 다르다 — 캐나다 실사는 원천이 공개일을 주지 않아
+          실사일이 이 자리에 들어간다. 문서를 열면 둘 다 나온다. -#}
+      <p class="fnd-browse-p">{{ recent_asof }} 수집 기준 최신 {{ recent_docs | length }}건입니다. 날짜는 문서가 공개된 날이고, 캐나다 실사만 실사일입니다.</p>
       <div class="fnd-rc-list">
         {%- for d in recent_docs %}
         <a class="fnd-rc-row" href="{{ rel_root }}findings/doc/{{ d.slug }}/">

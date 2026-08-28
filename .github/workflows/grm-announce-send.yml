@@ -10,6 +10,13 @@ name: GRM Announce Send
 # (`weekly_publish_date` 스위치 — 추가 발송 0건)이고, 이 워크플로는 기능군 단위 마일스톤에만
 # 사람이 직접 dispatch 한다.
 #
+# ## 예약은 Brevo 가 들고 있는다
+# `scheduled_at` 을 주면 캠페인을 **queued 로 만들어 두고 런은 끝난다**. 발송 시각을 러너
+# 크론에 두면 정각 지각(부하 피크)에 휘둘리고, 우리 스케줄러가 죽으면 메일이 영영 안 나간다.
+# Brevo 가 시각을 들고 있으면 우리 인프라가 전부 꺼져 있어도 정시에 나간다. 예약 성공은
+# HTTP 코드가 아니라 **캠페인을 되읽어** 판정한다(런 success ≠ 예약됨). 멱등(④)은 `queued`
+# 를 이미 '발송됨'으로 세므로 예약분을 두 번 만들지 않는다.
+#
 # ## 게이트 4겹(되돌릴 수 없는 발송)
 #   ① 스키마 — id/date/제목/항목 1~6/경로 형식(사이트 상대경로만).            → validate-build
 #   ② provenance — 메일이 우리 페이지만 링크하고 추적 파라미터 0(뉴스레터 게이트 재사용).
@@ -35,6 +42,11 @@ on:
           - validate
           - test
           - send
+      scheduled_at:
+        description: '예약 발송 시각(send 전용·비우면 즉시 발송). 오프셋 생략 시 KST — 예: 2026-08-29T08:00'
+        required: false
+        default: ''
+        type: string
 
 # 최소권한 — 콘텐츠 read 만(발송은 SaaS 시크릿으로, GitHub 쓰기 권한 불필요).
 permissions:
@@ -128,7 +140,11 @@ jobs:
         env:
           ANNOUNCE_ID: ${{ github.event.inputs.announce_id }}
           MODE: ${{ github.event.inputs.mode }}
+          ANNOUNCE_AT: ${{ github.event.inputs.scheduled_at }}
         run: |
-          python web/announce.py \
-            --id "$ANNOUNCE_ID" \
-            --mode "$MODE"
+          # --at 는 값이 있을 때만 붙인다(빈 문자열은 형식 오류로 발송을 막는다).
+          if [ -n "$ANNOUNCE_AT" ]; then
+            python web/announce.py --id "$ANNOUNCE_ID" --mode "$MODE" --at "$ANNOUNCE_AT"
+          else
+            python web/announce.py --id "$ANNOUNCE_ID" --mode "$MODE"
+          fi

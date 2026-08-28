@@ -294,6 +294,7 @@ class NewsletterDisclosureDriftTest(unittest.TestCase):
 class _FakeResp:
     def __init__(self, data, status=200):
         self._d, self.status = data, status
+        self.status_code = status
 
     def raise_for_status(self):
         if self.status >= 400:
@@ -304,15 +305,25 @@ class _FakeResp:
 
 
 class _FakeSession:
-    def __init__(self, campaigns=None, create_id="cid-99"):
+    def __init__(self, campaigns=None, create_id="cid-99", single=None, put_status=204):
         self.headers: dict = {}
         self.calls: list = []
         self._campaigns = campaigns or []
         self._create_id = create_id
+        # 단건 조회 응답을 리스트로 주면 호출마다 하나씩 — 'draft → 전환 → queued' 재현용.
+        self._single = list(single) if isinstance(single, list) else ([single] if single else [])
+        self._put_status = put_status
 
     def get(self, url, params=None, timeout=None):
         self.calls.append(("GET", url, params))
+        if not url.endswith("/emailCampaigns"):                  # 단건 조회
+            return _FakeResp(self._single.pop(0) if len(self._single) > 1 else
+                             (self._single[0] if self._single else {}))
         return _FakeResp({"campaigns": self._campaigns})
+
+    def put(self, url, data=None, timeout=None):
+        self.calls.append(("PUT", url, data))
+        return _FakeResp({}, status=self._put_status)
 
     def post(self, url, data=None, timeout=None):
         self.calls.append(("POST", url, data))
@@ -372,6 +383,49 @@ class BrevoSenderTest(unittest.TestCase):
         self.assertTrue(any(u.endswith("/emailCampaigns/42/sendNow") for u in urls))
         test_call = [c for c in sess.calls if c[1].endswith("/emailCampaigns/42/sendTest")][0]
         self.assertEqual(json.loads(test_call[2]), {"emailTo": ["a@x.com", "b@x.com"]})
+
+    # ── 예약 발송(scheduledAt) ────────────────────────────────────────────────
+    def test_create_campaign_omits_scheduled_at_when_immediate(self):
+        # 미지정 시 payload 불변 — 즉시 발송 경로에 예약 키가 새어 들어가면 안 된다.
+        s, sess = self._sender()
+        s.create_campaign(name="N", subject="S", html="<b>h</b>", list_ids=[3],
+                          sender_name="GRM", sender_email="brief@grm.example")
+        body = json.loads([c for c in sess.calls if c[0] == "POST"][0][2])
+        self.assertNotIn("scheduledAt", body)
+
+    def test_create_campaign_carries_scheduled_at(self):
+        s, sess = self._sender()
+        s.create_campaign(name="N", subject="S", html="<b>h</b>", list_ids=[3],
+                          sender_name="GRM", sender_email="brief@grm.example",
+                          scheduled_at="2026-08-29T08:00:00+09:00")
+        body = json.loads([c for c in sess.calls if c[0] == "POST"][0][2])
+        self.assertEqual(body["scheduledAt"], "2026-08-29T08:00:00+09:00")
+        # 예약은 sendNow 를 부르지 않는다(호출부 책임이지만, 생성 자체가 발송이면 안 됨).
+        self.assertFalse(any(c[1].endswith("/sendNow") for c in sess.calls))
+
+    def test_get_campaign_reads_single(self):
+        s, _ = self._sender(single={"id": 42, "status": "queued",
+                                    "scheduledAt": "2026-08-29T08:00:00+09:00"})
+        self.assertEqual(s.get_campaign("42")["status"], "queued")
+
+    def test_schedule_campaign_sets_time_then_status(self):
+        s, sess = self._sender()
+        s.schedule_campaign("42", "2026-08-29T08:00:00+09:00")
+        puts = [c for c in sess.calls if c[0] == "PUT"]
+        self.assertEqual(json.loads(puts[0][2]), {"scheduledAt": "2026-08-29T08:00:00+09:00"})
+        self.assertTrue(puts[0][1].endswith("/emailCampaigns/42"))
+        self.assertEqual(json.loads(puts[1][2]), {"status": "queued"})
+        self.assertTrue(puts[1][1].endswith("/emailCampaigns/42/status"))
+
+    def test_schedule_campaign_tolerates_400_already_queued(self):
+        # 이미 queued 인 캠페인에 전환을 걸면 Brevo 가 400 을 준다 — 이건 실패가 아니다.
+        s, _ = self._sender(put_status=400)
+        s.schedule_campaign("42", "2026-08-29T08:00:00+09:00")
+
+    def test_schedule_campaign_raises_on_real_error(self):
+        s, _ = self._sender(put_status=500)
+        with self.assertRaises(AssertionError):
+            s.schedule_campaign("42", "2026-08-29T08:00:00+09:00")
 
 
 # ── 호 로딩 + issue 번호(render 파생 재사용) ──────────────────────────────────

@@ -356,5 +356,126 @@ class WeeklyUpdatesBlockTest(unittest.TestCase):
         self.assertIn("서비스 소식", teaser["html"])
 
 
+# ── 예약 발송 ─────────────────────────────────────────────────────────────────
+class ScheduleNormalizeTest(unittest.TestCase):
+    def test_naive_time_is_read_as_kst(self):
+        # 오프셋 없는 입력을 UTC 로 읽으면 아홉 시간 어긋난 발송이 조용히 나간다.
+        self.assertEqual(announce.normalize_schedule("2026-08-29T08:00"),
+                         "2026-08-29T08:00:00+09:00")
+
+    def test_space_separator_and_seconds(self):
+        self.assertEqual(announce.normalize_schedule("2026-08-29 08:00:30"),
+                         "2026-08-29T08:00:30+09:00")
+
+    def test_explicit_offset_is_preserved(self):
+        self.assertEqual(announce.normalize_schedule("2026-08-29T08:00Z"),
+                         "2026-08-29T08:00:00+00:00")
+        self.assertEqual(announce.normalize_schedule("2026-08-29T08:00+0900"),
+                         "2026-08-29T08:00:00+09:00")
+
+    def test_rejects_garbage(self):
+        for bad in ("내일 8시", "2026-08-29", "08:00", "2026-13-01T08:00", "", "2026-08-29T25:00"):
+            with self.assertRaises(SystemExit, msg=bad):
+                announce.normalize_schedule(bad)
+
+    def test_past_is_not_future(self):
+        self.assertFalse(announce.schedule_is_future("2020-01-01T08:00:00+09:00"))
+        self.assertTrue(announce.schedule_is_future("2099-01-01T08:00:00+09:00"))
+
+
+class _FakeSender:
+    """예약 경로용 최소 sender — 되읽기 상태를 시나리오로 준다."""
+
+    def __init__(self, statuses, existing=None):
+        self.statuses = list(statuses)          # get_campaign 이 돌려줄 status 순서
+        self.existing = existing
+        self.created: dict = {}
+        self.scheduled: list = []
+        self.sent_now: list = []
+
+    def find_campaign(self, name):
+        return self.existing
+
+    def create_campaign(self, **kw):
+        self.created = kw
+        return "cid-1"
+
+    def schedule_campaign(self, cid, at):
+        self.scheduled.append((cid, at))
+
+    def send_campaign(self, cid):
+        self.sent_now.append(cid)
+
+    def get_campaign(self, cid):
+        st = self.statuses.pop(0) if len(self.statuses) > 1 else self.statuses[0]
+        return {"id": cid, "status": st, "scheduledAt": "2099-01-01T08:00:00+09:00"}
+
+
+class ScheduledSendTest(unittest.TestCase):
+    """`--at` 실발송 경로 — 네트워크 0(sender 전체를 대체)."""
+
+    ENV = {"NEWSLETTER_API_KEY": "k", "GRM_NEWSLETTER_SENDER_EMAIL": "a@b.c",
+           "GRM_NEWSLETTER_LIST_ID": "3"}
+
+    def _run(self, fake, *extra):
+        import contextlib
+        import io as _io
+        import os
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as td:
+            d = pathlib.Path(td)
+            (d / "2026-07-sample.json").write_text(
+                json.dumps(_ann()), encoding="utf-8")
+            buf = _io.StringIO()
+            with mock.patch.dict(os.environ, self.ENV, clear=False),                     mock.patch.object(newsletter, "BrevoSender", lambda *a, **k: fake),                     contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+                rc = announce.main(["--id", "2026-07-sample", "--data", str(d),
+                                    "--mode", "send", "--no-linkcheck", *extra])
+            return rc, buf.getvalue()
+
+    def test_schedules_instead_of_sending_now(self):
+        f = _FakeSender(["queued"])
+        rc, out = self._run(f, "--at", "2099-01-01T08:00")
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(f.created.get("scheduled_at"), "2099-01-01T08:00:00+09:00")
+        self.assertEqual(f.sent_now, [])          # 예약인데 즉시 나가면 최악
+        self.assertIn("예약 완료", out)
+
+    def test_draft_left_behind_fails_the_run(self):
+        # 핵심 가드 — 예약이 안 걸렸는데 런이 초록이면 발송일이 조용히 지나간다.
+        f = _FakeSender(["draft"])
+        rc, out = self._run(f, "--at", "2099-01-01T08:00")
+        self.assertEqual(rc, 1, out)
+        self.assertIn("예약 실패", out)
+        self.assertTrue(f.scheduled)              # 전환을 한 번은 재시도했어야 한다
+
+    def test_draft_then_queued_recovers(self):
+        f = _FakeSender(["draft", "queued"])
+        rc, out = self._run(f, "--at", "2099-01-01T08:00")
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(f.scheduled, [("cid-1", "2099-01-01T08:00:00+09:00")])
+
+    def test_past_time_refused_before_touching_brevo(self):
+        f = _FakeSender(["queued"])
+        rc, out = self._run(f, "--at", "2020-01-01T08:00")
+        self.assertEqual(rc, 2, out)
+        self.assertEqual(f.created, {})
+        self.assertEqual(f.sent_now, [])
+
+    def test_without_at_still_sends_now(self):
+        f = _FakeSender(["sent"])
+        rc, out = self._run(f)
+        self.assertEqual(rc, 0, out)
+        self.assertIsNone(f.created.get("scheduled_at"))
+        self.assertEqual(f.sent_now, ["cid-1"])
+
+    def test_already_dispatched_is_idempotent_even_with_at(self):
+        f = _FakeSender(["queued"], existing={"id": "old", "status": "queued"})
+        rc, out = self._run(f, "--at", "2099-01-01T08:00")
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(f.created, {})
+        self.assertIn("멱등", out)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

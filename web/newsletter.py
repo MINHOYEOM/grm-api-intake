@@ -406,7 +406,8 @@ class NewsletterSender:
         raise NotImplementedError
 
     def create_campaign(self, *, name: str, subject: str, html: str, list_ids: list[int],
-                        sender_name: str, sender_email: str) -> str:
+                        sender_name: str, sender_email: str,
+                        scheduled_at: "str | None" = None) -> str:
         raise NotImplementedError
 
     def send_campaign(self, campaign_id: str) -> None:
@@ -464,16 +465,44 @@ class BrevoSender(NewsletterSender):
         return None
 
     def create_campaign(self, *, name: str, subject: str, html: str, list_ids: list[int],
-                        sender_name: str, sender_email: str) -> str:
+                        sender_name: str, sender_email: str,
+                        scheduled_at: "str | None" = None) -> str:
         body = {
             "name": name, "subject": subject, "type": "classic",
             "sender": {"name": sender_name, "email": sender_email},
             "htmlContent": html, "recipients": {"listIds": list_ids},
             "inlineImageActivation": False,
         }
+        if scheduled_at:
+            body["scheduledAt"] = scheduled_at
         r = self.s.post(self._url("/emailCampaigns"), data=json.dumps(body), timeout=self.timeout)
         r.raise_for_status()
         return str((r.json() or {}).get("id"))
+
+    def get_campaign(self, campaign_id: str) -> dict:
+        """캠페인 1건 원본. 예약을 **걸었다고 믿지 않고 되읽어 확인**하는 데 쓴다."""
+        r = self.s.get(self._url(f"/emailCampaigns/{campaign_id}"), timeout=self.timeout)
+        r.raise_for_status()
+        return r.json() or {}
+
+    def schedule_campaign(self, campaign_id: str, scheduled_at: str) -> None:
+        """이미 있는 draft 를 예약으로 돌린다(이전 실패 잔여 재사용 경로).
+
+        Brevo 는 생성 시 `scheduledAt` 을 주면 대개 그 자리에서 queued 가 되지만, draft 로
+        남는 경우가 있어 **시각 갱신 → 상태 전환**을 따로 밟는다. 상태 전환이 이미 끝난
+        캠페인이면 4xx 가 나므로, 판정은 호출부에서 `get_campaign` 으로 한다."""
+        self._put_tolerating_conflict(f"/emailCampaigns/{campaign_id}",
+                                      {"scheduledAt": scheduled_at})
+        self._put_tolerating_conflict(f"/emailCampaigns/{campaign_id}/status",
+                                      {"status": "queued"})
+
+    def _put_tolerating_conflict(self, path: str, body: dict) -> None:
+        """400 만 관용 — 이미 queued 인 캠페인에 같은 전환을 걸면 Brevo 가 400 을 준다.
+        그건 '실패'가 아니라 '이미 그 상태'다. **최종 판정은 HTTP 코드가 아니라
+        `get_campaign` 되읽기**가 한다(런 success ≠ 예약됨)."""
+        r = self.s.put(self._url(path), data=json.dumps(body), timeout=self.timeout)
+        if r.status_code != 400:
+            r.raise_for_status()
 
     def send_campaign(self, campaign_id: str) -> None:
         r = self.s.post(self._url(f"/emailCampaigns/{campaign_id}/sendNow"), timeout=self.timeout)

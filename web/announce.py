@@ -355,6 +355,43 @@ def run_gates(ann: dict[str, Any], *, site_base_url: str,
     return newsletter.GateReport(ok=not fails, reasons=reasons, label="공지"), mail
 
 
+# ── 예약 발송 ─────────────────────────────────────────────────────────────────
+# 발송 시각을 **Brevo 가 들고 있게** 한다. GitHub 러너 크론은 정각에 지각하는 일이 잦고,
+# 예약을 우리 쪽 스케줄러에 두면 그 스케줄러가 죽는 순간 메일이 영영 안 나간다. 캠페인을
+# queued 로 올려 두면 우리 인프라가 전부 꺼져 있어도 정시에 나간다. 멱등 게이트(④)는
+# 이미 `queued` 를 '발송됨'으로 세므로 예약분을 두 번 만들지 않는다.
+KST = "+09:00"
+_AT_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?"
+                    r"(Z|[+-]\d{2}:?\d{2})?$")
+
+
+def normalize_schedule(at: str) -> str:
+    """`2026-08-29T08:00` → `2026-08-29T08:00:00+09:00`. 순수.
+
+    오프셋을 안 적으면 **한국 시각**으로 읽는다 — 이 서비스의 독자도 운영자도 KST 라,
+    UTC 기본값은 아홉 시간 어긋난 발송을 조용히 만든다. 명시한 오프셋은 그대로 둔다."""
+    m = _AT_RE.match((at or "").strip())
+    if not m:
+        raise SystemExit(f"--at 형식 오류: {at!r} (예: 2026-08-29T08:00 · 오프셋 생략 시 KST)")
+    date, hh, mm, ss, off = m.groups()
+    off = KST if off is None else ("+00:00" if off == "Z" else
+                                   (off if ":" in off else off[:3] + ":" + off[3:]))
+    out = f"{date}T{hh}:{mm}:{ss or '00'}{off}"
+    from datetime import datetime
+    try:                        # 정규식은 자릿수만 본다 — 13월·25시·2월 30일은 달력이 거른다
+        datetime.fromisoformat(out)
+    except ValueError:
+        raise SystemExit(f"--at 달력에 없는 시각: {at!r}") from None
+    return out
+
+
+def schedule_is_future(scheduled_at: str, *, now: "Any" = None) -> bool:
+    """이미 지난 시각으로 예약하면 Brevo 가 거절하거나 즉시 나간다 — 먼저 막는다."""
+    from datetime import datetime, timezone
+    now = now or datetime.now(timezone.utc)
+    return datetime.fromisoformat(scheduled_at) > now
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def main(argv: "list[str] | None" = None) -> int:
     for _stream in (sys.stdout, sys.stderr):          # Windows cp949 콘솔서도 한글·— 출력
@@ -373,6 +410,8 @@ def main(argv: "list[str] | None" = None) -> int:
                          "precheck=멱등 사전점검(should_send 방출, 발송 0) · list=보유 공지 목록")
     ap.add_argument("--out", type=Path, default=None, help="렌더된 메일 HTML 저장(사람 검토 아티팩트)")
     ap.add_argument("--no-linkcheck", action="store_true", help="링크 실존 게이트 건너뜀(오프라인 검증)")
+    ap.add_argument("--at", default=None,
+                    help="예약 발송 시각(오프셋 생략 시 KST. 예: 2026-08-29T08:00). 미지정=즉시 발송")
     args = ap.parse_args(argv)
 
     if args.mode == "list":
@@ -419,6 +458,16 @@ def main(argv: "list[str] | None" = None) -> int:
         print("⚠️  NEWSLETTER_API_KEY·GRM_NEWSLETTER_SENDER_EMAIL 미설정 — 발송 불가(게이트는 PASS).",
               file=sys.stderr)
         return 2
+    sched = None
+    if args.at:
+        if args.mode != "send":
+            print("⚠️  --at 는 send 모드 전용(test 는 즉시 발송).", file=sys.stderr)
+            return 2
+        sched = normalize_schedule(args.at)
+        if not schedule_is_future(sched):
+            print(f"⚠️  --at {sched} 는 이미 지난 시각 — 예약 불가.", file=sys.stderr)
+            return 2
+
     sender = newsletter.BrevoSender(api_key)
     name = idempotency_campaign_name(args.id)
     mail2 = build_announcement(ann, site_base_url=site_base_url,
@@ -455,13 +504,31 @@ def main(argv: "list[str] | None" = None) -> int:
         return 2
     if existing:                       # 이전 실패로 남은 미발송 draft → 재사용(중복 생성 방지)
         cid = existing["id"]
-        print(f"이전 미발송 캠페인 재사용(status={existing.get('status')}) → sendNow: {cid}")
+        print(f"이전 미발송 캠페인 재사용(status={existing.get('status')}): {cid}")
+        if sched:
+            sender.schedule_campaign(cid, sched)
     else:
         cid = sender.create_campaign(name=name, subject=mail2["subject"], html=mail2["html"],
                                      list_ids=list_ids, sender_name=sender_name,
-                                     sender_email=sender_email)
-    sender.send_campaign(cid)
-    print(f"발송 완료: 캠페인 {cid}({name}) → 리스트 {list_ids}")
+                                     sender_email=sender_email, scheduled_at=sched)
+    if not sched:
+        sender.send_campaign(cid)
+        print(f"발송 완료: 캠페인 {cid}({name}) → 리스트 {list_ids}")
+        return 0
+
+    # 예약은 **걸었다고 믿지 않고 되읽어 확인**한다 — 여기서 draft 로 남으면 아무도 모르는
+    # 채 발송일이 지나간다(런 success ≠ 발송됨). draft 면 상태 전환을 한 번 더 시도한다.
+    info = sender.get_campaign(cid)
+    if str(info.get("status", "")).lower() not in newsletter._DISPATCHED_STATUSES:
+        sender.schedule_campaign(cid, sched)
+        info = sender.get_campaign(cid)
+    status = str(info.get("status", "")).lower()
+    if status not in newsletter._DISPATCHED_STATUSES:
+        print(f"⚠️  예약 실패: 캠페인 {cid} 가 status={status!r} 로 남음 — 발송 안 됨.",
+              file=sys.stderr)
+        return 1
+    print(f"예약 완료: 캠페인 {cid}({name}) → 리스트 {list_ids} · "
+          f"status={status} · scheduledAt={info.get('scheduledAt')}")
     return 0
 
 

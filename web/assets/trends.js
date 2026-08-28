@@ -642,20 +642,38 @@
   //     캐나다 실사 1,480건(322문서) · FDA 483 1,142건(245문서) · 식약처 실사 698건(146문서)
   //   즉 "다른 기관은 데이터가 얇아서"가 아니라 그냥 목록이 낡아 있었다.
   //
-  // ★EMA·MHRA 는 **넣지 않는다** — 같은 창에서 34건/3건이다. 상위 5 순위는 그 정도
-  //   모수에서 순위가 아니라 잡음이고, 이 저장소가 tier·퀴즈에서 이미 겪은 실패다.
-  //   빠진 이유를 여기 적어 두고, 그 판단이 낡으면 알아채도록 아래 검사가 지킨다:
-  //   `tests/test_trends_agency_views.py` 가 커밋된 문서 정본에서 기관별 규모를 세어
-  //   **문턱을 넘긴 기관에 버튼이 없으면 실패**한다(손목록이 조용히 낡는 것을 막는다).
+  // ★EMA·MHRA 는 처음에 뺐다가(각각 34건/3건 — 상위 5 순위가 잡음이 된다) **합쳐서
+  //   넣기로 바꿨다.** 안 보이는 것이 더 나쁘기 때문이다: 버튼이 없으면 독자는 "우리가
+  //   EU·영국을 안 다룬다"고 읽는데 실제로는 모으고 있고 '전체'에도 섞여 있다.
+  //   합치면 최근 12개월 37건이고, 그 정도면 1위 데이터 완전성 11건(29.7%)·2위
+  //   무균보증 8건처럼 **읽을 수 있는 신호**가 된다. 모수가 작다는 사실은 감추지
+  //   않는다 — 순위 머리에 늘 "EU·영국 지적 N건"이 함께 나간다.
+  //   ★둘을 합치는 근거는 편의가 아니다: 둘 다 **GMP 비준수 성명서**라는 같은 문서
+  //     종류이고(EudraGMDP·MHRA GMDP 등록부), 영국의 체계는 EU 체계에서 갈라져 나온
+  //     것이라 읽는 사람에게 하나의 규제 현실로 묶인다.
+  //
+  // ★그래서 이제 어떤 기관도 화면에서 빠지지 않는다. `prefixes` 가 배열인 이유가
+  //   이것이다 — 한 버튼이 여러 레인을 덮을 수 있어야 '합쳐서 보여주기'가 가능하다.
   //
   // ★순서는 크기순이 아니다 — 기본값(식약처)이 맨 앞이어야 하고 그 이유는 위 주석에
   //   있다. '전체'는 합산이라 언제나 맨 뒤다.
   var AGENCY_VIEWS = [
-    { key: "mfds", label: "식약처", prefix: "MFDS" },
-    { key: "fda", label: "FDA", prefix: "FDA" },
-    { key: "hc", label: "캐나다", prefix: "Health Canada" },
-    { key: "all", label: "전체", prefix: "" },
+    { key: "mfds", label: "식약처", prefixes: ["MFDS"] },
+    { key: "fda", label: "FDA", prefixes: ["FDA"] },
+    { key: "hc", label: "캐나다", prefixes: ["Health Canada"] },
+    { key: "eu", label: "EU·영국", prefixes: ["EU GMP NCR", "MHRA"] },
+    { key: "all", label: "전체", prefixes: [] },
   ];
+
+  // 한 버튼이 여러 레인을 덮는다. 접두 목록이 비면 '전체'다.
+  function viewCoversLane(view, lane) {
+    var list = (view && view.prefixes) || [];
+    if (!list.length) return true;
+    for (var i = 0; i < list.length; i += 1) {
+      if (String(lane || "").indexOf(list[i]) === 0) return true;
+    }
+    return false;
+  }
   var AGENCY_STORE_KEY = "grm-trends-agency";
 
   function agencyView(key) {
@@ -686,7 +704,7 @@
     (grid || []).forEach(function (r) {
       var lane = r.lane || r.source;      // 053 미적용 응답은 lane 이 없다 → 소스 축 폴백
       if (!lane) return;
-      if (view.prefix && lane.indexOf(view.prefix) !== 0) return;
+      if (!viewCoversLane(view, lane)) return;
       if (isInspectionLane(lane)) kept[lane] = true;
     });
     return kept;
@@ -698,7 +716,7 @@
     (grid || []).forEach(function (r) {
       var lane = r.lane || r.source;
       if (!lane) return;
-      if (view.prefix && lane.indexOf(view.prefix) !== 0) return;
+      if (!viewCoversLane(view, lane)) return;
       if (!isInspectionLane(lane)) n += Number(r.cur_cnt) || 0;
     });
     return n;
@@ -817,10 +835,10 @@
   //   기관 이름을 하나 더 적는 대신, CFR 순위가 자기 scope 에 싣고 오는 소스 목록으로
   //   판정한다. 새 기관이 들어오거나 어느 기관이 조항을 인용하기 시작해도 저절로 맞다.
   function agencyCitesCfr(view) {
-    if (!view || !view.prefix) return true;              // '전체'는 FDA 를 포함한다
+    if (!view || !(view.prefixes || []).length) return true;   // '전체'는 FDA 를 포함한다
     var sources = ((state.cfrScope || {}).sources) || [];
     for (var i = 0; i < sources.length; i += 1) {
-      if (String(sources[i].source || "").indexOf(view.prefix) === 0) return true;
+      if (viewCoversLane(view, sources[i].source)) return true;
     }
     return false;
   }

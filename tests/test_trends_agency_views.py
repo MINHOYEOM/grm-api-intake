@@ -42,18 +42,51 @@ class TrendsAgencyViewsTest(unittest.TestCase):
         cls.docs = data["documents"] if isinstance(data, dict) else data
         cls.js = TRENDS_JS.read_text(encoding="utf-8")
         block = cls.js.split("var AGENCY_VIEWS = [", 1)[1].split("];", 1)[0]
-        cls.views = re.findall(r'key:\s*"([a-z]+)".*?prefix:\s*"([^"]*)"', block)
+        # prefixes 는 배열이다 — 한 버튼이 여러 레인을 덮을 수 있어야 작은 기관을
+        # 합쳐서 보여줄 수 있기 때문이다(EU·영국).
+        cls.views = [
+            (m.group(1), re.findall(r'"([^"]*)"', m.group(2)))
+            for m in re.finditer(r'key:\s*"([a-z]+)".*?prefixes:\s*\[([^\]]*)\]', block)
+        ]
 
     def test_scan_is_alive(self) -> None:
         """0건은 성공이 아니라 파싱이 낡았다는 뜻이다(이 저장소의 다른 가드와 같은 원칙)."""
         self.assertGreaterEqual(len(self.views), 3, "AGENCY_VIEWS 파싱 실패")
         self.assertTrue(self.docs, "문서 정본이 비었다")
 
-    def test_every_large_agency_has_a_button(self) -> None:
-        """★문턱을 넘긴 기관에 버튼이 없으면 실패한다 — 캐나다가 그랬다."""
+    def _covered_sources(self) -> "list[str]":
+        """버튼이 덮는 접두 전부(‘전체’ 제외)."""
+        out: list[str] = []
+        for _key, prefixes in self.views:
+            out.extend(prefixes)
+        return out
+
+    def test_every_agency_is_reachable_from_some_button(self) -> None:
+        """★어떤 기관도 화면에서 빠지지 않는다.
+
+        처음엔 '문턱을 넘긴 기관만' 요구했는데(캐나다가 그 검사에 걸렸다), 작은 기관을
+        **합쳐서** 보여주기로 하면서 기준을 올렸다 — 버튼이 없으면 독자는 "우리가 그
+        기관을 안 다룬다"고 읽는다. 실제로는 모으고 있고 '전체'에도 섞여 있으므로,
+        안 보이는 것이 틀린 인상을 준다.
+
+        판정은 **문서의 source 문자열**로 한다(레인 접두와 같은 축) — 기관 코드로 재면
+        합친 버튼(EU·영국)이 두 코드를 덮는 것을 표현할 수 없다."""
+        prefixes = self._covered_sources()
+        uncovered = sorted({
+            (d.get("source") or "")
+            for d in self.docs
+            if not any((d.get("source") or "").startswith(p) for p in prefixes)
+        })
+        self.assertEqual(
+            uncovered, [],
+            f"어느 버튼도 덮지 않는 소스가 있다: {uncovered}. "
+            "버튼을 더하거나 작은 기관이면 기존 버튼에 접두를 합쳐라.")
+
+    def test_large_agency_gets_its_own_button(self) -> None:
+        """문턱을 넘긴 기관은 **자기 버튼**을 가져야 한다 — 큰 기관을 남에게 합치면
+        그 기관의 순위가 남의 분모에 묻힌다(캐나다 1,330문서가 그럴 뻔했다)."""
         counts = Counter(d.get("agency") or "" for d in self.docs)
         keys = {k for k, _ in self.views}
-        # 기관 코드 → 버튼 key. 버튼 key 는 소문자 기관 코드다(mfds/fda/hc).
         missing = sorted(
             f"{agency}({n:,}문서)"
             for agency, n in counts.items()
@@ -61,8 +94,8 @@ class TrendsAgencyViewsTest(unittest.TestCase):
         )
         self.assertEqual(
             missing, [],
-            f"문서 {MIN_DOCS_FOR_BUTTON}건 이상인데 트렌드 기관 버튼이 없다: {missing}. "
-            "데이터가 자란 것이므로 버튼을 더하거나, 뺄 이유를 AGENCY_VIEWS 주석에 적어라.")
+            f"문서 {MIN_DOCS_FOR_BUTTON}건 이상인데 전용 버튼이 없다: {missing}. "
+            "데이터가 자란 것이므로 버튼을 더하거나, 합칠 이유를 AGENCY_VIEWS 주석에 적어라.")
 
     def test_all_view_is_last_and_default_is_first(self) -> None:
         """순서는 크기순이 아니다 — 기본값이 맨 앞, 합산이 맨 뒤다(그 이유는 주석에 있다)."""
@@ -70,15 +103,17 @@ class TrendsAgencyViewsTest(unittest.TestCase):
         self.assertEqual(keys[0], "mfds", "기본값(식약처)이 맨 앞이 아니다")
         self.assertEqual(keys[-1], "all", "'전체'(합산)가 맨 뒤가 아니다")
 
-    def test_prefix_matches_a_real_source_string(self) -> None:
-        """접두는 실제 `source` 문자열의 앞부분이어야 한다 — 오타 하나면 그 버튼이 0건이 된다."""
+    def test_every_prefix_matches_a_real_source_string(self) -> None:
+        """접두는 실제 `source` 문자열의 앞부분이어야 한다 — 오타 하나면 그 버튼이 0건이 된다.
+
+        합친 버튼은 접두가 여럿이라 **하나라도 죽으면** 그쪽 기관만 조용히 사라진다.
+        그래서 접두를 전수로 잰다."""
         sources = {(d.get("source") or "") for d in self.docs}
-        for key, prefix in self.views:
-            if not prefix:
-                continue                                  # '전체'
-            self.assertTrue(
-                any(s.startswith(prefix) for s in sources),
-                f"'{key}' 의 접두 '{prefix}' 로 시작하는 source 가 정본에 없다")
+        for key, prefixes in self.views:
+            for prefix in prefixes:
+                self.assertTrue(
+                    any(s.startswith(prefix) for s in sources),
+                    f"'{key}' 의 접두 '{prefix}' 로 시작하는 source 가 정본에 없다")
 
     def test_cfr_caveat_is_derived_not_a_named_agency(self) -> None:
         """21 CFR 인용 여부를 기관 **이름**으로 가르면 새 기관에서 거짓을 말한다.

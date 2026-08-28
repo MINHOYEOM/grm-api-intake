@@ -62,7 +62,11 @@
     </nav>
     <p class="kick">Firm Record</p>
     <h1 class="ff-h1">{{ firm.name }} 지적사항 이력</h1>
-    <p class="ff-lede">규제기관이 공개한 실사 문서 <b>{{ firm.doc_count }}건</b>에서 확인된 지적 <b>{{ firm.finding_count }}건</b>입니다. 아래 날짜는 실사한 날이 아니라 <b>문서가 공개된 날</b>입니다.</p>
+    {#- [2026-08-28] 종전 문구는 "아래 날짜는 실사한 날이 아니라 문서가 공개된 날"이었다.
+        이 페이지의 타임라인은 행마다 '공개'/'실사 종료'를 적고 있어서 **자기 화면과
+        모순**이었고, 캐나다 실사는 그 '공개' 자리에 실사일이 들어간다. 한 문장으로
+        단정하는 대신 행이 스스로 말한다는 사실을 가리킨다. -#}
+    <p class="ff-lede">규제기관이 공개한 실사 문서 <b>{{ firm.doc_count }}건</b>에서 확인된 지적 <b>{{ firm.finding_count }}건</b>입니다. 아래 <b>행마다 그 날짜가 무엇인지</b> 적혀 있어요.</p>
     <p class="ff-meta">
       {%- for a in firm.agencies %}<span class="ff-chip ag">{{ agency_labels.get(a, a) }}</span>{% endfor %}
       <span class="ff-chip dt"><b>{{ firm.first_seen }}</b> ~ <b>{{ firm.last_seen }}</b></span>

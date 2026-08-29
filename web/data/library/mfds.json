@@ -790,6 +790,22 @@
       "doc_type": "guidance-internal",
       "published_date": "2026-08-21",
       "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15280"
+    },
+    {
+      "id": "data0011-15930",
+      "title_en": "국소 안과용 의약품 품질 가이드라인",
+      "title_ko": "국소 안과용 의약품 품질 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-08-28",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15930"
+    },
+    {
+      "id": "data0011-15923",
+      "title_en": "의약품 허가·심사 조정협의체 운영안내서",
+      "title_ko": "의약품 허가·심사 조정협의체 운영안내서",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-08-27",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15923"
     }
   ]
 }

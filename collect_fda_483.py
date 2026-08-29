@@ -1109,6 +1109,65 @@ def _is_legible_deficiency(deficiency: str) -> bool:
     return sum(1 for ch in (deficiency or "") if ch.isalpha()) >= FDA483_DEFICIENCY_MIN_ALPHA
 
 
+# [양식 furniture 차단 2026-08-29] 관찰 표제는 **영문 산문**이지 양식 라벨·주소·로트줄이
+# 아니다. 483 스캔본에서 페이지 푸터("EMPLOYEE(S) SIGNATURE / DATE ISSUED")·주소·날짜줄이
+# `OBSERVATION n` 앵커 뒤에 걸려 관찰 1건으로 발행되는 사례가 라이브에서 실측됐다
+# (fda483-193964 obs 2 = "EM!'I.O~SI S IGNATIJftf DATelMUED" — 진짜 obs 2 는 페이지 경계
+# 너머에 있어 유실됐고, raw 의 관찰 번호가 1·2·3·4·**6** 으로 5번 결번이다).
+#
+# ★판정을 **기능어 유무**로 두는 이유 둘.
+#   ① 푸터 문구는 OCR 이 문서마다 다르게 뭉갠다 — "EMPU>YEE(S) SIGMT\JRE" ·
+#      "EMR.O'IEE(S) SIGNATURE OATEISSUEO" · "E~SIGW.TURE EMPLOVEE(SJ" · 위 obs 2.
+#      같은 물리 문자열이 매번 달라지므로 축자 목록(_FORM_BOILERPLATE_RE)으로는 원리적으로
+#      전수를 못 잡는다.
+#   ② 기호 깨짐(_deficiency_garble)이 못 보는 계열이 따로 있다 — fda483-77278 의
+#      "Matinaly Tnvesig iad FAY fe Vani wale yj gate, 422 2" 는 단어 속 기호 0 · 한 글자
+#      조각 0 이라 그 게이트를 그대로 통과한다(단어 **모양**만 멀쩡하고 의미가 없다).
+#   영문 산문은 기능어를 반드시 포함하고, 양식 라벨·주소·로트줄·OCR 무의미열은 포함하지
+#   않는다 — 두 계열을 하나의 순수 신호로 함께 거른다.
+#
+# 실측(라이브 findings, FDA 483 전체 11,492행): 기능어 0개 = 185행이고 scope_status 별로
+#   fragment 150 · non_pharma 26 · ok 9 다. 공개면에 남아 있던 ok 9 행은 **전부 관찰이
+#   아니었다** — 양식 푸터 3 · 주소/날짜 2 · OCR 붕괴 2 · 제품 로트줄 1 · 문장 단편 1.
+#   정밀도 9/9(오탈락 0). 기존 fragment 242행 중 150행이 이 신호를 공유해 교차 검증된다.
+# ★임계값을 1 로 올리면 안 된다 — 기능어 1개 버킷(86행)에는 정상 표제가 다수 있다
+#   ("Quality oversight is inadequate." · "Training practices are inadequate." ·
+#    "Materials management is deficient."). 0 과 1 사이가 경계다.
+#
+# ★어휘는 두 무리다. 기능어만으로는 부족하다 — 관사·전치사 없이도 성립하는 정상 표제가
+#   있다("Deficiency two concerns inadequate cleaning validation."). 483 표제는 **무언가가
+#   미흡하다는 서술**이므로, 영문 글루가 없으면 결함 서술어가 대신 있다. 반대로 양식
+#   furniture(서명란·주소·날짜·로트줄)는 **둘 다 없다** — 그게 판별선이다.
+_FUNCTION_WORDS = frozenset((
+    # ① 영문 글루
+    "the", "of", "and", "are", "not", "is", "to", "in", "for", "that", "was", "were",
+    "with", "a", "an", "by", "on", "as", "or", "be", "been", "have", "has", "had",
+    "do", "does", "did", "no", "your", "you", "this", "these", "all", "at", "from",
+    "it", "its", "there", "their", "each", "any",
+    # ② 결함 서술어 — 글루 없는 표제를 살린다. 위 9행 furniture 에는 하나도 없다.
+    "inadequate", "inadequately", "deficient", "deficiencies", "insufficient",
+    "improper", "improperly", "incomplete", "failed", "failure", "fails",
+    "lack", "lacks", "lacking", "concerns", "unable",
+))
+
+_NON_WORD_RE = re.compile(r"[^A-Za-z0-9]+")
+
+
+def _has_function_word(deficiency: str) -> bool:
+    """표제가 영문 산문인가 — 기능어를 하나라도 포함하는지(순수 함수).
+
+    토큰화는 **관대하게** 한다. OCR 은 구두점을 흘리거나 덧붙이므로("procedures,are")
+    영숫자 이외 문자를 전부 구분자로 보고 자른다 — 붙어 버린 기능어를 놓치지 않기 위해서다.
+    """
+    tokens = _NON_WORD_RE.split((deficiency or "").lower())
+    return any(tok in _FUNCTION_WORDS for tok in tokens)
+
+
+def _is_publishable_deficiency(deficiency: str) -> bool:
+    """정상 경로 표제 게이트 — 글자 실질 하한 + 영문 산문 여부(순수 함수)."""
+    return _is_legible_deficiency(deficiency) and _has_function_word(deficiency)
+
+
 def _strip_redaction_markers(text: str) -> str:
     """483 본문의 **정상** 마스킹 표기를 지운다(깨짐 판정 전처리, 순수 함수).
 
@@ -1155,11 +1214,15 @@ def _is_recovered_deficiency_publishable(deficiency: str) -> bool:
     ★정상 경로에는 적용하지 않는다 — 오늘 관찰이 나오는 1,545개 문서의 출력은 byte 단위로
     그대로 둔다(회귀 0을 측정이 아니라 **구조로** 보장). 이 게이트는 앵커를 느슨하게 잡는
     회수 경로에만 걸린다. 통과 조건 셋:
-      ① 기존 가독성 하한(_is_legible_deficiency)
+      ① 기존 가독성 하한 + 영문 산문 여부(_is_publishable_deficiency)
       ② 483 **양식 문구**가 아니다(_FORM_BOILERPLATE_RE)
       ③ 토큰 깨짐률이 하한 이하(_deficiency_garble_ratio)
+
+    ※ 2026-08-29: ①이 _is_legible_deficiency 에서 _is_publishable_deficiency 로 바뀌었다.
+      회수 경로는 정상 경로보다 **좁아야** 하는데, 기능어 게이트가 정상 경로에만 걸리면
+      회수 경로가 더 넓어지는 역전이 생긴다.
     """
-    if not _is_legible_deficiency(deficiency):
+    if not _is_publishable_deficiency(deficiency):
         return False
     if _FORM_BOILERPLATE_RE.search(deficiency or ""):
         return False
@@ -1645,7 +1708,7 @@ def _extract_483_observations_from_text(
         _cut_at_annotations(scoped),
         lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
         hints,
-        gate=_is_legible_deficiency,
+        gate=_is_publishable_deficiency,
     )
     if primary:
         return primary

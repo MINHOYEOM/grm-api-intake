@@ -1564,6 +1564,73 @@ class ObservationLegibilityTest(unittest.TestCase):
         self.assertTrue(f._is_legible_deficiency(
             "Aseptic processing areas are deficient."))
 
+
+class ObservationFormFurnitureTest(unittest.TestCase):
+    """[양식 furniture 2026-08-29] 페이지 푸터·주소·로트줄이 관찰로 발행되던 구멍.
+
+    라이브 실측 2건이 계기다. 둘은 **같은 결함이 아니다** — 하나는 기존 깨짐 게이트가
+    잡고(기호 1개), 하나는 그 게이트를 그대로 통과한다(기호 0·조각 0). 기능어 신호는
+    둘을 함께 거른다.
+    """
+
+    # 라이브에서 실제로 발행됐던 문자열 그대로(scope_status='ok' 였던 9행 + 계기 2건)
+    FURNITURE = (
+        "EM!'I.O~SI S IGNATIJftf DATelMUED",              # fda483-193964 obs 2
+        "Matinaly Tnvesig iad FAY fe Vani wale yj gate, 422 2",  # fda483-77278
+        "AMENDMENTl EMPI_OYEE(S) SIGNATURE",              # fda483-190024
+        "EMR.O'IEE(S) SIGNATURE OATEISSUEO",              # fda483-181933
+        "Add Continuation Page E PLOYEE(S) SIGNATURE",    # fda483-130155
+        "t/11-15/2022 1-1 , Kyowa-cho AP!",               # fda483-185527
+        "Wrimn p<'O«dura lOr <:lemma ...",                # fda483-79823
+        "H, oor rnvesligution BA-OOT/22/004 26f04/2022.",  # fda483-161810
+        "Completion date 30th September 2017 4 Constitution Way "
+        "• Suite L • Woburn • Massachusetts • 01801",     # fda483-107752
+    )
+
+    # ★오탈락 방어 — 짧아도 정상인 표제. 라이브 '기능어 1개' 버킷에서 그대로 가져왔다.
+    # 이들이 떨어지면 임계값을 잘못 올린 것이다.
+    REAL_TERSE = (
+        "Quality oversight is inadequate.",
+        "Training practices are inadequate.",
+        "Materials management is deficient.",
+        "Compounding sheets are inadequate.",
+        "Failure to maintain general records.",
+        "Deficiencies in shipping validation.",
+        "Aseptic processing areas are deficient.",
+    )
+
+    def test_form_furniture_is_rejected(self):
+        for junk in self.FURNITURE:
+            self.assertFalse(f._has_function_word(junk), junk)
+            self.assertFalse(f._is_publishable_deficiency(junk), junk)
+
+    def test_terse_real_headings_survive(self):
+        for good in self.REAL_TERSE:
+            self.assertTrue(f._has_function_word(good), good)
+            self.assertTrue(f._is_publishable_deficiency(good), good)
+
+    def test_garble_gate_alone_would_have_missed_one(self):
+        """계기 2건이 서로 다른 결함임을 고정한다 — 회귀 시 이 차이가 먼저 사라진다."""
+        redcross = "Matinaly Tnvesig iad FAY fe Vani wale yj gate, 422 2"
+        symbols, fragment_ratio = f._deficiency_garble(redcross)
+        self.assertEqual(symbols, 0)
+        self.assertEqual(fragment_ratio, 0.0)   # 깨짐 신호로는 통과한다
+        self.assertFalse(f._is_publishable_deficiency(redcross))  # 기능어로 걸린다
+
+    def test_tokenizer_tolerates_lost_punctuation(self):
+        """OCR 이 구두점을 흘려 기능어가 붙어 버려도 찾아야 한다."""
+        self.assertTrue(f._has_function_word("procedures,are;not established"))
+        self.assertTrue(f._has_function_word("cleaning/of/equipment"))
+
+    def test_parser_drops_form_footer_observation(self):
+        """앵커 뒤에 푸터만 걸린 관찰은 발행되지 않는다(정상 경로 배선 확인)."""
+        text = ("WE OBSERVED\n"
+                "OBSERVATION 1\nAseptic processing operations were deficient.\n"
+                "Specifically, first air was blocked.\n"
+                "OBSERVATION 2\nEM!'I.O~SI S IGNATIJftf\nDATelMUED\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1"])
+
     def test_parser_drops_noise_observation(self):
         text = ("WE OBSERVED\n"
                 "OBSERVATION 1\nAseptic processing operations were deficient.\n"

@@ -1,10 +1,10 @@
 {
  "schema_version": "grm-findings-docs/v1",
- "measured_on": "2026-08-27",
+ "measured_on": "2026-08-29",
  "min_findings": 3,
  "totals": {
   "documents": 3301,
-  "findings": 21490
+  "findings": 21483
  },
  "by_agency": [
   {
@@ -27112,11 +27112,6 @@
      "category_label_ko": "원자재/공급업체 관리"
     },
     {
-     "finding_id": "finding-39439fd7790b6a41376ac3d9",
-     "text_ko": "완료일 30th September 2017 4 Constitution Way • Suite L • Woburn • Massachusetts • 01801",
-     "category_label_ko": "기타 품질시스템"
-    },
-    {
      "finding_id": "finding-908667e86b8be1cf89100b3e",
      "text_ko": "Policies PP 04-01, Member Grievance 및 PP 04-07, Major Incident Response Plan은 Federal Food, Drug and Cosmetic Act section 503B에 따른 Adverse Event Reporting for Outsourcing Facilities, Guidance for Industry에 맞춰 개정될 예정이었다.",
      "category_label_ko": "규제보고/변경관리"
@@ -37572,8 +37567,7 @@
     "원자재/공급업체 관리",
     "오염/교차오염 관리",
     "밸리데이션/적격성평가",
-    "무균보증/무균공정",
-    "기타 품질시스템"
+    "무균보증/무균공정"
    ],
    "findings": [
     {
@@ -37595,11 +37589,6 @@
      "finding_id": "finding-4bc3ca5d2835398e0dec31fc",
      "text_ko": "귀사의 aseptic processing area에서 environmental monitoring이 수행되지 않았다.",
      "category_label_ko": "무균보증/무균공정"
-    },
-    {
-     "finding_id": "finding-84d77a92c937e99502176a87",
-     "text_ko": "Continuation Page 추가 EMPLOYEE(S) 서명.",
-     "category_label_ko": "기타 품질시스템"
     }
    ]
   },
@@ -53501,7 +53490,6 @@
    "categories": [
     "안정성/보관",
     "무균보증/무균공정",
-    "기타 품질시스템",
     "품질부서 관리감독",
     "시험실/품질관리",
     "문서화/기록관리"
@@ -53516,11 +53504,6 @@
      "finding_id": "finding-5eaf9825e59a418e97742197",
      "text_ko": "무균으로 표방되는 동시에 pyrogen-free로 표방되는 의약품의 각 batch가 해당 요건 적합성을 확인하기 위한 시험실 시험을 거치지 않았다.",
      "category_label_ko": "무균보증/무균공정"
-    },
-    {
-     "finding_id": "finding-6c234fa9b0506e560d731c06",
-     "text_ko": "직원 서명 발행일.",
-     "category_label_ko": "기타 품질시스템"
     },
     {
      "finding_id": "finding-827f9f5bb2f4fea852273aa1",
@@ -56091,11 +56074,6 @@
     "시험실/품질관리"
    ],
    "findings": [
-    {
-     "finding_id": "finding-15f8fe70686abec974fbd323",
-     "text_ko": "원문 OCR 지적사항은 \"-t/11-15/2022 1-1 , Kyowa-cho AP!\"로 기재되어 있어, 원문 표시를 보존해 번역 검토 대상으로 기록했다.",
-     "category_label_ko": "기타 품질시스템"
-    },
     {
      "finding_id": "finding-1ec1248b4ccbe7d16ba17db3",
      "text_ko": "생산 시스템: 귀하의 절차는 DCS S)' 스템(프로세스 모니터링 시스템)에서 관찰되는 경보를 분류하지 않았다.",
@@ -59575,7 +59553,6 @@
    "evidence_url": "https://www.fda.gov/media/190024/download",
    "categories": [
     "무균보증/무균공정",
-    "기타 품질시스템",
     "품질부서 관리감독",
     "컴퓨터화시스템",
     "설비/시설"
@@ -59585,11 +59562,6 @@
      "finding_id": "finding-0bc435da6bbae52e2699ae46",
      "text_ko": "무균(sterile)으로 표방되는 의약품의 미생물 오염 방지를 위한 절차에 무균공정(aseptic process)의 적절한 밸리데이션이 포함되어 있지 않았다.",
      "category_label_ko": "무균보증/무균공정"
-    },
-    {
-     "finding_id": "finding-1332d021fdca06dc5babfd06",
-     "text_ko": "AMENDMENTl EMPI_OYEE(S) SIGNATURE 항목은 문서상 직원 서명란으로 기재되어 있다.",
-     "category_label_ko": "기타 품질시스템"
     },
     {
      "finding_id": "finding-3f7e9a52c4e55fa459eb515d",
@@ -91039,10 +91011,10 @@
     "안정성/보관",
     "오염/교차오염 관리",
     "기타 품질시스템",
-    "설비/시설",
     "문서화/기록관리",
     "원자재/공급업체 관리",
-    "무균보증/무균공정"
+    "무균보증/무균공정",
+    "설비/시설"
    ],
    "findings": [
     {
@@ -91064,11 +91036,6 @@
      "finding_id": "finding-23c5e6639d2261a68d2c8af3",
      "text_ko": "구체적으로, 회사는 sporicidal agent(b4)를 sporicidal agent로서 편집하여 sporicidal agent의 효과를 입증할 데이터가 없했다.",
      "category_label_ko": "기타 품질시스템"
-    },
-    {
-     "finding_id": "finding-31763ca6ee488c743e84164d",
-     "text_ko": "일상적인 교정(calibration) 및 점검을 실시하지 않았다.",
-     "category_label_ko": "설비/시설"
     },
     {
      "finding_id": "finding-4509eb8f0bc37145848994a8",
@@ -91094,11 +91061,6 @@
      "finding_id": "finding-659e86d75ba1a73009138cbe",
      "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립되어 있지 않았고 문서화되어 있지 않았다.",
      "category_label_ko": "무균보증/무균공정"
-    },
-    {
-     "finding_id": "finding-7a4435bac0f52b0c10684b90",
-     "text_ko": "Edeate Disodium 10% injection, Rx redacted b4b6, 7/6/15 생산, lot 03-070615, expires 8/6/15로 기록되었다.",
-     "category_label_ko": "기타 품질시스템"
     },
     {
      "finding_id": "finding-85b7297ebb73ded29c59037c",

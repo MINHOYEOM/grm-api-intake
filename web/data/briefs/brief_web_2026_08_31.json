@@ -6,12 +6,14 @@
   "publish_date": "2026-08-31",
   "agencies": [
    "EMA",
+   "FDA",
    "MFDS",
    "Health Canada",
    "ISPE"
   ],
   "categories": [
-   "Other"
+   "Other",
+   "Warning Letter"
   ],
   "tldr": [
    "EU, 인도 Aculife 무균 제조소에 세척 밸리데이션 중대결함으로 GMP 비준수 판정",
@@ -20,10 +22,10 @@
   ],
   "coverage": {
    "intake_total": 44,
-   "rendered": 20,
+   "rendered": 21,
    "evidence": {
     "A": 20,
-    "B": 0,
+    "B": 1,
     "C": 0
    },
    "resources": 1
@@ -134,8 +136,110 @@
    }
   },
   {
-   "id": "admin-2026006476",
+   "id": "702264c05c8b",
    "render_order": 1,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 1,
+   "signal_label": "Low",
+   "type_tag": "CGMP",
+   "headline_target": "R3 Medical Companies",
+   "title_issue": "무균공정 미밸리데이션 등 CGMP 6건",
+   "summary": "FDA CBER 이 R3 Medical Companies(제조 Bello·유통 Regen)에 경고서한을 발부했다. 제대·제대혈 유래 제품을 미승인 신약·미허가 생물의약품으로 판정하는 한편, 무균공정 밸리데이션 부재, 무균시험 전 검체 동결, 안정성 자료 없는 유효기간 설정 등 21 CFR 210/211 위반 6건을 함께 지적했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "702264c05c8b"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "R3 Medical Companies"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Biologics Evaluation and Research (CBER) · 08/14/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "CGMP 위반 6건 — 무균공정 밸리데이션 미실시, 무균조작구역(BSC) 청소·소독 공정 미밸리데이션 (21 CFR 211.113(b)·211.42(c)(10)(v))",
+    "무균시험 전 검체를 동결·해동 — 동결이 검체 내 미생물을 파괴·손상시켜 동결 전 오염이 신뢰성 있게 검출되지 않을 수 있음 (21 CFR 211.160(b))",
+    "안정성 시험 자료 없이 24개월 유효기간 부여 · 품질관리부서 책임·절차 미문서화 (21 CFR 211.166(a)·211.22(d))",
+    "조치: 회신기한 15영업일 · 미이행 시 압류(seizure)·금지명령(injunction) 가능"
+   ],
+   "implication": "미승인 의약품 표제로 발부된 서한 안에 무균 보증 체계 전반의 CGMP 위반이 함께 담긴 사례로, 제품의 규제 지위(HCT/P 냐 의약품이냐) 다툼과 별개로 제조소의 GMP 수준이 독립적으로 평가된다는 점을 보여준다. 특히 무균시험 전 검체를 동결·해동해 검출력을 떨어뜨렸다는 지적은 세포치료제에 국한되지 않고 동결 검체를 쓰는 모든 무균시험에 걸리는 논점이고, 안정성 자료 없이 유효기간을 부여한 건은 국내 실사에서도 반복되는 축이다. 위탁제조를 맡긴 유통사(Regen)도 라벨링·보관·출하 승인을 이유로 제조자로 보아 CGMP 적용 대상이라고 한 각주는 국내 위수탁·사입 구조에 그대로 옮겨볼 만하다.",
+   "checks": [
+    "무균시험용 검체의 동결·해동 여부와 그것이 미생물 검출력에 미치는 영향에 대한 방법 적합성 근거",
+    "유효기간 설정을 뒷받침하는 안정성 시험 자료 보유 여부 — 자료 없이 부여된 유효기간이 없는지",
+    "위수탁 구조에서 라벨링·보관·출하 승인을 수행하는 사입 유통사가 GMP 적용 대상으로 관리되고 있는지"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.113(b)",
+      "original": "1. Failure to establish and follow appropriate written procedures designed to prevent microbiological contamination of drug products purporting to be sterile, including procedures for validation of all aseptic and sterilization processes, as required by 21 CFR 211.113(b). For example, your firm has not validated the aseptic processes used to manufacture your umbilical cord derived products. Your umbilical cord derived products purport to be sterile and are expected to be sterile.",
+      "description": "무균을 표방하는 제대 유래 제품에 대해 미생물오염을 방지하기 위한 적절한 written procedures 를 수립·이행하지 않았고, 모든 무균공정·멸균공정의 밸리데이션 절차도 갖추지 않았다. FDA 는 해당 업체가 제대 유래 제품 제조에 쓰는 무균공정을 밸리데이션하지 않았다고 적시했다.",
+      "risk": "무균공정이 밸리데이션되지 않으면 그 공정이 무균성을 재현성 있게 달성한다는 근거 자체가 없다. 무균을 표방해 체내 주입·시술에 쓰이는 제품이므로, 공정 편차가 곧 오염 제품의 시장 유통으로 이어지고 그 사실을 출하 판정 단계에서 검출할 수단이 없다."
+     },
+     {
+      "citation": "21 CFR 211.160(b)",
+      "original": "3. Failure to establish laboratory controls that include scientifically sound and appropriate specifications, standards, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity, as required by 21 CFR 211.160(b). For example, samples of your umbilical cord derived products are frozen and thawed prior to sterility testing. Freezing samples has the potential to destroy or compromise any microbial content in the samples before testing, if present; therefore, any contamination that was present prior to freezing may not be reliably detected.",
+      "description": "성분(components), 의약품 용기(drug product containers), 마개(closures), 공정중간체(in-process materials), 표시(labeling) 및 완제품이 확인(identity)·함량(strength)·품질(quality)·순도(purity)의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격(specifications)·표준(standards)·시험절차(test procedures)를 포함하는 실험실 관리(laboratory controls)를 수립하지 않았다. 예를 들어, 제대 유래 제품의 검체를 무균시험(sterility testing) 전에 동결하고 해동하고 있었다. 검체를 동결하는 것은 시험 전에 검체 안에 존재하는 미생물 함량을 파괴하거나 손상시킬 가능성이 있으며, 따라서 동결 이전에 존재하던 오염이 신뢰성 있게 검출되지 않을 수 있다.",
+      "risk": "동결은 검체 안에 존재하던 미생물을 파괴하거나 손상시킬 수 있어, 동결 전에 있던 오염이 시험에서 신뢰성 있게 검출되지 않을 수 있다. 즉 무균시험 결과가 '적합'으로 나와도 그것이 무균성의 증거가 되지 못하며, 검체 취급 방식 자체가 시험의 검출력을 무력화한 경우에 해당한다."
+     },
+     {
+      "citation": "21 CFR 211.166(a)",
+      "original": "5. Failure to establish and follow a written testing program designed to assess the stability characteristics of drug products and to use results of such stability testing to determine appropriate storage conditions and expiration dates, as required by 21 CFR 211.166(a). For example, your firm assigns a 24-month expiration date to your products without supporting stability testing data.",
+      "description": "의약품의 안정성 특성을 평가하고 그 결과로 적절한 보관조건과 유효기간을 정하도록 설계된 문서화된 안정성 시험 프로그램을 수립·이행하지 않았다. 그럼에도 제품에 24개월 유효기간을 부여하고 있었다.",
+      "risk": "안정성 자료 없이 부여된 유효기간은 그 기간 동안 품질이 유지된다는 근거가 없는 숫자다. 유효기간 내라는 이유로 유통·사용되는 제품의 역가·순도·무균성이 보증되지 않으며, 회수 판단의 기준선도 세울 수 없다."
+     },
+     {
+      "citation": "21 CFR 211.22(d)",
+      "original": "6. The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed, as required by 21 CFR 211.22(d). For example, at the time of the inspection, written procedures describing the responsibilities of the quality unit had not been established, including but not limited to, procedures for the approval or rejection of drug products (21 CFR 211.22(a)) and the handling of all written and oral complaints regarding a drug product (21 CFR 211.198(a)).",
+      "description": "품질관리부서의 책임과 절차가 문서화되어 있지 않고 완전히 이행되지도 않았다. 실사 시점에 품질부서의 책임을 기술한 written procedures 가 수립돼 있지 않았으며, 여기에는 제품의 승인 또는 기각 절차(21 CFR 211.22(a))와 의약품 관련 서면·구두 불만 처리 절차(21 CFR 211.198(a))가 포함된다.",
+      "risk": "품질부서의 권한과 절차가 문서로 없으면 출하 판정과 불만 처리의 책임 소재가 성립하지 않는다. 위 무균·안정성 지적이 걸러지지 못한 구조적 원인이기도 하며, 개별 공정을 고쳐도 같은 유형의 결함이 재발할 수 있다."
+     }
+    ],
+    "fda_evaluation": "FDA 는 Bello(2026년 1월 8일자)·Regen(2026년 1월 6일자) Form FDA-483 에 대한 회신과 2025년 11월 20일자 서신을 검토한 뒤, 업체가 제시한 시정조치가 위 위반을 해소하기에 부적절하다고 판단했다. 이유로 세 가지를 들었다 — ① 회신이 제품의 계속 유통 문제나 위반 조건 하에 제조된 잔여 재고의 처분 계획을 다루지 않았고, ② 일부 시정조치는 뒷받침하는 문서가 없어 평가 자체가 불가능하며, ③ 이미 출하돼 유효기간 내에 있는 제품에 대해 위 결함이 미치는 영향을 적절히 다루는 조치가 기술되지 않았다. FDA 는 업체가 Form FDA-483 지적사항을 시정할 때까지 제조를 일시 중단하겠다고 한 약속은 인정했으나, 그것으로 IND 부재와 BLA 미승인 문제가 해소되지는 않는다고 명시했다.",
+    "required_remediation": {
+     "deadline": "본 서한 수령 후 15영업일 이내 서면 회신(기한 내 불가 시 사유와 완료 예정 시점을 설명)",
+     "items": [
+      "무균을 표방하는 제품의 미생물오염 방지 절차를 수립하고, 모든 무균공정·멸균공정에 대한 밸리데이션을 수행할 것",
+      "무균시험 검체의 동결·해동이 미생물 검출에 미치는 영향을 해소하도록 실험실 관리(규격·표준·시험절차)를 재수립할 것",
+      "안정성 시험 프로그램을 수립하고, 그 결과로 보관조건과 유효기간을 정할 것 — 자료 없이 부여된 24개월 유효기간을 재검토할 것",
+      "품질관리부서의 책임과 절차를 문서화하고 완전히 이행할 것(제품 승인·기각 절차 및 서면·구두 불만 처리 절차 포함)",
+      "위반 조건 하에 제조돼 유효기간 내 유통 중인 기출하 제품에 대한 영향평가와 잔여 재고 처분 계획을 제출할 것",
+      "시정조치를 뒷받침하는 문서를 함께 제출할 것 — 문서가 없으면 FDA 가 조치를 평가할 수 없다"
+     ]
+    },
+    "administrative_risks": "서한은 이 사안들을 적절히 해소하지 못하면 추가 통지 없이 조치가 이뤄질 수 있고, 여기에는 압류(seizure) 및/또는 금지명령(injunction)이 포함된다고 명시했다. 또한 본 서한과 Form FDA-483 의 지적사항이 해당 제품과 관련해 존재할 수 있는 결함의 전부는 아니며, 위반의 원인을 조사·규명하고 재발과 다른 위반의 발생을 방지할 책임은 업체에 있다고 밝혔다. 제품이 승인된 BLA 없이 유통되고 있는 상태이므로, CGMP 시정만으로는 미승인·미허가 상태가 해소되지 않아 IND 또는 BLA 경로를 밟지 않는 한 합법적 유통이 불가능하다. FDA 는 2019년 5월 28일자로 동일 대표자에게 유사한 통지를 한 이력도 함께 적시했다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/r3-medical-companies-726330-08142026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026006476",
+   "render_order": 2,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -227,7 +331,7 @@
   },
   {
    "id": "gmpinspect-1Q0tuRbX8Vj",
-   "render_order": 2,
+   "render_order": 3,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -292,7 +396,7 @@
   },
   {
    "id": "admin-2026006456",
-   "render_order": 3,
+   "render_order": 4,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -379,7 +483,7 @@
   },
   {
    "id": "gmpinspect-1Q0yBve7Ucd",
-   "render_order": 4,
+   "render_order": 5,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -485,7 +589,7 @@
   },
   {
    "id": "gmpinspect-1Q0yBve7VdX",
-   "render_order": 5,
+   "render_order": 6,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -573,7 +677,7 @@
   },
   {
    "id": "gmpinspect-1Q0rVqgoott",
-   "render_order": 6,
+   "render_order": 7,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -676,7 +780,7 @@
   },
   {
    "id": "gmpinspect-1Q0ru5Iua2u",
-   "render_order": 7,
+   "render_order": 8,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -778,7 +882,7 @@
   },
   {
    "id": "gmpinspect-1Q0ru5Iufs4",
-   "render_order": 8,
+   "render_order": 9,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -908,7 +1012,7 @@
   },
   {
    "id": "gmpinspect-1Q0ru5IuiUK",
-   "render_order": 9,
+   "render_order": 10,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1003,7 +1107,7 @@
   },
   {
    "id": "gmpinspect-1Q0stu63hLx",
-   "render_order": 10,
+   "render_order": 11,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1068,7 +1172,7 @@
   },
   {
    "id": "recall-19cf5a509b80",
-   "render_order": 11,
+   "render_order": 12,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1140,7 +1244,7 @@
   },
   {
    "id": "hc-82524",
-   "render_order": 12,
+   "render_order": 13,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -1215,7 +1319,7 @@
   },
   {
    "id": "recall-3d9c0716308a",
-   "render_order": 13,
+   "render_order": 14,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1287,7 +1391,7 @@
   },
   {
    "id": "recall-4324d22da4d0",
-   "render_order": 14,
+   "render_order": 15,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1359,7 +1463,7 @@
   },
   {
    "id": "recall-7234e78c0075",
-   "render_order": 15,
+   "render_order": 16,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1431,7 +1535,7 @@
   },
   {
    "id": "recall-ba062a1b15d5",
-   "render_order": 16,
+   "render_order": 17,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1503,7 +1607,7 @@
   },
   {
    "id": "recall-dddc35f13616",
-   "render_order": 17,
+   "render_order": 18,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1575,7 +1679,7 @@
   },
   {
    "id": "hc-82536",
-   "render_order": 18,
+   "render_order": 19,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -1650,7 +1754,7 @@
   },
   {
    "id": "hc-82537",
-   "render_order": 19,
+   "render_order": 20,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",

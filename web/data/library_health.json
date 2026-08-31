@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-24T03:35:56+00:00",
+  "checked_at": "2026-08-31T08:53:30+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -30,10 +30,10 @@
   "summary": {
     "blocked": 63,
     "broken": 0,
-    "needs_review": 96,
+    "needs_review": 98,
     "ok": 425,
-    "references": 706,
-    "unique_urls": 584
+    "references": 708,
+    "unique_urls": 586
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -8086,6 +8086,36 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15923": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15923",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15923"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15930": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15930",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15930"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8627,7 +8657,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000267517.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8657,7 +8687,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000276919.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000276919.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8672,7 +8702,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280043.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280043.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8702,7 +8732,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280046.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8930,7 +8960,7 @@
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs-1052---annex-3--iaea-who-good-manufacturing-practices-for-in-house-cold-kits-for-radiopharmaceutical-preparations",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -8960,7 +8990,7 @@
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs-1060---annex-3--who-good-manufacturing-practices-for-excipients-used-in-pharmaceutical-products",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -8975,7 +9005,7 @@
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs-1060---annex-4--good-practices-for-blood-establishments",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -8990,7 +9020,7 @@
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs-1067---annex-2--who-points-to-consider-in-continuous-manufacturing-of-pharmaceutical-products",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -9050,7 +9080,7 @@
       "attempts": 1,
       "final_url": "https://www.who.int/publications/m/item/trs1010-annex9",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {

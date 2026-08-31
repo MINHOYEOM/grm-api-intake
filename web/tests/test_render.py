@@ -9349,6 +9349,212 @@ class WebFindingsDocPageTest(unittest.TestCase):
         self.assertGreater(linked, 0, "사례→문서 링크가 하나도 없다(배선 확인)")
 
 
+# ── [실사관 표기 · 정적 문서 페이지 2026-08-31] ────────────────────────────────
+# 라이브 findings_docs.json 은 아직 inspector_names 를 담지 않는다(findings_docs_
+# refresh.py 는 네트워크를 타야 재생성되므로 이 작업에서는 실행하지 않는다 — 스펙
+# 참조). 그래서 WebFindingsDocPageTest 처럼 라이브 정본을 읽는 방식으로는 이 기능을
+# 검사할 수 없다 — 아래 두 클래스는 합성 doc/합성 정본으로 render.doc_inspector_line()
+# 과 findings_doc.html·render_site() 의 신규 에셋 발행을 각각 직접 검사한다
+# (WebFda483InspectorLineTest 가 카드 경로에 쓰는 것과 같은 직접 템플릿 렌더 패턴).
+class WebFindingsDocInspectorLineTest(unittest.TestCase):
+    """findings_doc.html '실사관' 행 — render.doc_inspector_line() 이 만든 문자열을
+    템플릿이 그대로 낸다. 빈 라벨 금지·최대 3명+외 N명·코호트 무관 전원 평문(링크 0개
+    — 코호트를 아는 동적 층 findings.js 가 프로파일 진입을 계속 담당한다)."""
+
+    def _doc(self, **kw):
+        base = {
+            "document_id": "d1", "slug": "d1", "agency": "FDA", "source": "FDA 483",
+            "firm_name": "Acme Pharma", "firm_key": "acme-pharma",
+            "published_date": "2026-01-15", "inspection_date": "",
+            "evidence_url": "https://www.fda.gov/x",
+            "categories": [],
+            "findings": [{"finding_id": "f1", "text_ko": "지적 본문",
+                         "category_label_ko": ""}],
+        }
+        base.update(kw)
+        return base
+
+    def _render(self, doc):
+        env = render._make_env()
+        return env.get_template("findings_doc.html").render(
+            page_title="t", rel_root="", nav_active="findings", latest_slug="x",
+            description="d", canonical="c", json_ld="",
+            doc=doc, agency_labels={}, source_label="",
+            inspector_line=render.doc_inspector_line(doc),
+            related_categories=[], same_firm=[], finding_bodies=[],
+            firm_page_slug=None)
+
+    def test_line_rendered_when_present(self):
+        h = self._render(self._doc(
+            inspector_names=["Jose F Velez", "Ivis L Negron Torres"]))
+        self.assertIn(
+            '<p class="fd-insp">실사관 <b>Jose F Velez · Ivis L Negron Torres</b>'
+            '<span>공개 문서에 서명한 실사관입니다.</span></p>', h)
+
+    def test_no_line_when_key_absent(self):
+        # 페이지 전역에 "실사관"이 없어야 한다는 게 아니다 — base.html footer 의 상시
+        # 도구 링크("실사관 조회")가 이미 그 문자열을 담고 있다. 여기서 보는 건 이 행
+        # 전용 클래스(fd-insp)가 생성되지 않는다는 것 뿐이다.
+        h = self._render(self._doc())
+        self.assertNotIn('class="fd-insp"', h)
+
+    def test_no_line_for_blank_or_invalid_input(self):
+        for bad in (None, "Jose F Velez", 42, {}, [], [None, 123, "   ", ""]):
+            with self.subTest(bad=bad):
+                h = self._render(self._doc(inspector_names=bad))
+                self.assertNotIn('class="fd-insp"', h)
+
+    def test_more_than_three_shows_three_and_extra_count(self):
+        names = [f"Name {i}" for i in range(5)]
+        h = self._render(self._doc(inspector_names=names))
+        self.assertIn("실사관 <b>Name 0 · Name 1 · Name 2 외 2명</b>", h)
+        self.assertNotIn("Name 3", h)
+
+    def test_exactly_three_has_no_extra_suffix(self):
+        h = self._render(self._doc(inspector_names=["A B", "C D", "E F"]))
+        self.assertIn("실사관 <b>A B · C D · E F</b>", h)
+        self.assertNotIn("외 0명", h)
+
+    def test_no_profile_link_regardless_of_name(self):
+        """★코호트 개념이 정적 빌드에 없다 — 어떤 이름이 와도 <a> 를 만들지 않는다.
+
+        코호트(문서 5건 이상)는 findings_inspector_index RPC 가 정하는 런타임 개념이라,
+        정적 스냅샷이 이를 재현하면 두 정의가 갈라지고(드리프트) 갈라진 링크는 존재하지
+        않는 프로파일로 사용자를 보낸다. 그래서 이 행은 절대 <a> 를 만들지 않는다."""
+        h = self._render(self._doc(inspector_names=["Jose F Velez"]))
+        start = h.index('class="fd-insp"')
+        seg = h[start:h.index("</p>", start)]
+        self.assertNotIn("<a ", seg)
+
+    def test_names_are_html_escaped(self):
+        h = self._render(self._doc(
+            inspector_names=["<script>alert(1)</script>", "A & B"]))
+        self.assertNotIn("<script>alert(1)</script>", h)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", h)
+        self.assertIn("A &amp; B", h)
+
+
+class WebDocInspectorLineUnitTest(unittest.TestCase):
+    """render.doc_inspector_line() 순수 함수 단위 테스트."""
+
+    def test_empty_or_missing_returns_blank(self):
+        self.assertEqual(render.doc_inspector_line({}), "")
+        self.assertEqual(render.doc_inspector_line({"inspector_names": []}), "")
+        self.assertEqual(render.doc_inspector_line({"inspector_names": None}), "")
+
+    def test_up_to_three_joined_with_middle_dot_no_suffix(self):
+        self.assertEqual(
+            render.doc_inspector_line({"inspector_names": ["A", "B"]}), "A · B")
+        self.assertEqual(
+            render.doc_inspector_line({"inspector_names": ["A", "B", "C"]}), "A · B · C")
+
+    def test_more_than_three_truncates_with_count(self):
+        self.assertEqual(
+            render.doc_inspector_line(
+                {"inspector_names": ["A", "B", "C", "D", "E"]}),
+            "A · B · C 외 2명")
+
+    def test_defers_to_shared_sanitizer_no_double_cleaning(self):
+        """비문자열/공백 원소는 render._sanitize_inspector_names() 계약대로 걸러진다 —
+        여기서 별도 정제 로직을 다시 두지 않았다는 것을 고정."""
+        self.assertEqual(
+            render.doc_inspector_line({"inspector_names": ["A", None, "  ", "B"]}),
+            "A · B")
+
+    def test_names_beyond_sanitizer_cap_of_six(self):
+        """정제(6개 상한)가 먼저 걸리므로 8명 입력이어도 "외 N명"의 N 은 정제 통과분
+        기준(6-3=3)이지 실제 초과 인원(5)이 아니다 — doc_inspector_line() 주석에 명시된
+        의도된 트레이드오프(카드·검색 화면과 같은 기존 방어선)."""
+        names = [f"Name {i}" for i in range(8)]
+        self.assertEqual(render.doc_inspector_line({"inspector_names": names}),
+                         "Name 0 · Name 1 · Name 2 외 3명")
+
+
+class WebInspectorDocPagesAssetTest(unittest.TestCase):
+    """[실사관 프로파일 문서목록 멤버십 2026-08-31] assets/inspector-doc-pages.json.
+
+    실사관 프로파일 페이지(런타임 RPC 화면)가 "이 실사관이 서명한 문서" 목록에서 정적
+    문서 페이지(findings/doc/{slug}/)로 링크하기 전에, 그 페이지가 실제로 존재하는지
+    확인하는 멤버십 집합이다 — 정적 페이지는 두께 임계를 넘긴 문서만 있어서 확인 없이
+    링크하면 일부가 404 다. render.load_findings_docs 를 합성 정본으로 바꿔치기해
+    render_site() 를 실제로 돌린다(라이브 findings_docs.json 에는 아직 inspector_names
+    가 없어 실 데이터로는 이 계약을 검사할 수 없다)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._real_load = render.load_findings_docs
+
+        def _finding(fid):
+            return {"finding_id": fid, "text_ko": "x", "category_label_ko": ""}
+
+        docs = [
+            {"document_id": "d1-with-inspectors", "slug": "d1", "agency": "FDA",
+             "source": "FDA 483", "firm_name": "Acme Pharma", "firm_key": "acme",
+             "published_date": "2026-01-01", "inspection_date": "",
+             "evidence_url": "https://www.fda.gov/1", "categories": [],
+             "findings": [_finding("f1")], "inspector_names": ["Jose F Velez"]},
+            {"document_id": "d2-no-inspectors", "slug": "d2", "agency": "FDA",
+             "source": "FDA 483", "firm_name": "Beta Pharma", "firm_key": "beta",
+             "published_date": "2026-01-02", "inspection_date": "",
+             "evidence_url": "https://www.fda.gov/2", "categories": [],
+             "findings": [_finding("f2")]},
+            # 사전순으로 "d1-with-inspectors" 보다 앞서는 id — 정렬이 삽입 순서가 아니라
+            # **값**으로 결정된다는 것을 함께 고정한다.
+            {"document_id": "a0-with-inspectors", "slug": "d0", "agency": "HC",
+             "source": "Health Canada Inspection", "firm_name": "Charlie Inc",
+             "firm_key": "charlie", "published_date": "2026-01-03", "inspection_date": "",
+             "evidence_url": "https://x.gc.ca/3", "categories": [],
+             "findings": [_finding("f3")], "inspector_names": ["Zed Zephyr"]},
+        ]
+
+        def _fake_load(path=None):
+            return {
+                "schema_version": "grm-findings-docs/v1", "measured_on": "2026-08-31",
+                "min_findings": 3,
+                "totals": {"documents": len(docs),
+                          "findings": sum(len(d["findings"]) for d in docs)},
+                "by_agency": [], "excluded": [], "documents": docs,
+                "agency_labels": {"FDA": "FDA", "HC": "Health Canada"},
+            }
+        render.load_findings_docs = _fake_load
+
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_inspasset_"))
+        cls.out = cls._tmp / "single"
+        # render_doc_pages=False — 개별 문서 HTML 3천 장 렌더 비용과 무관하게 이 에셋이
+        # 나오는지가 검사 대상이다(sitemap·목록·색인과 같은 "스위치 무관" 계약).
+        render.render_site(SINGLE_FIXTURES, cls.out, render_doc_pages=False)
+        cls.asset_path = cls.out / "assets" / "inspector-doc-pages.json"
+        cls.asset = json.loads(cls.asset_path.read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls):
+        render.load_findings_docs = cls._real_load
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_written_even_when_doc_pages_render_is_off(self):
+        self.assertTrue(self.asset_path.exists())
+
+    def test_schema(self):
+        self.assertEqual(self.asset["schema"], "grm-inspector-doc-pages/v1")
+
+    def test_only_documents_with_inspector_names_are_listed(self):
+        self.assertEqual(self.asset["document_ids"],
+                         ["a0-with-inspectors", "d1-with-inspectors"])
+
+    def test_sorted_lexicographically(self):
+        ids = self.asset["document_ids"]
+        self.assertEqual(ids, sorted(ids))
+
+    def test_trailing_newline_and_ascii_safe_json_convention(self):
+        raw = self.asset_path.read_bytes()
+        self.assertTrue(raw.endswith(b"\n"))
+
+    def test_listed_in_written_manifest(self):
+        meta = render.render_site(SINGLE_FIXTURES, self._tmp / "single2",
+                                  render_doc_pages=False)
+        self.assertIn("assets/inspector-doc-pages.json", meta["written"])
+
+
 class WebGlossaryDeepFieldsTest(unittest.TestCase):
     """[용어사전 심화 필드 8차 웨이브 A] detail_ko(실무 맥락 설명)·reg_refs(관련 조항
     참조) — 병렬 작업자가 glossary.json 에 추가할 예정인 선택 필드. 현재 정본 데이터엔

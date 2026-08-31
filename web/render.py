@@ -855,6 +855,69 @@ def load_library_updates(
     }
 
 
+# ── [브리프 자료실 스트립 2026-08-31] 주간 창(window) 안 변경만 모아 보여준다 ──────
+# 배경: 위 load_library_updates() 는 "가장 최근 이력 1건"만 본다(자료실 허브·모아보기
+# 전용 — 둘 다 "지금 화면"이라 최신 스냅샷이 맞다). 브리프 상세는 그 주에 발행된
+# **과거 특정 주간**을 보여주는 페이지라 "지금 최신 이력"을 붙이면 주차와 이력 날짜가
+# 어긋난다(예: 이번 주 브리프에 지난달 이력이 붙는 사고). 그래서 브리프는 자기 창
+# (window)에 실제로 들어오는 이력만 모아야 한다 — 여러 주 전 이력을 뒤늦게 열람해도
+# 그 브리프가 커버하던 기간의 자료실 변경만 보이게.
+def build_library_update_window_view(
+    entries: list[dict[str, Any]],
+    catalogs: list[dict[str, Any]],
+    window_start_iso: str,
+    window_end_iso: str,
+    *,
+    cap: int = LIBRARY_UPDATE_ITEM_CAP_COMPACT,
+) -> dict[str, Any] | None:
+    """브리프 한 주 창(window_start_iso~window_end_iso, ISO 문자열 비교·양끝 포함) 안에
+    든 자료실 변경 이력만 모아 표시 뷰로 반환한다. 창 안에 이력이 0건이면 None — 브리프
+    독자가 "자료실 갱신 없음"을 빈 상자로 오인하지 않도록 아예 렌더하지 않는다(빈 상자 금지).
+
+    entries 는 load_library_update_entries() 결과(날짜 내림차순 정렬 전제) 그대로 받는다
+    — 이 함수 자신은 파일을 읽지 않는다(순수·결정론).
+
+    창에 여러 이력이 걸리면(격주 이상 지난 브리프를 뒤늦게 열람하는 경우 등) 소스별로
+    new_ids/changed_ids/removed_ids 를 등장 순서를 지키며 하나로 합치고(중복 제거),
+    total_count 는 그 소스를 언급한 이력 중 가장 최근 값을 쓴다(entries 가 최신순이라
+    먼저 만난 값을 그대로 두면 된다). 합성 date 는 창 안 최신 이력의 date. 합쳐진 뒤의
+    실제 렌더(제목 해석·라벨·round-robin 배분·hidden_count)는 기존 `_library_update_view`
+    에 그대로 맡긴다 — 그 로직을 여기서 다시 구현하지 않는다(단일 출처 유지)."""
+    matched = [e for e in entries
+               if window_start_iso <= str(e.get("date") or "") <= window_end_iso]
+    if not matched:
+        return None
+
+    merged_sources: dict[str, dict[str, Any]] = {}
+    for e in matched:                                  # matched 도 최신 우선(entries 순서 상속)
+        for src, detail in (e.get("sources") or {}).items():
+            if not isinstance(detail, dict):
+                continue
+            slot = merged_sources.setdefault(src, {
+                "new_ids": [], "changed_ids": [], "removed_ids": [],
+                "total_count": detail.get("total_count", 0),   # 이 소스를 처음 만난(=가장 최신) 값 고정
+            })
+            for key in ("new_ids", "changed_ids", "removed_ids"):
+                seen = set(slot[key])
+                for item_id in (detail.get(key) or []):
+                    if item_id not in seen:
+                        slot[key].append(item_id)
+                        seen.add(item_id)
+
+    merged_entry = {"date": matched[0].get("date", ""), "sources": merged_sources}
+    return _library_update_view(merged_entry, catalogs, cap=cap)
+
+
+def _parse_brief_window(window: str) -> tuple[str, str] | None:
+    """브리프 표시용 window 문자열("2026-08-24 ~ 2026-08-31")에서 ISO 날짜 두 개를 뽑아
+    (start, end) 로 반환한다. 정확히 두 개를 못 뽑으면(형식이 깨졌거나 비어 있으면) None
+    — 호출부는 조용히 스트립을 생략한다(깨진 표시보다 안 보이는 게 낫다)."""
+    found = re.findall(r"\d{4}-\d{2}-\d{2}", window or "")
+    if len(found) != 2:
+        return None
+    return found[0], found[1]
+
+
 # ── [이용안내] 제한 마크다운 서브셋 → 결정론 HTML ──────────────────────────────
 # guide_content.md 는 정확히 다음 서브셋만 쓴다(콘텐츠 실측): # / ## / ### 헤딩,
 # `- ` 순서없는 목록, `N. ` 순서있는 목록, `**굵게**`, 인라인 `` `코드` ``, 그 외는 문단.
@@ -2770,6 +2833,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 함께 쓰므로 세 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
     catalogs = load_library()
     library_updates = load_library_updates(catalogs)
+    # [브리프 자료실 스트립] load_library_updates() 는 "최신 1건"만 보므로 브리프
+    # 상세(과거 특정 주간)에는 못 쓴다 — 이력 전체를 한 번 더 확보해 브리프 루프에서
+    # 각자의 window 로 걸러 쓴다(같은 파일을 두 번 파싱하지 않도록 여기서 한 번만 로드).
+    lib_entries = load_library_update_entries()
     # 랜딩 자료실 카드용 집계 — **수치를 템플릿에 박지 않는다**. 카탈로그가 늘 때마다
     # 사람이 문구를 고쳐야 하면 반드시 낡는다(이용안내가 그렇게 낡았다 — 2026-07-25).
     library_summary = {
@@ -3599,6 +3666,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
         sections = _build_sections(card_views)
         ctx = _brief_context(b, issue_no)
+        # [브리프 자료실 스트립] 이 브리프가 커버하는 주간(window)에 실제로 든 자료실
+        # 변경만 싣는다 — window 파싱이 깨지면(형식 밖 표시 문자열 등) 조용히 생략한다
+        # (깨진 스트립보다 무렌더가 낫다. 빈 상자 금지 원칙과 같은 결).
+        _win = _parse_brief_window(ctx.get("window", ""))
+        lib_update_week = (
+            build_library_update_window_view(lib_entries, catalogs, _win[0], _win[1])
+            if _win else None
+        )
         html = brief_tmpl.render(
             page_title=f"{ctx['title_dateform']} 규제뉴스 · GRM",
             rel_root="../../",
@@ -3608,6 +3683,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             canonical=_abs_url(f"briefs/{pub}/"),
             brief=ctx,
             sections=sections,
+            lib_update_week=lib_update_week,
         )
         _write(out_dir / "briefs" / pub / "index.html", html)
         written.append(f"briefs/{pub}/index.html")

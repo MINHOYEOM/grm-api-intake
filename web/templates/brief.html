@@ -72,6 +72,27 @@
       </div>
       {%- endfor %}
       {% include "partials/resource_notes.html" %}
+      {#- [브리프 자료실 스트립 2026-08-31] 이 브리프가 커버하는 주간(window)에 실제로
+          든 자료실 자동 갱신만 짧게 알린다 — archive.html 의 arc-lib 스트립과 같은
+          마크업·같은 규율(빈 상자 금지: lib_update_week 가 None 이면 이 <aside> 자체가
+          렌더 0바이트). 뷰모델은 render.build_library_update_window_view() — 창 밖
+          이력은 절대 섞이지 않는다(과거 주 브리프에 "지금" 이력이 붙는 사고 방지).
+          부차 정보라 목차(TOC)에는 올리지 않는다. -#}
+      {% if lib_update_week %}
+      <aside class="arc-lib" aria-label="자료실 업데이트">
+        <div class="arc-lib-h">
+          <span class="arc-lib-k"><i class="ti ti-refresh" aria-hidden="true"></i>이번 주 자료실 업데이트</span>
+          <span class="arc-lib-sum"><b>{{ lib_update_week.date }}</b> · {% for s in lib_update_week.sources %}{{ s.short }} {{ s.change_count }}건{% if not loop.last %} · {% endif %}{% endfor %}</span>
+          <a class="arc-lib-go" href="{{ rel_root }}library/index.html">자료실 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <p class="arc-lib-l">
+          {%- for s in lib_update_week.sources %}{% for it in s['items'] %}
+          <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span>{{ it.title }}</a>
+          {%- endfor %}{% endfor %}
+          {%- if lib_update_week.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">외 {{ lib_update_week.hidden_count }}건</a>{% endif %}
+        </p>
+      </aside>
+      {% endif %}
     </div>
   </div>
   <button class="toc-fab" type="button" id="tocFab" aria-controls="toc" aria-expanded="false"><i class="ti ti-list-search"></i>목차</button>
@@ -103,6 +124,26 @@
   padding:4px 10px;cursor:pointer;transition:color .15s ease,border-color .15s ease}
 .tldr-copy:hover,.tldr-copy.is-done{color:var(--coral,#B9542F);border-color:var(--coral,#B9542F)}
 .tldr-copy .ti{font-size:14px}
+/* [브리프 자료실 스트립 2026-08-31] archive.html 의 .arc-lib* 규칙을 그대로 옮겨온다
+   (grm.css 는 무접촉 — archive.html 도 이 스타일을 페이지 스코프 <style> 에 둔다).
+   grm.css 토큰만 사용. 머리글 한 줄 + 제목 인라인 한 줄로 카드 목록 사이 높이를 최소로. */
+.arc-lib{margin:22px 0 0;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
+.arc-lib-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
+.arc-lib-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
+.arc-lib-k .ti{font-size:15px;color:var(--coral-2)}
+.arc-lib-sum{flex:1;min-width:0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
+.arc-lib-sum b{font-weight:600;color:var(--ink)}
+.arc-lib-go{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.arc-lib-go:hover{text-decoration:underline}
+.arc-lib-go .ti{font-size:14px;transition:transform .16s var(--ease)}
+.arc-lib-go:hover .ti{transform:translateX(3px)}
+.arc-lib-l{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line);font-size:0}
+.arc-lib-l a{font-family:var(--sans);font-size:13.5px;line-height:1.6;color:var(--body);text-decoration:none;word-break:keep-all;overflow-wrap:anywhere}
+.arc-lib-l a:hover{color:var(--coral-2);text-decoration:underline}
+.arc-lib-l a + a::before{content:"·";color:var(--lo);margin:0 8px;text-decoration:none;display:inline-block}
+.arc-lib-tag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:4px;padding:2px 6px;margin-right:6px;white-space:nowrap}
+.arc-lib-more{color:var(--muted)!important;font-weight:500}
+@media (max-width:640px){ .arc-lib{padding:12px 14px 11px} .arc-lib-sum{flex-basis:100%} }
 </style>
 {% endblock %}
 {% block ai_disclosure %}

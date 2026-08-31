@@ -1657,7 +1657,9 @@ def _fr_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
 
 def collect_openfda_recalls(start: date, end: date,
                             api_key: str | None) -> tuple[list[IntakeItem], str | None]:
-    """OpenFDA Drug Enforcement 항목 지난 7 일 전수 수집."""
+    """OpenFDA Drug Enforcement 항목 수집. report_date 는 지연 일괄 공개되므로
+    호출부는 기본 7 일이 아닌 enforcement 윈도우(지연공개 대응, MFDS_ENFORCEMENT_WINDOW_DAYS)
+    를 start 로 넘긴다."""
     search = f"report_date:[{start.strftime('%Y%m%d')}+TO+{end.strftime('%Y%m%d')}]"
     items: list[IntakeItem] = []
     skip = 0
@@ -3224,7 +3226,7 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
 
     recall_items: list[IntakeItem] = []
     if "recall" in active:
-        recall_items, rec_err = collect_openfda_recalls(start, end, openfda_key)
+        recall_items, rec_err = collect_openfda_recalls(enf_start, end, openfda_key)
         stats.recall_fetched = len(recall_items)
         if rec_err:
             stats.recall_error = True
@@ -3937,13 +3939,14 @@ def main() -> int:
     start, end = date_window(run_date, args.window_days)
     log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
 
-    # ── P0 개선: data.go.kr 지연공개 대응 윈도우 ───────────────────────────────
-    # 회수·행정처분은 사건일(회수명령일·최종처분일) 기준으로 윈도우를 거른다. 그런데
-    # data.go.kr은 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우
-    # 밖으로 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
-    # → 이 두 소스만 수집 윈도우를 넓혀 backfill하고, 중복은 dedup_window_days가 막는다.
-    #    handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로 잡힌 과거
-    #    일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
+    # ── P0 개선: 지연공개 대응 윈도우(enforcement window) ─────────────────────
+    # 사건일(회수명령일·최종처분일·report_date 등) 기준으로 윈도우를 거르는 소스는
+    # 원천이 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우 밖으로
+    # 빠지면 매일 돌려도 (날짜가 과거라) 영구 누락된다.
+    # → MFDS 회수·행정처분(data.go.kr), HC, FDA 483, ISPE, EU/MHRA GMP NCR, openFDA
+    #    Recall 은 이 넓은 윈도우로 수집해 backfill하고, 중복은 dedup_window_days가
+    #    막는다. handoff는 Run Date(수집일) 기준 필터이므로, 넓은 윈도우로 오늘 새로
+    #    잡힌 과거 일자 항목도 Run Date=오늘이 되어 Routine까지 정상 전달된다.
     mfds_enforcement_window_days = cfg.mfds_enforcement_window_days
     enf_start = run_date - timedelta(days=mfds_enforcement_window_days)
     log("INFO", f"MFDS enforcement window={enf_start}~{end} "

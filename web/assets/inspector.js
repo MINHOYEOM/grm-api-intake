@@ -35,6 +35,11 @@
  * [동기화 규칙] CATEGORY_LABELS 는 findings.js/trends.js/firm.js 의 동명 상수·grm_findings.
  * FINDING_TAXONOMY 20개 code/label_ko/label_en 과 완전히 일치해야 한다(web/tests/
  * test_render.py 가 web/assets/*.js 전수 글롭으로 대조 테스트를 강제한다).
+ *
+ * [확인한 제조소 2026-08-31] "반복 확인된 영역" 다음·"연도별 추이" 앞에 사는 블록
+ * (buildFirmGroups/buildFirmRow/renderFirms) — RPC 를 새로 만들지 않고 documents[]
+ * 를 firm_name 으로 클라이언트 집계한다. 정렬은 이름순(localeCompare) 고정, 문서 N건
+ * 표기는 037 이 색인에만 거는 건수 미표기 규칙과 별개로 허용된다(위 §범위 주석 참조).
  */
 (function () {
   "use strict";
@@ -54,6 +59,9 @@
   var repNoteEl = document.getElementById("ip-rep-note");
   var repEl = document.getElementById("ip-rep");
   var filterEl = document.getElementById("ip-filter");
+  // [확인한 제조소 2026-08-31] 신설 셸 — 마찬가지로 null 가드(renderFirms 참조).
+  var firmBlockEl = document.getElementById("ip-firm-block");
+  var firmEl = document.getElementById("ip-firm");
   // [존 재편 2026-08-26] ?key= 없이 들어왔을 때의 조회 랜딩(037 진입 경로 조항 개정 —
   // 템플릿 주석에 근거를 적어 뒀다). 하드 게이트에는 넣지 않는다.
   var lookupEl = document.getElementById("ip-lookup");
@@ -325,6 +333,70 @@
     });
   }
 
+  // ── [확인한 제조소 2026-08-31] documents[] 를 firm_name 으로 클라이언트 집계 ──────
+  // 마이그레이션 없음 — findings_inspector_profile RPC 응답의 documents[]
+  // (firm_name·firm_key·published_date) 을 그대로 재사용한다. 037 정책은 실사관 간
+  // 순위·비교를 금지하지 제조소 목록을 금지하지 않지만("행 안의 문서 N건 은 사실 표기라
+  // 허용" — 색인의 건수 미표기 규칙과는 다른 자리다), "찾기 쉬운 순서 = 중요도"로
+  // 읽히지 않도록 정렬 키는 firm_name(localeCompare) 하나로 고정한다(사용자 확정) —
+  // 건수 기준 비교자는 절대 만들지 않는다.
+  //
+  // firm_name 이 비면(방어) card_scaffold.VALUE_UNKNOWN 과 동일한 부재 어휘("미확인")로
+  // 표기한다 — 이 화면과 같은 FDA 483 파이프라인(_w2_extra_fda_483)이 이미 "제조소/업체"
+  // 행에 쓰는 값이라 새 어휘를 짓지 않는다. 그 버킷은 firm_key 를 신뢰할 수 없으므로
+  // (서로 다른 실제 제조소가 섞여 있을 수 있다) 절대 링크를 달지 않는다.
+  var FIRM_BLANK_LABEL = "미확인";
+
+  function buildFirmGroups(documents) {
+    var byName = {};
+    var order = [];
+    (documents || []).forEach(function (doc) {
+      if (!doc) return;
+      var decoded = decodeFirmDisplay(doc.firm_name || "").trim();
+      var name = decoded || FIRM_BLANK_LABEL;
+      var g = byName[name];
+      if (!g) {
+        g = { name: name, firm_key: "", count: 0, years: {} };
+        byName[name] = g;
+        order.push(g);
+      }
+      if (decoded && !g.firm_key && doc.firm_key) g.firm_key = doc.firm_key;
+      g.count++;
+      var year = String(doc.published_date || "").slice(0, 4);
+      if (/^\d{4}$/.test(year)) g.years[year] = true;
+    });
+    order.forEach(function (g) { g.years = Object.keys(g.years).sort(); });
+    // 이름순(오름차순) 고정 — 건수(count)는 정렬 키로 절대 쓰지 않는다.
+    order.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    return order;
+  }
+
+  function buildFirmRow(g) {
+    var row = el("div", "ip-firm-row");
+    if (g.firm_key) {
+      var link = document.createElement("a");
+      link.className = "ip-firm-name";
+      link.href = root + "findings/firm/index.html?key=" + encodeURIComponent(g.firm_key);
+      link.textContent = g.name;
+      row.appendChild(link);
+    } else {
+      row.appendChild(el("span", "ip-firm-name", g.name));
+    }
+    var meta = "문서 " + fmtNum(g.count) + "건";
+    if (g.years.length) meta += " · " + g.years.join(", ");
+    row.appendChild(el("span", "ip-firm-meta", meta));
+    return row;
+  }
+
+  function renderFirms(documents) {
+    if (!firmBlockEl || !firmEl) return;
+    var groups = buildFirmGroups(documents);
+    if (!groups.length) { firmBlockEl.hidden = true; return; }
+    firmBlockEl.hidden = false;
+    firmEl.innerHTML = "";
+    groups.forEach(function (g) { firmEl.appendChild(buildFirmRow(g)); });
+  }
+
   function renderCategories(byCategory, personName) {
     LAST_CATS = byCategory || [];
     catEl.innerHTML = "";
@@ -592,6 +664,7 @@
     renderStats(data.totals || {});
     renderCategories(data.by_category || [], LAST_NAME);
     renderRepeats(data.repeats || []);
+    renderFirms(LAST_DOCS);
     renderYears(data.by_year || []);
     renderFilter();
     renderDocuments(LAST_DOCS);

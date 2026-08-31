@@ -47,6 +47,11 @@
   </div>
   <div class="wrap">
     <div id="grm-inspector-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
+    {#- [진입점 3종 2026-08-31] 이 존의 세 면(검색·둘러보기·실사관)이 같은 자리에서 오갈
+        수 있어야 한다는 사용자 지적 반영 — 다른 두 템플릿(findings.html/findings_browse.
+        html)의 마크업을 그대로 이식한다. rel_root 는 이 페이지가 findings/browse 와 같은
+        깊이("../../")라 파셜을 손대지 않고 그대로 include 할 수 있다. -#}
+    {% with seg_active = "inspector" %}{% include "partials/findings_seg.html" %}{% endwith %}
 
     <div class="ip-state" id="ip-loading" role="status" aria-live="polite">불러오는 중…</div>
     <div class="ip-state" id="ip-unavailable" hidden>
@@ -127,6 +132,20 @@
         <div id="ip-rep" class="ip-rep"></div>
       </section>
 
+      {#- [확인한 제조소 2026-08-31] documents[] 를 firm_name 기준으로 클라이언트에서
+          집계한다(마이그레이션 없음 — findings_inspector_profile RPC 는 이미 documents[]
+          에 firm_name/firm_key/published_date 를 담고 있다). 서사 순서 = 무엇을(카테고리·
+          반복) → 어디를(제조소, 이 블록) → 언제(연도) → 원자료(문서 목록). 037 정책은
+          실사관 간 순위·비교를 금지하지, 제조소 목록에는 적용되지 않는다 — 그래도
+          "찾기 쉬운 순서"가 곧 "중요도 순서"로 읽히지 않게 정렬은 이름순(localeCompare)
+          으로 고정한다(사용자 확정, 건수순 정렬 UI 금지 — inspector.js renderFirms 참조).
+          문서 0건이면 블록째 숨긴다(빈 상자 금지). -#}
+      <section class="ip-block" id="ip-firm-block" aria-label="확인한 제조소" hidden>
+        <h2 class="ip-h">확인한 제조소</h2>
+        <p class="ip-note">이 실사관이 서명한 공개 문서에 나타난 제조소입니다. 이름순이며 제조소 간 비교나 순위가 아닙니다.</p>
+        <div id="ip-firm" class="ip-firm"></div>
+      </section>
+
       <section class="ip-block" aria-label="연도별 추이">
         <h2 class="ip-h">연도별 추이</h2>
         <div id="ip-year" class="ip-year"></div>
@@ -200,6 +219,16 @@ button.ip-cat-row[aria-pressed="true"] .ip-cat-label{color:var(--coral-2);font-w
 .ip-rep-docs{font-family:var(--mono);font-size:12px;color:var(--coral-2)}
 .ip-rep-years{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
 .ip-rep-year{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:999px;padding:2px 8px}
+
+/* [확인한 제조소] 이름순 목록 — .ip-rep-row 와 동형(구분선+행), 좌측 이름/우측 사실
+   표기(문서 N건 · 연도)만 다르다. */
+.ip-firm{display:flex;flex-direction:column;gap:0}
+.ip-firm-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding:11px 6px;border-top:1px solid var(--line)}
+.ip-firm-row:first-child{border-top:0}
+.ip-firm-name{font-size:14px;color:var(--ink);font-weight:500}
+a.ip-firm-name{color:var(--coral-2);text-decoration:none}
+a.ip-firm-name:hover{color:var(--coral);text-decoration:underline}
+.ip-firm-meta{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .ip-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
 .ip-filter[hidden]{display:none}
 .ip-filter-chip{display:inline-flex;align-items:center;gap:6px;height:26px;font:inherit;font-size:12px;color:var(--ink);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;cursor:pointer;line-height:1}

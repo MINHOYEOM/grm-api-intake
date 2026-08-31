@@ -49,7 +49,18 @@
     <p class="reveal" style="animation-delay:.14s">공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 문서 단위로 모아 보여줍니다.</p>
   </div>
   <div class="wrap">
-    <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden></div>
+    <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden></div><nav class="fnd-seg" aria-label="지적사항 면 전환">
+  <a href="../../findings/index.html">검색</a>
+  <a href="../../findings/browse/index.html">둘러보기</a>
+  <a href="../../findings/inspector/index.html" class="on" aria-current="page">실사관</a>
+</nav><style>
+.fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
+.fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
+.fnd-seg a:hover{color:var(--ink)}
+.fnd-seg a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--coral)}
+.fnd-seg a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
+@media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
+</style>
 
     <div class="ip-state" id="ip-loading" role="status" aria-live="polite">불러오는 중…</div>
     <div class="ip-state" id="ip-unavailable" hidden><p>해당 실사관의 프로파일을 표시할 수 없습니다.</p>
@@ -79,6 +90,10 @@
         <h2 class="ip-h">반복 확인된 영역</h2>
         <p class="ip-note" id="ip-rep-note"></p>
         <div id="ip-rep" class="ip-rep"></div>
+      </section><section class="ip-block" id="ip-firm-block" aria-label="확인한 제조소" hidden>
+        <h2 class="ip-h">확인한 제조소</h2>
+        <p class="ip-note">이 실사관이 서명한 공개 문서에 나타난 제조소입니다. 이름순이며 제조소 간 비교나 순위가 아닙니다.</p>
+        <div id="ip-firm" class="ip-firm"></div>
       </section>
 
       <section class="ip-block" aria-label="연도별 추이">
@@ -184,6 +199,16 @@ button.ip-cat-row[aria-pressed="true"] .ip-cat-label{color:var(--coral-2);font-w
 .ip-rep-docs{font-family:var(--mono);font-size:12px;color:var(--coral-2)}
 .ip-rep-years{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
 .ip-rep-year{font-family:var(--mono);font-size:11px;color:var(--body-s);background:var(--strong);border-radius:999px;padding:2px 8px}
+
+/* [확인한 제조소] 이름순 목록 — .ip-rep-row 와 동형(구분선+행), 좌측 이름/우측 사실
+   표기(문서 N건 · 연도)만 다르다. */
+.ip-firm{display:flex;flex-direction:column;gap:0}
+.ip-firm-row{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding:11px 6px;border-top:1px solid var(--line)}
+.ip-firm-row:first-child{border-top:0}
+.ip-firm-name{font-size:14px;color:var(--ink);font-weight:500}
+a.ip-firm-name{color:var(--coral-2);text-decoration:none}
+a.ip-firm-name:hover{color:var(--coral);text-decoration:underline}
+.ip-firm-meta{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .ip-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px}
 .ip-filter[hidden]{display:none}
 .ip-filter-chip{display:inline-flex;align-items:center;gap:6px;height:26px;font:inherit;font-size:12px;color:var(--ink);background:var(--strong);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;cursor:pointer;line-height:1}
@@ -307,7 +332,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/inspector.js?v=9f0fd42a" defer></script>
+<script src="../../assets/inspector.js?v=c1aeac7f" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

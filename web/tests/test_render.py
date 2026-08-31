@@ -6367,6 +6367,176 @@ class WebInspectorRenderTest(unittest.TestCase):
         self.assertNotIn("innerHTML", fn)
 
 
+class WebInspectorFirmBlockTest(unittest.TestCase):
+    """[확인한 제조소 2026-08-31] 프로파일 신규 블록 — RPC 를 새로 만들지 않고
+    findings_inspector_profile 응답의 documents[] 를 firm_name 으로 클라이언트에서
+    집계한다(inspector.js buildFirmGroups/buildFirmRow/renderFirms). '반복 확인된
+    영역' 다음·'연도별 추이' 앞이라는 서사 순서(무엇을→어디를→언제→원자료)와, 정렬은
+    이름순 고정(건수순 금지, 사용자 확정)을 여기서 고정한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_inspfirm_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "findings" / "inspector" / "index.html").read_text(encoding="utf-8")
+        cls.js_src = (WEB_DIR / "assets" / "inspector.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 마크업(셸) ──────────────────────────────────────────────────────────
+    def test_block_present_hidden_by_default_with_title_and_note(self):
+        self.assertIn(
+            '<section class="ip-block" id="ip-firm-block" aria-label="확인한 제조소" hidden>',
+            self.html)
+        block = self.html[self.html.index('id="ip-firm-block"'):]
+        block = block[:block.index("</section>")]
+        self.assertIn('<h2 class="ip-h">확인한 제조소</h2>', block)
+        self.assertIn(
+            "이 실사관이 서명한 공개 문서에 나타난 제조소입니다. "
+            "이름순이며 제조소 간 비교나 순위가 아닙니다.", block)
+        self.assertIn('id="ip-firm" class="ip-firm"', block)
+
+    def test_block_positioned_between_repeats_and_year_trend(self):
+        """서사 순서 = 무엇을(카테고리·반복) → 어디를(제조소) → 언제(연도) → 원자료(문서)."""
+        i_rep = self.html.index('id="ip-rep-block"')
+        i_firm = self.html.index('id="ip-firm-block"')
+        i_year = self.html.index('aria-label="연도별 추이"')
+        self.assertLess(i_rep, i_firm, "제조소 블록이 반복 확인된 영역보다 앞에 있다")
+        self.assertLess(i_firm, i_year, "제조소 블록이 연도별 추이보다 뒤에 있다")
+
+    # ── 집계(순수 함수, node 실행으로 동작 고정) ────────────────────────────────
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_build_firm_groups_behavior_via_node(self):
+        """이름순 정렬(건수 무관) · 연도 오름차순 dedup · firm_key 는 그룹의 첫 유효값을
+        유지 · firm_name 빈 값은 '미확인'(card_scaffold.VALUE_UNKNOWN 과 동일한 부재
+        어휘)으로 묶고, 그 버킷은 입력에 firm_key 가 있어도 절대 신뢰하지 않는다(링크
+        금지 — 서로 다른 실제 제조소가 섞였을 수 있다)."""
+        import subprocess
+
+        fn_src = WebInspectorRenderTest._extract_for_node(
+            ["decodeFirmDisplay", "FIRM_BLANK_LABEL", "buildFirmGroups"])
+        rows = [
+            {"firm_name": "Beta Pharma", "firm_key": "beta", "published_date": "2024-03-01"},
+            {"firm_name": "Beta Pharma", "firm_key": "beta-dup", "published_date": "2023-01-01"},
+            {"firm_name": "Alpha Labs", "firm_key": "alpha", "published_date": "2022-05-01"},
+            {"firm_name": "Alpha Labs", "firm_key": "", "published_date": "2022-09-01"},
+            # firm_name 공백뿐 + firm_key 가 있어도(방어 케이스) '미확인' 버킷은 링크를
+            # 만들 수 없어야 한다 — 아래에서 firm_key=="" 를 직접 검증한다.
+            {"firm_name": "  ", "firm_key": "ghost", "published_date": "2021-01-01"},
+        ] + [
+            # 건수(5)가 가장 많아도 이름순에서는 Alpha/Beta 뒤에 와야 한다(건수 정렬 금지).
+            {"firm_name": "ZZZ High Count", "firm_key": "zzz", "published_date": "2020-02-0" + str(i)}
+            for i in range(1, 6)
+        ]
+        driver = fn_src + "\n".join([
+            "",
+            "var rows = " + json.dumps(rows) + ";",
+            "console.log(JSON.stringify(buildFirmGroups(rows)));",
+        ])
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_firmgroups_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            # ★출력에 "미확인"(한글)이 섞인다 — text=True 만 쓰면 이 환경의 로캘
+            # 코드페이지(cp949)로 디코드를 시도해 UnicodeDecodeError 로 stdout 이
+            # None 이 된다(실측). encoding="utf-8" 을 명시해야 node 가 실제로 쓴
+            # UTF-8 바이트를 로캘과 무관하게 그대로 읽는다.
+            proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                   encoding="utf-8", timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+
+        by_name = {g["name"]: g for g in out}
+        self.assertEqual(
+            set(by_name), {"Alpha Labs", "Beta Pharma", "ZZZ High Count", "미확인"})
+
+        # 건수 기준이 아니라 이름순(라틴 3개는 어떤 콜레이션에서도 이 순서가 고정된다 —
+        # 혼용 스크립트("미확인" vs 라틴)와의 상대순서는 ICU 데이터에 따라 갈릴 수 있어
+        # 여기서는 단정하지 않는다).
+        latin_order = [g["name"] for g in out if g["name"] != "미확인"]
+        self.assertEqual(latin_order, ["Alpha Labs", "Beta Pharma", "ZZZ High Count"],
+                          "건수가 아니라 이름순이어야 한다(ZZZ 는 건수 5로 가장 많다)")
+
+        self.assertEqual(by_name["Alpha Labs"]["count"], 2)
+        self.assertEqual(by_name["Alpha Labs"]["years"], ["2022"])
+        self.assertEqual(by_name["Alpha Labs"]["firm_key"], "alpha")
+
+        self.assertEqual(by_name["Beta Pharma"]["count"], 2)
+        self.assertEqual(by_name["Beta Pharma"]["years"], ["2023", "2024"])
+        self.assertEqual(by_name["Beta Pharma"]["firm_key"], "beta",
+                          "firm_key 는 그룹의 첫 값을 유지해야 한다(마지막 값이 아니라)")
+
+        self.assertEqual(by_name["ZZZ High Count"]["count"], 5)
+        self.assertEqual(by_name["ZZZ High Count"]["years"], ["2020"])
+
+        blank = by_name["미확인"]
+        self.assertEqual(blank["count"], 1)
+        self.assertEqual(blank["years"], ["2021"])
+        self.assertEqual(blank["firm_key"], "",
+                          "이름이 없는 버킷은 입력에 firm_key 가 있어도 절대 신뢰하면 안 된다")
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_build_firm_groups_empty_when_no_documents(self):
+        import subprocess
+
+        fn_src = WebInspectorRenderTest._extract_for_node(
+            ["decodeFirmDisplay", "FIRM_BLANK_LABEL", "buildFirmGroups"])
+        driver = fn_src + "\nconsole.log(JSON.stringify(buildFirmGroups([])));"
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_firmgroups_empty_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        self.assertEqual(json.loads(proc.stdout), [])
+
+    # ── 렌더(DOM 생성, 소스 패턴) ─────────────────────────────────────────────
+    def test_build_firm_row_link_gated_by_firm_key_else_plain_text(self):
+        fn = WebInspectorRenderTest._slice_top_level_fn(self.js_src, "buildFirmRow")
+        self.assertIn("if (g.firm_key) {", fn)
+        self.assertIn(
+            'link.href = root + "findings/firm/index.html?key=" + encodeURIComponent(g.firm_key);',
+            fn)
+        self.assertIn("link.textContent = g.name;", fn)
+        self.assertIn('el("span", "ip-firm-name", g.name)', fn, "평문 분기(else)가 없다")
+        self.assertNotIn("innerHTML", fn)
+
+    def test_build_firm_row_meta_text_format(self):
+        """'문서 N건 · 2023, 2024' — 연도가 없으면 '·' 이하가 없다."""
+        fn = WebInspectorRenderTest._slice_top_level_fn(self.js_src, "buildFirmRow")
+        self.assertIn('var meta = "문서 " + fmtNum(g.count) + "건";', fn)
+        self.assertIn('meta += " · " + g.years.join(", ");', fn)
+
+    def test_render_firms_hides_block_when_zero_groups(self):
+        fn = WebInspectorRenderTest._slice_top_level_fn(self.js_src, "renderFirms")
+        self.assertIn("if (!groups.length) { firmBlockEl.hidden = true; return; }", fn)
+        self.assertIn("firmBlockEl.hidden = false;", fn)
+        self.assertIn("buildFirmGroups(documents)", fn)
+        self.assertIn(
+            "groups.forEach(function (g) { firmEl.appendChild(buildFirmRow(g)); });", fn)
+
+    def test_renderall_calls_render_firms_between_repeats_and_years(self):
+        fn = WebInspectorRenderTest._slice_top_level_fn(self.js_src, "renderAll")
+        i_rep = fn.index("renderRepeats(")
+        i_firm = fn.index("renderFirms(")
+        i_year = fn.index("renderYears(")
+        self.assertLess(i_rep, i_firm)
+        self.assertLess(i_firm, i_year)
+
+    def test_no_count_based_sort_for_firms(self):
+        fn = WebInspectorRenderTest._slice_top_level_fn(self.js_src, "buildFirmGroups")
+        self.assertIn("localeCompare", fn)
+        for pattern in ("a.count - b.count", "b.count - a.count", ".count - "):
+            self.assertNotIn(pattern, fn, f"제조소 목록에 건수 기준 정렬 패턴 발견: {pattern}")
+
+
 class WebFirmWatchlistTest(unittest.TestCase):
     """관심 업체 워치리스트(015_firm_watchlist.sql 의 웹 절반) — 셸 배선·JS 소스 계약.
 
@@ -9671,8 +9841,12 @@ class WebFindingsDocPageTest(unittest.TestCase):
 # (WebFda483InspectorLineTest 가 카드 경로에 쓰는 것과 같은 직접 템플릿 렌더 패턴).
 class WebFindingsDocInspectorLineTest(unittest.TestCase):
     """findings_doc.html '실사관' 행 — render.doc_inspector_line() 이 만든 문자열을
-    템플릿이 그대로 낸다. 빈 라벨 금지·최대 3명+외 N명·코호트 무관 전원 평문(링크 0개
-    — 코호트를 아는 동적 층 findings.js 가 프로파일 진입을 계속 담당한다)."""
+    템플릿이 그대로 낸다. 빈 라벨 금지·최대 3명+외 N명·코호트 무관 전원 평문. 이름에는
+    여전히 <a> 를 달지 않는다(코호트를 아는 동적 층 findings.js 가 개별 프로파일 진입을
+    계속 담당한다) — 하지만 [진입점 3종 2026-08-31]부터 행 끝에 코호트를 몰라도 걸 수
+    있는 링크 하나(실사관 조회 색인, findings/inspector/index.html)가 추가된다. 문구는
+    "실사관 이력 조회"이며 "이 실사관"이라고 쓰지 않는다(한 문서에 실사관 2명 이상이
+    흔하다 — 지시대상 모호 + 이 링크의 목적지는 애초에 개별 프로파일이 아니라 색인)."""
 
     def _doc(self, **kw):
         base = {
@@ -9702,7 +9876,9 @@ class WebFindingsDocInspectorLineTest(unittest.TestCase):
             inspector_names=["Jose F Velez", "Ivis L Negron Torres"]))
         self.assertIn(
             '<p class="fd-insp">실사관 <b>Jose F Velez · Ivis L Negron Torres</b>'
-            '<span>공개 문서에 서명한 실사관입니다.</span></p>', h)
+            '<span>공개 문서에 서명한 실사관입니다.</span>'
+            '<a class="fd-insp-go" href="findings/inspector/index.html">실사관 이력 조회 '
+            '<i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>', h)
 
     def test_no_line_when_key_absent(self):
         # 페이지 전역에 "실사관"이 없어야 한다는 게 아니다 — base.html footer 의 상시
@@ -9728,16 +9904,20 @@ class WebFindingsDocInspectorLineTest(unittest.TestCase):
         self.assertIn("실사관 <b>A B · C D · E F</b>", h)
         self.assertNotIn("외 0명", h)
 
-    def test_no_profile_link_regardless_of_name(self):
-        """★코호트 개념이 정적 빌드에 없다 — 어떤 이름이 와도 <a> 를 만들지 않는다.
-
-        코호트(문서 5건 이상)는 findings_inspector_index RPC 가 정하는 런타임 개념이라,
-        정적 스냅샷이 이를 재현하면 두 정의가 갈라지고(드리프트) 갈라진 링크는 존재하지
-        않는 프로파일로 사용자를 보낸다. 그래서 이 행은 절대 <a> 를 만들지 않는다."""
+    def test_index_link_present_but_never_individual_profile(self):
+        """★코호트 개념이 정적 빌드에 없다 — 어떤 이름이 와도 **개별** 프로파일(?key=)
+        링크는 만들지 않는다(코호트는 findings_inspector_index RPC 가 정하는 런타임
+        개념이라 정적 스냅샷이 재현하면 정의가 갈라지고, 갈라진 링크는 존재하지 않는
+        프로파일로 사용자를 보낸다 — #860 결정). 대신 코호트를 몰라도 항상 걸 수 있는
+        정적 색인 링크 정확히 1개(이름을 파라미터로 담지 않는다)를 이 행 끝에 둔다."""
         h = self._render(self._doc(inspector_names=["Jose F Velez"]))
         start = h.index('class="fd-insp"')
         seg = h[start:h.index("</p>", start)]
-        self.assertNotIn("<a ", seg)
+        self.assertEqual(seg.count("<a "), 1, "실사관 행의 링크는 정확히 1개(색인)여야 한다")
+        self.assertIn('href="findings/inspector/index.html"', seg)
+        self.assertNotIn("?key=", seg, "정적 빌드가 코호트를 몰라 개별 프로파일 링크를 걸면 안 된다")
+        self.assertNotIn("Jose F Velez", seg[seg.index("<a "):], "링크 자체에 이름을 담지 않는다")
+        self.assertNotIn("이 실사관", h)
 
     def test_names_are_html_escaped(self):
         h = self._render(self._doc(
@@ -12905,6 +13085,108 @@ class WebDiscoveryHubTest(unittest.TestCase):
         src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertNotIn('document.getElementById("fnd-search")', src)
         self.assertNotIn("searchSection.scrollIntoView()", src)
+
+
+# ── [진입점 3종 2026-08-31] 실사관 프로파일까지 가는 길 ─────────────────────────
+class WebInspectorEntryPointsTest(unittest.TestCase):
+    """실사관 프로파일(#862)은 이미 라이브였지만 실측상 닿는 길이 없었다 — 상단 nav
+    없음, /findings/ 본문 없음, footer 도구 열 링크 1개가 스크롤 17,120px 지점. 이
+    작업은 그 길을 세 곳에 낸다: (1) 지적사항 존 세그먼트에 '실사관' 탭, (2) 검색 화면
+    상단 안내 스트립, (3) 문서 상세 실사관 행의 조회 링크. 여기서는 (1)+(2)만 본다 —
+    (3)은 WebFindingsDocInspectorLineTest 가 별도로 지킨다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_insp_entry_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.search = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.browse = (cls.single / "findings" / "browse" / "index.html").read_text(encoding="utf-8")
+        cls.inspector = (cls.single / "findings" / "inspector" / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── (1) 세그먼트 탭 3페이지 일관성 ──────────────────────────────────────────
+    def _seg_block(self, html):
+        start = html.index('<nav class="fnd-seg"')
+        return html[start:html.index("</nav>", start)]
+
+    def test_all_three_pages_carry_the_same_three_tabs(self):
+        for label, html in (("search", self.search), ("browse", self.browse),
+                             ("inspector", self.inspector)):
+            with self.subTest(page=label):
+                seg = self._seg_block(html)
+                self.assertEqual(seg.count("<a "), 3, f"{label} 페이지 세그먼트 탭이 3개가 아니다")
+                for text in ("검색", "둘러보기", "실사관"):
+                    self.assertIn(f">{text}</a>", seg, f"{label} 페이지에 '{text}' 탭 없음")
+
+    def test_each_page_marks_only_itself_active(self):
+        cases = (
+            ("search", self.search, "검색"),
+            ("browse", self.browse, "둘러보기"),
+            ("inspector", self.inspector, "실사관"),
+        )
+        for label, html, own_text in cases:
+            with self.subTest(page=label):
+                seg = self._seg_block(html)
+                self.assertIn(f'class="on" aria-current="page">{own_text}</a>', seg,
+                               f"{label} 페이지에서 자기 탭이 활성 표시가 아니다")
+                # 활성 표시는 정확히 1개(다른 두 탭은 활성이 아니어야 한다).
+                self.assertEqual(seg.count('class="on"'), 1,
+                                  f"{label} 페이지에 활성 탭이 2개 이상이거나 없다")
+
+    def test_inspector_seg_link_paths_match_sibling_depth(self):
+        """inspector.html 은 findings/browse 와 같은 깊이(rel_root="../../")다 — 세그
+        안 링크 경로가 findings_browse.html 이 쓰는 것과 동일해야 한다(둘 다 같은
+        파셜을 그대로 include 하므로, rel_root 배선이 어긋나면 여기서 갈린다)."""
+        seg = self._seg_block(self.inspector)
+        self.assertIn('href="../../findings/index.html"', seg)
+        self.assertIn('href="../../findings/browse/index.html"', seg)
+        self.assertIn('href="../../findings/inspector/index.html"', seg)
+
+    def test_seg_appears_before_ip_lookup_state(self):
+        """세그가 본문(조회 랜딩)보다 앞 — 진입하자마자 다른 면으로도 오갈 수 있어야
+        한다(검색 화면의 '세그가 툴바보다 앞' 계약과 동형, WebDiscoveryHubTest 참조)."""
+        self.assertLess(self.inspector.index('class="fnd-seg"'),
+                         self.inspector.index('id="ip-lookup"'))
+
+    # ── (2) 검색 화면 상단 안내 스트립 ───────────────────────────────────────────
+    def test_strip_present_on_search_face_only(self):
+        self.assertIn('class="fnd-insp-cta"', self.search)
+        self.assertNotIn('class="fnd-insp-cta"', self.browse,
+                          "둘러보기 면에는 스트립을 넣지 않는다(스펙 §2) — 세그 탭만으로 충분")
+
+    def test_strip_content_and_link_path(self):
+        start = self.search.index('class="fnd-insp-cta"')
+        block = self.search[start:self.search.index("</aside>", start)]
+        self.assertIn("실사관으로 찾기", block)
+        self.assertIn("ti-user-search", block)
+        self.assertIn(
+            "FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 "
+            "문서 단위로 모아 봅니다.", block)
+        self.assertIn('href="../findings/inspector/index.html"', block,
+                       "검색 화면 rel_root는 '../'다")
+        self.assertIn("실사관 조회", block)
+        self.assertIn("ti-arrow-right", block)
+
+    def test_strip_sits_directly_above_fnd_tools(self):
+        i_strip = self.search.index('class="fnd-insp-cta"')
+        i_tools = self.search.index('<section class="fnd-tools"')
+        self.assertLess(i_strip, i_tools)
+        # "바로 위" — 스트립 닫힘과 툴바 시작 사이에 다른 aside/section 이 끼어들지 않는다.
+        i_strip_close = self.search.index("</aside>", i_strip) + len("</aside>")
+        between = self.search[i_strip_close:i_tools]
+        self.assertNotIn("<section", between)
+        self.assertNotIn("<aside", between)
+
+    def test_strip_css_is_page_scoped_not_in_grm_css(self):
+        """grm.css 무접촉 — 스타일은 findings.html 자체 <style> 안에만 있어야 한다."""
+        css = (WEB_DIR / "assets" / "grm.css").read_text(encoding="utf-8")
+        self.assertNotIn(".fnd-insp-cta", css)
+        template = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertIn(".fnd-insp-cta{", template)
 
 
 # ── P1 해석층 (2026-08-27 — 마이그 065 + 프로파일 3종 개편) ─────────────────────

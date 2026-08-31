@@ -37,6 +37,10 @@
   .fd-insp{margin-top:12px;font-family:var(--sans);font-size:13.5px;color:var(--body);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;word-break:keep-all}
   .fd-insp b{font-weight:500;color:var(--ink)}
   .fd-insp span{font-size:12.5px;color:var(--muted)}
+  /* [진입점 3종 2026-08-31] 색인(비개별) 링크 — fd-insp 행 끝. */
+  .fd-insp-go{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:500;color:var(--coral-2);text-decoration:none}
+  .fd-insp-go:hover{color:var(--coral);text-decoration:underline}
+  .fd-insp-go .ti{font-size:12px}
   .fd-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
   .fd-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
   .fd-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
@@ -78,13 +82,24 @@
       {%- for c in doc.categories %}<span class="fd-chip">{{ c }}</span>{% endfor %}
     </p>
     {#- [실사관 표기 2026-08-31] 값이 있을 때만 렌더한다(빈 라벨 금지). 코호트(문서
-        5건 이상) 여부와 무관하게 전원 평문 — 코호트는 findings_inspector_index RPC 가
-        정하는 런타임 개념이라 정적 빌드가 재현하면 정의가 갈라진다(드리프트). 갈라진
-        링크는 존재하지 않는 프로파일로 보내므로, 프로파일 진입 링크는 코호트를 아는
-        동적 층(검색 카드 findings.js buildDocHead())에게 남겨 둔다. 순위·비교·엄격도
-        뉘앙스 어휘는 037 정책상 금지 — 사실 표기 한 줄뿐이다. -#}
+        5건 이상) 여부와 무관하게 이름 자체는 전원 평문 — 코호트는 findings_inspector_index
+        RPC 가 정하는 런타임 개념이라 정적 빌드가 재현하면 정의가 갈라진다(드리프트).
+        갈라진 링크는 존재하지 않는 프로파일로 보내므로, **개별** 프로파일 진입 링크는
+        여전히 코호트를 아는 동적 층(검색 카드 findings.js buildDocHead())의 몫이다(#860
+        결정 — doc_inspector_line() 주석 참조). 순위·비교·엄격도 뉘앙스 어휘는 037
+        정책상 금지 — 사실 표기 한 줄뿐이다.
+
+        [진입점 3종 2026-08-31] 위 제약과 무충돌인 범위에서 **코호트를 모르고도 걸 수
+        있는** 링크 하나는 추가한다 — 개별 실사관이 아니라 실사관 조회 색인(findings/
+        inspector/index.html) 그 자체로. 정적 페이지라 항상 존재하고, 도착한 사용자가
+        검색창에 이름을 직접 입력하거나 이름순 색인에서 찾으면 된다(037 2026-08-31
+        개정으로 열린 이름순 색인). 문구는 "실사관 이력 조회"이지 "이 실사관 조회"가
+        아니다 — 한 문서에 실사관 2명 이상이 서명한 경우가 흔해(실측: 2명 276건·3명
+        89건·4~6명 28건) "이"가 가리키는 대상이 모호해지고, 애초에 이 링크가 데려가는
+        곳은 개별 프로파일이 아니라 색인이라 "이 실사관"이라는 단수 지시가 목적지와
+        어긋난다. -#}
     {%- if inspector_line %}
-    <p class="fd-insp">실사관 <b>{{ inspector_line }}</b><span>공개 문서에 서명한 실사관입니다.</span></p>
+    <p class="fd-insp">실사관 <b>{{ inspector_line }}</b><span>공개 문서에 서명한 실사관입니다.</span><a class="fd-insp-go" href="{{ rel_root }}findings/inspector/index.html">실사관 이력 조회 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
     {%- endif %}
     <p class="fd-src">
       <a href="{{ doc.evidence_url }}" target="_blank" rel="noopener">규제기관 공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>

@@ -586,5 +586,142 @@ class AliasInputResolutionBranchTest(AliasFunctionSlicesTestBase):
         )
 
 
+# ============================================================================
+# 070_findings_inspector_document_id.sql -- documents[] 에 document_id 순수 가산.
+#
+# 037/039 이후 065_profile_categories_and_repeats.sql 이 findings_inspector_profile 을
+# 다시 재선언해(categories·repeats·years 추가) 현재 정본이 됐다 -- 065 자체는 이 tests
+# 디렉터리에 오프라인 계약 파일이 없어(가장 최근 리팩터가 커버되지 않은 채로 있었다),
+# 070 의 허용목록은 037 당시의 _PROFILE_ALLOWED_KEYS 가 아니라 **065 가 이미 반영한
+# 현재 모양(그 세 키 포함)** 을 기준선으로 잡는다 -- 037 당시 허용목록으로 대조하면
+# categories/repeats/years 가 전부 "허용목록 밖의 새 키"로 오탐된다(070 이 늘린 게
+# 아닌데 070 탓처럼 보인다).
+# ============================================================================
+
+_DOCID_PATH = _MIGRATIONS_DIR / "070_findings_inspector_document_id.sql"
+
+# 065 가 이미 확정한 모양(순수 가산 이력) -- 070 의 "새로 추가된 키"를 이 기준선과
+# 비교해야 document_id **하나만** 늘었다는 걸 증명할 수 있다.
+_PROFILE_KEYS_AFTER_065 = _PROFILE_ALLOWED_KEYS | {"categories", "repeats", "years"}
+
+
+class DocumentIdMigrationFileTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_DOCID_PATH.is_file(), f"missing {_DOCID_PATH}")
+        self.sql = _DOCID_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+
+    def test_no_crlf(self) -> None:
+        self.assertNotIn(b"\r\n", _DOCID_PATH.read_bytes())
+
+    def test_has_korean_block_comments(self) -> None:
+        self.assertGreaterEqual(self.sql.count("--"), 15)
+
+    def test_defines_only_profile_function(self) -> None:
+        self.assertIn(_FN_PROFILE_SIG, self.code)
+        # ★범위 제한(070 헤더 근거) -- index/pairs/key 는 이 파일에서 재선언하지 않는다.
+        # 재선언하면 037→039 가 경계한 "각자 CTE 복제로 표류" 가 재발한다.
+        self.assertNotIn(
+            "create or replace function public.findings_inspector_index(", self.code
+        )
+        self.assertNotIn(
+            "create or replace function public.findings_inspector_pairs(", self.code
+        )
+        self.assertNotIn(
+            "create or replace function public.findings_inspector_key(", self.code
+        )
+
+
+class DocumentIdFunctionSliceTestBase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.assertTrue(_DOCID_PATH.is_file(), f"missing {_DOCID_PATH}")
+        self.sql = _DOCID_PATH.read_text(encoding="utf-8")
+        self.code = _strip_sql_comments(self.sql)
+        self.fn_profile = _slice_function(self.code, _FN_PROFILE_SIG)
+
+
+class DocumentIdPureAdditionTest(DocumentIdFunctionSliceTestBase):
+    """★가장 중요한 계약: documents[] 에 document_id 하나만 늘고, 065 가 이미 확정한
+    나머지 투영은 바이트 단위로 그대로여야 한다(임무 지시서 근거)."""
+
+    def test_signature_unchanged(self) -> None:
+        # PostgREST 는 인자가 하나만 달라도 404 -- 시그니처 불변이 이 계약의 전제(#681).
+        self.assertIn(_FN_PROFILE_SIG, self.code)
+
+    def test_document_id_selected_from_findings_in_rows_out(self) -> None:
+        # rows_out CTE 가 findings.document_id 를 select 하지 않으면 바깥 집계가 참조할
+        # 컬럼 자체가 없다 -- 배선의 첫 고리.
+        self.assertIn("f.document_id, p.raw_name as nm", self.fn_profile)
+
+    def test_document_id_aggregated_and_projected_in_documents_array(self) -> None:
+        self.assertIn("max(document_id) as document_id", self.fn_profile)
+        self.assertIn("'document_id',", self.fn_profile)
+
+    def test_projection_keys_are_065_baseline_plus_document_id_only(self) -> None:
+        keys = _jsonb_keys(self.fn_profile)
+        self.assertTrue(keys, "070 profile jsonb 키 파싱이 빈 목록 -- 가드가 공허하게 통과 중")
+        added = keys - _PROFILE_KEYS_AFTER_065
+        self.assertEqual(
+            added, {"document_id"},
+            msg=f"070 이 document_id 외의 키를 늘렸다(순수 가산 위반): {added}",
+        )
+        missing = _PROFILE_KEYS_AFTER_065 - keys
+        self.assertEqual(
+            missing, set(),
+            msg=f"070 이 065 가 이미 확정한 키를 잃었다(순수 가산 위반): {missing}",
+        )
+
+    def test_no_raw_text_or_url_keys(self) -> None:
+        keys = _jsonb_keys(self.fn_profile)
+        leaked = keys & _FORBIDDEN_KEYS
+        self.assertEqual(leaked, set(), msg=f"070 profile 투영에 금지 키 유출: {leaked}")
+
+
+class DocumentIdSafetyAndGateCarriedOverTest(DocumentIdFunctionSliceTestBase):
+    """037/039/065 가 세운 안전 계약·코호트 게이트가 070 재선언에서도 그대로인지 --
+    이 재선언이 로직을 다시 쓴 게 아니라 필드 하나만 얹은 것이라는 방증이기도 하다."""
+
+    def test_security_definer_and_search_path(self) -> None:
+        self.assertIn("security definer", self.fn_profile)
+        self.assertIn("set search_path = public", self.fn_profile)
+
+    def test_scope_and_source_gate_present(self) -> None:
+        self.assertIn("scope_status = 'ok'", self.fn_profile)
+        self.assertIn("source = 'FDA 483'", self.fn_profile)
+
+    def test_cohort_threshold_still_five_and_null_branch_present(self) -> None:
+        # ★070 의 profile 슬라이스에는 065 의 repeats having 절(`>= 2`)도 함께 들어 있어
+        # _THRESHOLD_RE(037/039 이 쓰던 "슬라이스 안 유일 비교" 가정)를 그대로 재사용하면
+        # 2건이 잡혀 오탐한다 -- 그래서 여기선 코호트 게이트 문구를 직접 대조한다.
+        self.assertIn(
+            "(select count(distinct raw_signal_id) from rows_out) < 5", self.fn_profile
+        )
+        self.assertIn("< 5 then 'null'::jsonb", self.fn_profile)
+
+    def test_display_name_tiebreak_preserved(self) -> None:
+        self.assertIn("count(*) desc, length(nm) desc, nm asc", self.fn_profile)
+
+    def test_input_resolution_both_branches_preserved(self) -> None:
+        self.assertIn(
+            "a.inspector_key = q.qk or public.findings_inspector_key(a.raw_name) = q.qk",
+            self.fn_profile,
+        )
+
+    def test_repeats_definition_unchanged(self) -> None:
+        # 065 의 핵심 정의(문서 수로 반복을 센다)가 070 재선언에서도 그대로인지.
+        self.assertIn("count(distinct raw_signal_id)::int as documents", self.fn_profile)
+        self.assertIn("having count(distinct raw_signal_id) >= 2", self.fn_profile)
+
+    def test_grant_execute_present_for_profile_only(self) -> None:
+        self.assertIn(
+            "grant execute on function public.findings_inspector_profile(text) "
+            "to anon, authenticated;",
+            self.sql,
+        )
+        self.assertNotIn("grant execute on function public.findings_inspector_index", self.sql)
+        self.assertNotIn("grant execute on function public.findings_inspector_pairs", self.sql)
+        self.assertNotIn("grant execute on function public.findings_inspector_key", self.sql)
+
+
 if __name__ == "__main__":
     unittest.main()

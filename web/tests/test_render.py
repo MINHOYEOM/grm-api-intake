@@ -5958,21 +5958,108 @@ class WebInspectorRenderTest(unittest.TestCase):
             self.js_src,
         )
 
-    def test_scope_guard_no_directory_ranking_or_comparison_symbols(self):
-        """의도적 범위 제한(회귀 금지) — 실사관 목록/디렉터리 페이지, 실사관 간 순위·비교
-        기능은 만들지 않는다."""
+    # ── [A2] 문서 상세 링크 멤버십 ────────────────────────────────────────────
+    def test_doc_page_membership_endpoint_and_schema_gate(self):
+        """assets/inspector-doc-pages.json 은 다른 에이전트가 발행하는 자산이라 이
+        세션에 실물이 없을 수 있다 — 계약은 소스 텍스트로 고정한다: root 기준 상대
+        경로로 fetch, {schema:"grm-inspector-doc-pages/v1", document_ids:[...]} 형태만
+        신뢰하고, 스키마가 다르면(구버전·손상) null 로 수렴해 링크를 걸지 않는다."""
+        self.assertIn('fetch(root + "assets/inspector-doc-pages.json")', self.js_src)
+        self.assertIn('data.schema !== "grm-inspector-doc-pages/v1"', self.js_src)
+        self.assertIn("!Array.isArray(data.document_ids)", self.js_src)
+
+    def test_doc_page_fetch_is_lazy_cached_and_swallows_failure(self):
+        """세션당 1회 lazy fetch(캐시) + 실패는 조용히 삼킨다 — 문서 목록 렌더 자체를
+        막지 않는다(임무 지시서 근거)."""
+        fn = self.js_src[self.js_src.index("function fetchDocPageIds()"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("if (docPagesPromise) return docPagesPromise;", fn)
+        self.assertIn(".catch(function () { return null; })", fn)
+
+    def test_doc_link_gated_by_membership_else_plain_text(self):
+        """document_id 가 집합에 있을 때만 findings/doc/{document_id}/ 링크, 없으면
+        현행처럼 평문(날짜+소스 배지만) — 확인 없이 링크했다가 16% 404 났던 실측 근거."""
+        fn = self.js_src[self.js_src.index("function appendDocTitleArea(main, doc)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("DOC_PAGE_IDS && docId && DOC_PAGE_IDS[docId]", fn)
+        self.assertIn('root + "findings/doc/" + encodeURIComponent(docId) + "/"', fn)
+        # 멤버십이 없을 때(hasPage=false) 링크 없이 기존과 동일한 평문 span 만 붙는다.
+        self.assertIn('main.appendChild(el("span", "ip-doc-date", doc.published_date || ""));', fn)
+
+    def test_doc_link_click_does_not_also_toggle_expand(self):
+        """링크는 main(펼치기 토글의 클릭 대상) 안에 중첩돼 있다 — stopPropagation 없이
+        두면 문서 페이지 이동과 지적사항 펼치기가 한 클릭에 동시 발화한다(임무 지시서의
+        '서로 삼키지 않게' 요구)."""
+        fn = self.js_src[self.js_src.index("function appendDocTitleArea(main, doc)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('link.addEventListener("click", function (ev) { ev.stopPropagation(); });', fn)
+        # 펼치기 토글 배선(makeClickableRow) 자체는 이 변경으로 건드리지 않았다(회귀 방지).
+        self.assertIn(
+            'makeClickableRow(main, (doc.source || "") + " " + (doc.published_date || "") '
+            '+ " 지적사항 펼치기",',
+            self.js_src,
+        )
+
+    def test_doc_link_uses_element_creation_not_innerhtml(self):
+        fn = self.js_src[self.js_src.index("function appendDocTitleArea(main, doc)"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn('var link = document.createElement("a");', fn)
+        self.assertNotIn("innerHTML", fn)
+
+    def test_scope_guard_no_ranking_or_comparison_symbols(self):
+        """★의도적 범위 제한(회귀 금지 — 037 2026-08-31 개정으로 교체).
+
+        개정 전 이 가드는 "실사관 목록/디렉터리" 자체를 금지 심볼 목록에 넣었다
+        (renderInspectorList·listInspectors·inspectorDirectory). 그 금지는 037 이 실제로
+        막으려던 것(사람을 서열화하는 것)과 "목록이 존재하는 것"을 같은 것으로 취급한
+        낡은 경계였다 — 지금 이 파일은 정확히 그런 이름의 색인 렌더 함수
+        (buildIndexGroups/renderIndexGroups)를 실제로 갖고 있고, 그것은 회귀가 아니다.
+        새 경계: 여전히 금지된 것은 실사관 간 **순위·비교**, "엄격하다/까다롭다" 류
+        성향 해석, **건수 기준 정렬(=사실상의 랭킹)**뿐이다."""
         forbidden = (
-            "renderInspectorList", "rankInspectors", "compareInspectors",
-            "listInspectors", "inspectorRanking", "inspectorDirectory",
+            "rankInspectors", "compareInspectors", "inspectorRanking",
+            "sortByDocumentCount", "sortByDocuments", "mostFindings", "topInspector",
         )
         for sym in forbidden:
             self.assertNotIn(sym, self.js_src, f"범위 밖 심볼 발견(inspector.js): {sym}")
             self.assertNotIn(sym, self.findings_js_src, f"범위 밖 심볼 발견(findings.js): {sym}")
+        # 건수 기준 정렬 비교자(내림차순이든 오름차순이든) 자체가 금지 — 색인은 이름순만.
+        for pattern in ("b.documents - a.documents", "a.documents - b.documents",
+                        "sort(function (a, b) { return b.documents", ".documents - "):
+            self.assertNotIn(pattern, self.js_src, f"건수 기준 정렬 패턴 발견: {pattern}")
         # "엄격하다/까다롭다" 류 성향 해석 문구는 **화면에 보이는 텍스트**(렌더된 HTML)에만
         # 금지한다 — 소스 주석이 "이런 문구를 만들지 않는다"고 설명하는 것 자체는 회귀가
         # 아니다(js_src 를 검사하면 이 주석 자체가 오탐을 낸다).
         for phrase in ("엄격", "까다롭"):
             self.assertNotIn(phrase, self.html)
+
+    @staticmethod
+    def _slice_top_level_fn(src, name):
+        """inspector.js 의 2-space 들여쓰기 최상위 함수를 이름으로 뽑는다(기존
+        test_normalize_inspector_key_behavior_via_node 가 쓰던 것과 같은 관례 —
+        내부 콜백은 4칸 이상 들여쓰기라 "\\n  }\\n"(정확히 2칸) 패턴과 충돌하지 않는다)."""
+        sig = "function " + name + "("
+        start = src.index(sig)
+        end = src.index("\n  }\n", start) + len("\n  }\n")
+        return src[start:end]
+
+    def test_index_data_shape_never_carries_document_count(self):
+        """★037 2026-08-31 개정의 핵심 비공허 가드 — 색인이 실제로 소비하는 데이터
+        모양(buildIndexGroups 반환 객체)과 그 값을 화면에 꽂는 함수(buildIndexItemLink)
+        양쪽 모두 documents(건수) 필드를 절대 다루지 않아야 한다. data.documents(프로파일
+        문서 **목록** — 전혀 다른 의미)와 이름이 겹치므로 파일 전체가 아니라 색인 전용
+        함수 슬라이스 안에서만 검사한다(전체 검사는 정상적인 documents[] 사용을 오탐한다)."""
+        for fn_name in ("buildIndexGroups", "filterIndexRows", "buildIndexItemLink",
+                         "renderIndexGroups"):
+            with self.subTest(fn=fn_name):
+                fn = self._slice_top_level_fn(self.js_src, fn_name)
+                self.assertNotIn(".documents", fn,
+                                  f"{fn_name} 슬라이스가 documents(건수) 필드를 참조한다")
+        # buildIndexItemLink(개별 항목 렌더) 는 코호트 게이트 고지문(공개 문서 5건 이상…)과
+        # 달리 항목 단위로 아무 숫자도 그리지 않는다 — 그 함수 슬라이스에는 "건" 자체가
+        # 없어야 한다(renderIndexGroups 의 빈 결과 고지문과는 다른 계층이라 따로 본다).
+        item_fn = self._slice_top_level_fn(self.js_src, "buildIndexItemLink")
+        self.assertNotIn("건", item_fn, "항목 렌더 함수에 건수 표기 단위가 있다")
 
     def test_normalize_inspector_key_structural_contract(self):
         """정규화 헬퍼는 findings.js/inspector.js 양쪽에 독립 복제본으로 존재하고, 서버
@@ -6030,6 +6117,232 @@ class WebInspectorRenderTest(unittest.TestCase):
         self.assertEqual(inspector_out, expected)
         self.assertEqual(findings_out, expected, "findings.js normalizeInspectorKey 가 서버 규칙과 어긋남")
         self.assertEqual(inspector_out, findings_out, "두 복제본의 정규화 결과가 서로 다름(파리티 위반)")
+
+    @staticmethod
+    def _extract_for_node(names):
+        """inspector.js 에서 이름 목록을 순서대로 뽑아 이어붙인다 — 함수 선언
+        ("function NAME(" 부터 "\\n  }\\n" 까지, _slice_top_level_fn 과 동일 관례)과
+        var 선언("var NAME = " 부터 그 줄의 ";" 까지) 양쪽을 지원한다(fetchInspector
+        ProfileWithRetry 가 참조하는 RETRY_DELAY_MS 처럼 함수가 아닌 상수도 있다 —
+        드라이버에서 빠지면 ReferenceError 로 조용히 실패해 재시도 자체가 무산된다).
+        Node 드라이버 스크립트에 그대로 주입할 소스 조각을 돌려준다."""
+        src = (WEB_DIR / "assets" / "inspector.js").read_text(encoding="utf-8")
+        out = []
+        for name in names:
+            fn_sig = "function " + name + "("
+            var_sig = "var " + name + " = "
+            if fn_sig in src:
+                start = src.index(fn_sig)
+                end = src.index("\n  }\n", start) + len("\n  }\n")
+            else:
+                start = src.index(var_sig)
+                end = src.index(";", start) + 1
+            out.append(src[start:end])
+        return "\n".join(out)
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_index_grouping_and_filtering_behavior_via_node(self) -> None:
+        """★037 2026-08-31 개정의 데이터 계층 증명 — B(이름순 색인)가 실제로 소비하는
+        buildIndexGroups/filterIndexRows 를 원본 그대로 Node 로 실행해 다음을 고정한다:
+        (1) 정렬은 display_name 오름차순뿐, (2) 첫 글자로 그룹핑, (3) 반환 객체 어디에도
+        documents(건수) 필드가 없다 — 입력에 documents 가 있어도 새어 나가지 않는다."""
+        import subprocess
+
+        fn_src = self._extract_for_node(["filterIndexRows", "buildIndexGroups"])
+        rows = [
+            {"inspector_key": "c", "display_name": "Charlie Amos", "documents": 20},
+            {"inspector_key": "a", "display_name": "amanda rutter", "documents": 9},
+            {"inspector_key": "b", "display_name": "Bob K", "documents": 5},
+            {"inspector_key": "d", "display_name": "", "documents": 99},  # 방어: 빈 이름 제외
+        ]
+        driver = fn_src + "\n".join([
+            "",
+            "var rows = " + json.dumps(rows) + ";",
+            "var out = {};",
+            "out.groups_empty_query = buildIndexGroups(filterIndexRows(rows, ''));",
+            "out.groups_filtered_aman = buildIndexGroups(filterIndexRows(rows, 'AMAN'));",
+            "out.groups_filtered_none = buildIndexGroups(filterIndexRows(rows, 'zzz'));",
+            "console.log(JSON.stringify(out));",
+        ])
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_idx_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+
+        # (1)+(2) 이름순 오름차순 + 첫 글자 그룹핑, 빈 이름은 제외.
+        self.assertEqual(
+            out["groups_empty_query"],
+            [
+                {"letter": "A", "items": [{"inspector_key": "a", "display_name": "amanda rutter"}]},
+                {"letter": "B", "items": [{"inspector_key": "b", "display_name": "Bob K"}]},
+                {"letter": "C", "items": [{"inspector_key": "c", "display_name": "Charlie Amos"}]},
+            ],
+        )
+        # 빈 질의 = 전체 복귀(037 개정으로 새로 허용된 지점).
+        self.assertEqual(len(out["groups_empty_query"]), 3)
+        # 부분일치 필터(대소문자 무시) — 대문자 질의 "AMAN" 이 소문자 표기 "amanda rutter"
+        # 를 찾아야 한다(대소문자 무시), 다른 항목은 걸리지 않아야 한다.
+        filtered_names = [it["display_name"] for g in out["groups_filtered_aman"] for it in g["items"]]
+        self.assertEqual(filtered_names, ["amanda rutter"])
+        self.assertEqual(out["groups_filtered_none"], [])
+        # (3) ★가장 중요 — 어떤 경로로도 documents(건수)가 출력에 없다(입력엔 있었다).
+        serialized = json.dumps(out)
+        self.assertNotIn("documents", serialized,
+                          "buildIndexGroups/filterIndexRows 출력에 건수 필드가 새어 나갔다")
+        self.assertNotIn("20", serialized)  # amanda=9·charlie=20·bob=5 입력값이 그대로 안 보임
+        self.assertNotIn("99", serialized)
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_a3_rpc_retry_behavior_via_node(self) -> None:
+        """A3 — findings_inspector_profile 호출이 5xx/네트워크 오류면 400ms 후 1회만
+        재시도, null(코호트 미달·미존재)은 정상 응답이라 재시도하지 않으며, 재시도까지
+        실패하면 그대로 reject 되는지(바깥 037 단일 상태 수렴은 그 reject 를 잡아 처리)를
+        실제 함수를 Node 로 실행해 고정한다. fetch/타이머는 전부 스텁 — 실 네트워크 없음."""
+        import subprocess
+
+        fn_src = self._extract_for_node([
+            "fetchInspectorProfileOnce", "RETRY_DELAY_MS", "isRetryableFetchError", "delay",
+            "fetchInspectorProfileWithRetry",
+        ])
+        driver = "\n".join([
+            'var url = "https://example.supabase.co";',
+            'var key = "anon-key";',
+            "function rpcEndpoint(name) {"
+            ' return url.replace(/\\/$/, "") + "/rest/v1/rpc/" + name; }',
+            fn_src,
+            "",
+            "var calls;",
+            "function mockFetchSeq(seq) {",
+            "  return function () {",
+            "    var behavior = seq[calls]; calls++;",
+            "    if (behavior.netError) return Promise.reject(new Error('network fail'));",
+            "    return Promise.resolve({",
+            "      ok: behavior.status < 400, status: behavior.status,",
+            "      json: function () { return Promise.resolve(behavior.body); },",
+            "    });",
+            "  };",
+            "}",
+            "",
+            "async function run() {",
+            "  var results = {};",
+            "",
+            "  calls = 0;",
+            "  fetch = mockFetchSeq([{status:500, body:null}, {status:200, body:{display_name:'X'}}]);",
+            "  try { var d1 = await fetchInspectorProfileWithRetry('k');",
+            "    results.retry_after_500 = { ok: true, data: d1, calls: calls }; }",
+            "  catch (e) { results.retry_after_500 = { ok: false, calls: calls }; }",
+            "",
+            "  calls = 0;",
+            "  fetch = mockFetchSeq([{status:200, body:null}]);",
+            "  try { var d2 = await fetchInspectorProfileWithRetry('k');",
+            "    results.null_is_not_retried = { ok: true, data: d2, calls: calls }; }",
+            "  catch (e) { results.null_is_not_retried = { ok: false, calls: calls }; }",
+            "",
+            "  calls = 0;",
+            "  fetch = mockFetchSeq([{status:500, body:null}, {status:500, body:null}]);",
+            "  try { var d3 = await fetchInspectorProfileWithRetry('k');",
+            "    results.two_failures_reject = { ok: true, calls: calls }; }",
+            "  catch (e) { results.two_failures_reject = { ok: false, calls: calls }; }",
+            "",
+            "  calls = 0;",
+            "  fetch = mockFetchSeq([{netError:true}, {status:200, body:{display_name:'Y'}}]);",
+            "  try { var d4 = await fetchInspectorProfileWithRetry('k');",
+            "    results.network_error_then_success = { ok: true, data: d4, calls: calls }; }",
+            "  catch (e) { results.network_error_then_success = { ok: false, calls: calls }; }",
+            "",
+            "  console.log(JSON.stringify(results));",
+            "}",
+            "run();",
+        ])
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_retry_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+
+        self.assertEqual(out["retry_after_500"],
+                          {"ok": True, "data": {"display_name": "X"}, "calls": 2},
+                          "500 -> 재시도 -> 200 성공 경로가 어긋남")
+        self.assertEqual(out["null_is_not_retried"],
+                          {"ok": True, "data": None, "calls": 1},
+                          "null(코호트 미달·미존재)은 정상 응답이라 재시도하면 안 된다")
+        self.assertEqual(out["two_failures_reject"],
+                          {"ok": False, "calls": 2},
+                          "1회 재시도까지 실패하면 reject 되어야 한다(추가 재시도 없음)")
+        self.assertEqual(out["network_error_then_success"],
+                          {"ok": True, "data": {"display_name": "Y"}, "calls": 2},
+                          "네트워크 오류(상태 없음)도 재시도 대상이어야 한다")
+
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_a2_doc_page_membership_behavior_via_node(self) -> None:
+        """A2 — fetchDocPageIds 를 실제로 실행해 (1) 올바른 스키마면 document_ids 를
+        멤버십 집합으로 바꾸고, (2) 스키마가 다르거나 document_ids 가 배열이 아니면
+        null, (3) HTTP 실패·네트워크 오류도 null 로 조용히 수렴하는지 고정한다."""
+        import subprocess
+
+        fn_src = self._extract_for_node(["fetchDocPageIds"])
+        driver = "\n".join([
+            'var root = "../../";',
+            "var docPagesPromise = null;",
+            "var DOC_PAGE_IDS = null;",
+            fn_src,
+            "",
+            "async function run() {",
+            "  var results = {};",
+            "",
+            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  fetch = function () { return Promise.resolve({ ok: true,",
+            "    json: function () { return Promise.resolve(",
+            '      {schema: "grm-inspector-doc-pages/v1", document_ids: ["fda483-1", "fda483-2"]}',
+            "    ); } }); };",
+            "  results.valid_schema = await fetchDocPageIds();",
+            "",
+            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  fetch = function () { return Promise.resolve({ ok: true,",
+            '    json: function () { return Promise.resolve({schema: "wrong/v1", document_ids: ["x"]}); } }); };',
+            "  results.wrong_schema = await fetchDocPageIds();",
+            "",
+            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  fetch = function () { return Promise.resolve({ ok: true,",
+            '    json: function () { return Promise.resolve({schema: "grm-inspector-doc-pages/v1", document_ids: "not-an-array"}); } }); };',
+            "  results.non_array_ids = await fetchDocPageIds();",
+            "",
+            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  fetch = function () { return Promise.resolve({ ok: false, status: 404 }); };",
+            "  results.http_404 = await fetchDocPageIds();",
+            "",
+            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  fetch = function () { return Promise.reject(new Error('network fail')); };",
+            "  results.network_error = await fetchDocPageIds();",
+            "",
+            "  console.log(JSON.stringify(results));",
+            "}",
+            "run();",
+        ])
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_docpages_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+
+        self.assertEqual(out["valid_schema"], {"fda483-1": True, "fda483-2": True})
+        self.assertIsNone(out["wrong_schema"], "스키마 불일치를 링크 가능으로 오판했다")
+        self.assertIsNone(out["non_array_ids"], "document_ids 비배열을 방어하지 못했다")
+        self.assertIsNone(out["http_404"], "404 가 조용히 null 로 수렴하지 않는다")
+        self.assertIsNone(out["network_error"], "네트워크 오류가 조용히 null 로 수렴하지 않는다")
 
     def test_findings_js_inspector_cohort_fetched_once_and_cached(self):
         """findings_inspector_index() 는 세션당 1회만 호출·캐시한다(카드마다 재조회 금지)."""
@@ -12133,24 +12446,40 @@ class WebZoneIaTest(unittest.TestCase):
         self.assertIn("findings_firm_search", src)
 
     def test_inspector_lookup_is_not_a_directory(self):
-        """037 계약 — 이 랜딩이 '사람을 훑어보는 목록'이 되지 않게 하는 장치들.
+        """037 계약(2026-08-31 개정) — 이 랜딩이 '사람을 서열화하는 화면'이 되지 않게
+        하는 장치들.
 
-        037 이 금지한 셋 중 (a)순위·비교와 (c)원문 반환은 그대로 지키고, 진입 경로
-        조항만 개정했다(근거는 inspector.html 주석). 그 개정이 목록화로 번지지 않도록
-        아래 세 장치를 **소스 계약**으로 고정한다 — 하나라도 빠지면 디렉터리가 된다."""
+        개정 전 이 테스트는 "2글자 미만이면 결과 없음"·"결과 최대 8명"을 지켰다 — 그
+        둘의 실제 목적은 **목록의 존재 자체를 막는 것**이었다. 037 2026-08-31 개정은
+        그 전제를 뒤집는다: 사용자 결정 "순위를 매기지 말라는 거고, 가나다 순으로
+        색인하면 됨"에 따라 이름순 전체 색인은 이제 **의도된 기능**이다(그래서 이
+        테스트는 저 두 장치를 더 이상 요구하지 않는다). 037 이 금지한 (a)순위·비교와
+        (c)원문 반환은 이번 개정과 무관하게 그대로 지킨다 — 아래 장치로 고정."""
         html = self.pages["findings/inspector/index.html"]
         self.assertIn('id="ip-lookup"', html)
+        self.assertIn('class="ip-idx-h"', html, "이름순 색인 머리글이 렌더되지 않는다")
         src = (WEB_DIR / "assets" / "inspector.js").read_text(encoding="utf-8")
-        # ① 2글자 미만이면 아무것도 그리지 않는다
-        self.assertIn("q.length < 2", src)
-        # ② 결과 상한
-        self.assertIn(".slice(0, 8)", src)
-        # ③ 정렬은 이름순이어야 한다 — 건수 내림차순이면 그 자체가 순위표다
+        # ① 037 개정으로 새로 허용된 것: 빈 질의 = 전체 A-Z 복귀(더 이상 목록화 방지
+        #   게이트로 막지 않는다 — 서버 코호트 게이트(문서 5건 이상)만으로 충분하다).
+        self.assertNotIn("q.length < 2", src)
+        self.assertNotIn(".slice(0, 8)", src)
+        # ② 정렬은 이름순뿐이어야 한다 — 건수 기준 정렬(오름차순이든 내림차순이든)이면
+        #   그 자체가 순위표라 (a)를 어긴다.
         self.assertIn("localeCompare", src)
         self.assertNotIn("b.documents - a.documents", src)
-        # 화면에는 [워딩 2026-08-27] 이후 **측정 정직성**만 적는다 — 기능 부재 광고는
-        # 사용자 피드백으로 걷어냈고, 037 정책 자체는 위 세 장치 + RPC 게이트가 지킨다.
-        self.assertIn("실사관에 대한 평가 지표가 아닙니다", html)
+        self.assertNotIn("a.documents - b.documents", src)
+        # ③ ★가장 중요 — 색인이 소비하는 데이터 모양 자체에 건수(documents)가 없다.
+        #   data.documents(프로파일 문서 목록)와 이름이 겹치므로 색인 전용 함수
+        #   슬라이스 안에서만 본다(WebInspectorRenderTest.test_index_data_shape_
+        #   never_carries_document_count 가 Node 실행으로 동일 계약을 한 번 더 증명).
+        idx_fn = src[src.index("function buildIndexGroups(rows) {"):]
+        idx_fn = idx_fn[:idx_fn.index("\n  }\n") + 4]
+        self.assertNotIn(".documents", idx_fn)
+        # ④ 코호트 게이트 고지(기존 고지 유지 — 워딩만 상단 힌트 문단으로 이동).
+        self.assertIn("공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다", html)
+        # ⑤ 순위·비교 뉘앙스 어휘 금지(신설 문안에도 새로 스며들지 않는지).
+        for phrase in ("가장 많은", "가장 활발", "주요 실사관", "활발한"):
+            self.assertNotIn(phrase, html)
 
     def test_landing_watchlist_cta_points_at_firm_lookup(self):
         """랜딩 워치리스트 CTA 는 조회 페이지로 직행한다.

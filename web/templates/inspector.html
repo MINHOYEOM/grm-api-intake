@@ -27,8 +27,13 @@
     raw_signal_id=eq.X`, RLS 로 공개 게이트 통과분만)로 별도 fetch 한다(firm.js 와 동일
     계약) — RPC 는 절대 원문을 내려주지 않는다.
 
-    ★범위(의도적 제한, 회귀 금지) — 이 페이지는 **단일 실사관 전용**이다. 실사관 목록/
-    디렉터리, 실사관 간 순위·비교, "엄격하다/까다롭다" 류 성향 해석은 만들지 않는다.
+    ★범위(의도적 제한, 회귀 금지 — 2026-08-31 개정) — 이 페이지는 단일 실사관 전용이다.
+    실사관 간 순위·비교, "엄격하다/까다롭다" 류 성향 해석은 여전히 만들지 않는다. 037 이
+    막던 "디렉터리(목록 열람) 페이지" 금지는 2026-08-31 자로 좁혀졌다 — 금지 대상은
+    "목록의 존재"가 아니라 "사람을 서열화하는 것"이었다. 그래서 아래 조회 랜딩(?key=
+    없는 상태) 안에 **이름순(display_name 오름차순) 색인 하나**를 새로 연다 — 자세한
+    근거와 장치는 아래 #ip-lookup 블록 주석과 037_findings_inspector_profile.sql 의
+    2026-08-31 개정 블록을 참조.
 
     ★SEO — 쿼리스트링 기반 동적 조회 + 실명 개인 집계라 sitemap 에 넣지 않는다(개별 URL
     은 물론 베이스 경로도 미등록 — firm 과 달리 베이스 경로조차 넣지 않는다). 위 meta_robots
@@ -51,41 +56,43 @@
       <a class="ip-back-link" href="{{ rel_root }}findings/index.html">지적사항 검색으로 돌아가기 →</a>
     </div>
 
-    {#- [존 재편 2026-08-26] 이름으로 조회하는 랜딩 — ?key= 없이 들어왔을 때.
+    {#- [존 재편 2026-08-26, 2026-08-31 개정] 이름으로 조회하는 랜딩 — ?key= 없이 들어왔을 때.
 
-        ══ 037 계약과의 관계(중요) ═══════════════════════════════════════════════
-        037_findings_inspector_profile.sql 은 세 가지를 금지한다:
+        037 계약과의 관계(중요) — 037_findings_inspector_profile.sql 은 세 가지를 금지한다:
           (a) 실사관 순위·비교·엄격도 추론
-          (b) 실사관 **디렉터리(목록 열람) 페이지**
+          (b) 실사관 디렉터리(목록 열람) 페이지
           (c) 원문 텍스트·URL 반환
-        이 랜딩은 (a)와 (c)를 그대로 지킨다. (b)에 대해서는 037 의 "진입은 항상 보고
-        있던 문서에서 그 문서의 서명자를 눌러 들어오는 경로뿐"이라는 **진입 경로 조항만**
-        개정한다 — 037 이 008 의 범위 주석을 명시적으로 개정했던 것과 같은 방식이다.
+        2026-08-31 자로 (b)의 의미가 좁아졌다(037 SQL 헤더의 개정 블록이 정본) — 금지
+        대상은 애초부터 "목록의 존재"가 아니라 "사람을 서열화하는 것"이었다. 사용자
+        결정을 그대로 옮긴다: "순위를 매기지 말라는 거고, 가나다 순으로 색인하면 됨.
+        그래야 찾기로 없을 때 찾을 수 있음." (a)와 (c)는 이번 개정과 무관하게 그대로
+        지킨다.
 
-        개정 사유: 실사관은 실사 오프닝에서 credential 을 제시하므로 **이름은 이미
-        알려진 상태**로 조회가 시작된다. 그 시점에 "이 서명자가 과거에 무엇을 지적해
-        왔나"를 보는 것은 037 이 막으려던 '사람 훑어보기'가 아니라 정확히 037 이
-        허용한 '보고 있던 대상의 이력 확인'이며, 다만 그 대상이 손에 든 문서가 아니라
-        눈앞의 명함일 뿐이다.
+        실측 배경: 이 랜딩은 원래 검색창뿐이었다 — 이름을 이미 알아야만 쓸 수 있고,
+        사이트 안 어디에도 실사관 이름을 알 방법이 없었다(사용자 지적). 검색창 바로
+        아래에 이름순 색인을 열어 "찾기로 없을 때 찾을 수 있게" 한다.
 
-        ★목록이 되지 않게 하는 장치(inspector.js 가 강제):
-          · **2글자 이상 입력해야** 결과가 나온다 — 빈 입력에 전체 명단을 뿌리지 않는다.
-          · 일치 결과는 최대 8명까지만.
-          · 정렬은 **가나다/알파벳순**이다. 문서 수 내림차순으로 정렬하면 그 자체가
-            순위표가 되어 (a)를 어긴다 — 건수는 맥락으로 병기만 한다.
+        ★목록이 서열화가 되지 않게 하는 장치(inspector.js 가 강제, 위반 시 회귀):
+          · 정렬 키는 **display_name 오름차순**(localeCompare) 하나뿐 — 문서 수 정렬·
+            "인기순"류 UI 는 만들지 않는다.
+          · **건수(documents)는 색인 어디에도 표기하지 않는다** — buildIndexGroups 의
+            반환 객체 자체가 그 필드를 담지 않아, 렌더 쪽 실수로도 건수가 그려질 수
+            없다(데이터 모양으로 막는 이중 방어).
+          · 이미 코호트(공개 문서 5건 이상)로 한정된 findings_inspector_index() 응답만
+            쓴다 — 이 페이지가 새로 완화하는 게이트는 없다.
+          · 검색창은 이 색인을 실시간으로 좁히는 필터일 뿐이다(비우면 전체 A–Z 복귀) —
+            별도의 대량 조회 경로를 여는 게 아니라 이미 그리고 있던 목록을 거르는 것.
         ★sitemap 미등록·noindex 는 그대로 유지한다(이 페이지 <head> 오버라이드) —
           검색엔진에는 계속 노출하지 않고, 우리 사용자에게만 내부 링크로 연다. -#}
     <div class="ip-state tr-look" id="ip-lookup" hidden>
-      <p class="tr-look-hint">실사관 이름을 넣어 그 실사관이 서명한 공개 FDA 483 문서와 지적 이력을 확인하세요. 성이나 이름의 일부만 넣어도 됩니다(두 글자 이상). 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.</p>
+      <p class="tr-look-hint">실사관 이름을 넣어 그 실사관이 서명한 공개 FDA 483 문서와 지적 이력을 확인하세요. 검색창을 비워 두면 이름순으로 전체 목록을 볼 수 있습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.</p>
       <form class="tr-look-form" id="ip-look-form" role="search">
         <label class="sr-only" for="ip-look-input">실사관 이름</label>
         <input class="tr-look-input" id="ip-look-input" type="search" name="q" placeholder="예: Moore" autocomplete="off" spellcheck="false" />
         <button class="tr-look-btn" id="ip-look-btn" type="submit">찾기</button>
       </form>
-      <div id="ip-look-res" class="tr-look-res" aria-live="polite"></div>
-      {#- [워딩 2026-08-27] 기능 부재를 광고하던 앞 문장은 제거, 측정 정직성(건수의
-          의미)은 유지 — 037 순위 금지 정책 자체는 RPC 게이트가 지킨다. -#}
-      <p class="tr-look-hint">지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관에 대한 평가 지표가 아닙니다.</p>
+      <h2 class="ip-idx-h">이름으로 훑어보기</h2>
+      <div id="ip-look-res" class="tr-look-res ip-idx" aria-live="polite"></div>
     </div>
 
     <div id="ip-content" hidden>
@@ -95,6 +102,11 @@
       </div>
 
       <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section>
+      {#- [측정 정직성 유지] 037 순위 금지 정책 자체는 RPC 게이트가 지키지만, 위 숫자를
+          "이 사람이 얼마나 문제 있나"로 오독하지 않게 문구로도 명시한다(구 #ip-lookup
+          하단 고지를 실제로 건수가 보이는 이 자리로 옮겼다 — 이름순 색인 화면엔 이제
+          건수가 아예 없어 그 자리는 더 이상 맞지 않는다). -#}
+      <p class="ip-stats-note">지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관에 대한 평가 지표가 아닙니다.</p>
 
       {#- [P1 해석층 2026-08-27] 분류 분포 — 해석 한 줄 + 행별 구성비. 줄을 누르면 검색으로
           나가지 않고 아래 문서 목록이 그 분류로 좁혀진다(065 documents[].categories).
@@ -138,11 +150,25 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .ip-back-link{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .ip-back-link:hover{color:var(--coral)}
 
+/* [037 2026-08-31 개정] 이름순 색인 -- 조회 랜딩(#ip-lookup) 전용, 검색창 아래. 좌우
+   정렬이 아니라 목록형(그룹 헤더 + 이름 링크)이라 이 상태 블록은 text-align 을 왼쪽으로
+   되돌린다(.ip-state 기본값은 가운데 정렬 안내문 전용). */
+.ip-state.tr-look{text-align:left}
+.ip-idx-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:26px 0 10px}
+.ip-idx-group{margin:0 0 20px}
+.ip-idx-group:last-child{margin-bottom:0}
+.ip-idx-letter{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--coral-2);margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.ip-idx-list{display:flex;flex-wrap:wrap;gap:3px 20px;margin:0;padding:0;list-style:none}
+.ip-idx-link{display:inline-block;padding:4px 2px;font-size:13.5px;color:var(--body-s);text-decoration:none;border-radius:6px}
+.ip-idx-link:hover,.ip-idx-link:focus-visible{color:var(--coral-2);text-decoration:underline;outline:none}
+
 .ip-head{margin:0 0 22px}
 .ip-name{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);margin:0}
 .ip-sub{font-size:13px;color:var(--muted);margin:6px 0 0}
 
-.ip-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 34px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.ip-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 10px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+/* [측정 정직성] 위 통계가 순위·평가 지표로 오독되지 않게 하는 고지 -- ip-stats 바로 아래. */
+.ip-stats-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 30px;word-break:keep-all}
 .ip-stat{display:flex;flex-direction:column;gap:4px}
 .ip-stat-num{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);line-height:1.1;font-variant-numeric:lining-nums}
 .ip-stat-lbl{font-size:12px;color:var(--muted)}
@@ -209,6 +235,12 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
 .ip-doc-detail{padding:4px 6px 20px;display:flex;flex-direction:column;gap:14px}
 .ip-doc-detail[hidden]{display:none}
 .ip-doc-detail-loading,.ip-doc-detail-empty{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+
+/* [A2] 문서 상세 링크 — document_id 가 assets/inspector-doc-pages.json 집합에 있을 때만
+   날짜+소스 배지를 findings/doc/{document_id}/ 앵커로 감싼다(inspector.js appendDocTitleArea).
+   시각적으로는 기존 평문과 동일하게 두고 hover 로만 링크임을 드러낸다. */
+.ip-doc-title{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
+.ip-doc-title:hover .ip-doc-date,.ip-doc-title:focus-visible .ip-doc-date{color:var(--coral-2)}
 
 /* 문서 인라인 확장 — 단순화한 국문+원문 details 카드(firm.html fp-obs 관례 동형). */
 .ip-obs{border:1px solid var(--line-2);border-radius:var(--rad-s);padding:14px 16px;background:var(--canvas)}

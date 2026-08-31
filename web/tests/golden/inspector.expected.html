@@ -55,13 +55,14 @@
     <div class="ip-state" id="ip-unavailable" hidden><p>해당 실사관의 프로파일을 표시할 수 없습니다.</p>
       <a class="ip-back-link" href="../../findings/index.html">지적사항 검색으로 돌아가기 →</a>
     </div><div class="ip-state tr-look" id="ip-lookup" hidden>
-      <p class="tr-look-hint">실사관 이름을 넣어 그 실사관이 서명한 공개 FDA 483 문서와 지적 이력을 확인하세요. 성이나 이름의 일부만 넣어도 됩니다(두 글자 이상). 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.</p>
+      <p class="tr-look-hint">실사관 이름을 넣어 그 실사관이 서명한 공개 FDA 483 문서와 지적 이력을 확인하세요. 검색창을 비워 두면 이름순으로 전체 목록을 볼 수 있습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.</p>
       <form class="tr-look-form" id="ip-look-form" role="search">
         <label class="sr-only" for="ip-look-input">실사관 이름</label>
         <input class="tr-look-input" id="ip-look-input" type="search" name="q" placeholder="예: Moore" autocomplete="off" spellcheck="false" />
         <button class="tr-look-btn" id="ip-look-btn" type="submit">찾기</button>
       </form>
-      <div id="ip-look-res" class="tr-look-res" aria-live="polite"></div><p class="tr-look-hint">지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관에 대한 평가 지표가 아닙니다.</p>
+      <h2 class="ip-idx-h">이름으로 훑어보기</h2>
+      <div id="ip-look-res" class="tr-look-res ip-idx" aria-live="polite"></div>
     </div>
 
     <div id="ip-content" hidden>
@@ -70,7 +71,7 @@
         <p class="ip-sub">FDA 483 서명 실사관</p>
       </div>
 
-      <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section><section class="ip-block" aria-label="지적 카테고리 분포">
+      <section class="ip-stats" id="ip-stats" aria-label="핵심 통계"></section><p class="ip-stats-note">지적 건수는 공개된 문서를 기계적으로 센 값이며, 실사관에 대한 평가 지표가 아닙니다.</p><section class="ip-block" aria-label="지적 카테고리 분포">
         <h2 class="ip-h">지적 카테고리 분포</h2>
         <p class="ip-note" id="ip-cat-note"></p>
         <div id="ip-cat" class="ip-cat"></div>
@@ -133,11 +134,25 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .ip-back-link{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .ip-back-link:hover{color:var(--coral)}
 
+/* [037 2026-08-31 개정] 이름순 색인 -- 조회 랜딩(#ip-lookup) 전용, 검색창 아래. 좌우
+   정렬이 아니라 목록형(그룹 헤더 + 이름 링크)이라 이 상태 블록은 text-align 을 왼쪽으로
+   되돌린다(.ip-state 기본값은 가운데 정렬 안내문 전용). */
+.ip-state.tr-look{text-align:left}
+.ip-idx-h{font-size:11.5px;font-weight:600;color:var(--muted);margin:26px 0 10px}
+.ip-idx-group{margin:0 0 20px}
+.ip-idx-group:last-child{margin-bottom:0}
+.ip-idx-letter{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--coral-2);margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.ip-idx-list{display:flex;flex-wrap:wrap;gap:3px 20px;margin:0;padding:0;list-style:none}
+.ip-idx-link{display:inline-block;padding:4px 2px;font-size:13.5px;color:var(--body-s);text-decoration:none;border-radius:6px}
+.ip-idx-link:hover,.ip-idx-link:focus-visible{color:var(--coral-2);text-decoration:underline;outline:none}
+
 .ip-head{margin:0 0 22px}
 .ip-name{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ink);margin:0}
 .ip-sub{font-size:13px;color:var(--muted);margin:6px 0 0}
 
-.ip-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 34px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.ip-stats{display:flex;flex-wrap:wrap;gap:36px;margin:0 0 10px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+/* [측정 정직성] 위 통계가 순위·평가 지표로 오독되지 않게 하는 고지 -- ip-stats 바로 아래. */
+.ip-stats-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 30px;word-break:keep-all}
 .ip-stat{display:flex;flex-direction:column;gap:4px}
 .ip-stat-num{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink);line-height:1.1;font-variant-numeric:lining-nums}
 .ip-stat-lbl{font-size:12px;color:var(--muted)}
@@ -204,6 +219,12 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
 .ip-doc-detail{padding:4px 6px 20px;display:flex;flex-direction:column;gap:14px}
 .ip-doc-detail[hidden]{display:none}
 .ip-doc-detail-loading,.ip-doc-detail-empty{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+
+/* [A2] 문서 상세 링크 — document_id 가 assets/inspector-doc-pages.json 집합에 있을 때만
+   날짜+소스 배지를 findings/doc/{document_id}/ 앵커로 감싼다(inspector.js appendDocTitleArea).
+   시각적으로는 기존 평문과 동일하게 두고 hover 로만 링크임을 드러낸다. */
+.ip-doc-title{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
+.ip-doc-title:hover .ip-doc-date,.ip-doc-title:focus-visible .ip-doc-date{color:var(--coral-2)}
 
 /* 문서 인라인 확장 — 단순화한 국문+원문 details 카드(firm.html fp-obs 관례 동형). */
 .ip-obs{border:1px solid var(--line-2);border-radius:var(--rad-s);padding:14px 16px;background:var(--canvas)}
@@ -286,7 +307,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="../../assets/inspector.js?v=e35a19f2" defer></script>
+<script src="../../assets/inspector.js?v=9f0fd42a" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

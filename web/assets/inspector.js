@@ -20,9 +20,17 @@
  * 업체명/실사관명은 자유 텍스트라 이스케이프 누락 시 XSS 위험, findings.js/firm.js 와
  * 동일 계약).
  *
- * ★범위(의도적 제한, 회귀 금지) — 이 파일은 **단일 실사관 프로파일 렌더만** 한다. 실사관
- * 목록/디렉터리, 실사관 간 순위·비교, "엄격하다/까다롭다" 류 성향 해석 함수는 만들지
- * 않는다(그런 심볼이 생기면 회귀 — web/tests/test_render.py 의 범위 가드 테스트 참조).
+ * ★범위(의도적 제한, 회귀 금지 — 2026-08-31 개정) — 037 이 세웠던 "실사관 디렉터리(목록
+ * 열람) 페이지를 만들지 않는다"는 이제 "목록의 존재"가 아니라 "사람을 서열화하는 것"을
+ * 금지하는 것으로 좁혔다(근거: 037 SQL 헤더 2026-08-31 개정 블록, 사용자 결정 "순위를
+ * 매기지 말라는 거고, 가나다 순으로 색인하면 됨"). 지금도 그대로 금지인 것: 실사관 간
+ * **순위·비교**, "엄격하다/까다롭다" 류 성향 해석, **건수 표기·건수 기준 정렬을 통한
+ * 사실상의 랭킹**(그런 심볼·패턴이 생기면 회귀 — web/tests/test_render.py 의 범위 가드
+ * 테스트 참조). 새로 허용된 것: 조회 랜딩(`ip-lookup`, ?key= 없는 상태) 안에서만 사는
+ * **이름순(display_name 오름차순) 색인 하나** — 정렬 키는 이름뿐이고 건수는 어디에도
+ * 찍지 않는다(buildIndexGroups/filterIndexRows 는 반환 객체에 documents 필드 자체를
+ * 담지 않는다 — 렌더가 실수로도 건수를 그릴 수 없게 데이터 모양으로 막는다). 별도
+ * 라우트는 새로 만들지 않는다.
  *
  * [동기화 규칙] CATEGORY_LABELS 는 findings.js/trends.js/firm.js 의 동명 상수·grm_findings.
  * FINDING_TAXONOMY 20개 code/label_ko/label_en 과 완전히 일치해야 한다(web/tests/
@@ -432,6 +440,60 @@
     rows.forEach(function (row) { container.appendChild(buildObsCard(row)); });
   }
 
+  // ── [A2] 문서 상세 링크 멤버십 — 다른 에이전트가 dist 에 발행하는
+  // assets/inspector-doc-pages.json({schema:"grm-inspector-doc-pages/v1",
+  // document_ids:[...]}, 사전순)을 소비한다. 이 집합은 **정적 문서 페이지가 실제
+  // 존재하는 문서 id** 뿐이다 — 임계 미달 문서까지 확인 없이 링크하면 16% 404(실측).
+  // 프로파일이 렌더될 때 한 번만 lazy fetch 하고 세션 캐시, 실패는 조용히 삼킨다(문서
+  // 목록 자체는 링크 없이 그대로 보여야 한다 — 렌더를 막지 않는다).
+  var DOC_PAGE_IDS = null; // null = 아직 모름/실패 · 객체 = {document_id: true, ...}
+  var docPagesPromise = null;
+
+  function fetchDocPageIds() {
+    if (docPagesPromise) return docPagesPromise;
+    docPagesPromise = fetch(root + "assets/inspector-doc-pages.json")
+      .then(function (r) {
+        if (!r.ok) throw new Error("inspector-doc-pages " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || data.schema !== "grm-inspector-doc-pages/v1" ||
+            !Array.isArray(data.document_ids)) {
+          return null;
+        }
+        var set = {};
+        data.document_ids.forEach(function (id) { if (id) set[id] = true; });
+        DOC_PAGE_IDS = set;
+        return set;
+      })
+      .catch(function () { return null; });
+    return docPagesPromise;
+  }
+
+  // document_id 가 위 집합에 있으면 날짜+소스 배지 영역을 findings/doc/{document_id}/
+  // 링크로 감싼다(제목이 따로 없는 이 행에서 가장 "제목"에 가까운 자리). 없으면 현행처럼
+  // 링크 없는 평문. 업체 링크(firm_key, 아래)는 이미 정상 동작 중이라 건드리지 않는다 —
+  // 이 링크는 문서 상세로 가는 **처음 생기는** 간선이다.
+  function appendDocTitleArea(main, doc) {
+    var docId = doc.document_id || "";
+    var hasPage = !!(DOC_PAGE_IDS && docId && DOC_PAGE_IDS[docId]);
+    if (!hasPage) {
+      main.appendChild(el("span", "ip-doc-date", doc.published_date || ""));
+      if (doc.source) main.appendChild(el("span", "ip-b", doc.source));
+      return;
+    }
+    var link = document.createElement("a");
+    link.className = "ip-doc-title";
+    link.href = root + "findings/doc/" + encodeURIComponent(docId) + "/";
+    link.appendChild(el("span", "ip-doc-date", doc.published_date || ""));
+    if (doc.source) link.appendChild(el("span", "ip-b", doc.source));
+    // 이 링크는 main 안에 중첩돼 있고 main 자체도 클릭 핸들러(지적사항 펼치기,
+    // makeClickableRow)를 갖는다 — stopPropagation 없이 두면 한 클릭이 "문서 페이지로
+    // 이동"과 "펼치기 토글"을 동시에 시도해 둘이 서로 삼킨다.
+    link.addEventListener("click", function (ev) { ev.stopPropagation(); });
+    main.appendChild(link);
+  }
+
   // [업체 프로파일 진입] doc.firm_key(findings_inspector_profile documents[].firm_key)로
   // 업체 프로파일 링크를 만든다 — findings/inspector/index.html 은 findings/firm/index.html
   // 과 같은 findings/ 하위 형제 디렉터리라 rel_root 계산 없이 "../firm/index.html" 상대경로
@@ -443,8 +505,7 @@
 
     var main = document.createElement("div");
     main.className = "ip-doc-row-main";
-    main.appendChild(el("span", "ip-doc-date", doc.published_date || ""));
-    if (doc.source) main.appendChild(el("span", "ip-b", doc.source));
+    appendDocTitleArea(main, doc);
 
     if (doc.firm_name) {
       var firmDisplay = decodeFirmDisplay(doc.firm_name);
@@ -540,24 +601,57 @@
     return url.replace(/\/$/, "") + "/rest/v1/rpc/" + name;
   }
 
-  function fetchInspectorProfile(inspectorKey) {
+  function fetchInspectorProfileOnce(inspectorKey) {
     return fetch(rpcEndpoint("findings_inspector_profile"), {
       method: "POST",
       headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ p_inspector_key: inspectorKey }),
     }).then(function (r) {
-      if (!r.ok) throw new Error("findings_inspector_profile " + r.status);
+      if (!r.ok) {
+        var err = new Error("findings_inspector_profile " + r.status);
+        err.status = r.status;
+        throw err;
+      }
       return r.json();
     });
   }
 
-  // ── [이름으로 조회] 037/039 findings_inspector_index ─────────────────────────
-  // ★이 코드가 지켜야 하는 037 계약(어기면 이 기능은 '디렉터리'가 된다):
-  //   · **2글자 미만이면 아무것도 그리지 않는다.** 빈 입력에 전체 명단을 뿌리는 순간
-  //     이 화면은 사람을 훑어보는 목록이 된다 — 037 이 금지한 바로 그것이다.
-  //   · 결과는 **알파벳순**으로 최대 8명. 문서 수 내림차순으로 정렬하면 그 자체가
-  //     순위표라 037 의 "순위·비교 금지"를 어긴다. 건수는 맥락으로 병기만 한다.
-  //   · index RPC 는 세션당 1회만 받아 캐시한다(findings.js 의 동일 관례).
+  // ── [A3] RPC 재시도 — 실측: 프로파일 RPC 첫 호출이 콜드스타트로 HTTP 500(직후 8/8
+  // 200·중앙값 645ms). 5xx 또는 네트워크 오류(응답이 없어 status 를 모르는 경우)만
+  // 재시도 대상이다. ★null 응답(코호트 미달·미존재)은 정상 200 이라 이 함수에 예외로
+  // 들어오지 않는다 — .then() 을 그대로 통과하므로 재시도 판정 자체가 발동하지 않는다
+  // (재시도 제외가 아니라 애초에 재시도 분기에 도달할 방법이 없다).
+  var RETRY_DELAY_MS = 400;
+
+  function isRetryableFetchError(err) {
+    if (!err) return false;
+    var status = err.status;
+    if (typeof status !== "number") return true; // fetch 자체가 실패(네트워크 오류)
+    return status >= 500 && status < 600;
+  }
+
+  function delay(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  // 037 의 정보 누출 방지 계약(실패 모드를 하나의 화면 상태로 수렴)은 그대로 — 재시도는
+  // fetch 계층 안에서만 일어나고 화면 상태를 늘리지 않는다. 1회 재시도도 실패하면
+  // 기존과 동일하게 바깥 .catch() 에서 "unavailable" 로 수렴한다.
+  function fetchInspectorProfileWithRetry(inspectorKey) {
+    return fetchInspectorProfileOnce(inspectorKey).catch(function (err) {
+      if (!isRetryableFetchError(err)) throw err;
+      return delay(RETRY_DELAY_MS).then(function () {
+        return fetchInspectorProfileOnce(inspectorKey);
+      });
+    });
+  }
+
+  // ── [B] 이름순 색인(037 2026-08-31 개정, findings_inspector_index RPC 소비) ────────
+  // 데이터는 037/039 findings_inspector_index() 그대로(코호트, {inspector_key,
+  // display_name, documents}). ★건수(documents)는 여기서부터 화면까지 어디에도 찍지
+  // 않는다 — buildIndexGroups 의 반환 객체가 애초에 그 필드를 담지 않으므로 렌더 쪽의
+  // 실수로도 건수가 그려질 수 없다(이중 방어, 소스 텍스트 가드는 web/tests/
+  // test_render.py 가 별도로 건다). index RPC 는 세션당 1회만 받아 캐시한다.
   var idxCache = null;
 
   function fetchInspectorIndex() {
@@ -573,45 +667,109 @@
     return idxCache;
   }
 
-  function buildLookupRow(item) {
+  // 부분일치(이름 또는 key) — 대소문자 무시. 빈 질의는 전체를 그대로 통과시킨다 — 037
+  // 개정으로 "빈 입력 = 이름순 전체 훑어보기"가 이제 허용된 상태다(과거엔 여기서
+  // 목록화 방지 게이트가 막았다).
+  function filterIndexRows(rows, query) {
+    var q = String(query || "").trim().toLowerCase();
+    var list = Array.isArray(rows) ? rows : [];
+    if (!q) return list.slice();
+    return list.filter(function (r) {
+      return String((r && r.display_name) || "").toLowerCase().indexOf(q) >= 0 ||
+             String((r && r.inspector_key) || "").toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  // display_name 오름차순(localeCompare) 정렬 + 첫 글자 그룹핑. 그룹 헤더는 **보이는
+  // 이름의 첫 글자**를 쓴다(성이 아니라 — 보이는 대로 정렬해야 예측 가능하다). ★반환
+  // 객체 {letter, items:[{inspector_key, display_name}]} 에는 documents(건수)가 없다.
+  function buildIndexGroups(rows) {
+    var list = (Array.isArray(rows) ? rows : [])
+      .filter(function (r) { return r && r.display_name; })
+      .slice()
+      .sort(function (a, b) {
+        return String(a.display_name).localeCompare(String(b.display_name));
+      });
+    var groups = [];
+    var byLetter = {};
+    list.forEach(function (r) {
+      var letter = String(r.display_name).charAt(0).toUpperCase() || "#";
+      if (!byLetter[letter]) {
+        byLetter[letter] = { letter: letter, items: [] };
+        groups.push(byLetter[letter]);
+      }
+      byLetter[letter].items.push({
+        inspector_key: r.inspector_key || "",
+        display_name: r.display_name,
+      });
+    });
+    return groups;
+  }
+
+  function buildIndexItemLink(item) {
     var a = document.createElement("a");
-    a.className = "tr-look-row";
+    a.className = "ip-idx-link";
     a.href = "?key=" + encodeURIComponent(item.inspector_key || "");
-    a.appendChild(el("span", "tr-look-name", item.display_name || item.inspector_key || ""));
-    a.appendChild(el("span", "tr-look-meta", "문서 " + (item.documents || 0) + "건"));
+    a.textContent = item.display_name || item.inspector_key || "";
     return a;
   }
 
-  function runLookup() {
-    if (!lookInputEl || !lookResEl) return;
-    var q = (lookInputEl.value || "").trim().toLowerCase();
+  // 접근성: 목록은 <ul>/<li>, 그룹 헤더(<h3>)와 목록을 aria-labelledby 로 연결.
+  function renderIndexGroups(groups) {
+    if (!lookResEl) return;
     lookResEl.innerHTML = "";
-    if (q.length < 2) {
-      // 목록화 방지 게이트 — 이 분기에서 절대 결과를 그리지 않는다.
-      lookResEl.appendChild(el("p", "tr-look-empty", "두 글자 이상 입력해 주세요."));
+    if (!groups.length) {
+      lookResEl.appendChild(el("p", "tr-look-empty",
+        "찾은 실사관이 없습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다."));
       return;
     }
-    lookResEl.appendChild(el("p", "tr-look-empty", "찾는 중\u2026"));
-    fetchInspectorIndex().then(function (rows) {
-      if (!lookResEl) return;
-      lookResEl.innerHTML = "";
-      var hits = (rows || []).filter(function (r) {
-        return String(r.display_name || "").toLowerCase().indexOf(q) >= 0 ||
-               String(r.inspector_key || "").toLowerCase().indexOf(q) >= 0;
-      }).sort(function (a, b) {
-        return String(a.display_name || "").localeCompare(String(b.display_name || ""));
-      }).slice(0, 8);
-      if (!hits.length) {
-        lookResEl.appendChild(el("p", "tr-look-empty",
-          "찾은 실사관이 없습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다."));
-        return;
-      }
-      hits.forEach(function (it) { lookResEl.appendChild(buildLookupRow(it)); });
-    }).catch(function () {
-      if (!lookResEl) return;
-      lookResEl.innerHTML = "";
-      lookResEl.appendChild(el("p", "tr-look-empty", "실사관 조회를 불러오지 못했습니다."));
+    groups.forEach(function (g, gi) {
+      var section = document.createElement("section");
+      section.className = "ip-idx-group";
+      var headingId = "ip-idx-g-" + gi;
+      var heading = el("h3", "ip-idx-letter", g.letter);
+      heading.id = headingId;
+      section.appendChild(heading);
+      var ul = document.createElement("ul");
+      ul.className = "ip-idx-list";
+      ul.setAttribute("aria-labelledby", headingId);
+      g.items.forEach(function (item) {
+        var li = document.createElement("li");
+        li.appendChild(buildIndexItemLink(item));
+        ul.appendChild(li);
+      });
+      section.appendChild(ul);
+      lookResEl.appendChild(section);
     });
+  }
+
+  var idxRowsCache = null; // fetchInspectorIndex 성공 후 원시 rows(필터링용, 세션 캐시)
+
+  // 검색창 실시간 필터링 + 최초 진입 시 전체 A–Z 렌더(둘 다 이 함수 하나) — 비우면
+  // 전체 복귀, 입력하면 부분일치로 좁힌다.
+  function renderNameIndex(query) {
+    if (!lookResEl) return;
+    if (idxRowsCache) {
+      renderIndexGroups(buildIndexGroups(filterIndexRows(idxRowsCache, query)));
+      return;
+    }
+    lookResEl.innerHTML = "";
+    lookResEl.appendChild(el("p", "tr-look-empty", "불러오는 중…"));
+    fetchInspectorIndex().then(function (rows) {
+      idxRowsCache = Array.isArray(rows) ? rows : [];
+      if (!lookResEl) return;
+      // 로딩 중 사용자가 계속 입력했을 수 있으니 지금 입력값 기준으로 그린다.
+      var live = lookInputEl ? lookInputEl.value : query;
+      renderIndexGroups(buildIndexGroups(filterIndexRows(idxRowsCache, live)));
+    }).catch(function () {
+      // ★색인 로드 실패 — 색인 영역만 조용히 생략한다(검색창 자체는 그대로 동작).
+      if (!lookResEl) return;
+      lookResEl.innerHTML = "";
+    });
+  }
+
+  function runLookup() {
+    renderNameIndex(lookInputEl ? lookInputEl.value : "");
   }
 
   if (lookFormEl) {
@@ -619,6 +777,10 @@
       ev.preventDefault();
       runLookup();
     });
+  }
+
+  if (lookInputEl) {
+    lookInputEl.addEventListener("input", function () { runLookup(); });
   }
 
   var inspectorKeyParam = getInspectorKeyParam();
@@ -631,10 +793,14 @@
     // [존 재편] 키가 없으면 조회 랜딩. 막다른 안내로 끝내지 않는다.
     showState("lookup");
     if (lookInputEl) lookInputEl.focus();
+    // [037 2026-08-31 개정] 빈 검색창 = 전체 이름순 색인을 바로 보여준다.
+    renderNameIndex("");
   } else {
     showState("loading");
-    fetchInspectorProfile(inspectorKeyParam)
-      .then(function (data) {
+    // A2: 문서 링크 멤버십은 프로파일 fetch 와 병렬로(서로 독립, 실패해도 서로 막지 않음).
+    Promise.all([fetchInspectorProfileWithRetry(inspectorKeyParam), fetchDocPageIds()])
+      .then(function (out) {
+        var data = out[0];
         // 코호트 미달·미존재·키 형식 오류는 전부 null(계약, findings_inspector_profile
         // 참조) — display_name 이 없으면 무조건 "표시할 수 없습니다"로 수렴한다.
         if (!data || typeof data !== "object" || !(data.display_name || "")) {
@@ -645,7 +811,7 @@
         showState("content");
       })
       .catch(function () {
-        // RPC 미배포·network 실패도 동일하게 수렴(구분 없음).
+        // RPC 미배포·network 실패(1회 재시도까지 소진)도 동일하게 수렴(구분 없음).
         showState("unavailable");
       });
   }

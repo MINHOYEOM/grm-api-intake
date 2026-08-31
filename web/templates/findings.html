@@ -23,6 +23,20 @@
 
     <p class="fnd-lead">업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.</p>
 
+    {#- [실사관 진입점 2026-08-31] 검색 화면 상단 안내 스트립 — archive.html/brief.html
+        의 arc-lib 스트립과 같은 결(soft 배경+1px 테두리+라운드, 머리글/설명/우측 화살표
+        링크 3분할)이지만 내용 성격이 달라(자료실 최신 갱신 요약이 아니라 다른 도구로의
+        안내) 클래스는 별도로 둔다(fnd-insp-cta, 아래 페이지 스코프 style). #fnd-tools
+        바로 위 — 검색을 쓰기 전에 "실사관으로도 찾을 수 있다"를 알린다. /findings/browse/
+        에는 넣지 않는다(그 면은 세그 탭만으로 충분 — 스펙 §2 참조). -#}
+    <aside class="fnd-insp-cta" aria-label="실사관 조회 안내">
+      <div class="fnd-insp-cta-h">
+        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>실사관으로 찾기</span>
+        <span class="fnd-insp-cta-sum">FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 문서 단위로 모아 봅니다.</span>
+        <a class="fnd-insp-cta-go" href="{{ rel_root }}findings/inspector/index.html">실사관 조회 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      </div>
+    </aside>
+
     {#- [M15] 툴바(검색+필터+정렬)를 대시보드보다 위로(검색이 최우선 도구), sticky
         컴팩트화. §4 전면 재설계 — 소스/증거등급/검토상태 칩 그룹을 카테고리·발행월과
         동일한 <select> 로 통일해 6개 컨트롤이 전부 같은 컴포넌트를 쓴다(균일 셀렉트 행).
@@ -128,6 +142,19 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .page-head p{max-width:none;text-wrap:pretty}
 /* 검색 리드 한 줄 — 세그 아래·툴바 위. */
 .fnd-lead{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 20px;max-width:760px;word-break:keep-all}
+/* [실사관 진입점 2026-08-31] 상단 안내 스트립 — archive.html/brief.html 의 .arc-lib*
+   규칙과 같은 결(soft 배경+테두리+라운드, 머리글/설명/링크 3분할)을 옮겨오되 이 스트립엔
+   목록(.arc-lib-l)이 없어 클래스는 새로 둔다(fnd-insp-cta) — grm.css 는 무접촉. */
+.fnd-insp-cta{margin:0 0 22px;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
+.fnd-insp-cta-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
+.fnd-insp-cta-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
+.fnd-insp-cta-k .ti{font-size:15px;color:var(--coral-2)}
+.fnd-insp-cta-sum{flex:1;min-width:0;font-family:var(--sans);font-size:12.5px;color:var(--muted);word-break:keep-all}
+.fnd-insp-cta-go{flex:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.fnd-insp-cta-go:hover{text-decoration:underline}
+.fnd-insp-cta-go .ti{font-size:14px;transition:transform .16s var(--ease)}
+.fnd-insp-cta-go:hover .ti{transform:translateX(3px)}
+@media (max-width:640px){ .fnd-insp-cta{padding:12px 14px 11px} .fnd-insp-cta-sum{flex-basis:100%} }
 /* FIND-1 M7 — 대시보드 밴드. [M14] 통짜 탄색 박스 → 캔버스+보더(경량 카드). */
 .fnd-dash{background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;margin:0 0 22px}
 /* [M14] 스탯 줄 → 스탯 블록(큰 숫자+라벨, 가로 나열, 좌측 정렬). */

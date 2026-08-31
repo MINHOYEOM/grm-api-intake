@@ -1,4 +1,4 @@
-{#- [지적사항 존 면 전환 2026-08-27] 검색 · 둘러보기 — **2면**.
+{#- [지적사항 존 면 전환 2026-08-27, 2026-08-31 3면 확장] 검색 · 둘러보기 · 실사관.
 
     ★왜 갈랐나(사용자 피드백): 발견 허브(#811)가 목적 카드·최근 문서·축 탐색·상세 검색을
     한 페이지에 쌓아 "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다"는 피드백을 받았다.
@@ -6,11 +6,18 @@
     쓸 수 있어야 한다(검색 면 기본). 트렌드 존의 세그먼트(#810 trends_seg)와 같은 패턴 —
     실제 <a> 라 JS 없이도 오갈 수 있고, 크롤러가 두 면을 발견하는 경로이기도 하다.
 
+    ★[진입점 3종 2026-08-31] 실사관 프로파일(findings/inspector/index.html)은 이미
+    라이브였지만(#862) 닿는 길이 사실상 없었다 — 실측: 상단 nav 없음, 이 존 본문에도
+    없음, footer 도구 열 링크 1개가 스크롤 17,120px 지점. 이 세그먼트에 세 번째 탭을
+    더해 검색·둘러보기와 같은 자리에서 오갈 수 있게 한다. inspector.html 은 findings/
+    browse 와 같은 깊이(rel_root="../../")라 이 파셜을 그대로 include 할 수 있다.
+
     스타일은 이 파셜이 자체 보유(.fnd-seg — grm.css 불가침, tr-seg 는 trends_style 스코프라
     재사용 불가). 페이지당 1회 include 라 <style> 중복 없음. -#}
 <nav class="fnd-seg" aria-label="지적사항 면 전환">
   <a href="{{ rel_root }}findings/index.html"{% if seg_active == 'search' %} class="on" aria-current="page"{% endif %}>검색</a>
   <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>둘러보기</a>
+  <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>실사관</a>
 </nav>
 {#- 시각 언어는 트렌드 존 세그(.tr-seg)와 동형 — 같은 사이트에서 "면 전환"이 두 가지
     모양이면 사용자가 같은 장치임을 알아보지 못한다. 셀렉터만 존 스코프로 다르다. -#}

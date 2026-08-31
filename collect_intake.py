@@ -1481,11 +1481,77 @@ def compute_signal_tier(source: str, type_or_class: str, qa_relevance: str,
     """
     decision = compute_signal_tier_detail(
         source, type_or_class, qa_relevance, osd_relevance, *text_parts)
+    record_tier_decision(decision, source, " ".join(t for t in text_parts if t))
+    return decision.tier
+
+
+# tier 문자열 → 서열. "올리기만" 하는 재판정(FDA WL 본문 cGMP floor)이 대소를 비교할 때 쓴다.
+_TIER_RANK: dict[str, int] = {"Tier 1": 1, "Tier 2": 2, "Tier 3": 3}
+
+# FDA WL 본문 cGMP floor 를 적용할 발행 부서 — 인체 의약품/바이오(CDER·CBER)만.
+# 식품·수의·담배 부서 서한은 본문에 "current good manufacturing practice" 가 있어도
+# 그건 21 CFR 111(건강기능식품 GMP) 등 **다른 축**이라 제약 GMP 신호가 아니다
+# (실측: Human Foods Program 의 'Dietary Supplement/New Drug/Misbranded' 서한이
+#  전문 재판정에서 Tier 3 로 잘못 올라갔다).
+_WL_BODY_CGMP_OFFICES: tuple[str, ...] = ("cder", "cber",
+                                          "center for drug evaluation",
+                                          "center for biologics evaluation")
+
+_WL_BODY_CGMP_MARKERS: tuple[str, ...] = ("cgmp", "current good manufacturing practice")
+
+# 제약 GMP 규정 본체(21 CFR 210/211) 인용. 'current good manufacturing practice' 라는
+# **말**만으로는 부족하다 — FDA 는 조제(compounding) 면제 조항을 설명하는 **각주**에서도
+# 그 문구를 쓴다(실측: 케타민 판매 사이트 3건이 §503A 각주만으로 Tier 3 로 오승격).
+# 실제로 그 업체의 cGMP 위반을 다투는 편지는 예외 없이 규정 조항을 함께 건다.
+_WL_BODY_CGMP_CFR_RE = re.compile(r"21\s+cfr\s+(?:parts?\s+)?21[01]")
+
+
+def fda_wl_body_cgmp_floor(issuing_office: str, body: str) -> bool:
+    """FDA WL **본문**이 제약 cGMP 위반을 다투는가(→ Tier 3 floor).
+
+    왜 '전문 재판정'이 아니라 이 좁은 floor 인가 — 본문(6~24k자)을 일반 어휘층
+    (`SIGNAL_TIER2_KEYWORDS` 등)에 통째로 먹이면 거의 모든 편지가 무언가에 걸린다.
+    실측(WL 49건 전수)에서 전문 재판정은 13건을 올렸고 그 대부분이 `t2_keywords` 노이즈
+    (텔레헬스 과대광고·미승인의약품 판매 서한)였다. 어휘층은 **짧은 인덱스 표제**용으로
+    보정된 층이라 전문에 그대로 쓰면 안 된다([[grm-taxonomy-split-word-v6]] — 측정
+    모집단이 결론의 한계).
+
+    그래서 세 조건을 **모두** 요구한다:
+      ① 발행 부서가 인체 의약품/바이오(CDER·CBER) — 식품 부서의 21 CFR 111 은 다른 축
+      ② 본문에 cGMP 표현
+      ③ 본문에 21 CFR 210/211 인용 — ②만으로는 조제 면제 각주에 걸린다
+
+    이는 기존 `wl_cgmp` 규칙(인덱스 Subject 의 'CGMP/' 접두)과 **같은 판단 기준을 같은
+    증거원에 한 겹 더** 적용하는 것이지, 새 어휘를 들이는 것이 아니다.
+
+    실측 정밀도(49건 전수) — 승격 2건(R3 Medical·Fagron BV) 모두 본문에 "CGMP Violations"
+    절이 실재. 오승격 0. 같은 표제·같은 부서의 Blue Horizon(CBER, 미허가 생물의약품)은
+    본문에 cGMP 가 없어 Tier 1 유지 = 표제가 아니라 내용으로 가른다는 증거.
+    """
+    if not body:
+        return False
+    office_lc = (issuing_office or "").lower()
+    if not any(tok in office_lc for tok in _WL_BODY_CGMP_OFFICES):
+        return False
+    body_lc = body.lower()
+    if not _tier_kw_any(body_lc, list(_WL_BODY_CGMP_MARKERS)):
+        return False
+    return _WL_BODY_CGMP_CFR_RE.search(body_lc) is not None
+
+
+def record_tier_decision(decision: TierDecision, source: str, blob: str) -> None:
+    """`TIER_OBSERVER` 기록 1회. **판정당 정확히 한 번만** 부르라.
+
+    두 번 세면 `default_fallthrough`·근접미스 카운트가 부풀어, 어휘 공백을 잡으라고 만든
+    계기가 도리어 못 믿을 값이 된다([[grm-tier-observability]] — 측정 코퍼스가 결론을 정한다).
+    그래서 2단 판정(1차=인덱스 행 · 2차=본문)을 하는 FDA WL 경로는 `compute_signal_tier`
+    (기록 포함 래퍼) 대신 순수 `compute_signal_tier_detail` 로 두 번 판정한 뒤,
+    **이긴 판정 하나만** 이 함수로 기록한다.
+    """
     try:
-        TIER_OBSERVER.record(decision, source, " ".join(t for t in text_parts if t))
+        TIER_OBSERVER.record(decision, source, blob)
     except Exception:  # noqa: BLE001 — 관측은 부수기능. 절대 수집을 중단시키지 않는다.
         pass
-    return decision.tier
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2718,8 +2784,12 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
 
         doc_id = _stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso)
         relevance = compute_relevance(headline, subject, issuing_office)
-        tier = compute_signal_tier(SOURCE_FDA_WL, issuing_office or "Warning Letter",
-                                   relevance, "N/A", headline, subject, issuing_office)
+        # [WL tier 2단 판정 2026-08-31] 1차 = 인덱스 행(subject·부서)만. 본문은 아직 없다
+        # (아래 wl_body_* 블록이 네트워크로 가져온다). 최종 판정은 본문 확보 뒤 내리므로
+        # 여기서는 **기록하지 않는 순수 함수**를 쓴다 — `record_tier_decision` 참조.
+        tier_decision = compute_signal_tier_detail(
+            SOURCE_FDA_WL, issuing_office or "Warning Letter",
+            relevance, "N/A", headline, subject, issuing_office)
 
         wl_raw: dict[str, Any] = {
             "firm": firm, "posted_date": posted_raw,
@@ -2767,6 +2837,34 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
                 # excerpt 가 이미 사유를 남겼으면 덮어쓰지 않는다(setdefault) — 같은 편지
                 # 이니 사유도 같을 확률이 높지만, excerpt 쪽 사유가 우선(먼저 시도됨).
                 wl_raw.setdefault("wl_body_status", wl_body_full_status)
+
+        # ── [WL tier 2차 판정 2026-08-31] 본문 cGMP floor(올리기만) ────────────────────
+        # 왜: FDA WL 인덱스의 Subject 열은 사실상 통제어휘라 cGMP 서한은 "CGMP/…" 접두를
+        # 단다. 그래서 1차 판정(인덱스 행만)이 `wl_cgmp` 규칙으로 대부분 잘 걸린다. 그런데
+        # 표제가 다른 축(미승인의약품·미허가 생물의약품 등)인데 **본문에는 21 CFR 210/211
+        # 위반이 들어 있는** 편지가 있다 — 2026-08-31 R3 Medical Companies(표제 "Unapproved
+        # New Drugs/Unlicensed Biological Product Violations", 본문에 CGMP 위반 6건·무균공정
+        # 밸리데이션·안정성·품질부서 미문서화)가 Tier 1 로 떨어져 그 주 브리프에서 빠졌다.
+        # 본문은 이미 위에서 확보해 두고도 판정에 쓰지 않고 있었다(값은 있는데 안 읽는 슬롯).
+        #
+        # 본문에서 읽는 신호는 **cGMP 하나뿐**이다 — 전문을 일반 어휘층에 통째로 먹이면
+        # 노이즈가 폭발한다(`fda_wl_body_cgmp_floor` docstring 의 실측 참조).
+        # **올리기만 한다(floor, 내리지 않음).** 본문 확보 실패(403·no-anchor)가 기존 판정을
+        # 조용히 강등시켜서는 안 되므로, 본문이 없으면 1차 판정이 그대로 최종이다.
+        body_for_tier = wl_raw.get("wl_body_full") or wl_raw.get("wl_body_excerpt") or ""
+        tier_blob_parts = [headline, subject, issuing_office]
+        if (_TIER_RANK.get(tier_decision.tier, 0) < 3
+                and fda_wl_body_cgmp_floor(issuing_office, body_for_tier)):
+            log("INFO",
+                f"FDA WL tier 본문 cGMP floor {tier_decision.tier}→Tier 3: "
+                f"{truncate(firm or headline, 60)}")
+            tier_decision = TierDecision(
+                "Tier 3", "wl_cgmp_body",
+                t2_matches=tier_decision.t2_matches, t3_matches=tier_decision.t3_matches)
+            tier_blob_parts.append(body_for_tier)
+        tier = tier_decision.tier
+        record_tier_decision(tier_decision, SOURCE_FDA_WL,
+                             " ".join(p for p in tier_blob_parts if p))
 
         items.append(IntakeItem(
             source=SOURCE_FDA_WL,

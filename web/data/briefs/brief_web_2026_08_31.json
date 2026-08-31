@@ -1,0 +1,1727 @@
+{
+ "schema_version": "grm-web-card/v1",
+ "brief": {
+  "run_date_kst": "2026-08-31",
+  "window": "2026-08-24 ~ 2026-08-31",
+  "publish_date": "2026-08-31",
+  "agencies": [
+   "EMA",
+   "MFDS",
+   "Health Canada",
+   "ISPE"
+  ],
+  "categories": [
+   "Other"
+  ],
+  "tldr": [
+   "EU, 인도 Aculife 무균 제조소에 세척 밸리데이션 중대결함으로 GMP 비준수 판정",
+   "Health Canada, 미표시 처방성분(sildenafil) 혼입 생약제품 2종 Type I 회수",
+   "식약처, 제조기록 동시작성 미준수 티디에스팜에 과징금 19,350,000원 처분"
+  ],
+  "coverage": {
+   "intake_total": 44,
+   "rendered": 20,
+   "evidence": {
+    "A": 20,
+    "B": 0,
+    "C": 0
+   },
+   "resources": 1
+  },
+  "ai_disclosure": true,
+  "resources": [
+   {
+    "id": "efb5433e2961",
+    "title": "위험기반 CSV 테스팅 논의",
+    "original_title": "Testing Focused on Improving System and Product Quality usin…",
+    "agency": "ISPE",
+    "type_tag": "GMP News",
+    "sources": {
+     "info_url": "https://ispe.org/pharmaceutical-engineering/ispeak-blogs/rss.xml",
+     "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/testing-focused-improving-system-and-product-quality-using",
+     "official_is_pdf": false,
+     "link_check": {
+      "info": "pending",
+      "official": "pending"
+     }
+    },
+    "summary": "ISPE 가 비판적 사고와 위험기반 의사결정을 활용해 시스템·제품 품질을 개선하는 테스팅 접근을 다룬 글을 게시한 것으로 보도되었다. 규제 환경에서 컴퓨터화 시스템이 환자 안전, 제품 품질, 데이터 완전성 확보에 핵심 역할을 한다는 문제의식을 배경으로 한다."
+   }
+  ]
+ },
+ "cards": [
+  {
+   "id": "187173",
+   "render_order": 0,
+   "group": "글로벌",
+   "group_label": "💊 합성의약품",
+   "agency": "EMA",
+   "card_type": "EU GMP 비준수",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "GMP 비준수",
+   "headline_target": "Aculife Healthcare Private Limited",
+   "title_issue": "무균제조 세척밸리데이션 중대결함",
+   "summary": "몰타 의약품청(Malta Medicines Authority)이 인도 소재 Aculife Healthcare Private Limited 제조소 실사에서 세척 밸리데이션 미흡을 중대(critical) 결함으로 판정하고 EU GMP 비준수 확인서를 발행하기로 결정했다. 비준수 범위에는 무균 조제 소량 액제와 최종멸균 대용량 액제, 2차 포장 공정이 포함됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "187173"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Aculife Healthcare Private Limited (India)"
+    },
+    {
+     "label": "발행기관(NCA)",
+     "value": "Malta"
+    },
+    {
+     "label": "제품범위",
+     "value": "Human Medicinal Products"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "The inspection resulted in a critical deficiency on inadequate cleaning validation as well as eight (8) major findings.",
+     "translation": "이번 실사에서 세척 밸리데이션 미흡에 대한 중대(critical) 결함 1건과 중요(major) 결함 8건이 도출되었습니다."
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "중대결함: 세척 밸리데이션 미흡 1건 (critical deficiency)",
+    "중요결함: 8건 — 용기밀폐완전성시험(CCIT) 미흡 및 장기 미해결 문제의 시정 지연, 무균공정 시뮬레이션 관리 미흡, 공정 밸리데이션 미흡, 중요 출발물질 제조업자·공급자 적격성 평가 불충분 등",
+    "비준수 범위: 무균 조제 소량 액제(1.1.1.4), 최종멸균 대용량 액제(1.1.2.1), 2차 포장(1.5.2)",
+    "조치: 비준수가 유지되거나 EU GMP 인증서로 대체되기 전까지 해당 제조소 제조 배치의 EEA 시장 출하 금지"
+   ],
+   "implication": "세척 밸리데이션을 중대 결함으로 판정하면서 CCIT·무균공정 시뮬레이션·공정 밸리데이션까지 묶어 비준수 확인서 발행으로 이어간 것은, 무균 제조소를 개별 결함이 아니라 무균 보증 체계 전반의 위험 관리 수준으로 평가하는 흐름을 보여준다. 무균 제조소를 직접 운영하거나 해외 위탁 무균 제조소를 쓰는 QA·RA 는 세척 밸리데이션과 용기밀폐완전성 시험이 장기 미해결 지적으로 남아 있지 않은지, 그 시정 이력이 문서로 남아 있는지를 함께 볼 필요가 있다.",
+   "checks": [
+    "세척 밸리데이션 검체채취 위치 선정 근거와 회수율 자료의 적정성",
+    "용기밀폐완전성(CCIT) 시험 방법·주기 및 장기 미해결 지적의 CAPA 진행 상황",
+    "무균공정 시뮬레이션(APS) 설계·판정기준과 중요 출발물질 공급자 적격성 평가"
+   ],
+   "deterministic_detail": {
+    "type": "eu_gmp_ncr_statement",
+    "authority_country": "Malta",
+    "product_scope": "Human Medicinal Products",
+    "operations": "1 NON-COMPLIANT MANUFACTURING OPERATIONS 1.1 Sterile products 1.1.1 Aseptically prepared (processing operations for the following dosage forms) 1.1.1.4 Small volume liquids 1.1.2 Terminally Sterilised (processing operations for the following dosage forms) 1.1.2.1 Large volume liquids 1.5 Packaging 1.5.2 Secondary packaging",
+    "nature": "The inspection resulted in a critical deficiency on inadequate cleaning validation as well as eight (8) major findings. These dealt with inadequate control of identification labels inside the manufacturing area, inadequate management of visual inspection activities, sterilized product passing through an area where un-sterilized bags were waiting to be autoclaved, inadequate container closure integrity testing and delayed action to correct this very long standing issue, process validation inadequacies, deficient complaint management, deficient management of aseptic process simulations as well as insufficient qualification of manufacturers and suppliers of critical starting materials and no reassurance that primary packaging materials for ophthalmic products were free from contamination. There were also 24 other deficiencies, in addition to the critical and major findings. All these observed deficiencies raise concerns that the approach to the manufacturing of sterile products is not adequately managing inherent risks pertaining to sterile processes and is not in line with applicable EU GMP requirements. As a result of this outcome, the Inspection Review Group (IRG) at the Malta Medicines Authority has met and decided that a Statement of Non-Compliance with the principles and guidelines of EU Good Manufacturing Practice is to be issued for the site.",
+    "action": "Prohibition of supply No products batches manufactured at the site should be released to EEA markets until this noncompliance remains in place or is superseded by an EU GMP certificate. Others Member states should consider not initiating or authorising new marketing authorisations with this site listed as a finished product manufacturer until the recommended non-compliance statement to be issued remains in place or is not superseded with a GMP certificate. The following applications are known to be ongoing: Sodium Chloride Intravenous Infusion – 0.9% w/v, nPVC bag 0.9% w/v Czechia (RMS), Germany (CMS), Spain (CMS) & Portugal (CMS) Ref. CZ/H/1558/001/DC Timolol 5 mg/mL Eye Drops Solution 5 mg/mL, 5 ml LDPE bottle Spain , Malta, Portugal, Hungary DCP slot requested in September 2025.",
+    "additional": "Since the site does not have any current valid EU-GMP certificates, there should not be any medicinal products manufactured at the site present in EEA markets. A teleconference has therefore not been proposed in view of this.",
+    "nature_ko": "이번 실사에서 세척 밸리데이션 미흡에 대한 중대(critical) 결함 1건과 중요(major) 결함 8건이 도출되었다. 이들 중요 결함은 제조구역 내 식별 라벨 관리 미흡, 육안검사 활동 관리 미흡, 멸균된 제품이 오토클레이브 처리를 기다리는 미멸균 백이 놓인 구역을 통과한 사례, 용기밀폐완전성시험(container closure integrity testing) 미흡 및 매우 오래 지속된 이 문제에 대한 시정 조치 지연, 공정 밸리데이션 미흡, 불만(complaint) 관리 미흡, 무균공정 시뮬레이션(aseptic process simulation) 관리 미흡, 그리고 중요 출발물질의 제조업자 및 공급자에 대한 적격성 평가 불충분과 안과용 제품의 1차 포장재가 오염되지 않았다는 보증의 결여에 관한 것이었다. 중대 및 중요 결함 외에도 24건의 다른 결함이 있었다. 관찰된 이러한 결함들은 무균 제품 제조에 대한 접근 방식이 무균 공정에 내재된 위험을 적절히 관리하지 못하고 있으며 적용되는 EU GMP 요건에 부합하지 않는다는 우려를 제기한다. 이 결과에 따라 몰타 의약품청(Malta Medicines Authority)의 실사 검토 그룹(Inspection Review Group, IRG)이 회의를 열어, 해당 제조소에 대해 EU GMP 원칙 및 가이드라인 비준수 확인서(Statement of Non-Compliance)를 발행하기로 결정하였다.",
+    "action_ko": "공급 금지 — 본 비준수가 유지되거나 EU GMP 인증서로 대체되기 전까지, 해당 제조소에서 제조된 어떠한 제품 배치도 EEA 시장에 출하되어서는 안 된다. 기타 — 회원국은 발행 예정인 비준수 확인서가 유지되거나 GMP 인증서로 대체되지 않는 한, 해당 제조소를 완제품 제조소로 등재한 신규 품목허가를 개시하거나 승인하지 않는 것을 고려하여야 한다. 진행 중인 것으로 알려진 신청은 다음과 같다. Sodium Chloride Intravenous Infusion – 0.9% w/v, nPVC bag 0.9% w/v — 체코(RMS), 독일(CMS), 스페인(CMS) 및 포르투갈(CMS), Ref. CZ/H/1558/001/DC. Timolol 5 mg/mL Eye Drops Solution 5 mg/mL, 5 ml LDPE bottle — 스페인, 몰타, 포르투갈, 헝가리, 2025년 9월에 DCP slot 요청.",
+    "operations_ko": "1 비준수 제조 운영 1.1 무균 제품 1.1.1 무균 조제(다음 제형에 대한 공정 운영) 1.1.1.4 소량 액제 1.1.2 최종 멸균(다음 제형에 대한 공정 운영) 1.1.2.1 대용량 액제 1.5 포장 1.5.2 2차 포장",
+    "additional_ko": "해당 제조소는 현재 유효한 EU-GMP 인증서를 보유하고 있지 않으므로, 해당 제조소에서 제조된 의약품이 EEA 시장에 존재해서는 안 된다. 따라서 이러한 점을 고려하여 화상회의(teleconference)는 제안되지 않았다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://eudragmdp.ema.europa.eu/inspections/gmpc/searchGMPNonCompliance.do",
+    "official_url": "https://rfwixqqdljpmtjdlblct.supabase.co/storage/v1/object/public/eudragmdp-ncr/ncr/187173.pdf",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026006476",
+   "render_order": 1,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "(주)유유제약",
+   "title_issue": "회수종료 통보 전 재출고",
+   "summary": "식품의약품안전처가 ㈜유유제약에 대해 의약품 회수의무자의 회수 및 폐기 등에 관한 준수사항 위반으로 해당 품목 제조업무정지 15일 처분을 내렸다. 회수 종료신고서를 제출한 뒤 지방청의 회수종료 통보를 받기 전에 해당 제조번호 제품을 재출고한 사실이 확인됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-27"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026006476"
+    },
+    {
+     "label": "업체",
+     "value": "(주)유유제약"
+    },
+    {
+     "label": "처분",
+     "value": " ○ 해당 품목 제조업무정지 15일(2026. 9. 10. ~ 2026. 9. 24.) \n   * (대상품목) ① 타나민정(은행엽건조엑스)(허가번호: 제6호, 허가일자: 1993.5.19.) \n                   ② 타나민정80밀리그램(은행엽건조엑스)(허가번호: 제7호, 허가일자: 1997.5.27.)\n                   ③ 타나민정120밀리그람(은행엽건조엑스)(허가번호: 제17호, 허가일자: 1993.3.4.)\n                   ④ 타나민정240밀리그램(은행엽건조엑스)(허가번호: 제5167호, 허가일자: 2023.4.7.)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약품 회수의무자의 회수 및 폐기 등에 관한 준수사항 위반\n -「약사법」제39조제1항 및「의약품 등의 안전에 관한 규칙」제90조에 따라, 회수의무자는 회수를 완료한 경우 회수종료신고서를 제출하고, 지방청장은 회수계획서에 따라 회수를 적절하게 이행하였다고 판단되는 경우 회수가 종료되었음을 확인하고 이를 회수의무자에게 서면으로 통보하도록 규정하고 있으나,\n - 동 업체는 2026.",
+     "translation": null
+    },
+    {
+     "original": "4.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 회수의무자의 회수 및 폐기 등에 관한 준수사항 위반",
+    "경위: 2026. 4. 14.자 및 2026. 4. 29.자 회수 종료신고서 제출 후, 회수종료 통보 전인 2026. 5. 6.자에 해당 제조번호 제품을 재출고",
+    "통보일: 대전식약청이 2026.6.19.자 및 2026.6.22.자에 회수종료 사실을 통보",
+    "처분: 해당 품목 제조업무정지 15일 (2026. 9. 10. ~ 2026. 9. 24.) — 타나민정 계열 4개 품목"
+   ],
+   "implication": "회수 종료신고서 제출만으로 회수가 종결된 것으로 보고 제품을 재출고한 행위에 품목 제조업무정지가 부과된 것은, 회수의 종결 시점을 정하는 주체가 회수의무자가 아니라 규제기관이라는 원칙을 확인시킨다. 회수를 운영하는 QA·RA 는 종료신고 이후 관할 지방청의 서면 통보를 받기 전까지 해당 제조번호가 출고 보류 상태로 잠겨 있는지 절차상 확인할 필요가 있다.",
+   "checks": [
+    "회수 종료신고 후 관할 지방청 서면 통보 수령 전 출고 차단 절차",
+    "회수 대상 제조번호의 격리 해제·재출고 승인 권한과 기록",
+    "회수 종료 관련 규제기관 통보 문서의 보관 및 추적"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "「약사법」제39조제1항 및「의약품 등의 안전에 관한 규칙」제90조",
+      "original": "○ 의약품 회수의무자의 회수 및 폐기 등에 관한 준수사항 위반\n -「약사법」제39조제1항 및「의약품 등의 안전에 관한 규칙」제90조에 따라, 회수의무자는 회수를 완료한 경우 회수종료신고서를 제출하고, 지방청장은 회수계획서에 따라 회수를 적절하게 이행하였다고 판단되는 경우 회수가 종료되었음을 확인하고 이를 회수의무자에게 서면으로 통보하도록 규정하고 있으나,\n - 동 업체는 2026. 4. 14.자에 ‘타나민정, 타나민정80밀리그램, 타나민정120밀리그램’ 및 2026. 4. 29.자에 타나민정240밀리그램의 영업자 회수 종료신고서를 제출하였으나 대전식약청으로부터 회수종료사실을 통보받기 전인 2026. 5. 6.자에 상기 제조번호에 해당하는 제품을 재 출고한 사실이 있음\n * 대전식약청은 2026.6.19.자에 타나민정, 타나민정80밀리그램, 타나민정120밀리그램에 대하여 회수종료 통보를, 2026.6.22.자에 타나민정240밀리그램에 대하여 회수종료 사실을 통보하였음",
+      "description": "의약품 회수의무자의 회수 및 폐기 등에 관한 준수사항 위반이다. 「약사법」제39조제1항 및「의약품 등의 안전에 관한 규칙」제90조에 따라 회수의무자는 회수를 완료한 경우 회수종료신고서를 제출하고, 지방청장은 회수계획서에 따라 회수를 적절하게 이행하였다고 판단되는 경우 회수가 종료되었음을 확인하여 이를 회수의무자에게 서면으로 통보하도록 규정하고 있다. 그러나 동 업체는 2026. 4. 14.자에 ‘타나민정, 타나민정80밀리그램, 타나민정120밀리그램’ 및 2026. 4. 29.자에 타나민정240밀리그램의 영업자 회수 종료신고서를 제출하였으나, 대전식약청으로부터 회수종료 사실을 통보받기 전인 2026. 5. 6.자에 상기 제조번호에 해당하는 제품을 재출고한 사실이 있다. 대전식약청은 2026. 6. 19.자에 타나민정, 타나민정80밀리그램, 타나민정120밀리그램에 대하여, 2026. 6. 22.자에 타나민정240밀리그램에 대하여 회수종료 사실을 통보하였다.",
+      "risk": "회수 종료를 확인하는 주체는 회수의무자가 아니라 지방청이므로, 통보 이전의 재출고는 규제기관의 적절성 판단이 이루어지지 않은 상태에서 시장에 제품을 다시 내보낸 것이 된다. 회수 사유가 완전히 해소되지 않았거나 회수 대상 범위가 재조정될 여지가 남아 있는 시점이어서, 문제 배치가 유통망에 재진입할 위험을 안고 있다. 실제로 재출고일(2026. 5. 6.)과 회수종료 통보일(2026. 6. 19. 및 6. 22.) 사이에는 약 6주 이상의 간격이 있어, 그 기간 동안 유통된 제품의 적법성 근거가 부재하다. 또한 회수 제조번호의 출고 보류 상태가 시스템상 해제될 수 있었다는 점은 격리·출고 통제 자체의 실효성 문제로 이어진다."
+     }
+    ],
+    "disposition_basis": "위반 근거 법령은 「약사법」제39조제1항 및「의약품 등의 안전에 관한 규칙」제90조이며, 처분 양정은 「약사법」제76조 및「의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅱ.개별기준 제28호마목에 따라 산정되었다. 이에 따라 해당 품목에 대하여 제조업무정지 15일(2026. 9. 10. ~ 2026. 9. 24.)이 부과되었다. 대상품목은 타나민정(은행엽건조엑스)(허가번호: 제6호), 타나민정80밀리그램(은행엽건조엑스)(허가번호: 제7호), 타나민정120밀리그람(은행엽건조엑스)(허가번호: 제17호), 타나민정240밀리그램(은행엽건조엑스)(허가번호: 제5167호) 4개 품목이다. 최종처분일자는 2026년 8월 27일이며, 공개종료일자는 2026년 12월 23일이다.",
+    "required_remediation": {
+     "deadline": "제조업무정지 15일: 2026. 9. 10. ~ 2026. 9. 24.",
+     "items": [
+      "회수 종료신고서 제출 이후 관할 지방청의 회수종료 서면 통보를 수령하기 전까지 해당 제조번호의 출고를 차단하는 절차를 회수 SOP 에 명문화할 것",
+      "회수 대상 제조번호의 격리 해제 및 재출고 승인 권한을 지정하고, 지방청 통보 문서 확인을 승인 선행 요건으로 두는 통제를 적용할 것",
+      "창고·출하 관리 시스템에서 회수 대상 제조번호의 출고 보류 상태가 규제기관 통보 확인 없이 해제되지 않도록 시스템 통제를 점검할 것",
+      "2026. 5. 6.자 재출고 제품의 유통 범위를 확인하고 해당 물량에 대한 조치 결과를 기록으로 보관할 것",
+      "제조업무정지 기간(2026. 9. 10. ~ 2026. 9. 24.) 중 대상 4개 품목의 제조 중단 이행과 공급 계획을 관리할 것"
+     ]
+    },
+    "administrative_risks": "해당 품목 4종에 대한 제조업무정지 15일이 2026년 9월 10일부터 24일까지 집행되어 그 기간 동안 생산이 중단되며, 은행엽건조엑스 제제 계열 전 품목이 대상이라는 점에서 공급 차질과 매출 영향이 직접 발생한다. 처분 이력은 2026년 12월 23일까지 공개되어 그 기간 동안 입찰·위탁 계약·공급자 평가에서 설명 부담으로 작용한다. 이번 건은 제품 품질 결함이 아니라 회수 절차 준수 실패에서 비롯된 처분이므로, 회수 운영 체계 전반의 신뢰도에 대한 규제기관의 관심이 높아질 수 있다. 향후 동일 업체의 회수 건에서 종료 절차가 재차 문제되면 가중 처분 대상이 될 위험이 있다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006476",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0tuRbX8Vj",
+   "render_order": 2,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "GMP실사",
+   "headline_target": "PHIL Inter Pharma Co., Ltd.",
+   "title_issue": "미생물한도시험법 적합성 보완",
+   "summary": "식품의약품안전처가 베트남 소재 PHIL Inter Pharma Co., Ltd. 제조소에 대한 사전 GMP 실사 결과를 등록했다. 주성분 미생물한도시험 관련 측정법의 적합성 자료 제출이 지적(보완)사항으로 제시됐고 보완완료로 기재됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0tuRbX8Vj"
+    },
+    {
+     "label": "제조소",
+     "value": "PHIL Inter Pharma Co., Ltd."
+    },
+    {
+     "label": "실사기간",
+     "value": "2025-07-08~2025-07-10"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "지적보완사항 요약 ( ) 비고 품질 중요 별표 제 호 [ 1] 6.3 주성분 미생물한도시험 관련 측정법의 적합성자료를 제출할 것 ‘ ’ 보완완료 제조방법 비고 비무균일반제제내용고형제 - - 완제 한 약 정 책 과",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "지적: 주성분 미생물한도시험 관련 측정법의 적합성자료를 제출할 것 (근거 [별표 1] 6.3, 품질 분야·중요) — 보완완료",
+    "제조소: PHIL Inter Pharma Co., Ltd. (베트남)",
+    "실사: 사전 실사 / 완제(단일), 실사기간 2025-07-08~2025-07-10",
+    "제조방법 구분: 비무균 일반제제(내용고형제)"
+   ],
+   "implication": "해외 제조소 사전 GMP 실사에서 주성분 미생물한도시험 측정법의 적합성 자료가 중요 등급으로 지적된 것은, 규격 수치 자체보다 그 규격을 판정하는 시험법의 타당성을 함께 본다는 점을 보여준다. 해외 제조소를 통해 완제를 도입하는 QA 는 미생물한도시험을 포함한 시험법 적합성 자료가 실사 이전에 확보돼 있는지 미리 확인할 필요가 있다.",
+   "checks": [
+    "미생물한도시험 측정법의 적합성(방법 적합성) 시험 자료 보유 여부",
+    "해외 제조소 사전 실사 대응 시 시험법 관련 문서 사전 확보 절차"
+   ],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0tuRbX8Vj",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "admin-2026006456",
+   "render_order": 3,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "(주)티디에스팜",
+   "title_issue": "제조기록 동시작성 미준수 과징금",
+   "summary": "식품의약품안전처가 ㈜티디에스팜에 대해 의약품 수탁자의 관리책임 등의 규정 위반으로 행정처분을 내렸다. ㈜유한양행으로부터 위탁받아 제조한 ‘안티푸라민한방카타플라스마’ 제조 과정에서 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않은 사실이 확인됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-24"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026006456"
+    },
+    {
+     "label": "업체",
+     "value": "(주)티디에스팜"
+    },
+    {
+     "label": "처분",
+     "value": "○ 해당 제형 제조업무정지 15일을 갈음한 과징금 19,350,000원\n - (과징금 산정) 해당 제형(카타플라스마제)에 해당하는 14개 품목 중 ‘25년도 생산실적이 있는 12개 품목의 업무정지 1일당 과징금 x 15일을 합산한 총액  = 19,350,000원\n\n  "
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약품 수탁자의 관리책임 등의 규정 위반\n - ㈜티디에스팜은 ‘안티푸라민한방카타플라스마’를 ㈜유한양행으로부터 위탁받아 제조하면서 자사 기준서 ‘GMP 문서작성(문서번호: SOP-G-0201)’을 준수하여 모든 기록문서는 작업과 동시에 작성 및 완료하여야 하나, \n  - 동 업체는 상기 품목을 제조하면서 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않은 사실이 있음\n  ※ 현장 점검 시 혼합공정을 진행 중이였으나, 제조지시 및…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 자사 기준서 ‘GMP 문서작성(문서번호: SOP-G-0201)’에 따라 모든 기록문서를 작업과 동시에 작성·완료해야 하나 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않음",
+    "현장 확인: 혼합공정 진행 중 완료된 원료 칭량 기록을 확인할 수 없었고 작업 전 점검, 설비 점검 및 가동 기록, 공정 투입 원료 확인을 하지 않음",
+    "처분: 해당 제형 제조업무정지 15일을 갈음한 과징금 19,350,000원",
+    "산정: 해당 제형(카타플라스마제) 14개 품목 중 ‘25년도 생산실적이 있는 12개 품목의 업무정지 1일당 과징금 x 15일 합산"
+   ],
+   "implication": "위탁 제조에서 수탁자의 기준서 미준수를 수탁자 관리책임 위반으로 묶어 제형 단위 업무정지에 갈음하는 과징금까지 부과한 것은, 기록의 동시성 결여를 문서 하자가 아니라 제조관리 실패로 본다는 신호다. 위수탁 구조로 생산하는 QA 는 수탁자의 제조지시 및 기록서가 작업과 동시에 작성되고 있는지를 서류 회수가 아닌 현장 확인 방식으로 점검하는지 살펴볼 필요가 있다.",
+   "checks": [
+    "제조지시 및 기록서의 동시 작성 준수 여부에 대한 현장 점검",
+    "위수탁 제조 시 수탁자 기준서 준수에 대한 위탁자 정기 점검 체계",
+    "작업 전 점검·설비 가동기록·공정 투입 원료 확인 기록의 완결성"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "「약사법」제31조제1항,「의약품 등의 제조업 및 수입자의 시설기준령」제4조 및「의약품 등의 제조업 및 수입자의 시설기준령 시행규칙」제11조제3항제4호",
+      "original": "○ 의약품 수탁자의 관리책임 등의 규정 위반\n - ㈜티디에스팜은 ‘안티푸라민한방카타플라스마’를 ㈜유한양행으로부터 위탁받아 제조하면서 자사 기준서 ‘GMP 문서작성(문서번호: SOP-G-0201)’을 준수하여 모든 기록문서는 작업과 동시에 작성 및 완료하여야 하나, \n  - 동 업체는 상기 품목을 제조하면서 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않은 사실이 있음\n  ※ 현장 점검 시 혼합공정을 진행 중이였으나, 제조지시 및 기록서에서 완료한 원료 칭량에 관한 기록을 확인할 수 없었고 작업 전 점검, 설비 점검 및 가동 기록, 공정 투입 원료 확인 등을 하지 않음",
+      "description": "의약품 수탁자의 관리책임 등의 규정 위반이다. ㈜티디에스팜은 ‘안티푸라민한방카타플라스마’를 ㈜유한양행으로부터 위탁받아 제조하면서, 자사 기준서 ‘GMP 문서작성(문서번호: SOP-G-0201)’을 준수하여 모든 기록문서를 작업과 동시에 작성 및 완료하여야 함에도, 상기 품목을 제조하면서 제조공정 작업 내용을 제조지시 및 기록서에 동시에 작성하지 않은 사실이 있다. 현장 점검 시 혼합공정이 진행 중이었으나 제조지시 및 기록서에서 완료한 원료 칭량에 관한 기록을 확인할 수 없었고, 작업 전 점검, 설비 점검 및 가동 기록, 공정 투입 원료 확인 등을 하지 않았다.",
+      "risk": "제조기록이 작업과 동시에 작성되지 않으면 실제 수행 사실을 기록으로 재현할 수 없어, 배치 이력 추적과 일탈 조사의 기반이 무너진다. 특히 완료된 원료 칭량 기록과 공정 투입 원료 확인 기록이 없으면 원료 오투입이나 투입량 편차가 발생하더라도 출하 판정 이전에 검출되지 않을 위험이 남는다. 작업 전 점검과 설비 가동 기록의 부재는 교차오염·잔류물 이월 여부를 사후에 입증할 수 없게 만들며, 데이터 완전성(ALCOA+) 원칙 중 동시성(Contemporaneous)과 완전성(Complete) 요건에 직접 저촉된다. 또한 위탁 제조 구조에서는 수탁자의 기록 부실이 위탁자의 출하 판정 근거까지 함께 훼손한다."
+     }
+    ],
+    "disposition_basis": "처분의 근거 법령은 「약사법」제31조제1항,「의약품 등의 제조업 및 수입자의 시설기준령」제4조 및「의약품 등의 제조업 및 수입자의 시설기준령 시행규칙」제11조제3항제4호이며, 처분 양정은 「약사법」제76조 및「의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅱ.개별기준 제2호자목2)나)에 따라 산정되었다. 이에 따라 해당 제형에 대한 제조업무정지 15일이 부과되었고, 이를 갈음하는 과징금으로 전환되었다. 과징금은 해당 제형(카타플라스마제)에 해당하는 14개 품목 중 ‘25년도 생산실적이 있는 12개 품목의 업무정지 1일당 과징금에 15일을 곱해 합산한 총액 19,350,000원으로 산정되었다. 최종처분일자는 2026년 8월 24일이며, 공개종료일자는 2027년 2월 22일이다.",
+    "required_remediation": {
+     "deadline": "확인 불가 (최종처분일자 2026-08-24, 공개종료일자 2027-02-22)",
+     "items": [
+      "제조지시 및 기록서를 작업과 동시에 작성·완료하도록 하는 사내 기준서 ‘GMP 문서작성(문서번호: SOP-G-0201)’의 실제 이행 상태를 재점검하고, 기록 작성 시점을 확인할 수 있는 통제 수단을 마련할 것",
+      "원료 칭량 완료 기록, 작업 전 점검 기록, 설비 점검 및 가동 기록, 공정 투입 원료 확인 기록이 각 공정 단계에서 누락 없이 남도록 제조지시 및 기록서 양식과 작성 시점을 정비할 것",
+      "혼합공정 등 진행 중 공정에 대해 현장 점검 시점에 기록이 실시간으로 확인되는지 자체 점검(내부 감사)으로 검증하고 그 결과를 기록으로 남길 것",
+      "위탁자인 ㈜유한양행과의 위수탁 계약상 품질합의 범위에서 수탁 제조 기록의 동시 작성 준수 여부를 위탁자가 확인할 수 있는 정기 점검 절차를 운영할 것"
+     ]
+    },
+    "administrative_risks": "해당 제형에 대한 제조업무정지 15일이 과징금 19,350,000원으로 갈음되어 생산 중단은 회피되었으나, 처분 이력 자체는 의약품안전나라 행정처분정보를 통해 2027년 2월 22일까지 공개된다. 이 기간 동안 해당 제조소는 공공 입찰 자격 심사, 위탁자 실사, 해외 규제기관의 제조소 평가에서 처분 이력에 대한 설명 부담을 지게 된다. 특히 이번 건은 위탁 제조에서 수탁자의 관리책임을 문제 삼은 사안이므로, 다른 위탁자와의 계약에서도 동일한 기록 관리 수준에 대한 재실사 요구로 이어질 수 있다. 제조기록 동시 작성 미준수는 반복 지적 시 데이터 완전성 위반으로 확대 해석될 여지가 있어, 후속 GMP 실사에서 동일 항목이 재차 지적되면 처분 수위가 높아질 위험이 있다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinExaathrService04/getMdcinExaathrList04?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json&order=Y",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006456",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0yBve7Ucd",
+   "render_order": 4,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "경남산소",
+   "title_issue": "제조소 총람 기재 미확인",
+   "summary": "식품의약품안전처가 경남산소에 대한 사후 GMP 실사 결과를 등록했다. 제조소 총람에서 의약품 품질시스템, 청소 및 소독, 컴퓨터화 시스템에 관한 내용을 확인할 수 없었다는 지적(보완)사항이 제시됐고 보완완료로 기재됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0yBve7Ucd"
+    },
+    {
+     "label": "제조소",
+     "value": "경남산소"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-04-13~2026-04-13"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약 비고3) 품질경영 기타 [별표 18] 2.",
+     "translation": null
+    },
+    {
+     "original": "의약품 품질시스템 제조소 총람 중 의약품 품질시스템에 대한 내용을 확인할 수 없었음.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "지적: 제조소 총람 중 의약품 품질시스템에 대한 내용을 확인할 수 없었음 (품질경영 분야, 근거 [별표 18] 2.) — 보완완료",
+    "지적: 제조소 총람 중 청소 및 소독([별표 18] 4.2.2), 컴퓨터화 시스템([별표 18] 4.2.3)에 관한 내용을 확인할 수 없었음 — 보완완료",
+    "제조소: 경남산소 — 사후 실사 / 완제(단일)",
+    "실사기간: 2026-04-13~2026-04-13"
+   ],
+   "implication": "제조소 총람에서 품질시스템, 청소 및 소독, 컴퓨터화 시스템 항목의 내용을 확인할 수 없다는 지적이 연달아 나온 것은, 제조소 총람을 형식 문서가 아니라 실사의 진입점으로 본다는 점을 보여준다. 제조소 총람을 관리하는 QA 는 필수 기재 항목이 실제 운영 실태와 일치하도록 갱신되고 있는지 확인할 필요가 있다.",
+   "checks": [
+    "제조소 총람 필수 기재 항목의 최신성과 완결성",
+    "품질시스템·청소소독·컴퓨터화 시스템 항목의 총람 반영 여부"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 4,
+    "severity_summary": {
+     "기타": 4
+    },
+    "rows": [
+     {
+      "area": "품질경영",
+      "severity": "기타",
+      "legal_basis": "[별표 18] 2. 의약품 품질시스템",
+      "summary": "제조소 총람 중 의약품 품질시스템에 대한 내용을 확인할 수 없었음.",
+      "followup": "보완완료"
+     },
+     {
+      "area": "시설 및 장비",
+      "severity": "기타",
+      "legal_basis": "[별표 18] 4.2.2 청소 및 소독",
+      "summary": "제조소 총람 중 청소 및 소독에 관한 내용을 확인할 수 없었음.",
+      "followup": "보완완료"
+     },
+     {
+      "area": "",
+      "severity": "기타",
+      "legal_basis": "[별표 18] 4.2.3 컴퓨터화 시스템",
+      "summary": "제조소 총람 중 컴퓨터화 시스템에 대한 내용을 확인할 수 없었음.",
+      "followup": "보완완료"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 18] 6.2 공정밸리데 이션",
+      "summary": "제조소 총람 중 공정밸리데이션에 대한 내용을 확인할 수 없었음.",
+      "followup": "보완완료"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0yBve7Ucd",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0yBve7VdX",
+   "render_order": 5,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "주)삼흥에너지",
+   "title_issue": "사후 GMP 실사 결과 등록",
+   "summary": "식품의약품안전처가 주)삼흥에너지에 대한 사후 GMP 실사 결과를 등록했다. 실사 결과에는 지적(보완)사항 구분 체계와 후속조치 원칙이 함께 제시됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0yBve7VdX"
+    },
+    {
+     "label": "제조소",
+     "value": "주)삼흥에너지"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-05-07~2026-05-07"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과 지적(보완)사항(Deficiencies) 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) 지적사항은 PIC/S 정의에 따라 중대, 중요, 기타로 구분됨 - 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 - 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 - ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획의 타당성이…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "제조소: 주)삼흥에너지 — 사후 실사 / 구분 해당없음",
+    "실사기간: 2026-05-07~2026-05-07",
+    "구분 체계: 지적사항은 PIC/S 정의에 따라 중대·중요·기타로 구분",
+    "후속: ‘중대·중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완 대상"
+   ],
+   "implication": "사후 GMP 실사 결과가 공개되면서 지적 등급에 따라 행정처분과 시정·보완으로 갈리는 체계가 그대로 적용되는 것이 확인된다. 해당 제조소를 공급자로 두고 있는 QA 는 실사결과 원문에서 지적 등급과 후속조치 현황을 확인할 필요가 있다.",
+   "checks": [
+    "실사결과 원문에서 지적 등급 및 후속조치 현황 확인",
+    "공급자 목록 내 해당 제조소의 적격성 상태 갱신"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 2,
+    "severity_summary": {
+     "기타": 2
+    },
+    "rows": [
+     {
+      "area": "품질경영",
+      "severity": "기타",
+      "legal_basis": "[별표 18] 1.1. 제조소의 연락처",
+      "summary": "제조소 총람 중 제조소 식별정보에 대한 내용을 확인할 수 없었음.",
+      "followup": "보완완료"
+     },
+     {
+      "area": "",
+      "severity": "기타",
+      "legal_basis": "[별표 17] 4.3 문서화와 관리 가.",
+      "summary": "제조소 총람 중 문서번호, 작성자 등의 정보를 확인할 수 없었음.",
+      "followup": "보완완료"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0yBve7VdX",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0rVqgoott",
+   "render_order": 6,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "엔비케이제약(주)",
+   "title_issue": "구형 시스템 데이터완전성 지적",
+   "summary": "식품의약품안전처가 엔비케이제약(주)에 대한 사후 GMP 실사 결과를 등록했다. 데이터 완전성을 보증할 수 없는 구형 시스템 관리, 자동화 장치 기록의 저장·보관 및 기능 검증, 세척 밸리데이션 검체채취 위치 선정이 지적(보완)사항으로 제시됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0rVqgoott"
+    },
+    {
+     "label": "제조소",
+     "value": "엔비케이제약(주)"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-06-09~2026-06-11"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 시설장비 기타 [별표 1] 1의2 데이터 완전성을 보증할 수 없는 구형 시스템은 위형평가를 통한 관리방안을 마련할 것 이행계획서 타당성 인정 시설장비 기타 [별표 1] 2.2 자동화 장치 등에 의한 모든 기록에 대하여 저장 및 보관하고, 해장 기능을 검증할 것 이행계획서 타당성 인정 제조 기타 [별표 1] 6.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "지적: 데이터 완전성을 보증할 수 없는 구형 시스템은 위험평가를 통한 관리방안을 마련할 것 (시설장비 분야, 근거 [별표 1] 1의2)",
+    "지적: 자동화 장치 등에 의한 모든 기록을 저장·보관하고 해당 기능을 검증할 것 (시설장비 분야, 근거 [별표 1] 2.2)",
+    "지적: 세척 밸리데이션 시 검체채취 위치를 적절히 선정할 것 (제조 분야, 근거 [별표 1] 6.4)",
+    "실사: 사후 실사 / 완제(단일), 실사기간 2026-06-09~2026-06-11 — 지적사항은 이행계획서 타당성 인정"
+   ],
+   "implication": "데이터 완전성을 보증할 수 없는 구형 시스템을 위험평가로 관리하라는 지적과 자동화 기록의 저장·기능 검증 지적이 함께 나온 것은, 설비 교체가 어려운 레거시 환경에 대해 통제 근거 문서를 요구하는 접근을 보여준다. 노후 설비를 운영하는 QA 는 해당 시스템의 위험평가와 보완 통제, 그리고 세척 밸리데이션 검체채취 위치 선정 근거가 문서로 남아 있는지 확인할 필요가 있다.",
+   "checks": [
+    "레거시 설비·시스템의 데이터 완전성 위험평가 및 보완 통제 문서",
+    "자동화 장치 기록의 저장·보관 및 해당 기능 검증 기록",
+    "세척 밸리데이션 검체채취 위치 선정 근거"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 4,
+    "severity_summary": {
+     "기타": 4
+    },
+    "rows": [
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 1의2",
+      "summary": "데이터 완전성을 보증할 수 없는 구형 시스템은 위형평가를 통한 관리방안을 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 2.2",
+      "summary": "자동화 장치 등에 의한 모든 기록에 대하여 저장 및 보관하고, 해장 기능을 검증할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 6.4",
+      "summary": "세척 밸리데이션 시 검체채취 위치를 적절히 선정할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 8.1",
+      "summary": "공정 중 시험결과에 대한 기록을 보존할 것",
+      "followup": "이행계획서 타당성 인정"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0rVqgoott",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0ru5Iua2u",
+   "render_order": 7,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "(주)애거슨바이오",
+   "title_issue": "원료 제조소 사후 실사",
+   "summary": "식품의약품안전처가 (주)애거슨바이오 원료 제조소에 대한 사후 GMP 실사 결과를 등록했다. 실사 결과에는 지적(보완)사항 구분 체계와 후속조치 원칙이 함께 제시됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0ru5Iua2u"
+    },
+    {
+     "label": "제조소",
+     "value": "(주)애거슨바이오"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-04-20~2026-04-22"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인정되는…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "제조소: (주)애거슨바이오 — 사후 실사 / 원료(단일)",
+    "실사기간: 2026-04-20~2026-04-22",
+    "구분 체계: 지적사항은 PIC/S 정의에 따라 중대·중요·기타로 작성",
+    "후속: ‘중대·중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완 대상이며 행정처분 확정 시 의약품안전나라 행정처분정보로 공개"
+   ],
+   "implication": "원료 제조소 사후 실사 결과가 공개되면서 지적 등급이 ‘중대·중요’이면 행정처분으로, ‘기타’이면 시정·보완으로 갈리는 구조가 그대로 확인된다. 원료를 공급받는 QA 는 공급자의 실사 결과와 지적 등급, 후속조치 상태를 공급자 관리 기록에 반영하고 있는지 확인할 필요가 있으며 개별 지적 상세는 실사결과 원문 확인이 필요하다.",
+   "checks": [
+    "원료 공급자 GMP 실사 결과 및 지적 등급의 공급자 관리 기록 반영",
+    "중대·중요 지적의 행정처분 연계 여부 모니터링"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 4,
+    "severity_summary": {
+     "기타": 4
+    },
+    "rows": [
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 12.4",
+      "summary": "제품과 직접 접촉하는 기구에 대해 세척밸리데이션을 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 12.6",
+      "summary": "제조설비 자동화장치의 데이터 및 점검기록 관리절차를 마련하고, 접근권한 및 보안기능을 검증할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 5",
+      "summary": "백업 데이터의 완전성, 정확성 및 복구 능력을 정기적으로 점검할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시험실",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 11.1",
+      "summary": "질소가스 품질관리 절차를 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0ru5Iua2u",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0ru5Iufs4",
+   "render_order": 8,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "지에이치(주) 응봉공장",
+   "title_issue": "품질경영 분야 기타 지적",
+   "summary": "식품의약품안전처가 지에이치(주) 응봉공장 원료 제조소에 대한 사후 GMP 실사 결과를 등록했다. 품질경영 분야에서 기타 등급의 지적(보완)사항이 제시됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0ru5Iufs4"
+    },
+    {
+     "label": "제조소",
+     "value": "지에이치(주) 응봉공장"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-04-14~2026-04-16"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 품질경영 기타 [별표 1의2] 2.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "지적: 품질경영 분야, 기타 등급 (근거 [별표 1의2] 2.)",
+    "제조소: 지에이치(주) 응봉공장 — 사후 실사 / 원료(단일)",
+    "실사기간: 2026-04-14~2026-04-16",
+    "지적 상세: 실사결과 원문 확인 필요"
+   ],
+   "implication": "원료 제조소 사후 실사에서 품질경영 분야가 지적된 것은, 원료 제조소에도 완제와 동일한 품질시스템 기준이 적용되고 있음을 보여준다. 원료 공급자를 관리하는 QA 는 품질경영 분야 지적의 이행계획과 완료 여부를 공급자 평가 주기에 반영하고 있는지 확인할 필요가 있다.",
+   "checks": [
+    "원료 공급자의 품질경영(품질시스템) 분야 지적 이행계획 확인",
+    "공급자 재평가 주기에 실사 지적 이력 반영 여부"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 8,
+    "severity_summary": {
+     "기타": 8
+    },
+    "rows": [
+     {
+      "area": "품질경영",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 2.1",
+      "summary": "‘의약품 제조업체 데이터완전성 평가지침’을 반영하여 데이터완전성에 대한 기준서를 개정할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 5",
+      "summary": "제조 설비의 교정을 실시하고, 작동 절차와 기준을 문서화할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 5",
+      "summary": "제조 설비는 번호나 코드를 부여하여 관리할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "시험실",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 5",
+      "summary": "시험 설비의 교정 및 적격성평가를 정기적으로 실시할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 5",
+      "summary": "세척한 제조 설비를 다음 사용 시까지 오염되지 않도록 관리할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 8.1",
+      "summary": "제조기록서를 상세히 기록하고, 근거자료를 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 8.1",
+      "summary": "중간체 보관 기간을 준수하여 품질이 유지되도록 관리할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "원자재",
+      "severity": "기타",
+      "legal_basis": "[별표 1의2] 4",
+      "summary": "보관소 온도 및 습도가 유지되도록 정기적으로 점검할 것",
+      "followup": "이행계획서 타당성 인정"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0ru5Iufs4",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0ru5IuiUK",
+   "render_order": 9,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "(주)티디에스팜",
+   "title_issue": "제조기록서 상세 작성 지적",
+   "summary": "식품의약품안전처가 (주)티디에스팜에 대한 사후 GMP 실사 결과를 등록했다. 제조기록서 작성의 상세성과 데이터 완전성을 보증할 수 없는 구형 시스템 관리가 지적(보완)사항으로 제시됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0ru5IuiUK"
+    },
+    {
+     "label": "제조소",
+     "value": "(주)티디에스팜"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-01-27~2026-01-29"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 분야1) 구분2) 근거 법령 지적(보완)사항 요약3) 비고 시설장비 기타 [별표 1] 2.2 데이터 완전성을 보증할 수 없는 구형 시스템은 위형평가를 통한 관리방안을 마련할 것 이행계획서 타당성 인정 제조 기타 [별표 1] 8.1 제조기록서에 실제 작업 내용을 작업 절차대로 상세히 작성할 것 이행계획서 타당성 인정 제조 기타 [별표 1] 8.",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "지적: 제조기록서에 실제 작업 내용을 작업 절차대로 상세히 작성할 것 (제조 분야, 근거 [별표 1] 8.1)",
+    "지적: 데이터 완전성을 보증할 수 없는 구형 시스템은 위험평가를 통한 관리방안을 마련할 것 (시설장비 분야, 근거 [별표 1] 2.2)",
+    "실사: 사후 실사 / 완제(단일), 실사기간 2026-01-27~2026-01-29",
+    "후속: 지적사항은 이행계획서 타당성 인정"
+   ],
+   "implication": "제조기록서에 실제 작업 내용을 절차대로 상세히 작성하라는 지적과 구형 시스템의 데이터 완전성 지적이 같은 실사에서 나온 것은, 기록의 상세성과 시스템 신뢰성을 하나의 축으로 본다는 점을 보여준다. 제조기록을 운영하는 QA 는 기록서 양식이 실제 작업 절차 순서를 반영하는지, 구형 시스템에 대한 관리방안이 마련돼 있는지 확인할 필요가 있다.",
+   "checks": [
+    "제조기록서 양식이 실제 작업 절차 순서와 상세 수준을 반영하는지 검토",
+    "구형 시스템의 데이터 완전성 위험평가 및 관리방안 수립 여부"
+   ],
+   "deterministic_detail": {
+    "type": "gmp_deficiencies",
+    "count": 3,
+    "severity_summary": {
+     "기타": 3
+    },
+    "rows": [
+     {
+      "area": "시설장비",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 2.2",
+      "summary": "데이터 완전성을 보증할 수 없는 구형 시스템은 위형평가를 통한 관리방안을 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 8.1",
+      "summary": "제조기록서에 실제 작업 내용을 작업 절차대로 상세히 작성할 것",
+      "followup": "이행계획서 타당성 인정"
+     },
+     {
+      "area": "제조",
+      "severity": "기타",
+      "legal_basis": "[별표 1] 8.1",
+      "summary": "반제품 보관기간을 설정하고, 근거를 마련할 것",
+      "followup": "이행계획서 타당성 인정"
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0ru5IuiUK",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "gmpinspect-1Q0stu63hLx",
+   "render_order": 10,
+   "group": "국내",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "GMP실사",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "GMP실사",
+   "headline_target": "(주)종근당바이오",
+   "title_issue": "지적사항 없음 원료 실사",
+   "summary": "식품의약품안전처가 (주)종근당바이오 원료 제조소에 대한 사후 GMP 실사 결과를 등록했다. 평가 결과 지적(보완)사항은 없는 것으로 기재됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "gmpinspect-1Q0stu63hLx"
+    },
+    {
+     "label": "제조소",
+     "value": "(주)종근당바이오"
+    },
+    {
+     "label": "실사기간",
+     "value": "2026-03-16~2026-03-16"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 1) GMP 감시 분야(6개): 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 2) PIC/S 정의에 따라 중대, 중요, 기타로 작성 3) 지적사항 중 ‘중대･중요’ 건은 행정처분 부과, ‘기타’ 건은 시정·보완토록 함 행정처분 부과가 확정되면 ‘의약품안전나라 행정처분정보’를 통해 공개됨 ‘중대･중요’ 지적사항은 보완 완료 후, ‘기타’ 지적사항은 이행계획 확인 후 타당성이 인…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "결과: 지적(보완)사항 없음",
+    "제조소: (주)종근당바이오 — 사후 실사 / 원료(단일)",
+    "실사기간: 2026-03-16~2026-03-16",
+    "감시 분야: 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 6개 분야"
+   ],
+   "implication": "원료 제조소 사후 실사가 지적사항 없이 종료된 결과까지 공개된 것은, 실사 결과 공개가 지적 유무와 무관하게 이뤄지고 있음을 보여준다. 원료 공급자를 평가하는 QA 는 무지적 실사 결과도 공급자 적격성 근거 자료로 수집·보관하고 있는지 확인할 필요가 있다.",
+   "checks": [
+    "무지적 실사 결과의 공급자 적격성 근거 자료 수집·보관",
+    "공급자 실사 이력의 6개 감시 분야별 관리 상태 확인"
+   ],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
+    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q0stu63hLx",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-19cf5a509b80",
+   "render_order": 11,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)동구바이오제약",
+   "title_issue": "케이스 측면부 제품명 오기",
+   "summary": "(주)동구바이오제약이 자이리스구강붕해필름20mg(타다라필)에 대해 영업자 회수를 실시한다. 제품 케이스에 기재된 제품명 오기가 회수 사유로 확인됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-19cf5a509b80"
+    },
+    {
+     "label": "업체",
+     "value": "(주)동구바이오제약"
+    },
+    {
+     "label": "제품",
+     "value": "자이리스구강붕해필름20mg(타다라필)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "제품 케이스에 기재된 제품명 오기(전면부 정상, 측면부 오기)에 따른 영업자 회수",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 제품 케이스에 기재된 제품명 오기(전면부 정상, 측면부 오기)",
+    "구분: 영업자 회수 (강제여부 N)",
+    "회수명령일자: 2026-08-26",
+    "제품: 자이리스구강붕해필름20mg(타다라필) — (주)동구바이오제약"
+   ],
+   "implication": "케이스 전면부는 정상인데 측면부 제품명만 잘못 기재된 건이 회수로 이어진 것은, 표시 오류가 한 면에만 국한돼도 시장 회수 사유가 된다는 점을 보여준다. 포장 아트워크를 관리하는 QA 는 교정·승인 단계의 대조 검증이 인쇄 전개도 전체 면을 대상으로 이뤄지는지 확인할 필요가 있다.",
+   "checks": [
+    "포장 아트워크 교정·승인 단계의 전개도 전체 면 대조 검증",
+    "포장자재 입고 검사 시 인쇄면 대조 항목의 범위"
+   ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "자진회수",
+    "item_seq": "201502273",
+    "std_cd": "8806573066601,8806573066618,8806573066625,8806573066632",
+    "bizrno": "1248533615"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "hc-82524",
+   "render_order": 12,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "Health Canada",
+   "card_type": "Recall(HC)",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "Recall",
+   "headline_target": "Twins Herbal",
+   "title_issue": "미표시 처방성분 혼입 회수",
+   "summary": "Health Canada 가 Twins Herbal Idakole 및 Twins Herbal Pelorie 액제에서 미표시 성분(undeclared substance)을 확인하고 Type I 회수를 공표했다. 표시된 성분표에 없는 처방의약품 성분(sildenafil)이 검출된 건이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "hc-82524"
+    },
+    {
+     "label": "업체",
+     "value": "Twins Herbal"
+    },
+    {
+     "label": "제품",
+     "value": "Twins Herbal Idakole and Twins Herbal Pelorie"
+    },
+    {
+     "label": "Class",
+     "value": "Type I"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Undeclared substance",
+     "translation": "미표시 성분"
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Type I",
+    "사유: 미표시 성분(Undeclared substance) — 처방의약품 성분 sildenafil",
+    "제품: Twins Herbal Idakole and Twins Herbal Pelorie (제형 Liquid)",
+    "조치: 해당 제품 사용 중단, 건강 우려 시 의료전문가 상담, 미허가 건강제품 구매·사용 금지 권고"
+   ],
+   "implication": "천연물을 표방한 제품에서 처방의약품 성분이 검출돼 최고 위해 등급인 Type I 회수로 이어진 사례로, 표시된 성분표가 아니라 실제 검출 성분이 회수 등급을 결정한다는 점이 드러난다. 생약·천연물 원료를 다루는 QA 는 공급망 단계에서 비표시 합성성분 혼입 가능성이 시험 항목으로 잡혀 있는지 확인해 둘 필요가 있다.",
+   "checks": [
+    "천연물·생약 원료 공급망의 미표시 합성성분 혼입 스크리닝 체계",
+    "확인시험 항목에 비허가 유사체 검출 방법 포함 여부"
+   ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "n/a",
+    "dosage_form": "Liquid",
+    "action": "&nbsp;Discontinue use of the affected products. Consult your healthcare provider for any health concerns.Do not buy or use unauthorized health products. Authorized health products have an eight-digit Drug Identification Number (DIN), Natural Product Number (NPN) or Homeopathic Drug Number (DIN-HM). You can also check whether products are authorized for sale by searching Health Canada's&nbsp;Drug Product Database or Licensed Natural Health Products Database.Contact the recalling firm if you have any questions about the recall.Report any health product related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints to Health Canada."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://recalls-rappels.canada.ca/sites/default/files/opendata-donneesouvertes/HCRSAMOpenData.json",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/twins-herbal-products-undeclared-prescription-drug-sildenafil",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-3d9c0716308a",
+   "render_order": 13,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)동양허브",
+   "title_issue": "산불용성회분",
+   "summary": "(주)동양허브의 동양허브목적에 대해 산불용성회분을 사유로 회수·판매중지 조치가 내려졌다. 강제 회수로 분류됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-3d9c0716308a"
+    },
+    {
+     "label": "업체",
+     "value": "(주)동양허브"
+    },
+    {
+     "label": "제품",
+     "value": "동양허브목적"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "산불용성회분",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 산불용성회분",
+    "구분: 강제 회수 (강제여부 Y)",
+    "회수명령일자: 2026-08-25",
+    "제품: 동양허브목적 — (주)동양허브"
+   ],
+   "implication": "생약 완제품에서 산불용성회분 항목 단독으로 강제 회수가 내려진 것은, 순도 관련 지표 항목이 보조 규격이 아니라 그 자체로 회수를 촉발한다는 점을 보여준다. 산불용성회분은 일반적으로 토사·이물 혼입과 연관될 수 있으므로, 생약을 취급하는 QA 는 입고 단계에서 해당 시험이 수행되는지와 공급자 관리 상태를 함께 볼 필요가 있다.",
+   "checks": [
+    "생약 원료 입고 시 산불용성회분 시험 수행 및 판정 기준",
+    "산지·수집 단계 이물 관리에 대한 공급자 평가"
+   ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200605623",
+    "std_cd": "8800672019506,8800672019513",
+    "bizrno": "2128175118"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-4324d22da4d0",
+   "render_order": 14,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)이풀잎제약",
+   "title_issue": "이산화황 사유 강제회수",
+   "summary": "(주)이풀잎제약의 이풀잎산약에 대해 이산화황을 사유로 회수·판매중지 조치가 내려졌다. 강제 회수로 분류됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-4324d22da4d0"
+    },
+    {
+     "label": "업체",
+     "value": "(주)이풀잎제약"
+    },
+    {
+     "label": "제품",
+     "value": "이풀잎산약"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "이산화황",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 이산화황",
+    "구분: 강제 회수 (강제여부 Y)",
+    "회수명령일자: 2026-08-25",
+    "제품: 이풀잎산약 — (주)이풀잎제약"
+   ],
+   "implication": "생약 제제에서 이산화황을 사유로 강제 회수가 내려진 것은, 완제품 규격만이 아니라 원료 단계에서 유입되는 잔류물질이 회수 사유로 직접 연결된다는 점을 보여준다. 이산화황은 일반적으로 생약의 건조·보관 과정에서 쓰이는 처리와 연관될 수 있으므로, QA 는 원료 공급자의 처리 이력과 입고 시 이산화황 시험 항목을 확인할 필요가 있다.",
+   "checks": [
+    "생약 원료 입고 시 이산화황 시험 항목 및 규격",
+    "공급자별 건조·보관 처리 이력 확인 절차"
+   ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200803925",
+    "std_cd": "8800660007508,8800660007515,8800660007522,8800660007539,8800660007546",
+    "bizrno": "1328195026"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-7234e78c0075",
+   "render_order": 15,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "영천약초도매시장주식회사",
+   "title_issue": "성상 부적합",
+   "summary": "영천약초도매시장주식회사의 영천약초도매시장택사에 대해 성상 부적합을 사유로 회수·판매중지 조치가 내려졌다. 강제 회수로 분류됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-7234e78c0075"
+    },
+    {
+     "label": "업체",
+     "value": "영천약초도매시장주식회사"
+    },
+    {
+     "label": "제품",
+     "value": "영천약초도매시장택사"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "성상 부적합",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 성상 부적합",
+    "구분: 강제 회수 (강제여부 Y)",
+    "회수명령일자: 2026-08-25",
+    "제품: 영천약초도매시장택사 — 영천약초도매시장주식회사"
+   ],
+   "implication": "성상 부적합만으로 강제 회수가 내려진 사례로, 관능·외관 규격이 보조 항목이 아니라 단독 회수 사유가 된다는 점이 드러난다. 생약을 취급하는 QA 는 성상 판정 기준과 판정자 훈련·판정 기록이 규격서와 일치하게 운영되는지 확인할 필요가 있다.",
+   "checks": [
+    "생약 성상 판정 기준의 규격서 일치 여부",
+    "성상 판정자 훈련 및 판정 기록의 보존"
+   ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "201503443",
+    "std_cd": "8800651003205,8800651003212,8800651003229,8800651003236,8800651003243,8800651003250",
+    "bizrno": "3538100034"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-ba062a1b15d5",
+   "render_order": 16,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)현진제약",
+   "title_issue": "잔류농약(뷰프로페진) 검출",
+   "summary": "(주)현진제약의 현진구기자에 대해 잔류농약(뷰프로페진)을 사유로 회수·판매중지 조치가 내려졌다. 강제 회수로 분류됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-ba062a1b15d5"
+    },
+    {
+     "label": "업체",
+     "value": "(주)현진제약"
+    },
+    {
+     "label": "제품",
+     "value": "현진구기자"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "잔류농약(뷰프로페진)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 잔류농약(뷰프로페진)",
+    "구분: 강제 회수 (강제여부 Y)",
+    "회수명령일자: 2026-08-25",
+    "제품: 현진구기자 — (주)현진제약"
+   ],
+   "implication": "생약 완제품에서 잔류농약 성분명을 특정해 강제 회수가 내려진 것은, 잔류농약 관리가 총량 개념을 넘어 개별 성분 단위로 좁혀지고 있음을 보여준다. 생약 원료를 취급하는 QA 는 공급자별 재배 이력과 개별 농약 성분에 대한 시험 범위가 규격을 충족하는지 확인할 필요가 있다.",
+   "checks": [
+    "생약 원료의 개별 잔류농약 성분 시험 범위와 규격 일치 여부",
+    "공급자 재배·수집 이력 확보 및 검증 절차"
+   ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200504474",
+    "std_cd": "8800648002501,8800648002518,8800648002525,8800648002532,8800648002549,8800648002556",
+    "bizrno": "2048189192"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "recall-dddc35f13616",
+   "render_order": 17,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "MFDS",
+   "card_type": "회수·판매중지",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "회수",
+   "headline_target": "(주)현진제약",
+   "title_issue": "중금속(카드뮴) 검출",
+   "summary": "(주)현진제약의 현진목단피에 대해 중금속(카드뮴)을 사유로 회수·판매중지 조치가 내려졌다. 강제 회수로 분류됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "recall-dddc35f13616"
+    },
+    {
+     "label": "업체",
+     "value": "(주)현진제약"
+    },
+    {
+     "label": "제품",
+     "value": "현진목단피"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "중금속(카드뮴)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "사유: 중금속(카드뮴)",
+    "구분: 강제 회수 (강제여부 Y)",
+    "회수명령일자: 2026-08-25",
+    "제품: 현진목단피 — (주)현진제약"
+   ],
+   "implication": "중금속 항목 중 카드뮴을 특정해 강제 회수가 내려진 것은, 중금속 규격이 총량이 아니라 개별 원소 단위로 관리·적용되고 있음을 보여준다. 카드뮴은 일반적으로 재배 토양과 연관될 수 있으므로, 생약 원료를 취급하는 QA 는 산지별 중금속 시험 이력과 공급자 관리 기준을 확인할 필요가 있다.",
+   "checks": [
+    "생약 원료의 개별 중금속 원소별 시험 항목과 규격",
+    "산지별 원료 이력 관리 및 공급자 재평가 주기"
+   ],
+   "deterministic_detail": {
+    "type": "mfds_recall_detail",
+    "enforcement": "회수명령 (강제)",
+    "item_seq": "200504564",
+    "std_cd": "8800648010209,8800648010216,8800648010223,8800648010230,8800648010247,8800648010254",
+    "bizrno": "2048189192"
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04/getMdcinRtrvlSleStpgelList03?serviceKey=***REDACTED***&pageNo=1&numOfRows=100&type=json",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAI01",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "hc-82536",
+   "render_order": 18,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "Health Canada",
+   "card_type": "Recall(HC)",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Apotex Inc.",
+   "title_issue": "주입기 용량 표시 오류",
+   "summary": "Health Canada 가 Apotex Inc. 의 Apo-Semaglutide 주사제에 대해 제품 품질(Product quality) 사유로 Type II 회수를 공표했다. 용량 표시 오류(Incorrect dose display)가 확인된 건이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-27"
+    },
+    {
+     "label": "문서번호",
+     "value": "hc-82536"
+    },
+    {
+     "label": "업체",
+     "value": "Apotex Inc."
+    },
+    {
+     "label": "제품",
+     "value": "Apo-Semaglutide"
+    },
+    {
+     "label": "Class",
+     "value": "Type II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Product quality",
+     "translation": "제품 품질"
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Type II",
+    "사유: Product quality — 용량 표시 오류(Incorrect dose display)",
+    "제품: Apo-Semaglutide, Semaglutide 0.68 mg/ml, 제형 Solution",
+    "조치: 해당 제품 영향 여부 확인, 사용 중단 전 의료전문가 상담 권고"
+   ],
+   "implication": "주사제의 용량 표시 오류가 제품 품질 사유의 Type II 회수로 처리된 것은, 디바이스가 결합된 제품에서 표시부 결함이 곧 품질 결함으로 다뤄진다는 점을 보여준다. 주입기 결합 제품을 다루는 QA 는 표시부 검사 항목이 완제품 출하 검사에 포함돼 있는지 확인할 필요가 있다.",
+   "checks": [
+    "디바이스 결합 제품의 용량 표시부 검사 항목과 합격 기준",
+    "조립·표시 공정의 디자인 검증과 출하 검사 연계"
+   ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Semaglutide 0.68 mg/ml",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://recalls-rappels.canada.ca/sites/default/files/opendata-donneesouvertes/HCRSAMOpenData.json",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/apo-semaglutide-injection-incorrect-dose-display",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "hc-82537",
+   "render_order": 19,
+   "group": "Recall",
+   "group_label": null,
+   "agency": "Health Canada",
+   "card_type": "Recall(HC)",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "Recall",
+   "headline_target": "Dr. Reddy's Laboratories Canada Inc",
+   "title_issue": "유연물질 기준일탈(OOS)",
+   "summary": "Health Canada 가 Dr. Reddy's Laboratories Canada Inc 의 Semaglutide Injection 에 대해 제품 품질(Product quality) 사유로 Type II 회수를 공표했다. 불순물 관련 기준일탈(Out-of-Specification)이 확인된 건이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-26"
+    },
+    {
+     "label": "문서번호",
+     "value": "hc-82537"
+    },
+    {
+     "label": "업체",
+     "value": "Dr. Reddy's Laboratories Canada Inc"
+    },
+    {
+     "label": "제품",
+     "value": "Semaglutide Injection"
+    },
+    {
+     "label": "Class",
+     "value": "Type II"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "Product quality",
+     "translation": "제품 품질"
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "등급: Type II",
+    "사유: Product quality — 기준일탈(Out-of-Specification, Impurity)",
+    "제품: Semaglutide Injection, Semaglutide 1.34 mg/ml, 제형 Solution",
+    "조치: 해당 제품 영향 여부 확인, 사용 중단 전 의료전문가 상담 권고"
+   ],
+   "implication": "펩타이드 주사제에서 불순물 기준일탈이 제품 품질 사유의 Type II 회수로 이어진 것은, 출하 이후 확인되는 규격 이탈까지 시장 회수로 연결되는 흐름을 보여준다. 펩타이드 제제를 다루는 QA 는 유연물질 규격 설정 근거와 함께, 안정성 시험 중 기준일탈 발생 시 이미 출하된 배치까지 검토하는 절차가 있는지 확인할 필요가 있다.",
+   "checks": [
+    "펩타이드 주사제의 유연물질 규격 설정 근거와 안정성 시험 계획",
+    "OOS 조사 절차와 기출하 배치 영향평가 연계"
+   ],
+   "deterministic_detail": {
+    "type": "hc_recall_detail",
+    "ingredient": "Semaglutide 1.34 mg/ml",
+    "dosage_form": "Solution",
+    "action": "Verify if your product is affected.Consult your healthcare provider prior to discontinuing use of the affected product, or for any health concerns.Contact the recalling firm if you have any questions about the recall.Report any health product&nbsp;related&nbsp;side effects&nbsp;to Health Canada.Report any other health product safety&nbsp;complaints&nbsp;to&nbsp;Health Canada."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://recalls-rappels.canada.ca/sites/default/files/opendata-donneesouvertes/HCRSAMOpenData.json",
+    "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/semaglutide-injection-out-specification-impurity",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  }
+ ]
+}

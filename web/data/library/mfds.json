@@ -806,6 +806,22 @@
       "doc_type": "guidance-industry",
       "published_date": "2026-08-27",
       "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15923"
+    },
+    {
+      "id": "data0010-15293",
+      "title_en": "우선심사 대상 의약품 지정 검토서 작성기준",
+      "title_ko": "우선심사 대상 의약품 지정 검토서 작성기준",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-08-31",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15293"
+    },
+    {
+      "id": "data0010-15291",
+      "title_en": "의약품 품목별 사전 GMP 평가 업무수행 편람",
+      "title_ko": "의약품 품목별 사전 GMP 평가 업무수행 편람",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-08-31",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15291"
     }
   ]
 }

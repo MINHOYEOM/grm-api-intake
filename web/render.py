@@ -2001,6 +2001,43 @@ def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> 
             f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
 
 
+_DOC_INSPECTOR_LIMIT = 3
+
+
+def doc_inspector_line(doc: dict[str, Any]) -> str:
+    """문서 상세 '실사관' 행 표시 문자열 — 최대 3명 평문 표기 + 초과분 "외 N명".
+
+    [실사관 표기 · 정적 문서 페이지 2026-08-31] `_sanitize_inspector_names()` 로 먼저
+    방어 정제한다(리스트가 아니면 무시·비문자열/공백 원소 제거·strip·6개 절단) —
+    `findings_docs_refresh._collect_inspector_names()` 는 문서 단위로 순서보존 중복
+    제거만 하고 값 자체는 정제하지 않으므로(그 함수 주석 참조), 정제는 표시 직전인
+    여기 한 곳에서만 일어난다(FDA483 카드 경로 `_card_view()`와 동일 원칙 — 이중 정제
+    금지). 6개 상한 안에서 다시 3개만 보이고 나머지는 "외 N명"으로 뭉친다 — 두 상한이
+    겹치는 만큼 6명을 넘는 실사관은 정확한 초과 인원이 아니라 절삭된 하한값을 보일 수
+    있으나, 그 상한은 이미 카드·검색 화면에서도 조용히 적용되는 기존 방어선이다.
+
+    ★코호트(문서 5건 이상 서명한 실사관) 여부와 무관하게 **전원 평문**이다. 코호트는
+    `findings_inspector_index` RPC 가 정하는 런타임 개념이라, 커밋된 JSON 만 보는 정적
+    빌드가 이를 재현하면 코호트 정의가 RPC 판정과 정적 스냅샷 두 곳으로 갈라진다
+    (드리프트) — 갈라진 채로 프로필 링크를 걸면 존재하지 않는 프로파일("없음" 페이지)로
+    사용자를 보내는 경우가 생긴다. 그래서 정적 페이지는 **사실(누가 서명했다)만** 싣고,
+    프로파일로 가는 링크는 코호트를 아는 동적 층(검색 카드 findings.js buildDocHead())이
+    계속 담당한다 — 이 함수는 링크를 만들지 않는다.
+
+    값이 없으면 빈 문자열 — 호출부(findings_doc.html)가 행 자체를 렌더하지 않는다
+    (빈 라벨 금지).
+    """
+    names = _sanitize_inspector_names(doc.get("inspector_names"))
+    if not names:
+        return ""
+    shown = names[:_DOC_INSPECTOR_LIMIT]
+    extra = len(names) - len(shown)
+    line = " · ".join(shown)
+    if extra > 0:
+        line += f" 외 {extra}명"
+    return line
+
+
 def combo_description(combo: dict[str, Any]) -> str:
     """분류 × 기관 조합 페이지의 meta description — 데이터에서 조립(문구 생성 0).
 
@@ -3358,6 +3395,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 제목은 슬러그별로 유일해야 한다 — 겹치면 검색 결과에서 서로 구분되지 않는다.
         doc_titles = build_doc_page_titles(documents)
 
+        # [실사관 프로파일 문서목록 멤버십 2026-08-31] 실사관 프로파일 페이지(런타임
+        # RPC 화면)가 "이 실사관이 서명한 문서" 목록에서 정적 문서 페이지(findings/doc/
+        # {slug}/)로 링크하려면, 그 페이지가 **실제로 존재하는지** 먼저 알아야 한다 —
+        # 정적 페이지는 두께 임계(apply_thickness_gate, 문서당 지적 3건 등)를 넘긴
+        # 문서만 있어서, 확인 없이 링크하면 그 중 일부가 404 다(실측 약 16%). `documents`
+        # 는 이미 그 게이트를 통과한 것들이므로, inspector_names 를 가진 문서의
+        # document_id 를 사전순으로 나열하면 그대로 "존재 증명" 멤버십 집합이 된다.
+        # ★렌더 스위치(render_doc_pages)와 무관하게 항상 쓴다 — sitemap·목록·색인과 같은
+        # 이유다: 이 값은 documents 데이터에서만 파생하고 개별 HTML 3천 장을 실제로
+        # 찍어내는 비용(약 27초)과 무관하므로, 테스트 빌드에서 스위치로 꺼도 이 파일은
+        # 프로덕션과 같아야 한다(꺼진 채로 빠지면 멤버십 검사가 프로덕션과 달라진다).
+        inspector_doc_ids = sorted(
+            d["document_id"] for d in documents if d.get("inspector_names"))
+        _write_json(dist_assets / "inspector-doc-pages.json", {
+            "schema": "grm-inspector-doc-pages/v1",
+            "document_ids": inspector_doc_ids,
+        })
+        written.append("assets/inspector-doc-pages.json")
+
         # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 용어 정본이 없으면 조용히 꺼진다.
         term_link_index = build_doc_term_link_index(glossary_terms) if glossary_terms else []
         term_doc_freq = (build_doc_term_doc_freq(term_link_index, documents)
@@ -3555,6 +3611,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     ("규제기관별", "findings/agency/"), (doc["firm_name"], "")]),
                 doc=doc, agency_labels=doc_agency_labels,
                 source_label=doc_source_label(doc),
+                # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
+                # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
+                inspector_line=doc_inspector_line(doc),
                 related_categories=related, same_firm=same_firm,
                 finding_bodies=finding_bodies,
                 # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),

@@ -112,6 +112,42 @@ def _safe_slug(doc_id: str) -> "str | None":
 _DATE_OK = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+def _collect_inspector_names(doc: dict[str, Any]) -> list[str]:
+    """[실사관 표기 · 문서 페이지 2026-08-31] 문서의 여러 finding 행에 흩어진
+    `inspector_names`(jsonb 배열 — 036 마이그레이션이 `findings_search` RPC 의 finding[]
+    투영에 실은 컬럼)를 문서 단위로 모은다.
+
+    같은 실사관이 여러 지적 행에 반복해서 실리므로(FDA 483 은 관찰마다 서명자 배열을
+    되풀이해 담는다) **등장 순서를 보존한 채 중복만 제거**한다.
+
+    ★정제(비문자열 방어·공백 제거·strip·개수 상한)는 **여기서 하지 않는다** — 카드
+    경로(FDA483 관찰 카드)의 선례를 따른다: card_scaffold 는 raw.fda483_inspectors 를
+    무변형으로 옮기고(수집기=무변형 producer), `web/render.py` 의 `_sanitize_inspector_names`
+    가 표시 직전 딱 한 곳에서 방어적으로 정제한다. 이 스크립트도 같은 계약을 따라 수집
+    단계에서는 원값을 그대로 모으기만 하고(중복 제거는 정제가 아니라 문서 단위로 접는
+    구조적 조작이라 producer 층에서 해도 안전), 정제는 `web/render.py` 의
+    `doc_inspector_line()` 이 표시 직전에 한 번만 한다 — 두 곳에서 정제하면 계약이
+    갈라질 위험만 커진다(findings.js sanitizeInspectorNames() 와의 3자 계약 동일성이
+    이미 주석으로 명시돼 있다)."""
+    seen: list[str] = []
+    seen_set: set[str] = set()
+    for f in doc.get("findings") or []:
+        names = f.get("inspector_names")
+        # ★list 가 아니면 건너뛴다(단순 truthy 검사가 아니다) — `for name in "a string"`
+        # 은 문자열을 한 글자씩 순회해 각 글자가 isinstance(str) 을 통과하므로, 값이
+        # 문자열 하나로 잘못 들어와도 "정제 없음" 원칙과 무관하게 글자 단위 오염이
+        # 생긴다. 이건 정제(내용 판단)가 아니라 자료형 방어라 producer 층에서 해도 된다.
+        if not isinstance(names, list):
+            continue
+        for name in names:
+            if not isinstance(name, str):
+                continue
+            if name not in seen_set:
+                seen_set.add(name)
+                seen.append(name)
+    return seen
+
+
 def post_search(base_url: str, anon_key: str, payload: dict[str, Any],
                 *, timeout: int = 120) -> dict[str, Any]:
     resp = requests.post(
@@ -176,7 +212,7 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
         if label and label not in seen:
             seen.append(label)
 
-    return {
+    view: dict[str, Any] = {
         "document_id": doc_id,
         "slug": slug,
         "agency": doc.get("agency") or "",
@@ -198,6 +234,15 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
         "categories": seen,
         "findings": findings,
     }
+    # [실사관 표기 · 문서 페이지 2026-08-31] 있을 때만 키를 싣는다 — 빈 배열을 넣으면
+    # 기존 레코드(FDA 483 이 아닌 대다수)가 전부 `"inspector_names": []`를 새로 얻어
+    # 바이트가 흔들린다(기존 레코드 바이트 불변이 목적). 정제는 여기서 하지 않는다
+    # (_collect_inspector_names 주석 참조 — 표시 직전 render.doc_inspector_line() 이
+    # 유일한 정제 지점).
+    inspector_names = _collect_inspector_names(doc)
+    if inspector_names:
+        view["inspector_names"] = inspector_names
+    return view
 
 
 def apply_thickness_gate(docs: list[dict[str, Any]], *, min_findings: int,

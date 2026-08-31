@@ -32,6 +32,11 @@
   .fd-src a{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;color:var(--on-coral);background:var(--coral);border-radius:var(--rad-s);padding:11px 20px;text-decoration:none}
   .fd-src a:hover{background:var(--coral-2)}
   .fd-src span{font-family:var(--sans);font-size:13px;color:var(--muted);word-break:keep-all}
+  /* [실사관 표기 2026-08-31] 기존 사실 행(fd-meta 칩)과 같은 자리 — 코호트 링크는
+     동적 층(findings.js)의 몫이라 여기는 <a> 없이 평문+보조문구만 낸다. */
+  .fd-insp{margin-top:12px;font-family:var(--sans);font-size:13.5px;color:var(--body);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;word-break:keep-all}
+  .fd-insp b{font-weight:500;color:var(--ink)}
+  .fd-insp span{font-size:12.5px;color:var(--muted)}
   .fd-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
   .fd-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
   .fd-list{display:flex;flex-direction:column;gap:14px;margin-top:16px}
@@ -72,6 +77,15 @@
       <span class="fd-chip">지적 {{ doc.findings | length }}건</span>
       {%- for c in doc.categories %}<span class="fd-chip">{{ c }}</span>{% endfor %}
     </p>
+    {#- [실사관 표기 2026-08-31] 값이 있을 때만 렌더한다(빈 라벨 금지). 코호트(문서
+        5건 이상) 여부와 무관하게 전원 평문 — 코호트는 findings_inspector_index RPC 가
+        정하는 런타임 개념이라 정적 빌드가 재현하면 정의가 갈라진다(드리프트). 갈라진
+        링크는 존재하지 않는 프로파일로 보내므로, 프로파일 진입 링크는 코호트를 아는
+        동적 층(검색 카드 findings.js buildDocHead())에게 남겨 둔다. 순위·비교·엄격도
+        뉘앙스 어휘는 037 정책상 금지 — 사실 표기 한 줄뿐이다. -#}
+    {%- if inspector_line %}
+    <p class="fd-insp">실사관 <b>{{ inspector_line }}</b><span>공개 문서에 서명한 실사관입니다.</span></p>
+    {%- endif %}
     <p class="fd-src">
       <a href="{{ doc.evidence_url }}" target="_blank" rel="noopener">규제기관 공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
       <span>판단의 근거는 언제나 원문입니다.</span>

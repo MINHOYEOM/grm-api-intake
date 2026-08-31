@@ -28,9 +28,15 @@ if str(ROOT) not in sys.path:
 import findings_docs_refresh as fdr  # noqa: E402
 
 
-def _finding(fid="f1", text_ko="지적 본문입니다.", label="일탈/CAPA/조사"):
-    return {"finding_id": fid, "finding_text_ko": text_ko,
-            "category_code": "deviation_capa", "category_label_ko": label}
+def _finding(fid="f1", text_ko="지적 본문입니다.", label="일탈/CAPA/조사",
+            inspector_names=None):
+    d = {"finding_id": fid, "finding_text_ko": text_ko,
+        "category_code": "deviation_capa", "category_label_ko": label}
+    # 실 RPC(036 마이그레이션)는 이 키를 finding 마다 싣는다 — 실측처럼 기본은 부재(키
+    # 자체가 없는 것)로 두고, 검사가 필요할 때만 명시로 채운다(빈 배열과 부재를 구분).
+    if inspector_names is not None:
+        d["inspector_names"] = inspector_names
+    return d
 
 
 def _doc(doc_id="abc123", n=3, **kw):
@@ -149,6 +155,66 @@ class DocumentViewGateTest(unittest.TestCase):
                            _finding("b", label="일탈/CAPA/조사"),
                            _finding("c", label="설비/시설")]
         self.assertEqual(self._view(doc)["categories"], ["설비/시설", "일탈/CAPA/조사"])
+
+    # ── [실사관 표기 · 문서 페이지 2026-08-31] document_view() 배선 ─────────────
+    def test_inspector_names_key_present_when_collected(self):
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", inspector_names=["Jose F Velez"])]
+        self.assertEqual(self._view(doc)["inspector_names"], ["Jose F Velez"])
+
+    def test_inspector_names_key_absent_when_no_finding_has_any(self):
+        """빈 배열을 넣지 않는다 — 기존 레코드(대다수) 바이트가 흔들리면 안 된다."""
+        view = self._view(_doc())
+        self.assertNotIn("inspector_names", view)
+
+    def test_inspector_names_deduped_across_findings_in_document_view(self):
+        doc = _doc(n=0)
+        doc["findings"] = [
+            _finding("a", inspector_names=["Jose F Velez", "Ivis L Negron Torres"]),
+            _finding("b", inspector_names=["Ivis L Negron Torres"]),
+        ]
+        self.assertEqual(self._view(doc)["inspector_names"],
+                         ["Jose F Velez", "Ivis L Negron Torres"])
+
+
+class InspectorNamesCollectionTest(unittest.TestCase):
+    """_collect_inspector_names() 단위 테스트 — 문서 단위로 순서보존 중복 제거만
+    한다. 정제(비문자열 방어·공백/strip·개수 상한)는 표시 직전(web/render.py 의
+    doc_inspector_line())에서 한 번만 한다(이 함수 docstring 참조 — 이중 정제 금지)."""
+
+    def test_dedupes_preserving_first_appearance_order(self):
+        doc = _doc(n=0)
+        doc["findings"] = [
+            _finding("a", inspector_names=["Jose F Velez", "Ivis L Negron Torres"]),
+            _finding("b", inspector_names=["Ivis L Negron Torres", "Jose F Velez"]),
+            _finding("c", inspector_names=["A New Name"]),
+        ]
+        self.assertEqual(fdr._collect_inspector_names(doc),
+                         ["Jose F Velez", "Ivis L Negron Torres", "A New Name"])
+
+    def test_missing_key_on_every_finding_yields_empty_list(self):
+        self.assertEqual(fdr._collect_inspector_names(_doc()), [])
+
+    def test_non_string_elements_are_dropped_but_not_stripped(self):
+        """정제는 하지 않는다 — 공백뿐인 문자열도 원값 그대로 살아남는다(비문자열만 거른다)."""
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", inspector_names=[None, 7, "  ", "Kept Name"])]
+        self.assertEqual(fdr._collect_inspector_names(doc), ["  ", "Kept Name"])
+
+    def test_non_list_value_on_a_finding_is_ignored_not_iterated_as_characters(self):
+        """★자료형 방어 — 문자열이 들어오면(배열이 아님) 글자 단위로 순회하지 않는다.
+
+        `f.get("inspector_names") or []` 만 썼다면 진리값이 참인 문자열은 `or` 로
+        걸러지지 않고 그대로 순회 대상이 되어 한 글자짜리 "이름"들이 새어 나간다."""
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", inspector_names="Jose F Velez"),
+                           _finding("b", inspector_names=["Kept Name"])]
+        self.assertEqual(fdr._collect_inspector_names(doc), ["Kept Name"])
+
+    def test_finding_without_the_key_does_not_break_others(self):
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a"), _finding("b", inspector_names=["X"])]
+        self.assertEqual(fdr._collect_inspector_names(doc), ["X"])
 
 
 class CollectDocumentsTest(unittest.TestCase):

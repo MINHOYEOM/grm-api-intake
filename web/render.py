@@ -1242,6 +1242,20 @@ def _glossary_alias_norm(s: str) -> str:
     return re.sub(r"[-\s]+", "", s.lower())
 
 
+def _glossary_case_count(case: "dict[str, Any] | None") -> int:
+    """glossary_cases 항목 → 사례 건수(정수). 없거나 깨졌거나 음수면 0 = 표시 생략.
+
+    용어 자신의 사례 수와 `related` 칩에 붙는 수가 **같은 규칙**을 쓰게 하려고 함수로
+    뽑았다 — 두 곳이 각자 파싱하면 한쪽만 고쳐질 때 같은 용어가 화면 두 곳에서 다른
+    숫자를 갖는다.
+    """
+    try:
+        n = int((case or {}).get("findings") or 0)
+    except (TypeError, ValueError):
+        return 0
+    return n if n > 0 else 0
+
+
 def build_glossary_view(
     terms: list[dict[str, Any]],
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
@@ -1276,8 +1290,17 @@ def build_glossary_view(
     cases = cases or {}
 
     def _term_view(t: dict[str, Any]) -> dict[str, Any]:
-        related = [{"id": r, "term_ko": label_by_id[r]}
-                   for r in (t.get("related") or []) if r in label_by_id]
+        # [C2] 관련 용어 칩에 그 용어의 사례 건수를 병기한다. ★순서는 손대지 않는다 —
+        # related 는 사람이 고른 목록이고 그 순서가 정본이다(사례 있는 것을 위로 올리면
+        # 큐레이션을 코드가 덮어쓴다). 사례가 있다는 **사실만** 덧붙여, 정의만 있는
+        # 용어에 착지한 방문자가 실제 지적사례가 있는 쪽으로 갈 수 있게 한다.
+        def _related_view(rid: str) -> "dict[str, Any]":
+            n = _glossary_case_count(cases.get(rid))
+            return {"id": rid, "term_ko": label_by_id[rid],
+                    "case_count_label": f"{n:,}" if n else ""}
+
+        related = [_related_view(r) for r in (t.get("related") or [])
+                   if r in label_by_id]
         reg_refs = [v for v in (_reg_ref_view(r, reg_ref_catalogs) for r in (t.get("reg_refs") or [])) if v]
         search_parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
         detail_ko = t.get("detail_ko") or ""
@@ -1295,12 +1318,7 @@ def build_glossary_view(
                             and _glossary_alias_norm(a) not in norm_en]
         case = cases.get(t["id"]) or {}
         case_q = str(case.get("q") or "")
-        try:
-            case_findings = int(case.get("findings") or 0)
-        except (TypeError, ValueError):
-            case_findings = 0
-        if case_findings < 0:
-            case_findings = 0
+        case_findings = _glossary_case_count(case)
         return {
             "id": t["id"],
             "term_ko": t["term_ko"],

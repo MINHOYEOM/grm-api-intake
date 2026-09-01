@@ -31,6 +31,7 @@
   .gt-links{display:flex;flex-wrap:wrap;gap:8px}
   .gt-links a,.gt-links span{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
   .gt-links a:hover{border-color:var(--coral);color:var(--coral)}
+  .gt-rel-n{color:var(--muted);font-size:12px;margin-left:5px}
   .gt-src a{font-family:var(--sans);font-size:14px;color:var(--body);text-decoration:none;border-bottom:1px solid var(--line-2);word-break:break-word}
   .gt-src a:hover{color:var(--coral)}
   .gt-case-lede{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:0 0 14px;word-break:keep-all}
@@ -82,7 +83,7 @@
     <section class="gt-sec">
       <h2 class="gt-sec-h">함께 보면 좋은 용어</h2>
       <div class="gt-links">
-        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.term_ko }}</a>{% endfor %}
+        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.term_ko }}{% if r.case_count_label %}<span class="gt-rel-n">사례 {{ r.case_count_label }}건</span>{% endif %}</a>{% endfor %}
       </div>
     </section>
     {% endif %}

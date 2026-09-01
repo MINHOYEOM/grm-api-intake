@@ -13428,6 +13428,93 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         self.assertIn("크롤러가 섞여 실사용 지표로 쓰지 않습니다", self.admin_html)
 
 
+class WebGlossaryRelatedCaseCountTest(unittest.TestCase):
+    """[C2] `함께 보면 좋은 용어` 칩의 사례 건수 병기.
+
+    왜: 검색 유입이 홈이 아니라 용어 낱개 페이지로 착지한다(실측 — 어제 상위 착지 2개가
+    모두 용어 페이지였고 둘 다 사례가 **없는** 용어였다). 사례 없는 용어는 정의만 주고
+    끝나므로, 방문자가 우리 고유 자산(실제 지적 문장)이 있는 쪽으로 건너갈 다리가 필요하다.
+
+    ★고치지 않는 것: `related` 의 **순서**. 사람이 고른 목록이고 그 순서가 정본이라,
+    사례 있는 것을 위로 올리면 코드가 큐레이션을 덮어쓴다. 사실(건수)만 덧붙인다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cls.cases = render.load_glossary_cases()
+        cls.view = render.build_glossary_view(cls.terms, None, cls.cases)
+        cls.by_id = {t["id"]: t for g in cls.view["groups"] for t in g["terms"]}
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glrel_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_related_order_is_untouched(self):
+        """순서 계약 — 뷰의 related 순서 = 정본 순서(존재하는 id 만 남긴 뒤)."""
+        checked = 0
+        for t in self.terms:
+            want = [r for r in (t.get("related") or []) if r in self.by_id]
+            got = [r["id"] for r in self.by_id[t["id"]]["related"]]
+            self.assertEqual(got, want, f"related 순서가 바뀌었다: {t['id']}")
+            checked += len(want)
+        self.assertGreater(checked, 0, "related 를 가진 용어가 0 — 검사 대상 자체가 없다")
+
+    def test_count_matches_that_terms_own_count(self):
+        """한 용어가 화면 두 곳에서 다른 숫자를 갖지 않는다 —
+        관련 칩의 건수 = 그 용어 상세의 case_count_label."""
+        labeled = 0
+        for tid, tv in self.by_id.items():
+            for r in tv["related"]:
+                self.assertEqual(r["case_count_label"],
+                                 self.by_id[r["id"]]["case_count_label"],
+                                 f"{tid} → {r['id']} 건수 불일치")
+                if r["case_count_label"]:
+                    labeled += 1
+        self.assertGreater(labeled, 0, "건수가 붙은 관련 용어가 0 — 가산이 발화하지 않았다")
+
+    def test_no_count_where_there_are_no_cases(self):
+        """사례가 없는 용어에는 숫자를 지어내지 않는다(빈 문자열 → 템플릿이 조용히 생략)."""
+        excluded = {e["id"] for e in (self.cases_raw().get("excluded") or [])}
+        self.assertGreater(len(excluded), 0, "excluded 0 — 검사 대상 없음")
+        seen = 0
+        for tv in self.by_id.values():
+            for r in tv["related"]:
+                if r["id"] in excluded:
+                    self.assertEqual(r["case_count_label"], "",
+                                     f"사례 없는 용어에 건수를 붙였다: {r['id']}")
+                    seen += 1
+        self.assertGreater(seen, 0, "excluded 용어를 related 로 가진 용어가 0 — 비공허 실패")
+
+    def cases_raw(self):
+        return json.loads(render.GLOSSARY_CASES_FILE.read_text(encoding="utf-8"))
+
+    def test_case_less_page_gets_a_bridge(self):
+        """이 변경의 목적 — 사례가 **없는** 용어 페이지에도 사례 있는 이웃으로 가는
+        다리가 실제로 렌더된다. 목적이 달성됐는지를 라이브 산출물로 확인한다."""
+        excluded = {e["id"] for e in (self.cases_raw().get("excluded") or [])}
+        bridged = []
+        for tid in excluded:
+            tv = self.by_id.get(tid)
+            if tv and any(r["case_count_label"] for r in tv["related"]):
+                bridged.append(tid)
+        self.assertGreater(len(bridged), 0,
+                           "사례 없는 용어 중 사례 있는 이웃을 가진 것이 0 — 다리가 안 놓인다")
+        page = (self.single / "glossary" / bridged[0] / "index.html").read_text(encoding="utf-8")
+        self.assertIn('class="gt-rel-n"', page)
+        self.assertRegex(page, r'<span class="gt-rel-n">사례 [0-9,]+건</span>')
+
+    def test_index_page_ignores_the_new_key(self):
+        """순수 가산 증명 — 색인(glossary/index.html)은 새 키를 읽지 않으므로
+        골든이 그대로다. 색인 골든은 별도 골든 테스트가 byte 로 잠근다."""
+        index = (self.single / "glossary" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("gt-rel-n", index)
+        self.assertNotIn("사례 1,", index)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

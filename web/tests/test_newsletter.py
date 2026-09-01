@@ -62,12 +62,38 @@ class NewsletterTeaserTest(unittest.TestCase):
         cls.t = newsletter.build_teaser(cls.brief, site_base_url=BASE, issue_no=2)
         cls.html = cls.t["html"]
 
-    def test_subject_date_issue_no_weekday(self):
-        # 발행일 기반(요일 없음 — web JSON 에 weekday 없음·산술 금지 클래스 차단). 2026-07-01
-        # 카피 톤 개편으로 "제N호" 표기 제거(주차 표기로 대체 표현).
-        self.assertEqual(self.t["subject"],
-                         "[GRM 규제뉴스] 2026년 6월 4주차 (2026-06-26 발행)")
+    def test_subject_is_headline(self):
+        """[포맷 실험 2026-09] 제목 = 그 주 헤드라인(tldr[0], 60자 초과 시 말줄임).
+
+        종전 주차형("{N}주차 ({날짜} 발행)")은 매주 제목이 같아 정보가 0 이었다 —
+        실측(공지형 오픈 5/클릭 25 vs 브리프형 오픈 1/클릭 0)에 따라 공지형 제목을
+        이식했다. 요일 표기 금지(산술 금지 클래스)는 그대로 유지."""
+        tldr0 = self.brief["brief"]["tldr"][0]
+        self.assertGreater(len(tldr0), newsletter.SUBJECT_HEADLINE_MAX)  # 픽스처가 절단 경로를 태운다
+        self.assertEqual(
+            self.t["subject"],
+            "[GRM 규제뉴스] " + tldr0[:newsletter.SUBJECT_HEADLINE_MAX - 1].rstrip() + "…")
+        self.assertNotIn("주차", self.t["subject"])
         self.assertNotRegex(self.t["subject"], r"(월|화|수|목|금|토|일)요일")
+
+    def test_subject_short_headline_no_ellipsis(self):
+        t = newsletter.build_teaser(_minimal("2026-06-01", tldr=["짧은 헤드라인"]),
+                                    site_base_url=BASE, issue_no=1)
+        self.assertEqual(t["subject"], "[GRM 규제뉴스] 짧은 헤드라인")
+
+    def test_subject_falls_back_to_dateform_without_tldr(self):
+        # tldr 없는 호(합성·과거분)는 종전 주차형 유지 — 빈 헤드라인 제목 차단.
+        t = newsletter.build_teaser(_minimal("2026-06-01"), site_base_url=BASE, issue_no=1)
+        self.assertEqual(t["subject"], "[GRM 규제뉴스] 2026년 6월 1주차 (2026-06-01 발행)")
+
+    def test_tldr_rest_rendered_as_linked_blocks(self):
+        """[포맷 실험 2026-09] tldr[0] 은 h1 제목, 나머지는 항목마다 "자세히 보기 →" 링크가
+        달린 블록(announce 항목 골격 이식). 링크 대상은 우리 브리프 페이지뿐(무변형)."""
+        rest = self.brief["brief"]["tldr"][1:]
+        self.assertTrue(rest)
+        self.assertEqual(self.html.count("자세히 보기 →"), len(rest))
+        # 링크 없는 <ul> 불릿(옛 형식)으로의 회귀 차단.
+        self.assertNotIn("<li", self.html.split("주제별 바로가기")[0])
 
     def test_title_is_tldr0(self):
         self.assertIn(self.brief["brief"]["tldr"][0], self.html)            # 제목 = tldr[0]

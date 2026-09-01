@@ -166,6 +166,33 @@ def render_library_block(update: dict[str, Any], *, site_base_url: str) -> str:
 _WRAP = ("font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',"
          "Arial,'Apple SD Gothic Neo','Malgun Gothic',sans-serif")
 
+# ── 포맷 실험(2026-09) — 공지형 제목·항목 블록 ────────────────────────────────
+# 실측 근거: 브리프형 No.9(08-18) 오픈 1·클릭 0 vs 공지형 서비스 안내(08-12) 오픈 5·
+# 클릭 25. 공지형이 이긴 두 장치를 주간호에 이식한다 —
+#   ① 제목: 매주 똑같던 "{N}주차 ({날짜} 발행)" 대신 그 주의 헤드라인(tldr[0] verbatim,
+#      60자 초과 시 말줄임). tldr 없는 호는 종전 주차형 폴백(결정론 유지).
+#   ② 핵심 항목: 링크 없는 <ul> 불릿 대신 항목마다 "자세히 보기 →" 링크가 달린 블록
+#      (announce.build_announcement 항목 골격과 동형·링크는 우리 브리프 페이지뿐).
+# 판정: 3개 호(오픈·클릭을 Brevo 캠페인 통계로 비교) 뒤 유지/revert 결정. 되돌릴 땐
+# 이 실험 커밋 revert 하나로 충분하다(멱등 캠페인명은 제목과 무관해 불변).
+SUBJECT_HEADLINE_MAX = 60
+
+
+def teaser_subject(brief_meta: dict[str, Any]) -> str:
+    """주간호 제목 — 헤드라인형(포맷 실험). 순수·결정론.
+
+    tldr[0] 이 있으면 그 문장(60자 초과 시 앞 59자 + …)을, 없으면 종전 주차형을 쓴다.
+    발행일 표기는 제목에서 뺀다 — 모바일 수신함 절단선(~40자) 안에 헤드라인이 들어가야
+    하고, 날짜는 본문 첫 줄에 이미 있다."""
+    pub = brief_meta.get("publish_date", "")
+    tldr = [t for t in (brief_meta.get("tldr") or []) if t]
+    if not tldr:
+        return f"[GRM 규제뉴스] {render.title_dateform(pub)} ({pub} 발행)"
+    head = tldr[0]
+    if len(head) > SUBJECT_HEADLINE_MAX:
+        head = head[:SUBJECT_HEADLINE_MAX - 1].rstrip() + "…"
+    return f"[GRM 규제뉴스] {head}"
+
 
 def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int,
                  unsubscribe_html: str = "", updates_html: str = "",
@@ -187,7 +214,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
     tldr = [t for t in (bm.get("tldr") or []) if t]
     base = site_base_url.rstrip("/")
     brief_url = brief_anchor_href(base, pub)
-    subject = f"[GRM 규제뉴스] {dateform} ({pub} 발행)"
+    subject = teaser_subject(bm)
 
     e = _html.escape
     parts: list[str] = [
@@ -204,13 +231,21 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         f'<div style="font-size:13px;color:#6C6A64;margin-bottom:22px">'
         f'{e(dateform)} · 발행 {e(pub)}</div>',
     ]
-    if tldr:
+    # 핵심 항목 블록(포맷 실험 ②) — tldr[0] 은 이미 h1 제목이므로 나머지를 항목 블록으로.
+    # 항목 골격은 announce 의 것과 동형(경계선 + 문장 + 링크)이되, 딥링크 대상이 브리프
+    # 페이지 하나뿐이므로 링크도 그 페이지다(무변형 계약: tldr verbatim·우리 링크만).
+    rest = tldr[1:]
+    if rest:
         parts.append('<div style="font-size:13px;font-weight:600;color:#A14B30;'
-                     'margin-bottom:8px">이번 주 핵심</div>')
-        parts.append('<ul style="margin:0 0 24px;padding-left:20px;color:#141413">')
-        for t in tldr:
-            parts.append(f'<li style="margin:8px 0">{e(t)}</li>')
-        parts.append("</ul>")
+                     'margin-bottom:4px">이번 주 핵심</div>')
+        for t in rest:
+            parts.append(
+                '<div style="border-top:1px solid #E6DFD8;padding:14px 0">'
+                f'<div style="font-size:15px;line-height:1.65;color:#141413;'
+                f'margin-bottom:8px">{e(t)}</div>'
+                f'<a href="{e(brief_url)}" style="color:#A14B30;text-decoration:none;'
+                'font-size:14px;font-weight:600">자세히 보기 →</a></div>')
+        parts.append('<div style="margin:0 0 10px"></div>')
     # 1차 CTA — 이번 호 전체(웹 브리프).
     parts.append(
         f'<div style="margin:0 0 24px"><a href="{e(brief_url)}" '

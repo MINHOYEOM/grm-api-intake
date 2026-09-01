@@ -278,7 +278,8 @@
     health: { supabase: null, github: null, brevo: null },
     backendProbe: null,
     publishPr: null,
-    growth: null
+    growth: null,
+    rum: null
   };
 
   if (!window.supabase || !window.supabase.createClient || !supabaseUrl || !anonKey) {
@@ -535,6 +536,79 @@
       renderSystemChecks([{ name: "Brevo API", ok: false, detail: errText(error) }]);
     });
   }
+  // RUM(방문·유입) — 072 rum_daily / rum_referrer_daily. Cloudflare 대시보드를 열지
+  // 않고도 "어제 몇 명 왔고 어디서 왔나"를 한국어로 보게 하는 층.
+  // ★분류는 화면이 한다 — 수집기는 리퍼러 호스트를 원문 그대로 넣고(사실), 어느 묶음에
+  // 넣을지는 여기서 정한다. 서버가 미리 뭉치면 나중에 새 채널이 생겼을 때 과거를 다시
+  // 못 가른다.
+  // ★순서가 판정이다 — 먼저 걸리는 규칙이 이긴다. AI 를 구글보다 앞에 두는 이유는
+  // gemini.google.com 이 구글 규칙(`.google.`)에도 걸리기 때문이다. 검색 유입과 AI 유입은
+  // 성격이 다른 채널이라 한쪽으로 뭉치면 둘 다 잘못 읽힌다.
+  var RUM_REFERRER_GROUPS = [
+    { key: "ai", label: "AI 검색", match: function (h) {
+        return /(^|\.)(chatgpt\.com|openai\.com|perplexity\.ai|gemini\.google\.com|claude\.ai|copilot\.microsoft\.com)$/.test(h);
+      } },
+    { key: "google", label: "구글", match: function (h) { return /(^|\.)google\./.test(h); } },
+    { key: "naver", label: "네이버", match: function (h) { return /(^|\.)naver\.com$/.test(h); } },
+    { key: "direct", label: "직접 방문", match: function (h) { return !h || h === "(direct)"; } }
+  ];
+  function rumGroupOf(host) {
+    var h = String(host || "").toLowerCase();
+    for (var i = 0; i < RUM_REFERRER_GROUPS.length; i++) {
+      if (RUM_REFERRER_GROUPS[i].match(h)) return RUM_REFERRER_GROUPS[i].key;
+    }
+    return "other";
+  }
+  function loadRum() {
+    var days = GROWTH_SNAPSHOT_DAYS;
+    return Promise.all([
+      state.client.from("rum_daily").select("snap_date,metric,value")
+        .order("snap_date", { ascending: false }).limit(days * 2),
+      state.client.from("rum_referrer_daily").select("snap_date,referer_host,visits")
+        .order("snap_date", { ascending: false }).limit(days * 25)
+    ]).then(function (res) {
+      if (res[0].error) throw res[0].error;
+      if (res[1].error) throw res[1].error;
+      var byDate = {};
+      (res[0].data || []).forEach(function (r) {
+        (byDate[r.snap_date] = byDate[r.snap_date] || {})[r.metric] = r.value || 0;
+      });
+      var refs = {};
+      (res[1].data || []).forEach(function (r) {
+        var d = (refs[r.snap_date] = refs[r.snap_date] || {});
+        var g = rumGroupOf(r.referer_host);
+        d[g] = (d[g] || 0) + (r.visits || 0);
+      });
+      state.rum = { byDate: byDate, refs: refs };
+      renderRum();
+    }).catch(function (error) {
+      state.rum = null;
+      renderRum(errText(error) || "방문 데이터를 불러오지 못했습니다.");
+    });
+  }
+  function renderRum(errorMessage) {
+    var host = byId("grm-rum-daily");
+    if (!host) return;
+    if (errorMessage || !state.rum) {
+      host.innerHTML = emptyRow(7, errorMessage || "데이터 없음");
+      return;
+    }
+    var byDate = state.rum.byDate || {};
+    var dates = Object.keys(byDate).sort().reverse().slice(0, GROWTH_SNAPSHOT_DAYS);
+    if (!dates.length) {
+      host.innerHTML = emptyRow(7, "아직 수집된 방문 데이터가 없습니다(첫 동기화 대기).");
+      return;
+    }
+    host.innerHTML = dates.map(function (d) {
+      var m = byDate[d] || {};
+      var r = (state.rum.refs || {})[d] || {};
+      return "<tr><td>" + esc(d) + "</td><td><b>" + number(m.visits || 0) + "</b></td><td>" +
+        number(m.page_views || 0) + "</td><td>" + number(r.google || 0) + "</td><td>" +
+        number(r.naver || 0) + "</td><td>" + number(r.ai || 0) + "</td><td>" +
+        number(r.direct || 0) + "</td></tr>";
+    }).join("");
+  }
+
   // 성장·유입 패널 — 깔때기 어휘는 060/071 CHECK 와 동일해야 한다(테스트가 대조).
   var FUNNEL_KEYS = ["band_view", "band_submit", "cta_view", "cta_submit", "cta_dismiss"];
   var GROWTH_SNAPSHOT_DAYS = 15;
@@ -713,7 +787,7 @@
     }
   }
   function refreshAll() {
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
       renderSystemChecks();
     });
   }
@@ -1356,7 +1430,9 @@
   byId("grm-refresh-all").addEventListener("click", refreshAll);
   byId("grm-system-refresh").addEventListener("click", refreshAll);
   byId("grm-subscribers-refresh").addEventListener("click", loadSubscribers);
-  byId("grm-growth-refresh").addEventListener("click", loadGrowth);
+  byId("grm-growth-refresh").addEventListener("click", function () {
+    loadGrowth(); loadRum();
+  });
   byId("grm-users-refresh").addEventListener("click", loadUsersOnly);
   byId("grm-feedback-refresh").addEventListener("click", loadFeedbackOnly);
   byId("grm-feedback-filter").addEventListener("input", renderFeedback);

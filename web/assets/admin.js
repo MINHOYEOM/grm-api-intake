@@ -277,7 +277,8 @@
     checks: [],
     health: { supabase: null, github: null, brevo: null },
     backendProbe: null,
-    publishPr: null
+    publishPr: null,
+    growth: null
   };
 
   if (!window.supabase || !window.supabase.createClient || !supabaseUrl || !anonKey) {
@@ -534,6 +535,92 @@
       renderSystemChecks([{ name: "Brevo API", ok: false, detail: errText(error) }]);
     });
   }
+  // 성장·유입 패널 — 깔때기 어휘는 060/071 CHECK 와 동일해야 한다(테스트가 대조).
+  var FUNNEL_KEYS = ["band_view", "band_submit", "cta_view", "cta_submit", "cta_dismiss"];
+  var GROWTH_SNAPSHOT_DAYS = 15;
+  function kstToday() {
+    // KST 는 DST 가 없어 고정 +9h 산술이 안전하다.
+    return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+  }
+  function loadGrowth() {
+    // 읽기 전용 select 둘 뿐 — 스냅샷 쓰기는 DB cron(funnel_snapshot)만 한다.
+    return Promise.all([
+      state.client.from("funnel_counts").select("key,total"),
+      state.client.from("funnel_counts_daily").select("snap_date,key,total")
+        .order("snap_date", { ascending: false }).limit(FUNNEL_KEYS.length * (GROWTH_SNAPSHOT_DAYS + 1))
+    ]).then(function (res) {
+      if (res[0].error) throw res[0].error;
+      if (res[1].error) throw res[1].error;
+      var totals = {};
+      (res[0].data || []).forEach(function (r) { totals[r.key] = r.total || 0; });
+      var byDate = {};
+      (res[1].data || []).forEach(function (r) {
+        (byDate[r.snap_date] = byDate[r.snap_date] || {})[r.key] = r.total || 0;
+      });
+      state.growth = { totals: totals, byDate: byDate };
+      renderGrowth();
+    }).catch(function (error) {
+      state.growth = null;
+      renderGrowth(errText(error) || "깔때기 데이터를 불러오지 못했습니다.");
+    });
+  }
+  function growthDelta(cur, prev) {
+    var row = {};
+    FUNNEL_KEYS.forEach(function (k) {
+      row[k] = Math.max(0, ((cur && cur[k]) || 0) - ((prev && prev[k]) || 0));
+    });
+    row.submits = row.band_submit + row.cta_submit;
+    row.views = row.band_view + row.cta_view;
+    return row;
+  }
+  function growthRate(subs, views) {
+    if (!views) return "-";
+    return (subs * 100 / views).toFixed(2) + "%";
+  }
+  function renderGrowth(errorMessage) {
+    var kpiHost = byId("grm-growth-kpis");
+    var tableHost = byId("grm-growth-daily");
+    if (!kpiHost || !tableHost) return;
+    if (errorMessage || !state.growth) {
+      kpiHost.innerHTML = '<div class="admin-metric"><span><i class="ti ti-alert-triangle"></i>성장 지표</span><b class="bad">오류</b><p>' +
+        esc(errorMessage || "데이터 없음") + "</p></div>";
+      tableHost.innerHTML = emptyRow(7, errorMessage || "데이터 없음");
+      return;
+    }
+    var totals = state.growth.totals || {};
+    var byDate = state.growth.byDate || {};
+    var dates = Object.keys(byDate).sort();
+    var rows = [];
+    for (var i = 1; i < dates.length; i++) {
+      var gapDays = Math.round((Date.parse(dates[i]) - Date.parse(dates[i - 1])) / 86400000);
+      rows.push({
+        label: dates[i] + (gapDays > 1 ? " (" + gapDays + "일치)" : ""),
+        delta: growthDelta(byDate[dates[i]], byDate[dates[i - 1]])
+      });
+    }
+    var last = dates.length ? byDate[dates[dates.length - 1]] : null;
+    var todayLabel = !dates.length ? "누적 (첫 스냅샷 대기)"
+      : dates[dates.length - 1] === kstToday() ? "오늘 (스냅샷 이후)" : "오늘 (진행 중)";
+    var todayDelta = growthDelta(totals, last);
+    rows.push({ label: todayLabel, delta: todayDelta, today: true });
+    rows.reverse();
+    tableHost.innerHTML = rows.slice(0, GROWTH_SNAPSHOT_DAYS).map(function (r) {
+      var d = r.delta;
+      return "<tr" + (r.today ? ' style="background:var(--soft)"' : "") + "><td>" + esc(r.label) + "</td><td>" +
+        number(d.band_view) + "</td><td>" + number(d.band_submit) + "</td><td>" + number(d.cta_view) + "</td><td>" +
+        number(d.cta_submit) + "</td><td>" + number(d.cta_dismiss) + "</td><td><b>" + number(d.submits) + "</b></td></tr>";
+    }).join("");
+    var week = rows.slice(0, Math.min(rows.length, 8));
+    var weekSubs = 0, weekViews = 0;
+    week.forEach(function (r) { weekSubs += r.delta.submits; weekViews += r.delta.views; });
+    var totalSubs = (totals.band_submit || 0) + (totals.cta_submit || 0);
+    kpiHost.innerHTML =
+      '<div class="admin-metric"><span><i class="ti ti-user-plus"></i>오늘 구독 제출</span><b class="' + (todayDelta.submits > 0 ? "ok" : "") + '">' +
+        number(todayDelta.submits) + "</b><p>밴드 " + number(todayDelta.band_submit) + " · CTA " + number(todayDelta.cta_submit) + "</p></div>" +
+      '<div class="admin-metric"><span><i class="ti ti-calendar-week"></i>최근 7일 제출</span><b>' + number(weekSubs) + "</b><p>오늘 포함 스냅샷 기준</p></div>" +
+      '<div class="admin-metric"><span><i class="ti ti-eye"></i>최근 7일 노출</span><b>' + number(weekViews) + "</b><p>JS 실행 크롤러 포함 가능 — 참고용</p></div>" +
+      '<div class="admin-metric"><span><i class="ti ti-percentage"></i>7일 노출→제출</span><b>' + growthRate(weekSubs, weekViews) + "</b><p>누적 제출 " + number(totalSubs) + "건</p></div>";
+  }
   function loadRuns() {
     return api("admin-github?action=ops").then(function (data) {
       state.ops = data;
@@ -626,7 +713,7 @@
     }
   }
   function refreshAll() {
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
       renderSystemChecks();
     });
   }
@@ -1269,6 +1356,7 @@
   byId("grm-refresh-all").addEventListener("click", refreshAll);
   byId("grm-system-refresh").addEventListener("click", refreshAll);
   byId("grm-subscribers-refresh").addEventListener("click", loadSubscribers);
+  byId("grm-growth-refresh").addEventListener("click", loadGrowth);
   byId("grm-users-refresh").addEventListener("click", loadUsersOnly);
   byId("grm-feedback-refresh").addEventListener("click", loadFeedbackOnly);
   byId("grm-feedback-filter").addEventListener("input", renderFeedback);

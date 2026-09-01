@@ -13358,6 +13358,76 @@ class WebProfileInterpretationTest(unittest.TestCase):
             self.assertNotIn(word, self.insp, word)
 
 
+class WebAdminGrowthPanelTest(unittest.TestCase):
+    """/admin 성장·유입 패널 + 깔때기 일별 스냅샷(071) 계약.
+
+    ① 어휘 동기화 — admin.js FUNNEL_KEYS = 060 CHECK = 071 CHECK. 한쪽만 늘리면
+       스냅샷/판독이 조용히 어긋난다(061 FEEDBACK_STATUS 대조와 동형).
+    ② 스냅샷 쓰기 경로는 DB cron 뿐 — funnel_snapshot 은 클라이언트 실행 권한이 없고,
+       admin.js 는 두 테이블을 select 로만 읽는다.
+    ③ 외부 계기는 RUM(봇 제외)을 정본으로 안내 — 존(zone) 지표는 크롤러가 섞여
+       실사용 지표로 쓰지 않는다는 경고가 화면에 남아 있어야 한다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.admin_js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+        cls.admin_html = (WEB_DIR / "templates" / "admin.html").read_text(encoding="utf-8")
+        cls.mig060 = (WEB_DIR / "migrations" /
+                      "060_subscribe_funnel_counts.sql").read_text(encoding="utf-8")
+        cls.mig071 = (WEB_DIR / "migrations" /
+                      "071_funnel_counts_daily.sql").read_text(encoding="utf-8")
+
+    def _check_keys(self, sql):
+        m = re.search(r"key in \(([^)]*)\)", sql)
+        self.assertIsNotNone(m, "CHECK 의 key 화이트리스트 미발견")
+        return set(re.findall(r"'([a-z_]+)'", m.group(1)))
+
+    def test_funnel_vocabulary_synced_three_ways(self):
+        expected = {"band_view", "band_submit", "cta_view", "cta_submit", "cta_dismiss"}
+        self.assertEqual(self._check_keys(self.mig060), expected, "060 CHECK 어휘")
+        self.assertEqual(self._check_keys(self.mig071), expected, "071 CHECK 어휘")
+        block = self.admin_js.split("var FUNNEL_KEYS = [", 1)[1].split("];", 1)[0]
+        client = set(re.findall(r'"([a-z_]+)"', block))
+        self.assertEqual(client, expected, "admin.js FUNNEL_KEYS 가 060/071 CHECK 와 다름")
+
+    def test_panel_wired(self):
+        for needle in ('data-tab="growth"', 'data-panel="growth"', 'id="grm-growth-kpis"',
+                       'id="grm-growth-daily"', 'id="grm-growth-refresh"'):
+            self.assertIn(needle, self.admin_html)
+        self.assertIn("loadGrowth", self.admin_js)
+        # refreshAll 에 실려야 전체 새로고침·최초 로드에서 함께 갱신된다.
+        refresh_all = self.admin_js.split("function refreshAll", 1)[1].split("}", 1)[0]
+        self.assertIn("loadGrowth()", refresh_all)
+        self.assertIn('byId("grm-growth-refresh").addEventListener("click", loadGrowth)',
+                      self.admin_js)
+
+    def test_snapshot_write_path_is_cron_only(self):
+        self.assertIn("enable row level security", self.mig071)
+        self.assertIn("grant select on public.funnel_counts_daily to anon, authenticated",
+                      self.mig071)
+        self.assertIn("revoke all on function public.funnel_snapshot() from anon", self.mig071)
+        self.assertIn("revoke all on function public.funnel_snapshot() from authenticated",
+                      self.mig071)
+        self.assertNotIn("grant execute on function public.funnel_snapshot", self.mig071)
+        self.assertIn("cron.schedule('grm-funnel-snapshot-daily', '55 14 * * *'", self.mig071)
+        # 클라이언트는 select 뿐 — insert/upsert/스냅샷 RPC 호출이 있으면 계약 위반.
+        self.assertIn('from("funnel_counts").select(', self.admin_js)
+        self.assertIn('from("funnel_counts_daily").select(', self.admin_js)
+        for banned in ('from("funnel_counts").insert', 'from("funnel_counts_daily").insert',
+                       'from("funnel_counts_daily").upsert', 'rpc("funnel_snapshot"'):
+            self.assertNotIn(banned, self.admin_js)
+
+    def test_external_gauges_point_to_rum(self):
+        # RUM 링크는 봇 제외 필터를 물고 있어야 한다 — 존 지표로의 회귀 방지.
+        self.assertIn("web-analytics/overview/visits?siteTag~in=", self.admin_html)
+        self.assertIn("excludeBots=Yes", self.admin_html)
+        self.assertIn("search.google.com/search-console", self.admin_html)
+        self.assertIn("searchadvisor.naver.com", self.admin_html)
+        self.assertIn("app.brevo.com", self.admin_html)
+        self.assertIn("크롤러가 섞여 실사용 지표로 쓰지 않습니다", self.admin_html)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

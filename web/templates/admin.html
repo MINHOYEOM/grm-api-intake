@@ -228,6 +228,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
       <nav class="admin-nav" id="grm-admin-tabs">
         <span class="admin-nav-label">매주 월요일</span>
         <button type="button" class="on" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>운영센터</button>
+        <span class="admin-nav-label">매일 확인</span>
+        <button type="button" data-tab="growth"><i class="ti ti-trending-up"></i>성장·유입</button>
         <span class="admin-nav-label">서비스 관리</span>
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
@@ -389,6 +391,49 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </div>
           </details>
           <div class="admin-status" id="grm-ops-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="growth" hidden>
+          <div class="admin-panel-head">
+            <div><h2>성장 · 유입</h2><p class="sub">구독 깔때기의 일별 흐름입니다. 노출(view)은 JS를 실행하는 크롤러가 섞일 수 있어 참고용이고, 제출(submit)이 실제 전환입니다. 방문·유입 경로는 아래 외부 계기에서 확인하세요.</p></div>
+            <button class="btn" type="button" id="grm-growth-refresh"><i class="ti ti-refresh"></i>새로고침</button>
+          </div>
+          <div class="admin-ops-summary" id="grm-growth-kpis">
+            <div class="admin-metric"><span><i class="ti ti-loader-2"></i>불러오는 중</span><b>-</b></div>
+          </div>
+          <div class="admin-monitor-section">
+            <h3>일별 깔때기 — 스냅샷 차분</h3>
+            <p class="admin-section-sub">매일 23:55(KST)에 누적 카운터를 동결해 전일 스냅샷과의 차이를 계산합니다. '오늘' 행은 마지막 스냅샷 이후의 진행분입니다.</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>날짜</th><th>밴드 노출</th><th>밴드 제출</th><th>CTA 노출</th><th>CTA 제출</th><th>CTA 닫기</th><th>제출 합계</th></tr></thead>
+                <tbody id="grm-growth-daily"><tr><td colspan="7"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
+            <h3>외부 계기 바로가기</h3>
+            <p class="admin-section-sub">방문·유입 경로의 정본은 Cloudflare Web Analytics(RUM·봇 제외)입니다. Cloudflare 존(Overview)의 방문자 수는 크롤러가 섞여 실사용 지표로 쓰지 않습니다.</p>
+            <div class="admin-actions-grid">
+              <div class="admin-op">
+                <div><h3><i class="ti ti-chart-line"></i>Cloudflare RUM</h3><p>실방문·페이지뷰·유입 리퍼러·경로(봇 제외). 30일 창으로 열립니다.</p></div>
+                <a class="btn" target="_blank" rel="noopener" href="https://dash.cloudflare.com/f8a15e3902ceb00a390635c040a2f551/web-analytics/overview/visits?siteTag~in=aa495e04c95449028591a30d7e0f87b4&amp;excludeBots=Yes&amp;time-window=43200">열기</a>
+              </div>
+              <div class="admin-op">
+                <div><h3><i class="ti ti-brand-google"></i>Search Console</h3><p>구글 노출·클릭·CTR·검색어. 검색 유입 성장의 정본.</p></div>
+                <a class="btn" target="_blank" rel="noopener" href="https://search.google.com/search-console/performance/search-analytics?resource_id=https%3A%2F%2Fgrm-solutions.com%2F">열기</a>
+              </div>
+              <div class="admin-op">
+                <div><h3><i class="ti ti-search"></i>네이버 서치어드바이저</h3><p>네이버 색인·노출·클릭.</p></div>
+                <a class="btn" target="_blank" rel="noopener" href="https://searchadvisor.naver.com/console">열기</a>
+              </div>
+              <div class="admin-op">
+                <div><h3><i class="ti ti-mail"></i>Brevo 구독자</h3><p>뉴스레터 구독자 리스트(구독자 수의 정본은 Brevo에만 있습니다).</p></div>
+                <a class="btn" target="_blank" rel="noopener" href="https://app.brevo.com/contact/list-listing">열기</a>
+              </div>
+            </div>
+          </div>
+          <div class="admin-status" id="grm-growth-status" role="status" aria-live="polite"></div>
         </section>
 
         <section class="admin-panel" data-panel="newsletter" hidden>

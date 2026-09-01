@@ -110,7 +110,28 @@
 .arc-lib-tag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:4px;padding:2px 6px;margin-right:6px;white-space:nowrap}
 .arc-lib-more{color:var(--muted)!important;font-weight:500}
 @media (max-width:640px){ .arc-lib{padding:12px 14px 11px} .arc-lib-sum{flex-basis:100%} }
+/* [CLS 예약 2026-09-01] 검색창·필터 패널·토글 바는 archive.js 가 인덱스 fetch 성공 후
+   body.js-search 로 노출한다(상단 주석 계약). display:none → block 공개가 첫 화면 안의
+   결과 목록(#results 래퍼)을 실측 419px(데스크톱)~833px(모바일 375px) 밀어내 RUM CLS
+   Poor 의 아카이브 축이었다(신고 요소 body.js-search>main>div.wrap). 세 컨트롤을
+   visibility 로만 숨겨 처음부터 자리를 차지하게 한다 — searchbar·bar 는 제 높이 그대로
+   정확 예약이 되고, facet 칩이 런타임 주입되는 panel 만 실측 스테어케이스 min-height 로
+   예약한다(1265/785/640/375px → 243/443/494/647 · 칩 수가 늘면 잔차만 남는다 — Good 범위).
+   grm.css(디자인 프리즈)의 display:none 은 같은 특이도라 소스 순서(이 블록이 뒤)로 이긴다.
+   폴백 2종: JS 미실행은 아래 noscript 가 종전 모습(컨트롤 0·정적 호 목록만)으로 되돌리고,
+   fetch 실패는 archive.js 가 body.js-search-off 를 세워 예약을 걷는다(실패 시에만 한 번
+   움직인다 — #740 이 수용한 희귀 경로 트레이드오프와 동형). */
+.searchbar,.panel{display:block;visibility:hidden}
+.bar{display:flex;visibility:hidden}
+body.js-search .searchbar,body.js-search .panel,body.js-search .bar{visibility:visible}
+.panel{min-height:243px}
+@media (max-width:860px){.panel{min-height:443px}}
+@media (max-width:700px){.panel{min-height:494px}}
+@media (max-width:430px){.panel{min-height:647px}}
+body.js-search .panel{min-height:0}
+body.js-search-off .searchbar,body.js-search-off .panel,body.js-search-off .bar{display:none}
 </style>
+<noscript><style>.searchbar,.panel,.bar{display:none}</style></noscript>
 <style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
 <style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
 <footer class="site"><div class="wrap">
@@ -164,7 +185,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e2a1d586" defer></script>
-<script src="/assets/archive.js?v=2c499bbb" defer></script>
+<script src="/assets/archive.js?v=af738d51" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

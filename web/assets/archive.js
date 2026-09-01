@@ -368,6 +368,8 @@
       render(); // #static-issues 를 동적 결과로 치환(무필터 = 동일 모습)
     })
     .catch(function () {
-      /* graceful: 정적 호 목록(#static-issues) 그대로 둔다. */
+      /* graceful: 정적 호 목록(#static-issues) 그대로 둔다. CLS 예약(archive.html 스코프
+         스타일)이 잡아 둔 검색 UI 자리는 여기서 걷는다 — 실패 시에만 한 번 움직인다. */
+      document.body.classList.add("js-search-off");
     });
 })();

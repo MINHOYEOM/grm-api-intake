@@ -283,8 +283,17 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fnd-count{flex:1 0 100%;margin-top:6px}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
-.fnd-state-error{color:var(--coral-2)}#fnd-loading,#fnd-error{min-height:max(240px,calc(100vh - 400px))}
-.fnd-results{display:flex;flex-direction:column;gap:14px}
+.fnd-state-error{color:var(--coral-2)}#fnd-loading,#fnd-error{min-height:max(240px,calc(100vh - 400px))}.wrap:has(#fnd-loading:not([hidden])) #fnd-dash[hidden],
+.wrap:has(#fnd-error:not([hidden])) #fnd-dash[hidden]{display:block;visibility:hidden;min-height:430px}
+#fnd-coverage-note[hidden]{display:block;visibility:hidden;min-height:69px}
+@media (max-width:860px){
+  .wrap:has(#fnd-loading:not([hidden])) #fnd-dash[hidden],
+  .wrap:has(#fnd-error:not([hidden])) #fnd-dash[hidden]{min-height:779px}
+}
+@media (max-width:700px){
+  .wrap:has(#fnd-loading:not([hidden])) #fnd-dash[hidden],
+  .wrap:has(#fnd-error:not([hidden])) #fnd-dash[hidden]{min-height:229px}
+}.fnd-results{display:flex;flex-direction:column;gap:14px}
 /* [문서 중심 열람] 문서 카드 — 기존 .fnd-card 스타일 계열(보더/라운드/배경) 재사용,
    내부에 소속 observation 카드(.fnd-card, 무변경)를 그대로 담는다. */
 .fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}
@@ -372,6 +381,10 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   /* 최소 터치영역 32px 유지(모바일 접근성) — 기존 30px 에서 상향. */
   .fnd-pager-btn{min-width:32px;height:32px;padding:0 8px;font-size:12.5px}
   .fnd-pager-status{height:32px}
+  /* [CLS 예약] 대시보드·커버리지 노트 ≤480px 단 — 본체·근거는 위 .fnd-state 예약 주석. */
+  .wrap:has(#fnd-loading:not([hidden])) #fnd-dash[hidden],
+  .wrap:has(#fnd-error:not([hidden])) #fnd-dash[hidden]{min-height:311px}
+  #fnd-coverage-note[hidden]{min-height:94px}
 }
 </style>
 <section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">

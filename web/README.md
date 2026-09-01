@@ -119,8 +119,10 @@ routine(사람 실행 Claude)이 만든 grm-web-card/v1 JSON 을 `web/data/brief
 - **인덱스 href 는 아카이브 페이지(깊이 1) 기준 상대경로**(`../briefs/{date}/index.html#{id}`).
   검색은 spec 상 아카이브에만 얹으므로 단일 산출물에 접두를 고정한다.
 - **progressive enhancement / graceful**: 서버가 `#static-issues`(호 목록)를 항상 렌더 = baseline.
-  검색창·필터·토글은 기본 `display:none`, `archive.js` 가 인덱스 fetch **성공 시에만** `body.js-search`
-  로 노출하고 `#results` 를 동적 치환한다. JS 미지원/fetch 실패 → 정적 목록 그대로(열람 가능).
+  검색창·필터·토글은 기본 **`visibility:hidden` 으로 자리만 예약**(CLS — display 공개가 결과 목록을
+  실측 419~833px 밀어냈다), `archive.js` 가 인덱스 fetch **성공 시에만** `body.js-search` 로 노출하고
+  `#results` 를 동적 치환한다. JS 미실행 → `<noscript>` 가 컨트롤을 `display:none` 으로 걷어 정적
+  목록 그대로(열람 가능), fetch 실패 → `body.js-search-off` 로 예약을 걷는다(archive.html 스코프 스타일).
 - **검색 동작은 비골든**(spec §1.5). 골든 = `search-index*.expected.json`(byte) + 정적 마크업.
   검색 로직 검증 = `WebSearchIndexTest`(구조·무변형·facet·정렬·앵커 href↔id 일치) + 결정론(2× 빌드 동일).
 - **XSS**: 인덱스 값은 `archive.js` 의 `esc()`(`& < > " '`)로 텍스트·속성 모두 이스케이프 후 삽입.

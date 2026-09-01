@@ -2560,6 +2560,29 @@
     errorEl.hidden = false;
   }
 
+  // [CLS 예약 2026-09-01] 부 데이터(008 히트맵·038 zone·042 조항)는 주 데이터보다 늦게
+  // 도착해 자기 블록을 un-hide 하며 아래 콘텐츠(AI 고지·구독밴드·푸터)를 화면 안에서
+  // 밀어냈다(트렌드 면 042 블록 데스크톱 실측 981px — RUM 신고 요소 section.subscribe 의
+  // 트렌드 축). 로딩 해제(revealContent)를 부 데이터 **정착(성공·실패 무관) 뒤**로 미뤄
+  // 모든 블록이 한 프레임에 열리게 한다 — fetch 발사는 종전과 동일하게 병렬이라 추가
+  // 대기는 응답 시차뿐이고, 실패 반경도 불변(부 데이터 실패는 자기 블록 hidden 유지).
+  // 부 데이터가 hang 하면 5초 캡이 강제 해제한다 — 그때 늦게 도착한 블록은 종전처럼
+  // 늦게 열린다(안전 후퇴: 스켈레톤 영구화보다 이동 한 번이 낫다).
+  var sidePending = 0, sideWaiters = [], sideCapTimer = null;
+  function sideBegin() { sidePending += 1; }
+  function sideFlush() { sideWaiters.splice(0).forEach(function (fn) { fn(); }); }
+  function sideEnd() {
+    if (sidePending > 0) sidePending -= 1;
+    if (sidePending === 0) sideFlush();
+  }
+  function afterSide(fn) {
+    if (sidePending === 0) { fn(); return; }
+    sideWaiters.push(fn);
+    if (!sideCapTimer) {
+      sideCapTimer = setTimeout(function () { sidePending = 0; sideFlush(); }, 5000);
+    }
+  }
+
   if (!url || !key) {
     // 안내 문구는 면마다 다르다(템플릿의 오류 div 가 정본) — 여기서 새로 짓지 않고
     // 그 문장을 그대로 옮겨 쓴다. 비어 있으면 공통 문안으로 폴백한다.
@@ -2579,9 +2602,13 @@
   if (WANT.stats) {
     fetchStats()
       .then(function (data) {
-        revealContent();
+        // hidden 컨테이너에 먼저 그려 두고(측정 의존 렌더 없음 — scaleX 비율 바만),
+        // 부 데이터가 정착하면 한 프레임에 연다(CLS 예약 — afterSide 주석 참조).
         renderAll(data);
-        maybeOpenFirmFromUrl();
+        afterSide(function () {
+          revealContent();
+          maybeOpenFirmFromUrl();
+        });
       })
       .catch(failContent);
   }
@@ -2606,17 +2633,21 @@
   // [부 데이터] 008 히트맵 — 실패해도(008 미적용 라이브 포함) tr-heatmap-block 은 정적
   // 셸의 기본값인 hidden 상태 그대로 남는다. 다른 섹션엔 전혀 영향이 없다.
   if (WANT.matrix) {
+    sideBegin();
     fetchCategoryMatrix()
       .then(function (data) { renderHeatmap(data); })
-      .catch(function () { /* 조용히 숨김 유지 */ });
+      .catch(function () { /* 조용히 숨김 유지 */ })
+      .then(sideEnd);
   }
 
   // [부 데이터] 038 해외 vs 미국 — '데이터 현황' 면의 독립 섹션(FDA 483 코퍼스의
   // 지리적 구성). 실패해도 그 블록만 hidden 으로 남는다.
   if (WANT.zone) {
+    sideBegin();
     fetchZoneCategory()
       .then(function (data) { renderZonePanel(data); })
-      .catch(function () { /* 조용히 숨김 유지 */ });
+      .catch(function () { /* 조용히 숨김 유지 */ })
+      .then(sideEnd);
   }
 
   // [부 데이터] 041 최근 12개월 — 한 번의 응답으로 월별 막대·최근 순위 보기·달라진 점
@@ -2629,8 +2660,11 @@
         // (여기서 따로 부르면 기관 없이 합산으로 한 번 그려졌다가 덮이는 깜빡임이 난다).
         renderRecentWindow(data);
         if (!WANT.stats) {
-          if (rankBlockEl && !rankBlockEl.hidden) revealContent();
-          else failContent();
+          // 042(조항) 등 부 데이터 정착 뒤 한 프레임에 연다(CLS 예약 — afterSide 주석 참조).
+          afterSide(function () {
+            if (rankBlockEl && !rankBlockEl.hidden) revealContent();
+            else failContent();
+          });
         }
       })
       .catch(function () { if (!WANT.stats) failContent(); });
@@ -2638,8 +2672,10 @@
 
   // [부 데이터] 042 인용 조항 — 실패해도 tr-cfr-block 은 hidden 그대로.
   if (WANT.cfr) {
+    sideBegin();
     fetchCfrRanking()
       .then(function (data) { renderCfrRanking(data); })
-      .catch(function () { /* 조용히 숨김 유지 */ });
+      .catch(function () { /* 조용히 숨김 유지 */ })
+      .then(sideEnd);
   }
 })();

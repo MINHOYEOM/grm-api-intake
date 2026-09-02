@@ -314,6 +314,36 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
             "section_count": len(groups)}
 
 
+# ── 로그 마스킹 ────────────────────────────────────────────────────────────────
+# 이 저장소는 PUBLIC 이고 GitHub Actions 로그도 공개다. 테스트 수신 주소는
+# `vars.GRM_NEWSLETTER_TEST_EMAILS`(secret 이 아니라 **변수**)라 GitHub 자동 마스킹이
+# 걸리지 않는다 — 그대로 찍으면 이메일 주소가 공개 기록으로 남는다.
+# watchlist_notify_service.mask_email 과 같은 규칙이되, web/ 모듈은 루트 모듈을 import
+# 하지 않는 구조라 여기 따로 둔다(두 곳 다 "가린다"는 계약만 지키면 되고, 표기가 조금
+# 달라져도 안전성은 변하지 않는다).
+def mask_email(addr: str) -> str:
+    """`ab***@d***.com` 형태로 마스킹. `@` 가 없거나 빈 값이면 `***`."""
+    text = str(addr or "").strip()
+    if "@" not in text:
+        return "***"
+    local, _, domain = text.partition("@")
+    local_mask = (local[:2] if len(local) >= 2 else local) + "***"
+    if "." in domain:
+        head, _, rest = domain.partition(".")
+        tld = rest.rsplit(".", 1)[-1] if rest else ""
+        domain_mask = (head[:1] if head else "") + "***" + (f".{tld}" if tld else "")
+    else:
+        domain_mask = (domain[:1] if domain else "") + "***"
+    return f"{local_mask}@{domain_mask}"
+
+
+def mask_emails(addrs) -> str:
+    """주소 목록 → 로그용 마스킹 문자열. 개수도 함께 밝힌다(발송 대상 수는 사실이고
+    개인정보가 아니다 — "몇 명에게 갔나"는 운영 판단에 필요하다)."""
+    masked = [mask_email(a) for a in addrs if str(a or "").strip()]
+    return f"{len(masked)}명({', '.join(masked)})" if masked else "0명"
+
+
 # ── 멱등 키(발송 기록 = 캠페인명) ─────────────────────────────────────────────
 def idempotency_campaign_name(publish_date: str, issue_no: int) -> str:
     """발송 멱등 키 = 캠페인명(결정론). SaaS 에 같은 이름 캠페인이 이미 있으면 재발송 0
@@ -694,7 +724,7 @@ def main(argv: "list[str] | None" = None) -> int:
                                      html=teaser2["html"], list_ids=list_ids,
                                      sender_name=sender_name, sender_email=sender_email)
         sender.send_test(cid, [x.strip() for x in test_emails])
-        print(f"테스트 발송 완료(캠페인 {cid}) → {', '.join(x.strip() for x in test_emails)}")
+        print(f"테스트 발송 완료(캠페인 {cid}) → {mask_emails(x.strip() for x in test_emails)}")
         return 0
 
     # mode == send — 멱등(③) 후 실발송.

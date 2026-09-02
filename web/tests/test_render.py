@@ -62,9 +62,9 @@ REAL_FIXTURE = SINGLE_FIXTURES / "brief_web_2026_06_22.json"
 # render.build_glossary_view(terms, render._load_reg_ref_catalogs()) 로 실제로 돌려
 # 얻은 실측치다(WebGlossaryRegRefLinkGuardTest.setUpClass 와 동일 호출). 이 숫자보다
 # **줄면** 링크가 사라진 것이고, 무링크 라벨이 이 숫자보다 **늘면** 새로운 결손이다.
-_REG_REF_RESOLVED_FLOOR = 421          # 실측: url 이 비어있지 않은 칩 421/455건
+_REG_REF_RESOLVED_FLOOR = 469          # 실측: url 이 비어있지 않은 칩 469/503건
 _REG_REF_FAMILY_FLOORS = {             # 실측: 계열별 url 비어있지 않은 칩 개수
-    "cfr": 115, "ich": 103, "eu_gmp": 169, "pics": 23, "who": 11,
+    "cfr": 141, "ich": 109, "eu_gmp": 184, "pics": 23, "who": 12,
 }
 # 실측: 링크가 안 붙는 고유 라벨 16종(21 CFR 범위 표기·EU GMP Annex 19 두 판본 모호·
 # EU GMP Part III Site Master File(모호)·MHRA GxP Data Integrity Guidance(자료실
@@ -77,6 +77,12 @@ _REG_REF_FAMILY_FLOORS = {             # 실측: 계열별 url 비어있지 않�
 # 무링크로 남는 건 국내 법령 3종(약사법 제39조·의약품 등의 안전에 관한 규칙 [별표 1]·
 # 같은 규칙 제50조)뿐이다 — mfds.json 카탈로그가 고시·가이드라인만 보유하고 법률·
 # 총리령 본문은 담지 않기 때문(R6 접두 분기에도 걸리지 않아 R7 로 떨어진다).
+#
+# 2026-09-02 복제 본문 해소 12어 재작성 + 신규 16어 반영: 칩 455→503, 해석 421→469(+48).
+# 계열별 cfr 115→141·ich 103→109·eu_gmp 169→184·pics 23·who 11→12. 새 라벨(ICH Q2(R2)
+# §3.3.x·ICH Q7 §12.30/§§11.40–11.44/§§14.50–14.52·EU GMP Part I Chapter 2~6·Part II·
+# WHO TRS 992 Annex 4·21 CFR 210.3/211.25/211.56/211.103/211.111/211.125/211.150/211.182/
+# 211.186/211.196/211.204)은 전부 자료실 카탈로그로 해석되고 무링크 라벨은 16종 그대로다.
 _REG_REF_KNOWN_UNRESOLVED_LABELS = frozenset({
     "21 CFR 211.160–211.194",
     "21 CFR 211.180–211.194",
@@ -8038,7 +8044,12 @@ class WebGlossaryRenderTest(unittest.TestCase):
         # 총 어휘 수 가드(교체 정합 — 9차 자율 런 G1). 용어를 **교체**할 때 실수로
         # 개수가 줄어드는 것을 잡는 장치라, 의도적 증설 때는 실측치로 갱신한다.
         # 200(v3) → 226: 2026-08-04 트랙③ 미국 FDA 법문 표현 중심 26어 추가.
-        self.assertEqual(len(self.terms), 226)
+        # 226 → 242: 2026-09-02 코퍼스(findings_docs.json) 최빈 미수록 표현 16어 추가
+        # (sanitation·master-production-record·ongoing-stability-programme·job-description·
+        # mix-up·training·certificate-of-analysis·returned-product·pressure-differential·
+        # sporicidal-agent·time-limits-on-production·yield·reconciliation·equipment-use-log·
+        # distribution-record·pest-control).
+        self.assertEqual(len(self.terms), 242)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).

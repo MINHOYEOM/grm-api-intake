@@ -148,6 +148,42 @@ def cap_referrers(refs, cap: int = REFERRER_CAP):
     return out
 
 
+def probe_report(payload: "dict[str, Any]") -> str:
+    """첫 실행 필드명 검증용 요약. **값은 찍지 않는다 — 구조만 찍는다.**
+
+    ★이 저장소는 PUBLIC 이고 Actions 로그는 누구나 볼 수 있다. 원시 응답을 그대로
+    쏟으면 사이트 방문자 수가 공개 로그에 남는다. 필드명 확인에 필요한 것은 값이 아니라
+    **키 이름과 GraphQL 오류**뿐이므로 그 둘만 낸다(오류 문구에는 잘못 쓴 필드명이
+    그대로 들어 있어 이 목적에 정확히 맞는다).
+    """
+    lines: "list[str]" = []
+    errors = payload.get("errors")
+    if errors:
+        # 오류는 전문 그대로 — 여기에 우리가 틀린 필드명이 들어 있고, 트래픽 값은 없다.
+        lines.append("GraphQL 오류:")
+        lines.append(json.dumps(errors, ensure_ascii=False, indent=2)[:4000])
+        return "\n".join(lines)
+    accounts = (((payload.get("data") or {}).get("viewer") or {}).get("accounts") or [])
+    lines.append(f"top-level keys: {sorted(payload.keys())}")
+    lines.append(f"accounts: {len(accounts)}")
+    if not accounts:
+        return "\n".join(lines)
+    for group in ("totals", "referrers"):
+        rows = accounts[0].get(group)
+        if rows is None:
+            lines.append(f"{group}: (없음 — 별칭/필드명 불일치 가능)")
+            continue
+        lines.append(f"{group}: {len(rows)}행")
+        if rows:
+            first = rows[0] or {}
+            lines.append(f"  row keys: {sorted(first.keys())}")
+            dims = first.get("dimensions") or {}
+            lines.append(f"  dimensions keys: {sorted(dims.keys())}")
+            sums = first.get("sum") or {}
+            lines.append(f"  sum keys: {sorted(sums.keys())}")
+    return "\n".join(lines)
+
+
 def upsert(url: str, key: str, table: str, rows, on_conflict: str,
            *, timeout: float = 30.0) -> int:
     if not rows:
@@ -198,16 +234,18 @@ def main(argv=None) -> int:
 
     payload = fetch(token, args.account_tag, args.site_tag, args.start, args.end)
     if args.probe:
-        print(json.dumps(payload, ensure_ascii=False, indent=2)[:8000])
+        print(probe_report(payload))
         return 0
 
     daily, refs = parse(payload)
     daily_rows = [{"snap_date": d, "metric": m, "value": v}
                   for d in sorted(daily) for m, v in sorted(daily[d].items())]
     ref_rows = cap_referrers(refs)
-    print(f"파싱: {len(daily)}일 · 지표행 {len(daily_rows)} · 리퍼러행 {len(ref_rows)}")
-    for d in sorted(daily):
-        print(f"  {d}  방문 {daily[d]['visits']} · 페이지뷰 {daily[d]['page_views']}")
+    # ★값은 로그에 남기지 않는다 — 이 저장소는 PUBLIC 이라 Actions 로그가 공개다.
+    # 숫자는 Supabase 에만 있고, 사람은 /admin 성장·유입 탭에서 본다. 여기서는 "몇 행이
+    # 어느 창에 들어갔나"만 남겨 동작 여부를 판정한다(빈 응답은 0행으로 드러난다).
+    span = f"{min(daily)}~{max(daily)}" if daily else "(없음)"
+    print(f"파싱: {len(daily)}일({span}) · 지표행 {len(daily_rows)} · 리퍼러행 {len(ref_rows)}")
     if args.dry_run:
         return 0
 

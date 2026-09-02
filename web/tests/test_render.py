@@ -13623,6 +13623,11 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn('from("rum_path_daily")', self.admin_js)
         self.assertIn('id="grm-rum-paths"', self.admin_html)
         self.assertIn("조회어는 저장하지 않습니다", self.admin_html)
+        # ★경로별 수치는 10단위 반올림이라 하루 5건 미만이 0 으로 사라진다.
+        # 밝히지 않으면 "목록에 없음"을 "방문 없음"으로 오독한다(실측: 경로 합 210
+        # vs 같은 기간 실제 방문 265 — 21%가 반올림으로 증발).
+        self.assertIn("10단위로 반올림", self.admin_html)
+        self.assertIn("방문이 없는 것은 아닙니다", self.admin_html)
 
     def test_zone_rules_are_specific_before_general(self):
         """구역 분류는 위에서부터 먼저 걸리는 규칙이 이긴다 — 일반 규칙(`/findings/`)이

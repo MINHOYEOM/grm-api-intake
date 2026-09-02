@@ -36,10 +36,12 @@
   <url><loc>https://grm-solutions.com/glossary/hepa-filter/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/supplier-qualification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/process-validation/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/time-limits-on-production/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/in-process-control/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/air-handling/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/state-of-control/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/control-strategy/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/training/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/calibration/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cross-contamination/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/attributable/</loc></url>
@@ -56,10 +58,12 @@
   <url><loc>https://grm-solutions.com/glossary/data-lifecycle/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/data-integrity/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/data-transfer/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/accurate/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/lyophilization/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/contemporaneous/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/dynamic-data/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/line-clearance/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/master-production-record/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/metadata/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/sterilization/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/sterilising-grade-filter/</loc></url>
@@ -72,8 +76,10 @@
   <url><loc>https://grm-solutions.com/glossary/microbial-limits/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/bioburden/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/repeatability/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/returned-product/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/pyrogen/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/depyrogenation/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/pest-control/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/barrier-technology/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/batch-release/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/backup/</loc></url>
@@ -96,21 +102,26 @@
   <url><loc>https://grm-solutions.com/glossary/blow-fill-seal/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/pupsit/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/user-requirements-specification/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/sporicidal-agent/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/viable-environmental-monitoring/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/biological-indicator/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/production/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/written-procedure/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/design-qualification/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/equipment-use-log/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/equipment-qualification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/installation-qualification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/performance-qualification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cleaning-validation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/disinfection/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/reconciliation/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/yield/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/contract-manufacturer/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/purity-test/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/system-owner/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/capa/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/corrective-action/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/certificate-of-analysis/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/laboratory-controls/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/laboratory-investigation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/reference-sample/</loc></url>
@@ -141,6 +152,7 @@
   <url><loc>https://grm-solutions.com/glossary/api-starting-material/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/original-data/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/raw-data/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/sanitation/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/outsourced-activities/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/harm/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/hazard/</loc></url>
@@ -155,6 +167,7 @@
   <url><loc>https://grm-solutions.com/glossary/risk/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/risk-based-decision-making/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/risk-assessment/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/distribution-record/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/shelf-life/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/expiry-date/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/active-ingredient/</loc></url>
@@ -184,7 +197,6 @@
   <url><loc>https://grm-solutions.com/glossary/static-data/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/purified-water/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/accuracy/</loc></url>
-  <url><loc>https://grm-solutions.com/glossary/accurate/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/water-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/manufacture/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/batch-record/</loc></url>
@@ -203,10 +215,13 @@
   <url><loc>https://grm-solutions.com/glossary/critical-intervention/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/continual-improvement/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/continued-process-verification/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/ongoing-stability-programme/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/knowledge-management/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/job-description/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/segregation-of-duties/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/linearity/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/true-copy/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/pressure-differential/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cleanroom/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cleanroom-classification/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/cleanroom-qualification/</loc></url>
@@ -244,6 +259,7 @@
   <url><loc>https://grm-solutions.com/glossary/hybrid-system/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/assay/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/field-alert/</loc></url>
+  <url><loc>https://grm-solutions.com/glossary/mix-up/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/identification-test/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/environmental-monitoring/</loc></url>
   <url><loc>https://grm-solutions.com/glossary/alcoa-plus/</loc></url>

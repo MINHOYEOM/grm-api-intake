@@ -82,9 +82,11 @@ _SAFE_URL_SCHEMES = ("http://", "https://")
 # 낮추라는 NOTICE만 출력(통과는 유지).
 
 # W1 — term_ko/term_en 중복 "쌍" 수. 같은 값을 공유하는 항목이 k개면 C(k,2)쌍.
-#   실측: term_ko 중복 그룹 1개('정확성': accuracy, accurate) → 1쌍.
+#   실측: 2026-08-04 term_ko 중복 그룹 1개('정확성': accuracy, accurate) → 1쌍.
+#         2026-09-02 accurate(ALCOA) 표제어를 '데이터 정확성'으로 갈라 0쌍 — 화면에 같은
+#         이름의 카드가 나란히 나와 구분이 불가능했다(유입이 들어오는 페이지). 기준선 0.
 #         term_en 중복 그룹 0개 → 0쌍.
-BASELINE_TERM_KO_DUP_PAIRS = 1
+BASELINE_TERM_KO_DUP_PAIRS = 0
 BASELINE_TERM_EN_DUP_PAIRS = 0
 
 # W2 — detail_ko 템플릿 복제. difflib.SequenceMatcher(autojunk=False).ratio()
@@ -98,36 +100,39 @@ BASELINE_TERM_EN_DUP_PAIRS = 0
 #   ★기준선은 "개수"가 아니라 "id 집합"이다. 개수로 두면 **상쇄가 숨는다** —
 #   기존 1건을 고치고 새 1건을 만들면 121로 같아 CI가 통과해버린다. 집합으로 두면
 #   새로 들어온 id 는 개수와 무관하게 잡힌다(신규=ERROR, 해소=NOTICE로 축소 안내).
+#
+#   2026-09-02 121 → 109: 4개 군 12어(accuracy/precision · DQ/IQ/OQ/PQ · sterilization/
+#   disinfection/sterility · risk-assessment/-control/-reduction)의 detail_ko 를 정본
+#   (ICH Q2(R2)·EU GMP Annex 15·Annex 1·ICH Q9(R1)) 조항으로 다시 써서 집합에서 뺐다
+#   (같은 스크립트로 재측정: 복제군 121→109, 85%+ 쌍 509→394). 남은 109개는 여전히 해소
+#   대상이며, 이 집합은 줄어들기만 해야 한다.
 DETAIL_KO_SIMILARITY_THRESHOLD = 0.85
 BASELINE_DETAIL_KO_SIMILAR_IDS = frozenset({
-    'acceptance-criteria', 'accuracy', 'action-limit', 'active-ingredient', 'airlock',
-    'alert-limit', 'analytical-procedure', 'analytical-procedure-validation', 'api',
+    'acceptance-criteria', 'action-limit', 'active-ingredient', 'airlock', 'alert-limit',
+    'analytical-procedure', 'analytical-procedure-validation', 'api',
     'api-starting-material', 'aseptic-processing', 'assay', 'authorized-person', 'batch',
     'batch-number', 'batch-release', 'bioburden', 'biological-indicator', 'bulk-product',
     'calibration', 'change-control', 'change-management', 'cleaning-validation',
     'cleanroom', 'cleanroom-classification', 'continual-improvement',
     'continued-process-verification', 'contract-manufacturer', 'control-strategy',
-    'corrective-action', 'depyrogenation', 'design-qualification', 'detection-limit',
-    'deviation', 'disinfection', 'documentation', 'drug-product', 'endotoxin',
-    'expiry-date', 'finished-product', 'hazard', 'hepa-filter', 'identification-test',
-    'impurity', 'impurity-profile', 'installation-qualification', 'intermediate',
+    'corrective-action', 'depyrogenation', 'detection-limit', 'deviation', 'documentation',
+    'drug-product', 'endotoxin', 'expiry-date', 'finished-product', 'hazard', 'hepa-filter',
+    'identification-test', 'impurity', 'impurity-profile', 'intermediate',
     'intermediate-product', 'isolator', 'knowledge-management', 'linearity', 'manufacture',
-    'manufacturer', 'marketing-authorization', 'oot', 'operational-qualification',
-    'outsourced-activities', 'packaging', 'packaging-material', 'performance-qualification',
-    'pharmaceutical-quality-system', 'precision', 'preventive-action', 'procedure',
+    'manufacturer', 'marketing-authorization', 'oot', 'outsourced-activities', 'packaging',
+    'packaging-material', 'pharmaceutical-quality-system', 'preventive-action', 'procedure',
     'product-complaint', 'product-quality-review', 'production', 'purity-test', 'pyrogen',
     'qualification', 'quality', 'quality-assurance', 'quality-control', 'quality-manual',
     'quality-objectives', 'quality-planning', 'quality-policy', 'quality-risk-management',
     'quality-unit', 'quantitation-limit', 'quarantine', 'rabs', 'range', 'raw-material',
     'recall', 'record', 'reference-standard', 'repeatability', 'reprocessing',
     'retest-date', 'revalidation', 'reworking', 'risk', 'risk-acceptance', 'risk-analysis',
-    'risk-assessment', 'risk-communication', 'risk-control', 'risk-evaluation',
-    'risk-identification', 'risk-reduction', 'risk-review', 'robustness',
-    'root-cause-analysis', 'severity', 'sop', 'specification', 'specificity',
-    'stability-testing', 'starting-material', 'state-of-control', 'sterility',
-    'sterility-assurance-level', 'sterilization', 'supplier-qualification',
-    'terminal-sterilization', 'user-requirements-specification', 'validation-master-plan',
-    'validation-protocol', 'validation-report', 'worst-case',
+    'risk-communication', 'risk-evaluation', 'risk-identification', 'risk-review',
+    'robustness', 'root-cause-analysis', 'severity', 'sop', 'specification', 'specificity',
+    'stability-testing', 'starting-material', 'state-of-control',
+    'sterility-assurance-level', 'supplier-qualification', 'terminal-sterilization',
+    'user-requirements-specification', 'validation-master-plan', 'validation-protocol',
+    'validation-report', 'worst-case',
 })
 
 # W3 — easy_ko/detail_ko 가 공백 제거 후 10자 미만인 발생 건수(값이 있는 경우만

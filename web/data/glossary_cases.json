@@ -1081,6 +1081,102 @@
       "q": "air handling",
       "findings": 7,
       "documents": 7
+    },
+    {
+      "id": "sanitation",
+      "q": "Sanitation",
+      "findings": 412,
+      "documents": 385
+    },
+    {
+      "id": "pest-control",
+      "q": "해충",
+      "findings": 84,
+      "documents": 77
+    },
+    {
+      "id": "master-production-record",
+      "q": "master production",
+      "findings": 256,
+      "documents": 248
+    },
+    {
+      "id": "ongoing-stability-programme",
+      "q": "ongoing stability",
+      "findings": 212,
+      "documents": 212
+    },
+    {
+      "id": "job-description",
+      "q": "직무기술서",
+      "findings": 181,
+      "documents": 181
+    },
+    {
+      "id": "mix-up",
+      "q": "mix-up",
+      "findings": 192,
+      "documents": 188
+    },
+    {
+      "id": "training",
+      "q": "교육훈련",
+      "findings": 149,
+      "documents": 149
+    },
+    {
+      "id": "certificate-of-analysis",
+      "q": "시험성적서",
+      "findings": 142,
+      "documents": 137
+    },
+    {
+      "id": "returned-product",
+      "q": "반품",
+      "findings": 116,
+      "documents": 116
+    },
+    {
+      "id": "pressure-differential",
+      "q": "양압",
+      "findings": 96,
+      "documents": 93
+    },
+    {
+      "id": "sporicidal-agent",
+      "q": "sporicidal",
+      "findings": 62,
+      "documents": 60
+    },
+    {
+      "id": "time-limits-on-production",
+      "q": "시간 제한",
+      "findings": 48,
+      "documents": 48
+    },
+    {
+      "id": "yield",
+      "q": "수율",
+      "findings": 39,
+      "documents": 39
+    },
+    {
+      "id": "reconciliation",
+      "q": "reconciliation",
+      "findings": 42,
+      "documents": 42
+    },
+    {
+      "id": "equipment-use-log",
+      "q": "usage log",
+      "findings": 45,
+      "documents": 43
+    },
+    {
+      "id": "distribution-record",
+      "q": "distribution record",
+      "findings": 54,
+      "documents": 54
     }
   ],
   "excluded": [
@@ -1291,8 +1387,8 @@
     },
     {
       "id": "accurate",
-      "term_ko": "정확성",
-      "reason": "한국어 '정확성'이 분석법 accuracy 와 ALCOA accurate 를 구분하지 못함 — accuracy 표제어에만 링크"
+      "term_ko": "데이터 정확성",
+      "reason": "ALCOA 의 accurate 는 '정확성'으로 검색하면 분석법 accuracy 지적문에 섞이고, '데이터 정확성'은 지적문에 쓰이지 않는 개념어라 사례 링크를 두지 않는다 — accuracy 표제어에만 링크"
     },
     {
       "id": "exception-report",

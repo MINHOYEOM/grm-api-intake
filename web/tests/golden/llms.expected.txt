@@ -23,7 +23,7 @@
 - [자가점검 체크리스트](https://grm-solutions.com/findings/checklist/): 빈발 지적 기반 자가 점검 문항
 
 ## 참조 자료
-- [규제 용어사전](https://grm-solutions.com/glossary/): GMP·품질 용어 226어 — 쉬운 한국어 풀이·공식 출처·실제 지적사례 연결
+- [규제 용어사전](https://grm-solutions.com/glossary/): GMP·품질 용어 242어 — 쉬운 한국어 풀이·공식 출처·실제 지적사례 연결
 - [자료실](https://grm-solutions.com/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인 공식 원문 링크
 - [이용안내](https://grm-solutions.com/guide/): 서비스 활용법과 자주 묻는 질문
 - [주간 퀴즈](https://grm-solutions.com/quiz/): 그 주 규제 소식 기반 학습 퀴즈

@@ -285,18 +285,22 @@ class GlossaryLintTest(unittest.TestCase):
     # ── warnings + baselines (W1, W2, W3) ───────────────────────────────
 
     def test_term_ko_and_term_en_duplicates_are_warned(self):
+        # 2026-09-02 기준선 1 → 0('정확성' 충돌을 '데이터 정확성'으로 해소). 이제 term_ko
+        # 중복 1쌍도 기준선 초과라 WARNING 에 더해 BASELINE ERROR 로 승격돼야 한다.
         report = self._lint(
             [
                 self._term(),
                 self._term(id="term-b", term_en="Term B"),  # same term_ko, distinct term_en
             ]
         )
-        self.assertTrue(report.ok, report.format())  # 1 pair == baseline, not over it
+        self.assertFalse(report.ok, report.format())  # 1 pair > baseline 0
         self.assertIn("TERM_KO_DUPLICATE", self._warn_codes(report))
+        self.assertIn("TERM_KO_DUPLICATE_BASELINE", self._codes(report))
         self.assertEqual(report.term_ko_dup_pairs, 1)
+        self.assertEqual(gl.BASELINE_TERM_KO_DUP_PAIRS, 0)
 
     def test_term_ko_duplicate_over_baseline_becomes_error(self):
-        # Fixed module baseline is 1 pair; 3 terms sharing term_ko = C(3,2) = 3 pairs, over it.
+        # Fixed module baseline is 0 pairs; 3 terms sharing term_ko = C(3,2) = 3 pairs, over it.
         report = self._lint(
             [
                 self._term(id="term-a", term_en="Term A"),
@@ -306,6 +310,7 @@ class GlossaryLintTest(unittest.TestCase):
         )
         self.assertFalse(report.ok, report.format())
         self.assertIn("TERM_KO_DUPLICATE_BASELINE", self._codes(report))
+        self.assertEqual(report.term_ko_dup_pairs, 3)
 
     def test_detail_ko_similarity_new_term_is_error(self):
         """기준선에 없는 용어가 다른 용어와 실무 맥락이 겹치면 ERROR.

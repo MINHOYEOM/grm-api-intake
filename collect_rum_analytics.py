@@ -38,6 +38,8 @@ GRAPHQL_ENDPOINT = "https://api.cloudflare.com/client/v4/graphql"
 GRAPHQL_LIMIT = 10000
 # 하루에 저장하는 리퍼러 호스트 상한 — 꼬리를 무한정 담지 않는다(화면은 상위만 쓴다).
 REFERRER_CAP = 25
+# 하루에 저장하는 착지 경로 상한. 사이트가 4,000쪽이라 꼬리가 길다 — 화면은 상위만 쓴다.
+PATH_CAP = 40
 
 QUERY = """
 query RumDaily($accountTag: string!, $siteTag: string!, $start: string!, $end: string!) {
@@ -60,10 +62,32 @@ query RumDaily($accountTag: string!, $siteTag: string!, $start: string!, $end: s
         sum { visits }
         dimensions { date refererHost }
       }
+      paths: rumPageloadEventsAdaptiveGroups(
+        filter: {siteTag: $siteTag, datetime_geq: $start, datetime_leq: $end, bot: 0}
+        limit: LIMIT_PLACEHOLDER
+        orderBy: [date_ASC]
+      ) {
+        sum { visits }
+        dimensions { date requestPath }
+      }
     }
   }
 }
 """.replace("LIMIT_PLACEHOLDER", str(GRAPHQL_LIMIT))
+
+def clean_path(raw: str) -> str:
+    """URL 경로만 남긴다 — **쿼리스트링은 버린다.**
+
+    `/findings/inspector/?key=홍길동` 처럼 URL 에 사람 이름이 실리는 경로가 있다. 통째로
+    담으면 실명이 테이블에 쌓인다. 경로만으로도 "어느 섹션이 유입을 받나"는 전부 답한다.
+    """
+    text = str(raw or "").strip()
+    for sep in ("?", "#"):
+        text = text.split(sep, 1)[0]
+    if not text:
+        return "/"
+    return text if text.startswith("/") else "/" + text
+
 
 def fetch(token: str, account_tag: str, site_tag: str, start: str, end: str,
           *, timeout: float = 30.0) -> "dict[str, Any]":
@@ -112,7 +136,20 @@ def parse(payload: "dict[str, Any]"):
         if visits <= 0:
             continue
         refs[(day, host)] = refs.get((day, host), 0) + visits
-    return daily, refs
+
+    paths: "dict[tuple[str, str], int]" = {}
+    for row in (acct.get("paths") or []):
+        dims = row.get("dimensions") or {}
+        day = str(dims.get("date") or "")
+        if not day:
+            continue
+        path = clean_path(dims.get("requestPath"))
+        visits = int(((row.get("sum") or {}).get("visits")) or 0)
+        if visits <= 0:
+            continue
+        # 쿼리스트링을 떼면 같은 경로가 여러 행으로 오므로 합산한다.
+        paths[(day, path)] = paths.get((day, path), 0) + visits
+    return daily, refs, paths
 
 
 def cap_referrers(refs, cap: int = REFERRER_CAP):
@@ -147,7 +184,7 @@ def probe_report(payload: "dict[str, Any]") -> str:
     lines.append(f"accounts: {len(accounts)}")
     if not accounts:
         return "\n".join(lines)
-    for group in ("totals", "referrers"):
+    for group in ("totals", "referrers", "paths"):
         rows = accounts[0].get(group)
         if rows is None:
             lines.append(f"{group}: (없음 — 별칭/필드명 불일치 가능)")
@@ -161,6 +198,18 @@ def probe_report(payload: "dict[str, Any]") -> str:
             sums = first.get("sum") or {}
             lines.append(f"  sum keys: {sorted(sums.keys())}")
     return "\n".join(lines)
+
+
+def cap_paths(paths, cap: int = PATH_CAP):
+    """날짜별 상위 cap 개만 남긴다(cap_referrers 와 같은 규칙 — 결정론)."""
+    by_day: "dict[str, list]" = {}
+    for (day, path), visits in paths.items():
+        by_day.setdefault(day, []).append((path, visits))
+    out = []
+    for day in sorted(by_day):
+        top = sorted(by_day[day], key=lambda kv: (-kv[1], kv[0]))[:cap]
+        out.extend({"snap_date": day, "request_path": p, "visits": v} for p, v in top)
+    return out
 
 
 def upsert(url: str, key: str, table: str, rows, on_conflict: str,
@@ -216,15 +265,17 @@ def main(argv=None) -> int:
         print(probe_report(payload))
         return 0
 
-    daily, refs = parse(payload)
+    daily, refs, paths = parse(payload)
     daily_rows = [{"snap_date": d, "metric": m, "value": v}
                   for d in sorted(daily) for m, v in sorted(daily[d].items())]
     ref_rows = cap_referrers(refs)
+    path_rows = cap_paths(paths)
     # ★값은 로그에 남기지 않는다 — 이 저장소는 PUBLIC 이라 Actions 로그가 공개다.
     # 숫자는 Supabase 에만 있고, 사람은 /admin 성장·유입 탭에서 본다. 여기서는 "몇 행이
     # 어느 창에 들어갔나"만 남겨 동작 여부를 판정한다(빈 응답은 0행으로 드러난다).
     span = f"{min(daily)}~{max(daily)}" if daily else "(없음)"
-    print(f"파싱: {len(daily)}일({span}) · 지표행 {len(daily_rows)} · 리퍼러행 {len(ref_rows)}")
+    print(f"파싱: {len(daily)}일({span}) · 지표행 {len(daily_rows)} · "
+          f"리퍼러행 {len(ref_rows)} · 경로행 {len(path_rows)}")
     if args.dry_run:
         return 0
 
@@ -235,7 +286,8 @@ def main(argv=None) -> int:
     url, key = creds
     n1 = upsert(url, key, "rum_daily", daily_rows, "snap_date,metric")
     n2 = upsert(url, key, "rum_referrer_daily", ref_rows, "snap_date,referer_host")
-    print(f"적재 완료: rum_daily {n1}행 · rum_referrer_daily {n2}행")
+    n3 = upsert(url, key, "rum_path_daily", path_rows, "snap_date,request_path")
+    print(f"적재 완료: rum_daily {n1}행 · rum_referrer_daily {n2}행 · rum_path_daily {n3}행")
     return 0
 
 

@@ -559,16 +559,61 @@
     }
     return "other";
   }
+  // 착지 경로를 사람이 아는 구역 이름으로 — 판정은 화면이 한다(수집기는 경로 원문만 넣는다).
+  // 위에서부터 먼저 걸리는 규칙이 이긴다(구체적인 것이 앞).
+  var RUM_ZONES = [
+    { re: /^\/library\//, label: "자료실" },
+    { re: /^\/glossary\//, label: "용어사전" },
+    { re: /^\/findings\/firm\//, label: "업체 프로파일" },
+    { re: /^\/findings\/inspector\//, label: "실사관 프로파일" },
+    { re: /^\/findings\/doc(s)?\//, label: "지적사항 문서" },
+    { re: /^\/findings\/trends\//, label: "트렌드" },
+    { re: /^\/findings\//, label: "지적사항 검색" },
+    { re: /^\/briefs\//, label: "주간 브리프" },
+    { re: /^\/archive\//, label: "아카이브" },
+    { re: /^\/quiz\//, label: "퀴즈" },
+    { re: /^\/guide\//, label: "이용안내" },
+    { re: /^\/admin\//, label: "운영 콘솔" },
+    { re: /^\/$/, label: "홈" }
+  ];
+  function rumZoneOf(path) {
+    var p = String(path || "");
+    for (var i = 0; i < RUM_ZONES.length; i++) {
+      if (RUM_ZONES[i].re.test(p)) return RUM_ZONES[i].label;
+    }
+    return "기타";
+  }
+  function renderRumPaths(errorMessage) {
+    var host = byId("grm-rum-paths");
+    if (!host) return;
+    if (errorMessage || !state.rum || !state.rum.paths) {
+      host.innerHTML = emptyRow(3, errorMessage || "데이터 없음");
+      return;
+    }
+    var rows = state.rum.paths;
+    if (!rows.length) {
+      host.innerHTML = emptyRow(3, "아직 수집된 경로 데이터가 없습니다(첫 동기화 대기).");
+      return;
+    }
+    host.innerHTML = rows.slice(0, 15).map(function (r) {
+      return "<tr><td>" + esc(r.path) + "</td><td>" + esc(rumZoneOf(r.path)) +
+        "</td><td><b>" + number(r.visits) + "</b></td></tr>";
+    }).join("");
+  }
+
   function loadRum() {
     var days = GROWTH_SNAPSHOT_DAYS;
     return Promise.all([
       state.client.from("rum_daily").select("snap_date,metric,value")
         .order("snap_date", { ascending: false }).limit(days * 2),
       state.client.from("rum_referrer_daily").select("snap_date,referer_host,visits")
-        .order("snap_date", { ascending: false }).limit(days * 25)
+        .order("snap_date", { ascending: false }).limit(days * 25),
+      state.client.from("rum_path_daily").select("snap_date,request_path,visits")
+        .order("snap_date", { ascending: false }).limit(days * 40)
     ]).then(function (res) {
       if (res[0].error) throw res[0].error;
       if (res[1].error) throw res[1].error;
+      if (res[2].error) throw res[2].error;
       var byDate = {};
       (res[0].data || []).forEach(function (r) {
         (byDate[r.snap_date] = byDate[r.snap_date] || {})[r.metric] = r.value || 0;
@@ -579,11 +624,25 @@
         var g = rumGroupOf(r.referer_host);
         d[g] = (d[g] || 0) + (r.visits || 0);
       });
-      state.rum = { byDate: byDate, refs: refs };
+      // 경로는 최근 7일만 합산해 상위를 낸다(섹션별 비교가 목적이라 일자별 분해는 불필요).
+      var recent = Object.keys(byDate).sort().slice(-7);
+      var window7 = {};
+      recent.forEach(function (d) { window7[d] = 1; });
+      var pathTotals = {};
+      (res[2].data || []).forEach(function (r) {
+        if (!window7[r.snap_date]) return;
+        pathTotals[r.request_path] = (pathTotals[r.request_path] || 0) + (r.visits || 0);
+      });
+      var paths = Object.keys(pathTotals)
+        .map(function (p) { return { path: p, visits: pathTotals[p] }; })
+        .sort(function (a, b) { return b.visits - a.visits || a.path.localeCompare(b.path); });
+      state.rum = { byDate: byDate, refs: refs, paths: paths };
       renderRum();
+      renderRumPaths();
     }).catch(function (error) {
       state.rum = null;
       renderRum(errText(error) || "방문 데이터를 불러오지 못했습니다.");
+      renderRumPaths(errText(error) || "방문 데이터를 불러오지 못했습니다.");
     });
   }
   function renderRum(errorMessage) {

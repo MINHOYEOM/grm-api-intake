@@ -13603,6 +13603,36 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn("row keys", probe_body)
         self.assertIn("GraphQL 오류", probe_body)
 
+    def test_landing_paths_are_tracked_without_query_strings(self):
+        """[073] 착지 경로 — "어느 섹션이 사람을 데려오나"의 유일한 사실 근거.
+
+        ★쿼리스트링은 저장하지 않는다. `/findings/inspector/?key=실명` 처럼 URL 에 사람
+        이름이 실리는 경로가 있어서, 통째로 담으면 실명이 테이블에 쌓인다.
+        """
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        mig = (WEB_DIR / "migrations" / "073_rum_path_daily.sql").read_text(encoding="utf-8")
+        self.assertIn("requestPath", src)
+        self.assertIn("def clean_path(", src)
+        # 쿼리·프래그먼트를 실제로 떼는지(구현 세부가 아니라 계약).
+        body = src.split("def clean_path(", 1)[1].split("def fetch(", 1)[0]
+        self.assertIn('"?"', body)
+        self.assertIn('"#"', body)
+        # 저장·노출 경로가 072 와 같은 규칙인지.
+        self.assertIn("grant select on public.rum_path_daily to authenticated", mig)
+        self.assertNotIn("to anon", mig.split("grant select", 1)[1].split(";", 1)[0])
+        self.assertIn('from("rum_path_daily")', self.admin_js)
+        self.assertIn('id="grm-rum-paths"', self.admin_html)
+        self.assertIn("조회어는 저장하지 않습니다", self.admin_html)
+
+    def test_zone_rules_are_specific_before_general(self):
+        """구역 분류는 위에서부터 먼저 걸리는 규칙이 이긴다 — 일반 규칙(`/findings/`)이
+        구체 규칙(`/findings/firm/`)보다 앞서면 하위 구역이 전부 삼켜진다."""
+        block = self.admin_js.split("var RUM_ZONES = [", 1)[1].split("];", 1)[0]
+        labels = re.findall(r'label: "([^"]+)"', block)
+        for specific in ("업체 프로파일", "실사관 프로파일", "지적사항 문서", "트렌드"):
+            self.assertLess(labels.index(specific), labels.index("지적사항 검색"),
+                            f"{specific} 규칙이 일반 규칙보다 뒤에 있다")
+
     def test_workflow_uses_the_new_secret_and_no_arithmetic_in_expressions(self):
         """GHA 표현식에는 산술이 없다 — 창 경계는 셸에서 계산해야 한다."""
         self.assertIn("secrets.CLOUDFLARE_ANALYTICS_TOKEN", self.wf)

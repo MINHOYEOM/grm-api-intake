@@ -4,11 +4,15 @@
 운영자가 Cloudflare 대시보드를 읽지 않고도 /admin 성장·유입 탭에서 방문·유입 경로를
 보게 하는 수집기. 하루 1회 워크플로(grm-rum-analytics.yml)가 호출한다.
 
-## 왜 시간 단위로 받아 KST 로 다시 묶나
-Cloudflare GraphQL 의 `date` 차원은 **UTC** 다. 그대로 담으면 09:00 KST 에서 하루가
-갈려 같은 화면의 funnel_counts_daily(23:55 KST 스냅샷)와 축이 어긋난다. 그래서
-`datetimeHour` 로 받아 +9h 시프트한 뒤 날짜별로 합산한다. 축은 바꾸지 말고 밝힌다 —
-저장되는 snap_date 는 전부 KST 다.
+## 왜 일 단위인가 (2026-09-02 정정 — 처음엔 시간 단위였다)
+축을 KST 에 맞추려고 `datetimeHour` 로 받아 +9h 시프트해 합산했는데, **버킷마다
+반올림이 걸려 작은 시간대가 사라졌다**. 실측: 대시보드 7일 264 방문 vs 시간합산 9일
+250, 9/1 은 60 vs 20 — 값이 전부 10 의 배수로 떨어졌다. 축 정렬을 위해 정확도를
+버린 거래였고, 정확도가 이긴다.
+
+그래서 `date` 차원(UTC)으로 받는다. **UTC 날짜는 한국 사이트에서 KST 날짜의 좋은
+근사다** — KST 09:00~24:00 이 같은 번호의 UTC 날짜에 들어가고, 어긋나는 구간은
+KST 00:00~09:00(트래픽이 가장 적은 새벽)뿐이다. 이 근사는 화면에 명시한다.
 
 ## 봇 제외
 `bot: 0` 필터가 대시보드의 "Exclude bots = Yes" 와 같은 모집단이다. 이 필터를 빼면
@@ -30,7 +34,6 @@ from typing import Any
 import grm_cli
 
 GRAPHQL_ENDPOINT = "https://api.cloudflare.com/client/v4/graphql"
-KST_OFFSET_HOURS = 9
 # 한 번에 받는 버킷 수 상한. 기본 창(7일)이면 시간 168개라 여유가 크다.
 GRAPHQL_LIMIT = 10000
 # 하루에 저장하는 리퍼러 호스트 상한 — 꼬리를 무한정 담지 않는다(화면은 상위만 쓴다).
@@ -43,52 +46,24 @@ query RumDaily($accountTag: string!, $siteTag: string!, $start: string!, $end: s
       totals: rumPageloadEventsAdaptiveGroups(
         filter: {siteTag: $siteTag, datetime_geq: $start, datetime_leq: $end, bot: 0}
         limit: LIMIT_PLACEHOLDER
-        orderBy: [datetimeHour_ASC]
+        orderBy: [date_ASC]
       ) {
         count
         sum { visits }
-        dimensions { datetimeHour }
+        dimensions { date }
       }
       referrers: rumPageloadEventsAdaptiveGroups(
         filter: {siteTag: $siteTag, datetime_geq: $start, datetime_leq: $end, bot: 0}
         limit: LIMIT_PLACEHOLDER
-        orderBy: [datetimeHour_ASC]
+        orderBy: [date_ASC]
       ) {
         sum { visits }
-        dimensions { datetimeHour refererHost }
+        dimensions { date refererHost }
       }
     }
   }
 }
 """.replace("LIMIT_PLACEHOLDER", str(GRAPHQL_LIMIT))
-
-_DAYS_IN_MONTH = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-
-
-def kst_date(datetime_hour: str) -> str:
-    """`2026-09-01T14:00:00Z`(UTC) → `2026-09-01`(KST 날짜).
-
-    datetime 모듈을 쓰지 않는다 — 이 저장소의 순수성 규율(render.py 참조)과 같은 이유로
-    now() 를 부르는 문을 열지 않는다. 시각은 입력에만 의존한다.
-    """
-    date_part, _, time_part = datetime_hour.partition("T")
-    parts = date_part.split("-")
-    if len(parts) != 3:
-        raise SystemExit(f"시각 형식이 아니다: {datetime_hour!r}")
-    y, m, d = (int(x) for x in parts)
-    hour = int(time_part[:2]) if time_part[:2].isdigit() else 0
-    if hour + KST_OFFSET_HOURS < 24:
-        return f"{y:04d}-{m:02d}-{d:02d}"
-    # 자정을 넘긴 경우만 날짜를 하루 민다(월·연 경계 포함).
-    leap = (y % 4 == 0 and y % 100 != 0) or y % 400 == 0
-    last = 29 if (m == 2 and leap) else _DAYS_IN_MONTH[m - 1]
-    d += 1
-    if d > last:
-        d, m = 1, m + 1
-        if m > 12:
-            m, y = 1, y + 1
-    return f"{y:04d}-{m:02d}-{d:02d}"
-
 
 def fetch(token: str, account_tag: str, site_tag: str, start: str, end: str,
           *, timeout: float = 30.0) -> "dict[str, Any]":
@@ -119,7 +94,9 @@ def parse(payload: "dict[str, Any]"):
 
     daily: "dict[str, dict[str, int]]" = {}
     for row in (acct.get("totals") or []):
-        day = kst_date(str((row.get("dimensions") or {}).get("datetimeHour") or ""))
+        day = str((row.get("dimensions") or {}).get("date") or "")
+        if not day:
+            continue
         bucket = daily.setdefault(day, {"visits": 0, "page_views": 0})
         bucket["visits"] += int(((row.get("sum") or {}).get("visits")) or 0)
         bucket["page_views"] += int(row.get("count") or 0)
@@ -127,7 +104,9 @@ def parse(payload: "dict[str, Any]"):
     refs: "dict[tuple[str, str], int]" = {}
     for row in (acct.get("referrers") or []):
         dims = row.get("dimensions") or {}
-        day = kst_date(str(dims.get("datetimeHour") or ""))
+        day = str(dims.get("date") or "")
+        if not day:
+            continue
         host = str(dims.get("refererHost") or "").strip() or "(direct)"
         visits = int(((row.get("sum") or {}).get("visits")) or 0)
         if visits <= 0:

@@ -13399,8 +13399,13 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         # refreshAll 에 실려야 전체 새로고침·최초 로드에서 함께 갱신된다.
         refresh_all = self.admin_js.split("function refreshAll", 1)[1].split("}", 1)[0]
         self.assertIn("loadGrowth()", refresh_all)
-        self.assertIn('byId("grm-growth-refresh").addEventListener("click", loadGrowth)',
-                      self.admin_js)
+        # 새로고침 버튼은 이 탭이 보여주는 것을 **전부** 다시 읽어야 한다. 072 로 방문
+        # 표가 같은 탭에 들어왔으므로 핸들러가 둘 다 부르는지 본문으로 확인한다
+        # (문자열 한 줄로 고정하면 탭에 뭔가 더 붙을 때마다 계약이 아니라 표기가 깨진다).
+        handler = self.admin_js.split('byId("grm-growth-refresh").addEventListener(', 1)[1]
+        handler = handler.split("});", 1)[0]
+        self.assertIn("loadGrowth()", handler)
+        self.assertIn("loadRum()", handler)
 
     def test_snapshot_write_path_is_cron_only(self):
         self.assertIn("enable row level security", self.mig071)
@@ -13513,6 +13518,74 @@ class WebGlossaryRelatedCaseCountTest(unittest.TestCase):
         index = (self.single / "glossary" / "index.html").read_text(encoding="utf-8")
         self.assertNotIn("gt-rel-n", index)
         self.assertNotIn("사례 1,", index)
+
+
+class WebAdminRumPanelTest(unittest.TestCase):
+    """[072] /admin 방문·유입 표 + Cloudflare RUM 수집기 계약.
+
+    목적: 운영자가 Cloudflare 대시보드를 읽지 않아도 되게 한다("뭐가 뭔지 하나도
+    모르겠다" — 2026-09-01 사용자). 그래서 이 표가 사라지거나 축이 어긋나면 곧바로
+    Cloudflare 로 되돌아가야 하므로 배선과 축을 함께 잠근다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.admin_js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+        cls.admin_html = (WEB_DIR / "templates" / "admin.html").read_text(encoding="utf-8")
+        cls.mig = (WEB_DIR / "migrations" / "072_rum_daily.sql").read_text(encoding="utf-8")
+        cls.wf = (WEB_DIR.parent / ".github" / "workflows"
+                  / "grm-rum-analytics.yml").read_text(encoding="utf-8")
+
+    def test_panel_wired(self):
+        self.assertIn('id="grm-rum-daily"', self.admin_html)
+        self.assertIn("방문 · 유입 경로", self.admin_html)
+        for needle in ("loadRum", "renderRum", 'from("rum_daily")',
+                       'from("rum_referrer_daily")'):
+            self.assertIn(needle, self.admin_js)
+        refresh_all = self.admin_js.split("function refreshAll", 1)[1].split("}", 1)[0]
+        self.assertIn("loadRum()", refresh_all)
+
+    def test_metric_vocabulary_matches_migration(self):
+        """화면이 읽는 metric 이름이 072 CHECK 와 같아야 한다 — 한쪽만 늘리면 표가
+        조용히 0 으로 찍힌다(060/071 어휘 동기화와 동형)."""
+        m = re.search(r"metric text not null check \(metric in \(([^)]*)\)", self.mig)
+        self.assertIsNotNone(m, "072 CHECK 의 metric 화이트리스트 미발견")
+        db = set(re.findall(r"'([a-z_]+)'", m.group(1)))
+        self.assertEqual(db, {"visits", "page_views"})
+        for k in db:
+            self.assertIn("m." + k, self.admin_js, f"화면이 {k} 를 읽지 않는다")
+
+    def test_read_is_signed_in_only_and_writes_have_no_client_path(self):
+        """방문 규모는 운영 지표다 — anon 공개인 funnel_counts 와 의도적으로 다르다."""
+        self.assertIn("enable row level security", self.mig)
+        self.assertIn("grant select on public.rum_daily to authenticated", self.mig)
+        self.assertNotIn("to anon", self.mig.split("grant select", 1)[1].split(";", 1)[0])
+        for banned in ('from("rum_daily").insert', 'from("rum_daily").upsert',
+                       'from("rum_referrer_daily").insert'):
+            self.assertNotIn(banned, self.admin_js)
+
+    def test_ai_is_classified_before_google(self):
+        """★순서가 판정이다 — gemini.google.com 은 구글 규칙(`.google.`)에도 걸린다.
+        AI 그룹이 뒤로 가면 AI 유입이 통째로 구글로 잘못 집계된다."""
+        block = self.admin_js.split("var RUM_REFERRER_GROUPS = [", 1)[1].split("];", 1)[0]
+        keys = re.findall(r'key: "([a-z]+)"', block)
+        self.assertEqual(keys[0], "ai", f"AI 가 첫 규칙이 아니다: {keys}")
+        self.assertLess(keys.index("ai"), keys.index("google"))
+
+    def test_kst_axis_is_stated_and_bot_filter_is_on(self):
+        """축(KST)과 모집단(봇 제외)은 밝혀야 한다 — 이 둘이 흔들리면 같은 화면의
+        깔때기(23:55 KST 스냅샷)와 비교가 성립하지 않는다."""
+        collector = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("bot: 0", collector)
+        self.assertIn("datetimeHour", collector)
+        self.assertIn("KST_OFFSET_HOURS = 9", collector)
+        self.assertIn("한국 시각 기준", self.admin_html)
+
+    def test_workflow_uses_the_new_secret_and_no_arithmetic_in_expressions(self):
+        """GHA 표현식에는 산술이 없다 — 창 경계는 셸에서 계산해야 한다."""
+        self.assertIn("secrets.CLOUDFLARE_ANALYTICS_TOKEN", self.wf)
+        self.assertIn("date -u -d", self.wf)
+        self.assertNotRegex(self.wf, r"\$\{\{[^}]*[0-9]\s*[-+*/]\s*[0-9][^}]*\}\}")
 
 
 if __name__ == "__main__":

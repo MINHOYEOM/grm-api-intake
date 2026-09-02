@@ -1,0 +1,84 @@
+name: GRM RUM Analytics Sync
+
+# Cloudflare Web Analytics(RUM) 일별 방문·유입을 Supabase 로 옮긴다(072). 운영자가
+# Cloudflare 대시보드를 읽지 않고 /admin 성장·유입 탭에서 한국어로 보게 하는 것이 목적.
+#
+# 시각: 16:30 UTC = 01:30 KST. 전날(KST) 이 15:00 UTC 에 이미 닫혔으므로 완결된 하루를
+# 담는다. 기존 크론(18:17 intake · 21:00 backlog · 목 18:15 glossary · 일 18:23 library)
+# 과 겹치지 않는 조용한 창이다.
+#
+# 창을 8일로 잡는 이유: 매번 최근 8일을 다시 upsert 한다. 하루치만 넣으면 한 번 실패한
+# 날이 영구 구멍으로 남고, RUM 은 집계가 늦게 도착하는 경우가 있어 최근 날짜가 나중에
+# 커질 수 있다. 재실행이 자기 구멍을 메우는 구조가 재시도 로직보다 단순하다.
+#
+# 시크릿: CLOUDFLARE_ANALYTICS_TOKEN(신규 · Account Analytics Read 전용)
+#         SUPABASE_URL · SUPABASE_SERVICE_ROLE_KEY(기존 재사용)
+# 계정·사이트 식별자는 비밀이 아니다(대시보드 URL 에 그대로 노출) — repo variable 로 두되
+# 미설정 시 기본값으로 폴백한다(라이브 값 = 단일 소스).
+
+on:
+  schedule:
+    - cron: '30 16 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '가져올 일수(기본 8). 백필 시 늘린다.'
+        required: false
+        default: '8'
+      probe:
+        description: 'true 면 원시 GraphQL 응답만 출력하고 적재하지 않는다(필드명 검증)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-rum-analytics
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync Cloudflare RUM into Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # GitHub Actions 표현식에는 산술이 없다 — 창 경계는 셸에서 계산한다.
+      - name: Resolve window
+        id: win
+        run: |
+          DAYS="${{ inputs.days || '8' }}"
+          echo "start=$(date -u -d "$DAYS days ago" +%Y-%m-%dT00:00:00Z)" >> "$GITHUB_OUTPUT"
+          echo "end=$(date -u +%Y-%m-%dT%H:00:00Z)" >> "$GITHUB_OUTPUT"
+
+      - name: Sync
+        env:
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'f8a15e3902ceb00a390635c040a2f551' }}
+          CLOUDFLARE_RUM_SITE_TAG: ${{ vars.CLOUDFLARE_RUM_SITE_TAG || 'aa495e04c95449028591a30d7e0f87b4' }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ inputs.probe || 'false' }}" = "true" ]; then
+            python collect_rum_analytics.py \
+              --start "${{ steps.win.outputs.start }}" \
+              --end "${{ steps.win.outputs.end }}" --probe
+          else
+            python collect_rum_analytics.py \
+              --start "${{ steps.win.outputs.start }}" \
+              --end "${{ steps.win.outputs.end }}"
+          fi

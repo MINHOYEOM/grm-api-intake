@@ -402,6 +402,16 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <div class="admin-metric"><span><i class="ti ti-loader-2"></i>불러오는 중</span><b>-</b></div>
           </div>
           <div class="admin-monitor-section">
+            <h3>방문 · 유입 경로</h3>
+            <p class="admin-section-sub">Cloudflare Web Analytics 실측(검색로봇 제외)을 매일 새벽 1시 30분에 가져옵니다. 날짜는 한국 시각 기준입니다.</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>날짜</th><th>방문</th><th>페이지뷰</th><th>구글</th><th>네이버</th><th>AI 검색</th><th>직접 방문</th></tr></thead>
+                <tbody id="grm-rum-daily"><tr><td colspan="7"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
             <h3>일별 깔때기 — 스냅샷 차분</h3>
             <p class="admin-section-sub">매일 23:55(KST)에 누적 카운터를 동결해 전일 스냅샷과의 차이를 계산합니다. '오늘' 행은 마지막 스냅샷 이후의 진행분입니다.</p>
             <div class="admin-table-wrap">

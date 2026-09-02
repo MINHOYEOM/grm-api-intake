@@ -13581,6 +13581,25 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn("KST_OFFSET_HOURS = 9", collector)
         self.assertIn("한국 시각 기준", self.admin_html)
 
+    def test_traffic_values_never_reach_the_public_log(self):
+        """★이 저장소는 PUBLIC 이고 Actions 로그는 누구나 본다.
+
+        수집기가 응답을 그대로 찍으면 사이트 방문자 수가 공개 로그에 남는다. 필드명
+        검증에 필요한 것은 값이 아니라 키 이름과 GraphQL 오류뿐이므로 그 둘만 낸다.
+        (2026-09-02: 최초 구현이 원시 payload 를 dump 하고 있었다 — 돌리기 전에 잡았다.)
+        """
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("def probe_report(", src)
+        # 원시 응답 통째 dump 금지.
+        self.assertNotIn("json.dumps(payload", src)
+        # 일별 방문/페이지뷰 값을 찍던 루프도 없어야 한다(행 수만 남긴다).
+        self.assertNotIn("daily[d]['visits']", src)
+        self.assertNotIn('daily[d]["visits"]', src)
+        # probe 는 구조만 — 오류 전문은 허용(우리가 틀린 필드명이 거기 들어 있다).
+        probe_body = src.split("def probe_report(", 1)[1].split("\ndef ", 1)[0]
+        self.assertIn("row keys", probe_body)
+        self.assertIn("GraphQL 오류", probe_body)
+
     def test_workflow_uses_the_new_secret_and_no_arithmetic_in_expressions(self):
         """GHA 표현식에는 산술이 없다 — 창 경계는 셸에서 계산해야 한다."""
         self.assertIn("secrets.CLOUDFLARE_ANALYTICS_TOKEN", self.wf)

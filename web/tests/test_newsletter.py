@@ -155,6 +155,41 @@ class NewsletterTeaserTest(unittest.TestCase):
         self.assertIn("{{ unsubscribe }}", with_unsub["html"])
 
 
+# ── 로그 마스킹(공개 저장소) ──────────────────────────────────────────────────
+class NewsletterLogMaskingTest(unittest.TestCase):
+    """테스트 수신 주소가 공개 Actions 로그에 원문으로 남지 않는다.
+
+    이 저장소는 PUBLIC 이고 `GRM_NEWSLETTER_TEST_EMAILS` 는 secret 이 아니라 **변수**라
+    GitHub 자동 마스킹이 걸리지 않는다 — 출력부가 직접 가려야 한다.
+    """
+
+    def test_masks_local_and_domain(self):
+        self.assertEqual(newsletter.mask_email("yeomminho1472@gmail.com"), "ye***@g***.com")
+        self.assertEqual(newsletter.mask_email("a@b.co.kr"), "a***@b***.kr")
+
+    def test_degenerate_input_is_fully_masked(self):
+        for bad in ("", "   ", "no-at-sign", None):
+            self.assertEqual(newsletter.mask_email(bad), "***", repr(bad))
+
+    def test_list_keeps_the_count_but_not_the_address(self):
+        out = newsletter.mask_emails(["yeomminho1472@gmail.com", "hichj95@huons.com"])
+        self.assertIn("2명", out)
+        self.assertNotIn("yeomminho1472", out)
+        self.assertNotIn("huons.com", out)
+        self.assertEqual(newsletter.mask_emails([]), "0명")
+
+    def test_send_paths_never_join_raw_addresses(self):
+        """★출력부가 마스킹을 거치는지 소스로 잠근다 — 헬퍼만 있고 안 쓰면 의미가 없다.
+        (두 모듈 모두 test 모드에서 수신 주소를 찍던 자리다.)"""
+        import pathlib
+        web = pathlib.Path(newsletter.__file__).resolve().parent
+        for name in ("newsletter.py", "announce.py"):
+            src = (web / name).read_text(encoding="utf-8")
+            self.assertNotIn("', '.join(test_emails)", src, name)
+            self.assertNotIn("', '.join(x.strip() for x in test_emails)", src, name)
+            self.assertIn("mask_emails(", src, name)
+
+
 # ── 발송 게이트 ────────────────────────────────────────────────────────────────
 class NewsletterGateTest(unittest.TestCase):
     def test_publishable_ok(self):

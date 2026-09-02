@@ -440,7 +440,7 @@ def main(argv: "list[str] | None" = None) -> int:
                                      html=mail2["html"], list_ids=list_ids,
                                      sender_name=sender_name, sender_email=sender_email)
         sender.send_test(cid, test_emails)
-        print(f"테스트 발송 완료(캠페인 {cid}) → {', '.join(test_emails)}")
+        print(f"테스트 발송 완료(캠페인 {cid}) → {newsletter.mask_emails(test_emails)}")
         return 0
 
     # mode == send — 멱등 후 실발송.

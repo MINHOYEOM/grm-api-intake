@@ -13577,9 +13577,12 @@ class WebAdminRumPanelTest(unittest.TestCase):
         깔때기(23:55 KST 스냅샷)와 비교가 성립하지 않는다."""
         collector = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
         self.assertIn("bot: 0", collector)
-        self.assertIn("datetimeHour", collector)
-        self.assertIn("KST_OFFSET_HOURS = 9", collector)
-        self.assertIn("한국 시각 기준", self.admin_html)
+        # ★일 단위로 받는다 — 시간 단위는 버킷마다 반올림이 걸려 작은 시간대가 사라진다
+        # (2026-09-02 실측: 대시보드 7일 264 vs 시간합산 9일 250, 9/1 은 60 vs 20).
+        self.assertIn("dimensions { date }", collector)
+        self.assertNotIn("datetimeHour", collector.split('"""', 2)[2])
+        # 축(UTC)은 단정하지 말고 밝힌다 — 화면이 근사임을 말해야 한다.
+        self.assertIn("협정시(UTC) 기준", self.admin_html)
 
     def test_traffic_values_never_reach_the_public_log(self):
         """★이 저장소는 PUBLIC 이고 Actions 로그는 누구나 본다.

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [조항 페이지] 조항별 색인 — /findings/clause/.
+
+    낱개 조항 페이지들의 **유일한 부모**다. sitemap 에만 있고 내부 링크가 없는 페이지는
+    색인이 안 되므로(문서 3,202장이 실제로 그렇게 떠 있었다), 이 목록이 곧 그 진입 경로다.
+    정렬은 조항 번호순 — 인용 건수순으로 줄 세우지 않는다(조항은 서로 경쟁하는 항목이
+    아니고, 건수 순위는 이미 /findings/checklist/ 가 목적을 갖고 낸다). -#}
+<style>
+  .fx-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fx-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .fx-crumb a:hover{color:var(--coral)}
+  .fx-crumb i{font-style:normal;color:var(--line-2)}
+  .fx-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .fx-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .fx-body{margin-top:34px;display:flex;flex-direction:column;gap:30px}
+  .fx-list{display:flex;flex-direction:column;gap:10px}
+  .fx-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;border:1px solid var(--line-2);border-radius:10px;padding:13px 16px;background:var(--paper);text-decoration:none}
+  .fx-row:hover{border-color:var(--coral)}
+  .fx-row-c{font-family:var(--sans);font-size:15px;color:var(--ink)}
+  .fx-row-t{font-family:var(--sans);font-size:13.5px;color:var(--muted);flex:1 1 260px}
+  .fx-row-n{font-family:var(--sans);font-size:13px;color:var(--muted)}
+  .fx-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="fx-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><span>조항별</span>
+    </nav>
+    <p class="kick">US &middot; 21 CFR</p>
+    <h1 class="fx-h1">21 CFR 조항별 지적사례</h1>
+    <p class="fx-sum">미국 GMP 규정(21 CFR Part 210&middot;211)의 조항을 인용한 지적사항을 조항별로 모았습니다. 조항 원문은 영문뿐이라, 실제로 어떤 지적이 나왔는지를 우리말 사례로 함께 봅니다. 사례가 <b>{{ min_documents }}</b>건 이상인 조항만 실었습니다.</p>
+  </div>
+
+  <div class="wrap fx-body">
+    <section class="fx-sec">
+      <div class="fx-list">
+        {%- for c in clauses %}
+        <a class="fx-row" href="{{ rel_root }}findings/clause/{{ c.slug }}/">
+          <span class="fx-row-c">{{ c.code }}</span>
+          <span class="fx-row-t">{{ c.title_en }}</span>
+          <span class="fx-row-n">문서 {{ "{:,}".format(c.documents) }}건</span>
+        </a>
+        {%- endfor %}
+      </div>
+    </section>
+
+    <section class="fx-sec">
+      <p class="fx-note">조항 제목은 미국 연방규정 원문(영문) 그대로입니다. 건수는 공개 문서에서 자동 집계한 값이고, 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것입니다. 각 조항 페이지에서 공개 원문으로 바로 갈 수 있습니다.</p>
+    </section>
+  </div>
+</main>
+{% endblock %}

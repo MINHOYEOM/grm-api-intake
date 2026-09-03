@@ -1209,23 +1209,34 @@ def _reg_ref_url(label: str, catalogs: dict[str, list[dict[str, Any]]]) -> str:
 _REG_REF_CFR_SECTION_RE = re.compile(r"^21 CFR (\d{3}\.\d+[a-z]?)$")
 
 
-def _reg_ref_cases_href(label: str) -> str:
+def _reg_ref_cases_href(label: str, clause_slugs: "set[str] | None" = None) -> str:
     """[용어사전 조항 착지] `21 CFR 211.192` → 그 조항의 지적사례 화면 상대경로.
+
+    [2026-09-03 2차] 착지를 **조항 정적 페이지**(`findings/clause/211-192/`)로 옮긴다.
+    1차(#883)는 체크리스트에 `?section=` 을 붙여 보냈는데 그건 런타임 RPC 라 크롤러에게는
+    빈 화면이고, 조항 원문 제목·관련 용어도 없다. 정적 페이지가 있으면 그쪽이 낫다.
+    `clause_slugs` 는 **실제로 만들어진 페이지 집합**이다 — 없는 페이지로 보내는 링크는
+    무링크보다 나쁘므로, 미지정이거나 그 조항 페이지가 없으면 "" 를 낸다(사례 3건 미만
+    조항은 페이지를 만들지 않는다).
 
     종전에는 관련 조항이 **전부 사이트 밖으로만** 나갔다(503 건 중 469 건이 링크되는데
     도착지는 eCFR·ICH·EU 공식문서 뿐이고 내부 링크는 0). 국문 사용자가 조항을 눌러
     닿는 곳이 영문 법령이라, "이 조항으로 실제 어떤 지적이 나왔나"를 볼 길이 없었다.
-    체크리스트(043 findings_checklist)가 이미 조항별 사례를 국문으로 들고 있으므로
-    그쪽으로 보낸다 — 새 데이터·새 RPC 0.
 
     범위 계약: 단일 조항 번호 형태만(`21 CFR 211.192`). 구간 표기(`211.160–211.194`)나
     Part 표기(`21 CFR Part 211`)는 대상 조항이 하나로 정해지지 않으므로 "" — 무링크가
     틀린 링크보다 안전하다(_reg_ref_url 과 같은 규율). 순수 함수(창작 0)."""
     m = _REG_REF_CFR_SECTION_RE.match((label or "").strip())
-    return f"findings/checklist/index.html?section={m.group(1)}" if m else ""
+    if not m:
+        return ""
+    slug = clause_slug(m.group(1))
+    if clause_slugs is not None and slug not in clause_slugs:
+        return ""
+    return f"findings/clause/{slug}/"
 
 
-def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = None) -> dict[str, str] | None:
+def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = None,
+                  clause_slugs: "set[str] | None" = None) -> dict[str, str] | None:
     """[용어사전 심화] reg_refs 항목 1건 → {"label","url","cases_href"} 정규화.
 
     문자열이면 label=문자열, url 은 _reg_ref_url 해석기로 채운다(B2). dict 면 label/url
@@ -1239,7 +1250,7 @@ def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = 
         if not label:
             return None
         return {"label": label, "url": _reg_ref_url(label, cat),
-                "cases_href": _reg_ref_cases_href(label)}
+                "cases_href": _reg_ref_cases_href(label, clause_slugs)}
     if isinstance(item, dict):
         label = (item.get("label") or "").strip()
         if not label:
@@ -1247,7 +1258,8 @@ def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = 
         url = _safe_url(item.get("url") or "")
         if not url:
             url = _reg_ref_url(label, cat)
-        return {"label": label, "url": url, "cases_href": _reg_ref_cases_href(label)}
+        return {"label": label, "url": url,
+                "cases_href": _reg_ref_cases_href(label, clause_slugs)}
     return None
 
 
@@ -1282,6 +1294,7 @@ def build_glossary_view(
     terms: list[dict[str, Any]],
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
     cases: dict[str, dict[str, Any]] | None = None,
+    clause_slugs: "set[str] | None" = None,
 ) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
@@ -1323,7 +1336,8 @@ def build_glossary_view(
 
         related = [_related_view(r) for r in (t.get("related") or [])
                    if r in label_by_id]
-        reg_refs = [v for v in (_reg_ref_view(r, reg_ref_catalogs) for r in (t.get("reg_refs") or [])) if v]
+        reg_refs = [v for v in (_reg_ref_view(r, reg_ref_catalogs, clause_slugs)
+                                for r in (t.get("reg_refs") or [])) if v]
         search_parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
         detail_ko = t.get("detail_ko") or ""
         if detail_ko:
@@ -1776,6 +1790,135 @@ def load_findings_facets(path: Path = FINDINGS_FACETS_FILE) -> "dict[str, Any] |
     if got != "grm-findings-facets/v2":
         raise SystemExit(f"findings_facets 스키마 불일치: {got!r} (기대: grm-findings-facets/v2)")
     return obj
+
+
+# ── [조항 페이지] 21 CFR 조항별 지적사례 — /findings/clause/{slug}/ ──────────────
+# 검색 실측(2026-09-03, 13쿼리): `21 CFR 211.192` 류 쿼리는 결과가 **전부 영문 법령
+# 사이트**로 국문 해설이 사실상 공백이다. 우리는 그 조항으로 지적받은 사례를 국문으로
+# 갖고 있는데 검색엔진에 보이는 형태로는 없었다(#883 의 용어사전 착지는 런타임 RPC 라
+# 크롤러에게 빈 화면이다). 이 페이지가 그 자리를 정적으로 채운다.
+#
+# 범위 계약 — 넓히지 않는다:
+#   · **GMP 조항만**(자료실 cfr.json 카탈로그 교집합 = Part 210/211). 경고서한은 표시
+#     (201.x)·등록(207.x)·FD&C Act(section 503 등)도 인용하는데, 그건 이 사이트의 주제가
+#     아니고 국문 맥락(카탈로그 제목·용어사전)도 없어 얇은 페이지가 된다.
+#   · **문서 3건 이상**(문서 페이지 임계와 같은 값). 사례 1~2건짜리 페이지는 사용자에게도
+#     검색엔진에게도 빈손이다.
+#   실측(2026-09-03): 원시 표기 497 → 정규화 96 섹션 → 위 두 게이트 통과 34개.
+_CFR_SECTION_RE = re.compile(r"^21 CFR (\d{3}\.\d+)")
+CLAUSE_MIN_DOCUMENTS = 3
+CLAUSE_MAX_SAMPLES = 6
+
+
+def load_cfr_catalog(library_dir: Path = LIBRARY_DIR) -> list[dict[str, Any]]:
+    """자료실 21 CFR 카탈로그(조항 제목·공식 원문 링크) 원본 items.
+
+    ★`_load_reg_ref_catalogs()` 를 쓰지 않는다 — 그쪽은 ich/eu_gmp/pics/who/mfds 만 싣고
+    **cfr 은 넣지 않는다**(21 CFR 은 정규식만으로 eCFR URL 을 조립할 수 있어 카탈로그가
+    필요 없었다). 모르고 `.get("cfr")` 를 쓰면 조용히 빈 리스트가 되고 조항 페이지가
+    0 장이 된다 — 실제로 그렇게 한 번 걸렸다. 파일 부재는 빈 리스트(무페이지)."""
+    p = library_dir / "cfr.json"
+    if not p.is_file():
+        return []
+    return json.loads(p.read_text(encoding="utf-8")).get("items") or []
+
+
+def _cfr_section_of(label: Any) -> str:
+    """`21 CFR 211.100(a)` → `211.100`. 조항이 아니면 "".
+
+    하위항(a)(1) 은 섹션으로 접는다 — eCFR 도 섹션 단위로만 앵커를 주고(`_reg_ref_url`
+    R1 과 같은 규칙), 사람도 "211.100"으로 검색한다. 접지 않으면 같은 조항이 페이지
+    대여섯 장으로 쪼개져 전부 얇아진다."""
+    m = _CFR_SECTION_RE.match(str(label or "").strip())
+    return m.group(1) if m else ""
+
+
+def clause_slug(section: str) -> str:
+    """`211.192` → `211-192`(URL 조각). 점은 확장자로 오독될 수 있어 하이픈으로."""
+    return section.replace(".", "-")
+
+
+def build_clause_views(docs_data: "dict[str, Any] | None",
+                       cfr_items: "list[dict[str, Any]] | None",
+                       glossary_terms: "list[dict[str, Any]] | None" = None,
+                       *, min_documents: int = CLAUSE_MIN_DOCUMENTS,
+                       max_samples: int = CLAUSE_MAX_SAMPLES) -> list[dict[str, Any]]:
+    """조항별 페이지 뷰 목록. 입력은 전부 커밋된 정본 — 네트워크·난수·now() 0.
+
+    본문은 자르지 않는다(길이 조절은 CSS 의 일이다 — findings_facet 과 같은 규율).
+    정렬은 공개일 내림차순 → 문서 id → 지적 id 로 완전 결정론이다(같은 입력이면 같은
+    바이트). 실사관 이름은 싣지 않는다(037 제약: 실명 개인 집계는 목적 밖)."""
+    docs = list((docs_data or {}).get("documents") or [])
+    catalog = {}
+    for it in (cfr_items or []):
+        sec = _cfr_section_of(it.get("code"))
+        if sec and sec not in catalog:
+            catalog[sec] = it
+    if not docs or not catalog:
+        return []
+
+    by_section: dict[str, list[dict[str, Any]]] = {}
+    doc_ids: dict[str, set] = {}
+    for doc in docs:
+        for f in doc.get("findings") or []:
+            text = (f.get("text_ko") or "").strip()
+            if not text:
+                continue
+            for sec in {_cfr_section_of(r) for r in (f.get("cfr_refs") or [])}:
+                if not sec or sec not in catalog:
+                    continue
+                by_section.setdefault(sec, []).append({
+                    "firm_name": doc.get("firm_name") or "",
+                    "agency": doc.get("agency") or "",
+                    "published_date": doc.get("published_date") or "",
+                    "doc_slug": doc.get("slug") or "",
+                    "evidence_url": doc.get("evidence_url") or "",
+                    "finding_id": f.get("finding_id") or "",
+                    "document_id": doc.get("document_id") or "",
+                    "text_ko": text,
+                })
+                doc_ids.setdefault(sec, set()).add(doc.get("document_id") or "")
+
+    # 조항 → 이 조항을 인용하는 용어사전 표제어(국문 맥락 · 상호 진입 간선).
+    terms_by_section: dict[str, list[dict[str, str]]] = {}
+    for t in (glossary_terms or []):
+        tid, tko = t.get("id") or "", t.get("term_ko") or ""
+        if not tid or not tko:
+            continue
+        for sec in sorted({_cfr_section_of(r) for r in (t.get("reg_refs") or [])} - {""}):
+            terms_by_section.setdefault(sec, []).append({"id": tid, "term_ko": tko})
+
+    views: list[dict[str, Any]] = []
+    for sec in sorted(by_section):
+        rows = by_section[sec]
+        n_docs = len(doc_ids.get(sec) or ())
+        if n_docs < min_documents:
+            continue
+        rows.sort(key=lambda r: (r["published_date"], r["document_id"], r["finding_id"]),
+                  reverse=True)
+        item = catalog[sec]
+        views.append({
+            "section": sec,
+            "code": f"21 CFR {sec}",
+            "slug": clause_slug(sec),
+            # 카탈로그 제목은 원문 그대로(영문) — 번역본을 지어내지 않는다.
+            "title_en": (item.get("title_en") or "").strip(),
+            "official_url": _safe_url(item.get("official_url") or ""),
+            "documents": n_docs,
+            "findings": len(rows),
+            "samples": rows[:max_samples],
+            "terms": terms_by_section.get(sec) or [],
+        })
+    return views
+
+
+def clause_description(clause: dict[str, Any]) -> str:
+    """meta description — 검색 결과에 그대로 나가는 문장. 숫자는 뷰에서 파생(사본 금지)."""
+    head = f"{clause['code']} 지적사례 {clause['findings']:,}건"
+    title = clause.get("title_en") or ""
+    tail = (f" 공개 문서 {clause['documents']:,}건에서 뽑아 우리말로 정리했습니다."
+            " 조항 원문 링크와 관련 용어를 함께 봅니다.")
+    return f"{head}({title}){tail}" if title else f"{head}.{tail}"
 
 
 def build_facet_item_view(item: dict[str, Any],
@@ -2927,6 +3070,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 렌더한다. 파일 로드일 뿐이라 렌더 비용이 아니다.
     facets = load_findings_facets()
     docs_data = load_findings_docs()
+    # [조항 페이지] 조항 뷰는 **용어사전보다 먼저** 만든다 — 용어사전의 "관련 조항"이
+    # 실제로 만들어진 조항 페이지에만 링크를 걸어야 하기 때문(없는 페이지로 보내는 링크는
+    # 무링크보다 나쁘다). 커밋 정본 3종에서만 파생하므로 네트워크·순서 부담 0.
+    clause_views = build_clause_views(docs_data, load_cfr_catalog(), load_glossary())
+    clause_slugs = {c["slug"] for c in clause_views}
     doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
@@ -3234,7 +3382,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
         # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
         glossary_view = build_glossary_view(
-            glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases())
+            glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases(),
+            clause_slugs)
         glossary_html = env.get_template("glossary.html").render(
             page_title="규제 용어사전 · GRM",
             rel_root="../",
@@ -3414,6 +3563,53 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 combo_mod = max((s.get("published_date") or ""
                                  for s in view.get("samples") or []), default="")
                 facet_paths.append((f"{base}{combo['slug']}/", combo_mod))
+
+    # [조항 페이지] 21 CFR 조항별 지적사례 — 색인 1장 + 조항 34장.
+    # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라
+    # 국문 해설이 공백이다. 데이터는 커밋 정본 셋(findings_docs·library/cfr·glossary)에서만
+    # 나오므로 facets 유무와 무관하게 만들어진다.
+    if clause_views:
+        clause_agency_labels = (docs_data or {}).get("agency_labels") or (
+            facets.get("agency_labels") if facets else {}) or {}
+        index_html = env.get_template("findings_clause_index.html").render(
+            page_title="21 CFR 조항별 지적사례 · GRM",
+            rel_root="../../",
+            nav_active="findings",
+            latest_slug=latest_slug,
+            description=("미국 GMP 규정(21 CFR Part 210·211) 조항별로 실제 지적사항을 "
+                         f"우리말로 모았습니다. 조항 {len(clause_views)}개."),
+            canonical=_abs_url("findings/clause/"),
+            json_ld=build_breadcrumb_json_ld([
+                ("홈", "/"), ("지적사항 검색", "findings/"), ("조항별", "")]),
+            clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
+        )
+        _write(out_dir / "findings" / "clause" / "index.html", index_html)
+        written.append("findings/clause/index.html")
+        index_mod = max((s.get("published_date") or ""
+                         for c in clause_views for s in c["samples"]), default="")
+        facet_paths.append(("findings/clause/", index_mod))
+
+        # 형제 목록은 전 조항 공통(같은 값 재사용 — 페이지마다 다시 만들지 않는다).
+        sibs = [{"slug": c["slug"], "code": c["code"]} for c in clause_views]
+        for clause in clause_views:
+            page_html = env.get_template("findings_clause.html").render(
+                page_title=f"{clause['code']} 지적사례 · GRM",
+                rel_root="../../../",
+                nav_active="findings",
+                latest_slug=latest_slug,
+                description=clause_description(clause),
+                canonical=_abs_url(f"findings/clause/{clause['slug']}/"),
+                json_ld=build_breadcrumb_json_ld([
+                    ("홈", "/"), ("지적사항 검색", "findings/"),
+                    ("조항별", "findings/clause/"), (clause["code"], "")]),
+                clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
+            )
+            _write(out_dir / "findings" / "clause" / clause["slug"] / "index.html",
+                   page_html)
+            written.append(f"findings/clause/{clause['slug']}/index.html")
+            clause_mod = max((s.get("published_date") or ""
+                              for s in clause["samples"]), default="")
+            facet_paths.append((f"findings/clause/{clause['slug']}/", clause_mod))
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지

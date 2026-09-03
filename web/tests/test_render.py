@@ -10087,11 +10087,13 @@ class WebGlossaryDeepFieldsTest(unittest.TestCase):
         view = render.build_glossary_view([synthetic])
         t = view["groups"][0]["terms"][0]
         self.assertEqual(t["detail_ko"], "실무에서는 이렇게 씁니다")
-        # [2026-09-03] cases_href 추가 — 단일 21 CFR 조항만 내부 사례 화면으로 착지시킨다
+        # [2026-09-03] cases_href — 단일 21 CFR 조항만 **조항 정적 페이지**로 착지한다
         # (그 외 계열·구간·Part 표기는 "" — 대상 조항이 하나로 안 정해진다).
+        # 이 호출은 clause_slugs 미지정이라 "실제 페이지 유무를 모르는" 모드다 →
+        # 형식만 맞으면 경로를 낸다(render_site 는 실제 슬러그 집합을 실어 좁힌다).
         self.assertEqual(t["reg_refs"], [
             {"label": "21 CFR 211.100", "url": "https://www.ecfr.gov/current/title-21/section-211.100",
-             "cases_href": "findings/checklist/index.html?section=211.100"},
+             "cases_href": "findings/clause/211-100/"},
             {"label": "ICH Q7", "url": "https://ich.org/q7", "cases_href": ""},
             {"label": "무링크 조항", "url": "", "cases_href": ""},
             {"label": "위험스킴", "url": "", "cases_href": ""},
@@ -10175,7 +10177,13 @@ class WebGlossaryRegRefLinkGuardTest(unittest.TestCase):
         # 명시적으로 실어 build_glossary_view 를 돌린다(카탈로그 미지정이면 R2~R6 이
         # 전부 "" 로 떨어져 이 가드 자체가 무의미해진다).
         cls.catalogs = render._load_reg_ref_catalogs()
-        cls.view = render.build_glossary_view(cls.terms, cls.catalogs)
+        # [2026-09-03] 조항 착지는 **실제로 만들어진 조항 페이지**에만 걸린다 —
+        # 프로덕션 호출부(render_site)와 같은 입력을 실어야 이 가드가 유효하다.
+        cls.clause_slugs = {
+            v["slug"] for v in render.build_clause_views(
+                render.load_findings_docs(), render.load_cfr_catalog(), cls.terms)}
+        cls.view = render.build_glossary_view(
+            cls.terms, cls.catalogs, None, cls.clause_slugs)
         # 그룹→용어→reg_refs 평탄화. 같은 라벨이 여러 용어에서 반복 인용돼도 그대로 둔다
         # — 화면은 용어 카드마다 칩을 새로 그리므로 "칩 개수"는 발생 건수 기준이어야
         # 렌더와 일치한다(고유 라벨 집합으로 접으면 실제 화면 손실 규모를 과소평가한다).
@@ -10247,10 +10255,16 @@ class WebGlossaryRegRefLinkGuardTest(unittest.TestCase):
         singles = [c for c in self.chips
                    if re.match(r"^21 CFR \d{3}\.\d+[a-z]?$", c["label"])]
         self.assertGreater(len(singles), 0, "단일 조항 표기가 하나도 없다 — 표본 자체가 깨졌다")
+        linked = 0
         for c in singles:
-            self.assertTrue(
-                c.get("cases_href", "").startswith("findings/checklist/index.html?section="),
-                f"단일 조항인데 내부 착지 경로가 없음: {c['label']!r} -> {c.get('cases_href')!r}")
+            href = c.get("cases_href", "")
+            if not href:
+                # 사례 3건 미만이라 조항 페이지가 없는 경우 — 무링크가 정답이다.
+                continue
+            linked += 1
+            self.assertTrue(href.startswith("findings/clause/"),
+                            f"착지가 조항 페이지가 아님: {c['label']!r} -> {href!r}")
+        self.assertGreater(linked, 0, "단일 조항 중 조항 페이지로 가는 링크가 하나도 없다")
 
     def test_ambiguous_cfr_labels_have_no_internal_href(self):
         """구간(`211.160–211.194`)·Part 표기는 대상 조항이 하나로 안 정해지므로 무링크.
@@ -10272,7 +10286,7 @@ class WebGlossaryRegRefLinkGuardTest(unittest.TestCase):
             href = c.get("cases_href") or ""
             if not href:
                 continue
-            section = href.split("section=", 1)[1]
+            section = href.rstrip("/").rsplit("/", 1)[1].replace("-", ".")
             self.assertIn(section, c["label"],
                           f"착지 조항이 라벨과 다름: {c['label']!r} -> {href!r}")
 
@@ -13696,6 +13710,110 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn("secrets.CLOUDFLARE_ANALYTICS_TOKEN", self.wf)
         self.assertIn("date -u -d", self.wf)
         self.assertNotRegex(self.wf, r"\$\{\{[^}]*[0-9]\s*[-+*/]\s*[0-9][^}]*\}\}")
+
+
+class WebClausePageTest(unittest.TestCase):
+    """[조항 페이지 2026-09-03] 21 CFR 조항별 지적사례 — /findings/clause/{slug}/.
+
+    검색 실측(13쿼리)에서 `21 CFR 211.192` 류는 결과가 **전부 영문 법령 사이트**였다.
+    국문 해설이 공백인 자리를 정적으로 채우는 페이지라, 이 클래스는 **커밋된 정본**
+    (findings_docs·library/cfr·glossary)으로 실제 뷰를 만들어 계약을 잰다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.docs = render.load_findings_docs()
+        cls.cfr = render.load_cfr_catalog()
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cls.views = render.build_clause_views(cls.docs, cls.cfr, cls.terms)
+
+    def test_catalog_loader_is_not_empty(self):
+        """★조용한 0장 가드. `_load_reg_ref_catalogs()` 는 cfr 을 싣지 않는다 —
+        모르고 `.get("cfr")` 를 쓰면 카탈로그가 빈 채로 페이지가 0장이 되고,
+        렌더는 아무 말 없이 성공한다(실제로 한 번 그렇게 걸렸다)."""
+        self.assertGreater(len(self.cfr), 0, "cfr 카탈로그가 비었다 — 조항 페이지가 0장이 된다")
+
+    def test_pages_are_generated(self):
+        self.assertGreater(len(self.views), 0, "조항 페이지가 0장 — 배선이 끊겼다")
+
+    def test_every_page_meets_the_document_floor(self):
+        """사례 1~2건짜리 페이지는 사용자에게도 검색엔진에게도 빈손이다."""
+        for v in self.views:
+            self.assertGreaterEqual(v["documents"], render.CLAUSE_MIN_DOCUMENTS, v["code"])
+
+    def test_scope_is_gmp_parts_only(self):
+        """범위를 넓히지 않는다 — 경고서한은 표시(201.x)·등록(207.x)·FD&C Act 도
+        인용하는데 그건 이 사이트의 주제가 아니고 국문 맥락도 없다."""
+        for v in self.views:
+            self.assertRegex(v["section"], r"^21[01]\.", f"GMP 밖 조항: {v['code']}")
+
+    def test_every_page_has_official_title_and_url(self):
+        for v in self.views:
+            self.assertTrue(v["title_en"], f"조항 제목 없음: {v['code']}")
+            self.assertTrue(v["official_url"].startswith("https://"), v["code"])
+
+    def test_samples_are_capped_and_carry_renderable_fields(self):
+        for v in self.views:
+            self.assertLessEqual(len(v["samples"]), render.CLAUSE_MAX_SAMPLES, v["code"])
+            self.assertGreater(len(v["samples"]), 0, v["code"])
+            for s in v["samples"]:
+                self.assertTrue(s["text_ko"].strip(), v["code"])
+                self.assertTrue(s["firm_name"].strip(), v["code"])
+                self.assertRegex(s["published_date"], r"^\d{4}-\d{2}-\d{2}$")
+
+    def test_samples_never_carry_inspector_names(self):
+        """037 제약 — 실명 개인 집계는 이 페이지의 목적 밖이다."""
+        for v in self.views:
+            for s in v["samples"]:
+                self.assertNotIn("inspector_names", s, v["code"])
+
+    def test_samples_are_newest_first_and_deterministic(self):
+        for v in self.views:
+            dates = [s["published_date"] for s in v["samples"]]
+            self.assertEqual(dates, sorted(dates, reverse=True), v["code"])
+        self.assertEqual(render.build_clause_views(self.docs, self.cfr, self.terms),
+                         self.views, "같은 입력이 같은 바이트를 내지 않는다")
+
+    def test_subsections_fold_into_their_section(self):
+        """`211.100(a)` 는 `211.100` 으로 접는다 — 접지 않으면 같은 조항이 페이지
+        대여섯 장으로 쪼개져 전부 얇아진다(eCFR 도 섹션 단위로만 앵커를 준다)."""
+        self.assertEqual(render._cfr_section_of("21 CFR 211.100(a)"), "211.100")
+        self.assertEqual(render._cfr_section_of("21 CFR 211.192"), "211.192")
+        for bad in ("section 503", "21 CFR Part 211", "21 U.S.C. § 331(a)", ""):
+            self.assertEqual(render._cfr_section_of(bad), "", bad)
+
+    def test_slugs_are_url_safe_and_unique(self):
+        slugs = [v["slug"] for v in self.views]
+        self.assertEqual(len(slugs), len(set(slugs)), "슬러그 충돌")
+        for s in slugs:
+            self.assertRegex(s, r"^\d{3}-\d+$")
+
+    def test_glossary_links_only_to_pages_that_exist(self):
+        """없는 페이지로 보내는 링크는 무링크보다 나쁘다 — 사례 3건 미만 조항은
+        페이지가 없으므로 용어사전도 그쪽으로 보내지 않는다."""
+        slugs = {v["slug"] for v in self.views}
+        view = render.build_glossary_view(
+            self.terms, render._load_reg_ref_catalogs(), None, slugs)
+        linked = 0
+        for g in view["groups"]:
+            for t in g["terms"]:
+                for r in t["reg_refs"]:
+                    href = r.get("cases_href") or ""
+                    if not href:
+                        continue
+                    linked += 1
+                    self.assertTrue(href.startswith("findings/clause/"), href)
+                    self.assertIn(href.split("/")[2], slugs, href)
+        self.assertGreater(linked, 0, "용어사전에서 조항 페이지로 가는 링크가 하나도 없다")
+
+    def test_no_clause_slugs_means_no_glossary_link(self):
+        """조항 페이지를 안 만드는 렌더(정본 부재)에서는 링크도 만들지 않는다."""
+        view = render.build_glossary_view(
+            self.terms, render._load_reg_ref_catalogs(), None, set())
+        for g in view["groups"]:
+            for t in g["terms"]:
+                for r in t["reg_refs"]:
+                    self.assertEqual(r.get("cases_href", ""), "")
 
 
 if __name__ == "__main__":

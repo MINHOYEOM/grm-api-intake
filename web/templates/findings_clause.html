@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [조항 페이지] 21 CFR 조항별 지적사례 — /findings/clause/{slug}/.
+
+    왜 있나: 검색 실측(2026-09-03)에서 `21 CFR 211.192` 류 쿼리는 결과가 **전부 영문
+    법령 사이트**였다. 국문 해설이 사실상 공백인데 우리는 그 조항으로 지적받은 사례를
+    국문으로 갖고 있다. 용어사전 착지(#883)는 런타임 RPC 라 크롤러에게 빈 화면이므로,
+    **이 페이지의 사례 본문이 곧 색인 대상**이다.
+
+    데이터 = web/data/findings_docs.json(커밋 정본) + library/cfr.json(조항 제목·원문
+    링크) + glossary.json(국문 맥락). 네트워크 0·값 무변형(본문을 자르지 않는다).
+
+    grm.css 프리즈 보존을 위해 스코프 <style>, 클래스 공간은 findings_facet 과 같은 .fx-*
+    (페이지마다 독립 HTML 이라 충돌하지 않고, 두 화면의 생김새가 갈라지지 않는다).
+    §4 한글 안전 가드: 인라인 스타일에 letter-spacing/text-transform 금지 → eyebrow 는
+    grm.css 전역 .kick 을 쓴다. -#}
+<style>
+  .fx-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fx-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .fx-crumb a:hover{color:var(--coral)}
+  .fx-crumb i{font-style:normal;color:var(--line-2)}
+  .fx-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .fx-title-en{font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--muted);margin:8px 0 0}
+  .fx-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .fx-cta{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:14px;color:var(--coral);text-decoration:none;margin:16px 0 0;border-bottom:1px solid var(--line-2)}
+  .fx-cta:hover{border-bottom-color:var(--coral)}
+  .fx-body{margin-top:34px;display:flex;flex-direction:column;gap:30px}
+  .fx-sec-h{font-family:var(--sans);font-size:14px;color:var(--muted);margin:0 0 12px}
+  .fx-cases{display:flex;flex-direction:column;gap:14px}
+  .fx-case{border:1px solid var(--line-2);border-radius:10px;padding:16px 18px;background:var(--paper)}
+  .fx-case-m{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .fx-case-f{color:var(--ink)}
+  .fx-case-t{font-family:var(--sans);font-size:14.5px;line-height:1.72;color:var(--ink);margin:0;word-break:keep-all}
+  .fx-case-a{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--coral);text-decoration:none;margin:10px 14px 0 0}
+  .fx-sibs{display:flex;flex-wrap:wrap;gap:8px}
+  .fx-sibs a{font-family:var(--sans);font-size:13.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:99px;padding:6px 12px}
+  .fx-sibs a:hover{border-color:var(--coral);color:var(--coral)}
+  .fx-sibs a.on{border-color:var(--coral);color:var(--coral)}
+  .fx-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="fx-crumb" aria-label="현재 위치">
+      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/clause/">조항별</a><i>&rsaquo;</i><span>{{ clause.code }}</span>
+    </nav>
+    <p class="kick">US &middot; 21 CFR</p>
+    <h1 class="fx-h1">{{ clause.code }} 지적사례</h1>
+    {%- if clause.title_en %}
+    {#- 조항 제목은 미국 연방규정 원문(영문) 그대로다 — 국문 제목을 지어내지 않는다. -#}
+    <p class="fx-title-en">{{ clause.title_en }}</p>
+    {%- endif %}
+    <p class="fx-sum">이 조항을 인용한 지적사항 <b>{{ "{:,}".format(clause.findings) }}</b>건을 <b>{{ "{:,}".format(clause.documents) }}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.</p>
+    <a class="fx-cta" href="{{ rel_root }}findings/index.html?q={{ clause.code | urlencode }}">{{ clause.code }} 지적사항 전체 검색 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+  </div>
+
+  <div class="wrap fx-body">
+    {% if clause.samples %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">최근 지적 사례</h2>
+      <div class="fx-cases">
+        {%- for s in clause.samples %}
+        <article class="fx-case">
+          <div class="fx-case-m">
+            <span class="fx-case-ag">{{ agency_labels.get(s.agency, s.agency) }}</span>
+            <span class="fx-case-f">{{ s.firm_name }}</span>
+            <span class="fx-case-d">{{ s.published_date }}</span>
+          </div>
+          <p class="fx-case-t">{{ s.text_ko }}</p>
+          {%- if s.doc_slug %}
+          <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">이 문서의 지적 전체 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          {%- endif %}
+          {%- if s.evidence_url %}
+          <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
+          {%- endif %}
+        </article>
+        {%- endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {#- 국문 맥락 — 이 조항을 인용하는 용어사전 표제어. 조항 원문은 영문뿐이라, 무슨
+        말인지는 우리 용어 설명이 채운다(상호 진입 간선이기도 하다). -#}
+    {% if clause.terms %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">이 조항과 관련된 용어</h2>
+      <div class="fx-sibs">
+        {%- for t in clause.terms %}<a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if clause.official_url %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">조항 원문</h2>
+      <div class="fx-sibs">
+        <a href="{{ clause.official_url }}" target="_blank" rel="noopener">eCFR 에서 {{ clause.code }} 원문 보기</a>
+      </div>
+    </section>
+    {% endif %}
+
+    {#- 진입 간선 — sitemap 에만 있고 내부 링크가 없는 페이지는 색인이 안 된다
+        (문서 3,202장이 실제로 그렇게 떠 있었다 · findings_facet.html 주석 참조). -#}
+    {% if siblings %}
+    <section class="fx-sec">
+      <h2 class="fx-sec-h">다른 조항</h2>
+      <div class="fx-sibs">
+        {%- for s in siblings %}<a href="{{ rel_root }}findings/clause/{{ s.slug }}/"{% if s.slug == clause.slug %} class="on" aria-current="page"{% endif %}>{{ s.code }}</a>{% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="fx-sec">
+{#- ★실명 업체가 인쇄되는 페이지에는 시점 고지가 반드시 붙는다(findings_facet 과 동일
+          문구·동일 규율). 같은 업체명을 같은 무게로 노출하면서 한쪽만 맥락을 주면 몇 년
+          전 지적이 현재 상태로 읽힌다. -#}
+      <p class="fx-note"><b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 &mdash; 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것이고, 조항 인용은 원문에 적힌 것을 그대로 집계했습니다. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.</p>
+    </section>
+  </div>
+</main>
+{% endblock %}

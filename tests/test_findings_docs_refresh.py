@@ -29,13 +29,17 @@ import findings_docs_refresh as fdr  # noqa: E402
 
 
 def _finding(fid="f1", text_ko="지적 본문입니다.", label="일탈/CAPA/조사",
-            inspector_names=None):
+            inspector_names=None, cfr_refs=None):
     d = {"finding_id": fid, "finding_text_ko": text_ko,
         "category_code": "deviation_capa", "category_label_ko": label}
     # 실 RPC(036 마이그레이션)는 이 키를 finding 마다 싣는다 — 실측처럼 기본은 부재(키
     # 자체가 없는 것)로 두고, 검사가 필요할 때만 명시로 채운다(빈 배열과 부재를 구분).
     if inspector_names is not None:
         d["inspector_names"] = inspector_names
+    # findings_search 는 cfr_refs 도 finding 마다 싣는다(실 RPC 정의 확인 2026-09-03).
+    # 실측 보유율 11.7% 라 기본은 부재로 둔다.
+    if cfr_refs is not None:
+        d["cfr_refs"] = cfr_refs
     return d
 
 
@@ -175,6 +179,31 @@ class DocumentViewGateTest(unittest.TestCase):
         ]
         self.assertEqual(self._view(doc)["inspector_names"],
                          ["Jose F Velez", "Ivis L Negron Torres"])
+
+    # ── [조항 착지 2026-09-03] cfr_refs — inspector_names 와 같은 규율 ─────────
+    def test_cfr_refs_kept_per_finding_when_present(self):
+        """조항별 정적 페이지의 유일한 렌더 시점 입력 — 문서가 아니라 지적 단위로 싣는다."""
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", cfr_refs=["21 CFR 211.192", "21 CFR 211.22"])]
+        self.assertEqual(self._view(doc)["findings"][0]["cfr_refs"],
+                         ["21 CFR 211.192", "21 CFR 211.22"])
+
+    def test_cfr_refs_key_absent_when_empty(self):
+        """빈 배열을 넣지 않는다 — 조항 없는 88% 레코드의 바이트가 흔들리면 안 된다."""
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a")]
+        self.assertNotIn("cfr_refs", self._view(doc)["findings"][0])
+
+    def test_cfr_refs_drops_blank_entries(self):
+        """공백뿐인 항목은 조항이 아니다 — 실으면 조항 페이지가 빈 이름으로 생긴다."""
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", cfr_refs=["  ", "21 CFR 211.100", ""])]
+        self.assertEqual(self._view(doc)["findings"][0]["cfr_refs"], ["21 CFR 211.100"])
+
+    def test_cfr_refs_all_blank_yields_no_key(self):
+        doc = _doc(n=0)
+        doc["findings"] = [_finding("a", cfr_refs=["", "   "])]
+        self.assertNotIn("cfr_refs", self._view(doc)["findings"][0])
 
 
 class InspectorNamesCollectionTest(unittest.TestCase):

@@ -196,11 +196,24 @@ def document_view(doc: dict[str, Any], *, min_findings: int,
             continue
         # 화면에 쓰는 것만 싣는다 — 이 파일은 국문 본문 167만 자를 담아 이미 9MB 급이라
         # "혹시 쓸까 봐" 넣는 필드 하나가 수백 KB 다(category_code 는 label 과 중복).
-        findings.append({
+        row: dict[str, Any] = {
             "finding_id": f["finding_id"],
             "text_ko": text,                              # 무변형 — 자르지 않는다
             "category_label_ko": f.get("category_label_ko") or "",
-        })
+        }
+        # [조항 착지 2026-09-03] 인용 조항(21 CFR 등). **값이 있을 때만** 키를 싣는다 —
+        # inspector_names 와 같은 규율이다(빈 배열을 넣으면 조항 없는 88% 레코드가 전부
+        # `"cfr_refs": []` 를 새로 얻어 기존 바이트가 흔들린다).
+        #
+        # 위 "혹시 쓸까 봐 금지" 규율과 어긋나지 않는 근거: 용어사전 "관련 조항"이 지금
+        # 체크리스트로만 착지하는데(#883), 그건 런타임 RPC 라 검색엔진에 보이지 않는다.
+        # 조항별 정적 페이지를 만들려면 렌더 시점에 이 값이 있어야 하고, 그 소비처가
+        # 이 커밋의 직후 작업이다. 실측 부담은 +310KB(8.8MB 대비 3.5%)로 국문 본문
+        # 4.4MB·영문 원문 8.5MB 와 자릿수가 다르다 — 영문 원문을 싣지 않는 이유이기도 하다.
+        cfr_refs = [str(r).strip() for r in (f.get("cfr_refs") or []) if str(r).strip()]
+        if cfr_refs:
+            row["cfr_refs"] = cfr_refs
+        findings.append(row)
     if not findings:
         # 국문 본문이 하나도 없으면 페이지를 만들 수 없다(임계와 무관한 절대 조건).
         reject["국문 지적 0건"] += 1

@@ -208,6 +208,7 @@
 
     if (docMetaEl && state.meta) {
       docMetaEl.textContent =
+        (state.focus ? "21 CFR " + state.focus + " 한 조항만 보는 중 · " : "") +
         "기준 " + state.meta.sortLabel + " · 조항 " + fmtNum(state.rows.length) +
         "개 · 조항당 사례 " + fmtNum(state.meta.examples) + "건 · 자료 기준일 " +
         state.meta.asOf + " · 출처 " + state.meta.sources;
@@ -307,6 +308,18 @@
     return isNaN(v) ? fallback : v;
   }
 
+  // [2026-09-03 조항 집중] `?section=211.192` 로 들어오면 그 조항 하나만 보여준다.
+  // 용어사전의 "관련 조항"이 종전에는 eCFR(영문 법령)로만 나갔다 — 국문 사용자가
+  // 조항을 눌렀을 때 우리 쪽 실제 지적사례로 올 수 있는 착지점이 없었다.
+  // 형식 게이트(21 CFR 조항 번호 모양)를 통과한 값만 쓴다 — 임의 문자열이 RPC 인자로
+  // 흘러가지 않게. 매치가 없으면 조용히 전체 목록으로 되돌린다(빈 화면보다 낫다).
+  var FOCUS_SECTION = (function () {
+    try {
+      var v = new URLSearchParams(window.location.search).get("section") || "";
+      return /^\d{3}\.\d+[a-z]?$/.test(v) ? v : "";
+    } catch (e) { return ""; }
+  })();
+
   function build() {
     var count = selectedInt(countEl, 15);
     var examples = selectedInt(examplesEl, 2);
@@ -325,8 +338,16 @@
         return (i[sortKey] || 0) > 0;
       }).sort(function (a, b) {
         return (b[sortKey] || 0) - (a[sortKey] || 0) || a.section.localeCompare(b.section);
-      }).slice(0, count);
+      });
       if (!items.length) throw new Error("empty ranking");
+
+      // 조항 집중은 **자르기 전에** 거른다 — 순위 20위 조항을 상위 15개에서 찾으면
+      // 영영 안 나온다. 매치 0건이면 전체 목록을 그대로 쓴다.
+      var focused = FOCUS_SECTION
+        ? items.filter(function (i) { return i.section === FOCUS_SECTION; })
+        : [];
+      state.focus = focused.length ? FOCUS_SECTION : "";
+      items = focused.length ? focused : items.slice(0, count);
 
       var sections = items.map(function (i) { return i.section; });
       return rpc("findings_checklist", { p_sections: sections, p_examples: examples })

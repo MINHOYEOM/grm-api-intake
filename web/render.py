@@ -1206,8 +1206,27 @@ def _reg_ref_url(label: str, catalogs: dict[str, list[dict[str, Any]]]) -> str:
     return ""
 
 
+_REG_REF_CFR_SECTION_RE = re.compile(r"^21 CFR (\d{3}\.\d+[a-z]?)$")
+
+
+def _reg_ref_cases_href(label: str) -> str:
+    """[용어사전 조항 착지] `21 CFR 211.192` → 그 조항의 지적사례 화면 상대경로.
+
+    종전에는 관련 조항이 **전부 사이트 밖으로만** 나갔다(503 건 중 469 건이 링크되는데
+    도착지는 eCFR·ICH·EU 공식문서 뿐이고 내부 링크는 0). 국문 사용자가 조항을 눌러
+    닿는 곳이 영문 법령이라, "이 조항으로 실제 어떤 지적이 나왔나"를 볼 길이 없었다.
+    체크리스트(043 findings_checklist)가 이미 조항별 사례를 국문으로 들고 있으므로
+    그쪽으로 보낸다 — 새 데이터·새 RPC 0.
+
+    범위 계약: 단일 조항 번호 형태만(`21 CFR 211.192`). 구간 표기(`211.160–211.194`)나
+    Part 표기(`21 CFR Part 211`)는 대상 조항이 하나로 정해지지 않으므로 "" — 무링크가
+    틀린 링크보다 안전하다(_reg_ref_url 과 같은 규율). 순수 함수(창작 0)."""
+    m = _REG_REF_CFR_SECTION_RE.match((label or "").strip())
+    return f"findings/checklist/index.html?section={m.group(1)}" if m else ""
+
+
 def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = None) -> dict[str, str] | None:
-    """[용어사전 심화] reg_refs 항목 1건 → {"label","url"} 정규화(무변형·안전 URL 게이트만).
+    """[용어사전 심화] reg_refs 항목 1건 → {"label","url","cases_href"} 정규화.
 
     문자열이면 label=문자열, url 은 _reg_ref_url 해석기로 채운다(B2). dict 면 label/url
     을 각각 strip/_safe_url 게이트만 거쳐 통과하되, **데이터의 url 이 비어 있을 때만**
@@ -1217,7 +1236,10 @@ def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = 
     cat = catalogs or {}
     if isinstance(item, str):
         label = item.strip()
-        return {"label": label, "url": _reg_ref_url(label, cat)} if label else None
+        if not label:
+            return None
+        return {"label": label, "url": _reg_ref_url(label, cat),
+                "cases_href": _reg_ref_cases_href(label)}
     if isinstance(item, dict):
         label = (item.get("label") or "").strip()
         if not label:
@@ -1225,7 +1247,7 @@ def _reg_ref_view(item: Any, catalogs: dict[str, list[dict[str, Any]]] | None = 
         url = _safe_url(item.get("url") or "")
         if not url:
             url = _reg_ref_url(label, cat)
-        return {"label": label, "url": url}
+        return {"label": label, "url": url, "cases_href": _reg_ref_cases_href(label)}
     return None
 
 

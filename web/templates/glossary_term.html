@@ -74,7 +74,7 @@
     <section class="gt-sec">
       <h2 class="gt-sec-h">관련 조항</h2>
       <div class="gt-links">
-        {%- for r in term.reg_refs %}{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span>{{ r.label }}</span>{% endif %}{% endfor %}
+        {%- for r in term.reg_refs %}{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span>{{ r.label }}</span>{% endif %}{% if r.cases_href %}<a href="{{ rel_root }}{{ r.cases_href }}">{{ r.label }} 지적사례 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>{% endif %}{% endfor %}
       </div>
     </section>
     {% endif %}

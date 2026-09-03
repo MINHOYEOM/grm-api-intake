@@ -10087,11 +10087,14 @@ class WebGlossaryDeepFieldsTest(unittest.TestCase):
         view = render.build_glossary_view([synthetic])
         t = view["groups"][0]["terms"][0]
         self.assertEqual(t["detail_ko"], "실무에서는 이렇게 씁니다")
+        # [2026-09-03] cases_href 추가 — 단일 21 CFR 조항만 내부 사례 화면으로 착지시킨다
+        # (그 외 계열·구간·Part 표기는 "" — 대상 조항이 하나로 안 정해진다).
         self.assertEqual(t["reg_refs"], [
-            {"label": "21 CFR 211.100", "url": "https://www.ecfr.gov/current/title-21/section-211.100"},
-            {"label": "ICH Q7", "url": "https://ich.org/q7"},
-            {"label": "무링크 조항", "url": ""},
-            {"label": "위험스킴", "url": ""},
+            {"label": "21 CFR 211.100", "url": "https://www.ecfr.gov/current/title-21/section-211.100",
+             "cases_href": "findings/checklist/index.html?section=211.100"},
+            {"label": "ICH Q7", "url": "https://ich.org/q7", "cases_href": ""},
+            {"label": "무링크 조항", "url": "", "cases_href": ""},
+            {"label": "위험스킴", "url": "", "cases_href": ""},
         ])
         self.assertIn("실무에서는 이렇게 씁니다", t["search"])
 
@@ -10233,6 +10236,45 @@ class WebGlossaryRegRefLinkGuardTest(unittest.TestCase):
                              f"reg_ref URL 이 https:// 로 시작하지 않음: {c['label']!r} -> {url!r}")
             self.assertNotRegex(url, r"\s",
                                  f"reg_ref URL 에 공백 포함: {c['label']!r} -> {url!r}")
+
+    # ── [2026-09-03 조항 착지] 단일 21 CFR 조항 → 내부 사례 화면 ────────────────
+    def test_single_cfr_sections_get_internal_cases_href(self):
+        """`21 CFR 211.192` 형태는 전부 내부 착지 경로를 갖는다.
+
+        고치려는 결함: 관련 조항 링크가 **전부 사이트 밖으로만** 나갔다(실측 503건 중
+        469건 링크·내부 0). 국문 사용자가 조항을 누르면 영문 법령으로 떠나 "이 조항으로
+        실제 어떤 지적이 나왔나"를 볼 길이 없었다."""
+        singles = [c for c in self.chips
+                   if re.match(r"^21 CFR \d{3}\.\d+[a-z]?$", c["label"])]
+        self.assertGreater(len(singles), 0, "단일 조항 표기가 하나도 없다 — 표본 자체가 깨졌다")
+        for c in singles:
+            self.assertTrue(
+                c.get("cases_href", "").startswith("findings/checklist/index.html?section="),
+                f"단일 조항인데 내부 착지 경로가 없음: {c['label']!r} -> {c.get('cases_href')!r}")
+
+    def test_ambiguous_cfr_labels_have_no_internal_href(self):
+        """구간(`211.160–211.194`)·Part 표기는 대상 조항이 하나로 안 정해지므로 무링크.
+
+        틀린 링크가 무링크보다 나쁘다 — _reg_ref_url 의 기존 규율을 그대로 따른다."""
+        for c in self.chips:
+            label = c["label"]
+            if not label.startswith("21 CFR"):
+                self.assertEqual(c.get("cases_href", ""), "",
+                                 f"21 CFR 이 아닌데 내부 경로가 생김: {label!r}")
+                continue
+            if not re.match(r"^21 CFR \d{3}\.\d+[a-z]?$", label):
+                self.assertEqual(c.get("cases_href", ""), "",
+                                 f"단일 조항이 아닌데 내부 경로가 생김: {label!r} -> {c.get('cases_href')!r}")
+
+    def test_internal_cases_href_section_matches_label(self):
+        """경로에 실린 조항 번호가 라벨의 조항 번호와 정확히 같다(엉뚱한 조항 착지 금지)."""
+        for c in self.chips:
+            href = c.get("cases_href") or ""
+            if not href:
+                continue
+            section = href.split("section=", 1)[1]
+            self.assertIn(section, c["label"],
+                          f"착지 조항이 라벨과 다름: {c['label']!r} -> {href!r}")
 
 
 # [C2] 용어사전→사례 링크 렌더 문구 안의 내부 운영 개념어 노출 검사 대상(예시 나열,

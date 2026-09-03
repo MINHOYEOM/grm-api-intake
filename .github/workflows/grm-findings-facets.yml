@@ -79,10 +79,25 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
         run: |
-          python findings_facets_refresh.py \
-            --supabase-url "$SUPABASE_URL" \
-            --supabase-anon-key "$SUPABASE_ANON_KEY" \
-            --min-findings "$MIN_FINDINGS"
+          # [2026-09-03] 재시도 추가 — 09-01 스케줄 실행이 findings_search RPC 의 일시적
+          # 500 하나로 실패했고(런 33559232503), 이 워크플로는 주 1회라 공개 퍼셋 숫자가
+          # 한 주 내내 낡은 채로 나갔다. 스크립트는 위반이면 **아무것도 쓰지 않고** exit 1
+          # 하므로 재시도가 안전하다(멱등). 결정론적 실패(0건 가드·표본 미달·기관 코드)는
+          # 3회 모두 같게 실패해 잡이 그대로 빨강으로 남는다 — 게이트는 약해지지 않는다.
+          for attempt in 1 2 3; do
+            if python findings_facets_refresh.py \
+                 --supabase-url "$SUPABASE_URL" \
+                 --supabase-anon-key "$SUPABASE_ANON_KEY" \
+                 --min-findings "$MIN_FINDINGS"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "::warning::퍼셋 갱신 실패(${attempt}/3) — 60초 후 재시도"
+              sleep 60
+            fi
+          done
+          echo "::error::퍼셋 갱신 3회 모두 실패 — 결정론적 실패이거나 Supabase 지속 장애"
+          exit 1
 
       - name: Detect meaningful changes
         id: changes

@@ -359,7 +359,7 @@ jobs:
               });
             } else {
               await github.rest.issues.create({
-                owner, repo, title, body, labels: [label],
+                owner, repo, title, body, labels: [label], assignees: [owner],
               });
             }
 
@@ -470,7 +470,8 @@ jobs:
             if (existing) {
               await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
             } else {
-              await github.rest.issues.create({ owner, repo, title, body, labels: [label] });
+              await github.rest.issues.create({ owner, repo, title, body, labels: [label],
+                assignees: [owner] });
             }
 
       - name: Summary

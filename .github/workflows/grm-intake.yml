@@ -267,6 +267,11 @@ jobs:
           # [MHRA GMP NCR 2026-07-23] MHRA GMDP 비준수 — EU NCR 과 동일(vars 전용·입력 없음).
           # 상시 활성은 vars.ENABLE_MHRA_GMP_NCR=true. 과거분은 grm-mhra-ncr-backfill.yml.
           ENABLE_MHRA_GMP_NCR: ${{ vars.ENABLE_MHRA_GMP_NCR || 'false' }}
+          # [MHRA 알림 본문 2026-08-26] gov.uk Content API 로 회수/결함 알림 전문을
+          # raw_payload.mhra_alert_body 에 싣는다(cap 10건·delay 1s·실패 조용히 skip).
+          # 2026-09-03: 배선 누락 수정 — collect_intake 가 읽는데 이 env 블록에 없어
+          # repo 변수를 켜도 전달되지 않았다(전달≠배선). vars 전용(입력 25 상한 회피).
+          ENABLE_MHRA_ALERT_BODY: ${{ vars.ENABLE_MHRA_ALERT_BODY || 'false' }}
           ENABLE_MOLEG_API: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_moleg_api != 'inherit') && inputs.enable_moleg_api || vars.ENABLE_MOLEG_API || 'false' }}
           ENABLE_SCRAPE: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_scrape != 'inherit') && inputs.enable_scrape || vars.ENABLE_SCRAPE || 'false' }}
           # WHY-1: 글로벌 소스 결함 excerpt(기본 off — dry-run 검증 후 on). 실패는 graceful(키 미기록).
@@ -441,6 +446,7 @@ jobs:
                 '실패해도 Claude Routine 은 v14.5 WebSearch-only 모드로 graceful degradation 됩니다.',
               ].join('\n'),
               labels: ['grm-intake', 'automation-failure'],
+              assignees: [owner],
             });
 
       - name: Open or update warning issue
@@ -583,7 +589,7 @@ jobs:
             // ── (B) 최초 발생 → 이슈 생성(=1회 알림) ────────────────────────────────
             if (!existing) {
               await github.rest.issues.create({ owner, repo, title, body: buildBody(),
-                labels: ['grm-intake', 'automation-warning'] });
+                labels: ['grm-intake', 'automation-warning'], assignees: [owner] });
               console.log(`created warning issue (codes: ${codes.join(',')})`);
               return;
             }

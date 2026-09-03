@@ -103,7 +103,7 @@ jobs:
             } else {
               const { data: created } = await github.rest.issues.create({
                 owner: context.repo.owner, repo: context.repo.repo,
-                title, body, labels: ['source-verify'],
+                title, body, labels: ['source-verify'], assignees: [context.repo.owner],
               });
               core.notice(`이슈 #${created.number} 생성`);
             }

@@ -13817,6 +13817,161 @@ class WebClausePageTest(unittest.TestCase):
                     self.assertEqual(r.get("cases_href", ""), "")
 
 
+class WebPagePathTest(unittest.TestCase):
+    """[다국어 1단계 2026-09-03] 페이지 주소의 단일 원천 — `render.PagePath`.
+
+    종전에는 렌더 호출마다 rel_root(27곳)·출력 경로(15곳)·canonical 을 손으로 따로 적었다.
+    `/en/` 트리를 얹으려면 그 42곳을 전부 다시 세야 했으므로 규칙을 한 곳으로 모았다.
+    여기서 고정하는 것: ①깊이 규칙 ②언어 접두 규칙(rel_root 는 언어 트리 루트·asset_root
+    는 사이트 루트) ③조용히 접히는 경로 거부 ④render.py 소스에 깊이 리터럴이 되살아나지
+    않는 것 ⑤실제 산출물 전수(골든 밖 수백 장 포함)의 rel_root 가 깊이와 일치하는 것.
+    """
+
+    def test_korean_tree_depth_rule(self):
+        """한국어 트리(접두 없음)에서는 rel_root·asset_root 가 같고 종전 손값과 일치한다."""
+        cases = {
+            "": ("", "index.html"),
+            "archive/": ("../", "archive/index.html"),
+            "findings/browse/": ("../../", "findings/browse/index.html"),
+            "findings/doc/hc-1/": ("../../../", "findings/doc/hc-1/index.html"),
+            "findings/c/x/fda/": ("../../../../", "findings/c/x/fda/index.html"),
+        }
+        for path, (rel, out) in cases.items():
+            with self.subTest(path=path):
+                pp = render.PagePath(path)
+                self.assertEqual(pp.lang, render.DEFAULT_LANG)
+                self.assertEqual(pp.prefix, "")
+                self.assertEqual(pp.site_path, path)
+                self.assertEqual(pp.depth, path.count("/"))
+                self.assertEqual(pp.rel_root, rel)
+                self.assertEqual(pp.asset_root, rel)
+                self.assertEqual(pp.out_file, out)
+                self.assertEqual(pp.canonical, f"{render.SITE_BASE_URL}/{path}")
+
+    def test_english_tree_adds_prefix_and_splits_roots(self):
+        """영어 트리: 출력·canonical 에는 `en/` 이 붙고, rel_root 는 **언어 트리 루트**를,
+        asset_root 는 **사이트 루트**를 가리킨다(한 단계 차이)."""
+        pp = render.PagePath("findings/browse/", "en")
+        self.assertEqual(pp.prefix, "en/")
+        self.assertEqual(pp.site_path, "en/findings/browse/")
+        self.assertEqual(pp.out_file, "en/findings/browse/index.html")
+        self.assertEqual(pp.canonical, f"{render.SITE_BASE_URL}/en/findings/browse/")
+        self.assertEqual(pp.depth, 3)
+        self.assertEqual(pp.rel_root, "../../")        # → /en/
+        self.assertEqual(pp.asset_root, "../../../")   # → /
+        home = render.PagePath("", "en")
+        self.assertEqual(home.site_path, "en/")
+        self.assertEqual(home.out_file, "en/index.html")
+        self.assertEqual(home.rel_root, "")
+        self.assertEqual(home.asset_root, "../")
+
+    def test_alternate_round_trips_between_languages(self):
+        ko = render.PagePath("glossary/oos/")
+        en = ko.alternate("en")
+        self.assertEqual((en.path, en.lang), ("glossary/oos/", "en"))
+        self.assertEqual(en.alternate("ko"), ko)
+        self.assertEqual(hash(en.alternate("ko")), hash(ko))
+        self.assertNotEqual(ko, en)
+
+    def test_rejects_paths_that_would_fold_silently(self):
+        """종전 `out_dir / "findings" / "doc" / slug / "index.html"` 은 slug 가 "" 이면
+        Path 가 조용히 접어 부모 색인을 덮어썼다 — 주소는 조용히 접히면 안 된다."""
+        for bad in ("findings/doc//", "/archive/", "archive", "../x/", "a/./b/",
+                    "a\\b/", "//"):
+            with self.subTest(path=bad):
+                with self.assertRaises(ValueError):
+                    render.PagePath(bad)
+        with self.assertRaises(ValueError):
+            render.PagePath("archive/", "jp")
+        pp = render.PagePath("briefs/2026-06-01/")
+        for bad_name in ("", "a/b", ".", ".."):
+            with self.subTest(name=bad_name):
+                with self.assertRaises(ValueError):
+                    pp.file(bad_name)
+
+    def test_file_sits_beside_index(self):
+        self.assertEqual(render.PagePath("briefs/2026-06-01/").file("share.txt"),
+                         "briefs/2026-06-01/share.txt")
+        self.assertEqual(render.PagePath("").file("404.html"), "404.html")
+        self.assertEqual(render.PagePath("", "en").file("404.html"), "en/404.html")
+
+    def test_breadcrumb_json_ld_follows_language_tree(self):
+        """빵부스러기 절대 URL 도 같은 규칙 — 한국어는 종전과 바이트 동일, 영어는 /en/."""
+        trail = [("홈", "/"), ("지적사항 검색", "findings/"), ("끝", "")]
+        ko = render.PagePath("findings/agency/").breadcrumb_json_ld(trail)
+        self.assertEqual(ko, render.build_breadcrumb_json_ld(trail))
+        self.assertIn(f'"item": "{render.SITE_BASE_URL}/findings/"', ko)
+        en = render.PagePath("findings/agency/", "en").breadcrumb_json_ld(trail)
+        self.assertIn(f'"item": "{render.SITE_BASE_URL}/en/"', en)
+        self.assertIn(f'"item": "{render.SITE_BASE_URL}/en/findings/"', en)
+        self.assertNotIn(f'"item": "{render.SITE_BASE_URL}/findings/"', en)
+        # 마지막 항목(현재 페이지)은 언어와 무관하게 item 을 갖지 않는다.
+        self.assertEqual(ko.count('"item"'), 2)
+        self.assertEqual(en.count('"item"'), 2)
+
+    def test_archive_search_index_prefix_is_derived(self):
+        """검색 인덱스 href 접두(`../`)는 손값이 아니라 아카이브 페이지 주소에서 나온다."""
+        self.assertEqual(render._ARCHIVE_REL, render.PagePath("archive/").rel_root)
+        self.assertEqual(render._ARCHIVE_REL, "../")
+
+    def test_render_site_has_no_hardcoded_depth_literals(self):
+        """render.py 에 `rel_root="../../"` 류 손값이 되살아나면 실패한다(AST 검사 —
+        주석·docstring 의 언급은 세지 않는다). 깊이 리터럴은 PagePath 안에서만 허용."""
+        import ast
+        src = (WEB_DIR / "render.py").read_text(encoding="utf-8")
+        tree = ast.parse(src)
+        inside_pagepath: set[int] = set()
+        render_site_def = None
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef) and node.name == "PagePath":
+                inside_pagepath = {id(n) for n in ast.walk(node)}
+            if isinstance(node, ast.FunctionDef) and node.name == "render_site":
+                render_site_def = node
+        self.assertIsNotNone(render_site_def)
+        depth_literals = [
+            n.value for n in ast.walk(tree)
+            if isinstance(n, ast.Constant) and isinstance(n.value, str)
+            and re.fullmatch(r"(\.\./)+", n.value) and id(n) not in inside_pagepath
+        ]
+        self.assertEqual(depth_literals, [], f"깊이 리터럴 잔존: {depth_literals}")
+        hard_rel_root = [
+            kw.value.value for n in ast.walk(render_site_def) if isinstance(n, ast.Call)
+            for kw in n.keywords
+            if kw.arg == "rel_root" and isinstance(kw.value, ast.Constant)
+        ]
+        self.assertEqual(hard_rel_root, [], f"rel_root 손값 잔존: {hard_rel_root}")
+        abs_url_calls = [
+            n for n in ast.walk(render_site_def) if isinstance(n, ast.Call)
+            and isinstance(n.func, ast.Name) and n.func.id == "_abs_url"
+        ]
+        self.assertEqual(abs_url_calls, [], "render_site 안의 canonical 은 PagePath 가 낸다")
+
+    def test_every_built_page_rel_root_matches_its_depth(self):
+        """산출물 전수 대조 — 골든 8장 밖의 수백 장(용어 낱개·모음·조항·목록)까지, 페이지가
+        실제로 놓인 깊이와 그 안의 rel_root(브랜드 링크 `href="{rel_root}index.html"`)가
+        일치해야 한다. 비공허 하한으로 검사 대상 수를 함께 고정한다."""
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_pagepath_"))
+        try:
+            out = tmp / "site"
+            _build_single(out)
+            checked = 0
+            for html_path in sorted(out.rglob("*.html")):
+                rel_dir = html_path.relative_to(out).parent.as_posix()
+                depth = 0 if rel_dir == "." else rel_dir.count("/") + 1
+                expected = "../" * depth
+                html = html_path.read_text(encoding="utf-8")
+                m = re.search(r'class="brand" href="([^"]*)"', html)
+                if not m:
+                    continue  # base.html 을 쓰지 않는 페이지(admin 등)는 대상이 아니다
+                checked += 1
+                self.assertEqual(m.group(1), f"{expected}index.html",
+                                 f"{html_path.relative_to(out).as_posix()} 의 rel_root 가 "
+                                 f"깊이({depth})와 어긋난다")
+            self.assertGreater(checked, 300, f"검사 대상이 너무 적다: {checked}")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

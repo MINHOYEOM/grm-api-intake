@@ -32,7 +32,6 @@
       "drug-product"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "유효성분·주성분의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 유효성분·주성분의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -53,7 +52,6 @@
       "drug-product"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "원료의약품의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 원료의약품의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -71,7 +69,6 @@
       "intermediate"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "원료의약품 출발물질의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 원료의약품 출발물질의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -89,7 +86,6 @@
       "batch-release"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "완제의약품의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 완제의약품의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -107,7 +103,6 @@
       "production"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "제조단위·배치·로트의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 제조단위·배치·로트의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -125,7 +120,6 @@
       "finished-product"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "제조번호·배치번호·로트번호의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 제조번호·배치번호·로트번호의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -165,7 +159,6 @@
       "packaging"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "벌크제품·반제품의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 벌크제품·반제품의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -183,7 +176,6 @@
       "intermediate-product"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "중간체의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 중간체의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -201,7 +193,6 @@
       "finished-product"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "중간제품·반제품의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 중간제품·반제품의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -222,7 +213,6 @@
       "batch-release"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "완제품·최종제품의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 완제품·최종제품의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -240,7 +230,6 @@
       "packaging-material"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "출발물질의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 출발물질의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -258,7 +247,6 @@
       "intermediate"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "원료·원료약품의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 원료·원료약품의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -276,7 +264,6 @@
       "finished-product"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "포장자재의 정의는 물질·제품의 단계와 GMP 책임 경계를 정확히 구분하는 기준점입니다. 실사에서는 포장자재의 식별, 상태표시, 승인 및 추적성이 규격서·라벨·재고기록·배치기록 사이에서 일치하는지 확인하며, 분류 오류나 무승인 사용은 조사 대상이 됩니다. 품목허가자료, 원자재·제품 규격서, 입출고·칭량 기록과 해당 배치기록을 함께 확인합니다.",
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
@@ -294,7 +281,6 @@
       "manufacturer"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "제조는 제조·허가·책임의 범위를 정해 누가 어떤 활동을 통제하고 승인해야 하는지 명확히 하는 용어입니다. 실사에서는 허가된 범위와 실제 작업, 조직도·직무기술서·기준서 및 배치기록이 서로 맞는지 확인합니다. 제조업 허가와 품목허가자료, 품질매뉴얼, 조직·업무분장 문서 및 관련 SOP를 교차 검토합니다.",
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
@@ -312,7 +298,6 @@
       "finished-product"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "생산은 제조·허가·책임의 범위를 정해 누가 어떤 활동을 통제하고 승인해야 하는지 명확히 하는 용어입니다. 실사에서는 허가된 범위와 실제 작업, 조직도·직무기술서·기준서 및 배치기록이 서로 맞는지 확인합니다. 제조업 허가와 품목허가자료, 품질매뉴얼, 조직·업무분장 문서 및 관련 SOP를 교차 검토합니다.",
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
@@ -330,7 +315,6 @@
       "finished-product"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "포장은 제조·허가·책임의 범위를 정해 누가 어떤 활동을 통제하고 승인해야 하는지 명확히 하는 용어입니다. 실사에서는 허가된 범위와 실제 작업, 조직도·직무기술서·기준서 및 배치기록이 서로 맞는지 확인합니다. 제조업 허가와 품목허가자료, 품질매뉴얼, 조직·업무분장 문서 및 관련 SOP를 교차 검토합니다.",
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
@@ -348,7 +332,6 @@
       "authorized-person"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "제조업자는 제조·허가·책임의 범위를 정해 누가 어떤 활동을 통제하고 승인해야 하는지 명확히 하는 용어입니다. 실사에서는 허가된 범위와 실제 작업, 조직도·직무기술서·기준서 및 배치기록이 서로 맞는지 확인합니다. 제조업 허가와 품목허가자료, 품질매뉴얼, 조직·업무분장 문서 및 관련 SOP를 교차 검토합니다.",
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
@@ -369,7 +352,6 @@
       "specification"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "품목허가·판매승인은 제조·허가·책임의 범위를 정해 누가 어떤 활동을 통제하고 승인해야 하는지 명확히 하는 용어입니다. 실사에서는 허가된 범위와 실제 작업, 조직도·직무기술서·기준서 및 배치기록이 서로 맞는지 확인합니다. 제조업 허가와 품목허가자료, 품질매뉴얼, 조직·업무분장 문서 및 관련 SOP를 교차 검토합니다.",
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
@@ -390,7 +372,6 @@
       "quality-unit"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "출하승인책임자는 제조·허가·책임의 범위를 정해 누가 어떤 활동을 통제하고 승인해야 하는지 명확히 하는 용어입니다. 실사에서는 허가된 범위와 실제 작업, 조직도·직무기술서·기준서 및 배치기록이 서로 맞는지 확인합니다. 제조업 허가와 품목허가자료, 품질매뉴얼, 조직·업무분장 문서 및 관련 SOP를 교차 검토합니다.",
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
@@ -411,7 +392,6 @@
       "finished-product"
     ],
     "source_url": "https://picscheme.org/docview/8881",
-    "detail_ko": "배치 출하승인은 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -430,7 +410,6 @@
       "finished-product"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "격리는 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -449,7 +428,6 @@
       "capa"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "재가공은 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -471,7 +449,6 @@
       "change-control"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "재작업·재처리는 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -490,7 +467,6 @@
       "batch-release"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "제품 회수는 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -509,7 +485,6 @@
       "specification"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "유효기한·사용기간은 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -528,7 +503,6 @@
       "api"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "재시험일자는 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -547,7 +521,6 @@
       "batch-release"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "적합기준·허용기준은 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -566,7 +539,6 @@
       "quality-control"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "규격·기준·시방서는 제품 또는 물질의 사용·출하 가능 여부와 재처리·회수 같은 수명주기 결정을 통제하는 핵심 개념입니다. 실사에서는 사전 승인, 과학적 근거, 품질부서 검토와 상태표시가 빠지거나 승인 전에 사용·출하된 사례가 지적됩니다. 배치기록, 시험성적서, 일탈·변경·회수 기록, 재고상태 로그와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
@@ -585,7 +557,6 @@
       "specification"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "품질은 제품 품질을 일관되게 확보하기 위한 조직·책임·시험·승인의 기본 축입니다. 실사에서는 품질부서의 독립성, 절차의 실제 이행, 충분한 자원과 기록 검토가 확인되며 책임이 생산부서에 사실상 종속되거나 승인 없이 출하한 경우가 지적됩니다. 품질매뉴얼, 조직도·직무기술서, 연간 품질계획, 배치 검토·출하승인 기록을 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
@@ -603,7 +574,6 @@
       "pharmaceutical-quality-system"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "품질보증은 제품 품질을 일관되게 확보하기 위한 조직·책임·시험·승인의 기본 축입니다. 실사에서는 품질부서의 독립성, 절차의 실제 이행, 충분한 자원과 기록 검토가 확인되며 책임이 생산부서에 사실상 종속되거나 승인 없이 출하한 경우가 지적됩니다. 품질매뉴얼, 조직도·직무기술서, 연간 품질계획, 배치 검토·출하승인 기록을 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
@@ -621,7 +591,6 @@
       "quality-unit"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "품질관리는 제품 품질을 일관되게 확보하기 위한 조직·책임·시험·승인의 기본 축입니다. 실사에서는 품질부서의 독립성, 절차의 실제 이행, 충분한 자원과 기록 검토가 확인되며 책임이 생산부서에 사실상 종속되거나 승인 없이 출하한 경우가 지적됩니다. 품질매뉴얼, 조직도·직무기술서, 연간 품질계획, 배치 검토·출하승인 기록을 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
@@ -639,7 +608,6 @@
       "pharmaceutical-quality-system"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "품질부서는 제품 품질을 일관되게 확보하기 위한 조직·책임·시험·승인의 기본 축입니다. 실사에서는 품질부서의 독립성, 절차의 실제 이행, 충분한 자원과 기록 검토가 확인되며 책임이 생산부서에 사실상 종속되거나 승인 없이 출하한 경우가 지적됩니다. 품질매뉴얼, 조직도·직무기술서, 연간 품질계획, 배치 검토·출하승인 기록을 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
@@ -660,7 +628,6 @@
       "continual-improvement"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "의약품 품질시스템은 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -678,7 +645,6 @@
       "pharmaceutical-quality-system"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "품질방침은 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -696,7 +662,6 @@
       "continual-improvement"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "품질목표는 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -714,7 +679,6 @@
       "procedure"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "품질매뉴얼은 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -732,7 +696,6 @@
       "pharmaceutical-quality-system"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "품질계획은 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -753,7 +716,6 @@
       "capa"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "지속적 개선은 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -771,7 +733,6 @@
       "process-validation"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "관리상태는 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -789,7 +750,6 @@
       "control-strategy"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "지식관리는 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -807,7 +767,6 @@
       "quality-risk-management"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "관리전략은 제품 수명주기 전반에서 관리상태와 지속적 개선을 유지하기 위한 의약품 품질시스템의 요소입니다. 실사에서는 경영진 검토, 목표·지표, 지식의 이전, 변경 후 효과 확인이 단절되어 문서만 존재하는 체계가 문제로 지적됩니다. 품질매뉴얼, 경영검토 회의록, 품질목표·지표, PQR, 변경관리 및 CAPA 효과확인 자료를 연결해 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
@@ -825,7 +784,6 @@
       "risk-review"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "품질위험관리는 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -843,7 +801,6 @@
       "risk-assessment"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험·리스크는 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -861,7 +818,6 @@
       "risk-identification"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위해요인은 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -879,7 +835,6 @@
       "risk-assessment"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험 확인은 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -897,7 +852,6 @@
       "risk-assessment"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험 분석은 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -915,7 +869,6 @@
       "risk-acceptance"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험 평가는 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -991,7 +944,6 @@
       "risk-review"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험 허용은 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -1009,7 +961,6 @@
       "risk-control"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험 소통은 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -1027,7 +978,6 @@
       "continual-improvement"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "위험 검토는 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -1045,7 +995,6 @@
       "risk-assessment"
     ],
     "source_url": "https://database.ich.org/sites/default/files/ICH_Q9%28R1%29_Guideline_Step4_2022_1219.pdf",
-    "detail_ko": "심각성·중대성은 환자보호와 제품 품질을 위해 위험을 과학적 근거로 평가·통제·소통·검토하는 과정의 구성요소입니다. 실사에서는 위험 질문과 가정이 불명확하거나 점수의 근거·불확실성·잔여위험·후속 검토가 기록되지 않은 평가가 지적될 수 있습니다. 위험평가서, 근거 데이터, 통제조치·잔여위험 승인, 변경·일탈·PQR의 위험 검토 기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
@@ -1084,7 +1033,6 @@
       "root-cause-analysis"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "시정조치는 일탈이나 품질문제를 조사하고 원인을 제거하며 변경의 영향을 통제하는 품질시스템 절차입니다. 실사에서는 원인을 증상으로 대체하거나 영향 배치를 좁게 한정하고, 조치 완료·효과확인 없이 사건을 종결한 사례가 반복 지적됩니다. 일탈·OOS 조사서, 근본원인 분석, CAPA·변경관리 기록, 효과확인과 추세분석 자료를 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
@@ -1102,7 +1050,6 @@
       "risk-reduction"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "예방조치는 일탈이나 품질문제를 조사하고 원인을 제거하며 변경의 영향을 통제하는 품질시스템 절차입니다. 실사에서는 원인을 증상으로 대체하거나 영향 배치를 좁게 한정하고, 조치 완료·효과확인 없이 사건을 종결한 사례가 반복 지적됩니다. 일탈·OOS 조사서, 근본원인 분석, CAPA·변경관리 기록, 효과확인과 추세분석 자료를 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
@@ -1120,7 +1067,6 @@
       "oos"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "근본원인분석은 일탈이나 품질문제를 조사하고 원인을 제거하며 변경의 영향을 통제하는 품질시스템 절차입니다. 실사에서는 원인을 증상으로 대체하거나 영향 배치를 좁게 한정하고, 조치 완료·효과확인 없이 사건을 종결한 사례가 반복 지적됩니다. 일탈·OOS 조사서, 근본원인 분석, CAPA·변경관리 기록, 효과확인과 추세분석 자료를 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
@@ -1138,7 +1084,6 @@
       "root-cause-analysis"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "일탈은 일탈이나 품질문제를 조사하고 원인을 제거하며 변경의 영향을 통제하는 품질시스템 절차입니다. 실사에서는 원인을 증상으로 대체하거나 영향 배치를 좁게 한정하고, 조치 완료·효과확인 없이 사건을 종결한 사례가 반복 지적됩니다. 일탈·OOS 조사서, 근본원인 분석, CAPA·변경관리 기록, 효과확인과 추세분석 자료를 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
@@ -1156,7 +1101,6 @@
       "validation"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "변경관리는 일탈이나 품질문제를 조사하고 원인을 제거하며 변경의 영향을 통제하는 품질시스템 절차입니다. 실사에서는 원인을 증상으로 대체하거나 영향 배치를 좁게 한정하고, 조치 완료·효과확인 없이 사건을 종결한 사례가 반복 지적됩니다. 일탈·OOS 조사서, 근본원인 분석, CAPA·변경관리 기록, 효과확인과 추세분석 자료를 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
@@ -1174,7 +1118,6 @@
       "continual-improvement"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q10_Guideline.pdf",
-    "detail_ko": "변경관리 프로세스는 일탈이나 품질문제를 조사하고 원인을 제거하며 변경의 영향을 통제하는 품질시스템 절차입니다. 실사에서는 원인을 증상으로 대체하거나 영향 배치를 좁게 한정하고, 조치 완료·효과확인 없이 사건을 종결한 사례가 반복 지적됩니다. 일탈·OOS 조사서, 근본원인 분석, CAPA·변경관리 기록, 효과확인과 추세분석 자료를 확인합니다.",
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
@@ -1196,7 +1139,6 @@
       "starting-material"
     ],
     "source_url": "https://picscheme.org/docview/6606",
-    "detail_ko": "공급업체 적격성평가는 공급망·위탁활동과 시판 후 품질정보를 품질시스템 안에서 관리하는 통제입니다. 실사에서는 계약상 책임 불명확, 공급자 평가·감사 미흡, 불만·PQR 신호의 CAPA 미연계가 지적됩니다. 품질협약, 공급자 승인목록·평가자료, 수탁자 감사기록, 불만조사와 PQR을 함께 검토합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 1",
       "EU GMP Part I Chapter 7",
@@ -1216,7 +1158,6 @@
       "quality-assurance"
     ],
     "source_url": "https://picscheme.org/docview/6606",
-    "detail_ko": "위탁활동은 공급망·위탁활동과 시판 후 품질정보를 품질시스템 안에서 관리하는 통제입니다. 실사에서는 계약상 책임 불명확, 공급자 평가·감사 미흡, 불만·PQR 신호의 CAPA 미연계가 지적됩니다. 품질협약, 공급자 승인목록·평가자료, 수탁자 감사기록, 불만조사와 PQR을 함께 검토합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 1",
       "EU GMP Part I Chapter 7",
@@ -1242,7 +1183,6 @@
       "quality-unit"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "수탁제조업자는 공급망·위탁활동과 시판 후 품질정보를 품질시스템 안에서 관리하는 통제입니다. 실사에서는 계약상 책임 불명확, 공급자 평가·감사 미흡, 불만·PQR 신호의 CAPA 미연계가 지적됩니다. 품질협약, 공급자 승인목록·평가자료, 수탁자 감사기록, 불만조사와 PQR을 함께 검토합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 1",
       "EU GMP Part I Chapter 7",
@@ -1265,7 +1205,6 @@
       "capa"
     ],
     "source_url": "https://picscheme.org/docview/6606",
-    "detail_ko": "제품품질평가는 공급망·위탁활동과 시판 후 품질정보를 품질시스템 안에서 관리하는 통제입니다. 실사에서는 계약상 책임 불명확, 공급자 평가·감사 미흡, 불만·PQR 신호의 CAPA 미연계가 지적됩니다. 품질협약, 공급자 승인목록·평가자료, 수탁자 감사기록, 불만조사와 PQR을 함께 검토합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 1",
       "EU GMP Part I Chapter 7",
@@ -1290,7 +1229,6 @@
       "root-cause-analysis"
     ],
     "source_url": "https://picscheme.org/docview/6606",
-    "detail_ko": "제품 품질불만은 공급망·위탁활동과 시판 후 품질정보를 품질시스템 안에서 관리하는 통제입니다. 실사에서는 계약상 책임 불명확, 공급자 평가·감사 미흡, 불만·PQR 신호의 CAPA 미연계가 지적됩니다. 품질협약, 공급자 승인목록·평가자료, 수탁자 감사기록, 불만조사와 PQR을 함께 검토합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 1",
       "EU GMP Part I Chapter 7",
@@ -1314,7 +1252,6 @@
       "documentation"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "표준작업절차서는 작업을 지시하고 실제 수행 사실을 재구성하게 하는 GMP 증거체계의 일부입니다. 실사에서는 승인본 미사용, 동시기록 누락, 소급작성·무단수정, 기록 보존·검색 실패가 지적됩니다. 문서관리 절차, 원본·개정이력, 현장 사용본, 배치·설비 로그와 보존목록을 확인합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
@@ -1332,7 +1269,6 @@
       "documentation"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "절차·절차서는 작업을 지시하고 실제 수행 사실을 재구성하게 하는 GMP 증거체계의 일부입니다. 실사에서는 승인본 미사용, 동시기록 누락, 소급작성·무단수정, 기록 보존·검색 실패가 지적됩니다. 문서관리 절차, 원본·개정이력, 현장 사용본, 배치·설비 로그와 보존목록을 확인합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
@@ -1350,7 +1286,6 @@
       "data-integrity"
     ],
     "source_url": "https://www.who.int/publications/m/item/trs986-annex2",
-    "detail_ko": "문서화는 작업을 지시하고 실제 수행 사실을 재구성하게 하는 GMP 증거체계의 일부입니다. 실사에서는 승인본 미사용, 동시기록 누락, 소급작성·무단수정, 기록 보존·검색 실패가 지적됩니다. 문서관리 절차, 원본·개정이력, 현장 사용본, 배치·설비 로그와 보존목록을 확인합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
@@ -1368,7 +1303,6 @@
       "documentation"
     ],
     "source_url": "https://www.who.int/publications/m/item/trs986-annex2",
-    "detail_ko": "기록은 작업을 지시하고 실제 수행 사실을 재구성하게 하는 GMP 증거체계의 일부입니다. 실사에서는 승인본 미사용, 동시기록 누락, 소급작성·무단수정, 기록 보존·검색 실패가 지적됩니다. 문서관리 절차, 원본·개정이력, 현장 사용본, 배치·설비 로그와 보존목록을 확인합니다.",
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
@@ -1544,7 +1478,6 @@
       "validation-report"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
-    "detail_ko": "밸리데이션 종합계획서는 시설·설비·시스템이 의도된 용도와 사전 승인 기준에 맞게 작동한다는 문서화된 증거의 한 요소입니다. 실사에서는 사용자요구 누락, 시험과 요구사항의 추적성 단절, 편차 미종결 또는 승인 전 사용이 지적됩니다. VMP, URS, DQ·IQ·OQ·PQ 문서, 편차·변경관리, 최종 보고서와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
@@ -1562,7 +1495,6 @@
       "acceptance-criteria"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
-    "detail_ko": "밸리데이션 실시계획서는 시설·설비·시스템이 의도된 용도와 사전 승인 기준에 맞게 작동한다는 문서화된 증거의 한 요소입니다. 실사에서는 사용자요구 누락, 시험과 요구사항의 추적성 단절, 편차 미종결 또는 승인 전 사용이 지적됩니다. VMP, URS, DQ·IQ·OQ·PQ 문서, 편차·변경관리, 최종 보고서와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
@@ -1580,7 +1512,6 @@
       "deviation"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
-    "detail_ko": "밸리데이션 결과보고서는 시설·설비·시스템이 의도된 용도와 사전 승인 기준에 맞게 작동한다는 문서화된 증거의 한 요소입니다. 실사에서는 사용자요구 누락, 시험과 요구사항의 추적성 단절, 편차 미종결 또는 승인 전 사용이 지적됩니다. VMP, URS, DQ·IQ·OQ·PQ 문서, 편차·변경관리, 최종 보고서와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
@@ -1598,7 +1529,6 @@
       "operational-qualification"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "적격성평가는 시설·설비·시스템이 의도된 용도와 사전 승인 기준에 맞게 작동한다는 문서화된 증거의 한 요소입니다. 실사에서는 사용자요구 누락, 시험과 요구사항의 추적성 단절, 편차 미종결 또는 승인 전 사용이 지적됩니다. VMP, URS, DQ·IQ·OQ·PQ 문서, 편차·변경관리, 최종 보고서와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
@@ -1619,7 +1549,6 @@
       "computerised-system"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
-    "detail_ko": "사용자요구사항규격서는 시설·설비·시스템이 의도된 용도와 사전 승인 기준에 맞게 작동한다는 문서화된 증거의 한 요소입니다. 실사에서는 사용자요구 누락, 시험과 요구사항의 추적성 단절, 편차 미종결 또는 승인 전 사용이 지적됩니다. VMP, URS, DQ·IQ·OQ·PQ 문서, 편차·변경관리, 최종 보고서와 승인기록을 함께 봅니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
@@ -1732,7 +1661,6 @@
       "continual-improvement"
     ],
     "source_url": "https://cdn.who.int/media/docs/default-source/medicines/norms-and-standards/guidelines/production/trs1019-annex3-gmp-validation.pdf?download=true&sfvrsn=9440a5c_0",
-    "detail_ko": "지속적 공정검증은 공정 또는 세척상태가 정한 품질을 재현성 있게 달성하고 계속 유지되는지 입증하는 수명주기 활동입니다. 실사에서는 최악조건·보유시간·샘플링 근거가 약하거나 상업생산 추세와 재검증 기준이 연결되지 않은 점이 지적됩니다. 공정·세척 밸리데이션 계획서와 보고서, 배치자료, 변경·일탈, 지속적 공정검증 추세를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
@@ -1751,7 +1679,6 @@
       "state-of-control"
     ],
     "source_url": "https://cdn.who.int/media/docs/default-source/medicines/norms-and-standards/guidelines/production/trs1019-annex3-gmp-validation.pdf?download=true&sfvrsn=9440a5c_0",
-    "detail_ko": "재밸리데이션은 공정 또는 세척상태가 정한 품질을 재현성 있게 달성하고 계속 유지되는지 입증하는 수명주기 활동입니다. 실사에서는 최악조건·보유시간·샘플링 근거가 약하거나 상업생산 추세와 재검증 기준이 연결되지 않은 점이 지적됩니다. 공정·세척 밸리데이션 계획서와 보고서, 배치자료, 변경·일탈, 지속적 공정검증 추세를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
@@ -1770,7 +1697,6 @@
       "worst-case"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/7c6c5b3c-4902-46ea-b7ab-7608682fb68d_en?filename=2015-10_annex15.pdf",
-    "detail_ko": "세척 밸리데이션은 공정 또는 세척상태가 정한 품질을 재현성 있게 달성하고 계속 유지되는지 입증하는 수명주기 활동입니다. 실사에서는 최악조건·보유시간·샘플링 근거가 약하거나 상업생산 추세와 재검증 기준이 연결되지 않은 점이 지적됩니다. 공정·세척 밸리데이션 계획서와 보고서, 배치자료, 변경·일탈, 지속적 공정검증 추세를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
@@ -1796,7 +1722,6 @@
       "precision"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "분석절차 밸리데이션은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1815,7 +1740,6 @@
       "reference-standard"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "교정은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1834,7 +1758,6 @@
       "operational-qualification"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "최악조건은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1857,7 +1780,6 @@
       "acceptance-criteria"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "분석절차·시험방법은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1914,7 +1836,6 @@
       "analytical-procedure-validation"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "반복성은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1936,7 +1857,6 @@
       "purity-test"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "특이성은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1955,7 +1875,6 @@
       "quantitation-limit"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "직선성은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1974,7 +1893,6 @@
       "precision"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "범위는 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -1993,7 +1911,6 @@
       "analytical-procedure-validation"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "검출한계는 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -2012,7 +1929,6 @@
       "precision"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "정량한계는 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -2031,7 +1947,6 @@
       "worst-case"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "완건성은 분석절차가 의도된 품질특성을 신뢰성 있게 측정하는지 설명하는 성능특성 또는 관리개념입니다. 실사에서는 사전 기준·통계 근거가 불충분하거나 실제 시료·범위·최악조건을 대표하지 않는 시험, 교정상태 미확인이 지적됩니다. 분석법 밸리데이션 계획서·보고서, 원자료, 계산식, 장비 교정·적격성 및 변경기록을 확인합니다.",
     "reg_refs": [
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
@@ -2053,7 +1968,6 @@
       "active-ingredient"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "함량·역가시험은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2074,7 +1988,6 @@
       "purity-test"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "확인시험은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2092,7 +2005,6 @@
       "analytical-procedure"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "순도시험은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2110,7 +2022,6 @@
       "cross-contamination"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "불순물은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2128,7 +2039,6 @@
       "specification"
     ],
     "source_url": "https://database.ich.org/sites/default/files/Q7_Guideline.pdf",
-    "detail_ko": "불순물 프로파일은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2146,7 +2056,6 @@
       "specification"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "표준품은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2188,7 +2097,6 @@
       "capa"
     ],
     "source_url": "https://www.who.int/publications/m/item/who-good-practices-for-pharmaceutical-quality-control-laboratories",
-    "detail_ko": "경향이탈 결과는 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2210,7 +2118,6 @@
       "oot"
     ],
     "source_url": "https://www.who.int/publications/m/item/quality-assurance-of-medicines-terminology-database",
-    "detail_ko": "안정성시험은 원료·공정·완제품의 규격 적합성과 안정성을 판단하는 시험실 의사결정에 직접 쓰입니다. 실사에서는 승인된 시험법 미준수, 부적절한 재시험·데이터 제외, 표준품 관리 미흡, 이상결과의 불완전한 조사가 지적됩니다. 규격서·시험방법, 원자료와 감사추적, 표준품·시약 기록, OOS/OOT 조사 및 안정성 자료를 봅니다.",
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
@@ -2232,7 +2139,6 @@
       "hepa-filter"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "청정실은 노출된 무균 제품을 미생물·입자 오염으로부터 보호하도록 청정구역을 설계하고 입증하는 개념입니다. 실사에서는 등급분류를 적격성평가나 일상 모니터링과 혼동하거나, 차압·기류·재적격성평가 근거가 부족한 점이 지적됩니다. 청정구역 적격성평가, 기류가시화 영상, HEPA 완전성, 차압·입자·미생물 추세와 도면을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.1–4.32",
       "EU GMP Annex 15"
@@ -2250,7 +2156,6 @@
       "hepa-filter"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "청정실 등급분류는 노출된 무균 제품을 미생물·입자 오염으로부터 보호하도록 청정구역을 설계하고 입증하는 개념입니다. 실사에서는 등급분류를 적격성평가나 일상 모니터링과 혼동하거나, 차압·기류·재적격성평가 근거가 부족한 점이 지적됩니다. 청정구역 적격성평가, 기류가시화 영상, HEPA 완전성, 차압·입자·미생물 추세와 도면을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.1–4.32",
       "EU GMP Annex 15"
@@ -2268,7 +2173,6 @@
       "cross-contamination"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "에어로크·전실은 노출된 무균 제품을 미생물·입자 오염으로부터 보호하도록 청정구역을 설계하고 입증하는 개념입니다. 실사에서는 등급분류를 적격성평가나 일상 모니터링과 혼동하거나, 차압·기류·재적격성평가 근거가 부족한 점이 지적됩니다. 청정구역 적격성평가, 기류가시화 영상, HEPA 완전성, 차압·입자·미생물 추세와 도면을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.1–4.32",
       "EU GMP Annex 15"
@@ -2286,7 +2190,6 @@
       "biological-indicator"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "바이오버든·미생물부하는 무균·저미생물 공정의 오염부하와 환자 위해 가능성을 판단하는 미생물학적 지표입니다. 실사에서는 샘플링 위치·시점이 공정을 대표하지 않거나 시험법 적합성, 한도·추세 및 일탈조사가 미흡한 점이 지적됩니다. 원료·공정중·완제품 시험기록, 시험법 적합성, 환경모니터링, 멸균·여과 밸리데이션과 추세자료를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.79–8.95, 9–10",
       "21 CFR 211.113"
@@ -2307,7 +2210,6 @@
       "bioburden"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "엔도톡신·내독소는 무균·저미생물 공정의 오염부하와 환자 위해 가능성을 판단하는 미생물학적 지표입니다. 실사에서는 샘플링 위치·시점이 공정을 대표하지 않거나 시험법 적합성, 한도·추세 및 일탈조사가 미흡한 점이 지적됩니다. 원료·공정중·완제품 시험기록, 시험법 적합성, 환경모니터링, 멸균·여과 밸리데이션과 추세자료를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.79–8.95, 9–10",
       "21 CFR 211.113"
@@ -2325,7 +2227,6 @@
       "sterility-assurance-level"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "발열성물질은 무균·저미생물 공정의 오염부하와 환자 위해 가능성을 판단하는 미생물학적 지표입니다. 실사에서는 샘플링 위치·시점이 공정을 대표하지 않거나 시험법 적합성, 한도·추세 및 일탈조사가 미흡한 점이 지적됩니다. 원료·공정중·완제품 시험기록, 시험법 적합성, 환경모니터링, 멸균·여과 밸리데이션과 추세자료를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.79–8.95, 9–10",
       "21 CFR 211.113"
@@ -2346,7 +2247,6 @@
       "sterility-assurance-level"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "무균공정·무균조작은 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2406,7 +2306,6 @@
       "oot"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "경고한계는 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2428,7 +2327,6 @@
       "capa"
     ],
     "source_url": "https://picscheme.org/docview/8881",
-    "detail_ko": "조치한계는 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2447,7 +2345,6 @@
       "environmental-monitoring"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "고효율 미립자 공기필터는 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2466,7 +2363,6 @@
       "contamination-control-strategy"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "아이솔레이터는 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2485,7 +2381,6 @@
       "cleanroom"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "접근제한형 배리어 시스템은 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2507,7 +2402,6 @@
       "biological-indicator"
     ],
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
-    "detail_ko": "최종멸균은 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2564,7 +2458,6 @@
       "sterility-test"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "무균보증수준은 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2659,7 +2552,6 @@
       "sterilization"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "발열성물질 제거는 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
@@ -2678,7 +2570,6 @@
       "sterility-assurance-level"
     ],
     "source_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=12934",
-    "detail_ko": "생물학적 지표는 무균제품의 미생물·입자·엔도톡신/발열성물질 오염을 예방하고 관리상태를 입증하는 핵심 개념입니다. 실사에서는 공정 설계와 CCS의 불일치, 개입·인력·기류·멸균 또는 모니터링의 미검증, 경고·조치한계 초과의 불완전한 조사가 지적됩니다. CCS, 무균공정·멸균 밸리데이션, APS, 환경·인원 모니터링, 배치기록과 일탈·CAPA를 함께 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",

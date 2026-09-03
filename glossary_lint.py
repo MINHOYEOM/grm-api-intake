@@ -103,37 +103,21 @@ BASELINE_TERM_EN_DUP_PAIRS = 0
 #
 #   2026-09-02 121 → 109: 4개 군 12어(accuracy/precision · DQ/IQ/OQ/PQ · sterilization/
 #   disinfection/sterility · risk-assessment/-control/-reduction)의 detail_ko 를 정본
-#   (ICH Q2(R2)·EU GMP Annex 15·Annex 1·ICH Q9(R1)) 조항으로 다시 써서 집합에서 뺐다
-#   (같은 스크립트로 재측정: 복제군 121→109, 85%+ 쌍 509→394). 남은 109개는 여전히 해소
-#   대상이며, 이 집합은 줄어들기만 해야 한다.
+#   (ICH Q2(R2)·EU GMP Annex 15·Annex 1·ICH Q9(R1)) 조항으로 다시 써서 집합에서 뺐다.
+#
+#   2026-09-03 109 → 0: **남은 복제군의 detail_ko 를 삭제했다.** detail_ko("실무 맥락")는
+#   규제기관 용어집에 없는 층이다 — 용어집은 정의 한 줄만 준다. 그래서 이 층은 처음부터
+#   저자 텍스트였고, 109개는 16개 템플릿을 돌려 쓴 것이라 용어별로 아무것도 말해주지
+#   않았다(bioburden·endotoxin·pyrogen 이 같은 글). 근거가 표시되지 않은 일반론이 "출처"
+#   줄 바로 위에 붙어 출처가 그 문장까지 덮는 것처럼 읽히는 것이 더 큰 문제였다.
+#   → 지웠다. 카드에는 정의(easy_ko, 용어집 출처 있음)·출처 링크·관련 조항 원문 링크·
+#   실제 지적 사례 인용이 남는다. detail_ko 는 OPTIONAL 이라 템플릿이 조용히 생략한다.
+#
+#   ★이 집합은 **비어 있어야 한다**. 앞으로 detail_ko 를 쓰려면 그 용어만의 실사 맥락을
+#   조항 근거와 함께 써라 — 템플릿 복제는 신규 id 로 잡혀 ERROR 가 된다. 여기에 id 를
+#   추가해서 통과시키지 말 것(그러면 이 게이트가 다시 무의미해진다).
 DETAIL_KO_SIMILARITY_THRESHOLD = 0.85
-BASELINE_DETAIL_KO_SIMILAR_IDS = frozenset({
-    'acceptance-criteria', 'action-limit', 'active-ingredient', 'airlock', 'alert-limit',
-    'analytical-procedure', 'analytical-procedure-validation', 'api',
-    'api-starting-material', 'aseptic-processing', 'assay', 'authorized-person', 'batch',
-    'batch-number', 'batch-release', 'bioburden', 'biological-indicator', 'bulk-product',
-    'calibration', 'change-control', 'change-management', 'cleaning-validation',
-    'cleanroom', 'cleanroom-classification', 'continual-improvement',
-    'continued-process-verification', 'contract-manufacturer', 'control-strategy',
-    'corrective-action', 'depyrogenation', 'detection-limit', 'deviation', 'documentation',
-    'drug-product', 'endotoxin', 'expiry-date', 'finished-product', 'hazard', 'hepa-filter',
-    'identification-test', 'impurity', 'impurity-profile', 'intermediate',
-    'intermediate-product', 'isolator', 'knowledge-management', 'linearity', 'manufacture',
-    'manufacturer', 'marketing-authorization', 'oot', 'outsourced-activities', 'packaging',
-    'packaging-material', 'pharmaceutical-quality-system', 'preventive-action', 'procedure',
-    'product-complaint', 'product-quality-review', 'production', 'purity-test', 'pyrogen',
-    'qualification', 'quality', 'quality-assurance', 'quality-control', 'quality-manual',
-    'quality-objectives', 'quality-planning', 'quality-policy', 'quality-risk-management',
-    'quality-unit', 'quantitation-limit', 'quarantine', 'rabs', 'range', 'raw-material',
-    'recall', 'record', 'reference-standard', 'repeatability', 'reprocessing',
-    'retest-date', 'revalidation', 'reworking', 'risk', 'risk-acceptance', 'risk-analysis',
-    'risk-communication', 'risk-evaluation', 'risk-identification', 'risk-review',
-    'robustness', 'root-cause-analysis', 'severity', 'sop', 'specification', 'specificity',
-    'stability-testing', 'starting-material', 'state-of-control',
-    'sterility-assurance-level', 'supplier-qualification', 'terminal-sterilization',
-    'user-requirements-specification', 'validation-master-plan', 'validation-protocol',
-    'validation-report', 'worst-case',
-})
+BASELINE_DETAIL_KO_SIMILAR_IDS: frozenset[str] = frozenset()
 
 # W3 — easy_ko/detail_ko 가 공백 제거 후 10자 미만인 발생 건수(값이 있는 경우만
 #   ― easy_ko가 아예 비어있으면 필수 필드라 E2 EMPTY_STRING이 이미 잡는다).

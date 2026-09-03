@@ -440,7 +440,14 @@ class CommittedDataTest(unittest.TestCase):
     # 이 숫자를 내리라고 알려준다.
     # [2026-08-27] 1337 → 1338. EU·영국 GMP 비준수 86건이 면제로 편입되며 1건 늘었다
     # (모집단 정의가 넓어진 만큼의 정직한 증가 — 상류 절단 자체는 그대로다).
-    BASELINE_UPSTREAM_TRUNCATED = 1338
+    # [2026-09-03] 1338 → 1340. 이번 갱신에 문서 4건·지적 16건이 새로 들어왔고 그 중
+    # 2건이 절단본이다(finding-6701ef9d…·finding-b9a60f9a…, 둘 다 FDA 경고서한
+    # 2026-09-01). **기존 건이 새로 잘린 것은 아니다** — 사라진 절단 0건, 순증 2건뿐.
+    # 우리 상한에 걸린 것도 아니다: 절단 군집은 473~480 자(알려진 경고서한 480 절단,
+    # #653)인데 이 둘은 5,985·5,551 자로 군집 밖이고, 1,000 자 넘는 절단은 2021-08-17
+    # 부터 있어 온 18 건짜리 기존 계열이다(전부 경고서한 한 소스). 원문(finding_text)
+    # 자체가 말줄임표로 끝나므로 번역층 결함도 아니다.
+    BASELINE_UPSTREAM_TRUNCATED = 1340
 
     def test_upstream_truncation_does_not_grow(self):
         bad = [f["finding_id"] for d in self.data["documents"] for f in d["findings"]

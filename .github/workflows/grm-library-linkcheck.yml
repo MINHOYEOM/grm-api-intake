@@ -91,5 +91,6 @@ jobs:
             if (existing) {
               await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
             } else {
-              await github.rest.issues.create({ owner, repo, title, body, labels: ['automation-warning'] });
+              await github.rest.issues.create({ owner, repo, title, body,
+                labels: ['automation-warning'], assignees: [owner] });
             }

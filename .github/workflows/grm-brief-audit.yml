@@ -111,6 +111,7 @@ jobs:
               }
               await github.rest.issues.create({
                 owner, repo, title, body, labels: ['grm-intake', 'automation-warning'],
+                assignees: [owner],
               });
             }
 

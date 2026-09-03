@@ -23,6 +23,11 @@ import sys
 # 브릿지가 구조적으로 실패하는 주에 워치독이 계속 때리는 것을 막는다(유한성 계약).
 DEFAULT_DISPATCH_CAP = 2
 
+# 조립(grm-web-publish) 재기동 상한. 브릿지(2회)보다 낮은 1회인 이유 — 조립 실패는
+# 회귀 가드·스캐폴드 부재처럼 결정론적인 경우가 있어 같은 입력으로 재시도하면 같게
+# 실패한다. 한 번만 시도하고 그래도 안 되면 사람을 부른다.
+DEFAULT_ASSEMBLE_CAP = 1
+
 # 이 시각(KST) 전에는 경보하지 않는다 — 조용히 복구만 시도한다.
 # 첫 회차(09:13)는 Routine 예치(07:30)가 늦은 경우와 구분이 안 되므로, 이른 시각의
 # 부재를 곧바로 "실패"로 부르면 오탐이 된다. 복구 시도는 멱등이라 일찍 해도 무해하지만
@@ -50,22 +55,62 @@ def decide_dispatch(delta_exists: bool, publish_pr_exists: bool,
     return True, f"델타·발행PR 모두 부재 — 브릿지 기동({dispatches_today + 1}/{cap})"
 
 
+def decide_assemble(delta_exists: bool, publish_pr_exists: bool, kst_hour: int,
+                    assembles_today: int, cap: int = DEFAULT_ASSEMBLE_CAP,
+                    quiet_before_hour: int = DEFAULT_QUIET_BEFORE_KST_HOUR) -> tuple[bool, str]:
+    """조립(grm-web-publish)을 재기동할 것인가. 반환 = (기동 여부, 사유).
+
+    [2026-09-03 신설] 브릿지 기동(decide_dispatch)은 **델타가 없을 때**를 위한 것이다.
+    델타는 main 에 있는데 발행 PR 이 없는 상태 = 브릿지는 성공했고 그 다음 단계인 조립이
+    실패한 것으로, 종전에는 어느 판정도 이 경우를 보지 않았다(감사 실측: 관측 6주 중
+    07-26·08-03·08-09·08-16 4주가 이 상태였고 매번 사람이 손으로 dispatch 해 복구했다).
+
+    브릿지를 다시 때리는 것은 소용이 없다 — 델타가 이미 main 에 있으면 브릿지는 할 일이
+    없다(decide_dispatch 첫 조건). 재기동 대상은 조립 워크플로 자신이다.
+
+    상한 1회 — 조립 실패가 결정론적(회귀 가드·스캐폴드 부재)이면 재시도해도 같게 실패하므로
+    한 번만 시도하고 경보로 넘긴다. 사람이 손으로 돌린 dispatch 도 함께 센다.
+    """
+    if publish_pr_exists:
+        return False, "발행 PR 이 이미 존재 — 조립 완료(재기동 불필요)"
+    if not delta_exists:
+        return False, "델타 부재 — 조립할 입력이 없음(브릿지 기동 판정 소관)"
+    if kst_hour < quiet_before_hour:
+        return False, (f"이른 회차({kst_hour}시 < {quiet_before_hour}시) — 조립이 아직 진행 "
+                       f"중일 수 있어 재기동하지 않음")
+    if assembles_today >= cap:
+        return False, f"오늘 조립 재기동 {assembles_today}회로 상한({cap}) 도달 — 추가 기동 중단"
+    return True, f"델타는 있으나 발행 PR 부재 — 조립 재기동({assembles_today + 1}/{cap})"
+
+
 def decide_escalate(delta_exists: bool, recovered: bool, kst_hour: int,
                     quiet_before_hour: int = DEFAULT_QUIET_BEFORE_KST_HOUR,
-                    publish_pr_exists: bool = False) -> tuple[bool, str]:
+                    publish_pr_exists: bool = False,
+                    assemble_recovered: bool = False) -> tuple[bool, str]:
     """운영 경고 이슈로 표면화할 것인가. 반환 = (경보 여부, 사유).
 
     복구됐거나 애초에 정상이면 경보하지 않는다(과알림 0). 이른 회차의 부재는 Routine
     예치 지연과 구분되지 않으므로 조용히 넘긴다 — 다음 회차가 판단한다.
 
-    `publish_pr_exists` 는 기동 판정과 **같은 이유로** 경보도 막는다(2026-07-20 시뮬레이션에서
-    발견): 발행 PR 이 이미 있으면 그 주 발행은 정상 진행 중이므로, 델타 파일이 안 보인다는
-    이유만으로 경보하면 오탐이다(경로 변경·수동 정리 등으로 델타만 사라질 수 있다).
+    발행이 끝났다는 증거는 델타가 아니라 **발행 PR** 이다. 그래서 그 판정을 맨 앞에 둔다.
+
+    [2026-09-03 수정 — 사각지대] 종전엔 `delta_exists` 를 첫 조건으로 보고 곧바로
+    "델타 정상"으로 반환해, 그 뒤에 오는 `publish_pr_exists` 를 **읽지도 않았다**. 그래서
+    브릿지는 성공하고 조립이 실패한 주에 워치독이 초록으로 지나갔다(감사 실측 6주 중 4주).
+    이제 델타 존재는 정상 신호가 아니라 "조립까지 갔는가"를 되묻는 분기다. 조립 실패는
+    조용한 회차(11시 전)에는 여전히 봐주는데, 델타 push 직후 조립이 도는 중일 수 있기
+    때문이다 — 기존 "일찍 고치고 늦게 소리친다" 규율을 그대로 물려받는다.
     """
-    if delta_exists:
-        return False, "델타 정상 — 경보 없음"
     if publish_pr_exists:
-        return False, "발행 PR 존재 — 발행 진행 중이므로 경보 없음"
+        return False, "발행 PR 존재 — 조립까지 완료(경보 없음)"
+    if delta_exists:
+        if assemble_recovered:
+            return False, "조립 재기동 성공 — 경보 없음(기록만 남김)"
+        if kst_hour < quiet_before_hour:
+            return False, (f"이른 회차({kst_hour}시 < {quiet_before_hour}시) — 조립이 진행 "
+                           f"중일 수 있어 경보는 다음 회차로 미룸")
+        return True, (f"{kst_hour}시 기준 델타는 있으나 발행 PR 부재 — "
+                      f"조립(grm-web-publish) 실패 의심")
     if recovered:
         return False, "자가 복구 성공 — 경보 없음(기록만 남김)"
     if kst_hour < quiet_before_hour:
@@ -99,22 +144,36 @@ def main(argv: list[str] | None = None) -> int:
     d.add_argument("--dispatches-today", type=int, default=0)
     d.add_argument("--cap", type=int, default=DEFAULT_DISPATCH_CAP)
 
+    a = sub.add_parser("assemble", help="조립(grm-web-publish) 재기동 여부 판정")
+    a.add_argument("--delta-exists", action="store_true")
+    a.add_argument("--publish-pr-exists", action="store_true")
+    a.add_argument("--kst-hour", type=int, required=True)
+    a.add_argument("--assembles-today", type=int, default=0)
+    a.add_argument("--cap", type=int, default=DEFAULT_ASSEMBLE_CAP)
+    a.add_argument("--quiet-before-hour", type=int, default=DEFAULT_QUIET_BEFORE_KST_HOUR)
+
     e = sub.add_parser("escalate", help="경보 여부 판정")
     e.add_argument("--delta-exists", action="store_true")
     e.add_argument("--recovered", action="store_true")
     e.add_argument("--kst-hour", type=int, required=True)
     e.add_argument("--quiet-before-hour", type=int, default=DEFAULT_QUIET_BEFORE_KST_HOUR)
     e.add_argument("--publish-pr-exists", action="store_true")
+    e.add_argument("--assemble-recovered", action="store_true")
 
     args = ap.parse_args(argv)
     if args.cmd == "dispatch":
         ok, reason = decide_dispatch(args.delta_exists, args.publish_pr_exists,
                                      args.dispatches_today, args.cap)
         _emit({"dispatch": ok, "dispatch_reason": reason})
+    elif args.cmd == "assemble":
+        ok, reason = decide_assemble(args.delta_exists, args.publish_pr_exists,
+                                     args.kst_hour, args.assembles_today,
+                                     args.cap, args.quiet_before_hour)
+        _emit({"assemble": ok, "assemble_reason": reason})
     else:
         ok, reason = decide_escalate(args.delta_exists, args.recovered,
                                      args.kst_hour, args.quiet_before_hour,
-                                     args.publish_pr_exists)
+                                     args.publish_pr_exists, args.assemble_recovered)
         _emit({"escalate": ok, "escalate_reason": reason})
     return 0
 

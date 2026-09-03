@@ -92,8 +92,38 @@ class DecideEscalateTest(unittest.TestCase):
     """경보 조건 — 과알림 0 과 침묵 방지 사이의 계약."""
 
     def test_normal_no_escalation(self):
-        ok, _ = w.decide_escalate(delta_exists=True, recovered=False, kst_hour=13)
+        """정상 = 델타가 있고 **발행 PR 까지** 있는 것.
+
+        2026-09-03 정정: 종전 이 테스트는 `delta_exists=True` 만으로 정상이라 단언했고,
+        그 전제가 곧 사각지대였다(감사 실측 6주 중 4주는 델타만 있고 조립이 실패한 주).
+        발행이 끝났다는 증거는 델타가 아니라 발행 PR 이므로 그것을 정상 조건으로 쓴다.
+        """
+        ok, _ = w.decide_escalate(delta_exists=True, recovered=False, kst_hour=13,
+                                  publish_pr_exists=True)
         self.assertFalse(ok)
+
+    def test_delta_without_publish_pr_escalates(self):
+        """델타는 있는데 발행 PR 이 없다 = 조립 실패. 이 조합이 종전엔 초록이었다.
+
+        실측 근거: 07-26·08-03·08-09·08-16 네 주가 이 상태였고 워치독은 매번
+        "델타 정상 — 경보 없음" 을 찍었다(런 31986188073 로그).
+        """
+        ok, reason = w.decide_escalate(delta_exists=True, recovered=False, kst_hour=13,
+                                       publish_pr_exists=False)
+        self.assertTrue(ok)
+        self.assertIn("발행 PR 부재", reason)
+
+    def test_delta_without_pr_stays_quiet_early(self):
+        # 델타 push 직후 조립이 도는 중일 수 있다 — 이른 회차는 기존 규율대로 침묵.
+        ok, reason = w.decide_escalate(delta_exists=True, recovered=False, kst_hour=9)
+        self.assertFalse(ok)
+        self.assertIn("이른 회차", reason)
+
+    def test_assemble_recovery_suppresses_alarm(self):
+        ok, reason = w.decide_escalate(delta_exists=True, recovered=False, kst_hour=13,
+                                       assemble_recovered=True)
+        self.assertFalse(ok)
+        self.assertIn("기록", reason)
 
     def test_recovered_no_escalation(self):
         ok, reason = w.decide_escalate(delta_exists=False, recovered=True, kst_hour=13)
@@ -141,6 +171,47 @@ class DecideEscalateTest(unittest.TestCase):
         self.assertFalse(e)
 
 
+class DecideAssembleTest(unittest.TestCase):
+    """조립 재기동 조건 — 브릿지 기동으로는 닿지 않는 사각지대의 복구 레인."""
+
+    def test_delta_without_pr_triggers_assemble(self):
+        ok, reason = w.decide_assemble(delta_exists=True, publish_pr_exists=False,
+                                       kst_hour=13, assembles_today=0)
+        self.assertTrue(ok)
+        self.assertIn("발행 PR 부재", reason)
+
+    def test_publish_pr_blocks_assemble(self):
+        ok, reason = w.decide_assemble(True, True, 13, 0)
+        self.assertFalse(ok)
+        self.assertIn("조립 완료", reason)
+
+    def test_no_delta_is_bridge_lane(self):
+        # 델타가 없으면 조립할 입력 자체가 없다 — 브릿지 판정이 맡는다.
+        ok, reason = w.decide_assemble(False, False, 13, 0)
+        self.assertFalse(ok)
+        self.assertIn("델타 부재", reason)
+
+    def test_early_run_does_not_reassemble(self):
+        ok, reason = w.decide_assemble(True, False, 9, 0)
+        self.assertFalse(ok)
+        self.assertIn("이른 회차", reason)
+
+    def test_cap_is_one(self):
+        # 조립 실패는 결정론적일 수 있어 한 번만 재시도한다.
+        self.assertEqual(w.DEFAULT_ASSEMBLE_CAP, 1)
+        ok, reason = w.decide_assemble(True, False, 13, assembles_today=1)
+        self.assertFalse(ok)
+        self.assertIn("상한", reason)
+
+    def test_bridge_lane_ignores_this_case(self):
+        """같은 사실에 두 레인이 겹치지 않는지 — 델타 존재 시 브릿지는 안 돌고 조립이 돈다."""
+        d, _ = w.decide_dispatch(delta_exists=True, publish_pr_exists=False, dispatches_today=0)
+        a, _ = w.decide_assemble(delta_exists=True, publish_pr_exists=False,
+                                 kst_hour=13, assembles_today=0)
+        self.assertFalse(d)
+        self.assertTrue(a)
+
+
 class NonAsciiOutputTest(unittest.TestCase):
     """사유 문자열의 비ASCII(—)가 cp949 stdout 에서 죽지 않는지.
 
@@ -166,6 +237,11 @@ class NonAsciiOutputTest(unittest.TestCase):
             w.decide_escalate(True, False, 13)[1], w.decide_escalate(False, True, 13)[1],
             w.decide_escalate(False, False, 9)[1], w.decide_escalate(False, False, 13)[1],
             w.decide_escalate(False, False, 13, publish_pr_exists=True)[1],
+            w.decide_escalate(True, False, 9)[1],
+            w.decide_escalate(True, False, 13, assemble_recovered=True)[1],
+            w.decide_assemble(True, False, 13, 0)[1], w.decide_assemble(True, True, 13, 0)[1],
+            w.decide_assemble(False, False, 13, 0)[1], w.decide_assemble(True, False, 9, 0)[1],
+            w.decide_assemble(True, False, 13, 1)[1],
         ]
         for r in reasons:
             self.assertTrue(r.strip())

@@ -46,7 +46,7 @@ jobs:
   check:
     name: delta_{date}.json 존재 확인(그 주 Routine 발행 여부)
     runs-on: ubuntu-latest
-    timeout-minutes: 20   # 자가 복구 대기(최대 10분) + 브릿지 기동 여유
+    timeout-minutes: 30   # 자가 복구 대기(브릿지 10분 또는 조립 15분) + 기동 여유
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -95,11 +95,19 @@ jobs:
                 --jq "[.[] | select(.createdAt | startswith(\"$TODAY_UTC\"))] | length" 2>/dev/null || echo 0)
           echo "오늘 브릿지 dispatch 횟수: $N"
 
+          # 조립 레인의 유한 계약 — 오늘 조립(grm-web-publish)이 dispatch 로 몇 번 돌았는지.
+          # 브릿지와 별도로 센다(상한도 별도: 조립은 1회).
+          A=$(gh run list -R "${GITHUB_REPOSITORY}" --workflow grm-web-publish.yml \
+                --event workflow_dispatch --limit 30 --json createdAt \
+                --jq "[.[] | select(.createdAt | startswith(\"$TODAY_UTC\"))] | length" 2>/dev/null || echo 0)
+          echo "오늘 조립 dispatch 횟수: $A"
+
           KST_HOUR=$(TZ='Asia/Seoul' date '+%-H')
           {
             echo "found=$FOUND"
             echo "pr_exists=$PR_EXISTS"
             echo "dispatches_today=$N"
+            echo "assembles_today=$A"
             echo "kst_hour=$KST_HOUR"
             echo "pub_date=$PUB_DATE_KST"
             echo "delta_path=$DELTA"
@@ -144,6 +152,47 @@ jobs:
           echo "::warning::브릿지 기동했으나 10분 내 델타 미확인 — 경보로 전환"
           echo "recovered=false" >> "$GITHUB_OUTPUT"
 
+      - name: 조립 재기동 판정 — publish_watchdog.decide_assemble
+        id: decide_assemble
+        run: |
+          set -euo pipefail
+          ARGS=(assemble --kst-hour "${{ steps.check.outputs.kst_hour }}"
+                --assembles-today "${{ steps.check.outputs.assembles_today }}")
+          [ "${{ steps.check.outputs.found }}"     = "true" ] && ARGS+=(--delta-exists)      || true
+          [ "${{ steps.check.outputs.pr_exists }}" = "true" ] && ARGS+=(--publish-pr-exists) || true
+          python publish_watchdog.py "${ARGS[@]}" | tee -a "$GITHUB_OUTPUT"
+
+      - name: 자가 복구 ② — 조립(grm-web-publish) 재기동 후 재확인
+        id: reassemble
+        if: steps.decide_assemble.outputs.assemble == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUB_DATE: ${{ steps.check.outputs.pub_date }}
+        run: |
+          set -euo pipefail
+          # [2026-09-03] 델타는 main 에 있는데 발행 PR 이 없다 = 브릿지가 아니라 **조립**이
+          # 실패했다. 브릿지를 다시 때려도 소용없다(델타가 이미 있으면 할 일이 없다).
+          # 실측: 07-26·08-03·08-09·08-16 네 주 모두 사람이 이 dispatch 를 손으로 쳐서
+          # 복구했다 — 그 손동작을 그대로 자동화한다.
+          PUB_BRANCH="publish/brief-${PUB_DATE}"
+          echo "조립 재기동 시도 — 사유: ${{ steps.decide_assemble.outputs.assemble_reason }}"
+          if ! gh workflow run grm-web-publish.yml --ref main -f publish_date="$PUB_DATE"; then
+            echo "::warning::조립 dispatch 실패 — 경보로 전환"
+            echo "assemble_recovered=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # 조립은 골든 재동결·렌더 스모크까지 도는 무거운 잡이라 브릿지(10분)보다 길게 본다.
+          for i in $(seq 1 30); do
+            sleep 30
+            if gh api "repos/${GITHUB_REPOSITORY}/branches/${PUB_BRANCH}" --silent 2>/dev/null; then
+              echo "::notice::조립 재기동 성공 — $PUB_BRANCH 확인(${i}회차)"
+              echo "assemble_recovered=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "::warning::조립 기동했으나 15분 내 발행 브랜치 미확인 — 경보로 전환"
+          echo "assemble_recovered=false" >> "$GITHUB_OUTPUT"
+
       - name: 경보 판정 — publish_watchdog.decide_escalate
         id: alarm
         run: |
@@ -152,6 +201,7 @@ jobs:
           [ "${{ steps.check.outputs.found }}"       = "true" ] && ARGS+=(--delta-exists)      || true
           [ "${{ steps.check.outputs.pr_exists }}"   = "true" ] && ARGS+=(--publish-pr-exists) || true
           [ "${{ steps.recover.outputs.recovered }}" = "true" ] && ARGS+=(--recovered)         || true
+          [ "${{ steps.reassemble.outputs.assemble_recovered }}" = "true" ] && ARGS+=(--assemble-recovered) || true
           python publish_watchdog.py "${ARGS[@]}" | tee -a "$GITHUB_OUTPUT"
 
       - name: 실행 요약(step summary) — 조용한 복구 방지
@@ -166,8 +216,11 @@ jobs:
             echo "| 델타 존재 | \`${{ steps.check.outputs.found }}\` (${{ steps.check.outputs.delta_path }}) |"
             echo "| 발행 브랜치 존재 | \`${{ steps.check.outputs.pr_exists }}\` |"
             echo "| 오늘 브릿지 dispatch | ${{ steps.check.outputs.dispatches_today }}회 |"
-            echo "| **복구 기동** | \`${{ steps.decide.outputs.dispatch }}\` — ${{ steps.decide.outputs.dispatch_reason }} |"
+            echo "| 오늘 조립 dispatch | ${{ steps.check.outputs.assembles_today }}회 |"
+            echo "| **복구 기동(브릿지)** | \`${{ steps.decide.outputs.dispatch }}\` — ${{ steps.decide.outputs.dispatch_reason }} |"
             echo "| 복구 결과 | \`${{ steps.recover.outputs.recovered || 'n/a' }}\` |"
+            echo "| **복구 기동(조립)** | \`${{ steps.decide_assemble.outputs.assemble }}\` — ${{ steps.decide_assemble.outputs.assemble_reason }} |"
+            echo "| 조립 복구 결과 | \`${{ steps.reassemble.outputs.assemble_recovered || 'n/a' }}\` |"
             echo "| **경보** | \`${{ steps.alarm.outputs.escalate }}\` — ${{ steps.alarm.outputs.escalate_reason }} |"
             echo ""
             if [ "${{ steps.recover.outputs.recovered }}" = "true" ]; then
@@ -242,6 +295,7 @@ jobs:
               await github.rest.issues.create({
                 owner, repo, title, body,
                 labels: ['grm-intake', 'automation-warning', 'grm-publish-watchdog'],
+                assignees: [owner],
               });
               console.log('created warning issue');
               return;

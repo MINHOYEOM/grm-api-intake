@@ -2389,11 +2389,119 @@ def _cover_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
     }
 
 
+# ── 페이지 주소(단일 원천) ────────────────────────────────────────────────────
+# [다국어 1단계 2026-09-03] 페이지 하나의 주소는 **사이트 루트 기준 상대 디렉터리 경로
+# 하나**(`"findings/browse/"`)에서 전부 파생한다 — 출력 파일·템플릿의 rel_root·canonical·
+# sitemap 경로·빵부스러기 절대 URL. 종전에는 이 넷을 렌더 호출마다 손으로 따로 적었다
+# (rel_root 27곳 + 출력 경로 15곳 = 42곳). 깊이를 세는 규칙이 한 곳에 있어야 `/en/` 처럼
+# 트리를 하나 더 얹을 때 42곳을 다시 세지 않는다
+# (설계: docs/specs/GRM_다국어_영문판_설계_2026-09-03.md §3·§7).
+#
+# 언어 트리: 기본(한국어)은 접두 없음, 영어는 `en/` 접두. 같은 path 라도 lang 이 다르면
+#   · site_path(출력 파일·canonical·sitemap)에는 접두가 붙고,
+#   · rel_root(템플릿 내부 링크 `{{ rel_root }}findings/`)는 **그 언어 트리의 루트**를,
+#   · asset_root(`assets/`·favicon 등 언어 무관 공유 자원)는 **사이트 루트**를 가리킨다.
+# 한국어 트리에서는 셋이 같은 값이라 기존 산출물이 바이트 단위로 불변이다(리팩터 증명 =
+# 전 파일 md5 동일). ★영어 트리를 실제로 렌더하는 것은 3단계 — 여기서는 규칙만 정한다.
+DEFAULT_LANG = "ko"
+LANG_PREFIXES: dict[str, str] = {"ko": "", "en": "en/"}
+
+
+class PagePath:
+    """사이트 루트 기준 디렉터리 경로 1개(`""` = 홈, 그 외 `a/b/` 꼴) + 언어 → 모든 주소.
+
+    값 객체(불변). 경로는 렌더가 실제로 쓰는 문자열 그대로 받으며, 디렉터리 페이지는
+    `index.html` 로 끝나는 파일 하나를 낸다. 파일 이름이 다른 부속 산출물(`share.txt`·
+    `404.html`)은 `file()` 로 같은 디렉터리 안의 이름을 만든다.
+
+    ★빈 세그먼트를 거부한다 — 종전 `out_dir / "findings" / "doc" / slug / "index.html"` 은
+      slug 가 "" 이면 Path 가 조용히 접어 **부모 색인을 덮어썼다**. 주소는 조용히 접히면 안 된다.
+    """
+
+    __slots__ = ("path", "lang")
+
+    def __init__(self, path: str, lang: str = DEFAULT_LANG) -> None:
+        if lang not in LANG_PREFIXES:
+            raise ValueError(f"모르는 언어 코드: {lang!r} (허용: {sorted(LANG_PREFIXES)})")
+        if path.startswith("/") or "\\" in path:
+            raise ValueError(f"사이트 루트 기준 상대 경로여야 한다: {path!r}")
+        if path and not path.endswith("/"):
+            raise ValueError(f"디렉터리 경로는 '/' 로 끝나야 한다(부속 파일은 .file()): {path!r}")
+        segments = path[:-1].split("/") if path else []
+        if any(seg in ("", ".", "..") for seg in segments):
+            raise ValueError(f"빈 세그먼트·상대 참조가 든 경로: {path!r}")
+        self.path = path
+        self.lang = lang
+
+    # ── 파생값 ──
+    @property
+    def prefix(self) -> str:
+        """언어 접두(`""` 또는 `"en/"`)."""
+        return LANG_PREFIXES[self.lang]
+
+    @property
+    def site_path(self) -> str:
+        """사이트 루트 기준 경로(접두 포함) — 출력·canonical·sitemap 이 쓰는 값."""
+        return self.prefix + self.path
+
+    @property
+    def depth(self) -> int:
+        """사이트 루트로부터의 디렉터리 깊이(홈 = 0)."""
+        return self.site_path.count("/")
+
+    @property
+    def rel_root(self) -> str:
+        """이 페이지에서 **언어 트리 루트**로 가는 상대 접두(`../` × 깊이). 템플릿 내부
+        링크(`{{ rel_root }}findings/`)가 같은 언어 트리 안에 머물게 하는 값이다."""
+        return "../" * self.path.count("/")
+
+    @property
+    def asset_root(self) -> str:
+        """이 페이지에서 **사이트 루트**로 가는 상대 접두 — 언어 무관 공유 자원용."""
+        return "../" * self.depth
+
+    @property
+    def out_file(self) -> str:
+        """out_dir 기준 출력 파일(항상 `.../index.html`) — `written` 목록에 남는 문자열."""
+        return self.site_path + "index.html"
+
+    def file(self, name: str) -> str:
+        """같은 디렉터리 안의 부속 파일 경로(`briefs/{pub}/share.txt`·`404.html`)."""
+        if not name or "/" in name or name in (".", ".."):
+            raise ValueError(f"파일 이름 하나여야 한다: {name!r}")
+        return self.site_path + name
+
+    @property
+    def canonical(self) -> str:
+        """절대 canonical URL(트레일링 슬래시 디렉터리형)."""
+        return _abs_url(self.site_path)
+
+    def alternate(self, lang: str) -> "PagePath":
+        """같은 페이지의 다른 언어판(hreflang 상대) — path 는 그대로, 접두만 바뀐다."""
+        return PagePath(self.path, lang)
+
+    def breadcrumb_json_ld(self, trail: "list[tuple[str, str]]") -> str:
+        """빵부스러기 JSON-LD — 절대 URL 이 이 페이지의 언어 트리 안에서 만들어진다."""
+        return build_breadcrumb_json_ld(trail, lang=self.lang)
+
+    # ── 값 객체 ──
+    def __eq__(self, other: object) -> bool:
+        return (isinstance(other, PagePath)
+                and (self.path, self.lang) == (other.path, other.lang))
+
+    def __hash__(self) -> int:
+        return hash((self.path, self.lang))
+
+    def __repr__(self) -> str:
+        return f"PagePath({self.path!r}, lang={self.lang!r})"
+
+
 # ── 검색 인덱스(P4 — 정적·결정론·무변형) ──────────────────────────────────────
 # 인덱스는 **아카이브 페이지(`archive/index.html`, 깊이 1)** 전용 → href 는 그 페이지
 # 기준 상대경로(`../`). render.py 가 페이지마다 새로 만들지 않는 단일 산출물이라 접두를
-# 여기 고정한다(검색은 spec 상 아카이브에만 얹는다 — P4 §2.3).
-_ARCHIVE_REL = "../"
+# 여기 고정한다(검색은 spec 상 아카이브에만 얹는다 — P4 §2.3). 값은 손으로 적지 않고
+# 아카이브 페이지의 주소에서 파생한다(깊이 규칙의 단일 원천 = PagePath).
+_ARCHIVE_REL = PagePath("archive/").rel_root
 
 
 def _card_search_text(card: dict[str, Any]) -> str:
@@ -2886,7 +2994,8 @@ def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
 
 
 def build_breadcrumb_json_ld(trail: "list[tuple[str, str]]",
-                             base_url: str = SITE_BASE_URL) -> str:
+                             base_url: str = SITE_BASE_URL,
+                             lang: str = DEFAULT_LANG) -> str:
     """schema.org BreadcrumbList — 검색 결과의 **URL 자리**를 읽을 수 있는 경로로 바꾼다.
 
     [B2 2026-08-27] 문서·업체·모음 약 4천 장은 구조화 데이터가 하나도 없었고, 그래서
@@ -2898,14 +3007,17 @@ def build_breadcrumb_json_ld(trail: "list[tuple[str, str]]",
     그래서 이 함수는 문자열을 지어내지 않고 템플릿이 그리는 것과 같은 trail 을 받는다.
     마지막 항목은 현재 페이지라 `item` 을 붙이지 않는다(자기 자신 링크 금지 관례).
 
-    trail 은 (이름, 사이트 루트 기준 상대경로) 목록이고, 마지막 항목의 경로는 빈 문자열.
+    trail 은 (이름, **언어 트리 루트** 기준 상대경로) 목록이고, 마지막 항목의 경로는 빈 문자열.
+    `lang` 이 접두를 정한다(한국어 = 접두 없음 → 종전과 동일, 영어 = `/en/...`) — 화면의
+    빵부스러기 링크가 `{{ rel_root }}` 로 같은 언어 트리 안에 머무는 것과 같은 규칙이다.
     build_json_ld 와 동일한 직렬화 계약('<' 치환으로 </script> 조기종료 차단).
     """
+    prefix = LANG_PREFIXES[lang]
     items = []
     for i, (name, path) in enumerate(trail, start=1):
         node: dict[str, Any] = {"@type": "ListItem", "position": i, "name": name}
         if path:
-            node["item"] = f"{base_url}/{path.lstrip('/')}"
+            node["item"] = f"{base_url}/{prefix}{path.lstrip('/')}"
         items.append(node)
     return json.dumps({"@context": "https://schema.org",
                        "@type": "BreadcrumbList",
@@ -3026,6 +3138,29 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     written: list[str] = []
 
+    # [다국어 1단계] 이 빌드가 그리는 언어 트리. 페이지 주소는 전부 page() 한 곳에서
+    # 나온다 — 렌더 호출마다 rel_root·출력 경로·canonical 을 손으로 적지 않는다(PagePath).
+    # 영어 트리(3단계)는 이 변수를 루프 변수로 바꾸는 것으로 얹는다.
+    lang = DEFAULT_LANG
+
+    def page(path: str) -> PagePath:
+        return PagePath(path, lang)
+
+    def render_page(template: str, pp: PagePath, **ctx: Any) -> str:
+        """템플릿 1장 렌더 — 주소 파생값(rel_root·asset_root·lang·canonical)과 latest_slug
+        를 여기서 한 번만 주입한다. ctx 가 같은 키를 주면 그쪽이 이긴다(404·admin 처럼
+        canonical 을 비우는 페이지)."""
+        return env.get_template(template).render({
+            "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
+            "canonical": pp.canonical, "latest_slug": latest_slug, **ctx,
+        })
+
+    def emit(template: str, pp: PagePath, **ctx: Any) -> None:
+        """페이지 1장 = 렌더 + 쓰기 + 산출 목록. 출력 경로와 `written` 항목이 같은 주소에서
+        나오므로 둘이 어긋날 수 없다."""
+        _write(out_dir / pp.out_file, render_page(template, pp, **ctx))
+        written.append(pp.out_file)
+
     # 클린 빌드(이전 산출 제거 — 결정론).
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -3087,20 +3222,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         }
 
     # 랜딩.
-    landing_html = env.get_template("landing.html").render(
+    emit("landing.html", page(""),
         page_title="GRM · Global Regulatory Monitor",
-        rel_root="",
         nav_active="home",
-        latest_slug=latest_slug,
         description=SITE_DESCRIPTION,
-        canonical=_abs_url(""),
         json_ld=build_json_ld(),
         cover=_cover_context(latest_brief, latest_issue_no),
         library=library_summary,
         findings_zone=findings_zone,
     )
-    _write(out_dir / "index.html", landing_html)
-    written.append("index.html")
 
     # 아카이브(최신호 desc 정렬).
     issues = sorted(
@@ -3108,20 +3238,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
          for b in briefs),
         key=lambda r: r["date"], reverse=True,
     )
-    archive_html = env.get_template("archive.html").render(
+    emit("archive.html", page("archive/"),
         # [네이밍 2026-08-27] nav 탭·h1(주간 브리프 아카이브)과 정합 — 제목만 옛
         # 이름이면 검색 결과와 탭 사이에서 페이지 정체가 갈라진다.
         page_title="주간 브리프 아카이브 · GRM",
-        rel_root="../",
         nav_active="board",
-        latest_slug=latest_slug,
         description=ARCHIVE_DESCRIPTION,
-        canonical=_abs_url("archive/"),
         issues=issues,
         lib_update=library_updates["compact"],
     )
-    _write(out_dir / "archive" / "index.html", archive_html)
-    written.append("archive/index.html")
 
     # facets/docs_data/doc_slugs 는 랜딩 직전에 이미 로드됐다(랜딩 '데이터 존' 섹션과
     # 공용). 모음 페이지의 사례가 문서 페이지로 이어지려면 "그 문서에 페이지가 있는가"
@@ -3180,72 +3305,50 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 조용히 종료한다(cfg data 속성은 위 reactions_enabled 와 무관하게 항상 주입).
     # [2면 분리 2026-08-27] 발견 허브(#811)가 쌓은 세 섹션은 둘러보기 면으로 이동 —
     # 사용자 피드백("너무 많은 정보가 한 페이지에"). 이 면은 검색 도구 전용이다.
-    findings_html = env.get_template("findings.html").render(
+    emit("findings.html", page("findings/"),
         zone_totals=findings_zone,
         page_title="지적사항 검색 · GRM",
-        rel_root="../",
         nav_active="findings",
-        latest_slug=latest_slug,
         description=FINDINGS_DESCRIPTION,
-        canonical=_abs_url("findings/"),
     )
-    _write(out_dir / "findings" / "index.html", findings_html)
-    written.append("findings/index.html")
 
     # [2면 분리] 둘러보기 면 — 정적 렌더 전용(fetch 0, 커밋된 스냅샷에서 나옴).
-    # 한 단계 깊은 경로라 rel_root 는 "../../".
-    browse_html = env.get_template("findings_browse.html").render(
+    emit("findings_browse.html", page("findings/browse/"),
         browse_axes=browse_axes,
         zone_totals=findings_zone,
         recent_docs=recent_docs,
         recent_asof=(docs_data or {}).get("measured_on", ""),
         has_docs=bool(docs_data and docs_data.get("documents")),
         page_title="지적사항 둘러보기 · GRM",
-        rel_root="../../",
         nav_active="findings",
-        latest_slug=latest_slug,
         description=FINDINGS_BROWSE_DESCRIPTION,
-        canonical=_abs_url("findings/browse/"),
     )
-    _write(out_dir / "findings" / "browse" / "index.html", browse_html)
-    written.append("findings/browse/index.html")
 
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
     # 수 없다(집계는 Supabase RPC findings_stats/findings_firm_stats 를 trends.js 가 직접
-    # fetch). 서버는 셸(로딩 상태)만 렌더 — findings/index.html 한 단계 더 깊은 경로라
-    # rel_root 는 "../../"(브리프 상세와 동일 깊이).
+    # fetch). 서버는 셸(로딩 상태)만 렌더.
     # [존 재편 2026-08-26] 트렌드 존은 이제 세 면이다(지적 경향 / 실사 결과 / 데이터 현황).
     # nav 탭은 '트렌드' 하나로 유지하고(저장소 'nav 과밀 금지' 원칙) 면 전환은
     # partials/trends_seg.html 이 맡는다 — seg_active 가 그 파셜의 활성 탭을 정한다.
-    # 세 면 모두 trends.html 계열 셸이라 rel_root·nav_active 는 동일하고, 셸의
+    # 세 면 모두 trends.html 계열 셸이라 nav_active 는 동일하고, 셸의
     # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
-    trends_html = env.get_template("trends.html").render(
+    emit("trends.html", page("findings/trends/"),
         page_title="규제 지적사항 트렌드 · GRM",
-        rel_root="../../",
         nav_active="trends",
         seg_active="trends",
-        latest_slug=latest_slug,
         description=TRENDS_DESCRIPTION,
-        canonical=_abs_url("findings/trends/"),
     )
-    _write(out_dir / "findings" / "trends" / "index.html", trends_html)
-    written.append("findings/trends/index.html")
 
     # 실사 결과(트렌드 존 2면) — 058/059 fda_inspection_stats() 전용. findings 계열과
     # **단위가 다르다**(실사 건 vs 지적 문장). 재편 전에는 지적사항 페이지에 얹혀 있어
     # "두 수치를 서로 나누지 마세요"라는 경고문이 필요했는데, 면을 가르면 그 경고가
     # 필요 없어진다 — 분모가 다른 것을 같은 페이지에 두지 않는 것이 이 재편의 핵심이다.
-    inspections_html = env.get_template("inspections.html").render(
+    emit("inspections.html", page("findings/inspections/"),
         page_title="FDA 실사 결과 · GRM",
-        rel_root="../../",
         nav_active="trends",
         seg_active="inspections",
-        latest_slug=latest_slug,
         description=INSPECTIONS_DESCRIPTION,
-        canonical=_abs_url("findings/inspections/"),
     )
-    _write(out_dir / "findings" / "inspections" / "index.html", inspections_html)
-    written.append("findings/inspections/index.html")
 
     # 데이터 현황 — 소스 구성·연도별 공개량·연도별 구성비·수집량 상위 업체 +
     # (컨셉 재정의로 넘어온) 전 기간 누적 순위·해외vs미국. 전부 "규제가 어떻게 변하나"가
@@ -3254,65 +3357,42 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   이 면이 답하는 것은 사용자가 하려는 일이 아니라 우리가 신뢰를 얻으려는 일이라
     #   nav 여섯 탭 어느 job 에도 속하지 않는다. 라우트·sitemap·footer 도구 열은 그대로
     #   두고, 두 면의 꼬리 각주가 이 페이지를 연다(숫자를 의심하는 사람만 마주친다).
-    coverage_html = env.get_template("coverage.html").render(
+    emit("coverage.html", page("findings/coverage/"),
         page_title="데이터 현황 · GRM",
-        rel_root="../../",
         nav_active="trends",
         seg_active="",
-        latest_slug=latest_slug,
         description=COVERAGE_DESCRIPTION,
-        canonical=_abs_url("findings/coverage/"),
     )
-    _write(out_dir / "findings" / "coverage" / "index.html", coverage_html)
-    written.append("findings/coverage/index.html")
 
     # 업체 프로파일(FIND-FIRM-ALIAS 웹 절반) — findings/trends 와 동일 이유로 라이브
     # 데이터는 빌드시 고정할 수 없다(013_findings_firm_key.sql 의 findings_firm_profile
     # RPC 를 firm.js 가 URL 파라미터(?key=)로 직접 fetch). 서버는 셸(로딩 상태)만 렌더.
-    # findings/firm/index.html 은 findings/trends/index.html 과 같은 깊이라 rel_root 동일.
-    firm_html = env.get_template("firm.html").render(
+    emit("firm.html", page("findings/firm/"),
         page_title="업체 프로파일 · GRM",
-        rel_root="../../",
         nav_active="findings",
-        latest_slug=latest_slug,
         description=FIRM_DESCRIPTION,
-        canonical=_abs_url("findings/firm/"),
     )
-    _write(out_dir / "findings" / "firm" / "index.html", firm_html)
-    written.append("findings/firm/index.html")
 
     # 자가점검 체크리스트 — findings/trends 와 동일 이유로 라이브 데이터는 빌드시 고정할 수
     # 없다(042 findings_cfr_ranking 로 조항 순위 + 043 findings_checklist 로 사례를 받아
     # checklist.js 가 조립). 서버는 셸(설정 바 + 로딩 상태)만 렌더한다.
-    # findings/checklist/index.html 은 findings/trends/index.html 과 같은 깊이라 rel_root 동일.
-    checklist_html = env.get_template("checklist.html").render(
+    emit("checklist.html", page("findings/checklist/"),
         page_title="자가점검 체크리스트 · GRM",
-        rel_root="../../",
         nav_active="trends",
-        latest_slug=latest_slug,
         description=CHECKLIST_DESCRIPTION,
-        canonical=_abs_url("findings/checklist/"),
     )
-    _write(out_dir / "findings" / "checklist" / "index.html", checklist_html)
-    written.append("findings/checklist/index.html")
 
     # 실사관 프로파일(FDA 483 서명 실사관 집계, firm 프로파일의 미러링) — findings/firm 과
     # 동일 이유로 라이브 데이터는 빌드시 고정할 수 없다(findings_inspector_profile RPC 를
     # inspector.js 가 URL 파라미터(?key=)로 직접 fetch). 서버는 셸(로딩 상태)만 렌더.
-    # findings/inspector/index.html 은 findings/firm/index.html 과 같은 깊이라 rel_root 동일.
     # ★sitemap 미등록(의도, firm 과 다름) — 실명이 적시된 개인 집계라 베이스 경로조차
     # 넣지 않는다. noindex 는 inspector.html 자체 <head> 오버라이드(meta_robots 블록)로
     # 배선하고, canonical 은 중복 URL 정리 목적으로 그대로 둔다.
-    inspector_html = env.get_template("inspector.html").render(
+    emit("inspector.html", page("findings/inspector/"),
         page_title="실사관 프로파일 · GRM",
-        rel_root="../../",
         nav_active="findings",
-        latest_slug=latest_slug,
         description=INSPECTOR_DESCRIPTION,
-        canonical=_abs_url("findings/inspector/"),
     )
-    _write(out_dir / "findings" / "inspector" / "index.html", inspector_html)
-    written.append("findings/inspector/index.html")
 
     # 자료실(트랙 C) — findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷
     # (web/data/library/*.json)을 결정론 렌더한다(주간 발행 게이트와 무관한 독립 정적
@@ -3326,52 +3406,37 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             "blurb": v["blurb"],
             "latest_published": v["latest_published"],
         } for v in catalogs]
-        library_html = env.get_template("library.html").render(
+        emit("library.html", page("library/"),
             page_title="자료실 · GRM",
-            rel_root="../",
             nav_active="library",
-            latest_slug=latest_slug,
             description=LIBRARY_DESCRIPTION,
-            canonical=_abs_url("library/"),
             catalogs=hub_catalogs,
             lib_update=library_updates["latest"],
         )
-        _write(out_dir / "library" / "index.html", library_html)
-        written.append("library/index.html")
 
     # 카탈로그 상세 — registry 전 항목을 공통 템플릿(library_catalog.html) 하나로 렌더.
     # 카탈로그 1개 추가 = 데이터 파일 + LIBRARY_REGISTRY 1항목(여기·템플릿 무수정).
     for v in catalogs:
-        catalog_html = env.get_template("library_catalog.html").render(
+        emit("library_catalog.html", page(f"library/{v['slug']}/"),
             page_title=f"{v['title']} · GRM",
-            rel_root="../../",
             nav_active="library",
-            latest_slug=latest_slug,
             description=v["desc"],
-            canonical=_abs_url(f"library/{v['slug']}/"),
             lib=v,
         )
-        _write(out_dir / "library" / v["slug"] / "index.html", catalog_html)
-        written.append(f"library/{v['slug']}/index.html")
 
     # 이용 안내(트랙 C 2차 웨이브) — guide_content.md(정본)를 제한 md 서브셋으로 결정론
     # 렌더. 라이브 데이터가 아니라 커밋 콘텐츠라 골든으로 고정된다. 파일 부재 시 조용히 생략.
     guide_md = load_guide()
     if guide_md:
         guide_title, guide_toc, guide_body = render_guide_html(guide_md)
-        guide_html = env.get_template("guide.html").render(
+        emit("guide.html", page("guide/"),
             page_title="이용 안내 · GRM",
-            rel_root="../",
             nav_active="guide",
-            latest_slug=latest_slug,
             description=GUIDE_DESCRIPTION,
-            canonical=_abs_url("guide/"),
             guide_title=guide_title,
             guide_toc=guide_toc,
             guide_body=guide_body,
         )
-        _write(out_dir / "guide" / "index.html", guide_html)
-        written.append("guide/index.html")
 
     # 용어사전(트랙 C 2차 웨이브) — glossary.json(정본)을 초성 색인 1페이지로 결정론 렌더.
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.
@@ -3384,42 +3449,31 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         glossary_view = build_glossary_view(
             glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases(),
             clause_slugs)
-        glossary_html = env.get_template("glossary.html").render(
+        emit("glossary.html", page("glossary/"),
             page_title="규제 용어사전 · GRM",
-            rel_root="../",
             nav_active="glossary",
-            latest_slug=latest_slug,
             description=GLOSSARY_DESCRIPTION,
-            canonical=_abs_url("glossary/"),
             glossary=glossary_view,
         )
-        _write(out_dir / "glossary" / "index.html", glossary_html)
-        written.append("glossary/index.html")
 
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
         # 재사용한다(별도 가공 0 → 두 화면이 갈라질 수 없다). 정렬은 뷰모델 순서 그대로라
         # 결정론이고, sitemap 도 이 순서를 쓴다.
         #   · title 은 `glossary_term_page_title` — 실제 검색어 형태("OOS 뜻")에 맞추고
         #     SERP 절단선 안에 들어가도록 영문은 약어로 접는다.
-        #   · rel_root 는 두 단계 위(`/glossary/{id}/` → 사이트 루트).
         #   · case_excerpts 는 커밋된 문서 정본에서 파생한 실제 지적 문장(순위 트랙).
         case_excerpts = build_glossary_case_excerpts(
             glossary_terms, docs_data, load_glossary_cases())
         for group in glossary_view["groups"]:
             for term in group["terms"]:
-                term_html = env.get_template("glossary_term.html").render(
+                emit("glossary_term.html", page(f"glossary/{term['id']}/"),
                     page_title=glossary_term_page_title(term),
-                    rel_root="../../",
                     nav_active="glossary",
-                    latest_slug=latest_slug,
                     description=glossary_term_description(term),
-                    canonical=_abs_url(f"glossary/{term['id']}/"),
                     json_ld=build_glossary_term_json_ld(term),
                     term=term,
                     case_excerpts=case_excerpts.get(term["id"]) or [],
                 )
-                _write(out_dir / "glossary" / term["id"] / "index.html", term_html)
-                written.append(f"glossary/{term['id']}/index.html")
                 glossary_term_ids.append(term["id"])
 
     # [검색 유입] 분류·국가·기관 모음 페이지 — 축 색인 3장 + 항목 페이지 N장.
@@ -3443,29 +3497,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             items = [build_facet_item_view(it, doc_slugs) for it in axis.get("items") or []]
             siblings = [{"slug": it["slug"], "label_ko": it["label_ko"]} for it in items]
 
-            index_html = env.get_template("findings_facet_index.html").render(
+            axis_page = page(f"findings/{meta['path']}/")
+            emit("findings_facet_index.html", axis_page,
                 page_title=f"{meta['title']} · GRM",
-                rel_root="../../",
                 nav_active="findings",
-                latest_slug=latest_slug,
                 description=meta["index_lede"],
-                canonical=_abs_url(f"findings/{meta['path']}/"),
                 axis=meta, items=items, excluded=axis.get("excluded") or [],
                 # [B2] 화면 빵부스러기와 동일한 순서·이름(findings_facet_index.html 참조).
-                json_ld=build_breadcrumb_json_ld([
+                json_ld=axis_page.breadcrumb_json_ld([
                     ("홈", "/"), ("지적사항 검색", "findings/"), (meta["title"], "")]),
                 # 문서 목록 입구 — 문서 정본이 없으면 링크를 만들지 않는다(없는 페이지로
                 # 보내는 링크는 무링크보다 나쁘다).
                 doc_index_total=((docs_data or {}).get("totals") or {}).get("documents", 0)
                 if render_doc_pages else 0,
             )
-            _write(out_dir / "findings" / meta["path"] / "index.html", index_html)
-            written.append(f"findings/{meta['path']}/index.html")
             # 축 색인의 갱신일 = 그 축 항목들이 실은 가장 최근 사례의 공개일.
             axis_mod = max((s.get("published_date") or ""
                             for it in items for s in it.get("samples") or []),
                            default="")
-            facet_paths.append((f"findings/{meta['path']}/", axis_mod))
+            facet_paths.append((axis_page.site_path, axis_mod))
 
             for item in items:
                 # 조합 페이지(분류 × 기관)로 가는 진입 간선 — 분류 축에서만, 그리고 그
@@ -3475,20 +3525,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                      "label": c["agency_label_ko"], "findings": c["findings"]}
                     for c in combos_by_category.get(item["slug"], [])
                 ] if axis_key == "category" else []
-                page_html = env.get_template("findings_facet.html").render(
+                item_page = page(f"findings/{meta['path']}/{item['slug']}/")
+                emit("findings_facet.html", item_page,
                     page_title=f"{item['label_ko']} {meta['headline_suffix']} · GRM",
-                    rel_root="../../../",
                     nav_active="findings",
-                    latest_slug=latest_slug,
                     description=facet_description(axis_key, item, agency_labels),
-                    canonical=_abs_url(f"findings/{meta['path']}/{item['slug']}/"),
                     axis=meta, item=item, siblings=siblings,
                     agency_labels=agency_labels, measured_on=measured_on,
                     crumb_mid=[{"href": f"findings/{meta['path']}/",
                                 "label": meta["title"]}],
                     crumb_last=item["label_ko"],
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
-                    json_ld=build_breadcrumb_json_ld([
+                    json_ld=item_page.breadcrumb_json_ld([
                         ("홈", "/"), ("지적사항 검색", "findings/"),
                         (meta["title"], f"findings/{meta['path']}/"),
                         (item["label_ko"], "")]),
@@ -3503,13 +3551,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     sibling_base=f"findings/{meta['path']}/",
                     narrow_links=narrow,
                 )
-                _write(out_dir / "findings" / meta["path"] / item["slug"] / "index.html",
-                       page_html)
-                written.append(f"findings/{meta['path']}/{item['slug']}/index.html")
                 item_mod = max((s.get("published_date") or ""
                                 for s in item.get("samples") or []), default="")
-                facet_paths.append(
-                    (f"findings/{meta['path']}/{item['slug']}/", item_mod))
+                facet_paths.append((item_page.site_path, item_mod))
 
         # ── [검색 유입 2차] 분류 × 기관 조합 페이지 ─────────────────────────────
         # 사람들이 치는 말은 주제 하나가 아니라 "기관 + 주제"다("FDA 무균 지적사항").
@@ -3526,13 +3570,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 view["by_agency"] = []
                 label = f"{combo['agency_label_ko']} {combo['category_label_ko']}"
                 base = f"findings/{cat_meta['path']}/{cat_slug}/"
-                page_html = env.get_template("findings_facet.html").render(
+                combo_page = page(f"{base}{combo['slug']}/")
+                emit("findings_facet.html", combo_page,
                     page_title=f"{label} 지적사항 · GRM",
-                    rel_root="../../../../",
                     nav_active="findings",
-                    latest_slug=latest_slug,
                     description=combo_description(combo),
-                    canonical=_abs_url(f"{base}{combo['slug']}/"),
                     axis=cat_meta, item=view, siblings=sibs,
                     agency_labels=agency_labels, measured_on=measured_on,
                     crumb_mid=[{"href": f"findings/{cat_meta['path']}/",
@@ -3540,7 +3582,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                {"href": base, "label": combo["category_label_ko"]}],
                     crumb_last=combo["agency_label_ko"],
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
-                    json_ld=build_breadcrumb_json_ld([
+                    json_ld=combo_page.breadcrumb_json_ld([
                         ("홈", "/"), ("지적사항 검색", "findings/"),
                         (cat_meta["title"], f"findings/{cat_meta['path']}/"),
                         (combo["category_label_ko"], base),
@@ -3557,12 +3599,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     sibling_base=base,
                     narrow_links=[],
                 )
-                _write(out_dir / "findings" / cat_meta["path"] / cat_slug
-                       / combo["slug"] / "index.html", page_html)
-                written.append(f"{base}{combo['slug']}/index.html")
                 combo_mod = max((s.get("published_date") or ""
                                  for s in view.get("samples") or []), default="")
-                facet_paths.append((f"{base}{combo['slug']}/", combo_mod))
+                facet_paths.append((combo_page.site_path, combo_mod))
 
     # [조항 페이지] 21 CFR 조항별 지적사례 — 색인 1장 + 조항 34장.
     # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라
@@ -3571,45 +3610,36 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if clause_views:
         clause_agency_labels = (docs_data or {}).get("agency_labels") or (
             facets.get("agency_labels") if facets else {}) or {}
-        index_html = env.get_template("findings_clause_index.html").render(
+        clause_index = page("findings/clause/")
+        emit("findings_clause_index.html", clause_index,
             page_title="21 CFR 조항별 지적사례 · GRM",
-            rel_root="../../",
             nav_active="findings",
-            latest_slug=latest_slug,
             description=("미국 GMP 규정(21 CFR Part 210·211) 조항별로 실제 지적사항을 "
                          f"우리말로 모았습니다. 조항 {len(clause_views)}개."),
-            canonical=_abs_url("findings/clause/"),
-            json_ld=build_breadcrumb_json_ld([
+            json_ld=clause_index.breadcrumb_json_ld([
                 ("홈", "/"), ("지적사항 검색", "findings/"), ("조항별", "")]),
             clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
         )
-        _write(out_dir / "findings" / "clause" / "index.html", index_html)
-        written.append("findings/clause/index.html")
         index_mod = max((s.get("published_date") or ""
                          for c in clause_views for s in c["samples"]), default="")
-        facet_paths.append(("findings/clause/", index_mod))
+        facet_paths.append((clause_index.site_path, index_mod))
 
         # 형제 목록은 전 조항 공통(같은 값 재사용 — 페이지마다 다시 만들지 않는다).
         sibs = [{"slug": c["slug"], "code": c["code"]} for c in clause_views]
         for clause in clause_views:
-            page_html = env.get_template("findings_clause.html").render(
+            clause_page = page(f"findings/clause/{clause['slug']}/")
+            emit("findings_clause.html", clause_page,
                 page_title=f"{clause['code']} 지적사례 · GRM",
-                rel_root="../../../",
                 nav_active="findings",
-                latest_slug=latest_slug,
                 description=clause_description(clause),
-                canonical=_abs_url(f"findings/clause/{clause['slug']}/"),
-                json_ld=build_breadcrumb_json_ld([
+                json_ld=clause_page.breadcrumb_json_ld([
                     ("홈", "/"), ("지적사항 검색", "findings/"),
                     ("조항별", "findings/clause/"), (clause["code"], "")]),
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
             )
-            _write(out_dir / "findings" / "clause" / clause["slug"] / "index.html",
-                   page_html)
-            written.append(f"findings/clause/{clause['slug']}/index.html")
             clause_mod = max((s.get("published_date") or ""
                               for s in clause["samples"]), default="")
-            facet_paths.append((f"findings/clause/{clause['slug']}/", clause_mod))
+            facet_paths.append((clause_page.site_path, clause_mod))
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지
@@ -3733,79 +3763,72 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         } for a in doc_agencies]
 
         newest_doc = max((d["published_date"] for d in documents), default="")
-        facet_paths.append(("findings/docs/", newest_doc))
+        docs_index = page("findings/docs/")
+        facet_paths.append((docs_index.site_path, newest_doc))
         for g in index_groups:
             for y in g["years"]:
                 bucket_mod = max(
                     (d["published_date"]
                      for d in by_ay[(g["slug"].upper(), y["year"])]), default="")
                 facet_paths.append(
-                    (f"findings/docs/{g['slug']}/{y['year']}/", bucket_mod))
+                    (page(f"findings/docs/{g['slug']}/{y['year']}/").site_path, bucket_mod))
 
         # ★목록·색인 21장은 **스위치와 무관하게 항상** 낸다. 비싼 것은 개별 문서 3,202장뿐
         # (한 번에 ~27초)이고, 목록을 함께 끄면 sitemap·진입 카드·404 페이지가 가리키는
         # 곳이 테스트 빌드에서만 없어져 **링크 무결성 검사가 프로덕션과 다른 것을 보게 된다**
         # (실제로 404 링크 검사가 이걸 잡았다).
-        _write(out_dir / "findings" / "docs" / "index.html",
-               env.get_template("findings_doc_list.html").render(
-                   page_title="문서로 찾기 · GRM",
-                   rel_root="../../", nav_active="findings", latest_slug=latest_slug,
-                   # [P1.5 잔재 수리 2026-08-27] "지적 3건 이상" 임계 문구는 면제
-                   # 규칙 도입으로 더 이상 사실이 아니다 — 화면 고지는 고쳤는데
-                   # meta description 이 낡은 채 남아 있었다(검색 스니펫이 먼저 거짓말).
-                   description=("규제기관이 공개한 실사 문서 "
-                                f"{docs_data['totals']['documents']:,}건을 기관·연도로"
-                                " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
-                                "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
-                                " 우리말로 볼 수 있습니다."),
-                   canonical=_abs_url("findings/docs/"),
-                   # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
-                   json_ld=build_breadcrumb_json_ld([
-                       ("홈", "/"), ("지적사항 검색", "findings/"), ("문서로 찾기", "")]),
-                   mode="index", heading="문서로 찾기",
-                   lede=(f"규제기관이 공개한 실사 문서 "
-                         f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
-                         " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
-                         " 우리말로 보실 수 있습니다."),
-                   groups=index_groups))
-        written.append("findings/docs/index.html")
+        emit("findings_doc_list.html", docs_index,
+             page_title="문서로 찾기 · GRM",
+             nav_active="findings",
+             # [P1.5 잔재 수리 2026-08-27] "지적 3건 이상" 임계 문구는 면제
+             # 규칙 도입으로 더 이상 사실이 아니다 — 화면 고지는 고쳤는데
+             # meta description 이 낡은 채 남아 있었다(검색 스니펫이 먼저 거짓말).
+             description=("규제기관이 공개한 실사 문서 "
+                          f"{docs_data['totals']['documents']:,}건을 기관·연도로"
+                          " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
+                          "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
+                          " 우리말로 볼 수 있습니다."),
+             # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
+             json_ld=docs_index.breadcrumb_json_ld([
+                 ("홈", "/"), ("지적사항 검색", "findings/"), ("문서로 찾기", "")]),
+             mode="index", heading="문서로 찾기",
+             lede=(f"규제기관이 공개한 실사 문서 "
+                   f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
+                   " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
+                   " 우리말로 보실 수 있습니다."),
+             groups=index_groups)
 
         for g in index_groups:
             for y in g["years"]:
                 bucket = by_ay[(g["slug"].upper(), y["year"])]
-                _write(out_dir / "findings" / "docs" / g["slug"] / y["year"] / "index.html",
-                       env.get_template("findings_doc_list.html").render(
-                           page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
-                           rel_root="../../../../", nav_active="findings",
-                           latest_slug=latest_slug,
-                           description=(f"{g['label_ko']}가 {y['year']}년에"
-                                        f" {date_axis_verb(bucket)} 실사"
-                                        f" 문서 {y['count']:,}건의 지적사항을 우리말로"
-                                        " 정리했습니다."),
-                           canonical=_abs_url(
-                               f"findings/docs/{g['slug']}/{y['year']}/"),
-                           # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
-                           json_ld=build_breadcrumb_json_ld([
-                               ("홈", "/"), ("지적사항 검색", "findings/"),
-                               ("문서로 찾기", "findings/docs/"),
-                               (f"{g['label_ko']} · {y['year']}년", "")]),
-                           mode="list",
-                           heading=f"{g['label_ko']} · {y['year']}년",
-                           lede=(f"{g['label_ko']}가 {y['year']}년에"
-                                 f" {date_axis_verb(bucket)} 실사 문서"
-                                 f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
-                                 " 지적을 모두 보실 수 있습니다."),
-                           documents=bucket, agency_slug=g["slug"],
-                           agency_label=g["label_ko"], year=y["year"],
-                           sibling_years=g["years"]))
-                written.append(
-                    f"findings/docs/{g['slug']}/{y['year']}/index.html")
+                list_page = page(f"findings/docs/{g['slug']}/{y['year']}/")
+                emit("findings_doc_list.html", list_page,
+                     page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
+                     nav_active="findings",
+                     description=(f"{g['label_ko']}가 {y['year']}년에"
+                                  f" {date_axis_verb(bucket)} 실사"
+                                  f" 문서 {y['count']:,}건의 지적사항을 우리말로"
+                                  " 정리했습니다."),
+                     # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
+                     json_ld=list_page.breadcrumb_json_ld([
+                         ("홈", "/"), ("지적사항 검색", "findings/"),
+                         ("문서로 찾기", "findings/docs/"),
+                         (f"{g['label_ko']} · {y['year']}년", "")]),
+                     mode="list",
+                     heading=f"{g['label_ko']} · {y['year']}년",
+                     lede=(f"{g['label_ko']}가 {y['year']}년에"
+                           f" {date_axis_verb(bucket)} 실사 문서"
+                           f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
+                           " 지적을 모두 보실 수 있습니다."),
+                     documents=bucket, agency_slug=g["slug"],
+                     agency_label=g["label_ko"], year=y["year"],
+                     sibling_years=g["years"])
 
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
             # sitemap 과 프로덕션 sitemap 이 달라져 골든 대조가 의미를 잃는다.
-            facet_paths.append(
-                (f"findings/doc/{doc['slug']}/", doc["published_date"]))
+            doc_page = page(f"findings/doc/{doc['slug']}/")
+            facet_paths.append((doc_page.site_path, doc["published_date"]))
             if not render_doc_pages:
                 continue
             related = [{"slug": cat_slug_by_label[label], "label_ko": label}
@@ -3830,19 +3853,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         if term_link_index else [])
             linked_used: set[str] = set()
             finding_bodies = [
-                link_terms_in_text(f.get("text_ko") or "", selected, "../../../", linked_used)
+                link_terms_in_text(f.get("text_ko") or "", selected, doc_page.rel_root,
+                                   linked_used)
                 for f in doc.get("findings") or []
             ]
-            doc_html = env.get_template("findings_doc.html").render(
+            emit("findings_doc.html", doc_page,
                 page_title=f"{doc_titles[doc['slug']]} · GRM",
-                rel_root="../../../",
                 nav_active="findings",
-                latest_slug=latest_slug,
                 description=doc_page_description(doc, doc_agency_labels),
-                canonical=_abs_url(f"findings/doc/{doc['slug']}/"),
                 # [B2] 화면 빵부스러기와 동일(findings_doc.html: 홈 › 지적사항 검색 ›
                 # 규제기관별 › 업체명). 이 4천 장이 SERP 에서 날 슬러그를 보이던 자리다.
-                json_ld=build_breadcrumb_json_ld([
+                json_ld=doc_page.breadcrumb_json_ld([
                     ("홈", "/"), ("지적사항 검색", "findings/"),
                     ("규제기관별", "findings/agency/"), (doc["firm_name"], "")]),
                 doc=doc, agency_labels=doc_agency_labels,
@@ -3856,52 +3877,42 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                 firm_page_slug=firm_page_slug_by_key.get(doc.get("firm_key") or ""),
             )
-            _write(out_dir / "findings" / "doc" / doc["slug"] / "index.html", doc_html)
-            written.append(f"findings/doc/{doc['slug']}/index.html")
 
         # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),
         # 실제 렌더는 문서 페이지와 같은 스위치를 탄다 — 이 페이지로 들어오는 링크가
         # 문서 상세에 있으므로, 문서 페이지를 끈 빌드에서 이것만 쓰면 고아가 된다.
         for fp in firm_pages:
-            facet_paths.append((f"findings/firm/{fp['slug']}/", fp["last_seen"]))
+            facet_paths.append((page(f"findings/firm/{fp['slug']}/").site_path,
+                                fp["last_seen"]))
         if render_doc_pages:
             for fp in firm_pages:
-                _write(out_dir / "findings" / "firm" / fp["slug"] / "index.html",
-                       env.get_template("findings_firm_page.html").render(
-                           page_title=f"{fp['name']} 지적사항 이력 · GRM",
-                           rel_root="../../../",
-                           nav_active="findings",
-                           latest_slug=latest_slug,
-                           description=(
-                               f"{fp['name']}의 공개 실사 문서 {fp['doc_count']:,}건에서"
-                               f" 확인된 지적 {fp['finding_count']:,}건을 우리말로"
-                               f" 정리했습니다({fp['first_seen'][:4]}~{fp['last_seen'][:4]})."),
-                           canonical=_abs_url(f"findings/firm/{fp['slug']}/"),
-                           # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
-                           json_ld=build_breadcrumb_json_ld([
-                               ("홈", "/"), ("지적사항", "findings/"),
-                               ("문서로 찾기", "findings/docs/"), (fp["name"], "")]),
-                           firm=fp, agency_labels=doc_agency_labels,
-                           measured_on=docs_data.get("measured_on", ""),
-                           min_findings=docs_data.get("min_findings")))
-                written.append(f"findings/firm/{fp['slug']}/index.html")
+                firm_page = page(f"findings/firm/{fp['slug']}/")
+                emit("findings_firm_page.html", firm_page,
+                     page_title=f"{fp['name']} 지적사항 이력 · GRM",
+                     nav_active="findings",
+                     description=(
+                         f"{fp['name']}의 공개 실사 문서 {fp['doc_count']:,}건에서"
+                         f" 확인된 지적 {fp['finding_count']:,}건을 우리말로"
+                         f" 정리했습니다({fp['first_seen'][:4]}~{fp['last_seen'][:4]})."),
+                     # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
+                     json_ld=firm_page.breadcrumb_json_ld([
+                         ("홈", "/"), ("지적사항", "findings/"),
+                         ("문서로 찾기", "findings/docs/"), (fp["name"], "")]),
+                     firm=fp, agency_labels=doc_agency_labels,
+                     measured_on=docs_data.get("measured_on", ""),
+                     min_findings=docs_data.get("min_findings"))
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전
     # 선택한다(같은 주 = 전 직원 동일 세트). 파일 부재 시 조용히 생략.
     quiz_bank = load_quiz_bank()
     if quiz_bank:
-        quiz_html = env.get_template("quiz.html").render(
+        emit("quiz.html", page("quiz/"),
             page_title="주간 퀴즈 · GRM",
-            rel_root="../",
             nav_active="guide",
-            latest_slug=latest_slug,
             description=QUIZ_DESCRIPTION,
-            canonical=_abs_url("quiz/"),
             quiz=build_quiz_view(quiz_bank),
         )
-        _write(out_dir / "quiz" / "index.html", quiz_html)
-        written.append("quiz/index.html")
 
     # 검색 인덱스(P4 — 정적 클라이언트사이드 검색용). assets 옆에 둔다(archive.js 가 fetch).
     search_index = build_search_index(briefs, issue_no_by_date, latest_slug)
@@ -3925,28 +3936,22 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 interest_vocab.append({"kind": _axis["axis"],
                                        "value": _item["key"],
                                        "label": _item["label_ko"]})
-        me_html = env.get_template("me.html").render(
+        # 개인화 페이지 — canonical 을 템플릿에 넘기지 않던 종전 계약 그대로(비색인).
+        emit("me.html", page("me/"),
             page_title="마이페이지 · GRM",
-            rel_root="../",
             nav_active="me",
-            latest_slug=latest_slug,
+            canonical="",
             interest_vocab=interest_vocab,
         )
-        _write(out_dir / "me" / "index.html", me_html)
-        written.append("me/index.html")
-        admin_html = env.get_template("admin.html").render(
+        emit("admin.html", page("admin/"),
             page_title="Admin · GRM",
-            rel_root="../",
             nav_active="admin",
-            latest_slug=latest_slug,
             description="",
             canonical="",
             json_ld="",
             newsletter_form_action="",
             reactions_enabled=False,
         )
-        _write(out_dir / "admin" / "index.html", admin_html)
-        written.append("admin/index.html")
 
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
@@ -3969,30 +3974,26 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             build_library_update_window_view(lib_entries, catalogs, _win[0], _win[1])
             if _win else None
         )
-        html = brief_tmpl.render(
+        brief_page = page(f"briefs/{pub}/")
+        emit("brief.html", brief_page,
             page_title=f"{ctx['title_dateform']} 규제뉴스 · GRM",
-            rel_root="../../",
             nav_active="detail",
-            latest_slug=latest_slug,
             description=_brief_description(b["brief"]),
-            canonical=_abs_url(f"briefs/{pub}/"),
             brief=ctx,
             sections=sections,
             lib_update_week=lib_update_week,
         )
-        _write(out_dir / "briefs" / pub / "index.html", html)
-        written.append(f"briefs/{pub}/index.html")
         # [성장 3차] 링크드인/커뮤니티 공유 초안 — tldr(큐레이션된 핵심)+절대 URL 을 고정
         # 경로(briefs/{pub}/share.txt)로 낸다. 운영 루틴: 발행 후 이 URL 을 열어 복사·
         # 다듬어 게시(주 5분). 내용이 공개 브리프 요약뿐이라 공개 무해·sitemap 비등록.
         # tldr 이 비면 불릿 없이 헤더+링크만 남는다(파일 존재는 항상 — 경로 예측 가능성).
         share_lines = [f"[GRM 주간 규제뉴스 · {ctx['title_dateform']}]", ""]
         share_lines += [f"· {t}" for t in (ctx.get("tldr") or [])]
-        share_lines += ["", f"이번 주 전체 보기: {_abs_url(f'briefs/{pub}/')}", "",
+        share_lines += ["", f"이번 주 전체 보기: {brief_page.canonical}", "",
                         "#GMP #제약규제 #품질관리 #RegulatoryIntelligence"]
-        _write(out_dir / "briefs" / pub / "share.txt",
-               "\n".join(share_lines) + "\n")
-        written.append(f"briefs/{pub}/share.txt")
+        share_file = brief_page.file("share.txt")
+        _write(out_dir / share_file, "\n".join(share_lines) + "\n")
+        written.append(share_file)
 
     # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
     # [검색 유입] 404 페이지 — Cloudflare Pages 는 `/404.html` 이 **있을 때만** 매칭되지 않는
@@ -4005,13 +4006,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "rss.xml", build_rss_xml(briefs))
     written.append("rss.xml")
 
-    _write(out_dir / "404.html", env.get_template("404.html").render(
+    # 404 는 루트의 파일 하나(`/404.html`)라 홈과 같은 깊이로 그린다(rel_root = 루트).
+    not_found = page("").file("404.html")
+    _write(out_dir / not_found, render_page("404.html", page(""),
         page_title="페이지를 찾을 수 없습니다 · GRM",
-        rel_root="", nav_active="", latest_slug=latest_slug,
+        nav_active="",
         description="찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요.",
         canonical="",
     ))
-    written.append("404.html")
+    written.append(not_found)
 
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))

@@ -8075,7 +8075,8 @@ class WebGlossaryRenderTest(unittest.TestCase):
 
     def test_search_data_attr_present_and_lowercased(self):
         # 카드마다 data-search(term_ko/en/easy+detail_ko(있을 때만) 소문자 결합) — 클라이언트
-        # 필터 입력. v3 부터 전 용어가 detail_ko 보유 — render 결합식과 동일하게 파생 대조.
+        # 필터 입력. 2026-09-03 부터 detail_ko 는 **일부 용어만** 보유한다(템플릿 복제 109건
+        # 삭제) — render 결합식과 동일하게 "있을 때만" 붙여 파생 대조한다.
         for t in self.terms:
             parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
             if t.get("detail_ko"):

@@ -3,6 +3,7 @@ import io
 import json
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import glossary_lint as gl
@@ -339,23 +340,28 @@ class GlossaryLintTest(unittest.TestCase):
         self.assertTrue(any("term-b" in i.message for i in new_issues), report.format())
 
     def test_detail_ko_similarity_within_baseline_ids_passes(self):
-        """기준선에 이미 등재된 id 끼리 겹치는 건 통과 — 기존 데이터를 갑자기 FAIL 시키지 않는다."""
-        known = sorted(gl.BASELINE_DETAIL_KO_SIMILAR_IDS)[:2]
-        self.assertEqual(len(known), 2, "기준선 집합이 비어 있으면 이 테스트가 헛돈다")
-        report = self._lint(
-            [
-                self._term(
-                    id=known[0],
-                    detail_ko="실무 맥락 설명입니다. 이 용어는 실사에서 반복적으로 확인됩니다. 예시 문장입니다.",
-                ),
-                self._term(
-                    id=known[1],
-                    term_ko="용어 비",
-                    term_en="Term B",
-                    detail_ko="실무 맥락 설명입니다. 이 용어는 실사에서 자주 확인됩니다. 예시 문장입니다.",
-                ),
-            ]
-        )
+        """기준선에 등재된 id 끼리 겹치는 건 통과 — 기존 데이터를 갑자기 FAIL 시키지 않는다.
+
+        2026-09-03 실 기준선은 **빈 집합**이 됐다(템플릿 복제 detail_ko 를 전부 삭제).
+        그래도 "기준선 안쪽은 통과한다"는 **장치 자체**는 살아 있어야 하므로, 합성 기준선을
+        주입해 검사한다 — 라이브 집합이 비었다고 이 분기를 테스트하지 않으면, 나중에 누가
+        기준선을 다시 채웠을 때 그 경로가 검증된 적 없는 코드가 된다."""
+        known = ["term-a", "term-b"]
+        with mock.patch.object(gl, "BASELINE_DETAIL_KO_SIMILAR_IDS", frozenset(known)):
+            report = self._lint(
+                [
+                    self._term(
+                        id=known[0],
+                        detail_ko="실무 맥락 설명입니다. 이 용어는 실사에서 반복적으로 확인됩니다. 예시 문장입니다.",
+                    ),
+                    self._term(
+                        id=known[1],
+                        term_ko="용어 비",
+                        term_en="Term B",
+                        detail_ko="실무 맥락 설명입니다. 이 용어는 실사에서 자주 확인됩니다. 예시 문장입니다.",
+                    ),
+                ]
+            )
         self.assertTrue(report.ok, report.format())
         self.assertNotIn("DETAIL_KO_SIMILAR_NEW", self._codes(report))
 
@@ -364,7 +370,7 @@ class GlossaryLintTest(unittest.TestCase):
 
         ★매번 509줄을 찍으면 아무도 안 읽고, 그러면 진짜 신규 경고가 그 사이에 묻힌다.
         항상 울리는 경보는 경보가 아니다."""
-        known = sorted(gl.BASELINE_DETAIL_KO_SIMILAR_IDS)[:2]
+        known = ["term-a", "term-b"]  # 실 기준선은 비어 있다(2026-09-03) — 합성 주입으로 장치만 검사
         items = [
             self._term(id=known[0], detail_ko="실무 맥락 설명입니다. 반복적으로 확인됩니다. 예시 문장입니다."),
             self._term(id=known[1], term_ko="용어 비", term_en="Term B",
@@ -373,8 +379,9 @@ class GlossaryLintTest(unittest.TestCase):
         self._write(self.glossary_path, items)
         self._write(self.cases_path, self._cases_for([i["id"] for i in items]))
 
-        folded = gl.lint_glossary(self.glossary_path, self.cases_path)
-        verbose = gl.lint_glossary(self.glossary_path, self.cases_path, verbose=True)
+        with mock.patch.object(gl, "BASELINE_DETAIL_KO_SIMILAR_IDS", frozenset(known)):
+            folded = gl.lint_glossary(self.glossary_path, self.cases_path)
+            verbose = gl.lint_glossary(self.glossary_path, self.cases_path, verbose=True)
         similar = [i for i in folded.warnings if i.code == "DETAIL_KO_SIMILAR"]
         self.assertEqual(len(similar), 1, folded.format())
         self.assertIn("요약", similar[0].location)
@@ -405,10 +412,22 @@ class GlossaryLintTest(unittest.TestCase):
         self.assertIn("SHORT_FIELD_BASELINE", self._codes(report))
 
     def test_baseline_below_measured_value_emits_notice_not_failure(self):
-        # No term_ko duplicates at all -> 0 pairs < baseline 1 -> NOTICE, still PASS.
-        report = self._lint([self._term(), self._term(id="term-b", term_ko="용어 비", term_en="Term B")])
+        """실측 < 기준선이면 NOTICE 만 남기고 통과는 유지한다(기준선을 낮추라는 안내).
+
+        ★이 테스트는 **기준선을 명시적으로 주입**해야 한다. 종전에는 라이브 상수에 기대
+        "term_ko 중복 0쌍 < 기준선 1" 을 노렸는데, 2026-09-02 에 그 기준선이 0 이 되면서
+        의도한 경로가 죽었고 **detail_ko 기준선(109개 id)이 통째로 해소됐다는 다른 NOTICE**
+        가 우연히 문자열을 채워 통과시키고 있었다. 라이브 상수가 움직이면 조용히 헛도는
+        검사가 된다 — 검사 대상 조건을 테스트가 직접 만든다.
+        """
+        with mock.patch.object(gl, "BASELINE_TERM_KO_DUP_PAIRS", 1):
+            report = self._lint(
+                [self._term(), self._term(id="term-b", term_ko="용어 비", term_en="Term B")])
         self.assertTrue(report.ok, report.format())
-        self.assertTrue(any("기준선" in notice for notice in report.notices), report.format())
+        self.assertEqual(report.term_ko_dup_pairs, 0)
+        self.assertTrue(
+            any("term_ko 중복 쌍" in notice and "기준선" in notice for notice in report.notices),
+            report.format())
 
     # ── CLI ───────────────────────────────────────────────────────────
 

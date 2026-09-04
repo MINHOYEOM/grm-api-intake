@@ -8355,12 +8355,18 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         페이지가 하는 주장은 "이 용어가 등장한 지적사항"뿐이고, 그 근거는 독자가 인용문
         안에서 토큰을 직접 보는 것이다. 토큰이 안 보이는 인용문이 하나라도 실리면 페이지가
         검증 불가능한 주장을 하게 된다.
+
+        ★[2026-09-04] 대조를 **대소문자 무시**로 맞춘다. 선택기가 영문 사례를 위해
+          `re.IGNORECASE` 로 찾게 되면서, 토큰 "air handling" 이 원문의 "Air Handling
+          Unit(AHU)" 을 고르게 됐다 — 계약(독자가 그 표현을 눈으로 본다)은 그대로 지켜
+          지고, 대소문자까지 같기를 요구하면 멀쩡한 영문 문장이 조용히 빠진다. 느슨해진
+          것은 **표기**뿐이고 "보여야 한다"는 요구는 그대로다.
         """
         ex = self.excerpts
         self.assertGreater(len(ex), 0, "사례 인용이 한 용어도 안 붙었다(배선 확인)")
         for tid, items in ex.items():
             for c in items:
-                self.assertIn(c["token"], c["quote"],
+                self.assertIn(c["token"].casefold(), c["quote"].casefold(),
                               f'인용문에 토큰이 없다: {tid} / {c["token"]}')
                 self.assertFalse(render._glossary_incidental(c["quote"], c["token"]),
                                  f'열거 안 우연 언급이 실렸다: {tid} / {c["quote"][:60]}')
@@ -14983,6 +14989,9 @@ class WebEnGlossaryTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.terms = render.load_glossary() or []
+        cls.cases_raw = (json.loads(render.GLOSSARY_CASES_EN_FILE.read_text(encoding="utf-8"))
+                         if render.GLOSSARY_CASES_EN_FILE.is_file() else {})
+        cls.case_items = cls.cases_raw.get("items") or []
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_engloss_"))
         cls.out = cls._tmp / "site"
         _build_single(cls.out)
@@ -15075,13 +15084,53 @@ class WebEnGlossaryTest(unittest.TestCase):
         self.assertGreater(len(buckets), 15, f"버킷이 너무 적다: {buckets}")
         self.assertEqual(buckets, sorted(buckets), "색인이 알파벳 순이 아니다")
 
-    def test_english_pages_do_not_show_case_links(self):
-        """사례 건수는 **전체 코퍼스**로 잰 값이라 영어 검색이 보여줄 수와 어긋난다 —
-        한 화면 안의 두 숫자가 다르면 어느 쪽이 맞는지 알 방법이 없다."""
-        for p in sorted(self.dir.glob("*/index.html"))[:40]:
-            html = p.read_text(encoding="utf-8")
-            self.assertNotIn("findings/index.html?q=", html,
-                             f"{p.parent.name}: 영어판에 사례 링크가 남았다")
+    def test_english_pages_show_case_links_with_the_english_canonical_counts(self):
+        """영문 링크의 q·숫자는 영문 정본과 정확히 같아야 한다.
+
+        전체 코퍼스용 한국어 정본을 쓰면 이 등식이 깨진다. 이 테스트는 링크 존재만 보지
+        않고 `orig_lang=en`·영어 q·카드 숫자·href까지 같은 파일과 대조한다.
+        """
+        self.assertEqual(self.cases_raw.get("orig_lang"), "en")
+        self.assertGreater(len(self.case_items), 0,
+                           "glossary_cases_en.json items 가 0건 — 영문 사례 링크 대상이 없다")
+        self.assertTrue(all(not re.search(r"[가-힣]", it.get("q") or "")
+                            for it in self.case_items),
+                        "영문 정본 q에 한글이 남았다")
+        index = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(index.count('class="gl-case-a"'), len(self.case_items))
+        view = render.build_glossary_view(
+            self.terms, None, render.load_glossary_cases(render.GLOSSARY_CASES_EN_FILE), lang="en")
+        by_id = {t["id"]: t for g in view["groups"] for t in g["terms"]}
+        from urllib.parse import quote as _quote
+        for item in self.case_items:
+            term = by_id.get(item["id"])
+            self.assertIsNotNone(term, item["id"])
+            expected_href = f"findings/index.html?q={_quote(item['q'], safe='')}"
+            self.assertEqual(term["case_findings"], item["findings"], item["id"])
+            self.assertEqual(term["case_href"], expected_href, item["id"])
+            html = (self.dir / item["id"] / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f'href="../../{expected_href}"', html, item["id"])
+
+    def test_english_excerpt_selection_uses_original_body_and_english_probe(self):
+        """인용도 링크와 같은 언어여야 한다 — 한국어 본문/탐침을 재사용하지 않는다."""
+        term = {"id": "quality-system", "term_ko": "품질시스템",
+                "term_en": "Quality System"}
+        docs = {"documents": [
+            {"document_id": "a", "slug": "a", "agency": "FDA", "source": "483",
+             "published_date": "2026-01-01", "findings": [{"finding_id": "fa",
+                 "text_ko": "품질시스템이라는 한국어 문장만으로는 영어 인용을 만들면 안 됩니다. " * 3,
+                 "text_orig": "The quality system lacked documented oversight for deviations, investigations, and corrective actions across the manufacturing operation."}]},
+            {"document_id": "b", "slug": "b", "agency": "FDA", "source": "483",
+             "published_date": "2026-01-02", "findings": [{"finding_id": "fb",
+                 "text_ko": "한국어 탐침으로 찾으면 안 되는 별도 문장입니다. " * 4,
+                 "text_orig": "Management did not ensure that the quality system reviewed batch records, laboratory results, and recurring deviation trends before release."}]},
+        ]}
+        excerpts = render.build_glossary_case_excerpts(
+            [term], docs, {"quality-system": {"q": "Quality System", "findings": 2}}, lang="en")
+        picked = excerpts.get("quality-system") or []
+        self.assertEqual(len(picked), 2, picked)
+        self.assertTrue(all("Quality System".lower() in c["quote"].lower() for c in picked))
+        self.assertTrue(all(not re.search(r"[가-힣]", c["quote"]) for c in picked))
 
     def test_structured_data_says_english_and_the_english_url(self):
         """구조화 데이터가 언어·주소를 잘못 말하면 그 자체가 거짓 신호다."""
@@ -15476,6 +15525,9 @@ class WebEnTreeTest(unittest.TestCase):
         hangul = re.compile("[가-힣]+")
         stripped = 0
         for rel, html in self.en.items():
+            # ★용어사전을 여기서 통째로 건너뛰지 않는다 — 그러면 243장의 **나머지 전부**가
+            #   검사 밖으로 나간다. 한국어가 남아도 되는 자리는 출처·관련조항 두 블록뿐이고,
+            #   아래에서 그 블록만 들어낸다(들어낸 뒤 잔존 한글 0 — 실측).
             if rel.startswith("en/library/"):
                 continue
             html, n = strip_named_original_blocks(html)

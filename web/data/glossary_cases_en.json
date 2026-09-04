@@ -1,0 +1,1415 @@
+{
+  "schema": "grm-glossary-cases/v1",
+  "source": "public.findings_search RPC (p_q=q, p_orig_lang=en) totals — /en/findings/?q=q 결과와 동일 함수",
+  "orig_lang": "en",
+  "measured_on": "2026-09-05",
+  "note": "glossary.json의 term_en(0건이면 괄호·슬래시를 뗀 주 표현)을 검색어로 삼고, 원문이 영어인 공개 지적에서 실제 결과가 있는 용어만 사례를 싣는다.",
+  "items": [
+    {
+      "id": "gmp",
+      "q": "Good Manufacturing Practice",
+      "findings": 767,
+      "documents": 655
+    },
+    {
+      "id": "active-ingredient",
+      "q": "Active Ingredient",
+      "findings": 626,
+      "documents": 600
+    },
+    {
+      "id": "api",
+      "q": "Active Pharmaceutical Ingredient",
+      "findings": 85,
+      "documents": 84
+    },
+    {
+      "id": "api-starting-material",
+      "q": "API Starting Material",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "drug-product",
+      "q": "Drug Product",
+      "findings": 5943,
+      "documents": 2175
+    },
+    {
+      "id": "batch",
+      "q": "Batch",
+      "findings": 2004,
+      "documents": 1438
+    },
+    {
+      "id": "batch-number",
+      "q": "Batch Number",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "batch-record",
+      "q": "Batch Records",
+      "findings": 77,
+      "documents": 73
+    },
+    {
+      "id": "bulk-product",
+      "q": "Bulk Product",
+      "findings": 12,
+      "documents": 12
+    },
+    {
+      "id": "intermediate",
+      "q": "Intermediate",
+      "findings": 109,
+      "documents": 88
+    },
+    {
+      "id": "intermediate-product",
+      "q": "Intermediate Product",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "finished-product",
+      "q": "Finished Product",
+      "findings": 411,
+      "documents": 391
+    },
+    {
+      "id": "starting-material",
+      "q": "Starting Material",
+      "findings": 15,
+      "documents": 13
+    },
+    {
+      "id": "raw-material",
+      "q": "Raw Material",
+      "findings": 435,
+      "documents": 370
+    },
+    {
+      "id": "packaging-material",
+      "q": "Packaging Material",
+      "findings": 266,
+      "documents": 244
+    },
+    {
+      "id": "manufacture",
+      "q": "Manufacture",
+      "findings": 1564,
+      "documents": 1013
+    },
+    {
+      "id": "production",
+      "q": "Production",
+      "findings": 1922,
+      "documents": 1390
+    },
+    {
+      "id": "packaging",
+      "q": "Packaging",
+      "findings": 1239,
+      "documents": 975
+    },
+    {
+      "id": "manufacturer",
+      "q": "Manufacturer",
+      "findings": 154,
+      "documents": 140
+    },
+    {
+      "id": "marketing-authorization",
+      "q": "Marketing Authorization",
+      "findings": 38,
+      "documents": 38
+    },
+    {
+      "id": "authorized-person",
+      "q": "Authorized Person",
+      "findings": 105,
+      "documents": 104
+    },
+    {
+      "id": "batch-release",
+      "q": "Batch Release",
+      "findings": 25,
+      "documents": 25
+    },
+    {
+      "id": "quarantine",
+      "q": "Quarantine",
+      "findings": 105,
+      "documents": 100
+    },
+    {
+      "id": "reprocessing",
+      "q": "Reprocessing",
+      "findings": 37,
+      "documents": 37
+    },
+    {
+      "id": "reworking",
+      "q": "Reworking",
+      "findings": 22,
+      "documents": 22
+    },
+    {
+      "id": "recall",
+      "q": "Product Recall",
+      "findings": 15,
+      "documents": 14
+    },
+    {
+      "id": "expiry-date",
+      "q": "Expiry Date",
+      "findings": 31,
+      "documents": 31
+    },
+    {
+      "id": "retest-date",
+      "q": "Retest Date",
+      "findings": 15,
+      "documents": 15
+    },
+    {
+      "id": "acceptance-criteria",
+      "q": "Acceptance Criteria",
+      "findings": 44,
+      "documents": 41
+    },
+    {
+      "id": "specification",
+      "q": "Specification",
+      "findings": 2249,
+      "documents": 1579
+    },
+    {
+      "id": "quality",
+      "q": "Quality",
+      "findings": 7597,
+      "documents": 3572
+    },
+    {
+      "id": "quality-assurance",
+      "q": "Quality Assurance (QA)",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "quality-control",
+      "q": "Quality Control (QC)",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "quality-unit",
+      "q": "Quality Unit",
+      "findings": 337,
+      "documents": 317
+    },
+    {
+      "id": "pharmaceutical-quality-system",
+      "q": "Pharmaceutical Quality System (PQS)",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "quality-manual",
+      "q": "Quality Manual",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "continual-improvement",
+      "q": "Continual Improvement",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "state-of-control",
+      "q": "State of Control",
+      "findings": 32,
+      "documents": 31
+    },
+    {
+      "id": "control-strategy",
+      "q": "Control Strategy",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "quality-risk-management",
+      "q": "Quality Risk Management",
+      "findings": 13,
+      "documents": 13
+    },
+    {
+      "id": "risk",
+      "q": "Risk",
+      "findings": 679,
+      "documents": 614
+    },
+    {
+      "id": "hazard",
+      "q": "Hazard",
+      "findings": 146,
+      "documents": 138
+    },
+    {
+      "id": "risk-analysis",
+      "q": "Risk Analysis",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "risk-evaluation",
+      "q": "Risk Evaluation",
+      "findings": 5,
+      "documents": 4
+    },
+    {
+      "id": "risk-assessment",
+      "q": "Risk Assessment",
+      "findings": 59,
+      "documents": 51
+    },
+    {
+      "id": "risk-reduction",
+      "q": "Risk Reduction",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "severity",
+      "q": "Severity",
+      "findings": 51,
+      "documents": 51
+    },
+    {
+      "id": "capa",
+      "q": "Corrective and Preventive Action (CAPA)",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "corrective-action",
+      "q": "Corrective Action",
+      "findings": 473,
+      "documents": 413
+    },
+    {
+      "id": "preventive-action",
+      "q": "Preventive Action",
+      "findings": 164,
+      "documents": 159
+    },
+    {
+      "id": "root-cause-analysis",
+      "q": "Root Cause Analysis",
+      "findings": 11,
+      "documents": 10
+    },
+    {
+      "id": "deviation",
+      "q": "Deviation",
+      "findings": 1918,
+      "documents": 1576
+    },
+    {
+      "id": "change-control",
+      "q": "Change Control",
+      "findings": 516,
+      "documents": 513
+    },
+    {
+      "id": "change-management",
+      "q": "Change Management",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "supplier-qualification",
+      "q": "Supplier Qualification",
+      "findings": 18,
+      "documents": 18
+    },
+    {
+      "id": "outsourced-activities",
+      "q": "Outsourced Activities",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "contract-manufacturer",
+      "q": "Contract Manufacturer",
+      "findings": 23,
+      "documents": 23
+    },
+    {
+      "id": "product-quality-review",
+      "q": "Product Quality Review",
+      "findings": 186,
+      "documents": 186
+    },
+    {
+      "id": "product-complaint",
+      "q": "Product Complaint",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "sop",
+      "q": "Standard Operating Procedure (SOP)",
+      "findings": 17,
+      "documents": 17
+    },
+    {
+      "id": "procedure",
+      "q": "Procedure(s)",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "documentation",
+      "q": "Documentation",
+      "findings": 1297,
+      "documents": 1114
+    },
+    {
+      "id": "record",
+      "q": "Record",
+      "findings": 3103,
+      "documents": 2111
+    },
+    {
+      "id": "raw-data",
+      "q": "Raw Data",
+      "findings": 26,
+      "documents": 23
+    },
+    {
+      "id": "electronic-record",
+      "q": "Electronic Record",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "data-integrity",
+      "q": "Data Integrity",
+      "findings": 48,
+      "documents": 45
+    },
+    {
+      "id": "audit-trail",
+      "q": "Audit Trail",
+      "findings": 19,
+      "documents": 18
+    },
+    {
+      "id": "computerised-system",
+      "q": "Computerised System",
+      "findings": 8,
+      "documents": 8
+    },
+    {
+      "id": "electronic-signature",
+      "q": "Electronic Signature",
+      "findings": 72,
+      "documents": 72
+    },
+    {
+      "id": "validation",
+      "q": "Validation",
+      "findings": 2555,
+      "documents": 1829
+    },
+    {
+      "id": "validation-master-plan",
+      "q": "Validation Master Plan (VMP)",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "validation-protocol",
+      "q": "Validation Protocol",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "validation-report",
+      "q": "Validation Report",
+      "findings": 14,
+      "documents": 12
+    },
+    {
+      "id": "qualification",
+      "q": "Qualification",
+      "findings": 805,
+      "documents": 716
+    },
+    {
+      "id": "installation-qualification",
+      "q": "Installation Qualification",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "operational-qualification",
+      "q": "Operational Qualification",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "performance-qualification",
+      "q": "Performance Qualification",
+      "findings": 20,
+      "documents": 20
+    },
+    {
+      "id": "process-validation",
+      "q": "Process Validation",
+      "findings": 107,
+      "documents": 104
+    },
+    {
+      "id": "continued-process-verification",
+      "q": "Continued Process Verification",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "revalidation",
+      "q": "Revalidation",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "cleaning-validation",
+      "q": "Cleaning Validation",
+      "findings": 59,
+      "documents": 59
+    },
+    {
+      "id": "calibration",
+      "q": "Calibration",
+      "findings": 618,
+      "documents": 594
+    },
+    {
+      "id": "worst-case",
+      "q": "Worst Case",
+      "findings": 22,
+      "documents": 22
+    },
+    {
+      "id": "analytical-procedure",
+      "q": "Analytical Procedure",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "accuracy",
+      "q": "Accuracy",
+      "findings": 462,
+      "documents": 429
+    },
+    {
+      "id": "precision",
+      "q": "Precision",
+      "findings": 45,
+      "documents": 33
+    },
+    {
+      "id": "repeatability",
+      "q": "Repeatability",
+      "findings": 2,
+      "documents": 1
+    },
+    {
+      "id": "specificity",
+      "q": "Specificity",
+      "findings": 72,
+      "documents": 71
+    },
+    {
+      "id": "linearity",
+      "q": "Linearity",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "range",
+      "q": "Range",
+      "findings": 121,
+      "documents": 111
+    },
+    {
+      "id": "robustness",
+      "q": "Robustness",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "assay",
+      "q": "Assay",
+      "findings": 107,
+      "documents": 103
+    },
+    {
+      "id": "identification-test",
+      "q": "Identification Test",
+      "findings": 23,
+      "documents": 23
+    },
+    {
+      "id": "purity-test",
+      "q": "Purity Test",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "impurity",
+      "q": "Impurity",
+      "findings": 24,
+      "documents": 23
+    },
+    {
+      "id": "impurity-profile",
+      "q": "Impurity Profile",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "reference-standard",
+      "q": "Reference Standard",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "oos",
+      "q": "Out-of-Specification (OOS) Result",
+      "findings": 33,
+      "documents": 33
+    },
+    {
+      "id": "oot",
+      "q": "Out-of-Trend",
+      "findings": 31,
+      "documents": 30
+    },
+    {
+      "id": "stability-testing",
+      "q": "Stability Testing",
+      "findings": 235,
+      "documents": 226
+    },
+    {
+      "id": "cleanroom",
+      "q": "Cleanroom",
+      "findings": 146,
+      "documents": 111
+    },
+    {
+      "id": "cleanroom-classification",
+      "q": "Cleanroom Classification",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "airlock",
+      "q": "Airlock",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "bioburden",
+      "q": "Bioburden",
+      "findings": 20,
+      "documents": 16
+    },
+    {
+      "id": "endotoxin",
+      "q": "Endotoxin",
+      "findings": 57,
+      "documents": 48
+    },
+    {
+      "id": "pyrogen",
+      "q": "Pyrogen",
+      "findings": 224,
+      "documents": 203
+    },
+    {
+      "id": "aseptic-processing",
+      "q": "Aseptic Processing",
+      "findings": 1530,
+      "documents": 848
+    },
+    {
+      "id": "aseptic-process-simulation",
+      "q": "Aseptic Process Simulation",
+      "findings": 29,
+      "documents": 29
+    },
+    {
+      "id": "environmental-monitoring",
+      "q": "Environmental Monitoring",
+      "findings": 138,
+      "documents": 122
+    },
+    {
+      "id": "alert-limit",
+      "q": "Alert Limit",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "action-limit",
+      "q": "Action Limit",
+      "findings": 22,
+      "documents": 22
+    },
+    {
+      "id": "hepa-filter",
+      "q": "High Efficiency Particulate Air (HEPA) Filter",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "isolator",
+      "q": "Isolator",
+      "findings": 9,
+      "documents": 7
+    },
+    {
+      "id": "rabs",
+      "q": "Restricted Access Barrier System (RABS)",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "sterilization",
+      "q": "Sterilisation",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "sterility",
+      "q": "Sterility",
+      "findings": 3613,
+      "documents": 1343
+    },
+    {
+      "id": "sterility-assurance-level",
+      "q": "Sterility Assurance Level (SAL)",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "sterility-test",
+      "q": "Sterility Test",
+      "findings": 67,
+      "documents": 58
+    },
+    {
+      "id": "contamination-control-strategy",
+      "q": "Contamination Control Strategy (CCS)",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "contamination",
+      "q": "Contamination",
+      "findings": 2495,
+      "documents": 1603
+    },
+    {
+      "id": "cross-contamination",
+      "q": "Cross-Contamination",
+      "findings": 206,
+      "documents": 197
+    },
+    {
+      "id": "depyrogenation",
+      "q": "Depyrogenation",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "biological-indicator",
+      "q": "Biological Indicator",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "disinfection",
+      "q": "Disinfection",
+      "findings": 65,
+      "documents": 60
+    },
+    {
+      "id": "line-clearance",
+      "q": "Line Clearance",
+      "findings": 13,
+      "documents": 13
+    },
+    {
+      "id": "self-inspection",
+      "q": "Self-Inspection",
+      "findings": 224,
+      "documents": 224
+    },
+    {
+      "id": "site-master-file",
+      "q": "Site Master File",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "reference-sample",
+      "q": "Reference Sample",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "retention-sample",
+      "q": "Retention Sample",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "first-air",
+      "q": "First Air",
+      "findings": 29,
+      "documents": 23
+    },
+    {
+      "id": "critical-zone",
+      "q": "Critical Zone",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "unidirectional-airflow",
+      "q": "Unidirectional Airflow",
+      "findings": 56,
+      "documents": 48
+    },
+    {
+      "id": "critical-intervention",
+      "q": "Critical Intervention",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "personnel-monitoring",
+      "q": "Personnel Monitoring",
+      "findings": 26,
+      "documents": 24
+    },
+    {
+      "id": "closed-system",
+      "q": "Closed System",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "lyophilization",
+      "q": "Lyophilization",
+      "findings": 4,
+      "documents": 1
+    },
+    {
+      "id": "filter-integrity-test",
+      "q": "Filter Integrity Test",
+      "findings": 4,
+      "documents": 4
+    },
+    {
+      "id": "container-closure-integrity",
+      "q": "Container Closure Integrity",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "metadata",
+      "q": "Metadata",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "data-governance",
+      "q": "Data Governance",
+      "findings": 133,
+      "documents": 131
+    },
+    {
+      "id": "true-copy",
+      "q": "True Copy",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "backup",
+      "q": "Back-up",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "archive",
+      "q": "Archiving",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "audit-trail-review",
+      "q": "Audit Trail Review",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "access-control",
+      "q": "Access Control",
+      "findings": 5,
+      "documents": 5
+    },
+    {
+      "id": "data-retention",
+      "q": "Data Retention",
+      "findings": 2,
+      "documents": 2
+    },
+    {
+      "id": "attributable",
+      "q": "Attributable",
+      "findings": 16,
+      "documents": 15
+    },
+    {
+      "id": "legible",
+      "q": "Legible",
+      "findings": 11,
+      "documents": 10
+    },
+    {
+      "id": "contemporaneous",
+      "q": "Contemporaneous",
+      "findings": 22,
+      "documents": 21
+    },
+    {
+      "id": "original-data",
+      "q": "Original Data",
+      "findings": 9,
+      "documents": 9
+    },
+    {
+      "id": "accurate",
+      "q": "Accurate (ALCOA)",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "detectability",
+      "q": "Detectability",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "uncertainty",
+      "q": "Uncertainty",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "harm",
+      "q": "Harm",
+      "findings": 8284,
+      "documents": 1811
+    },
+    {
+      "id": "risk-based-decision-making",
+      "q": "Risk-Based Decision-Making",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "written-procedure",
+      "q": "Written Procedures",
+      "findings": 1132,
+      "documents": 882
+    },
+    {
+      "id": "quality-control-unit",
+      "q": "Quality Control Unit",
+      "findings": 1151,
+      "documents": 975
+    },
+    {
+      "id": "laboratory-controls",
+      "q": "Laboratory Controls",
+      "findings": 317,
+      "documents": 313
+    },
+    {
+      "id": "sampling-plan",
+      "q": "Sampling Plan",
+      "findings": 199,
+      "documents": 196
+    },
+    {
+      "id": "adverse-event",
+      "q": "Adverse Event",
+      "findings": 121,
+      "documents": 115
+    },
+    {
+      "id": "quality-system",
+      "q": "Quality System",
+      "findings": 76,
+      "documents": 74
+    },
+    {
+      "id": "container-closure",
+      "q": "Container Closure System",
+      "findings": 39,
+      "documents": 39
+    },
+    {
+      "id": "water-system",
+      "q": "Water System",
+      "findings": 54,
+      "documents": 50
+    },
+    {
+      "id": "visual-inspection",
+      "q": "Visual Inspection",
+      "findings": 85,
+      "documents": 77
+    },
+    {
+      "id": "field-alert",
+      "q": "Field Alert Report (FAR)",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "in-process-control",
+      "q": "In-Process Control",
+      "findings": 31,
+      "documents": 31
+    },
+    {
+      "id": "quality-agreement",
+      "q": "Quality Agreement",
+      "findings": 441,
+      "documents": 438
+    },
+    {
+      "id": "preventive-maintenance",
+      "q": "Preventive Maintenance",
+      "findings": 25,
+      "documents": 25
+    },
+    {
+      "id": "equipment-qualification",
+      "q": "Equipment Qualification",
+      "findings": 16,
+      "documents": 16
+    },
+    {
+      "id": "laboratory-investigation",
+      "q": "Laboratory Investigation",
+      "findings": 15,
+      "documents": 13
+    },
+    {
+      "id": "shelf-life",
+      "q": "Shelf Life",
+      "findings": 26,
+      "documents": 26
+    },
+    {
+      "id": "non-conformance",
+      "q": "Non-conformance",
+      "findings": 11,
+      "documents": 11
+    },
+    {
+      "id": "purified-water",
+      "q": "Purified Water (PW)",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "management-review",
+      "q": "Management Review",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "labeling-control",
+      "q": "Labeling Control",
+      "findings": 10,
+      "documents": 10
+    },
+    {
+      "id": "complaint-handling",
+      "q": "Complaint Handling",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "good-documentation-practices",
+      "q": "Good Documentation Practices",
+      "findings": 6,
+      "documents": 6
+    },
+    {
+      "id": "air-handling",
+      "q": "Air Handling",
+      "findings": 7,
+      "documents": 7
+    },
+    {
+      "id": "microbial-limits",
+      "q": "Microbial Limits",
+      "findings": 6,
+      "documents": 6
+    },
+    {
+      "id": "sanitation",
+      "q": "Sanitation",
+      "findings": 412,
+      "documents": 385
+    },
+    {
+      "id": "pest-control",
+      "q": "Pest Control",
+      "findings": 78,
+      "documents": 78
+    },
+    {
+      "id": "master-production-record",
+      "q": "Master Production and Control Record",
+      "findings": 151,
+      "documents": 143
+    },
+    {
+      "id": "ongoing-stability-programme",
+      "q": "On-going Stability",
+      "findings": 6,
+      "documents": 6
+    },
+    {
+      "id": "job-description",
+      "q": "Job Description",
+      "findings": 181,
+      "documents": 181
+    },
+    {
+      "id": "mix-up",
+      "q": "Mix-up",
+      "findings": 192,
+      "documents": 188
+    },
+    {
+      "id": "training",
+      "q": "Training",
+      "findings": 1007,
+      "documents": 926
+    },
+    {
+      "id": "certificate-of-analysis",
+      "q": "Certificate of Analysis (CoA)",
+      "findings": 14,
+      "documents": 14
+    },
+    {
+      "id": "pressure-differential",
+      "q": "Pressure Differential",
+      "findings": 23,
+      "documents": 23
+    },
+    {
+      "id": "sporicidal-agent",
+      "q": "Sporicidal Agent",
+      "findings": 60,
+      "documents": 58
+    },
+    {
+      "id": "time-limits-on-production",
+      "q": "Time Limit",
+      "findings": 52,
+      "documents": 52
+    },
+    {
+      "id": "yield",
+      "q": "Yield",
+      "findings": 56,
+      "documents": 55
+    },
+    {
+      "id": "reconciliation",
+      "q": "Reconciliation",
+      "findings": 42,
+      "documents": 42
+    },
+    {
+      "id": "equipment-use-log",
+      "q": "Equipment Use Log",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "distribution-record",
+      "q": "Distribution Records",
+      "findings": 54,
+      "documents": 54
+    }
+  ],
+  "excluded": [
+    {
+      "id": "quality-policy",
+      "q": "Quality Policy",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "quality-objectives",
+      "q": "Quality Objectives",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "quality-planning",
+      "q": "Quality Planning",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "knowledge-management",
+      "q": "Knowledge Management",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "risk-identification",
+      "q": "Risk Identification",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "risk-control",
+      "q": "Risk Control",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "risk-acceptance",
+      "q": "Risk Acceptance",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "risk-communication",
+      "q": "Risk Communication",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "risk-review",
+      "q": "Risk Review",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "alcoa-plus",
+      "q": "ALCOA+",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "user-requirements-specification",
+      "q": "User Requirements Specification (URS)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "design-qualification",
+      "q": "Design Qualification (DQ)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "analytical-procedure-validation",
+      "q": "Analytical Procedure Validation",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "detection-limit",
+      "q": "Detection Limit",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "quantitation-limit",
+      "q": "Quantitation Limit",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "terminal-sterilization",
+      "q": "Terminal Sterilisation",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "airflow-visualization-study",
+      "q": "Airflow Visualization Study (Smoke Study)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "viable-environmental-monitoring",
+      "q": "Viable Environmental Monitoring",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "non-viable-particle-monitoring",
+      "q": "Total Particle (Non-viable) Monitoring",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "cleanroom-qualification",
+      "q": "Cleanroom Qualification",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "barrier-technology",
+      "q": "Barrier Technology",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "blow-fill-seal",
+      "q": "Blow-Fill-Seal (BFS)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "form-fill-seal",
+      "q": "Form-Fill-Seal (FFS)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "pupsit",
+      "q": "Pre-use Post Sterilisation Integrity Test (PUPSIT)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "sterilising-grade-filter",
+      "q": "Sterilising-grade Filter",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "d-value",
+      "q": "D-value",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "z-value",
+      "q": "Z-value",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "overkill-sterilisation",
+      "q": "Overkill Sterilisation",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "data-lifecycle",
+      "q": "Data Lifecycle",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "static-data",
+      "q": "Static Data / Static Record",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "dynamic-data",
+      "q": "Dynamic Data / Dynamic Record",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "system-owner",
+      "q": "System Owner",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "process-owner",
+      "q": "Process Owner",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "segregation-of-duties",
+      "q": "Segregation of Duties",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "periodic-evaluation",
+      "q": "Periodic Evaluation",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "data-migration",
+      "q": "Data Migration",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "hybrid-system",
+      "q": "Hybrid System",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "data-transfer",
+      "q": "Data Transfer",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "disaster-recovery",
+      "q": "Disaster Recovery",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "business-continuity",
+      "q": "Business Continuity",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "exception-report",
+      "q": "Exception Report",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "stakeholder",
+      "q": "Stakeholder",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "residual-risk",
+      "q": "Residual Risk",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "formality",
+      "q": "Formality in Quality Risk Management",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "subjectivity",
+      "q": "Subjectivity in Quality Risk Management",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "master-standard-documents",
+      "q": "Master Standard Documents (Gijunseo)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "business-operator-recall",
+      "q": "Recall by the Business Operator (Korea)",
+      "reason": "영문 원문 검색 결과 0건"
+    },
+    {
+      "id": "returned-product",
+      "q": "Returned Products",
+      "reason": "영문 원문 검색 결과 0건"
+    }
+  ]
+}

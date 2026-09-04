@@ -69,9 +69,12 @@ jobs:
         run: |
           set -euo pipefail
           count() { [ -f "$1" ] && jq '[.axes[].items[], (.combos.items // [])[]] | length' "$1" || echo 0; }
-          # ★두 언어를 **합쳐서** 센다. 따로 세면 한쪽이 통째로 사라져도 다른 쪽 숫자가
-          #   그대로라 축소 가드가 침묵한다(조합 51장 증발 사고와 같은 모양).
-          echo "items=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))" >> "$GITHUB_OUTPUT"
+          # ★[2026-09-05 정정] 종전엔 두 언어를 **합쳐서** 셌다. 그 근거("따로 세면 한쪽이
+          #   사라져도 침묵한다")는 거꾸로였다 — 언어마다 자기 숫자를 보면 그 언어가 0 이
+          #   되는 순간 그 검사가 걸린다. 반대로 **합산은 한쪽 붕괴를 다른 쪽 증가로 가린다**
+          #   (영어 57 → 0 인데 한국어가 57 늘면 총합이 그대로라 통과한다).
+          echo "items_ko=$(count "$DATA_PATH")" >> "$GITHUB_OUTPUT"
+          echo "items_en=$(count "$DATA_PATH_EN")" >> "$GITHUB_OUTPUT"
 
       # 스크립트가 0건 가드·표본 미달 제외·모르는 기관 코드·실패율 상한을 스스로 판정하고,
       # 위반이면 아무것도 쓰지 않은 채 exit 1 한다(잡 상태 빨강으로 드러난다).
@@ -130,18 +133,20 @@ jobs:
         run: |
           set -euo pipefail
           count() { [ -f "$1" ] && jq '[.axes[].items[], (.combos.items // [])[]] | length' "$1" || echo 0; }
-          AFTER=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))
-          BEFORE='${{ steps.before.outputs.items }}'
-          echo "after=$AFTER" >> "$GITHUB_OUTPUT"
           # GHA 표현식에는 산술이 없다 — 계산은 전부 셸에서 한다.
-          if [ "$BEFORE" -eq 0 ]; then
-            echo "allowed=true" >> "$GITHUB_OUTPUT"
-          elif [ $(( (BEFORE - AFTER) * 100 )) -ge $(( BEFORE * SHRINK_PCT )) ]; then
-            echo "allowed=false" >> "$GITHUB_OUTPUT"
-            echo "페이지 수 ${BEFORE} → ${AFTER} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "allowed=true" >> "$GITHUB_OUTPUT"
-          fi
+          # 언어마다 따로 본다(합산은 한쪽 붕괴를 다른 쪽 증가로 가린다 — before 단계 주석).
+          ALLOWED=true
+          check_shrink() {                   # $1=라벨  $2=이전  $3=정본경로
+            local before="$2" after; after=$(count "$3")
+            if [ "$before" -gt 0 ] && [ $(( (before - after) * 100 )) -ge $(( before * SHRINK_PCT )) ]; then
+              ALLOWED=false
+              echo "$1 페이지 수 ${before} → ${after} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          }
+          check_shrink "한국어" '${{ steps.before.outputs.items_ko }}' "$DATA_PATH"
+          check_shrink "영어" '${{ steps.before.outputs.items_en }}' "$DATA_PATH_EN"
+          echo "after=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))" >> "$GITHUB_OUTPUT"
+          echo "allowed=$ALLOWED" >> "$GITHUB_OUTPUT"
 
       - name: Freeze renderer-produced goldens
         if: steps.changes.outputs.changed == 'true'

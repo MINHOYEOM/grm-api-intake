@@ -56,6 +56,9 @@ LIBRARY_UPDATES_FILE = WEB_DIR / "data" / "library_updates.json"  # [자료실] 
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
+# 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
+# 영어 /findings/가 보여 줄 수와 카드의 수가 갈라진다.
+GLOSSARY_CASES_EN_FILE = WEB_DIR / "data" / "glossary_cases_en.json"
 FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
 # [다국어 2026-09-04] 영어 트리용 같은 정본 — **영어 모집단으로 다시 잰 값**이다
 # (`findings_facets_refresh.py --orig-lang en`). 한국어 파일을 받아 표본에서 한글만
@@ -1467,6 +1470,12 @@ def build_glossary_view(
         #   (불변식 #13). 템플릿이 `easy_ko` 를 직접 읽으면 영어 페이지에 한국어
         #   설명이 실린다 — 이번 다국어 작업에서 세 번 밟은 자리와 같은 모양이다.
         is_ko = lang == DEFAULT_LANG
+        # 조항 사례 정적 페이지는 아직 한국어 트리에만 있다. 영문 용어사전이 그곳으로
+        # 보내면 영어→한국어 전용 표면이라는 거짓 간선이 된다. 공식 원문 URL은 그대로
+        # 남기되, 한국어 조항 사례 착지만 비운다.
+        if not is_ko:
+            for ref in reg_refs:
+                ref["cases_href"] = ""
         term = t["term_ko"] if is_ko else t["term_en"]
         easy = t["easy_ko"] if is_ko else (t.get("easy_en") or "")
         detail = (t.get("detail_ko") or "") if is_ko else (t.get("detail_en") or "")
@@ -1488,11 +1497,10 @@ def build_glossary_view(
         display_aliases = [a for a in aliases
                             if _glossary_alias_norm(a) not in norm_ko
                             and _glossary_alias_norm(a) not in norm_en]
-        # ★사례 링크는 영어판에서 내지 않는다. 검색어 193개 중 61개가 한글이고,
-        #   건수는 **전체 코퍼스**로 잰 값이라 영어 검색(원문이 영어인 지적이 기본)이
-        #   보여줄 수와 어긋난다 — 한 화면 안의 두 숫자가 다르면 어느 쪽이 맞는지
-        #   알 방법이 없다(모음 페이지에서 같은 이유로 별도 정본을 만들었다).
-        case = (cases.get(t["id"]) or {}) if is_ko else {}
+        # 사례 정본도 읽는 트리의 모집단이어야 한다. 영어는 `term_en`을 실제 RPC로
+        # 확인하고 p_orig_lang=en으로 다시 센 별도 파일만 넘긴다. 파일 부재는 링크를
+        # 조용히 비우지만, 한국어 전체 코퍼스 파일로 폴백해 거짓 수를 만들지는 않는다.
+        case = cases.get(t["id"]) or {}
         case_q = str(case.get("q") or "")
         case_findings = _glossary_case_count(case)
         return {
@@ -1666,7 +1674,7 @@ def _glossary_shape(sentence: str) -> str:
 
 def _glossary_incidental(sentence: str, token: str) -> bool:
     """토큰이 열거(`제조, 가공, 포장 또는 보관`) 안에만 있으면 우연한 언급이다."""
-    for m in re.finditer(re.escape(token), sentence):
+    for m in re.finditer(re.escape(token), sentence, flags=re.IGNORECASE):
         left = sentence[max(0, m.start() - 8):m.start()]
         right = sentence[m.end():m.end() + 8]
         if not (_GLOSSARY_ENUM_L.search(left) and _GLOSSARY_ENUM_R.match(right)):
@@ -1674,10 +1682,18 @@ def _glossary_incidental(sentence: str, token: str) -> bool:
     return True
 
 
-def glossary_case_probes(term: dict[str, Any], case_q: str = "") -> list[str]:
-    """인용문에서 **눈으로 확인 가능한** 토큰만 — 사람이 검수한 q, 한글 표제어 분절, 약어."""
+def glossary_case_probes(term: dict[str, Any], case_q: str = "",
+                         lang: str = DEFAULT_LANG) -> list[str]:
+    """인용문에서 눈으로 확인 가능한 토큰만.
+
+    한국어판은 사람이 검수한 q와 한글 표제어 분절을 쓴다. 영어판은 같은 문장에 실제로
+    나타날 영문 q/표제어만 쓴다. 한국어 탐침이 영어 원문을 고르는 일을 허용하면, 화면의
+    인용이 링크의 영문 검색어를 입증하지 못한다.
+    """
     out: list[str] = []
-    for cand in [case_q, *(term.get("term_ko") or "").split("·")]:
+    candidates = ([case_q, term.get("term_en") or ""] if lang != DEFAULT_LANG
+                  else [case_q, *(term.get("term_ko") or "").split("·")])
+    for cand in candidates:
         cand = (cand or "").strip()
         if len(cand) >= 2 and cand not in out:
             out.append(cand)
@@ -1691,6 +1707,7 @@ def build_glossary_case_excerpts(
     terms: list[dict[str, Any]],
     docs_payload: "dict[str, Any] | None",
     cases: "dict[str, dict[str, Any]] | None" = None,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, list[dict[str, Any]]]:
     """{term_id: [인용 …]} — 결정론(입력 순서 고정·now()/난수 0·네트워크 0).
 
@@ -1699,16 +1716,26 @@ def build_glossary_case_excerpts(
     같은 문장이 여러 페이지에 실리면 중복 본문이다).
     """
     documents = (docs_payload or {}).get("documents") or []
-    if not documents:
+    if not documents or not cases:
         return {}
 
     # 문장 분할은 **한 번만** 한다. 용어마다 다시 쪼개면 21,347 건 × 226 어라 렌더·테스트가
     # 폭발한다(대량 페이지가 테스트 시간을 터뜨린 전례가 있다).
+    # ★[2026-09-05] 소문자 접기도 같은 이유로 한 번만 한다. 종전엔 대조 루프 안에서
+    #   `sent.casefold()` 를 **용어 242 개마다 다시** 계산했다(문장 수 × 242 회). 영문
+    #   발췌가 더해져 이 함수가 렌더당 두 번 돌게 되자 단일 렌더가 10.4s → 22.9s 가 됐고
+    #   CI 가 20 분 상한에서 잘렸다. 접은 문자열을 색인에 함께 실어 두면 동작은 그대로고
+    #   비용만 빠진다(대조 결과는 바이트 동일 — 골든이 지킨다).
     shape_docs: dict[str, set[str]] = {}
     index: list[tuple[dict[str, Any], str, list[str]]] = []   # (doc, finding_id, 문장들)
     for doc in documents:
+        # 영문 사례 정본의 모집단(p_orig_lang=en) 밖 문서에서 인용을 보태면, 카드의
+        # 링크·건수와 인용이 서로 다른 세계를 말하게 된다. `finding_body(..., "en")`의
+        # 한국어 fallback은 일반 영문 화면에는 유용하지만 여기서는 허용하지 않는다.
+        if lang != DEFAULT_LANG and not doc_is_english(doc):
+            continue
         for finding in doc.get("findings") or []:
-            sents = [s for s in _glossary_sentences(finding.get("text_ko") or "")
+            sents = [s for s in _glossary_sentences(finding_body(finding, lang))
                      if _GLOSSARY_QUOTE_MIN <= len(s) <= _GLOSSARY_QUOTE_MAX]
             if not sents:
                 continue
@@ -1716,19 +1743,24 @@ def build_glossary_case_excerpts(
                 shape_docs.setdefault(_glossary_shape(sent), set()).add(doc["document_id"])
             index.append((doc, finding.get("finding_id") or "", sents))
     boiler = {k for k, v in shape_docs.items() if len(v) >= _GLOSSARY_BOILER_DOCS}
-    index = [(doc, fid, [s for s in sents if _glossary_shape(s) not in boiler])
+    # 문장과 **접은 사본**을 짝으로 싣는다(대조는 접은 쪽, 표시·우연언급 판정은 원문 쪽).
+    index = [(doc, fid, [(s, s.casefold()) for s in sents
+                         if _glossary_shape(s) not in boiler])
              for doc, fid, sents in index]
 
     def _candidates(term: dict[str, Any]) -> list[dict[str, Any]]:
-        probes = glossary_case_probes(term, ((cases or {}).get(term["id"]) or {}).get("q", ""))
+        probes = glossary_case_probes(
+            term, ((cases or {}).get(term["id"]) or {}).get("q", ""), lang)
+        probes_cf = [(p, p.casefold()) for p in probes]
         found: list[dict[str, Any]] = []
         seen_docs: set[str] = set()
         for doc, fid, sents in index:              # 문서당 최대 1 건 — 한 문서로 도배 금지
             if doc["document_id"] in seen_docs:
                 continue
-            for sent in sents:
-                tok = next((p for p in probes
-                            if p in sent and not _glossary_incidental(sent, p)), None)
+            for sent, sent_cf in sents:
+                tok = next((p for p, p_cf in probes_cf
+                            if p_cf in sent_cf
+                            and not _glossary_incidental(sent, p)), None)
                 if tok:
                     found.append({"quote": sent, "token": tok,
                                   "agency": doc.get("agency") or "",
@@ -2793,7 +2825,7 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
 #   반대로 **빼는 것**과 그 이유(수리 순서가 곧 설계 문서 §7 의 4·5단계다):
 #     · 문서·모음·조항·업체 정적 페이지 = 본문이 `text_ko` 뿐이다(`findings_docs.json`·
 #       `findings_facets.json` 에 영문 원문이 없다) → 4단계에서 데이터를 넣은 뒤.
-#     · 용어사전 = `term_en` 은 100% 이나 풀이(`easy_ko`·`detail_ko`)가 한국어다.
+#     · 용어사전 = 영문 풀이·영문 사례 정본이 갖춰진 뒤 영어 트리에 편입했다.
 #     · 이용안내·주간 퀴즈·주간 브리프/아카이브 = 한국어 산문 그 자체 → 5단계.
 #     · 마이페이지·Admin = 개인화·운영자 화면(언어 트리와 무관).
 # 없는 페이지로 보내는 링크는 무링크보다 나쁘다는 저장소 규율 그대로, nav·푸터·언어
@@ -2808,6 +2840,7 @@ EN_TREE_STATIC: tuple[str, ...] = (
     "findings/firm/",
     "findings/inspector/",
     "library/",
+    "glossary/",
 )
 
 
@@ -4158,11 +4191,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 표제어(`term_en`)는 데이터에 이미 있었고, 설명 두 필드(`easy_en`·`detail_en`)를
         # 정본에 실어 본문이 영어로 성립하게 됐다. 색인은 **낱자 A–Z** 로 가른다 —
         # 한국어판의 라틴 버킷(A–Z 한 덩어리)을 그대로 쓰면 242개가 한 칸에 들어간다.
-        # ★사례 링크·인용은 영어판에서 내지 않는다: 사례 검색어 193개 중 61개가 한글이고
-        #   건수는 전체 코퍼스로 잰 값이라, 영어 검색(원문이 영어인 지적이 기본)이 보여줄
-        #   수와 어긋난다. 인용문 역시 한국어 본문에서 한국어 탐침으로 고른 것이다.
+        # ★영문 사례는 전체 코퍼스 정본을 절대 재사용하지 않는다. `term_en` 후보를 실제
+        #   `p_orig_lang=en` RPC로 확인해 다시 센 별도 정본만 쓴다. 없으면 링크·인용 모두
+        #   비운다 — 숫자와 착지가 갈리는 반쪽 링크보다 낫다.
+        glossary_en_cases = load_glossary_cases(GLOSSARY_CASES_EN_FILE) or {}
         glossary_en_view = build_glossary_view(
-            glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases(),
+            glossary_terms, _load_reg_ref_catalogs(), glossary_en_cases,
             clause_slugs, lang="en") if glossary_terms else None
         if glossary_en_view:
             en_emit("glossary.html", en_page("glossary/"),
@@ -4171,6 +4205,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=en_tr(GLOSSARY_DESCRIPTION),
                 glossary=glossary_en_view,
             )
+            # 제외된 용어에는 정본 사례가 없으므로 인용 후보도 만들지 않는다. 이 필터는
+            # 결과를 바꾸지 않고, 영문 문장 탐색 범위만 정본 링크 대상에 맞춘다.
+            glossary_en_case_terms = [term for term in glossary_terms
+                                      if term["id"] in glossary_en_cases]
+            glossary_en_excerpts = build_glossary_case_excerpts(
+                glossary_en_case_terms, docs_data, glossary_en_cases, lang="en")
             for group in glossary_en_view["groups"]:
                 for term in group["terms"]:
                     en_emit("glossary_term.html", en_page(f"glossary/{term['id']}/"),
@@ -4179,7 +4219,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         description=glossary_term_description(term, en_tr),
                         json_ld=build_glossary_term_json_ld(term, tr=en_tr, lang="en"),
                         term=term,
-                        case_excerpts=[],
+                        case_excerpts=glossary_en_excerpts.get(term["id"]) or [],
                     )
 
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을

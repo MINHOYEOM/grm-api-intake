@@ -365,6 +365,69 @@ class EnglishRefreshTest(unittest.TestCase):
         self.assertEqual(payload["excluded"], [{"id": "new", "q": "New Term", "reason": "조회 실패"}])
         self.assertEqual(report["counts"]["failed"], 2)
 
+    # ── 검색어 후보 (2026-09-05) ─────────────────────────────────────────────
+    def test_query_candidates_strip_the_headword_tail_only_as_a_fallback(self):
+        """★한국어 정본의 `q` 는 **손으로 고른 검색어**다(`gmp` → "GMP",
+        `root-cause-analysis` → "root cause"). 영문은 `term_en` 을 통짜로 써서,
+        표제어에 괄호가 붙었다는 이유만으로 46 개가 0건이 됐다 — 지적 원문에
+        "Good Manufacturing Practice (GMP)" 라고 적히지 않는다.
+        후보는 표제어에서 **기계적으로 잘라낸 것**뿐이고(지어내지 않는다), 순서가
+        중요하다 — 표제어가 먼저 이겨야 더 좁은 질의가 선택된다.
+        """
+        self.assertEqual(gcr.english_query_candidates("Deviation"), ["Deviation"])
+        self.assertEqual(
+            gcr.english_query_candidates("Good Manufacturing Practice (GMP)"),
+            ["Good Manufacturing Practice (GMP)", "Good Manufacturing Practice"])
+        self.assertEqual(
+            gcr.english_query_candidates("Drug Product / Medicinal Product"),
+            ["Drug Product / Medicinal Product", "Drug Product"])
+        self.assertEqual(gcr.english_query_candidates("Quality Unit(s)"),
+                         ["Quality Unit(s)", "Quality Unit"])
+
+    def test_headword_wins_when_it_has_results(self):
+        """주 표현은 **표제어가 0건일 때만** 쓴다 — 넓은 질의가 좁은 질의를 이기면
+        링크가 가리키는 검색이 그 용어의 사례가 아니게 된다."""
+        asked = []
+
+        def fetch(q):
+            asked.append(q)
+            return (5, 4, "")
+
+        payload, _ = gcr.run_english_refresh(
+            [{"id": "gmp", "term_en": "Good Manufacturing Practice (GMP)"}],
+            {"items": []}, fetch, run_date="2026-09-05")
+        self.assertEqual(asked, ["Good Manufacturing Practice (GMP)"],
+                         "표제어가 결과를 냈는데 주 표현까지 물었다")
+        self.assertEqual(payload["items"][0]["q"], "Good Manufacturing Practice (GMP)")
+
+    def test_fallback_query_is_the_one_recorded_so_link_and_count_agree(self):
+        """실제로 쓴 질의가 `q` 에 남아야 화면의 `?q=` 링크와 그 옆 건수가 **같은
+        검색**을 가리킨다. 표제어를 적어 두고 주 표현으로 센 숫자를 실으면 거짓이 된다."""
+        def fetch(q):
+            return (7, 6, "") if q == "Good Manufacturing Practice" else (0, 0, "")
+
+        payload, _ = gcr.run_english_refresh(
+            [{"id": "gmp", "term_en": "Good Manufacturing Practice (GMP)"}],
+            {"items": []}, fetch, run_date="2026-09-05")
+        self.assertEqual(payload["items"],
+                         [{"id": "gmp", "q": "Good Manufacturing Practice",
+                           "findings": 7, "documents": 6}])
+
+    def test_a_lookup_failure_stops_the_candidate_walk(self):
+        """조회 실패에서 다음 후보로 넘어가면 **장애를 '0건'으로 덮어쓴다.**"""
+        asked = []
+
+        def fetch(q):
+            asked.append(q)
+            return (None, None, "timeout")
+
+        payload, _ = gcr.run_english_refresh(
+            [{"id": "gmp", "term_en": "Good Manufacturing Practice (GMP)"}],
+            {"items": []}, fetch, run_date="2026-09-05", fail_abort_pct=101.0)
+        self.assertEqual(asked, ["Good Manufacturing Practice (GMP)"])
+        self.assertEqual(payload["excluded"][0]["reason"], "조회 실패")
+
+
 
 if __name__ == "__main__":
     unittest.main()

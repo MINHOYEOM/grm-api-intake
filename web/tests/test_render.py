@@ -15519,7 +15519,10 @@ class WebEnTreeTest(unittest.TestCase):
         hangul = re.compile("[가-힣]+")
         stripped = 0
         for rel, html in self.en.items():
-            if rel.startswith(("en/library/", "en/glossary/")):
+            # ★용어사전을 여기서 통째로 건너뛰지 않는다 — 그러면 243장의 **나머지 전부**가
+            #   검사 밖으로 나간다. 한국어가 남아도 되는 자리는 출처·관련조항 두 블록뿐이고,
+            #   아래에서 그 블록만 들어낸다(들어낸 뒤 잔존 한글 0 — 실측).
+            if rel.startswith("en/library/"):
                 continue
             html, n = strip_named_original_blocks(html)
             stripped += n

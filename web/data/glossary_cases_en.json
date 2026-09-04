@@ -1,10 +1,16 @@
 {
   "schema": "grm-glossary-cases/v1",
-  "source": "public.findings_search RPC (p_q=term_en, p_orig_lang=en) totals — /en/findings/?q=term_en 결과와 동일 함수",
+  "source": "public.findings_search RPC (p_q=q, p_orig_lang=en) totals — /en/findings/?q=q 결과와 동일 함수",
   "orig_lang": "en",
   "measured_on": "2026-09-05",
-  "note": "glossary.json의 term_en을 후보 검색어로 삼고, 원문이 영어인 공개 지적에서 실제 결과가 있는 용어만 사례를 싣는다.",
+  "note": "glossary.json의 term_en(0건이면 괄호·슬래시를 뗀 주 표현)을 검색어로 삼고, 원문이 영어인 공개 지적에서 실제 결과가 있는 용어만 사례를 싣는다.",
   "items": [
+    {
+      "id": "gmp",
+      "q": "Good Manufacturing Practice",
+      "findings": 767,
+      "documents": 655
+    },
     {
       "id": "active-ingredient",
       "q": "Active Ingredient",
@@ -12,10 +18,34 @@
       "documents": 600
     },
     {
+      "id": "api",
+      "q": "Active Pharmaceutical Ingredient",
+      "findings": 85,
+      "documents": 84
+    },
+    {
       "id": "api-starting-material",
       "q": "API Starting Material",
       "findings": 1,
       "documents": 1
+    },
+    {
+      "id": "drug-product",
+      "q": "Drug Product",
+      "findings": 5943,
+      "documents": 2175
+    },
+    {
+      "id": "batch",
+      "q": "Batch",
+      "findings": 2004,
+      "documents": 1438
+    },
+    {
+      "id": "batch-number",
+      "q": "Batch Number",
+      "findings": 10,
+      "documents": 10
     },
     {
       "id": "batch-record",
@@ -90,6 +120,12 @@
       "documents": 140
     },
     {
+      "id": "marketing-authorization",
+      "q": "Marketing Authorization",
+      "findings": 38,
+      "documents": 38
+    },
+    {
       "id": "authorized-person",
       "q": "Authorized Person",
       "findings": 105,
@@ -124,6 +160,12 @@
       "q": "Product Recall",
       "findings": 15,
       "documents": 14
+    },
+    {
+      "id": "expiry-date",
+      "q": "Expiry Date",
+      "findings": 31,
+      "documents": 31
     },
     {
       "id": "retest-date",
@@ -162,6 +204,12 @@
       "documents": 4
     },
     {
+      "id": "quality-unit",
+      "q": "Quality Unit",
+      "findings": 337,
+      "documents": 317
+    },
+    {
       "id": "pharmaceutical-quality-system",
       "q": "Pharmaceutical Quality System (PQS)",
       "findings": 2,
@@ -190,6 +238,12 @@
       "q": "Control Strategy",
       "findings": 9,
       "documents": 9
+    },
+    {
+      "id": "quality-risk-management",
+      "q": "Quality Risk Management",
+      "findings": 13,
+      "documents": 13
     },
     {
       "id": "risk",
@@ -252,6 +306,12 @@
       "documents": 159
     },
     {
+      "id": "root-cause-analysis",
+      "q": "Root Cause Analysis",
+      "findings": 11,
+      "documents": 10
+    },
+    {
       "id": "deviation",
       "q": "Deviation",
       "findings": 1918,
@@ -286,6 +346,12 @@
       "q": "Contract Manufacturer",
       "findings": 23,
       "documents": 23
+    },
+    {
+      "id": "product-quality-review",
+      "q": "Product Quality Review",
+      "findings": 186,
+      "documents": 186
     },
     {
       "id": "product-complaint",
@@ -384,6 +450,24 @@
       "documents": 716
     },
     {
+      "id": "installation-qualification",
+      "q": "Installation Qualification",
+      "findings": 1,
+      "documents": 1
+    },
+    {
+      "id": "operational-qualification",
+      "q": "Operational Qualification",
+      "findings": 3,
+      "documents": 3
+    },
+    {
+      "id": "performance-qualification",
+      "q": "Performance Qualification",
+      "findings": 20,
+      "documents": 20
+    },
+    {
       "id": "process-validation",
       "q": "Process Validation",
       "findings": 107,
@@ -468,6 +552,12 @@
       "documents": 2
     },
     {
+      "id": "assay",
+      "q": "Assay",
+      "findings": 107,
+      "documents": 103
+    },
+    {
       "id": "identification-test",
       "q": "Identification Test",
       "findings": 23,
@@ -502,6 +592,12 @@
       "q": "Out-of-Specification (OOS) Result",
       "findings": 33,
       "documents": 33
+    },
+    {
+      "id": "oot",
+      "q": "Out-of-Trend",
+      "findings": 31,
+      "documents": 30
     },
     {
       "id": "stability-testing",
@@ -552,6 +648,12 @@
       "documents": 848
     },
     {
+      "id": "aseptic-process-simulation",
+      "q": "Aseptic Process Simulation",
+      "findings": 29,
+      "documents": 29
+    },
+    {
       "id": "environmental-monitoring",
       "q": "Environmental Monitoring",
       "findings": 138,
@@ -586,6 +688,12 @@
       "q": "Restricted Access Barrier System (RABS)",
       "findings": 3,
       "documents": 3
+    },
+    {
+      "id": "sterilization",
+      "q": "Sterilisation",
+      "findings": 2,
+      "documents": 2
     },
     {
       "id": "sterility",
@@ -654,6 +762,12 @@
       "documents": 224
     },
     {
+      "id": "site-master-file",
+      "q": "Site Master File",
+      "findings": 5,
+      "documents": 5
+    },
+    {
       "id": "reference-sample",
       "q": "Reference Sample",
       "findings": 1,
@@ -678,6 +792,12 @@
       "documents": 1
     },
     {
+      "id": "unidirectional-airflow",
+      "q": "Unidirectional Airflow",
+      "findings": 56,
+      "documents": 48
+    },
+    {
       "id": "critical-intervention",
       "q": "Critical Intervention",
       "findings": 3,
@@ -696,10 +816,22 @@
       "documents": 1
     },
     {
+      "id": "lyophilization",
+      "q": "Lyophilization",
+      "findings": 4,
+      "documents": 1
+    },
+    {
       "id": "filter-integrity-test",
       "q": "Filter Integrity Test",
       "findings": 4,
       "documents": 4
+    },
+    {
+      "id": "container-closure-integrity",
+      "q": "Container Closure Integrity",
+      "findings": 7,
+      "documents": 7
     },
     {
       "id": "metadata",
@@ -724,6 +856,12 @@
       "q": "Back-up",
       "findings": 2,
       "documents": 2
+    },
+    {
+      "id": "archive",
+      "q": "Archiving",
+      "findings": 1,
+      "documents": 1
     },
     {
       "id": "audit-trail-review",
@@ -762,6 +900,12 @@
       "documents": 21
     },
     {
+      "id": "original-data",
+      "q": "Original Data",
+      "findings": 9,
+      "documents": 9
+    },
+    {
       "id": "accurate",
       "q": "Accurate (ALCOA)",
       "findings": 1,
@@ -798,6 +942,12 @@
       "documents": 882
     },
     {
+      "id": "quality-control-unit",
+      "q": "Quality Control Unit",
+      "findings": 1151,
+      "documents": 975
+    },
+    {
       "id": "laboratory-controls",
       "q": "Laboratory Controls",
       "findings": 317,
@@ -810,10 +960,28 @@
       "documents": 196
     },
     {
+      "id": "adverse-event",
+      "q": "Adverse Event",
+      "findings": 121,
+      "documents": 115
+    },
+    {
+      "id": "quality-system",
+      "q": "Quality System",
+      "findings": 76,
+      "documents": 74
+    },
+    {
       "id": "container-closure",
       "q": "Container Closure System",
       "findings": 39,
       "documents": 39
+    },
+    {
+      "id": "water-system",
+      "q": "Water System",
+      "findings": 54,
+      "documents": 50
     },
     {
       "id": "visual-inspection",
@@ -828,10 +996,22 @@
       "documents": 1
     },
     {
+      "id": "in-process-control",
+      "q": "In-Process Control",
+      "findings": 31,
+      "documents": 31
+    },
+    {
       "id": "quality-agreement",
       "q": "Quality Agreement",
       "findings": 441,
       "documents": 438
+    },
+    {
+      "id": "preventive-maintenance",
+      "q": "Preventive Maintenance",
+      "findings": 25,
+      "documents": 25
     },
     {
       "id": "equipment-qualification",
@@ -882,6 +1062,12 @@
       "documents": 7
     },
     {
+      "id": "good-documentation-practices",
+      "q": "Good Documentation Practices",
+      "findings": 6,
+      "documents": 6
+    },
+    {
       "id": "air-handling",
       "q": "Air Handling",
       "findings": 7,
@@ -904,6 +1090,12 @@
       "q": "Pest Control",
       "findings": 78,
       "documents": 78
+    },
+    {
+      "id": "master-production-record",
+      "q": "Master Production and Control Record",
+      "findings": 151,
+      "documents": 143
     },
     {
       "id": "ongoing-stability-programme",
@@ -936,10 +1128,28 @@
       "documents": 14
     },
     {
+      "id": "pressure-differential",
+      "q": "Pressure Differential",
+      "findings": 23,
+      "documents": 23
+    },
+    {
       "id": "sporicidal-agent",
       "q": "Sporicidal Agent",
       "findings": 60,
       "documents": 58
+    },
+    {
+      "id": "time-limits-on-production",
+      "q": "Time Limit",
+      "findings": 52,
+      "documents": 52
+    },
+    {
+      "id": "yield",
+      "q": "Yield",
+      "findings": 56,
+      "documents": 55
     },
     {
       "id": "reconciliation",
@@ -962,46 +1172,6 @@
   ],
   "excluded": [
     {
-      "id": "gmp",
-      "q": "Good Manufacturing Practice (GMP)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "api",
-      "q": "Active Pharmaceutical Ingredient (API) / Drug Substance",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "drug-product",
-      "q": "Drug Product / Medicinal Product",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "batch",
-      "q": "Batch (or Lot)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "batch-number",
-      "q": "Batch Number (or Lot Number)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "marketing-authorization",
-      "q": "Marketing Authorization (Product Licence, Registration Certificate)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "expiry-date",
-      "q": "Expiry Date (Expiration Date)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "quality-unit",
-      "q": "Quality Unit(s)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "quality-policy",
       "q": "Quality Policy",
       "reason": "영문 원문 검색 결과 0건"
@@ -1019,11 +1189,6 @@
     {
       "id": "knowledge-management",
       "q": "Knowledge Management",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "quality-risk-management",
-      "q": "Quality Risk Management (QRM)",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1052,16 +1217,6 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "root-cause-analysis",
-      "q": "Root Cause Analysis (RCA)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "product-quality-review",
-      "q": "Product Quality Review (PQR)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "alcoa-plus",
       "q": "ALCOA+",
       "reason": "영문 원문 검색 결과 0건"
@@ -1074,21 +1229,6 @@
     {
       "id": "design-qualification",
       "q": "Design Qualification (DQ)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "installation-qualification",
-      "q": "Installation Qualification (IQ)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "operational-qualification",
-      "q": "Operational Qualification (OQ)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "performance-qualification",
-      "q": "Performance Qualification (PQ)",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1107,38 +1247,8 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "assay",
-      "q": "Assay (Content or Potency)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "oot",
-      "q": "Out-of-Trend (OOT) Result",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "aseptic-process-simulation",
-      "q": "Aseptic Process Simulation (APS, Media Fill)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "terminal-sterilization",
       "q": "Terminal Sterilisation",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "sterilization",
-      "q": "Sterilisation / Sterilization",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "site-master-file",
-      "q": "Site Master File (SMF)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "unidirectional-airflow",
-      "q": "Unidirectional Airflow (UDAF)",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1177,11 +1287,6 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "lyophilization",
-      "q": "Lyophilization (Freeze-drying)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "pupsit",
       "q": "Pre-use Post Sterilisation Integrity Test (PUPSIT)",
       "reason": "영문 원문 검색 결과 0건"
@@ -1207,11 +1312,6 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "container-closure-integrity",
-      "q": "Container Closure Integrity (CCI)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "data-lifecycle",
       "q": "Data Lifecycle",
       "reason": "영문 원문 검색 결과 0건"
@@ -1224,11 +1324,6 @@
     {
       "id": "dynamic-data",
       "q": "Dynamic Data / Dynamic Record",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "archive",
-      "q": "Archiving / Archive",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1277,11 +1372,6 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "original-data",
-      "q": "Original Data / Original Record",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "exception-report",
       "q": "Exception Report",
       "reason": "영문 원문 검색 결과 0건"
@@ -1307,41 +1397,6 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "quality-control-unit",
-      "q": "Quality Control Unit (QCU)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "adverse-event",
-      "q": "Adverse Event (AE)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "quality-system",
-      "q": "Quality System (FDA Quality Systems Model)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "water-system",
-      "q": "Water System (Pharmaceutical Water System)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "in-process-control",
-      "q": "In-Process Control (IPC)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "preventive-maintenance",
-      "q": "Preventive Maintenance (PM)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "good-documentation-practices",
-      "q": "Good Documentation Practices (GDocP)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "master-standard-documents",
       "q": "Master Standard Documents (Gijunseo)",
       "reason": "영문 원문 검색 결과 0건"
@@ -1352,28 +1407,8 @@
       "reason": "영문 원문 검색 결과 0건"
     },
     {
-      "id": "master-production-record",
-      "q": "Master Production and Control Record (MPCR)",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
       "id": "returned-product",
       "q": "Returned Products",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "pressure-differential",
-      "q": "Pressure Differential / Positive Pressure",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "time-limits-on-production",
-      "q": "Time Limit / Hold Time",
-      "reason": "영문 원문 검색 결과 0건"
-    },
-    {
-      "id": "yield",
-      "q": "Yield (Theoretical / Actual)",
       "reason": "영문 원문 검색 결과 0건"
     }
   ]

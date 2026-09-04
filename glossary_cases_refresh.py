@@ -44,6 +44,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -56,6 +57,26 @@ from grm_cli import normalize_supabase_url as _normalize_supabase_url
 SCHEMA_VERSION = "grm-glossary-cases/v1"
 REPORT_SCHEMA_VERSION = "grm-glossary-cases-refresh-report/v1"
 RPC_NAME = "findings_search"
+
+#: 괄호·슬래시로 시작하는 부수 표기를 떼는 자리 — "Batch (or Lot)"·"Drug Product /
+#: Medicinal Product"·"Quality Unit(s)" 처럼 표제어에만 붙는 꼬리다.
+_EN_QUERY_TAIL = re.compile(r"[(/]")
+
+
+def english_query_candidates(term_en: str) -> "list[str]":
+    """영문 검색어 후보 — ① 표제어 그대로 ② 괄호·슬래시 앞의 주 표현.
+
+    ★지어내지 않는다. 후보는 표제어에서 **기계적으로 잘라낸 것**뿐이고, 실제로 쓴 질의는
+      `q` 에 남는다 — 그래서 화면의 링크와 그 옆 건수가 언제나 같은 검색을 가리킨다.
+    ★순서가 중요하다. 표제어가 먼저 이겨야 더 좁은 질의가 선택된다(주 표현은 표제어가
+      0건일 때만 쓴다).
+    """
+    term_en = (term_en or "").strip()
+    out = [term_en] if term_en else []
+    head = _EN_QUERY_TAIL.split(term_en)[0].strip().rstrip(",").strip()
+    if head and head != term_en:
+        out.append(head)
+    return out
 DEFAULT_PATH = Path("web/data/glossary_cases.json")
 DEFAULT_GLOSSARY_PATH = Path("web/data/glossary.json")
 
@@ -374,6 +395,24 @@ def run_english_refresh(
     results: list[dict[str, Any]] = []
     decisions: list[tuple[str, str, dict[str, Any], dict[str, Any]]] = []
 
+    def probe(candidates: "list[str]") -> "tuple[str, int, int, str]":
+        """후보를 순서대로 물어 **처음으로 결과가 있는 질의**를 쓴다.
+
+        표제어가 먼저다 — 더 좁은 질의가 이긴다. 조회가 실패하면 거기서 멈춘다(다음
+        후보로 넘어가면 장애를 '0건'으로 덮어 쓰게 된다). 실제로 쓴 질의를 함께 돌려주어
+        화면의 링크(`?q=`)와 그 옆의 건수가 **같은 검색**을 가리키게 한다.
+        """
+        first = ("", 0, 0, "")
+        for i, cand in enumerate(candidates):
+            f, d, err = fetch(cand)
+            if err:
+                return cand, f, d, err
+            if i == 0:
+                first = (cand, f, d, err)
+            if f > 0:
+                return cand, f, d, err
+        return first
+
     for term in terms:
         if not isinstance(term, dict):
             raise ValueError(f"malformed glossary term: {term!r}")
@@ -388,7 +427,8 @@ def run_english_refresh(
         # English is the candidate's canonical query, even while preserving counts after
         # an isolated failure. An old q must never silently leak back into this population.
         previous["q"] = q
-        findings, documents, error = fetch(q)
+        q, findings, documents, error = probe(english_query_candidates(q))
+        previous["q"] = q
         result = evaluate_item(
             previous, findings, documents, error, large_change_pct=large_change_pct)
         # 최초 영문 정본에는 비교 기준선이 없다. '0 → N'을 ±50% 변동으로 부르면 모든
@@ -466,11 +506,12 @@ def run_english_refresh(
 
     return {
         "schema": SCHEMA_VERSION,
-        "source": ("public.findings_search RPC (p_q=term_en, p_orig_lang=en) totals — "
-                   "/en/findings/?q=term_en 결과와 동일 함수"),
+        "source": ("public.findings_search RPC (p_q=q, p_orig_lang=en) totals — "
+                   "/en/findings/?q=q 결과와 동일 함수"),
         "orig_lang": "en",
         "measured_on": report["run_at"],
-        "note": ("glossary.json의 term_en을 후보 검색어로 삼고, 원문이 영어인 공개 "
+        "note": ("glossary.json의 term_en(0건이면 괄호·슬래시를 뗀 주 표현)을 "
+                 "검색어로 삼고, 원문이 영어인 공개 "
                  "지적에서 실제 결과가 있는 용어만 사례를 싣는다."),
         "items": items,
         "excluded": excluded,

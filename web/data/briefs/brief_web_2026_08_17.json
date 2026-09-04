@@ -204,7 +204,14 @@
     },
     "summary": "ISPE 가 GMP Fundamentals 교육과정 강사 Chip Bennett 을 소개하는 회원 인터뷰를 게재했다. 규제 기대사항을 실무 수행으로 옮기는 교육 취지를 다뤘다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "MFDS suspends all manufacturing for three months and seven days after quality control records were falsified and required test equipment was missing",
+    "MHRA issues a GMP non-compliance statement to NORGINE LIMITED over critical PQS and QP batch release deficiencies, suspending human medicine certificates in part and IMP certificates in full",
+    "FDA issues five Form 483 observations at Alvotech's biologics site covering complaint handling, aseptic process validation and environmental monitoring"
+   ]
+  }
  },
  "cards": [
   {
@@ -290,6 +297,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Critical PQS and QP batch release failures",
+    "summary": "MHRA issued a GMP non-compliance statement for the UK site of NORGINE LIMITED on the basis of an inspection carried out in May 2026. The GMP certificate covering human medicinal products was suspended in part.",
+    "implication": "MHRA bundled the reliability of individual batch release decisions into a failure of the design and operation of the pharmaceutical quality system as a whole and graded it critical. Sites supplying finished product to the UK, or relying on a UK Qualified Person for release, should confirm that batch record review and the basis for each release decision can be reconstructed from documents.",
+    "key_facts": [
+     "Inspection: the site was inspected from 05 to 08 May 2026",
+     "Deficiencies: two critical and three major",
+     "Findings: failure to implement and operate a pharmaceutical quality system including GMP and quality risk management, insufficient reliability of batch control procedures, and failure by the Qualified Person to confirm that each batch conformed to the marketing authorisation and to GMP",
+     "Action: GMP certificates suspended in part, with only batches of critical products able to be supplied to the UK market while the non-compliance statement stands"
+    ],
+    "checks": [
+     "Level of documentation behind each Qualified Person batch release decision",
+     "Records verifying the reliability of batch control procedures",
+     "How quality risk management is operated within the pharmaceutical quality system"
+    ]
    }
   },
   {
@@ -375,6 +398,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "IMP GMP certificate suspended in full",
+    "summary": "MHRA also issued a GMP non-compliance statement covering the human investigational medicinal products scope of NORGINE LIMITED, on the basis of the same May 2026 inspection. The MIA(IMP) certificate was suspended in full.",
+    "implication": "The same pharmaceutical quality system defect suspended the investigational medicinal product scope in full, showing that expectations for batch release control are not relaxed because the product is investigational. Firms manufacturing or importing investigational products under contract should map the batch certification route and their alternatives for continuity of supply together.",
+    "key_facts": [
+     "Scope: human investigational medicinal products, including batch certification of sterile products and batch certification on importation",
+     "Inspection: 05 to 08 May 2026, two critical and three major deficiencies",
+     "Findings: an inadequate pharmaceutical quality system and quality risk management, and failure by the Qualified Person to confirm GMP conformity batch by batch",
+     "Action: UK MIA(IMP) 322 INSP IMP 322/14798-0031[I] suspended in full"
+    ],
+    "checks": [
+     "Confirm the batch certification route for investigational medicinal products",
+     "Alternative supply plan if investigational product supply is interrupted",
+     "Routine monitoring of the GMP status of contract manufacturing sites"
+    ]
    }
   },
   {
@@ -509,6 +548,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Complaints and aseptic process, five items",
+    "summary": "FDA inspected the biological drug substance and drug product site of Alvotech Hf in Iceland from 29 April to 8 May 2026 and issued five Form 483 observations. Complaint handling, aseptic process validation, deviation investigation and quality unit oversight were cited together.",
+    "implication": "FDA read a surge in complaints, airflow behaviour in the aseptic process and environmental monitoring trending as one failure of quality management rather than three separate items. Sites handling biological drug substance and drug product should check whether complaint root cause investigation reaches the information held by contract packagers, and whether an excursion above an action limit widens the risk assessment to other batches from the same period.",
+    "key_facts": [
+     "Observation 1: procedures for handling complaints were deficiently written or followed - around 845 complaints related to batches distributed in the US since 2024, with root causes not identified and corrections not implemented",
+     "Observation 2: airflow visualisation on the aseptic filling line showed a void above the stopper bag during the stopper charging intervention",
+     "Observation 4: investigations of bioburden and objectionable organism excursions above the action limit did not extend the risk assessment to batches made in the same period",
+     "Observation 5: environmental monitoring trend reports were not generated, reviewed or approved"
+    ],
+    "checks": [
+     "Procedure for obtaining contractor information during complaint root cause investigation",
+     "Coverage of intervention movements in airflow visualisation studies",
+     "Frequency of preparation and approval of environmental monitoring trend reports"
+    ]
    }
   },
   {
@@ -639,6 +694,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Compounding area contamination, no endotoxin test",
+    "summary": "FDA inspected the compounding facility of Veterinary Pharmacy Corporation in the US from 9 to 19 March 2026 and issued three Form 483 observations. Contamination in the amoxicillin compounding area, poorly designed media fills and failure to meet consent decree requirements were cited.",
+    "implication": "Missing lot-level endotoxin testing on products purporting to be sterile, found alongside poorly designed media fills, shows that aseptic process qualification is not credited where it does not simulate worst-case conditions. Sterile compounding and small volume filling lines should confirm that media fill conditions cover the actual batch scale and that release testing for products purporting to be sterile is defined at lot level.",
+    "key_facts": [
+     "Observation 1: powder dispersal in the amoxicillin compounding and storage area, damaged and blackened wall surfaces, contaminated ceiling vents, and personnel movement without gowning",
+     "Observation 2: media fills did not simulate the actual container size, quantity or worst-case conditions, measured against batches of 2,000 mL bags",
+     "Observation 3: breach of paragraph 17 of consent decree No. OO-CV-2725 - no endotoxin testing by lot on products purporting to be sterile",
+     "Example: five lots of Iron 20% 2000 ml were released between 4 and 11 March 2026 without endotoxin testing"
+    ],
+    "checks": [
+     "Whether media fill design covers worst-case conditions and the actual batch scale",
+     "Whether endotoxin testing is required lot by lot for products purporting to be sterile",
+     "Personnel movement and gowning procedures for dedicated areas"
+    ]
    }
   },
   {
@@ -726,6 +797,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Stability OOS and Annex 16 breach",
+    "summary": "The Dutch competent authority issued a GMP non-compliance statement for Belgica De Weerd B.V. on the basis of a routine GMP inspection carried out in January and February 2026. The handling of out-of-specification results in ongoing stability testing and the Annex 16 batch certification arrangement were graded critical.",
+    "implication": "The reasoning used to treat out-of-specification results in ongoing stability testing as unrelated to marketed batches was itself graded a critical deficiency. Sites should document the impact assessment on marketed batches and the basis for the recall decision when a stability result goes out of specification, and confirm that the person releasing batches can actually reach the specifications in the registered dossier.",
+    "key_facts": [
+     "Inspection: routine GMP inspection performed on 29 January and 26 February 2026",
+     "Deficiencies: two critical, four major and three other",
+     "Critical deficiency: despite numerous out-of-specification results in ongoing stability testing there was insufficient basis for not recalling and not reporting to the authority, and no basis for the assay specification of 90% to 110%",
+     "Critical deficiency: the Qualified Person had no access to the registered dossier, so it could not be established against which specification batches were certified - non-compliance with GMP Annex 16"
+    ],
+    "checks": [
+     "Procedure for assessing the impact of an ongoing stability out-of-specification result on marketed batches",
+     "Records comparing against the registered dossier specification at the point of release",
+     "Control linking variation approval and release when a contract manufacturing site changes"
+    ]
    }
   },
   {
@@ -861,6 +948,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API facility upkeep and uninvestigated OOS",
+    "summary": "FDA inspected the active pharmaceutical ingredient site of Aurorium LLC in the US from 2 to 6 March 2026 and issued five Form 483 observations. Poor upkeep of buildings and equipment, uninvestigated endotoxin failures and a failure of quality unit oversight were cited.",
+    "implication": "This is an active ingredient site where ageing equipment and uninvestigated endotoxin failures in water ran through into a failure of document control by the quality unit. Finished-product firms buying active ingredients should look directly at out-of-specification investigation records for water testing and at whether the annual product quality review was carried out when they audit the supplier.",
+    "key_facts": [
+     "Observation 1: excessive corrosion, leaks and wall damage in the production area, and storage tanks open to the environment",
+     "Observation 2: four out-of-specification endotoxin results between March 2024 and February 2026 were not investigated and no product impact assessment was made, the highest at 17.589 EU/mL",
+     "Observation 3: CAPA effectiveness was not verified and CAPAs were left open, there was no procedure for issuing and reconciling loose forms, and laboratory record documents were uncontrolled",
+     "Observation 4: the 2024 annual product quality review was not carried out and the related deviation report was left open"
+    ],
+    "checks": [
+     "Review of out-of-specification investigation and product impact assessment records during API supplier audits",
+     "Whether the annual product quality review is carried out on schedule and how a failure to do so is handled as a deviation",
+     "Control procedure for loose forms and laboratory record documents"
+    ]
    }
   },
   {
@@ -924,6 +1027,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "ISH test systems reclassified",
+    "summary": "FDA published in the Federal Register a final order reclassifying in situ hybridization (ISH) test systems indicated for use with a corresponding approved oncology therapeutic product.",
+    "implication": "Regulatory class adjustments continue for test systems that act as companion diagnostics, so where a therapeutic and a diagnostic device are developed together the approval route may change. Since this document shows no direct contact point with drug GMP requirements, it is best handled at the level of regulatory affairs monitoring.",
+    "key_facts": [
+     "Scope: ISH test systems (product codes NYQ, MVD, OWE, PNK), all postamendments class III devices",
+     "Action: a reclassification final order was issued",
+     "Nature: an in vitro diagnostic device regulation - whether it changes drug manufacturing or quality requirements cannot be determined from it"
+    ],
+    "checks": [
+     "Whether the approval route changes for products linked to a companion diagnostic",
+     "Whether any of the listed product codes are handled"
+    ]
    }
   },
   {
@@ -987,6 +1104,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Endoscopic light sources reclassification proposed",
+    "summary": "FDA proposed reclassifying diagnostic endoscopic light source systems (product code OAY) from class III to class II with special controls, making them subject to premarket notification.",
+    "implication": "FDA continues to reclassify class III devices down to special controls on the basis of accumulated marketing experience. There is no direct link to drug manufacturing or quality, so it belongs at the level of trend awareness in regulatory affairs.",
+    "key_facts": [
+     "Scope: diagnostic endoscopic light source systems (product code OAY), postamendments class III devices",
+     "Action: reclassification proposed from class III (premarket approval) to class II (special controls), subject to premarket notification",
+     "Nature: a medical device regulation - no content relating to drug GMP can be determined from it"
+    ],
+    "checks": [
+     "Whether the device in question is handled",
+     "Confirm the change to the premarket notification route if the reclassification is finalised"
+    ]
    }
   },
   {
@@ -1096,6 +1227,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality control records falsified",
+    "summary": "The Ministry of Food and Drug Safety suspended all manufacturing and suspended manufacturing of individual products after finding failure to follow the firm's own standards, failure to carry out administrative instructions, missing test equipment needed for quality control, falsified quality control records and batch manufacturing records not written at all.",
+    "implication": "Falsified quality control records found together with missing test equipment led to a suspension of all manufacturing and product suspensions of up to twelve months. Read through a data integrity lens, it shows the originality of test records and the equipment actually available to generate them being assessed as one thing.",
+    "key_facts": [
+     "Grounds: failure to follow standards, failure to carry out administrative instructions, missing test equipment needed for quality control, falsified quality control records and batch manufacturing records not written",
+     "Action: suspension of all manufacturing for three months and seven days (17 August 2026 to 23 November 2026)",
+     "Action: suspension of manufacturing for the affected products from five to twelve months, starting 17 August 2026, with one tablet product at twelve months and one soft capsule product at eleven months and fifteen days",
+     "Law applied: Pharmaceutical Affairs Act article 38(1) and Rules on the Safety of Drugs article 48(9) and (14)"
+    ],
+    "checks": [
+     "Retention of original test data and control of the modification history",
+     "Inventory of the test equipment needed for quality control",
+     "Register tracking completion of administrative instructions"
+    ]
    }
   },
   {
@@ -1185,6 +1332,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Bioequivalence re-evaluation data not filed",
+    "summary": "The Ministry of Food and Drug Safety suspended sales of the affected product for two months because the data required for bioequivalence re-evaluation was not submitted by the deadline.",
+    "implication": "For re-evaluation the deadline itself is the standard against which action is taken, so a delay in preparing the data turns straight into a sales suspension. Firms holding products in scope for re-evaluation should be clear on who owns deadline tracking and who confirms that the dossier is complete.",
+    "key_facts": [
+     "Grounds: the data required for bioequivalence re-evaluation was not submitted by the deadline of 30 June 2026",
+     "Action: two-month suspension of sales of the affected product (26 August 2026 to 25 October 2026)",
+     "Product: a diclofenac beta-dimethylaminoethanol injection",
+     "Law applied: Pharmaceutical Affairs Act articles 33 and 76, and Rules on the Safety of Drugs article 95, Annex 8"
+    ],
+    "checks": [
+     "List of products in scope for bioequivalence re-evaluation and tracking of their submission deadlines",
+     "Frequency of progress reviews on preparation of re-evaluation data"
+    ]
    }
   },
   {
@@ -1276,6 +1438,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Protocol amendment without approval",
+    "summary": "The Ministry of Food and Drug Safety suspended the clinical trial in question for one month because an amendment to the clinical trial protocol was neither approved nor reported.",
+    "implication": "Misjudging which protocol amendments require approval and which require only a report can stop the trial itself. Firms running clinical development alongside manufacturing should tighten the procedure that decides whether an amendment needs approval, and keep the record of that decision.",
+    "key_facts": [
+     "Grounds: approval was not obtained for an amendment to the clinical trial protocol, and the amendment was not reported",
+     "Action: one-month suspension of the clinical trial concerned (10 August 2026 to 9 September 2026), first offence",
+     "Subject: a Phase 3 trial of AJU-S56 5% in patients with dry eye disease",
+     "Law applied: Pharmaceutical Affairs Act article 34(1) and (7), and Rules on the Safety of Drugs article 24"
+    ],
+    "checks": [
+     "Criteria separating protocol amendments requiring approval from those requiring a report",
+     "Management of submission deadlines once an amendment arises"
+    ]
    }
   },
   {
@@ -1361,6 +1538,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sales suspended over unfiled re-evaluation data",
+    "summary": "The Ministry of Food and Drug Safety suspended sales of the affected product for two months because the bioequivalence re-evaluation data was not submitted by the deadline. It is recorded as a first offence.",
+    "implication": "The same missed re-evaluation deadline is producing actions at several firms, which points to the deadline management system rather than to individual slips. The older the approval, the easier it is to miss that a product is in scope, so a review of the portfolio by year of approval is worth doing.",
+    "key_facts": [
+     "Grounds: re-evaluation data not submitted by the deadline of 30 June 2026 (first offence)",
+     "Action: two-month suspension of sales of the affected product (24 August 2026 to 23 October 2026)",
+     "Product: a hydroxocobalamin injection (approval no. 153, approved 24 November 2006)",
+     "Law applied: Pharmaceutical Affairs Act article 33 and Rules on the Safety of Drugs article 95, Annex 8"
+    ],
+    "checks": [
+     "Whether long-held approved products have been checked for re-evaluation scope",
+     "Alerting system for re-evaluation submission deadlines"
+    ]
    }
   },
   {
@@ -1450,6 +1642,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Six injectable products suspended from sale",
+    "summary": "The Ministry of Food and Drug Safety suspended sales of six injectable products for two months because the data required for bioequivalence re-evaluation was not submitted by the deadline. The same ground was applied to all six products together.",
+    "implication": "One missed re-evaluation deadline expanded into simultaneous sales suspension of six injectable products. Because the same ground is applied across a whole set of products at once, the scale of supply disruption for products in scope for re-evaluation is worth estimating in advance.",
+    "key_facts": [
+     "Grounds: the data required for bioequivalence re-evaluation was not submitted by the deadline of 30 June 2026",
+     "Action: two-month suspension of sales of the affected products (14 August 2026 to 13 October 2026)",
+     "Products: six injectables, including diclofenac sodium, diclofenac beta-dimethylaminoethanol, methocarbamol, atracurium besylate and a 250 mg choline preparation",
+     "Law applied: Pharmaceutical Affairs Act articles 33 and 76, and Rules on the Safety of Drugs article 95, Annex 8"
+    ],
+    "checks": [
+     "Advance estimate of supply impact for products in scope for re-evaluation",
+     "A single review of preparation status of the submission dossier for every affected product"
+    ]
    }
   },
   {
@@ -1534,6 +1741,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Change of site address not notified",
+    "summary": "The Ministry of Food and Drug Safety suspended all manufacturing for three months because the firm moved the address of its quasi-drug manufacturing operation without filing a change notification.",
+    "implication": "Missing an administrative change to a licensed or notified particular is on its own enough to stop all manufacturing. Where a physical change such as a site move or an expansion occurs, the timing of the change notification and the timing of the start of production have to be managed together.",
+    "key_facts": [
+     "Grounds: the quasi-drug manufacturing site was moved from one district of Hwaseong to another without a change notification being filed",
+     "Action: suspension of all manufacturing for three months (24 August 2026 to 23 November 2026)",
+     "Law applied: Pharmaceutical Affairs Act article 31(9) and Rules on the Safety of Drugs article 8(1)(1)"
+    ],
+    "checks": [
+     "Procedure and timing for filing a change notification when a site address changes",
+     "Operation of the register tracking changes to licensed and notified particulars"
+    ]
    }
   },
   {
@@ -1642,6 +1863,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Storage temperature and cleaning validation",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of a finished product site. Deficiencies were raised in the facilities and equipment, manufacturing and laboratory areas, and the remediation plan was accepted as adequate.",
+    "implication": "Items whose validation evidence tends to blur during routine operation, such as storage temperature distribution and cleaning effectiveness in campaign production, are what the post-approval inspection picked up. Finished product sites should confirm the requalification cycle for warehouse temperature mapping and the cleaning validation data covering campaign changeover.",
+    "key_facts": [
+     "Inspection: post-approval, finished product (single), inspected 22 to 23 January 2026",
+     "Deficiency: validate the temperature distribution study for the storage area properly, and control the temperature of drugs held in storage (Annex 1, clause 2.1)",
+     "Deficiency: establish a procedure to prevent foreign matter entering during manufacturing (Annex 1, clause 4.3), and verify cleaning effectiveness for campaign production (Annex 1, clause 6.4)",
+     "Outcome: the remediation plan for the deficiencies was accepted as adequate"
+    ],
+    "checks": [
+     "Requalification cycle for the storage area temperature distribution study",
+     "Cleaning effectiveness data at campaign production changeover",
+     "Procedure preventing foreign matter entering during manufacturing"
+    ]
    }
   },
   {
@@ -1750,6 +1987,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incoming testing and supplier audit findings",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of a finished product site. The remediation plan was accepted as adequate for deficiencies in the manufacturing, laboratory and materials areas.",
+    "implication": "Supplier management areas such as incoming material control and the supplier audit plan are what turned into inspection findings here. Firms should confirm that the supplier assessment cycle and the annual audit plan document are actually maintained and executed.",
+    "key_facts": [
+     "Inspection: post-approval, finished product (single), inspected 9 to 10 March 2026",
+     "Deficiency: include the date of change to licensed or notified particulars in the product master file and manage it there (Annex 1, clause 4.3)",
+     "Deficiency: carry out periodic full testing of incoming raw materials, and evaluate every test attribute in the product quality review (Annex 1, clauses 7.1 and 7.3)",
+     "Deficiency: prepare an annual plan for supplier audits (Annex 1, clause 3.3)"
+    ],
+    "checks": [
+     "Records showing the annual supplier audit plan is prepared and carried out",
+     "Basis for setting the scope of incoming material testing, full or sampled",
+     "Whether any test attribute is omitted from the product quality review"
+    ]
    }
   },
   {
@@ -1848,6 +2101,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Surcharge for breach of re-examination rules",
+    "summary": "The Ministry of Food and Drug Safety found that the re-examination requirements set by the Minister had been breached for an acetaminophen premix injection subject to re-examination, and imposed a surcharge in place of a one-month suspension of sales.",
+    "implication": "A breach of post-marketing re-examination obligations was settled as a surcharge in place of a sales suspension. Firms holding products subject to re-examination should periodically confirm that case collection for the survey and the reporting requirements are being met.",
+    "key_facts": [
+     "Grounds: breach of the re-examination requirements set by the Minister for a product subject to re-examination",
+     "Action: a surcharge of KRW 2,850,000 in place of a one-month suspension of sales of the affected product",
+     "Product: an acetaminophen premix injection",
+     "Law applied: former Pharmaceutical Affairs Act articles 32 and 76, and the former Rules on the Safety of Drugs, Annex 8"
+    ],
+    "checks": [
+     "Status of compliance with the requirements for products subject to re-examination",
+     "Schedule management for collection and reporting of post-marketing survey data"
+    ]
    }
   },
   {
@@ -1919,6 +2187,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recall over possible foreign matter",
+    "summary": "A voluntary recall was started for a glimepiride tablet because of concern that foreign matter had entered the product. The recall order is dated 13 August 2026.",
+    "implication": "Where concern about foreign matter is raised in a finished tablet, both in-process foreign matter control and the final visual inspection step come under scrutiny together. Sites running solid dosage lines should review the entry routes for foreign matter across compression and packaging and the means available to detect it.",
+    "key_facts": [
+     "Reason: voluntary recall because of concern about foreign matter contamination",
+     "Product: a glimepiride 2 mg tablet",
+     "Type: voluntary recall, not mandated, recall order dated 13 August 2026",
+     "Recall class: not determined"
+    ],
+    "checks": [
+     "Control of foreign matter entry routes across compression and packaging",
+     "Acceptance criteria and records for final visual inspection"
+    ]
    }
   },
   {
@@ -1993,6 +2276,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Mix-up with a combination product",
+    "summary": "Health Canada published a recall of pms-IRBESARTAN 150 mg tablets from Pharmascience Inc. The affected lot may contain pms-IRBESARTAN/HCTZ 150/12.5 mg tablets.",
+    "implication": "This is a mix-up recall in which a combination product from the same active ingredient family entered packs of the single-ingredient product. Sites handling products of similar appearance and the same active family on one line should check line clearance and the identification controls applied at packaging.",
+    "key_facts": [
+     "Issue: contamination",
+     "Detail: the affected lot may contain pms-IRBESARTAN/HCTZ 150/12.5 mg tablets",
+     "Class: Type II",
+     "Advice: verify whether product on hand is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "checks": [
+     "Line clearance procedure for products of similar appearance",
+     "Means of product identification and verification in the packaging process"
+    ]
    }
   },
   {
@@ -2067,6 +2365,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incorrect pen inside the package",
+    "summary": "Health Canada published a recall of Semaglutide Injection from Dr. Reddy's Laboratories Canada Inc. The ground is that an incorrect pen was placed inside the package.",
+    "implication": "For a prefilled pen presentation, the wrong component going into the pack at assembly is what led to the recall. Firms that pack pens or kits themselves or through a contractor should confirm the component verification method and the records of final pack inspection.",
+    "key_facts": [
+     "Issue: packaging - incorrect pen in package",
+     "Product: Semaglutide Injection, 1.34 mg/ml solution",
+     "Class: Type II",
+     "Advice: verify whether product on hand is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "checks": [
+     "Method for verifying pen and kit components against the pack specification",
+     "Line clearance records when components change over on the packaging line"
+    ]
    }
   },
   {
@@ -2141,6 +2454,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Lot number and expiry date missing",
+    "summary": "Health Canada published a recall of TEVA-ECTOSONE 0.1% Cream from Teva Canada Limited. The ground is that the lot number and expiry date may be missing from the affected lot.",
+    "implication": "A missing marking becomes a ground for recall because it breaks traceability and shelf life control rather than because anything is wrong with the product itself. Firms running tube printing for semi-solid products should confirm how printing is verified and how unprinted units are detected.",
+    "key_facts": [
+     "Issue: labelling",
+     "Detail: the lot number and expiry date may be missing from the affected lot",
+     "Class: Type II",
+     "Advice: product with no lot number and expiry date may be affected by the recall"
+    ],
+    "checks": [
+     "Means of verifying tube printing of lot number and expiry date",
+     "Procedure for detecting and segregating unprinted or badly printed units"
+    ]
    }
   },
   {
@@ -2256,6 +2584,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Defective container on an eye drop",
+    "summary": "FDA listed a recall of Dorzolamide HCl and Timolol Maleate Ophthalmic Solution from MICRO LABS USA INC. The ground is multiple complaints of broken cap spikes and drops that could not be delivered.",
+    "implication": "A defect in the opening structure of the primary pack of an eye drop escalated into a recall by way of accumulated user complaints. The change history of the container closure system, its usability verification and complaint trend monitoring need to be connected as one chain.",
+    "key_facts": [
+     "Reason: defective container - multiple complaints of broken cap spikes and undeliverable drops",
+     "Product: Dorzolamide HCl and Timolol Maleate Ophthalmic Solution, USP, 2%/0.5%, 10mL bottle",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Usability verification of the container closure system for eye drops",
+     "Criteria for considering a recall once complaints of the same type accumulate"
+    ]
    }
   },
   {
@@ -2367,6 +2709,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Abnormal texture in a topical gel",
+    "summary": "FDA listed a recall of Azelaic Acid Gel 15% in 50 gram tubes from Glenmark Pharmaceuticals Inc., USA. The ground is a CGMP deviation raised by product quality complaints of abnormal texture or consistency.",
+    "implication": "A change in the texture of a semi-solid can generally be linked to raw material particle size or to mixing and cooling conditions, and this case was classified as a CGMP deviation. Sites producing gels and creams should check whether the acceptance criteria for the description test would catch what the user actually perceives.",
+    "key_facts": [
+     "Reason: CGMP deviations - product quality complaints of abnormal texture or consistency, described as grainy, gritty or sandy",
+     "Product: Azelaic Acid Gel, 15%, 50 gram tubes, for topical use",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Acceptance criteria for description and particle size testing of semi-solids",
+     "Control of parameter variation in the mixing and cooling process"
+    ]
    }
   },
   {
@@ -2479,6 +2835,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Precipitate found in an injection",
+    "summary": "FDA listed a recall of Mycophenolate Mofetil for Injection USP 500 mg/Vial from MYLAN PHARMACEUTICALS INC. The ground is the presence of precipitate.",
+    "implication": "Precipitation in an injection can generally be linked to characteristics of the material or to manufacturing and storage conditions, and visual particulate inspection alone may find it late. Sites handling injectables should confirm the description attribute in the stability test panel and the criteria for responding to a storage condition excursion.",
+    "key_facts": [
+     "Reason: presence of precipitate",
+     "Product: Mycophenolate Mofetil for Injection USP, 500 mg/Vial, single dose vial",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Description and insoluble particulate attributes in the stability test panel for injectables",
+     "Criteria for reassessment following a temperature excursion in storage or distribution"
+    ]
    }
   }
  ]

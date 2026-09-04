@@ -14417,12 +14417,29 @@ class WebEnBriefTest(unittest.TestCase):
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 
-    def test_live_briefs_have_no_english_yet_so_no_pages(self):
-        """실 데이터 기준 — 지금은 영문 브리프가 0호다(다음 주 발행부터 채워진다)."""
+    def test_live_briefs_english_coverage_is_all_or_nothing(self):
+        """실 데이터 기준 — 소급 백필(2026-09-05) 이후 영문이 붙은 호의 상태.
+
+        ★한 호는 **전부 영어이거나 전부 아니거나** 둘 중 하나다(반쪽 영어 금지). 여기서는
+          호별 카드 수를 세어 그 두 상태만 나오는지 고정한다 — 카드 몇 장만 en 이 붙은
+          중간 상태가 생기면 그 호가 조용히 영어에서 빠지므로, 그때 이 검사가 먼저 운다.
+        ★2026-06-22 는 **의도적 제외**다: 서사 다섯과 tldr 이 전건 빈 placeholder 라
+          "같은 요약의 다른 언어 출력"의 원본이 없다. 지어내지 않으려면 en 을 통째로
+          비우는 쪽이 계약(설계 문서 §4)에 맞다.
+        """
         briefs = render.load_briefs(render.DATA_DIR)
         self.assertGreater(len(briefs), 0)
-        self.assertEqual([b["brief"]["publish_date"] for b in briefs
-                          if render.brief_has_english(b)], [])
+        for b in briefs:
+            cards = [c for c in (b.get("cards") or []) if render._is_renderable(c)]
+            with_en = [c for c in cards if render.card_has_english(c)]
+            self.assertIn(len(with_en), (0, len(cards)),
+                          f"{b['brief']['publish_date']}: 반쪽 영어 "
+                          f"({len(with_en)}/{len(cards)}장)")
+        english = {b["brief"]["publish_date"] for b in briefs
+                   if render.brief_has_english(b)}
+        self.assertNotIn("2026-06-22", english,
+                         "2026-06-22 은 한국어 서사가 빈 호라 영어로 내지 않는다")
+        self.assertTrue(english, "소급 백필분이 사라졌다")
 
     # ── 사실 게이트 ─────────────────────────────────────────────────────────
     def test_invented_numbers_block_publishing(self):
@@ -14457,18 +14474,24 @@ class WebEnBriefTest(unittest.TestCase):
 
     # ── 라벨 어휘 ───────────────────────────────────────────────────────────
     def test_every_brief_label_in_the_live_data_is_registered(self):
-        """카드 라벨은 데이터로 오므로 추출기가 못 본다 — 새 값이 들어오면 여기서 실패한다."""
+        """카드 라벨은 데이터로 오므로 추출기가 못 본다 — 새 값이 들어오면 여기서 실패한다.
+
+        ★한글만 훑던 판은 `Warning Letter`·`483` 같은 **영어로 된 데이터 라벨**을 못 봤다.
+          `tr()` 에는 항등 폴백이 없어 그런 값이 하나만 있어도 영어 빌드가 멈춘다 —
+          초록인데 빌드가 죽는 자리라서, 언어와 무관하게 실제로 `tr()` 을 타는 필드
+          전부를 대조한다(`group` 은 섹션 묶기용 데이터 값이라 번역 대상이 아니다).
+        """
         registered = set(render.BRIEF_LABEL_KEYS)
-        hangul = re.compile("[가-힣]")
         seen: set[str] = set()
         for b in render.load_briefs(render.DATA_DIR):
             for c in b.get("cards") or []:
-                for key in ("card_type", "type_tag", "group_label", "modality", "group"):
+                for key in ("card_type", "type_tag", "group_label", "modality",
+                            "evidence_basis"):
                     v = c.get(key)
-                    if v and hangul.search(str(v)):
+                    if v:
                         seen.add(str(v))
                 for f in c.get("facts") or []:
-                    if f.get("label") and hangul.search(str(f["label"])):
+                    if f.get("label"):
                         seen.add(str(f["label"]))
         missing = sorted(seen - registered)
         self.assertEqual(missing, [],

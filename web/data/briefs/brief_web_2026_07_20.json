@@ -120,7 +120,14 @@
     },
     "summary": "ISPE가 제약 제조의 핵심 원료인 제약용수 시스템 관리와 관련하여 Pharmaceutical Water System Certificate Program의 설계 배경 및 GMP 준수 중요성을 다루는 콘텐츠를 발행했다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "MFDS suspends manufacture of a disinfectant solution for three months after it failed the microbial limit test in surveillance sampling",
+    "Recalls over the N-nitroso-meglumine impurity spread across linagliptin and metformin combination products from several Korean firms",
+    "FDA lists a recall of 10 CareFusion ChloraPrep and PurPrep applicator products distributed before sterilisation"
+   ]
+  }
  },
  "cards": [
   {
@@ -230,6 +237,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Supplier qualification procedure not followed",
+    "summary": "Hillyard GMP received a Form 483 observation in the quality system area because it did not adequately follow its written procedure (SOP QA200-07) for qualifying and approving suppliers of components.",
+    "implication": "An FDA citation on supplier qualification shows the pressure on supply chain quality management for materials and components continuing. Quality and regulatory teams should check that their own supplier approval procedure matches how the process actually runs and that periodic reassessment records are in place.",
+    "key_facts": [
+     "Observation 1 (quality system): the written procedure for qualifying and approving component suppliers was not followed",
+     "Document concerned: SOP QA200-07",
+     "Site: Hillyard GMP (FEI 3009690111), drug manufacturer"
+    ],
+    "checks": [
+     "Whether the supplier qualification and approval procedure for components is followed",
+     "The approved supplier list and the reassessment interval",
+     "The procedure for confirming supplier qualification documents at component receipt"
+    ]
    }
   },
   {
@@ -387,6 +409,20 @@
      ]
     },
     "administrative_risks": "회신이 불충분하거나 시정 효과가 입증되지 않으면 FDA가 OAI로 분류하고 Warning Letter 발행, 후속 재실사, 제품 회수나 생산 제한을 포함한 추가 조치를 검토할 수 있다. 무균성 보증과 반복 오염 문제가 지속되면 승인 신청 심사 지연 또는 보류와 강제조치 위험이 커질 수 있다. 다만 이 시설은 미국 내 소재이므로 해외 제조소를 전제로 하는 Import Alert는 직접적인 후속 경로로 보기는 어렵다."
+   },
+   "en": {
+    "title_issue": "Mammalian hair recurs in finished product",
+    "summary": "FDA inspected the sterile site Catalent Indiana and issued eight observations. Mammalian hair was found repeatedly in sterile finished product across several batches since August 2025, investigations were not completed in a timely way, and the sensitivity of visual inspection was not adequately qualified.",
+    "implication": "Where foreign matter keeps being detected and batch investigations stay open waiting on a trend investigation, the basis for the release decision remains permanently unfinished. Sterile sites should check whether batch-level investigations into foreign matter close independently of the trend investigation, and whether visual inspection sensitivity is qualified against a defect size criterion.",
+    "key_facts": [
+     "Mammalian hair found in finished product from several batches since 30 August 2025, including three in 2026 - recurring contamination",
+     "The probable root cause was attributed to a stopper component on the basis of an ongoing combined trend investigation (REC 1093464), without being proved in the batch-level investigations",
+     "The visual inspection threshold study did not establish a defect size criterion, and the manual visual inspection study treated glass, metal, rubber and fibre as one combined category"
+    ],
+    "checks": [
+     "Whether batch-level foreign matter investigations close independently of the trend investigation",
+     "Whether visual inspection qualification uses a defect size criterion and distinguishes defect types"
+    ]
    }
   },
   {
@@ -503,6 +539,22 @@
       "citation": "21 CFR 211.63",
       "statement_ko": "귀사는 의약품의 제조·가공·포장·보관에 있어, 의도된 용도에 따른 작업과 세척·유지관리가 용이하도록 적절히 설계되고 충분한 크기를 가지며 알맞게 배치된 설비를 사용하지 않았다 (21 CFR 211.63)."
      }
+    ]
+   },
+   "en": {
+    "title_issue": "Aseptic contamination investigation closed early",
+    "summary": "International Medication Systems Limited received an FDA warning letter citing three provisions, including closing an investigation without identifying the root cause after environmental monitoring plates in the ISO 5 aseptic filling area of an epinephrine injection line showed contamination too numerous to count together with insect larvae.",
+    "implication": "What matters here is that the decision to close an environmental monitoring excursion as an isolated event and take no corrective action was itself judged an absence of contamination control oversight. Firms should check whether root cause investigation and batch impact assessment are mandatory when environmental monitoring returns a count too numerous to count or another excursion, and whether manual intervention in the critical aseptic zone is actually verified by airflow studies.",
+    "key_facts": [
+     "Issued: CDER, letter dated 14 July 2026, inspection dated 2 July 2026",
+     "Three citations: 21 CFR 211.192 investigation of discrepancies, 211.42(c)(10) and 211.113(b) aseptic processing, and 211.63 equipment",
+     "Core findings: an ISO 5 environmental monitoring plate too numerous to count with insect larvae, closed as an isolated event; repeated manual intervention on an aseptic line that does not meet barrier system requirements; deposits inside water system storage tanks",
+     "Response: written response within 15 working days of receipt of the letter"
+    ],
+    "checks": [
+     "Whether root cause investigation and batch impact assessment are mandatory for environmental monitoring excursions",
+     "List the manual interventions in the critical aseptic zone and re-verify them by dynamic smoke study",
+     "Audit the sanitary design of process and cleaning water systems, covering dead legs, threaded connections and sealant repairs"
     ]
    }
   },
@@ -647,6 +699,22 @@
       "statement_ko": "귀사는 모든 원료·의약품 용기·마개·공정중 물질·포장재·표시기재 및 완제의약품을 승인 또는 불합격 처리할 책임과 권한을 가지며, 오류가 발생하지 않았음을 보증하거나 오류가 발생한 경우 이를 충분히 조사하였음을 보증하기 위하여 제조기록을 검토할 권한을 가지는 적절한 품질관리부서를 설치하지 않았다 (21 CFR 211.22(a))."
      }
     ]
+   },
+   "en": {
+    "title_issue": "Water excursions retested until they passed",
+    "summary": "Spa De Soleil, Inc. received an FDA warning letter citing five provisions, including failure to adequately investigate 51 microbial out-of-limit and out-of-specification results in process water for OTC manufacture between May 2024 and July 2025, retesting until a passing result was obtained and continuing to use the water, and repeating a corrective commitment made at the 2021 inspection without carrying it out.",
+    "implication": "Passing water excursions off through retesting and omitting identity testing in reliance on supplier certificates ran into a repeat citation. Firms should check that their water out-of-specification procedure cannot be closed by a passing retest, and that compendial identity testing is applied lot by lot to high-risk components such as glycerin.",
+    "key_facts": [
+     "Issued: CDER, letter dated 14 July 2026, inspection dated 8 July 2026",
+     "Five citations: 21 CFR 211.192 investigation, 211.84(d)(1) and (2) component testing, 211.100(a) production and process control procedures, 211.160(b) laboratory controls, and 211.22(a) quality unit",
+     "Core findings: 51 process water out-of-limit and out-of-specification results not investigated, with gram negative organisms not identified; compendial identity testing omitted for high-risk components at risk of methanol and diethylene or ethylene glycol; validation defects in the alternative microbiological test system",
+     "Response: written response within 15 working days of receipt, with test results for the high-risk glycol components within 30 days"
+    ],
+    "checks": [
+     "Whether the process water excursion procedure bars closure on a retest and requires organism identification",
+     "Whether compendial identity testing is performed lot by lot on high-risk glycol-bearing components",
+     "Qualification of contract testing laboratories and completeness of the annual product review"
+    ]
    }
   },
   {
@@ -786,6 +854,22 @@
      ]
     },
     "administrative_risks": "483 에 대한 회신이 기한 내에 이루어지지 않거나 근본 원인 분석과 소급 검토 없이 형식적인 시정 약속에 그칠 경우, 이번 실사는 OAI(Official Action Indicated) 로 분류되어 Warning Letter 발부로 이어질 수 있다. 스위스 소재 해외 제조소이므로 후속 조치로 Import Alert 에 등재되어 해당 사이트에서 제조된 제품의 미국 반입이 차단될 위험이 있으며, 이 경우 미국 수출 중단과 위탁 의뢰사의 공급망 차질로 즉시 번진다. 또한 불순물 데이터 처리로 인해 출하 판정의 신뢰성이 부정되면 이미 유통된 배치에 대한 회수 요구, 해당 사이트를 제조소로 기재한 허가·변경 신청 건의 심사 지연, 후속 재실사 및 결함 반복 시 consent decree 로 이어지는 경로도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "Inspection observations issued",
+    "summary": "FDA inspected the Swiss drug manufacturer Siegfried Pharma AG (FEI 3007045622) on 13 December 2019 and issued a Form 483. The published record does not state the content of the observations.",
+    "implication": "The detail of the observations is not disclosed, but FDA inspections of European drug sites commonly cover GMP compliance as a whole. Firms supplied by Siegfried Pharma AG or in a contract manufacturing relationship with it should check the follow-up to this inspection and the site's current regulatory history.",
+    "key_facts": [
+     "Inspection date: 13 December 2019",
+     "Facility type: drug manufacturer",
+     "Location: Switzerland",
+     "FEI number: 3007045622"
+    ],
+    "checks": [
+     "Whether a contract manufacturing or material supply agreement with the site exists",
+     "The site's regulatory history since the inspection, warning letters included",
+     "Attempt to obtain the original Form 483"
+    ]
    }
   },
   {
@@ -955,6 +1039,22 @@
      ]
     },
     "administrative_risks": "483 에 대한 회신이 기한 내 제출되지 않거나 근본원인·소급 검토·전 제품 확대 없이 개별 사례 대응에 그칠 경우, 이번 실사는 OAI(Official Action Indicated) 로 분류되고 Warning Letter 발부로 이어질 수 있다. 해외 제조소이므로 무균 공정과 데이터 무결성 결함이 해소되지 않으면 Import Alert 등재를 통해 해당 제조소 제품의 미국 수입이 차단될 수 있고, 미국 출하 이력이 있는 벌크 정제·주사제에 대해서는 4/23/2026 제출된 field alert 후속으로 회수 요구가 확대될 수 있다. 또한 2025년 실사 지적이 반복된 항목이 확인된 만큼 시정 이행의 신뢰성이 낮게 평가되어 후속 재실사, 심사 중인 신청 건의 승인 보류, 반복·중대 위반이 누적될 경우 consent decree 로 이어지는 경로도 배제할 수 없다. 위탁 제조 비중이 큰 구조상 고객사(제조판매원)의 공급망 리스크 평가와 계약 해지, 타 규제기관의 연쇄 조치 가능성도 함께 고려해야 한다."
+   },
+   "en": {
+    "title_issue": "Inspection observations issued",
+    "summary": "FDA inspected the Chinese drug manufacturer Zhejiang Huahai Pharmaceutical Co., Ltd. (FEI 3003999190) on 24 April 2026 and issued a Form 483. The published record does not state the content of the observations.",
+    "implication": "The detail is not published, but an FDA inspection of a Chinese site carrying a large share of active ingredient supply can have a wide effect on supply chains. Finished product firms using material from this site should keep watching for follow-up action such as a warning letter or import restriction.",
+    "key_facts": [
+     "Inspection date: 24 April 2026",
+     "Facility type: drug manufacturer",
+     "Location: China",
+     "FEI number: 3003999190"
+    ],
+    "checks": [
+     "Whether material from Zhejiang Huahai is in use",
+     "Monitor for follow-up action such as import alert or warning letter",
+     "Check whether the original Form 483 becomes available"
+    ]
    }
   },
   {
@@ -1089,6 +1189,22 @@
      ]
     },
     "administrative_risks": "회신이 미흡하거나 시정이 지연될 경우 이번 실사는 OAI(Official Action Indicated)로 분류될 수 있고, 오염관리 결함이 3건 중첩된 점을 근거로 Warning Letter 가 발부될 가능성이 있다. 리투아니아 소재 해외 원료의약품 제조소이므로 시정이 확인되지 않으면 수입경보(Import Alert)를 통한 미국 반입 차단으로 이어질 수 있으며, 후속 재실사(follow-up inspection)에서 동일 결함이 재확인되면 제재 수위가 높아질 수 있다. 또한 이 483 이 CDER/OPQ 의 BLA 실사 회신 창구로 회신하도록 지정된 점을 고려하면, 해당 제조소가 관여하는 허가 심사 일정에 영향을 줄 가능성도 배제할 수 없다. 반복·미시정이 장기화되면 최종적으로 consent decree 등 사법적 조치로까지 확대될 수 있다."
+   },
+   "en": {
+    "title_issue": "Inspection observations issued",
+    "summary": "FDA inspected the Lithuanian drug substance manufacturer Biotechnologines farmacijos centras Biotechpharma UAB (FEI 3013580641) on 18 September 2025 and issued a Form 483. The published record does not state the content of the observations.",
+    "implication": "The detail is not published, but a Form 483 at a drug substance site can lead on to matters affecting approval and importation of the finished product. Firms supplied with material from this site should check whether follow-up action has been taken.",
+    "key_facts": [
+     "Inspection date: 18 September 2025",
+     "Facility type: drug substance manufacturer",
+     "Location: Lithuania",
+     "FEI number: 3013580641"
+    ],
+    "checks": [
+     "Whether a material supply agreement with Biotechpharma UAB exists",
+     "Review the effect on the marketing authorisations of the related finished products",
+     "Check whether the original Form 483 becomes available"
+    ]
    }
   },
   {
@@ -1223,6 +1339,22 @@
      ]
     },
     "administrative_risks": "15영업일 내 회신이 없거나 근본원인 조사·소급 검토 없이 형식적 시정만 제시할 경우 이번 실사가 OAI(Official Action Indicated)로 분류되고 Warning Letter 발부로 이어질 수 있다. 무균 제조소에서 환경모니터링 설계와 판정기준의 결함이 확인된 만큼, 시정이 지연되면 인도 소재 해외 제조소에 대한 Import Alert 등재를 통해 해당 사이트 제품의 미국 반입이 차단될 위험이 있고, 반복·미시정 시 후속 재실사와 consent decree 로 확대될 가능성도 있다. 또한 exhibit 겸 공정밸리데이션 배치의 규격 이탈 지적은 심사 중인 허가 신청의 승인 보류나 추가 자료 요구로 이어질 수 있다. 한국 QA 관점에서는 이 사이트를 완제·수탁 공급처로 두고 있다면 공급 중단 가능성과 대체 공급처 확보를 선제적으로 점검할 필요가 있다."
+   },
+   "en": {
+    "title_issue": "Inspection observations issued",
+    "summary": "FDA inspected the Indian finished pharmaceutical manufacturer MSN Laboratories Private Limited (FEI 3035592613) on 11 December 2025 and issued a Form 483. The published record does not state the content of the observations.",
+    "implication": "The detail is not published, but FDA inspections of Indian sites making sterile products commonly focus on aseptic process control and the contamination control system. Firms distributing MSN Laboratories product or taking material from the site should keep monitoring for follow-up action.",
+    "key_facts": [
+     "Inspection date: 11 December 2025",
+     "Location: India",
+     "Facility type: sterile manufacturer",
+     "FEI number: 3035592613"
+    ],
+    "checks": [
+     "Whether MSN Laboratories product is distributed or material taken from the site",
+     "Monitor for follow-up action relating to aseptic processing",
+     "Check whether the original Form 483 becomes available"
+    ]
    }
   },
   {
@@ -1355,6 +1487,20 @@
     },
     "administrative_risks": "미시정 또는 불충분한 회신 시 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 발부로 이어질 가능성이 있다. 무균 주사제용 원료의약품이라는 제품 특성상 오염관리 결함이 지속되면 후속 재실사에서 강화된 조치가 뒤따를 수 있고, 반복적·체계적 위반으로 판단될 경우 consent decree 등 법적 조치로 확대될 가능성도 배제할 수 없다. 또한 이 제조소 원료를 사용하는 완제 의약품의 승인·공급망 평가에 부정적 영향이 파급될 수 있다.",
     "document_id": "fda483-193540"
+   },
+   "en": {
+    "title_issue": "Spore forming organisms recur in classified areas",
+    "summary": "FDA inspected the Durham drug substance site of Fujifilm Diosynth Biotechnologies USA in March 2026 and issued observations. Bacteria were recovered around 80 times and moulds around six times in classified areas since January 2025, batches were rejected as a result, and yet manufacture of material for sterile injectables continued with no root cause investigation or corrective action.",
+    "implication": "Where a documented position that there is no effect on process performance is used to take repeated recoveries out of scope for investigation, contamination control does not exist. Firms making or buying biological materials should confirm that an organism recovery leads to a batch impact assessment and that the bioburden method can actually recover the organisms being found.",
+    "key_facts": [
+     "Spore forming organisms recovered repeatedly from air in classified areas, around 80 bacterial and six mould recoveries since January 2025, with batches rejected on those organisms since 2024",
+     "Many mould investigations identified no root cause and led to no improvement, and the viral pool from a batch where Talaromyces rugulosus was recovered was released",
+     "The quality director stated there is no acceptable limit for spore forming organisms, yet the current test method does not select for those organisms"
+    ],
+    "checks": [
+     "History of batch impact assessment and root cause investigation for organism recoveries in classified areas",
+     "Suitability assessment of whether the bioburden method recovers the resident organisms of the facility"
+    ]
    }
   },
   {
@@ -1499,6 +1645,20 @@
      ]
     },
     "administrative_risks": "시정이 불충분하거나 응답이 미흡할 경우 Warning Letter 발부와 OAI(Official Action Indicated) 실사 분류로 이어질 가능성이 크다. 무균 주사제의 무균성 보증 실패라는 지적 성격상 방출 배치의 회수, 나아가 압류(seizure)나 반복·미시정 시 consent decree 등 강제 조치로 확대될 수 있으며, 후속 재실사에서 시정조치의 실효성이 재검증된다. OAI 분류가 유지되면 신규 품목 승인 심사에도 부정적 영향이 미칠 수 있다."
+   },
+   "en": {
+    "title_issue": "Personnel monitoring excursions unresolved",
+    "summary": "FDA inspected the sterile injectable site Bora Pharmaceuticals Injectables in March 2026 and issued observations. There were around 189 investigations into personnel monitoring excursions in Grade A and B areas, 80 of them involving objectionable organisms, and the corrective actions did not address the root cause.",
+    "implication": "189 personnel monitoring excursions accumulating without the root cause being caught means the investigation system stopped at closing individual events. Sterile sites should check whether personnel monitoring excursions are handled as a cumulative trend and whether cleaning verification sampling points represent the worst case.",
+    "key_facts": [
+     "Around 189 personnel monitoring excursion investigations between June 2023 and March 2026, 80 of them objectionable organism isolates",
+     "The aseptic core cleaning procedure did not remove disinfectant residue, and residue was observed on the panels",
+     "Cleaning verification swabs were confined to a single location, with no samples taken from other product contact or adjacent surfaces such as doors, and no rinse samples"
+    ],
+    "checks": [
+     "Cumulative trend analysis and root cause identification for personnel monitoring excursions",
+     "Re-examine the basis for selecting cleaning verification sampling points, worst case and rinse sampling included"
+    ]
    }
   },
   {
@@ -1665,6 +1825,20 @@
      ]
     },
     "administrative_risks": "관찰사항이 시정되지 않거나 회신이 불충분할 경우 실사 결과가 OAI(Official Action Indicated)로 분류되고 Warning Letter 가 발부될 가능성이 있다. 이미 결함 용기 로트가 유통되고 규격이탈이 확인된 만큼 제품 회수 요구로 이어질 수 있으며, 체계적 미비로 판단되면 후속 재실사와 그 결과에 따라 consent decree 등 강제 조치로 확대될 리스크도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "Defective containers not rejected",
+    "summary": "FDA inspected the OTC site Eosera in March 2026 and issued observations. A bottle lot found defective at incoming inspection was not rejected and was used for filling, leading to leakage, and process validation for a new product was closed on data from a single batch.",
+    "implication": "Finding a defect at incoming inspection and not rejecting the lot turns that inspection into a procedure that only produces records. Firms should confirm that a reject decision at container and closure incoming inspection actually blocks use, and that the number of process validation batches has a basis.",
+    "key_facts": [
+     "A bottle lot found defective at incoming inspection was not rejected and was used for filling, leakage occurred during filling, and the lot was distributed",
+     "A stability out-of-specification result was invalidated on the ground that testing was performed 10 days and six weeks after the scheduled pull, with no basis given, and there is no document discontinuing the long-term study",
+     "Process qualification of a new filling line was closed on data from a single batch, after which numerous batches were manufactured and released"
+    ],
+    "checks": [
+     "Whether a reject decision at container and closure incoming inspection blocks use",
+     "The scientific basis for the number of process validation batches and the control strategy for a new product"
+    ]
    }
   },
   {
@@ -1818,6 +1992,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 응답 시 Warning Letter 발부로 이어질 수 있으며, 실사 결과가 OAI(Official Action Indicated) 로 분류되어 후속 재실사 대상이 될 가능성이 있다. 무균성 보증 실패와 관련된 오염관리 결함이 지속되면 제품 회수 요구나, 시정이 반복적으로 실패할 경우 consent decree 등 강제 조치로 확대될 수 있다. PET 방사성의약품은 반감기가 짧아 공급 중단이 곧 지역 환자 진료 공백으로 직결되므로, 행정 조치가 현실화되면 사업 연속성 타격도 크다."
+   },
+   "en": {
+    "title_issue": "Expired reagents used in production",
+    "summary": "FDA inspected the PET manufacturing site Isorx Cyclotron Center in March 2026 and issued seven observations. Expired reagents and materials were used in batch production without being recorded as deviations, and environmental monitoring of classified areas had not been performed for two years.",
+    "implication": "Use of expired materials that is not even captured as a deviation signals that batch review is being done as a formality. Radiopharmaceutical and small-scale sites should confirm that material expiry checks are enforced at the batch record stage and that the environmental monitoring interval is actually met.",
+    "key_facts": [
+     "Expired reagents and materials were used in batch production, recorded neither in the batch record nor in the deviation log",
+     "Environmental monitoring of the ISO 5, 7 and 8 classified areas has not been performed since April 2024, contrary to the requirements of procedure DOC-417",
+     "Batch records carry no action limit for radiochemical yield and no input-output reconciliation, and product labels differ between batches or are absent"
+    ],
+    "checks": [
+     "Whether material expiry checks are enforced in the batch record and linked to deviation recording",
+     "Performance against the environmental monitoring interval for classified areas and the procedure when it is missed"
+    ]
    }
   },
   {
@@ -1934,6 +2122,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 응답 시 Warning Letter 발부와 OAI 분류, 후속 재실사로 이어질 수 있다. 특히 RTE 식품 시설에서 L. monocytogenes 환경 양성이 다년간 지속된 사안이므로, 시정이 지연되면 제품 오염 확인 시 리콜 요구, 나아가 압류(seizure)·금지명령(injunction) 등 강제 조치로 확대될 가능성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "Listeria positives continue in the plant",
+    "summary": "FDA inspected Dreyer's Grand Ice Cream in February 2026 and issued sanitation observations. Although the firm's own hazard analysis identified Listeria as a hazard where ready-to-eat product is exposed, confirmed positives for L. monocytogenes continued to arise across production and support areas in environmental monitoring.",
+    "implication": "This is a food facility, but the structure is the same as aseptic manufacture - where a hazard is identified and the sanitation preventive control is not carried out, monitoring merely records the contamination. Quality teams can confirm it has nothing to do with their own products or materials and then filter it out of the list.",
+    "key_facts": [
+     "A hazard analysis dated 22 November 2025 identified Listeria and Salmonella contamination as hazards where ready-to-eat product is exposed",
+     "Confirmed L. monocytogenes positives continued in several zones across production and support areas, some about 45 centimetres from exposed product",
+     "Documented sanitation procedures, including the pathogen monitoring programme and line-specific sanitation procedures, were not carried out"
+    ],
+    "checks": [
+     "Confirm the relevance to the firm's own products and materials and exclude the unrelated",
+     "Review, for reference, whether environmental pathogen monitoring in the firm's own system leads to corrective action"
+    ]
    }
   },
   {
@@ -2066,6 +2268,20 @@
      ]
     },
     "administrative_risks": "시정이 미흡하거나 응답이 불충분할 경우 Warning Letter 발부, 해외 제조소로서 Import Alert 등재, 실사 결과의 OAI(Official Action Indicated) 분류, 후속 재실사로 이어질 수 있다. 무균 보증·오염관리 결함이 반복·방치되는 것으로 판단되면 미국 시장 공급 중단, 시판 제품 회수 압력, 나아가 consent decree 등 강제 조치로 확대될 가능성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "845 complaints with no root cause",
+    "summary": "FDA inspected the biologics site Alvotech Hf in May 2026 and issued observations. Around 845 complaints relating to batches distributed in the US since 2024 included about half concerning device malfunction with no root cause identified, and the airflow visualisation study showed stagnant air above the stopper bag.",
+    "implication": "845 complaints is a signal in itself, and where half are of the same type the root cause is already narrowed. Firms should check whether complaints are counted and trended by type, and whether aseptic airflow studies include real interventions such as introducing stoppers.",
+    "key_facts": [
+     "Around 845 complaints relating to US-bound batches since 2024, about 50 percent of them device malfunctions, with no root cause identified",
+     "In the airflow visualisation dated 15 August 2023, airflow from the filling unit created stagnant air above the unopened stopper bag and blocked first-pass air, and that bag receives no further disinfection before opening",
+     "The requalification interval for operators performing full visual inspection does not reflect the actual inspection volume, and environmental monitoring trend reports were not produced"
+    ],
+    "checks": [
+     "Whether complaints are counted and trended by type and linked to root cause identification",
+     "Whether the airflow visualisation study includes the intervention of introducing materials"
+    ]
    }
   },
   {
@@ -2185,6 +2401,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 반복된 audit trail 결함과 OOS·시험법 문제의 시정이 불충분하면 OAI 분류, Warning Letter 및 후속 재실사로 이어질 수 있다. 원문에서 제조소 소재국이 확인되지 않으므로 해외 제조소라면 Import Alert가 추가로 검토될 가능성이 있으며, 지속적인 미시정은 추가 집행조치 위험을 높인다."
+   },
+   "en": {
+    "title_issue": "Specification loosened after an OOS",
+    "summary": "FDA inspected Allure Labs in March 2026 and issued three observations. An out-of-specification investigation closed without identifying a root cause, after which the release acceptance criteria were loosened with no scientific justification or revalidation and the batch was distributed.",
+    "implication": "Lowering the specification when a result fails cannot substitute for an investigation. Firms should confirm that a change of specification is forced through change control and revalidation, and that microbiological methods are validated for all products.",
+    "key_facts": [
+     "An investigation opened on 11 November 2024 (A/OOS/QC/2024/003) identified neither a root cause nor a probable root cause",
+     "The release acceptance criteria and specification were loosened without revalidating the manufacturing process, and the whole batch was distributed",
+     "Only nine of the organisms covered by the microbiological release method for non-sterile OTC products are validated, and that validation is itself inadequate"
+    ],
+    "checks": [
+     "Whether a change to specification or acceptance criteria is forced through change control and revalidation",
+     "The scope of validation of the microbiological method for non-sterile products, product by product"
+    ]
    }
   },
   {
@@ -2305,6 +2535,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 불충분하거나 CAPA의 실효성이 입증되지 않으면 후속 실사, OAI 분류 및 Warning Letter로 확대될 수 있다. 시설이 해외에 있는 경우에만 Import Alert 검토 가능성이 추가될 수 있으나, 이 원문만으로는 소재 국가를 확인할 수 없다."
+   },
+   "en": {
+    "title_issue": "Incubation times recorded after the fact",
+    "summary": "FDA inspected the donor testing laboratory Donor Services Laboratories in Tampa in September 2025 and issued three observations. Incubation end times were recorded as values other than the actual time, and 18 of 21 failed tests carried no investigation, outcome or action.",
+    "implication": "Contemporaneous recording is the minimum requirement for data integrity, and where it has become established through training it is a system problem, not an individual error. Firms should check that contract testing laboratory records are written at the time the work is done and that failed tests lead to investigation without exception.",
+    "key_facts": [
+     "Incubation end times are not recorded contemporaneously - two technologists confirmed they had been trained to record them that way",
+     "Of around 21 failed tests since June 2024, 18 lacked any investigation, outcome or action",
+     "Batch checklists were missing many entries, including read time, batch number, operator initials and the times test kits were taken out and returned"
+    ],
+    "checks": [
+     "Contemporaneous recording practice at the contract testing laboratory",
+     "The rate at which failed test runs are documented with investigation and action"
+    ]
    }
   },
   {
@@ -2406,6 +2650,20 @@
      ]
     },
     "administrative_risks": "기록 신뢰성 문제와 처리 시간 일탈을 충분히 조사·시정하지 않으면 FDA가 후속 실사에서 반복 위반으로 판단해 OAI 분류나 Warning Letter 등 규제 조치를 취할 수 있다. 미국 내 시설이므로 Import Alert는 해당하지 않지만, 지속적인 미시정 시 추가 집행조치 가능성이 커진다."
+   },
+   "en": {
+    "title_issue": "Plasma processing time contradicts the label",
+    "summary": "FDA inspected the plasma collection centre Biomat USA in January 2026 and issued observations. Five plasma bottles exceeded the processing time window from removal from the collection device to placement in the freezer, yet the labels showed a placement time within the window.",
+    "implication": "Where a label differs from the actual time of work, the whole processing history of that product becomes untrustworthy. Blood and plasma organisations should check that records for time-based control points are written at the time the work is performed and that an exceeded window automatically quarantines the unit.",
+    "key_facts": [
+     "Five plasma bottles exceeded the processing time window, while the labels carried a freezer placement time within the window, inconsistent with what was observed",
+     "The remaining bottles on the same rack were within the time window",
+     "Records were not maintained at the same time as each significant step, so the sequence cannot be traced"
+    ],
+    "checks": [
+     "Contemporaneous recording at time-based control points, the processing time window included",
+     "Whether an exceeded time window triggers automatic quarantine and a disposition decision"
+    ]
    }
   },
   {
@@ -2530,6 +2788,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Reason for ineligibility not recorded",
+    "summary": "Center for Assisted Reproduction received a Form 483 observation because the summary of records for donors determined ineligible, where the tissue was released for limited use, did not state the reason for ineligibility.",
+    "implication": "It shows FDA continuing to examine the completeness of donor eligibility determination records for human tissue. Organisations handling tissue and reproductive cells should check that a procedure requires the reason for an ineligible determination to be recorded clearly.",
+    "key_facts": [
+     "Observation 1: the summary of records for ineligible donors of human cells, tissues and cellular and tissue-based products does not state the reason for ineligibility",
+     "Site: Center for Assisted Reproduction (FEI 3003926882)",
+     "Inspection date: 10 September 2025"
+    ],
+    "checks": [
+     "Whether the donor eligibility record form has a field for the reason for ineligibility",
+     "Completeness of records for tissue released for limited use"
+    ]
    }
   },
   {
@@ -2663,6 +2935,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality unit responsibilities not followed",
+    "summary": "In an FDA inspection of Turbare Manufacturing, an outsourcing facility in the US, the responsibilities and procedures applicable to the quality unit were cited as not fully followed.",
+    "implication": "A quality unit not following its responsibilities and procedures can indicate a structural weakness in quality system governance. Quality and regulatory teams should check the fit between the responsibilities stated in an outsourcing partner's quality unit procedures and how the unit actually operates.",
+    "key_facts": [
+     "Observation 1: the responsibilities and procedures applicable to the quality unit are not fully followed",
+     "Facility type: outsourcing facility",
+     "Inspection date: 7 July 2026 (FEI 3027507354)"
+    ],
+    "checks": [
+     "Documentation of quality unit responsibilities and authority in procedures",
+     "Whether the quality unit performs its role, as checked during audits of outsourcing facilities",
+     "Read the full Form 483 for Turbare Manufacturing"
+    ]
    }
   },
   {
@@ -2772,6 +3059,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Device report not filed within 30 days",
+    "summary": "Baxalta US Inc., a plasma derivative manufacturer, was cited for becoming aware of information reasonably suggesting that a marketed device malfunction could cause death or serious injury and not filing a medical device report within 30 days.",
+    "implication": "Compliance with reporting deadlines for post-market device and product information is confirmed as a core FDA inspection item. Firms should re-examine the internal process and tracking system running from the point of awareness of an adverse event or malfunction to the reporting deadline.",
+    "key_facts": [
+     "Observation: no medical device report was filed within 30 days of becoming aware of information about a marketed device malfunction",
+     "Risk: the matter was judged capable of causing death or serious injury if the malfunction recurred",
+     "Inspection date: 26 November 2025, Form 483 issued in July 2026",
+     "Site: Baxalta US Inc. (FEI 1000519965), plasma derivative manufacture"
+    ],
+    "checks": [
+     "Compliance with the firm's own adverse event reporting procedure and deadlines",
+     "Recording and tracking of the point of awareness of a malfunction or adverse information",
+     "Whether similar reporting delays have occurred for plasma derived products"
+    ]
    }
   },
   {
@@ -2891,6 +3194,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Phlebotomy site preparation inadequate",
+    "summary": "Central California Blood Center, a blood bank, was cited because the method of preparing the phlebotomy site did not provide maximum assurance of an aseptic blood collection container, with the preparation of the venipuncture site by specialists observed donor by donor during the inspection.",
+    "implication": "It shows that whether venipuncture site disinfection and preparation is standardised to a level that assures sterility is a core FDA inspection item. Blood centres and collection facilities should re-examine the site preparation procedure and how far it is followed on the floor, variation between operators included.",
+    "key_facts": [
+     "Observation 1: the method of preparing the phlebotomy site does not give maximum assurance of an aseptic blood collection container",
+     "What was observed: specialists were observed preparing the venipuncture site individually for each donor",
+     "Inspection date: 29 August 2025, Form 483 issued in July 2026",
+     "Site: Central California Blood Center (FEI 2970324), blood bank"
+    ],
+    "checks": [
+     "The phlebotomy site disinfection and preparation procedure and how far it is followed on the floor",
+     "The system for monitoring variation between collection staff in performing the procedure",
+     "Re-review of the verification data supporting assurance of an aseptic collection container"
+    ]
    }
   },
   {
@@ -3015,6 +3334,20 @@
      ]
     },
     "administrative_risks": "무균보증·오염관리 결함이 시정되지 않거나 응답이 불충분하면 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 발행으로 이어질 가능성이 있다. 주사제인 PET 의약품의 무균 결함은 제품 회수 요구나 규제 회의 소집으로 번질 수 있고, 반복 지적·미시정이 확인되면 후속 재실사와 압류·금지명령(consent decree) 등 사법 조치까지 검토될 수 있다."
+   },
+   "en": {
+    "title_issue": "Fungi in the ISO 5 hot cell uninvestigated",
+    "summary": "FDA inspected the PET drug site PETNET Solutions in February 2026 and issued observations. Fungi were recovered three times inside the ISO 5 hot cell with no investigation and no corrective action, and there was no in-process check on reused target material.",
+    "implication": "Fungi recovered repeatedly in a classified area with no investigation means environmental monitoring is not functioning as an alarm. Sterile and radiopharmaceutical sites should confirm that an organism recovery in a classified area leads without exception to investigation and species identification, and that reused materials get an in-process check.",
+    "key_facts": [
+     "Fungi recovered three times from active air sampling in the ISO 5 primary engineering control hot cell, on 2 October 2024 (Aspergillus hiratsukae), 8 October 2024 (Talaromyces delawarensis) and 7 February 2025, with no investigation, CAPA or species identification",
+     "No in-process check on the radioactive content of target material returned after reprocessing from other sites in the country",
+     "The oven qualification temperature range does not support the range actually needed for the analysis"
+    ],
+    "checks": [
+     "Whether an organism recovery in a classified area triggers investigation, species identification and CAPA",
+     "Whether an in-process check procedure exists for reused and reprocessed materials"
+    ]
    }
   },
   {
@@ -3168,6 +3501,20 @@
      ]
     },
     "administrative_risks": "지적사항을 시정하지 않거나 응답이 불충분할 경우 실사 결과가 OAI(Official Action Indicated)로 분류되고 Warning Letter 발부로 이어질 수 있다. 시험 없이 유통된 벌크 로트에 대해서는 회수 요구나 추가 시정 압력이 가해질 수 있으며, 후속 재실사에서 반복 지적이 확인되면 압류·금지명령(injunction)이나 consent decree 등 강제 조치로 확대될 가능성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "No water control, no release testing",
+    "summary": "FDA inspected the bulk OTC site Dr. J Skinclinic in March 2026 and issued seven observations. The deionised water used for equipment cleaning had no routine microbiological, total organic carbon or conductivity testing, and no identity or assay testing of the active was performed before bulk product shipped to customers.",
+    "implication": "Cleaning water and shared compounding tanks are the two main cross-contamination routes, and with no evidence for either the quality of the bulk is not assured. Firms should make water control specifications at a contract bulk site, cleaning validation of shared equipment and equipment traceability in batch records items in their audit.",
+    "key_facts": [
+     "No routine microbiological, total organic carbon or conductivity testing of the deionised water used for equipment cleaning, with the carbon and conductivity tests performed only within one short period in August 2025",
+     "No identity or assay testing of the active ingredient before bulk product is shipped and distributed to customers",
+     "Drugs and cosmetics are made in the same compounding tanks with no cleaning validation, batch records do not record the tank identity used, and annual product reviews were not performed for several years"
+    ],
+    "checks": [
+     "The test panel, frequency and specification for process water at the contract site",
+     "Cleaning validation of equipment shared between drugs and cosmetics, and equipment traceability by batch"
+    ]
    }
   },
   {
@@ -3272,6 +3619,20 @@
      ]
     },
     "administrative_risks": "시정이 불충분하거나 응답이 미흡할 경우 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 로 승격될 가능성이 있다. 맹검 훼손이 해당 시험의 안전성·유효성 데이터 신뢰성 문제로 평가되면 관련 허가신청 심사에서 해당 데이터의 수용성에 영향이 미칠 가능성도 있으며, 시정 이행을 확인하기 위한 후속 재실사로 이어질 수 있다."
+   },
+   "en": {
+    "title_issue": "Blinded staff could see safety data",
+    "summary": "FDA inspected Abbisko Therapeutics in March 2026 and issued observations. A permissions error at a vendor left five pharmacovigilance staff who should have been blinded able to access potentially unblinding safety information for more than seven months, and the company did not become aware of it until more than a year later.",
+    "implication": "Where responsibility for safety data review is left with a vendor without being properly transferred, a failure of oversight becomes a loss of blinding. Firms should check that a pharmacovigilance vendor's access permissions and their periodic review are controlled through the contract and procedures, and that an access anomaly is reported internally at once.",
+    "key_facts": [
+     "A vendor permissions renewal error left five blinded pharmacovigilance staff able to access safety information from May 2023 to January 2024, more than seven months",
+     "Two of them actually accessed suspected adverse reaction reports, with no internal reporting under the quality procedure",
+     "The company became aware in August 2024, established the full extent in November 2025, and started CAPA in January 2026"
+    ],
+    "checks": [
+     "The procedure setting and periodically reviewing system access permissions at pharmacovigilance vendors",
+     "The rule on internal reporting and CAPA deadlines for events that could unblind"
+    ]
    }
   },
   {
@@ -3411,6 +3772,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 응답 시 Warning Letter 발부와 OAI(Official Action Indicated) 분류, FSMA 재실사(재실사 수수료 부과 대상) 로 이어질 수 있다. 살아있는 해충·설치류 배설물이 식품접촉면 인근에서 다수 확인된 사안 특성상 제품이 불결한 조건에서 제조되었다는 adulteration 판단에 근거한 압류(seizure)·금지명령(injunction), 나아가 식품시설 등록 정지(FD&C Act §415) 까지 검토될 수 있으며, 미표시 알레르겐 통제 실패가 실제 제품으로 확인되면 리콜로 확대될 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Allergen control and pest findings",
+    "summary": "FDA inspected Sheng Kee Bakery in March 2025 and issued five observations. Allergen cross-contact was not identified as a hazard requiring a preventive control, and live beetle larvae and adults were found on the food contact surface of a dough press.",
+    "implication": "This is a food facility on a different regulatory track from medicines. Quality teams can confirm it has nothing to do with their own products or materials and then filter it out of the monitoring list.",
+    "key_facts": [
+     "The hazard analysis did not identify allergen cross-contact, mislabelling, environmental pathogen recontamination or metal as requiring preventive controls",
+     "Seven major allergens are used including wheat, milk, soy, egg, peanut, sesame and tree nuts, with no equipment dedicated by allergen",
+     "Around 20 live larvae and 10 adults were observed in debris in the crevices of the dough press food contact surface"
+    ],
+    "checks": [
+     "Confirm the relevance to the firm's own products and materials and exclude the unrelated",
+     "Refer, for reference, to how cross-contamination hazards are identified in the firm's own system"
+    ]
    }
   },
   {
@@ -3525,6 +3900,21 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 응답 시 실사 결과가 OAI(Official Action Indicated) 로 분류되고, 반복 지적된 데이터 무결성 결함을 근거로 Warning Letter 가 발부될 가능성이 있다. 데이터 무결성 사안의 특성상 제3자 감사·소급 데이터 검토 등 광범위한 시정 요구가 뒤따를 수 있으며, 후속 재실사에서 시정 미흡이 재확인되면 압류·금지명령(consent decree) 등 강제 조치로 이어질 가능성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "HPLC system clock could be changed",
+    "summary": "FDA inspected a manufacturer in February 2026 and issued two observations. Laboratory staff could change the system clock on the only HPLC system used for assay and related substances testing of all OTC drug products, and deletion of chromatographic data was demonstrated - a repeat observation.",
+    "implication": "Where the system clock can be changed and data can be deleted, neither the timing nor the completeness of any result from that laboratory holds. Firms should check that the rights to change the system clock and to delete data on chromatography systems are separated and blocked, and that the audit trail is actually switched on.",
+    "key_facts": [
+     "The date and time settings on the computer connected to the HPLC could be changed by the user, with no control restricting unauthorised change",
+     "A quality assurance supervisor demonstrated deletion of acquired data in the chromatography software, with no qualification preventing manual manipulation or deletion - a repeat observation",
+     "The stability procedure SOP 2-0102 (Rev.17) specifies attributes such as bioburden and concentration without referencing or linking a validated test method",
+     "Firm name: not identified, as it could not be obtained from the FOIA listing; facility type manufacturer, inspected in February 2026"
+    ],
+    "checks": [
+     "Whether the right to change the system clock on chromatography systems is blocked",
+     "Restriction of deletion rights and the activation and review history of the audit trail"
+    ]
    }
   },
   {
@@ -3638,6 +4028,22 @@
      ]
     },
     "administrative_risks": "483 응답이 기한 내 제출되지 않거나 근본원인·소급 검토 범위가 불충분할 경우 해당 실사는 OAI(Official Action Indicated) 로 분류되고 Warning Letter 로 이어질 가능성이 있다. 특히 관찰 2와 같이 written procedures 자체의 부재가 지적된 경우, 개별 사례 보완만 제시하고 절차 제정·교육·소급 검토 계획을 함께 제출하지 않으면 응답이 불충분(inadequate)으로 평가될 가능성이 있다. 이후 파마코비질런스 시스템 이행 여부를 확인하는 후속 재실사가 실시될 수 있으며, 중대·예상외 이상사례의 미보고가 반복·지속되는 것으로 확인되면 FD&C Act 상 보고 의무 위반을 근거로 한 추가 행정조치(승인 사항에 대한 규제적 후속 절차, 반복·중대한 경우 consent decree 등 사법적 조치)로 확대될 가능성도 배제할 수 없다. 본 사업장은 미국 내 소재이므로 해외 제조소 대상의 Import Alert 경로보다는 Warning Letter·재실사 경로가 현실적인 리스크로 평가된다."
+   },
+   "en": {
+    "title_issue": "Serious adverse event not reported in 15 days",
+    "summary": "Ascendis Pharma LLC received two Form 483 observations: it classified a consumer spontaneous report describing hospitalisation after use of Yorvipath as serious, unexpected and expedited in its own triage yet did not report it to FDA within 15 days, and it had no documented procedure for surveillance and reporting of post-market adverse events identified through social media monitoring.",
+    "implication": "The core point is that a case already judged serious, unexpected and expedited in the firm's own triage was reclassified as non-valid on the ground that the patient was not identifiable and therefore not reported. Safety officers should check that the criteria for validity of a spontaneous report do not operate as a way of avoiding reporting, and whether a documented procedure covers adverse events collected through non-standard channels such as social media.",
+    "key_facts": [
+     "Site: Ascendis Pharma LLC (FEI 3022069968), inspected in March 2026",
+     "Observation 1: failure to report a serious and unexpected adverse drug reaction to FDA within 15 days (case 2025US009908)",
+     "Observation 2: no documented procedure for surveillance, receipt, evaluation and reporting of post-market adverse events for the marketed products",
+     "Issued: July 2026"
+    ],
+    "checks": [
+     "The criteria for validity of a spontaneous report, including an identifiable patient, and the history of reclassifications",
+     "Whether a procedure covers receipt and evaluation of adverse events from non-standard channels such as social media monitoring",
+     "Self-inspection of compliance with the 15-day expedited reporting deadline for serious and unexpected cases"
+    ]
    }
   },
   {
@@ -3739,6 +4145,20 @@
      ]
     },
     "administrative_risks": "483 응답이 기한 내 제출되지 않거나 근본원인 조사와 소급 검토 없이 개별 사례 시정에 그칠 경우, 이번 실사가 OAI(Official Action Indicated)로 분류되고 Warning Letter 로 승격될 수 있다. 프로토콜 이탈이 체계적인 것으로 판단되면 해당 피험자와 실시기관에서 산출된 자료의 신뢰성이 문제되어 허가·심사 단계에서 자료 배제나 추가 자료 요구로 이어질 수 있고, 후속 재실사 또는 진행 중인 시험에 대한 규제적 조치로 확대될 가능성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "Enrolled before the eligibility test",
+    "summary": "FDA inspected BeOne Medicines USA in February 2026 and issued observations. A subject was enrolled and dosed without the hepatitis C test the protocol required before enrolment, and a tumour biopsy could not be shipped to the central laboratory for want of the consent required by national law.",
+    "implication": "Performing an eligibility test after the fact removes the basis for enrolling that subject and makes the safety judgement impossible to reconstruct. Firms should check that in trials they are involved in, completing exclusion criteria testing is enforced as a gate on enrolment and that sample shipping consent is built into the procedure.",
+    "key_facts": [
+     "Exclusion criterion 8b requires hepatitis C status to be confirmed before enrolment, but the test was performed 20 days after enrolment and dosing, with enrolment on 20 July 2023 and testing in August",
+     "A fresh tumour biopsy was not shipped to the central laboratory because the shipping consent required by national law was not obtained, so the pathological diagnosis could not be confirmed",
+     "Breach of section 6.12.6 of protocol amendment 1.0 and section 6.9.1 of amendment 2.0"
+    ],
+    "checks": [
+     "Whether completion of exclusion criteria testing is enforced as a gate before enrolment proceeds",
+     "Whether obtaining national sample shipping consent is reflected in the protocol"
+    ]
    }
   },
   {
@@ -3870,6 +4290,20 @@
      ]
     },
     "administrative_risks": "15영업일 내 회신이 없거나 근본원인·소급 검토·CAPA 가 빠진 형식적 회신에 그치면 이번 실사는 OAI 로 분류되고 Warning Letter 발부로 이어질 수 있다. 품질부서 출하승인 없이 출하된 배치와 확인시험 미수행 원료로 제조된 2024년 1월~2026년 1월 OTC 제품은 FD&C Act 상 adulterated 로 간주될 소지가 있어 자발적 회수 요구, 압류(seizure)·금지명령(injunction) 등 사법적 조치의 근거가 될 수 있다. 또한 단기 재실사에서 동일 결함이 반복 확인될 경우 consent decree 로까지 확대될 수 있고, 해외 제조소라면 Import Alert 등재로 미국 수입이 차단될 가능성이 있다. 위탁시험소 시험법 검증 부재와 세정 밸리데이션 결함은 해당 시험소·설비를 공유하는 다른 제품 라인으로 규제 리스크가 번질 수 있으며, 발주처(수탁제조 고객)의 공급자 감사 및 계약 해지 리스크도 함께 발생한다."
+   },
+   "en": {
+    "title_issue": "Shipped before quality unit release",
+    "summary": "FDA inspected the OTC site Enemeez in February 2026 and issued observations. Numerous batches left the facility since October 2024 before the quality unit approved release, and gaps were found in bulk hold time studies and in component identity testing.",
+    "implication": "Shipping before quality unit approval is not a procedural breach but an absence of the release decision itself. Firms should confirm that at a contract site, quality unit approval is enforced in the system as a precondition of physical shipment, and that finished product samples are taken from the final package.",
+    "key_facts": [
+     "Numerous batches shipped from the facility since October 2024 before the quality unit approved release",
+     "No documented bulk hold time study for the holding period before packaging, and no documentation of equivalence to USP <61> and <62> for the modified methods used by the contract laboratory",
+     "Finished product assay samples are taken from the manufacturing tank rather than the final package, and the full compendial identity testing has not been performed on incoming materials since January 2024"
+    ],
+    "checks": [
+     "Whether quality unit release approval is enforced as preceding physical shipment",
+     "The sampling point for finished product assay samples, at the final package"
+    ]
    }
   },
   {
@@ -4052,6 +4486,22 @@
      ]
     },
     "administrative_risks": "483 회신이 15영업일 내에 이뤄지지 않거나 시정 계획이 근거자료 없이 일반론에 그칠 경우, 이 사안은 OAI(Official Action Indicated) 분류와 Warning Letter 발부로 이어질 수 있다. 무균성 검증 실패와 미조사 excursion 상태의 시장 출하가 결합돼 있어, FDA 가 출하 배치에 대한 무균성 품질영향 평가와 회수 여부 판단을 요구하거나 무균공정 재검증 완료 전까지의 출하 보류·자발적 회수를 압박할 가능성이 있다. 후속 재실사에서 동일 결함이 재확인되면 FD&C Act 상 adulterated 판단을 근거로 consent decree·injunction·제품 압류 등 사법적 조치로 확대될 수 있으며, 해당 제조소를 대상으로 하는 신규 허가·변경 신청(사전 승인 실사 포함)의 승인 지연이나 보류로도 이어질 수 있다. 또한 회신에서 약속한 CAPA 가 기존 CAPA-00214·CAPA-00215·CAPA-00217·CAPA-00218·CAPA-00222 처럼 다시 기한을 넘길 경우, 품질시스템의 자체 통제력 자체에 대한 불신으로 후속 규제 조치의 강도가 높아질 수 있다."
+   },
+   "en": {
+    "title_issue": "Inspection observations issued",
+    "summary": "FDA inspected the US manufacturer RayzeBio, Inc (FEI 3030530655) on 24 February 2026 and issued a Form 483. The published record does not state the content of the observations.",
+    "implication": "The detail of this Form 483 is again undisclosed, so the specific grounds need to be read from the original. FDA inspections of sites like RayzeBio continue, so firms with material or finished product supply chains connected to it should keep the site's regulatory history under review.",
+    "key_facts": [
+     "Inspection date: 24 February 2026",
+     "Facility type: manufacturer",
+     "Location: USA",
+     "FEI number: 3030530655"
+    ],
+    "checks": [
+     "Check whether the original Form 483 becomes available",
+     "Whether a material or finished product supply agreement with RayzeBio exists",
+     "Monitor for follow-up regulatory action"
+    ]
    }
   },
   {
@@ -4170,6 +4620,20 @@
      ]
     },
     "administrative_risks": "483 에 회신하지 않거나 근본원인 조사·소급 전수 검토 없이 형식적 시정만 제시할 경우, FDA 는 임상시험자에 대한 Warning Letter 를 발부하거나 NIDPOE(자격박탈 절차 개시 및 소명 기회 통지) 를 거쳐 임상시험자 자격 제한·박탈 절차로 진행할 수 있다. 지적이 데이터 무결성 영역에 걸쳐 있어 이 시험기관에서 생성된 자료가 허가심사에서 신뢰할 수 없는 자료로 취급되거나 분석에서 제외될 수 있고, 그 파장은 시험기관을 넘어 의뢰자의 개발 일정과 신청 자료 전체에 미친다. 또한 후속 재실사, 같은 시험기관이 수행 중인 다른 임상시험으로의 조사 확대, 의뢰자 차원의 모니터링 강화·등록 중단·시험기관 계약 종료가 뒤따를 수 있으며, 피험자 안전 문제가 확인된 만큼 IRB 가 승인 조건 변경이나 신규 등록 중지를 요구할 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Dosed above the allowed concentration",
+    "summary": "FDA inspected the clinical investigator Prof. Bernardo Leon Rapaport in January 2026 and issued two observations. In two studies some subjects received investigational product above the concentration range the protocol allowed, and corrections in the preparation documents carried no signature or date.",
+    "implication": "Dose is the most direct subject safety variable in a clinical trial, and where corrections to the preparation record cannot be attributed the reliability of the raw data goes with it. Firms should check that the verification step on preparation concentration and the discipline over document correction actually operate in the trials they are involved in.",
+    "key_facts": [
+     "In one study two of eight subjects (25 percent) and in another three of 11 subjects (27 percent) received at least one dose above the allowed concentration, one at 4.255 mg/mL",
+     "The pharmacy manual requires a concentration range of 1.1 to 3.4 mg/mL",
+     "Many corrections to dilution volumes in the preparation documents carry no initials or date, so neither who made them nor when can be attributed"
+    ],
+    "checks": [
+     "Whether a double verification step exists for the concentration of investigational product prepared",
+     "Compliance with the discipline of signing and dating corrections to preparation documents"
+    ]
    }
   },
   {
@@ -4242,7 +4706,21 @@
      "official": "pending"
     }
    },
-   "merged_noun": "건"
+   "merged_noun": "건",
+   "en": {
+    "title_issue": "Multiple 483 records published",
+    "summary": "Eight Form 483 inspection records were published in the FDA OII FOIA electronic reading room. The original PDFs are available but the text of the individual observations could not be captured automatically, so only the facility and inspection date list is set out.",
+    "implication": "Publication of inspection records whose observation text could not be captured is not in itself a signal to act. Firms should check whether any of their supply chain facilities appear on the list and, if so, read the original PDF directly.",
+    "key_facts": [
+     "Records published: eight, with observation text not captured automatically, though the original PDFs are available",
+     "Representative facility: Cliantha Research Limited (FEI 3017682080), with seven others",
+     "Source: FDA OII FOIA electronic reading room"
+    ],
+    "checks": [
+     "Check whether any supply chain or sourcing facility appears on the list",
+     "Read the original FDA FOIA PDF directly where one does"
+    ]
+   }
   },
   {
    "id": "fda483-193583",
@@ -4352,6 +4830,21 @@
      ]
     },
     "administrative_risks": "483 을 15영업일 내에 시정하지 못하거나 회신이 불충분할 경우, CDER 이 이번 실사를 OAI(Official Action Indicated)로 분류하고 임상시험자를 수신인으로 하는 Warning Letter 를 발부할 가능성이 있다. 반복적 부적격 등록과 설명되지 않은 1차 유효성 자료 불일치가 해소되지 않으면 해당 기관 자료의 신뢰성 심사(data integrity review)로 이어져, 두 건의 BLA 심사에서 이 기관 자료의 배제나 추가 정보 요구·심사 지연으로 번질 수 있다. 중대·반복 위반이 계속되는 경우 21 CFR 312.70 에 따른 임상시험자 자격 제한(disqualification) 절차나 후속 재실사로 확대될 가능성도 배제할 수 없으며, 실사 종료 회의에서 실사관이 행정·민사·형사 조치 가능성을 고지한 점도 이러한 경로를 뒷받침한다. 규제 조치와 별개로 sponsor·CRO 가 향후 시험에서 해당 기관을 배제하거나 모니터링·감사 강도를 높이는 상업적 파장도 예상된다."
+   },
+   "en": {
+    "title_issue": "Ineligible subjects enrolled",
+    "summary": "The Chilean clinical investigator Eduardo Patricio Yanez Ruiz, MD (FEI 3022159116) received a Form 483 observation for not conducting the studies in accordance with the signed investigator statement, having enrolled subjects who did not meet the inclusion criteria or who met exclusion criteria in two studies.",
+    "implication": "Enrolling subjects in breach of inclusion and exclusion criteria is a finding that shakes the reliability of the study data itself. Where data from a study this investigator took part in is used to support a domestic approval or review, the inclusion of the affected subjects and its effect should be checked.",
+    "key_facts": [
+     "Investigator: Eduardo Patricio Yanez Ruiz, MD (FEI 3022159116), Chile",
+     "Inspection date: 22 January 2026",
+     "Observation 1: failure to follow the signed investigator statement - subjects who did not meet the screening criteria were enrolled",
+     "Facility type: clinical investigator"
+    ],
+    "checks": [
+     "Whether data from studies this investigator took part in supports a domestic approval or review",
+     "The procedure verifying inclusion and exclusion criteria and the record of eligibility confirmation before enrolment"
+    ]
    }
   },
   {
@@ -4453,6 +4946,20 @@
      ]
     },
     "administrative_risks": "483 에 대한 회신이 없거나 근본원인 분석·소급 전수 검토·CAPA 가 불충분하다고 판단되면 해당 실사는 OAI(Official Action Indicated)로 분류되고, 임상시험자 앞으로 Warning Letter 가 발부될 수 있다. 데이터 무결성 성격의 지적이 시정되지 않은 채 반복될 경우 FDA 는 자격박탈 절차 개시 통지(NIDPOE)를 통해 임상시험자의 임상시험 수행 자격을 제한하는 절차로 진행할 가능성이 있으며, 후속 재실사 대상이 될 수 있다. 실무적으로는 sponsor 측에도 파장이 있어, 원자료 근거가 없는 ISR·AE 자료는 신뢰성 부인 대상이 되어 해당 site 데이터가 분석에서 배제되거나 허가신청 자료 심사 지연·추가 자료 요구로 이어질 수 있고, sponsor 의 site 폐쇄(site closure)·향후 임상시험 참여 배제 결정으로 이어질 수 있다."
+   },
+   "en": {
+    "title_issue": "Source data missing for reported values",
+    "summary": "FDA inspected the clinical investigator Frederick J. Raal in September 2025 and issued observations. For some subjects who were enrolled, dosed and completed the study, the source data for injection site reaction measurements reported to the sponsor was missing.",
+    "implication": "Even where a value sits in the data capture system, without source data it is a number that cannot be verified. Firms should check that source data verification in the trials they are involved in works at the level of individual measured values.",
+    "key_facts": [
+     "Source data missing for injection site reaction measurements reported through the electronic data capture system for some enrolled, dosed and completed subjects",
+     "Examples reported: erythema of 20 mm on day 1 of treatment A dated 22 June 2020, and erythema of 5 mm on day 1 of treatment B",
+     "Cited as failure to prepare and maintain accurate case histories of the observations and data relating to the investigation"
+    ],
+    "checks": [
+     "Whether measured value fields are covered by source data verification",
+     "The procedure for action and prevention when a case history omission is found"
+    ]
    }
   },
   {
@@ -4613,6 +5120,20 @@
      ]
     },
     "administrative_risks": "483 응답이 불충분하거나 시정이 지연될 경우 이번 실사는 OAI(Official Action Indicated) 로 분류될 가능성이 있고, 데이터 무결성·objectionable organism·조사 부실이 함께 지적된 사안 특성상 Warning Letter 발부로 이어질 가능성이 있다. 유통된 로트에서 B. cepacia 오염이나 함량 부적합이 확인되면 FD&C Act 상 adulterated 판정과 자발적 회수·시장 조치가 뒤따를 수 있으며, 후속 재실사에서 동일 결함이 반복 확인되면 consent decree 등 사법적 조치로 확대될 가능성도 배제할 수 없다. 수탁 제조 형태의 OTC 사이트인 만큼 행정 조치가 공개되면 고객사(브랜드 소유자)의 공급망 리스크 평가, 계약 해지, 해당 사이트 생산 제품의 미국 내 유통 차질로 파장이 번질 수 있다."
+   },
+   "en": {
+    "title_issue": "B. cepacia found, never investigated",
+    "summary": "FDA inspected the OTC site Bentley Laboratories in March 2026 and issued observations. Burkholderia cepacia was recovered five times from the process water system with no documented investigation, and OTC products made with that water were distributed.",
+    "implication": "B. cepacia is the classic objectionable organism that triggers recalls even in non-sterile products, so its recovery should itself be an investigation trigger. Firms should check that recovery of an objectionable organism in process water monitoring automatically leads to investigation and product impact assessment.",
+    "key_facts": [
+     "B. cepacia recovered five times from the process water system, on 3 July and 4 November 2024 and on 3, 8 September and 24 October 2025, with no documented investigation, and OTC products made with that water were distributed",
+     "In stability out-of-specification results on assay, colour and appearance, retain samples showed slight to severe softening with no appropriate action taken",
+     "The deletion function in the FTIR software was not disabled and there is no audit trail, with deleted spectra found in the recycle bin"
+    ],
+    "checks": [
+     "Whether recovery of an objectionable organism such as B. cepacia in process water leads to investigation and product impact assessment",
+     "Restriction of deletion rights and activation of the audit trail in quality control instrument software"
+    ]
    }
   },
   {
@@ -4714,6 +5235,20 @@
      ]
     },
     "administrative_risks": "시정이 없거나 회신이 불충분하면 실사 결과가 OAI(Official Action Indicated)로 분류되고 Warning Letter 가 발부될 가능성이 있다. 임상시험자 실사에서 프로토콜 위반이 반복적·중대하다고 판단되면 21 CFR 312.70 에 따른 시험자 자격박탈(disqualification) 절차 개시 통지로 이어질 수 있으며, 후속 재실사와 해당 기관에서 산출된 시험 데이터의 신뢰성 심사가 뒤따를 수 있다."
+   },
+   "en": {
+    "title_issue": "Serious adverse event reported 78 days late",
+    "summary": "FDA inspected the clinical investigator Dennis J. Hsu, M.D. in early 2026 and issued observations. A grade 3 serious adverse event, which the protocol required to be reported within 10 days of awareness, was reported 78 days late.",
+    "implication": "Safety reporting deadlines bear on subject safety, not merely on the reliability of the trial data. Firms should check that in trials they take part in or draw data from, the interval between awareness of a serious adverse event and its report closes within the deadline and that those times are traceable in records.",
+    "key_facts": [
+     "Protocol section 9.3.1 requires a grade 3 serious adverse event not resulting in hospitalisation of more than 24 hours to be reported within 10 days of awareness",
+     "The event occurred between 27 August and 7 September 2022, the site became aware on 13 September 2022, and it was reported on 30 November 2022, 78 days late",
+     "Cited as failure to conduct the study in accordance with the signed investigator statement"
+    ],
+    "checks": [
+     "Traceability of the times of awareness and reporting of serious adverse events in trials the firm is involved in",
+     "The history of follow-up action and prevention where an expedited reporting deadline was exceeded"
+    ]
    }
   },
   {
@@ -4823,6 +5358,20 @@
      ]
     },
     "administrative_risks": "시정하지 않거나 응답이 불충분하면 Warning Letter 발부와 OAI(Official Action Indicated) 분류로 이어질 가능성이 있다. C. botulinum 위해가 통제되지 않은 수산물은 FD&C Act 상 불량(adulterated) 식품으로 간주될 수 있어 압류(seizure)·금지명령(injunction) 등 사법 조치의 근거가 될 수 있고, 일본산 냉장 수산물 수입이 핵심 사업이므로 수입 단계 억류·Import Alert 등재 가능성도 있다. 후속 재실사에서 동일 결함이 재확인되면 조치 수위가 높아질 수 있다."
+   },
+   "en": {
+    "title_issue": "Chilled seafood accepted over the limit",
+    "summary": "FDA inspected the importer and warehouse JFC International in February 2026 and issued observations. Reduced oxygen packaged chilled fish from Japan exceeded its critical temperature limit in transit, yet was accepted with no appropriate corrective action or hazard evaluation and the record was marked as passing.",
+    "implication": "The moment an exceeded critical limit is recorded as a pass, that control point ceases to exist. Importers and warehouses should check that a cold chain excursion record actually leads to rejection or investigation and that the disposition is not defaulted to pass.",
+    "key_facts": [
+     "The HACCP plan identifies Clostridium botulinum as a hazard for reduced oxygen packaged product and sets a critical limit for receiving temperature",
+     "There are records of the transit temperature exceeding the critical limit, yet the product was accepted with no corrective action or hazard evaluation",
+     "The temperature excursion is recorded and the receipt is nevertheless marked as passing, and the supplier suspension procedure did not operate"
+    ],
+    "checks": [
+     "The procedure linking a cold chain temperature excursion record to the receipt decision",
+     "Whether the supplier action and suspension procedure operates when a critical limit is exceeded"
+    ]
    }
   },
   {
@@ -4931,6 +5480,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 회신 시 Warning Letter 발부와 OAI(Official Action Indicated) 분류, 후속 재실사로 이어질 수 있다. 특히 설치류 배설물·소변 오염은 FD&C Act 402(a)(4)의 비위생적 조건(insanitary conditions) 하 보관에 따른 불량식품 판정 근거가 되어, 시정이 지연되면 제품 압류(seizure)나 금지명령(injunction) 등 사법 조치로 확대될 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Rodent contamination in a warehouse",
+    "summary": "FDA inspected the distribution warehouse The SYGMA Network in February 2026 and issued observations. Gnaw holes, urine staining and rodent excreta were found throughout a warehouse holding rice, flour and similar goods, and the building structure carried defects making maintenance difficult.",
+    "implication": "Pest control at the storage and distribution stage is inspected less often than at manufacturing sites but is an equal contamination route. Firms should check whether building structural defects at a contract warehouse feed into the pest control programme and whether inspection records lead to actual correction.",
+    "key_facts": [
+     "Gnaw holes in product bags up to about seven and a half inches by two, urine staining, and around 77 and around 53 rodent excreta pellets found",
+     "At least 30 excreta pellets found beneath the bottom of the dusting flour bags, with a pile of gnawed packaging material observed",
+     "Drywall temporarily patched with holes still exposed, and a gap about one and a half inches wide and six feet long in a roll-up door panel"
+    ],
+    "checks": [
+     "Management of openings and gaps in contract warehouse buildings and its link to the pest control programme",
+     "Whether routine warehouse inspection records lead to corrective action"
+    ]
    }
   },
   {
@@ -5050,6 +5613,20 @@
      ]
     },
     "administrative_risks": "15영업일 이내에 각 관찰사항에 대한 구체적 시정 계획과 증빙을 제출하지 못하거나 시정이 불충분하면 Warning Letter 발부, 실사 결과의 OAI(Official Action Indicated) 분류, 후속 재실사로 이어질 수 있다. 수탁 분석시험소의 오염 관리·데이터 신뢰성 결함은 위탁사 제품의 시험 결과와 출하 판정에도 파급될 수 있으며, 지속적 미시정 시 consent decree 등 강제 조치로 확대될 리스크가 있다."
+   },
+   "en": {
+    "title_issue": "Poor contamination control in a laboratory",
+    "summary": "FDA inspected the contract testing laboratory Custom Analytics in March 2026 and issued observations. The laboratory was not physically separated from office areas, a dog was seen in an adjacent office, and the laboratory door opened directly to the outside.",
+    "implication": "Environmental control at a contract testing laboratory carries straight through to the reliability of the results it produces for a firm's own products. Firms should check that laboratory environmental and segregation control, and correct reflection of compendial requirements, are covered in the selection and periodic assessment of contract laboratories.",
+    "key_facts": [
+     "No physical separation at the pass-through, and the laboratory door opens directly to the outside, giving a route for airborne particulate",
+     "A dog was seen in the office next to the laboratory, contrary to the firm's own procedure (SOP CA26150 section 12.5) prohibiting animals",
+     "The balance performance qualification procedure (SOP CAS01) reflects the USP <41> repeatability requirement incorrectly, as confirmed by CAPA 501-01-2026"
+    ],
+    "checks": [
+     "Whether laboratory environmental and segregation control is covered in the periodic assessment of contract laboratories",
+     "Accuracy with which contract test methods reflect compendial requirements"
+    ]
    }
   },
   {
@@ -5151,6 +5728,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 응답 시 실사 결과가 OAI(Official Action Indicated) 로 분류되고 Warning Letter 로 이어질 가능성이 있다. 수탁 분석시험소 특성상 보관 검체의 무결성 문제는 고객 제약사의 시험 데이터 신뢰성 문제로 파급되어 고객사 실사·자료 재검토 요구를 유발할 수 있으며, 후속 재실사에서 동일 결함이 재확인되면 규제 조치 수위가 높아질 수 있다."
+   },
+   "en": {
+    "title_issue": "Sample freezer maintenance deferred",
+    "summary": "FDA inspected the contract testing laboratory Gateway Analytical in March 2026 and issued observations. Preventive maintenance on the freezer holding customer analytical samples was deferred for four months through a deviation, during which temperature excursions recurred, once falling to minus 59.00 degrees Celsius for more than 55 minutes.",
+    "implication": "When a stored sample moves outside its defined conditions, the meaning of the results generated from it is shaken with it. Firms should make the maintenance record and temperature excursion history of a contract laboratory's sample storage equipment an item in contract review.",
+    "key_facts": [
+     "Preventive maintenance on the sample storage freezer, due 31 December 2025, was deferred to 30 April 2026 through deviation DEV-25-008-GA",
+     "Alarm reports between September and December 2025 show many temperature excursions beyond the allowed limits, the lowest at minus 59.00 degrees Celsius sustained for more than 55 minutes",
+     "No scientific justification was given for the deferred maintenance or for not replacing the equipment"
+    ],
+    "checks": [
+     "Preventive maintenance performance and temperature excursion history for sample storage equipment at contract laboratories",
+     "The procedure requiring scientific justification and alternative storage when maintenance is deferred"
+    ]
    }
   },
   {
@@ -5257,6 +5848,20 @@
      ]
     },
     "administrative_risks": "시정이 없거나 회신이 불충분할 경우 Warning Letter 발부로 승격될 가능성이 있으며, 실사 결과가 OAI(Official Action Indicated)로 분류되고 후속 재실사에서 시정 이행 여부가 집중 점검될 수 있다. 표준품 검증 결함은 시험 결과 전반의 신뢰성 문제로 해석되므로, 미시정 시 해당 실험실에서 산출된 시험 데이터의 수용 가능성 자체가 문제 되어 관련 제품의 출하 판정·재시험 요구로 파장이 확대될 수 있다."
+   },
+   "en": {
+    "title_issue": "No verification testing of reference standards",
+    "summary": "FDA inspected the contract testing laboratory SGS North America in March 2026 and issued observations. Reference standards used for release and stability testing of several drug products and materials were qualified on review of the supplier certificate of analysis alone, with no verification testing.",
+    "implication": "A reference standard is the fixed point for every quantitative result, so where its qualification depends only on supplier documents every number that laboratory produces rests on the same basis. Firms should make it a contract and audit item whether a contract laboratory verifies reference standards itself or relies on certificate review.",
+    "key_facts": [
+     "No minimum verification testing on reference standards used for release and stability testing, with the procedure SOP-000898 (v4) allowing certificate review to stand in for it",
+     "A reference standard lot received on 4 June 2025 was used in method transfer activities without identity, quality or suitability verification",
+     "Example: the method transfer report SGS-MT-09-25-29R dated 3 November 2025"
+    ],
+    "checks": [
+     "The contract laboratory's procedure for qualifying reference standards, verification testing against certificate review",
+     "Trace the verification history of the reference standard lots used in the firm's own results"
+    ]
    }
   },
   {
@@ -5315,6 +5920,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Concept paper on revising Annex 15",
+    "summary": "A joint EMA and PIC/S drafting group published a concept paper on revising Annex 15 (Qualification and validation) of the EU PIC/S GMP guide.",
+    "implication": "The move to revise Annex 15 appears to reflect a push towards greater international alignment of validation and qualification requirements. Sites should read the original for the direction of the proposed revision.",
+    "key_facts": [
+     "Issuing body: joint EMA and PIC/S drafting group",
+     "Subject: concept paper on revision of Annex 15 (Qualification and validation) of the EU PIC/S GMP guide",
+     "Published: 16 July 2026, Geneva"
+    ],
+    "checks": [
+     "Check the original concept paper and whether a follow-up draft is published",
+     "Review consistency with the firm's own validation master plan"
+    ]
    }
   },
   {
@@ -5373,6 +5992,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Annex 15 qualification and validation revision",
+    "summary": "EMA published a corrigendum to the concept paper on revising the Annex 15 guideline on qualification and validation.",
+    "implication": "It indicates that the qualification and validation requirements of GMP Annex 15 are at the revision discussion stage. Quality and regulatory teams should read the original and assess in advance the effect on their validation master plan.",
+    "key_facts": [
+     "Issuing body: EMA",
+     "Published: 15 July 2026",
+     "Subject: corrigendum to the concept paper on revising Annex 15 on qualification and validation"
+    ],
+    "checks": [
+     "Read the original concept paper",
+     "Review the effect on the firm's validation master plan"
+    ]
    }
   },
   {
@@ -5431,6 +6064,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "GMP and GDP questions and answers",
+    "summary": "EMA published guidance in question and answer form on good manufacturing practice and good distribution practice.",
+    "implication": "It shows EMA keeping its questions and answers on interpreting GMP and GDP up to date. Quality and regulatory teams should read the original and check consistency with their own distribution management standards.",
+    "key_facts": [
+     "Issuing body: EMA",
+     "Published: 13 July 2026",
+     "Subject: guidance in question and answer form on GMP and GDP"
+    ],
+    "checks": [
+     "Read the original guidance",
+     "Review consistency with the firm's own GMP and GDP procedures"
+    ]
    }
   },
   {
@@ -5495,6 +6142,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sterile packaging defect recall",
+    "summary": "Becton Dickinson UK Ltd recalled certain batches of ChloraPrep 2% w/v and 70% v/v cutaneous solution 1mL applicator at class 2 because of a possible breach of sterility arising in the packaging process.",
+    "implication": "A possible breach of sterility in the packaging process can generally be linked to sealing and process control on an aseptic packaging line. Firms handling comparable antiseptic and sterile applicator products should review their packaging seal validation and container closure integrity test records.",
+    "key_facts": [
+     "Product: ChloraPrep 2% w/v / 70% v/v cutaneous solution 1mL applicator",
+     "Recall class: class 2",
+     "Reason: possible breach of sterility arising in the packaging process",
+     "Notice: EL(26)A/34, issued 13 July 2026"
+    ],
+    "checks": [
+     "Confirm the packaging seal process validation records",
+     "Review the container closure integrity test results",
+     "Confirm the distribution status of the affected batches"
+    ]
    }
   },
   {
@@ -5559,6 +6222,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Labelling defect recall",
+    "summary": "Bristol Laboratories Limited recalled one batch (7124002) of Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free at class 2 because of product labelling issues.",
+    "implication": "A recall caused by a labelling error shows how much rests on label verification and print process control. Firms handling comparable oral antibiotic preparations should re-examine their label proofing and print comparison procedures.",
+    "key_facts": [
+     "Product: Phenoxymethylpenicillin 250 mg/5 ml Oral Solution Sugar Free BP",
+     "Batch number: 7124002",
+     "Recall class: class 2",
+     "Reason: product labelling issues, notice EL(26)A/33"
+    ],
+    "checks": [
+     "Confirm the label print comparison and verification procedure",
+     "Confirm the distribution status of the affected batch",
+     "Review the labelling management procedure"
+    ]
    }
   },
   {
@@ -5651,6 +6330,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Microbial limit failure suspends manufacture",
+    "summary": "A three-month suspension of manufacture was imposed after a polyhexamethylene biguanide hydrochloride solution in distribution failed the microbial limit test in regulatory surveillance sampling, with a total aerobic count of 97,000.",
+    "implication": "It shows microbial limit standards being applied strictly to quasi-drugs as well. Quality and regulatory teams should re-examine the validation status of microbial control, total aerobic count included, across manufacturing processes including quasi-drug lines.",
+    "key_facts": [
+     "Product: a polyhexamethylene biguanide hydrochloride 20% solution",
+     "Reason: failure of the microbial limit test, total aerobic count 97,000",
+     "Action: three-month suspension of manufacture (30 July 2026 to 29 October 2026)",
+     "Approval number: 5013"
+    ],
+    "checks": [
+     "Re-review the microbial limit test results for the firm's own quasi-drugs",
+     "Review validation of microbial control, total aerobic count included, in the manufacturing process",
+     "Monitor comparable enforcement cases"
+    ]
    }
   },
   {
@@ -5801,6 +6496,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Data integrity among the findings",
+    "summary": "MFDS notified deficiencies from a post-approval inspection covering data integrity management, records for managing contract testing, and GMP document control.",
+    "implication": "Requests for further material on data integrity, contract testing management and document control indicate that data integrity continues to be examined at recent inspections. Quality and regulatory teams should re-examine their own data integrity system and whether they hold the management records for contract testing laboratories.",
+    "key_facts": [
+     "Site: a finished product site",
+     "Inspection period: 27 to 29 January 2026",
+     "Deficiencies: submit further explanatory material on data integrity management, submit further management records for contract testing, and submit further explanatory material on GMP document control - all with the remediation plan accepted"
+    ],
+    "checks": [
+     "Review the firm's own data integrity management system",
+     "Whether management records for contract testing laboratories are held",
+     "Review the procedure for distributing and controlling GMP documents"
+    ]
    }
   },
   {
@@ -5896,6 +6606,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Three findings, all graded other",
+    "summary": "MFDS notified three deficiencies graded other, in the quality management, manufacturing and laboratory areas, from a post-approval inspection carried out in March 2026, all closed by submitting further material on the training evaluation method, the process validation revalidation interval and test record management.",
+    "implication": "The inspection produced only three findings graded other, all closed by submitting further material. Since the areas cluster around the sufficiency of documented evidence, covering training evaluation, the revalidation interval and test record management, quality teams should check that their own procedures can be produced as evidence immediately at inspection.",
+    "key_facts": [
+     "Site: a finished product site, inspected 10 to 12 March 2026",
+     "All three deficiencies graded other - none critical or major",
+     "Areas: quality management (training evaluation method), manufacturing (process validation revalidation interval) and laboratory (test record management)",
+     "Outcome: all three closed by remediation"
+    ],
+    "checks": [
+     "The level of documentation of the training evaluation method and the records of effectiveness evaluation",
+     "Whether the basis for setting the process validation revalidation interval is documented",
+     "Completeness of records in test record management procedures, including reagent preparation"
+    ]
    }
   },
   {
@@ -5959,6 +6685,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Inspection closed with no deficiencies",
+    "summary": "MFDS carried out a post-approval inspection and confirmed no deficiencies.",
+    "implication": "The site came through the post-approval inspection without findings, suggesting a sound level of GMP management at an active ingredient site. Quality and regulatory teams can use it as reference material when selecting and assessing comparable active ingredient sites.",
+    "key_facts": [
+     "Site: an active ingredient site",
+     "Inspection period: 27 May 2026",
+     "Outcome: no deficiencies"
+    ],
+    "checks": [
+     "Read the original inspection result",
+     "Use for reference in managing the GMP history of partner active ingredient sites"
+    ]
    }
   },
   {
@@ -6079,6 +6819,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Supplier management and quality review",
+    "summary": "A post-approval GMP inspection of a finished product site in March 2026 raised deficiencies on the supplier management procedure, the annual quality review and the site master file material.",
+    "implication": "The deficiencies concern supplier management and the documentation of the annual quality review, which suggests MFDS is examining the completeness of quality system document control as a whole. Sites should check in advance that the supplier assessment procedure, the annual product review report and the site master file reflect the current rules.",
+    "key_facts": [
+     "Site: a finished product site with its laboratory",
+     "Inspection category: post-approval, finished product (single), inspected 24 to 25 March 2026, published in July 2026",
+     "Deficiency: submit further explanatory material on the supplier management procedure - resolved",
+     "Deficiency: submit the annual quality review and site master file material reflecting Annex 18 - resolved"
+    ],
+    "checks": [
+     "Whether the supplier management procedure is current",
+     "The status of preparation of the annual product review report",
+     "Whether the site master file reflects Annex 18"
+    ]
    }
   },
   {
@@ -6151,6 +6907,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Impurity above the limit in an eye drop",
+    "summary": "A voluntary recall was carried out for moxifloxacin hydrochloride eye drops after an individual unspecified impurity exceeded its limit during post-market stability testing.",
+    "implication": "This is a case where control of impurity formation during long-term storage of an eye drop only surfaced after the fact through stability testing, which underlines how much rests on the specification. Quality and regulatory teams should re-confirm their post-market stability results for eye drops and the basis on which impurity specifications were set.",
+    "key_facts": [
+     "Reason: an individual unspecified impurity exceeded its limit in post-market stability testing",
+     "Recall order date: 14 July 2026",
+     "Products: a moxifloxacin hydrochloride eye drop, in single-use and multi-use presentations",
+     "Mandatory: no, a voluntary recall by the company"
+    ],
+    "checks": [
+     "Re-review the post-market stability results for the firm's own eye drops",
+     "Confirm the adequacy of the impurity specification and test method",
+     "Monitor other products containing the same active ingredient"
+    ]
    }
   },
   {
@@ -6223,6 +6995,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Microbial limit failure in stability testing",
+    "summary": "A voluntary recall was carried out for an oral liquid product after it failed the microbial limit test in stability testing.",
+    "implication": "Microbial control during long-term storage of a liquid preparation was confirmed after the fact through stability testing, which reaffirms how much rests on preservative effectiveness and microbial limit control. Quality and regulatory teams should review the preservative efficacy and stability test results for comparable liquid dosage forms.",
+    "key_facts": [
+     "Reason: stability test failure on microbial limit",
+     "Recall order date: 13 July 2026",
+     "Product: an oral liquid product",
+     "Mandatory: no, a voluntary recall by the company"
+    ],
+    "checks": [
+     "Re-review the preservative efficacy test for liquid preparations",
+     "Monitor microbial limit results in stability testing",
+     "A full review of products in comparable dosage forms"
+    ]
    }
   },
   {
@@ -6345,6 +7133,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitroso impurity above the daily intake limit",
+    "summary": "Cipla USA, Inc. recalled three products together after N-nitroso-cinacalcet was detected above the acceptable daily intake in cinacalcet hydrochloride tablets.",
+    "implication": "Nitrosamine impurities keep being detected across a widening range of drug classes, which reads as regulators strengthening surveillance of nitrosamine formation risk within CGMP processes. Quality and regulatory teams should review the nitrosamine risk assessment and compliance with acceptable daily intake limits for products using comparable materials.",
+    "key_facts": [
+     "Reason: CGMP deviations - N-nitroso-cinacalcet detected above the acceptable daily intake",
+     "Recall class: Class II",
+     "Products: Cinacalcet Hydrochloride Tablets, 30 mg (NDC 69097-410-02) and two others",
+     "Manufacture and sale: manufactured by Cipla Ltd. in Patalganga, India and sold by Cipla USA, Inc."
+    ],
+    "checks": [
+     "Re-review the nitrosamine risk assessment for cinacalcet-containing products",
+     "Confirm impurity test results against the acceptable daily intake limit",
+     "Review the response procedure for a Class II recall, customer notification included"
+    ]
    }
   },
   {
@@ -6417,6 +7221,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Pack marking error triggers a recall",
+    "summary": "A voluntary recall was carried out for an ezetimibe and rosuvastatin 10/5 mg tablet because the tablet count marked on the pack did not match.",
+    "implication": "This is a recall driven by a simple marking error rather than a quality defect, which exposes a gap in labelling and packaging checks before finished product release. Quality and regulatory teams should re-examine the verification of markings in the packaging process, including label reconciliation and double checking.",
+    "key_facts": [
+     "Reason: the pack unit marking does not match, with the tablet count written incorrectly",
+     "Recall order date: 7 July 2026",
+     "Product: an ezetimibe and rosuvastatin 10/5 mg tablet",
+     "Mandatory: no, a voluntary recall by the company"
+    ],
+    "checks": [
+     "Review the double check and label reconciliation for pack markings",
+     "Reconfirm the quality control checklist covering tablet count marking",
+     "An internal review of any history of comparable marking errors"
+    ]
    }
   },
   {
@@ -6489,6 +7309,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "N-nitroso-meglumine above the limit",
+    "summary": "A voluntary recall was carried out for a linagliptin and metformin extended-release tablet after the impurity N-nitroso-meglumine was detected above the permitted limit.",
+    "implication": "Detections of nitrosamine impurities keep arising in this diabetes combination, so impurity control over the material and the process may spread into an industry-wide issue. Quality and regulatory teams should review the nitrosamine testing history and the management of material suppliers for comparable products.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-meglumine detected above the permitted limit",
+     "Recall order date: 2 July 2026",
+     "Mandatory: no, a voluntary recall by the company",
+     "Product: a linagliptin and metformin extended-release tablet at the 1000 mg metformin strength"
+    ],
+    "checks": [
+     "Confirm the nitrosamine testing history for products in the same linagliptin and metformin class",
+     "Review material suppliers and the process factors that create impurity formation risk",
+     "Re-review the firm's own recall response and corrective action procedure"
+    ]
    }
   },
   {
@@ -6561,6 +7397,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Precautionary recall over the same impurity",
+    "summary": "A precautionary recall of stock in distribution was carried out for a linagliptin and metformin extended-release tablet because of concern that the impurity N-nitroso-meglumine had been detected above the limit.",
+    "implication": "Acting pre-emptively on concern alone, before an exceedance was confirmed, shows nitrosamine risk management extending into the preventive space. Quality and regulatory teams should put a prior risk assessment and a pre-emptive testing system in place for comparable products.",
+    "key_facts": [
+     "Reason: concern that N-nitroso-meglumine was detected above the limit, handled as a precautionary measure",
+     "Recall order date: 2 July 2026",
+     "Product: a linagliptin and metformin extended-release tablet at a different strength",
+     "Mandatory: no, a voluntary recall by the company"
+    ],
+    "checks": [
+     "Carry out a prior risk assessment across the linagliptin and metformin product family",
+     "Build a preventive monitoring and testing system for nitrosamines",
+     "Monitor related recall cases and any follow-up statement on the cause"
+    ]
    }
   },
   {
@@ -6637,6 +7489,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Three products over the same impurity limit",
+    "summary": "Three linagliptin and metformin hydrochloride combination tablets were recalled together after the impurity N-nitroso-meglumine was detected above the permitted limit.",
+    "implication": "Several products being recalled at once over the same impurity keeps recurring, which suggests the impurity may be a class issue rooted in the material or a particular manufacturing process. Quality and regulatory teams should review the material and process history across every linagliptin combination product.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-meglumine detected above the permitted limit",
+     "Recall order date: 24 June 2026",
+     "Scope: three products recalled together for the same reason",
+     "Representative product: a linagliptin and metformin hydrochloride combination tablet at the 850 mg metformin strength"
+    ],
+    "checks": [
+     "Establish the nitrosamine testing position across all linagliptin and metformin combination products",
+     "Compare impurity history by material supplier",
+     "Confirm the stock and distribution position of the products recalled together"
+    ]
    }
   },
   {
@@ -6710,6 +7578,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Unauthorized nicotine films and pouches",
+    "summary": "Health Canada carried out a recall of Supernova and Supreme Nicotine Film and Pouches on the ground that they are an unauthorized product.",
+    "implication": "A nicotine replacement product distributed without market authorisation was recalled, which suggests the problem of unauthorised nicotine products moving through online and informal channels continues. Quality and regulatory teams should check whether unauthorised or lookalike nicotine products are moving through their own distribution networks.",
+    "key_facts": [
+     "Reason: unauthorized product",
+     "Recall class: Type II",
+     "Product information: nicotine, film presentation"
+    ],
+    "checks": [
+     "Confirm the market authorisation position of the firm's own products in Canada",
+     "Monitor unauthorised parallel distribution channels"
+    ]
    }
   },
   {
@@ -6783,6 +7665,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Particle size out of specification",
+    "summary": "Health Canada recalled Apo-Tiotropium 18 mcg Capsules on product quality grounds, with particle size out of specification identified as the problem.",
+    "implication": "A particle size specification failure in a capsule presentation led to a recall, showing how far control of material particle size bears on the conformity of the finished product. Quality and regulatory teams should review the particle size control criteria and in-process data for comparable presentations.",
+    "key_facts": [
+     "Reason: product quality, particle size out of specification",
+     "Recall class: Type II",
+     "Product: Apo-Tiotropium 18 mcg Capsules (tiotropium bromide monohydrate 18 mcg)"
+    ],
+    "checks": [
+     "Review the particle size control criteria for materials in the firm's own capsule presentations",
+     "Reconfirm the specification for comparable tiotropium bromide preparations"
+    ]
    }
   },
   {
@@ -6856,6 +7752,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Bacterial contamination detected",
+    "summary": "Health Canada recalled Oribe Serene Scalp Densifying Shampoo on product quality grounds, with bacterial contamination identified as the problem.",
+    "implication": "Microbial contamination in a water-based presentation such as a shampoo led to a recall, which shows how much rests on the preservative system and microbial limit control. Quality and regulatory teams should review the microbial limits and preservative efficacy results for comparable water-based cosmetics and quasi-drugs.",
+    "key_facts": [
+     "Reason: product quality, bacterial contamination detected",
+     "Recall class: Type II",
+     "Product: Oribe Serene Scalp Densifying Shampoo"
+    ],
+    "checks": [
+     "Review microbial limit control for the firm's own water-based presentations",
+     "Reconfirm the preservative efficacy test results"
+    ]
    }
   },
   {
@@ -6929,6 +7839,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Product sterility issue",
+    "summary": "Health Canada recalled BD ChloraPrep Clear 1mL Applicator on product quality grounds, with product sterility identified as the problem.",
+    "implication": "A sterility issue confirmed as a ground for recall in a sterile product such as a skin antiseptic shows how much rests on aseptic process control and finished product sterility testing. Quality and regulatory teams should review the sterility assurance system and finished product test results for comparable sterile liquid antiseptics.",
+    "key_facts": [
+     "Reason: product quality, a sterility issue",
+     "Recall class: Type II",
+     "Product: BD ChloraPrep Clear 1mL Applicator (chlorhexidine gluconate 2% w/v, isopropyl alcohol 70% v/v, solution)"
+    ],
+    "checks": [
+     "Review the sterility assurance system for the firm's own sterile liquid preparations",
+     "Confirm the finished product sterility test and process control records"
+    ]
    }
   },
   {
@@ -7058,6 +7982,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Unsterilised product reached customers",
+    "summary": "CareFusion 213, LLC, a Becton Dickinson subsidiary, recalled 10 products together because unsterilised ChloraPrep and PurPrep applicators, which still required further processing and sterilisation, left the intended distribution route and reached customers.",
+    "implication": "Unsterilised product leaving the normal distribution route and reaching the market can generally be linked to a gap in process control and quarantine. Sterile product manufacturers and distributors should re-examine their quarantine and shipment control procedures for unsterilised work in progress.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Reason: unsterilised product left the intended distribution route before sterilisation and reached customers",
+     "Product: BD ChloraPrep Hi-Lite Orange (2% w/v chlorhexidine gluconate, 70% v/v isopropyl alcohol), NDC 54365-400-35",
+     "Products covered: 10 recalled together"
+    ],
+    "checks": [
+     "Confirm the quarantine and shipment control procedure for unsterilised work in progress",
+     "Review the system preventing product from leaving the intended distribution route",
+     "Confirm the distribution position of the 10 products covered"
+    ]
    }
   },
   {
@@ -7172,6 +8112,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sterility assurance lacking in a biologic",
+    "summary": "Accord BioPharma Inc. recalled IMULDOSA (ustekinumab-srlf) injection for lack of assurance of sterility.",
+    "implication": "Lack of sterility assurance in a biological injection can generally be linked to a gap in aseptic process validation or in the environmental monitoring system. Firms contracting biologics manufacture should review the aseptic process validation and environmental monitoring results at the contract site.",
+    "key_facts": [
+     "Product: IMULDOSA (ustekinumab-srlf) Injection, 130 mg/26 mL, NDC 69448-019-26",
+     "Recall class: Class II",
+     "Reason: lack of assurance of sterility",
+     "Manufacture: made by Catalent Indiana, LLC in Bloomington, Indiana"
+    ],
+    "checks": [
+     "Confirm the aseptic process validation records",
+     "Review the environmental monitoring results",
+     "Review the quality agreement with the contract manufacturer"
+    ]
    }
   },
   {
@@ -7286,6 +8242,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Foreign substance in an eye suspension",
+    "summary": "Lupin Pharmaceuticals Inc. recalled prednisoLONE Acetate Ophthalmic Suspension, USP, 1% for the presence of a foreign substance.",
+    "implication": "A foreign substance in an ophthalmic suspension can generally be linked to contamination control at the filling step or in material management. Firms making or importing ophthalmic preparations should review their foreign matter inspection records at filling and their incoming material inspection results.",
+    "key_facts": [
+     "Product: prednisoLONE Acetate Ophthalmic Suspension, USP, 1%, in 5 mL, 10 mL and 15 mL presentations",
+     "Recall class: Class II",
+     "Reason: presence of a foreign substance",
+     "Manufacture: made by Lupin Limited in Pithampur, India"
+    ],
+    "checks": [
+     "Confirm the foreign matter inspection records for the filling process",
+     "Review the incoming inspection results for materials and containers",
+     "Confirm the distribution position of the affected batches"
+    ]
    }
   },
   {
@@ -7400,6 +8372,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Subpotent levothyroxine tablets",
+    "summary": "Accord Healthcare, Inc. recalled Levothyroxine Sodium Tablets, USP, 300 mcg because the product was subpotent.",
+    "implication": "Subpotency in a thyroid hormone product can generally be linked to control of the potency of the active material or to a loss on stability. Firms handling thyroid hormone products should re-examine their content uniformity and stability test results.",
+    "key_facts": [
+     "Product: Levothyroxine Sodium Tablets, USP, 300 mcg, in bottles of 90 tablets",
+     "Recall class: Class II",
+     "Reason: subpotent drug",
+     "Manufacture: made by Intas Pharmaceuticals Limited in Dehradun, India"
+    ],
+    "checks": [
+     "Confirm the content uniformity test results",
+     "Review the stability data for loss of potency",
+     "Confirm the distribution position of the affected lots"
+    ]
    }
   },
   {
@@ -7496,6 +8484,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Wrong detergent, swab sampling skipped",
+    "summary": "Boehringer Ingelheim Pharmaceuticals, Inc. recalled Synjardy XR Tablets over CGMP deviations, namely use of an incorrect detergent in the cleaning process and failure to perform the required swab sampling on a production hopper previously used for another product.",
+    "implication": "Using the wrong detergent and omitting swab sampling points to weakness in cleaning process validation and cross-contamination control. Firms making several products on the same equipment should review compliance with the cleaning procedure and the completeness of swab sampling records.",
+    "key_facts": [
+     "Product: Synjardy XR Tablets (empagliflozin and metformin hydrochloride extended release), 12.5/1000 mg, NDC 00597-0300-45",
+     "Recall class: Class II",
+     "Reason: CGMP deviations - an incorrect detergent was used and the required swab sampling on a hopper previously used for another product was not performed",
+     "Manufacturer: Boehringer Ingelheim Pharmaceuticals, Inc."
+    ],
+    "checks": [
+     "Confirm the cleaning procedure and use of the specified detergent",
+     "Review swab sampling records at equipment changeover",
+     "Review the cross-contamination control system for shared equipment"
+    ]
    }
   },
   {
@@ -7608,6 +8612,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sterility assurance lacking in a kit",
+    "summary": "Asclemed USA Inc. recalled two products together, including an Accucaine kit containing lidocaine hydrochloride injection, for lack of assurance of sterility.",
+    "implication": "Lack of sterility assurance in a local anaesthetic kit can generally be linked to control at assembly and filling or at terminal sterilisation. Firms making or distributing injectable kits should review their terminal sterilisation validation and aseptic assembly records.",
+    "key_facts": [
+     "Product: Accucaine kit containing Lidocaine HCl Injection USP 1% (10 mg/mL) in a 5 mL ampoule, NDC 76420-715-01",
+     "Recall class: Class II",
+     "Reason: lack of assurance of sterility",
+     "Products covered: two recalled together"
+    ],
+    "checks": [
+     "Confirm the terminal sterilisation process validation records",
+     "Review the aseptic control procedure for kit assembly",
+     "Confirm the distribution position of the two products covered"
+    ]
    }
   },
   {
@@ -7704,6 +8724,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Label says extended release, contents are not",
+    "summary": "Lannett Company, Inc. recalled an amphetamine salts extended-release capsule for a label mix-up, in that the capsules were labelled as extended release but contained only immediate-release pellets.",
+    "implication": "A mismatch between the release characteristics stated on the label and what is actually filled can generally be linked to weak control of packaging and labelling verification. Firms handling extended-release products should re-examine line clearance and label matching verification on the packaging line.",
+    "key_facts": [
+     "Product: Dextroamphetamine Saccharate, Amphetamine Aspartate Monohydrate, Dextroamphetamine Sulfate and Amphetamine Sulfate Extended-Release Capsules",
+     "Recall class: Class II",
+     "Reason: label mix-up - the capsules are labelled extended release but contain only immediate-release pellets",
+     "Distribution: Lannett Company, Inc., NDC 0527-0790-37"
+    ],
+    "checks": [
+     "Confirm the line clearance and label matching verification procedure on the packaging line",
+     "Review the quality control records for the pellet filling process",
+     "Confirm the distribution position of the affected lots"
+    ]
    }
   }
  ]

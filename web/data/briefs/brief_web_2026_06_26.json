@@ -32,7 +32,14 @@
     "C": 0
    }
   },
-  "ai_disclosure": true
+  "ai_disclosure": true,
+  "en": {
+   "tldr": [
+    "Two domestic recalls over the N-nitroso-meglumine impurity cover four telmisartan and linagliptin combination products",
+    "FDA classes a doxorubicin hydrochloride liposome injection recall as Class I after particulate identified as glass is found",
+    "FDA issues a CGMP warning letter to Huons Co., Ltd. in Korea, confirming enforcement reaching a Korean finished product site"
+   ]
+  }
  },
  "cards": [
   {
@@ -121,6 +128,20 @@
       "statement_ko": "귀사는 무균 조건을 관리하는 데 사용되는 설비의 유지관리를 위한 적절한 시스템을 수립하지 않았다 (21 CFR 211.42(c)(10)(vi))."
      }
     ]
+   },
+   "en": {
+    "title_issue": "CGMP warning letter to a Korean site",
+    "summary": "FDA's Center for Drug Evaluation and Research issued a warning letter to the Korean manufacturer Huons Co., Ltd. for CGMP violations in finished pharmaceuticals, holding the products adulterated.",
+    "implication": "A warning letter to a Korean finished product site is a direct enforcement signal about the level of GMP compliance behind exports. Comparable sites exporting overseas should revisit their current CGMP status and the observations from their most recent FDA inspection.",
+    "key_facts": [
+     "Issued: posted 23 June 2026, letter dated 15 June 2026 from CDER",
+     "Subject: Huons Co., Ltd.",
+     "Four citations: 21 CFR 211.194(a) laboratory records, 211.192 investigation of discrepancies, 211.113(b) aseptic processing, and 211.42(c)(10)(vi) maintenance of equipment used to control aseptic conditions"
+    ],
+    "checks": [
+     "Whether CAPAs responding to the most recent FDA inspection observations have been carried out",
+     "Current compliance with the finished pharmaceuticals CGMP requirements in 21 CFR Part 211"
+    ]
    }
   },
   {
@@ -183,6 +204,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Hazardous drug cross-contamination control",
+    "summary": "FDA observed, on Form 483, that segregation and cleaning to prevent cross-contamination when handling hazardous drugs were inadequate at the non-sterile finished product site of Pharmaneek Inc in Indiana.",
+    "implication": "FDA citing the hazardous drug cross-contamination system at a non-sterile site directly shows enforcement in this area becoming specific down to the level of segregation standards and cleaning validation. Non-sterile sites handling hazardous drugs should review their segregation and cleaning procedures and their personnel protection arrangements.",
+    "key_facts": [
+     "Observation: inadequate measures to prevent contamination of segregated areas, work surfaces, utensils and personnel when handling hazardous drugs",
+     "Facility type: producer of non-sterile drug products",
+     "Inspected: April 2026"
+    ],
+    "checks": [
+     "Adequacy of the hazardous drug segregation and cleaning procedures and of the records showing they are followed",
+     "State of cross-contamination training for personnel handling hazardous drugs"
+    ]
    }
   },
   {
@@ -241,6 +276,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Reduced testing, GMP or specification",
+    "summary": "ECA Academy published an analysis on where the boundary lies between GMP compliance for reduced testing and the specification set in the marketing authorisation.",
+    "implication": "Whether the basis for reduced or skip-lot testing has to sit in the GMP standards or in the approved specification is a frequent source of confusion in practice. A site that runs testing frequency and the basis for skipping through GMP procedures alone, without reflecting them in the specification, may carry a compliance risk in the eyes of a regulator.",
+    "key_facts": [
+     "Subject: analysis of the boundary between GMP requirements for reduced testing and the approved specification",
+     "Source: ECA Academy, 24 June 2026",
+     "Detail: the original article needs to be consulted"
+    ],
+    "checks": [
+     "Whether the basis for reduced or skip-lot testing is linked to both the GMP documents and the approved specification",
+     "Readiness to answer regulator questions about the procedure for omitting tests"
+    ]
    }
   },
   {
@@ -299,6 +348,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Reduced testing and the specification line",
+    "summary": "ECA Academy published an article on the boundary between GMP compliance requirements for reduced testing of medicines and the specification set in the marketing authorisation.",
+    "implication": "If the division between the GMP basis for omitting a test and the role of the approved specification is left unclear, it can turn into a finding at inspection. Firms should confirm that their own reduced testing procedure is also reflected in the specification document.",
+    "key_facts": [
+     "Subject: the division of roles between GMP standards and the approved specification document for reduced testing",
+     "Source: ECA Academy, 22 June 2026",
+     "Detail: the original article needs to be consulted"
+    ],
+    "checks": [
+     "Whether the skip-lot or reduced testing procedure has a basis in the approved specification",
+     "Review of how recent ECA guidance is reflected in the firm's own GMP documents"
+    ]
    }
   },
   {
@@ -408,6 +471,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Data integrity roles and change control records",
+    "summary": "The Ministry of Food and Drug Safety found several deficiencies at a hospital finished product site during a post-approval GMP inspection in February 2026, including inadequate documentation of data integrity responsibilities, a deviation handling procedure needing review, and inadequate change control records.",
+    "implication": "Finding inadequate assignment of data integrity responsibilities and inadequate change control records together at a hospital manufacturing site suggests the document system built on the quality system is not being operated consistently. Findings on the GMP committee procedure and on reviewing the deviation handling procedure show the management level of the internal quality organisation becoming the issue at inspection.",
+    "key_facts": [
+     "Deficiency: the scope of responsibilities assigned to the data integrity officer was inadequately documented (Annex 1, clause 3.1)",
+     "Deficiency: the procedure for handling manufacturing deviations needs review (Annex 1, clause 3.2)",
+     "Deficiency: records of change control plans and outcomes were inadequate (Annex 1, clause 12)",
+     "Published 25 June 2026, inspected in early February 2026"
+    ],
+    "checks": [
+     "Whether data integrity role assignments and the related standards are current",
+     "Adequacy of change control plan and outcome records and of the procedure for convening the GMP committee",
+     "Whether the deviation handling procedure is current and is being followed"
+    ]
    }
   },
   {
@@ -516,6 +595,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Water records and data integrity roles",
+    "summary": "The Ministry of Food and Drug Safety raised deficiencies at a finished product site during a post-approval GMP inspection in February 2026, covering inadequate records for the process water system, no means of confirming cleaning and clean hold time for weighing scoops, and inadequate assignment of data integrity responsibilities.",
+    "implication": "Inadequate process water records and cleaning verification for weighing utensils appearing together at a finished product site reconfirms that equipment management procedures and the execution of cleaning validation are core inspection items. The finding on data integrity role assignment reflects a consistent expectation that the roles and responsibilities of the dedicated unit be documented.",
+    "key_facts": [
+     "Deficiency: inadequate records for management of the process water generation system, and the water management standard needs updating (Annex 1, clause 2.1)",
+     "Deficiency: no adequate means of confirming whether weighing scoops had been cleaned and how long that cleaning remains valid (Annex 1, clause 9.3)",
+     "Deficiency: inadequate assignment of responsibilities within the unit dedicated to data integrity (Annex 1, clause 3.1)"
+    ],
+    "checks": [
+     "Whether process water system records and the governing standard are current",
+     "Clean hold time and execution records for cleaning validation, including weighing utensils",
+     "Whether responsibilities within the data integrity organisation are assigned and documented"
+    ]
    }
   },
   {
@@ -602,6 +696,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Storage monitoring and clean hold time",
+    "summary": "The Ministry of Food and Drug Safety raised two deficiencies at the Shanghai Ethypharm Pharmaceuticals active ingredient site in China during a post-approval GMP inspection in November 2025, covering inadequate temperature and humidity monitoring in storage and inadequate verification of clean hold time after equipment cleaning.",
+    "implication": "That MFDS made storage condition monitoring and cleaning verification the core findings at a post-approval inspection of an overseas active ingredient site suggests these two are the priority items when maintaining qualification of an API supplier. Those managing overseas API supply chains should review supplier temperature and humidity monitoring records and cleaning validation reports on a regular basis.",
+    "key_facts": [
+     "Deficiency 1: carry out temperature and humidity monitoring of the storage area properly (Annex 1-2, clause 4)",
+     "Deficiency 2: verify the hold time after cleaning of manufacturing equipment properly (Annex 1-2, clause 12)",
+     "Published 24 June 2026, inspected 11 to 13 November 2025 in China"
+    ],
+    "checks": [
+     "A regular review system for temperature and humidity monitoring records at API supplier storage areas",
+     "Status of the supplier's verification of clean hold time after equipment cleaning"
+    ]
    }
   },
   {
@@ -661,6 +769,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Cleaning standard not followed, second offence",
+    "summary": "The Ministry of Food and Drug Safety suspended manufacture of a povidone-iodine swab stick product for three months because the firm did not follow its own standards for cleaning the automatic swab stick packaging machine, recorded as a second offence.",
+    "implication": "The same equipment cleaning standard being breached again, and treated as a second offence, signals that MFDS judges the effectiveness of corrective action strictly through escalating penalties. Missing entries on an equipment cleaning history card attract an aggravated penalty once they recur after a first finding, so the system for completing and reviewing those cards needs re-examining.",
+    "key_facts": [
+     "Action: three-month suspension of manufacture of the affected product, from early July to early October 2026",
+     "Product: a povidone-iodine swab stick",
+     "Violation: cleaning of the packaging machine and the associated records were not carried out as required by the firm's own hygiene management standard and equipment management rules, recorded as a second offence"
+    ],
+    "checks": [
+     "Whether the procedure for completing and reviewing equipment cleaning history cards is being followed",
+     "Self-inspection against the firm's own standards and the effectiveness of the corrective action preventing recurrence"
+    ]
    }
   },
   {
@@ -724,6 +846,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API inspection confirmed with no findings",
+    "summary": "The Ministry of Food and Drug Safety confirmed no deficiencies at an active ingredient site following a post-approval GMP inspection carried out from 20 to 22 May 2026.",
+    "implication": "A GMP inspection of an API site passing with no findings is a positive confirmation for maintaining qualification of that supplier. Finished product manufacturers using this supplier should update the inspection outcome in their supplier qualification records.",
+    "key_facts": [
+     "Outcome: no deficiencies",
+     "Subject: an active pharmaceutical ingredient site (single)",
+     "Inspection period: 20 to 22 May 2026"
+    ],
+    "checks": [
+     "Whether the API supplier's GMP inspection outcome is reflected in the firm's own supplier qualification records",
+     "The periodic requalification cycle for suppliers and the system monitoring changes in inspection outcomes"
+    ]
    }
   },
   {
@@ -803,6 +939,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "One other-grade laboratory finding",
+    "summary": "The Ministry of Food and Drug Safety recorded one deficiency graded other in the laboratory area at a finished product site during a post-approval GMP inspection carried out from 10 to 12 February 2026.",
+    "implication": "A laboratory finding goes to the core of quality control work, covering execution of analytical methods, test records and instrument management. The detail needs to be read from the attached inspection result, but laboratory procedures being current and the integrity of test data are the first things worth checking.",
+    "key_facts": [
+     "Deficiency: one item in the laboratory area, graded other (Annex 1, clause 6) - the detail was not parsed from the attachment",
+     "Subject: a finished product site (single)",
+     "Inspection period: 10 to 12 February 2026"
+    ],
+    "checks": [
+     "Review of laboratory procedures and the integrity of test record data",
+     "Establish a CAPA for the specific finding once the attached inspection result has been read"
+    ]
    }
   },
   {
@@ -867,6 +1017,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Growth promotion testing not per procedure",
+    "summary": "The Ministry of Food and Drug Safety recorded major and other deficiencies at a hospital cyclotron radiopharmaceutical facility during a post-approval GMP inspection in November 2025, covering growth promotion testing not carried out per the standard, inadequate environmental monitoring criteria, and inadequate cleaning validation for transfer tubing.",
+    "implication": "Growth promotion testing not following the standard, graded major, appearing together with inadequate environmental monitoring criteria at a sterile radiopharmaceutical facility points to weakness in the sterility assurance system for that process. Cyclotron and radioisotope drug sites should give priority to bringing the media fill procedure and the environmental monitoring standard up to date.",
+    "key_facts": [
+     "Major deficiency: the standard for growth promotion testing was not followed, and some compendial test attributes were not performed in media quality control (Annex 1, clause 7.1)",
+     "Other deficiency: inadequate environmental monitoring control criteria (Annex 1, clause 2.3)",
+     "Other deficiency: inadequate cleaning validation for transfer tubing (Annex 1, clause 6.4)",
+     "Inspection period: 19 to 21 November 2025"
+    ],
+    "checks": [
+     "The media fill procedure and the state of execution of its test attributes",
+     "Adequacy of the environmental monitoring standard and execution records for the production area",
+     "Clean hold time for tubing cleaning validation and whether it is carried out"
+    ]
    }
   },
   {
@@ -930,6 +1096,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Three-day suspension for late narcotics report",
+    "summary": "The Ministry of Food and Drug Safety suspended a narcotics manufacturer's operations for three days, as a second offence, because handling records for controlled substances were not reported within the deadline.",
+    "implication": "A late report of controlled substance handling records escalating to an aggravated second offence shows that timeliness of reporting into the national narcotics information system can attract cumulative penalties on repeat breach. Firms manufacturing or handling controlled substances should tighten how they check that entry and reporting procedures are carried out.",
+    "key_facts": [
+     "Action: three-day suspension of operations as a narcotics manufacturer, second offence, 24 to 26 June 2026",
+     "Violation: handling records for controlled substances, including correction of a unit count entry for an oxycodone salt, were not reported within the deadline",
+     "Basis: article 11 of the Narcotics Control Act and article 21 of its enforcement rules"
+    ],
+    "checks": [
+     "Procedure for checking timeliness of narcotics handling reports and whether a responsible person is named",
+     "Procedure for correcting unit count entry errors and management of the reporting deadline"
+    ]
    }
   },
   {
@@ -993,6 +1173,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas site inspected with no findings",
+    "summary": "The Ministry of Food and Drug Safety confirmed no deficiencies at Kowa Company, Ltd., Fuji Factory in Japan following a post-approval GMP inspection carried out from 2 to 4 December 2025.",
+    "implication": "A post-approval inspection of a Japanese finished product site closing without findings confirms that the supplier's GMP compliance is being maintained. To keep marketing authorisations for imported finished products in place, the supplier's post-approval inspection outcome should be refreshed and reflected in the qualification records.",
+    "key_facts": [
+     "Outcome: no deficiencies",
+     "Subject: Kowa Company, Ltd., Fuji Factory (finished product, Japan)",
+     "Inspection period: 2 to 4 December 2025"
+    ],
+    "checks": [
+     "Whether the supplier GMP inspection outcome is refreshed in the records for products supplied from this site",
+     "The qualification cycle for overseas finished product suppliers and the system monitoring inspection outcomes"
+    ]
    }
   },
   {
@@ -1056,6 +1250,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "EU site inspected with no findings",
+    "summary": "The Ministry of Food and Drug Safety confirmed no deficiencies at Cyndea Pharma S.L. in Spain following a post-approval GMP inspection carried out from 2 to 4 December 2025.",
+    "implication": "A Spanish finished product site coming through a post-approval inspection with no findings is a case where EU GMP practice and the domestic MFDS standard line up. Even for EU-based suppliers, the independent MFDS post-approval inspection outcome should be reflected in supplier qualification records.",
+    "key_facts": [
+     "Outcome: no deficiencies",
+     "Subject: Cyndea Pharma S.L. (finished product, Spain)",
+     "Inspection period: 2 to 4 December 2025"
+    ],
+    "checks": [
+     "Whether MFDS GMP inspection outcomes for Spanish and other EU suppliers are updated in qualification records",
+     "Managing the site's manufacturing authorisation status alongside the MFDS GMP inspection outcome"
+    ]
    }
   },
   {
@@ -1126,6 +1334,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "N-nitroso-meglumine above the limit",
+    "summary": "A precautionary voluntary recall of stock already in distribution was carried out for a telmisartan and S-amlodipine nicotinate 40/5 mg tablet because of concern that the impurity N-nitroso-meglumine had been detected above the limit.",
+    "implication": "An excess of N-nitroso-meglumine in a telmisartan preparation leading to a precautionary recall reconfirms that nitrosamines arising from an excipient, meglumine here, also fall within the scope of ICH M7 control. Sites making telmisartan and meglumine containing preparations should review their nitrosamine risk assessment, particularly for N-nitroso-meglumine, and the suitability of the test method.",
+    "key_facts": [
+     "Reason: concern that N-nitroso-meglumine was detected above the limit, handled as a precautionary measure",
+     "Product: a telmisartan and S-amlodipine nicotinate 40/5 mg tablet",
+     "Recall order date: 24 June 2026"
+    ],
+    "checks": [
+     "Whether telmisartan and meglumine containing preparations have an N-nitroso-meglumine risk assessment and confirmatory testing",
+     "Procedure for handling a nitrosamine out-of-specification result and the system for monitoring distributed stock"
+    ]
    }
   },
   {
@@ -1189,6 +1411,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Three products over N-nitroso-meglumine",
+    "summary": "A voluntary recall was carried out for three linagliptin and metformin hydrochloride combination tablets after the impurity N-nitroso-meglumine was detected above the permitted limit.",
+    "implication": "N-nitroso-meglumine exceeding the permitted limit across several products of a DPP-4 inhibitor and metformin combination shows that control of nitrosamines arising from metformin material and process remains a live industry issue. Sites making metformin combination products should revisit the N-nitroso-meglumine risk assessment by material and the adequacy of the release test method.",
+    "key_facts": [
+     "Reason: N-nitroso-meglumine detected above the permitted limit",
+     "Products: linagliptin and metformin hydrochloride combination tablets at 500 mg, 850 mg and 1000 mg metformin strengths, three products recalled together for the same reason",
+     "Recall order date: 24 June 2026"
+    ],
+    "checks": [
+     "Whether the N-nitroso-meglumine risk assessment for metformin material and the formulation process is current",
+     "Whether confirmatory nitrosamine testing is included in the release test panel"
+    ]
    }
   },
   {
@@ -1259,6 +1495,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Dissolution failure in stability testing",
+    "summary": "A voluntary recall was carried out for a warfarin sodium 5 mg tablet after a failing result on the dissolution attribute in stability testing.",
+    "implication": "A dissolution failure in stability testing means the product moved outside specification while in distribution, and for a narrow therapeutic index drug such as warfarin the effect on patient safety can be significant. Firms should check that they monitor stability results in real time and hold criteria and a procedure for deciding immediately whether market action is required when a result goes out of specification.",
+    "key_facts": [
+     "Reason: stability test failure - the dissolution attribute fell below specification",
+     "Product: a warfarin sodium 5 mg tablet",
+     "Recall order date: 24 June 2026"
+    ],
+    "checks": [
+     "Criteria and procedure for deciding on a market recall when a long-term or accelerated stability result is out of specification",
+     "Adequacy of the dissolution specification and stability testing frequency for narrow therapeutic index drugs such as warfarin"
+    ]
    }
   },
   {
@@ -1329,6 +1579,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Container defect and appearance concern",
+    "summary": "A voluntary recall was carried out for a Pelargonium sidoides extract syrup because of a concern about quality failure, namely a container defect and the risk of a change in appearance.",
+    "implication": "A concern about appearance arising from a container defect shows that container and packaging suitability testing can be a leading indicator of stability failure. For liquid preparations such as syrups, the suitability of the container and closure seal and the appearance check before release should be reviewed regularly.",
+    "key_facts": [
+     "Reason: concern about quality failure - container defect and possible change in appearance",
+     "Product: a Pelargonium sidoides ethanol extract and glycerin syrup",
+     "Recall order date: 22 June 2026"
+    ],
+    "checks": [
+     "Container and closure seal suitability testing and the procedure monitoring container defects",
+     "Criteria for checking appearance and container defects before release of liquid preparations"
+    ]
    }
   },
   {
@@ -1442,6 +1706,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Glass particulate, Class I injection recall",
+    "summary": "FDA listed a Class I recall of doxorubicin hydrochloride liposome injection from SUN PHARMACEUTICAL INDUSTRIES INC after particulate matter identified as glass was found in the single-dose vials.",
+    "implication": "Glass particulate in a liposome injection can cause direct harm to the patient, which is why FDA applied its highest recall class. Injectable sites should review how defects in the primary glass container are detected and whether their visual and automated particulate inspection arrangements are adequate.",
+    "key_facts": [
+     "Reason: presence of particulate matter identified as glass",
+     "Class: Class I",
+     "Product: DOXOrubicin Hydrochloride Liposome injection, 50 mg/25 mL (2 mg/mL), 25 mL single-dose vials",
+     "Firm: SUN PHARMACEUTICAL INDUSTRIES INC"
+    ],
+    "checks": [
+     "Particulate inspection of the primary glass vial and whether 100% automated visual inspection is in use",
+     "Adequacy of control at the process steps where glass particulate can arise, filling and sealing"
+    ]
    }
   },
   {
@@ -1555,6 +1834,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "N-nitroso-duloxetine above interim limit",
+    "summary": "FDA listed a Class II recall of Duloxetine Delayed-Release Capsules 30mg distributed by Breckenridge Pharmaceutical after the N-nitroso-duloxetine impurity exceeded the FDA recommended interim limit.",
+    "implication": "A nitroso impurity exceeding an interim limit in an SNRI leading to a Class II recall shows nitrosamine control extending beyond particular therapeutic classes to amine-containing active ingredients generally. Firms making duloxetine and similar amine drugs should confirm that their nitrosamine risk assessment and control methods are current.",
+    "key_facts": [
+     "Reason: CGMP deviations - N-nitroso-duloxetine impurity above the FDA recommended interim limit",
+     "Class: Class II",
+     "Product: Duloxetine Delayed-Release Capsules, USP, 30mg",
+     "Manufacture: made by Towa Pharmaceutical Europe, S.L. in Spain and distributed by Breckenridge Pharmaceutical"
+    ],
+    "checks": [
+     "Whether the nitroso impurity risk assessment for amine active ingredients such as duloxetine is current",
+     "Application of FDA recommended interim nitrosamine limits and review of the release testing criteria"
+    ]
    }
   },
   {
@@ -1668,6 +1962,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Same impurity at the 60mg strength",
+    "summary": "FDA listed a Class II recall of Duloxetine Delayed-Release Capsules 60mg distributed by Breckenridge Pharmaceutical after the N-nitroso-duloxetine impurity exceeded the FDA recommended interim limit.",
+    "implication": "N-nitroso-duloxetine exceeding the interim limit at both the 30mg and 60mg strengths from the same manufacturer suggests a systematic control failure at process or material level. The site needs a root cause investigation and CAPA addressing the common process cause, not testing each strength in isolation.",
+    "key_facts": [
+     "Reason: CGMP deviations - N-nitroso-duloxetine impurity above the FDA recommended interim limit",
+     "Class: Class II",
+     "Product: Duloxetine Delayed-Release Capsules, USP, 60mg",
+     "Manufacture: made by Towa Pharmaceutical Europe, S.L. in Spain and distributed by Breckenridge Pharmaceutical"
+    ],
+    "checks": [
+     "Whether nitroso impurity has been reassessed across all strengths sharing the same material and process",
+     "Whether the CAPA root cause response reaches beyond individual lots to the process and material level"
+    ]
    }
   },
   {
@@ -1763,6 +2072,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Coolant leak contaminates packaged product",
+    "summary": "FDA listed a Class I recall of Gas-X Extra Strength simethicone softgels from Haleon US Holdings LLC after chemical contamination with a diluted propylene glycol based coolant leaking from a machine during packaging.",
+    "implication": "A leak from the cooling system of packaging equipment contaminating product directly shows that a maintenance defect can produce harm at Class I level. OTC finished product sites should re-examine the inspection frequency for cooling systems on packaging equipment and their leak detection arrangements from a CGMP standpoint.",
+    "key_facts": [
+     "Reason: machine leakage during packaging - chemical contamination with a diluted propylene glycol based coolant",
+     "Class: Class I",
+     "Product: Gas-X Extra Strength, simethicone 125 mg softgels, in packs of 120 and 72",
+     "Firm: Haleon US Holdings LLC"
+    ],
+    "checks": [
+     "Periodic inspection and leak detection procedures for cooling and lubrication systems on packaging equipment",
+     "The link between equipment maintenance history records and product contamination risk assessment"
+    ]
    }
   },
   {
@@ -1880,6 +2204,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Microbial contamination in a sanitizer spray",
+    "summary": "FDA listed a Class II recall of Zep Alcohol Sanitizer Spray from Zep Inc for microbial contamination of sterile products.",
+    "implication": "Microbial contamination in the alcohol sanitizing product itself shows that a sanitizing agent can become a contamination route into a sterile manufacturing environment. Firms should re-examine the microbial limit specification for alcohols and disinfectants used to sanitize the manufacturing environment and the testing done on receipt.",
+    "key_facts": [
+     "Reason: microbial contamination of sterile products",
+     "Class: Class II",
+     "Product: Zep Alcohol Sanitizer Spray, ethanol 70%, 55 gallon drums",
+     "Firm: Zep Inc"
+    ],
+    "checks": [
+     "Whether microbial limit testing is performed when purchasing and receiving environmental disinfectants such as alcohol and isopropyl alcohol",
+     "The quality qualification system for suppliers of disinfectants used in aseptic manufacturing areas"
+    ]
    }
   },
   {
@@ -1993,6 +2332,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Low dissolution at the 24-hour timepoint",
+    "summary": "FDA listed a Class II recall of Niacin Extended-Release Tablets from Golden State Medical Supply Inc. after a lot was out of specification, low, for stage 3 dissolution at the 24-hour timepoint during 12-month long-term stability testing.",
+    "implication": "Dissolution falling below specification in long-term stability testing goes directly to loss of therapeutic effect and is therefore grounds for a Class II recall. Extended-release forms carry a risk that the dissolution profile drifts outside the criteria over the stability period, so the acceptance criterion at the 24-hour timepoint and the out-of-specification response procedure should be reviewed.",
+    "key_facts": [
+     "Reason: 12-month long-term stability testing - out of specification, low, for stage 3 dissolution at the 24-hour timepoint",
+     "Class: Class II",
+     "Product: NIACIN EXTENDED-RELEASE TABLETS, USP, 1,000 mg, 90 tablets",
+     "Firm: Golden State Medical Supply Inc."
+    ],
+    "checks": [
+     "Dissolution specification for extended-release forms in stability testing and the out-of-specification handling procedure",
+     "Criteria and decision-making for market action when an out-of-specification result arises at an intermediate stability timepoint"
+    ]
    }
   },
   {
@@ -2106,6 +2460,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Dissolution failure at the ninth month",
+    "summary": "FDA listed a Class II recall of Minocycline Hydrochloride Extended-Release Tablets from Ascend Laboratories after an out-of-specification dissolution result was observed during stability testing in the ninth month.",
+    "implication": "A dissolution failure at the ninth month for an extended-release antibiotic underlines the need to track the dissolution profile closely across the whole shelf life. Once such a result is confirmed, the speed of the decision on market action is what matters for patient safety and for the regulatory response.",
+    "key_facts": [
+     "Reason: out-of-specification dissolution result during stability testing in the ninth month",
+     "Class: Class II",
+     "Product: Minocycline Hydrochloride Extended-Release Tablets, USP, 115 mg, 30-count bottles",
+     "Firm: Ascend Laboratories, LLC"
+    ],
+    "checks": [
+     "Monitoring of dissolution trends at intermediate stability timepoints for extended-release antibiotics and the out-of-specification response procedure",
+     "Adequacy of the deadline for deciding on market action and of the regulatory reporting procedure"
+    ]
    }
   },
   {
@@ -2218,6 +2587,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Particles inside inhalation ampoules",
+    "summary": "FDA listed a Class II recall of Budesonide Inhalation Suspension from SUN PHARMACEUTICAL INDUSTRIES INC after black and brown specks and particles were found within the ampoule solution.",
+    "implication": "Foreign matter confirmed through a product quality complaint in a sterile inhalation ampoule exposes weaknesses in the aseptic filling and sealing process and in the particulate inspection arrangements. For a dosage form such as an inhalation suspension, where coloured particulate is hard to see, the suitability of the particulate inspection methodology needs re-examining.",
+    "key_facts": [
+     "Reason: presence of a foreign substance - black and brown specks and particles within the ampoule solution, raised by a product quality complaint",
+     "Class: Class II",
+     "Product: Budesonide Inhalation Suspension, 1 mg/2 mL, 30 single-dose ampoules",
+     "Firm: SUN PHARMACEUTICAL INDUSTRIES INC"
+    ],
+    "checks": [
+     "Suitability and sensitivity of the particulate inspection methodology for coloured inhalation suspensions",
+     "Procedures managing particulate risk in aseptic ampoule filling and sealing"
+    ]
    }
   },
   {
@@ -2326,6 +2710,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Microbial contamination in a nasal spray",
+    "summary": "FDA listed a recall of Saline Nasal Spray from BEEKEEPER'S NATURALS USA INC. for microbial contamination of a non-sterile product. The recall class has not yet been assigned.",
+    "implication": "Microbial contamination confirmed in a non-sterile OTC nasal spray shows that non-sterile preparations applied to the nose are also held strictly to microbial limit control and contamination prevention. Sites making non-sterile liquids for nasal, oral or topical use should review the basis on which the microbial limit specification was set and their microbial control strategy.",
+    "key_facts": [
+     "Reason: microbial contamination of non-sterile products",
+     "Class: not yet classified",
+     "Product: BEEKEEPER'S NATURALS Saline Nasal Spray containing propolis and xylitol",
+     "Firm: BEEKEEPER'S NATURALS USA INC."
+    ],
+    "checks": [
+     "Whether the microbial limit specification for non-sterile nasal, oral and topical liquids is justified",
+     "The system preventing microbial contamination from the manufacturing environment, materials and packaging of non-sterile preparations"
+    ]
    }
   }
  ]

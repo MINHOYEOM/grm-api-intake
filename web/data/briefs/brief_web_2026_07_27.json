@@ -69,7 +69,14 @@
     },
     "summary": "ISPE 가 ISA-95 시스템 계층 구성, NTP 시간 동기화, 인터페이스 밸리데이션 범위가 규제 조사에서 데이터 신뢰성을 좌우한다는 내용의 기고를 공개했다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "A nitrosamine impurity in tramadol preparations pulls products from five Korean firms into recall",
+    "MFDS imposes a KRW 227,850,000 surcharge after certificates of analysis were recorded as passing before testing was complete",
+    "Italy's AIFA declares GMP non-compliance at Avlab over critical and structural deficiencies in the aseptic compounding quality system"
+   ]
+  }
  },
  "cards": [
   {
@@ -195,6 +202,20 @@
      ]
     },
     "administrative_risks": "시정이 지연되거나 불충분하면 FDA가 해당 실사를 OAI로 분류하고 Warning Letter를 발행하거나 후속 재실사와 추가 규제조치를 요구할 수 있다. 무균보증 및 오염관리 결함이 지속되면 제품 관련 조치와 제조 제한이 확대될 수 있으며, 중대한 미시정 상태가 계속되면 injunction 또는 consent decree 같은 사법적 조치로도 이어질 가능성이 있다. 미국 내 시설이므로 Import Alert는 적용 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a sterile site",
+    "summary": "FDA inspected the sterile site of Bausch and Lomb Incorporated on 20 March 2026 and issued a Form 483, with the record published in the FOIA reading room in July 2026.",
+    "implication": "An FDA on-site inspection of a sterile site leading to a Form 483 shows surveillance of aseptic processing being maintained. Sites taking contract manufacture or supply from a facility of the same type should make the site's response to the Form 483 an item in supplier management.",
+    "key_facts": [
+     "Facility type: sterile drug manufacturer",
+     "Inspected 20 March 2026, published 24 July 2026",
+     "Three observations - inadequate investigation of adverse event complaints and no field alert report, Grade A aseptic operations, and a procedure for missing receipt documents not followed"
+    ],
+    "checks": [
+     "Confirm the FDA inspection history of sterile finished product suppliers",
+     "The procedure reflecting issuance of a Form 483 in supplier assessment"
+    ]
    }
   },
   {
@@ -371,6 +392,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Aseptic manipulation in ISO 5",
+    "summary": "FDA inspected the sterile products facility at Lt Col Luke Weather Jr Veterans Affairs Medical Center on 4 June 2026 and observed aseptic manipulations carried out while the movement of first air in the ISO 5 area was blocked or disrupted.",
+    "implication": "Whether operator movement and equipment placement obstruct first air during aseptic work has become an object of observation. Sites running aseptic areas should check, against the actual operations, that operator movements and material placement do not block unidirectional airflow.",
+    "key_facts": [
+     "Observation: aseptic manipulations with the movement of first air in the ISO 5 area blocked or disrupted",
+     "Facility type: producer of sterile drug products",
+     "Inspected 4 June 2026, published 23 July 2026"
+    ],
+    "checks": [
+     "Observe movements for obstruction of first air in the ISO 5 area",
+     "Qualification and requalification records for operators performing aseptic manipulations"
+    ]
    }
   },
   {
@@ -503,6 +538,20 @@
      ]
     },
     "administrative_risks": "시정조치가 불충분하거나 효과성이 입증되지 않으면 OAI 분류, Warning Letter 및 후속 재실사가 가능하며, 해외 제조소라는 점과 원문에 기재된 기존 억류·입국 거부 이력을 고려할 때 Import Alert의 유지·확대와 미국 반입 제한이 지속될 수 있다. 반복적 미생물·데이터 무결성·포장통제 결함이 해소되지 않으면 리콜 확대나 추가 집행조치의 근거가 될 수 있다."
+   },
+   "en": {
+    "title_issue": "Form 483 at an API and homeopathic site",
+    "summary": "FDA inspected the active ingredient and homeopathic finished product site of A. Nelson & Co. Ltd. on 19 September 2025 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Sites handling active ingredients and finished products together are within the scope of FDA inspection. Sites running both activities should confirm that the boundary between the two quality systems and the criteria for managing across them are clear.",
+    "key_facts": [
+     "Facility type: API and homeopathic drug product manufacturer",
+     "Inspected 19 September 2025, published 21 July 2026",
+     "Four observations - no conclusion in an out-of-specification investigation, unauthorised destruction of CGMP records, and extension of an expiry date with no stability data"
+    ],
+    "checks": [
+     "Documentation of the quality system boundary at a combined API and finished product site",
+     "Periodic review of the inspection history of overseas material suppliers"
+    ]
    }
   },
   {
@@ -648,6 +697,20 @@
      ]
     },
     "administrative_risks": "불충분한 회신이나 CAPA 미이행 시 OAI 분류, 후속 재실사 및 Warning Letter로 이어질 수 있다. 해외 무균 제조소에서 데이터 무결성과 오염통제 결함이 해소되지 않으면 Import Alert에 따른 미국 수입 제한이나 승인 심사 지연 등 추가 행정조치 가능성이 커진다."
+   },
+   "en": {
+    "title_issue": "Sterile site Form 483 published",
+    "summary": "The Form 483 FDA issued after inspecting the sterile site of Symbiosis Pharmaceutical Services Limited on 13 June 2023 was published in the FOIA reading room in July 2026.",
+    "implication": "There is a considerable gap between the inspection and its publication, so a Form 483 history cannot be judged from the latest published records alone. Firms using overseas sterile contract sites should requery supplier history periodically, allowing for past inspections surfacing late.",
+    "key_facts": [
+     "Facility type: sterile drug manufacturer",
+     "Inspected 13 June 2023, published 21 July 2026",
+     "Six observations - batch records not written contemporaneously, GMP documents discarded in the shredding bin, and retain samples not held"
+    ],
+    "checks": [
+     "The interval for requerying the inspection history of contract sterile sites",
+     "The criterion for refreshing the currency of supplier assessment material"
+    ]
    }
   },
   {
@@ -773,6 +836,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Production and process controls inadequate",
+    "summary": "FDA issued a warning letter to Island Kinetics, Inc. d.b.a. CoValence Laboratories for failing to establish adequate procedures for production and process control.",
+    "implication": "The CGMP test is not whether a production and process control procedure exists but whether it is designed to actually assure the product quality attributes. Sites should check that their process control procedures are designed against specification attributes such as identity, strength and purity.",
+    "key_facts": [
+     "Finding: no written procedures for production and process control designed to assure the identity, strength, quality and purity the drug products purport to possess (21 CFR 211.100(a))",
+     "Issued: Center for Drug Evaluation and Research (CDER), 16 July 2026",
+     "Published: 21 July 2026"
+    ],
+    "checks": [
+     "The link between production and process control procedures and the finished product specification attributes",
+     "Whether the basis for setting the process control limits is documented"
+    ]
    }
   },
   {
@@ -897,6 +974,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality unit responsibility not exercised",
+    "summary": "FDA issued a warning letter to BioMylz Pvt. Ltd. because the quality control unit failed to exercise its responsibility to ensure compliance with CGMP and conformance to specifications.",
+    "implication": "Whether the quality unit holds authority and actually exercises it is treated as a higher-order finding than any individual process defect. Sites should check that there are records of the quality unit actually exercising authority, such as placing product on hold or opening an investigation.",
+    "key_facts": [
+     "Finding: the quality control unit failed to exercise its responsibility to ensure products are made in compliance with CGMP and meet specifications for identity, strength, quality and purity (21 CFR 211.22)",
+     "Issued: Center for Drug Evaluation and Research (CDER), 13 July 2026",
+     "Published: 21 July 2026"
+    ],
+    "checks": [
+     "Whether records exist of the quality unit exercising its authority",
+     "Organisational and procedural provisions on the independence of the quality unit"
+    ]
    }
   },
   {
@@ -1009,6 +1100,20 @@
      ]
     },
     "administrative_risks": "반복된 세척 및 전산통제 결함과 데이터 무결성 우려가 충분히 시정되지 않으면 FDA가 후속 실사에서 OAI로 분류하거나 Warning Letter를 발행할 수 있으며, 지속적인 미시정은 재실사와 추가 집행조치로 이어질 수 있다. 미국 내 시설이므로 Import Alert는 적용 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a contract manufacturer",
+    "summary": "FDA inspected the contract manufacturing site Cerovene Inc. on 23 March 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Contract manufacturers continue to receive Form 483s at FDA inspection. Firms that place manufacture with a contract organisation need a procedure that assesses, as the contract giver's own responsibility, how the contractor's inspection outcome affects the quality of the contracted product.",
+    "key_facts": [
+     "Facility type: contract drug manufacturer",
+     "Inspected 23 March 2026, published 14 July 2026",
+     "Two observations - residue on equipment marked as cleaned, a repeat observation, and expired standard stock solutions held in storage"
+    ],
+    "checks": [
+     "Whether the quality agreement requires notification of contract site inspection outcomes",
+     "The procedure for notifying changes and corrective actions at the contract site"
+    ]
    }
   },
   {
@@ -1087,6 +1192,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API site declared GMP non-compliant",
+    "summary": "The Austrian competent authority issued a GMP non-compliance report for Sichuan New Hawk Biotechnology Co. Ltd. in China, covering active substance manufacturing activities.",
+    "implication": "A non-compliance determination arrived immediately at a first inspection for new registration, which shows how much rests on confirming the GMP maturity of a new material supplier. Firms introducing a diosmin material for the first time are safer not approving the supplier on a desk assessment alone.",
+    "key_facts": [
+     "Non-compliant scope: manufacturing of active substance only",
+     "Issued by: Austria as national competent authority, dated July 2026",
+     "Background: the first on-site GMP inspection of diosmin active substance manufacture, carried out in April 2026"
+    ],
+    "checks": [
+     "The requirement for an on-site inspection when approving a new material supplier",
+     "The procedure for searching the European non-compliance history of a material supplier"
+    ]
    }
   },
   {
@@ -1258,6 +1377,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 불충분하거나 반복 결함이 지속되면 FDA가 OAI로 분류하고 후속 실사 및 추가 Warning Letter를 진행할 수 있다. 프랑스 소재 해외 제조소이므로 미국 수입품에 Import Alert가 적용되거나 신규 신청·변경승인의 심사가 지연될 수 있으며, 중대한 무균성 위험이 해소되지 않으면 제품 회수와 법적 집행조치로 이어질 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a French sterile site",
+    "summary": "FDA inspected the sterile site of Excel Vision in France on 22 January 2026 and issued a Form 483, with the record published in May 2026.",
+    "implication": "European sterile sites are equally within the scope of FDA on-site inspection. Firms importing European sterile finished products can judge supply stability better by checking FDA inspection outcomes alongside the EU GMP certificate.",
+    "key_facts": [
+     "Facility type: sterile drug manufacturer",
+     "Inspected 22 January 2026, published 15 May 2026",
+     "Ten observations - a sterility failure closed as customer handling, cleanroom materials that cannot be wetted, and inadequate smoke studies, a repeat observation"
+    ],
+    "checks": [
+     "Check both the FDA and EU inspection outcomes for European sterile suppliers",
+     "Update the quality history register for imported finished product suppliers"
+    ]
    }
   },
   {
@@ -1395,6 +1528,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 무균성 보증·데이터 무결성·품질시스템 결함에 대한 CAPA와 소급평가가 불충분하면 OAI 분류, Warning Letter, 후속 재실사 및 미국 내 제품 승인·공급에 대한 규제 지연이 발생할 수 있다. 해외 제조소라는 점에서 결함이 지속되면 Import Alert와 수입거부로 확대될 가능성이 있으며, 반복적이거나 중대한 미시정 상태에서는 추가 집행조치도 가능하다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a Chinese API site",
+    "summary": "FDA inspected the drug substance site of Bio-Thera Solutions, Ltd. in China on 17 January 2025 and issued a Form 483, with the record published in May 2026.",
+    "implication": "FDA inspection outcomes for Chinese active ingredient sites continue to be published. The same site also appears in an EU GMP non-compliance report this week, so firms using this material should reflect in supplier assessment that determinations can diverge between regulators.",
+    "key_facts": [
+     "Facility type: drug substance manufacturer",
+     "Inspected 17 January 2025, published 6 May 2026",
+     "Five observations - sterilised materials handled with non-sterile tools, first air blocked, and audit trails not reviewed by quality assurance"
+    ],
+    "checks": [
+     "Compare the inspection determinations made by different authorities on the same site",
+     "Review the need for a second source of the material"
+    ]
    }
   },
   {
@@ -1560,6 +1707,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 CAPA가 근본원인·유통 배치 영향·무균성 보증 및 데이터 완전성 문제를 충분히 해소하지 못하면 OAI 분류, Warning Letter, 수입거부 또는 Import Alert, 후속 재실사와 추가 규제조치로 이어질 수 있다."
+   },
+   "en": {
+    "title_issue": "Observations at an Indian sterile site",
+    "summary": "FDA inspected the sterile site of Somerset Therapeutics Private Limited in India on 21 February 2025 and issued a Form 483, with the record published in May 2026.",
+    "implication": "Indian sterile finished product sites keep drawing observations at FDA inspection. Firms importing finished or semi-finished product from Indian sterile sites should reflect the inspection history relating to sterility assurance in their supplier risk grading.",
+    "key_facts": [
+     "Facility type: sterile drug manufacturer",
+     "Inspected 21 February 2025, published 6 May 2026",
+     "Nine observations - no field alert report after contamination in an aseptic process simulation, smoke studies under static conditions, and 17 interrupted active air sampling runs not reviewed"
+    ],
+    "checks": [
+     "Recalculate the risk grading of Indian sterile suppliers",
+     "Strengthen the supplier audit items relating to sterility assurance"
+    ]
    }
   },
   {
@@ -1630,7 +1791,21 @@
      "official": "pending"
     }
    },
-   "merged_noun": "건"
+   "merged_noun": "건",
+   "en": {
+    "title_issue": "Multiple 483 records published",
+    "summary": "Six Form 483 inspection records were published in the FDA OII FOIA electronic reading room. The original PDFs are available but the text of the individual observations could not be captured automatically, so only the facility and inspection date list is set out.",
+    "implication": "Publication of inspection records whose observation text could not be captured is not in itself a signal to act. Firms should check whether any of their supply chain facilities appear on the list and, if so, read the original PDF directly.",
+    "key_facts": [
+     "Records published: six, with observation text not captured automatically, though the original PDFs are available",
+     "Representative facility: Allergan Pharmaceuticals Ireland Unlimited (FEI 3002806285), with five others",
+     "Source: FDA OII FOIA electronic reading room"
+    ],
+    "checks": [
+     "Check whether any supply chain or sourcing facility appears on the list",
+     "Read the original FDA FOIA PDF directly where one does"
+    ]
+   }
   },
   {
    "id": "fda483-192222",
@@ -1778,6 +1953,20 @@
      ]
     },
     "administrative_risks": "시정조치가 불충분하거나 효과가 입증되지 않으면 FDA가 Warning Letter 발행, OAI 분류, 후속 재실사와 추가 집행조치를 검토할 수 있다. 데이터 무결성과 교차오염 통제가 계속 미흡하면 제품 품질 결정의 신뢰성에 대한 규제 심사가 강화될 수 있으나, 미국 내 시설이므로 Import Alert는 직접적인 승격 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Observations at a drug substance site",
+    "summary": "FDA inspected the drug substance site of Fujifilm Diosynth Biotechnologies Texas, LLC in the US on 11 March 2025 and issued a Form 483, with the record published in April 2026.",
+    "implication": "Contract development and manufacturing sites for drug substance are within the scope of FDA inspection. Firms that outsource drug substance production need a system linking the contract site's inspection outcome to their own process and quality change management.",
+    "key_facts": [
+     "Facility type: drug substance manufacturer",
+     "Inspected 11 March 2025, published 29 April 2026",
+     "Seven observations - no segregation of multi-product areas, test methods not verified, and stability testing windows exceeded by up to 107 days"
+    ],
+    "checks": [
+     "The route by which drug substance contract site inspection outcomes are received",
+     "The criteria for notification of process changes at the contract drug substance site"
+    ]
    }
   },
   {
@@ -1901,6 +2090,20 @@
      ]
     },
     "administrative_risks": "불만조사와 무균성 보증 결함을 기한 내 충분히 시정하지 못하면 FDA가 OAI로 분류하고 Warning Letter를 발행하거나 후속 재실사를 실시할 수 있다. 해외 제조소인 만큼 미국 수입 제품에 Import Alert가 적용될 수 있으며, 문제가 지속되면 제품 회수나 동의명령을 포함한 추가 집행조치로 이어질 가능성이 있다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a French site",
+    "summary": "FDA inspected the Excel Vision site in France on 19 November 2024 and issued a Form 483, with the record published in April 2026.",
+    "implication": "Form 483 records from different periods are being published in succession for the same firm, which leaves room to consider that these may not be isolated findings. For a supplier with a repeated inspection history, the effectiveness of the corrective action is worth bringing within the scope of what is checked.",
+    "key_facts": [
+     "Facility type: drug manufacturer",
+     "Inspected 19 November 2024, published 28 April 2026",
+     "Three observations - disinfection not validated for effectiveness against moulds, and no second person review of environmental monitoring"
+    ],
+    "checks": [
+     "Pull together the repeated inspection history for the same supplier",
+     "Confirm whether the earlier observations have been closed out"
+    ]
    }
   },
   {
@@ -2032,6 +2235,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 CAPA와 소급 영향평가가 불충분하면 OAI 분류, 후속 재실사 및 Warning Letter로 이어질 수 있다. 이 시설은 해외 제조소이므로 결함이 지속되거나 제품 품질 보증이 입증되지 않으면 Import Alert와 미국 시장 반입 제한으로 확대될 가능성이 있다."
+   },
+   "en": {
+    "title_issue": "Process control and integrity testing",
+    "summary": "FDA inspected the drug substance site of Lonza AG in Switzerland in October 2025 and issued four observations. A shelf life different from the registered dossier was applied to process validation batches, the integrity test procedure conflicted with the supplier's recommendation, and a critical process parameter deviation was found alongside an assay out-of-specification result.",
+    "implication": "Major material and drug substance suppliers are also drawing observations at FDA inspection. For a material with heavy single-source dependence, an alternative source is worth reviewing against the possibility that an inspection outcome interrupts supply.",
+    "key_facts": [
+     "A value for shelf life different from the registered dossier was applied to the process performance qualification batches and to batches made after them",
+     "The integrity test procedure does not match the supplier recommendation or the manufacturing execution system instruction, with a hold step omitted",
+     "A critical process parameter deviation together with an out-of-specification and borderline release assay result, and critical materials replaced only on failure"
+    ],
+    "checks": [
+     "The position on securing alternative sources for single-sourced materials",
+     "The interval for monitoring inspection outcomes at key material suppliers"
+    ]
    }
   },
   {
@@ -2112,6 +2329,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality system defects in aseptic compounding",
+    "summary": "The Italian competent authority AIFA issued a GMP non-compliance report for Avlab S.r.l., with aseptic compounding and batch certification among the activities covered.",
+    "implication": "In aseptic compounding the determination was made on structural defects in the quality system as a whole rather than on individual deviations. Sites carrying out aseptic compounding and batch release need a self-inspection at quality system level, not just a response to individual findings.",
+    "key_facts": [
+     "Non-compliant scope: sterile products (aseptically prepared large and small volume liquids), batch certification, packaging, and quality control testing (biological)",
+     "Issued by: Italy as national competent authority, dated 23 July 2026",
+     "Background: AIFA inspected between 22 and 24 June 2026 and identified critical and structural deficiencies in the pharmaceutical quality system and in implementation of EU GMP for aseptic compounding"
+    ],
+    "checks": [
+     "Whether a quality system self-inspection covering aseptic compounding has been carried out",
+     "Confirm the sterility evidence underlying the batch certification procedure"
+    ]
    }
   },
   {
@@ -2192,6 +2423,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Three critical findings for an IMP site",
+    "summary": "The Portuguese competent authority issued a GMP non-compliance report for Technophage Investigacao E Desenvolvimento Em Biotecnologia S.A., covering investigational medicinal products for human use.",
+    "implication": "The same GMP standard applies to manufacture of investigational products as to commercial ones, and numerous critical findings were identified. Developers making investigational product themselves or under contract should be careful not to set the GMP bar lower before the commercial stage.",
+    "key_facts": [
+     "Inspection outcome: three critical, five major and two other findings identified",
+     "Non-compliant scope: aseptically prepared small volume liquids, batch certification, and biological medicinal products (lytic bacteriophages and recombinant proteins)",
+     "Issued by: Portugal as national competent authority, dated 13 July 2026, human investigational medicinal products"
+    ],
+    "checks": [
+     "Confirm the scope of GMP application to manufacture of investigational medicinal products",
+     "Review the inspection history of contract sites making investigational product"
+    ]
    }
   },
   {
@@ -2276,6 +2521,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Unannounced inspection after recalls",
+    "summary": "MHRA issued a GMP non-compliance report for Geno Pharmaceuticals Private Limited in India, the inspection having been triggered by three recalls of product supplied to the UK market.",
+    "implication": "Repeated market recalls lead to an unannounced inspection with no prior notice, and its outcome can run through to a non-compliance determination. Firms should bear in mind that repeated recalls in the same product family can raise the intensity of the regulator's follow-up.",
+    "key_facts": [
+     "Background: an unannounced inspection carried out from 15 to 23 June 2026",
+     "Trigger: three Class II recalls of medicines supplied to the UK market",
+     "Non-compliant scope: non-sterile products (hard capsules, tablets), primary and secondary packaging, and quality control testing (non-sterile microbiology and physicochemical)"
+    ],
+    "checks": [
+     "Whether the scope of root cause investigation widens when recalls recur",
+     "The state of readiness of documents for an unannounced inspection"
+    ]
    }
   },
   {
@@ -2356,6 +2615,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Biosimilar finished product non-compliance",
+    "summary": "The French competent authority issued a GMP non-compliance report for Bio-Thera Solutions Ltd. in China, with the non-compliant scope limited to finished product manufacturing activities for four specified products.",
+    "implication": "A non-compliance determination can be limited to a specific product family rather than the whole site, so the scope of the impact has to be checked product by product. Firms importing biosimilar finished product from this site should first compare their own products against the scope of the determination.",
+    "key_facts": [
+     "Non-compliant scope: finished product manufacturing activities for four products including Usymro (ustekinumab) 45mg and 90mg injection and 130mg concentrate for infusion",
+     "Related activities: aseptically prepared small volume liquids, biotechnology products, and quality control testing (sterile, non-sterile, physicochemical and biological)",
+     "Issued by: France as national competent authority, dated 12 June 2026"
+    ],
+    "checks": [
+     "Compare the scope of the non-compliance determination against the products imported",
+     "Confirm the GMP status of the biologics contract site product by product"
+    ]
    }
   },
   {
@@ -2434,6 +2707,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Non-compliance at a follow-up inspection",
+    "summary": "The Maltese competent authority issued a GMP non-compliance report for Navesta Pharmaceuticals (Pvt) Ltd. in Sri Lanka, covering sterile solid dosage manufacture of beta-lactam antibiotics among other activities.",
+    "implication": "Failing to reach compliance even at a follow-up inspection after the first is a case where the effectiveness of the corrective action was not demonstrated. For products such as beta-lactam antibiotics that need dedicated facilities, it is worth confirming that a supplier has closed its corrective actions before renewing a contract.",
+    "key_facts": [
+     "Non-compliant scope: sterile products (solids and implants, beta-lactam antibiotics), packaging, and quality control testing (sterile, non-sterile, physicochemical and biological)",
+     "Background: an on-site follow-up inspection carried out after the very first inspection in January 2025 to assess EU GMP compliance",
+     "Issued by: Malta as national competent authority, dated 11 May 2026"
+    ],
+    "checks": [
+     "Confirm evidence of closure of supplier corrective actions before contract renewal",
+     "Confirm whether the requirement for dedicated beta-lactam facilities is met"
+    ]
    }
   },
   {
@@ -2514,6 +2801,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Critical findings in quality control testing",
+    "summary": "The Hungarian competent authority issued a GMP non-compliance report for Cadchem Laboratories Limited in India, with the non-compliant scope covering quality control testing.",
+    "implication": "A GMP non-compliance determination can be made on quality control testing alone, without any finding in the manufacturing process. Firms that outsource testing or rely on a supplier's certificate of analysis should separately confirm the evidence that the laboratory is suitable.",
+    "key_facts": [
+     "Non-compliant scope: quality control testing (microbiological sterility and non-sterility testing)",
+     "Inspection outcome: critical and major GMP deficiencies identified during an inspection carried out as part of the EDQM inspection programme",
+     "Issued by: Hungary as national competent authority, dated 4 May 2026"
+    ],
+    "checks": [
+     "Evidence of laboratory suitability where a supplier certificate is relied on",
+     "Whether microbiological testing is outsourced and how it is managed"
+    ]
    }
   },
   {
@@ -2572,6 +2873,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "In-use stability data requirements",
+    "summary": "EMA published revision 1 of the guideline on data requirements to support in-use stability claims for veterinary vaccines.",
+    "implication": "The requirements for the data supporting an in-use period claim after first opening are being reorganised. Firms holding multi-dose container products are worth checking against the original that the design of their in-use stability data does not conflict with the current requirements.",
+    "key_facts": [
+     "Subject: Guideline on data requirements to support in-use stability claims for veterinary vaccines - Revision 1",
+     "Issuing body: EMA, published 24 July 2026",
+     "Detail: the substance of the revision could not be established from the extract obtained, so the original needs to be read"
+    ],
+    "checks": [
+     "Review the design of in-use stability data for multi-dose products",
+     "Read the revised guideline and assess the impact"
+    ]
    }
   },
   {
@@ -2630,6 +2945,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "July CHMP meeting outcome",
+    "summary": "EMA published the highlights of the Committee for Medicinal Products for Human Use meeting held from 20 to 23 July 2026, at which 12 new medicines were recommended for approval.",
+    "implication": "The regular committee meeting outcome is a reference point for tracking European approval trends. Firms preparing a European approval or tracking competitor products are worth reading the list of recommended products in the original and comparing it against their own pipeline.",
+    "key_facts": [
+     "Subject: meeting highlights from the Committee for Medicinal Products for Human Use, 20 to 23 July 2026",
+     "Outcome: 12 new medicines recommended for approval",
+     "Issuing body: EMA, published 24 July 2026"
+    ],
+    "checks": [
+     "Compare the list of recommended products against the firm's own pipeline",
+     "A regular system for monitoring European approval trends"
+    ]
    }
   },
   {
@@ -2708,6 +3037,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Non-sterile solid dosage non-compliance",
+    "summary": "The Maltese competent authority issued a GMP non-compliance report for Zenzi Pharmaceutical Industries Private Limited in India, covering non-sterile solid dosage manufacture, packaging and quality control testing.",
+    "implication": "Sites making ordinary solid dosage forms such as tablets and capsules can also be found non-compliant at the entry assessment for the EU. Solid dosage sites preparing to export to Europe are better placed closing the gap against EU GMP requirements through a self gap analysis before applying.",
+    "key_facts": [
+     "Non-compliant scope: non-sterile products (hard capsules, tablets), primary and secondary packaging, and quality control testing (non-sterile microbiology and physicochemical)",
+     "Background: an on-site GMP inspection carried out following an application by the firm to assess compliance with the EU GMP guideline",
+     "Issued by: Malta as national competent authority, dated 5 May 2026"
+    ],
+    "checks": [
+     "Whether a self gap analysis against EU GMP requirements has been carried out",
+     "Confirm the scope of GMP control over the primary packaging process"
+    ]
    }
   },
   {
@@ -2821,6 +3164,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Donor screening not performed",
+    "summary": "FDA inspected Boston IVF Fertility Services at The Women's Hospital, LLC on 9 September 2025 and observed that donor screening through review of the relevant medical records for risk factors for communicable disease had not been carried out.",
+    "implication": "At facilities handling human cells and tissues, whether the documents supporting the donor eligibility determination were reviewed is being cited directly. Organisations handling human-derived materials should check that the evidence for donor eligibility determinations is actually reviewed and retained.",
+    "key_facts": [
+     "Observation: donor screening through review of relevant medical records for communicable disease risk factors was not performed",
+     "Facility type: HCT/P reproductive firm",
+     "Inspected 9 September 2025, published 24 July 2026"
+    ],
+    "checks": [
+     "Evidence of review of the records supporting donor eligibility determinations",
+     "Documentation of the screening procedure for communicable disease risk factors"
+    ]
    }
   },
   {
@@ -2967,6 +3324,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 CAPA의 범위·소급평가·효과 확인이 불충분하면 FDA가 실사를 OAI로 분류하고 Warning Letter 발부, 후속 재실사 및 규제 제출·출하 관련 추가 심사를 진행할 수 있다. 미국 내 소재 시설이므로 Import Alert보다는 국내 집행조치와 지속적 FDA 감독이 주된 행정 리스크다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a release testing facility",
+    "summary": "FDA inspected the release testing facility Clongen Laboratories, LLC on 17 June 2025 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Where release testing is outsourced, the laboratory itself becomes subject to inspection. Firms that outsource the testing underlying a release decision must manage the laboratory's inspection history and the reliability of its data as their own responsibility.",
+    "key_facts": [
+     "Facility type: release testing facility",
+     "Inspected 17 June 2025, published 24 July 2026",
+     "Six observations - no independent quality unit, equipment used past its calibration date, and no quality agreement with the contract giver"
+    ],
+    "checks": [
+     "The procedure for confirming the inspection history of a contract laboratory",
+     "The method for verifying the reliability of outsourced release test data"
+    ]
    }
   },
   {
@@ -3120,6 +3491,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Aseptic process validation inadequate",
+    "summary": "FDA inspected the compounding facility Sincerus Florida, LLC on 29 May 2026 and observed that the procedures preventing microbiological contamination of products purporting to be sterile did not include adequate validation of the aseptic process.",
+    "implication": "For a product purporting to be sterile the test is not whether a contamination prevention procedure exists but whether it is underpinned by aseptic process validation. Sites handling sterile products should compare the written procedure against the actual scope of the validation.",
+    "key_facts": [
+     "Observation: procedures preventing microbiological contamination of products purporting to be sterile did not include adequate validation of the aseptic process",
+     "Facility type: outsourcing facility",
+     "Inspected 29 May 2026, published 22 July 2026"
+    ],
+    "checks": [
+     "Whether the scope of aseptic process validation matches what the procedure states",
+     "Whether media fill conditions cover the actual production conditions"
+    ]
    }
   },
   {
@@ -3237,6 +3622,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Maintenance of aseptic area equipment",
+    "summary": "FDA inspected the compounding facility Annovex Pharma Inc on 3 July 2026 and observed that the system for maintaining the equipment used to control aseptic conditions was inadequate.",
+    "implication": "In an aseptic area it is not only the environment but the maintenance records of the equipment that sustains it that come under citation. Sites running aseptic equipment should check that the preventive maintenance interval matches what was actually done.",
+    "key_facts": [
+     "Observation: the system for maintaining the equipment used to control aseptic conditions is inadequate",
+     "Facility type: outsourcing facility",
+     "Inspected 3 July 2026, published 22 July 2026"
+    ],
+    "checks": [
+     "Agreement between the preventive maintenance interval and the records for aseptic area equipment",
+     "The procedure for assessing the effect on sterility when equipment is found abnormal"
+    ]
    }
   },
   {
@@ -3355,6 +3754,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 CAPA의 범위·효과 검증이 불충분하면 OAI 분류, Warning Letter, 후속 재실사 및 미국 유입 제품에 대한 Import Alert 조치로 이어질 수 있다. 무균 관리와 봉쇄, 시설·장비 상태 및 시험법 신뢰성 결함이 지속되면 추가 규제조치의 근거가 강화될 수 있다."
+   },
+   "en": {
+    "title_issue": "Observations at a substance and product site",
+    "summary": "FDA inspected the drug substance and drug product site of Biotest AG in Germany on 20 June 2025 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Where drug substance and drug product are made on one site, an inspection assesses both areas together. Sites with the same structure should confirm that the quality handover point between substance and product is clearly separated in documents.",
+    "key_facts": [
+     "Facility type: drug substance and drug product manufacturer",
+     "Inspected 20 June 2025, published 22 July 2026",
+     "Two observations - rust, residue and floor cracks in the manufacturing facility, and a fibrinogen reference standard not calibrated against the international standard"
+    ],
+    "checks": [
+     "Documentation of the quality handover criteria between drug substance and drug product",
+     "Confirm the scope of cross-contamination control within a single site"
+    ]
    }
   },
   {
@@ -3459,6 +3872,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 문서관리 결함의 범위평가와 CAPA가 불충분하면 FDA가 실사를 OAI로 분류하고 Warning Letter를 발행하거나 후속 재실사를 실시할 수 있다. 이 시설은 해외 제조소이므로 지속적인 미시정이 확인될 경우 Import Alert 등 미국 시장 접근을 제한하는 조치로 이어질 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Form 483 at an Indian site",
+    "summary": "FDA inspected the TrueCare Biomedix site in India on 21 February 2025 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Inspection records for Indian sites are sometimes published more than a year after the event. Relying on the latest publications alone can miss the state of the site at the time of inspection, so it is better to manage the history by inspection date as well.",
+    "key_facts": [
+     "Facility type: manufacturer",
+     "Inspected 21 February 2025, published 21 July 2026",
+     "One observation - no signature or date of the person performing the work in a logbook, contrary to the firm's own good documentation practice procedure"
+    ],
+    "checks": [
+     "Managing supplier inspection history by inspection date",
+     "Stating the reference date on overseas site assessment material"
+    ]
    }
   },
   {
@@ -3552,6 +3979,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API quality unit responsibility not met",
+    "summary": "FDA issued a warning letter to the active ingredient site Almon Healthcare Private Limited because the quality unit failed to exercise its responsibility to ensure that the active ingredients and intermediates conform to CGMP.",
+    "implication": "At active ingredient sites too, substantive oversight by the quality unit is becoming the central axis of citations, just as at finished product sites. Firms assessing overseas material suppliers should make the extent of the quality unit's involvement at intermediate stage an audit item.",
+    "key_facts": [
+     "Finding: the quality unit failed to exercise its responsibility to ensure the active ingredients and intermediates made at the facility conform to CGMP",
+     "Issued: Center for Drug Evaluation and Research (CDER), 13 July 2026",
+     "Published: 21 July 2026"
+    ],
+    "checks": [
+     "The extent of the material supplier's quality unit involvement at intermediate stage",
+     "Items confirming quality unit authority during material supplier audits"
+    ]
    }
   },
   {
@@ -3651,6 +4092,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "CGMP deviations at an API site",
+    "summary": "FDA inspected the active ingredient site Shimoga Chemicals, identified CGMP deviations and issued a warning letter.",
+    "implication": "Warning letters issued on the same date to two Indian active ingredient sites show surveillance of the material supply chain continuing. Firms with a large share of Indian material are helped by pulling together the regulatory action history of their suppliers in one view.",
+    "key_facts": [
+     "Finding: CGMP deviations identified during the inspection, with the detail not established from the extract obtained",
+     "Issued: Center for Drug Evaluation and Research (CDER), 13 July 2026",
+     "Published: 21 July 2026"
+    ],
+    "checks": [
+     "A single review of the regulatory action history of Indian material suppliers",
+     "The prior assessment procedure when a material supplier changes"
+    ]
    }
   },
   {
@@ -3762,6 +4217,20 @@
      ]
     },
     "administrative_risks": "품질부서 절차의 광범위한 미준수와 시험 신뢰성 관련 결함을 기한 내 충분히 시정하지 않으면 FDA가 OAI로 분류하고 Warning Letter를 발행하거나 후속 재실사를 실시할 수 있다. 미국 내 소재 시설이므로 Import Alert 승격 경로는 해당하지 않으며, 지속적인 미시정은 추가 집행조치 위험을 높인다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a contract laboratory",
+    "summary": "FDA inspected the contract testing laboratory Charles River Laboratories, Inc. DBA Charles River, Endosafe on 27 March 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "A contract laboratory performing quality testing such as endotoxin received a Form 483 at inspection. Firms outsourcing that testing should review the effect of the laboratory's inspection outcome on the basis for their own release decisions.",
+    "key_facts": [
+     "Facility type: contract testing laboratory",
+     "Inspected 27 March 2026, published 15 July 2026",
+     "One observation - not sealed off from the adjacent construction area, with the dust exposure of the endotoxin laboratory not assessed"
+    ],
+    "checks": [
+     "Confirm the inspection history of the endotoxin testing contractor",
+     "The procedure reflecting outsourced test results in the release decision"
+    ]
    }
   },
   {
@@ -3862,6 +4331,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 시정조치가 불충분하면 FDA가 Warning Letter 발행, OAI 분류, 후속 재실사 등 국내 시설에 적용 가능한 조치를 검토할 수 있다. 반복되거나 미시정 상태가 지속되면 계약시험실이 산출한 시험 결과의 규제적 신뢰성에 대한 추가 심사로 이어질 수 있으며, 미국 내 시설이므로 Import Alert는 직접적인 승격 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a contract laboratory",
+    "summary": "FDA inspected the contract testing laboratory Atlantic Analytical Laboratories LLC on 17 March 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Several contract laboratories were published as receiving Form 483s in the same week, which confirms surveillance of the testing outsourcing area. Firms with a large share of outsourced testing find it efficient to review the inspection status of their whole contractor list at once.",
+    "key_facts": [
+     "Facility type: contract testing laboratory",
+     "Inspected 17 March 2026, published 15 July 2026",
+     "One observation - method verification for a compendial test method not completed"
+    ],
+    "checks": [
+     "A single review of the inspection status of the whole contract laboratory list",
+     "Review the quality responsibility clauses in testing contracts"
+    ]
    }
   },
   {
@@ -3994,6 +4477,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 시정조치가 원인 제거와 소급 영향평가를 충분히 입증하지 못하면 OAI 분류, Warning Letter, 후속 재실사 및 추가 집행조치로 이어질 수 있다. 시설이 해외 제조소인 경우에만 Import Alert 검토 가능성이 있으나, 원문에는 시설 소재 국가가 확인되지 않는다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a contract manufacturer",
+    "summary": "FDA inspected the contract manufacturer Tarmac Products, Inc on 6 February 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Form 483 issuance continues to be seen in the contract manufacturing area. Firms with products made under contract should look at whether they hold a contractual basis for the contract giver to see how the contractor is responding to an inspection.",
+    "key_facts": [
+     "Facility type: contract manufacturer",
+     "Inspected 6 February 2026, published 14 July 2026",
+     "Four observations - no identity testing of incoming materials, unqualified temperature control equipment, and most annual product reviews not prepared"
+    ],
+    "checks": [
+     "The clause in the quality agreement obliging the contractor to share inspection outcomes",
+     "The contract giver's routine review history for contract manufactured products"
+    ]
    }
   },
   {
@@ -4100,6 +4597,20 @@
      ]
     },
     "administrative_risks": "FDA가 과거 TM-0059 시험 결과의 신뢰성과 reference standard 적격성을 충분히 회복했다고 판단하지 못하면 OAI 분류, Warning Letter, 후속 자료 요구 및 재실사가 이어질 수 있다. 원문에서 실사 대상 시설의 소재국을 확인할 수 없으므로 Import Alert 가능성은 별도로 판단할 수 없으며, 반복되거나 미시정 상태가 지속되면 더 강한 집행조치의 위험이 커질 수 있다."
+   },
+   "en": {
+    "title_issue": "Observation at a viral vector laboratory",
+    "summary": "FDA inspected the viral vector testing laboratory 2seventy bio, Inc. on 20 March 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Testing facilities working with viral vectors are also within the scope of FDA inspection. Developers relying on external testing of gene and cell therapy materials should check the regulatory history of the laboratory in advance.",
+    "key_facts": [
+     "Facility type: viral vector testing lab",
+     "Inspected 20 March 2026, published 14 July 2026",
+     "One observation - inadequate qualification of the reference standard for the lentivirus titre assay, with three reports in conflict"
+    ],
+    "checks": [
+     "Qualification assessment records for the viral vector testing contractor",
+     "Whether an alternative laboratory is secured for specialised test attributes"
+    ]
    }
   },
   {
@@ -4238,6 +4749,20 @@
      ]
     },
     "administrative_risks": "반복된 HACCP 및 위생 결함을 적시에 시정하지 않거나 회신이 불충분하면 FDA가 해당 실사를 OAI로 분류하고 Warning Letter 발행, 후속 재실사, 제품 압류 또는 가처분 등 국내 식품시설에 적용 가능한 행정·법적 조치를 검토할 수 있다. 특히 반복 지적에 대한 근본원인 분석과 CAPA 효과 입증이 부족하면 규제 대응이 강화될 가능성이 있다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a manufacturer",
+    "summary": "FDA inspected the Juicer Connections, Inc. site on 8 September 2025 and issued a Form 483, with the record published in July 2026.",
+    "implication": "The scope of FDA Form 483 publication reaches well beyond typical drug manufacturing sites. When reviewing a supply chain it is more efficient to check the registered facility type of the site first and judge its relevance to the firm's own products from that.",
+    "key_facts": [
+     "Facility type: manufacturer",
+     "Inspected 8 September 2025, published 14 July 2026",
+     "Five observations - no validation of the pathogen reduction step in the HACCP plan, inadequate sanitation, and repeat observations"
+    ],
+    "checks": [
+     "Confirm the FDA registered facility type of supply chain sites",
+     "The criteria for filtering out inspection records of low relevance"
+    ]
    }
   },
   {
@@ -4358,6 +4883,20 @@
      ]
     },
     "administrative_risks": "불완전한 회신이나 시정 지연은 OAI 분류, Warning Letter, 후속 재실사 및 혈장채취 운영에 대한 추가 규제조치로 이어질 수 있다. 특히 donor eligibility 기록과 donor adverse event 조사 결함이 지속되면 시설의 품질시스템과 기록 신뢰성에 대한 FDA의 우려가 커질 수 있으며, 미국 내 시설이므로 Import Alert는 적용 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Observations at a plasma centre",
+    "summary": "FDA inspected the plasmapheresis centre Biomat USA Inc on 4 February 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Facilities at the collection stage of plasma materials are within the scope of regulatory inspection. Firms importing plasma-derived product materials need supply chain qualification that reaches the collection facility.",
+    "key_facts": [
+     "Facility type: plasmapheresis centre",
+     "Inspected 4 February 2026, published 14 July 2026",
+     "Three observations - total protein quantitation results not received, the collection procedure not followed, and inadequate investigation of donor adverse reactions"
+    ],
+    "checks": [
+     "The scope of qualification of plasma material collection facilities",
+     "Traceability records for the source plasma supply chain"
+    ]
    }
   },
   {
@@ -4457,6 +4996,20 @@
      ]
     },
     "administrative_risks": "서면 절차와 PV 외주업체 감독 결함을 기한 내 시정하지 못하거나 회신이 불충분하면 OAI 분류, Warning Letter, 후속 재실사 등으로 이어질 수 있다. 미국 내 업체이므로 Import Alert는 적용 경로가 아니며, 반복되거나 지속되는 미준수는 추가 행정조치 가능성을 높인다."
+   },
+   "en": {
+    "title_issue": "Form 483 issued to a licence holder",
+    "summary": "FDA inspected the abbreviated new drug application sponsor Milla Pharmaceuticals, Inc. on 12 March 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "It confirms that a licence holder that does no manufacturing itself is also subject to inspection. Firms that outsource all manufacture and hold only the licence should set out in documents the scope of their quality responsibility as licence holder.",
+    "key_facts": [
+     "Facility type: abbreviated new drug application sponsor",
+     "Inspected 12 March 2026, published 14 July 2026",
+     "One observation - no procedure for post-market adverse drug reaction reporting, with no qualification assessment of the pharmacovigilance vendor"
+    ],
+    "checks": [
+     "Documentation of the scope of the licence holder's quality responsibility",
+     "Records of quality oversight activity for fully outsourced products"
+    ]
    }
   },
   {
@@ -4537,6 +5090,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Critical findings at a veterinary site",
+    "summary": "The Spanish competent authority issued a GMP non-compliance report for Laboratorios Eurisko S.L., covering manufacture of oral liquids for veterinary use and batch certification.",
+    "implication": "Deficiencies were identified in one particular building within the same site and led to a non-compliance determination. Sites operating several buildings should check that the level of facility and environmental management is uniform across them.",
+    "key_facts": [
+     "Non-compliant scope: manufacture of non-sterile oral liquids, batch certification, primary and secondary packaging, and quality control testing (physicochemical)",
+     "Inspection outcome: critical and major deficiencies in EU GMP compliance identified in the authorised building",
+     "Issued by: Spain as national competent authority, dated 13 July 2026, veterinary medicinal products"
+    ],
+    "checks": [
+     "Confirm uniformity of facility management across buildings",
+     "Review the scope of GMP control over veterinary product lines"
+    ]
    }
   },
   {
@@ -4615,6 +5182,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sterile veterinary product non-compliance",
+    "summary": "The Dutch competent authority issued a GMP non-compliance report for Intervet Inc. in the US, covering sterile manufacture of immunological veterinary products and quality control testing.",
+    "implication": "A non-compliance determination came out of a routine inspection carried out jointly by several regulators. Sites inspected by more than one authority are better placed organising their inspection material to a common standard, since requirements can differ between authorities.",
+    "key_facts": [
+     "Non-compliant scope: aseptically prepared large volume liquids, freeze-dried products and small volume liquids, immunological products, and quality control testing (sterile, non-sterile, physicochemical and biological)",
+     "Background: a routine joint GMP inspection carried out by the Dutch inspectorate and the UK veterinary authority between 2 and 5 September 2025",
+     "Issued by: Netherlands as national competent authority, dated 19 May 2026, veterinary medicinal products"
+    ],
+    "checks": [
+     "Consistency of the material prepared for joint and multi-authority inspections",
+     "Confirm the evidence assuring sterility in the freeze-drying process"
+    ]
    }
   },
   {
@@ -4727,6 +5308,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 회신은 OAI 분류, Warning Letter, 후속 재실사와 추가 집행조치로 이어질 수 있다. 특히 유통 배치의 교차오염 가능성, 높은 중량 OOS 및 반복된 파손 불만에 대한 소급평가가 부실하면 제품 회수나 미국 내 법적 집행의 위험이 커질 수 있으나, 국내 소재 시설이므로 Import Alert는 직접적인 후속 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a compounding facility",
+    "summary": "FDA inspected the compounding facility Wells Pharmacy Inc on 9 April 2026 and issued a Form 483, with the record published in May 2026.",
+    "implication": "US outsourcing facilities are subject to Form 483s in the same way as ordinary manufacturing sites. There is no equivalent regime domestically, but sites running small-scale aseptic compounding can usefully refer to the same aseptic control expectations.",
+    "key_facts": [
+     "Facility type: outsourcing facility",
+     "Inspected 9 April 2026, published 8 May 2026",
+     "Two observations - inadequate cleaning validation for hazardous drugs, and no hardness specification set, with wide variation within the batch"
+    ],
+    "checks": [
+     "Compare the control standards applied to small-scale aseptic compounding",
+     "The documents evidencing sterility assurance at the compounding step"
+    ]
    }
   },
   {
@@ -4846,6 +5441,20 @@
      ]
     },
     "administrative_risks": "기한 내 회신이 없거나 CAPA와 소급평가가 불충분하면 FDA가 OAI로 분류하고 Warning Letter 발행, 후속 재실사, 제품 출하 및 신청 심사에 대한 규제상 제약을 검토할 수 있다. 데이터 무결성 및 무균성 보증 결함이 지속되면 더 강한 집행조치나 consent decree 위험도 커질 수 있으며, 미국 내 시설이므로 해외 제조소 대상 Import Alert 경로는 해당하지 않는다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a compounding facility",
+    "summary": "FDA inspected the compounding facility Staska Pharmaceuticals, Inc on 20 February 2026 and issued a Form 483, with the record published in May 2026.",
+    "implication": "Several Form 483s at compounding facilities were published in the same period, which confirms a concentration of inspection in this area. Organisations doing aseptic compounding work can use the pattern of these findings as reference material.",
+    "key_facts": [
+     "Facility type: outsourcing facility",
+     "Inspected 20 February 2026, published 8 May 2026",
+     "Three observations - retesting after an acceptable quality limit failure without investigation, no data integrity control on the chromatography system, and the particle probe oriented incorrectly"
+    ],
+    "checks": [
+     "The scope of environmental monitoring in aseptic compounding work",
+     "Control over when compounding batch records are written"
+    ]
    }
   },
   {
@@ -4965,6 +5574,20 @@
      ]
     },
     "administrative_risks": "무균공정, 반복 미립자 및 소독 검증 결함을 기한 내 충분히 시정하지 못하면 FDA가 OAI로 분류하고 Warning Letter 발행, 후속 재실사 또는 추가 집행조치를 검토할 수 있다. 결함이 지속되거나 환자 위해 가능성이 해소되지 않으면 제품 회수나 생산 제한, 법원 명령을 포함한 더 강한 조치로 확대될 수 있으며, 미국 내 시설이므로 Import Alert는 통상적인 직접 경로가 아니다."
+   },
+   "en": {
+    "title_issue": "Form 483 at a compounding facility",
+    "summary": "FDA inspected the compounding facility SCA Pharmaceuticals LLC on 13 March 2026 and issued a Form 483, with the record published in May 2026.",
+    "implication": "Facilities carrying out large-scale compounding are also drawing observations at inspection. It suggests that the greater the compounding volume, the more the completeness of batch-level quality records matters.",
+    "key_facts": [
+     "Facility type: outsourcing facility",
+     "Inspected 13 March 2026, published 8 May 2026",
+     "Three observations - around 46 ISO 5 excursions involving objectionable organisms, and around 110 foreign matter deviations with no root cause identified"
+    ],
+    "checks": [
+     "Completeness of batch-level records in large-scale compounding",
+     "Whether stability evidence is held for compounded products"
+    ]
    }
   },
   {
@@ -5096,6 +5719,20 @@
      ]
     },
     "administrative_risks": "시정조치가 불충분하거나 재발 방지 효과를 입증하지 못하면 OAI 분류, Warning Letter, 후속 재실사와 함께 해외 제조소 제품에 대한 Import Alert 및 미국 반입 제한으로 이어질 수 있다. 멸균보증 또는 유리 이물 위험이 해소되지 않으면 관련 배치의 추가 평가와 회수 등 시장조치 요구 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Observations at an Indian sterile site",
+    "summary": "FDA inspected the sterile site of Eugia Pharma Specialities Limited in India on 27 February 2026 and issued a Form 483, with the record published in April 2026.",
+    "implication": "Inspections of Indian sterile sites continue up to recent dates. Firms importing or considering importing finished product from this site are safer including confirmation of the inspection outcome in their pre-contract procedure.",
+    "key_facts": [
+     "Facility type: sterile pharmaceutical manufacturer",
+     "Inspected 27 February 2026, published 29 April 2026",
+     "Four observations - Grade A not maintained during aseptic connections, no media fill since July 2022, and an incomplete investigation into glass particulate"
+    ],
+    "checks": [
+     "The procedure for confirming inspection outcomes before contracting a new supplier",
+     "Quality risk assessment when importing sterile finished product"
+    ]
    }
   },
   {
@@ -5228,6 +5865,20 @@
      ]
     },
     "administrative_risks": "누락 보고의 보완과 절차 개선이 적시에 입증되지 않으면 FDA가 Warning Letter를 발부하거나 OAI 분류, 후속 실사 및 추가 자료 요구로 보고 체계를 재검증할 수 있다. 반복적인 시판후 보고 불이행은 해당 ANDA 보유자의 규제 준수 신뢰도를 낮출 수 있으며, 업체의 해외 소재 여부가 원문에 없어 Import Alert 가능성은 이 문서만으로 판단할 수 없다."
+   },
+   "en": {
+    "title_issue": "Form 483 to an own-label distributor",
+    "summary": "FDA inspected the own-label distribution and repackaging operation Misemer Pharmaceutical, Inc. on 23 February 2026 and issued a Form 483, with the record published in July 2026.",
+    "implication": "Operations at the repackaging and labelling stage, not only manufacturing, fall within the scope of inspection. Firms that repackage imported finished product or distribute it under their own label should be clear on the scope of their quality responsibility at the labelling and packaging stage.",
+    "key_facts": [
+     "Facility type: own label distributor, repackager and relabeler",
+     "Inspected 23 February 2026, published 14 July 2026",
+     "Four observations - 10 quarterly periodic adverse drug experience reports not submitted, annual reports late, and no post-market reporting procedure"
+    ],
+    "checks": [
+     "Whether quality control procedures exist for the repackaging and labelling stage",
+     "Management of original manufacturer information for own-label distributed products"
+    ]
    }
   },
   {
@@ -5399,6 +6050,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 중국 저장성 사오싱시 웨청구 리하이가 즈위안대로 중단 188-1(312366) 소재 Zhejiang Medicine Co., Ltd – Xinchang Pharmaceutical Factory – Changhai 사이트는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Zhejiang Medicine (Shaoxing city site).",
+    "implication": "Inspection outcomes for Chinese sites are published through the WHO prequalification system. Firms considering public procurement or supply to international organisations are worth bearing in mind that a WHOPIR can serve as reference material for supplier assessment.",
+    "key_facts": [
+     "Site: Zhejiang Medicine (Shaoxing city site)",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and 15 summarised sections are included"
+    ],
+    "checks": [
+     "Read the inspection conclusion from the WHOPIR",
+     "The scope of supplier assessment material for supply to international organisations"
+    ]
    }
   },
   {
@@ -5507,6 +6172,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 중국 톈진시 300462 신예9가 19번지 소재 Tianjin Tianyao Pharmaceuticals Co., Ltd 는 원료의약품(API)에 대한 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Tianjin Tianyao Pharmaceuticals Co., Ltd.",
+    "implication": "A WHOPIR provides the GMP inspection outcome of an individual site in published form. Firms taking material or finished product from this site can hold the report as reference material alongside their own audit.",
+    "key_facts": [
+     "Site: Tianjin Tianyao Pharmaceuticals Co., Ltd",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and six summarised sections are included"
+    ],
+    "checks": [
+     "Confirm whether any product is taken from the site",
+     "Obtain the WHOPIR and file it in the supplier record"
+    ]
    }
   },
   {
@@ -5582,6 +6261,20 @@
      }
     ],
     "outcome_ko": "접수되어 검토된 GMP 증빙에 근거할 때, WHO 실사를 갈음하여 서면평가(desk assessment)를 수행할 수 있는 것으로 판단됐다. 인도 구자라트주 아메다바드(382213) 사난드 탈루카 마토다 마을 인근 Sarkhej-Bavla NH 8A 도로변 제약 특별경제구역(Pharmaceutical SEZ) PHARMEZ 내 Plot No. 20 & 21, Senador Laboratories Private Limited 에 위치한 Senador (Matoda) 사이트는 WHO GMP 가이드라인을 허용 가능한 수준으로 준수하며 운영 중인 것으로 판단된다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Mylan (Matoda) based on a desk assessment.",
+    "implication": "WHO published a desk assessment for an Indian site of a large generic company, relying on another regulator's inspection evidence. Where several sites of the same company are used, results can differ by site, so site-level confirmation is needed.",
+    "key_facts": [
+     "Site: Mylan (Matoda)",
+     "Document type: WHO public inspection report",
+     "Detail: the desk assessment conclusion and two relied-upon inspections are included"
+    ],
+    "checks": [
+     "Managing inspection outcomes separately by site within the same company",
+     "Accuracy of the site identification information in supplier material"
+    ]
    }
   },
   {
@@ -5753,6 +6446,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 텔랑가나주 상가레디 지구 파탄체루 파샤밀라람 IDA 2단지 Plot No. 182~186, 192-A, 193~197 및 212/A·B·C·D(502 307) 소재 MSN Pharmachem Private Limited 는 원료의약품(API)에 대한 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for MSN Pharmachem.",
+    "implication": "WHO inspection outcomes for active ingredient sites are accumulating as public documents. Using published inspection reports as initial screening material in supplier assessment helps in allocating audit resources.",
+    "key_facts": [
+     "Site: MSN Pharmachem",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and 15 summarised sections are included"
+    ],
+    "checks": [
+     "Whether WHOPIRs are used for initial screening of material suppliers",
+     "Recording the source of supplier assessment material"
+    ]
    }
   },
   {
@@ -5854,6 +6561,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 탄자니아 다르에스살람 16106 Off-Mandela Road, Mabibo-External 소재 TMDA 품질관리시험실은 WHO 의약품 품질관리시험실 우수운영기준(Good Practices for Pharmaceutical Quality Control Laboratories) 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 시험실이 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "Quality control laboratory inspection",
+    "summary": "WHO published a public inspection report (WHOPIR) for TMDA-QCL, a quality control laboratory in Tanzania.",
+    "implication": "WHO inspection covers quality control laboratories as well as manufacturing sites. Firms outsourcing testing to overseas laboratories can use published inspection outcomes for laboratories as assessment evidence too.",
+    "key_facts": [
+     "Organisation: TMDA-QCL (Tanzania)",
+     "Document type: WHO public inspection report, covering a quality control laboratory",
+     "Detail: the conclusion and five summarised sections are included"
+    ],
+    "checks": [
+     "Confirm published inspection outcomes for overseas contract laboratories",
+     "The scope of evidence used to qualify a contract laboratory"
+    ]
    }
   },
   {
@@ -6039,6 +6760,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 마하라슈트라주 팔가르 베부르 마을 Survey No. 43-44(401404) 소재 Bliss GVS Pharma Limited 는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Bliss GVS Pharma Limited (Palghar).",
+    "implication": "Indian sites continue to be inspected under WHO prequalification. Firms with a large share of Indian suppliers are worth putting publication of a WHOPIR on their supplier monitoring list.",
+    "key_facts": [
+     "Site: Bliss GVS Pharma Limited (Palghar)",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and 17 summarised sections are included"
+    ],
+    "checks": [
+     "Monitor whether WHOPIRs are published for Indian suppliers",
+     "Tidy up the routes through which supplier inspection information is collected"
+    ]
    }
   },
   {
@@ -6210,6 +6945,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 마디아프라데시주 라이센 지구 만디딥 신공업단지 2단지 Plot No. 06(462046) 소재 Kaygee Laboratories Private Limited 는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 전체 보고서에 기재된 실사 중 관찰 결함은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Kaygee (Mandideep).",
+    "implication": "Publication of WHO inspection outcomes applies equally to smaller sites. Firms using small and medium overseas suppliers should know the route by which published inspection material can be found.",
+    "key_facts": [
+     "Site: Kaygee (Mandideep)",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and 15 summarised sections are included"
+    ],
+    "checks": [
+     "The route for finding published inspection material on small and medium overseas suppliers",
+     "Whether assessment criteria are differentiated by supplier size"
+    ]
    }
   },
   {
@@ -6381,6 +7130,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 이집트 알렉산드리아 뉴 보르그 엘 아랍시 제2공업지구 5번 22블록(21934) 소재 Pharco B International (2) for Chemicals(PBIC)는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Pharco B (PBIC).",
+    "implication": "WHO prequalification operates broadly across sites in many regions. Where local manufacture is being considered for entry into a new market, published inspection outcomes can serve as initial evidence.",
+    "key_facts": [
+     "Site: Pharco B (PBIC)",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and 15 summarised sections are included"
+    ],
+    "checks": [
+     "Confirm inspection material when considering local sites in a new market",
+     "Pull together the inspection history of candidate suppliers by region"
+    ]
    }
   },
   {
@@ -6456,6 +7219,20 @@
      }
     ],
     "outcome_ko": "접수되어 검토된 GMP 증빙에 근거할 때, WHO 현장실사를 갈음하는 서면평가(desk assessment)가 수용 가능한 것으로 판단됐다. 스페인 레온주 비야킬람브레(24193) 나바테헤라 산업단지 C/ La Vallina s/n 소재 Laboratorios León Farma S.A. 사이트는 WHO GMP 가이드라인을 허용 가능한 수준으로 준수하며 운영 중인 것으로 판단된다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Laboratorios Leon Farma based on a desk assessment.",
+    "implication": "European sites are also within the scope of WHO prequalification and their outcomes are published. This one is a desk assessment relying on another regulator's inspection evidence, and since an EU GMP certificate and a WHO assessment are separate documents it is more accurate to keep both in the supplier file.",
+    "key_facts": [
+     "Site: Laboratorios Leon Farma",
+     "Document type: WHO public inspection report",
+     "Detail: the desk assessment conclusion and two relied-upon inspections are included"
+    ],
+    "checks": [
+     "Keeping the EU GMP certificate and the WHOPIR separate in the supplier file",
+     "Confirm the validity period of supplier certification and inspection material"
+    ]
    }
   },
   {
@@ -6627,6 +7404,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 중국 저장성 사오싱시 웨청구 리하이가 즈위안대로 중단 188-1(312366) 소재 Zhejiang Medicine Co., Ltd – Xinchang Pharmaceutical Factory – Changhai 사이트는 WHO GMP 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 실사 중 관찰돼 전체 보고서와 WHOPIR 에 기재된 모든 비준수 사항은 WHOPIR 공개 이전에 제조업체가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) for Zhejiang Keming Biopharmaceuticals.",
+    "implication": "WHO inspection outcomes for biologics sites are also provided as published documents. Firms importing biological materials or drug substance from overseas are worth checking the published inspection material for the site.",
+    "key_facts": [
+     "Site: Zhejiang Keming Biopharmaceuticals",
+     "Document type: WHO public inspection report",
+     "Detail: the conclusion and 15 summarised sections are included"
+    ],
+    "checks": [
+     "Confirm published inspection material for biological material suppliers",
+     "Whether separate assessment items are set for biologics suppliers"
+    ]
    }
   },
   {
@@ -6847,6 +7638,20 @@
      }
     ],
     "outcome_ko": "실사한 영역, 면담한 인원, 검토한 문서, 그리고 실사보고서에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 마니팔 카스투르바병원 외래동 인근 No.52-2(576 104) 소재 Ecron Acunova Limited(Navitas Life Sciences)는 WHO GCP 및 생물학적동등성(BE) 시험 가이드라인을 **허용 가능한 수준으로 준수하며 운영 중**인 것으로 판단됐다. 전체 보고서에 기재된 실사 중 관찰 결함은 WHOPIR 공개 이전에 Ecron Acunova Limited 가 만족스러운 수준으로 조치했다. 이 WHOPIR 은 해당 기간 중 수행되는 실사 결과가 긍정적인 한 3년간 유효하다."
+   },
+   "en": {
+    "title_issue": "Contract research organisation inspection",
+    "summary": "WHO published a public inspection report (WHOPIR) for Ecron Acunova Limited (Sri Shirdi Sai Baba Cancer Hospital).",
+    "implication": "WHO inspection covers contract research organisations as well as manufacturing sites. Firms using overseas contract organisations can find published inspection information for contractors outside the manufacturing area too.",
+    "key_facts": [
+     "Organisation: Ecron Acunova Limited (Sri Shirdi Sai Baba Cancer Hospital)",
+     "Document type: WHO public inspection report, covering a contract organisation",
+     "Detail: the conclusion and 22 summarised sections are included"
+    ],
+    "checks": [
+     "Confirm published inspection information on overseas contract organisations",
+     "Differentiate the qualification procedure by scope of outsourcing"
+    ]
    }
   },
   {
@@ -6944,6 +7749,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Change control procedure not followed",
+    "summary": "MFDS suspended manufacture of the affected products because the firm did not follow its own change control rules, failing to raise a change request and failing to notify the change.",
+    "implication": "Where a change that bears directly on quality, such as a change of test method, does not pass through the firm's own change control, it becomes subject to action even without any failing result. Sites should confirm from records that changes to specifications and test methods actually went through the change request and approval route.",
+    "key_facts": [
+     "Violation: the firm's own change control rules (document no. HS-G-04D01) require a change request setting out the basis and the necessary information whenever a method or procedure changes, and this was not done",
+     "Test concerned: a change to the assay method for glycyrrhizic acid in liquorice",
+     "Action: one-month suspension of manufacture of the affected products (6 August 2026 to 5 September 2026), issued 23 July 2026"
+    ],
+    "checks": [
+     "The history of change requests raised for changes to specifications and test methods",
+     "The criteria for deciding whether a change is notifiable and whether it was notified"
+    ]
    }
   },
   {
@@ -7035,6 +7854,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Batch record written in advance",
+    "summary": "MFDS found that a batch manufacturing record had been written before the process was actually carried out and suspended manufacture of the affected product.",
+    "implication": "Writing records in advance is treated as a head-on breach of the contemporaneity principle of data integrity. Sites should make agreement between the time a batch record is written and the time the process is performed an on-the-floor check item.",
+    "key_facts": [
+     "Violation: the firm's own quality management standard (document no. DK-SOP-00002) prohibits entering data and dates in advance or retrospectively, and this was breached",
+     "Facts: a tablet product (batch 26ISD0092) was in the fluid bed drying room after weighing of the materials, yet the batch record already showed everything from weighing through drying as complete",
+     "Action: 15-day suspension of manufacture of the affected product (6 August 2026 to 20 August 2026), issued 23 July 2026"
+    ],
+    "checks": [
+     "Agreement between the time the batch record is written and the time the process is performed",
+     "Training and floor inspection history on the prohibition of advance and retrospective recording"
+    ]
    }
   },
   {
@@ -7130,6 +7963,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Labelling differs from the notification",
+    "summary": "MFDS found that a quasi-drug had been sold with a product name and indications on the container and packaging that differed from what was notified, and suspended sales of the product.",
+    "implication": "A mismatch between what was licensed or notified and what the label actually says is an independent ground for action, separate from manufacturing quality. Firms should check that packaging material management includes a step comparing the label artwork against the current notification.",
+    "key_facts": [
+     "Violation 1: sold with a name on the container or packaging that was not the notified product name and was false or liable to mislead",
+     "Violation 2: sold with indications on the container or packaging different from what was notified",
+     "Action: suspension of sales of the affected product for three months and seven days (30 July 2026 to 5 November 2026), issued 20 July 2026"
+    ],
+    "checks": [
+     "The procedure comparing packaging artwork against the licensed and notified particulars",
+     "The approval route and current version control when a marking changes"
+    ]
    }
   },
   {
@@ -7210,6 +8057,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Operator hygiene standards to be clarified",
+    "summary": "MFDS published the result of a post-approval GMP inspection of RECKITT BENCKISER HEALTHCARE INTERNATIONAL LIMITED in the UK, with a deficiency raised in the facilities and equipment area.",
+    "implication": "Even on a non-sterile solid dosage line, the specificity of operator hygiene standards is cited where the product is exposed. Sites should identify the steps at which product is exposed and confirm that the gowning and hygiene standards applying to those steps are specified in documents.",
+    "key_facts": [
+     "Deficiency: facilities and equipment area, graded other (Annex 1, clause 9) - clarify the criteria for wearing masks and the operator hygiene standards for exposed manufacturing steps",
+     "Dosage form: non-sterile conventional solid oral, category post-approval, finished product (single)",
+     "Inspection period: 9 to 11 December 2025, published 20 July 2026"
+    ],
+    "checks": [
+     "Identification and documentation of the process steps at which product is exposed",
+     "Specificity of the gowning and hygiene standards for each such step"
+    ]
    }
   },
   {
@@ -7301,6 +8162,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Release without quality testing",
+    "summary": "MFDS found that a quasi-drug maker had not carried out the required testing or prepared the batch manufacturing and quality control records, and had not observed the requirement that only product passing quality testing be released, and suspended manufacture of the affected products.",
+    "implication": "Where quality testing before release and the associated records are missing, the action reaches the whole package of products rather than an individual lot. Firms should manage the records supporting the release decision bearing in mind that the reach of an action widens where products are grouped in a package.",
+    "key_facts": [
+     "Violation: testing or verification from receipt of materials through release of finished product was not carried out thoroughly, batch manufacturing and quality control records were not prepared and retained, and product that had not passed quality testing was released",
+     "Scope: three products including a hand sanitiser gel, with the whole package of products covered, and batches CM240826, CM241011, CM250305 and CM251119 affected",
+     "Action: three-month suspension of manufacture of the affected products (18 May 2026 to 17 August 2026), issued 4 May 2026"
+    ],
+    "checks": [
+     "Preparation and retention of test records by batch",
+     "The composition of the package of products and the completeness of the evidence for the release decision"
+    ]
    }
   },
   {
@@ -7398,6 +8273,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Released with no test records",
+    "summary": "MFDS found that a quasi-drug maker had not carried out the required testing or prepared the records during manufacture, and suspended manufacture of the affected products.",
+    "implication": "Actions on test records at hand sanitiser makers of the same type appeared at the same time, which suggests a focused review of that product group. Firms making comparable products should check their document control position, retention period requirements included.",
+    "key_facts": [
+     "Violation: testing or verification from receipt of materials through release of finished product was not carried out thoroughly, and batch manufacturing and quality control records were not prepared and retained for at least three years",
+     "Scope: two products including a hand cleaner gel, with the whole package of products covered",
+     "Action: three-month suspension of manufacture of the affected products (18 May 2026 to 17 August 2026), issued 4 May 2026"
+    ],
+    "checks": [
+     "Whether the three-year retention requirement for manufacturing and quality records is met",
+     "The state of execution of the test panel for disinfectant products"
+    ]
    }
   },
   {
@@ -7489,6 +8378,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "False reporting of supply records",
+    "summary": "MFDS found that serial number reporting on release was inadequate and that supply records had been reported falsely, and imposed a suspension of sales together with a surcharge.",
+    "implication": "Late reporting of supply records was assessed as false reporting and led to action across numerous products. Firms responsible for distribution reporting should manage the consistency between the reporting time and the actual release time at system level.",
+    "key_facts": [
+     "Violation: inadequate reporting of drug serial numbers on release and false reporting of drug supply records, by way of late reporting",
+     "Action 1: one-month suspension of sales of the affected products (14 May 2026 to 13 June 2026) and a 10-day suspension (14 May 2026 to 23 May 2026)",
+     "Action 2: a surcharge of KRW 51,250,000 in place of the 10-day suspension of sales, issued 30 April 2026"
+    ],
+    "checks": [
+     "Consistency between the serial number release reporting time and the actual release time",
+     "The system for detecting omissions and delays in supply record reporting"
+    ]
    }
   },
   {
@@ -7587,6 +8490,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Release approval rules not followed",
+    "summary": "MFDS found that the firm had not met its obligation to manufacture in accordance with the manufacturing control standard and product master file, and imposed a surcharge.",
+    "implication": "Even for products such as radiopharmaceuticals with a short half-life that need rapid release, compliance with the firm's own release approval rules is not waived. Firms operating a rapid release system should confirm that the rules are designed so the time constraint and the release approval procedure can coexist.",
+    "key_facts": [
+     "Violation: manufacture must follow the manufacturing control standard and product master file and the written standards and instructions must be observed, but the firm's own product release approval rules (document no. P1-A1-S19) were not followed",
+     "Products: two radiopharmaceutical injections labelled with fluorine-18",
+     "Action: a surcharge of KRW 10,500,000 in place of a suspension of manufacture of three months and 15 days, issued 30 April 2026"
+    ],
+    "checks": [
+     "Agreement between the release approval rules and how release actually operates",
+     "Whether approval steps are being skipped for rapidly released products"
+    ]
    }
   },
   {
@@ -7684,6 +8601,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Certificates of analysis falsified",
+    "summary": "MFDS found that certificates of analysis had been falsified, including recording a passing result before testing was complete, and imposed a surcharge.",
+    "implication": "Recording a passing result before testing is complete is treated as one of the heavier forms of data integrity breach and led to a substantial surcharge. Sites should confirm that control over when test results are entered and the final approval step by the head of the quality department actually operate.",
+    "key_facts": [
+     "Violation 1: certificates of analysis were falsified, including recording a passing result in advance although the testing was not complete",
+     "Violation 2: final review, approval and disposition by the quality department manager and head were missing from the incoming test records for media growth promotion testing",
+     "Action: a surcharge of KRW 227,850,000 in place of a suspension of manufacture of three months and 15 days for two fluorine-18 labelled injections, issued 30 April 2026"
+    ],
+    "checks": [
+     "Control over when test results are entered and confirmation through the audit trail",
+     "Final review and approval by the quality department on incoming test records"
+    ]
    }
   },
   {
@@ -7785,6 +8716,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Further material on deviation management",
+    "summary": "MFDS published the result of a post-approval GMP inspection, with deficiencies in the quality management and manufacturing areas.",
+    "implication": "Quality impact assessment of recurring deviations is treated as a separate item to be checked. Sites should check that recurrence analysis and the resulting impact assessment are recorded, not only whether individual deviations were closed.",
+    "key_facts": [
+     "Deficiency 1: quality management area (Annex 1, clause 3.3) - submit further material on deviation management, covering recurring deviations and quality impact assessment",
+     "Deficiency 2: further material required on the duties and delegation of the head of production (Annex 1, clause 3.2) and on the sampling method used in cleaning validation (Annex 1, clause 6.4)",
+     "Inspection period: 15 to 17 September 2025, published 30 April 2026"
+    ],
+    "checks": [
+     "Records identifying recurring deviations and assessing quality impact",
+     "The evidence supporting the sampling method used in cleaning validation"
+    ]
    }
   },
   {
@@ -7880,6 +8825,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recall action not taken",
+    "summary": "MFDS found that the recall obligor had not met its duty to stop sales immediately and take other necessary action where product is suspected of being subject to recall, and imposed a surcharge.",
+    "implication": "Failing to take initial action such as stopping sales at the stage of suspicion, before the ground for recall is confirmed, is itself subject to action. Firms handling sterile medicines should confirm they have a procedure for interim action before the assessment is complete when a suspected recall signal is received.",
+    "key_facts": [
+     "Violation: where product is suspected of being subject to recall the obligor must immediately stop sales and take other necessary action, and this was not done",
+     "Scope: a triamcinolone acetonide 40 mg injection (batch MTR4E027, manufactured in February 2025), a sterile medicine",
+     "Action: a surcharge of KRW 174,600,000 in place of a three-month suspension of manufacture of the affected product, issued 28 April 2026"
+    ],
+    "checks": [
+     "Whether a procedure exists for immediately stopping sales at the suspicion stage of a recall",
+     "The rule on receiving quality signals for sterile products and the deadline for a decision"
+    ]
    }
   },
   {
@@ -7971,6 +8930,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Supply records reported late",
+    "summary": "MFDS found that supply records had not been reported by the deadline and suspended sales of the affected products.",
+    "implication": "Even where late reporting was eventually carried out and taken into account, action still followed for missing the deadline itself. Firms are better placed treating the supply reporting deadline as a management indicator and identifying items approaching it in advance.",
+    "key_facts": [
+     "Violation: supply records for four products including a nicotine patch were not reported to the drug information centre by the deadline on release",
+     "Mitigation: the supply records for those products were reported within one month after the deadline had passed",
+     "Action: 10-day suspension of sales of the affected products (4 August 2026 to 13 August 2026), issued 21 July 2026"
+    ],
+    "checks": [
+     "A system alerting on supply reports approaching their deadline",
+     "Late reporting and record management where a delay occurs"
+    ]
    }
   },
   {
@@ -8035,6 +9008,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Inspection with no deficiencies",
+    "summary": "MFDS published the result of a post-approval GMP inspection of Labesfal-Laboratorios Almiro S.A. in Portugal, with no deficiencies on assessment.",
+    "implication": "Inspections closing without deficiencies are published too, which gives a comparison baseline for assessing overseas sites. Firms assessing overseas contract sites find it useful to record both whether findings were raised and in which areas, so the material can serve for relative comparison between suppliers.",
+    "key_facts": [
+     "Outcome: no deficiencies on assessment",
+     "Dosage form: non-sterile conventional solid oral, category post-approval, finished product (single)",
+     "Inspection period: 27 to 29 January 2026, published 20 July 2026"
+    ],
+    "checks": [
+     "Recording whether findings were raised in overseas contract site inspection outcomes",
+     "Consistency of the items used to compare suppliers"
+    ]
    }
   },
   {
@@ -8132,6 +9119,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Economic benefits provided to prescribers",
+    "summary": "MFDS found that economic benefits had been provided to healthcare professionals for sales promotion purposes and imposed a suspension of sales together with a surcharge.",
+    "implication": "A breach of sales conduct rules is unrelated to manufacturing quality but leads to sales being stopped across numerous products, which affects supply directly. Even from a quality standpoint the stock and alternative supply implications of the suspended products are worth establishing in advance.",
+    "key_facts": [
+     "Violation: between January 2016 and December 2018, economic benefits totalling KRW 169,819,544 were provided to 45 people including healthcare professionals, to promote adoption, prescribing and continued trade of 32 products the firm makes or imports",
+     "Action 1: a surcharge of KRW 285,300,000 in place of a three-month suspension of sales of the affected products",
+     "Action 2: three-month suspension of sales of the affected products (6 May 2026 to 5 August 2026), issued 30 April 2026"
+    ],
+    "checks": [
+     "Establish the scope of supply interruption for the products subject to action",
+     "Stock and alternative supply plans for the suspended products"
+    ]
    }
   },
   {
@@ -8190,6 +9191,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Review of parametric release dossiers",
+    "summary": "MFDS published general considerations for reviewing the quality assessment dossier of medicines to which parametric release is applied.",
+    "implication": "The review perspective on parametric release, which replaces the sterility test for terminally sterilised products, is being set out. Firms considering or applying parametric release should re-check the composition of their submission dossier against these considerations.",
+    "key_facts": [
+     "Subject: general considerations for reviewing quality assessment dossiers for medicines applying parametric release",
+     "Issuing body: MFDS, published 30 April 2026",
+     "Detail: the text of the document was not obtained, so the original needs to be read"
+    ],
+    "checks": [
+     "Review the composition of the submission dossier for products applying parametric release",
+     "Whether the evidence for the sterilisation process control indicators is held"
+    ]
    }
   },
   {
@@ -8298,6 +9313,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Further material on data integrity",
+    "summary": "MFDS published the result of a post-approval GMP inspection, with deficiencies on data integrity and deviations in the quality management area.",
+    "implication": "Data backup and access permission settings are being put forward as the concrete items on which data integrity is checked. Sites should compare whether the backup interval and account permission criteria for each system are documented and match the actual settings.",
+    "key_facts": [
+     "Deficiency 1: quality management area (Annex 1, clause 3.3) - submit further material on data integrity, covering data backup and access permission settings - resolved",
+     "Deficiency 2: (Annex 1, clause 3.3) - submit further material on deviations, specifically recurring deviations - resolved",
+     "Inspection period: 15 to 17 October 2025, published 30 April 2026"
+    ],
+    "checks": [
+     "Backup interval and restore testing records for each system",
+     "Agreement between the account permission criteria and the actual settings"
+    ]
    }
   },
   {
@@ -8406,6 +9435,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Backup and restore for test instruments",
+    "summary": "MFDS published the result of a post-approval GMP inspection of an active ingredient site, with deficiencies in the quality management and facilities and equipment areas.",
+    "implication": "At active ingredient sites, whether backup and restore is possible instrument by instrument comes within the scope of what is checked. Sites making active ingredients should confirm that standalone test instruments have not been left out of the backup arrangements.",
+    "key_facts": [
+     "Deficiency 1: quality management area (Annex 1-2, clauses 2 and 5) - submit further material on data integrity for certain test instruments, covering data backup and restore",
+     "Deficiency 2: further material required on the operating record of the GMP committee (Annex 1-2, clause 18) and on process equipment, covering the requalification interval and periodic review (clause 5)",
+     "Inspection period: 28 to 30 October 2025, category post-approval, active ingredient (single), published 30 April 2026"
+    ],
+    "checks": [
+     "Whether standalone test instruments are covered by the backup and restore arrangements",
+     "The basis for setting the requalification interval for process equipment"
+    ]
    }
   },
   {
@@ -8500,6 +9543,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Product master file revision control",
+    "summary": "MFDS published the result of a post-approval GMP inspection of a site making both finished products and active ingredients, with deficiencies in the quality management and facilities and equipment areas.",
+    "implication": "Managing the revision interval of the product master file is treated as a separate item to be checked. Sites with many products are worth confirming product by product that the periodic review interval for the master file is actually being met.",
+    "key_facts": [
+     "Deficiency 1: quality management area (Annex 1, clause 3.3) - submit further explanatory material on quality management including data integrity",
+     "Deficiency 2: (Annex 1, clauses 4.1 and 12) - submit further explanatory material on control of the product master file, specifically the revision interval",
+     "Inspection period: 3 to 7 November 2025, category post-approval, finished product and active ingredient (combined), published 30 April 2026"
+    ],
+    "checks": [
+     "The position on meeting the periodic review interval for the product master file",
+     "Separation of the finished product and active ingredient document systems at a combined site"
+    ]
    }
   },
   {
@@ -8608,6 +9665,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Assessment of active ingredient makers",
+    "summary": "MFDS published the result of a post-approval GMP inspection, with deficiencies in the quality management and laboratory areas.",
+    "implication": "Responsibility for assessing the maker of the active ingredient is confirmed as sitting with the head of the quality assurance department. Sites should check that material supplier assessment is carried out under quality department responsibility and that the outcome is recorded.",
+    "key_facts": [
+     "Deficiency 1: quality management area (Annex 1, clause 3.3) - submit further material on the head of the quality assurance department, covering assessment of active ingredient manufacturers - resolved",
+     "Deficiency 2: further material required on data integrity including restore (Annex 1) and on GMP training material for the head of manufacturing (Annex 1, clause 14)",
+     "Inspection period: 1 to 3 December 2025, published 30 April 2026"
+    ],
+    "checks": [
+     "Records of the quality department carrying out assessment of active ingredient manufacturers",
+     "Management of GMP training completion material for the head of manufacturing"
+    ]
    }
   },
   {
@@ -8717,6 +9788,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Major finding on material sampling",
+    "summary": "MFDS published the result of a post-approval GMP inspection, with a deficiency graded major in the materials area.",
+    "implication": "This is the case among the published results with a major grade in the materials area, showing that how raw materials are sampled is examined substantively. Sites should confirm that the raw material sampling plan is set against the number of containers and the level of risk.",
+    "key_facts": [
+     "Deficiency 1: materials area, graded major - submit material on sampling of raw materials, under the Rules on the Safety of Drugs articles 43(1)(3) and 48(9) - resolved",
+     "Deficiency 2: quality management area (Annex 1, clause 5.2) - submit further material on periodic review of computerised systems including the laboratory information management system",
+     "Inspection period: 21 to 24 October 2025, published 30 April 2026"
+    ],
+    "checks": [
+     "The basis on which the raw material sampling plan is set",
+     "Records of periodic review of computerised systems such as the laboratory information system"
+    ]
    }
   },
   {
@@ -8825,6 +9910,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recurring complaints to be managed",
+    "summary": "MFDS published the result of a post-approval GMP inspection, with deficiencies on data integrity and complaint management in the quality management area.",
+    "implication": "Recurring complaints are being treated as a matter for the management system rather than something closed case by case. Sites should check whether a procedure counts complaint data by type and judges recurrence from it.",
+    "key_facts": [
+     "Deficiency 1: quality management area (Annex 1, clauses 3.3 and 5.2) - submit further explanatory material on data integrity management, covering data backup and audit trail",
+     "Deficiency 2: (Annex 1, clauses 3.3 and 11) - submit further explanatory material on management of complaints, specifically recurring complaints",
+     "Inspection period: 29 September to 1 October 2025, published 30 April 2026"
+    ],
+    "checks": [
+     "The procedure for counting complaints by type and judging recurrence",
+     "The scope and interval set for audit trail review"
+    ]
    }
   },
   {
@@ -8930,6 +10029,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Critical process parameters in the master file",
+    "summary": "MFDS published the result of a post-approval GMP inspection of an active ingredient site, with deficiencies in the facilities and equipment and manufacturing areas.",
+    "implication": "In active ingredient manufacture, whether critical process parameters are reflected in the product master file is treated as a check item. Sites making active ingredients should compare whether the critical process parameters derived during process development are actually reflected in the master file.",
+    "key_facts": [
+     "Deficiency 1: manufacturing area (Annex 1-2, clause 8.1) - submit further explanatory material on the product master file, covering reflection of critical process parameters - resolved",
+     "Deficiency 2: facilities and equipment area (Annex 1-2, clause 4) - submit further explanatory material on the interior of the dust collection hood in the processing room, covering the control procedure, inspection and cleaning",
+     "Inspection period: 25 to 27 November 2025, category post-approval, active ingredient (single), published 30 April 2026"
+    ],
+    "checks": [
+     "Whether critical process parameters are reflected in the product master file",
+     "The procedure and records for inspecting and cleaning the interior of dust collection equipment"
+    ]
    }
   },
   {
@@ -9038,6 +10151,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Process validation to be supported",
+    "summary": "MFDS published the result of a post-approval GMP inspection, with validation deficiencies in the quality management and manufacturing areas.",
+    "implication": "The link between the validation master plan and validation of individual processes is being examined. Sites should confirm that the processes listed in the master plan match the list of validations actually carried out.",
+    "key_facts": [
+     "Deficiency 1: manufacturing area (Annex 1, clause 6.1) - submit further explanatory material on the validation master plan",
+     "Deficiency 2: (Annex 1, clause 6.2) - submit further explanatory material on process validation, covering packaging and drying processes - resolved",
+     "Inspection period: 18 to 21 November 2025, published 30 April 2026"
+    ],
+    "checks": [
+     "Agreement between the validation master plan and the list of validations actually performed",
+     "The scope of validation of individual processes such as packaging and drying"
+    ]
    }
   },
   {
@@ -9301,6 +10428,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality records to be written truthfully",
+    "summary": "MFDS published the result of a post-approval GMP inspection of a site making both finished products and active ingredients, with a deficiency graded major in the laboratory area.",
+    "implication": "A finding that quality records be written truthfully, graded major, shows data integrity being dealt with directly at inspection. Sites should check laboratory by laboratory that the way test records are written matches what was actually done.",
+    "key_facts": [
+     "Deficiency 1: laboratory area, graded major (Annex 1, clause 7.1) - quality records are to be written truthfully - resolved",
+     "Deficiency 2: (Annex 1, clause 6.3) inter-laboratory precision testing is to be carried out on the same sample, and (Annex 1, clause 10.2) environmental control of the raw material storage area",
+     "Inspection period: 12 to 15 May 2025, category post-approval, finished product and active ingredient (combined), published 30 April 2026"
+    ],
+    "checks": [
+     "Agreement between what test records state and what was actually performed",
+     "The method of managing samples for inter-laboratory precision testing"
+    ]
    }
   },
   {
@@ -9416,6 +10557,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Cleaning validation to be carried out",
+    "summary": "MFDS published the result of a post-approval GMP inspection of a site making both finished products and active ingredients, with deficiencies in the manufacturing and facilities and equipment areas.",
+    "implication": "Cleaning validation, cross-contamination prevention and verification of fumigation residue were cited together, which brought control of shared equipment areas within the scope of the check. Sites making both finished products and active ingredients should check that the cleaning evidence and the residue acceptance criteria for shared equipment are supported by documents.",
+    "key_facts": [
+     "Deficiency 1: manufacturing area (Annex 1-2, clause 11.4) - carry out cleaning validation on manufacturing equipment and utensils",
+     "Deficiency 2: (Annex 1-2, clause 8.3) prevent cross-contamination during manufacturing and in-process control operations",
+     "Deficiency 3: facilities and equipment area (Annex 1, clause 9.2) - verify the adequacy of residue measurement after fumigation of the aseptic area, inspected 28 to 31 October 2025"
+    ],
+    "checks": [
+     "Whether cleaning validation is carried out on shared equipment",
+     "The verification data for the method of measuring residue after fumigation of the aseptic area"
+    ]
    }
   },
   {
@@ -9486,6 +10641,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Assay and impurities above the limit",
+    "summary": "A voluntary recall was started for a docetaxel trihydrate injection after post-market stability testing showed assay and impurity results outside the specification.",
+    "implication": "This is a case where assay and impurities moved outside specification together at the post-market stability stage rather than at release. Firms holding injectable products should confirm they have criteria for action when intermediate stability results approach the specification.",
+    "key_facts": [
+     "Reason: assay and impurity results, both individual unspecified and total, exceeded the specification in post-market stability testing",
+     "Product: a docetaxel trihydrate injection",
+     "Recall type: voluntary recall by the company, recall order dated 23 July 2026"
+    ],
+    "checks": [
+     "Criteria for action when post-market stability results approach the specification",
+     "Consistency between the basis for the shelf life and the measured stability data"
+    ]
    }
   },
   {
@@ -9556,6 +10725,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Concern that tablets may break",
+    "summary": "A voluntary recall was started for an esomeprazole magnesium trihydrate 20 mg tablet because of concern that the tablets may break in distribution.",
+    "implication": "The ground for recall here is the physical integrity of the tablet rather than any ingredient specification. Solid dosage sites should confirm that physical attributes such as hardness and friability, and the pack format, hold up under distribution conditions.",
+    "key_facts": [
+     "Reason: concern that tablets may break in distribution",
+     "Product: an esomeprazole magnesium trihydrate 20 mg tablet",
+     "Recall type: voluntary recall by the company, recall order dated 22 July 2026"
+    ],
+    "checks": [
+     "Whether the hardness and friability specifications suit the distribution conditions",
+     "Assessment of physical protection when the pack format changes"
+    ]
    }
   },
   {
@@ -9625,6 +10808,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Metallic foreign body in toothpaste",
+    "summary": "A recall was carried out after a metallic foreign body was confirmed in a toothpaste product.",
+    "implication": "A metallic foreign body is treated as a ground that can arise from wear or breakage of manufacturing equipment. Sites should check whether a metal detection step exists and, if not, whether an equipment inspection interval can serve instead.",
+    "key_facts": [
+     "Reason: metallic foreign body confirmed in one toothpaste product",
+     "Product: a toothpaste product",
+     "Recall order dated 2 July 2026, approved 7 July 2026"
+    ],
+    "checks": [
+     "Whether metal detection or an equipment inspection substitute exists",
+     "The interval and records for inspecting equipment wear and breakage"
+    ]
    }
   },
   {
@@ -9694,6 +10891,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Metallic foreign body in toothpaste",
+    "summary": "A recall was carried out after a metallic foreign body was confirmed in a toothpaste product.",
+    "implication": "A separate recall document was published for the same product, so the scope of the recall may not be visible from one document alone. When establishing what is subject to recall it is more accurate to confirm the affected lots document by document, not only by firm and product name.",
+    "key_facts": [
+     "Reason: metallic foreign body confirmed in one toothpaste product",
+     "Product: a toothpaste product",
+     "Recall order dated 2 July 2026, approved 7 July 2026"
+    ],
+    "checks": [
+     "Confirm the affected lots document by document",
+     "Tidy up whether multiple recall entries for the same product overlap"
+    ]
    }
   },
   {
@@ -9767,6 +10978,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Precautionary nitrosamine recall",
+    "summary": "A precautionary voluntary recall of stock in distribution was carried out for two tramadol products because of concern that an impurity had been detected above the limit.",
+    "implication": "This is a case where a recall was decided pre-emptively at the concern stage, before an exceedance was confirmed. Firms holding active ingredients within the scope of nitrosamine control should set internal criteria allowing action without waiting for a confirmed result.",
+    "key_facts": [
+     "Reason: concern that the impurity N-nitroso-desmethyl-tramadol was detected above the limit, handled as a precautionary measure",
+     "Scope: two tramadol products recalled together for the same reason",
+     "Recall type: voluntary recall by the company, recall order dated 4 May 2026"
+    ],
+    "checks": [
+     "Keeping the list of products in scope for nitrosamine risk assessment current",
+     "Documenting the criteria for pre-emptive action at the concern stage"
+    ]
    }
   },
   {
@@ -9840,6 +11065,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine above the permitted limit",
+    "summary": "A recall was carried out for two tramadol products after an impurity was detected above the permitted limit.",
+    "implication": "Here an actual exceedance rather than a concern was confirmed, which exposes the level of control across preparations with the same active ingredient. Firms holding tramadol containing products should confirm that their measured impurity data has been assessed against the current permitted limit.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-desmethyl-tramadol detected above the permitted limit",
+     "Scope: two tramadol products recalled together for the same reason",
+     "Recall order dated 30 April 2026"
+    ],
+    "checks": [
+     "The reference date on which measured impurity data for tramadol preparations was assessed",
+     "Whether multiple products with the same active ingredient are assessed together"
+    ]
    }
   },
   {
@@ -9913,6 +11152,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine above the permitted limit",
+    "summary": "A recall was carried out for two tramadol products after an impurity was detected above the permitted limit.",
+    "implication": "Tramadol preparations from several firms were recalled on the same date over the same impurity, which reads as a matter at the level of the active ingredient class rather than of any one firm. Firms using the same material should obtain the impurity control material from the supplier.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-N-desmethyl-tramadol detected above the permitted limit",
+     "Scope: two tramadol products recalled together for the same reason",
+     "Recall order dated 30 April 2026"
+    ],
+    "checks": [
+     "Whether impurity control material has been obtained from the material supplier",
+     "Establish the range of products affected that use the same material"
+    ]
    }
   },
   {
@@ -9986,6 +11239,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine above the permitted limit",
+    "summary": "A recall was carried out for two tramadol products after an impurity was detected above the permitted limit.",
+    "implication": "Different strengths of the same active ingredient were recalled together, so the impact is confirmed at product family level rather than by individual strength. Firms should extend the impurity assessment across every strength rather than applying it to a representative one.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-N-desmethyl-tramadol detected above the permitted limit",
+     "Scope: two tramadol products recalled together for the same reason",
+     "Recall order dated 30 April 2026"
+    ],
+    "checks": [
+     "The scope of impurity assessment across every strength of the product",
+     "The procedure for confirming which strengths are covered in a product family recall"
+    ]
    }
   },
   {
@@ -10055,6 +11322,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Hydrogen peroxide assay failure",
+    "summary": "A recall was carried out for a tooth whitening product after it failed the assay test, and the recall is classified as mandatory.",
+    "implication": "Where the active ingredient content falls outside specification the outcome can be a mandatory rather than a voluntary recall. Firms handling presentations prone to content variation should re-examine mixing uniformity in manufacture and the content control criteria.",
+    "key_facts": [
+     "Reason: assay test failure (hydrogen peroxide)",
+     "Product: a tooth whitening product",
+     "Recall type: mandatory, recall order dated 30 April 2026"
+    ],
+    "checks": [
+     "The active ingredient content control criteria and confirmation of process uniformity",
+     "The response procedure for a mandatory recall following an assay failure"
+    ]
    }
   },
   {
@@ -10128,6 +11409,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine above the permitted limit",
+    "summary": "A recall was carried out for two tramadol products after an impurity was detected above the permitted limit.",
+    "implication": "Among the domestic recalls this week, the nitrosamine matter in tramadol preparations is confirmed across several firms. Firms handling this active ingredient are safer reviewing their own testing history pre-emptively even if they are not among those recalling.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-N-desmethyl-tramadol detected above the permitted limit",
+     "Scope: two tramadol products recalled together for the same reason",
+     "Recall order dated 30 April 2026"
+    ],
+    "checks": [
+     "Review the impurity testing history for the firm's own tramadol preparations",
+     "The interval and trigger conditions for reassessing nitrosamines"
+    ]
    }
   },
   {
@@ -10198,6 +11493,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality failures across several tests",
+    "summary": "A recall was carried out for a combination tablet after quality failures were confirmed in the identity test, the assay and the uniformity of dosage units test, and the recall is classified as mandatory.",
+    "implication": "Identity, assay and uniformity failing together points to a problem across the manufacturing process rather than one test attribute. Firms making combination solid dosage forms should confirm that content by ingredient and uniformity of dosage units are managed together.",
+    "key_facts": [
+     "Reason: quality failure - identity test, assay for chlorpheniramine maleate and pseudoephedrine hydrochloride, and uniformity of dosage units",
+     "Product: a combination tablet",
+     "Recall type: mandatory, recall order dated 29 April 2026"
+    ],
+    "checks": [
+     "The criteria for managing content by ingredient and uniformity of dosage units in combination products",
+     "The batch disposition procedure when the identity test fails"
+    ]
    }
   },
   {
@@ -10271,6 +11580,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Expiry date missing from the label",
+    "summary": "Health Canada published recall information for ATTITUDE Bathroom Cleaner Disinfectant because the expiry date may be missing from certain lots.",
+    "implication": "It shows that an omitted marking alone is enough for a formal recall to proceed. Firms should confirm that print verification for mandatory markings such as the expiry date actually operates in the packaging process.",
+    "key_facts": [
+     "Reason: a labelling issue, in that the expiry date may be missing from the affected lots",
+     "Recall class: Type III",
+     "Published 20 July 2026, firm ATTITUDE"
+    ],
+    "checks": [
+     "Confirm the effectiveness of the print verification step for the expiry date",
+     "The criteria for deciding on a recall when a lot with a missing marking arises"
+    ]
    }
   },
   {
@@ -10344,6 +11667,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Impurity may be out of specification",
+    "summary": "Health Canada published recall information for PMS-BUSULFAN 6mg/mL intravenous solution on quality grounds, because an impurity may fall outside specification.",
+    "implication": "Where the possibility of an impurity moving outside specification is confirmed in an injection, the potential risk alone leads to a recall. Firms handling injectables should confirm that meeting the impurity specification across the whole shelf life is supported by stability data.",
+    "key_facts": [
+     "Reason: product quality, in that an impurity may fall outside specification",
+     "Recall class: Type III",
+     "Published 29 April 2026, product PMS-BUSULFAN 6mg/mL intravenous solution"
+    ],
+    "checks": [
+     "Stability data covering the impurity attribute across the whole shelf life for injectables",
+     "The procedure for deciding on market action when an impurity may fall outside specification"
+    ]
    }
   },
   {
@@ -10417,6 +11754,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Particulate matter found in a lot",
+    "summary": "Health Canada published recall information for Sterile.H2O on contamination grounds, after particulate matter was found in a specific lot.",
+    "implication": "Particulate found in a liquid product purporting to be sterile leads to a recall at a raised class. Sites making liquid products should check that the particulate inspection method and its limit of detection are set to suit the product.",
+    "key_facts": [
+     "Reason: contamination, with particulate matter found in the affected lot",
+     "Recall class: Type II",
+     "Published 24 April 2026, product Sterile.H2O"
+    ],
+    "checks": [
+     "Suitability of the particulate inspection method and limit of detection for liquid products",
+     "The criterion for a full batch investigation when particulate is found"
+    ]
    }
   }
  ]

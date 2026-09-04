@@ -29,7 +29,14 @@
     "C": 0
    }
   },
-  "ai_disclosure": true
+  "ai_disclosure": true,
+  "en": {
+   "tldr": [
+    "A metal foreign body found in one toothpaste pulls 40 brands made on the same production line into a single recall",
+    "Botulinum toxin made for export only was sold domestically without national lot release, triggering a recall and sales suspension",
+    "A linagliptin and metformin extended-release tablet is recalled at two strengths over the N-nitroso-meglumine impurity"
+   ]
+  }
  },
  "cards": [
   {
@@ -192,6 +199,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality unit procedures not followed",
+    "summary": "During a Form 483 inspection of Mixlab WI LLC, a non-sterile drug product site, FDA observed that the responsibilities and procedures applicable to the quality control unit were not fully followed and that the firm's own procedure for the non-sterile compounding area was not consistently applied.",
+    "implication": "A quality unit not following its own procedures is the classic Form 483 finding showing a gap between the documented standard and how the site actually runs. Sites should check that the revision history of quality control procedures matches what is being followed on the floor.",
+    "key_facts": [
+     "Observation: the responsibilities and procedures applicable to the quality control unit were not fully followed",
+     "Procedure breached: the non-sterile compounding area procedure, SOP ML WI-001-04 Revision 2.0, was not consistently followed",
+     "Inspected: 24 July 2025 (FEI 3005946041)"
+    ],
+    "checks": [
+     "Whether quality control procedures match how the site actually operates",
+     "Records showing the non-sterile compounding area procedure is followed"
+    ]
    }
   },
   {
@@ -318,6 +339,20 @@
       "citation": "21 CFR 211.67(a)",
       "statement_ko": "귀사는 의약품의 안전성(safety)·확인(identity)·함량(strength)·품질(quality)·순도(purity)가 공정서 또는 그 밖에 설정된 요건을 벗어나 변질되게 할 수 있는 오작동이나 오염을 방지하기 위하여, 설비와 기구를 적절한 주기로 세척·유지관리하고 의약품의 특성에 맞게 소독 및/또는 멸균하지 않았다 (21 CFR 211.67(a))."
      }
+    ]
+   },
+   "en": {
+    "title_issue": "CGMP violations at a finished product site",
+    "summary": "FDA issued a warning letter to Wizcure Pharmaa Private Limited for CGMP violations in finished pharmaceuticals, holding the products adulterated.",
+    "implication": "A determination that finished pharmaceuticals are adulterated is a serious finding meaning the basic CGMP requirements were not met. Sites manufacturing for export should re-examine their compliance with those basic requirements to avoid the same citations.",
+    "key_facts": [
+     "Classification: CGMP, finished pharmaceuticals, adulterated",
+     "Issued: CDER, 24 June 2026",
+     "Four citations: 21 CFR 211.194(a) laboratory records, 211.42(c)(10) defined areas, 211.113(b) aseptic processing, and 211.67(a) equipment cleaning and maintenance"
+    ],
+    "checks": [
+     "Current status of compliance with the basic CGMP requirements",
+     "Read the full warning letter for the detail"
     ]
    }
   },
@@ -446,6 +481,20 @@
       "statement_ko": "귀사는 무균 조건을 조성하기 위한 작업실 및 설비의 세척·소독을 위한 적절한 시스템을 수립하지 않았다 (21 CFR 211.42(c)(10)(v))."
      }
     ]
+   },
+   "en": {
+    "title_issue": "CGMP violations at a finished product site",
+    "summary": "FDA issued a warning letter to the finished product site Excelvision - Fareva for CGMP violations in finished pharmaceuticals, holding the products adulterated.",
+    "implication": "Several warning letters carrying the same classification in one week show FDA continuing to enforce against breaches of the basic CGMP requirements for finished pharmaceuticals. Sites exporting finished products to the US should review their inspection readiness and CAPA history in advance.",
+    "key_facts": [
+     "Classification: CGMP, finished pharmaceuticals, adulterated",
+     "Issued: CDER, 25 June 2026",
+     "Four citations: 21 CFR 211.192 investigation of discrepancies, 211.113(b) aseptic processing, 211.42(c)(10)(i) surfaces in aseptic processing areas, and 211.42(c)(10)(v) cleaning and disinfection"
+    ],
+    "checks": [
+     "Current status of compliance with the basic CGMP requirements",
+     "Read the full warning letter for the detail"
+    ]
    }
   },
   {
@@ -548,6 +597,20 @@
       "citation": "21 CFR 211.22 · 21 CFR 211.194(a)",
       "statement_ko": "귀사의 품질관리부서는 의약품이 CGMP를 준수하여 제조되고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 대해 설정된 규격에 적합함을 보증할 책임을 이행하지 못하였다 (21 CFR 211.22). 구체적으로, 귀사의 품질부서는 다음 CGMP 요건의 준수를 보증할 책임을 이행하지 못하였다: a. 설정된 규격 및 기준에 대한 적합성을 보증하는 데 필요한 모든 시험으로부터 도출된 완전한 데이터가 시험기록에 포함되도록 하지 못함 (21 CFR 211.194(a))."
      }
+    ]
+   },
+   "en": {
+    "title_issue": "CGMP violations at a biologics site",
+    "summary": "FDA issued a warning letter to the biologics manufacturer Genzyme Ireland Limited over CGMP violations. The violations relate to deviations in a manufacturing process covered by a biologics licence application.",
+    "implication": "CGMP deviations in a biologics manufacturing process affect regulatory confidence in the quality system as a whole. Biologics sites should reconfirm how deviations are managed and whether the process still matches the conditions of the licence application.",
+    "key_facts": [
+     "Classification: CGMP, deviations, biologics licence application",
+     "Issued: CBER, 22 June 2026",
+     "Basis: adulterated under FD&C Act section 501(a)(2)(B) (21 U.S.C. 351(a)(2)(B)) and prohibited act under section 301(a) (21 U.S.C. 331(a))"
+    ],
+    "checks": [
+     "Review of the procedure for managing process deviations",
+     "Whether the manufacturing process still matches the conditions of the licence application"
     ]
    }
   },
@@ -674,6 +737,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Aseptic process procedures inadequate",
+    "summary": "During a Form 483 inspection of the outsourcing facility QuVa Pharma Inc, FDA observed that procedures designed to prevent microbiological contamination of drug products purporting to be sterile were not established, written and followed.",
+    "implication": "Failure to establish and document procedures preventing microbiological contamination in an aseptic process is a core Form 483 area that recurs. Contract manufacturing sites should check whether the aseptic process procedures exist and whether the records show they are followed.",
+    "key_facts": [
+     "Inspected: May 2026 (FEI 3012053582)",
+     "Observation: procedures to prevent microbiological contamination of products purporting to be sterile were not established or followed",
+     "Facility type: outsourcing facility"
+    ],
+    "checks": [
+     "Whether procedures covering the aseptic process are established",
+     "Review of the records showing the contamination prevention procedures are followed"
+    ]
    }
   },
   {
@@ -732,6 +809,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Should TGA publish GMP certificates",
+    "summary": "ECA published a news item on the discussion about Australia's TGA publishing GMP certificates and inspection outcomes more widely, tied to a TGA consultation on transparency of GMP inspection outcomes.",
+    "implication": "Wider publication of TGA GMP certificates and inspection outcomes is a movement that can influence transparency policy at other regulators too. Firms should manage their inspection history with the possibility of publication in mind.",
+    "key_facts": [
+     "Subject: discussion of whether TGA GMP certificates and inspection outcomes should be published",
+     "Issued: ECA, 1 July 2026",
+     "Related: a TGA consultation on transparency of GMP inspection outcomes is under way"
+    ],
+    "checks": [
+     "Follow where the TGA policy on publishing GMP certificates lands",
+     "Read the original article, as the report is at headline level"
+    ]
    }
   },
   {
@@ -830,6 +921,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Complaint handling procedure not followed",
+    "summary": "A one-month suspension of manufacture was imposed after the firm did not follow the assessment and action steps set out in its own complaint handling rules when dealing with a consumer complaint about an icosapent ethyl 300 mg soft capsule.",
+    "implication": "Failing to follow the complaint handling procedure undermines early detection of quality issues and the link through to corrective action. Sites should check that the whole path from receipt of a complaint through assessment to action is documented.",
+    "key_facts": [
+     "Violation: the assessment and action steps in the firm's complaint handling rules (document no. ACR01-001) were not followed",
+     "Action: one-month suspension of manufacture (13 July to 12 August 2026)",
+     "Product: an icosapent ethyl 300 mg soft capsule"
+    ],
+    "checks": [
+     "Whether the assessment criteria in the complaint handling rules are applied",
+     "Records linking complaints to corrective and preventive action"
+    ]
    }
   },
   {
@@ -918,6 +1023,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Product standards not followed",
+    "summary": "A one-month suspension of manufacture was imposed because the firm did not follow the product standards when making a herbal oral liquid containing L-muscone as a musk substitute.",
+    "implication": "Failure to follow the manufacturing control standard and the product master file is a breach of the most basic GMP requirement and recurs as a finding. Herbal preparation sites should reconfirm that the standards and the actual manufacturing records agree.",
+    "key_facts": [
+     "Violation: manufacture without following the product standards (Pharmaceutical Affairs Act article 38(1))",
+     "Action: one-month suspension of manufacture (16 July to 15 August 2026)",
+     "Product: a herbal oral liquid containing L-muscone as a musk substitute"
+    ],
+    "checks": [
+     "Whether the manufacturing standards and the actual batch records agree",
+     "Read the original decision for the detail"
+    ]
    }
   },
   {
@@ -1006,6 +1125,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Main ingredient testing not performed",
+    "summary": "A suspension of manufacture for three months and 15 days was imposed because the firm did not test the main ingredient against the notified specification and did not notify a change of the main ingredient's manufacturer when making two polyhexamethylene biguanide hydrochloride 20% solutions.",
+    "implication": "Not testing the main ingredient and not notifying a change of its manufacturer point to a fundamental gap in material traceability. Sites making similar preparations should re-examine the change control and notification system covering material sources.",
+    "key_facts": [
+     "Violation: main ingredient testing to the notified specification was not performed, and a change of the main ingredient manufacturer was not notified",
+     "Action: suspension of manufacture for three months and 15 days (15 July to 28 October 2026)",
+     "Products: two solution products containing polyhexamethylene biguanide hydrochloride 20%"
+    ],
+    "checks": [
+     "Whether main ingredient testing is performed and the certificates retained",
+     "The change control and notification procedure covering a change of material manufacturer"
+    ]
    }
   },
   {
@@ -1094,6 +1227,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Test request records not per procedure",
+    "summary": "A one-month suspension of manufacture for the affected products and a 15-day suspension for a contract dosage form were imposed after the firm did not follow the recording and approval steps required by its own quality control procedure when requesting microbiological testing of intermediates.",
+    "implication": "Failing to follow document management steps such as recording and approving a test request is a leading example of what gets cited from a data integrity standpoint. Herbal preparation sites should review the whole test request process for its recording and approval history.",
+    "key_facts": [
+     "Violation: the recording and team leader approval steps for requesting microbiological testing of intermediates were not followed",
+     "Action: one-month suspension of manufacture for four affected products (13 July to 12 August 2026)",
+     "Action: 15-day suspension of manufacture for the enteric film-coated tablet dosage form (13 to 27 July 2026)"
+    ],
+    "checks": [
+     "Whether the recording and approval steps for test requests are followed",
+     "How management responsibility is carried out for each dosage form made under contract"
+    ]
    }
   },
   {
@@ -1306,6 +1453,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Facilities and equipment remediation accepted",
+    "summary": "MFDS raised several facilities and equipment deficiencies at a post-approval GMP inspection, covering operation of manufacturing facilities to prevent cross-contamination, the calibration management procedure for instruments, and trending of compressed air. The remediation plan submitted by the firm was accepted as adequate.",
+    "implication": "Cross-contamination facilities, instrument calibration and trending of utilities such as compressed air are facility management areas that recur in GMP inspections. Sites should re-examine whether periodic trending of utility systems is performed and whether requalification intervals for instruments are set and documented.",
+    "key_facts": [
+     "Inspection period: 7 to 9 April 2026 (post-approval, finished product single)",
+     "Deficiencies: operate manufacturing facilities so as to prevent cross-contamination, establish a justified calibration management procedure and requalification interval for instruments, and trend compressed air (facilities and equipment area)",
+     "Outcome: the remediation plan for the deficiencies was accepted as adequate"
+    ],
+    "checks": [
+     "Whether trending of utilities such as compressed air is performed",
+     "Documentation of calibration and requalification intervals for instruments"
+    ]
    }
   },
   {
@@ -1369,6 +1530,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site Baxter Oncology GmbH in Germany for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 23 to 27 September 2024",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1432,6 +1607,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site Liebel-Flarsheim Company LLC in the US for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 9 to 13 December 2024",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1495,6 +1684,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site Guerbet in France for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 18 to 22 November 2024",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1558,6 +1761,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site Patheon France in France for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 10 to 14 February 2025",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1621,6 +1838,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site Recipharm Leganes S.L.U. in Spain for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 6 to 8 May 2025",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1688,6 +1919,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site Novartis Pharmaceuticals S.R.L. in Romania for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 12 to 16 May 2025",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1751,6 +1996,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Overseas pre-approval GMP inspection",
+    "summary": "MFDS carried out an on-site pre-approval GMP assessment of the overseas site IBSA Farmaceutici Italia S.r.l. in Italy for imported finished products. The assessment outcome could not be determined.",
+    "implication": "Pre-approval GMP assessment of imported finished products is the step that verifies an overseas site's quality system before the product reaches the domestic market. Firms supplied with materials or finished product from this site should confirm whether the assessment outcome has been finalised.",
+    "key_facts": [
+     "Inspection period: 17 to 21 November 2025",
+     "Method: on-site inspection (pre-approval, finished product single)",
+     "Outcome: not determined - the original document needs to be consulted"
+    ],
+    "checks": [
+     "Whether the pre-approval GMP assessment outcome has been finalised",
+     "Identify which imported products from this site are supplied domestically"
+    ]
    }
   },
   {
@@ -1809,6 +2068,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Guideline on change management plans",
+    "summary": "MFDS published a guideline on the approval and review of change management plans for digital medical devices. The detail of what it changes could not be determined.",
+    "implication": "Reviewing a change management plan up front for digital medical devices is a regulatory response to how frequently software as a medical device is updated. Firms working with digital medical devices should check the requirements for preparing a change management plan in advance.",
+    "key_facts": [
+     "Subject: guideline on approval and review of change management plans for digital medical devices",
+     "Issued: MFDS, 26 June 2026",
+     "Detail: the original guideline needs to be consulted, as only the title is available"
+    ],
+    "checks": [
+     "Read the guideline for its detailed requirements",
+     "Whether a change management plan needs to be prepared for digital medical devices"
+    ]
    }
   },
   {
@@ -1882,6 +2155,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Concern over a nitroso impurity",
+    "summary": "A precautionary voluntary recall was carried out for a linagliptin and metformin extended-release tablet because of concern that the impurity N-nitroso-meglumine exceeded the permitted limit.",
+    "implication": "Nitrosamines are the genotoxic impurity class that regulators worldwide keep under continuous monitoring. Sites making metformin combination products should re-examine whether their nitroso impurity control plan is being carried out.",
+    "key_facts": [
+     "Reason: concern that N-nitroso-meglumine exceeded the permitted limit, handled as a precautionary measure",
+     "Product: a linagliptin and metformin extended-release tablet at the 1000 mg metformin strength, with one further product",
+     "Issued: 2 July 2026"
+    ],
+    "checks": [
+     "Whether the nitroso impurity control plan is being carried out",
+     "Check the link to other strengths of the same linagliptin and metformin combination"
+    ]
    }
   },
   {
@@ -1951,6 +2238,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Metal foreign body pulls 40 brands",
+    "summary": "After a metal foreign body was confirmed in one toothpaste, the firm recalled 40 toothpaste brands made on the same production line at the site.",
+    "implication": "A metal foreign body found on one production line spreading to 40 private label toothpastes shows how a process failure in an own-label manufacturing arrangement can reach many distribution channels at once. Those responsible for own-label products such as toothpaste should check the inspection history of the metal detector and the foreign matter control records for each line.",
+    "key_facts": [
+     "Reason: a metallic foreign body confirmed in one of the toothpaste products",
+     "Scope: 40 toothpaste brands produced at the same site",
+     "Issued: 2 July 2026"
+    ],
+    "checks": [
+     "Inspection and calibration history of the metal detector on the production line",
+     "Check the link to other own-label brands produced on the same line"
+    ]
    }
   },
   {
@@ -2021,6 +2322,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Ash content above the limit",
+    "summary": "A herbal preparation was recalled and its sale suspended after it failed the ash test specification.",
+    "implication": "An ash specification failure in a herbal preparation points to the need to re-examine material control as a whole. Sites making herbal preparations should strengthen ash and acid-insoluble ash testing at goods receipt of materials.",
+    "key_facts": [
+     "Reason: failure of the ash specification",
+     "Product: a herbal (crude drug) preparation",
+     "Issued: 29 June 2026"
+    ],
+    "checks": [
+     "Whether ash testing is performed at goods receipt of materials",
+     "Check the link to other products using the same material"
+    ]
    }
   },
   {
@@ -2091,6 +2406,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Cadmium detected in a herbal material",
+    "summary": "A herbal preparation was recalled and its sale suspended after the heavy metal cadmium was found above the limit.",
+    "implication": "Cadmium detected in a herbal preparation points to the need to re-examine material control as a whole. Sites making herbal preparations should strengthen the heavy metal testing history by growing region for their materials.",
+    "key_facts": [
+     "Reason: heavy metal (cadmium) above the limit",
+     "Product: a herbal (crude drug) preparation",
+     "Issued: 29 June 2026"
+    ],
+    "checks": [
+     "Confirm the heavy metal test certificates by growing region for the material",
+     "Check the link to other products using the same material"
+    ]
    }
   },
   {
@@ -2160,6 +2489,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Microbial limit failure on surveillance testing",
+    "summary": "A polyhexamethylene biguanide hydrochloride 20% solution was recalled and its sale suspended after failing the microbial limit test in regulatory surveillance sampling.",
+    "implication": "A microbial limit failure in a preparation containing an antimicrobial ingredient can indicate a failure of preservative effectiveness control. Sites should re-examine the preservative efficacy testing history and microbial limit testing history for the finished product.",
+    "key_facts": [
+     "Reason: microbial limit failure on regulatory surveillance testing",
+     "Product: a polyhexamethylene biguanide hydrochloride 20% solution",
+     "Issued: 29 June 2026"
+    ],
+    "checks": [
+     "Review the preservative efficacy testing history for the finished product",
+     "Whether microbial limit testing has been repeated on other products with the same ingredient"
+    ]
    }
   },
   {
@@ -2230,6 +2573,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Acid-insoluble ash above the limit",
+    "summary": "A herbal preparation was recalled and its sale suspended after failing both the ash and the acid-insoluble ash test specifications.",
+    "implication": "Two different products from the same site failing ash-related specifications at the same time suggests the material testing process as a whole needs review. Sites making herbal preparations should re-check the ash testing records for every material.",
+    "key_facts": [
+     "Reason: failure of the ash and acid-insoluble ash specifications",
+     "Product: a herbal (crude drug) preparation",
+     "Issued: 29 June 2026"
+    ],
+    "checks": [
+     "Ash and acid-insoluble ash testing history at goods receipt of materials",
+     "Check the link to other herbal products from the same site"
+    ]
    }
   },
   {
@@ -2300,6 +2657,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Export-only product sold domestically",
+    "summary": "A botulinum toxin type A injection made for export only was sold on the domestic market without national lot release, and was recalled with its sale suspended.",
+    "implication": "Distributing an export-only medicine domestically without national lot release is a serious breach that undermines the foundation of the lot release system for biological products. Firms handling high-risk biologicals such as botulinum toxin should re-examine how they keep export and domestic distribution routes separate.",
+    "key_facts": [
+     "Reason: an export-only medicine was sold domestically without national lot release",
+     "Product: a Clostridium botulinum toxin type A injection made for export",
+     "Issued: 26 June 2026"
+    ],
+    "checks": [
+     "Separation of the domestic distribution route from export-only product",
+     "Review of release records for products subject to national lot release"
+    ]
    }
   },
   {
@@ -2369,6 +2740,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Precautionary voluntary recall",
+    "summary": "A precautionary voluntary recall was carried out for a single-use waterproof adhesive bandage on the basis of post-market safety information.",
+    "implication": "A precautionary voluntary recall driven by post-market surveillance information is a case of acting before adverse events spread. Makers of similar medical supplies should review their system for monitoring post-market information and their criteria for triggering a recall.",
+    "key_facts": [
+     "Reason: precautionary voluntary recall based on post-market safety information",
+     "Product: a single-use waterproof adhesive bandage",
+     "Issued: 26 June 2026"
+    ],
+    "checks": [
+     "The system for monitoring post-market safety information",
+     "Whether the same reason has been re-notified under a duplicate document number"
+    ]
    }
   },
   {
@@ -2442,6 +2827,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality issue in a radiopharmaceutical",
+    "summary": "Health Canada carried out a Type III recall of Fludeoxyglucose (18F) Injection, a radiopharmaceutical, on product quality grounds.",
+    "implication": "A quality issue in a radiopharmaceutical has an immediate effect on distribution and stock because of the short half-life. Organisations handling radiopharmaceuticals should review how quickly they can respond when a similar quality issue arises.",
+    "key_facts": [
+     "Class: Type III",
+     "Reason: product quality, as disclosed in the Health Canada recall classification",
+     "Product: Fludeoxyglucose (18F) Injection, a radiopharmaceutical"
+    ],
+    "checks": [
+     "Reconfirm the quality control criteria for radiopharmaceuticals",
+     "Confirm the distribution status of the lots subject to recall"
+    ]
    }
   },
   {
@@ -2549,6 +2948,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Total impurities out of specification",
+    "summary": "Glenmark Pharmaceuticals carried out a voluntary recall of the oral contraceptive Alyacen after out-of-specification results for total impurities.",
+    "implication": "Impurities exceeding specification in an oral tablet is a leading indicator of inadequate control of degradation products during stability. Sites should review how they manage the trend in degradation products and impurities through the shelf life.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: out-of-specification results for total impurities",
+     "Distribution: nationwide in the US"
+    ],
+    "checks": [
+     "Review of stability data trends for degradation products and impurities",
+     "Confirm whether the recalled lots reached the domestic market"
+    ]
    }
   },
   {
@@ -2647,6 +3060,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Does not meet the OTC monograph",
+    "summary": "PAI Holdings, distributed by VistaPharm, carried out a voluntary recall of an activated charcoal preparation, KERR Insta-Char in an aqueous base with cherry flavour, after it failed to meet OTC monograph M023.",
+    "implication": "Activated charcoal is an OTC product used in the emergency response to acute poisoning, so failing a compendial or monograph requirement affects confidence in its efficacy directly. Makers of comparable OTC preparations should reconfirm that their specifications meet the applicable monograph.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: the product did not meet OTC monograph M023",
+     "Distribution: nationwide in the US"
+    ],
+    "checks": [
+     "Review of specification conformity against the applicable OTC monograph",
+     "Check the link to other strengths and bases of the same dosage form"
+    ]
    }
   },
   {
@@ -2741,6 +3168,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Subpotent compounded injection",
+    "summary": "IntegraDose Compounding Services recalled a vasopressin injection it had compounded in sodium chloride after it was found to be subpotent.",
+    "implication": "A subpotent compounded injection points to inadequate control of measurement and mixing in the compounding process. Compounding organisations should re-examine the assay verification step applied to compounded injections.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: subpotent drug",
+     "Dosage form: aseptically compounded injection in a syringe"
+    ],
+    "checks": [
+     "Review of the assay verification procedure for compounded injections",
+     "Whether the healthcare institutions that received the lot have been notified"
+    ]
    }
   },
   {
@@ -2853,6 +3294,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Product mix-up in the bottle",
+    "summary": "A bottle containing voriconazole 50 mg tablets was labelled and distributed as aripiprazole 30 mg tablets by Ajanta Pharma USA Inc, and the product was recalled as a mix-up.",
+    "implication": "A mix-up at the packaging and labelling step carries the serious possibility of a patient taking a medicine they were not prescribed. Sites should reconfirm their line clearance and label verification procedures at packaging changeover.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: product mix-up - voriconazole 50 mg tablets were labelled and distributed as aripiprazole 30 mg tablets",
+     "Distribution: nationwide in the US"
+    ],
+    "checks": [
+     "Review of the line clearance procedure at packaging changeover",
+     "Confirm the double check applied to label verification"
+    ]
    }
   },
   {
@@ -2965,6 +3420,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Crystallisation in an injection",
+    "summary": "Par Health USA recalled buprenorphine hydrochloride injection after crystallisation identified as buprenorphine free base was found.",
+    "implication": "Crystallisation of the active ingredient in an injection points to a solubility or formulation stability problem and can present as a particulate risk on administration. Injectable sites should review the history of crystallisation under each storage condition.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: crystallisation identified as buprenorphine free base",
+     "Dosage form: single-dose vial for intramuscular and intravenous use"
+    ],
+    "checks": [
+     "Review of formulation stability and solubility data",
+     "History of crystallisation observed under each storage condition"
+    ]
    }
   },
   {
@@ -3085,6 +3554,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incomplete seals on the container",
+    "summary": "Keystone Industries recalled a topical anaesthetic gel containing benzocaine 20% because bottles may have incomplete seals.",
+    "implication": "The same container seal defect appearing across benzocaine gels distributed under several brands from one site points to a structural problem in packaging process control. Firms using contract packagers should check the container and seal leak test records.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: defective container - bottles may have incomplete seals",
+     "Product family: benzocaine 20% topical anaesthetic gel for dental use"
+    ],
+    "checks": [
+     "Review of container seal leak test records",
+     "Check the link to other brands from the same manufacturing site"
+    ]
    }
   },
   {
@@ -3197,6 +3680,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Failed dissolution specifications",
+    "summary": "Inventia Healthcare in India, with product distributed by Rising Pharma, recalled chlorthalidone 25 mg tablets after they failed the dissolution specification.",
+    "implication": "A dissolution failure is a departure on a core quality attribute that can affect bioavailability and equivalence. Generic sites should re-examine the dissolution profile trend batch by batch.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: failed dissolution specifications",
+     "Distribution: nationwide in the US"
+    ],
+    "checks": [
+     "Confirm the dissolution profile trend by batch",
+     "Review the history of formulation and process changes to the tablet"
+    ]
    }
   },
   {
@@ -3306,6 +3803,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recall over CGMP deviations",
+    "summary": "Dabur India Limited voluntarily recalled OTC products it manufactures, including an antifungal athlete's foot cream containing clotrimazole, on the basis of CGMP deviations observed during an FDA inspection.",
+    "implication": "CGMP deviations at one site pulling numerous private label products into a simultaneous recall shows how a quality system defect at the original manufacturer can spread through several distribution channels in a contract manufacturing supply chain. Those managing own-label manufacturing should reconfirm the CGMP inspection history of their material and finished product suppliers.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: CGMP deviations, from deficiencies observed during an FDA inspection",
+     "Distribution: nationwide in the US, sold under numerous private labels"
+    ],
+    "checks": [
+     "Confirm the CGMP inspection history of the contract manufacturing site",
+     "Check the link to other brands produced at the same site"
+    ]
    }
   }
  ]

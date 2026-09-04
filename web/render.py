@@ -1130,16 +1130,28 @@ _GLOSSARY_BUCKET_ORDER = [
 ]
 
 
-def _glossary_bucket(term_ko: str) -> str:
-    """term_ko 첫 글자 → 초성 버킷. 한글=초성(된소리 합침), 라틴 알파벳=A–Z, 그 외=#."""
-    ch = term_ko[0]
+def _glossary_bucket(term: str, lang: str = DEFAULT_LANG) -> str:
+    """표제어 첫 글자 → 색인 버킷.
+
+    한국어판: 한글=초성(된소리 합침), 라틴 알파벳은 **한 덩어리**(A–Z), 그 외=#.
+    ★영어판: 라틴을 한 덩어리로 두면 242개가 버킷 하나에 들어가 색인이 아무것도
+      가르지 못한다. 그래서 영어 트리에서는 **낱자**(A, B, C…)로 가른다.
+    """
+    ch = term[0]
     o = ord(ch)
     if 0xAC00 <= o <= 0xD7A3:
         lead = _GLOSSARY_LEAD[(o - 0xAC00) // 588]
         return _GLOSSARY_LEAD_BASE.get(lead, lead)
     if ch.isascii() and ch.isalpha():
-        return _GLOSSARY_LATIN
+        return ch.upper() if lang != DEFAULT_LANG else _GLOSSARY_LATIN
     return _GLOSSARY_ETC
+
+
+def _glossary_bucket_order(lang: str = DEFAULT_LANG) -> "list[str]":
+    """색인 바의 순서 — 영어는 A–Z 낱자, 한국어는 가나다 → 라틴 → 기타."""
+    if lang != DEFAULT_LANG:
+        return [chr(c) for c in range(ord("A"), ord("Z") + 1)] + [_GLOSSARY_ETC]
+    return _GLOSSARY_BUCKET_ORDER
 
 
 def load_glossary(path: Path = GLOSSARY_FILE) -> list[dict[str, Any]] | None:
@@ -1404,6 +1416,7 @@ def build_glossary_view(
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
     cases: dict[str, dict[str, Any]] | None = None,
     clause_slugs: "set[str] | None" = None,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
@@ -1430,7 +1443,10 @@ def build_glossary_view(
     있다). URL 인코딩은 _url_quote(q, safe="")(urllib.parse.quote 와 byte-동일 출력을
     자체 구현 — 순수성 게이트가 render.py 안의 urllib import 를 막는다. 결정론 — 한글
     검색어 포함)."""
-    label_by_id = {t["id"]: t["term_ko"] for t in terms}
+    # 관련 용어 칩의 라벨도 읽는 언어를 따른다 — 영어 화면에 한국어 표제어가 섞이면
+    # 그 칩만 번역이 덜 된 것으로 읽힌다.
+    label_by_id = {t["id"]: (t["term_ko"] if lang == DEFAULT_LANG else t["term_en"])
+                   for t in terms}
     cases = cases or {}
 
     def _term_view(t: dict[str, Any]) -> dict[str, Any]:
@@ -1440,13 +1456,20 @@ def build_glossary_view(
         # 용어에 착지한 방문자가 실제 지적사례가 있는 쪽으로 갈 수 있게 한다.
         def _related_view(rid: str) -> "dict[str, Any]":
             n = _glossary_case_count(cases.get(rid))
-            return {"id": rid, "term_ko": label_by_id[rid],
+            return {"id": rid, "label": label_by_id[rid],
                     "case_count_label": f"{n:,}" if n else ""}
 
         related = [_related_view(r) for r in (t.get("related") or [])
                    if r in label_by_id]
         reg_refs = [v for v in (_reg_ref_view(r, reg_ref_catalogs, clause_slugs)
                                 for r in (t.get("reg_refs") or [])) if v]
+        # ★[다국어 2026-09-04] 화면에 나갈 본문은 **뷰가 언어를 정해** 넘긴다
+        #   (불변식 #13). 템플릿이 `easy_ko` 를 직접 읽으면 영어 페이지에 한국어
+        #   설명이 실린다 — 이번 다국어 작업에서 세 번 밟은 자리와 같은 모양이다.
+        is_ko = lang == DEFAULT_LANG
+        term = t["term_ko"] if is_ko else t["term_en"]
+        easy = t["easy_ko"] if is_ko else (t.get("easy_en") or "")
+        detail = (t.get("detail_ko") or "") if is_ko else (t.get("detail_en") or "")
         search_parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
         detail_ko = t.get("detail_ko") or ""
         if detail_ko:
@@ -1454,6 +1477,10 @@ def build_glossary_view(
         aliases = list(t.get("aliases") or [])
         if aliases:
             search_parts.extend(aliases)
+        if not is_ko:
+            # 영어판 검색은 영어 본문으로 한다 — 한국어 문자열을 남기면 화면에 안 보이는
+            # 한글이 검색 인덱스에만 남아, 영어 사용자가 왜 걸렸는지 알 수 없게 된다.
+            search_parts = [t["term_en"], easy] + ([detail] if detail else [])
         # [A1] 표시용: 표제어와 하이픈·공백 차이만 있는 동의어는 잡음이라 제외(감춤은
         # 화면뿐 — search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
         norm_ko = _glossary_alias_norm(t["term_ko"])
@@ -1461,11 +1488,22 @@ def build_glossary_view(
         display_aliases = [a for a in aliases
                             if _glossary_alias_norm(a) not in norm_ko
                             and _glossary_alias_norm(a) not in norm_en]
-        case = cases.get(t["id"]) or {}
+        # ★사례 링크는 영어판에서 내지 않는다. 검색어 193개 중 61개가 한글이고,
+        #   건수는 **전체 코퍼스**로 잰 값이라 영어 검색(원문이 영어인 지적이 기본)이
+        #   보여줄 수와 어긋난다 — 한 화면 안의 두 숫자가 다르면 어느 쪽이 맞는지
+        #   알 방법이 없다(모음 페이지에서 같은 이유로 별도 정본을 만들었다).
+        case = (cases.get(t["id"]) or {}) if is_ko else {}
         case_q = str(case.get("q") or "")
         case_findings = _glossary_case_count(case)
         return {
             "id": t["id"],
+            # 표시용(언어가 정해진 값) — 템플릿은 이것만 쓴다.
+            "term": term,
+            # 부제는 한국어판에서만 영문 표제어를 덧붙인다(영어판에선 표제어 자신이다).
+            "term_sub": t["term_en"] if is_ko else "",
+            "easy": easy,
+            "detail": detail,
+            # 정본 값(무변형) — 정렬·앵커·데이터 대조용으로 남긴다.
             "term_ko": t["term_ko"],
             "term_en": t["term_en"],
             "easy_ko": t["easy_ko"],
@@ -1473,14 +1511,15 @@ def build_glossary_view(
             # v2: 출처 공식 링크(있으면 출처 표기를 새 탭 링크로 — 값 무변형·안전 URL 만).
             "source_url": _safe_url(t.get("source_url") or ""),
             "related": related,
-            "bucket": _glossary_bucket(t["term_ko"]),
+            "bucket": _glossary_bucket(term, lang),
             "search": " ".join(search_parts).lower(),
             # v3(8차 웨이브 A): 심화 필드 — 부재 시 ""/[] 라 템플릿 {% if %} 게이트로 조용히 생략.
             "detail_ko": detail_ko,
             "reg_refs": reg_refs,
             # [A1] 표시용 동의어(표제어와 하이픈·공백만 다른 것 제외) — 부재/전량제외 시
             # 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략.
-            "aliases": display_aliases,
+            # 동의어는 한국어 표기라 영어판에서는 싣지 않는다(검색에도 넣지 않는다).
+            "aliases": display_aliases if is_ko else [],
             # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
             "case_q": case_q,
             "case_findings": case_findings,
@@ -1490,16 +1529,30 @@ def build_glossary_view(
         }
 
     views = [_term_view(t) for t in terms]
-    order = {b: i for i, b in enumerate(_GLOSSARY_BUCKET_ORDER)}
+    # ★출처는 **실제 문서 이름**이라 번역하지도 빼지도 않는다 — 「알기 쉬운 GMP 용어집」을
+    #   영어로 옮기면 존재하지 않는 문서를 가리키게 되고, 빼면 근거를 감추는 것이 된다.
+    #   대신 영어 화면이 그 사실을 밝힌다(자료실의 한국어 원제와 같은 판단).
+    # 출처만이 아니라 **관련 조항**도 한국어 법령 이름이다(「약사법」 제39조,
+    # 「의약품 제조 및 품질관리에 관한 규정 [별표 1]」 …). 둘 다 실제 문서·법령의
+    # 이름이라 옮기면 존재하지 않는 것을 가리키게 되므로 원문 그대로 두고 함께 센다.
+    def _ko_named(t: dict[str, Any]) -> bool:
+        if _HANGUL_RE.search(t.get("definition_source") or ""):
+            return True
+        return any(_HANGUL_RE.search(str(r)) for r in (t.get("reg_refs") or []))
+
+    ko_only_sources = sum(1 for t in terms if _ko_named(t))
+    order = {b: i for i, b in enumerate(_glossary_bucket_order(lang))}
     groups_map: dict[str, list[dict[str, Any]]] = {}
     for v in views:
         groups_map.setdefault(v["bucket"], []).append(v)
     groups: list[dict[str, Any]] = []
     for idx, bucket in enumerate(sorted(groups_map, key=lambda b: (order.get(b, 99), b))):
-        items = sorted(groups_map[bucket], key=lambda v: v["term_ko"])
+        items = sorted(groups_map[bucket], key=lambda v: v["term"])
         # 그룹 앵커는 결정론 인덱스 파생(유니코드/en-dash 를 href 에 넣지 않음).
         groups.append({"bucket": bucket, "anchor": f"grp-{idx}", "terms": items})
     return {"groups": groups, "total": len(views),
+            # 한국어 출처명이 남는 건수 — 영어판에서만 화면이 밝힌다(0 이면 문구 없음).
+            "ko_only_sources": ko_only_sources if lang != DEFAULT_LANG else 0,
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
 
 
@@ -1524,7 +1577,7 @@ def glossary_term_description(term: dict[str, Any], tr: Translator = _KO) -> str
     입력에서는 기존과 byte 동일하다. DefinedTerm JSON-LD 의 description 은 이 함수를
     쓰지 않는다 — 구조화 데이터의 정의문은 순수 정의(easy_ko)로 남아야 한다.
     """
-    text = " ".join((term.get("easy_ko") or "").split())
+    text = " ".join((term.get("easy") or term.get("easy_ko") or "").split())
     try:
         case_findings = int(term.get("case_findings") or 0)
     except (TypeError, ValueError):
@@ -1833,9 +1886,12 @@ def link_terms_in_text(
 
 def glossary_term_page_title(term: dict[str, Any], tr: Translator = _KO) -> str:
     """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
-    term_ko = term.get("term_ko") or ""
-    short_en = glossary_title_en(term_ko, term.get("term_en") or "")
-    head = f"{term_ko}({short_en})" if short_en else term_ko
+    # ★표시 이름은 **뷰가 정한 값**을 쓴다(불변식 #13). 영어판에는 부제가 없으므로
+    #   괄호 약어를 붙이지 않는다 — 표제어 자신이 이미 영문이다.
+    head = term.get("term") or term.get("term_ko") or ""
+    if term.get("term_sub"):
+        short_en = glossary_title_en(head, term.get("term_sub") or "")
+        head = f"{head}({short_en})" if short_en else head
     return tr("{head} 뜻 · GRM 용어사전", head=head)
 
 
@@ -3224,25 +3280,31 @@ def build_rss_xml(briefs: list[dict[str, Any]],
 
 def build_glossary_term_json_ld(term: dict[str, Any],
                                 base_url: str = SITE_BASE_URL,
-                                tr: Translator = _KO) -> str:
+                                tr: Translator = _KO, lang: str = DEFAULT_LANG) -> str:
     """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
 
-    inLanguage=ko. `name` 은 한글 표제어, `alternateName` 은 영문 표제어(+동의어).
+    inLanguage 은 **그 페이지의 언어**다. `name` 은 그 언어의 표제어,
+    `alternateName` 은 한국어판에서만 영문 표제어(+동의어)를 싣는다.
     값은 전부 정본 무변형이고 json.dumps 가 이스케이프를 책임진다(수동 문자열 결합 0).
     """
-    alt = [term["term_en"], *term.get("aliases", [])]
+    # 한국어판은 영문 표제어를 대체명으로 싣는다. 영어판은 표제어가 곧 영문이라
+    # 대체명이 없다(한국어 표기를 영어 구조화 데이터에 넣지 않는다).
+    alt = ([term["term_sub"], *term.get("aliases", [])]
+           if term.get("term_sub") else list(term.get("aliases") or []))
     node: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "DefinedTerm",
-        "name": term["term_ko"],
+        "name": term.get("term") or term["term_ko"],
         "alternateName": [a for a in alt if a],
-        "description": term.get("easy_ko") or "",
-        "inLanguage": "ko",
-        "url": f"{base_url}/glossary/{term['id']}/",
+        "description": term.get("easy") or term.get("easy_ko") or "",
+        # ★언어와 URL 이 실제 페이지와 어긋나면 구조화 데이터가 거짓말이 된다 —
+        #   영어판이 "이 페이지는 한국어이고 주소는 /glossary/…"라고 말하게 된다.
+        "inLanguage": lang,
+        "url": f"{base_url}/{LANG_PREFIXES[lang]}glossary/{term['id']}/",
         "inDefinedTermSet": {
             "@type": "DefinedTermSet",
             "name": tr("GRM 규제 용어사전"),
-            "url": f"{base_url}/glossary/",
+            "url": f"{base_url}/{LANG_PREFIXES[lang]}glossary/",
         },
     }
     return json.dumps(node, ensure_ascii=False, sort_keys=True)
@@ -3666,6 +3728,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if en_docs:
         en_paths |= {f"findings/doc/{d['slug']}/" for d in en_docs}
         en_paths.add("findings/docs/")
+    # [다국어 2026-09-04] 용어사전 — **그리기 전에** 면 집합에 넣는다. 렌더 도중에
+    # 넣으면 먼저 그려진 한국어 용어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만
+    # 붙는다(모음 페이지에서 같은 실수를 CI 가 잡았다).
+    _glossary_terms_for_paths = load_glossary()
+    if _glossary_terms_for_paths:
+        en_paths.add("glossary/")
+        en_paths |= {f"glossary/{t['id']}/" for t in _glossary_terms_for_paths}
         en_paths.add("findings/browse/")
         # 기관×연도 목록은 **영어로 낼 문서가 있는 묶음만** 만든다(빈 목록 금지).
         en_paths |= {f"findings/docs/{d['agency'].lower()}/{d['published_date'][:4]}/"
@@ -3957,6 +4026,34 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=tr(GLOSSARY_DESCRIPTION),
             glossary=glossary_view,
         )
+
+        # ── [다국어 2026-09-04] 영어판 용어사전 ──────────────────────────────
+        # 표제어(`term_en`)는 데이터에 이미 있었고, 설명 두 필드(`easy_en`·`detail_en`)를
+        # 정본에 실어 본문이 영어로 성립하게 됐다. 색인은 **낱자 A–Z** 로 가른다 —
+        # 한국어판의 라틴 버킷(A–Z 한 덩어리)을 그대로 쓰면 242개가 한 칸에 들어간다.
+        # ★사례 링크·인용은 영어판에서 내지 않는다: 사례 검색어 193개 중 61개가 한글이고
+        #   건수는 전체 코퍼스로 잰 값이라, 영어 검색(원문이 영어인 지적이 기본)이 보여줄
+        #   수와 어긋난다. 인용문 역시 한국어 본문에서 한국어 탐침으로 고른 것이다.
+        glossary_en_view = build_glossary_view(
+            glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases(),
+            clause_slugs, lang="en") if glossary_terms else None
+        if glossary_en_view:
+            en_emit("glossary.html", en_page("glossary/"),
+                page_title=en_tr("규제 용어사전 · GRM"),
+                nav_active="glossary",
+                description=en_tr(GLOSSARY_DESCRIPTION),
+                glossary=glossary_en_view,
+            )
+            for group in glossary_en_view["groups"]:
+                for term in group["terms"]:
+                    en_emit("glossary_term.html", en_page(f"glossary/{term['id']}/"),
+                        page_title=glossary_term_page_title(term, en_tr),
+                        nav_active="glossary",
+                        description=glossary_term_description(term, en_tr),
+                        json_ld=build_glossary_term_json_ld(term, tr=en_tr, lang="en"),
+                        term=term,
+                        case_excerpts=[],
+                    )
 
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
         # 재사용한다(별도 가공 0 → 두 화면이 갈라질 수 없다). 정렬은 뷰모델 순서 그대로라

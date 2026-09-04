@@ -14881,6 +14881,145 @@ class WebEnFacetTest(unittest.TestCase):
         self.assertIn('"orig_lang": orig_lang,', src, "산출물이 모집단을 스스로 밝혀야 한다")
 
 
+class WebEnGlossaryTest(unittest.TestCase):
+    """[다국어 2026-09-04] 영어판 용어사전 242어 — 본문은 영어, 이름은 원문 그대로.
+
+    ★표제어(`term_en`)는 데이터에 이미 있었고, 이번에 설명 두 필드(`easy_en`·
+      `detail_en`)를 정본에 실어 본문이 영어로 성립하게 됐다.
+    ★출처(`definition_source`)와 관련 조항(`reg_refs`)은 **실제 문서·법령의 이름**이라
+      번역하지도 빼지도 않는다 — 「알기 쉬운 GMP 용어집」을 영어로 옮기면 존재하지 않는
+      문서를 가리키게 되고, 빼면 근거를 감추는 것이 된다. 대신 화면이 그 사실을 밝힌다
+      (자료실의 한국어 원제와 같은 판단).
+    """
+
+    #: 출처·조항 블록은 위 이유로 한글 검사에서 제외한다. 대신 **화면이 밝히는지**를
+    #: 아래 test_discloses_why_korean_names_remain 이 따로 본다.
+    _NAMED_SECTION = re.compile(
+        r'<section class="gt-sec(?: gt-src)?">\s*<h2 class="gt-sec-h">'
+        r'(?:Related sections|Source)</h2>.*?</section>', re.S)
+
+    @classmethod
+    def setUpClass(cls):
+        cls.terms = render.load_glossary() or []
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_engloss_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.dir = cls.out / "en" / "glossary"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 데이터 ──────────────────────────────────────────────────────────────
+    def test_every_term_has_english_definition(self):
+        """빠짐이 있으면 그 페이지만 한국어가 된다 — 부분 영어를 만들지 않는다."""
+        self.assertGreater(len(self.terms), 200)
+        missing = [t["id"] for t in self.terms if not (t.get("easy_en") or "").strip()]
+        self.assertEqual(missing, [], f"easy_en 결손: {missing[:6]}")
+
+    def test_detail_english_exists_exactly_where_korean_does(self):
+        """한국어에 없는 심화 설명을 영어에만 쓰면 지어낸 것이다(반대는 누락이다)."""
+        mismatch = [t["id"] for t in self.terms
+                    if bool((t.get("detail_ko") or "").strip())
+                    != bool((t.get("detail_en") or "").strip())]
+        self.assertEqual(mismatch, [], f"detail 유무 불일치: {mismatch[:6]}")
+
+    def test_english_text_invents_no_numbers(self):
+        """★생성 경로가 하나 더 생기면 게이트도 하나 더 — 브리프의 사실 게이트와 같은 규율.
+
+        영문이 한국어 원문·표제어·출처·조항에 없는 수치를 말하면 잡는다. 검사는 비대칭이다
+        (덜 말하는 것은 되고 없는 것을 말하는 것만 막는다). 한 자리 수는 영어가 'two sites'
+        처럼 풀어 쓰는 일이 잦아 대조에서 뺀다.
+        """
+        num = re.compile(r"\d[\d,]*\d")
+        def nums(*vals):
+            out = set()
+            for v in vals:
+                for m in num.finditer(str(v or "")):
+                    out.add(m.group(0).replace(",", ""))
+            return out
+        invented = []
+        for t in self.terms:
+            allowed = nums(t.get("easy_ko"), t.get("detail_ko"), t.get("term_ko"),
+                           t.get("term_en"), t.get("definition_source"),
+                           " ".join(t.get("reg_refs") or []), t.get("source_url"))
+            said = nums(t.get("easy_en"), t.get("detail_en"))
+            bad = sorted(said - allowed)
+            if bad:
+                invented.append(f"{t['id']}: {bad[:4]}")
+        self.assertEqual(invented, [], f"EN_INVENTED_NUMBER {invented[:5]}")
+
+    # ── 렌더 ────────────────────────────────────────────────────────────────
+    def test_every_term_gets_an_english_page(self):
+        got = {p.parent.name for p in self.dir.glob("*/index.html")}
+        want = {t["id"] for t in self.terms}
+        self.assertEqual(sorted(want - got), [], "영어판이 안 나온 용어")
+        self.assertEqual(sorted(got - want), [], "정본에 없는 영어 용어 페이지")
+        self.assertTrue((self.dir / "index.html").is_file(), "영문 색인이 없다")
+
+    def test_no_korean_body_outside_the_named_source_blocks(self):
+        hangul = re.compile(r"[가-힣]")
+        bad = []
+        for p in sorted(self.dir.glob("*/index.html")):
+            html = re.sub(r"(?s)<(script|style)\b.*?</\1>", " ",
+                          p.read_text(encoding="utf-8"))
+            html = re.sub(r"(?s)<!--.*?-->", " ", html)
+            html = self._NAMED_SECTION.sub(" ", html)
+            text = re.sub(r"(?s)<[^>]+>", " ", html)
+            hits = [h for h in re.findall(r"\S{0,12}[가-힣]+\S{0,12}", text)
+                    if h.strip() != "한국어"]
+            if hits:
+                bad.append((p.parent.name, hits[:3]))
+        self.assertEqual(bad, [], f"영문 용어 페이지에 한국어 본문: {bad[:3]}")
+
+    def test_discloses_why_korean_names_remain(self):
+        """거르지 않는 대신 **밝힌다** — 밝히지 않으면 번역 누락으로 읽힌다."""
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        n = sum(1 for t in self.terms
+                if re.search(r"[가-힣]", t.get("definition_source") or "")
+                or any(re.search(r"[가-힣]", str(r)) for r in (t.get("reg_refs") or [])))
+        self.assertGreater(n, 0, "이 가드가 아무것도 안 지킨다")
+        self.assertIn(f"For {n:,} of these terms", idx.replace(",", ",")) if n >= 1000 \
+            else self.assertIn(f"For {n} of these terms", idx)
+        # 한국어판에는 이 문구가 없다(거기서는 원문이 곧 그 언어다).
+        ko = (self.out / "glossary" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("gl-note", ko)
+
+    def test_index_splits_english_by_letter_not_one_latin_bucket(self):
+        """★라틴을 한 덩어리로 두면 242개가 한 칸에 들어가 색인이 아무것도 가르지 못한다."""
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        buckets = re.findall(r'<h2 class="gl-group-h">([^<]{1,3})</h2>', idx)
+        self.assertNotIn("A–Z", buckets, "라틴이 한 덩어리로 남았다")
+        self.assertGreater(len(buckets), 15, f"버킷이 너무 적다: {buckets}")
+        self.assertEqual(buckets, sorted(buckets), "색인이 알파벳 순이 아니다")
+
+    def test_english_pages_do_not_show_case_links(self):
+        """사례 건수는 **전체 코퍼스**로 잰 값이라 영어 검색이 보여줄 수와 어긋난다 —
+        한 화면 안의 두 숫자가 다르면 어느 쪽이 맞는지 알 방법이 없다."""
+        for p in sorted(self.dir.glob("*/index.html"))[:40]:
+            html = p.read_text(encoding="utf-8")
+            self.assertNotIn("findings/index.html?q=", html,
+                             f"{p.parent.name}: 영어판에 사례 링크가 남았다")
+
+    def test_structured_data_says_english_and_the_english_url(self):
+        """구조화 데이터가 언어·주소를 잘못 말하면 그 자체가 거짓 신호다."""
+        html = (self.dir / "data-integrity" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('"inLanguage": "en"', html)
+        self.assertIn(f'"url": "{render.SITE_BASE_URL}/en/glossary/data-integrity/"', html)
+        ko = (self.out / "glossary" / "data-integrity" / "index.html").read_text(
+            encoding="utf-8")
+        self.assertIn('"inLanguage": "ko"', ko)
+        self.assertIn(f'"url": "{render.SITE_BASE_URL}/glossary/data-integrity/"', ko)
+
+    def test_paired_both_ways_and_in_the_sitemap(self):
+        sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        slug = self.terms[0]["id"]
+        self.assertIn(f"{render.SITE_BASE_URL}/en/glossary/{slug}/</loc>", sitemap)
+        ko = (self.out / "glossary" / slug / "index.html").read_text(encoding="utf-8")
+        self.assertIn(f'hreflang="en" href="{render.SITE_BASE_URL}/en/glossary/{slug}/"',
+                      ko, "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 

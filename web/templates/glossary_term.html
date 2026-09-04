@@ -51,22 +51,22 @@
 <main>
   <div class="wrap gt-head">
     <nav class="gt-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}glossary/">{{ _('규제 용어사전') }}</a><i>&rsaquo;</i><span>{{ term.term_ko }}</span>
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}glossary/">{{ _('규제 용어사전') }}</a><i>&rsaquo;</i><span>{{ term.term }}</span>
     </nav>
     <p class="kick">Glossary</p>
-    <h1 class="gt-h1">{{ term.term_ko }}<span class="gt-en">{{ term.term_en }}</span></h1>
+    <h1 class="gt-h1">{{ term.term }}{% if term.term_sub %}<span class="gt-en">{{ term.term_sub }}</span>{% endif %}</h1>
     {% if term.aliases %}
     <p class="gt-alias"><b>{{ _('다른 표기') }}</b>{% for a in term.aliases %}<span>{{ a }}</span>{% endfor %}</p>
     {% endif %}
   </div>
 
   <div class="wrap gt-body">
-    <p class="gt-lede">{{ term.easy_ko }}</p>
+    <p class="gt-lede">{{ term.easy }}</p>
 
-    {% if term.detail_ko %}
+    {% if term.detail %}
     <section class="gt-sec">
       <h2 class="gt-sec-h">{{ _('자세히') }}</h2>
-      <p class="gt-detail">{{ term.detail_ko }}</p>
+      <p class="gt-detail">{{ term.detail }}</p>
     </section>
     {% endif %}
 
@@ -83,7 +83,7 @@
     <section class="gt-sec">
       <h2 class="gt-sec-h">{{ _('함께 보면 좋은 용어') }}</h2>
       <div class="gt-links">
-        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.term_ko }}{% if r.case_count_label %}<span class="gt-rel-n">{{ _("사례 {n}건", n=r.case_count_label) }}</span>{% endif %}</a>{% endfor %}
+        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.label }}{% if r.case_count_label %}<span class="gt-rel-n">{{ _("사례 {n}건", n=r.case_count_label) }}</span>{% endif %}</a>{% endfor %}
       </div>
     </section>
     {% endif %}

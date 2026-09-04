@@ -77,6 +77,15 @@
         <div class="fnd-field fnd-field--sort"><label for="fnd-sort">{{ _("정렬") }}</label><select id="fnd-sort"><option value="date_desc">{{ _("최신순") }}</option><option value="date_asc">{{ _("오래된순") }}</option><option value="firm_asc">{{ _("업체명순") }}</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>
+      {% if lang != 'ko' %}
+      {# [다국어 6단계 2026-09-04] 원문 언어 공지·해제 줄. 영어판 검색은 원문이 영어인
+         지적을 기본으로 보여준다(서버 p_orig_lang, 마이그 074) — 그렇게 하지 않으면
+         최신순 첫 화면이 식약처 한글 본문으로 덮인다(실측 135건 중 90건).
+         ★거르는 것 자체보다 **거르고 있다고 말하지 않는 것**이 문제이므로, 무엇을
+         보고 있는지 한 줄로 밝히고 한 번의 클릭으로 풀 수 있게 둔다. 내용은
+         findings.js renderLangNote() 가 채운다(빈 상자 금지 — 응답 전에는 hidden). #}
+      <p class="fnd-langnote" id="fnd-langnote" hidden></p>
+      {% endif %}
     </section>
 
     {#- FIND-1 M7 — 대시보드 밴드(콤팩트 조망: 스탯·카테고리 분포·월별 추이·업체 상위).
@@ -278,6 +287,15 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-active-x{color:var(--muted);font-size:13px;line-height:1}
 .fnd-active-chip:hover .fnd-active-x{color:var(--coral)}
 .fnd-active-clearall{font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:0 0 0 4px;cursor:pointer}
+{% if lang != 'ko' %}
+/* [다국어 6단계] 원문 언어 공지 줄 — 적용 필터 칩 행과 같은 자리·같은 톤. grm.css 무접촉.
+   마크업과 **같은 게이트**에 둔다: 한국어판에는 그 요소가 없으므로 규칙만 남으면
+   "이건 왜 있나"가 되고, 한국어판 산출 바이트도 불필요하게 흔들린다. */
+.fnd-langnote{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin:12px 0 0;font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.fnd-langnote[hidden]{display:none}
+.fnd-langnote-btn{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.fnd-langnote-btn:hover{color:var(--coral)}
+{% endif %}
 .fnd-active-clearall:hover{color:var(--coral)}
 /* [M2c] 1행이 좁아지면 열 수를 줄여 접는다 — 7개를 억지로 한 줄에 눌러 담으면 셀렉트가
    글자를 자른다. 4열/3열 모두 트랙이 균등해 옛 flex-wrap 처럼 마지막 항목만 덩그러니

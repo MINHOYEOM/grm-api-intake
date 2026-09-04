@@ -106,6 +106,16 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    ★`tldr` 은 **제목이기도 하다**(`_brief_title`/`_brief_description` 이 첫 줄을 쓴다). 영문판은
    `_brief_tldr(meta,"en")` 로 `brief.en.tldr` 만 보고, 없으면 날짜 파생으로 떨어진다 —
    한국어를 대신 끼우면 아카이브 제목·og:description 만 조용히 한국어가 된다.
+10. **영어판 검색은 원문이 영어인 지적을 기본으로 본다(2026-09-04, 다국어 6단계)** —
+   서버 축 `p_orig_lang`(마이그 074). 판정은 **본문 자체**다(`original_is_english` 생성 열 =
+   원문에 한글이 없는가) — 기관으로 가르면 지금은 맞아도 낡는다.
+   ★축은 `filtered` **와 패싯 6종 전부**에 건다. 한 곳만 걸면 결과는 영어인데 기관 패싯에
+   "MFDS 2,058" 이 남아, 누르면 0건이 나오는 죽은 칩이 생긴다.
+   ★거르는 것보다 **거른다고 말하지 않는 것**이 문제다 — `#fnd-langnote` 가 무엇을 보고
+   있는지 한 줄로 밝히고 한 번의 클릭으로 푼다. 해제 상태의 값은 `'all'` 이지 빈 문자열이
+   아니다(`syncStateToUrl` 이 falsy 를 안 실어 새로고침 때 필터가 되살아난다).
+   RPC 시그니처를 늘릴 때는 **맨 뒤 + 기본값**, drop+create 를 한 질의로, **마이그 먼저
+   사이트 배포 나중**(PostgREST 는 인자가 하나만 달라도 404 다 — #681).
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

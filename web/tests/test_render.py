@@ -8355,12 +8355,18 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         페이지가 하는 주장은 "이 용어가 등장한 지적사항"뿐이고, 그 근거는 독자가 인용문
         안에서 토큰을 직접 보는 것이다. 토큰이 안 보이는 인용문이 하나라도 실리면 페이지가
         검증 불가능한 주장을 하게 된다.
+
+        ★[2026-09-04] 대조를 **대소문자 무시**로 맞춘다. 선택기가 영문 사례를 위해
+          `re.IGNORECASE` 로 찾게 되면서, 토큰 "air handling" 이 원문의 "Air Handling
+          Unit(AHU)" 을 고르게 됐다 — 계약(독자가 그 표현을 눈으로 본다)은 그대로 지켜
+          지고, 대소문자까지 같기를 요구하면 멀쩡한 영문 문장이 조용히 빠진다. 느슨해진
+          것은 **표기**뿐이고 "보여야 한다"는 요구는 그대로다.
         """
         ex = self.excerpts
         self.assertGreater(len(ex), 0, "사례 인용이 한 용어도 안 붙었다(배선 확인)")
         for tid, items in ex.items():
             for c in items:
-                self.assertIn(c["token"], c["quote"],
+                self.assertIn(c["token"].casefold(), c["quote"].casefold(),
                               f'인용문에 토큰이 없다: {tid} / {c["token"]}')
                 self.assertFalse(render._glossary_incidental(c["quote"], c["token"]),
                                  f'열거 안 우연 언급이 실렸다: {tid} / {c["quote"][:60]}')

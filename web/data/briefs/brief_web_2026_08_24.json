@@ -274,7 +274,14 @@
     },
     "summary": "ISPE 가 GMP 무균제조 및 Commissioning and Qualification(C&Q) 교육과정 강사를 소개하는 기고를 게재했다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "FDA classes a Cyclophosphamide for Injection recall as Class I after particulate identified as stainless steel is found in product made by Sunny Pharmtech",
+    "Health Canada recalls B. Braun Lactated Ringer's Injection USP as Type I after particulate matter is found",
+    "MFDS recall covers three repaglinide products after N-nitroso-melumine is detected above the limit"
+   ]
+  }
  },
  "cards": [
   {
@@ -411,6 +418,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "No identity testing of incoming components",
+    "summary": "FDA issued a warning letter to Suretec Innovations, LLC for CGMP violations, including failure to test samples of each component for identity and for conformity with written specifications, and failure to establish the reliability of the supplier's certificates of analysis.",
+    "implication": "Treating reliance on a supplier's certificate of analysis as a CGMP violation in its own right signals that FDA reads incoming material control at a contract finished-product site as testing the firm does, not testing it accepts. Sites should confirm they hold identity testing per incoming lot and documented evidence that supplier certificates have been validated.",
+    "key_facts": [
+     "Finding: samples of each component were not tested for identity and for conformity with written specifications for purity, strength and quality",
+     "Classification: CGMP, finished pharmaceuticals, adulterated and misbranded",
+     "Issued: Center for Drug Evaluation and Research (CDER), dated 13 August 2026 and posted 18 August 2026"
+    ],
+    "checks": [
+     "Whether identity testing is performed on each incoming lot of components",
+     "Records of periodic revalidation of the reliability of supplier certificates of analysis",
+     "Whether component specifications cover purity and strength testing in full"
+    ]
    }
   },
   {
@@ -520,6 +542,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "RABS design gaps on an aseptic line",
+    "summary": "FDA issued a warning letter to the Unit I sterile injectable site of Eugia Pharma Specialities Limited, inspected 16 to 27 February 2026, citing CGMP violations that included restricted access barrier system design defects and inadequate environmental monitoring.",
+    "implication": "FDA's sterile enforcement has moved past correcting operator behaviour to challenging the physical design of the barrier system and the frequency of intervention itself. Sterile injectable sites should re-examine the number of manual interventions per batch and the degree of separation in extended ISO 5 zones as a design question rather than a training one.",
+    "key_facts": [
+     "Finding: operations were not carried out within defined areas of adequate size, and separate or defined areas or other control systems needed to prevent contamination or mix-ups were absent (21 CFR 211.42(c)(10))",
+     "Finding: poor aseptic technique and failure to reflect significant interventions in media fills (21 CFR 211.113(b))",
+     "Recurrence: Unit II and Unit III of the same company are also classified Official Action Indicated",
+     "Action: response within 15 working days, with an independent risk assessment of contamination hazards and a line redesign plan required"
+    ],
+    "checks": [
+     "Risk assessment records for interventions per batch, by number and by type",
+     "Whether media fill requalification includes worst-case interventions",
+     "Adequacy of environmental monitoring limits for the extended ISO 5 zone"
+    ]
    }
   },
   {
@@ -629,6 +667,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incomplete test records, OOS invalidated",
+    "summary": "FDA issued a warning letter to the Indian contract testing laboratory Auriga Research Pvt. Ltd., inspected 4 to 6 February 2026, citing CGMP violations that included laboratory records without complete raw data and out-of-specification results invalidated without justification.",
+    "implication": "FDA is treating a contract testing laboratory as an extension of the sponsor's site, so a data integrity defect at the laboratory is read as a conformity problem for every product it tested. Firms using contract laboratories should make out-of-specification history and the way raw data is recorded standing items in the supplier audit.",
+    "key_facts": [
+     "Finding: laboratory records did not include complete data from all tests needed to show compliance with specifications and standards, and were not recorded contemporaneously (21 CFR 211.194(a))",
+     "Finding: out-of-specification results were invalidated after retesting produced a passing result, without a scientifically justified root cause",
+     "Finding: the quality unit reviewed and approved those out-of-specification investigations (21 CFR 211.22(d))",
+     "Action: an independent retrospective review of every out-of-specification result for US-bound product over the past three years"
+    ],
+    "checks": [
+     "Contemporaneous recording of raw data and ALCOA compliance at the contract laboratory",
+     "Level of documented scientific root cause required before an out-of-specification retest is approved",
+     "Scope of the review of out-of-specification and invalidation history during contract laboratory audits"
+    ]
    }
   },
   {
@@ -775,6 +829,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Release continued after media fill failures",
+    "summary": "FDA issued a warning letter to K.C. Pharmaceuticals, Inc. for CGMP violations, including continuing to manufacture and release sterile products after media fill failures and inadequate airflow visualisation studies.",
+    "implication": "Deciding not to treat a media fill failure as a hold signal ended in a recall covering the whole intervening production period, and FDA used that outcome as evidence that the corrective actions were not effective. Sterile sites should confirm their procedures state, in writing, the criteria for holding or recalling product made in the period covered by a failed media fill.",
+    "key_facts": [
+     "Finding: sterile drug products continued to be manufactured and released after media fill failures on 21 June, 4 September and 4 November 2024 (21 CFR 211.113(b))",
+     "Finding: inadequate smoke studies for airflow visualisation, repeating a finding from a warning letter dated 3 August 2023",
+     "Action: on 18 February 2026 the firm voluntarily recalled product manufactured between 2024-03-27 and 2024-11-07 and stopped filling operations",
+     "Finding: no stability indicating method was established and testing timepoints were missed"
+    ],
+    "checks": [
+     "Criteria for holding or recalling product made during the period covered by a failed media fill",
+     "Whether smoke studies are run under dynamic conditions and from adequate camera positions",
+     "Whether the stability indicating method for sterile products is validated"
+    ]
    }
   },
   {
@@ -875,6 +945,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "No quality unit, poor warehouse control",
+    "summary": "FDA issued a warning letter to Safrel Pharmaceuticals LLC, which stores, labels and ships own-label OTC drug products, citing CGMP violations that included the absence of an adequate quality unit and no oversight of suppliers and contract manufacturers.",
+    "implication": "An own-label distributor that does no manufacturing itself, only labelling, storage and distribution, is still treated by FDA as carrying full CGMP responsibility. Firms placing products with contract manufacturers should check that their own quality unit holds real oversight authority and the records to show it.",
+    "key_facts": [
+     "Finding: no adequate quality unit was established, and its responsibilities and procedures were not in writing or fully followed (21 CFR 211.22(a))",
+     "Finding: certificates of analysis for incoming components and finished products were neither requested nor retained, and there were no quality agreements with suppliers",
+     "Finding: unlabelled and labelled finished products were stored together in the warehouse (21 CFR 211.42)",
+     "Finding: with no procedure to trace distribution by lot, a recall would be difficult to execute"
+    ],
+    "checks": [
+     "Whether a quality agreement defining roles and responsibilities exists for each contract manufacturer",
+     "Records of receipt and review of certificates of analysis for incoming finished product",
+     "Traceability of shipment and distribution at lot level"
+    ]
    }
   },
   {
@@ -956,6 +1042,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Cross-contamination control inadequate",
+    "summary": "The Belgian national competent authority issued a GMP non-compliance statement for the active substance site of Lianyungang Guike Pharmaceutical Co. Ltd. in China, based on 21 deficiencies against EU GMP identified during an inspection under the EDQM inspection programme.",
+    "implication": "For an active substance site running shared equipment, the EU is judging the specificity of the contamination control strategy and the evidence that it is applied at critical level, and the non-compliance statement fed straight through to CEP suspension. Products relying on the affected CEP material should review alternative sources and the need for a variation early.",
+    "key_facts": [
+     "Finding: one of the 21 deficiencies was classified critical - inadequate management of contamination and cross-contamination risk on shared equipment and an inadequate contamination control strategy",
+     "Finding: five major deficiencies covering cleaning validation, preventive maintenance and equipment condition, data integrity, change control, and batch release and conformity with the CEP",
+     "Action: prohibition of supply recommended and variation of marketing authorisations to be assessed, with EDQM suspending all CEPs held by the company",
+     "Scope: human medicinal products, manufacture of active substance and active substance intermediate"
+    ],
+    "checks": [
+     "Whether the contamination control strategy document is held for suppliers running shared equipment",
+     "Alternative source and change plan for products using material covered by the suspended CEPs",
+     "Cleaning validation evidence for shared equipment handling highly potent substances"
+    ]
    }
   },
   {
@@ -1069,6 +1171,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API supplied without process validation",
+    "summary": "FDA reviewed records requested under section 704(a)(4) and issued a warning letter to the Chinese active ingredient site Tianjin Kilo Pharmaceutical Sci-tech Co., Ltd., finding no process validation, no analytical method validation or verification, and no stability programme.",
+    "implication": "This is a case where FDA acted against an overseas active ingredient site on a written records request alone, without an inspection, and the gap between the firm's claim that it was at development stage and the actual distribution data was decisive. Firms should periodically confirm that overseas API suppliers hold process validation reports and check whether they appear on an import alert.",
+    "key_facts": [
+     "Finding: active pharmaceutical ingredients were manufactured without process validation and supplied to US 503A compounding pharmacies",
+     "Finding: master production and control records were incomplete, and there was no validation or verification of analytical methods and no stability testing programme",
+     "Action: on 21 July 2026 all products from the firm were placed on Import Alert 66-40",
+     "Additional: demecarium bromide and chlorambucil were held to be misbranded for failure to list the products"
+    ],
+    "checks": [
+     "Whether process validation reports are held for overseas API suppliers",
+     "Evidence of analytical method validation, or verification of compendial methods, for the active ingredient",
+     "Continuous monitoring of whether any supplier in use is listed on an import alert"
+    ]
    }
   },
   {
@@ -1132,6 +1250,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Color additive petition filed",
+    "summary": "FDA announced in the Federal Register that it has filed a color additive petition submitted by GNT USA, LLC.",
+    "implication": "A change to the color additive regulations does not itself change manufacturing requirements, but it does affect the listed status of colorants in the supply chain. Products that use colorants are worth keeping the regulatory listing status of those colorants under routine watch.",
+    "key_facts": [
+     "Content: the petition asks that the color additive regulations be amended to allow the use of a color derived from safflower (Carthamus tinctorius L.)",
+     "Issued: FDA, 19 August 2026, document 2026-16939",
+     "Status: notice of filing only - the outcome of the review cannot be determined from it"
+    ],
+    "checks": [
+     "Procedure for confirming the regulatory listing status of colorants used in drug products",
+     "Assessment of the impact on the marketing authorisation when a colorant supplier changes"
+    ]
    }
   },
   {
@@ -1195,6 +1327,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Gardenia blue petition filed",
+    "summary": "FDA announced in the Federal Register that it has filed a color additive petition submitted by the Gardenia Blue Interest Group.",
+    "implication": "Petitions for naturally derived colors arriving one after another in the same period show the move away from synthetic colors passing into the regulatory process itself. Products considering a change of colorant should track how far the alternative color has progressed towards listing.",
+    "key_facts": [
+     "Content: a color additive petition submitted by the Gardenia Blue Interest Group (GBIG) through Exponent, Inc. has been filed",
+     "Issued: FDA, 19 August 2026, document 2026-16944",
+     "Status: notice of filing only - the outcome of the review cannot be determined from it"
+    ],
+    "checks": [
+     "Plan for obtaining specifications and test methods when switching to a naturally derived colorant",
+     "Scope of stability data required to support a change of colorant"
+    ]
    }
   },
   {
@@ -1266,6 +1412,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) covering the desk assessment of the Farmabios (Corp) site dated 16 June 2026.",
+    "implication": "As WHO prequalification outcomes are published, the GMP history of an API supplier becomes verifiable from outside the supply relationship. This one was concluded by desk assessment on the evidence of another regulator's inspection rather than an onsite visit, so anyone carrying this site in their supply chain should hold the conclusion and the list of relied-upon inspections as supplier assessment evidence.",
+    "key_facts": [
+     "Site: Farmabios (Corp)",
+     "Desk assessment date: 16 June 2026",
+     "Publication: WHO public inspection report, carrying the conclusion and the inspection relied upon (AIFA)"
+    ],
+    "checks": [
+     "Obtain the WHOPIR text for the site and review the findings",
+     "Whether WHO inspection history is reflected in supplier assessment records"
+    ]
    }
   },
   {
@@ -1341,6 +1501,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) covering the desk assessment of Neuland Labs (Corp and Unit 1) dated 8 June 2026.",
+    "implication": "A desk assessment covering the corporate entity together with an individual unit means results have to be read at site level even within one company. Products using material from this company should check that the site actually manufacturing their material falls within the scope of this report.",
+    "key_facts": [
+     "Site: Neuland Labs (Corp and Unit 1)",
+     "Desk assessment date: 8 June 2026",
+     "Publication: WHO public inspection report, carrying the conclusion and the inspections relied upon (USFDA, EDQM and ANSM)"
+    ],
+    "checks": [
+     "Compare the site actually manufacturing the material in use against the scope of the report",
+     "Keep inspection outcomes separated by site within the same corporate group"
+    ]
    }
   },
   {
@@ -1554,6 +1728,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) covering its inspection of ACDIMA BioCenter (Amman) on 21 April 2026.",
+    "implication": "WHO is bringing testing and research organisations, not only manufacturing sites, within the scope of published inspection reports. Firms using overseas contract organisations can use the availability of a WHOPIR as one input when selecting them.",
+    "key_facts": [
+     "Site: ACDIMA BioCenter (Amman)",
+     "Inspection date: 21 April 2026",
+     "Publication: WHO public inspection report, carrying the conclusion and 21 summarised sections"
+    ],
+    "checks": [
+     "Procedure for checking WHO inspection history when selecting an overseas contract organisation",
+     "Follow-up on findings recorded in a contract organisation's inspection report"
+    ]
    }
   },
   {
@@ -1725,6 +1913,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) covering its inspection of Chongqing Huapont Shengchem on 30 March 2026.",
+    "implication": "Publication of an international body's inspection of a site in China gives firms that cannot readily inspect there themselves a documented basis to work from. Anyone holding Chinese API suppliers should put the published WHOPIR list on a regular review cycle.",
+    "key_facts": [
+     "Site: Chongqing Huapont Shengchem",
+     "Inspection date: 30 March 2026",
+     "Publication: WHO public inspection report, carrying the conclusion and 15 summarised sections"
+    ],
+    "checks": [
+     "Regular check of whether a WHOPIR has been published for suppliers located in China",
+     "Criteria for using a published report as evidence in place of an onsite audit"
+    ]
    }
   },
   {
@@ -1896,6 +2098,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "WHO public inspection report",
+    "summary": "WHO published a public inspection report (WHOPIR) covering its inspection of MSN Labs (Rudraram) on 17 March 2026.",
+    "implication": "Several months separate the inspection from publication, so what is published may not describe the site as it stands today. Products using material from this company should confirm separately with the supplier whether the findings in the report have been closed out.",
+    "key_facts": [
+     "Site: MSN Labs (Rudraram)",
+     "Inspection date: 17 March 2026",
+     "Publication: WHO public inspection report, carrying the conclusion and 15 summarised sections"
+    ],
+    "checks": [
+     "Confirm with the supplier whether the findings in the report have been closed",
+     "Set the supplier assessment cycle allowing for the lag between inspection and publication"
+    ]
    }
   },
   {
@@ -1999,6 +2215,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Equipment time control and audit trail gaps",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection carried out from 10 to 11 February 2026, which raised deficiencies in the facilities and equipment area.",
+    "implication": "Basic data integrity items such as equipment clock control and reconciliation against the audit trail keep recurring in domestic post-approval inspections. Finished product sites, including those attached to a healthcare institution, should set out clock synchronisation for equipment and the reconciliation cycle for usage logs in a procedure.",
+    "key_facts": [
+     "Deficiency: inadequate procedure for time control on manufacturing and testing equipment (Annex 1, clause 2.1) - resolved",
+     "Deficiency: inadequate detailed procedure for confirming that the audit trail agrees with the equipment usage log (Annex 1, clause 2.2) - resolved",
+     "Deficiency: standards for clean area control and for environmental and personnel monitoring were not kept current (Annex 1, clause 2.3) - resolved",
+     "Category: post-approval, finished product (single), inspected 10 to 11 February 2026"
+    ],
+    "checks": [
+     "Clock synchronisation and change control procedure for manufacturing and testing equipment",
+     "Frequency of audit trail review and reconciliation against equipment usage logs",
+     "Whether standards for clean area environmental and personnel monitoring are current"
+    ]
    }
   },
   {
@@ -2109,6 +2341,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "OS-level access rights not controlled",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection carried out from 9 to 11 March 2026, which raised deficiencies in the facilities and equipment area and in personnel hygiene.",
+    "implication": "Controlling rights inside the application while leaving operating system level access uncontrolled is what produced the data integrity finding here. Sites should confirm who holds administrator rights on the computers connected to laboratory instruments and whether the use of those rights is tracked.",
+    "key_facts": [
+     "Deficiency: inadequate control of operating system access rights on computerised systems (Annex 1, clause 2.2) - resolved",
+     "Deficiency: inadequate control of identification labels on gases used with the gas chromatograph (Annex 1, clause 2.1) - resolved",
+     "Deficiency: inadequate standards for gowning and inadequate laundering procedure (Annex 1, clause 9.1) - resolved",
+     "Category: post-approval, finished product (single), inspected 9 to 11 March 2026"
+    ],
+    "checks": [
+     "List of holders of operating system administrator rights on systems connected to laboratory instruments",
+     "Control of identification marking on consumables such as laboratory gases",
+     "Documentation of gowning standards and of the outsourced laundering procedure"
+    ]
    }
   },
   {
@@ -2220,6 +2468,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "No GMP committee meetings, no SOP review",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection carried out from 15 to 16 December 2025, which raised major deficiencies in the quality area.",
+    "implication": "When the GMP committee meetings and the periodic review of standards that evidence how the quality system runs are missing, the finding reaches major grade even where the documentation framework exists. Sites should confirm that management review minutes and the periodic review history for standards are on file at the required frequency.",
+    "key_facts": [
+     "Major deficiency: regular GMP committee meetings were not held and the records were not managed (Annex 1, clause 3.4) - resolved",
+     "Major deficiency: periodic review of standards and SOPs was not carried out (Annex 1, clause 5.1) - resolved",
+     "Deficiency: the unit dedicated to data integrity lacked independence and was inadequately constituted (Annex 1) - resolved",
+     "Deficiency: no deputy was appointed for duties the head of production may not delegate (Annex 1, clause 3.2) - resolved"
+    ],
+    "checks": [
+     "Whether regular GMP committee meetings are held and minutes retained",
+     "Records showing the periodic review cycle for standards and SOPs is met",
+     "Whether the unit responsible for data integrity is independent"
+    ]
    }
   },
   {
@@ -2295,6 +2559,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine impurity above the limit",
+    "summary": "A voluntary recall of product already in distribution was started for repaglinide preparations after the impurity N-nitroso-melumine was detected above the limit.",
+    "implication": "Control of nitrosamine impurities is extending past the sartan and ranitidine families to oral antidiabetics such as repaglinide. Firms should confirm that the list of products in scope for nitrosamine risk assessment is being updated to reflect the newest detection cases.",
+    "key_facts": [
+     "Reason: the impurity N-nitroso-melumine was detected above the limit",
+     "Scope: three products recalled together for the same reason, covering product already in distribution",
+     "Date: recall order dated 19 August 2026, not mandated"
+    ],
+    "checks": [
+     "Whether the list of products in scope for nitrosamine risk assessment is current",
+     "Test method and control limit set for nitroso impurities in active ingredient and finished product",
+     "Status of the confirmatory testing required by the risk assessment outcome"
+    ]
    }
   },
   {
@@ -2364,6 +2643,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Foreign matter contamination recall",
+    "summary": "A voluntary recall was started for a sterile gauze product after foreign matter was found in it.",
+    "implication": "Foreign matter usually enters through a route created in the manufacturing environment or the packaging step, so final visual inspection alone does not catch it. Firms handling sterile products should confirm that the review of foreign matter entry routes extends through to packaging.",
+    "key_facts": [
+     "Reason: foreign matter contamination",
+     "Product: a sterilised gauze product",
+     "Date: recall order dated 19 August 2026, not mandated"
+    ],
+    "checks": [
+     "Records of inspection of foreign matter entry routes within the packaging process",
+     "Visual inspection criteria for sterile products and defined examples of a reject"
+    ]
    }
   },
   {
@@ -2434,6 +2727,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Assay failure in post-market stability",
+    "summary": "A voluntary recall was started for a palonosetron hydrochloride injection after the assay result in post-market stability testing failed to meet specification.",
+    "implication": "An assay failure arising in post-market stability testing puts the basis on which the shelf life was set back under examination. Firms should confirm they have criteria for reviewing early when the assay trend at intermediate stability timepoints is drifting downwards.",
+    "key_facts": [
+     "Reason: the assay result in post-market stability testing did not meet specification",
+     "Product: palonosetron hydrochloride injection",
+     "Date: recall order dated 19 August 2026, not mandated"
+    ],
+    "checks": [
+     "Criteria for deciding on a recall when post-market stability testing fails",
+     "Review of assay trends across stability timepoints and the criteria for a trend excursion"
+    ]
    }
   },
   {
@@ -2508,6 +2815,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Particulate matter in an infusion solution",
+    "summary": "Health Canada published recall information for Lactated Ringer's Injection USP from B. Braun Medical Inc. after particulate matter was found in the product.",
+    "implication": "Particulate matter in a large volume infusion is classed at the highest risk level because of how it is administered, and this case was handled as Type I. Infusion solution sites should confirm that the acceptance criteria and sample size for particulate inspection of large volume containers are set in proportion to that risk.",
+    "key_facts": [
+     "Class: Type I",
+     "Reason: product quality - presence of particulate matter",
+     "Product: Lactated Ringer's Injection USP (B. Braun Medical Inc.), solution",
+     "Advice: verify whether product on hand is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "checks": [
+     "Acceptance criteria and sampling design for visual particulate inspection of large volume parenterals",
+     "Review of particulate entry routes from the container and closure of infusion solutions"
+    ]
    }
   },
   {
@@ -2607,6 +2929,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Stainless steel particulate in an injection",
+    "summary": "Particulate matter identified as stainless steel was found in Cyclophosphamide for Injection, USP manufactured by Sunny Pharmtech Inc., and FDA classified the recall as Class I.",
+    "implication": "Metal particulate confirmed in an injection also calls for an investigation into process-derived causes such as equipment wear or a detached part. Sterile injectable sites should confirm the inspection cycle for wear on metal contact parts of filling equipment, and that the finished product visual inspection criteria are designed to detect metal particulate.",
+    "key_facts": [
+     "Class: Class I",
+     "Reason: presence of particulate matter, identified as stainless steel",
+     "Scope: two products recalled together for the same reason",
+     "Firm: Sunny Pharmtech Inc., manufactured in Taiwan for Long Grove Pharmaceuticals, LLC"
+    ],
+    "checks": [
+     "Inspection frequency for wear and detachment of metal contact parts on injectable manufacturing lines",
+     "Risk assessment of foreign matter entry points in the filling process",
+     "Defect classification criteria for particulate in visual inspection of sterile injectables"
+    ]
    }
   },
   {
@@ -2720,6 +3058,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine impurity out of specification",
+    "summary": "An out-of-specification result for the N-Nitroso Mirabegron impurity was found in Mirabegron Extended-Release Tablets distributed by Zydus Pharmaceuticals (USA) Inc, and a recall followed.",
+    "implication": "A recall over excess nitroso impurity also arose domestically in the same week, showing that nitrosamine control is not confined to one group of active ingredients. Firms holding extended-release products should confirm whether the effect of the dosage form and the excipient combination on nitroso formation risk has been carried into the risk assessment.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: CGMP - out-of-specification result for the N-Nitroso Mirabegron impurity",
+     "Product: Mirabegron Extended-Release Tablets, 25 mg, manufactured in India by Zydus Lifesciences Ltd.",
+     "Issued: 12 August 2026"
+    ],
+    "checks": [
+     "Whether nitroso impurity formation risk by dosage form, including extended release, is reflected in the risk assessment",
+     "Testing frequency and control limits for nitroso impurities at finished product stage",
+     "Arrangements for receiving impurity test results for products manufactured overseas under contract"
+    ]
    }
   },
   {
@@ -2783,6 +3137,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recall over possible metal particles",
+    "summary": "MHRA issued recall notice EL(26)A/37 covering one batch of Fingolimod Zentiva 0.5 mg Capsules from Zentiva Pharma UK Limited.",
+    "implication": "Choosing a batch-level recall at the stage of a potential rather than a confirmed contamination shows the threshold for precautionary action moving lower. Firms should confirm they hold the traceability data that would let them narrow a recall to batch level if a possibility of metal particulate were raised.",
+    "key_facts": [
+     "Reason: precautionary measure because of a potential risk of contamination with metal particles",
+     "Scope: one batch of Fingolimod Zentiva 0.5 mg Capsules (BN 4L01372H)",
+     "Notice: EL(26)A/37, 20 August 2026"
+    ],
+    "checks": [
+     "Operation and verification status of metal detection on solid dosage manufacturing lines",
+     "Records of periodic inspection of wear parts on tablet and capsule filling equipment"
+    ]
    }
   },
   {
@@ -2857,6 +3225,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Degradant may fall outside specification",
+    "summary": "Health Canada published recall information for CISATRACURIUM BESYLATE INJECTION USP MULTIDOSE from Omega Laboratories Limited because the degradation product benzaldehyde may fall outside specification.",
+    "implication": "A multidose injection carries more room for a degradation product to move outside specification because the in-use period after first opening counts too, which makes the design of the stability test panel decisive. Firms should confirm that degradation product specifications for multidose products were set against real in-use conditions.",
+    "key_facts": [
+     "Class: Type III",
+     "Reason: product quality - the degradation product benzaldehyde may fall outside specification in the affected lots",
+     "Product: CISATRACURIUM BESYLATE INJECTION USP MULTIDOSE, cisatracurium 2 mg/mL, solution",
+     "Advice: verify whether product on hand is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "checks": [
+     "Basis for the degradation product specification and the test panel for multidose injections",
+     "Records of trend monitoring of degradation products through the shelf life"
+    ]
    }
   },
   {
@@ -2970,6 +3353,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Shortfill and empty capsules recalled",
+    "summary": "Reports of shortfill and empty capsules were received for Dicyclomine Hydrochloride Capsules, USP 10mg distributed by Aurobindo Pharma USA Inc, and a recall followed.",
+    "implication": "Empty capsules and shortfill together read as a failure caught neither by in-process weight control nor by final inspection. Capsule sites should confirm the limits of their in-process weight variation control and that the detection performance of the finished product weight sorter has been verified.",
+    "key_facts": [
+     "Class: Class II",
+     "Reason: shortfill and reports of empty capsules",
+     "Product: Dicyclomine Hydrochloride Capsules, USP, 10mg, 1,000 count bottles, manufactured in India",
+     "Issued: 12 August 2026"
+    ],
+    "checks": [
+     "Weight variation control limits and monitoring frequency in the capsule filling process",
+     "Verification records for the detection performance of the finished product weight sorter"
+    ]
    }
   }
  ]

@@ -462,7 +462,10 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "quotes": quotes,
         "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
         "key_facts": card.get("key_facts") or [],
-        "evidence_basis": card.get("evidence_basis", ""),
+        # ★근거 라벨도 데이터로 오는 표시 문구다(불변식 #13) — 여기서 한 번 번역해
+        #   넘기지 않으면 영어 카드의 "핵심 사실" 줄에 한국어가 그대로 실린다.
+        "evidence_basis": (tr(card["evidence_basis"]) if card.get("evidence_basis")
+                           else card.get("evidence_basis", "")),
         "implication": card.get("implication", ""),
         "checks": card.get("checks") or [],
         # [WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 그대로 통과(사실/URL 무변형 원칙과
@@ -2275,7 +2278,14 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     # facts[].label — 표 라벨
     N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
     N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
-    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"),
+    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"),
+    # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다.
+    N_("공식 인덱스 + 보조 출처"), N_("Intake raw"),
+    # ★영어처럼 보이는 값도 사전을 거친다. `tr()` 에는 항등 폴백이 없어 결손이면
+    #   영어 빌드가 MissingTranslation 으로 **멈춘다** — 한글이 없으니 아래 등록
+    #   검사(한글만 훑는 판)로는 안 잡혀서, 라벨 어휘는 언어와 무관하게 등록한다.
+    N_("483"), N_("CGMP"), N_("GMP News"), N_("Guidance"),
+    N_("Recall"), N_("Recall(HC)"), N_("Recall(UK)"), N_("Warning Letter"), N_("WHO"),
 )
 
 # 카드에서 **언어에 따라 갈리는 서사 필드** — Routine 이 원문을 요약해 만든 산문이라

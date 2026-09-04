@@ -142,7 +142,14 @@
      }
     }
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "MFDS suspends manufacture of numerous products and imposes a KRW 69,000,000 surcharge after batch records and certificates of analysis were falsified",
+    "FDA classes four products including BD ChloraPrep Clear as Class II recalls for lack of sterility assurance caused by a packaging seal defect",
+    "MFDS orders a mandatory recall of a herbal product after the heavy metal cadmium was detected"
+   ]
+  }
  },
  "cards": [
   {
@@ -309,6 +316,20 @@
      ]
     },
     "administrative_risks": "시정하지 않거나 응답이 불충분할 경우 Warning Letter 발부로 이어질 수 있으며, 해외(스웨덴) 제조소이므로 Import Alert 등재로 미국 수입이 차단될 가능성이 있다. 실사 결과가 OAI(Official Action Indicated)로 분류되면 신규 승인 보류·후속 재실사 등 감독 강화가 뒤따를 수 있고, 무균성 보증 결함의 성격상 시중 유통 제품의 회수 압력이나 반복 위반 시 consent decree 등 법적 조치로 확대될 가능성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "Aseptic process validation inadequate",
+    "summary": "FDA inspected the Swedish sterile site Apotek Production & Laboratorier AB in January 2026 and issued nine observations. The airflow visualisation smoke study was run under static conditions only, so dynamic filling, set-up and interventions were never assessed, and review of the media fills showed operators handling Grade A components directly with gloved hands.",
+    "implication": "The focus of aseptic process validation has moved from whether a smoke study was done to whether it simulated the real operating conditions. Sterile sites should confirm that their airflow visualisation goes beyond static footage to cover set-up, interventions and filling, and that those interventions are recorded in the batch record together with how long each took.",
+    "key_facts": [
+     "The smoke study was limited to static conditions, with dynamic filling, set-up and interventions not assessed and no basis given for neutral buoyancy of the smoke",
+     "No surface monitoring on the Grade A filling line, and interventions and their duration were not recorded in the batch record",
+     "The filling line has no restricted access barrier system and is not enclosed on all sides, with the ampoule loading area extending out into the Grade B room"
+    ],
+    "checks": [
+     "Whether the airflow visualisation study covers dynamic conditions, set-up, interventions and filling",
+     "Whether a risk assessment justifies surface monitoring locations and frequency at Grade A manual handling points"
+    ]
    }
   },
   {
@@ -448,6 +469,20 @@
      ]
     },
     "administrative_risks": "미시정 또는 불충분한 응답 시 Warning Letter 발부와 OAI(Official Action Indicated) 분류로 이어질 수 있으며, 후속 재실사에서 시정 미흡이 확인되면 압류·금지명령(consent decree) 등 강제 조치로 확대될 가능성이 있다. 무균 주사제 제조소라는 점에서 무균보증 결함이 해소되지 않으면 제품 회수 요구 등 시장 조치 압력도 커질 수 있다."
+   },
+   "en": {
+    "title_issue": "Stability samples moved to unqualified storage",
+    "summary": "FDA inspected the Gilead Sciences site in February 2026 and issued observations. Long-term stability samples had been moved to a retain sample room not qualified for stability conditions, with no document showing which room they went to, and US market retain samples were held in additional packaging rather than in their marketed presentation.",
+    "implication": "The requirement for a retain sample is not that it was stored, but that it was stored in its marketed state under the labelled conditions. Firms should check that transfers of stability and retain samples are traceable in documents, and that added protective packaging is not obscuring the very deterioration the sample exists to reveal.",
+    "key_facts": [
+     "Long-term stability samples placed on test between 2020 and 2023 were moved to a retain sample room not qualified for stability conditions, with the destination undocumented",
+     "US market retain samples were stored double-wrapped and otherwise differently from the marketed state, which can mask deterioration at the annual visual examination",
+     "In bacterial endotoxin testing, over-filling of the tube meant the sample preparation step was not properly performed"
+    ],
+    "checks": [
+     "Documented traceability of the destination and conditions when stability or retain samples are transferred",
+     "Compare the retain sample packaging against the marketed container closure system"
+    ]
    }
   },
   {
@@ -591,6 +626,20 @@
      ]
     },
     "administrative_risks": "15영업일 내 응답이 없거나 시정이 불충분하면 Warning Letter 발부로 이어질 가능성이 있으며, 실사 결과가 OAI(Official Action Indicated)로 분류되면 후속 재실사와 해당 시설 관련 허가 심사에 대한 부정적 영향이 뒤따를 수 있다. 무균성 보증 결함이라는 성격상 시정 실패가 지속되면 제품 회수 요구나 consent decree 등 강제 조치로 확대될 개연성도 배제할 수 없다."
+   },
+   "en": {
+    "title_issue": "Contamination control at equipment assembly",
+    "summary": "FDA inspected Hospira in March 2026 and issued observations. Filling line equipment was assembled in a Grade D area after sanitisation only rather than sterilisation, an operator with exposed facial skin worked above exposed sterile stopper contact surfaces, and a design gap left no HEPA filter directly above the stopper bowl.",
+    "implication": "Sterility assurance breaks more often at set-up and assembly interventions than at filling itself. Sterile sites should confirm the gowning grade and sterilisation status applied at equipment assembly, and whether airflow studies and environmental monitoring actually cover that intervention.",
+    "key_facts": [
+     "Equipment was assembled without being sterilised and while gowned only to Grade D, with work carried out directly above exposed sterile surfaces",
+     "No HEPA filter above the stopper bowl, no viable environmental monitoring at that location, and no smoke study of the intervention",
+     "No documented procedure or training records for reading environmental monitoring plates, so reading technique varied between staff"
+    ],
+    "checks": [
+     "The procedure covering gowning grade and equipment sterilisation for filling line assembly interventions",
+     "Whether the method for reading environmental monitoring plates is documented and readers are trained on record"
+    ]
    }
   },
   {
@@ -699,6 +748,20 @@
      ]
     },
     "administrative_risks": "시정이 이루어지지 않거나 15영업일 회신이 불충분하면 실사 결과가 OAI(Official Action Indicated)로 분류되고 Warning Letter 로 이어질 수 있다. 해외 제조소이므로 Import Alert 등재를 통해 미국 수입이 사실상 차단될 위험이 있으며, 이 경우 해당 제조소 OTC 제품의 대미 공급이 중단된다. 이후 재실사에서 동일 결함이 재확인되면 시정 신뢰도가 훼손되어 규제 조치가 장기화될 수 있다."
+   },
+   "en": {
+    "title_issue": "No change control for test instruments",
+    "summary": "FDA inspected Lights Medical Manufacture in China in November 2024 and issued two observations. There was no change control documentation for the potentiometric titrator and pH meter used for assay and pH testing of finished OTC products, and equipment use logs were not maintained.",
+    "implication": "Test equipment that bears directly on quality needs both change control and a use history before a specification decision has any basis. Firms should check that quality control instruments are actually on the change control register and that equipment use logs tie back to batches.",
+    "key_facts": [
+     "No change control documentation for the potentiometric titrator (ID HY-121) and pH meter (ID HY-120) used for OTC assay and pH testing",
+     "The change control required by the firm's own procedure (LIG/PCD-ZL-09-E/4) was not carried out",
+     "Equipment use logs were not maintained for equipment used in the OTC manufacturing process"
+    ],
+    "checks": [
+     "Whether quality control instruments are registered for change control and the documentation is held",
+     "Traceability between equipment use logs and batch records"
+    ]
    }
   },
   {
@@ -819,6 +882,20 @@
      ]
     },
     "administrative_risks": "시정이 이루어지지 않거나 응답이 불충분할 경우 이 실사는 OAI(Official Action Indicated) 로 분류되고 Warning Letter 로 이어질 가능성이 있다. 해외(중국) 제조소이므로 Import Alert 에 등재되어 미국 수입이 사실상 차단되는 조치(DWPE)로 확대될 수 있으며, 이 경우 해당 제조소 제품의 미국 공급이 중단된다. 또한 후속 재실사에서 시정 실효성이 검증되지 못하면 규제 조치가 장기화되고, 신규 신청 건에 대한 승인 심사에도 부정적 영향이 미칠 수 있다."
+   },
+   "en": {
+    "title_issue": "Residue on equipment marked as cleaned",
+    "summary": "FDA inspected Nanjing Cuccess Pharmaceutical in China in March 2025 and issued three observations. Unidentified residue was found on shared equipment and utensils designated as cleaned, and a stability chamber had been requalified loaded with empty boxes rather than in its real loading configuration.",
+    "implication": "A 'cleaned' label is a declaration of status, not evidence of it. Firms should check that the cleaning decision on shared equipment is supported by visual verification and records, and that stability chamber qualification represents the real loading condition.",
+    "key_facts": [
+     "Unidentified residue inside ports and on utensils of shared equipment used for multiple products, including hazardous drugs, all designated as cleaned",
+     "The stability chamber requalification was configured full with boxes unrelated to the study, and the temperature and humidity sensors sat directly in front of the circulation fan",
+     "No accelerated stability study at 40 degrees Celsius over six months to support the shelf life assigned to the three process validation lots"
+    ],
+    "checks": [
+     "Records supporting the cleaning decision on multi-product shared equipment, by visual check and residue testing",
+     "Re-examine the loading configuration and sensor placement used in stability chamber qualification"
+    ]
    }
   },
   {
@@ -951,6 +1028,20 @@
      ]
     },
     "administrative_risks": "시정이 불충분하거나 회신이 미흡할 경우 Warning Letter 발부로 이어질 가능성이 크고, 해외 제조소인 만큼 Import Alert 등재로 미국 수입이 차단될 수 있다. 실사 결과가 OAI(Official Action Indicated)로 분류되면 후속 재실사와 규제 감시 강화가 뒤따르며, 재실사에서 동일 결함이 재확인되면 조치가 가중될 수 있다."
+   },
+   "en": {
+    "title_issue": "Validation records not retained",
+    "summary": "FDA inspected the Chinese OTC site Jiangsu Intco Medical Products in November 2023 and issued four observations. Batch production records used for process validation and stability testing had not been retained, some having been destroyed in February 2023, and component identity testing was not being performed.",
+    "implication": "Validation and stability stand on the records that evidence them - with no records, the fact that the work was done cannot be shown at all. Firms should confirm that contract sites retain process qualification and stability batch records beyond the shelf life, and that the cycle for verifying supplier certificates is actually operating.",
+    "key_facts": [
+     "Batch records from process performance qualification of OTC liquids and gels were not retained, leaving no basis for the validation",
+     "Batch records used for accelerated and long-term stability testing were destroyed on 10 February 2023, and some marketed container closure configurations have no stability data",
+     "No spectroscopic identity testing of components, and the supplier certificate of analysis had never been verified by full testing"
+    ],
+    "checks": [
+     "Retention period and destruction procedure for process qualification and stability batch records at contract sites",
+     "The cycle for verifying the reliability of supplier certificates of analysis and the records of it"
+    ]
    }
   },
   {
@@ -1097,6 +1188,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Investigation records lack conclusions",
+    "summary": "During an inspection of the sterile drug site Catalent Indiana LLC, FDA observed that written records of investigations into a batch or component failing specification did not always include the conclusions and follow-up.",
+    "implication": "Completeness of out-of-specification investigation documentation is an area that recurs in Form 483 findings. Sites should reconfirm that deviation and out-of-specification investigation reports carry the conclusion and the follow-up action, linked to corrective action, without omission.",
+    "key_facts": [
+     "Observation: investigation records for a batch or component failing specification did not always record the conclusions and follow-up",
+     "Facility: sterile drug manufacturer",
+     "Inspected: 24 April 2026"
+    ],
+    "checks": [
+     "Whether conclusions and follow-up are recorded in out-of-specification and deviation investigation reports",
+     "Review of the process for reviewing and approving investigation reports"
+    ]
    }
   },
   {
@@ -1251,6 +1356,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "First air disrupted during aseptic work",
+    "summary": "During an inspection of the sterile drug production site at Richmond VA Medical Center, FDA recorded an observation that the movement of first air in the ISO 5 area was blocked or disrupted during aseptic manipulations.",
+    "implication": "Where first air protection is compromised by how the work is actually carried out, the contamination risk follows directly. Sterile sites should recheck whether operator movement in the ISO 5 area obstructs first air.",
+    "key_facts": [
+     "Observation: the movement of first air in the ISO 5 area was blocked or disrupted during aseptic manipulations",
+     "Facility: producer of sterile drug products",
+     "Inspected: 12 May 2026"
+    ],
+    "checks": [
+     "Recheck whether working movements in the ISO 5 area obstruct first air",
+     "Whether positioning and movement instructions in the aseptic procedure are followed"
+    ]
    }
   },
   {
@@ -1420,6 +1539,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Smoke study lacks dynamic conditions",
+    "summary": "During an inspection of the sterile drug production site at VA San Diego Healthcare Systems, FDA cited as a Form 483 observation that smoke studies under dynamic conditions were not adequately performed.",
+    "implication": "Dynamic airflow verification reflecting the actual work movements, not static conditions alone, is being required as the core evidence for sterility assurance. Sterile sites should check that their dynamic condition smoke study records are complete and current.",
+    "key_facts": [
+     "Observation: the smoke study was not adequately performed under dynamic conditions",
+     "Facility: producer of sterile drug products",
+     "Inspected: 8 May 2026"
+    ],
+    "checks": [
+     "Confirm the performance and records of smoke studies under dynamic conditions",
+     "Review the current history of aseptic process simulation"
+    ]
    }
   },
   {
@@ -1550,6 +1683,20 @@
      ]
     },
     "administrative_risks": "15영업일 내 응답이 없거나 시정이 불충분하면 이번 실사가 OAI(Official Action Indicated)로 분류되고 Warning Letter 발부로 이어질 가능성이 있다. 품질부서 감독 실패와 기록 신뢰성 문제가 얽혀 있어 후속 재실사에서 시정 이행 여부가 집중 검증될 것이며, 반복적 미시정 시 압류(seizure)·금지명령이나 consent decree 등 강제 조치로 확대될 수 있다."
+   },
+   "en": {
+    "title_issue": "Endotoxin failures not investigated",
+    "summary": "FDA inspected the active ingredient site Aurorium LLC in March 2026 and issued observations. Four endotoxin specification failures had occurred with neither an investigation nor a product impact assessment, the highest at 17.589 EU/mL, and the 2024 annual product quality review had not been carried out.",
+    "implication": "A specification failure that is never investigated becomes indistinguishable from one that never happened. Firms making or buying active ingredients should confirm that every microbiological or endotoxin specification failure leads to an investigation and an impact assessment, and that the annual product quality review is closed within its deadline.",
+    "key_facts": [
+     "Four endotoxin specification failures between March 2024 and February 2026, with no investigation or product impact assessment documented, the highest at 17.589 EU/mL",
+     "Numerous CAPAs lacked documented effectiveness verification and were left open (CP24-12, CP24-13, CP25-019)",
+     "The 2024 annual product quality review for the active ingredient was not performed, with a deviation report opened but left blank"
+    ],
+    "checks": [
+     "Whether microbiological and endotoxin specification failures trigger an investigation and product impact assessment",
+     "Documentation of CAPA effectiveness verification and management of closure deadlines"
+    ]
    }
   },
   {
@@ -1715,6 +1862,20 @@
      ]
     },
     "administrative_risks": "다수 관찰이 2018년 이후 반복 지적된 repeat observation 이고 식품·의약품·의료기기·화장품 전반에 adulteration 소지가 있어, 미시정 또는 불충분한 응답 시 Warning Letter 발부와 OAI(Official Action Indicated) 분류 가능성이 크다. 이후에도 시정이 확인되지 않으면 FD&C Act 에 근거한 제품 압류(seizure), 금지명령(injunction), consent decree 등 사법적 강제 조치와 후속 재실사로 이어질 수 있다. Observation 8 에는 시정 약속(Promised to correct) 주석이 있으나, 나머지 관찰의 반복 이력을 고려하면 서면 회신에서 전 항목에 대한 구체적 CAPA 와 증빙 제시가 필수적이다."
+   },
+   "en": {
+    "title_issue": "Rodents and pests in a distribution warehouse",
+    "summary": "FDA inspected the US distribution warehouse Gold Star Distribution in late 2025 and issued observations. Live rodents, droppings and gnaw marks were found throughout a warehouse where OTC drugs, medical devices and cosmetics were stored together with food and automotive products, and toxic chemicals such as motor oil were held right beside food pallets.",
+    "implication": "Storage and distribution are inspected less often than manufacturing but are equally capable of being the contamination route. Firms should make it an audit item that their contract warehouse does not store medicines together with food and chemicals, and that pest control and its records actually operate.",
+    "key_facts": [
+     "Live rodents and birds, dead rodents, droppings, gnaw holes and nesting material were found throughout the warehouse",
+     "Pest activity was found in areas directly below OTC drugs held for distribution, including the medical device and cosmetics storage areas",
+     "Motor oil and fuel additives were stored right beside beverage and cereal pallets - a repeat of a finding from the 2018 inspection"
+    ],
+    "checks": [
+     "Confirm the pest control programme and monitoring records at contract storage and distribution warehouses",
+     "On-site check that medicines are stored separately from chemicals and food"
+    ]
    }
   },
   {
@@ -1847,6 +2008,20 @@
      ]
     },
     "administrative_risks": "관찰 사항이 시정되지 않거나 회신이 불충분하면 실사 등급이 OAI(Official Action Indicated)로 분류되고 Warning Letter 로 승격될 가능성이 있다. 식품 잔해·오염원 하에서의 제조는 FD&C Act 상 비위생적 조건에서 제조된 식품의 adulteration 판단으로 이어질 수 있어, 방치·반복 시 압류(seizure)·금지명령(injunction) 등 사법 조치와 후속 재실사 리스크가 따른다."
+   },
+   "en": {
+    "title_issue": "Sanitation findings at a food plant",
+    "summary": "FDA inspected Krispy Kreme Doughnut Corporation on 15 July 2022 and issued four sanitation observations, and the record was published in the FOIA reading room about four years later in July 2026. Food debris accumulated under equipment, particulate on ceiling vents, and hand sinks without soap or paper towels were cited.",
+    "implication": "The FOIA reading room is not limited to drug sites and releases Form 483s from food facilities too, years after the event. Quality teams can confirm that such items have nothing to do with their own products or materials and then filter them out of the monitoring list.",
+    "key_facts": [
+     "Food debris accumulated on the underside of equipment, exposed tile above clean dishes, and cracked walls in the production area",
+     "Particulate accumulated at several locations including ceiling vents directly above ready-to-eat product",
+     "Hand sinks without soap or paper towels, with about four years between the inspection on 15 July 2022 and publication on 10 July 2026"
+    ],
+    "checks": [
+     "Confirm whether a published item concerns a drug facility and exclude the unrelated ones",
+     "Set criteria for judging currency where publication is delayed by years"
+    ]
    }
   },
   {
@@ -2013,6 +2188,20 @@
      ]
     },
     "administrative_risks": "시정이 불충분하거나 지연될 경우 무균 보증·데이터 무결성 결함의 성격상 Warning Letter 발행과 OAI(Official Action Indicated) 분류로 이어질 수 있고, 해외 제조소인 만큼 Import Alert 에 따른 수입 제한 가능성도 있다. 이후 재실사에서 동일 결함이 확인되면 후속 규제 조치가 누적되고 consent decree 등 강제 조치로 확대될 가능성도 있다."
+   },
+   "en": {
+    "title_issue": "Defect classification and airflow testing",
+    "summary": "FDA inspected PharmaEssentia in Taiwan in September 2023 and issued observations. Liquid between the stopper and broken containers had been classified as major defects, allowing up to three per batch without investigation, and airflow pattern testing of the Grade A barrier system did not include aseptic connections, set-up or actual filling.",
+    "implication": "How a defect is graded is itself a quality decision, and lowering the grade removes the obligation to investigate along with it. Firms should confirm that defects touching container closure integrity are classified as critical, and that airflow testing includes real filling and interventions.",
+    "key_facts": [
+     "Defects capable of compromising container closure integrity were classified as major - had they been critical, seven batches would have exceeded the limit",
+     "Airflow pattern testing did not include critical aseptic connections, set-up inside the barrier system, or actual liquid filling",
+     "No deviation or investigation was opened for nonconformance events such as unstoppered containers, and incoming materials were released before final testing"
+    ],
+    "checks": [
+     "Re-examine the scientific basis for visual inspection defect categories and the investigation threshold",
+     "Whether airflow pattern testing covers aseptic connections, set-up and actual filling"
+    ]
    }
   },
   {
@@ -2113,6 +2302,20 @@
      ]
     },
     "administrative_risks": "시정이 이뤄지지 않거나 회신이 불충분하면 실사 결과가 OAI(Official Action Indicated)로 분류될 수 있고, 반복·미시정 확인 시 Warning Letter 발부로 이어질 수 있다. 해외 제조소이므로 상황이 악화되면 Import Alert 를 통한 수입 제한 가능성도 있으며, 후속 재실사에서 동일 결함이 재확인되면 규제 조치 수위가 높아질 수 있다."
+   },
+   "en": {
+    "title_issue": "Water staining in the retain sample room",
+    "summary": "FDA inspected MSN Laboratories Unit-II in India in March 2024 and issued an observation. Water staining and unknown residue were found on ceiling tiles above the active ingredient retain samples and on the skirting, and the same staining was seen in the starting material and intermediate retain sample room.",
+    "implication": "A retain sample is the only physical evidence available to revisit a batch in a future investigation, which makes the storage environment itself a quality requirement. Firms should check that leaks and condensation in the retain sample room are recorded together with the action taken, and that the samples were not affected.",
+    "key_facts": [
+     "Water staining and unknown residue on ceiling tiles above the active ingredient retain samples and on the skirting",
+     "The same water staining was observed on the ceiling of the key starting material and intermediate retain sample room",
+     "Inspected 22 March 2024, published through FOIA on 10 July 2026"
+    ],
+    "checks": [
+     "Inspection frequency for leaks and condensation in retain sample rooms and the records of action taken",
+     "Whether a procedure exists for assessing the impact on samples stored in an affected area"
+    ]
    }
   },
   {
@@ -2203,6 +2406,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Certificates of analysis falsified",
+    "summary": "MFDS found that batch manufacturing records and certificates of analysis had been falsified for numerous active ingredient and finished products and that the firm's own standards were not followed. It imposed suspensions of manufacture by product ranging from one month to four months and 15 days, with a surcharge of KRW 69,000,000 in place of suspension for some products.",
+    "implication": "This is a serious case where the truthfulness of manufacturing and testing records was compromised across numerous products, the archetype of a data integrity breach. Sites should carry out a full review of whether batch records and certificates are written at the time the work is done and of how originality is verified.",
+    "key_facts": [
+     "Grounds: falsification of batch manufacturing records and certificates of analysis, and failure to follow the firm's own standards",
+     "Products: numerous active ingredients and finished products including cefotiam hydrochloride, ceftriaxone sodium hydrate and erdosteine",
+     "Action: suspension of manufacture by product up to four months and 15 days, with a surcharge of KRW 69,000,000 for some products"
+    ],
+    "checks": [
+     "Verification that batch records and certificates are written at the time the work is actually performed",
+     "Whether a data integrity self-inspection has been carried out",
+     "Review of the quality officer's record review and approval history"
+    ]
    }
   },
   {
@@ -2292,6 +2510,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality failures suspend several products",
+    "summary": "MFDS imposed suspensions of manufacture by product of between two and five months, and cancelled the notification for some products, after test results showed quality failures across a number of items.",
+    "implication": "Several products from one firm failing quality at the same time can point to a weakness in the quality management system as a whole rather than to individual batches. Firms handling comparable dosage forms should re-examine release testing and quality control across their whole portfolio.",
+    "key_facts": [
+     "Grounds: quality failure on test results",
+     "Action: two-month suspension of manufacture for one tablet product and five months for another (from 23 July 2026)",
+     "Further action: notification cancelled for several products"
+    ],
+    "checks": [
+     "Review of release test results across the whole portfolio",
+     "A company-wide review of the quality management system"
+    ]
    }
   },
   {
@@ -2355,6 +2587,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "No temperature control in the packaging room",
+    "summary": "MFDS carried out a post-approval inspection of the active ingredient site Guangdong Qingyunshan Pharmaceutical Co., Ltd. in China from 19 to 21 May 2026 and found deficiencies including no temperature and humidity control in the secondary packaging room.",
+    "implication": "This is a case where an overseas active ingredient site failed a basic environmental control requirement at GMP inspection. Firms sourcing material from this site should also review the environmental control records for the packaging process.",
+    "key_facts": [
+     "Deficiency: temperature and humidity in the secondary packaging room were not controlled",
+     "Category: post-approval inspection, active ingredient (single)",
+     "Inspection period: 19 to 21 May 2026"
+    ],
+    "checks": [
+     "Confirm whether the site has completed its remediation",
+     "Review the packaging room temperature and humidity records at the firm's own material sources"
+    ]
    }
   },
   {
@@ -2444,6 +2690,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Inadequate oversight of a contract site",
+    "summary": "MFDS imposed a suspension of manufacture of three months and seven days on the contract giver because it did not thoroughly supervise the contract manufacturer, which had not properly carried out manufacturing control for a levodropropizine syrup.",
+    "implication": "In a contract manufacturing arrangement, the contract giver's duty to supervise the contract manufacturer is itself subject to administrative action. Firms using contract manufacture should audit regularly whether the contractor follows the document control and record-writing rules.",
+    "key_facts": [
+     "Grounds: the contract giver did not supervise the contract manufacturer's inadequate manufacturing control",
+     "Detail: the contract manufacturer did not follow the document control rules or the rules for preparing manufacturing instructions and records (batch 24011)",
+     "Action: three-month and seven-day suspension of manufacture of the levodropropizine syrup (21 July to 27 October 2026)"
+    ],
+    "checks": [
+     "Regular audit of the contractor's compliance with document control and record-writing rules",
+     "Review of how effective the supervision procedure between contract giver and contractor is"
+    ]
    }
   },
   {
@@ -2533,6 +2793,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Assay testing not per the firm's standard",
+    "summary": "MFDS imposed a 15-day suspension of manufacture of the nasal solution dosage form after the firm did not follow its own standards during assay testing of mometasone furoate nasal solution and spray products it made under contract.",
+    "implication": "Assay testing standards not being followed across several contract products with the same active ingredient suggests the test procedure is not applied consistently across the product family. Contract manufacturing sites should re-examine whether the assay standard is applied correctly to each contract product.",
+    "key_facts": [
+     "Grounds: the firm's own standards were not followed during assay testing of medicines manufactured under contract",
+     "Products: mometasone furoate preparations, covering a nasal solution and two sprays",
+     "Action: 15-day suspension of manufacture of the nasal solution dosage form (21 July to 4 August 2026)"
+    ],
+    "checks": [
+     "Review of how consistently the assay standard is applied product by product",
+     "Re-review of the test records across the whole contract product family"
+    ]
    }
   },
   {
@@ -2622,6 +2896,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Manufacture suspended for standards breach",
+    "summary": "MFDS imposed a one-month suspension of manufacture of a rebamipide tablet because the firm did not follow the applicable standards.",
+    "implication": "Failure to follow the manufacturing and quality control standards recurs as a ground for administrative action. Sites should step up periodic checks that their own standards and the actual manufacturing and testing records agree on paper.",
+    "key_facts": [
+     "Grounds: the standards were not followed",
+     "Action: one-month suspension of manufacture of the rebamipide tablet (20 July to 19 August 2026)",
+     "Legal basis: Pharmaceutical Affairs Act article 38(1) among others"
+    ],
+    "checks": [
+     "Whether the firm's manufacturing and quality control standards agree with the actual work records",
+     "Adequacy of the revision history management for the standards"
+    ]
    }
   },
   {
@@ -2685,6 +2973,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Inspection closed with no deficiencies",
+    "summary": "MFDS carried out a post-approval inspection of a finished product site on 2 April 2026 and confirmed no deficiencies.",
+    "implication": "An inspection closing with no deficiencies is a useful reference point showing the site's GMP compliance is in good order. Quality teams should still record such outcomes in their supplier inspection history database so the trend can be managed.",
+    "key_facts": [
+     "Outcome: no deficiencies",
+     "Category: post-approval inspection, finished product (single)",
+     "Inspection date: 2 April 2026"
+    ],
+    "checks": [
+     "Update the supplier inspection history database",
+     "Confirm the interval and schedule for the next routine inspection"
+    ]
    }
   },
   {
@@ -2774,6 +3076,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Missing markings draw a surcharge",
+    "summary": "MFDS imposed a surcharge of KRW 20,535,000 in place of a suspension of sales because the batch number, expiry date and country of origin were not marked on the primary packaging of a herbal medicinal material across 24 batch numbers.",
+    "implication": "Labelling requirements for herbal materials, covering batch number, expiry and origin, were breached across many batch numbers here. Firms handling herbal materials should make sure the primary packaging labelling checklist includes the country of origin.",
+    "key_facts": [
+     "Grounds: no batch number and expiry or use-by date on the primary packaging, and no country of origin marked",
+     "Scope: a deer antler herbal medicinal material, across 24 batch numbers",
+     "Action: a surcharge of KRW 20,535,000 in place of a suspension of sales of one month and seven days"
+    ],
+    "checks": [
+     "A full check of primary packaging markings, batch number, expiry date and country of origin",
+     "Whether the origin marking rules for graded herbal materials are being met"
+    ]
    }
   },
   {
@@ -2844,6 +3160,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Ash quality failure recall",
+    "summary": "A herbal product was placed under mandatory recall after failing the ash and acid-insoluble ash specifications.",
+    "implication": "Ash and acid-insoluble ash failures can generally be linked to foreign matter and soil carried in with the crude drug material. Firms handling herbal preparations should re-examine the ash test results at goods receipt and the records for the washing and sorting steps.",
+    "key_facts": [
+     "Reason: quality failure on ash and acid-insoluble ash",
+     "Product: a herbal (crude drug) product",
+     "Recall type: mandatory recall"
+    ],
+    "checks": [
+     "Confirm the ash and acid-insoluble ash test results for the material",
+     "Review the control records for material washing and sorting"
+    ]
    }
   },
   {
@@ -2914,6 +3244,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sulfur dioxide above the limit",
+    "summary": "A herbal product was placed under mandatory recall after sulfur dioxide was detected.",
+    "implication": "Sulfur dioxide is a residue that commonly arises with crude drugs and can generally be linked to drying and preservation treatment. Firms handling herbal preparations should re-examine the sulfur dioxide residue test results for their materials.",
+    "key_facts": [
+     "Reason: sulfur dioxide",
+     "Product: a herbal (crude drug) product",
+     "Recall type: mandatory recall"
+    ],
+    "checks": [
+     "Confirm the sulfur dioxide residue test results for the material",
+     "Review the control records for drying and preservation treatment"
+    ]
    }
   },
   {
@@ -2984,6 +3328,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Pack marking does not match content",
+    "summary": "A voluntary recall and sales suspension were carried out for an ezetimibe and rosuvastatin 10/5 mg tablet because the tablet count marked on the pack was wrong.",
+    "implication": "A recall over a marking error is not a major safety risk but it does expose a gap in the labelling proofing process. Sites should reconfirm the final check step covering pack markings such as tablet count.",
+    "key_facts": [
+     "Reason: the pack unit marking does not match, with the tablet count written incorrectly",
+     "Product: an ezetimibe and rosuvastatin 10/5 mg tablet",
+     "Mandatory: no, a voluntary recall by the company"
+    ],
+    "checks": [
+     "Review the final check procedure for pack markings including quantity",
+     "Recheck the markings on other batch numbers of the same product"
+    ]
    }
   },
   {
@@ -3054,6 +3412,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Concern over appearance failure",
+    "summary": "A voluntary recall was carried out for a doxylamine succinate tablet because of concern that it would fail the description specification.",
+    "implication": "An appearance defect is easy to spot early, but depending on the cause it can point back to the material or to storage conditions. Sites should review the description test criteria for tablets alongside the possibility of deterioration in storage and distribution.",
+    "key_facts": [
+     "Reason: concern about failure of the description specification",
+     "Product: a doxylamine succinate tablet",
+     "Recall type: voluntary recall by the company, not mandated"
+    ],
+    "checks": [
+     "Review the description test criteria for tablets and the response procedure when a deviation is found",
+     "Confirm the storage and distribution history for the batch concerned"
+    ]
    }
   },
   {
@@ -3124,6 +3496,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Cadmium above the limit",
+    "summary": "A herbal product was placed under mandatory recall after the heavy metal cadmium was detected.",
+    "implication": "Heavy metals above the limit are a quality risk that can generally be linked to the growing region and cultivation environment of the material, and are treated seriously enough to warrant a mandatory recall. Firms handling herbal preparations should re-examine heavy metal test results for materials and their supplier management system.",
+    "key_facts": [
+     "Reason: heavy metal (cadmium)",
+     "Product: a herbal (crude drug) product",
+     "Recall type: mandatory recall"
+    ],
+    "checks": [
+     "Confirm the heavy metal test results for the material, cadmium included",
+     "Review quality agreements and audit history for material suppliers"
+    ]
    }
   },
   {
@@ -3194,6 +3580,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Some required markings omitted",
+    "summary": "A voluntary recall was carried out for a vitamin tablet product in an 800 count pack because some required markings were omitted.",
+    "implication": "Omitted markings point to a gap in labelling management procedures rather than to a safety issue. Sites should reconfirm that the labelling checklist reflects the current rules in full.",
+    "key_facts": [
+     "Reason: some required markings were omitted",
+     "Product: a vitamin tablet product, 800 count",
+     "Recall type: voluntary recall by the company, not mandated"
+    ],
+    "checks": [
+     "Confirm the labelling checklist is current",
+     "Review the final label check before release"
+    ]
    }
   },
   {
@@ -3264,6 +3664,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Misprint on the secondary packaging",
+    "summary": "A voluntary recall was carried out for a single-use sodium hyaluronate 0.15% eye drop because of a misprint on the secondary packaging, an aluminium foil pouch.",
+    "implication": "The case shows that misprints happen in sterile dosage forms such as eye drops too. Sites should review the proofing arrangements for markings in the printing and inspection steps for secondary packaging materials.",
+    "key_facts": [
+     "Reason: misprinted marking on the secondary packaging (aluminium foil)",
+     "Product: a single-use sodium hyaluronate 0.15% eye drop",
+     "Recall type: voluntary recall by the company, not mandated"
+    ],
+    "checks": [
+     "Review the printing and inspection procedure for markings on secondary packaging materials",
+     "Review the final marking check when packaging materials are changed or revised"
+    ]
    }
   },
   {
@@ -3358,6 +3772,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitroso impurity above the interim limit",
+    "summary": "Direct Rx carried out a Class II recall of a duloxetine delayed-release product after the N-nitroso-duloxetine impurity was detected above the FDA recommended interim limit.",
+    "implication": "Nitrosamine impurities continue to be a leading cause of recalls. Firms handling duloxetine and related products should revisit their nitrosamine risk assessment and control limits.",
+    "key_facts": [
+     "Reason: N-nitroso-duloxetine impurity above the FDA recommended interim limit",
+     "Product: duloxetine delayed-release capsules, 30 mg",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Revisit the nitroso impurity risk assessment and control limits",
+     "Confirm the most recent impurity test results for products with the same active ingredient"
+    ]
    }
   },
   {
@@ -3431,6 +3859,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Dissolution out of specification",
+    "summary": "Health Canada announced a Type III recall of JAMP Chlorthalidone 12.5 mg Tablets because of an out-of-specification dissolution result.",
+    "implication": "Dissolution is a core quality attribute tied directly to pharmaceutical equivalence, and cannot be left alone even at a lower recall class. Firms handling chlorthalidone products should re-review their dissolution results and stability data.",
+    "key_facts": [
+     "Reason: out-of-specification result on dissolution testing",
+     "Product: JAMP Chlorthalidone 12.5 mg Tablets",
+     "Class: Type III"
+    ],
+    "checks": [
+     "Re-review the dissolution results and stability data",
+     "Confirm dissolution specification conformity for products with the same active ingredient"
+    ]
    }
   },
   {
@@ -3543,6 +3985,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Subpotent tablets recalled",
+    "summary": "The Harvard Drug Group LLC carried out a Class II recall of methylergonovine maleate tablets because the product was subpotent.",
+    "implication": "Subpotency is a core quality risk that can lead to treatment failure. Firms handling uterotonics of the same class should re-review their assay results and stability data.",
+    "key_facts": [
+     "Reason: subpotent drug",
+     "Product: Methylergonovine Maleate Tablets, USP",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Re-review the assay results and stability data",
+     "Confirm the release test records for the batches concerned"
+    ]
    }
   },
   {
@@ -3653,6 +4109,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recall over CGMP deviations",
+    "summary": "Ajanta Pharma USA Inc carried out a Class II recall of fenofibrate capsules on the ground of CGMP deviations. The specific deviations are not stated in the notice.",
+    "implication": "A CGMP recall can be classified Class II even where the specific deviation is not disclosed. Firms using contract sites in India should look for the specific deviation in the official recall notice.",
+    "key_facts": [
+     "Reason: CGMP deviations, with the detail not stated",
+     "Product: Fenofibrate Capsules, USP 200 mg, manufactured by Ajanta Pharma Limited in India",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Look up the specific deviation in the official FDA recall notice",
+     "Review the CGMP compliance status of contract sites in India"
+    ]
    }
   },
   {
@@ -3775,6 +4245,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Foreign substance found in five products",
+    "summary": "Amgen, Inc. carried out a Class II recall of five products including Corlanor (ivabradine) for the presence of a foreign substance. All five were recalled together for the same reason.",
+    "implication": "The same foreign substance reason across several products can point to a weakness in contamination control on a shared step such as the packaging line. Sites should re-examine their foreign matter controls in packaging, both visual inspection and automated detection.",
+    "key_facts": [
+     "Reason: presence of a foreign substance",
+     "Scope: five products recalled together for the same reason, including Corlanor (ivabradine)",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Review foreign matter control in packaging, by visual inspection and automated detection",
+     "Confirm the history of foreign matter findings on other products from the same line"
+    ]
    }
   },
   {
@@ -3867,6 +4351,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incorrect formulation in a TPN bag",
+    "summary": "Central Admixture Pharmacy Services, Inc. carried out a Class II recall of a patient-specific paediatric total parenteral nutrition bag because it did not contain copper and famotidine as stated on the label.",
+    "implication": "In patient-specific compounding, a missing component can cause direct harm to vulnerable groups such as paediatric patients. Hospital compounding and specialist nutrition units should re-examine the double check that reconciles the prescription against what is compounded.",
+    "key_facts": [
+     "Reason: incorrect product formulation - the bag did not contain copper and famotidine per the label",
+     "Product: a patient-specific paediatric total parenteral nutrition bag",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Review the double check reconciling prescription against compounded product",
+     "Whether a final checklist confirms each component was added"
+    ]
    }
   },
   {
@@ -3959,6 +4457,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Lack of assurance of sterility",
+    "summary": "PReye LLC carried out a Class II recall of a preservative free eye drop product for lack of assurance of sterility.",
+    "implication": "In a preservative free eye drop, sterility assurance is the only microbiological control there is, which raises the risk this recall carries. Sites making preservative free eye drops should re-review their aseptic process validation and finished product sterility test history.",
+    "key_facts": [
+     "Reason: lack of assurance of sterility",
+     "Product: PReye Vitamin See Antioxidant Preservative Free Eye Drops",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Confirm the current history of aseptic process simulation",
+     "Re-review the finished product sterility test results"
+    ]
    }
   },
   {
@@ -4079,6 +4591,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Seal defect breaks sterility assurance",
+    "summary": "CareFusion 213, LLC carried out a Class II recall of four products including BD ChloraPrep Clear because wrinkles in the paper lidding may breach the seal area, leaving sterility assurance inadequate. All four were recalled together for the same reason.",
+    "implication": "A packaging seal defect led directly to a failure of sterility assurance, which suggests a defect in packaging material or process shared across several products. Sites making sealed sterile products such as antiseptics and eye drops should re-examine their seal integrity testing.",
+    "key_facts": [
+     "Reason: wrinkles in the paper lidding may breach the seal area, so sterility assurance is inadequate",
+     "Scope: four products recalled together for the same reason, including BD ChloraPrep Clear",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Review the seal integrity test history, including leak testing",
+     "Confirm whether other products using the same packaging material or line show seal defects"
+    ]
    }
   },
   {
@@ -4191,6 +4717,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Foreign tablet found in the bottle",
+    "summary": "Annora Pharma Private Limited carried out a Class II recall of lacosamide tablets after a complaint raised the possibility that a selexipag tablet had been mixed into a bottle.",
+    "implication": "Physical mixing of a different medicine is a serious risk that can point to a failure of changeover control on the packaging line. Sites should re-examine the completeness of line clearance records at product changeover on packaging lines.",
+    "key_facts": [
+     "Reason: a complaint raised the possibility that a selexipag 1000 mcg tablet was mixed into a bottle of lacosamide tablets",
+     "Product: Lacosamide Tablets, USP, 100mg",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Review line clearance records at packaging line changeover",
+     "Confirm physical separation from other products handled on the same line"
+    ]
    }
   },
   {
@@ -4307,6 +4847,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Subpotent oral antiseptic",
+    "summary": "Elevate Oral Care carried out a Class II recall of Povi-One 10% Povidone-Iodine Oral Antiseptic because it was subpotent.",
+    "implication": "The case shows that subpotency can be a ground for recall in OTC products such as oral antiseptics as well. Sites making comparable antiseptics should re-review the assay results for the active ingredient and the stability data.",
+    "key_facts": [
+     "Reason: sub potency",
+     "Product: Povi-One, 10% Povidone-Iodine Oral Antiseptic",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Re-review the assay results for the povidone-iodine active ingredient",
+     "Confirm the stability testing data"
+    ]
    }
   },
   {
@@ -4419,6 +4973,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Label mix-up between two strengths",
+    "summary": "SUN PHARMACEUTICAL INDUSTRIES INC carried out a Class II recall after a 10mg perampanel tablet was found in a bottle labelled as the lower strength.",
+    "implication": "Mixing tablets of the same active ingredient at different strengths can lead to overdose, particularly for a controlled substance. Firms handling multiple strengths should re-examine how strengths are separated and how changeover is verified on the packaging line.",
+    "key_facts": [
+     "Reason: label mix-up - a 10mg perampanel tablet was found in a bottle labelled as the lower strength",
+     "Product: Perampanel CIII Tablets, manufactured by Taro Pharmaceutical Industries in Israel",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Review the separation and changeover verification procedure for multi-strength tablet packaging lines",
+     "Confirm physical separation from other strengths handled on the same line"
+    ]
    }
   }
  ]

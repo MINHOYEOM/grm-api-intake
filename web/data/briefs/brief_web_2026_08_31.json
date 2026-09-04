@@ -49,7 +49,14 @@
     },
     "summary": "ISPE 가 비판적 사고와 위험기반 의사결정을 활용해 시스템·제품 품질을 개선하는 테스팅 접근을 다룬 글을 게시한 것으로 보도되었다. 규제 환경에서 컴퓨터화 시스템이 환자 안전, 제품 품질, 데이터 완전성 확보에 핵심 역할을 한다는 문제의식을 배경으로 한다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "EU declares GMP non-compliance for an Indian sterile site after cleaning validation is rated a critical deficiency",
+    "Health Canada issues Type I recalls for two herbal liquids found to contain the undeclared prescription ingredient sildenafil",
+    "MFDS imposes a KRW 19,350,000 surcharge after manufacturing steps were not recorded at the time the work was done"
+   ]
+  }
  },
  "cards": [
   {
@@ -133,6 +140,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Critical cleaning validation deficiency",
+    "summary": "The Malta Medicines Authority inspected Aculife Healthcare Private Limited in India, rated inadequate cleaning validation as a critical deficiency and decided to issue an EU GMP non-compliance statement. The non-compliant scope covers aseptically prepared small volume liquids, terminally sterilised large volume liquids and secondary packaging.",
+    "implication": "Rating cleaning validation as critical and then bundling container closure integrity, aseptic process simulation and process validation into a non-compliance statement shows sterile sites being judged on the whole of their sterility assurance system rather than on isolated findings. Quality and regulatory teams running or outsourcing sterile manufacture should check whether cleaning validation and container closure integrity testing are sitting as long-standing open findings, and whether the correction history is documented.",
+    "key_facts": [
+     "Critical deficiency: inadequate cleaning validation",
+     "Major findings: eight, covering container closure integrity testing and delayed correction of long-standing issues, aseptic process simulation, process validation, and qualification of manufacturers and suppliers of critical starting materials",
+     "Non-compliant scope: aseptically prepared small volume liquids, terminally sterilised large volume liquids, secondary packaging",
+     "Action: no batches manufactured at the site should be released to EEA markets while the non-compliance stands or until it is superseded by an EU GMP certificate"
+    ],
+    "checks": [
+     "Rationale for cleaning validation sampling locations and adequacy of recovery data",
+     "Container closure integrity test method and frequency, and CAPA progress on long-standing findings",
+     "Aseptic process simulation design and acceptance criteria, and qualification of critical starting material suppliers"
+    ]
    }
   },
   {
@@ -235,6 +258,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Unvalidated aseptic process, six CGMP citations",
+    "summary": "FDA's Center for Biologics Evaluation and Research issued a warning letter to R3 Medical Companies, covering manufacturer Bello and distributor Regen. Alongside treating the umbilical cord and cord blood derived products as unapproved new drugs and unlicensed biologics, the letter cited six violations of 21 CFR Parts 210 and 211, including no aseptic process validation, freezing of samples before sterility testing, and expiry dating assigned without stability data.",
+    "implication": "A letter headed by unapproved drug status that also carries CGMP violations across the whole sterility assurance system shows that a site's GMP standard is judged independently of the dispute over how the product is classified. The point that freezing samples before sterility testing reduces detection is not confined to cell therapy but reaches any sterility test run on frozen samples, and a footnote treating the distributor as a manufacturer because it labels, stores and releases product transfers directly to contract manufacturing and own-label distribution arrangements.",
+    "key_facts": [
+     "Violations: six CGMP citations - no validation of the aseptic process and no validated cleaning and disinfection of the biological safety cabinet (21 CFR 211.113(b), 211.42(c)(10)(v))",
+     "Sterility testing: samples were frozen and thawed before testing, which can destroy or injure microorganisms so that contamination present before freezing may not be reliably detected (21 CFR 211.160(b))",
+     "Expiry dating: a 24-month expiry was assigned without stability testing data, and quality unit responsibilities and procedures were not documented (21 CFR 211.166(a), 211.22(d))",
+     "Action: written response within 15 working days, with seizure or injunction possible if the violations are not corrected"
+    ],
+    "checks": [
+     "Whether sterility test samples are frozen and thawed, and the method suitability evidence for the effect on microbial recovery",
+     "Stability data supporting every assigned expiry date, and whether any expiry was set without it",
+     "Whether an own-label distributor that labels, stores or approves release is managed as being subject to GMP"
+    ]
    }
   },
   {
@@ -327,6 +366,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Re-shipment before recall closure was notified",
+    "summary": "The Ministry of Food and Drug Safety suspended manufacturing of the affected items for 15 days for breach of the rules a recall obligor must follow when carrying out and disposing of a recall. The firm shipped the affected lots again after filing its recall completion reports but before the regional office notified it that the recall was closed.",
+    "implication": "Suspending manufacture because product was shipped again on the view that filing the completion report ended the recall confirms that it is the regulator, not the recall obligor, that decides when a recall closes. Teams running recalls should confirm that the affected lots stay locked in a shipment hold until the written notice from the competent regional office is in hand.",
+    "key_facts": [
+     "Violation: breach of the compliance rules on recall and disposal that apply to a recall obligor",
+     "Sequence: recall completion reports filed on 14 and 29 April 2026, then the affected lot shipped again in early May 2026, before closure was notified",
+     "Notification: the Daejeon regional office confirmed closure of the recall on 19 and 22 June 2026",
+     "Action: 15-day suspension of manufacturing for the affected items (10 to 24 September 2026), covering four dried ginkgo leaf extract tablet products"
+    ],
+    "checks": [
+     "Procedure blocking shipment between filing a recall completion report and receiving written notice from the regional office",
+     "Authority and records for releasing recalled lots from quarantine and returning them to distribution",
+     "Retention and traceability of regulator notices closing a recall"
+    ]
    }
   },
   {
@@ -392,6 +447,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Suitability data for microbial limit test method",
+    "summary": "The Ministry of Food and Drug Safety published the result of a pre-approval GMP inspection of PHIL Inter Pharma Co., Ltd. in Vietnam. The deficiency asked the site to submit suitability data for the method used in the microbial limit test of the active ingredient, and it is recorded as resolved.",
+    "implication": "Grading the suitability of the microbial limit test method as major in a pre-approval inspection of an overseas site shows that the validity of the method used to judge a specification is examined alongside the specification itself. Quality teams sourcing finished product from overseas sites should confirm that method suitability data, microbial limit testing included, is in place before the inspection rather than after it.",
+    "key_facts": [
+     "Deficiency: submit suitability data for the method used in the microbial limit test of the active ingredient (quality area, major, Annex 1 clause 6.3) - recorded as resolved",
+     "Site: PHIL Inter Pharma Co., Ltd., Vietnam",
+     "Inspection: pre-approval, finished product (single), inspected 8 to 10 July 2025",
+     "Manufacturing category: non-sterile conventional preparation, solid oral dosage form"
+    ],
+    "checks": [
+     "Whether method suitability data for the microbial limit test is held",
+     "Procedure for assembling test method documentation ahead of an overseas pre-approval inspection"
+    ]
    }
   },
   {
@@ -479,6 +549,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Surcharge for records not written in real time",
+    "summary": "The Ministry of Food and Drug Safety took administrative action for breach of the rules on the management responsibilities of a contract manufacturer. While making a herbal cataplasm product under contract for another company, the firm did not enter the manufacturing steps in the manufacturing instruction and record at the same time as the work.",
+    "implication": "Treating a contract manufacturer's failure to follow its own standard as a breach of contract management responsibility, and carrying it through to a surcharge in place of a dosage form suspension, signals that a loss of contemporaneity in records is read as a failure of manufacturing control rather than a documentation defect. Quality teams manufacturing through contract arrangements should look at whether they verify contemporaneous completion of the contractor's manufacturing instruction and record on the floor, not by collecting paperwork afterwards.",
+    "key_facts": [
+     "Violation: the firm's own standard 'GMP documentation' (document no. SOP-G-0201) requires every record to be written and completed at the same time as the work, but the manufacturing steps were not recorded contemporaneously",
+     "On-site check: completed weighing records for raw materials could not be shown while the mixing step was running, and pre-work checks, equipment checks and running records, and verification of the raw materials charged into the process had not been done",
+     "Action: a penalty surcharge of KRW 19,350,000 in place of a 15-day suspension of manufacturing for the dosage form",
+     "Calculation: the daily suspension surcharge for the 12 products with production in the reference year, out of the 14 cataplasm products, multiplied by 15 days"
+    ],
+    "checks": [
+     "On-site verification that manufacturing instructions and records are completed at the same time as the work",
+     "Contract giver's routine audit of the contractor's compliance with its own standards",
+     "Completeness of pre-work checks, equipment running records and verification of raw materials charged into the process"
+    ]
    }
   },
   {
@@ -585,6 +671,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Site master file entries not verifiable",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection. The pharmaceutical quality system, cleaning and disinfection, and computerised systems could not be verified in the site master file, and the deficiencies are recorded as resolved.",
+    "implication": "Consecutive findings that the quality system, cleaning and disinfection, and computerised systems could not be found in the site master file show the master file being treated as the entry point to an inspection rather than as a formality. Quality teams that own the site master file should confirm it is kept current against how the site actually operates.",
+    "key_facts": [
+     "Deficiency: the content on the pharmaceutical quality system could not be verified in the site master file (quality management area, Annex 18 clause 2) - recorded as resolved",
+     "Deficiency: the content on cleaning and disinfection (Annex 18 clause 4.2.2) and computerised systems (Annex 18 clause 4.2.3) could not be verified in the site master file - recorded as resolved",
+     "Inspection: post-approval, finished product (single)",
+     "Inspection period: 13 April 2026"
+    ],
+    "checks": [
+     "Currency and completeness of the mandatory entries in the site master file",
+     "Whether the quality system, cleaning and disinfection, and computerised systems sections are reflected in the master file"
+    ]
    }
   },
   {
@@ -673,6 +774,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Post-approval GMP inspection result posted",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection. The published result also sets out how deficiencies are graded and what follow-up each grade attracts.",
+    "implication": "Publishing the result confirms that the same split applies throughout, with critical and major deficiencies going to administrative action and other deficiencies to correction. Quality teams that carry this site as a supplier should read the deficiency grades and follow-up status from the published inspection result itself.",
+    "key_facts": [
+     "Inspection: post-approval, category not applicable",
+     "Inspection period: 7 May 2026",
+     "Grading: deficiencies are graded critical, major or other in line with the PIC/S definitions",
+     "Follow-up: critical and major deficiencies draw administrative action, other deficiencies are corrected and remediated"
+    ],
+    "checks": [
+     "Deficiency grades and follow-up status in the published inspection result",
+     "Update of the site's qualification status in the approved supplier list"
+    ]
    }
   },
   {
@@ -776,6 +892,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Data integrity on legacy systems",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection. The deficiencies covered control of legacy systems whose data integrity cannot be assured, storage and retention of records produced by automated equipment together with verification of that function, and the choice of sampling locations in cleaning validation.",
+    "implication": "Asking for legacy systems whose data integrity cannot be assured to be managed through risk assessment, in the same inspection as findings on retention and functional verification of automated records, shows an approach that demands documented control where replacing the equipment is not practical. Quality teams running ageing equipment should check that the risk assessment, the compensating controls and the rationale for cleaning validation sampling locations exist on paper.",
+    "key_facts": [
+     "Deficiency: prepare a control plan based on risk assessment for legacy systems whose data integrity cannot be assured (facilities and equipment area, Annex 1)",
+     "Deficiency: store and retain all records generated by automated equipment and verify that function (facilities and equipment area, Annex 1 clause 2.2)",
+     "Deficiency: select appropriate sampling locations for cleaning validation (manufacturing area, Annex 1 clause 6.4)",
+     "Inspection: post-approval, finished product (single), inspected 9 to 11 June 2026 - the remediation plan was accepted as adequate"
+    ],
+    "checks": [
+     "Data integrity risk assessment and compensating controls for legacy equipment and systems",
+     "Records of storage and retention of automated equipment data and verification of that function",
+     "Documented rationale for cleaning validation sampling locations"
+    ]
    }
   },
   {
@@ -878,6 +1010,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Post-approval inspection of an API site",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of an active pharmaceutical ingredient site. The published result also sets out how deficiencies are graded and what follow-up each grade attracts.",
+    "implication": "Publication of an API site's post-approval inspection confirms the same structure, where a critical or major grade goes to administrative action and other findings go to correction. Quality teams buying active ingredients should confirm that the inspection outcome, deficiency grades and follow-up status are recorded in supplier management, and read the published inspection result for the detail of individual findings.",
+    "key_facts": [
+     "Inspection: post-approval, active ingredient (single)",
+     "Inspection period: 20 to 22 April 2026",
+     "Grading: deficiencies are written up as critical, major or other in line with the PIC/S definitions",
+     "Follow-up: critical and major deficiencies draw administrative action and other deficiencies are corrected, with confirmed administrative action published on the drug safety portal"
+    ],
+    "checks": [
+     "Whether API supplier inspection outcomes and deficiency grades are recorded in supplier management",
+     "Monitoring of whether critical or major deficiencies lead to administrative action"
+    ]
    }
   },
   {
@@ -1008,6 +1155,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Other-grade finding in quality management",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of an active pharmaceutical ingredient site. A deficiency graded other was raised in the quality management area.",
+    "implication": "A quality management finding at an API site shows that the same quality system expectations applied to finished product sites are being applied upstream. Quality teams managing API suppliers should confirm that the remediation plan and closure of quality management findings feed into the supplier requalification cycle.",
+    "key_facts": [
+     "Deficiency: quality management area, graded other",
+     "Inspection: post-approval, active ingredient (single)",
+     "Inspection period: 14 to 16 April 2026",
+     "Detail: the published inspection result must be read for the text of the finding"
+    ],
+    "checks": [
+     "Remediation plan for the API supplier's quality management finding",
+     "Whether inspection finding history feeds into the supplier requalification cycle"
+    ]
    }
   },
   {
@@ -1103,6 +1265,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Detail required in batch manufacturing records",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection. The deficiencies covered the level of detail in batch manufacturing records and control of legacy systems whose data integrity cannot be assured.",
+    "implication": "Raising the level of detail in batch records and the data integrity of legacy systems in the same inspection shows the completeness of the record and the trustworthiness of the system being treated as one axis. Quality teams that own manufacturing records should check that the record format follows the actual sequence and granularity of the operating procedure, and that a control plan exists for legacy systems.",
+    "key_facts": [
+     "Deficiency: record the actual work in the batch manufacturing record in detail and in the order of the operating procedure (manufacturing area, Annex 1 clause 8.1)",
+     "Deficiency: prepare a control plan based on risk assessment for legacy systems whose data integrity cannot be assured (facilities and equipment area, Annex 1 clause 2.2)",
+     "Inspection: post-approval, finished product (single), inspected 27 to 29 January 2026",
+     "Follow-up: the remediation plan was accepted as adequate"
+    ],
+    "checks": [
+     "Whether the batch manufacturing record format reflects the actual sequence and level of detail of the operating procedure",
+     "Data integrity risk assessment and control plan for legacy systems"
+    ]
    }
   },
   {
@@ -1168,6 +1345,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API inspection closed with no deficiencies",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of an active pharmaceutical ingredient site. The result records no deficiencies.",
+    "implication": "Publishing an API inspection that closed without a single deficiency shows that results are disclosed regardless of whether findings were raised. Quality teams assessing API suppliers should confirm they also collect and retain clean inspection outcomes as evidence supporting supplier qualification.",
+    "key_facts": [
+     "Outcome: no deficiencies",
+     "Inspection: post-approval, active ingredient (single)",
+     "Inspection period: 16 March 2026",
+     "Surveillance areas: quality management, facilities and equipment, manufacturing, laboratory, materials, packaging and labelling"
+    ],
+    "checks": [
+     "Collection and retention of clean inspection results as supplier qualification evidence",
+     "Status of the supplier's inspection history across the surveillance areas"
+    ]
    }
   },
   {
@@ -1240,6 +1432,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Product name misprinted on the carton side",
+    "summary": "A voluntary recall was started for a tadalafil orally disintegrating film. The product name printed on the carton was wrong, with the front panel correct and the side panel misprinted.",
+    "implication": "A recall triggered by the product name being wrong on one panel only, while the front panel is correct, shows that a labelling error confined to a single face is still enough to bring product back from the market. Quality teams that manage packaging artwork should confirm that proofing and approval compare against every face of the print layout, not only the front.",
+    "key_facts": [
+     "Reason: the product name printed on the carton is wrong, correct on the front panel and misprinted on the side panel",
+     "Type: voluntary recall by the company, not mandated",
+     "Recall order date: 26 August 2026",
+     "Product: tadalafil orally disintegrating film, 20 mg"
+    ],
+    "checks": [
+     "Whether artwork proofing and approval compare every face of the print layout",
+     "Scope of printed-surface comparison at incoming inspection of packaging materials"
+    ]
    }
   },
   {
@@ -1315,6 +1522,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Undeclared prescription ingredient in herbals",
+    "summary": "Health Canada announced a Type I recall of Twins Herbal Idakole and Twins Herbal Pelorie after finding an undeclared substance in the liquids. The prescription drug ingredient sildenafil, which does not appear on the declared ingredient list, was detected.",
+    "implication": "A product presented as herbal in which a prescription drug ingredient was detected, escalating to the highest risk class, shows that the recall class follows what is actually found rather than what the label declares. Quality teams handling botanical and herbal materials should confirm that the possibility of undeclared synthetic adulterants is captured as a test in the supply chain.",
+    "key_facts": [
+     "Class: Type I",
+     "Reason: undeclared substance - the prescription drug ingredient sildenafil",
+     "Product: Twins Herbal Idakole and Twins Herbal Pelorie, liquid",
+     "Advice: stop using the affected products, consult a healthcare provider for any health concerns, and do not buy or use unauthorised health products"
+    ],
+    "checks": [
+     "Screening for undeclared synthetic adulterants across the botanical and herbal supply chain",
+     "Whether identification testing includes methods able to detect unapproved analogues"
+    ]
    }
   },
   {
@@ -1387,6 +1609,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Acid-insoluble ash out of specification",
+    "summary": "A recall and sales suspension was ordered for a herbal drug product on the ground of acid-insoluble ash. The action is classified as a mandatory recall.",
+    "implication": "A mandatory recall on the acid-insoluble ash test alone shows that a purity indicator is not a secondary specification but can trigger a recall on its own. Acid-insoluble ash is generally associated with soil and foreign matter carried in with the material, so quality teams handling crude drugs should look at whether the test is performed at goods receipt and at how the supplier is managed.",
+    "key_facts": [
+     "Reason: acid-insoluble ash",
+     "Type: mandatory recall",
+     "Recall order date: 25 August 2026",
+     "Product: a herbal (crude drug) product"
+    ],
+    "checks": [
+     "Whether acid-insoluble ash is tested at goods receipt of crude drug materials, and the acceptance criteria",
+     "Supplier assessment of foreign matter control at growing and collection"
+    ]
    }
   },
   {
@@ -1459,6 +1696,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Sulfur dioxide triggers a mandatory recall",
+    "summary": "A recall and sales suspension was ordered for a herbal drug product on the ground of sulfur dioxide. The action is classified as a mandatory recall.",
+    "implication": "A mandatory recall of a herbal preparation on the ground of sulfur dioxide shows that residues entering at the material stage lead straight to a recall, not only the finished product specification. Sulfur dioxide is generally associated with treatments used in drying and storage of crude drugs, so quality teams should confirm the supplier's processing history and the sulfur dioxide test applied at goods receipt.",
+    "key_facts": [
+     "Reason: sulfur dioxide",
+     "Type: mandatory recall",
+     "Recall order date: 25 August 2026",
+     "Product: a herbal (crude drug) product"
+    ],
+    "checks": [
+     "Sulfur dioxide test and specification applied at goods receipt of crude drug materials",
+     "Procedure for confirming each supplier's drying and storage treatment history"
+    ]
    }
   },
   {
@@ -1531,6 +1783,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Description test out of specification",
+    "summary": "A recall and sales suspension was ordered for a herbal drug product because it failed the description test. The action is classified as a mandatory recall.",
+    "implication": "A mandatory recall on the description test alone shows that sensory and appearance specifications are not supporting attributes but stand on their own as grounds for recall. Quality teams handling crude drugs should confirm that the acceptance criteria for description, the training of the people who judge it and the records of their judgement match the specification document.",
+    "key_facts": [
+     "Reason: failure of the description test",
+     "Type: mandatory recall",
+     "Recall order date: 25 August 2026",
+     "Product: a herbal (crude drug) product"
+    ],
+    "checks": [
+     "Whether the acceptance criteria for description of crude drugs match the specification document",
+     "Training of assessors and retention of description test records"
+    ]
    }
   },
   {
@@ -1603,6 +1870,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Residual pesticide buprofezin detected",
+    "summary": "A recall and sales suspension was ordered for a herbal drug product on the ground of the residual pesticide buprofezin. The action is classified as a mandatory recall.",
+    "implication": "Naming the individual pesticide in a mandatory recall of a herbal product shows pesticide control narrowing from a total-residue concept to the level of the individual substance. Quality teams handling crude drug materials should confirm that the cultivation history of each supplier and the range of individual pesticides tested for meet the specification.",
+    "key_facts": [
+     "Reason: residual pesticide (buprofezin)",
+     "Type: mandatory recall",
+     "Recall order date: 25 August 2026",
+     "Product: a herbal (crude drug) product"
+    ],
+    "checks": [
+     "Whether the range of individual residual pesticides tested for in crude drug materials matches the specification",
+     "Procedure for obtaining and verifying supplier cultivation and collection history"
+    ]
    }
   },
   {
@@ -1675,6 +1957,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Heavy metal cadmium detected",
+    "summary": "A recall and sales suspension was ordered for a herbal drug product on the ground of the heavy metal cadmium. The action is classified as a mandatory recall.",
+    "implication": "Naming cadmium specifically in a mandatory recall shows heavy metal specifications being managed and applied element by element rather than as a total. Cadmium is generally associated with the soil the material was grown in, so quality teams handling crude drugs should confirm the heavy metal testing history by growing region and the criteria used to manage suppliers.",
+    "key_facts": [
+     "Reason: heavy metal (cadmium)",
+     "Type: mandatory recall",
+     "Recall order date: 25 August 2026",
+     "Product: a herbal (crude drug) product"
+    ],
+    "checks": [
+     "Element-by-element heavy metal test panel and specification for crude drug materials",
+     "Traceability of material origin by growing region and the supplier requalification cycle"
+    ]
    }
   },
   {
@@ -1750,6 +2047,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incorrect dose display on an injector",
+    "summary": "Health Canada announced a Type II recall of Apo-Semaglutide injection from Apotex Inc. on product quality grounds. An incorrect dose display was identified.",
+    "implication": "Handling an incorrect dose display on an injection as a product quality recall shows that on a combination product a defect in the display is treated as a quality defect in its own right. Quality teams working with injector-combined products should confirm that inspection of the display is part of finished product release testing.",
+    "key_facts": [
+     "Class: Type II",
+     "Reason: product quality - incorrect dose display",
+     "Product: Apo-Semaglutide, semaglutide 0.68 mg/ml, solution",
+     "Advice: verify whether your product is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "checks": [
+     "Inspection points and acceptance criteria for the dose display on device-combined products",
+     "Link between design verification of the assembly and labelling steps and release testing"
+    ]
    }
   },
   {
@@ -1825,6 +2137,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Impurity out of specification in an injection",
+    "summary": "Health Canada announced a Type II recall of Semaglutide Injection from Dr. Reddy's Laboratories Canada Inc on product quality grounds. An out-of-specification result for an impurity was identified.",
+    "implication": "An impurity out of specification in a peptide injection leading to a product quality recall shows specification failures found after release still being carried through to the market. Quality teams working with peptide preparations should confirm the basis on which impurity specifications were set, and whether an out-of-specification result during stability testing triggers review of batches already released.",
+    "key_facts": [
+     "Class: Type II",
+     "Reason: product quality - out-of-specification result for an impurity",
+     "Product: Semaglutide Injection, semaglutide 1.34 mg/ml, solution",
+     "Advice: verify whether your product is affected and consult a healthcare provider before discontinuing use"
+    ],
+    "checks": [
+     "Basis for the impurity specification of peptide injections and the stability testing plan",
+     "Link between the out-of-specification investigation procedure and impact assessment of released batches"
+    ]
    }
   }
  ]

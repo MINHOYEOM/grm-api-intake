@@ -102,7 +102,14 @@
     },
     "summary": "ECA Academy 가 FDA 가 2025년 12월 인도의 무균 OTC 제품 제조소를 실사한 뒤 발부한 Warning Letter 를 보도했다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "FDA issues a warning letter to Dabur India over data integrity violations including a falsified equipment use log",
+    "Rohto-Mentholatum in Vietnam recalls eight eye drop products for lack of assurance of sterility",
+    "MFDS suspends manufacture of a herbal product for three months after ash and acid-insoluble ash failed specification"
+   ]
+  }
  },
  "cards": [
   {
@@ -221,6 +228,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "No identity testing of high-risk components",
+    "summary": "FDA issued a warning letter to the OTC drug site of Woodbine Products Company Inc. for failure to test the identity of incoming components, absence of process and cleaning validation, and failure of quality unit oversight.",
+    "implication": "FDA is treating lot-by-lot identity testing of components at risk of diethylene glycol and ethylene glycol contamination, and of methanol in ethanol, as a top enforcement priority. Sites that substitute a supplier certificate of analysis for their own component testing should re-examine the scope of compendial identity testing they perform and the evidence supporting supplier reliability.",
+    "key_facts": [
+     "Violation 1: incoming components such as glycerin, propylene glycol and ethanol were not identity tested lot by lot, and non-pharmaceutical grade propylene glycol was used (21 CFR 211.84(d)(1))",
+     "Violation 2: no process performance qualification and no process monitoring programme, and no cleaning validation for non-dedicated equipment (21 CFR 211.100(a))",
+     "Violation 3: the quality unit did not hold test specifications, batch release testing, a stability programme or batch records (21 CFR 211.22)",
+     "Action: written response within 15 working days, test results for DEG, EG and alcohol impurities within 30 days of the letter, and a CGMP consultant recommended given the repeat violations"
+    ],
+    "checks": [
+     "Whether compendial identity testing is performed lot by lot on high-risk components such as glycerin and propylene glycol",
+     "Records of testing for methanol in ethanol and for the impurities in the relevant monographs",
+     "Basis for initial validation and periodic revalidation of supplier certificate reliability"
+    ]
    }
   },
   {
@@ -353,6 +376,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Falsified equipment log, data integrity",
+    "summary": "FDA issued a warning letter to the OTC drug site of Dabur India Limited for data integrity violations, including a falsified equipment use log and missing laboratory records.",
+    "implication": "FDA judged the quality unit's failure to catch the gap between raw data and reported values as a collapse of quality culture rather than a set of missing procedures. Anyone carrying an Indian site in a contract manufacturing arrangement or supply chain should check the supply impact of the import alert listing and the state of record originality verification at that site.",
+    "key_facts": [
+     "Violation 1: the equipment use log presented to the investigator was found to be falsified, and OTC products distributed in the US that appeared in the original log had been deliberately left out (21 CFR 211.22(a))",
+     "Violation 2: microbiological plates recorded as incubating were not in the incubator and their disposal was unexplained, and certificate of analysis results were reported for numerous batches with no test procedure or analytical record (21 CFR 211.194(a))",
+     "Violation 3: cleaning validation for non-dedicated equipment relied on visual inspection alone, with no maximum allowable carryover limit, no quantitative residue testing and no direct surface sampling (21 CFR 211.67(b))",
+     "Action: placed on Import Alert 66-40 in June 2026, a voluntary recall carried out earlier that month, and a written response required within 15 working days"
+    ],
+    "checks": [
+     "Issue and reconciliation control for original records such as equipment use logs, and safeguards against duplicate copies",
+     "Procedure reconciling analytical raw data against batch records and reported certificate values",
+     "Whether cleaning validation for non-dedicated equipment has quantitative residue limits and surface sampling"
+    ]
    }
   },
   {
@@ -492,6 +531,22 @@
       "statement_ko": "귀사는 의약품의 안정성 특성을 평가하도록 설계된 문서화된 시험 프로그램을 수립·준수하지 않았다 (21 CFR 211.166(a))."
      }
     ]
+   },
+   "en": {
+    "title_issue": "Combination not permitted by the monograph",
+    "summary": "FDA issued a warning letter to Thomas Brunner Hygiene GmbH treating its syNeo antiperspirant products as unapproved new drugs and misbranded, because the active ingredient combination used is not permitted by OTC monograph M019.",
+    "implication": "This is an enforcement case where each active ingredient is in the monograph but the combination itself is not permitted, which makes the product an unapproved new drug. Firms supplying OTC products to the US should confirm that the formulation combination sits within the permitted range of the applicable monograph and that two monographs are not being stacked.",
+    "key_facts": [
+     "Finding: aluminum chlorohydrate 10% and aluminum chloride 10% were declared as active ingredients, but M019 does not permit the two to be used in combination",
+     "Determination: not generally recognised as safe and effective, so the products are new drugs under section 201(p) of the FD&C Act, and unapproved because no application is approved",
+     "Finding: the products also fail the requirements of section 505G and are therefore misbranded under section 502(ee)",
+     "Action: written response within 15 working days, with refusal of admission possible under section 801(a)(3) on import into the US"
+    ],
+    "checks": [
+     "Whether the active ingredient combination in exported OTC products is within the permitted range of the applicable monograph",
+     "Whether more than one monograph is being applied at the same time, and on what basis",
+     "Record of the assessment of whether a new drug application is required"
+    ]
    }
   },
   {
@@ -572,6 +627,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Contamination control across aseptic manufacture",
+    "summary": "The Portuguese competent authority identified multiple critical and major deficiencies in the aseptic manufacturing areas of the Ananta Medicare Limited site in India and issued a GMP non-compliance report.",
+    "implication": "European inspection of a sterile site is converging on a single axis, the effectiveness of the contamination control strategy, rather than on a list of individual deficiencies. Firms running aseptic lines or using an Indian aseptic contract site should check the measured history of the pressure cascade between clean areas, the control of materials inside Grade B, and the state of the contamination control strategy.",
+    "key_facts": [
+     "Non-compliant scope: aseptic preparation (dry powder injection, cephalosporins), secondary packaging, and quality control testing (sterile and non-sterile microbiology, physicochemical)",
+     "Deficiency: insufficient and reversed pressure differentials between clean areas, and sterilised material exposed to Grade B because of layout constraints",
+     "Deficiency: gowning, aseptic technique and barrier system handling not followed, rusted pass boxes and contaminated balances and step stools, and open containers used within Grade B",
+     "Deficiency: data integrity defects including missing records and reporting of analyses that were not performed, and a contamination control strategy introduced late and not covering the risks"
+    ],
+    "checks": [
+     "Measured pressure cascade values between clean areas and the history of any reversals",
+     "Control of open containers and unapproved materials entering Grade B",
+     "Coverage of risk items in the contamination control strategy and its revision cycle"
+    ]
    }
   },
   {
@@ -773,6 +844,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Aseptic line control and complaint handling",
+    "summary": "FDA inspected the Emcure Pharmaceuticals Limited site and issued seven observations, covering equipment performance qualification that was never carried out, uninvestigated complaints about stoppers, and residue in the ISO 5 area.",
+    "implication": "FDA took issue with complaints of the same type accumulating over four years without the investigation widening to other batches, which puts the effectiveness of complaint handling at the entrance to any assessment of an aseptic line. Firms running injectable lines should confirm how far investigation extends for complaints with no batch number, and how trend analysis is applied to complaints about stoppers and container closure.",
+    "key_facts": [
+     "Observation 1: requalification of the vial filling and stoppering machine (ES/MFG/366) did not evaluate or qualify worst-case speed, and around 225 complaints about stopper dislodgement were received over the last four years",
+     "Observations 2 and 3: complaints that identified no batch number were closed without investigation, and complaints of lack of effect were tested for assay only",
+     "Observations 5 and 6: the airflow visualisation study performed in 2023 simulated interventions without removing exposed vials and stoppers, and residue and evidence of gap filling were found on surfaces in the ISO 5 area",
+     "Observation 7: audit trails were permitted to be reviewed on paper printouts, and analysts held rights that let them see results before deciding whether to save a chromatogram"
+    ],
+    "checks": [
+     "Scope of investigation and closure requirements for complaints that carry no batch number",
+     "Trigger for extending an investigation to other batches once complaints of the same type accumulate",
+     "Whether intervention simulation in airflow visualisation includes removal of exposed containers and stoppers"
+    ]
    }
   },
   {
@@ -979,6 +1066,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Airflow and environmental monitoring defects",
+    "summary": "FDA inspected the sterile site of Zydus Lifesciences Limited and issued seven observations, covering inadequate verification of airflow on the filling line, residue and cracks on ISO 5 barrier surfaces, and poor condition of the Grade B cleanroom.",
+    "implication": "FDA is now examining the adequacy of the airflow visualisation protocol itself, down to demonstrating neutral buoyancy and having pre-approved acceptance criteria. Sterile sites should confirm that smoke study reports carry pre-approved acceptance criteria and that review of printouts is not standing in for review of electronic raw data.",
+    "key_facts": [
+     "Observation 1: the distance from the HEPA filters to the work surface in the critical aseptic filling area was not defined during qualification, and the change in air velocity at working height between the earlier performance qualification in 2018 and requalification in 2025 was not investigated",
+     "Observations 2 and 3: residue and evidence of gap filling on ISO 5 barrier surfaces, cracks near the HEPA filters, and a Grade B cleanroom floor that was worn and delaminating",
+     "Observation 4: descriptions of Grade B surface sampling locations were insufficient, sampling history for ancillary equipment was not traceable, and the procedure defined non-viable particle excursions during interventions as not being deviations",
+     "Observations 6 and 7: turbulence was seen in airflow visualisation and neutral buoyancy of the smoke was not demonstrated, and SCADA and environmental monitoring electronic data were reviewed only as printouts before batches were released"
+    ],
+    "checks": [
+     "Whether the airflow visualisation study has a pre-approved protocol and acceptance criteria",
+     "Evidence demonstrating neutral buoyancy of the smoke and the density specification",
+     "Whether SCADA and environmental monitoring electronic data are reviewed electronically before release"
+    ]
    }
   },
   {
@@ -1132,6 +1235,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Weak OOS investigation, no OOT limits",
+    "summary": "FDA inspected the active ingredient site of MSN Life Sciences Private Limited, Unit II and issued four observations, covering weak justification for invalidating out-of-specification results and laboratory incidents that were never opened.",
+    "implication": "FDA is looking less at whether invalidating an out-of-specification result was justified than at whether the secondary events arising during that investigation, the retest error and the system suitability failure, were handled as separate events. Quality control organisations should confirm the criteria for opening a separate deviation for a laboratory error found during an out-of-specification investigation, and the rule for calculating out-of-trend limits for products with few batches.",
+    "key_facts": [
+     "Observation 1: on retest of OOS-23064 the analyst used a different sample solution without that being investigated as a separate deviation, and the system suitability failure in OOS-24006 was not investigated as a laboratory incident, with incident forms also missing for OOS-24032 and OOS-23093",
+     "Observation 2: out-of-specification results, deviations and system suitability failures were bundled into a single quality event investigation, diluting individual counting and trend analysis",
+     "Observation 3: out-of-trend ranges were not calculated or evaluated for products with few batches or not reflected in the laboratory information system (SOP CQC-0003-002)",
+     "Observation 4: no hot water was supplied to the hand washing area before entry to the production clean area"
+    ],
+    "checks": [
+     "Criteria for opening analytical errors and system suitability failures found during an OOS investigation as separate events",
+     "The unit of counting for quality events and the risk of omissions in trend analysis",
+     "Method for setting out-of-trend limits for products with an insufficient number of batches"
+    ]
    }
   },
   {
@@ -1316,6 +1435,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "OOS invalidation and standalone instrument data",
+    "summary": "FDA inspected the active ingredient site of SNJ Labs Private Ltd. and issued six observations, covering repeated invalidation of out-of-specification results, absence of data control on standalone analytical instruments, and poor cleanroom hygiene.",
+    "implication": "At active ingredient sites, standalone analytical instruments not connected to a server are being identified as the weak point for data integrity. Quality control laboratories should confirm the file permissions and clock change rights on standalone instruments and the validation status of the spreadsheets used for calculations.",
+    "key_facts": [
+     "Observation 1: four out-of-specification assay results on finished active ingredient between April and September 2024 were invalidated by retesting, although the instrument concerned had had no preventive maintenance since 2020, and batches were analysed and released during that period without a risk assessment",
+     "Observation 2: the test method used to set the retest period was not stability indicating and could not detect degradation products",
+     "Observation 3: data from the atomic absorption, UV/VIS and voltammetry instruments was backed up to an external drive, analysts held rights to delete and rename files and to change the date and time, and the spreadsheets used for calculation were not validated",
+     "Observations 4 and 6: contamination and cracks were found in cleanroom ceilings and floors, media were used without growth promotion testing, and original inoculation counts were not recorded"
+    ],
+    "checks": [
+     "Data storage and backup permissions on standalone instruments not connected to a server",
+     "Whether analyst accounts are blocked from changing the system date and time",
+     "Whether the method underpinning the retest period is stability indicating, and the forced degradation data behind it"
+    ]
    }
   },
   {
@@ -1565,6 +1700,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Media fill and environmental monitoring gaps",
+    "summary": "FDA inspected the sterile site of Sentiss Pharma Pvt. Ltd. and issued ten observations, covering media fill design defects, the absence of acceptance criteria for aseptic operator qualification, and inconsistencies in microbiological test records.",
+    "implication": "FDA is carrying as a repeat observation the point that where a media fill does not simulate real production conditions, the basis for sterility assurance does not stand at all. Firms running aseptic lines should confirm the number of containers actually filled during a media fill, the conditions under which interventions are performed, and the criteria applied to personnel monitoring in Grade A.",
+    "key_facts": [
+     "Observation 2: the line ran with no containers present for most of the media fill duration, interventions during line stoppages were performed with no containers on the conveyor, and acceptance criteria for aseptic operator qualification were not defined",
+     "Observation 2C: operators in the Grade A area during filling were judged against Grade B limits, and although the whole body enters Grade A during set-up only the hand plates were held to the Grade A criterion",
+     "Observation 3: incubation conditions for environmental and personnel monitoring media were not validated for recovery of bacteria, yeast and mould - a repeat observation",
+     "Observation 10: the number of environmental and personnel monitoring plates read was not reconciled against the numbers sterilised and discarded - a repeat observation - and the endotoxin test did not include a control standard endotoxin series"
+    ],
+    "checks": [
+     "Number of containers actually filled in the media fill and how closely it simulates production conditions",
+     "Acceptance criteria for Grade A operator monitoring and how far they apply during set-up",
+     "Reconciliation records between plates read and plates discarded for environmental and personnel monitoring"
+    ]
    }
   },
   {
@@ -1668,6 +1819,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "System suitability not established",
+    "summary": "FDA inspected the contract testing laboratory C.A.T. Gmbh and Co. KG and issued one observation, that system suitability was not established for chromatographic testing.",
+    "implication": "This confirms that the USP <621> system suitability requirement applies in full to chromatographic data generated by a contract testing laboratory. Firms that outsource testing should make the number of system suitability injections and the rule for reconfirmation during a run explicit items in the contract and the audit.",
+    "key_facts": [
+     "Observation 1: system suitability was not established by replicate injections of the standard solution for residual solvent and optical purity testing of numerous active ingredient lots",
+     "Practice: according to the representative, system suitability was performed with a single injection of the standard solution",
+     "Finding: standard solution was not injected during the analysis and after the final sample injection, so the validity of the system at the end of the run was not confirmed (based on USP <621>)"
+    ],
+    "checks": [
+     "The contract laboratory's rule on replicate standard injections for system suitability",
+     "Procedure for reconfirming system suitability during and after the analytical run"
+    ]
    }
   },
   {
@@ -1843,6 +2008,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Cross-contamination assessment and CAPA gaps",
+    "summary": "FDA inspected the Baxalta US Inc. site and issued five observations, covering repeated recoveries in the Flexbumin manufacturing area that were never investigated and an inadequate cross-contamination assessment.",
+    "implication": "FDA is treating the practice of closing an environmental recovery as a false positive on a single confirmatory test as avoidance of investigation. Biologics sites should confirm the basis on which a recovery is invalidated, the impact assessment records for lots manufactured during that period, and how overdue CAPA closures are managed.",
+    "key_facts": [
+     "Observation 1: there were numerous false positive recoveries from samples taken in the Flexbumin manufacturing area since 31 October 2022, and no impact assessment was made because the confirmatory result was treated as a recorded test",
+     "Observation 1: false positive recoveries between 15 September 2022 and 27 October 2025 were not investigated and no impact assessment was made, while numerous Flexbumin lots were manufactured in that period",
+     "Observation 2: CAPA No.4909673 on foreign matter in a lot manufactured on 21 November 2023 passed its target closure date and remained open until 4 November 2025, and the same type recurred, opening CAPA No.5165429",
+     "Observations 3 to 5: there is no validated method to test Flexbumin for cross-contamination, foreign matter found at final visual inspection was not recorded at the time it occurred, and maintenance on the supply system used for cleaning was not documented or evaluated"
+    ],
+    "checks": [
+     "Basis for declaring an environmental recovery a false positive and the detection range of the confirmatory method",
+     "Impact assessment records for lots manufactured during the period of false positive determinations",
+     "Management of CAPAs past their target closure date and whether effectiveness checks are carried out"
+    ]
    }
   },
   {
@@ -1906,6 +2087,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Breast imaging device reclassification proposed",
+    "summary": "FDA proposed reclassifying digital breast tomosynthesis (DBT) systems (product code OTE) from class III to class II, making them subject to premarket notification.",
+    "implication": "It continues FDA's approach of reclassifying class III devices down to special controls on the basis of accumulated marketing experience. Because the subject is device classification, there is no direct effect on drug manufacturing and quality work, and it needs attention only where a device business is run alongside.",
+    "key_facts": [
+     "Scope: digital breast tomosynthesis (DBT) systems, product code OTE",
+     "Change: reclassification from class III (premarket approval) to class II (special controls), subject to premarket notification",
+     "Applicability: a change to medical device classification regulations, not directly applicable to drug GMP requirements"
+    ],
+    "checks": [
+     "Whether the product code is handled, if a device business unit exists",
+     "Timing of the move to premarket notification if the reclassification is finalised"
+    ]
    }
   },
   {
@@ -2004,6 +2199,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Warning over late protocol amendment report",
+    "summary": "The Ministry of Food and Drug Safety issued a warning, recorded as a first offence, for a late report of a clinical trial protocol amendment and for breaches of quality assurance for the trial and quality control of trial data.",
+    "implication": "In the clinical trial domain too, quality control of data is being carried into enforcement as a violation separate from a procedural delay. Firms running clinical trials should confirm the system that tracks reporting deadlines when an amendment arises and the records of quality assurance checks on trial data.",
+    "key_facts": [
+     "Violation: late report of an amendment to the clinical trial protocol",
+     "Violation: breach of quality assurance for the clinical trial and of quality control of clinical trial data",
+     "Action: warning, first offence, final action dated 10 August 2026",
+     "Applied: Pharmaceutical Affairs Act article 34(1) and the Korean Good Clinical Practice standard in Annex 4 to the Rules on the Safety of Drugs"
+    ],
+    "checks": [
+     "System tracking the reporting deadline once a protocol amendment arises",
+     "Records of clinical trial quality assurance activity and data quality control"
+    ]
    }
   },
   {
@@ -2096,6 +2306,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Manufacture suspended over ash specification",
+    "summary": "The Ministry of Food and Drug Safety suspended manufacture of a herbal product for three months because it failed the specifications for ash and acid-insoluble ash.",
+    "implication": "Ash and acid-insoluble ash are generally indicators that can be linked to the level of inorganic matter and soil carried in with a crude drug material, and this action shows a failure on those attributes leading directly to suspension of manufacture for the product. Firms using crude drugs as materials should confirm the controls on pre-treatment such as washing and sorting, and the release testing history against the ash specification.",
+    "key_facts": [
+     "Grounds: quality failure - ash and acid-insoluble ash",
+     "Action: three-month suspension of manufacture of the affected product (19 August 2026 to 18 November 2026)",
+     "Applied: Pharmaceutical Affairs Act article 62(11) and article 76, and Rules on the Safety of Drugs article 95, Annex 8",
+     "Final action date: 5 August 2026"
+    ],
+    "checks": [
+     "Control criteria for pre-treatment of crude drug materials, including washing and sorting",
+     "Release testing history against the ash and acid-insoluble ash specifications"
+    ]
    }
   },
   {
@@ -2154,6 +2379,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Guidance on pre-approval GMP for biologics",
+    "summary": "The Ministry of Food and Drug Safety published guidance on pre-approval GMP assessment for biological products.",
+    "implication": "Setting out the criteria for pre-approval GMP assessment at the licensing stage for biological products as guidance can affect how submission dossiers are prepared in practice. Firms preparing a biological product application should read the guidance for the scope of the documents required and the assessment procedure.",
+    "key_facts": [
+     "Subject: guidance on pre-approval GMP assessment for biological products",
+     "Issued: MFDS, 4 August 2026",
+     "Detail: the full text was not obtained, so the original document needs to be consulted"
+    ],
+    "checks": [
+     "Scope of documents required for pre-approval GMP assessment of biological products",
+     "Effective date in the guidance and how it differs from the existing procedure"
+    ]
    }
   },
   {
@@ -2218,6 +2457,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Post-approval inspection with no deficiencies",
+    "summary": "The Ministry of Food and Drug Safety carried out a post-approval GMP inspection on 22 May 2026 and assessed the site as having no deficiencies.",
+    "implication": "A post-approval inspection of a single finished product site closing without deficiencies shows the post-approval inspection cycle turning normally. Sites with a post-approval inspection ahead of them are worth checking for whether change control since the previous inspection is in order.",
+    "key_facts": [
+     "Outcome: no deficiencies on assessment",
+     "Category: post-approval inspection, finished product (single)",
+     "Inspection date 22 May 2026, published 3 August 2026"
+    ],
+    "checks": [
+     "State of the record of change controls raised since the previous inspection",
+     "Whether the scope covered by the post-approval inspection matches the site's own manufacturing scope"
+    ]
    }
   },
   {
@@ -2282,6 +2535,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Herbal preparation plant inspected, no findings",
+    "summary": "The Ministry of Food and Drug Safety carried out a post-approval GMP inspection of a herbal medicine production centre on 7 May 2026 and assessed it as having no deficiencies.",
+    "implication": "Facilities producing herbal preparations are assessed under the same post-approval GMP inspection framework as finished product sites. Firms that have herbal preparations made under contract, or buy them in, can use the inspection category and outcome for that facility as supplier assessment evidence.",
+    "key_facts": [
+     "Outcome: no deficiencies on assessment",
+     "Subject: a herbal medicine preparation production centre, post-approval, finished product (single)",
+     "Inspection date 7 May 2026, published 3 August 2026"
+    ],
+    "checks": [
+     "Category and outcome of the most recent GMP inspection at contract producers of herbal preparations",
+     "Whether the inspection outcome is reflected in supplier assessment records"
+    ]
    }
   },
   {
@@ -2346,6 +2613,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "About two months from inspection to publication",
+    "summary": "The Ministry of Food and Drug Safety carried out a post-approval GMP inspection on 29 May 2026 and assessed the site as having no deficiencies, with the result published on 3 August 2026.",
+    "implication": "With around two months between the inspection and publication of the result, published information alone is a poor basis for judging a supplier's current state. Where GMP inspection disclosures are used in supplier assessment, it is safer to judge currency by the inspection date.",
+    "key_facts": [
+     "Outcome: no deficiencies on assessment",
+     "Category: post-approval inspection, finished product (single)",
+     "Inspection date 29 May 2026, published 3 August 2026 - roughly two months between inspection and publication"
+    ],
+    "checks": [
+     "Which date supplier assessment treats as authoritative, the inspection date or the publication date",
+     "Direct audit or enquiry procedures that compensate for the publication lag"
+    ]
    }
   },
   {
@@ -2416,6 +2697,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Missing package insert triggers recall",
+    "summary": "A voluntary recall was started for a dental local anaesthetic injection because part of the package insert, the precautions for use, was missing.",
+    "implication": "Here the ground for recall is a missing element of the package insert rather than any test result on the product itself. Firms should confirm that the step verifying the presence and version of the package insert in the packaging process actually operates.",
+    "key_facts": [
+     "Reason: part of the package insert (precautions for use) was missing",
+     "Type: voluntary recall, not mandated, recall order dated 6 August 2026",
+     "Product: a dental injection presented as 1/100,000 (product standard code 200308019)"
+    ],
+    "checks": [
+     "The step in packaging that confirms insertion of the package insert and verifies its version",
+     "Reconciliation of printed material against the revision history when precautions for use change"
+    ]
    }
   },
   {
@@ -2490,6 +2785,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Tablets larger than specification",
+    "summary": "Health Canada published recall information for JAMP Methotrexate 10 mg Tablets from JAMP Pharma on product quality grounds, because some lots may contain tablets larger than specification.",
+    "implication": "Variation in tablet size can generally be linked to weight and thickness control in compression, and for a dose-sensitive product such as methotrexate that variation leads straight to a recall. Firms running tablet lines should confirm the in-process weight and thickness control limits and the criteria for sorting out oversized tablets at final inspection.",
+    "key_facts": [
+     "Reason: product quality - the affected lots may contain tablets that exceed the specified size",
+     "Class: Type II",
+     "Product: JAMP Methotrexate 10 mg Tablets, from JAMP Pharma",
+     "Advice: verify whether product on hand is affected and consult a healthcare provider before discontinuing use or for any health concerns"
+    ],
+    "checks": [
+     "In-process control limits for weight and thickness in compression and the action taken on an excursion",
+     "Criteria for sorting out tablets of abnormal size at final visual inspection"
+    ]
    }
   },
   {
@@ -2615,6 +2925,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Subpotent levothyroxine tablets recalled",
+    "summary": "Major Pharmaceuticals recalled levothyroxine sodium tablets as subpotent, covering 12 products together for the same reason.",
+    "implication": "That the subpotency appeared across several products rather than at one strength suggests a question that needs checking over a wider range than a single batch. Firms handling narrow therapeutic index products should confirm their in-process control indicators for content uniformity and their assay trend data through the shelf life.",
+    "key_facts": [
+     "Reason: subpotent drug",
+     "Scope: 12 products recalled together for the same reason",
+     "Class: Class II",
+     "Firm: Major Pharmaceuticals, issued 29 July 2026"
+    ],
+    "checks": [
+     "In-process control indicators for content uniformity of narrow therapeutic index products",
+     "Frequency of review of assay decline trends within the shelf life"
+    ]
    }
   },
   {
@@ -2732,6 +3057,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Dissolution and assay failures recalled",
+    "summary": "Ascend Laboratories, LLC recalled amlodipine and olmesartan medoxomil combination tablets for failing dissolution specifications and for olmesartan medoxomil content below specification.",
+    "implication": "This is a combination tablet where dissolution failure and low content appeared together, and two attributes moving out at once can generally be linked to formulation and process variables. Firms having combination tablets made overseas under contract should confirm dissolution trends in stability testing and the history of process change notifications from the contract site.",
+    "key_facts": [
+     "Reason: failed dissolution specifications and olmesartan medoxomil content below specification",
+     "Product: Amlodipine and Olmesartan Medoxomil Tablets, 10 mg/20 mg (NDC 67877-500-30)",
+     "Manufacture and distribution: manufactured by Alkem Laboratories Ltd. in India, distributed by Ascend Laboratories, LLC",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Dissolution trend in stability testing of the combination tablet",
+     "History of process change notifications from the contract site and the impact assessments made"
+    ]
    }
   },
   {
@@ -2858,6 +3198,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Eye drops recalled for sterility assurance",
+    "summary": "Rohto-Mentholatum (Vietnam) Co., Ltd. recalled eye drops for lack of assurance of sterility, covering eight products together for the same reason.",
+    "implication": "In an ophthalmic dosage form that must be sterile, the lack of sterility assurance extended across the whole product family rather than one product. Firms producing or importing sterile dosage forms should confirm the valid scope of their aseptic process validation and which products their container closure integrity data actually covers.",
+    "key_facts": [
+     "Reason: lack of assurance of sterility",
+     "Scope: eight products recalled together for the same reason",
+     "Product family: sterile eye drops in 13 mL presentations, distributed by The Mentholatum Company",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Validity period and scope of the aseptic process validation, including media fills",
+     "The range of products covered by container closure integrity test data"
+    ]
    }
   },
   {
@@ -2971,6 +3326,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Crystallisation and floating particles in syrup",
+    "summary": "Rising Pharma Holding, Inc. recalled cyproheptadine hydrochloride syrup because the medication was crystallising and particles were floating in the bottle.",
+    "implication": "Precipitation in a liquid dosage form can generally be linked to the solubility limit and storage temperature, and as here it is often only found once the product is in distribution. Firms handling syrups should review whether the stability test panel includes appearance and precipitation, and whether precipitation has been checked at the lower end of the labelled storage range.",
+    "key_facts": [
+     "Reason: presence of precipitate - the medication was crystallising and particles were floating in the bottle",
+     "Product: Cyproheptadine Hydrochloride Syrup, 2mg/5 mL, 473 mL (NDC 64980-504-48)",
+     "Manufacture and sale: manufactured by Lyne Laboratories, Inc. in Brockton, MA and sold by Rising Pharma Holdings, Inc.",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Whether appearance and precipitation attributes are set in the stability test panel for syrups",
+     "Data confirming behaviour at the lower limit of the labelled storage temperature"
+    ]
    }
   },
   {
@@ -3090,6 +3460,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Hair found in an injection",
+    "summary": "Fresenius Kabi USA, LLC recalled glycopyrrolate injection after hair was found in the product, covering five products together for the same reason.",
+    "implication": "Hair detected in an injection can generally be linked to personnel gowning and to control of personnel intervention in the filling area. Firms running injectable lines should confirm how effective the gowning procedure is, the records of interventions in the filling area, and the sensitivity of final visual inspection to particulate.",
+    "key_facts": [
+     "Reason: presence of particulate matter - hair was found in the product",
+     "Scope: five products recalled together for the same reason",
+     "Product: Glycopyrrolate Injection, USP, 1 mg per 5 mL multiple dose vials among other injectables",
+     "Class: Class II"
+    ],
+    "checks": [
+     "Gowning procedure and records of personnel intervention in the aseptic filling area",
+     "Acceptance criteria for particulate at final visual inspection and qualification of the inspectors"
+    ]
    }
   },
   {
@@ -3198,6 +3583,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Unidentified impurity out of specification",
+    "summary": "Precision Dose Inc. started a recall of glycopyrrolate oral solution after an out-of-specification result for an unidentified impurity was found during routine stability testing.",
+    "implication": "Routine stability testing was the trigger for the recall here, showing that an unidentified impurity with no individual limit still has to be controlled against the unspecified impurity limit. Firms should confirm that the stability programme for liquid dosage forms sets an unspecified impurity limit and an identification threshold.",
+    "key_facts": [
+     "Reason: an out-of-specification result for an unidentified impurity detected during routine stability testing",
+     "Product: Glycopyrrolate Oral Solution, 1 mg/5 mL, unit dose oral syringes (NDC 68094-073-01, 68094-073-58)",
+     "Class: not yet classified",
+     "Firm: Precision Dose Inc., issued 29 July 2026"
+    ],
+    "checks": [
+     "Unspecified impurity limit and identification threshold in the stability specification",
+     "Procedure for deciding on recall of distributed stock when a stability result is out of specification"
+    ]
    }
   }
  ]

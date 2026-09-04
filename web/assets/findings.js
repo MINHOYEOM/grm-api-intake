@@ -233,13 +233,23 @@
   ];
 
   var SORT_VALUES = ["date_desc", "date_asc", "firm_asc"];
+  // [다국어 2026-09-04] 원문 언어 축(서버 p_orig_lang, 마이그 074). 영어판의 기본은
+  // "원문이 영어인 지적"이고 한국어판은 제한이 없다 — 정적 문서 페이지가 이미 그렇게
+  // 하고 있었는데(doc_is_english, 4단계) 런타임 검색만 안 해서, 영어 사용자가 여는 첫
+  // 3쪽 지적 135건 중 90건이 한글 본문이었다(2026-09-04 라이브 실측).
+  // ★값이 'all' 이지 빈 문자열이 아닌 이유: syncStateToUrl 은 falsy 를 URL 에 싣지
+  //   않는다. 빈 문자열로 두면 **사용자가 푼 필터가 URL 에 안 남아** 새로고침·공유 시
+  //   조용히 되살아난다(푼 것이 되돌아오는 것은 고장이다).
+  var ORIG_LANG_DEFAULT = _isEn ? "en" : "all";
   var DEFAULT_STATE = {
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
     review_status: "", month: "", country: "", sort: "date_desc",
+    orig_lang: ORIG_LANG_DEFAULT,
   };
   var state = {
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
     review_status: "", month: "", country: "", sort: "date_desc",
+    orig_lang: ORIG_LANG_DEFAULT,
   };
   var debounceTimer = null;
 
@@ -301,6 +311,10 @@
   var filtersToggleBtn = document.getElementById("fnd-filters-toggle");
   var filtersBadgeEl = document.getElementById("fnd-filters-badge");
   var activeEl = document.getElementById("fnd-active"); // [M15] 적용 필터 칩 행
+  var langNoteEl = document.getElementById("fnd-langnote"); // [다국어] 원문 언어 공지(영어 트리 전용)
+
+  // 숫자 표기는 읽는 언어를 따른다 — 자릿구분이 언어마다 다르다.
+  function nfmt(n) { return Number(n || 0).toLocaleString(_isEn ? "en-US" : "ko-KR"); }
   var dashToggleBtn = document.getElementById("fnd-dash-toggle");
   var dashGridEl = document.getElementById("fnd-dash-grid");
 
@@ -1387,6 +1401,7 @@
   var URL_KEYS = {
     q: "q", agency: "agency", category_code: "cat", source: "src",
     evidence_level: "ev", review_status: "status", month: "m", country: "country", sort: "sort",
+    orig_lang: "orig",
   };
 
   function syncStateToUrl() {
@@ -1477,6 +1492,9 @@
     state = {
       q: "", agency: "", category_code: "", source: "", evidence_level: "",
       review_status: "", month: "", country: "", sort: "date_desc",
+      // ★"모두 지우기"는 **그 트리의 기본**으로 돌아가는 것이지 영어판을 한국어 섞인
+      //   상태로 만드는 것이 아니다(DEFAULT_STATE 와 같은 값이어야 URL 도 깨끗해진다).
+      orig_lang: ORIG_LANG_DEFAULT,
     };
     syncControlsFromState();
     currentPage = 1; // [페이지네이션] 전체 초기화 → 1페이지로 리셋
@@ -1496,6 +1514,34 @@
     btn.appendChild(x);
     btn.addEventListener("click", onClear);
     return btn;
+  }
+
+  // [다국어 2026-09-04] 원문 언어 공지 — **무엇을 안 보여주고 있는지 화면이 말한다.**
+  // 걸러내는 것 자체는 옳지만(영어 셸에 한국어 본문을 내지 않는다), 말없이 걸러내면
+  // 사용자는 코퍼스가 작다고 오해한다. 한 줄로 밝히고 한 번의 클릭으로 풀 수 있게 둔다.
+  // 요소는 영어 트리에만 렌더되므로(findings.html) 없으면 조용히 건너뛴다.
+  function renderLangNote() {
+    if (!langNoteEl) return;
+    var on = state.orig_lang === "en";
+    var total = (LAST && LAST.totals && LAST.totals.findings) || 0;
+    langNoteEl.innerHTML = "";
+    var text = document.createElement("span");
+    text.textContent = on
+      ? _t("원문이 영어인 지적만 보고 있습니다({n}건).", { n: nfmt(total) })
+      : _t("원문 언어를 가리지 않고 보고 있습니다({n}건) — 원문이 한국어인 지적이 섞여 있습니다.",
+           { n: nfmt(total) });
+    langNoteEl.appendChild(text);
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fnd-langnote-btn";
+    btn.textContent = on ? _t("전체 보기") : _t("영어 원문만 보기");
+    btn.addEventListener("click", function () {
+      state.orig_lang = on ? "all" : "en";
+      currentPage = 1;      // 모집단이 바뀌면 페이지 번호는 의미를 잃는다
+      goToPage(1);
+    });
+    langNoteEl.appendChild(btn);
+    langNoteEl.hidden = false;
   }
 
   function renderActiveChips() {
@@ -1961,6 +2007,7 @@
     refreshFacetUI(); // [M15] 셀렉트 건수 갱신(표준 파세팅)
     refreshCountrySelectUI(); // [056] 국가 셀렉트 건수 갱신
     renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
+    renderLangNote();    // [다국어] 원문 언어 공지·해제 줄(영어 트리에만 존재)
     updateFiltersToggleBadge();
 
     // totals 는 검색·필터 적용 후 exact 다(추정치가 아니다) — "이상" 접미사 같은 불확실성
@@ -2128,6 +2175,9 @@
         // 없음) · 'UNKNOWN'(country_key='' 미확인 버킷, COUNTRY_UNKNOWN_VALUE) · ISO2 코드.
         // 변환 없이 그대로 전달.
         p_country: state.country,
+        // [다국어] 'en' = 원문에 한글이 없는 지적만(마이그 074). 그 밖의 값은 '' 로
+        // 보내 서버 기본(제한 없음)을 쓴다 — 클라이언트가 새 값을 지어내지 않는다.
+        p_orig_lang: state.orig_lang === "en" ? "en" : "",
       }),
     })
       .then(function (r) {

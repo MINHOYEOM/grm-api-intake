@@ -197,6 +197,20 @@ _DISPLAYED_ALIAS_PROBES: tuple[tuple[str, str], ...] = (
 _DOC_PAGES_IN_TESTS = False
 
 
+def js_function_body(src: str, header: str) -> str:
+    """`header` 로 시작하는 JS 함수의 **본문 전체**.
+
+    ★고정폭 슬라이스(`src[i:i+480]`)를 쓰지 않는 이유: 함수 안에 한 줄만 늘어도 검사
+      대상이 창 밖으로 밀려 나가 테스트가 거짓으로 실패한다. 실제로 이 저장소에서
+      320 → 400 → 480 으로 세 번 올라온 이력이 있고(주석에 그 이력이 남아 있었다),
+      네 번째로 또 밀렸다. 폭은 코드가 자랄 때마다 낡는 손값이므로 **구조**로 자른다.
+      findings.js 는 IIFE 안이라 함수가 2칸 들여쓰기로 시작하고 `\n  }` 로 닫힌다.
+    """
+    i = src.index(header)
+    end = src.index("\n  }", i) + len("\n  }")
+    return src[i:end]
+
+
 def _build_single(out: pathlib.Path, *, doc_pages: bool = _DOC_PAGES_IN_TESTS) -> None:
     render.render_site(SINGLE_FIXTURES, out, render_doc_pages=doc_pages)
 
@@ -1521,19 +1535,16 @@ class WebFindingsRenderTest(unittest.TestCase):
         render()의 syncStateToUrl() 이 기본 state 를 반영해 querystring 을 자동으로 비운다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function clearAllFilters()", js_src)
-        # [PR-0 딥링크] exitDeepLinkMode() 호출 한 줄이 앞에 추가돼 고정폭 320 이 goToPage(1)
-        # 을 담기엔 부족해졌다 — 400 으로 상향(함수 본문 전체를 여전히 넉넉히 담는다).
-        # [FIND-1 S1] exitSimilarMode() 호출 한 줄이 추가로 앞에 붙어 400 도 부족해졌다 —
-        # 480 으로 재상향(함수 본문 전체를 여전히 넉넉히 담는다).
-        fn_block = js_src[js_src.index("function clearAllFilters()"):js_src.index("function clearAllFilters()") + 480]
+        # [2026-09-04] 고정폭 슬라이스를 걷어냈다 — 320→400→480 으로 세 번 올려 왔고
+        # 네 번째로 또 밀렸다(원문 언어 축의 주석 두 줄). 폭이 아니라 함수 끝까지 자른다.
+        fn_block = js_function_body(js_src, "function clearAllFilters()")
         self.assertIn('sort: "date_desc"', fn_block)
         self.assertIn("syncControlsFromState()", fn_block)
         self.assertIn("currentPage = 1", fn_block)
         self.assertIn("goToPage(1)", fn_block)
         # goToPage 가 실제로 render() 를 호출해 재렌더(→URL clear)를 일으키는지 확인.
-        # [서버 canonical search] fetchSearch().then() 콜백 안에 페이지 경계 방어 주석·분기가
-        # 추가돼 render() 호출까지의 거리가 길어졌다 — 600 으로는 부족해 900 으로 재상향.
-        goto_block = js_src[js_src.index("function goToPage(n)"):js_src.index("function goToPage(n)") + 900]
+        # (600→900 으로 올려 온 고정폭도 같은 이유로 걷어낸다.)
+        goto_block = js_function_body(js_src, "function goToPage(n)")
         self.assertIn("render()", goto_block)
 
     def test_active_filter_chips_clear_and_clear_all_wiring(self):
@@ -14465,6 +14476,123 @@ class WebEnBriefTest(unittest.TestCase):
         catalog = grm_i18n.load_catalog("en")
         for key in registered:
             self.assertIn(key, catalog, f"등록됐지만 번역이 없다: {key!r}")
+
+
+class WebFindingsOrigLangTest(unittest.TestCase):
+    """[다국어 6단계 2026-09-04] 검색의 원문 언어 축 — 영어 화면에 한국어 본문을 내지 않는다.
+
+    ★계기(라이브 실측): `/en/findings/` 를 열면 최신순 첫 3쪽 지적 135건 중 **90건이
+      한글 본문**이었다. 코퍼스 전체로는 영어 원문이 91.7%인데(FDA 14,936 · HC 9,505 ·
+      EMA 78 · MHRA 8) 식약처가 가장 최근 편입분이라 첫 화면을 덮은 것이다. 정적 문서
+      페이지는 4단계에서 원문이 영어인 문서만 골라 냈는데(`doc_is_english`) 런타임
+      검색에만 그 필터가 없어서 생긴 비대칭이었다.
+
+    이 클래스가 지키는 것은 셋이다: ①서버 축이 **모든 집계에** 걸려 있는가(한 곳만
+    걸면 결과와 패싯 숫자가 갈린다) ②기본값이 트리마다 옳은가 ③**거르고 있다고 화면이
+    말하고, 한 번의 클릭으로 풀 수 있는가**(말없이 거르면 코퍼스가 작다는 오해가 된다).
+    """
+
+    MIG = WEB_DIR / "migrations" / "074_findings_search_orig_lang.sql"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.sql = cls.MIG.read_text(encoding="utf-8")
+        cls.js = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_origlang_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.ko = (cls.out / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.en = (cls.out / "en" / "findings" / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 서버 축 ─────────────────────────────────────────────────────────────
+    def test_predicate_is_the_text_itself_not_the_agency(self):
+        """판정 근거는 본문이다 — 기관으로 가르면 지금은 맞아도 낡는다.
+
+        실측: MFDS 2,125건 중 36건이 이미 한글이 아니었다(전부 `rejected` 인 OCR 잡음).
+        "MFDS = 한국어"는 데이터의 사실이 아니라 현재의 우연이다.
+        """
+        self.assertIn("generated always as (", self.sql)
+        self.assertIn("finding_text !~ '[가-힣ᄀ-ᇿ㄰-㆏]'", self.sql)
+        self.assertNotIn("agency <> 'MFDS'", self.sql)
+        self.assertNotIn("agency != 'MFDS'", self.sql)
+
+    def test_filter_applies_to_every_aggregate_not_just_the_rows(self):
+        """★결과·총계·패싯이 **같은 모집단**에서 나와야 한다.
+
+        `filtered` 에만 걸면 결과는 영어인데 기관 패싯에는 "MFDS 2,058" 이 남고, 누르면
+        0건이 나온다(죽은 칩). 대시보드는 `filtered` 파생이라 자동으로 따라온다.
+        """
+        self.assertEqual(self.sql.count("and (not p.f_orig_en or s.original_is_english)"),
+                         7, "filtered 1 + 패싯 6 = 7곳에 걸려야 한다")
+        for cte in ("fac_source", "fac_cat", "fac_month", "fac_ev", "fac_rs", "fac_agency"):
+            block = self.sql.split(cte + " as (", 1)[1].split("),", 1)[0]
+            self.assertIn("f_orig_en", block, f"{cte} 에 언어 축이 안 걸렸다")
+
+    def test_new_argument_is_last_and_defaulted_so_old_callers_survive(self):
+        """PostgREST 는 인자가 하나만 달라도 404 다(#681) — 기존 11인자 호출을 지킨다."""
+        sig = self.sql.split("create or replace function public.findings_search(", 1)[1]
+        sig = sig.split(")\nreturns jsonb", 1)[0]
+        self.assertTrue(sig.rstrip().rstrip(",").endswith("p_orig_lang text default ''::text"),
+                        "신설 인자는 맨 뒤 + 기본값이어야 한다")
+        self.assertIn("drop function if exists public.findings_search(", self.sql,
+                      "옛 11인자 판을 안 내리면 11인자 호출이 모호해진다")
+
+    def test_function_body_carries_no_comments_so_it_can_be_diffed_with_prosrc(self):
+        """본문에 주석을 두지 않는다 — `md5(prosrc)` 로 프로덕션 무단 수정을 잡기 위해."""
+        body = self.sql.split("as $function$", 1)[1].rsplit("$function$;", 1)[0]
+        stray = [ln for ln in body.split("\n") if ln.strip().startswith("--")]
+        self.assertEqual(stray, [], f"본문 주석 {stray[:3]}")
+
+    # ── 클라이언트 ──────────────────────────────────────────────────────────
+    def test_default_differs_by_tree(self):
+        self.assertIn('var ORIG_LANG_DEFAULT = _isEn ? "en" : "all";', self.js)
+        self.assertIn('p_orig_lang: state.orig_lang === "en" ? "en" : ""', self.js)
+
+    def test_released_state_is_all_not_empty_so_the_url_can_hold_it(self):
+        """★해제 상태가 URL 에 남아야 한다.
+
+        `syncStateToUrl` 은 falsy 를 싣지 않는다. 해제를 빈 문자열로 두면 새로고침·공유
+        시 필터가 조용히 되살아난다 — **사용자가 푼 것이 되돌아오는 것은 고장이다.**
+        """
+        self.assertIn('orig_lang: "orig"', self.js, "URL 키가 없다")
+        # ★해제가 만드는 값은 **truthy 문자열**이어야 한다. 아래 두 곳이 이 축의 값을
+        #   정하는 전부이므로 값 자체를 못박는다 — "빈 문자열이 아니다"만 보면
+        #   삼항 안의 빈 문자열을 놓친다(이 테스트가 실제로 그렇게 새 나갔다).
+        self.assertIn('_isEn ? "en" : "all"', self.js, "한국어 트리 기본이 빈 문자열이면 URL 에 안 남는다")
+        self.assertIn('state.orig_lang = on ? "all" : "en";', self.js,
+                      "해제 클릭이 빈 문자열을 만들면 새로고침 때 필터가 되살아난다")
+        # 기본 상태·초기화 상태 모두 트리 기본값을 쓴다(URL 도 깨끗해진다).
+        self.assertEqual(self.js.count("orig_lang: ORIG_LANG_DEFAULT,"), 3,
+                         "DEFAULT_STATE · state · clearAllFilters 세 곳")
+
+    def test_switching_language_mode_resets_to_the_first_page(self):
+        """모집단이 바뀌면 페이지 번호는 의미를 잃는다(7쪽만 보다가 3쪽뿐인 결과로 가면 빈 화면)."""
+        fn = self.js.split("function renderLangNote()", 1)[1].split("\n  function ", 1)[0]
+        self.assertIn("currentPage = 1;", fn)
+        self.assertIn("goToPage(1);", fn)
+
+    # ── 화면이 말하는가 ─────────────────────────────────────────────────────
+    def test_the_note_exists_only_in_the_english_tree(self):
+        self.assertIn('id="fnd-langnote"', self.en)
+        self.assertNotIn("fnd-langnote", self.ko,
+                         "한국어판에는 요소도 CSS 도 남지 않는다(죽은 규칙 금지)")
+
+    def test_the_note_is_empty_until_data_arrives(self):
+        """빈 상자 금지 — 응답 전에는 hidden 이고, 정적 셸은 문구를 담지 않는다."""
+        self.assertIn('<p class="fnd-langnote" id="fnd-langnote" hidden></p>', self.en)
+
+    def test_the_note_says_what_is_hidden_and_offers_one_click_release(self):
+        for key in ("원문이 영어인 지적만 보고 있습니다({n}건).",
+                    "원문 언어를 가리지 않고 보고 있습니다({n}건) — 원문이 한국어인 지적이 섞여 있습니다.",
+                    "전체 보기", "영어 원문만 보기"):
+            self.assertIn(key, self.js, f"공지 문구 누락: {key}")
+        catalog = json.loads((WEB_DIR / "data" / "i18n" / "en.json").read_text(encoding="utf-8"))
+        for key in ("전체 보기", "영어 원문만 보기"):
+            self.assertIn(key, catalog, f"영어 사전에 없다: {key}")
 
 
 class WebEnTreeTest(unittest.TestCase):

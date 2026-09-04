@@ -81,7 +81,19 @@ from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E4
 # 한국어를 유지한다(테스트가 헬퍼를 직접 부르는 계약 불변). 상세는 web/grm_i18n.py.
 if str(WEB_DIR) not in sys.path:
     sys.path.insert(0, str(WEB_DIR))
-from grm_i18n import KO as _KO, Translator, noop as N_  # noqa: E402
+from grm_i18n import (  # noqa: E402
+    KO as _KO, SUPPORTED_LANGS, Translator, build_js_catalog, noop as N_,
+)
+
+# ── 언어 트리 상수 ────────────────────────────────────────────────────────────
+# ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
+#   import 시점에 NameError 였다(정의 순서가 강제되는 자리).
+DEFAULT_LANG = "ko"
+LANG_PREFIXES: dict[str, str] = {"ko": "", "en": "en/"}
+# 언어 전환 UI·hreflang 이 쓰는 표시 이름(그 언어의 자칭 — 번역 대상이 아니다).
+LANG_ENDONYM: dict[str, str] = {"ko": "한국어", "en": "English"}
+# `og:locale` — 언어별 고정값(번역 대상 아님).
+LANG_OG_LOCALE: dict[str, str] = {"ko": "ko_KR", "en": "en_US"}
 
 # ── v4 디자인 계약에서 가져온 결정론 매핑 ──────────────────────────────────────
 # 사실표에서 mono(ASCII 데이터)로 표기하는 라벨(v4 dataLabels 동결). 한글에 mono 금지.
@@ -512,7 +524,7 @@ def load_briefs(data_dir: Path) -> list[dict[str, Any]]:
 #                          (guidance-internal 등)를 한국어 라벨로, ""로 매핑하면 칩 숨김.
 #                          미등재 값은 원문 그대로 표시.
 LIBRARY_REGISTRY: list[dict[str, Any]] = [
-    {"slug": "ich", "short": "ICH", "file": "ich.json", "unit": N_("토픽"), "kick": "ICH · Guidelines",
+    {"slug": "ich", "short": N_("ICH"), "file": "ich.json", "unit": N_("토픽"), "kick": "ICH · Guidelines",
      "title": N_("ICH 가이드라인 카탈로그"),
      "blurb": N_("FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽을 한글 명칭과 함께 정리."),
      "intro": N_("FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 한글 명칭을 병기해 정리했으며, 현행 문서가 공개된 토픽은 공식 원문 PDF로 바로 연결됩니다. 식약처 한글 번역본이 있는 토픽은 번역본 링크를 함께 제공합니다. 최신 Step·개정 현황은 계열별 ICH 공식 카탈로그 페이지에서 확인하실 수 있습니다."),
@@ -532,24 +544,24 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "sort": "published_desc",
      "doc_type_labels": {"guidance-internal": N_("공무원 지침서"), "guidance-industry": N_("민원인 안내서·지침"),
                          "legislative-notice": N_("입법·행정예고"), "notice-final": N_("고시 전문")}},
-    {"slug": "eu-gmp", "short": "EU GMP", "file": "eu_gmp.json", "unit": N_("건"), "kick": "EU · EudraLex Vol 4",
+    {"slug": "eu-gmp", "short": N_("EU GMP"), "file": "eu_gmp.json", "unit": N_("건"), "kick": "EU · EudraLex Vol 4",
      "title": N_("EU GMP 기준서 (EudraLex Vol 4)"),
      "blurb": N_("유럽연합 의약품 GMP 기준서. Part I·II·III 각 장과 부속서(Annex)를 구조 순서대로 정리."),
      "intro": N_("유럽연합 의약품 GMP 기준서(EudraLex Volume 4)의 문서 목록입니다. Part I(기본 요건)·Part II(원료의약품)·Part III(보조 문서)과 부속서(Annex)를 기준서 구조 순서대로 정리했으며, 각 문서의 공식 원문 PDF로 바로 연결됩니다. 법적 효력과 최신 개정본은 반드시 공식 원문에서 확인하세요."),
      "desc": N_("EU GMP 기준서(EudraLex Volume 4) 문서 목록 — Part I·II·III과 부속서(Annex), 공식 원문 PDF 링크.")},
-    {"slug": "pics", "short": "PIC/S", "file": "pics.json", "unit": N_("건"), "kick": "PIC/S · GMP Guide",
+    {"slug": "pics", "short": N_("PIC/S"), "file": "pics.json", "unit": N_("건"), "kick": "PIC/S · GMP Guide",
      "title": N_("PIC/S GMP 가이드"),
      "blurb": N_("의약품실사상호협력기구(PIC/S)의 GMP 가이드(PE 009)와 부속서·가이던스 문서 목록."),
      "intro": N_("의약품실사상호협력기구(PIC/S)가 공개한 GMP 가이드(PE 009) 각 부와 부속서, 관련 가이던스 문서를 발행일 순으로 정리했습니다. 식약처를 포함한 PIC/S 가입 규제기관의 실사 기준과 맞닿아 있는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
      "desc": N_("PIC/S GMP 가이드(PE 009)·부속서·가이던스 문서 목록 — 발행일·공식 원문 링크."),
      "sort": "published_desc"},
-    {"slug": "who", "short": "WHO", "file": "who.json", "unit": N_("건"), "kick": "WHO · TRS Annexes",
+    {"slug": "who", "short": N_("WHO"), "file": "who.json", "unit": N_("건"), "kick": "WHO · TRS Annexes",
      "title": N_("WHO TRS 부속서 모음"),
      "blurb": N_("WHO 전문가위원회 기술보고서(TRS) 부속서 중 GMP·품질 관련 문서 선별 목록."),
      "intro": N_("세계보건기구(WHO) 의약품 표준 전문가위원회 기술보고서(TRS)의 부속서 가운데 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. WHO 사전적격성평가(PQ)나 국제 조달 요건을 다룰 때 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
      "desc": N_("WHO 기술보고서(TRS) 부속서 중 GMP·품질 문서 선별 목록 — 발행일·공식 원문 링크."),
      "sort": "published_desc"},
-    {"slug": "fda-guidance", "short": "FDA", "file": "fda_guidance.json", "unit": N_("건"), "kick": "FDA · Guidance",
+    {"slug": "fda-guidance", "short": N_("FDA"), "file": "fda_guidance.json", "unit": N_("건"), "kick": "FDA · Guidance",
      "title": N_("FDA 가이던스 문서"),
      "blurb": N_("FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서 선별 목록."),
      "intro": N_("미국 FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서를 발행일 순으로 선별해 정리했습니다. 가이던스는 FDA의 현재 견해를 담은 권고 문서로, 법적 구속력이 있는 규정(CFR)과는 구분해 읽어야 합니다. 최신 개정 여부는 반드시 공식 원문에서 확인하세요."),
@@ -562,7 +574,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
     #   입도가 다르기 때문이다(가이던스 86건 = 문서 단위, 21 CFR 63건 = 조항 단위. 합치면
     #   "FDA 149건"이 무엇을 센 숫자인지 알 수 없게 되고, findings 의 cfr_refs 가 조항으로
     #   바로 갈 수 있는 조인 축도 사라진다). 배치와 상호 참조 문구로 관계를 밝힌다.
-    {"slug": "cfr", "short": "21 CFR", "file": "cfr.json", "unit": N_("개 조항"), "kick": "US · 21 CFR",
+    {"slug": "cfr", "short": N_("21 CFR"), "file": "cfr.json", "unit": N_("개 조항"), "kick": "US · 21 CFR",
      "title": N_("미국 연방규정 21 CFR (GMP)"),
      "blurb": N_("미국 연방규정(CFR) 중 의약품 GMP 조항 원문. 가이드라인이 아니라 법령 그 자체 — Part 210(총칙)·Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 수록."),
      "intro": N_("미국 연방규정집(Code of Federal Regulations) Title 21 가운데 의약품 현행 우수제조관리기준(CGMP)을 담은 Part 210(총칙)과 Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 정리했습니다. 자료실의 다른 컬렉션이 가이드라인·기준서인 것과 달리 이 컬렉션은 법적 구속력을 갖는 규정 원문 그 자체입니다. FDA가 권고 형태로 내는 문서는 바로 앞의 'FDA 가이던스 문서' 컬렉션에 있습니다. 각 조항은 공식 원문(eCFR)으로 바로 연결됩니다. 개정 이력과 최신본은 반드시 공식 원문에서 확인하세요."),
@@ -573,7 +585,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
          {"contains": "/part-210/", "badge": "210", "label": N_("총칙"), "label_en": "General Provisions"},
          {"contains": "/part-211/", "badge": "211", "label": N_("완제의약품 CGMP"), "label_en": "Finished Pharmaceuticals"},
      ]},
-    {"slug": "ema", "short": "EMA", "file": "ema.json", "unit": N_("건"), "kick": "EMA · Guidance",
+    {"slug": "ema", "short": N_("EMA"), "file": "ema.json", "unit": N_("건"), "kick": "EMA · Guidance",
      "title": N_("EMA GMP·품질 가이드라인"),
      "blurb": N_("유럽의약품청(EMA)이 공개한 GMP 관련 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록."),
      "intro": N_("유럽의약품청(EMA)이 공개한 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. 실사 당국 품질 시스템, 품질 결함 보고·신속 경보 처리 등 규제 절차 가이드라인과 과학 가이드라인, 질의응답(Q&A)을 포함합니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
@@ -583,7 +595,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "doc_type_labels": {"regulatory-procedural-guideline": N_("규제·절차 가이드라인"),
                          "scientific-guideline": N_("과학 가이드라인"),
                          "questions-and-answers": N_("질의응답(Q&A)")}},
-    {"slug": "mhra", "short": "MHRA", "file": "mhra.json", "unit": N_("건"), "kick": "UK · MHRA",
+    {"slug": "mhra", "short": N_("MHRA"), "file": "mhra.json", "unit": N_("건"), "kick": "UK · MHRA",
      "title": N_("MHRA GMP·GDP 가이던스"),
      # [정적 연도 제거 2026-08-12] 옛 문구는 "2019년 이후 갱신 없음"이라고 못박아 뒀다.
      # 외부 기관 상태를 정적으로 단정한 것이라, MHRA 가 새 통계를 내는 순간 조용히 거짓이
@@ -595,7 +607,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "doc_type_labels": {"information-sheet": N_("정보시트"), "gmp-deficiency-statistics": N_("GMP 실사 결함통계"),
                          "detailed_guide": N_("가이던스"), "notice": N_("공지"),
                          "transparency": N_("투명성 공개"), "guidance": N_("가이던스 자료")}},
-    {"slug": "health-canada", "short": "Health Canada", "file": "health_canada.json", "unit": N_("건"),
+    {"slug": "health-canada", "short": N_("Health Canada"), "file": "health_canada.json", "unit": N_("건"),
      "kick": "Health Canada · GMP",
      "title": N_("Health Canada GMP 가이드"),
      "blurb": N_("캐나다 보건부(Health Canada)의 GMP 가이드(GUI 시리즈) 문서 목록."),
@@ -604,7 +616,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
      "sort": "published_desc",
      "public_base": "https://www.canada.ca/en/health-canada.html",
      "doc_type_labels": {"guidance": N_("가이던스")}},
-    {"slug": "pmda", "short": "PMDA", "file": "pmda.json", "unit": N_("건"),
+    {"slug": "pmda", "short": N_("PMDA"), "file": "pmda.json", "unit": N_("건"),
      "kick": "PMDA · Inspection Cases",
      "title": N_("PMDA 실사 지적사례 (ORANGE Letter)"),
      "blurb": N_("일본 PMDA가 공개한 GMP 실사 지적사례(ORANGE Letter) 영문판과 GMP/GCTP 연차보고서 목록."),
@@ -619,7 +631,7 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
 ]
 
 
-def _library_item_view(it: dict[str, Any]) -> dict[str, Any]:
+def _library_item_view(it: dict[str, Any], lang: str = DEFAULT_LANG) -> dict[str, Any]:
     """카탈로그 항목 → 공통 항목 뷰 — 스키마 v2(값 무변형 통과).
 
     표시 제목은 한국어 우선: title_ko 가 있으면 주 제목, title_en 은 병기 줄(sub)로
@@ -629,12 +641,24 @@ def _library_item_view(it: dict[str, Any]) -> dict[str, Any]:
     (품질 기준 2026-07-18)."""
     title_en = it.get("title_en") or it.get("title") or ""
     title_ko = it.get("title_ko") or ""
+    # [다국어 3단계] 표시 제목은 **읽는 사람의 언어를 먼저** 고른다 — 한국어판은 title_ko,
+    # 영어판은 title_en, 없으면 있는 쪽으로 떨어지고 병기 줄(sub)은 반대편이 된다.
+    #   ★영문 제목이 없는 항목(실측: 식약처 99건 중 40건, 나머지 10개 카탈로그는 100% 보유)은
+    #     영어판에서도 한국어 제목 그대로다. 그 문서의 **실제 이름**이 한국어이기 때문이고,
+    #     여기서 지어낸 영어 제목을 붙이면 원문에 없는 이름을 만드는 것이다(무변형 규율).
+    if lang != DEFAULT_LANG:
+        # ★영어판에는 한국어 제목을 병기하지 않는다 — 한국어판의 병기는 영문 원제를
+        #   확인시켜 주는 장치인데, 그 반대는 영어 독자에게 읽을 수 없는 줄을 하나 더
+        #   얹을 뿐이다. 영문 제목이 없으면 한국어 제목 하나만 남는다(그 문서의 실제 이름).
+        primary, secondary = (title_en or title_ko), ""
+    else:
+        primary, secondary = (title_ko or title_en), (title_en if title_ko else "")
     return {
         # id 는 화면에 쓰지 않는다 — 변경이력(library_updates.json)이 id 만 저장하고
         # 제목·링크는 렌더 시점에 이 뷰에서 join 하므로 조인 키로만 싣는다.
         "id": it.get("id") or "",
-        "title": title_ko or title_en,
-        "sub": title_en if title_ko else "",
+        "title": primary,
+        "sub": secondary,
         "code": it.get("code") or "",
         "doc_type": it.get("doc_type") or "",
         "published_date": it.get("published_date") or "",
@@ -657,7 +681,7 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any],
     - groups_by_url: official_url 부분일치로 계열 그룹핑(ICH Q/M — 결정론 파생). 그룹
       공식 링크 = 그룹 내 공유 URL. 매칭 실패 항목은 무라벨 그룹으로 뒤에 둔다.
     - Tier/QA·수집일 등 내부 운영 필드는 뷰에 올리지 않는다(사용자 노출 금지)."""
-    items = [_library_item_view(it) for it in raw.get("items", [])]
+    items = [_library_item_view(it, tr.lang) for it in raw.get("items", [])]
     labels = entry.get("doc_type_labels") or {}
     if entry.get("sort") == "published_desc":
         items = sorted(items, key=lambda it: it["published_date"], reverse=True)
@@ -716,6 +740,10 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any],
         "public_base": _safe_url(entry.get("public_base") or meta.get("public_base", "")),
         "link_label": tr(entry.get("link_label", "")),
         "count": len(items),
+        # [다국어 3단계] 공식 영문 제목이 없는 항목 수 — 영어판이 "왜 한국어 제목이 보이는지"
+        # 를 밝히는 데만 쓴다(실측: 식약처 99건 중 40건, 나머지 카탈로그는 0).
+        "ko_only_titles": sum(1 for it in raw.get("items", [])
+                              if not (it.get("title_en") or it.get("title") or "").strip()),
         "latest_published": max(dates) if dates else "",
         "grouped": bool(entry.get("groups_by_url") or entry.get("groups_by_doc_type")),
         "groups": groups,
@@ -2451,8 +2479,48 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
 #   · asset_root(`assets/`·favicon 등 언어 무관 공유 자원)는 **사이트 루트**를 가리킨다.
 # 한국어 트리에서는 셋이 같은 값이라 기존 산출물이 바이트 단위로 불변이다(리팩터 증명 =
 # 전 파일 md5 동일). ★영어 트리를 실제로 렌더하는 것은 3단계 — 여기서는 규칙만 정한다.
-DEFAULT_LANG = "ko"
-LANG_PREFIXES: dict[str, str] = {"ko": "", "en": "en/"}
+# ── [다국어 3단계 2026-09-04] 영어 트리에 **실제로 내는** 페이지 ────────────────
+# ★껍데기만 영어인 페이지는 만들지 않는다. 기준은 하나 — **그 페이지의 본문이 영어로
+#   성립하는가**. 판정은 데이터 실측이다:
+#     · `/findings/` 계열 조회 화면 = `findings_search` RPC 가 `finding_text`(원문)를
+#       이미 돌려준다. 공개 지적 25,079건 중 22,974건(91.6%)이 원문 영어라, 표시 선호만
+#       뒤집으면 진짜 영어 본문이 나온다(덧씌운 한국어를 걷어내는 일).
+#     · 자료실 = 항목마다 `title_en` 을 갖고 있다.
+#   반대로 **빼는 것**과 그 이유(수리 순서가 곧 설계 문서 §7 의 4·5단계다):
+#     · 문서·모음·조항·업체 정적 페이지 = 본문이 `text_ko` 뿐이다(`findings_docs.json`·
+#       `findings_facets.json` 에 영문 원문이 없다) → 4단계에서 데이터를 넣은 뒤.
+#     · 용어사전 = `term_en` 은 100% 이나 풀이(`easy_ko`·`detail_ko`)가 한국어다.
+#     · 이용안내·주간 퀴즈·주간 브리프/아카이브 = 한국어 산문 그 자체 → 5단계.
+#     · 마이페이지·Admin = 개인화·운영자 화면(언어 트리와 무관).
+# 없는 페이지로 보내는 링크는 무링크보다 나쁘다는 저장소 규율 그대로, nav·푸터·언어
+# 전환·hreflang·sitemap 이 **전부 이 집합 하나**를 본다(사본 0).
+EN_TREE_STATIC: tuple[str, ...] = (
+    "",                        # 영어 홈(landing_en.html — 주간 브리프 히어로가 없는 별도 면)
+    "findings/",               # 지적사항 검색(원문 우선) — 영어판의 본체
+    "findings/trends/",
+    "findings/inspections/",
+    "findings/coverage/",
+    "findings/checklist/",
+    "findings/firm/",
+    "findings/inspector/",
+    "library/",
+)
+
+
+# ★sitemap 에서 빼는 경로 — 한국어 트리와 **같은 정책**이어야 한다. 실사관 프로파일은
+#   실명이 적시된 개인 집계라 베이스 경로조차 등록하지 않는다(noindex 는 템플릿이 건다).
+#   언어판이라고 정책이 느슨해지면 안 된다(영어판에서 색인되면 정책 우회가 된다).
+EN_SITEMAP_EXCLUDED: frozenset[str] = frozenset({"findings/inspector/"})
+
+
+def en_tree_paths(catalogs: "list[dict[str, Any]] | None" = None) -> set[str]:
+    """영어 트리 경로 집합 — 정적 목록 + 실제로 로드된 자료실 카탈로그.
+
+    카탈로그는 데이터 파일이 있는 것만 렌더되므로(`load_library`), 그 결과에서 파생해야
+    "sitemap 에는 있는데 파일이 없다"가 생기지 않는다(손목록 금지 규율).
+    """
+    return set(EN_TREE_STATIC) | {
+        f"library/{v['slug']}/" for v in (catalogs or [])}
 
 
 class PagePath:
@@ -2757,7 +2825,8 @@ def build_llms_txt(briefs: list[dict[str, Any]],
 def build_sitemap_xml(briefs: list[dict[str, Any]],
                       base_url: str = SITE_BASE_URL,
                       glossary_term_ids: "list[str] | None" = None,
-                      facet_paths: "list[tuple[str, str]] | None" = None) -> str:
+                      facet_paths: "list[tuple[str, str]] | None" = None,
+                      en_paths: "set[str] | None" = None) -> str:
     """sitemap.xml — 랜딩 + 아카이브 + 각 호. canonical = 트레일링 슬래시 디렉터리형
     (`/`·`/archive/`·`/briefs/{pub}/`). lastmod = publish_date(YYYY-MM-DD)만 — 랜딩·
     아카이브는 최신 publish_date. 정렬 = publish_date desc. 생성시각/난수 0(byte 고정).
@@ -2814,6 +2883,11 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
           for path, mod in (facet_paths or [])),
         # [주간 퀴즈] 트랙 C — 상설 학습 콘텐츠라 brief publish_date 와 분리(lastmod 생략).
         f"  <url><loc>{base_url}/quiz/</loc></url>",
+        # [다국어 3단계] 영어 트리 — 본문이 영어로 성립하는 면만 등록한다(EN_TREE_STATIC).
+        # 경로는 렌더가 실제로 쓴 집합 그대로라(손으로 다시 적지 않는다) 페이지와 sitemap 이
+        # 갈라질 수 없다. lastmod 는 비운다 — 한국어 짝과 같은 데이터라 별도 날짜가 없다.
+        *(f"  <url><loc>{base_url}/{LANG_PREFIXES['en']}{p}</loc></url>"
+          for p in sorted((en_paths or set()) - EN_SITEMAP_EXCLUDED)),
     ]
     for pub in pubs:
         lines.append(
@@ -3153,6 +3227,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["google_site_verification"] = GOOGLE_SITE_VERIFICATION
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"
+    env.globals["og_locale"] = LANG_OG_LOCALE[lang]
     # RUM 비콘 게이트(base.html)의 프로덕션 호스트 허용목록 — SITE_BASE_URL 파생(단일원천:
     # 커스텀 도메인 교체 시 SITE_BASE_URL 한 줄만 바꾸면 게이트도 따라온다).
     env.globals["site_host"] = SITE_BASE_URL.split("://", 1)[-1].split("/", 1)[0]
@@ -3198,25 +3273,53 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     written: list[str] = []
 
+    # [다국어 3단계] 영어 트리에 실제로 있는 경로 — nav·푸터·언어 전환·hreflang·sitemap 이
+    # 전부 이 하나를 본다. 자료실 카탈로그가 섞이므로 **카탈로그 로드 직후** 확정된다
+    # (아래 `en_paths = en_tree_paths(catalogs)`). 첫 렌더(랜딩)는 그 뒤라 항상 채워져 있고,
+    # 어긋나면 `WebEnTreeTest.test_emitted_en_paths_match_the_declared_set` 이 잡는다.
+    en_paths: set[str] = set()
+
     # 페이지 주소는 전부 page() 한 곳에서 나온다 — 렌더 호출마다 rel_root·출력 경로·
-    # canonical 을 손으로 적지 않는다(PagePath).
-    def page(path: str) -> PagePath:
-        return PagePath(path, lang)
+    # canonical 을 손으로 적지 않는다(PagePath). 언어 트리마다 같은 헬퍼를 다시 만든다
+    # (사본이 아니라 같은 공장에서 나온다 — ko/en 이 갈라질 자리가 없다).
+    def _make_tree(tree_lang: str, tree_env: Environment):
+        def page(path: str) -> PagePath:
+            return PagePath(path, tree_lang)
 
-    def render_page(template: str, pp: PagePath, **ctx: Any) -> str:
-        """템플릿 1장 렌더 — 주소 파생값(rel_root·asset_root·lang·canonical)과 latest_slug
-        를 여기서 한 번만 주입한다. ctx 가 같은 키를 주면 그쪽이 이긴다(404·admin 처럼
-        canonical 을 비우는 페이지)."""
-        return env.get_template(template).render({
-            "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
-            "canonical": pp.canonical, "latest_slug": latest_slug, **ctx,
-        })
+        def render_page(template: str, pp: PagePath, **ctx: Any) -> str:
+            """템플릿 1장 렌더 — 주소 파생값(rel_root·asset_root·lang·canonical)·언어 대체
+            링크·latest_slug 를 여기서 한 번만 주입한다. ctx 가 같은 키를 주면 그쪽이
+            이긴다(404·admin 처럼 canonical 을 비우는 페이지)."""
+            # hreflang·언어 전환은 **양쪽에 실제로 있는 페이지만** 짝짓는다 — 없는 페이지로
+            # 보내는 링크는 무링크보다 나쁘다(저장소 규율). 짝이 없으면 빈 목록이라
+            # base.html 의 {% if %} 가 태그·버튼을 통째로 생략한다.
+            # `href` = 절대 URL(hreflang 태그의 요건). `rel_href` = 이 페이지에서 그리로 가는
+            # **상대경로** — 화면 링크는 상대경로여야 한다(README 불변식 #4 호스트 무관).
+            # 절대 URL 로 걸면 도달성 BFS 가 못 따라가 영어 트리가 고립된 섬이 된다.
+            alts = ([{"lang": lg, "href": PagePath(pp.path, lg).canonical,
+                      "rel_href": pp.asset_root + PagePath(pp.path, lg).site_path
+                      + "index.html",
+                      "label": LANG_ENDONYM[lg], "current": lg == tree_lang}
+                     for lg in SUPPORTED_LANGS]
+                    if pp.path in en_paths else [])
+            return tree_env.get_template(template).render({
+                "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
+                "canonical": pp.canonical, "latest_slug": latest_slug,
+                "alternates": alts, "en_paths": en_paths,
+                # 헤더 전환 버튼이 쓸 "다른 언어" 하나(짝이 없으면 None → 버튼 미출력).
+                "alt_other": next((a for a in alts if not a["current"]), None),
+                **ctx,
+            })
 
-    def emit(template: str, pp: PagePath, **ctx: Any) -> None:
-        """페이지 1장 = 렌더 + 쓰기 + 산출 목록. 출력 경로와 `written` 항목이 같은 주소에서
-        나오므로 둘이 어긋날 수 없다."""
-        _write(out_dir / pp.out_file, render_page(template, pp, **ctx))
-        written.append(pp.out_file)
+        def emit(template: str, pp: PagePath, **ctx: Any) -> None:
+            """페이지 1장 = 렌더 + 쓰기 + 산출 목록. 출력 경로와 `written` 항목이 같은
+            주소에서 나오므로 둘이 어긋날 수 없다."""
+            _write(out_dir / pp.out_file, render_page(template, pp, **ctx))
+            written.append(pp.out_file)
+
+        return page, render_page, emit
+
+    page, render_page, emit = _make_tree(lang, env)
 
     # 클린 빌드(이전 산출 제거 — 결정론).
     if out_dir.exists():
@@ -3241,9 +3344,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "site.webmanifest", build_site_webmanifest())
     written.append("site.webmanifest")
 
+    # [다국어 3단계] 영어 화면 스크립트용 문구 사전 — `/en/` 페이지의 <head> 가 다른 스크립트
+    # **앞에서** 이 파일을 defer 로 싣는다(문서 순서 = defer 실행 순서). 카탈로그 전량을
+    # 싣는다: JS 가 쓰는 키만 골라 담으면 그 선별이 낡는 순간 영어 화면에 한국어가 조용히
+    # 남는다(이 저장소가 반복해서 데인 '조용한 결손'). 여분 키는 조회 테이블의 무해한 무게다.
+    _en_translator = Translator("en")
+    _i18n_en_js = build_js_catalog(_en_translator.catalog, _en_translator.catalog)
+    _write(dist_assets / "i18n-en.js", _i18n_en_js)
+    written.append("assets/i18n-en.js")
+    # 캐시버스팅은 **생성된 내용**에서 파생한다(assets_dir 에 원본이 없는 유일한 자산).
+    env.globals["i18nenjs_ver"] = hashlib.sha1(
+        _i18n_en_js.encode("utf-8")).hexdigest()[:8]
+
     # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 랜딩 카드·자료실 허브·아카이브 스트립이
     # 함께 쓰므로 세 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
     catalogs = load_library(tr=tr)
+    # [다국어 3단계] 영어 트리 경로 확정 — 여기부터 모든 렌더가 이 집합을 본다(위 선언 참조).
+    en_paths = en_tree_paths(catalogs)
     library_updates = load_library_updates(catalogs)
     # [브리프 자료실 스트립] load_library_updates() 는 "최신 1건"만 보므로 브리프
     # 상세(과거 특정 주간)에는 못 쓴다 — 이력 전체를 한 번 더 확보해 브리프 루프에서
@@ -4061,6 +4178,89 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _write(out_dir / share_file, "\n".join(share_lines) + "\n")
         written.append(share_file)
 
+    # ── [다국어 3단계 2026-09-04] 영어 트리 `/en/` ────────────────────────────────
+    # 한국어 트리를 다 그린 뒤, **본문이 영어로 성립하는 면만** 같은 템플릿으로 한 번 더
+    # 그린다(EN_TREE_STATIC 주석에 무엇을 왜 넣고 뺐는지 적어 두었다). 페이지 주소는 같은
+    # PagePath 공장에서, 문구는 같은 사전에서 나오므로 두 트리가 갈라질 자리가 없다.
+    #
+    # 화면 스크립트용 사전(`assets/i18n-en.js`)은 자산 복사 직후에 이미 냈다(위 참조).
+    en_tr = _en_translator
+    en_env = _make_env("en", en_tr)
+    for _k, _v in env.globals.items():          # 자산 해시·인증 메타·반응 게이트 공유
+        en_env.globals.setdefault(_k, _v)
+    en_env.globals["_"] = en_tr.template_gettext()
+    en_env.globals["og_locale"] = LANG_OG_LOCALE["en"]
+    en_page, _en_render, en_emit = _make_tree("en", en_env)
+
+    # 자료실은 카탈로그 카피(제목·소개·유형 라벨)가 사전을 타므로 영어로 다시 읽는다.
+    en_catalogs = load_library(tr=en_tr)
+    en_library_updates = load_library_updates(en_catalogs)
+
+    en_emit("landing_en.html", en_page(""),
+        # ★`en_tr(...)` 는 추출기의 함수 목록(tr/N_)에 없어 키로 잡히지 않는다 — 영어 전용
+        #   문구는 `N_()` 로 등록해야 카탈로그 결손 검사가 본다(안 그러면 렌더 시점에야 터진다).
+        page_title=en_tr(N_("GRM · 글로벌 규제 인텔리전스 · 영문판")),
+        nav_active="home",
+        description=en_tr(SITE_DESCRIPTION),
+        json_ld=build_json_ld(),
+        findings_zone=findings_zone,
+        library={"catalog_count": len(en_catalogs),
+                 "item_count": sum(v["count"] for v in en_catalogs)},
+    )
+    en_emit("findings.html", en_page("findings/"),
+        zone_totals=findings_zone,
+        page_title=en_tr("지적사항 검색 · GRM"),
+        nav_active="findings",
+        description=en_tr(FINDINGS_DESCRIPTION),
+    )
+    en_emit("trends.html", en_page("findings/trends/"),
+        page_title=en_tr("규제 지적사항 트렌드 · GRM"),
+        nav_active="trends", seg_active="trends",
+        description=en_tr(TRENDS_DESCRIPTION),
+    )
+    en_emit("inspections.html", en_page("findings/inspections/"),
+        page_title=en_tr("FDA 실사 결과 · GRM"),
+        nav_active="trends", seg_active="inspections",
+        description=en_tr(INSPECTIONS_DESCRIPTION),
+    )
+    en_emit("coverage.html", en_page("findings/coverage/"),
+        page_title=en_tr("데이터 현황 · GRM"),
+        nav_active="trends", seg_active="",
+        description=en_tr(COVERAGE_DESCRIPTION),
+    )
+    en_emit("checklist.html", en_page("findings/checklist/"),
+        page_title=en_tr("자가점검 체크리스트 · GRM"),
+        nav_active="trends",
+        description=en_tr(CHECKLIST_DESCRIPTION),
+    )
+    en_emit("firm.html", en_page("findings/firm/"),
+        page_title=en_tr("업체 프로파일 · GRM"),
+        nav_active="findings",
+        description=en_tr(FIRM_DESCRIPTION),
+    )
+    en_emit("inspector.html", en_page("findings/inspector/"),
+        page_title=en_tr("실사관 프로파일 · GRM"),
+        nav_active="findings",
+        description=en_tr(INSPECTOR_DESCRIPTION),
+    )
+    if en_catalogs:
+        en_emit("library.html", en_page("library/"),
+            page_title=en_tr("자료실 · GRM"),
+            nav_active="library",
+            description=en_tr(LIBRARY_DESCRIPTION),
+            catalogs=[{"href": f"{v['slug']}/index.html", "title": v["title"],
+                       "count": v["count"], "unit": v["unit"], "blurb": v["blurb"],
+                       "latest_published": v["latest_published"]} for v in en_catalogs],
+            lib_update=en_library_updates["latest"],
+        )
+    for v in en_catalogs:
+        en_emit("library_catalog.html", en_page(f"library/{v['slug']}/"),
+            page_title=en_tr("{title} · GRM", title=v["title"]),
+            nav_active="library",
+            description=v["desc"],
+            lib=v,
+        )
+
     # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
     # [검색 유입] 404 페이지 — Cloudflare Pages 는 `/404.html` 이 **있을 때만** 매칭되지 않는
     # 경로에 404 를 돌려준다. 없으면 루트 index.html 을 **200 으로** 준다(soft 404) — 실측으로
@@ -4079,6 +4279,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         nav_active="",
         description=tr("찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요."),
         canonical="",
+        # [다국어 3단계] 404 는 홈과 같은 `PagePath("")` 로 그리지만 **홈이 아니다** —
+        # 언어판 짝(`/en/404.html`)이 없고(Cloudflare Pages 는 루트 `/404.html` 만 본다)
+        # noindex 라 hreflang·언어 전환을 달지 않는다. 안 그러면 홈의 짝을 물려받는다.
+        alternates=[], alt_other=None,
     ))
     written.append(not_found)
 
@@ -4092,7 +4296,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     written.append("llms.txt")
     _write(out_dir / "sitemap.xml",
            build_sitemap_xml(briefs, glossary_term_ids=glossary_term_ids,
-                             facet_paths=facet_paths))
+                             facet_paths=facet_paths, en_paths=en_paths))
     written.append("sitemap.xml")
 
     return {"out_dir": str(out_dir), "written": written,

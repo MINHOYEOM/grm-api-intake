@@ -76,6 +76,18 @@
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
       return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
   };
+  var _isEn = (typeof document !== "undefined"
+    && (document.documentElement.lang || "ko") !== "ko");
+  var _bodyText = function (row) {
+    var ko = String((row && row.finding_text_ko) || "").trim();
+    var orig = String((row && row.finding_text) || "").trim();
+    return _isEn ? (orig || ko) : (ko || orig);
+  };
+  var _altText = function (row) {
+    var ko = String((row && row.finding_text_ko) || "").trim();
+    var orig = String((row && row.finding_text) || "").trim();
+    return (ko && orig) ? (_isEn ? ko : orig) : "";
+  };
 
   var cfg = document.getElementById("grm-findings-cfg");
   var loadingEl = document.getElementById("tr-loading");
@@ -2189,7 +2201,7 @@
       .filter(Boolean).join(" · ");
     item.appendChild(el("p", "tr-ex-meta", meta));
     // 국문이 있으면 국문, 없으면 영어 원문(빈칸으로 두지 않는다 — 부재 어휘 규칙).
-    var body = (f.finding_text_ko || "").trim() || (f.finding_text || "").trim();
+    var body = _bodyText(f);   // [다국어] 읽는 언어 먼저
     item.appendChild(el("p", "tr-ex-text", truncateText(body)));
     return item;
   }

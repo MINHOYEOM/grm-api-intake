@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,15 +9,15 @@
 <link rel="manifest" href="/site.webmanifest">
 <meta name="google-site-verification" content="pm3IGW80AsWscJVlQzMZel18pFcjFTxCxXrTDXqcjx4" />
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
-<title>지적사항 검색 · GRM</title>
-<meta name="description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. 검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다." />
-<link rel="canonical" href="https://grm-solutions.com/findings/" /><link rel="alternate" type="application/rss+xml" title="GRM 주간 브리프" href="/rss.xml" />
+<title>Findings search · GRM</title>
+<meta name="description" content="A database of FDA 483 observations, Warning Letters, Health Canada inspections, MFDS (Korea) actions, and EU/UK GMP non-compliance findings, extracted automatically from the source documents. Search, company histories, inspector lookup, and a self-inspection checklist." />
+<link rel="canonical" href="https://grm-solutions.com/en/findings/" /><link rel="alternate" type="application/rss+xml" title="GRM Weekly Brief" href="/rss.xml" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
-<meta property="og:locale" content="ko_KR" />
-<meta property="og:title" content="지적사항 검색 · GRM" />
-<meta property="og:description" content="FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. 검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다." />
-<meta property="og:url" content="https://grm-solutions.com/findings/" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:title" content="Findings search · GRM" />
+<meta property="og:description" content="A database of FDA 483 observations, Warning Letters, Health Canada inspections, MFDS (Korea) actions, and EU/UK GMP non-compliance findings, extracted automatically from the source documents. Search, company histories, inspector lookup, and a self-inspection checklist." />
+<meta property="og:url" content="https://grm-solutions.com/en/findings/" />
 <meta property="og:image" content="https://grm-solutions.com/assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -35,6 +35,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
+<script src="/assets/i18n-en.js?v=3e69a1ff" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -43,23 +44,21 @@
 </head>
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../archive/index.html">주간 브리프</a><a href="../findings/index.html" class="on">지적사항</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../guide/index.html">이용안내</a></nav>
+  <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor home"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../findings/index.html" class="on">Findings</a><a href="../findings/trends/index.html">Trends</a><a href="../library/index.html">Library</a></nav>
   <span class="sp"></span>
-  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
-  <a class="grm-lang" href="../en/findings/index.html" hreflang="en" lang="en" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>English</a>
-  <a class="btn coral" href="../briefs/2026-07-06/index.html">이번 주 소식</a>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="Open menu" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
+  <a class="grm-lang" href="../../findings/index.html" hreflang="ko" lang="ko" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>한국어</a>
 </div></header>
 
 <main><div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">지적사항 검색</h1><p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 6,158건에서 추출한 지적사항 24,895건을 원문 문장 단위로 모았습니다.</p>
+    <h1 class="reveal" style="animation-delay:.08s">Findings search</h1><p class="reveal" style="animation-delay:.14s">24,895 findings extracted sentence by sentence from 6,158 FDA 483, Warning Letter, Health Canada inspection, MFDS, and EU/UK GMP documents.</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="" data-key="" hidden></div>
-<nav class="fnd-seg" aria-label="지적사항 면 전환">
-  <a href="../findings/index.html" class="on" aria-current="page">검색</a>
-  <a href="../findings/browse/index.html">둘러보기</a>
-  <a href="../findings/inspector/index.html">실사관</a>
+<nav class="fnd-seg" aria-label="Findings views">
+  <a href="../findings/index.html" class="on" aria-current="page">Search</a>
+  <a href="../findings/inspector/index.html">Inspectors</a>
 </nav><style>
 .fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
 .fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}
@@ -69,58 +68,58 @@
 @media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
 </style>
 
-    <p class="fnd-lead">업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.</p><aside class="fnd-insp-cta" aria-label="실사관 조회 안내">
+    <p class="fnd-lead">Search by company name, document number, section, or wording, and narrow by source, category, period, or country.</p><aside class="fnd-insp-cta" aria-label="About inspector lookup">
       <div class="fnd-insp-cta-h">
-        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>실사관으로 찾기</span>
-        <span class="fnd-insp-cta-sum">FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 문서 단위로 모아 봅니다.</span>
-        <a class="fnd-insp-cta-go" href="../findings/inspector/index.html">실사관 조회 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>Find by inspector</span>
+        <span class="fnd-insp-cta-sum">See, document by document, which areas the inspectors who signed FDA 483s examined and which sites they visited.</span>
+        <a class="fnd-insp-cta-go" href="../findings/inspector/index.html">Inspector lookup <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
       </div>
-    </aside><section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
+    </aside><section class="fnd-tools" id="fnd-tools" aria-label="Search and filters">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
-        <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+        <input id="fnd-q" type="text" placeholder="Search company, document number, section, or text" autocomplete="off" aria-label="Findings search" />
         <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div><div class="fnd-pnav" id="fnd-pnav" hidden>
-          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-prev" aria-label="이전 페이지">‹</button>
-          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-next" aria-label="다음 페이지">›</button>
+          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-prev" aria-label="Previous page">‹</button>
+          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-next" aria-label="Next page">›</button>
         </div>
       </div>
       <button class="fnd-filters-toggle" id="fnd-filters-toggle" type="button" aria-expanded="false" aria-controls="fnd-filters">
-        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
+        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>Filter and sort<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
       </button>
       <div class="fnd-filters" id="fnd-filters">
-        <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category_code"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div><div class="fnd-field"><label for="fnd-f-country">국가</label><select id="fnd-f-country" data-key="country"><option value="">전체</option></select></div>
-        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-source">Source</label><select id="fnd-f-source" data-key="source"><option value="">All</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">Evidence grade</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">All</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-status">Review status</label><select id="fnd-f-status" data-key="review_status"><option value="">All</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-category">Category</label><select id="fnd-f-category" data-key="category_code"><option value="">All</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-month">Month published</label><select id="fnd-f-month" data-key="month"><option value="">All</option></select></div><div class="fnd-field"><label for="fnd-f-country">Country</label><select id="fnd-f-country" data-key="country"><option value="">All</option></select></div>
+        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">Sort</label><select id="fnd-sort"><option value="date_desc">Newest first</option><option value="date_asc">Oldest first</option><option value="firm_asc">Company name</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>
-    </section><section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
+    </section><section class="fnd-dash" id="fnd-dash" aria-label="Findings dashboard" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
-      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
+      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">Details<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
       <div class="fnd-dash-grid" id="fnd-dash-grid">
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">카테고리 분포<span class="fnd-dash-unit">지적사항 기준</span></h2>
+          <h2 class="fnd-dash-h">Category distribution<span class="fnd-dash-unit">by findings</span></h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
         </div>
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">월별 추이<span class="fnd-dash-unit">문서 기준</span></h2>
+          <h2 class="fnd-dash-h">Monthly trend<span class="fnd-dash-unit">by documents</span></h2>
           <div id="fnd-dash-month" class="fnd-dash-month"></div>
         </div>
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">업체 상위 5<span class="fnd-dash-unit">지적사항 기준</span></h2>
+          <h2 class="fnd-dash-h">Top 5 companies<span class="fnd-dash-unit">by findings</span></h2>
           <div id="fnd-dash-firm" class="fnd-dash-firm"></div>
         </div>
       </div>
     </section><div class="imp" id="fnd-coverage-note" hidden><p id="fnd-coverage-text"></p></div>
 
-    <section aria-label="검색 결과">
-      <div class="fnd-state" id="fnd-loading">불러오는 중…</div>
-      <div class="fnd-state fnd-state-error" id="fnd-error" hidden>데이터를 불러오지 못했습니다.</div>
-      <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div><nav class="fnd-pager" id="fnd-pager-top" aria-label="검색 결과 페이지 이동" hidden></nav>
+    <section aria-label="Search results">
+      <div class="fnd-state" id="fnd-loading">Loading…</div>
+      <div class="fnd-state fnd-state-error" id="fnd-error" hidden>Could not load the data.</div>
+      <div class="fnd-state" id="fnd-empty" hidden>No results.</div><nav class="fnd-pager" id="fnd-pager-top" aria-label="Search result pages" hidden></nav>
       <div id="fnd-results" class="fnd-results"></div>
-      <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="검색 결과 페이지 이동" hidden></nav>
+      <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="Search result pages" hidden></nav>
     </section>
   </div>
 </main>
@@ -383,14 +382,14 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fnd-pager-status{height:32px}
 }
 </style>
-<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
+<section class="ai-disclosure" id="ai-notice" aria-label="AI-generated content notice"><div class="wrap">
   <span class="kick">AI Disclosure</span>
-  <h2>콘텐츠 생성 방식 및 유의사항</h2>
+  <h2>How this content is produced, and caveats</h2>
   <div class="disc-body">
-    <div class="disc-sec"><p>본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.</p></div>
-    <div class="disc-sec"><p>국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
-    <div class="disc-sec"><p>각 항목의 증거 등급(Evidence A·B·C)은 추출 근거의 신뢰도를, '검토 필요' 표시는 사람 검수 전 상태를 뜻합니다. 모든 항목에 공식 원문 링크를 제공해 1차 자료까지 추적·검증할 수 있습니다.</p></div>
-    <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
+    <div class="disc-sec"><p>The findings on this page are extracted and split automatically from public source documents — FDA 483 observations, Warning Letters, Health Canada inspection reports, MFDS GMP inspections, and EU/UK GMP non-compliance reports (EudraGMDP, MHRA) — and normalised so that each item can be searched individually.</p></div>
+    <div class="disc-sec"><p>Korean renderings are generative-AI translations; the original (English) text is provided with every item. Base any legal judgement on the original.</p></div>
+    <div class="disc-sec"><p>Each item's evidence grade (A, B, C) indicates how reliable the extraction basis is, and 'Needs review' marks items not yet checked by a person. Every item links to the official source so you can trace and verify it against the primary document.</p></div>
+    <div class="disc-sec"><p>This service is reference material to support regulatory awareness and must not be taken as legal, regulatory, quality, or compliance advice. Review important decisions against the official source and with professional advisers.</p></div>
   </div>
 </div></section>
 <style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
@@ -398,18 +397,18 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>바로가기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">주간 브리프</a><a href="../findings/index.html">지적사항</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a><a href="../guide/index.html">이용안내</a></div>
-    <div><h5>도구</h5><a href="../findings/checklist/index.html">자가점검 체크리스트</a><a href="../findings/firm/index.html">업체 조회</a><a href="../findings/inspector/index.html">실사관 조회</a><a href="../findings/inspections/index.html">FDA 실사 결과</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../findings/docs/index.html">문서로 찾기</a></div>
-    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
-    <div><h5>안내</h5><a href="../index.html#notice">AI 자동 생성 고지</a><a href="../index.html#notice">원문 확인 안내</a></div>
+      <p>A regulatory news service that gathers global pharmaceutical GMP and quality developments automatically every week, sorts them by agency, and adds implications and check points.</p></div>
+    <div><h5>Quick links</h5><a href="../index.html#why">About</a><a href="../findings/index.html">Findings</a><a href="../findings/trends/index.html">Trends</a><a href="../library/index.html">Library</a></div>
+    <div><h5>Tools</h5><a href="../findings/checklist/index.html">Self-inspection checklist</a><a href="../findings/firm/index.html">Company lookup</a><a href="../findings/inspector/index.html">Inspector lookup</a><a href="../findings/inspections/index.html">FDA inspection outcomes</a><a href="../findings/coverage/index.html">Data coverage</a></div>
+    <div><h5>Sources</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · MFDS</span><span>ECA · ISPE</span></div>
+    <div><h5>Information</h5><a href="../index.html#notice">AI-generated content notice</a><a href="../index.html#notice">About checking the source</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
       <span>© 2026 Global Regulatory Monitor</span>
       <span class="prov">AI-generated from primary sources · verify against the original</span>
     </div>
-    <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
+    <p class="foot-disclaimer">This is an information service. Final judgement on, and responsibility for, the use of the information rests with the user.</p>
   </div>
 </div></footer>
 
@@ -425,28 +424,28 @@ if(_nt&&_nm){
 }
 </script>
 <div class="grm-pet" id="grm-pet" data-page="findings">
-  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel" title="드래그해 이동 · 눌러 관리">
+  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="Open Gurumi" aria-expanded="false" aria-controls="grm-pet-panel" title="Drag to move · click to manage">
     <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
     <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true" draggable="false">
     <span class="grm-pet-face-rig" aria-hidden="true"><i class="grm-pet-lid grm-pet-lid-l"></i><i class="grm-pet-lid grm-pet-lid-r"></i></span><span class="grm-pet-dot" aria-hidden="true"></span>
-    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>이동</span>
+    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>Move</span>
   </button>
-  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>쉬는 중</b></span>
+  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>Resting</b></span>
   <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
-  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="구름이 관리" hidden>
-    <header class="grm-pet-head" id="grm-pet-drag-handle" title="빈 곳을 드래그해 구름이 이동"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="구름이 위치 초기화" title="위치 초기화"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></div></header>
-    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
-    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
-    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새로운 소식을 기다리고 있어요</small></div>
-    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
-    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
-    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="../quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
-    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
-    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
+  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="Manage Gurumi" hidden>
+    <header class="grm-pet-head" id="grm-pet-drag-handle" title="Drag an empty area to move Gurumi"><div><span>MY GRM PET</span><h2>Manage Gurumi</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="Reset Gurumi's position" title="Reset position"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="Close Gurumi settings">×</button></div></header>
+    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>Growth stages preview</span></div>
+    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">Egg</h3><p id="grm-pet-mood">Solve a quiz to start hatching</p></div><span id="grm-pet-level">Lv.1</span></div>
+    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">Resting</b></span><small id="grm-pet-state-copy">Waiting for new news</small></div>
+    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 points</span><span id="grm-pet-next">50 points to go</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
+    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>Correct</span><span><b id="grm-pet-weeks">0</b>weeks joined</span><span><b id="grm-pet-streak">0</b>week streak</span></div>
+    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>Pet</button></div>
+    <div class="grm-pet-atlas-head"><b>Growth stages</b><span>Click a stage to preview it</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>Your growth record is stored safely in this browser.</p>
   </section>
 </div>
 <script src="/assets/pet.js?v=6dea54a3" defer></script>
-<script src="../assets/findings.js?v=df7b1238" defer></script>
+<script src="../../assets/findings.js?v=df7b1238" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}
@@ -464,10 +463,10 @@ body.grm-has-share .grm-card-actions{display:flex}
   function done(btn){
     var t=btn.querySelector('.grm-ca-t'); if(!t) return;
     var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
-    t.textContent='복사됨'; btn.classList.add('is-done');
+    t.textContent='Copied'; btn.classList.add('is-done');
     setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
   }
-  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  function fallback(url){ window.prompt('Copy this link', url); }
   for(var i=0;i<rows.length;i++){ (function(row){
     var btn=row.querySelector('[data-share]'); if(!btn) return;
     btn.addEventListener('click', function(){

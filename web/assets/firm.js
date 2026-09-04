@@ -31,6 +31,18 @@
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
       return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
   };
+  var _isEn = (typeof document !== "undefined"
+    && (document.documentElement.lang || "ko") !== "ko");
+  var _bodyText = function (row) {
+    var ko = String((row && row.finding_text_ko) || "").trim();
+    var orig = String((row && row.finding_text) || "").trim();
+    return _isEn ? (orig || ko) : (ko || orig);
+  };
+  var _altText = function (row) {
+    var ko = String((row && row.finding_text_ko) || "").trim();
+    var orig = String((row && row.finding_text) || "").trim();
+    return (ko && orig) ? (_isEn ? ko : orig) : "";
+  };
 
   var cfg = document.getElementById("grm-firm-cfg");
   var loadingEl = document.getElementById("fp-loading");
@@ -403,17 +415,18 @@
     var catText = label ? label.ko : (row.category_label_ko || "");
     if (catText) card.appendChild(el("p", "fp-obs-cat", catText));
 
-    var ko = (row.finding_text_ko || "").trim();
-    var mainText = ko || row.finding_text || "";
+    // [다국어 3단계] 본문은 읽는 언어 먼저(영어판=규제기관 원문), 접기는 반대편.
+    var mainText = _bodyText(row);
     if (mainText) card.appendChild(el("p", "fp-obs-text", mainText));
 
-    if (ko && row.finding_text) {
+    var altText = _altText(row);
+    if (altText) {
       var details = document.createElement("details");
       details.className = "fp-obs-orig";
       var summary = document.createElement("summary");
-      summary.textContent = _t("원문 보기 (영문)");
+      summary.textContent = _isEn ? _t("국문 번역 보기") : _t("원문 보기 (영문)");
       details.appendChild(summary);
-      details.appendChild(el("p", null, row.finding_text));
+      details.appendChild(el("p", null, altText));
       card.appendChild(details);
     }
 

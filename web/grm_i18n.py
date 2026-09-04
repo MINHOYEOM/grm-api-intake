@@ -155,6 +155,32 @@ JS_SHIM = (
 )
 
 
+# [다국어 3단계] 지적 본문의 표시 우선순위 — **읽는 언어를 먼저** 고른다.
+# 공개 지적 25,079건 중 22,974건(91.6%)은 규제기관이 쓴 영어가 원문(`finding_text`)이고
+# 한국어(`finding_text_ko`)가 그 위에 덧씌운 층이다. 그래서 영어판은 새로 번역하는 게
+# 아니라 **덧씌운 층을 걷어내면** 된다(설계 문서 §1). 한쪽이 비면 있는 쪽을 쓴다 —
+# 빈 화면보다 낫고, 식약처 지적처럼 원문이 한국어인 8.4%가 그 경로로 정상 표시된다.
+# `document` 가 없는 실행 맥락(node 하네스)에서도 안전하도록 typeof 로 막는다.
+# 원문을 쓰는 자산에 **바이트 그대로** 복사한다(`WebEnTreeTest` 가 사본 일치를 강제).
+JS_BODY_SHIM = (
+    "  var _isEn = (typeof document !== \"undefined\"\n"
+    "    && (document.documentElement.lang || \"ko\") !== \"ko\");\n"
+    "  var _bodyText = function (row) {\n"
+    "    var ko = String((row && row.finding_text_ko) || \"\").trim();\n"
+    "    var orig = String((row && row.finding_text) || \"\").trim();\n"
+    "    return _isEn ? (orig || ko) : (ko || orig);\n"
+    "  };\n"
+    "  var _altText = function (row) {\n"
+    "    var ko = String((row && row.finding_text_ko) || \"\").trim();\n"
+    "    var orig = String((row && row.finding_text) || \"\").trim();\n"
+    "    return (ko && orig) ? (_isEn ? ko : orig) : \"\";\n"
+    "  };\n"
+)
+
+# 위 사본을 반드시 가져야 하는 자산 = 지적 본문을 그리는 파일(원문 필드를 만지는 곳).
+JS_BODY_MARKER = "finding_text"
+
+
 def build_js_catalog(catalog: dict[str, str], keys: Iterable[str]) -> str:
     """영어 페이지에 실을 사전 스크립트 — JS 가 실제로 쓰는 키만, 정렬·결정론."""
     subset = {k: catalog[k] for k in sorted(set(keys))}
@@ -471,6 +497,14 @@ def check_js_shim(path: Path) -> "str | None":
     return None if JS_SHIM in src else f"{path.name}: JS shim(JS_SHIM) 사본 없음/불일치"
 
 
+def check_js_body_shim(path: Path) -> "str | None":
+    """지적 본문을 그리는 자산은 언어별 본문 선택 사본(JS_BODY_SHIM)을 가져야 한다."""
+    src = path.read_text(encoding="utf-8")
+    if JS_BODY_MARKER not in src or JS_BODY_SHIM in src:
+        return None
+    return f"{path.name}: 본문 shim(JS_BODY_SHIM) 사본 없음/불일치"
+
+
 def check_catalog(catalog: dict[str, str], keys: dict[str, list[str]],
                   lang: str = "en") -> list[str]:
     """결손·고아·슬롯 불일치·빈 값·미번역(한글 잔존)을 문장으로 낸다."""
@@ -505,9 +539,9 @@ def lint(web_dir: Path = WEB_DIR, langs: Iterable[str] = ("en",),
     for p in asset_files(web_dir):
         for line, snip in find_bare_hangul_js(p):
             problems.append(f"감싸지 않은 한글 {p.name}:{line}: {snip}")
-        shim = check_js_shim(p)
-        if shim:
-            problems.append(shim)
+        for shim in (check_js_shim(p), check_js_body_shim(p)):
+            if shim:
+                problems.append(shim)
     keys = collect_keys(web_dir)
     for lang in langs:
         path = catalog_path(lang, web_dir / "data" / "i18n")

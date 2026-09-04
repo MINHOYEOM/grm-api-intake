@@ -16,7 +16,11 @@
     재사용 불가). 페이지당 1회 include 라 <style> 중복 없음. -#}
 <nav class="fnd-seg" aria-label="{{ _('지적사항 면 전환') }}">
   <a href="{{ rel_root }}findings/index.html"{% if seg_active == 'search' %} class="on" aria-current="page"{% endif %}>{{ _("검색") }}</a>
-  <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>{{ _("둘러보기") }}</a>
+{# [다국어 3단계] 둘러보기 면은 커밋 스냅샷의 국문 지적 발췌로 채워져 영어판에 없다
+   (설계 문서 §7 4단계 데이터가 선행). 없는 페이지로 보내는 링크는 만들지 않는다.
+   들여쓰기는 조건 안에 둔다(참일 때 원래 바이트 보존 · 거짓일 때 빈 줄 0). #}
+{% if lang == 'ko' or 'findings/browse/' in en_paths %}  <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>{{ _("둘러보기") }}</a>
+{% endif %}
   <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>
 </nav>
 {#- 시각 언어는 트렌드 존 세그(.tr-seg)와 동형 — 같은 사이트에서 "면 전환"이 두 가지

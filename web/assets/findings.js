@@ -37,6 +37,18 @@
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
       return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
   };
+  var _isEn = (typeof document !== "undefined"
+    && (document.documentElement.lang || "ko") !== "ko");
+  var _bodyText = function (row) {
+    var ko = String((row && row.finding_text_ko) || "").trim();
+    var orig = String((row && row.finding_text) || "").trim();
+    return _isEn ? (orig || ko) : (ko || orig);
+  };
+  var _altText = function (row) {
+    var ko = String((row && row.finding_text_ko) || "").trim();
+    var orig = String((row && row.finding_text) || "").trim();
+    return (ko && orig) ? (_isEn ? ko : orig) : "";
+  };
 
   var cfg = document.getElementById("grm-findings-cfg");
   var loadingEl = document.getElementById("fnd-loading");
@@ -885,8 +897,7 @@
   // [M10b P1] 본문(국문 우선, 없으면 원문). 접힘 상태에서도 항상 보이므로 card 에 직접
   // 붙인다(부가 섹션과 분리) — 반환한 엘리먼트로 render() 가 오버플로 판정을 한다.
   function appendMainText(card, row, query) {
-    var ko = (row.finding_text_ko || "").trim();
-    var text = ko || row.finding_text || "";
+    var text = _bodyText(row);          // [다국어] 읽는 언어를 먼저(영어판=규제기관 원문)
     if (!text) return null;
     var p = elHL("p", "fnd-text", text, query);
     card.appendChild(p);
@@ -898,17 +909,21 @@
   // 원문 대조 권장")는 details 내부(summary 아래·원문 <p> 위)로 이동했다 — 원문을 펼쳐
   // 대조하는 맥락에서만 보이게 해, 기본(접힌) 화면의 AI 경고 문구 노출을 0회로 줄인다.
   function appendOrigAndNote(extra, row, query) {
-    var ko = (row.finding_text_ko || "").trim();
-    if (!ko || !row.finding_text) return;
+    // [다국어] 접기에 들어가는 것은 **본문의 반대편**이다 — 한국어판은 영문 원문,
+    // 영어판은 국문 번역. 한쪽이 없으면 접기 자체를 만들지 않는다(빈 상자 금지).
+    var alt = _altText(row);
+    if (!alt) return;
     var details = document.createElement("details");
     details.className = "fnd-orig";
     var summary = document.createElement("summary");
-    summary.textContent = _t("원문 보기 (영문)");
+    summary.textContent = _isEn ? _t("국문 번역 보기") : _t("원문 보기 (영문)");
     details.appendChild(summary);
+    // 번역고지는 **번역문을 보여줄 때만** 뜬다 — 영어판의 접기 안이 번역문이고,
+    // 한국어판은 본문이 번역문이라 그 자리에서 이미 고지한다(중복 노출 금지).
     if (row.translation_method === "llm_assisted") {
       details.appendChild(el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장")));
     }
-    var p = elHL("p", null, row.finding_text, query);
+    var p = elHL("p", null, alt, query);
     details.appendChild(p);
     extra.appendChild(details);
   }

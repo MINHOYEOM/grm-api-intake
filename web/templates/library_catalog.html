@@ -20,6 +20,12 @@
     <span class="kick reveal" style="animation-delay:.02s">{{ lib.kick }}</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ lib.title }}</h1>
     <p class="reveal" style="animation-delay:.14s">{{ lib.intro }}</p>
+{# [다국어 3단계] 영어판에서 한국어 제목이 남는 이유를 밝힌다 — 그 문서의 **실제 이름**이
+   한국어라서다(영문 제목을 지어내지 않는다는 무변형 규율). 해당 항목이 있을 때만 뜬다.
+   ★주석은 하이픈 없는 형태로, 들여쓰기는 조건 안에 — 둘 다 앞뒤 공백을 삼키지 않기 위해서다
+   (하이픈 주석이 앞 줄을 끌어당겨 한국어 골든이 흔들렸다). #}
+{% if lang != 'ko' and lib.ko_only_titles %}    <p class="reveal" style="animation-delay:.16s">{{ _("이 목록의 {n}건은 공식 영문 제목이 없어 한국어 원제를 그대로 표시합니다.", n=lib.ko_only_titles) }}</p>
+{% endif %}
     <div class="lib-meta reveal" style="animation-delay:.2s">
       <span class="lib-meta-i"><i class="ti ti-list-details" aria-hidden="true"></i>{{ _("총 {count}{unit}", count=lib.count, unit=lib.unit) }}</span>
       {% if lib.latest_published %}<span class="lib-meta-i"><i class="ti ti-calendar-event" aria-hidden="true"></i>{{ _("최근 발행 {date}", date=lib.latest_published) }}</span>{% endif %}

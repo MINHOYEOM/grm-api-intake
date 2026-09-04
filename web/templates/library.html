@@ -64,7 +64,10 @@
         <b>{{ _('규제 용어사전') }}</b>
         <span>{{ _('GMP·CAPA·데이터 완전성·무균 공정·ICH 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.') }}</span>
       </div>
-      <a class="lib-x-go" href="{{ rel_root }}glossary/index.html">{{ _('용어사전 열기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+{# [다국어 3단계] 용어사전은 풀이(easy_ko·detail_ko)가 한국어라 영어판에 없다.
+   들여쓰기는 조건 안에 둔다(참일 때 원래 바이트 보존 · 거짓일 때 빈 줄 0). #}
+{% if lang == 'ko' or 'glossary/' in en_paths %}      <a class="lib-x-go" href="{{ rel_root }}glossary/index.html">{{ _('용어사전 열기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+{% endif %}
     </aside>
   </div>
 </main>

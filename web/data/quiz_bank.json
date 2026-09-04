@@ -12,7 +12,15 @@
     "explanation_ko": "카드의 Observation 1은 작업자의 손 위치가 HEPA 필터 면과 임계작업면 사이의 퍼스트 에어를 방해했다고 명시합니다. EU GMP Annex 1의 퍼스트 에어 개념상 제품에 닿기 전 방해받지 않은 여과공기가 보호를 제공해야 합니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#fda483-193451",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At the Richmond VA Medical Center, FDA identified one specific operation as compromising first-air protection. Which was it?",
+    "choices_en": [
+      "An operation in which the operator's hands blocked the unidirectional airflow between the HEPA filter face and the bag port and needle",
+      "Cleaning and disinfecting the keyboard and mouse in the ISO 7 area",
+      "Evaluating the effect of depressurisation on sealed containers during transport",
+      "Integrity-testing a sterilising filter before use"
+    ],
+    "explanation_en": "Observation 1 states that the position of the operator's hands obstructed the first air between the HEPA filter face and the critical work surface. Under the first-air concept in EU GMP Annex 1, unobstructed filtered air must provide protection before the air reaches the product."
   },
   {
     "id": "q2-b02",
@@ -27,7 +35,15 @@
     "explanation_ko": "카드는 스모크 스터디가 동적 조건에서 수행되지 않았다고 명시합니다. EU GMP Annex 1 §4.15는 기류패턴 연구를 정지 상태와 작업자 개입을 모사한 가동 상태에서 수행하고 영상을 보존하도록 하므로 이 사건과 직접 연결됩니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#fda483-193451",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At the Richmond VA Medical Center, under which condition were smoke studies stated not to have been performed?",
+    "choices_en": [
+      "Static conditions, with equipment installed but not producing",
+      "Dynamic conditions, with operations and interventions taking place",
+      "Depressurisation and extreme-temperature conditions during transport",
+      "Long-term retention conditions after data transfer"
+    ],
+    "explanation_en": "The observation states that smoke studies were not performed under dynamic conditions. EU GMP Annex 1 §4.15 requires airflow pattern studies to be performed both at rest and in operation, simulating operator interventions, with the recordings retained — which connects the requirement directly to this case."
   },
   {
     "id": "q2-b03",
@@ -42,7 +58,15 @@
     "explanation_ko": "카드는 베타락탐 제품을 같은 ISO 5 후드에서 생산하면서 작업면·기구·인력의 격리, 분리 및 세척이 불충분했다고 명시합니다. 이는 21 CFR 211.42와 교차오염 방지 통제에 연결됩니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#fda483-193454",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At VA San Diego Healthcare Systems, beta-lactam and non-beta-lactam sterile products were produced in the same ISO 5 hood. Which combination of controls addresses that finding most directly?",
+    "choices_en": [
+      "Securing data availability through off-site backup and periodic restore testing",
+      "Revalidating the linearity, precision and range of the analytical method",
+      "Preventing cross-contamination through adequate segregation, separation and validated cleaning",
+      "Verifying container closure integrity under transport conditions"
+    ],
+    "explanation_en": "The observation states that beta-lactam products were produced in the same ISO 5 hood without adequate segregation, separation and cleaning of work surfaces, equipment and personnel. It connects to 21 CFR 211.42 and to cross-contamination controls."
   },
   {
     "id": "q2-b04",
@@ -57,7 +81,15 @@
     "explanation_ko": "카드는 원인 불명의 갈색 얼룩의 출처를 규명하지 못했고 필터 완전성, 공기품질 또는 ISO 5 무균조건에 영향을 주었는지도 확인하지 못했다고 명시합니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#fda483-193454",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "Brown staining was found on an ISO 5 HEPA filter at VA San Diego. What did the firm fail to establish?",
+    "choices_en": [
+      "The effect of analyst training on the accuracy of the analytical method",
+      "The change control history of the packaging film supplier",
+      "Dissolution trends in stability testing and the resulting shelf life",
+      "The source of the staining and its effect on filter integrity, air quality and aseptic conditions"
+    ],
+    "explanation_en": "The observation states that the source of the unexplained brown staining was never identified, and that the firm did not establish whether it affected filter integrity, air quality or the ISO 5 aseptic conditions."
   },
   {
     "id": "q2-b05",
@@ -72,7 +104,15 @@
     "explanation_ko": "카드는 반복 이물 사건의 배치별 조사가 적시에 완결되지 않았고 근본원인과 시정이 입증되지 않았으며, 조사기록에 결론·후속조치가 항상 포함되지 않았다고 명시합니다. 해당 관찰의 인용 조항은 21 CFR 211.192입니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#fda483-193455",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "Recurring mammalian hair particulate investigations at Catalent Indiana connect most directly to which requirement of 21 CFR 211.192?",
+    "choices_en": [
+      "Thoroughly investigating any failure to meet specifications, and recording the conclusions and follow-up in the investigation record",
+      "Having the quality unit approve or reject all components, containers, labelling materials and finished products",
+      "Including process validation in procedures preventing microbial contamination of products purporting to be sterile",
+      "Including scientifically sound specifications, standards, sampling plans and test procedures in laboratory controls"
+    ],
+    "explanation_en": "The observation states that batch-level investigations of recurring particulate events were not completed in a timely way, that root cause and correction were not demonstrated, and that investigation records did not always include the conclusions and follow-up. The clause cited for that observation is 21 CFR 211.192."
   },
   {
     "id": "q2-b06",
@@ -87,7 +127,15 @@
     "explanation_ko": "카드는 육안검사 방법이 검사 민감도, 결함 검출능력, 방법 간 비교가능성을 충분히 적격성평가하지 않은 채 적용됐다고 명시합니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#fda483-193455",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At Catalent Indiana, the qualification of the visual inspection method was found deficient in which three key respects?",
+    "choices_en": [
+      "Backup frequency, restore time and off-site storage distance",
+      "Inspection sensitivity, defect detectability and comparability between methods",
+      "Container closure dimensions, transport temperature and depressurisation conditions",
+      "Risk assessment formality, stakeholders and residual risk"
+    ],
+    "explanation_en": "The observation states that the visual inspection method was applied without adequate qualification of its inspection sensitivity, its ability to detect defects, and its comparability with other methods."
   },
   {
     "id": "q2-b07",
@@ -102,7 +150,15 @@
     "explanation_ko": "카드는 종이 리딩의 주름이 seal 부위를 손상시킬 수 있어 무균성 보증이 부족하다고 명시합니다. 이는 밀봉공정과 용기밀봉 완전성 관리가 제품 수명주기 동안 유지돼야 하는 이유를 보여줍니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-12/#D-0622-2026",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "In the Class II recall of four CareFusion products including BD ChloraPrep Clear, what directly weakened the assurance of sterility?",
+    "choices_en": [
+      "An out-of-specification low-dissolution result at 24 hours in 12-month stability testing",
+      "Black and brown foreign particles inside the ampoules",
+      "Wrinkling of the paper lidding, which could compromise the seal area",
+      "Exceeding the interim limit for N-nitroso-duloxetine"
+    ],
+    "explanation_en": "The recall states that wrinkling in the paper lidding could compromise the seal area, so sterility could not be assured. It shows why control of the sealing process and of container closure integrity has to hold across the product lifecycle."
   },
   {
     "id": "q2-b08",
@@ -117,7 +173,15 @@
     "explanation_ko": "QuVa Pharma 카드의 핵심 관찰은 무균 제품의 미생물 오염을 방지하는 절차가 수립·문서화·준수되지 않았다는 것입니다. 이 내용은 21 CFR 211.113(b)의 절차 및 무균·멸균 공정 밸리데이션 요구와 직접 대응합니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-06/#fda483-193419",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At QuVa Pharma, procedures to prevent microbial contamination of sterile drug products were not established or followed. Which US CGMP clause does that connect to directly?",
+    "choices_en": [
+      "21 CFR 211.22 — responsibilities of the quality control unit",
+      "21 CFR 211.68 — automatic, mechanical and electronic equipment",
+      "21 CFR 211.192 — production record review and investigation of specification failures",
+      "21 CFR 211.113(b) — procedures preventing microbial contamination of products purporting to be sterile, including validation of aseptic and sterilisation processes"
+    ],
+    "explanation_en": "The central observation is that procedures designed to prevent microbial contamination of sterile drug products were not established, written and followed. That maps directly onto the procedural requirement of 21 CFR 211.113(b) and its validation of aseptic and sterilisation processes."
   },
   {
     "id": "q2-b09",
@@ -132,7 +196,15 @@
     "explanation_ko": "카드는 작업자들이 가운착용 절차를 어기고 조제구역을 통과한 행동을 21 CFR 211.28과 연결합니다. 나머지 선택지도 같은 카드에 실재하는 관찰사항이지만 각각 구역 분리, 배치기록, 안정성시험 프로그램에 관한 별도 지적입니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-06/#fda483-193420",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At Mixlab WI, which operator behaviour in the non-sterile compounding area was cited against 21 CFR 211.28?",
+    "choices_en": [
+      "Entering through the back door wearing only gloves and shoe covers, passing through the compounding area, then gowning in the basement and re-entering",
+      "Filling the hazardous drug Methimazole in the non-hazardous compounding area",
+      "Omitting major production steps such as pen filling from the batch record",
+      "Operating no documented stability programme to establish finished-product beyond-use dates"
+    ],
+    "explanation_en": "The observation ties the operators' passage through the compounding area in breach of the gowning procedure to 21 CFR 211.28. The other options are also real observations from the same inspection, but they concern area segregation, batch records and the stability programme respectively."
   },
   {
     "id": "q2-b10",
@@ -147,7 +219,15 @@
     "explanation_ko": "카드는 보관소 온습도 모니터링 미흡과 제조장비 세척 후 유지시간 검증 미흡을 각각 명시합니다. 두 항목은 보관조건 관리와 세척 밸리데이션의 시간변수 관리에 해당합니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1PxtsjZTS6w",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "The Shanghai Ethypharm GMP inspection cited two control items together. Which pair?",
+    "choices_en": [
+      "First-air protection and PUPSIT",
+      "Temperature and humidity monitoring in the warehouse, and verification of hold time after equipment cleaning",
+      "Audit trail review and backup restore testing",
+      "Visual inspection detectability assessment and container closure integrity"
+    ],
+    "explanation_en": "The inspection cites inadequate temperature and humidity monitoring in the warehouse and inadequate verification of hold time after cleaning of manufacturing equipment. The two items belong to storage condition control and to the time variables of cleaning validation."
   },
   {
     "id": "q2-b11",
@@ -162,7 +242,15 @@
     "explanation_ko": "카드는 배지성능시험 관련 기준서 미준수와 배지 품질관리 시 일부 시험항목 미실시를 중요 지적으로 구분합니다. 환경모니터링 기준과 이송튜빙 세척 밸리데이션은 같은 카드에서 기타 지적으로 기재됩니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#gmpinspect-1PxzwRCkCdX",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "In the GMP inspection of Seoul National University Hospital, which matter was classified as a major finding?",
+    "choices_en": [
+      "Inadequate environmental monitoring control criteria",
+      "Inadequate cleaning validation for transfer tubing",
+      "Failure to follow the growth promotion testing standard, and omission of some test items",
+      "Inadequate temperature and humidity monitoring in the warehouse"
+    ],
+    "explanation_en": "The inspection separates out, as a major finding, the failure to follow the standard governing growth promotion testing together with the omission of some test items in media quality control. Environmental monitoring criteria and transfer tubing cleaning validation are recorded in the same inspection as other findings."
   },
   {
     "id": "q2-b12",
@@ -177,7 +265,15 @@
     "explanation_ko": "카드는 위험의약품 취급 시 격리, 작업면, 기구와 인원에 대한 교차오염 방지조치가 미흡했다고 명시합니다.",
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-06-26/#fda483-193232",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "At the Pharmaneek non-sterile manufacturing site, which control was stated to be deficient when handling hazardous drugs?",
+    "choices_en": [
+      "Metadata retrieval testing of long-term archived data",
+      "Leak testing and steam-in-place of the lyophilisation chamber",
+      "Depressurisation testing of the container closure during transport",
+      "Cross-contamination controls covering segregation, work surfaces, equipment and personnel"
+    ],
+    "explanation_en": "The observation states that measures to prevent cross-contamination — segregation, work surfaces, equipment and personnel — were inadequate when hazardous drugs were handled."
   },
   {
     "id": "q2-g01",
@@ -192,7 +288,15 @@
     "explanation_ko": "퍼스트 에어는 노출 제품과 제품접촉면에 닿기 전에 방해받지 않은 여과 공기입니다. 손이나 도구가 HEPA 면과 중요 지점 사이를 가로막으면 보호가 약화됩니다.",
     "source_type": "glossary",
     "source_ref": "first-air",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which is the most accurate definition of first air?",
+    "choices_en": [
+      "Filtered air that has not been interrupted by an operator or an object before it reaches the product",
+      "Unidirectional airflow moving uniformly in a single direction so that particles are swept from the critical zone",
+      "Non-unidirectional turbulent air that maintains acceptable cleanroom air quality by mixing and dilution",
+      "Sample air drawn by a particle counter to measure total particle concentration in a cleanroom"
+    ],
+    "explanation_en": "First air is filtered air that reaches exposed product and product contact surfaces without being interrupted. When a hand or a tool comes between the HEPA face and the critical point, that protection is weakened."
   },
   {
     "id": "q2-g02",
@@ -207,7 +311,15 @@
     "explanation_ko": "EU GMP Annex 1은 청정실 분류를 총입자 농도에 대한 평가로 정의하고, 청정실 적격성평가는 HEPA·기류·차압·미생물 등 의도용도 적합성을 평가하는 더 넓은 과정으로 구분합니다.",
     "source_type": "glossary",
     "source_ref": "cleanroom-qualification",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which activity is broader than total particle classification and assesses a cleanroom's fitness for intended use, covering HEPA integrity, airflow, pressure differentials and microbiology?",
+    "choices_en": [
+      "Cleanroom classification",
+      "Cleanroom qualification",
+      "Routine environmental monitoring",
+      "Aseptic process simulation (APS)"
+    ],
+    "explanation_en": "EU GMP Annex 1 defines cleanroom classification as an assessment against total particle concentration, and distinguishes cleanroom qualification as the wider process that assesses fitness for intended use, covering HEPA, airflow, pressure differentials and microbiology."
   },
   {
     "id": "q2-g03",
@@ -222,7 +334,15 @@
     "explanation_ko": "PUPSIT는 사용 전 멸균 후 필터 완전성시험으로, 필터 준비·멸균·설치 과정에서 생긴 손상이나 완전성 상실을 실제 여과 전에 확인합니다.",
     "source_type": "glossary",
     "source_ref": "pupsit",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "What is the purpose of PUPSIT?",
+    "choices_en": [
+      "To confirm soundness by non-destructive testing before a used filter is removed from its housing",
+      "To confirm leakage and integrity of an installed HEPA filter system during cleanroom qualification",
+      "To confirm that a sterilised, installed final filter was not damaged during preparation and installation before use",
+      "To confirm backed-up data, metadata and configuration through periodic restore testing"
+    ],
+    "explanation_en": "PUPSIT is the pre-use, post-sterilisation integrity test. It confirms, before filtration actually begins, that no damage or loss of integrity arose during preparation, sterilisation and installation of the filter."
   },
   {
     "id": "q2-g04",
@@ -237,7 +357,15 @@
     "explanation_ko": "백업은 재해·장애 복구를 위한 현재 데이터·메타데이터·설정의 복사본이고, 아카이브는 활동 재구성을 위해 완료 데이터와 메타데이터를 장기 보존하는 것입니다.",
     "source_type": "glossary",
     "source_ref": "backup",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which statement correctly distinguishes a backup from an archive?",
+    "choices_en": [
+      "A true copy is a verified copy that completely and accurately preserves the content, context and structure of the original record together with the metadata needed",
+      "Data transfer is the process of moving data and metadata between storage media types, formats or systems",
+      "Periodic evaluation is the activity that confirms a computerised system remains in a validated state and compliant with GMP",
+      "A backup is a current copy of data held for recovery from failure, whereas an archive is long-term retention of completed data and metadata"
+    ],
+    "explanation_en": "A backup is a copy of current data, metadata and configuration held for recovery from disaster or failure. An archive is the long-term retention of completed data and metadata so that the activity can be reconstructed."
   },
   {
     "id": "q2-g05",
@@ -252,7 +380,15 @@
     "explanation_ko": "시료 ID, 방법 버전, 생성시각, 분석자, 처리이력과 감사추적은 결과에 구조·관계·맥락과 의미를 부여하는 메타데이터입니다. 메타데이터가 없으면 결과값만으로 활동을 완전히 이해·재구성하기 어렵습니다.",
     "source_type": "glossary",
     "source_ref": "metadata",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which of the following is the best example of metadata?",
+    "choices_en": [
+      "Sample ID, method version, time of creation, analyst, processing history and audit trail",
+      "The final assay result value produced by the test",
+      "Finished product samples held in a stability chamber",
+      "The vials and stoppers used in container closure integrity testing"
+    ],
+    "explanation_en": "Sample ID, method version, time of creation, analyst, processing history and audit trail are the metadata that give a result its structure, relationships, context and meaning. Without metadata, a result value alone makes the activity hard to understand or reconstruct fully."
   },
   {
     "id": "q2-g06",
@@ -267,7 +403,15 @@
     "explanation_ko": "동적 데이터는 사용자가 질의·추세·재처리·확대 등 기록 내용과 상호작용할 수 있습니다. 크로마토그래피 전자 원파일은 대표적인 동적 기록이며 단순 PDF나 인쇄물은 정적 기록입니다.",
     "source_type": "glossary",
     "source_ref": "dynamic-data",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which of the following is the best example of dynamic data?",
+    "choices_en": [
+      "A fixed copy of a signed paper batch record",
+      "An electronic raw file in which a chromatogram can be expanded, reprocessed according to user permissions, and its processing history viewed",
+      "A PDF report whose content is fixed",
+      "A printed balance ticket"
+    ],
+    "explanation_en": "Dynamic data allow the user to interact with the content of the record — querying, trending, reprocessing, expanding. A chromatography electronic raw file is the classic dynamic record, whereas a plain PDF or a printout is a static record."
   },
   {
     "id": "q2-g07",
@@ -282,7 +426,15 @@
     "explanation_ko": "마이그레이션은 값뿐 아니라 데이터의 내용과 의미, 관계, 메타데이터·감사추적 및 중요 동적 기능이 유지되는지 검증해야 합니다.",
     "source_type": "glossary",
     "source_ref": "data-migration",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "In verifying a data migration, what must be confirmed as preserved beyond the matching of values?",
+    "choices_en": [
+      "Functional testing of whether the new system meets its intended use and user requirements",
+      "The roles, responsibilities and training status of the system owner and the process owner",
+      "The meaning and relationships of the content, the metadata and audit trail, and any dynamic functionality required",
+      "Business continuity and disaster recovery procedures for normal operation, and their periodic testing"
+    ],
+    "explanation_en": "A migration must be verified not only for values but for whether the content and its meaning, its relationships, the metadata and audit trail, and critical dynamic functionality are retained."
   },
   {
     "id": "q2-g08",
@@ -297,7 +449,15 @@
     "explanation_ko": "귀속성은 데이터의 생성·변경·삭제를 수행한 개인 또는 시스템과 그 시점을 식별할 수 있어야 한다는 원칙입니다.",
     "source_type": "glossary",
     "source_ref": "attributable",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "What does the ALCOA principle of \"attributable\" require?",
+    "choices_en": [
+      "That records remain readable and unambiguous throughout the retention period",
+      "That data are recorded at the time the work or observation is performed",
+      "That data correctly reflect the facts and the activity performed, without error",
+      "That it is possible to identify who, or which system, performed an action or change, and when"
+    ],
+    "explanation_en": "Attributable is the principle that it must be possible to identify the individual or system that created, changed or deleted the data, and the point in time at which they did so."
   },
   {
     "id": "q2-g09",
@@ -312,7 +472,15 @@
     "explanation_ko": "감사추적 검토는 GMP 관련 생성·변경·삭제, 재처리와 설정변경 등 데이터 신뢰성에 영향을 주는 사건을 행위자·시간·사유와 함께 평가합니다.",
     "source_type": "glossary",
     "source_ref": "audit-trail-review",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "What should a risk-based audit trail review be looking for?",
+    "choices_en": [
+      "Creation, change, deletion and reprocessing of GMP-relevant data, together with the reason and the actor",
+      "The quality unit's review of batch manufacturing and testing records for completeness and suitability for release",
+      "System functionality, deviations, incidents, security and validation status confirmed in periodic evaluation",
+      "Batch, deviation, out-of-specification, change, complaint and recall trends confirmed in product quality review"
+    ],
+    "explanation_en": "An audit trail review evaluates the events that bear on data reliability — GMP-relevant creation, change and deletion, reprocessing, configuration changes — together with who did them, when, and why."
   },
   {
     "id": "q2-g10",
@@ -327,7 +495,15 @@
     "explanation_ko": "CAPA는 근본원인에 맞는 조치를 실행하고 그 효과를 확인해 재발·발생 위험이 실제로 통제됐음을 입증해야 폐쇄형 절차가 됩니다.",
     "source_type": "glossary",
     "source_ref": "capa",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "What is the key element to confirm before closing a CAPA?",
+    "choices_en": [
+      "Whether the level of formality has been set to match the uncertainty, importance and complexity of the risk assessment",
+      "Whether actions linked to the root cause have been implemented and their effectiveness demonstrated",
+      "Whether the total particle concentration limits set by cleanroom classification have been met",
+      "Whether PUPSIT has confirmed the integrity of the filter assembly before sterilising filtration"
+    ],
+    "explanation_en": "A CAPA becomes a closed-loop process only when actions matched to the root cause have been implemented and their effectiveness confirmed, demonstrating that the risk of recurrence or occurrence is genuinely controlled."
   },
   {
     "id": "q2-g11",
@@ -342,7 +518,15 @@
     "explanation_ko": "OOS는 정해진 규격이나 허용기준을 벗어난 결과입니다. OOT는 규격 안에 있을 수 있지만 과거 또는 예상 경향에서 이례적으로 벗어난 결과를 말합니다.",
     "source_type": "glossary",
     "source_ref": "oos",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which statement correctly distinguishes OOS from OOT?",
+    "choices_en": [
+      "A deviation is a departure from approved instructions or an established standard",
+      "Change control is the formal system for reviewing and approving changes that could affect a validated state",
+      "An OOS result falls outside the specification or acceptance criteria, whereas an OOT result may sit within specification but departs from the established trend",
+      "An alert limit is a level giving early warning that a process may be drifting from normal operation"
+    ],
+    "explanation_en": "An OOS result is one that falls outside an established specification or acceptance criterion. An OOT result may still be within specification, but departs unusually from the historical or expected trend."
   },
   {
     "id": "q2-g12",
@@ -357,7 +541,15 @@
     "explanation_ko": "CCS는 시설 전체의 오염원과 중요관리점을 정의하고 모든 통제와 모니터링의 집합적 효과를 평가하며 지속적으로 검토·개선하는 통합 전략입니다.",
     "source_type": "glossary",
     "source_ref": "contamination-control-strategy",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which best characterises a contamination control strategy (CCS)?",
+    "choices_en": [
+      "The activity of classifying the air cleanliness of a cleanroom or clean air device by comparing total particle concentration against a specification",
+      "An aseptic process simulation that uses media to simulate the steps, interventions and worst cases of routine aseptic processing",
+      "PUPSIT, which confirms a sterilised and installed final filter assembly before use",
+      "A system that connects the site-wide critical control points for contamination with design, procedural, technical, organisational and monitoring controls, and reviews them periodically"
+    ],
+    "explanation_en": "A CCS is an integrated strategy that defines the sources of contamination and the critical control points across the whole facility, assesses the collective effectiveness of all controls and monitoring, and is continuously reviewed and improved."
   },
   {
     "id": "q2-g13",
@@ -372,7 +564,15 @@
     "explanation_ko": "지속적 공정검증은 PPQ 이후 상업생산 자료와 변동·추세를 계속 평가해 공정이 검증된 관리상태를 유지하는지 확인하는 수명주기 활동입니다.",
     "source_type": "glossary",
     "source_ref": "continued-process-verification",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Which activity continues to evaluate process data and trends during commercial production to confirm that the process remains in a state of control?",
+    "choices_en": [
+      "Continued process verification",
+      "Design qualification",
+      "Cleaning validation",
+      "Stability testing"
+    ],
+    "explanation_en": "Continued process verification is the lifecycle activity that keeps evaluating commercial production data, variability and trends after process performance qualification, to confirm the process remains in its validated state of control."
   },
   {
     "id": "q2-r01",
@@ -387,7 +587,15 @@
     "explanation_ko": "Annex 1 §2.2는 시설·설비·공정 설계, 잘 설계된 절차, 그다음 모니터링의 순서를 강조하며 모니터링이나 시험만으로 무균성을 보증하지 못한다고 설명합니다.",
     "source_type": "glossary",
     "source_ref": "aseptic-processing",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "EU GMP Annex 1 holds that sterility cannot be assured by monitoring or testing alone. Which reasoning fits that position best?",
+    "choices_en": [
+      "Because viable air monitoring in Grade A must cover the full duration of critical processing and equipment assembly",
+      "Because adequate design of facilities, equipment and processes, and sound procedures, come first, and monitoring is the element that shows those controls continue to work",
+      "Because the final container must be sealed by an appropriately validated method",
+      "Because sterilising filters must be confirmed by PUPSIT before use and by integrity testing after use"
+    ],
+    "explanation_en": "Annex 1 §2.2 stresses the order — design of facilities, equipment and processes, then well-designed procedures, then monitoring — and explains that sterility cannot be assured by monitoring or testing alone."
   },
   {
     "id": "q2-r02",
@@ -402,7 +610,15 @@
     "explanation_ko": "ICH Q9(R1) §5.1은 위험관리의 엄격성·형식성이 가용 지식과 함께 불확실성, 의사결정의 중요도, 문제의 복잡성에 상응해야 한다고 설명합니다.",
     "source_type": "glossary",
     "source_ref": "formality",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "Under ICH Q9(R1), which three factors are considered together when setting the level of formality in quality risk management?",
+    "choices_en": [
+      "Probability of harm, severity, and detectability where applicable",
+      "Risk assessment, risk control, risk communication and risk review",
+      "Uncertainty, importance and complexity",
+      "Attributable, legible and contemporaneous"
+    ],
+    "explanation_en": "ICH Q9(R1) §5.1 explains that the rigour and formality of risk management should be commensurate with the knowledge available, together with the degree of uncertainty, the importance of the decision, and the complexity of the problem."
   },
   {
     "id": "q2-r03",
@@ -417,7 +633,15 @@
     "explanation_ko": "ICH Q9(R1) §5.3은 편향과 가정을 다루고 품질위험관리 도구를 올바르게 사용하며 관련 데이터와 지식원을 최대한 활용해 주관성을 통제하도록 합니다.",
     "source_type": "glossary",
     "source_ref": "subjectivity",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "question_en": "How does ICH Q9(R1) propose to reduce subjectivity in quality risk management?",
+    "choices_en": [
+      "By reassessing residual risk after controls and documenting the acceptance criteria, approval and review cycle",
+      "By placing organisational and technical data governance controls across the whole data lifecycle",
+      "By periodically evaluating the functionality, deviations, security and validation status of critical computerised systems",
+      "By addressing bias and assumptions, using the tools properly, and making the fullest use of relevant data and knowledge sources"
+    ],
+    "explanation_en": "ICH Q9(R1) §5.3 asks that subjectivity be controlled by addressing bias and assumptions, using quality risk management tools correctly, and making maximum use of relevant data and sources of knowledge."
   },
   {
     "id": "q2-r04",
@@ -432,7 +656,15 @@
     "explanation_ko": "ICH Q9(R1)은 일부 도구에서 검출가능성을 위험 추정에 포함할 수 있고, 검출통제가 위해 발생확률을 줄이는 통제전략의 일부가 될 수 있다고 설명합니다. 다만 심각도나 예방통제를 대체하지 않습니다.",
     "source_type": "glossary",
     "source_ref": "detectability",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "How does ICH Q9(R1) describe the role of detection controls?",
+    "choices_en": [
+      "They can form part of risk control by increasing the chance that a hazard is found, thereby reducing the probability of harm",
+      "Severity is the measure of the possible consequences of a hazard",
+      "A hazard is the potential source of harm",
+      "Residual risk is the risk remaining after risk control has been applied"
+    ],
+    "explanation_en": "ICH Q9(R1) explains that some tools may include detectability in risk estimation, and that detection controls can form part of a control strategy that reduces the probability of harm. They do not, however, substitute for severity or for preventive controls."
   },
   {
     "id": "q2-r05",
@@ -447,7 +679,15 @@
     "explanation_ko": "EU GMP Annex 11 원칙은 애플리케이션을 밸리데이션하고 IT 인프라를 적격성평가하도록 명시합니다. 수명주기 위험평가에 따라 밸리데이션과 데이터 완전성 통제 범위를 정합니다.",
     "source_type": "glossary",
     "source_ref": "computerised-system",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "Under the principle of EU GMP Annex 11, what is the baseline expectation for computerised systems?",
+    "choices_en": [
+      "When critical data are entered manually, accuracy is additionally checked by a second operator or by a validated electronic means",
+      "The application is validated and the IT infrastructure is qualified",
+      "Relevant data are backed up regularly, and the integrity, accuracy and restorability of the backup are confirmed by validation and periodic testing",
+      "Audit trails of GMP-relevant changes and deletions are available in an intelligible form and are reviewed regularly"
+    ],
+    "explanation_en": "The principle of EU GMP Annex 11 states that the application should be validated and the IT infrastructure qualified. The extent of validation and of data integrity controls follows from a lifecycle risk assessment."
   },
   {
     "id": "q2-r06",
@@ -462,7 +702,15 @@
     "explanation_ko": "Annex 11 §11은 시스템이 계속 유효하고 GMP에 적합한지 확인하기 위해 기능, 일탈·사고·문제, 업그레이드, 성능·신뢰성·보안과 밸리데이션 상태 등을 평가하도록 합니다.",
     "source_type": "glossary",
     "source_ref": "periodic-evaluation",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "Which combination of items best fits the periodic evaluation required by EU GMP Annex 11?",
+    "choices_en": [
+      "HEPA integrity, air volume, pressure differential, airflow direction, microbiology and recovery testing from cleanroom qualification",
+      "Accuracy, precision, specificity, linearity, range and robustness from analytical procedure validation",
+      "Range of functionality, deviations, incidents, upgrade history, performance, reliability, security and validation status",
+      "Batch, deviation, out-of-specification, change, complaint, recall and stability trends from product quality review"
+    ],
+    "explanation_en": "Annex 11 §11 asks that systems be evaluated to confirm they remain in a valid state and compliant with GMP, covering functionality, deviations, incidents and problems, upgrades, performance, reliability, security and validation status."
   },
   {
     "id": "q2-r07",
@@ -477,7 +725,15 @@
     "explanation_ko": "Annex 15는 URS를 밸리데이션 수명주기의 기준점으로 두고 DQ에서 설계의 URS 준수를 확인하며, 이후 적절한 IQ·OQ·PQ 단계에서 관련 요구사항을 시험하도록 합니다.",
     "source_type": "glossary",
     "source_ref": "user-requirements-specification",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "Under EU GMP Annex 15, which statement about the relationship between the URS and the qualification stages is correct?",
+    "choices_en": [
+      "IQ confirms that equipment and systems have been installed in accordance with the approved design and the manufacturer's recommendations",
+      "OQ confirms that equipment and systems operate as intended across the anticipated operating ranges",
+      "PQ confirms that equipment and systems perform effectively and reproducibly according to approved process methods and specifications",
+      "The URS is the reference point of the validation lifecycle, and compliance with its requirements is confirmed at DQ and through the appropriate IQ, OQ and PQ testing"
+    ],
+    "explanation_en": "Annex 15 sets the URS as the reference point for the validation lifecycle, has DQ confirm that the design complies with the URS, and then has the relevant requirements tested through the appropriate IQ, OQ and PQ stages."
   },
   {
     "id": "q2-r08",
@@ -492,7 +748,15 @@
     "explanation_ko": "EU GMP Annex 1 §8.25는 운송·배송 요구가 용기밀봉 완전성에 미칠 수 있는 영향, 예를 들어 감압이나 극한온도를 밸리데이션에서 고려하도록 합니다.",
     "source_type": "glossary",
     "source_ref": "container-closure-integrity",
-    "difficulty": "normal"
+    "difficulty": "normal",
+    "question_en": "Under EU GMP Annex 1, which lifecycle factor must be included in the validation of container closure integrity?",
+    "choices_en": [
+      "Conditions that could compromise the seal, such as depressurisation or extreme temperature during transport and distribution",
+      "The type and frequency of critical interventions in aseptic processing, and their representation in APS",
+      "The maximum time, pressure, flow rate and volume of the sterilising filtration process, and filter compatibility",
+      "Accessibility, legibility, backup and restorability of computerised system data"
+    ],
+    "explanation_en": "EU GMP Annex 1 §8.25 requires validation to consider the effect that transport and shipping requirements may have on container closure integrity, for example depressurisation or extreme temperature."
   },
   {
     "id": "q-202630-01",
@@ -508,7 +772,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-20/#fda483-193675",
     "difficulty": "easy",
-    "week": "202630"
+    "week": "202630",
+    "question_en": "In Observation 1 of the 483 issued by FDA to Hillyard GMP, which written procedure was found not to have been properly followed?",
+    "choices_en": [
+      "The procedure for qualifying and approving suppliers of raw materials and components",
+      "The procedure for storing stability samples of finished drug products",
+      "The procedure for conducting media fills in aseptic processing",
+      "The procedure for routine sanitisation of the process water system"
+    ],
+    "explanation_en": "Observation 1 states that the documented procedure for supplier qualification and approval (SOP QA200-07.02 Vendor Audits) was not properly followed. Specifically, documentation audits of the suppliers of raw materials and components used in drug manufacture had not been carried out."
   },
   {
     "id": "q-202630-02",
@@ -524,7 +796,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-20/#recall-117f512e15b2",
     "difficulty": "easy",
-    "week": "202630"
+    "week": "202630",
+    "question_en": "Why did Optus Pharm voluntarily recall Opsalocin Ophthalmic Solution (moxifloxacin hydrochloride)?",
+    "choices_en": [
+      "An error in the dosage and administration statement on the packaging",
+      "An individual unspecified related substance exceeded its limit in post-marketing stability testing",
+      "Container closure integrity testing had not been performed",
+      "A failing sterility test"
+    ],
+    "explanation_en": "The stated reason for recall is that an individual unspecified related substance exceeded its limit during post-marketing stability testing. The recall is not mandatory: it is a voluntary recall by the business operator."
   },
   {
     "id": "q-202630-03",
@@ -540,7 +820,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-20/#admin-2026005761",
     "difficulty": "normal",
-    "week": "202630"
+    "week": "202630",
+    "question_en": "What administrative action did Human Bio receive after its product Purecl Solution failed the microbial limit test?",
+    "choices_en": [
+      "Suspension of manufacturing of that product for three months",
+      "Cancellation of the marketing authorisation for that product",
+      "Suspension of all operations at the site for six months",
+      "A corrective order and a warning"
+    ],
+    "explanation_en": "Surveillance sampling and testing of marketed product found a total aerobic microbial count of 97,000, failing the microbial limit test. Manufacturing of that product was accordingly suspended for three months, from 30 July 2026 to 29 October 2026."
   },
   {
     "id": "q-202630-04",
@@ -556,7 +844,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-20/#hc-82324",
     "difficulty": "easy",
-    "week": "202630"
+    "week": "202630",
+    "question_en": "Why did Health Canada recall the Supernova and Supreme Nicotine Film and Pouches products?",
+    "choices_en": [
+      "The nicotine content was below the labelled amount",
+      "Child-resistant packaging had not been applied",
+      "It was an unauthorized product",
+      "Concern about microbial contamination"
+    ],
+    "explanation_en": "The stated reason for recall is that it was an unauthorized product. The recall is classified Type II, and the product is a nicotine film presentation at 4 mg."
   },
   {
     "id": "q-202631-01",
@@ -572,7 +868,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-27/#c5e3e49faca2",
     "difficulty": "easy",
-    "week": "202631"
+    "week": "202631",
+    "question_en": "In the Warning Letter issued by FDA to Island Kinetics, Inc. d.b.a. CoValence Laboratories, what was found not to have been properly established?",
+    "choices_en": [
+      "Written procedures for production and process control",
+      "Records for the storage and control of reference standards",
+      "The annual hygiene training plan for operators",
+      "The register for receiving post-release market complaints"
+    ],
+    "explanation_en": "The finding in this Warning Letter is the failure to establish written production and process control procedures designed to assure the identity, strength, quality and purity that the drug products manufactured purport to possess (21 CFR 211.100(a))."
   },
   {
     "id": "q-202631-02",
@@ -588,7 +892,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-27/#gmpinspect-1Pzzvm8pprt",
     "difficulty": "easy",
-    "week": "202631"
+    "week": "202631",
+    "question_en": "In the follow-up GMP inspection of RECKITT BENCKISER HEALTHCARE INTERNATIONAL LIMITED, which standard did MFDS require to be clarified under facilities and equipment?",
+    "choices_en": [
+      "The criteria for wearing masks in exposed manufacturing operations, and the criteria for operator hygiene control",
+      "The criteria for the sanitisation interval of the process water system",
+      "The alarm criteria for temperature and humidity monitoring in the raw material warehouse",
+      "The criteria for pressure differential control in the finished product storage area"
+    ],
+    "explanation_en": "The finding from this inspection sits under facilities and equipment, other, item 9 of the annexed table, and required the criteria for mask wearing in exposed manufacturing operations and the criteria for operator hygiene control to be made explicit."
   },
   {
     "id": "q-202631-03",
@@ -604,7 +916,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-27/#admin-2026005814",
     "difficulty": "normal",
-    "week": "202631"
+    "week": "202631",
+    "question_en": "Korea Pharma received an administrative action for failing to follow its own standards. What specifically was the breach?",
+    "choices_en": [
+      "Failing to raise a change request under its own change control rule when an analytical method was changed",
+      "Manufacturing without a manufacturing instruction and writing the batch record afterwards",
+      "Failing to retain raw data from quality control testing",
+      "Failing to conclude a contract for contract manufacturing"
+    ],
+    "explanation_en": "The ground for the action is that, under the change control rule in the firm's own standard (document number HS-G-04D01), a change request including the rationale and the necessary information should have been raised and submitted when a method or procedure was changed, and this was not done. The change concerned the assay method for glycyrrhizic acid in liquorice."
   },
   {
     "id": "q-202631-04",
@@ -620,7 +940,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-07-27/#9cadd9160225",
     "difficulty": "easy",
-    "week": "202631"
+    "week": "202631",
+    "question_en": "In the outcome of the July 2026 meeting of the Committee for Medicinal Products for Human Use (CHMP) published by EMA, how many new medicines were recommended for approval?",
+    "choices_en": [
+      "8",
+      "12",
+      "16",
+      "24"
+    ],
+    "explanation_en": "The published outcome of the CHMP meeting held from 20 to 23 July 2026 states that 12 new medicines received a positive opinion recommending approval."
   },
   {
     "id": "q-202632-01",
@@ -636,7 +964,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#admin-2026005894",
     "difficulty": "normal",
-    "week": "202632"
+    "week": "202632",
+    "question_en": "Alpha Pharm omitted some test items for 10 raw materials and issued false certificates of analysis. What action did MFDS take?",
+    "choices_en": [
+      "Suspension of manufacturing of the product concerned for three months",
+      "Cancellation of the GMP conformity determination for oral solid dosage forms",
+      "Suspension of sales of the product concerned for one month",
+      "An order to recall the product and halt its sale"
+    ],
+    "explanation_en": "MFDS established that Alpha Pharm had repeatedly omitted some tests for 10 raw materials, including hydroxypropyl cellulose, and had drawn up false certificates of analysis. The resulting action was cancellation of the GMP conformity determination for oral solid dosage forms."
   },
   {
     "id": "q-202632-02",
@@ -652,7 +988,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#fda483-193868",
     "difficulty": "easy",
-    "week": "202632"
+    "week": "202632",
+    "question_en": "In the FDA inspection of the Wizcure Pharmaa Private Limited sterile manufacturing site, which item was cited as never having been performed?",
+    "choices_en": [
+      "Personnel monitoring for aseptic operations",
+      "Identity and assay testing of finished product",
+      "Marking of storage conditions on stability samples",
+      "Equipment cleaning at product changeover"
+    ],
+    "explanation_en": "FDA cited that personnel monitoring for aseptic operations had never been performed at this sterile site. Seven observations were issued in total."
   },
   {
     "id": "q-202632-03",
@@ -668,7 +1012,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#admin-2026005975",
     "difficulty": "easy",
-    "week": "202632"
+    "week": "202632",
+    "question_en": "For Daeil Pharmaceutical's quasi-drug Clean Waterproof Band (single use), which records did MFDS find had not been prepared?",
+    "choices_en": [
+      "Certificates of analysis from the raw material supplier",
+      "The stability study report",
+      "The manufacturing control record and the quality control record for each batch",
+      "Records of recall and disposal"
+    ],
+    "explanation_en": "Daeil Pharmaceutical manufactured and sold the product without preparing any manufacturing control record or quality control record for each batch, and received a three-month suspension of manufacturing for that product."
   },
   {
     "id": "q-202632-04",
@@ -684,7 +1036,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-03/#recall-ada7ac9cbd75",
     "difficulty": "easy",
-    "week": "202632"
+    "week": "202632",
+    "question_en": "Why did Ildong Pharmaceutical conduct a business operator recall of Ildong Adriamycin PFS Injection 10 mg (doxorubicin hydrochloride)?",
+    "choices_en": [
+      "A failing assay result",
+      "Total aerobic microbial count above specification",
+      "A failing stability test result",
+      "Concern about defective packaging in distribution"
+    ],
+    "explanation_en": "This is a voluntary recall by the business operator, on the ground of concern about defective packaging in distribution."
   },
   {
     "id": "q-202633-01",
@@ -700,7 +1060,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-10/#fda483-194067",
     "difficulty": "normal",
-    "week": "202633"
+    "week": "202633",
+    "question_en": "In the FDA inspection of the contract testing laboratory C.A.T. Gmbh and Co. KG, what was cited in relation to chromatographic testing?",
+    "choices_en": [
+      "Continuing to use reference standards without assigning a retest date",
+      "Keeping no record of column washing and storage history",
+      "Failing to establish system suitability by repeated injection of a standard solution",
+      "Operating analytical instruments without enabling the audit trail function"
+    ],
+    "explanation_en": "The observation cited that, in residual solvent and optical purity testing of numerous lots of drug substance, system suitability was not established by multiple consecutive injections of an appropriate standard solution. It also cited, on the basis of USP <621>, the failure to inject the standard during the run and after the final sample injection to confirm that the system remained valid to the end."
   },
   {
     "id": "q-202633-02",
@@ -716,7 +1084,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-10/#admin-2026006114",
     "difficulty": "easy",
-    "week": "202633"
+    "week": "202633",
+    "question_en": "What action did MFDS take against Barun Herbal Pharmaceutical's Barun Injinho for failing the ash and acid-insoluble ash quality tests?",
+    "choices_en": [
+      "Suspension of sales of that product for three months",
+      "Suspension of manufacturing of that product for three months",
+      "Suspension of manufacturing of that product for one month",
+      "Cancellation of the marketing authorisation for that product"
+    ],
+    "explanation_en": "On the ground of the failing ash and acid-insoluble ash quality tests, MFDS suspended manufacturing of Barun Injinho for three months, running from 19 August 2026 to 18 November 2026."
   },
   {
     "id": "q-202633-03",
@@ -732,7 +1108,15 @@
     "source_type": "glossary",
     "source_ref": "qualification",
     "difficulty": "easy",
-    "week": "202633"
+    "week": "202633",
+    "question_en": "What is qualification intended to demonstrate in GMP?",
+    "choices_en": [
+      "That an approved cleaning procedure renders equipment suitable for processing medicinal products",
+      "That a process, within set parameters, reproducibly produces product meeting its specification",
+      "That a test method is reliable for its intended analytical purpose",
+      "That premises, systems and equipment are correctly installed and work properly"
+    ],
+    "explanation_en": "Qualification is the act of demonstrating and documenting that premises, systems and equipment are correctly installed, work properly, and produce the expected results. Cleaning validation, process validation and analytical procedure validation are separate activities directed at cleaning procedures, manufacturing processes and test methods respectively."
   },
   {
     "id": "q-202633-04",
@@ -748,7 +1132,15 @@
     "source_type": "glossary",
     "source_ref": "identification-test",
     "difficulty": "easy",
-    "week": "202633"
+    "week": "202633",
+    "question_en": "What does an identification test determine?",
+    "choices_en": [
+      "Whether the principal component of a sample is the substance intended",
+      "Whether the types and amounts of impurities in a sample meet the criteria",
+      "How much of the analyte the sample contains",
+      "How quality changes with time and temperature"
+    ],
+    "explanation_en": "An identification test confirms whether the principal or a specified component of a sample is the intended substance. The types and amounts of impurities are determined by a purity test, the amount of analyte by an assay, and change in quality with time and temperature by stability testing."
   },
   {
     "id": "q-202634-01",
@@ -764,7 +1156,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-17/#fda483-193549",
     "difficulty": "easy",
-    "week": "202634"
+    "week": "202634",
+    "question_en": "In the FDA inspection of the Alvotech Hf site in Iceland, on what basis was aseptic process validation for a product purporting to be sterile found inadequate?",
+    "choices_en": [
+      "During the intervention to load a stopper bag, a void of stagnant air formed above the bag so that first air did not reach it",
+      "Environmental monitoring trend reports were not prepared, reviewed or approved",
+      "Requalification of staff performing visual inspection for particulates did not reflect actual inspection volumes",
+      "A bioburden excursion above the action limit was investigated without extending the risk assessment to batches manufactured in the same period"
+    ],
+    "explanation_en": "The airflow visualisation study on the aseptic filling line showed that, during the intervention to introduce an unopened stopper bag, a void of stagnant air formed above the bag so that first air did not reach it, and FDA cited this as a defect in aseptic process validation. The other three are also observations issued in the same inspection, but they concern quality unit oversight, laboratory controls and deviation investigation respectively."
   },
   {
     "id": "q-202634-02",
@@ -780,7 +1180,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-17/#admin-2026006188",
     "difficulty": "normal",
-    "week": "202634"
+    "week": "202634",
+    "question_en": "MFDS confirmed that Alpha Pharm had failed to follow its own standards and had falsified quality control records. What action followed?",
+    "choices_en": [
+      "Suspension of all manufacturing for three months and seven days, together with suspension of manufacturing of individual products",
+      "Suspension of sales of the product concerned for two months",
+      "A penalty surcharge in lieu of a one-month suspension of sales of the product concerned",
+      "Suspension of the clinical trial concerned for one month"
+    ],
+    "explanation_en": "Failure to follow its own standards, failure to implement administrative instructions, inadequate testing and inspection equipment, falsification of quality control records and failure to prepare manufacturing records were established together, and led to suspension of all manufacturing for three months and seven days (17 August 2026 to 23 November 2026) together with suspension of manufacturing of individual products. Where the truthfulness of records had broken down, the action stopped manufacture itself rather than the sales stage."
   },
   {
     "id": "q-202634-03",
@@ -796,7 +1204,15 @@
     "source_type": "glossary",
     "source_ref": "airflow-visualization-study",
     "difficulty": "easy",
-    "week": "202634"
+    "week": "202634",
+    "question_en": "Which statement about an airflow visualisation study (smoke study) in an aseptic manufacturing area is correct?",
+    "choices_en": [
+      "A study that makes airflow visible with smoke to confirm that contamination does not travel into the critical zone",
+      "The activity of checking the particulate and microbial state of cleanrooms and clean air devices continuously, at defined locations and intervals",
+      "A test that simulates the whole of a routine aseptic manufacturing process using media or a surrogate in place of the actual product",
+      "Air flowing uniformly in a single direction so that particles are reproducibly swept from the critical working zone"
+    ],
+    "explanation_en": "An airflow visualisation study, or smoke study, makes airflow visible using smoke so that it can be confirmed that contamination does not travel into the critical zone. The others describe environmental monitoring, aseptic process simulation (media fill), and unidirectional airflow respectively."
   },
   {
     "id": "q-202634-04",
@@ -812,7 +1228,15 @@
     "source_type": "glossary",
     "source_ref": "impurity",
     "difficulty": "easy",
-    "week": "202634"
+    "week": "202634",
+    "question_en": "Which statement about an impurity in pharmaceutical quality control is correct?",
+    "choices_en": [
+      "Any component of a drug substance or drug product that is not the intended active ingredient or excipient",
+      "A description of the identified and unidentified impurities present in a drug substance, with their types and levels",
+      "A test confirming whether the types and amounts of impurities in a sample meet the set criteria",
+      "The contamination of one material or product by another material or product"
+    ],
+    "explanation_en": "An impurity is any component of a drug substance or drug product that is not the intended active ingredient or excipient. The others describe the impurity profile, the purity test, and cross-contamination respectively."
   },
   {
     "id": "q-202635-01",
@@ -828,7 +1252,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-24/#187127",
     "difficulty": "normal",
-    "week": "202635"
+    "week": "202635",
+    "question_en": "Of the 21 EU GMP deficiencies found by the Belgian regulator at the Chinese API site Lianyungang Guike Pharmaceutical, only one was classified critical. Which?",
+    "choices_en": [
+      "Inadequate management of contamination and cross-contamination risk on shared equipment, and an inadequate contamination control strategy",
+      "Inadequate cleaning validation and cleaning procedures",
+      "Inadequate preventive maintenance planning and upkeep of equipment condition",
+      "Inadequate batch release procedures and management of CEP compliance"
+    ],
+    "explanation_en": "The single deficiency classified critical among the 21 was inadequate management of contamination and cross-contamination risk on shared equipment: the risk assessment and contamination control strategy for Workshop 2 and the weighing area were neither robust nor specific enough, and were not effectively implemented. The other three were classified major in the same inspection."
   },
   {
     "id": "q-202635-02",
@@ -844,7 +1276,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-24/#recall-b8b6f96d9b57",
     "difficulty": "easy",
-    "week": "202635"
+    "week": "202635",
+    "question_en": "Why did Hana Pharm conduct a business operator recall of Paloxi Injection (palonosetron hydrochloride)?",
+    "choices_en": [
+      "A failing assay result in post-marketing stability testing",
+      "A nitrosamine impurity detected above its limit in the finished product",
+      "Stainless steel particulate detected in the injection",
+      "Confirmation that a degradation product could fall outside specification"
+    ],
+    "explanation_en": "The ground for recall is a failing assay result in post-marketing stability testing, and the recall was ordered on 19 August 2026. The other three are also genuine recall reasons published for other products in the same week, but they are not the reason for this one."
   },
   {
     "id": "q-202635-03",
@@ -860,7 +1300,15 @@
     "source_type": "glossary",
     "source_ref": "rabs",
     "difficulty": "easy",
-    "week": "202635"
+    "week": "202635",
+    "question_en": "Which statement about a restricted access barrier system (RABS) used in aseptic manufacturing is correct?",
+    "choices_en": [
+      "A system that separates a Grade A interior from the surrounding cleanroom with rigid walls and integral gloves",
+      "A device that decontaminates its interior reproducibly and isolates a Grade A zone from the surrounding environment and from operators",
+      "A room designed to control airborne particle concentration and to reduce the introduction, generation and retention of microorganisms and particles",
+      "An enclosed space with two or more doors, used to manage airflow between areas of different cleanliness"
+    ],
+    "explanation_en": "A restricted access barrier system (RABS) is a barrier system that separates a Grade A interior from the surrounding cleanroom with rigid walls and integral gloves. The others describe an isolator, a cleanroom and an airlock respectively."
   },
   {
     "id": "q-202635-04",
@@ -876,7 +1324,15 @@
     "source_type": "glossary",
     "source_ref": "business-operator-recall",
     "difficulty": "normal",
-    "week": "202635"
+    "week": "202635",
+    "question_en": "Which statement about a business operator recall under the Korean pharmaceutical recall system is correct?",
+    "choices_en": [
+      "A recall in which the marketing authorisation holder or importer withdraws distributed product on its own initiative, without an order from the authorities",
+      "The state in which materials or products are effectively separated until a decision on release, rejection or reprocessing is made",
+      "A report to the US authorities within three working days of labelling mix-up, contamination or specification failure in a distributed medicine",
+      "The procedure for receiving written or oral complaints about a product, reviewing them, deciding whether investigation is needed, and recording the outcome"
+    ],
+    "explanation_en": "A business operator recall is one in which the marketing authorisation holder, importer or similar party, on becoming aware of a safety or efficacy problem, withdraws distributed product on its own initiative rather than waiting for an order from the authorities. The others describe quarantine, the field alert report (FAR) and complaint handling respectively."
   },
   {
     "id": "q-202636-01",
@@ -892,7 +1348,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-31/#702264c05c8b",
     "difficulty": "normal",
-    "week": "202636"
+    "week": "202636",
+    "question_en": "In the Warning Letter to R3 Medical Companies, on what basis did FDA hold that sterility test results could not be relied on as evidence of sterility?",
+    "choices_en": [
+      "Samples were being frozen and thawed before the sterility test",
+      "The aseptic process and the cleaning and disinfection of the aseptic processing area had not been validated",
+      "A 24-month expiry period had been assigned to the product without stability data",
+      "The responsibilities and procedures of the quality control unit had not been established in writing"
+    ],
+    "explanation_en": "FDA cited that freezing and thawing samples before the sterility test can destroy or injure microorganisms present in the sample, so contamination present before freezing may not be reliably detected (21 CFR 211.160(b)). The other three are also genuine findings in the same Warning Letter, but they concern aseptic process validation, expiry dating and quality unit documentation respectively."
   },
   {
     "id": "q-202636-02",
@@ -908,7 +1372,15 @@
     "source_type": "brief",
     "source_ref": "https://grm-solutions.com/briefs/2026-08-31/#admin-2026006456",
     "difficulty": "easy",
-    "week": "202636"
+    "week": "202636",
+    "question_en": "MFDS confirmed that TDS Pharm had not prepared its manufacturing instruction and record concurrently. What action followed?",
+    "choices_en": [
+      "A penalty surcharge in lieu of a 15-day suspension of manufacturing for the dosage form concerned",
+      "A penalty surcharge in lieu of a 15-day suspension of manufacturing for the product concerned",
+      "A penalty surcharge in lieu of a 15-day suspension of sales for the dosage form concerned",
+      "A penalty surcharge in lieu of a 15-day suspension of sales for the product concerned"
+    ],
+    "explanation_en": "The action is a penalty surcharge of 19,350,000 won in lieu of a 15-day suspension of manufacturing for the dosage form concerned. The surcharge was calculated by taking the 12 products with production output in FY25, out of the 14 products in that dosage form (cataplasms), and multiplying the daily surcharge for suspension by 15 days, then adding the results."
   },
   {
     "id": "q-202636-03",
@@ -924,7 +1396,15 @@
     "source_type": "glossary",
     "source_ref": "cleaning-validation",
     "difficulty": "easy",
-    "week": "202636"
+    "week": "202636",
+    "question_en": "Which statement about cleaning validation is correct?",
+    "choices_en": [
+      "Documented evidence that an approved cleaning procedure renders equipment suitable for processing medicinal products",
+      "The activity of demonstrating that a process, within set parameters, can reproducibly produce product meeting its specification and quality attributes",
+      "The activity of reconfirming, following a change or a periodic review, that a process, equipment or system remains in a validated state",
+      "The activity of confirming and documenting that critical equipment and ancillary systems are installed and operate as intended"
+    ],
+    "explanation_en": "Cleaning validation is documented evidence that an approved cleaning procedure renders equipment suitable for processing medicinal products (EU GMP Annex 15). The others describe process validation, revalidation and equipment qualification respectively."
   },
   {
     "id": "q-202636-04",
@@ -940,6 +1420,14 @@
     "source_type": "glossary",
     "source_ref": "contemporaneous",
     "difficulty": "normal",
-    "week": "202636"
+    "week": "202636",
+    "question_en": "Which statement about the data integrity principle of \"contemporaneous\" is correct?",
+    "choices_en": [
+      "The attribute that data are recorded at the time the work or observation is performed",
+      "The attribute that it is possible to identify who, or which system, performed a recorded action or change, and when",
+      "The attribute that a record stays readable and unambiguous, and so usable and understandable, throughout the retention period",
+      "The attribute that data correctly reflect the facts and the activity performed, without error"
+    ],
+    "explanation_en": "Contemporaneous is the attribute that data are recorded at the very moment the work or observation is performed, which prevents later transcription from memory or from informal notes (PIC/S PI 041-1 §7.4). The others describe attributable, legible and accurate respectively."
   }
 ]

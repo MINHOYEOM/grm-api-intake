@@ -245,6 +245,10 @@ SINGLE_GOLDENS = [
     # 문구 사전이 바뀌었을 때 영어 화면이 어떻게 달라지는지는 이 두 골든에만 드러난다.
     ("en/index.html", "en_landing.expected.html"),
     ("en/findings/index.html", "en_findings.expected.html"),
+    # [다국어 2026-09-05] 이용안내·주간 퀴즈 영문판 — 본문 정본이 **데이터에 따로** 있어
+    # 문구 사전만으로는 무엇이 실리는지 드러나지 않는다. 두 장을 바이트로 잠근다.
+    ("en/guide/index.html", "en_guide.expected.html"),
+    ("en/quiz/index.html", "en_quiz.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
     # [2면 분리 2026-08-27] 둘러보기 면 — 위 주석 그대로: 손열거라 여기 없으면 골든 없이 산다.
@@ -8051,6 +8055,105 @@ class WebGuideRenderTest(unittest.TestCase):
                          (out2 / "guide" / "index.html").read_bytes(), "비결정론 렌더")
 
 
+class WebGuideEnTest(unittest.TestCase):
+    """[다국어 2026-09-05] /en/guide/ — 영문 이용안내.
+
+    한국어판과 **같은 구조의 다른 정본**이다(번역 파일이 아니다). 그래서 고정할 것은 두
+    가지다: ① 두 정본의 h2 모양이 같아 목차·딥링크가 갈라지지 않는가, ② 영어 셸에
+    한국어 산문이 실리지 않는가.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_guide_en_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out)
+        cls.html = (cls.out / "en" / "guide" / "index.html").read_text(encoding="utf-8")
+        cls.ko_html = (cls.out / "guide" / "index.html").read_text(encoding="utf-8")
+        cls.md_ko = render.GUIDE_FILE.read_text(encoding="utf-8")
+        cls.md_en = render.GUIDE_EN_FILE.read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    @staticmethod
+    def _heading_shape(md):
+        return [len(ln) - len(ln.lstrip("#"))
+                for ln in md.splitlines() if re.match(r"^#{1,3} ", ln)]
+
+    def test_two_canons_have_the_same_heading_shape(self):
+        """목차는 h2 에서 결정론 파생된다 — 모양이 어긋나면 두 언어판의 목차 항목 수와
+        `#sec-N` 딥링크가 갈라져, 같은 앵커가 서로 다른 절을 가리킨다."""
+        self.assertEqual(self._heading_shape(self.md_ko), self._heading_shape(self.md_en))
+
+    def test_toc_anchors_are_identical_across_languages(self):
+        ko = re.findall(r'<li><a href="#(sec-\d+)">', self.ko_html)
+        en = re.findall(r'<li><a href="#(sec-\d+)">', self.html)
+        self.assertEqual(ko, en)
+        self.assertGreaterEqual(len(en), 8)
+
+    def test_body_carries_no_korean_prose(self):
+        """★이 저장소가 세 번 밟은 결함(불변식 #13) — 마크업만 보는 검사로는 안 보이고
+        '그 페이지에 한글이 남았는가'를 세는 검사만 잡는다."""
+        main = re.search(r"<main.*?</main>", self.html, re.S).group(0)
+        self.assertEqual(re.findall(r"[가-힣]", main), [],
+                         "영어 이용안내 본문에 한국어가 남았다")
+
+    def test_english_body_invents_no_numbers(self):
+        """영문 정본이 한국어 정본에 없는 수치를 말하면 안 된다(브리프·퀴즈와 같은 게이트).
+        검사는 비대칭 — 덜 말하는 것은 되고 없는 것을 말하는 것만 막는다."""
+        invented = sorted(render._fact_numbers([self.md_en])
+                          - render._fact_numbers([self.md_ko]))
+        self.assertEqual(invented, [], f"EN_INVENTED_NUMBER {invented}")
+
+    def test_glossary_box_follows_whether_that_tree_has_a_glossary(self):
+        """용어사전 상자는 **그 트리에 용어사전이 있을 때만** 그린다 — 없는 페이지로
+        보내는 링크는 무링크보다 나쁘다.
+
+        ★손으로 "영어엔 없다"고 적지 않는다(불변식 #16). 실제로 2026-09-05 리베이스에서
+          `/en/glossary/` 가 생겼고, 손목록이었다면 이 검사가 **맞는 화면을 틀렸다**고
+          했을 것이다. 판정은 렌더와 같은 선언(`en_tree_paths`)에서 온다.
+        """
+        # 마크업만 본다 — 스코프 <style> 의 `.guide-x{...}` 규칙은 양쪽에 그대로 있다
+        # (grm.css 프리즈 보존을 위해 템플릿이 들고 있는 CSS라, 상자와 함께 접히지 않는다).
+        self.assertIn('<aside class="guide-x">', self.ko_html)
+        en_has_glossary = "glossary/" in render.en_tree_paths(
+            render.load_library(),
+            guide_en=self.md_en, quiz_en=render.load_quiz_bank(),
+        ) | render.glossary_tree_paths(render.load_glossary())
+        if en_has_glossary:
+            self.assertIn('<aside class="guide-x">', self.html)
+            self.assertIn("glossary/index.html", self.html)
+        else:
+            self.assertNotIn('<aside class="guide-x">', self.html)
+            self.assertNotIn("glossary/index.html", self.html)
+
+    def test_missing_canon_emits_nothing(self):
+        """영문 정본이 없으면 **조용히 0장**이고, 선언(en_tree_paths)에서도 함께 빠진다 —
+        선언만 남으면 nav·푸터·sitemap 이 404 를 광고한다."""
+        self.assertNotIn("guide/", render.en_tree_paths(render.load_library()))
+        self.assertIn("guide/", render.en_tree_paths(render.load_library(),
+                                                     guide_en=self.md_en))
+        orig = render.load_guide
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_guide_none_"))
+        try:
+            render.load_guide = (
+                lambda path=render.GUIDE_FILE: None
+                if path == render.GUIDE_EN_FILE else orig(path))
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            self.assertFalse((out / "en" / "guide" / "index.html").exists())
+            self.assertTrue((out / "guide" / "index.html").exists())   # 한국어는 그대로
+            sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+            self.assertNotIn("/en/guide/", sitemap)
+            landing = (out / "en" / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn("guide/index.html", landing)              # nav·푸터도 함께 접힘
+        finally:
+            render.load_guide = orig
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
 class WebGlossaryRenderTest(unittest.TestCase):
     """[용어사전 트랙 C 2차] /glossary/ — glossary.json(정본)을 초성 색인 1페이지로
     결정론 렌더. 값(term_ko/term_en/easy_ko/출처) 무변형, 파생은 초성 버킷·related 라벨뿐.
@@ -12362,6 +12465,201 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["allPast"], [])
 
 
+class WebQuizEnTest(unittest.TestCase):
+    """[다국어 2026-09-05] /en/quiz/ — 영문 주간 퀴즈.
+
+    지킬 것은 세 가지다: ① `answer_index` 가 두 언어에서 같은 자리를 가리키는가,
+    ② 반쪽 영어 문항이 새어나오지 않는가, ③ 영어 셸에 한국어 본문이 실리지 않는가.
+    셋 다 "화면은 멀쩡한데 조용히 틀리는" 종류라 마크업만 보는 검사로는 안 보인다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_quiz_en_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out)
+        cls.html = (cls.out / "en" / "quiz" / "index.html").read_text(encoding="utf-8")
+        cls.ko_html = (cls.out / "quiz" / "index.html").read_text(encoding="utf-8")
+        cls.bank = json.loads(render.QUIZ_FILE.read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 정답 정합 ────────────────────────────────────────────────────────────
+    def test_choices_en_keeps_length_and_answer_index_stays_valid(self):
+        """`answer_index` 는 두 언어가 공유하는 **하나의 값**이다. 길이가 달라지면
+        영어판의 정답이 다른 선택지를 가리키거나 범위를 벗어난다 — 화면에는 아무
+        이상이 없고 채점만 조용히 틀린다."""
+        for q in self.bank:
+            if not any(q.get(f) for f in render.QUIZ_EN_FIELDS):
+                continue        # 영문이 아예 없는 문항은 대상이 아니다(전향적 채움)
+            with self.subTest(qid=q["id"]):
+                # ★`quiz_has_english` 로 거르고 나서 세면 안 된다 — 길이가 어긋난 문항은
+                #   그 필터에서 이미 빠져 검사가 **자기가 잡아야 할 것을 건너뛴다**.
+                #   실제로 뮤테이션(choices_en 절단)이 이 검사를 그렇게 통과했다.
+                #   영문에 손을 댄 문항은 전부 여기서 완결성을 증명해야 한다.
+                self.assertTrue(render.quiz_has_english(q),
+                                "영문 필드가 있는데 반쪽이거나 선택지 길이가 어긋난다")
+                self.assertEqual(len(q["choices_en"]), len(q["choices"]))
+                self.assertLess(q["answer_index"], len(q["choices_en"]))
+                self.assertTrue(q["choices_en"][q["answer_index"]].strip())
+
+    def test_rendered_answer_index_is_identical_in_both_trees(self):
+        """마크업으로 한 번 더 본다 — 데이터가 맞아도 뷰가 순서를 바꾸면 같은 일이 난다."""
+        pat = r'<article class="qz-card" id="([^"]+)"[^>]*?data-answer="(\d+)"'
+        ko = re.findall(pat, self.ko_html, re.S)
+        en = re.findall(pat, self.html, re.S)
+        self.assertTrue(ko, "한국어 퀴즈 카드를 하나도 못 읽었다 — 마크업 계약이 바뀌었다")
+        self.assertEqual(ko, en)
+
+    # ── 반쪽 영어 금지 ────────────────────────────────────────────────────────
+    def test_partial_english_question_is_dropped(self):
+        """셋 중 하나만 빠져도 그 문항은 영어 퀴즈에서 빠진다(브리프의
+        `brief_has_english` 와 같은 규율). 반쪽을 내느니 안 내는 쪽이 맞다."""
+        full = {"id": "x", "question_ko": "국문?", "choices": ["a", "b", "c", "d"],
+                "answer_index": 0, "explanation_ko": "국문 해설.",
+                "question_en": "EN?", "choices_en": ["A", "B", "C", "D"],
+                "explanation_en": "EN explanation."}
+        self.assertTrue(render.quiz_has_english(full))
+        for field in render.QUIZ_EN_FIELDS:
+            partial = {k: v for k, v in full.items() if k != field}
+            self.assertFalse(render.quiz_has_english(partial), f"{field} 없는데 통과")
+        short = dict(full, choices_en=["A", "B", "C"])
+        self.assertFalse(render.quiz_has_english(short), "choices_en 길이 불일치가 통과")
+
+    def test_view_drops_partial_questions_and_path_folds_when_none_qualify(self):
+        mixed = [
+            {"id": "ok", "question_ko": "국문?", "choices": ["a", "b", "c", "d"],
+             "answer_index": 0, "explanation_ko": "해설.", "difficulty": "easy",
+             "source_type": "glossary", "source_ref": "gmp",
+             "question_en": "EN?", "choices_en": ["A", "B", "C", "D"],
+             "explanation_en": "EN."},
+            {"id": "half", "question_ko": "반쪽?", "choices": ["a", "b", "c", "d"],
+             "answer_index": 1, "explanation_ko": "해설.", "difficulty": "easy",
+             "source_type": "glossary", "source_ref": "gmp",
+             "question_en": "EN only question"},
+        ]
+        view = render.build_quiz_view(mixed, render.Translator("en"), "en")
+        self.assertEqual([q["id"] for q in view["questions"]], ["ok"])
+        self.assertEqual(view["total"], 1)
+        # 한국어 트리는 둘 다 낸다(영문 결손은 한국어판과 무관).
+        self.assertEqual(len(render.build_quiz_view(mixed)["questions"]), 2)
+        # 영어로 낼 문항이 하나도 없으면 경로 선언 자체가 없다(빈 퀴즈 금지).
+        cats = render.load_library()
+        self.assertNotIn("quiz/", render.en_tree_paths(cats, quiz_en=[mixed[1]]))
+        self.assertIn("quiz/", render.en_tree_paths(cats, quiz_en=mixed))
+
+    def test_missing_english_bank_emits_nothing(self):
+        orig = render.load_quiz_bank
+        stripped = [{k: v for k, v in q.items() if k not in render.QUIZ_EN_FIELDS}
+                    for q in self.bank]
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_quiz_none_"))
+        try:
+            render.load_quiz_bank = lambda *a, **k: stripped
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            self.assertFalse((out / "en" / "quiz" / "index.html").exists())
+            self.assertTrue((out / "quiz" / "index.html").exists())
+            self.assertNotIn("/en/quiz/",
+                             (out / "sitemap.xml").read_text(encoding="utf-8"))
+        finally:
+            render.load_quiz_bank = orig
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    # ── 언어 순도 ────────────────────────────────────────────────────────────
+    def test_body_carries_no_korean_prose(self):
+        main = re.search(r"<main.*?</main>", self.html, re.S).group(0)
+        self.assertEqual(re.findall(r"[가-힣]", main), [],
+                         "영어 퀴즈 본문에 한국어가 남았다")
+
+    def test_view_picks_the_language_not_the_template(self):
+        """불변식 #13 — 템플릿이 `question_ko` 로 데이터에 손을 뻗으면 어느 언어인지
+        알 방법이 없다. 뷰가 정해 `question`·`choices`·`explanation` 으로 넘긴다."""
+        tpl = (WEB_DIR / "templates" / "quiz.html").read_text(encoding="utf-8")
+        for leaked in ("question_ko", "explanation_ko", "question_en",
+                       "explanation_en", "choices_en"):
+            self.assertNotIn(leaked, tpl, f"템플릿이 {leaked} 를 직접 읽는다")
+        q = {"id": "x", "question_ko": "국문?", "choices": ["가", "나"],
+             "answer_index": 0, "explanation_ko": "국문 해설.",
+             "question_en": "EN?", "choices_en": ["A", "B"], "explanation_en": "EN."}
+        self.assertEqual(render.quiz_question_text(q, "ko"), "국문?")
+        self.assertEqual(render.quiz_question_text(q, "en"), "EN?")
+        self.assertEqual(render.quiz_choices(q, "en"), ["A", "B"])
+        self.assertEqual(render.quiz_explanation(q, "en"), "EN.")
+
+    def test_glossary_source_link_follows_whether_that_tree_has_a_glossary(self):
+        """근거 링크는 **그 트리에 용어사전이 있을 때만** 건다. 없으면 라벨만 남기고
+        링크를 접는다 — 문항 자체는 어느 쪽이든 남는다.
+
+        ★손목록으로 적지 않는다(불변식 #16) — 2026-09-05 리베이스로 `/en/glossary/` 가
+          실제로 생겼고, 뷰가 `en_paths` 에서 파생했기에 렌더는 손대지 않고 맞았다.
+        ★nav·푸터도 `glossary/index.html` 로 간다 — 그냥 문자열로 찾으면 **근거 링크가
+          사라져도 nav 가 대신 맞혀** 검사가 통과한다(뮤테이션이 실제로 그렇게 빠져나갔다).
+          근거 링크만이 달고 나오는 **앵커 조각**(`#<용어 id>`)으로 본다.
+        """
+        self.assertIn("glossary/index.html", self.ko_html)
+        glossary_q = next(q for q in self.bank if q["source_type"] == "glossary")
+        self.assertIn('id="%s"' % glossary_q["id"], self.html)   # 문항 자체는 남는다
+
+        glossary_ids = {q["source_ref"] for q in self.bank
+                        if q["source_type"] == "glossary"}
+        anchors = set(re.findall(r"glossary/index\.html#([a-z0-9-]+)", self.html))
+        if "glossary/" in render.glossary_tree_paths(render.load_glossary()):
+            self.assertTrue(anchors, "영어 용어사전이 있는데 근거 링크가 하나도 없다")
+            self.assertLessEqual(anchors, glossary_ids,
+                                 "뱅크에 없는 용어로 보내는 근거 링크가 있다")
+        else:
+            self.assertEqual(anchors, set(), "없는 용어사전으로 보낸다")
+
+    # ── 사실 게이트 ──────────────────────────────────────────────────────────
+    def test_current_bank_invents_no_numbers(self):
+        self.assertEqual(render.validate_quiz_en_facts(self.bank), [])
+
+    def test_invented_number_is_caught(self):
+        """게이트가 실제로 문다 — 영문이 한국어에 없는 수치를 말하면 거부. 반대 방향
+        (덜 말하기)은 위반이 아니다(비대칭 검사)."""
+        ko = {"id": "x", "question_ko": "결함 21건 중 몇 건이 critical 인가?",
+              "choices": ["1건", "2건", "3건", "4건"], "answer_index": 0,
+              "explanation_ko": "21건 중 1건이다."}
+        ok = dict(ko, question_en="How many of the 21 deficiencies were critical?",
+                  choices_en=["1", "2", "3", "4"],
+                  explanation_en="One of the 21.")
+        self.assertEqual(render.validate_quiz_en_facts([ok]), [])
+        bad = dict(ok, explanation_en="One of the 37 deficiencies.")
+        problems = render.validate_quiz_en_facts([bad])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("EN_INVENTED_NUMBER", problems[0])
+        self.assertIn("37", problems[0])
+        self.assertEqual(render.validate_quiz_en_facts(
+            [dict(ok, explanation_en="Only one was critical.")]), [])
+
+    def test_merge_script_refuses_partial_reordered_and_invented_input(self):
+        """병합 스크립트가 생산 단계에서 멈춰야 결함이 정본에 남지 않는다."""
+        sys.path.insert(0, str(WEB_DIR))
+        import quiz_en_merge
+        bank = [{"id": "a", "question_ko": "국문?", "choices": ["a", "b", "c", "d"],
+                 "answer_index": 0, "explanation_ko": "국문 12개."}]
+        _, partial = quiz_en_merge.merge(bank, {"a": {"question_en": "EN?"}})
+        self.assertTrue(any("EN_PARTIAL" in p for p in partial))
+        _, short = quiz_en_merge.merge(bank, {"a": {
+            "question_en": "EN?", "choices_en": ["A", "B"], "explanation_en": "EN."}})
+        self.assertTrue(any("EN_CHOICES_LEN" in p for p in short))
+        _, invented = quiz_en_merge.merge(bank, {"a": {
+            "question_en": "EN?", "choices_en": ["A", "B", "C", "D"],
+            "explanation_en": "There were 99 of them."}})
+        self.assertTrue(any("EN_INVENTED_NUMBER" in p for p in invented))
+        _, unknown = quiz_en_merge.merge(bank, {"zzz": {}})
+        self.assertTrue(any("zzz" in p for p in unknown))
+        merged, clean = quiz_en_merge.merge(bank, {"a": {
+            "question_en": "EN?", "choices_en": ["A", "B", "C", "D"],
+            "explanation_en": "EN."}})
+        self.assertEqual(clean, [])
+        # 가산만 — 기존 키는 값도 순서도 그대로, 영문 세 필드가 뒤에 붙는다.
+        self.assertEqual(list(merged[0]),
+                         list(bank[0]) + list(render.QUIZ_EN_FIELDS))
+
+
 # ── 주간 퀴즈 학습 루프(13차) — 복원·완주 요약·오답노트·재도전·필터 ──────────────
 class WebQuizLearningLoopTest(unittest.TestCase):
     """정적 계약만 고정한다(동작은 quiz.js 소관·브라우저 검증).
@@ -15294,7 +15592,13 @@ class WebEnTreeTest(unittest.TestCase):
         # 빼고 본다 — 한국어 쪽과 같은 규율이다(sitemap 은 데이터에서, 파일은 스위치대로).
         docs = render.load_findings_docs() or {}
         cls.en_docs = [d for d in docs.get("documents", []) if render.doc_is_english(d)]
-        cls.expected = render.en_tree_paths(render.load_library())
+        # ★선언은 **렌더가 보는 것과 같은 값**을 받아야 한다 — 이용안내·퀴즈는
+        #   정본이 있을 때만 서므로(en_tree_paths 게이트), 여기서 인자를 빼면 테스트만
+        #   "없다"고 믿어 실제 산출과 갈라진다(같은 함수·같은 입력 규율).
+        cls.expected = render.en_tree_paths(
+            render.load_library(),
+            guide_en=render.load_guide(render.GUIDE_EN_FILE),
+            quiz_en=render.load_quiz_bank())
         if cls.en_docs:
             cls.expected |= {"findings/docs/", "findings/browse/"}
             cls.expected |= {f"findings/docs/{d['agency'].lower()}"
@@ -15343,10 +15647,12 @@ class WebEnTreeTest(unittest.TestCase):
         다시 잰 정본(`findings_facets_en.json`)이 생겨 건수까지 영어판이 성립한다.
         ★[2026-09-04] 용어사전(`glossary/`)과 조항(`findings/clause/`)도 빠졌다 — 설명
         두 필드(`easy_en`·`detail_en`)가 정본에 실렸고, 조항 표본은 `finding_body(f, "en")`
-        으로 원문을 싣는다. 남은 셋은 **아직 영어 본문이 없는 면**이다: 지난 브리프
-        아카이브·이용안내·퀴즈. 여기서 하나를 지울 때는 그 면의 본문이 실제로 영어로
-        성립하는지 먼저 재고, 이 목록이 빌 때가 §7 이 끝나는 때다."""
-        for path in ("archive/", "guide/", "quiz/"):
+        으로 원문을 싣는다.
+        ★[2026-09-05] 이용안내(`guide/`)·주간 퀴즈(`quiz/`)도 빠졌다 — 본문 정본이 영어로
+        따로 생겼다(`guide_content_en.md` · 뱅크의 `*_en` 세 필드). 남은 하나는 **아직
+        영어 본문이 없는 면**이다: 지난 브리프 아카이브. 여기서 하나를 지울 때는 그 면의
+        본문이 실제로 영어로 성립하는지 먼저 재고, 이 목록이 빌 때가 §7 이 끝나는 때다."""
+        for path in ("archive/",):
             self.assertNotIn(path, self.expected)
             self.assertNotIn(f"en/{path}index.html", self.pages)
 

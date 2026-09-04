@@ -2817,6 +2817,28 @@ EN_TREE_STATIC: tuple[str, ...] = (
 EN_SITEMAP_EXCLUDED: frozenset[str] = frozenset({"findings/inspector/"})
 
 
+def glossary_tree_paths(terms: "list[dict[str, Any]] | None") -> "set[str]":
+    """영어 용어사전 면 집합 — 정본에서 파생한다(색인 1 + 낱말 N).
+
+    렌더와 테스트가 **같은 함수**를 부른다. 각자 세면 두 목록이 갈라지고, 갈라지면
+    nav·hreflang·sitemap 이 없는 페이지를 가리킨다(`facet_tree_paths` 와 같은 계약).
+    """
+    if not terms:
+        return set()
+    return {"glossary/"} | {f"glossary/{t['id']}/" for t in terms}
+
+
+def clause_tree_paths(views: "list[dict[str, Any]] | None") -> "set[str]":
+    """영어 조항 면 집합 — **영어 모집단으로 다시 센 뷰**에서 파생한다.
+
+    한국어 뷰에서 파생하면 임계 미달로 안 만든 조항까지 선언에 들어간다(없는 페이지를
+    광고하는 것). 뷰가 곧 만들어질 페이지라, 뷰에서 파생하는 것이 유일하게 옳다.
+    """
+    if not views:
+        return set()
+    return {"findings/clause/"} | {f"findings/clause/{c['slug']}/" for c in views}
+
+
 def en_tree_paths(catalogs: "list[dict[str, Any]] | None" = None) -> set[str]:
     """영어 트리 경로 집합 — 정적 목록 + 실제로 로드된 자료실 카탈로그.
 
@@ -3063,7 +3085,8 @@ def build_llms_txt(briefs: list[dict[str, Any]],
                    base_url: str = SITE_BASE_URL,
                    *,
                    glossary_term_ids: "list[str] | None" = None,
-                   facet_paths: "list[tuple[str, str]] | None" = None) -> str:
+                   facet_paths: "list[tuple[str, str]] | None" = None,
+                   en_paths: "set[str] | None" = None) -> str:
     """llms.txt(llmstxt.org 관례) — AI 어시스턴트·AI 검색용 사이트 안내.
 
     RUM 실측(2026-08 30일)에서 AI 유입(chatgpt+gemini 합 30)이 이미 네이버(20)를
@@ -3072,6 +3095,13 @@ def build_llms_txt(briefs: list[dict[str, Any]],
     facet_paths)에서 파생한다 — 문장에 박은 숫자는 낡는다. facet_paths 는 문서 렌더
     스위치와 무관하게 데이터에서 파생되므로(sitemap 과 같은 원천) 테스트 빌드와
     프로덕션의 llms.txt 가 같다. 생성시각/난수 0(byte 고정).
+
+    ★[다국어 2026-09-04] 영어판 섹션을 더한다. 영문 트리 4,163장을 다 만들어 놓고도 이
+      파일에는 `/en/` 이 한 번도 안 나왔다 — AI 어시스턴트는 이 파일로 사이트 구조를
+      읽으므로, 영어로 물어본 사용자에게 **한국어 페이지만 인용**하게 된다. 만든 것과
+      알리는 것은 다른 일이다(sitemap 에만 있고 링크가 없어 색인 안 되던 문서 3,202장과
+      같은 실패의 다른 얼굴). 어떤 섹션을 적을지는 `en_paths` 가 정한다 — 없는 면을
+      적으면 AI 에게 없는 페이지를 알려주는 것이고, 그건 무링크보다 나쁘다.
     """
     pubs = sorted((b["brief"].get("publish_date", "") for b in briefs),
                   reverse=True)
@@ -3123,7 +3153,84 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
         f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
     ]
+    lines += _llms_english_section(base_url, en_paths or set())
     return "\n".join(lines) + "\n"
+
+
+#: 영어판 섹션의 행 후보 — (경로, 라벨, 설명). ★한국어판과 **같은 갈래를 미리 다** 적어
+#: 두고, 실제로 난 면만 출력한다. 그래서 아직 없는 아카이브·이용안내·퀴즈가 영어판으로
+#: 서는 날 이 파일이 저절로 그것을 알린다(손으로 고쳐야 하는 목록은 반드시 낡는다).
+#: 설명에 수치를 박지 않는다 — `{}` 자리는 아래에서 `en_paths` 로 센 값이 들어간다.
+LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
+    ("", "English edition home",
+     "Entry point for the English tree"),
+    ("findings/", "Findings search",
+     "Search inspection findings in the regulator's original English — FDA 483s,"
+     " Warning Letters, EU/UK GMP non-compliance reports, Health Canada inspections."
+     " Defaults to English-original findings; one click widens it to the full corpus"),
+    ("findings/browse/", "Browse findings",
+     "Entry points by task, recent documents, and the category/country/agency axes"),
+    ("findings/docs/", "Documents by agency and year",
+     "{docs:,} inspection documents whose source text is English"),
+    ("findings/clause/", "Findings by 21 CFR section",
+     "{clause} sections, each with the findings that cite it"),
+    ("findings/trends/", "Findings trends",
+     "Ranked deficiency areas over the last 12 months and the most-cited sections"),
+    ("findings/inspections/", "FDA inspection classifications",
+     "NAI/VAI/OAI counts by year and country"),
+    ("findings/coverage/", "Data coverage",
+     "Which sources are collected, how far back, and the known limits"),
+    ("findings/firm/", "Company lookup",
+     "{firms:,} companies with a static page listing that company's findings"),
+    ("findings/checklist/", "Self-assessment checklist",
+     "Checklist items derived from the most frequent deficiencies"),
+    ("glossary/", "Regulatory glossary",
+     "{terms} GMP and quality terms explained in plain English with official sources"),
+    ("library/", "Reference library",
+     "Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents"),
+    ("archive/", "Weekly brief archive", "Past weekly regulatory briefs"),
+    ("guide/", "Guide", "How to use the service, and frequently asked questions"),
+    ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),
+)
+
+
+def _llms_english_section(base_url: str, en_paths: "set[str]") -> list[str]:
+    """영어판 섹션 줄 — 실제로 난 면만. 영어 트리가 없으면 아무 줄도 내지 않는다."""
+    if not en_paths:
+        return []
+    counts = {
+        "docs": sum(1 for p in en_paths if p.startswith("findings/doc/")),
+        "terms": sum(1 for p in en_paths
+                     if p.startswith("glossary/") and p != "glossary/"),
+        "clause": sum(1 for p in en_paths
+                      if p.startswith("findings/clause/") and p != "findings/clause/"),
+        # 색인(`findings/firm/`) 자신을 빼야 업체 수다 — 안 빼면 585 개가 586 으로 나간다.
+        "firms": sum(1 for p in en_paths
+                     if p.startswith("findings/firm/") and p != "findings/firm/"),
+    }
+    rows = [(path, label, desc) for path, label, desc in LLMS_EN_ROWS
+            if path in en_paths]
+    if not rows:
+        return []
+    out = [
+        "",
+        "## English edition (/en/)",
+        "",
+        "The same service in English. Every page under `/en/` is the English edition of"
+        " the Korean page at the same path without the prefix, and the two declare each"
+        " other with `hreflang`. Findings are shown in the regulator's own English"
+        " wording rather than translated back from Korean.",
+        "",
+        "Some pages exist only in Korean because the source document is Korean — MFDS"
+        " inspection findings, for example. Those have no `/en/` counterpart, and the"
+        " English pages do not link to them. Where a Korean law or document name appears"
+        " on an English page it is kept in the original, because translating the name"
+        " would point at a document that does not exist.",
+        "",
+    ]
+    out += [f"- [{label}]({base_url}/en/{path}): {desc.format(**counts)}"
+            for path, label, desc in rows]
+    return out
 
 
 def build_sitemap_xml(briefs: list[dict[str, Any]],
@@ -3412,19 +3519,30 @@ def _brief_description(brief_meta: dict[str, Any], tr: Translator = _KO,
               date=title_dateform(brief_meta.get("publish_date", ""), tr))
 
 
-def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
+def build_json_ld(base_url: str = SITE_BASE_URL, tr: Translator = _KO,
+                  lang: str = DEFAULT_LANG) -> str:
     """랜딩 JSON-LD(Organization + WebSite) — 정적·결정론. <script> 임베드 안전 직렬화.
 
     값은 전부 렌더 보유 정적 카피 + base_url(무변형). '<' 만 \\u003c 로 치환해 </script>
     조기종료(브레이크아웃)를 원천 차단(데이터엔 '<' 부재 — 방어선). dict 삽입순 보존.
+
+    ★[다국어 2026-09-04] `inLanguage` 와 설명이 **한국어로 박혀 있었다**. 영어 홈이
+      "이 페이지는 한국어"라고 스스로 선언하면, 영어판을 만든 이유(영어 검색에 잡히는
+      것) 자체가 무너진다 — 화면은 영어인데 기계가 읽는 선언만 한국어인, 가장 찾기
+      어려운 종류의 거짓 신호다. `WebSite.url` 도 언어판 루트를 가리켜야 한다(그래야
+      두 노드가 서로 다른 판을 말한다). `Organization.url` 은 그대로 사이트 루트다 —
+      기관은 하나이고 언어판이 여럿인 것이지, 기관이 둘인 게 아니다.
     """
+    # 한국어는 종전 값 그대로(끝 "/" 없음) — 골든 바이트를 흔들지 않는다.
+    site_url = base_url if lang == DEFAULT_LANG else f"{base_url}/{LANG_PREFIXES[lang]}"
+    desc = tr(SITE_DESCRIPTION)
     nodes = [
         {"@context": "https://schema.org", "@type": "Organization",
-         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
+         "name": SITE_NAME, "url": base_url, "description": desc,
          "logo": f"{base_url}/assets/favicon-512.png"},
         {"@context": "https://schema.org", "@type": "WebSite",
-         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
-         "inLanguage": "ko"},
+         "name": SITE_NAME, "url": site_url, "description": desc,
+         "inLanguage": lang},
     ]
     return json.dumps(nodes, ensure_ascii=False, indent=1).replace("<", "\\u003c")
 
@@ -3739,20 +3857,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if en_docs:
         en_paths |= {f"findings/doc/{d['slug']}/" for d in en_docs}
         en_paths.add("findings/docs/")
-    # [다국어 2026-09-04] 용어사전 — **그리기 전에** 면 집합에 넣는다. 렌더 도중에
-    # 넣으면 먼저 그려진 한국어 용어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만
-    # 붙는다(모음 페이지에서 같은 실수를 CI 가 잡았다).
-    if clause_views_en:
-        en_paths.add("findings/clause/")
-        en_paths |= {f"findings/clause/{c['slug']}/" for c in clause_views_en}
-    _glossary_terms_for_paths = load_glossary()
-    if _glossary_terms_for_paths:
-        en_paths.add("glossary/")
-        en_paths |= {f"glossary/{t['id']}/" for t in _glossary_terms_for_paths}
         en_paths.add("findings/browse/")
         # 기관×연도 목록은 **영어로 낼 문서가 있는 묶음만** 만든다(빈 목록 금지).
         en_paths |= {f"findings/docs/{d['agency'].lower()}/{d['published_date'][:4]}/"
                      for d in en_docs}
+    # [다국어 2026-09-04] 용어사전·조항 — **그리기 전에** 면 집합에 넣는다. 렌더 도중에
+    # 넣으면 먼저 그려진 한국어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만 붙는다
+    # (모음 페이지에서 같은 실수를 CI 가 잡았다).
+    en_paths |= clause_tree_paths(clause_views_en)
+    en_paths |= glossary_tree_paths(load_glossary())
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).
@@ -3768,7 +3881,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         page_title="GRM · Global Regulatory Monitor",
         nav_active="home",
         description=tr(SITE_DESCRIPTION),
-        json_ld=build_json_ld(),
+        json_ld=build_json_ld(tr=tr, lang=DEFAULT_LANG),
         cover=_cover_context(latest_brief, latest_issue_no, tr),
         library=library_summary,
         findings_zone=findings_zone,
@@ -4822,7 +4935,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         page_title=en_tr(N_("GRM · 글로벌 규제 인텔리전스 · 영문판")),
         nav_active="home",
         description=en_tr(SITE_DESCRIPTION),
-        json_ld=build_json_ld(),
+        json_ld=build_json_ld(tr=en_tr, lang="en"),
         findings_zone=findings_zone,
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
@@ -4934,7 +5047,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     written.append("robots.txt")
     # llms.txt — AI 어시스턴트용 안내. sitemap 과 같은 입력에서 파생(결정론).
     _write(out_dir / "llms.txt",
-           build_llms_txt(briefs, glossary_term_ids=glossary_term_ids,
+           build_llms_txt(briefs, glossary_term_ids=glossary_term_ids, en_paths=en_paths,
                           facet_paths=facet_paths))
     written.append("llms.txt")
     _write(out_dir / "sitemap.xml",

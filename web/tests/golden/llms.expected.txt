@@ -27,3 +27,22 @@
 - [자료실](https://grm-solutions.com/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인 공식 원문 링크
 - [이용안내](https://grm-solutions.com/guide/): 서비스 활용법과 자주 묻는 질문
 - [주간 퀴즈](https://grm-solutions.com/quiz/): 그 주 규제 소식 기반 학습 퀴즈
+
+## English edition (/en/)
+
+The same service in English. Every page under `/en/` is the English edition of the Korean page at the same path without the prefix, and the two declare each other with `hreflang`. Findings are shown in the regulator's own English wording rather than translated back from Korean.
+
+Some pages exist only in Korean because the source document is Korean — MFDS inspection findings, for example. Those have no `/en/` counterpart, and the English pages do not link to them. Where a Korean law or document name appears on an English page it is kept in the original, because translating the name would point at a document that does not exist.
+
+- [English edition home](https://grm-solutions.com/en/): Entry point for the English tree
+- [Findings search](https://grm-solutions.com/en/findings/): Search inspection findings in the regulator's original English — FDA 483s, Warning Letters, EU/UK GMP non-compliance reports, Health Canada inspections. Defaults to English-original findings; one click widens it to the full corpus
+- [Browse findings](https://grm-solutions.com/en/findings/browse/): Entry points by task, recent documents, and the category/country/agency axes
+- [Documents by agency and year](https://grm-solutions.com/en/findings/docs/): 3,174 inspection documents whose source text is English
+- [Findings by 21 CFR section](https://grm-solutions.com/en/findings/clause/): 34 sections, each with the findings that cite it
+- [Findings trends](https://grm-solutions.com/en/findings/trends/): Ranked deficiency areas over the last 12 months and the most-cited sections
+- [FDA inspection classifications](https://grm-solutions.com/en/findings/inspections/): NAI/VAI/OAI counts by year and country
+- [Data coverage](https://grm-solutions.com/en/findings/coverage/): Which sources are collected, how far back, and the known limits
+- [Company lookup](https://grm-solutions.com/en/findings/firm/): 585 companies with a static page listing that company's findings
+- [Self-assessment checklist](https://grm-solutions.com/en/findings/checklist/): Checklist items derived from the most frequent deficiencies
+- [Regulatory glossary](https://grm-solutions.com/en/glossary/): 242 GMP and quality terms explained in plain English with official sources
+- [Reference library](https://grm-solutions.com/en/library/): Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents

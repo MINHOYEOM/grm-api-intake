@@ -49,7 +49,11 @@ EXCLUDED_ASSETS = frozenset({"admin.js"})
 IGNORE_MARK = "i18n-ignore"
 TEMPLATE_FUNCS = ("_",)
 JS_FUNC = "_t"
-PY_FUNCS = ("tr", "N_")
+# 파이썬 층에서 키를 여는 이름들. `tr` 은 기본 번역기, `N_` 은 키 등록 전용 no-op,
+# `_tr`·`en_tr` 은 **언어 트리를 도는 루프**가 쓰는 이름이다(다국어 3·4단계). 이 목록에
+# 없는 이름으로 부르면 그 키는 추출되지 않아 카탈로그 검사를 빠져나가고, 결손이 렌더
+# 시점(영어 빌드)에야 터진다 — 실제로 `en_tr`·`_tr` 에서 두 번 그랬다.
+PY_FUNCS = ("tr", "N_", "_tr", "en_tr")
 
 SLOT_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
 HANGUL_RE = re.compile(r"[\u3131-\u318E\uAC00-\uD7A3]")

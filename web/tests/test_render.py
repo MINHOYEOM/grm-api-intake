@@ -9514,13 +9514,56 @@ class WebFindingsDocPageTest(unittest.TestCase):
         self.assertEqual(orphans, [], f"정본에 없는 문서 페이지: {orphans[:5]}")
 
     def test_sitemap_and_files_agree(self):
-        """유령 URL 금지 — sitemap 에 있는 문서 URL 은 전부 실제 파일이어야 한다."""
+        """유령 URL 금지 — sitemap 에 있는 문서 URL 은 전부 실제 파일이어야 한다.
+
+        ★[다국어 4단계 2026-09-04] 이제 두 언어 트리가 각자 문서 URL 을 낸다. 한국어는
+        전량, 영어는 **원문이 영어인 문서만**(doc_is_english). 한 정규식으로 뭉뚱그리면
+        영어분이 한국어 수를 부풀려 '정본과 다르다'로 오판한다 — 트리별로 센다."""
         import re as _re
-        urls = _re.findall(r"<loc>[^<]*/findings/doc/([^<]+?)/</loc>", self.sitemap)
-        self.assertEqual(len(urls), len(self.data["documents"]),
-                         "sitemap 문서 URL 수가 정본과 다르다")
-        ghosts = [u for u in urls if not (self.root / u / "index.html").exists()]
+        base = render.SITE_BASE_URL
+        ko_urls = _re.findall(
+            _re.escape(base) + r"/findings/doc/([^<]+?)/</loc>", self.sitemap)
+        en_urls = _re.findall(
+            _re.escape(base) + r"/en/findings/doc/([^<]+?)/</loc>", self.sitemap)
+        self.assertEqual(len(ko_urls), len(self.data["documents"]),
+                         "sitemap 한국어 문서 URL 수가 정본과 다르다")
+        expected_en = {d["slug"] for d in self.data["documents"]
+                       if render.doc_is_english(d)}
+        self.assertEqual(set(en_urls), expected_en,
+                         "sitemap 영어 문서 URL 이 '원문이 영어인 문서' 집합과 다르다")
+        self.assertLess(len(en_urls), len(ko_urls),
+                        "원문이 한국어인 문서가 하나도 안 걸러졌다(판정이 무력화됐다)")
+        ghosts = [u for u in ko_urls if not (self.root / u / "index.html").exists()]
         self.assertEqual(ghosts, [], f"sitemap 에만 있는 유령 URL: {ghosts[:5]}")
+        # self.root = <dist>/findings/doc → dist 루트는 두 단계 위.
+        en_root = self.root.parent.parent / "en" / "findings" / "doc"
+        en_ghosts = [u for u in en_urls if not (en_root / u / "index.html").exists()]
+        self.assertEqual(en_ghosts, [], f"영어 유령 URL: {en_ghosts[:5]}")
+
+    def test_english_pages_carry_the_regulator_wording(self):
+        """[다국어 4단계 2026-09-04] 영어 문서 페이지의 본문은 **규제기관이 쓴 원문**이어야
+        한다 — 한국어 번역을 영어 껍데기에 담지 않는다는 것이 그 트리의 존재 이유다.
+        이 클래스는 문서 렌더를 켠 채로 짓는 유일한 자리라 여기서 실제 HTML 로 확인한다."""
+        en_root = self.root.parent.parent / "en" / "findings" / "doc"
+        en_docs = [d for d in self.data["documents"] if render.doc_is_english(d)]
+        self.assertGreater(len(en_docs), 100, "영어로 낼 문서가 비정상적으로 적다")
+        checked = 0
+        for doc in en_docs[:30]:
+            path = en_root / doc["slug"] / "index.html"
+            self.assertTrue(path.is_file(), f"영어 문서 페이지 누락: {doc['slug']}")
+            html = path.read_text(encoding="utf-8")
+            bodies = re.findall(r'<p class="fd-text">(.*?)</p>', html, re.S)
+            self.assertTrue(bodies, doc["slug"])
+            for b in bodies:
+                self.assertNotRegex(b, "[가-힣]", f"{doc['slug']} 본문이 한국어다")
+            self.assertIn('<html lang="en">', html)
+            checked += 1
+        self.assertGreater(checked, 0)
+        # 원문이 한국어인 문서는 영어 페이지 자체가 없다.
+        for doc in [d for d in self.data["documents"]
+                    if not render.doc_is_english(d)][:20]:
+            self.assertFalse((en_root / doc["slug"] / "index.html").exists(),
+                             f"원문이 한국어인데 영어 페이지가 있다: {doc['slug']}")
 
     def test_headline_facts_present(self):
         """업체명·발행일·원문 링크 — 실명 기록 페이지에서 빠지면 안 되는 셋."""
@@ -14163,7 +14206,17 @@ class WebEnTreeTest(unittest.TestCase):
         }
         cls.en = {k: v for k, v in cls.pages.items() if k.startswith("en/")}
         cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        # [다국어 4단계] 선언 집합 = 셸/자료실 + **원문이 영어인 실사 문서 표면**.
+        # 문서 페이지는 렌더 스위치(_DOC_PAGES_IN_TESTS)로 꺼지므로 파일 비교에서는
+        # 빼고 본다 — 한국어 쪽과 같은 규율이다(sitemap 은 데이터에서, 파일은 스위치대로).
+        docs = render.load_findings_docs() or {}
+        cls.en_docs = [d for d in docs.get("documents", []) if render.doc_is_english(d)]
         cls.expected = render.en_tree_paths(render.load_library())
+        if cls.en_docs:
+            cls.expected |= {"findings/docs/", "findings/browse/"}
+            cls.expected |= {f"findings/docs/{d['agency'].lower()}"
+                             f"/{d['published_date'][:4]}/" for d in cls.en_docs}
+        cls.expected_doc_paths = {f"findings/doc/{d['slug']}/" for d in cls.en_docs}
 
     @classmethod
     def tearDownClass(cls):
@@ -14174,8 +14227,13 @@ class WebEnTreeTest(unittest.TestCase):
         """렌더가 실제로 낸 영어 페이지 = `en_tree_paths()` 선언. 둘이 갈라지면 nav·
         hreflang·sitemap 이 전부 없는 페이지를 가리키게 된다(선언이 유일한 원천)."""
         emitted = {k[len("en/"):-len("index.html")] for k in self.en}
-        self.assertEqual(emitted, self.expected)
+        self.assertEqual(emitted - self.expected_doc_paths, self.expected)
         self.assertGreaterEqual(len(emitted), 9, "영어 트리가 비정상적으로 작다")
+        # 문서 페이지는 켠 빌드에서만 파일이 있고(비싼 3천 장), 껐을 때도 선언·sitemap 에는
+        # 남는다 — 켰다면 선언한 것과 정확히 같아야 한다.
+        rendered_docs = {p for p in emitted if p.startswith("findings/doc/")}
+        if rendered_docs:
+            self.assertEqual(rendered_docs, self.expected_doc_paths)
 
     def test_every_en_page_has_a_korean_counterpart(self):
         """영어판은 한국어판에 있는 면만 낸다 — 영어에만 있는 면은 짝이 없어 hreflang 이
@@ -14185,9 +14243,14 @@ class WebEnTreeTest(unittest.TestCase):
                           f"영어판에만 있는 면: {path}")
 
     def test_korean_only_sections_are_absent_from_en(self):
-        """본문이 한국어인 면은 영어 트리에 없다(설계 문서 §7 4·5단계 대기)."""
+        """본문이 한국어인 면은 영어 트리에 없다(설계 문서 §7 5단계 대기).
+
+        ★[다국어 4단계 2026-09-04] 문서 표면(`findings/docs/`·`findings/browse/`)은 여기서
+        빠졌다 — `findings_docs.json` 에 원문(`text_orig`)이 들어와 본문이 영어로 성립하기
+        때문이다. 모음·조항 페이지는 아직 남아 있다(다음 단계)."""
         for path in ("archive/", "glossary/", "guide/", "quiz/",
-                     "findings/browse/", "findings/docs/", "findings/clause/"):
+                     "findings/clause/", "findings/c/", "findings/agency/",
+                     "findings/country/"):
             self.assertNotIn(path, self.expected)
             self.assertNotIn(f"en/{path}index.html", self.pages)
 
@@ -14210,9 +14273,10 @@ class WebEnTreeTest(unittest.TestCase):
 
     def test_unpaired_korean_pages_have_no_hreflang(self):
         """짝이 없는 면에 hreflang 을 달면 없는 페이지를 광고하는 것이다."""
+        paired = self.expected | self.expected_doc_paths
         unpaired = [k for k in self.pages
                     if not k.startswith("en/")
-                    and k[:-len("index.html")] not in self.expected
+                    and k[:-len("index.html")] not in paired
                     and k.endswith("index.html")]
         self.assertGreater(len(unpaired), 5, "검사 대상이 없다")
         for rel in unpaired[:40]:
@@ -14264,8 +14328,10 @@ class WebEnTreeTest(unittest.TestCase):
             body = re.sub(r'<link rel="alternate".*?/>', "", body, flags=re.S)
             body = re.sub(r'<a class="records-all" href="[^"]*" hreflang="ko".*?</a>',
                           "", body, flags=re.S)
-            for hrefs in re.findall(r'href="((?:\.\./)*)(archive/|glossary/|guide/|quiz/|briefs/|me/|findings/browse/|findings/docs/)',
-                                    body):
+            for hrefs in re.findall(
+                    r'href="((?:\.\./)*)(archive/|glossary/|guide/|quiz/|briefs/|me/'
+                    r'|findings/c/|findings/agency/|findings/country/|findings/clause/)',
+                    body):
                 self.fail(f"{rel} → 한국어 전용 섹션 링크: {''.join(hrefs)}")
 
     def test_en_nav_shows_only_sections_that_exist_in_english(self):
@@ -14375,6 +14441,60 @@ class WebEnTreeTest(unittest.TestCase):
         # 비공허 — 특히 **영어 트리**를 실제로 덮어야 의미가 있다(결함이 거기서 났다).
         self.assertGreater(checked, 10, f"상대경로 자산 검사가 비었다: {checked}")
         self.assertGreater(en_checked, 3, f"영어 트리 자산 검사가 비었다: {en_checked}")
+
+    # ── [다국어 4단계] 실사 문서 표면 ────────────────────────────────────────
+    def test_original_text_is_present_in_the_committed_data(self):
+        """`text_orig`(규제기관 원문)가 정본에 실려 있어야 영어 문서 페이지가 성립한다.
+        국문과 같으면 싣지 않는 규율이라, **다를 때만** 있는 것이 정상이다."""
+        docs = render.load_findings_docs() or {}
+        rows = [f for d in docs.get("documents", []) for f in d.get("findings", [])]
+        self.assertGreater(len(rows), 1000, "정본이 비었다")
+        with_orig = [f for f in rows if (f.get("text_orig") or "").strip()]
+        self.assertGreater(len(with_orig) * 100 // len(rows), 90,
+                           "원문이 실린 지적이 90% 미만 — 데이터 갱신이 빠졌다")
+        for f in with_orig[:500]:
+            self.assertNotEqual(f["text_orig"], f.get("text_ko"),
+                                "국문과 같은 원문을 실었다(중복 저장)")
+
+    # 영어 문서 페이지의 **본문**이 원문인지는 문서 렌더를 켠 빌드가 필요하다 —
+    # 그 검사는 이미 켠 채로 짓는 `WebFindingsDocPageTest` 가 맡는다(빌드 중복 금지).
+
+    def test_documents_with_korean_originals_stay_out_of_english(self):
+        """원문이 한국어인 문서(실측 131건·전부 식약처)는 영어 트리에 없다 — 번역 누락이
+        아니라 **원문이 한국어**라서다. 판정은 소스 이름이 아니라 값으로 한다."""
+        docs = render.load_findings_docs() or {}
+        ko_docs = [d for d in docs.get("documents", [])
+                   if not render.doc_is_english(d)]
+        self.assertGreater(len(ko_docs), 0, "판정이 아무것도 거르지 않았다")
+        for d in ko_docs:
+            self.assertNotIn(f"findings/doc/{d['slug']}/", self.expected_doc_paths)
+            self.assertNotIn(f"en/findings/doc/{d['slug']}/index.html", self.pages)
+        # 뺀 사실을 영어 문서 색인이 화면에 밝힌다(조용히 빼지 않는다).
+        idx = self.en.get("en/findings/docs/index.html")
+        if idx:
+            self.assertIn("original text is Korean", idx,
+                          "영어 문서 색인이 제외 사실을 밝히지 않는다")
+
+    def test_finding_body_prefers_the_reading_language(self):
+        row = {"text_ko": "국문", "text_orig": "English"}
+        self.assertEqual(render.finding_body(row, "ko"), "국문")
+        self.assertEqual(render.finding_body(row, "en"), "English")
+        # 한쪽이 없으면 있는 쪽 — 빈 화면보다 낫다.
+        self.assertEqual(render.finding_body({"text_ko": "국문"}, "en"), "국문")
+        self.assertEqual(render.finding_body({"text_orig": "only"}, "ko"), "only")
+        self.assertEqual(render.finding_body({}, "en"), "")
+
+    def test_data_labels_needed_by_english_pages_are_registered(self):
+        """기관 라벨은 **데이터에서** 오므로 추출기가 못 본다 — `DATA_LABEL_KEYS` 에
+        등록해야 카탈로그 검사가 본다. 새 기관이 편입되면 여기서 실패해야 한다."""
+        registered = set(render.DATA_LABEL_KEYS)
+        for source in (render.load_findings_docs() or {}, render.load_findings_facets() or {}):
+            for label in (source.get("agency_labels") or {}).values():
+                self.assertIn(label, registered,
+                              f"데이터 라벨 미등록: {label!r} — DATA_LABEL_KEYS 에 추가하라")
+        catalog = grm_i18n.load_catalog("en")
+        for key in registered:
+            self.assertIn(key, catalog, f"등록됐지만 번역이 없다: {key!r}")
 
     # ── sitemap ─────────────────────────────────────────────────────────────
     def test_sitemap_registers_the_en_tree_except_inspector(self):

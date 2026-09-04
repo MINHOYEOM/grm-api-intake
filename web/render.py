@@ -2004,6 +2004,50 @@ def build_facet_item_view(item: dict[str, Any],
     return view
 
 
+_HANGUL_RE = re.compile("[가-힣]")
+
+# [다국어 4단계 2026-09-04] **데이터에서 오는 표시 라벨**은 소스에 리터럴이 없어(값이
+# `findings_docs.json`·`findings_facets.json` 의 `agency_labels` 에서 온다) 문구 추출기가
+# 보지 못한다. 그래서 여기에 키로 등록한다 — 빠뜨리면 영어 빌드가 MissingTranslation 으로
+# **멈춘다**(조용히 한국어가 남는 것보다 낫다). 새 규제기관이 편입되면 이 목록도 함께
+# 늘어야 하고, 그 강제는 `WebEnFindingsTest` 가 데이터와 대조해 한다.
+# ★분류 라벨 20종은 이미 JS 맵(`CATEGORY_LABELS`)에 리터럴로 있어 자동 추출된다.
+DATA_LABEL_KEYS: tuple[str, ...] = (
+    N_("미국 FDA"), N_("캐나다 보건부"), N_("식품의약품안전처"),
+    N_("유럽 EMA"), N_("영국 MHRA"),
+)
+
+
+def finding_body(f: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
+    """지적 본문 — **읽는 언어를 먼저**. 영어판은 규제기관 원문(`text_orig`), 한국어판은
+    국문(`text_ko`). 한쪽이 비면 있는 쪽을 쓴다(빈 화면보다 낫다).
+
+    [다국어 4단계 2026-09-04] `text_orig` 는 `findings_docs_refresh.py` 가 국문과 다를 때만
+    싣는 필드다. 자르지 않는다 — 이 문장이 그 페이지의 색인 대상 본문이다.
+    """
+    ko = (f.get("text_ko") or "").strip()
+    if lang == DEFAULT_LANG:
+        return ko or (f.get("text_orig") or "").strip()
+    return (f.get("text_orig") or "").strip() or ko
+
+
+def doc_is_english(doc: dict[str, Any]) -> bool:
+    """이 문서를 **영어 트리에 낼 수 있는가** — 원문이 실제로 영어인가.
+
+    ★영어 껍데기에 한국어 본문을 담지 않는다는 것이 언어 트리의 유일한 기준이다. 판정은
+    소스 이름이 아니라 **값**으로 한다(그래야 원천이 바뀌어도 저절로 옳다). 실측(2026-09-04):
+    문서 3,305건 중 3,174건이 원문 전부 영어, 131건(전부 식약처)이 원문 한국어이고 **혼재는
+    0건**이라 문서 단위 판정이 깨끗하게 성립한다. 지적 기준으로는 21,499건 중 96%가 영어다.
+
+    빠진 131건은 번역이 누락된 것이 아니라 **원문이 한국어인 것**이다(식약처 지적의 영문화는
+    설계 문서가 별도 트랙으로 둔 일이다). 그 사실은 영어 문서 색인이 화면에 밝힌다.
+    """
+    findings = doc.get("findings") or []
+    if not findings:
+        return False
+    return not any(_HANGUL_RE.search(finding_body(f, "en")) for f in findings)
+
+
 def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | None":
     """문서 단위 페이지 정본 로드. 부재 시 None → 섹션이 조용히 꺼진다.
 
@@ -2160,7 +2204,9 @@ def build_doc_page_titles(documents: list[dict[str, Any]],
         if counts[key] == 1:
             out[d["slug"]] = key
             continue
-        cats = d.get("categories") or []
+        # [다국어 4단계] 제목을 넓히는 구분자도 화면 문구다 — 분류 라벨이 데이터에
+        # 한국어로 실려 있으므로 그 언어의 번역기를 태운다(영어 제목에 한국어가 섞였다).
+        cats = [tr(c) for c in (d.get("categories") or [])]
         widened = f"{key} · {cats[0]}" if cats else key
         second.setdefault(widened, []).append(d)
 
@@ -3356,6 +3402,22 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["i18nenjs_ver"] = hashlib.sha1(
         _i18n_en_js.encode("utf-8")).hexdigest()[:8]
 
+    # [다국어 3·4단계] 영어 트리 환경 — 여기서 만들어 두면 아래 페이지 루프가 언어마다
+    # 한 번씩 돌 수 있다(`trees`). 자산 해시·인증 메타·반응 게이트는 한국어 환경과 공유하고
+    # 문구 함수와 og:locale 만 갈아 끼운다.
+    en_tr = _en_translator
+    en_env = _make_env("en", en_tr)
+    for _k, _v in env.globals.items():
+        en_env.globals.setdefault(_k, _v)
+    en_env.globals["_"] = en_tr.template_gettext()
+    en_env.globals["og_locale"] = LANG_OG_LOCALE["en"]
+    en_page, _en_render, en_emit = _make_tree("en", en_env)
+    # (언어, page 팩토리, emit, 번역기) — 한국어가 **먼저**여야 산출 순서가 종전과 같다.
+    trees: list[tuple[str, Any, Any, Translator]] = [
+        (DEFAULT_LANG, page, emit, tr),
+        ("en", en_page, en_emit, en_tr),
+    ]
+
     # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 랜딩 카드·자료실 허브·아카이브 스트립이
     # 함께 쓰므로 세 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
     catalogs = load_library(tr=tr)
@@ -3385,6 +3447,20 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     clause_views = build_clause_views(docs_data, load_cfr_catalog(), load_glossary())
     clause_slugs = {c["slug"] for c in clause_views}
     doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
+
+    # ── [다국어 4단계 2026-09-04] 영어 트리에 실사 문서 표면을 더한다 ─────────────
+    # 3단계는 조회 화면(런타임 RPC)만 영어로 냈다. 정적 문서 페이지는 그때 `findings_docs.json`
+    # 에 원문이 없어 "영어 껍데기에 한국어 본문"이 될 수밖에 없었는데, 이제 `text_orig` 가
+    # 들어와 그 조건이 풀렸다. **원문이 실제로 영어인 문서만** 낸다(doc_is_english).
+    en_docs = [d for d in (docs_data or {}).get("documents", []) if doc_is_english(d)]
+    en_doc_slugs = {d["slug"] for d in en_docs}
+    if en_docs:
+        en_paths |= {f"findings/doc/{d['slug']}/" for d in en_docs}
+        en_paths.add("findings/docs/")
+        en_paths.add("findings/browse/")
+        # 기관×연도 목록은 **영어로 낼 문서가 있는 묶음만** 만든다(빈 목록 금지).
+        en_paths |= {f"findings/docs/{d['agency'].lower()}/{d['published_date'][:4]}/"
+                     for d in en_docs}
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).
@@ -3454,25 +3530,33 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [발견 허브] 최근 공개 문서 — 문서 페이지 정본(findings_docs.json)에서 공개일
     # 내림차순 5건(동일 날짜는 slug 로 갈라 결정론 유지). 검색 결과와 달리 fetch 없이
     # 첫 화면에서 바로 보이는 정적 미리보기라, 스냅샷 기준일(measured_on)을 함께 적는다.
-    recent_docs = []
-    if docs_data:
-        for d in sorted(docs_data.get("documents", []),
-                        key=lambda x: (x.get("published_date", ""), x.get("slug", "")),
-                        reverse=True)[:5]:
+    def _recent_doc_views(pool: "list[dict[str, Any]]", lang_: str,
+                          tr_: Translator) -> list[dict[str, Any]]:
+        """최근 공개 문서 미리보기 — 발췌는 **읽는 언어의 본문**에서 뽑는다."""
+        out: list[dict[str, Any]] = []
+        for d in sorted(pool, key=lambda x: (x.get("published_date", ""),
+                                             x.get("slug", "")), reverse=True)[:5]:
             first = (d.get("findings") or [{}])[0]
-            snippet = " ".join(str(first.get("text_ko", "")).split())
+            snippet = " ".join(finding_body(first, lang_).split())
             if len(snippet) > 92:
                 snippet = snippet[:92].rstrip() + "…"
             agency = d.get("agency", "")
-            agency_label = ((facets or {}).get("agency_labels") or {}).get(agency, agency)
-            recent_docs.append({
+            raw_label = ((facets or {}).get("agency_labels") or {}).get(agency, agency)
+            agency_label = tr_(raw_label) if raw_label != agency else agency
+            out.append({
                 "date": d.get("published_date", ""),
                 "src_label": doc_source_label(d) or agency_label,
                 "firm": d.get("firm_name", ""),
                 "slug": d.get("slug", ""),
-                "cats": (d.get("categories") or [])[:2],
+                "cats": [tr_(c) for c in (d.get("categories") or [])[:2]],
                 "snippet": snippet,
             })
+        return out
+
+    recent_docs = (_recent_doc_views(docs_data.get("documents", []), lang, tr)
+                   if docs_data else [])
+    # 영어 둘러보기 면의 최근 문서 — 영어로 낼 문서만(정의가 위 함수라 여기서 만든다).
+    en_recent_docs = _recent_doc_views(en_docs, "en", en_tr) if en_docs else []
 
     # 지적사항 검색(FIND-1 M3c) — 라이브 데이터(Supabase PostgREST)라 빌드시 목록을 고정할
     # 수 없다. 서버는 셸(로딩 상태)만 렌더 — env 미설정이면 findings.js 가 "준비 중" 안내로
@@ -3487,16 +3571,29 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
 
     # [2면 분리] 둘러보기 면 — 정적 렌더 전용(fetch 0, 커밋된 스냅샷에서 나옴).
-    emit("findings_browse.html", page("findings/browse/"),
-        browse_axes=browse_axes,
-        zone_totals=findings_zone,
-        recent_docs=recent_docs,
-        recent_asof=(docs_data or {}).get("measured_on", ""),
-        has_docs=bool(docs_data and docs_data.get("documents")),
-        page_title=tr("지적사항 둘러보기 · GRM"),
-        nav_active="findings",
-        description=tr(FINDINGS_BROWSE_DESCRIPTION),
-    )
+    # [다국어 4단계] 영어판에도 낸다 — 문서 표면이 생겼으므로 진입면이 필요하다.
+    #   ★영어에서는 **문서 축만** 싣는다(분류·국가·기관 모음 페이지는 아직 한국어 트리
+    #     전용이라 링크하면 없는 페이지로 보낸다). 최근 문서 발췌도 영어로 낼 문서만 쓴다.
+    for _lg, _mkpage, _emit, _tr in trees:
+        if _lg != DEFAULT_LANG and "findings/browse/" not in en_paths:
+            continue
+        _axes = browse_axes if _lg == DEFAULT_LANG else ([{
+            "href": "findings/docs/",
+            "title": _tr("문서로 찾기"),
+            "blurb": _tr("실사 문서 {n}건을 기관·연도로 묶어 봅니다.",
+                         n=f"{len(en_docs):,}"),
+        }] if en_docs else [])
+        _recent = recent_docs if _lg == DEFAULT_LANG else en_recent_docs
+        _emit("findings_browse.html", _mkpage("findings/browse/"),
+            browse_axes=_axes,
+            zone_totals=findings_zone,
+            recent_docs=_recent,
+            recent_asof=(docs_data or {}).get("measured_on", ""),
+            has_docs=bool(docs_data and docs_data.get("documents")),
+            page_title=_tr("지적사항 둘러보기 · GRM"),
+            nav_active="findings",
+            description=_tr(FINDINGS_BROWSE_DESCRIPTION),
+        )
 
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
     # 수 없다(집계는 Supabase RPC findings_stats/findings_firm_stats 를 trends.js 가 직접
@@ -3839,6 +3936,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         documents = docs_data.get("documents") or []
         # 제목은 슬러그별로 유일해야 한다 — 겹치면 검색 결과에서 서로 구분되지 않는다.
         doc_titles = build_doc_page_titles(documents, tr)
+        # [다국어 4단계] 언어별 제목·기관 라벨. 제목의 유일성 계산은 언어 안에서 따로
+        # 돌아야 한다(번역 뒤 겹칠 수 있으므로 같은 함수를 그 언어 번역기로 다시 부른다).
+        doc_titles_by_lang = {DEFAULT_LANG: doc_titles}
+        agency_labels_by_lang = {DEFAULT_LANG: doc_agency_labels}
+        for _lg, _p, _e, _t in trees:
+            if _lg == DEFAULT_LANG:
+                continue
+            doc_titles_by_lang[_lg] = build_doc_page_titles(documents, _t)
+            agency_labels_by_lang[_lg] = {
+                k: _t(v) for k, v in doc_agency_labels.items()}
 
         # [실사관 프로파일 문서목록 멤버십 2026-08-31] 실사관 프로파일 페이지(런타임
         # RPC 화면)가 "이 실사관이 서명한 문서" 목록에서 정적 문서 페이지(findings/doc/
@@ -3957,53 +4064,117 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 곳이 테스트 빌드에서만 없어져 **링크 무결성 검사가 프로덕션과 다른 것을 보게 된다**
         # (실제로 404 링크 검사가 이걸 잡았다).
         docs_total = f"{docs_data['totals']['documents']:,}"
-        emit("findings_doc_list.html", docs_index,
-             page_title=tr("문서로 찾기 · GRM"),
-             nav_active="findings",
-             # [P1.5 잔재 수리 2026-08-27] "지적 3건 이상" 임계 문구는 면제
-             # 규칙 도입으로 더 이상 사실이 아니다 — 화면 고지는 고쳤는데
-             # meta description 이 낡은 채 남아 있었다(검색 스니펫이 먼저 거짓말).
-             description=tr("규제기관이 공개한 실사 문서 {n}건을 기관·연도로"
-                            " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
-                            "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
-                            " 우리말로 볼 수 있습니다.", n=docs_total),
-             # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
-             json_ld=docs_index.breadcrumb_json_ld([
-                 (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (tr("문서로 찾기"), "")]),
-             mode="index", heading=tr("문서로 찾기"),
-             lede=tr("규제기관이 공개한 실사 문서 <b>{n}</b>건을 기관과 연도로"
-                     " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
-                     " 우리말로 보실 수 있습니다.", n=docs_total),
-             groups=index_groups)
+        # [다국어 4단계] 영어 색인은 **영어로 낸 문서만** 센다(3,174/3,305). 빠진 것은
+        # 원문이 한국어인 식약처 문서이고, 그 사실을 화면이 밝힌다(아래 en_excluded).
+        en_by_ay: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for d in en_docs:
+            en_by_ay.setdefault((d["agency"], d["published_date"][:4]), []).append(d)
+        for _bucket in en_by_ay.values():
+            _bucket.sort(key=lambda x: (x["published_date"], x["slug"]), reverse=True)
+        for _lg, _mkpage, _emit, _tr in trees:
+            _by_ay = by_ay if _lg == DEFAULT_LANG else en_by_ay
+            if not _by_ay:
+                continue
+            _idx_page = docs_index if _lg == DEFAULT_LANG else _mkpage("findings/docs/")
+            _agencies = sorted({a for a, _ in _by_ay},
+                               key=lambda a: -sum(len(v) for (aa, _), v in _by_ay.items()
+                                                  if aa == a))
+            _groups = [{
+                "slug": a.lower(),
+                "label_ko": _tr(doc_agency_labels[a]) if a in doc_agency_labels else a,
+                "total": sum(len(v) for (aa, _), v in _by_ay.items() if aa == a),
+                "years": [{"year": y, "count": len(_by_ay[(a, y)])}
+                          for y in sorted({yy for aa, yy in _by_ay if aa == a},
+                                          reverse=True)],
+            } for a in _agencies]
+            _total = (docs_total if _lg == DEFAULT_LANG
+                      else f"{sum(len(v) for v in _by_ay.values()):,}")
+            # ★영어판은 뺀 문서 수를 밝힌다 — 원문이 한국어라 못 낸 것이지 누락이 아니다.
+            _excluded = len(documents) - len(en_docs)
+            # ★`<b>` 는 렌더러가 쓴 강조 마크업이라 그대로 나가야 한다 — 문자열로 넘기면
+            #   autoescape 가 `&lt;b&gt;` 로 바꿔 화면에 태그가 글자로 보인다(라이브에
+            #   실재하던 결함, 2026-09-04 발견). 값은 전부 렌더러·정본 파생이고 사용자
+            #   입력이 없어 Markup 으로 감싸는 것이 안전하다.
+            _lede = Markup(
+                _tr("규제기관이 공개한 실사 문서 <b>{n}</b>건을 기관과 연도로"
+                    " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
+                    " 우리말로 보실 수 있습니다.", n=_total)
+                if _lg == DEFAULT_LANG or not _excluded else
+                _tr("규제기관이 공개한 실사 문서 <b>{n}</b>건을 기관과 연도로"
+                    " 묶었습니다. 원문이 한국어인 문서 {k}건은 이 목록에 없습니다.",
+                    n=_total, k=f"{_excluded:,}"))
+            _emit("findings_doc_list.html", _idx_page,
+                 page_title=_tr("문서로 찾기 · GRM"),
+                 nav_active="findings",
+                 # [P1.5 잔재 수리 2026-08-27] "지적 3건 이상" 임계 문구는 면제
+                 # 규칙 도입으로 더 이상 사실이 아니다 — 화면 고지는 고쳤는데
+                 # meta description 이 낡은 채 남아 있었다(검색 스니펫이 먼저 거짓말).
+                 description=_tr("규제기관이 공개한 실사 문서 {n}건을 기관·연도로"
+                                 " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
+                                 "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
+                                 " 우리말로 볼 수 있습니다.", n=_total),
+                 # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
+                 json_ld=_idx_page.breadcrumb_json_ld([
+                     (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                     (_tr("문서로 찾기"), "")]),
+                 mode="index", heading=_tr("문서로 찾기"),
+                 lede=_lede,
+                 groups=_groups)
 
-        for g in index_groups:
-            for y in g["years"]:
-                bucket = by_ay[(g["slug"].upper(), y["year"])]
-                list_page = page(f"findings/docs/{g['slug']}/{y['year']}/")
-                verb = date_axis_verb(bucket, tr)
-                heading = tr("{agency} · {year}년", agency=g["label_ko"], year=y["year"])
-                emit("findings_doc_list.html", list_page,
-                     page_title=tr("{agency} {year}년 실사 문서 · GRM",
-                                   agency=g["label_ko"], year=y["year"]),
-                     nav_active="findings",
-                     description=tr("{agency}가 {year}년에 {verb} 실사 문서 {n}건의"
-                                    " 지적사항을 우리말로 정리했습니다.",
-                                    agency=g["label_ko"], year=y["year"], verb=verb,
-                                    n=f"{y['count']:,}"),
-                     # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
-                     json_ld=list_page.breadcrumb_json_ld([
-                         (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
-                         (tr("문서로 찾기"), "findings/docs/"),
-                         (heading, "")]),
-                     mode="list",
-                     heading=heading,
-                     lede=tr("{agency}가 {year}년에 {verb} 실사 문서 <b>{n}</b>건입니다."
-                             " 문서를 열면 그 실사의 지적을 모두 보실 수 있습니다.",
-                             agency=g["label_ko"], year=y["year"], verb=verb,
-                             n=f"{y['count']:,}"),
-                     documents=bucket, agency_slug=g["slug"],
-                     agency_label=g["label_ko"], year=y["year"],
-                     sibling_years=g["years"])
+        for _lg, _mkpage, _emit, _tr in trees:
+            # 언어별로 **그 언어에 낼 문서**만 묶는다. 영어는 목록·연도·건수가 전부
+            # 영어 문서 기준이라, 열어 보면 없는 문서를 세는 일이 없다.
+            _by_ay = by_ay if _lg == DEFAULT_LANG else en_by_ay
+            if not _by_ay:
+                continue
+            _agencies = sorted({a for a, _ in _by_ay},
+                               key=lambda a: -sum(len(v) for (aa, _), v in _by_ay.items()
+                                                  if aa == a))
+            _groups = [{
+                "slug": a.lower(),
+                "label_ko": _tr(doc_agency_labels[a]) if a in doc_agency_labels else a,
+                "total": sum(len(v) for (aa, _), v in _by_ay.items() if aa == a),
+                "years": [{"year": y, "count": len(_by_ay[(a, y)])}
+                          for y in sorted({yy for aa, yy in _by_ay if aa == a},
+                                          reverse=True)],
+            } for a in _agencies]
+            for g in _groups:
+                for y in g["years"]:
+                    bucket = _by_ay[(g["slug"].upper(), y["year"])]
+                    list_page = _mkpage(f"findings/docs/{g['slug']}/{y['year']}/")
+                    verb = date_axis_verb(bucket, _tr)
+                    heading = _tr("{agency} · {year}년", agency=g["label_ko"],
+                                  year=y["year"])
+                    _emit("findings_doc_list.html", list_page,
+                         page_title=_tr("{agency} {year}년 실사 문서 · GRM",
+                                        agency=g["label_ko"], year=y["year"]),
+                         nav_active="findings",
+                         description=_tr("{agency}가 {year}년에 {verb} 실사 문서 {n}건의"
+                                         " 지적사항을 우리말로 정리했습니다.",
+                                         agency=g["label_ko"], year=y["year"], verb=verb,
+                                         n=f"{y['count']:,}"),
+                         # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
+                         json_ld=list_page.breadcrumb_json_ld([
+                             (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                             (_tr("문서로 찾기"), "findings/docs/"),
+                             (heading, "")]),
+                         mode="list",
+                         heading=heading,
+                         # `<b>` 는 렌더러 강조 마크업 — 위 색인과 같은 이유로 Markup.
+                         lede=Markup(
+                             _tr("{agency}가 {year}년에 {verb} 실사 문서 <b>{n}</b>건입니다."
+                                 " 문서를 열면 그 실사의 지적을 모두 보실 수 있습니다.",
+                                 agency=g["label_ko"], year=y["year"], verb=verb,
+                                 n=f"{y['count']:,}")),
+                         # 목록 행의 분류 칩도 데이터가 한국어다 — 언어 트리에 맞춰
+                         # 번역한 사본을 넘긴다(정본 무변형).
+                         documents=(bucket if _lg == DEFAULT_LANG else
+                                    [{**d, "categories": [_tr(c) for c in
+                                                          (d.get("categories") or [])]}
+                                     for d in bucket]),
+                         agency_slug=g["slug"],
+                         agency_label=g["label_ko"], year=y["year"],
+                         sibling_years=g["years"])
 
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
@@ -4032,32 +4203,63 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             # 용어가 여러 지적에 나와도 첫 곳 하나만 링크된다.
             selected = (select_doc_term_links(doc, term_link_index, term_doc_freq)
                         if term_link_index else [])
-            linked_used: set[str] = set()
-            finding_bodies = [
-                link_terms_in_text(f.get("text_ko") or "", selected, doc_page.rel_root,
-                                   linked_used)
-                for f in doc.get("findings") or []
-            ]
-            emit("findings_doc.html", doc_page,
-                page_title=tr("{title} · GRM", title=doc_titles[doc["slug"]]),
-                nav_active="findings",
-                description=doc_page_description(doc, doc_agency_labels, tr),
-                # [B2] 화면 빵부스러기와 동일(findings_doc.html: 홈 › 지적사항 검색 ›
-                # 규제기관별 › 업체명). 이 4천 장이 SERP 에서 날 슬러그를 보이던 자리다.
-                json_ld=doc_page.breadcrumb_json_ld([
-                    (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
-                    (tr("규제기관별"), "findings/agency/"), (doc["firm_name"], "")]),
-                doc=doc, agency_labels=doc_agency_labels,
-                source_label=doc_source_label(doc),
-                # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
-                # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
-                inspector_line=doc_inspector_line(doc, tr),
-                related_categories=related, same_firm=same_firm,
-                finding_bodies=finding_bodies,
-                # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
-                # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
-                firm_page_slug=firm_page_slug_by_key.get(doc.get("firm_key") or ""),
-            )
+            # [다국어 4단계] 언어 트리마다 한 장씩 — 뷰모델은 같고 **본문과 라벨만** 언어를
+            # 따른다. 영어판은 원문이 실제로 영어인 문서에만 낸다(doc_is_english).
+            for _lg, _mkpage, _emit, _tr in trees:
+                if _lg != DEFAULT_LANG and doc["slug"] not in en_doc_slugs:
+                    continue
+                _pp = (doc_page if _lg == DEFAULT_LANG
+                       else _mkpage(f"findings/doc/{doc['slug']}/"))
+                # 용어 링크는 한국어 용어사전으로 가는 것이라 영어판에는 걸지 않는다
+                # (없는 페이지로 보내는 링크 금지 — 영어 용어사전은 미착수).
+                _sel = selected if _lg == DEFAULT_LANG else []
+                _used: set[str] = set()
+                _labels = agency_labels_by_lang[_lg]
+                # 분류 라벨은 **데이터에 한국어로** 실려 있고 템플릿이 그대로 찍는다 —
+                # 언어 트리에 맞춰 뷰에서 번역한 사본을 넘긴다(정본 데이터는 무변형).
+                _doc = doc if _lg == DEFAULT_LANG else {
+                    **doc,
+                    "categories": [_tr(c) for c in (doc.get("categories") or [])],
+                    "findings": [{**f, "category_label_ko":
+                                  _tr(f["category_label_ko"])
+                                  if f.get("category_label_ko") else ""}
+                                 for f in (doc.get("findings") or [])],
+                }
+                _emit("findings_doc.html", _pp,
+                    page_title=_tr("{title} · GRM",
+                                   title=doc_titles_by_lang[_lg][doc["slug"]]),
+                    nav_active="findings",
+                    description=doc_page_description(doc, doc_agency_labels, _tr),
+                    # [B2] 화면 빵부스러기와 동일(findings_doc.html: 홈 › 지적사항 검색 ›
+                    # 규제기관별 › 업체명). 이 4천 장이 SERP 에서 날 슬러그를 보이던 자리다.
+                    # [B2] 마크업은 **화면 빵부스러기와 같은 순서·같은 이름**이어야 한다
+                    # (구글 요건) — 위 템플릿이 언어에 따라 중간 마디를 바꾸므로 여기도 같이.
+                    json_ld=_pp.breadcrumb_json_ld([
+                        (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                        ((_tr("규제기관별"), "findings/agency/")
+                         if _lg == DEFAULT_LANG else
+                         (_tr("문서로 찾기"), "findings/docs/")),
+                        (doc["firm_name"], "")]),
+                    doc=_doc, agency_labels=_labels,
+                    source_label=doc_source_label(doc),
+                    # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
+                    # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
+                    inspector_line=doc_inspector_line(doc, _tr),
+                    # ★없는 페이지로 보내지 않는다 — 분류 모음·업체 정적 페이지는 아직
+                    #   한국어 트리에만 있다(다음 단계). 영어판에서는 링크를 만들지 않고,
+                    #   같은 업체 기록은 **영어로 낸 문서만** 남긴다.
+                    related_categories=(related if _lg == DEFAULT_LANG else []),
+                    same_firm=(same_firm if _lg == DEFAULT_LANG else
+                               [s for s in same_firm if s["slug"] in en_doc_slugs]),
+                    finding_bodies=[
+                        link_terms_in_text(finding_body(f, _lg), _sel, _pp.rel_root, _used)
+                        for f in doc.get("findings") or []
+                    ],
+                    # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
+                    # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
+                    firm_page_slug=(firm_page_slug_by_key.get(doc.get("firm_key") or "")
+                                    if _lg == DEFAULT_LANG else None),
+                )
 
         # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),
         # 실제 렌더는 문서 페이지와 같은 스위치를 탄다 — 이 페이지로 들어오는 링크가
@@ -4183,15 +4385,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 그린다(EN_TREE_STATIC 주석에 무엇을 왜 넣고 뺐는지 적어 두었다). 페이지 주소는 같은
     # PagePath 공장에서, 문구는 같은 사전에서 나오므로 두 트리가 갈라질 자리가 없다.
     #
-    # 화면 스크립트용 사전(`assets/i18n-en.js`)은 자산 복사 직후에 이미 냈다(위 참조).
-    en_tr = _en_translator
-    en_env = _make_env("en", en_tr)
-    for _k, _v in env.globals.items():          # 자산 해시·인증 메타·반응 게이트 공유
-        en_env.globals.setdefault(_k, _v)
-    en_env.globals["_"] = en_tr.template_gettext()
-    en_env.globals["og_locale"] = LANG_OG_LOCALE["en"]
-    en_page, _en_render, en_emit = _make_tree("en", en_env)
-
+    # 화면 스크립트용 사전(`assets/i18n-en.js`)과 영어 환경(en_tr·en_page·en_emit)은
+    # 자산 복사 직후에 이미 만들었다(위 참조). 여기서는 남은 셸 페이지만 그린다.
     # 자료실은 카탈로그 카피(제목·소개·유형 라벨)가 사전을 타므로 영어로 다시 읽는다.
     en_catalogs = load_library(tr=en_tr)
     en_library_updates = load_library_updates(en_catalogs)

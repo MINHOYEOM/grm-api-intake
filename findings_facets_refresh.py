@@ -140,9 +140,14 @@ def _sample_view(doc: dict[str, Any], finding: dict[str, Any]) -> dict[str, Any]
     원문 절단으로 이미 두 번 데였다(deep_analysis·경고서한 조각). 길이 조절은 표시층(CSS)의
     일이지 데이터의 일이 아니다.
     """
+    # [다국어 4단계 2026-09-04] 규제기관 원문 — 영어판 모음 페이지의 사례 본문이 이것이다.
+    # 국문과 **다를 때만** 싣는다(원문이 한국어인 지적은 같은 문장을 두 번 적게 된다).
+    _ko = finding.get("finding_text_ko") or ""
+    _orig = (finding.get("finding_text") or "").strip()
     return {
         "finding_id": finding["finding_id"],
-        "text_ko": finding.get("finding_text_ko") or "",
+        "text_ko": _ko,
+        **({"text_orig": _orig} if _orig and _orig != _ko else {}),
         "agency": finding.get("agency") or doc.get("agency") or "",
         "firm_name": finding.get("firm_name") or doc.get("firm_name") or "",
         "published_date": finding.get("published_date") or doc.get("published_date") or "",

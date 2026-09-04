@@ -14729,6 +14729,164 @@ class WebEnFirmPageTest(unittest.TestCase):
         self.assertEqual((v1["doc_count"], v1["finding_count"]), (1, 2))
 
 
+class WebEnFacetTest(unittest.TestCase):
+    """[다국어 2026-09-04] 영어판 모음 페이지 — 숫자는 영어 모집단에서 다시 잰 값이다.
+
+    ★한국어 집계를 영어면에 실으면 **화면의 건수와 그 페이지가 보내는 검색 결과가
+      갈린다.** 실측으로 `data_integrity` 는 134건 중 50%가 한국어 원문이라 두 배
+      어긋난다. 그래서 같은 생산자를 축만 바꿔 한 번 더 돌린 별도 정본
+      (`findings_facets_en.json`, `--orig-lang en`)을 쓴다.
+    ★사후 필터(표본에서 한글만 제거)로는 안 된다 — 표본만 고쳐지고 `findings`·
+      `documents`·`by_agency` 가 한국어인 채로 남아 머리 숫자가 거짓이 된다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.ko_data = render.load_findings_facets()
+        cls.en_data = (render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
+                       if render.FINDINGS_FACETS_EN_FILE.exists() else None)
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enfacet_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _en_paths_from_data(self):
+        """영어 정본이 선언한 면 집합 — 손으로 적지 않고 데이터에서 파생한다."""
+        want = set()
+        for axis in self.en_data["axes"]:
+            meta = render.facet_meta(axis["axis"], render._KO)
+            want.add(f"findings/{meta['path']}/")
+            for it in axis["items"]:
+                want.add(f"findings/{meta['path']}/{it['slug']}/")
+        cat = render.facet_meta("category", render._KO)
+        for c in (self.en_data["combos"] or {}).get("items") or []:
+            want.add(f"findings/{cat['path']}/{c['category_slug']}/{c['slug']}/")
+        return want
+
+    def test_english_facet_data_declares_its_population(self):
+        """파일 이름이 아니라 **데이터 자신**이 어느 모집단인지 말해야 한다."""
+        self.assertIsNotNone(self.en_data, "findings_facets_en.json 이 없다")
+        self.assertEqual(self.en_data.get("orig_lang"), "en")
+        self.assertEqual(self.en_data.get("schema_version"), "grm-findings-facets/v2")
+        # 한국어 정본은 그 키를 갖지 않는다(기존 파일을 건드리지 않았다는 뜻).
+        self.assertIsNone((self.ko_data or {}).get("orig_lang"))
+
+    def test_emitted_pages_match_the_english_data_exactly(self):
+        want = self._en_paths_from_data()
+        got = {p.parent.relative_to(self.out / "en").as_posix() + "/"
+               for p in (self.out / "en" / "findings").rglob("index.html")
+               if p.parent.name not in ("findings",)}
+        got = {g for g in got
+               if g.startswith(("findings/c/", "findings/country/", "findings/agency/"))}
+        self.assertTrue(want, "영어 정본에 면이 하나도 없다")
+        self.assertEqual(sorted(want - got), [], "선언했는데 안 나온 면")
+        self.assertEqual(sorted(got - want), [], "정본에 없는데 나온 면")
+
+    def test_counts_come_from_the_english_population(self):
+        """★같은 축 항목의 건수가 한국어판과 **달라야** 한다(모집단이 다르므로).
+
+        같으면 둘 중 하나다 — 영어 데이터를 안 쓰고 있거나, 그 항목이 우연히 전부
+        영어 원문이거나. 그래서 '한 항목이라도 달라야 한다'로 본다.
+        """
+        ko_cat = {it["slug"]: it["findings"]
+                  for a in self.ko_data["axes"] if a["axis"] == "category"
+                  for it in a["items"]}
+        en_cat = {it["slug"]: it["findings"]
+                  for a in self.en_data["axes"] if a["axis"] == "category"
+                  for it in a["items"]}
+        shared = sorted(set(ko_cat) & set(en_cat))
+        self.assertTrue(shared)
+        self.assertTrue(any(en_cat[s] < ko_cat[s] for s in shared),
+                        "영어 건수가 한국어와 전부 같다 — 영어 정본을 안 쓰고 있다")
+        # 그리고 화면에 그 값이 실려야 한다(데이터만 맞고 렌더가 옛 값이면 소용없다).
+        meta = render.facet_meta("category", render._KO)
+        for slug in shared[:8]:
+            html = (self.out / "en" / "findings" / meta["path"] / slug
+                    / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f"{en_cat[slug]:,}", html,
+                          f"{slug}: 영어 건수 {en_cat[slug]:,} 가 화면에 없다")
+
+    def test_no_korean_body_on_english_facet_pages(self):
+        hangul = re.compile(r"[가-힣]")
+        bad = []
+        for rel in sorted(self._en_paths_from_data()):
+            p = self.out / "en" / rel / "index.html"
+            if not p.is_file():
+                continue
+            html = p.read_text(encoding="utf-8")
+            body = re.sub(r"(?s)<(script|style)\b.*?</\1>", "", html)
+            body = re.sub(r"(?s)<!--.*?-->", "", body)
+            text = re.sub(r"(?s)<[^>]+>", " ", body)
+            hits = [h for h in re.findall(r"\S{0,14}[가-힣]+\S{0,14}", text)
+                    if h.strip() != "한국어"]
+            if hits:
+                bad.append((rel, hits[:3]))
+        self.assertEqual(bad, [], f"영문 모음 페이지에 한국어 잔존: {bad[:3]}")
+
+    def test_sample_links_point_at_documents_that_exist_in_this_tree(self):
+        """사례 → 문서 링크는 **그 트리에 있는 문서**로만 잇는다."""
+        missing = []
+        for rel in sorted(self._en_paths_from_data()):
+            p = self.out / "en" / rel / "index.html"
+            if not p.is_file():
+                continue
+            html = p.read_text(encoding="utf-8")
+            for href in re.findall(r'href="([^"#?]*findings/doc/[^"?]+/)"', html):
+                slug = href.rstrip("/").rsplit("/", 1)[-1]
+                if not (self.out / "en" / "findings" / "doc" / slug
+                        / "index.html").is_file():
+                    missing.append(f"{rel} -> {slug}")
+        self.assertEqual(missing, [], f"영어판에 없는 문서로 보낸다: {missing[:5]}")
+
+    def test_korean_only_items_get_no_english_page_and_no_pairing(self):
+        """★영어에서 표본 미달로 빠진 항목은 짝을 만들지 않는다.
+
+        한국어 페이지에 hreflang 만 붙고 그쪽에 페이지가 없으면, 검색엔진에게
+        "영어판이 있다"고 말해 놓고 404 를 주는 것이다.
+        """
+        meta = render.facet_meta("category", render._KO)
+        ko_slugs = {it["slug"] for a in self.ko_data["axes"] if a["axis"] == "category"
+                    for it in a["items"]}
+        en_slugs = {it["slug"] for a in self.en_data["axes"] if a["axis"] == "category"
+                    for it in a["items"]}
+        # 조합 축은 영어에서 실제로 줄어든다(실측 52 → 36) — 거기서 확인한다.
+        cat = render.facet_meta("category", render._KO)
+        ko_combo = {(c["category_slug"], c["slug"])
+                    for c in (self.ko_data["combos"] or {}).get("items") or []}
+        en_combo = {(c["category_slug"], c["slug"])
+                    for c in (self.en_data["combos"] or {}).get("items") or []}
+        dropped = sorted(ko_combo - en_combo)
+        self.assertTrue(dropped, "영어에서 빠진 조합이 없다 — 이 가드가 아무것도 안 지킨다")
+        for cat_slug, combo_slug in dropped[:12]:
+            rel = f"findings/{cat['path']}/{cat_slug}/{combo_slug}/"
+            self.assertFalse((self.out / "en" / rel / "index.html").is_file(),
+                             f"{rel}: 영어 정본에 없는데 페이지가 났다")
+            ko_html = (self.out / rel / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn(f'hreflang="en" href="{render.SITE_BASE_URL}/en/{rel}"',
+                             ko_html, f"{rel}: 없는 영어판을 짝이라고 말한다")
+        self.assertLessEqual(len(en_slugs), len(ko_slugs))
+
+    def test_every_english_facet_page_is_in_the_sitemap(self):
+        for rel in sorted(self._en_paths_from_data()):
+            if not (self.out / "en" / rel / "index.html").is_file():
+                continue
+            self.assertIn(f"<loc>{render.SITE_BASE_URL}/en/{rel}</loc>", self.sitemap,
+                          f"{rel}: sitemap 누락")
+
+    def test_producer_threads_the_axis_through_every_call(self):
+        """생산자가 축을 **후보 목록에도** 물어야 한다 — 여기만 빼면 excluded 사유가 거짓이 된다."""
+        src = (pathlib.Path(WEB_DIR).parent / "findings_facets_refresh.py").read_text(
+            encoding="utf-8")
+        self.assertEqual(src.count('"p_orig_lang": orig_lang'), 3,
+                         "root(dash)·축·조합 세 곳 전부에 실어야 한다")
+        self.assertIn('ap.add_argument("--orig-lang"', src)
+        self.assertIn('"orig_lang": orig_lang,', src, "산출물이 모집단을 스스로 밝혀야 한다")
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 

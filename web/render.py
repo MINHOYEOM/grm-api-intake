@@ -57,6 +57,11 @@ GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
 FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
+# [다국어 2026-09-04] 영어 트리용 같은 정본 — **영어 모집단으로 다시 잰 값**이다
+# (`findings_facets_refresh.py --orig-lang en`). 한국어 파일을 받아 표본에서 한글만
+# 걸러 쓰지 않는 이유는, 그러면 표본만 고쳐지고 건수·문서수·기관 구성이 한국어인 채로
+# 남아 **화면의 머리 숫자가 거짓**이 되기 때문이다.
+FINDINGS_FACETS_EN_FILE = WEB_DIR / "data" / "findings_facets_en.json"
 FINDINGS_DOCS_FILE = WEB_DIR / "data" / "findings_docs.json"      # [검색 유입] 문서 단위 페이지 정본(findings_docs_refresh.py · 임계 3 + 소스 소거 면제)
 QUIZ_FILE = WEB_DIR / "data" / "quiz_bank.json"      # [주간 퀴즈] 정본 문항 뱅크(커밋 데이터)
 ASSETS_DIR = WEB_DIR / "assets"
@@ -3578,6 +3583,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 가는 **유일한 진입 간선**(홈 BFS 도달 28/3,520 이던 고립을 메운 경로)도 이 데이터로
     # 렌더한다. 파일 로드일 뿐이라 렌더 비용이 아니다.
     facets = load_findings_facets()
+    # 파일이 없으면 영어 모음 페이지가 0장이 된다 — 그건 의도된 상태다(생기면 저절로
+    # 선다). 스키마가 어긋나면 로더가 실패한다 — 빈 페이지 수십 장을 내보내지 않는다.
+    facets_en = load_findings_facets(FINDINGS_FACETS_EN_FILE)
     docs_data = load_findings_docs()
     # [조항 페이지] 조항 뷰는 **용어사전보다 먼저** 만든다 — 용어사전의 "관련 조항"이
     # 실제로 만들어진 조항 페이지에만 링크를 걸어야 하기 때문(없는 페이지로 보내는 링크는
@@ -3922,23 +3930,33 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # facets·docs_data·doc_slugs 는 findings 셸 렌더 직전에 이미 읽어 두었다(진입 간선
     # 카드가 그 데이터를 필요로 한다) — 여기서 다시 읽지 않는다.
     # (경로, lastmod) — lastmod 는 데이터에 실제 날짜가 있을 때만 채운다.
+    # ── [다국어 2026-09-04] 모음 페이지를 언어 트리마다 그린다 ────────────────
+    # ★영어판은 **영어 모집단으로 다시 잰 데이터**(`findings_facets_en.json`)를 쓴다.
+    #   한국어 집계를 그대로 실으면 화면의 건수와 그 페이지가 보내는 검색 결과가 갈린다 —
+    #   실측으로 `data_integrity` 는 134건 중 50%가 한국어 원문이라 두 배 어긋난다.
+    #   사후 필터(표본에서 한글만 제거)로는 표본만 고쳐지고 머리 숫자가 거짓으로 남는다.
+    # 사례 → 문서 링크는 **그 트리에 있는 문서**로만 잇는다(link_doc_slugs).
     facet_paths: list[tuple[str, str]] = []
-    if facets:
-        agency_labels = facets.get("agency_labels") or {}
-        measured_on = facets.get("measured_on") or ""
+    en_facet_paths: set[str] = set()
+
+    def emit_facet_tree(facets_data, mkpage, emit_page, tr, lang_key, link_doc_slugs):
+        if not facets_data:
+            return
+        agency_labels = facets_data.get("agency_labels") or {}
+        measured_on = facets_data.get("measured_on") or ""
         # 분류 슬러그 → 그 분류의 조합(기관) 목록. 분류 페이지가 진입 간선을 걸 때와
         # 조합 페이지를 쓸 때 같은 원천을 본다(두 곳에서 따로 세면 갈라진다).
         combos_by_category: dict[str, list[dict[str, Any]]] = {}
-        for combo in ((facets.get("combos") or {}).get("items") or []):
+        for combo in ((facets_data.get("combos") or {}).get("items") or []):
             combos_by_category.setdefault(combo["category_slug"], []).append(combo)
-        for axis in facets.get("axes") or []:
+        for axis in facets_data.get("axes") or []:
             axis_key = axis["axis"]
             meta = facet_meta(axis_key, tr)            # 모르는 축 = KeyError(조용한 누락 금지)
-            items = [build_facet_item_view(it, doc_slugs) for it in axis.get("items") or []]
+            items = [build_facet_item_view(it, link_doc_slugs) for it in axis.get("items") or []]
             siblings = [{"slug": it["slug"], "label_ko": it["label_ko"]} for it in items]
 
-            axis_page = page(f"findings/{meta['path']}/")
-            emit("findings_facet_index.html", axis_page,
+            axis_page = mkpage(f"findings/{meta['path']}/")
+            emit_page("findings_facet_index.html", axis_page,
                 page_title=tr("{title} · GRM", title=meta["title"]),
                 nav_active="findings",
                 description=meta["index_lede"],
@@ -3955,7 +3973,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             axis_mod = max((s.get("published_date") or ""
                             for it in items for s in it.get("samples") or []),
                            default="")
-            facet_paths.append((axis_page.site_path, axis_mod))
+            if lang_key == DEFAULT_LANG:
+                facet_paths.append((axis_page.site_path, axis_mod))
+            else:
+                en_facet_paths.add(f"findings/{meta['path']}/")
 
             for item in items:
                 # 조합 페이지(분류 × 기관)로 가는 진입 간선 — 분류 축에서만, 그리고 그
@@ -3965,9 +3986,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                      "label": c["agency_label_ko"], "findings": c["findings"]}
                     for c in combos_by_category.get(item["slug"], [])
                 ] if axis_key == "category" else []
-                item_page = page(f"findings/{meta['path']}/{item['slug']}/")
+                item_page = mkpage(f"findings/{meta['path']}/{item['slug']}/")
                 item_label = tr(item["label_ko"])
-                emit("findings_facet.html", item_page,
+                emit_page("findings_facet.html", item_page,
                     page_title=tr("{label} {suffix} · GRM", label=item_label,
                                   suffix=meta["headline_suffix"]),
                     nav_active="findings",
@@ -3996,7 +4017,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 )
                 item_mod = max((s.get("published_date") or ""
                                 for s in item.get("samples") or []), default="")
-                facet_paths.append((item_page.site_path, item_mod))
+                if lang_key == DEFAULT_LANG:
+                    facet_paths.append((item_page.site_path, item_mod))
+                else:
+                    en_facet_paths.add(f"findings/{meta['path']}/{item['slug']}/")
 
         # ── [검색 유입 2차] 분류 × 기관 조합 페이지 ─────────────────────────────
         # 사람들이 치는 말은 주제 하나가 아니라 "기관 + 주제"다("FDA 무균 지적사항").
@@ -4007,7 +4031,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             sibs = [{"slug": c["slug"], "label_ko": c["agency_label_ko"]}
                     for c in combo_items]
             for combo in combo_items:
-                view = build_facet_item_view(combo, doc_slugs)
+                view = build_facet_item_view(combo, link_doc_slugs)
                 # by_agency 막대는 조합에선 뜻이 없다(기관이 하나뿐이라 100% 한 줄) —
                 # 데이터에 아예 넣지 않아 템플릿의 {% if %} 가 섹션을 지운다.
                 view["by_agency"] = []
@@ -4015,8 +4039,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 category_label = tr(combo["category_label_ko"])
                 label = tr("{agency} {category}", agency=agency_label, category=category_label)
                 base = f"findings/{cat_meta['path']}/{cat_slug}/"
-                combo_page = page(f"{base}{combo['slug']}/")
-                emit("findings_facet.html", combo_page,
+                combo_page = mkpage(f"{base}{combo['slug']}/")
+                emit_page("findings_facet.html", combo_page,
                     page_title=tr("{label} 지적사항 · GRM", label=label),
                     nav_active="findings",
                     description=combo_description(combo, tr),
@@ -4046,7 +4070,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 )
                 combo_mod = max((s.get("published_date") or ""
                                  for s in view.get("samples") or []), default="")
-                facet_paths.append((combo_page.site_path, combo_mod))
+                if lang_key == DEFAULT_LANG:
+                    facet_paths.append((combo_page.site_path, combo_mod))
+                else:
+                    en_facet_paths.add(f"{base}{combo['slug']}/")
+
+    emit_facet_tree(facets, page, emit, tr, DEFAULT_LANG, doc_slugs)
+    if facets_en:
+        emit_facet_tree(facets_en, en_page, en_emit, en_tr, "en", en_doc_slugs)
+        en_paths |= en_facet_paths
 
     # [조항 페이지] 21 CFR 조항별 지적사례 — 색인 1장 + 조항 34장.
     # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라

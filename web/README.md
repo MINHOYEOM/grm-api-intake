@@ -126,6 +126,17 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    갈라지지 않게 한다.
    ★문서 행의 분류 라벨과 **대표 발췌**도 언어를 탄다(`d.excerpt` = `finding_body(f, lang)`).
    템플릿이 `text_ko` 를 직접 읽으면 영어 페이지에 한국어 문장이 실린다 — 실제로 그랬다.
+12. **영어판 모음 페이지는 영어 모집단으로 다시 잰 정본을 쓴다(2026-09-04)** —
+   `findings_facets_en.json`(`findings_facets_refresh.py --orig-lang en`). 한국어 파일을
+   받아 표본에서 한글만 걸러 쓰지 않는다: 그러면 표본만 고쳐지고 `findings`·`documents`·
+   `by_agency` 가 한국어인 채로 남아 **화면의 머리 숫자가 거짓**이 된다(실측 —
+   `data_integrity` 는 134건 중 50%가 한국어 원문이라 두 배 어긋난다).
+   ★생산자는 축을 **후보 목록(dash)에도** 물어야 한다. 거기만 빼면 한국어 모집단의 후보에
+   영어 집계가 붙어, 영어로는 0건인 항목이 "표본 미달"로 빠진다 — 결과는 같아 보여도
+   `excluded` 사유가 거짓이 된다.
+   ★렌더는 두 트리가 `emit_facet_tree()` **한 함수**를 데이터·주소·번역자만 달리 받아 돈다.
+   사례→문서 링크는 그 트리에 있는 문서로만 잇고(`link_doc_slugs`), 영어에서 표본 미달로
+   빠진 항목은 **한국어 쪽에 hreflang 도 붙이지 않는다**(없는 영어판을 짝이라 말하지 않는다).
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

@@ -46,6 +46,8 @@ jobs:
       BRANCH: automation/findings-facets-auto-${{ github.run_id }}
       GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
       DATA_PATH: web/data/findings_facets.json
+      # [다국어 2026-09-04] 영어 트리용 같은 정본 — 원문이 영어인 지적만 센 값.
+      DATA_PATH_EN: web/data/findings_facets_en.json
     steps:
       - uses: actions/checkout@v6.0.2
         with:
@@ -66,11 +68,10 @@ jobs:
         id: before
         run: |
           set -euo pipefail
-          if [ -f "$DATA_PATH" ]; then
-            echo "items=$(jq '[.axes[].items[], (.combos.items // [])[]] | length' "$DATA_PATH")" >> "$GITHUB_OUTPUT"
-          else
-            echo "items=0" >> "$GITHUB_OUTPUT"
-          fi
+          count() { [ -f "$1" ] && jq '[.axes[].items[], (.combos.items // [])[]] | length' "$1" || echo 0; }
+          # ★두 언어를 **합쳐서** 센다. 따로 세면 한쪽이 통째로 사라져도 다른 쪽 숫자가
+          #   그대로라 축소 가드가 침묵한다(조합 51장 증발 사고와 같은 모양).
+          echo "items=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))" >> "$GITHUB_OUTPUT"
 
       # 스크립트가 0건 가드·표본 미달 제외·모르는 기관 코드·실패율 상한을 스스로 판정하고,
       # 위반이면 아무것도 쓰지 않은 채 exit 1 한다(잡 상태 빨강으로 드러난다).
@@ -84,25 +85,36 @@ jobs:
           # 한 주 내내 낡은 채로 나갔다. 스크립트는 위반이면 **아무것도 쓰지 않고** exit 1
           # 하므로 재시도가 안전하다(멱등). 결정론적 실패(0건 가드·표본 미달·기관 코드)는
           # 3회 모두 같게 실패해 잡이 그대로 빨강으로 남는다 — 게이트는 약해지지 않는다.
-          for attempt in 1 2 3; do
-            if python findings_facets_refresh.py \
-                 --supabase-url "$SUPABASE_URL" \
-                 --supabase-anon-key "$SUPABASE_ANON_KEY" \
-                 --min-findings "$MIN_FINDINGS"; then
-              exit 0
-            fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "::warning::퍼셋 갱신 실패(${attempt}/3) — 60초 후 재시도"
-              sleep 60
-            fi
-          done
-          echo "::error::퍼셋 갱신 3회 모두 실패 — 결정론적 실패이거나 Supabase 지속 장애"
-          exit 1
+          # [다국어 2026-09-04] 갈래가 둘이다 — 한국어(전체 모집단)와 영어(원문이 영어인
+          # 지적만). 영어면에 한국어 집계를 실으면 화면의 건수와 그 페이지가 보내는 검색
+          # 결과가 갈리므로, 사후 필터가 아니라 **서버에 다시 물어** 따로 만든다.
+          run_pass() {                       # $1=라벨  $2=출력경로  $3=--orig-lang 값
+            for attempt in 1 2 3; do
+              if python findings_facets_refresh.py \
+                   --supabase-url "$SUPABASE_URL" \
+                   --supabase-anon-key "$SUPABASE_ANON_KEY" \
+                   --min-findings "$MIN_FINDINGS" \
+                   --orig-lang "$3" \
+                   --out "$2"; then
+                return 0
+              fi
+              if [ "$attempt" -lt 3 ]; then
+                echo "::warning::$1 퍼셋 갱신 실패(${attempt}/3) — 60초 후 재시도"
+                sleep 60
+              fi
+            done
+            echo "::error::$1 퍼셋 갱신 3회 모두 실패 — 결정론적 실패이거나 Supabase 지속 장애"
+            return 1
+          }
+          # ★한쪽만 갱신된 상태를 커밋하지 않는다. 두 파일은 같은 화면의 두 언어판이라,
+          #   한쪽이 낡으면 같은 페이지의 한국어판과 영어판이 다른 주를 말하게 된다.
+          run_pass "한국어" "$DATA_PATH" "" || exit 1
+          run_pass "영어" "$DATA_PATH_EN" "en" || exit 1
 
       - name: Detect meaningful changes
         id: changes
         run: |
-          if git diff --quiet -- "$DATA_PATH"; then
+          if git diff --quiet -- "$DATA_PATH" "$DATA_PATH_EN"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "모음 페이지 데이터 변경 없음 — PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
           else
@@ -117,7 +129,8 @@ jobs:
         id: gate
         run: |
           set -euo pipefail
-          AFTER=$(jq '[.axes[].items[], (.combos.items // [])[]] | length' "$DATA_PATH")
+          count() { [ -f "$1" ] && jq '[.axes[].items[], (.combos.items // [])[]] | length' "$1" || echo 0; }
+          AFTER=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))
           BEFORE='${{ steps.before.outputs.items }}'
           echo "after=$AFTER" >> "$GITHUB_OUTPUT"
           # GHA 표현식에는 산술이 없다 — 계산은 전부 셸에서 한다.
@@ -141,7 +154,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$DATA_PATH" web/tests/golden
+          git add -- "$DATA_PATH" "$DATA_PATH_EN" web/tests/golden
           git commit -m "chore: refresh findings facet pages"
           git push -u origin "$BRANCH"
           SUMMARY=$(jq -r '.axes[] | "- \(.axis): 페이지 \(.items | length)개 · 제외 \(.excluded | length)개"' "$DATA_PATH")

@@ -137,7 +137,7 @@
     <section class="fx-sec">
       <h2 class="fx-sec-h">{{ sibling_title }}</h2>
       <div class="fx-sibs">
-        {%- for s in siblings %}<a href="{{ rel_root }}{{ sibling_base }}{{ s.slug }}/"{% if s.slug == item.slug %} class="on" aria-current="page"{% endif %}>{{ s.label_ko }}</a>{% endfor %}
+        {%- for s in siblings %}<a href="{{ rel_root }}{{ sibling_base }}{{ s.slug }}/"{% if s.slug == item.slug %} class="on" aria-current="page"{% endif %}>{{ s.label }}</a>{% endfor %}
       </div>
     </section>
     {% endif %}

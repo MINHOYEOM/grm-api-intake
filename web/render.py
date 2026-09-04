@@ -87,7 +87,8 @@ from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E4
 if str(WEB_DIR) not in sys.path:
     sys.path.insert(0, str(WEB_DIR))
 from grm_i18n import (  # noqa: E402
-    KO as _KO, SUPPORTED_LANGS, Translator, build_js_catalog, noop as N_,
+    KO as _KO, SUPPORTED_LANGS, MissingTranslation, Translator, build_js_catalog,
+    noop as N_,
 )
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
@@ -2074,6 +2075,51 @@ def firm_page_view(key: str, slug: str, rows: list[dict[str, Any]]) -> dict[str,
     }
 
 
+# [다국어 2026-09-04] 모음 축의 **제외 사유**는 생산자가 만든 문장이라 소스에 리터럴이
+# 없다(추출기가 못 본다). 어휘가 닫혀 있으므로 여기에 등록하고, 모르는 사유를 만나면
+# **실패**한다 — 조용히 한국어를 내보내는 것보다 빌드가 멈추는 편이 낫다
+# (`AGENCY_LABELS_KO` 에 없는 기관 코드를 생산자가 거부하는 것과 같은 규율).
+FACET_REASON_KEYS: tuple[str, ...] = (
+    N_("한국어 표기 없음(정본 맵 미수록)"), N_("국가 미상(원문에 표기 없음)"),
+    N_("조회 실패"), N_("표본 미달(<{n})"),
+    N_("분류 독점({a}/{b}={pct}%) — 부모 페이지의 복제본"),
+)
+_FACET_REASON_SHORTFALL = re.compile(r"^표본 미달\(<(\d+)\)$")
+_FACET_REASON_DOMINANT = re.compile(
+    r"^분류 독점\((\d[\d,]*)/(\d[\d,]*)=([\d.]+)%\) — 부모 페이지의 복제본$")
+
+
+def facet_tree_paths(facets_data: "dict[str, Any] | None") -> "set[str]":
+    """이 정본이 만들어 낼 면 집합 — 렌더와 테스트가 **같은 함수**에서 파생한다."""
+    if not facets_data:
+        return set()
+    out: set[str] = set()
+    for axis in facets_data.get("axes") or []:
+        path = facet_meta(axis["axis"], _KO)["path"]
+        out.add(f"findings/{path}/")
+        out |= {f"findings/{path}/{it['slug']}/" for it in axis.get("items") or []}
+    cat = facet_meta("category", _KO)["path"]
+    out |= {f"findings/{cat}/{c['category_slug']}/{c['slug']}/"
+            for c in ((facets_data.get("combos") or {}).get("items") or [])}
+    return out
+
+
+def facet_excluded_reason(reason: str, tr: Translator = _KO) -> str:
+    """제외 사유 한 줄 — 값이 박힌 사유는 값만 뽑아 번역문에 다시 끼운다."""
+    m = _FACET_REASON_SHORTFALL.match(reason)
+    if m:
+        return tr("표본 미달(<{n})", n=m.group(1))
+    m = _FACET_REASON_DOMINANT.match(reason)
+    if m:
+        return tr("분류 독점({a}/{b}={pct}%) — 부모 페이지의 복제본",
+                  a=m.group(1), b=m.group(2), pct=m.group(3))
+    if reason in FACET_REASON_KEYS:
+        return tr(reason)
+    raise MissingTranslation(
+        f"모르는 모음 제외 사유: {reason!r} — FACET_REASON_KEYS 에 등록하세요"
+        " (조용히 한국어를 내보내지 않습니다).")
+
+
 def build_facet_item_view(item: dict[str, Any],
                           doc_slugs: "set[str] | None" = None) -> dict[str, Any]:
     """항목 1건의 표시용 투영 — 값 무변형, 파생은 막대 비율뿐.
@@ -3937,12 +3983,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   사후 필터(표본에서 한글만 제거)로는 표본만 고쳐지고 머리 숫자가 거짓으로 남는다.
     # 사례 → 문서 링크는 **그 트리에 있는 문서**로만 잇는다(link_doc_slugs).
     facet_paths: list[tuple[str, str]] = []
-    en_facet_paths: set[str] = set()
 
     def emit_facet_tree(facets_data, mkpage, emit_page, tr, lang_key, link_doc_slugs):
         if not facets_data:
             return
-        agency_labels = facets_data.get("agency_labels") or {}
+        # ★기관 라벨은 **데이터에 한국어로** 실려 있고 템플릿이 그대로 찍는다.
+        #   CI 가 `/en/findings/agency/` 에서 '미국·캐나다 보건부'를 잡아냈다.
+        agency_labels = {k: tr(v) for k, v in
+                         (facets_data.get("agency_labels") or {}).items()}
         measured_on = facets_data.get("measured_on") or ""
         # 분류 슬러그 → 그 분류의 조합(기관) 목록. 분류 페이지가 진입 간선을 걸 때와
         # 조합 페이지를 쓸 때 같은 원천을 본다(두 곳에서 따로 세면 갈라진다).
@@ -3953,14 +4001,21 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             axis_key = axis["axis"]
             meta = facet_meta(axis_key, tr)            # 모르는 축 = KeyError(조용한 누락 금지)
             items = [build_facet_item_view(it, link_doc_slugs) for it in axis.get("items") or []]
-            siblings = [{"slug": it["slug"], "label_ko": it["label_ko"]} for it in items]
+            # 표시용 이름은 언어를 타고, `label_ko` 는 정본 값으로 남는다(무변형).
+            # 한 번만 번역해 돌려 쓴다 — 두 번 걸면 이미 영어인 값이 사전에 없어 실패한다.
+            for _v in items:
+                _v["label"] = tr(_v["label_ko"])
+            siblings = [{"slug": it["slug"], "label": it["label"]} for it in items]
+            excluded_view = [
+                {**ex, "reason": facet_excluded_reason(ex.get("reason", ""), tr)}
+                for ex in (axis.get("excluded") or [])]
 
             axis_page = mkpage(f"findings/{meta['path']}/")
             emit_page("findings_facet_index.html", axis_page,
                 page_title=tr("{title} · GRM", title=meta["title"]),
                 nav_active="findings",
                 description=meta["index_lede"],
-                axis=meta, items=items, excluded=axis.get("excluded") or [],
+                axis=meta, items=items, excluded=excluded_view,
                 # [B2] 화면 빵부스러기와 동일한 순서·이름(findings_facet_index.html 참조).
                 json_ld=axis_page.breadcrumb_json_ld([
                     (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (meta["title"], "")]),
@@ -3975,19 +4030,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                            default="")
             if lang_key == DEFAULT_LANG:
                 facet_paths.append((axis_page.site_path, axis_mod))
-            else:
-                en_facet_paths.add(f"findings/{meta['path']}/")
 
             for item in items:
                 # 조합 페이지(분류 × 기관)로 가는 진입 간선 — 분류 축에서만, 그리고 그
                 # 분류에 실제로 만들어진 조합에만 건다(없는 페이지로 보내는 링크 금지).
                 narrow = [
                     {"href": f"findings/{meta['path']}/{item['slug']}/{c['slug']}/",
-                     "label": c["agency_label_ko"], "findings": c["findings"]}
+                     "label": tr(c["agency_label_ko"]), "findings": c["findings"]}
                     for c in combos_by_category.get(item["slug"], [])
                 ] if axis_key == "category" else []
                 item_page = mkpage(f"findings/{meta['path']}/{item['slug']}/")
-                item_label = tr(item["label_ko"])
+                item_label = item["label"]
                 emit_page("findings_facet.html", item_page,
                     page_title=tr("{label} {suffix} · GRM", label=item_label,
                                   suffix=meta["headline_suffix"]),
@@ -4019,8 +4072,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                 for s in item.get("samples") or []), default="")
                 if lang_key == DEFAULT_LANG:
                     facet_paths.append((item_page.site_path, item_mod))
-                else:
-                    en_facet_paths.add(f"findings/{meta['path']}/{item['slug']}/")
 
         # ── [검색 유입 2차] 분류 × 기관 조합 페이지 ─────────────────────────────
         # 사람들이 치는 말은 주제 하나가 아니라 "기관 + 주제"다("FDA 무균 지적사항").
@@ -4028,7 +4079,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 부모에 진입 간선을 이미 걸었으므로 이 페이지들은 고립되지 않는다.
         cat_meta = facet_meta("category", tr)
         for cat_slug, combo_items in combos_by_category.items():
-            sibs = [{"slug": c["slug"], "label_ko": c["agency_label_ko"]}
+            sibs = [{"slug": c["slug"], "label": tr(c["agency_label_ko"])}
                     for c in combo_items]
             for combo in combo_items:
                 view = build_facet_item_view(combo, link_doc_slugs)
@@ -4072,13 +4123,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                  for s in view.get("samples") or []), default="")
                 if lang_key == DEFAULT_LANG:
                     facet_paths.append((combo_page.site_path, combo_mod))
-                else:
-                    en_facet_paths.add(f"{base}{combo['slug']}/")
 
+    # ★영어 면 집합을 **그리기 전에** 데이터에서 파생해 `en_paths` 에 넣는다.
+    #   렌더 도중에 넣으면 한국어 모음 페이지가 먼저 그려지는 동안 짝을 몰라
+    #   hreflang·언어 전환이 한쪽에만 붙는다(단방향 짝은 짝이 아니다).
+    if facets_en:
+        en_paths |= facet_tree_paths(facets_en)
     emit_facet_tree(facets, page, emit, tr, DEFAULT_LANG, doc_slugs)
     if facets_en:
         emit_facet_tree(facets_en, en_page, en_emit, en_tr, "en", en_doc_slugs)
-        en_paths |= en_facet_paths
 
     # [조항 페이지] 21 CFR 조항별 지적사례 — 색인 1장 + 조항 34장.
     # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라

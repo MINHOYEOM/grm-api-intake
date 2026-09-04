@@ -14747,7 +14747,10 @@ class WebEnFacetTest(unittest.TestCase):
                        if render.FINDINGS_FACETS_EN_FILE.exists() else None)
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enfacet_"))
         cls.out = cls._tmp / "site"
-        _build_single(cls.out)
+        # ★문서 페이지를 **켠 채로** 짓는다 — 사례 → 문서 링크가 실제로 이어지는지가
+        #   이 클래스의 검사 항목이고, 끄면 그 경로가 통째로 검사 밖으로 나간다
+        #   (WebZoneIaTest 가 도달성을 잴 때 같은 판단을 한다).
+        _build_single(cls.out, doc_pages=True)
         cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
 
     @classmethod
@@ -14755,17 +14758,8 @@ class WebEnFacetTest(unittest.TestCase):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def _en_paths_from_data(self):
-        """영어 정본이 선언한 면 집합 — 손으로 적지 않고 데이터에서 파생한다."""
-        want = set()
-        for axis in self.en_data["axes"]:
-            meta = render.facet_meta(axis["axis"], render._KO)
-            want.add(f"findings/{meta['path']}/")
-            for it in axis["items"]:
-                want.add(f"findings/{meta['path']}/{it['slug']}/")
-        cat = render.facet_meta("category", render._KO)
-        for c in (self.en_data["combos"] or {}).get("items") or []:
-            want.add(f"findings/{cat['path']}/{c['category_slug']}/{c['slug']}/")
-        return want
+        """영어 정본이 선언한 면 집합 — 렌더가 쓰는 **그 함수**에서 파생한다."""
+        return render.facet_tree_paths(self.en_data)
 
     def test_english_facet_data_declares_its_population(self):
         """파일 이름이 아니라 **데이터 자신**이 어느 모집단인지 말해야 한다."""
@@ -14919,6 +14913,11 @@ class WebEnTreeTest(unittest.TestCase):
             cls.expected |= {f"findings/docs/{d['agency'].lower()}"
                              f"/{d['published_date'][:4]}/" for d in cls.en_docs}
         cls.expected_doc_paths = {f"findings/doc/{d['slug']}/" for d in cls.en_docs}
+        # [다국어 2026-09-04] 모음 면은 영어 정본에서 파생된다 — 렌더가 쓰는 바로 그
+        # 함수를 쓴다(테스트가 따로 세면 두 목록이 갈라지고, 그건 이 가드가 막으려던 것이다).
+        cls.en_facets = (render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
+                         if render.FINDINGS_FACETS_EN_FILE.exists() else None)
+        cls.expected |= render.facet_tree_paths(cls.en_facets)
 
     @classmethod
     def tearDownClass(cls):
@@ -14949,10 +14948,13 @@ class WebEnTreeTest(unittest.TestCase):
 
         ★[다국어 4단계 2026-09-04] 문서 표면(`findings/docs/`·`findings/browse/`)은 여기서
         빠졌다 — `findings_docs.json` 에 원문(`text_orig`)이 들어와 본문이 영어로 성립하기
-        때문이다. 모음·조항 페이지는 아직 남아 있다(다음 단계)."""
+        때문이다.
+        ★[2026-09-04] 모음 축(`findings/c/`·`agency/`·`country/`)도 빠졌다 — 영어 모집단으로
+        다시 잰 정본(`findings_facets_en.json`)이 생겨 건수까지 영어판이 성립한다.
+        조항(`findings/clause/`)은 표본을 `text_ko` 로 모으고 국문 용어사전으로 링크해
+        아직 남아 있다."""
         for path in ("archive/", "glossary/", "guide/", "quiz/",
-                     "findings/clause/", "findings/c/", "findings/agency/",
-                     "findings/country/"):
+                     "findings/clause/"):
             self.assertNotIn(path, self.expected)
             self.assertNotIn(f"en/{path}index.html", self.pages)
 
@@ -15032,7 +15034,7 @@ class WebEnTreeTest(unittest.TestCase):
                           "", body, flags=re.S)
             for hrefs in re.findall(
                     r'href="((?:\.\./)*)(archive/|glossary/|guide/|quiz/|briefs/|me/'
-                    r'|findings/c/|findings/agency/|findings/country/|findings/clause/)',
+                    r'|findings/clause/)',
                     body):
                 self.fail(f"{rel} → 한국어 전용 섹션 링크: {''.join(hrefs)}")
 

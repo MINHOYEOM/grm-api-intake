@@ -37,7 +37,7 @@
     <div class="fi-grid">
       {%- for it in items %}
       <a class="fi-card" href="{{ rel_root }}findings/{{ axis.path }}/{{ it.slug }}/">
-        <span class="fi-card-t">{{ it.label_ko }}</span>
+        <span class="fi-card-t">{{ it.label }}</span>
         <span class="fi-card-n">{{ _("지적 <b>{a}</b>건 · 문서 <b>{b}</b>건", a="{:,}".format(it.findings), b="{:,}".format(it.documents)) }}</span>
       </a>
       {%- endfor %}

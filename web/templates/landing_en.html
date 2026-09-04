@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [다국어 3단계 2026-09-04] 영어판 홈.
+
+    한국어 랜딩(landing.html)을 그대로 번역하지 않는다 — 그 면의 뼈대가 **주간 브리프**
+    (히어로 이슈카드·"이번 주 소식 읽기"·인기 카드·주간 퀴즈)인데 영어판에는 그 물건이
+    없기 때문이다(영문 브리프는 설계 문서 §7 5단계). 없는 것을 광고하는 홈보다, 있는 것을
+    정확히 말하는 홈이 낫다.
+
+    그래서 이 면이 말하는 것은 하나다: **영어판의 본체는 지적사항 데이터베이스와 자료실**.
+    ★그리고 무엇이 영어가 아닌지도 같이 밝힌다(#scope) — 나중에 한국어 페이지로 떨어진
+      독자가 "고장난 사이트"로 읽지 않도록. 이 저장소의 "모르는 것을 아는 척하지 않는다"
+      규율을 언어판에 적용한 것이다.
+
+    마크업은 landing.html 과 같은 grm.css 클래스만 쓴다(디자인 동결 — 새 CSS 0). -#}
+<main>
+  <div class="wrap hero">
+    <div class="hero-top"><span>{{ _("제약 GMP · 품질 규제소식") }}</span><span class="r">English edition</span></div>
+    <div class="hero-grid">
+      <div>
+        <span class="kick reveal" style="animation-delay:.05s">Global Regulatory Monitor</span>
+        <h1 class="reveal" style="animation-delay:.12s">{{ _('규제 지적사항을<br>한 곳에서 <span class="c">검색</span>하세요.') }}</h1>
+        <p class="lede reveal" style="animation-delay:.2s">{{ _("여덟 개 규제기관이 공개한 실사 지적사항을 하나의 분류 체계로 정규화해 무료로 공개합니다. 대부분의 지적은 규제기관이 쓴 영어 원문 그대로 보실 수 있습니다.") }}</p>
+        <div class="hero-cta reveal" style="animation-delay:.28s">
+          <a class="btn coral lg" href="{{ rel_root }}findings/index.html">{{ _("지적사항 검색 열기 ") }}<i class="ti ti-arrow-right"></i></a>
+          <a class="btn lg" href="{{ rel_root }}library/index.html">{{ _("자료실 보기") }}</a>
+        </div>
+      </div>
+      {% if findings_zone %}
+      <div>
+        <div class="issuecard reveal" style="animation-delay:.2s">
+          <div class="top"><span class="dot"></span><span class="dot g"></span><span class="dot y"></span><span class="d">Findings database · Live</span></div>
+          <div class="body">
+            <div class="vol">{{ _("공개 지적 {n}건 · 문서 {d}건", n=findings_zone.findings, d=findings_zone.documents) }}</div>
+            <h3>{{ _("FDA 483 · Warning Letter · 캐나다 실사 · EU/영국 GMP 비준수 · 식약처") }}</h3>
+            <div class="win">{{ _("기관 · 국가 · 주제로 좁혀 보실 수 있습니다.") }}</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <section class="section" id="records"><div class="wrap">
+    <span class="kick">Findings Database</span>
+    <h2 class="sec-title">{{ _("실사에서 실제로 지적된 문장들") }}</h2>
+    <p class="records-sub">{{ _("규제기관이 공개한 실사 문서에서 지적 문장을 뽑아 하나의 분류 체계로 정규화했습니다. 대부분 규제기관이 쓴 영어 원문 그대로입니다.") }}</p>
+    <div class="records-grid">
+      <a class="records-card" href="{{ rel_root }}findings/firm/index.html"><b>{{ _("이 거래처, 과거에 무엇을 지적받았나요?") }}</b><span>{{ _("업체 이름으로 지적 이력 조회") }}</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/inspector/index.html"><b>{{ _("이 실사관이 서명한 문서에는 무엇이 있었나요?") }}</b><span>{{ _("실사관 이름으로 이력 조회") }}</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/checklist/index.html"><b>{{ _("실사 준비, 무엇부터 점검할까요?") }}</b><span>{{ _("빈발 조항 기반 자가점검") }}</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/trends/index.html"><b>{{ _("요즘 어떤 지적이 늘고 있나요?") }}</b><span>{{ _("최근 12개월 지적 경향") }}</span></a>
+    </div>
+    <a class="records-all" href="{{ rel_root }}findings/index.html">{{ _("규제 지적사항 전체 화면 →") }}</a>
+  </div></section>
+
+  {% if library %}
+  <section class="section soft"><div class="wrap">
+    <span class="kick">Library</span>
+    <h2 class="sec-title">{{ _("규제 원문을 다시 찾을 곳") }}</h2>
+    <p class="records-sub">{{ _("FDA·EMA·PIC/S·ICH·WHO·식약처 등 {c}개 카탈로그 {n}건의 지침·기준서를 공식 원문 링크와 함께 모았습니다.", c=library.catalog_count, n=library.item_count) }}</p>
+    <a class="records-all" href="{{ rel_root }}library/index.html">{{ _("자료실 전체 보기 →") }}</a>
+  </div></section>
+  {% endif %}
+
+  {# ★영어판의 경계를 밝힌다 — 없는 것을 감추면 독자가 한국어 페이지에 떨어졌을 때
+     사이트가 고장난 줄 안다. 한국어판으로 가는 길을 함께 준다. #}
+  <section class="section" id="scope"><div class="wrap">
+    <span class="kick">Scope</span>
+    <h2 class="sec-title">{{ _("영어로 제공되는 범위") }}</h2>
+    <p class="records-sub">{{ _("지적사항 데이터베이스와 자료실은 영어로 제공됩니다. 주간 브리프·용어사전·이용안내는 아직 한국어로만 있습니다 — 한국어판에서 보실 수 있습니다.") }}</p>
+    <a class="records-all" href="{{ alt_other.rel_href if alt_other else rel_root ~ 'index.html' }}" hreflang="ko" lang="ko">{{ _("한국어판으로 이동 →") }}</a>
+  </div></section>
+</main>
+{% endblock %}
+
+{% block ai_disclosure %}
+<section class="ai-disclosure" id="notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
+  <span class="kick">AI Disclosure</span>
+  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
+  <div class="disc-body">
+    <div class="disc-sec"><p>{{ _("본 서비스는 규제기관이 공개한 문서에서 지적 문장을 기계적으로 추출·분류한 것입니다. 분류와 요약에는 생성형 AI 가 쓰이며, 각 항목은 공식 원문 링크를 함께 제공합니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 법적 판단은 반드시 공식 원문을 기준으로 하시기 바랍니다.") }}</p></div>
+  </div>
+</div></section>
+{% endblock %}

@@ -71,6 +71,15 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    새 문구를 넣을 때는 감싸고 en.json 에 한 줄 추가한다 — `python web/grm_i18n.py lint` 가
    감싸지 않은 한글·결손·고아·슬롯 불일치를 파일:줄로 찍는다(`WebI18nTest` 가 CI 에서 같은 검사).
    데이터 비교값(`it.state == '신규'`)만 `i18n-ignore` 마커로 면제. Admin 콘솔은 대상 밖(한국어 고정).
+7. **영어 트리 `/en/` 은 본문이 영어로 성립하는 면만 낸다(2026-09-04, 다국어 3단계)** —
+   낼 집합의 단일 원천은 `render.en_tree_paths()`(정적 목록 `EN_TREE_STATIC` + 실제 로드된
+   자료실 카탈로그). nav·푸터·언어 전환·hreflang·sitemap 이 **전부 이 집합 하나**를 본다.
+   지적 본문은 언어별로 우선순위가 뒤집힌다(`grm_i18n.JS_BODY_SHIM` 의 `_bodyText`/`_altText`
+   — 영어판은 규제기관 원문 `finding_text` 가 앞, 한국어판은 `finding_text_ko` 가 앞).
+   짝이 없는 면에는 hreflang·언어 전환을 **달지 않는다**. 검증 = `WebEnTreeTest`.
+   ★조건 블록을 쓸 때 **들여쓰기를 조건 안에** 둔다(`{% if c %}  <a …>` + 다음 줄 `{% endif %}`) —
+   `{% if %}` 를 줄 앞에 두면 lstrip_blocks 가 들여쓰기를 먹고, `{%+ %}` 로 막으면 거짓일 때
+   공백만 남은 줄이 생겨 한국어 골든이 흔들린다. 주석도 하이픈 없는 `{# #}` 형태로.
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

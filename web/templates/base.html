@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="{{ lang }}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -26,7 +26,7 @@
 <link rel="alternate" type="application/rss+xml" title="{{ _('GRM 주간 브리프') }}" href="/rss.xml" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
-<meta property="og:locale" content="ko_KR" />
+<meta property="og:locale" content="{{ og_locale }}" />
 <meta property="og:title" content="{{ page_title }}" />
 {% if description %}
 <meta property="og:description" content="{{ description }}" />
@@ -48,6 +48,29 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="/assets/grm.css?v={{ css_ver }}">
 <link rel="stylesheet" href="/assets/pet.css?v={{ petcss_ver }}">
+{# [다국어 3단계] 언어판 상호 선언 — 두 판이 "같은 내용의 다른 언어"임을 검색엔진에 알린다.
+   없으면 중복 페이지로 보고 한쪽을 버릴 수 있다. `alternates` 는 **양쪽에 실제로 있는
+   페이지에서만** 채워지므로(render.py), 짝이 없는 면에는 태그가 아예 나가지 않는다. #}
+{% if alternates %}
+{% for a in alternates %}
+<link rel="alternate" hreflang="{{ a.lang }}" href="{{ a.href }}" />
+{% endfor %}
+<link rel="alternate" hreflang="x-default" href="{{ alternates[0].href }}" />
+{% endif %}
+{# 화면 스크립트용 문구 사전 — defer 는 문서 순서대로 실행되므로 이 선언이 다른 스크립트보다
+   앞에 있어야 `window.GRM_I18N` 이 먼저 채워진다(순서가 뒤집히면 영어 화면에 한국어가 남는다). #}
+{% if lang != 'ko' %}
+<script src="/assets/i18n-en.js?v={{ i18nenjs_ver }}" defer></script>
+{% endif %}
+{# 언어 전환 링크 스타일 — grm.css 는 디자인 동결이라 마스코트·구독밴드 선례대로 스코프 인라인.
+   §4 한글 안전: 자간·대문자 변형·mono 미사용(라벨에 '한국어'가 들어간다). #}
+{% if alt_other %}
+<style>
+  .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
+  .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
+  @media (max-width:640px){ .grm-lang{padding:5px 9px;font-size:12.5px} }
+</style>
+{% endif %}
 {% if json_ld %}
 <script type="application/ld+json">{{ json_ld | safe }}</script>
 {% endif %}
@@ -67,17 +90,27 @@
       [네이밍 2026-08-27] 사용자 피드백('전문성이 보이는 워딩') — M15 가 '지적사항'을
       '찾아보기'로 바꿨던 결정(당시 피드백: 캐주얼하게)을 오늘 피드백이 뒤집는다.
       내용을 그대로 이름으로: 모아보기→주간 브리프, 찾아보기→지적사항. -#}
-  <nav id="navmenu"><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>{{ _("주간 브리프") }}</a><a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>{{ _("자료실") }}</a><a href="{{ rel_root }}glossary/index.html"{% if nav_active == 'glossary' %} class="on"{% endif %}>{{ _("용어사전") }}</a><a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>{{ _("이용안내") }}</a></nav>
+  <nav id="navmenu">{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html"{% if nav_active == 'glossary' %} class="on"{% endif %}>{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>{{ _("이용안내") }}</a>{% endif %}</nav>
   <span class="sp"></span>
   {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}
   <button class="navtoggle" id="navToggle" type="button" aria-label="{{ _('메뉴 열기') }}" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   {# P0-2: 로그인 기능 미구현 — 죽은 버튼 비표시(렌더 출력 0). 도입 시 복원: <button class="btn" type="button">로그인</button> #}
   {# P0-3: 구독 기능 미도입 — 헤더 상시 CTA를 이번 주 소식으로. archive 3중 중복 제거. #}
-  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
+  {# [다국어 3단계] 언어 전환 — 짝이 **실제로 있는 페이지에서만** 뜬다(render.py 가 alternates
+     를 그렇게 채운다). 라벨은 목적지 언어의 자칭(한국어/English)이라 번역하지 않는다. #}
+{# ★들여쓰기를 조건 **안**에 둔다 — `{% if %}` 를 줄 앞에 두면 lstrip_blocks 가 들여쓰기를
+   먹고(참일 때 줄이 붙는다), `{%+ %}` 로 막으면 거짓일 때 공백만 남은 줄이 생긴다.
+   이 형태는 참이면 원래 바이트 그대로, 거짓이면 아무것도 내지 않는다. #}
+{% if alt_other %}  <a class="grm-lang" href="{{ alt_other.rel_href }}" hreflang="{{ alt_other.lang }}" lang="{{ alt_other.lang }}" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>{{ alt_other.label }}</a>
+{% endif %}
+{% if lang == 'ko' or ('briefs/' ~ latest_slug ~ '/') in en_paths %}  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
+{% endif %}
 </div></header>
 
 {% block content %}{% endblock %}
-{% if newsletter_form_action %}
+{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 받을 물건이 없으므로
+   권유하지 않는다(영문 브리프는 설계 문서 §7 5단계). #}
+{% if newsletter_form_action and lang == 'ko' %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
   {# 구독 전 상태(입력) — 제출 성공 시 아래 스크립트가 이 블록 전체를 감추고 .sub-done 만 표시. div 는 display 미지정이라 hidden 속성이 정상 동작(폼과 달리). #}
@@ -150,9 +183,9 @@
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>{{ _("전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.") }}</p></div>
     {# 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다(뉴스레터 밴드 선례 동형). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
-    <div><h5>{{ _("바로가기") }}</h5><a href="{{ about_href }}">{{ _("소개") }}</a><a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a><a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a><a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a><a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a><a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
+    <div><h5>{{ _("바로가기") }}</h5><a href="{{ about_href }}">{{ _("소개") }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% endif %}{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
     {# [존 재편 2026-08-26] 조회·산출 도구 열 신설. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데(찾아보기 6,774 · 트렌드 3,517 · 자료실 3,518), 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙 — 마이페이지를 footer 에만 둔 것과 같은 판단)는 대신, footer 에 열을 하나 더해 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. #}
-    <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a><a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a><a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a></div>
+    <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a><a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a>{% if lang == 'ko' or 'findings/docs/' in en_paths %}<a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a>{% endif %}</div>
     {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — 여기엔 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나 있었다. WebSourceCopyConsistencyTest 가 두 목록의 집합 일치를 검사한다. 위 주석 경고대로 이 주석도 공백을 삼키지 않는 형태여야 한다(하이픈 변형 금지). #}
     <div><h5>{{ _("수집 소스") }}</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>{{ _("Health Canada · 식약처") }}</span><span>ECA · ISPE</span></div>
     <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a></div>
@@ -193,7 +226,7 @@ if(_nt&&_nm){
     <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">{{ _("쉬는 중") }}</b></span><small id="grm-pet-state-copy">{{ _("새로운 소식을 기다리고 있어요") }}</small></div>
     <div class="grm-pet-progress"><div><span id="grm-pet-points">{{ _("0 포인트") }}</span><span id="grm-pet-next">{{ _("50 포인트 남음") }}</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
     <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>{{ _("정답") }}</span><span><b id="grm-pet-weeks">0</b>{{ _("주 참여") }}</span><span><b id="grm-pet-streak">0</b>{{ _("주 연속") }}</span></div>
-    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>{{ _("쓰다듬기") }}</button><a href="{{ rel_root }}quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>{{ _("함께 성장하기") }}</a></div>
+    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>{{ _("쓰다듬기") }}</button>{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>{{ _("함께 성장하기") }}</a>{% endif %}</div>
     <div class="grm-pet-atlas-head"><b>{{ _("성장 도감") }}</b><span>{{ _("단계를 눌러 미리 볼 수 있어요") }}</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
     <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>{{ _("성장 기록은 이 브라우저에 안전하게 보관돼요.") }}</p>
   </section>
@@ -399,7 +432,9 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
      · 구독 밴드가 이미 화면에 보이는 동안에는 숨는다(같은 요청을 두 번 하지 않는다).
    env-off(테스트·기본 빌드)면 블록 전체가 생략돼 골든 byte-diff 0 — 게이트가 그 증명이다.
    §4 한글안전: letter-spacing/text-transform/mono 미사용. 결정론: now()/난수 0. #}
-{% if newsletter_form_action %}
+{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 받을 물건이 없으므로
+   권유하지 않는다(영문 브리프는 설계 문서 §7 5단계). #}
+{% if newsletter_form_action and lang == 'ko' %}
 <style>
 .grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}
 .grm-cta.on{transform:translateY(0)}

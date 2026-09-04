@@ -225,6 +225,11 @@ RESOURCE_GOLDENS = [
 # (built_relpath, golden_filename)
 SINGLE_GOLDENS = [
     ("index.html", "landing.expected.html"),
+    # [다국어 3단계 2026-09-04] 영어 트리도 바이트로 잠근다 — 홈(별도 템플릿
+    # landing_en.html)과 본체(지적사항 검색 셸) 두 장. 구조·정책은 WebEnTreeTest 가 보지만,
+    # 문구 사전이 바뀌었을 때 영어 화면이 어떻게 달라지는지는 이 두 골든에만 드러난다.
+    ("en/index.html", "en_landing.expected.html"),
+    ("en/findings/index.html", "en_findings.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
     # [2면 분리 2026-08-27] 둘러보기 면 — 위 주석 그대로: 손열거라 여기 없으면 골든 없이 산다.
@@ -1633,10 +1638,15 @@ class WebFindingsRenderTest(unittest.TestCase):
         <p> 위)에서 생성돼야 한다 — 접힌 기본 화면에는 노출되지 않고, 원문을 펼쳐 대조하는
         맥락에서만 보인다(클래스·문구는 기존 테스트 마커와 동일하게 불변)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        fn = js_src[js_src.index("function appendOrigAndNote"):js_src.index("function appendOrigAndNote") + 700]
+        # 함수 끝까지 자른다 — 고정 길이(구 700자) 슬라이스는 주석이 늘면 조용히 잘려
+        # "substring not found" 로 죽는다(다국어 3단계에서 실제로 그랬다).
+        fn = js_src[js_src.index("function appendOrigAndNote"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
         idx_summary_append = fn.index("details.appendChild(summary)")
         idx_trnote = fn.index('el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장"))')
-        idx_p_append = fn.index("details.appendChild(p)")
+        # [다국어 3단계] 접기에 들어가는 본문은 언어에 따라 갈리므로(`_altText`) 변수명이
+        # `p` 그대로여도 인자가 바뀌었다 — 순서 계약(고지가 summary 뒤·본문 앞)은 불변.
+        idx_p_append = fn.index("details.appendChild(p);")
         self.assertLess(idx_summary_append, idx_trnote, "tr-note 가 summary 보다 먼저 옴")
         self.assertLess(idx_trnote, idx_p_append, "tr-note 가 원문 <p> 보다 뒤에 생성됨")
         self.assertIn("details.appendChild(el(", fn[idx_trnote - 30:idx_trnote + 10])
@@ -2619,7 +2629,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('finding_text: "",', fn)
         orig_fn = js_src[js_src.index("function appendOrigAndNote(extra, row, query) {"):]
         orig_fn = orig_fn[:orig_fn.index("\n  }\n") + 4]
-        self.assertIn("if (!ko || !row.finding_text) return;", orig_fn)
+        # [다국어 3단계] 가드는 `_altText()` 로 옮겼다 — 두 본문이 다 있을 때만 접기를
+        # 만든다는 계약은 그대로다(한쪽이 비면 "" 를 돌려주므로 조용히 no-op).
+        self.assertIn("var alt = _altText(row);", orig_fn)
+        self.assertIn("if (!alt) return;", orig_fn)
 
     def test_hide_pager_also_hides_sticky_mininav(self):
         """[단독 렌더 모드 공통] hidePager() 는 상/하단 페이저 + sticky 미니 내비
@@ -4473,10 +4486,15 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("p_docs_per_page: EXAMPLE_ROWS", fn)
         # 본문 텍스트를 읽는 곳은 이 한 경로뿐이어야 한다 — 집계 RPC 응답에서
         # finding_text 를 꺼내 쓰는 코드가 생기면 계약이 조용히 깨진 것이다.
-        self.assertEqual(self.js_src.count("finding_text"), 2,
-                         "finding_text 참조는 buildExampleItem 의 국문/영문 폴백 2회뿐이어야 한다")
+        # ★[다국어 3단계] 원문 필드를 만지는 자리는 **언어별 선택 사본 한 곳으로 모였다**
+        #   (`_bodyText`/`_altText`). 그래서 파일 전체의 참조 수는 "사본 안 4회 + 그 밖 0회"
+        #   여야 한다 — 사본 밖에서 원문을 직접 꺼내면 그게 계약 위반이다.
+        outside = self.js_src.replace(grm_i18n.JS_BODY_SHIM, "")
+        self.assertEqual(outside.count("finding_text"), 0,
+                         "본문 선택 사본 밖에서 finding_text 를 직접 읽는다")
+        self.assertEqual(grm_i18n.JS_BODY_SHIM.count("finding_text"), 4)
         item_fn = self._fn("buildExampleItem")
-        self.assertEqual(item_fn.count("finding_text"), 2)
+        self.assertIn("_bodyText(f)", item_fn)
         # 사례 경로의 출처가 findings_search 임을 파일 계약 주석이 못박는다.
         self.assertIn("security invoker", self.js_src)
 
@@ -4852,11 +4870,17 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
 
     # ── 사례 드릴다운 ────────────────────────────────────────────────────────
     def test_example_text_prefers_korean_falls_back_to_english(self):
-        """국문이 있으면 국문, 없으면 영어 원문 — 빈칸으로 두지 않는다(부재 어휘 규칙)."""
+        """읽는 언어를 먼저, 없으면 반대편 — 빈칸으로 두지 않는다(부재 어휘 규칙).
+
+        ★[다국어 3단계 2026-09-04] 폴백의 **방향이 언어에 따라 뒤집힌다** — 한국어판은
+        국문 우선, 영어판은 규제기관 원문 우선(`_bodyText`, grm_i18n.JS_BODY_SHIM 정본).
+        "빈칸으로 두지 않는다"는 계약은 그대로다(한쪽이 없으면 있는 쪽을 쓴다)."""
         fn = self._fn("buildExampleItem")
-        self.assertIn(
-            'var body = (f.finding_text_ko || "").trim() || (f.finding_text || "").trim();', fn)
+        self.assertIn("var body = _bodyText(f);", fn)
         self.assertIn('el("p", "tr-ex-text", truncateText(body))', fn)
+        shim = grm_i18n.JS_BODY_SHIM
+        self.assertIn("return _isEn ? (orig || ko) : (ko || orig);", shim)
+        self.assertIn(shim, self.js_src, "본문 선택 사본이 없다")
 
     def test_example_panel_links_back_to_findings_search_with_cat_param(self):
         fn = self._fn("buildExamplePanel")
@@ -12840,16 +12864,26 @@ class WebZoneIaTest(unittest.TestCase):
 
         '한 페이지에서만 링크됨'은 사실상 링크가 없는 것이다 — 자가점검 체크리스트가
         딱 그 상태(트렌드 페이지 본문 안 링크 1개)로 몇 주를 살았다. 인바운드가 전체
-        페이지 수 수준인지를 본다(footer 배선이 살아 있다는 뜻)."""
-        total = len(self.pages)
-        for route in ("findings/checklist/index.html", "findings/firm/index.html",
-                      "findings/inspector/index.html", "findings/inspections/index.html",
-                      "findings/coverage/index.html"):
-            n = sum(1 for rel, html in self.pages.items()
-                    if route in self._links(rel, html))
-            self.assertGreaterEqual(
-                n, total - 5,
-                f"{route} 인바운드 {n}/{total} — footer 도구 열 배선이 끊겼다")
+        페이지 수 수준인지를 본다(footer 배선이 살아 있다는 뜻).
+
+        ★[다국어 3단계 2026-09-04] **언어 트리마다 따로 센다.** 영어 페이지의 footer 는
+        영어 도구(`en/findings/...`)를 가리키므로, 두 트리를 한 통에 넣고 세면 한국어
+        라우트의 인바운드가 전체 페이지 수에 못 미쳐 배선이 멀쩡한데도 실패한다. 불변식은
+        "그 트리의 모든 페이지에서 그 트리의 도구에 닿는다"이지 트리를 섞은 총계가 아니다."""
+        for prefix in ("", "en/"):
+            pages = {rel: html for rel, html in self.pages.items()
+                     if rel.startswith("en/") == bool(prefix)}
+            self.assertTrue(pages, f"{prefix or 'ko'} 트리에 페이지가 없다")
+            total = len(pages)
+            for route in ("findings/checklist/index.html", "findings/firm/index.html",
+                          "findings/inspector/index.html", "findings/inspections/index.html",
+                          "findings/coverage/index.html"):
+                target = prefix + route
+                n = sum(1 for rel, html in pages.items()
+                        if target in self._links(rel, html))
+                self.assertGreaterEqual(
+                    n, total - 5,
+                    f"{target} 인바운드 {n}/{total} — footer 도구 열 배선이 끊겼다")
 
     # ── 존 3면 ───────────────────────────────────────────────────────────────
     def test_all_three_routes_built_even_though_segment_shows_two(self):
@@ -13990,25 +14024,35 @@ class WebPagePathTest(unittest.TestCase):
     def test_every_built_page_rel_root_matches_its_depth(self):
         """산출물 전수 대조 — 골든 8장 밖의 수백 장(용어 낱개·모음·조항·목록)까지, 페이지가
         실제로 놓인 깊이와 그 안의 rel_root(브랜드 링크 `href="{rel_root}index.html"`)가
-        일치해야 한다. 비공허 하한으로 검사 대상 수를 함께 고정한다."""
+        일치해야 한다. 비공허 하한으로 검사 대상 수를 함께 고정한다.
+
+        ★[다국어 3단계 2026-09-04] 깊이는 **그 페이지의 언어 트리 루트 기준**이다 —
+        `rel_root` 의 정의가 그것이기 때문이다(브랜드 링크는 같은 언어의 홈으로 가야 한다).
+        `/en/findings/checklist/` 의 rel_root 는 `../../`(트리 깊이 2)이지 `../../../`
+        (사이트 깊이 3)이 아니다. 사이트 루트로 가는 접두는 `asset_root` 가 따로 맡고,
+        그 배선은 `WebEnTreeTest` 의 자산 검사가 본다."""
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_pagepath_"))
         try:
             out = tmp / "site"
             _build_single(out)
-            checked = 0
+            checked, en_checked = 0, 0
             for html_path in sorted(out.rglob("*.html")):
                 rel_dir = html_path.relative_to(out).parent.as_posix()
-                depth = 0 if rel_dir == "." else rel_dir.count("/") + 1
+                segments = [] if rel_dir == "." else rel_dir.split("/")
+                is_en = bool(segments) and segments[0] == "en"
+                depth = len(segments) - 1 if is_en else len(segments)
                 expected = "../" * depth
                 html = html_path.read_text(encoding="utf-8")
                 m = re.search(r'class="brand" href="([^"]*)"', html)
                 if not m:
                     continue  # base.html 을 쓰지 않는 페이지(admin 등)는 대상이 아니다
                 checked += 1
+                en_checked += is_en
                 self.assertEqual(m.group(1), f"{expected}index.html",
                                  f"{html_path.relative_to(out).as_posix()} 의 rel_root 가 "
-                                 f"깊이({depth})와 어긋난다")
+                                 f"언어 트리 깊이({depth})와 어긋난다")
             self.assertGreater(checked, 300, f"검사 대상이 너무 적다: {checked}")
+            self.assertGreater(en_checked, 5, f"영어 트리 검사가 비었다: {en_checked}")
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 
@@ -14096,6 +14140,252 @@ class WebI18nTest(unittest.TestCase):
             self.assertEqual(lines, [1, 2, 3, 5], grm_i18n.find_bare_hangul_template(html))
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+class WebEnTreeTest(unittest.TestCase):
+    """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
+
+    이 클래스가 지키는 불변식은 하나로 요약된다: **껍데기만 영어인 페이지를 만들지 않는다.**
+    그래서 ①낼 페이지 집합이 선언과 일치하고 ②짝이 있는 페이지만 hreflang·언어 전환으로
+    잇고 ③영어 페이지가 한국어 전용 섹션으로 링크하지 않고 ④영어 페이지에 한국어 UI 문구가
+    남지 않는지를 본다. 데이터가 한국어인 것(영문 제목 없는 식약처 문서)은 결함이 아니라
+    사실이므로, 그 사실을 화면이 **밝히는지**를 대신 검사한다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_en_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.pages = {
+            p.relative_to(cls.out).as_posix(): p.read_text(encoding="utf-8")
+            for p in cls.out.rglob("*.html")
+        }
+        cls.en = {k: v for k, v in cls.pages.items() if k.startswith("en/")}
+        cls.sitemap = (cls.out / "sitemap.xml").read_text(encoding="utf-8")
+        cls.expected = render.en_tree_paths(render.load_library())
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 집합 ────────────────────────────────────────────────────────────────
+    def test_emitted_en_paths_match_the_declared_set(self):
+        """렌더가 실제로 낸 영어 페이지 = `en_tree_paths()` 선언. 둘이 갈라지면 nav·
+        hreflang·sitemap 이 전부 없는 페이지를 가리키게 된다(선언이 유일한 원천)."""
+        emitted = {k[len("en/"):-len("index.html")] for k in self.en}
+        self.assertEqual(emitted, self.expected)
+        self.assertGreaterEqual(len(emitted), 9, "영어 트리가 비정상적으로 작다")
+
+    def test_every_en_page_has_a_korean_counterpart(self):
+        """영어판은 한국어판에 있는 면만 낸다 — 영어에만 있는 면은 짝이 없어 hreflang 이
+        성립하지 않는다(영어 홈은 landing_en.html 이지만 주소 `/` 는 양쪽에 있다)."""
+        for path in sorted(self.expected):
+            self.assertIn(f"{path}index.html", self.pages,
+                          f"영어판에만 있는 면: {path}")
+
+    def test_korean_only_sections_are_absent_from_en(self):
+        """본문이 한국어인 면은 영어 트리에 없다(설계 문서 §7 4·5단계 대기)."""
+        for path in ("archive/", "glossary/", "guide/", "quiz/",
+                     "findings/browse/", "findings/docs/", "findings/clause/"):
+            self.assertNotIn(path, self.expected)
+            self.assertNotIn(f"en/{path}index.html", self.pages)
+
+    # ── 언어판 상호 선언 ─────────────────────────────────────────────────────
+    def _hreflangs(self, html):
+        return dict(re.findall(r'<link rel="alternate" hreflang="([^"]+)" href="([^"]+)" />',
+                               html))
+
+    def test_hreflang_on_paired_pages_both_ways(self):
+        for path in sorted(self.expected):
+            for rel in (f"{path}index.html", f"en/{path}index.html"):
+                with self.subTest(page=rel):
+                    tags = self._hreflangs(self.pages[rel])
+                    self.assertEqual(
+                        tags.get("ko"), f"{render.SITE_BASE_URL}/{path}")
+                    self.assertEqual(
+                        tags.get("en"), f"{render.SITE_BASE_URL}/en/{path}")
+                    self.assertEqual(tags.get("x-default"), tags["ko"],
+                                     "x-default 는 한국어판(주 언어)을 가리킨다")
+
+    def test_unpaired_korean_pages_have_no_hreflang(self):
+        """짝이 없는 면에 hreflang 을 달면 없는 페이지를 광고하는 것이다."""
+        unpaired = [k for k in self.pages
+                    if not k.startswith("en/")
+                    and k[:-len("index.html")] not in self.expected
+                    and k.endswith("index.html")]
+        self.assertGreater(len(unpaired), 5, "검사 대상이 없다")
+        for rel in unpaired[:40]:
+            self.assertEqual(self._hreflangs(self.pages[rel]), {}, rel)
+
+    def test_404_carries_no_hreflang_or_switcher(self):
+        """404 는 홈과 같은 주소로 그리지만 짝이 없다(`/en/404.html` 은 서빙되지 않는다)."""
+        html = (self.out / "404.html").read_text(encoding="utf-8")
+        self.assertEqual(self._hreflangs(html), {})
+        self.assertNotIn('class="grm-lang"', html)
+
+    def test_html_lang_and_og_locale_follow_the_tree(self):
+        for rel, html in self.pages.items():
+            want = ("en", "en_US") if rel.startswith("en/") else ("ko", "ko_KR")
+            with self.subTest(page=rel):
+                self.assertIn(f'<html lang="{want[0]}">', html)
+                if "og:locale" in html:
+                    self.assertIn(f'<meta property="og:locale" content="{want[1]}" />',
+                                  html)
+
+    # ── 언어 전환 ────────────────────────────────────────────────────────────
+    def test_language_switch_resolves_to_a_real_file_both_ways(self):
+        """전환 링크는 **상대경로**여야 하고(호스트 무관 규약) 실제 파일에 닿아야 한다 —
+        절대 URL 이면 도달성 BFS 가 못 따라가 영어 트리가 고립된 섬이 된다."""
+        checked = 0
+        for path in sorted(self.expected):
+            for rel in (f"{path}index.html", f"en/{path}index.html"):
+                m = re.search(r'class="grm-lang" href="([^"]+)"', self.pages[rel])
+                self.assertIsNotNone(m, f"{rel} 에 언어 전환 링크가 없다")
+                href = m.group(1)
+                self.assertFalse(href.startswith("http"), f"{rel}: 절대 URL")
+                target = (self.out / rel).parent / href
+                self.assertTrue(target.resolve().is_file(),
+                                f"{rel} → {href} 가 없는 파일을 가리킨다")
+                checked += 1
+        self.assertGreaterEqual(checked, 18)
+
+    def test_switcher_absent_where_there_is_no_counterpart(self):
+        for rel in ("glossary/index.html", "quiz/index.html", "guide/index.html"):
+            if rel in self.pages:
+                self.assertNotIn('class="grm-lang"', self.pages[rel], rel)
+
+    # ── 링크 정책 ────────────────────────────────────────────────────────────
+    def test_english_pages_never_link_into_korean_only_sections(self):
+        """영어 nav·푸터·본문 어디서도 한국어 전용 섹션으로 보내지 않는다(언어 전환 링크는
+        예외 — 그건 '한국어판으로 간다'고 라벨에 밝힌 의도적 간선이다)."""
+        for rel, html in self.en.items():
+            body = re.sub(r'<a class="grm-lang".*?</a>', "", html, flags=re.S)
+            body = re.sub(r'<link rel="alternate".*?/>', "", body, flags=re.S)
+            body = re.sub(r'<a class="records-all" href="[^"]*" hreflang="ko".*?</a>',
+                          "", body, flags=re.S)
+            for hrefs in re.findall(r'href="((?:\.\./)*)(archive/|glossary/|guide/|quiz/|briefs/|me/|findings/browse/|findings/docs/)',
+                                    body):
+                self.fail(f"{rel} → 한국어 전용 섹션 링크: {''.join(hrefs)}")
+
+    def test_en_nav_shows_only_sections_that_exist_in_english(self):
+        nav = re.search(r'<nav id="navmenu">(.*?)</nav>', self.en["en/index.html"], re.S)
+        self.assertIsNotNone(nav)
+        for gone in ("주간 브리프", "용어사전", "이용안내",
+                     "Weekly brief", "Glossary", "Guide"):
+            self.assertNotIn(gone, nav.group(1))
+        self.assertIn("Findings", nav.group(1))
+        self.assertIn("Library", nav.group(1))
+
+    # ── 한국어 잔존 ──────────────────────────────────────────────────────────
+    def test_english_shell_pages_have_no_korean_ui_copy(self):
+        """영어 화면에 남는 한글은 **언어 전환 라벨('한국어')뿐**이어야 한다.
+        자료실 항목 제목은 데이터(문서의 실제 이름)라 아래 별도 테스트가 본다."""
+        hangul = re.compile("[가-힣]+")
+        for rel, html in self.en.items():
+            if rel.startswith("en/library/"):
+                continue
+            body = re.sub(r"<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->",
+                          " ", html, flags=re.S | re.I)
+            text = re.sub(r"<[^>]+>", " ", body)
+            attrs = " ".join(m.group(1) for m in re.finditer(
+                r'(?:aria-label|alt|title|placeholder|content)="([^"]*)"', body))
+            leaked = sorted(set(hangul.findall(text + " " + attrs)) - {"한국어"})
+            self.assertEqual(leaked, [], f"{rel} 에 한국어 UI 문구 잔존: {leaked[:6]}")
+
+    def test_library_discloses_why_korean_titles_remain(self):
+        """영문 제목이 없는 문서는 한국어 원제를 그대로 보인다(지어내지 않는다) — 대신
+        **왜 그런지 화면이 밝혀야** 한다. 밝히지 않으면 번역 누락으로 읽힌다."""
+        catalogs = {v["slug"]: v for v in render.load_library()}
+        disclosed = 0
+        for slug, view in catalogs.items():
+            rel = f"en/library/{slug}/index.html"
+            if rel not in self.en:
+                continue
+            if view["ko_only_titles"]:
+                self.assertIn("no official English title", self.en[rel],
+                              f"{slug}: 한국어 제목이 남는데 고지가 없다")
+                disclosed += 1
+            else:
+                self.assertNotIn("no official English title", self.en[rel],
+                                 f"{slug}: 해당 없는데 고지가 떴다")
+        self.assertGreaterEqual(disclosed, 1, "고지 경로가 한 번도 안 탔다")
+
+    def test_english_library_does_not_show_korean_subtitles(self):
+        """한국어판의 병기(영문 원제)는 영어판에서 뒤집히지 않는다 — 영어 독자에게
+        읽을 수 없는 줄을 얹지 않는다(sub 는 비운다)."""
+        view = render._catalog_view(
+            {"slug": "ich", "short": "ICH", "file": "ich.json", "unit": "토픽",
+             "kick": "k", "title": "t", "blurb": "b", "intro": "i", "desc": "d"},
+            {"items": [{"id": "x", "title_ko": "한글제목", "title_en": "English title"}]},
+            grm_i18n.Translator("en", {"토픽": "topics", "ICH": "ICH", "t": "t",
+                                       "b": "b", "i": "i", "d": "d"}))
+        item = view["groups"][0]["items"][0]
+        self.assertEqual(item["title"], "English title")
+        self.assertEqual(item["sub"], "")
+
+    # ── 자산·스크립트 ───────────────────────────────────────────────────────
+    def test_i18n_dictionary_asset_is_loaded_only_by_english_pages(self):
+        asset = self.out / "assets" / "i18n-en.js"
+        self.assertTrue(asset.is_file(), "영어 문구 사전 자산이 없다")
+        src = asset.read_text(encoding="utf-8")
+        self.assertTrue(src.startswith("window.GRM_I18N="))
+        data = json.loads(src[len("window.GRM_I18N="):].rstrip().rstrip(";"))
+        self.assertEqual(data, grm_i18n.load_catalog("en"),
+                         "사전 자산이 카탈로그 전량과 다르다(선별은 조용한 결손을 만든다)")
+        for rel, html in self.pages.items():
+            loaded = "/assets/i18n-en.js" in html
+            self.assertEqual(loaded, rel.startswith("en/"), rel)
+
+    def test_body_shim_is_present_and_used_where_findings_text_is_drawn(self):
+        """지적 본문을 그리는 자산은 언어별 선택 사본을 갖고, 옛 '국문 우선' 고정 표현이
+        남아 있으면 안 된다(영어판에서 한국어가 그대로 나온다)."""
+        used = 0
+        for p in grm_i18n.asset_files():
+            src = p.read_text(encoding="utf-8")
+            if grm_i18n.JS_BODY_MARKER not in src:
+                continue
+            used += 1
+            self.assertIsNone(grm_i18n.check_js_body_shim(p), p.name)
+            self.assertIn("_bodyText(", src, p.name)
+            self.assertNotIn('var text = ko || row.finding_text', src, p.name)
+            self.assertNotIn('var mainText = ko || row.finding_text', src, p.name)
+        self.assertGreaterEqual(used, 5, "본문 자산 탐지가 비었다")
+
+    def test_every_relative_asset_reference_resolves_to_a_real_file(self):
+        """`<script src>`·`<link href>` 의 **상대경로 자산**이 실제 파일에 닿아야 한다.
+
+        ★실제로 났던 결함이다 — 페이지별 스크립트가 `{{ rel_root }}assets/findings.js` 를
+          쓰고 있었는데, `rel_root` 는 **언어 트리 루트**라 영어판에서 `/en/assets/...` 가
+          되어 404 였다(자산은 언어와 무관하므로 `asset_root` = 사이트 루트를 써야 한다).
+          링크 가드(`<a href>`)도 도달성 BFS 도 이걸 못 본다 — 스크립트가 죽으면 화면은
+          '불러오는 중…' 에서 멈추는데 HTML 은 멀쩡하기 때문이다. 그래서 별도 검사다.
+        """
+        checked, en_checked = 0, 0
+        for rel, html in self.pages.items():
+            base = (self.out / rel).parent
+            for ref in re.findall(r'<(?:script|link)\b[^>]*?(?:src|href)="([^"]+)"', html):
+                if ref.startswith(("http://", "https://", "//", "/", "#", "data:")):
+                    continue
+                target = base / ref.split("?", 1)[0]
+                checked += 1
+                en_checked += rel.startswith("en/")
+                self.assertTrue(target.is_file(),
+                                f"{rel} → {ref} 자산이 없다(경로 접두를 잘못 쓴 것)")
+        # 비공허 — 특히 **영어 트리**를 실제로 덮어야 의미가 있다(결함이 거기서 났다).
+        self.assertGreater(checked, 10, f"상대경로 자산 검사가 비었다: {checked}")
+        self.assertGreater(en_checked, 3, f"영어 트리 자산 검사가 비었다: {en_checked}")
+
+    # ── sitemap ─────────────────────────────────────────────────────────────
+    def test_sitemap_registers_the_en_tree_except_inspector(self):
+        """실사관 프로파일은 실명 개인 집계라 **언어와 무관하게** 등록하지 않는다 —
+        영어판에서 색인되면 그 정책을 우회하는 것이다."""
+        for path in sorted(self.expected - render.EN_SITEMAP_EXCLUDED):
+            self.assertIn(f"<loc>{render.SITE_BASE_URL}/en/{path}</loc>", self.sitemap,
+                          f"sitemap 에 en/{path} 누락")
+        for path in sorted(render.EN_SITEMAP_EXCLUDED):
+            self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/en/{path}</loc>", self.sitemap)
+            self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/{path}</loc>", self.sitemap)
 
 
 if __name__ == "__main__":

@@ -56,6 +56,9 @@ LIBRARY_UPDATES_FILE = WEB_DIR / "data" / "library_updates.json"  # [자료실] 
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
+# 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
+# 영어 /findings/가 보여 줄 수와 카드의 수가 갈라진다.
+GLOSSARY_CASES_EN_FILE = WEB_DIR / "data" / "glossary_cases_en.json"
 FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
 # [다국어 2026-09-04] 영어 트리용 같은 정본 — **영어 모집단으로 다시 잰 값**이다
 # (`findings_facets_refresh.py --orig-lang en`). 한국어 파일을 받아 표본에서 한글만
@@ -1133,16 +1136,28 @@ _GLOSSARY_BUCKET_ORDER = [
 ]
 
 
-def _glossary_bucket(term_ko: str) -> str:
-    """term_ko 첫 글자 → 초성 버킷. 한글=초성(된소리 합침), 라틴 알파벳=A–Z, 그 외=#."""
-    ch = term_ko[0]
+def _glossary_bucket(term: str, lang: str = DEFAULT_LANG) -> str:
+    """표제어 첫 글자 → 색인 버킷.
+
+    한국어판: 한글=초성(된소리 합침), 라틴 알파벳은 **한 덩어리**(A–Z), 그 외=#.
+    ★영어판: 라틴을 한 덩어리로 두면 242개가 버킷 하나에 들어가 색인이 아무것도
+      가르지 못한다. 그래서 영어 트리에서는 **낱자**(A, B, C…)로 가른다.
+    """
+    ch = term[0]
     o = ord(ch)
     if 0xAC00 <= o <= 0xD7A3:
         lead = _GLOSSARY_LEAD[(o - 0xAC00) // 588]
         return _GLOSSARY_LEAD_BASE.get(lead, lead)
     if ch.isascii() and ch.isalpha():
-        return _GLOSSARY_LATIN
+        return ch.upper() if lang != DEFAULT_LANG else _GLOSSARY_LATIN
     return _GLOSSARY_ETC
+
+
+def _glossary_bucket_order(lang: str = DEFAULT_LANG) -> "list[str]":
+    """색인 바의 순서 — 영어는 A–Z 낱자, 한국어는 가나다 → 라틴 → 기타."""
+    if lang != DEFAULT_LANG:
+        return [chr(c) for c in range(ord("A"), ord("Z") + 1)] + [_GLOSSARY_ETC]
+    return _GLOSSARY_BUCKET_ORDER
 
 
 def load_glossary(path: Path = GLOSSARY_FILE) -> list[dict[str, Any]] | None:
@@ -1407,6 +1422,7 @@ def build_glossary_view(
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
     cases: dict[str, dict[str, Any]] | None = None,
     clause_slugs: "set[str] | None" = None,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, Any]:
     """용어 리스트 → 초성 그룹 뷰모델(무변형 — 값 재작성 0, 파생만).
 
@@ -1433,7 +1449,10 @@ def build_glossary_view(
     있다). URL 인코딩은 _url_quote(q, safe="")(urllib.parse.quote 와 byte-동일 출력을
     자체 구현 — 순수성 게이트가 render.py 안의 urllib import 를 막는다. 결정론 — 한글
     검색어 포함)."""
-    label_by_id = {t["id"]: t["term_ko"] for t in terms}
+    # 관련 용어 칩의 라벨도 읽는 언어를 따른다 — 영어 화면에 한국어 표제어가 섞이면
+    # 그 칩만 번역이 덜 된 것으로 읽힌다.
+    label_by_id = {t["id"]: (t["term_ko"] if lang == DEFAULT_LANG else t["term_en"])
+                   for t in terms}
     cases = cases or {}
 
     def _term_view(t: dict[str, Any]) -> dict[str, Any]:
@@ -1443,13 +1462,26 @@ def build_glossary_view(
         # 용어에 착지한 방문자가 실제 지적사례가 있는 쪽으로 갈 수 있게 한다.
         def _related_view(rid: str) -> "dict[str, Any]":
             n = _glossary_case_count(cases.get(rid))
-            return {"id": rid, "term_ko": label_by_id[rid],
+            return {"id": rid, "label": label_by_id[rid],
                     "case_count_label": f"{n:,}" if n else ""}
 
         related = [_related_view(r) for r in (t.get("related") or [])
                    if r in label_by_id]
         reg_refs = [v for v in (_reg_ref_view(r, reg_ref_catalogs, clause_slugs)
                                 for r in (t.get("reg_refs") or [])) if v]
+        # ★[다국어 2026-09-04] 화면에 나갈 본문은 **뷰가 언어를 정해** 넘긴다
+        #   (불변식 #13). 템플릿이 `easy_ko` 를 직접 읽으면 영어 페이지에 한국어
+        #   설명이 실린다 — 이번 다국어 작업에서 세 번 밟은 자리와 같은 모양이다.
+        is_ko = lang == DEFAULT_LANG
+        # 조항 사례 정적 페이지는 아직 한국어 트리에만 있다. 영문 용어사전이 그곳으로
+        # 보내면 영어→한국어 전용 표면이라는 거짓 간선이 된다. 공식 원문 URL은 그대로
+        # 남기되, 한국어 조항 사례 착지만 비운다.
+        if not is_ko:
+            for ref in reg_refs:
+                ref["cases_href"] = ""
+        term = t["term_ko"] if is_ko else t["term_en"]
+        easy = t["easy_ko"] if is_ko else (t.get("easy_en") or "")
+        detail = (t.get("detail_ko") or "") if is_ko else (t.get("detail_en") or "")
         search_parts = [t["term_ko"], t["term_en"], t["easy_ko"]]
         detail_ko = t.get("detail_ko") or ""
         if detail_ko:
@@ -1457,6 +1489,10 @@ def build_glossary_view(
         aliases = list(t.get("aliases") or [])
         if aliases:
             search_parts.extend(aliases)
+        if not is_ko:
+            # 영어판 검색은 영어 본문으로 한다 — 한국어 문자열을 남기면 화면에 안 보이는
+            # 한글이 검색 인덱스에만 남아, 영어 사용자가 왜 걸렸는지 알 수 없게 된다.
+            search_parts = [t["term_en"], easy] + ([detail] if detail else [])
         # [A1] 표시용: 표제어와 하이픈·공백 차이만 있는 동의어는 잡음이라 제외(감춤은
         # 화면뿐 — search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
         norm_ko = _glossary_alias_norm(t["term_ko"])
@@ -1464,11 +1500,21 @@ def build_glossary_view(
         display_aliases = [a for a in aliases
                             if _glossary_alias_norm(a) not in norm_ko
                             and _glossary_alias_norm(a) not in norm_en]
+        # 사례 정본도 읽는 트리의 모집단이어야 한다. 영어는 `term_en`을 실제 RPC로
+        # 확인하고 p_orig_lang=en으로 다시 센 별도 파일만 넘긴다. 파일 부재는 링크를
+        # 조용히 비우지만, 한국어 전체 코퍼스 파일로 폴백해 거짓 수를 만들지는 않는다.
         case = cases.get(t["id"]) or {}
         case_q = str(case.get("q") or "")
         case_findings = _glossary_case_count(case)
         return {
             "id": t["id"],
+            # 표시용(언어가 정해진 값) — 템플릿은 이것만 쓴다.
+            "term": term,
+            # 부제는 한국어판에서만 영문 표제어를 덧붙인다(영어판에선 표제어 자신이다).
+            "term_sub": t["term_en"] if is_ko else "",
+            "easy": easy,
+            "detail": detail,
+            # 정본 값(무변형) — 정렬·앵커·데이터 대조용으로 남긴다.
             "term_ko": t["term_ko"],
             "term_en": t["term_en"],
             "easy_ko": t["easy_ko"],
@@ -1476,14 +1522,15 @@ def build_glossary_view(
             # v2: 출처 공식 링크(있으면 출처 표기를 새 탭 링크로 — 값 무변형·안전 URL 만).
             "source_url": _safe_url(t.get("source_url") or ""),
             "related": related,
-            "bucket": _glossary_bucket(t["term_ko"]),
+            "bucket": _glossary_bucket(term, lang),
             "search": " ".join(search_parts).lower(),
             # v3(8차 웨이브 A): 심화 필드 — 부재 시 ""/[] 라 템플릿 {% if %} 게이트로 조용히 생략.
             "detail_ko": detail_ko,
             "reg_refs": reg_refs,
             # [A1] 표시용 동의어(표제어와 하이픈·공백만 다른 것 제외) — 부재/전량제외 시
             # 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략.
-            "aliases": display_aliases,
+            # 동의어는 한국어 표기라 영어판에서는 싣지 않는다(검색에도 넣지 않는다).
+            "aliases": display_aliases if is_ko else [],
             # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
             "case_q": case_q,
             "case_findings": case_findings,
@@ -1493,16 +1540,30 @@ def build_glossary_view(
         }
 
     views = [_term_view(t) for t in terms]
-    order = {b: i for i, b in enumerate(_GLOSSARY_BUCKET_ORDER)}
+    # ★출처는 **실제 문서 이름**이라 번역하지도 빼지도 않는다 — 「알기 쉬운 GMP 용어집」을
+    #   영어로 옮기면 존재하지 않는 문서를 가리키게 되고, 빼면 근거를 감추는 것이 된다.
+    #   대신 영어 화면이 그 사실을 밝힌다(자료실의 한국어 원제와 같은 판단).
+    # 출처만이 아니라 **관련 조항**도 한국어 법령 이름이다(「약사법」 제39조,
+    # 「의약품 제조 및 품질관리에 관한 규정 [별표 1]」 …). 둘 다 실제 문서·법령의
+    # 이름이라 옮기면 존재하지 않는 것을 가리키게 되므로 원문 그대로 두고 함께 센다.
+    def _ko_named(t: dict[str, Any]) -> bool:
+        if _HANGUL_RE.search(t.get("definition_source") or ""):
+            return True
+        return any(_HANGUL_RE.search(str(r)) for r in (t.get("reg_refs") or []))
+
+    ko_only_sources = sum(1 for t in terms if _ko_named(t))
+    order = {b: i for i, b in enumerate(_glossary_bucket_order(lang))}
     groups_map: dict[str, list[dict[str, Any]]] = {}
     for v in views:
         groups_map.setdefault(v["bucket"], []).append(v)
     groups: list[dict[str, Any]] = []
     for idx, bucket in enumerate(sorted(groups_map, key=lambda b: (order.get(b, 99), b))):
-        items = sorted(groups_map[bucket], key=lambda v: v["term_ko"])
+        items = sorted(groups_map[bucket], key=lambda v: v["term"])
         # 그룹 앵커는 결정론 인덱스 파생(유니코드/en-dash 를 href 에 넣지 않음).
         groups.append({"bucket": bucket, "anchor": f"grp-{idx}", "terms": items})
     return {"groups": groups, "total": len(views),
+            # 한국어 출처명이 남는 건수 — 영어판에서만 화면이 밝힌다(0 이면 문구 없음).
+            "ko_only_sources": ko_only_sources if lang != DEFAULT_LANG else 0,
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
 
 
@@ -1527,7 +1588,7 @@ def glossary_term_description(term: dict[str, Any], tr: Translator = _KO) -> str
     입력에서는 기존과 byte 동일하다. DefinedTerm JSON-LD 의 description 은 이 함수를
     쓰지 않는다 — 구조화 데이터의 정의문은 순수 정의(easy_ko)로 남아야 한다.
     """
-    text = " ".join((term.get("easy_ko") or "").split())
+    text = " ".join((term.get("easy") or term.get("easy_ko") or "").split())
     try:
         case_findings = int(term.get("case_findings") or 0)
     except (TypeError, ValueError):
@@ -1616,7 +1677,7 @@ def _glossary_shape(sentence: str) -> str:
 
 def _glossary_incidental(sentence: str, token: str) -> bool:
     """토큰이 열거(`제조, 가공, 포장 또는 보관`) 안에만 있으면 우연한 언급이다."""
-    for m in re.finditer(re.escape(token), sentence):
+    for m in re.finditer(re.escape(token), sentence, flags=re.IGNORECASE):
         left = sentence[max(0, m.start() - 8):m.start()]
         right = sentence[m.end():m.end() + 8]
         if not (_GLOSSARY_ENUM_L.search(left) and _GLOSSARY_ENUM_R.match(right)):
@@ -1624,10 +1685,18 @@ def _glossary_incidental(sentence: str, token: str) -> bool:
     return True
 
 
-def glossary_case_probes(term: dict[str, Any], case_q: str = "") -> list[str]:
-    """인용문에서 **눈으로 확인 가능한** 토큰만 — 사람이 검수한 q, 한글 표제어 분절, 약어."""
+def glossary_case_probes(term: dict[str, Any], case_q: str = "",
+                         lang: str = DEFAULT_LANG) -> list[str]:
+    """인용문에서 눈으로 확인 가능한 토큰만.
+
+    한국어판은 사람이 검수한 q와 한글 표제어 분절을 쓴다. 영어판은 같은 문장에 실제로
+    나타날 영문 q/표제어만 쓴다. 한국어 탐침이 영어 원문을 고르는 일을 허용하면, 화면의
+    인용이 링크의 영문 검색어를 입증하지 못한다.
+    """
     out: list[str] = []
-    for cand in [case_q, *(term.get("term_ko") or "").split("·")]:
+    candidates = ([case_q, term.get("term_en") or ""] if lang != DEFAULT_LANG
+                  else [case_q, *(term.get("term_ko") or "").split("·")])
+    for cand in candidates:
         cand = (cand or "").strip()
         if len(cand) >= 2 and cand not in out:
             out.append(cand)
@@ -1641,6 +1710,7 @@ def build_glossary_case_excerpts(
     terms: list[dict[str, Any]],
     docs_payload: "dict[str, Any] | None",
     cases: "dict[str, dict[str, Any]] | None" = None,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, list[dict[str, Any]]]:
     """{term_id: [인용 …]} — 결정론(입력 순서 고정·now()/난수 0·네트워크 0).
 
@@ -1649,16 +1719,26 @@ def build_glossary_case_excerpts(
     같은 문장이 여러 페이지에 실리면 중복 본문이다).
     """
     documents = (docs_payload or {}).get("documents") or []
-    if not documents:
+    if not documents or not cases:
         return {}
 
     # 문장 분할은 **한 번만** 한다. 용어마다 다시 쪼개면 21,347 건 × 226 어라 렌더·테스트가
     # 폭발한다(대량 페이지가 테스트 시간을 터뜨린 전례가 있다).
+    # ★[2026-09-05] 소문자 접기도 같은 이유로 한 번만 한다. 종전엔 대조 루프 안에서
+    #   `sent.casefold()` 를 **용어 242 개마다 다시** 계산했다(문장 수 × 242 회). 영문
+    #   발췌가 더해져 이 함수가 렌더당 두 번 돌게 되자 단일 렌더가 10.4s → 22.9s 가 됐고
+    #   CI 가 20 분 상한에서 잘렸다. 접은 문자열을 색인에 함께 실어 두면 동작은 그대로고
+    #   비용만 빠진다(대조 결과는 바이트 동일 — 골든이 지킨다).
     shape_docs: dict[str, set[str]] = {}
     index: list[tuple[dict[str, Any], str, list[str]]] = []   # (doc, finding_id, 문장들)
     for doc in documents:
+        # 영문 사례 정본의 모집단(p_orig_lang=en) 밖 문서에서 인용을 보태면, 카드의
+        # 링크·건수와 인용이 서로 다른 세계를 말하게 된다. `finding_body(..., "en")`의
+        # 한국어 fallback은 일반 영문 화면에는 유용하지만 여기서는 허용하지 않는다.
+        if lang != DEFAULT_LANG and not doc_is_english(doc):
+            continue
         for finding in doc.get("findings") or []:
-            sents = [s for s in _glossary_sentences(finding.get("text_ko") or "")
+            sents = [s for s in _glossary_sentences(finding_body(finding, lang))
                      if _GLOSSARY_QUOTE_MIN <= len(s) <= _GLOSSARY_QUOTE_MAX]
             if not sents:
                 continue
@@ -1666,19 +1746,24 @@ def build_glossary_case_excerpts(
                 shape_docs.setdefault(_glossary_shape(sent), set()).add(doc["document_id"])
             index.append((doc, finding.get("finding_id") or "", sents))
     boiler = {k for k, v in shape_docs.items() if len(v) >= _GLOSSARY_BOILER_DOCS}
-    index = [(doc, fid, [s for s in sents if _glossary_shape(s) not in boiler])
+    # 문장과 **접은 사본**을 짝으로 싣는다(대조는 접은 쪽, 표시·우연언급 판정은 원문 쪽).
+    index = [(doc, fid, [(s, s.casefold()) for s in sents
+                         if _glossary_shape(s) not in boiler])
              for doc, fid, sents in index]
 
     def _candidates(term: dict[str, Any]) -> list[dict[str, Any]]:
-        probes = glossary_case_probes(term, ((cases or {}).get(term["id"]) or {}).get("q", ""))
+        probes = glossary_case_probes(
+            term, ((cases or {}).get(term["id"]) or {}).get("q", ""), lang)
+        probes_cf = [(p, p.casefold()) for p in probes]
         found: list[dict[str, Any]] = []
         seen_docs: set[str] = set()
         for doc, fid, sents in index:              # 문서당 최대 1 건 — 한 문서로 도배 금지
             if doc["document_id"] in seen_docs:
                 continue
-            for sent in sents:
-                tok = next((p for p in probes
-                            if p in sent and not _glossary_incidental(sent, p)), None)
+            for sent, sent_cf in sents:
+                tok = next((p for p, p_cf in probes_cf
+                            if p_cf in sent_cf
+                            and not _glossary_incidental(sent, p)), None)
                 if tok:
                     found.append({"quote": sent, "token": tok,
                                   "agency": doc.get("agency") or "",
@@ -1836,9 +1921,12 @@ def link_terms_in_text(
 
 def glossary_term_page_title(term: dict[str, Any], tr: Translator = _KO) -> str:
     """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
-    term_ko = term.get("term_ko") or ""
-    short_en = glossary_title_en(term_ko, term.get("term_en") or "")
-    head = f"{term_ko}({short_en})" if short_en else term_ko
+    # ★표시 이름은 **뷰가 정한 값**을 쓴다(불변식 #13). 영어판에는 부제가 없으므로
+    #   괄호 약어를 붙이지 않는다 — 표제어 자신이 이미 영문이다.
+    head = term.get("term") or term.get("term_ko") or ""
+    if term.get("term_sub"):
+        short_en = glossary_title_en(head, term.get("term_sub") or "")
+        head = f"{head}({short_en})" if short_en else head
     return tr("{head} 뜻 · GRM 용어사전", head=head)
 
 
@@ -1966,7 +2054,8 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
                        cfr_items: "list[dict[str, Any]] | None",
                        glossary_terms: "list[dict[str, Any]] | None" = None,
                        *, min_documents: int = CLAUSE_MIN_DOCUMENTS,
-                       max_samples: int = CLAUSE_MAX_SAMPLES) -> list[dict[str, Any]]:
+                       max_samples: int = CLAUSE_MAX_SAMPLES,
+                       lang: str = DEFAULT_LANG) -> list[dict[str, Any]]:
     """조항별 페이지 뷰 목록. 입력은 전부 커밋된 정본 — 네트워크·난수·now() 0.
 
     본문은 자르지 않는다(길이 조절은 CSS 의 일이다 — findings_facet 과 같은 규율).
@@ -1985,8 +2074,11 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
     doc_ids: dict[str, set] = {}
     for doc in docs:
         for f in doc.get("findings") or []:
-            text = (f.get("text_ko") or "").strip()
-            if not text:
+            # ★본문은 **읽는 언어**를 따른다(불변식 #13). 영어판은 원문이 실제로
+            #   영어인 지적만 싣는다 — 한글이 섞인 원문을 영어 화면에 올리면 그 페이지의
+            #   본문이 곧 한국어가 된다(문서 페이지의 doc_is_english 와 같은 판정).
+            text = finding_body(f, lang).strip()
+            if not text or (lang != DEFAULT_LANG and _HANGUL_RE.search(text)):
                 continue
             for sec in {_cfr_section_of(r) for r in (f.get("cfr_refs") or [])}:
                 if not sec or sec not in catalog:
@@ -1999,7 +2091,7 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
                     "evidence_url": doc.get("evidence_url") or "",
                     "finding_id": f.get("finding_id") or "",
                     "document_id": doc.get("document_id") or "",
-                    "text_ko": text,
+                    "body": text,
                 })
                 doc_ids.setdefault(sec, set()).add(doc.get("document_id") or "")
 
@@ -2010,7 +2102,9 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
         if not tid or not tko:
             continue
         for sec in sorted({_cfr_section_of(r) for r in (t.get("reg_refs") or [])} - {""}):
-            terms_by_section.setdefault(sec, []).append({"id": tid, "term_ko": tko})
+            # 용어 라벨도 읽는 언어를 따른다 — 영문 용어사전이 생겨 링크가 성립한다.
+            label = tko if lang == DEFAULT_LANG else (t.get("term_en") or tko)
+            terms_by_section.setdefault(sec, []).append({"id": tid, "label": label})
 
     views: list[dict[str, Any]] = []
     for sec in sorted(by_section):
@@ -2741,7 +2835,7 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
 #   반대로 **빼는 것**과 그 이유(수리 순서가 곧 설계 문서 §7 의 4·5단계다):
 #     · 문서·모음·조항·업체 정적 페이지 = 본문이 `text_ko` 뿐이다(`findings_docs.json`·
 #       `findings_facets.json` 에 영문 원문이 없다) → 4단계에서 데이터를 넣은 뒤.
-#     · 용어사전 = `term_en` 은 100% 이나 풀이(`easy_ko`·`detail_ko`)가 한국어다.
+#     · 용어사전 = 영문 풀이·영문 사례 정본이 갖춰진 뒤 영어 트리에 편입했다.
 #     · 이용안내·주간 퀴즈·주간 브리프/아카이브 = 한국어 산문 그 자체 → 5단계.
 #     · 마이페이지·Admin = 개인화·운영자 화면(언어 트리와 무관).
 # 없는 페이지로 보내는 링크는 무링크보다 나쁘다는 저장소 규율 그대로, nav·푸터·언어
@@ -2756,6 +2850,7 @@ EN_TREE_STATIC: tuple[str, ...] = (
     "findings/firm/",
     "findings/inspector/",
     "library/",
+    "glossary/",
 )
 
 
@@ -2763,6 +2858,28 @@ EN_TREE_STATIC: tuple[str, ...] = (
 #   실명이 적시된 개인 집계라 베이스 경로조차 등록하지 않는다(noindex 는 템플릿이 건다).
 #   언어판이라고 정책이 느슨해지면 안 된다(영어판에서 색인되면 정책 우회가 된다).
 EN_SITEMAP_EXCLUDED: frozenset[str] = frozenset({"findings/inspector/"})
+
+
+def glossary_tree_paths(terms: "list[dict[str, Any]] | None") -> "set[str]":
+    """영어 용어사전 면 집합 — 정본에서 파생한다(색인 1 + 낱말 N).
+
+    렌더와 테스트가 **같은 함수**를 부른다. 각자 세면 두 목록이 갈라지고, 갈라지면
+    nav·hreflang·sitemap 이 없는 페이지를 가리킨다(`facet_tree_paths` 와 같은 계약).
+    """
+    if not terms:
+        return set()
+    return {"glossary/"} | {f"glossary/{t['id']}/" for t in terms}
+
+
+def clause_tree_paths(views: "list[dict[str, Any]] | None") -> "set[str]":
+    """영어 조항 면 집합 — **영어 모집단으로 다시 센 뷰**에서 파생한다.
+
+    한국어 뷰에서 파생하면 임계 미달로 안 만든 조항까지 선언에 들어간다(없는 페이지를
+    광고하는 것). 뷰가 곧 만들어질 페이지라, 뷰에서 파생하는 것이 유일하게 옳다.
+    """
+    if not views:
+        return set()
+    return {"findings/clause/"} | {f"findings/clause/{c['slug']}/" for c in views}
 
 
 def en_tree_paths(catalogs: "list[dict[str, Any]] | None" = None) -> set[str]:
@@ -3011,7 +3128,8 @@ def build_llms_txt(briefs: list[dict[str, Any]],
                    base_url: str = SITE_BASE_URL,
                    *,
                    glossary_term_ids: "list[str] | None" = None,
-                   facet_paths: "list[tuple[str, str]] | None" = None) -> str:
+                   facet_paths: "list[tuple[str, str]] | None" = None,
+                   en_paths: "set[str] | None" = None) -> str:
     """llms.txt(llmstxt.org 관례) — AI 어시스턴트·AI 검색용 사이트 안내.
 
     RUM 실측(2026-08 30일)에서 AI 유입(chatgpt+gemini 합 30)이 이미 네이버(20)를
@@ -3020,6 +3138,13 @@ def build_llms_txt(briefs: list[dict[str, Any]],
     facet_paths)에서 파생한다 — 문장에 박은 숫자는 낡는다. facet_paths 는 문서 렌더
     스위치와 무관하게 데이터에서 파생되므로(sitemap 과 같은 원천) 테스트 빌드와
     프로덕션의 llms.txt 가 같다. 생성시각/난수 0(byte 고정).
+
+    ★[다국어 2026-09-04] 영어판 섹션을 더한다. 영문 트리 4,163장을 다 만들어 놓고도 이
+      파일에는 `/en/` 이 한 번도 안 나왔다 — AI 어시스턴트는 이 파일로 사이트 구조를
+      읽으므로, 영어로 물어본 사용자에게 **한국어 페이지만 인용**하게 된다. 만든 것과
+      알리는 것은 다른 일이다(sitemap 에만 있고 링크가 없어 색인 안 되던 문서 3,202장과
+      같은 실패의 다른 얼굴). 어떤 섹션을 적을지는 `en_paths` 가 정한다 — 없는 면을
+      적으면 AI 에게 없는 페이지를 알려주는 것이고, 그건 무링크보다 나쁘다.
     """
     pubs = sorted((b["brief"].get("publish_date", "") for b in briefs),
                   reverse=True)
@@ -3071,7 +3196,84 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
         f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
     ]
+    lines += _llms_english_section(base_url, en_paths or set())
     return "\n".join(lines) + "\n"
+
+
+#: 영어판 섹션의 행 후보 — (경로, 라벨, 설명). ★한국어판과 **같은 갈래를 미리 다** 적어
+#: 두고, 실제로 난 면만 출력한다. 그래서 아직 없는 아카이브·이용안내·퀴즈가 영어판으로
+#: 서는 날 이 파일이 저절로 그것을 알린다(손으로 고쳐야 하는 목록은 반드시 낡는다).
+#: 설명에 수치를 박지 않는다 — `{}` 자리는 아래에서 `en_paths` 로 센 값이 들어간다.
+LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
+    ("", "English edition home",
+     "Entry point for the English tree"),
+    ("findings/", "Findings search",
+     "Search inspection findings in the regulator's original English — FDA 483s,"
+     " Warning Letters, EU/UK GMP non-compliance reports, Health Canada inspections."
+     " Defaults to English-original findings; one click widens it to the full corpus"),
+    ("findings/browse/", "Browse findings",
+     "Entry points by task, recent documents, and the category/country/agency axes"),
+    ("findings/docs/", "Documents by agency and year",
+     "{docs:,} inspection documents whose source text is English"),
+    ("findings/clause/", "Findings by 21 CFR section",
+     "{clause} sections, each with the findings that cite it"),
+    ("findings/trends/", "Findings trends",
+     "Ranked deficiency areas over the last 12 months and the most-cited sections"),
+    ("findings/inspections/", "FDA inspection classifications",
+     "NAI/VAI/OAI counts by year and country"),
+    ("findings/coverage/", "Data coverage",
+     "Which sources are collected, how far back, and the known limits"),
+    ("findings/firm/", "Company lookup",
+     "{firms:,} companies with a static page listing that company's findings"),
+    ("findings/checklist/", "Self-assessment checklist",
+     "Checklist items derived from the most frequent deficiencies"),
+    ("glossary/", "Regulatory glossary",
+     "{terms} GMP and quality terms explained in plain English with official sources"),
+    ("library/", "Reference library",
+     "Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents"),
+    ("archive/", "Weekly brief archive", "Past weekly regulatory briefs"),
+    ("guide/", "Guide", "How to use the service, and frequently asked questions"),
+    ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),
+)
+
+
+def _llms_english_section(base_url: str, en_paths: "set[str]") -> list[str]:
+    """영어판 섹션 줄 — 실제로 난 면만. 영어 트리가 없으면 아무 줄도 내지 않는다."""
+    if not en_paths:
+        return []
+    counts = {
+        "docs": sum(1 for p in en_paths if p.startswith("findings/doc/")),
+        "terms": sum(1 for p in en_paths
+                     if p.startswith("glossary/") and p != "glossary/"),
+        "clause": sum(1 for p in en_paths
+                      if p.startswith("findings/clause/") and p != "findings/clause/"),
+        # 색인(`findings/firm/`) 자신을 빼야 업체 수다 — 안 빼면 585 개가 586 으로 나간다.
+        "firms": sum(1 for p in en_paths
+                     if p.startswith("findings/firm/") and p != "findings/firm/"),
+    }
+    rows = [(path, label, desc) for path, label, desc in LLMS_EN_ROWS
+            if path in en_paths]
+    if not rows:
+        return []
+    out = [
+        "",
+        "## English edition (/en/)",
+        "",
+        "The same service in English. Every page under `/en/` is the English edition of"
+        " the Korean page at the same path without the prefix, and the two declare each"
+        " other with `hreflang`. Findings are shown in the regulator's own English"
+        " wording rather than translated back from Korean.",
+        "",
+        "Some pages exist only in Korean because the source document is Korean — MFDS"
+        " inspection findings, for example. Those have no `/en/` counterpart, and the"
+        " English pages do not link to them. Where a Korean law or document name appears"
+        " on an English page it is kept in the original, because translating the name"
+        " would point at a document that does not exist.",
+        "",
+    ]
+    out += [f"- [{label}]({base_url}/en/{path}): {desc.format(**counts)}"
+            for path, label, desc in rows]
+    return out
 
 
 def build_sitemap_xml(briefs: list[dict[str, Any]],
@@ -3234,25 +3436,31 @@ def build_rss_xml(briefs: list[dict[str, Any]],
 
 def build_glossary_term_json_ld(term: dict[str, Any],
                                 base_url: str = SITE_BASE_URL,
-                                tr: Translator = _KO) -> str:
+                                tr: Translator = _KO, lang: str = DEFAULT_LANG) -> str:
     """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
 
-    inLanguage=ko. `name` 은 한글 표제어, `alternateName` 은 영문 표제어(+동의어).
+    inLanguage 은 **그 페이지의 언어**다. `name` 은 그 언어의 표제어,
+    `alternateName` 은 한국어판에서만 영문 표제어(+동의어)를 싣는다.
     값은 전부 정본 무변형이고 json.dumps 가 이스케이프를 책임진다(수동 문자열 결합 0).
     """
-    alt = [term["term_en"], *term.get("aliases", [])]
+    # 한국어판은 영문 표제어를 대체명으로 싣는다. 영어판은 표제어가 곧 영문이라
+    # 대체명이 없다(한국어 표기를 영어 구조화 데이터에 넣지 않는다).
+    alt = ([term["term_sub"], *term.get("aliases", [])]
+           if term.get("term_sub") else list(term.get("aliases") or []))
     node: dict[str, Any] = {
         "@context": "https://schema.org",
         "@type": "DefinedTerm",
-        "name": term["term_ko"],
+        "name": term.get("term") or term["term_ko"],
         "alternateName": [a for a in alt if a],
-        "description": term.get("easy_ko") or "",
-        "inLanguage": "ko",
-        "url": f"{base_url}/glossary/{term['id']}/",
+        "description": term.get("easy") or term.get("easy_ko") or "",
+        # ★언어와 URL 이 실제 페이지와 어긋나면 구조화 데이터가 거짓말이 된다 —
+        #   영어판이 "이 페이지는 한국어이고 주소는 /glossary/…"라고 말하게 된다.
+        "inLanguage": lang,
+        "url": f"{base_url}/{LANG_PREFIXES[lang]}glossary/{term['id']}/",
         "inDefinedTermSet": {
             "@type": "DefinedTermSet",
             "name": tr("GRM 규제 용어사전"),
-            "url": f"{base_url}/glossary/",
+            "url": f"{base_url}/{LANG_PREFIXES[lang]}glossary/",
         },
     }
     return json.dumps(node, ensure_ascii=False, sort_keys=True)
@@ -3354,19 +3562,30 @@ def _brief_description(brief_meta: dict[str, Any], tr: Translator = _KO,
               date=title_dateform(brief_meta.get("publish_date", ""), tr))
 
 
-def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
+def build_json_ld(base_url: str = SITE_BASE_URL, tr: Translator = _KO,
+                  lang: str = DEFAULT_LANG) -> str:
     """랜딩 JSON-LD(Organization + WebSite) — 정적·결정론. <script> 임베드 안전 직렬화.
 
     값은 전부 렌더 보유 정적 카피 + base_url(무변형). '<' 만 \\u003c 로 치환해 </script>
     조기종료(브레이크아웃)를 원천 차단(데이터엔 '<' 부재 — 방어선). dict 삽입순 보존.
+
+    ★[다국어 2026-09-04] `inLanguage` 와 설명이 **한국어로 박혀 있었다**. 영어 홈이
+      "이 페이지는 한국어"라고 스스로 선언하면, 영어판을 만든 이유(영어 검색에 잡히는
+      것) 자체가 무너진다 — 화면은 영어인데 기계가 읽는 선언만 한국어인, 가장 찾기
+      어려운 종류의 거짓 신호다. `WebSite.url` 도 언어판 루트를 가리켜야 한다(그래야
+      두 노드가 서로 다른 판을 말한다). `Organization.url` 은 그대로 사이트 루트다 —
+      기관은 하나이고 언어판이 여럿인 것이지, 기관이 둘인 게 아니다.
     """
+    # 한국어는 종전 값 그대로(끝 "/" 없음) — 골든 바이트를 흔들지 않는다.
+    site_url = base_url if lang == DEFAULT_LANG else f"{base_url}/{LANG_PREFIXES[lang]}"
+    desc = tr(SITE_DESCRIPTION)
     nodes = [
         {"@context": "https://schema.org", "@type": "Organization",
-         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
+         "name": SITE_NAME, "url": base_url, "description": desc,
          "logo": f"{base_url}/assets/favicon-512.png"},
         {"@context": "https://schema.org", "@type": "WebSite",
-         "name": SITE_NAME, "url": base_url, "description": SITE_DESCRIPTION,
-         "inLanguage": "ko"},
+         "name": SITE_NAME, "url": site_url, "description": desc,
+         "inLanguage": lang},
     ]
     return json.dumps(nodes, ensure_ascii=False, indent=1).replace("<", "\\u003c")
 
@@ -3656,6 +3875,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 무링크보다 나쁘다). 커밋 정본 3종에서만 파생하므로 네트워크·순서 부담 0.
     clause_views = build_clause_views(docs_data, load_cfr_catalog(), load_glossary())
     clause_slugs = {c["slug"] for c in clause_views}
+    # [다국어 2026-09-04] 영어판 조항 — **원문이 영어인 지적만** 다시 세어 만든다.
+    # 문서 임계(CLAUSE_MIN_DOCUMENTS)를 그대로 다시 적용하므로 영어 모집단에서 얇아진
+    # 조항은 페이지를 만들지 않는다(얇은 페이지는 색인에 해롭다 — 한국어판과 같은 규율).
+    clause_views_en = build_clause_views(docs_data, load_cfr_catalog(), load_glossary(),
+                                         lang="en")
     doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
 
     # ── [다국어 4단계 2026-09-04] 영어 트리에 실사 문서 표면을 더한다 ─────────────
@@ -3680,6 +3904,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 기관×연도 목록은 **영어로 낼 문서가 있는 묶음만** 만든다(빈 목록 금지).
         en_paths |= {f"findings/docs/{d['agency'].lower()}/{d['published_date'][:4]}/"
                      for d in en_docs}
+    # [다국어 2026-09-04] 용어사전·조항 — **그리기 전에** 면 집합에 넣는다. 렌더 도중에
+    # 넣으면 먼저 그려진 한국어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만 붙는다
+    # (모음 페이지에서 같은 실수를 CI 가 잡았다).
+    en_paths |= clause_tree_paths(clause_views_en)
+    en_paths |= glossary_tree_paths(load_glossary())
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).
@@ -3695,7 +3924,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         page_title="GRM · Global Regulatory Monitor",
         nav_active="home",
         description=tr(SITE_DESCRIPTION),
-        json_ld=build_json_ld(),
+        json_ld=build_json_ld(tr=tr, lang=DEFAULT_LANG),
         cover=_cover_context(latest_brief, latest_issue_no, tr),
         library=library_summary,
         findings_zone=findings_zone,
@@ -3968,6 +4197,41 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             glossary=glossary_view,
         )
 
+        # ── [다국어 2026-09-04] 영어판 용어사전 ──────────────────────────────
+        # 표제어(`term_en`)는 데이터에 이미 있었고, 설명 두 필드(`easy_en`·`detail_en`)를
+        # 정본에 실어 본문이 영어로 성립하게 됐다. 색인은 **낱자 A–Z** 로 가른다 —
+        # 한국어판의 라틴 버킷(A–Z 한 덩어리)을 그대로 쓰면 242개가 한 칸에 들어간다.
+        # ★영문 사례는 전체 코퍼스 정본을 절대 재사용하지 않는다. `term_en` 후보를 실제
+        #   `p_orig_lang=en` RPC로 확인해 다시 센 별도 정본만 쓴다. 없으면 링크·인용 모두
+        #   비운다 — 숫자와 착지가 갈리는 반쪽 링크보다 낫다.
+        glossary_en_cases = load_glossary_cases(GLOSSARY_CASES_EN_FILE) or {}
+        glossary_en_view = build_glossary_view(
+            glossary_terms, _load_reg_ref_catalogs(), glossary_en_cases,
+            clause_slugs, lang="en") if glossary_terms else None
+        if glossary_en_view:
+            en_emit("glossary.html", en_page("glossary/"),
+                page_title=en_tr("규제 용어사전 · GRM"),
+                nav_active="glossary",
+                description=en_tr(GLOSSARY_DESCRIPTION),
+                glossary=glossary_en_view,
+            )
+            # 제외된 용어에는 정본 사례가 없으므로 인용 후보도 만들지 않는다. 이 필터는
+            # 결과를 바꾸지 않고, 영문 문장 탐색 범위만 정본 링크 대상에 맞춘다.
+            glossary_en_case_terms = [term for term in glossary_terms
+                                      if term["id"] in glossary_en_cases]
+            glossary_en_excerpts = build_glossary_case_excerpts(
+                glossary_en_case_terms, docs_data, glossary_en_cases, lang="en")
+            for group in glossary_en_view["groups"]:
+                for term in group["terms"]:
+                    en_emit("glossary_term.html", en_page(f"glossary/{term['id']}/"),
+                        page_title=glossary_term_page_title(term, en_tr),
+                        nav_active="glossary",
+                        description=glossary_term_description(term, en_tr),
+                        json_ld=build_glossary_term_json_ld(term, tr=en_tr, lang="en"),
+                        term=term,
+                        case_excerpts=glossary_en_excerpts.get(term["id"]) or [],
+                    )
+
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
         # 재사용한다(별도 가공 0 → 두 화면이 갈라질 수 없다). 정렬은 뷰모델 순서 그대로라
         # 결정론이고, sitemap 도 이 순서를 쓴다.
@@ -4156,9 +4420,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라
     # 국문 해설이 공백이다. 데이터는 커밋 정본 셋(findings_docs·library/cfr·glossary)에서만
     # 나오므로 facets 유무와 무관하게 만들어진다.
-    if clause_views:
-        clause_agency_labels = (docs_data or {}).get("agency_labels") or (
-            facets.get("agency_labels") if facets else {}) or {}
+    def emit_clause_tree(views, mkpage, emit_page, tr, lang_key, agency_labels):
+        """조항 색인 + 조항 N장 — 구현을 두 벌 두지 않는다(두 벌이면 언젠가 갈라진다)."""
+        if not views:
+            return
+        clause_views = views
+        clause_agency_labels = agency_labels
+        page, emit = mkpage, emit_page
         clause_index = page("findings/clause/")
         emit("findings_clause_index.html", clause_index,
             page_title=tr("21 CFR 조항별 지적사례 · GRM"),
@@ -4171,7 +4439,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         index_mod = max((s.get("published_date") or ""
                          for c in clause_views for s in c["samples"]), default="")
-        facet_paths.append((clause_index.site_path, index_mod))
+        if lang_key == DEFAULT_LANG:
+            facet_paths.append((clause_index.site_path, index_mod))
 
         # 형제 목록은 전 조항 공통(같은 값 재사용 — 페이지마다 다시 만들지 않는다).
         sibs = [{"slug": c["slug"], "code": c["code"]} for c in clause_views]
@@ -4188,7 +4457,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             )
             clause_mod = max((s.get("published_date") or ""
                               for s in clause["samples"]), default="")
-            facet_paths.append((clause_page.site_path, clause_mod))
+            if lang_key == DEFAULT_LANG:
+                facet_paths.append((clause_page.site_path, clause_mod))
+
+    _clause_agency_labels = (docs_data or {}).get("agency_labels") or (
+        facets.get("agency_labels") if facets else {}) or {}
+    emit_clause_tree(clause_views, page, emit, tr, DEFAULT_LANG, _clause_agency_labels)
+    emit_clause_tree(clause_views_en, en_page, en_emit, en_tr, "en",
+                     {k: en_tr(v) for k, v in _clause_agency_labels.items()})
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지
@@ -4709,7 +4985,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         page_title=en_tr(N_("GRM · 글로벌 규제 인텔리전스 · 영문판")),
         nav_active="home",
         description=en_tr(SITE_DESCRIPTION),
-        json_ld=build_json_ld(),
+        json_ld=build_json_ld(tr=en_tr, lang="en"),
         findings_zone=findings_zone,
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
@@ -4821,7 +5097,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     written.append("robots.txt")
     # llms.txt — AI 어시스턴트용 안내. sitemap 과 같은 입력에서 파생(결정론).
     _write(out_dir / "llms.txt",
-           build_llms_txt(briefs, glossary_term_ids=glossary_term_ids,
+           build_llms_txt(briefs, glossary_term_ids=glossary_term_ids, en_paths=en_paths,
                           facet_paths=facet_paths))
     written.append("llms.txt")
     _write(out_dir / "sitemap.xml",

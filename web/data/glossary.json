@@ -19,7 +19,9 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
-    ]
+    ],
+    "easy_en": "The part of quality assurance ensuring that medicines are consistently produced and controlled to the quality standards appropriate to their intended use.",
+    "detail_en": "GMP is not a way of confirming quality by testing alone; it is the minimum operating system that designs and controls people, facilities, processes, records, and release so that product is made consistently. In inspections, the gap between the approved procedure and what is actually done, weak quality unit oversight, and incomplete data and batch records are what turn into system level findings. Look at the quality manual, the organisation and its responsibilities, manufacturing and testing records, deviations, CAPA and change control, and the release approval evidence together."
   },
   {
     "id": "active-ingredient",
@@ -35,7 +37,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A component of a medicine intended to exert a pharmacological action or other direct effect in the diagnosis, treatment, or prevention of disease."
   },
   {
     "id": "api",
@@ -55,7 +58,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A substance or mixture of substances used in manufacturing a medicine that becomes the active ingredient in the finished product."
   },
   {
     "id": "api-starting-material",
@@ -72,7 +76,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A raw material, intermediate, or API used in producing an API and incorporated as a significant structural fragment into the structure of the API."
   },
   {
     "id": "drug-product",
@@ -89,7 +94,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A medicine in its dosage form that has completed all stages of production, including final packaging."
   },
   {
     "id": "batch",
@@ -106,7 +112,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A defined quantity produced in a process or series of processes and expected to be homogeneous within specified limits."
   },
   {
     "id": "batch-number",
@@ -123,7 +130,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A distinctive combination of numbers, letters, or both that uniquely identifies a batch and allows its manufacturing and distribution history to be traced."
   },
   {
     "id": "batch-record",
@@ -145,7 +153,9 @@
     "reg_refs": [
       "21 CFR 211.188",
       "EU GMP Part I Chapter 4"
-    ]
+    ],
+    "easy_en": "All the documents that show how a particular batch was made and the circumstances bearing on its final quality.",
+    "detail_en": "Batch manufacturing records are the primary evidence from which the execution of a particular batch, and any event affecting its quality, can be reconstructed from beginning to end. Inspections look for missing critical process steps, actual values, signature times or deviations, for divergence from the master instruction, and for unexplained differences in yield or material reconciliation. Read the master production record, the executed batch record, equipment logs, yield and reconciliation, deviations, test results, and the release approval record as one connected chain."
   },
   {
     "id": "bulk-product",
@@ -162,7 +172,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "Product that has completed every processing stage except final packaging."
   },
   {
     "id": "intermediate",
@@ -179,7 +190,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A material produced during processing of an API that must undergo further molecular change or purification before it becomes an API."
   },
   {
     "id": "intermediate-product",
@@ -196,7 +208,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "Partly processed material that must undergo further manufacturing steps before it becomes a bulk product."
   },
   {
     "id": "finished-product",
@@ -216,7 +229,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A medicine that has completed all stages of production, including filling into the final container and packaging."
   },
   {
     "id": "starting-material",
@@ -233,7 +247,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "Any substance used in the production of a medicine, excluding packaging materials."
   },
   {
     "id": "raw-material",
@@ -250,7 +265,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "A general starting material intended for use in producing an intermediate or an API."
   },
   {
     "id": "packaging-material",
@@ -267,7 +283,8 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "ICH Q7 §§7–11"
-    ]
+    ],
+    "easy_en": "Any material used in packaging a medicine, other than the outer packaging used for transport."
   },
   {
     "id": "manufacture",
@@ -284,7 +301,8 @@
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
-    ]
+    ],
+    "easy_en": "All operations of purchase of materials and products, production, quality control, release, storage, and distribution, and the related controls."
   },
   {
     "id": "production",
@@ -301,7 +319,8 @@
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
-    ]
+    ],
+    "easy_en": "All the operations from receipt of materials, through processing and packaging, to the finished product."
   },
   {
     "id": "packaging",
@@ -318,7 +337,8 @@
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
-    ]
+    ],
+    "easy_en": "All the operations, including filling and labelling, by which a bulk product becomes a finished product."
   },
   {
     "id": "manufacturer",
@@ -335,7 +355,8 @@
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
-    ]
+    ],
+    "easy_en": "A person or company holding an authorisation to manufacture medicines under the applicable regulation."
   },
   {
     "id": "marketing-authorization",
@@ -355,7 +376,8 @@
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
-    ]
+    ],
+    "easy_en": "The official authorisation from the regulatory authority that fixes the approved composition, manufacture, testing, and labelling of a medicine."
   },
   {
     "id": "authorized-person",
@@ -375,7 +397,8 @@
     "reg_refs": [
       "WHO TRS 986 Annex 2, Part 1",
       "의약품 제조 및 품질관리에 관한 규정 [별표 1]"
-    ]
+    ],
+    "easy_en": "The person recognised by the regulatory authority who is responsible for ensuring that each batch is manufactured and tested in accordance with the law and approved for release."
   },
   {
     "id": "batch-release",
@@ -396,7 +419,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The process of reviewing a batch's manufacturing and testing records and its compliance with requirements, and then approving it for sale."
   },
   {
     "id": "quarantine",
@@ -414,7 +438,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The status of materials or products held physically or by another effective means apart, pending a decision on release, rejection, or reprocessing."
   },
   {
     "id": "reprocessing",
@@ -432,7 +457,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "Returning an intermediate or API that does not conform to standards or specifications to a defined process step and repeating the established process."
   },
   {
     "id": "reworking",
@@ -453,7 +479,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "Subjecting material that does not conform to specification to one or more processing steps different from the established process, in order to make it acceptable."
   },
   {
     "id": "recall",
@@ -471,7 +498,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The procedure for withdrawing or removing a medicine from the distribution chain because of a quality defect or a safety concern."
   },
   {
     "id": "expiry-date",
@@ -489,7 +517,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The date after which the material may not be used, being the date up to which it is expected to remain within specification under the stated storage conditions."
   },
   {
     "id": "retest-date",
@@ -507,7 +536,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The date on which an API must be re-examined to confirm it is still suitable for use."
   },
   {
     "id": "acceptance-criteria",
@@ -525,7 +555,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "Numerical limits, ranges, or other suitable measures that decide whether a test result is acceptable."
   },
   {
     "id": "specification",
@@ -543,7 +574,8 @@
       "ICH Q7 §§10, 14–15",
       "EU GMP Part I Chapter 4",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The set of tests, analytical procedures, and acceptance criteria against which a material is judged suitable for its intended use."
   },
   {
     "id": "quality",
@@ -560,7 +592,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
-    ]
+    ],
+    "easy_en": "The degree to which an API or a medicine is suitable for its intended use, including such attributes as identity, strength, and purity."
   },
   {
     "id": "quality-assurance",
@@ -577,7 +610,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
-    ]
+    ],
+    "easy_en": "The total arrangement of everything that bears on ensuring a medicine has the quality required for its intended use."
   },
   {
     "id": "quality-control",
@@ -594,7 +628,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
-    ]
+    ],
+    "easy_en": "Setting specifications, sampling, testing, and approving so that materials, intermediates, packaging materials, and finished products conform to the defined specifications."
   },
   {
     "id": "quality-unit",
@@ -611,7 +646,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8",
       "21 CFR 211.22"
-    ]
+    ],
+    "easy_en": "The organisational unit, independent of production, that carries out both quality assurance and quality control responsibilities."
   },
   {
     "id": "pharmaceutical-quality-system",
@@ -631,7 +667,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "The management system that links organisation, responsibilities, procedures, processes, and resources so that quality objectives are achieved across the product lifecycle."
   },
   {
     "id": "quality-policy",
@@ -648,7 +685,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "The overall intentions and direction of the organisation regarding quality, formally expressed by senior management."
   },
   {
     "id": "quality-objectives",
@@ -665,7 +703,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "Specific, measurable targets the organisation sets itself in order to carry out the quality policy."
   },
   {
     "id": "quality-manual",
@@ -682,7 +721,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "The document describing the scope, processes, responsibilities, and interrelationships of the quality system."
   },
   {
     "id": "quality-planning",
@@ -699,7 +739,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "Setting quality objectives and determining the operational procedures and resources needed to achieve them."
   },
   {
     "id": "continual-improvement",
@@ -719,7 +760,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "A recurring activity to increase the ability to fulfil requirements."
   },
   {
     "id": "state-of-control",
@@ -736,7 +778,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "The condition in which the set of controls in use provides continued assurance that process performance and product quality remain suitable."
   },
   {
     "id": "knowledge-management",
@@ -753,7 +796,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "A systematic approach to acquiring, analysing, storing, and disseminating information about products, manufacturing processes, and components."
   },
   {
     "id": "control-strategy",
@@ -770,7 +814,8 @@
     "reg_refs": [
       "ICH Q10 §§1.5–1.8, 2–4",
       "EU GMP Part I Chapter 1"
-    ]
+    ],
+    "easy_en": "A planned set of controls, derived from current product and process understanding, that assures process performance and product quality."
   },
   {
     "id": "quality-risk-management",
@@ -787,7 +832,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "A systematic process for assessing, controlling, communicating, and reviewing quality risk across the product lifecycle."
   },
   {
     "id": "risk",
@@ -804,7 +850,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "The combination of the probability of harm occurring and the severity of that harm."
   },
   {
     "id": "hazard",
@@ -821,7 +868,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "A potential source of harm to human health or to product quality."
   },
   {
     "id": "risk-identification",
@@ -838,7 +886,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "Finding potential sources of harm, working from the risk question or problem statement."
   },
   {
     "id": "risk-analysis",
@@ -855,7 +904,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "The estimation of the risk associated with identified hazards."
   },
   {
     "id": "risk-evaluation",
@@ -872,7 +922,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "Comparing the estimated risk against defined risk criteria to judge its significance."
   },
   {
     "id": "risk-assessment",
@@ -890,7 +941,9 @@
     "reg_refs": [
       "ICH Q9(R1) §4.3",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "The whole process of identifying, analysing, and then evaluating risk.",
+    "detail_en": "Risk assessment is the process of organising information, made up of risk identification (what could go wrong), risk analysis (the probability and severity, and where relevant detectability), and risk evaluation (comparison against defined criteria); taking that output and deciding whether to reduce or accept, and then acting, is risk control — assessment produces the material for the judgement and control carries the judgement out. ICH Q9(R1) §4.3 requires the work to begin from a well defined problem statement or risk question and to answer the three questions of what might go wrong, what is the likelihood, and what are the consequences, and notes that the robustness of the data determines the quality of the output, so assumptions and sources of uncertainty should be made explicit. Inspections cite documents with no risk question so that what was assessed cannot be told, FMEAs with no data behind the scores, signs that the conclusion was fixed first and the scores fitted to it, detectability overrated so as to lower the risk, and assessments whose results never became control decisions."
   },
   {
     "id": "risk-control",
@@ -908,7 +961,9 @@
     "reg_refs": [
       "ICH Q9(R1) §4.4",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "The process of deciding whether to accept a risk or to reduce or otherwise handle it, and of implementing that decision.",
+    "detail_en": "Risk control takes the output of the risk assessment and decides, then implements, whether to reduce the risk to an acceptable level (risk reduction) or to accept it (risk acceptance); it is distinct from the assessment stage that identifies and estimates risk — the ICH Q9(R1) glossary, following ISO Guide 73, defines it as actions implementing risk management decisions. §4.4 requires the effort put into control to be proportionate to the significance of the risk and to address four questions: is the risk above an acceptable level, what can be done to reduce or eliminate it, what is the appropriate balance among benefits, risks, and resources, and are new risks introduced as a result of the controls; it notes that processes such as cost-benefit analysis may be used to determine the optimal level of control. Inspections cite documents closed with no control measures although the risk was assessed as high, no confirmation that control measures were implemented or effective, no record of who accepted the risk and on what basis, and new risks created by the controls left unexamined."
   },
   {
     "id": "risk-reduction",
@@ -930,7 +985,9 @@
     "reg_refs": [
       "ICH Q9(R1) §4.4",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "Action taken to lessen the probability of harm occurring or its severity.",
+    "detail_en": "Risk reduction is the action actually taken to lower the probability or severity of harm, and within risk control it is the option set against acceptance — if control is deciding what to do, reduction is the act of actually lowering the risk. ICH Q9(R1) §4.4 gives, as means of reduction where a risk exceeds an acceptable level, measures that mitigate severity and probability and procedures that improve the detectability of the harm, and recommends that the risk assessment be repeated after the action because reduction measures may introduce new risks or increase existing ones. Inspections cite measures such as more training recorded as reduction although they do not actually lower probability, residual risk not reassessed after the action, reduction measures not connected to CAPA so that implementation cannot be traced, and improved detection treated as though it had addressed the root cause."
   },
   {
     "id": "risk-acceptance",
@@ -947,7 +1004,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "The decision to accept a risk."
   },
   {
     "id": "risk-communication",
@@ -964,7 +1022,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "The sharing of information about risk and risk management between decision makers and other stakeholders."
   },
   {
     "id": "risk-review",
@@ -981,7 +1040,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "Reviewing or monitoring the output of risk management in the light of new knowledge and experience."
   },
   {
     "id": "severity",
@@ -998,7 +1058,8 @@
     "reg_refs": [
       "ICH Q9(R1) §§4–5, 7",
       "EU GMP Part I Chapter 1 §1.12"
-    ]
+    ],
+    "easy_en": "A measure of the possible consequences of a hazard if the harm occurs."
   },
   {
     "id": "capa",
@@ -1019,7 +1080,9 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "A system for investigating causes and implementing and verifying actions so that problems that occurred do not recur and potential problems do not arise.",
+    "detail_en": "CAPA is a closed loop procedure that removes the cause of a confirmed nonconformity, prevents potential problems, and goes on to verify that the action taken actually worked. Inspections cite repeated retraining unrelated to the root cause, extended due dates, a narrowed impact assessment, and closure without effectiveness checks. Trace the investigation report, the evidence for the root cause, the action plan with owner and due date, change control, and the effectiveness verification record."
   },
   {
     "id": "corrective-action",
@@ -1036,7 +1099,8 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "Action to eliminate the cause of a detected nonconformity or other undesirable situation so that it does not recur."
   },
   {
     "id": "preventive-action",
@@ -1053,7 +1117,8 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "Action to eliminate the cause of a potential nonconformity or other undesirable situation so that it does not occur."
   },
   {
     "id": "root-cause-analysis",
@@ -1070,7 +1135,8 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "Analysis that finds the underlying cause and contributing factors of a problem so that corrective and preventive action can be matched to the cause."
   },
   {
     "id": "deviation",
@@ -1087,7 +1153,8 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "A departure from an approved instruction or an established standard."
   },
   {
     "id": "change-control",
@@ -1104,7 +1171,8 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "A formal system in which representatives of the relevant disciplines review and approve changes that could affect the validated state."
   },
   {
     "id": "change-management",
@@ -1121,7 +1189,8 @@
     "reg_refs": [
       "ICH Q10 §§3.2.2–3.2.3",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "A systematic approach to proposing, evaluating, approving, implementing, and reviewing changes."
   },
   {
     "id": "supplier-qualification",
@@ -1144,7 +1213,8 @@
       "EU GMP Part I Chapter 7",
       "EU GMP Part I Chapter 8",
       "ICH Q10 §2.7"
-    ]
+    ],
+    "easy_en": "Assessing and approving whether a supplier is able to provide materials or services that consistently meet the defined quality requirements."
   },
   {
     "id": "outsourced-activities",
@@ -1163,7 +1233,8 @@
       "EU GMP Part I Chapter 7",
       "EU GMP Part I Chapter 8",
       "ICH Q10 §2.7"
-    ]
+    ],
+    "easy_en": "Activities within the scope of the quality system that are given to an external contractor to perform."
   },
   {
     "id": "contract-manufacturer",
@@ -1188,7 +1259,8 @@
       "EU GMP Part I Chapter 7",
       "EU GMP Part I Chapter 8",
       "ICH Q10 §2.7"
-    ]
+    ],
+    "easy_en": "A manufacturer performing some or all of the manufacturing operations on behalf of another manufacturer under a written contract."
   },
   {
     "id": "product-quality-review",
@@ -1210,7 +1282,8 @@
       "EU GMP Part I Chapter 7",
       "EU GMP Part I Chapter 8",
       "ICH Q10 §2.7"
-    ]
+    ],
+    "easy_en": "A quality review performed periodically to confirm the consistency of the process and product, the adequacy of specifications, trends, and the need for improvement."
   },
   {
     "id": "product-complaint",
@@ -1234,7 +1307,8 @@
       "EU GMP Part I Chapter 7",
       "EU GMP Part I Chapter 8",
       "ICH Q10 §2.7"
-    ]
+    ],
+    "easy_en": "Information raising the possibility of a defect in the quality, packaging, or labelling of a distributed medicine."
   },
   {
     "id": "sop",
@@ -1255,7 +1329,8 @@
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
-    ]
+    ],
+    "easy_en": "A document setting out the approved method and sequence for performing a particular operation consistently."
   },
   {
     "id": "procedure",
@@ -1272,7 +1347,8 @@
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
-    ]
+    ],
+    "easy_en": "A document describing the operations, precautions, and measures directly or indirectly related to the manufacture of a medicine."
   },
   {
     "id": "documentation",
@@ -1289,7 +1365,8 @@
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
-    ]
+    ],
+    "easy_en": "The GMP system of preparing, approving, and controlling specifications, procedures, records, and reports so that activities and decisions are evidenced."
   },
   {
     "id": "record",
@@ -1306,7 +1383,8 @@
     "reg_refs": [
       "EU GMP Part I Chapter 4",
       "21 CFR 211.180–211.194"
-    ]
+    ],
+    "easy_en": "A document or data providing evidence of an activity performed or a result obtained."
   },
   {
     "id": "raw-data",
@@ -1328,7 +1406,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§7, 9, 13",
       "21 CFR 211.194"
-    ]
+    ],
+    "easy_en": "The original observations and the subsequent original records and data needed to reconstruct and evaluate an activity completely.",
+    "detail_en": "Raw data covers not only the first observation but the metadata and subsequent processing records needed to reconstruct a GMP activity completely. Inspections cite the printout kept as the only official record, or deleted injections, reprocessing, and informal notes excluded, so that the original result and the decision cannot be reconstructed. Check together the electronic files of the method and the analytical system, audit trails, metadata, the calculation and reprocessing history, and the retention and review procedures."
   },
   {
     "id": "electronic-record",
@@ -1346,7 +1426,9 @@
     "reg_refs": [
       "EU GMP Annex 11 §§4–14",
       "21 CFR Part 11"
-    ]
+    ],
+    "easy_en": "A record in digital form that a computer system creates, modifies, stores, retrieves, and distributes.",
+    "detail_en": "An electronic record is digital information created, modified, maintained, archived, retrieved, and distributed by a computer system, and the meaning and context of that data must be preserved. Inspections cite failure to demonstrate lifecycle control, access rights, audit trails, electronic signatures, long term readability, or that the record is original and accurate. Check the system inventory, data flows, the URS and validation, the privilege table, audit trail review, and backup, recovery, and retention records."
   },
   {
     "id": "data-integrity",
@@ -1367,7 +1449,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§5, 7, 9, 13",
       "EU GMP Annex 11 §§4, 9, 12"
-    ]
+    ],
+    "easy_en": "The degree to which data stays complete, consistent, accurate, and trustworthy from creation to disposal.",
+    "detail_en": "Data integrity is the state in which data remains complete, consistent, accurate, and trustworthy across the whole lifecycle and keeps the ALCOA+ attributes. The central inspection findings are missing raw data or metadata, shared accounts, selective reporting, deletion and reprocessing traces that were never reviewed, and backups whose restoration was never tested. Check data governance, the system inventory, privileges and audit trails, raw data review, and retention, backup, and recovery evidence."
   },
   {
     "id": "alcoa-plus",
@@ -1385,7 +1469,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §7.4",
       "WHO Technical Report Series No. 1033, Annex 4"
-    ]
+    ],
+    "easy_en": "The principle that data must be attributable, legible, contemporaneous, original, and accurate, and must also stay complete, consistent, enduring, and available.",
+    "detail_en": "ALCOA+ is the practical standard that data be attributable, legible, contemporaneous, original and accurate, and in addition complete, consistent, enduring and available. Inspections do not stop at whether the principle is written into a procedure; they check whether it is actually implemented, looking at shared accounts, records made after the fact, discarded temporary records, missing data, change history, and whether records can still be retrieved years later. Look at raw data, metadata, audit trails, review records, privilege management, and retention and backup procedures across the whole data lifecycle."
   },
   {
     "id": "audit-trail",
@@ -1406,7 +1492,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§5, 7, 9, 13",
       "EU GMP Annex 11 §§4, 9, 12"
-    ]
+    ],
+    "easy_en": "A secure record that allows the creation, change, and deletion of electronic records, and the reasons for them, to be reconstructed in time order.",
+    "detail_en": "An audit trail is the metadata that lets the creation, change, and deletion of GMP relevant data be reconstructed together with when it happened and who did it. Inspections cite the function being switched off, administrator and analyst privileges not being separated, and periodic review either not performed or missing the reason for the change. Check the system configuration, user privileges, the audit trail review procedure and its records, and how data review connects to incident investigation."
   },
   {
     "id": "computerised-system",
@@ -1428,7 +1516,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§5, 7, 9, 13",
       "EU GMP Annex 11 §§4, 9, 12"
-    ]
+    ],
+    "easy_en": "A set of software and hardware components configured to perform a particular function together.",
+    "detail_en": "A computerised system is software and hardware performing a GMP function together; the application is validated and the IT infrastructure is qualified. Inspections cite the absence of an up to date system inventory, user requirements specification, data flow, or interface description, and inadequate access control, change control, and periodic review. Look at the system description, validation traceability, privileges, audit trails, backup and recovery, and records of changes, incidents, and periodic review."
   },
   {
     "id": "electronic-signature",
@@ -1446,7 +1536,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§5, 7, 9, 13",
       "EU GMP Annex 11 §§4, 9, 12"
-    ]
+    ],
+    "easy_en": "Data generated electronically to show the identity of the signer and their responsibility for an electronic record.",
+    "detail_en": "The electronic signature is a data control concept that allows GMP activities and decisions to be reconstructed completely in both paper and electronic environments. Inspections cite shared accounts, audit trails not enabled or not reviewed, missing raw data or metadata, and deletions and reprocessing recorded without a reason. Check the system inventory, the URS and validation, user privileges, audit trail review, and backup, recovery, and raw data retention records."
   },
   {
     "id": "validation",
@@ -1464,7 +1556,9 @@
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "Demonstrating and documenting that a procedure, process, equipment, material, activity, or system actually gives the expected result.",
+    "detail_en": "Validation is a lifecycle activity that establishes documented, high level assurance that a process, procedure, or system consistently produces the intended result. Inspections cite criteria altered to fit the results because none were approved in advance, and operation continued with deviations or changes left unclosed. Check the validation master plan, risk assessments, protocols, raw data, and reports, requirements traceability, and the basis for changes and revalidation."
   },
   {
     "id": "validation-master-plan",
@@ -1481,7 +1575,8 @@
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "The high level document summarising a site's qualification and validation policy, organisation, scope, status, and strategy."
   },
   {
     "id": "validation-protocol",
@@ -1498,7 +1593,8 @@
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "A document fixing in advance the critical systems, attributes, and parameters to be tested in a validation, together with the methods and acceptance criteria."
   },
   {
     "id": "validation-report",
@@ -1515,7 +1611,8 @@
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "A document comparing validation results against the acceptance criteria and recording deviations, conclusions, and any recommendations."
   },
   {
     "id": "qualification",
@@ -1532,7 +1629,8 @@
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "Demonstrating and documenting that facilities, systems, and equipment are correctly installed, work properly, and give the expected results."
   },
   {
     "id": "user-requirements-specification",
@@ -1552,7 +1650,8 @@
     "reg_refs": [
       "EU GMP Annex 15 §§1–4",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "The specification setting out the requirements a facility, equipment, utility, or system must meet to be fit for its intended use."
   },
   {
     "id": "design-qualification",
@@ -1571,7 +1670,9 @@
       "EU GMP Annex 15 §§3.2–3.7",
       "ICH Q7 §12.30",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "The stage that documents and demonstrates that the design of a facility, equipment, utility, or system meets GMP and the user requirements.",
+    "detail_en": "Design qualification is the first stage of qualification: before installation, it documents that the design of the equipment, facility, utility, or system meets GMP and the user requirements specification — it asks whether the requirements were carried into the design, before IQ asks whether it was installed as drawn, OQ whether it works as designed, and PQ whether it performs in practice. EU GMP Annex 15 §3.3 requires that the requirements of the URS be verified during DQ, and §§3.4–3.7 allow documentation and tests confirmed at factory acceptance testing and site acceptance testing not to be repeated at IQ/OQ where it can be shown that transport and installation did not affect functionality. Inspections cite a supplier's specification used as the DQ in place of a URS, no traceability between URS items and what DQ verified, and design changes carried into IQ without being reflected in the DQ."
   },
   {
     "id": "installation-qualification",
@@ -1590,7 +1691,9 @@
       "EU GMP Annex 15 §§3.8–3.9",
       "ICH Q7 §12.30",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "The stage confirming that a facility, equipment, utility, or system has been installed correctly in accordance with the approved design and specification.",
+    "detail_en": "Installation qualification confirms that equipment, facilities, utilities, and systems have been installed in accordance with the approved design and specification; it is not operational testing (OQ) or performance confirmation (PQ) but asks whether what should be there is there and correctly placed. EU GMP Annex 15 §3.9 requires IQ to include verification of the installation of components, instrumentation, equipment, pipework, and utilities against engineering drawings and specifications, verification of the installation against predefined criteria, collection and collation of supplier operating and working instructions and maintenance requirements, calibration of instrumentation, and verification of materials of construction. Inspections cite instrument calibration at the IQ stage carried out only after use, installation drawings that differ from the pipework and components actually fitted yet passed without a deviation, missing evidence for product contact materials, and maintenance procedures written without the supplier's instructions."
   },
   {
     "id": "operational-qualification",
@@ -1609,7 +1712,9 @@
       "EU GMP Annex 15 §§3.10–3.12",
       "ICH Q7 §12.30",
       "EU GMP Annex 11 §4"
-    ]
+    ],
+    "easy_en": "The stage that tests whether equipment or a system operates as designed throughout the defined operating range and at worst case conditions.",
+    "detail_en": "Operational qualification tests that installed equipment and systems operate as designed across the whole defined operating range and at worst case conditions; it sits between IQ, which checks the installed state, and PQ, which looks at process performance with real materials. EU GMP Annex 15 §3.11 requires tests developed from knowledge of the process, system, and equipment, and tests confirming the upper and lower operating limits and worst case conditions, and §3.12 requires standard operating and cleaning procedures, operator training, and preventive maintenance requirements to be finalised only after OQ has been successfully completed (for simple equipment IQ and OQ may be combined as IOQ, §3.10). Inspections cite testing at the normal set point alone with both ends of the range and the worst case omitted, no testing of alarms, interlocks, or power failure recovery, procedures approved and used in production before OQ was complete, and failed tests covered by a retest with no deviation raised."
   },
   {
     "id": "performance-qualification",
@@ -1628,7 +1733,9 @@
       "EU GMP Annex 15 §§3.13–3.14",
       "ICH Q7 §12.30",
       "EU GMP Annex 15 §5"
-    ]
+    ],
+    "easy_en": "The stage confirming that equipment or a system consistently delivers the required performance with actual or equivalent materials under normal operating conditions.",
+    "detail_en": "Performance qualification is the last stage, confirming that equipment and systems consistently deliver the required performance with real production materials (or a substitute or simulated product shown to behave equivalently), under normal operating conditions and at worst case batch size; unlike OQ, which looks at the equipment operating, it looks at what the equipment produces. EU GMP Annex 15 §3.14 requires the sampling frequency used to confirm process control to be justified, and, absent documented justification from the development phase, requires tests to cover the operating range of the intended process; §3.13 notes that PQ may in some cases be performed together with OQ or process validation. Inspections cite PQ performed only with water or placebo without confirmation using the real product or a justified equivalent, worst case batch size not tested, PQ skipped straight to process validation with no justification, and no justification for the sampling frequency."
   },
   {
     "id": "process-validation",
@@ -1647,7 +1754,9 @@
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
       "21 CFR 211.110"
-    ]
+    ],
+    "easy_en": "Demonstrating that a process, within set parameters, can effectively and reproducibly produce product meeting its specification and quality attributes.",
+    "detail_en": "Process validation demonstrates, from process design through continued verification, that the commercial process reproducibly achieves the predetermined quality attributes. Inspections cite batches that are not representative, worst case conditions and process variability not evaluated, and no trend monitoring after PPQ. Look at process design knowledge, the PPQ protocol and batch data, statistical trends, deviations and changes, and the continued process verification report."
   },
   {
     "id": "continued-process-verification",
@@ -1665,7 +1774,8 @@
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
       "21 CFR 211.110"
-    ]
+    ],
+    "easy_en": "Continually collecting and evaluating process performance and product quality data during commercial production to confirm that the process remains in a state of control."
   },
   {
     "id": "revalidation",
@@ -1683,7 +1793,8 @@
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
       "21 CFR 211.110"
-    ]
+    ],
+    "easy_en": "Reconfirming, following a change or the outcome of a periodic review, that a process, equipment, or system remains in a validated state."
   },
   {
     "id": "cleaning-validation",
@@ -1701,7 +1812,8 @@
       "EU GMP Annex 15 §§5, 9–10",
       "21 CFR 211.100",
       "21 CFR 211.110"
-    ]
+    ],
+    "easy_en": "Documented evidence that an approved cleaning procedure leaves equipment in a condition suitable for processing medicines."
   },
   {
     "id": "analytical-procedure-validation",
@@ -1726,7 +1838,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "Demonstrating, through performance characteristics and criteria, that an analytical procedure performs suitably for its intended purpose."
   },
   {
     "id": "calibration",
@@ -1744,7 +1857,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "Checking, under specified conditions, the relationship between the values indicated by a measuring instrument and a traceable standard value."
   },
   {
     "id": "worst-case",
@@ -1762,7 +1876,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "Test conditions set at the upper and lower limits and circumstances that give the greatest chance of process failure."
   },
   {
     "id": "analytical-procedure",
@@ -1784,7 +1899,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "A detailed description of the operations and conditions used to perform a test."
   },
   {
     "id": "accuracy",
@@ -1803,7 +1919,9 @@
       "ICH Q2(R2) §3.3.1",
       "21 CFR 211.165",
       "21 CFR 211.160"
-    ]
+    ],
+    "easy_en": "How close a measured value is to the known true value or an accepted reference value.",
+    "detail_en": "Accuracy is how close a measured value is to the true (or accepted reference) value, while precision is how closely repeated measurements of the same sample agree with each other — if the mean is displaced from the true value, results can be tightly grouped (precise) and still not accurate. ICH Q2(R2) §3.3.1 asks that accuracy be established across the whole reportable range by comparison with a reference material, by spiking recovery, or by comparison with an orthogonal procedure, that it be demonstrated under normal test conditions including the real sample matrix and sample preparation, and that results from an adequate number of concentrations and replicates (for example three concentrations by three replicates) be reported as mean recovery (%) or as the difference from the true value with confidence intervals. Inspections cite recovery experiments run only on standard solutions without the matrix, acceptance criteria set after the results were seen, missing records establishing the accuracy and reproducibility of a test method as required by 21 CFR 211.165(e), and calibration programmes under 211.160(b)(4) that omit limits for accuracy and precision."
   },
   {
     "id": "precision",
@@ -1822,7 +1940,9 @@
       "ICH Q2(R2) §3.3.2",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The closeness of agreement between results obtained by repeatedly measuring the same homogeneous sample under prescribed conditions.",
+    "detail_en": "Precision is the scatter of results when the same homogeneous sample is measured several times under prescribed conditions, and is distinct from accuracy, which is closeness to the true value — results that agree closely with each other but sit to one side are precise but not accurate. ICH Q2(R2) divides precision into three levels, repeatability (same conditions, short interval), intermediate precision (different days, environments, analysts, equipment), and reproducibility (between laboratories); repeatability is confirmed by at least 9 determinations covering the reportable range (for example three concentrations by three replicates) or at least 6 determinations at 100% of the test concentration, and standard deviation, relative standard deviation, and confidence interval are reported (§3.3.2). Inspections cite validation completed on repeatability alone with intermediate precision omitted, RSD acceptance criteria with no justification, artificially prepared samples used without the reason being recorded, and instrument calibration programmes under 21 CFR 211.160(b)(4) with no limits set for accuracy and precision."
   },
   {
     "id": "repeatability",
@@ -1840,7 +1960,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The precision obtained when an analytical procedure is repeated under the same conditions over a short interval of time."
   },
   {
     "id": "specificity",
@@ -1861,7 +1982,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The ability to assess the analyte accurately in the presence of other components such as impurities, degradants, and matrix."
   },
   {
     "id": "linearity",
@@ -1879,7 +2001,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The ability to obtain test results that are proportional to the amount of analyte in the sample within a given range."
   },
   {
     "id": "range",
@@ -1897,7 +2020,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The interval between the upper and lower amounts over which an analytical procedure shows suitable precision, accuracy, and linearity."
   },
   {
     "id": "detection-limit",
@@ -1915,7 +2039,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The lowest amount of analyte in a sample that can be detected, without necessarily being quantified as an exact value."
   },
   {
     "id": "quantitation-limit",
@@ -1933,7 +2058,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The lowest amount of analyte in a sample that can be quantified with suitable precision and accuracy."
   },
   {
     "id": "robustness",
@@ -1951,7 +2077,8 @@
       "ICH Q2(R2) §§2–4",
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "The degree to which an analytical procedure is unaffected by small deliberate variations in the test conditions."
   },
   {
     "id": "assay",
@@ -1971,7 +2098,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A test that accurately measures the content or potency of the analyte present in a sample."
   },
   {
     "id": "identification-test",
@@ -1991,7 +2119,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A test confirming that the main component, or a specified component, of a sample is the substance it is intended to be."
   },
   {
     "id": "purity-test",
@@ -2008,7 +2137,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A test confirming that the types and amounts of impurities in a sample meet the defined criteria."
   },
   {
     "id": "impurity",
@@ -2025,7 +2155,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "Any component of an API or a finished product that is not the intended active ingredient or excipient."
   },
   {
     "id": "impurity-profile",
@@ -2042,7 +2173,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A description of the identified and unidentified impurities present in an API, and of their levels."
   },
   {
     "id": "reference-standard",
@@ -2059,7 +2191,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A substance of established characteristics and purity used as the basis for comparison in analytical testing."
   },
   {
     "id": "oos",
@@ -2080,7 +2213,9 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A test result that falls outside the specification or acceptance criteria in the marketing application, the pharmacopoeia, or the manufacturer's own standard.",
+    "detail_en": "An OOS is a test result outside specification, and the original result cannot be invalidated on the hypothesis of laboratory error alone. Inspections cite retesting without a scientific hypothesis, selection of the favourable result, and investigations not extended to the manufacturing process or to other batches. Check the raw data and audit trail, the calculations and the state of the equipment, the phased OOS investigation, the batch impact assessment, and CAPA."
   },
   {
     "id": "oot",
@@ -2100,7 +2235,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "A test result that, although within specification, departs from previous results or from the expected statistical trend."
   },
   {
     "id": "stability-testing",
@@ -2121,7 +2257,8 @@
     "reg_refs": [
       "21 CFR 211.160–211.194",
       "EU GMP Part I Chapter 6"
-    ]
+    ],
+    "easy_en": "Testing that evaluates how quality changes with time and with temperature, humidity, and light, in order to set the retest period, shelf life, and storage conditions."
   },
   {
     "id": "cleanroom",
@@ -2142,7 +2279,8 @@
     "reg_refs": [
       "EU GMP Annex 1 §§4.1–4.32",
       "EU GMP Annex 15"
-    ]
+    ],
+    "easy_en": "A room designed and operated to control airborne particle concentration and to reduce the introduction, generation, and retention of particles and microorganisms."
   },
   {
     "id": "cleanroom-classification",
@@ -2159,7 +2297,8 @@
     "reg_refs": [
       "EU GMP Annex 1 §§4.1–4.32",
       "EU GMP Annex 15"
-    ]
+    ],
+    "easy_en": "The method of assessing whether a cleanroom or clean air equipment meets a specified cleanliness grade by measuring total particle concentration."
   },
   {
     "id": "airlock",
@@ -2176,7 +2315,8 @@
     "reg_refs": [
       "EU GMP Annex 1 §§4.1–4.32",
       "EU GMP Annex 15"
-    ]
+    ],
+    "easy_en": "An enclosed space with two or more doors, used to control airflow between areas of different cleanliness."
   },
   {
     "id": "bioburden",
@@ -2193,7 +2333,8 @@
     "reg_refs": [
       "EU GMP Annex 1 §§8.79–8.95, 9–10",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "The number and type of microorganisms present on a material, product, person, surface, or in the environment."
   },
   {
     "id": "endotoxin",
@@ -2213,7 +2354,8 @@
     "reg_refs": [
       "EU GMP Annex 1 §§8.79–8.95, 9–10",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A lipopolysaccharide component of the cell wall of Gram-negative bacteria which, if present in a medicine, can cause a pyrogenic response."
   },
   {
     "id": "pyrogen",
@@ -2230,7 +2372,8 @@
     "reg_refs": [
       "EU GMP Annex 1 §§8.79–8.95, 9–10",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A substance that can cause a febrile reaction when administered to humans or animals."
   },
   {
     "id": "aseptic-processing",
@@ -2251,7 +2394,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A process controlled so that microorganisms, endotoxin, and particles do not contaminate sterilised product, containers, and equipment while they are handled."
   },
   {
     "id": "aseptic-process-simulation",
@@ -2270,7 +2414,9 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A test that simulates the entire routine aseptic manufacturing process using a growth medium or a substitute in place of the actual product.",
+    "detail_en": "An APS uses a growth medium to simulate all critical steps, interventions, shifts, and worst case conditions of the routine aseptic process, and so assesses whether the process can be carried out aseptically. Inspections cite omission of genuine interventions and inadequate incubation, growth promotion testing, investigation of contaminated units, or requalification of personnel. Check the APS protocol, video, and batch record, the intervention list, incubation and growth promotion results, failure investigations, and personnel qualification records."
   },
   {
     "id": "environmental-monitoring",
@@ -2289,7 +2435,9 @@
       "EU GMP Annex 1 §§9.1–9.32",
       "21 CFR 211.42(c)(10)",
       "21 CFR 211.113(b)"
-    ]
+    ],
+    "easy_en": "Continuing checks on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies.",
+    "detail_en": "Environmental monitoring watches viable and total particles, personnel, and the environmental conditions required, according to a risk assessment, and so demonstrates through trends that clean areas remain in control. Inspections cite sampling plans that do not reflect worst case locations or the time of operation, inappropriate alert and action limits, and inadequate investigation of recurring isolates and excursions, or the omission of a batch impact assessment. Check the CCS and risk assessments, the rationale for locations and frequencies, incubation and identification data, personnel monitoring, trend reports, and deviations and CAPA."
   },
   {
     "id": "alert-limit",
@@ -2310,7 +2458,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "An established level that gives early warning of a possible drift from normal operating conditions and signals that investigation or attention is needed."
   },
   {
     "id": "action-limit",
@@ -2331,7 +2480,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "An established criterion which, when exceeded, requires an immediate investigation of the cause and appropriate corrective action."
   },
   {
     "id": "hepa-filter",
@@ -2349,7 +2499,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A high efficiency air filter that removes fine particles from the air supplied to a cleanroom or aseptic working area."
   },
   {
     "id": "isolator",
@@ -2367,7 +2518,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "Equipment whose interior can be reproducibly decontaminated and which continuously separates a Grade A working zone from the surrounding environment and the operator."
   },
   {
     "id": "rabs",
@@ -2385,7 +2537,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A barrier system that separates a Grade A interior from the surrounding cleanroom by rigid walls and integrated gloves."
   },
   {
     "id": "terminal-sterilization",
@@ -2406,7 +2559,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "Applying a sterilisation process to the product after it has been filled and sealed in its final container."
   },
   {
     "id": "sterilization",
@@ -2425,7 +2579,9 @@
       "EU GMP Annex 1 §§8.34–8.46",
       "21 CFR 211.113",
       "21 CFR 211.167"
-    ]
+    ],
+    "easy_en": "A validated process that removes or kills viable microorganisms by physical or chemical means.",
+    "detail_en": "Sterilisation is the validated process that removes or kills viable microorganisms to create sterility, disinfection is treatment that reduces the microorganisms on a surface to a level appropriate for the intended purpose, and sterility is the resulting state — disinfection does not substitute for sterilisation. EU GMP Annex 1 §8.34 requires terminal sterilisation in the final container to be chosen wherever possible (it gives higher sterility assurance than aseptic processing), §8.36 requires every sterilisation process to be validated taking account of product composition, storage conditions, and the maximum time between the start of preparation and sterilisation, and to demonstrate for each loading pattern that all parts reach the required conditions, by physical measurement and, where applicable, biological indicators, and §§8.38–8.41 require loading patterns to be verified, worst case loads to be revalidated at least annually, and cycles falling outside validated parameters to be detected and investigated. Inspections cite the use of loading patterns that were never validated, autoclave cycle deviations left uninvestigated, sterilisation judged on a chemical indicator colour change alone (§8.44 states that this shows only that the process was undergone and does not indicate sterility), and the absence of the validation records for aseptic and sterilisation processes required by 21 CFR 211.113(b)."
   },
   {
     "id": "sterility",
@@ -2444,7 +2600,9 @@
       "EU GMP Annex 1 §§10.5–10.7",
       "21 CFR 211.167",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "The state in which no viable microorganisms are present.",
+    "detail_en": "Sterility is the state of having no viable microorganisms; sterilisation is the process that creates that state, and disinfection is treatment that reduces microorganisms — sterility is not proved by finished product testing but assured by a validated process. EU GMP Annex 1 §10.5 treats the finished product sterility test as only the last of a series of critical control measures by which sterility is assured, and states expressly that the sterility of a product that has not met its design, procedural, and validated parameters cannot be assured by that test; §10.6 requires the samples to be representative of the whole batch but to include the parts at greatest risk of contamination, such as the beginning and end of filling, immediately after critical interventions, and the coolest location in a heat sterilised load. Terminal sterilisation aims at a sterility assurance level of 10⁻⁶ or better, and in aseptic processing the aseptic process simulation, environmental monitoring, and intervention control take that place. Inspections cite batch sterility claimed on a passing sterility test alone with a contamination event left uninvestigated, a failing sterility test invalidated as laboratory error without justification, and the absence of the documented test procedure for batches purporting to be sterile required by 21 CFR 211.167(a)."
   },
   {
     "id": "sterility-assurance-level",
@@ -2462,7 +2620,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A quantitative expression of the probability that a single viable microorganism is present on a product unit after sterilisation."
   },
   {
     "id": "sterility-test",
@@ -2480,7 +2639,9 @@
     "reg_refs": [
       "EU GMP Annex 1 §§10.4–10.7",
       "21 CFR 211.167(a)"
-    ]
+    ],
+    "easy_en": "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample.",
+    "detail_en": "The sterility test is a detection test on a limited, destructively taken sample, so it cannot substitute for process design, validation, and contamination control. Inspections concentrate on method suitability, negative and positive controls, growth promotion, incubation conditions, the investigation of an initial positive, and the justification for any retest. Look together at the test raw data and growth promotion testing, organism identification, environmental and process data, and the investigation of positives and the basis for the batch disposition."
   },
   {
     "id": "contamination-control-strategy",
@@ -2499,7 +2660,9 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A plan that brings facilities, equipment, processes, people, and monitoring together to control microorganisms, endotoxin and pyrogens, and particles.",
+    "detail_en": "A CCS is a documented system that links the contamination critical control points of the whole facility with the design, procedural, technical, organisational, and monitoring controls, as one strategy whose preventive effect can be assessed. Inspections cite a CCS that is no more than a list of individual SOPs, or that omits the interaction of facility, personnel, utilities, suppliers, interventions, and trends, and management review. Check the CCS itself, the underlying risk assessments, facility and process drawings, validation and monitoring trends, and change control, product quality review, and management review."
   },
   {
     "id": "contamination",
@@ -2517,7 +2680,9 @@
     "reg_refs": [
       "ICH Q7 Glossary and §4",
       "EU GMP Part I Chapter 5"
-    ]
+    ],
+    "easy_en": "The unwanted introduction of chemical or microbiological impurities, or of foreign matter, into a material during production, sampling, packaging, storage, or transport.",
+    "detail_en": "Contamination is the unwanted introduction of chemicals, microorganisms, or foreign matter into a material or product during manufacture, sampling, packaging, storage, or transport. Inspections check whether weaknesses in personnel, material, and waste flows, open processing, equipment condition, cleaning and disinfection, storage, and pest control actually translate into contamination risk. Look at facility and process flow diagrams, hygiene and cleaning procedures, environmental and water data, equipment logs, and deviation and contamination investigation records."
   },
   {
     "id": "cross-contamination",
@@ -2538,7 +2703,9 @@
     "reg_refs": [
       "ICH Q7 §§4.4, 5",
       "EU GMP Part I Chapter 5 §§5.18–5.21"
-    ]
+    ],
+    "easy_en": "Contamination of one material or product by another material or product.",
+    "detail_en": "Cross-contamination is the contamination of one material or product by components, dust, or microorganisms originating from another. Inspections check whether air handling and pressure differentials in shared facilities, dust migration, campaign production, personnel and material flows, cleaning verification, and the criteria for dedication are proportionate to the toxicological, sensitisation, and exposure risk. Look at facility and HVAC drawings, the cross-contamination risk assessment, cleaning validation, residue limits, the production sequence, and environmental and product test data."
   },
   {
     "id": "depyrogenation",
@@ -2556,7 +2723,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A process that removes or inactivates pyrogens on product contact surfaces or materials to a defined level."
   },
   {
     "id": "biological-indicator",
@@ -2574,7 +2742,8 @@
       "EU GMP Annex 1 §§2–10",
       "21 CFR 211.42",
       "21 CFR 211.113"
-    ]
+    ],
+    "easy_en": "A test piece carrying microorganisms of known resistance to a sterilisation process, used to confirm the effectiveness of a sterilisation cycle."
   },
   {
     "id": "disinfection",
@@ -2596,7 +2765,9 @@
       "EU GMP Annex 1 §§4.33–4.36",
       "21 CFR 211.42",
       "21 CFR 211.56"
-    ]
+    ],
+    "easy_en": "A process that reduces the microorganisms present on a surface or object to an appropriate level.",
+    "detail_en": "Disinfection reduces, by an irreversible action, the number of microorganisms on a surface or object to a level appropriate for the intended use (EU GMP Annex 1 glossary); it does not eliminate surviving organisms as sterilisation does, so in cleanroom control disinfection is one layer of the contamination control strategy rather than a substitute for sterilisation. Annex 1 §4.33 requires cleaning to remove surface contamination before disinfection and residues of disinfectant to be removed, requires more than one disinfectant with different modes of action so that both bacteria and fungi are covered, requires a sporicidal agent to be included periodically, and requires the effectiveness of the disinfection programme and the emergence of resistant strains to be monitored regularly. §4.34 requires the disinfection process to be validated for the way it is actually used and for the surface materials, with the in-use shelf life of prepared solutions supported; §4.35 requires disinfectants and detergents used in Grade A and B areas to be sterile before use. Inspections cite sporicidal agents not used, dwell times shorter than the contact time on the label, non-sterile disinfectants and wipes used in Grade A and B, and the absence of disinfectant rotation and effectiveness verification."
   },
   {
     "id": "line-clearance",
@@ -2614,7 +2785,9 @@
     "reg_refs": [
       "EU GMP Part I Chapter 5 §§5.40, 5.50",
       "21 CFR 211.130(e)"
-    ]
+    ],
+    "easy_en": "The procedure confirming, before new work starts, that no previous product, material, or document remains in the working area or on the equipment.",
+    "detail_en": "Line clearance is the on-the-floor control that removes previous product, materials, labelling, documents, and residues before and after an operation so that mix-ups and cross-contamination are prevented. Inspections cite check items applied as a formality, labelling and records from the previous batch left in place, and no evidence of the person performing and an independent checker. Check the line clearance checklist, material issue and reconciliation, the state of the equipment and area, batch and packaging records, and deviations."
   },
   {
     "id": "self-inspection",
@@ -2638,7 +2811,9 @@
     "reg_refs": [
       "EU GMP Part I Chapter 9",
       "ICH Q10 §4.1"
-    ]
+    ],
+    "easy_en": "The site's own periodic assessment of GMP compliance and of the effectiveness of the quality system.",
+    "detail_en": "Self-inspection independently confirms whether the quality system actually operates in line with GMP requirements and the company's own procedures, and looks for opportunities to improve. Inspections cite the absence of a risk-based plan or of independence for the inspectors, and repeated findings that were not carried into CAPA and effectiveness verification. Look at the annual inspection plan, the checklists and reports, the classification of findings, CAPA due dates and effectiveness checks, and management review."
   },
   {
     "id": "site-master-file",
@@ -2656,7 +2831,9 @@
     "reg_refs": [
       "EU GMP Part III, Site Master File Explanatory Notes",
       "PIC/S PE 008-4"
-    ]
+    ],
+    "easy_en": "A document summarising a site's GMP related activities, organisation, facilities and equipment, documentation, and quality control arrangements.",
+    "detail_en": "The site master file is an up to date document that summarises the site's quality system, organisation, facilities and equipment, and its manufacturing, testing, storage, and contracted activities so that a regulator can understand them in advance. Inspections cite the actual organisation, drawings, product scope, processes, or outsourcing arrangements differing from the file, and significant changes not carried into it. Cross-check the approved version and its revision history against the manufacturing authorisation, the organisation chart, layout and personnel and facility drawings, and the lists of products and contract acceptors."
   },
   {
     "id": "reference-sample",
@@ -2674,7 +2851,9 @@
     "reg_refs": [
       "EU GMP Annex 19 §§1–4",
       "PIC/S PE 009-17 Annex 19"
-    ]
+    ],
+    "easy_en": "A sample of a starting material, packaging material, intermediate, or finished product retained so that it can be analysed if needed during the life of the batch.",
+    "detail_en": "Reference samples are retained, representative of the batch, so that testing of a starting material, packaging material, or finished product batch can be repeated when required. Inspections cite quantities too small for retesting, and representativeness, identification, storage conditions, retention period, and access control that do not follow the procedure. Check the sampling records, the sample register and labels, storage temperature trends, quantity reconciliation, and issue, testing, and disposal records."
   },
   {
     "id": "retention-sample",
@@ -2695,7 +2874,9 @@
     "reg_refs": [
       "EU GMP Annex 19 §§1–4",
       "EU GMP Annex 19 §§7–9"
-    ]
+    ],
+    "easy_en": "A fully packaged unit from a finished product batch, retained so that its labelling and packaging can be checked.",
+    "detail_en": "Retention samples are kept as complete packaged units identical to the marketed labelling and packaging of the finished product batch, so that appearance, labelling, packaging, and traceability can be checked. Inspections cite samples that do not represent every pack presentation, insufficient quantity, storage conditions, or retention period, and an inability to produce them promptly when investigating a complaint or a suspected falsified product. Look at the per batch retention register, the completeness of the packaged state, storage conditions and access records, periodic inspection, and disposal approvals."
   },
   {
     "id": "first-air",
@@ -2713,7 +2894,9 @@
     "reg_refs": [
       "EU GMP Annex 1 §§4.4, 4.19, 11 Glossary",
       "21 CFR 211.42(c)(10)"
-    ]
+    ],
+    "easy_en": "Filtered air that has not been interrupted by people or objects before it reaches exposed product or product contact surfaces.",
+    "detail_en": "First air protects exposed product directly in the Grade A critical zone, so hands, tools, and containers must not come between the HEPA face and the critical point. Inspections cite cases where an operator's hands or an item blocked the airflow and this was not reflected in the airflow visualisation study or in the procedures. Check the airflow visualisation video, the aseptic technique SOP, the intervention list, and operator training and observation records."
   },
   {
     "id": "critical-zone",
@@ -2734,7 +2917,9 @@
     "detail_ko": "임계구역은 오염이 제품으로 직접 전달될 수 있어 Grade A 조건과 퍼스트 에어 보호가 필요한 가장 중요한 공간입니다. 실사에서는 구역 경계·중요 표면이 불명확하거나 인력·물품 이동과 개입이 기류·모니터링 설계에 반영되지 않은 점이 지적됩니다. 구역도, 기류가시화, CCS, 개입 위험평가와 환경·인원 모니터링 위치를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.4, 4.15, 11 Glossary"
-    ]
+    ],
+    "easy_en": "The zone in which product and critical surfaces are exposed to the environment during aseptic processing.",
+    "detail_en": "The critical zone is the most important space because contamination there passes directly to the product, so it requires Grade A conditions and protection of first air. Inspections cite unclear zone boundaries and critical surfaces, and movement of people and materials and interventions that are not reflected in the airflow and monitoring design. Look at the zone drawings, airflow visualisation, the CCS, the intervention risk assessment, and the locations chosen for environmental and personnel monitoring."
   },
   {
     "id": "unidirectional-airflow",
@@ -2757,7 +2942,9 @@
     "detail_ko": "단일방향 기류는 노출 제품·부품에서 오염원을 밀어내는 공학적 보호수단입니다. 실사에서는 실제 작업위치의 속도·균일성 근거가 없거나 빠른 손동작·설비가 난류를 만들고도 평가되지 않은 점이 지적됩니다. 적격성평가 계획서, 풍속측정, 기류가시화 영상, 설비 배치와 작업자 동작을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.15, 4.30, 11 Glossary"
-    ]
+    ],
+    "easy_en": "Air flowing uniformly in one direction so that particles are reproducibly swept out of the critical working zone.",
+    "detail_en": "Unidirectional airflow is the engineering protection that pushes contamination away from exposed product and components. Inspections cite the absence of velocity and uniformity data at the actual working position, and rapid hand movements or equipment creating turbulence that was never assessed. Check the qualification protocol, air velocity measurements, airflow visualisation video, equipment layout, and operator movement."
   },
   {
     "id": "airflow-visualization-study",
@@ -2777,7 +2964,9 @@
     "detail_ko": "기류가시화 연구는 정지 상태뿐 아니라 작업·개입을 모사한 동적 상태에서 퍼스트 에어 보호와 저등급 공기 유입 방지를 입증해야 합니다. 실사에서는 실제 최악 개입을 누락하거나 영상 미보존, 설비 변경 후 재평가 미실시가 지적됩니다. 승인 계획서, 원본 영상, 개입 시나리오, 결론·CAPA 및 환경모니터링 위치 선정 근거를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.15, 4.30"
-    ]
+    ],
+    "easy_en": "A study that makes airflow visible, for example with smoke, to confirm that contamination is not carried into critical zones.",
+    "detail_en": "An airflow visualisation study must demonstrate protection of first air and the exclusion of lower grade air not only at rest but in the dynamic state, simulating operations and interventions. Inspections cite omission of the genuine worst case interventions, failure to retain the video, and no reassessment after equipment changes. Look at the approved protocol, the original video, the intervention scenarios, the conclusions and CAPA, and the rationale for the environmental monitoring locations."
   },
   {
     "id": "critical-intervention",
@@ -2794,7 +2983,9 @@
     "detail_ko": "중요 개입은 퍼스트 에어와 무균 표면을 교란할 수 있어 사전에 정의·위험평가하고 최소화해야 합니다. 실사에서는 비계획 개입이 배치기록·APS·환경모니터링에 반영되지 않거나 개입 후 조치가 불명확한 점이 지적됩니다. 개입 목록, 무균조작 SOP, APS 시나리오, 배치기록과 개입 시 모니터링 결과를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.16–8.18, 9.34, 11 Glossary"
-    ]
+    ],
+    "easy_en": "An inherent or corrective intervention that enters the critical zone.",
+    "detail_en": "A critical intervention can disturb first air and sterile surfaces, so it must be defined in advance, risk assessed, and minimised. Inspections cite unplanned interventions that are not reflected in the batch record, the APS, or environmental monitoring, and unclear follow-up after an intervention. Check the intervention list, the aseptic technique SOP, the APS scenarios, the batch record, and the monitoring results taken at the time of the intervention."
   },
   {
     "id": "personnel-monitoring",
@@ -2811,7 +3002,9 @@
     "detail_ko": "인원은 무균공정의 주요 오염원이므로 모니터링 결과는 배치 영향과 작업자 자격 유지에 직접 연결됩니다. 실사에서는 개입 후·퇴실 시 채취 누락, 위치·빈도 근거 부족, 반복 양성 추세와 재교육·재적격성평가 미연계가 지적됩니다. 장갑·가운 배지결과, 작업·개입 기록, 작업자별 추세, 이탈조사와 자격상태를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§7.6, 9.22, 9.25–9.27"
-    ]
+    ],
+    "easy_en": "Checking, by defined methods, the microbial contamination that may be present on the gloves and gowns of operators in aseptic areas.",
+    "detail_en": "People are the main source of contamination in aseptic processing, so monitoring results connect directly to batch impact and to the operator's continued qualification. Inspections cite samples not taken after interventions or on exit, weak justification for locations and frequency, and recurring positive trends not linked to retraining or requalification. Look at glove and gown plate results, operation and intervention records, per operator trends, excursion investigations, and qualification status."
   },
   {
     "id": "viable-environmental-monitoring",
@@ -2833,7 +3026,9 @@
     "detail_ko": "생균 모니터링은 공기·침강·표면·장갑 등 상호보완 방법을 이용해 실제 미생물 오염 신호를 찾습니다. 실사에서는 Grade A 중요공정 전 기간을 포괄하지 않거나 채취가 기류를 방해하고, 균 동정·추세·배치 영향평가가 부족한 점이 지적됩니다. 위치·빈도 위험평가, 배지성능, 배양·동정 원자료, 경고·조치한계와 추세를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§9.22–9.30"
-    ]
+    ],
+    "easy_en": "Monitoring the microbial condition of clean areas by sampling culturable microorganisms from air, surfaces, and personnel.",
+    "detail_en": "Viable monitoring uses complementary methods — active air, settle plates, surfaces, gloves — to look for real signals of microbial contamination. Inspections cite monitoring that does not cover the whole duration of Grade A critical processing, sampling that disturbs the airflow, and inadequate organism identification, trending, and batch impact assessment. Check the risk assessment behind locations and frequencies, growth promotion, incubation and identification raw data, alert and action limits, and trends."
   },
   {
     "id": "non-viable-particle-monitoring",
@@ -2856,7 +3051,9 @@
     "detail_ko": "총입자 모니터링은 청정구역 관리상태와 일시적 개입·설비 열화를 빠르게 포착하지만 단독으로 무균성을 입증하지는 않습니다. 실사에서는 Grade A 중요공정 전 기간 미모니터링, 경보 지연·비활성화, 일탈의 작업 시점 연계 부족이 지적됩니다. 입자계 교정·샘플링 위치, 연속 데이터·알람, 배치 타임라인과 조사기록을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§9.2, 9.15–9.21"
-    ]
+    ],
+    "easy_en": "Measuring total airborne particle concentration continuously or at a defined frequency to watch the state of cleanliness.",
+    "detail_en": "Total particle monitoring quickly picks up the control state of a clean area and transient interventions or equipment degradation, but on its own it does not demonstrate sterility. Inspections cite Grade A critical processing not monitored for its full duration, delayed or disabled alarms, and excursions not linked back to the point in the operation at which they occurred. Check particle counter calibration and sampling locations, continuous data and alarms, the batch timeline, and investigation records."
   },
   {
     "id": "cleanroom-qualification",
@@ -2877,7 +3074,9 @@
     "reg_refs": [
       "EU GMP Annex 1 §§4.24–4.32",
       "EU GMP Annex 15"
-    ]
+    ],
+    "easy_en": "The overall assessment of whether a classified cleanroom or clean air equipment is fit for its intended use.",
+    "detail_en": "Cleanroom qualification bundles together the performance needed for the intended use — not only particle classification but HEPA integrity, air volume and velocity, pressure differentials, airflow direction, microbial results, and recovery. Inspections cite qualification declared on the basis of the classification test alone, and missing requalification intervals or impact assessment after a change. Look at the qualification protocol and report, the raw data, the drawings, and the history of changes, maintenance, and requalification."
   },
   {
     "id": "barrier-technology",
@@ -2894,7 +3093,9 @@
     "detail_ko": "배리어 기술은 직접 인적 개입을 줄여 무균공정 오염위험을 낮추지만 장갑·이송·제염·배경등급까지 통합 관리해야 합니다. 실사에서는 장갑 누설시험, 생물제염 주기, 도어 개방과 이송경로가 CCS에 충분히 반영되지 않은 점이 지적됩니다. 설계·적격성평가, 장갑 완전성, 제염 밸리데이션, 기류가시화와 개입기록을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§4.3, 4.18–4.22"
-    ]
+    ],
+    "easy_en": "Technology such as RABS or an isolator that places a physical barrier between the operator and the Grade A critical zone.",
+    "detail_en": "Barrier technology lowers the contamination risk of aseptic processing by reducing direct human intervention, but gloves, transfers, decontamination, and the background grade all have to be managed together. Inspections cite glove leak testing, bio-decontamination cycles, door openings, and transfer routes that are not adequately reflected in the contamination control strategy. Check the design and qualification, glove integrity, decontamination validation, airflow visualisation, and intervention records."
   },
   {
     "id": "closed-system",
@@ -2911,7 +3112,9 @@
     "detail_ko": "폐쇄 시스템은 주변 환경에서 유입되는 미생물·입자·화학 오염을 줄이지만 연결 후 전체 접촉면의 무균성과 사용 중 완전성을 입증해야 합니다. 실사에서는 연결부·샘플링·유지보수 시 개방 위험이나 압력시험·누설감시 근거가 부족한 점이 지적됩니다. 시스템 경계도, 멸균·연결 밸리데이션, 완전성시험, 사용·개방·유지보수 기록을 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.127–8.131, 11 Glossary"
-    ]
+    ],
+    "easy_en": "A system connected and sealed so that the product is not exposed to the surrounding environment.",
+    "detail_en": "A closed system reduces microbial, particulate, and chemical contamination entering from the surrounding environment, but the sterility of every contact surface after connection, and integrity during use, still have to be demonstrated. Inspections cite the risk of opening at connections, during sampling, or during maintenance, and weak evidence from pressure testing or leak monitoring. Look at the system boundary diagram, sterilisation and connection validation, integrity testing, and records of use, opening, and maintenance."
   },
   {
     "id": "blow-fill-seal",
@@ -2932,7 +3135,9 @@
     "detail_ko": "BFS는 성형·충전·밀봉을 통합해 개방시간을 줄이지만 파리손, 충전구역, 고열·복잡기류와 설비 개입이 특별한 오염위험을 만듭니다. 실사에서는 기류가시화·환경모니터링, 중요구역 등급, 절단·트리밍과 금형 개입의 검증이 부족한 점이 지적됩니다. 설비 적격성, 공정·밀봉 밸리데이션, APS, 기류영상과 환경추세를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.105–8.110"
-    ]
+    ],
+    "easy_en": "A technology that forms a container from thermoplastic resin, fills it with product, and seals it in one continuous automated operation.",
+    "detail_en": "BFS combines forming, filling, and sealing so that the open time is short, but the parison, the filling zone, the high temperatures and complex airflow, and equipment interventions create their own contamination risks. Inspections cite weak airflow visualisation and environmental monitoring, the grade assigned to critical zones, and unverified cutting, trimming, and mould interventions. Check equipment qualification, process and seal validation, APS, airflow video, and environmental trends."
   },
   {
     "id": "form-fill-seal",
@@ -2952,7 +3157,9 @@
     "detail_ko": "FFS는 용기 형성·충전·밀봉의 연속성을 이용하므로 필름 규격, 밀봉 파라미터와 완결성 관리가 제품보호에 중요합니다. 실사에서는 시작·정지·접합부·롤 교체의 최악조건, 밀봉검사와 중요공정변수 추세가 불충분한 점이 지적됩니다. 자재규격, 설비·공정 밸리데이션, 밀봉 완결성시험, 배치기록과 일탈을 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.96–8.104"
-    ]
+    ],
+    "easy_en": "An automated technology that forms a container from packaging film, fills it with product, and seals it in a continuous operation.",
+    "detail_en": "Because FFS relies on the continuity of forming, filling, and sealing, the film specification, the sealing parameters, and integrity control matter to product protection. Inspections cite inadequate treatment of worst cases at start-up, stoppage, splices, and roll changes, and insufficient seal inspection and trending of critical process parameters. Look at material specifications, equipment and process validation, seal integrity testing, batch records, and deviations."
   },
   {
     "id": "lyophilization",
@@ -2972,7 +3179,9 @@
     "detail_ko": "무균 동결건조에서는 충전 후 완전 밀전 전까지 제품이 노출되므로 이송·로딩·챔버·부분타전 바이알의 보호가 중요합니다. 실사에서는 적재패턴·누설·멸균·보유시간·수동 개입과 공정실패 시 제품영향 평가가 불충분한 점이 지적됩니다. 사이클 밸리데이션, 챔버 멸균·누설시험, 적재도, 이송·개입기록과 CCI 자료를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.117–8.126"
-    ]
+    ],
+    "easy_en": "A physicochemical drying process that removes water or solvent from a product by subliming it from the frozen state.",
+    "detail_en": "In sterile freeze-drying the product is exposed from filling until full stoppering, so protection during transfer, loading, in the chamber, and for partially stoppered vials matters. Inspections cite inadequate treatment of loading patterns, leak testing, sterilisation, hold times, manual interventions, and assessment of the product impact when the process fails. Check cycle validation, chamber sterilisation and leak testing, loading diagrams, transfer and intervention records, and CCI data."
   },
   {
     "id": "filter-integrity-test",
@@ -2992,7 +3201,9 @@
     "detail_ko": "필터 완전성시험은 멸균여과 필터의 물리적 건전성이 미생물 보유성능과 연결됨을 배치별로 확인합니다. 실사에서는 시험값과 검증된 미생물 보유성의 상관관계 부족, 부적합 결과의 재시험·조사 미흡, 필터 제거 후 시험이 지적됩니다. 시험법 밸리데이션, 사전·사후 원자료, 필터 인증서, 배치기록과 실패조사를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.82, 8.87–8.89"
-    ]
+    ],
+    "easy_en": "A non-destructive test confirming that a filter is undamaged and still delivers the required retention performance.",
+    "detail_en": "Filter integrity testing confirms per batch that the physical soundness of a sterilising filter is linked to its microbial retention performance. Inspections cite weak correlation between the test value and validated microbial retention, inadequate retesting and investigation of failing results, and testing performed after the filter had been removed. Look at test method validation, pre-use and post-use raw data, the filter certificate, the batch record, and failure investigations."
   },
   {
     "id": "pupsit",
@@ -3009,7 +3220,9 @@
     "detail_ko": "PUPSIT는 필터 멸균·설치 후 사용 전에 손상이나 완전성 상실을 찾아 멸균여과의 시작상태를 보증합니다. 실사에서는 기술적으로 불가능하다는 주장에 충분한 위험평가·대체통제·공급망 지식이 없거나 시험이 제품 품질에 미치는 영향이 검증되지 않은 점이 지적됩니다. 필터 조립도, 위험평가, 시험 원자료, 대체통제와 사후시험·조사기록을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §8.87"
-    ]
+    ],
+    "easy_en": "An integrity test performed before use to confirm that a sterilised final filter assembly was not damaged during preparation and installation.",
+    "detail_en": "PUPSIT looks for damage or loss of integrity after the filter has been sterilised and installed but before it is used, and so assures the starting condition of sterilising filtration. Inspections cite claims that it is not technically feasible unsupported by adequate risk assessment, alternative controls, or supply chain knowledge, and cases where the effect of the test on product quality was not verified. Check the filter assembly drawing, the risk assessment, the test raw data, the alternative controls, and the post-use test and investigation records."
   },
   {
     "id": "sterilising-grade-filter",
@@ -3030,7 +3243,9 @@
     "detail_ko": "멸균등급 필터는 최종멸균이 불가능한 제품에서 핵심 미생물 장벽이므로 제품 적합성·흡착·추출물·미생물 보유성을 검증해야 합니다. 실사에서는 필터와 제품의 호환성, 최대 시간·압력·부피, 사전 바이오버든과 완전성시험 관리가 부족한 점이 지적됩니다. 필터 밸리데이션, 공급자 인증서, 공정변수, PUPSIT·사후시험과 배치기록을 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§6.19, 8.79–8.95"
-    ]
+    ],
+    "easy_en": "A filter, normally of a maximum nominal pore size of 0.22 µm, suitably validated to remove microorganisms from a liquid or gas and so give a sterile filtrate.",
+    "detail_en": "A sterilising-grade filter is the key microbial barrier for products that cannot be terminally sterilised, so product compatibility, adsorption, extractables, and microbial retention all have to be verified. Inspections cite inadequate control of the compatibility of filter and product, the maximum time, pressure, and volume, the pre-filtration bioburden, and integrity testing. Look at filter validation, the supplier's certificate, the process parameters, PUPSIT and post-use testing, and the batch record."
   },
   {
     "id": "d-value",
@@ -3047,7 +3262,9 @@
     "detail_ko": "D값은 생물학적 지표와 목표 미생물의 내열·내방사선성을 수치화해 멸균주기의 치사력을 설계하는 기초입니다. 실사에서는 사용 균주·로트의 D값, 개체수·순도 확인과 공정조건의 상관관계가 부족한 점이 지적됩니다. BI 인증서·입고시험, 주기개발 계산, 열분포·침투 원자료와 변경기록을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.39–8.43, 11 Glossary"
-    ]
+    ],
+    "easy_en": "The time or absorbed dose required, under defined sterilising conditions, to reduce the number of surviving organisms to 10% of the original number.",
+    "detail_en": "The D-value puts a number on the heat or radiation resistance of the biological indicator and the target organisms, and is the basis on which the lethality of a sterilisation cycle is designed. Inspections cite weak correlation between the D-value of the strain and lot in use, the population and purity checks, and the process conditions. Check the BI certificate and incoming testing, the cycle development calculations, the heat distribution and penetration raw data, and change records."
   },
   {
     "id": "z-value",
@@ -3064,7 +3281,9 @@
     "detail_ko": "Z값은 온도 변화가 멸균 치사속도에 미치는 영향을 연결해 열멸균주기의 등가 치사량을 해석하는 데 쓰입니다. 실사에서는 BI 로트 인증값과 계산에 사용한 Z값 불일치, 온도센서 오차·최악위치 미반영이 지적될 수 있습니다. BI 인증서, 주기 계산서, 센서 교정, 열분포·침투와 원자료 검토를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §8.43, 11 Glossary"
-    ]
+    ],
+    "easy_en": "The temperature difference required to change the D-value of a biological indicator by a factor of ten.",
+    "detail_en": "The Z-value links the effect of temperature change on the rate of kill, and is used to interpret the equivalent lethality of a heat sterilisation cycle. Inspections may cite disagreement between the certified value for the BI lot and the Z-value used in the calculation, and temperature sensor error or worst case locations not taken into account. Look at the BI certificate, the cycle calculations, sensor calibration, heat distribution and penetration, and review of the raw data."
   },
   {
     "id": "overkill-sterilisation",
@@ -3084,7 +3303,9 @@
     "detail_ko": "오버킬 접근은 초기 오염부하의 정밀한 내열성 정보에 덜 의존하면서 높은 멸균보증을 제공하지만 제품·용기 열안정성을 함께 입증해야 합니다. 실사에서는 12-log 근거, 최악 적재·냉점, BI 특성 및 사전 바이오버든 모니터링이 불충분한 점이 지적됩니다. 주기개발·PQ, BI 자료, 열분포·침투, 바이오버든 추세와 제품안정성 자료를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.37–8.43, 10.3, 11 Glossary"
-    ]
+    ],
+    "easy_en": "A sterilisation process set to deliver at least a 12 log10 reduction of a biological indicator of appropriate resistance.",
+    "detail_en": "The overkill approach gives high sterility assurance while depending less on precise heat resistance data for the initial bioburden, but the thermal stability of the product and container has to be demonstrated alongside it. Inspections cite inadequate justification for the 12 log reduction, worst case loading and cold spots, BI characterisation, and pre-sterilisation bioburden monitoring. Check cycle development and PQ, BI data, heat distribution and penetration, bioburden trends, and product stability data."
   },
   {
     "id": "container-closure-integrity",
@@ -3105,7 +3326,9 @@
     "detail_ko": "CCI는 멸균 후 제품이 사용 시점까지 무균성과 품질을 유지하는 마지막 물리적 장벽입니다. 실사에서는 밀봉공정 밸리데이션, 통계적으로 타당한 샘플링, 운송·감압·극한온도 영향과 안정성 시점 검증이 부족한 점이 지적됩니다. 용기·마개 규격, 밀봉공정·시험법 밸리데이션, 운송·안정성 CCI 결과와 불만·회수 추세를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.21–8.25"
-    ]
+    ],
+    "easy_en": "The ability of a container closure system to keep out microorganisms, gases, moisture, and other external ingress throughout the product's lifecycle.",
+    "detail_en": "CCI is the last physical barrier that keeps a product sterile and of the intended quality from sterilisation until the point of use. Inspections cite weak sealing process validation, sampling that is not statistically sound, and unverified effects of transport, reduced pressure, and extreme temperature, as well as missing verification at stability time points. Look at the container and closure specification, validation of the sealing process and the test method, transport and stability CCI results, and complaint and recall trends."
   },
   {
     "id": "metadata",
@@ -3122,7 +3345,9 @@
     "detail_ko": "메타데이터는 결과값이 누구에 의해 언제 어떤 방법·설정으로 생성됐는지 설명하므로 원기록의 일부입니다. 실사에서는 결과 PDF만 보존하고 주입순서·방법버전·처리이력·감사추적을 누락해 활동 재구성이 불가능한 점이 지적됩니다. 원전자파일, 감사추적, 메서드·시퀀스, 사용자·시간정보와 보존·이관 범위를 확인합니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§9.4, 9.8, 13"
-    ]
+    ],
+    "easy_en": "Data describing the attributes, structure, relationships, context, and meaning of other data.",
+    "detail_en": "Metadata explains by whom, when, and by what method and settings a result was produced, so it is part of the original record. Inspections cite retention of the result PDF alone, with injection sequence, method version, processing history, and audit trail omitted so that the activity cannot be reconstructed. Check the original electronic files, audit trails, methods and sequences, user and time information, and the scope of retention and transfer."
   },
   {
     "id": "data-lifecycle",
@@ -3139,7 +3364,9 @@
     "detail_ko": "데이터 수명주기는 시스템·부서·수탁자 사이의 경계를 포함하므로 한 단계의 통제만으로 완전성을 보증할 수 없습니다. 실사에서는 생성 후 전사·변환·보고·보관 과정에서 원자료나 메타데이터가 사라지고 책임이 불명확한 점이 지적됩니다. 데이터흐름도, 시스템·인터페이스 목록, 처리·검토·보존·폐기 절차와 품질협약을 봅니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§5.1–5.2, 13"
-    ]
+    ],
+    "easy_en": "All the phases of data, from creation and recording through processing, transfer, use, retention, retrieval, and disposal.",
+    "detail_en": "The data lifecycle includes the boundaries between systems, departments, and contract acceptors, so control at one phase alone cannot assure integrity. Inspections cite raw data or metadata that disappears during transcription, transformation, reporting, or archiving after creation, with responsibility left unclear. Look at the data flow diagram, the inventory of systems and interfaces, procedures for processing, review, retention, and disposal, and the quality agreements."
   },
   {
     "id": "data-governance",
@@ -3156,7 +3383,9 @@
     "detail_ko": "데이터 거버넌스는 소유권·책임·문화·절차·기술통제를 PQS 안에서 데이터 수명주기 전체에 배치합니다. 실사에서는 경영진 책임, 데이터 중요도·위험 평가, 오류 보고 문화, 수탁자 데이터 접근과 주기적 효과검토가 빠진 체계가 지적됩니다. 거버넌스 정책, 책임체계, 데이터흐름·위험평가, 교육·자율점검, 경영검토와 개선계획을 확인합니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§5.1–5.6"
-    ]
+    ],
+    "easy_en": "The sum of the organisational and technical arrangements that assure data integrity, whatever the format or technology.",
+    "detail_en": "Data governance places ownership, accountability, culture, procedures, and technical controls across the whole data lifecycle within the pharmaceutical quality system. Inspections cite systems that lack senior management accountability, data criticality and risk assessment, a culture in which errors are reported, control over contract giver access to data, and periodic review of effectiveness. Check the governance policy, the accountability structure, data flow and risk assessments, training and self-inspection, and management review and improvement plans."
   },
   {
     "id": "static-data",
@@ -3173,7 +3402,9 @@
     "detail_ko": "정적 기록은 읽기와 보존에는 유용하지만 크로마토그램 재처리·베이스라인 확대·추세 질의 같은 원래의 동적 기능을 잃을 수 있습니다. 실사에서는 동적 원전자기록이 있는데 인쇄물이나 PDF만 원자료로 보존해 검토가능성을 축소한 점이 지적됩니다. 시스템 원파일, 출력물 생성절차, 메타데이터·감사추적 보존과 정적 전환 위험평가를 봅니다.",
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §§6.2, 6.11.1"
-    ]
+    ],
+    "easy_en": "A paper or electronic record format whose content is fixed, with little or no possibility for the user to interact with it.",
+    "detail_en": "A static record is useful for reading and retention but can lose the original dynamic functions such as reprocessing a chromatogram, expanding the baseline, or querying a trend. Inspections cite a dynamic original electronic record existing while only the printout or PDF was retained as raw data, narrowing what could be reviewed. Look at the original system files, the procedure for producing the printout, retention of metadata and audit trail, and the risk assessment for converting to static form."
   },
   {
     "id": "dynamic-data",
@@ -3190,7 +3421,9 @@
     "detail_ko": "동적 데이터는 분석과 검토에 필요한 기능·맥락을 보존하므로 중요할 때 원래 상태로 유지해야 합니다. 실사에서는 동적 원자료를 정적 PDF로만 보존하거나 재처리·질의 기능과 감사추적이 이관 과정에서 사라진 점이 지적됩니다. 원전자파일, 시스템 접근성, 처리이력·감사추적, 아카이브·마이그레이션 검증을 확인합니다.",
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §§6.2, 6.11.1, 6.17.1"
-    ]
+    ],
+    "easy_en": "An electronic data format that lets the user interact with the record, for example by trending, reprocessing, or zooming.",
+    "detail_en": "Dynamic data preserves the functionality and context needed for analysis and review, so where that matters it must be kept in its original state. Inspections cite dynamic raw data retained only as a static PDF, and reprocessing or query functions and audit trails lost during transfer. Check the original electronic files, access to the system, processing history and audit trails, and verification of archiving and migration."
   },
   {
     "id": "true-copy",
@@ -3207,7 +3440,9 @@
     "detail_ko": "진본 사본은 원본을 대체하거나 외부에 제공할 때도 활동을 완전히 재구성할 수 있어야 합니다. 실사에서는 스캔 가장자리 누락, 전자기록의 메타데이터·감사추적 손실, 인증자·일자와 생성절차 통제 부족이 지적됩니다. 진본사본 SOP, 검증·인증 기록, 원본 대조, 전자파일·메타데이터와 배포목록을 봅니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §8.4"
-    ]
+    ],
+    "easy_en": "A verified copy that completely and accurately preserves the content, context, and structure of the original record together with the necessary metadata.",
+    "detail_en": "A true copy must allow the activity to be reconstructed completely even when it replaces the original or is provided to a third party. Inspections cite scans with the edges cut off, electronic records whose metadata and audit trail were lost, and weak control over the certifier, the date, and the procedure by which the copy is produced. Look at the true copy SOP, verification and certification records, comparison against the original, the electronic files and metadata, and the distribution list."
   },
   {
     "id": "backup",
@@ -3229,7 +3464,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §9.8",
       "EU GMP Annex 11 §7.2"
-    ]
+    ],
+    "easy_en": "A copy of current, editable data together with its metadata and system configuration, kept so that recovery is possible after a disaster or failure.",
+    "detail_en": "A backup exists for operational recovery and does not take the place of an archive kept for regulatory retention. Inspections cite copies that took the data but omitted metadata, audit trails, and configuration, and success logs relied on with no restoration test. Check the backup scope and frequency, off site storage, automatic logs, periodic restoration testing, and investigation of failures."
   },
   {
     "id": "archive",
@@ -3250,7 +3487,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§8.10, 9.8, 13",
       "EU GMP Annex 11 §17"
-    ]
+    ],
+    "easy_en": "Long term preservation of completed data and its metadata in final form so that a process or activity can be reconstructed.",
+    "detail_en": "An archive must keep records readable, retrievable, and intact for the required retention period, and must make change or deletion detectable. Inspections cite data that became inaccessible after a legacy system was retired, metadata that was not preserved, and restoration and readability that were never tested. Look at the retention inventory, access rights, media and environmental control, periodic retrieval and readability testing, and approval for disposal."
   },
   {
     "id": "audit-trail-review",
@@ -3268,7 +3507,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §9.6",
       "EU GMP Annex 11 §9"
-    ]
+    ],
+    "easy_en": "Reviewing the history of creation, change, and deletion of GMP relevant data on a risk basis and investigating anomalous activity.",
+    "detail_en": "Audit trail review looks beyond the approved results for deletions, reprocessing, configuration changes, and failed attempts, and so assesses the possibility that data was selected. Inspections cite scope, frequency, and responsibility that were never defined, or review carried out as a formality after batch release. Check the risk assessment, the per system review procedure, the evidence of review, exception reports, and how review connects to raw data review and OOS investigation."
   },
   {
     "id": "system-owner",
@@ -3285,7 +3526,9 @@
     "detail_ko": "시스템 소유자는 기술적 상태·보안·유지보수·가용성을 책임지고 프로세스 소유자·품질부서와 협력합니다. 실사에서는 책임자가 없거나 IT에 전적으로 위임되어 권한·변경·백업·주기평가 결정이 품질절차와 분리된 점이 지적됩니다. 역할기술서, 시스템 목록, 권한·변경·사고·백업·주기평가 승인기록을 봅니다.",
     "reg_refs": [
       "EU GMP Annex 11 §§2, 11–13, Glossary"
-    ]
+    ],
+    "easy_en": "The person responsible for the availability and maintenance of a computerised system and for the security of the data it holds.",
+    "detail_en": "The system owner is responsible for the technical state, security, maintenance, and availability of the system and works with the process owner and the quality unit. Inspections cite no owner assigned, or the role delegated wholly to IT so that decisions on privileges, changes, backups, and periodic review sit outside the quality procedures. Look at the role description, the system inventory, and the approval records for privileges, changes, incidents, backups, and periodic review."
   },
   {
     "id": "process-owner",
@@ -3302,7 +3545,9 @@
     "detail_ko": "프로세스 소유자는 업무요구·의도용도·데이터 검토와 현장 운영이 시스템 기능에 올바르게 반영되도록 책임집니다. 실사에서는 URS 승인, 위험평가, 절차·교육, 변경 후 업무영향과 데이터 검토 책임이 불명확한 점이 지적됩니다. 역할기술서, URS, 위험평가, SOP·교육, 변경·일탈·주기평가 기록을 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 11 §§2, 4, Glossary"
-    ]
+    ],
+    "easy_en": "The person responsible for the proper operation of the business process that a computerised system supports.",
+    "detail_en": "The process owner is responsible for ensuring that business requirements, intended use, data review, and day to day operation are correctly reflected in the system's functionality. Inspections cite unclear responsibility for URS approval, risk assessment, procedures and training, the business impact of a change, and data review. Check the role description, the URS, risk assessments, SOPs and training, and change, deviation, and periodic review records."
   },
   {
     "id": "access-control",
@@ -3320,7 +3565,9 @@
     "reg_refs": [
       "EU GMP Annex 11 §12",
       "PIC/S PI 041-1 §9.5"
-    ]
+    ],
+    "easy_en": "Physical and logical controls that restrict computerised systems and data so that only authorised people can use the functions they are permitted to use.",
+    "detail_en": "Access control ties each user's identity to their job authority so that unauthorised entry, change, or deletion is prevented and traceable. Inspections commonly cite shared accounts, excessive administrator rights, accounts of departed staff left active, and the absence of periodic privilege reviews or change records. Look at the user and role list, records of approval, change, and revocation, login and audit trail data, administrator activity, and periodic privilege reviews."
   },
   {
     "id": "segregation-of-duties",
@@ -3337,7 +3584,9 @@
     "detail_ko": "직무분리는 사용자가 자신의 결과·권한·감사추적을 독립적 감독 없이 바꾸는 이해상충을 줄입니다. 실사에서는 분석자가 관리자권한을 갖거나 사용자 생성·삭제와 데이터 승인을 동시에 수행하는 구조가 지적됩니다. 역할·권한 매트릭스, 관리자 지정근거, 독립 검토, 긴급권한 사용과 정기 권한검토를 확인합니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§6.4, 9.5"
-    ]
+    ],
+    "easy_en": "Control that separates responsibilities so that the rights to create, change, review, and approve data and to administer the system are not inappropriately concentrated in one person.",
+    "detail_en": "Segregation of duties reduces the conflict of interest in which a user can change their own results, privileges, or audit trail without independent oversight. Inspections cite analysts holding administrator rights, or a structure in which the same person creates and deletes users and approves data. Check the role and privilege matrix, the justification for administrator assignments, independent review, use of emergency privileges, and periodic privilege review."
   },
   {
     "id": "periodic-evaluation",
@@ -3354,7 +3603,9 @@
     "detail_ko": "주기적 평가는 기능·일탈·사고·업그레이드·성능·신뢰성·보안·밸리데이션 상태를 종합해 시스템의 지속 적합성을 판단합니다. 실사에서는 달력식 체크리스트만 사용하거나 누적 변경·반복사고·접근권한·백업복구 결과를 평가하지 않은 점이 지적됩니다. 평가계획·보고서, 변경·일탈·사고, 성능·보안, 권한과 밸리데이션 상태를 봅니다.",
     "reg_refs": [
       "EU GMP Annex 11 §11"
-    ]
+    ],
+    "easy_en": "Periodic assessment of whether a computerised system remains validated and compliant with GMP.",
+    "detail_en": "Periodic evaluation judges the continued fitness of a system by taking together its functionality, deviations, incidents, upgrades, performance, reliability, security, and validation status. Inspections cite the use of a calendar checklist alone, and failure to assess accumulated changes, recurring incidents, access rights, and backup and recovery results. Look at the evaluation plan and report, changes, deviations, and incidents, performance and security, privileges, and validation status."
   },
   {
     "id": "data-migration",
@@ -3372,7 +3623,9 @@
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §6.8",
       "EU GMP Annex 11 §4.8"
-    ]
+    ],
+    "easy_en": "Moving stored data to another long term location or system, changing the format if necessary while preserving its content and meaning.",
+    "detail_en": "Data migration must preserve not only values but relationships, context, metadata, dynamic functionality, and the meaning of the audit trail. Inspections cite comparisons limited to record counts and values, with no verification of searchability, linkage, time zones, units, or loss of the audit trail. Look at the migration strategy, mapping and transformation rules, the verification plan and reconciliation results, exceptions and approvals, and the decision to retire the source system."
   },
   {
     "id": "hybrid-system",
@@ -3389,7 +3642,9 @@
     "detail_ko": "하이브리드 시스템에서는 종이와 전자 구성요소 어느 하나만으로 활동이 완성되지 않으므로 상호참조와 동시 검토가 필요합니다. 실사에서는 종이 출력물만 검토해 전자 원자료·감사추적을 누락하거나 두 기록의 불일치를 발견하지 못한 점이 지적됩니다. 데이터흐름도, 기록 간 식별자, 검토 SOP, 전자원자료·종이기록과 보존·검색 시험을 확인합니다.",
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §§4.3, 6.17.1"
-    ]
+    ],
+    "easy_en": "A system in which paper and electronic records together make up the complete record of one GxP activity.",
+    "detail_en": "In a hybrid system neither the paper nor the electronic component alone completes the activity, so the two must be cross-referenced and reviewed together. Inspections cite review of the paper printout alone with the electronic raw data and audit trail omitted, and discrepancies between the two records that were never noticed. Check the data flow diagram, the identifiers linking the records, the review SOP, the electronic raw data and paper records, and retention and retrieval testing."
   },
   {
     "id": "data-transfer",
@@ -3407,7 +3662,9 @@
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §6.8",
       "EU GMP Annex 11 §§4.8, 5"
-    ]
+    ],
+    "easy_en": "Moving data and metadata between different storage media types, formats, or computerised systems.",
+    "detail_en": "Data transfer needs built-in checks and traceability so that values and meaning do not change through interfaces, middleware, or manual export. Inspections cite truncation, rounding, unit and date format conversion, and transfer failures, retransmissions, and changes that go undetected. Look at the interface specification, verification and reconciliation testing, transfer logs and audit trails, error handling, and change control."
   },
   {
     "id": "data-retention",
@@ -3425,7 +3682,9 @@
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §6.17",
       "EU GMP Annex 11 §§7, 17"
-    ]
+    ],
+    "easy_en": "Controls that keep data and metadata secure, readable, and retrievable for the statutory and GMP retention period.",
+    "detail_en": "Data retention must prevent alteration and loss while keeping accessibility, readability, and context for the whole period. Inspections cite raw data that became inaccessible after equipment replacement or software retirement, retention periods that do not agree with each other, disposal without approval, and inadequate verification of true copies. Check the retention policy and inventory, system end of life plans, archive retrieval testing, disposal approvals, and the mapping to statutory periods."
   },
   {
     "id": "disaster-recovery",
@@ -3443,7 +3702,9 @@
     "reg_refs": [
       "EU GMP Annex 11 §§7.2, 16",
       "PIC/S PI 041-1 §9.8"
-    ]
+    ],
+    "easy_en": "The plan and procedures for restoring systems or data to an agreed state from backups after a failure or disaster.",
+    "detail_en": "Disaster recovery has to demonstrate not that a backup exists but that data and configuration can actually be restored to a defined point within a defined time. Inspections cite restoration testing never performed, key metadata and audit trails omitted, failed tests not investigated, and procedures that do not match the real environment. Look at the recovery plan, the basis for the RPO and RTO, the backup scope, periodic restoration tests and their results, and CAPA."
   },
   {
     "id": "business-continuity",
@@ -3460,7 +3721,9 @@
     "detail_ko": "업무연속성은 시스템 복구 전에도 배치·시험·보관 같은 중요 활동을 안전하고 추적 가능하게 유지하도록 합니다. 실사에서는 수기 대체절차의 발동 기준·책임·데이터 재입력·조정 방법이 없거나 모의시험을 하지 않은 점이 지적됩니다. 중요도 위험평가, 대체절차, 연락·권한체계, 시험기록과 정상화 후 데이터 조정·검토를 확인합니다.",
     "reg_refs": [
       "EU GMP Annex 11 §16"
-    ]
+    ],
+    "easy_en": "Arrangements that keep essential GMP processes running by suitable alternative means during a failure of a critical computerised system.",
+    "detail_en": "Business continuity keeps critical activities such as batch processing, testing, and storage safe and traceable even before the system is restored. Inspections cite manual fallback procedures with no trigger criteria, responsibilities, data re-entry, or reconciliation method defined, and fallback arrangements that were never exercised. Check the criticality risk assessment, the fallback procedures, the contact and authority structure, exercise records, and the data reconciliation and review carried out once normal operation resumes."
   },
   {
     "id": "attributable",
@@ -3477,7 +3740,9 @@
     "detail_ko": "귀속성은 데이터 생성·수정·삭제의 책임과 시간순서를 재구성하게 합니다. 실사에서는 공유 ID, 대리서명, 날짜 없는 수정, 자동생성 데이터의 원천 식별 불가가 지적됩니다. 서명·사용자계정, 시간동기화, 감사추적, 기록수정과 전자서명 통제를 확인합니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §7.4"
-    ]
+    ],
+    "easy_en": "The property of being able to identify who, or which system, performed a recorded action or change, and when.",
+    "detail_en": "Attributability lets the responsibility for, and the time order of, data creation, modification, and deletion be reconstructed. Inspections cite shared IDs, signing on behalf of someone else, undated corrections, and automatically generated data whose source cannot be identified. Check signatures and user accounts, time synchronisation, audit trails, and the controls over record correction and electronic signatures."
   },
   {
     "id": "legible",
@@ -3494,7 +3759,9 @@
     "detail_ko": "가독성은 단순히 글자가 보이는 것을 넘어 단위·맥락·수정 전후 내용이 명확하고 장기간 읽을 수 있어야 한다는 의미입니다. 실사에서는 흐린 열전사지, 덮어쓰기, 잘린 스캔, 비표준 약어와 레거시 파일 미열람이 지적됩니다. 원기록, 수정방식, 스캔·진본사본 검증, 보존매체와 정기 가독성 시험을 봅니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§7.4, 8.3"
-    ]
+    ],
+    "easy_en": "The property of a record being readable and unambiguous, so that it can be understood and used throughout the retention period.",
+    "detail_en": "Legibility means more than that the characters can be seen: units, context, and the content before and after a correction must be clear, and it must stay readable for a long time. Inspections cite faded thermal paper, overwriting, truncated scans, non-standard abbreviations, and legacy files that can no longer be opened. Look at the original records, how corrections are made, verification of scans and true copies, the retention media, and periodic readability testing."
   },
   {
     "id": "contemporaneous",
@@ -3511,7 +3778,9 @@
     "detail_ko": "동시기록성은 기억이나 비공식 메모에 의존한 사후 전사를 막아 실제 작업 순서를 보존합니다. 실사에서는 미리 서명한 기록, 교대 말 일괄기입, 임시 종이에서 공식기록으로의 무통제 전사가 지적됩니다. 작업시간·시스템시간, 현장 기록 접근성, 원메모 통제, 배치·설비 로그와 감사추적을 확인합니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§7.4, 8.2"
-    ]
+    ],
+    "easy_en": "The property of data being recorded at the time the work or observation is performed.",
+    "detail_en": "Contemporaneous recording preserves the real order of work by preventing later transcription from memory or informal notes. Inspections cite pre-signed records, batch entry at the end of a shift, and uncontrolled transcription from scrap paper into the official record. Check working time against system time, access to records at the point of work, control of original notes, batch and equipment logs, and audit trails."
   },
   {
     "id": "original-data",
@@ -3528,7 +3797,9 @@
     "detail_ko": "원본성은 최초 포착 데이터와 그 맥락·메타데이터를 보존해 선택적 전사나 재구성을 방지합니다. 실사에서는 전자 원파일 대신 계산된 요약·인쇄물만 보존하거나 임시 기록을 폐기한 점이 지적됩니다. 원자료 지정 근거, 장비 저장파일, 메타데이터·감사추적, 진본사본 생성·인증과 보존을 봅니다.",
     "reg_refs": [
       "PIC/S PI 041-1 §§7.4, 13"
-    ]
+    ],
+    "easy_en": "The record in which information was first captured, or a verified true copy that preserves its content and meaning.",
+    "detail_en": "Originality preserves the first captured data with its context and metadata, and so prevents selective transcription or reconstruction. Inspections cite retention of a calculated summary or printout instead of the original electronic file, and discarded temporary records. Look at the basis on which raw data is designated, the files stored on the instrument, metadata and audit trails, and how true copies are created, certified, and retained."
   },
   {
     "id": "accurate",
@@ -3546,7 +3817,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§7.4–7.5",
       "21 CFR 211.68"
-    ]
+    ],
+    "easy_en": "The property of a record being free from error and correctly reflecting the facts and the activity performed.",
+    "detail_en": "'Accurate' in the ALCOA principles is a data integrity attribute about whether a record truthfully represents what actually happened; it is a different concept from accuracy in analytical procedure validation, which is the closeness of a measured value to the true value. PIC/S PI 041-1 §7.5 explains that the accuracy of records is secured not by one control but by several elements of the quality system — qualification, calibration and maintenance of equipment together with computerised system validation, data review procedures that confirm the procedure was followed, deviation management including root cause analysis, impact assessment and CAPA, and trained people who understand why the procedures and records matter. Inspections cite manual transcription errors, unvalidated spreadsheet formulas, unit and rounding errors, corrections and overwrites made without a reason, values that changed after transfer between systems, and the absence of the input and output accuracy checks required by 21 CFR 211.68(b)."
   },
   {
     "id": "exception-report",
@@ -3564,7 +3837,9 @@
     "reg_refs": [
       "MHRA GxP Data Integrity Guidance §6.13",
       "EU GMP Annex 11 §9"
-    ]
+    ],
+    "easy_en": "A report that uses validated search rules to find predefined abnormal data or actions and present them to the reviewer.",
+    "detail_en": "Exception reports allow risk events to be selected efficiently from large audit trails, but they must be validated so that events outside the rule are not automatically excluded. Inspections cite weak justification for the search conditions and thresholds, unverified completeness and sensitivity, and missing version control and reconciliation against the source audit trail. Look at the requirements and verification evidence, the rules and their versions, generation logs, review and investigation, and periodic performance assessment."
   },
   {
     "id": "detectability",
@@ -3581,7 +3856,9 @@
     "detail_ko": "검출가능성은 일부 위험평가 도구에서 위험 추정과 통제 설계에 쓰이지만 심각도·발생가능성을 대신하지 않습니다. 실사에서는 낮은 검출가능성을 근거 없이 높은 점수로 평가하거나 검출통제를 예방통제처럼 취급한 점이 지적될 수 있습니다. 위험평가 기준, 검출방법 성능자료, 경보·검사 추세와 통제 효과검토를 확인합니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4.3, 5, 7"
-    ]
+    ],
+    "easy_en": "The ability to discover or determine the existence, presence, or fact of a hazard.",
+    "detail_en": "Detectability is used in some risk assessment tools to estimate risk and design controls, but it does not stand in for severity or probability. Inspections may cite low detectability scored high without justification, or a detection control treated as though it were a preventive control. Check the risk assessment criteria, performance data for the detection method, alarm and inspection trends, and review of control effectiveness."
   },
   {
     "id": "uncertainty",
@@ -3598,7 +3875,9 @@
     "detail_ko": "불확실성은 위험평가 결과의 신뢰한계와 필요한 형식성·추가조사를 결정합니다. 실사에서는 데이터 공백·가정·변동성을 밝히지 않고 단일 점수로 확정적으로 표현한 평가가 문제됩니다. 위험질문, 가정·데이터 출처, 민감도·시나리오 분석, 지식확보와 재검토 계획을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4.3, 5.1"
-    ]
+    ],
+    "easy_en": "A lack of knowledge about a hazard, the harm, and the associated risk, arising from incomplete knowledge and from process variability.",
+    "detail_en": "Uncertainty determines the confidence limits of a risk assessment and the formality and further investigation required. Inspections take issue with assessments expressed as a single definitive score without disclosing data gaps, assumptions, or variability. Look at the risk question, the assumptions and data sources, sensitivity and scenario analysis, and the plans for obtaining knowledge and for review."
   },
   {
     "id": "harm",
@@ -3615,7 +3894,9 @@
     "detail_ko": "위해는 위해요인 그 자체와 구분되며 실제 환자·사용자에게 미칠 결과를 위험질문에 연결합니다. 실사에서는 품질결함을 기술적으로만 평가하고 환자노출·투여경로·공급중단 영향을 고려하지 않은 점이 지적될 수 있습니다. 위해 시나리오, 환자·제품 사용정보, 심각도 근거, 불만·이상사례·공급자료를 확인합니다.",
     "reg_refs": [
       "ICH Q9(R1) §§1, 7"
-    ]
+    ],
+    "easy_en": "Damage to health, including the damage that can occur from loss of product quality or availability.",
+    "detail_en": "Harm is distinct from the hazard itself and connects the risk question to the consequences for the actual patient or user. Inspections may cite a quality defect assessed only in technical terms, without considering patient exposure, route of administration, or the effect of a supply interruption. Check the harm scenarios, information on the patient and on how the product is used, the basis for the severity rating, and complaint, adverse event, and supply data."
   },
   {
     "id": "stakeholder",
@@ -3632,7 +3913,9 @@
     "detail_ko": "이해관계자는 같은 위험을 다르게 인식할 수 있으므로 환자 보호를 우선하면서 적절한 전문성과 관점을 의사결정에 포함해야 합니다. 실사에서는 핵심 기능·수탁자·규제 요구 또는 환자영향 관점이 빠진 단일부서 평가가 취약점으로 드러날 수 있습니다. 팀 구성·역할, 회의·검토 기록, 위험소통과 승인 근거를 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §§1, 4.5, 7"
-    ]
+    ],
+    "easy_en": "Any individual, group, or organisation that can affect, be affected by, or perceive itself to be affected by a risk.",
+    "detail_en": "Different stakeholders may perceive the same risk differently, so decision making must give priority to protecting the patient while bringing in the right expertise and perspectives. Inspections may find a single department assessment weak where key functions, contract acceptors, regulatory requirements, or the patient impact perspective were left out. Look at the composition and roles of the team, meeting and review records, risk communication, and the basis for approval."
   },
   {
     "id": "residual-risk",
@@ -3649,7 +3932,9 @@
     "detail_ko": "잔여위험은 통제조치 후 재평가하여 수용 가능성, 추가 통제, 소통과 검토주기를 결정해야 합니다. 실사에서는 초기 위험점수만 남기고 조치 후 위험·새로 생긴 위험·수용 권한을 기록하지 않은 점이 지적됩니다. 통제 전후 평가, 효과자료, 수용기준·승인, 모니터링과 재검토 기록을 확인합니다.",
     "reg_refs": [
       "ICH Q9(R1) §§4.4, 5.2"
-    ]
+    ],
+    "easy_en": "The risk that remains after risk controls have been applied.",
+    "detail_en": "Residual risk must be reassessed after the control measures so that acceptability, further controls, communication, and the review interval can be decided. Inspections cite records that keep only the initial risk score, without the post-control risk, any newly created risk, or the authority for acceptance. Check the assessments before and after control, the effectiveness data, the acceptance criteria and approval, and monitoring and review records."
   },
   {
     "id": "risk-based-decision-making",
@@ -3669,7 +3954,9 @@
     "detail_ko": "위험기반 의사결정은 사안의 중요도·불확실성·복잡성에 맞춰 노력·형식성·문서화 수준을 정합니다. 실사에서는 결론을 정한 뒤 점수를 맞추거나 데이터 완전성·잔여위험·반대 근거를 고려하지 않은 결정이 지적될 수 있습니다. 의사결정 기준, 근거 데이터, 대안 비교, 승인·소통과 후속검토를 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §5.2"
-    ]
+    ],
+    "easy_en": "Deciding how to control, accept, communicate, and review on the basis of risk together with knowledge and uncertainty.",
+    "detail_en": "Risk-based decision-making sets the effort, the formality, and the level of documentation to match the importance, uncertainty, and complexity of the matter. Inspections may cite scores fitted to a conclusion decided in advance, or decisions made without considering data integrity, residual risk, or the evidence against. Look at the decision criteria, the supporting data, the comparison of alternatives, approval and communication, and the subsequent review."
   },
   {
     "id": "formality",
@@ -3686,7 +3973,9 @@
     "detail_ko": "형식성은 모든 사안에 같은 도구를 쓰는 것이 아니라 불확실성·중요도·복잡성에 비례해 팀·도구·보고 수준을 정하게 합니다. 실사에서는 자원 부족을 낮은 형식성의 이유로 삼거나 고위험 사안을 비공식 메모로만 처리한 점이 지적될 수 있습니다. 형식성 결정기준, 위험질문, 팀·도구 선택, 보고서와 품질시스템 내 기록을 확인합니다.",
     "reg_refs": [
       "ICH Q9(R1) §5.1"
-    ]
+    ],
+    "easy_en": "The degree of structure, rigour, and documentation applied to a quality risk management activity, which sits on a continuum from low to high.",
+    "detail_en": "Formality does not mean using the same tool for everything; it sets the team, the tools, and the level of reporting in proportion to uncertainty, importance, and complexity. Inspections may cite a lack of resources given as the reason for low formality, or a high risk matter handled only through an informal note. Check the criteria for deciding formality, the risk question, the choice of team and tools, the report, and how it is recorded within the quality system."
   },
   {
     "id": "subjectivity",
@@ -3703,7 +3992,9 @@
     "detail_ko": "주관성은 위험확인부터 발생가능성·심각도·통제효과 추정까지 모든 단계에 영향을 줄 수 있습니다. 실사에서는 모호한 위험질문, 근거 없는 점수, 촉진자·교차기능 검토 부재와 결론편향이 문제됩니다. 가정·편향 기록, 점수기준, 데이터·지식 출처, 독립 검토와 이견 처리기록을 봅니다.",
     "reg_refs": [
       "ICH Q9(R1) §5.3"
-    ]
+    ],
+    "easy_en": "The tendency for people to perceive hazards, harms, and risks differently, and for bias, assumptions, or an unsuitable scoring scale to change the assessment.",
+    "detail_en": "Subjectivity can affect every stage from risk identification to the estimation of probability, severity, and control effectiveness. Inspections take issue with vague risk questions, scores with no basis, the absence of a facilitator or cross-functional review, and bias toward a conclusion. Look at records of assumptions and bias, the scoring criteria, the sources of data and knowledge, independent review, and how dissenting views were handled."
   },
   {
     "id": "written-procedure",
@@ -3721,7 +4012,9 @@
     "reg_refs": [
       "21 CFR 211.100",
       "21 CFR 211.22"
-    ]
+    ],
+    "easy_en": "Instructions written in advance for how production and process control are to be carried out, approved by the appropriate organisational unit and by the quality control unit.",
+    "detail_en": "This is the phrase that appears most often in United States findings, cited in two forms: the procedure was never established, and the procedure existed but was not followed. Real cases include no cleaning or equipment maintenance procedure, revisions that did not go through approval by the appropriate unit and the quality control unit, and records written up later in a batch rather than at the time of performance. Because 211.100(b) requires any deviation from the procedure to be recorded and justified, check the approval block and the copy available at the point of work together with the justification records for departures from it."
   },
   {
     "id": "quality-control-unit",
@@ -3739,7 +4032,9 @@
     "reg_refs": [
       "21 CFR 211.22",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "The unit with the authority to approve or reject components, containers, closures, in-process materials, labelling, and finished products, and to review production records.",
+    "detail_en": "This is the name under which the United States regulation fixes the authority and responsibility of the quality unit in the text itself. The most common citation in the corpus is that the responsibilities and procedures applicable to the quality control unit were not in writing or were not fully followed (211.22(d)), cited together with cases where the unit had no authority to approve or reject specifications and procedures (211.22(c)) or had no adequate laboratory facilities (211.22(b)). An organisation chart settles nothing, so check in the records who actually approved batch release and whether the authority to reject was ever overridden by the production schedule."
   },
   {
     "id": "laboratory-controls",
@@ -3757,7 +4052,9 @@
     "reg_refs": [
       "21 CFR 211.160",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "Controls that establish scientifically sound specifications, standards, sampling plans, and test procedures so that materials from components to finished products can be judged against them.",
+    "detail_en": "This is the title of the subpart in the United States regulation that gathers the testing requirements together, so individual laboratory failures are cited under this name. Most findings use the standard sentence that scientifically sound and appropriate specifications, standards, sampling plans, and test procedures were not established, followed by the absence of the quality control unit review and approval required by 211.160(a), or by records not made at the time of performance. What is examined is not whether the result passed but on what basis the specification was set and who approved it."
   },
   {
     "id": "sampling-plan",
@@ -3775,7 +4072,9 @@
     "reg_refs": [
       "WHO TRS 929 Annex 4",
       "21 CFR 211.160"
-    ]
+    ],
+    "easy_en": "A plan fixing in advance from which locations, how many, and how much to sample, together with the criteria for judging the result.",
+    "detail_en": "The essential point is that the sampling locations, quantities, and acceptance criteria are fixed in advance; if the sample does not represent the population, every test result that follows loses its basis. Findings either bundle it into one sentence with specifications, standards, and test procedures as not established, or cite separately the fact that a plan already fixed was not followed. Because 21 CFR 211.165(c) and (d) require the number of units tested per batch and the statistical acceptance and rejection levels to be documented, what is examined is how the sample size was derived."
   },
   {
     "id": "adverse-event",
@@ -3792,7 +4091,9 @@
     "detail_ko": "제품의 결함이 아니라 사람에게 나타난 사건을 가리키므로 품질불만과 구분되며, 인과관계가 확인되지 않아도 이상사례입니다. 코퍼스에서는 위탁조제시설이 이상사례 보고를 FDA 가 정한 내용·형식대로 제출하지 않은 점, 용기에 이상사례 신고처를 적지 않은 점, 홍보 과정에서 중대한 이상사례를 알리지 않은 점이 지적됐습니다. 21 CFR 211.198(a)는 불만을 검토할 때 중대하고 예상하지 못한 이상약물반응에 해당하는지 판단하도록 요구하므로, 불만처리 절차와 안전성 보고 절차가 어디서 이어지는지를 확인합니다.",
     "reg_refs": [
       "21 CFR 211.198"
-    ]
+    ],
+    "easy_en": "Any untoward medical occurrence in a person who has been given a medicine, which does not necessarily have a causal relationship with that medicine.",
+    "detail_en": "An adverse event is something that happened to a person rather than a defect in the product, so it is distinct from a quality complaint, and it remains an adverse event even where causality has not been established. In the corpus, an outsourcing facility was cited for not submitting adverse event reports in the content and format FDA requires, for not putting a contact point for reporting adverse events on the container, and for failing to disclose serious adverse events in promotional activity. Because 21 CFR 211.198(a) requires complaint review to decide whether a complaint represents a serious and unexpected adverse drug experience, check where the complaint handling procedure connects to the safety reporting procedure."
   },
   {
     "id": "quality-system",
@@ -3810,7 +4111,9 @@
     "reg_refs": [
       "21 CFR 211.22",
       "21 CFR 211.100"
-    ]
+    ],
+    "easy_en": "The company-wide quality management system that FDA places at the centre when it divides the CGMP regulations into six systems for inspection.",
+    "detail_en": "What it aims at is the same as the pharmaceutical quality system of ICH Q10, but in the United States the term is used more often for the model this guidance sets out and for the systems-based inspection approach built on it. Warning letters repeatedly list violations of individual sections and then gather them under a statement that the firm's quality system is inadequate, with a reference to this guidance, and inspection outcomes are likewise expressed by the quality, facilities and equipment, materials, production, packaging and labelling, and laboratory systems. The judgement therefore rests not on a single finding but on whether the same type of defect appears across several systems at once."
   },
   {
     "id": "container-closure",
@@ -3828,7 +4131,9 @@
     "reg_refs": [
       "21 CFR 211.94",
       "21 CFR 211.166"
-    ]
+    ],
+    "easy_en": "The container and its closure treated as one protective system, which must protect the product from foreseeable external factors during storage and use.",
+    "detail_en": "The essential point is that the container and the closure are assessed as one system rather than separately. The most frequently cited sentence is that the container closure system does not provide adequate protection against foreseeable external factors in storage and use (211.94(b)), and for injectables the absence of a depyrogenation treatment and its validation is cited alongside it (211.94(c)). Whether stability testing was performed in the same container closure combination as the marketed product (211.166(a)(4)) is also checked."
   },
   {
     "id": "water-system",
@@ -3847,7 +4152,9 @@
       "WHO TRS 1033 Annex 3",
       "21 CFR 211.63",
       "21 CFR 211.67"
-    ]
+    ],
+    "easy_en": "The whole installation that produces, stores, and delivers pharmaceutical water to the points of use, requiring design, qualification, and continuous monitoring together.",
+    "detail_en": "What is in scope is not the specification of the water but the whole installation that makes and delivers it, with the purification units, storage tank, and distribution pipework assessed as one. The corpus repeatedly cites the system used without being qualified, microbial contamination not tested at appropriate intervals, the system not designed to deliver water fit for the intended use, and no confirmation that the operating state was being maintained. Look also at dead legs and flow velocity in the pipework, the sanitisation interval, and the records of what was done when a limit was exceeded."
   },
   {
     "id": "visual-inspection",
@@ -3864,7 +4171,9 @@
     "detail_ko": "합격·불합격을 가르는 것으로 끝나지 않고 결함 유형을 분류해 배치별 발생 수준을 추세로 보는 활동입니다. Annex 1 은 알려진 결함을 모은 결함 라이브러리를 만들어 교육에 쓰고, 검사원은 최소 연 1회 적격성평가를 받으며, 자동 검사는 사람 검사와 같거나 그 이상으로 검출하도록 밸리데이션하라고 요구합니다. 코퍼스에서는 검사 프로그램이 무균 주사제를 보증하기에 부족했던 점, 원액 바이알을 눈으로 확인하지 않은 점, 검사에서 나온 중대 결함을 조사하지 않은 점이 지적됐습니다.",
     "reg_refs": [
       "EU GMP Annex 1 §§8.30–8.32"
-    ]
+    ],
+    "easy_en": "Examining filled containers one by one to detect foreign matter or defects.",
+    "detail_en": "This does not end at sorting accept from reject: defect types are classified so that the rate per batch can be trended. Annex 1 requires a defect library of known defects to be built and used in training, inspectors to be qualified at least annually, and automated inspection to be validated to detect as well as or better than manual inspection. The corpus cites an inspection programme inadequate to assure sterile injectables, bulk vials not visually examined, and critical defects found at inspection left uninvestigated."
   },
   {
     "id": "field-alert",
@@ -3881,7 +4190,9 @@
     "detail_ko": "허가를 보유한 자에게만 걸리는 미국 고유의 신고 의무로, 회수 여부와 상관없이 정보를 받은 날부터 3근무일이라는 기한이 먼저 작동합니다. 대상은 제품이나 표시가 다른 것으로 오인될 수 있는 사고와, 세균 오염·중대한 화학적·물리적 변화·유통 배치의 규격 부적합 두 갈래입니다. 코퍼스에서는 세균 오염 정보를 받고도 기한 안에 내지 않은 사례가 반복되므로, 불만이나 시험 결과를 인지한 날짜와 보고서를 낸 날짜, 그 사이에 취한 조치를 함께 확인합니다.",
     "reg_refs": [
       "21 CFR 314.81"
-    ]
+    ],
+    "easy_en": "A report that must reach FDA within 3 working days when a distributed medicine is found to have labelling confusion, bacterial contamination, deterioration, or a specification failure.",
+    "detail_en": "This is a United States specific reporting duty that falls only on the application holder, and the 3 working day clock from receipt of the information runs regardless of whether a recall follows. It covers two branches: incidents in which the product or its labelling could be mistaken for another, and bacterial contamination, a significant chemical or physical change, or a distributed batch failing specification. The corpus repeatedly shows information about bacterial contamination received but no report filed within the deadline, so check the date the complaint or test result was known, the date the report was filed, and what was done in between."
   },
   {
     "id": "in-process-control",
@@ -3899,7 +4210,9 @@
     "reg_refs": [
       "ICH Q7 Glossary",
       "21 CFR 211.110"
-    ]
+    ],
+    "easy_en": "Checks performed during manufacture, with adjustment where necessary, so that an intermediate or API conforms to its specification.",
+    "detail_en": "Rather than screening by testing the finished product, this keeps a batch uniform by checking values while manufacture is under way. Because 21 CFR 211.110(a) gives tablet and capsule weight variation, disintegration time, blend uniformity, dissolution, and the clarity and pH of solutions as examples, findings quote that same list. The corpus cites procedures that omitted tablet and capsule checks or had no clarity check for solutions, so also look at whether the in-process limits are consistent with the finished product specification (211.110(b))."
   },
   {
     "id": "quality-agreement",
@@ -3917,7 +4230,9 @@
     "reg_refs": [
       "21 CFR 211.22",
       "EU GMP Part I Chapter 7"
-    ]
+    ],
+    "easy_en": "A written agreement dividing which CGMP activities the contract giver and the contract acceptor are each responsible for.",
+    "detail_en": "The existence of an agreement is no defence in itself; what is judged is whether the responsibilities written into it were actually carried out. The corpus includes an agreement stating that quality requirements would be defined where those requirements were then never established, and responsibility for a contract manufacturing site defined in the agreement but never exercised as oversight. Even where responsibility is said to have been passed on by agreement, the responsibility for deciding whether to release remains, so compare the division of roles in the agreement against the actual batch release decision records."
   },
   {
     "id": "preventive-maintenance",
@@ -3935,7 +4250,9 @@
     "reg_refs": [
       "ICH Q7 §5.2",
       "21 CFR 211.67"
-    ]
+    ],
+    "easy_en": "Inspecting and servicing equipment to a predetermined schedule and procedure, rather than repairing it after it has failed.",
+    "detail_en": "The name resembles the preventive action of CAPA but the object is different: this is the planned inspection and servicing of equipment, and ICH Q7 requires the schedule and procedures to name who is responsible. The corpus includes cases with no preventive maintenance programme at all, including filter inspection and replacement, inadequate tank maintenance, and a firm required to both carry out repairs and keep to the maintenance schedule. Because 21 CFR 211.67(c) requires records of maintenance, cleaning, and inspection, compare the planned interval with the history of what was actually done."
   },
   {
     "id": "equipment-qualification",
@@ -3953,7 +4270,9 @@
     "reg_refs": [
       "ICH Q7 §12.3",
       "EU GMP Annex 15 §§1–4"
-    ]
+    ],
+    "easy_en": "Documented confirmation, before process validation begins, that critical equipment and ancillary systems are installed and operate as intended.",
+    "detail_en": "More important than what DQ, IQ, OQ, and PQ are each called is the order: this has to be finished before process validation as a prerequisite. The corpus includes qualification performed without a documented programme, cases where the documents submitted did not allow it to be judged whether the qualification was adequate, and inadequate control of the anomalies the qualification revealed. Before asking whether the document package is complete for each item of equipment, check first whether batches made on that equipment were released before qualification was complete."
   },
   {
     "id": "laboratory-investigation",
@@ -3971,7 +4290,9 @@
     "reg_refs": [
       "21 CFR 211.192",
       "21 CFR 211.160"
-    ]
+    ],
+    "easy_en": "The investigation stage that first asks whether the laboratory is the cause when a test result falls outside specification.",
+    "detail_en": "To attribute an out-of-specification result to laboratory error, the error has to be identified and evidenced; where it cannot be identified, the investigation must widen to production. The corpus cites retest results accepted as passing without the root cause being found, laboratory causes named but not supported by documentation, and intermediate failures where no investigation was performed at all. What is examined is who approved the decision to invalidate the original result and when, and where the retest sample came from."
   },
   {
     "id": "shelf-life",
@@ -3988,7 +4309,9 @@
     "detail_ko": "특정 날짜를 가리키는 유효기한과 달리 “얼마 동안”이라는 기간과 그 기간을 뒷받침하는 안정성 자료를 함께 뜻합니다. 코퍼스에서는 주장한 기간을 뒷받침할 안정성 자료가 없던 사례, 사용기한을 표시해 두고 전 기간 안정성시험으로 확인하지 않은 사례가 반복됩니다. 21 CFR 211.166(a)(4)가 시판되는 것과 같은 용기·마개로 시험하도록 요구하므로, 기간을 정하거나 늘린 근거가 실제 포장 형태에서 나온 자료인지 확인합니다.",
     "reg_refs": [
       "21 CFR 211.166"
-    ]
+    ],
+    "easy_en": "The period during which a product is expected to remain within its approved specification under the labelled storage conditions.",
+    "detail_en": "Unlike an expiry date, which names a particular day, shelf life means a length of time together with the stability data supporting it. The corpus repeatedly shows a claimed period with no stability data behind it, and an in-use period stated on the label but never confirmed by stability testing across the whole period. Because 21 CFR 211.166(a)(4) requires testing in the same container closure system as the marketed product, check that the basis for setting or extending the period came from data in the actual pack presentation."
   },
   {
     "id": "non-conformance",
@@ -4006,7 +4329,9 @@
     "reg_refs": [
       "ICH Q10 §3.2.2",
       "EU GMP Part I Chapter 4"
-    ]
+    ],
+    "easy_en": "A state in which a defined requirement has not been met; one of the input signals that triggers investigation and CAPA.",
+    "detail_en": "ICH Q10 places nonconformance alongside complaints, product rejections, recalls, deviations, audits, and regulatory inspection findings, and requires all of them to be treated as inputs to CAPA. A nonconformance is therefore not an event that ends in itself but a signal that has to be put onto an investigation path. The corpus includes investigations of nonconformances that were not adequate, nonconformance report forms found together with pre-signed blank forms, and a corrective plan submitted to computerise nonconformance and CAPA management. EU GMP Part I 4.29 lists records of deviation and nonconformance investigations among the documents that must be held."
   },
   {
     "id": "purified-water",
@@ -4024,7 +4349,9 @@
     "reg_refs": [
       "WHO TRS 1033 Annex 3",
       "21 CFR 211.48"
-    ]
+    ],
+    "easy_en": "Pharmaceutical water produced from at least potable water as feed, meeting the pharmacopoeial chemical and microbiological purity specifications.",
+    "detail_en": "If a pharmaceutical water system is the equipment, purified water is the water quality grade that equipment has to deliver. The feed water must at minimum meet drinking water standards, whatever purification method is used has to be qualified, and the water follows the pharmacopoeial chemical and microbiological purity specifications. The corpus includes purified water that did not meet its microbial specification, purified water used as a component of the product with inadequate control of the equipment, and poor temperature control in the purified water generation area. What is examined is not only the test result but whether the point at which the sample was taken represents the actual point of use."
   },
   {
     "id": "management-review",
@@ -4041,7 +4368,9 @@
     "detail_ko": "ICH Q10 은 무엇을 넣고 무엇을 내놓아야 하는지를 나눠 규정합니다. 넣는 것은 규제 실사 결과와 당국에 한 약속, 정기 품질검토, 불만·회수, 공정성과와 제품품질 감시의 결론, 변경과 CAPA 의 효과, 지난 검토의 후속조치이고, 내놓는 것은 공정·제품 개선, 자원 제공과 교육, 지식의 축적과 전파입니다. 회의를 열었다는 기록보다 거기서 무엇을 결정했고 그 결정이 이행됐는지가 확인 대상이며, 회사 규모에 따라 여러 단계로 나누되 중요한 품질 문제가 상위로 올라가는 경로가 있어야 합니다.",
     "reg_refs": [
       "ICH Q10 §4.1"
-    ]
+    ],
+    "easy_en": "The procedure by which senior management periodically reviews whether the quality system is working and decides the action needed.",
+    "detail_en": "ICH Q10 separates what goes in from what must come out. What goes in is the results of regulatory inspections and commitments made to authorities, periodic quality reviews, complaints and recalls, the conclusions of process performance and product quality monitoring, the effectiveness of changes and CAPA, and follow-up from the previous review; what comes out is improvements to processes and products, provision of resources and training, and the capture and dissemination of knowledge. What is examined is not the record that a meeting was held but what was decided there and whether the decision was implemented; the review may be split into several levels according to the size of the company, provided there is a route by which significant quality issues reach the top."
   },
   {
     "id": "labeling-control",
@@ -4059,7 +4388,9 @@
     "reg_refs": [
       "21 CFR 211.122",
       "21 CFR 211.188"
-    ]
+    ],
+    "easy_en": "Control of the whole path by which labelling and packaging materials are received, stored, issued, and used, with the records kept in the batch record.",
+    "detail_en": "Even where the product itself is sound, wrong labelling means the patient gets a different medicine, so the United States regulation groups labelling and packaging materials into their own subpart. Almost every finding in the corpus takes the form of 21 CFR 211.188(b)(8): the batch record lacked the control records including specimens or copies of the labelling used. Also check whether obsolete and outdated labelling was destroyed (211.122(e)) and whether special control such as dedicated lines or examination of every unit was in place to prevent mix-ups between similar products (211.122(g))."
   },
   {
     "id": "complaint-handling",
@@ -4077,7 +4408,9 @@
     "reg_refs": [
       "21 CFR 211.198",
       "EU GMP Part I Chapter 8"
-    ]
+    ],
+    "easy_en": "The procedure for receiving written and oral complaints about a product, reviewing them, deciding whether investigation is needed, and keeping the record.",
+    "detail_en": "What is regulated is not the fact that a complaint arrived but the procedure for handling it, and the regulation requires three judgements: whether the quality control unit reviewed it, whether an investigation under 21 CFR 211.192 is required, and whether it represents a serious and unexpected adverse drug experience that must be reported to the authority. Where the decision is not to investigate, the reason for that decision must also be recorded. The corpus cites inadequate complaint handling procedures, procedures that were established but not followed, and cases where the procedure did not exist at all alongside quarantine and change control gaps."
   },
   {
     "id": "good-documentation-practices",
@@ -4095,7 +4428,9 @@
     "reg_refs": [
       "PIC/S PI 041-1 §§7.2–7.3, 8.1",
       "EU GMP Part I Chapter 4"
-    ]
+    ],
+    "easy_en": "The collective term for the ways in which all records, paper or electronic, are prepared, reviewed, and controlled so that they meet the data integrity principles (ALCOA+).",
+    "detail_en": "This treats data integrity not as a separate activity but as the everyday way documents are made and handled. PIC/S applies the same principles to paper and electronic records and requires procedures to cover the preparation, review, and approval of source documents and procedures, the generation, distribution, and control of record templates, and retrieval and disaster recovery. The corpus includes European and UK inspection reports where weakness in this practice led to data integrity and traceability problems, and cases where a finding repeated from a previous inspection was escalated to major. What is judged is not the single erroneous record but the document management system that allowed such errors to arise."
   },
   {
     "id": "air-handling",
@@ -4113,7 +4448,9 @@
     "reg_refs": [
       "WHO TRS 1010 Annex 8",
       "21 CFR 211.46"
-    ]
+    ],
+    "easy_en": "Equipment and its operation that condition air for temperature, humidity, and cleanliness and deliver the required airflow.",
+    "detail_en": "Air handling is both the means by which a cleanliness grade is created and a route along which contamination travels, so a design fault in one area becomes contamination in another. The corpus includes air carrying unrefined intermediate that was found to contaminate as it passed through the air handling unit, cleanroom air handling whose qualification had not been completed, limits exceeded with no action taken, and inadequate air handling design in unclassified areas. Look together at the balance of supply and extract, the pressure differentials between areas, filter specifications and replacement history, and what was done when a limit was exceeded."
   },
   {
     "id": "microbial-limits",
@@ -4131,7 +4468,9 @@
     "reg_refs": [
       "21 CFR 211.113",
       "21 CFR 211.165"
-    ]
+    ],
+    "easy_en": "Microbiological acceptance criteria a product must meet, such as total aerobic count, total yeast and mould count, and absence of specified objectionable organisms.",
+    "detail_en": "These criteria apply to products for which sterility is not required, and alongside total counts and yeast and mould they specify the absence of particular objectionable organisms such as Staphylococcus aureus, Escherichia coli, Salmonella, and Pseudomonas aeruginosa. Because the limits depend on the nature of the product, the way it is made, and its intended use, numbers cannot simply be carried over from another product. The corpus cites compendial monograph specifications and microbial limits not carried into the specification document, water that failed to meet its limits, and batch records missing the microbial limit test data."
   },
   {
     "id": "master-standard-documents",
@@ -4148,7 +4487,9 @@
     "detail_ko": "국내 GMP 는 갖추어야 할 문서를 제품표준서·품질관리기준서·제조관리기준서·제조위생관리기준서 네 가지로 이름까지 지정해 요구합니다. 제품표준서는 품목마다 작성하고, 제조부서 책임자와 품질(보증)부서 책임자가 각각 서명해 승인한 뒤 운영해야 합니다. 식약처 실사 지적은 대개 “기준서 미준수” 형태로, 회사가 자기 기준서에 적어 둔 문서관리·변경관리 규정을 스스로 지키지 않은 사실을 근거로 듭니다. 기록을 작업과 동시에 작성하도록 정해 놓고 그렇게 하지 않았거나, 시험방법을 바꾸면서 변경요청서를 내지 않은 경우가 그 예입니다.",
     "reg_refs": [
       "의약품 등의 안전에 관한 규칙 [별표 1]"
-    ]
+    ],
+    "easy_en": "The collective name for the four basic documents a Korean manufacturer must hold in order to carry out manufacturing and quality control properly.",
+    "detail_en": "Korean GMP requires the documents to be held by name, as four: the product standard document, the quality control standard document, the manufacturing control standard document, and the manufacturing hygiene control standard document. A product standard document is prepared for each product and must be approved by signature of both the head of the manufacturing department and the head of the quality (assurance) department before it is used. MFDS inspection findings usually take the form of failure to comply with the standard documents, citing the fact that the company did not follow the document control and change control rules it had written into its own standard documents. Examples are records required to be made at the time of the work but not made that way, and a test method changed without a change request being raised."
   },
   {
     "id": "business-operator-recall",
@@ -4166,7 +4507,9 @@
     "reg_refs": [
       "약사법 제39조",
       "의약품 등의 안전에 관한 규칙 제50조"
-    ]
+    ],
+    "easy_en": "In Korea, a recall in which the marketing authorisation holder or importer withdraws distributed product on its own initiative once it learns of a safety or efficacy problem, without waiting for an order from the authority.",
+    "detail_en": "This is the Korean distinction based on who started the recall: unlike a recall ordered by the authority, the business operator begins it on its own judgement. The parties obliged to recall are the marketing authorisation holder, quasi-drug manufacturers, and importers; they assess the hazard as Class 1 to 3, submit a recall plan to the regional office within 5 days of learning of the problem, and must complete the recall within 15 days for Class 1 and 30 days for Classes 2 and 3. Published Korean cases are often precautionary recalls citing impurity levels above the limit, or related substance and microbial limit failures found in post-marketing stability testing. That a diligently executed recall can reduce an administrative penalty also bears on the decision."
   },
   {
     "id": "sanitation",
@@ -4190,7 +4533,9 @@
       "21 CFR 211.56",
       "EU GMP Part I Chapter 3 §§3.3–3.4",
       "21 CFR 211.67"
-    ]
+    ],
+    "easy_en": "The system of cleaning, pest control, and waste handling, with its written procedures, that keeps buildings and facilities clean and sanitary.",
+    "detail_en": "Sanitation is a facility level programme that keeps manufacturing and storage buildings clean and sanitary; 21 CFR 211.56 requires (a) freedom from infestation by rodents, birds, insects, and other vermin, and timely disposal of trash and organic waste, (b) written procedures assigning responsibility and describing in sufficient detail the cleaning schedules, methods, equipment, and materials, (c) procedures for the use of rodenticides, insecticides, fungicides, fumigating agents, and cleaning and sanitising agents (registered products only, used so that components, containers, and products are not contaminated), and (d) the same procedures to apply to contractors and temporary employees. If disinfection is the individual treatment that reduces microorganisms, sanitation is the wider system that includes it along with cleaning, pests, and waste, and the Canadian finding of an inadequate sanitation programme points at which of the three layers — design (identifying the contamination risk), execution, and effectiveness — is missing. Inspections cite cleaning frequencies and methods absent from the procedure or no cleaning records, pests, foreign matter, or accumulated dust observed in production areas, and hygiene procedures not applied to contracted personnel."
   },
   {
     "id": "pest-control",
@@ -4212,7 +4557,9 @@
     "reg_refs": [
       "21 CFR 211.56",
       "EU GMP Part I Chapter 3 §3.4"
-    ]
+    ],
+    "easy_en": "Control that keeps insects, rodents, and other pests out of manufacturing and storage facilities and monitors for and eliminates any that enter.",
+    "detail_en": "Pest control is one element of sanitation: 21 CFR 211.56(a) requires buildings to be free of infestation by rodents, birds, insects, and other vermin, (c) requires rodenticides, insecticides, fungicides, and fumigating agents to be registered products used under written procedures so that equipment, components, containers, and products are not contaminated, and EU GMP Part I Chapter 3 §3.4 requires premises to be designed and equipped so as to afford maximum protection against the entry of insects and animals. If sanitation is the wider system covering cleaning and waste, pest control is the part that deals with living things coming in from outside, and the trap layout, inspection frequency, catch records, and trend review form one set. Inspections cite the work handed to a contractor with no trap layout or inspection records held, no trend review or action on rising catches, doors, drains, and wall gaps left unattended, and insects observed directly in production areas."
   },
   {
     "id": "master-production-record",
@@ -4238,7 +4585,9 @@
       "21 CFR 211.186",
       "21 CFR 211.188",
       "EU GMP Part I Chapter 4 §§4.17–4.19"
-    ]
+    ],
+    "easy_en": "The approved document that sets components, quantities, theoretical yield, and manufacturing and control instructions for each product and batch size, and from which each batch record is copied.",
+    "detail_en": "The master production and control record is the original document prepared in advance for each product and batch size to assure batch to batch uniformity, and the batch production and control record is its exact copy in which what was actually done is written — 21 CFR 211.188(a) requires the batch record to include an accurate reproduction of the appropriate master record, checked for accuracy, dated, and signed. 211.186 requires the MPCR to be prepared, dated, and signed in full handwriting by one person and independently checked, dated, and signed by a second, and to contain the product name, strength, and dosage form, the amount of active ingredient per unit, the list of components and their weights, the theoretical weight at each stage and the theoretical yield with the upper and lower percentage limits beyond which investigation is required, specimens of container, closure, and labelling materials, and complete manufacturing and control instructions with sampling and testing procedures and precautions (corresponding to the manufacturing formula and processing instructions of EU GMP Chapter 4 §§4.17–4.18). Inspections cite an MPCR issued without the independent second person check, missing upper and lower theoretical yield limits, manufacturing instructions so incomplete that operators relied on verbal instruction, and unauthorised personnel able to change a computerised MPCR (211.68(b))."
   },
   {
     "id": "ongoing-stability-programme",
@@ -4262,7 +4611,9 @@
     "reg_refs": [
       "EU GMP Part I Chapter 6 §§6.26–6.36",
       "21 CFR 211.166"
-    ]
+    ],
+    "easy_en": "A programme that puts batches on test every year after marketing, to confirm the product stays within specification for its whole shelf life.",
+    "detail_en": "Unlike the initial stability studies submitted at authorisation, the on-going stability programme monitors batches actually produced after marketing, through to the end of shelf life; EU GMP Chapter 6 §6.27 gives its purpose as confirming that the product remains, and can be expected to remain, within specification under the labelled storage conditions. §§6.29–6.32 require a written protocol and report following the rules of Chapter 4, qualified stability chambers, a protocol running to the end of shelf life that covers the number of batches, tests, acceptance criteria, testing frequency, and storage conditions, and, unless otherwise justified, at least one batch per year per strength and per primary packaging type so that trend analysis is possible; §6.33 requires additional batches after significant changes or deviations in process or packaging, and after rework, reprocessing, or recovery. 21 CFR 211.166 requires a statistically sound number of samples and test intervals, testing in the marketed container closure, and results reflected in the storage conditions and expiry date. Inspections cite the absence of the programme or of a written protocol, missing annual batches, and out-of-specification or out-of-trend results that were not carried into an assessment of product on the market."
   },
   {
     "id": "job-description",
@@ -4284,7 +4635,9 @@
     "reg_refs": [
       "EU GMP Part I Chapter 2 §§2.3–2.5",
       "21 CFR 211.25"
-    ]
+    ],
+    "easy_en": "A document setting out the specific duties and authority of a person in a responsible position, so that there are no gaps or unexplained overlaps in responsibility.",
+    "detail_en": "The job description is the document required by EU GMP Chapter 2 §2.3: the specific duties of each person in a responsible position are recorded, they are given sufficient authority to discharge those responsibilities, duties may be delegated to designated deputies of a satisfactory qualification level, and there should be no gaps or unexplained overlaps in the responsibilities of personnel concerned with the application of GMP; §2.4 places ultimate responsibility for defining, communicating, and implementing roles, responsibilities, and authorities with senior management, and §2.5 requires the heads of production and of quality control to be independent of each other. If training is about whether a person can do the work and the organisation chart about who reports to whom, the job description settles what they are responsible for. Canadian inspections repeatedly cite job descriptions, authorities, and delegation that are inadequate or undocumented, including no signed job description, documents that differ from the work actually done, and unrecorded delegation leaving approval authority unclear."
   },
   {
     "id": "mix-up",
@@ -4307,7 +4660,9 @@
       "21 CFR 211.42",
       "21 CFR 211.125",
       "EU GMP Part I Chapter 5 §§5.9, 5.46"
-    ]
+    ],
+    "easy_en": "An incident in which components, containers, labelling, or products are interchanged or intermingled and used in error, to be prevented, alongside contamination, by facility design, segregation, and control.",
+    "detail_en": "A mix-up is the interchange or intermingling of different components, containers, closures, labelling, in-process materials, or products: where cross-contamination is another substance getting into the product, a mix-up is the item itself being the wrong one. 21 CFR 211.42(b) requires buildings to have adequate space and flow to prevent this, (c) requires separate defined areas or another control system to prevent contamination or mix-ups in each of ten named operations from receipt, quarantine, and storage through manufacturing, packaging, labelling, and testing, and 211.125(e) requires returned labelling to be identified and stored so that mix-ups are prevented; EU GMP Chapter 5 §5.9 allows different products to be worked on in the same room simultaneously or consecutively only where there is no risk of mix-up or cross-contamination, and §5.46 requires cut labels and other loose printed materials to be stored and transported in separate closed containers. Inspections cite quarantined, rejected, and released materials standing together with no separation, the next product started without line clearance, similar looking labelling stored side by side, and temporary storage areas with no status marking."
   },
   {
     "id": "training",
@@ -4329,7 +4684,9 @@
     "reg_refs": [
       "21 CFR 211.25",
       "EU GMP Part I Chapter 2 §§2.10–2.13"
-    ]
+    ],
+    "easy_en": "Instructing staff so they can perform their duties and GMP, and verifying and recording its effect, both on hiring and continuously thereafter.",
+    "detail_en": "Training is one of the combination of education, training, and experience by which 21 CFR 211.25(a) requires each employee to be enabled to perform their assigned functions; it must be given by qualified individuals on a continuing basis and with sufficient frequency, covering the particular operations and the cGMP regulations and written procedures relevant to the function, and (c) requires an adequate number of qualified personnel. EU GMP Chapter 2 §§2.10–2.11 require training for all personnel entering production, storage, and laboratory areas (including technical, maintenance, and cleaning staff) and for anyone whose activities could affect quality, require new personnel to receive job specific training beyond the basic theory and practice, require continuing training thereafter with its practical effectiveness periodically assessed, and require records to be kept; §2.12 requires special training for personnel working in clean areas or handling highly active, toxic, or sensitising materials, and §2.13 requires visitors and untrained persons to be given information beforehand and closely supervised. If the job description settles what a person is responsible for, training records prove they can do it. Inspections cite missing training records or records with a signature but no content or assessment, work performed after a procedure was revised without retraining, no assessment of training effectiveness, and trainers whose own qualification is not evidenced."
   },
   {
     "id": "certificate-of-analysis",
@@ -4355,7 +4712,9 @@
       "ICH Q7 §§11.40–11.44",
       "21 CFR 211.84",
       "EU GMP Part II §§11.40–11.44"
-    ]
+    ],
+    "easy_en": "A document issued, dated, and signed by the quality unit for each batch, setting out which tests were performed, against what criteria, and what the results were.",
+    "detail_en": "Under ICH Q7 §§11.41–11.43 a certificate of analysis states the material name, grade, batch number, and release date (including the expiry or retest date), lists each test performed under the compendial or customer requirement together with the acceptance criteria and the numerical result, is dated and signed by an authorised person of the quality unit, and carries the name, address, and telephone number of the original manufacturer; where a repacker or reprocessor did the testing, that fact and the original manufacturer are both shown (§11.43), and a certificate newly issued by an agent must also preserve the original manufacturer's information (§11.44). If a specification says what must be tested and what it must meet, the certificate of analysis is the per batch document saying that this batch actually met it. 21 CFR 211.84(d)(2) allows a supplier's certificate to be accepted in place of full in-house testing only where the manufacturer performs at least one specific identity test on each component itself and establishes the reliability of the supplier's results by validating them at appropriate intervals. Inspections cite components released on a certificate alone with no identity test, missing records validating supplier certificates (periodic full testing), and, as in the Canadian finding of no authentic certificate of analysis, having only an agent's certificate rather than the original manufacturer's."
   },
   {
     "id": "returned-product",
@@ -4380,7 +4739,9 @@
       "21 CFR 211.204",
       "EU GMP Part I Chapter 5 §5.70",
       "ICH Q7 §§14.50–14.52"
-    ]
+    ],
+    "easy_en": "A medicine sent back to the manufacturer after leaving for the market; destruction is the default where storage and transport history cannot be confirmed, and resale requires assessment by the quality unit.",
+    "detail_en": "A returned product is one that left the manufacturer's control and came back: where a recall is the manufacturer calling product in from the market because of a quality defect, a return is product coming back from the distribution chain, and as the EU GMP glossary definition allows, it may or may not be defective. 21 CFR 211.204 requires returned products to be identified and held in quarantine, to be destroyed unless testing or investigation shows they meet appropriate standards where conditions of storage or shipment before or after the return, or the condition of the product, container, or labelling, cast doubt on safety, identity, strength, quality, or purity, and requires records of the product name, labelled potency, dosage form, lot number, reason for return, quantity, date of disposition, and ultimate disposition, with investigation under 211.192 where the reason for return implicates associated batches; EU GMP Chapter 5 §5.70 requires destruction unless there is no doubt about quality, and permits resale, relabelling, or recovery only after critical assessment by the quality control department under a written procedure, taking account of the nature, storage conditions, condition, history, and elapsed time. Inspections cite no return records or no recorded disposition, stock returned to inventory without assessment, and product re-released with no knowledge of its temperature history."
   },
   {
     "id": "pressure-differential",
@@ -4404,7 +4765,9 @@
     "reg_refs": [
       "EU GMP Annex 1 §4.14",
       "21 CFR 211.42"
-    ]
+    ],
+    "easy_en": "Keeping the air pressure of a cleaner room above that of the adjacent lower grade area so that air flows only from the cleaner side to the less clean side.",
+    "detail_en": "A pressure differential is the difference in air pressure between adjacent areas of different grade, and positive pressure is the state in which a cleanroom is held above its surroundings so that filtered air flows only outward. EU GMP Annex 1 §4.14 requires cleanrooms to maintain a positive pressure or airflow relative to a lower grade background under all operational conditions so that the area is effectively flushed, with a guidance value of a minimum 10 Pa between adjacent rooms of different grade and particular attention to protecting critical zones; 21 CFR 211.42(c)(10)(iii) requires aseptic processing areas to be supplied with HEPA filtered air under positive pressure, whether or not laminar flow is used. Containment areas handling highly active substances or pathogens use negative pressure instead, so what matters is not the direction itself but whether the designed direction is always maintained and monitored. Inspections cite pressure differentials not continuously monitored or recorded, work carried out with the differential at zero or reversed and no alarm, doors opened together so the cascade collapses, and pressure excursions not carried into a product impact assessment."
   },
   {
     "id": "sporicidal-agent",
@@ -4428,7 +4791,9 @@
       "EU GMP Annex 1 §§4.33–4.35",
       "21 CFR 211.42",
       "21 CFR 211.56"
-    ]
+    ],
+    "easy_en": "An agent that, used at a sufficient concentration for a defined contact time, destroys bacterial and fungal spores and is expected to kill vegetative organisms as well.",
+    "detail_en": "The EU GMP Annex 1 glossary defines a sporicidal agent as one that destroys bacterial and fungal spores when used at a sufficient concentration for a specified contact time, and it fills the gap left by ordinary disinfectants, which act on vegetative bacteria and fungi but not on spores. Annex 1 §4.33 requires a cleanroom disinfection programme to use more than one disinfectant with different modes of action, to include a sporicidal agent periodically, and to monitor the effectiveness of the programme and the emergence of resistant strains; §4.35 requires disinfectants used in Grade A and B areas to be sterile before use. If disinfection is the whole business of reducing microorganisms, the sporicidal agent is the one within that programme charged with spores. FDA warning letters and 483s repeatedly cite sporicidal agents not used at all or used too rarely in ISO 5 aseptic processing areas, application for less than the contact or dwell time the label requires, and non-sterile sporicides and wipes used in Grade A."
   },
   {
     "id": "time-limits-on-production",
@@ -4454,7 +4819,9 @@
       "21 CFR 211.111",
       "WHO TRS 992 Annex 4",
       "EU GMP Annex 1 §8.36"
-    ]
+    ],
+    "easy_en": "Setting the time by which each production phase must be completed and the maximum time materials, in-process product, or bulk may be held before the next step, so that quality is assured.",
+    "detail_en": "21 CFR 211.111 requires time limits for the completion of each phase of production where they are necessary to assure product quality, and requires deviations from them to be documented and justified as not compromising quality. WHO TRS 992 Annex 4 describes hold time as the established period for which dispensed materials, intermediates, and bulk awaiting final packaging remain within specification under defined conditions, and requires the limits for each stage to be set by hold time studies in which samples from representative batches are held in the actual or simulated container for the defined period and then tested; for sterile products, EU GMP Annex 1 §8.36 requires the maximum time from the start of preparation to sterilisation to be reflected in the sterilisation validation. If stability testing asks whether the finished product holds up over its shelf life, hold time asks whether in-process material holds up until the next step. Inspections cite time limits never established at all (a standard FDA 483 finding), batch records with no start and finish times for each stage so that compliance cannot be told, and bulk hold periods extended with no supporting data."
   },
   {
     "id": "yield",
@@ -4481,7 +4848,9 @@
       "21 CFR 211.103",
       "21 CFR 211.192",
       "EU GMP Part I Chapter 5 §5.8"
-    ]
+    ],
+    "easy_en": "Theoretical yield is the quantity that would be produced with no loss, actual yield is what was produced; where the percentage of the two falls outside the set range it must be investigated.",
+    "detail_en": "21 CFR 210.3(b) defines theoretical yield as the quantity that would be produced at any appropriate phase of production based on the quantity of components to be used, in the absence of any loss or error, actual yield as the quantity actually produced, and percentage of theoretical yield as the ratio of actual to theoretical yield at the same phase, expressed as a percentage; the ICH Q7 glossary carries the same sense of theoretical yield. 211.103 requires actual yields and percentages of theoretical yield to be determined at the conclusion of each appropriate phase of manufacturing, processing, packaging, and holding, with the calculation performed by one person and independently verified by a second (one person where automated equipment is used); 211.186(b)(7) requires the master record to state the upper and lower percentage limits beyond which investigation is required; 211.192 requires any batch outside that range to be thoroughly investigated even if it has already been distributed; and EU GMP Chapter 5 §5.8 likewise requires yield checks as necessary. If reconciliation compares whether the count of materials and labelling adds up, yield measures how much came out of the process. Inspections cite yield limits never set, excursions approved without investigation, and calculations with no independent verification signature."
   },
   {
     "id": "reconciliation",
@@ -4506,7 +4875,9 @@
       "EU GMP Part I Chapter 5 §§5.8, 5.61",
       "21 CFR 211.125",
       "21 CFR 211.192"
-    ]
+    ],
+    "easy_en": "Comparing, with due allowance for normal variation, the quantity that theoretically should have been produced or used against the quantity actually there; discrepancies, especially in labelling and bulk product, must be investigated.",
+    "detail_en": "The EU GMP glossary defines reconciliation as a comparison, making allowance for normal variation, between the amount of product or materials theoretically produced or used and the amount actually produced or used. Chapter 5 §5.8 requires yield checks and quantity reconciliations to be carried out as necessary so that there are no discrepancies outside acceptable limits, and §5.61 requires the amounts of bulk product and printed packaging materials and the number of units produced to be reconciled during packaging, with any significant or unusual discrepancy investigated and satisfactorily accounted for before release; 21 CFR 211.125(c) requires the quantities of labelling issued, used, and returned to be reconciled and any discrepancy outside narrow limits based on historical operating data to be investigated under 211.192 (exempt where 100% labelling examination under 211.122(g)(2) is performed). If yield is the output ratio of a process, reconciliation is the counting exercise that asks where a missing label went, and a failed labelling reconciliation connects directly to the possibility that mislabelled product reached the market. Inspections cite labelling reconciliation not performed at all, discrepancies written off as waste without investigation, and reconciliation limits set wide with no justification."
   },
   {
     "id": "equipment-use-log",
@@ -4532,7 +4903,9 @@
       "21 CFR 211.182",
       "EU GMP Part I Chapter 4 §4.31",
       "21 CFR 211.67"
-    ]
+    ],
+    "easy_en": "A per equipment record kept in chronological order showing which product and batch each major item was used for, and when it was cleaned and maintained.",
+    "detail_en": "21 CFR 211.182 requires that cleaning, maintenance (except routine maintenance such as lubrication and adjustment), and use of major equipment be recorded in an individual equipment log with the date, time, product, and batch number, that the person performing and the person double-checking each date and sign (or initial) it, and that entries be in chronological order (for equipment dedicated to one product, the batch record may serve instead where batches follow in numerical order). EU GMP Chapter 4 §4.31 requires logbooks for major or critical analytical testing instruments, production equipment, and areas where product has been processed, recording use, calibration, maintenance, cleaning, and repair in chronological order with dates and the identity of the person. If the batch record follows what happened to that batch, the equipment log follows what happened to that equipment, so a cross-contamination investigation or the worst case determination for cleaning validation starts here. Canadian inspections repeatedly cite inadequate usage logs for major manufacturing and testing equipment as a standard finding, along with missing or retrospective entries, gaps between cleaning and next use, and cases where no log existed so the history of use could not be reconstructed."
   },
   {
     "id": "distribution-record",
@@ -4555,6 +4928,8 @@
     "reg_refs": [
       "21 CFR 211.196",
       "21 CFR 211.150"
-    ]
+    ],
+    "easy_en": "The record of which lot of which product went to whom, when, and in what quantity — the basis for finding where product is if a recall becomes necessary.",
+    "detail_en": "21 CFR 211.196 requires distribution records to contain the name, strength, and dosage form of the product, the name and address of the consignee, the date and quantity shipped, and the lot or control number; 211.150(b) requires a system by which the distribution of each lot can be readily determined to facilitate recall if necessary, and (a) requires a procedure whereby the oldest approved stock is distributed first. If a return is the record of product that came back and a recall is the decision to call product in, the distribution record is the only basis for answering which lot is where and in what quantity when a recall has to be executed — without it the scope of a recall cannot be set. Inspections cite distribution records missing the lot number or the consignee's address, records kept by product rather than by lot, and, in a Canadian finding, a computerised system managing distribution records that had not been validated."
   }
 ]

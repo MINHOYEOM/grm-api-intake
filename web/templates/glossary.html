@@ -17,6 +17,8 @@
     </div>
     <p class="gl-count" id="grm-gl-count" data-total="{{ glossary.total }}">{{ _("전체 <b>{n}</b>개 용어", n=glossary.total) }}</p>
   </div>
+  {% if glossary.ko_only_sources %}  <p class="wrap gl-note">{{ _("이 사전의 {n}건은 출처나 관련 조항이 한국어 문서·법령이라 그 이름을 원문 그대로 표시합니다.", n=glossary.ko_only_sources) }}</p>
+  {% endif %}
   <nav class="wrap gl-index" id="grm-gl-index" aria-label="{{ _('초성 색인') }}">
     {% for b in glossary.buckets %}
     <a href="#{{ b.anchor }}" data-bucket="{{ b.anchor }}">{{ b.bucket }}</a>
@@ -35,12 +37,13 @@
                 가장 많이 받는 허브인데, 종전에는 자식 226장을 하나도 가리키지 않아(전부
                 `#` 프래그먼트) 낱개 페이지가 sitemap 전용 고아였다 — 45개 용어는 인바운드가
                 0이었다. `#` 앵커는 그대로 둔다(퀴즈의 `glossary/#id` 딥링크가 쓴다). -#}
-            <h3 class="gl-term-ko"><a class="gl-term-link" href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a><a class="gl-anchor" href="#{{ t.id }}" aria-label="{{ _('이 용어로 바로가기') }}">#</a></h3>
-            <span class="gl-term-en">{{ t.term_en }}</span>
+            <h3 class="gl-term-ko"><a class="gl-term-link" href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term }}</a><a class="gl-anchor" href="#{{ t.id }}" aria-label="{{ _('이 용어로 바로가기') }}">#</a></h3>
+            {# 부제(영문 표제어)는 한국어판에만 값이 있다. 영어판에선 빈 인라인 span 이 남지만 조건문으로 감싸면 lstrip_blocks 가 들여쓰기를 먹어 한국어판 바이트가 흔들린다 — 보이지 않는 빈 span 쪽이 낫다(이 저장소가 반복해 데인 자리). #}
+            <span class="gl-term-en">{{ t.term_sub }}</span>
             {% if t.aliases %}<p class="gl-alias"><span class="gl-alias-k">{{ _('다른 표현') }}</span><span class="gl-alias-v">{{ t.aliases|join(' · ') }}</span></p>{% endif %}
           </div>
-          <p class="gl-def">{{ t.easy_ko }}</p>
-          {% if t.detail_ko %}<p class="gl-detail"><span class="gl-detail-k">{{ _('실무 맥락') }}</span>{{ t.detail_ko }}</p>{% endif %}
+          <p class="gl-def">{{ t.easy }}</p>
+          {% if t.detail %}<p class="gl-detail"><span class="gl-detail-k">{{ _('실무 맥락') }}</span>{{ t.detail }}</p>{% endif %}
           {% if t.source_url %}
           <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span><a class="gl-src-a" href="{{ t.source_url }}" target="_blank" rel="noopener">{{ t.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
           {% else %}
@@ -52,7 +55,7 @@
           {% if t.related %}
           <div class="gl-rel">
             <span class="gl-rel-k">{{ _('관련 용어') }}</span>
-            {% for r in t.related %}<a class="gl-rel-a" href="#{{ r.id }}">{{ r.term_ko }}</a>{% endfor %}
+            {% for r in t.related %}<a class="gl-rel-a" href="#{{ r.id }}">{{ r.label }}</a>{% endfor %}
           </div>
           {% endif %}
           {% if t.case_findings %}

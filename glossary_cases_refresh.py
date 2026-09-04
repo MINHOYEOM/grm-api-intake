@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""용어사전 "사례 건수" 주간 재측정 — `web/data/glossary_cases.json` 의 findings/documents
-**숫자만** 다시 센다.
+"""용어사전 "사례 건수" 주간 재측정.
+
+기본 경로는 사람이 검수한 `web/data/glossary_cases.json`의 findings/documents **숫자만**
+다시 센다. `--orig-lang en` 경로는 별도 영문 정본(`glossary_cases_en.json`)을 만든다.
 
 배경: 용어사전 각 용어 카드 아래 "이 용어로 검색되는 지적사례 N건 보기 →" 링크가 달린다(C1/C2).
 그 숫자는 `public.findings_search` RPC(030, `/findings/?q=...` 화면이 쓰는 것과 **동일 함수**)를
@@ -11,7 +13,7 @@
 **불가침 계약**:
   · `q`(검색어)는 **절대 바꾸지 않는다** — 사람이 실제 지적 문장을 읽고 판정한 값이다.
   · `excluded` 배열도 건드리지 않는다 — 링크를 안 다는 이유가 이미 데이터에 적혀 있다.
-  · 이 스크립트가 고치는 건 `items[].findings` / `items[].documents` / 최상위 `measured_on`
+  · 기본 경로에서 이 스크립트가 고치는 건 `items[].findings` / `items[].documents` / 최상위 `measured_on`
     뿐이다. 그 외 키(`schema`·`source`·`note`·`curated_on`·`corpus_note`·항목별 `note`)는
     무변형 통과.
 
@@ -55,6 +57,7 @@ SCHEMA_VERSION = "grm-glossary-cases/v1"
 REPORT_SCHEMA_VERSION = "grm-glossary-cases-refresh-report/v1"
 RPC_NAME = "findings_search"
 DEFAULT_PATH = Path("web/data/glossary_cases.json")
+DEFAULT_GLOSSARY_PATH = Path("web/data/glossary.json")
 
 _HTTP_TIMEOUT_SECONDS = 15
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
@@ -75,6 +78,7 @@ def _post_findings_search(
     anon_key: str,
     q: str,
     *,
+    orig_lang: str = "",
     timeout: int = _HTTP_TIMEOUT_SECONDS,
 ) -> tuple[int, Any, str]:
     """POST rpc/findings_search(p_q=q, p_page=1, p_docs_per_page=1) — anon 키.
@@ -93,7 +97,8 @@ def _post_findings_search(
         "Authorization": f"Bearer {anon_key}",
         "Content-Type": "application/json",
     }
-    body = {"p_q": q, "p_page": 1, "p_docs_per_page": 1}
+    body = {"p_q": q, "p_page": 1, "p_docs_per_page": 1,
+            "p_orig_lang": orig_lang}
     for attempt in range(1, _MAX_ATTEMPTS + 1):
         try:
             resp = requests.post(url, headers=headers, json=body, timeout=timeout)
@@ -128,10 +133,12 @@ def _int(value: Any) -> int | None:
 
 
 def fetch_counts(
-    base_url: str, anon_key: str, q: str, *, timeout: int = _HTTP_TIMEOUT_SECONDS,
+    base_url: str, anon_key: str, q: str, *, orig_lang: str = "",
+    timeout: int = _HTTP_TIMEOUT_SECONDS,
 ) -> tuple[int | None, int | None, str]:
     """findings_search(q) 호출 → (findings, documents, error). error 는 정상 시 ""."""
-    _status, data, err = _post_findings_search(base_url, anon_key, q, timeout=timeout)
+    _status, data, err = _post_findings_search(
+        base_url, anon_key, q, orig_lang=orig_lang, timeout=timeout)
     if err:
         return None, None, err
     if not isinstance(data, dict):
@@ -341,6 +348,116 @@ def run_refresh(
     return new_payload, report
 
 
+def run_english_refresh(
+    terms: list[dict[str, Any]],
+    previous_payload: dict[str, Any] | None,
+    fetch: FetchFn,
+    *,
+    large_change_pct: float = DEFAULT_LARGE_CHANGE_PCT,
+    fail_abort_pct: float = DEFAULT_FAIL_ABORT_PCT,
+    run_date: str | None = None,
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    """영문 사례 정본을 glossary 전체 후보에서 다시 만든다.
+
+    후보 목록도 `p_orig_lang='en'`으로 RPC에 묻는 호출부가 이 함수를 위해 각 항목을
+    순회한다. 한국어 정본의 items/excluded를 필터링하는 사후 처리로는, 영어에서 0건인
+    항목이 "기존 한국어 제외 사유"로 남아 거짓 설명이 된다. `term_en`만을 q 후보로 쓰고
+    RPC가 0을 돌려주면 제외한다. 다른 검색어를 추측해 보완하지 않는다.
+
+    개별 조회 실패는 기존 영문 items만 유지한다. 새 후보는 '조회 실패' excluded로 남긴다.
+    실패율 게이트를 넘으면 기본 경로와 마찬가지로 아무것도 쓰지 않는다.
+    """
+    old_items = {
+        it.get("id"): it for it in ((previous_payload or {}).get("items") or [])
+        if isinstance(it, dict) and isinstance(it.get("id"), str)
+    }
+    results: list[dict[str, Any]] = []
+    decisions: list[tuple[str, str, dict[str, Any], dict[str, Any]]] = []
+
+    for term in terms:
+        if not isinstance(term, dict):
+            raise ValueError(f"malformed glossary term: {term!r}")
+        term_id = str(term.get("id") or "").strip()
+        q = str(term.get("term_en") or "").strip()
+        if not term_id or not q:
+            raise ValueError(f"malformed glossary term (missing id/term_en): {term!r}")
+        previous = dict(old_items.get(term_id) or {
+            "id": term_id, "q": q, "findings": 0, "documents": 0,
+        })
+        # English is the candidate's canonical query, even while preserving counts after
+        # an isolated failure. An old q must never silently leak back into this population.
+        previous["q"] = q
+        findings, documents, error = fetch(q)
+        result = evaluate_item(
+            previous, findings, documents, error, large_change_pct=large_change_pct)
+        results.append(result)
+        decisions.append((term_id, q, previous, result))
+
+    report = build_report(
+        results,
+        large_change_pct=large_change_pct,
+        fail_abort_pct=fail_abort_pct,
+        run_date=run_date or date.today().isoformat(),
+    )
+    report["orig_lang"] = "en"
+    # `evaluate_item`'s default wording says 'previous kept' because the Korean file's
+    # historical contract does that. English 0 means no public English link, so make the
+    # diagnostic say precisely what the generated payload does.
+    warnings: list[str] = []
+    for result in results:
+        if result["failed"]:
+            warnings.append(
+                f"[실패] {result['id']} ({result['q']}): {result['error']} — "
+                "종전 영문 값 유지")
+        elif result["zero"]:
+            warnings.append(
+                f"[0건] {result['id']} ({result['q']}): 영문 원문 검색 결과 0건 — "
+                "사례를 싣지 않음")
+        elif result["large_change"]:
+            warnings.append(
+                f"[변동 큼] {result['id']} ({result['q']}): {result['previous_findings']} → "
+                f"{result['fetched_findings']} ({result['change_pct']}%)")
+    report["warnings"] = warnings
+    # The compact replacement above deliberately preserves report order. It is easier to
+    # audit than accepting an English report that says a zero-result link was retained.
+    if report["aborted"]:
+        return None, report
+
+    items: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for term_id, q, previous, result in decisions:
+        if result["failed"]:
+            if int(previous.get("findings") or 0) > 0:
+                items.append({
+                    "id": term_id, "q": q,
+                    "findings": int(previous["findings"]),
+                    "documents": int(previous.get("documents") or 0),
+                })
+            else:
+                excluded.append({"id": term_id, "q": q, "reason": "조회 실패"})
+        elif result["zero"]:
+            excluded.append({"id": term_id, "q": q,
+                             "reason": "영문 원문 검색 결과 0건"})
+        else:
+            items.append({
+                "id": term_id, "q": q,
+                "findings": int(result["applied_findings"]),
+                "documents": int(result["applied_documents"]),
+            })
+
+    return {
+        "schema": SCHEMA_VERSION,
+        "source": ("public.findings_search RPC (p_q=term_en, p_orig_lang=en) totals — "
+                   "/en/findings/?q=term_en 결과와 동일 함수"),
+        "orig_lang": "en",
+        "measured_on": report["run_at"],
+        "note": ("glossary.json의 term_en을 후보 검색어로 삼고, 원문이 영어인 공개 "
+                 "지적에서 실제 결과가 있는 용어만 사례를 싣는다."),
+        "items": items,
+        "excluded": excluded,
+    }, report
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -369,6 +486,24 @@ def _load_payload(path: Path) -> dict[str, Any]:
         raise ValueError(
             f"{path}: unexpected schema {data.get('schema')!r} (expected {SCHEMA_VERSION!r})"
         )
+    return data
+
+
+def _load_glossary_terms(path: Path) -> list[dict[str, Any]]:
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError(f"{path}: glossary root must be a list")
+    return data
+
+
+def _load_optional_english_payload(path: Path) -> dict[str, Any]:
+    """기존 영문 파일은 실패 격리용 기준선일 뿐, 없으면 첫 생산을 허용한다."""
+    if not path.is_file():
+        return {}
+    data = _load_payload(path)
+    if data.get("orig_lang") != "en":
+        raise ValueError(f"{path}: expected orig_lang='en'")
     return data
 
 
@@ -406,6 +541,14 @@ def main(argv: list[str] | None = None) -> int:
         "--path", type=Path, default=DEFAULT_PATH,
         help=f"glossary_cases.json 경로(읽고 씀, 기본 {DEFAULT_PATH})",
     )
+    parser.add_argument(
+        "--orig-lang", default="", choices=["", "en"],
+        help="'en'이면 term_en 후보와 영어 원문 모집단으로 별도 정본을 만듭니다.",
+    )
+    parser.add_argument(
+        "--glossary", type=Path, default=DEFAULT_GLOSSARY_PATH,
+        help=f"영문 후보를 읽을 glossary.json 경로(기본 {DEFAULT_GLOSSARY_PATH})",
+    )
     parser.add_argument("--supabase-url", help="Supabase project URL (falls back to $SUPABASE_URL)")
     parser.add_argument(
         "--supabase-anon-key",
@@ -436,20 +579,29 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        payload = _load_payload(args.path)
+        payload = (_load_optional_english_payload(args.path) if args.orig_lang == "en"
+                   else _load_payload(args.path))
+        terms = _load_glossary_terms(args.glossary) if args.orig_lang == "en" else []
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"glossary_cases_refresh: {exc}", file=sys.stderr)
         return 2
 
     def _fetch(q: str) -> tuple[int | None, int | None, str]:
-        return fetch_counts(base_url, anon_key, q, timeout=args.timeout)
+        return fetch_counts(base_url, anon_key, q, orig_lang=args.orig_lang, timeout=args.timeout)
 
     try:
-        new_payload, report = run_refresh(
-            payload, _fetch,
-            large_change_pct=args.large_change_pct,
-            fail_abort_pct=args.fail_abort_pct,
-        )
+        if args.orig_lang == "en":
+            new_payload, report = run_english_refresh(
+                terms, payload, _fetch,
+                large_change_pct=args.large_change_pct,
+                fail_abort_pct=args.fail_abort_pct,
+            )
+        else:
+            new_payload, report = run_refresh(
+                payload, _fetch,
+                large_change_pct=args.large_change_pct,
+                fail_abort_pct=args.fail_abort_pct,
+            )
     except ValueError as exc:
         print(f"glossary_cases_refresh: {exc}", file=sys.stderr)
         return 2
@@ -479,6 +631,7 @@ __all__ = [
     "evaluate_item",
     "build_report",
     "run_refresh",
+    "run_english_refresh",
     "fetch_counts",
     "main",
 ]

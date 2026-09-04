@@ -27,6 +27,10 @@ on:
         description: '전체 항목 중 재측정 실패 비율 상한 %(도달 시 전면 중단, 파일 미기록)'
         required: true
         default: '20'
+      shrink_review_percent:
+        description: '두 언어 사례 링크 합계가 이 비율(%) 이상 줄면 자동 머지 대신 사람 검토'
+        required: true
+        default: '20'
 
 permissions:
   actions: write
@@ -45,9 +49,13 @@ jobs:
     env:
       LARGE_CHANGE_PCT: ${{ inputs.large_change_percent || '50' }}
       FAIL_ABORT_PCT: ${{ inputs.fail_abort_percent || '20' }}
+      SHRINK_PCT: ${{ inputs.shrink_review_percent || '20' }}
       BRANCH: automation/glossary-cases-auto-${{ github.run_id }}
       GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/glossary_cases.json
+      DATA_PATH_EN: web/data/glossary_cases_en.json
       REPORT_PATH: web/data/glossary_cases_refresh_report.json
+      REPORT_PATH_EN: web/data/glossary_cases_en_refresh_report.json
     steps:
       - uses: actions/checkout@v6.0.2
         with:
@@ -60,25 +68,40 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Create isolated candidate branch
         run: git switch -c "$BRANCH"
+      - name: Record pre-refresh case-link counts
+        id: before
+        run: |
+          set -euo pipefail
+          count() { [ -f "$1" ] && jq '.items | length' "$1" || echo 0; }
+          # 한쪽만 줄어도 가드가 보게 두 언어를 합친다. 영문 첫 생산 전에는 0이다.
+          echo "items=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))" >> "$GITHUB_OUTPUT"
       # ── 재측정(항목별 격리 실패·0건 유지·±50% 표시). ≥fail_abort_percent% 실패면 이 스텝이
       #    exit 1 로 하드 실패한다(library_staging_build.py 의 "과반 실패 시 전면 중단"과 같은
       #    관례) — 파일은 이미 아무것도 못 썼으므로 아래 diff 스텝도 어차피 변경 0 이 되지만,
       #    "실패로 끝낸다"를 잡 상태(빨강)로도 드러내기 위해 continue-on-error 를 두지 않는다.
-      - name: Refresh glossary case counts (findings_search RPC)
+      - name: Refresh glossary case counts (findings_search RPC, anon)
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
         run: |
-          python glossary_cases_refresh.py \
-            --supabase-url "$SUPABASE_URL" \
-            --supabase-anon-key "$SUPABASE_ANON_KEY" \
-            --large-change-pct "$LARGE_CHANGE_PCT" \
-            --fail-abort-pct "$FAIL_ABORT_PCT" \
-            --report "$REPORT_PATH"
+          # 같은 화면의 두 언어판이므로 둘이 연달아 성공해야만 아래에서 커밋한다.
+          # anon만 쓴다. service role은 RLS를 우회해 공개 페이지에 없는 수를 광고한다.
+          run_pass() { # $1=data path $2=report path $3=orig-lang
+            python glossary_cases_refresh.py \
+              --supabase-url "$SUPABASE_URL" \
+              --supabase-anon-key "$SUPABASE_ANON_KEY" \
+              --large-change-pct "$LARGE_CHANGE_PCT" \
+              --fail-abort-pct "$FAIL_ABORT_PCT" \
+              --path "$1" \
+              --orig-lang "$3" \
+              --report "$2"
+          }
+          run_pass "$DATA_PATH" "$REPORT_PATH" "" || exit 1
+          run_pass "$DATA_PATH_EN" "$REPORT_PATH_EN" "en" || exit 1
       - name: Detect meaningful changes
         id: changes
         run: |
-          if git diff --quiet -- web/data/glossary_cases.json; then
+          if git diff --quiet -- "$DATA_PATH" "$DATA_PATH_EN"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No glossary case count changes; no PR will be created." >> "$GITHUB_STEP_SUMMARY"
           else
@@ -87,11 +110,25 @@ jobs:
       - name: Freeze renderer-produced goldens
         if: steps.changes.outputs.changed == 'true'
         run: python web/tests/test_render.py --freeze
-      - name: Read gate decision
+      - name: Read combined gate decision
         if: steps.changes.outputs.changed == 'true'
         id: gate
         run: |
-          echo "allowed=$(jq -r '.gate.automatic_merge_allowed' "$REPORT_PATH")" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          allowed=true
+          for report in "$REPORT_PATH" "$REPORT_PATH_EN"; do
+            if [ "$(jq -r '.gate.automatic_merge_allowed' "$report")" != true ]; then
+              allowed=false
+            fi
+          done
+          count() { [ -f "$1" ] && jq '.items | length' "$1" || echo 0; }
+          BEFORE='${{ steps.before.outputs.items }}'
+          AFTER=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))
+          if [ "$BEFORE" -gt 0 ] && [ $(( (BEFORE - AFTER) * 100 )) -ge $(( BEFORE * SHRINK_PCT )) ]; then
+            allowed=false
+            echo "사례 링크 수 ${BEFORE} → ${AFTER} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "allowed=$allowed" >> "$GITHUB_OUTPUT"
       - name: Commit and open candidate PR
         if: steps.changes.outputs.changed == 'true'
         id: pr
@@ -99,21 +136,21 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- web/data/glossary_cases.json "$REPORT_PATH" web/tests/golden
+          git add -- "$DATA_PATH" "$DATA_PATH_EN" "$REPORT_PATH" "$REPORT_PATH_EN" web/tests/golden
           git commit -m "chore: refresh glossary case counts"
           git push -u origin "$BRANCH"
-          COUNTS=$(jq -r '.counts | "갱신 \(.updated) · 무변동 \(.unchanged) · 0건유지 \(.zero_kept) · 변동큼 \(.large_change) · 실패 \(.failed)"' "$REPORT_PATH")
-          REASONS=$(jq -r 'if (.gate.review_reasons | length) == 0 then "- None (automatic merge eligible)" else .gate.review_reasons | map("- " + .) | join("\n") end' "$REPORT_PATH")
-          WARNINGS=$(jq -r 'if (.warnings | length) == 0 then "" else (.warnings | map("- " + .) | join("\n")) end' "$REPORT_PATH")
+          COUNTS=$(for report in "$REPORT_PATH" "$REPORT_PATH_EN"; do jq -r '(.orig_lang // "ko") as $lang | .counts | "\($lang): 갱신 \(.updated) · 무변동 \(.unchanged) · 0건 \(.zero_kept) · 변동큼 \(.large_change) · 실패 \(.failed)"' "$report"; done)
+          REASONS=$(for report in "$REPORT_PATH" "$REPORT_PATH_EN"; do jq -r '(.orig_lang // "ko") as $lang | if (.gate.review_reasons | length) == 0 then "- \($lang): None (automatic merge eligible)" else .gate.review_reasons | map("- \($lang): " + .) | join("\n") end' "$report"; done)
+          WARNINGS=$(for report in "$REPORT_PATH" "$REPORT_PATH_EN"; do jq -r '.warnings | if length == 0 then "" else map("- " + .) | join("\n") end' "$report"; done)
           cat > /tmp/pr-body.md <<EOF
-          Automated weekly refresh of glossary case-count links (findings_search RPC, same function as /findings/).
+          Automated weekly refresh of Korean and English glossary case-count links (findings_search RPC, same function as each /findings/ tree).
 
           ## Counts
           $COUNTS
 
           ## Safety gates
           - Thresholds: large_change_pct=${LARGE_CHANGE_PCT}% (flagged, value still applied) · fail_abort_pct=${FAIL_ABORT_PCT}% (would abort with no write)
-          - \`q\` (search terms) and \`excluded\` are never modified by this script — human-curated.
+          - Korean \`q\` and \`excluded\` remain human-curated. English candidates are every \`term_en\`, queried with \`p_orig_lang=en\`; a 0-result candidate is explicitly excluded.
 
           ## Review reasons
           $REASONS
@@ -158,8 +195,10 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          if [ -f "$REPORT_PATH" ]; then
+          for report in "$REPORT_PATH" "$REPORT_PATH_EN"; do
+          if [ -f "$report" ]; then
             echo '```json' >> "$GITHUB_STEP_SUMMARY"
-            cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
+            cat "$report" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
+          done

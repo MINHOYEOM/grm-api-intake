@@ -97,8 +97,10 @@
             {%- if d.categories %}<span class="ff-doc-cats">{{ d.categories | join(" · ") }}</span>{% endif %}
           </span>
           {#- 대표 지적 한 문장 — 목록이 날짜 나열로 끝나지 않게 실물을 보여준다.
-              원문 무변형(잘림 없이 그대로) — 우리 요약을 만들지 않는다. -#}
-          {%- if d.findings %}<span class="ff-doc-ex">{{ d.findings[0].text_ko }}</span>{% endif %}
+              원문 무변형(잘림 없이 그대로) — 우리 요약을 만들지 않는다.
+              ★[다국어] 어느 언어의 본문인지는 **뷰가 정한다**(render.finding_body) —
+              종전처럼 `text_ko` 를 못박으면 영어 페이지에 한국어 문장이 실린다. -#}
+          {%- if d.excerpt %}<span class="ff-doc-ex">{{ d.excerpt }}</span>{% endif %}
         </a>
         {%- endfor %}
       </div>
@@ -115,7 +117,11 @@
 
     <section class="ff-rel">
       <a href="{{ rel_root }}findings/firm/index.html?key={{ firm.key | urlencode }}" rel="nofollow">{{ _("{name} 전체 이력 조회 &mdash; 실사 등급까지", name=firm.name) }}</a>
-      {%- for a in firm.agencies %}<a href="{{ rel_root }}findings/agency/{{ a | lower }}/">{{ _("{agency} 지적사항 전체", agency=agency_labels.get(a, a)) }}</a>{% endfor %}
+      {#- [다국어] 기관 모음 페이지는 아직 한국어 트리에만 있다 — 영어판에서는 이 줄을
+          만들지 않는다(없는 페이지로 보내는 링크는 무링크보다 나쁘다). 아래 두 링크는
+          두 트리에 다 있으므로 이 묶음이 통째로 비지는 않는다. -#}
+      {% if lang == 'ko' %}{% for a in firm.agencies %}<a href="{{ rel_root }}findings/agency/{{ a | lower }}/">{{ _("{agency} 지적사항 전체", agency=agency_labels.get(a, a)) }}</a>{% endfor %}
+      {% endif %}
       <a href="{{ rel_root }}findings/docs/">{{ _('문서로 찾기') }}</a>
       <a href="{{ rel_root }}findings/">{{ _('지적사항 검색으로') }}</a>
     </section>

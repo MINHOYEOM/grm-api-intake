@@ -14595,6 +14595,140 @@ class WebFindingsOrigLangTest(unittest.TestCase):
             self.assertIn(key, catalog, f"영어 사전에 없다: {key}")
 
 
+class WebEnFirmPageTest(unittest.TestCase):
+    """[다국어 2026-09-04] 영어판 업체 페이지 — 슬러그는 물려받고, 숫자는 다시 센다.
+
+    ★슬러그를 영어 문서 집합으로 새로 뽑으면 안 된다. 한국어에서 슬러그를 차지했던
+      업체가 영어에 없을 때 **다른 업체가 같은 슬러그를 차지**할 수 있고, 그러면
+      `/findings/firm/x/` 와 `/en/findings/firm/x/` 가 서로 다른 업체를 가리킨 채
+      hreflang 으로 묶인다 — 짝이 아닌 것을 짝이라고 말하는 것이다.
+    ★집계는 **그 트리의 문서 집합에서** 다시 센다. 한국어 숫자를 그대로 실으면 머리의
+      "문서 7건"과 그 아래 실린 목록이 어긋나고, 사용자는 어느 쪽이 맞는지 알 수 없다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enfirm_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out, doc_pages=True)
+        cls.ko_dir = cls.out / "findings" / "firm"
+        cls.en_dir = cls.out / "en" / "findings" / "firm"
+        cls.ko_slugs = {p.parent.name for p in cls.ko_dir.glob("*/index.html")}
+        cls.en_slugs = {p.parent.name for p in cls.en_dir.glob("*/index.html")}
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_english_slugs_are_a_subset_of_the_korean_ones(self):
+        """★영어 전용 슬러그가 하나라도 생기면 짝짓기가 틀어진 것이다."""
+        self.assertTrue(self.en_slugs, "영문 업체 페이지가 하나도 없다")
+        extra = sorted(self.en_slugs - self.ko_slugs)
+        self.assertEqual(extra, [], f"한국어에 없는 영어 전용 슬러그: {extra[:5]}")
+
+    def test_the_same_slug_is_the_same_company_in_both_trees(self):
+        """짝지어진 페이지가 같은 업체여야 한다 — hreflang 이 그렇게 말하고 있으므로."""
+        for slug in sorted(self.en_slugs)[:40]:
+            ko = (self.ko_dir / slug / "index.html").read_text(encoding="utf-8")
+            en = (self.en_dir / slug / "index.html").read_text(encoding="utf-8")
+            ko_name = re.search(r'<h1 class="ff-h1">(.*?)</h1>', ko).group(1)
+            en_name = re.search(r'<h1 class="ff-h1">(.*?)</h1>', en).group(1)
+            # 업체명은 데이터 값이라 번역하지 않는다 — 제목 문구만 언어를 탄다.
+            core = re.sub(r"\s*(지적사항 이력|findings history)\s*$", "", ko_name)
+            self.assertIn(core, en_name, f"{slug}: 두 트리가 다른 업체를 가리킨다")
+
+    def test_counts_are_recomputed_from_the_english_document_set(self):
+        """머리 숫자와 실제로 실린 문서 수가 같아야 한다(한 페이지 안의 두 숫자)."""
+        checked = 0
+        for slug in sorted(self.en_slugs):
+            en = (self.en_dir / slug / "index.html").read_text(encoding="utf-8")
+            rows = len(re.findall(r'<a class="ff-doc" ', en))
+            m = re.search(r"<b>([\d,]+) inspection documents?</b>", en)
+            if not m:
+                continue
+            self.assertEqual(int(m.group(1).replace(",", "")), rows,
+                             f"{slug}: 머리 숫자와 문서 목록이 어긋난다")
+            # ★그리고 실린 문서가 **영어판에 실재**해야 한다. 머리와 목록이 함께
+            #   한국어 집합이면 둘끼리는 맞으므로 위 검사만으로는 안 잡힌다 —
+            #   그때 목록의 링크는 영어판에 없는 문서를 가리킨다.
+            for href in re.findall(r'<a class="ff-doc" href="([^"]+)"', en):
+                doc_slug = href.rstrip("/").rsplit("/", 1)[-1]
+                self.assertTrue(
+                    (self.out / "en" / "findings" / "doc" / doc_slug / "index.html").is_file(),
+                    f"{slug}: 영어판에 없는 문서를 목록에 실었다({doc_slug})")
+            checked += 1
+        self.assertGreater(checked, 100, f"검사 대상이 너무 적다: {checked}")
+
+    def test_no_korean_body_survives_on_an_english_firm_page(self):
+        """★분류 라벨과 **대표 발췌**까지 영어여야 한다.
+
+        종전 템플릿은 발췌를 `d.findings[0].text_ko` 로 못박아 두어, 영어 페이지에
+        한국어 한 문장이 그대로 실렸다(실측). 언어를 정하는 곳은 뷰다.
+        """
+        hangul = re.compile(r"[가-힣]")
+        bad = []
+        for slug in sorted(self.en_slugs):
+            html = (self.en_dir / slug / "index.html").read_text(encoding="utf-8")
+            body = re.sub(r"(?s)<(script|style)\b.*?</\1>", "", html)
+            body = re.sub(r"(?s)<!--.*?-->", "", body)
+            text = re.sub(r"(?s)<[^>]+>", " ", body)
+            hits = [h for h in re.findall(r"\S{0,14}[가-힣]+\S{0,14}", text)
+                    if h.strip() != "한국어"]     # 언어 전환기 자기 이름은 제외
+            if hits:
+                bad.append((slug, hits[:3]))
+        self.assertEqual(bad, [], f"영문 업체 페이지에 한국어 잔존: {bad[:3]}")
+
+    def test_english_pages_do_not_link_to_korean_only_collections(self):
+        """기관 모음 페이지는 아직 한국어 트리에만 있다 — 링크를 만들지 않는다."""
+        for slug in sorted(self.en_slugs)[:60]:
+            html = (self.en_dir / slug / "index.html").read_text(encoding="utf-8")
+            self.assertEqual(re.findall(r'href="[^"]*findings/agency/[^"]*"', html), [],
+                             f"{slug}: 영어판에 없는 기관 모음으로 보낸다")
+            # 그렇다고 관련 링크 묶음이 비지는 않는다(빈 상자 금지).
+            rel = re.search(r'<section class="ff-rel">(.*?)</section>', html, re.S)
+            self.assertIsNotNone(rel, f"{slug}: 관련 링크 묶음이 없다")
+            self.assertGreaterEqual(rel.group(1).count("<a "), 3, f"{slug}: 링크가 너무 적다")
+
+    def test_document_pages_link_to_the_firm_page_only_where_it_exists(self):
+        """없는 페이지로 보내지 않는다 — 영어 문서가 2건 미만인 업체는 영어판이 없다."""
+        docs = sorted((self.out / "en" / "findings" / "doc").glob("*/index.html"))
+        self.assertTrue(docs)
+        for p in docs:
+            html = p.read_text(encoding="utf-8")
+            for href in re.findall(r'href="([^"?]*findings/firm/[^"?]+/)"', html):
+                slug = href.rstrip("/").rsplit("/", 1)[-1]
+                self.assertIn(slug, self.en_slugs,
+                              f"{p.parent.name}: 영어판에 없는 업체 페이지로 보낸다")
+
+    def test_every_english_firm_page_is_in_the_sitemap_and_paired(self):
+        sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        for slug in sorted(self.en_slugs):
+            self.assertIn(f"{render.SITE_BASE_URL}/en/findings/firm/{slug}/</loc>", sitemap,
+                          f"{slug}: sitemap 누락")
+        # 짝이 생겼으므로 한국어 쪽에도 hreflang 이 붙어야 한다(단방향 짝은 짝이 아니다).
+        slug = sorted(self.en_slugs)[0]
+        ko = (self.ko_dir / slug / "index.html").read_text(encoding="utf-8")
+        self.assertIn(f'hreflang="en" href="{render.SITE_BASE_URL}'
+                      f'/en/findings/firm/{slug}/"', ko)
+
+    def test_the_view_is_built_by_one_function_for_both_trees(self):
+        """집계 구현이 두 벌이면 언젠가 갈라진다 — 한 함수가 문서 집합만 달리 받는다."""
+        rows = [{"slug": "a", "published_date": "2026-01-02", "firm_name": "Acme Ltd",
+                 "agency": "FDA", "categories": ["교육/작업자"], "findings": [{}, {}]},
+                {"slug": "b", "published_date": "2026-03-04", "firm_name": "Acme Ltd.",
+                 "agency": "HC", "categories": ["교육/작업자", "설비/시설"],
+                 "findings": [{}]}]
+        v = render.firm_page_view("acme", "acme-1234", rows)
+        self.assertEqual((v["doc_count"], v["finding_count"]), (2, 3))
+        self.assertEqual((v["first_seen"], v["last_seen"]), ("2026-01-02", "2026-03-04"))
+        self.assertEqual(v["agencies"], ["FDA", "HC"])
+        self.assertEqual(v["categories"], ["교육/작업자", "설비/시설"])
+        self.assertEqual(v["documents"][0]["slug"], "b", "최신순 정렬")
+        # 부분집합만 주면 그 집합에서만 센다(영어판이 바로 이 경로다).
+        v1 = render.firm_page_view("acme", "acme-1234", rows[:1])
+        self.assertEqual((v1["doc_count"], v1["finding_count"]), (1, 2))
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 

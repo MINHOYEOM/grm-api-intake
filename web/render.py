@@ -2037,6 +2037,38 @@ def clause_description(clause: dict[str, Any], tr: Translator = _KO) -> str:
     return f"{head}({title}){tail}" if title else f"{head}.{tail}"
 
 
+def firm_page_view(key: str, slug: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """업체 페이지 1장의 뷰 — **주어진 문서 집합에서만** 센다.
+
+    ★언어 트리마다 문서 집합이 다르므로(영어판은 원문이 영어인 문서만) 집계를 여기서
+      다시 한다. 한국어 집계를 영어 화면에 그대로 실으면 머리 숫자("문서 7건")와 그
+      아래 실린 문서 목록이 어긋난다 — 한 페이지 안에서 두 숫자가 다른 것은 그 자체로
+      결함이고, 사용자는 어느 쪽이 맞는지 알 방법이 없다.
+    """
+    rows = sorted(rows, key=lambda x: (x["published_date"], x["slug"]), reverse=True)
+    cat_counts: dict[str, int] = {}
+    for d in rows:
+        for label in (d.get("categories") or []):
+            cat_counts[label] = cat_counts.get(label, 0) + 1
+    return {
+        "key": key, "slug": slug,
+        # 표시명은 그 업체의 문서에서 가장 많이 쓰인 표기(동률이면 긴 쪽) —
+        # firm_key 는 정규화값이라 화면에 그대로 쓰면 "(주)" 가 사라진 형태가 된다.
+        "name": max(
+            sorted({d.get("firm_name", "") for d in rows if d.get("firm_name")}),
+            key=lambda n: (sum(1 for d in rows if d.get("firm_name") == n), len(n)),
+            default=key),
+        "documents": rows,
+        "doc_count": len(rows),
+        "finding_count": sum(len(d.get("findings") or []) for d in rows),
+        "first_seen": min(d["published_date"] for d in rows),
+        "last_seen": max(d["published_date"] for d in rows),
+        "agencies": sorted({d["agency"] for d in rows}),
+        "categories": [c for c, _ in sorted(cat_counts.items(),
+                                            key=lambda kv: (-kv[1], kv[0]))],
+    }
+
+
 def build_facet_item_view(item: dict[str, Any],
                           doc_slugs: "set[str] | None" = None) -> dict[str, Any]:
     """항목 1건의 표시용 투영 — 값 무변형, 파생은 막대 비율뿐.
@@ -4142,30 +4174,36 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             slug = _firm_slug(key)
             if not slug or slug in firm_page_slug_by_key.values():
                 continue  # 슬러그를 못 만들거나 충돌하면 페이지를 만들지 않는다
-            rows = sorted(group, key=lambda x: (x["published_date"], x["slug"]),
-                          reverse=True)
-            cat_counts: dict[str, int] = {}
-            for d in rows:
-                for label in (d.get("categories") or []):
-                    cat_counts[label] = cat_counts.get(label, 0) + 1
             firm_page_slug_by_key[key] = slug
-            firm_pages.append({
-                "key": key, "slug": slug,
-                # 표시명은 그 업체의 문서에서 가장 많이 쓰인 표기(동률이면 긴 쪽) —
-                # firm_key 는 정규화값이라 화면에 그대로 쓰면 "(주)" 가 사라진 형태가 된다.
-                "name": max(
-                    sorted({d.get("firm_name", "") for d in rows if d.get("firm_name")}),
-                    key=lambda n: (sum(1 for d in rows if d.get("firm_name") == n), len(n)),
-                    default=key),
-                "documents": rows,
-                "doc_count": len(rows),
-                "finding_count": sum(len(d.get("findings") or []) for d in rows),
-                "first_seen": min(d["published_date"] for d in rows),
-                "last_seen": max(d["published_date"] for d in rows),
-                "agencies": sorted({d["agency"] for d in rows}),
-                "categories": [c for c, _ in sorted(cat_counts.items(),
-                                                    key=lambda kv: (-kv[1], kv[0]))],
-            })
+            firm_pages.append(firm_page_view(key, slug, group))
+
+        # ── [다국어 2026-09-04] 영어판 업체 페이지 ────────────────────────────
+        # ★슬러그는 **한국어판에서 물려받는다.** 영어 문서 집합으로 슬러그를 새로 뽑으면,
+        #   한국어에서 슬러그를 차지했던 업체가 영어에 없을 때 다른 업체가 같은 슬러그를
+        #   차지할 수 있다 — `/findings/firm/x/` 와 `/en/findings/firm/x/` 가 서로 다른
+        #   업체를 가리키게 되고, hreflang 으로 짝지어지는 순간 그건 거짓말이 된다.
+        # 문서 임계(2건)는 그대로 다시 적용한다 — 영어로 1건만 남은 업체 페이지는 그
+        # 문서 상세와 사실상 겹치는 얇은 페이지라, 한국어판에서 안 만드는 것과 같은
+        # 이유로 영어판에서도 만들지 않는다(실측: 588 중 585 가 남는다).
+        en_firm_pages: list[dict[str, Any]] = []
+        for fp in firm_pages:
+            en_rows = [d for d in fp["documents"] if d["slug"] in en_doc_slugs]
+            if len(en_rows) >= FIRM_PAGE_MIN_DOCS:
+                en_firm_pages.append(firm_page_view(fp["key"], fp["slug"], en_rows))
+        en_firm_slugs = {fp["slug"] for fp in en_firm_pages}
+        if en_firm_slugs:
+            en_paths |= {f"findings/firm/{sl}/" for sl in en_firm_slugs}
+
+        def _firm_slug_for(doc: dict[str, Any], lg: str) -> "str | None":
+            """그 언어 트리에 **실제로 있는** 업체 페이지의 슬러그(없으면 None).
+
+            영어 문서가 2건 미만인 업체는 영어판 페이지가 없다 — 없는 페이지로 보내는
+            링크는 무링크보다 나쁘다.
+            """
+            slug = firm_page_slug_by_key.get(doc.get("firm_key") or "")
+            if not slug:
+                return None
+            return slug if (lg == DEFAULT_LANG or slug in en_firm_slugs) else None
 
         # 기관×연도 그룹. 정렬은 전부 결정론(연도 내림차순·같은 연도 안은 날짜 내림차순).
         by_ay: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -4382,9 +4420,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
                     inspector_line=doc_inspector_line(doc, _tr),
-                    # ★없는 페이지로 보내지 않는다 — 분류 모음·업체 정적 페이지는 아직
-                    #   한국어 트리에만 있다(다음 단계). 영어판에서는 링크를 만들지 않고,
-                    #   같은 업체 기록은 **영어로 낸 문서만** 남긴다.
+                    # ★없는 페이지로 보내지 않는다 — 분류 모음은 아직 한국어 트리에만
+                    #   있다. 영어판에서는 그 링크를 만들지 않고, 같은 업체 기록은
+                    #   **영어로 낸 문서만** 남긴다.
                     related_categories=(related if _lg == DEFAULT_LANG else []),
                     same_firm=(same_firm if _lg == DEFAULT_LANG else
                                [s for s in same_firm if s["slug"] in en_doc_slugs]),
@@ -4394,8 +4432,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     ],
                     # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
-                    firm_page_slug=(firm_page_slug_by_key.get(doc.get("firm_key") or "")
-                                    if _lg == DEFAULT_LANG else None),
+                    # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
+                    firm_page_slug=_firm_slug_for(doc, _lg),
                 )
 
         # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),
@@ -4405,24 +4443,40 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             facet_paths.append((page(f"findings/firm/{fp['slug']}/").site_path,
                                 fp["last_seen"]))
         if render_doc_pages:
-            for fp in firm_pages:
-                firm_page = page(f"findings/firm/{fp['slug']}/")
-                emit("findings_firm_page.html", firm_page,
-                     page_title=tr("{name} 지적사항 이력 · GRM", name=fp["name"]),
-                     nav_active="findings",
-                     description=tr(
-                         "{name}의 공개 실사 문서 {d}건에서 확인된 지적 {n}건을 우리말로"
-                         " 정리했습니다({y1}~{y2}).",
-                         name=fp["name"], d=f"{fp['doc_count']:,}",
-                         n=f"{fp['finding_count']:,}",
-                         y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]),
-                     # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
-                     json_ld=firm_page.breadcrumb_json_ld([
-                         (tr("홈"), "/"), (tr("지적사항"), "findings/"),
-                         (tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
-                     firm=fp, agency_labels=doc_agency_labels,
-                     measured_on=docs_data.get("measured_on", ""),
-                     min_findings=docs_data.get("min_findings"))
+            # [다국어 2026-09-04] 언어 트리마다 한 장씩. 뷰모델 구조는 같고 **집계는 그
+            # 트리의 문서 집합에서** 나온다(firm_page_view). 분류 칩은 데이터에 한국어로
+            # 실려 있어 뷰에서 번역한 사본을 넘긴다 — 정본 데이터는 무변형(문서 페이지와
+            # 같은 규율).
+            for _lg, _mkpage, _emit, _tr in trees:
+                for fp in (firm_pages if _lg == DEFAULT_LANG else en_firm_pages):
+                    # ★문서 행의 **분류 라벨과 대표 발췌**도 언어를 탄다. 종전 템플릿은
+                    #   발췌를 `d.findings[0].text_ko` 로 못박아 두어, 영어 페이지에
+                    #   한국어 한 문장이 그대로 실렸다(실측). 뷰에서 정해 넘긴다 —
+                    #   템플릿이 데이터에 손을 뻗으면 언어를 알 방법이 없다.
+                    _fp = {**fp, "documents": [
+                        {**d,
+                         "categories": [_tr(c) for c in (d.get("categories") or [])],
+                         "excerpt": (finding_body(d["findings"][0], _lg)
+                                     if d.get("findings") else "")}
+                        for d in fp["documents"]],
+                        "categories": [_tr(c) for c in fp["categories"]]}
+                    firm_page = _mkpage(f"findings/firm/{fp['slug']}/")
+                    _emit("findings_firm_page.html", firm_page,
+                         page_title=_tr("{name} 지적사항 이력 · GRM", name=fp["name"]),
+                         nav_active="findings",
+                         description=_tr(
+                             "{name}의 공개 실사 문서 {d}건에서 확인된 지적 {n}건을 우리말로"
+                             " 정리했습니다({y1}~{y2}).",
+                             name=fp["name"], d=f"{fp['doc_count']:,}",
+                             n=f"{fp['finding_count']:,}",
+                             y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]),
+                         # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
+                         json_ld=firm_page.breadcrumb_json_ld([
+                             (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
+                             (_tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
+                         firm=_fp, agency_labels=agency_labels_by_lang[_lg],
+                         measured_on=docs_data.get("measured_on", ""),
+                         min_findings=docs_data.get("min_findings"))
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

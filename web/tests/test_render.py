@@ -8555,6 +8555,16 @@ class WebNotFoundPageTest(unittest.TestCase):
     검색엔진에게 이것은 ①없는 페이지가 있다고 말하고 ②같은 랜딩 본문이 무한한 URL 로
     중복돼 있다고 말하는 것이라 색인 품질을 직접 깎는다. 문서 페이지 3천 장이 매주
     재생성돼 낡은 URL 이 계속 생기는 구조라 특히 중요하다.
+
+    ★[다국어 6단계 2026-09-04] 그리고 이 페이지는 **자기 주소에서 뜨지 않는다** —
+    Cloudflare 는 가장 가까운 `404.html` 의 본문을 **원래 요청된 주소에 그 자리로** 404
+    상태와 함께 실어 준다. 그래서 브라우저의 base URL 은 `/404.html` 이 아니라 요청 URL
+    이고, 상대경로는 그 기준으로 풀린다:
+      `/findings/doc/zzz/` 에서 `href="library/"` → `/findings/doc/zzz/library/` → **또 404**
+    라이브 실측에서 되돌림 카드·nav·footer **링크 30개가 전부** 그 상태였다. 그런데 이
+    클래스의 옛 검사는 초록이었다 — 링크가 "있었고" 가리키는 파일도 dist 안에 있었기
+    때문이다. **어디로 풀리는지**를 안 봤다. 그래서 지금은 "상대 참조가 하나도 남지
+    않는다"를 본다 — 이 페이지에서 상대 참조는 그 자체로 깨진 링크다.
     """
 
     @classmethod
@@ -8562,38 +8572,96 @@ class WebNotFoundPageTest(unittest.TestCase):
         cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_404_"))
         cls.out = cls._tmp / "single"
         _build_single(cls.out)
-        cls.html = (cls.out / "404.html").read_bytes().decode("utf-8") \
-            if (cls.out / "404.html").exists() else ""
+        cls.html = (cls.out / "404.html").read_text(encoding="utf-8")
+        cls.en_html = (cls.out / "en" / "404.html").read_text(encoding="utf-8")
+        cls.both = (("404.html", cls.html), ("en/404.html", cls.en_html))
 
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls._tmp, ignore_errors=True)
 
-    def test_file_exists_at_dist_root(self):
-        """경로가 정확히 `/404.html` 이어야 Pages 가 인식한다."""
+    def test_file_exists_at_each_tree_root(self):
+        """경로가 정확히 `/404.html`·`/en/404.html` 이어야 Cloudflare 가 인식한다."""
         self.assertTrue((self.out / "404.html").exists(), "404.html 누락")
+        self.assertTrue((self.out / "en" / "404.html").exists(), "en/404.html 누락")
 
-    def test_is_noindex(self):
-        self.assertIn('<meta name="robots" content="noindex">', self.html)
+    def test_is_noindex_without_language_pairing(self):
+        """홈과 같은 주소로 그리지만 홈이 아니다 — 색인·언어 짝을 물려받으면 안 된다."""
+        for name, html in self.both:
+            self.assertIn('<meta name="robots" content="noindex">', html, name)
+            self.assertNotIn('rel="alternate" hreflang=', html, name)
+            self.assertNotIn('class="grm-lang"', html, name)
 
     def test_not_in_sitemap(self):
         sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
-        self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/404.html</loc>", sitemap)
-        self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/404</loc>", sitemap)
+        for path in ("/404.html", "/404", "/en/404.html"):
+            self.assertNotIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", sitemap)
+
+    def test_no_relative_reference_survives(self):
+        """★이 페이지에서만은 상대경로가 **전부 오답**이다 — 하나도 남으면 안 된다.
+
+        요청 URL 기준으로 풀리기 때문이다. 사이트 절대경로는 호스트를 박지 않으므로
+        README 불변식 #4(상대경로·호스트 무관)의 근거는 그대로 만족한다.
+        """
+        for name, html in self.both:
+            bad = [m.group(1) for m in re.finditer(r'(?:href|src)="([^"]*)"', html)
+                   if not m.group(1).startswith(
+                       ("http://", "https://", "/", "#", "mailto:", "data:"))]
+            self.assertEqual(bad, [], f"{name}: 요청 URL 기준으로 풀려 죽는 참조 {bad[:8]}")
 
     def test_offers_ways_back(self):
         """막다른 길로 두지 않는다 — 주요 표면으로 되돌려 보낸다."""
-        for href in ('href="findings/"', 'href="archive/"', 'href="library/"',
-                     'href="glossary/"'):
+        for href in ('href="/findings/"', 'href="/archive/"', 'href="/library/"',
+                     'href="/glossary/"'):
             self.assertIn(href, self.html, f"복귀 링크 누락: {href}")
+        for href in ('href="/en/findings/"', 'href="/en/library/"'):
+            self.assertIn(href, self.en_html, f"영어판 복귀 링크 누락: {href}")
 
     def test_links_resolve_to_real_pages(self):
-        """404 페이지의 링크가 또 404 면 안 된다 — rel_root 는 dist 루트 기준이다."""
-        import re as _re
-        for href in _re.findall(r'class="nf-card" href="([^"]*)"', self.html):
-            target = self.out / (href + "index.html" if href.endswith("/") or not href
-                                 else href)
-            self.assertTrue(target.exists(), f"404 페이지가 없는 곳으로 보낸다: {href!r}")
+        """404 페이지의 링크가 또 404 면 안 된다 — 카드만이 아니라 nav·footer 까지 전수."""
+        for name, html in self.both:
+            missing = []
+            for href in re.findall(r'href="(/[^"#?]*)"', html):
+                rel = href.lstrip("/")
+                if rel.endswith("/") or rel == "":
+                    rel += "index.html"
+                if rel.startswith("assets/"):
+                    continue          # 자산 참조는 별도 가드(WebEnTreeTest)의 몫
+                if not (self.out / rel).is_file():
+                    missing.append(href)
+            self.assertEqual(missing, [], f"{name}: 없는 곳으로 보낸다 {missing[:8]}")
+
+    def test_english_404_is_english_and_stays_in_its_tree(self):
+        self.assertIn('<html lang="en">', self.en_html)
+        self.assertIn("Page not found", self.en_html)
+        self.assertNotIn("찾으시는 페이지가 없습니다", self.en_html)
+        cards = re.findall(r'<a class="nf-card" href="([^"]*)"', self.en_html)
+        self.assertTrue(cards)
+        for href in cards:
+            self.assertTrue(href.startswith("/en/"),
+                            f"영어 404 가 트리 밖으로 보낸다: {href}")
+
+    def test_english_404_omits_routes_the_english_tree_does_not_have(self):
+        """영어 트리에 없는 면(아카이브·용어사전)은 **카드 자체를 만들지 않는다**.
+
+        손으로 적은 여섯 장을 두 트리에 똑같이 그리면 404 를 고치려다 404 를 여섯 개
+        만든다. 목록은 `en_paths`(실제 산출 라우트)에서 파생되므로 라우트가 늘면 저절로
+        따라온다 — 손목록은 낡는다.
+        """
+        cards = re.findall(r'<a class="nf-card" href="([^"]*)"', self.en_html)
+        self.assertNotIn("/en/glossary/", cards)
+        self.assertNotIn("/en/archive/", cards)   # 영문 브리프 0호 — 아카이브가 없다
+        self.assertIn("/en/findings/", cards)
+        self.assertEqual(len(re.findall(r'<a class="nf-card"', self.html)),
+                         len(render.NOT_FOUND_CARDS), "한국어판은 여섯 장 그대로다")
+
+    def test_card_filter_is_derived_from_built_routes(self):
+        self.assertEqual(
+            [c["path"] for c in render.not_found_cards(render._KO, "en",
+                                                       {"", "findings/"})],
+            ["findings/", ""])
+        self.assertEqual([c["path"] for c in render.not_found_cards()],
+                         [p for p, _t, _d in render.NOT_FOUND_CARDS])
 
 
 class WebFindingsFacetPageTest(unittest.TestCase):
@@ -12809,6 +12877,7 @@ class WebZoneIaTest(unittest.TestCase):
     #: **왜 사용자가 링크로 닿지 않아도 되는지**를 반드시 적는다.
     UNREACHABLE_OK = {
         "404.html": "존재하지 않는 경로에 서버가 띄우는 페이지 — 링크 대상이 아니다.",
+        "en/404.html": "위와 같다. 영어 트리에서도 Cloudflare 가 상태코드로 띄운다.",
         "admin/index.html": "운영자 전용 콘솔 — 공개 링크를 두지 않는 것이 의도다.",
     }
 
@@ -14089,6 +14158,16 @@ class WebPagePathTest(unittest.TestCase):
                 m = re.search(r'class="brand" href="([^"]*)"', html)
                 if not m:
                     continue  # base.html 을 쓰지 않는 페이지(admin 등)는 대상이 아니다
+                if html_path.name == "404.html":
+                    # ★[다국어 6단계 2026-09-04] 404 만 **의도적으로** 사이트 절대경로다.
+                    #   이 페이지는 자기 주소에서 뜨지 않고 요청된 주소에 실려 나오므로
+                    #   깊이 기반 상대경로가 요청 URL 기준으로 풀려 전부 죽는다.
+                    #   그 불변식은 `WebNotFoundPageTest` 가 따로 지킨다.
+                    self.assertEqual(
+                        m.group(1), "/" + ("en/" if is_en else "") + "index.html",
+                        f"{html_path.relative_to(out).as_posix()}: 404 의 브랜드 링크는 "
+                        f"사이트 절대경로여야 한다")
+                    continue
                 checked += 1
                 en_checked += is_en
                 self.assertEqual(m.group(1), f"{expected}index.html",

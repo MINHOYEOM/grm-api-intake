@@ -30,31 +30,17 @@
     <p class="nf-code">404</p>
     <h1 class="nf-h1">{{ _('찾으시는 페이지가 없습니다') }}</h1>
     <p class="nf-p">{{ _('주소가 바뀌었거나, 더 이상 제공하지 않는 자료일 수 있습니다. 지적사항 문서 페이지는 매주 새로 정리되기 때문에 예전 주소가 사라지기도 합니다. 아래에서 다시 찾아보세요.') }}</p>
+    {#- [다국어 6단계 2026-09-04] 되돌림 카드는 **그 트리에 실제로 있는 면만** 싣는다.
+        영어 트리에는 아카이브·용어사전이 없어서, 손으로 적은 여섯 장을 그대로 그리면
+        404 를 고치려다 404 를 여섯 개 만드는 꼴이 된다. 목록은 render.not_found_cards()
+        가 `en_paths`(실제 산출된 라우트)에서 걸러 준다 — 라우트가 늘면 저절로 따라온다. -#}
     <div class="nf-grid">
-      <a class="nf-card" href="{{ rel_root }}findings/">
-        <span class="nf-t">{{ _('지적사항 검색') }}</span>
-        <span class="nf-d">{{ _('규제기관 공개 지적사항을 검색합니다.') }}</span>
+      {% for c in nf_cards %}
+      <a class="nf-card" href="{{ rel_root }}{{ c.path }}">
+        <span class="nf-t">{{ c.title }}</span>
+        <span class="nf-d">{{ c.desc }}</span>
       </a>
-      <a class="nf-card" href="{{ rel_root }}findings/docs/">
-        <span class="nf-t">{{ _('문서로 찾기') }}</span>
-        <span class="nf-d">{{ _('실사 문서를 기관·연도로 묶어 봅니다.') }}</span>
-      </a>
-      <a class="nf-card" href="{{ rel_root }}archive/">
-        <span class="nf-t">{{ _('주간 브리프 아카이브') }}</span>
-        <span class="nf-d">{{ _('매주 발행한 규제 소식을 모았습니다.') }}</span>
-      </a>
-      <a class="nf-card" href="{{ rel_root }}library/">
-        <span class="nf-t">{{ _('자료실') }}</span>
-        <span class="nf-d">{{ _('ICH·식약처·EU GMP 등 참조 자료.') }}</span>
-      </a>
-      <a class="nf-card" href="{{ rel_root }}glossary/">
-        <span class="nf-t">{{ _('규제 용어사전') }}</span>
-        <span class="nf-d">{{ _('GMP·규제 용어를 쉬운 우리말로.') }}</span>
-      </a>
-      <a class="nf-card" href="{{ rel_root }}">
-        <span class="nf-t">{{ _('홈으로') }}</span>
-        <span class="nf-d">{{ _('이번 주 브리프부터 다시 보기.') }}</span>
-      </a>
+      {% endfor %}
     </div>
   </div>
 </main>

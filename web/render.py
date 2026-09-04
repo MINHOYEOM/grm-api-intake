@@ -2098,6 +2098,29 @@ CARD_NARRATIVE_FIELDS: tuple[str, ...] = (
     "title_issue", "summary", "implication", "key_facts", "checks",
 )
 
+# [다국어 6단계 2026-09-04] 404 의 되돌림 카드 — **그 트리에 실제로 있는 면만** 싣는다.
+# ★영어 트리에는 아카이브(영문 브리프가 있어야 선다)와 용어사전이 없다. 손으로 적은
+#   여섯 장을 두 트리에 똑같이 그리면 404 를 고치려다 404 를 여섯 개 만든다 —
+#   "없는 페이지로 보내는 링크는 무링크보다 나쁘다"가 여기서 가장 아프게 걸린다.
+#   그래서 목록을 손으로 갈래별로 적지 않고 `en_paths`(실제 산출된 라우트)로 거른다.
+NOT_FOUND_CARDS: tuple[tuple[str, str, str], ...] = (
+    ("findings/", N_("지적사항 검색"), N_("규제기관 공개 지적사항을 검색합니다.")),
+    ("findings/docs/", N_("문서로 찾기"), N_("실사 문서를 기관·연도로 묶어 봅니다.")),
+    ("archive/", N_("주간 브리프 아카이브"), N_("매주 발행한 규제 소식을 모았습니다.")),
+    ("library/", N_("자료실"), N_("ICH·식약처·EU GMP 등 참조 자료.")),
+    ("glossary/", N_("규제 용어사전"), N_("GMP·규제 용어를 쉬운 우리말로.")),
+    ("", N_("홈으로"), N_("이번 주 브리프부터 다시 보기.")),
+)
+
+
+def not_found_cards(tr: Translator = _KO, lang: str = DEFAULT_LANG,
+                    en_paths: "set[str] | None" = None) -> list[dict[str, str]]:
+    """404 되돌림 카드 — 그 언어 트리에 **실제로 산출된** 면만 남긴다."""
+    allowed = en_paths or set()
+    return [{"path": path, "title": tr(title), "desc": tr(desc)}
+            for path, title, desc in NOT_FOUND_CARDS
+            if lang == DEFAULT_LANG or path in allowed]
+
 
 def finding_body(f: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
     """지적 본문 — **읽는 언어를 먼저**. 영어판은 규제기관 원문(`text_orig`), 한국어판은
@@ -4598,19 +4621,42 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "rss.xml", build_rss_xml(briefs))
     written.append("rss.xml")
 
-    # 404 는 루트의 파일 하나(`/404.html`)라 홈과 같은 깊이로 그린다(rel_root = 루트).
-    not_found = page("").file("404.html")
-    _write(out_dir / not_found, render_page("404.html", page(""),
-        page_title=tr("페이지를 찾을 수 없습니다 · GRM"),
-        nav_active="",
-        description=tr("찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요."),
-        canonical="",
-        # [다국어 3단계] 404 는 홈과 같은 `PagePath("")` 로 그리지만 **홈이 아니다** —
-        # 언어판 짝(`/en/404.html`)이 없고(Cloudflare Pages 는 루트 `/404.html` 만 본다)
-        # noindex 라 hreflang·언어 전환을 달지 않는다. 안 그러면 홈의 짝을 물려받는다.
-        alternates=[], alt_other=None,
-    ))
-    written.append(not_found)
+    # 404 는 그 트리 루트의 파일 하나(`/404.html`)라 홈과 같은 깊이로 그린다(rel_root = 루트).
+    # [다국어 6단계 2026-09-04] 영어판도 같은 자리에 그린다(`/en/404.html`) — Cloudflare 는
+    # 매칭 실패 시 **가장 가까운 `404.html`** 을 돌려주므로 `/en/…` 오타는 영어 404 를 받는다.
+    # ★이 동작은 문서가 아니라 배포 후 실측으로 확인한다(`docs/` 의 주장과 배포 결과가
+    #   갈린 적이 있다). 만에 하나 루트만 본다면 영어 방문자는 지금처럼 한국어 404 를
+    #   받을 뿐이라 **더 나빠지지는 않는다** — 그때는 루트 404 를 두 언어로 바꾼다.
+    # ★번역자 인자 이름은 **`tr` 로 고정**한다 — 문구 추출기는 호출 이름으로 키를 찾으므로
+    #   `_nf_tr(...)` 처럼 이름을 바꾸면 그 문구가 소스에서 사라진 것으로 보여 사전에서
+    #   탈락한다(검사기가 "고아"로 잡아 줬다. 4단계에서 `en_tr` 로 같은 곳을 밟았다).
+    def emit_not_found(nf_lang: str, nf_page, nf_render, tr: Translator) -> None:
+        not_found = nf_page("").file("404.html")
+        _write(out_dir / not_found, nf_render("404.html", nf_page(""),
+            page_title=tr("페이지를 찾을 수 없습니다 · GRM"),
+            nav_active="",
+            description=tr("찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요."),
+            canonical="",
+            nf_cards=not_found_cards(tr, nf_lang, en_paths),
+            # ★★404 만은 **사이트 절대경로**를 쓴다 — 이 페이지는 자기 주소에서 뜨지 않고
+            #   **요청된 주소에서** 그 자리에 실려 나온다(Cloudflare 가 404 상태로 본문만
+            #   바꿔 준다). 그래서 상대경로는 요청 URL 기준으로 풀린다:
+            #   `/findings/doc/zzz/` 에서 `href="library/"` 는 `/findings/doc/zzz/library/`
+            #   가 되어 **또 404** 다. 실측으로 확인했다(라이브에서 되돌림 카드 6장·nav·
+            #   footer 30개 링크가 전부 죽어 있었다 — "막다른 길로 두지 않는다"는 이 페이지
+            #   자신의 규율이 정반대로 깨져 있었다).
+            #   README 불변식 #4(상대경로)의 근거는 "호스트에 묶이지 않는다"인데, 사이트
+            #   절대경로도 호스트를 박지 않으므로 그 근거를 그대로 만족한다.
+            rel_root="/" + nf_page("").prefix, asset_root="/",
+            # [다국어 3단계] 404 는 홈과 같은 `PagePath("")` 로 그리지만 **홈이 아니다** —
+            # noindex 이고 서버가 상태코드로 돌려주는 페이지라 hreflang·언어 전환을 달지
+            # 않는다. 안 그러면 홈의 짝을 물려받아 "없는 페이지"끼리 짝을 짓는다.
+            alternates=[], alt_other=None,
+        ))
+        written.append(not_found)
+
+    emit_not_found(lang, page, render_page, tr)
+    emit_not_found("en", en_page, _en_render, en_tr)
 
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))

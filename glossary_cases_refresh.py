@@ -59,24 +59,32 @@ REPORT_SCHEMA_VERSION = "grm-glossary-cases-refresh-report/v1"
 RPC_NAME = "findings_search"
 
 #: 괄호·슬래시로 시작하는 부수 표기를 떼는 자리 — "Batch (or Lot)"·"Drug Product /
-#: Medicinal Product"·"Quality Unit(s)" 처럼 표제어에만 붙는 꼬리다.
+#: Medicinal Product"·"Quality Unit(s)" 처럼 **표제어에만** 붙는 꼬리다(지적 원문에는
+#: 이 꼴로 적히지 않는다 — english_query_candidates 의 실측 참조).
 _EN_QUERY_TAIL = re.compile(r"[(/]")
 
 
 def english_query_candidates(term_en: str) -> "list[str]":
-    """영문 검색어 후보 — ① 표제어 그대로 ② 괄호·슬래시 앞의 주 표현.
+    """영문 검색어 후보 — ① 괄호·슬래시 앞의 **주 표현** ② 표제어 그대로.
 
     ★지어내지 않는다. 후보는 표제어에서 **기계적으로 잘라낸 것**뿐이고, 실제로 쓴 질의는
       `q` 에 남는다 — 그래서 화면의 링크와 그 옆 건수가 언제나 같은 검색을 가리킨다.
-    ★순서가 중요하다. 표제어가 먼저 이겨야 더 좁은 질의가 선택된다(주 표현은 표제어가
-      0건일 때만 쓴다).
+    ★순서: **주 표현이 먼저다.** 처음엔 반대로 뒀다("좁은 질의가 이긴다"). 라이브에서
+      `capa` 가 1건으로 떴고, 전수 재측정(2026-09-05, 프로덕션 anon RPC)에서 괄호형
+      16건이 **예외 없이** 다듬은 쪽이 많았다 — 줄어드는 항목은 0이었다:
+        procedure 2 → 5,054 · quality-control 4 → 1,407 · sop 17 → 639 ·
+        oos 33 → 366 · capa 1 → 52
+      괄호는 **표제어의 주석**이지 지적 원문에 적히는 표현이 아니다. "Corrective and
+      Preventive Action (CAPA)" 가 통째로 적힌 문장은 우연히 1건 있을 뿐이고, 그 1건을
+      "이 용어의 사례"라고 내놓는 것은 좁은 게 아니라 **틀린** 것이다.
+      다듬은 값이 한국어 정본과도 맞는다(OOS 366=366 · QA 85=85 · PQS 22=22) — 한국어의
+      수동 큐레이션이 고른 것이 바로 이 주 표현이었다.
     """
     term_en = (term_en or "").strip()
-    out = [term_en] if term_en else []
+    if not term_en:
+        return []
     head = _EN_QUERY_TAIL.split(term_en)[0].strip().rstrip(",").strip()
-    if head and head != term_en:
-        out.append(head)
-    return out
+    return [head, term_en] if head and head != term_en else [term_en]
 DEFAULT_PATH = Path("web/data/glossary_cases.json")
 DEFAULT_GLOSSARY_PATH = Path("web/data/glossary.json")
 

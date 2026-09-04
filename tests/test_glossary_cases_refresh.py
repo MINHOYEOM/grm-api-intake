@@ -377,16 +377,22 @@ class EnglishRefreshTest(unittest.TestCase):
         self.assertEqual(gcr.english_query_candidates("Deviation"), ["Deviation"])
         self.assertEqual(
             gcr.english_query_candidates("Good Manufacturing Practice (GMP)"),
-            ["Good Manufacturing Practice (GMP)", "Good Manufacturing Practice"])
+            ["Good Manufacturing Practice", "Good Manufacturing Practice (GMP)"])
         self.assertEqual(
             gcr.english_query_candidates("Drug Product / Medicinal Product"),
-            ["Drug Product / Medicinal Product", "Drug Product"])
+            ["Drug Product", "Drug Product / Medicinal Product"])
         self.assertEqual(gcr.english_query_candidates("Quality Unit(s)"),
-                         ["Quality Unit(s)", "Quality Unit"])
+                         ["Quality Unit", "Quality Unit(s)"])
 
-    def test_headword_wins_when_it_has_results(self):
-        """주 표현은 **표제어가 0건일 때만** 쓴다 — 넓은 질의가 좁은 질의를 이기면
-        링크가 가리키는 검색이 그 용어의 사례가 아니게 된다."""
+    def test_primary_phrase_wins_when_it_has_results(self):
+        """★주 표현이 먼저다. 처음엔 반대로 뒀다가 라이브에서 `capa` 가 **1건**으로 떴다.
+
+        괄호는 표제어의 주석이지 지적 원문에 적히는 표현이 아니다 — "Corrective and
+        Preventive Action (CAPA)" 가 통째로 적힌 문장은 우연히 1건 있을 뿐이고, 그 1건을
+        "이 용어의 사례"라고 내놓는 것은 좁은 게 아니라 틀린 것이다. 전수 재측정에서
+        괄호형 16건이 예외 없이 다듬은 쪽이 많았고(줄어드는 항목 0), 그 값이 한국어
+        수동 큐레이션과도 맞았다.
+        """
         asked = []
 
         def fetch(q):
@@ -396,11 +402,23 @@ class EnglishRefreshTest(unittest.TestCase):
         payload, _ = gcr.run_english_refresh(
             [{"id": "gmp", "term_en": "Good Manufacturing Practice (GMP)"}],
             {"items": []}, fetch, run_date="2026-09-05")
-        self.assertEqual(asked, ["Good Manufacturing Practice (GMP)"],
-                         "표제어가 결과를 냈는데 주 표현까지 물었다")
-        self.assertEqual(payload["items"][0]["q"], "Good Manufacturing Practice (GMP)")
+        self.assertEqual(asked, ["Good Manufacturing Practice"],
+                         "주 표현이 결과를 냈는데 표제어까지 물었다")
+        self.assertEqual(payload["items"][0]["q"], "Good Manufacturing Practice")
 
-    def test_fallback_query_is_the_one_recorded_so_link_and_count_agree(self):
+    def test_headword_is_the_fallback_when_the_primary_phrase_is_empty_handed(self):
+        """주 표현이 0건이면 표제어로 되돌아간다 — 잘라내기가 손해가 되는 경우는
+        측정상 없었지만, 없다고 단정하지 않고 되돌아갈 길을 남긴다."""
+        def fetch(q):
+            return (4, 3, "") if q.endswith("(CAPA)") else (0, 0, "")
+
+        payload, _ = gcr.run_english_refresh(
+            [{"id": "capa", "term_en": "Corrective and Preventive Action (CAPA)"}],
+            {"items": []}, fetch, run_date="2026-09-05")
+        self.assertEqual(payload["items"][0]["q"],
+                         "Corrective and Preventive Action (CAPA)")
+
+    def test_recorded_query_is_the_one_actually_used_so_link_and_count_agree(self):
         """실제로 쓴 질의가 `q` 에 남아야 화면의 `?q=` 링크와 그 옆 건수가 **같은
         검색**을 가리킨다. 표제어를 적어 두고 주 표현으로 센 숫자를 실으면 거짓이 된다."""
         def fetch(q):
@@ -424,7 +442,7 @@ class EnglishRefreshTest(unittest.TestCase):
         payload, _ = gcr.run_english_refresh(
             [{"id": "gmp", "term_en": "Good Manufacturing Practice (GMP)"}],
             {"items": []}, fetch, run_date="2026-09-05", fail_abort_pct=101.0)
-        self.assertEqual(asked, ["Good Manufacturing Practice (GMP)"])
+        self.assertEqual(asked, ["Good Manufacturing Practice"])
         self.assertEqual(payload["excluded"][0]["reason"], "조회 실패")
 
 

@@ -193,15 +193,15 @@
     },
     {
       "id": "quality-assurance",
-      "q": "Quality Assurance (QA)",
-      "findings": 5,
-      "documents": 5
+      "q": "Quality Assurance",
+      "findings": 85,
+      "documents": 82
     },
     {
       "id": "quality-control",
-      "q": "Quality Control (QC)",
-      "findings": 4,
-      "documents": 4
+      "q": "Quality Control",
+      "findings": 1407,
+      "documents": 1165
     },
     {
       "id": "quality-unit",
@@ -211,9 +211,9 @@
     },
     {
       "id": "pharmaceutical-quality-system",
-      "q": "Pharmaceutical Quality System (PQS)",
-      "findings": 2,
-      "documents": 2
+      "q": "Pharmaceutical Quality System",
+      "findings": 22,
+      "documents": 22
     },
     {
       "id": "quality-manual",
@@ -289,9 +289,9 @@
     },
     {
       "id": "capa",
-      "q": "Corrective and Preventive Action (CAPA)",
-      "findings": 1,
-      "documents": 1
+      "q": "Corrective and Preventive Action",
+      "findings": 52,
+      "documents": 50
     },
     {
       "id": "corrective-action",
@@ -361,15 +361,15 @@
     },
     {
       "id": "sop",
-      "q": "Standard Operating Procedure (SOP)",
-      "findings": 17,
-      "documents": 17
+      "q": "Standard Operating Procedure",
+      "findings": 639,
+      "documents": 591
     },
     {
       "id": "procedure",
-      "q": "Procedure(s)",
-      "findings": 2,
-      "documents": 2
+      "q": "Procedure",
+      "findings": 5054,
+      "documents": 2762
     },
     {
       "id": "documentation",
@@ -427,9 +427,9 @@
     },
     {
       "id": "validation-master-plan",
-      "q": "Validation Master Plan (VMP)",
-      "findings": 1,
-      "documents": 1
+      "q": "Validation Master Plan",
+      "findings": 3,
+      "documents": 2
     },
     {
       "id": "validation-protocol",
@@ -589,9 +589,9 @@
     },
     {
       "id": "oos",
-      "q": "Out-of-Specification (OOS) Result",
-      "findings": 33,
-      "documents": 33
+      "q": "Out-of-Specification",
+      "findings": 366,
+      "documents": 355
     },
     {
       "id": "oot",
@@ -673,7 +673,7 @@
     },
     {
       "id": "hepa-filter",
-      "q": "High Efficiency Particulate Air (HEPA) Filter",
+      "q": "High Efficiency Particulate Air",
       "findings": 1,
       "documents": 1
     },
@@ -685,9 +685,9 @@
     },
     {
       "id": "rabs",
-      "q": "Restricted Access Barrier System (RABS)",
-      "findings": 3,
-      "documents": 3
+      "q": "Restricted Access Barrier System",
+      "findings": 8,
+      "documents": 8
     },
     {
       "id": "sterilization",
@@ -703,7 +703,7 @@
     },
     {
       "id": "sterility-assurance-level",
-      "q": "Sterility Assurance Level (SAL)",
+      "q": "Sterility Assurance Level",
       "findings": 2,
       "documents": 2
     },
@@ -715,9 +715,9 @@
     },
     {
       "id": "contamination-control-strategy",
-      "q": "Contamination Control Strategy (CCS)",
-      "findings": 2,
-      "documents": 2
+      "q": "Contamination Control Strategy",
+      "findings": 8,
+      "documents": 8
     },
     {
       "id": "contamination",
@@ -907,9 +907,9 @@
     },
     {
       "id": "accurate",
-      "q": "Accurate (ALCOA)",
-      "findings": 1,
-      "documents": 1
+      "q": "Accurate",
+      "findings": 111,
+      "documents": 103
     },
     {
       "id": "detectability",
@@ -991,9 +991,9 @@
     },
     {
       "id": "field-alert",
-      "q": "Field Alert Report (FAR)",
-      "findings": 1,
-      "documents": 1
+      "q": "Field Alert Report",
+      "findings": 33,
+      "documents": 33
     },
     {
       "id": "in-process-control",
@@ -1039,9 +1039,9 @@
     },
     {
       "id": "purified-water",
-      "q": "Purified Water (PW)",
-      "findings": 3,
-      "documents": 3
+      "q": "Purified Water",
+      "findings": 23,
+      "documents": 23
     },
     {
       "id": "management-review",
@@ -1123,9 +1123,9 @@
     },
     {
       "id": "certificate-of-analysis",
-      "q": "Certificate of Analysis (CoA)",
-      "findings": 14,
-      "documents": 14
+      "q": "Certificate of Analysis",
+      "findings": 98,
+      "documents": 95
     },
     {
       "id": "pressure-differential",
@@ -1223,12 +1223,12 @@
     },
     {
       "id": "user-requirements-specification",
-      "q": "User Requirements Specification (URS)",
+      "q": "User Requirements Specification",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
       "id": "design-qualification",
-      "q": "Design Qualification (DQ)",
+      "q": "Design Qualification",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1253,7 +1253,7 @@
     },
     {
       "id": "airflow-visualization-study",
-      "q": "Airflow Visualization Study (Smoke Study)",
+      "q": "Airflow Visualization Study",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1263,7 +1263,7 @@
     },
     {
       "id": "non-viable-particle-monitoring",
-      "q": "Total Particle (Non-viable) Monitoring",
+      "q": "Total Particle",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1278,17 +1278,17 @@
     },
     {
       "id": "blow-fill-seal",
-      "q": "Blow-Fill-Seal (BFS)",
+      "q": "Blow-Fill-Seal",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
       "id": "form-fill-seal",
-      "q": "Form-Fill-Seal (FFS)",
+      "q": "Form-Fill-Seal",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
       "id": "pupsit",
-      "q": "Pre-use Post Sterilisation Integrity Test (PUPSIT)",
+      "q": "Pre-use Post Sterilisation Integrity Test",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1318,12 +1318,12 @@
     },
     {
       "id": "static-data",
-      "q": "Static Data / Static Record",
+      "q": "Static Data",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
       "id": "dynamic-data",
-      "q": "Dynamic Data / Dynamic Record",
+      "q": "Dynamic Data",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
@@ -1398,12 +1398,12 @@
     },
     {
       "id": "master-standard-documents",
-      "q": "Master Standard Documents (Gijunseo)",
+      "q": "Master Standard Documents",
       "reason": "영문 원문 검색 결과 0건"
     },
     {
       "id": "business-operator-recall",
-      "q": "Recall by the Business Operator (Korea)",
+      "q": "Recall by the Business Operator",
       "reason": "영문 원문 검색 결과 0건"
     },
     {

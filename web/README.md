@@ -87,6 +87,18 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    낸다(`doc_is_english` — 값으로 판정, 소스 이름으로 판정하지 않는다).
    ★데이터에서 오는 표시 라벨(기관명 등)은 소스에 리터럴이 없어 추출기가 못 보므로
    `render.DATA_LABEL_KEYS` 에 `N_()` 로 등록한다 — 빠뜨리면 영어 빌드가 **멈춘다**.
+9. **영문 브리프는 번역이 아니라 같은 요약의 다른 언어 출력이다(2026-09-04, 다국어 5단계)** —
+   Routine 이 카드마다 `en{title_issue,summary,implication,key_facts,checks}` 와 브리프
+   `en.tldr` 을 채운다. **다섯을 전부 채우거나 전부 비운다**(반쪽 영어 금지) — 부분 제공은
+   `inject_slots` 가 발행 전에 막고, 웹은 그 호를 영어로 내지 않는다.
+   ★생성 경로가 하나 더 생기면 게이트도 하나 더 — `validate_brief_en_facts` 가
+   **영문이 한국어판·표·인용에 없는 수치를 말하면 발행을 차단**한다(`EN_INVENTED_NUMBER`).
+   검사는 비대칭이다: 덜 말하는 것은 되고 **없는 것을 말하는 것**만 막는다.
+   카드 라벨(종류·제형·표 라벨)은 `render.BRIEF_LABEL_KEYS` 에 등록한다. 섹션 앵커(`#sec-글로벌`)는
+   **번역하지 않는다** — 두 언어판의 딥링크가 갈라지면 안 된다.
+   ★`tldr` 은 **제목이기도 하다**(`_brief_title`/`_brief_description` 이 첫 줄을 쓴다). 영문판은
+   `_brief_tldr(meta,"en")` 로 `brief.en.tldr` 만 보고, 없으면 날짜 파생으로 떨어진다 —
+   한국어를 대신 끼우면 아카이브 제목·og:description 만 조용히 한국어가 된다.
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

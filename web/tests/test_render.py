@@ -14185,6 +14185,209 @@ class WebI18nTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
 
 
+class WebEnBriefTest(unittest.TestCase):
+    """[다국어 5단계 2026-09-04] 영문 주간 브리프 — 슬롯·게이트·반쪽 금지.
+
+    ★영문 서사(`title_issue`·`summary`·`implication`·`key_facts`·`checks`)와 `tldr` 은
+    Routine 이 매주 만드는 산문이라 **오늘의 발행분에는 없다**. 설계 문서 §4 의 운영자
+    결정이 "다음 주 발행부터 전향적"이므로, 이 클래스는 **기계장치**를 합성 브리프로
+    증명한다 — 데이터가 채워지는 순간 페이지가 저절로 생기고, 안 채워지면 아무것도
+    생기지 않는다는 두 방향을 모두 고정한다.
+    """
+
+    @staticmethod
+    def _brief(pub="2026-06-01", *, en=True, invented=False):
+        card = {
+            "id": "c-en-1", "render_order": 1, "group": "글로벌",
+            "group_label": "💊 합성의약품", "agency": "FDA", "card_type": "GMP 비준수",
+            "category": "Other", "modality": "💊 합성의약품", "type_tag": "GMP 비준수",
+            "evidence_level": "A", "signal_tier": 1, "signal_label": "High",
+            "headline_target": "Acme Pharma",
+            "title_issue": "세척 밸리데이션 중대결함",
+            "summary": "중대결함 1건과 중요결함 8건이 확인됐다.",
+            "implication": "세척 밸리데이션이 중대 결함으로 판정됐다.",
+            "key_facts": ["중대결함 1건", "중요결함 8건"],
+            "checks": ["세척 밸리데이션 회수율 자료 점검"],
+            "facts": [{"label": "발행일", "value": "2026-05-28"},
+                      {"label": "제조소", "value": "Acme Pharma"}],
+            "quotes": [{"original": "critical 1, major 8", "translation": "중대 1, 중요 8"}],
+            "sources": {"info_url": "https://example.org/a",
+                        "official_url": "https://example.org/b"},
+        }
+        if en:
+            card["en"] = {
+                "title_issue": "Critical cleaning validation deficiency",
+                "summary": ("1 critical and 8 major deficiencies were confirmed."
+                            if not invented else
+                            "42 major deficiencies were confirmed."),
+                "implication": "Cleaning validation was classified as critical.",
+                "key_facts": ["1 critical deficiency", "8 major deficiencies"],
+                "checks": ["Review cleaning validation recovery data"],
+            }
+        meta = {"run_date_kst": pub, "publish_date": pub,
+                "window": "2026-05-25~2026-05-31", "agencies": ["FDA"],
+                "tldr": ["국문 요약 한 줄"], "ai_disclosure": True,
+                "coverage": {"rendered": 1, "intake_total": 1,
+                             "evidence": {"A": 1, "B": 0, "C": 0}}}
+        if en:
+            meta["en"] = {"tldr": ["One-line English summary"]}
+        return {"schema": "grm-web-card/v1", "brief": meta, "cards": [card]}
+
+    def _build(self, brief):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enbrief_"))
+        data = tmp / "data"
+        data.mkdir(parents=True)
+        (data / f"brief_web_{brief['brief']['publish_date']}.json").write_text(
+            json.dumps(brief, ensure_ascii=False), encoding="utf-8")
+        out = tmp / "site"
+        render.render_site(data, out, render_doc_pages=False)
+        return tmp, out
+
+    # ── 슬롯 판정 ────────────────────────────────────────────────────────────
+    def test_card_needs_all_five_narrative_fields(self):
+        """다섯 중 하나만 비어도 영어로 내지 않는다 — 반쪽 영어 카드는 만들지 않는다."""
+        card = self._brief()["cards"][0]
+        self.assertTrue(render.card_has_english(card))
+        for field in render.CARD_NARRATIVE_FIELDS:
+            broken = {**card, "en": {**card["en"], field: "" if not isinstance(
+                card["en"][field], list) else []}}
+            self.assertFalse(render.card_has_english(broken), field)
+        self.assertFalse(render.card_has_english({k: v for k, v in card.items()
+                                                  if k != "en"}))
+
+    def test_brief_needs_tldr_and_every_card(self):
+        b = self._brief()
+        self.assertTrue(render.brief_has_english(b))
+        no_tldr = {**b, "brief": {**b["brief"], "en": {"tldr": []}}}
+        self.assertFalse(render.brief_has_english(no_tldr))
+        mixed = {**b, "cards": [b["cards"][0],
+                                {k: v for k, v in b["cards"][0].items() if k != "en"}
+                                | {"id": "c2", "render_order": 2}]}
+        self.assertFalse(render.brief_has_english(mixed),
+                         "한 장이라도 영어가 없으면 그 호는 영어로 내지 않는다")
+
+    # ── 렌더 ────────────────────────────────────────────────────────────────
+    def test_english_brief_and_archive_appear_when_the_data_is_there(self):
+        tmp, out = self._build(self._brief())
+        try:
+            page = out / "en" / "briefs" / "2026-06-01" / "index.html"
+            self.assertTrue(page.is_file(), "영문 브리프가 렌더되지 않았다")
+            html = page.read_text(encoding="utf-8")
+            self.assertIn('<html lang="en">', html)
+            self.assertIn("Critical cleaning validation deficiency", html)
+            self.assertIn("1 critical and 8 major deficiencies", html)
+            self.assertIn("GMP non-compliance", html, "카드 종류 라벨이 한국어다")
+            self.assertIn("💊 Small molecule", html, "제형 라벨이 한국어다")
+            self.assertIn("Published", html, "표 라벨이 한국어다")
+            for gone in ("세척 밸리데이션 중대결함", "중대결함 1건과", "GMP 비준수"):
+                self.assertNotIn(gone, html, f"영문 브리프에 한국어 잔존: {gone}")
+            # 앵커는 원본 값 그대로 — 두 언어판의 딥링크가 갈라지면 안 된다.
+            ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+            self.assertIn('id="sec-글로벌"', ko)
+            self.assertIn('id="sec-글로벌"', html)
+            archive = out / "en" / "archive" / "index.html"
+            self.assertTrue(archive.is_file(), "영문 아카이브가 없다")
+            self.assertIn("2026-06-01", archive.read_text(encoding="utf-8"))
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_english_archive_and_tldr_never_fall_back_to_korean(self):
+        """★제목·요약은 **영어로 다시 만든다** — 한국어 행을 거르기만 하면 안 된다.
+
+        아카이브 제목과 브리프 description 은 `tldr[0]` 이다(`_brief_title`). 영문판이
+        `brief.en.tldr` 을 안 보면 영어 화면에 한국어 제목이 그대로 실린다 — 화면 전체가
+        영어인데 제목만 한국어면 "번역이 덜 됐다"로 읽힌다.
+        """
+        tmp, out = self._build(self._brief())
+        try:
+            archive = (out / "en" / "archive" / "index.html").read_text(encoding="utf-8")
+            self.assertIn("One-line English summary", archive)
+            self.assertNotIn("국문 요약 한 줄", archive)
+            brief = (out / "en" / "briefs" / "2026-06-01" / "index.html").read_text(
+                encoding="utf-8")
+            self.assertIn("One-line English summary", brief)
+            self.assertNotIn("국문 요약 한 줄", brief)
+            # 한국어판은 그대로 한국어 요약을 쓴다(회귀 방지).
+            ko = (out / "archive" / "index.html").read_text(encoding="utf-8")
+            self.assertIn("국문 요약 한 줄", ko)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_nothing_is_rendered_without_the_english_slots(self):
+        """오늘의 실제 발행분이 이 상태다 — 슬롯이 없으면 **아무 페이지도 생기지 않는다**."""
+        tmp, out = self._build(self._brief(en=False))
+        try:
+            self.assertFalse((out / "en" / "briefs").exists())
+            self.assertFalse((out / "en" / "archive").exists())
+            sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+            self.assertNotIn("/en/briefs/", sitemap)
+            self.assertNotIn("/en/archive/", sitemap)
+            # 한국어판은 평소대로 나온다.
+            self.assertTrue((out / "briefs" / "2026-06-01" / "index.html").is_file())
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_live_briefs_have_no_english_yet_so_no_pages(self):
+        """실 데이터 기준 — 지금은 영문 브리프가 0호다(다음 주 발행부터 채워진다)."""
+        briefs = render.load_briefs(render.DATA_DIR)
+        self.assertGreater(len(briefs), 0)
+        self.assertEqual([b["brief"]["publish_date"] for b in briefs
+                          if render.brief_has_english(b)], [])
+
+    # ── 사실 게이트 ─────────────────────────────────────────────────────────
+    def test_invented_numbers_block_publishing(self):
+        """영문이 한국어판·표·인용에 없는 수치를 말하면 발행이 멈춘다(생성 경로 = 게이트)."""
+        ok = render.validate_brief_en_facts([self._brief()])
+        self.assertEqual(ok, [])
+        bad = render.validate_brief_en_facts([self._brief(invented=True)])
+        self.assertEqual(len(bad), 1)
+        self.assertIn("EN_INVENTED_NUMBER", bad[0])
+        self.assertIn("42", bad[0])
+
+    def test_gate_is_wired_into_the_publish_path(self):
+        """게이트가 배선돼 있어야 한다 — 함수만 있고 안 부르면 없는 것과 같다."""
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_engate_"))
+        try:
+            data = tmp / "data"
+            data.mkdir(parents=True)
+            (data / "brief_web_2026-06-01.json").write_text(
+                json.dumps(self._brief(invented=True), ensure_ascii=False),
+                encoding="utf-8")
+            with self.assertRaises(render.BriefEnFactValidationError):
+                render._validate_briefs_or_raise(data)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_omitting_a_number_is_allowed(self):
+        """요약은 덜 말할 수 있다 — 빠뜨림은 위반이 아니고 **없는 것을 말하는** 것만 위반."""
+        b = self._brief()
+        b["cards"][0]["en"]["summary"] = "Deficiencies were confirmed."
+        b["cards"][0]["en"]["key_facts"] = ["Critical finding"]
+        self.assertEqual(render.validate_brief_en_facts([b]), [])
+
+    # ── 라벨 어휘 ───────────────────────────────────────────────────────────
+    def test_every_brief_label_in_the_live_data_is_registered(self):
+        """카드 라벨은 데이터로 오므로 추출기가 못 본다 — 새 값이 들어오면 여기서 실패한다."""
+        registered = set(render.BRIEF_LABEL_KEYS)
+        hangul = re.compile("[가-힣]")
+        seen: set[str] = set()
+        for b in render.load_briefs(render.DATA_DIR):
+            for c in b.get("cards") or []:
+                for key in ("card_type", "type_tag", "group_label", "modality", "group"):
+                    v = c.get(key)
+                    if v and hangul.search(str(v)):
+                        seen.add(str(v))
+                for f in c.get("facts") or []:
+                    if f.get("label") and hangul.search(str(f["label"])):
+                        seen.add(str(f["label"]))
+        missing = sorted(seen - registered)
+        self.assertEqual(missing, [],
+                         f"BRIEF_LABEL_KEYS 미등록 라벨: {missing}")
+        catalog = grm_i18n.load_catalog("en")
+        for key in registered:
+            self.assertIn(key, catalog, f"등록됐지만 번역이 없다: {key!r}")
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 

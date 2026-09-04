@@ -74,7 +74,10 @@ jobs:
           set -euo pipefail
           count() { [ -f "$1" ] && jq '.items | length' "$1" || echo 0; }
           # 한쪽만 줄어도 가드가 보게 두 언어를 합친다. 영문 첫 생산 전에는 0이다.
-          echo "items=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))" >> "$GITHUB_OUTPUT"
+          # ★언어별로 따로 적는다. 합산하면 한쪽이 0 으로 무너져도 다른 쪽 증가에
+          # 가려져 축소 가드가 아무 말도 안 한다("조용한 0장" 그 자체).
+          echo "items_ko=$(count "$DATA_PATH")" >> "$GITHUB_OUTPUT"
+          echo "items_en=$(count "$DATA_PATH_EN")" >> "$GITHUB_OUTPUT"
       # ── 재측정(항목별 격리 실패·0건 유지·±50% 표시). ≥fail_abort_percent% 실패면 이 스텝이
       #    exit 1 로 하드 실패한다(library_staging_build.py 의 "과반 실패 시 전면 중단"과 같은
       #    관례) — 파일은 이미 아무것도 못 썼으므로 아래 diff 스텝도 어차피 변경 0 이 되지만,
@@ -122,12 +125,17 @@ jobs:
             fi
           done
           count() { [ -f "$1" ] && jq '.items | length' "$1" || echo 0; }
-          BEFORE='${{ steps.before.outputs.items }}'
-          AFTER=$(( $(count "$DATA_PATH") + $(count "$DATA_PATH_EN") ))
-          if [ "$BEFORE" -gt 0 ] && [ $(( (BEFORE - AFTER) * 100 )) -ge $(( BEFORE * SHRINK_PCT )) ]; then
-            allowed=false
-            echo "사례 링크 수 ${BEFORE} → ${AFTER} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          # ★축소 가드는 **언어마다 따로** 본다. 합산하면 영어가 194 → 0 이 돼도 한국어가
+          # 그만큼 늘면 총합이 그대로라 통과한다 — 가드가 지키려던 바로 그 사고를 놓친다.
+          check_shrink() {                   # $1=라벨  $2=이전  $3=정본경로
+            local before="$2" after; after=$(count "$3")
+            if [ "$before" -gt 0 ] && [ $(( (before - after) * 100 )) -ge $(( before * SHRINK_PCT )) ]; then
+              allowed=false
+              echo "$1 사례 링크 수 ${before} → ${after} (축소 ${SHRINK_PCT}% 이상) — 사람 검토로 남깁니다." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          }
+          check_shrink "한국어" '${{ steps.before.outputs.items_ko }}' "$DATA_PATH"
+          check_shrink "영어" '${{ steps.before.outputs.items_en }}' "$DATA_PATH_EN"
           echo "allowed=$allowed" >> "$GITHUB_OUTPUT"
       - name: Commit and open candidate PR
         if: steps.changes.outputs.changed == 'true'

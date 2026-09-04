@@ -115,7 +115,7 @@ class BuildAxisGateTest(unittest.TestCase):
             self.calls.append(payload)
             key = next((v for k, v in payload.items()
                         if k.startswith("p_") and k not in
-                        ("p_q", "p_page", "p_docs_per_page")), "")
+                        ("p_q", "p_page", "p_docs_per_page", "p_orig_lang")), "")
             if key in fail_keys:
                 raise RuntimeError("boom")
             return (per_key or {}).get(key) or _resp(
@@ -427,7 +427,8 @@ class NarrowConsoleEncodingTest(unittest.TestCase):
     def _stub(self, payload=None):
         data = payload if payload is not None else self._payload()
 
-        def fake(base_url, anon_key, *, min_findings, samples, measured_on, log):
+        def fake(base_url, anon_key, *, min_findings, samples, measured_on, log,
+                 orig_lang=""):
             return data
         ffr.build_payload = fake
 

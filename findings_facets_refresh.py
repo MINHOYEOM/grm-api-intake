@@ -33,6 +33,21 @@ service-role 로 세면 **RLS 를 우회해 비공개 행까지 집계**되어, 
   5. **항목별 실패 격리** — 개별 축 값의 조회 실패는 그 항목만 빼고 계속하되, 실패가
      20% 를 넘으면 전면 중단한다(부분 갱신 상태를 기준선으로 남기지 않는다).
 
+## 언어판 (`--orig-lang en`, 2026-09-04)
+
+영어 트리의 모음 페이지는 **원문이 영어인 지적만** 세야 한다. 한국어 집계를 그대로
+실으면 화면의 숫자와 그 페이지가 보내는 검색 결과가 갈린다 — 실측으로 `data_integrity`
+는 134건 중 **50%가 한국어 원문**이라 두 배 어긋난다. 그래서 같은 스크립트를 축만 바꿔
+한 번 더 돌려 `findings_facets_en.json` 을 따로 낸다(`p_orig_lang` = 마이그레이션 074).
+
+★사후 필터가 아니라 **서버에 물어서** 만든다. 한국어 파일을 받아 표본에서 한글을 걸러
+내는 방식은 표본만 고쳐질 뿐 `findings`·`documents`·`by_agency` 숫자가 한국어인 채로
+남는다 — 화면의 머리 숫자가 거짓이 되는 쪽이 표본이 한국어인 것보다 나쁘다.
+
+★게이트는 두 벌 모두에 그대로 적용된다. 특히 표본 미달(`--min-findings`)은 언어판에서
+**더 많이 걸린다**(모집단이 작으므로) — 그건 결함이 아니라 사실이고, 빠진 항목은
+`excluded` 에 사유와 함께 남는다.
+
 ## 라벨의 출처
 
   · **분류** — RPC 응답의 `category_label_ko`(DB 정본). 여기서 만들지 않는다.
@@ -205,8 +220,11 @@ def collect_samples(resp: dict[str, Any], limit: int,
 def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
                values: list[dict[str, Any]], labels: dict[str, str] | None,
                min_findings: int, samples: int,
-               log) -> dict[str, Any]:
-    """축 하나(분류/국가/기관)의 항목·제외 목록을 만든다."""
+               log, orig_lang: str = "") -> dict[str, Any]:
+    """축 하나(분류/국가/기관)의 항목·제외 목록을 만든다.
+
+    `orig_lang='en'` 이면 원문이 영어인 지적만 센다(서버가 가른다 — 마이그 074).
+    """
     items: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
     skipped_absence: list[str] = []
@@ -248,7 +266,8 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
         try:
             resp = post_search(base_url, anon_key,
                                {"p_q": "", param: key, "p_page": 1,
-                                "p_docs_per_page": max(samples, 10)})
+                                "p_docs_per_page": max(samples, 10),
+                                "p_orig_lang": orig_lang})
         except Exception as exc:                       # noqa: BLE001 — 항목별 격리
             failures += 1
             log(f"  ! {axis}/{key} 조회 실패: {exc}")
@@ -305,7 +324,7 @@ def build_axis(base_url: str, anon_key: str, *, axis: str, param: str,
 def build_category_agency_combos(base_url: str, anon_key: str, *,
                                  category_axis: dict[str, Any],
                                  min_findings: int, samples: int,
-                                 log) -> dict[str, Any]:
+                                 log, orig_lang: str = "") -> dict[str, Any]:
     """분류 × 기관 조합 페이지 데이터. 후보는 분류 축의 by_agency 에서 파생한다."""
     items: list[dict[str, Any]] = []
     excluded: list[dict[str, Any]] = []
@@ -339,7 +358,8 @@ def build_category_agency_combos(base_url: str, anon_key: str, *,
                 resp = post_search(base_url, anon_key,
                                    {"p_q": "", "p_category": cat["key"],
                                     "p_agency": agency, "p_page": 1,
-                                    "p_docs_per_page": max(samples, 10)})
+                                    "p_docs_per_page": max(samples, 10),
+                                    "p_orig_lang": orig_lang})
             except Exception as exc:                   # noqa: BLE001 — 항목별 격리
                 failures += 1
                 log(f"  ! combo/{label_key} 조회 실패: {exc}")
@@ -398,8 +418,12 @@ def build_category_agency_combos(base_url: str, anon_key: str, *,
 
 
 def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: int,
-                  measured_on: str, log) -> dict[str, Any]:
-    root = post_search(base_url, anon_key, {"p_q": "", "p_page": 1, "p_docs_per_page": 1})
+                  measured_on: str, log, orig_lang: str = "") -> dict[str, Any]:
+    # ★축 후보(dash)도 같은 축으로 물어야 한다. 여기만 빼면 한국어 모집단의 후보 목록에
+    #   영어 집계를 붙이게 되어, 영어로는 0건인 항목이 후보에 남고 표본 미달로 조용히
+    #   빠진다 — 결과는 같아 보이지만 `excluded` 사유가 거짓이 된다.
+    root = post_search(base_url, anon_key, {"p_q": "", "p_page": 1, "p_docs_per_page": 1,
+                                            "p_orig_lang": orig_lang})
     dash = root.get("dash") or {}
     totals = root.get("totals") or {}
     countries = country_labels_ko()
@@ -408,15 +432,17 @@ def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: i
         build_axis(base_url, anon_key, axis="category", param="p_category",
                    values=[{"v": c.get("v"), "c": c.get("c")}
                            for c in (dash.get("by_category") or [])],
-                   labels=None, min_findings=min_findings, samples=samples, log=log),
+                   labels=None, min_findings=min_findings, samples=samples, log=log,
+                   orig_lang=orig_lang),
         build_axis(base_url, anon_key, axis="country", param="p_country",
                    values=(dash.get("by_country") or []),
-                   labels=countries, min_findings=min_findings, samples=samples, log=log),
+                   labels=countries, min_findings=min_findings, samples=samples, log=log,
+                   orig_lang=orig_lang),
         build_axis(base_url, anon_key, axis="agency", param="p_agency",
                    values=[{"v": a.get("v"), "c": a.get("c")}
                            for a in (dash.get("by_agency") or [])],
                    labels=AGENCY_LABELS_KO, min_findings=min_findings,
-                   samples=samples, log=log),
+                   samples=samples, log=log, orig_lang=orig_lang),
     ]
     # 분류 라벨은 DB 정본(category_label_ko)에서 채운다 — 표본에서 읽으므로 사본이 없다.
     for axis in axes:
@@ -433,10 +459,13 @@ def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: i
     category_axis = next(a for a in axes if a["axis"] == "category")
     combos = build_category_agency_combos(
         base_url, anon_key, category_axis=category_axis,
-        min_findings=min_findings, samples=samples, log=log)
+        min_findings=min_findings, samples=samples, log=log, orig_lang=orig_lang)
 
     return {
         "schema_version": SCHEMA_VERSION,
+        # 이 파일이 어느 모집단을 센 것인지 데이터 자신이 말한다 — 렌더가 파일 이름으로
+        # 짐작하지 않게 한다(이름은 바뀌고 값은 안 바뀐다).
+        "orig_lang": orig_lang,
         "measured_on": measured_on,
         "min_findings": min_findings,
         "totals": {"findings": int(totals.get("findings") or 0),
@@ -473,6 +502,8 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--samples", type=int, default=DEFAULT_SAMPLES)
     ap.add_argument("--measured-on", default="",
                     help="측정일(YYYY-MM-DD). 미지정 시 오늘(UTC 아님·러너 로컬).")
+    ap.add_argument("--orig-lang", default="", choices=["", "en"],
+                    help="'en' 이면 원문이 영어인 지적만 센다(영어 트리용). 기본은 전체.")
     ap.add_argument("--dry-run", action="store_true", help="파일을 쓰지 않고 요약만 출력")
     args = ap.parse_args(argv)
 
@@ -486,7 +517,7 @@ def main(argv: "list[str] | None" = None) -> int:
     payload = build_payload(base_url, args.supabase_anon_key,
                             min_findings=args.min_findings, samples=args.samples,
                             measured_on=args.measured_on or date.today().isoformat(),
-                            log=log)
+                            log=log, orig_lang=args.orig_lang)
 
     # 산출물을 요약 로그보다 **먼저** 쓴다. payload 는 RPC 90여 회(수 분)의 결과인데
     # 종전에는 요약 출력이 먼저였다 — 출력 한 줄이 실패하면 그 수 분이 통째로 버려졌다

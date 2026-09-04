@@ -4322,8 +4322,82 @@
   <url><loc>https://grm-solutions.com/quiz/</loc></url>
   <url><loc>https://grm-solutions.com/en/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/agency/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/agency/ema/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/agency/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/agency/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/agency/mhra/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/browse/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/aseptic-sterility-assurance/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/aseptic-sterility-assurance/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/aseptic-sterility-assurance/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/cleaning-validation/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/cleaning-validation/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/cleaning-validation/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/complaint-recall/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/complaint-recall/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/complaint-recall/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/computer-system-validation/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/computer-system-validation/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/computer-system-validation/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/contamination-control/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/contamination-control/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/contamination-control/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/data-integrity/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/data-integrity/ema/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/data-integrity/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/deviation-capa/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/deviation-capa/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/deviation-capa/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/documentation-records/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/documentation-records/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/environmental-monitoring/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/environmental-monitoring/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/equipment-facility/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/equipment-facility/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/equipment-facility/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/labeling-packaging/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/labeling-packaging/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/labeling-packaging/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/material-supplier-control/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/material-supplier-control/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/material-supplier-control/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/other-quality-system/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/other-quality-system/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/other-quality-system/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/process-validation/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/qc-lab-controls/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/qc-lab-controls/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/qc-lab-controls/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/quality-unit-oversight/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/quality-unit-oversight/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/quality-unit-oversight/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/regulatory-reporting/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/regulatory-reporting/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/regulatory-reporting/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/stability-storage/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/stability-storage/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/stability-storage/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/training-personnel/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/training-personnel/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/training-personnel/hc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/validation-qualification/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/validation-qualification/fda/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/c/validation-qualification/hc/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/checklist/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/ca/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/cn/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/de/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/es/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/fr/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/gb/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/in/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/it/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/jp/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/kr/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/country/us/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/coverage/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/009ffad3df01/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/00a06c78c3aa/</loc></url>

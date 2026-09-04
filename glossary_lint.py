@@ -52,6 +52,12 @@ OPTIONAL_FIELDS: dict[str, type] = {
     "detail_ko": str,
     "reg_refs": list,
     "aliases": list,
+    # [다국어 2026-09-04] 영어판 용어사전의 본문. `easy_en` 은 전 용어에 있고
+    # `detail_en` 은 `detail_ko` 가 있는 용어에만 있다(없는 심화 설명을 영어에만 쓰면
+    # 지어낸 것이 된다 — WebEnGlossaryTest 가 그 짝을 따로 본다). 여기 등록하지 않으면
+    # 이 게이트가 정본 전체를 UNKNOWN_FIELD 로 거부한다.
+    "easy_en": str,
+    "detail_en": str,
 }
 ALLOWED_FIELDS = set(REQUIRED_FIELDS) | set(OPTIONAL_FIELDS)
 

@@ -8334,10 +8334,19 @@ class WebGlossaryTermPageTest(unittest.TestCase):
                              f"짧은 영문 판정 어긋남: {term_ko} / {term_en}")
 
     def test_title_reaches_rendered_page(self):
-        """producer 만 맞고 렌더 배선이 빠지는 사고를 막는다(#729 교훈)."""
+        """producer 만 맞고 렌더 배선이 빠지는 사고를 막는다(#729 교훈).
+
+        ★[2026-09-04] 표시 이름은 **뷰가 정한 값**(`term`·`term_sub`)이다(불변식 #13) —
+          정본 항목을 그대로 넣으면 부제가 없어 "(GMP)" 가 빠진 제목과 비교하게 되고,
+          그건 렌더 배선이 아니라 **테스트가 다른 것을 만들어 비교**하는 것이다.
+          렌더가 쓰는 바로 그 뷰에서 뽑는다.
+        """
         from markupsafe import escape as _esc
+        views = {v["id"]: v for g in render.build_glossary_view(self.terms)["groups"]
+                 for v in g["terms"]}
         for t in self.terms[:8]:
-            self.assertIn(f'<title>{_esc(render.glossary_term_page_title(t))}</title>',
+            v = views[t["id"]]
+            self.assertIn(f'<title>{_esc(render.glossary_term_page_title(v))}</title>',
                           self._page(t["id"]), f'제목 미배선: {t["id"]}')
 
     def test_case_excerpt_quote_contains_its_token(self):
@@ -8587,6 +8596,14 @@ class WebNotFoundPageTest(unittest.TestCase):
         cls.html = (cls.out / "404.html").read_text(encoding="utf-8")
         cls.en_html = (cls.out / "en" / "404.html").read_text(encoding="utf-8")
         cls.both = (("404.html", cls.html), ("en/404.html", cls.en_html))
+        # 카드 필터의 입력 = **실제로 난 영어 라우트**. 선언을 다시 조립하지 않고 산출물
+        # 에서 읽는다 — 이 페이지가 하는 약속이 "여기 적힌 곳은 실제로 있다"이므로,
+        # 그 약속과 같은 원천을 본다(문서 페이지는 렌더 스위치로 꺼지지만 카드가 가리키는
+        # 섹션 면은 언제나 난다).
+        en_root = cls.out / "en"
+        cls.en_paths = {
+            "" if p.parent == en_root else f"{p.parent.relative_to(en_root).as_posix()}/"
+            for p in en_root.rglob("index.html")}
 
     @classmethod
     def tearDownClass(cls):
@@ -8661,7 +8678,13 @@ class WebNotFoundPageTest(unittest.TestCase):
         따라온다 — 손목록은 낡는다.
         """
         cards = re.findall(r'<a class="nf-card" href="([^"]*)"', self.en_html)
-        self.assertNotIn("/en/glossary/", cards)
+        # ★[2026-09-04] "용어사전은 영어에 없다"를 손으로 적어 뒀다가, 영어판 243장이
+        #   실제로 생긴 뒤 이 가드가 **맞는 화면을 틀렸다고** 했다. 존재 여부는
+        #   `en_paths` 가 정한다 — 여기서는 그 파생이 화면과 일치하는지만 본다.
+        want = {f"/en/{c['path']}" for c in render.not_found_cards(
+            render._KO, "en", self.en_paths)}
+        self.assertEqual(sorted(cards), sorted(want))
+        self.assertIn("/en/glossary/", cards, "영어 용어사전이 생겼는데 카드가 없다")
         self.assertNotIn("/en/archive/", cards)   # 영문 브리프 0호 — 아카이브가 없다
         self.assertIn("/en/findings/", cards)
         self.assertEqual(len(re.findall(r'<a class="nf-card"', self.html)),
@@ -13992,7 +14015,9 @@ class WebClausePageTest(unittest.TestCase):
             self.assertLessEqual(len(v["samples"]), render.CLAUSE_MAX_SAMPLES, v["code"])
             self.assertGreater(len(v["samples"]), 0, v["code"])
             for s in v["samples"]:
-                self.assertTrue(s["text_ko"].strip(), v["code"])
+                # [다국어 2026-09-04] 표본 본문은 뷰가 언어를 정해 넘긴다(불변식 #13) —
+                # `text_ko` 를 직접 읽던 자리가 `body` 가 됐다.
+                self.assertTrue(s["body"].strip(), v["code"])
                 self.assertTrue(s["firm_name"].strip(), v["code"])
                 self.assertRegex(s["published_date"], r"^\d{4}-\d{2}-\d{2}$")
 

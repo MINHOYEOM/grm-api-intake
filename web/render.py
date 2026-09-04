@@ -54,6 +54,11 @@ DATA_DIR = WEB_DIR / "data" / "briefs"
 LIBRARY_DIR = WEB_DIR / "data" / "library"      # [자료실] ICH/MFDS 참조 카탈로그 커밋 데이터
 LIBRARY_UPDATES_FILE = WEB_DIR / "data" / "library_updates.json"  # [자료실] 주간 자동 갱신 변경 이력
 GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마크다운(정본)
+# [다국어 2026-09-05] 영문 이용안내 본문 — **번역 파일이 아니라 또 하나의 정본**이다.
+# 한국어 파일과 **같은 h2 순서**여야 한다(목차가 h2 에서 결정론 파생되므로 구조가 어긋나면
+# 두 언어판의 목차·딥링크가 갈라진다 — `WebGuideEnTest` 가 모양을 고정한다).
+# ★파일이 없으면 영어 이용안내는 **조용히 0장**이다(load_guide 의 부재 관례 그대로).
+GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
 # 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
@@ -2677,10 +2682,58 @@ def load_quiz_bank(path: Path = QUIZ_FILE) -> list[dict[str, Any]] | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
-def _quiz_question_view(q: dict[str, Any], tr: Translator = _KO) -> dict[str, Any]:
+# [다국어 2026-09-05] 영문 문항의 세 필드 — **셋을 전부 채우거나 전부 비운다**(반쪽 영어
+# 금지). 브리프의 `CARD_NARRATIVE_FIELDS`·`brief_has_english` 와 같은 규율이다.
+QUIZ_EN_FIELDS: tuple[str, ...] = ("question_en", "choices_en", "explanation_en")
+
+
+def quiz_has_english(q: dict[str, Any]) -> bool:
+    """이 문항을 영어 퀴즈에 낼 수 있는가 — 셋이 전부 있고 선택지가 **같은 길이**인가.
+
+    ★`choices_en` 은 `choices` 와 같은 길이·같은 순서여야 한다. `answer_index` 는 두
+      언어가 **공유하는 하나의 값**이라, 순서를 바꾸거나 개수를 줄이면 영어판의 정답이
+      다른 선택지를 가리킨다 — 화면에는 아무 이상이 없고 채점만 조용히 틀린다.
+      그래서 길이를 여기서 막고, 순서는 병합 스크립트(`quiz_en_merge.py`)가 사람 손에서
+      바뀌지 않게 지킨다(`WebQuizEnTest` 가 둘 다 고정).
+    """
+    if any(not q.get(f) for f in QUIZ_EN_FIELDS):
+        return False
+    choices, choices_en = q.get("choices") or [], q.get("choices_en") or []
+    if len(choices_en) != len(choices):
+        return False
+    return all(isinstance(c, str) and c.strip() for c in choices_en)
+
+
+def quiz_question_text(q: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
+    """문항 지문 — **뷰가 언어를 정한다**(README 불변식 #13). 템플릿은 `q.question` 만 본다."""
+    return str((q.get("question_en") if lang != DEFAULT_LANG else q.get("question_ko")) or "")
+
+
+def quiz_choices(q: dict[str, Any], lang: str = DEFAULT_LANG) -> list[str]:
+    """선택지 — 언어를 정해 넘긴다. 순서는 두 언어가 같아야 한다(`answer_index` 공유)."""
+    return list((q.get("choices_en") if lang != DEFAULT_LANG else q.get("choices")) or [])
+
+
+def quiz_explanation(q: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
+    """해설 — 언어를 정해 넘긴다."""
+    return str((q.get("explanation_en") if lang != DEFAULT_LANG
+                else q.get("explanation_ko")) or "")
+
+
+def _quiz_question_view(q: dict[str, Any], tr: Translator = _KO,
+                        lang: str = DEFAULT_LANG,
+                        glossary_link: bool = True) -> dict[str, Any]:
     """문항 1건 → 렌더 뷰모델. 값(질문/선택지/정답/해설)은 무변형, 파생은 난이도 라벨과
     근거 링크 구성뿐. glossary 는 자체 용어사전 딥링크 id(무변형 통과 — 템플릿이 rel_root
-    로 조립), brief/finding 은 공개 URL(_safe_url 스킴 게이트만). 순수·결정론."""
+    로 조립), brief/finding 은 공개 URL(_safe_url 스킴 게이트만). 순수·결정론.
+
+    ★본문 세 필드는 **여기서 언어가 확정된다**(`question`·`choices`·`explanation`) —
+      템플릿이 `question_ko` 로 데이터에 직접 손을 뻗으면 영어 셸에 한국어 본문이 실린다
+      (README 불변식 #13. 이 저장소가 세 번 밟은 자리다).
+    ★`glossary_link=False` 는 **그 언어 트리에 용어사전 페이지가 없다**는 뜻이다. 없는
+      페이지로 보내는 링크는 무링크보다 나쁘므로 근거 링크를 통째로 접는다(라벨은 남아
+      출처가 용어사전이라는 사실은 그대로 보인다).
+    """
     st = q.get("source_type", "")
     ref = str(q.get("source_ref") or "")
     is_glossary = st == "glossary"
@@ -2689,16 +2742,17 @@ def _quiz_question_view(q: dict[str, Any], tr: Translator = _KO) -> dict[str, An
     source_kind = _QUIZ_SOURCE_KIND.get(st)
     return {
         "id": q.get("id", ""),
-        "question_ko": q.get("question_ko", ""),
-        "choices": list(q.get("choices") or []),
+        "question": quiz_question_text(q, lang),
+        "choices": quiz_choices(q, lang),
         "answer_index": q.get("answer_index"),
-        "explanation_ko": q.get("explanation_ko", ""),
+        "explanation": quiz_explanation(q, lang),
         "difficulty": difficulty,
         "difficulty_label": tr(difficulty_label) if difficulty_label else difficulty,
         "source_type": st,
         "source_kind": tr(source_kind) if source_kind else st,
         # glossary → 용어사전 앵커 id(템플릿이 rel_root+glossary/#id 로 조립), 그 외는 "".
-        "source_glossary_id": ref if is_glossary else "",
+        # 그 트리에 용어사전이 없으면 "" — 없는 페이지로 보내지 않는다(위 docstring).
+        "source_glossary_id": ref if (is_glossary and glossary_link) else "",
         # brief/finding → 공개 절대 URL(스킴 화이트리스트 통과분만; 비허용은 ""→링크 생략).
         "source_url": (_safe_url(ref) if not is_glossary else ""),
         # [9차 G3] week(YYYYWW) — 월 13:00 자동 생성 파이프라인이 붙이는 선택 필드. 있으면
@@ -2708,11 +2762,20 @@ def _quiz_question_view(q: dict[str, Any], tr: Translator = _KO) -> dict[str, An
     }
 
 
-def build_quiz_view(bank: list[dict[str, Any]], tr: Translator = _KO) -> dict[str, Any]:
+def build_quiz_view(bank: list[dict[str, Any]], tr: Translator = _KO,
+                    lang: str = DEFAULT_LANG,
+                    glossary_link: bool = True) -> dict[str, Any]:
     """문항 뱅크 → 렌더 뷰모델(무변형 — 값 재작성 0). 전 문항을 뱅크 순서 그대로 embed
     (클라이언트 결정론 회전용). 난이도 집계는 클라이언트 주차 회전이 easy 과반·normal 1~2
-    구성을 맞추는 데 쓰는 파생 메타다."""
-    questions = [_quiz_question_view(q, tr) for q in bank]
+    구성을 맞추는 데 쓰는 파생 메타다.
+
+    ★기본 언어가 아니면 **영문 세 필드가 다 있는 문항만** 남는다(`quiz_has_english`).
+      반쪽 영어를 내느니 그 문항을 빼는 쪽이 맞다 — 브리프의 `brief_has_english` 와 같은
+      규율이다. 남은 문항이 0이면 호출부가 페이지를 내지 않는다(빈 퀴즈 금지).
+    """
+    if lang != DEFAULT_LANG:
+        bank = [q for q in bank if quiz_has_english(q)]
+    questions = [_quiz_question_view(q, tr, lang, glossary_link) for q in bank]
     easy_total = sum(1 for q in questions if q["difficulty"] == "easy")
     return {
         "questions": questions,
@@ -2841,7 +2904,18 @@ EN_TREE_STATIC: tuple[str, ...] = (
     "findings/inspector/",
     "library/",
     "glossary/",
+    # [다국어 2026-09-05] 이용안내·주간 퀴즈 — 정본이 영어로 **따로 있는** 면이다.
+    # 아래 EN_TREE_DATA_GATED 참조: 정본이 없으면 이 두 줄은 집합에서 빠진다.
+    "guide/",
+    "quiz/",
 )
+
+
+# ★위 목록 중 **데이터가 있어야 서는** 경로. 자료실 카탈로그가 그렇듯, 낼 수 있는지는
+#   선언이 아니라 데이터가 정한다 — 정본 파일이 없는데 선언만 남으면 nav·푸터·sitemap 이
+#   404 를 광고한다(이 저장소가 "손목록 금지"로 굳힌 자리). 선언은 위 한 곳에 두되
+#   `en_tree_paths()` 가 실제 가용성으로 걸러 내보낸다.
+EN_TREE_DATA_GATED: frozenset[str] = frozenset({"guide/", "quiz/"})
 
 
 # ★sitemap 에서 빼는 경로 — 한국어 트리와 **같은 정책**이어야 한다. 실사관 프로파일은
@@ -2872,13 +2946,30 @@ def clause_tree_paths(views: "list[dict[str, Any]] | None") -> "set[str]":
     return {"findings/clause/"} | {f"findings/clause/{c['slug']}/" for c in views}
 
 
-def en_tree_paths(catalogs: "list[dict[str, Any]] | None" = None) -> set[str]:
+def en_tree_paths(catalogs: "list[dict[str, Any]] | None" = None, *,
+                  guide_en: "str | None" = None,
+                  quiz_en: "list[dict[str, Any]] | None" = None) -> set[str]:
     """영어 트리 경로 집합 — 정적 목록 + 실제로 로드된 자료실 카탈로그.
 
     카탈로그는 데이터 파일이 있는 것만 렌더되므로(`load_library`), 그 결과에서 파생해야
     "sitemap 에는 있는데 파일이 없다"가 생기지 않는다(손목록 금지 규율).
+
+    ★`guide_en`·`quiz_en` 은 **렌더가 실제로 쓸 값 그대로** 받는다(본문 md·문항 뱅크).
+      "있다/없다"를 호출부가 따로 판단해 boolean 으로 넘기면 그 판단이 렌더의 판단과
+      갈라질 수 있다 — 같은 값을 보게 해서 갈라질 자리를 없앤다. 기본값(None)은 정본
+      부재와 같으므로, 이 인자를 모르는 호출부는 두 면을 선언하지 않는다.
     """
-    return set(EN_TREE_STATIC) | {
+    available = {
+        "guide/": bool(guide_en),
+        "quiz/": any(quiz_has_english(q) for q in (quiz_en or [])),
+    }
+    # 선언(EN_TREE_DATA_GATED)과 판정(available)이 갈라지면 즉시 실패한다 — 게이트 목록에
+    # 경로만 늘리고 판정을 안 붙이면 그 면은 **정본 없이도 광고된다**(조용한 404). 반대로
+    # 판정만 남기고 목록에서 빼면 영영 안 걸린다. 둘을 여기서 맞물려 둔다.
+    if set(available) != EN_TREE_DATA_GATED:
+        raise ValueError(
+            f"게이트 선언과 판정이 갈라졌다: {sorted(EN_TREE_DATA_GATED)} vs {sorted(available)}")
+    return {p for p in EN_TREE_STATIC if available.get(p, True)} | {
         f"library/{v['slug']}/" for v in (catalogs or [])}
 
 
@@ -3837,8 +3928,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 랜딩 카드·자료실 허브·아카이브 스트립이
     # 함께 쓰므로 세 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
     catalogs = load_library(tr=tr)
+    # [이용안내·주간 퀴즈] 정본은 **경로 집합을 정하기 전에** 읽는다 — 영어판을 낼 수
+    # 있는지가 이 두 값에 달려 있고(en_tree_paths), 그 판단과 실제 렌더가 **같은 값**을
+    # 봐야 "선언에는 있는데 페이지가 없다"가 생기지 않는다. 파일 읽기뿐이라 비용 0.
+    guide_md = load_guide()
+    guide_md_en = load_guide(GUIDE_EN_FILE)
+    quiz_bank = load_quiz_bank()
     # [다국어 3단계] 영어 트리 경로 확정 — 여기부터 모든 렌더가 이 집합을 본다(위 선언 참조).
-    en_paths = en_tree_paths(catalogs)
+    en_paths = en_tree_paths(catalogs, guide_en=guide_md_en, quiz_en=quiz_bank)
     library_updates = load_library_updates(catalogs)
     # [브리프 자료실 스트립] load_library_updates() 는 "최신 1건"만 보므로 브리프
     # 상세(과거 특정 주간)에는 못 쓴다 — 이력 전체를 한 번 더 확보해 브리프 루프에서
@@ -3863,7 +3960,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [조항 페이지] 조항 뷰는 **용어사전보다 먼저** 만든다 — 용어사전의 "관련 조항"이
     # 실제로 만들어진 조항 페이지에만 링크를 걸어야 하기 때문(없는 페이지로 보내는 링크는
     # 무링크보다 나쁘다). 커밋 정본 3종에서만 파생하므로 네트워크·순서 부담 0.
-    clause_views = build_clause_views(docs_data, load_cfr_catalog(), load_glossary())
+    # 용어사전 정본은 한 번만 읽어 조항 뷰와 용어사전 페이지가 **같은 값**을 본다(종전에는
+    # 여기서 한 번, 아래 페이지에서 또 한 번 읽었다). 이용안내·퀴즈의 "용어사전으로 가는
+    # 링크"도 이 값이 정한다 — 페이지가 서지 않으면 링크도 걸지 않는다.
+    glossary_terms = load_glossary()
+    clause_views = build_clause_views(docs_data, load_cfr_catalog(), glossary_terms)
     clause_slugs = {c["slug"] for c in clause_views}
     # [다국어 2026-09-04] 영어판 조항 — **원문이 영어인 지적만** 다시 세어 만든다.
     # 문서 임계(CLAUSE_MIN_DOCUMENTS)를 그대로 다시 적용하므로 영어 모집단에서 얇아진
@@ -4157,7 +4258,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # 이용 안내(트랙 C 2차 웨이브) — guide_content.md(정본)를 제한 md 서브셋으로 결정론
     # 렌더. 라이브 데이터가 아니라 커밋 콘텐츠라 골든으로 고정된다. 파일 부재 시 조용히 생략.
-    guide_md = load_guide()
+    # (정본 로드는 위 en_paths 확정 자리에서 이미 했다 — 같은 값을 두 번 읽지 않는다.)
     if guide_md:
         guide_title, guide_toc, guide_body = render_guide_html(guide_md)
         emit("guide.html", page("guide/"),
@@ -4167,12 +4268,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             guide_title=guide_title,
             guide_toc=guide_toc,
             guide_body=guide_body,
+            glossary_link=bool(glossary_terms),
         )
 
     # 용어사전(트랙 C 2차 웨이브) — glossary.json(정본)을 초성 색인 1페이지로 결정론 렌더.
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.
     # nav_active="glossary"(8차 웨이브 A 2026-07-18 — nav 에 용어사전 전용 탭 신설).
-    glossary_terms = load_glossary()
     glossary_term_ids: list[str] = []
     if glossary_terms:
         # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
@@ -4851,13 +4952,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전
     # 선택한다(같은 주 = 전 직원 동일 세트). 파일 부재 시 조용히 생략.
-    quiz_bank = load_quiz_bank()
+    # (정본 로드는 위 en_paths 확정 자리에서 이미 했다 — 같은 값을 두 번 읽지 않는다.)
     if quiz_bank:
         emit("quiz.html", page("quiz/"),
             page_title=tr("주간 퀴즈 · GRM"),
             nav_active="guide",
             description=tr(QUIZ_DESCRIPTION),
-            quiz=build_quiz_view(quiz_bank, tr),
+            quiz=build_quiz_view(quiz_bank, tr,
+                                 glossary_link=bool(glossary_terms)),
         )
 
     # 검색 인덱스(P4 — 정적 클라이언트사이드 검색용). assets 옆에 둔다(archive.js 가 fetch).
@@ -5032,6 +5134,39 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             nav_active="library",
             description=v["desc"],
             lib=v,
+        )
+
+    # [다국어 2026-09-05] 이용 안내 — 영문 정본(`guide_content_en.md`)이 있을 때만 낸다.
+    # **번역이 아니라 같은 문서의 다른 언어 정본**이라 한국어 본문을 대신 끼우지 않는다
+    # (끼우면 영어 셸에 한국어 산문 12,000자가 그대로 실린다 — 불변식 #13 이 말하는 자리).
+    # 파일이 없으면 조용히 0장이고, 그 경우 en_paths 에도 없어 nav·푸터·sitemap 이 함께
+    # 접힌다(위 en_tree_paths — 선언과 산출이 한 값에서 나온다).
+    if guide_md_en:
+        en_guide_title, en_guide_toc, en_guide_body = render_guide_html(guide_md_en)
+        en_emit("guide.html", en_page("guide/"),
+            page_title=en_tr("이용 안내 · GRM"),
+            nav_active="guide",
+            description=en_tr(GUIDE_DESCRIPTION),
+            guide_title=en_guide_title,
+            guide_toc=en_guide_toc,
+            guide_body=en_guide_body,
+            # 영어 트리에는 용어사전이 없다 — 없는 페이지로 보내는 상자를 그리지 않는다.
+            glossary_link="glossary/" in en_paths,
+        )
+
+    # [다국어 2026-09-05] 주간 퀴즈 — 영문 세 필드가 다 있는 문항만(`quiz_has_english`).
+    # 남은 문항이 0이면 페이지를 내지 않는다(빈 퀴즈 금지 = 빈 상자 금지 원칙).
+    # ★뱅크가 두 언어에서 같은 순서·같은 `answer_index` 를 쓰므로, 영어에서 문항이 빠지면
+    #   클라이언트 주차 회전이 뽑는 세트가 한국어와 달라질 수 있다 — 채점은 문항 안에서
+    #   끝나므로 정합성 문제는 없고, 두 언어가 같은 주에 같은 문제를 풀려면 뱅크를 전부
+    #   채워 두면 된다(현재 정본은 전량 영문이 있어 두 트리의 세트가 같다).
+    if quiz_bank and "quiz/" in en_paths:
+        en_emit("quiz.html", en_page("quiz/"),
+            page_title=en_tr("주간 퀴즈 · GRM"),
+            nav_active="guide",
+            description=en_tr(QUIZ_DESCRIPTION),
+            quiz=build_quiz_view(quiz_bank, en_tr, "en",
+                                 glossary_link="glossary/" in en_paths),
         )
 
     # 검색 노출(robots.txt + sitemap.xml) — 정적·결정론(입력 publish_date 파생).
@@ -5273,6 +5408,35 @@ def validate_brief_en_facts(briefs: list[dict[str, Any]]) -> list[str]:
                 violations.append(
                     f"{label} / card {card.get('id', '?')}: EN_INVENTED_NUMBER "
                     f"{invented[:6]}")
+    return violations
+
+
+def validate_quiz_en_facts(bank: list[dict[str, Any]]) -> list[str]:
+    """[다국어 2026-09-05] 영문 퀴즈 사실 일치 게이트 — **지어내지 않기**.
+
+    `validate_brief_en_facts` 와 같은 검사를 문항 단위로 건다. 허용 수치는 **그 문항의
+    한국어 세 필드**(지문·선택지·해설)에 실제로 있는 값뿐이다 — 다른 문항이나 URL 에서
+    빌려오지 않는다. 퀴즈는 정답이 걸린 글이라, "어디선가 본 숫자"가 아니라 이 문항이
+    말한 숫자만 말해야 한다.
+
+    ★방향은 비대칭이다 — 영문이 한국어에 없는 수치를 말하면 위반이고, 한국어에 있는
+      수치를 영문이 빼는 것은 위반이 아니다(요약은 덜 말할 수 있다).
+    ★한 자리 수는 대조하지 않는다(`_fact_numbers` — 영어가 'seven observations' 처럼
+      풀어 쓰는 일이 잦아 오탐이 된다).
+    """
+    violations: list[str] = []
+    for q in bank:
+        if not any(q.get(f) for f in QUIZ_EN_FIELDS):
+            continue
+        allowed = _fact_numbers(
+            [q.get("question_ko", ""), q.get("explanation_ko", "")]
+            + list(q.get("choices") or []))
+        invented = sorted(_fact_numbers(
+            [q.get("question_en", ""), q.get("explanation_en", "")]
+            + list(q.get("choices_en") or [])) - allowed)
+        if invented:
+            violations.append(
+                f"quiz {q.get('id', '?')}: EN_INVENTED_NUMBER {invented[:6]}")
     return violations
 
 

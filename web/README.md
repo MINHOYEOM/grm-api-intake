@@ -80,7 +80,7 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    데이터 비교값(`it.state == '신규'`)만 `i18n-ignore` 마커로 면제. Admin 콘솔은 대상 밖(한국어 고정).
 7. **영어 트리 `/en/` 은 본문이 영어로 성립하는 면만 낸다(2026-09-04, 다국어 3단계)** —
    낼 집합의 단일 원천은 `render.en_tree_paths()`(정적 목록 `EN_TREE_STATIC` + 실제 로드된
-   자료실 카탈로그). nav·푸터·언어 전환·hreflang·sitemap 이 **전부 이 집합 하나**를 본다.
+   자료실 카탈로그 + **정본이 실제로 있는 이용안내·주간 퀴즈** — 2026-09-05). nav·푸터·언어 전환·hreflang·sitemap 이 **전부 이 집합 하나**를 본다.
    지적 본문은 언어별로 우선순위가 뒤집힌다(`grm_i18n.JS_BODY_SHIM` 의 `_bodyText`/`_altText`
    — 영어판은 규제기관 원문 `finding_text` 가 앞, 한국어판은 `finding_text_ko` 가 앞).
    짝이 없는 면에는 hreflang·언어 전환을 **달지 않는다**. 검증 = `WebEnTreeTest`.
@@ -175,6 +175,19 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    안 된다", "영어 페이지의 상대 링크는 해석 결과가 `en/` 안에 있어야 한다". 예외를 둘
    때는 **예외가 실제로 걸렸는지 세어** 확인한다(마크업이 바뀌어 예외 정규식이 아무것도
    못 잡으면 검사는 조용히 통과한다).
+17. **본문이 데이터에 있는 면은 그 데이터가 영어로 있어야 영어판이 선다(2026-09-05)** —
+   이용안내(`web/data/guide_content_en.md`)와 주간 퀴즈(뱅크의 `question_en`·`choices_en`·
+   `explanation_en`)가 그렇다. 문구 사전은 **셸**을 번역할 뿐 본문을 만들지 않는다.
+   ★영문 이용안내는 번역 파일이 아니라 **같은 h2 순서의 다른 정본**이다 — 목차가 h2 에서
+   결정론 파생되므로 구조가 어긋나면 두 언어판의 `#sec-N` 딥링크가 서로 다른 절을 가리킨다.
+   ★퀴즈는 **셋을 전부 채우거나 전부 비운다**(반쪽 영어 금지 — 불변식 #9 와 같은 규율).
+   `choices_en` 은 `choices` 와 **같은 길이·같은 순서**여야 한다: `answer_index` 는 두 언어가
+   공유하는 **하나의 값**이라 순서가 바뀌면 화면은 멀쩡한데 채점만 조용히 틀린다. 길이는
+   `quiz_lint.py`(EN_CHOICES_LEN)와 `web/quiz_en_merge.py` 가 막지만 **순서는 기계가 볼 수 없다** —
+   병합기가 정답 줄을 두 언어로 나란히 찍어 사람이 본다.
+   ★정본이 없으면 **조용히 0장**이고 `en_tree_paths()` 선언에서도 함께 빠진다(불변식 #7).
+   생성 경로가 하나 더 생기면 게이트도 하나 더 — `validate_quiz_en_facts` 가 `EN_INVENTED_NUMBER`
+   로 막는다(불변식 #9 의 브리프판과 같은 비대칭 검사).
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

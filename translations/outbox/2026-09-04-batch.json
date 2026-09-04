@@ -1,0 +1,140 @@
+[
+  {
+    "finding_id": "finding-1d680fe257173e6c5f86e41c",
+    "finding_text": "제조 기타 [별표 1] 6.4 [별표 1의2] 12.4 세척밸리데이션 시 적절한 세척, 채취방법을 설정할 것",
+    "finding_text_ko": "제조 부문 지적사항이다. [별표 1] 6.4 및 [별표 1의2] 12.4에 따라 세척밸리데이션(cleaning validation) 수행 시 적절한 세척방법과 검체 채취방법을 설정해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-30fc350c1e1cbdca2618e543",
+    "finding_text": "Fairlue to appropriately and regularly clean and disinfect or sterilize equipment located in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에 위치한 장비를 적절하게, 그리고 정기적으로 세척하고 소독 또는 멸균하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-545f89f75f4ce02164741351",
+    "finding_text": "기타 세척밸리데이션 시 적절한 검체 채취방법을 설정할 것",
+    "finding_text_ko": "기타 항목이다. 세척밸리데이션(cleaning validation) 수행 시 적절한 검체 채취방법을 설정해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5c57fc8e63745a823ce53727",
+    "finding_text": "기타 모든 세척방법에 대한 밸리데이션을 실시할 것",
+    "finding_text_ko": "기타 항목이다. 모든 세척방법에 대하여 밸리데이션(validation)을 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-649e58f3ab667c984ad39077",
+    "finding_text": "제조 기타 [별표 1의2] 12.4 제조설비 및 도구에 대하여 세척벨리데이션을 실시할 것",
+    "finding_text_ko": "제조 부문 지적사항이다. [별표 1의2] 12.4에 따라 제조설비 및 도구에 대하여 세척밸리데이션(cleaning validation)을 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7702b7c6e0912907c7730916",
+    "finding_text": "기타 생산 설비에 대한 세척 밸리데이션을 실시할 것",
+    "finding_text_ko": "기타 항목이다. 생산 설비에 대하여 세척밸리데이션(cleaning validation)을 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7c4da6ba80acc9f9d20bef0b",
+    "finding_text": "기타 장비의 가동범위을 모두 포함하여 적격성평가를 실시할 것",
+    "finding_text_ko": "기타 항목이다. 장비의 가동범위를 모두 포함하여 적격성평가(qualification)를 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7dcbcdbc0472f01ab505d0c8",
+    "finding_text": "Beta-lactam drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination.",
+    "finding_text_ko": "베타락탐(beta-lactam) 제제를 제조하면서 교차오염(cross-contamination)을 방지하기 위한 적절한 격리(containment), 구획 분리(segregation), 그리고/또는 작업 표면·기구·작업자에 대한 세척을 제공하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b6811b55f13e25864022484",
+    "finding_text": "기타 [별표 1의2] 12.2 제조공정이 일관되게 유지되고 있음을 검증할 것",
+    "finding_text_ko": "기타 항목이다. [별표 1의2] 12.2에 따라 제조공정이 일관되게 유지되고 있음을 검증해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-99ae42b0587fa5d434228d19",
+    "finding_text": "시험실 기타 [별표 1] 7.1 제품과 접촉하는 질소가스의 품질관리 절차를 마련할 것",
+    "finding_text_ko": "시험실 부문 지적사항이다. [별표 1] 7.1에 따라 제품과 접촉하는 질소가스의 품질관리 절차를 마련해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9b1be79ab174f3567c82ef40",
+    "finding_text": "포장표시 기타 [별표 1의2] 9 표시재료 사용 전 점검절차를 마련할 것",
+    "finding_text_ko": "포장·표시 부문 지적사항이다. [별표 1의2] 9에 따라 표시재료를 사용하기 전 점검절차를 마련해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a529d333f1eece87713d2b9e",
+    "finding_text": "기타 [별표 1의2] 5 장비의 가동범위을 모두 포함하여 적격성평가를 실시할 것",
+    "finding_text_ko": "기타 항목이다. [별표 1의2] 5에 따라 장비의 가동범위를 모두 포함하여 적격성평가(qualification)를 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a534634de060f8445d97348a",
+    "finding_text": "시설장비 기타 [별표 1] 2.2 자동화장치 등 모든 기록은 저장 및 보관할 것",
+    "finding_text_ko": "시설·장비 부문 지적사항이다. [별표 1] 2.2에 따라 자동화장치 등의 모든 기록을 저장 및 보관해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a77ca47ec523bd5e5203e70f",
+    "finding_text": "기타 반제품 보관기간의 타당성을 예측적으로 평가할 것",
+    "finding_text_ko": "기타 항목이다. 반제품 보관기간의 타당성을 예측적으로 평가해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c6e845e46a8f90f0d7156375",
+    "finding_text": "기타 [별표 1] 8.1 [별표 1의2] 8.1 반제품 보관기간의 타당성을 입증할 것",
+    "finding_text_ko": "기타 항목이다. [별표 1] 8.1 및 [별표 1의2] 8.1에 따라 반제품 보관기간의 타당성을 입증해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c900c085caf21c0f92c6bf88",
+    "finding_text": "시설장비 기타 [별표 1의2] 5 제조 및 시험에 사용하는 중요 장비의 교정을 실시할 것",
+    "finding_text_ko": "시설·장비 부문 지적사항이다. [별표 1의2] 5에 따라 제조 및 시험에 사용하는 중요 장비의 교정(calibration)을 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f0f74415d1ca1b5145527374",
+    "finding_text": "Microbial contamination was present in the.",
+    "finding_text_ko": "미생물 오염(microbial contamination)이 확인되었다. (원문이 문장 중간에서 절단되어 있어 오염이 확인된 대상은 원문에 기재되어 있지 않다.)",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fdf183ba11adbdafcac3cd15",
+    "finding_text": "1.폴메디슨미백실버라차치약: 품질부적합(함량시험 2) 과산화수소(35%), pH3.75)",
+    "finding_text_ko": "1. 폴메디슨미백실버라차치약: 품질부적합에 해당한다. 함량시험 2) 과산화수소(35%), pH 3.75 항목에서 부적합이 확인되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ffd6309f14029b2e2c85c3d1",
+    "finding_text": "기타 [별표 1의2] 8.1 반제품 보관기간의 타당성을 입증할 것",
+    "finding_text_ko": "기타 항목이다. [별표 1의2] 8.1에 따라 반제품 보관기간의 타당성을 입증해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-13184a20c520c8e22e6a9707",
+    "finding_text": "○ 경인지방식품의약품안전청장의 시험검사 명령에 따라 식품의약품안전처장이 지정하는 의약품 등 시험·검사기관에서 의약품을 검사한 후 그 결과를 제출하여야 함에도 불구하고, ‘노텍정(세티리진염산염)’ 등 9품목*에 대하여 시험검사를 실시하지 않거나 그 결과를 제출하지 않은 사실이 있음 * (1차 위반) 노텍정(세티리진염산염), 하이타민골드정, 탄시나정, 하이드로핀정(펠로디핀), 헤파코엔정, 싸이베린정, 멀티브큐골드정 * (2차 위반) 이모나캡슐, 리치정",
+    "finding_text_ko": "경인지방식품의약품안전청장의 시험검사 명령에 따라 식품의약품안전처장이 지정하는 의약품 등 시험·검사기관에서 의약품을 검사한 후 그 결과를 제출하여야 함에도 불구하고, ‘노텍정(세티리진염산염)’ 등 9품목에 대하여 시험검사를 실시하지 않거나 그 결과를 제출하지 않은 사실이 확인되었다. 해당 9품목은 다음과 같다. (1차 위반) 노텍정(세티리진염산염), 하이타민골드정, 탄시나정, 하이드로핀정(펠로디핀), 헤파코엔정, 싸이베린정, 멀티브큐골드정. (2차 위반) 이모나캡슐, 리치정.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8410d29c208b98443b43e0f5",
+    "finding_text": "레파넘정1밀리그램(레파글리니드): 불순물(N-nitroso-meglumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "레파넘정1밀리그램(레파글리니드)에서 불순물 N-nitroso-meglumine이 기준을 초과하여 검출되었다. 이에 따라 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e3aad6a65f3de3ace505d96c",
+    "finding_text": "레파넘정2밀리그람(레파글리니드): 불순물(N-nitroso-meglumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "레파넘정2밀리그람(레파글리니드)에서 불순물 N-nitroso-meglumine이 기준을 초과하여 검출되었다. 이에 따라 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f621bcc5fce59209af5f0e98",
+    "finding_text": "레파넘정0.5밀리그램(레파글리니드): 불순물(N-nitroso-meglumine) 초과 검출에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "레파넘정0.5밀리그램(레파글리니드)에서 불순물 N-nitroso-meglumine이 기준을 초과하여 검출되었다. 이에 따라 시중 유통품에 대하여 영업자 회수를 실시하였다.",
+    "translation_method": "llm_assisted"
+  }
+]

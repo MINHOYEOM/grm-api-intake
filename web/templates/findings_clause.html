@@ -65,7 +65,7 @@
             <span class="fx-case-f">{{ s.firm_name }}</span>
             <span class="fx-case-d">{{ s.published_date }}</span>
           </div>
-          <p class="fx-case-t">{{ s.text_ko }}</p>
+          <p class="fx-case-t">{{ s.body }}</p>
           {%- if s.doc_slug %}
           <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">{{ _('이 문서의 지적 전체 보기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
           {%- endif %}
@@ -84,7 +84,7 @@
     <section class="fx-sec">
       <h2 class="fx-sec-h">{{ _('이 조항과 관련된 용어') }}</h2>
       <div class="fx-sibs">
-        {%- for t in clause.terms %}<a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a>{% endfor %}
+        {%- for t in clause.terms %}<a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.label }}</a>{% endfor %}
       </div>
     </section>
     {% endif %}

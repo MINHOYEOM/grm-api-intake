@@ -1,7 +1,11 @@
 name: GRM CI (compile + tests)
 
 # push/PR 마다 py_compile + unittest 실행 — 회귀 게이트.
-# 수집/Notion 호출 없음(네트워크 불필요), 정상 실행 ~5분(스위트 성장, 2026-08 실측 4m40s).
+# 수집/Notion 호출 없음(네트워크 불필요).
+# 소요 실측: 2026-08 4m40s → 2026-09-04 **9m50s(5,392건)**. 스위트가 반년도 안 돼
+# 두 배가 됐고, 10분 상한에 걸려 **테스트가 OK 를 찍은 직후 잡이 cancelled** 됐다
+# (초록 로그 + 빨간 체크 — 원인을 헷갈리기 딱 좋은 실패 모양이다). 상한은 '멈춘 잡'을
+# 잡으라고 있는 것이지 정상 실행을 자르라고 있는 것이 아니므로 현 소요의 약 2배로 둔다.
 on:
   push:
     branches: ['**']
@@ -14,7 +18,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

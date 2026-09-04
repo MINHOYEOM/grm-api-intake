@@ -170,12 +170,23 @@ def _safe_url(u: str) -> str:
     return u if (u or "").strip().lower().startswith(_SAFE_URL_PREFIXES) else ""
 
 
-def _brief_title(brief_meta: dict[str, Any]) -> str:
+def _brief_tldr(brief_meta: dict[str, Any], lang: str = DEFAULT_LANG) -> list[str]:
+    """[다국어 5단계] 읽는 언어의 요약 세 줄.
+
+    ★영어판은 `brief.en.tldr` 만 본다 — 없으면 **빈 리스트**다. 한국어를 대신 끼워 넣으면
+      제목·description·본문이 조용히 한국어가 된다(영어 화면에 한국어 = 반쪽 영어 금지).
+    """
+    key = brief_meta if lang == DEFAULT_LANG else (brief_meta.get("en") or {})
+    return [t for t in (key.get("tldr") or []) if str(t).strip()]
+
+
+def _brief_title(brief_meta: dict[str, Any], tr: Translator = _KO,
+                 lang: str = DEFAULT_LANG) -> str:
     """아카이브/표지 제목 = tldr[0] 있으면 사용, 없으면 날짜 파생(§1.b)."""
-    tldr = brief_meta.get("tldr") or []
-    if tldr and tldr[0]:
+    tldr = _brief_tldr(brief_meta, lang)
+    if tldr:
         return tldr[0]
-    return title_dateform(brief_meta.get("publish_date", ""))
+    return title_dateform(brief_meta.get("publish_date", ""), tr)
 
 
 def _card_anchor(card: dict[str, Any]) -> str:
@@ -313,7 +324,45 @@ def split_gmp_operations(text: str) -> list[dict[str, Any]]:
 
 
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
-def _card_view(card: dict[str, Any], tr: Translator = _KO) -> dict[str, Any]:
+def card_has_english(card: dict[str, Any]) -> bool:
+    """[다국어 5단계] 이 카드를 영어로 낼 수 있는가 — 서사 다섯이 **전부** 있는가.
+
+    ★부분 충족은 실패로 친다. 다섯 중 넷만 영어면 화면에 한국어 한 문단이 섞이는데,
+      그건 번역 누락처럼 보이고 실제로도 그렇다. 반쪽짜리 영어 카드는 만들지 않는다.
+    """
+    en = card.get("en")
+    if not isinstance(en, dict):
+        return False
+    for field in CARD_NARRATIVE_FIELDS:
+        value = en.get(field)
+        if isinstance(value, list):
+            if not [v for v in value if str(v).strip()]:
+                return False
+        elif not str(value or "").strip():
+            return False
+    return True
+
+
+def brief_has_english(brief: dict[str, Any]) -> bool:
+    """브리프 한 호를 영어로 낼 수 있는가 — `tldr` 과 **렌더되는 카드 전부**가 영어인가.
+
+    한 장이라도 빠지면 그 호는 영어로 내지 않는다. 카드가 목차·앵커로 서로 엮여 있어
+    일부만 빼면 목차가 없는 카드를 가리키게 되고, 남은 한국어 카드는 영어 독자에게
+    "고장난 페이지"로 읽힌다(설계 문서 §4 "지어내지 않기"와 같은 결의 판단).
+    """
+    en_meta = (brief.get("brief") or {}).get("en") or {}
+    if not [t for t in (en_meta.get("tldr") or []) if str(t).strip()]:
+        return False
+    cards = [c for c in (brief.get("cards") or []) if _is_renderable(c)]
+    return bool(cards) and all(card_has_english(c) for c in cards)
+
+
+def _card_view(card: dict[str, Any], tr: Translator = _KO,
+               lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    # [다국어 5단계] 서사 다섯은 언어에 따라 **다른 출력**을 쓴다(번역이 아니라 같은
+    # 요약의 다른 언어판 — 설계 문서 §4). 영어 슬롯이 없으면 한국어 그대로다.
+    if lang != DEFAULT_LANG and card_has_english(card):
+        card = {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
     quotes_in = card.get("quotes") or []
     multi = len(quotes_in) > 1
     any_trans = any(q.get("translation") for q in quotes_in)  # null·"" 둘 다 falsy
@@ -363,11 +412,14 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO) -> dict[str, Any]:
     return {
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
+        # ★`group` 은 **데이터 값**이다(섹션 묶기·정렬 키) — 번역하면 묶임이 깨진다.
+        #   화면에 보이는 것은 `group_label` 이므로 그쪽만 언어를 탄다.
         "group": card.get("group"),
-        "group_label": card.get("group_label"),
+        "group_label": tr(card["group_label"]) if card.get("group_label") else
+                       card.get("group_label"),
         "group_head": None,                            # 섹션 조립 시 결정
         "is_evA": card.get("evidence_level") == "A",
-        "card_type": card.get("card_type", ""),
+        "card_type": tr(card["card_type"]) if card.get("card_type") else "",
         "agency": card.get("agency", ""),
         "headline_target": card.get("headline_target", ""),
         "title_issue": card.get("title_issue", ""),
@@ -376,10 +428,12 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO) -> dict[str, Any]:
         "signal_label": card.get("signal_label", ""),
         "signal_tier": card.get("signal_tier", ""),
         "sig_color": SIG_COLOR.get(card.get("signal_label"), "var(--lo)"),
-        "modality": card.get("modality"),
-        "type_tag": card.get("type_tag"),
+        "modality": tr(card["modality"]) if card.get("modality") else card.get("modality"),
+        "type_tag": tr(card["type_tag"]) if card.get("type_tag") else card.get("type_tag"),
         "summary": card.get("summary", ""),
-        "facts": [{"label": f.get("label", ""),
+        # ★`mono` 판정은 **원본 라벨**로 한다 — 번역된 라벨로 보면 한글 상수 집합과
+        #   영영 안 맞아 날짜 칸의 모노 서체가 조용히 사라진다.
+        "facts": [{"label": tr(f["label"]) if f.get("label") else "",
                    "value": f.get("value", ""),
                    "mono": f.get("label", "") in MONO_LABELS}
                   for f in (card.get("facts") or [])],
@@ -461,7 +515,8 @@ def _is_renderable(card: dict[str, Any]) -> bool:
     return True
 
 
-def _build_sections(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _build_sections(card_views: list[dict[str, Any]],
+                    tr: Translator = _KO) -> list[dict[str, Any]]:
     """render_order 순 카드를 group(섹션)·group_label(소제목)별로 연속 묶음.
 
     재정렬 금지 — 입력 순서 그대로 인접 그룹핑(v4 JS 동치). 섹션 count 는 파생.
@@ -472,7 +527,10 @@ def _build_sections(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for cv in card_views:
         if cur is None or cv["group"] != cur["name"]:
             cur = {
-                "name": cv["group"],
+                # [다국어 5단계] 화면에 보이는 이름만 번역한다. `slug` 는 앵커 id 이자
+                # 딥링크(`#sec-글로벌`)라 **원본 값 그대로** — 번역하면 기존 링크가 죽고
+                # 두 언어판의 앵커가 갈라진다.
+                "name": tr(cv["group"]) if cv.get("group") else cv["group"],
                 "slug": cv["group"],                   # 앵커 id (HTML5 허용 — 한글 가능)
                 "icon": SECTION_ICON.get(cv["group"], _SECTION_ICON_DEFAULT),
                 "cards": [],
@@ -2017,6 +2075,29 @@ DATA_LABEL_KEYS: tuple[str, ...] = (
     N_("유럽 EMA"), N_("영국 MHRA"),
 )
 
+# [다국어 5단계 2026-09-04] 주간 브리프 카드가 **데이터로** 들고 오는 표시 라벨.
+# 위와 같은 이유로 여기에 등록한다(소스에 리터럴이 없어 추출기가 못 본다). 어휘가 닫혀
+# 있어야 영어 브리프가 성립하므로, 새 값이 들어오면 `WebEnBriefTest` 가 이름을 대며 실패한다.
+BRIEF_LABEL_KEYS: tuple[str, ...] = (
+    # card_type · type_tag — 카드 종류
+    N_("FDA 483 실사 관찰"), N_("GMP 비준수"), N_("GMP실사"), N_("UK GMP 비준수"),
+    N_("규제 소식"), N_("지침·안내서"), N_("행정처분"), N_("회수"), N_("회수·판매중지"),
+    N_("처분"), N_("주제"), N_("EU GMP 비준수"),
+    # group · group_label · modality — 묶음/제형
+    N_("국내"), N_("글로벌"), N_("💊 합성의약품"), N_("🧬 바이오의약품"), N_("▫️ 기타"),
+    # facts[].label — 표 라벨
+    N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
+    N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
+    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"),
+)
+
+# 카드에서 **언어에 따라 갈리는 서사 필드** — Routine 이 원문을 요약해 만든 산문이라
+# 번역이 아니라 **같은 요약의 다른 언어 출력**이다(설계 문서 §4). 영어판 카드는 이 다섯이
+# 전부 있어야 성립한다. 하나라도 비면 그 브리프는 영어로 내지 않는다(반쪽 영어 금지).
+CARD_NARRATIVE_FIELDS: tuple[str, ...] = (
+    "title_issue", "summary", "implication", "key_facts", "checks",
+)
+
 
 def finding_body(f: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
     """지적 본문 — **읽는 언어를 먼저**. 영어판은 규제기관 원문(`text_orig`), 한국어판은
@@ -2450,7 +2531,7 @@ def assign_issue_numbers(briefs: list[dict[str, Any]]) -> dict[str, int]:
 
 # ── 컨텍스트 빌더 ─────────────────────────────────────────────────────────────
 def _brief_context(brief: dict[str, Any], issue_no: int,
-                   tr: Translator = _KO) -> dict[str, Any]:
+                   tr: Translator = _KO, lang: str = DEFAULT_LANG) -> dict[str, Any]:
     bm = brief["brief"]
     # [업계 브리핑 노트 2026-07-13] resources 키 부재/빈값 → None(리스트 아님) — 템플릿의
     # `{% if brief.resources %}` 게이트가 그대로 False 라 partial 이 0바이트 렌더(하드 요구:
@@ -2464,14 +2545,15 @@ def _brief_context(brief: dict[str, Any], issue_no: int,
         "window": bm.get("window", ""),
         "title_dateform": title_dateform(bm.get("publish_date", ""), tr),
         "coverage": _norm_coverage(bm.get("coverage") or {}),
-        "tldr": bm.get("tldr") or [],
+        "tldr": _brief_tldr(bm, lang),
         "ai_disclosure": bool(bm.get("ai_disclosure")),
         "agencies": bm.get("agencies") or [],
         "resources": resources,
     }
 
 
-def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str) -> dict[str, Any]:
+def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str,
+               tr: Translator = _KO, lang: str = DEFAULT_LANG) -> dict[str, Any]:
     bm = brief["brief"]
     cov = _norm_coverage(bm.get("coverage") or {})
     pub = bm.get("publish_date", "")
@@ -2480,7 +2562,7 @@ def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str) -> dict[s
     return {
         "slug": pub,
         "issue_no": issue_no,
-        "title": _brief_title(bm),
+        "title": _brief_title(bm, tr, lang),
         "date": pub,
         "month": pub[:7],                          # YYYY-MM (publish_date 파생 — facet 기간)
         "agencies": agencies,                      # 칩(기관) per-tag 렌더(v2)
@@ -3138,10 +3220,11 @@ def _abs_url(rel_path: str = "") -> str:
     return f"{SITE_BASE_URL}/{rel_path}"
 
 
-def _brief_description(brief_meta: dict[str, Any], tr: Translator = _KO) -> str:
+def _brief_description(brief_meta: dict[str, Any], tr: Translator = _KO,
+                       lang: str = DEFAULT_LANG) -> str:
     """브리프 description = tldr[0] 있으면 사용, 없으면 날짜 파생 한 줄(결정론)."""
-    tldr = brief_meta.get("tldr") or []
-    if tldr and tldr[0]:
+    tldr = _brief_tldr(brief_meta, lang)
+    if tldr:
         return tldr[0]
     return tr("{date} 글로벌·국내 제약 GMP·품질 규제 소식.",
               date=title_dateform(brief_meta.get("publish_date", ""), tr))
@@ -3454,6 +3537,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 들어와 그 조건이 풀렸다. **원문이 실제로 영어인 문서만** 낸다(doc_is_english).
     en_docs = [d for d in (docs_data or {}).get("documents", []) if doc_is_english(d)]
     en_doc_slugs = {d["slug"] for d in en_docs}
+
+    # [다국어 5단계] 영문 브리프 — 서사 다섯과 tldr 이 전부 있는 호만. 오늘의 발행분에는
+    # 그 슬롯이 없어 빈 집합이고, 다음 주 발행부터 Routine 이 채우면 저절로 채워진다.
+    en_brief_slugs = {b["brief"].get("publish_date", "") for b in briefs
+                      if brief_has_english(b)}
+    en_brief_slugs.discard("")
+    if en_brief_slugs:
+        en_paths |= {f"briefs/{s}/" for s in en_brief_slugs}
+        en_paths.add("archive/")
     if en_docs:
         en_paths |= {f"findings/doc/{d['slug']}/" for d in en_docs}
         en_paths.add("findings/docs/")
@@ -3488,6 +3580,28 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
          for b in briefs),
         key=lambda r: r["date"], reverse=True,
     )
+    # [다국어 5단계] 영문 아카이브 — **영어로 낸 호만** 싣는다(없는 페이지로 보내는 링크
+    # 금지). 영문 브리프가 하나도 없으면 아카이브 자체를 만들지 않는다.
+    if en_brief_slugs:
+        # ★행을 **영어로 다시 만든다** — 한국어 행을 거르기만 하면 제목이 한국어 tldr[0]
+        #   그대로 실린다(`_brief_title` 은 요약 첫 줄을 제목으로 쓴다).
+        #   `latest`(이번 주 · LIVE)는 **전체 최신호** 기준 그대로다 — 영어로 낸 호 중
+        #   가장 최근이라는 이유로 지난 호에 "이번 주" 배지를 달 수는 없다.
+        en_issues = sorted(
+            (_issue_row(b, issue_no_by_date[b["brief"].get("publish_date", "")],
+                        latest_slug, en_tr, "en")
+             for b in briefs
+             if b["brief"].get("publish_date", "") in en_brief_slugs),
+            key=lambda r: r["date"], reverse=True,
+        )
+        en_emit("archive.html", en_page("archive/"),
+            page_title=en_tr("주간 브리프 아카이브 · GRM"),
+            nav_active="board",
+            description=en_tr(ARCHIVE_DESCRIPTION),
+            issues=en_issues,
+            lib_update=None,      # 자료실 스트립은 한국어 큐레이션 문구다
+        )
+
     emit("archive.html", page("archive/"),
         # [네이밍 2026-08-27] nav 탭·h1(주간 브리프 아카이브)과 정합 — 제목만 옛
         # 이름이면 검색 결과와 탭 사이에서 페이지 정체가 갈라진다.
@@ -4347,9 +4461,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
-        card_views = [_card_view(c, tr) for c in cards_sorted]
+        card_views = [_card_view(c, tr, lang) for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
-        sections = _build_sections(card_views)
+        sections = _build_sections(card_views, tr)
         ctx = _brief_context(b, issue_no, tr)
         # [브리프 자료실 스트립] 이 브리프가 커버하는 주간(window)에 실제로 든 자료실
         # 변경만 싣는다 — window 파싱이 깨지면(형식 밖 표시 문자열 등) 조용히 생략한다
@@ -4379,6 +4493,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         share_file = brief_page.file("share.txt")
         _write(out_dir / share_file, "\n".join(share_lines) + "\n")
         written.append(share_file)
+
+        # [다국어 5단계 2026-09-04] 영문 브리프 — **서사 다섯과 tldr 이 전부 영어인 호만**
+        # 낸다(반쪽 영어 금지). 오늘의 발행분에는 그 슬롯이 없으므로 아무 페이지도 나오지
+        # 않고, 다음 주 발행부터 Routine 이 채우면 저절로 생긴다(전향적 — 설계 문서 §4).
+        if pub in en_brief_slugs:
+            en_ctx = _brief_context(b, issue_no, en_tr, "en")
+            en_card_views = [_card_view(c, en_tr, "en") for c in cards_sorted]
+            _annotate_toc_distinguishers(en_card_views)
+            en_brief_page = en_page(f"briefs/{pub}/")
+            en_emit("brief.html", en_brief_page,
+                page_title=en_tr("{date} 규제뉴스 · GRM", date=en_ctx["title_dateform"]),
+                nav_active="detail",
+                description=_brief_description(b["brief"], en_tr, "en"),
+                brief=en_ctx,
+                sections=_build_sections(en_card_views, en_tr),
+                lib_update_week=None,     # 자료실 스트립은 한국어 큐레이션 문구다
+            )
 
     # ── [다국어 3단계 2026-09-04] 영어 트리 `/en/` ────────────────────────────────
     # 한국어 트리를 다 그린 뒤, **본문이 영어로 성립하는 면만** 같은 템플릿으로 한 번 더
@@ -4612,6 +4743,69 @@ def validate_wl_violations(cards_or_briefs: list[dict[str, Any]]) -> list[str]:
     return violations
 
 
+class BriefEnFactValidationError(ValueError):
+    """영문 브리프가 한국어판·표에 없는 수치를 말한다 — 발행 차단."""
+
+
+# 숫자 토큰: 두 자리 이상(한 자리는 영어가 'two' 처럼 풀어 쓰는 일이 잦아 대조가 무의미).
+# 자릿구분 쉼표는 제거해 `1,234` 와 `1234` 를 같은 값으로 본다.
+_FACT_NUM_RE = re.compile(r"\d[\d,]*\d")
+
+
+def _fact_numbers(texts: "list[str]") -> set[str]:
+    out: set[str] = set()
+    for t in texts:
+        for m in _FACT_NUM_RE.finditer(str(t)):
+            out.add(m.group(0).replace(",", ""))
+    return out
+
+
+def _card_narrative_texts(source: dict[str, Any]) -> list[str]:
+    """서사 다섯을 평문 리스트로(문자열·리스트 혼재를 평탄화)."""
+    out: list[str] = []
+    for field in CARD_NARRATIVE_FIELDS:
+        v = source.get(field)
+        if isinstance(v, list):
+            out.extend(str(x) for x in v)
+        elif v:
+            out.append(str(v))
+    return out
+
+
+def validate_brief_en_facts(briefs: list[dict[str, Any]]) -> list[str]:
+    """[다국어 5단계 2026-09-04] 영문 브리프 사실 일치 게이트 — **지어내지 않기**.
+
+    영문 서사는 번역이 아니라 같은 원문을 요약한 **또 하나의 생성물**이다(설계 문서 §4).
+    생성 경로가 하나 더 생기면 그것을 검사하는 게이트도 하나 더 있어야 한다는 것이 이
+    저장소의 규율이다(`verify_deep_analysis.py` 의 근거 대조가 본보기).
+
+    ★검사 방향은 **비대칭**이다 — 영문이 한국어판·표에 없는 수치를 말하면 위반이고,
+      반대로 한국어에 있는 수치를 영문이 빼는 것은 위반이 아니다. 요약은 덜 말할 수
+      있지만 **없는 것을 말할 수는 없다**. 이 방향이라야 "영어가 더 간결하다"는 정상적인
+      차이를 잡지 않으면서 날조만 잡는다.
+    ★한 자리 수는 대조하지 않는다 — 영어가 'two sites' 처럼 풀어 쓰는 일이 잦아 오탐이 된다.
+    """
+    violations: list[str] = []
+    for brief in briefs:
+        meta = brief.get("brief") or {}
+        label = meta.get("publish_date", "?")
+        for card in (brief.get("cards") or []):
+            en = card.get("en")
+            if not isinstance(en, dict):
+                continue
+            allowed = _fact_numbers(
+                _card_narrative_texts(card)
+                + [f.get("value", "") for f in (card.get("facts") or [])]
+                + [q.get("original", "") for q in (card.get("quotes") or [])]
+                + [meta.get("window", ""), meta.get("publish_date", "")])
+            invented = sorted(_fact_numbers(_card_narrative_texts(en)) - allowed)
+            if invented:
+                violations.append(
+                    f"{label} / card {card.get('id', '?')}: EN_INVENTED_NUMBER "
+                    f"{invented[:6]}")
+    return violations
+
+
 class WhopirKoValidationError(ValueError):
     """WHOPIR 상세 국문 병기 게이트 위반 — fail-closed. main() 전용(하단 참조)."""
 
@@ -4686,6 +4880,13 @@ def _validate_briefs_or_raise(data_dir: Path) -> None:
         raise WhopirKoValidationError(
             "WHOPIR 상세 국문 병기 게이트 위반 — 발행 차단(brief file / card id / "
             "field / fail code):\n" + "\n".join(f"  · {v}" for v in whopir_missing)
+        )
+    # [다국어 5단계] 영문 서사가 없는 수치를 말하면 발행을 막는다(생성 경로 하나 = 게이트 하나).
+    en_invented = validate_brief_en_facts(briefs)
+    if en_invented:
+        raise BriefEnFactValidationError(
+            "영문 브리프 사실 게이트 위반 — 발행 차단(brief / card id / fail code):\n"
+            + "\n".join(f"  · {v}" for v in en_invented)
         )
 
 

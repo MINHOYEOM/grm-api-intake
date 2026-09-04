@@ -144,6 +144,27 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
 
         _validate_quotes(report, cid, card.get("quotes") or [], d.get("quotes_translation"))
 
+        # [다국어 5단계 2026-09-04] 영문 갈래 — 웹 `/en/` 판이 쓰는 슬롯.
+        # ★전부 채우거나 전부 비운다. 하나라도 빠지면 영어 화면에 한국어 한 문단이
+        #   섞이므로, 부분 제공은 **경고가 아니라 오류**로 막는다(반쪽 영어 금지).
+        if "en" in d:
+            _validate_en_block(report, cid, d["en"])
+
+    # [다국어 5단계] brief 영문 tldr — 제공되면 한국어와 같은 규약(정확히 3개·평문).
+    if "tldr_en" in delta:
+        tldr_en = delta["tldr_en"]
+        if not isinstance(tldr_en, list) or not all(isinstance(x, str) for x in tldr_en):
+            report.errors.append("delta.tldr_en: 문자열 리스트여야 함")
+        elif tldr_en and len(tldr_en) != _TLDR_LEN:
+            report.errors.append(
+                f"delta.tldr_en: {len(tldr_en)}개 — 정확히 {_TLDR_LEN}개여야 함")
+        else:
+            for i, item in enumerate(tldr_en):
+                tok = _markup_violation(item)
+                if tok is not None:
+                    report.errors.append(
+                        f"delta.tldr_en[{i}]: 마크업 토큰 {tok!r} — 평문만 허용")
+
     # brief tldr — 제공·비어있지 않으면 정확히 3개(§13.1) + 평문.
     if "tldr" in delta:
         tldr = delta["tldr"]
@@ -160,6 +181,56 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
                     report.errors.append(f"delta.tldr[{i}]: 마크업 토큰 {tok!r} — 평문만 허용")
 
     return report
+
+
+_EN_FIELDS = ("title_issue", "summary", "implication", "key_facts", "checks")
+
+
+def _validate_en_block(report: InjectionReport, cid: str, en: Any) -> None:
+    """[다국어 5단계] 카드 영문 갈래 검증 — 한국어 슬롯과 **같은 규약**.
+
+    ★부분 제공을 오류로 막는 이유: 다섯 중 넷만 영어면 그 카드가 영어 화면에서 한국어
+      한 문단을 달고 나온다. 웹 렌더러도 같은 판정을 하지만(`card_has_english`), 거기서는
+      **조용히 그 호 전체를 안 내는 것**으로 끝난다 — 왜 안 나갔는지는 여기서만 드러난다.
+    """
+    if not isinstance(en, dict):
+        report.errors.append(f"delta.cards[{cid!r}].en: 객체여야 함")
+        return
+    unknown = sorted(set(en) - set(_EN_FIELDS))
+    if unknown:
+        report.errors.append(f"{cid}.en: 모르는 필드 {unknown}")
+    filled = []
+    for key in _EN_FIELDS:
+        value = en.get(key)
+        if isinstance(value, list):
+            ok = bool([v for v in value if isinstance(v, str) and v.strip()])
+        else:
+            ok = isinstance(value, str) and bool(value.strip())
+        if ok:
+            filled.append(key)
+    if filled and len(filled) != len(_EN_FIELDS):
+        missing = [k for k in _EN_FIELDS if k not in filled]
+        report.errors.append(
+            f"{cid}.en: 부분 제공 — 빠진 슬롯 {missing}. 다섯을 전부 채우거나 en 을 생략하라")
+        return
+    if not filled:
+        report.warnings.append(f"카드 {cid!r}: en 비어있음 — 이 호는 영어로 발행되지 않는다")
+        return
+    for key in ("title_issue", "summary", "implication"):
+        _check_str_slot(report, f"{cid}.en", key, en[key])
+    if len(en["title_issue"]) > _MAX_TITLE_ISSUE * 2:
+        # 영어는 같은 뜻에 글자가 더 든다 — 한도를 두 배로 두되 무한정은 아니다.
+        report.errors.append(
+            f"{cid}.en.title_issue: {len(en['title_issue'])}자 — 너무 김")
+    for key in ("key_facts", "checks"):
+        _check_list_slot(report, f"{cid}.en", key, en[key])
+    if len(en["key_facts"]) > _MAX_KEY_FACTS:
+        report.errors.append(
+            f"{cid}.en.key_facts: {len(en['key_facts'])}개 — ≤{_MAX_KEY_FACTS} 초과")
+    lo, hi = _CHECKS_RANGE
+    if not (lo <= len(en["checks"]) <= hi):
+        report.errors.append(
+            f"{cid}.en.checks: {len(en['checks'])}개 — {lo}~{hi} 범위 벗어남")
 
 
 def _validate_quotes(report: InjectionReport, cid: str, quotes: list[dict[str, Any]],
@@ -223,9 +294,25 @@ def inject_llm_slots(brief: dict[str, Any], delta: dict[str, Any], *,
             if key in d and isinstance(d[key], list):
                 card[key] = list(d[key])
         _inject_quotes(card, d.get("quotes_translation"))
+        # [다국어 5단계] 영문 갈래 — **다섯이 전부 있을 때만** 싣는다(validate 가 부분
+        # 제공을 이미 막지만, 주입도 같은 판정을 해야 검증을 건너뛴 경로에서도 안전하다).
+        en = d.get("en")
+        if isinstance(en, dict):
+            complete = all(
+                bool([v for v in en.get(k) or [] if str(v).strip()])
+                if isinstance(en.get(k), list)
+                else bool(str(en.get(k) or "").strip())
+                for k in _EN_FIELDS)
+            if complete:
+                card["en"] = {k: (list(en[k]) if isinstance(en[k], list) else en[k])
+                              for k in _EN_FIELDS}
 
     if "tldr" in delta and isinstance(delta["tldr"], list):
         out.setdefault("brief", {})["tldr"] = list(delta["tldr"])
+    if "tldr_en" in delta and isinstance(delta["tldr_en"], list):
+        tldr_en = [t for t in delta["tldr_en"] if isinstance(t, str) and t.strip()]
+        if tldr_en:
+            out.setdefault("brief", {})["en"] = {"tldr": tldr_en}
 
     return out
 

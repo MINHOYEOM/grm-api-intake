@@ -46,8 +46,8 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings Intelligence</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 지적사항 트렌드</h1>
-    <p class="reveal" style="animation-delay:.14s"><span class="ln">기관을 고르면 최근 12개월 동안 그 기관이 가장 많이 지적한 영역과 조항을 보여드립니다.</span> <span class="ln">줄을 누르면 실제 지적 문장으로, 마지막에는 자가점검 체크리스트로 이어집니다.</span></p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("규제 지적사항 트렌드") }}</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("기관을 고르면 최근 12개월 동안 그 기관이 가장 많이 지적한 영역과 조항을 보여드립니다.") }}</span> <span class="ln">{{ _("줄을 누르면 실제 지적 문장으로, 마지막에는 자가점검 체크리스트로 이어집니다.") }}</span></p>
   </div>
   <div class="wrap">
     {% include "partials/trends_seg.html" %}
@@ -61,7 +61,7 @@
       <div class="tr-skel-row w2"></div>
       <div class="tr-skel-row w3"></div>
     </div>
-    <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
+    <div class="tr-state tr-state-error" id="tr-error" hidden>{{ _("통계 서비스 준비 중입니다.") }}</div>
 
     <div id="tr-content" hidden>
       {#- ────────────────────────────────────────────────────────────────────
@@ -73,8 +73,8 @@
             하되 페이지는 살아 있다) — 셸의 기본값이 hidden 인 이유다.
           ★버튼은 <button> 이다. 링크가 아니라 같은 페이지의 보기 전환이라 URL 을 바꾸지
             않는다(선택은 브라우저에 기억된다). -#}
-      <div class="tr-agency" id="tr-agency" role="group" aria-label="기관 선택" hidden>
-        <span class="tr-agency-lab">어느 기관 기준으로 볼까요?</span>
+      <div class="tr-agency" id="tr-agency" role="group" aria-label="{{ _('기관 선택') }}" hidden>
+        <span class="tr-agency-lab">{{ _("어느 기관 기준으로 볼까요?") }}</span>
         <div class="tr-agency-btns" id="tr-agency-btns"></div>
       </div>
 
@@ -85,8 +85,8 @@
             설명도 함께 바뀌어야 한다. trends.js 가 고른 기관에 맞춰 다시 적는다.
           ★행 클릭 → 026 findings_search 로 그 영역의 **실제 지적 문장**(규율 3).
             집계 RPC 가 아니라 공개 게이트(010)를 통과한 행만 나오는 다른 층이다. -#}
-      <section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="가장 많이 지적된 영역" hidden>
-        <h2 class="tr-h">가장 많이 지적된 영역</h2>
+      <section class="tr-block tr-rank-block" id="tr-rank-block" aria-label="{{ _('가장 많이 지적된 영역') }}" hidden>
+        <h2 class="tr-h">{{ _("가장 많이 지적된 영역") }}</h2>
         <p class="tr-read" id="tr-rank-read"></p>
         <p class="tr-rank-sub" id="tr-rank-sub"></p>
         <div class="tr-recent-cats" id="tr-recent-cats"></div>
@@ -98,22 +98,22 @@
           ★기본 접힘 — 라이브 산출이 얇다(합산 기준 증가 1행·감소 0행). 삭제하지 않는
             이유는 기관별로 다시 계산하면 산출이 늘어날 여지가 있기 때문이고, 열기 전에
             내용의 유무를 알 수 있도록 summary 를 trends.js 가 채운다. -#}
-      <section class="tr-block tr-move-block" id="tr-move-block" aria-label="달라진 점" hidden>
+      <section class="tr-block tr-move-block" id="tr-move-block" aria-label="{{ _('달라진 점') }}" hidden>
         <details class="tr-fold" id="tr-move-fold">
           <summary>
-            <span class="tr-fold-t">달라진 점</span>
-            <span class="tr-fold-c" id="tr-move-summary">최근 12개월과 직전 12개월의 비중 차이</span>
+            <span class="tr-fold-t">{{ _("달라진 점") }}</span>
+            <span class="tr-fold-c" id="tr-move-summary">{{ _("최근 12개월과 직전 12개월의 비중 차이") }}</span>
             <span class="tr-fold-caret" aria-hidden="true">&#9660;</span>
           </summary>
           <div class="tr-fold-body">
-            <p class="tr-read">각 영역이 전체에서 차지하는 <b>비중</b>이 두 기간 사이에 얼마나 달라졌는지입니다. 비중은 두 기간 각각에서 합이 100%라, 어딘가 늘면 어딘가는 줄어듭니다. 표본이 얇은 영역은 한두 건에도 비율이 크게 흔들려 빼 두었습니다.</p>
+            <p class="tr-read">{{ _("각 영역이 전체에서 차지하는 <b>비중</b>이 두 기간 사이에 얼마나 달라졌는지입니다. 비중은 두 기간 각각에서 합이 100%라, 어딘가 늘면 어딘가는 줄어듭니다. 표본이 얇은 영역은 한두 건에도 비율이 크게 흔들려 빼 두었습니다.") }}</p>
             <div class="tr-move-cols">
               <div>
-                <h3 class="tr-sub-h">비중이 커진 영역</h3>
+                <h3 class="tr-sub-h">{{ _("비중이 커진 영역") }}</h3>
                 <div id="tr-move-up" class="tr-move-list"></div>
               </div>
               <div>
-                <h3 class="tr-sub-h">비중이 줄어든 영역</h3>
+                <h3 class="tr-sub-h">{{ _("비중이 줄어든 영역") }}</h3>
                 <div id="tr-move-down" class="tr-move-list"></div>
               </div>
             </div>
@@ -131,17 +131,17 @@
             하드코딩 금지. 042 미적용·fetch 실패면 이 블록만 조용히 숨긴 채로 둔다.
           ★식약처를 고른 사용자에게 21 CFR 조항 순위는 다른 나라 규정이다 — trends.js 가
             그 사실을 읽는 법에 적는다(식약처 조항 축은 별건). -#}
-      <section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="많이 인용된 조항" hidden>
-        <h2 class="tr-h">많이 인용된 조항</h2>
-        <p class="tr-read" id="tr-cfr-read">규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 &mdash; 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.</p>
+      <section class="tr-block tr-cfr-block" id="tr-cfr-block" aria-label="{{ _('많이 인용된 조항') }}" hidden>
+        <h2 class="tr-h">{{ _("많이 인용된 조항") }}</h2>
+        <p class="tr-read" id="tr-cfr-read">{{ _("규제기관이 지적서에 실제로 적은 <b>조항</b> 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 &mdash; 줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.") }}</p>
         <p class="tr-cfr-sub" id="tr-cfr-sub"></p>
         <div id="tr-cfr" class="tr-cfr"></div>
         <div class="tr-cta">
           <span class="tr-cta-b">
-            <span class="tr-cta-t">자가점검 체크리스트 만들기</span>
-            <span class="tr-cta-d">위 조항 순위를 그대로 받아 조항마다 실제 지적 문장을 붙인 점검표를 만듭니다. 인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰세요.</span>
+            <span class="tr-cta-t">{{ _("자가점검 체크리스트 만들기") }}</span>
+            <span class="tr-cta-d">{{ _("위 조항 순위를 그대로 받아 조항마다 실제 지적 문장을 붙인 점검표를 만듭니다. 인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰세요.") }}</span>
           </span>
-          <a class="tr-cta-go" href="{{ rel_root }}findings/checklist/index.html">체크리스트 만들기 &rarr;</a>
+          <a class="tr-cta-go" href="{{ rel_root }}findings/checklist/index.html">{{ _("체크리스트 만들기 &rarr;") }}</a>
         </div>
         <p class="tr-note" id="tr-cfr-note"></p>
       </section>
@@ -150,7 +150,7 @@
           위쪽 '먼저 알아두세요' 블록에 세 줄로 있었는데, 아직 아무것도 못 본 사람에게
           주의사항부터 읽히는 자리였다. 데이터 현황 면으로 가는 링크가 여기 있다
           (세그먼트에서 내린 대신 각주가 그 목적지를 연다). -#}
-      <p class="tr-more">모으는 곳은 FDA 483 · Warning Letter · 식약처 · 캐나다 실사 · EU·영국 GMP 비준수입니다 &mdash; &lsquo;전체&rsquo;는 이 다섯을 합친 값이에요. 여기서 세는 날짜는 <b>자료가 공개된 날</b>이고, <b>캐나다 실사</b>만 원천이 공개일을 주지 않아 실사일이 그 자리에 들어갑니다. 어느 기관에서 얼마나 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="{{ rel_root }}findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.</p>
+      <p class="tr-more">{{ _('모으는 곳은 FDA 483 · Warning Letter · 식약처 · 캐나다 실사 · EU·영국 GMP 비준수입니다 &mdash; &lsquo;전체&rsquo;는 이 다섯을 합친 값이에요. 여기서 세는 날짜는 <b>자료가 공개된 날</b>이고, <b>캐나다 실사</b>만 원천이 공개일을 주지 않아 실사일이 그 자리에 들어갑니다. 어느 기관에서 얼마나 모았는지, 연도별 확보량이 얼마나 다른지는 <a href="{rel_root}findings/coverage/index.html">데이터 현황</a>에서 볼 수 있습니다.', rel_root=rel_root) }}</p>
     </div>
   </div>
 </main>

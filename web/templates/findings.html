@@ -12,16 +12,16 @@
       이 면은 조회 도구다. 면 전환은 findings_seg.html(트렌드 존 세그와 동형). -#}
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
-    <h1 class="reveal" style="animation-delay:.08s">지적사항 검색</h1>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항 검색") }}</h1>
     {#- 설명문은 한 문장(M15 사용자 피드백 — 첫 화면 밀도) — 건수는 별도 문장이 아니라
         문장 안에 녹인다. 수치는 render 가 정본에서 계산(하드코딩 금지). -#}
-    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {{ zone_totals.documents }}건에서 추출한 지적사항 {{ zone_totals.findings }}건을 원문 문장 단위로 모았습니다.{% else %}FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.{% endif %}</p>
+    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {docs}건에서 추출한 지적사항 {n}건을 원문 문장 단위로 모았습니다.", docs=zone_totals.documents, n=zone_totals.findings) }}{% else %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.") }}{% endif %}</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
     {% with seg_active = "search" %}{% include "partials/findings_seg.html" %}{% endwith %}
 
-    <p class="fnd-lead">업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.</p>
+    <p class="fnd-lead">{{ _("업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.") }}</p>
 
     {#- [실사관 진입점 2026-08-31] 검색 화면 상단 안내 스트립 — archive.html/brief.html
         의 arc-lib 스트립과 같은 결(soft 배경+1px 테두리+라운드, 머리글/설명/우측 화살표
@@ -29,11 +29,11 @@
         안내) 클래스는 별도로 둔다(fnd-insp-cta, 아래 페이지 스코프 style). #fnd-tools
         바로 위 — 검색을 쓰기 전에 "실사관으로도 찾을 수 있다"를 알린다. /findings/browse/
         에는 넣지 않는다(그 면은 세그 탭만으로 충분 — 스펙 §2 참조). -#}
-    <aside class="fnd-insp-cta" aria-label="실사관 조회 안내">
+    <aside class="fnd-insp-cta" aria-label="{{ _('실사관 조회 안내') }}">
       <div class="fnd-insp-cta-h">
-        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>실사관으로 찾기</span>
-        <span class="fnd-insp-cta-sum">FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 문서 단위로 모아 봅니다.</span>
-        <a class="fnd-insp-cta-go" href="{{ rel_root }}findings/inspector/index.html">실사관 조회 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+        <span class="fnd-insp-cta-k"><i class="ti ti-user-search" aria-hidden="true"></i>{{ _("실사관으로 찾기") }}</span>
+        <span class="fnd-insp-cta-sum">{{ _("FDA 483 문서에 서명한 실사관이 어떤 분야를 확인했고 어느 제조소를 다녀갔는지 문서 단위로 모아 봅니다.") }}</span>
+        <a class="fnd-insp-cta-go" href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회 ") }}<i class="ti ti-arrow-right" aria-hidden="true"></i></a>
       </div>
     </aside>
 
@@ -47,34 +47,34 @@
         [M2c] 정렬(.fnd-field--sort)은 나머지 6개와 성격이 다르다 — 6개는 결과를 좁히고
         (무엇을 볼까) 정렬은 순서만 바꾼다(어떻게 늘어놓을까). 같은 행에 두되 세로선으로
         갈라 성격 차이를 드러낸다(신규 컴포넌트 0 — 보더 1px). -#}
-    <section class="fnd-tools" id="fnd-tools" aria-label="검색 및 필터">
+    <section class="fnd-tools" id="fnd-tools" aria-label="{{ _('검색 및 필터') }}">
       <div class="fnd-search">
         <i class="ti ti-search" aria-hidden="true"></i>
-        <input id="fnd-q" type="text" placeholder="업체·문서번호·조항·내용 검색" autocomplete="off" aria-label="지적사항 검색" />
+        <input id="fnd-q" type="text" placeholder="{{ _('업체·문서번호·조항·내용 검색') }}" autocomplete="off" aria-label="{{ _('지적사항 검색') }}" />
         <div class="fnd-count" id="fnd-count" role="status" aria-live="polite"></div>
         {#- [sticky 미니 내비] 이전/다음 — sticky 툴바(.fnd-tools) 안에 있어 스크롤 위치와
             무관하게 항상 같은 화면 자리에 떠 있다(실사용자 신고 "다음 누르면 밀려나 매번
             위로 되돌아가야 함" 해법의 본체). 셸은 hidden — findings.js 의 updatePnav() 가
             페이지 상태에 따라 노출/비활성을 관리한다(구버전 JS 에서도 무해). -#}
         <div class="fnd-pnav" id="fnd-pnav" hidden>
-          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-prev" aria-label="이전 페이지">‹</button>
-          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-next" aria-label="다음 페이지">›</button>
+          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-prev" aria-label="{{ _('이전 페이지') }}">‹</button>
+          <button type="button" class="fnd-pnav-btn" id="fnd-pnav-next" aria-label="{{ _('다음 페이지') }}">›</button>
         </div>
       </div>
       <button class="fnd-filters-toggle" id="fnd-filters-toggle" type="button" aria-expanded="false" aria-controls="fnd-filters">
-        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>필터·정렬<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
+        <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>{{ _("필터·정렬") }}<span class="fnd-filters-badge" id="fnd-filters-badge"></span>
       </button>
       <div class="fnd-filters" id="fnd-filters">
-        <div class="fnd-field"><label for="fnd-f-source">소스</label><select id="fnd-f-source" data-key="source"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-evidence">증거 등급</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-status">검토 상태</label><select id="fnd-f-status" data-key="review_status"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-category">카테고리</label><select id="fnd-f-category" data-key="category_code"><option value="">전체</option></select></div>
-        <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-source">{{ _("소스") }}</label><select id="fnd-f-source" data-key="source"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-evidence">{{ _("증거 등급") }}</label><select id="fnd-f-evidence" data-key="evidence_level"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-status">{{ _("검토 상태") }}</label><select id="fnd-f-status" data-key="review_status"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-category">{{ _("카테고리") }}</label><select id="fnd-f-category" data-key="category_code"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-month">{{ _("발행월") }}</label><select id="fnd-f-month" data-key="month"><option value="">{{ _("전체") }}</option></select></div>
         {#- [056] 국가 필터 — country_key 축(055/056). 다른 5개와 달리 findings.js 가
             LAST.dash.by_country(자기 축 제외하지 않는 현재 결과 분포)로 옵션을 채운다.
             값은 findings.js 런타임 대입 전까지 "전체" 하나뿐(골든 결정론). -#}
-        <div class="fnd-field"><label for="fnd-f-country">국가</label><select id="fnd-f-country" data-key="country"><option value="">전체</option></select></div>
-        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
+        <div class="fnd-field"><label for="fnd-f-country">{{ _("국가") }}</label><select id="fnd-f-country" data-key="country"><option value="">{{ _("전체") }}</option></select></div>
+        <div class="fnd-field fnd-field--sort"><label for="fnd-sort">{{ _("정렬") }}</label><select id="fnd-sort"><option value="date_desc">{{ _("최신순") }}</option><option value="date_asc">{{ _("오래된순") }}</option><option value="firm_asc">{{ _("업체명순") }}</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>
     </section>
@@ -87,20 +87,20 @@
         지적사항이다 — 한 대시보드 안에 두 단위가 섞이는 건 피할 수 없다(카테고리는 지적사항이
         자연 단위고, 기관 비교는 문서가 자연 단위다). 섞이는 게 문제가 아니라 **어느 쪽인지
         안 적는 것**이 문제였다. -#}
-    <section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
+    <section class="fnd-dash" id="fnd-dash" aria-label="{{ _('지적사항 현황 대시보드') }}" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
-      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
+      <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">{{ _("세부 지표") }}<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
       <div class="fnd-dash-grid" id="fnd-dash-grid">
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">카테고리 분포<span class="fnd-dash-unit">지적사항 기준</span></h2>
+          <h2 class="fnd-dash-h">{{ _("카테고리 분포") }}<span class="fnd-dash-unit">{{ _("지적사항 기준") }}</span></h2>
           <div id="fnd-dash-cat" class="fnd-dash-cat"></div>
         </div>
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">월별 추이<span class="fnd-dash-unit">문서 기준</span></h2>
+          <h2 class="fnd-dash-h">{{ _("월별 추이") }}<span class="fnd-dash-unit">{{ _("문서 기준") }}</span></h2>
           <div id="fnd-dash-month" class="fnd-dash-month"></div>
         </div>
         <div class="fnd-dash-block">
-          <h2 class="fnd-dash-h">업체 상위 5<span class="fnd-dash-unit">지적사항 기준</span></h2>
+          <h2 class="fnd-dash-h">{{ _("업체 상위 5") }}<span class="fnd-dash-unit">{{ _("지적사항 기준") }}</span></h2>
           <div id="fnd-dash-firm" class="fnd-dash-firm"></div>
         </div>
       </div>
@@ -114,19 +114,19 @@
         .imp(시사점 노트) 토큰을 그대로 재사용 — 신규 CSS 0. -#}
     <div class="imp" id="fnd-coverage-note" hidden><p id="fnd-coverage-text"></p></div>
 
-    <section aria-label="검색 결과">
-      <div class="fnd-state" id="fnd-loading">불러오는 중…</div>
-      <div class="fnd-state fnd-state-error" id="fnd-error" hidden>데이터를 불러오지 못했습니다.</div>
-      <div class="fnd-state" id="fnd-empty" hidden>검색 결과가 없습니다.</div>
+    <section aria-label="{{ _('검색 결과') }}">
+      <div class="fnd-state" id="fnd-loading">{{ _("불러오는 중…") }}</div>
+      <div class="fnd-state fnd-state-error" id="fnd-error" hidden>{{ _("데이터를 불러오지 못했습니다.") }}</div>
+      <div class="fnd-state" id="fnd-empty" hidden>{{ _("검색 결과가 없습니다.") }}</div>
       {#- [문서 단위 페이지네이션] 목록 상단·하단에 동일한 페이지네이션 바 — 문서 24개=
           1페이지, 페이지 경계에서 문서(같은 raw_signal_id)가 쪼개지지 않는다. 정적 셸은
           빈 hidden nav 만 렌더하고(골든 결정론), 이전/다음·페이지 번호·처음/끝 버튼은
           findings.js 의 renderPager() 가 채운다(#fnd-pager-* 부재=구버전 셸 방어와
           동형 — hasDash 관례 참조). 상단 바는 목록을 다시 스크롤하지 않고 페이지를
           바꿀 수 있게 해준다(과거 "더 보기" 발견성 신고 대응과 같은 취지). -#}
-      <nav class="fnd-pager" id="fnd-pager-top" aria-label="검색 결과 페이지 이동" hidden></nav>
+      <nav class="fnd-pager" id="fnd-pager-top" aria-label="{{ _('검색 결과 페이지 이동') }}" hidden></nav>
       <div id="fnd-results" class="fnd-results"></div>
-      <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="검색 결과 페이지 이동" hidden></nav>
+      <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="{{ _('검색 결과 페이지 이동') }}" hidden></nav>
     </section>
   </div>
 </main>
@@ -399,14 +399,14 @@ main{word-break:keep-all;overflow-wrap:anywhere}
     으로 이전 — 신규 CSS 없음, grm.css 기존 클래스만 사용. id="notice" 는 landing 전용이라
     findings 전용 id="ai-notice" + aria-label 을 쓴다(원문 요청). -#}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="ai-notice" aria-label="AI 자동 생성 고지"><div class="wrap">
+<section class="ai-disclosure" id="ai-notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
   <span class="kick">AI Disclosure</span>
-  <h2>콘텐츠 생성 방식 및 유의사항</h2>
+  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
   <div class="disc-body">
-    <div class="disc-sec"><p>본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.</p></div>
-    <div class="disc-sec"><p>국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
-    <div class="disc-sec"><p>각 항목의 증거 등급(Evidence A·B·C)은 추출 근거의 신뢰도를, '검토 필요' 표시는 사람 검수 전 상태를 뜻합니다. 모든 항목에 공식 원문 링크를 제공해 1차 자료까지 추적·검증할 수 있습니다.</p></div>
-    <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
+    <div class="disc-sec"><p>{{ _("본 페이지의 지적사항은 FDA 483 Observation·Warning Letter·캐나다 실사보고서(Health Canada)·식약처 GMP 실태조사·EU/영국 GMP 비준수 보고서(EudraGMDP·MHRA) 등 공개 원문에서 자동 추출·분해한 것으로, 개별 항목 단위로 검색할 수 있도록 정규화됩니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("국문 해석은 생성형 AI 번역이며 원문(영문)을 항목마다 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("각 항목의 증거 등급(Evidence A·B·C)은 추출 근거의 신뢰도를, '검토 필요' 표시는 사람 검수 전 상태를 뜻합니다. 모든 항목에 공식 원문 링크를 제공해 1차 자료까지 추적·검증할 수 있습니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
   </div>
 </div></section>
 {% endblock %}

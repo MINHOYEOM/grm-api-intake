@@ -1,15 +1,20 @@
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   var root = document.getElementById("grm-pet");
   if (!root || !window.localStorage) return;
   var KEY = "grm-gurumi-growth", POS_KEY = "grm-gurumi-position-v1", VERSION = 1;
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var stages = [
-    { min: 0, slug: "egg", name: "알", mood: "톡톡, 곧 만날 수 있을 것 같아요" },
-    { min: 50, slug: "baby", name: "아기 구름이", mood: "세상의 규제 소식이 궁금해요" },
-    { min: 150, slug: "youth", name: "소년 구름이", mood: "오늘도 문서 한 장을 배웠어요" },
-    { min: 350, slug: "adult", name: "어른 구름이", mood: "핵심만 쏙쏙 정리할 준비 완료!" },
-    { min: 700, slug: "legend", name: "전설 구름이", mood: "규제의 하늘을 든든하게 지켜요" }
+    { min: 0, slug: "egg", name: _t("알"), mood: _t("톡톡, 곧 만날 수 있을 것 같아요") },
+    { min: 50, slug: "baby", name: _t("아기 구름이"), mood: _t("세상의 규제 소식이 궁금해요") },
+    { min: 150, slug: "youth", name: _t("소년 구름이"), mood: _t("오늘도 문서 한 장을 배웠어요") },
+    { min: 350, slug: "adult", name: _t("어른 구름이"), mood: _t("핵심만 쏙쏙 정리할 준비 완료!") },
+    { min: 700, slug: "legend", name: _t("전설 구름이"), mood: _t("규제의 하늘을 든든하게 지켜요") }
   ];
   var $ = function (id) { return document.getElementById(id); };
   var toggle = $("grm-pet-toggle"), panel = $("grm-pet-panel"), close = $("grm-pet-close"), resetPos = $("grm-pet-reset-pos"), panelDragHandle = $("grm-pet-drag-handle");
@@ -17,14 +22,14 @@
   var stateChip = root.querySelector("#grm-pet-state-chip b"), stateName = $("grm-pet-state-name"), stateCopy = $("grm-pet-state-copy");
   var currentStage = -1, talkTimer, stateTimer, blinkTimer, scrollTimer, previewStage = null, drag = null, suppressClick = false, activeDock = null, nearDock = null;
   var states = {
-    idle: { name: "쉬는 중", copy: "새로운 소식을 기다리고 있어요" },
-    reading: { name: "읽는 중", copy: "지금 보고 있는 내용을 따라가고 있어요" },
-    thinking: { name: "생각 중", copy: "답을 고르는 중이에요" },
-    ready: { name: "완료", copy: "정답과 성장 포인트를 확인했어요" },
-    retry: { name: "다시 도전", copy: "다음 문제를 함께 풀어봐요" },
-    moving: { name: "이동 중", copy: "새 자리를 찾고 있어요" },
-    sleeping: { name: "잠든 중", copy: "돌아오면 다시 깨어나요" },
-    together: { name: "함께 보는 중", copy: "성장 기록을 살펴보고 있어요" }
+    idle: { name: _t("쉬는 중"), copy: _t("새로운 소식을 기다리고 있어요") },
+    reading: { name: _t("읽는 중"), copy: _t("지금 보고 있는 내용을 따라가고 있어요") },
+    thinking: { name: _t("생각 중"), copy: _t("답을 고르는 중이에요") },
+    ready: { name: _t("완료"), copy: _t("정답과 성장 포인트를 확인했어요") },
+    retry: { name: _t("다시 도전"), copy: _t("다음 문제를 함께 풀어봐요") },
+    moving: { name: _t("이동 중"), copy: _t("새 자리를 찾고 있어요") },
+    sleeping: { name: _t("잠든 중"), copy: _t("돌아오면 다시 깨어나요") },
+    together: { name: _t("함께 보는 중"), copy: _t("성장 기록을 살펴보고 있어요") }
   };
 
   function restingState() { return panel.hidden ? "idle" : "together"; }
@@ -123,7 +128,7 @@
     activeDock = null; nearDock = null;
     root.style.removeProperty("left"); root.style.removeProperty("top"); root.style.removeProperty("right"); root.style.removeProperty("bottom");
     requestAnimationFrame(function () { updateSide(); positionPanel(); });
-    say("기본 위치로 돌아왔어요");
+    say(_t("기본 위치로 돌아왔어요"));
   }
   function positionPanel() {
     if (panel.hidden) return;
@@ -140,7 +145,7 @@
   function asset(i) { return "/assets/gurumi-" + stages[i].slug + ".png"; }
   function atlas() {
     var host = $("grm-pet-atlas"), html = "";
-    stages.forEach(function (s, i) { html += '<button class="grm-pet-stage" type="button" data-stage="' + i + '" aria-label="' + s.name + ' 미리보기"><img src="' + asset(i) + '" width="512" height="512" loading="lazy" decoding="async" alt=""><span>' + s.name.replace(" 구름이", "") + "</span></button>"; });
+    stages.forEach(function (s, i) { html += '<button class="grm-pet-stage" type="button" data-stage="' + i + '" aria-label="' + _t("{name} 미리보기", { name: s.name }) + '"><img src="' + asset(i) + '" width="512" height="512" loading="lazy" decoding="async" alt=""><span>' + s.name.replace(" 구름이", "") /* i18n-ignore */ + "</span></button>"; });
     host.innerHTML = html;
     host.addEventListener("click", function (e) { var b = e.target.closest("[data-stage]"); if (!b) return; preview(parseInt(b.getAttribute("data-stage"), 10)); });
   }
@@ -152,20 +157,20 @@
     var s = derive(), i = s.stage, next = stages[i + 1], pct = next ? Math.round((s.points - stages[i].min) * 100 / (next.min - stages[i].min)) : 100;
     var evolved = currentStage >= 0 && i > currentStage; currentStage = i; previewStage = null; root.setAttribute("data-stage", i);
     sprite.src = asset(i); hero.src = asset(i); hero.alt = stages[i].name; $("grm-pet-name").textContent = stages[i].name; $("grm-pet-mood").textContent = stages[i].mood; $("grm-pet-level").textContent = "Lv." + (i + 1);
-    $("grm-pet-points").textContent = s.points + " 포인트"; $("grm-pet-next").textContent = next ? (next.min - s.points) + " 포인트 남음" : "최고 단계"; $("grm-pet-bar").style.width = pct + "%";
+    $("grm-pet-points").textContent = _t("{points} 포인트", { points: s.points }); $("grm-pet-next").textContent = next ? _t("{n} 포인트 남음", { n: (next.min - s.points) }) : _t("최고 단계"); $("grm-pet-bar").style.width = pct + "%";
     $("grm-pet-correct").textContent = s.correct; $("grm-pet-weeks").textContent = s.weeks; $("grm-pet-streak").textContent = s.streak; $("grm-pet-preview").hidden = true;
     root.querySelectorAll(".grm-pet-stage").forEach(function (b, n) { b.classList.toggle("is-current", n === i); b.classList.toggle("is-future", n > i); if (n === i) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
-    if (evolved) { panel.classList.add("is-evolve"); openPanel(); say("새로운 모습으로 성장했어요! ✨"); setTimeout(function () { panel.classList.remove("is-evolve"); }, 950); }
-    if (celebrate) { party(); say(celebrate === "correct" ? "정답! 포인트가 쑥 올랐어요 ✨" : "좋은 도전이었어요. 다음 문제도 함께해요!"); }
+    if (evolved) { panel.classList.add("is-evolve"); openPanel(); say(_t("새로운 모습으로 성장했어요! ✨")); setTimeout(function () { panel.classList.remove("is-evolve"); }, 950); }
+    if (celebrate) { party(); say(celebrate === "correct" ? _t("정답! 포인트가 쑥 올랐어요 ✨") : _t("좋은 도전이었어요. 다음 문제도 함께해요!")); }
   }
-  function openPanel() { panel.hidden = false; positionPanel(); toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", "구름이 펫 닫기"); setPetState("together"); }
-  function closePanel() { panel.hidden = true; toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", "구름이 펫 열기"); if (previewStage !== null) refresh(); setPetState("idle"); }
+  function openPanel() { panel.hidden = false; positionPanel(); toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", _t("구름이 펫 닫기")); setPetState("together"); }
+  function closePanel() { panel.hidden = true; toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", _t("구름이 펫 열기")); if (previewStage !== null) refresh(); setPetState("idle"); }
   function say(text) { talk.textContent = text; talk.classList.add("show"); clearTimeout(talkTimer); talkTimer = setTimeout(function () { talk.classList.remove("show"); }, 3000); }
   function particles(count) {
     if (reduce) return; var glyphs = ["♥", "✦", "★", "●"];
     for (var i = 0; i < count; i++) { (function (n) { setTimeout(function () { var p = document.createElement("i"); p.className = "grm-pet-particle"; p.textContent = glyphs[Math.floor(Math.random() * glyphs.length)]; p.style.color = n % 2 ? "#e8b04a" : "#ce6e4c"; p.style.setProperty("--x", (Math.random() * 90 - 45) + "px"); p.style.setProperty("--y", (-55 - Math.random() * 45) + "px"); p.style.setProperty("--r", (Math.random() * 100 - 50) + "deg"); root.appendChild(p); setTimeout(function () { p.remove(); }, 1000); }, n * 55); })(i); }
   }
-  function pat() { root.classList.remove("is-patted"); void root.offsetWidth; root.classList.add("is-patted"); particles(5); say(["기분이 몽글몽글해요 ☁️", "조금 더 가까워진 것 같아요", "오늘도 같이 소식을 살펴봐요"][Math.floor(Math.random() * 3)]); setTimeout(function () { root.classList.remove("is-patted"); }, 700); }
+  function pat() { root.classList.remove("is-patted"); void root.offsetWidth; root.classList.add("is-patted"); particles(5); say([_t("기분이 몽글몽글해요 ☁️"), _t("조금 더 가까워진 것 같아요"), _t("오늘도 같이 소식을 살펴봐요")][Math.floor(Math.random() * 3)]); setTimeout(function () { root.classList.remove("is-patted"); }, 700); }
   function party() { panel.classList.remove("is-party"); void panel.offsetWidth; panel.classList.add("is-party"); particles(7); setTimeout(function () { panel.classList.remove("is-party"); }, 850); }
   function scheduleBlink() {
     clearTimeout(blinkTimer); if (reduce) return;
@@ -201,8 +206,8 @@
     var moved = drag.moved, dock = nearDock, source = drag.source; drag = null; root.classList.remove("is-dragging"); dockLayer.classList.remove("show");
     if (source.releasePointerCapture && source.hasPointerCapture && source.hasPointerCapture(e.pointerId)) source.releasePointerCapture(e.pointerId);
     if (moved) {
-      if (dock) { setDock(dock, true); root.classList.add("is-docking"); say("여기에 앉아 있을게요"); setTimeout(function () { root.classList.remove("is-docking"); }, 650); }
-      else { savePosition(); say("여기에 자리 잡을게요"); }
+      if (dock) { setDock(dock, true); root.classList.add("is-docking"); say(_t("여기에 앉아 있을게요")); setTimeout(function () { root.classList.remove("is-docking"); }, 650); }
+      else { savePosition(); say(_t("여기에 자리 잡을게요")); }
       nearDock = null; dockLayer.querySelectorAll(".is-near").forEach(function (marker) { marker.classList.remove("is-near"); });
       setPetState(restingState(), 900); suppressClick = true; setTimeout(function () { suppressClick = false; }, 0);
     }
@@ -228,6 +233,6 @@
   window.addEventListener("storage", function (e) { if (e.key === KEY) refresh(); });
   window.addEventListener("resize", function () { if (activeDock) setDock(activeDock, false); else restorePosition(); renderDocks(); if (!panel.hidden) positionPanel(); });
   window.addEventListener("grm:gurumi-change", function (e) { var correct = e.detail && e.detail.correct; refresh(e.detail ? (correct ? "correct" : "try") : null); setPetState(correct ? "ready" : "retry", 3200); });
-  setTimeout(function () { if (panel.hidden) say("저를 눌러 성장 상태를 확인해 보세요"); }, 1600);
+  setTimeout(function () { if (panel.hidden) say(_t("저를 눌러 성장 상태를 확인해 보세요")); }, 1600);
   window.GurumiPet = { refresh: refresh, derive: derive, stages: stages, celebrate: party, setState: setPetState, setDock: setDock };
 })();

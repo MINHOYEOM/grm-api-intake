@@ -23,6 +23,12 @@
 (function () {
   "use strict";
 
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
+
   var cfg = document.getElementById("grm-findings-cfg");
   var loadingEl = document.getElementById("cl-loading");
   var errorEl = document.getElementById("cl-error");
@@ -46,47 +52,47 @@
 
   // trends.js 의 동명 상수 verbatim 복제(동기화 테스트로 드리프트 차단, 파일 상단 계약 참조).
   var CFR_SECTION_LABELS = {
-    "210.3": "정의",
-    "211.22": "품질관리부서의 책임·권한",
-    "211.25": "작업자 자격·교육",
-    "211.28": "작업자 위생·복장",
-    "211.42": "건물의 설계·구조(무균 구역 포함)",
-    "211.46": "환기·공기 여과",
-    "211.56": "청소·위생 관리",
-    "211.58": "건물 유지관리",
-    "211.63": "설비의 설계·규격·설치 위치",
-    "211.67": "설비 세척·유지관리",
-    "211.68": "전산화 설비 관리(접근권한·백업)",
-    "211.80": "원자재·용기 일반 관리",
-    "211.84": "원자재·용기 시험 및 합부 판정",
-    "211.87": "승인된 원자재 재시험",
-    "211.94": "용기·마개 적합성",
-    "211.100": "생산·공정관리 절차서와 일탈 처리",
-    "211.101": "원료 칭량·투입",
-    "211.110": "공정 중 시료채취·시험",
-    "211.111": "공정 단계별 시간 제한",
-    "211.113": "미생물 오염 관리(무균공정 밸리데이션)",
-    "211.115": "재작업",
-    "211.125": "표시자재 불출 관리",
-    "211.130": "포장·표시 작업 관리",
-    "211.137": "사용기한 설정",
-    "211.142": "보관 절차",
-    "211.150": "출하·유통 절차",
-    "211.160": "시험실 관리 일반(규격·시험방법의 타당성)",
-    "211.165": "완제품 시험 및 출하 판정",
-    "211.166": "안정성 시험",
-    "211.167": "특수 시험(무균·발열성 등)",
-    "211.170": "보관용 검체",
-    "211.176": "페니실린 교차오염",
-    "211.180": "기록·보고 일반(보관기간·연간 품질평가)",
-    "211.182": "설비 사용·세척 기록",
-    "211.186": "마스터 제조지시서",
-    "211.188": "배치 제조기록서",
-    "211.192": "제조기록 검토와 일탈 조사",
-    "211.194": "시험기록",
-    "211.198": "불만 처리 기록",
-    "211.204": "반품 의약품",
-    "211.208": "회수품 재생",
+    "210.3": _t("정의"),
+    "211.22": _t("품질관리부서의 책임·권한"),
+    "211.25": _t("작업자 자격·교육"),
+    "211.28": _t("작업자 위생·복장"),
+    "211.42": _t("건물의 설계·구조(무균 구역 포함)"),
+    "211.46": _t("환기·공기 여과"),
+    "211.56": _t("청소·위생 관리"),
+    "211.58": _t("건물 유지관리"),
+    "211.63": _t("설비의 설계·규격·설치 위치"),
+    "211.67": _t("설비 세척·유지관리"),
+    "211.68": _t("전산화 설비 관리(접근권한·백업)"),
+    "211.80": _t("원자재·용기 일반 관리"),
+    "211.84": _t("원자재·용기 시험 및 합부 판정"),
+    "211.87": _t("승인된 원자재 재시험"),
+    "211.94": _t("용기·마개 적합성"),
+    "211.100": _t("생산·공정관리 절차서와 일탈 처리"),
+    "211.101": _t("원료 칭량·투입"),
+    "211.110": _t("공정 중 시료채취·시험"),
+    "211.111": _t("공정 단계별 시간 제한"),
+    "211.113": _t("미생물 오염 관리(무균공정 밸리데이션)"),
+    "211.115": _t("재작업"),
+    "211.125": _t("표시자재 불출 관리"),
+    "211.130": _t("포장·표시 작업 관리"),
+    "211.137": _t("사용기한 설정"),
+    "211.142": _t("보관 절차"),
+    "211.150": _t("출하·유통 절차"),
+    "211.160": _t("시험실 관리 일반(규격·시험방법의 타당성)"),
+    "211.165": _t("완제품 시험 및 출하 판정"),
+    "211.166": _t("안정성 시험"),
+    "211.167": _t("특수 시험(무균·발열성 등)"),
+    "211.170": _t("보관용 검체"),
+    "211.176": _t("페니실린 교차오염"),
+    "211.180": _t("기록·보고 일반(보관기간·연간 품질평가)"),
+    "211.182": _t("설비 사용·세척 기록"),
+    "211.186": _t("마스터 제조지시서"),
+    "211.188": _t("배치 제조기록서"),
+    "211.192": _t("제조기록 검토와 일탈 조사"),
+    "211.194": _t("시험기록"),
+    "211.198": _t("불만 처리 기록"),
+    "211.204": _t("반품 의약품"),
+    "211.208": _t("회수품 재생"),
   };
 
   // 매핑에 없는 조항은 번호만 쓴다(추측 번역 금지 — trends.js countryLabelKo 와 동일 폴백).
@@ -147,7 +153,7 @@
   // ── 렌더 ────────────────────────────────────────────────────────────────
   function buildVerdictBox(idx) {
     var box = el("div", "cl-verdict");
-    ["적합", "부적합", "해당없음"].forEach(function (label, i) {
+    [_t("적합"), _t("부적합"), _t("해당없음")].forEach(function (label, i) {
       var lab = document.createElement("label");
       var input = document.createElement("input");
       input.type = "radio";
@@ -170,23 +176,24 @@
     var name = sectionLabel(row.section);
     if (name) id.appendChild(el("span", "cl-item-name", name));
     id.appendChild(el("span", "cl-item-cnt",
-      "인용 문서 " + fmtNum(row.docs) + "건 · 최근 12개월 " + fmtNum(row.recent_docs) + "건"));
+      _t("인용 문서 {docs}건 · 최근 12개월 {recent}건",
+        { docs: fmtNum(row.docs), recent: fmtNum(row.recent_docs) })));
     head.appendChild(id);
     head.appendChild(buildVerdictBox(idx));
     item.appendChild(head);
 
     var ex = el("div", "cl-ex");
-    ex.appendChild(el("h3", "cl-ex-h", "실제 지적 사례"));
+    ex.appendChild(el("h3", "cl-ex-h", _t("실제 지적 사례")));
     if (!row.examples.length) {
       // 042 는 전량 집계(definer), 043 은 공개 게이트(invoker) — 차이가 여기서 드러난다.
-      ex.appendChild(el("p", "cl-ex-text", "국문으로 열람할 수 있는 사례가 아직 없습니다."));
+      ex.appendChild(el("p", "cl-ex-text", _t("국문으로 열람할 수 있는 사례가 아직 없습니다.")));
     } else {
       row.examples.forEach(function (f) {
         var one = el("div", "cl-ex-item");
         var meta = el("p", "cl-ex-meta", exampleMeta(f));
         if (f.anchored === false) {
           // 같은 위반 블록이 여러 조항을 함께 인용한 경우 — 문장에 이 조항 번호가 없다.
-          meta.appendChild(el("span", "cl-ex-loose", "(같은 지적에 여러 조항이 함께 인용됨)"));
+          meta.appendChild(el("span", "cl-ex-loose", _t("(같은 지적에 여러 조항이 함께 인용됨)")));
         }
         one.appendChild(meta);
         one.appendChild(el("p", "cl-ex-text", exampleText(f)));
@@ -196,7 +203,7 @@
     item.appendChild(ex);
 
     var note = el("div", "cl-note-line");
-    note.appendChild(el("span", "", "확인 결과 · 근거 문서"));
+    note.appendChild(el("span", "", _t("확인 결과 · 근거 문서")));
     note.appendChild(el("i", ""));
     item.appendChild(note);
     return item;
@@ -208,18 +215,16 @@
 
     if (docMetaEl && state.meta) {
       docMetaEl.textContent =
-        (state.focus ? "21 CFR " + state.focus + " 한 조항만 보는 중 · " : "") +
-        "기준 " + state.meta.sortLabel + " · 조항 " + fmtNum(state.rows.length) +
-        "개 · 조항당 사례 " + fmtNum(state.meta.examples) + "건 · 자료 기준일 " +
-        state.meta.asOf + " · 출처 " + state.meta.sources;
+        (state.focus ? _t("21 CFR {focus} 한 조항만 보는 중 · ", { focus: state.focus }) : "") +
+        _t("기준 {sortLabel} · 조항 {count}개 · 조항당 사례 {examples}건 · 자료 기준일 {asOf} · 출처 {sources}", {
+          sortLabel: state.meta.sortLabel, count: fmtNum(state.rows.length),
+          examples: fmtNum(state.meta.examples), asOf: state.meta.asOf, sources: state.meta.sources
+        });
     }
     if (docFootEl) {
       docFootEl.textContent =
-        "이 표는 " + state.meta.partFilter + " 조항 중 규제 문서에 인용된 횟수가 많은 순으로 뽑은 것입니다. " +
-        "FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없어, 순위는 사실상 Warning Letter 기준입니다. " +
-        "모든 경고서한 맺음말에 붙는 권고·정의 조항(" + state.meta.excluded + ")은 위반 인용이 아니라 제외했습니다. " +
-        "사례는 국문 번역이 끝난 지적만 나오므로 인용 문서 수보다 적을 수 있습니다. " +
-        "날짜는 실사한 날이 아니라 자료가 공개된 날입니다. 출처: GRM (grm-solutions.com)";
+        _t("이 표는 {partFilter} 조항 중 규제 문서에 인용된 횟수가 많은 순으로 뽑은 것입니다. FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없어, 순위는 사실상 Warning Letter 기준입니다. 모든 경고서한 맺음말에 붙는 권고·정의 조항({excluded})은 위반 인용이 아니라 제외했습니다. 사례는 국문 번역이 끝난 지적만 나오므로 인용 문서 수보다 적을 수 있습니다. 날짜는 실사한 날이 아니라 자료가 공개된 날입니다. 출처: GRM (grm-solutions.com)",
+          { partFilter: state.meta.partFilter, excluded: state.meta.excluded });
     }
     docEl.hidden = false;
     if (exportEl) exportEl.hidden = false;
@@ -229,9 +234,9 @@
   // 열 구성은 TSV(클립보드)·CSV(파일)가 완전히 같다 — 같은 표를 두 경로로 낼 뿐이다.
   function exportRows() {
     var maxEx = state.meta ? state.meta.examples : 0;
-    var header = ["번호", "조항", "요지", "인용 문서수", "최근 12개월"];
-    for (var i = 0; i < maxEx; i++) header.push("대표 사례 " + (i + 1));
-    header.push("판정", "확인 결과·근거 문서");
+    var header = [_t("번호"), _t("조항"), _t("요지"), _t("인용 문서수"), _t("최근 12개월")];
+    for (var i = 0; i < maxEx; i++) header.push(_t("대표 사례 {n}", { n: i + 1 }));
+    header.push(_t("판정"), _t("확인 결과·근거 문서"));
     var out = [header];
     state.rows.forEach(function (row, idx) {
       var line = [
@@ -278,13 +283,13 @@
     var text = toTsv(exportRows());
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
-        flashCopyMsg("복사했습니다 — 엑셀에 붙여넣으세요.");
+        flashCopyMsg(_t("복사했습니다 — 엑셀에 붙여넣으세요."));
       }).catch(function () {
-        flashCopyMsg("복사하지 못했습니다. CSV 내려받기를 이용해 주세요.");
+        flashCopyMsg(_t("복사하지 못했습니다. CSV 내려받기를 이용해 주세요."));
       });
       return;
     }
-    flashCopyMsg("이 브라우저에서는 복사가 지원되지 않습니다. CSV 내려받기를 이용해 주세요.");
+    flashCopyMsg(_t("이 브라우저에서는 복사가 지원되지 않습니다. CSV 내려받기를 이용해 주세요."));
   }
 
   function downloadCsv() {
@@ -294,12 +299,12 @@
     var href = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = href;
-    a.download = "GRM_자가점검_체크리스트_" + (state.meta ? state.meta.asOf : "") + ".csv";
+    a.download = _t("GRM_자가점검_체크리스트_{asOf}", { asOf: state.meta ? state.meta.asOf : "" }) + ".csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(href);
-    flashCopyMsg("CSV 파일을 내려받았습니다.");
+    flashCopyMsg(_t("CSV 파일을 내려받았습니다."));
   }
 
   // ── 조립 ────────────────────────────────────────────────────────────────
@@ -329,7 +334,7 @@
     if (exportEl) exportEl.hidden = true;
     errorEl.hidden = true;
     loadingEl.hidden = false;
-    loadingEl.textContent = "체크리스트를 만드는 중…";
+    loadingEl.textContent = _t("체크리스트를 만드는 중…");
     flashCopyMsg("");
 
     rpc("findings_cfr_ranking", { p_months: 12 }).then(function (rank) {
@@ -369,12 +374,12 @@
             // ★sortKey 는 응답 필드명("recent_docs"/"docs")이지 셀렉트 값("recent")이
             // 아니다 — 여기서 "recent" 와 비교하면 항상 거짓이 되어, 최근순으로 정렬한
             // 표에도 인쇄물 머리에 "전체 누적 인용순"이 찍힌다(실제로 그랬다).
-            sortLabel: sortKey === "recent_docs" ? "최근 12개월 인용순" : "전체 누적 인용순",
+            sortLabel: sortKey === "recent_docs" ? _t("최근 12개월 인용순") : _t("전체 누적 인용순"),
             asOf: scope.as_of || "",
             partFilter: scope.part_filter || "21 CFR 210/211",
             excluded: (scope.excluded_sections || []).join(" · "),
             sources: (scope.sources || []).map(function (s) {
-              return s.source + " " + fmtNum(s.docs) + "건";
+              return _t("{source} {docs}건", { source: s.source, docs: fmtNum(s.docs) });
             }).join(" · "),
           };
           loadingEl.hidden = true;
@@ -389,7 +394,7 @@
   }
 
   if (!url || !key) {
-    loadingEl.textContent = "체크리스트 서비스 준비 중입니다.";
+    loadingEl.textContent = _t("체크리스트 서비스 준비 중입니다.");
     return;
   }
 

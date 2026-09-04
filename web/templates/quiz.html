@@ -12,31 +12,31 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Weekly Quiz</span>
-    <h1 class="reveal" style="animation-delay:.08s">주간 퀴즈</h1>
-    <p class="reveal" style="animation-delay:.14s">규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위 경쟁은 없어요 — 풀이 기록은 이 브라우저에만 저장되어 구름이가 자라나요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.</p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _('주간 퀴즈') }}</h1>
+    <p class="reveal" style="animation-delay:.14s">{{ _('규제·품질 용어와 최근 공개 사례를 짧게 복습하는 퀴즈입니다. 선택하면 바로 정답과 해설, 그리고 근거로 이동하는 링크를 보여드려요. 순위 경쟁은 없어요 — 풀이 기록은 이 브라우저에만 저장되어 구름이가 자라나요. 정답과 해설은 모두 GRM의 공개 근거에서 다시 확인할 수 있습니다.') }}</p>
   </div>
 
   {#- 구름이 성장 패널 자리표시자(9차 G2) — 마크업·수치는 전부 assets/growth.js 가 런타임
       주입(localStorage 파생 — 결정론 골든 불침범). JS 미로드 시 hidden 그대로 = 무영향. -#}
-  <section class="wrap qz-growth" id="grm-growth" hidden aria-label="구름이 성장 현황"></section>
+  <section class="wrap qz-growth" id="grm-growth" hidden aria-label="{{ _('구름이 성장 현황') }}"></section>
 
   <div class="wrap qz-tools reveal" style="animation-delay:.2s"
        id="grm-qz" data-weekly-count="{{ quiz.weekly_count }}" data-total="{{ quiz.total }}">
     <div class="qz-head">
-      <h2 class="qz-set-title" id="grm-qz-title">이번 주 퀴즈</h2>
-      <p class="qz-set-sub" id="grm-qz-sub">이번 주에 뽑은 문항이에요. 같은 주에는 모두 같은 문제를 풀어요.</p>
+      <h2 class="qz-set-title" id="grm-qz-title">{{ _('이번 주 퀴즈') }}</h2>
+      <p class="qz-set-sub" id="grm-qz-sub">{{ _('이번 주에 뽑은 문항이에요. 같은 주에는 모두 같은 문제를 풀어요.') }}</p>
     </div>
     <div class="qz-bar">
-      <p class="qz-score" id="grm-qz-score" aria-live="polite">맞힌 문제 <b id="grm-qz-correct">0</b> · 푼 문제 <b id="grm-qz-answered">0</b></p>
-      <button class="qz-toggle" id="grm-qz-toggle" type="button" aria-pressed="false">전체 {{ quiz.total }}문항 풀기</button>
+      <p class="qz-score" id="grm-qz-score" aria-live="polite">{{ _('맞힌 문제 <b id="grm-qz-correct">0</b> · 푼 문제 <b id="grm-qz-answered">0</b>') }}</p>
+      <button class="qz-toggle" id="grm-qz-toggle" type="button" aria-pressed="false">{{ _("전체 {n}문항 풀기", n=quiz.total) }}</button>
     </div>
     {#- 전체 보기 필터(13차) — 뱅크가 주 4문항씩 늘어 다 푼 문항을 다시 훑는 것 말고
         할 게 없던 문제. 기본 숨김이고 전체 보기에서만 quiz.js 가 노출한다. -#}
-    <div class="qz-filters" id="grm-qz-filters" role="group" aria-label="문항 종류 고르기" hidden>
-      <button class="qz-chip" type="button" data-filter="all" aria-pressed="true">전체</button>
-      <button class="qz-chip" type="button" data-filter="glossary" aria-pressed="false">개념</button>
-      <button class="qz-chip" type="button" data-filter="brief" aria-pressed="false">사례</button>
-      <button class="qz-chip" type="button" data-filter="unsolved" aria-pressed="false">안 푼 문항만</button>
+    <div class="qz-filters" id="grm-qz-filters" role="group" aria-label="{{ _('문항 종류 고르기') }}" hidden>
+      <button class="qz-chip" type="button" data-filter="all" aria-pressed="true">{{ _('전체') }}</button>
+      <button class="qz-chip" type="button" data-filter="glossary" aria-pressed="false">{{ _('개념') }}</button>
+      <button class="qz-chip" type="button" data-filter="brief" aria-pressed="false">{{ _('사례') }}</button>
+      <button class="qz-chip" type="button" data-filter="unsolved" aria-pressed="false">{{ _('안 푼 문항만') }}</button>
     </div>
   </div>
 
@@ -53,7 +53,7 @@
         <span class="qz-src-kind">{{ q.source_kind }}</span>
       </div>
       <h3 class="qz-q">{{ q.question_ko }}</h3>
-      <div class="qz-choices" role="group" aria-label="선택지">
+      <div class="qz-choices" role="group" aria-label="{{ _('선택지') }}">
         {% for c in q.choices %}
         <button class="qz-choice" type="button" data-i="{{ loop.index0 }}">
           <span class="qz-mark" aria-hidden="true">{{ marks[loop.index0] }}</span>
@@ -67,10 +67,10 @@
         <p class="qz-exp">{{ q.explanation_ko }}</p>
         {% if q.source_glossary_id %}
         <a class="qz-src-link" href="{{ rel_root }}glossary/index.html#{{ q.source_glossary_id }}">
-          <i class="ti ti-book-2" aria-hidden="true"></i>{{ q.source_kind }}에서 근거 보기</a>
+          <i class="ti ti-book-2" aria-hidden="true"></i>{{ _("{kind}에서 근거 보기", kind=q.source_kind) }}</a>
         {% elif q.source_url %}
         <a class="qz-src-link" href="{{ q.source_url }}">
-          <i class="ti ti-external-link" aria-hidden="true"></i>{{ q.source_kind }}에서 근거 보기</a>
+          <i class="ti ti-external-link" aria-hidden="true"></i>{{ _("{kind}에서 근거 보기", kind=q.source_kind) }}</a>
         {% endif %}
       </div>
     </article>
@@ -78,20 +78,20 @@
     {#- 완주 요약·오답노트(13차) — 정적 뼈대만 서버가 렌더하고(골든 고정) 점수·오답 목록은
         quiz.js 가 이미 렌더된 DOM 값으로 채운다. 이번 주 세트를 다 풀었을 때만 노출. -#}
     <section class="qz-result" id="grm-qz-result" role="status" aria-live="polite" hidden>
-      <h3 class="qz-result-title">이번 주 퀴즈 완주!</h3>
+      <h3 class="qz-result-title">{{ _('이번 주 퀴즈 완주!') }}</h3>
       <p class="qz-result-score" id="grm-qz-result-score"></p>
       <p class="qz-result-note" id="grm-qz-result-note"></p>
       <div class="qz-wrong" id="grm-qz-wrong" hidden>
-        <h4 class="qz-wrong-title">다시 볼 문항</h4>
+        <h4 class="qz-wrong-title">{{ _('다시 볼 문항') }}</h4>
         <ul class="qz-wrong-list" id="grm-qz-wrong-list"></ul>
       </div>
       <div class="qz-result-actions">
-        <button class="qz-result-btn is-primary" id="grm-qz-retry" type="button" hidden>틀린 문제만 다시 풀기</button>
-        <button class="qz-result-btn" id="grm-qz-share" type="button">결과 복사</button>
+        <button class="qz-result-btn is-primary" id="grm-qz-retry" type="button" hidden>{{ _('틀린 문제만 다시 풀기') }}</button>
+        <button class="qz-result-btn" id="grm-qz-share" type="button">{{ _('결과 복사') }}</button>
       </div>
     </section>
     {#- 필터 결과가 0건일 때(예: 전체를 다 푼 뒤 "안 푼 문항만") — 빈 화면 대신 안내. -#}
-    <p class="qz-empty" id="grm-qz-empty" hidden>조건에 맞는 문항이 없어요. 다른 필터를 눌러보세요.</p>
+    <p class="qz-empty" id="grm-qz-empty" hidden>{{ _('조건에 맞는 문항이 없어요. 다른 필터를 눌러보세요.') }}</p>
   </div>
 </main>
 {% include "backtotop.html" %}

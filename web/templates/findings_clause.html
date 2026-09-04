@@ -40,23 +40,23 @@
 </style>
 <main>
   <div class="wrap">
-    <nav class="fx-crumb" aria-label="현재 위치">
-      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/clause/">조항별</a><i>&rsaquo;</i><span>{{ clause.code }}</span>
+    <nav class="fx-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/clause/">{{ _('조항별') }}</a><i>&rsaquo;</i><span>{{ clause.code }}</span>
     </nav>
     <p class="kick">US &middot; 21 CFR</p>
-    <h1 class="fx-h1">{{ clause.code }} 지적사례</h1>
+    <h1 class="fx-h1">{{ _("{code} 지적사례", code=clause.code) }}</h1>
     {%- if clause.title_en %}
     {#- 조항 제목은 미국 연방규정 원문(영문) 그대로다 — 국문 제목을 지어내지 않는다. -#}
     <p class="fx-title-en">{{ clause.title_en }}</p>
     {%- endif %}
-    <p class="fx-sum">이 조항을 인용한 지적사항 <b>{{ "{:,}".format(clause.findings) }}</b>건을 <b>{{ "{:,}".format(clause.documents) }}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.</p>
-    <a class="fx-cta" href="{{ rel_root }}findings/index.html?q={{ clause.code | urlencode }}">{{ clause.code }} 지적사항 전체 검색 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+    <p class="fx-sum">{{ _("이 조항을 인용한 지적사항 <b>{a}</b>건을 <b>{b}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.", a="{:,}".format(clause.findings), b="{:,}".format(clause.documents)) }}</p>
+    <a class="fx-cta" href="{{ rel_root }}findings/index.html?q={{ clause.code | urlencode }}">{{ _("{code} 지적사항 전체 검색", code=clause.code) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
   </div>
 
   <div class="wrap fx-body">
     {% if clause.samples %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">최근 지적 사례</h2>
+      <h2 class="fx-sec-h">{{ _('최근 지적 사례') }}</h2>
       <div class="fx-cases">
         {%- for s in clause.samples %}
         <article class="fx-case">
@@ -67,10 +67,10 @@
           </div>
           <p class="fx-case-t">{{ s.text_ko }}</p>
           {%- if s.doc_slug %}
-          <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">이 문서의 지적 전체 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">{{ _('이 문서의 지적 전체 보기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
           {%- endif %}
           {%- if s.evidence_url %}
-          <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
+          <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">{{ _('공개 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
           {%- endif %}
         </article>
         {%- endfor %}
@@ -82,7 +82,7 @@
         말인지는 우리 용어 설명이 채운다(상호 진입 간선이기도 하다). -#}
     {% if clause.terms %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">이 조항과 관련된 용어</h2>
+      <h2 class="fx-sec-h">{{ _('이 조항과 관련된 용어') }}</h2>
       <div class="fx-sibs">
         {%- for t in clause.terms %}<a href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a>{% endfor %}
       </div>
@@ -91,9 +91,9 @@
 
     {% if clause.official_url %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">조항 원문</h2>
+      <h2 class="fx-sec-h">{{ _('조항 원문') }}</h2>
       <div class="fx-sibs">
-        <a href="{{ clause.official_url }}" target="_blank" rel="noopener">eCFR 에서 {{ clause.code }} 원문 보기</a>
+        <a href="{{ clause.official_url }}" target="_blank" rel="noopener">{{ _("eCFR 에서 {code} 원문 보기", code=clause.code) }}</a>
       </div>
     </section>
     {% endif %}
@@ -102,7 +102,7 @@
         (문서 3,202장이 실제로 그렇게 떠 있었다 · findings_facet.html 주석 참조). -#}
     {% if siblings %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">다른 조항</h2>
+      <h2 class="fx-sec-h">{{ _('다른 조항') }}</h2>
       <div class="fx-sibs">
         {%- for s in siblings %}<a href="{{ rel_root }}findings/clause/{{ s.slug }}/"{% if s.slug == clause.slug %} class="on" aria-current="page"{% endif %}>{{ s.code }}</a>{% endfor %}
       </div>
@@ -113,7 +113,7 @@
 {#- ★실명 업체가 인쇄되는 페이지에는 시점 고지가 반드시 붙는다(findings_facet 과 동일
           문구·동일 규율). 같은 업체명을 같은 무게로 노출하면서 한쪽만 맥락을 주면 몇 년
           전 지적이 현재 상태로 읽힌다. -#}
-      <p class="fx-note"><b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 &mdash; 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것이고, 조항 인용은 원문에 적힌 것을 그대로 집계했습니다. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.</p>
+      <p class="fx-note">{{ _('<b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 &mdash; 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것이고, 조항 인용은 원문에 적힌 것을 그대로 집계했습니다. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.') }}</p>
     </section>
   </div>
 </main>

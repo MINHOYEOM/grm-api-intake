@@ -5,6 +5,11 @@
    provenance: 카드 사실·원문 URL 미참조 — 불투명 card_id(=card.anchor)만 취급. */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
 
   // ── 인증 오류 분류(순수 함수 — DOM·Supabase 무의존) ───────────────────────────
   // Supabase Auth 는 공식 오류 코드를 준다(email_not_confirmed·user_already_exists·
@@ -110,23 +115,23 @@
     var el = ensureAuthEl(); if (!el) return;
     el.innerHTML = "";
     if (session && session.user) {
-      var email = session.user.email || "회원", ini = acctInitial(email);
+      var email = session.user.email || _t("회원"), ini = acctInitial(email);
       var wrap = document.createElement("div"); wrap.className = "grm-acct";
       wrap.innerHTML =
-        '<button type="button" class="grm-acct-btn" aria-haspopup="menu" aria-expanded="false" aria-label="계정 메뉴">' +
+        '<button type="button" class="grm-acct-btn" aria-haspopup="menu" aria-expanded="false" aria-label="' + _t("계정 메뉴") + '">' +
         '<span class="grm-acct-av">' + esc(ini) + '</span>' +
         '<i class="ti ti-chevron-down grm-acct-cv" aria-hidden="true"></i></button>' +
         '<div class="grm-acct-menu" role="menu" hidden>' +
         '<div class="grm-acct-head"><span class="grm-acct-av grm-acct-av-lg">' + esc(ini) + '</span>' +
-        '<span class="grm-acct-id"><span class="grm-acct-label">로그인 계정</span>' +
+        '<span class="grm-acct-id"><span class="grm-acct-label">' + _t("로그인 계정") + '</span>' +
         '<span class="grm-acct-email">' + esc(email) + '</span></span></div>' +
         '<div class="grm-acct-div"></div>' +
         // 13차: /me 가 스크랩 전용에서 개인 홈(스크랩·구름이·관심 업체)으로 넓어져
         // 메뉴 이름도 실제와 맞췄다 — 링크·아이콘·위치는 그대로(새 표면 0).
         '<a class="grm-acct-item" role="menuitem" href="' + esc(cfgRoot) + 'me/index.html">' +
-        '<i class="ti ti-bookmark" aria-hidden="true"></i>마이페이지</a>' +
+        '<i class="ti ti-bookmark" aria-hidden="true"></i>' + _t("마이페이지") + '</a>' +
         '<button type="button" class="grm-acct-item grm-acct-out" role="menuitem">' +
-        '<i class="ti ti-logout" aria-hidden="true"></i>로그아웃</button></div>';
+        '<i class="ti ti-logout" aria-hidden="true"></i>' + _t("로그아웃") + '</button></div>';
       el.appendChild(wrap);
       var btn = wrap.querySelector(".grm-acct-btn"), menu = wrap.querySelector(".grm-acct-menu");
       btn.addEventListener("click", function (e) {
@@ -148,7 +153,7 @@
       }
     } else {
       var login = document.createElement("button");
-      login.type = "button"; login.className = "grm-acct-login"; login.textContent = "로그인";
+      login.type = "button"; login.className = "grm-acct-login"; login.textContent = _t("로그인");
       login.addEventListener("click", function () { openLogin(); });
       el.appendChild(login);
     }
@@ -165,11 +170,11 @@
   // 성공 경로·세션 저장소(grm-public-auth-v1)·하트/스크랩 로직은 건드리지 않는다.
   var pop, resetEmail = "", pendingSignupEmail = "", resendTimer = null;
   var MODE_COPY = {
-    login:   { title: "로그인",          sub: "이메일과 비밀번호만 있으면 됩니다." },
-    signup:  { title: "회원가입",        sub: "이메일과 비밀번호만 정하면 끝이에요. 확인 코드를 메일로 보내드립니다." },
-    confirm: { title: "확인 코드 입력",   sub: "메일로 받은 코드를 넣으면 가입이 끝나요." },
-    reqcode: { title: "비밀번호 재설정",   sub: "가입한 이메일로 재설정 코드를 보내드립니다." },
-    newpw:   { title: "새 비밀번호 설정",  sub: "메일로 받은 코드와 새 비밀번호를 입력하세요." }
+    login:   { title: _t("로그인"),          sub: _t("이메일과 비밀번호만 있으면 됩니다.") },
+    signup:  { title: _t("회원가입"),        sub: _t("이메일과 비밀번호만 정하면 끝이에요. 확인 코드를 메일로 보내드립니다.") },
+    confirm: { title: _t("확인 코드 입력"),   sub: _t("메일로 받은 코드를 넣으면 가입이 끝나요.") },
+    reqcode: { title: _t("비밀번호 재설정"),   sub: _t("가입한 이메일로 재설정 코드를 보내드립니다.") },
+    newpw:   { title: _t("새 비밀번호 설정"),  sub: _t("메일로 받은 코드와 새 비밀번호를 입력하세요.") }
   };
 
   // 가입 진행 상태 보존(팝업을 닫아도 코드 입력 단계로 복원) ─────────────────────
@@ -197,40 +202,40 @@
   function pwField(ph, ac) {
     return '<span class="grm-pw-wrap"><input type="password" required minlength="6" autocomplete="' + ac +
       '" placeholder="' + ph + '" aria-label="' + ph + '" />' +
-      '<button type="button" class="grm-pw-toggle" aria-label="비밀번호 표시">' + EYE + '</button></span>';
+      '<button type="button" class="grm-pw-toggle" aria-label="' + _t("비밀번호 표시") + '">' + EYE + '</button></span>';
   }
 
   function buildPop() {
     pop = document.createElement("div");
     pop.className = "grm-login-pop";
     pop.innerHTML =
-      '<div class="grm-login-card" role="dialog" aria-modal="true" aria-label="로그인">' +
-      '<button type="button" class="grm-login-x" aria-label="닫기">×</button>' +
+      '<div class="grm-login-card" role="dialog" aria-modal="true" aria-label="' + _t("로그인") + '">' +
+      '<button type="button" class="grm-login-x" aria-label="' + _t("닫기") + '">×</button>' +
       '<div class="grm-login-brand">' + OWL_SVG + '<span>Global Regulatory Monitor</span></div>' +
-      '<h3 class="grm-login-title">로그인</h3>' +
+      '<h3 class="grm-login-title">' + _t("로그인") + '</h3>' +
       '<p class="grm-login-sub"></p>' +
       // 로그인·회원가입 공용 폼(이메일 + 비밀번호)
       '<form class="grm-login-form grm-login-auth" novalidate>' +
-      '<input type="email" required autocomplete="email" placeholder="you@company.com" aria-label="이메일" />' +
-      pwField("비밀번호(6자 이상)", "current-password") +
-      '<button type="submit" class="grm-login-primary">로그인</button></form>' +
+      '<input type="email" required autocomplete="email" placeholder="you@company.com" aria-label="' + _t("이메일") + '" />' +
+      pwField(_t("비밀번호(6자 이상)"), "current-password") +
+      '<button type="submit" class="grm-login-primary">' + _t("로그인") + '</button></form>' +
       // 회원가입 이메일 확인: 코드
       '<form class="grm-login-form grm-login-confirm" style="display:none" novalidate>' +
-      '<input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="메일로 받은 확인 코드" aria-label="확인 코드" />' +
-      '<button type="submit" class="grm-login-primary">가입 완료</button></form>' +
+      '<input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="' + _t("메일로 받은 확인 코드") + '" aria-label="' + _t("확인 코드") + '" />' +
+      '<button type="submit" class="grm-login-primary">' + _t("가입 완료") + '</button></form>' +
       // 재설정 1단계: 이메일
       '<form class="grm-login-form grm-login-reqcode" style="display:none" novalidate>' +
-      '<input type="email" required autocomplete="email" placeholder="가입한 이메일" aria-label="이메일" />' +
-      '<button type="submit" class="grm-login-primary">재설정 코드 받기</button></form>' +
+      '<input type="email" required autocomplete="email" placeholder="' + _t("가입한 이메일") + '" aria-label="' + _t("이메일") + '" />' +
+      '<button type="submit" class="grm-login-primary">' + _t("재설정 코드 받기") + '</button></form>' +
       // 재설정 2단계: 코드 + 새 비밀번호
       '<form class="grm-login-form grm-login-newpw" style="display:none" novalidate>' +
-      '<input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="메일로 받은 코드" aria-label="재설정 코드" />' +
-      pwField("새 비밀번호(6자 이상)", "new-password") +
-      '<button type="submit" class="grm-login-primary">비밀번호 변경</button></form>' +
+      '<input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="' + _t("메일로 받은 코드") + '" aria-label="' + _t("재설정 코드") + '" />' +
+      pwField(_t("새 비밀번호(6자 이상)"), "new-password") +
+      '<button type="submit" class="grm-login-primary">' + _t("비밀번호 변경") + '</button></form>' +
       '<p class="grm-login-hint" role="alert"></p>' +
       '<p class="grm-login-msg" role="status" aria-live="polite"></p>' +
       '<button type="button" class="grm-login-resend" style="display:none"></button>' +
-      '<p class="grm-login-note" style="display:none">가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 이메일 외에는 아무것도 받지 않으며, 비밀번호는 안전하게 암호화되어 저장됩니다.</p>' +
+      '<p class="grm-login-note" style="display:none">' + _t("가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 이메일 외에는 아무것도 받지 않으며, 비밀번호는 안전하게 암호화되어 저장됩니다.") + '</p>' +
       '<div class="grm-login-alt"></div>' +
       '</div>';
     document.body.appendChild(pop);
@@ -252,7 +257,7 @@
         var show = inp.type === "password";
         inp.type = show ? "text" : "password";
         tg.innerHTML = show ? EYE_OFF : EYE;
-        tg.setAttribute("aria-label", show ? "비밀번호 숨김" : "비밀번호 표시");
+        tg.setAttribute("aria-label", show ? _t("비밀번호 숨김") : _t("비밀번호 표시"));
       });
     });
     // 입력 시 힌트 해제
@@ -265,11 +270,11 @@
       e.preventDefault();
       var email = (authForm.querySelector('input[type="email"]').value || "").trim();
       var pw = (authForm.querySelector(".grm-pw-wrap input").value || "");
-      if (!EMAIL_RE.test(email)) { hint.textContent = "올바른 이메일 형식을 입력해 주세요."; return; }
-      if (isAdminEmail(email)) { hint.textContent = "운영자 계정은 Admin 페이지에서 로그인하세요."; return; }
-      if (pw.length < 6) { hint.textContent = "비밀번호는 6자 이상이어야 합니다."; return; }
+      if (!EMAIL_RE.test(email)) { hint.textContent = _t("올바른 이메일 형식을 입력해 주세요."); return; }
+      if (isAdminEmail(email)) { hint.textContent = _t("운영자 계정은 Admin 페이지에서 로그인하세요."); return; }
+      if (pw.length < 6) { hint.textContent = _t("비밀번호는 6자 이상이어야 합니다."); return; }
       var signup = pop.getAttribute("data-mode") === "signup";
-      setBusy(authForm, true); m.textContent = signup ? "가입 중…" : "로그인 중…";
+      setBusy(authForm, true); m.textContent = signup ? _t("가입 중…") : _t("로그인 중…");
       var call = signup
         ? sb.auth.signUp({ email: email, password: pw })
         : sb.auth.signInWithPassword({ email: email, password: pw });
@@ -281,46 +286,46 @@
           if (!signup && classifyAuthError(res.error) === "unconfirmed") {
             pendingSignupEmail = email; saveSignupProgress(email);
             setMode("confirm");
-            m.textContent = "가입 확인이 아직이에요 — " + email + " 로 보낸 확인 코드를 입력해 주세요. 코드가 없으면 아래에서 다시 받을 수 있어요.";
+            m.textContent = _t("가입 확인이 아직이에요 — {email} 로 보낸 확인 코드를 입력해 주세요. 코드가 없으면 아래에서 다시 받을 수 있어요.", { email: email });
             return;
           }
           hint.textContent = authErr(res.error, signup);
           return;
         }
         if (signup) {
-          if (res.data && res.data.session) { clearSignupProgress(); m.textContent = "가입되었습니다."; }
-          else { pendingSignupEmail = email; saveSignupProgress(email); setMode("confirm"); m.textContent = "확인 코드를 " + email + " 로 보냈습니다."; }
-        } else { m.textContent = "로그인되었습니다."; }
-      }).catch(function () { setBusy(authForm, false); m.textContent = ""; hint.textContent = "요청에 실패했습니다. 잠시 후 다시 시도해 주세요."; });
+          if (res.data && res.data.session) { clearSignupProgress(); m.textContent = _t("가입되었습니다."); }
+          else { pendingSignupEmail = email; saveSignupProgress(email); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); }
+        } else { m.textContent = _t("로그인되었습니다."); }
+      }).catch(function () { setBusy(authForm, false); m.textContent = ""; hint.textContent = _t("요청에 실패했습니다. 잠시 후 다시 시도해 주세요."); });
     });
 
     // 회원가입 이메일 확인: 코드 검증(type:"signup")
     confirmForm.addEventListener("submit", function (e) {
       e.preventDefault();
       var token = (confirmForm.querySelector("input").value || "").trim();
-      if (!token) { hint.textContent = "메일로 받은 코드를 입력해 주세요."; return; }
+      if (!token) { hint.textContent = _t("메일로 받은 코드를 입력해 주세요."); return; }
       if (!pendingSignupEmail) { setMode("signup"); return; }
-      setBusy(confirmForm, true); m.textContent = "확인 중…";
+      setBusy(confirmForm, true); m.textContent = _t("확인 중…");
       sb.auth.verifyOtp({ email: pendingSignupEmail, token: token, type: "signup" }).then(function (res) {
         setBusy(confirmForm, false);
-        if (res && res.error) { m.textContent = ""; hint.textContent = "코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."; return; }
+        if (res && res.error) { m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
         clearSignupProgress();
-        m.textContent = "가입이 완료되었습니다.";
-      }).catch(function () { setBusy(confirmForm, false); m.textContent = ""; hint.textContent = "확인에 실패했습니다. 다시 시도해 주세요."; });
+        m.textContent = _t("가입이 완료되었습니다.");
+      }).catch(function () { setBusy(confirmForm, false); m.textContent = ""; hint.textContent = _t("확인에 실패했습니다. 다시 시도해 주세요."); });
     });
 
     // 재설정 1단계: 코드 발송
     reqcodeForm.addEventListener("submit", function (e) {
       e.preventDefault();
       var email = (reqcodeForm.querySelector("input").value || "").trim();
-      if (!EMAIL_RE.test(email)) { hint.textContent = "올바른 이메일 형식을 입력해 주세요."; return; }
-      if (isAdminEmail(email)) { hint.textContent = "운영자 비밀번호 재설정은 Admin 페이지에서 진행하세요."; return; }
-      setBusy(reqcodeForm, true); m.textContent = "전송 중…";
+      if (!EMAIL_RE.test(email)) { hint.textContent = _t("올바른 이메일 형식을 입력해 주세요."); return; }
+      if (isAdminEmail(email)) { hint.textContent = _t("운영자 비밀번호 재설정은 Admin 페이지에서 진행하세요."); return; }
+      setBusy(reqcodeForm, true); m.textContent = _t("전송 중…");
       sb.auth.resetPasswordForEmail(email).then(function (res) {
         setBusy(reqcodeForm, false);
-        if (res && res.error) { m.textContent = ""; hint.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해 주세요."; return; }
-        resetEmail = email; setMode("newpw"); m.textContent = "재설정 코드를 " + email + " 로 보냈습니다.";
-      }).catch(function () { setBusy(reqcodeForm, false); m.textContent = ""; hint.textContent = "전송에 실패했습니다. 잠시 후 다시 시도해 주세요."; });
+        if (res && res.error) { m.textContent = ""; hint.textContent = _t("전송에 실패했습니다. 잠시 후 다시 시도해 주세요."); return; }
+        resetEmail = email; setMode("newpw"); m.textContent = _t("재설정 코드를 {email} 로 보냈습니다.", { email: email });
+      }).catch(function () { setBusy(reqcodeForm, false); m.textContent = ""; hint.textContent = _t("전송에 실패했습니다. 잠시 후 다시 시도해 주세요."); });
     });
 
     // 재설정 2단계: 코드 검증(recovery) → 새 비밀번호 저장
@@ -328,18 +333,18 @@
       e.preventDefault();
       var token = (newpwForm.querySelector('input[type="text"]').value || "").trim();
       var pw = (newpwForm.querySelector(".grm-pw-wrap input").value || "");
-      if (!token) { hint.textContent = "메일로 받은 코드를 입력해 주세요."; return; }
-      if (pw.length < 6) { hint.textContent = "새 비밀번호는 6자 이상이어야 합니다."; return; }
+      if (!token) { hint.textContent = _t("메일로 받은 코드를 입력해 주세요."); return; }
+      if (pw.length < 6) { hint.textContent = _t("새 비밀번호는 6자 이상이어야 합니다."); return; }
       if (!resetEmail) { setMode("reqcode"); return; }
-      setBusy(newpwForm, true); m.textContent = "확인 중…";
+      setBusy(newpwForm, true); m.textContent = _t("확인 중…");
       sb.auth.verifyOtp({ email: resetEmail, token: token, type: "recovery" }).then(function (res) {
-        if (res && res.error) { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = "코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."; return; }
+        if (res && res.error) { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
         return sb.auth.updateUser({ password: pw }).then(function (up) {
           setBusy(newpwForm, false);
-          if (up && up.error) { m.textContent = ""; hint.textContent = "비밀번호 변경에 실패했습니다. 다시 시도해 주세요."; return; }
-          m.textContent = "비밀번호가 변경되어 로그인되었습니다.";
+          if (up && up.error) { m.textContent = ""; hint.textContent = _t("비밀번호 변경에 실패했습니다. 다시 시도해 주세요."); return; }
+          m.textContent = _t("비밀번호가 변경되어 로그인되었습니다.");
         });
-      }).catch(function () { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = "확인에 실패했습니다. 다시 시도해 주세요."; });
+      }).catch(function () { setBusy(newpwForm, false); m.textContent = ""; hint.textContent = _t("확인에 실패했습니다. 다시 시도해 주세요."); });
     });
 
     // 코드 재전송(쿨다운 30초)
@@ -352,12 +357,12 @@
         : sb.auth.resetPasswordForEmail(email);
       startResendCooldown();
       if (mode === "confirm") saveSignupProgress(email);   // 재전송 = 진행 중 → 만료 시계 갱신
-      m.textContent = "코드를 다시 보냈습니다.";
+      m.textContent = _t("코드를 다시 보냈습니다.");
       call.then(function (res) {
         if (res && res.error) {
           m.textContent = classifyAuthError(res.error) === "rate_limit"
-            ? "메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요."
-            : "재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+            ? _t("메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.")
+            : _t("재전송에 실패했습니다. 잠시 후 다시 시도해 주세요.");
         }
       }).catch(function () {});
     });
@@ -367,12 +372,12 @@
   // 맥락별 기본 문구로 떨어진다(가입/로그인 각각 기존 문구 그대로 — 무회귀).
   function authErr(err, signup) {
     switch (classifyAuthError(err)) {
-      case "exists":         return "이미 가입된 이메일이에요. 로그인하거나 비밀번호를 재설정해 주세요.";
-      case "weak_password":  return "비밀번호는 6자 이상으로 정해 주세요.";
-      case "rate_limit":     return "메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.";
-      case "unconfirmed":    return "가입 확인이 아직이에요. 메일로 받은 확인 코드를 입력해 주세요.";
-      default:               return signup ? "가입에 실패했습니다. 잠시 후 다시 시도해 주세요."
-                                           : "이메일 또는 비밀번호가 올바르지 않습니다.";
+      case "exists":         return _t("이미 가입된 이메일이에요. 로그인하거나 비밀번호를 재설정해 주세요.");
+      case "weak_password":  return _t("비밀번호는 6자 이상으로 정해 주세요.");
+      case "rate_limit":     return _t("메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.");
+      case "unconfirmed":    return _t("가입 확인이 아직이에요. 메일로 받은 확인 코드를 입력해 주세요.");
+      default:               return signup ? _t("가입에 실패했습니다. 잠시 후 다시 시도해 주세요.")
+                                           : _t("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
   }
 
@@ -386,11 +391,11 @@
     var left = 30;
     link.disabled = true;
     if (resendTimer) clearInterval(resendTimer);
-    link.textContent = "재전송 (" + left + "초)";
+    link.textContent = _t("재전송 ({left}초)", { left: left });
     resendTimer = setInterval(function () {
       left -= 1;
-      if (left <= 0) { clearInterval(resendTimer); resendTimer = null; link.disabled = false; link.textContent = "코드 재전송"; }
-      else { link.textContent = "재전송 (" + left + "초)"; }
+      if (left <= 0) { clearInterval(resendTimer); resendTimer = null; link.disabled = false; link.textContent = _t("코드 재전송"); }
+      else { link.textContent = _t("재전송 ({left}초)", { left: left }); }
     }, 1000);
   }
 
@@ -418,14 +423,14 @@
     if (isAuth) {
       var pwIn = authForm.querySelector(".grm-pw-wrap input");
       pwIn.setAttribute("autocomplete", mode === "signup" ? "new-password" : "current-password");
-      authForm.querySelector(".grm-login-primary").textContent = (mode === "signup") ? "가입하기" : "로그인";
+      authForm.querySelector(".grm-login-primary").textContent = (mode === "signup") ? _t("가입하기") : _t("로그인");
     }
 
     // 코드 재전송 링크(confirm/newpw) + 개인정보 안내(signup)
     var resend = pop.querySelector(".grm-login-resend");
     var showResend = (mode === "confirm" || mode === "newpw");
     resend.style.display = showResend ? "block" : "none";
-    if (showResend && !resend.disabled) resend.textContent = "코드 재전송";
+    if (showResend && !resend.disabled) resend.textContent = _t("코드 재전송");
     pop.querySelector(".grm-login-note").style.display = (mode === "signup") ? "block" : "none";
 
     // 하단 전환 링크
@@ -440,14 +445,14 @@
       });
       alt.appendChild(b);
     }
-    if (mode === "login") { addLink("회원가입", "signup"); addLink("비밀번호를 잊으셨나요?", "reqcode"); }
-    else if (mode === "signup") { addLink("이미 계정이 있어요 · 로그인", "login"); }
+    if (mode === "login") { addLink(_t("회원가입"), "signup"); addLink(_t("비밀번호를 잊으셨나요?"), "reqcode"); }
+    else if (mode === "signup") { addLink(_t("이미 계정이 있어요 · 로그인"), "login"); }
     else if (mode === "confirm") {
       // 복원된 가입 흐름에서 빠져나갈 두 출구(막다른 길 0) — "다른 이메일"은 진행 상태를 버린다.
-      addLink("로그인으로 돌아가기", "login");
-      addLink("다른 이메일로 가입", "signup", function () { clearSignupProgress(); pendingSignupEmail = ""; });
+      addLink(_t("로그인으로 돌아가기"), "login");
+      addLink(_t("다른 이메일로 가입"), "signup", function () { clearSignupProgress(); pendingSignupEmail = ""; });
     }
-    else { addLink("로그인으로 돌아가기", "login"); }
+    else { addLink(_t("로그인으로 돌아가기"), "login"); }
 
     var focusForm = isAuth ? authForm
       : (mode === "confirm" ? confirmForm : (mode === "reqcode" ? reqcodeForm : newpwForm));
@@ -465,7 +470,7 @@
     var o = (typeof opts === "string") ? { msg: opts } : (opts || {});
     Array.prototype.forEach.call(pop.querySelectorAll("input"), function (i) { i.value = ""; });
     Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-wrap input"), function (i) { i.type = "password"; });
-    Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-toggle"), function (t) { t.innerHTML = EYE; t.setAttribute("aria-label", "비밀번호 표시"); });
+    Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-toggle"), function (t) { t.innerHTML = EYE; t.setAttribute("aria-label", _t("비밀번호 표시")); });
     resetEmail = ""; pendingSignupEmail = "";
     if (resendTimer) { clearInterval(resendTimer); resendTimer = null; }
     var rs = pop.querySelector(".grm-login-resend"); rs.disabled = false;
@@ -474,7 +479,7 @@
     if (resume) {
       pendingSignupEmail = resume;
       setMode("confirm");
-      msg = "가입을 이어서 마무리할 수 있어요 — " + resume + " 로 보낸 확인 코드를 입력해 주세요.";
+      msg = _t("가입을 이어서 마무리할 수 있어요 — {resume} 로 보낸 확인 코드를 입력해 주세요.", { resume: resume });
     } else {
       setMode(o.mode === "signup" ? "signup" : "login");
     }
@@ -560,12 +565,12 @@
     head.innerHTML =
       '<div class="grm-me-card grm-me-guest">' +
       '<span class="grm-acct-av grm-acct-av-xl" aria-hidden="true"><i class="ti ti-user"></i></span>' +
-      '<div class="grm-me-idbox"><div class="grm-me-label">게스트</div>' +
-      '<div class="grm-me-email">아직 로그인하지 않았어요</div>' +
-      '<p class="grm-me-guest-s">가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓이고 있어요.</p>' +
+      '<div class="grm-me-idbox"><div class="grm-me-label">' + _t("게스트") + '</div>' +
+      '<div class="grm-me-email">' + _t("아직 로그인하지 않았어요") + '</div>' +
+      '<p class="grm-me-guest-s">' + _t("가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓이고 있어요.") + '</p>' +
       '<div class="grm-me-metaline">' +
-      '<button type="button" class="grm-me-signup">가입하고 시작하기</button>' +
-      '<button type="button" class="grm-me-out grm-me-login">이미 계정이 있어요 · 로그인</button>' +
+      '<button type="button" class="grm-me-signup">' + _t("가입하고 시작하기") + '</button>' +
+      '<button type="button" class="grm-me-out grm-me-login">' + _t("이미 계정이 있어요 · 로그인") + '</button>' +
       '</div></div></div>';
     // 가입 의도가 분명한 진입점이라 로그인 화면을 한 번 거치지 않고 가입 폼으로 직행한다
     // (growth-sync.js 펫 CTA 와 동일 계약 — window.GRM_AUTH.open({mode:"signup"})).
@@ -578,15 +583,15 @@
     var head = document.getElementById("grm-me-head");
     if (!head) return;
     if (!session || !session.user) { renderMeGuestHead(head); return; }
-    var email = session.user.email || "회원", ini = acctInitial(email);
-    var stat = (count == null) ? "" : ('<span class="grm-me-stat"><b>' + count + '</b> 스크랩</span>');
+    var email = session.user.email || _t("회원"), ini = acctInitial(email);
+    var stat = (count == null) ? "" : ('<span class="grm-me-stat">' + _t("<b>{count}</b> 스크랩", { count: count }) + '</span>');
     head.innerHTML =
       '<div class="grm-me-card">' +
       '<span class="grm-acct-av grm-acct-av-xl">' + esc(ini) + '</span>' +
-      '<div class="grm-me-idbox"><div class="grm-me-label">로그인 계정</div>' +
+      '<div class="grm-me-idbox"><div class="grm-me-label">' + _t("로그인 계정") + '</div>' +
       '<div class="grm-me-email">' + esc(email) + '</div>' +
       '<div class="grm-me-metaline">' + stat +
-      '<button type="button" class="grm-me-out">로그아웃</button></div></div></div>';
+      '<button type="button" class="grm-me-out">' + _t("로그아웃") + '</button></div></div></div>';
     var out = head.querySelector(".grm-me-out");
     if (out) out.addEventListener("click", function () { sb.auth.signOut(); });
   }
@@ -598,24 +603,24 @@
     if (!session || !session.user) {
       // 로그인 버튼은 상단 게스트 카드 하나로 모았다(같은 화면에 CTA 난립 금지) —
       // 여기선 무엇이 모이는지만 알려 주고 조용히 폴백한다. 관심 업체 섹션과 동형.
-      myScrapsEl.innerHTML = '<p class="grm-my-note">로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.</p>';
+      myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 스크랩한 카드를 이곳에 모아볼 수 있어요.") + '</p>';
       return;
     }
-    myScrapsEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
+    myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
     var idxUrl = myScrapsEl.getAttribute("data-index") || "/assets/search-index.json";
     Promise.all([
       sb.from("reaction").select("card_id,created_at").eq("kind", "scrap"),
       fetch(idxUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (out) {
       var res = out[0], idx = out[1];
-      if (res && res.error) { myScrapsEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>'; return; }
+      if (res && res.error) { myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오지 못했습니다. 잠시 후 다시 시도해 주세요.") + '</p>'; return; }
       var scraps = (res && res.data) ? res.data.slice() : [];
       if (!scraps.length) {
         myScrapsEl.innerHTML =
           '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-bookmark" aria-hidden="true"></i></span>' +
-          '<p class="grm-my-empty-t">아직 스크랩한 카드가 없어요</p>' +
-          '<p class="grm-my-empty-s">카드의 스크랩 버튼을 누르면 이곳에 모여요.</p>' +
-          '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'archive/index.html">규제뉴스 둘러보기</a></div>';
+          '<p class="grm-my-empty-t">' + _t("아직 스크랩한 카드가 없어요") + '</p>' +
+          '<p class="grm-my-empty-s">' + _t("카드의 스크랩 버튼을 누르면 이곳에 모여요.") + '</p>' +
+          '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'archive/index.html">' + _t("규제뉴스 둘러보기") + '</a></div>';
         renderMeHead(0);
         return;
       }
@@ -633,16 +638,16 @@
         li.className = "grm-my-item";
         if (e) {
           var a = document.createElement("a"); a.className = "grm-my-a"; a.href = e.href;
-          a.textContent = (e.target || "") + (e.issue ? (" — " + e.issue) : "") || "카드 보기";
+          a.textContent = (e.target || "") + (e.issue ? (" — " + e.issue) : "") || _t("카드 보기");
           var meta = document.createElement("span"); meta.className = "grm-my-meta";
           meta.textContent = [e.agency, e.date].filter(Boolean).join(" · ");
           li.appendChild(a); li.appendChild(meta);
         } else {
           var sp = document.createElement("span"); sp.className = "grm-my-meta";
-          sp.textContent = "저장된 카드 (원문을 찾지 못함)";
+          sp.textContent = _t("저장된 카드 (원문을 찾지 못함)");
           li.appendChild(sp);
         }
-        var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = "스크랩 해제";
+        var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = _t("스크랩 해제");
         rm.addEventListener("click", function () {
           rm.disabled = true;
           sb.from("reaction").delete().match({ user_id: session.user.id, card_id: sc.card_id, kind: "scrap" })
@@ -673,24 +678,24 @@
   function renderMyFirms() {
     if (!myFirmsEl) return;
     if (!session || !session.user) {
-      myFirmsEl.innerHTML = '<p class="grm-my-note">로그인하면 관심 업체를 모아볼 수 있어요.</p>';
+      myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 관심 업체를 모아볼 수 있어요.") + '</p>';
       return;
     }
-    myFirmsEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
+    myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
     sb.from("firm_watchlist").select("firm_key,firm_display,created_at")
       .then(function (res) {
         // 015 미적용(테이블 부재 → PostgREST 오류) 포함 — "준비 중" 노트로 조용히 폴백.
         if (res && res.error) {
-          myFirmsEl.innerHTML = '<p class="grm-my-note">관심 업체 목록 준비 중입니다.</p>';
+          myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("관심 업체 목록 준비 중입니다.") + '</p>';
           return;
         }
         var firms = (res && res.data) ? res.data.slice() : [];
         if (!firms.length) {
           myFirmsEl.innerHTML =
             '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-building-factory-2" aria-hidden="true"></i></span>' +
-            '<p class="grm-my-empty-t">아직 등록한 업체가 없습니다</p>' +
-            '<p class="grm-my-empty-s">업체 프로파일에서 관심 업체로 등록하세요.</p>' +
-            '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'findings/index.html">규제 지적사항 검색하기</a></div>';
+            '<p class="grm-my-empty-t">' + _t("아직 등록한 업체가 없습니다") + '</p>' +
+            '<p class="grm-my-empty-s">' + _t("업체 프로파일에서 관심 업체로 등록하세요.") + '</p>' +
+            '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'findings/index.html">' + _t("규제 지적사항 검색하기") + '</a></div>';
           return;
         }
         firms.sort(function (a, c) { return (c.created_at || "").localeCompare(a.created_at || ""); });
@@ -702,9 +707,9 @@
           a.href = cfgRoot + "findings/firm/index.html?key=" + encodeURIComponent(fw.firm_key);
           a.textContent = decodeFirmDisplay(fw.firm_display) || fw.firm_key;
           var meta = document.createElement("span"); meta.className = "grm-my-meta";
-          meta.textContent = "등록 " + String(fw.created_at || "").slice(0, 10);
+          meta.textContent = _t("등록 {date}", { date: String(fw.created_at || "").slice(0, 10) });
           li.appendChild(a); li.appendChild(meta);
-          var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = "해제";
+          var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = _t("해제");
           rm.addEventListener("click", function () {
             rm.disabled = true;
             sb.from("firm_watchlist").delete().match({ user_id: session.user.id, firm_key: fw.firm_key })
@@ -719,14 +724,14 @@
         myFirmsEl.innerHTML = ""; myFirmsEl.appendChild(ul);
       })
       .catch(function () {
-        myFirmsEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>';
+        myFirmsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오지 못했습니다. 잠시 후 다시 시도해 주세요.") + '</p>';
       });
   }
 
   // ── [P2 관심 범위 · 067] /me 에서 축을 고르고 해제한다 ────────────────────
   // 015 워치리스트와 같은 계약: 로그인 상태에서만 동작하고, 067 미적용(테이블 부재 →
   // PostgREST 오류)·네트워크 실패는 오류처럼 보이지 않는 노트로 조용히 폴백한다.
-  var INT_KIND_LABEL = { agency: "규제기관", category: "지적 분류", country: "제조소 국가" };
+  var INT_KIND_LABEL = { agency: _t("규제기관"), category: _t("지적 분류"), country: _t("제조소 국가") };
 
   function intVocab() {
     if (!intVocabEl) return [];
@@ -739,19 +744,19 @@
   function renderMyInterests() {
     if (!myIntEl) return;
     if (!session || !session.user) {
-      myIntEl.innerHTML = '<p class="grm-my-note">로그인하면 관심 범위를 저장할 수 있어요.</p>';
+      myIntEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 관심 범위를 저장할 수 있어요.") + '</p>';
       return;
     }
     var vocab = intVocab();
     if (!vocab.length) {
-      myIntEl.innerHTML = '<p class="grm-my-note">관심 범위 준비 중입니다.</p>';
+      myIntEl.innerHTML = '<p class="grm-my-note">' + _t("관심 범위 준비 중입니다.") + '</p>';
       return;
     }
-    myIntEl.innerHTML = '<p class="grm-my-note">불러오는 중…</p>';
+    myIntEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
     sb.from("user_interest").select("kind,value")
       .then(function (res) {
         if (res && res.error) {
-          myIntEl.innerHTML = '<p class="grm-my-note">관심 범위 준비 중입니다.</p>';
+          myIntEl.innerHTML = '<p class="grm-my-note">' + _t("관심 범위 준비 중입니다.") + '</p>';
           return;
         }
         var on = {};
@@ -778,7 +783,7 @@
         });
       })
       .catch(function () {
-        myIntEl.innerHTML = '<p class="grm-my-note">불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>';
+        myIntEl.innerHTML = '<p class="grm-my-note">' + _t("불러오지 못했습니다. 잠시 후 다시 시도해 주세요.") + '</p>';
       });
   }
 
@@ -823,7 +828,7 @@
           var cats = (d.categories || []).filter(Boolean);
           if (cats.length) {
             var c = document.createElement("span"); c.className = "fnd-rc-cats";
-            c.textContent = "지적 " + (d.obs_cnt || 0) + "건";
+            c.textContent = _t("지적 {n}건", { n: (d.obs_cnt || 0) });
             head.appendChild(c);
           }
           a.appendChild(head);
@@ -831,10 +836,10 @@
         });
         if (mineSubEl) {
           mineSubEl.textContent =
-            "마이페이지에서 고른 관심 범위와 관심 업체에 걸린 최근 공개입니다. " +
+            _t("마이페이지에서 고른 관심 범위와 관심 업체에 걸린 최근 공개입니다. ") +
             // 날짜의 정체는 소스마다 다르다 — 캐나다 실사는 원천이 공개일을 주지 않아
             // 실사일이 이 자리에 들어간다(문서를 열면 둘 다 나온다).
-            "날짜는 문서가 공개된 날이고, 캐나다 실사만 실사일입니다.";
+            _t("날짜는 문서가 공개된 날이고, 캐나다 실사만 실사일입니다.");
         }
         mineEl.hidden = false;
       })

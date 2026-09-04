@@ -75,6 +75,14 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 
+# [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
+# `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
+# 표시만 하는 no-op(번역은 쓰는 자리에서 `tr(상수)`). 헬퍼 함수는 `tr=_KO` 기본값으로
+# 한국어를 유지한다(테스트가 헬퍼를 직접 부르는 계약 불변). 상세는 web/grm_i18n.py.
+if str(WEB_DIR) not in sys.path:
+    sys.path.insert(0, str(WEB_DIR))
+from grm_i18n import KO as _KO, Translator, noop as N_  # noqa: E402
+
 # ── v4 디자인 계약에서 가져온 결정론 매핑 ──────────────────────────────────────
 # 사실표에서 mono(ASCII 데이터)로 표기하는 라벨(v4 dataLabels 동결). 한글에 mono 금지.
 MONO_LABELS = {"발행일", "문서번호", "실사일", "Class", "회수 등급"}
@@ -128,11 +136,11 @@ def _date_parts(date_str: str) -> tuple[int, int, int]:
     return y, m, d
 
 
-def title_dateform(publish_date: str) -> str:
+def title_dateform(publish_date: str, tr: Translator = _KO) -> str:
     """publish_date → "{Y}년 {M}월 {N}주차". 주차 = (day-1)//7 + 1 (결정론)."""
     y, m, d = _date_parts(publish_date)
     week = (d - 1) // 7 + 1
-    return f"{y}년 {m}월 {week}주차"
+    return tr("{y}년 {m}월 {week}주차", y=y, m=m, week=week)
 
 
 def _date_dotted(publish_date: str) -> str:
@@ -169,7 +177,7 @@ def _card_anchor(card: dict[str, Any]) -> str:
 
 
 # ── [소스확장 2026-07-02] 상세보기 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0) ──────
-def _deep_preview(da: dict[str, Any] | None) -> str:
+def _deep_preview(da: dict[str, Any] | None, tr: Translator = _KO) -> str:
     """분석층(deep) 접힘 summary 에 붙는 내용 힌트 — 펼치기 전에 무엇이 들었는지 스캔용.
     유형별 ②섹션명으로 구분: admin=처분근거(disposition_basis)·483=실사의미
     (inspectional_significance)·WL=대응조치(기본). 결정론(값 재생성 0)."""
@@ -178,22 +186,22 @@ def _deep_preview(da: dict[str, Any] | None) -> str:
     kv = da.get("key_violations")
     n = len(kv) if isinstance(kv, list) else 0
     if da.get("disposition_basis"):
-        mid = "처분근거"
+        mid = tr("처분근거")
     elif da.get("inspectional_significance"):
-        mid = "실사의미"
+        mid = tr("실사의미")
     else:
-        mid = "대응조치"
-    parts = ([f"위반 {n}건"] if n else []) + [mid, "행정리스크"]
+        mid = tr("대응조치")
+    parts = ([tr("위반 {n}건", n=n)] if n else []) + [mid, tr("행정리스크")]
     return " · ".join(parts)
 
 
-def _detail_preview(dd: dict[str, Any] | None) -> str:
+def _detail_preview(dd: dict[str, Any] | None, tr: Translator = _KO) -> str:
     """결정론 상세(deterministic_detail) 접힘 summary 힌트. fda_483_observations 는 Observation
     건수. gmp_deficiencies 는 card.html 이 자체 '· N건' 힌트를 쓰므로 빈 문자열."""
     if not isinstance(dd, dict):
         return ""
     if dd.get("type") == "fda_483_observations":
-        return f"Observation {dd.get('count') or 0}건"
+        return tr("Observation {n}건", n=dd.get("count") or 0)
     return ""
 
 
@@ -293,7 +301,7 @@ def split_gmp_operations(text: str) -> list[dict[str, Any]]:
 
 
 # ── 카드 뷰모델(표시 플래그만 산출 — 사실/URL 값은 절대 변형 금지) ─────────────
-def _card_view(card: dict[str, Any]) -> dict[str, Any]:
+def _card_view(card: dict[str, Any], tr: Translator = _KO) -> dict[str, Any]:
     quotes_in = card.get("quotes") or []
     multi = len(quotes_in) > 1
     any_trans = any(q.get("translation") for q in quotes_in)  # null·"" 둘 다 falsy
@@ -321,7 +329,7 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
             "url": _safe_url(src.get("official_url", "")),
             "state": lc.get("official", "pending"),
             "icon": ("ti-file-type-pdf" if is_pdf else "ti-file-text"),
-            "text": ("PDF 원문" if is_pdf else "공식 페이지"),
+            "text": (tr("PDF 원문") if is_pdf else tr("공식 페이지")),
         },
     }
 
@@ -370,9 +378,9 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         "merged_count": card.get("merged_count", 1),
         "merged_items": card.get("merged_items") or [],
         # 병합 목록 단위 명사(기본 '품목' — 회수 골든 불변). 483 실사기록 다건 공개 디제스트는 '건'.
-        "merged_noun": card.get("merged_noun") or "품목",
+        "merged_noun": card.get("merged_noun") or tr("품목"),
         "quotes": quotes,
-        "quote_label": (("원문 및 번역" if any_trans else "원문") if quotes_in else None),
+        "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
         "key_facts": card.get("key_facts") or [],
         "evidence_basis": card.get("evidence_basis", ""),
         "implication": card.get("implication", ""),
@@ -385,8 +393,8 @@ def _card_view(card: dict[str, Any]) -> dict[str, Any]:
         # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
         "deterministic_detail": detail,
         # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
-        "deep_preview": _deep_preview(card.get("deep_analysis")),
-        "detail_preview": _detail_preview(card.get("deterministic_detail")),
+        "deep_preview": _deep_preview(card.get("deep_analysis"), tr),
+        "detail_preview": _detail_preview(card.get("deterministic_detail"), tr),
         "sources": sources,
     }
 
@@ -504,48 +512,48 @@ def load_briefs(data_dir: Path) -> list[dict[str, Any]]:
 #                          (guidance-internal 등)를 한국어 라벨로, ""로 매핑하면 칩 숨김.
 #                          미등재 값은 원문 그대로 표시.
 LIBRARY_REGISTRY: list[dict[str, Any]] = [
-    {"slug": "ich", "short": "ICH", "file": "ich.json", "unit": "토픽", "kick": "ICH · Guidelines",
-     "title": "ICH 가이드라인 카탈로그",
-     "blurb": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽을 한글 명칭과 함께 정리.",
-     "intro": "FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 한글 명칭을 병기해 정리했으며, 현행 문서가 공개된 토픽은 공식 원문 PDF로 바로 연결됩니다. 식약처 한글 번역본이 있는 토픽은 번역본 링크를 함께 제공합니다. 최신 Step·개정 현황은 계열별 ICH 공식 카탈로그 페이지에서 확인하실 수 있습니다.",
-     "desc": "ICH Q(품질)·M(다분야) 가이드라인 토픽 카탈로그 — 코드·한글 명칭 병기, 원문 PDF·식약처 번역본·ICH 공식 카탈로그 링크.",
+    {"slug": "ich", "short": "ICH", "file": "ich.json", "unit": N_("토픽"), "kick": "ICH · Guidelines",
+     "title": N_("ICH 가이드라인 카탈로그"),
+     "blurb": N_("FDA·EMA·식약처가 공통으로 채택하는 국제 조화 가이드라인. 품질(Q)·다분야(M) 계열별 토픽을 한글 명칭과 함께 정리."),
+     "intro": N_("FDA·EMA·식약처가 공통으로 채택하는 국제 조화(ICH) 가이드라인의 토픽 카탈로그입니다. 품질(Q)·다분야(M) 계열별로 한글 명칭을 병기해 정리했으며, 현행 문서가 공개된 토픽은 공식 원문 PDF로 바로 연결됩니다. 식약처 한글 번역본이 있는 토픽은 번역본 링크를 함께 제공합니다. 최신 Step·개정 현황은 계열별 ICH 공식 카탈로그 페이지에서 확인하실 수 있습니다."),
+     "desc": N_("ICH Q(품질)·M(다분야) 가이드라인 토픽 카탈로그 — 코드·한글 명칭 병기, 원문 PDF·식약처 번역본·ICH 공식 카탈로그 링크."),
      "public_base": "https://www.ich.org/",
-     "link_label": "ICH 공식 카탈로그",
+     "link_label": N_("ICH 공식 카탈로그"),
      "doc_type_labels": {"guideline-topic": ""},
      "groups_by_url": [
-         {"contains": "quality-guidelines", "badge": "Q", "label": "품질", "label_en": "Quality"},
-         {"contains": "multidisciplinary-guidelines", "badge": "M", "label": "다분야", "label_en": "Multidisciplinary"},
+         {"contains": "quality-guidelines", "badge": "Q", "label": N_("품질"), "label_en": "Quality"},
+         {"contains": "multidisciplinary-guidelines", "badge": "M", "label": N_("다분야"), "label_en": "Multidisciplinary"},
      ]},
-    {"slug": "mfds", "short": "식약처", "file": "mfds.json", "unit": "건", "kick": "MFDS · Guidance",
-     "title": "MFDS 지침·고시 아카이브",
-     "blurb": "식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록.",
-     "intro": "식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 발행일 순으로 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "식약처(MFDS) 지침·안내서·고시·행정예고 아카이브 — 제목·유형·발행일·공식 원문 링크.",
+    {"slug": "mfds", "short": N_("식약처"), "file": "mfds.json", "unit": N_("건"), "kick": "MFDS · Guidance",
+     "title": N_("MFDS 지침·고시 아카이브"),
+     "blurb": N_("식약처가 공개한 지침·안내서·고시·행정예고. 주간 브리프에서 다룬 뒤에도 다시 찾아볼 수 있는 누적 목록."),
+     "intro": N_("식약처(MFDS)가 공개한 지침·안내서·고시·행정예고를 발행일 순으로 모았습니다. 주간 브리프에서 한 번 다룬 문서도 이곳에서 다시 찾아볼 수 있습니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("식약처(MFDS) 지침·안내서·고시·행정예고 아카이브 — 제목·유형·발행일·공식 원문 링크."),
      "sort": "published_desc",
-     "doc_type_labels": {"guidance-internal": "공무원 지침서", "guidance-industry": "민원인 안내서·지침",
-                         "legislative-notice": "입법·행정예고", "notice-final": "고시 전문"}},
-    {"slug": "eu-gmp", "short": "EU GMP", "file": "eu_gmp.json", "unit": "건", "kick": "EU · EudraLex Vol 4",
-     "title": "EU GMP 기준서 (EudraLex Vol 4)",
-     "blurb": "유럽연합 의약품 GMP 기준서. Part I·II·III 각 장과 부속서(Annex)를 구조 순서대로 정리.",
-     "intro": "유럽연합 의약품 GMP 기준서(EudraLex Volume 4)의 문서 목록입니다. Part I(기본 요건)·Part II(원료의약품)·Part III(보조 문서)과 부속서(Annex)를 기준서 구조 순서대로 정리했으며, 각 문서의 공식 원문 PDF로 바로 연결됩니다. 법적 효력과 최신 개정본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "EU GMP 기준서(EudraLex Volume 4) 문서 목록 — Part I·II·III과 부속서(Annex), 공식 원문 PDF 링크."},
-    {"slug": "pics", "short": "PIC/S", "file": "pics.json", "unit": "건", "kick": "PIC/S · GMP Guide",
-     "title": "PIC/S GMP 가이드",
-     "blurb": "의약품실사상호협력기구(PIC/S)의 GMP 가이드(PE 009)와 부속서·가이던스 문서 목록.",
-     "intro": "의약품실사상호협력기구(PIC/S)가 공개한 GMP 가이드(PE 009) 각 부와 부속서, 관련 가이던스 문서를 발행일 순으로 정리했습니다. 식약처를 포함한 PIC/S 가입 규제기관의 실사 기준과 맞닿아 있는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "PIC/S GMP 가이드(PE 009)·부속서·가이던스 문서 목록 — 발행일·공식 원문 링크.",
+     "doc_type_labels": {"guidance-internal": N_("공무원 지침서"), "guidance-industry": N_("민원인 안내서·지침"),
+                         "legislative-notice": N_("입법·행정예고"), "notice-final": N_("고시 전문")}},
+    {"slug": "eu-gmp", "short": "EU GMP", "file": "eu_gmp.json", "unit": N_("건"), "kick": "EU · EudraLex Vol 4",
+     "title": N_("EU GMP 기준서 (EudraLex Vol 4)"),
+     "blurb": N_("유럽연합 의약품 GMP 기준서. Part I·II·III 각 장과 부속서(Annex)를 구조 순서대로 정리."),
+     "intro": N_("유럽연합 의약품 GMP 기준서(EudraLex Volume 4)의 문서 목록입니다. Part I(기본 요건)·Part II(원료의약품)·Part III(보조 문서)과 부속서(Annex)를 기준서 구조 순서대로 정리했으며, 각 문서의 공식 원문 PDF로 바로 연결됩니다. 법적 효력과 최신 개정본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("EU GMP 기준서(EudraLex Volume 4) 문서 목록 — Part I·II·III과 부속서(Annex), 공식 원문 PDF 링크.")},
+    {"slug": "pics", "short": "PIC/S", "file": "pics.json", "unit": N_("건"), "kick": "PIC/S · GMP Guide",
+     "title": N_("PIC/S GMP 가이드"),
+     "blurb": N_("의약품실사상호협력기구(PIC/S)의 GMP 가이드(PE 009)와 부속서·가이던스 문서 목록."),
+     "intro": N_("의약품실사상호협력기구(PIC/S)가 공개한 GMP 가이드(PE 009) 각 부와 부속서, 관련 가이던스 문서를 발행일 순으로 정리했습니다. 식약처를 포함한 PIC/S 가입 규제기관의 실사 기준과 맞닿아 있는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("PIC/S GMP 가이드(PE 009)·부속서·가이던스 문서 목록 — 발행일·공식 원문 링크."),
      "sort": "published_desc"},
-    {"slug": "who", "short": "WHO", "file": "who.json", "unit": "건", "kick": "WHO · TRS Annexes",
-     "title": "WHO TRS 부속서 모음",
-     "blurb": "WHO 전문가위원회 기술보고서(TRS) 부속서 중 GMP·품질 관련 문서 선별 목록.",
-     "intro": "세계보건기구(WHO) 의약품 표준 전문가위원회 기술보고서(TRS)의 부속서 가운데 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. WHO 사전적격성평가(PQ)나 국제 조달 요건을 다룰 때 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "WHO 기술보고서(TRS) 부속서 중 GMP·품질 문서 선별 목록 — 발행일·공식 원문 링크.",
+    {"slug": "who", "short": "WHO", "file": "who.json", "unit": N_("건"), "kick": "WHO · TRS Annexes",
+     "title": N_("WHO TRS 부속서 모음"),
+     "blurb": N_("WHO 전문가위원회 기술보고서(TRS) 부속서 중 GMP·품질 관련 문서 선별 목록."),
+     "intro": N_("세계보건기구(WHO) 의약품 표준 전문가위원회 기술보고서(TRS)의 부속서 가운데 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. WHO 사전적격성평가(PQ)나 국제 조달 요건을 다룰 때 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("WHO 기술보고서(TRS) 부속서 중 GMP·품질 문서 선별 목록 — 발행일·공식 원문 링크."),
      "sort": "published_desc"},
-    {"slug": "fda-guidance", "short": "FDA", "file": "fda_guidance.json", "unit": "건", "kick": "FDA · Guidance",
-     "title": "FDA 가이던스 문서",
-     "blurb": "FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서 선별 목록.",
-     "intro": "미국 FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서를 발행일 순으로 선별해 정리했습니다. 가이던스는 FDA의 현재 견해를 담은 권고 문서로, 법적 구속력이 있는 규정(CFR)과는 구분해 읽어야 합니다. 최신 개정 여부는 반드시 공식 원문에서 확인하세요.",
-     "desc": "FDA 의약품 GMP·품질 가이던스 문서 선별 목록 — 발행일·유형·공식 원문 링크.",
+    {"slug": "fda-guidance", "short": "FDA", "file": "fda_guidance.json", "unit": N_("건"), "kick": "FDA · Guidance",
+     "title": N_("FDA 가이던스 문서"),
+     "blurb": N_("FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서 선별 목록."),
+     "intro": N_("미국 FDA가 공개한 의약품 GMP·품질 관련 가이던스 문서를 발행일 순으로 선별해 정리했습니다. 가이던스는 FDA의 현재 견해를 담은 권고 문서로, 법적 구속력이 있는 규정(CFR)과는 구분해 읽어야 합니다. 최신 개정 여부는 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("FDA 의약품 GMP·품질 가이던스 문서 선별 목록 — 발행일·유형·공식 원문 링크."),
      "sort": "published_desc"},
     # [자료실 배치 2026-08-11] 같은 관할은 붙여 둔다. 미국은 "가이던스(권고) → 21 CFR(법령)",
     #   유럽은 "EudraLex Vol 4(기준서) → EMA(가이던스)" 로 이미 쌍을 이루고 있었는데, 신규
@@ -554,60 +562,60 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
     #   입도가 다르기 때문이다(가이던스 86건 = 문서 단위, 21 CFR 63건 = 조항 단위. 합치면
     #   "FDA 149건"이 무엇을 센 숫자인지 알 수 없게 되고, findings 의 cfr_refs 가 조항으로
     #   바로 갈 수 있는 조인 축도 사라진다). 배치와 상호 참조 문구로 관계를 밝힌다.
-    {"slug": "cfr", "short": "21 CFR", "file": "cfr.json", "unit": "개 조항", "kick": "US · 21 CFR",
-     "title": "미국 연방규정 21 CFR (GMP)",
-     "blurb": "미국 연방규정(CFR) 중 의약품 GMP 조항 원문. 가이드라인이 아니라 법령 그 자체 — Part 210(총칙)·Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 수록.",
-     "intro": "미국 연방규정집(Code of Federal Regulations) Title 21 가운데 의약품 현행 우수제조관리기준(CGMP)을 담은 Part 210(총칙)과 Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 정리했습니다. 자료실의 다른 컬렉션이 가이드라인·기준서인 것과 달리 이 컬렉션은 법적 구속력을 갖는 규정 원문 그 자체입니다. FDA가 권고 형태로 내는 문서는 바로 앞의 'FDA 가이던스 문서' 컬렉션에 있습니다. 각 조항은 공식 원문(eCFR)으로 바로 연결됩니다. 개정 이력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "미국 연방규정(21 CFR) Part 210(총칙)·Part 211(완제의약품 CGMP) 조항 목록 — 조번호·제목·공식 원문(eCFR) 링크.",
+    {"slug": "cfr", "short": "21 CFR", "file": "cfr.json", "unit": N_("개 조항"), "kick": "US · 21 CFR",
+     "title": N_("미국 연방규정 21 CFR (GMP)"),
+     "blurb": N_("미국 연방규정(CFR) 중 의약품 GMP 조항 원문. 가이드라인이 아니라 법령 그 자체 — Part 210(총칙)·Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 수록."),
+     "intro": N_("미국 연방규정집(Code of Federal Regulations) Title 21 가운데 의약품 현행 우수제조관리기준(CGMP)을 담은 Part 210(총칙)과 Part 211(완제의약품 CGMP) 전 조항을 조문 단위로 정리했습니다. 자료실의 다른 컬렉션이 가이드라인·기준서인 것과 달리 이 컬렉션은 법적 구속력을 갖는 규정 원문 그 자체입니다. FDA가 권고 형태로 내는 문서는 바로 앞의 'FDA 가이던스 문서' 컬렉션에 있습니다. 각 조항은 공식 원문(eCFR)으로 바로 연결됩니다. 개정 이력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("미국 연방규정(21 CFR) Part 210(총칙)·Part 211(완제의약품 CGMP) 조항 목록 — 조번호·제목·공식 원문(eCFR) 링크."),
      "public_base": "https://www.ecfr.gov/current/title-21",
-     "doc_type_labels": {"regulation-section": "규정 조항"},
+     "doc_type_labels": {"regulation-section": N_("규정 조항")},
      "groups_by_url": [
-         {"contains": "/part-210/", "badge": "210", "label": "총칙", "label_en": "General Provisions"},
-         {"contains": "/part-211/", "badge": "211", "label": "완제의약품 CGMP", "label_en": "Finished Pharmaceuticals"},
+         {"contains": "/part-210/", "badge": "210", "label": N_("총칙"), "label_en": "General Provisions"},
+         {"contains": "/part-211/", "badge": "211", "label": N_("완제의약품 CGMP"), "label_en": "Finished Pharmaceuticals"},
      ]},
-    {"slug": "ema", "short": "EMA", "file": "ema.json", "unit": "건", "kick": "EMA · Guidance",
-     "title": "EMA GMP·품질 가이드라인",
-     "blurb": "유럽의약품청(EMA)이 공개한 GMP 관련 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록.",
-     "intro": "유럽의약품청(EMA)이 공개한 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. 실사 당국 품질 시스템, 품질 결함 보고·신속 경보 처리 등 규제 절차 가이드라인과 과학 가이드라인, 질의응답(Q&A)을 포함합니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "EMA GMP·품질 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록 — 발행일·유형·공식 원문 링크.",
+    {"slug": "ema", "short": "EMA", "file": "ema.json", "unit": N_("건"), "kick": "EMA · Guidance",
+     "title": N_("EMA GMP·품질 가이드라인"),
+     "blurb": N_("유럽의약품청(EMA)이 공개한 GMP 관련 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록."),
+     "intro": N_("유럽의약품청(EMA)이 공개한 GMP·품질 관련 문서를 발행일 순으로 선별해 정리했습니다. 실사 당국 품질 시스템, 품질 결함 보고·신속 경보 처리 등 규제 절차 가이드라인과 과학 가이드라인, 질의응답(Q&A)을 포함합니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("EMA GMP·품질 절차·과학 가이드라인과 질의응답(Q&A) 선별 목록 — 발행일·유형·공식 원문 링크."),
      "sort": "published_desc",
      "public_base": "https://www.ema.europa.eu/",
-     "doc_type_labels": {"regulatory-procedural-guideline": "규제·절차 가이드라인",
-                         "scientific-guideline": "과학 가이드라인",
-                         "questions-and-answers": "질의응답(Q&A)"}},
-    {"slug": "mhra", "short": "MHRA", "file": "mhra.json", "unit": "건", "kick": "UK · MHRA",
-     "title": "MHRA GMP·GDP 가이던스",
+     "doc_type_labels": {"regulatory-procedural-guideline": N_("규제·절차 가이드라인"),
+                         "scientific-guideline": N_("과학 가이드라인"),
+                         "questions-and-answers": N_("질의응답(Q&A)")}},
+    {"slug": "mhra", "short": "MHRA", "file": "mhra.json", "unit": N_("건"), "kick": "UK · MHRA",
+     "title": N_("MHRA GMP·GDP 가이던스"),
      # [정적 연도 제거 2026-08-12] 옛 문구는 "2019년 이후 갱신 없음"이라고 못박아 뒀다.
      # 외부 기관 상태를 정적으로 단정한 것이라, MHRA 가 새 통계를 내는 순간 조용히 거짓이
      # 된다(카탈로그는 매주 자동 갱신되는데 이 문장만 안 바뀐다). 경고는 유지하되 연도는
      # 아래 목록이 스스로 보여주게 넘긴다.
-     "blurb": "영국 MHRA의 GMP·GDP 컴플라이언스 정보시트·실사 결함통계·가이던스 문서 목록.",
-     "intro": "영국 의약품·의료제품규제청(MHRA)이 공개한 GMP·GDP 관련 문서를 정보시트·실사 결함통계·가이던스로 나누어 정리했습니다. 컴플라이언스 매니지먼트(Compliance Management)·규제조치(Regulatory Action) 절차를 설명하는 정보시트, 실사에서 반복 확인되는 결함 유형을 다룬 GMP 실사 결함통계, 실사 대응·분산형 제조 등 개별 주제를 다루는 가이던스·공지 문서를 포함합니다. GMP 실사 결함통계 시리즈는 발행 간격이 길어 목록의 최신 자료가 몇 해 전일 수 있습니다 — 아래 각 문서의 발행 연도를 확인하시고, 오래된 통계를 현재 실사 경향으로 그대로 참고하지 마세요. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "MHRA(영국) GMP·GDP 컴플라이언스 정보시트·실사 결함통계·가이던스 문서 목록 — 제목·유형·공식 원문 링크.",
-     "doc_type_labels": {"information-sheet": "정보시트", "gmp-deficiency-statistics": "GMP 실사 결함통계",
-                         "detailed_guide": "가이던스", "notice": "공지",
-                         "transparency": "투명성 공개", "guidance": "가이던스 자료"}},
-    {"slug": "health-canada", "short": "Health Canada", "file": "health_canada.json", "unit": "건",
+     "blurb": N_("영국 MHRA의 GMP·GDP 컴플라이언스 정보시트·실사 결함통계·가이던스 문서 목록."),
+     "intro": N_("영국 의약품·의료제품규제청(MHRA)이 공개한 GMP·GDP 관련 문서를 정보시트·실사 결함통계·가이던스로 나누어 정리했습니다. 컴플라이언스 매니지먼트(Compliance Management)·규제조치(Regulatory Action) 절차를 설명하는 정보시트, 실사에서 반복 확인되는 결함 유형을 다룬 GMP 실사 결함통계, 실사 대응·분산형 제조 등 개별 주제를 다루는 가이던스·공지 문서를 포함합니다. GMP 실사 결함통계 시리즈는 발행 간격이 길어 목록의 최신 자료가 몇 해 전일 수 있습니다 — 아래 각 문서의 발행 연도를 확인하시고, 오래된 통계를 현재 실사 경향으로 그대로 참고하지 마세요. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("MHRA(영국) GMP·GDP 컴플라이언스 정보시트·실사 결함통계·가이던스 문서 목록 — 제목·유형·공식 원문 링크."),
+     "doc_type_labels": {"information-sheet": N_("정보시트"), "gmp-deficiency-statistics": N_("GMP 실사 결함통계"),
+                         "detailed_guide": N_("가이던스"), "notice": N_("공지"),
+                         "transparency": N_("투명성 공개"), "guidance": N_("가이던스 자료")}},
+    {"slug": "health-canada", "short": "Health Canada", "file": "health_canada.json", "unit": N_("건"),
      "kick": "Health Canada · GMP",
-     "title": "Health Canada GMP 가이드",
-     "blurb": "캐나다 보건부(Health Canada)의 GMP 가이드(GUI 시리즈) 문서 목록.",
-     "intro": "캐나다 보건부(Health Canada)가 공개한 GMP 가이드(GUI 시리즈) 문서를 발행일 순으로 정리했습니다. 의약품 GMP 실사와 시설 허가(Establishment Licence) 운영의 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요.",
-     "desc": "Health Canada GMP 가이드(GUI 시리즈) 문서 목록 — 코드·발행일·공식 원문 링크.",
+     "title": N_("Health Canada GMP 가이드"),
+     "blurb": N_("캐나다 보건부(Health Canada)의 GMP 가이드(GUI 시리즈) 문서 목록."),
+     "intro": N_("캐나다 보건부(Health Canada)가 공개한 GMP 가이드(GUI 시리즈) 문서를 발행일 순으로 정리했습니다. 의약품 GMP 실사와 시설 허가(Establishment Licence) 운영의 기준이 되는 문서들입니다. 법적 효력과 최신본은 반드시 공식 원문에서 확인하세요."),
+     "desc": N_("Health Canada GMP 가이드(GUI 시리즈) 문서 목록 — 코드·발행일·공식 원문 링크."),
      "sort": "published_desc",
      "public_base": "https://www.canada.ca/en/health-canada.html",
-     "doc_type_labels": {"guidance": "가이던스"}},
-    {"slug": "pmda", "short": "PMDA", "file": "pmda.json", "unit": "건",
+     "doc_type_labels": {"guidance": N_("가이던스")}},
+    {"slug": "pmda", "short": "PMDA", "file": "pmda.json", "unit": N_("건"),
      "kick": "PMDA · Inspection Cases",
-     "title": "PMDA 실사 지적사례 (ORANGE Letter)",
-     "blurb": "일본 PMDA가 공개한 GMP 실사 지적사례(ORANGE Letter) 영문판과 GMP/GCTP 연차보고서 목록.",
-     "intro": "일본 의약품의료기기종합기구(PMDA)가 공개한 GMP 실사 지적사례(ORANGE Letter)의 영문판과 GMP/GCTP 연차보고서를 정리했습니다. ORANGE Letter는 특정 업체가 아니라 실사에서 반복 확인되는 결함 유형(기록 부적정·CAPA 미흡·무균 환경모니터링 등)의 배경·위험·점검 포인트를 익명 케이스로 설명하는 자료입니다. 각 문서의 공식 원문 PDF로 바로 연결됩니다. 영문판은 일본어 원문 대비 시차가 있을 수 있으며, 최신 현황은 공식 원문에서 확인하세요.",
-     "desc": "일본 PMDA GMP 실사 지적사례(ORANGE Letter) 영문판·GMP/GCTP 연차보고서 목록 — 제목·유형·공식 원문 PDF 링크.",
+     "title": N_("PMDA 실사 지적사례 (ORANGE Letter)"),
+     "blurb": N_("일본 PMDA가 공개한 GMP 실사 지적사례(ORANGE Letter) 영문판과 GMP/GCTP 연차보고서 목록."),
+     "intro": N_("일본 의약품의료기기종합기구(PMDA)가 공개한 GMP 실사 지적사례(ORANGE Letter)의 영문판과 GMP/GCTP 연차보고서를 정리했습니다. ORANGE Letter는 특정 업체가 아니라 실사에서 반복 확인되는 결함 유형(기록 부적정·CAPA 미흡·무균 환경모니터링 등)의 배경·위험·점검 포인트를 익명 케이스로 설명하는 자료입니다. 각 문서의 공식 원문 PDF로 바로 연결됩니다. 영문판은 일본어 원문 대비 시차가 있을 수 있으며, 최신 현황은 공식 원문에서 확인하세요."),
+     "desc": N_("일본 PMDA GMP 실사 지적사례(ORANGE Letter) 영문판·GMP/GCTP 연차보고서 목록 — 제목·유형·공식 원문 PDF 링크."),
      "public_base": "https://www.pmda.go.jp/english/review-services/gmp-qms-gctp/0007.html",
      "groups_by_doc_type": [
-         {"doc_type": "inspection-observation", "label": "실사 지적사례", "label_en": "Inspection Cases"},
-         {"doc_type": "annual-report", "label": "연차보고서", "label_en": "Annual Reports"},
+         {"doc_type": "inspection-observation", "label": N_("실사 지적사례"), "label_en": "Inspection Cases"},
+         {"doc_type": "annual-report", "label": N_("연차보고서"), "label_en": "Annual Reports"},
      ],
-     "doc_type_labels": {"inspection-observation": "실사 지적사례", "annual-report": "연차보고서"}},
+     "doc_type_labels": {"inspection-observation": N_("실사 지적사례"), "annual-report": N_("연차보고서")}},
 ]
 
 
@@ -636,8 +644,13 @@ def _library_item_view(it: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
+def _catalog_view(entry: dict[str, Any], raw: dict[str, Any],
+                  tr: Translator = _KO) -> dict[str, Any]:
     """카탈로그 raw(v2 평면 items[]) → 공통 템플릿 뷰모델(결정론 — 데이터 파생, 창작 0).
+
+    [다국어 2단계] registry 의 화면 카피(title·blurb·intro·desc·unit·short·link_label·
+    그룹 라벨·doc_type 라벨)는 여기서 `tr` 을 거쳐 뷰에 실린다 — 템플릿은 뷰 값을 그대로
+    찍으므로 언어를 모른다. 데이터 값(항목 제목·URL)은 무변형.
 
     - sort="published_desc": 발행일 내림차순 뷰 정렬(값 무수정 — 표시 순서만). 무날짜
       항목은 뒤로, 동일 날짜는 데이터 순 유지(안정 정렬).
@@ -656,9 +669,9 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
             rest = [it for it in rest if it not in matched]
             groups.append({
                 "badge": spec.get("badge", ""),
-                "label": spec.get("label", ""),
+                "label": tr(spec.get("label", "")),
                 "label_en": spec.get("label_en", ""),
-                "blurb": spec.get("blurb", ""),
+                "blurb": tr(spec.get("blurb", "")),
                 "official_url": matched[0]["official_url"] if matched else "",
                 "items": matched,
             })
@@ -674,9 +687,9 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
             rest = [it for it in rest if it not in matched]
             groups.append({
                 "badge": spec.get("badge", ""),
-                "label": spec.get("label", ""),
+                "label": tr(spec.get("label", "")),
                 "label_en": spec.get("label_en", ""),
-                "blurb": spec.get("blurb", ""),
+                "blurb": tr(spec.get("blurb", "")),
                 "official_url": "",
                 "items": matched,
             })
@@ -688,19 +701,20 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
                        "official_url": "", "items": items})
     # doc_type 표시 라벨은 그룹핑(원 slug 매칭) 이후 적용 — groups_by_doc_type 가 slug 로 나뉘도록.
     for it in items:
-        it["doc_type"] = labels.get(it["doc_type"], it["doc_type"])
+        mapped = labels.get(it["doc_type"])
+        it["doc_type"] = tr(mapped) if mapped is not None else it["doc_type"]
     dates = [it["published_date"] for it in items if it["published_date"]]
     meta = raw.get("meta", {})
     return {
-        "slug": entry["slug"], "unit": entry["unit"], "kick": entry["kick"],
+        "slug": entry["slug"], "unit": tr(entry["unit"]), "kick": entry["kick"],
         # source = 카탈로그 파일 stem — 수집기 LIBRARY_SOURCE·변경이력 키와 같은 값.
-        "source": entry["file"].rsplit(".", 1)[0], "short": entry.get("short", ""),
+        "source": entry["file"].rsplit(".", 1)[0], "short": tr(entry.get("short", "")),
         "items_by_id": {it["id"]: it for it in items},
-        "intro": entry["intro"], "blurb": entry["blurb"], "desc": entry["desc"],
-        "title": entry.get("title") or meta.get("title", ""),
+        "intro": tr(entry["intro"]), "blurb": tr(entry["blurb"]), "desc": tr(entry["desc"]),
+        "title": tr(entry["title"]) if entry.get("title") else meta.get("title", ""),
         "note": meta.get("note", ""),
         "public_base": _safe_url(entry.get("public_base") or meta.get("public_base", "")),
-        "link_label": entry.get("link_label", ""),
+        "link_label": tr(entry.get("link_label", "")),
         "count": len(items),
         "latest_published": max(dates) if dates else "",
         "grouped": bool(entry.get("groups_by_url") or entry.get("groups_by_doc_type")),
@@ -708,14 +722,15 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def load_library(library_dir: Path = LIBRARY_DIR) -> list[dict[str, Any]]:
+def load_library(library_dir: Path = LIBRARY_DIR,
+                 tr: Translator = _KO) -> list[dict[str, Any]]:
     """[자료실] registry 순서대로 커밋 데이터를 로드해 공통 뷰 리스트로 반환 — 결정론
     (파일 byte 파생, 네트워크 0). 파일 부재 카탈로그는 조용히 건너뛴다(허브는 존재분만)."""
     views = []
     for entry in LIBRARY_REGISTRY:
         p = library_dir / entry["file"]
         if p.is_file():
-            views.append(_catalog_view(entry, json.loads(p.read_text(encoding="utf-8"))))
+            views.append(_catalog_view(entry, json.loads(p.read_text(encoding="utf-8")), tr))
     return views
 
 
@@ -752,7 +767,9 @@ def _library_update_view(
         # 있는 것만 센다.
         rows: list[dict[str, Any]] = []
         counted = {"신규": 0, "변경": 0}
-        for state, key in (("신규", "new_ids"), ("변경", "changed_ids")):
+        # state 는 데이터 값이자 화면 라벨이다(템플릿이 `_(it.state)` 로 찍는다) — N_ 로
+        # 키를 등록만 하고 값은 그대로 둔다(개수 집계·CSS 분기가 이 값을 비교한다).
+        for state, key in ((N_("신규"), "new_ids"), (N_("변경"), "changed_ids")):
             for item_id in sorted(set(detail.get(key) or [])):
                 item = view["items_by_id"].get(item_id)
                 if not item:
@@ -1401,7 +1418,7 @@ def build_glossary_view(
 _GLOSSARY_META_MAX = 155
 
 
-def glossary_term_description(term: dict[str, Any]) -> str:
+def glossary_term_description(term: dict[str, Any], tr: Translator = _KO) -> str:
     """meta description — easy_ko 를 어절 경계에서 절단(정본 무변형·now()/난수 0).
 
     155 자를 넘으면 마지막 공백까지만 남기고 말줄임표를 붙인다. 공백이 없으면(붙여쓴 긴
@@ -1420,7 +1437,8 @@ def glossary_term_description(term: dict[str, Any]) -> str:
         case_findings = int(term.get("case_findings") or 0)
     except (TypeError, ValueError):
         case_findings = 0
-    suffix = (f" 실제 지적사례 {case_findings:,}건과 공식 출처를 함께 정리했습니다."
+    suffix = (" " + tr("실제 지적사례 {n}건과 공식 출처를 함께 정리했습니다.",
+                       n=f"{case_findings:,}")
               if case_findings > 0 else "")
     budget = _GLOSSARY_META_MAX - len(suffix)
     if len(text) > budget:
@@ -1721,12 +1739,12 @@ def link_terms_in_text(
     return Markup("".join(out))
 
 
-def glossary_term_page_title(term: dict[str, Any]) -> str:
+def glossary_term_page_title(term: dict[str, Any], tr: Translator = _KO) -> str:
     """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
     term_ko = term.get("term_ko") or ""
     short_en = glossary_title_en(term_ko, term.get("term_en") or "")
     head = f"{term_ko}({short_en})" if short_en else term_ko
-    return f"{head} 뜻 · GRM 용어사전"
+    return tr("{head} 뜻 · GRM 용어사전", head=head)
 
 
 # build_glossary_term_json_ld 는 SITE_BASE_URL 정의 이후(SEO 섹션)에 있다 — 기본 인자로
@@ -1745,34 +1763,45 @@ FACET_AXES: dict[str, dict[str, str]] = {
     "category": {
         "path": "c",
         "kick": "By Category",
-        "title": "분류별 지적사항",
+        "title": N_("분류별 지적사항"),
         "query_key": "cat",
-        "headline_suffix": "지적사항",
-        "lede_prefix": "이 분류로",
-        "sibling_title": "다른 분류 보기",
-        "index_lede": "규제기관이 지적한 내용을 주제별로 묶었습니다. 무균공정·시험실 관리·일탈 조사처럼 실사에서 반복되는 축이라, 우리 현장의 취약 지점과 대조해 보실 수 있습니다.",
+        "headline_suffix": N_("지적사항"),
+        "lede_prefix": N_("이 분류로"),
+        "sibling_title": N_("다른 분류 보기"),
+        "index_lede": N_("규제기관이 지적한 내용을 주제별로 묶었습니다. 무균공정·시험실 관리·일탈 조사처럼 실사에서 반복되는 축이라, 우리 현장의 취약 지점과 대조해 보실 수 있습니다."),
     },
     "country": {
         "path": "country",
         "kick": "By Country",
-        "title": "국가별 지적사항",
+        "title": N_("국가별 지적사항"),
         "query_key": "country",
-        "headline_suffix": "제조소 지적사항",
-        "lede_prefix": "이 나라에 있는 제조소에서",
-        "sibling_title": "다른 국가 보기",
-        "index_lede": "지적을 받은 제조소가 어느 나라에 있는지로 묶었습니다. 위탁 제조·원료 공급을 맡긴 지역의 규제 동향을 확인하실 때 쓰실 수 있습니다.",
+        "headline_suffix": N_("제조소 지적사항"),
+        "lede_prefix": N_("이 나라에 있는 제조소에서"),
+        "sibling_title": N_("다른 국가 보기"),
+        "index_lede": N_("지적을 받은 제조소가 어느 나라에 있는지로 묶었습니다. 위탁 제조·원료 공급을 맡긴 지역의 규제 동향을 확인하실 때 쓰실 수 있습니다."),
     },
     "agency": {
         "path": "agency",
         "kick": "By Agency",
-        "title": "규제기관별 지적사항",
+        "title": N_("규제기관별 지적사항"),
         "query_key": "agency",
-        "headline_suffix": "지적사항",
-        "lede_prefix": "이 기관이",
-        "sibling_title": "다른 기관 보기",
-        "index_lede": "어느 규제기관이 공개한 지적인지로 묶었습니다. 기관마다 문서 형식과 지적의 결이 달라, 대응 준비도 기관 단위로 갈립니다.",
+        "headline_suffix": N_("지적사항"),
+        "lede_prefix": N_("이 기관이"),
+        "sibling_title": N_("다른 기관 보기"),
+        "index_lede": N_("어느 규제기관이 공개한 지적인지로 묶었습니다. 기관마다 문서 형식과 지적의 결이 달라, 대응 준비도 기관 단위로 갈립니다."),
     },
 }
+
+
+_FACET_COPY_KEYS = ("title", "headline_suffix", "lede_prefix", "sibling_title", "index_lede")
+
+
+def facet_meta(axis_key: str, tr: Translator = _KO) -> dict[str, str]:
+    """[다국어 2단계] FACET_AXES 항목의 **번역된 사본** — 경로·쿼리 키는 그대로, 화면 카피
+    5종만 `tr` 을 거친다. 템플릿은 이 사본(`axis`)을 그대로 찍으므로 언어를 모른다.
+    모르는 축은 KeyError(조용한 누락 금지 — 종전 `FACET_AXES[axis_key]` 와 동일)."""
+    meta = FACET_AXES[axis_key]
+    return {**meta, **{k: tr(meta[k]) for k in _FACET_COPY_KEYS}}
 
 
 def load_findings_facets(path: Path = FINDINGS_FACETS_FILE) -> "dict[str, Any] | None":
@@ -1912,12 +1941,13 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
     return views
 
 
-def clause_description(clause: dict[str, Any]) -> str:
+def clause_description(clause: dict[str, Any], tr: Translator = _KO) -> str:
     """meta description — 검색 결과에 그대로 나가는 문장. 숫자는 뷰에서 파생(사본 금지)."""
-    head = f"{clause['code']} 지적사례 {clause['findings']:,}건"
+    head = tr("{code} 지적사례 {n}건", code=clause["code"], n=f"{clause['findings']:,}")
     title = clause.get("title_en") or ""
-    tail = (f" 공개 문서 {clause['documents']:,}건에서 뽑아 우리말로 정리했습니다."
-            " 조항 원문 링크와 관련 용어를 함께 봅니다.")
+    tail = " " + tr("공개 문서 {n}건에서 뽑아 우리말로 정리했습니다."
+                    " 조항 원문 링크와 관련 용어를 함께 봅니다.",
+                    n=f"{clause['documents']:,}")
     return f"{head}({title}){tail}" if title else f"{head}.{tail}"
 
 
@@ -2043,17 +2073,19 @@ def title_firm_name(name: str) -> str:
 # ★저장된 `source` 문자열은 여전히 불가침이다(`raw_signal_id`/`finding_id` 해시 입력).
 # 여기서 바꾸는 건 표시용 사본뿐이고 `doc_source_label` 은 손대지 않는다.
 TITLE_SOURCE_SHORT = {
-    "Health Canada Inspection": "캐나다 실사",
-    "EU GMP NCR (EudraGMDP)": "EU GMP 비준수",
+    "Health Canada Inspection": N_("캐나다 실사"),
+    "EU GMP NCR (EudraGMDP)": N_("EU GMP 비준수"),
 }
 
 
-def title_source_label(doc: dict[str, Any]) -> str:
+def title_source_label(doc: dict[str, Any], tr: Translator = _KO) -> str:
     """`<title>` 에 쓰는 문서종류 — 표에 있으면 짧은 말로, 없으면 화면과 같은 값."""
-    return TITLE_SOURCE_SHORT.get(doc_source_label(doc), doc_source_label(doc))
+    short = TITLE_SOURCE_SHORT.get(doc_source_label(doc))
+    return tr(short) if short else doc_source_label(doc)
 
 
-def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
+def build_doc_page_titles(documents: list[dict[str, Any]],
+                          tr: Translator = _KO) -> dict[str, str]:
     """문서 페이지 `<title>` — 슬러그별로 **유일**하게 만든다.
 
     ★기본형 "{업체} {문서종류} 지적사항 ({발행일})" 은 문서를 유일하게 식별하지 못한다.
@@ -2084,10 +2116,10 @@ def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
     (문서 619장이 `2024-01-17` 하나를 공유 — 실사는 2015~2019년).
     """
     def base(d: dict[str, Any]) -> str:
-        src = title_source_label(d)
+        src = title_source_label(d, tr)
         firm = title_firm_name(d["firm_name"])
         head = f"{firm} {src}".strip() if src else firm
-        return f"{head} ({doc_display_date(d)}) 지적사항"
+        return tr("{head} ({date}) 지적사항", head=head, date=doc_display_date(d))
 
     counts: dict[str, int] = {}
     for d in documents:
@@ -2111,7 +2143,8 @@ def build_doc_page_titles(documents: list[dict[str, Any]]) -> dict[str, str]:
         for d in group:
             # 문서번호 = document_id 의 마지막 마디(hc-insp-82408 → 82408). id 자체가
             # 유일하므로 이 단계는 반드시 충돌을 해소한다.
-            out[d["slug"]] = f"{widened} · 문서 {d['document_id'].rsplit('-', 1)[-1]}"
+            out[d["slug"]] = tr("{title} · 문서 {no}", title=widened,
+                                no=d["document_id"].rsplit("-", 1)[-1])
     return out
 
 
@@ -2132,7 +2165,7 @@ def doc_display_date(doc: dict[str, Any]) -> str:
     return (doc.get("inspection_date") or "").strip() or doc["published_date"]
 
 
-def date_axis_verb(documents: "list[dict[str, Any]]") -> str:
+def date_axis_verb(documents: "list[dict[str, Any]]", tr: Translator = _KO) -> str:
     """연도별 목록의 축이 '공개'인가 '실사'인가 — **데이터에서 파생한다.**
 
     `/findings/docs/{기관}/{연도}/` 는 `published_date` 의 연도로 묶는다. 대개 그건
@@ -2145,13 +2178,14 @@ def date_axis_verb(documents: "list[dict[str, Any]]") -> str:
     저절로 따라온다. 비어 있으면 종전 표현을 쓴다(없는 것을 단정하지 않는다).
     """
     if not documents:
-        return "공개한"
+        return tr("공개한")
     same = all((d.get("inspection_date") or "") == (d.get("published_date") or "")
                for d in documents)
-    return "실사한" if same else "공개한"
+    return tr("실사한") if same else tr("공개한")
 
 
-def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> str:
+def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str],
+                         tr: Translator = _KO) -> str:
     """meta description — 누가·언제·몇 건·어떤 주제. 데이터 조립뿐(문구 생성 0).
 
     ★날짜를 반드시 넣는다. 검색 결과 스니펫에 연도가 없으면 몇 년 전 지적이 현재 상태로
@@ -2162,32 +2196,37 @@ def doc_page_description(doc: dict[str, Any], agency_labels: dict[str, str]) -> 
     말해 주는 자리가 여기다. 실측 비용: 이 한 줄 때문에 문서 148장이 "주요 분류" 시작을
     절단선 밖으로 밀지만, 1,524장이 평균 4.2년 어긋난 날짜를 그만 보여준다.
     """
-    agency = agency_labels.get(doc["agency"], doc["agency"])
-    cats = " · ".join(doc.get("categories") or [])
-    tail = f" 주요 분류: {cats}." if cats else ""
+    label = agency_labels.get(doc["agency"])
+    agency = tr(label) if label else doc["agency"]
+    cats = " · ".join(tr(c) for c in (doc.get("categories") or []))
+    tail = " " + tr("주요 분류: {cats}.", cats=cats) if cats else ""
     src = doc_source_label(doc)
     subject = f"{doc['firm_name']} {src}".strip() if src else doc["firm_name"]
     inspected = (doc.get("inspection_date") or "").strip()
+    n = len(doc["findings"])
     if inspected and inspected != doc["published_date"]:
-        return (f"{agency}가 {inspected} 실사에서 확인한 {subject} "
-                f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다"
-                f"({doc['published_date']} 공개).{tail}")
+        return tr("{agency}가 {inspected} 실사에서 확인한 {subject} 지적사항 {n}건을 "
+                  "우리말로 정리했습니다({published} 공개).",
+                  agency=agency, inspected=inspected, subject=subject, n=n,
+                  published=doc["published_date"]) + tail
     if inspected:
         # ★두 값이 같으면 **날짜가 하나뿐**이라는 뜻이다 — 캐나다 실사가 그렇다
         #   (수집기가 `inspectionStartDate` 를 published_date 에 넣는다). 한 날짜를
         #   두 번 적으면서 한쪽을 "공개"라고 부르면 그게 바로 고치려던 거짓말이다.
         #   소스 이름이 아니라 **값**으로 판정하므로 다른 소스에서 우연히 같아져도
         #   (실측 FDA 483 에 1건) 알아서 옳게 나온다.
-        return (f"{agency}가 {inspected} 실사에서 확인한 {subject} "
-                f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
-    return (f"{agency}가 {doc['published_date']}에 공개한 {subject} "
-            f"지적사항 {len(doc['findings'])}건을 우리말로 정리했습니다.{tail}")
+        return tr("{agency}가 {inspected} 실사에서 확인한 {subject} 지적사항 {n}건을 "
+                  "우리말로 정리했습니다.",
+                  agency=agency, inspected=inspected, subject=subject, n=n) + tail
+    return tr("{agency}가 {published}에 공개한 {subject} 지적사항 {n}건을 "
+              "우리말로 정리했습니다.",
+              agency=agency, published=doc["published_date"], subject=subject, n=n) + tail
 
 
 _DOC_INSPECTOR_LIMIT = 3
 
 
-def doc_inspector_line(doc: dict[str, Any]) -> str:
+def doc_inspector_line(doc: dict[str, Any], tr: Translator = _KO) -> str:
     """문서 상세 '실사관' 행 표시 문자열 — 최대 3명 평문 표기 + 초과분 "외 N명".
 
     [실사관 표기 · 정적 문서 페이지 2026-08-31] `_sanitize_inspector_names()` 로 먼저
@@ -2217,11 +2256,11 @@ def doc_inspector_line(doc: dict[str, Any]) -> str:
     extra = len(names) - len(shown)
     line = " · ".join(shown)
     if extra > 0:
-        line += f" 외 {extra}명"
+        line = tr("{names} 외 {n}명", names=line, n=extra)
     return line
 
 
-def combo_description(combo: dict[str, Any]) -> str:
+def combo_description(combo: dict[str, Any], tr: Translator = _KO) -> str:
     """분류 × 기관 조합 페이지의 meta description — 데이터에서 조립(문구 생성 0).
 
     단일 축(facet_description)은 "어느 기관들이" 를 뒤에 붙이지만, 조합은 기관이 이미
@@ -2232,34 +2271,39 @@ def combo_description(combo: dict[str, Any]) -> str:
     기관명에는 영문 약어(FDA·EMA·MHRA)가 섞여 있어 규칙이 성립하지 않는다.
     """
     firms = len(combo.get("top_firms") or [])
-    tail = f" 지적이 많았던 업체 {firms}곳도 함께 보실 수 있습니다." if firms else ""
-    return (f"{combo['agency_label_ko']} 공개 문서에서 {combo['category_label_ko']} "
-            f"지적사항 {combo['findings']:,}건(문서 {combo['documents']:,}건)을 "
-            f"우리말로 정리했습니다.{tail}")
+    tail = (" " + tr("지적이 많았던 업체 {n}곳도 함께 보실 수 있습니다.", n=firms)
+            if firms else "")
+    return tr("{agency} 공개 문서에서 {category} 지적사항 {n}건(문서 {d}건)을 "
+              "우리말로 정리했습니다.",
+              agency=tr(combo["agency_label_ko"]), category=tr(combo["category_label_ko"]),
+              n=f"{combo['findings']:,}", d=f"{combo['documents']:,}") + tail
 
 
 def facet_description(axis_key: str, item: dict[str, Any],
-                      agency_labels: dict[str, str]) -> str:
+                      agency_labels: dict[str, str], tr: Translator = _KO) -> str:
     """meta description — 데이터에서 조립한다(문구 생성 0·now()/난수 0).
 
     "무엇이 몇 건, 어느 기관에서" 를 앞세운다. 검색 결과에 그대로 노출되는 문장이라
     수식어보다 숫자와 기관명이 클릭을 만든다.
     """
-    meta = FACET_AXES[axis_key]
-    names = [agency_labels.get(a["v"], a["v"]) for a in (item.get("by_agency") or [])[:3]]
+    meta = facet_meta(axis_key, tr)
+    names = [tr(agency_labels[a["v"]]) if a["v"] in agency_labels else a["v"]
+             for a in (item.get("by_agency") or [])[:3]]
     who = "·".join(n for n in names if n)
-    tail = f" {who} 공개 문서 기준." if who else ""
-    return (f"{item['label_ko']} {meta['headline_suffix']} {item['findings']:,}건"
-            f"(문서 {item['documents']:,}건)을 우리말로 정리했습니다.{tail}")
+    tail = " " + tr("{who} 공개 문서 기준.", who=who) if who else ""
+    return tr("{label} {suffix} {n}건(문서 {d}건)을 우리말로 정리했습니다.",
+              label=tr(item["label_ko"]), suffix=meta["headline_suffix"],
+              n=f"{item['findings']:,}", d=f"{item['documents']:,}") + tail
 
 
 # ── [주간 퀴즈] 문항 뱅크 로드·뷰모델(결정론 — 값 무변형, 파생은 근거 링크/라벨뿐) ────
 # "이번 주" 문항 선택은 렌더러가 하지 않는다(now() 금지·결정론 불가침). 렌더러는 정본
 # 뱅크 전 문항을 순서 그대로 페이지에 embed 하고, 클라이언트(assets/quiz.js)가 ISO 주차
 # 키로 결정론 회전 선택한다(같은 주 = 전 직원 동일 세트). 사실/정답/해설은 무변형 통과.
-_QUIZ_DIFFICULTY_LABEL = {"easy": "기본", "normal": "심화"}
+_QUIZ_DIFFICULTY_LABEL = {"easy": N_("기본"), "normal": N_("심화")}
 # source_type → 근거 진입 라벨(어디로 가는지). glossary=자체 딥링크, brief/finding=공개 URL.
-_QUIZ_SOURCE_KIND = {"glossary": "용어사전", "brief": "주간 브리프", "finding": "지적사항 검색"}
+_QUIZ_SOURCE_KIND = {"glossary": N_("용어사전"), "brief": N_("주간 브리프"),
+                     "finding": N_("지적사항 검색")}
 # 기본 노출 문항 수(운영설계 §2.3 — 주 4문항 기본, 운영자가 3~5 범위 조정). 이 상수만
 # 바꾸면 클라이언트 회전 로직이 easy 과반·normal 1~2 구성을 자동으로 맞춘다(코드 수정 0).
 WEEKLY_QUIZ_COUNT = 4
@@ -2270,24 +2314,26 @@ def load_quiz_bank(path: Path = QUIZ_FILE) -> list[dict[str, Any]] | None:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
-def _quiz_question_view(q: dict[str, Any]) -> dict[str, Any]:
+def _quiz_question_view(q: dict[str, Any], tr: Translator = _KO) -> dict[str, Any]:
     """문항 1건 → 렌더 뷰모델. 값(질문/선택지/정답/해설)은 무변형, 파생은 난이도 라벨과
     근거 링크 구성뿐. glossary 는 자체 용어사전 딥링크 id(무변형 통과 — 템플릿이 rel_root
     로 조립), brief/finding 은 공개 URL(_safe_url 스킴 게이트만). 순수·결정론."""
     st = q.get("source_type", "")
     ref = str(q.get("source_ref") or "")
     is_glossary = st == "glossary"
+    difficulty = q.get("difficulty", "")
+    difficulty_label = _QUIZ_DIFFICULTY_LABEL.get(difficulty)
+    source_kind = _QUIZ_SOURCE_KIND.get(st)
     return {
         "id": q.get("id", ""),
         "question_ko": q.get("question_ko", ""),
         "choices": list(q.get("choices") or []),
         "answer_index": q.get("answer_index"),
         "explanation_ko": q.get("explanation_ko", ""),
-        "difficulty": q.get("difficulty", ""),
-        "difficulty_label": _QUIZ_DIFFICULTY_LABEL.get(q.get("difficulty", ""),
-                                                       q.get("difficulty", "")),
+        "difficulty": difficulty,
+        "difficulty_label": tr(difficulty_label) if difficulty_label else difficulty,
         "source_type": st,
-        "source_kind": _QUIZ_SOURCE_KIND.get(st, st),
+        "source_kind": tr(source_kind) if source_kind else st,
         # glossary → 용어사전 앵커 id(템플릿이 rel_root+glossary/#id 로 조립), 그 외는 "".
         "source_glossary_id": ref if is_glossary else "",
         # brief/finding → 공개 절대 URL(스킴 화이트리스트 통과분만; 비허용은 ""→링크 생략).
@@ -2299,11 +2345,11 @@ def _quiz_question_view(q: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build_quiz_view(bank: list[dict[str, Any]]) -> dict[str, Any]:
+def build_quiz_view(bank: list[dict[str, Any]], tr: Translator = _KO) -> dict[str, Any]:
     """문항 뱅크 → 렌더 뷰모델(무변형 — 값 재작성 0). 전 문항을 뱅크 순서 그대로 embed
     (클라이언트 결정론 회전용). 난이도 집계는 클라이언트 주차 회전이 easy 과반·normal 1~2
     구성을 맞추는 데 쓰는 파생 메타다."""
-    questions = [_quiz_question_view(q) for q in bank]
+    questions = [_quiz_question_view(q, tr) for q in bank]
     easy_total = sum(1 for q in questions if q["difficulty"] == "easy")
     return {
         "questions": questions,
@@ -2329,7 +2375,8 @@ def assign_issue_numbers(briefs: list[dict[str, Any]]) -> dict[str, int]:
 
 
 # ── 컨텍스트 빌더 ─────────────────────────────────────────────────────────────
-def _brief_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
+def _brief_context(brief: dict[str, Any], issue_no: int,
+                   tr: Translator = _KO) -> dict[str, Any]:
     bm = brief["brief"]
     # [업계 브리핑 노트 2026-07-13] resources 키 부재/빈값 → None(리스트 아님) — 템플릿의
     # `{% if brief.resources %}` 게이트가 그대로 False 라 partial 이 0바이트 렌더(하드 요구:
@@ -2341,7 +2388,7 @@ def _brief_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
         "run_date_kst": bm.get("run_date_kst", ""),
         "publish_date": bm.get("publish_date", ""),
         "window": bm.get("window", ""),
-        "title_dateform": title_dateform(bm.get("publish_date", "")),
+        "title_dateform": title_dateform(bm.get("publish_date", ""), tr),
         "coverage": _norm_coverage(bm.get("coverage") or {}),
         "tldr": bm.get("tldr") or [],
         "ai_disclosure": bool(bm.get("ai_disclosure")),
@@ -2370,7 +2417,8 @@ def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str) -> dict[s
     }
 
 
-def _cover_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
+def _cover_context(brief: dict[str, Any], issue_no: int,
+                   tr: Translator = _KO) -> dict[str, Any]:
     bm = brief["brief"]
     cov = _norm_coverage(bm.get("coverage") or {})
     pub = bm.get("publish_date", "")
@@ -2382,7 +2430,7 @@ def _cover_context(brief: dict[str, Any], issue_no: int) -> dict[str, Any]:
         "rendered": cov["rendered"],
         "intake_total": cov["intake_total"],     # 다크밴드 바인딩(단일 파생 경로)
         "evidence": cov["evidence"],              # 다크밴드 Evidence A/B
-        "title_dateform": title_dateform(pub),    # 다크밴드 "{Y}년 {M}월 {N}주차"
+        "title_dateform": title_dateform(pub, tr),  # 다크밴드 "{Y}년 {M}월 {N}주차"
         "window": bm.get("window", ""),
         "title": _brief_title(bm),
         "tldr": bm.get("tldr") or [],
@@ -2859,7 +2907,8 @@ def build_rss_xml(briefs: list[dict[str, Any]],
 
 
 def build_glossary_term_json_ld(term: dict[str, Any],
-                                base_url: str = SITE_BASE_URL) -> str:
+                                base_url: str = SITE_BASE_URL,
+                                tr: Translator = _KO) -> str:
     """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
 
     inLanguage=ko. `name` 은 한글 표제어, `alternateName` 은 영문 표제어(+동의어).
@@ -2876,7 +2925,7 @@ def build_glossary_term_json_ld(term: dict[str, Any],
         "url": f"{base_url}/glossary/{term['id']}/",
         "inDefinedTermSet": {
             "@type": "DefinedTermSet",
-            "name": "GRM 규제 용어사전",
+            "name": tr("GRM 규제 용어사전"),
             "url": f"{base_url}/glossary/",
         },
     }
@@ -2923,43 +2972,45 @@ SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "").strip()
 
 # 서비스 캐논 카피(랜딩 description·OG·JSON-LD 공용). 한글 본문 — mono/자간/대문자 미적용.
 SITE_NAME = "Global Regulatory Monitor"
-SITE_DESCRIPTION = ("전 세계 제약 GMP·품질 규제 소식을 매주 한자리에 모아 "
-                    "기관별 정렬·시사점·점검까지 정리하는 규제뉴스.")
-ARCHIVE_DESCRIPTION = ("GRM 주간 브리프 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
-                       "주차별로 모아 기관·기간으로 검색·필터.")
-FINDINGS_DESCRIPTION = ("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
-                        "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. "
-                        "검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다.")
+# [다국어 2단계] 아래 카피는 N_ 로 키를 등록만 한다 — 번역은 쓰는 자리(render_site)에서
+# `tr(상수)`. RSS 는 한국어 채널이라 그대로 둔다(영어 피드는 별도 결정).
+SITE_DESCRIPTION = N_("전 세계 제약 GMP·품질 규제 소식을 매주 한자리에 모아 "
+                      "기관별 정렬·시사점·점검까지 정리하는 규제뉴스.")
+ARCHIVE_DESCRIPTION = N_("GRM 주간 브리프 아카이브 — 전 세계 제약 GMP·품질 규제 소식을 "
+                         "주차별로 모아 기관·기간으로 검색·필터.")
+FINDINGS_DESCRIPTION = N_("FDA 483 Observation · Warning Letter · 캐나다 실사 · 식약처 · "
+                          "EU/영국 GMP 비준수 지적사항을 원문에서 자동 추출한 데이터베이스. "
+                          "검색과 업체 이력·실사관 조회·자가점검 체크리스트를 제공합니다.")
 # [2면 분리 2026-08-27] 둘러보기 면 — 업무별 진입·최근 공개 문서·축별 탐색.
-FINDINGS_BROWSE_DESCRIPTION = ("규제 지적사항 데이터 둘러보기 — 업무별 바로가기, "
-                               "최근 공개된 실사 문서, 분류·국가·기관 축별 탐색.")
+FINDINGS_BROWSE_DESCRIPTION = N_("규제 지적사항 데이터 둘러보기 — 업무별 바로가기, "
+                                 "최근 공개된 실사 문서, 분류·국가·기관 축별 탐색.")
 # [존 재편 2026-08-26] 트렌드 존이 세 면으로 갈리면서 이 설명도 '지적 경향' 면만 가리킨다 —
 # 연도별 구성비·업체 랭킹은 데이터 현황 면으로 옮겼으므로 문안에서도 뺐다(설명이 실제
 # 페이지 내용과 어긋나면 검색결과 스니펫이 먼저 거짓말을 한다).
-TRENDS_DESCRIPTION = ("식약처·FDA 중 기관을 골라 최근 12개월에 가장 많이 지적된 영역과 조항을 확인하고 "
-                      "자가점검 체크리스트까지 — 기관마다 상위 지적이 다릅니다. "
-                      "FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계.")
-INSPECTIONS_DESCRIPTION = ("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
-                           "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
-COVERAGE_DESCRIPTION = ("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
-                        "연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다.")
-FIRM_DESCRIPTION = ("특정 업체의 FDA 483·Warning Letter·캐나다 실사·식약처·EU/영국 GMP 비준수 지적사항 "
-                    "누적 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
-CHECKLIST_DESCRIPTION = ("규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 "
-                         "지적 문장을 붙인 GMP 자가점검 체크리스트 — 인쇄·엑셀 내보내기 지원.")
-INSPECTOR_DESCRIPTION = ("공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 "
-                         "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 실사관 프로파일.")
-LIBRARY_DESCRIPTION = ("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내외 규제기관의 GMP 지침·고시·"
-                       "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
-GUIDE_DESCRIPTION = ("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
-                     "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
+TRENDS_DESCRIPTION = N_("식약처·FDA 중 기관을 골라 최근 12개월에 가장 많이 지적된 영역과 조항을 확인하고 "
+                        "자가점검 체크리스트까지 — 기관마다 상위 지적이 다릅니다. "
+                        "FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계.")
+INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
+                             "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
+COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
+                          "연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다.")
+FIRM_DESCRIPTION = N_("특정 업체의 FDA 483·Warning Letter·캐나다 실사·식약처·EU/영국 GMP 비준수 지적사항 "
+                      "누적 이력을 카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 업체 프로파일.")
+CHECKLIST_DESCRIPTION = N_("규제기관이 실제로 인용한 21 CFR 조항을 인용 빈도순으로 뽑고 조항별 실제 "
+                           "지적 문장을 붙인 GMP 자가점검 체크리스트 — 인쇄·엑셀 내보내기 지원.")
+INSPECTOR_DESCRIPTION = N_("공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 "
+                           "카테고리·연도별 추이·문서 이력으로 한 곳에서 확인하는 실사관 프로파일.")
+LIBRARY_DESCRIPTION = N_("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내외 규제기관의 GMP 지침·고시·"
+                         "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
+GUIDE_DESCRIPTION = N_("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
+                       "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
 RSS_TITLE = "GRM 주간 브리프 · 글로벌 규제 인텔리전스"
 RSS_DESCRIPTION = ("전 세계·국내 제약 GMP/품질 규제 소식을 매주 한국어로 정리해 드립니다. "
                    "FDA·EMA·식약처·캐나다 보건부 등의 공개 자료가 원천입니다.")
-GLOSSARY_DESCRIPTION = ("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
-                        "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
-QUIZ_DESCRIPTION = ("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 "
-                    "전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요.")
+GLOSSARY_DESCRIPTION = N_("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
+                          "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
+QUIZ_DESCRIPTION = N_("GRM 주간 퀴즈 — 규제·품질 용어와 최근 공개 사례를 짧게 복습하는 "
+                      "전 직원 학습 퀴즈. 선택 즉시 정답·해설·근거 링크를 확인하세요.")
 
 
 def _abs_url(rel_path: str = "") -> str:
@@ -2967,13 +3018,13 @@ def _abs_url(rel_path: str = "") -> str:
     return f"{SITE_BASE_URL}/{rel_path}"
 
 
-def _brief_description(brief_meta: dict[str, Any]) -> str:
+def _brief_description(brief_meta: dict[str, Any], tr: Translator = _KO) -> str:
     """브리프 description = tldr[0] 있으면 사용, 없으면 날짜 파생 한 줄(결정론)."""
     tldr = brief_meta.get("tldr") or []
     if tldr and tldr[0]:
         return tldr[0]
-    return (f"{title_dateform(brief_meta.get('publish_date', ''))} "
-            "글로벌·국내 제약 GMP·품질 규제 소식.")
+    return tr("{date} 글로벌·국내 제약 GMP·품질 규제 소식.",
+              date=title_dateform(brief_meta.get("publish_date", ""), tr))
 
 
 def build_json_ld(base_url: str = SITE_BASE_URL) -> str:
@@ -3042,7 +3093,8 @@ def build_site_webmanifest() -> str:
 
 
 # ── 렌더 ─────────────────────────────────────────────────────────────────────
-def _make_env() -> Environment:
+def _make_env(lang: str = DEFAULT_LANG,
+              translator: "Translator | None" = None) -> Environment:
     env = Environment(
         loader=FileSystemLoader([str(TEMPLATES_DIR), str(PARTIALS_PARENT)]),
         autoescape=select_autoescape(default=True, default_for_string=True),
@@ -3053,6 +3105,9 @@ def _make_env() -> Environment:
     # [상세 가독성 2026-07-27] 표현층 전용 필터 — 데이터는 verbatim, 렌더만 분해한다.
     env.filters["detail_blocks"] = split_detail_blocks
     env.filters["gmp_operations"] = split_gmp_operations
+    # [다국어 2단계] 템플릿 전역 `_("…")` — 문구 사전. 한국어는 항등(Markup 으로 그대로),
+    # 영어는 카탈로그 결손 시 즉시 실패. 슬롯 `{name}` 값은 escape 된다.
+    env.globals["_"] = (translator or Translator(lang)).template_gettext()
     return env
 
 
@@ -3084,7 +3139,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
       렌더 결과에서 파생되지 않으므로, 켜고 끄는 것이 골든을 흔들지 않는다(테스트가 보는
       sitemap 과 프로덕션 sitemap 이 같아야 대조가 의미 있다).
     """
-    env = _make_env()
+    # [다국어 1·2단계] 이 빌드가 그리는 언어 트리와 그 언어의 번역기. 페이지 주소는 page()
+    # 한 곳에서, 화면 문구는 tr()/템플릿 `_()` 한 곳에서 나온다. 영어 트리(3단계)는 이 둘을
+    # 루프 변수로 바꾸는 것으로 얹는다.
+    lang = DEFAULT_LANG
+    tr = Translator(lang)
+    env = _make_env(lang, tr)
     # 소유권 인증 메타(env-param) — 전 페이지 <head> 공통(미설정 시 미출력). 아래 전역들
     # (SITE_BASE_URL·NEWSLETTER_FORM_ACTION·*_SITE_VERIFICATION)은 import 시점에 os.environ
     # 에서 캡처된다. 여기서는 그 모듈 전역을 render_site() 호출 시점에 env.globals 로 주입 —
@@ -3138,11 +3198,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     written: list[str] = []
 
-    # [다국어 1단계] 이 빌드가 그리는 언어 트리. 페이지 주소는 전부 page() 한 곳에서
-    # 나온다 — 렌더 호출마다 rel_root·출력 경로·canonical 을 손으로 적지 않는다(PagePath).
-    # 영어 트리(3단계)는 이 변수를 루프 변수로 바꾸는 것으로 얹는다.
-    lang = DEFAULT_LANG
-
+    # 페이지 주소는 전부 page() 한 곳에서 나온다 — 렌더 호출마다 rel_root·출력 경로·
+    # canonical 을 손으로 적지 않는다(PagePath).
     def page(path: str) -> PagePath:
         return PagePath(path, lang)
 
@@ -3186,7 +3243,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # [자료실] 카탈로그 스냅샷 + 최근 변경 이력 — 랜딩 카드·자료실 허브·아카이브 스트립이
     # 함께 쓰므로 세 렌더보다 먼저 한 번만 읽는다(같은 입력 → 같은 출력).
-    catalogs = load_library()
+    catalogs = load_library(tr=tr)
     library_updates = load_library_updates(catalogs)
     # [브리프 자료실 스트립] load_library_updates() 는 "최신 1건"만 보므로 브리프
     # 상세(과거 특정 주간)에는 못 쓴다 — 이력 전체를 한 번 더 확보해 브리프 루프에서
@@ -3225,9 +3282,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     emit("landing.html", page(""),
         page_title="GRM · Global Regulatory Monitor",
         nav_active="home",
-        description=SITE_DESCRIPTION,
+        description=tr(SITE_DESCRIPTION),
         json_ld=build_json_ld(),
-        cover=_cover_context(latest_brief, latest_issue_no),
+        cover=_cover_context(latest_brief, latest_issue_no, tr),
         library=library_summary,
         findings_zone=findings_zone,
     )
@@ -3241,9 +3298,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     emit("archive.html", page("archive/"),
         # [네이밍 2026-08-27] nav 탭·h1(주간 브리프 아카이브)과 정합 — 제목만 옛
         # 이름이면 검색 결과와 탭 사이에서 페이지 정체가 갈라진다.
-        page_title="주간 브리프 아카이브 · GRM",
+        page_title=tr("주간 브리프 아카이브 · GRM"),
         nav_active="board",
-        description=ARCHIVE_DESCRIPTION,
+        description=tr(ARCHIVE_DESCRIPTION),
         issues=issues,
         lib_update=library_updates["compact"],
     )
@@ -3255,9 +3312,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 진입 카드는 **데이터가 있는 축만** 만든다 — 없는 페이지로 보내는 링크는 무링크보다
     # 나쁘다. 문서 축은 렌더 스위치가 꺼진 테스트 빌드에서 페이지가 없으므로 함께 건다.
     _axis_blurb = {
-        "category": "무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다.",
-        "country": "제조소가 어느 나라에 있는지로 묶어 봅니다.",
-        "agency": "FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다.",
+        "category": tr("무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다."),
+        "country": tr("제조소가 어느 나라에 있는지로 묶어 봅니다."),
+        "agency": tr("FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다."),
     }
     browse_axes = []
     for _axis in (facets.get("axes") if facets else []) or []:
@@ -3265,16 +3322,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         if not _meta or not _axis.get("items"):
             continue
         browse_axes.append({"href": f"findings/{_meta['path']}/",
-                            "title": _meta["title"],
+                            "title": tr(_meta["title"]),
                             "blurb": _axis_blurb.get(_axis["axis"], "")})
     # ★sitemap 과 같은 규칙: **데이터에서 파생**하지 렌더 결과에서 파생하지 않는다.
     # `render_doc_pages` 로 가르면 테스트 빌드의 골든이 프로덕션과 다른 것을 고정하게 되어
     # (골든에 이 카드가 없는데 라이브엔 있는 상태) 대조가 의미를 잃는다.
     if docs_data and docs_data.get("documents"):
         browse_axes.append({
-            "href": "findings/docs/", "title": "문서로 찾기",
-            "blurb": (f"실사 문서 {docs_data['totals']['documents']:,}건을 기관·연도로"
-                      " 묶어 봅니다."),
+            "href": "findings/docs/", "title": tr("문서로 찾기"),
+            "blurb": tr("실사 문서 {n}건을 기관·연도로 묶어 봅니다.",
+                        n=f"{docs_data['totals']['documents']:,}"),
         })
 
     # [발견 허브] 최근 공개 문서 — 문서 페이지 정본(findings_docs.json)에서 공개일
@@ -3307,9 +3364,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 사용자 피드백("너무 많은 정보가 한 페이지에"). 이 면은 검색 도구 전용이다.
     emit("findings.html", page("findings/"),
         zone_totals=findings_zone,
-        page_title="지적사항 검색 · GRM",
+        page_title=tr("지적사항 검색 · GRM"),
         nav_active="findings",
-        description=FINDINGS_DESCRIPTION,
+        description=tr(FINDINGS_DESCRIPTION),
     )
 
     # [2면 분리] 둘러보기 면 — 정적 렌더 전용(fetch 0, 커밋된 스냅샷에서 나옴).
@@ -3319,9 +3376,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         recent_docs=recent_docs,
         recent_asof=(docs_data or {}).get("measured_on", ""),
         has_docs=bool(docs_data and docs_data.get("documents")),
-        page_title="지적사항 둘러보기 · GRM",
+        page_title=tr("지적사항 둘러보기 · GRM"),
         nav_active="findings",
-        description=FINDINGS_BROWSE_DESCRIPTION,
+        description=tr(FINDINGS_BROWSE_DESCRIPTION),
     )
 
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
@@ -3333,10 +3390,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 세 면 모두 trends.html 계열 셸이라 nav_active 는 동일하고, 셸의
     # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
     emit("trends.html", page("findings/trends/"),
-        page_title="규제 지적사항 트렌드 · GRM",
+        page_title=tr("규제 지적사항 트렌드 · GRM"),
         nav_active="trends",
         seg_active="trends",
-        description=TRENDS_DESCRIPTION,
+        description=tr(TRENDS_DESCRIPTION),
     )
 
     # 실사 결과(트렌드 존 2면) — 058/059 fda_inspection_stats() 전용. findings 계열과
@@ -3344,10 +3401,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # "두 수치를 서로 나누지 마세요"라는 경고문이 필요했는데, 면을 가르면 그 경고가
     # 필요 없어진다 — 분모가 다른 것을 같은 페이지에 두지 않는 것이 이 재편의 핵심이다.
     emit("inspections.html", page("findings/inspections/"),
-        page_title="FDA 실사 결과 · GRM",
+        page_title=tr("FDA 실사 결과 · GRM"),
         nav_active="trends",
         seg_active="inspections",
-        description=INSPECTIONS_DESCRIPTION,
+        description=tr(INSPECTIONS_DESCRIPTION),
     )
 
     # 데이터 현황 — 소스 구성·연도별 공개량·연도별 구성비·수집량 상위 업체 +
@@ -3358,28 +3415,28 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   nav 여섯 탭 어느 job 에도 속하지 않는다. 라우트·sitemap·footer 도구 열은 그대로
     #   두고, 두 면의 꼬리 각주가 이 페이지를 연다(숫자를 의심하는 사람만 마주친다).
     emit("coverage.html", page("findings/coverage/"),
-        page_title="데이터 현황 · GRM",
+        page_title=tr("데이터 현황 · GRM"),
         nav_active="trends",
         seg_active="",
-        description=COVERAGE_DESCRIPTION,
+        description=tr(COVERAGE_DESCRIPTION),
     )
 
     # 업체 프로파일(FIND-FIRM-ALIAS 웹 절반) — findings/trends 와 동일 이유로 라이브
     # 데이터는 빌드시 고정할 수 없다(013_findings_firm_key.sql 의 findings_firm_profile
     # RPC 를 firm.js 가 URL 파라미터(?key=)로 직접 fetch). 서버는 셸(로딩 상태)만 렌더.
     emit("firm.html", page("findings/firm/"),
-        page_title="업체 프로파일 · GRM",
+        page_title=tr("업체 프로파일 · GRM"),
         nav_active="findings",
-        description=FIRM_DESCRIPTION,
+        description=tr(FIRM_DESCRIPTION),
     )
 
     # 자가점검 체크리스트 — findings/trends 와 동일 이유로 라이브 데이터는 빌드시 고정할 수
     # 없다(042 findings_cfr_ranking 로 조항 순위 + 043 findings_checklist 로 사례를 받아
     # checklist.js 가 조립). 서버는 셸(설정 바 + 로딩 상태)만 렌더한다.
     emit("checklist.html", page("findings/checklist/"),
-        page_title="자가점검 체크리스트 · GRM",
+        page_title=tr("자가점검 체크리스트 · GRM"),
         nav_active="trends",
-        description=CHECKLIST_DESCRIPTION,
+        description=tr(CHECKLIST_DESCRIPTION),
     )
 
     # 실사관 프로파일(FDA 483 서명 실사관 집계, firm 프로파일의 미러링) — findings/firm 과
@@ -3389,9 +3446,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 넣지 않는다. noindex 는 inspector.html 자체 <head> 오버라이드(meta_robots 블록)로
     # 배선하고, canonical 은 중복 URL 정리 목적으로 그대로 둔다.
     emit("inspector.html", page("findings/inspector/"),
-        page_title="실사관 프로파일 · GRM",
+        page_title=tr("실사관 프로파일 · GRM"),
         nav_active="findings",
-        description=INSPECTOR_DESCRIPTION,
+        description=tr(INSPECTOR_DESCRIPTION),
     )
 
     # 자료실(트랙 C) — findings/trends 와 달리 라이브 데이터가 아니라 커밋 스냅샷
@@ -3407,9 +3464,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             "latest_published": v["latest_published"],
         } for v in catalogs]
         emit("library.html", page("library/"),
-            page_title="자료실 · GRM",
+            page_title=tr("자료실 · GRM"),
             nav_active="library",
-            description=LIBRARY_DESCRIPTION,
+            description=tr(LIBRARY_DESCRIPTION),
             catalogs=hub_catalogs,
             lib_update=library_updates["latest"],
         )
@@ -3418,7 +3475,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 카탈로그 1개 추가 = 데이터 파일 + LIBRARY_REGISTRY 1항목(여기·템플릿 무수정).
     for v in catalogs:
         emit("library_catalog.html", page(f"library/{v['slug']}/"),
-            page_title=f"{v['title']} · GRM",
+            page_title=tr("{title} · GRM", title=v["title"]),
             nav_active="library",
             description=v["desc"],
             lib=v,
@@ -3430,9 +3487,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if guide_md:
         guide_title, guide_toc, guide_body = render_guide_html(guide_md)
         emit("guide.html", page("guide/"),
-            page_title="이용 안내 · GRM",
+            page_title=tr("이용 안내 · GRM"),
             nav_active="guide",
-            description=GUIDE_DESCRIPTION,
+            description=tr(GUIDE_DESCRIPTION),
             guide_title=guide_title,
             guide_toc=guide_toc,
             guide_body=guide_body,
@@ -3450,9 +3507,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             glossary_terms, _load_reg_ref_catalogs(), load_glossary_cases(),
             clause_slugs)
         emit("glossary.html", page("glossary/"),
-            page_title="규제 용어사전 · GRM",
+            page_title=tr("규제 용어사전 · GRM"),
             nav_active="glossary",
-            description=GLOSSARY_DESCRIPTION,
+            description=tr(GLOSSARY_DESCRIPTION),
             glossary=glossary_view,
         )
 
@@ -3467,10 +3524,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for group in glossary_view["groups"]:
             for term in group["terms"]:
                 emit("glossary_term.html", page(f"glossary/{term['id']}/"),
-                    page_title=glossary_term_page_title(term),
+                    page_title=glossary_term_page_title(term, tr),
                     nav_active="glossary",
-                    description=glossary_term_description(term),
-                    json_ld=build_glossary_term_json_ld(term),
+                    description=glossary_term_description(term, tr),
+                    json_ld=build_glossary_term_json_ld(term, tr=tr),
                     term=term,
                     case_excerpts=case_excerpts.get(term["id"]) or [],
                 )
@@ -3493,19 +3550,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             combos_by_category.setdefault(combo["category_slug"], []).append(combo)
         for axis in facets.get("axes") or []:
             axis_key = axis["axis"]
-            meta = FACET_AXES[axis_key]                 # 모르는 축 = KeyError(조용한 누락 금지)
+            meta = facet_meta(axis_key, tr)            # 모르는 축 = KeyError(조용한 누락 금지)
             items = [build_facet_item_view(it, doc_slugs) for it in axis.get("items") or []]
             siblings = [{"slug": it["slug"], "label_ko": it["label_ko"]} for it in items]
 
             axis_page = page(f"findings/{meta['path']}/")
             emit("findings_facet_index.html", axis_page,
-                page_title=f"{meta['title']} · GRM",
+                page_title=tr("{title} · GRM", title=meta["title"]),
                 nav_active="findings",
                 description=meta["index_lede"],
                 axis=meta, items=items, excluded=axis.get("excluded") or [],
                 # [B2] 화면 빵부스러기와 동일한 순서·이름(findings_facet_index.html 참조).
                 json_ld=axis_page.breadcrumb_json_ld([
-                    ("홈", "/"), ("지적사항 검색", "findings/"), (meta["title"], "")]),
+                    (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (meta["title"], "")]),
                 # 문서 목록 입구 — 문서 정본이 없으면 링크를 만들지 않는다(없는 페이지로
                 # 보내는 링크는 무링크보다 나쁘다).
                 doc_index_total=((docs_data or {}).get("totals") or {}).get("documents", 0)
@@ -3526,27 +3583,30 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     for c in combos_by_category.get(item["slug"], [])
                 ] if axis_key == "category" else []
                 item_page = page(f"findings/{meta['path']}/{item['slug']}/")
+                item_label = tr(item["label_ko"])
                 emit("findings_facet.html", item_page,
-                    page_title=f"{item['label_ko']} {meta['headline_suffix']} · GRM",
+                    page_title=tr("{label} {suffix} · GRM", label=item_label,
+                                  suffix=meta["headline_suffix"]),
                     nav_active="findings",
-                    description=facet_description(axis_key, item, agency_labels),
+                    description=facet_description(axis_key, item, agency_labels, tr),
                     axis=meta, item=item, siblings=siblings,
                     agency_labels=agency_labels, measured_on=measured_on,
                     crumb_mid=[{"href": f"findings/{meta['path']}/",
                                 "label": meta["title"]}],
-                    crumb_last=item["label_ko"],
+                    crumb_last=item_label,
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
                     json_ld=item_page.breadcrumb_json_ld([
-                        ("홈", "/"), ("지적사항 검색", "findings/"),
+                        (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
                         (meta["title"], f"findings/{meta['path']}/"),
-                        (item["label_ko"], "")]),
-                    headline=f"{item['label_ko']} {meta['headline_suffix']}",
+                        (item_label, "")]),
+                    headline=tr("{label} {suffix}", label=item_label,
+                                suffix=meta["headline_suffix"]),
                     lede_prefix=meta["lede_prefix"],
                     # 값 인코딩은 템플릿의 `| urlencode` 가 한다 — 렌더러는 urllib 을
                     # import 할 수 없다(순수성 가드가 비결정/네트워크 모듈의 **문 자체**를
                     # 닫아 둔다). 조립만 여기서 하고 인코딩 규칙은 옮기지 않는다.
                     cta_params=[(meta["query_key"], item["key"])],
-                    cta_label=f"{item['label_ko']} 지적사항 전체 보기",
+                    cta_label=tr("{label} 지적사항 전체 보기", label=item_label),
                     sibling_title=meta["sibling_title"],
                     sibling_base=f"findings/{meta['path']}/",
                     narrow_links=narrow,
@@ -3559,7 +3619,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 사람들이 치는 말은 주제 하나가 아니라 "기관 + 주제"다("FDA 무균 지적사항").
         # 부모는 언제나 분류 페이지 하나뿐이라 URL 도 그 밑에 둔다 — 위 루프가 그
         # 부모에 진입 간선을 이미 걸었으므로 이 페이지들은 고립되지 않는다.
-        cat_meta = FACET_AXES["category"]
+        cat_meta = facet_meta("category", tr)
         for cat_slug, combo_items in combos_by_category.items():
             sibs = [{"slug": c["slug"], "label_ko": c["agency_label_ko"]}
                     for c in combo_items]
@@ -3568,34 +3628,36 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 # by_agency 막대는 조합에선 뜻이 없다(기관이 하나뿐이라 100% 한 줄) —
                 # 데이터에 아예 넣지 않아 템플릿의 {% if %} 가 섹션을 지운다.
                 view["by_agency"] = []
-                label = f"{combo['agency_label_ko']} {combo['category_label_ko']}"
+                agency_label = tr(combo["agency_label_ko"])
+                category_label = tr(combo["category_label_ko"])
+                label = tr("{agency} {category}", agency=agency_label, category=category_label)
                 base = f"findings/{cat_meta['path']}/{cat_slug}/"
                 combo_page = page(f"{base}{combo['slug']}/")
                 emit("findings_facet.html", combo_page,
-                    page_title=f"{label} 지적사항 · GRM",
+                    page_title=tr("{label} 지적사항 · GRM", label=label),
                     nav_active="findings",
-                    description=combo_description(combo),
+                    description=combo_description(combo, tr),
                     axis=cat_meta, item=view, siblings=sibs,
                     agency_labels=agency_labels, measured_on=measured_on,
                     crumb_mid=[{"href": f"findings/{cat_meta['path']}/",
                                 "label": cat_meta["title"]},
-                               {"href": base, "label": combo["category_label_ko"]}],
-                    crumb_last=combo["agency_label_ko"],
+                               {"href": base, "label": category_label}],
+                    crumb_last=agency_label,
                     # [B2] 위 crumb_mid/crumb_last 와 **같은 값**으로 만든다.
                     json_ld=combo_page.breadcrumb_json_ld([
-                        ("홈", "/"), ("지적사항 검색", "findings/"),
+                        (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
                         (cat_meta["title"], f"findings/{cat_meta['path']}/"),
-                        (combo["category_label_ko"], base),
-                        (combo["agency_label_ko"], "")]),
-                    headline=f"{label} 지적사항",
+                        (category_label, base),
+                        (agency_label, "")]),
+                    headline=tr("{label} 지적사항", label=label),
                     # 기관명에 조사를 붙이지 않는다 — 한국어 조사는 앞말의 받침에
                     # 따라 갈리는데 기관명은 영문 약어가 섞여 있어(FDA·EMA·MHRA)
                     # 규칙이 성립하지 않는다. 이름은 제목이 이미 말하고 있다.
-                    lede_prefix="이 기관이 이 분류로",
+                    lede_prefix=tr("이 기관이 이 분류로"),
                     cta_params=[(cat_meta["query_key"], combo["category_key"]),
                                 ("agency", combo["agency_key"])],
-                    cta_label=f"{label} 지적사항 전체 보기",
-                    sibling_title="다른 기관 보기",
+                    cta_label=tr("{label} 지적사항 전체 보기", label=label),
+                    sibling_title=tr("다른 기관 보기"),
                     sibling_base=base,
                     narrow_links=[],
                 )
@@ -3612,12 +3674,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             facets.get("agency_labels") if facets else {}) or {}
         clause_index = page("findings/clause/")
         emit("findings_clause_index.html", clause_index,
-            page_title="21 CFR 조항별 지적사례 · GRM",
+            page_title=tr("21 CFR 조항별 지적사례 · GRM"),
             nav_active="findings",
-            description=("미국 GMP 규정(21 CFR Part 210·211) 조항별로 실제 지적사항을 "
-                         f"우리말로 모았습니다. 조항 {len(clause_views)}개."),
+            description=tr("미국 GMP 규정(21 CFR Part 210·211) 조항별로 실제 지적사항을 "
+                           "우리말로 모았습니다. 조항 {n}개.", n=len(clause_views)),
             json_ld=clause_index.breadcrumb_json_ld([
-                ("홈", "/"), ("지적사항 검색", "findings/"), ("조항별", "")]),
+                (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (tr("조항별"), "")]),
             clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
         )
         index_mod = max((s.get("published_date") or ""
@@ -3629,12 +3691,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for clause in clause_views:
             clause_page = page(f"findings/clause/{clause['slug']}/")
             emit("findings_clause.html", clause_page,
-                page_title=f"{clause['code']} 지적사례 · GRM",
+                page_title=tr("{code} 지적사례 · GRM", code=clause["code"]),
                 nav_active="findings",
-                description=clause_description(clause),
+                description=clause_description(clause, tr),
                 json_ld=clause_page.breadcrumb_json_ld([
-                    ("홈", "/"), ("지적사항 검색", "findings/"),
-                    ("조항별", "findings/clause/"), (clause["code"], "")]),
+                    (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                    (tr("조항별"), "findings/clause/"), (clause["code"], "")]),
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
             )
             clause_mod = max((s.get("published_date") or ""
@@ -3659,7 +3721,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
         documents = docs_data.get("documents") or []
         # 제목은 슬러그별로 유일해야 한다 — 겹치면 검색 결과에서 서로 구분되지 않는다.
-        doc_titles = build_doc_page_titles(documents)
+        doc_titles = build_doc_page_titles(documents, tr)
 
         # [실사관 프로파일 문서목록 멤버십 2026-08-31] 실사관 프로파일 페이지(런타임
         # RPC 화면)가 "이 실사관이 서명한 문서" 목록에서 정적 문서 페이지(findings/doc/
@@ -3756,7 +3818,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                                  if aa == a))
         index_groups = [{
             "slug": a.lower(),
-            "label_ko": doc_agency_labels.get(a, a),
+            "label_ko": tr(doc_agency_labels[a]) if a in doc_agency_labels else a,
             "total": sum(len(v) for (aa, _), v in by_ay.items() if aa == a),
             "years": [{"year": y, "count": len(by_ay[(a, y)])}
                       for y in sorted({yy for aa, yy in by_ay if aa == a}, reverse=True)],
@@ -3777,49 +3839,51 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # (한 번에 ~27초)이고, 목록을 함께 끄면 sitemap·진입 카드·404 페이지가 가리키는
         # 곳이 테스트 빌드에서만 없어져 **링크 무결성 검사가 프로덕션과 다른 것을 보게 된다**
         # (실제로 404 링크 검사가 이걸 잡았다).
+        docs_total = f"{docs_data['totals']['documents']:,}"
         emit("findings_doc_list.html", docs_index,
-             page_title="문서로 찾기 · GRM",
+             page_title=tr("문서로 찾기 · GRM"),
              nav_active="findings",
              # [P1.5 잔재 수리 2026-08-27] "지적 3건 이상" 임계 문구는 면제
              # 규칙 도입으로 더 이상 사실이 아니다 — 화면 고지는 고쳤는데
              # meta description 이 낡은 채 남아 있었다(검색 스니펫이 먼저 거짓말).
-             description=("규제기관이 공개한 실사 문서 "
-                          f"{docs_data['totals']['documents']:,}건을 기관·연도로"
-                          " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
-                          "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
-                          " 우리말로 볼 수 있습니다."),
+             description=tr("규제기관이 공개한 실사 문서 {n}건을 기관·연도로"
+                            " 정리했습니다. FDA 483·Warning Letter·캐나다 실사·"
+                            "식약처·EU/영국 GMP 비준수 — 문서를 열면 지적 전체를"
+                            " 우리말로 볼 수 있습니다.", n=docs_total),
              # [B2] 화면 빵부스러기와 동일(findings_doc_list.html index 모드).
              json_ld=docs_index.breadcrumb_json_ld([
-                 ("홈", "/"), ("지적사항 검색", "findings/"), ("문서로 찾기", "")]),
-             mode="index", heading="문서로 찾기",
-             lede=(f"규제기관이 공개한 실사 문서 "
-                   f"<b>{docs_data['totals']['documents']:,}</b>건을 기관과 연도로"
-                   " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
-                   " 우리말로 보실 수 있습니다."),
+                 (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (tr("문서로 찾기"), "")]),
+             mode="index", heading=tr("문서로 찾기"),
+             lede=tr("규제기관이 공개한 실사 문서 <b>{n}</b>건을 기관과 연도로"
+                     " 묶었습니다. 문서 하나를 열면 그 실사에서 나온 지적을 모두"
+                     " 우리말로 보실 수 있습니다.", n=docs_total),
              groups=index_groups)
 
         for g in index_groups:
             for y in g["years"]:
                 bucket = by_ay[(g["slug"].upper(), y["year"])]
                 list_page = page(f"findings/docs/{g['slug']}/{y['year']}/")
+                verb = date_axis_verb(bucket, tr)
+                heading = tr("{agency} · {year}년", agency=g["label_ko"], year=y["year"])
                 emit("findings_doc_list.html", list_page,
-                     page_title=f"{g['label_ko']} {y['year']}년 실사 문서 · GRM",
+                     page_title=tr("{agency} {year}년 실사 문서 · GRM",
+                                   agency=g["label_ko"], year=y["year"]),
                      nav_active="findings",
-                     description=(f"{g['label_ko']}가 {y['year']}년에"
-                                  f" {date_axis_verb(bucket)} 실사"
-                                  f" 문서 {y['count']:,}건의 지적사항을 우리말로"
-                                  " 정리했습니다."),
+                     description=tr("{agency}가 {year}년에 {verb} 실사 문서 {n}건의"
+                                    " 지적사항을 우리말로 정리했습니다.",
+                                    agency=g["label_ko"], year=y["year"], verb=verb,
+                                    n=f"{y['count']:,}"),
                      # [B2] 화면 빵부스러기와 동일(list 모드는 '문서로 찾기'가 낀다).
                      json_ld=list_page.breadcrumb_json_ld([
-                         ("홈", "/"), ("지적사항 검색", "findings/"),
-                         ("문서로 찾기", "findings/docs/"),
-                         (f"{g['label_ko']} · {y['year']}년", "")]),
+                         (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                         (tr("문서로 찾기"), "findings/docs/"),
+                         (heading, "")]),
                      mode="list",
-                     heading=f"{g['label_ko']} · {y['year']}년",
-                     lede=(f"{g['label_ko']}가 {y['year']}년에"
-                           f" {date_axis_verb(bucket)} 실사 문서"
-                           f" <b>{y['count']:,}</b>건입니다. 문서를 열면 그 실사의"
-                           " 지적을 모두 보실 수 있습니다."),
+                     heading=heading,
+                     lede=tr("{agency}가 {year}년에 {verb} 실사 문서 <b>{n}</b>건입니다."
+                             " 문서를 열면 그 실사의 지적을 모두 보실 수 있습니다.",
+                             agency=g["label_ko"], year=y["year"], verb=verb,
+                             n=f"{y['count']:,}"),
                      documents=bucket, agency_slug=g["slug"],
                      agency_label=g["label_ko"], year=y["year"],
                      sibling_years=g["years"])
@@ -3858,19 +3922,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 for f in doc.get("findings") or []
             ]
             emit("findings_doc.html", doc_page,
-                page_title=f"{doc_titles[doc['slug']]} · GRM",
+                page_title=tr("{title} · GRM", title=doc_titles[doc["slug"]]),
                 nav_active="findings",
-                description=doc_page_description(doc, doc_agency_labels),
+                description=doc_page_description(doc, doc_agency_labels, tr),
                 # [B2] 화면 빵부스러기와 동일(findings_doc.html: 홈 › 지적사항 검색 ›
                 # 규제기관별 › 업체명). 이 4천 장이 SERP 에서 날 슬러그를 보이던 자리다.
                 json_ld=doc_page.breadcrumb_json_ld([
-                    ("홈", "/"), ("지적사항 검색", "findings/"),
-                    ("규제기관별", "findings/agency/"), (doc["firm_name"], "")]),
+                    (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                    (tr("규제기관별"), "findings/agency/"), (doc["firm_name"], "")]),
                 doc=doc, agency_labels=doc_agency_labels,
                 source_label=doc_source_label(doc),
                 # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                 # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
-                inspector_line=doc_inspector_line(doc),
+                inspector_line=doc_inspector_line(doc, tr),
                 related_categories=related, same_firm=same_firm,
                 finding_bodies=finding_bodies,
                 # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
@@ -3888,16 +3952,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for fp in firm_pages:
                 firm_page = page(f"findings/firm/{fp['slug']}/")
                 emit("findings_firm_page.html", firm_page,
-                     page_title=f"{fp['name']} 지적사항 이력 · GRM",
+                     page_title=tr("{name} 지적사항 이력 · GRM", name=fp["name"]),
                      nav_active="findings",
-                     description=(
-                         f"{fp['name']}의 공개 실사 문서 {fp['doc_count']:,}건에서"
-                         f" 확인된 지적 {fp['finding_count']:,}건을 우리말로"
-                         f" 정리했습니다({fp['first_seen'][:4]}~{fp['last_seen'][:4]})."),
+                     description=tr(
+                         "{name}의 공개 실사 문서 {d}건에서 확인된 지적 {n}건을 우리말로"
+                         " 정리했습니다({y1}~{y2}).",
+                         name=fp["name"], d=f"{fp['doc_count']:,}",
+                         n=f"{fp['finding_count']:,}",
+                         y1=fp["first_seen"][:4], y2=fp["last_seen"][:4]),
                      # [B2] 화면 빵부스러기와 동일(findings_firm_page.html).
                      json_ld=firm_page.breadcrumb_json_ld([
-                         ("홈", "/"), ("지적사항", "findings/"),
-                         ("문서로 찾기", "findings/docs/"), (fp["name"], "")]),
+                         (tr("홈"), "/"), (tr("지적사항"), "findings/"),
+                         (tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
                      firm=fp, agency_labels=doc_agency_labels,
                      measured_on=docs_data.get("measured_on", ""),
                      min_findings=docs_data.get("min_findings"))
@@ -3908,10 +3974,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     quiz_bank = load_quiz_bank()
     if quiz_bank:
         emit("quiz.html", page("quiz/"),
-            page_title="주간 퀴즈 · GRM",
+            page_title=tr("주간 퀴즈 · GRM"),
             nav_active="guide",
-            description=QUIZ_DESCRIPTION,
-            quiz=build_quiz_view(quiz_bank),
+            description=tr(QUIZ_DESCRIPTION),
+            quiz=build_quiz_view(quiz_bank, tr),
         )
 
     # 검색 인덱스(P4 — 정적 클라이언트사이드 검색용). assets 옆에 둔다(archive.js 가 fetch).
@@ -3938,7 +4004,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                        "label": _item["label_ko"]})
         # 개인화 페이지 — canonical 을 템플릿에 넘기지 않던 종전 계약 그대로(비색인).
         emit("me.html", page("me/"),
-            page_title="마이페이지 · GRM",
+            page_title=tr("마이페이지 · GRM"),
             nav_active="me",
             canonical="",
             interest_vocab=interest_vocab,
@@ -3962,10 +4028,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
-        card_views = [_card_view(c) for c in cards_sorted]
+        card_views = [_card_view(c, tr) for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
         sections = _build_sections(card_views)
-        ctx = _brief_context(b, issue_no)
+        ctx = _brief_context(b, issue_no, tr)
         # [브리프 자료실 스트립] 이 브리프가 커버하는 주간(window)에 실제로 든 자료실
         # 변경만 싣는다 — window 파싱이 깨지면(형식 밖 표시 문자열 등) 조용히 생략한다
         # (깨진 스트립보다 무렌더가 낫다. 빈 상자 금지 원칙과 같은 결).
@@ -3976,9 +4042,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         brief_page = page(f"briefs/{pub}/")
         emit("brief.html", brief_page,
-            page_title=f"{ctx['title_dateform']} 규제뉴스 · GRM",
+            page_title=tr("{date} 규제뉴스 · GRM", date=ctx["title_dateform"]),
             nav_active="detail",
-            description=_brief_description(b["brief"]),
+            description=_brief_description(b["brief"], tr),
             brief=ctx,
             sections=sections,
             lib_update_week=lib_update_week,
@@ -3987,10 +4053,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 경로(briefs/{pub}/share.txt)로 낸다. 운영 루틴: 발행 후 이 URL 을 열어 복사·
         # 다듬어 게시(주 5분). 내용이 공개 브리프 요약뿐이라 공개 무해·sitemap 비등록.
         # tldr 이 비면 불릿 없이 헤더+링크만 남는다(파일 존재는 항상 — 경로 예측 가능성).
-        share_lines = [f"[GRM 주간 규제뉴스 · {ctx['title_dateform']}]", ""]
+        share_lines = [tr("[GRM 주간 규제뉴스 · {date}]", date=ctx["title_dateform"]), ""]
         share_lines += [f"· {t}" for t in (ctx.get("tldr") or [])]
-        share_lines += ["", f"이번 주 전체 보기: {brief_page.canonical}", "",
-                        "#GMP #제약규제 #품질관리 #RegulatoryIntelligence"]
+        share_lines += ["", tr("이번 주 전체 보기: {url}", url=brief_page.canonical), "",
+                        tr("#GMP #제약규제 #품질관리 #RegulatoryIntelligence")]
         share_file = brief_page.file("share.txt")
         _write(out_dir / share_file, "\n".join(share_lines) + "\n")
         written.append(share_file)
@@ -4009,9 +4075,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 404 는 루트의 파일 하나(`/404.html`)라 홈과 같은 깊이로 그린다(rel_root = 루트).
     not_found = page("").file("404.html")
     _write(out_dir / not_found, render_page("404.html", page(""),
-        page_title="페이지를 찾을 수 없습니다 · GRM",
+        page_title=tr("페이지를 찾을 수 없습니다 · GRM"),
         nav_active="",
-        description="찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요.",
+        description=tr("찾으시는 페이지가 없습니다. 지적사항 검색·자료실·용어사전에서 다시 찾아보세요."),
         canonical="",
     ))
     written.append(not_found)

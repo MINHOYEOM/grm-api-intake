@@ -10,6 +10,11 @@
  */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
 
   // ── 인덱스 위치: 자기 <script src> 기준(페이지 깊이·서브패스 무관) ──────────
   var scriptEl =
@@ -88,10 +93,10 @@
 
   // ── facet 칩(데이터 기반 — 실제 존재값만) ────────────────────────────────
   var FACET_DEFS = [
-    ["기관", "agencies", "agency"],
-    ["카테고리", "categories", "cat"],
-    ["제품군", "modalities", "mod"],
-    ["기간", "months", "month"],
+    [_t("기관"), "agencies", "agency"],
+    [_t("카테고리"), "categories", "cat"],
+    [_t("제품군"), "modalities", "mod"],
+    [_t("기간"), "months", "month"],
   ];
   function buildFacets() {
     var html = FACET_DEFS.map(function (def) {
@@ -126,7 +131,8 @@
   // ── 렌더 ────────────────────────────────────────────────────────────────
   function emptyHTML() {
     return (
-      '<div class="empty"><i class="ti ti-search-off"></i><b>결과 없음</b><br>검색어나 필터를 바꿔보세요.</div>'
+      '<div class="empty"><i class="ti ti-search-off"></i><b>' + _t("결과 없음") +
+      "</b><br>" + _t("검색어나 필터를 바꿔보세요.") + "</div>"
     );
   }
   function delay(i) {
@@ -140,12 +146,8 @@
     var filtered = anyFilter();
 
     if (state.view === "cards") {
-      countEl.innerHTML =
-        "카드 <b>" +
-        matched.length +
-        '</b><span class="mono"> / ' +
-        DATA.cards.length +
-        "</span>건";
+      countEl.innerHTML = _t("카드 <b>{matched}</b><span class=\"mono\"> / {total}</span>건",
+        { matched: matched.length, total: DATA.cards.length });
     } else {
       var shown = filtered
         ? new Set(
@@ -156,8 +158,8 @@
         : DATA.issues.length;
       // P1-3: 필터 적용 시 일치 카드 총수를 함께 노출(호 수만으론 'EMA 2건' 같은 결과량이 안 보임).
       countEl.innerHTML = filtered
-        ? "카드 <b>" + matched.length + "</b>건 · 호 " + shown + "개"
-        : "호 <b>" + shown + "</b>개";
+        ? _t("카드 <b>{matched}</b>건 · 호 {shown}개", { matched: matched.length, shown: shown })
+        : _t("호 <b>{shown}</b>개", { shown: shown });
     }
     document.getElementById("clearall").classList.toggle("on", !!filtered);
 
@@ -235,7 +237,7 @@
       issues
         .map(function (v, i) {
           var badge = v.latest
-            ? '<span class="badge"><span class="live"></span>이번 주 · LIVE</span>'
+            ? _t("<span class=\"badge\"><span class=\"live\"></span>이번 주 · LIVE</span>")
             : "";
           var tags = (v.agencies || [])
             .map(function (a) {
@@ -243,7 +245,7 @@
             })
             .join("");
           var hit = filtered
-            ? '<span class="tag hit">일치 ' + volHit[v.date] + "건</span>"
+            ? _t("<span class=\"tag hit\">일치 {n}건</span>", { n: volHit[v.date] })
             : "";
           return (
             '<a class="issue' +
@@ -269,7 +271,7 @@
             "</div></div>" +
             '<div class="stat"><b>' +
             esc(v.count) +
-            '</b><span class="u">건</span><span class="ev mono">' +
+            '</b><span class="u">' + _t("건") + '</span><span class="ev mono">' +
             esc(v.ev) +
             "</span></div></a>"
           );

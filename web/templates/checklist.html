@@ -22,8 +22,8 @@
 <main>
   <div class="wrap page-head cl-screen-only">
     <span class="kick reveal" style="animation-delay:.02s">Self-Inspection</span>
-    <h1 class="reveal" style="animation-delay:.08s">자가점검 체크리스트</h1>
-    <p class="reveal" style="animation-delay:.14s"><span class="ln">규제기관이 실제로 인용한 조항을 많이 인용된 순으로 뽑고, 조항마다 실제 지적 문장을 붙여 점검표로 만듭니다.</span> <span class="ln">인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰시면 됩니다.</span></p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("자가점검 체크리스트") }}</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("규제기관이 실제로 인용한 조항을 많이 인용된 순으로 뽑고, 조항마다 실제 지적 문장을 붙여 점검표로 만듭니다.") }}</span> <span class="ln">{{ _("인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰시면 됩니다.") }}</span></p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
@@ -33,49 +33,49 @@
     <div class="cl-controls cl-screen-only" id="cl-controls">
       <div class="cl-ctl-row">
         <label class="cl-ctl">
-          <span>조항 수</span>
+          <span>{{ _("조항 수") }}</span>
           <select id="cl-count">
-            <option value="10">10개</option>
-            <option value="15" selected>15개</option>
-            <option value="20">20개</option>
+            <option value="10">{{ _("10개") }}</option>
+            <option value="15" selected>{{ _("15개") }}</option>
+            <option value="20">{{ _("20개") }}</option>
           </select>
         </label>
         <label class="cl-ctl">
-          <span>기준</span>
+          <span>{{ _("기준") }}</span>
           <select id="cl-sort">
-            <option value="docs" selected>전체 누적 인용순</option>
-            <option value="recent">최근 12개월 인용순</option>
+            <option value="docs" selected>{{ _("전체 누적 인용순") }}</option>
+            <option value="recent">{{ _("최근 12개월 인용순") }}</option>
           </select>
         </label>
         <label class="cl-ctl">
-          <span>조항당 사례</span>
+          <span>{{ _("조항당 사례") }}</span>
           <select id="cl-examples">
-            <option value="1">1건</option>
-            <option value="2" selected>2건</option>
-            <option value="3">3건</option>
+            <option value="1">{{ _("1건") }}</option>
+            <option value="2" selected>{{ _("2건") }}</option>
+            <option value="3">{{ _("3건") }}</option>
           </select>
         </label>
-        <button class="cl-btn cl-btn-primary" id="cl-build" type="button">다시 만들기</button>
+        <button class="cl-btn cl-btn-primary" id="cl-build" type="button">{{ _("다시 만들기") }}</button>
       </div>
       <div class="cl-ctl-row cl-ctl-export" id="cl-export" hidden>
-        <button class="cl-btn" id="cl-print" type="button">인쇄 / PDF로 저장</button>
-        <button class="cl-btn" id="cl-copy" type="button">표로 복사(엑셀 붙여넣기)</button>
-        <button class="cl-btn" id="cl-csv" type="button">CSV 내려받기</button>
+        <button class="cl-btn" id="cl-print" type="button">{{ _("인쇄 / PDF로 저장") }}</button>
+        <button class="cl-btn" id="cl-copy" type="button">{{ _("표로 복사(엑셀 붙여넣기)") }}</button>
+        <button class="cl-btn" id="cl-csv" type="button">{{ _("CSV 내려받기") }}</button>
         <span class="cl-copy-msg" id="cl-copy-msg" role="status" aria-live="polite"></span>
       </div>
     </div>
 
-    <div class="cl-state" id="cl-loading" role="status" aria-live="polite">체크리스트를 만드는 중…</div>
-    <div class="cl-state cl-state-error" id="cl-error" hidden>체크리스트 서비스 준비 중입니다.</div>
+    <div class="cl-state" id="cl-loading" role="status" aria-live="polite">{{ _("체크리스트를 만드는 중…") }}</div>
+    <div class="cl-state cl-state-error" id="cl-error" hidden>{{ _("체크리스트 서비스 준비 중입니다.") }}</div>
 
     <div id="cl-doc" hidden>
       {#- 인쇄물 머리 — 화면에서도 보이고 인쇄에도 실린다. 점검자·점검일은 손으로
           채우는 칸이라 빈 밑줄로 둔다(값을 서버가 지어내지 않는다). -#}
       <div class="cl-doc-head">
-        <h2 class="cl-doc-title">GMP 자가점검 체크리스트</h2>
+        <h2 class="cl-doc-title">{{ _("GMP 자가점검 체크리스트") }}</h2>
         <p class="cl-doc-meta" id="cl-doc-meta"></p>
-        <p class="cl-doc-fields"><span>점검 대상(사업장/공정)</span><i></i></p>
-        <p class="cl-doc-fields"><span>점검자</span><i class="short"></i><span>점검일</span><i class="short"></i></p>
+        <p class="cl-doc-fields"><span>{{ _("점검 대상(사업장/공정)") }}</span><i></i></p>
+        <p class="cl-doc-fields"><span>{{ _("점검자") }}</span><i class="short"></i><span>{{ _("점검일") }}</span><i class="short"></i></p>
       </div>
       <div id="cl-items" class="cl-items"></div>
       <p class="cl-doc-foot" id="cl-doc-foot"></p>
@@ -84,7 +84,7 @@
     {#- [발견 허브 2026-08-26] 종착지 탈출 링크 — 이 페이지는 존 안에서 유일하게 나가는
         링크가 0개인 막다른 화면이었다. 점검표의 근거(빈발 조항 순위·실제 지적 문장)로
         이어지는 화면 두 곳만 조용히 잇는다. 인쇄물에는 싣지 않는다(cl-screen-only). -#}
-    <p class="cl-links cl-screen-only">점검표가 어떤 근거로 만들어졌는지 보시려면 — <a href="{{ rel_root }}findings/trends/index.html">많이 인용된 조항(지적 경향)</a> · <a href="{{ rel_root }}findings/index.html">규제 지적사항 전체</a></p>
+    <p class="cl-links cl-screen-only">{{ _('점검표가 어떤 근거로 만들어졌는지 보시려면 — <a href="{rel_root}findings/trends/index.html">많이 인용된 조항(지적 경향)</a> · <a href="{rel_root}findings/index.html">규제 지적사항 전체</a>', rel_root=rel_root) }}</p>
   </div>
 </main>
 <style>

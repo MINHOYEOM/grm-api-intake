@@ -6,8 +6,8 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Reference Library</span>
-    <h1 class="reveal" style="animation-delay:.08s">자료실</h1>
-    <p class="reveal" style="animation-delay:.14s">규제 실무에서 자주 되짚는 참조 문서를 한곳에 모았습니다. 매주 흘러가는 브리프와 달리, 필요할 때 언제든 다시 찾아볼 수 있도록 카탈로그 형태로 정리하고 공식 원문 링크를 함께 제공합니다.</p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _('자료실') }}</h1>
+    <p class="reveal" style="animation-delay:.14s">{{ _('규제 실무에서 자주 되짚는 참조 문서를 한곳에 모았습니다. 매주 흘러가는 브리프와 달리, 필요할 때 언제든 다시 찾아볼 수 있도록 카탈로그 형태로 정리하고 공식 원문 링크를 함께 제공합니다.') }}</p>
   </div>
   <div class="wrap">
     {#- 최근 업데이트(2026-07-25) — 주간 자동 갱신이 무엇을 바꿨는지. 뷰모델은
@@ -15,13 +15,13 @@
         렌더 시점에 라이브 카탈로그에서 join 된다. 변경이 없으면 lib_update 가 None →
         "최근 변경 없음"으로 정직하게 표시한다(가짜 항목을 만들지 않는다).
         ⚠️ Jinja 에서 s.items 는 dict 의 메서드로 잡힌다 — 반드시 s['items']. -#}
-    <section class="lib-upd reveal" aria-label="자료실 최근 업데이트">
+    <section class="lib-upd reveal" aria-label="{{ _('자료실 최근 업데이트') }}">
       <div class="lib-upd-h">
-        <span class="lib-upd-k"><i class="ti ti-refresh" aria-hidden="true"></i>최근 업데이트</span>
+        <span class="lib-upd-k"><i class="ti ti-refresh" aria-hidden="true"></i>{{ _('최근 업데이트') }}</span>
         {% if lib_update %}
-        <span class="lib-upd-sum"><b>{{ lib_update.date }}</b> · 자료 {{ lib_update.change_count }}건 반영</span>
+        <span class="lib-upd-sum">{{ _("<b>{date}</b> · 자료 {n}건 반영", date=lib_update.date, n=lib_update.change_count) }}</span>
         {% else %}
-        <span class="lib-upd-sum">최근 변경 없음</span>
+        <span class="lib-upd-sum">{{ _('최근 변경 없음') }}</span>
         {% endif %}
       </div>
       {% if lib_update %}
@@ -30,19 +30,19 @@
         <div class="lib-upd-cat">
           <div class="lib-upd-cat-h">
             <a class="lib-upd-tag" href="{{ rel_root }}library/{{ s.slug }}/index.html">{{ s.short }}</a>
-            <span class="lib-upd-n">{% if s.new_count %}신규 {{ s.new_count }}건{% endif %}{% if s.new_count and s.changed_count %} · {% endif %}{% if s.changed_count %}변경 {{ s.changed_count }}건{% endif %}{% if s.removed_count %} · 내림 {{ s.removed_count }}건{% endif %}</span>
+            <span class="lib-upd-n">{% if s.new_count %}{{ _("신규 {n}건", n=s.new_count) }}{% endif %}{% if s.new_count and s.changed_count %} · {% endif %}{% if s.changed_count %}{{ _("변경 {n}건", n=s.changed_count) }}{% endif %}{% if s.removed_count %} · {{ _("내림 {n}건", n=s.removed_count) }}{% endif %}</span>
           </div>
           <ul class="lib-upd-l">
             {% for it in s['items'] %}
-            <li><a href="{{ it.url }}" target="_blank" rel="noopener"><span class="lib-upd-st{% if it.state == '신규' %} is-new{% endif %}">{{ it.state }}</span><span class="lib-upd-t">{{ it.title }}</span><i class="ti ti-external-link" aria-hidden="true"></i></a></li>
+{# i18n-ignore #}            <li><a href="{{ it.url }}" target="_blank" rel="noopener"><span class="lib-upd-st{% if it.state == '신규' %} is-new{% endif %}">{{ it.state }}</span><span class="lib-upd-t">{{ it.title }}</span><i class="ti ti-external-link" aria-hidden="true"></i></a></li>
             {% endfor %}
-            {% if s.hidden_count %}<li class="lib-upd-more"><a href="{{ rel_root }}library/{{ s.slug }}/index.html">외 {{ s.hidden_count }}건 — {{ s.short }} 카탈로그에서 보기</a></li>{% endif %}
+            {% if s.hidden_count %}<li class="lib-upd-more"><a href="{{ rel_root }}library/{{ s.slug }}/index.html">{{ _("외 {n}건 — {short} 카탈로그에서 보기", n=s.hidden_count, short=s.short) }}</a></li>{% endif %}
           </ul>
         </div>
         {% endfor %}
       </div>
       {% endif %}
-      <p class="lib-upd-f">규제기관·전문기관 공개 자료를 <b>매주 월요일</b> 자동으로 확인해 반영합니다 — 한 번에 크게 바뀌거나 사라지면 사람이 먼저 확인합니다.</p>
+      <p class="lib-upd-f">{{ _('규제기관·전문기관 공개 자료를 <b>매주 월요일</b> 자동으로 확인해 반영합니다 — 한 번에 크게 바뀌거나 사라지면 사람이 먼저 확인합니다.') }}</p>
     </section>
     <div class="lib-cats">
       {% for c in catalogs %}
@@ -53,18 +53,18 @@
         </div>
         <p>{{ c.blurb }}</p>
         <div class="lib-cat-f">
-          {% if c.latest_published %}<span class="lib-asof">최근 발행 {{ c.latest_published }}</span>{% else %}<span class="lib-asof"></span>{% endif %}
-          <span class="lib-go">바로가기 <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+          {% if c.latest_published %}<span class="lib-asof">{{ _("최근 발행 {date}", date=c.latest_published) }}</span>{% else %}<span class="lib-asof"></span>{% endif %}
+          <span class="lib-go">{{ _('바로가기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
         </div>
       </a>
       {% endfor %}
     </div>
     <aside class="lib-x reveal">
       <div class="lib-x-t">
-        <b>규제 용어사전</b>
-        <span>GMP·CAPA·데이터 완전성·무균 공정·ICH 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.</span>
+        <b>{{ _('규제 용어사전') }}</b>
+        <span>{{ _('GMP·CAPA·데이터 완전성·무균 공정·ICH 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.') }}</span>
       </div>
-      <a class="lib-x-go" href="{{ rel_root }}glossary/index.html">용어사전 열기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="lib-x-go" href="{{ rel_root }}glossary/index.html">{{ _('용어사전 열기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     </aside>
   </div>
 </main>

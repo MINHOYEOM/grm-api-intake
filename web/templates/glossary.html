@@ -7,23 +7,23 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Glossary</span>
-    <h1 class="reveal" style="animation-delay:.08s">규제 용어사전</h1>
-    <p class="reveal" style="animation-delay:.14s">GMP·규제 문서에서 자주 나오는 용어를 쉬운 우리말 풀이와 공식 출처로 정리했습니다. 한글 또는 영문으로 검색하거나 초성 색인으로 바로 찾아보세요. 최종 판단은 언제나 공식 원문과 최신 기준을 확인하세요.</p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _('규제 용어사전') }}</h1>
+    <p class="reveal" style="animation-delay:.14s">{{ _('GMP·규제 문서에서 자주 나오는 용어를 쉬운 우리말 풀이와 공식 출처로 정리했습니다. 한글 또는 영문으로 검색하거나 초성 색인으로 바로 찾아보세요. 최종 판단은 언제나 공식 원문과 최신 기준을 확인하세요.') }}</p>
   </div>
   <div class="wrap gl-tools reveal" style="animation-delay:.2s">
     <div class="gl-search">
       <i class="ti ti-search" aria-hidden="true"></i>
-      <input id="grm-gl-q" type="search" autocomplete="off" placeholder="용어 검색 (예: 무균, data integrity, CAPA)" aria-label="용어 검색" />
+      <input id="grm-gl-q" type="search" autocomplete="off" placeholder="{{ _('용어 검색 (예: 무균, data integrity, CAPA)') }}" aria-label="{{ _('용어 검색') }}" />
     </div>
-    <p class="gl-count" id="grm-gl-count" data-total="{{ glossary.total }}">전체 <b>{{ glossary.total }}</b>개 용어</p>
+    <p class="gl-count" id="grm-gl-count" data-total="{{ glossary.total }}">{{ _("전체 <b>{n}</b>개 용어", n=glossary.total) }}</p>
   </div>
-  <nav class="wrap gl-index" id="grm-gl-index" aria-label="초성 색인">
+  <nav class="wrap gl-index" id="grm-gl-index" aria-label="{{ _('초성 색인') }}">
     {% for b in glossary.buckets %}
     <a href="#{{ b.anchor }}" data-bucket="{{ b.anchor }}">{{ b.bucket }}</a>
     {% endfor %}
   </nav>
   <div class="wrap gl-body">
-    <p class="gl-empty" id="grm-gl-empty" hidden>검색어와 일치하는 용어가 없습니다. 다른 표현(한글↔영문)으로 다시 검색해 보세요.</p>
+    <p class="gl-empty" id="grm-gl-empty" hidden>{{ _('검색어와 일치하는 용어가 없습니다. 다른 표현(한글↔영문)으로 다시 검색해 보세요.') }}</p>
     {% for g in glossary.groups %}
     <section class="gl-group" id="{{ g.anchor }}" data-bucket="{{ g.anchor }}">
       <h2 class="gl-group-h">{{ g.bucket }}</h2>
@@ -35,28 +35,28 @@
                 가장 많이 받는 허브인데, 종전에는 자식 226장을 하나도 가리키지 않아(전부
                 `#` 프래그먼트) 낱개 페이지가 sitemap 전용 고아였다 — 45개 용어는 인바운드가
                 0이었다. `#` 앵커는 그대로 둔다(퀴즈의 `glossary/#id` 딥링크가 쓴다). -#}
-            <h3 class="gl-term-ko"><a class="gl-term-link" href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a><a class="gl-anchor" href="#{{ t.id }}" aria-label="이 용어로 바로가기">#</a></h3>
+            <h3 class="gl-term-ko"><a class="gl-term-link" href="{{ rel_root }}glossary/{{ t.id }}/">{{ t.term_ko }}</a><a class="gl-anchor" href="#{{ t.id }}" aria-label="{{ _('이 용어로 바로가기') }}">#</a></h3>
             <span class="gl-term-en">{{ t.term_en }}</span>
-            {% if t.aliases %}<p class="gl-alias"><span class="gl-alias-k">다른 표현</span><span class="gl-alias-v">{{ t.aliases|join(' · ') }}</span></p>{% endif %}
+            {% if t.aliases %}<p class="gl-alias"><span class="gl-alias-k">{{ _('다른 표현') }}</span><span class="gl-alias-v">{{ t.aliases|join(' · ') }}</span></p>{% endif %}
           </div>
           <p class="gl-def">{{ t.easy_ko }}</p>
-          {% if t.detail_ko %}<p class="gl-detail"><span class="gl-detail-k">실무 맥락</span>{{ t.detail_ko }}</p>{% endif %}
+          {% if t.detail_ko %}<p class="gl-detail"><span class="gl-detail-k">{{ _('실무 맥락') }}</span>{{ t.detail_ko }}</p>{% endif %}
           {% if t.source_url %}
-          <p class="gl-src"><span class="gl-src-k">출처</span><a class="gl-src-a" href="{{ t.source_url }}" target="_blank" rel="noopener">{{ t.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
+          <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span><a class="gl-src-a" href="{{ t.source_url }}" target="_blank" rel="noopener">{{ t.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
           {% else %}
-          <p class="gl-src"><span class="gl-src-k">출처</span>{{ t.definition_source }}</p>
+          <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span>{{ t.definition_source }}</p>
           {% endif %}
           {% if t.reg_refs %}
-          <div class="gl-refs"><span class="gl-refs-k">관련 조항</span>{% for r in t.reg_refs %}{% if r.url %}<a class="gl-refs-a" href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span class="gl-refs-a">{{ r.label }}</span>{% endif %}{% endfor %}</div>
+          <div class="gl-refs"><span class="gl-refs-k">{{ _('관련 조항') }}</span>{% for r in t.reg_refs %}{% if r.url %}<a class="gl-refs-a" href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span class="gl-refs-a">{{ r.label }}</span>{% endif %}{% endfor %}</div>
           {% endif %}
           {% if t.related %}
           <div class="gl-rel">
-            <span class="gl-rel-k">관련 용어</span>
+            <span class="gl-rel-k">{{ _('관련 용어') }}</span>
             {% for r in t.related %}<a class="gl-rel-a" href="#{{ r.id }}">{{ r.term_ko }}</a>{% endfor %}
           </div>
           {% endif %}
           {% if t.case_findings %}
-          <a class="gl-case-a" href="{{ rel_root }}{{ t.case_href }}">이 용어로 검색되는 지적사례 <b>{{ t.case_count_label }}</b>건 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          <a class="gl-case-a" href="{{ rel_root }}{{ t.case_href }}">{{ _("이 용어로 검색되는 지적사례 <b>{n}</b>건 보기", n=t.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
           {% endif %}
         </article>
         {% endfor %}

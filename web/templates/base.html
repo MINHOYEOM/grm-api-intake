@@ -23,7 +23,7 @@
 {% if canonical %}
 <link rel="canonical" href="{{ canonical }}" />
 {#- RSS 자동 발견 — 피드 리더와 네이버 수집기가 이 선언으로 피드를 찾는다. -#}
-<link rel="alternate" type="application/rss+xml" title="GRM 주간 브리프" href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="{{ _('GRM 주간 브리프') }}" href="/rss.xml" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="ko_KR" />
@@ -61,19 +61,19 @@
 {% set notice_href = '#notice' if nav_active == 'home' else rel_root ~ 'index.html#notice' %}
 <header class="nav" id="nav"><div class="wrap nav-in">
   {# 헤더 브랜드 락업(B안) — favicon.svg(올빼미) 재사용(단일원천) + GRM/서브타이틀. grm.css 프리즈 보존 위해 인라인 스타일(정렬·크기)만; .brand-full 은 기존 ≤640px 반응형 은닉 클래스 재사용(서브타이틀=구 전체명 대체). #}
-  <a class="brand" href="{{ rel_root }}index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
+  <a class="brand" href="{{ rel_root }}index.html" aria-label="{{ _('Global Regulatory Monitor 홈') }}"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
   {#- nav 탭 순서(8차 웨이브 A 2026-07-18): '소개' 제거·'용어사전' 신규 삽입 —
       주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내 6개.
       [네이밍 2026-08-27] 사용자 피드백('전문성이 보이는 워딩') — M15 가 '지적사항'을
       '찾아보기'로 바꿨던 결정(당시 피드백: 캐주얼하게)을 오늘 피드백이 뒤집는다.
       내용을 그대로 이름으로: 모아보기→주간 브리프, 찾아보기→지적사항. -#}
-  <nav id="navmenu"><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>주간 브리프</a><a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>지적사항</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>트렌드</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>자료실</a><a href="{{ rel_root }}glossary/index.html"{% if nav_active == 'glossary' %} class="on"{% endif %}>용어사전</a><a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>이용안내</a></nav>
+  <nav id="navmenu"><a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>{{ _("주간 브리프") }}</a><a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>{{ _("자료실") }}</a><a href="{{ rel_root }}glossary/index.html"{% if nav_active == 'glossary' %} class="on"{% endif %}>{{ _("용어사전") }}</a><a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>{{ _("이용안내") }}</a></nav>
   <span class="sp"></span>
   {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}
-  <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
+  <button class="navtoggle" id="navToggle" type="button" aria-label="{{ _('메뉴 열기') }}" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   {# P0-2: 로그인 기능 미구현 — 죽은 버튼 비표시(렌더 출력 0). 도입 시 복원: <button class="btn" type="button">로그인</button> #}
   {# P0-3: 구독 기능 미도입 — 헤더 상시 CTA를 이번 주 소식으로. archive 3중 중복 제거. #}
-  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">이번 주 소식</a>
+  <a class="btn coral" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
 </div></header>
 
 {% block content %}{% endblock %}
@@ -83,25 +83,25 @@
   {# 구독 전 상태(입력) — 제출 성공 시 아래 스크립트가 이 블록 전체를 감추고 .sub-done 만 표시. div 는 display 미지정이라 hidden 속성이 정상 동작(폼과 달리). #}
   <div id="grm-sub-intro">
     <span class="kick">Weekly Newsletter</span>
-    <h2>매주 새로운 규제소식을 이메일로 받아보세요</h2>
+    <h2>{{ _("매주 새로운 규제소식을 이메일로 받아보세요") }}</h2>
     {# 동의 범위 문안 — 주간 클리핑 + 서비스 업데이트 안내(web/announce.py) 두 종류를 모두 포괄한다. 공지 메일은 이 문장에 근거해 같은 리스트로 나간다. 좁히면 공지 발송 근거가 사라지므로 함부로 줄이지 말 것. #}
-    <p>매주 모아드리는 규제 클리핑의 핵심 요약과 바로가기를 메일로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.</p>
+    <p>{{ _("매주 모아드리는 규제 클리핑의 핵심 요약과 바로가기를 메일로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
-      <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="이메일 주소" placeholder="you@company.com" />
+      <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
       <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="locale" value="en" />
-      <button class="btn coral" type="submit">구독</button>
+      <button class="btn coral" type="submit">{{ _("구독") }}</button>
     </form>
-    <p class="note">구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.</p>
+    <p class="note">{{ _("구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.") }}</p>
   </div>
   {# 인라인 성공 상태(방식 A) — 제출 시 intro 를 감추고 이 패널만 표시. 페이지 이동 없음. 아이콘=코랄 원형 + SVG 체크(웹폰트 비의존). #}
   <div id="grm-sub-done" class="sub-done" role="status" aria-live="polite" hidden>
     <span class="sub-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
-    <h2>확인 메일을 보냈습니다</h2>
+    <h2>{{ _("확인 메일을 보냈습니다") }}</h2>
     <p class="sub-done-mail"><b id="grm-sub-dest"></b></p>
-    <p>메일에서 <b>구독 확인</b> 버튼을 눌러 구독을 완료해 주세요.</p>
-    <p class="sub-done-sub">메일이 보이지 않으면 스팸함도 확인해 주세요.</p>
+    <p>{{ _("메일에서 <b>구독 확인</b> 버튼을 눌러 구독을 완료해 주세요.") }}</p>
+    <p class="sub-done-sub">{{ _("메일이 보이지 않으면 스팸함도 확인해 주세요.") }}</p>
   </div>
 </div></section>
 {# 방식 A 배선: 폼 제출을 가로채 fetch(no-cors)로 Brevo endpoint 에 백그라운드 POST → 페이지를 떠나지 않고 intro 를 성공 패널로 교체. 스크립트 미실행(JS off)·fetch 미지원이면 preventDefault 가 안 걸려 네이티브 POST 로 자연 폴백(=기존 동작). 밴드 한글안전(§4): 아래 스크립트에 letter-spacing/text-transform/mono 미사용. #}
@@ -148,21 +148,21 @@
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
+      <p>{{ _("전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.") }}</p></div>
     {# 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다(뉴스레터 밴드 선례 동형). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
-    <div><h5>바로가기</h5><a href="{{ about_href }}">소개</a><a href="{{ rel_root }}archive/index.html">주간 브리프</a><a href="{{ rel_root }}findings/index.html">지적사항</a><a href="{{ rel_root }}findings/trends/index.html">트렌드</a><a href="{{ rel_root }}library/index.html">자료실</a><a href="{{ rel_root }}glossary/index.html">용어사전</a><a href="{{ rel_root }}quiz/index.html">주간 퀴즈</a><a href="{{ rel_root }}guide/index.html">이용안내</a>{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">마이페이지</a>{% endif %}</div>
+    <div><h5>{{ _("바로가기") }}</h5><a href="{{ about_href }}">{{ _("소개") }}</a><a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a><a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a><a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a><a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a><a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
     {# [존 재편 2026-08-26] 조회·산출 도구 열 신설. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데(찾아보기 6,774 · 트렌드 3,517 · 자료실 3,518), 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙 — 마이페이지를 footer 에만 둔 것과 같은 판단)는 대신, footer 에 열을 하나 더해 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. #}
-    <div><h5>도구</h5><a href="{{ rel_root }}findings/checklist/index.html">자가점검 체크리스트</a><a href="{{ rel_root }}findings/firm/index.html">업체 조회</a><a href="{{ rel_root }}findings/inspector/index.html">실사관 조회</a><a href="{{ rel_root }}findings/inspections/index.html">FDA 실사 결과</a><a href="{{ rel_root }}findings/coverage/index.html">데이터 현황</a><a href="{{ rel_root }}findings/docs/index.html">문서로 찾기</a></div>
+    <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a><a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a><a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a></div>
     {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — 여기엔 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나 있었다. WebSourceCopyConsistencyTest 가 두 목록의 집합 일치를 검사한다. 위 주석 경고대로 이 주석도 공백을 삼키지 않는 형태여야 한다(하이픈 변형 금지). #}
-    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
-    <div><h5>안내</h5><a href="{{ notice_href }}">AI 자동 생성 고지</a><a href="{{ notice_href }}">원문 확인 안내</a></div>
+    <div><h5>{{ _("수집 소스") }}</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>{{ _("Health Canada · 식약처") }}</span><span>ECA · ISPE</span></div>
+    <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
       <span>© 2026 Global Regulatory Monitor</span>
       <span class="prov">AI-generated from primary sources · verify against the original</span>
     </div>
-    <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
+    <p class="foot-disclaimer">{{ _("본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.") }}</p>
   </div>
 </div></footer>
 
@@ -178,24 +178,24 @@ if(_nt&&_nm){
 }
 </script>
 <div class="grm-pet" id="grm-pet" data-page="{{ nav_active }}">
-  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel" title="드래그해 이동 · 눌러 관리">
+  <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="{{ _('구름이 펫 열기') }}" aria-expanded="false" aria-controls="grm-pet-panel" title="{{ _('드래그해 이동 · 눌러 관리') }}">
     <span class="grm-pet-aura" aria-hidden="true"></span><span class="grm-pet-shadow" aria-hidden="true"></span>
     <img class="grm-pet-sprite" id="grm-pet-sprite" src="/assets/gurumi-egg.png" width="512" height="512" alt="" aria-hidden="true" draggable="false">
     <span class="grm-pet-face-rig" aria-hidden="true"><i class="grm-pet-lid grm-pet-lid-l"></i><i class="grm-pet-lid grm-pet-lid-r"></i></span><span class="grm-pet-dot" aria-hidden="true"></span>
-    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>이동</span>
+    <span class="grm-pet-grab-hint" aria-hidden="true"><i class="ti ti-grip-horizontal"></i>{{ _("이동") }}</span>
   </button>
-  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>쉬는 중</b></span>
+  <span class="grm-pet-state-chip" id="grm-pet-state-chip" aria-hidden="true"><i></i><b>{{ _("쉬는 중") }}</b></span>
   <p class="grm-pet-talk" id="grm-pet-talk" role="status" aria-live="polite"></p>
-  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="구름이 관리" hidden>
-    <header class="grm-pet-head" id="grm-pet-drag-handle" title="빈 곳을 드래그해 구름이 이동"><div><span>MY GRM PET</span><h2>구름이 관리</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="구름이 위치 초기화" title="위치 초기화"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="구름이 관리 닫기">×</button></div></header>
-    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>도감 미리보기</span></div>
-    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">알</h3><p id="grm-pet-mood">퀴즈를 풀면 부화가 시작돼요</p></div><span id="grm-pet-level">Lv.1</span></div>
-    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">쉬는 중</b></span><small id="grm-pet-state-copy">새로운 소식을 기다리고 있어요</small></div>
-    <div class="grm-pet-progress"><div><span id="grm-pet-points">0 포인트</span><span id="grm-pet-next">50 포인트 남음</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
-    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>정답</span><span><b id="grm-pet-weeks">0</b>주 참여</span><span><b id="grm-pet-streak">0</b>주 연속</span></div>
-    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>쓰다듬기</button><a href="{{ rel_root }}quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>함께 성장하기</a></div>
-    <div class="grm-pet-atlas-head"><b>성장 도감</b><span>단계를 눌러 미리 볼 수 있어요</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
-    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>성장 기록은 이 브라우저에 안전하게 보관돼요.</p>
+  <section class="grm-pet-panel" id="grm-pet-panel" aria-label="{{ _('구름이 관리') }}" hidden>
+    <header class="grm-pet-head" id="grm-pet-drag-handle" title="{{ _('빈 곳을 드래그해 구름이 이동') }}"><div><span>MY GRM PET</span><h2>{{ _("구름이 관리") }}</h2></div><div class="grm-pet-head-actions"><button id="grm-pet-reset-pos" type="button" aria-label="{{ _('구름이 위치 초기화') }}" title="{{ _('위치 초기화') }}"><i class="ti ti-current-location" aria-hidden="true"></i></button><button id="grm-pet-close" type="button" aria-label="{{ _('구름이 관리 닫기') }}">×</button></div></header>
+    <div class="grm-pet-hero"><span class="grm-pet-hero-glow" aria-hidden="true"></span><img id="grm-pet-hero-img" src="/assets/gurumi-egg.png" width="512" height="512" alt=""><span class="grm-pet-preview" id="grm-pet-preview" hidden>{{ _("도감 미리보기") }}</span></div>
+    <div class="grm-pet-identity"><div><h3 id="grm-pet-name">{{ _("알") }}</h3><p id="grm-pet-mood">{{ _("퀴즈를 풀면 부화가 시작돼요") }}</p></div><span id="grm-pet-level">Lv.1</span></div>
+    <div class="grm-pet-now" aria-live="polite"><span><i id="grm-pet-state-dot"></i><b id="grm-pet-state-name">{{ _("쉬는 중") }}</b></span><small id="grm-pet-state-copy">{{ _("새로운 소식을 기다리고 있어요") }}</small></div>
+    <div class="grm-pet-progress"><div><span id="grm-pet-points">{{ _("0 포인트") }}</span><span id="grm-pet-next">{{ _("50 포인트 남음") }}</span></div><div class="grm-pet-track"><i id="grm-pet-bar"></i></div></div>
+    <div class="grm-pet-stats"><span><b id="grm-pet-correct">0</b>{{ _("정답") }}</span><span><b id="grm-pet-weeks">0</b>{{ _("주 참여") }}</span><span><b id="grm-pet-streak">0</b>{{ _("주 연속") }}</span></div>
+    <div class="grm-pet-actions"><button id="grm-pet-pat" type="button"><i class="ti ti-hand-finger" aria-hidden="true"></i>{{ _("쓰다듬기") }}</button><a href="{{ rel_root }}quiz/index.html"><i class="ti ti-sparkles" aria-hidden="true"></i>{{ _("함께 성장하기") }}</a></div>
+    <div class="grm-pet-atlas-head"><b>{{ _("성장 도감") }}</b><span>{{ _("단계를 눌러 미리 볼 수 있어요") }}</span></div><div class="grm-pet-atlas" id="grm-pet-atlas"></div>
+    <p class="grm-pet-local"><i class="ti ti-device-desktop" aria-hidden="true"></i>{{ _("성장 기록은 이 브라우저에 안전하게 보관돼요.") }}</p>
   </section>
 </div>
 <script src="/assets/pet.js?v={{ petjs_ver }}" defer></script>
@@ -219,10 +219,10 @@ body.grm-has-share .grm-card-actions{display:flex}
   function done(btn){
     var t=btn.querySelector('.grm-ca-t'); if(!t) return;
     var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
-    t.textContent='복사됨'; btn.classList.add('is-done');
+    t.textContent='{{ _("복사됨") }}'; btn.classList.add('is-done');
     setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
   }
-  function fallback(url){ window.prompt('이 링크를 복사하세요', url); }
+  function fallback(url){ window.prompt('{{ _("이 링크를 복사하세요") }}', url); }
   for(var i=0;i<rows.length;i++){ (function(row){
     var btn=row.querySelector('[data-share]'); if(!btn) return;
     btn.addEventListener('click', function(){
@@ -424,22 +424,22 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   .grm-cta-txt span{display:none}
 }
 </style>
-<aside class="grm-cta" id="grm-cta" role="complementary" aria-label="뉴스레터 구독 안내" hidden>
+<aside class="grm-cta" id="grm-cta" role="complementary" aria-label="{{ _('뉴스레터 구독 안내') }}" hidden>
   <div class="grm-cta-in">
     <div class="grm-cta-txt">
-      <b>매주 새로운 규제소식을 메일로 받아보세요</b>
-      <span>FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료</span>
+      <b>{{ _("매주 새로운 규제소식을 메일로 받아보세요") }}</b>
+      <span>{{ _("FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료") }}</span>
     </div>
     <form class="grm-cta-form" id="grm-cta-form" action="{{ newsletter_form_action }}" method="post">
-      <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="이메일 주소" placeholder="you@company.com" />
+      <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       <input type="text" name="email_address_check" value="" class="grm-cta-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="locale" value="en" />
-      <button type="submit">구독</button>
+      <button type="submit">{{ _("구독") }}</button>
     </form>
     <div class="grm-cta-side">
-      {% if reactions_enabled %}<a href="{{ rel_root }}index.html#watchlist">관심 업체 알림</a>{% endif %}
-      <button type="button" id="grm-cta-today">오늘 하루 보지 않기</button>
-      <button type="button" id="grm-cta-close" class="grm-cta-x" aria-label="닫기">&times;</button>
+      {% if reactions_enabled %}<a href="{{ rel_root }}index.html#watchlist">{{ _("관심 업체 알림") }}</a>{% endif %}
+      <button type="button" id="grm-cta-today">{{ _("오늘 하루 보지 않기") }}</button>
+      <button type="button" id="grm-cta-close" class="grm-cta-x" aria-label="{{ _('닫기') }}">&times;</button>
     </div>
   </div>
 </aside>
@@ -500,7 +500,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');
-      if(t){t.innerHTML='<b>확인 메일을 보냈습니다</b><span>메일에서 구독 확인 버튼을 눌러 주세요.</span>';}
+      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{{ _("메일에서 구독 확인 버튼을 눌러 주세요.") }}</span>';}
       f.hidden=true;
       setTimeout(function(){dismiss(true);},4000);
     });

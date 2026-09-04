@@ -4,6 +4,11 @@
  * 보임(progressive enhancement) — 정적 열람·해시 딥링크 무영향. */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   var input = document.getElementById("grm-gl-q");
   if (!input) return;
   var terms = Array.prototype.slice.call(document.querySelectorAll(".gl-term"));
@@ -35,8 +40,8 @@
     }
     if (emptyEl) emptyEl.hidden = shown !== 0;
     if (countEl) {
-      if (q === "") countEl.innerHTML = "전체 <b>" + total + "</b>개 용어";
-      else countEl.innerHTML = "<b>" + shown + "</b>개 표시";
+      if (q === "") countEl.innerHTML = _t("전체") + " <b>" + total + "</b>" + _t("개 용어");
+      else countEl.innerHTML = "<b>" + shown + "</b>" + _t("개 표시");
     }
   }
 

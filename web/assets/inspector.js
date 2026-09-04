@@ -43,6 +43,11 @@
  */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
 
   var cfg = document.getElementById("grm-inspector-cfg");
   var loadingEl = document.getElementById("ip-loading");
@@ -79,26 +84,26 @@
   // 의 동명 상수와 동일 복제본(동기화 테스트로 드리프트 차단, 별도 공유 파일로 빼지 않는다
   // — 이 저장소의 확립된 방식).
   var CATEGORY_LABELS = {
-    data_integrity: { ko: "데이터 완전성", en: "Data integrity" },
-    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
-    documentation_records: { ko: "문서화/기록관리", en: "Documentation and records" },
-    aseptic_sterility_assurance: { ko: "무균보증/무균공정", en: "Aseptic processing and sterility assurance" },
-    environmental_monitoring: { ko: "환경모니터링", en: "Environmental monitoring" },
-    cleaning_validation: { ko: "세척밸리데이션", en: "Cleaning validation" },
-    complaint_recall: { ko: "불만/회수", en: "Complaint and recall handling" },
-    deviation_capa: { ko: "일탈/CAPA/조사", en: "Deviation, CAPA, and investigation" },
-    quality_unit_oversight: { ko: "품질부서 관리감독", en: "Quality unit oversight" },
-    qc_lab_controls: { ko: "시험실/품질관리", en: "Laboratory and QC controls" },
-    process_validation: { ko: "공정밸리데이션", en: "Process validation" },
-    equipment_facility: { ko: "설비/시설", en: "Equipment and facility" },
-    material_supplier_control: { ko: "원자재/공급업체 관리", en: "Material and supplier control" },
-    contamination_control: { ko: "오염/교차오염 관리", en: "Contamination control" },
-    validation_qualification: { ko: "밸리데이션/적격성평가", en: "Validation and qualification" },
-    stability_storage: { ko: "안정성/보관", en: "Stability and storage" },
-    labeling_packaging: { ko: "표시/포장", en: "Labeling and packaging" },
-    regulatory_reporting: { ko: "규제보고/변경관리", en: "Regulatory reporting and change control" },
-    training_personnel: { ko: "교육/작업자", en: "Training and personnel" },
-    other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
+    data_integrity: { ko: _t("데이터 완전성"), en: "Data integrity" },
+    computer_system_validation: { ko: _t("컴퓨터화시스템"), en: "Computer system validation" },
+    documentation_records: { ko: _t("문서화/기록관리"), en: "Documentation and records" },
+    aseptic_sterility_assurance: { ko: _t("무균보증/무균공정"), en: "Aseptic processing and sterility assurance" },
+    environmental_monitoring: { ko: _t("환경모니터링"), en: "Environmental monitoring" },
+    cleaning_validation: { ko: _t("세척밸리데이션"), en: "Cleaning validation" },
+    complaint_recall: { ko: _t("불만/회수"), en: "Complaint and recall handling" },
+    deviation_capa: { ko: _t("일탈/CAPA/조사"), en: "Deviation, CAPA, and investigation" },
+    quality_unit_oversight: { ko: _t("품질부서 관리감독"), en: "Quality unit oversight" },
+    qc_lab_controls: { ko: _t("시험실/품질관리"), en: "Laboratory and QC controls" },
+    process_validation: { ko: _t("공정밸리데이션"), en: "Process validation" },
+    equipment_facility: { ko: _t("설비/시설"), en: "Equipment and facility" },
+    material_supplier_control: { ko: _t("원자재/공급업체 관리"), en: "Material and supplier control" },
+    contamination_control: { ko: _t("오염/교차오염 관리"), en: "Contamination control" },
+    validation_qualification: { ko: _t("밸리데이션/적격성평가"), en: "Validation and qualification" },
+    stability_storage: { ko: _t("안정성/보관"), en: "Stability and storage" },
+    labeling_packaging: { ko: _t("표시/포장"), en: "Labeling and packaging" },
+    regulatory_reporting: { ko: _t("규제보고/변경관리"), en: "Regulatory reporting and change control" },
+    training_personnel: { ko: _t("교육/작업자"), en: "Training and personnel" },
+    other_quality_system: { ko: _t("기타 품질시스템"), en: "Other quality system" },
   };
 
   // ★정체성 키 정규화 — findings_inspector_index()/findings_inspector_profile() RPC(서버)와
@@ -187,11 +192,11 @@
   // '일관성' 때문에 맞추지 말 것 — 다른 것이 맞다.
   function renderStats(totals) {
     statsEl.innerHTML = "";
-    statsEl.appendChild(buildStat(fmtNum(totals.documents), "실사 문서"));
-    statsEl.appendChild(buildStat(fmtNum(totals.findings), "지적"));
-    statsEl.appendChild(buildStat(fmtNum(totals.firms), "업체"));
+    statsEl.appendChild(buildStat(fmtNum(totals.documents), _t("실사 문서")));
+    statsEl.appendChild(buildStat(fmtNum(totals.findings), _t("지적")));
+    statsEl.appendChild(buildStat(fmtNum(totals.firms), _t("업체")));
     var period = (totals.first_seen || "?") + " ~ " + (totals.last_seen || "?");
-    statsEl.appendChild(buildStat(period, "기간"));
+    statsEl.appendChild(buildStat(period, _t("기간")));
   }
 
   // ── [P1 해석층] 프로파일 안 좁히기 상태 (firm.js 와 동일 계약) ────────────────
@@ -231,15 +236,15 @@
     var chip = document.createElement("button");
     chip.type = "button";
     chip.className = "ip-filter-chip";
-    chip.appendChild(el("span", null, catLabel(activeCat) + " · 문서 " + fmtNum(shown) + "건"));
+    chip.appendChild(el("span", null, _t("{cat} · 문서 {n}건", { cat: catLabel(activeCat), n: fmtNum(shown) })));
     chip.appendChild(el("span", "x", "×"));
-    chip.setAttribute("aria-label", catLabel(activeCat) + " 필터 해제");
+    chip.setAttribute("aria-label", _t("{cat} 필터 해제", { cat: catLabel(activeCat) }));
     chip.addEventListener("click", function () { setActiveCat(activeCat); });
     filterEl.appendChild(chip);
     var out = document.createElement("a");
     out.className = "ip-filter-out";
     out.href = findingsHref("cat", activeCat, LAST_NAME);
-    out.textContent = "전체 지적사항에서 보기 →";
+    out.textContent = _t("전체 지적사항에서 보기 →");
     filterEl.appendChild(out);
   }
 
@@ -263,7 +268,7 @@
     bar.style.transform = "scaleX(" + Math.max(0.02, ratio) + ")";
     track.appendChild(bar);
     row.appendChild(track);
-    row.appendChild(el("span", "ip-cat-count", fmtNum(entry.cnt) + "건"));
+    row.appendChild(el("span", "ip-cat-count", _t("{n}건", { n: fmtNum(entry.cnt) })));
     if (total > 0) {
       row.appendChild(el("span", "ip-cat-share", Math.round((entry.cnt / total) * 100) + "%"));
     }
@@ -285,22 +290,21 @@
     var other = cats.filter(function (c) { return c.category_code === CATCH_ALL; })[0];
     if (ranked.length) {
       var top = ranked[0];
-      catNoteEl.appendChild(document.createTextNode("이 실사관이 서명한 공개 문서에서 가장 많이 확인된 영역은 "));
+      catNoteEl.appendChild(document.createTextNode(_t("이 실사관이 서명한 공개 문서에서 가장 많이 확인된 영역은 ")));
       catNoteEl.appendChild(el("b", null, catLabel(top.category_code)));
       catNoteEl.appendChild(document.createTextNode(
-        "입니다(" + fmtNum(top.cnt) + "건 · 이 이력 안에서 " +
-        Math.round((top.cnt / total) * 100) + "%)."
+        _t("입니다({n}건 · 이 이력 안에서 {pct}%).", { n: fmtNum(top.cnt), pct: Math.round((top.cnt / total) * 100) })
       ));
     }
     if (other) {
       catNoteEl.appendChild(document.createTextNode(
-        " " + catLabel(CATCH_ALL) + " " + fmtNum(other.cnt) + "건은 세부 분류 전이라 이 문장에서 " +
-        "뺐습니다 — 위 비율의 분모와 아래 막대에는 그대로 들어 있습니다."
+        _t(" {cat} {n}건은 세부 분류 전이라 이 문장에서 뺐습니다 — 위 비율의 분모와 아래 막대에는 그대로 들어 있습니다.",
+          { cat: catLabel(CATCH_ALL), n: fmtNum(other.cnt) })
       ));
     }
     if (filterable) {
       catNoteEl.appendChild(document.createTextNode(
-        " 줄을 누르면 아래 문서 목록이 그 분류로 좁혀집니다."
+        _t(" 줄을 누르면 아래 문서 목록이 그 분류로 좁혀집니다.")
       ));
     }
   }
@@ -315,16 +319,15 @@
     repBlockEl.hidden = false;
     if (repNoteEl) {
       repNoteEl.textContent =
-        "이 실사관이 서명한 서로 다른 문서 2건 이상에서 다시 확인된 영역입니다. " +
-        "같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않으며, 다른 실사관과 비교한 값이 아닙니다." +
-        (dropped ? " " + catLabel(CATCH_ALL) + "(문서 " + fmtNum(dropped.documents) +
-                   "건)은 세부 분류 전이라 뺐습니다." : "");
+        _t("이 실사관이 서명한 서로 다른 문서 2건 이상에서 다시 확인된 영역입니다. 같은 문서 안에서 여러 건이 잡힌 것은 반복으로 세지 않으며, 다른 실사관과 비교한 값이 아닙니다.") +
+        (dropped ? _t(" {cat}(문서 {n}건)은 세부 분류 전이라 뺐습니다.",
+          { cat: catLabel(CATCH_ALL), n: fmtNum(dropped.documents) }) : "");
     }
     repEl.innerHTML = "";
     rows.forEach(function (r) {
       var row = el("div", "ip-rep-row");
       row.appendChild(el("span", "ip-rep-name", catLabel(r.category_code)));
-      row.appendChild(el("span", "ip-rep-docs", "문서 " + fmtNum(r.documents) + "건"));
+      row.appendChild(el("span", "ip-rep-docs", _t("문서 {n}건", { n: fmtNum(r.documents) })));
       var years = document.createElement("span");
       years.className = "ip-rep-years";
       (r.years || []).forEach(function (y) { years.appendChild(el("span", "ip-rep-year", y)); });
@@ -345,7 +348,7 @@
   // 표기한다 — 이 화면과 같은 FDA 483 파이프라인(_w2_extra_fda_483)이 이미 "제조소/업체"
   // 행에 쓰는 값이라 새 어휘를 짓지 않는다. 그 버킷은 firm_key 를 신뢰할 수 없으므로
   // (서로 다른 실제 제조소가 섞여 있을 수 있다) 절대 링크를 달지 않는다.
-  var FIRM_BLANK_LABEL = "미확인";
+  var FIRM_BLANK_LABEL = _t("미확인");
 
   function buildFirmGroups(documents) {
     var byName = {};
@@ -382,7 +385,7 @@
     } else {
       row.appendChild(el("span", "ip-firm-name", g.name));
     }
-    var meta = "문서 " + fmtNum(g.count) + "건";
+    var meta = _t("문서 {n}건", { n: fmtNum(g.count) });
     if (g.years.length) meta += " · " + g.years.join(", ");
     row.appendChild(el("span", "ip-firm-meta", meta));
     return row;
@@ -401,7 +404,7 @@
     LAST_CATS = byCategory || [];
     catEl.innerHTML = "";
     if (!LAST_CATS.length) {
-      catEl.appendChild(el("p", "ip-empty", "표시할 데이터가 없습니다."));
+      catEl.appendChild(el("p", "ip-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     // RPC 가 이미 cnt desc 로 정렬해 반환한다(findings_firm_profile by_category 와 동일
@@ -418,7 +421,7 @@
   function renderYears(byYear) {
     yearEl.innerHTML = "";
     if (!byYear.length) {
-      yearEl.appendChild(el("p", "ip-empty", "표시할 데이터가 없습니다."));
+      yearEl.appendChild(el("p", "ip-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCnt = byYear.reduce(function (m, y) { return Math.max(m, y.cnt); }, 0) || 1;
@@ -478,7 +481,7 @@
       var details = document.createElement("details");
       details.className = "ip-obs-orig";
       var summary = document.createElement("summary");
-      summary.textContent = "원문 보기 (영문)";
+      summary.textContent = _t("원문 보기 (영문)");
       details.appendChild(summary);
       details.appendChild(el("p", null, row.finding_text));
       card.appendChild(details);
@@ -495,18 +498,18 @@
 
   function renderDocDetailLoading(container) {
     container.innerHTML = "";
-    container.appendChild(el("p", "ip-doc-detail-loading", "불러오는 중…"));
+    container.appendChild(el("p", "ip-doc-detail-loading", _t("불러오는 중…")));
   }
 
   function renderDocDetailError(container) {
     container.innerHTML = "";
-    container.appendChild(el("p", "ip-doc-detail-empty", "지적사항을 불러오지 못했습니다."));
+    container.appendChild(el("p", "ip-doc-detail-empty", _t("지적사항을 불러오지 못했습니다.")));
   }
 
   function renderDocDetail(container, rows) {
     container.innerHTML = "";
     if (!Array.isArray(rows) || !rows.length) {
-      container.appendChild(el("p", "ip-doc-detail-empty", "공개된 지적사항이 없습니다."));
+      container.appendChild(el("p", "ip-doc-detail-empty", _t("공개된 지적사항이 없습니다.")));
       return;
     }
     rows.forEach(function (row) { container.appendChild(buildObsCard(row)); });
@@ -598,8 +601,8 @@
     // 미번역이 남은 듯한 인상만 주므로 생략 — 일부만 공개된 문서에만 "(국문 열람 가능
     // M건)"을 남긴다(firm.js 와 동일 계약).
     var partiallyPublic = canExpand && (doc.public_obs_cnt || 0) < obsCnt;
-    var countText = "지적 " + fmtNum(obsCnt) + "건" +
-      (partiallyPublic ? "(국문 열람 가능 " + fmtNum(doc.public_obs_cnt) + "건)" : "");
+    var countText = _t("지적 {n}건", { n: fmtNum(obsCnt) }) +
+      (partiallyPublic ? _t("(국문 열람 가능 {n}건)", { n: fmtNum(doc.public_obs_cnt) }) : "");
     main.appendChild(el("span", "ip-doc-count", countText));
 
     var detail = document.createElement("div");
@@ -609,7 +612,7 @@
     if (canExpand) {
       main.appendChild(el("span", "ip-doc-chev", "▸"));
       var loaded = false;
-      makeClickableRow(main, (doc.source || "") + " " + (doc.published_date || "") + " 지적사항 펼치기",
+      makeClickableRow(main, _t("{source} {date} 지적사항 펼치기", { source: doc.source || "", date: doc.published_date || "" }),
         function () {
           var open = row.classList.toggle("open");
           detail.hidden = !open;
@@ -623,7 +626,7 @@
         });
     } else {
       row.classList.add("disabled");
-      main.appendChild(el("span", "ip-doc-pending", "국문 번역 대기 중"));
+      main.appendChild(el("span", "ip-doc-pending", _t("국문 번역 대기 중")));
     }
 
     row.appendChild(main);
@@ -634,7 +637,7 @@
   function renderDocuments(documents) {
     docsEl.innerHTML = "";
     if (!documents.length) {
-      docsEl.appendChild(el("p", "ip-empty", "표시할 문서가 없습니다."));
+      docsEl.appendChild(el("p", "ip-empty", _t("표시할 문서가 없습니다.")));
       return;
     }
     // [P1 해석층] 활성 분류가 있으면 그 분류가 붙은 문서만 — 프로파일을 벗어나지 않는다.
@@ -643,7 +646,7 @@
       : documents;
     if (!rows.length) {
       docsEl.appendChild(el("p", "ip-empty",
-        catLabel(activeCat) + " 분류가 붙은 문서가 목록에 없습니다."));
+        _t("{cat} 분류가 붙은 문서가 목록에 없습니다.", { cat: catLabel(activeCat) })));
       return;
     }
     // RPC 가 이미 published_date desc 로 정렬해 반환한다(findings_firm_profile documents
@@ -793,7 +796,7 @@
     lookResEl.innerHTML = "";
     if (!groups.length) {
       lookResEl.appendChild(el("p", "tr-look-empty",
-        "찾은 실사관이 없습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다."));
+        _t("찾은 실사관이 없습니다. 공개 문서 5건 이상 확인된 실사관만 이력을 제공합니다.")));
       return;
     }
     groups.forEach(function (g, gi) {
@@ -827,7 +830,7 @@
       return;
     }
     lookResEl.innerHTML = "";
-    lookResEl.appendChild(el("p", "tr-look-empty", "불러오는 중…"));
+    lookResEl.appendChild(el("p", "tr-look-empty", _t("불러오는 중…")));
     fetchInspectorIndex().then(function (rows) {
       idxRowsCache = Array.isArray(rows) ? rows : [];
       if (!lookResEl) return;

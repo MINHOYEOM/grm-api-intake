@@ -32,6 +32,11 @@
  */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
 
   var cfg = document.getElementById("grm-findings-cfg");
   var loadingEl = document.getElementById("fnd-loading");
@@ -52,7 +57,7 @@
 
   if (!url || !key) {
     showState("loading");
-    loadingEl.textContent = "검색 서비스 준비 중입니다.";
+    loadingEl.textContent = _t("검색 서비스 준비 중입니다.");
     return;
   }
 
@@ -61,26 +66,26 @@
   // v3(2026-07-12): FINDING_TAXONOMY 순서 변경(complaint_recall, computer_system_validation
   // 이동)에 맞춰 선언 순서도 동기화 -- code/label 값 자체는 불변(20개).
   var CATEGORY_LABELS = {
-    data_integrity: { ko: "데이터 완전성", en: "Data integrity" },
-    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
-    documentation_records: { ko: "문서화/기록관리", en: "Documentation and records" },
-    aseptic_sterility_assurance: { ko: "무균보증/무균공정", en: "Aseptic processing and sterility assurance" },
-    environmental_monitoring: { ko: "환경모니터링", en: "Environmental monitoring" },
-    cleaning_validation: { ko: "세척밸리데이션", en: "Cleaning validation" },
-    complaint_recall: { ko: "불만/회수", en: "Complaint and recall handling" },
-    deviation_capa: { ko: "일탈/CAPA/조사", en: "Deviation, CAPA, and investigation" },
-    quality_unit_oversight: { ko: "품질부서 관리감독", en: "Quality unit oversight" },
-    qc_lab_controls: { ko: "시험실/품질관리", en: "Laboratory and QC controls" },
-    process_validation: { ko: "공정밸리데이션", en: "Process validation" },
-    equipment_facility: { ko: "설비/시설", en: "Equipment and facility" },
-    material_supplier_control: { ko: "원자재/공급업체 관리", en: "Material and supplier control" },
-    contamination_control: { ko: "오염/교차오염 관리", en: "Contamination control" },
-    validation_qualification: { ko: "밸리데이션/적격성평가", en: "Validation and qualification" },
-    stability_storage: { ko: "안정성/보관", en: "Stability and storage" },
-    labeling_packaging: { ko: "표시/포장", en: "Labeling and packaging" },
-    regulatory_reporting: { ko: "규제보고/변경관리", en: "Regulatory reporting and change control" },
-    training_personnel: { ko: "교육/작업자", en: "Training and personnel" },
-    other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
+    data_integrity: { ko: _t("데이터 완전성"), en: "Data integrity" },
+    computer_system_validation: { ko: _t("컴퓨터화시스템"), en: "Computer system validation" },
+    documentation_records: { ko: _t("문서화/기록관리"), en: "Documentation and records" },
+    aseptic_sterility_assurance: { ko: _t("무균보증/무균공정"), en: "Aseptic processing and sterility assurance" },
+    environmental_monitoring: { ko: _t("환경모니터링"), en: "Environmental monitoring" },
+    cleaning_validation: { ko: _t("세척밸리데이션"), en: "Cleaning validation" },
+    complaint_recall: { ko: _t("불만/회수"), en: "Complaint and recall handling" },
+    deviation_capa: { ko: _t("일탈/CAPA/조사"), en: "Deviation, CAPA, and investigation" },
+    quality_unit_oversight: { ko: _t("품질부서 관리감독"), en: "Quality unit oversight" },
+    qc_lab_controls: { ko: _t("시험실/품질관리"), en: "Laboratory and QC controls" },
+    process_validation: { ko: _t("공정밸리데이션"), en: "Process validation" },
+    equipment_facility: { ko: _t("설비/시설"), en: "Equipment and facility" },
+    material_supplier_control: { ko: _t("원자재/공급업체 관리"), en: "Material and supplier control" },
+    contamination_control: { ko: _t("오염/교차오염 관리"), en: "Contamination control" },
+    validation_qualification: { ko: _t("밸리데이션/적격성평가"), en: "Validation and qualification" },
+    stability_storage: { ko: _t("안정성/보관"), en: "Stability and storage" },
+    labeling_packaging: { ko: _t("표시/포장"), en: "Labeling and packaging" },
+    regulatory_reporting: { ko: _t("규제보고/변경관리"), en: "Regulatory reporting and change control" },
+    training_personnel: { ko: _t("교육/작업자"), en: "Training and personnel" },
+    other_quality_system: { ko: _t("기타 품질시스템"), en: "Other quality system" },
   };
 
   // [동기화 규칙 — 056] ISO 3166-1 alpha-2 코드 → 한국어 국가명. 매핑 정본은
@@ -89,79 +94,79 @@
   // 동일 계약을 복제한다(다른 파일이라 import 불가, 계약만 복제하는 기존 관례).
   // 매핑에 없는 코드는 코드 자체를 그대로 보여준다(빈칸/추측 번역 금지).
   var COUNTRY_LABELS_KO = {
-    US: "미국",
-    KR: "대한민국",
-    PR: "푸에르토리코",
-    IN: "인도",
-    CN: "중국",
-    JP: "일본",
-    DE: "독일",
-    CA: "캐나다",
-    FR: "프랑스",
-    GB: "영국",
-    IS: "아이슬란드",
-    IT: "이탈리아",
-    MY: "말레이시아",
-    ES: "스페인",
-    BE: "벨기에",
-    HU: "헝가리",
-    TW: "대만",
-    CH: "스위스",
-    CY: "키프로스",
-    AU: "호주",
-    IE: "아일랜드",
-    SE: "스웨덴",
-    JO: "요르단",
-    GR: "그리스",
-    DK: "덴마크",
-    NL: "네덜란드",
-    MX: "멕시코",
-    CZ: "체코",
-    LT: "리투아니아",
-    PL: "폴란드",
-    CL: "칠레",
-    AT: "오스트리아",
-    RO: "루마니아",
-    ZA: "남아프리카공화국",
-    BD: "방글라데시",
-    ID: "인도네시아",
-    LB: "레바논",
-    PT: "포르투갈",
-    SK: "슬로바키아",
-    LK: "스리랑카",
-    TR: "튀르키예",
-    NO: "노르웨이",
-    FI: "핀란드",
-    VN: "베트남",
-    BY: "벨라루스",
-    SI: "슬로베니아",
-    IL: "이스라엘",
+    US: _t("미국"),
+    KR: _t("대한민국"),
+    PR: _t("푸에르토리코"),
+    IN: _t("인도"),
+    CN: _t("중국"),
+    JP: _t("일본"),
+    DE: _t("독일"),
+    CA: _t("캐나다"),
+    FR: _t("프랑스"),
+    GB: _t("영국"),
+    IS: _t("아이슬란드"),
+    IT: _t("이탈리아"),
+    MY: _t("말레이시아"),
+    ES: _t("스페인"),
+    BE: _t("벨기에"),
+    HU: _t("헝가리"),
+    TW: _t("대만"),
+    CH: _t("스위스"),
+    CY: _t("키프로스"),
+    AU: _t("호주"),
+    IE: _t("아일랜드"),
+    SE: _t("스웨덴"),
+    JO: _t("요르단"),
+    GR: _t("그리스"),
+    DK: _t("덴마크"),
+    NL: _t("네덜란드"),
+    MX: _t("멕시코"),
+    CZ: _t("체코"),
+    LT: _t("리투아니아"),
+    PL: _t("폴란드"),
+    CL: _t("칠레"),
+    AT: _t("오스트리아"),
+    RO: _t("루마니아"),
+    ZA: _t("남아프리카공화국"),
+    BD: _t("방글라데시"),
+    ID: _t("인도네시아"),
+    LB: _t("레바논"),
+    PT: _t("포르투갈"),
+    SK: _t("슬로바키아"),
+    LK: _t("스리랑카"),
+    TR: _t("튀르키예"),
+    NO: _t("노르웨이"),
+    FI: _t("핀란드"),
+    VN: _t("베트남"),
+    BY: _t("벨라루스"),
+    SI: _t("슬로베니아"),
+    IL: _t("이스라엘"),
     // [057] FDA Data Dashboard API CountryName 확장분(21개 신규 코드 — SG/BR/TH/MT/
     // AR/HR/HK/CO/NZ/BG/DO/LV/OM/CR/EG/MO/PH/UY/AW/EE/AE. KR/CZ/FI/IL/SI/NO 는
     // 위 47개 안에 이미 있으므로 여기서 다시 추가하지 않는다 — 같은 나라의 DDAPI
     // 표기가 다른 코드로 오추가되지 않도록 057 확장분 중 기존 코드 재사용 6개는
     // 의도적으로 생략했다).
-    SG: "싱가포르",
-    BR: "브라질",
-    TH: "태국",
-    MT: "몰타",
-    AR: "아르헨티나",
-    HR: "크로아티아",
-    HK: "홍콩",
-    CO: "콜롬비아",
-    NZ: "뉴질랜드",
-    BG: "불가리아",
-    DO: "도미니카공화국",
-    LV: "라트비아",
-    OM: "오만",
-    CR: "코스타리카",
-    EG: "이집트",
-    MO: "마카오",
-    PH: "필리핀",
-    UY: "우루과이",
-    AW: "아루바",
-    EE: "에스토니아",
-    AE: "아랍에미리트",
+    SG: _t("싱가포르"),
+    BR: _t("브라질"),
+    TH: _t("태국"),
+    MT: _t("몰타"),
+    AR: _t("아르헨티나"),
+    HR: _t("크로아티아"),
+    HK: _t("홍콩"),
+    CO: _t("콜롬비아"),
+    NZ: _t("뉴질랜드"),
+    BG: _t("불가리아"),
+    DO: _t("도미니카공화국"),
+    LV: _t("라트비아"),
+    OM: _t("오만"),
+    CR: _t("코스타리카"),
+    EG: _t("이집트"),
+    MO: _t("마카오"),
+    PH: _t("필리핀"),
+    UY: _t("우루과이"),
+    AW: _t("아루바"),
+    EE: _t("에스토니아"),
+    AE: _t("아랍에미리트"),
   };
 
   // country_key='' 버킷은 findings_search(056) 에서 sentinel 값 "UNKNOWN" 으로 필터링한다
@@ -171,7 +176,7 @@
   var COUNTRY_UNKNOWN_VALUE = "UNKNOWN";
 
   function countryLabelKo(code) {
-    if (code === COUNTRY_UNKNOWN_VALUE) return "미확인";
+    if (code === COUNTRY_UNKNOWN_VALUE) return _t("미확인");
     return COUNTRY_LABELS_KO[code] || code;
   }
 
@@ -205,14 +210,14 @@
   // agency 는 M14 이후 화면 컨트롤이 없지만 URL(?agency=)로는 여전히 걸린다 — 보이지 않는
   // 필터가 결과를 좁히는 상태를 드러내는 것이 이 칩 행의 존재 이유이므로 칩에는 포함한다.
   var ACTIVE_FILTER_DEFS = [
-    ["q", "검색", function (v) { return v; }],
-    ["agency", "기관", function (v) { return v; }],
-    ["source", "소스", function (v) { return v; }],
-    ["evidence_level", "증거 등급", function (v) { return EVIDENCE_LABEL[v] || v; }],
-    ["review_status", "검토 상태", function (v) { return STATUS_LABEL[v] || v; }],
-    ["category_code", "카테고리", function (v) { var c = CATEGORY_LABELS[v]; return c ? c.ko : v; }],
-    ["month", "발행월", function (v) { return v; }],
-    ["country", "국가", function (v) { return countryLabelKo(v); }],
+    ["q", _t("검색"), function (v) { return v; }],
+    ["agency", _t("기관"), function (v) { return v; }],
+    ["source", _t("소스"), function (v) { return v; }],
+    ["evidence_level", _t("증거 등급"), function (v) { return EVIDENCE_LABEL[v] || v; }],
+    ["review_status", _t("검토 상태"), function (v) { return STATUS_LABEL[v] || v; }],
+    ["category_code", _t("카테고리"), function (v) { var c = CATEGORY_LABELS[v]; return c ? c.ko : v; }],
+    ["month", _t("발행월"), function (v) { return v; }],
+    ["country", _t("국가"), function (v) { return countryLabelKo(v); }],
   ];
 
   var SORT_VALUES = ["date_desc", "date_asc", "firm_asc"];
@@ -337,8 +342,8 @@
     pnavEl.hidden = false;
     pnavPrevBtn.disabled = current === 1;
     pnavNextBtn.disabled = current >= total && !moreMayExist;
-    pnavPrevBtn.setAttribute("aria-label", "이전 페이지 (현재 " + current + " / " + total + ")");
-    pnavNextBtn.setAttribute("aria-label", "다음 페이지 (현재 " + current + " / " + total + ")");
+    pnavPrevBtn.setAttribute("aria-label", _t("이전 페이지 (현재 {current} / {total})", { current: current, total: total }));
+    pnavNextBtn.setAttribute("aria-label", _t("다음 페이지 (현재 {current} / {total})", { current: current, total: total }));
   }
 
   // LAST.facets 의 축 배열([{v,c}]) → {v: c} 평탄화. 축 자체가 없으면(구버전 RPC 등
@@ -401,7 +406,7 @@
   // 같은 방향이다. 뒤늦게 나타나는 월(파셋은 필터에 따라 변한다)도 제 연도 그룹의 제
   // 자리에 끼워 넣는다(그룹 끝에 붙이면 한 그룹 안에서 순서가 섞여 보인다).
   function monthYearGroup(sel, year) {
-    var label = year + "\ub144";
+    var label = _t("{year}년", { year: year });
     var groups = sel.getElementsByTagName("optgroup");
     for (var i = 0; i < groups.length; i += 1) {
       if (groups[i].label === label) return groups[i];
@@ -577,9 +582,9 @@
     // 낀 문서만 다른 단위). 라벨을 "지적사항"으로 못박아 단위를 화면에 드러낸다.
     // 옵셔널 스탯 관례 유지 — 값이 없으면 블록 자체를 생략한다(레이아웃 깨짐 없음).
     if (stats.documents !== undefined && stats.documents !== null) {
-      dashStatsEl.appendChild(buildStatBlock(String(stats.documents), "문서", false));
+      dashStatsEl.appendChild(buildStatBlock(String(stats.documents), _t("문서"), false));
     }
-    dashStatsEl.appendChild(buildStatBlock(String(stats.total), "지적사항", false));
+    dashStatsEl.appendChild(buildStatBlock(String(stats.total), _t("지적사항"), false));
     stats.agencies.forEach(function (a) {
       var block = buildStatBlock(String(a.count), a.agency, false);
       // 툴팁에 두 축을 병기한다 — "FDA 가 왜 이렇게 큰가"의 답이 문서당 지적 건수(483
@@ -587,14 +592,14 @@
       // RPC 면 문서 축이 없으므로 종전대로 지적사항 수를 그리되, 툴팁이 그 사실을
       // 밝힌다(조용히 축이 뒤바뀌는 것만은 막는다 — title 관례는 XSS 무관).
       if (a.unit === "documents") {
-        block.title = a.agency + " — 문서 " + a.docs + "건 · 지적사항 " + a.findings + "건";
+        block.title = _t("{agency} — 문서 {docs}건 · 지적사항 {findings}건", { agency: a.agency, docs: a.docs, findings: a.findings });
       } else {
-        block.title = a.agency + " — 지적사항 " + a.findings + "건(문서 기준 집계 미제공)";
+        block.title = _t("{agency} — 지적사항 {findings}건(문서 기준 집계 미제공)", { agency: a.agency, findings: a.findings });
       }
       dashStatsEl.appendChild(block);
     });
     if (stats.needsReview > 0) {
-      dashStatsEl.appendChild(buildStatBlock(String(stats.needsReview), "검토 필요", true));
+      dashStatsEl.appendChild(buildStatBlock(String(stats.needsReview), _t("검토 필요"), true));
     }
   }
 
@@ -614,9 +619,9 @@
       return { label: c.ko, count: c.count, code: c.code };
     });
     var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);
-    if (restCount > 0) rows.push({ label: "그 외", count: restCount, code: null });
+    if (restCount > 0) rows.push({ label: _t("그 외"), count: restCount, code: null });
     if (!rows.length) {
-      dashCatEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
+      dashCatEl.appendChild(el("p", "fnd-dash-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCount = rows.reduce(function (m, r) { return Math.max(m, r.count); }, 0) || 1;
@@ -634,7 +639,7 @@
       if (state.category_code === code) row.classList.add("on");
       makeClickableRow(
         row,
-        label + " 카테고리로 필터: " + count + "건",
+        _t("{label} 카테고리로 필터: {count}건", { label: label, count: count }),
         function () { toggleCategoryFilter(code); }
       );
     }
@@ -661,7 +666,7 @@
     dashMonthEl.innerHTML = "";
     var months = stats.months;
     if (!months.length) {
-      dashMonthEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
+      dashMonthEl.appendChild(el("p", "fnd-dash-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCount = months.reduce(function (m, x) { return Math.max(m, x.count); }, 0) || 1;
@@ -670,13 +675,13 @@
     var multiYear = Object.keys(years).length > 1;
     // [문서 축 054] 월 추이는 '유입량' 지표라 문서가 자연 단위다 — 지적사항으로 세면
     // 483 대량 백필이 몰린 달이 다른 달을 전부 눌러버린다. 단위를 라벨에 적는다.
-    var monthUnit = stats.monthsUnit === "documents" ? "문서 " : "지적 ";
+    var monthUnit = stats.monthsUnit === "documents" ? _t("문서 ") : _t("지적 ");
     var wrap = el("div", "fnd-dash-month-bars");
     months.forEach(function (x) {
       var col = document.createElement("div");
       col.className = "fnd-dash-month-col";
       if (state.month === x.month) col.classList.add("on");
-      var monthLabelText = x.month + " " + monthUnit + x.count + "건";
+      var monthLabelText = _t("{month} {unit}{count}건", { month: x.month, unit: monthUnit, count: x.count });
       makeClickableRow(col, monthLabelText, function () {
         toggleMonthFilter(x.month);
       });
@@ -697,7 +702,7 @@
   function renderDashFirms(stats) {
     dashFirmEl.innerHTML = "";
     if (!stats.firms.length) {
-      dashFirmEl.appendChild(el("p", "fnd-dash-empty", "표시할 데이터가 없습니다."));
+      dashFirmEl.appendChild(el("p", "fnd-dash-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     stats.firms.forEach(function (f) {
@@ -707,7 +712,7 @@
       // [firm_name 엔티티 디코드 M5] 클릭/필터는 raw f.name(DB 원본값) 그대로 써야 서버
       // 검색어(state.q → p_q) 매칭이 어긋나지 않는다 — 디코드는 표시(라벨·툴팁)에만.
       var firmDisplay = decodeFirmDisplay(f.name);
-      makeClickableRow(row, firmDisplay + " 검색: " + f.count + "건", function () {
+      makeClickableRow(row, _t("{firm} 검색: {count}건", { firm: firmDisplay, count: f.count }), function () {
         toggleFirmFilter(f.name);
       });
       row.appendChild(el("span", "fnd-dash-firm-name", firmDisplay));
@@ -863,18 +868,18 @@
   }
 
   var EVIDENCE_LABEL = { A: "Evidence A", B: "Evidence B", C: "Evidence C" };
-  var STATUS_LABEL = { needs_review: "검토 필요", accepted: "검토 완료", rejected: "반려" };
+  var STATUS_LABEL = { needs_review: _t("검토 필요"), accepted: _t("검토 완료"), rejected: _t("반려") };
   // [M13a] 배지 의미 툴팁 — 증거등급/검토상태가 "무엇을 뜻하는지" title 로 즉답한다
   // (setAttribute("title", ...) 뿐이라 XSS 무관). accepted 는 사람이 검토를 마쳤다는
   // 뜻이 아니라 결정론 규칙 기반 자동 승인이므로, 그렇게 오해될 문구는 쓰지 않는다.
   var EVIDENCE_TITLE = {
-    A: "Evidence A — 1차 공식문서에서 직접 추출(신뢰도 높음)",
-    B: "Evidence B — 공식 인덱스+보조 자료 기반(원문 대조 권장)",
-    C: "Evidence C — 보조 출처 단독(참고용)",
+    A: _t("Evidence A — 1차 공식문서에서 직접 추출(신뢰도 높음)"),
+    B: _t("Evidence B — 공식 인덱스+보조 자료 기반(원문 대조 권장)"),
+    C: _t("Evidence C — 보조 출처 단독(참고용)"),
   };
   var STATUS_TITLE = {
-    needs_review: "AI 추출 후 사람 검수 전 — 원문 대조 필수",
-    accepted: "결정론 추출 규칙 통과(자동 승인)",
+    needs_review: _t("AI 추출 후 사람 검수 전 — 원문 대조 필수"),
+    accepted: _t("결정론 추출 규칙 통과(자동 승인)"),
   };
 
   // [M10b P1] 본문(국문 우선, 없으면 원문). 접힘 상태에서도 항상 보이므로 card 에 직접
@@ -898,10 +903,10 @@
     var details = document.createElement("details");
     details.className = "fnd-orig";
     var summary = document.createElement("summary");
-    summary.textContent = "원문 보기 (영문)";
+    summary.textContent = _t("원문 보기 (영문)");
     details.appendChild(summary);
     if (row.translation_method === "llm_assisted") {
-      details.appendChild(el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장"));
+      details.appendChild(el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장")));
     }
     var p = elHL("p", null, row.finding_text, query);
     details.appendChild(p);
@@ -918,7 +923,7 @@
         if (r) refsWrap.appendChild(el("span", "fnd-ref", r));
       });
     } else {
-      refsWrap.appendChild(el("span", "fnd-ref-missing", "조항 미추출"));
+      refsWrap.appendChild(el("span", "fnd-ref-missing", _t("조항 미추출")));
     }
     extra.appendChild(refsWrap);
   }
@@ -929,12 +934,12 @@
     var docId = row.document_id || "";
     var meta = document.createElement("p");
     meta.className = "fnd-meta";
-    meta.appendChild(document.createTextNode("문서번호 "));
+    meta.appendChild(document.createTextNode(_t("문서번호 ")));
     var docSpan = elHL("span", "fnd-meta-doc", docId, query);
     meta.appendChild(docSpan);
     if (row.confidence !== undefined && row.confidence !== null && row.confidence !== "") {
       var pct = Math.round(Number(row.confidence) * 100);
-      if (!isNaN(pct)) meta.appendChild(document.createTextNode(" · 신뢰도 " + pct + "%"));
+      if (!isNaN(pct)) meta.appendChild(document.createTextNode(_t(" · 신뢰도 {pct}%", { pct: pct })));
     }
     extra.appendChild(meta);
   }
@@ -948,13 +953,13 @@
     btn.type = "button";
     btn.className = "fnd-more-btn";
     btn.setAttribute("aria-expanded", "false");
-    btn.textContent = "자세히 보기";
+    btn.textContent = _t("자세히 보기");
     btn.hidden = true;
     btn.addEventListener("click", function () {
       var stillCollapsed = card.classList.toggle("fnd-collapsed");
       var expanded = !stillCollapsed;
       btn.setAttribute("aria-expanded", expanded ? "true" : "false");
-      btn.textContent = expanded ? "접기" : "자세히 보기";
+      btn.textContent = expanded ? _t("접기") : _t("자세히 보기");
     });
     return btn;
   }
@@ -1009,7 +1014,7 @@
       head.appendChild(date);
     }
     if (Number(item.dup_findings) > 1) {
-      var badge = el("span", null, "동일 문구 " + (item.dup_documents || 0) + "개 문서");
+      var badge = el("span", null, _t("동일 문구 {n}개 문서", { n: item.dup_documents || 0 }));
       badge.style.cssText =
         "display:inline-flex;align-items:center;height:20px;font-size:11px;font-weight:600;" +
         "line-height:1;border-radius:var(--rad-s);padding:0 7px;border:1px solid rgba(194,96,63,.22);" +
@@ -1025,7 +1030,7 @@
     if (item.finding_id) {
       var link = document.createElement("a");
       link.href = similarItemDeepLinkUrl(item.finding_id);
-      link.textContent = "해당 문서 보기";
+      link.textContent = _t("해당 문서 보기");
       link.style.cssText = "font-size:12px;font-weight:600;color:var(--coral-2);text-decoration:none";
       row.appendChild(link);
     }
@@ -1037,13 +1042,13 @@
   function renderSimilarToState(block, items) {
     block.textContent = "";
     if (items === null) {
-      var loading = el("p", null, "불러오는 중…");
+      var loading = el("p", null, _t("불러오는 중…"));
       loading.style.cssText = "font-size:12.5px;color:var(--muted);margin:0";
       block.appendChild(loading);
       return;
     }
     if (!items.length) {
-      var empty = el("p", null, "유사 사례를 찾지 못했습니다");
+      var empty = el("p", null, _t("유사 사례를 찾지 못했습니다"));
       empty.style.cssText = "font-size:12.5px;color:var(--muted);margin:0";
       block.appendChild(empty);
       return;
@@ -1065,7 +1070,7 @@
     btn.type = "button";
     btn.className = "fnd-simto-btn";
     btn.setAttribute("aria-expanded", "false");
-    btn.textContent = "유사 사례";
+    btn.textContent = _t("유사 사례");
     btn.style.cssText =
       "font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);" +
       "background:transparent;border:0;padding:0;cursor:pointer";
@@ -1150,7 +1155,7 @@
       icon.className = "ti ti-external-link";
       icon.setAttribute("aria-hidden", "true");
       a.appendChild(icon);
-      a.appendChild(document.createTextNode("원문 보기"));
+      a.appendChild(document.createTextNode(_t("원문 보기")));
       actions.appendChild(a);
     }
     // ["이 지적과 유사한 사례"] 기존 "자세히 보기"(moreBtn) 관례와 나란히, 그 앞에 배치
@@ -1258,7 +1263,7 @@
     var meta = el("div", "fnd-doc-meta");
     if (head.source) meta.appendChild(el("span", "fnd-b", head.source));
     if (head.published_date) meta.appendChild(el("span", "fnd-doc-date", head.published_date));
-    meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));
+    meta.appendChild(el("span", "fnd-doc-count", _t("지적 {n}건", { n: rows.length })));
     // [FDA 483 실사관 표기] 값이 있을 때만 span 을 만든다(빈 라벨 금지). 기존 .fnd-doc-count
     // 클래스를 그대로 재사용해 신규 CSS 0(§ 최소화 원칙) — 시각적으로 동일한 보조 메타
     // 텍스트다. 이름은 textContent 로만 대입하므로 HTML 특수문자가 있어도 안전하게
@@ -1273,7 +1278,7 @@
     var inspectors = sanitizeInspectorNames(head.inspector_names);
     if (inspectors.length) {
       var inspectorSpan = el("span", "fnd-doc-count");
-      inspectorSpan.appendChild(document.createTextNode("실사관: "));
+      inspectorSpan.appendChild(document.createTextNode(_t("실사관: ")));
       inspectors.forEach(function (name, idx) {
         if (idx > 0) inspectorSpan.appendChild(document.createTextNode(" · "));
         var ik = normalizeInspectorKey(name);
@@ -1304,12 +1309,12 @@
     btn.type = "button";
     btn.className = "fnd-doc-toggle";
     btn.setAttribute("aria-expanded", "false");
-    btn.textContent = "지적 " + totalCount + "건 모두 보기";
+    btn.textContent = _t("지적 {n}건 모두 보기", { n: totalCount });
     btn.addEventListener("click", function () {
       var expanded = hiddenWrap.hidden; // 현재 숨김이면 이번 클릭으로 펼쳐짐
       hiddenWrap.hidden = !expanded;
       btn.setAttribute("aria-expanded", expanded ? "true" : "false");
-      btn.textContent = expanded ? "접기" : "지적 " + totalCount + "건 모두 보기";
+      btn.textContent = expanded ? _t("접기") : _t("지적 {n}건 모두 보기", { n: totalCount });
     });
     return btn;
   }
@@ -1467,7 +1472,7 @@
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "fnd-active-chip";
-    btn.setAttribute("aria-label", label + " 필터 해제");
+    btn.setAttribute("aria-label", _t("{label} 필터 해제", { label: label }));
     btn.appendChild(document.createTextNode(label + ": " + value + " "));
     var x = document.createElement("span");
     x.className = "fnd-active-x";
@@ -1494,7 +1499,7 @@
     var clearAllBtn = document.createElement("button");
     clearAllBtn.type = "button";
     clearAllBtn.className = "fnd-active-clearall";
-    clearAllBtn.textContent = "모두 지우기";
+    clearAllBtn.textContent = _t("모두 지우기");
     clearAllBtn.addEventListener("click", clearAllFilters);
     activeEl.appendChild(clearAllBtn);
     activeEl.hidden = false;
@@ -1543,7 +1548,7 @@
     var link = document.createElement("a");
     link.id = "fnd-deeplink-banner-link";
     link.style.cssText = "font-weight:600;color:var(--coral-2)";
-    link.textContent = "전체 목록 보기";
+    link.textContent = _t("전체 목록 보기");
     link.hidden = true;
     bannerEl.appendChild(link);
     if (loadingEl && loadingEl.parentNode) loadingEl.parentNode.insertBefore(bannerEl, loadingEl);
@@ -1556,7 +1561,7 @@
 
   function showDeepLinkFoundBanner() {
     var b = ensureDeepLinkBanner();
-    document.getElementById("fnd-deeplink-banner-text").textContent = "공유된 지적사항의 문서를 표시 중입니다.";
+    document.getElementById("fnd-deeplink-banner-text").textContent = _t("공유된 지적사항의 문서를 표시 중입니다.");
     var link = document.getElementById("fnd-deeplink-banner-link");
     link.href = urlWithoutDeepLink(); // [4] finding_id 파라미터 제거한 URL
     link.hidden = false;
@@ -1566,7 +1571,7 @@
   function showDeepLinkNotFoundBanner() {
     var b = ensureDeepLinkBanner();
     document.getElementById("fnd-deeplink-banner-text").textContent =
-      "공유된 지적사항을 찾을 수 없습니다(비공개이거나 존재하지 않는 항목일 수 있습니다). 전체 목록을 표시합니다.";
+      _t("공유된 지적사항을 찾을 수 없습니다(비공개이거나 존재하지 않는 항목일 수 있습니다). 전체 목록을 표시합니다.");
     document.getElementById("fnd-deeplink-banner-link").hidden = true;
     b.hidden = false;
   }
@@ -1641,7 +1646,7 @@
       var toggleBtn = moreWrap.parentNode ? moreWrap.parentNode.querySelector(".fnd-doc-toggle") : null;
       if (toggleBtn) {
         toggleBtn.setAttribute("aria-expanded", "true");
-        toggleBtn.textContent = "접기";
+        toggleBtn.textContent = _t("접기");
       }
     }
     if (targetEl.classList.contains("fnd-collapsed")) {
@@ -1649,7 +1654,7 @@
       if (item && item.moreBtn) {
         item.moreBtn.hidden = false;
         item.moreBtn.setAttribute("aria-expanded", "true");
-        item.moreBtn.textContent = "접기";
+        item.moreBtn.textContent = _t("접기");
       }
     }
     var toolsBar = document.getElementById("fnd-tools");
@@ -1698,7 +1703,7 @@
         var toggleBtn = moreWrap.parentNode ? moreWrap.parentNode.querySelector(".fnd-doc-toggle") : null;
         if (toggleBtn) {
           toggleBtn.setAttribute("aria-expanded", "true");
-          toggleBtn.textContent = "접기";
+          toggleBtn.textContent = _t("접기");
         }
       }
       doc.built.forEach(function (item) {
@@ -1787,7 +1792,7 @@
       "display:inline-flex;align-items:center;height:22px;font-size:11.5px;font-weight:600;" +
       "line-height:1;border-radius:var(--rad-s);padding:0 8px;border:1px solid rgba(194,96,63,.22);" +
       "background:var(--coral-tint);color:var(--coral-2)";
-    badge.textContent = "동일 문구 " + (item.dup_documents || 0) + "개 문서";
+    badge.textContent = _t("동일 문구 {n}개 문서", { n: item.dup_documents || 0 });
     var dateBadge = head.querySelector(".fnd-b.date");
     if (dateBadge) head.insertBefore(badge, dateBadge);
     else head.appendChild(badge);
@@ -1811,7 +1816,7 @@
     icon.className = "ti ti-file-text";
     icon.setAttribute("aria-hidden", "true");
     a.appendChild(icon);
-    a.appendChild(document.createTextNode("해당 문서 보기"));
+    a.appendChild(document.createTextNode(_t("해당 문서 보기")));
     actions.insertBefore(a, actions.firstChild);
   }
 
@@ -1835,7 +1840,7 @@
     if (hasDash) dashEl.hidden = true;
     resultsEl.textContent = "";
     countEl.textContent = "";
-    countEl.appendChild(document.createTextNode("유사 문구 " + items.length.toLocaleString("ko-KR") + "건"));
+    countEl.appendChild(document.createTextNode(_t("유사 문구 {n}건", { n: items.length.toLocaleString("ko-KR") })));
     var frag = document.createDocumentFragment();
     items.forEach(function (item) {
       var row = mapSimilarItemToRow(item);
@@ -1918,8 +1923,8 @@
     btn.type = "button";
     btn.id = "fnd-similar-toggle";
     btn.setAttribute("aria-pressed", "false");
-    btn.setAttribute("aria-label", "유사 문구 검색 켜기/끄기");
-    btn.textContent = "유사 문구 검색";
+    btn.setAttribute("aria-label", _t("유사 문구 검색 켜기/끄기"));
+    btn.textContent = _t("유사 문구 검색");
     btn.style.cssText =
       "flex:none;height:34px;padding:0 14px;font:inherit;font-size:12.5px;font-weight:600;" +
       "color:var(--body);background:var(--canvas);border:1.5px solid var(--line-2);" +
@@ -1953,15 +1958,15 @@
 
     // [문서 중심 열람] "전체 N문서 · M지적 · 페이지 X / Y"
     countEl.textContent = "";
-    countEl.appendChild(document.createTextNode("전체 "));
+    countEl.appendChild(document.createTextNode(_t("전체 ")));
     var bDocs = document.createElement("b");
     bDocs.textContent = totalDocs.toLocaleString("ko-KR");
     countEl.appendChild(bDocs);
-    countEl.appendChild(document.createTextNode("문서 · "));
+    countEl.appendChild(document.createTextNode(_t("문서 · ")));
     var bObs = document.createElement("b");
     bObs.textContent = totalFindings.toLocaleString("ko-KR");
     countEl.appendChild(bObs);
-    countEl.appendChild(document.createTextNode("지적 · 페이지 "));
+    countEl.appendChild(document.createTextNode(_t("지적 · 페이지 ")));
     var bCur = document.createElement("b");
     bCur.textContent = String(currentPage);
     countEl.appendChild(bCur);
@@ -2211,12 +2216,12 @@
         Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.disabled = true; });
         var current = nav.querySelector(".fnd-pager-btn.on");
         if (current) {
-          current.textContent = "불러오는 중…";
+          current.textContent = _t("불러오는 중…");
         } else {
           var status = document.createElement("span");
           status.className = "fnd-pager-status";
           status.setAttribute("aria-live", "polite");
-          status.textContent = "불러오는 중…";
+          status.textContent = _t("불러오는 중…");
           nav.appendChild(status);
         }
       }
@@ -2268,8 +2273,8 @@
         return;
       }
       nav.hidden = false;
-      nav.appendChild(buildPagerBtn("«", "처음 페이지로 이동", current === 1, function () { goToPageFromPager(1); }));
-      nav.appendChild(buildPagerBtn("‹ 이전", "이전 페이지", current === 1, function () { goToPageFromPager(current - 1); }));
+      nav.appendChild(buildPagerBtn("«", _t("처음 페이지로 이동"), current === 1, function () { goToPageFromPager(1); }));
+      nav.appendChild(buildPagerBtn(_t("‹ 이전"), _t("이전 페이지"), current === 1, function () { goToPageFromPager(current - 1); }));
       computePageWindow(current, total).forEach(function (item) {
         if (item === "...") {
           var gap = document.createElement("span");
@@ -2281,7 +2286,7 @@
         }
         var isLastKnown = item === total;
         var label = String(item) + (isLastKnown && moreMayExist ? "+" : "");
-        var btn = buildPagerBtn(label, "페이지 " + item + "로 이동", false, function () { goToPageFromPager(item); });
+        var btn = buildPagerBtn(label, _t("페이지 {n}로 이동", { n: item }), false, function () { goToPageFromPager(item); });
         if (item === current) {
           btn.classList.add("on");
           btn.setAttribute("aria-current", "page");
@@ -2290,8 +2295,8 @@
         nav.appendChild(btn);
       });
       var atKnownEnd = current >= total && !moreMayExist;
-      nav.appendChild(buildPagerBtn("다음 ›", "다음 페이지", atKnownEnd, function () { goToPageFromPager(current + 1); }));
-      nav.appendChild(buildPagerBtn("»", "끝 페이지로 이동", atKnownEnd, function () { goToPageFromPager(total); }));
+      nav.appendChild(buildPagerBtn(_t("다음 ›"), _t("다음 페이지"), atKnownEnd, function () { goToPageFromPager(current + 1); }));
+      nav.appendChild(buildPagerBtn("»", _t("끝 페이지로 이동"), atKnownEnd, function () { goToPageFromPager(total); }));
     });
   }
 
@@ -2340,17 +2345,17 @@
         // 어긋난다 — 그때는 "과거 자료를 순차 공개 중"으로 정직하게 알린다. 어느 쪽도 미공개
         // 원문 내용을 단정하지 않는다(VALUE_UNKNOWN 규율 — 사유만, 원문 단정 없음).
         var pendingNote = gap > _COVERAGE_BACKLOG_GAP
-          ? " — 과거 수집분을 국문으로 순차 공개하고 있습니다."
-          : " — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.";
+          ? _t(" — 과거 수집분을 국문으로 순차 공개하고 있습니다.")
+          : _t(" — 신규 수집분은 국문 번역을 거쳐 다음 날 공개됩니다.");
         coverageTextEl.textContent = isComplete
           ? (hasDocs
-              ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
-                total + "건 전체를 국문으로 열람할 수 있습니다."
-              : "전체 " + total + "건을 국문으로 열람할 수 있습니다.")
+              ? _t("규제 문서 {docs}건 · 지적사항 {total}건 전체를 국문으로 열람할 수 있습니다.",
+                  { docs: Number(totals.documents).toLocaleString("ko-KR"), total: total })
+              : _t("전체 {total}건을 국문으로 열람할 수 있습니다.", { total: total }))
           : (hasDocs
-              ? "규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") + "건 · 지적사항 " +
-                total + "건 중 " + pub + "건 국문 열람 가능"
-              : "지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능") +
+              ? _t("규제 문서 {docs}건 · 지적사항 {total}건 중 {pub}건 국문 열람 가능",
+                  { docs: Number(totals.documents).toLocaleString("ko-KR"), total: total, pub: pub })
+              : _t("지적사항 {total}건 중 {pub}건 국문 열람 가능", { total: total, pub: pub })) +
             pendingNote;
         coverageNoteEl.hidden = false;
       })

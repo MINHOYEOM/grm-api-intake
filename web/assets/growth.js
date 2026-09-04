@@ -9,6 +9,11 @@
  * 런타임 주입(자리표시자 1줄만 서버 렌더). */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   var host = document.getElementById("grm-growth");
   if (!host || !window.localStorage) return;
 
@@ -65,11 +70,11 @@
 
   // ── 성장 단계(v1 확정안 — 대안은 PR/보고 기록) ──
   var STAGES = [
-    { min: 0,   name: "알",        sub: "퀴즈를 풀면 부화가 시작돼요" },
-    { min: 50,  name: "아기 구름이", sub: "방금 알을 깨고 나왔어요" },
-    { min: 150, name: "소년 구름이", sub: "매주 소식을 먹고 자라는 중이에요" },
-    { min: 350, name: "어른 구름이", sub: "규제 소식이라면 척척 정리해요" },
-    { min: 700, name: "전설 구름이", sub: "규제의 하늘을 지키는 전설이에요" }
+    { min: 0,   name: _t("알"),        sub: _t("퀴즈를 풀면 부화가 시작돼요") },
+    { min: 50,  name: _t("아기 구름이"), sub: _t("방금 알을 깨고 나왔어요") },
+    { min: 150, name: _t("소년 구름이"), sub: _t("매주 소식을 먹고 자라는 중이에요") },
+    { min: 350, name: _t("어른 구름이"), sub: _t("규제 소식이라면 척척 정리해요") },
+    { min: 700, name: _t("전설 구름이"), sub: _t("규제의 하늘을 지키는 전설이에요") }
   ];
   function stageIndex(points) {
     var i = 0;
@@ -201,7 +206,7 @@
       '  <span class="qzg-stage-art" aria-hidden="true">' + STAGE_ART[stageNo] + '</span>' +
       '  <span class="qzg-stage-step">Lv.' + (stageNo + 1) + '</span>' +
       '  <b>' + STAGES[stageNo].name + '</b>' +
-      '  <small>' + STAGES[stageNo].min + '점부터</small>' +
+      '  <small>' + _t("{min}점부터", { min: STAGES[stageNo].min }) + '</small>' +
       '  <span class="qzg-stage-copy">' + STAGES[stageNo].sub + '</span>' +
       '</article>';
   }
@@ -215,17 +220,17 @@
     '      <b class="qzg-name" id="grm-qzg-name"></b>' +
     '      <span class="qzg-lv" id="grm-qzg-lv"></span>' +
     '      <span class="qzg-streak" id="grm-qzg-streak"></span>' +
-    '      <button class="qzg-atlas-toggle" id="grm-qzg-atlas-toggle" type="button" aria-expanded="false" aria-controls="grm-qzg-atlas">성장 단계 보기</button>' +
+    '      <button class="qzg-atlas-toggle" id="grm-qzg-atlas-toggle" type="button" aria-expanded="false" aria-controls="grm-qzg-atlas">' + _t("성장 단계 보기") + '</button>' +
     '    </div>' +
     '    <p class="qzg-sub" id="grm-qzg-sub"></p>' +
     '    <div class="qzg-barwrap"><div class="qzg-bar" id="grm-qzg-bar"></div></div>' +
     '    <p class="qzg-meta"><span id="grm-qzg-pts"></span> · <span id="grm-qzg-stat"></span>' +
-    '      <span class="qzg-note">기록은 이 브라우저에만 저장돼요</span>' +
-    '      <button class="qzg-reset" id="grm-qzg-reset" type="button">기록 초기화</button></p>' +
+    '      <span class="qzg-note">' + _t("기록은 이 브라우저에만 저장돼요") + '</span>' +
+    '      <button class="qzg-reset" id="grm-qzg-reset" type="button">' + _t("기록 초기화") + '</button></p>' +
     '  </div>' +
     '</div>' +
     '<div class="qzg-atlas" id="grm-qzg-atlas" hidden>' +
-    '  <div class="qzg-atlas-head"><div><b>구름이 성장 도감</b><p>같은 구름이가 경험을 쌓으며 표정과 행동이 깊어져요.</p></div><span>알 → 전설</span></div>' +
+    '  <div class="qzg-atlas-head"><div><b>' + _t("구름이 성장 도감") + '</b><p>' + _t("같은 구름이가 경험을 쌓으며 표정과 행동이 깊어져요.") + '</p></div><span>' + _t("알 → 전설") + '</span></div>' +
     '  <div class="qzg-stage-track">' + stageCardsHtml + '</div>' +
     '</div>';
   host.hidden = false;
@@ -253,14 +258,14 @@
     }
     nameEl.textContent = STAGES[si].name;
     lvEl.textContent = "Lv." + (si + 1) + "/" + STAGES.length;
-    subEl.textContent = s.answered ? STAGES[si].sub : "이번 주 퀴즈를 풀면 구름이가 자라나요";
-    streakEl.textContent = s.streak >= 2 ? "연속 참여 " + s.streak + "주" : "";
+    subEl.textContent = s.answered ? STAGES[si].sub : _t("이번 주 퀴즈를 풀면 구름이가 자라나요");
+    streakEl.textContent = s.streak >= 2 ? _t("연속 참여 {n}주", { n: s.streak }) : "";
     streakEl.hidden = s.streak < 2;
     var next = STAGES[si + 1];
     var pct = next ? Math.max(0, Math.min(100, Math.round((s.points - STAGES[si].min) * 100 / (next.min - STAGES[si].min)))) : 100;
     barEl.style.width = pct + "%";
-    ptsEl.textContent = next ? ("성장 포인트 " + s.points + " (다음 단계까지 " + (next.min - s.points) + ")") : ("성장 포인트 " + s.points + " · 최고 단계");
-    statEl.textContent = "누적 정답 " + s.correct + " · 푼 문제 " + s.answered + " · 참여 " + s.weeks + "주";
+    ptsEl.textContent = next ? _t("성장 포인트 {pts} (다음 단계까지 {left})", { pts: s.points, left: (next.min - s.points) }) : _t("성장 포인트 {pts} · 최고 단계", { pts: s.points });
+    statEl.textContent = _t("누적 정답 {correct} · 푼 문제 {answered} · 참여 {weeks}주", { correct: s.correct, answered: s.answered, weeks: s.weeks });
     for (var c = 0; c < stageCards.length; c++) {
       stageCards[c].classList.toggle("is-current", c === si);
       stageCards[c].classList.toggle("is-reached", c < si);
@@ -279,7 +284,7 @@
     if (!atlasEl || !atlasToggle) return;
     atlasEl.hidden = !open;
     atlasToggle.setAttribute("aria-expanded", open ? "true" : "false");
-    atlasToggle.textContent = open ? "성장 단계 접기" : "성장 단계 보기";
+    atlasToggle.textContent = open ? _t("성장 단계 접기") : _t("성장 단계 보기");
   }
   if (atlasToggle) atlasToggle.addEventListener("click", function () { setAtlas(atlasEl.hidden); });
   document.addEventListener("keydown", function (e) {
@@ -310,7 +315,7 @@
   var resetBtn = document.getElementById("grm-qzg-reset");
   if (resetBtn) {
     resetBtn.addEventListener("click", function () {
-      if (!window.confirm("구름이 성장 기록을 모두 지울까요? (이 브라우저에서만 지워져요)")) return;
+      if (!window.confirm(_t("구름이 성장 기록을 모두 지울까요? (이 브라우저에서만 지워져요)"))) return;
       data = { version: SCHEMA_VERSION, weeks: {} };
       save(data);
       window.dispatchEvent(new CustomEvent("grm:gurumi-change"));

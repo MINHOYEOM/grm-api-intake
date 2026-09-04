@@ -27,8 +27,8 @@
 </style>
 <main>
   <div class="wrap">
-    <nav class="fi-crumb" aria-label="현재 위치">
-      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><span>{{ axis.title }}</span>
+    <nav class="fi-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><span>{{ axis.title }}</span>
     </nav>
     <p class="kick">{{ axis.kick }}</p>
     <h1 class="fi-h1">{{ axis.title }}</h1>
@@ -38,7 +38,7 @@
       {%- for it in items %}
       <a class="fi-card" href="{{ rel_root }}findings/{{ axis.path }}/{{ it.slug }}/">
         <span class="fi-card-t">{{ it.label_ko }}</span>
-        <span class="fi-card-n">지적 <b>{{ "{:,}".format(it.findings) }}</b>건 · 문서 <b>{{ "{:,}".format(it.documents) }}</b>건</span>
+        <span class="fi-card-n">{{ _("지적 <b>{a}</b>건 · 문서 <b>{b}</b>건", a="{:,}".format(it.findings), b="{:,}".format(it.documents)) }}</span>
       </a>
       {%- endfor %}
     </div>
@@ -47,15 +47,15 @@
     <div class="fi-tail">
       {#- 문서 목록으로 가는 입구. 문서 페이지 3천 장이 sitemap 에만 있으면 사이트
           구조에서 닿는 경로가 없다 — 축 색인이 그 입구 역할을 함께 한다. -#}
-      <p class="fi-tail-h">문서 하나를 통째로 보고 싶다면</p>
-      <p class="fi-tail-p">실사 문서 <a href="{{ rel_root }}findings/docs/">{{ "{:,}".format(doc_index_total) }}건을 기관·연도로 묶어</a> 두었습니다. 문서를 열면 그 실사에서 나온 지적을 모두 우리말로 보실 수 있습니다.</p>
+      <p class="fi-tail-h">{{ _('문서 하나를 통째로 보고 싶다면') }}</p>
+      <p class="fi-tail-p">{{ _('실사 문서 <a href="{href}">{n}건을 기관·연도로 묶어</a> 두었습니다. 문서를 열면 그 실사에서 나온 지적을 모두 우리말로 보실 수 있습니다.', href=rel_root ~ "findings/docs/", n="{:,}".format(doc_index_total)) }}</p>
     </div>
     {% endif %}
 
     {% if excluded %}
     <div class="fi-tail">
-      <p class="fi-tail-h">여기에 없는 것</p>
-      <p class="fi-tail-p">{% for ex in excluded %}{{ ex.key or "국가 미상" }} {{ "{:,}".format(ex.findings) }}건({{ ex.reason }}){% if not loop.last %} · {% endif %}{% endfor %}. 표본이 적은 항목은 별도 페이지를 만들지 않지만 <a href="{{ rel_root }}findings/">지적사항 검색</a>에서는 모두 찾아보실 수 있습니다.</p>
+      <p class="fi-tail-h">{{ _('여기에 없는 것') }}</p>
+      <p class="fi-tail-p">{% for ex in excluded %}{{ _("{key} {n}건({reason})", key=ex.key or _("국가 미상"), n="{:,}".format(ex.findings), reason=ex.reason) }}{% if not loop.last %} · {% endif %}{% endfor %}. {{ _('표본이 적은 항목은 별도 페이지를 만들지 않지만 <a href="{href}">지적사항 검색</a>에서는 모두 찾아보실 수 있습니다.', href=rel_root ~ "findings/") }}</p>
     </div>
     {% endif %}
   </div>

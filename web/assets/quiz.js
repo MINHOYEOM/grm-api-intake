@@ -15,6 +15,11 @@
  * week 가 하나도 없으면(현 데이터) 기존 회전과 완전 동일 경로 — node 테스트가 두 경로 고정. */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   function mod(n, m) { return ((n % m) + m) % m; }
 
   // [9차 G3] 주간 선택 — 순수 함수(DOM 무접촉·테스트 대상). items = [{index(뱅크순),
@@ -148,17 +153,17 @@
     }
     if (emptyEl) emptyEl.hidden = shown > 0;
     if (mode === "weekly") {
-      if (titleEl) titleEl.textContent = hasPinnedSet ? "이번 주 퀴즈" : "지난 문항으로 복습";
+      if (titleEl) titleEl.textContent = hasPinnedSet ? _t("이번 주 퀴즈") : _t("지난 문항으로 복습");
       if (subEl) {
         subEl.textContent = hasPinnedSet
-          ? "이번 주에 뽑은 " + weekly.length + "문항이에요. 같은 주에는 모두 같은 문제를 풀어요."
-          : "이번 주 문항은 아직 준비 중이에요. 그동안 지난 " + weekly.length + "문항으로 복습해 보세요.";
+          ? _t("이번 주에 뽑은 {n}문항이에요. 같은 주에는 모두 같은 문제를 풀어요.", { n: weekly.length })
+          : _t("이번 주 문항은 아직 준비 중이에요. 그동안 지난 {n}문항으로 복습해 보세요.", { n: weekly.length });
       }
-      if (toggle) { toggle.textContent = "전체 " + cards.length + "문항 풀기"; toggle.setAttribute("aria-pressed", "false"); }
+      if (toggle) { toggle.textContent = _t("전체 {n}문항 풀기", { n: cards.length }); toggle.setAttribute("aria-pressed", "false"); }
     } else {
-      if (titleEl) titleEl.textContent = "전체 문항";
-      if (subEl) subEl.textContent = "정본 문항 " + cards.length + "개 중 " + shown + "개를 보고 있어요.";
-      if (toggle) { toggle.textContent = "이번 주 문항만 보기"; toggle.setAttribute("aria-pressed", "true"); }
+      if (titleEl) titleEl.textContent = _t("전체 문항");
+      if (subEl) subEl.textContent = _t("정본 문항 {total}개 중 {shown}개를 보고 있어요.", { total: cards.length, shown: shown });
+      if (toggle) { toggle.textContent = _t("이번 주 문항만 보기"); toggle.setAttribute("aria-pressed", "true"); }
     }
     updateResult();
   }
@@ -222,12 +227,12 @@
     if (!complete) { resultShown = false; return; }
 
     var titleNode = resultEl.querySelector(".qz-result-title");
-    if (titleNode) titleNode.textContent = hasPinnedSet ? "이번 주 퀴즈 완주!" : "복습 완주!";
-    if (resultScoreEl) resultScoreEl.textContent = s.total + "문제 중 " + s.right + "개를 맞혔어요.";
+    if (titleNode) titleNode.textContent = hasPinnedSet ? _t("이번 주 퀴즈 완주!") : _t("복습 완주!");
+    if (resultScoreEl) resultScoreEl.textContent = _t("{total}문제 중 {right}개를 맞혔어요.", { total: s.total, right: s.right });
     if (resultNoteEl) {
       resultNoteEl.textContent = s.wrong.length
-        ? "다시 풀어도 구름이 점수는 처음 결과로 남아요 — 편하게 복습하세요."
-        : "이번 주 문항을 모두 맞혔어요. 다음 주에 새 문항으로 만나요!";
+        ? _t("다시 풀어도 구름이 점수는 처음 결과로 남아요 — 편하게 복습하세요.")
+        : _t("이번 주 문항을 모두 맞혔어요. 다음 주에 새 문항으로 만나요!");
     }
     if (wrongWrapEl) wrongWrapEl.hidden = !s.wrong.length;
     if (retryBtn) retryBtn.hidden = !s.wrong.length;
@@ -266,13 +271,13 @@
       var state = choices[i].querySelector(".qz-state");
       if (ci === answerI) {
         choices[i].classList.add("is-correct");
-        if (state) state.textContent = "✓ 정답";
+        if (state) state.textContent = _t("✓ 정답");
       }
       if (ci === pickedI) {
         choices[i].classList.add("is-picked");
         if (!isRight) {
           choices[i].classList.add("is-wrong");
-          if (state) state.textContent = "✗ 내 선택";
+          if (state) state.textContent = _t("✗ 내 선택");
         }
       }
     }
@@ -280,7 +285,7 @@
     var verdict = card.querySelector(".qz-verdict");
     if (verdict) {
       verdict.classList.add(isRight ? "is-correct" : "is-wrong");
-      verdict.textContent = isRight ? "🦉 정답이에요!" : "🦉 아쉬워요 — 해설로 근거를 확인해 보세요.";
+      verdict.textContent = isRight ? _t("🦉 정답이에요!") : _t("🦉 아쉬워요 — 해설로 근거를 확인해 보세요.");
     }
     if (fb) fb.hidden = false;
     if (!restoring && card.id) { picks[card.id] = pickedI; savePicks(); }
@@ -347,12 +352,12 @@
   if (shareBtn) {
     shareBtn.addEventListener("click", function () {
       var s = weeklyStats();
-      var text = (hasPinnedSet ? "이번 주 GRM 규제 퀴즈 " : "GRM 규제 퀴즈 복습 ") +
+      var text = (hasPinnedSet ? _t("이번 주 GRM 규제 퀴즈 ") : _t("GRM 규제 퀴즈 복습 ")) +
                  s.right + "/" + s.total + " 🦉\n" +
                  window.location.origin + window.location.pathname;
       function done() {
-        shareBtn.textContent = "복사했어요";
-        window.setTimeout(function () { shareBtn.textContent = "결과 복사"; }, 2000);
+        shareBtn.textContent = _t("복사했어요");
+        window.setTimeout(function () { shareBtn.textContent = _t("결과 복사"); }, 2000);
       }
       function fallback() {
         var ta = document.createElement("textarea");

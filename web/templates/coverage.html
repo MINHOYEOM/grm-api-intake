@@ -34,8 +34,8 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Data Coverage</span>
-    <h1 class="reveal" style="animation-delay:.08s">데이터 현황</h1>
-    <p class="reveal" style="animation-delay:.14s"><span class="ln">트렌드 수치를 어디까지 믿어도 되는지 판단하는 데 필요한 것들입니다.</span> <span class="ln">무엇을 어느 기관에서 얼마나 모았고, 연도마다 확보량이 얼마나 다른지를 그대로 보여줍니다.</span></p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("데이터 현황") }}</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("트렌드 수치를 어디까지 믿어도 되는지 판단하는 데 필요한 것들입니다.") }}</span> <span class="ln">{{ _("무엇을 어느 기관에서 얼마나 모았고, 연도마다 확보량이 얼마나 다른지를 그대로 보여줍니다.") }}</span></p>
   </div>
   <div class="wrap">
     {% include "partials/trends_seg.html" %}
@@ -46,46 +46,46 @@
       <div class="tr-skel-row w2"></div>
       <div class="tr-skel-row w3"></div>
     </div>
-    <div class="tr-state tr-state-error" id="tr-error" hidden>통계 서비스 준비 중입니다.</div>
+    <div class="tr-state tr-state-error" id="tr-error" hidden>{{ _("통계 서비스 준비 중입니다.") }}</div>
 
     <div id="tr-content" hidden>
-      <section class="tr-stats" id="tr-stats" aria-label="핵심 통계"></section>
+      <section class="tr-stats" id="tr-stats" aria-label="{{ _('핵심 통계') }}"></section>
 
       {#- [읽기 전에] 다른 두 면에서 각 차트 밑에 반복되던 해설을 여기 한 번만 적는다.
           이 세 문장은 데이터와 무관한 사실이라 정적 텍스트로 둔다(골든에 남아 리뷰
           가능) — 숫자가 들어가는 줄만 trends.js 가 totals 로 채운다. -#}
       <div class="imp" id="tr-coverage-note" hidden>
-        <span class="lab">읽기 전에</span>
+        <span class="lab">{{ _("읽기 전에") }}</span>
         {#- [2026-08-28] 종전 문구는 "원문 문서가 실사일을 주지 않기 때문이며, 소스가
             늘어도 이 한계는 바뀌지 않습니다"였다. 둘 다 사실이 아니었다 — 실측해 보니
             네 소스가 실사일을 준다(FDA 483 발부일 · 식약처·EU·영국 실사 종료일 ·
             캐나다 실사 시작일). 지금은 문서 페이지가 실사일과 공개일을 함께 보여준다.
             "한계는 바뀌지 않는다"는 단정이 바로 그 한계를 오래 살려 둔 문장이었다. -#}
-        <p>아래 집계의 날짜는 <b>자료가 공개된 날</b>입니다 &mdash; 다만 <b>캐나다 실사</b>는 원천이 공개일을 주지 않아 <b>실사일</b>이 그 자리에 들어갑니다. <b>문서를 열면</b> 그 문서의 실사일과 공개일을 각각 보실 수 있어요.</p>
+        <p>{{ _("아래 집계의 날짜는 <b>자료가 공개된 날</b>입니다 &mdash; 다만 <b>캐나다 실사</b>는 원천이 공개일을 주지 않아 <b>실사일</b>이 그 자리에 들어갑니다. <b>문서를 열면</b> 그 문서의 실사일과 공개일을 각각 보실 수 있어요.") }}</p>
         <p id="tr-coverage-text"></p>
-        <p>연도별 확보량이 10배 넘게 차이나므로, 연도 간 비교는 건수가 아니라 <b>구성비(%)</b>로만 하셔야 합니다. 건수 비교는 규제 활동이 아니라 저희 수집 이력을 비교하는 것이 됩니다.</p>
+        <p>{{ _("연도별 확보량이 10배 넘게 차이나므로, 연도 간 비교는 건수가 아니라 <b>구성비(%)</b>로만 하셔야 합니다. 건수 비교는 규제 활동이 아니라 저희 수집 이력을 비교하는 것이 됩니다.") }}</p>
       </div>
 
-      <section class="tr-block" aria-label="소스 구성">
-        <h2 class="tr-h">소스 구성</h2>
-        <p class="tr-read">지적사항이 어느 기관 문서에서 왔는지입니다. 소스마다 문서 한 건에 담기는 지적 수가 다르므로(실사보고서는 여러 건, 비준수 보고서는 대개 한 건), 이 구성비는 규제 강도가 아니라 문서 형식의 차이도 함께 반영합니다.</p>
+      <section class="tr-block" aria-label="{{ _('소스 구성') }}">
+        <h2 class="tr-h">{{ _("소스 구성") }}</h2>
+        <p class="tr-read">{{ _("지적사항이 어느 기관 문서에서 왔는지입니다. 소스마다 문서 한 건에 담기는 지적 수가 다르므로(실사보고서는 여러 건, 비준수 보고서는 대개 한 건), 이 구성비는 규제 강도가 아니라 문서 형식의 차이도 함께 반영합니다.") }}</p>
         <div id="tr-source" class="tr-source"></div>
       </section>
 
-      <section class="tr-block" aria-label="연도별 공개량">
-        <h2 class="tr-h">연도별 공개량</h2>
-        <p class="tr-read">그 해 날짜로 공개된 문서에서 나온 지적 수, 즉 저희가 연도별로 확보한 자료의 양입니다. 막대가 높은 해는 그 해에 문서가 많이 공개됐다는 뜻이지, <b>그 해에 지적이 많아졌다는 뜻이 아닙니다</b>.</p>
+      <section class="tr-block" aria-label="{{ _('연도별 공개량') }}">
+        <h2 class="tr-h">{{ _("연도별 공개량") }}</h2>
+        <p class="tr-read">{{ _("그 해 날짜로 공개된 문서에서 나온 지적 수, 즉 저희가 연도별로 확보한 자료의 양입니다. 막대가 높은 해는 그 해에 문서가 많이 공개됐다는 뜻이지, <b>그 해에 지적이 많아졌다는 뜻이 아닙니다</b>.") }}</p>
         <div id="tr-year" class="tr-year"></div>
-        <p class="tr-note">연도별 높이 차이는 소스마다 거슬러 올라간 범위가 다르기 때문이기도 합니다 &mdash; 캐나다 실사는 2021년 이후만, Warning Letter 는 수집을 시작한 이후만 담겨 있어 그 이전 연도는 실제보다 적은 하한치로 보셔야 합니다.</p>
+        <p class="tr-note">{{ _("연도별 높이 차이는 소스마다 거슬러 올라간 범위가 다르기 때문이기도 합니다 &mdash; 캐나다 실사는 2021년 이후만, Warning Letter 는 수집을 시작한 이후만 담겨 있어 그 이전 연도는 실제보다 적은 하한치로 보셔야 합니다.") }}</p>
       </section>
 
       {#- [컨셉 재정의] 전 기간 누적 순위 — 지적 경향 면에서 넘어왔다.
           ★그 면에서 뺀 이유: 분모가 2016년 이후 전량이라 "지금 무엇이 지적되나"에
           답하지 못한다. 여기서는 반대로 **우리 코퍼스가 어느 영역에 기울어 있나**를
           보여주는 값이라 제자리다. -#}
-      <section class="tr-block" aria-label="전 기간 카테고리 구성">
-        <h2 class="tr-h">전 기간 카테고리 구성</h2>
-        <p class="tr-read">2016년 이후 모아 둔 전량을 합친 순위입니다. 최근 흐름이 아니라 <b>우리가 확보한 자료가 어느 영역에 몰려 있는지</b>를 보여줍니다 &mdash; 지금 무엇이 지적되는지는 <a href="{{ rel_root }}findings/trends/index.html">지적 경향</a>에서 기관을 골라 보세요.</p>
+      <section class="tr-block" aria-label="{{ _('전 기간 카테고리 구성') }}">
+        <h2 class="tr-h">{{ _("전 기간 카테고리 구성") }}</h2>
+        <p class="tr-read">{{ _('2016년 이후 모아 둔 전량을 합친 순위입니다. 최근 흐름이 아니라 <b>우리가 확보한 자료가 어느 영역에 몰려 있는지</b>를 보여줍니다 &mdash; 지금 무엇이 지적되는지는 <a href="{rel_root}findings/trends/index.html">지적 경향</a>에서 기관을 골라 보세요.', rel_root=rel_root) }}</p>
         <div id="tr-cat" class="tr-cat"></div>
       </section>
 
@@ -93,13 +93,13 @@
           ★그 면에서 뺀 이유: "해외"는 미국 외 전체라 인도가 61%인 덩어리이고, 국내
           사용자가 "해외=우리"로 읽기 쉽다. 여기서는 **FDA 483 코퍼스의 지리적 구성**
           이라는 사실 그대로 선다. 038 미배포·빈 응답이면 조용히 숨긴 채로 남는다. -#}
-      <section class="tr-block tr-zone-block" id="tr-zone-block" aria-label="해외 실사 vs 미국 내 실사" hidden>
-        <h2 class="tr-h">해외 실사 vs 미국 내 실사</h2>
-        <p class="tr-read">FDA 483 만 대상으로, 미국 밖 실사와 미국 내 실사를 각자 안에서 100%로 놓고 견줍니다 &mdash; 미국 쪽 건수가 훨씬 많아 절대 건수로는 비교가 안 되기 때문이에요.</p>
+      <section class="tr-block tr-zone-block" id="tr-zone-block" aria-label="{{ _('해외 실사 vs 미국 내 실사') }}" hidden>
+        <h2 class="tr-h">{{ _("해외 실사 vs 미국 내 실사") }}</h2>
+        <p class="tr-read">{{ _("FDA 483 만 대상으로, 미국 밖 실사와 미국 내 실사를 각자 안에서 100%로 놓고 견줍니다 &mdash; 미국 쪽 건수가 훨씬 많아 절대 건수로는 비교가 안 되기 때문이에요.") }}</p>
         <p class="tr-zone-sub" id="tr-zone-sub"></p>
         <div id="tr-zone" class="tr-zone"></div>
         <p class="tr-note" id="tr-zone-countries"></p>
-        <p class="tr-note">"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.</p>
+        <p class="tr-note">{{ _('"해외"는 미국 외 전체이며 국가별 구성이 고르지 않습니다.') }}</p>
       </section>
 
       {#- FIND-1 H1 — findings_category_matrix() RPC(008) 전용 섹션. 008 미적용 라이브·
@@ -110,16 +110,16 @@
           10배 넘게 차이나서 건수 히트맵은 사실상 "어느 해에 문서가 많이 공개됐는가"
           지도였다. 표본이 너무 적은 연도는 trends.js 가 열 자체를 빼고 그 사실을
           tr-heatmap-note 에 적는다(억지 해석 금지). -#}
-      <section class="tr-block tr-heatmap-block" id="tr-heatmap-block" aria-label="연도별 구성비" hidden>
-        <h2 class="tr-h">연도별 구성비</h2>
-        <p class="tr-read">각 연도를 100%로 놓고, 그 해 지적이 어떤 영역에 몰렸는지를 봅니다. 연도마다 확보한 문서 양이 크게 달라 건수로는 비교가 안 되기 때문이에요 &mdash; 색이 진할수록 그 해에서 비중이 큰 영역입니다.</p>
+      <section class="tr-block tr-heatmap-block" id="tr-heatmap-block" aria-label="{{ _('연도별 구성비') }}" hidden>
+        <h2 class="tr-h">{{ _("연도별 구성비") }}</h2>
+        <p class="tr-read">{{ _("각 연도를 100%로 놓고, 그 해 지적이 어떤 영역에 몰렸는지를 봅니다. 연도마다 확보한 문서 양이 크게 달라 건수로는 비교가 안 되기 때문이에요 &mdash; 색이 진할수록 그 해에서 비중이 큰 영역입니다.") }}</p>
         <div id="tr-heatmap" class="tr-heatmap"></div>
         <p class="tr-note" id="tr-heatmap-note" hidden></p>
       </section>
 
-      <section class="tr-block" aria-label="수집량 상위 업체">
-        <h2 class="tr-h">수집량 상위 업체</h2>
-        <p class="tr-read"><b>품질이 나쁜 순서가 아닙니다.</b> 저희가 확보한 공개 문서가 많은 업체일수록 위에 옵니다 &mdash; 실사를 여러 번 받았거나 문서가 긴 업체가 올라오며, 문서 한 건에 지적이 여러 개 담기기 때문입니다. 특정 업체의 이력을 보시려면 순위가 아니라 <a href="{{ rel_root }}findings/firm/index.html">업체 조회</a>를 쓰세요.</p>
+      <section class="tr-block" aria-label="{{ _('수집량 상위 업체') }}">
+        <h2 class="tr-h">{{ _("수집량 상위 업체") }}</h2>
+        <p class="tr-read">{{ _('<b>품질이 나쁜 순서가 아닙니다.</b> 저희가 확보한 공개 문서가 많은 업체일수록 위에 옵니다 &mdash; 실사를 여러 번 받았거나 문서가 긴 업체가 올라오며, 문서 한 건에 지적이 여러 개 담기기 때문입니다. 특정 업체의 이력을 보시려면 순위가 아니라 <a href="{rel_root}findings/firm/index.html">업체 조회</a>를 쓰세요.', rel_root=rel_root) }}</p>
         <div id="tr-firms" class="tr-firms"></div>
         <div id="tr-firm-detail" class="tr-firm-detail" hidden></div>
       </section>

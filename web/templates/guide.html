@@ -9,11 +9,11 @@
   <div class="wrap page-head guide-head">
     <span class="kick reveal" style="animation-delay:.02s">User Guide</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ guide_title }}</h1>
-    <p class="reveal" style="animation-delay:.14s">GRM을 어떻게 업무에 활용하면 되는지 — 월요일 브리프 3분 활용법부터 findings 검색 실전 예시, 자료실·용어사전·퀴즈 활용까지 실사용 순서로 정리했습니다.</p>
+    <p class="reveal" style="animation-delay:.14s">{{ _('GRM을 어떻게 업무에 활용하면 되는지 — 월요일 브리프 3분 활용법부터 findings 검색 실전 예시, 자료실·용어사전·퀴즈 활용까지 실사용 순서로 정리했습니다.') }}</p>
   </div>
   {% if guide_toc %}
-  <nav class="wrap guide-toc reveal" style="animation-delay:.2s" aria-label="이용 안내 목차">
-    <span class="guide-toc-k">목차</span>
+  <nav class="wrap guide-toc reveal" style="animation-delay:.2s" aria-label="{{ _('이용 안내 목차') }}">
+    <span class="guide-toc-k">{{ _('목차') }}</span>
     <ol>
       {% for s in guide_toc %}
       <li><a href="#{{ s.id }}">{{ s.title }}</a></li>
@@ -25,10 +25,10 @@
     {{ guide_body }}
     <aside class="guide-x">
       <div class="guide-x-t">
-        <b>규제 용어가 낯설다면</b>
-        <span>GMP·CAPA·데이터 완전성·무균 공정 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.</span>
+        <b>{{ _('규제 용어가 낯설다면') }}</b>
+        <span>{{ _('GMP·CAPA·데이터 완전성·무균 공정 등 자주 나오는 용어를 쉬운 풀이와 공식 출처로 설명합니다.') }}</span>
       </div>
-      <a class="guide-x-go" href="{{ rel_root }}glossary/index.html">용어사전 열기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="guide-x-go" href="{{ rel_root }}glossary/index.html">{{ _('용어사전 열기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     </aside>
   </div>
 </main>

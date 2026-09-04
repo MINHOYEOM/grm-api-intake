@@ -24,12 +24,12 @@
 </style>
 <main>
   <div class="wrap">
-    <nav class="fx-crumb" aria-label="현재 위치">
-      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i><span>조항별</span>
+    <nav class="fx-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><span>{{ _('조항별') }}</span>
     </nav>
     <p class="kick">US &middot; 21 CFR</p>
-    <h1 class="fx-h1">21 CFR 조항별 지적사례</h1>
-    <p class="fx-sum">미국 GMP 규정(21 CFR Part 210&middot;211)의 조항을 인용한 지적사항을 조항별로 모았습니다. 조항 원문은 영문뿐이라, 실제로 어떤 지적이 나왔는지를 우리말 사례로 함께 봅니다. 사례가 <b>{{ min_documents }}</b>건 이상인 조항만 실었습니다.</p>
+    <h1 class="fx-h1">{{ _('21 CFR 조항별 지적사례') }}</h1>
+    <p class="fx-sum">{{ _("미국 GMP 규정(21 CFR Part 210&middot;211)의 조항을 인용한 지적사항을 조항별로 모았습니다. 조항 원문은 영문뿐이라, 실제로 어떤 지적이 나왔는지를 우리말 사례로 함께 봅니다. 사례가 <b>{min_documents}</b>건 이상인 조항만 실었습니다.", min_documents=min_documents) }}</p>
   </div>
 
   <div class="wrap fx-body">
@@ -39,14 +39,14 @@
         <a class="fx-row" href="{{ rel_root }}findings/clause/{{ c.slug }}/">
           <span class="fx-row-c">{{ c.code }}</span>
           <span class="fx-row-t">{{ c.title_en }}</span>
-          <span class="fx-row-n">문서 {{ "{:,}".format(c.documents) }}건</span>
+          <span class="fx-row-n">{{ _("문서 {n}건", n="{:,}".format(c.documents)) }}</span>
         </a>
         {%- endfor %}
       </div>
     </section>
 
     <section class="fx-sec">
-      <p class="fx-note">조항 제목은 미국 연방규정 원문(영문) 그대로입니다. 건수는 공개 문서에서 자동 집계한 값이고, 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것입니다. 각 조항 페이지에서 공개 원문으로 바로 갈 수 있습니다.</p>
+      <p class="fx-note">{{ _('조항 제목은 미국 연방규정 원문(영문) 그대로입니다. 건수는 공개 문서에서 자동 집계한 값이고, 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것입니다. 각 조항 페이지에서 공개 원문으로 바로 갈 수 있습니다.') }}</p>
     </section>
   </div>
 </main>

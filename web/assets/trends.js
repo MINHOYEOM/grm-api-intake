@@ -71,6 +71,12 @@
 (function () {
   "use strict";
 
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
+
   var cfg = document.getElementById("grm-findings-cfg");
   var loadingEl = document.getElementById("tr-loading");
   var errorEl = document.getElementById("tr-error");
@@ -182,26 +188,26 @@
   // 불변(20개), 대조 테스트는 순서 무관 dict 비교이지만 이 파일의 관례상 선언 순서는
   // taxonomy 계약 순서를 따른다.
   var CATEGORY_LABELS = {
-    data_integrity: { ko: "데이터 완전성", en: "Data integrity" },
-    computer_system_validation: { ko: "컴퓨터화시스템", en: "Computer system validation" },
-    documentation_records: { ko: "문서화/기록관리", en: "Documentation and records" },
-    aseptic_sterility_assurance: { ko: "무균보증/무균공정", en: "Aseptic processing and sterility assurance" },
-    environmental_monitoring: { ko: "환경모니터링", en: "Environmental monitoring" },
-    cleaning_validation: { ko: "세척밸리데이션", en: "Cleaning validation" },
-    complaint_recall: { ko: "불만/회수", en: "Complaint and recall handling" },
-    deviation_capa: { ko: "일탈/CAPA/조사", en: "Deviation, CAPA, and investigation" },
-    quality_unit_oversight: { ko: "품질부서 관리감독", en: "Quality unit oversight" },
-    qc_lab_controls: { ko: "시험실/품질관리", en: "Laboratory and QC controls" },
-    process_validation: { ko: "공정밸리데이션", en: "Process validation" },
-    equipment_facility: { ko: "설비/시설", en: "Equipment and facility" },
-    material_supplier_control: { ko: "원자재/공급업체 관리", en: "Material and supplier control" },
-    contamination_control: { ko: "오염/교차오염 관리", en: "Contamination control" },
-    validation_qualification: { ko: "밸리데이션/적격성평가", en: "Validation and qualification" },
-    stability_storage: { ko: "안정성/보관", en: "Stability and storage" },
-    labeling_packaging: { ko: "표시/포장", en: "Labeling and packaging" },
-    regulatory_reporting: { ko: "규제보고/변경관리", en: "Regulatory reporting and change control" },
-    training_personnel: { ko: "교육/작업자", en: "Training and personnel" },
-    other_quality_system: { ko: "기타 품질시스템", en: "Other quality system" },
+    data_integrity: { ko: _t("데이터 완전성"), en: "Data integrity" },
+    computer_system_validation: { ko: _t("컴퓨터화시스템"), en: "Computer system validation" },
+    documentation_records: { ko: _t("문서화/기록관리"), en: "Documentation and records" },
+    aseptic_sterility_assurance: { ko: _t("무균보증/무균공정"), en: "Aseptic processing and sterility assurance" },
+    environmental_monitoring: { ko: _t("환경모니터링"), en: "Environmental monitoring" },
+    cleaning_validation: { ko: _t("세척밸리데이션"), en: "Cleaning validation" },
+    complaint_recall: { ko: _t("불만/회수"), en: "Complaint and recall handling" },
+    deviation_capa: { ko: _t("일탈/CAPA/조사"), en: "Deviation, CAPA, and investigation" },
+    quality_unit_oversight: { ko: _t("품질부서 관리감독"), en: "Quality unit oversight" },
+    qc_lab_controls: { ko: _t("시험실/품질관리"), en: "Laboratory and QC controls" },
+    process_validation: { ko: _t("공정밸리데이션"), en: "Process validation" },
+    equipment_facility: { ko: _t("설비/시설"), en: "Equipment and facility" },
+    material_supplier_control: { ko: _t("원자재/공급업체 관리"), en: "Material and supplier control" },
+    contamination_control: { ko: _t("오염/교차오염 관리"), en: "Contamination control" },
+    validation_qualification: { ko: _t("밸리데이션/적격성평가"), en: "Validation and qualification" },
+    stability_storage: { ko: _t("안정성/보관"), en: "Stability and storage" },
+    labeling_packaging: { ko: _t("표시/포장"), en: "Labeling and packaging" },
+    regulatory_reporting: { ko: _t("규제보고/변경관리"), en: "Regulatory reporting and change control" },
+    training_personnel: { ko: _t("교육/작업자"), en: "Training and personnel" },
+    other_quality_system: { ko: _t("기타 품질시스템"), en: "Other quality system" },
   };
 
   // [동기화 규칙 — 056] ISO 3166-1 alpha-2 코드 → 한국어 국가명. 이전(2026-07-31 이전)엔
@@ -218,79 +224,79 @@
   // 둘 다 top_countries/by_country[].code 로 이 코드를 내려준다 — 새 정규화 사전을
   // 만들지 않고 이 사전을 그대로 재사용한다(임무서 지시).
   var COUNTRY_LABELS_KO = {
-    US: "미국",
-    KR: "대한민국",
-    PR: "푸에르토리코",
-    IN: "인도",
-    CN: "중국",
-    JP: "일본",
-    DE: "독일",
-    CA: "캐나다",
-    FR: "프랑스",
-    GB: "영국",
-    IS: "아이슬란드",
-    IT: "이탈리아",
-    MY: "말레이시아",
-    ES: "스페인",
-    BE: "벨기에",
-    HU: "헝가리",
-    TW: "대만",
-    CH: "스위스",
-    CY: "키프로스",
-    AU: "호주",
-    IE: "아일랜드",
-    SE: "스웨덴",
-    JO: "요르단",
-    GR: "그리스",
-    DK: "덴마크",
-    NL: "네덜란드",
-    MX: "멕시코",
-    CZ: "체코",
-    LT: "리투아니아",
-    PL: "폴란드",
-    CL: "칠레",
-    AT: "오스트리아",
-    RO: "루마니아",
-    ZA: "남아프리카공화국",
-    BD: "방글라데시",
-    ID: "인도네시아",
-    LB: "레바논",
-    PT: "포르투갈",
-    SK: "슬로바키아",
-    LK: "스리랑카",
-    TR: "튀르키예",
-    NO: "노르웨이",
-    FI: "핀란드",
-    VN: "베트남",
-    BY: "벨라루스",
-    SI: "슬로베니아",
-    IL: "이스라엘",
+    US: _t("미국"),
+    KR: _t("대한민국"),
+    PR: _t("푸에르토리코"),
+    IN: _t("인도"),
+    CN: _t("중국"),
+    JP: _t("일본"),
+    DE: _t("독일"),
+    CA: _t("캐나다"),
+    FR: _t("프랑스"),
+    GB: _t("영국"),
+    IS: _t("아이슬란드"),
+    IT: _t("이탈리아"),
+    MY: _t("말레이시아"),
+    ES: _t("스페인"),
+    BE: _t("벨기에"),
+    HU: _t("헝가리"),
+    TW: _t("대만"),
+    CH: _t("스위스"),
+    CY: _t("키프로스"),
+    AU: _t("호주"),
+    IE: _t("아일랜드"),
+    SE: _t("스웨덴"),
+    JO: _t("요르단"),
+    GR: _t("그리스"),
+    DK: _t("덴마크"),
+    NL: _t("네덜란드"),
+    MX: _t("멕시코"),
+    CZ: _t("체코"),
+    LT: _t("리투아니아"),
+    PL: _t("폴란드"),
+    CL: _t("칠레"),
+    AT: _t("오스트리아"),
+    RO: _t("루마니아"),
+    ZA: _t("남아프리카공화국"),
+    BD: _t("방글라데시"),
+    ID: _t("인도네시아"),
+    LB: _t("레바논"),
+    PT: _t("포르투갈"),
+    SK: _t("슬로바키아"),
+    LK: _t("스리랑카"),
+    TR: _t("튀르키예"),
+    NO: _t("노르웨이"),
+    FI: _t("핀란드"),
+    VN: _t("베트남"),
+    BY: _t("벨라루스"),
+    SI: _t("슬로베니아"),
+    IL: _t("이스라엘"),
     // [057] FDA Data Dashboard API CountryName 확장분(21개 신규 코드 — SG/BR/TH/MT/
     // AR/HR/HK/CO/NZ/BG/DO/LV/OM/CR/EG/MO/PH/UY/AW/EE/AE. KR/CZ/FI/IL/SI/NO 는
     // 위 47개 안에 이미 있으므로 여기서 다시 추가하지 않는다 — 같은 나라의 DDAPI
     // 표기가 다른 코드로 오추가되지 않도록 057 확장분 중 기존 코드 재사용 6개는
     // 의도적으로 생략했다).
-    SG: "싱가포르",
-    BR: "브라질",
-    TH: "태국",
-    MT: "몰타",
-    AR: "아르헨티나",
-    HR: "크로아티아",
-    HK: "홍콩",
-    CO: "콜롬비아",
-    NZ: "뉴질랜드",
-    BG: "불가리아",
-    DO: "도미니카공화국",
-    LV: "라트비아",
-    OM: "오만",
-    CR: "코스타리카",
-    EG: "이집트",
-    MO: "마카오",
-    PH: "필리핀",
-    UY: "우루과이",
-    AW: "아루바",
-    EE: "에스토니아",
-    AE: "아랍에미리트",
+    SG: _t("싱가포르"),
+    BR: _t("브라질"),
+    TH: _t("태국"),
+    MT: _t("몰타"),
+    AR: _t("아르헨티나"),
+    HR: _t("크로아티아"),
+    HK: _t("홍콩"),
+    CO: _t("콜롬비아"),
+    NZ: _t("뉴질랜드"),
+    BG: _t("불가리아"),
+    DO: _t("도미니카공화국"),
+    LV: _t("라트비아"),
+    OM: _t("오만"),
+    CR: _t("코스타리카"),
+    EG: _t("이집트"),
+    MO: _t("마카오"),
+    PH: _t("필리핀"),
+    UY: _t("우루과이"),
+    AW: _t("아루바"),
+    EE: _t("에스토니아"),
+    AE: _t("아랍에미리트"),
   };
 
   // [코드 우선, 원문 폴백] code(ISO2)가 있으면 그 라벨(없는 코드는 코드 자체를 그대로
@@ -309,47 +315,47 @@
   // 않는다(번역문이 조문 행세를 하면 안 된다).
   // 매핑에 없는 조항은 번호만 표시한다(추측 번역 금지 — countryLabelKo 와 동일 원칙).
   var CFR_SECTION_LABELS = {
-    "210.3": "정의",
-    "211.22": "품질관리부서의 책임·권한",
-    "211.25": "작업자 자격·교육",
-    "211.28": "작업자 위생·복장",
-    "211.42": "건물의 설계·구조(무균 구역 포함)",
-    "211.46": "환기·공기 여과",
-    "211.56": "청소·위생 관리",
-    "211.58": "건물 유지관리",
-    "211.63": "설비의 설계·규격·설치 위치",
-    "211.67": "설비 세척·유지관리",
-    "211.68": "전산화 설비 관리(접근권한·백업)",
-    "211.80": "원자재·용기 일반 관리",
-    "211.84": "원자재·용기 시험 및 합부 판정",
-    "211.87": "승인된 원자재 재시험",
-    "211.94": "용기·마개 적합성",
-    "211.100": "생산·공정관리 절차서와 일탈 처리",
-    "211.101": "원료 칭량·투입",
-    "211.110": "공정 중 시료채취·시험",
-    "211.111": "공정 단계별 시간 제한",
-    "211.113": "미생물 오염 관리(무균공정 밸리데이션)",
-    "211.115": "재작업",
-    "211.125": "표시자재 불출 관리",
-    "211.130": "포장·표시 작업 관리",
-    "211.137": "사용기한 설정",
-    "211.142": "보관 절차",
-    "211.150": "출하·유통 절차",
-    "211.160": "시험실 관리 일반(규격·시험방법의 타당성)",
-    "211.165": "완제품 시험 및 출하 판정",
-    "211.166": "안정성 시험",
-    "211.167": "특수 시험(무균·발열성 등)",
-    "211.170": "보관용 검체",
-    "211.176": "페니실린 교차오염",
-    "211.180": "기록·보고 일반(보관기간·연간 품질평가)",
-    "211.182": "설비 사용·세척 기록",
-    "211.186": "마스터 제조지시서",
-    "211.188": "배치 제조기록서",
-    "211.192": "제조기록 검토와 일탈 조사",
-    "211.194": "시험기록",
-    "211.198": "불만 처리 기록",
-    "211.204": "반품 의약품",
-    "211.208": "회수품 재생",
+    "210.3": _t("정의"),
+    "211.22": _t("품질관리부서의 책임·권한"),
+    "211.25": _t("작업자 자격·교육"),
+    "211.28": _t("작업자 위생·복장"),
+    "211.42": _t("건물의 설계·구조(무균 구역 포함)"),
+    "211.46": _t("환기·공기 여과"),
+    "211.56": _t("청소·위생 관리"),
+    "211.58": _t("건물 유지관리"),
+    "211.63": _t("설비의 설계·규격·설치 위치"),
+    "211.67": _t("설비 세척·유지관리"),
+    "211.68": _t("전산화 설비 관리(접근권한·백업)"),
+    "211.80": _t("원자재·용기 일반 관리"),
+    "211.84": _t("원자재·용기 시험 및 합부 판정"),
+    "211.87": _t("승인된 원자재 재시험"),
+    "211.94": _t("용기·마개 적합성"),
+    "211.100": _t("생산·공정관리 절차서와 일탈 처리"),
+    "211.101": _t("원료 칭량·투입"),
+    "211.110": _t("공정 중 시료채취·시험"),
+    "211.111": _t("공정 단계별 시간 제한"),
+    "211.113": _t("미생물 오염 관리(무균공정 밸리데이션)"),
+    "211.115": _t("재작업"),
+    "211.125": _t("표시자재 불출 관리"),
+    "211.130": _t("포장·표시 작업 관리"),
+    "211.137": _t("사용기한 설정"),
+    "211.142": _t("보관 절차"),
+    "211.150": _t("출하·유통 절차"),
+    "211.160": _t("시험실 관리 일반(규격·시험방법의 타당성)"),
+    "211.165": _t("완제품 시험 및 출하 판정"),
+    "211.166": _t("안정성 시험"),
+    "211.167": _t("특수 시험(무균·발열성 등)"),
+    "211.170": _t("보관용 검체"),
+    "211.176": _t("페니실린 교차오염"),
+    "211.180": _t("기록·보고 일반(보관기간·연간 품질평가)"),
+    "211.182": _t("설비 사용·세척 기록"),
+    "211.186": _t("마스터 제조지시서"),
+    "211.188": _t("배치 제조기록서"),
+    "211.192": _t("제조기록 검토와 일탈 조사"),
+    "211.194": _t("시험기록"),
+    "211.198": _t("불만 처리 기록"),
+    "211.204": _t("반품 의약품"),
+    "211.208": _t("회수품 재생"),
   };
 
   function cfrSectionLabel(section) {
@@ -556,15 +562,15 @@
   function renderStats(totals) {
     if (!statsEl) return;   // [존 재편] 이 면에 스탯 스트립이 없으면 조용히 no-op
     statsEl.innerHTML = "";
-    statsEl.appendChild(buildStat(fmtNum(totals.findings), "총 지적사항"));
+    statsEl.appendChild(buildStat(fmtNum(totals.findings), _t("총 지적사항")));
     if (hasDocumentsCount(totals)) {
-      statsEl.appendChild(buildStat(fmtNum(totals.documents), "분석 문서"));
+      statsEl.appendChild(buildStat(fmtNum(totals.documents), _t("분석 문서")));
     }
-    statsEl.appendChild(buildStat(fmtNum(totals.firms), "업체"));
-    statsEl.appendChild(buildStat(fmtNum(totals.raw_signals), "원문서"));
-    var pub = buildStat(fmtNum(totals.public_findings), "국문 열람 가능");
+    statsEl.appendChild(buildStat(fmtNum(totals.firms), _t("업체")));
+    statsEl.appendChild(buildStat(fmtNum(totals.raw_signals), _t("원문서")));
+    var pub = buildStat(fmtNum(totals.public_findings), _t("국문 열람 가능"));
     if (Number(totals.findings || 0) > 0 && untranslatedGap(totals) > 5) {
-      pub.appendChild(el("span", "tr-stat-note", "나머지는 집계에만 반영(원문 영문)"));
+      pub.appendChild(el("span", "tr-stat-note", _t("나머지는 집계에만 반영(원문 영문)")));
     }
     statsEl.appendChild(pub);
   }
@@ -579,9 +585,9 @@
     if (!coverageNoteEl || !coverageTextEl) return;
     var total = Number(totals.findings || 0).toLocaleString("ko-KR");
     var intro = hasDocumentsCount(totals)
-      ? "숫자는 규제 문서 " + Number(totals.documents).toLocaleString("ko-KR") +
-        "건에서 뽑은 지적사항 " + total + "건 기준입니다."
-      : "숫자는 전체 " + total + "건 기준입니다.";
+      ? _t("숫자는 규제 문서 {docs}건에서 뽑은 지적사항 {total}건 기준입니다.",
+          { docs: Number(totals.documents).toLocaleString("ko-KR"), total: total })
+      : _t("숫자는 전체 {total}건 기준입니다.", { total: total });
     // [완역 자동 전환] 미번역 잔량이 5건 이하면(2026-07-15 백로그 완역 — 잔여는 OCR
     // 완파손 등 번역 불능 원문뿐) 미완료 경고를 완료형으로 스스로 전환한다(완역 시점엔
     // 카테고리 클릭 결과와 집계 수치가 일치하므로 경고 자체가 무의미).
@@ -590,8 +596,8 @@
     // 구간에만 나타난다 — "번역이 밀려 있다"가 아니라 "신규분이 번역 중"으로 읽히도록
     // 지연 사유를 명시한다. 집계 수치와 클릭 결과가 다를 수 있다는 실질 안내는 유지.
     coverageTextEl.textContent = isComplete
-      ? intro + " 모두 국문으로 볼 수 있습니다."
-      : intro + " 신규 수집분은 번역 완료 전까지 목록에서 영어 원문으로만 표시됩니다.";
+      ? intro + _t(" 모두 국문으로 볼 수 있습니다.")
+      : intro + _t(" 신규 수집분은 번역 완료 전까지 목록에서 영어 원문으로만 표시됩니다.");
     coverageNoteEl.hidden = false;
   }
 
@@ -666,11 +672,11 @@
   //   있다. 새 방문자에게는 두 번째 칩이 켜진 채로 열린다.
   // ★기관 사이 순서도 크기순이 아니다 — 독자가 국내 실무자라 식약처가 기관 중 처음이다.
   var AGENCY_VIEWS = [
-    { key: "all", label: "전체", prefixes: [] },
-    { key: "mfds", label: "식약처", prefixes: ["MFDS"] },
+    { key: "all", label: _t("전체"), prefixes: [] },
+    { key: "mfds", label: _t("식약처"), prefixes: ["MFDS"] },
     { key: "fda", label: "FDA", prefixes: ["FDA"] },
-    { key: "hc", label: "캐나다", prefixes: ["Health Canada"] },
-    { key: "eu", label: "EU·영국", prefixes: ["EU GMP NCR", "MHRA"] },
+    { key: "hc", label: _t("캐나다"), prefixes: ["Health Canada"] },
+    { key: "eu", label: _t("EU·영국"), prefixes: ["EU GMP NCR", "MHRA"] },
   ];
 
   // 한 버튼이 여러 레인을 덮는다. 접두 목록이 비면 '전체'다.
@@ -780,13 +786,11 @@
     if (view.key === "all")
       // ★"전체"가 무엇을 합친 것인지 말한다 — 안 적으면 독자가 자기와 관련 있는 기관만
       //   들어 있다고 가정한다(실제로는 캐나다 실사가 이 창의 32%를 차지한다).
-      return "식약처·FDA 에 캐나다 실사와 EU·영국 GMP 비준수까지, 실사에서 나온 지적만 합쳐 센 순위입니다. " +
-        "기관마다 많이 지적하는 영역이 크게 달라(식약처와 FDA 는 상위 항목이 겹치지 않습니다) " +
-        "실사를 준비하신다면 해당 기관을 골라 보세요.";
+      return _t("식약처·FDA 에 캐나다 실사와 EU·영국 GMP 비준수까지, 실사에서 나온 지적만 합쳐 센 순위입니다. 기관마다 많이 지적하는 영역이 크게 달라(식약처와 FDA 는 상위 항목이 겹치지 않습니다) 실사를 준비하신다면 해당 기관을 골라 보세요.");
     // ★기관명에 한국어 조사를 붙이지 않는다 — 조사는 앞말의 받침으로 갈리는데 기관명엔
     //   영문 약어(FDA)가 섞여 규칙이 성립하지 않는다("FDA이(가)"). 명사구로만 잇는다.
-    return "최근 12개월 " + view.label + " 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 " +
-      view.label + " 지적 전체 중 이 영역이 차지하는 비율이에요. 줄을 누르면 실제 지적 문장을 볼 수 있습니다.";
+    return _t("최근 12개월 {label} 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 {label} 지적 전체 중 이 영역이 차지하는 비율이에요. 줄을 누르면 실제 지적 문장을 볼 수 있습니다.",
+      { label: view.label });
   }
 
   // 선택을 화면에 반영한다(버튼 상태 + 순위 + 달라진 점). 클릭·최초 렌더 양쪽에서 호출.
@@ -819,21 +823,20 @@
     if (rankSubEl) {
       var scope = (data.scope || {});
       rankSubEl.textContent = monthLabelKo(scope.cur_from) + " ~ " + monthLabelKo(scope.cur_to) +
-        " · " + view.label + " 지적 " + fmtNum(built.total) + "건";
+        " · " + _t("{label} 지적 {total}건", { label: view.label, total: fmtNum(built.total) });
     }
     if (rankNoteEl) {
       var note = "";
       if (built.excluded > 0) {
         // 규율 2 — 감추지 않고 크기를 밝힌다. 분모에는 남아 있다는 사실도 함께 적는다.
-        note = "이 기간 " + view.label + " 지적의 " + pctText(built.excluded, built.total) +
-          "(" + fmtNum(built.excluded) + "건)는 아직 세부 분류가 되지 않아 순위에서 뺐습니다 — " +
-          "위 비율의 분모에는 그대로 들어 있습니다.";
+        note = _t("이 기간 {label} 지적의 {pct}({cnt}건)는 아직 세부 분류가 되지 않아 순위에서 뺐습니다 — 위 비율의 분모에는 그대로 들어 있습니다.",
+          { label: view.label, pct: pctText(built.excluded, built.total), cnt: fmtNum(built.excluded) });
       }
       // 실사가 아닌 문서를 뺐다면 **뺐다는 사실과 크기와 갈 곳**을 같이 적는다.
       // 조용히 빼면 "식약처 자료가 이것뿐"으로 읽힌다.
       if (built.offCnt > 0) {
-        note += (note ? " " : "") + "회수 공고·행정처분 " + fmtNum(built.offCnt) +
-          "건은 실사 지적이 아니라 이 순위에서 제외했습니다 — 지적사항 검색에서 모두 확인하실 수 있습니다.";
+        note += (note ? " " : "") + _t("회수 공고·행정처분 {cnt}건은 실사 지적이 아니라 이 순위에서 제외했습니다 — 지적사항 검색에서 모두 확인하실 수 있습니다.",
+          { cnt: fmtNum(built.offCnt) });
       }
       rankNoteEl.textContent = note;
       rankNoteEl.hidden = !note;
@@ -862,16 +865,14 @@
 
   function applyAgencyToCfr(view) {
     if (!cfrReadEl) return;
-    var tail = "줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.";
+    var tail = _t("줄을 누르면 그 조항으로 지적된 실제 문장과 조문 원문으로 갑니다.");
     var v = view || agencyView(state.agency);
     cfrReadEl.textContent = !agencyCitesCfr(v)
       // 그 기관을 고른 사람에게 21 CFR 은 다른 나라 규정이다. 말없이 두면 "그 기관 기준"
       // 으로 읽히므로 그 사실을 먼저 말하되, 버리라는 뜻이 아니라는 것도 함께 말한다.
-      ? "아래는 미국 21 CFR 조항 순위입니다 — " + (v.label || "이 기관") +
-        " 지적서에는 이 조항이 인용되지 않습니다. " +
-        "다만 요구사항 자체는 GMP 공통이라 무엇을 확인해야 하는지의 목록으로는 그대로 쓸 수 있어요. " + tail
-      : "규제기관이 지적서에 실제로 적은 조항 순위입니다. 카테고리보다 한 단계 구체적이라 " +
-        "사내 절차서와 바로 맞대어 볼 수 있어요 — " + tail;
+      ? _t("아래는 미국 21 CFR 조항 순위입니다 — {label} 지적서에는 이 조항이 인용되지 않습니다. 다만 요구사항 자체는 GMP 공통이라 무엇을 확인해야 하는지의 목록으로는 그대로 쓸 수 있어요. ",
+          { label: v.label || _t("이 기관") }) + tail
+      : _t("규제기관이 지적서에 실제로 적은 조항 순위입니다. 카테고리보다 한 단계 구체적이라 사내 절차서와 바로 맞대어 볼 수 있어요 — ") + tail;
   }
 
   // 052/053 미적용 라이브용 후퇴 경로 — by_category(합산)로 종전처럼 그린다.
@@ -931,7 +932,7 @@
     bar.style.opacity = String(Math.max(0.4, 1 - idx * (0.6 / 9)));
     track.appendChild(bar);
     a.appendChild(track);
-    a.appendChild(el("span", "tr-cat-count", fmtNum(entry.cnt) + "건"));
+    a.appendChild(el("span", "tr-cat-count", _t("{n}건", { n: fmtNum(entry.cnt) })));
     a.appendChild(el("span", "tr-cat-share", pctText(entry.cnt, total)));
     return a;
   }
@@ -943,7 +944,7 @@
     var total = catTotal(all);              // 구성비 분모는 상위 10이 아니라 전체 카테고리
     var cats = all.slice(0, 10);
     if (!cats.length) {
-      catEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      catEl.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCnt = cats[0].cnt || 1;
@@ -982,7 +983,7 @@
     var allYears = data.years || [];
     var cats = (data.category_totals || []).slice(0, 12);
     if (!cats.length || !allYears.length) {
-      heatmapEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      heatmapEl.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       heatmapBlockEl.hidden = false;
       return;
     }
@@ -1010,7 +1011,7 @@
 
     var caption = document.createElement("caption");
     caption.className = "tr-heatmap-caption";
-    caption.textContent = "연도별 지적 구성비(각 연도를 100%로 본 비율 — 코럴 농도가 그 해에서의 비중을 나타냅니다)";
+    caption.textContent = _t("연도별 지적 구성비(각 연도를 100%로 본 비율 — 코럴 농도가 그 해에서의 비중을 나타냅니다)");
     table.appendChild(caption);
 
     var thead = document.createElement("thead");
@@ -1018,7 +1019,7 @@
     var cornerTh = document.createElement("th");
     cornerTh.setAttribute("scope", "col");
     cornerTh.className = "tr-heatmap-corner";
-    cornerTh.textContent = "카테고리";
+    cornerTh.textContent = _t("카테고리");
     headRow.appendChild(cornerTh);
     years.forEach(function (y) {
       var th = document.createElement("th");
@@ -1026,7 +1027,7 @@
       th.className = "tr-heatmap-yearhead";
       th.appendChild(el("span", "", y));
       // 분모 병기 — %만 있으면 표본 크기를 알 수 없어 얇은 해의 큰 %를 과대해석하게 된다.
-      th.appendChild(el("span", "tr-heatmap-yearbase", fmtNum(yearBase[y] || 0) + "건"));
+      th.appendChild(el("span", "tr-heatmap-yearbase", _t("{n}건", { n: fmtNum(yearBase[y] || 0) })));
       headRow.appendChild(th);
     });
     thead.appendChild(headRow);
@@ -1048,8 +1049,8 @@
         var share = base > 0 ? (cnt / base) * 100 : 0;
         var td = document.createElement("td");
         td.className = "tr-heatmap-cell";
-        td.title = ko + " · " + y + " · " + fmtNum(cnt) + "건(그 해 " + fmtNum(base) +
-          "건 중 " + pctText(cnt, base) + ")";
+        td.title = ko + " · " + y + " · " + _t("{cnt}건(그 해 {base}건 중 {pct})",
+          { cnt: fmtNum(cnt), base: fmtNum(base), pct: pctText(cnt, base) });
         if (cnt > 0) {
           var opacity = shareOpacity(share);
           td.style.backgroundColor = "rgba(194,96,63," + opacity + ")";
@@ -1068,8 +1069,8 @@
 
     if (heatmapNoteEl) {
       heatmapNoteEl.textContent = dropped.length
-        ? ("표에는 지적이 " + MIN_YEAR_BASE + "건 이상 쌓인 연도만 넣었습니다 — " +
-           dropped.join("·") + "년은 자료가 너무 적어 비율이 의미를 갖지 못해 뺐습니다.")
+        ? _t("표에는 지적이 {min}건 이상 쌓인 연도만 넣었습니다 — {years}년은 자료가 너무 적어 비율이 의미를 갖지 못해 뺐습니다.",
+           { min: MIN_YEAR_BASE, years: dropped.join("·") })
         : "";
       heatmapNoteEl.hidden = !dropped.length;
     }
@@ -1085,7 +1086,7 @@
     yearEl.innerHTML = "";
     var years = aggregateYears(byMonth);
     if (!years.length) {
-      yearEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      yearEl.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCnt = years.reduce(function (m, y) { return Math.max(m, y.cnt); }, 0) || 1;
@@ -1119,7 +1120,7 @@
     // openFirm()/syncFirmUrl() 이 그 값을 findings_firm_stats RPC exact-match 파라미터로
     // 쓰므로 디코드하면 어긋난다. 디코드는 표시(라벨·aria-label)에만 적용한다.
     var firmDisplay = decodeFirmDisplay(f.firm_name);
-    makeClickableRow(row, firmDisplay + " 상세 보기: " + f.cnt + "건", function () {
+    makeClickableRow(row, _t("{firm} 상세 보기: {cnt}건", { firm: firmDisplay, cnt: f.cnt }), function () {
       if (state.openFirm === f.firm_name) closeFirm();
       else openFirm(f.firm_name, f.firm_key);
     });
@@ -1148,7 +1149,7 @@
     if (!firmsEl) return;   // [존 재편] 데이터 현황 면에만 있다
     firmsEl.innerHTML = "";
     if (!topFirms.length) {
-      firmsEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      firmsEl.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var rows = topFirms.slice(0, FIRM_ROWS);
@@ -1158,13 +1159,13 @@
 
   function buildFirmDetailCatCol(byCategory) {
     var col = document.createElement("div");
-    col.appendChild(el("h4", "tr-fd-h", "카테고리 분포"));
+    col.appendChild(el("h4", "tr-fd-h", _t("카테고리 분포")));
     var rows = byCategory.map(function (r) {
       var cat = CATEGORY_LABELS[r.category_code];
       return { ko: cat ? cat.ko : r.category_code, cnt: r.cnt || 0 };
     }).sort(function (a, b) { return b.cnt - a.cnt; }).slice(0, 6);
     if (!rows.length) {
-      col.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      col.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return col;
     }
     var maxCnt = rows[0].cnt || 1;
@@ -1189,10 +1190,10 @@
     var col = document.createElement("div");
     // "추이"가 아니라 "공개량" — 이 막대도 실사 시점이 아니라 공개 시점 분포다(페이지 전체
     // 규칙과 같은 이유, 파일 머리 §13차 (1)). 업체 단위라 표본이 더 작으니 더욱 그렇다.
-    col.appendChild(el("h4", "tr-fd-h", "연도별 공개량"));
+    col.appendChild(el("h4", "tr-fd-h", _t("연도별 공개량")));
     var years = aggregateYears(byMonth);
     if (!years.length) {
-      col.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      col.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return col;
     }
     var maxCnt = years.reduce(function (m, y) { return Math.max(m, y.cnt); }, 0) || 1;
@@ -1218,17 +1219,17 @@
   function buildFirmDetailSourceRow(bySource) {
     var wrap = document.createElement("div");
     wrap.className = "tr-fd-src";
-    wrap.appendChild(el("h4", "tr-fd-h", "소스 구성"));
+    wrap.appendChild(el("h4", "tr-fd-h", _t("소스 구성")));
     var sorted = bySource.slice().sort(function (a, b) { return (b.cnt || 0) - (a.cnt || 0); });
     if (!sorted.length) {
-      wrap.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      wrap.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return wrap;
     }
     var list = document.createElement("p");
     list.className = "tr-fd-src-list";
     sorted.forEach(function (s, i) {
       if (i > 0) list.appendChild(document.createTextNode(" · "));
-      list.appendChild(document.createTextNode(s.source + " " + fmtNum(s.cnt) + "건"));
+      list.appendChild(document.createTextNode(s.source + " " + _t("{n}건", { n: fmtNum(s.cnt) })));
     });
     wrap.appendChild(list);
     return wrap;
@@ -1245,7 +1246,7 @@
     var a = document.createElement("a");
     a.className = "tr-fd-profile-link";
     a.href = "../firm/index.html?key=" + encodeURIComponent(firmKey);
-    a.textContent = "업체 프로파일 전체 보기 →";
+    a.textContent = _t("업체 프로파일 전체 보기 →");
     return a;
   }
 
@@ -1260,12 +1261,12 @@
     idbox.appendChild(el("h3", "tr-firm-detail-name", decodeFirmDisplay(data.firm_name || "")));
     var period = (data.first_seen || "?") + " ~ " + (data.last_seen || "?");
     idbox.appendChild(el("p", "tr-firm-detail-meta",
-      period + " · 총 " + fmtNum((data.totals || {}).findings || 0) + "건"));
+      period + " · " + _t("총 {n}건", { n: fmtNum((data.totals || {}).findings || 0) })));
     head.appendChild(idbox);
     var closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.className = "tr-firm-detail-close";
-    closeBtn.setAttribute("aria-label", "업체 상세 닫기");
+    closeBtn.setAttribute("aria-label", _t("업체 상세 닫기"));
     closeBtn.textContent = "×";
     closeBtn.addEventListener("click", closeFirm);
     head.appendChild(closeBtn);
@@ -1281,12 +1282,12 @@
 
   function renderFirmDetailLoading() {
     firmDetailEl.innerHTML = "";
-    firmDetailEl.appendChild(el("p", "tr-empty", "불러오는 중…"));
+    firmDetailEl.appendChild(el("p", "tr-empty", _t("불러오는 중…")));
   }
 
   function renderFirmDetailError() {
     firmDetailEl.innerHTML = "";
-    firmDetailEl.appendChild(el("p", "tr-empty", "업체 통계를 불러오지 못했습니다."));
+    firmDetailEl.appendChild(el("p", "tr-empty", _t("업체 통계를 불러오지 못했습니다.")));
   }
 
   // ?firm= 은 findings_firm_stats(p_firm) 의 exact-match 계약을 따른다(top_firms.firm_name
@@ -1360,7 +1361,7 @@
     sourceEl.innerHTML = "";
     var sorted = (bySource || []).slice().sort(function (a, b) { return (b.cnt || 0) - (a.cnt || 0); });
     if (!sorted.length) {
-      sourceEl.appendChild(el("p", "tr-empty", "표시할 데이터가 없습니다."));
+      sourceEl.appendChild(el("p", "tr-empty", _t("표시할 데이터가 없습니다.")));
       return;
     }
     var maxCnt = sorted[0].cnt || 1;
@@ -1439,13 +1440,13 @@
     // 무한대가 되어 "N배" 형식으로 표기할 수 없다(실데이터 20개 카테고리에선 발생하지
     // 않지만, 방어적으로 배지를 생략한다 — 억지 표기 금지).
     if (isFinite(r.ratio) && r.ratio >= ZONE_BADGE_RATIO && r.foreignCnt >= ZONE_MIN_FOREIGN_SAMPLE) {
-      head.appendChild(el("span", "tr-zone-badge", "해외 " + (Math.round(r.ratio * 10) / 10) + "배"));
+      head.appendChild(el("span", "tr-zone-badge", _t("해외 {ratio}배", { ratio: Math.round(r.ratio * 10) / 10 })));
     }
     row.appendChild(head);
     var bars = document.createElement("div");
     bars.className = "tr-zone-bars";
-    bars.appendChild(buildZoneBarLine("해외", r.foreignShare, maxShare, r.foreignPctText, "tr-zone-bar-foreign"));
-    bars.appendChild(buildZoneBarLine("미국", r.usShare, maxShare, r.usPctText, "tr-zone-bar-us"));
+    bars.appendChild(buildZoneBarLine(_t("해외"), r.foreignShare, maxShare, r.foreignPctText, "tr-zone-bar-foreign"));
+    bars.appendChild(buildZoneBarLine(_t("미국"), r.usShare, maxShare, r.usPctText, "tr-zone-bar-us"));
     row.appendChild(bars);
     return row;
   }
@@ -1490,11 +1491,12 @@
       // [부제 필수] 숫자는 전부 이 응답(totals/scope)에서 뽑는다 — 하드코딩 금지.
       // scope.excluded_unknown_country 는 0 이거나 없을 수 있어 방어적으로만 덧붙인다.
       var scope = d.scope || {};
-      var sub = "FDA 483 기준 · 해외 " + fmtNum(foreign.findings) + "건(" +
-        fmtNum(foreign.documents) + "개 문서·" + fmtNum(foreign.countries) + "개국) vs 미국 내 " +
-        fmtNum(us.findings) + "건(" + fmtNum(us.documents) + "개 문서)";
+      var sub = _t("FDA 483 기준 · 해외 {ff}건({fd}개 문서·{fc}개국) vs 미국 내 {uf}건({ud}개 문서)", {
+        ff: fmtNum(foreign.findings), fd: fmtNum(foreign.documents), fc: fmtNum(foreign.countries),
+        uf: fmtNum(us.findings), ud: fmtNum(us.documents)
+      });
       if (typeof scope.excluded_unknown_country === "number" && scope.excluded_unknown_country > 0) {
-        sub += " · 소재국 미상 " + fmtNum(scope.excluded_unknown_country) + "건 제외";
+        sub += " · " + _t("소재국 미상 {n}건 제외", { n: fmtNum(scope.excluded_unknown_country) });
       }
       zoneSubEl.textContent = sub;
     }
@@ -1512,7 +1514,7 @@
       // 주면 독자가 "해외 = 한국"으로 오독한다. top_countries 상위 5개만 짧게 표기.
       var top = (d.top_countries || []).slice(0, 5);
       if (top.length) {
-        zoneCountriesEl.appendChild(document.createTextNode("해외 실사 구성: "));
+        zoneCountriesEl.appendChild(document.createTextNode(_t("해외 실사 구성: ")));
         top.forEach(function (c, i) {
           if (i > 0) zoneCountriesEl.appendChild(document.createTextNode(" · "));
           zoneCountriesEl.appendChild(
@@ -1548,7 +1550,7 @@
   // ★데이터가 아직 없을 때(058 미적용 라이브·0건)는 섹션을 그리지 않는다(빈 껍데기
   // 금지) — totals.inspections 가 0 이하면 조용히 return 하고 정적 셸의 기본값인
   // hidden 상태를 그대로 둔다.
-  var FDA_GRADE_LABELS = { nai: "NAI(적합)", vai: "VAI(경미)", oai: "OAI(중대)" };
+  var FDA_GRADE_LABELS = { nai: _t("NAI(적합)"), vai: _t("VAI(경미)"), oai: _t("OAI(중대)") };
 
   function buildFdaYearRow(y) {
     var nai = y.nai || 0, vai = y.vai || 0, oai = y.oai || 0;
@@ -1563,12 +1565,12 @@
       var cnt = k === "nai" ? nai : k === "vai" ? vai : oai;
       var share = total > 0 ? cnt / total : 0;
       seg.style.flex = "0 0 " + (share * 100) + "%";
-      seg.title = "FY" + y.fiscal_year + " " + FDA_GRADE_LABELS[k] + " " + fmtNum(cnt) + "건";
+      seg.title = "FY" + y.fiscal_year + " " + FDA_GRADE_LABELS[k] + " " + _t("{n}건", { n: fmtNum(cnt) });
       track.appendChild(seg);
     });
     row.appendChild(track);
     row.appendChild(el("span", "tr-fda-y-oai-pct", "OAI " + pctText(oai, total)));
-    row.appendChild(el("span", "tr-fda-y-total", fmtNum(total) + "건"));
+    row.appendChild(el("span", "tr-fda-y-total", _t("{n}건", { n: fmtNum(total) })));
     return row;
   }
 
@@ -1579,7 +1581,7 @@
 
   function buildFdaCountryRow(c, isKorea) {
     var row = el("div", "tr-fda-c-row" + (isKorea ? " is-kr" : ""));
-    var label = c.code ? countryLabelKo(c.code, c.country) : "국가명 미확인";
+    var label = c.code ? countryLabelKo(c.code, c.country) : _t("국가명 미확인");
     row.appendChild(el("span", "tr-fda-c-label", label));
     var track = document.createElement("div");
     track.className = "tr-fda-c-track";
@@ -1589,8 +1591,8 @@
     bar.style.transform = "scaleX(" + Math.max(0.02, oaiShare) + ")";
     track.appendChild(bar);
     row.appendChild(track);
-    row.appendChild(el("span", "tr-fda-c-count", fmtNum(c.total) + "건"));
-    row.appendChild(el("span", "tr-fda-c-oai", "OAI " + fmtNum(c.oai) + "건(" + pctText(c.oai, c.total) + ")"));
+    row.appendChild(el("span", "tr-fda-c-count", _t("{n}건", { n: fmtNum(c.total) })));
+    row.appendChild(el("span", "tr-fda-c-oai", "OAI " + _t("{n}건({pct})", { n: fmtNum(c.oai), pct: pctText(c.oai, c.total) })));
     return row;
   }
 
@@ -1606,13 +1608,13 @@
 
     var scope = d.scope || {};
     if (fdaScopeEl) {
-      var scopeText = (scope.project_area || "GMP 실사") + " 한정";
+      var scopeText = _t("{area} 한정", { area: scope.project_area || _t("GMP 실사") });
       var excluded = scope.excluded_project_areas || [];
-      if (excluded.length) scopeText += " · " + excluded.join("·") + " 등 다른 모집단 제외";
+      if (excluded.length) scopeText += " · " + _t("{list} 등 다른 모집단 제외", { list: excluded.join("·") });
       if (typeof scope.fiscal_year_min === "number" && typeof scope.fiscal_year_max === "number") {
         scopeText += " · FY" + scope.fiscal_year_min + "~FY" + scope.fiscal_year_max;
       }
-      scopeText += " · 출처: " + (scope.source || "FDA Data Dashboard API");
+      scopeText += " · " + _t("출처: {src}", { src: scope.source || "FDA Data Dashboard API" });
       fdaScopeEl.textContent = scopeText;
     }
 
@@ -1629,19 +1631,19 @@
     if (fdaAsOfEl) {
       var asOf = [];
       if (typeof scope.last_ingested_date_kst === "string" && scope.last_ingested_date_kst) {
-        asOf.push("새 실사를 마지막으로 받아온 날 " + scope.last_ingested_date_kst);
+        asOf.push(_t("새 실사를 마지막으로 받아온 날 {d}", { d: scope.last_ingested_date_kst }));
       }
       if (typeof scope.latest_inspection_end_date === "string" && scope.latest_inspection_end_date) {
-        asOf.push("담긴 실사 중 가장 최근 종료일 " + scope.latest_inspection_end_date);
+        asOf.push(_t("담긴 실사 중 가장 최근 종료일 {d}", { d: scope.latest_inspection_end_date }));
       }
-      fdaAsOfEl.textContent = asOf.length ? "숫자 기준일 — " + asOf.join(" · ") : "";
+      fdaAsOfEl.textContent = asOf.length ? _t("숫자 기준일 — {list}", { list: asOf.join(" · ") }) : "";
     }
 
     fdaStatsEl.innerHTML = "";
-    fdaStatsEl.appendChild(buildStat(fmtNum(total), "FDA 의약품 GMP 실사"));
-    fdaStatsEl.appendChild(buildStat(fmtNum(totals.oai) + "건(" + pctText(totals.oai, total) + ")", "중대 지적 OAI"));
-    fdaStatsEl.appendChild(buildStat(fmtNum(totals.vai) + "건(" + pctText(totals.vai, total) + ")", "경미 지적 VAI"));
-    fdaStatsEl.appendChild(buildStat(fmtNum(totals.nai) + "건(" + pctText(totals.nai, total) + ")", "적합 NAI"));
+    fdaStatsEl.appendChild(buildStat(fmtNum(total), _t("FDA 의약품 GMP 실사")));
+    fdaStatsEl.appendChild(buildStat(_t("{n}건({pct})", { n: fmtNum(totals.oai), pct: pctText(totals.oai, total) }), _t("중대 지적 OAI")));
+    fdaStatsEl.appendChild(buildStat(_t("{n}건({pct})", { n: fmtNum(totals.vai), pct: pctText(totals.vai, total) }), _t("경미 지적 VAI")));
+    fdaStatsEl.appendChild(buildStat(_t("{n}건({pct})", { n: fmtNum(totals.nai), pct: pctText(totals.nai, total) }), _t("적합 NAI")));
 
     fdaYearEl.innerHTML = "";
     (d.by_year || []).forEach(function (y) { fdaYearEl.appendChild(buildFdaYearRow(y)); });
@@ -1661,11 +1663,12 @@
 
     if (fdaNoteEl) {
       var shownTotal = top.reduce(function (s, c) { return s + (c.total || 0); }, 0);
-      var note = "국가 " + countries.length + "종 중 건수 상위 " + top.length +
-        "곳(전체의 " + pctText(shownTotal, total) + ")만 표시" +
-        (korea && !koreaInTop ? " · 한국은 목록 밖이라 따로 덧붙임" : "") + ".";
+      var note = _t("국가 {total}종 중 건수 상위 {top}곳(전체의 {pct})만 표시{extra}.", {
+        total: countries.length, top: top.length, pct: pctText(shownTotal, total),
+        extra: korea && !koreaInTop ? _t(" · 한국은 목록 밖이라 따로 덧붙임") : "",
+      });
       if (typeof scope.unmapped_country_count === "number" && scope.unmapped_country_count > 0) {
-        note += " 국가명 미확인 " + fmtNum(scope.unmapped_country_count) + "건 포함.";
+        note += _t(" 국가명 미확인 {n}건 포함.", { n: fmtNum(scope.unmapped_country_count) });
       }
       fdaNoteEl.textContent = note;
     }
@@ -1708,10 +1711,10 @@
     track.appendChild(bar);
     el_.appendChild(track);
     el_.appendChild(el("span", "tr-fq-pct", pctText(oai, total)));
-    el_.appendChild(el("span", "tr-fq-total", fmtNum(total) + "건"));
-    el_.appendChild(el("span", "tr-fq-tag", partial ? "채워지는 중" : ""));
-    el_.title = row.quarter + " · 실사 " + fmtNum(total) + "건 · 중대 지적 " +
-      fmtNum(oai) + "건 · 지적서 공개 " + fmtNum(row.citations_posted) + "건";
+    el_.appendChild(el("span", "tr-fq-total", _t("{n}건", { n: fmtNum(total) })));
+    el_.appendChild(el("span", "tr-fq-tag", partial ? _t("채워지는 중") : ""));
+    el_.title = row.quarter + " · " + _t("실사 {total}건 · 중대 지적 {oai}건 · 지적서 공개 {posted}건",
+      { total: fmtNum(total), oai: fmtNum(oai), posted: fmtNum(row.citations_posted) });
     return el_;
   }
 
@@ -1729,17 +1732,17 @@
       var solid = shown.filter(function (r) {
         return !fqIsPartial(r, frontier) && (r.total || 0) > 0;
       });
-      var note = "막대는 그 분기 실사 중 중대 지적(OAI) 비율입니다(가로 축 최대 " +
-        Math.round(FQ_SCALE_MAX * 100) + "%).";
+      var note = _t("막대는 그 분기 실사 중 중대 지적(OAI) 비율입니다(가로 축 최대 {pct}%).",
+        { pct: Math.round(FQ_SCALE_MAX * 100) });
       if (solid.length >= 2) {
         var pcts = solid.map(function (r) { return (r.oai || 0) / r.total; });
         var lo = Math.min.apply(null, pcts), hi = Math.max.apply(null, pcts);
-        note += " 표시된 분기 중 자료가 다 찬 " + solid.length + "개 분기는 " +
-          (lo * 100).toFixed(1) + "%~" + (hi * 100).toFixed(1) + "% 사이입니다.";
+        note += _t(" 표시된 분기 중 자료가 다 찬 {n}개 분기는 {lo}%~{hi}% 사이입니다.",
+          { n: solid.length, lo: (lo * 100).toFixed(1), hi: (hi * 100).toFixed(1) });
       }
       if (frontier) {
-        note += " ‘채워지는 중’으로 표시한 분기는 FDA 의 등급 확정·공개가 아직 끝나지 " +
-          "않아 낮게 보입니다 — 담긴 실사 중 가장 최근 종료일은 " + frontier + "입니다.";
+        note += _t(" ‘채워지는 중’으로 표시한 분기는 FDA 의 등급 확정·공개가 아직 끝나지 않아 낮게 보입니다 — 담긴 실사 중 가장 최근 종료일은 {frontier}입니다.",
+          { frontier: frontier });
       }
       fqNoteEl.textContent = note;
     }
@@ -1753,18 +1756,18 @@
     var nai = y.nai || 0, vai = y.vai || 0, oai = y.oai || 0;
     var total = nai + vai + oai;
     var row = el("div", "tr-fda-y-row");
-    row.appendChild(el("span", "tr-fda-y-label", String(y.year) + "년"));
+    row.appendChild(el("span", "tr-fda-y-label", _t("{y}년", { y: String(y.year) })));
     var track = el("div", "tr-fda-y-track");
     ["nai", "vai", "oai"].forEach(function (k) {
       var seg = el("div", "tr-fda-y-seg " + k);
       var cnt = k === "nai" ? nai : k === "vai" ? vai : oai;
       seg.style.flex = "0 0 " + (total > 0 ? (cnt / total) * 100 : 0) + "%";
-      seg.title = y.year + "년 " + FDA_GRADE_LABELS[k] + " " + fmtNum(cnt) + "건";
+      seg.title = _t("{y}년 {grade} {n}건", { y: y.year, grade: FDA_GRADE_LABELS[k], n: fmtNum(cnt) });
       track.appendChild(seg);
     });
     row.appendChild(track);
-    row.appendChild(el("span", "tr-fda-y-oai-pct", "OAI " + fmtNum(oai) + "건"));
-    row.appendChild(el("span", "tr-fda-y-total", fmtNum(total) + "건"));
+    row.appendChild(el("span", "tr-fda-y-oai-pct", _t("OAI {n}건", { n: fmtNum(oai) })));
+    row.appendChild(el("span", "tr-fda-y-total", _t("{n}건", { n: fmtNum(total) })));
     return row;
   }
 
@@ -1776,9 +1779,10 @@
     var years = kr.by_year || [];
     if (!(Number(t.inspections) > 0) || !years.length) return;
     if (krSubEl) {
-      krSubEl.textContent = "누적 실사 " + fmtNum(t.inspections) + "건 · 사업장 " +
-        fmtNum(t.firms) + "곳 · 중대 지적 " + fmtNum(t.oai) + "건(" +
-        pctText(t.oai, t.inspections) + ")";
+      krSubEl.textContent = _t("누적 실사 {insp}건 · 사업장 {firms}곳 · 중대 지적 {oai}건({pct})", {
+        insp: fmtNum(t.inspections), firms: fmtNum(t.firms), oai: fmtNum(t.oai),
+        pct: pctText(t.oai, t.inspections),
+      });
     }
     krYearEl.innerHTML = "";
     years.forEach(function (y) { krYearEl.appendChild(buildKrYearRow(y)); });
@@ -1786,23 +1790,24 @@
       // ★표본이 작다는 사실을 화면이 먼저 말한다 — 연 2~22건에서 비율을 앞세우면
       //   한두 건 차이가 큰 변화로 읽힌다(히트맵의 표본 하한 관례와 같은 취지).
       var maxYear = years.reduce(function (m, y) { return Math.max(m, y.total || 0); }, 0);
-      var note = "연도별 실사 수가 " + fmtNum(maxYear) + "건 이하라 비율보다 건수로 보셔야 합니다 — " +
-        "한두 건 차이가 비율로는 크게 흔들립니다.";
+      var note = _t("연도별 실사 수가 {n}건 이하라 비율보다 건수로 보셔야 합니다 — 한두 건 차이가 비율로는 크게 흔들립니다.",
+        { n: fmtNum(maxYear) });
       // 같은 해에 두 번 실사받은 사업장이 있었는지는 세어서 그대로 말한다(해석 없이).
       var repeated = years.filter(function (y) { return (y.total || 0) > (y.firms || 0); });
       note += repeated.length
-        ? " 같은 해에 두 번 이상 실사받은 사업장이 있는 해: " +
-          repeated.map(function (y) { return y.year + "년"; }).join(" · ") + "."
-        : " 표시된 모든 해에서 실사 수와 사업장 수가 같습니다 — 같은 해에 두 번 실사받은 사업장은 없었습니다.";
+        ? _t(" 같은 해에 두 번 이상 실사받은 사업장이 있는 해: {list}.", {
+            list: repeated.map(function (y) { return _t("{y}년", { y: y.year }); }).join(" · "),
+          })
+        : _t(" 표시된 모든 해에서 실사 수와 사업장 수가 같습니다 — 같은 해에 두 번 실사받은 사업장은 없었습니다.");
       // ★위 부제의 "누적 실사 N건 · 사업장 M곳"에서 N > M 이면 **해를 건너뛴 재실사**가
       //   있었다는 뜻이다. 이 다리를 놓지 않으면 바로 위 문장("같은 해에 두 번은 없었다")과
       //   부제가 서로 어긋나 보인다 — 두 수치가 다른 것을 세고 있다는 사실을 화면이
       //   말해야 한다(계기판 합산 오진을 문장 층에서 되풀이하지 않는다).
       var revisited = Number(t.inspections || 0) - Number(t.firms || 0);
       if (revisited > 0) {
-        note += " 다만 누적으로는 실사 " + fmtNum(t.inspections) + "건이 사업장 " +
-          fmtNum(t.firms) + "곳에서 나왔습니다 — " + fmtNum(revisited) +
-          "건은 앞서 실사받았던 곳을 다른 해에 다시 실사한 것입니다.";
+        note += _t(" 다만 누적으로는 실사 {insp}건이 사업장 {firms}곳에서 나왔습니다 — {rev}건은 앞서 실사받았던 곳을 다른 해에 다시 실사한 것입니다.", {
+          insp: fmtNum(t.inspections), firms: fmtNum(t.firms), rev: fmtNum(revisited),
+        });
       }
       krNoteEl.textContent = note;
     }
@@ -1833,7 +1838,7 @@
   function monthLabelKo(ym) {
     var s = String(ym || "");
     if (s.length < 7) return s;
-    return s.slice(0, 4) + "년 " + String(Number(s.slice(5, 7))) + "월";
+    return _t("{y}년 {m}월", { y: s.slice(0, 4), m: Number(s.slice(5, 7)) });
   }
 
   function shareOf(part, whole) {
@@ -1849,7 +1854,7 @@
 
   function buildRecentCatRow(entry, idx, maxCnt, curFindings) {
     var row = el("div", "tr-rc-row" + (state.openCat === entry.code ? " on" : ""));
-    makeClickableRow(row, entry.ko + " 실제 지적 사례 보기", function () {
+    makeClickableRow(row, entry.ko + _t(" 실제 지적 사례 보기"), function () {
       if (state.openCat === entry.code) closeRecentCat();
       else openRecentCat(entry.code, entry.ko);
     });
@@ -1861,10 +1866,10 @@
     track.appendChild(bar);
     row.appendChild(track);
     row.appendChild(el("span", "tr-rc-docs",
-      fmtNum(entry.cnt) + "건 · " + pctText(entry.cnt, curFindings)));
+      _t("{n}건 · {pct}", { n: fmtNum(entry.cnt), pct: pctText(entry.cnt, curFindings) })));
     row.appendChild(el("span", "tr-rc-caret", state.openCat === entry.code ? "▲" : "▼"));
-    row.title = entry.ko + " · 최근 12개월 지적 " + fmtNum(entry.cnt) + "건 · 문서 " +
-      fmtNum(entry.docs) + "건";
+    row.title = entry.ko + " · " + _t("최근 12개월 지적 {n}건 · 문서 {d}건",
+      { n: fmtNum(entry.cnt), d: fmtNum(entry.docs) });
     return row;
   }
 
@@ -1878,7 +1883,7 @@
     rows.forEach(function (entry, i) {
       recentCatsEl.appendChild(buildRecentCatRow(entry, i, maxCnt, curFindings));
       if (state.openCat === entry.code) {
-        recentCatsEl.appendChild(state.exampleNode || el("p", "tr-empty", "불러오는 중…"));
+        recentCatsEl.appendChild(state.exampleNode || el("p", "tr-empty", _t("불러오는 중…")));
       }
     });
   }
@@ -1907,11 +1912,11 @@
     var row = el("div", "tr-mv-row " + (isUp ? "tr-mv-up" : "tr-mv-down"));
     var label = el("span", "tr-mv-label", r.ko);
     label.appendChild(el("span", "tr-mv-cnt",
-      "지적 " + fmtNum(r.prevCnt) + " → " + fmtNum(r.curCnt) + "건"));
+      _t("지적 {prev} → {cur}건", { prev: fmtNum(r.prevCnt), cur: fmtNum(r.curCnt) })));
     row.appendChild(label);
     row.appendChild(el("span", "tr-mv-shift", r.prevPct + " → " + r.curPct));
     row.appendChild(el("span", "tr-mv-badge", ppText(r.deltaPp)));
-    row.title = r.ko + " · 문서 " + fmtNum(r.prevDocs) + "건 → " + fmtNum(r.curDocs) + "건";
+    row.title = r.ko + " · " + _t("문서 {prev}건 → {cur}건", { prev: fmtNum(r.prevDocs), cur: fmtNum(r.curDocs) });
     return row;
   }
 
@@ -1919,7 +1924,7 @@
     if (!listEl) return;
     listEl.innerHTML = "";
     if (!rows.length) {
-      listEl.appendChild(el("p", "tr-empty", "기준(" + MOVER_MIN_PP + "%p 이상)을 넘는 변화가 없습니다."));
+      listEl.appendChild(el("p", "tr-empty", _t("기준({n}%p 이상)을 넘는 변화가 없습니다.", { n: MOVER_MIN_PP })));
       return;
     }
     rows.forEach(function (r) { listEl.appendChild(buildMoverRow(r, isUp)); });
@@ -1932,9 +1937,9 @@
   // 합치면 2.45(점유율 배율 1.57 = "정상")로 보인다.
   // ★화면에는 내부 키가 아니라 사람이 읽는 이름을 쓴다.
   var LANE_LABELS = {
-    "MFDS/admin-action": "MFDS 행정처분",
-    "MFDS/gmp-inspection": "MFDS GMP 실사",
-    "MFDS/recall-quality": "MFDS 회수",
+    "MFDS/admin-action": _t("MFDS 행정처분"),
+    "MFDS/gmp-inspection": _t("MFDS GMP 실사"),
+    "MFDS/recall-quality": _t("MFDS 회수"),
   };
   function laneLabel(lane) { return LANE_LABELS[lane] || lane; }
 
@@ -2058,20 +2063,24 @@
       .sort(function (a, b) { return b.cur - a.cur; });
     var text = "";
     if (parts.length) {
-      text = "두 기간의 소스 구성: " +
-        parts.map(function (s) { return s.source + " " + s.prevPct + " → " + s.curPct; }).join(" · ") +
-        ".";
+      text = _t("두 기간의 소스 구성: {list}.", {
+        list: parts.map(function (s) { return s.source + " " + s.prevPct + " → " + s.curPct; }).join(" · "),
+      });
     }
     // ★뺀 소스는 이름·건수·이유를 그대로 적는다 — 조용히 빼면 위 표가 전량 비교처럼 보인다.
     var out = (droppedSources || []);
     if (out.length) {
-      text += (text ? " " : "") + "비교에서 뺀 소스: " + out.map(function (s) {
-        return s.source + "(직전 " + fmtNum(s.prevCnt) + "건 → 최근 " + fmtNum(s.curCnt) + "건, " +
-          (s.reason === "thin" ? "한쪽 기간이 " + MOVER_SOURCE_MIN + "건 미만"
-                               : "두 기간 자료량 차이가 큼") + ")";
-      }).join(" · ") + ". 두 기간에 걸쳐 견줄 수 있는 소스만 남겨 위 증감을 계산했습니다.";
+      text += (text ? " " : "") + _t("비교에서 뺀 소스: {list}. 두 기간에 걸쳐 견줄 수 있는 소스만 남겨 위 증감을 계산했습니다.", {
+        list: out.map(function (s) {
+          return _t("{source}(직전 {prev}건 → 최근 {cur}건, {reason})", {
+            source: s.source, prev: fmtNum(s.prevCnt), cur: fmtNum(s.curCnt),
+            reason: s.reason === "thin" ? _t("한쪽 기간이 {n}건 미만", { n: MOVER_SOURCE_MIN })
+                                         : _t("두 기간 자료량 차이가 큼"),
+          });
+        }).join(" · "),
+      });
     } else if (text) {
-      text += " 소스 구성이 달라지면 위 증감도 함께 움직입니다.";
+      text += _t(" 소스 구성이 달라지면 위 증감도 함께 움직입니다.");
     }
     moveSourceEl.textContent = text;
   }
@@ -2141,15 +2150,15 @@
     renderMoverSourceLine(d.by_source, curFindings, prevFindings, mix.dropped);
     if (moveNoteEl) {
       // ★"비중이 줄었다 ≠ 건수가 줄었다" — 이 한 줄이 없으면 표가 오독된다.
-      var note = "여기서 재는 것은 전체에서 차지하는 비중입니다. 건수가 늘어도 다른 영역이 " +
-        "더 늘면 비중은 줄어듭니다 — 각 줄의 건수를 함께 보세요. 비교 기준: 최근 12개월 지적 " +
-        fmtNum(mix.curFindings) + "건 vs 직전 12개월 " + fmtNum(mix.prevFindings) + "건" +
-        (mix.applied ? "(견줄 수 있는 소스만)" : "") + ".";
+      var note = _t("여기서 재는 것은 전체에서 차지하는 비중입니다. 건수가 늘어도 다른 영역이 더 늘면 비중은 줄어듭니다 — 각 줄의 건수를 함께 보세요. 비교 기준: 최근 12개월 지적 {cur}건 vs 직전 12개월 {prev}건{extra}.", {
+        cur: fmtNum(mix.curFindings), prev: fmtNum(mix.prevFindings),
+        extra: mix.applied ? _t("(견줄 수 있는 소스만)") : "",
+      });
       if (dropped > 0) {
-        note += " 두 기간 합이 " + MOVER_MIN_SAMPLE + "건 미만인 " + dropped +
-          "개 영역은 비율이 흔들려 뺐습니다.";
+        note += _t(" 두 기간 합이 {min}건 미만인 {n}개 영역은 비율이 흔들려 뺐습니다.",
+          { min: MOVER_MIN_SAMPLE, n: dropped });
       }
-      note += " 날짜는 자료가 공개된 날 기준이라 실사 시점과는 다릅니다.";
+      note += _t(" 날짜는 자료가 공개된 날 기준이라 실사 시점과는 다릅니다.");
       moveNoteEl.textContent = note;
     }
     // [존 재편] 이 섹션은 기본 접힘이다. 열기 전에 안에 뭐가 있는지 알 수 있어야
@@ -2157,8 +2166,8 @@
     // 이 값은 "커진 1 · 줄어든 0"이고, 그 사실 자체가 이 섹션을 접어 둔 근거다).
     if (moveSummaryEl) {
       moveSummaryEl.textContent = up.length || down.length
-        ? "비중이 커진 영역 " + up.length + "개 · 줄어든 영역 " + down.length + "개"
-        : "기준(1%p 이상)을 넘는 변화 없음";
+        ? _t("비중이 커진 영역 {up}개 · 줄어든 영역 {down}개", { up: up.length, down: down.length })
+        : _t("기준(1%p 이상)을 넘는 변화 없음");
     }
     moveBlockEl.hidden = false;
   }
@@ -2196,7 +2205,7 @@
     });
     if (!picked.length) {
       panel.appendChild(el("p", "tr-empty",
-        "이 영역은 아직 국문으로 열람할 수 있는 지적이 없습니다."));
+        _t("이 영역은 아직 국문으로 열람할 수 있는 지적이 없습니다.")));
       return panel;
     }
     picked.forEach(function (f) { panel.appendChild(buildExampleItem(f)); });
@@ -2209,7 +2218,7 @@
     var a = document.createElement("a");
     a.className = "tr-ex-more";
     a.href = findingsHref("cat", code);
-    a.textContent = "전체 기간 " + ko + " 지적 " + fmtNum(total) + "건 보기 →";
+    a.textContent = _t("전체 기간 {ko} 지적 {n}건 보기 →", { ko: ko, n: fmtNum(total) });
     foot.appendChild(a);
     panel.appendChild(foot);
     return panel;
@@ -2217,7 +2226,7 @@
 
   function openRecentCat(code, ko) {
     state.openCat = code;
-    state.exampleNode = el("p", "tr-empty", "불러오는 중…");
+    state.exampleNode = el("p", "tr-empty", _t("불러오는 중…"));
     renderRecentCats();
     fetchCategoryExamples(code).then(function (payload) {
       if (state.openCat !== code) return;          // 그 사이 다른 행을 열었으면 버린다
@@ -2225,7 +2234,7 @@
       renderRecentCats();
     }).catch(function () {
       if (state.openCat !== code) return;
-      state.exampleNode = el("p", "tr-empty", "사례를 불러오지 못했습니다.");
+      state.exampleNode = el("p", "tr-empty", _t("사례를 불러오지 못했습니다."));
       renderRecentCats();
     });
   }
@@ -2246,7 +2255,7 @@
   function buildCfrRow(item, idx, maxDocs) {
     var row = el("div", "tr-cf-row" + (state.openCfr === item.section ? " on" : ""));
     var name = cfrSectionLabel(item.section);
-    makeClickableRow(row, "21 CFR " + item.section + " 지적 사례와 조문 보기", function () {
+    makeClickableRow(row, _t("21 CFR {sec} 지적 사례와 조문 보기", { sec: item.section }), function () {
       if (state.openCfr === item.section) closeCfr();
       else openCfr(item.section);
     });
@@ -2258,9 +2267,9 @@
     bar.style.transform = "scaleX(" + Math.max(0.02, maxDocs > 0 ? item.docs / maxDocs : 0) + ")";
     track.appendChild(bar);
     row.appendChild(track);
-    var docs = el("span", "tr-cf-docs", "문서 " + fmtNum(item.docs) + "건");
+    var docs = el("span", "tr-cf-docs", _t("문서 {n}건", { n: fmtNum(item.docs) }));
     // 누적만 보면 "예전에 많이 걸렸던 조항"과 "지금도 걸리는 조항"이 구분되지 않는다.
-    docs.appendChild(el("span", "tr-cf-recent", "최근 12개월 " + fmtNum(item.recent_docs) + "건"));
+    docs.appendChild(el("span", "tr-cf-recent", _t("최근 12개월 {n}건", { n: fmtNum(item.recent_docs) })));
     row.appendChild(docs);
     row.appendChild(el("span", "tr-cf-caret", state.openCfr === item.section ? "▲" : "▼"));
     return row;
@@ -2275,7 +2284,7 @@
     rows.forEach(function (item, i) {
       cfrEl.appendChild(buildCfrRow(item, i, maxDocs));
       if (state.openCfr === item.section) {
-        cfrEl.appendChild(state.cfrExampleNode || el("p", "tr-empty", "불러오는 중…"));
+        cfrEl.appendChild(state.cfrExampleNode || el("p", "tr-empty", _t("불러오는 중…")));
       }
     });
   }
@@ -2290,12 +2299,12 @@
     a.href = ecfrHref(item.section);
     a.target = "_blank";
     a.rel = "noopener";
-    a.textContent = "21 CFR " + item.section + " 조문 원문 보기(eCFR) →";
+    a.textContent = _t("21 CFR {sec} 조문 원문 보기(eCFR) →", { sec: item.section });
     wrap.appendChild(a);
     var variants = item.variants || [];
     if (variants.length) {
       wrap.appendChild(el("span", "tr-cf-variants",
-        "실제 인용된 항: " + variants.join(" · ")));
+        _t("실제 인용된 항: {list}", { list: variants.join(" · ") })));
     }
     return wrap;
   }
@@ -2318,7 +2327,7 @@
     });
     if (!picked.length) {
       panel.appendChild(el("p", "tr-empty",
-        "이 조항으로 지적된 문장 중 국문으로 열람할 수 있는 것이 아직 없습니다."));
+        _t("이 조항으로 지적된 문장 중 국문으로 열람할 수 있는 것이 아직 없습니다.")));
       return panel;
     }
     picked.forEach(function (f) { panel.appendChild(buildExampleItem(f)); });
@@ -2326,7 +2335,7 @@
     var more = document.createElement("a");
     more.className = "tr-ex-more";
     more.href = findingsHref("q", item.section);
-    more.textContent = "이 조항이 인용된 지적 검색 결과 보기 →";
+    more.textContent = _t("이 조항이 인용된 지적 검색 결과 보기 →");
     foot.appendChild(more);
     panel.appendChild(foot);
     return panel;
@@ -2334,7 +2343,7 @@
 
   function openCfr(section) {
     state.openCfr = section;
-    state.cfrExampleNode = el("p", "tr-empty", "불러오는 중…");
+    state.cfrExampleNode = el("p", "tr-empty", _t("불러오는 중…"));
     renderCfrRows();
     var item = null;
     (state.cfrItems || []).forEach(function (r) { if (r.section === section) item = r; });
@@ -2374,22 +2383,23 @@
 
     if (cfrSubEl) {
       var sources = (scope.sources || []).map(function (s) {
-        return s.source + " " + fmtNum(s.docs) + "건";
+        return s.source + " " + _t("{n}건", { n: fmtNum(s.docs) });
       }).join(" · ");
-      cfrSubEl.textContent = "조항이 명시된 문서 " + fmtNum(scope.docs_with_clause) +
-        "건 기준" + (sources ? " (" + sources + ")" : "") + " · 막대는 그 조항을 인용한 문서 수입니다.";
+      cfrSubEl.textContent = _t("조항이 명시된 문서 {n}건 기준{sources} · 막대는 그 조항을 인용한 문서 수입니다.", {
+        n: fmtNum(scope.docs_with_clause), sources: sources ? " (" + sources + ")" : "",
+      });
     }
     if (cfrNoteEl) {
       // 무엇을 세지 않았는지 밝히지 않으면 이 순위는 검증 불가능한 주장이 된다.
-      var note = "FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없습니다 — " +
-        "이 순위는 사실상 Warning Letter 기준입니다. " +
-        (scope.part_filter ? scope.part_filter + " 조항만 셌고(표시·OTC 모노그래프·임상 조항 제외), " : "");
+      var note = _t("FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없습니다 — 이 순위는 사실상 Warning Letter 기준입니다. {filter}", {
+        filter: scope.part_filter ? _t("{part} 조항만 셌고(표시·OTC 모노그래프·임상 조항 제외), ", { part: scope.part_filter }) : "",
+      });
       var ex = scope.excluded_sections || [];
       if (ex.length) {
-        note += "모든 경고서한 맺음말에 붙는 권고·정의 조항(" + ex.join(" · ") +
-          ")은 위반 인용이 아니라 뺐습니다. ";
+        note += _t("모든 경고서한 맺음말에 붙는 권고·정의 조항({list})은 위반 인용이 아니라 뺐습니다. ",
+          { list: ex.join(" · ") });
       }
-      note += "211.22(a)처럼 항으로 갈라진 인용은 조항 단위로 합쳤습니다.";
+      note += _t("211.22(a)처럼 항으로 갈라진 인용은 조항 단위로 합쳤습니다.");
       cfrNoteEl.textContent = note;
     }
     cfrBlockEl.hidden = false;
@@ -2563,7 +2573,7 @@
   if (!url || !key) {
     // 안내 문구는 면마다 다르다(템플릿의 오류 div 가 정본) — 여기서 새로 짓지 않고
     // 그 문장을 그대로 옮겨 쓴다. 비어 있으면 공통 문안으로 폴백한다.
-    loadingEl.textContent = (errorEl.textContent || "").trim() || "통계 서비스 준비 중입니다.";
+    loadingEl.textContent = (errorEl.textContent || "").trim() || _t("통계 서비스 준비 중입니다.");
     return;
   }
 

@@ -23,6 +23,11 @@
  * 경합에서도 마지막 쓰기가 사실을 지우지 않는다(병합이 멱등 union 이라 반복 적용 안전). */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   if (!window.localStorage) return;
   var cfg = document.getElementById("grm-reactions-cfg");
   var lib = window.supabase;
@@ -188,17 +193,17 @@
     if (loggedIn) {
       var on = document.createElement("p");
       on.className = "grm-pet-sync-on";
-      on.innerHTML = '<i class="ti ti-cloud-check" aria-hidden="true"></i>구름이가 계정에 안전하게 보관되고 있어요';
+      on.innerHTML = '<i class="ti ti-cloud-check" aria-hidden="true"></i>' + _t("구름이가 계정에 안전하게 보관되고 있어요");
       var sub = document.createElement("p");
       sub.className = "grm-pet-sync-s";
-      sub.textContent = "어느 기기에서든 이어서 키울 수 있어요";
+      sub.textContent = _t("어느 기기에서든 이어서 키울 수 있어요");
       slot.appendChild(on);
       slot.appendChild(sub);
     } else {
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "grm-pet-sync-cta";
-      btn.innerHTML = '<i class="ti ti-cloud-up" aria-hidden="true"></i>구름이 안전하게 보관하기';
+      btn.innerHTML = '<i class="ti ti-cloud-up" aria-hidden="true"></i>' + _t("구름이 안전하게 보관하기");
       btn.addEventListener("click", function () {
         // 가입 의도가 분명한 진입점 → 가입 폼 직행(로그인 화면 경유 1클릭 제거).
         // GRM_AUTH 부재(reactions.js 미로드)면 기존 헤더 위임으로 폴백.
@@ -211,7 +216,7 @@
       });
       var hint = document.createElement("p");
       hint.className = "grm-pet-sync-s";
-      hint.textContent = "로그인하면 어느 기기에서든 이어서 키울 수 있어요";
+      hint.textContent = _t("로그인하면 어느 기기에서든 이어서 키울 수 있어요");
       slot.appendChild(btn);
       slot.appendChild(hint);
     }

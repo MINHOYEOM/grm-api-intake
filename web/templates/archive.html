@@ -7,8 +7,8 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Weekly News · Archive</span>
-    <h1 class="reveal" style="animation-delay:.08s">주간 브리프 아카이브</h1>
-    <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("주간 브리프 아카이브") }}</h1>
+    <p class="reveal" style="animation-delay:.14s">{{ _("매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.") }}</p>
     {#- 자료실 업데이트 스트립(2026-07-25) — 주간 자동 갱신이 반영한 자료를 짧게 알린다.
         뷰모델은 render.load_library_updates()["compact"](제목 상한 3건). 변경이 없거나
         이력이 아직 없으면 lib_update 가 None → 스트립 자체를 렌더하지 않는다(빈 상자 금지).
@@ -16,32 +16,32 @@
         **머리글 한 줄 + 제목 인라인 한 줄**로만 둔다(쌓아 올리면 목록이 접힌 화면 밖으로
         밀린다 — 2026-07-25 실측 267px). ⚠️ Jinja 의 s.items 는 dict 메서드 — s['items']. -#}
     {% if lib_update %}
-    <aside class="arc-lib reveal" style="animation-delay:.18s" aria-label="자료실 업데이트">
+    <aside class="arc-lib reveal" style="animation-delay:.18s" aria-label="{{ _('자료실 업데이트') }}">
       <div class="arc-lib-h">
-        <span class="arc-lib-k"><i class="ti ti-refresh" aria-hidden="true"></i>자료실 업데이트</span>
-        <span class="arc-lib-sum"><b>{{ lib_update.date }}</b> · {% for s in lib_update.sources %}{{ s.short }} {{ s.change_count }}건{% if not loop.last %} · {% endif %}{% endfor %}</span>
-        <a class="arc-lib-go" href="{{ rel_root }}library/index.html">자료실 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+        <span class="arc-lib-k"><i class="ti ti-refresh" aria-hidden="true"></i>{{ _("자료실 업데이트") }}</span>
+        <span class="arc-lib-sum"><b>{{ lib_update.date }}</b> · {% for s in lib_update.sources %}{{ s.short }} {{ _("{n}건", n=s.change_count) }}{% if not loop.last %} · {% endif %}{% endfor %}</span>
+        <a class="arc-lib-go" href="{{ rel_root }}library/index.html">{{ _("자료실") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
       </div>
       <p class="arc-lib-l">
         {%- for s in lib_update.sources %}{% for it in s['items'] %}
         <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span>{{ it.title }}</a>
         {%- endfor %}{% endfor %}
-        {%- if lib_update.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">외 {{ lib_update.hidden_count }}건</a>{% endif %}
+        {%- if lib_update.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">{{ _("외 {n}건", n=lib_update.hidden_count) }}</a>{% endif %}
       </p>
     </aside>
     {% endif %}
     <div class="searchbar reveal" id="searchbar" style="animation-delay:.2s">
       <i class="ti ti-search lead"></i>
-      <input id="q" type="text" placeholder="업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA" autocomplete="off" aria-label="규제뉴스 카드 검색" />
-      <button class="clear" id="qclear" type="button" aria-label="검색 지우기"><i class="ti ti-x"></i></button>
+      <input id="q" type="text" placeholder="{{ _('업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA') }}" autocomplete="off" aria-label="{{ _('규제뉴스 카드 검색') }}" />
+      <button class="clear" id="qclear" type="button" aria-label="{{ _('검색 지우기') }}"><i class="ti ti-x"></i></button>
     </div>
     <div class="panel reveal" id="panel" style="animation-delay:.26s">
-      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>필터</div>
+      <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>{{ _("필터") }}</div>
       <div class="facets" id="facets"></div>
     </div>
     <div class="bar reveal" id="bar" style="animation-delay:.32s">
-      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">주간</button><button type="button" data-view="cards">카드 전체</button></div>
-      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>필터 초기화</button></div>
+      <div class="toggle" id="toggle"><span class="slider"></span><button type="button" data-view="issues" class="on">{{ _("주간") }}</button><button type="button" data-view="cards">{{ _("카드 전체") }}</button></div>
+      <div class="right"><span class="count" id="count"></span><button class="clearall" id="clearall" type="button"><i class="ti ti-x" style="font-size:14px"></i>{{ _("필터 초기화") }}</button></div>
     </div>
   </div>
   <div class="wrap">
@@ -50,9 +50,9 @@
         {%- for issue in issues %}
         <a class="issue{% if issue.latest %} latest{% endif %}" href="{{ rel_root }}briefs/{{ issue.slug }}/index.html">
           <div class="vol">Vol.<b>{{ issue.issue_no }}</b></div>
-          <div>{% if issue.latest %}<span class="badge"><span class="live"></span>이번 주 · LIVE</span>{% endif %}<h3>{{ issue.title }}</h3>
+          <div>{% if issue.latest %}<span class="badge"><span class="live"></span>{{ _("이번 주 · LIVE") }}</span>{% endif %}<h3>{{ issue.title }}</h3>
             <div class="row"><span class="tag date">{{ issue.date }}</span>{% for a in issue.agencies %}<span class="tag">{{ a }}</span>{% endfor %}</div></div>
-          <div class="stat"><b>{{ issue.count }}</b><span class="u">건</span><span class="ev mono">{{ issue.ev }}</span></div>
+          <div class="stat"><b>{{ issue.count }}</b><span class="u">{{ _("건") }}</span><span class="ev mono">{{ issue.ev }}</span></div>
         </a>
         {%- endfor %}
       </div>

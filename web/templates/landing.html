@@ -12,26 +12,26 @@
     늘리지 말 것). 인기 카드 빈 상태의 이동 버튼도 두지 않는다(유도 문구만). -#}
 <main>
   <div class="wrap hero">
-    <div class="hero-top"><span>제약 GMP · 품질 규제소식</span><span class="r">Weekly News — Vol. {{ cover.issue_no }}</span></div>
+    <div class="hero-top"><span>{{ _("제약 GMP · 품질 규제소식") }}</span><span class="r">Weekly News — Vol. {{ cover.issue_no }}</span></div>
     <div class="hero-grid">
       <div>
         <span class="kick reveal" style="animation-delay:.05s">Global Regulatory Monitor</span>
-        <h1 class="reveal" style="animation-delay:.12s">모든 규제 신호를<br>단 <span class="c">한곳으로</span>.</h1>
-        <p class="lede reveal" style="animation-delay:.2s">규제 정보 수집에 소요되던 업무 시간을 주간 규제뉴스 한 장으로 줄여드립니다.
-          핵심 사실과 시사점, 그리고 실무 점검 포인트까지 한 페이지에 담아, 공유받은 즉시 업무에 활용할 수 있습니다.</p>
-        <div class="lede-tags reveal" style="animation-delay:.24s"><span class="tag fact">사실</span><span class="tag insight">시사점</span><span class="tag check">점검</span></div>
+        <h1 class="reveal" style="animation-delay:.12s">{{ _('모든 규제 신호를<br>단 <span class="c">한곳으로</span>.') }}</h1>
+        <p class="lede reveal" style="animation-delay:.2s">{{ _("규제 정보 수집에 소요되던 업무 시간을 주간 규제뉴스 한 장으로 줄여드립니다.
+          핵심 사실과 시사점, 그리고 실무 점검 포인트까지 한 페이지에 담아, 공유받은 즉시 업무에 활용할 수 있습니다.") }}</p>
+        <div class="lede-tags reveal" style="animation-delay:.24s"><span class="tag fact">{{ _("사실") }}</span><span class="tag insight">{{ _("시사점") }}</span><span class="tag check">{{ _("점검") }}</span></div>
         <div class="btns reveal" style="animation-delay:.28s">
-          <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">이번 주 소식 읽기 <i class="ti ti-arrow-right"></i></a>
-          <a class="btn lg" href="{{ rel_root }}archive/index.html">지난 소식 둘러보기</a>
+          <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">{{ _("이번 주 소식 읽기 ") }}<i class="ti ti-arrow-right"></i></a>
+          <a class="btn lg" href="{{ rel_root }}archive/index.html">{{ _("지난 소식 둘러보기") }}</a>
         </div>
       </div>
       <aside class="reveal" style="animation-delay:.22s">
         <div class="issuecard">
           <div class="top"><span class="dot"></span><span class="dot g"></span><span class="dot y"></span><span class="d">Issue {{ cover.issue_no }} · Live</span></div>
           <div class="bd">
-            <div class="vol">Vol. {{ cover.issue_no }} — 카드 {{ cover.rendered }}장</div>
+            <div class="vol">{{ _("Vol. {n} — 카드 {c}장", n=cover.issue_no, c=cover.rendered) }}</div>
             <h3>{{ cover.title }}</h3>
-            <div class="win">검색 기간 <span class="mono">{{ cover.window }}</span></div>
+            <div class="win">{{ _("검색 기간 ") }}<span class="mono">{{ cover.window }}</span></div>
             {%- if cover.tldr %}
             <ul>
               {%- for t in cover.tldr %}
@@ -39,20 +39,20 @@
               {%- endfor %}
             </ul>
             {%- endif %}
-            <div class="ev"><span>수집 <b>{{ cover.intake_total }}</b></span><span>Evidence <b>A {{ cover.evidence.A }} · B {{ cover.evidence.B }}</b></span></div>
+            <div class="ev"><span>{{ _("수집 ") }}<b>{{ cover.intake_total }}</b></span><span>Evidence <b>A {{ cover.evidence.A }} · B {{ cover.evidence.B }}</b></span></div>
           </div>
         </div>
       </aside>
     </div>
     {#- §5-3: 통계 바를 히어로 그리드 밖 전폭으로 이동 — 좌측 컬럼에 갇혀 우측(카드) 여백이 비던 문제 해소. 4등분 스팬. -#}
     <div class="stats reveal" style="animation-delay:.4s">
-      <div><b>12</b><span>규제 소스</span></div>
-      <div><b>주 1회</b><span>정기 발행</span></div>
-      <div><b>A·B·C</b><span>신뢰 등급</span></div>
-      <div><b>100%</b><span>원문 추적</span></div>
+      <div><b>12</b><span>{{ _("규제 소스") }}</span></div>
+      <div><b>{{ _("주 1회") }}</b><span>{{ _("정기 발행") }}</span></div>
+      <div><b>A·B·C</b><span>{{ _("신뢰 등급") }}</span></div>
+      <div><b>100%</b><span>{{ _("원문 추적") }}</span></div>
     </div>
     <div class="srcs reveal" style="animation-delay:.44s">
-      <span class="l">수집 대상 — 12 sources</span>
+      <span class="l">{{ _("수집 대상 — 12 sources") }}</span>
       <div class="marquee"><div class="track">
         <span>FDA</span><span>EMA</span><span>EudraGMDP</span><span>MHRA</span><span>PIC/S</span><span>ICH</span><span>MFDS</span><span>WHO</span><span>Health&nbsp;Canada</span><span>ECA</span><span>ISPE</span><span>OpenFDA</span>
         <span aria-hidden="true">FDA</span><span aria-hidden="true">EMA</span><span aria-hidden="true">EudraGMDP</span><span aria-hidden="true">MHRA</span><span aria-hidden="true">PIC/S</span><span aria-hidden="true">ICH</span><span aria-hidden="true">MFDS</span><span aria-hidden="true">WHO</span><span aria-hidden="true">Health&nbsp;Canada</span><span aria-hidden="true">ECA</span><span aria-hidden="true">ISPE</span><span aria-hidden="true">OpenFDA</span>
@@ -68,18 +68,18 @@
       뱃지만 의미 정보를 담아 aria-label/title 로 노출. 터치(hover:none)에선 상시 노출(CSS).
       순수 CSS — JS 없음. -#}
   <section class="section soft" id="why"><div class="wrap">
-    <span class="kick">What it does</span><h2 class="sec-title">데이터 수집에서 점검 항목까지.</h2>
+    <span class="kick">What it does</span><h2 class="sec-title">{{ _("데이터 수집에서 점검 항목까지.") }}</h2>
     <div class="feats">
-      <div class="feat"><span class="no">01</span><div class="ic"><i class="ti ti-world-search"></i></div><h3>글로벌 소스 자동 수집</h3><p>FDA 경고장·483, OpenFDA(공개 데이터)·회수, EMA·MHRA·PIC/S·ECA, 식약처, ICH·WHO·Health Canada 등 국내외 핵심 규제 소식을 매일 자동으로 수집합니다.</p>
+      <div class="feat"><span class="no">01</span><div class="ic"><i class="ti ti-world-search"></i></div><h3>{{ _("글로벌 소스 자동 수집") }}</h3><p>{{ _("FDA 경고장·483, OpenFDA(공개 데이터)·회수, EMA·MHRA·PIC/S·ECA, 식약처, ICH·WHO·Health Canada 등 국내외 핵심 규제 소식을 매일 자동으로 수집합니다.") }}</p>
         <div class="feat-prev"><div class="feat-prev-in feat-chips" aria-hidden="true"><span class="fchip mono">FDA 483</span><span class="fchip mono">EMA</span><span class="fchip mono">MFDS</span><span class="fchip mono">PIC/S</span><span class="fchip mono">ICH</span></div></div></div>
-      <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>사실과 해석의 분리</h3><p>객관적 사실(Fact)은 원문 그대로 유지하고, 편집 해석(Insight)은 색상과 위치를 통해 명확히 분리하여 표기합니다.</p>
-        <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">사실 <span class="en">Fact</span></span><span class="fblock insight">시사점 <span class="en">Insight</span></span></div></div></div>
-      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p>
+      <div class="feat"><span class="no">02</span><div class="ic"><i class="ti ti-rosette-discount-check"></i></div><h3>{{ _("사실과 해석의 분리") }}</h3><p>{{ _("객관적 사실(Fact)은 원문 그대로 유지하고, 편집 해석(Insight)은 색상과 위치를 통해 명확히 분리하여 표기합니다.") }}</p>
+        <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">{{ _("사실 ") }}<span class="en">Fact</span></span><span class="fblock insight">{{ _("시사점 ") }}<span class="en">Insight</span></span></div></div></div>
+      <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>{{ _("신뢰도 및 신호 등급화") }}</h3><p>{{ _("사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.") }}</p>
         <div class="feat-prev"><div class="feat-prev-in feat-grades">
-          <span class="grade ev" tabindex="0" title="신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=2차 보도, C=추정·미확인)" aria-label="신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 2차 보도, C는 추정·미확인."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
-          <span class="grade sig" tabindex="0" title="신호 강도 T3 (최상) — 업무 영향도 높음, 즉시 점검 권장 (T2=중간, T1=참고)" aria-label="신호 강도 T3 최상: 업무 영향도 높음, 즉시 점검 권장. T2는 중간, T1은 참고."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
-          <span class="grade-tip t-ev" aria-hidden="true"><b>신뢰도 A</b> — 공식 처분·원문으로 확인된 1차 근거. <span class="dim">B=2차 보도, C=추정·미확인.</span></span>
-          <span class="grade-tip t-sig" aria-hidden="true"><b>신호 T3 (최상)</b> — 업무 영향도 높음, 즉시 점검 권장. <span class="dim">T2=중간, T1=참고.</span></span>
+          <span class="grade ev" tabindex="0" title="{{ _('신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=2차 보도, C=추정·미확인)') }}" aria-label="{{ _('신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 2차 보도, C는 추정·미확인.') }}"><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
+          <span class="grade sig" tabindex="0" title="{{ _('신호 강도 T3 (최상) — 업무 영향도 높음, 즉시 점검 권장 (T2=중간, T1=참고)') }}" aria-label="{{ _('신호 강도 T3 최상: 업무 영향도 높음, 즉시 점검 권장. T2는 중간, T1은 참고.') }}"><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
+          <span class="grade-tip t-ev" aria-hidden="true">{{ _('<b>신뢰도 A</b> — 공식 처분·원문으로 확인된 1차 근거. <span class="dim">B=2차 보도, C=추정·미확인.</span>') }}</span>
+          <span class="grade-tip t-sig" aria-hidden="true">{{ _('<b>신호 T3 (최상)</b> — 업무 영향도 높음, 즉시 점검 권장. <span class="dim">T2=중간, T1=참고.</span>') }}</span>
         </div></div></div>
     </div>
   </div></section>
@@ -100,15 +100,15 @@
   {% if findings_zone %}
   <section class="section" id="records"><div class="wrap">
     <span class="kick">Findings Database</span>
-    <h2 class="sec-title">주간 브리프의 원천 — 실사에서 실제 지적된 문장들</h2>
-    <p class="records-sub">브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 {{ findings_zone.documents }}건 · 지적사항 {{ findings_zone.findings }}건이 쌓여 있습니다.</p>
+    <h2 class="sec-title">{{ _("주간 브리프의 원천 — 실사에서 실제 지적된 문장들") }}</h2>
+    <p class="records-sub">{{ _("브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 {docs}건 · 지적사항 {n}건이 쌓여 있습니다.", docs=findings_zone.documents, n=findings_zone.findings) }}</p>
     <div class="records-grid">
-      <a class="records-card" href="{{ rel_root }}findings/firm/index.html"><b>이 거래처, 과거에 무엇을 지적받았나요?</b><span>업체 이름으로 지적 이력 조회</span></a>
-      <a class="records-card" href="{{ rel_root }}findings/inspector/index.html"><b>이 실사관이 서명한 문서에는 무엇이 있었나요?</b><span>실사관 이름으로 공개 문서 조회</span></a>
-      <a class="records-card" href="{{ rel_root }}findings/checklist/index.html"><b>실사 준비, 무엇부터 점검할까요?</b><span>실제 지적 문장이 붙은 자가점검표</span></a>
-      <a class="records-card" href="{{ rel_root }}findings/trends/index.html"><b>요즘 어떤 지적이 늘고 있나요?</b><span>최근 12개월 지적 경향</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/firm/index.html"><b>{{ _("이 거래처, 과거에 무엇을 지적받았나요?") }}</b><span>{{ _("업체 이름으로 지적 이력 조회") }}</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/inspector/index.html"><b>{{ _("이 실사관이 서명한 문서에는 무엇이 있었나요?") }}</b><span>{{ _("실사관 이름으로 공개 문서 조회") }}</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/checklist/index.html"><b>{{ _("실사 준비, 무엇부터 점검할까요?") }}</b><span>{{ _("실제 지적 문장이 붙은 자가점검표") }}</span></a>
+      <a class="records-card" href="{{ rel_root }}findings/trends/index.html"><b>{{ _("요즘 어떤 지적이 늘고 있나요?") }}</b><span>{{ _("최근 12개월 지적 경향") }}</span></a>
     </div>
-    <a class="records-all" href="{{ rel_root }}findings/index.html">규제 지적사항 전체 화면 →</a>
+    <a class="records-all" href="{{ rel_root }}findings/index.html">{{ _("규제 지적사항 전체 화면 →") }}</a>
   </div></section>
   {% endif %}
 
@@ -124,12 +124,12 @@
   <section class="section" id="engage"><div class="wrap">
     <div id="popular">
       <span class="kick">Weekly Reactions</span>
-      <h2 class="sec-title">이번 주 반응이 모인 카드</h2>
-      <p class="popular-sub">하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.</p>
+      <h2 class="sec-title">{{ _("이번 주 반응이 모인 카드") }}</h2>
+      <p class="popular-sub">{{ _("하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.") }}</p>
       <div id="grm-popular" data-index="/assets/search-index.json">
         <div class="popular-empty">
-          <p class="popular-empty-t">아직 이번 주 하트·스크랩이 없어요.</p>
-          <p class="popular-empty-s">관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.</p>
+          <p class="popular-empty-t">{{ _("아직 이번 주 하트·스크랩이 없어요.") }}</p>
+          <p class="popular-empty-s">{{ _("관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.") }}</p>
         </div>
       </div>
     </div>
@@ -138,10 +138,10 @@
     <div class="quiz-cta">
       <div class="quiz-cta-txt">
         <span class="kick">Weekly Quiz</span>
-        <h3>이번 주 규제 퀴즈, 3분이면 충분해요.</h3>
-        <p>규제·품질 용어와 최근 공개 사례를 짧게 복습해 보세요. 선택하면 바로 정답과 해설, 근거 링크를 보여드립니다. 순위 경쟁은 없어요 — 풀수록 구름이가 자라나요.</p>
+        <h3>{{ _("이번 주 규제 퀴즈, 3분이면 충분해요.") }}</h3>
+        <p>{{ _("규제·품질 용어와 최근 공개 사례를 짧게 복습해 보세요. 선택하면 바로 정답과 해설, 근거 링크를 보여드립니다. 순위 경쟁은 없어요 — 풀수록 구름이가 자라나요.") }}</p>
       </div>
-      <a class="btn coral lg" href="{{ rel_root }}quiz/index.html">퀴즈 풀어보기 <i class="ti ti-arrow-right"></i></a>
+      <a class="btn coral lg" href="{{ rel_root }}quiz/index.html">{{ _("퀴즈 풀어보기 ") }}<i class="ti ti-arrow-right"></i></a>
     </div>
     {#- 보조 진입 카드 2종(11차 정리) — 자료실(2026-07-25)·워치리스트(성장 2차 2026-08-15)
         배너를 세로 나열 대신 반폭 카드 한 줄(.mini-ctas)로 압축한다(참여 존 꼬리 과밀 해소).
@@ -161,20 +161,20 @@
       <div class="quiz-cta lib-cta">
         <div class="quiz-cta-txt">
           <span class="kick">Reference Library</span>
-          <h3>찾아볼 자료는 자료실에 상시 있어요.</h3>
-          <p>국내외 규제기관의 GMP 지침·고시·기준서를 기관별 카탈로그 {{ library.catalog_count }}종, 총 {{ library.item_count }}건으로 모았습니다. 전 항목이 공식 원문으로 연결되고 매주 월요일 자동 갱신됩니다.</p>
+          <h3>{{ _("찾아볼 자료는 자료실에 상시 있어요.") }}</h3>
+          <p>{{ _("국내외 규제기관의 GMP 지침·고시·기준서를 기관별 카탈로그 {cat}종, 총 {item}건으로 모았습니다. 전 항목이 공식 원문으로 연결되고 매주 월요일 자동 갱신됩니다.", cat=library.catalog_count, item=library.item_count) }}</p>
         </div>
-        <a class="btn" href="{{ rel_root }}library/index.html">자료실 열기 <i class="ti ti-arrow-right"></i></a>
+        <a class="btn" href="{{ rel_root }}library/index.html">{{ _("자료실 열기 ") }}<i class="ti ti-arrow-right"></i></a>
       </div>
       {% endif %}
       {% if reactions_enabled %}
       <div class="quiz-cta watch-cta" id="watchlist">
         <div class="quiz-cta-txt">
           <span class="kick">Firm Watchlist</span>
-          <h3>관심 업체의 새 지적사항, 메일로 받아보세요.</h3>
-          <p>협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 업체 이름을 넣어 찾은 뒤 그 업체 화면에서 바로 등록할 수 있어요.</p>
+          <h3>{{ _("관심 업체의 새 지적사항, 메일로 받아보세요.") }}</h3>
+          <p>{{ _("협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 주간 메일로 모아 알려드립니다. 무료 회원이면 업체 이름을 넣어 찾은 뒤 그 업체 화면에서 바로 등록할 수 있어요.") }}</p>
         </div>
-        <a class="btn" href="{{ rel_root }}findings/firm/index.html">업체 조회하러 가기 <i class="ti ti-arrow-right"></i></a>
+        <a class="btn" href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회하러 가기 ") }}<i class="ti ti-arrow-right"></i></a>
       </div>
       {% endif %}
     </div>
@@ -225,14 +225,14 @@
 {% if reactions_enabled %}<script src="/assets/popular.js?v={{ popularjs_ver }}" defer></script>{% endif %}
 {% endblock %}
 {% block ai_disclosure %}
-<section class="ai-disclosure" id="notice" aria-label="AI 자동 생성 고지"><div class="wrap">
+<section class="ai-disclosure" id="notice" aria-label="{{ _('AI 자동 생성 고지') }}"><div class="wrap">
   <span class="kick">AI Disclosure</span>
-  <h2>콘텐츠 생성 방식 및 유의사항</h2>
+  <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
   <div class="disc-body">
-    <div class="disc-sec"><p>본 서비스는 FDA, EMA, MHRA, PIC/S, ICH, WHO, Health Canada, ECA, 식약처 등 주요 규제기관 및 공신력 있는 전문기관의 공개 자료를 정기적으로 수집·분석하여 생성형 AI 기반의 한국어 브리핑 카드로 제공합니다.</p></div>
-    <div class="disc-sec"><p>수치·코드·일자·영문 원문 인용·출처 링크 및 기계 추출 표는 원문 정보를 기준으로 제공되며, 생성형 AI 요약과 구분하여 표시합니다.</p></div>
-    <div class="disc-sec"><p>각 정보는 신뢰도(Evidence A·B·C) 및 신호 강도(Tier 1~3) 기준에 따라 분류되며, 정보출처와 공식 원문 링크를 함께 제공하여 사용자가 1차 자료까지 추적·검증할 수 있도록 설계되었습니다.</p></div>
-    <div class="disc-sec"><p>본 서비스는 규제 동향 및 품질 이슈 파악을 지원하기 위한 참고자료입니다. 제공되는 요약, 분석 및 해석은 공식 규제기관의 견해를 대변하지 않으며, 법률·규제·품질·컴플라이언스 자문이나 인증 의견으로 간주되어서는 안 됩니다. 중요한 의사결정은 반드시 공식 원문 및 전문 자문을 통해 검토하시기 바랍니다.</p></div>
+    <div class="disc-sec"><p>{{ _("본 서비스는 FDA, EMA, MHRA, PIC/S, ICH, WHO, Health Canada, ECA, 식약처 등 주요 규제기관 및 공신력 있는 전문기관의 공개 자료를 정기적으로 수집·분석하여 생성형 AI 기반의 한국어 브리핑 카드로 제공합니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("수치·코드·일자·영문 원문 인용·출처 링크 및 기계 추출 표는 원문 정보를 기준으로 제공되며, 생성형 AI 요약과 구분하여 표시합니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("각 정보는 신뢰도(Evidence A·B·C) 및 신호 강도(Tier 1~3) 기준에 따라 분류되며, 정보출처와 공식 원문 링크를 함께 제공하여 사용자가 1차 자료까지 추적·검증할 수 있도록 설계되었습니다.") }}</p></div>
+    <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 및 품질 이슈 파악을 지원하기 위한 참고자료입니다. 제공되는 요약, 분석 및 해석은 공식 규제기관의 견해를 대변하지 않으며, 법률·규제·품질·컴플라이언스 자문이나 인증 의견으로 간주되어서는 안 됩니다. 중요한 의사결정은 반드시 공식 원문 및 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
   </div>
 </div></section>
 {% endblock %}

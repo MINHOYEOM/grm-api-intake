@@ -53,12 +53,12 @@
 </style>
 <main>
   <div class="wrap">
-    <nav class="fx-crumb" aria-label="현재 위치">
-      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">지적사항 검색</a><i>&rsaquo;</i>{% for c in crumb_mid %}<a href="{{ rel_root }}{{ c.href }}">{{ c.label }}</a><i>&rsaquo;</i>{% endfor %}<span>{{ crumb_last }}</span>
+    <nav class="fx-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i>{% for c in crumb_mid %}<a href="{{ rel_root }}{{ c.href }}">{{ c.label }}</a><i>&rsaquo;</i>{% endfor %}<span>{{ crumb_last }}</span>
     </nav>
     <p class="kick">{{ axis.kick }}</p>
     <h1 class="fx-h1">{{ headline }}</h1>
-    <p class="fx-sum">{{ lede_prefix }} <b>{{ "{:,}".format(item.findings) }}</b>건의 지적사항을 <b>{{ "{:,}".format(item.documents) }}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.</p>
+    <p class="fx-sum">{{ lede_prefix }} {{ _("<b>{a}</b>건의 지적사항을 <b>{b}</b>건의 공개 문서에서 뽑아 우리말로 정리했습니다. 아래는 가장 최근 사례이고, 전체는 검색에서 보실 수 있습니다.", a="{:,}".format(item.findings), b="{:,}".format(item.documents)) }}</p>
     {#- 값 인코딩은 여기(Jinja `urlencode`)가 정본이다 — 렌더러는 순수성 가드 때문에
         urllib 을 import 할 수 없다. 구분자는 속성값이므로 `&amp;` 로 적는다. -#}
     <a class="fx-cta" href="{{ rel_root }}findings/index.html?{% for k, v in cta_params %}{% if not loop.first %}&amp;{% endif %}{{ k }}={{ v | urlencode }}{% endfor %}">{{ cta_label }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
@@ -67,7 +67,7 @@
   <div class="wrap fx-body">
     {% if item.by_agency %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">어느 기관이 지적했나</h2>
+      <h2 class="fx-sec-h">{{ _('어느 기관이 지적했나') }}</h2>
       <div class="fx-mix">
         {%- for a in item.by_agency %}
         <div class="fx-mix-row">
@@ -82,7 +82,7 @@
 
     {% if item.top_firms %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">지적이 많았던 업체</h2>
+      <h2 class="fx-sec-h">{{ _('지적이 많았던 업체') }}</h2>
       {#- [P1.5-1 2026-08-27] 업체명이 평문이라 축 → 업체 경로가 여기서 끊겼다(막다른
           지점). firm_key 가 있으면 업체 조회(?key= 계약)로 잇고, 키 없는 구 스냅샷
           항목은 종전 그대로 무링크 — 폴백이 있어야 스냅샷 재생성 전에도 페이지가 산다.
@@ -96,7 +96,7 @@
 
     {% if item.samples %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">최근 지적 사례</h2>
+      <h2 class="fx-sec-h">{{ _('최근 지적 사례') }}</h2>
       <div class="fx-cases">
         {%- for s in item.samples %}
         <article class="fx-case">
@@ -110,10 +110,10 @@
               렌더가 findings_docs.json 과 대조해 `doc_slug` 를 채운다. 없는 페이지로 보내는
               링크는 무링크보다 나쁘다. -#}
           {%- if s.doc_slug %}
-          <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">이 문서의 지적 전체 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          <a class="fx-case-a" href="{{ rel_root }}findings/doc/{{ s.doc_slug }}/">{{ _('이 문서의 지적 전체 보기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
           {%- endif %}
           {%- if s.evidence_url %}
-          <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">공개 원문 보기 <i class="ti ti-external-link" aria-hidden="true"></i></a>
+          <a class="fx-case-a" href="{{ s.evidence_url }}" target="_blank" rel="noopener">{{ _('공개 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
           {%- endif %}
         </article>
         {%- endfor %}
@@ -126,7 +126,7 @@
         조합 페이지의 유일한 부모가 이 분류 페이지라, 이 목록이 곧 그 경로다. -#}
     {% if narrow_links %}
     <section class="fx-sec">
-      <h2 class="fx-sec-h">기관별로 좁혀 보기</h2>
+      <h2 class="fx-sec-h">{{ _('기관별로 좁혀 보기') }}</h2>
       <div class="fx-sibs">
         {%- for n in narrow_links %}<a href="{{ rel_root }}{{ n.href }}">{{ n.label }}<b>&nbsp;{{ "{:,}".format(n.findings) }}</b></a>{% endfor %}
       </div>
@@ -146,7 +146,7 @@
 {#- ★실명 업체가 인쇄되는 페이지에는 시점 고지가 반드시 붙는다. 문서 페이지에만 두고
           여기엔 빠뜨렸었다 — 같은 업체명을 같은 무게로 노출하면서 한쪽만 맥락을 주면
           몇 년 전 지적이 현재 상태로 읽힌다. -#}
-      <p class="fx-note"><b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 — 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 건수는 {{ measured_on }} 기준 공개 데이터 실측값이고, 지적사항은 규제기관 공개 원문에서 자동 추출·번역한 것입니다. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.</p>
+      <p class="fx-note">{{ _('<b>이 지적들은 각 문서가 공개된 시점의 기록입니다.</b> 실사 지적에는 대개 업체의 소명과 시정 절차가 뒤따르지만 그 결과가 어떻게 되었는지는 이 페이지가 알지 못합니다 — 현재 상태로 읽지 마시고 최신 현황은 해당 규제기관의 공식 발표를 확인하세요. 건수는 {measured_on} 기준 공개 데이터 실측값이고, 지적사항은 규제기관 공개 원문에서 자동 추출·번역한 것입니다. 각 사례의 &ldquo;공개 원문 보기&rdquo;가 그 원문으로 바로 연결됩니다.', measured_on=measured_on) }}</p>
     </section>
   </div>
 </main>

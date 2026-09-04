@@ -18,24 +18,24 @@
     를 quiz.html 과 이 파일이 함께 include 한다(그 파일은 quiz.html 에서 잘라낸 원본
     그대로 — 한 글자도 더하지 않아야 quiz 골든 byte 가 보존된다). -#}
 <main class="wrap" id="grm-me">
-  <h1 class="grm-my-h">마이페이지</h1>
-  <p class="grm-my-sub">스크랩한 카드와 구름이, 관심 업체를 한 화면에 모았습니다.</p>
+  <h1 class="grm-my-h">{{ _('마이페이지') }}</h1>
+  <p class="grm-my-sub">{{ _('스크랩한 카드와 구름이, 관심 업체를 한 화면에 모았습니다.') }}</p>
   <div id="grm-me-head" class="grm-me-head"></div>
 
   {#- 구름이를 스크랩보다 위에 둔다: 로그인 여부와 무관하게 항상 내용이 있는 유일한
       섹션이라, 처음 들어온 게스트에게 빈 화면 대신 자기 기록을 먼저 보여 준다. -#}
-  <h2 class="grm-my-h2">구름이 성장 현황</h2>
-  <p class="grm-my-sub">주간 퀴즈를 풀면 구름이가 자랍니다. 로그인하지 않아도 이 브라우저에 기록이 쌓여요.</p>
-  <section class="me-growth" id="grm-growth" hidden aria-label="구름이 성장 현황"></section>
+  <h2 class="grm-my-h2">{{ _('구름이 성장 현황') }}</h2>
+  <p class="grm-my-sub">{{ _('주간 퀴즈를 풀면 구름이가 자랍니다. 로그인하지 않아도 이 브라우저에 기록이 쌓여요.') }}</p>
+  <section class="me-growth" id="grm-growth" hidden aria-label="{{ _('구름이 성장 현황') }}"></section>
   {#- growth.js 미로드·localStorage 차단 시 위 섹션은 hidden 그대로 남는다 — 제목만 덩그러니
       남지 않도록 정적 폴백 문단을 두고, 패널이 뜨면 CSS 인접 선택자로 감춘다(JS 0). -#}
-  <p class="grm-my-note me-growth-fb">성장 기록은 이 브라우저에 저장됩니다 — 표시되지 않으면 브라우저에서 저장이 차단된 상태일 수 있어요.</p>
-  <p class="me-growth-go"><a href="{{ rel_root }}quiz/index.html">주간 퀴즈 풀러 가기 →</a></p>
+  <p class="grm-my-note me-growth-fb">{{ _('성장 기록은 이 브라우저에 저장됩니다 — 표시되지 않으면 브라우저에서 저장이 차단된 상태일 수 있어요.') }}</p>
+  <p class="me-growth-go"><a href="{{ rel_root }}quiz/index.html">{{ _('주간 퀴즈 풀러 가기 →') }}</a></p>
 
-  <h2 class="grm-my-h2">내 스크랩</h2>
-  <p class="grm-my-sub">관심 있게 저장한 카드를 한곳에 모았습니다.</p>
+  <h2 class="grm-my-h2">{{ _('내 스크랩') }}</h2>
+  <p class="grm-my-sub">{{ _('관심 있게 저장한 카드를 한곳에 모았습니다.') }}</p>
   <div id="grm-my-scraps" data-index="/assets/search-index.json">
-    <p class="grm-my-note">불러오는 중…</p>
+    <p class="grm-my-note">{{ _('불러오는 중…') }}</p>
   </div>
 
   {#- 관심 업체(015_firm_watchlist.sql) — 스크랩 목록과 동일 관례: 셸은 로딩 노트만,
@@ -45,10 +45,10 @@
       셸은 로딩 노트만이고 목록·추가·해제는 reactions.js(renderMyInterests)가 런타임에
       그린다. 067 미적용/비로그인이면 오류처럼 보이지 않는 노트로 조용히 폴백한다.
       ★여기서 고른 축은 둘러보기 첫 화면의 '내 범위의 최근 공개'가 읽는 입력이다. -#}
-  <h2 class="grm-my-h2">관심 범위</h2>
-  <p class="grm-my-sub">기관·분류·국가를 골라 두면 둘러보기 첫 화면이 그 범위의 최근 공개부터 보여줍니다.</p>
+  <h2 class="grm-my-h2">{{ _('관심 범위') }}</h2>
+  <p class="grm-my-sub">{{ _('기관·분류·국가를 골라 두면 둘러보기 첫 화면이 그 범위의 최근 공개부터 보여줍니다.') }}</p>
   <div id="grm-my-interests">
-    <p class="grm-my-note">불러오는 중…</p>
+    <p class="grm-my-note">{{ _('불러오는 중…') }}</p>
   </div>
   {#- 선택지 어휘 — render 가 facets 정본에서 심는다(JS 사전 복제 0). reactions.js 가
       이 블록을 읽어 토글을 만든다. 어휘가 없으면(정본 부재) 블록 자체가 비고, JS 는
@@ -57,10 +57,10 @@
     {%- for v in interest_vocab | default([]) %}<span data-kind="{{ v.kind }}" data-value="{{ v.value }}">{{ v.label }}</span>{% endfor %}
   </div>
 
-  <h2 class="grm-my-h2">관심 업체</h2>
-  <p class="grm-my-sub">등록한 업체의 새 규제 이력을 프로파일에서 확인할 수 있습니다.</p>
+  <h2 class="grm-my-h2">{{ _('관심 업체') }}</h2>
+  <p class="grm-my-sub">{{ _('등록한 업체의 새 규제 이력을 프로파일에서 확인할 수 있습니다.') }}</p>
   <div id="grm-my-firms">
-    <p class="grm-my-note">불러오는 중…</p>
+    <p class="grm-my-note">{{ _('불러오는 중…') }}</p>
   </div>
 </main>
 <style>

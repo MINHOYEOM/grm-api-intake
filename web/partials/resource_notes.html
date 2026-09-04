@@ -29,9 +29,9 @@ a.res-link:hover{color:var(--coral)}
 .res-orig{color:var(--muted);font-size:13px;max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .res-sum{margin:5px 0 0;font-size:13px;line-height:1.55;color:var(--muted)}
 </style>
-<h2 class="sec-h" id="sec-resources"><i class="ti ti-news" style="color:var(--coral);font-size:20px"></i>전문지 브리핑 <span class="n">{{ brief.resources|length }}건</span></h2>
+<h2 class="sec-h" id="sec-resources"><i class="ti ti-news" style="color:var(--coral);font-size:20px"></i>{{ _("전문지 브리핑") }} <span class="n">{{ _("{n}건", n=brief.resources|length) }}</span></h2>
 <div class="sec-body" id="secbody-resources">
-  <p class="res-sub">업계 전문지의 해설·교육 자료 {{ brief.resources|length }}건 · 규제 변경 아님</p>
+  <p class="res-sub">{{ _("업계 전문지의 해설·교육 자료 {n}건 · 규제 변경 아님", n=brief.resources|length) }}</p>
   <div class="res-list">
   {%- for r in brief.resources %}
     <div class="res-item">

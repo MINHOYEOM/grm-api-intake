@@ -50,13 +50,13 @@
 </style>
 <main>
   <div class="wrap gt-head">
-    <nav class="gt-crumb" aria-label="현재 위치">
-      <a href="{{ rel_root }}">홈</a><i>&rsaquo;</i><a href="{{ rel_root }}glossary/">규제 용어사전</a><i>&rsaquo;</i><span>{{ term.term_ko }}</span>
+    <nav class="gt-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}glossary/">{{ _('규제 용어사전') }}</a><i>&rsaquo;</i><span>{{ term.term_ko }}</span>
     </nav>
     <p class="kick">Glossary</p>
     <h1 class="gt-h1">{{ term.term_ko }}<span class="gt-en">{{ term.term_en }}</span></h1>
     {% if term.aliases %}
-    <p class="gt-alias"><b>다른 표기</b>{% for a in term.aliases %}<span>{{ a }}</span>{% endfor %}</p>
+    <p class="gt-alias"><b>{{ _('다른 표기') }}</b>{% for a in term.aliases %}<span>{{ a }}</span>{% endfor %}</p>
     {% endif %}
   </div>
 
@@ -65,37 +65,37 @@
 
     {% if term.detail_ko %}
     <section class="gt-sec">
-      <h2 class="gt-sec-h">자세히</h2>
+      <h2 class="gt-sec-h">{{ _('자세히') }}</h2>
       <p class="gt-detail">{{ term.detail_ko }}</p>
     </section>
     {% endif %}
 
     {% if term.reg_refs %}
     <section class="gt-sec">
-      <h2 class="gt-sec-h">관련 조항</h2>
+      <h2 class="gt-sec-h">{{ _('관련 조항') }}</h2>
       <div class="gt-links">
-        {%- for r in term.reg_refs %}{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span>{{ r.label }}</span>{% endif %}{% if r.cases_href %}<a href="{{ rel_root }}{{ r.cases_href }}">{{ r.label }} 지적사례 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>{% endif %}{% endfor %}
+        {%- for r in term.reg_refs %}{% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span>{{ r.label }}</span>{% endif %}{% if r.cases_href %}<a href="{{ rel_root }}{{ r.cases_href }}">{{ _("{label} 지적사례", label=r.label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>{% endif %}{% endfor %}
       </div>
     </section>
     {% endif %}
 
     {% if term.related %}
     <section class="gt-sec">
-      <h2 class="gt-sec-h">함께 보면 좋은 용어</h2>
+      <h2 class="gt-sec-h">{{ _('함께 보면 좋은 용어') }}</h2>
       <div class="gt-links">
-        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.term_ko }}{% if r.case_count_label %}<span class="gt-rel-n">사례 {{ r.case_count_label }}건</span>{% endif %}</a>{% endfor %}
+        {%- for r in term.related %}<a href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.term_ko }}{% if r.case_count_label %}<span class="gt-rel-n">{{ _("사례 {n}건", n=r.case_count_label) }}</span>{% endif %}</a>{% endfor %}
       </div>
     </section>
     {% endif %}
 
     {% if term.case_href %}
     <section class="gt-sec">
-      <h2 class="gt-sec-h">실제 지적 사례</h2>
+      <h2 class="gt-sec-h">{{ _('실제 지적 사례') }}</h2>
       {#- 문구 규율: "이 용어가 등장한" 이지 "이 용어에 관한" 이 아니다. 인용문 안에 그
           토큰이 그대로 보이므로 독자가 눈으로 검증할 수 있는 주장만 한다. 업체명은 싣지
           않는다 — 업체는 링크로 잇는 문서 페이지의 주제다. #}
       {%- if case_excerpts %}
-      <p class="gt-case-lede">규제기관 실사 문서에서 <b>이 용어가 등장한</b> 지적사항입니다.</p>
+      <p class="gt-case-lede">{{ _('규제기관 실사 문서에서 <b>이 용어가 등장한</b> 지적사항입니다.') }}</p>
       <ol class="gt-cases">
         {%- for c in case_excerpts %}
         <li class="gt-case-item">
@@ -105,12 +105,12 @@
         {%- endfor %}
       </ol>
       {%- endif %}
-      <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">이 용어로 검색되는 지적사례 <b>{{ term.case_count_label }}</b>건 보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">{{ _("이 용어로 검색되는 지적사례 <b>{n}</b>건 보기", n=term.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     </section>
     {% endif %}
 
     <section class="gt-sec gt-src">
-      <h2 class="gt-sec-h">출처</h2>
+      <h2 class="gt-sec-h">{{ _('출처') }}</h2>
       {%- if term.source_url %}
       <a href="{{ term.source_url }}" target="_blank" rel="noopener">{{ term.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
       {%- else %}
@@ -119,7 +119,7 @@
     </section>
 
     <div class="gt-foot">
-      <a href="{{ rel_root }}glossary/">&larr; 규제 용어사전 전체 보기</a>
+      <a href="{{ rel_root }}glossary/">&larr; {{ _('규제 용어사전 전체 보기') }}</a>
     </div>
   </div>
 </main>

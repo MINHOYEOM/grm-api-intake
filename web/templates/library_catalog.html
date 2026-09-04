@@ -16,14 +16,14 @@
     {#- breadcrumb(8차 웨이브 A 2026-07-18) — registry 전 카탈로그(8개)가 이 공통 템플릿
         하나로 렌더되므로 여기 1곳 수정으로 전파된다. guide/glossary/quiz 는 최상위 섹션
         판단으로 breadcrumb 미부착(설계 확정). -#}
-    <nav class="lib-crumb reveal" aria-label="상위로"><a href="{{ rel_root }}library/index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i>자료실</a></nav>
+    <nav class="lib-crumb reveal" aria-label="{{ _('상위로') }}"><a href="{{ rel_root }}library/index.html"><i class="ti ti-arrow-left" aria-hidden="true"></i>{{ _('자료실') }}</a></nav>
     <span class="kick reveal" style="animation-delay:.02s">{{ lib.kick }}</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ lib.title }}</h1>
     <p class="reveal" style="animation-delay:.14s">{{ lib.intro }}</p>
     <div class="lib-meta reveal" style="animation-delay:.2s">
-      <span class="lib-meta-i"><i class="ti ti-list-details" aria-hidden="true"></i>총 {{ lib.count }}{{ lib.unit }}</span>
-      {% if lib.latest_published %}<span class="lib-meta-i"><i class="ti ti-calendar-event" aria-hidden="true"></i>최근 발행 {{ lib.latest_published }}</span>{% endif %}
-      {% if lib.public_base %}<a class="lib-meta-link" href="{{ lib.public_base }}" target="_blank" rel="noopener">공식 사이트 <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
+      <span class="lib-meta-i"><i class="ti ti-list-details" aria-hidden="true"></i>{{ _("총 {count}{unit}", count=lib.count, unit=lib.unit) }}</span>
+      {% if lib.latest_published %}<span class="lib-meta-i"><i class="ti ti-calendar-event" aria-hidden="true"></i>{{ _("최근 발행 {date}", date=lib.latest_published) }}</span>{% endif %}
+      {% if lib.public_base %}<a class="lib-meta-link" href="{{ lib.public_base }}" target="_blank" rel="noopener">{{ _('공식 사이트') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
     </div>
   </div>
   <div class="wrap lib-body">
@@ -36,7 +36,7 @@
           <h2>{{ g.label }}{% if g.label_en %} <span>{{ g.label_en }}</span>{% endif %}</h2>
           {% if g.blurb %}<p>{{ g.blurb }}</p>{% endif %}
         </div>
-        {% if g.official_url %}<a class="lib-series-link" href="{{ g.official_url }}" target="_blank" rel="noopener">{{ lib.link_label or "공식 페이지" }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
+        {% if g.official_url %}<a class="lib-series-link" href="{{ g.official_url }}" target="_blank" rel="noopener">{{ lib.link_label or _("공식 페이지") }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}
       </div>
       <ul class="lib-items lib-items-grid">
     {% else %}
@@ -67,8 +67,8 @@
           {% if it.doc_type or it.published_date or it.ko_url or it.pdf_url %}
           <div class="lib-item-meta">
             {% if it.doc_type %}<span class="lib-type">{{ it.doc_type }}</span>{% endif %}
-            {% if it.published_date %}<span class="lib-date"><i class="ti ti-calendar" aria-hidden="true"></i>발행 {{ it.published_date }}</span>{% endif %}
-            {% if it.ko_url %}<a class="lib-extra" href="{{ it.ko_url }}" target="_blank" rel="noopener"><i class="ti ti-language" aria-hidden="true"></i>한글 번역본</a>{% endif %}
+            {% if it.published_date %}<span class="lib-date"><i class="ti ti-calendar" aria-hidden="true"></i>{{ _("발행 {date}", date=it.published_date) }}</span>{% endif %}
+            {% if it.ko_url %}<a class="lib-extra" href="{{ it.ko_url }}" target="_blank" rel="noopener"><i class="ti ti-language" aria-hidden="true"></i>{{ _('한글 번역본') }}</a>{% endif %}
             {#- link_label+pdf_url 은 제목이 이미 PDF 직결 — 중복 칩 억제 -#}
             {% if it.pdf_url and it.pdf_url != it.official_url and not lib.link_label %}<a class="lib-extra" href="{{ it.pdf_url }}" target="_blank" rel="noopener"><i class="ti ti-file-type-pdf" aria-hidden="true"></i>PDF</a>{% endif %}
           </div>

@@ -33,6 +33,7 @@ REPO_ROOT = WEB_DIR.parent                                     # 저장소 루�
 sys.path.insert(0, str(WEB_DIR))
 sys.path.insert(0, str(REPO_ROOT))
 import render  # noqa: E402  (web/render.py — 경로 삽입 후 import)
+import grm_i18n  # noqa: E402  (web/grm_i18n.py — 다국어 문구 사전·검사기)
 import grm_findings  # noqa: E402  (FIND-1 M6d 카테고리 라벨 동기화 대조용)
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
@@ -1052,7 +1053,7 @@ class WebFindingsRenderTest(unittest.TestCase):
             "var restCount = stats.categories.slice(8).reduce(function (s, c) { return s + c.count; }, 0);",
             fn,
         )
-        self.assertIn('rows.push({ label: "그 외", count: restCount, code: null });', fn)
+        self.assertIn('rows.push({ label: _t("그 외"), count: restCount, code: null });', fn)
         # ★핵심 불변식 — maxCount 는 rows(=실제로 그리는 행)에서만 나온다.
         self.assertIn(
             "var maxCount = rows.reduce(function (m, r) { return Math.max(m, r.count); }, 0) || 1;",
@@ -1060,7 +1061,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         )
         self.assertNotIn("top.reduce(", fn)
         # maxCount 계산이 rows 조립보다 뒤에 와야 한다(합산행이 스케일에 반영되려면).
-        self.assertLess(fn.index('rows.push({ label: "그 외"'), fn.index("var maxCount ="))
+        self.assertLess(fn.index('rows.push({ label: _t("그 외")'), fn.index("var maxCount ="))
 
     def test_dash_category_bar_cannot_overflow_count_column(self):
         """[막대 침범 방지 M2c] 가로 막대가 오른쪽 건수 글자를 덮는 결함이 두 번 났다.
@@ -1247,7 +1248,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn('card.classList.add("fnd-collapsed")', js_src)
         self.assertIn("자세히 보기", js_src)
-        self.assertIn('btn.textContent = expanded ? "접기" : "자세히 보기"', js_src)
+        self.assertIn('btn.textContent = expanded ? _t("접기") : _t("자세히 보기");', js_src)
         self.assertIn('setAttribute("aria-expanded"', js_src)
         # CSS: 접힘 상태에서만 3줄 클램프 + 부가 섹션(.fnd-extra) 숨김.
         self.assertIn(".fnd-card.fnd-collapsed .fnd-text", self.html)
@@ -1281,7 +1282,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         """펼침 영역 하단 메타 줄 = 문서번호(mono, ASCII) · 신뢰도(퍼센트)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function appendMetaLine(extra, row, query)", js_src)
-        self.assertIn('meta.appendChild(document.createTextNode("문서번호 "))', js_src)
+        self.assertIn('meta.appendChild(document.createTextNode(_t("문서번호 ")))', js_src)
         self.assertIn("fnd-meta-doc", js_src)
         self.assertIn(".fnd-meta-doc{font-family:var(--mono)}", self.html)
 
@@ -1538,7 +1539,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function clearActiveFilter(key)", js_src)
         self.assertIn("function renderActiveChips()", js_src)
         self.assertIn("function buildActiveChip(label, value, onClear)", js_src)
-        self.assertIn('btn.setAttribute("aria-label", label + " 필터 해제")', js_src)
+        self.assertIn('btn.setAttribute("aria-label", _t("{label} 필터 해제", { label: label }));', js_src)
         self.assertIn('clearAllBtn.addEventListener("click", clearAllFilters)', js_src)
         self.assertIn("renderActiveChips();", js_src[js_src.index("function render()"):], "render() 가 renderActiveChips 호출 안 함")
         # 정렬(sort)은 필터가 아니므로 칩 대상에서 제외된다.
@@ -1604,9 +1605,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         self.assertIn("function renderDashStats(stats)", js_src)
         self.assertIn("function buildStatBlock(num, label, warn)", js_src)
-        self.assertIn('buildStatBlock(String(stats.total), "지적사항", false)', js_src)
+        self.assertIn('buildStatBlock(String(stats.total), _t("지적사항"), false)', js_src)
         self.assertIn('buildStatBlock(String(a.count), a.agency, false)', js_src)
-        self.assertIn('buildStatBlock(String(stats.needsReview), "검토 필요", true)', js_src)
+        self.assertIn('buildStatBlock(String(stats.needsReview), _t("검토 필요"), true)', js_src)
         self.assertNotIn("fnd-dash-chip", js_src)
         self.assertNotIn("fnd-dash-chip", self.html)
         self.assertIn(".fnd-dash-stat-num{", self.html)
@@ -1634,7 +1635,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function appendOrigAndNote"):js_src.index("function appendOrigAndNote") + 700]
         idx_summary_append = fn.index("details.appendChild(summary)")
-        idx_trnote = fn.index('el("span", "fnd-tr-note", "AI 번역 — 원문 대조 권장")')
+        idx_trnote = fn.index('el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장"))')
         idx_p_append = fn.index("details.appendChild(p)")
         self.assertLess(idx_summary_append, idx_trnote, "tr-note 가 summary 보다 먼저 옴")
         self.assertLess(idx_trnote, idx_p_append, "tr-note 가 원문 <p> 보다 뒤에 생성됨")
@@ -1753,7 +1754,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function fetchCoverageNote()"):]
         fn = fn[:fn.index("\n  showState(\"loading\");")]
-        self.assertIn('"지적사항 " + total + "건 중 " + pub + "건 국문 열람 가능"', fn)
+        self.assertIn('_t("지적사항 {total}건 중 {pub}건 국문 열람 가능", { total: total, pub: pub })', fn)
         self.assertNotIn("매일 확대 중", fn)
         # 두 경로 모두 삼항연산자 한 문장으로 분기(방어적 no-op 이 아니라 문구 전환) —
         # 완역 자동 전환(isComplete)이 최상위 분기, hasDocs 가 그 아래 분기다.
@@ -1774,7 +1775,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("Number(totals.findings || 0) > 0", fn)
         self.assertIn("건 전체를 국문으로 열람할 수 있습니다.", fn)
         # 완료형에도 hasDocs 유무(010 미적용) 폴백이 있다.
-        self.assertIn('전체 " + total + "건을 국문으로 열람할 수 있습니다.', fn)
+        self.assertIn('_t("전체 {total}건을 국문으로 열람할 수 있습니다.", { total: total })', fn)
 
     # ── [문서 중심 열람] observation 조각 → 문서 카드 재편 ─────────────────────────────
     # [서버 canonical search] FIELDS/FIELDS_NO_FIRM_KEY/LEGACY_FIELDS select 목록과
@@ -1847,8 +1848,10 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("var DOC_OBS_INITIAL_SHOW = 5;", js_src)
         self.assertIn("var overflows = rows.length >= DOC_OBS_VISIBLE_LIMIT;", js_src)
         self.assertIn("var visibleCount = overflows ? DOC_OBS_INITIAL_SHOW : rows.length;", js_src)
-        self.assertIn('btn.textContent = "지적 " + totalCount + "건 모두 보기";', js_src)
-        self.assertIn('btn.textContent = expanded ? "접기" : "지적 " + totalCount + "건 모두 보기";', js_src)
+        self.assertIn('btn.textContent = _t("지적 {n}건 모두 보기", { n: totalCount });', js_src)
+        self.assertIn(
+            'btn.textContent = expanded ? _t("접기") : _t("지적 {n}건 모두 보기", { n: totalCount });',
+            js_src)
         self.assertIn('hiddenWrap.hidden = true;', js_src)
         self.assertIn('setAttribute("aria-expanded"', js_src[js_src.index("function buildDocObsToggle"):])
 
@@ -1870,9 +1873,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         render_fn = js_src[start:js_src.index("\n  function ", start + 20)]
         self.assertIn('bDocs.textContent = totalDocs.toLocaleString("ko-KR")', render_fn)
         self.assertIn('bObs.textContent = totalFindings.toLocaleString("ko-KR")', render_fn)
-        self.assertIn('countEl.appendChild(document.createTextNode("전체 "));', render_fn)
-        self.assertIn('countEl.appendChild(document.createTextNode("문서 · "));', render_fn)
-        self.assertIn('countEl.appendChild(document.createTextNode("지적 · 페이지 "));', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode(_t("전체 ")));', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode(_t("문서 · ")));', render_fn)
+        self.assertIn('countEl.appendChild(document.createTextNode(_t("지적 · 페이지 ")));', render_fn)
         self.assertIn('countEl.appendChild(document.createTextNode(" / "));', render_fn)
         self.assertNotIn('countEl.appendChild(document.createTextNode("총 "));', js_src)
 
@@ -1904,7 +1907,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("function buildDocHead(rows)", js_src)
         self.assertIn('el("h2", "fnd-doc-firm", firmDisplay)', js_src)
         self.assertIn('meta.appendChild(el("span", "fnd-b", head.source));', js_src)
-        self.assertIn('meta.appendChild(el("span", "fnd-doc-count", "지적 " + rows.length + "건"));', js_src)
+        self.assertIn(
+            'meta.appendChild(el("span", "fnd-doc-count", _t("지적 {n}건", { n: rows.length })));',
+            js_src)
         self.assertIn(".fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}", self.html)
         self.assertIn("font-family:var(--serif)", self.html[self.html.index(".fnd-doc-firm{"):self.html.index(".fnd-doc-firm{") + 100])
 
@@ -2050,12 +2055,12 @@ class WebFindingsRenderTest(unittest.TestCase):
 
         pager_fn = js_src[js_src.index("function renderPager(current, total, moreMayExist)"):]
         pager_fn = pager_fn[:pager_fn.index("\n  }\n") + 4]
-        self.assertIn('buildPagerBtn("«", "처음 페이지로 이동"', pager_fn)
+        self.assertIn('buildPagerBtn("«", _t("처음 페이지로 이동")', pager_fn)
         # [b 폴리시] 이전/다음은 «‹›» 단독 글리프 대신 아이콘+텍스트를 병기해 처음 보는
         # 사용자에게도 명확하다("‹ 이전"/"다음 ›") — 처음/끝은 압축 글리프 그대로 유지.
-        self.assertIn('buildPagerBtn("‹ 이전", "이전 페이지"', pager_fn)
-        self.assertIn('buildPagerBtn("다음 ›", "다음 페이지"', pager_fn)
-        self.assertIn('buildPagerBtn("»", "끝 페이지로 이동"', pager_fn)
+        self.assertIn('buildPagerBtn(_t("‹ 이전"), _t("이전 페이지")', pager_fn)
+        self.assertIn('buildPagerBtn(_t("다음 ›"), _t("다음 페이지")', pager_fn)
+        self.assertIn('buildPagerBtn("»", _t("끝 페이지로 이동")', pager_fn)
         self.assertIn('btn.setAttribute("aria-current", "page");', pager_fn)
         # 마지막(=지금까지 알려진) 페이지 번호는 moreMayExist 면 "+" 를 덧붙인다(최소 추정 —
         # 이 압축 페이지 버튼의 "+" 표기는 카운트 줄의 " 이상" 문구와 달리 그대로 유지한다,
@@ -2125,9 +2130,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn('Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.disabled = true; });', fn)
         self.assertIn('var current = nav.querySelector(".fnd-pager-btn.on");', fn)
-        self.assertIn('current.textContent = "불러오는 중…";', fn)
+        self.assertIn('current.textContent = _t("불러오는 중…");', fn)
         self.assertIn('status.className = "fnd-pager-status";', fn)
-        self.assertIn('status.textContent = "불러오는 중…";', fn)
+        self.assertIn('status.textContent = _t("불러오는 중…");', fn)
 
     def test_pager_click_scrolls_results_into_view_after_render(self):
         """[로딩 UX b] 페이지네이션 바 클릭(goToPageFromPager())으로 촉발된 이동만 완료
@@ -2189,12 +2194,12 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function renderDashStats(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (stats.documents !== undefined && stats.documents !== null) {", fn)
-        self.assertIn('buildStatBlock(String(stats.documents), "문서", false)', fn)
-        self.assertIn('buildStatBlock(String(stats.total), "지적사항", false)', fn)
+        self.assertIn('buildStatBlock(String(stats.documents), _t("문서"), false)', fn)
+        self.assertIn('buildStatBlock(String(stats.total), _t("지적사항"), false)', fn)
         # 문서 블록이 총건수 블록보다 **앞**에 온다(라벨만 맞고 순서가 뒤집히면 무의미).
         self.assertLess(
-            fn.index('String(stats.documents), "문서"'),
-            fn.index('String(stats.total), "지적사항"'),
+            fn.index('String(stats.documents), _t("문서")'),
+            fn.index('String(stats.total), _t("지적사항")'),
             "문서 스탯이 지적사항 스탯보다 앞에 와야 한다(기관 스탯의 기준선 역할)",
         )
         self.assertNotIn("agenciesExact", fn, "옛 추정치 툴팁 분기는 054 로 사라졌다")
@@ -2227,17 +2232,22 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('stats.monthsUnit = monthsDocs.length ? "documents" : "findings";', js_src)
         fn = js_src[js_src.index("function renderDashMonths(stats)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn('var monthUnit = stats.monthsUnit === "documents" ? "문서 " : "지적 ";', fn)
-        self.assertIn('x.month + " " + monthUnit + x.count + "건"', fn)
+        self.assertIn(
+            'var monthUnit = stats.monthsUnit === "documents" ? _t("문서 ") : _t("지적 ");', fn)
+        self.assertIn(
+            '_t("{month} {unit}{count}건", { month: x.month, unit: monthUnit, count: x.count })', fn)
 
     def test_dash_block_headings_declare_their_unit(self):
         """[문서 축 054] 한 대시보드 안에 두 단위가 섞이는 건 피할 수 없다(카테고리는
         지적사항이, 기관 비교는 문서가 자연 단위다). 섞이는 게 문제가 아니라 **어느 쪽인지
         안 적는 것**이 문제였으므로, 세 블록 제목이 각자 단위를 밝힌다."""
         html = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
-        self.assertIn('카테고리 분포<span class="fnd-dash-unit">지적사항 기준</span>', html)
-        self.assertIn('월별 추이<span class="fnd-dash-unit">문서 기준</span>', html)
-        self.assertIn('업체 상위 5<span class="fnd-dash-unit">지적사항 기준</span>', html)
+        self.assertIn(
+            '{{ _("카테고리 분포") }}<span class="fnd-dash-unit">{{ _("지적사항 기준") }}</span>', html)
+        self.assertIn(
+            '{{ _("월별 추이") }}<span class="fnd-dash-unit">{{ _("문서 기준") }}</span>', html)
+        self.assertIn(
+            '{{ _("업체 상위 5") }}<span class="fnd-dash-unit">{{ _("지적사항 기준") }}</span>', html)
         self.assertIn(".fnd-dash-unit{", html)
 
     def test_facet_skeleton_idempotent_for_reload_after_more(self):
@@ -2529,7 +2539,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         표현은 findings.js 어디에도 있으면 안 된다 — trigram+FTS 렉시컬이지 의미 매칭이
         아니다(018 마이그레이션 주석과 동일 원칙)."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn('btn.textContent = "유사 문구 검색";', js_src)
+        self.assertIn('btn.textContent = _t("유사 문구 검색");', js_src)
         self.assertNotIn("의미검색", js_src)
         self.assertNotIn("시맨틱", js_src)
 
@@ -2652,7 +2662,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function appendSimilarDupBadge(card, item) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (!item || !(Number(item.dup_findings) > 1)) return;", fn)
-        self.assertIn('badge.textContent = "동일 문구 " + (item.dup_documents || 0) + "개 문서";', fn)
+        self.assertIn(
+            'badge.textContent = _t("동일 문구 {n}개 문서", { n: item.dup_documents || 0 });', fn)
 
     def test_similar_deeplink_landing_reuses_pr0_param(self):
         """[딥링크 연계 §4] 각 결과 카드는 PR-0 딥링크(/findings/?finding_id=<id>)로
@@ -2834,7 +2845,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function buildSimilarToItem(item) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (Number(item.dup_findings) > 1) {", fn)
-        self.assertIn('"동일 문구 " + (item.dup_documents || 0) + "개 문서"', fn)
+        self.assertIn('_t("동일 문구 {n}개 문서", { n: item.dup_documents || 0 })', fn)
 
     def test_similar_to_needs_review_visual_distinction_inline_no_css_edit(self):
         """[검토 필요 시각 경계] .fnd-card--review 관례(왼쪽 3px coral 보더)를 grm.css
@@ -2854,7 +2865,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function buildSimilarToItem(item) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("similarItemDeepLinkUrl(item.finding_id)", fn)
-        self.assertIn('link.textContent = "해당 문서 보기";', fn)
+        self.assertIn('link.textContent = _t("해당 문서 보기");', fn)
 
     def test_similar_to_no_client_side_resort_or_refilter(self):
         """[서버 순서 그대로] renderSimilarToState() 는 items 를 재정렬·재필터하지 않고
@@ -2959,7 +2970,7 @@ class WebFindingsInspectorNamesTest(unittest.TestCase):
         # (findings_inspector_index 캐시, WebInspectorRenderTest 가 그 배선을 가드) —
         # 이름은 join() 문자열 결합이 아니라 forEach 로 하나씩 appendChild 된다.
         self.assertIn('var inspectorSpan = el("span", "fnd-doc-count");', gate)
-        self.assertIn('inspectorSpan.appendChild(document.createTextNode("실사관: "));', gate)
+        self.assertIn('inspectorSpan.appendChild(document.createTextNode(_t("실사관: ")));', gate)
         self.assertIn("inspectors.forEach(function (name, idx) {", gate)
         self.assertIn("meta.appendChild(inspectorSpan);", gate)
 
@@ -3357,9 +3368,9 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn("yearBase[c.year] = (yearBase[c.year] || 0) + (c.cnt || 0);", fn)
         self.assertIn("var share = base > 0 ? (cnt / base) * 100 : 0;", fn)
         self.assertIn("td.textContent = pctText(cnt, base);", fn)
-        self.assertIn('el("span", "tr-heatmap-yearbase", fmtNum(yearBase[y] || 0) + "건")', fn)
+        self.assertIn('el("span", "tr-heatmap-yearbase", _t("{n}건", { n: fmtNum(yearBase[y] || 0) }))', fn)
         # 툴팁은 건수·분모·비율을 모두 보여 준다(원 수치 은폐 금지).
-        self.assertIn('"건(그 해 "', fn)
+        self.assertIn('_t("{cnt}건(그 해 {base}건 중 {pct})",', fn)
 
     def test_heatmap_thin_years_dropped_but_disclosed(self):
         """표본이 얇은 연도는 비율이 노이즈라 열에서 빼되, **뺐다는 사실을 화면에 적는다**.
@@ -3476,7 +3487,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         fn = js_src[js_src.index("function renderStats(totals)"):]
         fn = fn[:fn.index("\n  }")]
         self.assertIn("if (hasDocumentsCount(totals)) {", fn)
-        self.assertIn('buildStat(fmtNum(totals.documents), "분석 문서")', fn)
+        self.assertIn('buildStat(fmtNum(totals.documents), _t("분석 문서"))', fn)
         # "총 지적사항" 카드 다음, "업체" 카드 이전에 위치(문서-지적 관계를 바로 옆에서
         # 대조할 수 있도록).
         idx_findings = fn.index('"총 지적사항"')
@@ -3495,9 +3506,9 @@ class WebTrendsRenderTest(unittest.TestCase):
         # 가능) 는 조건과 무관하게 무조건 실행된다 — 문서 스탯만 옵셔널.
         guard_idx = fn.index("if (hasDocumentsCount(totals)) {")
         after_guard = fn[fn.index("}", guard_idx) + 1:]
-        self.assertIn('buildStat(fmtNum(totals.firms), "업체")', after_guard)
-        self.assertIn('buildStat(fmtNum(totals.raw_signals), "원문서")', after_guard)
-        self.assertIn('buildStat(fmtNum(totals.public_findings), "국문 열람 가능")', after_guard)
+        self.assertIn('buildStat(fmtNum(totals.firms), _t("업체"))', after_guard)
+        self.assertIn('buildStat(fmtNum(totals.raw_signals), _t("원문서"))', after_guard)
+        self.assertIn('buildStat(fmtNum(totals.public_findings), _t("국문 열람 가능"))', after_guard)
 
     def test_coverage_note_documents_present_path_mentions_document_count(self):
         """010 적용 라이브(totals.documents 존재)에서는 첫 문장이 "규제 문서 N건에서
@@ -3592,7 +3603,7 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn(
             'a.href = "../firm/index.html?key=" + encodeURIComponent(firmKey);', fn
         )
-        self.assertIn('a.textContent = "업체 프로파일 전체 보기 →";', fn)
+        self.assertIn('a.textContent = _t("업체 프로파일 전체 보기 →");', fn)
         self.assertIn('a.className = "tr-fd-profile-link";', fn)
 
     def test_profile_link_rendered_at_top_of_detail_panel_only_when_key_present(self):
@@ -4090,7 +4101,7 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
     def test_badge_text_format_matches_spec_example(self):
         """스펙 예시 형태 "해외 2.0배" — 소수 1자리 반올림."""
         self.assertIn(
-            '"해외 " + (Math.round(r.ratio * 10) / 10) + "배"', self.js_src
+            '_t("해외 {ratio}배", { ratio: Math.round(r.ratio * 10) / 10 })', self.js_src
         )
 
     # ── 부제 숫자는 응답에서(하드코딩 금지) ─────────────────────────────────
@@ -4111,9 +4122,9 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
     def test_subtitle_mentions_fda483_scope_and_excluded_unknown(self):
         fn = self.js_src[self.js_src.index("function renderZonePanel(data)"):]
         fn = fn[:fn.index("\n  }\n")]
-        self.assertIn('"FDA 483 기준 · 해외 "', fn)
+        self.assertIn('_t("FDA 483 기준 · 해외 {ff}건', fn)
         self.assertIn("scope.excluded_unknown_country", fn)
-        self.assertIn('"건 제외"', fn)
+        self.assertIn('_t("소재국 미상 {n}건 제외"', fn)
 
     # ── 해외 국가 구성(오독 방지) ────────────────────────────────────────────
     def test_top_countries_top5_rendered(self):
@@ -4139,7 +4150,8 @@ class WebFindingsZoneComparisonTest(unittest.TestCase):
         m = re.search(r"var COUNTRY_LABELS_KO = \{(.*?)\n  \};", self.js_src, re.S)
         self.assertIsNotNone(m, "trends.js 에 COUNTRY_LABELS_KO 정의 미발견")
         body = m.group(1)
-        pairs = dict(re.findall(r'([A-Z]{2}):\s*"([^"]+)",?', body))
+        # [i18n 2단계] 값은 `_t("…")` 로 감싸질 수 있다 — 선택적 래퍼를 허용한다.
+        pairs = dict(re.findall(r'([A-Z]{2}):\s*(?:_t\()?"([^"]+)"\)?,?', body))
 
         canon_codes = set(grm_findings._COUNTRY_CODE_MAP.values())
         self.assertEqual(len(canon_codes), 68, "매핑 정본 코드 수가 68이 아님(전제 재확인 필요)")
@@ -4421,7 +4433,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("지적사항 검색에서 모두 확인하실 수 있습니다", self.js_src)
         self.assertIn("offCnt: agencyOffCount(grid, view),", self.js_src)
         # 읽는 법도 분모에 맞춰 다시 적혀 있어야 한다.
-        self.assertIn('" 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 "', self.js_src)
+        self.assertIn("{label} 실사 지적에서만 셉니다. 오른쪽 %는 그 기간 {label} 지적 전체", self.js_src)
         self.assertIn("실사에서 나온 지적만 합쳐 센 순위입니다", self.js_src)
 
     def test_new_elements_defensively_queried_not_in_hard_gate(self):
@@ -4526,7 +4538,8 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         거의 그대로인데 비중은 22%→17%다. 각 행에 건수를 병기하고, 표제도 '줄어든'이
         아니라 '비중이 줄어든'이며, 노트가 그 차이를 한 줄로 못박는다."""
         row = self._fn("buildMoverRow")
-        self.assertIn('"지적 " + fmtNum(r.prevCnt) + " → " + fmtNum(r.curCnt) + "건"', row)
+        self.assertIn(
+            '_t("지적 {prev} → {cur}건", { prev: fmtNum(r.prevCnt), cur: fmtNum(r.curCnt) })', row)
         self.assertIn('el("span", "tr-mv-cnt"', row)
         self.assertIn("<h3 class=\"tr-sub-h\">비중이 커진 영역</h3>", self.html)
         self.assertIn("<h3 class=\"tr-sub-h\">비중이 줄어든 영역</h3>", self.html)
@@ -4546,8 +4559,10 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("b.cnt - a.cnt || a.code.localeCompare(b.code)", fn)
         self.assertIn(".slice(0, RECENT_CAT_ROWS)", fn)
         row = self._fn("buildRecentCatRow")
-        self.assertIn('fmtNum(entry.cnt) + "건 · " + pctText(entry.cnt, curFindings)', row)
-        self.assertIn('"건 · 문서 " +', row)   # 문서 수는 툴팁으로 보존
+        self.assertIn(
+            '_t("{n}건 · {pct}", { n: fmtNum(entry.cnt), pct: pctText(entry.cnt, curFindings) })',
+            row)
+        self.assertIn('_t("최근 12개월 지적 {n}건 · 문서 {d}건",', row)   # 문서 수는 툴팁으로 보존
 
     # ── 표본 하한 · 유의 폭(억지 해석 금지) ──────────────────────────────────
     def test_sample_and_significance_thresholds_declared_with_rationale(self):
@@ -4594,7 +4609,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
 
     def test_empty_mover_list_says_so_instead_of_rendering_nothing(self):
         fn = self._fn("fillMoverList")
-        self.assertIn('"기준(" + MOVER_MIN_PP + "%p 이상)을 넘는 변화가 없습니다."', fn)
+        self.assertIn('_t("기준({n}%p 이상)을 넘는 변화가 없습니다.", { n: MOVER_MIN_PP })', fn)
 
     # ── 교란 요인 공개(소스 구성 변화) ──────────────────────────────────────
     def test_source_mix_shift_is_disclosed_from_response(self):
@@ -4603,7 +4618,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         by_source(cur/prev)로 두 기간 구성을 나란히 적는다(하드코딩 금지)."""
         fn = self._fn("renderMoverSourceLine")
         self.assertIn("s.prev_cnt", fn)
-        self.assertIn('"두 기간의 소스 구성: "', fn)
+        self.assertIn('_t("두 기간의 소스 구성: {list}.", {', fn)
         self.assertIn("소스 구성이 달라지면 위 증감도 함께 움직입니다.", fn)
         self.assertIn("moveSourceEl.textContent =", fn)
         # 분모는 증감과 같은 단위(지적 건수)여야 독자가 두 수치를 견줄 수 있다.
@@ -4789,9 +4804,9 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
     def test_dropped_lane_names_are_human_readable(self):
         """뺀 레인을 화면에 적을 때 내부 키(`MFDS/gmp-inspection`)를 그대로 노출하면
         안 된다 — 사람이 읽는 이름으로 바꾼다(트랙C 품질 기준: 내부 개념 미노출)."""
-        self.assertIn('"MFDS/admin-action": "MFDS 행정처분"', self.js_src)
-        self.assertIn('"MFDS/gmp-inspection": "MFDS GMP 실사"', self.js_src)
-        self.assertIn('"MFDS/recall-quality": "MFDS 회수"', self.js_src)
+        self.assertIn('"MFDS/admin-action": _t("MFDS 행정처분"),', self.js_src)
+        self.assertIn('"MFDS/gmp-inspection": _t("MFDS GMP 실사"),', self.js_src)
+        self.assertIn('"MFDS/recall-quality": _t("MFDS 회수"),', self.js_src)
         align = self._fn("alignSourceMix")
         self.assertEqual(align.count("source: laneLabel(s.lane)"), 2,
                          "thin·skew 두 경로 모두 라벨을 거쳐야 한다")
@@ -4849,7 +4864,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         # ★건수의 범위를 라벨에 적는다 — findings_search 가 세는 것은 전 기간 공개분인데
         # 이 패널이 달린 행은 최근 12개월 수치라(실측 309건 vs 2,976건) 범위를 빼면 두
         # 숫자가 어긋나 보인다. 링크가 가는 곳도 기간 필터 없는 검색이다.
-        self.assertIn('"전체 기간 " + ko + " 지적 " + fmtNum(total) + "건 보기 →"', fn)
+        self.assertIn('_t("전체 기간 {ko} 지적 {n}건 보기 →", { ko: ko, n: fmtNum(total) })', fn)
         # 공개 게이트 밖이라 사례가 하나도 없을 수 있다 — 그 사실을 적는다.
         self.assertIn("이 영역은 아직 국문으로 열람할 수 있는 지적이 없습니다.", fn)
 
@@ -5056,7 +5071,7 @@ class WebTrendsCfrRankingTest(unittest.TestCase):
         self.assertIn('a.rel = "noopener";', link)
         self.assertIn("조문 원문 보기(eCFR) →", link)
         # 조항 뿌리로 합치면서 버린 하위 항 정보를 여기서 되돌려준다.
-        self.assertIn('"실제 인용된 항: " + variants.join(" · ")', link)
+        self.assertIn('_t("실제 인용된 항: {list}", { list: variants.join(" · ") })', link)
 
     def test_examples_filtered_by_actual_cfr_refs_not_blob_match(self):
         """검색은 blob ILIKE 라 본문에 번호만 스친 행도 걸린다 — 실제로 그 조항이
@@ -5082,8 +5097,8 @@ class WebTrendsCfrRankingTest(unittest.TestCase):
     def test_recent_docs_shown_beside_cumulative(self):
         """누적만 보면 "예전에 많이 걸렸던 조항"과 "지금도 걸리는 조항"이 구분되지 않는다."""
         fn = self._fn("buildCfrRow")
-        self.assertIn('"문서 " + fmtNum(item.docs) + "건"', fn)
-        self.assertIn('"최근 12개월 " + fmtNum(item.recent_docs) + "건"', fn)
+        self.assertIn('_t("문서 {n}건", { n: fmtNum(item.docs) })', fn)
+        self.assertIn('_t("최근 12개월 {n}건", { n: fmtNum(item.recent_docs) })', fn)
 
     # ── 조항 국문 요지 ───────────────────────────────────────────────────────
     def test_section_labels_cover_observed_sections_and_fall_back(self):
@@ -5091,7 +5106,8 @@ class WebTrendsCfrRankingTest(unittest.TestCase):
         조항은 번호만 표시한다(추측 번역 금지 — countryLabelKo 와 동일 폴백 계약)."""
         m = re.search(r"var CFR_SECTION_LABELS = \{(.*?)\n  \};", self.js_src, re.S)
         self.assertIsNotNone(m, "CFR_SECTION_LABELS 정의 미발견")
-        pairs = dict(re.findall(r'"([0-9.]+)":\s*"([^"]+)"', m.group(1)))
+        # [i18n 2단계] 값은 `_t("…")` 로 감싸질 수 있다 — 선택적 래퍼를 허용한다.
+        pairs = dict(re.findall(r'"([0-9.]+)":\s*(?:_t\()?"([^"]+)"\)?', m.group(1)))
         # 라이브 실측 상위 조항은 반드시 요지를 갖는다.
         for sec, cue in (("211.22", "품질관리부서"), ("211.84", "원자재"),
                          ("211.100", "생산·공정관리"), ("211.192", "일탈"),
@@ -5215,7 +5231,7 @@ class WebChecklistRenderTest(unittest.TestCase):
         self.assertIn('<div class="cl-ctl-row cl-ctl-export" id="cl-export" hidden>', self.html)
 
     def test_env_missing_ends_quietly_not_as_error(self):
-        self.assertIn('loadingEl.textContent = "체크리스트 서비스 준비 중입니다.";', self.js_src)
+        self.assertIn('loadingEl.textContent = _t("체크리스트 서비스 준비 중입니다.");', self.js_src)
 
     # ── 층 분리: 순위 정본은 042 하나 ────────────────────────────────────────
     def test_two_round_trips_only_ranking_then_examples(self):
@@ -5247,7 +5263,7 @@ class WebChecklistRenderTest(unittest.TestCase):
         값("recent")과 비교해 항상 거짓이 됐다 — 최근순으로 정렬한 표에도 인쇄물 머리에
         "전체 누적 인용순"이 찍혔다(인쇄물이 자기 기준을 잘못 말하는 결함)."""
         self.assertIn(
-            'sortLabel: sortKey === "recent_docs" ? "최근 12개월 인용순" : "전체 누적 인용순",',
+            'sortLabel: sortKey === "recent_docs" ? _t("최근 12개월 인용순") : _t("전체 누적 인용순"),',
             self.js_src)
         self.assertNotIn('sortKey === "recent" ?', self.js_src)
 
@@ -5284,11 +5300,11 @@ class WebChecklistRenderTest(unittest.TestCase):
     def test_verdict_and_note_fields_are_blank_for_humans(self):
         """판정·근거는 사람이 채우는 칸이다 — 서버가 값을 지어내지 않는다."""
         fn = self._fn("buildVerdictBox")
-        self.assertIn('["적합", "부적합", "해당없음"]', fn)
+        self.assertIn('[_t("적합"), _t("부적합"), _t("해당없음")]', fn)
         self.assertIn('input.type = "radio";', fn)
         self.assertIn('input.name = "cl-v-" + idx;', fn)   # 항목별 배타 선택
         item = self._fn("buildItem")
-        self.assertIn('el("span", "", "확인 결과 · 근거 문서")', item)
+        self.assertIn('el("span", "", _t("확인 결과 · 근거 문서"))', item)
         rows = self._fn("exportRows")
         self.assertIn('line.push("", "");', rows)          # 내보내기에서도 빈 칸
 
@@ -5380,7 +5396,8 @@ class WebCfrSectionLabelsSyncTest(unittest.TestCase):
     침묵 통과한다(PR#351·#366 이 정확히 그 실패였다) — web/assets/*.js 를 글롭으로 훑어
     선언 파일을 **전부 자동 발견**해 서로 대조하고, 0건이면 선언 형식이 깨진 것으로 본다."""
 
-    _PAT = re.compile(r'"([0-9.]+)":\s*"((?:[^"\\]|\\.)*)"')
+    # [i18n 2단계] 값은 `_t("…")` 로 감싸질 수 있다 — 선택적 래퍼를 허용한다.
+    _PAT = re.compile(r'"([0-9.]+)":\s*(?:_t\()?"((?:[^"\\]|\\.)*)"\)?')
 
     def _copies(self):
         out = {}
@@ -5433,7 +5450,9 @@ class WebCountryLabelsSyncTest(unittest.TestCase):
     형제 가드와 동일하게 **web/assets/*.js 를 글롭으로 훑어 선언 파일을 전부 자동 발견**
     하고, 0건이면 선언 형식이 깨진 것으로 본다(수동 파일 목록 금지)."""
 
-    _PAT = re.compile(r'([A-Z]{2}):\s*"((?:[^"\\]|\\.)*)"')
+    # [i18n 2단계] 값은 `_t("…")` 로 감싸질 수 있다 — 선택적 래퍼를 허용해 파싱 결과는
+    # 감싸기 전과 같게 유지한다.
+    _PAT = re.compile(r'([A-Z]{2}):\s*(?:_t\()?"((?:[^"\\]|\\.)*)"\)?')
 
     def _copies(self):
         out = {}
@@ -5482,8 +5501,10 @@ class WebCategoryLabelsSyncTest(unittest.TestCase):
     같은 원칙: web/assets/*.js 를 글롭으로 훑어 'var CATEGORY_LABELS = {' 를 선언한 파일을
     전부 자동 발견해 각각 grm_findings.FINDING_TAXONOMY 와 대조한다(개별 메서드 0개)."""
 
+    # [i18n 2단계] ko 값은 `_t("…")` 로 감싸질 수 있다 — 감싸든 안 감싸든 파싱 결과(파싱된
+    # dict)는 같아야 하므로 선택적 `_t(` … `)` 래퍼를 허용한다.
     _ENTRY_PAT = re.compile(
-        r'(\w+):\s*\{\s*ko:\s*"((?:[^"\\]|\\.)*)",\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
+        r'(\w+):\s*\{\s*ko:\s*(?:_t\()?"((?:[^"\\]|\\.)*)"\)?,\s*en:\s*"((?:[^"\\]|\\.)*)"\s*\}'
     )
 
     def test_all_category_labels_copies_match_taxonomy(self):
@@ -5684,7 +5705,7 @@ class WebFirmRenderTest(unittest.TestCase):
         404·network 실패)와 key 파라미터 없음/빈 프로파일(display_name "")을 서로 다른
         상태로 구분해 처리하는지 소스 마커로 확인한다."""
         js_src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
-        self.assertIn('loadingEl.textContent = "업체 프로파일 준비 중입니다."', js_src)
+        self.assertIn('loadingEl.textContent = _t("업체 프로파일 준비 중입니다.");', js_src)
         self.assertIn('showState("notfound")', js_src)
         self.assertIn('showState("error")', js_src)
         self.assertIn("!(data.display_name || \"\")", js_src)
@@ -5744,10 +5765,10 @@ class WebFirmRenderTest(unittest.TestCase):
         문서는 공개일(published_date), 실사는 실사 종료일(inspection_end_date).
         행마다 무엇이고 그 날짜가 무슨 날인지 적는다."""
         src = (WEB_DIR / "assets" / "firm.js").read_text(encoding="utf-8")
-        self.assertIn('el("span", "fp-tl-when", "공개")', src)
-        self.assertIn('el("span", "fp-tl-when", "실사 종료")', src)
-        self.assertIn('el("span", "fp-tl-kind", "문서")', src)
-        self.assertIn('el("span", "fp-tl-kind insp", "실사")', src)
+        self.assertIn('el("span", "fp-tl-when", _t("공개"))', src)
+        self.assertIn('el("span", "fp-tl-when", _t("실사 종료"))', src)
+        self.assertIn('el("span", "fp-tl-kind", _t("문서"))', src)
+        self.assertIn('el("span", "fp-tl-kind insp", _t("실사"))', src)
 
     def test_timeline_sorts_desc_and_parks_undated_last(self):
         """정렬 계약 — 날짜 내림차순, 날짜가 빈 행은 맨 뒤.
@@ -5808,7 +5829,10 @@ class WebFirmRenderTest(unittest.TestCase):
         fn = src[src.index("function renderInspections("):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("scope.fiscal_year_min", fn)
-        self.assertIn('"확인된 " + range +', fn)
+        self.assertIn(
+            '_t("확인된 {range} 기록이 없습니다. 그 이전 실사나 다른 유형의 실사는 이 범위 밖입니다.", '
+            '{ range: range })',
+            fn)
         # 범위를 만들 수 없으면 부재 문장 자체를 싣지 않는다(빈 문자열로 남긴다).
         self.assertIn('inspSubEl.textContent = range', fn)
         # 템플릿·JS 어디에도 좁히지 않은 부재 단정이 없어야 한다.
@@ -6001,8 +6025,8 @@ class WebInspectorRenderTest(unittest.TestCase):
         self.assertIn('link.addEventListener("click", function (ev) { ev.stopPropagation(); });', fn)
         # 펼치기 토글 배선(makeClickableRow) 자체는 이 변경으로 건드리지 않았다(회귀 방지).
         self.assertIn(
-            'makeClickableRow(main, (doc.source || "") + " " + (doc.published_date || "") '
-            '+ " 지적사항 펼치기",',
+            'makeClickableRow(main, _t("{source} {date} 지적사항 펼치기", '
+            '{ source: doc.source || "", date: doc.published_date || "" }),',
             self.js_src,
         )
 
@@ -6131,7 +6155,13 @@ class WebInspectorRenderTest(unittest.TestCase):
         var 선언("var NAME = " 부터 그 줄의 ";" 까지) 양쪽을 지원한다(fetchInspector
         ProfileWithRetry 가 참조하는 RETRY_DELAY_MS 처럼 함수가 아닌 상수도 있다 —
         드라이버에서 빠지면 ReferenceError 로 조용히 실패해 재시도 자체가 무산된다).
-        Node 드라이버 스크립트에 그대로 주입할 소스 조각을 돌려준다."""
+        Node 드라이버 스크립트에 그대로 주입할 소스 조각을 돌려준다.
+
+        [i18n 2단계] 추출한 조각이 `_t(...)` 를 참조할 수 있으므로(FIRM_BLANK_LABEL 등)
+        node 에서 단독 실행 가능하도록 grm_i18n.JS_SHIM(정본 shim)을 앞에 붙인다 — shim
+        문구를 손으로 베끼지 않는다. shim 자체는 브라우저 전역 `window` 를 참조하므로,
+        plain node(=window 없음)에서 `_t()`가 죽지 않도록 빈 `window` 스텁도 함께 준다
+        (카탈로그가 없으므로 항등 — 한국어 그대로 돌려주는 기존 기대와 일치)."""
         src = (WEB_DIR / "assets" / "inspector.js").read_text(encoding="utf-8")
         out = []
         for name in names:
@@ -6144,7 +6174,7 @@ class WebInspectorRenderTest(unittest.TestCase):
                 start = src.index(var_sig)
                 end = src.index(";", start) + 1
             out.append(src[start:end])
-        return "\n".join(out)
+        return "var window = {};\n" + grm_i18n.JS_SHIM + "\n".join(out)
 
     @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
     def test_index_grouping_and_filtering_behavior_via_node(self) -> None:
@@ -6517,7 +6547,7 @@ class WebInspectorFirmBlockTest(unittest.TestCase):
     def test_build_firm_row_meta_text_format(self):
         """'문서 N건 · 2023, 2024' — 연도가 없으면 '·' 이하가 없다."""
         fn = WebInspectorRenderTest._slice_top_level_fn(self.js_src, "buildFirmRow")
-        self.assertIn('var meta = "문서 " + fmtNum(g.count) + "건";', fn)
+        self.assertIn('var meta = _t("문서 {n}건", { n: fmtNum(g.count) });', fn)
         self.assertIn('meta += " · " + g.years.join(", ");', fn)
 
     def test_render_firms_hides_block_when_zero_groups(self):
@@ -6821,8 +6851,9 @@ class WebMePageTest(unittest.TestCase):
         self.assertEqual(nav_m.group(1).count("<a "), 6)
         self.assertNotIn("마이페이지", nav_m.group(1))
         # 헤더 계정 메뉴 항목도 실제 페이지 내용과 이름을 맞췄다(링크·아이콘은 그대로).
-        self.assertIn('<i class="ti ti-bookmark" aria-hidden="true"></i>마이페이지</a>',
-                      self.reactions_js)
+        self.assertIn(
+            "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"마이페이지\") + '</a>'",
+            self.reactions_js)
 
     def test_no_new_backend_surface(self):
         """신규 RPC·마이그레이션 0 — 기존 reaction·firm_watchlist·gurumi_growth 경로만
@@ -9375,15 +9406,18 @@ class WebInspectionDateTest(unittest.TestCase):
                / "findings_doc.html").read_text(encoding="utf-8")
         self.assertIn("{%- if doc.inspection_date %}", tpl,
                       "실사일 칩이 조건 없이 그려지면 빈 칩이 나간다")
-        self.assertIn("</b> 실사</span>", tpl)
-        self.assertIn("</b> 공개</span>", tpl)
+        # [다국어 2단계 2026-09-04] 칩 문구는 문구 사전을 거친다(`_()`), 날짜는 슬롯이다 —
+        # 검사 대상은 "칩마다 날짜 옆에 종류를 적는가"이므로 감싼 형태로 그대로 고정한다.
+        self.assertIn('{{ _("<b>{date}</b> 실사", date=doc.inspection_date) }}</span>', tpl)
+        self.assertIn('{{ _("<b>{date}</b> 공개", date=doc.published_date) }}</span>', tpl)
         # ★같은 날짜면 '공개' 칩을 만들지 않는다 — 캐나다 실사가 그렇다(mig 069).
         #   두 번 적으면서 한쪽을 '공개'라고 부르면 그게 고치려던 거짓말이다.
         self.assertIn("{%- if doc.published_date != doc.inspection_date %}", tpl,
                       "같은 날짜가 '실사'와 '공개'로 두 번 나간다")
-        # 본문의 출처 문장도 같은 규칙을 따라야 한다.
-        self.assertIn("{% if doc.published_date == doc.inspection_date %}실사한"
-                      "{% else %}공개한{% endif %}", tpl)
+        # 본문의 출처 문장도 같은 규칙을 따라야 한다(갈래마다 문장 전체가 하나의 키다).
+        self.assertIn("{% if doc.published_date == doc.inspection_date %}", tpl)
+        self.assertIn('_("{agency}가 <b>{date}</b>에 실사한 문서에서', tpl)
+        self.assertIn('_("{agency}가 <b>{date}</b>에 공개한 문서에서', tpl)
 
 
 class WebFindingsDocPageTest(unittest.TestCase):
@@ -12208,7 +12242,7 @@ class WebLoginFrictionTest(unittest.TestCase):
         self.assertIn("window.GRM_AUTH.open = openLogin;", self.js)
         self.assertIn('setMode(o.mode === "signup" ? "signup" : "login");', self.js)
         # 가입 화면엔 로그인 전환이 항상 있다(막다른 길 0).
-        self.assertIn('addLink("이미 계정이 있어요 · 로그인", "login")', self.js)
+        self.assertIn('addLink(_t("이미 계정이 있어요 · 로그인"), "login")', self.js)
         # 펫 CTA(가입 의도 분명) → 가입 직행 + reactions.js 미로드 시 기존 헤더 위임 폴백.
         self.assertIn('window.GRM_AUTH.open({ mode: "signup" })', self.sync_js)
         self.assertIn('querySelector(".grm-auth .grm-acct-login")', self.sync_js)
@@ -12219,7 +12253,7 @@ class WebLoginFrictionTest(unittest.TestCase):
         self.assertIn('setMode("confirm");', self.js)
         # 성공(세션 성립)·명시적 이탈에서 진행 상태를 지운다 — 유령 복원 0.
         self.assertIn("clearSignupProgress(); closeLogin();", self.js)
-        self.assertIn('addLink("다른 이메일로 가입", "signup"', self.js)
+        self.assertIn('addLink(_t("다른 이메일로 가입"), "signup"', self.js)
         # 저장 대상은 이메일+시각뿐(비밀번호·토큰·세션 미저장) + 30분 만료.
         self.assertIn("JSON.stringify({ email: email, ts: Date.now() })", self.js)
         self.assertIn("var SIGNUP_TTL_MS = 30 * 60 * 1000;", self.js)
@@ -12319,10 +12353,16 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         track = re.search(r'class="track">(.*?)</div>', landing, re.S)
         self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
         marquee = {norm(s.replace("\xa0", " ").strip()) for s in re.findall(r"<span>([^<]+)</span>", track.group(1))}
-        foot = re.search(r"<h5>수집 소스</h5>(.*?)</div>", base, re.S)
+        # [i18n 2단계] 템플릿 원문은 {{ _("수집 소스") }} 로 감싸져 있다.
+        foot = re.search(r'<h5>\{\{ _\("수집 소스"\) \}\}</h5>(.*?)</div>', base, re.S)
         self.assertIsNotNone(foot, "푸터 '수집 소스' 블록을 찾지 못함")
         footer = set()
+        # [i18n 2단계] 한글이 섞인 span 은 {{ _("…") }} 로 감싸져 있다 — 안쪽 원문만 꺼낸다.
+        i18n_span = re.compile(r'^\{\{ _\("(.*)"\) \}\}$')
         for chunk in re.findall(r"<span>([^<]+)</span>", foot.group(1)):
+            im = i18n_span.match(chunk)
+            if im:
+                chunk = im.group(1)
             footer.update(norm(x.strip()) for x in chunk.replace("\xa0", " ").split("·"))
         self.assertEqual(marquee, footer,
                          f"마퀴에만: {sorted(marquee - footer)} / 푸터에만: {sorted(footer - marquee)}")
@@ -12389,7 +12429,8 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         # ② render.py 메타 설명 3종 — 상수 본문을 개별 검증(하나만 고치고 나머지 빠뜨리는 것 방지).
         render_src = (WEB_DIR / "render.py").read_text(encoding="utf-8")
         for const in ("FINDINGS_DESCRIPTION", "TRENDS_DESCRIPTION", "FIRM_DESCRIPTION"):
-            m = re.search(const + r"\s*=\s*\((.*?)\)", render_src, re.S)
+            # [i18n 2단계] 값은 이제 N_("…") 로 감싸져 있다.
+            m = re.search(const + r"\s*=\s*N_\((.*?)\)", render_src, re.S)
             self.assertIsNotNone(m, f"{const} 정의를 찾지 못함")
             body = m.group(1)
             for kw in REQUIRED:
@@ -13968,6 +14009,91 @@ class WebPagePathTest(unittest.TestCase):
                                  f"{html_path.relative_to(out).as_posix()} 의 rel_root 가 "
                                  f"깊이({depth})와 어긋난다")
             self.assertGreater(checked, 300, f"검사 대상이 너무 적다: {checked}")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
+class WebI18nTest(unittest.TestCase):
+    """[다국어 2단계 2026-09-03] 문구 사전(`web/grm_i18n.py`) — 감싸기 완결·카탈로그 정합·항등.
+
+    키는 한국어 원문이고 한국어 빌드는 항등이라 산출물이 바이트 불변이다(그 증명은 골든과
+    전체 빌드 md5 대조). 여기서 고정하는 것: ①공개 템플릿·JS 에 감싸지 않은 한글이 없다
+    ②소스에서 추출한 키 전량이 영어 카탈로그에 있고 고아·슬롯 불일치·미번역이 없다
+    ③JS 마다 shim 사본이 바이트 동일하다 ④한국어 번역기는 항등·영어는 결손 시 즉시 실패
+    ⑤검사 대상이 비공허하다(파일 수·키 수 하한).
+    """
+
+    def test_lint_is_clean(self):
+        problems = grm_i18n.lint(langs=("en",), require_catalog=True)
+        self.assertEqual(problems, [], "i18n lint 위반:\n" + "\n".join(problems[:40]))
+
+    def test_scan_is_not_vacuous(self):
+        self.assertGreaterEqual(len(grm_i18n.template_files()), 28)
+        self.assertGreaterEqual(len(grm_i18n.asset_files()), 12)
+        self.assertNotIn("admin.html", [p.name for p in grm_i18n.template_files()])
+        self.assertNotIn("admin.js", [p.name for p in grm_i18n.asset_files()])
+        keys = grm_i18n.collect_keys()
+        self.assertGreater(len(keys), 1000, f"추출된 키가 너무 적다: {len(keys)}")
+        self.assertTrue(any(k for k in keys if "{" in k), "슬롯이 든 키가 하나도 없다")
+
+    def test_catalog_file_is_sorted_for_stable_diffs(self):
+        raw = json.loads(grm_i18n.catalog_path("en").read_text(encoding="utf-8"))
+        self.assertEqual(list(raw), sorted(raw), "en.json 키는 정렬 상태로 유지한다")
+
+    def test_korean_translator_is_identity(self):
+        tr = grm_i18n.Translator("ko")
+        self.assertEqual(tr("문서 {n}건", n=3), "문서 3건")
+        self.assertEqual(tr(""), "")
+        env = render._make_env()
+        out = env.from_string('{{ _("문서 {n}건 <b>{who}</b>", n=5, who=x) }}').render(x="A&B")
+        self.assertEqual(out, "문서 5건 <b>A&amp;B</b>")   # 문구는 Markup, 슬롯 값은 escape
+        self.assertEqual(env.from_string('{{ _("A & B") }}').render(), "A & B")
+
+    def test_english_missing_key_fails_loudly(self):
+        tr = grm_i18n.Translator("en", {"홈": "Home"})
+        self.assertEqual(tr("홈"), "Home")
+        with self.assertRaises(grm_i18n.MissingTranslation):
+            tr("없는 키")
+        with self.assertRaises(KeyError):
+            grm_i18n.Translator("en", {"{n}건": "{n} items"})("{n}건")   # 슬롯 값 누락
+
+    def test_render_helpers_default_to_korean(self):
+        self.assertEqual(render.title_dateform("2026-06-22"), "2026년 6월 4주차")
+        self.assertEqual(render.facet_meta("category")["title"], render.FACET_AXES["category"]["title"])
+        self.assertEqual(render.facet_meta("category")["path"], "c")
+
+    def test_render_helpers_translate_with_english_catalog(self):
+        tr = grm_i18n.Translator("en", {"{y}년 {m}월 {week}주차": "Week {week}, {m}/{y}"})
+        self.assertEqual(render.title_dateform("2026-06-22", tr), "Week 4, 6/2026")
+
+    def test_js_shim_is_byte_identical_in_every_asset(self):
+        for p in grm_i18n.asset_files():
+            self.assertIsNone(grm_i18n.check_js_shim(p), p.name)
+
+    def test_js_scanner_skips_comments_and_regex(self):
+        src = 'var a = "가"; // "나"\n/* "다" */ var r = /"라"/; var b = _t("마");'
+        bodies = [b for _, _, _, b in grm_i18n.scan_js_strings(src)]
+        self.assertEqual(bodies, ["가", "마"])
+
+    def test_lint_catches_bare_hangul_and_bad_calls(self):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_i18n_"))
+        try:
+            js = tmp / "x.js"
+            js.write_text('(function(){ var a = "한글"; var b = _t(v); var c = `템플릿 ${x}`; })();',
+                          encoding="utf-8")
+            found = grm_i18n.find_bare_hangul_js(js)
+            self.assertEqual(len(found), 3, found)
+            html = tmp / "x.html"
+            # 한 줄에 하나씩 — 검사기는 줄 단위로 보고한다(같은 줄의 둘째 한글은 첫째에 묻힌다).
+            html.write_text('{# 주석 #}<p>본문</p>\n'
+                            '<a title="속성">{{ _("감쌈") }}</a>\n'
+                            '{{ "표현식" if 1 else "" }}<i>{{ _("ok") }}</i>\n'
+                            '<b>면제</b> {# i18n-ignore #}\n'
+                            '<script>var a = "스크립트"; // 주석 한글\n</script>\n'
+                            '<style>/* 한글 주석 */ .x{content:"{{ _(\'현재\') }}"}</style>\n',
+                            encoding="utf-8")
+            lines = [l for l, _ in grm_i18n.find_bare_hangul_template(html)]
+            self.assertEqual(lines, [1, 2, 3, 5], grm_i18n.find_bare_hangul_template(html))
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 

@@ -64,6 +64,13 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    빵부스러기 절대 URL 이 전부 나온다. `render_site` 안에서는 `page("…")` + `emit(템플릿, page, …)`
    만 쓰고 `rel_root="../../"` 같은 깊이 손값을 적지 않는다(`WebPagePathTest` 가 AST 로 막는다).
 5. **디자인 = v4** — `assets/grm.css` 수정 금지(디자인 변경은 v4 갱신 후 재추출). 한글에 mono 금지.
+6. **화면 문구는 문구 사전을 거친다(2026-09-03, 다국어 2단계 — `grm_i18n.py`)** — 키는 한국어
+   원문 그대로, 템플릿 `{{ _("…") }}`·JS `_t("…")`·파이썬 `tr("…")`/상수 `N_("…")` 로 감싼다.
+   한국어 빌드는 항등이라 바이트 불변, 영어는 `data/i18n/en.json`(정렬 유지)에서 찾고 **결손이면
+   빌드가 즉시 실패**한다. 슬롯은 세 층 공통 `{name}`(`_("문서 {n}건", n=x)` — 템플릿 층은 값을 escape).
+   새 문구를 넣을 때는 감싸고 en.json 에 한 줄 추가한다 — `python web/grm_i18n.py lint` 가
+   감싸지 않은 한글·결손·고아·슬롯 불일치를 파일:줄로 찍는다(`WebI18nTest` 가 CI 에서 같은 검사).
+   데이터 비교값(`it.state == '신규'`)만 `i18n-ignore` 마커로 면제. Admin 콘솔은 대상 밖(한국어 고정).
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

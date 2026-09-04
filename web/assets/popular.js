@@ -11,6 +11,11 @@
    provenance: card_id 는 인덱스 앵커 조회 키로만 사용. */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   var cfg = document.getElementById("grm-reactions-cfg");
   if (!cfg) return;
   var SUPA_URL = cfg.getAttribute("data-url") || "";
@@ -75,12 +80,12 @@
       a.className = "popular-title";
       a.href = String(e.href || "").replace(/^\.\.\//, "");
       var title = (e.target || "") + (e.issue ? (" — " + e.issue) : "");
-      a.textContent = title || "카드 보기";
+      a.textContent = title || _t("카드 보기");
       li.appendChild(a);
 
       var count = document.createElement("span");
       count.className = "popular-count";
-      count.textContent = p.count + "명 반응";
+      count.textContent = _t("{n}명 반응", { n: p.count });
       li.appendChild(count);
 
       ul.appendChild(li);

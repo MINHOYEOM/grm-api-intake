@@ -18,8 +18,8 @@
     영문 단독 카드에서도 이 텍스트가 어느 기관 원문인지는 밝혀야 한다(종전 nature/action 동작). -#}
 {%- macro ncr_field(label, src, en, ko, kind) -%}
     <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">{{ label }}</span></div>
-      <div class="obs-orig"><span class="viol-lang">원문 · {{ src }}</span>{% if kind == 'ops' %}{{ ops_body(en, 'obs-en') }}{% else %}{{ detail_body(en, 'obs-en') }}{% endif %}</div>
-      {%- if ko %}<div class="obs-ko"><span class="viol-lang ko">국문 해석</span>{% if kind == 'ops' %}{{ ops_body(ko, 'dt-sum') }}{% else %}{{ detail_body(ko, 'dt-sum') }}{% endif %}</div>{% endif %}
+      <div class="obs-orig"><span class="viol-lang">{{ _("원문 · {src}", src=src) }}</span>{% if kind == 'ops' %}{{ ops_body(en, 'obs-en') }}{% else %}{{ detail_body(en, 'obs-en') }}{% endif %}</div>
+      {%- if ko %}<div class="obs-ko"><span class="viol-lang ko">{{ _("국문 해석") }}</span>{% if kind == 'ops' %}{{ ops_body(ko, 'dt-sum') }}{% else %}{{ detail_body(ko, 'dt-sum') }}{% endif %}</div>{% endif %}
     </div>
 {%- endmacro -%}
 {#- card.html — grm-web-card/v1 한 카드 → v4 카드 마크업. 순수 렌더(사실/URL 무변형).
@@ -28,7 +28,7 @@
   {%- if src.url -%}
     {%- if src.state == 'broken' -%}
     {#- href 없는 <a> = 클릭 비활성이되 .src a pill 스타일 상속(grm.css 동결 유지). -#}
-    <a class="src-broken" title="일시 접근불가" style="opacity:.55;cursor:not-allowed"><span class="t">{{ role_label }}</span><i class="ti ti-link-off"></i> 일시 접근불가</a>
+    <a class="src-broken" title="{{ _('일시 접근불가') }}" style="opacity:.55;cursor:not-allowed"><span class="t">{{ role_label }}</span><i class="ti ti-link-off"></i> {{ _("일시 접근불가") }}</a>
     {%- else -%}
     <a href="{{ src.url }}" target="_blank" rel="noopener"><span class="t">{{ role_label }}</span>{% if src.state == 'degraded' %}<i class="ti ti-alert-triangle"></i> {% endif %}<i class="ti {{ src.icon }}"></i> {{ src.text }} <i class="ti ti-external-link" style="font-size:12px"></i></a>
     {%- endif -%}
@@ -56,7 +56,7 @@
   </table>
   {%- endif %}
   {%- if card.merged %}
-  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>전체 {{ card.merged_count }}{{ card.merged_noun }}</summary>
+  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>{{ _("전체 {n}{noun}", n=card.merged_count, noun=card.merged_noun) }}</summary>
     <ul class="facts2">
       {%- for item in card.merged_items %}
       <li>{{ item }}</li>
@@ -71,7 +71,7 @@
   </div>
   {%- endif %}
   {%- if card.key_facts %}
-  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: {{ card.evidence_basis }}</span></div>
+  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>{{ _("핵심 사실") }} <span class="sub">· {{ _("근거: {basis}", basis=card.evidence_basis) }}</span></div>
     <ul class="facts2">
       {%- for k in card.key_facts %}
       <li>{{ k }}</li>
@@ -79,10 +79,10 @@
     </ul></div>
   {%- endif %}
   {%- if card.implication %}
-  <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>시사점 <span class="sub">· 편집 해석</span></div><p>{{ card.implication }}</p></div>
+  <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>{{ _("시사점") }} <span class="sub">· {{ _("편집 해석") }}</span></div><p>{{ card.implication }}</p></div>
   {%- endif %}
   {%- if card.checks %}
-  <div class="chk"><div class="lab"><i class="ti ti-checklist"></i>점검 사항</div><ul>
+  <div class="chk"><div class="lab"><i class="ti ti-checklist"></i>{{ _("점검 사항") }}</div><ul>
     {%- for c in card.checks %}
     <li>{{ c }}</li>
     {%- endfor %}
@@ -93,7 +93,7 @@
       그 아래 공식원문 링크(.src)로 이어짐(단계적 노출: 요약 → 심층분석 → 원문). Overview 는
       §2.5 로 제거(summary 흡수). 섹션 헤더 = 원형번호 배지(①②③④, 폰트 비의존 CSS 원)
       + 세리프 소제목으로 4섹션 위계·가시성 확보. -#}
-  <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>상세 분석 보기 <span class="tag-interp">해석</span> <span class="sub">{% if card.deep_preview %}· {{ card.deep_preview }} {% endif %}· 원문 근거·검증</span></summary>
+  <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>{{ _("상세 분석 보기") }} <span class="tag-interp">{{ _("해석") }}</span> <span class="sub">{% if card.deep_preview %}· {{ card.deep_preview }} {% endif %}· {{ _("원문 근거·검증") }}</span></summary>
     {#- [소스확장 2026-07-02] admin-action(행정처분)은 disposition_basis, [483 분석층 2026-07-02]
         FDA 483 은 inspectional_significance 슬롯 보유 → 한글·기관중립 섹션명. 둘 다 부재인 WL 은
         기존 영문 섹션명 그대로 = 바이트 불변(da_ko 는 WL 에서 falsy). -#}
@@ -101,7 +101,7 @@
     {%- set da_fda483 = card.deep_analysis.inspectional_significance %}
     {%- set da_ko = da_admin or da_fda483 %}
     {%- if card.deep_analysis.key_violations %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">1</span><span class="deep-t">{% if da_ko %}위반 항목 및 리스크{% else %}Key Violations &amp; Risk Analysis{% endif %}</span></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">1</span><span class="deep-t">{% if da_ko %}{{ _("위반 항목 및 리스크") }}{% else %}Key Violations &amp; Risk Analysis{% endif %}</span></div>
       {%- for v in card.deep_analysis.key_violations %}
       {%- if v is mapping %}
       {#- 위반/관찰 본문은 유형별 키를 흡수: WL·admin=description/summary, FDA 483=observation
@@ -111,7 +111,7 @@
           있으면 원문(세리프)→국문 해석 쌍으로 렌더하고 "국문 해석" 라벨을 해석 앞에 붙여 짝을 명시한다.
           original 미보유 카드(백필 전·구데이터)는 두 {% if v.original %} 가 모두 falsy → 기존 출력
           바이트 불변(additive·골든 fixture 무영향). -#}
-      <div class="viol">{% if v.citation %}<span class="viol-cite">{{ v.citation }}</span>{% endif %}{% if v.original and not da_fda483 %}<div class="viol-orig"><span class="viol-lang">원문 · 규제 원어</span><p class="viol-o">{{ v.original }}</p></div>{% endif %}{% if v.description or v.summary or v.observation %}<p class="viol-desc">{% if v.original and not da_fda483 %}<span class="viol-lang ko">국문 해석</span>{% endif %}{{ v.description or v.summary or v.observation }}</p>{% endif %}{% if v.risk %}<p class="viol-risk"><i class="ti ti-alert-triangle"></i> {{ v.risk }}</p>{% endif %}</div>
+      <div class="viol">{% if v.citation %}<span class="viol-cite">{{ v.citation }}</span>{% endif %}{% if v.original and not da_fda483 %}<div class="viol-orig"><span class="viol-lang">{{ _("원문 · 규제 원어") }}</span><p class="viol-o">{{ v.original }}</p></div>{% endif %}{% if v.description or v.summary or v.observation %}<p class="viol-desc">{% if v.original and not da_fda483 %}<span class="viol-lang ko">{{ _("국문 해석") }}</span>{% endif %}{{ v.description or v.summary or v.observation }}</p>{% endif %}{% if v.risk %}<p class="viol-risk"><i class="ti ti-alert-triangle"></i> {{ v.risk }}</p>{% endif %}</div>
       {%- else %}
       <div class="viol"><p class="viol-desc">{{ v }}</p></div>
       {%- endif %}
@@ -119,15 +119,15 @@
     </div>
     {%- endif %}
     {%- if card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">2</span><span class="deep-t">{% if da_admin %}처분 내용 및 근거{% elif da_fda483 %}실사 지적의 의미{% else %}FDA's Evaluation of Response{% endif %}</span></div><p>{{ card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance }}</p></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">2</span><span class="deep-t">{% if da_admin %}{{ _("처분 내용 및 근거") }}{% elif da_fda483 %}{{ _("실사 지적의 의미") }}{% else %}FDA's Evaluation of Response{% endif %}</span></div><p>{{ card.deep_analysis.disposition_basis or card.deep_analysis.fda_evaluation or card.deep_analysis.inspectional_significance }}</p></div>
     {%- endif %}
     {%- if card.deep_analysis.required_remediation %}
     {%- set rem = card.deep_analysis.required_remediation %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">3</span><span class="deep-t">{% if da_admin %}이행·후속 조치{% elif da_fda483 %}요구 시정 조치{% else %}Required Remediation{% endif %}</span></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">3</span><span class="deep-t">{% if da_admin %}{{ _("이행·후속 조치") }}{% elif da_fda483 %}{{ _("요구 시정 조치") }}{% else %}Required Remediation{% endif %}</span></div>
       {%- if rem is mapping %}
       {#- rem['items'] 는 반드시 대괄호 접근 — Jinja 에서 rem.items 는 dict 의 .items() 메서드로
           해석돼 렌더가 깨진다(키 'items' 와 충돌). deadline 은 충돌 없으나 일관성 위해 대괄호. -#}
-      {%- if rem['deadline'] %}<div class="rem-deadline"><span class="rem-dl">마감기한</span><b>{{ rem['deadline'] }}</b></div>{% endif %}
+      {%- if rem['deadline'] %}<div class="rem-deadline"><span class="rem-dl">{{ _("마감기한") }}</span><b>{{ rem['deadline'] }}</b></div>{% endif %}
       {%- if rem['items'] %}
       <ul class="rem-list">
         {%- for it in rem['items'] %}
@@ -141,7 +141,7 @@
     </div>
     {%- endif %}
     {%- if card.deep_analysis.administrative_risks %}
-    <div class="deep-sec"><div class="deep-h"><span class="deep-n">4</span><span class="deep-t">{% if da_ko %}행정 리스크{% else %}Administrative Risks &amp; Special Notes{% endif %}</span></div><p>{{ card.deep_analysis.administrative_risks }}</p></div>
+    <div class="deep-sec"><div class="deep-h"><span class="deep-n">4</span><span class="deep-t">{% if da_ko %}{{ _("행정 리스크") }}{% else %}Administrative Risks &amp; Special Notes{% endif %}</span></div><p>{{ card.deep_analysis.administrative_risks }}</p></div>
     {%- endif %}
   </details>
   {%- endif %}
@@ -153,7 +153,7 @@
       셀은 전부 한글일 수 있어 mono/code·자간 클래스 절대 사용 안 함(근거법령도 일반 서체). -#}
   {%- if card.deterministic_detail.type == 'gmp_deficiencies' %}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-table"></i>지적사항 상세 <span class="sub">· {{ dd.count }}건</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-table"></i>{{ _("지적사항 상세") }} <span class="sub">· {{ _("{n}건", n=dd.count) }}</span></summary>
     {%- if dd.severity_summary %}
     <div class="dt-sev">{% for sev, n in dd.severity_summary.items() %}<span class="dt-chip">{{ sev }} {{ n }}</span>{% endfor %}</div>
     {%- endif %}
@@ -176,25 +176,25 @@
       **우리가 스캔 이미지를 OCR 로 판독한 결과**다. 판독물을 "원문"이라고 부르면 거짓이므로
       라벨을 갈라 쓴다(OCR 오인식이 실제로 관찰됐다). 키 없는 기존 카드는 종전 라벨 그대로. -#}
   {%- set dd = card.deterministic_detail %}
-  {%- set obs_src = 'FDA 483 · OCR 판독' if dd.text_source == 'ocr' else 'FDA 483' %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>Observation 상세 <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ dd.count }}건 {% endif %}· {% if dd.text_source == 'ocr' %}스캔 원문 OCR 판독{% else %}원문 기반{% endif %}</span></summary>
+  {%- set obs_src = _('FDA 483 · OCR 판독') if dd.text_source == 'ocr' else 'FDA 483' %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>{{ _("Observation 상세") }} <span class="sub">{% if card.detail_preview %}· {{ card.detail_preview }} {% else %}· {{ _("{n}건", n=dd.count) }} {% endif %}· {% if dd.text_source == 'ocr' %}{{ _("스캔 원문 OCR 판독") }}{% else %}{{ _("원문 기반") }}{% endif %}</span></summary>
     {%- if dd.inspectors %}
     {#- [실사관 표기 2026-07-30] `/findings/` 검색 화면과 동일 형식·구분자(" · "). 링크는
         걸지 않는다(코호트 판정에 RPC 가 필요한데 브리프는 정적 렌더 — 사실 표기만). 값이
         없으면(dd.inspectors 부재) 이 블록 자체가 렌더되지 않는다(빈 라벨 금지). 기존
         `.dt-fu`(위 OCR 안내문과 동일 클래스)를 재사용해 신규 CSS 0. 이름은 개별 `{{ }}` 로
         내보내 Jinja autoescape 가 각 원소를 텍스트로만 다룬다(HTML 삽입 불가). -#}
-    <p class="dt-fu">실사관: {% for name in dd.inspectors %}{% if not loop.first %} · {% endif %}{{ name }}{% endfor %}</p>
+    <p class="dt-fu">{{ _("실사관:") }} {% for name in dd.inspectors %}{% if not loop.first %} · {% endif %}{{ name }}{% endfor %}</p>
     {%- endif %}
     {%- if dd.text_source == 'ocr' %}
-    <p class="dt-fu">이 실사기록은 공개 PDF 가 스캔 이미지여서 기계 판독(OCR)으로 옮겼다. 오인식이 있을 수 있으니 정확한 문구는 공식원본 PDF 를 확인한다.</p>
+    <p class="dt-fu">{{ _("이 실사기록은 공개 PDF 가 스캔 이미지여서 기계 판독(OCR)으로 옮겼다. 오인식이 있을 수 있으니 정확한 문구는 공식원본 PDF 를 확인한다.") }}</p>
     {%- endif %}
     {%- for r in dd.observations %}
     <div class="dt-row obs-row">
       <div class="dt-h"><span class="obs-num">Observation {{ r.number }}</span></div>
       {%- if r.deficiency_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · {{ obs_src }}</span><p class="obs-en">{{ r.deficiency }}</p>{% if r.detail %}<p class="obs-en-det">{{ r.detail }}</p>{% endif %}</div>
-      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ r.deficiency_ko }}</p>{% if r.detail_ko %}<p class="dt-fu">{{ r.detail_ko }}</p>{% endif %}</div>
+      <div class="obs-orig"><span class="viol-lang">{{ _("원문 · {src}", src=obs_src) }}</span><p class="obs-en">{{ r.deficiency }}</p>{% if r.detail %}<p class="obs-en-det">{{ r.detail }}</p>{% endif %}</div>
+      <div class="obs-ko"><span class="viol-lang ko">{{ _("국문 해석") }}</span><p class="dt-sum">{{ r.deficiency_ko }}</p>{% if r.detail_ko %}<p class="dt-fu">{{ r.detail_ko }}</p>{% endif %}</div>
       {%- else %}
       <p class="dt-sum">{{ r.deficiency }}</p>
       {%- if r.detail %}<p class="dt-fu">{{ r.detail }}</p>{% endif %}
@@ -209,13 +209,13 @@
       통째로 비었고, 그 빈 입력이 "원문 미기재" 오서술까지 낳았다. 이제 fan-out 성패와 무관하게
       조항별 위반이 항상 남는다. statement_ko(선택)가 있으면 원문→국문 병기. -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>위반항목 상세 <span class="sub">· {{ dd.count }}건 · 원문 기반</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-list-numbers"></i>{{ _("위반항목 상세") }} <span class="sub">· {{ _("{n}건", n=dd.count) }} · {{ _("원문 기반") }}</span></summary>
     {%- for r in dd.violations %}
     <div class="dt-row obs-row">
-      <div class="dt-h"><span class="obs-num">위반 {{ r.number }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}</div>
+      <div class="dt-h"><span class="obs-num">{{ _("위반 {n}", n=r.number) }}</span>{% if r.citation %}<span class="dt-law">{{ r.citation }}</span>{% endif %}</div>
       {%- if r.statement_ko %}
-      <div class="obs-orig"><span class="viol-lang">원문 · FDA Warning Letter</span><p class="obs-en">{{ r.statement }}</p></div>
-      <div class="obs-ko"><span class="viol-lang ko">국문 해석</span><p class="dt-sum">{{ r.statement_ko }}</p></div>
+      <div class="obs-orig"><span class="viol-lang">{{ _("원문 · FDA Warning Letter") }}</span><p class="obs-en">{{ r.statement }}</p></div>
+      <div class="obs-ko"><span class="viol-lang ko">{{ _("국문 해석") }}</span><p class="dt-sum">{{ r.statement_ko }}</p></div>
       {%- else %}
       <p class="obs-en">{{ r.statement }}</p>
       {%- endif %}
@@ -233,14 +233,14 @@
       만 내보내 한국어 이용자가 비준수 상세를 못 읽었다 — 원문 보존은 유지하되 국문을 나란히
       둔다. `_ko` 미보유 카드는 기존 영문 단독 렌더 그대로(골든 바이트 불변·additive). -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>비준수 상세 <span class="sub">· 원문 기반 · EudraGMDP</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>{{ _("비준수 상세") }} <span class="sub">· {{ _("원문 기반") }} · EudraGMDP</span></summary>
     {%- if dd.authority_country or dd.product_scope %}
-    <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">발행 NCA · {{ dd.authority_country }}</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
+    <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">{{ _("발행 NCA · {country}", country=dd.authority_country) }}</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
     {%- endif %}
-    {%- if dd.operations %}{{ ncr_field('비준수 운영항목', 'EudraGMDP', dd.operations, dd.operations_ko, 'ops') }}{% endif %}
-    {%- if dd.nature %}{{ ncr_field('위반내용 (Nature of non-compliance)', 'EudraGMDP', dd.nature, dd.nature_ko, '') }}{% endif %}
-    {%- if dd.action %}{{ ncr_field('당국 조치 (Action taken/proposed)', 'EudraGMDP', dd.action, dd.action_ko, '') }}{% endif %}
-    {%- if dd.additional %}{{ ncr_field('추가 코멘트', 'EudraGMDP', dd.additional, dd.additional_ko, '') }}{% endif %}
+    {%- if dd.operations %}{{ ncr_field(_('비준수 운영항목'), 'EudraGMDP', dd.operations, dd.operations_ko, 'ops') }}{% endif %}
+    {%- if dd.nature %}{{ ncr_field(_('위반내용 (Nature of non-compliance)'), 'EudraGMDP', dd.nature, dd.nature_ko, '') }}{% endif %}
+    {%- if dd.action %}{{ ncr_field(_('당국 조치 (Action taken/proposed)'), 'EudraGMDP', dd.action, dd.action_ko, '') }}{% endif %}
+    {%- if dd.additional %}{{ ncr_field(_('추가 코멘트'), 'EudraGMDP', dd.additional, dd.additional_ko, '') }}{% endif %}
   </details>
   {%- elif card.deterministic_detail.type == 'mhra_gmp_ncr_statement' %}
   {#- [MHRA GMP NCR 상세 2026-07-23] MHRA Statement of Non-Compliance 전문 — EU NCR 블록과
@@ -249,14 +249,14 @@
       원문(상세 페이지)은 공식원본 링크로 별도. 값 부재 카드는 미렌더(수집기 게이트).
       [국문 병기 2026-07-27] EU 형제와 동형으로 `*_ko` 있을 때만 원문→국문 병기(additive). -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>비준수 상세 <span class="sub">· 원문 기반 · MHRA</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>{{ _("비준수 상세") }} <span class="sub">· {{ _("원문 기반") }} · MHRA</span></summary>
     {%- if dd.authority_country or dd.product_scope %}
-    <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">발행기관 · MHRA</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
+    <div class="dt-sev">{% if dd.authority_country %}<span class="dt-chip">{{ _("발행기관 · MHRA") }}</span>{% endif %}{% if dd.product_scope %}<span class="dt-chip">{{ dd.product_scope }}</span>{% endif %}</div>
     {%- endif %}
-    {%- if dd.operations %}{{ ncr_field('비준수 운영항목', 'MHRA', dd.operations, dd.operations_ko, 'ops') }}{% endif %}
-    {%- if dd.nature %}{{ ncr_field('위반내용 (Nature of non-compliance)', 'MHRA', dd.nature, dd.nature_ko, '') }}{% endif %}
-    {%- if dd.action %}{{ ncr_field('당국 조치 (Action taken/proposed)', 'MHRA', dd.action, dd.action_ko, '') }}{% endif %}
-    {%- if dd.additional %}{{ ncr_field('제한사항', 'MHRA', dd.additional, dd.additional_ko, '') }}{% endif %}
+    {%- if dd.operations %}{{ ncr_field(_('비준수 운영항목'), 'MHRA', dd.operations, dd.operations_ko, 'ops') }}{% endif %}
+    {%- if dd.nature %}{{ ncr_field(_('위반내용 (Nature of non-compliance)'), 'MHRA', dd.nature, dd.nature_ko, '') }}{% endif %}
+    {%- if dd.action %}{{ ncr_field(_('당국 조치 (Action taken/proposed)'), 'MHRA', dd.action, dd.action_ko, '') }}{% endif %}
+    {%- if dd.additional %}{{ ncr_field(_('제한사항'), 'MHRA', dd.additional, dd.additional_ko, '') }}{% endif %}
   </details>
   {%- elif card.deterministic_detail.type == 'whopir_report' %}
   {#- [WHOPIR 상세 2026-07-27] WHO 공개 실사보고서(Public Inspection Report) 구조 —
@@ -267,11 +267,11 @@
       SRA/NRA 실사증거 의존 보고서는 항목 요약이 원문에 없다 — 결론 + 인용 실사기관만 렌더
       한다(없는 항목을 만들지 않는다). -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>실사보고서 상세 <span class="sub">· 원문 기반 · WHO{% if dd.sections %} · 항목 {{ dd.sections | length }}{% endif %}</span></summary>
-    {%- if dd.outcome %}{{ ncr_field('실사 결론 (Inspection outcome)', 'WHOPIR', dd.outcome, dd.outcome_ko, '') }}{% endif %}
+  <details class="block detail"><summary class="lab"><i class="ti ti-file-description"></i>{{ _("실사보고서 상세") }} <span class="sub">· {{ _("원문 기반") }} · WHO{% if dd.sections %} · {{ _("항목 {n}", n=(dd.sections | length)) }}{% endif %}</span></summary>
+    {%- if dd.outcome %}{{ ncr_field(_('실사 결론 (Inspection outcome)'), 'WHOPIR', dd.outcome, dd.outcome_ko, '') }}{% endif %}
     {%- for s in dd.reliance or [] %}
-    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">인용 실사</span></div>
-      <div class="obs-orig"><span class="viol-lang">원문 · WHOPIR</span><p class="obs-en">{{ s.authority }}{% if s.dates %} — {{ s.dates }}{% endif %}</p></div>
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">{{ _("인용 실사") }}</span></div>
+      <div class="obs-orig"><span class="viol-lang">{{ _("원문 · WHOPIR") }}</span><p class="obs-en">{{ s.authority }}{% if s.dates %} — {{ s.dates }}{% endif %}</p></div>
     </div>
     {%- endfor %}
     {%- for s in dd.sections or [] %}{{ ncr_field(s.no ~ '. ' ~ (s.title_ko or s.title), 'WHOPIR', s.text, s.text_ko, '') }}{% endfor %}
@@ -285,34 +285,34 @@
       가능하다. 자유서술(로트·수량·유통범위)은 원문 verbatim 으로 두고 옮겨 적지 않는다.
       483/NCR 블록과 같은 클래스만 써 CSS 추가 0. -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · OpenFDA{% if card.merged %} · 대표 품목 기준{% endif %}</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>{{ _("회수 상세") }} <span class="sub">· {{ _("원문 기반") }} · OpenFDA{% if card.merged %} · {{ _("대표 품목 기준") }}{% endif %}</span></summary>
     {%- if card.merged %}
     {#- 병합 대표 카드의 로트·수량·타임라인은 **대표 레코드 1건**의 값이다. 멤버 raw 는
         병합 시 보존되지 않아 나머지 품목의 로트를 알 수 없고, 지어내서도 안 된다. -#}
-    <p class="dt-fu"><i class="ti ti-info-circle"></i>이 카드는 {{ card.merged_count }}개 품목을 한 건으로 묶었다. 아래 값은 모두 <b>대표 품목 1건</b> 기준이다(로트·수량·처리 경과 포함).</p>
+    <p class="dt-fu"><i class="ti ti-info-circle"></i>{{ _("이 카드는 {n}개 품목을 한 건으로 묶었다. 아래 값은 모두 <b>대표 품목 1건</b> 기준이다(로트·수량·처리 경과 포함).", n=card.merged_count) }}</p>
     {%- endif %}
     {%- if dd.status or dd.initiation or dd.notification %}
-    <div class="dt-sev">{% if dd.status %}<span class="dt-chip">진행상태 · {{ dd.status_ko or dd.status }}</span>{% endif %}{% if dd.initiation %}<span class="dt-chip">{{ dd.initiation_ko or dd.initiation }}</span>{% endif %}{% if dd.notification %}<span class="dt-chip">최초 통지 · {{ dd.notification_ko or dd.notification }}</span>{% endif %}</div>
+    <div class="dt-sev">{% if dd.status %}<span class="dt-chip">{{ _("진행상태 · {v}", v=(dd.status_ko or dd.status)) }}</span>{% endif %}{% if dd.initiation %}<span class="dt-chip">{{ dd.initiation_ko or dd.initiation }}</span>{% endif %}{% if dd.notification %}<span class="dt-chip">{{ _("최초 통지 · {v}", v=(dd.notification_ko or dd.notification)) }}</span>{% endif %}</div>
     {%- endif %}
     {%- if dd.timeline %}
-    <div class="dt-row"><div class="dt-h"><span class="dt-area">처리 경과</span></div>
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">{{ _("처리 경과") }}</span></div>
       <div class="dt-sev">{% for t in dd.timeline %}<span class="dt-chip">{{ t.label }} · {{ t.date }}</span>{% endfor %}</div>
     </div>
     {%- endif %}
     {%- if dd.code_info %}
-    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">대상 로트·유효기한</span></div>
-      <div class="obs-orig"><span class="viol-lang">원문 · OpenFDA</span><p class="obs-en">{{ dd.code_info }}</p></div>
+    <div class="dt-row obs-row"><div class="dt-h"><span class="dt-area">{{ _("대상 로트·유효기한") }}</span></div>
+      <div class="obs-orig"><span class="viol-lang">{{ _("원문 · OpenFDA") }}</span><p class="obs-en">{{ dd.code_info }}</p></div>
     </div>
     {%- endif %}
     {%- if dd.quantity or dd.distribution or dd.firm_location %}
-    <div class="dt-row"><div class="dt-h"><span class="dt-area">회수 규모·범위</span></div>
-      {%- if dd.quantity %}<p class="dt-sum">회수 수량 — {{ dd.quantity }}</p>{% endif %}
-      {%- if dd.distribution %}<p class="dt-sum">유통 범위 — {{ dd.distribution }}</p>{% endif %}
-      {%- if dd.firm_location %}<p class="dt-sum">업체 소재지 — {{ dd.firm_location }}</p>{% endif %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">{{ _("회수 규모·범위") }}</span></div>
+      {%- if dd.quantity %}<p class="dt-sum">{{ _("회수 수량 — {v}", v=dd.quantity) }}</p>{% endif %}
+      {%- if dd.distribution %}<p class="dt-sum">{{ _("유통 범위 — {v}", v=dd.distribution) }}</p>{% endif %}
+      {%- if dd.firm_location %}<p class="dt-sum">{{ _("업체 소재지 — {v}", v=dd.firm_location) }}</p>{% endif %}
     </div>
     {%- endif %}
     {%- if dd.product %}
-    <div class="dt-row"><div class="dt-h"><span class="dt-area">제품 식별</span></div>
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">{{ _("제품 식별") }}</span></div>
       {%- for p in dd.product %}<p class="dt-sum">{{ p.label }} — {{ p.value }}</p>{% endfor %}
     </div>
     {%- endif %}
@@ -323,18 +323,18 @@
       가르는 규제 신호 — 는 10주 43장 동안 한 번도 발행되지 않았다. 나머지는 품목·업체
       식별코드로, 실무자가 자사 품목 코드와 대조하는 칸이다. 전부 국문 원천이라 병기 불필요. -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · 식약처{% if card.merged %} · 대표 품목 기준{% endif %}</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>{{ _("회수 상세") }} <span class="sub">· {{ _("원문 기반") }} · {{ _("식약처") }}{% if card.merged %} · {{ _("대표 품목 기준") }}{% endif %}</span></summary>
     {%- if card.merged %}
-    <p class="dt-fu"><i class="ti ti-info-circle"></i>이 카드는 {{ card.merged_count }}개 품목을 한 건으로 묶었다. 아래 값은 모두 <b>대표 품목 1건</b> 기준이다.</p>
+    <p class="dt-fu"><i class="ti ti-info-circle"></i>{{ _("이 카드는 {n}개 품목을 한 건으로 묶었다. 아래 값은 모두 <b>대표 품목 1건</b> 기준이다.", n=card.merged_count) }}</p>
     {%- endif %}
     {%- if dd.enforcement %}
     <div class="dt-sev"><span class="dt-chip">{{ dd.enforcement }}</span></div>
     {%- endif %}
     {%- if dd.item_seq or dd.std_cd or dd.bizrno %}
-    <div class="dt-row"><div class="dt-h"><span class="dt-area">품목·업체 식별코드</span></div>
-      {%- if dd.item_seq %}<p class="dt-sum">품목기준코드 — {{ dd.item_seq }}</p>{% endif %}
-      {%- if dd.std_cd %}<p class="dt-sum">표준코드 — {{ dd.std_cd }}</p>{% endif %}
-      {%- if dd.bizrno %}<p class="dt-sum">사업자등록번호 — {{ dd.bizrno }}</p>{% endif %}
+    <div class="dt-row"><div class="dt-h"><span class="dt-area">{{ _("품목·업체 식별코드") }}</span></div>
+      {%- if dd.item_seq %}<p class="dt-sum">{{ _("품목기준코드 — {v}", v=dd.item_seq) }}</p>{% endif %}
+      {%- if dd.std_cd %}<p class="dt-sum">{{ _("표준코드 — {v}", v=dd.std_cd) }}</p>{% endif %}
+      {%- if dd.bizrno %}<p class="dt-sum">{{ _("사업자등록번호 — {v}", v=dd.bizrno) }}</p>{% endif %}
     </div>
     {%- endif %}
   </details>
@@ -345,8 +345,8 @@
       회수 배경) 그것을 verbatim 으로 싣는다(LLM 0·환각 0). NCR 형제와 같은 매크로를 써
       원문→국문 병기 슬롯(`body_ko`)을 열어 둔다 — 없으면 영문 단독(additive). -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · MHRA</span></summary>
-    {{ ncr_field('알림 전문 (Drug Alert)', 'MHRA', dd.body, dd.body_ko, '') }}
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>{{ _("회수 상세") }} <span class="sub">· {{ _("원문 기반") }} · MHRA</span></summary>
+    {{ ncr_field(_('알림 전문 (Drug Alert)'), 'MHRA', dd.body, dd.body_ko, '') }}
   </details>
   {%- elif card.deterministic_detail.type == 'hc_recall_detail' %}
   {#- [회수 상세 2026-08-25] Health Canada 회수의 미사용 사실층. HC 피드는 필드가 11개뿐이라
@@ -355,26 +355,26 @@
       제형)도 W2 4행 상한에 밀려 미표시였다. 권고 조치는 NCR 형제와 동형으로 원문→국문 병기
       슬롯(`action_ko`)을 열어 둔다(현재 미보유 → 영문 단독 렌더·additive). -#}
   {%- set dd = card.deterministic_detail %}
-  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>회수 상세 <span class="sub">· 원문 기반 · Health Canada</span></summary>
+  <details class="block detail"><summary class="lab"><i class="ti ti-package"></i>{{ _("회수 상세") }} <span class="sub">· {{ _("원문 기반") }} · Health Canada</span></summary>
     {%- if dd.ingredient or dd.dosage_form %}
-    <div class="dt-sev">{% if dd.ingredient %}<span class="dt-chip">유효성분 · {{ dd.ingredient }}</span>{% endif %}{% if dd.dosage_form %}<span class="dt-chip">제형 · {{ dd.dosage_form }}</span>{% endif %}</div>
+    <div class="dt-sev">{% if dd.ingredient %}<span class="dt-chip">{{ _("유효성분 · {v}", v=dd.ingredient) }}</span>{% endif %}{% if dd.dosage_form %}<span class="dt-chip">{{ _("제형 · {v}", v=dd.dosage_form) }}</span>{% endif %}</div>
     {%- endif %}
-    {%- if dd.action %}{{ ncr_field('권고 조치 (What you should do)', 'Health Canada', dd.action, dd.action_ko, '') }}{% endif %}
+    {%- if dd.action %}{{ ncr_field(_('권고 조치 (What you should do)'), 'Health Canada', dd.action, dd.action_ko, '') }}{% endif %}
   </details>
   {%- endif %}
   {%- endif %}
   {%- if card.sources.info.url or card.sources.official.url %}
-  <div class="src">{{ srclink(card.sources.info, '정보출처') }}{{ srclink(card.sources.official, '공식원본') }}</div>
+  <div class="src">{{ srclink(card.sources.info, _('정보출처')) }}{{ srclink(card.sources.official, _('공식원본')) }}</div>
   {%- endif %}
   {#- [카드 반응 계층 S0 — 공유하기 2026-07-03] 순수 클라이언트(백엔드·계정 0). 정적 마크업(카드값
       미참조·불투명 anchor 만) → 콘텐츠 순수/결정론(#1·#2) 불침범. 기본 display:none, base.html 인라인
       스크립트가 활성 시에만 노출(progressive enhancement — JS off 면 미표시). 공유 URL 은 런타임에
       location + '#'+anchor 로 조립(빌드는 호스트 무관 유지). §4 한글안전: mono/자간/대문자 미사용. -#}
   <div class="grm-card-actions" data-anchor="{{ card.anchor }}">
-    <button type="button" class="grm-ca" data-share aria-label="이 카드 공유하기"><i class="ti ti-share-2"></i><span class="grm-ca-t">공유</span></button>
+    <button type="button" class="grm-ca" data-share aria-label="{{ _('이 카드 공유하기') }}"><i class="ti ti-share-2"></i><span class="grm-ca-t">{{ _("공유") }}</span></button>
     {% if reactions_enabled %}
-    <button type="button" class="grm-ca-react" data-react="heart" aria-pressed="false" aria-label="관심(하트)"><i class="ti ti-heart"></i><span class="grm-ca-count" data-count>0</span></button>
-    <button type="button" class="grm-ca-react" data-react="scrap" aria-pressed="false" aria-label="스크랩"><i class="ti ti-bookmark"></i></button>
+    <button type="button" class="grm-ca-react" data-react="heart" aria-pressed="false" aria-label="{{ _('관심(하트)') }}"><i class="ti ti-heart"></i><span class="grm-ca-count" data-count>0</span></button>
+    <button type="button" class="grm-ca-react" data-react="scrap" aria-pressed="false" aria-label="{{ _('스크랩') }}"><i class="ti ti-bookmark"></i></button>
     {% endif %}
   </div>
 </article>

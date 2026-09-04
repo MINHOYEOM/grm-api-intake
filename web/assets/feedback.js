@@ -21,6 +21,11 @@
    한다(모르는 값은 RPC 가 거부한다·폴백 금지). */
 (function () {
   "use strict";
+  var _t = function (s, v) {
+    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
+    return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
+  };
   var cfg = document.getElementById("grm-reactions-cfg");
   if (!cfg || !window.fetch) return;
   var SUPA_URL = (cfg.getAttribute("data-url") || "").replace(/\/+$/, "");
@@ -32,14 +37,14 @@
   var DRAFT_KEY = "grm-fb-draft-v1";
   // [id, 라벨, 그 유형을 골랐을 때 보여줄 작성 예시] — id 는 061 CHECK 와 같은 4종.
   var CATEGORIES = [
-    ["usability", "이용이 불편한 점",
-     "예) 모바일에서 표가 화면 밖으로 잘려 가로로 스크롤해야 읽을 수 있습니다."],
-    ["correction", "내용 오류·수정 요청",
-     "예) 8월 24일자 식약처 카드의 처분 기간이 원문(2026.7.1~7.31)과 다릅니다."],
-    ["feature", "기능 제안",
-     "예) 관심 업체의 지적사항을 엑셀로 내려받을 수 있으면 좋겠습니다."],
-    ["other", "그 밖의 의견",
-     "예) 서비스 전반에 대한 의견을 자유롭게 남겨 주세요."]
+    ["usability", _t("이용이 불편한 점"),
+     _t("예) 모바일에서 표가 화면 밖으로 잘려 가로로 스크롤해야 읽을 수 있습니다.")],
+    ["correction", _t("내용 오류·수정 요청"),
+     _t("예) 8월 24일자 식약처 카드의 처분 기간이 원문(2026.7.1~7.31)과 다릅니다.")],
+    ["feature", _t("기능 제안"),
+     _t("예) 관심 업체의 지적사항을 엑셀로 내려받을 수 있으면 좋겠습니다.")],
+    ["other", _t("그 밖의 의견"),
+     _t("예) 서비스 전반에 대한 의견을 자유롭게 남겨 주세요.")]
   ];
 
   function isOperator() {
@@ -55,13 +60,13 @@
   var slot = null;
   var heads = document.querySelectorAll("footer.site .foot h5");
   for (var i = 0; i < heads.length; i++) {
-    if (heads[i].textContent.trim() === "안내") { slot = heads[i].parentNode; break; }
+    if (heads[i].textContent.trim() === _t("안내")) { slot = heads[i].parentNode; break; }
   }
   if (!slot) return;
   var trigger = document.createElement("a");
   trigger.href = "#";
   trigger.id = "grm-feedback-open";
-  trigger.textContent = "문의 및 제안";
+  trigger.textContent = _t("문의 및 제안");
   slot.appendChild(trigger);
 
   var pop = null, lastFocus = null, sending = false, saveTimer = null;
@@ -78,40 +83,40 @@
     // 정적 문자열만 innerHTML — 사용자 입력은 어떤 경로로도 마크업에 섞지 않는다.
     pop.innerHTML =
       '<div class="grm-fb-card" role="dialog" aria-modal="true" aria-labelledby="grm-fb-title" aria-describedby="grm-fb-lede">' +
-      '<button class="grm-fb-x" type="button" id="grm-fb-close" aria-label="닫기">&times;</button>' +
-      '<h3 id="grm-fb-title">문의 및 제안</h3>' +
-      '<p class="grm-fb-lede" id="grm-fb-lede">이용하며 불편했던 점, 잘못된 내용, 있으면 좋을 기능을 알려주세요.<br>' +
-      '보내주신 의견은 운영자가 직접 확인합니다.</p>' +
+      '<button class="grm-fb-x" type="button" id="grm-fb-close" aria-label="' + _t("닫기") + '">&times;</button>' +
+      '<h3 id="grm-fb-title">' + _t("문의 및 제안") + '</h3>' +
+      '<p class="grm-fb-lede" id="grm-fb-lede">' + _t("이용하며 불편했던 점, 잘못된 내용, 있으면 좋을 기능을 알려주세요.") + '<br>' +
+      _t("보내주신 의견은 운영자가 직접 확인합니다.") + '</p>' +
       '<form class="grm-fb-form" id="grm-fb-form" novalidate>' +
       '<div class="grm-fb-field">' +
-      '<label for="grm-fb-cat">문의 유형</label>' +
+      '<label for="grm-fb-cat">' + _t("문의 유형") + '</label>' +
       '<select id="grm-fb-cat" name="category" required>' + opts + "</select>" +
       "</div>" +
       '<div class="grm-fb-field">' +
-      '<div class="grm-fb-labelrow"><label for="grm-fb-msg">내용</label>' +
+      '<div class="grm-fb-labelrow"><label for="grm-fb-msg">' + _t("내용") + '</label>' +
       '<span class="grm-fb-count" id="grm-fb-count" aria-live="off">0 / ' + MAX + "</span></div>" +
       '<textarea id="grm-fb-msg" name="message" required minlength="5" maxlength="' + MAX + '" rows="5"></textarea>' +
       "</div>" +
       '<div class="grm-fb-field">' +
-      '<label for="grm-fb-email">회신 받을 이메일 <span class="grm-fb-opt">선택</span></label>' +
+      '<label for="grm-fb-email">' + _t("회신 받을 이메일") + ' <span class="grm-fb-opt">' + _t("선택") + '</span></label>' +
       '<input type="email" id="grm-fb-email" name="email" maxlength="200" autocomplete="email" placeholder="you@company.com">' +
       '<label class="grm-fb-consent" id="grm-fb-consent-row" hidden>' +
       '<input type="checkbox" id="grm-fb-consent" name="consent">' +
-      '<span>회신을 위해 이메일 주소를 수집·이용하는 데 동의합니다. 답변 후 보관하지 않으며, 동의하지 않으면 이메일 없이 접수됩니다.</span>' +
+      '<span>' + _t("회신을 위해 이메일 주소를 수집·이용하는 데 동의합니다. 답변 후 보관하지 않으며, 동의하지 않으면 이메일 없이 접수됩니다.") + '</span>' +
       "</label>" +
       "</div>" +
-      '<p class="grm-fb-meta">접수 시 현재 페이지 주소와 브라우저·화면 정보가 함께 전달됩니다 — 재현에만 사용합니다.</p>' +
-      '<button class="grm-fb-submit" type="submit" id="grm-fb-submit">보내기</button>' +
+      '<p class="grm-fb-meta">' + _t("접수 시 현재 페이지 주소와 브라우저·화면 정보가 함께 전달됩니다 — 재현에만 사용합니다.") + '</p>' +
+      '<button class="grm-fb-submit" type="submit" id="grm-fb-submit">' + _t("보내기") + '</button>' +
       "</form>" +
       '<p class="grm-fb-status" id="grm-fb-status" role="status" aria-live="polite"></p>' +
       '<div class="grm-fb-done" id="grm-fb-done" hidden>' +
       '<span class="grm-fb-done-ic" aria-hidden="true">' +
       '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' +
       "</span>" +
-      "<b>접수되었습니다</b>" +
+      "<b>" + _t("접수되었습니다") + "</b>" +
       '<span class="grm-fb-ticket" id="grm-fb-ticket"></span>' +
-      "<span>보내주신 내용은 운영자가 직접 확인합니다. 감사합니다.</span>" +
-      '<button class="grm-fb-doneclose" type="button" id="grm-fb-doneclose">닫기</button>' +
+      "<span>" + _t("보내주신 내용은 운영자가 직접 확인합니다. 감사합니다.") + "</span>" +
+      '<button class="grm-fb-doneclose" type="button" id="grm-fb-doneclose">' + _t("닫기") + '</button>' +
       "</div>" +
       "</div>";
     document.body.appendChild(pop);
@@ -183,24 +188,24 @@
       var addr = email.value.trim();
       status.className = "grm-fb-status";
       if (body.length < 5) {
-        status.textContent = "내용을 5자 이상 적어주세요.";
+        status.textContent = _t("내용을 5자 이상 적어주세요.");
         msg.focus();
         return;
       }
       if (addr && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr)) {
-        status.textContent = "이메일 주소 형식을 확인해 주세요.";
+        status.textContent = _t("이메일 주소 형식을 확인해 주세요.");
         email.focus();
         return;
       }
       if (addr && !consent.checked) {
-        status.textContent = "이메일로 회신받으시려면 수집·이용 동의가 필요합니다.";
+        status.textContent = _t("이메일로 회신받으시려면 수집·이용 동의가 필요합니다.");
         consent.focus();
         return;
       }
       sending = true;
       var btn = el("grm-fb-submit");
       btn.disabled = true;
-      btn.textContent = "보내는 중…";
+      btn.textContent = _t("보내는 중…");
       status.textContent = "";
       fetch(SUPA_URL + "/rest/v1/rpc/feedback_submit", {
         method: "POST",
@@ -229,12 +234,12 @@
       }).catch(function (err) {
         sending = false;
         btn.disabled = false;
-        btn.textContent = "보내기";
+        btn.textContent = _t("보내기");
         var raw = (err && err.raw) || "";
         status.className = "grm-fb-status is-err";
         status.textContent = raw.indexOf("rate limited") >= 0
-          ? "잠시 뒤에 다시 시도해 주세요. 접수가 한꺼번에 몰리고 있습니다."
-          : "전송에 실패했습니다. 네트워크를 확인하고 다시 시도해 주세요.";
+          ? _t("잠시 뒤에 다시 시도해 주세요. 접수가 한꺼번에 몰리고 있습니다.")
+          : _t("전송에 실패했습니다. 네트워크를 확인하고 다시 시도해 주세요.");
       });
     });
   }
@@ -243,7 +248,7 @@
     sending = false;
     el("grm-fb-form").hidden = true;
     el("grm-fb-status").textContent = "";
-    el("grm-fb-ticket").textContent = ticket ? "접수번호 " + ticket + "번" : "";
+    el("grm-fb-ticket").textContent = ticket ? _t("접수번호 {ticket}번", { ticket: ticket }) : "";
     el("grm-fb-done").hidden = false;
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* noop */ }
     el("grm-fb-doneclose").focus();
@@ -259,7 +264,7 @@
     el("grm-fb-status").textContent = "";
     el("grm-fb-status").className = "grm-fb-status";
     btn.disabled = false;
-    btn.textContent = "보내기";
+    btn.textContent = _t("보내기");
     // 쓰다 만 초안 복원 — 실수로 닫았거나 페이지를 옮겨도 내용이 사라지지 않는다.
     var draft = null;
     try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { draft = null; }

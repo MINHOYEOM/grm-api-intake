@@ -33,8 +33,8 @@
 <main>
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Inspection Outcomes</span>
-    <h1 class="reveal" style="animation-delay:.08s">FDA 실사 결과</h1>
-    <p class="reveal" style="animation-delay:.14s"><span class="ln">FDA가 의약품 제조소를 직접 실사하고 매긴 등급(NAI·VAI·OAI)입니다.</span> <span class="ln">지적사항을 센 것이 아니라 <b>실사 한 건이 어떻게 끝났는지</b>를 셉니다.</span></p>
+    <h1 class="reveal" style="animation-delay:.08s">{{ _("FDA 실사 결과") }}</h1>
+    <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("FDA가 의약품 제조소를 직접 실사하고 매긴 등급(NAI·VAI·OAI)입니다.") }}</span> <span class="ln">{{ _("지적사항을 센 것이 아니라 <b>실사 한 건이 어떻게 끝났는지</b>를 셉니다.") }}</span></p>
   </div>
   <div class="wrap">
     {% include "partials/trends_seg.html" %}
@@ -45,20 +45,20 @@
       <div class="tr-skel-row w2"></div>
       <div class="tr-skel-row w3"></div>
     </div>
-    <div class="tr-state tr-state-error" id="tr-error" hidden>실사 등급 통계 준비 중입니다.</div>
+    <div class="tr-state tr-state-error" id="tr-error" hidden>{{ _("실사 등급 통계 준비 중입니다.") }}</div>
 
     <div id="tr-content" hidden>
-      <section class="tr-block tr-fda-block" id="tr-fda-block" aria-label="FDA 의약품 GMP 실사 등급" hidden>
-        <h2 class="tr-h">등급 구성</h2>
-        <p class="tr-read"><b>NAI</b>는 지적사항 없음, <b>VAI</b>는 경미한 지적, <b>OAI</b>는 시정조치가 필요한 중대한 지적입니다.</p>
+      <section class="tr-block tr-fda-block" id="tr-fda-block" aria-label="{{ _('FDA 의약품 GMP 실사 등급') }}" hidden>
+        <h2 class="tr-h">{{ _("등급 구성") }}</h2>
+        <p class="tr-read">{{ _("<b>NAI</b>는 지적사항 없음, <b>VAI</b>는 경미한 지적, <b>OAI</b>는 시정조치가 필요한 중대한 지적입니다.") }}</p>
         <p class="tr-fda-scope" id="tr-fda-scope"></p>
         <p class="tr-fda-asof" id="tr-fda-asof"></p>
         <div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>
-        <h3 class="tr-sub-h">연도별 등급 구성</h3>
+        <h3 class="tr-sub-h">{{ _("연도별 등급 구성") }}</h3>
         <div id="tr-fda-year" class="tr-fda-year"></div>
         <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
-        <h3 class="tr-sub-h">국가별 등급 구성</h3>
-        <p class="tr-read">건수가 많은 국가 순입니다. 한국은 목록 밖이어도 따로 표시합니다.</p>
+        <h3 class="tr-sub-h">{{ _("국가별 등급 구성") }}</h3>
+        <p class="tr-read">{{ _("건수가 많은 국가 순입니다. 한국은 목록 밖이어도 따로 표시합니다.") }}</p>
         <div id="tr-fda-country" class="tr-fda-country"></div>
         <p class="tr-note" id="tr-fda-note"></p>
       </section>
@@ -78,9 +78,9 @@
           는 즉시 읽히지 않는다.
           ★표본이 작다(연 2~22건). 그래서 비율을 앞세우지 않고 **건수를 그대로** 보여
           주고, 표본이 작다는 사실을 화면에 적는다(억지 해석 금지 — 히트맵 관례 동형). -#}
-      <section class="tr-block tr-kr-block" id="tr-kr-block" aria-label="한국 소재 제조소" hidden>
-        <h2 class="tr-h">한국 소재 제조소</h2>
-        <p class="tr-read">FDA가 한국에 있는 의약품 제조소를 실사한 기록만 따로 모았습니다. 연도는 실사가 끝난 날 기준이에요.</p>
+      <section class="tr-block tr-kr-block" id="tr-kr-block" aria-label="{{ _('한국 소재 제조소') }}" hidden>
+        <h2 class="tr-h">{{ _("한국 소재 제조소") }}</h2>
+        <p class="tr-read">{{ _("FDA가 한국에 있는 의약품 제조소를 실사한 기록만 따로 모았습니다. 연도는 실사가 끝난 날 기준이에요.") }}</p>
         <p class="tr-kr-sub" id="tr-kr-sub"></p>
         <div id="tr-kr-year" class="tr-fda-year"></div>
         <div class="tr-fda-y-legend"><span><span class="tr-fda-y-key nai"></span>NAI</span><span><span class="tr-fda-y-key vai"></span>VAI</span><span><span class="tr-fda-y-key oai"></span>OAI</span></div>
@@ -101,16 +101,16 @@
           `scope.latest_inspection_end_date`(데이터의 전선)에서 파생한다.
 
           062 미적용 라이브·빈 응답이면 이 블록만 조용히 숨긴 채로 남는다. -#}
-      <section class="tr-block tr-fq-block" id="tr-fq-block" aria-label="실사일 기준 분기 추이" hidden>
-        <h2 class="tr-h">실사일 기준 분기 추이</h2>
-        <p class="tr-read">위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 길이가 고르면 그 기간 동안 판정 강도가 안정적이었다는 뜻입니다.</p>
+      <section class="tr-block tr-fq-block" id="tr-fq-block" aria-label="{{ _('실사일 기준 분기 추이') }}" hidden>
+        <h2 class="tr-h">{{ _("실사일 기준 분기 추이") }}</h2>
+        <p class="tr-read">{{ _("위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 길이가 고르면 그 기간 동안 판정 강도가 안정적이었다는 뜻입니다.") }}</p>
         <div id="tr-fq" class="tr-fq"></div>
         <p class="tr-note" id="tr-fq-note"></p>
       </section>
 
       {#- [존 재편] 이 면에서 지적사항 면으로 되돌아가는 다리. 두 면의 단위가 다르다는
           사실을 링크 문장 자체가 말하게 한다(경고문 대신 안내). -#}
-      <p class="tr-more">실사에서 실제로 어떤 항목이 지적됐는지는 단위가 다른 집계입니다 &mdash; <a href="{{ rel_root }}findings/trends/index.html">지적 경향</a>에서 보세요. 특정 업체의 이력은 <a href="{{ rel_root }}findings/firm/index.html">업체 조회</a>에서 찾을 수 있습니다.</p>
+      <p class="tr-more">{{ _('실사에서 실제로 어떤 항목이 지적됐는지는 단위가 다른 집계입니다 &mdash; <a href="{rel_root}findings/trends/index.html">지적 경향</a>에서 보세요. 특정 업체의 이력은 <a href="{rel_root}findings/firm/index.html">업체 조회</a>에서 찾을 수 있습니다.', rel_root=rel_root) }}</p>
     </div>
   </div>
 </main>

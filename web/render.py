@@ -1721,6 +1721,11 @@ def build_glossary_case_excerpts(
 
     # 문장 분할은 **한 번만** 한다. 용어마다 다시 쪼개면 21,347 건 × 226 어라 렌더·테스트가
     # 폭발한다(대량 페이지가 테스트 시간을 터뜨린 전례가 있다).
+    # ★[2026-09-05] 소문자 접기도 같은 이유로 한 번만 한다. 종전엔 대조 루프 안에서
+    #   `sent.casefold()` 를 **용어 242 개마다 다시** 계산했다(문장 수 × 242 회). 영문
+    #   발췌가 더해져 이 함수가 렌더당 두 번 돌게 되자 단일 렌더가 10.4s → 22.9s 가 됐고
+    #   CI 가 20 분 상한에서 잘렸다. 접은 문자열을 색인에 함께 실어 두면 동작은 그대로고
+    #   비용만 빠진다(대조 결과는 바이트 동일 — 골든이 지킨다).
     shape_docs: dict[str, set[str]] = {}
     index: list[tuple[dict[str, Any], str, list[str]]] = []   # (doc, finding_id, 문장들)
     for doc in documents:
@@ -1738,20 +1743,23 @@ def build_glossary_case_excerpts(
                 shape_docs.setdefault(_glossary_shape(sent), set()).add(doc["document_id"])
             index.append((doc, finding.get("finding_id") or "", sents))
     boiler = {k for k, v in shape_docs.items() if len(v) >= _GLOSSARY_BOILER_DOCS}
-    index = [(doc, fid, [s for s in sents if _glossary_shape(s) not in boiler])
+    # 문장과 **접은 사본**을 짝으로 싣는다(대조는 접은 쪽, 표시·우연언급 판정은 원문 쪽).
+    index = [(doc, fid, [(s, s.casefold()) for s in sents
+                         if _glossary_shape(s) not in boiler])
              for doc, fid, sents in index]
 
     def _candidates(term: dict[str, Any]) -> list[dict[str, Any]]:
         probes = glossary_case_probes(
             term, ((cases or {}).get(term["id"]) or {}).get("q", ""), lang)
+        probes_cf = [(p, p.casefold()) for p in probes]
         found: list[dict[str, Any]] = []
         seen_docs: set[str] = set()
         for doc, fid, sents in index:              # 문서당 최대 1 건 — 한 문서로 도배 금지
             if doc["document_id"] in seen_docs:
                 continue
-            for sent in sents:
-                tok = next((p for p in probes
-                            if p.casefold() in sent.casefold()
+            for sent, sent_cf in sents:
+                tok = next((p for p, p_cf in probes_cf
+                            if p_cf in sent_cf
                             and not _glossary_incidental(sent, p)), None)
                 if tok:
                     found.append({"quote": sent, "token": tok,

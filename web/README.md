@@ -63,6 +63,13 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    출력 파일·`rel_root`(언어 트리 루트)·`asset_root`(사이트 루트)·canonical·sitemap 경로·
    빵부스러기 절대 URL 이 전부 나온다. `render_site` 안에서는 `page("…")` + `emit(템플릿, page, …)`
    만 쓰고 `rel_root="../../"` 같은 깊이 손값을 적지 않는다(`WebPagePathTest` 가 AST 로 막는다).
+   ★**404 만 예외 — 사이트 절대경로를 쓴다(2026-09-04, 다국어 6단계).** 이 페이지는 자기
+   주소에서 뜨지 않고 **요청된 주소에 그 자리로** 실려 나오므로(Cloudflare 가 상태코드만
+   404 로 바꾼다), 상대경로가 요청 URL 기준으로 풀려 전부 죽는다 — `/findings/doc/zzz/` 에서
+   `href="library/"` 는 `/findings/doc/zzz/library/` 다. 라이브 실측에서 되돌림 카드·nav·
+   footer 30개 링크가 전부 그랬다. 그래서 `emit_not_found()` 가 `rel_root="/"+prefix`·
+   `asset_root="/"` 를 덮어쓴다. 사이트 절대경로도 호스트를 박지 않으므로 이 불변식의
+   근거(호스트 무관)는 그대로다. `WebNotFoundTest` 가 상대 참조 0을 고정한다.
 5. **디자인 = v4** — `assets/grm.css` 수정 금지(디자인 변경은 v4 갱신 후 재추출). 한글에 mono 금지.
 6. **화면 문구는 문구 사전을 거친다(2026-09-03, 다국어 2단계 — `grm_i18n.py`)** — 키는 한국어
    원문 그대로, 템플릿 `{{ _("…") }}`·JS `_t("…")`·파이썬 `tr("…")`/상수 `N_("…")` 로 감싼다.

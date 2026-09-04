@@ -105,7 +105,11 @@
             <span class="fx-case-f">{{ s.firm_name }}</span>
             <span class="fx-case-d">{{ s.published_date }}</span>
           </div>
-          <p class="fx-case-t">{{ s.text_ko }}</p>
+          {#- ★[다국어 2026-09-04] 어느 언어의 본문인지는 **뷰가 정한다**
+              (render.finding_body 로 채운 `body`). 종전처럼 `text_ko` 를 못박으면
+              영어 모음 페이지에 한국어 지적 문장이 그대로 실린다 — 업체 페이지에서
+              똑같이 밟았고, CI 가 `/en/findings/agency/fda/` 에서 잡아냈다. -#}
+          <p class="fx-case-t">{{ s.body }}</p>
           {#- 문서 페이지가 있는 사례만 잇는다(지적 3건 미만이면 페이지가 없다) —
               렌더가 findings_docs.json 과 대조해 `doc_slug` 를 채운다. 없는 페이지로 보내는
               링크는 무링크보다 나쁘다. -#}

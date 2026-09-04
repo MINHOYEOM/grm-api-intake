@@ -2121,7 +2121,8 @@ def facet_excluded_reason(reason: str, tr: Translator = _KO) -> str:
 
 
 def build_facet_item_view(item: dict[str, Any],
-                          doc_slugs: "set[str] | None" = None) -> dict[str, Any]:
+                          doc_slugs: "set[str] | None" = None,
+                          lang: str = DEFAULT_LANG) -> dict[str, Any]:
     """항목 1건의 표시용 투영 — 값 무변형, 파생은 막대 비율뿐.
 
     `pct` 는 그 항목 안에서 가장 큰 기관 건수를 100 으로 둔 상대값이다(전체 대비가 아니다
@@ -2137,8 +2138,12 @@ def build_facet_item_view(item: dict[str, Any],
     # 사례 → 문서 페이지 연결. `doc_slugs` 에 있는 것만 잇는다 — 지적 3건 미만 문서는
     # 페이지가 없고, 없는 페이지로 보내는 링크는 무링크보다 나쁘다.
     known = doc_slugs or set()
+    # ★[다국어 2026-09-04] 표본 본문은 **읽는 언어**를 따른다. 템플릿이 `text_ko` 를
+    #   직접 읽으면 영어 페이지에 한국어 지적 문장이 실린다(업체 페이지에서 밟은 자리와
+    #   같다) — 언어를 아는 곳은 여기뿐이므로 여기서 정해 `body` 로 넘긴다.
     view["samples"] = [
-        {**s, "doc_slug": (s.get("document_id") or "")
+        {**s, "body": finding_body(s, lang),
+         "doc_slug": (s.get("document_id") or "")
          if (s.get("document_id") or "") in known else ""}
         for s in (item.get("samples") or [])
     ]
@@ -2547,13 +2552,16 @@ def facet_description(axis_key: str, item: dict[str, Any],
     "무엇이 몇 건, 어느 기관에서" 를 앞세운다. 검색 결과에 그대로 노출되는 문장이라
     수식어보다 숫자와 기관명이 클릭을 만든다.
     """
+    # ★[다국어 2026-09-04] `agency_labels` 와 `item["label"]` 은 **이미 그 트리의 언어**로
+    #   와 있다(호출부가 한 번 번역해 화면·설명이 같은 값을 쓰게 한다). 여기서 또 걸면
+    #   이미 영어인 값을 사전에서 찾다가 멈춘다 — CI 가 `'US FDA'` 로 잡아냈다.
+    #   fail-closed 라 유출 대신 빌드가 선 것이고, 고칠 곳은 **두 번 거는 쪽**이다.
     meta = facet_meta(axis_key, tr)
-    names = [tr(agency_labels[a["v"]]) if a["v"] in agency_labels else a["v"]
-             for a in (item.get("by_agency") or [])[:3]]
+    names = [agency_labels.get(a["v"], a["v"]) for a in (item.get("by_agency") or [])[:3]]
     who = "·".join(n for n in names if n)
     tail = " " + tr("{who} 공개 문서 기준.", who=who) if who else ""
     return tr("{label} {suffix} {n}건(문서 {d}건)을 우리말로 정리했습니다.",
-              label=tr(item["label_ko"]), suffix=meta["headline_suffix"],
+              label=item["label"], suffix=meta["headline_suffix"],
               n=f"{item['findings']:,}", d=f"{item['documents']:,}") + tail
 
 
@@ -4000,7 +4008,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for axis in facets_data.get("axes") or []:
             axis_key = axis["axis"]
             meta = facet_meta(axis_key, tr)            # 모르는 축 = KeyError(조용한 누락 금지)
-            items = [build_facet_item_view(it, link_doc_slugs) for it in axis.get("items") or []]
+            items = [build_facet_item_view(it, link_doc_slugs, lang_key)
+                     for it in axis.get("items") or []]
             # 표시용 이름은 언어를 타고, `label_ko` 는 정본 값으로 남는다(무변형).
             # 한 번만 번역해 돌려 쓴다 — 두 번 걸면 이미 영어인 값이 사전에 없어 실패한다.
             for _v in items:
@@ -4082,7 +4091,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             sibs = [{"slug": c["slug"], "label": tr(c["agency_label_ko"])}
                     for c in combo_items]
             for combo in combo_items:
-                view = build_facet_item_view(combo, link_doc_slugs)
+                view = build_facet_item_view(combo, link_doc_slugs, lang_key)
                 # by_agency 막대는 조합에선 뜻이 없다(기관이 하나뿐이라 100% 한 줄) —
                 # 데이터에 아예 넣지 않아 템플릿의 {% if %} 가 섹션을 지운다.
                 view["by_agency"] = []

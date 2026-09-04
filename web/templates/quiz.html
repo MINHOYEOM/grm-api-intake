@@ -52,7 +52,7 @@
         {% if q.difficulty_label %}<span class="qz-diff qz-diff-{{ q.difficulty }}">{{ q.difficulty_label }}</span>{% endif %}
         <span class="qz-src-kind">{{ q.source_kind }}</span>
       </div>
-      <h3 class="qz-q">{{ q.question_ko }}</h3>
+      <h3 class="qz-q">{{ q.question }}</h3>
       <div class="qz-choices" role="group" aria-label="{{ _('선택지') }}">
         {% for c in q.choices %}
         <button class="qz-choice" type="button" data-i="{{ loop.index0 }}">
@@ -64,7 +64,7 @@
       </div>
       <div class="qz-fb" hidden>
         <p class="qz-verdict" role="status" aria-live="polite"></p>
-        <p class="qz-exp">{{ q.explanation_ko }}</p>
+        <p class="qz-exp">{{ q.explanation }}</p>
         {% if q.source_glossary_id %}
         <a class="qz-src-link" href="{{ rel_root }}glossary/index.html#{{ q.source_glossary_id }}">
           <i class="ti ti-book-2" aria-hidden="true"></i>{{ _("{kind}에서 근거 보기", kind=q.source_kind) }}</a>

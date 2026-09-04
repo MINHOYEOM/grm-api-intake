@@ -46,3 +46,5 @@ Some pages exist only in Korean because the source document is Korean — MFDS i
 - [Self-assessment checklist](https://grm-solutions.com/en/findings/checklist/): Checklist items derived from the most frequent deficiencies
 - [Regulatory glossary](https://grm-solutions.com/en/glossary/): 242 GMP and quality terms explained in plain English with official sources
 - [Reference library](https://grm-solutions.com/en/library/): Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents
+- [Guide](https://grm-solutions.com/en/guide/): How to use the service, and frequently asked questions
+- [Weekly quiz](https://grm-solutions.com/en/quiz/): Learning quiz based on that week's regulatory news

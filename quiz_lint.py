@@ -36,7 +36,15 @@ REQUIRED_FIELDS: dict[str, type] = {
     "source_ref": str,
     "difficulty": str,
 }
-OPTIONAL_FIELDS: dict[str, type] = {"week": str}
+# [다국어 2026-09-05] 영문 문항 세 필드 — **선택이되, 셋은 한 몸**이다(아래 EN_TRIPLE).
+# 하나만 있는 반쪽 영어는 렌더가 그 문항을 조용히 빼 버리므로 여기서 막는다.
+EN_TRIPLE: tuple[str, ...] = ("question_en", "choices_en", "explanation_en")
+OPTIONAL_FIELDS: dict[str, type] = {
+    "week": str,
+    "question_en": str,
+    "choices_en": list,
+    "explanation_en": str,
+}
 ALLOWED_SOURCE_TYPES = frozenset({"glossary", "brief", "finding", "external"})
 ALLOWED_DIFFICULTIES = frozenset({"easy", "normal"})
 
@@ -84,6 +92,14 @@ QUIZ_BANK_SCHEMA: dict[str, Any] = {
             "source_ref": {"type": "string", "minLength": 1},
             "difficulty": {"enum": sorted(ALLOWED_DIFFICULTIES)},
             "week": {"type": "string", "pattern": r"^[0-9]{4}(0[1-9]|[1-4][0-9]|5[0-3])$"},
+            "question_en": {"type": "string", "minLength": 1},
+            "choices_en": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": {"type": "string", "minLength": 1},
+            },
+            "explanation_en": {"type": "string", "minLength": 1},
         },
     },
 }
@@ -356,17 +372,62 @@ def _validate_item_schema(item: Any, index: int, report: LintReport) -> bool:
     if isinstance(week, str) and not _valid_week(week):
         report.add("WEEK", location, "week는 실제 ISO 주차를 나타내는 YYYYWW 형식이어야 합니다")
 
+    _validate_english(item, location, report)
+
     return not missing
+
+
+def _validate_english(item: dict[str, Any], location: str, report: LintReport) -> None:
+    """[다국어 2026-09-05] 영문 세 필드 — 전부 있거나 전부 없거나.
+
+    반쪽 영어가 데이터에 남으면 `web/render.py` 의 `quiz_has_english` 가 그 문항만 조용히
+    빼고, 영어 퀴즈는 이유 없이 짧아진다.  조용한 유실 대신 생성 단계에서 멈춘다
+    (`week` 상한이 조용한 유실을 막는 것과 같은 결).
+
+    ★`choices_en` 은 `choices` 와 **같은 길이**여야 한다.  `answer_index` 는 두 언어가
+      공유하는 하나의 값이라, 길이가 다르면 영어판의 정답이 다른 선택지를 가리키거나
+      아예 범위를 벗어난다 — 화면에는 아무 이상이 없고 채점만 틀린다.  순서까지는 기계가
+      볼 수 없으므로 `web/quiz_en_merge.py` 가 정답 줄을 두 언어로 나란히 찍어 사람이 본다.
+    """
+    present = [name for name in EN_TRIPLE if item.get(name)]
+    if present and len(present) != len(EN_TRIPLE):
+        missing_en = [name for name in EN_TRIPLE if not item.get(name)]
+        report.add(
+            "EN_PARTIAL",
+            location,
+            f"영문 필드는 전부 채우거나 전부 비워야 합니다 (빠짐: {', '.join(missing_en)})",
+        )
+
+    choices, choices_en = item.get("choices"), item.get("choices_en")
+    if isinstance(choices, list) and isinstance(choices_en, list):
+        if len(choices_en) != len(choices):
+            report.add(
+                "EN_CHOICES_LEN",
+                location,
+                f"choices_en은 choices와 같은 길이여야 합니다 "
+                f"(choices {len(choices)}개, choices_en {len(choices_en)}개) — "
+                f"answer_index가 어긋납니다",
+            )
+        for choice_index, choice in enumerate(choices_en):
+            if not isinstance(choice, str):
+                report.add("EN_CHOICE_TYPE", location,
+                           f"choices_en[{choice_index}]는 문자열이어야 합니다")
+            elif not choice.strip():
+                report.add("EN_CHOICE_EMPTY", location,
+                           f"choices_en[{choice_index}]는 비어 있을 수 없습니다")
 
 
 def _validate_internal_concepts(item: dict[str, Any], index: int, report: LintReport) -> None:
     exposed: list[str] = []
-    for name in ("question_ko", "explanation_ko"):
+    # [다국어 2026-09-05] 영문 사본도 **공개 문구**다 — 같은 금지어 게이트를 지난다.
+    # 언어가 하나 늘 때 검사가 따라 늘지 않으면, 영어판만 규율 밖에 놓인다.
+    for name in ("question_ko", "explanation_ko", "question_en", "explanation_en"):
         if isinstance(item.get(name), str):
             exposed.append(item[name])
-    choices = item.get("choices")
-    if isinstance(choices, list):
-        exposed.extend(choice for choice in choices if isinstance(choice, str))
+    for key in ("choices", "choices_en"):
+        choices = item.get(key)
+        if isinstance(choices, list):
+            exposed.extend(choice for choice in choices if isinstance(choice, str))
     text = unicodedata.normalize("NFKC", "\n".join(exposed))
     for label, pattern in _INTERNAL_REGEXES:
         if pattern.search(text):

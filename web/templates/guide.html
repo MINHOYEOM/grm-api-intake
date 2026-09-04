@@ -23,6 +23,8 @@
   {% endif %}
   <div class="wrap guide-body reveal" style="animation-delay:.26s">
     {{ guide_body }}
+    {# 용어사전 상자는 **그 언어 트리에 용어사전이 있을 때만** — 뷰가 정해 넘긴다. #}
+    {% if glossary_link %}
     <aside class="guide-x">
       <div class="guide-x-t">
         <b>{{ _('규제 용어가 낯설다면') }}</b>
@@ -30,6 +32,7 @@
       </div>
       <a class="guide-x-go" href="{{ rel_root }}glossary/index.html">{{ _('용어사전 열기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     </aside>
+    {% endif %}
   </div>
 </main>
 <style>

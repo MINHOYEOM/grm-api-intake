@@ -20,6 +20,7 @@ from __future__ import annotations
 import collections
 import json
 import pathlib
+import posixpath
 import re
 import shutil
 import sys
@@ -10831,6 +10832,41 @@ class WebLlmsTxtTest(unittest.TestCase):
         self.assertIn(f"<loc>{m.group(1)}</loc>", self.sitemap,
                       "llms.txt 의 최신 브리프가 sitemap 에 없는 유령 URL")
 
+    # ── 영어판 고지 ─────────────────────────────────────────────────────────
+    def test_announces_the_english_edition(self):
+        """★[2026-09-04] 영문 트리 4,163장을 다 만들어 놓고도 이 파일에는 `/en/` 이 한 번도
+        나오지 않았다. AI 어시스턴트는 이 파일로 사이트 구조를 읽으므로, 영어로 물어본
+        사용자에게 **한국어 페이지만 인용**하게 된다 — 만드는 것과 알리는 것은 다른 일이다
+        (sitemap 에만 있고 내부 링크가 없어 색인 안 되던 문서 3,202장과 같은 실패)."""
+        self.assertIn("## English edition", self.txt)
+        for path in ("/en/", "/en/findings/", "/en/glossary/", "/en/findings/clause/"):
+            self.assertIn(f"]({render.SITE_BASE_URL}{path})", self.txt,
+                          f"영어판 핵심 링크 누락: {path}")
+
+    def test_english_rows_never_advertise_a_page_that_does_not_exist(self):
+        """없는 페이지를 알려주는 것은 무링크보다 나쁘다 — 특히 상대가 AI 면 그 URL 을
+        그대로 인용해 사용자를 404 로 보낸다. 모든 `/en/` 행이 sitemap 에 있어야 한다."""
+        rows = re.findall(
+            rf"\]\({re.escape(render.SITE_BASE_URL)}(/en/\S*?)\)", self.txt)
+        self.assertGreater(len(rows), 5, "영어 행이 거의 없다 — 게이트가 꺼졌나?")
+        for path in rows:
+            self.assertIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", self.sitemap,
+                          f"llms.txt 가 sitemap 에 없는 영어 URL 을 알린다: {path}")
+
+    def test_english_counts_derive_from_the_rendered_tree(self):
+        """수치는 한국어 섹션과 같은 규율 — 문장에 박으면 낡는다."""
+        n_docs = self.sitemap.count(f"<loc>{render.SITE_BASE_URL}/en/findings/doc/")
+        self.assertIn(f"{n_docs:,} inspection documents", self.txt)
+        # 색인(`/en/glossary/`) 1건을 빼면 낱말 수 — 사이트맵과 같은 원천에서 센다.
+        n_terms = self.sitemap.count(f"<loc>{render.SITE_BASE_URL}/en/glossary/") - 1
+        self.assertGreater(n_terms, 0)
+        self.assertIn(f"{n_terms} GMP and quality terms", self.txt)
+
+    def test_says_which_pages_have_no_english_counterpart(self):
+        """★영어판이 **전부**라고 오해하게 두지 않는다. 한국어 원문 문서는 영어판이 없고,
+        그 사실을 안 밝히면 AI 가 '없는 것'을 '아직 안 만든 것'으로 요약한다."""
+        self.assertIn("only in Korean", self.txt)
+
 
 def freeze() -> None:
     GOLDEN_DIR.mkdir(parents=True, exist_ok=True)
@@ -14881,6 +14917,33 @@ class WebEnFacetTest(unittest.TestCase):
         self.assertIn('"orig_lang": orig_lang,', src, "산출물이 모집단을 스스로 밝혀야 한다")
 
 
+#: 영어 화면에 **한국어가 남아도 되는 유일한 자리** — 출처(`definition_source`)와
+#: 관련 조항(`reg_refs`). 이건 UI 문구가 아니라 **실재하는 문서·법령의 이름**이다.
+#: 「알기 쉬운 GMP 용어집」을 영어로 옮기면 존재하지 않는 문서를 가리키게 되고, 빼면
+#: 근거를 감추는 것이 된다 — 그래서 그대로 두고 **화면이 그 사실을 밝힌다**(자료실의
+#: 한국어 원제와 같은 판단). 목록 카드(`gl-*`)와 낱말 페이지(`gt-*`) 두 마크업 모두.
+#: ★이 목록은 **좁게** 유지한다. 여기에 뭔가를 더하는 순간 그만큼 검사가 사라진다.
+EN_NAMED_ORIGINAL_BLOCKS = (
+    re.compile(r'<p class="gl-src">.*?</p>', re.S),
+    re.compile(r'<div class="gl-refs">.*?</div>', re.S),
+    re.compile(r'<section class="gt-sec(?: gt-src)?">\s*<h2 class="gt-sec-h">'
+               r'(?:Related sections|Source)</h2>.*?</section>', re.S),
+)
+
+
+def strip_named_original_blocks(html):
+    """출처·조항 블록을 들어낸 HTML 과 **실제로 지운 개수**를 함께 돌려준다.
+
+    개수를 같이 돌려주는 이유: 마크업이 바뀌어 정규식이 아무것도 못 잡게 되면 예외는
+    안 나고 검사만 조용히 통과한다(낡은 손목록이 초록으로 남는 그 실패다).
+    """
+    n = 0
+    for rx in EN_NAMED_ORIGINAL_BLOCKS:
+        html, k = rx.subn(" ", html)
+        n += k
+    return html, n
+
+
 class WebEnGlossaryTest(unittest.TestCase):
     """[다국어 2026-09-04] 영어판 용어사전 242어 — 본문은 영어, 이름은 원문 그대로.
 
@@ -14891,12 +14954,6 @@ class WebEnGlossaryTest(unittest.TestCase):
       문서를 가리키게 되고, 빼면 근거를 감추는 것이 된다. 대신 화면이 그 사실을 밝힌다
       (자료실의 한국어 원제와 같은 판단).
     """
-
-    #: 출처·조항 블록은 위 이유로 한글 검사에서 제외한다. 대신 **화면이 밝히는지**를
-    #: 아래 test_discloses_why_korean_names_remain 이 따로 본다.
-    _NAMED_SECTION = re.compile(
-        r'<section class="gt-sec(?: gt-src)?">\s*<h2 class="gt-sec-h">'
-        r'(?:Related sections|Source)</h2>.*?</section>', re.S)
 
     @classmethod
     def setUpClass(cls):
@@ -14964,7 +15021,7 @@ class WebEnGlossaryTest(unittest.TestCase):
             html = re.sub(r"(?s)<(script|style)\b.*?</\1>", " ",
                           p.read_text(encoding="utf-8"))
             html = re.sub(r"(?s)<!--.*?-->", " ", html)
-            html = self._NAMED_SECTION.sub(" ", html)
+            html, _ = strip_named_original_blocks(html)
             text = re.sub(r"(?s)<[^>]+>", " ", html)
             hits = [h for h in re.findall(r"\S{0,12}[가-힣]+\S{0,12}", text)
                     if h.strip() != "한국어"]
@@ -15174,6 +15231,9 @@ class WebEnTreeTest(unittest.TestCase):
         cls.en_facets = (render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
                          if render.FINDINGS_FACETS_EN_FILE.exists() else None)
         cls.expected |= render.facet_tree_paths(cls.en_facets)
+        cls.expected |= render.glossary_tree_paths(render.load_glossary())
+        cls.expected |= render.clause_tree_paths(render.build_clause_views(
+            docs, render.load_cfr_catalog(), render.load_glossary(), lang="en"))
 
     @classmethod
     def tearDownClass(cls):
@@ -15207,10 +15267,12 @@ class WebEnTreeTest(unittest.TestCase):
         때문이다.
         ★[2026-09-04] 모음 축(`findings/c/`·`agency/`·`country/`)도 빠졌다 — 영어 모집단으로
         다시 잰 정본(`findings_facets_en.json`)이 생겨 건수까지 영어판이 성립한다.
-        조항(`findings/clause/`)은 표본을 `text_ko` 로 모으고 국문 용어사전으로 링크해
-        아직 남아 있다."""
-        for path in ("archive/", "glossary/", "guide/", "quiz/",
-                     "findings/clause/"):
+        ★[2026-09-04] 용어사전(`glossary/`)과 조항(`findings/clause/`)도 빠졌다 — 설명
+        두 필드(`easy_en`·`detail_en`)가 정본에 실렸고, 조항 표본은 `finding_body(f, "en")`
+        으로 원문을 싣는다. 남은 셋은 **아직 영어 본문이 없는 면**이다: 지난 브리프
+        아카이브·이용안내·퀴즈. 여기서 하나를 지울 때는 그 면의 본문이 실제로 영어로
+        성립하는지 먼저 재고, 이 목록이 빌 때가 §7 이 끝나는 때다."""
+        for path in ("archive/", "guide/", "quiz/"):
             self.assertNotIn(path, self.expected)
             self.assertNotIn(f"en/{path}index.html", self.pages)
 
@@ -15275,42 +15337,124 @@ class WebEnTreeTest(unittest.TestCase):
         self.assertGreaterEqual(checked, 18)
 
     def test_switcher_absent_where_there_is_no_counterpart(self):
-        for rel in ("glossary/index.html", "quiz/index.html", "guide/index.html"):
-            if rel in self.pages:
-                self.assertNotIn('class="grm-lang"', self.pages[rel], rel)
+        """짝이 없는 면에 전환 링크를 달면 없는 페이지로 보내는 것이다.
+
+        ★[2026-09-04] 손목록("glossary/", "quiz/", "guide/")이었다가 파생으로 바꿨다 —
+          영어 트리가 자랄 때마다 목록이 낡고, 낡은 목록은 **초록인 채로 아무것도 안
+          지킨다**(용어사전·조항이 실제로 그렇게 됐다). 선언(`expected`)에서 파생하면
+          목록이 스스로 따라오고, 검사 범위도 세 면에서 한국어 전용 전체로 넓어진다.
+        """
+        paired = self.expected | self.expected_doc_paths
+        unpaired = [k for k in self.pages
+                    if not k.startswith("en/") and k.endswith("index.html")
+                    and k[:-len("index.html")] not in paired]
+        self.assertGreater(len(unpaired), 5, "검사 대상이 없다")
+        for rel in unpaired:
+            self.assertNotIn('class="grm-lang"', self.pages[rel], rel)
 
     # ── 링크 정책 ────────────────────────────────────────────────────────────
     def test_english_pages_never_link_into_korean_only_sections(self):
         """영어 nav·푸터·본문 어디서도 한국어 전용 섹션으로 보내지 않는다(언어 전환 링크는
-        예외 — 그건 '한국어판으로 간다'고 라벨에 밝힌 의도적 간선이다)."""
+        예외 — 그건 '한국어판으로 간다'고 라벨에 밝힌 의도적 간선이다).
+
+        ★[2026-09-04] 금지 접두 손목록("archive/|glossary/|…")이었다. 용어사전·조항이
+          영어판으로 나오자 그 목록이 **맞는 링크를 잡는 오탐**이 됐고, 반대로 새로 생길
+          한국어 전용 섹션은 목록에 없어 **놓친다**. 그래서 목록을 지우고 일반 성질로
+          바꾼다: 영어 페이지의 상대 링크는 **해석 결과가 `en/` 안에 있어야 한다**.
+          이건 갈래가 늘어도 낡지 않고, 종전 목록이 막던 것을 전부 포함한다(실측:
+          영어 4,163장의 이탈 링크 0). 자산(`.css`·이미지)은 주소 규약이 달라 제외하고,
+          라벨을 달아 밝힌 세 간선(언어 전환·hreflang·"전체 기록")만 예외다.
+        """
+        checked = 0
         for rel, html in self.en.items():
             body = re.sub(r'<a class="grm-lang".*?</a>', "", html, flags=re.S)
             body = re.sub(r'<link rel="alternate".*?/>', "", body, flags=re.S)
             body = re.sub(r'<a class="records-all" href="[^"]*" hreflang="ko".*?</a>',
                           "", body, flags=re.S)
-            for hrefs in re.findall(
-                    r'href="((?:\.\./)*)(archive/|glossary/|guide/|quiz/|briefs/|me/'
-                    r'|findings/clause/)',
-                    body):
-                self.fail(f"{rel} → 한국어 전용 섹션 링크: {''.join(hrefs)}")
+            base = posixpath.dirname(rel)
+            for href in re.findall(r'href="([^"]+)"', body):
+                if re.match(r"(?:https?:|mailto:|tel:|#|data:|//|/)", href):
+                    continue
+                target = href.split("#")[0].split("?")[0]
+                if not target or not (target.endswith("/") or target.endswith(".html")):
+                    continue  # 자산은 asset_root 규약을 따로 쓴다
+                # normpath 는 끝 "/" 를 지운다 — 영어 홈은 "en/" 이 아니라 "en" 이 된다.
+                resolved = posixpath.normpath(posixpath.join(base, target))
+                self.assertTrue(resolved == "en" or resolved.startswith("en/"),
+                                f"{rel} → {href} 가 영어 트리를 벗어난다({resolved})")
+                checked += 1
+        self.assertGreater(checked, 100, "검사한 링크가 너무 적다 — 추출이 깨졌나?")
+
+    #: nav 라벨 → 그 섹션의 경로. **뜨는지 여부는 손으로 적지 않는다** — 아래에서
+    #: 선언(`expected`)에 있으면 떠야 하고 없으면 뜨면 안 된다로 뒤집어 본다.
+    NAV_SECTIONS = (("Weekly brief", "archive/"), ("Findings", "findings/"),
+                    ("Library", "library/"), ("Glossary", "glossary/"),
+                    ("Guide", "guide/"))
 
     def test_en_nav_shows_only_sections_that_exist_in_english(self):
+        """★[2026-09-04] "Glossary 는 nav 에 없다"를 손으로 적어 뒀더니, 영어 용어사전
+        243장이 실제로 생긴 뒤에도 그 가드가 **맞는 화면을 틀렸다고** 했다. 존재 여부는
+        선언이 정한다 — 여기서는 선언과 화면이 일치하는지만 본다."""
         nav = re.search(r'<nav id="navmenu">(.*?)</nav>', self.en["en/index.html"], re.S)
         self.assertIsNotNone(nav)
-        for gone in ("주간 브리프", "용어사전", "이용안내",
-                     "Weekly brief", "Glossary", "Guide"):
-            self.assertNotIn(gone, nav.group(1))
-        self.assertIn("Findings", nav.group(1))
-        self.assertIn("Library", nav.group(1))
+        for label, path in self.NAV_SECTIONS:
+            with self.subTest(section=path):
+                if path in self.expected:
+                    self.assertIn(label, nav.group(1),
+                                  f"{path} 는 영어판에 있는데 nav 에 없다(닿는 길이 없다)")
+                else:
+                    self.assertNotIn(label, nav.group(1),
+                                     f"{path} 는 영어판에 없는데 nav 가 가리킨다")
+        self.assertNotIn("주간 브리프", nav.group(1))
+        self.assertEqual(re.findall("[가-힣]+", nav.group(1)), [],
+                         "영어 nav 에 한글이 남았다")
+
+    def test_structured_data_on_the_english_home_declares_english(self):
+        """★[2026-09-04] 영어 홈의 JSON-LD 가 `inLanguage: ko` 였고 설명도 한국어였다.
+
+        화면은 영어인데 **기계가 읽는 선언만 한국어**인, 가장 찾기 어려운 종류의 거짓
+        신호다 — 영어 검색에 잡히는 것이 영어판을 만든 이유인데 그 선언이 정반대를
+        말하고 있었다. `WebSite.url` 도 언어판 루트를 가리켜야 두 노드가 서로 다른 판을
+        말한다(`Organization.url` 은 사이트 루트 그대로 — 기관은 하나다).
+        """
+        for rel, want_lang, want_url in (
+                ("en/index.html", "en", f"{render.SITE_BASE_URL}/en/"),
+                ("index.html", "ko", render.SITE_BASE_URL)):
+            with self.subTest(page=rel):
+                m = re.search(r'<script type="application/ld\+json">(.*?)</script>',
+                              self.pages[rel], re.S)
+                self.assertIsNotNone(m, f"{rel} 에 구조화 데이터가 없다")
+                nodes = json.loads(m.group(1))
+                site = [n for n in nodes if n.get("@type") == "WebSite"]
+                self.assertEqual(len(site), 1, "WebSite 노드가 하나가 아니다")
+                self.assertEqual(site[0]["inLanguage"], want_lang)
+                self.assertEqual(site[0]["url"], want_url)
+                org = [n for n in nodes if n.get("@type") == "Organization"]
+                self.assertEqual(org[0]["url"], render.SITE_BASE_URL,
+                                 "기관 URL 은 언어판마다 갈라지지 않는다")
+                if want_lang != "ko":
+                    self.assertEqual(
+                        re.findall("[가-힣]+", json.dumps(nodes, ensure_ascii=False)),
+                        [], "영어 홈의 구조화 데이터에 한국어가 남았다")
 
     # ── 한국어 잔존 ──────────────────────────────────────────────────────────
     def test_english_shell_pages_have_no_korean_ui_copy(self):
         """영어 화면에 남는 한글은 **언어 전환 라벨('한국어')뿐**이어야 한다.
-        자료실 항목 제목은 데이터(문서의 실제 이름)라 아래 별도 테스트가 본다."""
+        자료실 항목 제목은 데이터(문서의 실제 이름)라 아래 별도 테스트가 본다.
+
+        ★[2026-09-04] 용어사전이 영어판으로 나오면서 출처·관련조항이 한국어로 남는다.
+        그 두 블록은 **페이지를 통째로 건너뛰지 않고 블록만 들어내고** 나머지는 그대로
+        검사한다 — 자료실처럼 `continue` 로 빼면 그 화면의 나머지 전부가 검사 밖으로
+        나간다(실측: 블록을 들어낸 뒤 용어사전 색인의 잔존 한글은 0). 왜 남기는지는
+        `test_discloses_why_korean_names_remain` 이 따로 본다.
+        """
         hangul = re.compile("[가-힣]+")
+        stripped = 0
         for rel, html in self.en.items():
             if rel.startswith("en/library/"):
                 continue
+            html, n = strip_named_original_blocks(html)
+            stripped += n
             body = re.sub(r"<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->",
                           " ", html, flags=re.S | re.I)
             text = re.sub(r"<[^>]+>", " ", body)
@@ -15318,6 +15462,9 @@ class WebEnTreeTest(unittest.TestCase):
                 r'(?:aria-label|alt|title|placeholder|content)="([^"]*)"', body))
             leaked = sorted(set(hangul.findall(text + " " + attrs)) - {"한국어"})
             self.assertEqual(leaked, [], f"{rel} 에 한국어 UI 문구 잔존: {leaked[:6]}")
+        # 예외 경로가 살아 있는지 — 0 이면 마크업이 바뀌어 이 가드가 아무것도 안 거른
+        # 채 초록이 된 것이다(그때는 위 검사가 진짜로 통과한 것인지 알 수 없다).
+        self.assertGreater(stripped, 0, "출처·조항 블록을 하나도 못 찾았다 — 마크업 변경?")
 
     def test_library_discloses_why_korean_titles_remain(self):
         """영문 제목이 없는 문서는 한국어 원제를 그대로 보인다(지어내지 않는다) — 대신

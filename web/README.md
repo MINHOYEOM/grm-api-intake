@@ -80,6 +80,13 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    ★조건 블록을 쓸 때 **들여쓰기를 조건 안에** 둔다(`{% if c %}  <a …>` + 다음 줄 `{% endif %}`) —
    `{% if %}` 를 줄 앞에 두면 lstrip_blocks 가 들여쓰기를 먹고, `{%+ %}` 로 막으면 거짓일 때
    공백만 남은 줄이 생겨 한국어 골든이 흔들린다. 주석도 하이픈 없는 `{# #}` 형태로.
+8. **지적 본문은 언어에 따라 원문/번역이 갈린다(2026-09-04, 다국어 4단계)** — `text_orig`
+   (규제기관 원문)가 `findings_docs.json`·`findings_facets.json` 에 실린다(국문과 **다를
+   때만**). 렌더는 `finding_body(f, lang)`, 화면 스크립트는 `grm_i18n.JS_BODY_SHIM` 의
+   `_bodyText`/`_altText` 로 고른다. 영어 문서 페이지는 **원문이 실제로 영어인 문서만**
+   낸다(`doc_is_english` — 값으로 판정, 소스 이름으로 판정하지 않는다).
+   ★데이터에서 오는 표시 라벨(기관명 등)은 소스에 리터럴이 없어 추출기가 못 보므로
+   `render.DATA_LABEL_KEYS` 에 `N_()` 로 등록한다 — 빠뜨리면 영어 빌드가 **멈춘다**.
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

@@ -61,7 +61,10 @@
 <main>
   <div class="wrap">
     <nav class="fd-crumb" aria-label="{{ _('현재 위치') }}">
-      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/agency/">{{ _('규제기관별') }}</a><i>&rsaquo;</i><span>{{ doc.firm_name }}</span>
+{# [다국어 4단계] 중간 마디는 **그 언어 트리에 있는 면**으로 보낸다 — 기관 모음 페이지는
+   아직 한국어 전용이라, 영어판에서는 같은 자리를 '문서로 찾기'가 맡는다(둘 다 이 문서로
+   내려오는 상위 목록이다). 없는 페이지로 보내는 링크는 무링크보다 나쁘다. #}
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i>{% if 'findings/agency/' in en_paths or lang == 'ko' %}<a href="{{ rel_root }}findings/agency/">{{ _('규제기관별') }}</a>{% else %}<a href="{{ rel_root }}findings/docs/">{{ _('문서로 찾기') }}</a>{% endif %}<i>&rsaquo;</i><span>{{ doc.firm_name }}</span>
     </nav>
     <p class="kick">Inspection Record</p>
     {#- source 가 문서종류가 아니면(식약처 121장의 "MFDS") 표기하지 않는다 —
@@ -156,7 +159,8 @@
           않은 업체는 종전대로 조회 화면으로(런타임 RPC 라 nofollow). -#}
       {% if firm_page_slug %}<a href="{{ rel_root }}findings/firm/{{ firm_page_slug }}/">{{ _("{firm} 지적사항 이력 — 이 업체의 다른 문서까지", firm=doc.firm_name) }}</a>
       {%- elif doc.firm_key %}<a href="{{ rel_root }}findings/firm/index.html?key={{ doc.firm_key | urlencode }}" rel="nofollow">{{ _("{firm} 업체 프로파일 — 전체 이력 조회", firm=doc.firm_name) }}</a>{% endif %}
-      <a href="{{ rel_root }}findings/agency/{{ doc.agency | lower }}/">{{ _("{agency} 지적사항 전체", agency=agency_labels.get(doc.agency, doc.agency)) }}</a>
+{# [다국어 4단계] 기관 모음 페이지는 아직 한국어 트리 전용이다(다음 단계). #}
+      {% if 'findings/agency/' in en_paths or lang == 'ko' %}<a href="{{ rel_root }}findings/agency/{{ doc.agency | lower }}/">{{ _("{agency} 지적사항 전체", agency=agency_labels.get(doc.agency, doc.agency)) }}</a>{% endif %}
       <a href="{{ rel_root }}findings/docs/{{ doc.agency | lower }}/{{ doc.published_date[:4] }}/">{{ _("{year}년 {agency} 문서 목록", year=doc.published_date[:4], agency=agency_labels.get(doc.agency, doc.agency)) }}</a>
       {%- for c in related_categories %}<a href="{{ rel_root }}findings/c/{{ c.slug }}/">{{ _("{cat} 지적사항", cat=c.label_ko) }}</a>{% endfor %}
       <a href="{{ rel_root }}findings/">{{ _("지적사항 검색으로") }}</a>

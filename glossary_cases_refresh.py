@@ -381,6 +381,7 @@ def run_english_refresh(
         q = str(term.get("term_en") or "").strip()
         if not term_id or not q:
             raise ValueError(f"malformed glossary term (missing id/term_en): {term!r}")
+        had_previous = term_id in old_items
         previous = dict(old_items.get(term_id) or {
             "id": term_id, "q": q, "findings": 0, "documents": 0,
         })
@@ -390,6 +391,11 @@ def run_english_refresh(
         findings, documents, error = fetch(q)
         result = evaluate_item(
             previous, findings, documents, error, large_change_pct=large_change_pct)
+        # 최초 영문 정본에는 비교 기준선이 없다. '0 → N'을 ±50% 변동으로 부르면 모든
+        # 실제 hit가 경고가 되어 첫 파일을 자동화가 절대 커밋하지 못한다. 기준선이 생긴
+        # 다음 주부터는 evaluate_item의 기존 변동 가드가 그대로 적용된다.
+        if not had_previous and not result["failed"]:
+            result["large_change"] = False
         results.append(result)
         decisions.append((term_id, q, previous, result))
 
@@ -400,6 +406,19 @@ def run_english_refresh(
         run_date=run_date or date.today().isoformat(),
     )
     report["orig_lang"] = "en"
+    # 영문 후보의 0건은 오류가 아니라 링크를 만들지 않는다는 정상 판정이다. 기본(한국어)
+    # 경로처럼 '종전 링크 유지' 경고로 자동 병합을 막으면 첫 생산부터 0건 후보 때문에
+    # 영문 정본이 영원히 커밋되지 않는다. 급격한 총 링크 감소는 워크플로의 두 언어 합산
+    # shrink guard가 별도로 사람 검토로 올린다.
+    report["gate"]["automatic_merge_allowed"] = (
+        not report["aborted"]
+        and not any(r["failed"] for r in results)
+        and not any(r["large_change"] for r in results)
+    )
+    report["gate"]["review_reasons"] = [
+        reason for reason in report["gate"]["review_reasons"]
+        if "0건 전환" not in reason
+    ]
     # `evaluate_item`'s default wording says 'previous kept' because the Korean file's
     # historical contract does that. English 0 means no public English link, so make the
     # diagnostic say precisely what the generated payload does.

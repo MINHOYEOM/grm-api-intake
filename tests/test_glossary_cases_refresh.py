@@ -330,6 +330,8 @@ class EnglishRefreshTest(unittest.TestCase):
         payload, report = gcr.run_english_refresh(
             self._terms(), {}, fetch, run_date="2026-09-05")
         self.assertFalse(report["aborted"])
+        self.assertTrue(report["gate"]["automatic_merge_allowed"],
+                        "첫 영문 기준선은 비교할 종전 값이 없어 자동 병합 가능해야 한다")
         self.assertEqual(calls, [t["term_en"] for t in self._terms()])
         self.assertEqual(payload["orig_lang"], "en")
         self.assertEqual(payload["measured_on"], "2026-09-05")
@@ -342,11 +344,13 @@ class EnglishRefreshTest(unittest.TestCase):
     def test_zero_does_not_resurrect_a_previous_link(self):
         previous = {"items": [{"id": "empty", "q": "Old phrase", "findings": 9,
                                  "documents": 8}]}
-        payload, _ = gcr.run_english_refresh(
+        payload, report = gcr.run_english_refresh(
             [{"id": "empty", "term_en": "No English Hit"}], previous,
             lambda q: (0, 0, ""), run_date="2026-09-05")
         self.assertEqual(payload["items"], [])
         self.assertEqual(payload["excluded"][0]["reason"], "영문 원문 검색 결과 0건")
+        self.assertTrue(report["gate"]["automatic_merge_allowed"],
+                        "0건 후보는 영문 링크를 만들지 않는 정상 판정이다")
 
     def test_isolated_failure_keeps_only_existing_english_item(self):
         previous = {"items": [{"id": "gmp", "q": "Good Manufacturing Practice",

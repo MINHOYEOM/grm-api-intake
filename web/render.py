@@ -2019,7 +2019,8 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
                        cfr_items: "list[dict[str, Any]] | None",
                        glossary_terms: "list[dict[str, Any]] | None" = None,
                        *, min_documents: int = CLAUSE_MIN_DOCUMENTS,
-                       max_samples: int = CLAUSE_MAX_SAMPLES) -> list[dict[str, Any]]:
+                       max_samples: int = CLAUSE_MAX_SAMPLES,
+                       lang: str = DEFAULT_LANG) -> list[dict[str, Any]]:
     """조항별 페이지 뷰 목록. 입력은 전부 커밋된 정본 — 네트워크·난수·now() 0.
 
     본문은 자르지 않는다(길이 조절은 CSS 의 일이다 — findings_facet 과 같은 규율).
@@ -2038,8 +2039,11 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
     doc_ids: dict[str, set] = {}
     for doc in docs:
         for f in doc.get("findings") or []:
-            text = (f.get("text_ko") or "").strip()
-            if not text:
+            # ★본문은 **읽는 언어**를 따른다(불변식 #13). 영어판은 원문이 실제로
+            #   영어인 지적만 싣는다 — 한글이 섞인 원문을 영어 화면에 올리면 그 페이지의
+            #   본문이 곧 한국어가 된다(문서 페이지의 doc_is_english 와 같은 판정).
+            text = finding_body(f, lang).strip()
+            if not text or (lang != DEFAULT_LANG and _HANGUL_RE.search(text)):
                 continue
             for sec in {_cfr_section_of(r) for r in (f.get("cfr_refs") or [])}:
                 if not sec or sec not in catalog:
@@ -2052,7 +2056,7 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
                     "evidence_url": doc.get("evidence_url") or "",
                     "finding_id": f.get("finding_id") or "",
                     "document_id": doc.get("document_id") or "",
-                    "text_ko": text,
+                    "body": text,
                 })
                 doc_ids.setdefault(sec, set()).add(doc.get("document_id") or "")
 
@@ -2063,7 +2067,9 @@ def build_clause_views(docs_data: "dict[str, Any] | None",
         if not tid or not tko:
             continue
         for sec in sorted({_cfr_section_of(r) for r in (t.get("reg_refs") or [])} - {""}):
-            terms_by_section.setdefault(sec, []).append({"id": tid, "term_ko": tko})
+            # 용어 라벨도 읽는 언어를 따른다 — 영문 용어사전이 생겨 링크가 성립한다.
+            label = tko if lang == DEFAULT_LANG else (t.get("term_en") or tko)
+            terms_by_section.setdefault(sec, []).append({"id": tid, "label": label})
 
     views: list[dict[str, Any]] = []
     for sec in sorted(by_section):
@@ -3708,6 +3714,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 무링크보다 나쁘다). 커밋 정본 3종에서만 파생하므로 네트워크·순서 부담 0.
     clause_views = build_clause_views(docs_data, load_cfr_catalog(), load_glossary())
     clause_slugs = {c["slug"] for c in clause_views}
+    # [다국어 2026-09-04] 영어판 조항 — **원문이 영어인 지적만** 다시 세어 만든다.
+    # 문서 임계(CLAUSE_MIN_DOCUMENTS)를 그대로 다시 적용하므로 영어 모집단에서 얇아진
+    # 조항은 페이지를 만들지 않는다(얇은 페이지는 색인에 해롭다 — 한국어판과 같은 규율).
+    clause_views_en = build_clause_views(docs_data, load_cfr_catalog(), load_glossary(),
+                                         lang="en")
     doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
 
     # ── [다국어 4단계 2026-09-04] 영어 트리에 실사 문서 표면을 더한다 ─────────────
@@ -3731,6 +3742,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [다국어 2026-09-04] 용어사전 — **그리기 전에** 면 집합에 넣는다. 렌더 도중에
     # 넣으면 먼저 그려진 한국어 용어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만
     # 붙는다(모음 페이지에서 같은 실수를 CI 가 잡았다).
+    if clause_views_en:
+        en_paths.add("findings/clause/")
+        en_paths |= {f"findings/clause/{c['slug']}/" for c in clause_views_en}
     _glossary_terms_for_paths = load_glossary()
     if _glossary_terms_for_paths:
         en_paths.add("glossary/")
@@ -4243,9 +4257,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라
     # 국문 해설이 공백이다. 데이터는 커밋 정본 셋(findings_docs·library/cfr·glossary)에서만
     # 나오므로 facets 유무와 무관하게 만들어진다.
-    if clause_views:
-        clause_agency_labels = (docs_data or {}).get("agency_labels") or (
-            facets.get("agency_labels") if facets else {}) or {}
+    def emit_clause_tree(views, mkpage, emit_page, tr, lang_key, agency_labels):
+        """조항 색인 + 조항 N장 — 구현을 두 벌 두지 않는다(두 벌이면 언젠가 갈라진다)."""
+        if not views:
+            return
+        clause_views = views
+        clause_agency_labels = agency_labels
+        page, emit = mkpage, emit_page
         clause_index = page("findings/clause/")
         emit("findings_clause_index.html", clause_index,
             page_title=tr("21 CFR 조항별 지적사례 · GRM"),
@@ -4258,7 +4276,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
         index_mod = max((s.get("published_date") or ""
                          for c in clause_views for s in c["samples"]), default="")
-        facet_paths.append((clause_index.site_path, index_mod))
+        if lang_key == DEFAULT_LANG:
+            facet_paths.append((clause_index.site_path, index_mod))
 
         # 형제 목록은 전 조항 공통(같은 값 재사용 — 페이지마다 다시 만들지 않는다).
         sibs = [{"slug": c["slug"], "code": c["code"]} for c in clause_views]
@@ -4275,7 +4294,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             )
             clause_mod = max((s.get("published_date") or ""
                               for s in clause["samples"]), default="")
-            facet_paths.append((clause_page.site_path, clause_mod))
+            if lang_key == DEFAULT_LANG:
+                facet_paths.append((clause_page.site_path, clause_mod))
+
+    _clause_agency_labels = (docs_data or {}).get("agency_labels") or (
+        facets.get("agency_labels") if facets else {}) or {}
+    emit_clause_tree(clause_views, page, emit, tr, DEFAULT_LANG, _clause_agency_labels)
+    emit_clause_tree(clause_views_en, en_page, en_emit, en_tr, "en",
+                     {k: en_tr(v) for k, v in _clause_agency_labels.items()})
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지

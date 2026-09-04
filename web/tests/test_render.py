@@ -15020,6 +15020,123 @@ class WebEnGlossaryTest(unittest.TestCase):
                       ko, "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
 
 
+class WebEnClauseTest(unittest.TestCase):
+    """[다국어 2026-09-04] 영어판 조항 페이지 — 본문은 원문(영어), 건수는 그 모집단.
+
+    조항 페이지의 값은 **실제 지적 문장**이다. 종전 뷰는 `text_ko` 만 모았기 때문에
+    영어판을 낼 수 없었다 — 이번에 `finding_body(f, lang)` 으로 언어를 정하고, 영어판은
+    **원문이 실제로 영어인 지적만** 싣는다(문서 페이지의 `doc_is_english` 와 같은 판정).
+    ★문서 임계(`CLAUSE_MIN_DOCUMENTS`)를 영어 모집단에도 그대로 다시 적용한다 — 얇아진
+      조항은 페이지를 만들지 않는다. 한국어판에서 얇은 페이지를 안 만드는 이유와 같다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.ko = render.build_clause_views(
+            render.load_findings_docs(), render.load_cfr_catalog(), render.load_glossary())
+        cls.en = render.build_clause_views(
+            render.load_findings_docs(), render.load_cfr_catalog(), render.load_glossary(),
+            lang="en")
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enclause_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.dir = cls.out / "en" / "findings" / "clause"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_english_clauses_are_a_subset_of_the_korean_ones(self):
+        """영어 전용 조항이 생기면 짝이 없는 페이지가 된다."""
+        self.assertTrue(self.en, "영문 조항이 하나도 없다")
+        extra = sorted({c["slug"] for c in self.en} - {c["slug"] for c in self.ko})
+        self.assertEqual(extra, [], f"한국어에 없는 영어 전용 조항: {extra}")
+
+    def test_counts_are_recomputed_from_the_english_population(self):
+        """건수는 **그 트리의 모집단**에서 다시 센다.
+
+        ★실측(2026-09-04): 두 트리의 건수가 **같다**. 21 CFR 조항을 인용하는 지적은
+          FDA 뿐이고 FDA 는 전부 영어 원문이기 때문이다 — 필터가 안 걸린 게 아니라
+          거를 것이 없다. 그래서 "달라야 한다"가 아니라 **"영어가 한국어를 넘지 않는다"**
+          로 본다(모집단이 부분집합이라는 사실은 그 방향으로만 성립한다).
+        """
+        ko = {c["slug"]: c["findings"] for c in self.ko}
+        en = {c["slug"]: c["findings"] for c in self.en}
+        shared = sorted(set(ko) & set(en))
+        self.assertTrue(shared)
+        for slug in shared:
+            self.assertLessEqual(en[slug], ko[slug],
+                                 f"{slug}: 영어 건수가 한국어보다 많다(모집단이 부분집합이다)")
+        for c in self.en:
+            self.assertLessEqual(len(c["samples"]), c["findings"])
+            self.assertGreaterEqual(c["documents"], render.CLAUSE_MIN_DOCUMENTS,
+                                    f"{c['slug']}: 임계 미달인데 페이지를 만든다")
+
+    def test_filter_actually_excludes_korean_original_findings(self):
+        """거를 것이 없어 건수가 같더라도, **거르는 동작 자체**는 살아 있어야 한다.
+
+        합성 문서로 확인한다 — 실 데이터가 우연히 전부 영어라고 해서 필터가 없어도
+        되는 것은 아니다(코퍼스가 바뀌면 그날 조용히 한국어가 실린다).
+        """
+        docs = {"documents": [{
+            "document_id": "d1", "slug": "d1", "published_date": "2026-01-01",
+            "firm_name": "Acme", "agency": "FDA", "evidence_url": "",
+            "findings": [
+                {"finding_id": "f-en", "cfr_refs": ["21 CFR 211.192"],
+                 "text_ko": "조사가 미흡했다.",
+                 "text_orig": "Your firm failed to thoroughly investigate the discrepancy."},
+                {"finding_id": "f-ko", "cfr_refs": ["21 CFR 211.192"],
+                 "text_ko": "제조기록 검토가 미흡했다.", "text_orig": "제조기록 검토가 미흡했다."},
+            ]}]}
+        cfr = render.load_cfr_catalog()
+        en = render.build_clause_views(docs, cfr, None, min_documents=1, lang="en")
+        ko = render.build_clause_views(docs, cfr, None, min_documents=1)
+        self.assertEqual([c["findings"] for c in ko], [2], "한국어는 둘 다 싣는다")
+        self.assertEqual([c["findings"] for c in en], [1],
+                         "영어는 원문이 한국어인 지적을 빼야 한다")
+        self.assertNotIn("제조기록", en[0]["samples"][0]["body"])
+
+    def test_english_samples_carry_no_korean_body(self):
+        """★본문이 곧 이 페이지의 값이다 — 한 문장이라도 한국어면 영어판이 성립하지 않는다."""
+        hangul = re.compile(r"[가-힣]")
+        bad = [(c["slug"], s["body"][:40]) for c in self.en for s in c["samples"]
+               if hangul.search(s["body"])]
+        self.assertEqual(bad, [], f"영문 조항 표본에 한국어: {bad[:3]}")
+
+    def test_term_chips_use_the_english_headword(self):
+        """영문 용어사전이 생겨 링크가 성립한다 — 라벨이 한국어면 그 칩만 번역이 덜 된 것으로 읽힌다."""
+        labels = [t["label"] for c in self.en for t in c["terms"]]
+        self.assertTrue(labels, "용어 칩이 하나도 없다 — 이 가드가 아무것도 안 지킨다")
+        hangul = re.compile(r"[가-힣]")
+        self.assertEqual([x for x in labels if hangul.search(x)], [])
+
+    def test_rendered_pages_match_the_view_and_carry_no_korean(self):
+        got = {p.parent.name for p in self.dir.glob("*/index.html")} - {"clause"}
+        self.assertEqual(sorted(got), sorted(c["slug"] for c in self.en))
+        hangul = re.compile(r"[가-힣]")
+        bad = []
+        for p in sorted(self.dir.glob("*/index.html")):
+            html = re.sub(r"(?s)<(script|style)\b.*?</\1>", " ",
+                          p.read_text(encoding="utf-8"))
+            html = re.sub(r"(?s)<!--.*?-->", " ", html)
+            text = re.sub(r"(?s)<[^>]+>", " ", html)
+            hits = [h for h in re.findall(r"\S{0,12}[가-힣]+\S{0,12}", text)
+                    if h.strip() != "한국어"]
+            if hits:
+                bad.append((p.parent.name, hits[:3]))
+        self.assertEqual(bad, [], f"영문 조항 페이지에 한국어: {bad[:3]}")
+
+    def test_paired_both_ways_and_in_the_sitemap(self):
+        sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
+        slug = sorted(c["slug"] for c in self.en)[0]
+        self.assertIn(f"{render.SITE_BASE_URL}/en/findings/clause/{slug}/</loc>", sitemap)
+        ko = (self.out / "findings" / "clause" / slug / "index.html").read_text(
+            encoding="utf-8")
+        self.assertIn(f'hreflang="en" href="{render.SITE_BASE_URL}'
+                      f'/en/findings/clause/{slug}/"', ko,
+                      "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 

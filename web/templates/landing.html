@@ -12,7 +12,12 @@
     늘리지 말 것). 인기 카드 빈 상태의 이동 버튼도 두지 않는다(유도 문구만). -#}
 <main>
   <div class="wrap hero">
+{# ★[다국어 2026-09-05] 표지(`cover`)는 **그 언어로 낼 수 있는 최신 호**에서 온다.
+    낼 호가 하나도 없으면(픽스처 빌드가 그렇다) 히어로의 표지 조각만 생략한다 —
+    한국어 표지를 대신 싣지 않는다. 그러면 영어 홈 첫 화면이 통째로 한국어가 된다. #}
+{% if cover %}
     <div class="hero-top"><span>{{ _("제약 GMP · 품질 규제소식") }}</span><span class="r">Weekly News — Vol. {{ cover.issue_no }}</span></div>
+{% endif %}
     <div class="hero-grid">
       <div>
         <span class="kick reveal" style="animation-delay:.05s">Global Regulatory Monitor</span>
@@ -21,10 +26,13 @@
           핵심 사실과 시사점, 그리고 실무 점검 포인트까지 한 페이지에 담아, 공유받은 즉시 업무에 활용할 수 있습니다.") }}</p>
         <div class="lede-tags reveal" style="animation-delay:.24s"><span class="tag fact">{{ _("사실") }}</span><span class="tag insight">{{ _("시사점") }}</span><span class="tag check">{{ _("점검") }}</span></div>
         <div class="btns reveal" style="animation-delay:.28s">
+{% if cover %}
           <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">{{ _("이번 주 소식 읽기 ") }}<i class="ti ti-arrow-right"></i></a>
+{% endif %}
           <a class="btn lg" href="{{ rel_root }}archive/index.html">{{ _("지난 소식 둘러보기") }}</a>
         </div>
       </div>
+{% if cover %}
       <aside class="reveal" style="animation-delay:.22s">
         <div class="issuecard">
           <div class="top"><span class="dot"></span><span class="dot g"></span><span class="dot y"></span><span class="d">Issue {{ cover.issue_no }} · Live</span></div>
@@ -43,6 +51,7 @@
           </div>
         </div>
       </aside>
+{% endif %}
     </div>
     {#- §5-3: 통계 바를 히어로 그리드 밖 전폭으로 이동 — 좌측 컬럼에 갇혀 우측(카드) 여백이 비던 문제 해소. 4등분 스팬. -#}
     <div class="stats reveal" style="animation-delay:.4s">
@@ -120,13 +129,17 @@
       card_id·distinct_user_count 두 필드만 반환(불가침) — 화면 텍스트는 전부 인덱스 파생 +
       숫자뿐. 빈 상태의 브리프 이동 버튼은 CTA 중복 정리로 제거(유도 문구만 유지 — 브리프행
       CTA 는 히어로·하단 콜아웃 2개뿐). 섹션 하나에 h2 를 둘 두지 않기 위해 퀴즈 배너 제목은
-      h3(스코프 스타일로 시각 위계 유지). grm.css 프리즈 보존 위해 스코프 <style>. -#}
+      h3(스코프 스타일로 시각 위계 유지). grm.css 프리즈 보존 위해 스코프 <style>.
+      ★[다국어 2026-09-05] `data-index` 는 **언어별 인덱스**를 가리킨다. 인기 카드 제목은
+      런타임에 그 인덱스에서 오므로, 하나만 가리키면 영어 홈에 한국어 카드 제목이 뜬다 —
+      HTML 에는 없는 내용이라 정적 테스트가 볼 수 없는 자리다(영문 아카이브 검색이
+      한국어 인덱스를 읽고 있던 것과 같은 결함). -#}
   <section class="section" id="engage"><div class="wrap">
     <div id="popular">
       <span class="kick">Weekly Reactions</span>
       <h2 class="sec-title">{{ _("이번 주 반응이 모인 카드") }}</h2>
       <p class="popular-sub">{{ _("하트·스크랩 기준 — 조회수가 아니라 독자들의 반응으로 모았어요.") }}</p>
-      <div id="grm-popular" data-index="/assets/search-index.json">
+      <div id="grm-popular" data-index="/assets/search-index{{ '' if lang == 'ko' else '.en' }}.json">
         <div class="popular-empty">
           <p class="popular-empty-t">{{ _("아직 이번 주 하트·스크랩이 없어요.") }}</p>
           <p class="popular-empty-s">{{ _("관심 있는 카드에 ♥를 눌러 주세요 — 반응이 모이면 이 자리에 소개해 드려요.") }}</p>

@@ -352,6 +352,83 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             and not (self.out / "en" / sec / "index.html").is_file())
         self.assertEqual(missing, [], f"영어 짝이 없는 섹션: {missing}")
 
+    def test_home_is_the_same_page_in_both_languages(self):
+        """★[2026-09-05] 영어 홈은 `landing_en.html` 이라는 **별도 템플릿**이었다. 그때는
+        영문 브리프가 0호라 히어로에 실을 표지가 없었기 때문인데, 그 사이 10호가 서면서
+        전제가 사라졌는데도 템플릿은 둘로 남아 있었다 — 한국어 홈에는 있는 기능 소개·
+        인기 카드가 영어 홈에는 없었고, 사용자가 "차이가 꽤 많다"고 본 게 바로 이것이다.
+
+        구조 서명(클래스 멀티셋)으로 본다 — **글자는 달라야 하고 구조는 같아야 한다**는
+        요구를 기계가 볼 수 있게 만든 형태다. 라이브 데이터에서 봐야 표지까지 포함해
+        엄격하게 대조된다.
+        """
+        ko = class_signature((self.out / "index.html").read_text(encoding="utf-8"))
+        en = class_signature((self.out / "en" / "index.html").read_text(encoding="utf-8"))
+        diff = sorted(c for c in set(ko) | set(en)
+                      if ko.get(c, 0) != en.get(c, 0)
+                      and c not in INTENTIONAL_CLASS_DIFFS)
+        self.assertEqual(diff, [], f"홈 구조가 갈라졌다: {diff[:8]}")
+        self.assertGreater(len(ko), 30, "서명이 비었다 — 추출이 깨졌나?")
+
+    def test_english_home_cover_comes_from_an_english_issue(self):
+        """표지는 **그 언어로 낼 수 있는 최신 호**에서 온다. 한국어 최신호가 영어에 없을 수
+        있고(2026-06-22 가 그렇다), 그때 한국어 표지를 실으면 영어 홈 첫 화면이 한국어가
+        된다 — 홈은 첫 접점이라 그 한 장이 서비스 전체의 인상을 정한다."""
+        html = (self.out / "en" / "index.html").read_text(encoding="utf-8")
+        m = re.search(r'href="briefs/(\d{4}-\d{2}-\d{2})/index\.html"', html)
+        self.assertIsNotNone(m, "영어 홈 히어로에 브리프 CTA 가 없다")
+        pub = m.group(1)
+        en_pubs = {b["brief"]["publish_date"] for b in render.load_briefs(DATA_DIR)
+                   if render.brief_has_english(b)}
+        self.assertIn(pub, en_pubs, f"영어 홈이 영어판 없는 호({pub})를 가리킨다")
+        self.assertEqual(pub, max(en_pubs), "영어로 낼 수 있는 최신 호가 아니다")
+        body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->",
+                      " ", html)
+        self.assertEqual(
+            [w for w in re.findall("[가-힣]+", re.sub(r"<[^>]+>", " ", body))
+             if w != "한국어"], [], "영어 홈에 한국어가 남았다")
+
+    def test_english_search_index_exists_and_matches_the_english_issues(self):
+        """★영문 아카이브가 **한국어 인덱스를 검색**하고 있었다. `archive.js` 가 자기
+        스크립트 경로에서 인덱스 URL 을 만들기 때문에 두 트리가 같은 파일을 읽었고,
+        화면은 영어인데 결과 카드와 필터 라벨이 한국어로 떴다. HTML 에는 없는 내용이라
+        지금까지의 어떤 정적 검사도 이걸 볼 수 없었다."""
+        f = self.out / "assets" / "search-index.en.json"
+        self.assertTrue(f.is_file(), "영어 검색 인덱스가 없다")
+        idx = json.loads(f.read_text(encoding="utf-8"))
+        briefs = render.load_briefs(DATA_DIR)
+        want = {b["brief"]["publish_date"] for b in briefs
+                if render.brief_has_english(b)}
+        self.assertEqual({i["date"] for i in idx["issues"]}, want)
+        nums = render.assign_issue_numbers(briefs)
+        for row in idx["issues"]:
+            self.assertEqual(row["issue_no"], nums[row["date"]],
+                             "영어 인덱스가 호 번호를 다시 매겼다")
+        self.assertEqual(
+            [m for m in idx["facets"]["modalities"] if re.search("[가-힣]", m)],
+            [], "제형 필터 라벨이 한국어로 남았다")
+
+    def test_english_index_carries_korean_only_where_a_name_is_korean(self):
+        """★한국 업체·기관의 **실명**은 원문 그대로 둔다 — 옮기면 존재하지 않는 이름을
+        가리키게 된다(용어사전 출처·자료실 원제와 같은 판단). 그래서 이름이 들어가는
+        두 슬롯만 예외로 두고, **그 밖의 어떤 필드에도** 한국어가 있으면 잡는다."""
+        idx = json.loads((self.out / "assets" / "search-index.en.json")
+                         .read_text(encoding="utf-8"))
+        name_slots = {"target", "text"}     # text 는 target 을 포함하는 검색용 결합값
+        leaked = sorted({
+            k for c in idx["cards"] for k, v in c.items()
+            if k not in name_slots and isinstance(v, str) and re.search("[가-힣]", v)})
+        self.assertEqual(leaked, [], f"영어 인덱스에 한국어 필드: {leaked}")
+        self.assertTrue(idx["cards"], "카드가 비었다 — 이 가드가 아무것도 안 지킨다")
+
+    def test_archive_script_picks_the_index_by_document_language(self):
+        """경로를 파싱하지 않고 `<html lang>` 하나만 본다 — 언어 트리가 늘어도 낡지 않는다."""
+        js = (WEB_DIR / "assets" / "archive.js").read_text(encoding="utf-8")
+        self.assertIn("documentElement.getAttribute(\"lang\")", js)
+        self.assertIn("search-index.en.json", js)
+        for rel in ("assets/search-index.json", "assets/search-index.en.json"):
+            self.assertTrue((self.out / rel).is_file(), f"인덱스 누락: {rel}")
+
     def test_english_feed_exists_and_speaks_english(self):
         """★영어 4천 장이 **한국어 피드**(`<language>ko</language>`·한국어 제목)를 자기
         대체본이라고 말하고 있었다. 피드 리더는 그 선언을 그대로 믿는다."""
@@ -15664,6 +15741,25 @@ class WebEnClauseTest(unittest.TestCase):
                       "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
 
 
+#: 두 언어판이 **같은 화면**이어야 한다는 요구를 기계가 볼 수 있게 만든 것.
+#: 서명 = 그 페이지의 CSS 클래스 멀티셋(언어 무관 — 글자는 다르고 구조는 같아야 한다).
+#: 이 방식으로 실제 결함을 찾았다: 영어 홈이 아예 다른 템플릿이었고, 문서 3,165장에
+#: 용어 링크가 없었고, 영문 브리프 목차가 카드마다 그룹을 새로 열고 있었다.
+def class_signature(html: str) -> "collections.Counter":
+    body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->", " ", html)
+    return collections.Counter(
+        c for m in re.finditer(r'class="([^"]+)"', body)
+        for c in m.group(1).split())
+
+
+#: 두 트리가 **의도적으로** 다른 클래스. 여기에 무언가를 더할 때는 왜 다른지를 함께 적는다
+#: — 목록이 길어지는 것은 파리티가 무너지는 소리다.
+INTENTIONAL_CLASS_DIFFS: dict[str, str] = {
+    # 한국어 화면에서만 뜨는 "영어판이 있다" 안내(영어 화면에 권할 이유가 없다).
+    "grm-langhint": "한국어 전용 진입 안내",
+}
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 
@@ -15801,6 +15897,25 @@ class WebEnTreeTest(unittest.TestCase):
                                 f"{rel} → {href} 가 없는 파일을 가리킨다")
                 checked += 1
         self.assertGreaterEqual(checked, 18)
+
+    # ── 홈 구조 동일성 ──────────────────────────────────────────────────────
+    # ★구조 대조 자체는 **라이브 빌드**에서 한다(`WebLiveBriefsRenderSmokeTest`) —
+    #   픽스처에는 영문 브리프가 없어 히어로 표지가 빠지고, 그걸 예외로 빼려면 `btn`·
+    #   `reveal` 같은 **범용 클래스까지** 제외해야 해서 가드가 거의 아무것도 안 지키게 된다.
+    #   (검사가 자기 모집단에서 반례를 먼저 지우는 그 실패 — 오늘 두 번째다.)
+    def test_the_second_landing_template_is_gone(self):
+        """구현을 두 벌 두지 않는다 — 두 벌이면 한쪽만 고쳐지는 날이 반드시 온다
+        (모음·조항에서 한 함수를 공유한 것과 같은 규율)."""
+        self.assertFalse((WEB_DIR / "templates" / "landing_en.html").exists(),
+                         "영어 전용 랜딩 템플릿이 되살아났다")
+
+    def test_popular_cards_read_the_index_of_their_own_language(self):
+        """인기 카드 제목은 런타임에 검색 인덱스에서 온다 — 하나만 가리키면 영어 홈에
+        **한국어 카드 제목**이 뜬다(HTML 에 없는 내용이라 다른 검사가 못 본다)."""
+        self.assertIn('data-index="/assets/search-index.json"',
+                      self.pages["index.html"])
+        self.assertIn('data-index="/assets/search-index.en.json"',
+                      self.pages["en/index.html"])
 
     # ── 루트 진입 안내 ──────────────────────────────────────────────────────
     def _hint(self, html):

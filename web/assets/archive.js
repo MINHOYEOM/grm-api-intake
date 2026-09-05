@@ -21,7 +21,14 @@
     document.currentScript ||
     document.querySelector('script[src$="archive.js"]');
   if (!scriptEl) return;
-  var indexUrl = new URL("search-index.json", scriptEl.src).href;
+  // [다국어 2026-09-05] 언어판마다 자기 인덱스를 읽는다. 종전에는 파일 이름이 하나뿐이라
+  // **영문 아카이브가 한국어 인덱스를 검색**했다 — 화면은 영어인데 결과 카드와 필터
+  // 라벨이 한국어로 뜬다. HTML 에는 없는 내용이라 정적 테스트가 볼 수 없던 자리다.
+  // 기준은 문서의 `lang` 하나뿐이다(경로를 파싱하면 언어 트리가 늘 때마다 낡는다).
+  var _lang = (document.documentElement.getAttribute("lang") || "ko").toLowerCase();
+  var indexUrl = new URL(
+    _lang.indexOf("ko") === 0 ? "search-index.json" : "search-index.en.json",
+    scriptEl.src).href;
 
   var state = {
     q: "",

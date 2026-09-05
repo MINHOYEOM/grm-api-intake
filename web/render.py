@@ -2855,7 +2855,15 @@ def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str,
 
 
 def _cover_context(brief: dict[str, Any], issue_no: int,
-                   tr: Translator = _KO) -> dict[str, Any]:
+                   tr: Translator = _KO,
+                   lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """홈 히어로의 이슈카드 — 제목·요약이 **읽는 언어**를 따른다.
+
+    ★[다국어 2026-09-05] 종전에는 영어 홈이 `landing_en.html` 이라는 **별도 템플릿**을
+      썼다. 이유는 하나였다 — 그때는 영문 브리프가 0호라 히어로에 실을 표지가 없었다.
+      이제 10호가 있으므로 그 전제가 사라졌고, 템플릿을 두 벌 두면 한쪽만 고쳐지는
+      날이 반드시 온다(구현을 두 벌 두지 않는다 — 모음·조항에서 쓴 것과 같은 규율).
+    """
     bm = brief["brief"]
     cov = _norm_coverage(bm.get("coverage") or {})
     pub = bm.get("publish_date", "")
@@ -2869,8 +2877,8 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
         "evidence": cov["evidence"],              # 다크밴드 Evidence A/B
         "title_dateform": title_dateform(pub, tr),  # 다크밴드 "{Y}년 {M}월 {N}주차"
         "window": bm.get("window", ""),
-        "title": _brief_title(bm),
-        "tldr": bm.get("tldr") or [],
+        "title": _brief_title(bm, tr, lang),
+        "tldr": _brief_tldr(bm, lang),
     }
 
 
@@ -3101,8 +3109,27 @@ def _card_search_text(card: dict[str, Any]) -> str:
 
 
 def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
-                      month: str, vol_title: str) -> dict[str, Any]:
-    """카드 1개 → 검색 인덱스 엔트리. 전 필드 카드 기존 값 파생(무변형)."""
+                      month: str, vol_title: str,
+                      tr: Translator = _KO,
+                      lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """카드 1개 → 검색 인덱스 엔트리. 전 필드 카드 기존 값 파생(무변형).
+
+    ★[다국어 2026-09-05] 언어를 탄다. 종전에는 한국어 인덱스 하나뿐이었고, `archive.js`
+      가 **자기 스크립트 경로**에서 인덱스 URL 을 만들기 때문에(`new URL("search-index.json",
+      scriptEl.src)`) 영문 아카이브도 그 한국어 인덱스를 검색했다 — 화면은 영어인데
+      검색 결과와 필터 라벨이 한국어로 뜨는 상태였다. 정적 테스트는 이걸 볼 수 없다
+      (런타임에 주입되는 내용이라 HTML 에는 없다).
+      서사 다섯은 `_card_view` 와 **같은 방식**으로 영어 슬롯을 덮어쓴다(구현을 두 벌
+      두지 않는다). 제형 라벨은 한국어 값이 곧 사전 키라 `tr()` 을 태우고, 기관·분류는
+      데이터가 이미 영문 고정값이라 그대로 둔다(다시 번역하면 사전에 없는 키가 된다).
+    """
+    if lang != DEFAULT_LANG and card_has_english(card):
+        card = {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
+    # 카드 종류 라벨은 **지역 사본에** 번역해 둔다 — 그래야 아래 엔트리 필드와
+    # `_card_search_text(card)` 가 같은 값을 본다(두 곳에서 따로 번역하면 검색어와
+    # 화면 라벨이 갈라진다). 한국어는 항등이라 골든 바이트가 흔들리지 않는다.
+    if card.get("card_type"):
+        card = {**card, "card_type": tr(card["card_type"])}
     return {
         "issue_no": issue_no,
         "date": date,
@@ -3110,7 +3137,8 @@ def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
         "vol_title": vol_title,
         "agency": card.get("agency", ""),
         "category": card.get("category", ""),
-        "modality": card.get("modality"),               # null 가능(필터 미해당)
+        "modality": (tr(card["modality"]) if card.get("modality")
+                     else card.get("modality")),        # null 가능(필터 미해당)
         "card_type": card.get("card_type", ""),
         "evidence_level": card.get("evidence_level", ""),
         "signal_tier": card.get("signal_tier", ""),
@@ -3124,14 +3152,27 @@ def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
 
 
 def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str, int],
-                       latest_slug: str) -> dict[str, Any]:
+                       latest_slug: str, tr: Translator = _KO,
+                       lang: str = DEFAULT_LANG) -> "dict[str, Any] | None":
     """전 브리프 카드 → 검색 인덱스(facet 메타 + 호 메타 + 카드 엔트리).
+
+    ★[다국어 2026-09-05] 언어판마다 자기 인덱스를 낸다. 영어판은 `brief_has_english` 인
+      호만 싣는다 — 한 호라도 섞으면 영어 화면의 검색 결과에 한국어 카드가 뜬다.
+      **호 번호는 다시 매기지 않는다**(피드와 같은 규율: 같은 브리프가 두 언어에서 다른
+      Vol. 을 가지면 사람이 서로를 못 찾는다). 카드 href 는 `../briefs/…` 상대경로 그대로라
+      언어와 무관하다 — `/en/archive/` 에서도 `/en/` 에서도 같은 트리 안에 떨어진다
+      (popular.js 가 선행 `../` 를 벗겨 랜딩에서도 성립하는 기존 관례).
+      영어로 낼 호가 없으면 `None` 을 돌려주고 호출부가 파일을 만들지 않는다.
 
     정렬(결정론): 카드 = date desc, 동일 호 내 render_order asc. facet 후보는 **실제
     존재값만** 노출(데이터 파생) — agency/category/modality 알파벳, months 최신순.
     호 메타(issues)는 baseline 서버목록과 JS 검색뷰가 동일하게 쓰는 단일 파생원
     (`_issue_row`)에서 만들어 두 경로 일관성 보장.
     """
+    if lang != DEFAULT_LANG:
+        briefs = [b for b in briefs if brief_has_english(b)]
+        if not briefs:
+            return None
     cards_idx: list[dict[str, Any]] = []
     issues_idx: list[dict[str, Any]] = []
     agencies: set[str] = set()
@@ -3145,14 +3186,15 @@ def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str,
         date = bm.get("publish_date", "")
         month = date[:7]
         issue_no = issue_no_by_date[date]
-        vol_title = _brief_title(bm)
+        vol_title = _brief_title(bm, tr, lang)
         renderable = [c for c in (b.get("cards") or []) if _is_renderable(c)]
         cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
         for c in cards_sorted:
             entry = _card_index_entry(c, issue_no=issue_no, date=date,
-                                      month=month, vol_title=vol_title)
+                                      month=month, vol_title=vol_title,
+                                      tr=tr, lang=lang)
             cards_idx.append(entry)
             if entry["agency"]:
                 agencies.add(entry["agency"])
@@ -3163,7 +3205,7 @@ def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str,
         if month:
             months.add(month)
 
-        row = _issue_row(b, issue_no, latest_slug)
+        row = _issue_row(b, issue_no, latest_slug, tr, lang)
         issues_idx.append({
             "issue_no": row["issue_no"],
             "slug": row["slug"],
@@ -5005,6 +5047,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     search_index = build_search_index(briefs, issue_no_by_date, latest_slug)
     _write_json(dist_assets / "search-index.json", search_index)
     written.append("assets/search-index.json")
+    # 영어 인덱스 — 파일 이름으로 언어를 가른다(`archive.js` 가 `<html lang>` 을 보고
+    # 고른다). 자산은 언어 트리 밖 `/assets/` 공용이라 트리마다 두지 않는다.
+    # 낼 호가 없으면 파일도 만들지 않는다 — 그때 영문 아카이브 검색은 조용히 빈 결과를
+    # 내는 대신 **한국어 인덱스로 폴백하지 않는다**(그게 지금까지의 결함이었다).
+    search_index_en = build_search_index(briefs, issue_no_by_date, latest_slug,
+                                         tr=en_tr, lang="en")
+    if search_index_en is not None:
+        _write_json(dist_assets / "search-index.en.json", search_index_en)
+        written.append("assets/search-index.en.json")
 
     # 마이페이지(/me) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
     # 개인화 페이지라 sitemap/canonical 제외(비색인). 스크랩·관심 업체는 reactions.js 가,
@@ -5110,16 +5161,26 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_catalogs = load_library(tr=en_tr)
     en_library_updates = load_library_updates(en_catalogs)
 
-    en_emit("landing_en.html", en_page(""),
-        # ★`en_tr(...)` 는 추출기의 함수 목록(tr/N_)에 없어 키로 잡히지 않는다 — 영어 전용
-        #   문구는 `N_()` 로 등록해야 카탈로그 결손 검사가 본다(안 그러면 렌더 시점에야 터진다).
+    # [다국어 2026-09-05] 영어 홈 = **한국어와 같은 템플릿**. 히어로 표지는 영문으로 낼 수
+    # 있는 가장 최근 호에서 뽑는다(한국어 최신호가 영어에 없을 수 있다 — 그때 한국어 표지를
+    # 실으면 영어 홈 첫 화면이 한국어가 된다).
+    en_cover_brief = max(
+        (b for b in briefs if brief_has_english(b)),
+        key=lambda b: b["brief"].get("publish_date", ""), default=None)
+    en_emit("landing.html", en_page(""),
         page_title=en_tr(N_("GRM · 글로벌 규제 인텔리전스 · 영문판")),
         nav_active="home",
         description=en_tr(SITE_DESCRIPTION),
         json_ld=build_json_ld(tr=en_tr, lang="en"),
-        findings_zone=findings_zone,
+        # 낼 호가 없으면 None — 템플릿이 히어로의 표지 조각만 생략한다(한국어 표지를
+        # 대신 싣지 않는다). 픽스처 빌드가 정확히 그 경우다.
+        cover=(_cover_context(
+            en_cover_brief,
+            issue_no_by_date[en_cover_brief["brief"]["publish_date"]],
+            en_tr, "en") if en_cover_brief is not None else None),
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
+        findings_zone=findings_zone,
     )
     en_emit("findings.html", en_page("findings/"),
         zone_totals=findings_zone,

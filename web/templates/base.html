@@ -91,11 +91,9 @@
 {% endif %}
 </head>
 <body>
-{# P0-4: '소개' = 홈의 기능 소개 섹션(#why — 11차 정리에서 단독 WHY 섹션을 걷어내며 앵커를
-   기능 섹션으로 옮김·footer 링크 무단절). nav 탭에서는 제거(8차 웨이브 A 2026-07-18)했지만
-   footer 둘러보기·notice_href 배선에는 여전히 쓰여 변수 정의는 유지한다. 홈에선 순수
-   프래그먼트(새로고침 0), 타 페이지에선 홈으로 이동 후 스크롤. 브랜드 로고는 홈(index.html) 유지. #}
-{% set about_href = '#why' if nav_active == 'home' else rel_root ~ 'index.html#why' %}
+{# P0-4: 'AI 자동 생성 고지' = 홈의 고지 섹션(#notice). 홈에선 순수 프래그먼트(새로고침 0),
+   타 페이지에선 홈으로 이동 후 스크롤. [소개 2026-09-06] 종전 '소개'(about_href → 홈 #why
+   기능 섹션)는 전용 페이지 /about/ 로 바뀌어 변수가 사라졌다 — 푸터 '서비스' 열 참조. #}
 {% set notice_href = '#notice' if nav_active == 'home' else rel_root ~ 'index.html#notice' %}
 {#- [루트 진입 2026-09-05] 영어 사용자가 `grm-solutions.com` 을 직접 치면 한국어 홈을
     만난다. 헤더에 "English" 칩이 있지만 한국어 화면을 처음 본 사람이 그걸 찾을 이유가
@@ -211,8 +209,16 @@
 </script>
 {% endif %}
 {% block ai_disclosure %}{% endblock %}
-{# [존 재편 2026-08-26] footer 열이 4개 → 5개가 되면서 grm.css 의 `.foot{grid-template-columns:1.6fr 1fr 1fr 1fr}` 로는 다섯째 열이 둘째 줄로 떨어진다(브랜드 열 아래에 홀로 붙어 어긋나 보인다). grm.css 는 디자인 동결이라 손대지 않고(README 불변식), 마스코트·구독밴드·반응 계층이 쓰는 '스코프 인라인 override' 관례를 그대로 따른다. 브랜드 열은 1.6fr→1.3fr 로 조금 줄여 링크 열 넷이 좁아지지 않게 한다. 반응형(≤1024px 2열 / ≤900px 1열)은 grm.css 의 미디어쿼리가 그대로 이긴다 — 겹치지 않는 min-width 로만 덮어 그 단계적 축소를 건드리지 않는다. #}
-<style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
+{# [푸터 정리 2026-09-06] 5열 23항목 → 4열 17링크. 종전 '바로가기'(헤더 탭과 6개 중복·'소개'는 홈 앵커)·'수집 소스'(클릭 안 되는 텍스트 5줄)·'안내'(두 링크가 같은 앵커)를 콘텐츠·도구·서비스 셋으로 다시 묶고, 소스 목록은 브랜드 열 아래 한 줄로 내린다. 4열은 grm.css 기본값(`.foot{grid-template-columns:1.6fr 1fr 1fr 1fr}`)이라 종전 5열 override 는 걷어 내고, 새 요소(소스 줄·법적 줄 가로 배치·연락 아이콘)만 같은 스코프 인라인 관례로 덮는다(grm.css 는 디자인 동결). 반응형(≤1024px 2열 / ≤900px 1열)은 grm.css 미디어쿼리가 그대로 이긴다 — 법적 줄 가로 배치도 ≥901px 에서만. 한글 word-break:keep-all. #}
+<style>
+.foot .b1 .foot-src{font-size:12px;line-height:1.7;max-width:40ch;margin-top:18px;color:var(--band-mut);opacity:.75;word-break:keep-all}
+.foot .b1 .foot-src b{display:block;font-weight:600;font-size:11px;margin-bottom:2px}
+.foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
+.foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
+.foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.foot-copy .foot-ico .ti{font-size:13px;line-height:1}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+</style>
 {# [네이밍 2026-08-27] 탭 라벨이 2글자 길어지며(주간 브리프·지적사항) 641~900px 구간에서
    헤더 플렉스 행이 13px 넘쳐 로그인 버튼이 화면 밖으로 밀렸다(768px 실측 781>768 —
    프로덕션 종전 라벨은 766 으로 무오버플로). grm.css 동결이라 위 footer 와 같은 스코프
@@ -221,21 +227,21 @@
 <style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
+    {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — WebSourceCopyConsistencyTest 가 이 줄(.foot-src)과 마퀴의 집합 일치를 검사한다. 종전 '수집 소스' 열(클릭 안 되는 span 5줄)을 브랜드 열 아래 한 줄로 내린 것(2026-09-06). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>{{ _("전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.") }}</p></div>
-    {# 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다(뉴스레터 밴드 선례 동형). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
-    <div><h5>{{ _("바로가기") }}</h5><a href="{{ about_href }}">{{ _("소개") }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% endif %}{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
-    {# [존 재편 2026-08-26] 조회·산출 도구 열 신설. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데(찾아보기 6,774 · 트렌드 3,517 · 자료실 3,518), 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙 — 마이페이지를 footer 에만 둔 것과 같은 판단)는 대신, footer 에 열을 하나 더해 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. #}
-    <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a><a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a>{% if lang == 'ko' or 'findings/docs/' in en_paths %}<a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a>{% endif %}</div>
-    {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — 여기엔 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나 있었다. WebSourceCopyConsistencyTest 가 두 목록의 집합 일치를 검사한다. 위 주석 경고대로 이 주석도 공백을 삼키지 않는 형태여야 한다(하이픈 변형 금지). #}
-    <div><h5>{{ _("수집 소스") }}</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>{{ _("Health Canada · 식약처") }}</span><span>ECA · ISPE</span></div>
-    <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a></div>
+      <p>{{ _("전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.") }}</p>
+      <p class="foot-src"><b>Sources</b>FDA · OpenFDA · EMA · EudraGMDP · MHRA · PIC/S · ICH · WHO · Health Canada · {{ _("식약처") }} · ECA · ISPE</p></div>
+    {# [푸터 정리 2026-09-06] 콘텐츠 열 = 읽는 것(헤더 탭과 겹치는 건 푸터의 사이트맵 역할로 그대로 둔다). 종전 '바로가기'에서 소개·이용안내·마이페이지를 서비스 열로 옮겨 9→6. #}
+    <div><h5>{{ _("콘텐츠") }}</h5>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a>{% endif %}</div>
+    {# [존 재편 2026-08-26] 조회·산출 도구 열. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데, 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙 — 마이페이지를 footer 에만 둔 것과 같은 판단)는 대신, footer 열로 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. 데이터 현황은 도구가 아니라 서비스 투명성 면이라 서비스 열로(2026-09-06). #}
+    <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a>{% if lang == 'ko' or 'findings/docs/' in en_paths %}<a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a>{% endif %}</div>
+    {# [푸터 정리 2026-09-06] 서비스 열 = 서비스 자체에 관한 것. '소개'는 전용 페이지(/about/ — 종전엔 홈 #why 기능 목록 앵커)·'AI 자동 생성 고지'는 홈 #notice 하나(종전 '원문 확인 안내'와 같은 앵커라 둘을 하나로). 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다. '문의 및 제안'은 feedback.js 가 이 열(`data-feedback-slot` — 열 제목 문자열이 아니라 속성으로 찾는다, 언어 무관)에 런타임 주입한다(JS 미실행이면 흔적 0). #}
+    <div data-feedback-slot><h5>{{ _("서비스") }}</h5>{% if lang == 'ko' or 'about/' in en_paths %}<a href="{{ rel_root }}about/index.html">{{ _("소개") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% endif %}<a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a>{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
   </div>
+  {# [푸터 정리 2026-09-06] 법적 줄 — 종전 영문 prov 문장("AI-generated from primary sources…")은 아래 한글 면책과 같은 말이라 걷어 냈다(AI 고지는 위 '서비스' 열 링크가 맡는다). 연락 아이콘(LinkedIn·이메일)은 contact.json 에 값이 있을 때만(load_contact — 빈 값이면 아이콘도 span 도 없다). #}
   <div class="foot-legal">
     <div class="foot-copy">
-      <span>© 2026 Global Regulatory Monitor</span>
-      <span class="prov">AI-generated from primary sources · verify against the original</span>
-    </div>
+      <span>© 2026 Global Regulatory Monitor</span>{% if contact %}<span class="foot-contact">{% if contact.linkedin %}<a class="foot-ico" href="{{ contact.linkedin }}" target="_blank" rel="me noopener" aria-label="LinkedIn" title="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a>{% endif %}{% if contact.email %}<a class="foot-ico" href="mailto:{{ contact.email }}" aria-label="{{ _('이메일') }}" title="{{ _('이메일') }}"><i class="ti ti-mail" aria-hidden="true"></i></a>{% endif %}</span>{% endif %}</div>
     <p class="foot-disclaimer">{{ _("본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.") }}</p>
   </div>
 </div></footer>

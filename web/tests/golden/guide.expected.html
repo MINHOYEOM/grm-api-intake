@@ -168,22 +168,28 @@
 .guide-x-go:hover .ti{transform:translateX(3px)}
 @media (max-width:640px){ .guide-body{font-size:15.5px} .guide-body h2{font-size:21px} .guide-toc ol{grid-template-columns:1fr} }
 </style>
-<style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
+<style>
+.foot .b1 .foot-src{font-size:12px;line-height:1.7;max-width:40ch;margin-top:18px;color:var(--band-mut);opacity:.75;word-break:keep-all}
+.foot .b1 .foot-src b{display:block;font-weight:600;font-size:11px;margin-bottom:2px}
+.foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
+.foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
+.foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.foot-copy .foot-ico .ti{font-size:13px;line-height:1}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+</style>
 <style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>바로가기</h5><a href="../index.html#why">소개</a><a href="../archive/index.html">주간 브리프</a><a href="../findings/index.html">지적사항</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a><a href="../guide/index.html">이용안내</a></div>
-    <div><h5>도구</h5><a href="../findings/checklist/index.html">자가점검 체크리스트</a><a href="../findings/firm/index.html">업체 조회</a><a href="../findings/inspector/index.html">실사관 조회</a><a href="../findings/inspections/index.html">FDA 실사 결과</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../findings/docs/index.html">문서로 찾기</a></div>
-    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
-    <div><h5>안내</h5><a href="../index.html#notice">AI 자동 생성 고지</a><a href="../index.html#notice">원문 확인 안내</a></div>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p>
+      <p class="foot-src"><b>Sources</b>FDA · OpenFDA · EMA · EudraGMDP · MHRA · PIC/S · ICH · WHO · Health Canada · 식약처 · ECA · ISPE</p></div>
+    <div><h5>콘텐츠</h5><a href="../archive/index.html">주간 브리프</a><a href="../findings/index.html">지적사항</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../quiz/index.html">주간 퀴즈</a></div>
+    <div><h5>도구</h5><a href="../findings/checklist/index.html">자가점검 체크리스트</a><a href="../findings/firm/index.html">업체 조회</a><a href="../findings/inspector/index.html">실사관 조회</a><a href="../findings/inspections/index.html">FDA 실사 결과</a><a href="../findings/docs/index.html">문서로 찾기</a></div>
+    <div data-feedback-slot><h5>서비스</h5><a href="../about/index.html">소개</a><a href="../guide/index.html">이용안내</a><a href="../findings/coverage/index.html">데이터 현황</a><a href="../index.html#notice">AI 자동 생성 고지</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
-      <span>© 2026 Global Regulatory Monitor</span>
-      <span class="prov">AI-generated from primary sources · verify against the original</span>
-    </div>
+      <span>© 2026 Global Regulatory Monitor</span></div>
     <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
   </div>
 </div></footer>

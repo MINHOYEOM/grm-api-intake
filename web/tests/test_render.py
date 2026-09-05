@@ -353,6 +353,33 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             and not (self.out / "en" / sec / "index.html").is_file())
         self.assertEqual(missing, [], f"영어 짝이 없는 섹션: {missing}")
 
+    def test_every_page_family_is_structurally_the_same_in_both_languages(self):
+        """★사용자가 "언어를 빼면 두 사이트가 같아야 하는데 차이가 꽤 많다"고 했고,
+        그 말이 맞았다. 짝 4,176장의 클래스 유무를 대조해 찾은 것: 영어 홈이 아예 다른
+        템플릿 · 문서 3,165장에 용어 링크 0 · 아카이브·브리프의 자료실 스트립 부재 ·
+        둘러보기 카드 4장 중 1장 · 용어 별칭 0 · 영문 브리프 목차가 카드마다 그룹을 새로 엶.
+
+        **이 차이들은 아무 가드도 없어서 생겼다.** 고치기만 하면 다음 달에 같은 자리가
+        다시 벌어진다 — 그래서 찾을 때 쓴 방법을 그대로 가드로 굳힌다.
+        문서군(`findings/doc`)은 이 빌드에서 꺼져 있어 `WebFindingsDocPageTest` 가 본다.
+
+        ★이 가드가 **보지 못하는 것**을 적어 둔다(가드를 믿는 범위를 좁게 유지하려고):
+        수량만 다른 경우는 통과시킨다. 그래서 둘러보기 카드가 4장에서 1장으로 줄어든
+        결함(실측 KO 4 / EN 1)은 여기서 안 걸리고, 그 면의 전용 가드가 따로 본다.
+        수량까지 잡으려 하면 영어 모집단이 부분집합이라는 이유로 매번 울리게 되고,
+        매번 우는 가드는 아무도 안 본다 — 그게 더 나쁘다.
+        """
+        pairs = [
+            p.parent.relative_to(self.out).as_posix()
+            for p in self.out.rglob("index.html")
+            if not p.relative_to(self.out).as_posix().startswith("en/")
+            and (self.out / "en" / p.parent.relative_to(self.out) /
+                 "index.html").is_file()]
+        pairs = [("" if p == "." else p) for p in pairs]
+        self.assertGreater(len(pairs), 20, "짝 페이지를 못 찾았다 — 추출이 깨졌나?")
+        diffs = presence_diffs(self.out, pairs)
+        self.assertEqual(diffs, [], "언어판 구조가 갈라졌다:\n  " + "\n  ".join(diffs))
+
     def test_home_is_the_same_page_in_both_languages(self):
         """★[2026-09-05] 영어 홈은 `landing_en.html` 이라는 **별도 템플릿**이었다. 그때는
         영문 브리프가 0호라 히어로에 실을 표지가 없었기 때문인데, 그 사이 10호가 서면서
@@ -16243,6 +16270,70 @@ INTENTIONAL_CLASS_DIFFS: dict[str, str] = {
     # 한국어 화면에서만 뜨는 "영어판이 있다" 안내(영어 화면에 권할 이유가 없다).
     "grm-langhint": "한국어 전용 진입 안내",
 }
+
+
+def page_family(path: str) -> str:
+    """짝 경로 → 페이지군. 같은 템플릿에서 나오는 면을 한 덩어리로 본다."""
+    seg = [x for x in path.split("/") if x]
+    if not seg:
+        return "(home)"
+    if seg[0] == "findings" and len(seg) > 1:
+        return f"findings/{seg[1]}"
+    return f"{seg[0]}/*" if len(seg) > 1 else f"{seg[0]}/"
+
+
+#: **유무 차이**(한쪽엔 있고 다른 쪽엔 0)가 허용되는 (페이지군 → 클래스 → 이유).
+#: ★수량 차이는 보지 않는다. 영어 모집단이 한국어의 부분집합이라 사례·링크 개수는
+#:   당연히 다르고, 그것까지 잡으면 가드가 매번 울려 아무도 안 본다. **있어야 할 것이
+#:   통째로 없는 것**만 잡는다 — 실제로 그 신호가 랜딩 별도 템플릿·문서 3,165장의
+#:   용어 링크·아카이브 자료실 스트립·둘러보기 카드 3장을 전부 찾아냈다.
+#: ★클래스만이 아니라 **(페이지군, 클래스)** 쌍으로 적는다. `ti-arrow-right` 같은 범용
+#:   아이콘을 전역으로 풀면 그만큼 가드가 사라진다.
+INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
+    "*": {
+        "grm-langhint": "한국어 전용 진입 안내(영어 화면에 권할 이유가 없다)",
+    },
+    "glossary/*": {
+        "gt-en": "영문 병기 — 영어판은 표제어 자체가 영문이라 덧붙일 것이 없다",
+        "gt-alias": "한글만 있는 별칭은 영어에 싣지 않는다(용어마다 갈린다)",
+        "gt-case": "사례 수록 여부가 용어·언어별로 갈린다(영어는 영어 원문 모집단)",
+        "gt-cases": "위와 같음",
+        "gt-case-item": "위와 같음",
+        "gt-case-lede": "위와 같음",
+        "gt-case-meta": "위와 같음",
+        "gt-quote": "위와 같음",
+        "ti-arrow-right": "사례 링크에 딸린 아이콘 — 사례 유무를 따라간다",
+    },
+    "glossary/": {
+        "gl-note": "영어 전용 고지 — 출처·조항 이름이 한국어로 남는 이유를 밝힌다",
+    },
+    "findings/": {
+        "fnd-langnote": "영어 전용 고지 — 원문 영어만 보고 있다는 것과 해제 방법",
+    },
+    "library/*": {
+        "lib-item-sub": "한국어판의 병기(영문 원제)를 영어판에서 뒤집지 않는다 — 영어"
+                        " 독자에게 읽을 수 없는 줄을 얹지 않는다",
+    },
+}
+
+
+def presence_diffs(out, pairs) -> "list[str]":
+    """짝 페이지들에서 **한쪽에만 있는 클래스**를 (페이지군, 클래스) 단위로 모은다."""
+    seen: dict[tuple[str, str], str] = {}
+    for path in pairs:
+        ko = class_signature((out / path / "index.html").read_text(encoding="utf-8"))
+        en = class_signature(
+            (out / "en" / path / "index.html").read_text(encoding="utf-8"))
+        fam = page_family(path)
+        for cls in set(ko) | set(en):
+            if bool(ko.get(cls)) == bool(en.get(cls)):
+                continue
+            allowed = (INTENTIONAL_PRESENCE_DIFFS.get("*", {})
+                       | INTENTIONAL_PRESENCE_DIFFS.get(fam, {}))
+            if cls not in allowed:
+                side = "KO만" if ko.get(cls) else "EN만"
+                seen[(fam, cls)] = f"{fam}: {cls} ({side}, 예: {path or '(home)'})"
+    return sorted(seen.values())
 
 
 class WebEnTreeTest(unittest.TestCase):

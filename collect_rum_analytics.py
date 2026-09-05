@@ -100,6 +100,29 @@ PATH_CAP = 40
 # 2.0 으로 잡으면 정상 관측값 **위에 정확히 앉아** 가장 거친 표의 정상 갱신이 상시 막힌다.
 # 빈 구간 한가운데를 집는다.
 PRECISION_BAND = 3.0
+# 한 질의가 담는 최대 일수. ★ 2026-09-05 통제 실측으로 정한 값이다.
+#
+# **Cloudflare 의 전수(비표본) 데이터셋은 보존기간이 약 7일이다.** 그보다 오래된 구간을
+# 조금이라도 건드리는 질의는 통째로 표본 데이터셋으로 떨어진다(간격 10~15).
+#
+# 한 실행 안에서 1일 창 두 개를 나란히 던져 갈랐다 — 창 길이·시각·실행이 모두 같고
+# **날짜만** 다르다:
+#     ~2026-08-29T00:00:00Z (8/28 = 8일 전)  → 방문 간격 12.5   표본
+#     ~2026-08-29T23:59:59Z (8/29 = 7일 전)  → 방문 간격  1.07  전수
+# 경계가 8/28 과 8/29 **사이**에 있다. 1일 창 · 8일 전은 두 번 독립으로 12.5 였다.
+#
+# 이 하나로 이전 관측이 전부 설명된다: 7일 창은 전수, 8일 창은 표본이었던 것은 창 **길이**
+# 때문이 아니라 8일 창이 보존 경계 **밖을 건드렸기** 때문이고, 경계가 시각에 따라 움직인
+# 것은 보존 경계가 시계와 함께 굴러가기 때문이다. (★앞선 세션에서 "창 길이가 원인"이라고
+# 단정한 것은 틀렸다 — 그때 스캔은 창 길이와 가장 오래된 날의 나이가 같은 수라 두 축이
+# 분리되지 않았다. 선명한 경계는 가설의 시작이지 결론이 아니다.)
+#
+# 따라야 할 규칙: **어릴 때 짧은 창으로 받아 둔다.** 놓친 날은 영구히 표본으로만 남는다
+# (8/10~8/28 이 그렇게 굳었다 — 8일 창 하나로만 물어 왔기 때문에 모든 날이 표본으로
+# 저장된 채 나이를 먹었다).
+#
+# 3일: 보존 구간(7일) 안쪽이면서 여유가 있다. 경계가 시계와 함께 움직이므로 붙이지 않는다.
+CHUNK_DAYS = 3
 # [077] 하루에 저장하는 국가 상한. 국가는 수십 개뿐이라 꼬리가 짧다 — 방어용 상한.
 COUNTRY_CAP = 20
 # [077] 기기 유형은 desktop/mobile/tablet(+미상)뿐 — 방어용 상한.
@@ -434,6 +457,39 @@ def split_window(start: str, end: str):
     return out or [(start, end, "완결")]
 
 
+def chunk_window(start: str, end: str, max_days: int = CHUNK_DAYS):
+    """[start, end] 를 max_days 이하 조각으로 자른다. 순수.
+
+    ★조각끼리 **겹치지 않게** 자른다. GraphQL 필터가 `datetime_leq`(끝 포함)라, 조각을
+    자정에서 맞대면 앞 조각이 다음 날의 00:00:00 한 순간을 삼킨다. 그 하루치 행이 값
+    ~0 으로 만들어지고, `replace_days` 는 "응답이 답한 날"을 통째로 지우고 다시 넣으므로
+    **멀쩡한 날이 0 으로 덮인다**. 그래서 조각 끝을 23:59:59 로 물린다.
+    (잃는 것은 조각마다 마지막 1초 — 파괴적이지 않은 쪽으로 기운 거래다.)
+
+    반환: [(start, end)] — 원래 범위가 max_days 이하면 그대로 하나만.
+    """
+    from datetime import datetime, timedelta, timezone
+
+    def _parse(t):
+        return datetime.strptime(t, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+    def _fmt(d):
+        return d.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    if max_days is None or max_days <= 0:
+        return [(start, end)]
+    s_dt, e_dt = _parse(start), _parse(end)
+    if e_dt <= s_dt:
+        return [(start, end)]
+    out, cur = [], s_dt
+    while cur < e_dt:
+        nxt = min(cur + timedelta(days=max_days), e_dt)
+        # 마지막 조각만 원래 끝을 그대로 쓴다 — 중간 조각은 1초 물려 겹침을 없앤다.
+        out.append((_fmt(cur), _fmt(nxt if nxt >= e_dt else nxt - timedelta(seconds=1))))
+        cur = nxt
+    return out
+
+
 def replace_days(url: str, key: str, table: str, rows, days, *, timeout: float = 30.0) -> int:
     """days 의 행을 지우고 rows 를 넣는다(upsert 아님 — 사라진 키의 잔재를 남기지 않는다).
 
@@ -483,6 +539,9 @@ def main(argv=None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="파싱 결과만 출력(적재 0)")
     ap.add_argument("--allow-downgrade", action="store_true",
                     help="저장된 정확값을 표본 추정값으로 덮는 것을 허용한다(기본 금지)")
+    ap.add_argument("--chunk-days", type=int, default=CHUNK_DAYS,
+                    help=f"한 질의가 담는 최대 일수(기본 {CHUNK_DAYS}). "
+                         "0 이면 쪼개지 않는다 — 창 길이 영향 재측정용.")
     args = ap.parse_args(argv)
 
     token = (os.environ.get("CLOUDFLARE_ANALYTICS_TOKEN") or "").strip()
@@ -497,7 +556,11 @@ def main(argv=None) -> int:
         print("account-tag / site-tag 필요", file=sys.stderr)
         return 2
 
-    windows = split_window(args.start, args.end)
+    # 완결/진행중으로 가른 뒤, 각 구간을 다시 chunk_days 이하로 쪼갠다 — 성질이
+    # 다른 것을 안 섞는 것(split)과 질의를 짧게 유지하는 것(chunk)은 다른 목적이다.
+    windows = [(cs, ce, label)
+               for w_start, w_end, label in split_window(args.start, args.end)
+               for cs, ce in chunk_window(w_start, w_end, args.chunk_days)]
     if args.probe:
         for w_start, w_end, label in windows:
             print(f"── 창[{label}] {w_start} ~ {w_end}")

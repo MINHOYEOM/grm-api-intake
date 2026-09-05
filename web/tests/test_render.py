@@ -14822,9 +14822,21 @@ class WebAdminRumPanelTest(unittest.TestCase):
         got = split("2026-09-05T00:00:00Z", "2026-09-05T07:00:00Z")
         self.assertEqual(len(got), 1)
         # 수집기가 실제로 이 분할을 쓰는지 — 순수 함수만 초록이면 배선이 죽어도 모른다.
+        # ★대입문 한 줄을 통째로 문자열 대조하지 않는다 — 2026-09-05 에 그 줄이
+        # 조각화(chunk_window) 때문에 리스트 컴프리헨션으로 바뀌자 **배선은 멀쩡한데**
+        # 가드만 깨졌다. 지키려는 것은 표현식의 모양이 아니라 두 가지다:
+        #   ① 수집기가 split_window 를 **인자 그대로** 부른다
+        #   ② 그 결과를 (시작, 끝, 라벨) 로 풀어 창마다 돈다
         src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
-        self.assertIn("windows = split_window(args.start, args.end)", src)
-        self.assertIn("for w_start, w_end, label in windows:", src)
+        body = src.split("def main(", 1)[1]
+        self.assertIn("split_window(args.start, args.end)", body,
+                      "main() 이 split_window 를 부르지 않는다 — 배선이 끊겼다")
+        # ★"in \w+" 같은 느슨한 패턴을 쓰지 않는다 — 조각화 컴프리헨션에도
+        # `for w_start, w_end, label in split_window(...)` 가 있어 그쪽이 먼저
+        # 걸린다(뮤테이션으로 확인: 수집 루프를 해체해도 통과했다). 수집 루프를
+        # 정확히 지목한다.
+        self.assertIn("for w_start, w_end, label in windows:", src,
+                      "수집 루프가 창을 (시작, 끝, 라벨)로 풀어 돌지 않는다")
 
     def test_window_is_replaced_so_stale_rows_cannot_survive(self):
         """upsert 만 하면 사라진 호스트의 옛 행이 남는다 — 2026-09-05 실측: 8/31 은

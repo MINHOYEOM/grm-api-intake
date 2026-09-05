@@ -37,9 +37,13 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: '가져올 일수(기본 8). 백필 시 늘린다.'
+        description: '가져올 일수(기본 8). 창을 **7일 이하**로 잡아야 전수가 온다.'
         required: false
         default: '8'
+      end:
+        description: '창 끝(UTC ISO, 예 2026-08-29T00:00:00Z). 비우면 실행 시각 — 과거 구간 회수용.'
+        required: false
+        default: ''
       probe:
         description: 'true 면 원시 GraphQL 응답만 출력하고 적재하지 않는다(필드명 검증)'
         required: false
@@ -73,12 +77,44 @@ jobs:
           pip install -r requirements.txt
 
       # GitHub Actions 표현식에는 산술이 없다 — 창 경계는 셸에서 계산한다.
+      #
+      # ★`end` 를 열어 둔 이유(2026-09-05): 예약 실행은 언제나 "지금"에서 거꾸로 세므로
+      # **최근 N일**밖에 못 본다. 그런데 8일 이상 창은 ABR 표본(간격 10~12.5)으로 떨어져,
+      # 8/24~8/28 이 추정값으로 굳은 채 어떤 재실행으로도 닿지 않았다 — 7일 이하로 좁히면
+      # 그 구간이 창 밖으로 나가 버리기 때문이다. 끝을 옮길 수 있어야 **짧은 창을 과거로
+      # 밀어** 회수할 수 있다.
+      #
+      # 입력은 env 로 넘긴다 — `${{ }}` 를 run 본문에 직접 펼치면 입력이 셸 코드가 된다.
       - name: Resolve window
         id: win
+        env:
+          IN_DAYS: ${{ inputs.days || '8' }}
+          IN_END: ${{ inputs.end }}
         run: |
-          DAYS="${{ inputs.days || '8' }}"
-          echo "start=$(date -u -d "$DAYS days ago" +%Y-%m-%dT00:00:00Z)" >> "$GITHUB_OUTPUT"
-          echo "end=$(date -u +%Y-%m-%dT%H:00:00Z)" >> "$GITHUB_OUTPUT"
+          set -eu
+          case "$IN_DAYS" in
+            ''|*[!0-9]*) echo "days 는 양의 정수여야 한다: '$IN_DAYS'" >&2; exit 1 ;;
+            0) echo "days 가 0 이면 창이 비어 아무것도 안 받는다" >&2; exit 1 ;;
+          esac
+          if [ -z "$IN_END" ]; then
+            END="$(date -u +%Y-%m-%dT%H:00:00Z)"
+          else
+            # 형식을 먼저 막는다 — date 는 못 읽은 문자열을 조용히 "지금"으로 바꾸지 않지만
+            # 부분 해석은 한다("2026-08-29" 는 통과, "8/29" 도 통과하며 다른 날이 된다).
+            case "$IN_END" in
+              [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z) : ;;
+              *) echo "end 는 2026-08-29T00:00:00Z 꼴이어야 한다: '$IN_END'" >&2; exit 1 ;;
+            esac
+            END="$IN_END"
+          fi
+          # GNU date 는 'T'/'Z' 뒤에 상대항을 붙이면 파싱이 흔들린다 — 공백 형태로 편다.
+          BASE="$(printf '%s' "$END" | sed 's/T/ /; s/Z$/ UTC/')"
+          START="$(date -u -d "$BASE - $IN_DAYS days" +%Y-%m-%dT00:00:00Z)"
+          # 계산이 어긋나면 조용히 빈 창을 돌리느니 여기서 멈춘다.
+          [ "$START" \< "$END" ] || { echo "창이 비었다: $START ~ $END" >&2; exit 1; }
+          echo "창 $START ~ $END (${IN_DAYS}일)"
+          echo "start=$START" >> "$GITHUB_OUTPUT"
+          echo "end=$END" >> "$GITHUB_OUTPUT"
 
       - name: Sync
         env:

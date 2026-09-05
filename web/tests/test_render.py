@@ -10075,6 +10075,42 @@ class WebFindingsDocPageTest(unittest.TestCase):
                                main_only=True)
         self.assertEqual(diffs, [], "문서 언어판 구조가 갈라졌다: " + " / ".join(diffs))
 
+    def test_english_find_fast_path_agrees_with_the_regex_it_replaced(self):
+        """★영어 경로는 IGNORECASE 정규식 대신 **접어서 `str.find`** 로 찾는다(문서마다
+        표면형 수만큼 도는 자리라 39.6s → 6.2s). 빠른 길이 느린 길과 **같은 답**을 내는지
+        직접 물어본다 — 산출물 대조로만 확인하면 오늘 데이터에 없는 문장에서 갈린다.
+        """
+        import re as _re
+
+        def slow(text, surface, start=0):
+            m = _re.compile(
+                rf"(?<![A-Za-z0-9]){_re.escape(surface)}(?![A-Za-z0-9])",
+                _re.IGNORECASE).search(text, start)
+            return m.start() if m else -1
+
+        cases = [
+            ("The aseptic processing area", "Aseptic Processing"),
+            ("ASEPTIC PROCESSING failed", "aseptic processing"),
+            ("inequality of quality", "quality"),          # 낱말 안에 걸리면 안 된다
+            ("RAPID test and API lot", "API"),
+            ("no match here", "batch record"),
+            ("batch-record and batch record", "batch record"),
+            ("(CAPA) was opened; capa again", "CAPA"),
+            ("quality", "quality"),                        # 문자열 전체
+            ("한글 사이 quality 사이", "quality"),           # 비ASCII 경계
+            ("quality2 quality", "quality"),               # 숫자 경계
+        ]
+        for text, surface in cases:
+            with self.subTest(text=text, surface=surface):
+                self.assertEqual(render._doc_term_find(text, surface, lang="en"),
+                                 slow(text, surface), f"{surface!r} in {text!r}")
+                # 이어찾기(start)도 같은 답이어야 한다 — link_terms_in_text 가 쓴다.
+                first = slow(text, surface)
+                if first >= 0:
+                    self.assertEqual(
+                        render._doc_term_find(text, surface, first + 1, lang="en"),
+                        slow(text, surface, first + 1))
+
     def test_english_term_autolinks_stay_in_the_english_glossary(self):
         """영어 문서 링크는 실제 `/en/glossary/` 면만 가리키며 한글 라벨이 없다.
 

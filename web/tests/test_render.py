@@ -5175,6 +5175,63 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("return _isEn ? (orig || ko) : (ko || orig);", shim)
         self.assertIn(shim, self.js_src, "본문 선택 사본이 없다")
 
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_body_shim_behavior_via_node(self):
+        """본문·대조 선택을 **실행해서** 고정한다(문자열 대조가 아니라 행동).
+
+        ★[2026-09-06] 종전 가드는 `self.assertIn("return _isEn ? ...", shim)` 이라
+          정본을 고치면 가드도 같이 고쳐져 언제나 초록이었다 — 검사가 자기 술어로 묻는
+          꼴이다. 실제로 영어 업체 프로파일이 **한국어 원문 지적 아래 "국문 번역 보기"**
+          를 달고 있었는데(원문·번역이 둘 다 한국어라 뜻이 통하지 않는 토글), 그 결함을
+          이 가드는 볼 수 없었다. 그래서 두 언어로 각각 실행해 산출을 못 박는다.
+        """
+        import subprocess
+
+        # (설명, row) — 실제 데이터의 네 갈래.
+        cases = [
+            ["영어 원문 + 국문 번역(공개분 91.6%)",
+             {"finding_text": "Procedures are not in writing.",
+              "finding_text_ko": "절차가 문서화되어 있지 않다."}],
+            ["한국어 원문 + 국문(식약처 8.4%) — 원문·번역이 같은 언어",
+             {"finding_text": "제조 기록서가 작성되지 않았다.",
+              "finding_text_ko": "제조 기록서가 작성되지 않았다."}],
+            ["영어만", {"finding_text": "Equipment not qualified.", "finding_text_ko": ""}],
+            ["국문만", {"finding_text": "", "finding_text_ko": "설비 적격성 미확보."}],
+        ]
+
+        def run(lang):
+            driver = (
+                'var document = { documentElement: { lang: %s } };\n' % json.dumps(lang)
+                + grm_i18n.JS_BODY_SHIM
+                + "\nconsole.log(JSON.stringify(" + json.dumps([c[1] for c in cases])
+                + ".map(function (r) { return [_bodyText(r), _altText(r)]; })));")
+            tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_bodyshim_"))
+            try:
+                drv = tmp / "driver.js"
+                drv.write_text(driver, encoding="utf-8")
+                proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                      text=True, timeout=30)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
+            self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+            return [tuple(x) for x in json.loads(proc.stdout)]
+
+        # 한국어판 — 국문 우선, 원문이 있으면 대조로 붙인다.
+        self.assertEqual(run("ko"), [
+            ("절차가 문서화되어 있지 않다.", "Procedures are not in writing."),
+            ("제조 기록서가 작성되지 않았다.", "제조 기록서가 작성되지 않았다."),
+            ("Equipment not qualified.", ""),
+            ("설비 적격성 미확보.", ""),
+        ])
+        # 영어판 — 규제기관 원문 우선. ★2행: 원문이 한국어면 대조를 **달지 않는다**
+        #   (같은 언어의 글을 "번역"이라며 한 번 더 펼치지 않는다).
+        self.assertEqual(run("en"), [
+            ("Procedures are not in writing.", "절차가 문서화되어 있지 않다."),
+            ("제조 기록서가 작성되지 않았다.", ""),
+            ("Equipment not qualified.", ""),
+            ("설비 적격성 미확보.", ""),
+        ])
+
     def test_example_panel_links_back_to_findings_search_with_cat_param(self):
         fn = self._fn("buildExamplePanel")
         self.assertIn('a.href = findingsHref("cat", code);', fn)
@@ -6992,6 +7049,53 @@ class WebFirmWatchlistTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
         self.assertIn('id="grm-my-firms"', me)
         self.assertIn("관심 업체", me)
+
+    def test_en_me_page_is_built_and_its_vocabulary_follows_the_language(self):
+        """영어 푸터가 가리키는 /en/me/ 가 **실제로 서고**, 그 안의 어휘가 영어인가.
+
+        ★[2026-09-06] 전면 점검이 잡은 것: 켠 빌드의 영어 푸터에 '마이페이지' 링크가
+          찍히는데 /en/me/ 는 렌더된 적이 없었다(영어 트리 선언에 그 경로가 없었다).
+          링크를 지우는 대신 면을 냈다 — 셸은 이미 _() 전량 포장이고 런타임 두 층도
+          완역이라, 빠져 있던 건 라우트 하나였다.
+        ★관심 범위 칩은 정본(`facets`)의 `label_ko` 를 심는다. 정본 값을 그대로 심으면
+          영어 화면의 칩 37개가 통째로 한국어가 된다 — **뷰가 언어를 정해 넘긴다**는
+          규율(이 저장소가 세 번 밟은 자리)이 여기서도 지켜지는지 본다.
+        """
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enme_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            self.assertTrue(render.reactions_enabled(), "게이트가 안 켜졌다 — 가드가 헛돈다")
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            en_me = out / "en" / "me" / "index.html"
+            self.assertTrue(en_me.is_file(), "영어 푸터가 가리키는 /en/me/ 가 없다")
+            html = en_me.read_text(encoding="utf-8")
+            ko_html = (out / "me" / "index.html").read_text(encoding="utf-8")
+            sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+
+        chips = re.findall(r'<span data-kind="[^"]*" data-value="[^"]*">([^<]*)</span>', html)
+        ko_chips = re.findall(r'<span data-kind="[^"]*" data-value="[^"]*">([^<]*)</span>',
+                              ko_html)
+        self.assertGreater(len(chips), 5, "관심 칩이 비었다 — 추출이 깨졌나?")
+        self.assertEqual(len(chips), len(ko_chips), "언어판에서 어휘가 줄었다")
+        left = [c for c in chips if re.search(r"[가-힣]", c)]
+        self.assertEqual(left, [], f"영어 마이페이지 칩이 한국어다: {left[:5]}")
+        self.assertTrue(any(re.search(r"[가-힣]", c) for c in ko_chips),
+                        "한국어 칩이 한국어가 아니다 — 정본이 뒤집혔나?")
+
+        # 셸 본문에 남는 한글은 언어 전환 라벨('한국어') 하나뿐이어야 한다.
+        body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->", " ", html)
+        body = re.sub(r"(?s)<[^>]+>", " ", body)
+        runs = {r for r in re.findall(r"[가-힣]+", body)} - {"한국어"}
+        self.assertEqual(runs, set(), f"영어 마이페이지 셸에 한국어가 남았다: {sorted(runs)[:5]}")
+
+        # 개인화 면은 **양쪽 다** 비색인 — 언어판이라고 정책이 느슨해지지 않는다.
+        self.assertNotIn("/me/", sitemap)
 
     def test_reactions_js_my_firms_renderer(self):
         # me 페이지 관심 업체 목록 — 스크랩 목록(renderMyScraps) 관례 동형.
@@ -13701,7 +13805,20 @@ class WebZoneIaTest(unittest.TestCase):
         #   사라져 멀쩡한 라우트가 고아로 보인다 — 실제로 이 가드를 처음 켰을 때 용어
         #   239장·패싯 76장이 그렇게 잡혔다. **속도 스위치 뒤에 가드 사각지대를 만들지
         #   않는다**(대량 페이지 도입 때 겪은 것과 같은 함정).
-        _build_single(cls.single, doc_pages=True)
+        # ★[2026-09-06] **env 스위치도 같은 사각지대다.** 반응 계층(SUPABASE_*)이 꺼진
+        #   빌드에서는 마이페이지 링크가 아예 렌더되지 않아, 아래 깨진 링크 가드가
+        #   초록인 채로 라이브 영어 푸터가 존재하지 않는 /en/me/ 를 가리키고 있었다
+        #   (전면 점검이 사람 눈으로 잡았다). 켠 상태가 곧 **프로덕션 상태**이므로
+        #   여기서는 켜고 짓는다 — 이 한 줄이 env 게이트 뒤의 모든 링크를 가드 안으로
+        #   들인다(손목록을 늘리지 않는 방식).
+        _u0, _k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            assert render.reactions_enabled(), "반응 게이트가 안 켜졌다 — 가드가 헛돈다"
+            _build_single(cls.single, doc_pages=True)
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = _u0, _k0
         cls.pages = {}
         for p in sorted(cls.single.rglob("*.html")):
             rel = p.relative_to(cls.single).as_posix()

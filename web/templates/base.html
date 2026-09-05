@@ -224,12 +224,12 @@
     <div class="b1"><b>Global Regulatory Monitor</b>
       <p>{{ _("전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.") }}</p></div>
     {# 마이페이지(/me) 링크는 nav 탭을 늘리지 않고 footer 에만 둔다(nav 과밀 금지 원칙). me/index.html 자체가 reactions env-gate 뒤에서만 생성되므로 링크도 같은 게이트로 묶어야 env-off 빌드에서 404 링크가 남지 않는다 — 게이트가 꺼지면 조건 블록이 아무것도 출력하지 않아 전 페이지 골든 byte-diff 가 0 이다(뉴스레터 밴드 선례 동형). 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}
-    <div><h5>{{ _("바로가기") }}</h5><a href="{{ about_href }}">{{ _("소개") }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% endif %}{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
+    <div><h5>{{ _("바로가기") }}</h5><a href="{{ about_href }}">{{ _("소개") }}</a>{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html">{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html">{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html">{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html">{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html">{{ _("이용안내") }}</a>{% endif %}{% if reactions_enabled and (lang == 'ko' or 'me/' in en_paths) %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}</div>
     {# [존 재편 2026-08-26] 조회·산출 도구 열 신설. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데(찾아보기 6,774 · 트렌드 3,517 · 자료실 3,518), 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙 — 마이페이지를 footer 에만 둔 것과 같은 판단)는 대신, footer 에 열을 하나 더해 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. #}
     <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a><a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a>{% if lang == 'ko' or 'findings/docs/' in en_paths %}<a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a>{% endif %}</div>
     {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — 여기엔 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나 있었다. WebSourceCopyConsistencyTest 가 두 목록의 집합 일치를 검사한다. 위 주석 경고대로 이 주석도 공백을 삼키지 않는 형태여야 한다(하이픈 변형 금지). #}
     <div><h5>{{ _("수집 소스") }}</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>{{ _("Health Canada · 식약처") }}</span><span>ECA · ISPE</span></div>
-    <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a></div>
+    <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a>{% if rss_rel_href %}<a href="{{ rss_rel_href }}">{{ _("RSS 피드") }}</a>{% endif %}</div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
@@ -250,6 +250,23 @@ if(_nt&&_nm){
   _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
+{% if alt_other %}
+// [언어 전환 2026-09-06] 보고 있던 **검색어·업체 키·앵커를 그대로 들고** 건너간다.
+// 종전에는 링크가 `../en/findings/index.html` 로 고정돼 있어, 업체 프로파일에서 언어를
+// 바꾸면 빈 조회 화면이 떴다(`?key=` 유실). 조회 조건은 URL 이 갖고 있고 그 파라미터
+// 이름은 두 트리가 **같은 스크립트**를 쓰므로 양쪽에서 같은 뜻이다 — 그대로 옮기면 된다.
+// 앵커도 같이 옮긴다(카드 앵커는 언어와 무관한 문서 id 파생이라 양쪽이 같다).
+(function(){
+  var a=document.querySelector('a.grm-lang');
+  if(!a||(!location.search&&!location.hash))return;
+  try{
+    var u=new URL(a.getAttribute('href'),location.href);
+    u.search=location.search; u.hash=location.hash;
+    // 같은 출처 안에서만 다시 쓴다(외부로 새는 경로를 만들지 않는다).
+    if(u.origin===location.origin)a.setAttribute('href',u.pathname+u.search+u.hash);
+  }catch(e){}
+})();
+{% endif %}
 {% if show_langhint %}
 // [루트 진입] 브라우저 언어가 한국어가 아니면 영어판 안내를 보인다(리다이렉트 없음).
 // localStorage 는 사생활 모드·차단 설정에서 **접근 자체가 던진다** — 읽기·쓰기를 각각

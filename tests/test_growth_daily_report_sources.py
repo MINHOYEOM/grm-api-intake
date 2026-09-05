@@ -12,8 +12,12 @@
 """
 import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -27,6 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # 병렬 세션끼리 충돌해 옮겨 다닌다(실제로 076 이 077 로 밀렸다).
 MIG_GROWTH = ROOT / "web" / "migrations" / "077_growth_daily_report.sql"
 WORKFLOW = ROOT / ".github" / "workflows" / "grm-rum-analytics.yml"
+BASH = shutil.which("bash")
 
 
 def _rum_payload(rows):
@@ -236,6 +241,117 @@ class WorkflowWiringTest(unittest.TestCase):
         # GHA 표현식에는 산술이 없다(기존 계약 유지).
         self.assertNotRegex(wf, r"\$\{\{[^}]*[0-9]\s*[-+*/]\s*[0-9][^}]*\}\}")
 
+
+class ResolveWindowStepTest(unittest.TestCase):
+    """★워크플로의 창 계산을 **실행해서** 검증한다 — YAML 문자열 대조가 아니라.
+
+    이 스텝의 위험은 문법이 아니라 **날짜 산술**이다. `--end` 를 열어 준 이유가
+    "짧은 창을 과거로 밀어 표본 구간을 회수한다"인데, 끝에서 거꾸로 세는 계산이
+    하루라도 어긋나면 회수 대상 날이 창 밖으로 나가고 **아무 오류 없이** 엉뚱한
+    날을 다시 덮는다. 그래서 셸을 그대로 떼어 돌리고 산출값을 본다.
+
+    PyYAML 은 쓰지 않는다 — CI 테스트 환경에 없다(test_workflow_flag_resolution.py
+    가 같은 이유로 표준 라이브러리 파싱을 쓴다).
+    """
+
+    @staticmethod
+    def _run_block(step_name: str) -> str:
+        """지정한 스텝의 `run: |` 본문을 들여쓰기로 잘라 온다."""
+        lines = WORKFLOW.read_text(encoding="utf-8").splitlines()
+        i = next(n for n, ln in enumerate(lines)
+                 if ln.strip() == f"- name: {step_name}")
+        j = next(n for n in range(i + 1, len(lines))
+                 if lines[n].strip() == "run: |")
+        body_indent = len(lines[j]) - len(lines[j].lstrip()) + 2
+        out = []
+        for ln in lines[j + 1:]:
+            if ln.strip() and len(ln) - len(ln.lstrip()) < body_indent:
+                break
+            out.append(ln[body_indent:] if ln.strip() else "")
+        return "\n".join(out)
+
+    def _resolve(self, days, end):
+        """스텝을 돌려 (rc, {start, end}) 를 준다."""
+        script = self._run_block("Resolve window")
+        with tempfile.TemporaryDirectory() as tmp:
+            sh = os.path.join(tmp, "step.sh")
+            out = os.path.join(tmp, "gh_output")
+            with open(sh, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(script)
+            open(out, "w").close()
+            env = dict(os.environ, IN_DAYS=days, IN_END=end, GITHUB_OUTPUT=out)
+            # 한국어 오류문을 읽는다 — 로케일 기본(cp949)으로는 디코드가 터진다.
+            proc = subprocess.run([BASH, sh], env=env, capture_output=True,
+                                  text=True, encoding="utf-8", errors="replace")
+            with open(out, encoding="utf-8") as fh:
+                got = dict(ln.split("=", 1)
+                           for ln in fh.read().splitlines() if "=" in ln)
+        return proc.returncode, got
+
+    def test_end_is_declared_as_an_optional_dispatch_input(self):
+        wf = WORKFLOW.read_text(encoding="utf-8")
+        block = wf.split("workflow_dispatch:", 1)[1].split("\npermissions:", 1)[0]
+        lines = block.splitlines()
+        i = next((n for n, ln in enumerate(lines) if ln.strip() == "end:"), None)
+        self.assertIsNotNone(i, "창 끝을 옮길 입력이 없다 — 과거 구간에 영원히 못 닿는다")
+        # 기본값이 비어 있어야 예약 실행(입력 없음)이 지금까지처럼 "지금"으로 끝난다.
+        indent = len(lines[i]) - len(lines[i].lstrip())
+        body = []
+        for ln in lines[i + 1:]:
+            if ln.strip() and len(ln) - len(ln.lstrip()) <= indent:
+                break
+            body.append(ln)
+        decl = "\n".join(body)
+        self.assertRegex(decl, r"default:\s*''")
+        self.assertRegex(decl, r"required:\s*false")
+
+    @unittest.skipIf(BASH is None, "bash 없음")
+    def test_empty_end_still_means_now(self):
+        """예약 실행 경로는 바뀌지 않는다 — 입력을 안 주면 오늘까지."""
+        rc, got = self._resolve("8", "")
+        self.assertEqual(rc, 0)
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        self.assertTrue(got["end"].startswith(today), got)
+        self.assertRegex(got["end"], r"T\d{2}:00:00Z$")
+
+    @unittest.skipIf(BASH is None, "bash 없음")
+    def test_start_is_counted_back_from_the_given_end(self):
+        """★회수의 핵심 — 끝을 과거로 옮기면 시작도 같이 옮겨간다.
+
+        8/24~8/28 이 표본으로 굳은 구간이다. 끝 8/29 자정 · 5일이면 그 다섯 날이
+        정확히 들어오고, 창 길이는 전수 계층(7일 이하)에 남는다.
+        """
+        rc, got = self._resolve("5", "2026-08-29T00:00:00Z")
+        self.assertEqual(rc, 0)
+        self.assertEqual(got["start"], "2026-08-24T00:00:00Z")
+        self.assertEqual(got["end"], "2026-08-29T00:00:00Z")
+
+    @unittest.skipIf(BASH is None, "bash 없음")
+    def test_month_boundary_does_not_shift_the_window(self):
+        """달을 넘는 뺄셈을 손으로 하지 않는다는 증명(9/2 에서 5일 전 = 8/28)."""
+        rc, got = self._resolve("5", "2026-09-02T00:00:00Z")
+        self.assertEqual(rc, 0)
+        self.assertEqual(got["start"], "2026-08-28T00:00:00Z")
+
+    @unittest.skipIf(BASH is None, "bash 없음")
+    def test_malformed_inputs_stop_the_run_instead_of_shifting_the_window(self):
+        """★조용히 엉뚱한 창을 도는 것이 실패보다 나쁘다 — 그 실행이 정확한 날을
+        표본으로 덮을 수 있다. 형식이 어긋나면 적재 전에 멈춘다."""
+        for days, end in [("8", "2026-08-29"),        # 시각 없음
+                          ("8", "8/29"),              # 다른 표기
+                          ("8", "2026-08-29T00:00:00"),  # Z 없음
+                          ("abc", ""),                # 일수가 수가 아님
+                          ("0", "")]:                 # 빈 창
+            with self.subTest(days=days, end=end):
+                rc, got = self._resolve(days, end)
+                self.assertNotEqual(rc, 0, f"통과하면 안 된다: days={days} end={end}")
+                self.assertEqual(got, {}, "실패했는데 창을 뱉었다")
+
+    def test_inputs_are_passed_through_env_not_expanded_into_the_shell(self):
+        """dispatch 입력을 run 본문에 직접 펼치면 입력이 셸 코드가 된다."""
+        script = self._run_block("Resolve window")
+        self.assertNotIn("${{", script)
+        self.assertIn("$IN_END", script)
 
 if __name__ == "__main__":
     unittest.main()

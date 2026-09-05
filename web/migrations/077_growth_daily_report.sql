@@ -129,6 +129,44 @@ begin
     into v_day
     from public.rum_daily where snap_date = d;
 
+  -- ★★★같은 날 방문 수를 **세 방법으로 잰다** — 총합표·국가 합·기기 합.
+  -- ABR 이 표마다 다른 정밀도를 주기 때문에 **같은 날인데 표마다 값이 다르다.**
+  -- 실측(2026-09-02): 총합표 10(간격 12.1) vs 국가 합 29(1.16)·기기 합 29(1.18) —
+  -- **3배 차이**고 서로 독립인 두 차원이 29 에서 일치한다. 2026-09-04 도 총합 80(10.7)
+  -- vs 국가 74·기기 74(1.2~1.4). 즉 **헤드라인만 읽으면 3배 틀린 날이 있다.**
+  --
+  -- 그래서 "가장 정밀한 관측"을 고르는 일을 사람(보고 작성자)의 판단에 맡기지 않고
+  -- 여기서 결정론으로 정한다. NULL 정밀도는 **미상 = 무한히 부정확**으로 읽는다
+  -- (수집기 stored_precision 과 같은 규칙 — 1.0 으로 읽으면 가장 나쁜 값이 이긴다).
+  -- 무엇을 골랐는지·다른 방법은 뭐라고 했는지 함께 내보내 사람이 검증할 수 있게 한다.
+  with m(src, pref, v, si) as (
+    values
+      ('totals', 1,
+       (select value from public.rum_daily where snap_date = d and metric = 'visits'),
+       (select sample_interval from public.rum_daily where snap_date = d and metric = 'visits')),
+      ('countries', 2,
+       (select sum(visits)::integer from public.rum_country_daily where snap_date = d),
+       (select max(sample_interval) from public.rum_country_daily where snap_date = d)),
+      ('devices', 3,
+       (select sum(visits)::integer from public.rum_device_daily where snap_date = d),
+       (select max(sample_interval) from public.rum_device_daily where snap_date = d))
+  ),
+  ranked as (
+    select * from m where v is not null
+     order by coalesce(si, 'infinity'::numeric), pref
+  )
+  select v_day
+         || jsonb_build_object(
+              'best_visits', (select v from ranked limit 1),
+              'best_visits_source', (select src from ranked limit 1),
+              'best_visits_sample_interval', (select si from ranked limit 1),
+              'measurements', coalesce(
+                (select jsonb_agg(jsonb_build_object(
+                          'source', src, 'visits', v, 'sample_interval', si)
+                          order by pref)
+                   from m where v is not null), '[]'::jsonb))
+    into v_day;
+
   -- 최근 14일 흐름(요일 포함) — "어제가 평소보다 높은가"는 이 줄로 본다
   select coalesce(jsonb_agg(jsonb_build_object(
            'date', t.snap_date,
@@ -351,7 +389,9 @@ begin
            'newsletter_latest_snapshot', (select max(snap_date) from public.newsletter_subscribers_daily),
            'date_basis', 'RUM 날짜는 UTC 기준 — KST 09:00~24:00 방문이 같은 날짜에 들어가고, KST 새벽 0~9시 방문은 전날로 잡힌다',
            'bot_basis', 'RUM 은 Cloudflare bot:0 필터(대시보드 Exclude bots=Yes 와 같은 모집단) + 운영자 제외 게이트(grm-op) 적용. 존(zone) 지표가 아니다',
-           'precision_basis', 'sample_interval 1=정확, N>1=약 N배 표본 추정(10이면 10단위 반올림), null=정밀도 미상(추정으로 취급)')
+           'precision_basis', 'sample_interval 1=정확, N>1=약 N배 표본 추정(10이면 10단위 반올림), null=정밀도 미상(추정으로 취급)',
+           'best_visits_basis', '같은 날 방문을 총합표·국가합·기기합 셋으로 재고 가장 정밀한 것을 day.best_visits 로 낸다. 표마다 정밀도가 달라 값이 갈리기 때문(실측 9/2: 총합 10 vs 국가·기기 29 = 3배). 헤드라인(day.visits)이 아니라 best_visits 를 보고에 쓴다',
+           'path_precision_note', '경로 표는 차원 기수가 커(사이트 4천 쪽) 좋은 실행에서도 방문·국가·기기보다 한 급 거칠다 — 구조적이고 수리로 없앨 수 없다')
     into v_quality;
 
   return jsonb_build_object(

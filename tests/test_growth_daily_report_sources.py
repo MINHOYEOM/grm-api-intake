@@ -179,6 +179,34 @@ class Migration077ContractTest(unittest.TestCase):
         fn = self.mig.split("create or replace function public.growth_daily_report", 1)[1]
         self.assertLess(fn.index("then 'ai'"), fn.index("then 'google'"))
 
+    def test_daily_visits_are_cross_checked_across_three_tables(self):
+        """★★★헤드라인 하나만 읽으면 3배 틀린 날이 있다.
+
+        실측 2026-09-02: 총합표 10(간격 12.1) vs 국가 합 29(1.16)·기기 합 29(1.18).
+        서로 독립인 두 차원이 29 에서 일치하는데 총합표만 10 이었다 — ABR 이 표마다
+        다른 정밀도를 줬기 때문이다. 그래서 "어느 수를 믿을지"를 보고 작성자의 판단에
+        맡기지 않고 함수가 결정론으로 고른다.
+        """
+        fn = self.mig.split("create or replace function public.growth_daily_report", 1)[1]
+        block = fn.split("into v_day", 2)[1]
+        # 세 출처를 모두 재고,
+        for src in ("'totals'", "'countries'", "'devices'"):
+            self.assertIn(src, block, src)
+        for table in ("rum_daily", "rum_country_daily", "rum_device_daily"):
+            self.assertIn(table, block, table)
+        # 가장 정밀한 것을 고르며(작은 sample_interval 우선),
+        self.assertIn("order by coalesce(si, 'infinity'::numeric), pref", block,
+                      "정밀도 순 정렬이 없다 — 아무거나 고르게 된다")
+        # ★NULL=미상은 무한히 부정확으로 읽는다(수집기 stored_precision 과 같은 규칙).
+        # 1.0 으로 읽으면 정밀도를 모르는 값이 항상 이겨 가드가 뒤집힌다.
+        self.assertNotIn("coalesce(si, 1", block)
+        # 무엇을 골랐는지·다른 방법은 뭐라 했는지 함께 낸다(사람이 검증할 수 있게).
+        for key in ("'best_visits'", "'best_visits_source'",
+                    "'best_visits_sample_interval'", "'measurements'"):
+            self.assertIn(key, block, key)
+        # 그리고 보고가 헤드라인 대신 이걸 쓰도록 근거 문구를 함께 낸다.
+        self.assertIn("'best_visits_basis'", fn)
+
     def test_precision_is_carried_per_block(self):
         """표본 간격을 값마다 같이 낸다 — 추정값을 정확값처럼 읽지 않게."""
         fn = self.mig.split("create or replace function public.growth_daily_report", 1)[1]

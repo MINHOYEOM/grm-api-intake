@@ -215,6 +215,39 @@ def _card_anchor(card: dict[str, Any]) -> str:
 
 
 # ── [소스확장 2026-07-02] 상세보기 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0) ──────
+def detail_is_korean(detail: "dict[str, Any] | None") -> bool:
+    """이 결정론 상세가 **한국어 기록인가** — 값으로 판정한다.
+
+    ★[2026-09-05] 영문 브리프 실측: `/en/briefs/2026-08-31/` 의 한글 낱말 2,933개 중
+      2,688개가 이 블록이었다(식약처 실사기록의 지적 요약·조치 경과·근거법령·구분 라벨).
+      영어 껍데기 안의 한국어 산문이라, 문서 페이지에서 원문이 한국어인 문서를 내지
+      않는 것과 **같은 규율**로 영어판에서는 싣지 않고 화면이 이유를 밝힌다.
+    ★타입으로 가르지 않는다(`gmp_deficiencies` 는 한국어, `fda_483_observations` 는
+      영어 — 지금은 맞아도 소스가 늘면 낡는다). 값에 한글이 있는지로 판정한다.
+      영어로 쓰인 상세(FDA 483 관찰사항)는 그대로 남는다.
+    """
+    if not detail:
+        return False
+    return bool(_HANGUL_RE.search(json.dumps(detail, ensure_ascii=False)))
+
+
+def _detail_for_lang(detail: "dict[str, Any] | None",
+                     lang: str) -> "dict[str, Any] | None":
+    """읽는 언어의 결정론 상세 — 한국어 기록은 통째로 빼고, 영어 기록의 국문 패널만 뗀다."""
+    if lang == DEFAULT_LANG or not detail:
+        return detail
+    #: 원문(영어) 옆에 붙는 국문 번역 슬롯. 영어 화면에서는 같은 내용의 반복이다.
+    ko_slots = ("statement_ko", "deficiency_ko", "detail_ko")
+    out = dict(detail)
+    for key in ("violations", "observations", "rows"):
+        if isinstance(out.get(key), list):
+            out[key] = [{k: v for k, v in r.items() if k not in ko_slots}
+                        if isinstance(r, dict) else r for r in out[key]]
+    # ★국문 슬롯을 **뗀 뒤에** 판정한다. 먼저 판정하면 원문이 영어인 상세도 딸린 번역
+    #   때문에 "한국어 기록"으로 잘못 걸려 통째로 사라진다(합성 입력으로 확인한 결함).
+    return None if detail_is_korean(out) else out
+
+
 def _deep_preview(da: dict[str, Any] | None, tr: Translator = _KO) -> str:
     """분석층(deep) 접힘 summary 에 붙는 내용 힌트 — 펼치기 전에 무엇이 들었는지 스캔용.
     유형별 ②섹션명으로 구분: admin=처분근거(disposition_basis)·483=실사의미
@@ -472,10 +505,25 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         # [WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 그대로 통과(사실/URL 무변형 원칙과
         # 동형 — 표시 플래그 미가공, 값 자체는 raw). 대다수 카드는 키 부재/None → card.html
         # `{% if card.deep_analysis %}` 가 False 라 기존 golden 출력 바이트 불변(additive).
-        "deep_analysis": card.get("deep_analysis") or None,
+        # 심층분석(LLM 서술)도 같은 규율 — 한국어로 쓰였으면 영어판에 싣지 않는다.
+        # `deterministic_detail` 과 판정·고지를 공유한다(두 벌 두지 않는다).
+        "deep_analysis": (
+            None if lang != DEFAULT_LANG and detail_is_korean(card.get("deep_analysis"))
+            else (card.get("deep_analysis") or None)),
         # [상세보기 결정론 승격 2026-07-02] 결정론 상세 슬롯 그대로 통과(deep_analysis 와 동형).
         # 키 부재/None → card.html `{% if card.deterministic_detail %}` False → golden 불변.
-        "deterministic_detail": detail,
+        # 영어판은 **한국어로 쓰인 상세를 싣지 않는다**(위 detail_is_korean 참조).
+        # 한국어 트리는 판정 자체가 없어 바이트 불변이다.
+        # 영어판은 **한국어로 쓰인 상세를 싣지 않고**, 영어 상세에 딸린 국문 번역 패널도
+        # 걷어낸다(원문이 바로 옆에 있어 중복이다). 후자는 `*_ko` 슬롯을 뷰에서 지워
+        # 템플릿의 기존 분기가 저절로 원문 쪽을 타게 한다 — 템플릿 조건을 건드리면
+        # 한국어 분기까지 흔들린다(실제로 그렇게 해서 한국어 9장이 바뀌었다).
+        "deterministic_detail": _detail_for_lang(detail, lang),
+        # 고지는 **실제로 뺐을 때만** 뜬다 — 뺀 것이 없는데 "싣지 않습니다"라고 하면
+        # 거짓이다. 상세 쪽 판정은 `_detail_for_lang` 과 같은 함수를 통해 일치시킨다.
+        "deep_omitted_ko": lang != DEFAULT_LANG and (
+            (detail is not None and _detail_for_lang(detail, lang) is None)
+            or detail_is_korean(card.get("deep_analysis"))),
         # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
         "deep_preview": _deep_preview(card.get("deep_analysis"), tr),
         "detail_preview": _detail_preview(card.get("deterministic_detail"), tr),

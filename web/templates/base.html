@@ -141,8 +141,16 @@
 </div></header>
 
 {% block content %}{% endblock %}
-{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 받을 물건이 없으므로
-   권유하지 않는다(영문 브리프는 설계 문서 §7 5단계). #}
+{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 권유하지 않는다.
+   ★[2026-09-05 이유 정정] 종전 근거는 "영문 브리프는 §7 5단계(미착수)"였는데 그 전제는
+   사라졌다 — 영문 브리프 10호와 영어 피드(`/en/rss.xml`)가 라이브다. 그런데도 게이트는
+   그대로 둔다. **이유가 바뀌었을 뿐 결론은 같다: 메일 자체가 한국어다.**
+   `newsletter.py:teaser_subject` 는 한국어 `tldr` 로 제목을 만들고 접두도 "[GRM 규제뉴스]"
+   다. 영어 독자를 한국어 메일에 초대하는 것은 읽을 수 없는 것을 구독시키는 일이다.
+   영어 뉴스레터를 내려면 `newsletter.py` 가 `brief.en` 에서 본문을 짓고 발송 리스트도
+   따로 있어야 한다 — 그때 이 게이트를 푼다.
+   ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
+   파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
 {% if newsletter_form_action and lang == 'ko' %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
@@ -480,8 +488,16 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
      · 구독 밴드가 이미 화면에 보이는 동안에는 숨는다(같은 요청을 두 번 하지 않는다).
    env-off(테스트·기본 빌드)면 블록 전체가 생략돼 골든 byte-diff 0 — 게이트가 그 증명이다.
    §4 한글안전: letter-spacing/text-transform/mono 미사용. 결정론: now()/난수 0. #}
-{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 받을 물건이 없으므로
-   권유하지 않는다(영문 브리프는 설계 문서 §7 5단계). #}
+{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 권유하지 않는다.
+   ★[2026-09-05 이유 정정] 종전 근거는 "영문 브리프는 §7 5단계(미착수)"였는데 그 전제는
+   사라졌다 — 영문 브리프 10호와 영어 피드(`/en/rss.xml`)가 라이브다. 그런데도 게이트는
+   그대로 둔다. **이유가 바뀌었을 뿐 결론은 같다: 메일 자체가 한국어다.**
+   `newsletter.py:teaser_subject` 는 한국어 `tldr` 로 제목을 만들고 접두도 "[GRM 규제뉴스]"
+   다. 영어 독자를 한국어 메일에 초대하는 것은 읽을 수 없는 것을 구독시키는 일이다.
+   영어 뉴스레터를 내려면 `newsletter.py` 가 `brief.en` 에서 본문을 짓고 발송 리스트도
+   따로 있어야 한다 — 그때 이 게이트를 푼다.
+   ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
+   파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
 {% if newsletter_form_action and lang == 'ko' %}
 <style>
 .grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}

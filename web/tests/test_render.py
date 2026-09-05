@@ -14502,15 +14502,16 @@ class WebAdminRumPanelTest(unittest.TestCase):
                             f"{specific} 규칙이 일반 규칙보다 뒤에 있다")
 
     def test_groups_are_asked_in_separate_requests(self):
-        """★한 쿼리에 묶으면 가장 비싼 그룹이 나머지까지 표본으로 끌고 내려간다.
+        """그룹마다 별도 요청 — 요청을 싸게 유지한다.
 
-        rumPageloadEventsAdaptiveGroups 의 Adaptive(ABR)는 **쿼리 하나를 통째로 보고**
-        데이터셋을 고른다. 2026-09-02 에 착지 경로(requestPath — 사이트가 4천 쪽이라
-        차원 기수가 크다)를 세 번째 그룹으로 같은 쿼리에 붙이자, 그 실행부터 방문·
-        리퍼러까지 전부 10 의 배수가 됐고(정확값 0건) 같은 창의 방문 합이 대시보드
-        대조를 마친 264 에서 210 으로 내려앉았다.
+        ★효과는 **입증되지 않았다.** 처음엔 "073 이 경로 차원을 같은 쿼리에 붙여서
+        방문까지 표본으로 내려갔다"고 판정했지만(9/2 실행부터 정확값 0건·방문 합
+        264→210), 쪼갠 뒤 같은 코드·같은 창이 90분 간격으로 표본 간격 1.0~1.2 와
+        10~12.5 를 각각 줬다 — ABR 의 선택은 우리가 통제하는 축이 아니다.
 
-        쪼갠 뒤 실측(2026-09-05 probe): 표본 간격 10 → 1.0~1.2, 경로 행 30 → 235.
+        그래도 이 계약을 잠그는 이유: 요청이 쌀수록 나쁠 것이 없고, 정밀도를 지키는
+        진짜 장치(sampleInterval 저장 + 하락 금지 래칫)와 같은 자리에서 깨지기 때문이다.
+        여기서 red 가 나면 "다시 한 쿼리로 묶었다"는 뜻이고, 그건 근거 없이 되돌린 것이다.
         """
         self.assertEqual(set(rum_collector.GROUPS), {"totals", "referrers", "paths"})
         marks = {"referrers": "refererHost", "paths": "requestPath"}

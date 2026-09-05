@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cloudflare Web Analytics(RUM) → Supabase 일별 적재 (072·073·075).
+"""Cloudflare Web Analytics(RUM) → Supabase 일별 적재 (072·073·075·077).
 
 운영자가 Cloudflare 대시보드를 읽지 않고도 /admin 성장·유입 탭에서 방문·유입 경로를
 보게 하는 수집기. 하루 1회 워크플로(grm-rum-analytics.yml)가 호출한다.
@@ -49,6 +49,15 @@ KST 00:00~09:00(트래픽이 가장 적은 새벽)뿐이다. 이 근사는 화�
 행을 지우고 다시 넣는다**. 지우는 대상은 이번 응답의 totals 에 등장한 날뿐이다 —
 API 가 답하지 않은 날을 지워 구멍을 내지 않기 위해서다.
 
+## [077] 국가·기기 (2026-09-05 — 일일 성장 보고의 재료)
+`countries`(countryName)·`devices`(deviceType) 두 그룹을 더했다. 매일 아침 보고가
+"어느 나라에서, 어떤 기기로 들어왔나"를 답하려면 이 둘이 필요했다. ★**이 두 그룹이
+표본을 덜 탄다고 주장하지 않는다** — 위 절대로 ABR 의 선택은 우리가 통제하지 못하고,
+실측에서도 국가·기기는 방문·리퍼러와 **같이** 정확했다가 같이 표본으로 내려갔다
+(00:56 UTC 전부 1.0~1.36 / 01:19 UTC 전부 10~20). 두 표에도 `sample_interval` 을
+행마다 저장해 같은 래칫(keep_days)에 태우는 것이 유일한 방어다. 저장값은 Cloudflare
+원문 그대로(국가 코드/이름) — 한국어 이름은 보고 함수(growth_daily_report)가 붙인다.
+
 ## 봇 제외
 `bot: 0` 필터가 대시보드의 "Exclude bots = Yes" 와 같은 모집단이다. 이 필터를 빼면
 크롤러가 섞여 방문이 몇 배로 부푼다(2026-09-01 실측: 존 지표 1.4k/일 vs 실방문 60/일).
@@ -80,6 +89,10 @@ PATH_CAP = 40
 # 정밀도 하락 허용 배수(keep_days). 표본 간격 평균의 실행 간 흔들림(1.00↔1.16)은 통과시키고
 # 1 → 10 같은 자릿수 하락만 막는다 — 너무 빡빡하면 늦게 도착한 집계가 영영 못 들어온다.
 DOWNGRADE_TOLERANCE = 1.5
+# [077] 하루에 저장하는 국가 상한. 국가는 수십 개뿐이라 꼬리가 짧다 — 방어용 상한.
+COUNTRY_CAP = 20
+# [077] 기기 유형은 desktop/mobile/tablet(+미상)뿐 — 방어용 상한.
+DEVICE_CAP = 8
 
 # ★그룹마다 별도 요청이다(위 docstring "왜 그룹마다 따로 묻는가"). 한 쿼리에 묶으면
 # 가장 비싼 그룹이 나머지까지 표본 데이터셋으로 끌고 내려간다.
@@ -106,6 +119,11 @@ GROUPS = {
     "totals": ("        count\n        sum { visits }", "date"),
     "referrers": ("        sum { visits }", "date refererHost"),
     "paths": ("        sum { visits }", "date requestPath"),
+    # [077] 국가·기기 — 일일 성장 보고("어느 나라에서, 어떤 기기로")의 재료. 이 두 그룹이
+    # 표본을 덜 탄다는 근거는 없다(위 docstring) — 다른 그룹과 함께 정확했다가 함께
+    # 내려간다. 방어는 sample_interval 저장 + keep_days 래칫 하나뿐이다.
+    "countries": ("        sum { visits }", "date countryName"),
+    "devices": ("        sum { visits }", "date deviceType"),
 }
 
 
@@ -219,6 +237,18 @@ def parse_paths(payload):
     return _parse_keyed(payload, "paths", "requestPath", clean_path)
 
 
+def parse_countries(payload):
+    """[077] 국가는 Cloudflare 원문 그대로(코드/이름) — 번역은 보고 함수가 한다."""
+    return _parse_keyed(payload, "countries", "countryName",
+                        lambda v: str(v or "").strip(), "(unknown)")
+
+
+def parse_devices(payload):
+    """[077] desktop/mobile/tablet — 소문자로 정규화(같은 값이 대소문자로 갈리지 않게)."""
+    return _parse_keyed(payload, "devices", "deviceType",
+                        lambda v: str(v or "").strip().lower(), "(unknown)")
+
+
 def cap_by_day(keyed, si, cap: int, key_field: str):
     """날짜별 상위 cap 개만 남긴다(방문 내림차순·동률은 키 이름순 = 결정론)."""
     by_day: "dict[str, list]" = {}
@@ -238,6 +268,14 @@ def cap_referrers(refs, si=None, cap: int = REFERRER_CAP):
 
 def cap_paths(paths, si=None, cap: int = PATH_CAP):
     return cap_by_day(paths, si or {}, cap, "request_path")
+
+
+def cap_countries(countries, si=None, cap: int = COUNTRY_CAP):
+    return cap_by_day(countries, si or {}, cap, "country")
+
+
+def cap_devices(devices, si=None, cap: int = DEVICE_CAP):
+    return cap_by_day(devices, si or {}, cap, "device_type")
 
 
 def probe_report(payloads: "dict[str, dict[str, Any]]") -> str:
@@ -410,23 +448,30 @@ def main(argv=None) -> int:
     daily, si_totals = parse_totals(payloads["totals"])
     refs, si_refs = parse_referrers(payloads["referrers"])
     paths, si_paths = parse_paths(payloads["paths"])
+    countries, si_countries = parse_countries(payloads["countries"])
+    devices, si_devices = parse_devices(payloads["devices"])
 
     daily_rows = [{"snap_date": d, "metric": m, "value": v,
                    "sample_interval": si_totals.get(d, 1.0)}
                   for d in sorted(daily) for m, v in sorted(daily[d].items())]
     ref_rows = cap_referrers(refs, si_refs)
     path_rows = cap_paths(paths, si_paths)
+    country_rows = cap_countries(countries, si_countries)
+    device_rows = cap_devices(devices, si_devices)
 
     # ★값은 로그에 남기지 않는다 — 이 저장소는 PUBLIC 이라 Actions 로그가 공개다.
     # 숫자는 Supabase 에만 있고, 사람은 /admin 성장·유입 탭에서 본다. 표본 간격은
     # 배율이라 값이 아니고, 이 수집이 정확한지 판정하는 유일한 계기라 남긴다.
     span = f"{min(daily)}~{max(daily)}" if daily else "(없음)"
     print(f"파싱: {len(daily)}일({span}) · 지표행 {len(daily_rows)} · "
-          f"리퍼러행 {len(ref_rows)} · 경로행 {len(path_rows)}")
-    print("표본 간격 — 방문 %s · 리퍼러 %s · 경로 %s (1=전수)"
+          f"리퍼러행 {len(ref_rows)} · 경로행 {len(path_rows)} · "
+          f"국가행 {len(country_rows)} · 기기행 {len(device_rows)}")
+    print("표본 간격 — 방문 %s · 리퍼러 %s · 경로 %s · 국가 %s · 기기 %s (1=전수)"
           % (sorted(set(si_totals.values())) or [1.0],
              sorted(set(si_refs.values())) or [1.0],
-             sorted(set(si_paths.values())) or [1.0]))
+             sorted(set(si_paths.values())) or [1.0],
+             sorted(set(si_countries.values())) or [1.0],
+             sorted(set(si_devices.values())) or [1.0]))
     if args.dry_run:
         return 0
 
@@ -441,7 +486,9 @@ def main(argv=None) -> int:
     answered = sorted(daily)
     plan = [("rum_daily", daily_rows, si_totals),
             ("rum_referrer_daily", ref_rows, si_refs),
-            ("rum_path_daily", path_rows, si_paths)]
+            ("rum_path_daily", path_rows, si_paths),
+            ("rum_country_daily", country_rows, si_countries),
+            ("rum_device_daily", device_rows, si_devices)]
     total_written = 0
     for table, rows, new_si in plan:
         # 리퍼러·경로는 그 표의 표본 간격을 쓰되, 응답이 답한 날 집합은 totals 를 따른다.

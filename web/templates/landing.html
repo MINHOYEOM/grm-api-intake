@@ -29,7 +29,9 @@
 {% if cover %}
           <a class="btn coral lg" href="{{ rel_root }}briefs/{{ cover.slug }}/index.html">{{ _("이번 주 소식 읽기 ") }}<i class="ti ti-arrow-right"></i></a>
 {% endif %}
+{% if lang == 'ko' or 'archive/' in en_paths %}
           <a class="btn lg" href="{{ rel_root }}archive/index.html">{{ _("지난 소식 둘러보기") }}</a>
+{% endif %}
         </div>
       </div>
 {% if cover %}

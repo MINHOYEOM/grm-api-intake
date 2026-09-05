@@ -3479,26 +3479,40 @@ def rfc822_date(iso_date: str) -> str:
 
 
 def build_rss_xml(briefs: list[dict[str, Any]],
-                  base_url: str = SITE_BASE_URL) -> str:
+                  base_url: str = SITE_BASE_URL,
+                  tr: Translator = _KO, lang: str = DEFAULT_LANG) -> str:
     """주간 브리프 RSS 2.0. 발행일 내림차순·생성시각 0(byte 고정).
 
     본문(tldr)은 한국어 산문이라 XML 메타문자가 실재한다 — `escape()` 로 반드시 감싼다
     (sitemap 은 URL·날짜뿐이라 무변형 결합이 성립하지만 여기는 다르다).
+
+    ★[다국어 2026-09-05] 언어판마다 **자기 피드**를 낸다. 영어 피드에는 `brief.en` 이
+      온전한 호만 싣는다 — 한국어 호를 영어 피드에 끼워 넣으면 피드 리더에 한국어 제목이
+      뜨고, 그건 화면에서 반쪽 영어를 금지한 이유와 똑같다. **호 번호는 한국어 전체
+      발행 순서를 그대로 쓴다**(영어에 없는 호가 있어도 Vol. 을 다시 매기지 않는다 —
+      같은 브리프가 두 언어에서 다른 번호를 갖게 되면 사람이 서로를 못 찾는다).
+      영어로 낼 호가 하나도 없으면 빈 문자열을 돌려주고, 호출부가 파일을 만들지 않는다.
     """
     nums = assign_issue_numbers(briefs)
+    if lang != DEFAULT_LANG:
+        briefs = [b for b in briefs if brief_has_english(b)]
+        if not briefs:
+            return ""
     ordered = sorted(briefs, key=lambda b: b["brief"].get("publish_date", ""),
                      reverse=True)
     latest = ordered[0]["brief"].get("publish_date", "") if ordered else ""
+    feed_path = LANG_PREFIXES[lang] + "rss.xml"
 
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
         "  <channel>",
-        f"    <title>{_x(RSS_TITLE)}</title>",
-        f"    <link>{base_url}/</link>",
-        f"    <description>{_x(RSS_DESCRIPTION)}</description>",
-        "    <language>ko</language>",
-        f'    <atom:link href="{base_url}/rss.xml" rel="self" type="application/rss+xml" />',
+        f"    <title>{_x(tr(RSS_TITLE))}</title>",
+        f"    <link>{base_url}/{LANG_PREFIXES[lang]}</link>",
+        f"    <description>{_x(tr(RSS_DESCRIPTION))}</description>",
+        f"    <language>{lang}</language>",
+        f'    <atom:link href="{base_url}/{feed_path}" rel="self"'
+        ' type="application/rss+xml" />',
     ]
     if latest:
         lines.append(f"    <lastBuildDate>{rfc822_date(latest)}</lastBuildDate>")
@@ -3508,13 +3522,13 @@ def build_rss_xml(briefs: list[dict[str, Any]],
         pub = bm.get("publish_date", "")
         if not pub:
             continue
-        url = f"{base_url}/briefs/{pub}/"
-        tldr = [t for t in (bm.get("tldr") or []) if str(t).strip()]
-        # 설명은 지어내지 않는다 — 그 호의 tldr 을 그대로 잇는다(값 무변형).
+        url = f"{base_url}/{LANG_PREFIXES[lang]}briefs/{pub}/"
+        # 설명은 지어내지 않는다 — 그 호의 tldr 을 **읽는 언어로** 그대로 잇는다.
+        tldr = [t for t in _brief_tldr(bm, lang) if str(t).strip()]
         desc = " · ".join(str(t).strip() for t in tldr)
         lines += [
             "    <item>",
-            f"      <title>{_x(f'GRM 주간 브리프 Vol.{nums.get(pub, 0)} ({pub})')}</title>",
+            f"      <title>{_x(tr('GRM 주간 브리프 Vol.{no} ({date})', no=nums.get(pub, 0), date=pub))}</title>",
             f"      <link>{url}</link>",
             f'      <guid isPermaLink="true">{url}</guid>',
             f"      <pubDate>{rfc822_date(pub)}</pubDate>",
@@ -3629,8 +3643,14 @@ LIBRARY_DESCRIPTION = N_("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내�
                          "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
 GUIDE_DESCRIPTION = N_("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
                        "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
-RSS_TITLE = "GRM 주간 브리프 · 글로벌 규제 인텔리전스"
-RSS_DESCRIPTION = ("전 세계·국내 제약 GMP/품질 규제 소식을 매주 한국어로 정리해 드립니다. "
+# [다국어 2026-09-05] 채널 문구도 사전을 탄다. 종전 주석은 "RSS 는 한국어 채널이라
+# 그대로 둔다(영어 피드는 별도 결정)"였는데, 영문 브리프 10호가 서면서 그 결정을 내릴
+# 때가 됐다 — 그때까지 **영어 4천 장이 전부 한국어 피드를 자기 대체본이라고 말하고
+# 있었다**(`<language>ko</language>`, 한국어 제목). 설명문의 "한국어로 정리"가 영어
+# 사전에서는 "in English"가 되는데, 그건 번역 오류가 아니라 각 피드가 자기 언어를
+# 정확히 말하는 것이다.
+RSS_TITLE = N_("GRM 주간 브리프 · 글로벌 규제 인텔리전스")
+RSS_DESCRIPTION = N_("전 세계·국내 제약 GMP/품질 규제 소식을 매주 한국어로 정리해 드립니다. "
                    "FDA·EMA·식약처·캐나다 보건부 등의 공개 자료가 원천입니다.")
 GLOSSARY_DESCRIPTION = N_("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
                           "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
@@ -3841,6 +3861,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (아래 `en_paths = en_tree_paths(catalogs)`). 첫 렌더(랜딩)는 그 뒤라 항상 채워져 있고,
     # 어긋나면 `WebEnTreeTest.test_emitted_en_paths_match_the_declared_set` 이 잡는다.
     en_paths: set[str] = set()
+    # 영어 피드가 실제로 나오는가 — `en_brief_slugs` 확정 직후 채워진다(en_paths 와 같은
+    # 관례: 클로저는 호출 시점의 값을 읽는다). 영어 피드가 없으면 영어 페이지는 피드
+    # 링크를 아예 걸지 않는다 — 한국어 피드를 자기 대체본이라고 말하지 않기 위해서다.
+    en_feed = False
 
     # 페이지 주소는 전부 page() 한 곳에서 나온다 — 렌더 호출마다 rel_root·출력 경로·
     # canonical 을 손으로 적지 않는다(PagePath). 언어 트리마다 같은 헬퍼를 다시 만든다
@@ -3869,6 +3893,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
                 "canonical": pp.canonical, "latest_slug": latest_slug,
                 "alternates": alts, "en_paths": en_paths,
+                # 자기 언어의 피드만 가리킨다. 영어 피드가 없으면 빈 문자열 —
+                # 한국어 피드를 영어 페이지의 대체본이라고 말하지 않는다.
+                "rss_href": ("/rss.xml" if pp.lang == DEFAULT_LANG
+                             else ("/en/rss.xml" if en_feed else "")),
                 # 헤더 전환 버튼이 쓸 "다른 언어" 하나(짝이 없으면 None → 버튼 미출력).
                 "alt_other": next((a for a in alts if not a["current"]), None),
                 **ctx,
@@ -3995,6 +4023,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_brief_slugs = {b["brief"].get("publish_date", "") for b in briefs
                       if brief_has_english(b)}
     en_brief_slugs.discard("")
+    en_feed = bool(en_brief_slugs)
     if en_brief_slugs:
         en_paths |= {f"briefs/{s}/" for s in en_brief_slugs}
         en_paths.add("archive/")
@@ -5187,8 +5216,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [검색 유입] RSS — 네이버 서치어드바이저가 사이트맵과 **별개로 받는 채널**이고,
     # 피드 리더·사내 그룹웨어 위젯에도 그대로 쓰인다. 내용은 주간 브리프로 한정한다
     # (지적사항 문서는 시간순 발행물이 아니라 참조 자료라 sitemap 의 몫이다).
-    _write(out_dir / "rss.xml", build_rss_xml(briefs))
+    _write(out_dir / "rss.xml", build_rss_xml(briefs, tr=tr, lang=DEFAULT_LANG))
     written.append("rss.xml")
+    # 영어 피드 — 낼 호가 하나도 없으면 파일을 만들지 않는다(빈 피드는 구독자에게
+    # "이 서비스는 아무것도 안 낸다"고 말한다). 그때는 영어 페이지가 피드 링크 자체를
+    # 걸지 않는다(`rss_href` 가 빈 문자열 → base.html 이 태그를 생략).
+    _en_rss = build_rss_xml(briefs, tr=en_tr, lang="en")
+    if _en_rss:
+        _write(out_dir / "en" / "rss.xml", _en_rss)
+        written.append("en/rss.xml")
 
     # 404 는 그 트리 루트의 파일 하나(`/404.html`)라 홈과 같은 깊이로 그린다(rel_root = 루트).
     # [다국어 6단계 2026-09-04] 영어판도 같은 자리에 그린다(`/en/404.html`) — Cloudflare 는

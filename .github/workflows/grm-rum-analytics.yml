@@ -13,6 +13,14 @@ name: GRM RUM Analytics Sync
 #
 # 시크릿: CLOUDFLARE_ANALYTICS_TOKEN(신규 · Account Analytics Read 전용)
 #         SUPABASE_URL · SUPABASE_SERVICE_ROLE_KEY(기존 재사용)
+#         NEWSLETTER_API_KEY(기존 재사용 — 077 구독자 수 스냅샷 스텝)
+#         GSC_SERVICE_ACCOUNT_JSON(신규 · 078 Search Console — 서비스 계정 키 JSON 전문)
+#
+# [077] 2026-09-05: 같은 실행이 국가·기기(수집기 그룹 2개)와 Brevo 구독자 수(두 번째
+# 스텝)까지 적재한다. 매일 아침 예약 태스크가 growth_daily_report() 로 읽어 보고한다.
+# [078] 2026-09-05: 세 번째 스텝이 Search Console(검색어·노출·순위)을 적재한다.
+# RUM 은 "google.com 에서 왔다"까지만 알고 **무엇을 검색했는지**는 여기서만 온다.
+# 확정 데이터가 2~3일 늦으므로 이 표의 최신 날짜는 RUM 보다 뒤처진다(정상).
 # 계정·사이트 식별자는 비밀이 아니다(대시보드 URL 에 그대로 노출) — repo variable 로 두되
 # 미설정 시 기본값으로 폴백한다(라이브 값 = 단일 소스).
 
@@ -88,4 +96,33 @@ jobs:
             python collect_rum_analytics.py \
               --start "${{ steps.win.outputs.start }}" \
               --end "${{ steps.win.outputs.end }}"
+          fi
+
+      # [077] Brevo 리스트 구독자 수 스냅샷 — 일일 성장 보고의 "구독자가 늘었나" 재료.
+      # RUM 동기화와 독립이라 앞 스텝이 실패해도 돈다(취소만 제외). probe 실행은 구조
+      # 확인이 목적이라 적재하지 않는다. 시크릿은 뉴스레터 발송과 같은 NEWSLETTER_API_KEY.
+      - name: Snapshot newsletter subscribers
+        if: ${{ !cancelled() && (inputs.probe || 'false') != 'true' }}
+        env:
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+          GRM_NEWSLETTER_LIST_ID: ${{ vars.GRM_NEWSLETTER_LIST_ID }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python collect_newsletter_subscribers.py
+
+      # [078] Search Console — "무엇을 검색해 들어왔나". RUM 은 google.com 까지만 안다.
+      # 앞 스텝과 독립이라 하나가 실패해도 돈다(취소만 제외). 확정 데이터가 2~3일 늦게
+      # 오므로 창은 스크립트 기본값(16일)을 쓰고 매번 다시 적재한다.
+      - name: Sync Search Console
+        if: ${{ !cancelled() }}
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ vars.GSC_SITE_URL }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ inputs.probe || 'false' }}" = "true" ]; then
+            python collect_search_console.py --probe
+          else
+            python collect_search_console.py
           fi

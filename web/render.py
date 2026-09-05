@@ -4329,6 +4329,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             # 종전 주석("한국어 큐레이션 문구")은 실측과 다르다: 큐레이션한 문장은 없고
             # 데이터 조인뿐이다. 영문 제목이 없는 문서는 뷰가 개수로만 남긴다.
             lib_update=en_library_updates["compact"],
+            # [2026-09-05] 이 화면의 검색은 영어 인덱스(= 영문으로 낼 수 있는 호의 카드
+            # 전부)를 훑는다. 그 안에 한국 규제기관 문서의 업체·기관 실명이 섞여 있으면
+            # 결과 제목에 한글이 그대로 뜬다 — 브리프 상세와 같은 상황이라 같은 방식으로
+            # 밝힌다(이름은 옮기지 않는다: 옮기면 공식 기록에서 그 조직을 못 찾는다).
+            # ★개수는 넘기지 않는다. 결과는 질의마다 달라지므로 "N건"은 화면과 어긋난다 —
+            #   여기서 참인 것은 "그런 이름이 섞여 있다"는 사실뿐이다.
+            ko_named_cards=any(
+                _HANGUL_RE.search(c.get("headline_target") or "")
+                for b in briefs if brief_has_english(b)
+                for c in (b.get("cards") or []) if _is_renderable(c)),
         )
 
     emit("archive.html", page("archive/"),

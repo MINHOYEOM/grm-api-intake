@@ -16541,6 +16541,7 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
     #   남는 차이는 고지 한 줄뿐이다.
     "archive/": {
         "arc-lib-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",
+        "arc-name-note": "영어 전용 고지 — 검색 결과의 업체·기관 실명이 한국어인 이유",
     },
     "briefs/*": {
         "arc-lib-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",

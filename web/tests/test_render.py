@@ -19,10 +19,12 @@ from __future__ import annotations
 
 import collections
 import json
+import os
 import pathlib
 import posixpath
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -14551,6 +14553,125 @@ class WebGlossaryRelatedCaseCountTest(unittest.TestCase):
         self.assertNotIn("gt-rel-n", index)
         self.assertNotIn("사례 1,", index)
 
+
+class WebAdminSearchConsolePanelTest(unittest.TestCase):
+    """[078] /admin 검색어 표 — "무슨 말로 검색해 들어오나".
+
+    RUM 은 "google.com 에서 왔다"까지만 안다. 사용자가 실제로 무엇을 검색했는지는
+    Search Console 에만 있고, 이 표가 없으면 매일 아침 보고를 기다리는 것 말고는
+    볼 방법이 없다(2026-09-06 사용자 요청).
+
+    ★이 표의 고유 위험은 **비율의 산술**이다. 클릭률과 평균 순위는 날짜·검색어마다
+    분모가 다르므로, 그냥 평균 내면 노출 10 인 날과 1,000 인 날이 같은 무게가 되어
+    조용히 틀린 수가 나온다. 표가 그려지는지보다 **수가 맞는지**를 잠근다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+        cls.html = (WEB_DIR / "templates" / "admin.html").read_text(encoding="utf-8")
+
+    def test_panel_is_wired_end_to_end(self):
+        for needle in ('id="grm-gsc-queries"', 'id="grm-gsc-zones"', 'id="grm-gsc-summary"'):
+            self.assertIn(needle, self.html, f"{needle} 가 화면에 없다")
+        for needle in ('from("gsc_daily")', 'from("gsc_query_daily")',
+                       'from("gsc_page_daily")', "function loadSearchConsole"):
+            self.assertIn(needle, self.js, f"{needle} 배선 없음")
+        refresh_all = self.js.split("function refreshAll", 1)[1].split("}", 1)[0]
+        self.assertIn("loadSearchConsole()", refresh_all,
+                      "refreshAll 이 안 부르면 표가 영원히 '불러오는 중'이다")
+
+    def test_ctr_is_derived_and_never_read_from_a_column(self):
+        """★클릭률을 저장된 값으로 읽으면 합칠 때 '평균의 평균'이 된다.
+
+        078 이 애초에 ctr 을 저장하지 않는 이유와 같다 — 화면도 같은 규율을 따라야
+        한다. select 목록에 ctr 이 끼어들면 여기서 걸린다.
+        """
+        for sel in re.findall(r'\.select\("([^"]*)"\)', self.js):
+            if "impressions" in sel:
+                self.assertNotIn("ctr", sel.split(","),
+                                 f"저장된 ctr 을 읽는다: {sel}")
+        self.assertIn("(clicks / impressions) * 100", self.js,
+                      "클릭률을 클릭÷노출로 만들지 않는다")
+
+    def test_average_position_is_impression_weighted(self):
+        """★순위는 노출 가중이라야 뜻이 맞는다 — 단순 평균이면 노출 1 짜리 검색어가
+        노출 1,000 짜리와 같은 무게를 갖는다."""
+        rollup = self.js.split("function gscRollup", 1)[1].split("\n  }", 1)[0]
+        self.assertRegex(rollup, r"posWeighted \+= \(r\.avg_position \|\| 0\) \* impr",
+                         "누적이 노출 가중이 아니다")
+        self.assertIn("weighted / impressions", self.js, "환산이 노출로 나누지 않는다")
+
+    @unittest.skipIf(shutil.which("node") is None, "node 없음")
+    def test_rollup_math_is_correct_when_executed(self):
+        """구조가 아니라 **결과**를 본다 — 함수를 떼어 node 로 돌리고 값을 대조한다."""
+        src = self.js
+        funcs = "".join(
+            src[src.index("function " + name):
+                src.index("\n  }", src.index("function " + name)) + 4]
+            for name in ("gscRate", "gscPos", "gscRollup"))
+        rows = ('[{query:"a",clicks:1,impressions:100,avg_position:10},'
+                ' {query:"a",clicks:3,impressions:900,avg_position:2},'
+                ' {query:"b",clicks:0,impressions:50,avg_position:5}]')
+        script = (funcs + "\n"
+                  "var out = gscRollup(" + rows + ", function (r) { return r.query; });\n"
+                  "var a = out.filter(function (x) { return x.key === 'a'; })[0];\n"
+                  "console.log(JSON.stringify({key: a.key, clicks: a.clicks,"
+                  " impressions: a.impressions,"
+                  " rate: gscRate(a.clicks, a.impressions),"
+                  " pos: gscPos(a.posWeighted, a.impressions),"
+                  " firstKey: out[0].key}));")
+        with tempfile.TemporaryDirectory() as tmp:
+            f = os.path.join(tmp, "t.js")
+            with open(f, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(script)
+            proc = subprocess.run([shutil.which("node"), f], capture_output=True,
+                                  text=True, encoding="utf-8", errors="replace")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        got = json.loads(proc.stdout.strip())
+        self.assertEqual(got["clicks"], 4)
+        self.assertEqual(got["impressions"], 1000)
+        # 클릭률 = 4/1000 = 0.4% (0.5%(=(1%+0.33%)/2 꼴의 평균의 평균)가 아니다)
+        self.assertAlmostEqual(got["rate"], 0.4, places=6)
+        # 순위 = (10*100 + 2*900)/1000 = 2.8 (단순 평균 6.0 이 아니다)
+        self.assertEqual(got["pos"], "2.8")
+        # 노출 많은 순 정렬 — 화면이 상위 20 만 그리므로 정렬이 곧 무엇이 보이나다.
+        self.assertEqual(got["firstKey"], "a")
+
+    def test_absence_is_not_reported_as_zero_traffic(self):
+        """★"아직 연결 안 됨"과 "검색 유입 0"은 다른 말이다 — 0 이라고 쓰면
+        성적이 나쁘다는 뜻이 되어 거짓 보고가 된다(078 의 connected:false 와 동형)."""
+        # ★주석을 먼저 걷어낸다 — 규칙을 설명하는 주석에 금지 문구가 그대로 들어
+        # 있어서, 그냥 검사하면 **자기 설명문에 걸린다**(실제로 걸렸다). 저장소에
+        # 같은 함정 전례가 있다: 078 의 "ctr 은 저장하지 않는다" 주석이 ctr 금지
+        # 검사에 걸렸다. 검사 대상은 **실행되는 코드**이지 그 옆의 설명이 아니다.
+        code = chr(10).join(ln for ln in self.js.splitlines()
+                            if not ln.lstrip().startswith("//"))
+        self.assertIn("아직 검색 데이터가 없습니다", code)
+        for banned in ("검색 유입 0", "검색 유입이 없습니다", "노출 0회"):
+            self.assertNotIn(banned, code, f"부재를 0 으로 보고한다: {banned}")
+
+    def test_screen_states_the_two_things_that_make_numbers_look_wrong(self):
+        """확정 지연(2~3일)과 희귀 검색어 익명화를 화면이 말해야 한다 — 둘 다
+        "표가 서로 안 맞는다"로 오해되는 정상 동작이다."""
+        panel = self.html.split('id="grm-gsc-summary"', 1)[0].rsplit("<h3>", 1)[1]
+        self.assertIn("2~3일", panel, "확정 지연 고지가 없다")
+        self.assertRegex(panel, r"희귀 검색어|적은 희귀", "익명화 고지가 없다")
+
+    def test_reads_are_signed_in_only_and_there_is_no_client_write_path(self):
+        """방문·검색 규모는 운영 지표다 — anon 공개인 funnel_counts 와 다르다."""
+        mig = (WEB_DIR / "migrations" / "078_search_console.sql").read_text(encoding="utf-8")
+        for table in ("gsc_daily", "gsc_query_daily", "gsc_page_daily"):
+            self.assertIn(f"grant select on public.{table} to authenticated", mig)
+            self.assertNotIn(f'from("{table}").insert', self.js)
+            self.assertNotIn(f'from("{table}").upsert', self.js)
+
+    def test_zone_labels_come_from_the_existing_single_source(self):
+        """구역 규칙 사본을 만들지 않는다 — 착지 페이지 표와 같은 rumZoneOf 를 쓴다.
+        사본을 들면 같은 경로가 두 표에서 다른 구역으로 찍힌다."""
+        load = self.js.split("function loadSearchConsole", 1)[1].split("\n  }", 1)[0]
+        self.assertIn("rumZoneOf(r.page_path)", load)
+        self.assertEqual(self.js.count("var RUM_ZONES = ["), 1, "구역 규칙 사본이 생겼다")
 
 class WebAdminRumPanelTest(unittest.TestCase):
     """[072] /admin 방문·유입 표 + Cloudflare RUM 수집기 계약.

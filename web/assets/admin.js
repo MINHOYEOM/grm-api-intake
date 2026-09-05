@@ -938,8 +938,127 @@
       setStatus(byId("grm-web-approve-status"), "미리보기에서 이번 주 카드를 확인한 뒤 승인을 누르세요. 승인하면 몇 분 안에 라이브 사이트가 바뀝니다.", "");
     }
   }
+  // ── Search Console ────────────────────────────────────────────────────────
+  // RUM 은 "google.com 에서 왔다"까지만 안다 — **무엇을 검색했는지**는 여기서만 온다.
+  //
+  // ★비율은 저장하지 않고 여기서 만든다. 클릭률을 미리 계산해 두면 합칠 때 "평균의
+  // 평균"이 되어(노출 10 짜리 날과 1,000 짜리 날이 같은 무게) 틀린 수가 된다. 순위도
+  // 같은 이유로 **노출 가중 평균**이라야 뜻이 맞는다.
+  function gscRate(clicks, impressions) {
+    if (!impressions) return null;
+    return (clicks / impressions) * 100;
+  }
+  function gscPct(clicks, impressions) {
+    var v = gscRate(clicks, impressions);
+    return v === null ? "-" : v.toFixed(v < 10 ? 2 : 1) + "%";
+  }
+  function gscPos(weighted, impressions) {
+    return impressions ? (weighted / impressions).toFixed(1) : "-";
+  }
+  // 키(검색어·구역)별로 클릭·노출과 **순위×노출**을 함께 누적한다.
+  function gscRollup(rows, keyOf) {
+    var acc = {};
+    (rows || []).forEach(function (r) {
+      var k = keyOf(r);
+      if (k === null || k === undefined || k === "") return;
+      var a = acc[k] || (acc[k] = { key: k, clicks: 0, impressions: 0, posWeighted: 0 });
+      var impr = r.impressions || 0;
+      a.clicks += r.clicks || 0;
+      a.impressions += impr;
+      a.posWeighted += (r.avg_position || 0) * impr;
+    });
+    return Object.keys(acc).map(function (k) { return acc[k]; })
+      .sort(function (a, b) {
+        return b.impressions - a.impressions || b.clicks - a.clicks ||
+          String(a.key).localeCompare(String(b.key));
+      });
+  }
+
+  function loadSearchConsole() {
+    var days = GROWTH_SNAPSHOT_DAYS;
+    return Promise.all([
+      state.client.from("gsc_daily").select("snap_date,clicks,impressions,avg_position")
+        .order("snap_date", { ascending: false }).limit(days),
+      state.client.from("gsc_query_daily").select("snap_date,query,clicks,impressions,avg_position")
+        .order("snap_date", { ascending: false }).limit(days * 60),
+      state.client.from("gsc_page_daily").select("snap_date,page_path,clicks,impressions,avg_position")
+        .order("snap_date", { ascending: false }).limit(days * 60)
+    ]).then(function (res) {
+      if (res[0].error) throw res[0].error;
+      if (res[1].error) throw res[1].error;
+      if (res[2].error) throw res[2].error;
+      var totals = gscRollup(res[0].data || [], function () { return "site"; })[0] || null;
+      state.gsc = {
+        totals: totals,
+        dates: (res[0].data || []).map(function (r) { return r.snap_date; }).sort(),
+        queries: gscRollup(res[1].data, function (r) { return r.query; }),
+        zones: gscRollup(res[2].data, function (r) { return rumZoneOf(r.page_path); })
+      };
+      renderGscQueries();
+      renderGscZones();
+    }).catch(function (error) {
+      state.gsc = null;
+      renderGscQueries(errText(error) || "검색 데이터를 불러오지 못했습니다.");
+      renderGscZones(errText(error) || "검색 데이터를 불러오지 못했습니다.");
+    });
+  }
+
+  // ★"연결 안 됨"과 "검색 유입 0"은 다른 말이다. 행이 아예 없으면 아직 배선이 안 된
+  // 것이고, 0 이라고 쓰면 성적이 나쁘다는 뜻이 되어 거짓 보고가 된다.
+  function renderGscQueries(errorMessage) {
+    var note = byId("grm-gsc-summary");
+    var host = byId("grm-gsc-queries");
+    var g = state.gsc;
+    if (note) {
+      if (errorMessage) note.textContent = "";
+      else if (!g || !g.totals || !g.totals.impressions) {
+        note.textContent = "아직 검색 데이터가 없습니다 — 첫 동기화를 기다리는 중입니다.";
+      } else {
+        note.textContent = "기간 " + g.dates[0] + " ~ " + g.dates[g.dates.length - 1] +
+          " · 노출 " + number(g.totals.impressions) + "회 · 클릭 " + number(g.totals.clicks) +
+          "회 · 클릭률 " + gscPct(g.totals.clicks, g.totals.impressions) +
+          " · 평균 순위 " + gscPos(g.totals.posWeighted, g.totals.impressions) + "위";
+      }
+    }
+    if (!host) return;
+    if (errorMessage || !g) {
+      host.innerHTML = emptyRow(5, errorMessage || "데이터 없음");
+      return;
+    }
+    if (!g.queries.length) {
+      host.innerHTML = emptyRow(5, "아직 수집된 검색어가 없습니다(첫 동기화 대기).");
+      return;
+    }
+    host.innerHTML = g.queries.slice(0, 20).map(function (r) {
+      return "<tr><td>" + esc(r.key) + "</td><td>" + number(r.impressions) +
+        "</td><td><b>" + number(r.clicks) + "</b></td><td>" +
+        esc(gscPct(r.clicks, r.impressions)) + "</td><td>" +
+        esc(gscPos(r.posWeighted, r.impressions)) + "</td></tr>";
+    }).join("");
+  }
+
+  function renderGscZones(errorMessage) {
+    var host = byId("grm-gsc-zones");
+    if (!host) return;
+    var g = state.gsc;
+    if (errorMessage || !g) {
+      host.innerHTML = emptyRow(5, errorMessage || "데이터 없음");
+      return;
+    }
+    if (!g.zones.length) {
+      host.innerHTML = emptyRow(5, "아직 수집된 페이지가 없습니다(첫 동기화 대기).");
+      return;
+    }
+    host.innerHTML = g.zones.map(function (r) {
+      return "<tr><td>" + esc(r.key) + "</td><td>" + number(r.impressions) +
+        "</td><td><b>" + number(r.clicks) + "</b></td><td>" +
+        esc(gscPct(r.clicks, r.impressions)) + "</td><td>" +
+        esc(gscPos(r.posWeighted, r.impressions)) + "</td></tr>";
+    }).join("");
+  }
+
   function refreshAll() {
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadSearchConsole(), loadRuns(), loadHealth(), loadPublishPr()]).then(function () {
       renderSystemChecks();
     });
   }

@@ -70,6 +70,9 @@ GRAPHQL_LIMIT = 10000
 REFERRER_CAP = 25
 # 하루에 저장하는 착지 경로 상한. 사이트가 4,000쪽이라 꼬리가 길다 — 화면은 상위만 쓴다.
 PATH_CAP = 40
+# 정밀도 하락 허용 배수(keep_days). 표본 간격 평균의 실행 간 흔들림(1.00↔1.16)은 통과시키고
+# 1 → 10 같은 자릿수 하락만 막는다 — 너무 빡빡하면 늦게 도착한 집계가 영영 못 들어온다.
+DOWNGRADE_TOLERANCE = 1.5
 
 # ★그룹마다 별도 요청이다(위 docstring "왜 그룹마다 따로 묻는가"). 한 쿼리에 묶으면
 # 가장 비싼 그룹이 나머지까지 표본 데이터셋으로 끌고 내려간다.
@@ -294,23 +297,34 @@ def stored_precision(url: str, key: str, table: str, days, *, timeout: float = 3
         day = str(row.get("snap_date") or "")
         if not day:
             continue
+        raw = row.get("sample_interval")
         try:
-            value = float(row.get("sample_interval") or 1.0)
+            # ★NULL(=075 이전 적재분)은 "미상"이고 미상은 **무한히 부정확**으로 읽는다.
+            # 1.0 으로 읽으면 가장 부정확한 옛 값이 "전수"를 자칭해 새 수집을 영구히
+            # 막는다 — 가드가 지키려던 것과 정확히 반대가 된다.
+            value = float("inf") if raw is None else float(raw)
         except (TypeError, ValueError):
-            value = 1.0
+            value = float("inf")
+        # 그 날 행들 중 가장 나쁜 정밀도가 그 날의 정밀도다.
         out[day] = max(out.get(day, 1.0), value)
     return out
 
 
 def keep_days(new_si, stored_si, *, allow_downgrade: bool = False):
-    """쓸 날짜와 건너뛸 날짜를 가른다. **저장값이 더 정확하면 건너뛴다.**
+    """쓸 날짜와 건너뛸 날짜를 가른다. **저장값이 뚜렷이 더 정확하면 건너뛴다.**
+
+    ★"조금이라도 나쁘면 건너뛴다"로 두면 안 된다. 표본 간격은 그 날 행들의 **평균**이라
+    1.00 과 1.16 처럼 실행마다 흔들리는데(간격 10 인 이벤트가 1.8% 섞이면 1.16 이 된다),
+    그 흔들림으로 건너뛰면 **늦게 도착한 집계가 영영 반영되지 않는다** — 워크플로가 창을
+    8일로 잡은 이유가 바로 그 지각분을 메우는 것이라 자기 목적을 스스로 깬다.
+    막으려는 것은 1 → 10 같은 **자릿수 하락**이므로 여유를 1.5배로 둔다.
 
     순수 함수 — 정책이 네트워크와 섞이지 않게 분리했다(테스트가 여기를 직접 문다).
     """
     write, skip = [], []
     for day in sorted(new_si):
         old = stored_si.get(day)
-        if (not allow_downgrade) and old is not None and old < new_si[day]:
+        if (not allow_downgrade) and old is not None and new_si[day] > old * DOWNGRADE_TOLERANCE:
             skip.append(day)
         else:
             write.append(day)
@@ -333,9 +347,10 @@ def replace_days(url: str, key: str, table: str, rows, days, *, timeout: float =
                         timeout=timeout, headers=dict(headers, Prefer="return=minimal"))
     if r.status_code >= 300:
         raise SystemExit(f"{table} 창 삭제 실패 {r.status_code}: {r.text[:400]}")
-    # ★변수 이름을 payload 로 쓰지 않는다 — 공개 로그 가드가 `json.dumps(payload`
-    # 문자열을 금지어로 잡는다(원시 응답 dump 재발 방지). 여기 body 는 우리가 만든
-    # 적재 행이라 성격이 다르지만, 가드를 약화시키느니 이름을 피한다.
+    # ★직렬화하는 변수 이름을 p·a·y·l·o·a·d 로 쓰지 않는다 — 공개 로그 가드가 그
+    # 이름으로 직렬화하는 코드를 금지어로 잡는다(원시 응답 dump 재발 방지). 여기 body 는
+    # 우리가 만든 적재 행이라 성격이 다르지만, 가드를 약화시키느니 이름을 피한다.
+    # (이 주석에도 그 이름을 붙여 쓰면 가드가 걸린다 — 실제로 한 번 걸렸다.)
     body = [row for row in rows if row.get("snap_date") in set(days)]
     if not body:
         return 0

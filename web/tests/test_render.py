@@ -398,6 +398,62 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
         self.assertEqual(diff, [], f"홈 구조가 갈라졌다: {diff[:8]}")
         self.assertGreater(len(ko), 30, "서명이 비었다 — 추출이 깨졌나?")
 
+    def test_english_briefs_omit_korean_written_detail_and_say_so(self):
+        """★[2026-09-05 사용자 결정 ①] 영문 브리프의 지적사항 상세가 통째로 한국어였다
+        (실측 `/en/briefs/2026-08-31/` 한글 낱말 2,933개 중 2,688개). 식약처 실사기록의
+        지적 요약·조치 경과·근거법령과, 한국어로 쓰인 심층분석이다. 영어 껍데기 안에
+        한국어 산문을 싣지 않는다는 규율은 문서 페이지에서 원문이 한국어인 문서를 내지
+        않는 것과 같다 — **싣지 않고 밝힌다**. 수리 후 682개(전부 업체·기관 실명).
+
+        ★판정은 타입이 아니라 값으로 한다. 영어로 쓰인 상세(FDA 483·WL)는 남아야 한다 —
+          그것까지 지우면 영어 독자가 볼 수 있는 것을 이유 없이 뺏는 것이다.
+        """
+        omitted = kept = 0
+        for d in sorted((self.out / "en" / "briefs").iterdir()):
+            page = d / "index.html"
+            if not page.is_file():
+                continue
+            html = page.read_text(encoding="utf-8")
+            body = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|<!--.*?-->",
+                          " ", html)
+            with self.subTest(issue=d.name):
+                # ① 국문 번역 패널은 영어판에 없다(원문이 바로 옆에 있어 중복이다).
+                self.assertNotIn('class="obs-ko"', body, f"{d.name}: 국문 해석 패널이 남았다")
+                # ② 남아 있는 상세 블록에는 한국어가 없다.
+                for m in re.finditer(r'(?s)<details class="block (?:detail|deep)".*?</details>',
+                                     body):
+                    left = [w for w in re.findall("[가-힣]+", re.sub(r"<[^>]+>", " ", m.group(0)))
+                            if w != "한국어"]
+                    self.assertEqual(left, [], f"{d.name}: 영어 상세에 한국어 산문 {left[:3]}")
+                    kept += 1
+                omitted += len(re.findall(r'class="dt-omit"', body))
+        self.assertGreater(omitted, 5, "생략 고지가 거의 없다 — 게이트가 꺼졌나?")
+        self.assertGreater(kept, 5, "영어 상세가 전부 사라졌다 — 값이 아니라 타입으로 걸렀나?")
+
+    def test_detail_language_rule_is_value_based(self):
+        """합성 입력으로 판정 자체를 묻는다 — 오늘 데이터가 우연히 그렇다고 규칙이 맞는 건
+        아니다. 한국어 상세는 통째로 빠지고, 영어 상세는 남되 국문 슬롯만 떨어진다."""
+        ko_detail = {"type": "gmp_deficiencies",
+                     "rows": [{"area": "품질경영", "summary": "지적 요약"}]}
+        en_detail = {"type": "wl_violations",
+                     "violations": [{"number": 1, "statement": "Your firm failed to…",
+                                     "statement_ko": "귀사는 …하지 않았다"}]}
+        self.assertTrue(render.detail_is_korean(ko_detail))
+        # ★`detail_is_korean` 의 계약은 "이 dict 에 한글이 있는가"다 — 영어 상세라도
+        #   국문 번역 슬롯이 딸려 있으면 참이다. **정책**(국문 슬롯을 떼고 나서 판정)은
+        #   `_detail_for_lang` 이 갖는다. 둘을 섞으면 원문이 영어인 상세가 딸린 번역
+        #   때문에 통째로 사라진다(처음 구현이 실제로 그랬고 이 합성 입력이 잡았다).
+        self.assertTrue(render.detail_is_korean(en_detail))
+        self.assertIsNone(render._detail_for_lang(ko_detail, "en"))
+        kept = render._detail_for_lang(en_detail, "en")
+        self.assertIsNotNone(kept)
+        self.assertNotIn("statement_ko", kept["violations"][0],
+                         "영어 상세에 국문 번역 슬롯이 남았다")
+        self.assertIn("statement", kept["violations"][0], "원문까지 지웠다")
+        # 한국어 트리는 손대지 않는다 — 같은 객체가 그대로 나간다.
+        self.assertIs(render._detail_for_lang(en_detail, "ko"), en_detail)
+        self.assertIs(render._detail_for_lang(ko_detail, "ko"), ko_detail)
+
     def test_english_briefs_disclose_why_korean_names_remain(self):
         """★영문 브리프에 남는 한글은 **한국 규제기관 문서의 업체·기관 실명**뿐이다
         (동아제약(주)·화순전남대학병원). 옮기면 존재하지 않는 이름을 가리키게 되므로
@@ -16558,6 +16614,36 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
     "briefs/*": {
         "arc-lib-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",
         "cov-note": "영어 전용 고지 — 업체·기관 실명이 한국어로 남는 이유",
+        "dt-omit": "영어 전용 고지 — 한국어로 쓰인 상세를 싣지 않는 이유",
+        # ★[2026-09-05 결정 ①] 한국어로 쓰인 상세는 영어판에 싣지 않는다. 그 하나의 판단이
+        #   블록 하위 클래스 수십 개로 드러나므로 접두로 묶어 **이유를 한 번만** 적는다.
+        #   영어로 쓰인 상세(FDA 483·WL 위반항목)는 남는다 — `obs-num`·`obs-orig`·`obs-en`
+        #   이 이 목록에 **없다는 것**이 값 기준 판정이 살아 있다는 증거다(타입으로 걸렀다면
+        #   그것들도 여기 들어와야 했다).
+        "deep*": "심층분석(한국어 서술) 블록과 그 하위",
+        # ★접두를 `dt-*` 로 넓게 쓰지 않는다 — `dt-law`·`dt-row`·`dt-h` 는 살아남은 영어
+        #   상세가 **실제로 쓰고 있어**(161블록) 넓게 풀면 그만큼 가드가 사라진다.
+        #   한국어 상세에만 나오는 다섯 개만 적는다.
+        "dt-sum": "한국어 지적 요약", "dt-badge": "한국어 구분 배지",
+        "dt-fu": "한국어 조치 경과", "dt-code": "한국어 조문 코드",
+        "dt-ops": "한국어 조문 목록", "dt-list": "한국어 상세 목록",
+        "viol*": "한국어 위반 서술 블록의 하위",
+        "rem-*": "한국어 조치기한 블록의 하위",
+        # 영어는 국문 슬롯이 없어 템플릿의 **원문/번역 병기 분기 대신 단문 분기**를 탄다 —
+        # 병기 라벨(`obs-orig`)과 그 상세(`obs-en-det`)가 안 나오는 것이 정상 동작이다.
+        "obs-orig": "원문/국문 병기 라벨 — 영어판은 병기할 국문이 없어 단문으로 낸다",
+        "obs-en-det": "위 병기 분기에서만 쓰는 상세 문단",
+        "ti-info-circle": "생략된 블록의 아이콘", "ti-package": "위와 같음",
+        "lv0": "한국어 조문 계층 목록", "lv1": "위와 같음",
+        "lv2": "위와 같음", "lv3": "위와 같음",
+        "obs-ko": "원문 옆 국문 번역 패널 — 영어판은 원문이 바로 옆이라 중복이다",
+        "ko": "위 국문 패널의 언어 배지",
+        "tag-interp": "한국어 해석 태그",
+        # 심층분석이 없으면 카드가 2×2 facts 그리드 대신 기존 세로 표를 쓴다(설계 그대로).
+        "facts-grid": "심층 카드 전용 facts 레이아웃 — 심층분석이 없으면 세로 표로 돌아간다",
+        "fcell": "위와 같음", "fk": "위와 같음", "fv": "위와 같음",
+        "ti-file-search": "생략된 블록의 아이콘", "ti-table": "위와 같음",
+        "ti-file-description": "위와 같음", "ti-arrow-narrow-right": "위와 같음",
     },
     "findings/doc": {
         # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은
@@ -16590,7 +16676,13 @@ def _main_only(html: str) -> str:
 
 def presence_diffs(out, pairs, main_only: bool = False) -> "list[str]":
     """짝 페이지들에서 **한쪽에만 있는 클래스**를 (페이지군, 클래스) 단위로 모은다."""
-    seen: dict[tuple[str, str], str] = {}
+    # ★페이지군 **합집합**으로 본다. 페이지 하나씩 보면 "그 호에 그 종류의 카드가 없다"
+    #   같은 데이터 차이가 전부 울린다 — 그건 이 가드가 안 잡기로 한 수량 차이와 같은
+    #   성질이다(실측: 브리프군에서 페이지 단위는 5건을 더 울렸는데 전 호 합산하면 0이다).
+    #   여기서 잡으려는 것은 **한 언어에 그 기능이 통째로 없는 것**이다.
+    fam_ko: dict[str, set[str]] = {}
+    fam_en: dict[str, set[str]] = {}
+    fam_example: dict[str, str] = {}
     pick = _main_only if main_only else (lambda h: h)
     for path in pairs:
         ko = class_signature(
@@ -16598,15 +16690,25 @@ def presence_diffs(out, pairs, main_only: bool = False) -> "list[str]":
         en = class_signature(
             pick((out / "en" / path / "index.html").read_text(encoding="utf-8")))
         fam = page_family(path)
-        for cls in set(ko) | set(en):
-            if bool(ko.get(cls)) == bool(en.get(cls)):
+        fam_ko.setdefault(fam, set()).update(k for k, v in ko.items() if v)
+        fam_en.setdefault(fam, set()).update(k for k, v in en.items() if v)
+        fam_example.setdefault(fam, path or "(home)")
+    out: list[str] = []
+    for fam in sorted(fam_ko):
+        allowed = (INTENTIONAL_PRESENCE_DIFFS.get("*", {})
+                   | INTENTIONAL_PRESENCE_DIFFS.get(fam, {}))
+        # `"deep*"` 처럼 끝에 `*` 를 붙이면 접두로 맞춘다. 한 번의 판단이 하위 클래스
+        # 수십 개로 흩어지는 블록을 그만큼 적으면 목록이 판단보다 커지고, 커진 목록은
+        # 읽히지 않는다. 접두는 **그 블록 하나**를 가리킬 때만 쓴다.
+        ok = lambda c: c in allowed or any(
+            k.endswith("*") and c.startswith(k[:-1]) for k in allowed)
+        for cls in sorted((fam_ko[fam] - fam_en.get(fam, set()))
+                          | (fam_en.get(fam, set()) - fam_ko[fam])):
+            if ok(cls):
                 continue
-            allowed = (INTENTIONAL_PRESENCE_DIFFS.get("*", {})
-                       | INTENTIONAL_PRESENCE_DIFFS.get(fam, {}))
-            if cls not in allowed:
-                side = "KO만" if ko.get(cls) else "EN만"
-                seen[(fam, cls)] = f"{fam}: {cls} ({side}, 예: {path or '(home)'})"
-    return sorted(seen.values())
+            side = "KO만" if cls in fam_ko[fam] else "EN만"
+            out.append(f"{fam}: {cls} ({side}, 예: {fam_example[fam]})")
+    return out
 
 
 class WebEnTreeTest(unittest.TestCase):

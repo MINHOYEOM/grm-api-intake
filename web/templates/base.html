@@ -23,7 +23,12 @@
 {% if canonical %}
 <link rel="canonical" href="{{ canonical }}" />
 {#- RSS 자동 발견 — 피드 리더와 네이버 수집기가 이 선언으로 피드를 찾는다. -#}
-<link rel="alternate" type="application/rss+xml" title="{{ _('GRM 주간 브리프') }}" href="/rss.xml" />
+{#- 피드 링크는 **자기 언어의 피드**만 가리킨다. 영어 피드가 없던 동안 영어 4천 장이
+    한국어 피드(`<language>ko</language>`)를 자기 대체본이라고 말하고 있었다.
+    줄바꿈을 블록 **안**에 둔다 — `{% if %}…{% endif %}` 를 한 줄에 두면 trim_blocks 가
+    뒤 줄바꿈을 먹어 한국어 8,508장의 바이트가 흔들린다(실측). -#}
+{% if rss_href %}<link rel="alternate" type="application/rss+xml" title="{{ _('GRM 주간 브리프') }}" href="{{ rss_href }}" />
+{% endif %}
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="{{ og_locale }}" />
@@ -64,11 +69,21 @@
 {% endif %}
 {# 언어 전환 링크 스타일 — grm.css 는 디자인 동결이라 마스코트·구독밴드 선례대로 스코프 인라인.
    §4 한글 안전: 자간·대문자 변형·mono 미사용(라벨에 '한국어'가 들어간다). #}
+{% set show_langhint = lang == 'ko' and alt_other and alt_other.lang == 'en' %}
 {% if alt_other %}
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
   @media (max-width:640px){ .grm-lang{padding:5px 9px;font-size:12.5px} }
+</style>
+{% endif %}
+{% if show_langhint %}
+<style>
+  .grm-langhint{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--soft);border-bottom:1px solid var(--line-2);padding:9px 16px;font-family:var(--sans);font-size:13.5px;color:var(--body)}
+  .grm-langhint a{color:var(--coral);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .grm-langhint a:hover{border-bottom-color:var(--coral)}
+  .grm-langhint button{background:none;border:0;color:var(--muted);font-family:var(--sans);font-size:16px;line-height:1;cursor:pointer;padding:2px 6px}
+  .grm-langhint button:hover{color:var(--ink)}
 </style>
 {% endif %}
 {% if json_ld %}
@@ -82,6 +97,24 @@
    프래그먼트(새로고침 0), 타 페이지에선 홈으로 이동 후 스크롤. 브랜드 로고는 홈(index.html) 유지. #}
 {% set about_href = '#why' if nav_active == 'home' else rel_root ~ 'index.html#why' %}
 {% set notice_href = '#notice' if nav_active == 'home' else rel_root ~ 'index.html#notice' %}
+{#- [루트 진입 2026-09-05] 영어 사용자가 `grm-solutions.com` 을 직접 치면 한국어 홈을
+    만난다. 헤더에 "English" 칩이 있지만 한국어 화면을 처음 본 사람이 그걸 찾을 이유가
+    없다 — 검색 유입은 hreflang 으로 `/en/` 에 바로 착지하지만 직접·공유 링크 진입은 그
+    경로를 타지 않는다.
+    ★자동 리다이렉트는 하지 않는다. 브라우저 언어는 사람의 선택이 아니라 기기 설정이고
+      (해외에 있는 한국어 사용자·회사 지급 노트북), 검색엔진에게도 같은 URL 이 방문자마다
+      다른 내용을 주는 꼴이 된다. 우리는 **알리기만** 하고 선택은 독자가 한다.
+    ★기본은 `hidden` 이다 — 크롤러와 한국어 사용자가 받는 문서는 종전과 같고, 브라우저
+      언어가 한국어가 아닌 사람에게만 스크립트가 벗긴다(클로킹이 아니다: 두 경우 모두
+      같은 HTML 이고 표시 여부만 클라이언트에서 갈린다).
+    ★짝이 있는 면에서만 뜬다(`alt_other`) — 없는 페이지로 보내지 않는다. -#}
+{% if show_langhint %}
+<div class="grm-langhint" id="grmLangHint" role="region" aria-label="Language" lang="en" hidden>
+  <span>This page is also available in English.</span>
+  <a href="{{ alt_other.rel_href }}" hreflang="en" lang="en" rel="alternate">Read in English &rarr;</a>
+  <button type="button" id="grmLangHintX" aria-label="Dismiss">&times;</button>
+</div>
+{% endif %}
 <header class="nav" id="nav"><div class="wrap nav-in">
   {# 헤더 브랜드 락업(B안) — favicon.svg(올빼미) 재사용(단일원천) + GRM/서브타이틀. grm.css 프리즈 보존 위해 인라인 스타일(정렬·크기)만; .brand-full 은 기존 ≤640px 반응형 은닉 클래스 재사용(서브타이틀=구 전체명 대체). #}
   <a class="brand" href="{{ rel_root }}index.html" aria-label="{{ _('Global Regulatory Monitor 홈') }}"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a>
@@ -209,6 +242,21 @@ if(_nt&&_nm){
   _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
+{% if show_langhint %}
+// [루트 진입] 브라우저 언어가 한국어가 아니면 영어판 안내를 보인다(리다이렉트 없음).
+// localStorage 는 사생활 모드·차단 설정에서 **접근 자체가 던진다** — 읽기·쓰기를 각각
+// 감싸고, 실패하면 그냥 안내를 보인다(기억을 못 할 뿐 화면은 정상).
+(function(){
+  var b=document.getElementById('grmLangHint'); if(!b) return;
+  try{ if(localStorage.getItem('grm-langhint')==='off') return; }catch(e){}
+  var l=(navigator.languages&&navigator.languages[0])||navigator.language||'';
+  if(/^ko\b/i.test(l)) return;
+  b.hidden=false;
+  document.getElementById('grmLangHintX').addEventListener('click',function(){
+    b.hidden=true; try{ localStorage.setItem('grm-langhint','off'); }catch(e){}
+  });
+})();
+{% endif %}
 </script>
 <div class="grm-pet" id="grm-pet" data-page="{{ nav_active }}">
   <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="{{ _('구름이 펫 열기') }}" aria-expanded="false" aria-controls="grm-pet-panel" title="{{ _('드래그해 이동 · 눌러 관리') }}">

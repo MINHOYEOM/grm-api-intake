@@ -1,0 +1,74 @@
+[
+  {
+    "finding_id": "finding-2379f2735b3d2f1f62f698b9",
+    "finding_text": "품질경영 기타 [별표 1] 3.1 데이터 완전성 관련 지침을 운영 할 전담 조직을 구성할 것",
+    "finding_text_ko": "품질경영 분야 지적사항으로, [별표 1] 3.1에 따라 데이터 완전성(data integrity) 관련 지침을 운영할 전담 조직을 구성할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2d922718c963ee0a981a3fdc",
+    "finding_text": "품질경영 기타 [별표 1] 5.2 [별표 1의2] 6.1 보존기간 동안 기록서가 온전하게 보존될 수 있도록 보안관리를 할 것",
+    "finding_text_ko": "품질경영 분야 지적사항으로, [별표 1] 5.2 및 [별표 1의2] 6.1에 따라 보존기간 동안 기록서가 온전하게 보존될 수 있도록 보안관리를 할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3737e0bddf6e77a659dc2caf",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 의약품의 제조 및 시험에 사용되는 설비(계측기)에 대하여 교정 리스 트를 작성할 것",
+    "finding_text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 의약품의 제조 및 시험에 사용되는 설비(계측기)에 대하여 교정 리스트를 작성할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-39d5c24d46e68f7b26868411",
+    "finding_text": "제조 기타 [별표 1] 4.3 [별표 1의2] 6.2 사용하려는 원료약품의 적합 판정 여부를 확인하여 관리할 것",
+    "finding_text_ko": "제조 분야 지적사항으로, [별표 1] 4.3 및 [별표 1의2] 6.2에 따라 사용하려는 원료약품의 적합 판정 여부를 확인하여 관리할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8f471aa7017bfb2164589762",
+    "finding_text": "제조 기타 [별표 1] 4.3 [별표 1의2] 6.2 원료약품 관리에 관한 보관장소 및 보관방법을 기준서에 포함할 것",
+    "finding_text_ko": "제조 분야 지적사항으로, [별표 1] 4.3 및 [별표 1의2] 6.2에 따라 원료약품 관리에 관한 보관장소 및 보관방법을 기준서에 포함할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-956e5b4f38fa86c33f221ac1",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 적격성평가 수행 시 작동 범위를 포함하여 실시할 것",
+    "finding_text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 적격성평가(qualification) 수행 시 작동 범위를 포함하여 실시할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95ba474d72a9714a18c003ee",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 정제수 시스템의 필터에 대한 적합 성을 정기적으로 확인할 것",
+    "finding_text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 정제수 시스템의 필터에 대한 적합성을 정기적으로 확인할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ba939816334310d5f5df3bed",
+    "finding_text": "시험실 기타 [별표 1] 7.1 [별표 1의2] 11.1 표준품, 중요 시약 등에 대한 관리 상황을 기록할 것",
+    "finding_text_ko": "시험실 분야 지적사항으로, [별표 1] 7.1 및 [별표 1의2] 11.1에 따라 표준품, 중요 시약 등에 대한 관리 상황을 기록할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3c5f557b2ab44c95109d397",
+    "finding_text": "품질경영 기타 [별표 1] 3.3 조건부 출하 승인에 대한 절차를 마련할 것",
+    "finding_text_ko": "품질경영 분야 지적사항으로, [별표 1] 3.3에 따라 조건부 출하 승인에 대한 절차를 마련할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f2a1b676c4814e7e7dd23144",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 칭량작업에 사용하는 저울의 실제 사용 범위를 고려하여 일일점검을 수행할 것",
+    "finding_text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 칭량작업에 사용하는 저울의 실제 사용 범위를 고려하여 일일점검을 수행할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fbdc37b38f98c45adbfcc4cf",
+    "finding_text": "품질경영 기타 [별표 1] 1의2 [별표 1의2] 2 품질 목표 달성을 위하여 의약품 제조업의 경영진과 작업원은 품질 보증시스템을 마련하고, 적절하게 시행할 것",
+    "finding_text_ko": "품질경영 분야 지적사항으로, [별표 1] 1의2 및 [별표 1의2] 2에 따라 품질 목표 달성을 위하여 의약품 제조업의 경영진과 작업원이 품질보증시스템을 마련하고 적절하게 시행할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fd3732dcae7f0962c62d0d61",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 제조에 사용되는 중요 기계·설비에 대하여 모든 중요공정변수를 포함 하여 교정할 것",
+    "finding_text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 제조에 사용되는 중요 기계 및 설비에 대하여 모든 중요공정변수를 포함하여 교정할 것을 요구했다.",
+    "translation_method": "llm_assisted"
+  }
+]

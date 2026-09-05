@@ -11,8 +11,7 @@
 <meta name="naver-site-verification" content="51283dc3591917baf9e057d220f053a91131bbe2" />
 <title>Guide · GRM</title>
 <meta name="description" content="How to use GRM — the Monday brief in three minutes, worked examples of findings search, how to use the library, glossary, and quiz, and frequently asked questions." />
-<link rel="canonical" href="https://grm-solutions.com/en/guide/" /><link rel="alternate" type="application/rss+xml" title="GRM Weekly Brief" href="/rss.xml" />
-<meta property="og:type" content="website" />
+<link rel="canonical" href="https://grm-solutions.com/en/guide/" /><meta property="og:type" content="website" />
 <meta property="og:site_name" content="Global Regulatory Monitor" />
 <meta property="og:locale" content="en_US" />
 <meta property="og:title" content="Guide · GRM" />
@@ -35,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/guide/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/guide/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/guide/" />
-<script src="/assets/i18n-en.js?v=38c08a46" defer></script>
+<script src="/assets/i18n-en.js?v=95fdfc53" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -248,14 +247,15 @@ body.grm-has-share .grm-card-actions{display:flex}
 </script>
 <script>
 (function(){
-  var p=location.pathname,h=location.hostname;
+  var p=location.pathname,h=location.hostname,ua=navigator.userAgent||'';
   var admin=p==='/admin'||p.indexOf('/admin/')===0;
+  var auto=navigator.webdriver===true||/\bHeadless|\bClaude\//.test(ua);
   var op=false;
   try{
     if(admin)localStorage.setItem('grm-op','1');
     op=localStorage.getItem('grm-op')==='1';
   }catch(e){}
-  if(admin||op)return;
+  if(admin||op||auto)return;
   if(h!=='grm-solutions.com'&&h!=='www.grm-solutions.com')return;
   var s=document.createElement('script');
   s.src='https://static.cloudflareinsights.com/beacon.min.js';

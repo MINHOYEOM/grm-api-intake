@@ -1475,11 +1475,12 @@ def build_glossary_view(
     미지정 시 URL 은 모두 ""(호출부 호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론.
 
     aliases([A1] 동의어, glossary.json 정본 — 여기서 수정 안 함)는 검색용과 표시용이
-    다르다. search 에는 항상 전량 포함(사용자가 FDA 표현으로 검색해도 걸리도록).
-    뷰모델 "aliases" 키(표시용)는 _glossary_alias_norm 판정으로 표제어(term_ko 또는
-    term_en)와 하이픈·공백 차이만 있는 표현만 골라 제외한 나머지만 담는다(원본 순서
-    유지). aliases 없으면 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략,
-    search 도 기존과 byte 동일.
+    다르다. 한국어판 search 에는 항상 전량 포함(사용자가 FDA 표현으로 검색해도 걸리도록).
+    뷰모델 "aliases" 키(표시용)는 _glossary_alias_norm 판정으로 **그 트리가 띄운 표제어**
+    (한국어판=term_ko·term_en, 영어판=term_en)와 하이픈·공백 차이만 있는 표현을 제외한
+    나머지만 담는다(원본 순서 유지). 영어판은 거기서 한 겹 더 — 한글이 든 동의어는
+    싣지 않는다(영어 트리에 한국어 0). aliases 없거나 전량 제외면 빈 리스트라 템플릿
+    {% if t.aliases %} 게이트로 조용히 생략, search 도 기존과 byte 동일.
 
     cases(glossary_cases.json items, id→item)는 [C1] 사례 링크 심화 필드 — 있으면
     case_q/case_findings/case_count_label/case_href 를 채운다(id 가 cases 에 없으면
@@ -1533,12 +1534,24 @@ def build_glossary_view(
             # 한글이 검색 인덱스에만 남아, 영어 사용자가 왜 걸렸는지 알 수 없게 된다.
             search_parts = [t["term_en"], easy] + ([detail] if detail else [])
         # [A1] 표시용: 표제어와 하이픈·공백 차이만 있는 동의어는 잡음이라 제외(감춤은
-        # 화면뿐 — search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
-        norm_ko = _glossary_alias_norm(t["term_ko"])
-        norm_en = _glossary_alias_norm(t["term_en"])
+        # 화면뿐 — 한국어판 search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
+        # ★비교 대상 표제어는 **그 트리가 실제로 띄운 표제어**다(2026-09-05). 영어판은
+        #   `term_en` 만 보이므로 한국어 표제어와 대조하면 아무것도 걸러지지 않는다 —
+        #   한글과 로마자는 하이픈·공백을 지워도 겹칠 수가 없기 때문이다. 그러면
+        #   `Back-up` 옆에 `backup` 이 "다른 표기"로 나란히 서는, 한국어판에서 이미
+        #   잡음이라고 판정한 그 화면이 영어판에서만 되살아난다.
+        head_norms = ([_glossary_alias_norm(t["term_ko"]),
+                       _glossary_alias_norm(t["term_en"])] if is_ko
+                      else [_glossary_alias_norm(t["term_en"])])
         display_aliases = [a for a in aliases
-                            if _glossary_alias_norm(a) not in norm_ko
-                            and _glossary_alias_norm(a) not in norm_en]
+                           if all(_glossary_alias_norm(a) not in h for h in head_norms)]
+        if not is_ko:
+            # ★영어 화면에 한글 표기는 싣지 않는다. 동의어 149개 중 40개는 한국어 표기
+            #   (「기준일탈」·「밸리데이션」…)라 영어 독자에게는 읽히지 않고, 이 사이트가
+            #   지켜 온 "영어 트리에 한국어 0" 규율을 화면 한복판에서 깬다. 남는 것이
+            #   하나도 없는 용어는 빈 리스트가 되어 템플릿 {% if %} 게이트가 라벨까지
+            #   통째로 생략한다(빈 "Also written" 만 남기지 않는다).
+            display_aliases = [a for a in display_aliases if not _HANGUL_RE.search(a)]
         # 사례 정본도 읽는 트리의 모집단이어야 한다. 영어는 `term_en`을 실제 RPC로
         # 확인하고 p_orig_lang=en으로 다시 센 별도 파일만 넘긴다. 파일 부재는 링크를
         # 조용히 비우지만, 한국어 전체 코퍼스 파일로 폴백해 거짓 수를 만들지는 않는다.
@@ -1568,8 +1581,8 @@ def build_glossary_view(
             "reg_refs": reg_refs,
             # [A1] 표시용 동의어(표제어와 하이픈·공백만 다른 것 제외) — 부재/전량제외 시
             # 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략.
-            # 동의어는 한국어 표기라 영어판에서는 싣지 않는다(검색에도 넣지 않는다).
-            "aliases": display_aliases if is_ko else [],
+            # 영어판은 한글이 든 동의어만 더 걸러 낸다(위 head_norms/한글 판정 참조).
+            "aliases": display_aliases,
             # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
             "case_q": case_q,
             "case_findings": case_findings,
@@ -2938,7 +2951,15 @@ def _issue_row(brief: dict[str, Any], issue_no: int, latest_slug: str,
 
 
 def _cover_context(brief: dict[str, Any], issue_no: int,
-                   tr: Translator = _KO) -> dict[str, Any]:
+                   tr: Translator = _KO,
+                   lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """홈 히어로의 이슈카드 — 제목·요약이 **읽는 언어**를 따른다.
+
+    ★[다국어 2026-09-05] 종전에는 영어 홈이 `landing_en.html` 이라는 **별도 템플릿**을
+      썼다. 이유는 하나였다 — 그때는 영문 브리프가 0호라 히어로에 실을 표지가 없었다.
+      이제 10호가 있으므로 그 전제가 사라졌고, 템플릿을 두 벌 두면 한쪽만 고쳐지는
+      날이 반드시 온다(구현을 두 벌 두지 않는다 — 모음·조항에서 쓴 것과 같은 규율).
+    """
     bm = brief["brief"]
     cov = _norm_coverage(bm.get("coverage") or {})
     pub = bm.get("publish_date", "")
@@ -2952,8 +2973,8 @@ def _cover_context(brief: dict[str, Any], issue_no: int,
         "evidence": cov["evidence"],              # 다크밴드 Evidence A/B
         "title_dateform": title_dateform(pub, tr),  # 다크밴드 "{Y}년 {M}월 {N}주차"
         "window": bm.get("window", ""),
-        "title": _brief_title(bm),
-        "tldr": bm.get("tldr") or [],
+        "title": _brief_title(bm, tr, lang),
+        "tldr": _brief_tldr(bm, lang),
     }
 
 
@@ -3184,8 +3205,27 @@ def _card_search_text(card: dict[str, Any]) -> str:
 
 
 def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
-                      month: str, vol_title: str) -> dict[str, Any]:
-    """카드 1개 → 검색 인덱스 엔트리. 전 필드 카드 기존 값 파생(무변형)."""
+                      month: str, vol_title: str,
+                      tr: Translator = _KO,
+                      lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """카드 1개 → 검색 인덱스 엔트리. 전 필드 카드 기존 값 파생(무변형).
+
+    ★[다국어 2026-09-05] 언어를 탄다. 종전에는 한국어 인덱스 하나뿐이었고, `archive.js`
+      가 **자기 스크립트 경로**에서 인덱스 URL 을 만들기 때문에(`new URL("search-index.json",
+      scriptEl.src)`) 영문 아카이브도 그 한국어 인덱스를 검색했다 — 화면은 영어인데
+      검색 결과와 필터 라벨이 한국어로 뜨는 상태였다. 정적 테스트는 이걸 볼 수 없다
+      (런타임에 주입되는 내용이라 HTML 에는 없다).
+      서사 다섯은 `_card_view` 와 **같은 방식**으로 영어 슬롯을 덮어쓴다(구현을 두 벌
+      두지 않는다). 제형 라벨은 한국어 값이 곧 사전 키라 `tr()` 을 태우고, 기관·분류는
+      데이터가 이미 영문 고정값이라 그대로 둔다(다시 번역하면 사전에 없는 키가 된다).
+    """
+    if lang != DEFAULT_LANG and card_has_english(card):
+        card = {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
+    # 카드 종류 라벨은 **지역 사본에** 번역해 둔다 — 그래야 아래 엔트리 필드와
+    # `_card_search_text(card)` 가 같은 값을 본다(두 곳에서 따로 번역하면 검색어와
+    # 화면 라벨이 갈라진다). 한국어는 항등이라 골든 바이트가 흔들리지 않는다.
+    if card.get("card_type"):
+        card = {**card, "card_type": tr(card["card_type"])}
     return {
         "issue_no": issue_no,
         "date": date,
@@ -3193,7 +3233,8 @@ def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
         "vol_title": vol_title,
         "agency": card.get("agency", ""),
         "category": card.get("category", ""),
-        "modality": card.get("modality"),               # null 가능(필터 미해당)
+        "modality": (tr(card["modality"]) if card.get("modality")
+                     else card.get("modality")),        # null 가능(필터 미해당)
         "card_type": card.get("card_type", ""),
         "evidence_level": card.get("evidence_level", ""),
         "signal_tier": card.get("signal_tier", ""),
@@ -3207,14 +3248,27 @@ def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
 
 
 def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str, int],
-                       latest_slug: str) -> dict[str, Any]:
+                       latest_slug: str, tr: Translator = _KO,
+                       lang: str = DEFAULT_LANG) -> "dict[str, Any] | None":
     """전 브리프 카드 → 검색 인덱스(facet 메타 + 호 메타 + 카드 엔트리).
+
+    ★[다국어 2026-09-05] 언어판마다 자기 인덱스를 낸다. 영어판은 `brief_has_english` 인
+      호만 싣는다 — 한 호라도 섞으면 영어 화면의 검색 결과에 한국어 카드가 뜬다.
+      **호 번호는 다시 매기지 않는다**(피드와 같은 규율: 같은 브리프가 두 언어에서 다른
+      Vol. 을 가지면 사람이 서로를 못 찾는다). 카드 href 는 `../briefs/…` 상대경로 그대로라
+      언어와 무관하다 — `/en/archive/` 에서도 `/en/` 에서도 같은 트리 안에 떨어진다
+      (popular.js 가 선행 `../` 를 벗겨 랜딩에서도 성립하는 기존 관례).
+      영어로 낼 호가 없으면 `None` 을 돌려주고 호출부가 파일을 만들지 않는다.
 
     정렬(결정론): 카드 = date desc, 동일 호 내 render_order asc. facet 후보는 **실제
     존재값만** 노출(데이터 파생) — agency/category/modality 알파벳, months 최신순.
     호 메타(issues)는 baseline 서버목록과 JS 검색뷰가 동일하게 쓰는 단일 파생원
     (`_issue_row`)에서 만들어 두 경로 일관성 보장.
     """
+    if lang != DEFAULT_LANG:
+        briefs = [b for b in briefs if brief_has_english(b)]
+        if not briefs:
+            return None
     cards_idx: list[dict[str, Any]] = []
     issues_idx: list[dict[str, Any]] = []
     agencies: set[str] = set()
@@ -3228,14 +3282,15 @@ def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str,
         date = bm.get("publish_date", "")
         month = date[:7]
         issue_no = issue_no_by_date[date]
-        vol_title = _brief_title(bm)
+        vol_title = _brief_title(bm, tr, lang)
         renderable = [c for c in (b.get("cards") or []) if _is_renderable(c)]
         cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
         for c in cards_sorted:
             entry = _card_index_entry(c, issue_no=issue_no, date=date,
-                                      month=month, vol_title=vol_title)
+                                      month=month, vol_title=vol_title,
+                                      tr=tr, lang=lang)
             cards_idx.append(entry)
             if entry["agency"]:
                 agencies.add(entry["agency"])
@@ -3246,7 +3301,7 @@ def build_search_index(briefs: list[dict[str, Any]], issue_no_by_date: dict[str,
         if month:
             months.add(month)
 
-        row = _issue_row(b, issue_no, latest_slug)
+        row = _issue_row(b, issue_no, latest_slug, tr, lang)
         issues_idx.append({
             "issue_no": row["issue_no"],
             "slug": row["slug"],
@@ -3562,26 +3617,40 @@ def rfc822_date(iso_date: str) -> str:
 
 
 def build_rss_xml(briefs: list[dict[str, Any]],
-                  base_url: str = SITE_BASE_URL) -> str:
+                  base_url: str = SITE_BASE_URL,
+                  tr: Translator = _KO, lang: str = DEFAULT_LANG) -> str:
     """주간 브리프 RSS 2.0. 발행일 내림차순·생성시각 0(byte 고정).
 
     본문(tldr)은 한국어 산문이라 XML 메타문자가 실재한다 — `escape()` 로 반드시 감싼다
     (sitemap 은 URL·날짜뿐이라 무변형 결합이 성립하지만 여기는 다르다).
+
+    ★[다국어 2026-09-05] 언어판마다 **자기 피드**를 낸다. 영어 피드에는 `brief.en` 이
+      온전한 호만 싣는다 — 한국어 호를 영어 피드에 끼워 넣으면 피드 리더에 한국어 제목이
+      뜨고, 그건 화면에서 반쪽 영어를 금지한 이유와 똑같다. **호 번호는 한국어 전체
+      발행 순서를 그대로 쓴다**(영어에 없는 호가 있어도 Vol. 을 다시 매기지 않는다 —
+      같은 브리프가 두 언어에서 다른 번호를 갖게 되면 사람이 서로를 못 찾는다).
+      영어로 낼 호가 하나도 없으면 빈 문자열을 돌려주고, 호출부가 파일을 만들지 않는다.
     """
     nums = assign_issue_numbers(briefs)
+    if lang != DEFAULT_LANG:
+        briefs = [b for b in briefs if brief_has_english(b)]
+        if not briefs:
+            return ""
     ordered = sorted(briefs, key=lambda b: b["brief"].get("publish_date", ""),
                      reverse=True)
     latest = ordered[0]["brief"].get("publish_date", "") if ordered else ""
+    feed_path = LANG_PREFIXES[lang] + "rss.xml"
 
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
         "  <channel>",
-        f"    <title>{_x(RSS_TITLE)}</title>",
-        f"    <link>{base_url}/</link>",
-        f"    <description>{_x(RSS_DESCRIPTION)}</description>",
-        "    <language>ko</language>",
-        f'    <atom:link href="{base_url}/rss.xml" rel="self" type="application/rss+xml" />',
+        f"    <title>{_x(tr(RSS_TITLE))}</title>",
+        f"    <link>{base_url}/{LANG_PREFIXES[lang]}</link>",
+        f"    <description>{_x(tr(RSS_DESCRIPTION))}</description>",
+        f"    <language>{lang}</language>",
+        f'    <atom:link href="{base_url}/{feed_path}" rel="self"'
+        ' type="application/rss+xml" />',
     ]
     if latest:
         lines.append(f"    <lastBuildDate>{rfc822_date(latest)}</lastBuildDate>")
@@ -3591,13 +3660,13 @@ def build_rss_xml(briefs: list[dict[str, Any]],
         pub = bm.get("publish_date", "")
         if not pub:
             continue
-        url = f"{base_url}/briefs/{pub}/"
-        tldr = [t for t in (bm.get("tldr") or []) if str(t).strip()]
-        # 설명은 지어내지 않는다 — 그 호의 tldr 을 그대로 잇는다(값 무변형).
+        url = f"{base_url}/{LANG_PREFIXES[lang]}briefs/{pub}/"
+        # 설명은 지어내지 않는다 — 그 호의 tldr 을 **읽는 언어로** 그대로 잇는다.
+        tldr = [t for t in _brief_tldr(bm, lang) if str(t).strip()]
         desc = " · ".join(str(t).strip() for t in tldr)
         lines += [
             "    <item>",
-            f"      <title>{_x(f'GRM 주간 브리프 Vol.{nums.get(pub, 0)} ({pub})')}</title>",
+            f"      <title>{_x(tr('GRM 주간 브리프 Vol.{no} ({date})', no=nums.get(pub, 0), date=pub))}</title>",
             f"      <link>{url}</link>",
             f'      <guid isPermaLink="true">{url}</guid>',
             f"      <pubDate>{rfc822_date(pub)}</pubDate>",
@@ -3614,11 +3683,14 @@ def build_glossary_term_json_ld(term: dict[str, Any],
     """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
 
     inLanguage 은 **그 페이지의 언어**다. `name` 은 그 언어의 표제어,
-    `alternateName` 은 한국어판에서만 영문 표제어(+동의어)를 싣는다.
+    `alternateName` 은 한국어판이면 영문 표제어(+동의어), 영어판이면 화면에 실린
+    동의어(한글 표기는 뷰가 이미 걸러 냈다 — 영어 구조화 데이터에 한국어를 넣지
+    않는다는 판단은 그대로다).
     값은 전부 정본 무변형이고 json.dumps 가 이스케이프를 책임진다(수동 문자열 결합 0).
     """
-    # 한국어판은 영문 표제어를 대체명으로 싣는다. 영어판은 표제어가 곧 영문이라
-    # 대체명이 없다(한국어 표기를 영어 구조화 데이터에 넣지 않는다).
+    # 한국어판은 영문 표제어를 대체명 맨 앞에 싣는다(term_sub 는 한국어판에만 있다).
+    # 두 트리 모두 그 뒤에 **화면과 같은 동의어 목록**을 잇는다 — 구조화 데이터가
+    # 화면보다 더 말하거나 덜 말하면 그 자체가 어긋난 신호다.
     alt = ([term["term_sub"], *term.get("aliases", [])]
            if term.get("term_sub") else list(term.get("aliases") or []))
     node: dict[str, Any] = {
@@ -3712,8 +3784,14 @@ LIBRARY_DESCRIPTION = N_("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내�
                          "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
 GUIDE_DESCRIPTION = N_("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
                        "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
-RSS_TITLE = "GRM 주간 브리프 · 글로벌 규제 인텔리전스"
-RSS_DESCRIPTION = ("전 세계·국내 제약 GMP/품질 규제 소식을 매주 한국어로 정리해 드립니다. "
+# [다국어 2026-09-05] 채널 문구도 사전을 탄다. 종전 주석은 "RSS 는 한국어 채널이라
+# 그대로 둔다(영어 피드는 별도 결정)"였는데, 영문 브리프 10호가 서면서 그 결정을 내릴
+# 때가 됐다 — 그때까지 **영어 4천 장이 전부 한국어 피드를 자기 대체본이라고 말하고
+# 있었다**(`<language>ko</language>`, 한국어 제목). 설명문의 "한국어로 정리"가 영어
+# 사전에서는 "in English"가 되는데, 그건 번역 오류가 아니라 각 피드가 자기 언어를
+# 정확히 말하는 것이다.
+RSS_TITLE = N_("GRM 주간 브리프 · 글로벌 규제 인텔리전스")
+RSS_DESCRIPTION = N_("전 세계·국내 제약 GMP/품질 규제 소식을 매주 한국어로 정리해 드립니다. "
                    "FDA·EMA·식약처·캐나다 보건부 등의 공개 자료가 원천입니다.")
 GLOSSARY_DESCRIPTION = N_("제약 GMP·규제 용어사전 — GMP·CAPA·데이터 완전성·무균 공정·ICH 등 "
                           "핵심 용어를 쉬운 풀이와 공식 출처로 설명합니다.")
@@ -3924,6 +4002,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (아래 `en_paths = en_tree_paths(catalogs)`). 첫 렌더(랜딩)는 그 뒤라 항상 채워져 있고,
     # 어긋나면 `WebEnTreeTest.test_emitted_en_paths_match_the_declared_set` 이 잡는다.
     en_paths: set[str] = set()
+    # 영어 피드가 실제로 나오는가 — `en_brief_slugs` 확정 직후 채워진다(en_paths 와 같은
+    # 관례: 클로저는 호출 시점의 값을 읽는다). 영어 피드가 없으면 영어 페이지는 피드
+    # 링크를 아예 걸지 않는다 — 한국어 피드를 자기 대체본이라고 말하지 않기 위해서다.
+    en_feed = False
 
     # 페이지 주소는 전부 page() 한 곳에서 나온다 — 렌더 호출마다 rel_root·출력 경로·
     # canonical 을 손으로 적지 않는다(PagePath). 언어 트리마다 같은 헬퍼를 다시 만든다
@@ -3952,6 +4034,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 "rel_root": pp.rel_root, "asset_root": pp.asset_root, "lang": pp.lang,
                 "canonical": pp.canonical, "latest_slug": latest_slug,
                 "alternates": alts, "en_paths": en_paths,
+                # 자기 언어의 피드만 가리킨다. 영어 피드가 없으면 빈 문자열 —
+                # 한국어 피드를 영어 페이지의 대체본이라고 말하지 않는다.
+                "rss_href": ("/rss.xml" if pp.lang == DEFAULT_LANG
+                             else ("/en/rss.xml" if en_feed else "")),
                 # 헤더 전환 버튼이 쓸 "다른 언어" 하나(짝이 없으면 None → 버튼 미출력).
                 "alt_other": next((a for a in alts if not a["current"]), None),
                 **ctx,
@@ -4083,6 +4169,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_brief_slugs = {b["brief"].get("publish_date", "") for b in briefs
                       if brief_has_english(b)}
     en_brief_slugs.discard("")
+    en_feed = bool(en_brief_slugs)
     if en_brief_slugs:
         en_paths |= {f"briefs/{s}/" for s in en_brief_slugs}
         en_paths.add("archive/")
@@ -5058,6 +5145,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     search_index = build_search_index(briefs, issue_no_by_date, latest_slug)
     _write_json(dist_assets / "search-index.json", search_index)
     written.append("assets/search-index.json")
+    # 영어 인덱스 — 파일 이름으로 언어를 가른다(`archive.js` 가 `<html lang>` 을 보고
+    # 고른다). 자산은 언어 트리 밖 `/assets/` 공용이라 트리마다 두지 않는다.
+    # 낼 호가 없으면 파일도 만들지 않는다 — 그때 영문 아카이브 검색은 조용히 빈 결과를
+    # 내는 대신 **한국어 인덱스로 폴백하지 않는다**(그게 지금까지의 결함이었다).
+    search_index_en = build_search_index(briefs, issue_no_by_date, latest_slug,
+                                         tr=en_tr, lang="en")
+    if search_index_en is not None:
+        _write_json(dist_assets / "search-index.en.json", search_index_en)
+        written.append("assets/search-index.en.json")
 
     # 마이페이지(/me) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
     # 개인화 페이지라 sitemap/canonical 제외(비색인). 스크랩·관심 업체는 reactions.js 가,
@@ -5167,17 +5263,27 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 화면 스크립트용 사전(`assets/i18n-en.js`)과 영어 환경(en_tr·en_page·en_emit)은
     # 자산 복사 직후에 이미 만들었다(위 참조). 여기서는 남은 셸 페이지만 그린다.
     # 자료실 카탈로그(카피가 사전을 타므로 영어로 다시 읽은 `en_catalogs`)와 그 변경
-    # 이력 뷰도 위 카탈로그 로드 자리에서 함께 만들었다 — 아카이브·브리프가 먼저 쓴다.
-    en_emit("landing_en.html", en_page(""),
-        # ★`en_tr(...)` 는 추출기의 함수 목록(tr/N_)에 없어 키로 잡히지 않는다 — 영어 전용
-        #   문구는 `N_()` 로 등록해야 카탈로그 결손 검사가 본다(안 그러면 렌더 시점에야 터진다).
+    # 이력 뷰는 **위 카탈로그 로드 자리에서** 함께 만들었다 — 아카이브·브리프가 먼저 쓴다.
+    # [다국어 2026-09-05] 영어 홈 = **한국어와 같은 템플릿**. 히어로 표지는 영문으로 낼 수
+    # 있는 가장 최근 호에서 뽑는다(한국어 최신호가 영어에 없을 수 있다 — 그때 한국어 표지를
+    # 실으면 영어 홈 첫 화면이 한국어가 된다).
+    en_cover_brief = max(
+        (b for b in briefs if brief_has_english(b)),
+        key=lambda b: b["brief"].get("publish_date", ""), default=None)
+    en_emit("landing.html", en_page(""),
         page_title=en_tr(N_("GRM · 글로벌 규제 인텔리전스 · 영문판")),
         nav_active="home",
         description=en_tr(SITE_DESCRIPTION),
         json_ld=build_json_ld(tr=en_tr, lang="en"),
-        findings_zone=findings_zone,
+        # 낼 호가 없으면 None — 템플릿이 히어로의 표지 조각만 생략한다(한국어 표지를
+        # 대신 싣지 않는다). 픽스처 빌드가 정확히 그 경우다.
+        cover=(_cover_context(
+            en_cover_brief,
+            issue_no_by_date[en_cover_brief["brief"]["publish_date"]],
+            en_tr, "en") if en_cover_brief is not None else None),
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
+        findings_zone=findings_zone,
     )
     en_emit("findings.html", en_page("findings/"),
         zone_totals=findings_zone,
@@ -5274,8 +5380,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [검색 유입] RSS — 네이버 서치어드바이저가 사이트맵과 **별개로 받는 채널**이고,
     # 피드 리더·사내 그룹웨어 위젯에도 그대로 쓰인다. 내용은 주간 브리프로 한정한다
     # (지적사항 문서는 시간순 발행물이 아니라 참조 자료라 sitemap 의 몫이다).
-    _write(out_dir / "rss.xml", build_rss_xml(briefs))
+    _write(out_dir / "rss.xml", build_rss_xml(briefs, tr=tr, lang=DEFAULT_LANG))
     written.append("rss.xml")
+    # 영어 피드 — 낼 호가 하나도 없으면 파일을 만들지 않는다(빈 피드는 구독자에게
+    # "이 서비스는 아무것도 안 낸다"고 말한다). 그때는 영어 페이지가 피드 링크 자체를
+    # 걸지 않는다(`rss_href` 가 빈 문자열 → base.html 이 태그를 생략).
+    _en_rss = build_rss_xml(briefs, tr=en_tr, lang="en")
+    if _en_rss:
+        _write(out_dir / "en" / "rss.xml", _en_rss)
+        written.append("en/rss.xml")
 
     # 404 는 그 트리 루트의 파일 하나(`/404.html`)라 홈과 같은 깊이로 그린다(rel_root = 루트).
     # [다국어 6단계 2026-09-04] 영어판도 같은 자리에 그린다(`/en/404.html`) — Cloudflare 는

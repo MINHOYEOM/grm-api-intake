@@ -403,7 +403,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section">
             <h3>방문 · 유입 경로</h3>
-            <p class="admin-section-sub">Cloudflare Web Analytics 실측(검색로봇 제외)을 매일 새벽 1시 30분에 가져옵니다. 날짜는 협정시(UTC) 기준이라 한국 시각으로는 그날 오전 9시부터 다음날 오전 9시까지를 담습니다 — 업무시간 방문은 같은 날짜에 들어갑니다.</p>
+            <p class="admin-section-sub">Cloudflare Web Analytics 실측(검색로봇 제외·자동화 브라우저 제외)을 매일 새벽 1시 30분에 가져옵니다. 날짜는 협정시(UTC) 기준이라 한국 시각으로는 그날 오전 9시부터 다음날 오전 9시까지를 담습니다 — 업무시간 방문은 같은 날짜에 들어갑니다.</p>
+            <p class="admin-section-sub" id="grm-rum-precision">정밀도 확인 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>날짜</th><th>방문</th><th>페이지뷰</th><th>구글</th><th>네이버</th><th>AI 검색</th><th>직접 방문</th></tr></thead>
@@ -413,11 +414,22 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
             <h3>어느 페이지로 들어오나 — 최근 7일 합계</h3>
-            <p class="admin-section-sub">방문자가 사이트에서 처음 연 페이지입니다. 어느 섹션이 실제로 사람을 데려오는지 보여줍니다(개인정보 보호를 위해 물음표 뒤 조회어는 저장하지 않습니다). <b>주의</b> — 경로별 수치는 Cloudflare가 10단위로 반올림해서 줍니다. 하루 5건 미만인 페이지는 0으로 사라지므로, 목록에 없다고 방문이 없는 것은 아닙니다. 위 방문 표의 합계가 정확한 값입니다.</p>
+            <p class="admin-section-sub">방문자가 사이트에서 처음 연 페이지입니다. 어느 섹션이 실제로 사람을 데려오는지 보여줍니다(개인정보 보호를 위해 물음표 뒤 조회어는 저장하지 않습니다). Cloudflare가 표본추출을 걸면 값이 10단위로 반올림되고, 그러면 하루 5건 미만인 페이지가 0으로 사라져 목록에 없다고 방문이 없는 것은 아닙니다 — 그때는 바로 아래 줄이 '표본 추정'이라고 알려줍니다.</p>
+            <p class="admin-section-sub" id="grm-rum-paths-precision">정밀도 확인 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>페이지</th><th>구역</th><th>방문</th></tr></thead>
                 <tbody id="grm-rum-paths"><tr><td colspan="3"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
+            <h3>구독은 어느 구역에서 눌렀나</h3>
+            <p class="admin-section-sub">구독 제출이 일어난 페이지의 최상위 구역입니다(누적). 밴드와 CTA는 모든 한국어 페이지에 있어서, 이 표가 없으면 "어디서 구독했나"에 답할 자료가 없습니다. 개인정보 보호를 위해 경로의 첫 조각만 남깁니다. 2026-09-05 이전 제출은 이 기록이 없어 집계에 빠져 있습니다.</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>구역</th><th>밴드 제출</th><th>CTA 제출</th><th>합계</th></tr></thead>
+                <tbody id="grm-funnel-zones"><tr><td colspan="4"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
               </table>
             </div>
           </div>

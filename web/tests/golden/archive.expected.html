@@ -164,7 +164,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=6dea54a3" defer></script>
-<script src="/assets/archive.js?v=6c6549fe" defer></script>
+<script src="/assets/archive.js?v=1c1593c5" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}
@@ -202,14 +202,15 @@ body.grm-has-share .grm-card-actions{display:flex}
 </script>
 <script>
 (function(){
-  var p=location.pathname,h=location.hostname;
+  var p=location.pathname,h=location.hostname,ua=navigator.userAgent||'';
   var admin=p==='/admin'||p.indexOf('/admin/')===0;
+  var auto=navigator.webdriver===true||/\bHeadless|\bClaude\//.test(ua);
   var op=false;
   try{
     if(admin)localStorage.setItem('grm-op','1');
     op=localStorage.getItem('grm-op')==='1';
   }catch(e){}
-  if(admin||op)return;
+  if(admin||op||auto)return;
   if(h!=='grm-solutions.com'&&h!=='www.grm-solutions.com')return;
   var s=document.createElement('script');
   s.src='https://static.cloudflareinsights.com/beacon.min.js';

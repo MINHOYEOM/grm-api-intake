@@ -36,6 +36,7 @@ sys.path.insert(0, str(REPO_ROOT))
 import render  # noqa: E402  (web/render.py — 경로 삽입 후 import)
 import grm_i18n  # noqa: E402  (web/grm_i18n.py — 다국어 문구 사전·검사기)
 import grm_findings  # noqa: E402  (FIND-1 M6d 카테고리 라벨 동기화 대조용)
+import collect_rum_analytics as rum_collector  # noqa: E402  (RUM 수집기 — 순수 함수 계약)
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
 GOLDEN_DIR = TESTS_DIR / "golden"
@@ -322,6 +323,158 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
                     "assets/search-index.json", "sitemap.xml", "robots.txt",
                     "llms.txt"):
             self.assertTrue((self.out / rel).exists(), f"라이브 렌더 누락: {rel}")
+
+    # ── 언어판 (라이브 데이터에서만 보이는 것들) ────────────────────────────
+    #: 영어 짝이 **없어도 되는** 한국어 최상위 섹션. 지금은 비어 있다(§7 완료).
+    #: 여기에 무언가를 더할 때는 왜 영어로 낼 수 없는지를 함께 적는다 — 빈 채로 두는
+    #: 것이 정상이고, 채워지는 순간 그건 되돌릴 일이 생겼다는 뜻이다.
+    KO_ONLY_SECTIONS: tuple[str, ...] = ()
+
+    def test_every_korean_section_has_an_english_counterpart(self):
+        """★[2026-09-05] 종전엔 "영어에 아직 없는 섹션" **손목록**을 픽스처 빌드에서 봤다.
+        픽스처에는 영문 브리프가 하나도 없어, 영문 아카이브가 실제로 선 뒤에도 그 가드는
+        "아카이브는 영어에 없다"를 **초록으로 통과**시켰다 — 검사가 자기 모집단에서
+        반례를 먼저 지운 것이다. 그래서 라이브 데이터 빌드에서, 목록이 아니라 성질로 본다.
+
+        섹션이란 한국어 트리의 최상위 디렉터리다(`briefs/` 는 색인이 없고 `archive/` 가
+        그 자리라 대상이 아니다). 낱장까지 짝을 요구하지는 않는다 — 원문이 한국어인
+        문서에는 영어판이 없는 것이 옳다.
+        """
+        ko_sections = {
+            p.relative_to(self.out).parts[0] + "/"
+            for p in self.out.rglob("index.html")
+            if p.parent != self.out and p.relative_to(self.out).parts[0] != "en"}
+        self.assertGreater(len(ko_sections), 4, "섹션을 못 찾았다 — 추출이 깨졌나?")
+        missing = sorted(
+            sec for sec in ko_sections
+            if sec not in self.KO_ONLY_SECTIONS
+            and (self.out / sec).is_dir()
+            and (self.out / sec / "index.html").is_file()
+            and not (self.out / "en" / sec / "index.html").is_file())
+        self.assertEqual(missing, [], f"영어 짝이 없는 섹션: {missing}")
+
+    def test_home_is_the_same_page_in_both_languages(self):
+        """★[2026-09-05] 영어 홈은 `landing_en.html` 이라는 **별도 템플릿**이었다. 그때는
+        영문 브리프가 0호라 히어로에 실을 표지가 없었기 때문인데, 그 사이 10호가 서면서
+        전제가 사라졌는데도 템플릿은 둘로 남아 있었다 — 한국어 홈에는 있는 기능 소개·
+        인기 카드가 영어 홈에는 없었고, 사용자가 "차이가 꽤 많다"고 본 게 바로 이것이다.
+
+        구조 서명(클래스 멀티셋)으로 본다 — **글자는 달라야 하고 구조는 같아야 한다**는
+        요구를 기계가 볼 수 있게 만든 형태다. 라이브 데이터에서 봐야 표지까지 포함해
+        엄격하게 대조된다.
+        """
+        ko = class_signature((self.out / "index.html").read_text(encoding="utf-8"))
+        en = class_signature((self.out / "en" / "index.html").read_text(encoding="utf-8"))
+        diff = sorted(c for c in set(ko) | set(en)
+                      if ko.get(c, 0) != en.get(c, 0)
+                      and c not in INTENTIONAL_CLASS_DIFFS)
+        self.assertEqual(diff, [], f"홈 구조가 갈라졌다: {diff[:8]}")
+        self.assertGreater(len(ko), 30, "서명이 비었다 — 추출이 깨졌나?")
+
+    def test_english_home_cover_comes_from_an_english_issue(self):
+        """표지는 **그 언어로 낼 수 있는 최신 호**에서 온다. 한국어 최신호가 영어에 없을 수
+        있고(2026-06-22 가 그렇다), 그때 한국어 표지를 실으면 영어 홈 첫 화면이 한국어가
+        된다 — 홈은 첫 접점이라 그 한 장이 서비스 전체의 인상을 정한다."""
+        html = (self.out / "en" / "index.html").read_text(encoding="utf-8")
+        m = re.search(r'href="briefs/(\d{4}-\d{2}-\d{2})/index\.html"', html)
+        self.assertIsNotNone(m, "영어 홈 히어로에 브리프 CTA 가 없다")
+        pub = m.group(1)
+        en_pubs = {b["brief"]["publish_date"] for b in render.load_briefs(DATA_DIR)
+                   if render.brief_has_english(b)}
+        self.assertIn(pub, en_pubs, f"영어 홈이 영어판 없는 호({pub})를 가리킨다")
+        self.assertEqual(pub, max(en_pubs), "영어로 낼 수 있는 최신 호가 아니다")
+        body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->",
+                      " ", html)
+        self.assertEqual(
+            [w for w in re.findall("[가-힣]+", re.sub(r"<[^>]+>", " ", body))
+             if w != "한국어"], [], "영어 홈에 한국어가 남았다")
+
+    def test_english_search_index_exists_and_matches_the_english_issues(self):
+        """★영문 아카이브가 **한국어 인덱스를 검색**하고 있었다. `archive.js` 가 자기
+        스크립트 경로에서 인덱스 URL 을 만들기 때문에 두 트리가 같은 파일을 읽었고,
+        화면은 영어인데 결과 카드와 필터 라벨이 한국어로 떴다. HTML 에는 없는 내용이라
+        지금까지의 어떤 정적 검사도 이걸 볼 수 없었다."""
+        f = self.out / "assets" / "search-index.en.json"
+        self.assertTrue(f.is_file(), "영어 검색 인덱스가 없다")
+        idx = json.loads(f.read_text(encoding="utf-8"))
+        briefs = render.load_briefs(DATA_DIR)
+        want = {b["brief"]["publish_date"] for b in briefs
+                if render.brief_has_english(b)}
+        self.assertEqual({i["date"] for i in idx["issues"]}, want)
+        nums = render.assign_issue_numbers(briefs)
+        for row in idx["issues"]:
+            self.assertEqual(row["issue_no"], nums[row["date"]],
+                             "영어 인덱스가 호 번호를 다시 매겼다")
+        self.assertEqual(
+            [m for m in idx["facets"]["modalities"] if re.search("[가-힣]", m)],
+            [], "제형 필터 라벨이 한국어로 남았다")
+
+    def test_english_index_carries_korean_only_where_a_name_is_korean(self):
+        """★한국 업체·기관의 **실명**은 원문 그대로 둔다 — 옮기면 존재하지 않는 이름을
+        가리키게 된다(용어사전 출처·자료실 원제와 같은 판단). 그래서 이름이 들어가는
+        두 슬롯만 예외로 두고, **그 밖의 어떤 필드에도** 한국어가 있으면 잡는다."""
+        idx = json.loads((self.out / "assets" / "search-index.en.json")
+                         .read_text(encoding="utf-8"))
+        name_slots = {"target", "text"}     # text 는 target 을 포함하는 검색용 결합값
+        leaked = sorted({
+            k for c in idx["cards"] for k, v in c.items()
+            if k not in name_slots and isinstance(v, str) and re.search("[가-힣]", v)})
+        self.assertEqual(leaked, [], f"영어 인덱스에 한국어 필드: {leaked}")
+        self.assertTrue(idx["cards"], "카드가 비었다 — 이 가드가 아무것도 안 지킨다")
+
+    def test_archive_script_picks_the_index_by_document_language(self):
+        """경로를 파싱하지 않고 `<html lang>` 하나만 본다 — 언어 트리가 늘어도 낡지 않는다."""
+        js = (WEB_DIR / "assets" / "archive.js").read_text(encoding="utf-8")
+        self.assertIn("documentElement.getAttribute(\"lang\")", js)
+        self.assertIn("search-index.en.json", js)
+        for rel in ("assets/search-index.json", "assets/search-index.en.json"):
+            self.assertTrue((self.out / rel).is_file(), f"인덱스 누락: {rel}")
+
+    def test_english_feed_exists_and_speaks_english(self):
+        """★영어 4천 장이 **한국어 피드**(`<language>ko</language>`·한국어 제목)를 자기
+        대체본이라고 말하고 있었다. 피드 리더는 그 선언을 그대로 믿는다."""
+        en_rss = self.out / "en" / "rss.xml"
+        self.assertTrue(en_rss.is_file(), "영문 브리프가 있는데 영어 피드가 없다")
+        xml = en_rss.read_text(encoding="utf-8")
+        self.assertIn("<language>en</language>", xml)
+        self.assertIn(f'href="{render.SITE_BASE_URL}/en/rss.xml" rel="self"', xml)
+        self.assertEqual(re.findall("[가-힣]+", xml), [], "영어 피드에 한국어가 남았다")
+        for loc in re.findall(r"<link>(\S+?)</link>", xml):
+            self.assertTrue(loc.startswith(f"{render.SITE_BASE_URL}/en/"), loc)
+
+    def test_english_feed_carries_only_issues_that_exist_in_english(self):
+        """한국어 호를 영어 피드에 끼워 넣으면 구독자에게 한국어 제목이 뜬다 —
+        화면에서 반쪽 영어를 금지한 이유와 같다. ★호 번호는 **다시 매기지 않는다**:
+        같은 브리프가 두 언어에서 다른 Vol. 을 가지면 사람이 서로를 못 찾는다."""
+        briefs = render.load_briefs(DATA_DIR)
+        want = {b["brief"]["publish_date"] for b in briefs if render.brief_has_english(b)}
+        self.assertTrue(want, "영문 브리프가 하나도 없다 — 이 가드가 아무것도 안 지킨다")
+        xml = (self.out / "en" / "rss.xml").read_text(encoding="utf-8")
+        got = set(re.findall(r"/en/briefs/(\d{4}-\d{2}-\d{2})/</link>", xml))
+        self.assertEqual(got, want)
+        nums = render.assign_issue_numbers(briefs)
+        for pub in sorted(want):
+            self.assertIn(f"Vol.{nums[pub]} ({pub})", xml,
+                          f"{pub}: 영어 피드가 호 번호를 다시 매겼다")
+
+    def test_each_tree_points_at_its_own_feed(self):
+        ko = (self.out / "index.html").read_text(encoding="utf-8")
+        en = (self.out / "en" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('type="application/rss+xml" title="GRM 주간 브리프" '
+                      'href="/rss.xml"', ko)
+        self.assertIn('type="application/rss+xml" title="GRM Weekly Brief" '
+                      'href="/en/rss.xml"', en)
+
+    def test_no_english_briefs_means_no_feed_and_no_link(self):
+        """★빈 피드를 내지 않는다 — 구독자에게 "이 서비스는 아무것도 안 낸다"고 말하는
+        꼴이고, 한국어 피드를 대신 가리키면 영어 독자가 읽을 수 없는 것을 구독한다.
+        (합성 입력으로 확인한다 — 라이브에 영문 호가 있다고 이 경로가 죽은 게 아니다.)"""
+        ko_only = [b for b in render.load_briefs(DATA_DIR)
+                   if not render.brief_has_english(b)]
+        self.assertTrue(ko_only, "영어가 없는 호가 없다 — 합성 대신 실물로 못 본다")
+        self.assertEqual(render.build_rss_xml(ko_only, tr=render._KO, lang="en"), "")
+        self.assertTrue(render.build_rss_xml(ko_only, tr=render._KO).strip())
+
 
     def test_every_live_brief_has_a_page(self):
         briefs = render.load_briefs(DATA_DIR)
@@ -7231,6 +7384,28 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertLess(fscript.index("hn!=='grm-solutions.com'"),
                         fscript.index("rpc/funnel_bump"),
                         "호스트 판정이 전송(fetch)보다 뒤다")
+        # 자동화 브라우저 제외 — RUM 게이트(2026-09-05)와 같은 판정. 노출(view) 카운터가
+        # JS 실행 크롤러로 부푸는 경로를 일부 막는다(일 170 vs 실방문 21 — 2026-09-01 실측).
+        self.assertIn("navigator.webdriver===true", fscript,
+                      "깔때기 bump 에 자동화 브라우저 제외가 없다")
+        self.assertLess(fscript.index("navigator.webdriver"),
+                        fscript.index("rpc/funnel_bump"),
+                        "자동화 판정이 전송(fetch)보다 뒤다")
+        # [076] 제출은 구역을 함께 남긴다 — "어디서 구독했나"에 답할 유일한 자료.
+        self.assertIn("rpc/funnel_zone_bump", fscript)
+        self.assertIn("JSON.stringify({p_key:key,p_zone:zone()})", fscript)
+        # ★노출(view)은 보내지 않는다 — 요청이 두 배가 되고, 노출은 크롤러 오염이라
+        # 구역별로 갈라도 못 읽는다. 조건이 제출 두 키로 좁혀져 있어야 한다.
+        self.assertIn("key==='band_submit'||key==='cta_submit'", fscript)
+        # ★구역은 경로 첫 조각뿐 — 쿼리스트링이 실리면 URL 에 든 실명이 DB 로 간다.
+        # ★"}" 로 자르면 안 된다 — 정규식 `{1,24}` 안에 그 문자가 있어서 함수 본문이
+        # 정규식 앞에서 잘린다(2026-09-05 CI 가 잡았다). 다음 함수 선언으로 자른다.
+        zone_fn = fscript.split("function zone()", 1)[1].split("function bump(", 1)[0]
+        self.assertIn("location.pathname", zone_fn)
+        self.assertIn("split('/')[1]", zone_fn)
+        self.assertNotIn("location.search", zone_fn)
+        self.assertNotIn("location.href", zone_fn)
+        self.assertIn("/^[a-z0-9-]{1,24}$/", zone_fn)
 
 
 class WebAdminRenderTest(unittest.TestCase):
@@ -7390,7 +7565,7 @@ class WebCloudflareBeaconGateTest(unittest.TestCase):
     def test_gate_decides_before_injecting(self):
         # 판정 3종이 전부 주입 URL 보다 앞 — 게이트를 주입 뒤로 옮기면(=무력화) 여기서 red.
         inject = self.landing.index("static.cloudflareinsights.com/beacon.min.js")
-        self.assertLess(self.landing.index("if(admin||op)return;"), inject)
+        self.assertLess(self.landing.index("if(admin||op||auto)return;"), inject)
         self.assertLess(
             self.landing.index("if(h!=='grm-solutions.com'&&h!=='www.grm-solutions.com')return;"),
             inject)
@@ -7398,6 +7573,31 @@ class WebCloudflareBeaconGateTest(unittest.TestCase):
         # 운영자 판정 재료 — 플래그 조회 + /admin 방문 즉시 세팅(첫 admin 방문도 비집계).
         self.assertIn("localStorage.getItem('grm-op')==='1'", self.landing)
         self.assertIn("localStorage.setItem('grm-op','1')", self.landing)
+
+    def test_automation_browsers_are_excluded(self):
+        """★우리 자신의 트래픽을 우리 지표에서 뺀다.
+
+        2026-09-04 실측: 라이브에서 404 를 점검하던 개발용 인앱 브라우저가 그날 방문
+        표본 6건 중 2건으로 잡혔다(`/findings/doc/zzz-none/` — 그 슬러그는 그날 커밋
+        메시지에만 있는 가짜라 외부 방문일 수 없다).
+
+        ★navigator.webdriver 만으로는 못 잡는다 — 그 브라우저는 값이 **false** 다
+        (2026-09-05 실측 · UA 는 `Claude/1.46388.3`). 자기를 밝히는 UA 표식을 함께
+        본다. Cloudflare 의 bot 필터를 대신하려는 것이 아니다(남을 속이는 크롤러는
+        여전히 그쪽 몫) — 목적은 우리 손이 만든 트래픽을 우리 계기에서 빼는 것뿐이다.
+        """
+        inject = self.landing.index("static.cloudflareinsights.com/beacon.min.js")
+        self.assertIn("var auto=", self.landing)
+        expr = self.landing.split("var auto=", 1)[1].split(";", 1)[0]
+        self.assertIn("navigator.webdriver===true", expr)
+        self.assertIn("Claude", expr, "인앱 브라우저 표식이 없다 — webdriver 는 false 다")
+        self.assertIn("Headless", expr)
+        self.assertLess(self.landing.index("var auto="), inject,
+                        "자동화 판정이 주입보다 뒤다 — 비콘이 먼저 나간다")
+        # ★계산만 하고 안 쓰면 게이트가 아니다 — 주입 전에 auto 가 조기 return 에 실려야 한다.
+        guard = self.landing[self.landing.index("var auto="):inject]
+        self.assertRegex(guard, r"if\([^)]*\bauto\b[^)]*\)return;",
+                         "auto 를 계산만 하고 판정에 쓰지 않는다")
 
     def test_beacon_injection_is_dynamic_only(self):
         # 정적 태그(엣지 자동 주입과 같은 형태)로 "단순화"하면 게이트가 통째로 우회된다 —
@@ -14006,6 +14206,8 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
                       "060_subscribe_funnel_counts.sql").read_text(encoding="utf-8")
         cls.mig071 = (WEB_DIR / "migrations" /
                       "071_funnel_counts_daily.sql").read_text(encoding="utf-8")
+        cls.mig076 = (WEB_DIR / "migrations" /
+                      "076_funnel_zone_counts.sql").read_text(encoding="utf-8")
 
     def _check_keys(self, sql):
         m = re.search(r"key in \(([^)]*)\)", sql)
@@ -14016,6 +14218,7 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         expected = {"band_view", "band_submit", "cta_view", "cta_submit", "cta_dismiss"}
         self.assertEqual(self._check_keys(self.mig060), expected, "060 CHECK 어휘")
         self.assertEqual(self._check_keys(self.mig071), expected, "071 CHECK 어휘")
+        self.assertEqual(self._check_keys(self.mig076), expected, "076 CHECK 어휘")
         block = self.admin_js.split("var FUNNEL_KEYS = [", 1)[1].split("];", 1)[0]
         client = set(re.findall(r'"([a-z_]+)"', block))
         self.assertEqual(client, expected, "admin.js FUNNEL_KEYS 가 060/071 CHECK 와 다름")
@@ -14035,6 +14238,35 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         handler = handler.split("});", 1)[0]
         self.assertIn("loadGrowth()", handler)
         self.assertIn("loadRum()", handler)
+
+    def test_zone_axis_answers_where_the_subscribe_happened(self):
+        """★2026-09-04 실측: 구독 2건은 시각이 초 단위로 남았는데(17:07 CTA · 17:09 밴드)
+        **어느 페이지에서 눌렀는지는 어디에도 없었다** — 밴드·CTA 는 전 한국어 페이지에
+        있고 060 은 키 문자열 하나만 보내기 때문이다. 076 이 그 빈칸을 메운다.
+
+        ★구역은 경로의 첫 조각이다 — 손으로 적은 구역 목록을 두지 않는다(목록은 라우트가
+        늘면 조용히 낡는다). 대신 형식 제약 + 구역 수 상한으로 남용을 유한하게 막는다.
+        """
+        self.assertIn("create table if not exists public.funnel_zone_counts", self.mig076)
+        self.assertIn("zone ~ '^[a-z0-9-]{1,24}$'", self.mig076,
+                      "구역 형식 제약이 없다 — anon RPC 가 열린 문자열을 받는다")
+        self.assertIn("cap constant integer", self.mig076,
+                      "구역 수 상한이 없다 — 쓰레기 구역을 무한히 만들 수 있다")
+        # 읽기는 로그인뿐(운영 지표 — 072/073 과 같은 규칙) · 쓰기는 RPC 뿐.
+        self.assertIn("grant select on public.funnel_zone_counts to authenticated", self.mig076)
+        self.assertNotIn("grant insert", self.mig076)
+        self.assertIn("grant execute on function public.funnel_zone_bump(text, text) "
+                      "to anon, authenticated", self.mig076)
+        # 화면은 읽기만 한다.
+        self.assertIn('from("funnel_zone_counts").select', self.admin_js)
+        for banned in ('from("funnel_zone_counts").insert',
+                       'from("funnel_zone_counts").upsert',
+                       'from("funnel_zone_counts").delete'):
+            self.assertNotIn(banned, self.admin_js)
+        self.assertIn('id="grm-funnel-zones"', self.admin_html)
+        self.assertIn("renderFunnelZones", self.admin_js)
+        # 라벨이 낡아도 값이 사라지면 안 된다 — 모르는 슬러그는 그대로 보여준다.
+        self.assertIn("ZONE_LABELS[r.zone] || r.zone", self.admin_js)
 
     def test_snapshot_write_path_is_cron_only(self):
         self.assertIn("enable row level security", self.mig071)
@@ -14208,7 +14440,9 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn("bot: 0", collector)
         # ★일 단위로 받는다 — 시간 단위는 버킷마다 반올림이 걸려 작은 시간대가 사라진다
         # (2026-09-02 실측: 대시보드 7일 264 vs 시간합산 9일 250, 9/1 은 60 vs 20).
-        self.assertIn("dimensions { date }", collector)
+        # 차원의 단일 원천은 GROUPS 표다(쿼리는 거기서 조립된다).
+        self.assertEqual(rum_collector.GROUPS["totals"][1], "date")
+        self.assertIn("dimensions { date }", rum_collector.build_query("totals"))
         self.assertNotIn("datetimeHour", collector.split('"""', 2)[2])
         # 축(UTC)은 단정하지 말고 밝힌다 — 화면이 근사임을 말해야 한다.
         self.assertIn("협정시(UTC) 기준", self.admin_html)
@@ -14266,6 +14500,87 @@ class WebAdminRumPanelTest(unittest.TestCase):
         for specific in ("업체 프로파일", "실사관 프로파일", "지적사항 문서", "트렌드"):
             self.assertLess(labels.index(specific), labels.index("지적사항 검색"),
                             f"{specific} 규칙이 일반 규칙보다 뒤에 있다")
+
+    def test_groups_are_asked_in_separate_requests(self):
+        """그룹마다 별도 요청 — 요청을 싸게 유지한다.
+
+        ★효과는 **입증되지 않았다.** 처음엔 "073 이 경로 차원을 같은 쿼리에 붙여서
+        방문까지 표본으로 내려갔다"고 판정했지만(9/2 실행부터 정확값 0건·방문 합
+        264→210), 쪼갠 뒤 같은 코드·같은 창이 90분 간격으로 표본 간격 1.0~1.2 와
+        10~12.5 를 각각 줬다 — ABR 의 선택은 우리가 통제하는 축이 아니다.
+
+        그래도 이 계약을 잠그는 이유: 요청이 쌀수록 나쁠 것이 없고, 정밀도를 지키는
+        진짜 장치(sampleInterval 저장 + 하락 금지 래칫)와 같은 자리에서 깨지기 때문이다.
+        여기서 red 가 나면 "다시 한 쿼리로 묶었다"는 뜻이고, 그건 근거 없이 되돌린 것이다.
+        """
+        self.assertEqual(set(rum_collector.GROUPS), {"totals", "referrers", "paths"})
+        marks = {"referrers": "refererHost", "paths": "requestPath"}
+        for group in rum_collector.GROUPS:
+            q = rum_collector.build_query(group)
+            with self.subTest(group=group):
+                self.assertIn("avg { sampleInterval }", q, "정밀도를 같이 묻지 않는다")
+                self.assertIn("bot: 0", q)
+                for other, mark in marks.items():
+                    if other == group:
+                        self.assertIn(mark, q)
+                    else:
+                        self.assertNotIn(mark, q,
+                                         f"{group} 쿼리에 {mark} 가 섞였다 — 묶이면 함께 내려간다")
+
+    def test_sample_interval_is_recorded_not_assumed(self):
+        """정밀도를 저장하지 않으면 화면이 추정값을 정확값이라 부른다(2026-09-02~04 실사고)."""
+        mig = (WEB_DIR / "migrations" / "075_rum_sample_interval.sql").read_text(encoding="utf-8")
+        for table in ("rum_daily", "rum_referrer_daily", "rum_path_daily"):
+            self.assertIn(f"alter table public.{table}", mig)
+        # ★기본값 1(전수)을 주면 **가장 부정확한 옛 행에 가장 정확하다는 표식**이 붙는다.
+        # NULL=미상이어야 새 수집이 그 행을 이긴다.
+        self.assertNotIn("default 1", mig)
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("def sample_interval_of(", src)
+        for field in ("snap_date,metric,value,sample_interval",
+                      "snap_date,referer_host,visits,sample_interval",
+                      "snap_date,request_path,visits,sample_interval"):
+            self.assertIn(field, self.admin_js, "화면이 정밀도를 읽지 않는다")
+        self.assertIn('id="grm-rum-precision"', self.admin_html)
+        self.assertIn('id="grm-rum-paths-precision"', self.admin_html)
+
+    def test_precision_guard_never_downgrades_a_stored_day(self):
+        """★8일 롤링 재적재가 과거의 정확값을 표본 추정값으로 덮어썼다(8/25~9/1 파괴).
+
+        순수 함수라 값으로 직접 묻는다 — 문자열 대조로는 이 계약을 잴 수 없다.
+        """
+        keep = rum_collector.keep_days
+        self.assertEqual(keep({"d1": 10.0}, {"d1": 1.0}), ([], ["d1"]),
+                         "저장값이 더 정확한데 덮어쓴다")
+        self.assertEqual(keep({"d1": 1.0}, {"d1": 10.0}), (["d1"], []))
+        self.assertEqual(keep({"d1": 1.0}, {"d1": 1.0}), (["d1"], []))
+        # ★평균의 실행 간 흔들림(1.00↔1.16)으로 건너뛰면 **늦게 도착한 집계가 영영 못
+        # 들어온다** — 창을 8일로 잡은 목적 자체를 깬다. 막을 것은 자릿수 하락뿐.
+        self.assertEqual(keep({"d1": 1.16}, {"d1": 1.0}), (["d1"], []),
+                         "표본 간격 평균의 미세한 흔들림으로 지각 집계를 버린다")
+        self.assertEqual(keep({"d1": 2.0}, {"d1": 1.0}), ([], ["d1"]))
+        self.assertEqual(keep({"d1": 10.0}, {}), (["d1"], []), "저장된 적 없는 날은 써야 한다")
+        self.assertEqual(keep({"d1": 10.0}, {"d1": 1.0}, allow_downgrade=True), (["d1"], []))
+        # NULL(미상)은 무한대로 읽혀 새 수집이 이긴다 — 075 이전 행이 영구히 남지 않게.
+        self.assertEqual(keep({"d1": 10.0}, {"d1": float("inf")}), (["d1"], []))
+
+    def test_window_is_replaced_so_stale_rows_cannot_survive(self):
+        """upsert 만 하면 사라진 호스트의 옛 행이 남는다 — 2026-09-05 실측: 8/31 은
+        방문 20 인데 같은 날 리퍼러 행의 합이 43 이었다(서로 다른 실행의 잔재)."""
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("def replace_days(", src)
+        self.assertIn("requests.delete(", src)
+        self.assertNotIn("merge-duplicates", src)
+        self.assertNotIn("on_conflict=", src)
+        # ★지우는 날은 응답이 답한 날뿐 — API 침묵이 창을 비우면 안 된다.
+        self.assertIn("answered = sorted(daily)", src)
+
+    def test_admin_does_not_claim_exactness_it_cannot_know(self):
+        """★이 문구가 며칠간 거짓이었다 — 방문 표까지 10단위였는데 "정확한 값"이라 적었다."""
+        self.assertNotIn("위 방문 표의 합계가 정확한 값입니다", self.admin_html)
+        for needle in ("function rumPrecision(", "function precisionNote(",
+                       "setPrecisionNote(", "표본 추정", "정밀도 미상"):
+            self.assertIn(needle, self.admin_js)
 
     def test_workflow_uses_the_new_secret_and_no_arithmetic_in_expressions(self):
         """GHA 표현식에는 산술이 없다 — 창 경계는 셸에서 계산해야 한다."""
@@ -15630,6 +15945,128 @@ class WebEnGlossaryTest(unittest.TestCase):
         self.assertIn(f'hreflang="en" href="{render.SITE_BASE_URL}/en/glossary/{slug}/"',
                       ko, "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
 
+    # ── [동의어 2026-09-05] 영어판 "다른 표기" 칩 ────────────────────────────
+    # 영문 243장이 라이브가 된 뒤 실측하니 별칭 칩이 영어 트리에 **0개**였다(색인
+    # `gl-alias` KO 61 / EN 0, 낱말 페이지 `gt-alias` KO 1 / EN 0). 템플릿도 문구 사전도
+    # 멀쩡했고 — `{% if %}` 게이트와 "Also called"/"Also written" 번역은 이미 있었다 —
+    # 뷰가 `lang != "ko"` 에서 표시용 목록을 **통째로 빈 리스트로** 넘기고 있었다.
+    # 그래서 영어 독자가 FDA 문서에서 보고 온 이름(`cGMP`·`reserve sample`)이 영어
+    # 화면에는 한 번도 나오지 않았다. 정본 149개 중 109개가 비한글인데 0개였다.
+    # 실측(2026-09-05) — 영문 표제어와 표기만 다른 것 22 제외 · 한글이라 40 제외 ·
+    # 실제로 화면에 실린 것 55어 87개.
+    _ALIAS_HANGUL = re.compile("[가-힣]")
+
+    @staticmethod
+    def _term_alias_chips(html: str) -> "list[str]":
+        """낱말 페이지 `gt-alias` 블록 안 칩 텍스트만(라벨 `<b>` 는 뺀다)."""
+        m = re.search(r'<p class="gt-alias">(.*?)</p>', html, re.S)
+        return re.findall(r"<span>(.*?)</span>", m.group(1)) if m else []
+
+    @staticmethod
+    def _index_card(index_html: str, term_id: str) -> str:
+        """색인에서 그 용어 카드 한 장만 잘라 낸다(옆 카드의 블록에 속지 않도록)."""
+        start = index_html.index(f'<article class="gl-term" id="{term_id}"')
+        return index_html[start:index_html.index("</article>", start)]
+
+    def _view_by_id(self, lang: str) -> "dict[str, dict]":
+        view = render.build_glossary_view(self.terms, lang=lang)
+        return {t["id"]: t for g in view["groups"] for t in g["terms"]}
+
+    def test_english_alias_chips_carry_no_korean(self):
+        """★영어 화면에 한글 표기를 실으면 그 칩만 번역이 덜 된 것으로 읽힌다.
+
+        정본 동의어 149개 중 40개는 한국어 표기(「기준일탈」·「밸리데이션」…)다. 빼는
+        기준은 "번역이 어려워서"가 아니라 **그 값이 이름인가 표기인가**다 — 출처
+        「알기 쉬운 GMP 용어집」이나 「약사법」 제39조는 실제 문서·법령의 **이름**이라
+        옮기면 존재하지 않는 것을 가리키게 되므로 원문 그대로 두고 화면이 그 사실을
+        밝힌다. 반면 동의어는 같은 개념의 **다른 표기**라, 한국어 표기는 영어 독자에게
+        읽히지 않는 글자일 뿐이고 남겨 둘 근거가 없다.
+        """
+        bad = []
+        for p in sorted(self.dir.glob("*/index.html")):
+            bad += [(p.parent.name, c)
+                    for c in self._term_alias_chips(p.read_text(encoding="utf-8"))
+                    if self._ALIAS_HANGUL.search(c)]
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        bad += [("index", v)
+                for v in re.findall(r'<span class="gl-alias-v">(.*?)</span>', idx, re.S)
+                if self._ALIAS_HANGUL.search(v)]
+        self.assertEqual(bad, [], f"영어 별칭 칩에 한글이 남았다: {bad[:5]}")
+
+    def test_terms_left_with_no_english_alias_drop_the_block_entirely(self):
+        """남길 것이 하나도 없으면 라벨만 남은 빈 블록을 만들지 않는다.
+
+        한글 동의어만 가진 용어가 6개 있다(data-integrity·capa·sop…). 여기서 라벨을
+        먼저 찍고 목록을 비우면 "Also written" 뒤가 텅 빈 줄이 되어, 값이 실리다 만
+        것처럼 보인다 — 실제로는 **실을 값이 애초에 없다**. 대상은 손으로 적지 않고
+        두 트리 뷰의 차집합에서 파생한다(정본이 바뀌면 목록도 따라 바뀐다).
+        """
+        ko, en = self._view_by_id("ko"), self._view_by_id("en")
+        only_ko = sorted(i for i, t in ko.items() if t["aliases"] and not en[i]["aliases"])
+        self.assertGreater(
+            len(only_ko), 0,
+            "한글 전용 동의어만 가진 용어가 하나도 없다 — 이 가드가 아무것도 안 지킨다"
+            "(정본이 바뀌었다면 가드를 다시 겨눠야 한다)")
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        bad = []
+        for tid in only_ko:
+            html = (self.dir / tid / "index.html").read_text(encoding="utf-8")
+            if '<p class="gt-alias">' in html:
+                bad.append(f"{tid}(낱말 페이지)")
+            if '<p class="gl-alias">' in self._index_card(idx, tid):
+                bad.append(f"{tid}(색인 카드)")
+        self.assertEqual(bad, [], f"실을 별칭이 0인데 블록이 남았다: {bad[:5]}")
+
+    def test_english_aliases_actually_reach_the_screen(self):
+        """뷰가 채워도 템플릿이 안 그리면 사용자는 못 본다 — 화면 HTML 로 확인한다.
+
+        ★하한을 함께 건다. "한글이 없다"만 보는 가드는 별칭이 **전부 사라져도** 초록이라
+          바로 이번에 고친 상태(EN 0개)를 그대로 통과시킨다 — 이 저장소가 반복해 데인
+          "아무것도 안 지키는 가드"다. 실측 2026-09-05 = 55어 87개.
+        """
+        from markupsafe import escape as _esc_en_alias
+        en = self._view_by_id("en")
+        expected = {i: t["aliases"] for i, t in en.items() if t["aliases"]}
+        self.assertGreaterEqual(len(expected), 50,
+                                f"영어 별칭이 실린 용어가 줄었다: {len(expected)}어")
+        self.assertGreaterEqual(
+            sum(len(v) for v in expected.values()), 80,
+            f"영어에 실린 별칭 총량이 줄었다: {sum(len(v) for v in expected.values())}개")
+        bad = []
+        for tid, aliases in sorted(expected.items()):
+            chips = self._term_alias_chips(
+                (self.dir / tid / "index.html").read_text(encoding="utf-8"))
+            if chips != [str(_esc_en_alias(a)) for a in aliases]:
+                bad.append(f"{tid}: 화면={chips} 뷰={aliases}")
+        self.assertEqual(bad, [], f"낱말 페이지에 별칭이 뷰대로 안 실렸다: {bad[:3]}")
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(idx.count('<p class="gl-alias">'), len(expected),
+                         "색인 카드의 별칭 블록 수가 뷰와 다르다")
+        # 실측 대표 1건 — 이 사이트에서 가장 많이 읽히는 용어의 FDA 표기.
+        self.assertIn("<span>cGMP</span>",
+                      (self.dir / "gmp" / "index.html").read_text(encoding="utf-8"))
+
+    def test_english_hides_aliases_that_only_differ_from_the_english_headword(self):
+        """★중복 판정의 비교 대상은 **그 트리가 실제로 띄운 표제어**여야 한다.
+
+        영어판에서 한국어 표제어와 대조하면 한글 대 로마자라 하이픈·공백을 지워도
+        겹칠 수가 없어 **아무것도 걸러지지 않는다** — 한국어판이 이미 잡음이라고
+        판정한 `Back-up` 옆의 `backup` 이 영어판에서만 되살아난다. 감춤이 화면 전용
+        이라는 성질은 그대로다(검색은 위 `_FDA_ALIAS_PROBES` 계열이 지킨다).
+        실측 = 22개가 이 판정으로 빠진다.
+        """
+        en = self._view_by_id("en")
+        dup = [(t["id"], a) for t in self.terms for a in (t.get("aliases") or [])
+               if render._glossary_alias_norm(a)
+               in render._glossary_alias_norm(t["term_en"])]
+        self.assertGreater(
+            len(dup), 0,
+            "영문 표제어와 표기만 다른 동의어가 정본에 하나도 없다 — 이 가드가 "
+            "아무것도 안 지킨다")
+        left = [f"{tid}:{a}" for tid, a in dup if a in en[tid]["aliases"]]
+        self.assertEqual(left, [],
+                         f"영문 표제어와 표기만 다른 동의어가 화면에 남았다: {left[:5]}")
+
 
 class WebEnClauseTest(unittest.TestCase):
     """[다국어 2026-09-04] 영어판 조항 페이지 — 본문은 원문(영어), 건수는 그 모집단.
@@ -15748,6 +16185,25 @@ class WebEnClauseTest(unittest.TestCase):
                       "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
 
 
+#: 두 언어판이 **같은 화면**이어야 한다는 요구를 기계가 볼 수 있게 만든 것.
+#: 서명 = 그 페이지의 CSS 클래스 멀티셋(언어 무관 — 글자는 다르고 구조는 같아야 한다).
+#: 이 방식으로 실제 결함을 찾았다: 영어 홈이 아예 다른 템플릿이었고, 문서 3,165장에
+#: 용어 링크가 없었고, 영문 브리프 목차가 카드마다 그룹을 새로 열고 있었다.
+def class_signature(html: str) -> "collections.Counter":
+    body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->", " ", html)
+    return collections.Counter(
+        c for m in re.finditer(r'class="([^"]+)"', body)
+        for c in m.group(1).split())
+
+
+#: 두 트리가 **의도적으로** 다른 클래스. 여기에 무언가를 더할 때는 왜 다른지를 함께 적는다
+#: — 목록이 길어지는 것은 파리티가 무너지는 소리다.
+INTENTIONAL_CLASS_DIFFS: dict[str, str] = {
+    # 한국어 화면에서만 뜨는 "영어판이 있다" 안내(영어 화면에 권할 이유가 없다).
+    "grm-langhint": "한국어 전용 진입 안내",
+}
+
+
 class WebEnTreeTest(unittest.TestCase):
     """[다국어 3단계 2026-09-04] 영어 트리 `/en/` — 무엇을 내고, 무엇을 안 내는가.
 
@@ -15819,24 +16275,12 @@ class WebEnTreeTest(unittest.TestCase):
             self.assertIn(f"{path}index.html", self.pages,
                           f"영어판에만 있는 면: {path}")
 
-    def test_korean_only_sections_are_absent_from_en(self):
-        """본문이 한국어인 면은 영어 트리에 없다(설계 문서 §7 5단계 대기).
-
-        ★[다국어 4단계 2026-09-04] 문서 표면(`findings/docs/`·`findings/browse/`)은 여기서
-        빠졌다 — `findings_docs.json` 에 원문(`text_orig`)이 들어와 본문이 영어로 성립하기
-        때문이다.
-        ★[2026-09-04] 모음 축(`findings/c/`·`agency/`·`country/`)도 빠졌다 — 영어 모집단으로
-        다시 잰 정본(`findings_facets_en.json`)이 생겨 건수까지 영어판이 성립한다.
-        ★[2026-09-04] 용어사전(`glossary/`)과 조항(`findings/clause/`)도 빠졌다 — 설명
-        두 필드(`easy_en`·`detail_en`)가 정본에 실렸고, 조항 표본은 `finding_body(f, "en")`
-        으로 원문을 싣는다.
-        ★[2026-09-05] 이용안내(`guide/`)·주간 퀴즈(`quiz/`)도 빠졌다 — 본문 정본이 영어로
-        따로 생겼다(`guide_content_en.md` · 뱅크의 `*_en` 세 필드). 남은 하나는 **아직
-        영어 본문이 없는 면**이다: 지난 브리프 아카이브. 여기서 하나를 지울 때는 그 면의
-        본문이 실제로 영어로 성립하는지 먼저 재고, 이 목록이 빌 때가 §7 이 끝나는 때다."""
-        for path in ("archive/",):
-            self.assertNotIn(path, self.expected)
-            self.assertNotIn(f"en/{path}index.html", self.pages)
+    # ★[2026-09-05] `test_korean_only_sections_are_absent_from_en` 은 여기서 사라졌다.
+    #   "영어에 아직 없는 섹션" 손목록이었고, 마지막 항목이 `archive/` 였는데 **픽스처에는
+    #   영문 브리프가 하나도 없어** 영문 아카이브가 실제로 선 뒤에도 초록으로 통과했다
+    #   (검사가 자기 모집단에서 반례를 먼저 지운 꼴 — `assertNotIn` 은 없는 것을 못 본다).
+    #   §7 이 끝나 목록이 비었으므로, 남은 성질("모든 한국어 섹션은 영어 짝이 있다")은
+    #   **라이브 데이터**를 보는 `WebLiveBriefsRenderSmokeTest` 로 옮겼다.
 
     # ── 언어판 상호 선언 ─────────────────────────────────────────────────────
     def _hreflangs(self, html):
@@ -15897,6 +16341,92 @@ class WebEnTreeTest(unittest.TestCase):
                                 f"{rel} → {href} 가 없는 파일을 가리킨다")
                 checked += 1
         self.assertGreaterEqual(checked, 18)
+
+    # ── 홈 구조 동일성 ──────────────────────────────────────────────────────
+    # ★구조 대조 자체는 **라이브 빌드**에서 한다(`WebLiveBriefsRenderSmokeTest`) —
+    #   픽스처에는 영문 브리프가 없어 히어로 표지가 빠지고, 그걸 예외로 빼려면 `btn`·
+    #   `reveal` 같은 **범용 클래스까지** 제외해야 해서 가드가 거의 아무것도 안 지키게 된다.
+    #   (검사가 자기 모집단에서 반례를 먼저 지우는 그 실패 — 오늘 두 번째다.)
+    def test_the_second_landing_template_is_gone(self):
+        """구현을 두 벌 두지 않는다 — 두 벌이면 한쪽만 고쳐지는 날이 반드시 온다
+        (모음·조항에서 한 함수를 공유한 것과 같은 규율)."""
+        self.assertFalse((WEB_DIR / "templates" / "landing_en.html").exists(),
+                         "영어 전용 랜딩 템플릿이 되살아났다")
+
+    def test_popular_cards_read_the_index_of_their_own_language(self):
+        """인기 카드 제목은 런타임에 검색 인덱스에서 온다 — 하나만 가리키면 영어 홈에
+        **한국어 카드 제목**이 뜬다(HTML 에 없는 내용이라 다른 검사가 못 본다)."""
+        self.assertIn('data-index="/assets/search-index.json"',
+                      self.pages["index.html"])
+        self.assertIn('data-index="/assets/search-index.en.json"',
+                      self.pages["en/index.html"])
+
+    # ── 루트 진입 안내 ──────────────────────────────────────────────────────
+    def _hint(self, html):
+        return re.search(r'<div class="grm-langhint"[^>]*>(.*?)</div>', html, re.S)
+
+    def test_language_hint_only_on_korean_pages_that_have_an_english_twin(self):
+        """★영어 사용자가 `grm-solutions.com` 을 직접 치면 한국어 홈을 만난다. 검색 유입은
+        hreflang 으로 `/en/` 에 착지하지만 직접·공유 링크 진입은 그 경로를 타지 않는다.
+
+        짝이 없는 면에는 뜨지 않는다(없는 페이지로 보내지 않는다). 영어 페이지에도 뜨지
+        않는다 — 이미 영어를 보고 있는 사람에게 영어판을 권하는 꼴이다.
+        """
+        paired = self.expected | self.expected_doc_paths
+        shown = absent = 0
+        for rel, html in self.pages.items():
+            if not rel.endswith("index.html"):
+                continue
+            want = (not rel.startswith("en/")
+                    and rel[:-len("index.html")] in paired)
+            with self.subTest(page=rel):
+                if want:
+                    self.assertIsNotNone(self._hint(html), f"{rel}: 안내가 없다")
+                    shown += 1
+                else:
+                    self.assertIsNone(self._hint(html), f"{rel}: 안내가 뜨면 안 된다")
+                    absent += 1
+        self.assertGreater(shown, 5, "안내가 뜬 면이 너무 적다")
+        self.assertGreater(absent, 5, "안내가 빠진 면이 없다 — 검사가 한쪽만 본다")
+
+    def test_language_hint_is_hidden_until_the_browser_says_not_korean(self):
+        """기본은 숨김이다 — 크롤러와 한국어 사용자가 받는 문서는 종전과 같고, 브라우저
+        언어가 한국어가 아닌 사람에게만 스크립트가 벗긴다. 두 경우 모두 **같은 HTML** 이라
+        클로킹이 아니다(표시 여부만 클라이언트에서 갈린다)."""
+        html = self.pages["index.html"]
+        m = re.search(r'<div class="grm-langhint"[^>]*\bhidden\b[^>]*>', html)
+        self.assertIsNotNone(m, "안내가 기본 노출이다 — 한국어 독자에게도 뜬다")
+        self.assertIn("navigator.language", html)
+        self.assertRegex(html, r"/\^ko\\b/i")
+
+    def test_language_hint_never_redirects(self):
+        """★자동 리다이렉트 금지. 브라우저 언어는 사람의 선택이 아니라 기기 설정이고
+        (해외의 한국어 사용자·회사 지급 노트북), 같은 URL 이 방문자마다 다른 내용을 주면
+        검색엔진에게도 문제가 된다. 우리는 알리기만 하고 선택은 독자가 한다."""
+        script = re.search(r"// \[루트 진입\].*?\}\)\(\);",
+                           self.pages["index.html"], re.S)
+        self.assertIsNotNone(script, "안내 스크립트를 못 찾았다 — 마크업 변경?")
+        for banned in ("location.href", "location.replace", "location.assign",
+                       "window.location"):
+            self.assertNotIn(banned, script.group(0), f"자동 이동 코드: {banned}")
+
+    def test_language_hint_link_resolves_to_a_real_english_file(self):
+        """상대경로여야 하고(호스트 무관 규약) 실제 파일에 닿아야 한다 — 언어 전환 칩과
+        같은 목적지를 가리킨다(두 간선이 갈라지면 하나는 반드시 낡는다)."""
+        checked = 0
+        for rel, html in self.pages.items():
+            hint = self._hint(html)
+            if not hint:
+                continue
+            href = re.search(r'href="([^"]+)"', hint.group(1)).group(1)
+            self.assertFalse(href.startswith("http"), f"{rel}: 절대 URL")
+            self.assertTrue(((self.out / rel).parent / href).resolve().is_file(),
+                            f"{rel} → {href} 가 없는 파일을 가리킨다")
+            switch = re.search(r'class="grm-lang" href="([^"]+)"', html)
+            self.assertEqual(href, switch.group(1),
+                             f"{rel}: 안내와 언어 전환이 다른 곳을 가리킨다")
+            checked += 1
+        self.assertGreater(checked, 5)
 
     def test_switcher_absent_where_there_is_no_counterpart(self):
         """짝이 없는 면에 전환 링크를 달면 없는 페이지로 보내는 것이다.

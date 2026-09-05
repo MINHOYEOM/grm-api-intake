@@ -102,6 +102,11 @@
           {%- endfor %}{% endfor %}
           {%- if lib_update_week.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">{{ _("외 {n}건", n=lib_update_week.hidden_count) }}</a>{% endif %}
         </p>
+{% if lib_update_week.ko_only_titles %}
+        {#- 한국어 원제는 그대로 싣고 **이유를 밝힌다** — 옮기면 존재하지 않는 문서를
+            가리키게 된다(용어사전 출처·자료실 카탈로그와 같은 판단). -#}
+        <p class="arc-lib-note">{{ _("이 목록의 {n}건은 공식 영문 제목이 없어 한국어 원제를 그대로 표시합니다.", n=lib_update_week.ko_only_titles) }}</p>
+{% endif %}
       </aside>
       {% endif %}
     </div>

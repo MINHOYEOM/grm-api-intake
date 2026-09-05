@@ -15528,9 +15528,13 @@ class WebEnBriefTest(unittest.TestCase):
         **영어에만 스트립이 통째로 없었다**(실측 2026-09-05: 아카이브 KO 1 / EN 0,
         영문 브리프 10호 전부 0).
 
-        동시에 지키는 것: 영어 화면에 한글 0. 자료실 항목 중에는 `title_en` 값이 그대로
-        한국어인 문서가 있는데(그 문서의 실제 이름이라 지어내 바꿀 수 없다), 영어판은
-        그 줄을 **싣지 않고 개수로만** 남긴다 — 요약 줄의 건수는 두 언어가 같다.
+        ★[2026-09-05 판단 뒤집음] 자료실 항목 중에는 `title_en` 값이 그대로 한국어인
+        문서가 있다(그 문서의 실제 이름이라 지어내 바꿀 수 없다). 처음엔 그 줄을 **싣지
+        않고 개수로만** 남겼는데, 실측에서 영어 스트립이 "MFDS 2 items · and 2 more" 만
+        되어 실린 항목이 0 이었다 — 정직하지만 정보가 없는 화면이다. 같은 상황에서 이
+        저장소가 이미 두 번 내린 판단은 반대다(용어사전 출처 이름 · 자료실 카탈로그
+        원제): **이름은 그대로 보이고 화면이 이유를 밝힌다.** 그래야 영어 독자가 그
+        문서를 실제로 찾을 수 있다. 감추는 것이 곧 정직한 것은 아니다.
         """
         payload, en_pair, ko_pair = self._library_update_fixture()
         self.assertIsNotNone(en_pair, "영문 제목 항목이 없다 — 픽스처가 무의미하다")
@@ -15556,13 +15560,15 @@ class WebEnBriefTest(unittest.TestCase):
                 self.assertIn("Library updates", en_a)
                 # 영문 제목 항목은 두 언어판 모두에 뜬다.
                 self.assertIn(str(_esc(en_pair[1]["title"])), en_b)
-                # 한국어 제목만 있는 항목은 한국어판에만 — 영어판은 개수로만 남긴다.
+                # 한국어 제목 항목도 **양쪽에 실린다** — 대신 영어 쪽만 이유를 밝힌다.
                 if ko_pair:
                     self.assertIn(str(_esc(ko_pair[1]["title"])), ko_b)
-                    self.assertNotIn(str(_esc(ko_pair[1]["title"])), en_b,
-                                     "영어 화면에 한국어 문서 제목이 실렸다")
-                    self.assertIn("and 1 more", en_b,
-                                  "못 실은 건수를 '외 N건'으로 밝히지 않았다")
+                    self.assertIn(str(_esc(ko_pair[1]["title"])), en_b,
+                                  "영어 화면에서 한국어 문서 제목이 사라졌다")
+                    self.assertIn("no official English title", en_b,
+                                  "한국어 원제를 실으면서 이유를 밝히지 않았다")
+                    self.assertNotIn("no official English title", ko_b,
+                                     "한국어판에 불필요한 고지가 떴다")
                 # 요약 줄의 건수는 언어와 무관하다 — 한국어 "N건" 과 영어 "N items" 의
                 # 숫자가 같아야 한다(거르는 것은 제목 줄뿐이라는 계약).
                 self.assertEqual(
@@ -15575,10 +15581,14 @@ class WebEnBriefTest(unittest.TestCase):
             render.LIBRARY_UPDATES_FILE = original
             shutil.rmtree(tmp, ignore_errors=True)
 
-    def test_library_update_counts_do_not_change_with_the_language(self):
-        """거르는 것은 **제목 줄뿐**이다 — 요약의 건수(`change_count`)와 못 보여준
-        건수를 합친 총량은 두 언어에서 같아야 한다. 제목을 못 실었다고 개수까지 줄면
-        화면이 조용히 거짓말을 한다(조용한 절삭 금지)."""
+    def test_library_update_rows_and_counts_match_across_languages(self):
+        """두 언어판이 **같은 줄을 같은 수만큼** 싣는다 — 언어는 라벨만 바꾼다.
+
+        ★[2026-09-05] 종전에는 영어에서 한국어 제목 줄을 걸렀고 이 검사도 "영어 뷰에
+          한글 제목이 없다"를 요구했다. 판단이 뒤집혔으므로 검사도 뒤집는다: 이제
+          **행 집합이 같아야** 하고, 한국어 원제로 실리는 줄은 `ko_only_titles` 가 센다
+          (화면이 그 수만큼 고지한다). 개수가 언어에 따라 달라지지 않는다는 요구는 그대로다
+          — 오히려 더 강해졌다(개수뿐 아니라 제목까지 같다)."""
         payload, _en, _ko = self._library_update_fixture()
         entry = payload["entries"][0]
         ko_cats = render.load_library()
@@ -15597,9 +15607,22 @@ class WebEnBriefTest(unittest.TestCase):
                 len(source["items"]) + source["hidden_count"],
                 source["new_count"] + source["changed_count"],
                 "보인 것 + 외 N건 이 해소된 건수와 다르다")
-            for item in source["items"]:
-                self.assertIsNone(re.search("[가-힣]", item["title"]),
-                                  f"영어 뷰에 한국어 제목: {item['title']}")
+        # **같은 문서를 같은 수만큼** 싣는다. 제목 문자열까지 같기를 요구하지는 않는다 —
+        # 공식 영문 제목이 있는 문서는 그 언어의 카탈로그가 영문 제목을 준다(그게 정상이다).
+        # 요구는 "영어에서 줄이 사라지지 않는다"이지 "제목이 한국어와 같다"가 아니다.
+        self.assertEqual(
+            [len(s["items"]) for s in en_view["sources"]],
+            [len(s["items"]) for s in ko_view["sources"]],
+            "언어에 따라 실리는 줄 수가 달라졌다")
+        self.assertEqual([s["slug"] for s in en_view["sources"]],
+                         [s["slug"] for s in ko_view["sources"]])
+        # 고지 수 = **실제로 실린** 줄 중 한국어 원제인 것. 한국어판은 항상 0이다.
+        shown_ko = sum(1 for s in en_view["sources"] for i in s["items"]
+                       if re.search("[가-힣]", i["title"] or ""))
+        self.assertEqual(en_view["ko_only_titles"], shown_ko)
+        self.assertEqual(ko_view["ko_only_titles"], 0,
+                         "한국어판에 고지가 붙으면 안 된다")
+        self.assertGreater(shown_ko, 0, "이 가드가 아무것도 안 지킨다 — 픽스처 확인")
 
 
 class WebFindingsOrigLangTest(unittest.TestCase):
@@ -16508,22 +16531,19 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "lib-item-sub": "한국어판의 병기(영문 원제)를 영어판에서 뒤집지 않는다 — 영어"
                         " 독자에게 읽을 수 없는 줄을 얹지 않는다",
     },
-    # ★자료실 갱신 스트립 — 영어판은 **제목이 한국어인 행을 싣지 않고 개수로만** 남긴다.
-    #   최근 이력이 전부 식약처 문서이고 그 `title_en` 이 한국어 그대로이기 때문이다
-    #   (문서의 실제 이름 — 지어내 바꾸면 무변형 위반). 개수는 두 언어가 같은 값이고
-    #   "and N more" 가 못 실은 만큼을 밝히며, 문서 이름 자체는 `/en/library/{slug}/`
-    #   에서 고지와 함께 볼 수 있다.
-    #   ⚠️이 선택의 대가: 오늘 실측에서 영어 스트립은 실린 항목이 0이라 "MFDS 2 items ·
-    #     and 2 more" 만 보인다. 정직하지만 정보가 거의 없다. 이력에 영문 제목 문서가
-    #     섞이면 저절로 나아지고(08-03·08-17 호가 그렇다), 그래도 부족하면 카탈로그
-    #     페이지처럼 **한국어 제목 + 고지**로 뒤집는 것이 대안이다.
+    # ★자료실 갱신 스트립 — 영어판도 **한국어 원제를 그대로 싣고 이유를 밝힌다**.
+    #   [2026-09-05 판단 뒤집음] 처음엔 그런 행을 싣지 않고 개수로만 남겼다. 정직했지만
+    #   실측에서 영어 스트립이 "MFDS 2 items · and 2 more" 만 되어 **실린 항목이 0** 이었다
+    #   — 정보가 거의 없는 화면이다. 같은 상황에서 이 저장소가 이미 두 번 내린 판단은
+    #   반대다(용어사전 출처 이름 · 자료실 카탈로그 원제): 이름은 그대로 보이고 화면이
+    #   이유를 밝힌다. 그래야 영어 독자가 그 문서를 실제로 찾을 수 있다.
+    #   그 결과 제목 행 클래스(`arc-lib-tag`·`lib-upd-t`·`is-new` …)는 두 트리에 **다 있고**,
+    #   남는 차이는 고지 한 줄뿐이다.
     "archive/": {
-        "arc-lib-tag": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
-        "arc-lib-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+        "arc-lib-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",
     },
     "briefs/*": {
-        "arc-lib-tag": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
-        "arc-lib-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+        "arc-lib-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",
         "cov-note": "영어 전용 고지 — 업체·기관 실명이 한국어로 남는 이유",
     },
     "findings/doc": {
@@ -16538,11 +16558,7 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "coral": "위와 같음(같은 버튼의 색 클래스)",
     },
     "library/": {
-        "lib-upd-t": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
-        "lib-upd-st": "위와 같음 — 제목 행에 딸린 부제",
-        "is-new": "위와 같음 — 제목 행의 신규 표시",
-        "ti-external-link": "위와 같음 — 제목 행의 외부 링크 아이콘",
-        "lib-upd-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+        "lib-upd-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",
     },
 }
 

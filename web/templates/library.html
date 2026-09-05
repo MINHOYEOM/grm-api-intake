@@ -34,7 +34,7 @@
           </div>
           <ul class="lib-upd-l">
             {% for it in s['items'] %}
-{# i18n-ignore #}            <li><a href="{{ it.url }}" target="_blank" rel="noopener"><span class="lib-upd-st{% if it.state == '신규' %} is-new{% endif %}">{{ it.state }}</span><span class="lib-upd-t">{{ it.title }}</span><i class="ti ti-external-link" aria-hidden="true"></i></a></li>
+{# i18n-ignore #}            <li><a href="{{ it.url }}" target="_blank" rel="noopener"><span class="lib-upd-st{% if it.state == '신규' %} is-new{% endif %}">{{ _(it.state) }}</span><span class="lib-upd-t">{{ it.title }}</span><i class="ti ti-external-link" aria-hidden="true"></i></a></li>
             {% endfor %}
             {% if s.hidden_count %}<li class="lib-upd-more"><a href="{{ rel_root }}library/{{ s.slug }}/index.html">{{ _("외 {n}건 — {short} 카탈로그에서 보기", n=s.hidden_count, short=s.short) }}</a></li>{% endif %}
           </ul>
@@ -42,6 +42,11 @@
         {% endfor %}
       </div>
       {% endif %}
+{% if lib_update.ko_only_titles %}
+      {#- 한국어 원제는 그대로 싣고 **이유를 밝힌다** — 옮기면 존재하지 않는 문서를
+          가리키게 된다(용어사전 출처·카탈로그 페이지와 같은 판단). -#}
+      <p class="lib-upd-note">{{ _("이 목록의 {n}건은 공식 영문 제목이 없어 한국어 원제를 그대로 표시합니다.", n=lib_update.ko_only_titles) }}</p>
+{% endif %}
       <p class="lib-upd-f">{{ _('규제기관·전문기관 공개 자료를 <b>매주 월요일</b> 자동으로 확인해 반영합니다 — 한 번에 크게 바뀌거나 사라지면 사람이 먼저 확인합니다.') }}</p>
     </section>
     <div class="lib-cats">

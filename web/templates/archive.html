@@ -24,7 +24,7 @@
       </div>
       <p class="arc-lib-l">
         {%- for s in lib_update.sources %}{% for it in s['items'] %}
-        <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span>{{ it.title }}</a>
+        <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span> {{ it.title }}</a>
         {%- endfor %}{% endfor %}
         {%- if lib_update.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">{{ _("외 {n}건", n=lib_update.hidden_count) }}</a>{% endif %}
       </p>

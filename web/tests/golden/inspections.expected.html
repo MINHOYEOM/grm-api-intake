@@ -509,7 +509,7 @@ main{word-break:keep-all;overflow-wrap:anywhere}
     <div><h5>바로가기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
     <div><h5>도구</h5><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/inspector/index.html">실사관 조회</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
     <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
-    <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
+    <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a><a href="../../rss.xml">RSS 피드</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
@@ -530,6 +530,21 @@ if(_nt&&_nm){
   _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
+// [언어 전환 2026-09-06] 보고 있던 **검색어·업체 키·앵커를 그대로 들고** 건너간다.
+// 종전에는 링크가 `../en/findings/index.html` 로 고정돼 있어, 업체 프로파일에서 언어를
+// 바꾸면 빈 조회 화면이 떴다(`?key=` 유실). 조회 조건은 URL 이 갖고 있고 그 파라미터
+// 이름은 두 트리가 **같은 스크립트**를 쓰므로 양쪽에서 같은 뜻이다 — 그대로 옮기면 된다.
+// 앵커도 같이 옮긴다(카드 앵커는 언어와 무관한 문서 id 파생이라 양쪽이 같다).
+(function(){
+  var a=document.querySelector('a.grm-lang');
+  if(!a||(!location.search&&!location.hash))return;
+  try{
+    var u=new URL(a.getAttribute('href'),location.href);
+    u.search=location.search; u.hash=location.hash;
+    // 같은 출처 안에서만 다시 쓴다(외부로 새는 경로를 만들지 않는다).
+    if(u.origin===location.origin)a.setAttribute('href',u.pathname+u.search+u.hash);
+  }catch(e){}
+})();
 // [루트 진입] 브라우저 언어가 한국어가 아니면 영어판 안내를 보인다(리다이렉트 없음).
 // localStorage 는 사생활 모드·차단 설정에서 **접근 자체가 던진다** — 읽기·쓰기를 각각
 // 감싸고, 실패하면 그냥 안내를 보인다(기억을 못 할 뿐 화면은 정상).
@@ -566,7 +581,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=6dea54a3" defer></script>
-<script src="../../assets/trends.js?v=344d71e3" defer></script>
+<script src="../../assets/trends.js?v=f227f14c" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

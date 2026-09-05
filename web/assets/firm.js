@@ -33,6 +33,7 @@
   };
   var _isEn = (typeof document !== "undefined"
     && (document.documentElement.lang || "ko") !== "ko");
+  var _HANGUL = /[가-힣]/;
   var _bodyText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
@@ -41,8 +42,12 @@
   var _altText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
-    return (ko && orig) ? (_isEn ? ko : orig) : "";
+    if (!ko || !orig) return "";
+    if (_isEn && _HANGUL.test(orig)) return "";
+    return _isEn ? ko : orig;
   };
+  //: 이 화면에 한국어 원문 지적이 섞였는가 — 섞였으면 목록 머리에서 한 번 밝힌다.
+  var _sawKoreanBody = false;
 
   var cfg = document.getElementById("grm-firm-cfg");
   var loadingEl = document.getElementById("fp-loading");
@@ -412,12 +417,21 @@
   function buildObsCard(row) {
     var card = el("article", "fp-obs");
     var label = CATEGORY_LABELS[row.category_code];
-    var catText = label ? label.ko : (row.category_label_ko || "");
+    // 분류 라벨은 사전을 타는 표(`label.ko` 가 _t() 라 영어에서 영문으로 나온다).
+    // 표에 없는 코드일 때의 폴백은 DB 의 한국어 라벨이라, 영어 화면에는 싣지 않는다
+    // — 라벨 하나를 잃는 것보다 영어 화면에 한국어를 남기는 쪽이 나쁘다(손목록이 낡으면
+    // 여기로 샌다).
+    var fallbackCat = row.category_label_ko || "";
+    var catText = label ? label.ko
+      : (_isEn && _HANGUL.test(fallbackCat) ? "" : fallbackCat);
     if (catText) card.appendChild(el("p", "fp-obs-cat", catText));
 
     // [다국어 3단계] 본문은 읽는 언어 먼저(영어판=규제기관 원문), 접기는 반대편.
     var mainText = _bodyText(row);
-    if (mainText) card.appendChild(el("p", "fp-obs-text", mainText));
+    if (mainText) {
+      card.appendChild(el("p", "fp-obs-text", mainText));
+      if (_isEn && _HANGUL.test(mainText)) _sawKoreanBody = true;
+    }
 
     var altText = _altText(row);
     if (altText) {
@@ -455,7 +469,17 @@
       container.appendChild(el("p", "fp-doc-detail-empty", _t("공개된 지적사항이 없습니다.")));
       return;
     }
+    _sawKoreanBody = false;
     rows.forEach(function (row) { container.appendChild(buildObsCard(row)); });
+    // ★[2026-09-06] 영어 화면에 한국어 원문 지적이 섞이면 **감추지 말고 밝힌다** —
+    //   식약처 실사기록은 원문이 한국어라 번역본이 따로 없다. 사이트의 다른 다섯 곳
+    //   (용어사전 출처·자료실 제목·갱신 스트립·브리프 이름/인용·검색 결과)과 같은 규율.
+    if (_isEn && _sawKoreanBody) {
+      container.insertBefore(
+        el("p", "fp-obs-ko-note",
+           _t("이 문서는 한국 규제기관 기록이라 지적 원문이 한국어로 표시됩니다.")),
+        container.firstChild);
+    }
   }
 
   function buildDocRow(doc) {

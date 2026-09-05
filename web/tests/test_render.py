@@ -398,7 +398,48 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
         self.assertEqual(diff, [], f"홈 구조가 갈라졌다: {diff[:8]}")
         self.assertGreater(len(ko), 30, "서명이 비었다 — 추출이 깨졌나?")
 
-    def test_english_home_cover_comes_from_an_english_issue(self):
+    def test_english_briefs_disclose_why_korean_names_remain(self):
+        """★영문 브리프에 남는 한글은 **한국 규제기관 문서의 업체·기관 실명**뿐이다
+        (동아제약(주)·화순전남대학병원). 옮기면 존재하지 않는 이름을 가리키게 되므로
+        원문 그대로 두고, 대신 **화면이 그 사실을 밝힌다** — 용어사전의 출처 이름,
+        자료실의 한국어 원제와 같은 판단이다. 밝히지 않으면 번역 누락으로 읽힌다.
+
+        고지 유무는 손으로 적지 않는다. 그 호에 실제로 한글 이름이 있는지로 판정한다.
+        """
+        hangul = re.compile("[가-힣]")
+        checked = disclosed = 0
+        for d in sorted((self.out / "en" / "briefs").iterdir()):
+            page = d / "index.html"
+            if not page.is_file():
+                continue
+            html = page.read_text(encoding="utf-8")
+            body = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|<!--.*?-->",
+                          " ", html)
+            note = re.search(r'<p class="cov-note">([^<]*)</p>', body)
+            text = re.sub(r"<[^>]+>", " ", re.sub(r'<p class="cov-note">.*?</p>', " ",
+                                                  body, flags=re.S))
+            has_korean = [w for w in re.findall("[가-힣]+", text) if w != "한국어"]
+            checked += 1
+            with self.subTest(issue=d.name):
+                if has_korean:
+                    self.assertIsNotNone(
+                        note, f"{d.name}: 한국어 이름이 남는데 고지가 없다 — {has_korean[:3]}")
+                    disclosed += 1
+                else:
+                    self.assertIsNone(note, f"{d.name}: 해당 없는데 고지가 떴다")
+        self.assertGreater(checked, 5, "영문 브리프가 너무 적다")
+        self.assertGreater(disclosed, 0, "고지 경로가 한 번도 안 탔다 — 가드가 헛돈다")
+
+    def test_ko_only_name_count_is_measured_not_guessed(self):
+        """세는 대상은 **카드 수**다. 이름이 아니라 장수여야 독자가 '이 호에서 몇 장이
+        그런가'를 안다. 합성 카드로 판정 자체를 직접 물어본다."""
+        views = [
+            {"headline_target": "Acme Pharma", "facts": [{"value": "2026-01-01"}]},
+            {"headline_target": "동아제약(주)", "facts": []},
+            {"headline_target": "Beta Labs", "facts": [{"value": "식약처 처분"}]},
+        ]
+        self.assertEqual(render.count_ko_only_names(views), 2)
+        self.assertEqual(render.count_ko_only_names(views[:1]), 0)
         """표지는 **그 언어로 낼 수 있는 최신 호**에서 온다. 한국어 최신호가 영어에 없을 수
         있고(2026-06-22 가 그렇다), 그때 한국어 표지를 실으면 영어 홈 첫 화면이 한국어가
         된다 — 홈은 첫 접점이라 그 한 장이 서비스 전체의 인상을 정한다."""
@@ -16483,6 +16524,7 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
     "briefs/*": {
         "arc-lib-tag": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
         "arc-lib-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+        "cov-note": "영어 전용 고지 — 업체·기관 실명이 한국어로 남는 이유",
     },
     "findings/doc": {
         # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은

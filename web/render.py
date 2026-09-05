@@ -533,6 +533,23 @@ def _is_renderable(card: dict[str, Any]) -> bool:
     return True
 
 
+def count_ko_only_names(card_views: list[dict[str, Any]]) -> int:
+    """카드 중 **한국어 실명**(업체·기관)이 남은 장수.
+
+    ★영문 브리프에 한글이 남는 자리는 `headline_target` 과 `facts[].value` 뿐이고, 그건
+      한국 규제기관 문서에 적힌 **그 조직의 실제 이름**이다(동아제약(주)·화순전남대학병원).
+      옮기면 존재하지 않는 이름을 가리키게 되므로 원문 그대로 둔다 — 용어사전의 출처
+      이름, 자료실의 한국어 원제와 **같은 판단**이다.
+    ★다만 그 두 자리는 화면이 이유를 밝히는데 여기만 밝히지 않았다. 영어 독자에게는
+      번역이 덜 된 것으로 읽힌다. 세는 것은 카드 수다(이름 수가 아니라) — 독자가 "이
+      호에서 몇 장이 그런가"를 알면 되고, 이름을 몇 개 셌는지는 알 바가 아니다.
+    """
+    return sum(
+        1 for v in card_views
+        if _HANGUL_RE.search(v.get("headline_target") or "")
+        or any(_HANGUL_RE.search(str(f.get("value") or "")) for f in v.get("facts") or []))
+
+
 def _build_sections(card_views: list[dict[str, Any]],
                     tr: Translator = _KO) -> list[dict[str, Any]]:
     """render_order 순 카드를 group(섹션)·group_label(소제목)별로 연속 묶음.
@@ -5313,6 +5330,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
                 sections=_build_sections(en_card_views, en_tr),
+                ko_only_names=count_ko_only_names(en_card_views),
                 # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로
                 # 다시 조인한다 — 창은 브리프가 정하는 값이라 언어와 무관해야 한다.
                 # 한국어 뷰를 물려주면 제목이 한국어인 채로 영어 페이지에 실린다.

@@ -11,6 +11,17 @@
       <span>{{ _("수집 <b>{n}</b>건 · 카드 <b>{c}</b>장", n=brief.coverage.intake_total, c=brief.coverage.rendered) }}</span>
       <span>Evidence <b class="mono">A {{ brief.coverage.evidence.A }} · B {{ brief.coverage.evidence.B }} · C {{ brief.coverage.evidence.C }}</b></span>
     </div>
+{%- if ko_only_names %}
+    {#- 한국 규제기관 문서의 업체·기관 실명은 원문 그대로 둔다(옮기면 존재하지 않는
+        이름이 된다). 그 사실을 밝히지 않으면 영어 독자에게는 번역 누락으로 읽힌다 —
+        용어사전 출처·자료실 원제와 같은 규율.
+        ★스타일도 **이 블록 안에** 둔다. 밖에 두면 고지가 없는 한국어 브리프 11장의
+        바이트가 흔들린다(grm.css 프리즈 보존을 위한 스코프 인라인 관례 그대로). -#}
+    <style>
+      .cov-note{font-family:var(--sans);font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 0;word-break:keep-all;max-width:760px}
+    </style>
+    <p class="cov-note">{{ _("이 호의 {n}장은 한국 규제기관 문서를 다루며, 업체·기관 이름은 공식 기록에 적힌 대로 한국어로 표시합니다.", n=ko_only_names) }}</p>
+{% endif %}
     {%- if brief.tldr %}
     {#- [성장 2차] 요약 복사 — 실무자의 실제 공유 형태는 사내 메신저/단톡방 텍스트
         붙여넣기다(RUM 실측: 데스크톱 95%·Edge+Windows 사내 PC 프로파일). 이미 큐레이션된

@@ -14512,18 +14512,43 @@ class WebAdminRumPanelTest(unittest.TestCase):
         그래도 이 계약을 잠그는 이유: 요청이 쌀수록 나쁠 것이 없고, 정밀도를 지키는
         진짜 장치(sampleInterval 저장 + 하락 금지 래칫)와 같은 자리에서 깨지기 때문이다.
         여기서 red 가 나면 "다시 한 쿼리로 묶었다"는 뜻이고, 그건 근거 없이 되돌린 것이다.
+
+        ★**그룹 이름을 손으로 열거하지 않는다**(2026-09-05 정정). 종전엔
+        `set(GROUPS) == {"totals","referrers","paths"}` 로 못박아 둬서, 국가·기기를
+        정당하게 더한 순간 red 가 났다 — 계약이 아니라 **목록이 낡은 것**이었다.
+
+        ★★그렇다고 기준을 GROUPS 에서 통째로 파생시키면 **눈이 먼다**(같은 날 실제로
+        한 번 그렇게 썼다가 변이 검사에서 걸렸다). "각 쿼리에 자기 차원만 있는가"를
+        GROUPS 가 정의한 '자기 차원'으로 물으면, 한 그룹에 차원을 둘 붙이는 변이가
+        **기준까지 같이 바꿔** 검사가 통과해 버린다.
+
+        그래서 계약을 **산술**로 적는다: 쪼갠다는 것은 곧 *요청 하나에 공유축(date) +
+        고유 차원 최대 1개* 라는 뜻이다. 이건 GROUPS 가 어떻게 바뀌어도 흔들리지 않고,
+        그룹을 더하는 정당한 변경은 통과시키면서 묶는 변경만 red 로 만든다.
         """
-        self.assertEqual(set(rum_collector.GROUPS), {"totals", "referrers", "paths"})
-        marks = {"referrers": "refererHost", "paths": "requestPath"}
-        for group in rum_collector.GROUPS:
+        groups = rum_collector.GROUPS
+        self.assertGreater(len(groups), 1, "그룹이 하나면 '쪼갠다'는 계약 자체가 없다")
+        # 그룹별 고유 차원 = 그 그룹 dims 에서 공유축(date)을 뺀 것.
+        own = {g: [t for t in dims.split() if t != "date"]
+               for g, (_fields, dims) in groups.items()}
+        for group, dims in own.items():
+            # ★계약의 본체 — 한 요청은 차원을 하나까지만 묻는다.
+            self.assertLessEqual(len(dims), 1,
+                                 f"{group} 이 한 쿼리에 차원을 {len(dims)}개 묶었다: {dims}")
+        for group in groups:
             q = rum_collector.build_query(group)
             with self.subTest(group=group):
                 self.assertIn("avg { sampleInterval }", q, "정밀도를 같이 묻지 않는다")
                 self.assertIn("bot: 0", q)
-                for other, mark in marks.items():
+                self.assertIn("date", q, "공유축 date 가 빠졌다")
+                for mark in own[group]:
+                    self.assertIn(mark, q, f"{group} 쿼리에 자기 차원 {mark} 가 없다")
+                for other, marks in own.items():
                     if other == group:
-                        self.assertIn(mark, q)
-                    else:
+                        continue
+                    for mark in marks:
+                        if mark in own[group]:
+                            continue  # 두 그룹이 같은 차원을 쓰는 건 별개 문제다
                         self.assertNotIn(mark, q,
                                          f"{group} 쿼리에 {mark} 가 섞였다 — 묶이면 함께 내려간다")
 

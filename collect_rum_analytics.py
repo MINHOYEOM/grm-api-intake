@@ -37,6 +37,14 @@ KST 00:00~09:00(트래픽이 가장 적은 새벽)뿐이다. 이 근사는 화�
      1.00 으로 저장됐고, 이후 표본 실행 2회를 **그대로 버텨 냈다**.
   ⓓ 화면이 "전수/거의 전수/표본 추정/미상"을 그대로 표시한다.
 
+## ★완결된 날과 진행 중인 날을 한 질의에 섞지 않는다 (2026-09-05)
+워크플로가 주는 `end` 는 실행 **시각**의 시를 자른 값이라, 00 시대에 돌지 않는 한 범위
+끝이 **아직 안 닫힌 날의 한복판**에 걸린다(크론이 04:30·16:30 이라 예약 실행은 항상
+그렇다). `split_window()` 가 마지막 완결 자정에서 끊어 **두 번 묻는다**. 완결분은 다시
+바뀌지 않는 확정 구간이고 진행 중인 날은 계속 커지는 잠정치다 — 성질이 다른 것을 한 축에
+합치지 않는다. 실측에서 표본 여부가 갈린 자리가 정확히 그 경계였지만 **인과로 단정하지
+않는다**(그날 런들은 시각과 `--end` 가 같이 커져 교란돼 있었다).
+
 ## ★정확한 값을 추정값으로 덮지 않는다
 창을 8일로 잡고 매일 다시 적재하므로, **한 번 표본으로 내려간 실행이 과거의 정확한
 값을 덮어쓴다**(2026-09-02~04 에 실제로 그렇게 8/25~9/1 이 파괴됐다). 그래서 적재
@@ -86,9 +94,12 @@ GRAPHQL_LIMIT = 10000
 REFERRER_CAP = 25
 # 하루에 저장하는 착지 경로 상한. 사이트가 4,000쪽이라 꼬리가 길다 — 화면은 상위만 쓴다.
 PATH_CAP = 40
-# 정밀도 하락 허용 배수(keep_days). 표본 간격 평균의 실행 간 흔들림(1.00↔1.16)은 통과시키고
-# 1 → 10 같은 자릿수 하락만 막는다 — 너무 빡빡하면 늦게 도착한 집계가 영영 못 들어온다.
-DOWNGRADE_TOLERANCE = 1.5
+# 정밀도 **계층** 경계(keep_days). 이 값 미만이면 '사실상 전수', 이상이면 '표본 추정'.
+# ★관측 분포를 보고 정했다 — 표본 없는 실행의 최대 간격이 2.0(경로: 사이트가 4천 쪽이라
+# 좋은 실행에서도 가장 거칠다), 표본 실행의 최소가 10.0 이라 그 사이가 비어 있다.
+# 2.0 으로 잡으면 정상 관측값 **위에 정확히 앉아** 가장 거친 표의 정상 갱신이 상시 막힌다.
+# 빈 구간 한가운데를 집는다.
+PRECISION_BAND = 3.0
 # [077] 하루에 저장하는 국가 상한. 국가는 수십 개뿐이라 꼬리가 짧다 — 방어용 상한.
 COUNTRY_CAP = 20
 # [077] 기기 유형은 desktop/mobile/tablet(+미상)뿐 — 방어용 상한.
@@ -356,24 +367,71 @@ def stored_precision(url: str, key: str, table: str, days, *, timeout: float = 3
 
 
 def keep_days(new_si, stored_si, *, allow_downgrade: bool = False):
-    """쓸 날짜와 건너뛸 날짜를 가른다. **저장값이 뚜렷이 더 정확하면 건너뛴다.**
+    """쓸 날짜와 건너뛸 날짜를 가른다. **막는 것은 계층 하락 하나뿐이다.**
 
-    ★"조금이라도 나쁘면 건너뛴다"로 두면 안 된다. 표본 간격은 그 날 행들의 **평균**이라
-    1.00 과 1.16 처럼 실행마다 흔들리는데(간격 10 인 이벤트가 1.8% 섞이면 1.16 이 된다),
-    그 흔들림으로 건너뛰면 **늦게 도착한 집계가 영영 반영되지 않는다** — 워크플로가 창을
-    8일로 잡은 이유가 바로 그 지각분을 메우는 것이라 자기 목적을 스스로 깬다.
-    막으려는 것은 1 → 10 같은 **자릿수 하락**이므로 여유를 1.5배로 둔다.
+    ★이 함수는 처음에 "저장값보다 1.5배 넘게 나빠지면 건너뛴다"는 **걸음 제한**이었다.
+    그건 누적을 못 막는다 — 걸음마다 1.5배 **미만**이면 한 번도 안 걸리고 걸어 올라간다:
+    `1.0 → 1.48 → 2.19 → 3.24 → 4.8 → 7.1 → 10.5 → … → 110`(상한 없음). "되돌아가지 않는
+    래칫"이라고 부르던 성질이 엄밀히는 성립하지 않았다(2026-09-05 실측 재현).
+
+    그래서 **총량 제한**으로 바꾼다. 정밀도를 두 계층으로 보고, 막는 것은 **정확 계층에서
+    표본 계층으로의 하락** 하나뿐이다:
+
+      new <= old        → 쓴다   개선·회수(표본 10 → 전수 1 이 여기로 들어온다)
+      new <  BAND       → 쓴다   둘 다 정확 계층 — 지각 도착분·평균 흔들림(1.00↔1.16) 수용
+      old >= BAND       → 쓴다   둘 다 표본 계층 — 정밀도 우열이 없으니 신선한 쪽
+      그 외              → 건너뛴다
+
+    정확 계층이 BAND 미만으로 **봉인**되므로 그 안의 드리프트는 유한하다(1.0→1.48→2.19 에서
+    멈춘다).
+
+    ★보증하는 것은 **"정확 계층으로 라벨된 날이 조용히 표본 계층으로 내려가지 않는다"
+    하나**다. 표본 계층 **안에서의** 정밀도 단조성은 보증하지 않는다 — 신선도를 택한
+    의도적 거래다(12 → 15 는 통과한다. 테스트가 이걸 계약으로 박아 둔다). 표본 계층에도
+    상한을 두려는 유혹(`new <= old*3`)은 **거절한다** — 그건 방금 제거한 걸음 제한을 그대로
+    다시 심는 것이고(12 → 36 → 108), 절대 상한을 정할 관측 근거가 지금 없다.
+
+    `old is None` 은 "그 날 행이 아예 없다"이고 `inf` 는 "행은 있는데 값이 NULL(미상)"이다 —
+    둘 다 새 값이 이기지만 상태가 다르므로 분기를 분리해 둔다.
 
     순수 함수 — 정책이 네트워크와 섞이지 않게 분리했다(테스트가 여기를 직접 문다).
     """
     write, skip = [], []
     for day in sorted(new_si):
         old = stored_si.get(day)
-        if (not allow_downgrade) and old is not None and new_si[day] > old * DOWNGRADE_TOLERANCE:
-            skip.append(day)
-        else:
+        new = new_si[day]
+        if (allow_downgrade or old is None or new <= old
+                or new < PRECISION_BAND or old >= PRECISION_BAND):
             write.append(day)
+        else:
+            skip.append(day)
     return write, skip
+
+
+def split_window(start: str, end: str):
+    """요청 범위를 **완결된 날들**과 **진행 중인 날**로 가른다. 순수.
+
+    ★워크플로는 `end` 를 `date -u +%Y-%m-%dT%H:00:00Z` 로 준다 — 실행 **시각**의 시를
+    잘라 쓰므로, 00 시대에 돌지 않는 한 범위 끝이 **아직 안 닫힌 날의 한복판**에 걸린다.
+    크론이 04:30·16:30 이라 예약 실행은 **항상** 그 상태다.
+
+    2026-09-05 실측에서 표본 여부가 갈린 자리가 정확히 그 경계였다(00 시대 실행은 전수,
+    01 시대 이후는 전부 표본). **인과로 단정하지 않는다** — 그날 런들은 시각과 `--end` 가
+    같이 커져 두 축이 교란돼 있었고, ABR 은 창 길이에도 반응하는 것이 따로 확인됐다.
+
+    다만 **가설이 맞든 틀리든 이렇게 쪼개는 편이 낫다**: 완결분은 다시 바뀌지 않는 확정
+    구간이고, 진행 중인 날은 계속 커지는 잠정치다. 둘을 한 질의에 섞으면 확정 구간까지
+    잠정치의 성질을 뒤집어쓴다. 성질이 다른 것을 한 축에 합치지 않는다.
+
+    반환: [(start, end, 라벨)] — 비는 구간은 빼고 준다.
+    """
+    boundary = end[:10] + "T00:00:00Z"      # end 가 속한 날의 자정(=마지막 완결 경계)
+    out = []
+    if boundary > start:
+        out.append((start, boundary, "완결"))
+    if end > boundary:
+        out.append((boundary, end, "진행중"))
+    return out or [(start, end, "완결")]
 
 
 def replace_days(url: str, key: str, table: str, rows, days, *, timeout: float = 30.0) -> int:
@@ -439,12 +497,34 @@ def main(argv=None) -> int:
         print("account-tag / site-tag 필요", file=sys.stderr)
         return 2
 
-    payloads = {g: fetch_group(token, args.account_tag, args.site_tag,
-                               args.start, args.end, g) for g in GROUPS}
+    windows = split_window(args.start, args.end)
     if args.probe:
-        print(probe_report(payloads))
+        for w_start, w_end, label in windows:
+            print(f"── 창[{label}] {w_start} ~ {w_end}")
+            print(probe_report({g: fetch_group(token, args.account_tag, args.site_tag,
+                                               w_start, w_end, g) for g in GROUPS}))
         return 0
 
+    creds = None
+    if not args.dry_run:
+        creds = grm_cli.resolve_supabase_service_credentials(args)
+        if not creds:
+            print("SUPABASE_URL/SERVICE_ROLE_KEY 미설정 — 적재 불가", file=sys.stderr)
+            return 2
+
+    grand_total = 0
+    for w_start, w_end, label in windows:
+        print(f"── 창[{label}] {w_start} ~ {w_end}")
+        grand_total += collect_window(token, args, w_start, w_end, creds)
+    if creds:
+        print(f"적재 완료: 총 {grand_total}행")
+    return 0
+
+
+def collect_window(token, args, start: str, end: str, creds) -> int:
+    """창 하나를 수집해 적재한다. creds 가 None 이면 파싱까지만(dry-run)."""
+    payloads = {g: fetch_group(token, args.account_tag, args.site_tag,
+                               start, end, g) for g in GROUPS}
     daily, si_totals = parse_totals(payloads["totals"])
     refs, si_refs = parse_referrers(payloads["referrers"])
     paths, si_paths = parse_paths(payloads["paths"])
@@ -472,13 +552,8 @@ def main(argv=None) -> int:
              sorted(set(si_paths.values())) or [1.0],
              sorted(set(si_countries.values())) or [1.0],
              sorted(set(si_devices.values())) or [1.0]))
-    if args.dry_run:
+    if creds is None:
         return 0
-
-    creds = grm_cli.resolve_supabase_service_credentials(args)
-    if not creds:
-        print("SUPABASE_URL/SERVICE_ROLE_KEY 미설정 — 적재 불가", file=sys.stderr)
-        return 2
     url, key = creds
 
     # 답을 받은 날(totals 기준)만 손댄다. 표별로 정밀도 가드를 따로 적용한다 —
@@ -499,8 +574,7 @@ def main(argv=None) -> int:
         total_written += n
         note = f" · 건너뜀 {len(skip)}일(저장값이 더 정확)" if skip else ""
         print(f"{table}: {len(write)}일 {n}행 재적재{note}")
-    print(f"적재 완료: 총 {total_written}행")
-    return 0
+    return total_written
 
 
 if __name__ == "__main__":

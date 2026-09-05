@@ -15471,6 +15471,128 @@ class WebEnGlossaryTest(unittest.TestCase):
         self.assertIn(f'hreflang="en" href="{render.SITE_BASE_URL}/en/glossary/{slug}/"',
                       ko, "짝이 생겼는데 한국어 쪽이 모른다(단방향 짝은 짝이 아니다)")
 
+    # ── [동의어 2026-09-05] 영어판 "다른 표기" 칩 ────────────────────────────
+    # 영문 243장이 라이브가 된 뒤 실측하니 별칭 칩이 영어 트리에 **0개**였다(색인
+    # `gl-alias` KO 61 / EN 0, 낱말 페이지 `gt-alias` KO 1 / EN 0). 템플릿도 문구 사전도
+    # 멀쩡했고 — `{% if %}` 게이트와 "Also called"/"Also written" 번역은 이미 있었다 —
+    # 뷰가 `lang != "ko"` 에서 표시용 목록을 **통째로 빈 리스트로** 넘기고 있었다.
+    # 그래서 영어 독자가 FDA 문서에서 보고 온 이름(`cGMP`·`reserve sample`)이 영어
+    # 화면에는 한 번도 나오지 않았다. 정본 149개 중 109개가 비한글인데 0개였다.
+    # 실측(2026-09-05) — 영문 표제어와 표기만 다른 것 22 제외 · 한글이라 40 제외 ·
+    # 실제로 화면에 실린 것 55어 87개.
+    _ALIAS_HANGUL = re.compile("[가-힣]")
+
+    @staticmethod
+    def _term_alias_chips(html: str) -> "list[str]":
+        """낱말 페이지 `gt-alias` 블록 안 칩 텍스트만(라벨 `<b>` 는 뺀다)."""
+        m = re.search(r'<p class="gt-alias">(.*?)</p>', html, re.S)
+        return re.findall(r"<span>(.*?)</span>", m.group(1)) if m else []
+
+    @staticmethod
+    def _index_card(index_html: str, term_id: str) -> str:
+        """색인에서 그 용어 카드 한 장만 잘라 낸다(옆 카드의 블록에 속지 않도록)."""
+        start = index_html.index(f'<article class="gl-term" id="{term_id}"')
+        return index_html[start:index_html.index("</article>", start)]
+
+    def _view_by_id(self, lang: str) -> "dict[str, dict]":
+        view = render.build_glossary_view(self.terms, lang=lang)
+        return {t["id"]: t for g in view["groups"] for t in g["terms"]}
+
+    def test_english_alias_chips_carry_no_korean(self):
+        """★영어 화면에 한글 표기를 실으면 그 칩만 번역이 덜 된 것으로 읽힌다.
+
+        정본 동의어 149개 중 40개는 한국어 표기(「기준일탈」·「밸리데이션」…)다. 빼는
+        기준은 "번역이 어려워서"가 아니라 **그 값이 이름인가 표기인가**다 — 출처
+        「알기 쉬운 GMP 용어집」이나 「약사법」 제39조는 실제 문서·법령의 **이름**이라
+        옮기면 존재하지 않는 것을 가리키게 되므로 원문 그대로 두고 화면이 그 사실을
+        밝힌다. 반면 동의어는 같은 개념의 **다른 표기**라, 한국어 표기는 영어 독자에게
+        읽히지 않는 글자일 뿐이고 남겨 둘 근거가 없다.
+        """
+        bad = []
+        for p in sorted(self.dir.glob("*/index.html")):
+            bad += [(p.parent.name, c)
+                    for c in self._term_alias_chips(p.read_text(encoding="utf-8"))
+                    if self._ALIAS_HANGUL.search(c)]
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        bad += [("index", v)
+                for v in re.findall(r'<span class="gl-alias-v">(.*?)</span>', idx, re.S)
+                if self._ALIAS_HANGUL.search(v)]
+        self.assertEqual(bad, [], f"영어 별칭 칩에 한글이 남았다: {bad[:5]}")
+
+    def test_terms_left_with_no_english_alias_drop_the_block_entirely(self):
+        """남길 것이 하나도 없으면 라벨만 남은 빈 블록을 만들지 않는다.
+
+        한글 동의어만 가진 용어가 6개 있다(data-integrity·capa·sop…). 여기서 라벨을
+        먼저 찍고 목록을 비우면 "Also written" 뒤가 텅 빈 줄이 되어, 값이 실리다 만
+        것처럼 보인다 — 실제로는 **실을 값이 애초에 없다**. 대상은 손으로 적지 않고
+        두 트리 뷰의 차집합에서 파생한다(정본이 바뀌면 목록도 따라 바뀐다).
+        """
+        ko, en = self._view_by_id("ko"), self._view_by_id("en")
+        only_ko = sorted(i for i, t in ko.items() if t["aliases"] and not en[i]["aliases"])
+        self.assertGreater(
+            len(only_ko), 0,
+            "한글 전용 동의어만 가진 용어가 하나도 없다 — 이 가드가 아무것도 안 지킨다"
+            "(정본이 바뀌었다면 가드를 다시 겨눠야 한다)")
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        bad = []
+        for tid in only_ko:
+            html = (self.dir / tid / "index.html").read_text(encoding="utf-8")
+            if '<p class="gt-alias">' in html:
+                bad.append(f"{tid}(낱말 페이지)")
+            if '<p class="gl-alias">' in self._index_card(idx, tid):
+                bad.append(f"{tid}(색인 카드)")
+        self.assertEqual(bad, [], f"실을 별칭이 0인데 블록이 남았다: {bad[:5]}")
+
+    def test_english_aliases_actually_reach_the_screen(self):
+        """뷰가 채워도 템플릿이 안 그리면 사용자는 못 본다 — 화면 HTML 로 확인한다.
+
+        ★하한을 함께 건다. "한글이 없다"만 보는 가드는 별칭이 **전부 사라져도** 초록이라
+          바로 이번에 고친 상태(EN 0개)를 그대로 통과시킨다 — 이 저장소가 반복해 데인
+          "아무것도 안 지키는 가드"다. 실측 2026-09-05 = 55어 87개.
+        """
+        from markupsafe import escape as _esc_en_alias
+        en = self._view_by_id("en")
+        expected = {i: t["aliases"] for i, t in en.items() if t["aliases"]}
+        self.assertGreaterEqual(len(expected), 50,
+                                f"영어 별칭이 실린 용어가 줄었다: {len(expected)}어")
+        self.assertGreaterEqual(
+            sum(len(v) for v in expected.values()), 80,
+            f"영어에 실린 별칭 총량이 줄었다: {sum(len(v) for v in expected.values())}개")
+        bad = []
+        for tid, aliases in sorted(expected.items()):
+            chips = self._term_alias_chips(
+                (self.dir / tid / "index.html").read_text(encoding="utf-8"))
+            if chips != [str(_esc_en_alias(a)) for a in aliases]:
+                bad.append(f"{tid}: 화면={chips} 뷰={aliases}")
+        self.assertEqual(bad, [], f"낱말 페이지에 별칭이 뷰대로 안 실렸다: {bad[:3]}")
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(idx.count('<p class="gl-alias">'), len(expected),
+                         "색인 카드의 별칭 블록 수가 뷰와 다르다")
+        # 실측 대표 1건 — 이 사이트에서 가장 많이 읽히는 용어의 FDA 표기.
+        self.assertIn("<span>cGMP</span>",
+                      (self.dir / "gmp" / "index.html").read_text(encoding="utf-8"))
+
+    def test_english_hides_aliases_that_only_differ_from_the_english_headword(self):
+        """★중복 판정의 비교 대상은 **그 트리가 실제로 띄운 표제어**여야 한다.
+
+        영어판에서 한국어 표제어와 대조하면 한글 대 로마자라 하이픈·공백을 지워도
+        겹칠 수가 없어 **아무것도 걸러지지 않는다** — 한국어판이 이미 잡음이라고
+        판정한 `Back-up` 옆의 `backup` 이 영어판에서만 되살아난다. 감춤이 화면 전용
+        이라는 성질은 그대로다(검색은 위 `_FDA_ALIAS_PROBES` 계열이 지킨다).
+        실측 = 22개가 이 판정으로 빠진다.
+        """
+        en = self._view_by_id("en")
+        dup = [(t["id"], a) for t in self.terms for a in (t.get("aliases") or [])
+               if render._glossary_alias_norm(a)
+               in render._glossary_alias_norm(t["term_en"])]
+        self.assertGreater(
+            len(dup), 0,
+            "영문 표제어와 표기만 다른 동의어가 정본에 하나도 없다 — 이 가드가 "
+            "아무것도 안 지킨다")
+        left = [f"{tid}:{a}" for tid, a in dup if a in en[tid]["aliases"]]
+        self.assertEqual(left, [],
+                         f"영문 표제어와 표기만 다른 동의어가 화면에 남았다: {left[:5]}")
+
 
 class WebEnClauseTest(unittest.TestCase):
     """[다국어 2026-09-04] 영어판 조항 페이지 — 본문은 원문(영어), 건수는 그 모집단.

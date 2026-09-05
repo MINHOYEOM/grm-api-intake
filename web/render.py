@@ -1441,11 +1441,12 @@ def build_glossary_view(
     미지정 시 URL 은 모두 ""(호출부 호환 — 기존 동작 그대로). 그룹·용어 정렬 결정론.
 
     aliases([A1] 동의어, glossary.json 정본 — 여기서 수정 안 함)는 검색용과 표시용이
-    다르다. search 에는 항상 전량 포함(사용자가 FDA 표현으로 검색해도 걸리도록).
-    뷰모델 "aliases" 키(표시용)는 _glossary_alias_norm 판정으로 표제어(term_ko 또는
-    term_en)와 하이픈·공백 차이만 있는 표현만 골라 제외한 나머지만 담는다(원본 순서
-    유지). aliases 없으면 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략,
-    search 도 기존과 byte 동일.
+    다르다. 한국어판 search 에는 항상 전량 포함(사용자가 FDA 표현으로 검색해도 걸리도록).
+    뷰모델 "aliases" 키(표시용)는 _glossary_alias_norm 판정으로 **그 트리가 띄운 표제어**
+    (한국어판=term_ko·term_en, 영어판=term_en)와 하이픈·공백 차이만 있는 표현을 제외한
+    나머지만 담는다(원본 순서 유지). 영어판은 거기서 한 겹 더 — 한글이 든 동의어는
+    싣지 않는다(영어 트리에 한국어 0). aliases 없거나 전량 제외면 빈 리스트라 템플릿
+    {% if t.aliases %} 게이트로 조용히 생략, search 도 기존과 byte 동일.
 
     cases(glossary_cases.json items, id→item)는 [C1] 사례 링크 심화 필드 — 있으면
     case_q/case_findings/case_count_label/case_href 를 채운다(id 가 cases 에 없으면
@@ -1499,12 +1500,24 @@ def build_glossary_view(
             # 한글이 검색 인덱스에만 남아, 영어 사용자가 왜 걸렸는지 알 수 없게 된다.
             search_parts = [t["term_en"], easy] + ([detail] if detail else [])
         # [A1] 표시용: 표제어와 하이픈·공백 차이만 있는 동의어는 잡음이라 제외(감춤은
-        # 화면뿐 — search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
-        norm_ko = _glossary_alias_norm(t["term_ko"])
-        norm_en = _glossary_alias_norm(t["term_en"])
+        # 화면뿐 — 한국어판 search 는 위에서 이미 전량 포함했다). 순서는 데이터 원본 유지.
+        # ★비교 대상 표제어는 **그 트리가 실제로 띄운 표제어**다(2026-09-05). 영어판은
+        #   `term_en` 만 보이므로 한국어 표제어와 대조하면 아무것도 걸러지지 않는다 —
+        #   한글과 로마자는 하이픈·공백을 지워도 겹칠 수가 없기 때문이다. 그러면
+        #   `Back-up` 옆에 `backup` 이 "다른 표기"로 나란히 서는, 한국어판에서 이미
+        #   잡음이라고 판정한 그 화면이 영어판에서만 되살아난다.
+        head_norms = ([_glossary_alias_norm(t["term_ko"]),
+                       _glossary_alias_norm(t["term_en"])] if is_ko
+                      else [_glossary_alias_norm(t["term_en"])])
         display_aliases = [a for a in aliases
-                            if _glossary_alias_norm(a) not in norm_ko
-                            and _glossary_alias_norm(a) not in norm_en]
+                           if all(_glossary_alias_norm(a) not in h for h in head_norms)]
+        if not is_ko:
+            # ★영어 화면에 한글 표기는 싣지 않는다. 동의어 149개 중 40개는 한국어 표기
+            #   (「기준일탈」·「밸리데이션」…)라 영어 독자에게는 읽히지 않고, 이 사이트가
+            #   지켜 온 "영어 트리에 한국어 0" 규율을 화면 한복판에서 깬다. 남는 것이
+            #   하나도 없는 용어는 빈 리스트가 되어 템플릿 {% if %} 게이트가 라벨까지
+            #   통째로 생략한다(빈 "Also written" 만 남기지 않는다).
+            display_aliases = [a for a in display_aliases if not _HANGUL_RE.search(a)]
         # 사례 정본도 읽는 트리의 모집단이어야 한다. 영어는 `term_en`을 실제 RPC로
         # 확인하고 p_orig_lang=en으로 다시 센 별도 파일만 넘긴다. 파일 부재는 링크를
         # 조용히 비우지만, 한국어 전체 코퍼스 파일로 폴백해 거짓 수를 만들지는 않는다.
@@ -1534,8 +1547,8 @@ def build_glossary_view(
             "reg_refs": reg_refs,
             # [A1] 표시용 동의어(표제어와 하이픈·공백만 다른 것 제외) — 부재/전량제외 시
             # 빈 리스트라 템플릿 {% if t.aliases %} 게이트로 조용히 생략.
-            # 동의어는 한국어 표기라 영어판에서는 싣지 않는다(검색에도 넣지 않는다).
-            "aliases": display_aliases if is_ko else [],
+            # 영어판은 한글이 든 동의어만 더 걸러 낸다(위 head_norms/한글 판정 참조).
+            "aliases": display_aliases,
             # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
             "case_q": case_q,
             "case_findings": case_findings,
@@ -3531,11 +3544,14 @@ def build_glossary_term_json_ld(term: dict[str, Any],
     """schema.org DefinedTerm — 용어 페이지가 '사전 항목'임을 검색엔진에 명시.
 
     inLanguage 은 **그 페이지의 언어**다. `name` 은 그 언어의 표제어,
-    `alternateName` 은 한국어판에서만 영문 표제어(+동의어)를 싣는다.
+    `alternateName` 은 한국어판이면 영문 표제어(+동의어), 영어판이면 화면에 실린
+    동의어(한글 표기는 뷰가 이미 걸러 냈다 — 영어 구조화 데이터에 한국어를 넣지
+    않는다는 판단은 그대로다).
     값은 전부 정본 무변형이고 json.dumps 가 이스케이프를 책임진다(수동 문자열 결합 0).
     """
-    # 한국어판은 영문 표제어를 대체명으로 싣는다. 영어판은 표제어가 곧 영문이라
-    # 대체명이 없다(한국어 표기를 영어 구조화 데이터에 넣지 않는다).
+    # 한국어판은 영문 표제어를 대체명 맨 앞에 싣는다(term_sub 는 한국어판에만 있다).
+    # 두 트리 모두 그 뒤에 **화면과 같은 동의어 목록**을 잇는다 — 구조화 데이터가
+    # 화면보다 더 말하거나 덜 말하면 그 자체가 어긋난 신호다.
     alt = ([term["term_sub"], *term.get("aliases", [])]
            if term.get("term_sub") else list(term.get("aliases") or []))
     node: dict[str, Any] = {

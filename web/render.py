@@ -33,6 +33,7 @@ import argparse
 import hashlib
 import json
 import os
+import functools
 import re
 import shutil
 import sys
@@ -1929,6 +1930,20 @@ def _doc_term_is_verbish(text: str, start: int, end: int) -> bool:
                 or _DOC_TERM_POST_VERBISH.match(text[end:end + 2]))
 
 
+@functools.lru_cache(maxsize=4096)
+def _doc_term_pattern(surface: str, ignore_case: bool) -> "re.Pattern[str]":
+    """낱말 경계 패턴 — **표면형당 한 번만** 컴파일한다.
+
+    ★[2026-09-05] 종전에는 `_doc_term_find` 안에서 매 호출마다 `re.compile` 했다.
+      영어 경로가 생기면서 표면형 351개 × 문서 3,305장 = 116만 회가 됐고, 문서 빈도
+      계산이 **한국어 2.9s / 영어 40.7s** 로 벌어졌다(같은 일인데 14배). CI 전체가
+      15m50s → 29m28s 로 늘어 30분 상한에 닿았다 — 상한을 올리기 전에 이유를 재니
+      알고리즘이 아니라 컴파일 반복이었다. 판정 결과는 그대로다(패턴이 같다).
+    """
+    return re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])",
+                      re.IGNORECASE if ignore_case else 0)
+
+
 def _doc_term_find(
     text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
 ) -> int:
@@ -1936,12 +1951,26 @@ def _doc_term_find(
     if lang != DEFAULT_LANG:
         # 영어는 대소문자가 문장 안에서 바뀌어도 같은 표제어다. 다만 낱말 경계는
         # 표제어 전체에 적용해 `quality`가 `inequality` 안에 걸리는 일을 막는다.
-        m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])",
-                       re.IGNORECASE).search(text, start)
-        return m.start() if m else -1
+        # ★대소문자 무시 스캔은 문서마다 표면형 수만큼 돌아 비싸다(실측: 표면형 351개 ×
+        #   문서 3,305장에서 IGNORECASE 정규식 39.6s vs 한국어 경로 2.9s — 한국어는
+        #   표면형 대부분이 한글이라 `str.find` 로 빠지기 때문이다). 그래서 텍스트를
+        #   **한 번만 접어** `str.find` 로 위치를 잡고 경계는 따로 본다. 길이가 보존되지
+        #   않는 문자가 섞이면(예: 'İ'.lower() 는 2자) 위치가 어긋나므로 그때만 정규식으로
+        #   되돌아간다 — 빠른 길은 안전할 때만 탄다.
+        low, s_low = text.lower(), surface.lower()
+        if len(low) != len(text) or len(s_low) != len(surface):
+            m = _doc_term_pattern(surface, True).search(text, start)
+            return m.start() if m else -1
+        pos = low.find(s_low, start)
+        while pos >= 0:
+            before = low[pos - 1] if pos else ""
+            after = low[pos + len(s_low):pos + len(s_low) + 1]
+            if not (before.isalnum() and before.isascii()) and                not (after.isalnum() and after.isascii()):
+                return pos
+            pos = low.find(s_low, pos + 1)
+        return -1
     if _LATIN_TOKEN.match(surface):
-        m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])").search(
-            text, start)
+        m = _doc_term_pattern(surface, False).search(text, start)
         return m.start() if m else -1
     pos = text.find(surface, start)
     while pos >= 0 and _doc_term_is_verbish(text, pos, pos + len(surface)):

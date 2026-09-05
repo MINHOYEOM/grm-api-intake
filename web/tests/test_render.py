@@ -14663,25 +14663,91 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn('id="grm-rum-precision"', self.admin_html)
         self.assertIn('id="grm-rum-paths-precision"', self.admin_html)
 
-    def test_precision_guard_never_downgrades_a_stored_day(self):
+    def test_precision_guard_blocks_only_tier_downgrade(self):
         """★8일 롤링 재적재가 과거의 정확값을 표본 추정값으로 덮어썼다(8/25~9/1 파괴).
+
+        ★처음엔 걸음 제한("저장값보다 1.5배 넘게 나빠지면 건너뛴다")이었는데, 그건 누적을
+        못 막는다 — 걸음마다 1.5배 미만이면 한 번도 안 걸리고 `1.0 → … → 110` 까지 걸어
+        올라간다(아래 드리프트 테스트가 이걸 잠근다). 그래서 **계층(총량) 제한**이다.
 
         순수 함수라 값으로 직접 묻는다 — 문자열 대조로는 이 계약을 잴 수 없다.
         """
         keep = rum_collector.keep_days
-        self.assertEqual(keep({"d1": 10.0}, {"d1": 1.0}), ([], ["d1"]),
-                         "저장값이 더 정확한데 덮어쓴다")
-        self.assertEqual(keep({"d1": 1.0}, {"d1": 10.0}), (["d1"], []))
+        band = rum_collector.PRECISION_BAND
+        # 막는 것은 이것 하나 — 정확 계층 → 표본 계층 하락.
+        self.assertEqual(keep({"d1": 5.5}, {"d1": 1.0}), ([], ["d1"]),
+                         "정확 계층의 값을 표본 계층 값이 덮는다")
+        self.assertEqual(keep({"d1": band}, {"d1": 1.0}), ([], ["d1"]), "계층 경계는 하락이다")
+        # 나머지는 전부 통과해야 한다.
+        self.assertEqual(keep({"d1": 1.0}, {"d1": 10.0}), (["d1"], []), "회수를 막는다")
         self.assertEqual(keep({"d1": 1.0}, {"d1": 1.0}), (["d1"], []))
-        # ★평균의 실행 간 흔들림(1.00↔1.16)으로 건너뛰면 **늦게 도착한 집계가 영영 못
-        # 들어온다** — 창을 8일로 잡은 목적 자체를 깬다. 막을 것은 자릿수 하락뿐.
+        # ★평균의 실행 간 흔들림(1.00↔1.16)으로 건너뛰면 늦게 도착한 집계가 영영 못
+        # 들어온다 — 창을 8일로 잡은 목적 자체를 깬다.
         self.assertEqual(keep({"d1": 1.16}, {"d1": 1.0}), (["d1"], []),
                          "표본 간격 평균의 미세한 흔들림으로 지각 집계를 버린다")
-        self.assertEqual(keep({"d1": 2.0}, {"d1": 1.0}), ([], ["d1"]))
+        # ★경로는 좋은 실행에서도 2.0 까지 간다(차원 기수). 여기서 막히면 가장 거친 표의
+        # 정상 갱신이 상시 차단된다 — 경계를 2.0 에 두면 안 되는 이유가 이것이다.
+        self.assertEqual(keep({"d1": 2.0}, {"d1": 1.5}), (["d1"], []))
         self.assertEqual(keep({"d1": 10.0}, {}), (["d1"], []), "저장된 적 없는 날은 써야 한다")
         self.assertEqual(keep({"d1": 10.0}, {"d1": 1.0}, allow_downgrade=True), (["d1"], []))
         # NULL(미상)은 무한대로 읽혀 새 수집이 이긴다 — 075 이전 행이 영구히 남지 않게.
         self.assertEqual(keep({"d1": 10.0}, {"d1": float("inf")}), (["d1"], []))
+
+    def test_sampled_tier_prefers_freshness_and_says_so(self):
+        """★보증하지 않는 것도 계약이다.
+
+        표본 계층 **안에서는** 정밀도 단조성을 보증하지 않는다 — 둘 다 못 믿는 값이라
+        신선한 쪽을 택한 **의도적 거래**다. 이걸 적어 두지 않으면 다음 사람이
+        "래칫 = 정밀도 단조 개선"으로 읽고 정상 동작(12 → 15)을 결함으로 신고한다.
+        (2026-09-05: 병렬 세션의 감시 태스크가 실제로 그 오경보를 낼 뻔했다.)
+        """
+        keep = rum_collector.keep_days
+        self.assertEqual(keep({"d1": 15.0}, {"d1": 12.0}), (["d1"], []),
+                         "표본끼리는 신선한 쪽을 택한다 — 이건 결함이 아니라 계약이다")
+
+    def test_precision_drift_is_sealed_inside_the_exact_tier(self):
+        """★걸음마다 안전해도 총량은 안전하지 않다.
+
+        옛 걸음 제한(1.5배)에서는 1.48배를 반복하면 한 번도 안 걸리고 110배까지 갔다.
+        계층 규칙에서는 정확 계층이 BAND 미만으로 봉인돼 누적 이탈이 유한하다.
+        """
+        keep = rum_collector.keep_days
+        band = rum_collector.PRECISION_BAND
+        cur, steps = 1.0, 0
+        while steps < 50:
+            nxt = cur * 1.48
+            write, _skip = keep({"d1": nxt}, {"d1": cur})
+            if not write:
+                break
+            cur, steps = nxt, steps + 1
+        self.assertLess(cur, band, f"정확 계층이 봉인되지 않는다 — {cur} 까지 걸어 올라갔다")
+        self.assertLess(steps, 5, "걸음이 계속 허용된다 = 총량 제한이 아니다")
+
+    def test_window_is_split_at_the_last_completed_utc_midnight(self):
+        """★완결된 날과 진행 중인 날을 한 질의에 섞지 않는다.
+
+        워크플로는 `end` 를 실행 **시각**의 시로 잘라 준다(`date -u +%…T%H:00:00Z`).
+        그래서 00 시대에 돌지 않는 한 범위 끝이 아직 안 닫힌 날의 한복판에 걸린다.
+        완결분은 다시 안 바뀌는 확정 구간이고 진행 중인 날은 계속 커지는 잠정치라,
+        성질이 다른 둘을 한 축에 합치지 않는다.
+        """
+        split = rum_collector.split_window
+        # 진행 중인 날이 걸린 창 → 둘로 갈린다.
+        got = split("2026-08-28T00:00:00Z", "2026-09-05T04:00:00Z")
+        self.assertEqual([(a, b) for a, b, _l in got],
+                         [("2026-08-28T00:00:00Z", "2026-09-05T00:00:00Z"),
+                          ("2026-09-05T00:00:00Z", "2026-09-05T04:00:00Z")])
+        # 이미 자정에서 끝나면 완결분 하나뿐 — 빈 창을 만들지 않는다.
+        got = split("2026-08-28T00:00:00Z", "2026-09-05T00:00:00Z")
+        self.assertEqual(len(got), 1)
+        self.assertEqual(got[0][1], "2026-09-05T00:00:00Z")
+        # 오늘 안에서만 도는 창도 성립해야 한다(빈 목록을 주면 수집이 통째로 사라진다).
+        got = split("2026-09-05T00:00:00Z", "2026-09-05T07:00:00Z")
+        self.assertEqual(len(got), 1)
+        # 수집기가 실제로 이 분할을 쓰는지 — 순수 함수만 초록이면 배선이 죽어도 모른다.
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("windows = split_window(args.start, args.end)", src)
+        self.assertIn("for w_start, w_end, label in windows:", src)
 
     def test_window_is_replaced_so_stale_rows_cannot_survive(self):
         """upsert 만 하면 사라진 호스트의 옛 행이 남는다 — 2026-09-05 실측: 8/31 은

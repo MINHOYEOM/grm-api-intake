@@ -7321,7 +7321,9 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 구역별로 갈라도 못 읽는다. 조건이 제출 두 키로 좁혀져 있어야 한다.
         self.assertIn("key==='band_submit'||key==='cta_submit'", fscript)
         # ★구역은 경로 첫 조각뿐 — 쿼리스트링이 실리면 URL 에 든 실명이 DB 로 간다.
-        zone_fn = fscript.split("function zone()", 1)[1].split("}", 1)[0]
+        # ★"}" 로 자르면 안 된다 — 정규식 `{1,24}` 안에 그 문자가 있어서 함수 본문이
+        # 정규식 앞에서 잘린다(2026-09-05 CI 가 잡았다). 다음 함수 선언으로 자른다.
+        zone_fn = fscript.split("function zone()", 1)[1].split("function bump(", 1)[0]
         self.assertIn("location.pathname", zone_fn)
         self.assertIn("split('/')[1]", zone_fn)
         self.assertNotIn("location.search", zone_fn)

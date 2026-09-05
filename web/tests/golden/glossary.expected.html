@@ -3179,14 +3179,15 @@ body.grm-has-share .grm-card-actions{display:flex}
 </script>
 <script>
 (function(){
-  var p=location.pathname,h=location.hostname;
+  var p=location.pathname,h=location.hostname,ua=navigator.userAgent||'';
   var admin=p==='/admin'||p.indexOf('/admin/')===0;
+  var auto=navigator.webdriver===true||/\bHeadless|\bClaude\//.test(ua);
   var op=false;
   try{
     if(admin)localStorage.setItem('grm-op','1');
     op=localStorage.getItem('grm-op')==='1';
   }catch(e){}
-  if(admin||op)return;
+  if(admin||op||auto)return;
   if(h!=='grm-solutions.com'&&h!=='www.grm-solutions.com')return;
   var s=document.createElement('script');
   s.src='https://static.cloudflareinsights.com/beacon.min.js';

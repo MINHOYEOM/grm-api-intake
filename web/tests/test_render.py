@@ -36,6 +36,7 @@ sys.path.insert(0, str(REPO_ROOT))
 import render  # noqa: E402  (web/render.py — 경로 삽입 후 import)
 import grm_i18n  # noqa: E402  (web/grm_i18n.py — 다국어 문구 사전·검사기)
 import grm_findings  # noqa: E402  (FIND-1 M6d 카테고리 라벨 동기화 대조용)
+import collect_rum_analytics as rum_collector  # noqa: E402  (RUM 수집기 — 순수 함수 계약)
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
 GOLDEN_DIR = TESTS_DIR / "golden"
@@ -7231,6 +7232,26 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertLess(fscript.index("hn!=='grm-solutions.com'"),
                         fscript.index("rpc/funnel_bump"),
                         "호스트 판정이 전송(fetch)보다 뒤다")
+        # 자동화 브라우저 제외 — RUM 게이트(2026-09-05)와 같은 판정. 노출(view) 카운터가
+        # JS 실행 크롤러로 부푸는 경로를 일부 막는다(일 170 vs 실방문 21 — 2026-09-01 실측).
+        self.assertIn("navigator.webdriver===true", fscript,
+                      "깔때기 bump 에 자동화 브라우저 제외가 없다")
+        self.assertLess(fscript.index("navigator.webdriver"),
+                        fscript.index("rpc/funnel_bump"),
+                        "자동화 판정이 전송(fetch)보다 뒤다")
+        # [076] 제출은 구역을 함께 남긴다 — "어디서 구독했나"에 답할 유일한 자료.
+        self.assertIn("rpc/funnel_zone_bump", fscript)
+        self.assertIn("JSON.stringify({p_key:key,p_zone:zone()})", fscript)
+        # ★노출(view)은 보내지 않는다 — 요청이 두 배가 되고, 노출은 크롤러 오염이라
+        # 구역별로 갈라도 못 읽는다. 조건이 제출 두 키로 좁혀져 있어야 한다.
+        self.assertIn("key==='band_submit'||key==='cta_submit'", fscript)
+        # ★구역은 경로 첫 조각뿐 — 쿼리스트링이 실리면 URL 에 든 실명이 DB 로 간다.
+        zone_fn = fscript.split("function zone()", 1)[1].split("}", 1)[0]
+        self.assertIn("location.pathname", zone_fn)
+        self.assertIn("split('/')[1]", zone_fn)
+        self.assertNotIn("location.search", zone_fn)
+        self.assertNotIn("location.href", zone_fn)
+        self.assertIn("/^[a-z0-9-]{1,24}$/", zone_fn)
 
 
 class WebAdminRenderTest(unittest.TestCase):
@@ -7390,7 +7411,7 @@ class WebCloudflareBeaconGateTest(unittest.TestCase):
     def test_gate_decides_before_injecting(self):
         # 판정 3종이 전부 주입 URL 보다 앞 — 게이트를 주입 뒤로 옮기면(=무력화) 여기서 red.
         inject = self.landing.index("static.cloudflareinsights.com/beacon.min.js")
-        self.assertLess(self.landing.index("if(admin||op)return;"), inject)
+        self.assertLess(self.landing.index("if(admin||op||auto)return;"), inject)
         self.assertLess(
             self.landing.index("if(h!=='grm-solutions.com'&&h!=='www.grm-solutions.com')return;"),
             inject)
@@ -7398,6 +7419,31 @@ class WebCloudflareBeaconGateTest(unittest.TestCase):
         # 운영자 판정 재료 — 플래그 조회 + /admin 방문 즉시 세팅(첫 admin 방문도 비집계).
         self.assertIn("localStorage.getItem('grm-op')==='1'", self.landing)
         self.assertIn("localStorage.setItem('grm-op','1')", self.landing)
+
+    def test_automation_browsers_are_excluded(self):
+        """★우리 자신의 트래픽을 우리 지표에서 뺀다.
+
+        2026-09-04 실측: 라이브에서 404 를 점검하던 개발용 인앱 브라우저가 그날 방문
+        표본 6건 중 2건으로 잡혔다(`/findings/doc/zzz-none/` — 그 슬러그는 그날 커밋
+        메시지에만 있는 가짜라 외부 방문일 수 없다).
+
+        ★navigator.webdriver 만으로는 못 잡는다 — 그 브라우저는 값이 **false** 다
+        (2026-09-05 실측 · UA 는 `Claude/1.46388.3`). 자기를 밝히는 UA 표식을 함께
+        본다. Cloudflare 의 bot 필터를 대신하려는 것이 아니다(남을 속이는 크롤러는
+        여전히 그쪽 몫) — 목적은 우리 손이 만든 트래픽을 우리 계기에서 빼는 것뿐이다.
+        """
+        inject = self.landing.index("static.cloudflareinsights.com/beacon.min.js")
+        self.assertIn("var auto=", self.landing)
+        expr = self.landing.split("var auto=", 1)[1].split(";", 1)[0]
+        self.assertIn("navigator.webdriver===true", expr)
+        self.assertIn("Claude", expr, "인앱 브라우저 표식이 없다 — webdriver 는 false 다")
+        self.assertIn("Headless", expr)
+        self.assertLess(self.landing.index("var auto="), inject,
+                        "자동화 판정이 주입보다 뒤다 — 비콘이 먼저 나간다")
+        # ★계산만 하고 안 쓰면 게이트가 아니다 — 주입 전에 auto 가 조기 return 에 실려야 한다.
+        guard = self.landing[self.landing.index("var auto="):inject]
+        self.assertRegex(guard, r"if\([^)]*\bauto\b[^)]*\)return;",
+                         "auto 를 계산만 하고 판정에 쓰지 않는다")
 
     def test_beacon_injection_is_dynamic_only(self):
         # 정적 태그(엣지 자동 주입과 같은 형태)로 "단순화"하면 게이트가 통째로 우회된다 —
@@ -14006,6 +14052,8 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
                       "060_subscribe_funnel_counts.sql").read_text(encoding="utf-8")
         cls.mig071 = (WEB_DIR / "migrations" /
                       "071_funnel_counts_daily.sql").read_text(encoding="utf-8")
+        cls.mig076 = (WEB_DIR / "migrations" /
+                      "076_funnel_zone_counts.sql").read_text(encoding="utf-8")
 
     def _check_keys(self, sql):
         m = re.search(r"key in \(([^)]*)\)", sql)
@@ -14016,6 +14064,7 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         expected = {"band_view", "band_submit", "cta_view", "cta_submit", "cta_dismiss"}
         self.assertEqual(self._check_keys(self.mig060), expected, "060 CHECK 어휘")
         self.assertEqual(self._check_keys(self.mig071), expected, "071 CHECK 어휘")
+        self.assertEqual(self._check_keys(self.mig076), expected, "076 CHECK 어휘")
         block = self.admin_js.split("var FUNNEL_KEYS = [", 1)[1].split("];", 1)[0]
         client = set(re.findall(r'"([a-z_]+)"', block))
         self.assertEqual(client, expected, "admin.js FUNNEL_KEYS 가 060/071 CHECK 와 다름")
@@ -14035,6 +14084,35 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         handler = handler.split("});", 1)[0]
         self.assertIn("loadGrowth()", handler)
         self.assertIn("loadRum()", handler)
+
+    def test_zone_axis_answers_where_the_subscribe_happened(self):
+        """★2026-09-04 실측: 구독 2건은 시각이 초 단위로 남았는데(17:07 CTA · 17:09 밴드)
+        **어느 페이지에서 눌렀는지는 어디에도 없었다** — 밴드·CTA 는 전 한국어 페이지에
+        있고 060 은 키 문자열 하나만 보내기 때문이다. 076 이 그 빈칸을 메운다.
+
+        ★구역은 경로의 첫 조각이다 — 손으로 적은 구역 목록을 두지 않는다(목록은 라우트가
+        늘면 조용히 낡는다). 대신 형식 제약 + 구역 수 상한으로 남용을 유한하게 막는다.
+        """
+        self.assertIn("create table if not exists public.funnel_zone_counts", self.mig076)
+        self.assertIn("zone ~ '^[a-z0-9-]{1,24}$'", self.mig076,
+                      "구역 형식 제약이 없다 — anon RPC 가 열린 문자열을 받는다")
+        self.assertIn("cap constant integer", self.mig076,
+                      "구역 수 상한이 없다 — 쓰레기 구역을 무한히 만들 수 있다")
+        # 읽기는 로그인뿐(운영 지표 — 072/073 과 같은 규칙) · 쓰기는 RPC 뿐.
+        self.assertIn("grant select on public.funnel_zone_counts to authenticated", self.mig076)
+        self.assertNotIn("grant insert", self.mig076)
+        self.assertIn("grant execute on function public.funnel_zone_bump(text, text) "
+                      "to anon, authenticated", self.mig076)
+        # 화면은 읽기만 한다.
+        self.assertIn('from("funnel_zone_counts").select', self.admin_js)
+        for banned in ('from("funnel_zone_counts").insert',
+                       'from("funnel_zone_counts").upsert',
+                       'from("funnel_zone_counts").delete'):
+            self.assertNotIn(banned, self.admin_js)
+        self.assertIn('id="grm-funnel-zones"', self.admin_html)
+        self.assertIn("renderFunnelZones", self.admin_js)
+        # 라벨이 낡아도 값이 사라지면 안 된다 — 모르는 슬러그는 그대로 보여준다.
+        self.assertIn("ZONE_LABELS[r.zone] || r.zone", self.admin_js)
 
     def test_snapshot_write_path_is_cron_only(self):
         self.assertIn("enable row level security", self.mig071)
@@ -14208,7 +14286,9 @@ class WebAdminRumPanelTest(unittest.TestCase):
         self.assertIn("bot: 0", collector)
         # ★일 단위로 받는다 — 시간 단위는 버킷마다 반올림이 걸려 작은 시간대가 사라진다
         # (2026-09-02 실측: 대시보드 7일 264 vs 시간합산 9일 250, 9/1 은 60 vs 20).
-        self.assertIn("dimensions { date }", collector)
+        # 차원의 단일 원천은 GROUPS 표다(쿼리는 거기서 조립된다).
+        self.assertEqual(rum_collector.GROUPS["totals"][1], "date")
+        self.assertIn("dimensions { date }", rum_collector.build_query("totals"))
         self.assertNotIn("datetimeHour", collector.split('"""', 2)[2])
         # 축(UTC)은 단정하지 말고 밝힌다 — 화면이 근사임을 말해야 한다.
         self.assertIn("협정시(UTC) 기준", self.admin_html)
@@ -14266,6 +14346,86 @@ class WebAdminRumPanelTest(unittest.TestCase):
         for specific in ("업체 프로파일", "실사관 프로파일", "지적사항 문서", "트렌드"):
             self.assertLess(labels.index(specific), labels.index("지적사항 검색"),
                             f"{specific} 규칙이 일반 규칙보다 뒤에 있다")
+
+    def test_groups_are_asked_in_separate_requests(self):
+        """★한 쿼리에 묶으면 가장 비싼 그룹이 나머지까지 표본으로 끌고 내려간다.
+
+        rumPageloadEventsAdaptiveGroups 의 Adaptive(ABR)는 **쿼리 하나를 통째로 보고**
+        데이터셋을 고른다. 2026-09-02 에 착지 경로(requestPath — 사이트가 4천 쪽이라
+        차원 기수가 크다)를 세 번째 그룹으로 같은 쿼리에 붙이자, 그 실행부터 방문·
+        리퍼러까지 전부 10 의 배수가 됐고(정확값 0건) 같은 창의 방문 합이 대시보드
+        대조를 마친 264 에서 210 으로 내려앉았다.
+
+        쪼갠 뒤 실측(2026-09-05 probe): 표본 간격 10 → 1.0~1.2, 경로 행 30 → 235.
+        """
+        self.assertEqual(set(rum_collector.GROUPS), {"totals", "referrers", "paths"})
+        marks = {"referrers": "refererHost", "paths": "requestPath"}
+        for group in rum_collector.GROUPS:
+            q = rum_collector.build_query(group)
+            with self.subTest(group=group):
+                self.assertIn("avg { sampleInterval }", q, "정밀도를 같이 묻지 않는다")
+                self.assertIn("bot: 0", q)
+                for other, mark in marks.items():
+                    if other == group:
+                        self.assertIn(mark, q)
+                    else:
+                        self.assertNotIn(mark, q,
+                                         f"{group} 쿼리에 {mark} 가 섞였다 — 묶이면 함께 내려간다")
+
+    def test_sample_interval_is_recorded_not_assumed(self):
+        """정밀도를 저장하지 않으면 화면이 추정값을 정확값이라 부른다(2026-09-02~04 실사고)."""
+        mig = (WEB_DIR / "migrations" / "075_rum_sample_interval.sql").read_text(encoding="utf-8")
+        for table in ("rum_daily", "rum_referrer_daily", "rum_path_daily"):
+            self.assertIn(f"alter table public.{table}", mig)
+        # ★기본값 1(전수)을 주면 **가장 부정확한 옛 행에 가장 정확하다는 표식**이 붙는다.
+        # NULL=미상이어야 새 수집이 그 행을 이긴다.
+        self.assertNotIn("default 1", mig)
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("def sample_interval_of(", src)
+        for field in ("snap_date,metric,value,sample_interval",
+                      "snap_date,referer_host,visits,sample_interval",
+                      "snap_date,request_path,visits,sample_interval"):
+            self.assertIn(field, self.admin_js, "화면이 정밀도를 읽지 않는다")
+        self.assertIn('id="grm-rum-precision"', self.admin_html)
+        self.assertIn('id="grm-rum-paths-precision"', self.admin_html)
+
+    def test_precision_guard_never_downgrades_a_stored_day(self):
+        """★8일 롤링 재적재가 과거의 정확값을 표본 추정값으로 덮어썼다(8/25~9/1 파괴).
+
+        순수 함수라 값으로 직접 묻는다 — 문자열 대조로는 이 계약을 잴 수 없다.
+        """
+        keep = rum_collector.keep_days
+        self.assertEqual(keep({"d1": 10.0}, {"d1": 1.0}), ([], ["d1"]),
+                         "저장값이 더 정확한데 덮어쓴다")
+        self.assertEqual(keep({"d1": 1.0}, {"d1": 10.0}), (["d1"], []))
+        self.assertEqual(keep({"d1": 1.0}, {"d1": 1.0}), (["d1"], []))
+        # ★평균의 실행 간 흔들림(1.00↔1.16)으로 건너뛰면 **늦게 도착한 집계가 영영 못
+        # 들어온다** — 창을 8일로 잡은 목적 자체를 깬다. 막을 것은 자릿수 하락뿐.
+        self.assertEqual(keep({"d1": 1.16}, {"d1": 1.0}), (["d1"], []),
+                         "표본 간격 평균의 미세한 흔들림으로 지각 집계를 버린다")
+        self.assertEqual(keep({"d1": 2.0}, {"d1": 1.0}), ([], ["d1"]))
+        self.assertEqual(keep({"d1": 10.0}, {}), (["d1"], []), "저장된 적 없는 날은 써야 한다")
+        self.assertEqual(keep({"d1": 10.0}, {"d1": 1.0}, allow_downgrade=True), (["d1"], []))
+        # NULL(미상)은 무한대로 읽혀 새 수집이 이긴다 — 075 이전 행이 영구히 남지 않게.
+        self.assertEqual(keep({"d1": 10.0}, {"d1": float("inf")}), (["d1"], []))
+
+    def test_window_is_replaced_so_stale_rows_cannot_survive(self):
+        """upsert 만 하면 사라진 호스트의 옛 행이 남는다 — 2026-09-05 실측: 8/31 은
+        방문 20 인데 같은 날 리퍼러 행의 합이 43 이었다(서로 다른 실행의 잔재)."""
+        src = (WEB_DIR.parent / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("def replace_days(", src)
+        self.assertIn("requests.delete(", src)
+        self.assertNotIn("merge-duplicates", src)
+        self.assertNotIn("on_conflict=", src)
+        # ★지우는 날은 응답이 답한 날뿐 — API 침묵이 창을 비우면 안 된다.
+        self.assertIn("answered = sorted(daily)", src)
+
+    def test_admin_does_not_claim_exactness_it_cannot_know(self):
+        """★이 문구가 며칠간 거짓이었다 — 방문 표까지 10단위였는데 "정확한 값"이라 적었다."""
+        self.assertNotIn("위 방문 표의 합계가 정확한 값입니다", self.admin_html)
+        for needle in ("function rumPrecision(", "function precisionNote(",
+                       "setPrecisionNote(", "표본 추정", "정밀도 미상"):
+            self.assertIn(needle, self.admin_js)
 
     def test_workflow_uses_the_new_secret_and_no_arithmetic_in_expressions(self):
         """GHA 표현식에는 산술이 없다 — 창 경계는 셸에서 계산해야 한다."""

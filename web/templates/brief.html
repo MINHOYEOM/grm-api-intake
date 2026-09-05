@@ -98,7 +98,7 @@
         </div>
         <p class="arc-lib-l">
           {%- for s in lib_update_week.sources %}{% for it in s['items'] %}
-          <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span>{{ it.title }}</a>
+          <a href="{{ it.url }}" target="_blank" rel="noopener"><span class="arc-lib-tag">{{ s.short }}</span> {{ it.title }}</a>
           {%- endfor %}{% endfor %}
           {%- if lib_update_week.hidden_count %}<a class="arc-lib-more" href="{{ rel_root }}library/index.html">{{ _("외 {n}건", n=lib_update_week.hidden_count) }}</a>{% endif %}
         </p>
@@ -365,7 +365,8 @@
       var icon=document.createElement('i'); icon.className='ti ti-history';
       a.appendChild(icon);
       var t=document.createElement('span'); t.className='grm-ca-t';
-      t.textContent='{{ _("규제 이력 ") }}'+stat.findings+'{{ _("건") }}';
+      var historyLabel='{{ _("규제 이력 {n}건", n="__COUNT__") }}';
+      t.textContent=historyLabel.replace("__COUNT__", String(stat.findings));
       a.appendChild(t);
       var arrow=document.createElement('i'); arrow.className='ti ti-arrow-right';
       a.appendChild(arrow);

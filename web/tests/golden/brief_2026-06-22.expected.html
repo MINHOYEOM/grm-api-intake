@@ -612,7 +612,8 @@ if(_nt&&_nm){
       var icon=document.createElement('i'); icon.className='ti ti-history';
       a.appendChild(icon);
       var t=document.createElement('span'); t.className='grm-ca-t';
-      t.textContent='규제 이력 '+stat.findings+'건';
+      var historyLabel='규제 이력 __COUNT__건';
+      t.textContent=historyLabel.replace("__COUNT__", String(stat.findings));
       a.appendChild(t);
       var arrow=document.createElement('i'); arrow.className='ti ti-arrow-right';
       a.appendChild(arrow);

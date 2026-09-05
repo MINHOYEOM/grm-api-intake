@@ -537,12 +537,19 @@ def _build_sections(card_views: list[dict[str, Any]],
     """render_order 순 카드를 group(섹션)·group_label(소제목)별로 연속 묶음.
 
     재정렬 금지 — 입력 순서 그대로 인접 그룹핑(v4 JS 동치). 섹션 count 는 파생.
+
+    ★연속 판정은 **원본 group 값끼리** 한다(`slug`) — 화면 이름(`name`)은 `tr` 을 거친
+      번역문이라 언어가 섞인 비교가 된다. 한국어는 `tr` 이 항등이라 둘이 같아 오래
+      멀쩡했지만, 영어에서는 `cv["group"]`("글로벌") != `cur["name"]`("Global") 이 매번
+      참이 되어 **카드마다 섹션이 새로 열렸다**(2026-08-31 실측: 한국어 3그룹 · 영어
+      13그룹 — 목차가 "Global│Global│Korea×10│Recall"). 정렬·비교의 기준은 비교하려는
+      값 그 자체여야 한다(README 불변식 #14 와 같은 결).
     """
     sections: list[dict[str, Any]] = []
     cur: dict[str, Any] | None = None
     cur_grp: Any = object()                            # sentinel
     for cv in card_views:
-        if cur is None or cv["group"] != cur["name"]:
+        if cur is None or cv["group"] != cur["slug"]:
             cur = {
                 # [다국어 5단계] 화면에 보이는 이름만 번역한다. `slug` 는 앵커 id 이자
                 # 딥링크(`#sec-글로벌`)라 **원본 값 그대로** — 번역하면 기존 링크가 죽고
@@ -847,8 +854,24 @@ LIBRARY_UPDATE_ITEM_CAP = 12       # 자료실 허브 — 한 화면에 남는 �
 LIBRARY_UPDATE_ITEM_CAP_COMPACT = 3
 
 
+def _update_row_is_readable(row: dict[str, Any], lang: str) -> bool:
+    """이 제목 줄을 그 언어 화면에 **읽을 수 있는 채로** 실을 수 있는가.
+
+    판정은 **값**으로 한다(문서 제목에 한글이 남았는가) — 소스 이름으로 가르면 지금은
+    맞아도 낡는다(README 불변식 #8 과 같은 규율). 자료실 항목의 `title_en` 은 있어도
+    값이 한국어인 경우가 있다(실측 2026-09-05: 최근 자료실 갱신 이력 7건이 전부 식약처
+    문서이고, 그 `title_en` 은 문서의 실제 이름인 한국어 그대로다). 그 제목을 지어내
+    영어로 바꾸는 것은 무변형 위반이고, 그대로 싣는 것은 영어 화면에 한글을 남기는
+    일이라 — **싣지 않고 개수로만 남긴다**(아래 `hidden_count` 가 "외 N건"으로 드러낸다).
+    한국어 트리는 항상 참이라 판정 자체가 없다(바이트 불변)."""
+    if lang == DEFAULT_LANG:
+        return True
+    return not _HANGUL_RE.search(row.get("title") or "")
+
+
 def _library_update_view(
     entry: dict[str, Any], catalogs: list[dict[str, Any]], *, cap: int,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, Any] | None:
     """이력 항목 1건 + 카탈로그 뷰 → 표시 뷰모델(결정론 — 데이터 파생, 창작 0).
 
@@ -890,6 +913,9 @@ def _library_update_view(
         removed_total += removed_count
         collected.append({
             "view": view, "rows": rows, "truncated": bool(detail.get("truncated")),
+            # 화면에 제목으로 실을 수 있는 줄만 따로 둔다 — 개수(`rows`)는 그대로라
+            # 요약 줄의 "N건"은 언어와 무관하게 같은 값이다(거르는 것은 제목뿐).
+            "shown": [r for r in rows if _update_row_is_readable(r, lang)],
             "new_count": new_count, "changed_count": changed_count,
             "removed_count": removed_count,
         })
@@ -899,12 +925,12 @@ def _library_update_view(
     # 라운드로빈 배분 — 한 바퀴에 카탈로그당 한 건씩, 상한이 차거나 더 줄 게 없을 때까지.
     quota = [0] * len(collected)
     remaining = cap
-    while remaining > 0 and any(quota[i] < len(c["rows"])
+    while remaining > 0 and any(quota[i] < len(c["shown"])
                                 for i, c in enumerate(collected)):
         for index, entry_rows in enumerate(collected):
             if remaining <= 0:
                 break
-            if quota[index] < len(entry_rows["rows"]):
+            if quota[index] < len(entry_rows["shown"]):
                 quota[index] += 1
                 remaining -= 1
 
@@ -919,7 +945,9 @@ def _library_update_view(
             "new_count": new_count, "changed_count": changed_count,
             "removed_count": removed_count,
             "change_count": new_count + changed_count,
-            "items": rows[:quota[index]],
+            "items": collected_source["shown"][:quota[index]],
+            # 못 보여준 건수 = **해소된 전체** - 실제로 보인 것. 제목을 못 싣는 줄도
+            # 여기 들어가므로 "외 N건"이 조용히 줄지 않는다(조용한 절삭 금지).
             "hidden_count": len(rows) - quota[index],
             # truncated = 이력 저장 단계에서 id 자체가 잘린 경우(표시 상한과 별개).
             "truncated": collected_source["truncated"],
@@ -952,14 +980,19 @@ def load_library_update_entries(updates_file: Path | None = None) -> list[dict[s
 
 def build_library_update_view(
     entry: dict[str, Any] | None, catalogs: list[dict[str, Any]], *, cap: int,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, Any] | None:
     """이력 항목 1건 → 표시 뷰(공개 진입점). **표시 상한은 부르는 쪽(채널)이 정한다** —
-    자료실 허브·모아보기 스트립·뉴스레터가 각자 다른 분량을 싣기 때문이다."""
-    return _library_update_view(entry, catalogs, cap=cap) if entry else None
+    자료실 허브·모아보기 스트립·뉴스레터가 각자 다른 분량을 싣기 때문이다.
+
+    `catalogs` 는 **그 언어로 읽은 카탈로그 뷰**를 받는다(제목이 `title_en` 에서 나온다).
+    `lang` 은 제목 줄을 실을 수 있는지 판정하는 데만 쓴다(`_update_row_is_readable`)."""
+    return _library_update_view(entry, catalogs, cap=cap, lang=lang) if entry else None
 
 
 def load_library_updates(
     catalogs: list[dict[str, Any]], updates_file: Path | None = None,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, Any]:
     """최근 자료실 변경 1건을 두 화면(자료실 허브·모아보기)용 뷰로 반환.
 
@@ -968,9 +1001,9 @@ def load_library_updates(
     entries = load_library_update_entries(updates_file)
     latest = entries[0] if entries else None
     return {
-        "latest": build_library_update_view(latest, catalogs,
+        "latest": build_library_update_view(latest, catalogs, lang=lang,
                                             cap=LIBRARY_UPDATE_ITEM_CAP),
-        "compact": build_library_update_view(latest, catalogs,
+        "compact": build_library_update_view(latest, catalogs, lang=lang,
                                              cap=LIBRARY_UPDATE_ITEM_CAP_COMPACT),
     }
 
@@ -989,6 +1022,7 @@ def build_library_update_window_view(
     window_end_iso: str,
     *,
     cap: int = LIBRARY_UPDATE_ITEM_CAP_COMPACT,
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, Any] | None:
     """브리프 한 주 창(window_start_iso~window_end_iso, ISO 문자열 비교·양끝 포함) 안에
     든 자료실 변경 이력만 모아 표시 뷰로 반환한다. 창 안에 이력이 0건이면 None — 브리프
@@ -1025,7 +1059,7 @@ def build_library_update_window_view(
                         seen.add(item_id)
 
     merged_entry = {"date": matched[0].get("date", ""), "sources": merged_sources}
-    return _library_update_view(merged_entry, catalogs, cap=cap)
+    return _library_update_view(merged_entry, catalogs, cap=cap, lang=lang)
 
 
 def _parse_brief_window(window: str) -> tuple[str, str] | None:
@@ -1831,14 +1865,26 @@ _DOC_TERM_MIN_LEN = 2
 _LATIN_TOKEN = re.compile(r"^[A-Za-z0-9/-]+$")
 
 
-def build_doc_term_link_index(terms: list[dict[str, Any]]) -> list[tuple[str, str]]:
-    """[(표면형, term_id)] — 긴 표면형 우선(`시정 및 예방조치` 가 `예방조치` 를 이긴다)."""
+def build_doc_term_link_index(
+    terms: list[dict[str, Any]], lang: str = DEFAULT_LANG,
+) -> list[tuple[str, str]]:
+    """[(표면형, term_id)] — 읽는 언어의 표제어를 긴 것부터 고른다.
+
+    한국어는 기존의 한글 표제어(및 영문 약어)만, 영어는 영문 표제어와 한글이 없는
+    aliases만 쓴다. 영어 셸에 한국어 링크 라벨이 생기지 않게 표면형 단계에서 막는다.
+    """
     surfaces: dict[str, str] = {}
     for t in terms:
-        cands = [p.strip() for p in (t.get("term_ko") or "").split("·")]
-        m = re.search(r"\(([A-Z][A-Za-z0-9/-]{1,9})\)", t.get("term_en") or "")
-        if m:
-            cands.append(m.group(1))
+        if lang == DEFAULT_LANG:
+            # 한국어 출력의 기존 선정 규칙은 바이트까지 불변이어야 한다.
+            cands = [p.strip() for p in (t.get("term_ko") or "").split("·")]
+            m = re.search(r"\(([A-Z][A-Za-z0-9/-]{1,9})\)", t.get("term_en") or "")
+            if m:
+                cands.append(m.group(1))
+        else:
+            cands = [str(t.get("term_en") or "").strip()]
+            cands.extend(str(a).strip() for a in (t.get("aliases") or [])
+                         if not _HANGUL_RE.search(str(a)))
         for c in cands:
             if len(c) >= _DOC_TERM_MIN_LEN and c not in surfaces:
                 surfaces[c] = t["id"]
@@ -1847,14 +1893,19 @@ def build_doc_term_link_index(terms: list[dict[str, Any]]) -> list[tuple[str, st
 
 def build_doc_term_doc_freq(
     index: list[tuple[str, str]], documents: list[dict[str, Any]],
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, int]:
     """term_id → 그 용어가 등장한 문서 수. 희소도 판정의 유일한 근거(사람 목록 0)."""
     freq: dict[str, int] = {tid: 0 for _, tid in index}
     for doc in documents:
-        blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+        # 한국어는 종전 `text_ko` 전용 정책을 byte까지 보존한다. 영어만 #13의
+        # 언어 확정 뷰(`finding_body`)를 쓴다.
+        blob = "\n".join(
+            (f.get("text_ko") or "") if lang == DEFAULT_LANG else finding_body(f, lang)
+            for f in doc.get("findings") or [])
         hit: set[str] = set()
         for surface, tid in index:
-            if tid not in hit and _doc_term_find(blob, surface) >= 0:
+            if tid not in hit and _doc_term_find(blob, surface, lang=lang) >= 0:
                 hit.add(tid)
         for tid in hit:
             freq[tid] += 1
@@ -1878,8 +1929,16 @@ def _doc_term_is_verbish(text: str, start: int, end: int) -> bool:
                 or _DOC_TERM_POST_VERBISH.match(text[end:end + 2]))
 
 
-def _doc_term_find(text: str, surface: str, start: int = 0) -> int:
+def _doc_term_find(
+    text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
+) -> int:
     """등장 위치. 라틴 표면형은 낱말 경계를 요구한다(`API` 가 `RAPID` 안에 걸리면 안 된다)."""
+    if lang != DEFAULT_LANG:
+        # 영어는 대소문자가 문장 안에서 바뀌어도 같은 표제어다. 다만 낱말 경계는
+        # 표제어 전체에 적용해 `quality`가 `inequality` 안에 걸리는 일을 막는다.
+        m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])",
+                       re.IGNORECASE).search(text, start)
+        return m.start() if m else -1
     if _LATIN_TOKEN.match(surface):
         m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])").search(
             text, start)
@@ -1895,12 +1954,17 @@ def select_doc_term_links(
     index: list[tuple[str, str]],
     doc_freq: dict[str, int],
     limit: int = _DOC_TERM_LINK_MAX,
+    lang: str = DEFAULT_LANG,
 ) -> list[tuple[str, str]]:
     """이 문서에서 링크할 [(표면형, term_id)] — 희소(df 낮은) 용어 우선, 용어당 1 개."""
-    blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+    # 한국어의 기존 매칭 입력은 `text_ko` 그대로다. 영어만 번역본이 아니라 원문을
+    # 본다(README 불변식 #13).
+    blob = "\n".join(
+        (f.get("text_ko") or "") if lang == DEFAULT_LANG else finding_body(f, lang)
+        for f in doc.get("findings") or [])
     best: dict[str, str] = {}
     for surface, tid in index:                     # index 가 긴 표면형 우선이라 첫 매치가 최장
-        if tid not in best and _doc_term_find(blob, surface) >= 0:
+        if tid not in best and _doc_term_find(blob, surface, lang=lang) >= 0:
             best[tid] = surface
     ranked = sorted(best.items(), key=lambda kv: (doc_freq.get(kv[0], 0), kv[0]))
     return [(surface, tid) for tid, surface in ranked[:limit]]
@@ -1908,6 +1972,7 @@ def select_doc_term_links(
 
 def link_terms_in_text(
     text: str, selected: list[tuple[str, str]], rel_root: str, used: set[str],
+    lang: str = DEFAULT_LANG,
 ) -> Markup:
     """본문 1 조각에 용어 링크를 끼운다 — 텍스트 무변형(escape 후 `<a>` 만 삽입).
 
@@ -1917,9 +1982,9 @@ def link_terms_in_text(
     for surface, tid in selected:
         if tid in used:
             continue
-        pos = _doc_term_find(text, surface)
+        pos = _doc_term_find(text, surface, lang=lang)
         while pos >= 0 and any(s < pos + len(surface) and pos < e for s, e, _ in spans):
-            pos = _doc_term_find(text, surface, pos + 1)
+            pos = _doc_term_find(text, surface, pos + 1, lang=lang)
         if pos >= 0:
             spans.append((pos, pos + len(surface), tid))
             used.add(tid)
@@ -1992,6 +2057,55 @@ FACET_AXES: dict[str, dict[str, str]] = {
         "index_lede": N_("어느 규제기관이 공개한 지적인지로 묶었습니다. 기관마다 문서 형식과 지적의 결이 달라, 대응 준비도 기관 단위로 갈립니다."),
     },
 }
+
+
+# 둘러보기(findings/browse/) 진입 카드의 한 줄 설명 — 축 하나에 한 줄. 여기 없는 축은
+# 설명 없이 제목만 나간다(축이 늘어도 빌드가 서지 않는다). 문구 사전 키로 등록해 두므로
+# 두 언어 트리가 같은 값을 서로 다른 언어로 낸다(`browse_axis_cards` 가 tr 을 건다).
+BROWSE_AXIS_BLURB: dict[str, str] = {
+    "category": N_("무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다."),
+    "country": N_("제조소가 어느 나라에 있는지로 묶어 봅니다."),
+    "agency": N_("FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다."),
+}
+
+
+def browse_axis_cards(facets_data: "dict[str, Any] | None", *,
+                      docs_present: bool, doc_count: int,
+                      tr: Translator = _KO,
+                      allowed: "set[str] | None" = None) -> list[dict[str, str]]:
+    """둘러보기(`findings/browse/`) 진입 카드 — **그 트리의 데이터**에서 축을 뽑고,
+    `allowed`(그 언어 트리에 실제로 산출되는 라우트 집합)로 한 번 더 거른다.
+    `allowed=None` 은 "거르지 않는다"(한국어 트리 — 모든 면이 그 트리에 있다).
+
+    ★갈래를 손으로 적지 않는다. 종전에는 렌더 안에서 영어 트리에만 "문서 축 하나"를
+      손으로 박아 뒀는데, 그 뒤 분류·국가·기관 모음이 영어로 실제로 생겼는데도 카드는
+      1장에 머물렀다(실측 2026-09-05: 한국어 4장 / 영어 1장 — `/en/findings/c/`·
+      `country/`·`agency/` 는 그때 이미 색인 3장 + 하위 35장이 서 있었다).
+      손목록은 트리가 자라는 순간 낡는다(README 불변식 #16).
+
+    모듈 수준 순수 함수인 이유: 게이트(`allowed`)를 **직접** 물어볼 수 있어야 하기
+    때문이다. 렌더 결과로만 보면 두 트리의 축이 우연히 같은 동안에는 게이트가 빠져도
+    초록이라, 정작 갈라지는 날 처음 알게 된다.
+    """
+    out: list[dict[str, str]] = []
+    for axis in (facets_data.get("axes") if facets_data else []) or []:
+        meta = FACET_AXES.get(axis["axis"])
+        if not meta or not axis.get("items"):
+            continue
+        href = f"findings/{meta['path']}/"
+        if allowed is not None and href not in allowed:
+            continue
+        blurb = BROWSE_AXIS_BLURB.get(axis["axis"], "")
+        out.append({"href": href, "title": tr(meta["title"]),
+                    "blurb": tr(blurb) if blurb else ""})
+    # ★sitemap 과 같은 규칙: **데이터에서 파생**하지 렌더 결과에서 파생하지 않는다.
+    # `render_doc_pages` 로 가르면 테스트 빌드의 골든이 프로덕션과 다른 것을 고정하게
+    # 되어(골든에 이 카드가 없는데 라이브엔 있는 상태) 대조가 의미를 잃는다.
+    if docs_present and (allowed is None or "findings/docs/" in allowed):
+        out.append({"href": "findings/docs/", "title": tr("문서로 찾기"),
+                    "blurb": tr("실사 문서 {n}건을 기관·연도로 묶어 봅니다.",
+                                n=f"{doc_count:,}")})
+    return out
 
 
 _FACET_COPY_KEYS = ("title", "headline_suffix", "lede_prefix", "sibling_title", "index_lede")
@@ -4033,6 +4147,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [다국어 3단계] 영어 트리 경로 확정 — 여기부터 모든 렌더가 이 집합을 본다(위 선언 참조).
     en_paths = en_tree_paths(catalogs, guide_en=guide_md_en, quiz_en=quiz_bank)
     library_updates = load_library_updates(catalogs)
+    # [다국어 2026-09-05] 영어 카탈로그·변경 이력 뷰는 **여기서 함께** 만든다. 자료실
+    # 허브(트리 끝)뿐 아니라 아카이브·브리프 상세(트리 앞쪽)도 이 값을 쓰기 때문이다 —
+    # 쓰는 자리마다 다시 읽으면 같은 파일을 두 번 파싱하고, 두 벌이 언젠가 갈라진다.
+    en_catalogs = load_library(tr=en_tr)
+    en_library_updates = load_library_updates(en_catalogs, lang="en")
     # [브리프 자료실 스트립] load_library_updates() 는 "최신 1건"만 보므로 브리프
     # 상세(과거 특정 주간)에는 못 쓴다 — 이력 전체를 한 번 더 확보해 브리프 루프에서
     # 각자의 window 로 걸러 쓴다(같은 파일을 두 번 파싱하지 않도록 여기서 한 번만 로드).
@@ -4097,6 +4216,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # (모음 페이지에서 같은 실수를 CI 가 잡았다).
     en_paths |= clause_tree_paths(clause_views_en)
     en_paths |= glossary_tree_paths(load_glossary())
+    # ★모음(분류·국가·기관)도 여기서 넣는다 — 종전에는 그 트리를 그리기 직전(한참 아래)
+    #   에 넣었는데, 그때는 이미 둘러보기 면이 그려진 뒤라 **영어 진입 카드가 자기
+    #   트리에 난 면을 못 봤다**(실측: 영어 둘러보기 카드 1장 / 한국어 4장). 면 집합은
+    #   "무엇을 그릴지"의 선언이므로 **어떤 렌더보다도 먼저** 확정한다.
+    if facets_en:
+        en_paths |= facet_tree_paths(facets_en)
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).
@@ -4143,7 +4268,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             nav_active="board",
             description=en_tr(ARCHIVE_DESCRIPTION),
             issues=en_issues,
-            lib_update=None,      # 자료실 스트립은 한국어 큐레이션 문구다
+            # [다국어 2026-09-05] 자료실 스트립은 **영어로도 성립한다** — 머리글·건수·
+            # 링크 라벨은 전부 문구 사전을 타고, 제목은 카탈로그의 `title_en` 에서 온다.
+            # 종전 주석("한국어 큐레이션 문구")은 실측과 다르다: 큐레이션한 문장은 없고
+            # 데이터 조인뿐이다. 영문 제목이 없는 문서는 뷰가 개수로만 남긴다.
+            lib_update=en_library_updates["compact"],
         )
 
     emit("archive.html", page("archive/"),
@@ -4162,28 +4291,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # 진입 카드는 **데이터가 있는 축만** 만든다 — 없는 페이지로 보내는 링크는 무링크보다
     # 나쁘다. 문서 축은 렌더 스위치가 꺼진 테스트 빌드에서 페이지가 없으므로 함께 건다.
-    _axis_blurb = {
-        "category": tr("무균공정·시험실 관리처럼 실사에서 반복되는 주제로 묶어 봅니다."),
-        "country": tr("제조소가 어느 나라에 있는지로 묶어 봅니다."),
-        "agency": tr("FDA·캐나다 보건부·식약처 등 기관별로 묶어 봅니다."),
-    }
-    browse_axes = []
-    for _axis in (facets.get("axes") if facets else []) or []:
-        _meta = FACET_AXES.get(_axis["axis"])
-        if not _meta or not _axis.get("items"):
-            continue
-        browse_axes.append({"href": f"findings/{_meta['path']}/",
-                            "title": tr(_meta["title"]),
-                            "blurb": _axis_blurb.get(_axis["axis"], "")})
-    # ★sitemap 과 같은 규칙: **데이터에서 파생**하지 렌더 결과에서 파생하지 않는다.
-    # `render_doc_pages` 로 가르면 테스트 빌드의 골든이 프로덕션과 다른 것을 고정하게 되어
-    # (골든에 이 카드가 없는데 라이브엔 있는 상태) 대조가 의미를 잃는다.
-    if docs_data and docs_data.get("documents"):
-        browse_axes.append({
-            "href": "findings/docs/", "title": tr("문서로 찾기"),
-            "blurb": tr("실사 문서 {n}건을 기관·연도로 묶어 봅니다.",
-                        n=f"{docs_data['totals']['documents']:,}"),
-        })
+    browse_axes = browse_axis_cards(
+        facets, tr=tr,
+        docs_present=bool(docs_data and docs_data.get("documents")),
+        doc_count=(docs_data or {}).get("totals", {}).get("documents", 0))
+    # 영어판은 **영어 모집단으로 다시 잰 정본**(findings_facets_en.json)에서 축을 뽑고,
+    # 문서 건수도 영어로 낼 문서만 센다(불변식 #12 — 머리 숫자와 그 아래 목록이 어긋나면
+    # 안 된다). `en_paths` 가 최종 판정이라 없는 면은 어느 쪽에서도 새지 않는다.
+    en_browse_axes = browse_axis_cards(
+        facets_en, tr=en_tr, docs_present=bool(en_docs), doc_count=len(en_docs),
+        allowed=en_paths)
 
     # [발견 허브] 최근 공개 문서 — 문서 페이지 정본(findings_docs.json)에서 공개일
     # 내림차순 5건(동일 날짜는 slug 로 갈라 결정론 유지). 검색 결과와 달리 fetch 없이
@@ -4230,24 +4347,22 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # [2면 분리] 둘러보기 면 — 정적 렌더 전용(fetch 0, 커밋된 스냅샷에서 나옴).
     # [다국어 4단계] 영어판에도 낸다 — 문서 표면이 생겼으므로 진입면이 필요하다.
-    #   ★영어에서는 **문서 축만** 싣는다(분류·국가·기관 모음 페이지는 아직 한국어 트리
-    #     전용이라 링크하면 없는 페이지로 보낸다). 최근 문서 발췌도 영어로 낼 문서만 쓴다.
+    #   ★진입 카드는 `browse_axis_cards()` 가 **그 트리의 데이터 + en_paths** 로 만든다
+    #     (위 참조). 여기서 갈래를 다시 적지 않는다 — 두 벌이 되는 순간 갈라진다.
     for _lg, _mkpage, _emit, _tr in trees:
         if _lg != DEFAULT_LANG and "findings/browse/" not in en_paths:
             continue
-        _axes = browse_axes if _lg == DEFAULT_LANG else ([{
-            "href": "findings/docs/",
-            "title": _tr("문서로 찾기"),
-            "blurb": _tr("실사 문서 {n}건을 기관·연도로 묶어 봅니다.",
-                         n=f"{len(en_docs):,}"),
-        }] if en_docs else [])
+        _axes = browse_axes if _lg == DEFAULT_LANG else en_browse_axes
         _recent = recent_docs if _lg == DEFAULT_LANG else en_recent_docs
         _emit("findings_browse.html", _mkpage("findings/browse/"),
             browse_axes=_axes,
             zone_totals=findings_zone,
             recent_docs=_recent,
             recent_asof=(docs_data or {}).get("measured_on", ""),
-            has_docs=bool(docs_data and docs_data.get("documents")),
+            # '문서로 찾기' 바로가기도 그 트리에 그 면이 있을 때만 — 한국어 데이터로
+            # 판정하면 영어 화면이 없는 페이지를 가리킨다.
+            has_docs=(bool(docs_data and docs_data.get("documents"))
+                      if _lg == DEFAULT_LANG else "findings/docs/" in en_paths),
             page_title=_tr("지적사항 둘러보기 · GRM"),
             nav_active="findings",
             description=_tr(FINDINGS_BROWSE_DESCRIPTION),
@@ -4595,11 +4710,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 if lang_key == DEFAULT_LANG:
                     facet_paths.append((combo_page.site_path, combo_mod))
 
-    # ★영어 면 집합을 **그리기 전에** 데이터에서 파생해 `en_paths` 에 넣는다.
-    #   렌더 도중에 넣으면 한국어 모음 페이지가 먼저 그려지는 동안 짝을 몰라
-    #   hreflang·언어 전환이 한쪽에만 붙는다(단방향 짝은 짝이 아니다).
-    if facets_en:
-        en_paths |= facet_tree_paths(facets_en)
+    # 영어 면 집합(`facet_tree_paths(facets_en)`)은 **어떤 렌더보다도 먼저** 위 선언
+    # 자리에서 en_paths 에 들어갔다 — 여기서 넣으면 그 전에 그려진 면(둘러보기 진입
+    # 카드·한국어 페이지의 hreflang)이 짝을 몰라 단방향이 된다(단방향 짝은 짝이 아니다).
     emit_facet_tree(facets, page, emit, tr, DEFAULT_LANG, doc_slugs)
     if facets_en:
         emit_facet_tree(facets_en, en_page, en_emit, en_tr, "en", en_doc_slugs)
@@ -4703,10 +4816,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         })
         written.append("assets/inspector-doc-pages.json")
 
-        # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 용어 정본이 없으면 조용히 꺼진다.
-        term_link_index = build_doc_term_link_index(glossary_terms) if glossary_terms else []
-        term_doc_freq = (build_doc_term_doc_freq(term_link_index, documents)
-                         if term_link_index and render_doc_pages else {})
+        # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 언어마다 본문·표제어가 달라
+        # 색인과 문서 빈도도 같은 언어로 다시 잰다. 용어 정본이 없으면 조용히 꺼진다.
+        term_link_index_by_lang = {
+            _lg: build_doc_term_link_index(glossary_terms, _lg)
+            for _lg, _p, _e, _t in trees
+        } if glossary_terms else {}
+        term_doc_freq_by_lang = {
+            _lg: (build_doc_term_doc_freq(term_link_index_by_lang[_lg], documents, _lg)
+                  if term_link_index_by_lang[_lg] and render_doc_pages else {})
+            for _lg, _p, _e, _t in trees
+        }
 
         # ── 내부 링크 구조 ───────────────────────────────────────────────────
         # 문서 페이지 3천 장을 sitemap 에만 올려두면 사이트 구조에서 그 페이지에 닿는
@@ -4942,10 +5062,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             same_firm = [{"slug": s["slug"], "published_date": doc_display_date(s),
                           "agency": s["agency"], "count": len(s["findings"])}
                          for s in siblings[:6]]
-            # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라 같은
-            # 용어가 여러 지적에 나와도 첫 곳 하나만 링크된다.
-            selected = (select_doc_term_links(doc, term_link_index, term_doc_freq)
-                        if term_link_index else [])
             # [다국어 4단계] 언어 트리마다 한 장씩 — 뷰모델은 같고 **본문과 라벨만** 언어를
             # 따른다. 영어판은 원문이 실제로 영어인 문서에만 낸다(doc_is_english).
             for _lg, _mkpage, _emit, _tr in trees:
@@ -4953,9 +5069,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     continue
                 _pp = (doc_page if _lg == DEFAULT_LANG
                        else _mkpage(f"findings/doc/{doc['slug']}/"))
-                # 용어 링크는 한국어 용어사전으로 가는 것이라 영어판에는 걸지 않는다
-                # (없는 페이지로 보내는 링크 금지 — 영어 용어사전은 미착수).
-                _sel = selected if _lg == DEFAULT_LANG else []
+                # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라
+                # 같은 용어가 여러 지적에 나와도 첫 곳 하나만 링크된다. 영어도 실제로
+                # 난 `/en/glossary/{id}/`만 목적지로 삼는 같은 용어 정본을 쓴다.
+                _index = term_link_index_by_lang.get(_lg, [])
+                _sel = (select_doc_term_links(
+                    doc, _index, term_doc_freq_by_lang.get(_lg, {}), lang=_lg)
+                    if _index else [])
                 _used: set[str] = set()
                 _labels = agency_labels_by_lang[_lg]
                 # 분류 라벨은 **데이터에 한국어로** 실려 있고 템플릿이 그대로 찍는다 —
@@ -4995,7 +5115,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     same_firm=(same_firm if _lg == DEFAULT_LANG else
                                [s for s in same_firm if s["slug"] in en_doc_slugs]),
                     finding_bodies=[
-                        link_terms_in_text(finding_body(f, _lg), _sel, _pp.rel_root, _used)
+                        link_terms_in_text(finding_body(f, _lg), _sel, _pp.rel_root, _used,
+                                           lang=_lg)
                         for f in doc.get("findings") or []
                     ],
                     # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
@@ -5163,7 +5284,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
                 sections=_build_sections(en_card_views, en_tr),
-                lib_update_week=None,     # 자료실 스트립은 한국어 큐레이션 문구다
+                # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로
+                # 다시 조인한다 — 창은 브리프가 정하는 값이라 언어와 무관해야 한다.
+                # 한국어 뷰를 물려주면 제목이 한국어인 채로 영어 페이지에 실린다.
+                lib_update_week=(
+                    build_library_update_window_view(
+                        lib_entries, en_catalogs, _win[0], _win[1], lang="en")
+                    if _win else None
+                ),
             )
 
     # ── [다국어 3단계 2026-09-04] 영어 트리 `/en/` ────────────────────────────────
@@ -5173,10 +5301,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #
     # 화면 스크립트용 사전(`assets/i18n-en.js`)과 영어 환경(en_tr·en_page·en_emit)은
     # 자산 복사 직후에 이미 만들었다(위 참조). 여기서는 남은 셸 페이지만 그린다.
-    # 자료실은 카탈로그 카피(제목·소개·유형 라벨)가 사전을 타므로 영어로 다시 읽는다.
-    en_catalogs = load_library(tr=en_tr)
-    en_library_updates = load_library_updates(en_catalogs)
-
+    # 자료실 카탈로그(카피가 사전을 타므로 영어로 다시 읽은 `en_catalogs`)와 그 변경
+    # 이력 뷰는 **위 카탈로그 로드 자리에서** 함께 만들었다 — 아카이브·브리프가 먼저 쓴다.
     # [다국어 2026-09-05] 영어 홈 = **한국어와 같은 템플릿**. 히어로 표지는 영문으로 낼 수
     # 있는 가장 최근 호에서 뽑는다(한국어 최신호가 영어에 없을 수 있다 — 그때 한국어 표지를
     # 실으면 영어 홈 첫 화면이 한국어가 된다).

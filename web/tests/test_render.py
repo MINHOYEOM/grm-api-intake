@@ -14865,6 +14865,165 @@ class WebEnBriefTest(unittest.TestCase):
         for key in registered:
             self.assertIn(key, catalog, f"등록됐지만 번역이 없다: {key!r}")
 
+    # ── 목차 그룹 연속성(C1) ─────────────────────────────────────────────────
+    @staticmethod
+    def _grouped_brief(pub="2026-06-01"):
+        """같은 섹션에 카드가 **여러 장 연속으로** 놓인 브리프 — 목차 묶음을 보려면
+        섹션당 1장짜리로는 아무것도 증명할 수 없다(1장이면 갈라져도 3=3)."""
+        base = WebEnBriefTest._brief(pub)
+        proto = base["cards"][0]
+        groups = ["글로벌", "글로벌", "국내", "국내", "국내", "Recall"]
+        base["cards"] = [
+            {**proto, "id": f"c-en-{i}", "render_order": i, "group": g,
+             "headline_target": f"Acme {i}"}
+            for i, g in enumerate(groups, start=1)
+        ]
+        return base
+
+    def test_section_grouping_does_not_depend_on_the_language(self):
+        """★섹션 연속 판정은 **원본 group 값**끼리 해야 한다.
+
+        종전 코드는 `cv["group"]`(원본)을 `cur["name"]`(번역된 화면 이름)과 비교했다.
+        한국어는 `tr` 이 항등이라 둘이 같아 오래 멀쩡했지만, 영어에서는 매번 달라
+        **카드마다 섹션이 새로 열렸다**(2026-08-31 실측: 한국어 3그룹 / 영어 13그룹 —
+        목차가 "Global│Global│Korea×10│Recall"). 언어를 바꿔도 묶음은 같아야 한다.
+        """
+        cards = [{"group": g, "group_label": "", "headline_target": f"t{i}"}
+                 for i, g in enumerate(["글로벌", "글로벌", "국내", "국내", "Recall"])]
+        en_tr = grm_i18n.Translator("en", grm_i18n.load_catalog("en"))
+        ko_sections = render._build_sections([dict(c) for c in cards])
+        en_sections = render._build_sections([dict(c) for c in cards], en_tr)
+        self.assertEqual([s["slug"] for s in ko_sections], ["글로벌", "국내", "Recall"])
+        self.assertEqual([s["slug"] for s in en_sections],
+                         [s["slug"] for s in ko_sections],
+                         "언어가 섹션 묶음을 바꿨다 — 연속 판정이 번역문을 보고 있다")
+        self.assertEqual([s["count"] for s in en_sections],
+                         [s["count"] for s in ko_sections])
+        # 화면 이름은 그대로 번역된다(고치려던 것은 비교 기준이지 표시가 아니다).
+        self.assertEqual([s["name"] for s in en_sections], ["Global", "Korea", "Recall"])
+
+    def test_en_brief_toc_has_the_same_group_count_as_korean(self):
+        """빌드 실측판 — 목차 `<details class="toc-grp">` 개수가 두 언어판에서 같은가."""
+        tmp, out = self._build(self._grouped_brief())
+        try:
+            ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+            en = (out / "en" / "briefs" / "2026-06-01"
+                  / "index.html").read_text(encoding="utf-8")
+            ko_n = ko.count('<details class="toc-grp"')
+            en_n = en.count('<details class="toc-grp"')
+            self.assertEqual(ko_n, 3, "픽스처가 3그룹이 아니다 — 이 검사가 무의미해진다")
+            self.assertEqual(en_n, ko_n, f"영문 목차 그룹 {en_n}개 / 한국어 {ko_n}개")
+            labels = re.findall(r'toc-grp-label">([^<]*)<', en)
+            self.assertEqual(labels, ["Global", "Korea", "Recall"], labels)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    # ── 자료실 스트립(C2) ────────────────────────────────────────────────────
+    @staticmethod
+    def _library_update_fixture(date="2026-05-28"):
+        """라이브 카탈로그에서 **영문 제목이 있는 항목**과 **한국어 제목만 남는 항목**을
+        하나씩 골라 합성 이력 1건을 만든다. 손으로 id 를 적지 않는다 — 카탈로그가 바뀌면
+        그 자리가 조용히 낡는다(값에서 고른다)."""
+        hangul = re.compile("[가-힣]")
+        en_title = ko_title = None
+        for view in render.load_library(
+                tr=grm_i18n.Translator("en", grm_i18n.load_catalog("en"))):
+            for item in view["items_by_id"].values():
+                target = "ko" if hangul.search(item["title"] or "") else "en"
+                if target == "en" and en_title is None:
+                    en_title = (view["source"], item)
+                elif target == "ko" and ko_title is None:
+                    ko_title = (view["source"], item)
+        sources = {}
+        for pair in (en_title, ko_title):
+            if pair:
+                src, item = pair
+                slot = sources.setdefault(src, {"new_ids": [], "changed_ids": [],
+                                                "removed_ids": [], "total_count": 1,
+                                                "truncated": False})
+                slot["new_ids"].append(item["id"])
+        return {"schema_version": "grm-library-updates/v1",
+                "entries": [{"date": date, "sources": sources}]}, en_title, ko_title
+
+    def test_en_brief_and_archive_carry_the_library_update_strip(self):
+        """★자료실 스트립은 영어로도 성립한다 — 머리글·건수·링크 라벨은 문구 사전을 타고
+        제목은 카탈로그의 `title_en` 에서 온다. 종전에는 두 자리 모두 `None` 을 넘겨
+        **영어에만 스트립이 통째로 없었다**(실측 2026-09-05: 아카이브 KO 1 / EN 0,
+        영문 브리프 10호 전부 0).
+
+        동시에 지키는 것: 영어 화면에 한글 0. 자료실 항목 중에는 `title_en` 값이 그대로
+        한국어인 문서가 있는데(그 문서의 실제 이름이라 지어내 바꿀 수 없다), 영어판은
+        그 줄을 **싣지 않고 개수로만** 남긴다 — 요약 줄의 건수는 두 언어가 같다.
+        """
+        payload, en_pair, ko_pair = self._library_update_fixture()
+        self.assertIsNotNone(en_pair, "영문 제목 항목이 없다 — 픽스처가 무의미하다")
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enlibstrip_"))
+        updates = tmp / "library_updates.json"
+        updates.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        original = render.LIBRARY_UPDATES_FILE
+        render.LIBRARY_UPDATES_FILE = updates
+        try:
+            # 합성 브리프의 window(2026-05-25~05-31)가 이력 날짜를 감싼다.
+            tmp2, out = self._build(self._brief())
+            try:
+                ko_b = (out / "briefs" / "2026-06-01"
+                        / "index.html").read_text(encoding="utf-8")
+                en_b = (out / "en" / "briefs" / "2026-06-01"
+                        / "index.html").read_text(encoding="utf-8")
+                en_a = (out / "en" / "archive"
+                        / "index.html").read_text(encoding="utf-8")
+                self.assertIn('<aside class="arc-lib"', ko_b, "한국어 스트립이 사라졌다")
+                self.assertIn('<aside class="arc-lib"', en_b, "영문 브리프에 스트립이 없다")
+                self.assertIn('<aside class="arc-lib', en_a, "영문 아카이브에 스트립이 없다")
+                self.assertIn("This week's library updates", en_b)
+                self.assertIn("Library updates", en_a)
+                # 영문 제목 항목은 두 언어판 모두에 뜬다.
+                self.assertIn(str(_esc(en_pair[1]["title"])), en_b)
+                # 한국어 제목만 있는 항목은 한국어판에만 — 영어판은 개수로만 남긴다.
+                if ko_pair:
+                    self.assertIn(str(_esc(ko_pair[1]["title"])), ko_b)
+                    self.assertNotIn(str(_esc(ko_pair[1]["title"])), en_b,
+                                     "영어 화면에 한국어 문서 제목이 실렸다")
+                    self.assertIn("and 1 more", en_b,
+                                  "못 실은 건수를 '외 N건'으로 밝히지 않았다")
+                # 요약 줄의 건수는 언어와 무관하다 — 한국어 "N건" 과 영어 "N items" 의
+                # 숫자가 같아야 한다(거르는 것은 제목 줄뿐이라는 계약).
+                self.assertEqual(
+                    re.findall(r"</b> · .*?(\d+) items", en_b),
+                    re.findall(r"</b> · .*?(\d+)건", ko_b),
+                    "요약 줄의 건수가 언어에 따라 달라졌다")
+            finally:
+                shutil.rmtree(tmp2, ignore_errors=True)
+        finally:
+            render.LIBRARY_UPDATES_FILE = original
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_library_update_counts_do_not_change_with_the_language(self):
+        """거르는 것은 **제목 줄뿐**이다 — 요약의 건수(`change_count`)와 못 보여준
+        건수를 합친 총량은 두 언어에서 같아야 한다. 제목을 못 실었다고 개수까지 줄면
+        화면이 조용히 거짓말을 한다(조용한 절삭 금지)."""
+        payload, _en, _ko = self._library_update_fixture()
+        entry = payload["entries"][0]
+        ko_cats = render.load_library()
+        en_cats = render.load_library(
+            tr=grm_i18n.Translator("en", grm_i18n.load_catalog("en")))
+        ko_view = render.build_library_update_view(entry, ko_cats, cap=12)
+        en_view = render.build_library_update_view(entry, en_cats, cap=12, lang="en")
+        self.assertIsNotNone(ko_view)
+        self.assertIsNotNone(en_view)
+        self.assertEqual(en_view["change_count"], ko_view["change_count"])
+        self.assertEqual(
+            [(s["slug"], s["change_count"]) for s in en_view["sources"]],
+            [(s["slug"], s["change_count"]) for s in ko_view["sources"]])
+        for source in en_view["sources"]:
+            self.assertEqual(
+                len(source["items"]) + source["hidden_count"],
+                source["new_count"] + source["changed_count"],
+                "보인 것 + 외 N건 이 해소된 건수와 다르다")
+            for item in source["items"]:
+                self.assertIsNone(re.search("[가-힣]", item["title"]),
+                                  f"영어 뷰에 한국어 제목: {item['title']}")
+
 
 class WebFindingsOrigLangTest(unittest.TestCase):
     """[다국어 6단계 2026-09-04] 검색의 원문 언어 축 — 영어 화면에 한국어 본문을 내지 않는다.
@@ -15787,6 +15946,77 @@ class WebEnTreeTest(unittest.TestCase):
                                 f"{rel} → {href} 가 영어 트리를 벗어난다({resolved})")
                 checked += 1
         self.assertGreater(checked, 100, "검사한 링크가 너무 적다 — 추출이 깨졌나?")
+
+    def test_en_browse_cards_cover_every_axis_the_english_tree_actually_has(self):
+        """★둘러보기 진입 카드 = **그 트리에 실제로 난 축 전부**, 그 이상도 이하도 아니다.
+
+        종전에는 영어 트리에만 "문서 축 하나"를 손으로 박아 뒀다. 그 뒤 분류·국가·기관
+        모음이 영어로 실제로 생겼는데도(색인 3장 + 하위 35장) 카드는 1장에 머물렀다 —
+        실측 2026-09-05: 한국어 4장 / 영어 1장. 손목록은 트리가 자라는 순간 낡는다
+        (README 불변식 #16). 그래서 기대값을 여기서도 손으로 적지 않고 **렌더가 보는
+        같은 레지스트리(`FACET_AXES`) + 같은 선언(`expected`)** 에서 파생한다.
+        """
+        page = self.en.get("en/findings/browse/index.html")
+        if page is None:
+            self.skipTest("영어 둘러보기 면이 없는 빌드")
+        # 축 후보 = 모음 축 레지스트리 + 문서 축. 실제로 낼지는 선언이 정한다.
+        candidates = ({f"findings/{m['path']}/" for m in render.FACET_AXES.values()}
+                      | {"findings/docs/"})
+        want = candidates & self.expected
+        got = set(re.findall(r'<a class="fnd-browse-card" href="\.\./\.\./([^"]+)"', page))
+        self.assertEqual(got, want,
+                         f"영어 둘러보기 카드가 선언과 다르다: 빠짐 {sorted(want - got)} /"
+                         f" 없는 면을 가리킴 {sorted(got - want)}")
+        self.assertGreaterEqual(len(got), 2,
+                                "카드가 1장 이하다 — 축이 실제로 있는데 못 보고 있다")
+        # 카드가 가리키는 면이 정말 났는지 파일로 확인한다(선언과 산출이 갈라지는 자리).
+        for href in sorted(got):
+            self.assertIn(f"en/{href}index.html", self.pages, f"없는 면을 가리킨다: {href}")
+
+    def test_browse_axis_cards_drop_axes_the_tree_does_not_have(self):
+        """게이트를 **직접** 물어본다 — 렌더 결과로만 보면 두 트리의 축이 우연히 같은
+        동안에는 게이트가 빠져도 초록이고, 정작 갈라지는 날 처음 알게 된다.
+
+        `allowed` 는 "그 언어 트리에 실제로 난 라우트"다. 거기 없는 축은 카드가 되면
+        안 된다(없는 페이지로 보내는 링크는 무링크보다 나쁘다)."""
+        data = {"axes": [{"axis": "category", "items": [{"slug": "a"}]},
+                         {"axis": "country", "items": [{"slug": "b"}]},
+                         {"axis": "agency", "items": []}]}
+        # 거르지 않으면(한국어 트리) 항목이 있는 두 축 + 문서 축.
+        allc = render.browse_axis_cards(data, docs_present=True, doc_count=7)
+        self.assertEqual([c["href"] for c in allc],
+                         ["findings/c/", "findings/country/", "findings/docs/"])
+        self.assertIn("7", allc[-1]["blurb"], "문서 건수가 카드에 실리지 않았다")
+        # 국가 축과 문서 축이 그 트리에 없으면 카드도 없다.
+        gated = render.browse_axis_cards(data, docs_present=True, doc_count=7,
+                                         allowed={"findings/c/"})
+        self.assertEqual([c["href"] for c in gated], ["findings/c/"])
+        # 항목이 0인 축은 선언에 있어도 카드가 되지 않는다(빈 페이지로 보내지 않는다).
+        self.assertEqual(
+            render.browse_axis_cards(data, docs_present=False, doc_count=0,
+                                     allowed={"findings/agency/"}), [])
+        # 라벨은 언어를 탄다 — 뷰가 번역해 넘기고 템플릿은 그대로 찍는다(불변식 #13).
+        en = render.browse_axis_cards(
+            data, docs_present=False, doc_count=0,
+            tr=grm_i18n.Translator("en", grm_i18n.load_catalog("en")))
+        self.assertEqual([c["title"] for c in en],
+                         ["Findings by category", "Findings by country"])
+        for card in en:
+            self.assertIsNone(re.search("[가-힣]", card["title"] + card["blurb"]),
+                              f"영어 카드에 한글: {card}")
+
+    def test_browse_cards_never_leave_their_own_language_tree(self):
+        """두 트리 모두 — 진입 카드는 자기 트리 안의 면만 가리킨다. 한국어 카드가
+        영어 전용 축을 가리키거나 그 반대가 되면 그대로 404 다."""
+        for prefix, rel in (("", "findings/browse/index.html"),
+                            ("en/", "en/findings/browse/index.html")):
+            page = self.pages.get(rel)
+            if page is None:
+                continue
+            for href in re.findall(
+                    r'<a class="fnd-browse-card" href="\.\./\.\./([^"]+)"', page):
+                self.assertIn(f"{prefix}{href}index.html", self.pages,
+                              f"{rel} 의 카드가 없는 면을 가리킨다: {href}")
 
     #: nav 라벨 → 그 섹션의 경로. **뜨는지 여부는 손으로 적지 않는다** — 아래에서
     #: 선언(`expected`)에 있으면 떠야 하고 없으면 뜨면 안 된다로 뒤집어 본다.

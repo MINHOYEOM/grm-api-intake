@@ -40,8 +40,20 @@
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
   @media (max-width:640px){ .grm-lang{padding:5px 9px;font-size:12.5px} }
 </style>
+<style>
+  .grm-langhint{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--soft);border-bottom:1px solid var(--line-2);padding:9px 16px;font-family:var(--sans);font-size:13.5px;color:var(--body)}
+  .grm-langhint a{color:var(--coral);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .grm-langhint a:hover{border-bottom-color:var(--coral)}
+  .grm-langhint button{background:none;border:0;color:var(--muted);font-family:var(--sans);font-size:16px;line-height:1;cursor:pointer;padding:2px 6px}
+  .grm-langhint button:hover{color:var(--ink)}
+</style>
 </head>
 <body>
+<div class="grm-langhint" id="grmLangHint" role="region" aria-label="Language" lang="en" hidden>
+  <span>This page is also available in English.</span>
+  <a href="../../en/library/cfr/index.html" hreflang="en" lang="en" rel="alternate">Read in English &rarr;</a>
+  <button type="button" id="grmLangHintX" aria-label="Dismiss">&times;</button>
+</div>
 <header class="nav" id="nav"><div class="wrap nav-in">
   <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html" class="on">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
   <span class="sp"></span>
@@ -679,6 +691,19 @@ if(_nt&&_nm){
   _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
+// [루트 진입] 브라우저 언어가 한국어가 아니면 영어판 안내를 보인다(리다이렉트 없음).
+// localStorage 는 사생활 모드·차단 설정에서 **접근 자체가 던진다** — 읽기·쓰기를 각각
+// 감싸고, 실패하면 그냥 안내를 보인다(기억을 못 할 뿐 화면은 정상).
+(function(){
+  var b=document.getElementById('grmLangHint'); if(!b) return;
+  try{ if(localStorage.getItem('grm-langhint')==='off') return; }catch(e){}
+  var l=(navigator.languages&&navigator.languages[0])||navigator.language||'';
+  if(/^ko\b/i.test(l)) return;
+  b.hidden=false;
+  document.getElementById('grmLangHintX').addEventListener('click',function(){
+    b.hidden=true; try{ localStorage.setItem('grm-langhint','off'); }catch(e){}
+  });
+})();
 </script>
 <div class="grm-pet" id="grm-pet" data-page="library">
   <button class="grm-pet-orb" id="grm-pet-toggle" type="button" aria-label="구름이 펫 열기" aria-expanded="false" aria-controls="grm-pet-panel" title="드래그해 이동 · 눌러 관리">

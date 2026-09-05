@@ -323,6 +323,81 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
                     "llms.txt"):
             self.assertTrue((self.out / rel).exists(), f"라이브 렌더 누락: {rel}")
 
+    # ── 언어판 (라이브 데이터에서만 보이는 것들) ────────────────────────────
+    #: 영어 짝이 **없어도 되는** 한국어 최상위 섹션. 지금은 비어 있다(§7 완료).
+    #: 여기에 무언가를 더할 때는 왜 영어로 낼 수 없는지를 함께 적는다 — 빈 채로 두는
+    #: 것이 정상이고, 채워지는 순간 그건 되돌릴 일이 생겼다는 뜻이다.
+    KO_ONLY_SECTIONS: tuple[str, ...] = ()
+
+    def test_every_korean_section_has_an_english_counterpart(self):
+        """★[2026-09-05] 종전엔 "영어에 아직 없는 섹션" **손목록**을 픽스처 빌드에서 봤다.
+        픽스처에는 영문 브리프가 하나도 없어, 영문 아카이브가 실제로 선 뒤에도 그 가드는
+        "아카이브는 영어에 없다"를 **초록으로 통과**시켰다 — 검사가 자기 모집단에서
+        반례를 먼저 지운 것이다. 그래서 라이브 데이터 빌드에서, 목록이 아니라 성질로 본다.
+
+        섹션이란 한국어 트리의 최상위 디렉터리다(`briefs/` 는 색인이 없고 `archive/` 가
+        그 자리라 대상이 아니다). 낱장까지 짝을 요구하지는 않는다 — 원문이 한국어인
+        문서에는 영어판이 없는 것이 옳다.
+        """
+        ko_sections = {
+            p.relative_to(self.out).parts[0] + "/"
+            for p in self.out.rglob("index.html")
+            if p.parent != self.out and p.relative_to(self.out).parts[0] != "en"}
+        self.assertGreater(len(ko_sections), 4, "섹션을 못 찾았다 — 추출이 깨졌나?")
+        missing = sorted(
+            sec for sec in ko_sections
+            if sec not in self.KO_ONLY_SECTIONS
+            and (self.out / sec).is_dir()
+            and (self.out / sec / "index.html").is_file()
+            and not (self.out / "en" / sec / "index.html").is_file())
+        self.assertEqual(missing, [], f"영어 짝이 없는 섹션: {missing}")
+
+    def test_english_feed_exists_and_speaks_english(self):
+        """★영어 4천 장이 **한국어 피드**(`<language>ko</language>`·한국어 제목)를 자기
+        대체본이라고 말하고 있었다. 피드 리더는 그 선언을 그대로 믿는다."""
+        en_rss = self.out / "en" / "rss.xml"
+        self.assertTrue(en_rss.is_file(), "영문 브리프가 있는데 영어 피드가 없다")
+        xml = en_rss.read_text(encoding="utf-8")
+        self.assertIn("<language>en</language>", xml)
+        self.assertIn(f'href="{render.SITE_BASE_URL}/en/rss.xml" rel="self"', xml)
+        self.assertEqual(re.findall("[가-힣]+", xml), [], "영어 피드에 한국어가 남았다")
+        for loc in re.findall(r"<link>(\S+?)</link>", xml):
+            self.assertTrue(loc.startswith(f"{render.SITE_BASE_URL}/en/"), loc)
+
+    def test_english_feed_carries_only_issues_that_exist_in_english(self):
+        """한국어 호를 영어 피드에 끼워 넣으면 구독자에게 한국어 제목이 뜬다 —
+        화면에서 반쪽 영어를 금지한 이유와 같다. ★호 번호는 **다시 매기지 않는다**:
+        같은 브리프가 두 언어에서 다른 Vol. 을 가지면 사람이 서로를 못 찾는다."""
+        briefs = render.load_briefs(DATA_DIR)
+        want = {b["brief"]["publish_date"] for b in briefs if render.brief_has_english(b)}
+        self.assertTrue(want, "영문 브리프가 하나도 없다 — 이 가드가 아무것도 안 지킨다")
+        xml = (self.out / "en" / "rss.xml").read_text(encoding="utf-8")
+        got = set(re.findall(r"/en/briefs/(\d{4}-\d{2}-\d{2})/</link>", xml))
+        self.assertEqual(got, want)
+        nums = render.assign_issue_numbers(briefs)
+        for pub in sorted(want):
+            self.assertIn(f"Vol.{nums[pub]} ({pub})", xml,
+                          f"{pub}: 영어 피드가 호 번호를 다시 매겼다")
+
+    def test_each_tree_points_at_its_own_feed(self):
+        ko = (self.out / "index.html").read_text(encoding="utf-8")
+        en = (self.out / "en" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('type="application/rss+xml" title="GRM 주간 브리프" '
+                      'href="/rss.xml"', ko)
+        self.assertIn('type="application/rss+xml" title="GRM Weekly Brief" '
+                      'href="/en/rss.xml"', en)
+
+    def test_no_english_briefs_means_no_feed_and_no_link(self):
+        """★빈 피드를 내지 않는다 — 구독자에게 "이 서비스는 아무것도 안 낸다"고 말하는
+        꼴이고, 한국어 피드를 대신 가리키면 영어 독자가 읽을 수 없는 것을 구독한다.
+        (합성 입력으로 확인한다 — 라이브에 영문 호가 있다고 이 경로가 죽은 게 아니다.)"""
+        ko_only = [b for b in render.load_briefs(DATA_DIR)
+                   if not render.brief_has_english(b)]
+        self.assertTrue(ko_only, "영어가 없는 호가 없다 — 합성 대신 실물로 못 본다")
+        self.assertEqual(render.build_rss_xml(ko_only, tr=render._KO, lang="en"), "")
+        self.assertTrue(render.build_rss_xml(ko_only, tr=render._KO).strip())
+
+
     def test_every_live_brief_has_a_page(self):
         briefs = render.load_briefs(DATA_DIR)
         self.assertGreater(len(briefs), 0, "라이브 브리프 0건 — 발행 디렉터리 확인")
@@ -15660,24 +15735,12 @@ class WebEnTreeTest(unittest.TestCase):
             self.assertIn(f"{path}index.html", self.pages,
                           f"영어판에만 있는 면: {path}")
 
-    def test_korean_only_sections_are_absent_from_en(self):
-        """본문이 한국어인 면은 영어 트리에 없다(설계 문서 §7 5단계 대기).
-
-        ★[다국어 4단계 2026-09-04] 문서 표면(`findings/docs/`·`findings/browse/`)은 여기서
-        빠졌다 — `findings_docs.json` 에 원문(`text_orig`)이 들어와 본문이 영어로 성립하기
-        때문이다.
-        ★[2026-09-04] 모음 축(`findings/c/`·`agency/`·`country/`)도 빠졌다 — 영어 모집단으로
-        다시 잰 정본(`findings_facets_en.json`)이 생겨 건수까지 영어판이 성립한다.
-        ★[2026-09-04] 용어사전(`glossary/`)과 조항(`findings/clause/`)도 빠졌다 — 설명
-        두 필드(`easy_en`·`detail_en`)가 정본에 실렸고, 조항 표본은 `finding_body(f, "en")`
-        으로 원문을 싣는다.
-        ★[2026-09-05] 이용안내(`guide/`)·주간 퀴즈(`quiz/`)도 빠졌다 — 본문 정본이 영어로
-        따로 생겼다(`guide_content_en.md` · 뱅크의 `*_en` 세 필드). 남은 하나는 **아직
-        영어 본문이 없는 면**이다: 지난 브리프 아카이브. 여기서 하나를 지울 때는 그 면의
-        본문이 실제로 영어로 성립하는지 먼저 재고, 이 목록이 빌 때가 §7 이 끝나는 때다."""
-        for path in ("archive/",):
-            self.assertNotIn(path, self.expected)
-            self.assertNotIn(f"en/{path}index.html", self.pages)
+    # ★[2026-09-05] `test_korean_only_sections_are_absent_from_en` 은 여기서 사라졌다.
+    #   "영어에 아직 없는 섹션" 손목록이었고, 마지막 항목이 `archive/` 였는데 **픽스처에는
+    #   영문 브리프가 하나도 없어** 영문 아카이브가 실제로 선 뒤에도 초록으로 통과했다
+    #   (검사가 자기 모집단에서 반례를 먼저 지운 꼴 — `assertNotIn` 은 없는 것을 못 본다).
+    #   §7 이 끝나 목록이 비었으므로, 남은 성질("모든 한국어 섹션은 영어 짝이 있다")은
+    #   **라이브 데이터**를 보는 `WebLiveBriefsRenderSmokeTest` 로 옮겼다.
 
     # ── 언어판 상호 선언 ─────────────────────────────────────────────────────
     def _hreflangs(self, html):
@@ -15738,6 +15801,73 @@ class WebEnTreeTest(unittest.TestCase):
                                 f"{rel} → {href} 가 없는 파일을 가리킨다")
                 checked += 1
         self.assertGreaterEqual(checked, 18)
+
+    # ── 루트 진입 안내 ──────────────────────────────────────────────────────
+    def _hint(self, html):
+        return re.search(r'<div class="grm-langhint"[^>]*>(.*?)</div>', html, re.S)
+
+    def test_language_hint_only_on_korean_pages_that_have_an_english_twin(self):
+        """★영어 사용자가 `grm-solutions.com` 을 직접 치면 한국어 홈을 만난다. 검색 유입은
+        hreflang 으로 `/en/` 에 착지하지만 직접·공유 링크 진입은 그 경로를 타지 않는다.
+
+        짝이 없는 면에는 뜨지 않는다(없는 페이지로 보내지 않는다). 영어 페이지에도 뜨지
+        않는다 — 이미 영어를 보고 있는 사람에게 영어판을 권하는 꼴이다.
+        """
+        paired = self.expected | self.expected_doc_paths
+        shown = absent = 0
+        for rel, html in self.pages.items():
+            if not rel.endswith("index.html"):
+                continue
+            want = (not rel.startswith("en/")
+                    and rel[:-len("index.html")] in paired)
+            with self.subTest(page=rel):
+                if want:
+                    self.assertIsNotNone(self._hint(html), f"{rel}: 안내가 없다")
+                    shown += 1
+                else:
+                    self.assertIsNone(self._hint(html), f"{rel}: 안내가 뜨면 안 된다")
+                    absent += 1
+        self.assertGreater(shown, 5, "안내가 뜬 면이 너무 적다")
+        self.assertGreater(absent, 5, "안내가 빠진 면이 없다 — 검사가 한쪽만 본다")
+
+    def test_language_hint_is_hidden_until_the_browser_says_not_korean(self):
+        """기본은 숨김이다 — 크롤러와 한국어 사용자가 받는 문서는 종전과 같고, 브라우저
+        언어가 한국어가 아닌 사람에게만 스크립트가 벗긴다. 두 경우 모두 **같은 HTML** 이라
+        클로킹이 아니다(표시 여부만 클라이언트에서 갈린다)."""
+        html = self.pages["index.html"]
+        m = re.search(r'<div class="grm-langhint"[^>]*\bhidden\b[^>]*>', html)
+        self.assertIsNotNone(m, "안내가 기본 노출이다 — 한국어 독자에게도 뜬다")
+        self.assertIn("navigator.language", html)
+        self.assertRegex(html, r"/\^ko\\b/i")
+
+    def test_language_hint_never_redirects(self):
+        """★자동 리다이렉트 금지. 브라우저 언어는 사람의 선택이 아니라 기기 설정이고
+        (해외의 한국어 사용자·회사 지급 노트북), 같은 URL 이 방문자마다 다른 내용을 주면
+        검색엔진에게도 문제가 된다. 우리는 알리기만 하고 선택은 독자가 한다."""
+        script = re.search(r"// \[루트 진입\].*?\}\)\(\);",
+                           self.pages["index.html"], re.S)
+        self.assertIsNotNone(script, "안내 스크립트를 못 찾았다 — 마크업 변경?")
+        for banned in ("location.href", "location.replace", "location.assign",
+                       "window.location"):
+            self.assertNotIn(banned, script.group(0), f"자동 이동 코드: {banned}")
+
+    def test_language_hint_link_resolves_to_a_real_english_file(self):
+        """상대경로여야 하고(호스트 무관 규약) 실제 파일에 닿아야 한다 — 언어 전환 칩과
+        같은 목적지를 가리킨다(두 간선이 갈라지면 하나는 반드시 낡는다)."""
+        checked = 0
+        for rel, html in self.pages.items():
+            hint = self._hint(html)
+            if not hint:
+                continue
+            href = re.search(r'href="([^"]+)"', hint.group(1)).group(1)
+            self.assertFalse(href.startswith("http"), f"{rel}: 절대 URL")
+            self.assertTrue(((self.out / rel).parent / href).resolve().is_file(),
+                            f"{rel} → {href} 가 없는 파일을 가리킨다")
+            switch = re.search(r'class="grm-lang" href="([^"]+)"', html)
+            self.assertEqual(href, switch.group(1),
+                             f"{rel}: 안내와 언어 전환이 다른 곳을 가리킨다")
+            checked += 1
+        self.assertGreater(checked, 5)
 
     def test_switcher_absent_where_there_is_no_counterpart(self):
         """짝이 없는 면에 전환 링크를 달면 없는 페이지로 보내는 것이다.

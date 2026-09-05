@@ -210,31 +210,40 @@ class Migration078ContractTest(unittest.TestCase):
         self.assertNotIn("avg(avg_position)", fn)
 
 
-class ZoneRuleParityTest(unittest.TestCase):
-    """★077 인라인 CASE 와 078 grm_zone_of 는 **같은 규칙·같은 순서**여야 한다.
+class ZoneRuleSingleSourceTest(unittest.TestCase):
+    """★구역 규칙은 **정의가 하나뿐**이어야 한다 — 077 의 `grm_zone_of`.
 
-    같은 사이트를 두 보고가 다른 구역 이름으로 부르면 사람이 둘을 못 겹쳐 읽는다.
-    손목록이 낡는 계열 결함이라 목록끼리 직접 비교한다.
+    처음엔 077(착지 표)과 078(검색 페이지 표)에 같은 CASE 를 복제해 두고 "파리티
+    테스트로 어긋남을 잡겠다"고 했다. 그건 사본을 두 개 두고 감시하겠다는 뜻이고,
+    같은 사이트를 두 보고가 다른 구역 이름으로 부를 여지를 남긴다. **사본을 감시하는
+    대신 사본을 없앴다** — 손목록이 낡는 계열과 같은 교훈이라, 검사도 "두 목록이 같은가"
+    가 아니라 "목록이 하나인가"를 묻는다.
     """
 
-    @staticmethod
-    def _rules(sql: str, var: str):
-        block = sql.split(f"when {var} ~ '^/library/'", 1)[1].split("else '기타'", 1)[0]
-        block = f"when {var} ~ '^/library/'" + block
-        patterns = re.findall(rf"when {var} ~ '([^']+)' then '([^']+)'", block)
-        tail = re.findall(rf"when {var} = '/' or {var} = '' then '([^']+)'", block)
-        return patterns, tail
+    MIGRATIONS = sorted((ROOT / "web" / "migrations").glob("*.sql"))
 
-    def test_rule_order_and_labels_match(self):
-        p_growth, t_growth = self._rules(MIG_GROWTH.read_text(encoding="utf-8"), "base_path")
-        p_gsc, t_gsc = self._rules(MIG_GSC.read_text(encoding="utf-8"), "base")
-        self.assertEqual(p_growth, p_gsc, "077 과 078 의 구역 규칙이 갈렸다")
-        self.assertEqual(t_growth, t_gsc, "홈 규칙이 갈렸다")
-        self.assertGreater(len(p_gsc), 10, "구역 규칙이 너무 적다 — 슬라이스가 빗나갔다")
+    def test_exactly_one_definition_across_all_migrations(self):
+        defs = [m.name for m in self.MIGRATIONS
+                if "create or replace function public.grm_zone_of" in m.read_text(encoding="utf-8")]
+        self.assertEqual(defs, ["077_growth_daily_report.sql"],
+                         f"grm_zone_of 정의가 하나가 아니다: {defs}")
+
+    def test_both_reports_call_the_shared_function(self):
+        """정의가 하나여도 한쪽이 자기 CASE 를 다시 쓰면 소용없다."""
+        for mig in (MIG_GROWTH, MIG_GSC):
+            sql = mig.read_text(encoding="utf-8")
+            self.assertIn("public.grm_zone_of(", sql, mig.name)
+            # 호출부 아래에 구역 라벨을 직접 적은 CASE 가 남아 있으면 안 된다.
+            body = sql.split("create or replace function public.grm_zone_of", 1)[-1]
+            body = body.split("$$;", 1)[-1] if mig is MIG_GROWTH else body
+            self.assertNotIn("then '자료실'", body,
+                             f"{mig.name} 에 구역 CASE 사본이 남아 있다")
 
     def test_specific_rules_come_before_the_general_one(self):
-        p_gsc, _ = self._rules(MIG_GSC.read_text(encoding="utf-8"), "base")
-        order = [pat for pat, _label in p_gsc]
+        """순서가 판정이다 — 일반 규칙이 앞서면 하위 구역이 통째로 삼켜진다."""
+        fn = MIG_GROWTH.read_text(encoding="utf-8")             .split("create or replace function public.grm_zone_of", 1)[1].split("$$;", 1)[0]
+        order = re.findall(r"when base ~ '(\^/[^']+)' then", fn)
+        self.assertGreater(len(order), 10, "구역 규칙이 너무 적다 — 슬라이스가 빗나갔다")
         general = order.index("^/findings/")
         for specific in ("^/findings/firm/", "^/findings/inspector/", "^/findings/docs?/",
                          "^/findings/trends/", "^/findings/clause/"):
@@ -242,8 +251,7 @@ class ZoneRuleParityTest(unittest.TestCase):
 
     def test_english_tree_folds_into_the_same_zone(self):
         """`/en/glossary/x` 는 용어사전이다 — 언어별로 구역이 갈리면 비교가 안 된다."""
-        sql = MIG_GSC.read_text(encoding="utf-8")
-        fn = sql.split("create or replace function public.grm_zone_of", 1)[1]
+        fn = MIG_GROWTH.read_text(encoding="utf-8")             .split("create or replace function public.grm_zone_of", 1)[1].split("$$;", 1)[0]
         self.assertIn("'^/en(?=/|$)'", fn)
 
 

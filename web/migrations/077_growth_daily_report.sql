@@ -77,6 +77,40 @@ create policy "signed-in can read newsletter subscriber counts"
 on public.newsletter_subscribers_daily for select to authenticated using (true);
 
 -- ---------------------------------------------------------------------------
+-- 경로 → 사람이 아는 구역 이름. **이 규칙의 유일한 정의다** — 077 의 착지 표와
+-- 078 의 검색 페이지 표가 둘 다 이걸 부른다(사본 없음).
+-- ★순서가 판정이다: 먼저 걸리는 규칙이 이긴다. 일반 규칙(`^/findings/`)이 구체 규칙
+--   (`^/findings/firm/`)보다 앞에 오면 하위 구역이 통째로 삼켜진다.
+-- ★`/en/` 접두는 떼고 같은 규칙을 쓴다 — 언어별로 구역이 갈리면 비교가 안 된다.
+create or replace function public.grm_zone_of(p_path text)
+returns text
+language sql
+immutable
+as $$
+  select case
+    when base ~ '^/library/' then '자료실'
+    when base ~ '^/glossary/' then '용어사전'
+    when base ~ '^/findings/firm/' then '업체 프로파일'
+    when base ~ '^/findings/inspector/' then '실사관 프로파일'
+    when base ~ '^/findings/docs?/' then '지적사항 문서'
+    when base ~ '^/findings/trends/' then '트렌드'
+    when base ~ '^/findings/clause/' then '조항별 사례'
+    when base ~ '^/findings/' then '지적사항 검색'
+    when base ~ '^/briefs/' then '주간 브리프'
+    when base ~ '^/archive/' then '아카이브'
+    when base ~ '^/quiz/' then '퀴즈'
+    when base ~ '^/guide/' then '이용안내'
+    when base ~ '^/admin/' then '운영 콘솔'
+    when base = '/' or base = '' then '홈'
+    else '기타'
+  end
+  from (select regexp_replace(coalesce(p_path, ''), '^/en(?=/|$)', '') as base) t;
+$$;
+
+comment on function public.grm_zone_of(text) is
+  '경로 → 구역 이름. 이 규칙의 유일한 정의(077 착지 표·078 검색 페이지 표가 공용). /en 접두는 떼고 같은 규칙.';
+
+-- ---------------------------------------------------------------------------
 -- 보고 함수. 하루치 JSON 하나로 "어제"를 설명하는 데 필요한 모든 수를 낸다.
 -- 숫자는 여기서 정하고, 말은 보고 작성자가 한다(계산이 대화 속에서 흔들리지 않게).
 --
@@ -130,14 +164,32 @@ begin
     from public.rum_daily where snap_date = d;
 
   -- ★★★같은 날 방문 수를 **세 방법으로 잰다** — 총합표·국가 합·기기 합.
-  -- ABR 이 표마다 다른 정밀도를 주기 때문에 **같은 날인데 표마다 값이 다르다.**
-  -- 실측(2026-09-02): 총합표 10(간격 12.1) vs 국가 합 29(1.16)·기기 합 29(1.18) —
-  -- **3배 차이**고 서로 독립인 두 차원이 29 에서 일치한다. 2026-09-04 도 총합 80(10.7)
-  -- vs 국가 74·기기 74(1.2~1.4). 즉 **헤드라인만 읽으면 3배 틀린 날이 있다.**
+  -- 실측(2026-09-02): 총합표 10(간격 12.1) vs 국가 합 29(1.16)·기기 합 29(1.18) =
+  -- **3배 차이**. 2026-09-04 도 총합 80(10.7) vs 국가 74·기기 74(1.2~1.4).
   --
-  -- 그래서 "가장 정밀한 관측"을 고르는 일을 사람(보고 작성자)의 판단에 맡기지 않고
-  -- 여기서 결정론으로 정한다. NULL 정밀도는 **미상 = 무한히 부정확**으로 읽는다
-  -- (수집기 stored_precision 과 같은 규칙 — 1.0 으로 읽으면 가장 나쁜 값이 이긴다).
+  -- ★원인은 "차원이 다르면 다르게 센다"가 **아니다**(그렇게 적었다가 정정했다).
+  -- 표본 여부는 **실행 단위**로 정해진다 — 한 실행 안에서는 다섯 표가 같은 체제에 있고
+  -- (좋은 실행 1.0~2.0 · 나쁜 실행 10~20), 표끼리는 조금만 갈린다. 10배 차이는 한
+  -- 실행 안에서 생길 수 없다. **그러므로 같은 날 표들이 10배로 갈렸다면 그 표들은 서로
+  -- 다른 실행에서 굳은 것이다.**
+  --
+  -- 그 일이 일어나는 이유는 **정밀도 래칫(keep_days)이 표마다 독립으로 돌기 때문**이다.
+  -- 이건 의도된 설계다(방문은 전수인데 경로만 표본인 경우가 실제로 있다). 부작용이
+  -- 이것이다 — 어떤 실행이 A표에는 쓰이고 B표에서는 건너뛰면 두 표가 다른 시점에 굳는다.
+  --
+  -- 실측 기전(2026-09-05 00:56:57 UTC 실행 로그로 확정):
+  --   rum_daily 1일 재적재·**건너뜀 7일** / referrer·path 도 건너뜀 7일 /
+  --   rum_country_daily **8일 전부** 재적재 / rum_device_daily **8일 전부** 재적재
+  -- 그 실행은 다섯 표 모두 간격 1.0~1.36 의 정확한 값을 갖고 있었는데, 옛 세 표는
+  -- 당시 `stored_precision` 이 **NULL 을 1.0(전수)으로 읽는 버그** 탓에 "저장값이 더
+  -- 정확"으로 막혔고, 신규 두 표는 그 날 행이 없어 가드에 안 걸려 그대로 들어갔다.
+  -- (그 버그는 이후 NULL→infinity 로 수정됐다.) 뒤이은 표본 실행이 NULL 이던
+  -- rum_daily 를 10 으로 채우면서 9/2 가 "총합 10 / 국가·기기 29"로 굳었다.
+  --
+  -- 래칫이 표별 독립인 한 이 어긋남은 또 생길 수 있다. 그래서 "가장 정밀한 관측"을
+  -- 고르는 일을 사람(보고 작성자)의 판단에 맡기지 않고 여기서 결정론으로 정한다.
+  -- NULL 정밀도는 **미상 = 무한히 부정확**으로 읽는다(수집기 stored_precision 과 같은
+  -- 규칙 — 1.0 으로 읽으면 정밀도를 모르는 값이 항상 이겨 가드가 정확히 뒤집힌다).
   -- 무엇을 골랐는지·다른 방법은 뭐라고 했는지 함께 내보내 사람이 검증할 수 있게 한다.
   with m(src, pref, v, si) as (
     values
@@ -285,25 +337,10 @@ begin
       from public.rum_path_daily
      where snap_date between d7_start and d),
   z as (
-    select *,
-           case
-             when base_path ~ '^/library/' then '자료실'
-             when base_path ~ '^/glossary/' then '용어사전'
-             when base_path ~ '^/findings/firm/' then '업체 프로파일'
-             when base_path ~ '^/findings/inspector/' then '실사관 프로파일'
-             when base_path ~ '^/findings/docs?/' then '지적사항 문서'
-             when base_path ~ '^/findings/trends/' then '트렌드'
-             when base_path ~ '^/findings/clause/' then '조항별 사례'
-             when base_path ~ '^/findings/' then '지적사항 검색'
-             when base_path ~ '^/briefs/' then '주간 브리프'
-             when base_path ~ '^/archive/' then '아카이브'
-             when base_path ~ '^/quiz/' then '퀴즈'
-             when base_path ~ '^/guide/' then '이용안내'
-             when base_path ~ '^/admin/' then '운영 콘솔'
-             when base_path = '/' or base_path = '' then '홈'
-             else '기타'
-           end as zone
-      from p)
+    -- ★구역 규칙은 위 grm_zone_of 하나뿐이다. 처음엔 이 자리에 같은 CASE 를 복제하고
+    -- "파리티 테스트로 어긋남을 잡겠다"고 했는데, 사본을 두 개 두고 감시하느니
+    -- **사본을 없애는 쪽**이 옳다(손목록이 낡는 계열과 같은 교훈).
+    select *, public.grm_zone_of(request_path) as zone from p)
   select jsonb_build_object(
            'day', (select coalesce(jsonb_agg(jsonb_build_object('path', request_path, 'zone', zone, 'en', is_en, 'visits', visits) order by visits desc, request_path), '[]'::jsonb)
                      from (select * from z where snap_date = d order by visits desc, request_path limit 12) x),
@@ -390,7 +427,7 @@ begin
            'date_basis', 'RUM 날짜는 UTC 기준 — KST 09:00~24:00 방문이 같은 날짜에 들어가고, KST 새벽 0~9시 방문은 전날로 잡힌다',
            'bot_basis', 'RUM 은 Cloudflare bot:0 필터(대시보드 Exclude bots=Yes 와 같은 모집단) + 운영자 제외 게이트(grm-op) 적용. 존(zone) 지표가 아니다',
            'precision_basis', 'sample_interval 1=정확, N>1=약 N배 표본 추정(10이면 10단위 반올림), null=정밀도 미상(추정으로 취급)',
-           'best_visits_basis', '같은 날 방문을 총합표·국가합·기기합 셋으로 재고 가장 정밀한 것을 day.best_visits 로 낸다. 표마다 정밀도가 달라 값이 갈리기 때문(실측 9/2: 총합 10 vs 국가·기기 29 = 3배). 헤드라인(day.visits)이 아니라 best_visits 를 보고에 쓴다',
+           'best_visits_basis', '같은 날 방문을 총합표·국가합·기기합 셋으로 재고 가장 정밀한 것을 day.best_visits 로 낸다. 표본 여부는 실행 단위로 정해지는데 정밀도 래칫이 표마다 독립으로 돌아, 어떤 실행이 A표에는 쓰이고 B표에서는 건너뛰면 같은 날이 표별로 다른 시점에 굳는다(실측 9/2: 총합 10 vs 국가·기기 29 = 3배). 헤드라인(day.visits)이 아니라 best_visits 를 보고에 쓴다',
            'path_precision_note', '경로 표는 차원 기수가 커(사이트 4천 쪽) 좋은 실행에서도 방문·국가·기기보다 한 급 거칠다 — 구조적이고 수리로 없앨 수 없다')
     into v_quality;
 

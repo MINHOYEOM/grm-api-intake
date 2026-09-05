@@ -71,36 +71,9 @@ create policy "signed-in can read gsc pages"
 on public.gsc_page_daily for select to authenticated using (true);
 
 -- ---------------------------------------------------------------------------
--- 구역 분류 — 077 의 growth_daily_report 가 인라인으로 갖고 있던 규칙과 **같은 규칙·
--- 같은 순서**다(구체 규칙이 일반 규칙보다 앞). 두 곳에 있는 것은 이 저장소의 기존
--- 관례(어휘 다중 동기화 + 파리티 테스트)를 따른 것이고, 어긋나면 테스트가 잡는다.
-create or replace function public.grm_zone_of(p_path text)
-returns text
-language sql
-immutable
-as $$
-  select case
-    when base ~ '^/library/' then '자료실'
-    when base ~ '^/glossary/' then '용어사전'
-    when base ~ '^/findings/firm/' then '업체 프로파일'
-    when base ~ '^/findings/inspector/' then '실사관 프로파일'
-    when base ~ '^/findings/docs?/' then '지적사항 문서'
-    when base ~ '^/findings/trends/' then '트렌드'
-    when base ~ '^/findings/clause/' then '조항별 사례'
-    when base ~ '^/findings/' then '지적사항 검색'
-    when base ~ '^/briefs/' then '주간 브리프'
-    when base ~ '^/archive/' then '아카이브'
-    when base ~ '^/quiz/' then '퀴즈'
-    when base ~ '^/guide/' then '이용안내'
-    when base ~ '^/admin/' then '운영 콘솔'
-    when base = '/' or base = '' then '홈'
-    else '기타'
-  end
-  from (select regexp_replace(coalesce(p_path, ''), '^/en(?=/|$)', '') as base) t;
-$$;
-
-comment on function public.grm_zone_of(text) is
-  '경로 → 사람이 아는 구역 이름. /en 접두는 떼고 같은 규칙을 쓴다. 077 인라인 규칙과 파리티.';
+-- 구역 분류 함수 `grm_zone_of` 는 **077 에 정의돼 있다**(사본 없음 — 077 착지 표와
+-- 여기 검색 페이지 표가 같은 것을 부른다). 마이그레이션은 번호 순으로 적용되므로
+-- 여기서는 재정의하지 않고 그대로 쓴다.
 
 -- ---------------------------------------------------------------------------
 -- 보고 함수. **RUM 과 기준일이 다르다** — GSC 확정 데이터는 2~3일 늦게 오므로 기본

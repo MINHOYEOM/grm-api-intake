@@ -168,8 +168,8 @@ class Migration077ContractTest(unittest.TestCase):
 
     def test_zone_rules_are_specific_before_general(self):
         """admin.js RUM_ZONES 와 같은 원칙 — 일반 규칙 `^/findings/` 이 먼저 오면 하위 구역이 삼켜진다."""
-        fn = self.mig.split("create or replace function public.growth_daily_report", 1)[1]
-        order = [m.group(1) for m in re.finditer(r"when base_path ~ '\^/([^']+)' then", fn)]
+        fn = self.mig.split("create or replace function public.grm_zone_of", 1)[1].split("$$;", 1)[0]
+        order = [m.group(1) for m in re.finditer(r"when base ~ '\^/([^']+)' then", fn)]
         general = order.index("findings/")
         for specific in ("findings/firm/", "findings/inspector/", "findings/docs?/", "findings/trends/", "findings/clause/"):
             self.assertLess(order.index(specific), general, specific)
@@ -183,9 +183,19 @@ class Migration077ContractTest(unittest.TestCase):
         """★★★헤드라인 하나만 읽으면 3배 틀린 날이 있다.
 
         실측 2026-09-02: 총합표 10(간격 12.1) vs 국가 합 29(1.16)·기기 합 29(1.18).
-        서로 독립인 두 차원이 29 에서 일치하는데 총합표만 10 이었다 — ABR 이 표마다
-        다른 정밀도를 줬기 때문이다. 그래서 "어느 수를 믿을지"를 보고 작성자의 판단에
-        맡기지 않고 함수가 결정론으로 고른다.
+
+        ★원인은 "차원이 다르면 다르게 센다"가 **아니다**(그렇게 적었다가 정정했다).
+        표본 여부는 **실행 단위**로 정해지고 한 실행 안에서는 다섯 표가 같은 체제에
+        있다 — 10배 차이는 한 실행 안에서 생길 수 없다. 갈렸다면 **서로 다른 실행에서
+        굳은 것**이고, 그 일이 생기는 이유는 **정밀도 래칫이 표마다 독립**이기 때문이다
+        (의도된 설계 — 방문은 전수인데 경로만 표본인 경우가 있다. 이건 그 부작용).
+
+        확정 근거(00:56:57 UTC 실행 로그): 다섯 표 모두 간격 1.0~1.36 을 받았는데
+        `rum_daily`·referrer·path 는 **건너뜀 7일**(당시 NULL 을 1.0 으로 읽던 버그가
+        "저장값이 더 정확"으로 막았다), 신규 country·device 는 **8일 전부** 적재됐다.
+
+        래칫이 표별 독립인 한 또 생길 수 있으므로, "어느 수를 믿을지"를 보고 작성자의
+        판단에 맡기지 않고 함수가 결정론으로 고른다.
         """
         fn = self.mig.split("create or replace function public.growth_daily_report", 1)[1]
         block = fn.split("into v_day", 2)[1]

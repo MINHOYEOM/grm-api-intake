@@ -872,19 +872,24 @@ LIBRARY_UPDATE_ITEM_CAP = 12       # 자료실 허브 — 한 화면에 남는 �
 LIBRARY_UPDATE_ITEM_CAP_COMPACT = 3
 
 
-def _update_row_is_readable(row: dict[str, Any], lang: str) -> bool:
-    """이 제목 줄을 그 언어 화면에 **읽을 수 있는 채로** 실을 수 있는가.
+def _update_row_keeps_korean_title(row: dict[str, Any], lang: str) -> bool:
+    """이 제목 줄이 그 언어 화면에 **한국어 원제로** 실리는가(고지 대상인가).
 
     판정은 **값**으로 한다(문서 제목에 한글이 남았는가) — 소스 이름으로 가르면 지금은
     맞아도 낡는다(README 불변식 #8 과 같은 규율). 자료실 항목의 `title_en` 은 있어도
     값이 한국어인 경우가 있다(실측 2026-09-05: 최근 자료실 갱신 이력 7건이 전부 식약처
-    문서이고, 그 `title_en` 은 문서의 실제 이름인 한국어 그대로다). 그 제목을 지어내
-    영어로 바꾸는 것은 무변형 위반이고, 그대로 싣는 것은 영어 화면에 한글을 남기는
-    일이라 — **싣지 않고 개수로만 남긴다**(아래 `hidden_count` 가 "외 N건"으로 드러낸다).
-    한국어 트리는 항상 참이라 판정 자체가 없다(바이트 불변)."""
+    문서이고, 그 `title_en` 은 문서의 실제 이름인 한국어 그대로다).
+
+    ★[2026-09-05 판단 뒤집음] 종전에는 그런 줄을 **싣지 않고 개수로만** 남겼다. 정직했지만
+      실측에서 영어 스트립이 "MFDS 2 items · and 2 more" 만 되어 **실린 항목이 0** 이었다.
+      이 저장소가 같은 상황에서 이미 두 번 내린 판단은 반대다 — 용어사전의 출처 이름과
+      자료실 카탈로그의 원제는 **한국어 그대로 보이고 화면이 이유를 밝힌다**. 옮기면
+      존재하지 않는 문서를 가리키게 되므로 이름은 그대로 두고, 감추는 대신 밝힌다.
+      그래야 영어 독자가 그 문서를 실제로 찾을 수 있다.
+    한국어 트리는 항상 거짓이라 고지가 뜨지 않는다(바이트 불변)."""
     if lang == DEFAULT_LANG:
-        return True
-    return not _HANGUL_RE.search(row.get("title") or "")
+        return False
+    return bool(_HANGUL_RE.search(row.get("title") or ""))
 
 
 def _library_update_view(
@@ -931,9 +936,9 @@ def _library_update_view(
         removed_total += removed_count
         collected.append({
             "view": view, "rows": rows, "truncated": bool(detail.get("truncated")),
-            # 화면에 제목으로 실을 수 있는 줄만 따로 둔다 — 개수(`rows`)는 그대로라
-            # 요약 줄의 "N건"은 언어와 무관하게 같은 값이다(거르는 것은 제목뿐).
-            "shown": [r for r in rows if _update_row_is_readable(r, lang)],
+            # 제목 줄은 언어와 무관하게 **전부** 후보다(상한만 자른다). 한국어 원제로
+            # 실리는 줄은 아래에서 세어 화면이 그 사실을 밝힌다.
+            "shown": rows,
             "new_count": new_count, "changed_count": changed_count,
             "removed_count": removed_count,
         })
@@ -979,6 +984,11 @@ def _library_update_view(
         "catalog_count": len(sources),
         # 표시 상한에 걸려 못 보여준 건수 — "외 N건"으로 반드시 드러낸다(조용한 절삭 금지).
         "hidden_count": sum(s["hidden_count"] for s in sources),
+        # 화면에 **실제로 실린** 줄 중 한국어 원제인 것의 수. 실린 것만 센다 — 독자가
+        # 눈으로 보는 것에 대한 설명이지, 데이터에 그런 게 몇 개인지가 아니다.
+        "ko_only_titles": sum(
+            1 for src in sources for row in src["items"]
+            if _update_row_keeps_korean_title(row, lang)),
     }
 
 
@@ -1004,7 +1014,7 @@ def build_library_update_view(
     자료실 허브·모아보기 스트립·뉴스레터가 각자 다른 분량을 싣기 때문이다.
 
     `catalogs` 는 **그 언어로 읽은 카탈로그 뷰**를 받는다(제목이 `title_en` 에서 나온다).
-    `lang` 은 제목 줄을 실을 수 있는지 판정하는 데만 쓴다(`_update_row_is_readable`)."""
+    `lang` 은 한국어 원제로 실리는 줄을 세는 데만 쓴다(`_update_row_keeps_korean_title`)."""
     return _library_update_view(entry, catalogs, cap=cap, lang=lang) if entry else None
 
 

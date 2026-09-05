@@ -10061,6 +10061,20 @@ class WebFindingsDocPageTest(unittest.TestCase):
             total += len(hrefs)
         self.assertGreater(total, 0, "용어 링크가 하나도 안 붙었다(배선 확인)")
 
+    def test_document_pages_are_structurally_the_same_in_both_languages(self):
+        """문서군(3,174장)의 언어판 구조 대조 — 이 클래스가 스위트에서 **유일하게**
+        문서 페이지를 켠 채로 짓기 때문에 여기서 본다(다른 빌드는 속도 때문에 끈다).
+
+        이 대조가 찾아낸 것: 영어 문서 3,174장에 용어 자동링크가 **한 개도** 없었다
+        (`fd-term` KO만). 전제가 사라진 게이트가 주석과 함께 남아 있던 자리다.
+        """
+        pairs = [d["slug"] for d in self.data["documents"]
+                 if render.doc_is_english(d)][:400]     # 400장이면 결손은 전부 드러난다
+        self.assertGreater(len(pairs), 50, "영어 문서가 너무 적다 — 추출이 깨졌나?")
+        diffs = presence_diffs(self.out, [f"findings/doc/{s}" for s in pairs],
+                               main_only=True)
+        self.assertEqual(diffs, [], "문서 언어판 구조가 갈라졌다: " + " / ".join(diffs))
+
     def test_english_term_autolinks_stay_in_the_english_glossary(self):
         """영어 문서 링크는 실제 `/en/glossary/` 면만 가리키며 한글 라벨이 없다.
 
@@ -10075,15 +10089,21 @@ class WebFindingsDocPageTest(unittest.TestCase):
         term_ids = {t["id"] for t in json.loads(
             render.GLOSSARY_FILE.read_text(encoding="utf-8"))}
         total = 0
-        for doc in (d for d in self.data["documents"] if render.doc_is_english(d)):
+        with_links = 0
+        docs = [d for d in self.data["documents"] if render.doc_is_english(d)]
+        for doc in docs:
             page = (en_root / doc["slug"] / "index.html").read_text(encoding="utf-8")
             links = re.findall(r'<a class="fd-term" href="([^"]+)">([^<]*)</a>', page)
-            expected = [(f"../../../glossary/{tid}/", label) for tid, label in re.findall(
+            strict = re.findall(
                 r'<a class="fd-term" href="\.\./\.\./\.\./glossary/([^/]+)/">([^<]*)</a>',
-                page)]
-            self.assertEqual(links, expected,
+                page)
+            # 느슨한 추출과 엄격한 추출의 **개수**가 같아야 한다 — 하나라도 다른 깊이·
+            # 다른 경로로 나가면 여기서 갈린다(값 비교는 href vs id 라 성립하지 않는다).
+            self.assertEqual(len(links), len(strict),
                              f'영어 용어 링크가 /en/glossary/ 밖으로 간다: {doc["slug"]}')
-            for tid, label in links:
+            if links:
+                with_links += 1
+            for tid, label in strict:
                 self.assertIn(tid, term_ids, f'없는 영어 용어 링크: {doc["slug"]} → {tid}')
                 self.assertTrue((en_glossary / tid / "index.html").is_file(),
                                 f'영어 용어 페이지 부재: {doc["slug"]} → {tid}')
@@ -10091,6 +10111,12 @@ class WebFindingsDocPageTest(unittest.TestCase):
                                     f'영어 용어 링크 라벨에 한글: {doc["slug"]} → {label}')
             total += len(links)
         self.assertGreater(total, 0, "영어 용어 링크가 0개 — 가드가 아무것도 지키지 않는다")
+        # ★커버리지 하한 — "0개는 아니다"만 보면 3,174장 중 1장만 붙어도 통과한다.
+        #   실측 98.8%(37장은 원문에 걸리는 표제어가 없다). 90%를 밑돌면 선정 규칙이
+        #   조용히 망가진 것이다.
+        self.assertGreaterEqual(
+            with_links / len(docs), 0.90,
+            f"영어 문서 용어링크 커버리지 {with_links}/{len(docs)} — 선정 규칙 확인")
 
     def test_english_term_selection_uses_the_original_body(self):
         """불변식 #13: 영어 선택은 text_ko가 아니라 finding_body(..., "en")를 쓴다."""
@@ -16314,16 +16340,65 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "lib-item-sub": "한국어판의 병기(영문 원제)를 영어판에서 뒤집지 않는다 — 영어"
                         " 독자에게 읽을 수 없는 줄을 얹지 않는다",
     },
+    # ★자료실 갱신 스트립 — 영어판은 **제목이 한국어인 행을 싣지 않고 개수로만** 남긴다.
+    #   최근 이력이 전부 식약처 문서이고 그 `title_en` 이 한국어 그대로이기 때문이다
+    #   (문서의 실제 이름 — 지어내 바꾸면 무변형 위반). 개수는 두 언어가 같은 값이고
+    #   "and N more" 가 못 실은 만큼을 밝히며, 문서 이름 자체는 `/en/library/{slug}/`
+    #   에서 고지와 함께 볼 수 있다.
+    #   ⚠️이 선택의 대가: 오늘 실측에서 영어 스트립은 실린 항목이 0이라 "MFDS 2 items ·
+    #     and 2 more" 만 보인다. 정직하지만 정보가 거의 없다. 이력에 영문 제목 문서가
+    #     섞이면 저절로 나아지고(08-03·08-17 호가 그렇다), 그래도 부족하면 카탈로그
+    #     페이지처럼 **한국어 제목 + 고지**로 뒤집는 것이 대안이다.
+    "archive/": {
+        "arc-lib-tag": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
+        "arc-lib-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+    },
+    "briefs/*": {
+        "arc-lib-tag": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
+        "arc-lib-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+    },
+    "findings/doc": {
+        # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은
+        # 원문에 걸리는 표제어가 없어 링크가 0개다 — 1.2%). **통째로 빠지는 것**은
+        # 아래 `test_english_term_autolinks_...` 의 커버리지 하한이 본다.
+        "fd-term": "문서별 데이터 차이 — 전면 결손은 커버리지 하한이 잡는다",
+        # 그 문서를 다룬 브리프로 가는 CTA — 해당 호가 **그 언어에 있을 때만** 뜬다
+        # (없는 페이지로 보내지 않는다는 규율의 정상 동작이다). 영문 브리프가 0호인
+        # 픽스처 빌드에서는 영어 쪽이 통째로 꺼진다.
+        "btn": "브리프 CTA — 그 호가 그 언어에 있을 때만 뜬다",
+        "coral": "위와 같음(같은 버튼의 색 클래스)",
+    },
+    "library/": {
+        "lib-upd-t": "한국어 제목 행을 영어에 싣지 않는다(위 사유)",
+        "lib-upd-st": "위와 같음 — 제목 행에 딸린 부제",
+        "is-new": "위와 같음 — 제목 행의 신규 표시",
+        "ti-external-link": "위와 같음 — 제목 행의 외부 링크 아이콘",
+        "lib-upd-more": "영어 전용 — 못 실은 항목 수를 밝히는 줄",
+    },
 }
 
 
-def presence_diffs(out, pairs) -> "list[str]":
+def _main_only(html: str) -> str:
+    """`<main>` 안만 — 껍데기(헤더·푸터·펫)를 비교에서 뺀다.
+
+    껍데기는 브리프 유무 같은 **데이터 조건**으로 갈리고(영문 브리프가 없는 픽스처
+    빌드에서는 영어 헤더의 '이번 주 소식' 버튼이 꺼진다), 그건 페이지군의 문제가 아니라
+    그 빌드의 입력 문제다. 껍데기 자체는 홈·검색 등 **라이브 데이터로 도는** 페이지군이
+    이미 본다. 여기서는 그 면이 고유하게 만드는 것만 본다.
+    """
+    m = re.search(r"(?s)<main.*?</main>", html)
+    return m.group(0) if m else html
+
+
+def presence_diffs(out, pairs, main_only: bool = False) -> "list[str]":
     """짝 페이지들에서 **한쪽에만 있는 클래스**를 (페이지군, 클래스) 단위로 모은다."""
     seen: dict[tuple[str, str], str] = {}
+    pick = _main_only if main_only else (lambda h: h)
     for path in pairs:
-        ko = class_signature((out / path / "index.html").read_text(encoding="utf-8"))
+        ko = class_signature(
+            pick((out / path / "index.html").read_text(encoding="utf-8")))
         en = class_signature(
-            (out / "en" / path / "index.html").read_text(encoding="utf-8"))
+            pick((out / "en" / path / "index.html").read_text(encoding="utf-8")))
         fam = page_family(path)
         for cls in set(ko) | set(en):
             if bool(ko.get(cls)) == bool(en.get(cls)):

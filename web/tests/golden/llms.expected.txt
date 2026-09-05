@@ -15,7 +15,7 @@
 ## 규제 지적사항 데이터
 - [지적사항 검색](https://grm-solutions.com/findings/): FDA 483 · Warning Letter · EU/영국 GMP 비준수 · 캐나다 실사 · 식약처 지적사항 통합 검색
 - [지적사항 둘러보기](https://grm-solutions.com/findings/browse/): 업무별 바로가기 · 최근 공개 문서 · 분류·국가·기관 축별 탐색
-- [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 3,305건 — 기관·연도별 색인
+- [문서로 찾기](https://grm-solutions.com/findings/docs/): 실사 문서 단위 한국어 정리 3,310건 — 기관·연도별 색인
 - [지적 경향](https://grm-solutions.com/findings/trends/): 최근 12개월 지적 영역 순위 · 많이 인용된 조항
 - [FDA 실사 결과](https://grm-solutions.com/findings/inspections/): FDA GMP 실사 등급(NAI·VAI·OAI) 연도별·국가별 집계
 - [데이터 현황](https://grm-solutions.com/findings/coverage/): 소스 구성 · 연도별 확보량 · 수집 범위와 한계
@@ -38,7 +38,7 @@ Some pages exist only in Korean because the source document is Korean — MFDS i
 - [English edition home](https://grm-solutions.com/en/): Entry point for the English tree
 - [Findings search](https://grm-solutions.com/en/findings/): Search inspection findings in the regulator's original English — FDA 483s, Warning Letters, EU/UK GMP non-compliance reports, Health Canada inspections. Defaults to English-original findings; one click widens it to the full corpus
 - [Browse findings](https://grm-solutions.com/en/findings/browse/): Entry points by task, recent documents, and the category/country/agency axes
-- [Documents by agency and year](https://grm-solutions.com/en/findings/docs/): 3,174 inspection documents whose source text is English
+- [Documents by agency and year](https://grm-solutions.com/en/findings/docs/): 3,175 inspection documents whose source text is English
 - [Findings by 21 CFR section](https://grm-solutions.com/en/findings/clause/): 34 sections, each with the findings that cite it
 - [Findings trends](https://grm-solutions.com/en/findings/trends/): Ranked deficiency areas over the last 12 months and the most-cited sections
 - [FDA inspection classifications](https://grm-solutions.com/en/findings/inspections/): NAI/VAI/OAI counts by year and country

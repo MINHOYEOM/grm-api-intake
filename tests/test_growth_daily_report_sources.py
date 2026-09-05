@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""[076] 일일 성장 보고의 데이터층 — 수집기 국가·기기 그룹 · Brevo 구독자 스냅샷 · 마이그레이션 계약.
+"""[077] 일일 성장 보고의 데이터층 — 수집기 국가·기기 그룹 · Brevo 구독자 스냅샷 · 마이그레이션 계약.
 
 보고 자체는 대화(예약 태스크)가 쓰지만, 숫자의 출처는 여기서 고정한다:
 ① RUM 수집기가 국가·기기를 **별도 요청**으로 받는다(한 쿼리에 묶으면 방문 수까지 표본으로
    깎인다 — f923f0c 의 교훈). 그룹이 늘어도 기존 3개 그룹의 쿼리는 바뀌지 않는다.
 ② Brevo 구독자 수는 uniqueSubscribers → totalSubscribers → contacts.count 순으로 읽고,
    지원 중단으로 0 이 와도 "전원 이탈"로 저장하지 않는다.
-③ 076 마이그레이션은 072 와 같은 읽기 권한(authenticated 만)이고, 보고 함수는
+③ 077 마이그레이션은 072 와 같은 읽기 권한(authenticated 만)이고, 보고 함수는
    auth.users 를 읽는 security definer 라 anon/authenticated 에 실행 권한이 없다.
 ④ 워크플로는 새 스크립트를 부르고, 시크릿 이름은 기존 NEWSLETTER_API_KEY 를 재사용한다.
 """
@@ -23,7 +23,9 @@ import collect_newsletter_subscribers as subs  # noqa: E402
 import collect_rum_analytics as rum  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-MIGRATION = ROOT / "web" / "migrations" / "076_growth_daily_report.sql"
+# ★파일명을 번호로 참조하되 **변수 이름은 내용으로** 짓는다 — 마이그 번호는
+# 병렬 세션끼리 충돌해 옮겨 다닌다(실제로 076 이 077 로 밀렸다).
+MIG_GROWTH = ROOT / "web" / "migrations" / "077_growth_daily_report.sql"
 WORKFLOW = ROOT / ".github" / "workflows" / "grm-rum-analytics.yml"
 
 
@@ -127,7 +129,7 @@ class NewsletterSubscriberSnapshotTest(unittest.TestCase):
                              list_id=3, snap_date="2026-09-05")
         self.assertEqual(set(row), {"snap_date", "list_id", "total_subscribers",
                                     "total_blacklisted", "unique_subscribers"})
-        mig = MIGRATION.read_text(encoding="utf-8")
+        mig = MIG_GROWTH.read_text(encoding="utf-8")
         table = mig.split("create table if not exists public.newsletter_subscribers_daily", 1)[1].split(");", 1)[0]
         for col in row:
             self.assertIn(col, table, col)
@@ -143,10 +145,10 @@ class NewsletterSubscriberSnapshotTest(unittest.TestCase):
             self.assertEqual(subs.main(["--list-id", "3", "--dry-run", "--as-of", "2026-09-05"]), 0)
 
 
-class Migration076ContractTest(unittest.TestCase):
+class Migration077ContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.mig = MIGRATION.read_text(encoding="utf-8")
+        cls.mig = MIG_GROWTH.read_text(encoding="utf-8")
 
     def test_tables_follow_072_read_rules(self):
         for table in ("rum_country_daily", "rum_device_daily", "newsletter_subscribers_daily"):

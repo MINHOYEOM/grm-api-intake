@@ -1,10 +1,10 @@
--- 077 — Google Search Console 일별 적재 + 보고 함수 (2026-09-05)
+-- 078 — Google Search Console 일별 적재 + 보고 함수 (2026-09-05)
 --
 -- Cloudflare RUM 은 "google.com 에서 왔다"까지만 안다. **무엇을 검색해서 왔는지**는
 -- Search Console 만 안다 — 08-12 SEO 감사에서 이미 "남은 건 여기서 쿼리를 읽는 것"으로
 -- 지목됐던 공백을 이 파일이 채운다.
 --
--- ★읽기 권한은 072·076 과 같다: authenticated 만(운영 지표). 쓰기는 service_role.
+-- ★읽기 권한은 072·077 과 같다: authenticated 만(운영 지표). 쓰기는 service_role.
 -- ★CTR 은 저장하지 않는다 — 클릭÷노출로 언제든 나오고, 저장해 두면 합산할 때
 --   "평균의 평균"이라는 틀린 수가 만들어진다. 순위도 합산은 반드시 노출 가중이다.
 -- ★열 이름은 `avg_position` 이다. `position` 은 PostgreSQL 의 내장 함수 이름이라
@@ -71,7 +71,7 @@ create policy "signed-in can read gsc pages"
 on public.gsc_page_daily for select to authenticated using (true);
 
 -- ---------------------------------------------------------------------------
--- 구역 분류 — 076 의 growth_daily_report 가 인라인으로 갖고 있던 규칙과 **같은 규칙·
+-- 구역 분류 — 077 의 growth_daily_report 가 인라인으로 갖고 있던 규칙과 **같은 규칙·
 -- 같은 순서**다(구체 규칙이 일반 규칙보다 앞). 두 곳에 있는 것은 이 저장소의 기존
 -- 관례(어휘 다중 동기화 + 파리티 테스트)를 따른 것이고, 어긋나면 테스트가 잡는다.
 create or replace function public.grm_zone_of(p_path text)
@@ -100,13 +100,13 @@ as $$
 $$;
 
 comment on function public.grm_zone_of(text) is
-  '경로 → 사람이 아는 구역 이름. /en 접두는 떼고 같은 규칙을 쓴다. 076 인라인 규칙과 파리티.';
+  '경로 → 사람이 아는 구역 이름. /en 접두는 떼고 같은 규칙을 쓴다. 077 인라인 규칙과 파리티.';
 
 -- ---------------------------------------------------------------------------
 -- 보고 함수. **RUM 과 기준일이 다르다** — GSC 확정 데이터는 2~3일 늦게 오므로 기본
 -- 기준일은 "어제"가 아니라 **GSC 가 실제로 준 최신 날짜**다. 이 날짜를 보고가 밝힌다.
 --
--- 별도 함수인 이유: 076 의 growth_daily_report 를 통째로 다시 쓰면 200줄이 복제된다.
+-- 별도 함수인 이유: 077 의 growth_daily_report 를 통째로 다시 쓰면 200줄이 복제된다.
 -- 호출자가 두 번 부르는 편이 싸고, 두 데이터의 기준일이 애초에 다르므로 분리가 자연스럽다.
 create or replace function public.gsc_report(p_date date default null)
 returns jsonb

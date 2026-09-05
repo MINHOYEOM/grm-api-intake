@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""[077] Search Console 수집기 · 마이그레이션 계약.
+"""[078] Search Console 수집기 · 마이그레이션 계약.
 
 Cloudflare RUM 은 "google.com 에서 왔다"까지만 안다. 이 트랙이 채우는 것은 **무엇을
 검색해 들어왔는가**이고, 그래서 여기서 고정하는 계약은 네 가지다:
@@ -8,7 +8,7 @@ Cloudflare RUM 은 "google.com 에서 왔다"까지만 안다. 이 트랙이 채
    접근 가능한 속성을 열거해 고르고, 못 고르면 무엇이 보였는지를 실패 메시지에 담는다.
 ② **경로만 저장한다** — 쿼리스트링에 실명이 실리는 경로가 있다(rum_path_daily 와 같은 규칙).
 ③ **순위 합산은 노출 가중** — 단순 평균은 뜻이 없는 수다.
-④ **구역 규칙은 076 과 파리티** — 두 곳에 있는 어휘는 어긋나는 순간 두 보고가 갈린다.
+④ **구역 규칙은 077 과 파리티** — 두 곳에 있는 어휘는 어긋나는 순간 두 보고가 갈린다.
 """
 import os
 import re
@@ -22,8 +22,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import collect_search_console as gsc  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-MIG_076 = ROOT / "web" / "migrations" / "076_growth_daily_report.sql"
-MIG_077 = ROOT / "web" / "migrations" / "077_search_console.sql"
+# ★파일명을 번호로 참조하되 **변수 이름은 내용으로** 짓는다 — 마이그 번호는
+# 병렬 세션끼리 충돌해 옮겨 다닌다(실제로 076 이 077 로 밀렸다).
+MIG_GROWTH = ROOT / "web" / "migrations" / "077_growth_daily_report.sql"
+MIG_GSC = ROOT / "web" / "migrations" / "078_search_console.sql"
 WORKFLOW = ROOT / ".github" / "workflows" / "grm-rum-analytics.yml"
 
 
@@ -143,10 +145,10 @@ class CredentialTest(unittest.TestCase):
         self.assertIn(".keys()", probe, "probe 가 필드 이름조차 안 찍으면 구조 검증이 안 된다")
 
 
-class Migration077ContractTest(unittest.TestCase):
+class Migration078ContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.mig = MIG_077.read_text(encoding="utf-8")
+        cls.mig = MIG_GSC.read_text(encoding="utf-8")
 
     def test_tables_follow_the_072_read_rules(self):
         for table in ("gsc_daily", "gsc_query_daily", "gsc_page_daily"):
@@ -209,7 +211,7 @@ class Migration077ContractTest(unittest.TestCase):
 
 
 class ZoneRuleParityTest(unittest.TestCase):
-    """★076 인라인 CASE 와 077 grm_zone_of 는 **같은 규칙·같은 순서**여야 한다.
+    """★077 인라인 CASE 와 078 grm_zone_of 는 **같은 규칙·같은 순서**여야 한다.
 
     같은 사이트를 두 보고가 다른 구역 이름으로 부르면 사람이 둘을 못 겹쳐 읽는다.
     손목록이 낡는 계열 결함이라 목록끼리 직접 비교한다.
@@ -224,15 +226,15 @@ class ZoneRuleParityTest(unittest.TestCase):
         return patterns, tail
 
     def test_rule_order_and_labels_match(self):
-        p76, t76 = self._rules(MIG_076.read_text(encoding="utf-8"), "base_path")
-        p77, t77 = self._rules(MIG_077.read_text(encoding="utf-8"), "base")
-        self.assertEqual(p76, p77, "076 과 077 의 구역 규칙이 갈렸다")
-        self.assertEqual(t76, t77, "홈 규칙이 갈렸다")
-        self.assertGreater(len(p77), 10, "구역 규칙이 너무 적다 — 슬라이스가 빗나갔다")
+        p_growth, t_growth = self._rules(MIG_GROWTH.read_text(encoding="utf-8"), "base_path")
+        p_gsc, t_gsc = self._rules(MIG_GSC.read_text(encoding="utf-8"), "base")
+        self.assertEqual(p_growth, p_gsc, "077 과 078 의 구역 규칙이 갈렸다")
+        self.assertEqual(t_growth, t_gsc, "홈 규칙이 갈렸다")
+        self.assertGreater(len(p_gsc), 10, "구역 규칙이 너무 적다 — 슬라이스가 빗나갔다")
 
     def test_specific_rules_come_before_the_general_one(self):
-        p77, _ = self._rules(MIG_077.read_text(encoding="utf-8"), "base")
-        order = [pat for pat, _label in p77]
+        p_gsc, _ = self._rules(MIG_GSC.read_text(encoding="utf-8"), "base")
+        order = [pat for pat, _label in p_gsc]
         general = order.index("^/findings/")
         for specific in ("^/findings/firm/", "^/findings/inspector/", "^/findings/docs?/",
                          "^/findings/trends/", "^/findings/clause/"):
@@ -240,7 +242,7 @@ class ZoneRuleParityTest(unittest.TestCase):
 
     def test_english_tree_folds_into_the_same_zone(self):
         """`/en/glossary/x` 는 용어사전이다 — 언어별로 구역이 갈리면 비교가 안 된다."""
-        sql = MIG_077.read_text(encoding="utf-8")
+        sql = MIG_GSC.read_text(encoding="utf-8")
         fn = sql.split("create or replace function public.grm_zone_of", 1)[1]
         self.assertIn("'^/en(?=/|$)'", fn)
 

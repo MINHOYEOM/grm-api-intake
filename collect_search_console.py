@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Google Search Console → Supabase 일별 적재 (077).
+"""Google Search Console → Supabase 일별 적재 (078).
 
 Cloudflare RUM 은 "google.com 에서 왔다"까지만 알려준다([[grm-seo-indexable-surface]]
 08-12 에 이미 지목된 공백). **무엇을 검색해서 왔는지**는 Search Console 만 안다 —

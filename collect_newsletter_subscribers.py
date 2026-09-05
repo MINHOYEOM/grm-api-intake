@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Brevo 리스트 구독자 수 → Supabase 일별 스냅샷 (076 newsletter_subscribers_daily).
+"""Brevo 리스트 구독자 수 → Supabase 일별 스냅샷 (077 newsletter_subscribers_daily).
 
 "구독자가 늘고 있나"의 정본은 Brevo 다(더블옵트인을 마친 사람만 리스트에 남는다).
 지금까지는 사람이 Brevo 화면을 캡처해 세었다(2026-09-01 "6→8"). 이 스크립트가 하루

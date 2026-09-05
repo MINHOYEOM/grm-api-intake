@@ -1,7 +1,8 @@
 /* GRM 문의 및 제안 — 전 페이지 공통 런타임 위젯.
-   비골든: 푸터 '안내' 열의 진입 링크와 모달을 전부 런타임에 주입한다 — JS 미실행이면
+   비골든: 푸터 '서비스' 열(`[data-feedback-slot]`)의 진입 링크와 모달, 소개 페이지 연락
+   블록(`[data-feedback-mount]`)의 진입 버튼을 전부 런타임에 주입한다 — JS 미실행이면
    흔적 0(죽은 링크를 남기지 않는 share 버튼 선례). 스타일은 base.html 게이트 안 스코프
-   <style>(.grm-fb-*) — grm.css 프리즈 보존(reactions 관례).
+   <style>(.grm-fb-*) — grm.css 프리즈 보존(reactions 관례). 소개 버튼 스타일은 about.html.
 
    쓰기 경로(불가침): 061 RPC(feedback_submit)만 — anon 은 user_feedback 테이블에 직접
    insert 할 수 없다(060 funnel_bump 관례 동형). 호출은 popular.js 와 같은 raw PostgREST
@@ -56,18 +57,29 @@
     try { return (window.innerWidth || 0) + "x" + (window.innerHeight || 0); } catch (e) { return ""; }
   }
 
-  // ── 진입점: 푸터 '안내' 열에 링크 주입(전 페이지 공통·nav 과밀 금지 원칙) ──────────
-  var slot = null;
-  var heads = document.querySelectorAll("footer.site .foot h5");
-  for (var i = 0; i < heads.length; i++) {
-    if (heads[i].textContent.trim() === _t("안내")) { slot = heads[i].parentNode; break; }
-  }
+  // ── 진입점: 푸터 '서비스' 열에 링크 주입(전 페이지 공통·nav 과밀 금지 원칙) ──────────
+  //    열은 제목 문자열이 아니라 `[data-feedback-slot]` 속성으로 찾는다 — 제목은 언어·문구
+  //    사전을 타서 바뀔 수 있고, 그러면 링크가 조용히 사라진다(속성은 언어와 무관).
+  //    마이페이지(계정) 링크가 있으면 그 앞에 둔다 — 계정 링크는 열의 맨 끝.
+  var slot = document.querySelector("footer.site .foot [data-feedback-slot]");
   if (!slot) return;
   var trigger = document.createElement("a");
   trigger.href = "#";
   trigger.id = "grm-feedback-open";
   trigger.textContent = _t("문의 및 제안");
-  slot.appendChild(trigger);
+  var meLink = slot.querySelector('a[href$="me/index.html"]');
+  if (meLink) slot.insertBefore(trigger, meLink); else slot.appendChild(trigger);
+  // ── 소개 페이지 연락 블록(`[data-feedback-mount]`)에도 같은 진입 버튼 — 푸터 링크와 같은
+  //    관례(JS 미실행이면 흔적 0). 없는 페이지에서는 아무것도 하지 않는다.
+  var mount = document.querySelector("[data-feedback-mount]");
+  var mountBtn = null;
+  if (mount) {
+    mountBtn = document.createElement("a");
+    mountBtn.href = "#";
+    mountBtn.className = "about-fb";
+    mountBtn.textContent = _t("문의 및 제안");
+    mount.appendChild(mountBtn);
+  }
 
   var pop = null, lastFocus = null, sending = false, saveTimer = null;
 
@@ -288,4 +300,5 @@
   }
 
   trigger.addEventListener("click", function (e) { e.preventDefault(); open(); });
+  if (mountBtn) mountBtn.addEventListener("click", function (e) { e.preventDefault(); open(); });
 })();

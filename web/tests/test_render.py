@@ -252,6 +252,8 @@ SINGLE_GOLDENS = [
     # 문구 사전만으로는 무엇이 실리는지 드러나지 않는다. 두 장을 바이트로 잠근다.
     ("en/guide/index.html", "en_guide.expected.html"),
     ("en/quiz/index.html", "en_quiz.expected.html"),
+    # [소개 2026-09-06] 소개 페이지 영문판 — 본문 정본이 데이터에 따로 있어 골든이 정본.
+    ("en/about/index.html", "en_about.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
     # [2면 분리 2026-08-27] 둘러보기 면 — 위 주석 그대로: 손열거라 여기 없으면 골든 없이 산다.
@@ -278,6 +280,7 @@ SINGLE_GOLDENS = [
     ("library/cfr/index.html", "library_cfr.expected.html"),
     ("library/mhra/index.html", "library_mhra.expected.html"),
     ("guide/index.html", "guide.expected.html"),
+    ("about/index.html", "about.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
     ("quiz/index.html", "quiz.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
@@ -8590,7 +8593,7 @@ class WebGlossaryRenderTest(unittest.TestCase):
         self.assertIn('<meta name="description" content="', self.html)
 
     def test_sitemap_includes_guide_and_glossary(self):
-        for path in ("/guide/", "/glossary/"):
+        for path in ("/guide/", "/glossary/", "/about/"):
             self.assertIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", self.sitemap)
 
     def test_grm_css_untouched_by_glossary(self):
@@ -13269,6 +13272,130 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["empty"], "unknown")
 
 
+class WebAboutTest(unittest.TestCase):
+    """[소개 2026-09-06] /about/ + 푸터 정리. 소개 페이지는 about_content.md(정본)를
+    render_about_html 이 제목·리드·블록으로 잘라 렌더한다. 바이트는 골든(about.expected.html·
+    en_about.expected.html)이 잠그고, 여기선 배선·정책만 본다 — 실명·낡는 숫자 없음, 연락
+    링크는 contact.json 에 값이 있을 때만, nav 6탭 불변, 푸터는 브랜드 + 링크 열 셋."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_about_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "about" / "index.html").read_text(encoding="utf-8")
+        cls.en_html = (cls.single / "en" / "about" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.trends = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.md = render.ABOUT_FILE.read_text(encoding="utf-8")
+        cls.md_en = render.ABOUT_EN_FILE.read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_title_and_sections_from_markdown(self):
+        title = next(ln[2:].strip() for ln in self.md.splitlines() if ln.startswith("# "))
+        self.assertIn(f">{title}</h1>", self.html)
+        self.assertNotIn(f"<h1>{title}</h1>", self.html)   # md h1 이 본문에 재출력되지 않음
+        # 본문 블록 = md 의 ## 수. 연락 블록(id="contact")은 템플릿이 하나 더 붙인다.
+        n_h2 = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
+        self.assertEqual(self.html.count('<section class="about-sec" id="sec-'), n_h2)
+        self.assertEqual(self.html.count('<section class="about-sec" id="contact">'), 1)
+
+    def test_en_is_a_separate_source_with_same_shape(self):
+        # 영문은 번역본이 아니라 같은 h2 구조의 다른 정본 — 블록 수가 같아야 딥링크(sec-N)가 맞는다.
+        n_ko = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
+        n_en = sum(1 for ln in self.md_en.splitlines() if ln.startswith("## "))
+        self.assertEqual(n_ko, n_en)
+        self.assertEqual(self.en_html.count('<section class="about-sec" id="sec-'), n_en)
+        main = self.en_html[self.en_html.index("<main>"):self.en_html.index("</main>")]
+        self.assertNotRegex(main, r"[가-힣]")   # 영어 면 본문에 한글 잔존 0
+
+    def test_no_operator_name_and_no_perishable_numbers(self):
+        # 사용자 결정(2026-09-06): 실명을 싣지 않는다. 문서·지적 수 같은 숫자도 늘 낡아 싣지 않는다.
+        main = self.html[self.html.index("<main>"):self.html.index("</main>")]
+        self.assertNotRegex(main, r"\d{1,3}(,\d{3})+")   # 6,158 같은 수 없음
+        self.assertNotIn("data-feedback-mount", self.landing)   # 연락 블록은 소개 페이지에만
+        self.assertIn("data-feedback-mount", main)             # 문의 버튼은 JS 가 얹는 자리
+        self.assertNotIn('class="about-fb"', main)             # 정적 HTML 엔 버튼 없음(JS 미실행 = 흔적 0)
+
+    def test_contact_links_only_when_configured(self):
+        # 기본(contact.json 빈 값) 빌드 — 링크도 아이콘도 없다(죽은 링크 금지). 값이 있으면 소개
+        # 페이지와 전 페이지 푸터 법적 줄에 함께 나온다(같은 env.globals 값).
+        self.assertNotIn("ti-brand-linkedin", self.html)
+        self.assertNotIn("mailto:", self.html)
+        self.assertNotIn('class="foot-contact"', self.landing)
+        c0 = render.load_contact
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_about_contact_"))
+        try:
+            render.load_contact = lambda path=None: {
+                "linkedin": "https://www.linkedin.com/in/example/", "email": "hello@example.com"}
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            about = (out / "about" / "index.html").read_text(encoding="utf-8")
+            landing = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.load_contact = c0
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertIn('href="https://www.linkedin.com/in/example/" target="_blank" rel="me noopener"', about)
+        self.assertIn('href="mailto:hello@example.com"', about)
+        self.assertIn('class="foot-ico" href="https://www.linkedin.com/in/example/"', landing)
+        self.assertIn('class="foot-ico" href="mailto:hello@example.com"', landing)
+
+    def test_load_contact_validates_shape(self):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_contact_"))
+        try:
+            p = tmp / "contact.json"
+            p.write_text('{"linkedin": "", "email": "  "}', encoding="utf-8")
+            self.assertEqual(render.load_contact(p), {})           # 빈 값 = 없음
+            p.write_text('{"linkedin": "linkedin.com/in/x", "email": ""}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                render.load_contact(p)                             # https:// 없는 주소
+            p.write_text('{"linkedin": "", "email": "not-an-email"}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                render.load_contact(p)
+            p.write_text('{"twitter": "x"}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                render.load_contact(p)                             # 모르는 키
+            self.assertEqual(render.load_contact(tmp / "absent.json"), {})
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_footer_is_brand_plus_three_link_columns(self):
+        foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
+        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["콘텐츠", "도구", "서비스"])
+        self.assertNotIn("<span>", foot)                            # 클릭 안 되는 라벨 열 0
+        self.assertIn('<p class="foot-src"><b>Sources</b>', foot)   # 소스는 브랜드 아래 한 줄
+        self.assertIn('href="../../about/index.html">소개</a>', foot)
+        self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
+        self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
+        self.assertIn("<div data-feedback-slot>", foot)              # 문의 링크가 얹힐 열
+        self.assertNotIn("repeat(4,1fr)", self.trends)               # 5열 시절 override 제거
+        self.assertNotIn("AI-generated from primary sources", self.trends)   # 중복 prov 삭제
+
+    def test_nav_unchanged_six_tabs_and_about_lights_none(self):
+        nav = self.html[self.html.index('<nav id="navmenu">'):]
+        nav = nav[:nav.index("</nav>")]
+        self.assertEqual(nav.count("<a "), 6)
+        self.assertNotIn("about/", nav)
+        self.assertNotIn('class="on"', nav)
+
+    def test_sitemap_and_llms_list_about(self):
+        sitemap = (self.single / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/about/</loc>", sitemap)
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/en/about/</loc>", sitemap)
+        llms = (self.single / "llms.txt").read_text(encoding="utf-8")
+        self.assertIn(f"({render.SITE_BASE_URL}/about/)", llms)
+        self.assertIn(f"({render.SITE_BASE_URL}/en/about/)", llms)
+
+    def test_feedback_js_finds_slot_by_attribute_not_heading_text(self):
+        js = (WEB_DIR / "assets" / "feedback.js").read_text(encoding="utf-8")
+        self.assertIn("[data-feedback-slot]", js)
+        self.assertIn("[data-feedback-mount]", js)
+        self.assertNotIn('_t("안내")', js)   # 열 제목 문자열 매칭은 언어·문구 변경에 조용히 깨진다
+
+
 class WebSourceCopyConsistencyTest(unittest.TestCase):
     """[재발 방지 가드 2026-07] 새 규제 소스를 추가할 때 코드(수집기·DB)만 고치고 사이트
     설명·마퀴 갱신을 빠뜨리던 문제를 CI 에서 잡는다 — EU/영국 GMP 비준수(EudraGMDP·MHRA)
@@ -13291,17 +13418,12 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         track = re.search(r'class="track">(.*?)</div>', landing, re.S)
         self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
         marquee = {norm(s.replace("\xa0", " ").strip()) for s in re.findall(r"<span>([^<]+)</span>", track.group(1))}
-        # [i18n 2단계] 템플릿 원문은 {{ _("수집 소스") }} 로 감싸져 있다.
-        foot = re.search(r'<h5>\{\{ _\("수집 소스"\) \}\}</h5>(.*?)</div>', base, re.S)
-        self.assertIsNotNone(foot, "푸터 '수집 소스' 블록을 찾지 못함")
-        footer = set()
-        # [i18n 2단계] 한글이 섞인 span 은 {{ _("…") }} 로 감싸져 있다 — 안쪽 원문만 꺼낸다.
-        i18n_span = re.compile(r'^\{\{ _\("(.*)"\) \}\}$')
-        for chunk in re.findall(r"<span>([^<]+)</span>", foot.group(1)):
-            im = i18n_span.match(chunk)
-            if im:
-                chunk = im.group(1)
-            footer.update(norm(x.strip()) for x in chunk.replace("\xa0", " ").split("·"))
+        # [푸터 정리 2026-09-06] 소스 목록은 열이 아니라 브랜드 아래 한 줄(.foot-src)이다.
+        # 한글 기관명은 {{ _("…") }} 로 감싸져 있다 — 안쪽 원문만 꺼낸 뒤 '·' 로 가른다.
+        foot = re.search(r'<p class="foot-src"><b>[^<]*</b>(.*?)</p>', base, re.S)
+        self.assertIsNotNone(foot, "푸터 소스 줄(.foot-src)을 찾지 못함")
+        line = re.sub(r'\{\{ _\("(.*?)"\) \}\}', r"\1", foot.group(1))
+        footer = {norm(x.strip()) for x in line.replace("\xa0", " ").split("·")}
         self.assertEqual(marquee, footer,
                          f"마퀴에만: {sorted(marquee - footer)} / 푸터에만: {sorted(footer - marquee)}")
 
@@ -16864,7 +16986,8 @@ class WebEnTreeTest(unittest.TestCase):
         cls.expected = render.en_tree_paths(
             render.load_library(),
             guide_en=render.load_guide(render.GUIDE_EN_FILE),
-            quiz_en=render.load_quiz_bank())
+            quiz_en=render.load_quiz_bank(),
+            about_en=render.load_guide(render.ABOUT_EN_FILE))
         if cls.en_docs:
             cls.expected |= {"findings/docs/", "findings/browse/"}
             cls.expected |= {f"findings/docs/{d['agency'].lower()}"

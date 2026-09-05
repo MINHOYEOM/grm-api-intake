@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [소개 2026-09-06] 소개 페이지(/about/) — web/data/about_content.md(정본)를 render_about_html
+    이 제목·리드·블록으로 잘라 넘긴다(about_title·about_lead·about_sections). 이용안내처럼
+    목차가 달린 긴 문서가 아니라 **왼쪽 레이블 + 오른쪽 본문** 블록 몇 개다.
+    싣지 않는 것: 운영자 실명, 문서·지적 수 같은 숫자(늘 바뀌어 낡는다), 소스 개수 강조.
+    연락: LinkedIn·이메일(env.globals contact — 빈 값이면 링크 미출력)과 '문의 및 제안'
+    (feedback.js 가 [data-feedback-mount] 에 런타임 주입 — JS 미실행이면 흔적 0).
+    nav 탭은 늘리지 않는다(nav_active="about" 은 어느 탭도 켜지 않는다 — 진입은 푸터).
+    grm.css 프리즈 보존 위해 레이아웃은 기존 토큰만 쓰는 스코프 <style>(이용안내 선례).
+    §4 한글안전: letter-spacing/text-transform/mono 미사용(영문 eyebrow 제외) + keep-all. -#}
+<main>
+  <div class="wrap page-head about-head">
+    <span class="kick reveal" style="animation-delay:.02s">About</span>
+    <h1 class="reveal" style="animation-delay:.08s">{{ about_title }}</h1>
+    <div class="about-lead reveal" style="animation-delay:.14s">{{ about_lead }}</div>
+  </div>
+  <div class="wrap about-body reveal" style="animation-delay:.2s">
+    {% for s in about_sections %}
+    <section class="about-sec" id="{{ s.id }}">
+      <h2>{{ s.title }}</h2>
+      <div class="about-prose">{{ s.body }}</div>
+    </section>
+    {% endfor %}
+    <section class="about-sec" id="contact">
+      <h2>{{ _("연락") }}</h2>
+      <div class="about-prose">
+        <p>{{ _("궁금한 점이나 제안이 있으면 편하게 알려 주세요. 잘못된 내용을 발견하셨을 때도요.") }}</p>
+        <div class="about-acts" data-feedback-mount>{% if contact.linkedin %}<a class="about-act" href="{{ contact.linkedin }}" target="_blank" rel="me noopener"><i class="ti ti-brand-linkedin" aria-hidden="true"></i>LinkedIn</a>{% endif %}{% if contact.email %}<a class="about-act" href="mailto:{{ contact.email }}"><i class="ti ti-mail" aria-hidden="true"></i>{{ _("이메일") }}</a>{% endif %}</div>
+      </div>
+    </section>
+  </div>
+</main>
+<style>
+/* [소개] 레이블 + 본문 블록 — grm.css 토큰만 사용(프리즈 보존). 카드·배지 없이 괘선으로만 나눈다. */
+.about-head h1{max-width:20ch;text-wrap:balance;word-break:keep-all}
+.about-head .about-lead p{color:var(--body);margin-top:22px;font-size:17px;line-height:1.7;max-width:56ch;word-break:keep-all}
+.about-body{padding-top:40px;padding-bottom:80px}
+.about-sec{display:grid;grid-template-columns:200px 1fr;gap:40px;padding:44px 0;border-top:1px solid var(--line)}
+.about-sec h2{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);margin:0;padding-top:4px;line-height:1.5;word-break:keep-all}
+.about-prose{max-width:60ch;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all}
+.about-prose p{margin:0 0 1.1em}
+.about-prose p:last-child{margin-bottom:0}
+.about-prose ul{list-style:none;margin:0;padding:0}
+.about-prose li{padding:12px 0;border-top:1px solid var(--line)}
+.about-prose li:first-child{border-top:0;padding-top:0}
+.about-prose strong{font-weight:600;color:var(--ink)}
+.about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.about-acts:empty{display:none}
+.about-act,.about-fb{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 16px;background:transparent;transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease)}
+.about-act:hover{border-color:var(--ink)}
+.about-act .ti{font-size:16px;line-height:1}
+.about-fb{background:var(--coral);border-color:var(--coral);color:var(--on-coral)}
+.about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
+@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:14px;padding:34px 0} .about-head h1{font-size:38px} .about-prose{font-size:16px} }
+</style>
+{% endblock %}

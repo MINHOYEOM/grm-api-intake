@@ -27,6 +27,7 @@
 - [자료실](https://grm-solutions.com/library/): FDA·EMA·PIC/S·ICH·WHO·식약처 지침·가이드라인 공식 원문 링크
 - [이용안내](https://grm-solutions.com/guide/): 서비스 활용법과 자주 묻는 질문
 - [주간 퀴즈](https://grm-solutions.com/quiz/): 그 주 규제 소식 기반 학습 퀴즈
+- [소개](https://grm-solutions.com/about/): 서비스를 만든 이유와 만드는 방식, 연락처
 
 ## English edition (/en/)
 
@@ -48,3 +49,4 @@ Some pages exist only in Korean because the source document is Korean — MFDS i
 - [Reference library](https://grm-solutions.com/en/library/): Official FDA, EMA, PIC/S, ICH, WHO and MFDS guidance documents
 - [Guide](https://grm-solutions.com/en/guide/): How to use the service, and frequently asked questions
 - [Weekly quiz](https://grm-solutions.com/en/quiz/): Learning quiz based on that week's regulatory news
+- [About](https://grm-solutions.com/en/about/): Why the service exists, how it is made, and how to get in touch

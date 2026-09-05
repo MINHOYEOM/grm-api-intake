@@ -43,6 +43,10 @@ def _row(day, dim, value, visits, si=1.0):
             "dimensions": {"date": day, dim: value}}
 
 
+def _dt(t):
+    return datetime.strptime(t, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+
 class RumCountryDeviceGroupsTest(unittest.TestCase):
     def test_new_groups_are_separate_requests_and_do_not_touch_existing_queries(self):
         """국가·기기는 각자 요청이고, 기존 그룹의 쿼리 본문은 그대로다."""
@@ -352,6 +356,66 @@ class ResolveWindowStepTest(unittest.TestCase):
         script = self._run_block("Resolve window")
         self.assertNotIn("${{", script)
         self.assertIn("$IN_END", script)
+
+class ChunkWindowTest(unittest.TestCase):
+    """★전수 데이터셋은 약 7일만 보존된다 — 어릴 때 짧은 창으로 받아야 한다.
+
+    2026-09-05 통제 실측(한 실행 · 같은 1일 창 · 날짜만 다름):
+        ~08-29T00:00:00Z (8/28 = 8일 전) → 간격 12.5   표본
+        ~08-29T23:59:59Z (8/29 = 7일 전) → 간격  1.07  전수
+    보존 경계 밖을 조금이라도 건드리는 질의는 통째로 표본으로 떨어진다. 8일 창 하나로만
+    물어 온 결과 8/10~8/28 이 전부 표본으로 저장된 채 나이를 먹어 **영구히 회수 불가**가
+    됐다. 다시 그렇게 되지 않게 질의를 짧게 유지한다.
+    """
+
+    def test_every_chunk_stays_inside_the_limit(self):
+        """계약은 개수가 아니라 **상한**이다 — 손으로 센 목록은 낡는다."""
+        got = rum.chunk_window("2026-08-28T00:00:00Z", "2026-09-05T00:00:00Z", 3)
+        self.assertGreater(len(got), 1, "8일 창이 안 쪼개졌다")
+        for a, b in got:
+            span = _dt(b) - _dt(a)
+            self.assertLessEqual(span.total_seconds(), 3 * 86400,
+                                 f"조각이 상한을 넘는다: {a} ~ {b}")
+
+    def test_chunks_never_overlap(self):
+        """★겹치면 데이터가 **사라진다**. GraphQL 필터가 datetime_leq(끝 포함)라 조각을
+        자정에서 맞대면 앞 조각이 다음 날 00:00:00 한 순간을 삼켜 그 날 행을 값 ~0 으로
+        만든다. replace_days 는 응답이 답한 날을 통째로 지우고 다시 넣으므로 멀쩡한
+        하루가 0 으로 덮인다."""
+        for days in (1, 2, 3, 5, 7):
+            got = rum.chunk_window("2026-08-10T00:00:00Z", "2026-09-05T00:00:00Z", days)
+            with self.subTest(days=days):
+                for (_a, prev_end), (nxt_start, _b) in zip(got, got[1:]):
+                    self.assertLess(prev_end, nxt_start,
+                                    f"조각이 겹친다: …{prev_end} / {nxt_start}…")
+
+    def test_the_whole_range_is_covered_with_only_second_wide_seams(self):
+        """이음매 말고는 구멍이 없어야 한다 — 조각 사이가 벌어지면 그 날이 통째로 빈다."""
+        got = rum.chunk_window("2026-08-10T00:00:00Z", "2026-09-05T00:00:00Z", 3)
+        self.assertEqual(got[0][0], "2026-08-10T00:00:00Z")
+        self.assertEqual(got[-1][1], "2026-09-05T00:00:00Z", "마지막 조각이 원래 끝을 잃었다")
+        for (_a, prev_end), (nxt_start, _b) in zip(got, got[1:]):
+            gap = (_dt(nxt_start) - _dt(prev_end)).total_seconds()
+            self.assertEqual(gap, 1, f"이음매가 1초가 아니다: {gap}s")
+
+    def test_short_range_is_left_alone_and_zero_disables(self):
+        one = ("2026-09-05T00:00:00Z", "2026-09-05T04:00:00Z")
+        self.assertEqual(rum.chunk_window(*one, 3), [one])
+        wide = ("2026-08-28T00:00:00Z", "2026-09-05T00:00:00Z")
+        self.assertEqual(rum.chunk_window(*wide, 0), [wide],
+                         "0 은 쪼개지 않는다 — 창 길이 영향 재측정 경로")
+
+    def test_default_limit_sits_inside_the_measured_exact_window(self):
+        """경계(7일)는 시계와 함께 굴러간다 — 붙이지 않는다."""
+        self.assertGreaterEqual(rum.CHUNK_DAYS, 1)
+        self.assertLess(rum.CHUNK_DAYS, 7,
+                        "기본 조각이 관측된 보존 경계에 붙어 있다 — 여유가 없다")
+
+    def test_collector_actually_chunks_before_querying(self):
+        """순수 함수만 초록이면 배선이 죽어도 모른다(split_window 계약과 동형)."""
+        src = (ROOT / "collect_rum_analytics.py").read_text(encoding="utf-8")
+        self.assertIn("for cs, ce in chunk_window(w_start, w_end, args.chunk_days)", src)
+        self.assertIn("--chunk-days", src)
 
 if __name__ == "__main__":
     unittest.main()

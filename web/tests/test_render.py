@@ -10034,6 +10034,47 @@ class WebFindingsDocPageTest(unittest.TestCase):
             total += len(hrefs)
         self.assertGreater(total, 0, "용어 링크가 하나도 안 붙었다(배선 확인)")
 
+    def test_english_term_autolinks_stay_in_the_english_glossary(self):
+        """영어 문서 링크는 실제 `/en/glossary/` 면만 가리키며 한글 라벨이 없다.
+
+        영어 용어사전이 생긴 뒤에도 문서 emit 루프가 링크를 비워 두면 이 검사의 하한이
+        실패한다. 상대 href는 문서 페이지에서 해석했을 때 `/en/glossary/{id}/`가 되므로,
+        정확한 깊이와 실제 산출 파일을 함께 확인한다.
+        """
+        import html as _html
+
+        en_root = self.root.parent.parent / "en" / "findings" / "doc"
+        en_glossary = self.out / "en" / "glossary"
+        term_ids = {t["id"] for t in json.loads(
+            render.GLOSSARY_FILE.read_text(encoding="utf-8"))}
+        total = 0
+        for doc in (d for d in self.data["documents"] if render.doc_is_english(d)):
+            page = (en_root / doc["slug"] / "index.html").read_text(encoding="utf-8")
+            links = re.findall(r'<a class="fd-term" href="([^"]+)">([^<]*)</a>', page)
+            expected = [(f"../../../glossary/{tid}/", label) for tid, label in re.findall(
+                r'<a class="fd-term" href="\.\./\.\./\.\./glossary/([^/]+)/">([^<]*)</a>',
+                page)]
+            self.assertEqual(links, expected,
+                             f'영어 용어 링크가 /en/glossary/ 밖으로 간다: {doc["slug"]}')
+            for tid, label in links:
+                self.assertIn(tid, term_ids, f'없는 영어 용어 링크: {doc["slug"]} → {tid}')
+                self.assertTrue((en_glossary / tid / "index.html").is_file(),
+                                f'영어 용어 페이지 부재: {doc["slug"]} → {tid}')
+                self.assertNotRegex(_html.unescape(label), r"[가-힣]",
+                                    f'영어 용어 링크 라벨에 한글: {doc["slug"]} → {label}')
+            total += len(links)
+        self.assertGreater(total, 0, "영어 용어 링크가 0개 — 가드가 아무것도 지키지 않는다")
+
+    def test_english_term_selection_uses_the_original_body(self):
+        """불변식 #13: 영어 선택은 text_ko가 아니라 finding_body(..., "en")를 쓴다."""
+        term = next(t for t in json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+                    if t["term_en"] == "Aseptic Processing")
+        doc = {"findings": [{"text_ko": "무균 공정이라는 번역문에는 영문 표제어가 없다.",
+                             "text_orig": "The aseptic processing area was not controlled."}]}
+        index = render.build_doc_term_link_index([term], lang="en")
+        selected = render.select_doc_term_links(doc, index, {term["id"]: 0}, lang="en")
+        self.assertEqual(selected, [("Aseptic Processing", term["id"])])
+
     def test_term_autolink_skips_verb_and_purposive_usage(self):
         """[비순환 가드] 명사가 아닌 자리에는 링크하지 않는다 — 규칙을 실제 문장으로 고정.
 

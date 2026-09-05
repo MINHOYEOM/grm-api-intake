@@ -1865,14 +1865,26 @@ _DOC_TERM_MIN_LEN = 2
 _LATIN_TOKEN = re.compile(r"^[A-Za-z0-9/-]+$")
 
 
-def build_doc_term_link_index(terms: list[dict[str, Any]]) -> list[tuple[str, str]]:
-    """[(표면형, term_id)] — 긴 표면형 우선(`시정 및 예방조치` 가 `예방조치` 를 이긴다)."""
+def build_doc_term_link_index(
+    terms: list[dict[str, Any]], lang: str = DEFAULT_LANG,
+) -> list[tuple[str, str]]:
+    """[(표면형, term_id)] — 읽는 언어의 표제어를 긴 것부터 고른다.
+
+    한국어는 기존의 한글 표제어(및 영문 약어)만, 영어는 영문 표제어와 한글이 없는
+    aliases만 쓴다. 영어 셸에 한국어 링크 라벨이 생기지 않게 표면형 단계에서 막는다.
+    """
     surfaces: dict[str, str] = {}
     for t in terms:
-        cands = [p.strip() for p in (t.get("term_ko") or "").split("·")]
-        m = re.search(r"\(([A-Z][A-Za-z0-9/-]{1,9})\)", t.get("term_en") or "")
-        if m:
-            cands.append(m.group(1))
+        if lang == DEFAULT_LANG:
+            # 한국어 출력의 기존 선정 규칙은 바이트까지 불변이어야 한다.
+            cands = [p.strip() for p in (t.get("term_ko") or "").split("·")]
+            m = re.search(r"\(([A-Z][A-Za-z0-9/-]{1,9})\)", t.get("term_en") or "")
+            if m:
+                cands.append(m.group(1))
+        else:
+            cands = [str(t.get("term_en") or "").strip()]
+            cands.extend(str(a).strip() for a in (t.get("aliases") or [])
+                         if not _HANGUL_RE.search(str(a)))
         for c in cands:
             if len(c) >= _DOC_TERM_MIN_LEN and c not in surfaces:
                 surfaces[c] = t["id"]
@@ -1881,14 +1893,19 @@ def build_doc_term_link_index(terms: list[dict[str, Any]]) -> list[tuple[str, st
 
 def build_doc_term_doc_freq(
     index: list[tuple[str, str]], documents: list[dict[str, Any]],
+    lang: str = DEFAULT_LANG,
 ) -> dict[str, int]:
     """term_id → 그 용어가 등장한 문서 수. 희소도 판정의 유일한 근거(사람 목록 0)."""
     freq: dict[str, int] = {tid: 0 for _, tid in index}
     for doc in documents:
-        blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+        # 한국어는 종전 `text_ko` 전용 정책을 byte까지 보존한다. 영어만 #13의
+        # 언어 확정 뷰(`finding_body`)를 쓴다.
+        blob = "\n".join(
+            (f.get("text_ko") or "") if lang == DEFAULT_LANG else finding_body(f, lang)
+            for f in doc.get("findings") or [])
         hit: set[str] = set()
         for surface, tid in index:
-            if tid not in hit and _doc_term_find(blob, surface) >= 0:
+            if tid not in hit and _doc_term_find(blob, surface, lang=lang) >= 0:
                 hit.add(tid)
         for tid in hit:
             freq[tid] += 1
@@ -1912,8 +1929,16 @@ def _doc_term_is_verbish(text: str, start: int, end: int) -> bool:
                 or _DOC_TERM_POST_VERBISH.match(text[end:end + 2]))
 
 
-def _doc_term_find(text: str, surface: str, start: int = 0) -> int:
+def _doc_term_find(
+    text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
+) -> int:
     """등장 위치. 라틴 표면형은 낱말 경계를 요구한다(`API` 가 `RAPID` 안에 걸리면 안 된다)."""
+    if lang != DEFAULT_LANG:
+        # 영어는 대소문자가 문장 안에서 바뀌어도 같은 표제어다. 다만 낱말 경계는
+        # 표제어 전체에 적용해 `quality`가 `inequality` 안에 걸리는 일을 막는다.
+        m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])",
+                       re.IGNORECASE).search(text, start)
+        return m.start() if m else -1
     if _LATIN_TOKEN.match(surface):
         m = re.compile(rf"(?<![A-Za-z0-9]){re.escape(surface)}(?![A-Za-z0-9])").search(
             text, start)
@@ -1929,12 +1954,17 @@ def select_doc_term_links(
     index: list[tuple[str, str]],
     doc_freq: dict[str, int],
     limit: int = _DOC_TERM_LINK_MAX,
+    lang: str = DEFAULT_LANG,
 ) -> list[tuple[str, str]]:
     """이 문서에서 링크할 [(표면형, term_id)] — 희소(df 낮은) 용어 우선, 용어당 1 개."""
-    blob = "\n".join(f.get("text_ko") or "" for f in doc.get("findings") or [])
+    # 한국어의 기존 매칭 입력은 `text_ko` 그대로다. 영어만 번역본이 아니라 원문을
+    # 본다(README 불변식 #13).
+    blob = "\n".join(
+        (f.get("text_ko") or "") if lang == DEFAULT_LANG else finding_body(f, lang)
+        for f in doc.get("findings") or [])
     best: dict[str, str] = {}
     for surface, tid in index:                     # index 가 긴 표면형 우선이라 첫 매치가 최장
-        if tid not in best and _doc_term_find(blob, surface) >= 0:
+        if tid not in best and _doc_term_find(blob, surface, lang=lang) >= 0:
             best[tid] = surface
     ranked = sorted(best.items(), key=lambda kv: (doc_freq.get(kv[0], 0), kv[0]))
     return [(surface, tid) for tid, surface in ranked[:limit]]
@@ -1942,6 +1972,7 @@ def select_doc_term_links(
 
 def link_terms_in_text(
     text: str, selected: list[tuple[str, str]], rel_root: str, used: set[str],
+    lang: str = DEFAULT_LANG,
 ) -> Markup:
     """본문 1 조각에 용어 링크를 끼운다 — 텍스트 무변형(escape 후 `<a>` 만 삽입).
 
@@ -1951,9 +1982,9 @@ def link_terms_in_text(
     for surface, tid in selected:
         if tid in used:
             continue
-        pos = _doc_term_find(text, surface)
+        pos = _doc_term_find(text, surface, lang=lang)
         while pos >= 0 and any(s < pos + len(surface) and pos < e for s, e, _ in spans):
-            pos = _doc_term_find(text, surface, pos + 1)
+            pos = _doc_term_find(text, surface, pos + 1, lang=lang)
         if pos >= 0:
             spans.append((pos, pos + len(surface), tid))
             used.add(tid)
@@ -4785,10 +4816,17 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         })
         written.append("assets/inspector-doc-pages.json")
 
-        # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 용어 정본이 없으면 조용히 꺼진다.
-        term_link_index = build_doc_term_link_index(glossary_terms) if glossary_terms else []
-        term_doc_freq = (build_doc_term_doc_freq(term_link_index, documents)
-                         if term_link_index and render_doc_pages else {})
+        # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 언어마다 본문·표제어가 달라
+        # 색인과 문서 빈도도 같은 언어로 다시 잰다. 용어 정본이 없으면 조용히 꺼진다.
+        term_link_index_by_lang = {
+            _lg: build_doc_term_link_index(glossary_terms, _lg)
+            for _lg, _p, _e, _t in trees
+        } if glossary_terms else {}
+        term_doc_freq_by_lang = {
+            _lg: (build_doc_term_doc_freq(term_link_index_by_lang[_lg], documents, _lg)
+                  if term_link_index_by_lang[_lg] and render_doc_pages else {})
+            for _lg, _p, _e, _t in trees
+        }
 
         # ── 내부 링크 구조 ───────────────────────────────────────────────────
         # 문서 페이지 3천 장을 sitemap 에만 올려두면 사이트 구조에서 그 페이지에 닿는
@@ -5024,10 +5062,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             same_firm = [{"slug": s["slug"], "published_date": doc_display_date(s),
                           "agency": s["agency"], "count": len(s["findings"])}
                          for s in siblings[:6]]
-            # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라 같은
-            # 용어가 여러 지적에 나와도 첫 곳 하나만 링크된다.
-            selected = (select_doc_term_links(doc, term_link_index, term_doc_freq)
-                        if term_link_index else [])
             # [다국어 4단계] 언어 트리마다 한 장씩 — 뷰모델은 같고 **본문과 라벨만** 언어를
             # 따른다. 영어판은 원문이 실제로 영어인 문서에만 낸다(doc_is_english).
             for _lg, _mkpage, _emit, _tr in trees:
@@ -5035,9 +5069,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     continue
                 _pp = (doc_page if _lg == DEFAULT_LANG
                        else _mkpage(f"findings/doc/{doc['slug']}/"))
-                # 용어 링크는 한국어 용어사전으로 가는 것이라 영어판에는 걸지 않는다
-                # (없는 페이지로 보내는 링크 금지 — 영어 용어사전은 미착수).
-                _sel = selected if _lg == DEFAULT_LANG else []
+                # 용어 링크는 렌더 직전에 본문 조각별로 끼운다. `used` 가 페이지 단위라
+                # 같은 용어가 여러 지적에 나와도 첫 곳 하나만 링크된다. 영어도 실제로
+                # 난 `/en/glossary/{id}/`만 목적지로 삼는 같은 용어 정본을 쓴다.
+                _index = term_link_index_by_lang.get(_lg, [])
+                _sel = (select_doc_term_links(
+                    doc, _index, term_doc_freq_by_lang.get(_lg, {}), lang=_lg)
+                    if _index else [])
                 _used: set[str] = set()
                 _labels = agency_labels_by_lang[_lg]
                 # 분류 라벨은 **데이터에 한국어로** 실려 있고 템플릿이 그대로 찍는다 —
@@ -5077,7 +5115,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     same_firm=(same_firm if _lg == DEFAULT_LANG else
                                [s for s in same_firm if s["slug"] in en_doc_slugs]),
                     finding_bodies=[
-                        link_terms_in_text(finding_body(f, _lg), _sel, _pp.rel_root, _used)
+                        link_terms_in_text(finding_body(f, _lg), _sel, _pp.rel_root, _used,
+                                           lang=_lg)
                         for f in doc.get("findings") or []
                     ],
                     # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),

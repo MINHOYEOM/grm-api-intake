@@ -611,9 +611,23 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   if(!cfg||!window.fetch)return;
   var hn=location.hostname;
   if(hn!=='{{ site_host }}'&&hn!=='www.{{ site_host }}')return;
+  // 자동화 브라우저 제외 — RUM 게이트와 같은 판정(그쪽 IIFE 안의 검사는 여기에 효력이
+  // 없어 호스트 검사처럼 한 줄 중복한다). UA·webdriver 는 페이지 수명 동안 안 변하므로
+  // 진입 1회 검사면 충분하다(전송마다 재검사하는 grm-op 과 다르다).
+  if(navigator.webdriver===true||/\bHeadless|\bClaude\//.test(navigator.userAgent||''))return;
   var u=cfg.getAttribute('data-url')||'',k=cfg.getAttribute('data-key')||'';
   if(!u||!k)return;
   var sent={};
+  // 구역 = 경로의 **첫 조각**뿐(076). 손으로 적은 구역 목록을 두지 않는다 — 목록은
+  // 라우트가 늘면 조용히 낡는다. 쿼리스트링·경로 뒷부분은 통째로 버리므로
+  // `/findings/inspector/?key=실명` 이 와도 남는 값은 'findings' 뿐이다(무PII).
+  function zone(){
+    // 빈 경로(홈)와 형식 위반을 같은 값으로 접지 않는다 — 둘은 다른 사실이고, 합치면
+    // 알 수 없는 경로의 제출이 홈 실적으로 둔갑한다(076 의 RPC 도 위반은 other 로 접는다).
+    var s=String(location.pathname||'/').split('/')[1]||'home';
+    s=s.toLowerCase();
+    return /^[a-z0-9-]{1,24}$/.test(s)?s:'other';
+  }
   function bump(key,once){
     try{if(localStorage.getItem('grm-op')==='1')return;}catch(_){}
     if(once){if(sent[key])return;sent[key]=1;}
@@ -621,6 +635,13 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       fetch(u+'/rest/v1/rpc/funnel_bump',{method:'POST',keepalive:true,
         headers:{'Content-Type':'application/json',apikey:k,Authorization:'Bearer '+k},
         body:JSON.stringify({p_key:key})}).catch(function(){});
+      // ★제출만 구역을 남긴다 — 노출까지 보내면 요청이 두 배가 되고, 노출 카운터는
+      // 어차피 크롤러 오염이라 구역별로 갈라도 못 읽는다(2026-09-01 실측 일 170 vs 21).
+      if(key==='band_submit'||key==='cta_submit'){
+        fetch(u+'/rest/v1/rpc/funnel_zone_bump',{method:'POST',keepalive:true,
+          headers:{'Content-Type':'application/json',apikey:k,Authorization:'Bearer '+k},
+          body:JSON.stringify({p_key:key,p_zone:zone()})}).catch(function(){});
+      }
     }catch(_){}
   }
   var band=document.querySelector('.subscribe');
@@ -661,6 +682,13 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
        *.pages.dev 미리보기·file:// — 은 주입 0. 엣지 주입 시절엔 없던 오염 경로가 수동
        주입으로 새로 생기는 것을 막는다.
      · storage 예외는 fail-open(측정) — 확실한 운영자만 제외한다.
+     · ★자동화 브라우저는 주입 0. 2026-09-04 실측: 라이브에서 404 를 점검하던 개발용
+       인앱 브라우저가 그날 방문 표본 6건 중 2건으로 잡혔다(/findings/doc/zzz-none/).
+       판별을 navigator.webdriver 로만 두면 안 된다 — 그 브라우저는 값이 false 다
+       (2026-09-05 실측). 자기를 밝히는 UA 표식(Claude/·Headless)을 함께 본다. 이건
+       봇 탐지가 아니라 **우리 자신의 트래픽을 우리 지표에서 빼는 것**이다 — 남을
+       속이는 크롤러까지 잡는 것이 목적이 아니므로 Cloudflare 의 bot 필터를 대신하지
+       않는다.
    env 게이트 밖(무조건 출력) — env-off 골든에도 전 페이지 탑재. 정적 <script src> 태그로
    바꾸면 게이트가 무력화되므로 금지(동적 삽입만). fetch/sendBeacon 미사용이라 §9 네트워크
    API 금지 가드(pet.js·growth.js 파일 한정 스코프)에는 애초에 걸리지 않는다.
@@ -669,14 +697,15 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
    그대로 잇는다 — siteTag 를 실으면 데이터가 다른(없는) 사이트로 흘러 연속성이 끊긴다. #}
 <script>
 (function(){
-  var p=location.pathname,h=location.hostname;
+  var p=location.pathname,h=location.hostname,ua=navigator.userAgent||'';
   var admin=p==='/admin'||p.indexOf('/admin/')===0;
+  var auto=navigator.webdriver===true||/\bHeadless|\bClaude\//.test(ua);
   var op=false;
   try{
     if(admin)localStorage.setItem('grm-op','1');
     op=localStorage.getItem('grm-op')==='1';
   }catch(e){}
-  if(admin||op)return;
+  if(admin||op||auto)return;
   if(h!=='{{ site_host }}'&&h!=='www.{{ site_host }}')return;
   var s=document.createElement('script');
   s.src='https://static.cloudflareinsights.com/beacon.min.js';

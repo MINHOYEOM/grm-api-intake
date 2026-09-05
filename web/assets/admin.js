@@ -552,6 +552,46 @@
     { key: "naver", label: "네이버", match: function (h) { return /(^|\.)naver\.com$/.test(h); } },
     { key: "direct", label: "직접 방문", match: function (h) { return !h || h === "(direct)"; } }
   ];
+  // ★값이 정확한지 추측하지 않는다 — 075 sample_interval 이 행마다 "이 값이 몇 배
+  // 추정인지"를 담는다. Cloudflare 의 Adaptive 데이터셋은 질의가 비싸지면 표본으로
+  // 내려가고 그때 값이 10 의 배수로 뭉개진다. 2026-09-02~04 에 실제로 방문 표까지
+  // 10단위로 내려앉았는데 화면은 "위 방문 표의 합계가 정확한 값입니다"라고 적고
+  // 있었다 — 화면이 스스로 정밀도를 말하지 않으면 그 거짓말이 며칠을 간다.
+  // sample_interval 이 null 인 행 = 이 열을 만들기 전(075 이전)에 적재된 값.
+  function rumPrecision(rows) {
+    var worst = 1, unknown = false, known = false;
+    (rows || []).forEach(function (r) {
+      var v = r ? r.sample_interval : null;
+      if (v === null || v === undefined || v === "") { unknown = true; return; }
+      v = Number(v);
+      if (!isFinite(v) || v < 1) v = 1;
+      known = true;
+      if (v > worst) worst = v;
+    });
+    return { worst: worst, unknown: unknown, known: known };
+  }
+  function precisionNote(list) {
+    var worst = 1, unknown = false, known = false;
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      if (p.unknown) unknown = true;
+      if (p.known) { known = true; if (p.worst > worst) worst = p.worst; }
+    });
+    if (!known) {
+      return { warn: true, text: "정밀도 미상 — 표본 간격을 기록하기 전에 적재된 값입니다. 다음 동기화가 덮어씁니다." };
+    }
+    var tail = unknown ? " (일부 오래된 날은 정밀도 미상)" : "";
+    if (worst < 1.05) return { warn: false, text: "전수 집계 — 표본추출 없이 받은 값입니다." + tail };
+    if (worst < 2) return { warn: false, text: "거의 전수 — 표본 간격 최대 " + worst.toFixed(2) + "배로, 일부 이벤트만 추정입니다." + tail };
+    return { warn: true, text: "표본 추정 — 표본 간격 최대 " + worst.toFixed(1) + "배입니다. 이보다 작은 값은 0으로 사라질 수 있습니다." + tail };
+  }
+  function setPrecisionNote(id, list, errorMessage) {
+    var el = byId(id);
+    if (!el) return;
+    if (errorMessage) { el.textContent = ""; return; }
+    var n = precisionNote(list);
+    el.innerHTML = (n.warn ? "<b>주의</b> — " : "") + esc(n.text);
+  }
   function rumGroupOf(host) {
     var h = String(host || "").toLowerCase();
     for (var i = 0; i < RUM_REFERRER_GROUPS.length; i++) {
@@ -585,6 +625,8 @@
   }
   function renderRumPaths(errorMessage) {
     var host = byId("grm-rum-paths");
+    setPrecisionNote("grm-rum-paths-precision",
+      [(state.rum || {}).precision && state.rum.precision.paths], errorMessage);
     if (!host) return;
     if (errorMessage || !state.rum || !state.rum.paths) {
       host.innerHTML = emptyRow(3, errorMessage || "데이터 없음");
@@ -604,11 +646,11 @@
   function loadRum() {
     var days = GROWTH_SNAPSHOT_DAYS;
     return Promise.all([
-      state.client.from("rum_daily").select("snap_date,metric,value")
+      state.client.from("rum_daily").select("snap_date,metric,value,sample_interval")
         .order("snap_date", { ascending: false }).limit(days * 2),
-      state.client.from("rum_referrer_daily").select("snap_date,referer_host,visits")
+      state.client.from("rum_referrer_daily").select("snap_date,referer_host,visits,sample_interval")
         .order("snap_date", { ascending: false }).limit(days * 25),
-      state.client.from("rum_path_daily").select("snap_date,request_path,visits")
+      state.client.from("rum_path_daily").select("snap_date,request_path,visits,sample_interval")
         .order("snap_date", { ascending: false }).limit(days * 40)
     ]).then(function (res) {
       if (res[0].error) throw res[0].error;
@@ -636,7 +678,14 @@
       var paths = Object.keys(pathTotals)
         .map(function (p) { return { path: p, visits: pathTotals[p] }; })
         .sort(function (a, b) { return b.visits - a.visits || a.path.localeCompare(b.path); });
-      state.rum = { byDate: byDate, refs: refs, paths: paths };
+      // 정밀도는 "화면에 실제로 보이는 행"에서만 잰다 — 창 밖 오래된 행의 미상이
+      // 지금 보고 있는 표를 미상으로 물들이면 안 된다.
+      var precision = {
+        daily: rumPrecision(res[0].data || []),
+        refs: rumPrecision(res[1].data || []),
+        paths: rumPrecision((res[2].data || []).filter(function (r) { return window7[r.snap_date]; }))
+      };
+      state.rum = { byDate: byDate, refs: refs, paths: paths, precision: precision };
       renderRum();
       renderRumPaths();
     }).catch(function (error) {
@@ -647,6 +696,11 @@
   }
   function renderRum(errorMessage) {
     var host = byId("grm-rum-daily");
+    // 방문 표는 방문·페이지뷰(rum_daily)와 유입 열(rum_referrer_daily)을 함께 그린다 —
+    // 정밀도는 둘 중 나쁜 쪽을 말해야 표 전체에 대한 진술이 된다.
+    setPrecisionNote("grm-rum-precision",
+      [(state.rum || {}).precision && state.rum.precision.daily,
+       (state.rum || {}).precision && state.rum.precision.refs], errorMessage);
     if (!host) return;
     if (errorMessage || !state.rum) {
       host.innerHTML = emptyRow(7, errorMessage || "데이터 없음");
@@ -675,27 +729,66 @@
     // KST 는 DST 가 없어 고정 +9h 산술이 안전하다.
     return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   }
+  // 구역 라벨 — 화면 표기만이다. 없는 슬러그는 그대로 보여준다(목록이 낡아도 값은
+  // 사라지지 않는다 — 076 이 구역을 경로 첫 조각으로 정한 것과 같은 이유).
+  var ZONE_LABELS = {
+    home: "홈", briefs: "주간 브리프", findings: "지적사항", glossary: "용어사전",
+    library: "자료실", quiz: "주간 퀴즈", guide: "이용안내", archive: "지난 호",
+    search: "검색", other: "기타"
+  };
   function loadGrowth() {
-    // 읽기 전용 select 둘 뿐 — 스냅샷 쓰기는 DB cron(funnel_snapshot)만 한다.
+    // 읽기 전용 select 셋 뿐 — 스냅샷 쓰기는 DB cron(funnel_snapshot)만 한다.
     return Promise.all([
       state.client.from("funnel_counts").select("key,total"),
       state.client.from("funnel_counts_daily").select("snap_date,key,total")
-        .order("snap_date", { ascending: false }).limit(FUNNEL_KEYS.length * (GROWTH_SNAPSHOT_DAYS + 1))
+        .order("snap_date", { ascending: false }).limit(FUNNEL_KEYS.length * (GROWTH_SNAPSHOT_DAYS + 1)),
+      state.client.from("funnel_zone_counts").select("key,zone,total")
     ]).then(function (res) {
       if (res[0].error) throw res[0].error;
       if (res[1].error) throw res[1].error;
+      if (res[2].error) throw res[2].error;
       var totals = {};
       (res[0].data || []).forEach(function (r) { totals[r.key] = r.total || 0; });
       var byDate = {};
       (res[1].data || []).forEach(function (r) {
         (byDate[r.snap_date] = byDate[r.snap_date] || {})[r.key] = r.total || 0;
       });
-      state.growth = { totals: totals, byDate: byDate };
+      var zones = {};
+      (res[2].data || []).forEach(function (r) {
+        var z = (zones[r.zone] = zones[r.zone] || { zone: r.zone, band_submit: 0, cta_submit: 0 });
+        if (r.key === "band_submit" || r.key === "cta_submit") z[r.key] += (r.total || 0);
+      });
+      state.growth = { totals: totals, byDate: byDate, zones: zones };
       renderGrowth();
+      renderFunnelZones();
     }).catch(function (error) {
       state.growth = null;
       renderGrowth(errText(error) || "깔때기 데이터를 불러오지 못했습니다.");
+      renderFunnelZones(errText(error) || "깔때기 데이터를 불러오지 못했습니다.");
     });
+  }
+  function renderFunnelZones(errorMessage) {
+    var host = byId("grm-funnel-zones");
+    if (!host) return;
+    if (errorMessage || !state.growth || !state.growth.zones) {
+      host.innerHTML = emptyRow(4, errorMessage || "데이터 없음");
+      return;
+    }
+    var rows = Object.keys(state.growth.zones).map(function (z) {
+      var r = state.growth.zones[z];
+      return { zone: z, band: r.band_submit || 0, cta: r.cta_submit || 0,
+               sum: (r.band_submit || 0) + (r.cta_submit || 0) };
+    }).filter(function (r) { return r.sum > 0; })
+      .sort(function (a, b) { return b.sum - a.sum || a.zone.localeCompare(b.zone); });
+    if (!rows.length) {
+      host.innerHTML = emptyRow(4, "아직 구역이 기록된 제출이 없습니다(2026-09-05 배선 이후 제출부터).");
+      return;
+    }
+    host.innerHTML = rows.map(function (r) {
+      var label = ZONE_LABELS[r.zone] || r.zone;
+      return "<tr><td>" + esc(label) + " <span class=\"mono\">/" + esc(r.zone) + "/</span></td><td>" +
+        number(r.band) + "</td><td>" + number(r.cta) + "</td><td><b>" + number(r.sum) + "</b></td></tr>";
+    }).join("");
   }
   function growthDelta(cur, prev) {
     var row = {};

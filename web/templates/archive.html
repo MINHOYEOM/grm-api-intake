@@ -40,6 +40,15 @@
       <input id="q" type="text" placeholder="{{ _('업체·기관·주제 검색 — 예: 경방신약, 무균, CAPA, FDA') }}" autocomplete="off" aria-label="{{ _('규제뉴스 카드 검색') }}" />
       <button class="clear" id="qclear" type="button" aria-label="{{ _('검색 지우기') }}"><i class="ti ti-x"></i></button>
     </div>
+{% if ko_named_cards %}
+    {#- 검색 결과에는 한국 규제기관 문서의 업체·기관 실명이 한국어로 뜬다. 이름은 옮기지
+        않고(옮기면 공식 기록에서 그 조직을 못 찾는다) 이유를 밝힌다 — 브리프 상세·자료실
+        스트립·용어사전 출처와 같은 규율. -#}
+    <style>
+      .arc-name-note{font-family:var(--sans);font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 0;word-break:keep-all;max-width:760px}
+    </style>
+    <p class="arc-name-note">{{ _("검색 결과에는 한국 규제기관 문서의 업체·기관 이름이 공식 기록에 적힌 대로 한국어로 표시됩니다.") }}</p>
+{% endif %}
     <div class="panel reveal" id="panel" style="animation-delay:.26s">
       <div class="panel-h"><i class="ti ti-adjustments-horizontal" style="font-size:15px"></i>{{ _("필터") }}</div>
       <div class="facets" id="facets"></div>

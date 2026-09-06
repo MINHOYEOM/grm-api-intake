@@ -5374,6 +5374,11 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
             ["국문만", {"finding_text": "", "finding_text_ko": "설비 적격성 미확보."}],
         ]
 
+        # ★`text=True` 는 **로케일 인코딩**으로 디코드한다 — node 는 UTF-8 을 내므로 한글이
+        #   섞인 산출은 cp949 콘솔에서 UnicodeDecodeError 로 죽고, subprocess 가 stdout 을
+        #   None 으로 돌려 "JSON 이 str 이 아니다"라는 엉뚱한 오류로 나타난다(윈도우 실측).
+        #   ubuntu CI 는 UTF-8 이라 **영원히 초록**이다 — `encoding="utf-8"` 을 명시한다
+        #   (tests/test_cli_stdout_encoding.py 가 같은 함정을 CLI 쪽에서 막는 그 규율).
         def run(lang):
             driver = (
                 'var document = { documentElement: { lang: %s } };\n' % json.dumps(lang)
@@ -5385,7 +5390,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
                 drv = tmp / "driver.js"
                 drv.write_text(driver, encoding="utf-8")
                 proc = subprocess.run(["node", str(drv)], capture_output=True,
-                                      text=True, timeout=30)
+                                      encoding="utf-8", timeout=30)
             finally:
                 shutil.rmtree(tmp, ignore_errors=True)
             self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
@@ -6744,7 +6749,8 @@ class WebInspectorRenderTest(unittest.TestCase):
             try:
                 drv = tmp / "driver.js"
                 drv.write_text(driver, encoding="utf-8")
-                proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+                proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                  encoding="utf-8", timeout=30)
             finally:
                 shutil.rmtree(tmp, ignore_errors=True)
             self.assertEqual(proc.returncode, 0, f"node 실행 실패({js_path.name}): {proc.stderr}")
@@ -6819,7 +6825,8 @@ class WebInspectorRenderTest(unittest.TestCase):
         try:
             drv = tmp / "driver.js"
             drv.write_text(driver, encoding="utf-8")
-            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                  encoding="utf-8", timeout=30)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
         self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
@@ -6914,7 +6921,8 @@ class WebInspectorRenderTest(unittest.TestCase):
         try:
             drv = tmp / "driver.js"
             drv.write_text(driver, encoding="utf-8")
-            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                  encoding="utf-8", timeout=30)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
         self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
@@ -6983,7 +6991,8 @@ class WebInspectorRenderTest(unittest.TestCase):
         try:
             drv = tmp / "driver.js"
             drv.write_text(driver, encoding="utf-8")
-            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                  encoding="utf-8", timeout=30)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
         self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
@@ -7142,7 +7151,8 @@ class WebInspectorFirmBlockTest(unittest.TestCase):
         try:
             drv = tmp / "driver.js"
             drv.write_text(driver, encoding="utf-8")
-            proc = subprocess.run(["node", str(drv)], capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                  encoding="utf-8", timeout=30)
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
         self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")

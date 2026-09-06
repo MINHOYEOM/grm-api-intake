@@ -13317,8 +13317,8 @@ class WebAboutTest(unittest.TestCase):
         main = self.html[self.html.index("<main>"):self.html.index("</main>")]
         self.assertNotRegex(main, r"\d{1,3}(,\d{3})+")   # 6,158 같은 수 없음
         self.assertNotIn("data-feedback-mount", self.landing)   # 연락 블록은 소개 페이지에만
-        self.assertIn("data-feedback-mount", main)             # 문의 버튼은 JS 가 얹는 자리
-        self.assertNotIn('class="about-fb"', main)             # 정적 HTML 엔 버튼 없음(JS 미실행 = 흔적 0)
+        self.assertIn("data-feedback-mount", main)             # 문의 줄은 JS 가 얹는 자리
+        self.assertNotIn("about-fb", main)                     # 정적 HTML 엔 줄 없음(JS 미실행 = 흔적 0)
 
     def test_contact_links_come_from_the_data_file(self):
         """정본(contact.json)에 있는 주소가 소개 페이지와 전 페이지 푸터에 **같은 값**으로
@@ -13332,9 +13332,37 @@ class WebAboutTest(unittest.TestCase):
         for page in (self.html, self.landing):
             self.assertIn(f'href="mailto:{contact["email"]}"', page)
         self.assertIn('class="foot-ico"', self.landing)      # 푸터 법적 줄 아이콘
-        self.assertIn('class="about-act"', self.html)        # 소개 페이지 버튼
+        self.assertIn('class="ac-row"', self.html)           # 소개 페이지 채널 줄
         # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
         self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
+
+    def test_each_contact_channel_says_what_it_is_for(self):
+        """[연락 2026-09-06] 줄마다 이름 + 쓰임이 함께 있다 — 이름만 적힌 알약 셋으로
+        돌아가지 않는다. 어느 쪽으로 보내야 하는지가 화면에 없으면 채널이 셋이어도
+        고를 수가 없다(그게 '연락 블록이 부족하다'의 실체였다)."""
+        rows = re.findall(r'<a class="ac-row".*?</a>', self.html, re.S)
+        self.assertGreaterEqual(len(rows), 2, "정적 채널 줄이 둘 미만(이메일·LinkedIn)")
+        for row in rows:
+            self.assertRegex(row, r"<b>[^<]+</b>", f"이름 없는 줄: {row[:120]}")
+            self.assertRegex(row, r"<span>[^<]+</span>", f"쓰임 없는 줄: {row[:120]}")
+        # 목록 밖에 알약이 남아 있지 않다(종전 `.about-acts` 잔재 금지).
+        self.assertNotIn("about-acts", self.html)
+        self.assertNotIn("about-act", self.html)
+
+    def test_feedback_row_copy_lives_in_the_template(self):
+        """문의 줄의 이름·쓰임은 **템플릿이 정한다**(`data-fb-*`). feedback.js 가 그 줄을
+        런타임에 얹지만, 문안까지 JS 가 들고 있으면 이 페이지의 연락 문구를 고칠 자리가
+        두 파일로 갈라진다. JS 는 속성을 읽기만 하고, 없을 때만 푸터와 같은 사전 키로
+        떨어진다(새 키를 만들지 않는다)."""
+        self.assertIn('data-fb-name="문의 및 제안"', self.html)
+        self.assertRegex(self.html, r'data-fb-desc="[^"]+"')
+        js = (WEB_DIR / "assets" / "feedback.js").read_text(encoding="utf-8")
+        self.assertIn('getAttribute("data-fb-name")', js)
+        self.assertIn('getAttribute("data-fb-desc")', js)
+        # 영어 면은 같은 자리에서 영어 문구를 받는다(사전을 타므로 JS 하드코딩이 아니다).
+        self.assertIn('data-fb-name="Contact and suggestions"', self.en_html)
+        self.assertNotRegex(re.search(r'data-fb-desc="([^"]*)"', self.en_html).group(1),
+                            r"[가-힣]")
 
     def test_contact_links_vanish_when_data_file_is_empty(self):
         """정본이 비면 링크도 아이콘도 남지 않는다(죽은 링크 금지 — share 버튼 선례).

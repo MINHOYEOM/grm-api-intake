@@ -55,7 +55,7 @@
   <button type="button" id="grmLangHintX" aria-label="Dismiss">&times;</button>
 </div>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html" class="on">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html" class="on">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a><span class="navmore"><a href="../../quiz/index.html">주간 퀴즈</a><a class="navmore-cta" href="../../briefs/2026-07-06/index.html">이번 주 소식</a><a class="navmore-lang" href="../../en/findings/trends/index.html" hreflang="en" lang="en">English</a></span></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="grm-lang" href="../../en/findings/trends/index.html" hreflang="en" lang="en" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>English</a>
@@ -519,22 +519,48 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 /* 순위 섹션의 창·분모 한 줄 — 어느 기관 몇 건이 분모인지 항상 보인다. */
 .tr-rank-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;line-height:1.6}
 </style>
-<style>@media(min-width:1025px){.foot{grid-template-columns:1.3fr repeat(4,1fr)}}</style>
-<style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
+<style>
+.foot .b1 .foot-src{font-size:12px;line-height:1.7;max-width:40ch;margin-top:18px;color:var(--band-mut);opacity:.75;word-break:keep-all}
+.foot .b1 .foot-src b{display:block;font-weight:600;font-size:11px;margin-bottom:2px}
+.foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
+.foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
+.foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.foot-copy .foot-ico .ti{font-size:13px;line-height:1}
+@media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
+</style>
+<style>
+.navmore{display:none}
+@media(max-width:900px){
+  .brand-full{display:none}
+  .nav-in{gap:10px}
+  .navtoggle{display:inline-flex;flex:none;order:3}
+  .nav-in .grm-auth{order:2;margin-left:0}
+  /* 로그인은 12px 회색 텍스트라 그대로 두면 터치 타깃이 14px 다 — grm.css 의 모바일
+     44px 관례(P1-4)를 이 버튼에도 적용한다(시각 크기는 거의 그대로, 히트 영역만 확대). */
+  .nav-in .grm-auth .grm-acct-login{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+  .nav-in > .grm-lang,.nav-in > .btn.coral{display:none}
+  .nav nav{position:absolute;top:100%;right:22px;left:auto;min-width:184px;max-width:calc(100vw - 44px);
+    flex-direction:column;align-items:stretch;gap:2px;margin:0;background:var(--canvas);
+    border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:var(--shadow);padding:8px;z-index:57;display:none}
+  .nav nav.open{display:flex}
+  .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
+  .nav nav a:hover{background:var(--soft)}
+  .navmore{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line-2)}
+  .navmore .navmore-cta{color:var(--coral-2);font-weight:600}
+}
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p></div>
-    <div><h5>바로가기</h5><a href="../../index.html#why">소개</a><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a><a href="../../guide/index.html">이용안내</a></div>
-    <div><h5>도구</h5><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/inspector/index.html">실사관 조회</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
-    <div><h5>수집 소스</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>Health Canada · 식약처</span><span>ECA · ISPE</span></div>
-    <div><h5>안내</h5><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../index.html#notice">원문 확인 안내</a></div>
+      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p>
+      <p class="foot-src"><b>Sources</b>FDA · OpenFDA · EMA · EudraGMDP · MHRA · PIC/S · ICH · WHO · Health Canada · 식약처 · ECA · ISPE</p></div>
+    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
+    <div><h5>도구</h5><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/inspector/index.html">실사관 조회</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
+    <div data-feedback-slot><h5>서비스</h5><a href="../../about/index.html">소개</a><a href="../../guide/index.html">이용안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../rss.xml">RSS 피드</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
-      <span>© 2026 Global Regulatory Monitor</span>
-      <span class="prov">AI-generated from primary sources · verify against the original</span>
-    </div>
+      <span>© 2026 Global Regulatory Monitor</span><span class="foot-contact"><a class="foot-ico" href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener" aria-label="LinkedIn" title="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a><a class="foot-ico" href="mailto:yeomminho1472@gmail.com" aria-label="이메일" title="이메일"><i class="ti ti-mail" aria-hidden="true"></i></a></span></div>
     <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
   </div>
 </div></footer>
@@ -549,6 +575,21 @@ if(_nt&&_nm){
   _nt.addEventListener('click',()=>{const o=!_nm.classList.contains('open');_nm.classList.toggle('open',o);_nt.setAttribute('aria-expanded',o?'true':'false');});
   _nm.addEventListener('click',e=>{if(e.target.closest('a')){_nm.classList.remove('open');_nt.setAttribute('aria-expanded','false');}});
 }
+// [언어 전환 2026-09-06] 보고 있던 **검색어·업체 키·앵커를 그대로 들고** 건너간다.
+// 종전에는 링크가 `../en/findings/index.html` 로 고정돼 있어, 업체 프로파일에서 언어를
+// 바꾸면 빈 조회 화면이 떴다(`?key=` 유실). 조회 조건은 URL 이 갖고 있고 그 파라미터
+// 이름은 두 트리가 **같은 스크립트**를 쓰므로 양쪽에서 같은 뜻이다 — 그대로 옮기면 된다.
+// 앵커도 같이 옮긴다(카드 앵커는 언어와 무관한 문서 id 파생이라 양쪽이 같다).
+(function(){
+  var a=document.querySelector('a.grm-lang');
+  if(!a||(!location.search&&!location.hash))return;
+  try{
+    var u=new URL(a.getAttribute('href'),location.href);
+    u.search=location.search; u.hash=location.hash;
+    // 같은 출처 안에서만 다시 쓴다(외부로 새는 경로를 만들지 않는다).
+    if(u.origin===location.origin)a.setAttribute('href',u.pathname+u.search+u.hash);
+  }catch(e){}
+})();
 // [루트 진입] 브라우저 언어가 한국어가 아니면 영어판 안내를 보인다(리다이렉트 없음).
 // localStorage 는 사생활 모드·차단 설정에서 **접근 자체가 던진다** — 읽기·쓰기를 각각
 // 감싸고, 실패하면 그냥 안내를 보인다(기억을 못 할 뿐 화면은 정상).
@@ -585,7 +626,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=6dea54a3" defer></script>
-<script src="../../assets/trends.js?v=d265b30a" defer></script>
+<script src="../../assets/trends.js?v=c4769d0c" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

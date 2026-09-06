@@ -13,7 +13,7 @@
   · 10번 21 CFR 211.42 에도 같은 서두가 붙음
   · 3번 211.100 · 11번 211.188 의 사례로 Jabil 의 **211.22(d)** 문장이 반복 첨부됨
 
-그리고 **수리 후 실측 발췌**(079 findings_clause_excerpt 가 라이브에서 내려준 값)를 함께
+그리고 **수리 후 실측 발췌**(080 findings_clause_excerpt 가 라이브에서 내려준 값)를 함께
 둔다 — 가드가 정상 사례를 위반으로 잡으면(과잉) 그것도 결함이기 때문이다. 한쪽만 있으면
 "아무것도 안 잡는 가드"나 "전부 잡는 가드"가 초록으로 통과한다.
 """
@@ -50,7 +50,7 @@ JABIL_2122D_EN = (
     "adequate oversight for the manufacture of your drug products. For example, you"
 )
 
-# ── 수리 후 실측(079 라이브 발췌) ─────────────────────────────────────────────
+# ── 수리 후 실측(080 라이브 발췌) ─────────────────────────────────────────────
 PREYE_2122_FIXED_KO = (
     "…귀사의 품질관리부서는 제조되는 의약품이 CGMP에 적합하고 확인, 함량, 품질 및 순도에 "
     "관한 설정된 규격을 충족하도록 보증할 책임을 이행하지 못하였다(21 CFR 211.22). 귀사의 "
@@ -135,7 +135,7 @@ class FixedExamplesPassTest(unittest.TestCase):
 
 class RuleShapeTest(unittest.TestCase):
     def test_clause_boundary_does_not_swallow_neighbours(self):
-        """`211.22` 질의가 본문 `211.226` 을 앵커로 삼으면 안 된다(079 SQL 과 같은 규칙)."""
+        """`211.22` 질의가 본문 `211.226` 을 앵커로 삼으면 안 된다(080 SQL 과 같은 규칙)."""
         self.assertFalse(guard.anchored_in("… 위반이다(21 CFR 211.226).", "211.22"))
         self.assertTrue(guard.anchored_in("… 위반이다(21 CFR 211.22).", "211.22"))
         self.assertTrue(guard.anchored_in("… 위반이다(21 CFR 211.22(d)).", "211.22"))

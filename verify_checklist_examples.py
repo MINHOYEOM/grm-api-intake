@@ -5,7 +5,7 @@
 
 `/findings/checklist/` 는 "조항마다 실제 지적 문장"을 약속하고 **인쇄해서 쓰는** 점검표다.
 약속과 다른 것이 실리는 것은 표시 결함이 아니라 정직성 결함이라, 화면이 아니라 데이터에서
-전수로 막아야 한다. 이 스크립트가 042 가 아는 **모든 조항**에 대해 043→079 가 실제로
+전수로 막아야 한다. 이 스크립트가 042 가 아는 **모든 조항**에 대해 043→080 가 실제로
 내려주는 사례를 받아 아래를 검사한다(하나라도 깨지면 exit 1).
 
   ① **앵커** — 인용된 조항 번호가 그 사례 발췌 문장에 **실제로 등장**한다. 국문·영문
@@ -36,7 +36,7 @@
 
 ## 권한 — anon 키를 쓴다(service-role 금지)
 
-`findings_checklist`(079)는 **security invoker** 라 RLS(010)가 공개 집합을 정의한다.
+`findings_checklist`(080)는 **security invoker** 라 RLS(010)가 공개 집합을 정의한다.
 service-role 로 부르면 RLS 를 우회해 **화면에 없는 행까지** 검사 대상이 되어, 가드가
 사용자가 보는 것과 다른 세계를 검사하게 된다. `glossary_cases_refresh.py`·
 `findings_facets_refresh.py` 와 같은 판단이다.
@@ -77,7 +77,7 @@ UI_MAX_EXAMPLES = 5
 # ---------------------------------------------------------------------------
 
 def clause_anchor_re(section: str) -> "re.Pattern[str]":
-    """`211.22` 가 `211.226` 에 걸리지 않는 조항 경계 정규식(079 SQL 과 같은 규칙)."""
+    """`211.22` 가 `211.226` 에 걸리지 않는 조항 경계 정규식(080 SQL 과 같은 규칙)."""
     return re.compile(re.escape(section) + r"(?![0-9])")
 
 
@@ -88,7 +88,7 @@ def anchored_in(text: str, section: str) -> bool:
 
 # ② 비지적 문장 판정 — **편지가 열리는 자리의 정형문**만 잡는다.
 #
-# ★이 목록은 "고치는 장치"가 아니라 "고쳐졌는지 묻는 장치"다. 진짜 방어는 079 가
+# ★이 목록은 "고치는 장치"가 아니라 "고쳐졌는지 묻는 장치"다. 진짜 방어는 080 이
 #   발췌를 조항 위치에서 뜨는 것이고(서두는 특정 조항 번호를 인용하지 않으므로 구조적으로
 #   고를 수 없다), 이 정규식은 그 구조가 무너졌을 때 **소리를 내는 계기**다. 그래서 목록이
 #   낡는 위험은 아래 뮤테이션 자가시험이 받는다 — 실측 서두가 더 이상 안 걸리면 즉시 실패.
@@ -164,7 +164,7 @@ def fetch_ranking(base_url: str, anon_key: str) -> tuple[list[dict[str, Any]], s
 
 def fetch_checklist(base_url: str, anon_key: str, sections: list[str],
                     examples: int) -> tuple[list[dict[str, Any]], str]:
-    """079 — 조항별 사례. 화면과 **같은 함수·같은 게이트**를 쓴다."""
+    """080 — 조항별 사례. 화면과 **같은 함수·같은 게이트**를 쓴다."""
     data, err = _post_rpc(base_url, anon_key, "findings_checklist",
                           {"p_sections": sections, "p_examples": examples})
     if err:

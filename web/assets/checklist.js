@@ -30,6 +30,7 @@
   };
   var _isEn = (typeof document !== "undefined"
     && (document.documentElement.lang || "ko") !== "ko");
+  var _HANGUL = /[가-힣]/;
   var _bodyText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
@@ -38,7 +39,9 @@
   var _altText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
-    return (ko && orig) ? (_isEn ? ko : orig) : "";
+    if (!ko || !orig) return "";
+    if (_isEn && _HANGUL.test(orig)) return "";
+    return _isEn ? ko : orig;
   };
 
   var cfg = document.getElementById("grm-findings-cfg");
@@ -131,17 +134,17 @@
     return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
   }
 
-  // 043→079: 043 은 지적 **전문**을 내려줬고 이 파일이 앞 240자를 잘라 찍었다. 그 방식은
+  // 043→080: 043 은 지적 **전문**을 내려줬고 이 파일이 앞 240자를 잘라 찍었다. 그 방식은
   // "조항마다 실제 지적 문장"이라는 약속을 지킬 수 없었다 — 조항 매칭은 그 지적이 인용한
   // 조항 **전부**를 기준으로 하는데 화면에 뜨는 건 늘 앞머리라, 그 조항이 본문 중간에서
   // 인용됐으면 **다른 조항의 문장**이 뜨고 통짜 지적이면 **편지 서두**가 떴다.
-  // 079 는 그 조항이 인용된 문장에서 시작하는 **발췌**를 완성해 내려준다(공백 정규화·
+  // 080 은 그 조항이 인용된 문장에서 시작하는 **발췌**를 완성해 내려준다(공백 정규화·
   // 길이 상한·앞뒤 '…' 전부 RPC 몫).
   //
-  // ★여기서 다시 자르지 않는다 — 자르면 조항 번호가 발췌 밖으로 밀려나 079 가 세운
+  // ★여기서 다시 자르지 않는다 — 자르면 조항 번호가 발췌 밖으로 밀려나 080 이 세운
   //   "보이는 문장에 그 조항이 있다"는 보장이 그대로 무너진다(그게 종전 결함이었다).
   // ★언어 선택은 공용 `_bodyText`(JS_BODY_SHIM 정본)에 그대로 맡긴다 — 사본을 만들면
-  //   findings.js/trends.js 와 두 벌로 갈라진다. 옛 키는 배포 창 폴백이다(079 헤더 참조).
+  //   findings.js/trends.js 와 두 벌로 갈라진다. 옛 키는 배포 창 폴백이다(080 헤더 참조).
   function exampleText(f) {
     return _bodyText({
       finding_text_ko: (f && (f.excerpt_ko || f.finding_text_ko)) || "",
@@ -205,7 +208,7 @@
     ex.appendChild(el("h3", "cl-ex-h", _t("실제 지적 사례")));
     if (!row.examples.length) {
       // 두 가지 이유로 비어 있을 수 있고, 둘 다 정상이다. (1) 042 는 전량 집계(definer),
-      // 079 는 공개 게이트(invoker) — 국문 번역이 끝난 지적만 나온다. (2) 079 는 그 조항이
+      // 080 은 공개 게이트(invoker) — 국문 번역이 끝난 지적만 나온다. (2) 080 은 그 조항이
       // 본문에 실제로 적힌 지적만 사례로 쓴다 — 인용은 있는데 문장에 조항 번호가 없는
       // 문서(옛 480자 절단본 등)는 사례가 되지 못한다. 지어내느니 없다고 말한다.
       ex.appendChild(el("p", "cl-ex-text",
@@ -213,7 +216,7 @@
     } else {
       row.examples.forEach(function (f) {
         var one = el("div", "cl-ex-item");
-        // 079 이후 사례는 전부 그 조항이 본문에 적힌 지적이다 — "이 조항 번호가 문장에
+        // 080 이후 사례는 전부 그 조항이 본문에 적힌 지적이다 — "이 조항 번호가 문장에
         // 없다"는 예외 표기(옛 anchored=false 딱지)가 필요 없어졌다. 대신 발췌가 지적
         // 중간에서 시작했으면 RPC 가 문자열 앞에 '…' 를 붙여 보낸다.
         one.appendChild(el("p", "cl-ex-meta", exampleMeta(f)));

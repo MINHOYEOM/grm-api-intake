@@ -16,7 +16,7 @@ web/
 ├─ render.py            # 빌더(순수): data/briefs/*.json → dist/
 ├─ linkcheck.py         # 배포단계 링크체크(P3·C1): link_check enrich. 네트워크는 여기만 — render.py 순수성 보존
 ├─ newsletter.py        # [T1.3] 뉴스레터 — 순수 티저 빌더 + 발송 게이트 + SaaS-무관 NewsletterSender + BrevoSender(Campaigns API) + CLI. 수집/배포와 별도(D8)
-├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief · me(내 스크랩) · admin(운영 콘솔, env-gated)
+├─ templates/           # base(네비·모션) · landing · archive(검색 UI) · brief · me(내 스크랩) · admin(운영 콘솔, env-gated) · guide/about(md 정본 정적 페이지 — data/guide_content*.md·about_content*.md)
 ├─ partials/card.html   # 카드 1장 (grm-web-card/v1 card → v4 카드 마크업)
 ├─ assets/grm.css       # 디자인 동결 CSS(v4 + P4 네비/모션/검색 UI). 손으로 편집 금지 — 디자인 변경은 프로토타입 갱신 후 반영
 ├─ assets/archive.js    # 아카이브 교차검색(P4·정적 클라이언트사이드). search-index.json fetch → facet/검색/토글. 비골든

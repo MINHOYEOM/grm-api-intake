@@ -424,6 +424,28 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </div>
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
+            <h3>무슨 말로 검색해 들어오나 &mdash; 최근 15일</h3>
+            <p class="admin-section-sub">구글 Search Console 실측입니다. <b>노출</b>은 검색결과에 우리 페이지가 보인 횟수, <b>클릭</b>은 실제로 눌린 횟수, <b>순위</b>는 평균 몇 번째에 떴는지입니다(1이 가장 위). 방문 기록은 &ldquo;구글에서 왔다&rdquo;까지만 알려주고, <b>무엇을 검색했는지는 이 표에만</b> 있습니다.</p>
+            <p class="admin-section-sub">구글이 확정 데이터를 2~3일 늦게 주므로 이 표의 최신 날짜는 위 방문 표보다 뒤처집니다(정상입니다). 또 검색한 사람이 적은 희귀 검색어는 구글이 개인 식별을 막으려고 아예 빼고 주기 때문에, <b>검색어 표의 합은 사이트 총합보다 작습니다</b> &mdash; 어긋난 것이 아닙니다.</p>
+            <p class="admin-section-sub" id="grm-gsc-summary">불러오는 중</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>검색어</th><th>노출</th><th>클릭</th><th>클릭률</th><th>평균 순위</th></tr></thead>
+                <tbody id="grm-gsc-queries"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
+            <h3>어느 구역이 검색에 뜨나 &mdash; 최근 15일</h3>
+            <p class="admin-section-sub">검색결과에 노출된 페이지를 사이트 구역별로 묶었습니다. 위의 &ldquo;어느 페이지로 들어오나&rdquo;가 <b>실제로 들어온</b> 사람이라면, 이 표는 <b>보이기는 했는데 들어왔는지는 별개</b>인 숫자입니다. 노출이 많은데 클릭률이 낮은 구역은 순위가 아니라 검색결과에 뜨는 제목·설명이 문제일 수 있습니다.</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>구역</th><th>노출</th><th>클릭</th><th>클릭률</th><th>평균 순위</th></tr></thead>
+                <tbody id="grm-gsc-zones"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
             <h3>구독은 어느 구역에서 눌렀나</h3>
             <p class="admin-section-sub">구독 제출이 일어난 페이지의 최상위 구역입니다(누적). 밴드와 CTA는 모든 한국어 페이지에 있어서, 이 표가 없으면 "어디서 구독했나"에 답할 자료가 없습니다. 개인정보 보호를 위해 경로의 첫 조각만 남깁니다. 2026-09-05 이전 제출은 이 기록이 없어 집계에 빠져 있습니다.</p>
             <div class="admin-table-wrap">

@@ -229,7 +229,7 @@
     <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a><a href="{{ rel_root }}findings/coverage/index.html">{{ _("데이터 현황") }}</a>{% if lang == 'ko' or 'findings/docs/' in en_paths %}<a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a>{% endif %}</div>
     {# [소스 나열 정합] 랜딩 마퀴(landing.html '수집 대상 — N sources')와 같은 집합이어야 한다 — 여기엔 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나 있었다. WebSourceCopyConsistencyTest 가 두 목록의 집합 일치를 검사한다. 위 주석 경고대로 이 주석도 공백을 삼키지 않는 형태여야 한다(하이픈 변형 금지). #}
     <div><h5>{{ _("수집 소스") }}</h5><span>FDA · OpenFDA</span><span>EMA · EudraGMDP · MHRA</span><span>PIC/S · ICH · WHO</span><span>{{ _("Health Canada · 식약처") }}</span><span>ECA · ISPE</span></div>
-    <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a>{% if rss_rel_href %}<a href="{{ rss_rel_href }}">{{ _("RSS 피드") }}</a>{% endif %}</div>
+    <div><h5>{{ _("안내") }}</h5><a href="{{ notice_href }}">{{ _("AI 자동 생성 고지") }}</a><a href="{{ notice_href }}">{{ _("원문 확인 안내") }}</a>{% if rss_href %}<a href="{{ rel_root }}rss.xml">{{ _("RSS 피드") }}</a>{% endif %}</div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">

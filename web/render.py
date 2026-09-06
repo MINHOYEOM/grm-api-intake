@@ -4219,12 +4219,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 # 한국어 피드를 영어 페이지의 대체본이라고 말하지 않는다.
                 "rss_href": ("/rss.xml" if pp.lang == DEFAULT_LANG
                              else ("/en/rss.xml" if en_feed else "")),
-                # 화면에 보이는 링크는 **상대경로**여야 한다(README 불변식 #4 호스트
-                # 무관). 피드는 트리 루트에 있으므로 rel_root + 파일명이 두 트리 모두
-                # 맞는다. 유무 판정은 위 rss_href 를 그대로 따라간다 — 조건이 둘로
-                # 갈라지면 "태그는 있는데 링크는 없다"가 생긴다.
-                "rss_rel_href": (pp.rel_root + "rss.xml"
-                                 if (pp.lang == DEFAULT_LANG or en_feed) else ""),
                 # 헤더 전환 버튼이 쓸 "다른 언어" 하나(짝이 없으면 None → 버튼 미출력).
                 "alt_other": next((a for a in alts if not a["current"]), None),
                 **ctx,

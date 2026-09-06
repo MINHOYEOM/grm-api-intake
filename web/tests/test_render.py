@@ -3112,13 +3112,28 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_similar_to_on_demand_no_fetch_before_click(self):
         """[on-demand] 카드 89개 전체에 자동 조회하지 않는다 — buildSimilarCasesControl()
-        은 버튼을 만들 때 fetchSimilarTo 를 호출하지 않고, click 리스너 안에서만 호출한다."""
+        은 버튼을 만들 때 fetchSimilarTo 를 호출하지 않고, 클릭(또는 재시도)으로만 부른다.
+
+        ★가드 방식 정정(2026-09-06): 종전엔 "fetchSimilarTo 가 addEventListener 보다
+        **앞에 적혀** 있으면 안 된다"는 **글자 순서**로 쟀다. 재시도 기능 때문에 fetch 를
+        이름 있는 `load()` 로 빼자 그 순서가 뒤집혔는데, **호출 시점은 그대로**였다
+        (load 는 클릭 리스너와 재시도 버튼에서만 부른다). 순서라는 대리 지표 대신
+        **생성 시점에 실행되는 코드**에 호출이 없는지를 직접 본다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        before_listener = fn[:fn.index("addEventListener")]
-        self.assertNotIn("fetchSimilarTo(", before_listener)
-        self.assertIn("fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)", fn)
+
+        # 생성 시점에 **실행되는** 코드 = load 정의 이전 구간. 여기에 호출이 있으면 안 된다.
+        setup = fn[:fn.index("function load() {")]
+        self.assertNotIn("fetchSimilarTo(", setup)
+        self.assertNotIn("load()", setup)
+
+        # fetch 는 load() 안에 **한 번만** 있고, load 는 클릭 리스너에서 불린다.
+        self.assertEqual(fn.count("fetchSimilarTo("), 1)
+        load_body = fn[fn.index("function load() {"):fn.index('btn.addEventListener("click"')]
+        self.assertIn("fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)", load_body)
+        listener = fn[fn.index('btn.addEventListener("click"'):]
+        self.assertIn("load();", listener)
         self.assertIn("var SIMILAR_TO_LIMIT = 5;", js_src)
 
     def test_similar_to_cached_after_first_fetch_no_refetch(self):
@@ -3152,28 +3167,45 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (!findingId) return null;", fn)
 
-    def test_similar_to_silent_failure_and_state_wording(self):
-        """[§3 조용한 폴백] 실패(.catch)도 0건과 동일하게 renderSimilarToState(block, [])
-        로 수렴한다 — throw 재발생·console.error 없음. 로딩/0건 문구도 명세와 정확히
-        일치해야 한다(RPC 미적용(404) 상태에서도 페이지가 정상 동작해야 하는 계약)."""
+    def test_similar_to_error_is_not_rendered_as_zero_results(self):
+        """[2026-09-06 수리 · 회귀 가드] **오류와 빈 결과를 화면에서 구분한다.**
+
+        종전 계약은 "실패도 0건과 동일하게 renderSimilarToState(block, []) 로 수렴"이었다.
+        그 조용한 폴백 때문에 `findings_similar_to` 가 **500(statement timeout)** 을 뱉는
+        동안 화면은 "유사 사례를 찾지 못했습니다"라고 **단언**했고, 같은 문구가 수천 건인
+        지적에서도 사용자는 유사 사례가 없다고 믿었다(프로덕션 실측 81/145 실패).
+        → catch 는 renderSimilarToError 로 가야 하며 **0건 문구를 쓰면 안 된다**.
+        (404(RPC 미적용)도 오류다 — 그것도 "없음"이 아니다.)"""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertNotIn("console.error", fn)
         catch_branch = fn[fn.index(".catch(function () {"):]
         catch_branch = catch_branch[:catch_branch.index("});") + 3]
-        self.assertIn("renderSimilarToState(block, []);", catch_branch)
+        self.assertIn("renderSimilarToError(block, load);", catch_branch)
+        self.assertNotIn("renderSimilarToState(block, []);", catch_branch)
         self.assertNotIn("throw", catch_branch)
+
+        # 0건 문구는 **빈 배열 경로에만** 있어야 한다.
         state_fn = js_src[js_src.index("function renderSimilarToState(block, items) {"):]
         state_fn = state_fn[:state_fn.index("\n  }\n") + 4]
         self.assertIn('"불러오는 중…"', state_fn)
         self.assertIn('"유사 사례를 찾지 못했습니다"', state_fn)
 
+        # 오류 렌더러는 사실을 단언하지 않고(0건 문구 금지) 재시도 수단을 준다.
+        err_fn = js_src[js_src.index("function renderSimilarToError(block, onRetry) {"):]
+        err_fn = err_fn[:err_fn.index("\n  }\n") + 4]
+        self.assertNotIn("찾지 못했습니다", err_fn)
+        self.assertIn('"유사 사례를 지금 불러오지 못했습니다"', err_fn)
+        self.assertIn('_t("다시 시도")', err_fn)
+        self.assertIn('retry.addEventListener("click", onRetry);', err_fn)
+
     def test_f08_similar_cases_retry_allowed_after_transient_failure(self):
         """[F-08] "유사 사례" 재시도 불가 수리 — fetched=true 는 성공(then)에서만 세워
         캐시를 확정하고, catch 에서는 false 로 되돌려 다음 클릭이 재시도하게 한다(일시
         네트워크 오류·404(RPC 미존재) 후에도 새로고침 없이 재시도 가능). catch 의 사용자
-        표시는 종전과 동일한 조용한 폴백(콘솔 로그·throw 없음)이어야 한다."""
+        표시는 **오류 상태 + 재시도 버튼**이다(콘솔 로그·throw 는 여전히 없음) —
+        종전의 "조용한 0건 폴백"은 오류를 사실로 위장해 폐기했다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
@@ -3184,7 +3216,96 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("fetched = false;", catch_branch)  # 실패 시 재시도 허용
         self.assertNotIn("console.error", catch_branch)
         self.assertNotIn("throw", catch_branch)
-        self.assertIn("renderSimilarToState(block, []);", catch_branch)
+        # [2026-09-06] 표시는 더 이상 조용한 0건이 아니라 오류 상태 + 재시도다.
+        self.assertIn("renderSimilarToError(block, load);", catch_branch)
+        self.assertNotIn("renderSimilarToState(block, []);", catch_branch)
+        # 재시도 버튼 연타로 요청이 겹치지 않아야 한다.
+        self.assertIn("if (inFlight) return;", fn)
+
+    def test_migration_079_is_behaviour_preserving_and_keeps_signature(self):
+        """[079] 유사검색 RPC 성능 수리가 **동작을 바꾸지 않았는지**를 소스로 고정한다.
+
+        ①시그니처 불변 — 인자를 하나라도 더하면 새 오버로드가 생겨 기존 호출이 PostgREST
+          404 가 된다(#681). ②`@@` 술어는 018 표현식 그대로여야 인덱스를 계속 탄다 —
+          저장열로 바꾸면 `idx_findings_search_fts` 를 못 쓴다. ③생성열 식이 018 인덱스
+          식과 byte 일치해야 값이 같다. ④022 가 고친 F-01/F-02(전량 집계·붕괴 후 절단)를
+          되돌리지 않았는가. ⑤반환 키 13개가 022 와 완전히 같은가(신설·삭제 0)."""
+        def _exec_only(text):
+            """주석 줄을 걷어낸 **실행되는 SQL** 만 남긴다 — 해설이 개수를 부풀리면
+            가드가 조용히 헐거워진다(079 헤더는 `limit 400` 을 설명으로도 언급한다)."""
+            return "\n".join(l for l in text.split("\n") if not l.lstrip().startswith("--"))
+
+        sql_raw = (WEB_DIR / "migrations" / "079_findings_similar_perf.sql").read_text(encoding="utf-8")
+        sql = _exec_only(sql_raw)
+        sql022 = _exec_only((WEB_DIR / "migrations" / "022_findings_similar_truth.sql")
+                            .read_text(encoding="utf-8"))
+        idx018 = (WEB_DIR / "migrations" / "018_findings_similar_lexical.sql").read_text(encoding="utf-8")
+
+        # ① 시그니처 불변(인자 추가 금지) + revoke 가 grant 보다 먼저
+        self.assertIn("create or replace function public.findings_similar(\n  p_query text,\n"
+                      "  p_limit int default 20\n)", sql)
+        self.assertIn("create or replace function public.findings_similar_to(\n  p_finding_id text,\n"
+                      "  p_limit int default 5\n)", sql)
+        self.assertLess(sql.index("revoke all on function"), sql.index("grant execute on function"))
+
+        # ② `@@` 술어는 표현식 그대로 — 저장열로 바꾸지 않았다.
+        pred = ("to_tsvector('simple', coalesce(nullif(f.finding_text_ko, ''), f.finding_text)) @@ t.tq")
+        self.assertEqual(sql.count(pred), 2, "두 함수 모두 표현식 술어를 유지해야 한다")
+        self.assertNotIn("f.search_tsv @@", sql)
+
+        # ③ 생성열 식 == 018 GIN 인덱스 식(byte 일치). 018 은 컬럼명만 쓰므로 접두사를 맞춘다.
+        self.assertIn("to_tsvector('simple', coalesce(nullif(finding_text_ko, ''), finding_text))", idx018)
+        self.assertIn("generated always as (\n    to_tsvector('simple', "
+                      "coalesce(nullif(finding_text_ko, ''), finding_text))\n  ) stored", sql)
+
+        # ④ 022 의 사실성 수리를 되돌리지 않았다 — 전량 집계 + 그룹 공간 절단 400.
+        self.assertEqual(sql.count("count(distinct raw_signal_id) as dup_documents"), 2)
+        self.assertEqual(sql.count("max(fts_rank) as best_rank"), 2)
+        self.assertEqual(sql.count("limit 400"), 2)
+        self.assertNotIn("limit 200", sql)  # 021 의 '절단 후 붕괴'로 되돌아가면 안 된다
+
+        # ⑤ ts_rank 입력만 저장열로 — to_tsvector 를 ts_rank 인자로 다시 쓰지 않는다.
+        self.assertEqual(sql.count("ts_rank(f.search_tsv, t.tq) as fts_rank"), 2)
+        self.assertNotIn("ts_rank(\n        to_tsvector(", sql)
+        self.assertEqual(sql.count("tsq as materialized ("), 2)
+        self.assertNotIn("\n  tsq as (\n", sql)  # 인라인되면 행마다 tsquery 재생성(원래 결함)
+
+        # ⑤ 반환 키 집합이 022 와 완전히 동일(신설·삭제 0)
+        import re as _re
+        keys = lambda t: sorted(set(_re.findall(r"'(\w+)', (?:finding_id|raw_signal_id|source|agency|"
+                                                r"published_date|firm_name|category_code|evidence_level|"
+                                                r"review_status|search_text|round\(group_score|"
+                                                r"dup_documents|dup_findings)", t)))
+        self.assertEqual(keys(sql), keys(sql022), "반환 키가 022 와 달라졌다")
+        self.assertEqual(len(keys(sql)), 13)
+
+    def test_category_option_label_never_repeats_itself_in_english(self):
+        """[2026-09-06 수리] 분류 필터 옵션 라벨이 영어판에서 "Data integrity ·
+        Data integrity" 로 같은 말을 두 번 쓰던 결함.
+
+        `ko · en` 병기는 **한국어 화면에서 영문 원어를 같이 보여주려는** 장치인데, 영어
+        화면에서는 `cat.ko` 가 _t() 로 이미 영어(= cat.en 과 같은 문자열)가 되어 양쪽이
+        같아진다(20개 분류 전부). 손목록으로 언어를 분기하지 말고 **성질로** 판정한다 —
+        앞뒤가 같으면 한 번만 쓴다. 그래야 사전이 바뀌어 병기가 유의미해지는 날 자동으로
+        되돌아온다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function selectOptionLabel(key2, v) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("cat.ko === cat.en ? cat.ko : cat.ko", fn)
+        # 언어 분기(_isEn 등)로 구현하면 안 된다 — 값의 성질로만 판정한다.
+        self.assertNotIn("_isEn", fn)
+
+        # 영어 카탈로그 실측: 20개 분류의 ko 번역이 전부 cat.en 과 같아야 이 수리가 발동한다.
+        catalog = json.loads(grm_i18n.catalog_path("en").read_text(encoding="utf-8"))
+        block = js_src[js_src.index("var CATEGORY_LABELS = {"):]
+        block = block[:block.index("\n  };\n")]
+        pairs = re.findall(r'\{ ko: _t\("([^"]+)"\), en: "([^"]+)" \}', block)
+        self.assertEqual(len(pairs), 20, "분류 20개를 다 못 읽었다")
+        collapsed = [ko for ko, en in pairs if catalog.get(ko) == en]
+        self.assertEqual(
+            len(collapsed), 20,
+            "영어판에서 ko 번역과 en 이 다른 분류가 있다 — 그 항목은 병기가 유지된다: "
+            + repr([ko for ko, en in pairs if catalog.get(ko) != en]))
 
     def test_similar_to_dup_badge_only_when_dup_findings_gt_1(self):
         """[중복 배지] dup_findings>1 인 항목에만 "동일 문구 N개 문서"(N=dup_documents)

@@ -69,16 +69,35 @@
   trigger.textContent = _t("문의 및 제안");
   var meLink = slot.querySelector('a[href$="me/index.html"]');
   if (meLink) slot.insertBefore(trigger, meLink); else slot.appendChild(trigger);
-  // ── 소개 페이지 연락 블록(`[data-feedback-mount]`)에도 같은 진입 버튼 — 푸터 링크와 같은
+  // ── 소개 페이지 연락 목록(`[data-feedback-mount]`)에 채널 줄 하나 — 푸터 링크와 같은
   //    관례(JS 미실행이면 흔적 0). 없는 페이지에서는 아무것도 하지 않는다.
+  //    ★문구는 마운트 지점이 `data-fb-name`·`data-fb-desc` 로 정한다 — 소개 페이지의 연락
+  //    문안이 템플릿 한 곳에 모이게 하기 위해서다(문안이 JS 로 새면 고칠 자리가 갈라진다).
+  //    속성이 없으면 푸터 링크와 같은 사전 키로 떨어진다(새 키를 만들지 않는다).
+  //    ★주 채널이라 목록 **맨 위**에 넣는다 — 붙이는 순서가 곧 고르는 순서다.
   var mount = document.querySelector("[data-feedback-mount]");
   var mountBtn = null;
   if (mount) {
     mountBtn = document.createElement("a");
     mountBtn.href = "#";
-    mountBtn.className = "about-fb";
-    mountBtn.textContent = _t("문의 및 제안");
-    mount.appendChild(mountBtn);
+    mountBtn.className = "ac-row about-fb";
+    var mIcon = document.createElement("i");
+    mIcon.className = "ti ti-message-report ac-ic";
+    mIcon.setAttribute("aria-hidden", "true");
+    var mName = document.createElement("b");
+    mName.textContent = mount.getAttribute("data-fb-name") || _t("문의 및 제안");
+    var mDesc = document.createElement("span");
+    mDesc.textContent = mount.getAttribute("data-fb-desc") || "";
+    var mGo = document.createElement("i");
+    mGo.className = "ti ti-arrow-right ac-go";
+    mGo.setAttribute("aria-hidden", "true");
+    mountBtn.appendChild(mIcon);
+    mountBtn.appendChild(mName);
+    mountBtn.appendChild(mDesc);
+    mountBtn.appendChild(mGo);
+    var mRow = document.createElement("li");
+    mRow.appendChild(mountBtn);
+    mount.insertBefore(mRow, mount.firstChild);
   }
 
   var pop = null, lastFocus = null, sending = false, saveTimer = null;

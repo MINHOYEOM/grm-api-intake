@@ -83,11 +83,11 @@
       <h2>지키는 것</h2>
       <div class="about-prose"><ul><li><strong>원문이 먼저입니다.</strong> 요약은 읽는 시간을 줄여 줄 뿐, 판단은 원문으로 합니다.</li><li><strong>사실과 해석을 구분합니다.</strong> 문서에 적힌 것과 편집자가 덧붙인 것을 색과 위치로 나눕니다.</li><li><strong>AI가 만든 것은 그렇다고 적어 둡니다.</strong> 어디까지가 자동 생성인지 숨기지 않습니다.</li></ul></div>
     </section>
-    <section class="about-sec" id="contact">
+<section class="about-sec" id="contact">
       <h2>연락</h2>
-      <div class="about-prose">
-        <p>궁금한 점이나 제안이 있으면 편하게 알려 주세요. 잘못된 내용을 발견하셨을 때도요.</p>
-        <div class="about-acts" data-feedback-mount><a class="about-act" href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener"><i class="ti ti-brand-linkedin" aria-hidden="true"></i>LinkedIn</a><a class="about-act" href="mailto:yeomminho1472@gmail.com"><i class="ti ti-mail" aria-hidden="true"></i>이메일</a></div>
+      <div class="ac">
+        <p class="ac-lede">궁금한 점이나 제안이 있으면 편하게 알려 주세요. 잘못된 내용을 발견하셨을 때도요.</p>
+        <ul class="ac-list" data-feedback-mount data-fb-name="문의 및 제안" data-fb-desc="이 화면에서 바로 남길 수 있어요"><li><a class="ac-row" href="mailto:yeomminho1472@gmail.com"><i class="ti ti-mail ac-ic" aria-hidden="true"></i><b>이메일</b><span>길게 쓰고 싶을 때</span><i class="ti ti-arrow-right ac-go" aria-hidden="true"></i></a></li><li><a class="ac-row" href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener"><i class="ti ti-brand-linkedin ac-ic" aria-hidden="true"></i><b>LinkedIn</b><span>운영자 프로필</span><i class="ti ti-external-link ac-go" aria-hidden="true"></i></a></li></ul>
       </div>
     </section>
   </div>
@@ -106,14 +106,25 @@
 .about-prose li{padding:12px 0;border-top:1px solid var(--line)}
 .about-prose li:first-child{border-top:0;padding-top:0}
 .about-prose strong{font-weight:600;color:var(--ink)}
-.about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-.about-acts:empty{display:none}
-.about-act,.about-fb{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:9px 16px;background:transparent;transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease)}
-.about-act:hover{border-color:var(--ink)}
-.about-act .ti{font-size:16px;line-height:1}
-.about-fb{background:var(--coral);border-color:var(--coral);color:var(--on-coral)}
-.about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
-@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:14px;padding:34px 0} .about-head h1{font-size:38px} .about-prose{font-size:16px} }
+/* [연락] 채널 줄 목록. `.about-prose` 밖에 두는 것이 중요하다 — 그 안이면 위 목록용
+   `.about-prose li{padding;border-top}` 이 그대로 걸려 줄 간격이 두 규칙 사이에서 다툰다. */
+.ac{max-width:60ch}
+.ac-lede{font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;margin:0 0 24px}
+.ac-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.ac-list:empty{display:none}   /* 정본이 비고 JS 도 안 돌면 괘선만 남는 빈 상자가 되지 않게 */
+.ac-list > li{border-bottom:1px solid var(--line)}
+.ac-row{display:grid;grid-template-columns:26px 1fr 18px;grid-template-rows:auto auto;align-items:center;column-gap:14px;padding:15px 2px;color:var(--ink);cursor:pointer}
+.ac-row .ac-ic{grid-column:1;grid-row:1/3;font-size:19px;line-height:1;color:var(--muted-2);transition:color .16s var(--ease)}
+.ac-row b{grid-column:2;grid-row:1;font-family:var(--sans);font-size:15.5px;font-weight:600;line-height:1.45;color:var(--ink);transition:color .16s var(--ease);word-break:keep-all}
+.ac-row span{grid-column:2;grid-row:2;font-family:var(--sans);font-size:13.5px;line-height:1.55;color:var(--muted);word-break:keep-all}
+.ac-row .ac-go{grid-column:3;grid-row:1/3;font-size:16px;line-height:1;color:var(--line-2);transition:color .16s var(--ease),transform .16s var(--ease)}
+.ac-row.about-fb .ac-ic{color:var(--coral)}   /* 주 채널만 쉼 상태에서도 강조(알약 대신 점 하나) */
+.ac-row:hover b{color:var(--coral-2)}
+.ac-row:hover .ac-ic,.ac-row:hover .ac-go{color:var(--coral)}
+.ac-row:hover .ac-go{transform:translateX(3px)}
+.ac-row:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:var(--rad-s)}
+@media (prefers-reduced-motion:reduce){ .ac-row:hover .ac-go{transform:none} }
+@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:14px;padding:34px 0} .about-head h1{font-size:38px} .about-prose{font-size:16px} .ac-lede{font-size:16px} }
 </style>
 <style>
 .foot .b1 .foot-src{font-size:12px;line-height:1.7;max-width:40ch;margin-top:18px;color:var(--band-mut);opacity:.75;word-break:keep-all}

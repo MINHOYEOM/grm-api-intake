@@ -17,7 +17,7 @@
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항 둘러보기") }}</h1>
-    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("보유한 지적사항 {n}건을 업무·문서·분류 축으로 탐색합니다.", n=zone_totals.findings) }}{% else %}{{ _("보유한 지적사항을 업무·문서·분류 축으로 탐색합니다.") }}{% endif %}</p>
+    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("보유한 지적사항 {n}건을 업무·문서·분류 축으로 탐색합니다({asof} 기준).", n=zone_totals.findings, asof=zone_totals.as_of) }}{% else %}{{ _("보유한 지적사항을 업무·문서·분류 축으로 탐색합니다.") }}{% endif %}</p>
   </div>
   <div class="wrap">
     {% with seg_active = "browse" %}{% include "partials/findings_seg.html" %}{% endwith %}

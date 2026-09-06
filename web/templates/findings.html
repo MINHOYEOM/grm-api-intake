@@ -14,8 +14,12 @@
     <span class="kick reveal" style="animation-delay:.02s">Findings</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ _("지적사항 검색") }}</h1>
     {#- 설명문은 한 문장(M15 사용자 피드백 — 첫 화면 밀도) — 건수는 별도 문장이 아니라
-        문장 안에 녹인다. 수치는 render 가 정본에서 계산(하드코딩 금지). -#}
-    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {docs}건에서 추출한 지적사항 {n}건을 원문 문장 단위로 모았습니다.", docs=zone_totals.documents, n=zone_totals.findings) }}{% else %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.") }}{% endif %}</p>
+        문장 안에 녹인다. 수치는 render 가 정본에서 계산(하드코딩 금지).
+        ★기준일도 **문장 안**에 넣는다. 이 수는 주 1회 스냅샷이라 바로 아래 런타임 목록과
+          며칠씩 어긋나는데(실측 24,895 vs 24,956) 시점을 안 밝히면 결함으로 읽힌다.
+          그렇다고 뒤에 괄호 문장을 덧붙이면 마침표가 둘이 되어 한 문장 계약이 깨진다 —
+          날짜를 그 수 바로 옆에 붙여 둘 다 지킨다. -#}
+    <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {docs}건에서 추출한 지적사항 {n}건({asof} 기준)을 원문 문장 단위로 모았습니다.", docs=zone_totals.documents, n=zone_totals.findings, asof=zone_totals.as_of) }}{% else %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.") }}{% endif %}</p>
   </div>
   <div class="wrap">
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>

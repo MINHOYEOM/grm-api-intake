@@ -613,6 +613,15 @@
     coverageTextEl.textContent = isComplete
       ? intro + _t(" 모두 국문으로 볼 수 있습니다.")
       : intro + _t(" 신규 수집분은 번역 완료 전까지 목록에서 영어 원문으로만 표시됩니다.");
+    // [분모 고지 2026-09-06] 위 스탯 스트립의 '원문서'(raw_signals 전량)와 '분석 문서'
+    // (지적이 하나라도 나온 문서)는 **다른 것을 센다**. 라벨만 달아 두면 두 수의 차이가
+    // 결함처럼 읽힌다 — 무엇이 그 차이인지 한 문장으로 적는다(수치는 응답에서, 하드코딩
+    // 금지). 두 값이 다 있을 때만 적는다.
+    if (hasDocumentsCount(totals) && Number(totals.raw_signals || 0) > Number(totals.documents || 0)) {
+      coverageTextEl.textContent += " " + _t("'원문서 {raw}건'은 수집한 규제 문서 전량이고, 그중 범위 안 지적이 나온 {docs}건이 '분석 문서'입니다 — 나머지는 지적이 없거나 이 데이터의 범위 밖입니다.",
+        { raw: Number(totals.raw_signals).toLocaleString("ko-KR"),
+          docs: Number(totals.documents).toLocaleString("ko-KR") });
+    }
     coverageNoteEl.hidden = false;
   }
 

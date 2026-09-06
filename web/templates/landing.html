@@ -112,7 +112,7 @@
   <section class="section" id="records"><div class="wrap">
     <span class="kick">Findings Database</span>
     <h2 class="sec-title">{{ _("주간 브리프의 원천 — 실사에서 실제 지적된 문장들") }}</h2>
-    <p class="records-sub">{{ _("브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 {docs}건 · 지적사항 {n}건이 쌓여 있습니다.", docs=findings_zone.documents, n=findings_zone.findings) }}</p>
+    <p class="records-sub">{{ _("브리프가 요약해 드리는 그 원문 기록을 직접 찾아보실 수 있습니다. FDA 483 · Warning Letter · 캐나다/EU 실사보고서 · 식약처 처분에서 추출한 문서 {docs}건 · 지적사항 {n}건이 쌓여 있습니다({asof} 기준 — 검색 화면은 오늘 값을 보여드립니다).", docs=findings_zone.documents, n=findings_zone.findings, asof=findings_zone.as_of) }}</p>
     <div class="records-grid">
       <a class="records-card" href="{{ rel_root }}findings/firm/index.html"><b>{{ _("이 거래처, 과거에 무엇을 지적받았나요?") }}</b><span>{{ _("업체 이름으로 지적 이력 조회") }}</span></a>
       <a class="records-card" href="{{ rel_root }}findings/inspector/index.html"><b>{{ _("이 실사관이 서명한 문서에는 무엇이 있었나요?") }}</b><span>{{ _("실사관 이름으로 공개 문서 조회") }}</span></a>

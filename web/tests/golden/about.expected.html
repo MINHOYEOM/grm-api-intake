@@ -98,41 +98,46 @@
   </div>
 </main>
 <style>
-/* [소개] 레이블 + 본문 블록 — grm.css 토큰만 사용(프리즈 보존). 카드·배지 없이 괘선으로만 나눈다. */
-.about-head h1{max-width:22ch;text-wrap:balance;word-break:keep-all}
-.about-head .about-lead p{color:var(--body);margin-top:22px;font-size:17px;line-height:1.7;max-width:56ch;word-break:keep-all;text-wrap:pretty}
-.about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+/* [정렬 2026-09-07] 이 사이트는 wrap 왼쪽 **한 줄**을 기준선으로 쓴다 — 이용안내·데이터
+   현황 등 다른 정적 면은 제목·본문이 전부 그 한 줄에서 시작한다(1440px 실측 158px).
+   소개만 절마다 200px 라벨 칸을 둬 본문이 240px 안쪽에서 시작했고, 그래서 이 페이지에만
+   왼쪽 기준선이 **둘**(159 / 399) 있었다. 읽어 내려갈 때 눈이 붙잡을 축이 없어 "줄맞춤이
+   엉망"으로 보이던 실체가 그것이다. 라벨 칸을 걷어내고 절 제목을 본문 위로 올려 기준선을
+   하나로 되돌린다.
+   ★한 벌의 폭(600px)을 제목·리드·본문이 함께 쓴다 — 왼쪽뿐 아니라 오른쪽 끝도 맞아 한 단의
+   글기둥이 된다. 한글 16.5px 기준 한 줄 약 36자로 읽기 폭 안이다.
+   ★좁은 폭 위계도 구조가 해결한다: 절 제목이 명조 25px 이라 항목 제목(고딕 굵게 17px)과
+   서체·크기로 갈린다. 색으로 구분하려고 넣었던 coral 라벨은 그래서 되돌린다.
+   §4 한글안전: 자간·대문자 미사용 — 그 속성 이름은 한국어로만 적는다(이 주석은 HTML 로
+   나가고 `WebKoreanSafetyTest` 가 문자열로 훑어 자기 설명에 걸린 적이 있다). */
+.about-head h1{max-width:600px;text-wrap:balance;word-break:keep-all}
+.about-head .about-lead p{color:var(--body);margin-top:24px;font-size:17.5px;line-height:1.72;max-width:600px;word-break:keep-all;text-wrap:pretty}
+.about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 .about-cta .btn{font-size:14.5px}
 .about-cta .btn .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
 .about-cta .btn:hover .ti{transform:translateX(3px)}
-.about-body{padding-top:44px;padding-bottom:80px}
-.about-sec{display:grid;grid-template-columns:200px 1fr;gap:40px;padding:44px 0;border-top:1px solid var(--line)}
-/* 절 레이블은 **내용이 아니라 이름표**다 — 색으로 그렇게 말한다(사이트의 eyebrow 관례 =
-   coral). 종전엔 ink 14px 이었는데 절 안의 항목 제목이 ink 15.5px 이라, 왼쪽 칸이 사라지는
-   좁은 폭에서 둘이 위아래로 붙으면 **레이블이 항목보다 작고 같은 색인 채로 나란히** 놓여
-   위계가 뒤집혀 보였다(375px 실측). 자리로 구분하던 것을 색으로도 구분한다.
-   §4 한글안전: 자간·대문자는 쓰지 않는다 — 크기와 색만 쓴다.
-   ★이 주석은 CSS 주석이라 **HTML 로 나간다.** `WebKoreanSafetyTest` 는 전 페이지 HTML 을
-   문자열로 훑으므로 금지 속성 이름을 여기 그대로 적으면 가드가 자기 설명에 걸린다
-   (실제로 걸렸다). 설명할 때도 그 낱말은 한국어로 쓴다. */
-.about-sec h2{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--coral-2);margin:0;padding-top:5px;line-height:1.5;word-break:keep-all}
-/* text-wrap:pretty — 마지막 줄에 낱말 하나만 남는 것(“제공합니다.” 73px)을 줄인다. 지원하지
-   않는 브라우저는 무시하므로 폴백이 곧 종전 동작이다. */
-.about-prose{max-width:60ch;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;text-wrap:pretty}
+.about-body{padding-top:52px;padding-bottom:88px}
+.about-sec{padding:44px 0;border-top:1px solid var(--line);scroll-margin-top:88px}  /* 절마다 id(sec-N)가 있어 딥링크가 가능하다 — 고정 헤더 높이만큼 비워 제목이 헤더 뒤로 숨지 않게(이용안내 선례). */
+.about-sec:last-child{padding-bottom:4px}
+.about-sec h2{font-family:var(--serif);font-size:25px;font-weight:600;line-height:1.32;color:var(--ink);margin:0 0 18px;word-break:keep-all}
+/* text-wrap:pretty — 마지막 줄에 낱말 하나만 남는 것을 줄인다. 미지원 브라우저는 무시하므로
+   폴백이 곧 종전 동작이다. */
+.about-prose{max-width:600px;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;text-wrap:pretty}
 .about-prose p{margin:0 0 1.1em}
 .about-prose p:last-child{margin-bottom:0}
-.about-prose ul{list-style:none;margin:0;padding:0}
-.about-prose li{padding:14px 0;border-top:1px solid var(--line)}
-.about-prose li:first-child{border-top:0;padding-top:0}
+/* 항목 사이는 괘선이 아니라 여백으로 가른다 — 절마다 이미 괘선이 하나 있어서, 항목까지
+   괘선을 두면 한 화면에 가로줄이 열 개 넘게 깔린다(경계의 종류 하나에 괘선 하나). */
+.about-prose ul{list-style:none;margin:0;padding:0;display:grid;gap:22px}
+.about-prose li{margin:0}
 .about-prose strong{font-weight:600;color:var(--ink)}
 /* 목록 항목은 '이름 한 줄 + 설명 한 줄' — 굵은 머리말을 블록으로 떨어뜨려 둘을 가른다. */
-.about-prose li strong{display:block;font-size:15.5px;line-height:1.5;margin-bottom:3px}
-.about-more{margin-top:20px}
+.about-prose li strong{display:block;font-size:17px;line-height:1.5;margin-bottom:5px}
+.about-more{margin-top:22px}
 .about-more a{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--coral-2);border-bottom:1px solid var(--line-2);padding-bottom:2px;transition:border-color .16s var(--ease)}
 .about-more a:hover{border-bottom-color:var(--coral-2)}
 .about-more .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
 .about-more a:hover .ti{transform:translateX(3px)}
-.about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .about-acts:empty{display:none}
 .about-act,.about-fb{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:10px 17px;background:transparent;cursor:pointer;transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease)}
 .about-act:hover{border-color:var(--ink)}
@@ -141,11 +146,10 @@
 .about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
 .about-act:focus-visible,.about-fb:focus-visible,.about-more a:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti,.about-more a:hover .ti{transform:none} }
-/* 좁은 폭: 레이블과 첫 항목이 붙지 않게 간격을 조금 벌리고(14→18), 레이블은 한 단 더 작게.
-   ★640px 이하에서 제목을 한 번 더 줄인다 — 36px 은 375px 화면에서 둘째 줄이 331px 중 330px
-   을 차지해 오른쪽 여백이 사라졌다(실측). 글자를 줄이는 대신 줄이 숨 쉴 자리를 준다. */
-@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:18px;padding:34px 0} .about-sec h2{font-size:13px;padding-top:0} .about-head h1{font-size:36px;max-width:none} .about-prose{font-size:16px} }
-@media (max-width:640px){ .about-head h1{font-size:31px} .about-head .about-lead p{font-size:16.5px} .about-body{padding-bottom:64px} }
+/* 좁은 폭은 폭만 줄어들 뿐 구조가 같다 — 기준선이 하나라 재배치할 것이 없다. 제목은 375px
+   에서 36px 이면 둘째 줄이 오른쪽 여백을 다 먹어(331 중 330px 실측) 한 단 줄인다. */
+@media (max-width:900px){ .about-sec{padding:36px 0} .about-sec h2{font-size:22px;margin-bottom:14px} .about-head h1{font-size:36px} .about-prose{font-size:16px} .about-body{padding-top:40px} }
+@media (max-width:640px){ .about-head h1{font-size:31px} .about-head .about-lead p{font-size:16.5px} .about-sec h2{font-size:21px} .about-body{padding-bottom:64px} }
 </style>
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}

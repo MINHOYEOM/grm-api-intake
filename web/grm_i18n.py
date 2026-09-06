@@ -169,6 +169,7 @@ JS_SHIM = (
 JS_BODY_SHIM = (
     "  var _isEn = (typeof document !== \"undefined\"\n"
     "    && (document.documentElement.lang || \"ko\") !== \"ko\");\n"
+    "  var _HANGUL = /[\uac00-\ud7a3]/;\n"
     "  var _bodyText = function (row) {\n"
     "    var ko = String((row && row.finding_text_ko) || \"\").trim();\n"
     "    var orig = String((row && row.finding_text) || \"\").trim();\n"
@@ -177,10 +178,18 @@ JS_BODY_SHIM = (
     "  var _altText = function (row) {\n"
     "    var ko = String((row && row.finding_text_ko) || \"\").trim();\n"
     "    var orig = String((row && row.finding_text) || \"\").trim();\n"
-    "    return (ko && orig) ? (_isEn ? ko : orig) : \"\";\n"
+    "    if (!ko || !orig) return \"\";\n"
+    "    if (_isEn && _HANGUL.test(orig)) return \"\";\n"
+    "    return _isEn ? ko : orig;\n"
     "  };\n"
 )
 
+# ★[2026-09-06] 영어 화면에서 **원문이 이미 한국어면 대조 토글을 달지 않는다**.
+#   식약처 지적(8.4%)은 원문이 한국어라 원문·번역이 둘 다 한국어이고, 그때
+#   "국문 번역 보기"는 같은 언어의 글을 번역이라며 한 번 더 펼치는 셈이라 뜻이
+#   통하지 않는다(전면 점검에서 업체 프로파일이 실제로 이 상태였다). 본문 자체는
+#   그대로 싫고 화면이 한국어인 이유를 밝힌다 — 감추는 대신 밝히는 사이트 규율.
+#   타입/소스 목록이 아니라 **값에 한글이 있는가**로 가른다(목록은 낡는다).
 # 위 사본을 반드시 가져야 하는 자산 = 지적 본문을 그리는 파일(원문 필드를 만지는 곳).
 JS_BODY_MARKER = "finding_text"
 

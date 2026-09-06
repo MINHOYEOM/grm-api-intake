@@ -1303,9 +1303,17 @@ class WebFindingsRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertNotIn(">이번 주<", nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6, "nav 탭은 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내 6개여야 함")
+        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
+        # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
+        # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
+        tabs, sep, more = nav_m.group(1).partition('<span class="navmore">')
+        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
+        self.assertNotIn(">이번 주<", tabs)
+        self.assertEqual(tabs.count("<a "), 6, "nav 탭은 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내 6개여야 함")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
+        # 서랍에는 헤더 한 줄에서 밀려난 것들이 들어간다 — 휴대폰에서 유일한 도달 경로다.
+        for label in ("주간 퀴즈", "이번 주 소식"):
+            self.assertIn(label, more, f"서랍에 '{label}' 이 없다(휴대폰에서 도달 불가)")
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
@@ -3554,8 +3562,12 @@ class WebTrendsRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertNotIn('class="on">지적사항', nav_m.group(1))
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
+        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
+        # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
+        # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
+        tabs = nav_m.group(1).partition('<span class="navmore">')[0]
+        self.assertNotIn('class="on">지적사항', tabs)
+        self.assertEqual(tabs.count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
 
     def test_footer_link_present(self):
         self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
@@ -6219,8 +6231,18 @@ class WebFirmRenderTest(unittest.TestCase):
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
-        self.assertNotIn("findings/firm", nav_m.group(1))
+        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
+        # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
+        # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
+        tabs, _sep, more = nav_m.group(1).partition('<span class="navmore">')
+        self.assertEqual(tabs.count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
+        # 서랍의 언어 전환 링크는 **같은 페이지의 영어판**을 가리키므로 경로가 통째로
+        # 겹친다(en/{route}/) — 그 하나 때문에 부분일치가 오탐한다. 탭 승격 여부를
+        # 묻는 가드이므로 탭 행을 보고, 서랍은 언어 링크만 뺀 나머지로 본다(서랍에
+        # 별도 진입 링크가 새로 생기면 여전히 여기서 걸린다).
+        self.assertNotIn("findings/firm", tabs)
+        self.assertNotIn("findings/firm",
+                         _re.sub(r'<a class="navmore-lang".*?</a>', "", more))
 
     def test_canonical_and_description(self):
         self.assertIn(
@@ -6466,8 +6488,18 @@ class WebInspectorRenderTest(unittest.TestCase):
     def test_nav_not_added_entry_only_via_link(self):
         nav_m = re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, re.S)
         self.assertIsNotNone(nav_m)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
-        self.assertNotIn("findings/inspector", nav_m.group(1))
+        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
+        # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
+        # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
+        tabs, _sep, more = nav_m.group(1).partition('<span class="navmore">')
+        self.assertEqual(tabs.count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
+        # 서랍의 언어 전환 링크는 **같은 페이지의 영어판**을 가리키므로 경로가 통째로
+        # 겹친다(en/{route}/) — 그 하나 때문에 부분일치가 오탐한다. 탭 승격 여부를
+        # 묻는 가드이므로 탭 행을 보고, 서랍은 언어 링크만 뺀 나머지로 본다(서랍에
+        # 별도 진입 링크가 새로 생기면 여전히 여기서 걸린다).
+        self.assertNotIn("findings/inspector", tabs)
+        self.assertNotIn("findings/inspector",
+                         re.sub(r'<a class="navmore-lang".*?</a>', "", more))
 
     def test_canonical_and_description(self):
         # sitemap 미등록과 별개로 canonical 은 유지한다(중복 URL 정리 목적).
@@ -7432,8 +7464,17 @@ class WebMePageTest(unittest.TestCase):
         # nav 탭 수는 그대로 6개(과밀 금지).
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re.S)
-        self.assertEqual(nav_m.group(1).count("<a "), 6)
-        self.assertNotIn("마이페이지", nav_m.group(1))
+        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
+        # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
+        # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
+        tabs, sep, more = nav_m.group(1).partition('<span class="navmore">')
+        self.assertTrue(sep)
+        self.assertEqual(tabs.count("<a "), 6)
+        self.assertNotIn("마이페이지", tabs)
+        # [모바일 헤더 2026-09-06] 세 번째 진입점 — 햄버거 서랍. 휴대폰에는 헤더 계정
+        # 메뉴가 뜰 자리가 없고 footer 는 스크롤 끝이라, 같은 env-gate 로 서랍에도 둔다.
+        self.assertIn('<a href="me/index.html">마이페이지</a>', more)
+        self.assertNotIn("마이페이지", self.landing_off)   # env-off = 서랍에도 없다
         # 헤더 계정 메뉴 항목도 실제 페이지 내용과 이름을 맞췄다(링크·아이콘은 그대로).
         self.assertIn(
             "'<i class=\"ti ti-bookmark\" aria-hidden=\"true\"></i>' + _t(\"마이페이지\") + '</a>'",
@@ -13680,9 +13721,21 @@ class WebAboutTest(unittest.TestCase):
     def test_nav_unchanged_six_tabs_and_about_lights_none(self):
         nav = self.html[self.html.index('<nav id="navmenu">'):]
         nav = nav[:nav.index("</nav>")]
-        self.assertEqual(nav.count("<a "), 6)
-        self.assertNotIn("about/", nav)
+        # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭에서만
+        # 펼쳐지는 서랍 전용 묶음(.navmore). "탭 6개"가 지키려는 것은 탭 행이므로 세는
+        # 대상도 탭 행이다(서랍은 헤더 한 줄에서 밀려난 것들의 유일한 도달 경로).
+        tabs, sep, more = nav.partition('<span class="navmore">')
+        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
+        self.assertEqual(tabs.count("<a "), 6)
         self.assertNotIn('class="on"', nav)
+        # 소개는 탭에도 서랍에도 올리지 않는다 — 진입은 푸터 '서비스' 열 하나로 유지한다.
+        # 단 서랍의 언어 전환 링크는 **이 페이지의 영어판**(`../en/about/`)을 가리켜
+        # 경로가 통째로 겹치므로 부분일치가 오탐한다. 그 하나만 빼고 본다(firm·inspector
+        # 의 같은 가드와 동형) — 서랍에 소개 링크가 새로 생기면 여전히 여기서 걸린다.
+        import re as _re
+        self.assertNotIn("about/", tabs)
+        self.assertNotIn("about/",
+                         _re.sub(r'<a class="navmore-lang".*?</a>', "", more))
 
     def test_sitemap_and_llms_list_about(self):
         sitemap = (self.single / "sitemap.xml").read_text(encoding="utf-8")
@@ -17573,10 +17626,16 @@ class WebEnTreeTest(unittest.TestCase):
         """
         checked = 0
         for rel, html in self.en.items():
-            body = re.sub(r'<a class="grm-lang".*?</a>', "", html, flags=re.S)
+            # ★[모바일 헤더 2026-09-06] 예외가 **클래스 손목록**이었다(grm-lang ·
+            #   records-all). 햄버거 서랍에 언어 전환 링크가 하나 더 생기자
+            #   (`.navmore-lang`) 그 목록이 **맞는 링크를 이탈로 신고**했다 — 이 검사가
+            #   금지 접두 손목록을 성질로 바꾼 것과 **같은 종류의 낡음**이 예외 쪽에
+            #   남아 있었던 것이다. 예외의 성질은 클래스가 아니라 링크가 스스로
+            #   **"한국어판으로 간다"고 밝혔는가**이고, 그 선언이 `hreflang="ko"` 다.
+            #   종전 세 간선이 전부 그것을 달고 있어 잡는 범위는 그대로이고, 앞으로
+            #   생길 언어 전환 링크도 라벨만 제대로 달면 저절로 따라온다.
+            body = re.sub(r'<a\b[^>]*\bhreflang="ko"[^>]*>.*?</a>', "", html, flags=re.S)
             body = re.sub(r'<link rel="alternate".*?/>', "", body, flags=re.S)
-            body = re.sub(r'<a class="records-all" href="[^"]*" hreflang="ko".*?</a>',
-                          "", body, flags=re.S)
             base = posixpath.dirname(rel)
             for href in re.findall(r'href="([^"]+)"', body):
                 if re.match(r"(?:https?:|mailto:|tel:|#|data:|//|/)", href):
@@ -17674,17 +17733,25 @@ class WebEnTreeTest(unittest.TestCase):
         선언이 정한다 — 여기서는 선언과 화면이 일치하는지만 본다."""
         nav = re.search(r'<nav id="navmenu">(.*?)</nav>', self.en["en/index.html"], re.S)
         self.assertIsNotNone(nav)
+        # [모바일 헤더 2026-09-06] nav 안은 탭 행 + 서랍 전용 묶음(.navmore) 둘이다.
+        tabs, sep, more = nav.group(1).partition('<span class="navmore">')
+        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
         for label, path in self.NAV_SECTIONS:
             with self.subTest(section=path):
                 if path in self.expected:
-                    self.assertIn(label, nav.group(1),
+                    self.assertIn(label, tabs,
                                   f"{path} 는 영어판에 있는데 nav 에 없다(닿는 길이 없다)")
                 else:
-                    self.assertNotIn(label, nav.group(1),
+                    self.assertNotIn(label, tabs,
                                      f"{path} 는 영어판에 없는데 nav 가 가리킨다")
         self.assertNotIn("주간 브리프", nav.group(1))
-        self.assertEqual(re.findall("[가-힣]+", nav.group(1)), [],
-                         "영어 nav 에 한글이 남았다")
+        self.assertEqual(re.findall("[가-힣]+", tabs), [],
+                         "영어 nav 탭에 한글이 남았다")
+        # 서랍에서 한글이 허용되는 것은 **한국어판으로 가는 링크의 라벨 하나**뿐이다 —
+        # 라벨은 목적지 언어의 자칭이라 번역하지 않는다(헤더 언어 칩 .grm-lang 과 같은
+        # 규칙). 그 하나 말고 한글이 더 섞이면 여기서 걸린다.
+        self.assertEqual(re.findall("[가-힣]+", more), ["한국어"],
+                         "영어 서랍에 언어 전환 라벨 말고 다른 한글이 있다")
 
     def test_structured_data_on_the_english_home_declares_english(self):
         """★[2026-09-04] 영어 홈의 JSON-LD 가 `inLanguage: ko` 였고 설명도 한국어였다.

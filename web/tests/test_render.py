@@ -1271,7 +1271,9 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
 
     def test_footer_link_present(self):
-        self.assertIn('<a href="../findings/index.html">지적사항</a>', self.html)
+        # [푸터 확정 2026-09-06] 푸터 라벨은 헤더보다 한 겹 더 설명적이다 — 헤더는 이미 그
+        # 화면에 있는 사람이 읽고, 푸터는 아직 무엇인지 모르는 사람이 읽는다.
+        self.assertIn('<a href="../findings/index.html">실사 지적사항</a>', self.html)
         self.assertNotIn(">이번 주</a>", self.html)
 
     def test_canonical_and_description(self):
@@ -3400,7 +3402,8 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertEqual(nav_m.group(1).count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
 
     def test_footer_link_present(self):
-        self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
+        # [푸터 확정 2026-09-06] 헤더 탭은 '트렌드', 푸터는 '규제 동향'(위 findings 동류).
+        self.assertIn('<a href="../../findings/trends/index.html">규제 동향</a>', self.html)
 
     def test_findings_zone_links_to_trends(self):
         """[2면 분리 2026-08-27] 검색 면의 히어로 링크 행("전체 트렌드 보기")은 세그와
@@ -7161,12 +7164,17 @@ class WebMePageTest(unittest.TestCase):
         self.assertIn('<p class="grm-my-note me-growth-fb">', self.me)
         self.assertIn(".me-growth:not([hidden]) + .me-growth-fb{display:none}", self.me)
 
-    def test_entry_point_footer_only_and_env_gated(self):
-        """진입점은 헤더 계정 메뉴(로그인 시)와 footer(상시) 두 곳 — nav 탭은 늘리지 않는다.
-        footer 링크는 me/index.html 과 같은 env-gate 로 묶어, env-off 빌드에서 404 링크가
-        남지 않고 전 페이지 골든 byte-diff 가 0 이 되게 한다."""
-        self.assertIn('<a href="me/index.html">마이페이지</a>', self.landing_on)
-        self.assertNotIn("마이페이지", self.landing_off)   # env-off = 링크 자체가 없다
+    def test_entry_point_is_the_account_menu_not_the_footer(self):
+        """[푸터 확정 2026-09-06] 진입점은 **헤더 계정 메뉴 하나**다 — nav 탭은 늘리지 않고,
+        푸터에서도 뺐다. 로그인해야 열리는 면을 모두에게 보이는 자리에 두면, 대다수에게는
+        눌러도 아무것도 없는 링크가 된다. 종전에는 footer 에 env-gate 로 걸어 뒀었다.
+
+        ★빼기만 하고 끝내면 그 면은 닿을 길이 없어진다 — 대체 경로(reactions.js 가 로그인
+        시 얹는 계정 메뉴)가 실제로 그 링크를 들고 있는지 여기서 함께 본다."""
+        self.assertNotIn("me/index.html", self.landing_on)   # 푸터·본문 어디에도 없다
+        self.assertNotIn("마이페이지", self.landing_on)
+        self.assertNotIn("마이페이지", self.landing_off)
+        self.assertIn("me/index.html", self.reactions_js)    # 대체 경로는 살아 있다
         # nav 탭 수는 그대로 6개(과밀 금지).
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re.S)
@@ -13298,10 +13306,11 @@ class WebAboutTest(unittest.TestCase):
         title = next(ln[2:].strip() for ln in self.md.splitlines() if ln.startswith("# "))
         self.assertIn(f">{title}</h1>", self.html)
         self.assertNotIn(f"<h1>{title}</h1>", self.html)   # md h1 이 본문에 재출력되지 않음
-        # 본문 블록 = md 의 ## 수. 연락 블록(id="contact")은 템플릿이 하나 더 붙인다.
+        # 본문 블록 = md 의 ## 수 그대로. [확정안 2026-09-06] 연락 절도 md 의 한 절이다 —
+        # 종전엔 템플릿이 절 하나를 더 붙였는데, 그러면 그 절의 문안만 다른 파일에 산다.
         n_h2 = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
         self.assertEqual(self.html.count('<section class="about-sec" id="sec-'), n_h2)
-        self.assertEqual(self.html.count('<section class="about-sec" id="contact">'), 1)
+        self.assertEqual(self.html.count('<section class="about-sec"'), n_h2)
 
     def test_en_is_a_separate_source_with_same_shape(self):
         # 영문은 번역본이 아니라 같은 h2 구조의 다른 정본 — 블록 수가 같아야 딥링크(sec-N)가 맞는다.
@@ -13332,37 +13341,61 @@ class WebAboutTest(unittest.TestCase):
         for page in (self.html, self.landing):
             self.assertIn(f'href="mailto:{contact["email"]}"', page)
         self.assertIn('class="foot-ico"', self.landing)      # 푸터 법적 줄 아이콘
-        self.assertIn('class="ac-row"', self.html)           # 소개 페이지 채널 줄
+        self.assertIn('class="about-act"', self.html)        # 소개 페이지 이메일 버튼
+        self.assertIn('class="about-more"', self.html)       # '만든 사람' 절의 LinkedIn 줄
         # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
         self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
 
-    def test_each_contact_channel_says_what_it_is_for(self):
-        """[연락 2026-09-06] 줄마다 이름 + 쓰임이 함께 있다 — 이름만 적힌 알약 셋으로
-        돌아가지 않는다. 어느 쪽으로 보내야 하는지가 화면에 없으면 채널이 셋이어도
-        고를 수가 없다(그게 '연락 블록이 부족하다'의 실체였다)."""
-        rows = re.findall(r'<a class="ac-row".*?</a>', self.html, re.S)
-        self.assertGreaterEqual(len(rows), 2, "정적 채널 줄이 둘 미만(이메일·LinkedIn)")
-        for row in rows:
-            self.assertRegex(row, r"<b>[^<]+</b>", f"이름 없는 줄: {row[:120]}")
-            self.assertRegex(row, r"<span>[^<]+</span>", f"쓰임 없는 줄: {row[:120]}")
-        # 목록 밖에 알약이 남아 있지 않다(종전 `.about-acts` 잔재 금지).
-        self.assertNotIn("about-acts", self.html)
-        self.assertNotIn("about-act", self.html)
+    def test_widgets_are_placed_by_slots_declared_in_the_markdown(self):
+        """[확정안 2026-09-06] 링크·버튼은 md 서브셋이 표현할 수 없어 템플릿이 그리지만,
+        **어느 절에** 그릴지는 md 의 `## 제목 {slot}` 이 정한다. 문안을 손보는 사람이 절을
+        옮기면 위젯도 따라가야 한다 — 위치까지 템플릿에 박으면 md 만 고친 결과가 어긋난다.
+        슬롯 이름은 제목에서 떼어 화면에 남지 않는다."""
+        self.assertRegex(self.md, r"(?m)^## .+\{linkedin\}\s*$")
+        self.assertRegex(self.md, r"(?m)^## .+\{contact\}\s*$")
+        self.assertRegex(self.md_en, r"(?m)^## .+\{linkedin\}\s*$")
+        self.assertRegex(self.md_en, r"(?m)^## .+\{contact\}\s*$")
+        self.assertNotIn("{linkedin}", self.html)     # 마커가 제목에 새어나오지 않는다
+        self.assertNotIn("{contact}", self.html)
+        _, _, secs = render.render_about_html(self.md)
+        self.assertEqual([s["slot"] for s in secs if s["slot"]], ["linkedin", "contact"])
+        # LinkedIn 줄은 `{linkedin}` 을 단 절 **안**에 있다(다음 절로 밀리지 않는다).
+        linked = next(s for s in secs if s["slot"] == "linkedin")
+        after = self.html[self.html.index(f'id="{linked["id"]}"'):]
+        self.assertLess(after.index("about-more"), after.index("</section>"))
+        # 모르는 슬롯은 조용히 무시하지 않고 즉시 실패한다(오타로 연락처가 사라지는 것 방지).
+        with self.assertRaises(ValueError):
+            render.render_about_html("# t\n\n## 어떤 절 {sponsors}\n\n본문\n")
 
-    def test_feedback_row_copy_lives_in_the_template(self):
-        """문의 줄의 이름·쓰임은 **템플릿이 정한다**(`data-fb-*`). feedback.js 가 그 줄을
+    def test_feedback_button_copy_lives_in_the_template(self):
+        """문의 버튼의 라벨은 **템플릿이 정한다**(`data-fb-name`). feedback.js 가 그 버튼을
         런타임에 얹지만, 문안까지 JS 가 들고 있으면 이 페이지의 연락 문구를 고칠 자리가
         두 파일로 갈라진다. JS 는 속성을 읽기만 하고, 없을 때만 푸터와 같은 사전 키로
         떨어진다(새 키를 만들지 않는다)."""
         self.assertIn('data-fb-name="문의 및 제안"', self.html)
-        self.assertRegex(self.html, r'data-fb-desc="[^"]+"')
         js = (WEB_DIR / "assets" / "feedback.js").read_text(encoding="utf-8")
         self.assertIn('getAttribute("data-fb-name")', js)
-        self.assertIn('getAttribute("data-fb-desc")', js)
         # 영어 면은 같은 자리에서 영어 문구를 받는다(사전을 타므로 JS 하드코딩이 아니다).
         self.assertIn('data-fb-name="Contact and suggestions"', self.en_html)
-        self.assertNotRegex(re.search(r'data-fb-desc="([^"]*)"', self.en_html).group(1),
-                            r"[가-힣]")
+
+    def test_about_hides_mascot_and_pinned_subscribe_band(self):
+        """[확정안 2026-09-06] 소개 면에서는 마스코트와 고정 구독 밴드를 접는다 — 서비스가
+        무엇인지 읽는 자리를 떠 있는 것이 가리거나 끊지 않게. 구독 경로는 스크롤 배너
+        하나로 남는다. 구독 밴드는 env-param 뒤라 기본 빌드에서 원래 안 보이므로, 게이트
+        **조건 자체**를 본다(안 보이는 것을 가드가 안 보는 것이 이 저장소의 재발 함정)."""
+        self.assertNotIn('id="grm-pet"', self.html)
+        self.assertNotIn('id="grm-pet"', self.en_html)
+        self.assertIn('id="grm-pet"', self.landing)          # 다른 면에서는 그대로
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' %}",
+                      base)
+        self.assertIn("{% if nav_active != 'about' %}\n<div class=\"grm-pet\"", base)
+
+    def test_hero_offers_the_next_step(self):
+        """리드 아래 진입 둘(주간 브리프·이용안내) — 소개를 읽고 나면 갈 곳이 있어야 한다."""
+        head = self.html[self.html.index('class="wrap page-head'):self.html.index('about-body')]
+        self.assertIn('class="btn coral" href="../archive/index.html"', head)
+        self.assertIn('href="../guide/index.html"', head)
 
     def test_contact_links_vanish_when_data_file_is_empty(self):
         """정본이 비면 링크도 아이콘도 남지 않는다(죽은 링크 금지 — share 버튼 선례).
@@ -13404,14 +13437,37 @@ class WebAboutTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
 
     def test_footer_is_brand_plus_three_link_columns(self):
+        """[확정안 2026-09-06] 열 순서 = 서비스 안내 → 콘텐츠 → 도구. 처음 온 사람이 먼저
+        묻는 것("여기가 무엇인가")을 앞에 둔다."""
         foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
-        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["콘텐츠", "도구", "서비스"])
+        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["서비스 안내", "콘텐츠", "도구"])
         self.assertNotIn("<span>", foot)                            # 클릭 안 되는 라벨 열 0
-        self.assertIn('<p class="foot-src"><b>Sources</b>', foot)   # 소스는 브랜드 아래 한 줄
-        self.assertIn('href="../../about/index.html">소개</a>', foot)
+        self.assertIn('href="../../about/index.html">서비스 소개</a>', foot)
         self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
         self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
         self.assertIn("<div data-feedback-slot>", foot)              # 문의 링크가 얹힐 열
+
+    def test_footer_points_at_the_sources_page_instead_of_listing_them(self):
+        """[확정안 2026-09-06] 브랜드 열은 소스를 **나열하지 않고** 실제로 집계해 보여주는
+        면(데이터 현황)으로 보낸다. 손으로 적은 목록은 소스가 늘 때마다 반드시 낡는다 —
+        종전엔 그 목록과 랜딩 마퀴를 서로 대조하는 가드까지 있었고, 그 가드가 있기 전에는
+        실제로 EudraGMDP·ISPE 가 빠진 채 오래 방치됐다. 목록을 없애면 낡을 것이 없다."""
+        foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
+        self.assertNotIn('<p class="foot-src"', foot)      # 나열 줄 잔재 0
+        self.assertNotIn("EudraGMDP", foot)
+        self.assertIn('class="foot-srclink" href="../../findings/coverage/index.html"', foot)
+        # 링크가 가리키는 면이 실제로 서 있어야 한다(죽은 링크 금지).
+        self.assertTrue((self.single / "findings" / "coverage" / "index.html").is_file())
+
+    def test_my_page_left_the_footer_but_the_account_menu_keeps_it(self):
+        """[확정안 2026-09-06] 마이페이지는 푸터에서 뺀다 — 로그인해야 열리는 면을 모두에게
+        보이는 자리에 두지 않는다. 대신 계정 메뉴(reactions.js)가 같은 링크를 얹는지 확인한다:
+        빼기만 하고 대체 경로를 안 보면 그 면은 닿을 길이 없어진다."""
+        foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
+        self.assertNotIn("me/index.html", foot)
+        reactions = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
+        self.assertIn("me/index.html", reactions)
+        self.assertIn("grm-acct-item", reactions)
         self.assertNotIn("repeat(4,1fr)", self.trends)               # 5열 시절 override 제거
         self.assertNotIn("AI-generated from primary sources", self.trends)   # 중복 prov 삭제
 
@@ -13442,31 +13498,29 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
     설명·마퀴 갱신을 빠뜨리던 문제를 CI 에서 잡는다 — EU/영국 GMP 비준수(EudraGMDP·MHRA)
     편입 후 findings 계열 카피에 소스가 누락됐던 사례(2026-07)의 회귀 잠금."""
 
-    def test_footer_sources_match_landing_marquee(self):
-        """[손목록 정합 2026-08-12] 수집 소스는 두 곳에 손으로 적혀 있다 — 랜딩 마퀴와 전
-        페이지 푸터. 푸터에는 EudraGMDP·ISPE 가 빠져 있어 랜딩이 광고하는 12개와 어긋나
-        있었다(두 목록을 서로 검사하는 가드가 없어 아무 소리도 나지 않았다). 집합이
-        일치해야 한다 — 한쪽만 고치면 여기서 걸린다."""
-        # 마퀴는 영문 축약(MFDS), 푸터는 국문(식약처)으로 같은 기관을 적는다 — 표기 차이는
-        # 의도된 것이라 정규화하고 **집합**만 비교한다(별칭을 늘리려면 여기 한 줄).
-        ALIAS = {"MFDS": "식약처"}
-        # 마퀴는 줄바꿈 방지로 `Health&nbsp;Canada` 처럼 엔티티를 쓴다(템플릿 원문 문자열).
-        def norm(s):
-            s = s.replace("&nbsp;", " ").replace("\xa0", " ").strip()
-            return ALIAS.get(s, s)
-        landing = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
+    def test_the_marquee_is_the_only_hand_written_source_list(self):
+        """[손목록 정리 2026-09-06] 종전에는 수집 소스가 **두 곳에** 손으로 적혀 있었고
+        (랜딩 마퀴 · 전 페이지 푸터) 둘이 어긋나 있었다(푸터에 EudraGMDP·ISPE 누락).
+        그래서 두 목록을 서로 대조하는 가드를 뒀었는데, 확정안에서 푸터 목록 자체를 없애고
+        **실제로 소스를 집계해 보여주는 면**(데이터 현황) 링크로 대체했다 — 목록이 하나면
+        서로 어긋날 수가 없다.
+
+        이 테스트가 지키는 것은 그 상태다: 손으로 적은 소스 목록이 **마퀴 하나뿐**이어야
+        한다. 푸터에 목록이 되살아나면(또는 다른 템플릿에 새로 생기면) 여기서 걸린다 —
+        가드를 지우는 대신 지키는 대상을 바꾼 것이다. 마퀴 자체의 정합은 아래 두 테스트
+        (칩 수 ↔ 선언 카운트, 추출기 배선 ↔ 카피 키워드)가 계속 본다."""
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
-        track = re.search(r'class="track">(.*?)</div>', landing, re.S)
-        self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
-        marquee = {norm(s.replace("\xa0", " ").strip()) for s in re.findall(r"<span>([^<]+)</span>", track.group(1))}
-        # [푸터 정리 2026-09-06] 소스 목록은 열이 아니라 브랜드 아래 한 줄(.foot-src)이다.
-        # 한글 기관명은 {{ _("…") }} 로 감싸져 있다 — 안쪽 원문만 꺼낸 뒤 '·' 로 가른다.
-        foot = re.search(r'<p class="foot-src"><b>[^<]*</b>(.*?)</p>', base, re.S)
-        self.assertIsNotNone(foot, "푸터 소스 줄(.foot-src)을 찾지 못함")
-        line = re.sub(r'\{\{ _\("(.*?)"\) \}\}', r"\1", foot.group(1))
-        footer = {norm(x.strip()) for x in line.replace("\xa0", " ").split("·")}
-        self.assertEqual(marquee, footer,
-                         f"마퀴에만: {sorted(marquee - footer)} / 푸터에만: {sorted(footer - marquee)}")
+        foot = re.search(r'<footer class="site">.*?</footer>', base, re.S)
+        self.assertIsNotNone(foot, "푸터 블록을 찾지 못함")
+        # Jinja 주석은 렌더되지 않으므로 검사 대상이 아니다 — 주석은 **왜 뺐는지**를 설명하며
+        # 기관명을 그대로 인용하고 있어서, 걷어내지 않으면 이 가드가 자기 설명에 걸린다.
+        block = re.sub(r"\{#.*?#\}", "", foot.group(0), flags=re.S)
+        # 소스 기관명이 푸터에 다시 나열되면 그 순간 두 번째 손목록이 생긴다.
+        for token in ("EudraGMDP", "OpenFDA", "PIC/S", "Health Canada"):
+            self.assertNotIn(token, block,
+                             f"푸터에 소스 나열이 되살아났다({token}) — 목록은 마퀴 하나만 둔다")
+        # 대신 소스를 집계해 보여주는 면으로 가는 링크가 있어야 한다(설명 없는 삭제 금지).
+        self.assertIn("findings/coverage/index.html", block)
 
     def test_marquee_source_count_matches_chips(self):
         """랜딩 마퀴 '수집 대상 — N sources' 의 N 이 실제 표기 소스 칩 수와 일치해야 한다

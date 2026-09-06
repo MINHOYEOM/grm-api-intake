@@ -13320,17 +13320,29 @@ class WebAboutTest(unittest.TestCase):
         self.assertIn("data-feedback-mount", main)             # 문의 버튼은 JS 가 얹는 자리
         self.assertNotIn('class="about-fb"', main)             # 정적 HTML 엔 버튼 없음(JS 미실행 = 흔적 0)
 
-    def test_contact_links_only_when_configured(self):
-        # 기본(contact.json 빈 값) 빌드 — 링크도 아이콘도 없다(죽은 링크 금지). 값이 있으면 소개
-        # 페이지와 전 페이지 푸터 법적 줄에 함께 나온다(같은 env.globals 값).
-        self.assertNotIn("ti-brand-linkedin", self.html)
-        self.assertNotIn("mailto:", self.html)
-        self.assertNotIn('class="foot-contact"', self.landing)
+    def test_contact_links_come_from_the_data_file(self):
+        """정본(contact.json)에 있는 주소가 소개 페이지와 전 페이지 푸터에 **같은 값**으로
+        나온다 — 두 자리가 env.globals["contact"] 하나를 보므로 갈라질 수 없다. 주소를
+        테스트에 다시 적지 않는다(적으면 정본을 바꿀 때마다 여기도 고쳐야 하고, 그 손질을
+        잊으면 가드가 낡는다 — 이 저장소의 손목록 금지 규율)."""
+        contact = render.load_contact()
+        self.assertTrue(contact, "contact.json 이 비었다 — 값을 지우려면 이 테스트도 함께 본다")
+        for value, page in ((contact["linkedin"], self.html), (contact["linkedin"], self.landing)):
+            self.assertIn(f'href="{value}" target="_blank" rel="me noopener"', page)
+        for page in (self.html, self.landing):
+            self.assertIn(f'href="mailto:{contact["email"]}"', page)
+        self.assertIn('class="foot-ico"', self.landing)      # 푸터 법적 줄 아이콘
+        self.assertIn('class="about-act"', self.html)        # 소개 페이지 버튼
+        # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
+        self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
+
+    def test_contact_links_vanish_when_data_file_is_empty(self):
+        """정본이 비면 링크도 아이콘도 남지 않는다(죽은 링크 금지 — share 버튼 선례).
+        빈 값에 `#` 이나 빈 href 를 남기면 화면엔 버튼이 보이는데 눌러도 아무 일이 없다."""
         c0 = render.load_contact
-        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_about_contact_"))
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_about_nocontact_"))
         try:
-            render.load_contact = lambda path=None: {
-                "linkedin": "https://www.linkedin.com/in/example/", "email": "hello@example.com"}
+            render.load_contact = lambda path=None: {}
             out = tmp / "out"
             render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
             about = (out / "about" / "index.html").read_text(encoding="utf-8")
@@ -13338,10 +13350,11 @@ class WebAboutTest(unittest.TestCase):
         finally:
             render.load_contact = c0
             shutil.rmtree(tmp, ignore_errors=True)
-        self.assertIn('href="https://www.linkedin.com/in/example/" target="_blank" rel="me noopener"', about)
-        self.assertIn('href="mailto:hello@example.com"', about)
-        self.assertIn('class="foot-ico" href="https://www.linkedin.com/in/example/"', landing)
-        self.assertIn('class="foot-ico" href="mailto:hello@example.com"', landing)
+        for page in (about, landing):
+            self.assertNotIn("ti-brand-linkedin", page)
+            self.assertNotIn("mailto:", page)
+            self.assertNotIn('class="foot-contact"', page)
+        self.assertIn("data-feedback-mount", about)   # 문의 버튼 자리는 남는다(JS 주입)
 
     def test_load_contact_validates_shape(self):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_contact_"))

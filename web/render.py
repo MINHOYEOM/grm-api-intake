@@ -60,6 +60,14 @@ GUIDE_FILE = WEB_DIR / "data" / "guide_content.md"   # [이용안내] 본문 마
 # 두 언어판의 목차·딥링크가 갈라진다 — `WebGuideEnTest` 가 모양을 고정한다).
 # ★파일이 없으면 영어 이용안내는 **조용히 0장**이다(load_guide 의 부재 관례 그대로).
 GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
+# [소개 2026-09-06] 소개 페이지(/about/) 본문 — 이용안내와 같은 제한 md 서브셋·같은 부재 관례.
+# `# ` 한 줄 = 제목, 첫 `## ` 앞 문단 = 리드, `## ` 마다 한 블록(왼쪽 레이블 + 본문).
+# 영문 파일은 번역본이 아니라 또 하나의 정본이며 h2 순서가 같아야 한다(WebAboutTest 가 고정).
+ABOUT_FILE = WEB_DIR / "data" / "about_content.md"
+ABOUT_EN_FILE = WEB_DIR / "data" / "about_content_en.md"
+# [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 LinkedIn·이메일. 값이 비어 있으면
+# 그 링크는 **그리지 않는다**(죽은 링크 금지). 사이트에 그대로 실리므로 공개 주소만 넣는다.
+CONTACT_FILE = WEB_DIR / "data" / "contact.json"
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
 GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전→사례] 용어별 findings 검색 건수 커밋 데이터
 # 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
@@ -1236,6 +1244,68 @@ def render_guide_html(md_text: str) -> tuple[str, list[dict[str, str]], Markup]:
 def load_guide(path: Path = GUIDE_FILE) -> str | None:
     """[이용안내] 본문 md 로드(파일 부재 시 None → 페이지 조용히 생략)."""
     return path.read_text(encoding="utf-8") if path.is_file() else None
+
+
+def load_contact(path: Path = CONTACT_FILE) -> dict[str, str]:
+    """[소개] 연락처 로드 — 비어 있지 않은 값만 남긴다(빈 값 = 그 링크 미출력).
+
+    허용 키는 linkedin·email 둘뿐이고 값은 문자열이어야 한다. 모르는 키·다른 형·모양이
+    아닌 값은 조용히 무시하지 않고 실패한다 — 운영자가 오타를 낸 자리를 렌더가 숨기면
+    사이트에 잘못된 주소가 그대로 실린다.
+    """
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or set(data) - {"linkedin", "email"}:
+        raise ValueError(f"contact.json 은 linkedin·email 두 키만 허용한다: {path}")
+    out: dict[str, str] = {}
+    for key, val in data.items():
+        if not isinstance(val, str):
+            raise ValueError(f"contact.json 값은 문자열이어야 한다: {key}={val!r}")
+        val = val.strip()
+        if not val:
+            continue
+        if key == "linkedin" and not val.startswith("https://"):
+            raise ValueError(f"linkedin 은 https:// 절대 URL 이어야 한다: {val!r}")
+        if key == "email" and ("@" not in val or any(c in val for c in " /<>\"'")):
+            raise ValueError(f"email 모양이 아니다: {val!r}")
+        out[key] = val
+    return out
+
+
+def render_about_html(md_text: str) -> tuple[str, Markup, list[dict[str, Any]]]:
+    """[소개] 제한 md 서브셋 → (제목, 리드 HTML, 블록 목록). 순수·결정론.
+
+    이용안내 변환기(render_guide_html)를 그대로 쓰되 모양만 다르다 — 소개 페이지는 목차가
+    달린 긴 문서가 아니라 **왼쪽 레이블 + 오른쪽 본문** 블록 몇 개다. 그래서 `## ` 단위로
+    잘라 조각마다 변환한다(조각 안에는 `#`/`##` 가 없어 제목·목차가 비고 본문만 나온다).
+    · `# ` 한 줄 = 페이지 제목(page-head h1)
+    · 첫 `## ` 앞의 문단 = 리드(page-head 아래 문단)
+    · `## ` 마다 {id: "sec-N", title, body} — 레이블은 h2 평문, 본문은 변환된 HTML
+    """
+    title = ""
+    lead_lines: list[str] = []
+    chunks: list[dict[str, Any]] = []
+    cur: dict[str, Any] | None = None
+    for raw in md_text.split("\n"):
+        line = raw.rstrip()
+        if line.startswith("# "):
+            title = line[2:].strip()
+        elif line.startswith("## "):
+            cur = {"id": f"sec-{len(chunks) + 1}",
+                   "title": _MD_CODE_RE.sub(r"\1", _MD_BOLD_RE.sub(r"\1", line[3:])).strip(),
+                   "lines": []}
+            chunks.append(cur)
+        elif cur is None:
+            lead_lines.append(raw)
+        else:
+            cur["lines"].append(raw)
+    _, _, lead = render_guide_html("\n".join(lead_lines))
+    sections = []
+    for c in chunks:
+        _, _, body = render_guide_html("\n".join(c["lines"]))
+        sections.append({"id": c["id"], "title": c["title"], "body": body})
+    return title, lead, sections
 
 
 # ── [용어사전] 초성 색인 그룹핑(결정론 — 데이터 파생, 분류 창작 0) ──────────────
@@ -3157,6 +3227,8 @@ EN_TREE_STATIC: tuple[str, ...] = (
     # 아래 EN_TREE_DATA_GATED 참조: 정본이 없으면 이 두 줄은 집합에서 빠진다.
     "guide/",
     "quiz/",
+    # [소개 2026-09-06] 소개 페이지 — 영문 정본(about_content_en.md)이 있을 때만.
+    "about/",
 )
 
 
@@ -3164,7 +3236,7 @@ EN_TREE_STATIC: tuple[str, ...] = (
 #   선언이 아니라 데이터가 정한다 — 정본 파일이 없는데 선언만 남으면 nav·푸터·sitemap 이
 #   404 를 광고한다(이 저장소가 "손목록 금지"로 굳힌 자리). 선언은 위 한 곳에 두되
 #   `en_tree_paths()` 가 실제 가용성으로 걸러 내보낸다.
-EN_TREE_DATA_GATED: frozenset[str] = frozenset({"guide/", "quiz/"})
+EN_TREE_DATA_GATED: frozenset[str] = frozenset({"guide/", "quiz/", "about/"})
 
 
 # ★sitemap 에서 빼는 경로 — 한국어 트리와 **같은 정책**이어야 한다. 실사관 프로파일은
@@ -3197,20 +3269,22 @@ def clause_tree_paths(views: "list[dict[str, Any]] | None") -> "set[str]":
 
 def en_tree_paths(catalogs: "list[dict[str, Any]] | None" = None, *,
                   guide_en: "str | None" = None,
-                  quiz_en: "list[dict[str, Any]] | None" = None) -> set[str]:
+                  quiz_en: "list[dict[str, Any]] | None" = None,
+                  about_en: "str | None" = None) -> set[str]:
     """영어 트리 경로 집합 — 정적 목록 + 실제로 로드된 자료실 카탈로그.
 
     카탈로그는 데이터 파일이 있는 것만 렌더되므로(`load_library`), 그 결과에서 파생해야
     "sitemap 에는 있는데 파일이 없다"가 생기지 않는다(손목록 금지 규율).
 
-    ★`guide_en`·`quiz_en` 은 **렌더가 실제로 쓸 값 그대로** 받는다(본문 md·문항 뱅크).
-      "있다/없다"를 호출부가 따로 판단해 boolean 으로 넘기면 그 판단이 렌더의 판단과
-      갈라질 수 있다 — 같은 값을 보게 해서 갈라질 자리를 없앤다. 기본값(None)은 정본
-      부재와 같으므로, 이 인자를 모르는 호출부는 두 면을 선언하지 않는다.
+    ★`guide_en`·`quiz_en`·`about_en` 은 **렌더가 실제로 쓸 값 그대로** 받는다(본문 md·
+      문항 뱅크). "있다/없다"를 호출부가 따로 판단해 boolean 으로 넘기면 그 판단이 렌더의
+      판단과 갈라질 수 있다 — 같은 값을 보게 해서 갈라질 자리를 없앤다. 기본값(None)은
+      정본 부재와 같으므로, 이 인자를 모르는 호출부는 그 면을 선언하지 않는다.
     """
     available = {
         "guide/": bool(guide_en),
         "quiz/": any(quiz_has_english(q) for q in (quiz_en or [])),
+        "about/": bool(about_en),
     }
     # 선언(EN_TREE_DATA_GATED)과 판정(available)이 갈라지면 즉시 실패한다 — 게이트 목록에
     # 경로만 늘리고 판정을 안 붙이면 그 면은 **정본 없이도 광고된다**(조용한 404). 반대로
@@ -3559,6 +3633,7 @@ def build_llms_txt(briefs: list[dict[str, Any]],
         " 공식 원문 링크",
         f"- [이용안내]({base_url}/guide/): 서비스 활용법과 자주 묻는 질문",
         f"- [주간 퀴즈]({base_url}/quiz/): 그 주 규제 소식 기반 학습 퀴즈",
+        f"- [소개]({base_url}/about/): 서비스를 만든 이유와 만드는 방식, 연락처",
     ]
     lines += _llms_english_section(base_url, en_paths or set())
     return "\n".join(lines) + "\n"
@@ -3598,6 +3673,7 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
     ("archive/", "Weekly brief archive", "Past weekly regulatory briefs"),
     ("guide/", "Guide", "How to use the service, and frequently asked questions"),
     ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),
+    ("about/", "About", "Why the service exists, how it is made, and how to get in touch"),
 )
 
 
@@ -3681,6 +3757,8 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         # [이용안내·용어사전] 트랙 C 2차 웨이브 — library 와 동일하게 브리프 발행일과
         # 분리된 상설 참조 콘텐츠라 lastmod 는 생략(정적 커밋 데이터).
         f"  <url><loc>{base_url}/guide/</loc></url>",
+        # [소개 2026-09-06] 정적 커밋 콘텐츠 — 이용안내와 같은 근거로 lastmod 생략.
+        f"  <url><loc>{base_url}/about/</loc></url>",
         f"  <url><loc>{base_url}/glossary/</loc></url>",
         # [용어사전 낱개] 색인 페이지 1건만 등록하면 226 어가 URL 하나에 묶여 검색 대상이
         # 되지 못한다("OOS 뜻"·"CAPA 란"). 용어당 URL 을 등록해 각 용어가 독립 색인 대상이
@@ -3919,6 +3997,9 @@ LIBRARY_DESCRIPTION = N_("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내�
                          "기준서를 한곳에 모은 규제 자료실 — 공식 원문 링크와 함께 언제든 다시 찾아보세요.")
 GUIDE_DESCRIPTION = N_("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
                        "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
+# [소개 2026-09-06] 소개 페이지 meta description — 본문(about_content.md)과 별개의 짧은 문장.
+ABOUT_DESCRIPTION = N_("GRM 소개 — 쏟아지는 규제 소식을 매주 읽을 수 있는 크기로 정리하는 "
+                       "서비스를 만든 이유와 만드는 방식, 연락처.")
 # [다국어 2026-09-05] 채널 문구도 사전을 탄다. 종전 주석은 "RSS 는 한국어 채널이라
 # 그대로 둔다(영어 피드는 별도 결정)"였는데, 영문 브리프 10호가 서면서 그 결정을 내릴
 # 때가 됐다 — 그때까지 **영어 4천 장이 전부 한국어 피드를 자기 대체본이라고 말하고
@@ -4087,6 +4168,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"
     env.globals["og_locale"] = LANG_OG_LOCALE[lang]
+    # [소개 2026-09-06] 연락처(LinkedIn·이메일) — 푸터 법적 줄(전 페이지)과 소개 페이지가
+    # 같은 값을 본다. 빈 값은 load_contact 가 걸러 내므로 템플릿의 {% if %} 가 링크를
+    # 통째로 생략한다(죽은 링크 금지). 영어 env 는 아래 setdefault 복사로 같은 값을 받는다.
+    env.globals["contact"] = load_contact()
     # RUM 비콘 게이트(base.html)의 프로덕션 호스트 허용목록 — SITE_BASE_URL 파생(단일원천:
     # 커스텀 도메인 교체 시 SITE_BASE_URL 한 줄만 바꾸면 게이트도 따라온다).
     env.globals["site_host"] = SITE_BASE_URL.split("://", 1)[-1].split("/", 1)[0]
@@ -4248,8 +4333,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     guide_md = load_guide()
     guide_md_en = load_guide(GUIDE_EN_FILE)
     quiz_bank = load_quiz_bank()
+    # [소개 2026-09-06] 같은 이유로 소개 본문도 여기서 읽는다(영문 정본 유무 = en 면 유무).
+    about_md = load_guide(ABOUT_FILE)
+    about_md_en = load_guide(ABOUT_EN_FILE)
     # [다국어 3단계] 영어 트리 경로 확정 — 여기부터 모든 렌더가 이 집합을 본다(위 선언 참조).
-    en_paths = en_tree_paths(catalogs, guide_en=guide_md_en, quiz_en=quiz_bank)
+    en_paths = en_tree_paths(catalogs, guide_en=guide_md_en, quiz_en=quiz_bank,
+                             about_en=about_md_en)
     library_updates = load_library_updates(catalogs)
     # [다국어 2026-09-05] 영어 카탈로그·변경 이력 뷰는 **여기서 함께** 만든다. 자료실
     # 허브(트리 끝)뿐 아니라 아카이브·브리프 상세(트리 앞쪽)도 이 값을 쓰기 때문이다 —
@@ -4595,6 +4684,20 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             guide_toc=guide_toc,
             guide_body=guide_body,
             glossary_link=bool(glossary_terms),
+        )
+
+    # [소개 2026-09-06] 소개 페이지 — about_content.md(정본). 이용안내와 같은 관례(커밋
+    # 콘텐츠·골든 고정·파일 부재 시 조용히 생략). nav 탭은 늘리지 않는다 — 진입은 전 페이지
+    # 푸터 '서비스' 열의 '소개'다. 연락처(LinkedIn·이메일)는 env.globals["contact"] 가 준다.
+    if about_md:
+        about_title, about_lead, about_sections = render_about_html(about_md)
+        emit("about.html", page("about/"),
+            page_title=tr("소개 · GRM"),
+            nav_active="about",
+            description=tr(ABOUT_DESCRIPTION),
+            about_title=about_title,
+            about_lead=about_lead,
+            about_sections=about_sections,
         )
 
     # 용어사전(트랙 C 2차 웨이브) — glossary.json(정본)을 초성 색인 1페이지로 결정론 렌더.
@@ -5509,6 +5612,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             guide_body=en_guide_body,
             # 영어 트리에는 용어사전이 없다 — 없는 페이지로 보내는 상자를 그리지 않는다.
             glossary_link="glossary/" in en_paths,
+        )
+
+    # [소개 2026-09-06] 영문 소개 — 영문 정본(about_content_en.md)이 있을 때만(이용안내 동형).
+    if about_md_en:
+        en_about_title, en_about_lead, en_about_sections = render_about_html(about_md_en)
+        en_emit("about.html", en_page("about/"),
+            page_title=en_tr("소개 · GRM"),
+            nav_active="about",
+            description=en_tr(ABOUT_DESCRIPTION),
+            about_title=en_about_title,
+            about_lead=en_about_lead,
+            about_sections=en_about_sections,
         )
 
     # [다국어 2026-09-05] 주간 퀴즈 — 영문 세 필드가 다 있는 문항만(`quiz_has_english`).

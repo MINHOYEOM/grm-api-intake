@@ -19,10 +19,12 @@ from __future__ import annotations
 
 import collections
 import json
+import os
 import pathlib
 import posixpath
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -250,6 +252,8 @@ SINGLE_GOLDENS = [
     # 문구 사전만으로는 무엇이 실리는지 드러나지 않는다. 두 장을 바이트로 잠근다.
     ("en/guide/index.html", "en_guide.expected.html"),
     ("en/quiz/index.html", "en_quiz.expected.html"),
+    # [소개 2026-09-06] 소개 페이지 영문판 — 본문 정본이 데이터에 따로 있어 골든이 정본.
+    ("en/about/index.html", "en_about.expected.html"),
     ("archive/index.html", "archive.expected.html"),
     ("findings/index.html", "findings.expected.html"),
     # [2면 분리 2026-08-27] 둘러보기 면 — 위 주석 그대로: 손열거라 여기 없으면 골든 없이 산다.
@@ -276,6 +280,7 @@ SINGLE_GOLDENS = [
     ("library/cfr/index.html", "library_cfr.expected.html"),
     ("library/mhra/index.html", "library_mhra.expected.html"),
     ("guide/index.html", "guide.expected.html"),
+    ("about/index.html", "about.expected.html"),
     ("glossary/index.html", "glossary.expected.html"),
     ("quiz/index.html", "quiz.expected.html"),
     ("briefs/2026-06-22/index.html", "brief_2026-06-22.expected.html"),
@@ -8709,7 +8714,7 @@ class WebGlossaryRenderTest(unittest.TestCase):
         self.assertIn('<meta name="description" content="', self.html)
 
     def test_sitemap_includes_guide_and_glossary(self):
-        for path in ("/guide/", "/glossary/"):
+        for path in ("/guide/", "/glossary/", "/about/"):
             self.assertIn(f"<loc>{render.SITE_BASE_URL}{path}</loc>", self.sitemap)
 
     def test_grm_css_untouched_by_glossary(self):
@@ -13388,6 +13393,171 @@ console.log(JSON.stringify(out));
         self.assertEqual(out["empty"], "unknown")
 
 
+class WebAboutTest(unittest.TestCase):
+    """[소개 2026-09-06] /about/ + 푸터 정리. 소개 페이지는 about_content.md(정본)를
+    render_about_html 이 제목·리드·블록으로 잘라 렌더한다. 바이트는 골든(about.expected.html·
+    en_about.expected.html)이 잠그고, 여기선 배선·정책만 본다 — 실명·낡는 숫자 없음, 연락
+    링크는 contact.json 에 값이 있을 때만, nav 6탭 불변, 푸터는 브랜드 + 링크 열 셋."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_about_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "about" / "index.html").read_text(encoding="utf-8")
+        cls.en_html = (cls.single / "en" / "about" / "index.html").read_text(encoding="utf-8")
+        cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.trends = (cls.single / "findings" / "trends" / "index.html").read_text(encoding="utf-8")
+        cls.md = render.ABOUT_FILE.read_text(encoding="utf-8")
+        cls.md_en = render.ABOUT_EN_FILE.read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_title_and_sections_from_markdown(self):
+        title = next(ln[2:].strip() for ln in self.md.splitlines() if ln.startswith("# "))
+        self.assertIn(f">{title}</h1>", self.html)
+        self.assertNotIn(f"<h1>{title}</h1>", self.html)   # md h1 이 본문에 재출력되지 않음
+        # 본문 블록 = md 의 ## 수. 연락 블록(id="contact")은 템플릿이 하나 더 붙인다.
+        n_h2 = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
+        self.assertEqual(self.html.count('<section class="about-sec" id="sec-'), n_h2)
+        self.assertEqual(self.html.count('<section class="about-sec" id="contact">'), 1)
+
+    def test_en_is_a_separate_source_with_same_shape(self):
+        # 영문은 번역본이 아니라 같은 h2 구조의 다른 정본 — 블록 수가 같아야 딥링크(sec-N)가 맞는다.
+        n_ko = sum(1 for ln in self.md.splitlines() if ln.startswith("## "))
+        n_en = sum(1 for ln in self.md_en.splitlines() if ln.startswith("## "))
+        self.assertEqual(n_ko, n_en)
+        self.assertEqual(self.en_html.count('<section class="about-sec" id="sec-'), n_en)
+        main = self.en_html[self.en_html.index("<main>"):self.en_html.index("</main>")]
+        self.assertNotRegex(main, r"[가-힣]")   # 영어 면 본문에 한글 잔존 0
+
+    def test_no_operator_name_and_no_perishable_numbers(self):
+        # 사용자 결정(2026-09-06): 실명을 싣지 않는다. 문서·지적 수 같은 숫자도 늘 낡아 싣지 않는다.
+        main = self.html[self.html.index("<main>"):self.html.index("</main>")]
+        self.assertNotRegex(main, r"\d{1,3}(,\d{3})+")   # 6,158 같은 수 없음
+        self.assertNotIn("data-feedback-mount", self.landing)   # 연락 블록은 소개 페이지에만
+        self.assertIn("data-feedback-mount", main)             # 문의 줄은 JS 가 얹는 자리
+        self.assertNotIn("about-fb", main)                     # 정적 HTML 엔 줄 없음(JS 미실행 = 흔적 0)
+
+    def test_contact_links_come_from_the_data_file(self):
+        """정본(contact.json)에 있는 주소가 소개 페이지와 전 페이지 푸터에 **같은 값**으로
+        나온다 — 두 자리가 env.globals["contact"] 하나를 보므로 갈라질 수 없다. 주소를
+        테스트에 다시 적지 않는다(적으면 정본을 바꿀 때마다 여기도 고쳐야 하고, 그 손질을
+        잊으면 가드가 낡는다 — 이 저장소의 손목록 금지 규율)."""
+        contact = render.load_contact()
+        self.assertTrue(contact, "contact.json 이 비었다 — 값을 지우려면 이 테스트도 함께 본다")
+        for value, page in ((contact["linkedin"], self.html), (contact["linkedin"], self.landing)):
+            self.assertIn(f'href="{value}" target="_blank" rel="me noopener"', page)
+        for page in (self.html, self.landing):
+            self.assertIn(f'href="mailto:{contact["email"]}"', page)
+        self.assertIn('class="foot-ico"', self.landing)      # 푸터 법적 줄 아이콘
+        self.assertIn('class="ac-row"', self.html)           # 소개 페이지 채널 줄
+        # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
+        self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
+
+    def test_each_contact_channel_says_what_it_is_for(self):
+        """[연락 2026-09-06] 줄마다 이름 + 쓰임이 함께 있다 — 이름만 적힌 알약 셋으로
+        돌아가지 않는다. 어느 쪽으로 보내야 하는지가 화면에 없으면 채널이 셋이어도
+        고를 수가 없다(그게 '연락 블록이 부족하다'의 실체였다)."""
+        rows = re.findall(r'<a class="ac-row".*?</a>', self.html, re.S)
+        self.assertGreaterEqual(len(rows), 2, "정적 채널 줄이 둘 미만(이메일·LinkedIn)")
+        for row in rows:
+            self.assertRegex(row, r"<b>[^<]+</b>", f"이름 없는 줄: {row[:120]}")
+            self.assertRegex(row, r"<span>[^<]+</span>", f"쓰임 없는 줄: {row[:120]}")
+        # 목록 밖에 알약이 남아 있지 않다(종전 `.about-acts` 잔재 금지).
+        self.assertNotIn("about-acts", self.html)
+        self.assertNotIn("about-act", self.html)
+
+    def test_feedback_row_copy_lives_in_the_template(self):
+        """문의 줄의 이름·쓰임은 **템플릿이 정한다**(`data-fb-*`). feedback.js 가 그 줄을
+        런타임에 얹지만, 문안까지 JS 가 들고 있으면 이 페이지의 연락 문구를 고칠 자리가
+        두 파일로 갈라진다. JS 는 속성을 읽기만 하고, 없을 때만 푸터와 같은 사전 키로
+        떨어진다(새 키를 만들지 않는다)."""
+        self.assertIn('data-fb-name="문의 및 제안"', self.html)
+        self.assertRegex(self.html, r'data-fb-desc="[^"]+"')
+        js = (WEB_DIR / "assets" / "feedback.js").read_text(encoding="utf-8")
+        self.assertIn('getAttribute("data-fb-name")', js)
+        self.assertIn('getAttribute("data-fb-desc")', js)
+        # 영어 면은 같은 자리에서 영어 문구를 받는다(사전을 타므로 JS 하드코딩이 아니다).
+        self.assertIn('data-fb-name="Contact and suggestions"', self.en_html)
+        self.assertNotRegex(re.search(r'data-fb-desc="([^"]*)"', self.en_html).group(1),
+                            r"[가-힣]")
+
+    def test_contact_links_vanish_when_data_file_is_empty(self):
+        """정본이 비면 링크도 아이콘도 남지 않는다(죽은 링크 금지 — share 버튼 선례).
+        빈 값에 `#` 이나 빈 href 를 남기면 화면엔 버튼이 보이는데 눌러도 아무 일이 없다."""
+        c0 = render.load_contact
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_about_nocontact_"))
+        try:
+            render.load_contact = lambda path=None: {}
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            about = (out / "about" / "index.html").read_text(encoding="utf-8")
+            landing = (out / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.load_contact = c0
+            shutil.rmtree(tmp, ignore_errors=True)
+        for page in (about, landing):
+            self.assertNotIn("ti-brand-linkedin", page)
+            self.assertNotIn("mailto:", page)
+            self.assertNotIn('class="foot-contact"', page)
+        self.assertIn("data-feedback-mount", about)   # 문의 버튼 자리는 남는다(JS 주입)
+
+    def test_load_contact_validates_shape(self):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_contact_"))
+        try:
+            p = tmp / "contact.json"
+            p.write_text('{"linkedin": "", "email": "  "}', encoding="utf-8")
+            self.assertEqual(render.load_contact(p), {})           # 빈 값 = 없음
+            p.write_text('{"linkedin": "linkedin.com/in/x", "email": ""}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                render.load_contact(p)                             # https:// 없는 주소
+            p.write_text('{"linkedin": "", "email": "not-an-email"}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                render.load_contact(p)
+            p.write_text('{"twitter": "x"}', encoding="utf-8")
+            with self.assertRaises(ValueError):
+                render.load_contact(p)                             # 모르는 키
+            self.assertEqual(render.load_contact(tmp / "absent.json"), {})
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_footer_is_brand_plus_three_link_columns(self):
+        foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
+        self.assertEqual(re.findall(r"<h5>([^<]+)</h5>", foot), ["콘텐츠", "도구", "서비스"])
+        self.assertNotIn("<span>", foot)                            # 클릭 안 되는 라벨 열 0
+        self.assertIn('<p class="foot-src"><b>Sources</b>', foot)   # 소스는 브랜드 아래 한 줄
+        self.assertIn('href="../../about/index.html">소개</a>', foot)
+        self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
+        self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
+        self.assertIn("<div data-feedback-slot>", foot)              # 문의 링크가 얹힐 열
+        self.assertNotIn("repeat(4,1fr)", self.trends)               # 5열 시절 override 제거
+        self.assertNotIn("AI-generated from primary sources", self.trends)   # 중복 prov 삭제
+
+    def test_nav_unchanged_six_tabs_and_about_lights_none(self):
+        nav = self.html[self.html.index('<nav id="navmenu">'):]
+        nav = nav[:nav.index("</nav>")]
+        self.assertEqual(nav.count("<a "), 6)
+        self.assertNotIn("about/", nav)
+        self.assertNotIn('class="on"', nav)
+
+    def test_sitemap_and_llms_list_about(self):
+        sitemap = (self.single / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/about/</loc>", sitemap)
+        self.assertIn(f"<loc>{render.SITE_BASE_URL}/en/about/</loc>", sitemap)
+        llms = (self.single / "llms.txt").read_text(encoding="utf-8")
+        self.assertIn(f"({render.SITE_BASE_URL}/about/)", llms)
+        self.assertIn(f"({render.SITE_BASE_URL}/en/about/)", llms)
+
+    def test_feedback_js_finds_slot_by_attribute_not_heading_text(self):
+        js = (WEB_DIR / "assets" / "feedback.js").read_text(encoding="utf-8")
+        self.assertIn("[data-feedback-slot]", js)
+        self.assertIn("[data-feedback-mount]", js)
+        self.assertNotIn('_t("안내")', js)   # 열 제목 문자열 매칭은 언어·문구 변경에 조용히 깨진다
+
+
 class WebSourceCopyConsistencyTest(unittest.TestCase):
     """[재발 방지 가드 2026-07] 새 규제 소스를 추가할 때 코드(수집기·DB)만 고치고 사이트
     설명·마퀴 갱신을 빠뜨리던 문제를 CI 에서 잡는다 — EU/영국 GMP 비준수(EudraGMDP·MHRA)
@@ -13410,17 +13580,12 @@ class WebSourceCopyConsistencyTest(unittest.TestCase):
         track = re.search(r'class="track">(.*?)</div>', landing, re.S)
         self.assertIsNotNone(track, "마퀴 track 을 찾지 못함")
         marquee = {norm(s.replace("\xa0", " ").strip()) for s in re.findall(r"<span>([^<]+)</span>", track.group(1))}
-        # [i18n 2단계] 템플릿 원문은 {{ _("수집 소스") }} 로 감싸져 있다.
-        foot = re.search(r'<h5>\{\{ _\("수집 소스"\) \}\}</h5>(.*?)</div>', base, re.S)
-        self.assertIsNotNone(foot, "푸터 '수집 소스' 블록을 찾지 못함")
-        footer = set()
-        # [i18n 2단계] 한글이 섞인 span 은 {{ _("…") }} 로 감싸져 있다 — 안쪽 원문만 꺼낸다.
-        i18n_span = re.compile(r'^\{\{ _\("(.*)"\) \}\}$')
-        for chunk in re.findall(r"<span>([^<]+)</span>", foot.group(1)):
-            im = i18n_span.match(chunk)
-            if im:
-                chunk = im.group(1)
-            footer.update(norm(x.strip()) for x in chunk.replace("\xa0", " ").split("·"))
+        # [푸터 정리 2026-09-06] 소스 목록은 열이 아니라 브랜드 아래 한 줄(.foot-src)이다.
+        # 한글 기관명은 {{ _("…") }} 로 감싸져 있다 — 안쪽 원문만 꺼낸 뒤 '·' 로 가른다.
+        foot = re.search(r'<p class="foot-src"><b>[^<]*</b>(.*?)</p>', base, re.S)
+        self.assertIsNotNone(foot, "푸터 소스 줄(.foot-src)을 찾지 못함")
+        line = re.sub(r'\{\{ _\("(.*?)"\) \}\}', r"\1", foot.group(1))
+        footer = {norm(x.strip()) for x in line.replace("\xa0", " ").split("·")}
         self.assertEqual(marquee, footer,
                          f"마퀴에만: {sorted(marquee - footer)} / 푸터에만: {sorted(footer - marquee)}")
 
@@ -14728,6 +14893,125 @@ class WebGlossaryRelatedCaseCountTest(unittest.TestCase):
         self.assertNotIn("gt-rel-n", index)
         self.assertNotIn("사례 1,", index)
 
+
+class WebAdminSearchConsolePanelTest(unittest.TestCase):
+    """[078] /admin 검색어 표 — "무슨 말로 검색해 들어오나".
+
+    RUM 은 "google.com 에서 왔다"까지만 안다. 사용자가 실제로 무엇을 검색했는지는
+    Search Console 에만 있고, 이 표가 없으면 매일 아침 보고를 기다리는 것 말고는
+    볼 방법이 없다(2026-09-06 사용자 요청).
+
+    ★이 표의 고유 위험은 **비율의 산술**이다. 클릭률과 평균 순위는 날짜·검색어마다
+    분모가 다르므로, 그냥 평균 내면 노출 10 인 날과 1,000 인 날이 같은 무게가 되어
+    조용히 틀린 수가 나온다. 표가 그려지는지보다 **수가 맞는지**를 잠근다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "admin.js").read_text(encoding="utf-8")
+        cls.html = (WEB_DIR / "templates" / "admin.html").read_text(encoding="utf-8")
+
+    def test_panel_is_wired_end_to_end(self):
+        for needle in ('id="grm-gsc-queries"', 'id="grm-gsc-zones"', 'id="grm-gsc-summary"'):
+            self.assertIn(needle, self.html, f"{needle} 가 화면에 없다")
+        for needle in ('from("gsc_daily")', 'from("gsc_query_daily")',
+                       'from("gsc_page_daily")', "function loadSearchConsole"):
+            self.assertIn(needle, self.js, f"{needle} 배선 없음")
+        refresh_all = self.js.split("function refreshAll", 1)[1].split("}", 1)[0]
+        self.assertIn("loadSearchConsole()", refresh_all,
+                      "refreshAll 이 안 부르면 표가 영원히 '불러오는 중'이다")
+
+    def test_ctr_is_derived_and_never_read_from_a_column(self):
+        """★클릭률을 저장된 값으로 읽으면 합칠 때 '평균의 평균'이 된다.
+
+        078 이 애초에 ctr 을 저장하지 않는 이유와 같다 — 화면도 같은 규율을 따라야
+        한다. select 목록에 ctr 이 끼어들면 여기서 걸린다.
+        """
+        for sel in re.findall(r'\.select\("([^"]*)"\)', self.js):
+            if "impressions" in sel:
+                self.assertNotIn("ctr", sel.split(","),
+                                 f"저장된 ctr 을 읽는다: {sel}")
+        self.assertIn("(clicks / impressions) * 100", self.js,
+                      "클릭률을 클릭÷노출로 만들지 않는다")
+
+    def test_average_position_is_impression_weighted(self):
+        """★순위는 노출 가중이라야 뜻이 맞는다 — 단순 평균이면 노출 1 짜리 검색어가
+        노출 1,000 짜리와 같은 무게를 갖는다."""
+        rollup = self.js.split("function gscRollup", 1)[1].split("\n  }", 1)[0]
+        self.assertRegex(rollup, r"posWeighted \+= \(r\.avg_position \|\| 0\) \* impr",
+                         "누적이 노출 가중이 아니다")
+        self.assertIn("weighted / impressions", self.js, "환산이 노출로 나누지 않는다")
+
+    @unittest.skipIf(shutil.which("node") is None, "node 없음")
+    def test_rollup_math_is_correct_when_executed(self):
+        """구조가 아니라 **결과**를 본다 — 함수를 떼어 node 로 돌리고 값을 대조한다."""
+        src = self.js
+        funcs = "".join(
+            src[src.index("function " + name):
+                src.index("\n  }", src.index("function " + name)) + 4]
+            for name in ("gscRate", "gscPos", "gscRollup"))
+        rows = ('[{query:"a",clicks:1,impressions:100,avg_position:10},'
+                ' {query:"a",clicks:3,impressions:900,avg_position:2},'
+                ' {query:"b",clicks:0,impressions:50,avg_position:5}]')
+        script = (funcs + "\n"
+                  "var out = gscRollup(" + rows + ", function (r) { return r.query; });\n"
+                  "var a = out.filter(function (x) { return x.key === 'a'; })[0];\n"
+                  "console.log(JSON.stringify({key: a.key, clicks: a.clicks,"
+                  " impressions: a.impressions,"
+                  " rate: gscRate(a.clicks, a.impressions),"
+                  " pos: gscPos(a.posWeighted, a.impressions),"
+                  " firstKey: out[0].key}));")
+        with tempfile.TemporaryDirectory() as tmp:
+            f = os.path.join(tmp, "t.js")
+            with open(f, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(script)
+            proc = subprocess.run([shutil.which("node"), f], capture_output=True,
+                                  text=True, encoding="utf-8", errors="replace")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        got = json.loads(proc.stdout.strip())
+        self.assertEqual(got["clicks"], 4)
+        self.assertEqual(got["impressions"], 1000)
+        # 클릭률 = 4/1000 = 0.4% (0.5%(=(1%+0.33%)/2 꼴의 평균의 평균)가 아니다)
+        self.assertAlmostEqual(got["rate"], 0.4, places=6)
+        # 순위 = (10*100 + 2*900)/1000 = 2.8 (단순 평균 6.0 이 아니다)
+        self.assertEqual(got["pos"], "2.8")
+        # 노출 많은 순 정렬 — 화면이 상위 20 만 그리므로 정렬이 곧 무엇이 보이나다.
+        self.assertEqual(got["firstKey"], "a")
+
+    def test_absence_is_not_reported_as_zero_traffic(self):
+        """★"아직 연결 안 됨"과 "검색 유입 0"은 다른 말이다 — 0 이라고 쓰면
+        성적이 나쁘다는 뜻이 되어 거짓 보고가 된다(078 의 connected:false 와 동형)."""
+        # ★주석을 먼저 걷어낸다 — 규칙을 설명하는 주석에 금지 문구가 그대로 들어
+        # 있어서, 그냥 검사하면 **자기 설명문에 걸린다**(실제로 걸렸다). 저장소에
+        # 같은 함정 전례가 있다: 078 의 "ctr 은 저장하지 않는다" 주석이 ctr 금지
+        # 검사에 걸렸다. 검사 대상은 **실행되는 코드**이지 그 옆의 설명이 아니다.
+        code = chr(10).join(ln for ln in self.js.splitlines()
+                            if not ln.lstrip().startswith("//"))
+        self.assertIn("아직 검색 데이터가 없습니다", code)
+        for banned in ("검색 유입 0", "검색 유입이 없습니다", "노출 0회"):
+            self.assertNotIn(banned, code, f"부재를 0 으로 보고한다: {banned}")
+
+    def test_screen_states_the_two_things_that_make_numbers_look_wrong(self):
+        """확정 지연(2~3일)과 희귀 검색어 익명화를 화면이 말해야 한다 — 둘 다
+        "표가 서로 안 맞는다"로 오해되는 정상 동작이다."""
+        panel = self.html.split('id="grm-gsc-summary"', 1)[0].rsplit("<h3>", 1)[1]
+        self.assertIn("2~3일", panel, "확정 지연 고지가 없다")
+        self.assertRegex(panel, r"희귀 검색어|적은 희귀", "익명화 고지가 없다")
+
+    def test_reads_are_signed_in_only_and_there_is_no_client_write_path(self):
+        """방문·검색 규모는 운영 지표다 — anon 공개인 funnel_counts 와 다르다."""
+        mig = (WEB_DIR / "migrations" / "078_search_console.sql").read_text(encoding="utf-8")
+        for table in ("gsc_daily", "gsc_query_daily", "gsc_page_daily"):
+            self.assertIn(f"grant select on public.{table} to authenticated", mig)
+            self.assertNotIn(f'from("{table}").insert', self.js)
+            self.assertNotIn(f'from("{table}").upsert', self.js)
+
+    def test_zone_labels_come_from_the_existing_single_source(self):
+        """구역 규칙 사본을 만들지 않는다 — 착지 페이지 표와 같은 rumZoneOf 를 쓴다.
+        사본을 들면 같은 경로가 두 표에서 다른 구역으로 찍힌다."""
+        load = self.js.split("function loadSearchConsole", 1)[1].split("\n  }", 1)[0]
+        self.assertIn("rumZoneOf(r.page_path)", load)
+        self.assertEqual(self.js.count("var RUM_ZONES = ["), 1, "구역 규칙 사본이 생겼다")
 
 class WebAdminRumPanelTest(unittest.TestCase):
     """[072] /admin 방문·유입 표 + Cloudflare RUM 수집기 계약.
@@ -16864,7 +17148,8 @@ class WebEnTreeTest(unittest.TestCase):
         cls.expected = render.en_tree_paths(
             render.load_library(),
             guide_en=render.load_guide(render.GUIDE_EN_FILE),
-            quiz_en=render.load_quiz_bank())
+            quiz_en=render.load_quiz_bank(),
+            about_en=render.load_guide(render.ABOUT_EN_FILE))
         if cls.en_docs:
             cls.expected |= {"findings/docs/", "findings/browse/"}
             cls.expected |= {f"findings/docs/{d['agency'].lower()}"

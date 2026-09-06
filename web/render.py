@@ -1294,6 +1294,15 @@ def load_contact(path: Path = CONTACT_FILE) -> dict[str, str]:
     return out
 
 
+# [소개] 본문 md 가 템플릿 위젯을 부르는 자리 — `## 만든 사람 {linkedin}` 처럼 제목 끝에
+# 적는다. 링크·버튼은 md 서브셋이 표현할 수 없어(링크 문법 없음) 템플릿이 그리는데, 그리는
+# **위치**까지 템플릿이 정하면 문안을 손보는 사람이 순서를 못 바꾼다. 슬롯은 섹션에 붙어
+# 다니므로 md 에서 절을 옮기면 위젯도 함께 옮겨간다. 모르는 이름은 조용히 무시하지 않고
+# 즉시 실패한다 — 오타 하나로 연락처가 통째로 사라지는 것이 가장 나쁜 결과다.
+ABOUT_SLOTS: frozenset[str] = frozenset({"linkedin", "contact"})
+_ABOUT_SLOT_RE = re.compile(r"\s*\{([a-z][a-z0-9-]*)\}\s*$")
+
+
 def render_about_html(md_text: str) -> tuple[str, Markup, list[dict[str, Any]]]:
     """[소개] 제한 md 서브셋 → (제목, 리드 HTML, 블록 목록). 순수·결정론.
 
@@ -1302,7 +1311,8 @@ def render_about_html(md_text: str) -> tuple[str, Markup, list[dict[str, Any]]]:
     잘라 조각마다 변환한다(조각 안에는 `#`/`##` 가 없어 제목·목차가 비고 본문만 나온다).
     · `# ` 한 줄 = 페이지 제목(page-head h1)
     · 첫 `## ` 앞의 문단 = 리드(page-head 아래 문단)
-    · `## ` 마다 {id: "sec-N", title, body} — 레이블은 h2 평문, 본문은 변환된 HTML
+    · `## ` 마다 {id: "sec-N", title, slot, body} — 레이블은 h2 평문, 본문은 변환된 HTML
+    · 제목 끝의 `{slot}` 은 그 절에 붙는 템플릿 위젯 이름(ABOUT_SLOTS)이며 제목에서 뗀다
     """
     title = ""
     lead_lines: list[str] = []
@@ -1313,9 +1323,17 @@ def render_about_html(md_text: str) -> tuple[str, Markup, list[dict[str, Any]]]:
         if line.startswith("# "):
             title = line[2:].strip()
         elif line.startswith("## "):
-            cur = {"id": f"sec-{len(chunks) + 1}",
-                   "title": _MD_CODE_RE.sub(r"\1", _MD_BOLD_RE.sub(r"\1", line[3:])).strip(),
-                   "lines": []}
+            head = _MD_CODE_RE.sub(r"\1", _MD_BOLD_RE.sub(r"\1", line[3:])).strip()
+            slot = ""
+            m = _ABOUT_SLOT_RE.search(head)
+            if m:
+                slot = m.group(1)
+                if slot not in ABOUT_SLOTS:
+                    raise ValueError(
+                        f"모르는 소개 슬롯: {{{slot}}} (허용: {sorted(ABOUT_SLOTS)}) — "
+                        f"절 제목: {head!r}")
+                head = head[:m.start()].strip()
+            cur = {"id": f"sec-{len(chunks) + 1}", "title": head, "slot": slot, "lines": []}
             chunks.append(cur)
         elif cur is None:
             lead_lines.append(raw)
@@ -1325,7 +1343,7 @@ def render_about_html(md_text: str) -> tuple[str, Markup, list[dict[str, Any]]]:
     sections = []
     for c in chunks:
         _, _, body = render_guide_html("\n".join(c["lines"]))
-        sections.append({"id": c["id"], "title": c["title"], "body": body})
+        sections.append({"id": c["id"], "title": c["title"], "slot": c["slot"], "body": body})
     return title, lead, sections
 
 
@@ -4061,8 +4079,8 @@ LIBRARY_DESCRIPTION = N_("FDA·EMA·식약처·PIC/S·ICH·WHO·PMDA 등 국내�
 GUIDE_DESCRIPTION = N_("GRM 이용 안내 — 월요일 브리프 3분 활용법, findings 검색 실전 예시, "
                        "자료실·용어사전·퀴즈 활용법과 자주 묻는 질문을 한곳에 정리했습니다.")
 # [소개 2026-09-06] 소개 페이지 meta description — 본문(about_content.md)과 별개의 짧은 문장.
-ABOUT_DESCRIPTION = N_("GRM 소개 — 쏟아지는 규제 소식을 매주 읽을 수 있는 크기로 정리하는 "
-                       "서비스를 만든 이유와 만드는 방식, 연락처.")
+ABOUT_DESCRIPTION = N_("Global Regulatory Monitor 소개 — 국내외 의약품 GMP·품질 규제 동향을 "
+                       "제공하는 무료 정보 서비스의 제공 정보, 운영 방식, 정보 제공 원칙과 문의처.")
 # [다국어 2026-09-05] 채널 문구도 사전을 탄다. 종전 주석은 "RSS 는 한국어 채널이라
 # 그대로 둔다(영어 피드는 별도 결정)"였는데, 영문 브리프 10호가 서면서 그 결정을 내릴
 # 때가 됐다 — 그때까지 **영어 4천 장이 전부 한국어 피드를 자기 대체본이라고 말하고

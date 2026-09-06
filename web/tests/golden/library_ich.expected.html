@@ -385,8 +385,9 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 @media (max-width:640px){ .lib-item-title{font-size:15px} }
 </style>
 <style>
-.foot .b1 .foot-src{font-size:12px;line-height:1.7;max-width:40ch;margin-top:18px;color:var(--band-mut);opacity:.75;word-break:keep-all}
-.foot .b1 .foot-src b{display:block;font-weight:600;font-size:11px;margin-bottom:2px}
+.foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
+.foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
+.foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}
 .foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
@@ -417,11 +418,11 @@ a.lib-item-a:hover .lib-item-ext{opacity:1}
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>
-      <p>전 세계 제약 GMP·품질 규제 소식을 매주 자동으로 모아, 기관별로 정렬하고 시사점·점검 포인트까지 정리하는 규제뉴스 서비스.</p>
-      <p class="foot-src"><b>Sources</b>FDA · OpenFDA · EMA · EudraGMDP · MHRA · PIC/S · ICH · WHO · Health Canada · 식약처 · ECA · ISPE</p></div>
-    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
+      <p>국내외 의약품 GMP·품질 규제 동향을 한국어와 영어로 제공하는 무료 정보 서비스입니다.</p>
+      <a class="foot-srclink" href="../../findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
+    <div data-feedback-slot><h5>서비스 안내</h5><a href="../../about/index.html">서비스 소개</a><a href="../../guide/index.html">이용안내</a><a href="../../index.html#notice">AI 활용 안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../rss.xml">RSS 피드</a></div>
+    <div><h5>콘텐츠</h5><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">실사 지적사항</a><a href="../../findings/trends/index.html">규제 동향</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../quiz/index.html">주간 퀴즈</a></div>
     <div><h5>도구</h5><a href="../../findings/checklist/index.html">자가점검 체크리스트</a><a href="../../findings/firm/index.html">업체 조회</a><a href="../../findings/inspector/index.html">실사관 조회</a><a href="../../findings/inspections/index.html">FDA 실사 결과</a><a href="../../findings/docs/index.html">문서로 찾기</a></div>
-    <div data-feedback-slot><h5>서비스</h5><a href="../../about/index.html">소개</a><a href="../../guide/index.html">이용안내</a><a href="../../findings/coverage/index.html">데이터 현황</a><a href="../../index.html#notice">AI 자동 생성 고지</a><a href="../../rss.xml">RSS 피드</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">

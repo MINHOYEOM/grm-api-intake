@@ -78,6 +78,7 @@
   };
   var _isEn = (typeof document !== "undefined"
     && (document.documentElement.lang || "ko") !== "ko");
+  var _HANGUL = /[가-힣]/;
   var _bodyText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
@@ -86,7 +87,9 @@
   var _altText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
-    return (ko && orig) ? (_isEn ? ko : orig) : "";
+    if (!ko || !orig) return "";
+    if (_isEn && _HANGUL.test(orig)) return "";
+    return _isEn ? ko : orig;
   };
 
   var cfg = document.getElementById("grm-findings-cfg");

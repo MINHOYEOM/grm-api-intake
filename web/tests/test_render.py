@@ -18,6 +18,7 @@ CI(`unittest discover -s tests`)는 `tests/test_web_render.py` shim 을 통해 �
 from __future__ import annotations
 
 import collections
+import html as html_mod
 import json
 import os
 import pathlib
@@ -385,6 +386,42 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
         diffs = presence_diffs(self.out, pairs)
         self.assertEqual(diffs, [], "언어판 구조가 갈라졌다:\n  " + "\n  ".join(diffs))
 
+    def test_only_declared_page_families_keep_korean_on_the_english_tree(self):
+        """영어 화면에 한국어가 남는 자리는 **선언된 여섯 군뿐**이어야 한다.
+
+        ★구조 파리티는 클래스만 본다 — 글자가 무슨 언어인지는 못 본다. 그 사각지대에서
+          영어 업체 프로파일이 한국어 지적을, 영어 브리프가 한국어 심층분석을, 영어
+          마이페이지가 한국어 칩 37개를 띄우는 동안 파리티는 계속 초록이었다(전면 점검이
+          사람 눈으로 잡았다). 그래서 언어를 재는 자를 옆에 둔다.
+
+        남겨 둔 여섯 군은 **감추는 대신 밝히는** 자리다 — 업체 이름을 옮기면 존재하지
+        않는 회사가 되고, 인용을 옮기면 인용이 아니게 되며, 공식 영문 제목이 없는 문서를
+        지어내면 없는 문서를 가리킨다. 화면이 각각 그 이유를 적는다.
+        """
+        pairs = [
+            p.parent.relative_to(self.out).as_posix()
+            for p in self.out.rglob("index.html")
+            if not p.relative_to(self.out).as_posix().startswith("en/")
+            and (self.out / "en" / p.parent.relative_to(self.out) /
+                 "index.html").is_file()]
+        pairs = [("" if p == "." else p) for p in pairs]
+        self.assertGreater(len(pairs), 20, "짝 페이지를 못 찾았다 — 추출이 깨졌나?")
+        found = hangul_families(self.out, pairs)
+
+        leaked = sorted(set(found) - set(INTENTIONAL_KO_ON_EN))
+        self.assertEqual(
+            leaked, [],
+            "영어 화면에 한국어가 새는 페이지군이 늘었다(옮길 수 없는 이름·인용이라면 "
+            "INTENTIONAL_KO_ON_EN 에 근거와 함께 등록하고, 화면에도 그 이유를 적어라): "
+            + repr([(f, found[f]) for f in leaked][:4]))
+
+        # 반대 방향 — 목록만 남고 실체가 사라지면 그 줄은 가드가 아니라 장식이다.
+        stale = sorted(set(INTENTIONAL_KO_ON_EN) - set(found))
+        self.assertEqual(
+            stale, [],
+            "이 군에는 더 이상 한국어가 없다 — INTENTIONAL_KO_ON_EN 에서 지워라(낡은 "
+            "예외는 그만큼 가드를 잃은 것이다): " + repr(stale))
+
     def test_home_is_the_same_page_in_both_languages(self):
         """★[2026-09-05] 영어 홈은 `landing_en.html` 이라는 **별도 템플릿**이었다. 그때는
         영문 브리프가 0호라 히어로에 실을 표지가 없었기 때문인데, 그 사이 10호가 서면서
@@ -419,7 +456,7 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             if not page.is_file():
                 continue
             html = page.read_text(encoding="utf-8")
-            body = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|<!--.*?-->",
+            body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->",
                           " ", html)
             with self.subTest(issue=d.name):
                 # ① 국문 번역 패널은 영어판에 없다(원문이 바로 옆에 있어 중복이다).
@@ -474,7 +511,7 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             if not page.is_file():
                 continue
             html = page.read_text(encoding="utf-8")
-            body = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|<!--.*?-->",
+            body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->",
                           " ", html)
             note = re.search(r'<p class="cov-note">([^<]*)</p>', body)
             text = re.sub(r"<[^>]+>", " ", re.sub(r'<p class="cov-note">.*?</p>', " ",
@@ -3077,13 +3114,28 @@ class WebFindingsRenderTest(unittest.TestCase):
 
     def test_similar_to_on_demand_no_fetch_before_click(self):
         """[on-demand] 카드 89개 전체에 자동 조회하지 않는다 — buildSimilarCasesControl()
-        은 버튼을 만들 때 fetchSimilarTo 를 호출하지 않고, click 리스너 안에서만 호출한다."""
+        은 버튼을 만들 때 fetchSimilarTo 를 호출하지 않고, 클릭(또는 재시도)으로만 부른다.
+
+        ★가드 방식 정정(2026-09-06): 종전엔 "fetchSimilarTo 가 addEventListener 보다
+        **앞에 적혀** 있으면 안 된다"는 **글자 순서**로 쟀다. 재시도 기능 때문에 fetch 를
+        이름 있는 `load()` 로 빼자 그 순서가 뒤집혔는데, **호출 시점은 그대로**였다
+        (load 는 클릭 리스너와 재시도 버튼에서만 부른다). 순서라는 대리 지표 대신
+        **생성 시점에 실행되는 코드**에 호출이 없는지를 직접 본다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        before_listener = fn[:fn.index("addEventListener")]
-        self.assertNotIn("fetchSimilarTo(", before_listener)
-        self.assertIn("fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)", fn)
+
+        # 생성 시점에 **실행되는** 코드 = load 정의 이전 구간. 여기에 호출이 있으면 안 된다.
+        setup = fn[:fn.index("function load() {")]
+        self.assertNotIn("fetchSimilarTo(", setup)
+        self.assertNotIn("load()", setup)
+
+        # fetch 는 load() 안에 **한 번만** 있고, load 는 클릭 리스너에서 불린다.
+        self.assertEqual(fn.count("fetchSimilarTo("), 1)
+        load_body = fn[fn.index("function load() {"):fn.index('btn.addEventListener("click"')]
+        self.assertIn("fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)", load_body)
+        listener = fn[fn.index('btn.addEventListener("click"'):]
+        self.assertIn("load();", listener)
         self.assertIn("var SIMILAR_TO_LIMIT = 5;", js_src)
 
     def test_similar_to_cached_after_first_fetch_no_refetch(self):
@@ -3117,28 +3169,45 @@ class WebFindingsRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertIn("if (!findingId) return null;", fn)
 
-    def test_similar_to_silent_failure_and_state_wording(self):
-        """[§3 조용한 폴백] 실패(.catch)도 0건과 동일하게 renderSimilarToState(block, [])
-        로 수렴한다 — throw 재발생·console.error 없음. 로딩/0건 문구도 명세와 정확히
-        일치해야 한다(RPC 미적용(404) 상태에서도 페이지가 정상 동작해야 하는 계약)."""
+    def test_similar_to_error_is_not_rendered_as_zero_results(self):
+        """[2026-09-06 수리 · 회귀 가드] **오류와 빈 결과를 화면에서 구분한다.**
+
+        종전 계약은 "실패도 0건과 동일하게 renderSimilarToState(block, []) 로 수렴"이었다.
+        그 조용한 폴백 때문에 `findings_similar_to` 가 **500(statement timeout)** 을 뱉는
+        동안 화면은 "유사 사례를 찾지 못했습니다"라고 **단언**했고, 같은 문구가 수천 건인
+        지적에서도 사용자는 유사 사례가 없다고 믿었다(프로덕션 실측 81/145 실패).
+        → catch 는 renderSimilarToError 로 가야 하며 **0건 문구를 쓰면 안 된다**.
+        (404(RPC 미적용)도 오류다 — 그것도 "없음"이 아니다.)"""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
         self.assertNotIn("console.error", fn)
         catch_branch = fn[fn.index(".catch(function () {"):]
         catch_branch = catch_branch[:catch_branch.index("});") + 3]
-        self.assertIn("renderSimilarToState(block, []);", catch_branch)
+        self.assertIn("renderSimilarToError(block, load);", catch_branch)
+        self.assertNotIn("renderSimilarToState(block, []);", catch_branch)
         self.assertNotIn("throw", catch_branch)
+
+        # 0건 문구는 **빈 배열 경로에만** 있어야 한다.
         state_fn = js_src[js_src.index("function renderSimilarToState(block, items) {"):]
         state_fn = state_fn[:state_fn.index("\n  }\n") + 4]
         self.assertIn('"불러오는 중…"', state_fn)
         self.assertIn('"유사 사례를 찾지 못했습니다"', state_fn)
 
+        # 오류 렌더러는 사실을 단언하지 않고(0건 문구 금지) 재시도 수단을 준다.
+        err_fn = js_src[js_src.index("function renderSimilarToError(block, onRetry) {"):]
+        err_fn = err_fn[:err_fn.index("\n  }\n") + 4]
+        self.assertNotIn("찾지 못했습니다", err_fn)
+        self.assertIn('"유사 사례를 지금 불러오지 못했습니다"', err_fn)
+        self.assertIn('_t("다시 시도")', err_fn)
+        self.assertIn('retry.addEventListener("click", onRetry);', err_fn)
+
     def test_f08_similar_cases_retry_allowed_after_transient_failure(self):
         """[F-08] "유사 사례" 재시도 불가 수리 — fetched=true 는 성공(then)에서만 세워
         캐시를 확정하고, catch 에서는 false 로 되돌려 다음 클릭이 재시도하게 한다(일시
         네트워크 오류·404(RPC 미존재) 후에도 새로고침 없이 재시도 가능). catch 의 사용자
-        표시는 종전과 동일한 조용한 폴백(콘솔 로그·throw 없음)이어야 한다."""
+        표시는 **오류 상태 + 재시도 버튼**이다(콘솔 로그·throw 는 여전히 없음) —
+        종전의 "조용한 0건 폴백"은 오류를 사실로 위장해 폐기했다."""
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
         fn = js_src[js_src.index("function buildSimilarCasesControl(row) {"):]
         fn = fn[:fn.index("\n  }\n") + 4]
@@ -3149,7 +3218,96 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn("fetched = false;", catch_branch)  # 실패 시 재시도 허용
         self.assertNotIn("console.error", catch_branch)
         self.assertNotIn("throw", catch_branch)
-        self.assertIn("renderSimilarToState(block, []);", catch_branch)
+        # [2026-09-06] 표시는 더 이상 조용한 0건이 아니라 오류 상태 + 재시도다.
+        self.assertIn("renderSimilarToError(block, load);", catch_branch)
+        self.assertNotIn("renderSimilarToState(block, []);", catch_branch)
+        # 재시도 버튼 연타로 요청이 겹치지 않아야 한다.
+        self.assertIn("if (inFlight) return;", fn)
+
+    def test_migration_079_is_behaviour_preserving_and_keeps_signature(self):
+        """[079] 유사검색 RPC 성능 수리가 **동작을 바꾸지 않았는지**를 소스로 고정한다.
+
+        ①시그니처 불변 — 인자를 하나라도 더하면 새 오버로드가 생겨 기존 호출이 PostgREST
+          404 가 된다(#681). ②`@@` 술어는 018 표현식 그대로여야 인덱스를 계속 탄다 —
+          저장열로 바꾸면 `idx_findings_search_fts` 를 못 쓴다. ③생성열 식이 018 인덱스
+          식과 byte 일치해야 값이 같다. ④022 가 고친 F-01/F-02(전량 집계·붕괴 후 절단)를
+          되돌리지 않았는가. ⑤반환 키 13개가 022 와 완전히 같은가(신설·삭제 0)."""
+        def _exec_only(text):
+            """주석 줄을 걷어낸 **실행되는 SQL** 만 남긴다 — 해설이 개수를 부풀리면
+            가드가 조용히 헐거워진다(079 헤더는 `limit 400` 을 설명으로도 언급한다)."""
+            return "\n".join(l for l in text.split("\n") if not l.lstrip().startswith("--"))
+
+        sql_raw = (WEB_DIR / "migrations" / "079_findings_similar_perf.sql").read_text(encoding="utf-8")
+        sql = _exec_only(sql_raw)
+        sql022 = _exec_only((WEB_DIR / "migrations" / "022_findings_similar_truth.sql")
+                            .read_text(encoding="utf-8"))
+        idx018 = (WEB_DIR / "migrations" / "018_findings_similar_lexical.sql").read_text(encoding="utf-8")
+
+        # ① 시그니처 불변(인자 추가 금지) + revoke 가 grant 보다 먼저
+        self.assertIn("create or replace function public.findings_similar(\n  p_query text,\n"
+                      "  p_limit int default 20\n)", sql)
+        self.assertIn("create or replace function public.findings_similar_to(\n  p_finding_id text,\n"
+                      "  p_limit int default 5\n)", sql)
+        self.assertLess(sql.index("revoke all on function"), sql.index("grant execute on function"))
+
+        # ② `@@` 술어는 표현식 그대로 — 저장열로 바꾸지 않았다.
+        pred = ("to_tsvector('simple', coalesce(nullif(f.finding_text_ko, ''), f.finding_text)) @@ t.tq")
+        self.assertEqual(sql.count(pred), 2, "두 함수 모두 표현식 술어를 유지해야 한다")
+        self.assertNotIn("f.search_tsv @@", sql)
+
+        # ③ 생성열 식 == 018 GIN 인덱스 식(byte 일치). 018 은 컬럼명만 쓰므로 접두사를 맞춘다.
+        self.assertIn("to_tsvector('simple', coalesce(nullif(finding_text_ko, ''), finding_text))", idx018)
+        self.assertIn("generated always as (\n    to_tsvector('simple', "
+                      "coalesce(nullif(finding_text_ko, ''), finding_text))\n  ) stored", sql)
+
+        # ④ 022 의 사실성 수리를 되돌리지 않았다 — 전량 집계 + 그룹 공간 절단 400.
+        self.assertEqual(sql.count("count(distinct raw_signal_id) as dup_documents"), 2)
+        self.assertEqual(sql.count("max(fts_rank) as best_rank"), 2)
+        self.assertEqual(sql.count("limit 400"), 2)
+        self.assertNotIn("limit 200", sql)  # 021 의 '절단 후 붕괴'로 되돌아가면 안 된다
+
+        # ⑤ ts_rank 입력만 저장열로 — to_tsvector 를 ts_rank 인자로 다시 쓰지 않는다.
+        self.assertEqual(sql.count("ts_rank(f.search_tsv, t.tq) as fts_rank"), 2)
+        self.assertNotIn("ts_rank(\n        to_tsvector(", sql)
+        self.assertEqual(sql.count("tsq as materialized ("), 2)
+        self.assertNotIn("\n  tsq as (\n", sql)  # 인라인되면 행마다 tsquery 재생성(원래 결함)
+
+        # ⑤ 반환 키 집합이 022 와 완전히 동일(신설·삭제 0)
+        import re as _re
+        keys = lambda t: sorted(set(_re.findall(r"'(\w+)', (?:finding_id|raw_signal_id|source|agency|"
+                                                r"published_date|firm_name|category_code|evidence_level|"
+                                                r"review_status|search_text|round\(group_score|"
+                                                r"dup_documents|dup_findings)", t)))
+        self.assertEqual(keys(sql), keys(sql022), "반환 키가 022 와 달라졌다")
+        self.assertEqual(len(keys(sql)), 13)
+
+    def test_category_option_label_never_repeats_itself_in_english(self):
+        """[2026-09-06 수리] 분류 필터 옵션 라벨이 영어판에서 "Data integrity ·
+        Data integrity" 로 같은 말을 두 번 쓰던 결함.
+
+        `ko · en` 병기는 **한국어 화면에서 영문 원어를 같이 보여주려는** 장치인데, 영어
+        화면에서는 `cat.ko` 가 _t() 로 이미 영어(= cat.en 과 같은 문자열)가 되어 양쪽이
+        같아진다(20개 분류 전부). 손목록으로 언어를 분기하지 말고 **성질로** 판정한다 —
+        앞뒤가 같으면 한 번만 쓴다. 그래야 사전이 바뀌어 병기가 유의미해지는 날 자동으로
+        되돌아온다."""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        fn = js_src[js_src.index("function selectOptionLabel(key2, v) {"):]
+        fn = fn[:fn.index("\n  }\n") + 4]
+        self.assertIn("cat.ko === cat.en ? cat.ko : cat.ko", fn)
+        # 언어 분기(_isEn 등)로 구현하면 안 된다 — 값의 성질로만 판정한다.
+        self.assertNotIn("_isEn", fn)
+
+        # 영어 카탈로그 실측: 20개 분류의 ko 번역이 전부 cat.en 과 같아야 이 수리가 발동한다.
+        catalog = json.loads(grm_i18n.catalog_path("en").read_text(encoding="utf-8"))
+        block = js_src[js_src.index("var CATEGORY_LABELS = {"):]
+        block = block[:block.index("\n  };\n")]
+        pairs = re.findall(r'\{ ko: _t\("([^"]+)"\), en: "([^"]+)" \}', block)
+        self.assertEqual(len(pairs), 20, "분류 20개를 다 못 읽었다")
+        collapsed = [ko for ko, en in pairs if catalog.get(ko) == en]
+        self.assertEqual(
+            len(collapsed), 20,
+            "영어판에서 ko 번역과 en 이 다른 분류가 있다 — 그 항목은 병기가 유지된다: "
+            + repr([ko for ko, en in pairs if catalog.get(ko) != en]))
 
     def test_similar_to_dup_badge_only_when_dup_findings_gt_1(self):
         """[중복 배지] dup_findings>1 인 항목에만 "동일 문구 N개 문서"(N=dup_documents)
@@ -5183,6 +5341,63 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         self.assertIn("return _isEn ? (orig || ko) : (ko || orig);", shim)
         self.assertIn(shim, self.js_src, "본문 선택 사본이 없다")
 
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_body_shim_behavior_via_node(self):
+        """본문·대조 선택을 **실행해서** 고정한다(문자열 대조가 아니라 행동).
+
+        ★[2026-09-06] 종전 가드는 `self.assertIn("return _isEn ? ...", shim)` 이라
+          정본을 고치면 가드도 같이 고쳐져 언제나 초록이었다 — 검사가 자기 술어로 묻는
+          꼴이다. 실제로 영어 업체 프로파일이 **한국어 원문 지적 아래 "국문 번역 보기"**
+          를 달고 있었는데(원문·번역이 둘 다 한국어라 뜻이 통하지 않는 토글), 그 결함을
+          이 가드는 볼 수 없었다. 그래서 두 언어로 각각 실행해 산출을 못 박는다.
+        """
+        import subprocess
+
+        # (설명, row) — 실제 데이터의 네 갈래.
+        cases = [
+            ["영어 원문 + 국문 번역(공개분 91.6%)",
+             {"finding_text": "Procedures are not in writing.",
+              "finding_text_ko": "절차가 문서화되어 있지 않다."}],
+            ["한국어 원문 + 국문(식약처 8.4%) — 원문·번역이 같은 언어",
+             {"finding_text": "제조 기록서가 작성되지 않았다.",
+              "finding_text_ko": "제조 기록서가 작성되지 않았다."}],
+            ["영어만", {"finding_text": "Equipment not qualified.", "finding_text_ko": ""}],
+            ["국문만", {"finding_text": "", "finding_text_ko": "설비 적격성 미확보."}],
+        ]
+
+        def run(lang):
+            driver = (
+                'var document = { documentElement: { lang: %s } };\n' % json.dumps(lang)
+                + grm_i18n.JS_BODY_SHIM
+                + "\nconsole.log(JSON.stringify(" + json.dumps([c[1] for c in cases])
+                + ".map(function (r) { return [_bodyText(r), _altText(r)]; })));")
+            tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_bodyshim_"))
+            try:
+                drv = tmp / "driver.js"
+                drv.write_text(driver, encoding="utf-8")
+                proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                      text=True, timeout=30)
+            finally:
+                shutil.rmtree(tmp, ignore_errors=True)
+            self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+            return [tuple(x) for x in json.loads(proc.stdout)]
+
+        # 한국어판 — 국문 우선, 원문이 있으면 대조로 붙인다.
+        self.assertEqual(run("ko"), [
+            ("절차가 문서화되어 있지 않다.", "Procedures are not in writing."),
+            ("제조 기록서가 작성되지 않았다.", "제조 기록서가 작성되지 않았다."),
+            ("Equipment not qualified.", ""),
+            ("설비 적격성 미확보.", ""),
+        ])
+        # 영어판 — 규제기관 원문 우선. ★2행: 원문이 한국어면 대조를 **달지 않는다**
+        #   (같은 언어의 글을 "번역"이라며 한 번 더 펼치지 않는다).
+        self.assertEqual(run("en"), [
+            ("Procedures are not in writing.", "절차가 문서화되어 있지 않다."),
+            ("제조 기록서가 작성되지 않았다.", ""),
+            ("Equipment not qualified.", ""),
+            ("설비 적격성 미확보.", ""),
+        ])
+
     def test_example_panel_links_back_to_findings_search_with_cat_param(self):
         fn = self._fn("buildExamplePanel")
         self.assertIn('a.href = findingsHref("cat", code);', fn)
@@ -7000,6 +7215,53 @@ class WebFirmWatchlistTest(unittest.TestCase):
             shutil.rmtree(tmp, ignore_errors=True)
         self.assertIn('id="grm-my-firms"', me)
         self.assertIn("관심 업체", me)
+
+    def test_en_me_page_is_built_and_its_vocabulary_follows_the_language(self):
+        """영어 푸터가 가리키는 /en/me/ 가 **실제로 서고**, 그 안의 어휘가 영어인가.
+
+        ★[2026-09-06] 전면 점검이 잡은 것: 켠 빌드의 영어 푸터에 '마이페이지' 링크가
+          찍히는데 /en/me/ 는 렌더된 적이 없었다(영어 트리 선언에 그 경로가 없었다).
+          링크를 지우는 대신 면을 냈다 — 셸은 이미 _() 전량 포장이고 런타임 두 층도
+          완역이라, 빠져 있던 건 라우트 하나였다.
+        ★관심 범위 칩은 정본(`facets`)의 `label_ko` 를 심는다. 정본 값을 그대로 심으면
+          영어 화면의 칩 37개가 통째로 한국어가 된다 — **뷰가 언어를 정해 넘긴다**는
+          규율(이 저장소가 세 번 밟은 자리)이 여기서도 지켜지는지 본다.
+        """
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enme_"))
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            self.assertTrue(render.reactions_enabled(), "게이트가 안 켜졌다 — 가드가 헛돈다")
+            out = tmp / "out"
+            render.render_site(SINGLE_FIXTURES, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            en_me = out / "en" / "me" / "index.html"
+            self.assertTrue(en_me.is_file(), "영어 푸터가 가리키는 /en/me/ 가 없다")
+            html = en_me.read_text(encoding="utf-8")
+            ko_html = (out / "me" / "index.html").read_text(encoding="utf-8")
+            sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+            shutil.rmtree(tmp, ignore_errors=True)
+
+        chips = re.findall(r'<span data-kind="[^"]*" data-value="[^"]*">([^<]*)</span>', html)
+        ko_chips = re.findall(r'<span data-kind="[^"]*" data-value="[^"]*">([^<]*)</span>',
+                              ko_html)
+        self.assertGreater(len(chips), 5, "관심 칩이 비었다 — 추출이 깨졌나?")
+        self.assertEqual(len(chips), len(ko_chips), "언어판에서 어휘가 줄었다")
+        left = [c for c in chips if re.search(r"[가-힣]", c)]
+        self.assertEqual(left, [], f"영어 마이페이지 칩이 한국어다: {left[:5]}")
+        self.assertTrue(any(re.search(r"[가-힣]", c) for c in ko_chips),
+                        "한국어 칩이 한국어가 아니다 — 정본이 뒤집혔나?")
+
+        # 셸 본문에 남는 한글은 언어 전환 라벨('한국어') 하나뿐이어야 한다.
+        body = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->", " ", html)
+        body = re.sub(r"(?s)<[^>]+>", " ", body)
+        runs = {r for r in re.findall(r"[가-힣]+", body)} - {"한국어"}
+        self.assertEqual(runs, set(), f"영어 마이페이지 셸에 한국어가 남았다: {sorted(runs)[:5]}")
+
+        # 개인화 면은 **양쪽 다** 비색인 — 언어판이라고 정책이 느슨해지지 않는다.
+        self.assertNotIn("/me/", sitemap)
 
     def test_reactions_js_my_firms_renderer(self):
         # me 페이지 관심 업체 목록 — 스크랩 목록(renderMyScraps) 관례 동형.
@@ -13446,6 +13708,9 @@ class WebAboutTest(unittest.TestCase):
         self.assertNotIn("index.html#why", foot)                     # 종전 홈 앵커 소개 없음
         self.assertEqual(foot.count("index.html#notice"), 1)        # 같은 앵커 링크 둘 → 하나
         self.assertIn("<div data-feedback-slot>", foot)              # 문의 링크가 얹힐 열
+        # RSS 피드(#927) — 열을 재구성하며 실제로 한 번 떨어뜨렸다가 i18n 고아 경고로
+        # 되찾은 링크다. 피드는 링크가 없으면 발견 자체가 안 되므로 여기 못 박는다.
+        self.assertIn("rss.xml", foot)
 
     def test_footer_points_at_the_sources_page_instead_of_listing_them(self):
         """[확정안 2026-09-06] 브랜드 열은 소스를 **나열하지 않고** 실제로 집계해 보여주는
@@ -13899,6 +14164,14 @@ class WebZoneIaTest(unittest.TestCase):
         "404.html": "존재하지 않는 경로에 서버가 띄우는 페이지 — 링크 대상이 아니다.",
         "en/404.html": "위와 같다. 영어 트리에서도 Cloudflare 가 상태코드로 띄운다.",
         "admin/index.html": "운영자 전용 콘솔 — 공개 링크를 두지 않는 것이 의도다.",
+        # [푸터 확정 2026-09-06] 마이페이지는 푸터에서 뺐다 — 로그인해야 열리는 면을 모두에게
+        # 보이는 자리에 두면 대다수에게는 눌러도 아무것도 없는 링크가 된다. 진입은 로그인 시
+        # reactions.js 가 헤더에 얹는 계정 메뉴 하나이고, 그건 **런타임 주입이라 이 BFS 가
+        # 원리적으로 못 본다**(정적 HTML 만 훑는다). 대체 경로가 살아 있다는 것은
+        # WebAboutTest.test_my_page_left_the_footer_but_the_account_menu_keeps_it 이 본다 —
+        # 여기에 등록만 하고 대체 경로를 아무도 안 보면 그게 조용한 고아가 된다.
+        "me/index.html": "로그인 전용 면 — 진입은 reactions.js 가 얹는 헤더 계정 메뉴(런타임).",
+        "en/me/index.html": "위와 같다.",
     }
 
     #: 세그먼트에 서는 면. [컨셉 재정의] '데이터 현황'은 세그먼트에서 내렸다 — 그 면이
@@ -13920,7 +14193,20 @@ class WebZoneIaTest(unittest.TestCase):
         #   사라져 멀쩡한 라우트가 고아로 보인다 — 실제로 이 가드를 처음 켰을 때 용어
         #   239장·패싯 76장이 그렇게 잡혔다. **속도 스위치 뒤에 가드 사각지대를 만들지
         #   않는다**(대량 페이지 도입 때 겪은 것과 같은 함정).
-        _build_single(cls.single, doc_pages=True)
+        # ★[2026-09-06] **env 스위치도 같은 사각지대다.** 반응 계층(SUPABASE_*)이 꺼진
+        #   빌드에서는 마이페이지 링크가 아예 렌더되지 않아, 아래 깨진 링크 가드가
+        #   초록인 채로 라이브 영어 푸터가 존재하지 않는 /en/me/ 를 가리키고 있었다
+        #   (전면 점검이 사람 눈으로 잡았다). 켠 상태가 곧 **프로덕션 상태**이므로
+        #   여기서는 켜고 짓는다 — 이 한 줄이 env 게이트 뒤의 모든 링크를 가드 안으로
+        #   들인다(손목록을 늘리지 않는 방식).
+        _u0, _k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            assert render.reactions_enabled(), "반응 게이트가 안 켜졌다 — 가드가 헛돈다"
+            _build_single(cls.single, doc_pages=True)
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = _u0, _k0
         cls.pages = {}
         for p in sorted(cls.single.rglob("*.html")):
             rel = p.relative_to(cls.single).as_posix()
@@ -16951,6 +17237,12 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
     },
     "briefs/*": {
         "arc-lib-note": "영어 전용 고지 — 한국어 원제가 그대로 실리는 이유",
+        # ★[2026-09-06] 자료 노트의 두 줄은 영어판에서 **접힌다**. `res-orig`(영문 원제
+        #   병기)는 영어판에서 그 원제가 제목 자리로 올라오므로 같은 줄을 두 번 쓰는 셈이고,
+        #   `res-sum`(한국어 요약)은 영어 독자가 읽을 수 없는 줄이라 싣지 않는다.
+        #   빈 슬롯이 아니라 **없는 것이 맞는 슬롯**이다(자료실 카탈로그와 같은 판단).
+        "res-orig": "영문 원제가 영어판에서는 제목 그 자체다 — 병기할 것이 없다",
+        "res-sum": "한국어 요약은 영어 독자에게 읽을 수 없는 줄이라 싣지 않는다",
         "cov-note": "영어 전용 고지 — 업체·기관 실명이 한국어로 남는 이유",
         "dt-omit": "영어 전용 고지 — 한국어로 쓰인 상세를 싣지 않는 이유",
         # ★[2026-09-05 결정 ①] 한국어로 쓰인 상세는 영어판에 싣지 않는다. 그 하나의 판단이
@@ -17000,6 +17292,47 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
 }
 
 
+#: 영어 화면의 `<main>` 안에 한국어가 **남아 있어도 되는** 페이지군 → 그 근거.
+#: ★구조 파리티(클래스 멀티셋)는 글자를 보지 못한다 — 그래서 영어 업체 프로파일이
+#:   한국어 지적 본문을 그대로 띄우고, 영어 브리프가 한국어 심층분석을 싣고, 영어
+#:   마이페이지 칩 37개가 통째로 한국어인 동안에도 파리티는 초록이었다. 구조 옆에
+#:   **언어**를 재는 자를 하나 더 둔다.
+#: ★수량이 아니라 **유무**다(구조 파리티와 같은 규율). 이름이 몇 개 나오는지는 데이터가
+#:   정하고 매주 달라진다 — 여기서 잡으려는 것은 *새 페이지군이 한국어를 흘리기 시작한
+#:   것*이다. 실측(2026-09-06): 짝 4,176장 22개 군 중 한글이 있는 군은 아래 6개뿐이고,
+#:   문서 3,174장·업체 586장·조항 35장·분류 57장은 전부 0이다.
+#: ★목록에 적힌 군에서 한국어가 **사라져도** 실패한다 — 손목록이 낡는 것을 막는 방향이다
+#:   (이 저장소가 가드 7개를 그렇게 잃은 적이 있다).
+INTENTIONAL_KO_ON_EN: dict[str, str] = {
+    "briefs/*": "업체·기관의 실제 이름과 인용한 원문 — 옮기면 존재하지 않는 조직·문장을"
+                " 가리키게 된다. 화면이 `cov-note` 로 이유를 밝힌다.",
+    "archive/": "자료실 스트립의 한국어 원제 — 공식 영문 제목이 없다(`arc-lib-note`).",
+    "library/": "위와 같다(`lib-upd-note`).",
+    "library/*": "카탈로그 항목 제목 — 위와 같다.",
+    "glossary/": "출처·조항 이름이 한국어 문서 그 자체다(`gl-note`).",
+    "glossary/*": "용어별 출처 — 위와 같다.",
+}
+
+
+def visible_text(html: str) -> str:
+    """사람이 읽는 글자만 — 태그·스크립트·스타일·주석을 걷어낸다."""
+    b = re.sub(r"(?s)<script\b.*?</script>|<style\b.*?</style>|<!--.*?-->", " ", html)
+    return html_mod.unescape(re.sub(r"(?s)<[^>]+>", " ", b))
+
+
+def hangul_families(out, pairs) -> "dict[str, tuple[str, list[str]]]":
+    """영어 `<main>` 에 한글이 있는 페이지군 → (예시 경로, 발췌)."""
+    found: dict[str, tuple[str, list[str]]] = {}
+    for path in pairs:
+        en = (out / "en" / path / "index.html").read_text(encoding="utf-8")
+        runs = re.findall(r"[가-힣][가-힣0-9 ·/()]{0,30}",
+                          visible_text(_main_only(en)))
+        if runs and page_family(path) not in found:
+            found[page_family(path)] = (path or "(home)",
+                                        [r.strip() for r in runs[:3]])
+    return found
+
+
 def _main_only(html: str) -> str:
     """`<main>` 안만 — 껍데기(헤더·푸터·펫)를 비교에서 뺀다.
 
@@ -17008,7 +17341,7 @@ def _main_only(html: str) -> str:
     그 빌드의 입력 문제다. 껍데기 자체는 홈·검색 등 **라이브 데이터로 도는** 페이지군이
     이미 본다. 여기서는 그 면이 고유하게 만드는 것만 본다.
     """
-    m = re.search(r"(?s)<main.*?</main>", html)
+    m = re.search(r"(?s)<main\b.*?</main>", html)
     return m.group(0) if m else html
 
 

@@ -39,6 +39,7 @@
   };
   var _isEn = (typeof document !== "undefined"
     && (document.documentElement.lang || "ko") !== "ko");
+  var _HANGUL = /[가-힣]/;
   var _bodyText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
@@ -47,7 +48,9 @@
   var _altText = function (row) {
     var ko = String((row && row.finding_text_ko) || "").trim();
     var orig = String((row && row.finding_text) || "").trim();
-    return (ko && orig) ? (_isEn ? ko : orig) : "";
+    if (!ko || !orig) return "";
+    if (_isEn && _HANGUL.test(orig)) return "";
+    return _isEn ? ko : orig;
   };
 
   var cfg = document.getElementById("grm-findings-cfg");
@@ -397,10 +400,17 @@
     return sorted;
   }
 
+  // [영문 중복 수리 2026-09-06] `ko · en` 병기는 **한국어 화면에서 영문 원어를 같이 보여주려는**
+  // 장치다. 영어 화면에서는 `cat.ko` 가 _t() 로 이미 영어(= cat.en 과 같은 문자열)라 그대로
+  // 이으면 "Data integrity · Data integrity" 가 된다(20개 분류 전부 동일 증상).
+  // 손목록으로 언어를 분기하지 않고 **성질로** 판정한다 — 앞뒤가 같은 말이면 한 번만 쓴다.
+  // 이러면 사전이 바뀌어(영문 라벨이 cat.en 과 달라져) 병기가 유의미해지는 날에도 자동으로
+  // 다시 병기된다.
   function selectOptionLabel(key2, v) {
     if (key2 === "category_code") {
       var cat = CATEGORY_LABELS[v];
-      return cat ? cat.ko + " · " + cat.en : v;
+      if (!cat) return v;
+      return cat.ko === cat.en ? cat.ko : cat.ko + " · " + cat.en;
     }
     if (key2 === "evidence_level") return EVIDENCE_LABEL[v] || v;
     if (key2 === "review_status") return STATUS_LABEL[v] || v;
@@ -1000,9 +1010,14 @@
   // 등장하지 않아야 한다, 평가 결과 반영 계약). 서버가 공개 게이트·
   // 같은 문서 제외·중복 붕괴·정렬을 전부 처리하므로 클라이언트는 재정렬·재필터를 하지
   // 않는다(§ S1 관례와 동일 — renderSimilarToState() 는 반환 순서 그대로 렌더). RPC 는
-  // 라이브 DB 에 아직 미적용일 수 있어(컨트롤타워가 별도 적용) 실패는 조용히 0건과
-  // 동일하게 처리한다 — 콘솔 에러도 화면 에러 상태도 없다. 카드 89개 전체에 자동 조회하지
-  // 않도록 on-demand(클릭 전 fetch 없음) + 1회 fetch 후 캐시(재클릭은 토글만)로 구현한다.
+  // ★[2026-09-06 수리] 종전에는 실패를 **조용히 0건과 동일하게** 처리했다(RPC 미적용 404
+  // 방어가 원래 의도). 그 결과 서버가 500(`57014 statement timeout`)을 돌려주는 동안 화면은
+  // "유사 사례를 찾지 못했습니다"라고 단언했고, 같은 문구가 수천 건 있는 지적(21 CFR 211.192
+  // 등)에서도 사용자는 **유사 사례가 없다고 믿었다**. 오류와 빈 결과는 서로 다른 사실이므로
+  // 화면에서도 구분한다 — 실패는 "지금 불러오지 못했습니다 · 다시 시도"(renderSimilarToError)
+  // 로, 빈 결과만 0건 문구로 간다. 404(RPC 미적용)도 오류로 취급한다: 그것도 "없음"이 아니다.
+  // 카드 89개 전체에 자동 조회하지 않도록 on-demand(클릭 전 fetch 없음) + **성공** 1회 후
+  // 캐시(재클릭은 토글만)로 구현한다.
   var SIMILAR_TO_LIMIT = 5;
 
   function fetchSimilarTo(findingId, limit) {
@@ -1066,8 +1081,9 @@
     return row;
   }
 
-  // 상태 렌더 — items===null 이면 로딩 문구, 빈 배열이면 0건 문구(실패도 이 경로로
-  // 수렴, §3). items 를 재정렬·재필터하지 않고 서버가 반환한 순서 그대로 forEach 렌더한다.
+  // 상태 렌더 — items===null 이면 로딩 문구, 빈 배열이면 **진짜 0건** 문구. 실패는 이 경로로
+  // 오지 않는다(renderSimilarToError 가 따로 받는다 — 오류≠빈 결과).
+  // items 를 재정렬·재필터하지 않고 서버가 반환한 순서 그대로 forEach 렌더한다.
   function renderSimilarToState(block, items) {
     block.textContent = "";
     if (items === null) {
@@ -1085,7 +1101,26 @@
     items.forEach(function (item) { block.appendChild(buildSimilarToItem(item)); });
   }
 
-  // 카드 액션 행에 붙는 "유사 사례" 토글 — on-demand(클릭 전 fetch 없음), 1회 fetch 후
+  // 오류 상태 — 0건과 **문구도 동작도** 다르다. 사실을 단언하지 않고("찾지 못했습니다" 금지)
+  // 불러오기가 실패했음만 말한 뒤 재시도 수단을 준다. onRetry 는 같은 fetch 를 다시 태운다
+  // (성공 전까지 캐시 플래그가 서지 않으므로 재시도는 항상 실제 요청이다).
+  function renderSimilarToError(block, onRetry) {
+    block.textContent = "";
+    var msg = el("p", null, _t("유사 사례를 지금 불러오지 못했습니다"));
+    msg.style.cssText = "font-size:12.5px;color:var(--muted);margin:0 0 6px";
+    block.appendChild(msg);
+    var retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "fnd-simto-retry";
+    retry.textContent = _t("다시 시도");
+    retry.style.cssText =
+      "font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);" +
+      "background:transparent;border:0;padding:0;cursor:pointer;text-decoration:underline";
+    retry.addEventListener("click", onRetry);
+    block.appendChild(retry);
+  }
+
+  // 카드 액션 행에 붙는 "유사 사례" 토글 — on-demand(클릭 전 fetch 없음), **성공** 1회 후
   // 캐시(재클릭은 접기/펼치기만, 재요청 금지). finding_id 가 없는 방어적 행(레거시 폴백
   // 등)은 버튼 자체를 만들지 않는다(evidence_url 조건부와 동형 관례 — 카드 깨짐 없음).
   function buildSimilarCasesControl(row) {
@@ -1103,25 +1138,35 @@
     btn.style.cssText =
       "font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);" +
       "background:transparent;border:0;padding:0;cursor:pointer";
-    var fetched = false; // [on-demand+캐시] 1회 fetch 이후 재클릭은 토글만(재요청 금지)
-    btn.addEventListener("click", function () {
-      var opening = block.hidden;
-      block.hidden = !opening;
-      btn.setAttribute("aria-expanded", opening ? "true" : "false");
-      if (!opening || fetched) return; // 접는 조작이거나 이미 fetch 완료 — 재요청 금지
+    var fetched = false;  // [on-demand+캐시] **성공** 1회 이후 재클릭은 토글만(재요청 금지)
+    var inFlight = false; // 재시도 버튼 연타로 요청이 겹치지 않게 한다
+
+    // [F-08] fetched=true 는 성공(then)에서만 세운다 — 클릭 시점에 미리 세우면 일시 오류 후
+    // 재클릭이 새로고침 전까지 영구 봉쇄된다. 실패는 오류 상태로 렌더하고 재시도를 남긴다.
+    function load() {
+      if (inFlight) return;
+      inFlight = true;
       renderSimilarToState(block, null); // 로딩 표시
-      // [F-08] fetched=true 는 성공(then)에서만 세운다 — 클릭 시점에 미리 세우면 일시 오류 후 재클릭이 새로고침 전까지 영구 봉쇄된다.
       fetchSimilarTo(findingId, SIMILAR_TO_LIMIT)
         .then(function (data) {
+          inFlight = false;
           fetched = true;
           var items = (data && Array.isArray(data.items)) ? data.items : [];
           renderSimilarToState(block, items);
         })
         .catch(function () {
-          fetched = false; // [F-08] 재시도 허용(404 RPC 미존재도 멱등 GET성 POST라 무해) — 표시는 종전과 동일한 조용한 폴백
-          renderSimilarToState(block, []); // §3 조용한 폴백 — RPC 미적용(404)/네트워크
-          // 오류 전부 0건과 동일 문구로 수렴한다(재발생·콘솔 에러 로그 없음).
+          inFlight = false;
+          fetched = false;            // 재시도 허용(멱등 GET성 POST라 재요청은 무해)
+          renderSimilarToError(block, load); // ★오류는 0건으로 위장하지 않는다
         });
+    }
+
+    btn.addEventListener("click", function () {
+      var opening = block.hidden;
+      block.hidden = !opening;
+      btn.setAttribute("aria-expanded", opening ? "true" : "false");
+      if (!opening || fetched) return; // 접는 조작이거나 이미 성공 — 재요청 금지
+      load();
     });
     return { btn: btn, block: block };
   }

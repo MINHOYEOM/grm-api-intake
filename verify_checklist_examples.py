@@ -192,9 +192,18 @@ _FIXTURE_PREAMBLE_KO = (
     "실시하였다. 이 실사는 안전하지 않거나 유효하지 않거나 품질이 낮은 의약품으로부터 "
     "공중을 보호하기 위한 FDA의 법적 권한과 공중보건상의 책임에 따라 수행되었다."
 )
+# ★영문은 **화면에 실제로 실렸던 240자 그대로**다(짓지 않는다). 이 편지는 "during an
+#   inspection of…"로 열려 `wl_opening_en` 에는 안 걸리고 `fei_header` 에 걸린다 — 서두를
+#   잡는 길이 하나뿐이 아니어야 한다는 것을 이 표본이 증명한다.
 _FIXTURE_PREAMBLE_EN = (
-    "We conducted an inspection of your drug manufacturing facility, PReye, LLC, "
-    "FEI 3031057987, at 4855 Ward Road, Wheat Ridge, from March 17 to 19, 2026."
+    "during an inspection of your drug manufacturing facility, PReye, LLC, FDA "
+    "Establishment Identifier (FEI) 3031057987, at 4855 Ward Road, Wheat Ridge, from "
+    "March 17 to 19, 2026. This inspection was conducted under FDA's statutory authority an"
+)
+# 정형 WL 서두("We conducted an inspection of your …") — 이쪽은 `wl_opening_en` 이 잡는다.
+_FIXTURE_PREAMBLE_EN_CANONICAL = (
+    "We conducted an inspection of your drug manufacturing facility from March 17 to 19, "
+    "2026. This warning letter summarizes significant violations of CGMP regulations."
 )
 _FIXTURE_GOOD = (
     "귀사의 품질관리부서는 제조되는 의약품이 CGMP에 적합하고 확인, 함량, 품질 및 순도에 "
@@ -220,6 +229,8 @@ def self_test(base_url: str, anon_key: str) -> list[str]:
         problems.append("자가시험 ②: 실측 국문 서두가 비지적으로 잡히지 않는다(검사기 무력)")
     if not non_finding_hits(_FIXTURE_PREAMBLE_EN):
         problems.append("자가시험 ②: 실측 영문 서두가 비지적으로 잡히지 않는다(검사기 무력)")
+    if not non_finding_hits(_FIXTURE_PREAMBLE_EN_CANONICAL):
+        problems.append("자가시험 ②: 정형 영문 WL 서두가 비지적으로 잡히지 않는다(검사기 무력)")
     if non_finding_hits(_FIXTURE_GOOD):
         problems.append("자가시험 ②: 정상 지적 문장이 비지적으로 잡힌다(검사기 과잉)")
 

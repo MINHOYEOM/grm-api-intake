@@ -17229,6 +17229,71 @@ class WebEnTreeTest(unittest.TestCase):
             loaded = "/assets/i18n-en.js" in html
             self.assertEqual(loaded, rel.startswith("en/"), rel)
 
+    # ── 숫자: 무엇의 개수인가 ────────────────────────────────────────────────
+    def test_english_headline_counts_come_from_the_english_corpus(self):
+        """★실측 결함이었다(2026-09-06 사용자 신고): 영문 `/en/findings/` 머리글이
+        24,895건이라고 적는데 바로 아래 목록은 22,886건(원문이 영어인 지적)을 보여줬다 —
+        **같은 화면의 두 수가 서로 다른 모집단**을 세고 있었다. 영어 정본
+        (`findings_facets_en.json`)은 이미 있었고 영어 둘러보기 축 카드가 그걸 쓰고
+        있었는데, 머리 숫자만 한국어 파일을 봤다."""
+        ko = render.load_findings_facets()
+        en = render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
+        if not (ko and en):
+            self.skipTest("정본 파일 없음")
+        # 한국어 수가 영어 페이지에 새어 나오면 안 된다(두 값이 같으면 시험이 무의미).
+        if ko["totals"]["findings"] == en["totals"]["findings"]:
+            self.skipTest("두 모집단의 값이 같아 대조가 성립하지 않는다")
+        ko_n = f"{ko['totals']['findings']:,}"
+        en_n = f"{en['totals']['findings']:,}"
+        for rel in ("en/index.html", "en/findings/index.html", "en/findings/browse/index.html"):
+            html = self.pages.get(rel)
+            if html is None:
+                continue
+            self.assertIn(en_n, html, f"{rel}: 영어 모집단 수가 없다")
+            self.assertNotIn(ko_n, html, f"{rel}: 한국어 모집단 수가 영어 페이지에 있다")
+
+    def test_snapshot_counts_disclose_their_as_of_date(self):
+        """정적 사이트는 커밋된 데이터만 렌더하므로 이 수는 **스냅샷**이고, 런타임 목록과
+        반드시 어긋난다(실측: 머리글 24,895 vs 목록 24,956). 정의가 같고 시점만 다른
+        것이므로 값을 맞추는 게 아니라 화면이 기준일을 밝힌다."""
+        ko = render.load_findings_facets()
+        en = render.load_findings_facets(render.FINDINGS_FACETS_EN_FILE)
+        for rel, data in (("index.html", ko), ("findings/index.html", ko),
+                          ("findings/browse/index.html", ko),
+                          ("en/index.html", en), ("en/findings/index.html", en),
+                          ("en/findings/browse/index.html", en)):
+            html = self.pages.get(rel)
+            if html is None or not data or not data.get("measured_on"):
+                continue
+            self.assertIn(data["measured_on"], html, f"{rel}: 스냅샷 기준일이 화면에 없다")
+
+    def test_counts_with_a_different_denominator_say_so(self):
+        """정의가 다른 수는 통일하지 않는다 — 대신 분모를 적는다. '문서로 찾기'의 수는
+        개별 페이지를 만든 문서(지적 3건 이상 + 발행일)이지 보유 문서 전량이 아니다."""
+        browse = self.pages.get("findings/browse/index.html")
+        if browse is None:
+            self.skipTest("둘러보기 면 없음")
+        docs = render.load_findings_docs()
+        if not (docs and docs.get("documents")):
+            self.skipTest("문서 정본 없음")
+        self.assertIn("지적이 3건 이상이고 발행일이 있는", browse)
+        self.assertIn("보유 문서 전량은 아닙니다", browse)
+
+    def test_glossary_case_count_discloses_its_as_of_date(self):
+        """사례 건수는 주 1회 스냅샷이고 누르면 나오는 검색은 오늘 값이라 어긋난다
+        (실측 2026-09-06: 136 vs 137). 정의가 같으므로 시점을 적는다."""
+        asof = render.glossary_cases_measured_on()
+        if not asof:
+            self.skipTest("용어사전 사례 정본 없음")
+        # 색인 면이 아니라 **사례 링크가 실제로 붙은 낱개 용어 페이지**만 본다
+        # (색인에도 같은 문구가 카드 안에 들어가지만 링크 블록은 용어 페이지에만 있다).
+        pages = [h for rel, h in self.pages.items()
+                 if rel.startswith("glossary/") and rel != "glossary/index.html"
+                 and 'class="gt-case"' in h]
+        self.assertTrue(pages, "사례 링크가 붙은 용어 페이지가 하나도 없다")
+        for html in pages:
+            self.assertIn(asof, html, "사례 건수 기준일이 화면에 없다")
+
     def test_body_shim_is_present_and_used_where_findings_text_is_drawn(self):
         """지적 본문을 그리는 자산은 언어별 선택 사본을 갖고, 옛 '국문 우선' 고정 표현이
         남아 있으면 안 된다(영어판에서 한국어가 그대로 나온다)."""

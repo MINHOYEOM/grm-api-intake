@@ -37,6 +37,7 @@
   .gt-case-lede{font-family:var(--sans);font-size:14.5px;color:var(--muted);margin:0 0 14px;word-break:keep-all}
   .gt-case-lede b{color:var(--body);font-weight:600}
   .gt-cases{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:14px}
+  .gt-case-asof{margin:8px 0 0;font-size:11.5px;color:var(--muted-2);word-break:keep-all}
   .gt-case-item{border-left:3px solid var(--line-2);padding:2px 0 2px 16px}
   .gt-quote{font-family:var(--sans);font-size:15px;line-height:1.75;color:var(--body);margin:0 0 7px;word-break:keep-all}
   .gt-case-meta{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;color:var(--muted);text-decoration:none}
@@ -106,6 +107,10 @@
       </ol>
       {%- endif %}
       <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">{{ _("이 용어로 검색되는 지적사례 <b>{n}</b>건 보기", n=term.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      {#- [기준일 병기 2026-09-06] 이 건수는 주 1회 재측정하는 스냅샷이고 누르면 나오는
+          검색은 오늘 값이라, 며칠씩 어긋난다(실측: 136 vs 137). 정의는 완전히 같으므로
+          값을 맞추는 게 아니라 시점을 밝힌다. 기준일이 없으면(파일 부재) 문장도 없다. -#}
+      {% if cases_asof %}<p class="gt-case-asof">{{ _("{asof} 기준으로 센 건수입니다 — 눌러서 보시는 검색 결과는 오늘 값이라 조금 다를 수 있습니다.", asof=cases_asof) }}</p>{% endif %}
     </section>
     {% endif %}
 

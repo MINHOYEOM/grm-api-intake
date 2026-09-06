@@ -1305,6 +1305,19 @@ def _url_quote(value: str, safe: str = "") -> str:
     return "".join(out)
 
 
+def glossary_cases_measured_on(path: Path = GLOSSARY_CASES_FILE) -> str:
+    """[용어사전→사례] 사례 건수 스냅샷의 재측정일(`measured_on`).
+
+    ★사례 수는 **주 1회 재측정하는 스냅샷**이라 눌렀을 때의 검색 결과와 며칠씩 어긋난다
+      (실측 2026-09-06: "데이터 완전성" 사례 136 vs 검색 137). 정의는 완전히 같고 시점만
+      다르므로, 값을 맞추는 게 아니라 **언제 기준인지를 화면이 밝힌다**(자료실·둘러보기가
+      이미 쓰는 관례). `load_glossary_cases` 는 items 만 돌려주므로 여기서 따로 읽는다."""
+    if not path.is_file():
+        return ""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return str(data.get("measured_on") or "")
+
+
 def load_glossary_cases(path: Path = GLOSSARY_CASES_FILE) -> dict[str, dict[str, Any]] | None:
     """[용어사전→사례] 용어별 findings 검색어/건수 커밋 데이터 로드(id → item 딕셔너리).
 
@@ -2206,8 +2219,13 @@ def browse_axis_cards(facets_data: "dict[str, Any] | None", *,
     # `render_doc_pages` 로 가르면 테스트 빌드의 골든이 프로덕션과 다른 것을 고정하게
     # 되어(골든에 이 카드가 없는데 라이브엔 있는 상태) 대조가 의미를 잃는다.
     if docs_present and (allowed is None or "findings/docs/" in allowed):
+        # [분모 고지 2026-09-06] 이 수는 **개별 페이지를 만든 문서**이지 보유한 문서 전량이
+        # 아니다(3,305 vs 6,187). 지적 3건 이상 + 발행일이 있는 문서만 페이지가 되고, 그
+        # 임계가 어떤 소스의 문서를 하나도 남기지 못하면 그 소스는 면제된다(findings_docs
+        # _refresh 헤더). 분모를 안 밝히면 "우리가 가진 문서가 3,305건"으로 읽힌다.
         out.append({"href": "findings/docs/", "title": tr("문서로 찾기"),
-                    "blurb": tr("실사 문서 {n}건을 기관·연도로 묶어 봅니다.",
+                    "blurb": tr("지적이 3건 이상이고 발행일이 있는 실사 문서 {n}건을 "
+                                "기관·연도로 묶어 봅니다(보유 문서 전량은 아닙니다).",
                                 n=f"{doc_count:,}")})
     return out
 
@@ -4329,12 +4347,26 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [발견 허브 2026-08-26] 랜딩·findings 허브 공용 요약 — 수치를 템플릿에 박지 않는다
     # (자료실 카드와 같은 계약: 손으로 적은 수치는 반드시 낡는다). 데이터가 없으면 None
     # → 해당 섹션이 조용히 꺼진다(load_findings_facets 관례 동형).
-    findings_zone = None
-    if facets:
-        findings_zone = {
-            "documents": f"{facets['totals']['documents']:,}",
-            "findings": f"{facets['totals']['findings']:,}",
+    # ★[2026-09-06] 언어 트리마다 **그 트리의 정본**에서 뽑는다. 종전에는 영어 페이지에도
+    #   한국어 스냅샷을 넘겨, 영문 `/findings/` 가 머리글에 24,895건이라고 적고 바로 아래
+    #   목록은 22,886건(원문이 영어인 지적)을 보여줬다 — 같은 화면의 두 수가 서로 다른
+    #   모집단을 세고 있었다. 영어 정본(`findings_facets_en.json`)은 이미 있고 영어
+    #   둘러보기 축 카드가 그걸 쓰고 있었는데 **머리 숫자만** 한국어 파일을 봤다.
+    # ★기준일(`measured_on`)을 함께 넘긴다. 이 수는 주 1회 재측정하는 **스냅샷**이라
+    #   런타임 목록과 며칠씩 어긋나는데(실측 2026-09-06: 24,895 vs 24,956), 화면이 시점을
+    #   안 밝히면 "같은 것을 세는데 값이 다르다"로 읽힌다. 값을 맞추는 게 아니라 언제
+    #   기준인지를 적는다(자료실·둘러보기가 이미 쓰는 관례).
+    def _zone_totals(data):
+        if not data:
+            return None
+        return {
+            "documents": f"{data['totals']['documents']:,}",
+            "findings": f"{data['totals']['findings']:,}",
+            "as_of": data.get("measured_on", ""),
         }
+
+    findings_zone = _zone_totals(facets)
+    findings_zone_en = _zone_totals(facets_en)
 
     # 랜딩.
     emit("landing.html", page(""),
@@ -4470,7 +4502,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _recent = recent_docs if _lg == DEFAULT_LANG else en_recent_docs
         _emit("findings_browse.html", _mkpage("findings/browse/"),
             browse_axes=_axes,
-            zone_totals=findings_zone,
+            zone_totals=(findings_zone if _lg == DEFAULT_LANG else findings_zone_en),
             recent_docs=_recent,
             recent_asof=(docs_data or {}).get("measured_on", ""),
             # '문서로 찾기' 바로가기도 그 트리에 그 면이 있을 때만 — 한국어 데이터로
@@ -4647,6 +4679,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         json_ld=build_glossary_term_json_ld(term, tr=en_tr, lang="en"),
                         term=term,
                         case_excerpts=glossary_en_excerpts.get(term["id"]) or [],
+                        cases_asof=glossary_cases_measured_on(GLOSSARY_CASES_EN_FILE),
                     )
 
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
@@ -4666,6 +4699,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     json_ld=build_glossary_term_json_ld(term, tr=tr),
                     term=term,
                     case_excerpts=case_excerpts.get(term["id"]) or [],
+                    cases_asof=glossary_cases_measured_on(),
                 )
                 glossary_term_ids.append(term["id"])
 
@@ -5437,10 +5471,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             en_tr, "en") if en_cover_brief is not None else None),
         library={"catalog_count": len(en_catalogs),
                  "item_count": sum(v["count"] for v in en_catalogs)},
-        findings_zone=findings_zone,
+        findings_zone=findings_zone_en,
     )
     en_emit("findings.html", en_page("findings/"),
-        zone_totals=findings_zone,
+        zone_totals=findings_zone_en,
         page_title=en_tr("지적사항 검색 · GRM"),
         nav_active="findings",
         description=en_tr(FINDINGS_DESCRIPTION),

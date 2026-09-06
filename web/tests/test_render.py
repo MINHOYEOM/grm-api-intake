@@ -7458,17 +7458,25 @@ class WebMePageTest(unittest.TestCase):
         self.assertIn('<p class="grm-my-note me-growth-fb">', self.me)
         self.assertIn(".me-growth:not([hidden]) + .me-growth-fb{display:none}", self.me)
 
-    def test_entry_point_is_the_account_menu_not_the_footer(self):
-        """[푸터 확정 2026-09-06] 진입점은 **헤더 계정 메뉴 하나**다 — nav 탭은 늘리지 않고,
-        푸터에서도 뺐다. 로그인해야 열리는 면을 모두에게 보이는 자리에 두면, 대다수에게는
-        눌러도 아무것도 없는 링크가 된다. 종전에는 footer 에 env-gate 로 걸어 뒀었다.
+    def test_entry_point_is_the_header_not_the_footer(self):
+        """[푸터 확정 2026-09-06] 마이페이지는 **푸터에서 뺐다** — 로그인해야 열리는 면을
+        모두에게 보이는 자리에 두면 대다수에게는 눌러도 아무것도 없는 링크가 된다.
+        진입은 헤더 두 갈래로 남는다: 좁은 폭 서랍(.navmore, 정적·reactions 게이트)과
+        로그인 시 reactions.js 가 얹는 계정 메뉴(런타임).
 
-        ★빼기만 하고 끝내면 그 면은 닿을 길이 없어진다 — 대체 경로(reactions.js 가 로그인
-        시 얹는 계정 메뉴)가 실제로 그 링크를 들고 있는지 여기서 함께 본다."""
-        self.assertNotIn("me/index.html", self.landing_on)   # 푸터·본문 어디에도 없다
-        self.assertNotIn("마이페이지", self.landing_on)
-        self.assertNotIn("마이페이지", self.landing_off)
-        self.assertIn("me/index.html", self.reactions_js)    # 대체 경로는 살아 있다
+        ★빼기만 하고 끝내면 그 면은 닿을 길이 없어진다 — 그래서 여기서 **뺀 자리와 남은
+        자리를 함께** 본다. 남은 자리를 안 보면 다음 사람이 서랍을 손볼 때 조용히 고아가
+        된다(이 저장소가 도달성 감사로 한 번 겪은 실패)."""
+        foot = self.landing_on[self.landing_on.index('<footer class="site">'):]
+        self.assertNotIn("me/index.html", foot)              # 푸터에는 없다
+        self.assertNotIn("마이페이지", foot)
+        self.assertNotIn("마이페이지", self.landing_off)      # env-off 면 어디에도 없다
+        import re as _re0
+        nav0 = _re0.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re0.S).group(1)
+        _, sep0, drawer = nav0.partition('<span class="navmore">')
+        self.assertTrue(sep0, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
+        self.assertIn('me/index.html">마이페이지</a>', drawer)   # 헤더 서랍(정적)
+        self.assertIn("me/index.html", self.reactions_js)        # 계정 메뉴(런타임)
         # nav 탭 수는 그대로 6개(과밀 금지).
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re.S)
@@ -13767,10 +13775,15 @@ class WebAboutTest(unittest.TestCase):
 
     def test_my_page_left_the_footer_but_the_account_menu_keeps_it(self):
         """[확정안 2026-09-06] 마이페이지는 푸터에서 뺀다 — 로그인해야 열리는 면을 모두에게
-        보이는 자리에 두지 않는다. 대신 계정 메뉴(reactions.js)가 같은 링크를 얹는지 확인한다:
+        보이는 자리에 두지 않는다. 대신 헤더가 두 갈래로 들고 있는지 확인한다: 좁은 폭
+        서랍(.navmore — 정적, #935)과 로그인 시 계정 메뉴(reactions.js — 런타임).
         빼기만 하고 대체 경로를 안 보면 그 면은 닿을 길이 없어진다."""
         foot = self.trends[self.trends.index('<div class="foot">'):self.trends.index('<div class="foot-legal">')]
         self.assertNotIn("me/index.html", foot)
+        base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        _, sep, drawer = base.partition('<span class="navmore">')
+        self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 사라졌다 — 마이페이지 정적 진입 경로")
+        self.assertIn("me/index.html", drawer[:drawer.index("</span>")])
         reactions = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
         self.assertIn("me/index.html", reactions)
         self.assertIn("grm-acct-item", reactions)
@@ -14217,14 +14230,6 @@ class WebZoneIaTest(unittest.TestCase):
         "404.html": "존재하지 않는 경로에 서버가 띄우는 페이지 — 링크 대상이 아니다.",
         "en/404.html": "위와 같다. 영어 트리에서도 Cloudflare 가 상태코드로 띄운다.",
         "admin/index.html": "운영자 전용 콘솔 — 공개 링크를 두지 않는 것이 의도다.",
-        # [푸터 확정 2026-09-06] 마이페이지는 푸터에서 뺐다 — 로그인해야 열리는 면을 모두에게
-        # 보이는 자리에 두면 대다수에게는 눌러도 아무것도 없는 링크가 된다. 진입은 로그인 시
-        # reactions.js 가 헤더에 얹는 계정 메뉴 하나이고, 그건 **런타임 주입이라 이 BFS 가
-        # 원리적으로 못 본다**(정적 HTML 만 훑는다). 대체 경로가 살아 있다는 것은
-        # WebAboutTest.test_my_page_left_the_footer_but_the_account_menu_keeps_it 이 본다 —
-        # 여기에 등록만 하고 대체 경로를 아무도 안 보면 그게 조용한 고아가 된다.
-        "me/index.html": "로그인 전용 면 — 진입은 reactions.js 가 얹는 헤더 계정 메뉴(런타임).",
-        "en/me/index.html": "위와 같다.",
     }
 
     #: 세그먼트에 서는 면. [컨셉 재정의] '데이터 현황'은 세그먼트에서 내렸다 — 그 면이

@@ -1,5 +1,5 @@
 /* GRM 문의 및 제안 — 전 페이지 공통 런타임 위젯.
-   비골든: 푸터 '서비스' 열(`[data-feedback-slot]`)의 진입 링크와 모달, 소개 페이지 연락
+   비골든: 푸터 '서비스 안내' 열(`[data-feedback-slot]`)의 진입 링크와 모달, 소개 페이지 연락
    블록(`[data-feedback-mount]`)의 진입 버튼을 전부 런타임에 주입한다 — JS 미실행이면
    흔적 0(죽은 링크를 남기지 않는 share 버튼 선례). 스타일은 base.html 게이트 안 스코프
    <style>(.grm-fb-*) — grm.css 프리즈 보존(reactions 관례). 소개 버튼 스타일은 about.html.
@@ -57,47 +57,36 @@
     try { return (window.innerWidth || 0) + "x" + (window.innerHeight || 0); } catch (e) { return ""; }
   }
 
-  // ── 진입점: 푸터 '서비스' 열에 링크 주입(전 페이지 공통·nav 과밀 금지 원칙) ──────────
+  // ── 진입점: 푸터 '서비스 안내' 열에 링크 주입(전 페이지 공통·nav 과밀 금지 원칙) ─────
   //    열은 제목 문자열이 아니라 `[data-feedback-slot]` 속성으로 찾는다 — 제목은 언어·문구
-  //    사전을 타서 바뀔 수 있고, 그러면 링크가 조용히 사라진다(속성은 언어와 무관).
-  //    마이페이지(계정) 링크가 있으면 그 앞에 둔다 — 계정 링크는 열의 맨 끝.
+  //    사전을 타서 바뀔 수 있고(실제로 '안내' → '서비스' → '서비스 안내' 로 두 번 바뀌었다),
+  //    그러면 링크가 조용히 사라진다. 속성은 언어와 무관하다.
   var slot = document.querySelector("footer.site .foot [data-feedback-slot]");
   if (!slot) return;
   var trigger = document.createElement("a");
   trigger.href = "#";
   trigger.id = "grm-feedback-open";
   trigger.textContent = _t("문의 및 제안");
-  var meLink = slot.querySelector('a[href$="me/index.html"]');
-  if (meLink) slot.insertBefore(trigger, meLink); else slot.appendChild(trigger);
-  // ── 소개 페이지 연락 목록(`[data-feedback-mount]`)에 채널 줄 하나 — 푸터 링크와 같은
+  slot.appendChild(trigger);   // '서비스 안내' 열의 마지막 항목
+  // ── 소개 페이지 연락 블록(`[data-feedback-mount]`)에 주 버튼 하나 — 푸터 링크와 같은
   //    관례(JS 미실행이면 흔적 0). 없는 페이지에서는 아무것도 하지 않는다.
-  //    ★문구는 마운트 지점이 `data-fb-name`·`data-fb-desc` 로 정한다 — 소개 페이지의 연락
-  //    문안이 템플릿 한 곳에 모이게 하기 위해서다(문안이 JS 로 새면 고칠 자리가 갈라진다).
-  //    속성이 없으면 푸터 링크와 같은 사전 키로 떨어진다(새 키를 만들지 않는다).
-  //    ★주 채널이라 목록 **맨 위**에 넣는다 — 붙이는 순서가 곧 고르는 순서다.
+  //    ★라벨은 마운트 지점이 `data-fb-name` 으로 정한다 — 소개 페이지의 연락 문안이 템플릿
+  //    한 곳에 모이게 하기 위해서다(문안이 JS 로 새면 고칠 자리가 갈라진다). 속성이 없으면
+  //    푸터 링크와 같은 사전 키로 떨어진다(새 키를 만들지 않는다).
+  //    ★주 채널이라 **맨 앞**에 넣는다 — 붙이는 순서가 곧 고르는 순서다.
   var mount = document.querySelector("[data-feedback-mount]");
   var mountBtn = null;
   if (mount) {
     mountBtn = document.createElement("a");
     mountBtn.href = "#";
-    mountBtn.className = "ac-row about-fb";
+    mountBtn.className = "about-act about-fb";
     var mIcon = document.createElement("i");
-    mIcon.className = "ti ti-message-report ac-ic";
+    mIcon.className = "ti ti-message-report";
     mIcon.setAttribute("aria-hidden", "true");
-    var mName = document.createElement("b");
-    mName.textContent = mount.getAttribute("data-fb-name") || _t("문의 및 제안");
-    var mDesc = document.createElement("span");
-    mDesc.textContent = mount.getAttribute("data-fb-desc") || "";
-    var mGo = document.createElement("i");
-    mGo.className = "ti ti-arrow-right ac-go";
-    mGo.setAttribute("aria-hidden", "true");
     mountBtn.appendChild(mIcon);
-    mountBtn.appendChild(mName);
-    mountBtn.appendChild(mDesc);
-    mountBtn.appendChild(mGo);
-    var mRow = document.createElement("li");
-    mRow.appendChild(mountBtn);
-    mount.insertBefore(mRow, mount.firstChild);
+    mountBtn.appendChild(document.createTextNode(
+      mount.getAttribute("data-fb-name") || _t("문의 및 제안")));
+    mount.insertBefore(mountBtn, mount.firstChild);
   }
 
   var pop = null, lastFocus = null, sending = false, saveTimer = null;

@@ -3,73 +3,78 @@
 {#- [소개 2026-09-06] 소개 페이지(/about/) — web/data/about_content.md(정본)를 render_about_html
     이 제목·리드·블록으로 잘라 넘긴다(about_title·about_lead·about_sections). 이용안내처럼
     목차가 달린 긴 문서가 아니라 **왼쪽 레이블 + 오른쪽 본문** 블록 몇 개다.
-    싣지 않는 것: 운영자 실명, 문서·지적 수 같은 숫자(늘 바뀌어 낡는다), 소스 개수 강조.
-    연락: LinkedIn·이메일(env.globals contact — 빈 값이면 링크 미출력)과 '문의 및 제안'
-    (feedback.js 가 [data-feedback-mount] 에 런타임 주입 — JS 미실행이면 흔적 0).
+    ★링크·버튼은 md 서브셋이 표현할 수 없어(링크 문법 없음) 여기서 그리되, **어느 절에**
+    그릴지는 md 가 정한다(`## 만든 사람 {linkedin}` — render.ABOUT_SLOTS). 문안을 손보는
+    사람이 절을 옮기면 위젯도 따라간다.
+    싣지 않는 것: 운영자 실명, 문서·지적 수 같은 낡는 숫자, 소속 회사와의 관계·게시 전
+    개별 검토 여부에 관한 문장(사용자 확정 2026-09-06).
     nav 탭은 늘리지 않는다(nav_active="about" 은 어느 탭도 켜지 않는다 — 진입은 푸터).
+    같은 값(nav_active)으로 base.html 이 마스코트와 고정 구독 밴드를 이 면에서만 접는다.
     grm.css 프리즈 보존 위해 레이아웃은 기존 토큰만 쓰는 스코프 <style>(이용안내 선례).
     §4 한글안전: letter-spacing/text-transform/mono 미사용(영문 eyebrow 제외) + keep-all. -#}
 <main>
   <div class="wrap page-head about-head">
-    <span class="kick reveal" style="animation-delay:.02s">About</span>
+    <span class="kick reveal" style="animation-delay:.02s">About Global Regulatory Monitor</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ about_title }}</h1>
     <div class="about-lead reveal" style="animation-delay:.14s">{{ about_lead }}</div>
+    {#- 리드 바로 아래 진입 둘 — 소개를 읽고 나면 다음 행동은 브리프를 보거나 쓰는 법을
+        익히는 것이다. 없는 언어판으로 보내지 않도록 en_paths 로 거른다(푸터와 같은 규칙). -#}
+    <div class="about-cta reveal" style="animation-delay:.2s">{% if lang == 'ko' or 'archive/' in en_paths %}<a class="btn coral" href="{{ rel_root }}archive/index.html">{{ _("주간 브리프 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a class="btn" href="{{ rel_root }}guide/index.html">{{ _("이용안내") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>{% endif %}</div>
   </div>
-  <div class="wrap about-body reveal" style="animation-delay:.2s">
+  <div class="wrap about-body reveal" style="animation-delay:.26s">
     {% for s in about_sections %}
     <section class="about-sec" id="{{ s.id }}">
       <h2>{{ s.title }}</h2>
-      <div class="about-prose">{{ s.body }}</div>
-    </section>
-    {% endfor %}
-    {#- [연락 2026-09-06] 채널을 나란한 버튼 셋에서 **줄 목록**으로 바꾼다. 종전은 이름만
-        적힌 작은 알약 셋이라 "어느 쪽으로 보내야 하는지"를 말하지 않았고, 페이지의 끝인데도
-        가장 가벼웠다. 줄마다 아이콘·이름·쓰임을 두면 고르는 데 필요한 것이 다 있고, 괘선은
-        위 '지키는 것' 목록과 같은 언어라 카드를 새로 들이지 않는다.
-        ★문의 줄의 문구는 **여기(data-fb-*)가 정한다** — feedback.js 가 그 줄을 런타임에
-        얹지만(JS 미실행이면 흔적 0 계약), 문안이 JS 파일로 새면 이 페이지의 연락 문구가 두
-        파일로 갈라진다. 속성이 없으면 JS 는 푸터와 같은 라벨로 떨어진다(사전 키 재사용). -#}
-    <section class="about-sec" id="contact">
-      <h2>{{ _("연락") }}</h2>
-      <div class="ac">
-        <p class="ac-lede">{{ _("궁금한 점이나 제안이 있으면 편하게 알려 주세요. 잘못된 내용을 발견하셨을 때도요.") }}</p>
-        <ul class="ac-list" data-feedback-mount data-fb-name="{{ _('문의 및 제안') }}" data-fb-desc="{{ _('이 화면에서 바로 남길 수 있어요') }}">{% if contact.email %}<li><a class="ac-row" href="mailto:{{ contact.email }}"><i class="ti ti-mail ac-ic" aria-hidden="true"></i><b>{{ _("이메일") }}</b><span>{{ _("길게 쓰고 싶을 때") }}</span><i class="ti ti-arrow-right ac-go" aria-hidden="true"></i></a></li>{% endif %}{% if contact.linkedin %}<li><a class="ac-row" href="{{ contact.linkedin }}" target="_blank" rel="me noopener"><i class="ti ti-brand-linkedin ac-ic" aria-hidden="true"></i><b>LinkedIn</b><span>{{ _("운영자 프로필") }}</span><i class="ti ti-external-link ac-go" aria-hidden="true"></i></a></li>{% endif %}</ul>
+      <div class="about-prose">
+        {{ s.body }}
+        {%- if s.slot == 'linkedin' and contact.linkedin %}
+        <p class="about-more"><a href="{{ contact.linkedin }}" target="_blank" rel="me noopener">{{ _("LinkedIn에서 더 알아보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
+        {%- endif %}
+        {%- if s.slot == 'contact' %}
+        {#- '문의 및 제안'(주 버튼)은 feedback.js 가 목록 맨 앞에 얹는다 — JS 미실행이면 흔적 0
+            (죽은 링크 금지). 문안은 `data-fb-name` 으로 여기서 넘겨 연락 문구가 JS 로 새지
+            않게 한다. 이메일은 정본(contact.json)에 값이 있을 때만. -#}
+        <div class="about-acts" data-feedback-mount data-fb-name="{{ _('문의 및 제안') }}">{% if contact.email %}<a class="about-act" href="mailto:{{ contact.email }}"><i class="ti ti-mail" aria-hidden="true"></i>{{ _("이메일") }}</a>{% endif %}</div>
+        {%- endif %}
       </div>
     </section>
+    {% endfor %}
   </div>
 </main>
 <style>
 /* [소개] 레이블 + 본문 블록 — grm.css 토큰만 사용(프리즈 보존). 카드·배지 없이 괘선으로만 나눈다. */
-.about-head h1{max-width:20ch;text-wrap:balance;word-break:keep-all}
+.about-head h1{max-width:22ch;text-wrap:balance;word-break:keep-all}
 .about-head .about-lead p{color:var(--body);margin-top:22px;font-size:17px;line-height:1.7;max-width:56ch;word-break:keep-all}
-.about-body{padding-top:40px;padding-bottom:80px}
+.about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.about-cta .btn{font-size:14.5px}
+.about-cta .btn .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
+.about-cta .btn:hover .ti{transform:translateX(3px)}
+.about-body{padding-top:44px;padding-bottom:80px}
 .about-sec{display:grid;grid-template-columns:200px 1fr;gap:40px;padding:44px 0;border-top:1px solid var(--line)}
 .about-sec h2{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);margin:0;padding-top:4px;line-height:1.5;word-break:keep-all}
 .about-prose{max-width:60ch;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all}
 .about-prose p{margin:0 0 1.1em}
 .about-prose p:last-child{margin-bottom:0}
 .about-prose ul{list-style:none;margin:0;padding:0}
-.about-prose li{padding:12px 0;border-top:1px solid var(--line)}
+.about-prose li{padding:14px 0;border-top:1px solid var(--line)}
 .about-prose li:first-child{border-top:0;padding-top:0}
 .about-prose strong{font-weight:600;color:var(--ink)}
-/* [연락] 채널 줄 목록. `.about-prose` 밖에 두는 것이 중요하다 — 그 안이면 위 목록용
-   `.about-prose li{padding;border-top}` 이 그대로 걸려 줄 간격이 두 규칙 사이에서 다툰다. */
-.ac{max-width:60ch}
-.ac-lede{font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;margin:0 0 24px}
-.ac-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.ac-list:empty{display:none}   /* 정본이 비고 JS 도 안 돌면 괘선만 남는 빈 상자가 되지 않게 */
-.ac-list > li{border-bottom:1px solid var(--line)}
-.ac-row{display:grid;grid-template-columns:26px 1fr 18px;grid-template-rows:auto auto;align-items:center;column-gap:14px;padding:15px 2px;color:var(--ink);cursor:pointer}
-.ac-row .ac-ic{grid-column:1;grid-row:1/3;font-size:19px;line-height:1;color:var(--muted-2);transition:color .16s var(--ease)}
-.ac-row b{grid-column:2;grid-row:1;font-family:var(--sans);font-size:15.5px;font-weight:600;line-height:1.45;color:var(--ink);transition:color .16s var(--ease);word-break:keep-all}
-.ac-row span{grid-column:2;grid-row:2;font-family:var(--sans);font-size:13.5px;line-height:1.55;color:var(--muted);word-break:keep-all}
-.ac-row .ac-go{grid-column:3;grid-row:1/3;font-size:16px;line-height:1;color:var(--line-2);transition:color .16s var(--ease),transform .16s var(--ease)}
-.ac-row.about-fb .ac-ic{color:var(--coral)}   /* 주 채널만 쉼 상태에서도 강조(알약 대신 점 하나) */
-.ac-row:hover b{color:var(--coral-2)}
-.ac-row:hover .ac-ic,.ac-row:hover .ac-go{color:var(--coral)}
-.ac-row:hover .ac-go{transform:translateX(3px)}
-.ac-row:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:var(--rad-s)}
-@media (prefers-reduced-motion:reduce){ .ac-row:hover .ac-go{transform:none} }
-@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:14px;padding:34px 0} .about-head h1{font-size:38px} .about-prose{font-size:16px} .ac-lede{font-size:16px} }
+/* 목록 항목은 '이름 한 줄 + 설명 한 줄' — 굵은 머리말을 블록으로 떨어뜨려 둘을 가른다. */
+.about-prose li strong{display:block;font-size:15.5px;line-height:1.5;margin-bottom:3px}
+.about-more{margin-top:20px}
+.about-more a{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--coral-2);border-bottom:1px solid var(--line-2);padding-bottom:2px;transition:border-color .16s var(--ease)}
+.about-more a:hover{border-bottom-color:var(--coral-2)}
+.about-more .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
+.about-more a:hover .ti{transform:translateX(3px)}
+.about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.about-acts:empty{display:none}
+.about-act,.about-fb{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:10px 17px;background:transparent;cursor:pointer;transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease)}
+.about-act:hover{border-color:var(--ink)}
+.about-act .ti,.about-fb .ti{font-size:16px;line-height:1}
+.about-fb{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
+.about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
+.about-act:focus-visible,.about-fb:focus-visible,.about-more a:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti,.about-more a:hover .ti{transform:none} }
+@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:14px;padding:34px 0} .about-head h1{font-size:36px;max-width:none} .about-prose{font-size:16px} }
 </style>
 {% endblock %}

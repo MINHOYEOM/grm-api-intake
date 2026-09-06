@@ -5485,8 +5485,10 @@ class WebChecklistRenderTest(unittest.TestCase):
         cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
         cls.js_src = (WEB_DIR / "assets" / "checklist.js").read_text(encoding="utf-8")
         cls.html_src = (WEB_DIR / "templates" / "checklist.html").read_text(encoding="utf-8")
-        cls.sql_src = (WEB_DIR / "migrations" / "043_findings_checklist.sql").read_text(
-            encoding="utf-8")
+        # 043 은 079 로 대체됐다 — **현행 정의가 있는 파일**을 읽는다(옛 파일을 계속
+        # 읽으면 이미 갈아엎은 계약을 검사하며 초록이 뜬다).
+        cls.sql_src = (WEB_DIR / "migrations"
+                       / "079_findings_checklist_excerpt.sql").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
@@ -5588,7 +5590,7 @@ class WebChecklistRenderTest(unittest.TestCase):
         """사례는 원문 문장이다 — definer 로 내보내면 미번역·비공개 행까지 샌다.
         invoker 라 RLS(010)가 게이트를 강제한다(026 과 동일 이유, 042 와는 반대)."""
         self.assertIn("security invoker", self.sql_src)
-        self.assertIn("findings 의 RLS(010 정책", self.sql_src)
+        self.assertIn("RLS(010)", self.sql_src)      # 왜 invoker 인지가 파일에 적혀 있어야 한다
         self.assertNotIn("security definer", self.sql_src)
 
     def test_sql_section_match_does_not_swallow_neighbours(self):
@@ -5604,14 +5606,42 @@ class WebChecklistRenderTest(unittest.TestCase):
         self.assertIn("(coalesce(p_sections, '{}'::text[]))[1:50]", self.sql_src)
         self.assertIn("least(greatest(coalesce(p_examples, 2), 1), 5)", self.sql_src)
 
-    def test_sql_dedupes_by_firm_and_prefers_anchored_examples(self):
-        """같은 업체 사례 2건이면 "여러 곳에서 반복되는 지적"이라는 전제가 깨진다.
-        또 위반 블록 하나가 여러 조항을 인용하면 문장에 그 조항 번호가 없을 수 있어,
-        번호가 실제로 적힌 사례를 앞세운다(실측 결함이었다)."""
-        self.assertIn("partition by sec.section, f.firm_key", self.sql_src)
-        self.assertIn("as anchored", self.sql_src)
-        self.assertIn("order by c.anchored, c.published_date desc, c.finding_id", self.sql_src)
-        self.assertIn("21 CFR 211.22(a)를 인용", self.sql_src)   # 근거 실측 기록
+    def test_sql_dedupes_by_firm(self):
+        """같은 업체 사례 2건이면 "여러 곳에서 반복되는 지적"이라는 전제가 깨진다."""
+        self.assertIn("partition by m.section, m.firm_key", self.sql_src)
+
+    def test_sql_excerpt_starts_at_the_clause_not_at_the_head(self):
+        """★2026-09-06 실측 결함의 정본 수리. 043 은 finding **앞머리**를 내려줬고 화면은
+        240자를 잘라 찍었다 — 조항 매칭은 cfr_refs(그 finding 이 인용한 조항 전부)로 하는데
+        발췌는 늘 앞머리라, 조항이 본문 중간에서 인용됐으면 **다른 조항의 문장**이 뜨고
+        통짜 finding 이면 **편지 서두**가 떴다. 079 는 그 조항이 인용된 자리에서 발췌한다."""
+        self.assertIn("create or replace function public.findings_clause_excerpt(",
+                      self.sql_src)
+        self.assertIn("public.findings_clause_excerpt(f.finding_text_ko, k.section)",
+                      self.sql_src)
+        self.assertIn("public.findings_clause_excerpt(f.finding_text,    k.section)",
+                      self.sql_src)
+        # 되짚기 상한 < 발췌 길이 — 이 부등식이 "조항이 발췌 안에 있다"의 근거다.
+        # ★두 수를 손으로 적어 비교하면 기본값에서만 참인 보장이 된다(호출자가 p_max=120·
+        #   p_lead=400 을 주면 깨진다). SQL 이 **관계를 강제**하는지 본다.
+        self.assertIn("least(greatest(coalesce(p_lead, 300), 0), 400, maxlen - 40)",
+                      self.sql_src, "되짚기 상한이 발췌 길이에 묶여 있지 않다")
+
+    def test_sql_drops_rows_whose_text_does_not_cite_the_clause(self):
+        """화면이 증명할 수 없는 문장을 "실제 지적 사례"라고 싣지 않는다 — 없으면 없다고
+        말한다. 있는 언어는 전부 앵커돼야 한다(한쪽만 맞으면 다른 언어 화면이 거짓이 된다)."""
+        self.assertIn("(not m.has_ko or m.anch_ko)", self.sql_src)
+        self.assertIn("(not m.has_en or m.anch_en)", self.sql_src)
+        self.assertIn("(m.anch_ko or m.anch_en)", self.sql_src)
+        # 조항 경계 — 211.22 질의가 본문 211.226 을 앵커로 삼으면 안 된다.
+        self.assertIn(r"(?![0-9])", self.sql_src)
+
+    def test_sql_return_keys_are_additive_for_the_deploy_window(self):
+        """SQL 은 마이그레이션으로, 화면 JS 는 정적 배포로 **다른 시각에** 라이브가 된다.
+        키를 갈아치우면 그 사이에 사례 문장이 통째로 빈다(실측: 새 RPC + 옛 JS = 업체·날짜만
+        남고 본문 0). 그래서 옛 키에도 같은 값을 낸다."""
+        for key in ("'excerpt_ko',", "'excerpt',", "'finding_text_ko',", "'finding_text',"):
+            self.assertIn(key, self.sql_src, key)
 
     # ── 산출물로서의 요건 ────────────────────────────────────────────────────
     def test_verdict_and_note_fields_are_blank_for_humans(self):
@@ -5666,21 +5696,37 @@ class WebChecklistRenderTest(unittest.TestCase):
         fn = fn[:fn.index("\n  }\n")]
         self.assertIn("사실상 Warning Letter 기준입니다.", fn)
         self.assertIn("위반 인용이 아니라 제외했습니다.", fn)
-        self.assertIn("인용 문서 수보다 적을 수 있습니다.", fn)
+        self.assertIn("인용 문서 수보다 적습니다", fn)
+        # 사례가 인용 문서 수보다 적은 이유는 **둘**이다(공개 게이트 + 조항 미인용).
+        # 하나만 적으면 인쇄물이 자기 모집단을 절반만 밝히는 셈이다.
+        self.assertIn("지적 본문에 그 조항 번호가 실제로 적힌 것만", fn)
         self.assertIn("자료가 공개된 날입니다.", fn)
         self.assertIn("state.meta.excluded", fn)   # 제외 목록은 응답에서(하드코딩 금지)
         self.assertIn("state.meta.partFilter", fn)
 
     def test_missing_examples_state_is_explicit(self):
+        """사례가 비는 이유가 둘로 늘었다(공개 게이트 + 조항 미인용). 어느 쪽이든 화면은
+        지어내지 않고 없다고 말한다."""
         item = self._fn("buildItem")
-        self.assertIn("국문으로 열람할 수 있는 사례가 아직 없습니다.", item)
+        self.assertIn("이 조항을 본문에 인용한 지적이 아직 없습니다.", item)
 
-    def test_loose_example_is_flagged(self):
-        """anchored=false 면 같은 위반 블록이 여러 조항을 함께 인용한 경우다 — 문장에
-        그 조항 번호가 없다는 사실을 적어 오해를 막는다."""
-        item = self._fn("buildItem")
-        self.assertIn("if (f.anchored === false)", item)
-        self.assertIn("같은 지적에 여러 조항이 함께 인용됨", item)
+    def test_client_does_not_re_truncate_the_excerpt(self):
+        """★발췌를 여기서 다시 자르면 조항 번호가 화면 밖으로 밀려나 079 가 세운 "보이는
+        문장에 그 조항이 있다"는 보장이 그대로 무너진다 — 그게 정확히 종전 결함이었다
+        (RPC 는 전문을 주고 이 파일이 240자로 잘랐다). "무엇이 보이는가"의 정본은 RPC 다."""
+        fn = self._fn("exampleText")
+        for forbidden in ("slice(", "substring(", "substr(", "MAX_CHARS"):
+            self.assertNotIn(forbidden, fn, f"발췌를 다시 자르고 있다: {forbidden}")
+        self.assertNotIn("EXAMPLE_MAX_CHARS", self.js_src)
+
+    def test_client_prefers_the_excerpt_fields_and_reuses_the_shared_shim(self):
+        """RPC 가 내려주는 것은 전문이 아니라 **그 조항 문장**이다. 언어 선택 로직은
+        저장소 공용 `_bodyText`(JS_BODY_SHIM 정본)에 맡긴다 — 사본을 만들면 findings.js·
+        trends.js 와 두 벌로 갈라진다."""
+        fn = self._fn("exampleText")
+        self.assertIn("f.excerpt_ko || f.finding_text_ko", fn)
+        self.assertIn("f.excerpt || f.finding_text", fn)
+        self.assertIn("_bodyText({", fn)
 
     # ── 공통 계약 ────────────────────────────────────────────────────────────
     def test_no_innerhtml_data_injection(self):

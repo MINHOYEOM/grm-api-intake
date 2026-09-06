@@ -112,10 +112,6 @@
     return CFR_SECTION_LABELS[section] || "";
   }
 
-  // 인쇄물 한 줄에 들어가야 읽히는 길이. 원문 전체는 [사례 원문 보기] 링크가 아니라
-  // 검색 페이지(/findings/)에서 확인한다 — 체크리스트는 요지 확인용이다.
-  var EXAMPLE_MAX_CHARS = 240;
-
   var state = { rows: [], meta: null };
 
   function el(tag, className, text) {
@@ -135,11 +131,22 @@
     return String(s || "").replace(/&amp;/g, "&").replace(/&#039;/g, "'");
   }
 
+  // 043→079: 043 은 지적 **전문**을 내려줬고 이 파일이 앞 240자를 잘라 찍었다. 그 방식은
+  // "조항마다 실제 지적 문장"이라는 약속을 지킬 수 없었다 — 조항 매칭은 그 지적이 인용한
+  // 조항 **전부**를 기준으로 하는데 화면에 뜨는 건 늘 앞머리라, 그 조항이 본문 중간에서
+  // 인용됐으면 **다른 조항의 문장**이 뜨고 통짜 지적이면 **편지 서두**가 떴다.
+  // 079 는 그 조항이 인용된 문장에서 시작하는 **발췌**를 완성해 내려준다(공백 정규화·
+  // 길이 상한·앞뒤 '…' 전부 RPC 몫).
+  //
+  // ★여기서 다시 자르지 않는다 — 자르면 조항 번호가 발췌 밖으로 밀려나 079 가 세운
+  //   "보이는 문장에 그 조항이 있다"는 보장이 그대로 무너진다(그게 종전 결함이었다).
+  // ★언어 선택은 공용 `_bodyText`(JS_BODY_SHIM 정본)에 그대로 맡긴다 — 사본을 만들면
+  //   findings.js/trends.js 와 두 벌로 갈라진다. 옛 키는 배포 창 폴백이다(079 헤더 참조).
   function exampleText(f) {
-    // 국문이 있으면 국문, 없으면 영어 원문(빈칸으로 두지 않는다 — 부재 어휘 규칙).
-    var body = _bodyText(f);   // [다국어] 읽는 언어 먼저
-    body = body.replace(/\s+/g, " ").trim();
-    return body.length > EXAMPLE_MAX_CHARS ? body.slice(0, EXAMPLE_MAX_CHARS) + "…" : body;
+    return _bodyText({
+      finding_text_ko: (f && (f.excerpt_ko || f.finding_text_ko)) || "",
+      finding_text: (f && (f.excerpt || f.finding_text)) || "",
+    });
   }
 
   function exampleMeta(f) {
@@ -197,17 +204,19 @@
     var ex = el("div", "cl-ex");
     ex.appendChild(el("h3", "cl-ex-h", _t("실제 지적 사례")));
     if (!row.examples.length) {
-      // 042 는 전량 집계(definer), 043 은 공개 게이트(invoker) — 차이가 여기서 드러난다.
-      ex.appendChild(el("p", "cl-ex-text", _t("국문으로 열람할 수 있는 사례가 아직 없습니다.")));
+      // 두 가지 이유로 비어 있을 수 있고, 둘 다 정상이다. (1) 042 는 전량 집계(definer),
+      // 079 는 공개 게이트(invoker) — 국문 번역이 끝난 지적만 나온다. (2) 079 는 그 조항이
+      // 본문에 실제로 적힌 지적만 사례로 쓴다 — 인용은 있는데 문장에 조항 번호가 없는
+      // 문서(옛 480자 절단본 등)는 사례가 되지 못한다. 지어내느니 없다고 말한다.
+      ex.appendChild(el("p", "cl-ex-text",
+        _t("이 조항을 본문에 인용한 지적이 아직 없습니다.")));
     } else {
       row.examples.forEach(function (f) {
         var one = el("div", "cl-ex-item");
-        var meta = el("p", "cl-ex-meta", exampleMeta(f));
-        if (f.anchored === false) {
-          // 같은 위반 블록이 여러 조항을 함께 인용한 경우 — 문장에 이 조항 번호가 없다.
-          meta.appendChild(el("span", "cl-ex-loose", _t("(같은 지적에 여러 조항이 함께 인용됨)")));
-        }
-        one.appendChild(meta);
+        // 079 이후 사례는 전부 그 조항이 본문에 적힌 지적이다 — "이 조항 번호가 문장에
+        // 없다"는 예외 표기(옛 anchored=false 딱지)가 필요 없어졌다. 대신 발췌가 지적
+        // 중간에서 시작했으면 RPC 가 문자열 앞에 '…' 를 붙여 보낸다.
+        one.appendChild(el("p", "cl-ex-meta", exampleMeta(f)));
         one.appendChild(el("p", "cl-ex-text", exampleText(f)));
         ex.appendChild(one);
       });
@@ -235,7 +244,7 @@
     }
     if (docFootEl) {
       docFootEl.textContent =
-        _t("이 표는 {partFilter} 조항 중 규제 문서에 인용된 횟수가 많은 순으로 뽑은 것입니다. FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없어, 순위는 사실상 Warning Letter 기준입니다. 모든 경고서한 맺음말에 붙는 권고·정의 조항({excluded})은 위반 인용이 아니라 제외했습니다. 사례는 국문 번역이 끝난 지적만 나오므로 인용 문서 수보다 적을 수 있습니다. 날짜는 실사한 날이 아니라 자료가 공개된 날입니다. 출처: GRM (grm-solutions.com)",
+        _t("이 표는 {partFilter} 조항 중 규제 문서에 인용된 횟수가 많은 순으로 뽑은 것입니다. FDA 483은 조항 대신 요구사항을 문장으로 적어 조항 인용이 거의 없어, 순위는 사실상 Warning Letter 기준입니다. 모든 경고서한 맺음말에 붙는 권고·정의 조항({excluded})은 위반 인용이 아니라 제외했습니다. 사례는 국문 번역이 끝났고 지적 본문에 그 조항 번호가 실제로 적힌 것만 싣기 때문에 인용 문서 수보다 적습니다 — 발췌는 그 조항이 인용된 문장에서 시작하며, 앞이 잘린 발췌에는 '…'가 붙습니다. 날짜는 실사한 날이 아니라 자료가 공개된 날입니다. 출처: GRM (grm-solutions.com)",
           { partFilter: state.meta.partFilter, excluded: state.meta.excluded });
     }
     docEl.hidden = false;

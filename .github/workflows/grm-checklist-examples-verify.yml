@@ -1,0 +1,95 @@
+name: GRM Checklist Examples Verify
+
+# 자가점검 체크리스트 사례 **전수 가드** — 조항마다 실린 문장이 그 조항의 지적인가.
+#
+# 배경(2026-09-06 사용자 신고·실측): `/findings/checklist/` 는 "조항마다 실제 지적 문장"을
+# 약속하는데, 043 이 finding **앞머리**를 내려주고 화면이 240자를 잘라 찍는 구조라 두 갈래로
+# 약속이 깨져 있었다 — 통짜 경고서한이 걸린 조항에는 **편지 서두**가, 조항이 본문 중간에서
+# 인용된 경우에는 **다른 조항의 문장**이 실렸다. 인쇄해서 쓰는 산출물이라 이건 표시 결함이
+# 아니라 정직성 결함이다. 079 가 발췌를 조항 위치에서 뜨도록 고쳤고, 이 잡이 그 수리가
+# 살아 있는지 **전 조항 전수로** 계속 묻는다.
+#
+# ★왜 CI(코드 검사)가 아니라 별도 스케줄인가: 이 결함은 코드가 아니라 **데이터**에서 난다.
+#   내일 들어오는 경고서한 하나가 파서의 degrade 경로를 타면 다시 통짜 finding 이 생기고,
+#   저장소 코드는 한 글자도 안 바뀐 채 화면만 거짓이 된다. 그래서 매일 수집 뒤에 본다.
+# ★읽기 전용 · anon 키. service-role 을 쓰면 RLS 를 우회해 **화면에 없는 행까지** 검사하게
+#   되어, 가드가 사용자가 보는 것과 다른 세계를 검사한다(스크립트 docstring 참조).
+# ★새 시크릿 없음 — SUPABASE_URL·SUPABASE_ANON_KEY(repo Variables)를 그대로 재사용한다.
+on:
+  schedule:
+    # 매일 20:40 UTC = 익일 05:40 KST. 수집(18:17 UTC)·번역 배치 뒤라 그날 들어온 문서가
+    # 이미 공개 게이트를 통과한 상태에서 본다.
+    - cron: '40 20 * * *'
+  workflow_dispatch:
+    inputs:
+      examples:
+        description: '조항당 검사할 사례 수(1~5). 화면 최대치가 5다.'
+        type: string
+        default: '5'
+      sections:
+        description: '쉼표로 구분한 조항 목록(비우면 042 가 아는 전 조항).'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-checklist-examples-verify
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Every clause's examples actually cite that clause
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 의존성
+        run: pip install -r requirements.txt
+
+      # 판정기 자체의 오프라인 회귀(수리 전 실측 4건을 잡는가 · 수리 후 실측을 통과시키는가).
+      # 라이브를 보기 전에 **검사기가 눈멀지 않았는지** 먼저 확인한다.
+      - name: 판정기 오프라인 검증
+        run: python -m unittest tests.test_checklist_examples_guard -v
+
+      - name: 자격증명 선점검
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL / SUPABASE_ANON_KEY (repo Variables) 미설정 — "\
+                 "값이 없으면 스크립트가 exit 2 로 끝나 '검사했는데 통과'로 오독된다"
+            exit 1
+          fi
+
+      - name: 전수 검사
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          set -o pipefail
+          # `inputs.*` 는 dispatch 에서만 채워진다 — 표현식에 기본값을 못박지 않으면
+          # schedule 에서 빈 문자열이 인자 자리에 들어가 argparse 가 죽는다.
+          EXAMPLES="${{ inputs.examples || '5' }}"
+          SECTIONS="${{ inputs.sections || '' }}"
+          ARGS="--examples $EXAMPLES --json checklist-examples-verify.json"
+          ARGS="$ARGS --summary $GITHUB_STEP_SUMMARY"
+          if [ -n "$SECTIONS" ]; then
+            ARGS="$ARGS --sections $SECTIONS"
+          fi
+          python verify_checklist_examples.py $ARGS
+
+      - name: 결과 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checklist-examples-verify
+          path: checklist-examples-verify.json
+          if-no-files-found: warn

@@ -87,15 +87,25 @@
 <style>
 /* [소개] 레이블 + 본문 블록 — grm.css 토큰만 사용(프리즈 보존). 카드·배지 없이 괘선으로만 나눈다. */
 .about-head h1{max-width:22ch;text-wrap:balance;word-break:keep-all}
-.about-head .about-lead p{color:var(--body);margin-top:22px;font-size:17px;line-height:1.7;max-width:56ch;word-break:keep-all}
+.about-head .about-lead p{color:var(--body);margin-top:22px;font-size:17px;line-height:1.7;max-width:56ch;word-break:keep-all;text-wrap:pretty}
 .about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
 .about-cta .btn{font-size:14.5px}
 .about-cta .btn .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
 .about-cta .btn:hover .ti{transform:translateX(3px)}
 .about-body{padding-top:44px;padding-bottom:80px}
 .about-sec{display:grid;grid-template-columns:200px 1fr;gap:40px;padding:44px 0;border-top:1px solid var(--line)}
-.about-sec h2{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);margin:0;padding-top:4px;line-height:1.5;word-break:keep-all}
-.about-prose{max-width:60ch;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all}
+/* 절 레이블은 **내용이 아니라 이름표**다 — 색으로 그렇게 말한다(사이트의 eyebrow 관례 =
+   coral). 종전엔 ink 14px 이었는데 절 안의 항목 제목이 ink 15.5px 이라, 왼쪽 칸이 사라지는
+   좁은 폭에서 둘이 위아래로 붙으면 **레이블이 항목보다 작고 같은 색인 채로 나란히** 놓여
+   위계가 뒤집혀 보였다(375px 실측). 자리로 구분하던 것을 색으로도 구분한다.
+   §4 한글안전: 자간·대문자는 쓰지 않는다 — 크기와 색만 쓴다.
+   ★이 주석은 CSS 주석이라 **HTML 로 나간다.** `WebKoreanSafetyTest` 는 전 페이지 HTML 을
+   문자열로 훑으므로 금지 속성 이름을 여기 그대로 적으면 가드가 자기 설명에 걸린다
+   (실제로 걸렸다). 설명할 때도 그 낱말은 한국어로 쓴다. */
+.about-sec h2{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--coral-2);margin:0;padding-top:5px;line-height:1.5;word-break:keep-all}
+/* text-wrap:pretty — 마지막 줄에 낱말 하나만 남는 것(“제공합니다.” 73px)을 줄인다. 지원하지
+   않는 브라우저는 무시하므로 폴백이 곧 종전 동작이다. */
+.about-prose{max-width:60ch;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;text-wrap:pretty}
 .about-prose p{margin:0 0 1.1em}
 .about-prose p:last-child{margin-bottom:0}
 .about-prose ul{list-style:none;margin:0;padding:0}
@@ -118,7 +128,11 @@
 .about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
 .about-act:focus-visible,.about-fb:focus-visible,.about-more a:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti,.about-more a:hover .ti{transform:none} }
-@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:14px;padding:34px 0} .about-head h1{font-size:36px;max-width:none} .about-prose{font-size:16px} }
+/* 좁은 폭: 레이블과 첫 항목이 붙지 않게 간격을 조금 벌리고(14→18), 레이블은 한 단 더 작게.
+   ★640px 이하에서 제목을 한 번 더 줄인다 — 36px 은 375px 화면에서 둘째 줄이 331px 중 330px
+   을 차지해 오른쪽 여백이 사라졌다(실측). 글자를 줄이는 대신 줄이 숨 쉴 자리를 준다. */
+@media (max-width:900px){ .about-sec{grid-template-columns:1fr;gap:18px;padding:34px 0} .about-sec h2{font-size:13px;padding-top:0} .about-head h1{font-size:36px;max-width:none} .about-prose{font-size:16px} }
+@media (max-width:640px){ .about-head h1{font-size:31px} .about-head .about-lead p{font-size:16.5px} .about-body{padding-bottom:64px} }
 </style>
 <style>
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}

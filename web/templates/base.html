@@ -121,7 +121,7 @@
       [네이밍 2026-08-27] 사용자 피드백('전문성이 보이는 워딩') — M15 가 '지적사항'을
       '찾아보기'로 바꿨던 결정(당시 피드백: 캐주얼하게)을 오늘 피드백이 뒤집는다.
       내용을 그대로 이름으로: 모아보기→주간 브리프, 찾아보기→지적사항. -#}
-  <nav id="navmenu">{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html"{% if nav_active == 'glossary' %} class="on"{% endif %}>{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>{{ _("이용안내") }}</a>{% endif %}</nav>
+  <nav id="navmenu">{% if lang == 'ko' or 'archive/' in en_paths %}<a href="{{ rel_root }}archive/index.html"{% if nav_active == 'board' %} class="on"{% endif %}>{{ _("주간 브리프") }}</a>{% endif %}<a href="{{ rel_root }}findings/index.html"{% if nav_active == 'findings' %} class="on"{% endif %}>{{ _("지적사항") }}</a><a href="{{ rel_root }}findings/trends/index.html"{% if nav_active == 'trends' %} class="on"{% endif %}>{{ _("트렌드") }}</a><a href="{{ rel_root }}library/index.html"{% if nav_active == 'library' %} class="on"{% endif %}>{{ _("자료실") }}</a>{% if lang == 'ko' or 'glossary/' in en_paths %}<a href="{{ rel_root }}glossary/index.html"{% if nav_active == 'glossary' %} class="on"{% endif %}>{{ _("용어사전") }}</a>{% endif %}{% if lang == 'ko' or 'guide/' in en_paths %}<a href="{{ rel_root }}guide/index.html"{% if nav_active == 'guide' %} class="on"{% endif %}>{{ _("이용안내") }}</a>{% endif %}<span class="navmore">{% if lang == 'ko' or 'quiz/' in en_paths %}<a href="{{ rel_root }}quiz/index.html">{{ _("주간 퀴즈") }}</a>{% endif %}{% if lang == 'ko' or ('briefs/' ~ latest_slug ~ '/') in en_paths %}<a class="navmore-cta" href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>{% endif %}{% if reactions_enabled %}<a href="{{ rel_root }}me/index.html">{{ _("마이페이지") }}</a>{% endif %}{% if alt_other %}<a class="navmore-lang" href="{{ alt_other.rel_href }}" hreflang="{{ alt_other.lang }}" lang="{{ alt_other.lang }}">{{ alt_other.label }}</a>{% endif %}</span></nav>
   <span class="sp"></span>
   {# P2-2: 좁은 폭(≤640px) 햄버거 — 데스크톱 숨김(CSS). 클릭 시 #navmenu 드롭다운 토글. #}
   <button class="navtoggle" id="navToggle" type="button" aria-label="{{ _('메뉴 열기') }}" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
@@ -224,12 +224,46 @@
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
 @media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
 </style>
-{# [네이밍 2026-08-27] 탭 라벨이 2글자 길어지며(주간 브리프·지적사항) 641~900px 구간에서
-   헤더 플렉스 행이 13px 넘쳐 로그인 버튼이 화면 밖으로 밀렸다(768px 실측 781>768 —
-   프로덕션 종전 라벨은 766 으로 무오버플로). grm.css 동결이라 위 footer 와 같은 스코프
-   인라인 override 관례로 그 구간에서만 탭 좌우 패딩을 12→9px 로 줄인다(6탭 × 2 × 3px =
-   36px 회수). ≤640px 은 햄버거 수납이라 무관, ≥901px 은 여유가 충분해 원래 값 유지. #}
-<style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
+{# [모바일·태블릿 헤더 2026-09-06] 좁은 폭에서 헤더 한 줄이 넘쳐 로그인(.grm-auth)이 화면
+   **밖으로** 나가던 결함 수리. 로컬 빌드 실측(320/375/641/753/885px): 헤더 행이 요구하는
+   최소 폭은 853px 이라 375px 만이 아니라 **641~852px 구간도 똑같이 넘쳤다**(뷰포트 641 ·
+   로그인 x=822 · 문서폭 853). 종전 수리(2026-08-27)는 이 구간 탭 패딩을 12→9px 로 줄여
+   36px 을 회수한 것이었는데, 그 뒤 언어 전환 칩(.grm-lang, 84px)이 헤더에 들어오면서
+   회수분이 도로 잠겼다 — 패딩 조정으로 닿는 폭이 아니라서 그 규칙은 아래 서랍 수납으로
+   대체한다(이 블록이 그 구간을 햄버거로 바꾸므로 옛 규칙은 더는 걸리지 않는다).
+   ★한 줄에 남기는 것은 **브랜드 · 로그인 · 햄버거** 셋뿐이다. 320px 예산이 이유다 —
+     가용폭 276px 에서 브랜드(92)와 햄버거(44)를 빼면 가운데에 105px 짜리 CTA 든 로그인이든
+     **하나만** 들어간다. 로그인을 남긴 이유: 서랍으로 옮기면 계정 드롭다운(reactions.js 가
+     런타임 주입하는 .grm-acct-menu)이 드롭다운 안의 드롭다운이 되고, '이번 주 소식'은
+     서랍과 홈에 다른 길이 있지만 로그인은 그 길이 없다.
+   ★햄버거 경계는 grm.css 의 640 이 아니라 **900** 이다 — 900 은 이미 사이트가 1단 모바일
+     레이아웃으로 넘어가는 경계(.layout·.toc·.wrap 이 전부 여기서 바뀐다)이고, 실측 요구폭
+     853px 위로 47px 여유가 남는다. grm.css 동결이라 ≤640 드롭다운 규칙을 **같은 값으로**
+     900 까지 넓혀 다시 쓴다(소스가 뒤라 ≤640 에서도 이 블록이 이긴다 — 값이 같아 종전
+     휴대폰 화면은 무변형). .nav-in 높이 66px 은 건드리지 않는다(.fnd-tools 가 top:66px
+     sticky 로 이 값에 물려 있다).
+   §4 한글안전: letter-spacing·text-transform·mono 미사용. #}
+<style>
+.navmore{display:none}
+@media(max-width:900px){
+  .brand-full{display:none}
+  .nav-in{gap:10px}
+  .navtoggle{display:inline-flex;flex:none;order:3}
+  .nav-in .grm-auth{order:2;margin-left:0}
+  /* 로그인은 12px 회색 텍스트라 그대로 두면 터치 타깃이 14px 다 — grm.css 의 모바일
+     44px 관례(P1-4)를 이 버튼에도 적용한다(시각 크기는 거의 그대로, 히트 영역만 확대). */
+  .nav-in .grm-auth .grm-acct-login{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+  .nav-in > .grm-lang,.nav-in > .btn.coral{display:none}
+  .nav nav{position:absolute;top:100%;right:22px;left:auto;min-width:184px;max-width:calc(100vw - 44px);
+    flex-direction:column;align-items:stretch;gap:2px;margin:0;background:var(--canvas);
+    border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:var(--shadow);padding:8px;z-index:57;display:none}
+  .nav nav.open{display:flex}
+  .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
+  .nav nav a:hover{background:var(--soft)}
+  .navmore{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line-2)}
+  .navmore .navmore-cta{color:var(--coral-2);font-weight:600}
+}
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     {# [푸터 확정 2026-09-06] 브랜드 열. 종전의 소스 기관 나열(FDA · OpenFDA · …)은 뺐다 — 푸터가 손으로 적은 두 번째 소스 목록을 들고 있으면 소스가 늘 때마다 반드시 낡는다(그래서 마퀴와 대조하는 가드까지 있었다). 대신 소스를 **실제로 집계해 보여주는 면**(데이터 현황 = 소스 구성·연도별 확보량·수집 범위와 한계)으로 보낸다. 이 주석은 공백을 삼키지 않는 형태로 써야 한다 — 하이픈(공백 제거) 변형을 쓰면 앞 줄과 아래 div 가 붙어 전 페이지 골든이 깨진다. #}

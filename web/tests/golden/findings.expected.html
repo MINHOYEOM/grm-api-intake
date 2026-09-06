@@ -55,7 +55,7 @@
   <button type="button" id="grmLangHintX" aria-label="Dismiss">&times;</button>
 </div>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../archive/index.html">주간 브리프</a><a href="../findings/index.html" class="on">지적사항</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../guide/index.html">이용안내</a></nav>
+  <a class="brand" href="../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../archive/index.html">주간 브리프</a><a href="../findings/index.html" class="on">지적사항</a><a href="../findings/trends/index.html">트렌드</a><a href="../library/index.html">자료실</a><a href="../glossary/index.html">용어사전</a><a href="../guide/index.html">이용안내</a><span class="navmore"><a href="../quiz/index.html">주간 퀴즈</a><a class="navmore-cta" href="../briefs/2026-07-06/index.html">이번 주 소식</a><a class="navmore-lang" href="../en/findings/index.html" hreflang="en" lang="en">English</a></span></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="grm-lang" href="../en/findings/index.html" hreflang="en" lang="en" rel="alternate"><i class="ti ti-language" aria-hidden="true"></i>English</a>
@@ -302,6 +302,14 @@ main{word-break:keep-all;overflow-wrap:anywhere}
   .fnd-field select{max-width:100%}
   .fnd-search{flex-wrap:wrap}
   .fnd-count{flex:1 0 100%;margin-top:6px}
+  /* 돋보기 아이콘은 .fnd-search(position:relative) 기준 top:50% 로 놓여 있었다. 이 폭에서
+     컨테이너가 줄바꿈되면(입력 44 + 유사문구 토글 34 + 결과 카운트 = 132px 실측) 그
+     '50%' 는 입력창이 아니라 **묶음 전체**의 중앙이라, 아이콘이 입력창을 벗어나 토글 줄로
+     내려간다(375px 실측: 입력 612~656 · 아이콘 669~687). 기준점을 컨테이너 중앙에서
+     **첫 줄(=입력창 44px)의 중앙**으로 못박는다(translateY(-50%)는 그대로 두고 top 만
+     교체) — 토글이 같은 줄에 오든 아래로 접히든 값이 변하지 않는다. 데스크톱은 컨테이너가
+     한 줄(44px)이라 50% 가 곧 22px 이었다: 같은 자리, 계산만 폭 무관하게 바뀐다. */
+  .fnd-search i{top:22px}
 }
 .fnd-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
 .fnd-state-error{color:var(--coral-2)}#fnd-loading,#fnd-error{min-height:max(240px,calc(100vh - 400px))}
@@ -415,7 +423,27 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
 @media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
 </style>
-<style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
+<style>
+.navmore{display:none}
+@media(max-width:900px){
+  .brand-full{display:none}
+  .nav-in{gap:10px}
+  .navtoggle{display:inline-flex;flex:none;order:3}
+  .nav-in .grm-auth{order:2;margin-left:0}
+  /* 로그인은 12px 회색 텍스트라 그대로 두면 터치 타깃이 14px 다 — grm.css 의 모바일
+     44px 관례(P1-4)를 이 버튼에도 적용한다(시각 크기는 거의 그대로, 히트 영역만 확대). */
+  .nav-in .grm-auth .grm-acct-login{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+  .nav-in > .grm-lang,.nav-in > .btn.coral{display:none}
+  .nav nav{position:absolute;top:100%;right:22px;left:auto;min-width:184px;max-width:calc(100vw - 44px);
+    flex-direction:column;align-items:stretch;gap:2px;margin:0;background:var(--canvas);
+    border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:var(--shadow);padding:8px;z-index:57;display:none}
+  .nav nav.open{display:flex}
+  .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
+  .nav nav a:hover{background:var(--soft)}
+  .navmore{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line-2)}
+  .navmore .navmore-cta{color:var(--coral-2);font-weight:600}
+}
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>

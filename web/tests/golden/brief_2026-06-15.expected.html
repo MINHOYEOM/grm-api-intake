@@ -35,7 +35,7 @@
 </head>
 <body>
 <header class="nav" id="nav"><div class="wrap nav-in">
-  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a></nav>
+  <a class="brand" href="../../index.html" aria-label="Global Regulatory Monitor 홈"><img src="/favicon.svg" width="34" height="34" alt="" aria-hidden="true" style="display:block;border-radius:8px"><span style="display:flex;flex-direction:column;line-height:1.05"><span style="font-family:var(--serif);font-weight:600;font-size:22px;color:var(--ink)">GRM</span><span class="brand-full" style="font-size:11px;color:var(--muted)">Global Regulatory Monitor</span></span></a><nav id="navmenu"><a href="../../archive/index.html">주간 브리프</a><a href="../../findings/index.html">지적사항</a><a href="../../findings/trends/index.html">트렌드</a><a href="../../library/index.html">자료실</a><a href="../../glossary/index.html">용어사전</a><a href="../../guide/index.html">이용안내</a><span class="navmore"><a href="../../quiz/index.html">주간 퀴즈</a><a class="navmore-cta" href="../../briefs/2026-06-22/index.html">이번 주 소식</a></span></nav>
   <span class="sp"></span>
   <button class="navtoggle" id="navToggle" type="button" aria-label="메뉴 열기" aria-controls="navmenu" aria-expanded="false"><i class="ti ti-menu-2"></i></button>
   <a class="btn coral" href="../../briefs/2026-06-22/index.html">이번 주 소식</a>
@@ -143,7 +143,27 @@
 .foot-copy .foot-ico .ti{font-size:13px;line-height:1}
 @media(min-width:901px){.foot-legal{flex-direction:row;justify-content:space-between;align-items:flex-start;gap:16px 40px}.foot-disclaimer{text-align:right;max-width:60ch}}
 </style>
-<style>@media(min-width:641px) and (max-width:900px){.nav nav a{padding-left:9px;padding-right:9px}}</style>
+<style>
+.navmore{display:none}
+@media(max-width:900px){
+  .brand-full{display:none}
+  .nav-in{gap:10px}
+  .navtoggle{display:inline-flex;flex:none;order:3}
+  .nav-in .grm-auth{order:2;margin-left:0}
+  /* 로그인은 12px 회색 텍스트라 그대로 두면 터치 타깃이 14px 다 — grm.css 의 모바일
+     44px 관례(P1-4)를 이 버튼에도 적용한다(시각 크기는 거의 그대로, 히트 영역만 확대). */
+  .nav-in .grm-auth .grm-acct-login{display:inline-flex;align-items:center;min-height:44px;font-size:13px}
+  .nav-in > .grm-lang,.nav-in > .btn.coral{display:none}
+  .nav nav{position:absolute;top:100%;right:22px;left:auto;min-width:184px;max-width:calc(100vw - 44px);
+    flex-direction:column;align-items:stretch;gap:2px;margin:0;background:var(--canvas);
+    border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:var(--shadow);padding:8px;z-index:57;display:none}
+  .nav nav.open{display:flex}
+  .nav nav a{padding:12px 14px;border-radius:var(--rad-s);min-height:44px;white-space:normal}
+  .nav nav a:hover{background:var(--soft)}
+  .navmore{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line-2)}
+  .navmore .navmore-cta{color:var(--coral-2);font-weight:600}
+}
+</style>
 <footer class="site"><div class="wrap">
   <div class="foot">
     <div class="b1"><b>Global Regulatory Monitor</b>

@@ -98,7 +98,10 @@
    coral). 종전엔 ink 14px 이었는데 절 안의 항목 제목이 ink 15.5px 이라, 왼쪽 칸이 사라지는
    좁은 폭에서 둘이 위아래로 붙으면 **레이블이 항목보다 작고 같은 색인 채로 나란히** 놓여
    위계가 뒤집혀 보였다(375px 실측). 자리로 구분하던 것을 색으로도 구분한다.
-   §4 한글안전: letter-spacing/대문자 미사용 — 크기와 색만 쓴다. */
+   §4 한글안전: 자간·대문자는 쓰지 않는다 — 크기와 색만 쓴다.
+   ★이 주석은 CSS 주석이라 **HTML 로 나간다.** `WebKoreanSafetyTest` 는 전 페이지 HTML 을
+   문자열로 훑으므로 금지 속성 이름을 여기 그대로 적으면 가드가 자기 설명에 걸린다
+   (실제로 걸렸다). 설명할 때도 그 낱말은 한국어로 쓴다. */
 .about-sec h2{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--coral-2);margin:0;padding-top:5px;line-height:1.5;word-break:keep-all}
 /* text-wrap:pretty — 마지막 줄에 낱말 하나만 남는 것(“제공합니다.” 73px)을 줄인다. 지원하지
    않는 브라우저는 무시하므로 폴백이 곧 종전 동작이다. */

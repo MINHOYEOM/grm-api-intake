@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.241` |
-| 최종 수정일 | 2026-09-07 |
+| 문서 버전 | `v1.242` |
+| 최종 수정일 | 2026-09-08 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -189,6 +189,7 @@ flowchart TD
 | 보조 | 주간 퀴즈 자동 출제(그 주 브리프 2 + 용어사전 개념 1~2 생성→quiz_lint→PR→CI 머지, 미라이브 시 스킵) | 로컬 태스크 `grm-monday-quiz-gen` | 월 13:00 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | **주간 퀴즈 미생성 감시**(로컬 태스크의 침묵을 클라우드에서 본다 — 이번 주 세트 부재 시 `quiz-freshness` 이슈, 생기면 자동 종료) | `grm-quiz-freshness.yml` | cron 화 13:10 KST | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
+| 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 9장 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt`, 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0) | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
 | 보조 | 관심업체 통지 자동 발송(멱등 로그·상한) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | 없음 |
 | 보조 | 서비스 업데이트 안내 발송(멱등·마일스톤에만) | `grm-announce-send.yml` | **수동 dispatch만**(스케줄 없음 — 의도적) | 없음 |
 | 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST + 발행 머지 직후 | 없음 |
@@ -533,6 +534,7 @@ grm-api-intake/
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
+│  ├─ linkedin_cards.py           # [성장·배포 2026-09-08] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 9장 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문. 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본
 │  ├─ quiz_en_merge.py           # [다국어 2026-09-05] 주간 퀴즈 영문 문항 병합기 — 정본에 `question_en`·`choices_en`·`explanation_en` 을 **가산**한다(기존 키·들여쓰기 무변형·멱등). 게이트 3중 = 세 필드 전부거나 전부 없거나 · `choices_en` 길이 일치(`answer_index` 공유) · **EN_INVENTED_NUMBER**(`render.validate_quiz_en_facts` — 렌더와 같은 함수를 불러 사본 0)
 │  ├─ templates/  (landing·archive·brief·findings·**findings_browse**(둘러보기 면)·trends·**inspections**·**coverage**·**checklist**·firm·**inspector**·me·admin·base·library·library_catalog·guide·**about**(소개 /about/ — 2026-09-06)·glossary·**glossary_term**·**findings_facet**·**findings_facet_index**·**findings_doc**·**findings_doc_list**·quiz·**landing_en**(영어판 홈 — 주간 브리프 히어로가 없는 별도 면))
@@ -661,6 +663,7 @@ grm-api-intake/
 ### 6.3 정기 운영 (사람 개입 지점)
 - **매주 월요일:** Admin 콘솔에서 웹 브리프 미리보기 확인 후 **승인 버튼 1클릭**(트랙 A). Findings 번역(트랙 B)은 예약 세션이 자동 처리 — 데스크톱 앱이 열려 있어야 정시 실행(꺼져 있으면 다음 실행 시 처리).
 - **매일 07:17 UTC:** 외부 백필(F2) cron이 `--auto` 로 483→WL 순 1청크씩 자동 소진(사람 개입 없음, 완료 시 자가 종료 후 신규 문서 안전망으로 전환).
+- **매주 월요일(선택, 1분):** 라이브 반영 후 `/briefs/{date}/linkedin.pdf` 를 받고 `/briefs/{date}/linkedin.txt` 를 복사해 링크드인 작성창에 첨부·붙여넣기 → 게시. 영문판·소개 카드는 `tmp/cardnews_2026-09-07/`(로컬 빌더) 참조.
 - **가끔:** health 경고 Issue 확인, Secrets 로테이션.
 
 ### 6.4 FIND-1 전략 로드맵 대비 현황 (공모전 목표)

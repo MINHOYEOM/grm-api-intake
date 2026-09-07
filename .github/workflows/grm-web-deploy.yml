@@ -104,6 +104,17 @@ jobs:
           fi
           python web/render.py --data "$DATA" --out web/dist
 
+      # ── C2b: 링크드인 카드뉴스(PDF+게시 본문) — 최신 브리프 1호, 비차단(D7). ──────────
+      #   web/linkedin_cards.py 가 브리프 JSON·용어사전으로 9장 캐러셀을 짓고 러너의 Chrome 으로
+      #   인쇄한다 → web/dist/briefs/{pub}/linkedin.pdf · linkedin.txt (share.txt 와 같은 관례로
+      #   sitemap 비등록). 운영: 배포 후 PDF 내려받고 txt 복사해 작성창에 붙이고 게시(사람).
+      #   Chrome 이 없거나 렌더가 실패해도 txt 는 남고 배포는 진행한다 — render.py 와 파일이 달라
+      #   골든·결정론에 영향 0(Chrome 은 이 스텝만 쓴다).
+      - name: LinkedIn cards (non-blocking)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist
+
       # 미리보기 산출물(시크릿 미등록·호스트 미연결 시에도 D5 육안검토 가능).
       - name: Upload dist artifact (preview)
         uses: actions/upload-artifact@v4

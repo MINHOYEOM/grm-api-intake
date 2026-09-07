@@ -18340,6 +18340,75 @@ class WebEnTreeTest(unittest.TestCase):
             self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/{path}</loc>", self.sitemap)
 
 
+class SubscribePeekLinkTest(unittest.TestCase):
+    """[구독 밴드 실물 링크 2026-09-07] 밴드 설명문 아래 '이번 주 소식 먼저 보기'.
+
+    밴드는 env-param 게이트(`GRM_NEWSLETTER_FORM_ACTION`) 뒤에 있어 **로컬·CI 빌드에서는
+    아예 렌더되지 않는다** — 구조 파리티 가드가 원리적으로 못 보는 자리다. 그래서 기존
+    `test_newsletter_form_conditional` 과 같은 방식(모듈 전역 monkeypatch → 켜진 빌드)으로
+    켜 놓고 실제 HTML 을 읽는다. 검사 대상은 **화면에 나가는 문자열**(href 전체)이지
+    템플릿 소스가 아니다.
+    """
+
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_peek_"))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _render(self, briefs: list[dict]) -> pathlib.Path:
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        for br in briefs:
+            pub = br["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        return out
+
+    def test_peek_link_points_at_latest_brief_when_band_is_on(self):
+        older, latest = "2026-06-22", "2026-06-29"      # latest_slug = max(publish_date)
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render([_minimal_brief(older), _minimal_brief(latest)])
+            landing = (out / "index.html").read_text(encoding="utf-8")
+            detail = (out / "briefs" / older / "index.html").read_text(encoding="utf-8")
+            en_landing = (out / "en" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        for name, html, root in (("랜딩", landing, ""), ("브리프 상세", detail, "../../")):
+            band = html[html.index('class="subscribe"'):html.index("<footer")]
+            self.assertIn('class="sub-peek"', band, f"{name}: 링크 줄 없음")
+            self.assertIn("이번 주 소식 먼저 보기", band, f"{name}: 문구 없음")
+            # 목적지는 **최신호**다(자기 페이지가 아니라). rel_root 를 포함한 실제 href 로 잰다.
+            self.assertIn(f'<a href="{root}briefs/{latest}/index.html">', band,
+                          f"{name}: 최신호 href 아님")
+            self.assertNotIn(f'<a href="{root}briefs/{older}/index.html">', band)
+            # 폼 **위**에 온다 — 설명문 다음, 입력 앞.
+            self.assertLess(band.index('class="sub-peek"'), band.index('class="sub-form"'),
+                            f"{name}: 링크가 폼 아래에 있다")
+            # 스타일 규칙은 밴드 **안**에 있어야 기존 한글안전 가드(같은 slice)가 재 준다.
+            self.assertIn(".subscribe .sub-peek{", band,
+                          f"{name}: 규칙이 밴드 밖 — 한글안전 가드가 못 본다")
+        # 밴드 자체가 한국어 전용이라 영어판에는 링크도 없다(게이트 재확인).
+        self.assertNotIn("sub-peek", en_landing)
+
+    def test_peek_link_absent_when_band_is_off(self):
+        # 게이트 off(기본·골든 빌드) — 링크도 <style> 도 나오지 않아야 골든 byte-diff 가 0 이다.
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = ""
+            out = self._render([_minimal_brief("2026-06-29")])
+            landing = (out / "index.html").read_text(encoding="utf-8")
+            detail = (out / "briefs" / "2026-06-29" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        for html in (landing, detail):
+            self.assertNotIn("sub-peek", html)
+            self.assertNotIn("이번 주 소식 먼저 보기", html)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

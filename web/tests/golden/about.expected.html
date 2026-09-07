@@ -104,14 +104,18 @@
    왼쪽 기준선이 **둘**(159 / 399) 있었다. 읽어 내려갈 때 눈이 붙잡을 축이 없어 "줄맞춤이
    엉망"으로 보이던 실체가 그것이다. 라벨 칸을 걷어내고 절 제목을 본문 위로 올려 기준선을
    하나로 되돌린다.
-   ★한 벌의 폭(600px)을 제목·리드·본문이 함께 쓴다 — 왼쪽뿐 아니라 오른쪽 끝도 맞아 한 단의
-   글기둥이 된다. 한글 16.5px 기준 한 줄 약 36자로 읽기 폭 안이다.
+   ★[2026-09-07 정정] 본문 폭을 600px 로 묶었더니 **한 문장이 서너 줄로 접혔다.** 이 면의
+   문안은 문장 하나가 한 줄로 쭉 들어와야 한다는 것이 사용자 결정이고, 줄을 어디서 나눌지는
+   정본 파일이 정한다(keep_line_breaks). 폭 제한을 두면 그 결정을 CSS 가 다시 덮어쓴다 —
+   그래서 캡을 없애고 wrap 전폭을 쓴다. 이용안내가 이미 같은 판단을 해 뒀다(templates/
+   guide.html: "표준 wrap 전폭 — 좁은 max-width 캡 금지"). 왼쪽·오른쪽이 모두 wrap 경계와
+   맞아 절 괘선과도 끝이 같다.
    ★좁은 폭 위계도 구조가 해결한다: 절 제목이 명조 25px 이라 항목 제목(고딕 굵게 17px)과
    서체·크기로 갈린다. 색으로 구분하려고 넣었던 coral 라벨은 그래서 되돌린다.
    §4 한글안전: 자간·대문자 미사용 — 그 속성 이름은 한국어로만 적는다(이 주석은 HTML 로
    나가고 `WebKoreanSafetyTest` 가 문자열로 훑어 자기 설명에 걸린 적이 있다). */
 .about-head h1{max-width:none;text-wrap:balance;word-break:keep-all}  /* 제목은 넓은 화면에서 한 줄로 간다(사용자 지정) — 폭을 600px 로 묶으면 무조건 두 줄이 된다. 좁아지면 어절에서 접히고, 그때 balance 가 두 줄 길이를 고르게 만든다. */
-.about-head .about-lead p{color:var(--body);margin-top:24px;font-size:17.5px;line-height:1.72;max-width:600px;word-break:keep-all;text-wrap:pretty}
+.about-head .about-lead p{color:var(--body);margin-top:24px;font-size:17.5px;line-height:1.72;max-width:none;word-break:keep-all;text-wrap:pretty}
 .about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 .about-cta .btn{font-size:14.5px}
 .about-cta .btn .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
@@ -122,7 +126,7 @@
 .about-sec h2{font-family:var(--serif);font-size:25px;font-weight:600;line-height:1.32;color:var(--ink);margin:0 0 18px;word-break:keep-all}
 /* text-wrap:pretty — 마지막 줄에 낱말 하나만 남는 것을 줄인다. 미지원 브라우저는 무시하므로
    폴백이 곧 종전 동작이다. */
-.about-prose{max-width:600px;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;text-wrap:pretty}
+.about-prose{max-width:none;font-family:var(--sans);font-size:16.5px;line-height:1.85;color:var(--body-s);word-break:keep-all;text-wrap:pretty}
 .about-prose p{margin:0 0 1.1em}
 .about-prose p:last-child{margin-bottom:0}
 /* 항목 사이는 괘선이 아니라 여백으로 가른다 — 절마다 이미 괘선이 하나 있어서, 항목까지

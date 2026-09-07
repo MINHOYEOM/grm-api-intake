@@ -136,7 +136,14 @@
     },
     "summary": "ISPE 가 ASTM E2500 과 EU GMP Annex 1 체계 안에서 AI 를 활용한 검증(CQV) 접근을 다룬 기고를 게시했다."
    }
-  ]
+  ],
+  "en": {
+   "tldr": [
+    "FDA issues a Class I recall of a compounded glutathione injection from Victory Medical Center Pharmacy over out-of-specification bacterial endotoxin results",
+    "Two more FDA Class I recalls: particulate matter in Optiray contrast injection and undeclared drug ingredients in Kian Pee Wan capsules",
+    "MFDS suspends manufacturing for nine Mirae Bio Pharm products over unperformed mandated testing, with three months imposed on the two repeat violations"
+   ]
+  }
  },
  "cards": [
   {
@@ -262,6 +269,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Aseptic area contamination and cross-contamination",
+    "summary": "FDA recorded Form 483 observations at Fayetteville VA Medical Center, a producer of sterile drug products, covering microbial contamination on ISO Class 5 surfaces and inadequate control of beta-lactam cross-contamination.",
+    "implication": "An environmental monitoring excursion left uninvestigated and weak beta-lactam segregation were cited in the same inspection. Sterile manufacturing and compounding sites should review how surface monitoring action-level excursions are handled procedurally, together with their beta-lactam cross-contamination controls.",
+    "key_facts": [
+     "Observation 1: surface samples in the ISO Class 5 area recovered 4 cfu/plate above the action level, with no investigation or corrective plan performed",
+     "Observation 3: beta-lactam and non-beta-lactam products compounded in the same ISO Class 5 area with inadequate cross-contamination controls",
+     "Site and type: Producer of Sterile Drug Products, Form 483 (FEI 1073803)",
+     "Inspection date: 06/15/2026"
+    ],
+    "checks": [
+     "Procedure for investigating and correcting surface environmental monitoring action-level excursions",
+     "Dedicated equipment and area segregation and cleaning standards for beta-lactam products",
+     "Effectiveness of cleaning and disinfection records for aseptic compounding equipment"
+    ]
    }
   },
   {
@@ -367,6 +390,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Aseptic area design and quality unit failures",
+    "summary": "FDA issued a warning letter to PReye, LLC citing inadequate separation and design of aseptic processing areas and a quality control unit that did not carry out its responsibilities.",
+    "implication": "FDA treated the physical design of aseptic areas and the quality unit's ultimate accountability as one matter. Aseptic sites should be able to show qualification evidence for area separation and equipment layout alongside documented quality unit authority over specification conformance decisions.",
+    "key_facts": [
+     "Citation 1: failure to provide adequate separation and equipment design in aseptic processing areas to prevent contamination and mix-ups (21 CFR 211.42(c)(10), 21 CFR 211.63)",
+     "Citation 2: quality control unit failed to assure conformance to identity, strength, quality and purity specifications (21 CFR 211.22)",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 08/18/2026"
+    ],
+    "checks": [
+     "Qualification evidence for aseptic area separation and equipment layout",
+     "Documented quality control unit responsibilities and specification conformance records"
+    ]
    }
   },
   {
@@ -472,6 +509,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Deviation investigation and process control gaps",
+    "summary": "FDA issued a warning letter to Fresenius Medical Care AG & Co. KGaA citing failure to investigate batch specification failures and the absence of written manufacturing and process control procedures.",
+    "implication": "The depth of specification-failure investigations and the process controls that should follow from them were required as a single package. Quality assurance functions should be able to trace whether the conclusions of deviation and OOS investigations actually resulted in revised production and process control procedures.",
+    "key_facts": [
+     "Citation 1: failure to thoroughly investigate unexplained discrepancies and batch specification failures, including batches already distributed (21 CFR 211.192)",
+     "Citation 2: failure to establish written production and process control procedures designed to assure identity, strength, quality and purity (21 CFR 211.100(a))",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 08/25/2026"
+    ],
+    "checks": [
+     "Scope of OOS and deviation investigations and the basis for root cause determinations",
+     "History of investigation outcomes being reflected in production and process control procedures"
+    ]
    }
   },
   {
@@ -578,6 +629,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Incomplete test records and aseptic validation",
+    "summary": "FDA issued a warning letter to Reliance Life Sciences Private Limited in India citing incomplete laboratory records and inadequate procedures and validation for preventing microbiological contamination in aseptic processing.",
+    "implication": "Incomplete laboratory records were cited alongside a reliability problem in aseptic process validation. Sterile product sites should check that the scope of retained raw test data is consistent with the evidence supporting their aseptic and sterilization process validation.",
+    "key_facts": [
+     "Citation 1: laboratory records did not include complete data derived from all tests necessary to assure compliance with specifications and standards (21 CFR 211.194(a))",
+     "Citation 2: failure to establish and follow written procedures to prevent microbiological contamination of products purporting to be sterile, and failure to validate aseptic and sterilization processes (21 CFR 211.113(b))",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 08/18/2026"
+    ],
+    "checks": [
+     "Completeness of raw laboratory data and the extent of audit trail coverage",
+     "Evidence supporting aseptic and sterilization process validation and revalidation"
+    ]
    }
   },
   {
@@ -691,6 +756,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Investigations, aseptic process, facility upkeep",
+    "summary": "FDA issued a warning letter covering the Pharmaceutics International, Inc. site of Jabil Inc., citing inadequate deviation investigations, missing quality unit procedures, failures in aseptic contamination control, and poor building maintenance.",
+    "implication": "Deviation investigations, quality unit procedures, aseptic processing and building maintenance were cited in one letter and treated as a quality system level defect. Companies relying on contract manufacturing should extend audit scope beyond aseptic process validation to the physical condition and maintenance of buildings and equipment.",
+    "key_facts": [
+     "Citation 1: failure to thoroughly investigate unexplained discrepancies and batch specification failures (21 CFR 211.192)",
+     "Citation 2: failure to establish written responsibilities and procedures applicable to the quality control unit (21 CFR 211.22(d))",
+     "Citation 3: failure in aseptic contamination control procedures and validation, and buildings not maintained in a good state of repair (21 CFR 211.113(b), 21 CFR 211.58)",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 08/27/2026"
+    ],
+    "checks": [
+     "Deviation closure criteria and quality unit approval records at contract manufacturing sites",
+     "Maintenance and repair history for aseptic manufacturing buildings and equipment"
+    ]
    }
   },
   {
@@ -786,6 +866,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Insanitary API site and cleaning control gaps",
+    "summary": "FDA issued a warning letter to Shoolin Pharma Chem LLP in India, an active pharmaceutical ingredient manufacturer, citing insanitary manufacturing conditions and inadequate control of cleaning and laboratory records.",
+    "implication": "At an API site supplying the United States for compounding use, cleaning and laboratory record deficiencies escalated into a finding of insanitary conditions. Finished product manufacturers should strengthen the cleaning validation evidence and raw data checks they require when auditing API suppliers.",
+    "key_facts": [
+     "Citation: insanitary conditions including residue and corrosion on non-dedicated equipment and inadequate gowning in open processing areas",
+     "Citation: no written cleaning and maintenance procedures established, and cleaning not verified through swab or rinse testing",
+     "Citation: insufficient evidence that tests reported on certificates of analysis were performed, and contract laboratory results issued as the firm's own certificates without naming the performing laboratory",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 08/18/2026"
+    ],
+    "checks": [
+     "Cleaning validation evidence for non-dedicated equipment at API suppliers",
+     "Identification of the performing laboratory for contract testing and procedures for verifying raw data"
+    ]
    }
   },
   {
@@ -959,6 +1054,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API site found compliant with WHO GMP",
+    "summary": "WHO published the inspection report for the SCL Lifesciences (API Corp - formerly Saurav) active pharmaceutical ingredient site in India, assessing it as operating at an acceptable level of compliance with WHO API GMP guidelines.",
+    "implication": "WHO inspection reports publish observations by area, covering quality management, laboratory and validation, not just the overall outcome, which makes them usable as supplier assessment material. Manufacturers evaluating overseas API suppliers can compare the area-by-area content of a WHOPIR against their own audit findings.",
+    "key_facts": [
+     "Outcome: assessed as operating at an acceptable level of compliance with WHO API GMP guidelines",
+     "Follow-up: non-compliances identified during the inspection were addressed to a satisfactory level before the report was published",
+     "Validity: valid for three years provided inspections carried out during that period are positive",
+     "Inspection date: 2026-03-16"
+    ],
+    "checks": [
+     "Whether a WHOPIR is published for the API supplier and its validity period",
+     "Comparison of area-by-area WHOPIR content against internal supplier audit results"
+    ]
    }
   },
   {
@@ -1047,6 +1157,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Manufacturing suspension for unperformed testing",
+    "summary": "MFDS confirmed that Mirae Bio Pharm did not perform testing ordered by the regional office, or did not submit the results, and suspended manufacturing of the affected products.",
+    "implication": "The action confirms an escalation structure in which repeated failure to comply with a testing order raises the suspension from one month to three. Quality assurance functions should confirm they have a control point that tracks receipt, execution and result submission for regulator-ordered testing, together with the applicable deadlines.",
+    "key_facts": [
+     "Grounds: failure to comply with an order to have products tested by a designated testing institution and submit the results, covering nine products including Notec Tab (cetirizine hydrochloride)",
+     "Breakdown: seven products at first violation, two products at second violation (Imona Capsule, Rich Tab)",
+     "Action: manufacturing suspension of one month for the affected products, with periods varying by product, and three months for Imona Capsule and Rich Tab (September 16, 2026 to December 15, 2026)",
+     "Published: 2026-09-02"
+    ],
+    "checks": [
+     "System for tracking receipt, execution and result submission of regulator-ordered testing",
+     "Review frequency for compliance, given the heavier penalty applied to repeat violations"
+    ]
    }
   },
   {
@@ -1141,6 +1266,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Batch record reissue procedure not followed",
+    "summary": "MFDS confirmed that Dongkwang Pharmaceutical rewrote records without following the reissue procedure set out in its own standards for manufacturing and packaging instructions and records, and suspended manufacturing.",
+    "implication": "A failure to control record reissue led directly to output and yield figures being rewritten, making this a data integrity matter. Quality assurance functions should verify that all three steps, requesting reissue, approving it, and destroying the superseded document, leave an actual record.",
+    "key_facts": [
+     "Grounds: manufacturing instructions and records reissued without a completed and approved reissue request, with output, receipt quantity and yield rewritten and the superseded documents neither retrieved nor destroyed",
+     "Products: Cyone Injection (thymosin alpha 1), Dongkwang Rosuvastatin Calcium Tab 20 mg, and the contract-manufactured Asverin Capsule 100/5 mg",
+     "Action: one month manufacturing suspension for the affected products (September 15, 2026 to October 14, 2026) and 15 days for the affected dosage form, capsules (September 15, 2026 to September 29, 2026)",
+     "Published: 2026-09-01"
+    ],
+    "checks": [
+     "Retention of reissue request and approval records for manufacturing and packaging instructions and records",
+     "Evidence of retrieval and destruction of superseded documents on reissue",
+     "Compliance with site standards for contract-manufactured products"
+    ]
    }
   },
   {
@@ -1250,6 +1391,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "GMP findings across six inspection areas",
+    "summary": "MFDS published the results of a post-approval GMP inspection of the Coreapharm Bio finished product site, with deficiencies identified across six areas: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling.",
+    "implication": "When findings are spread across all six inspection areas, correcting individual items rarely explains the pattern and a quality system level diagnosis usually follows. Sites should check whether recent inspections produced findings spread widely across areas, and whether common causes across those areas have been documented.",
+    "key_facts": [
+     "Areas cited: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling",
+     "Classification: deficiencies are graded critical, major or other under PIC/S definitions, with critical and major findings subject to administrative action",
+     "Inspection period: 2026-04-27 to 2026-04-29",
+     "Published: 2026-09-01"
+    ],
+    "checks": [
+     "Common root cause analysis across deficiencies in different inspection areas",
+     "Whether classification as critical or major implies follow-on administrative action"
+    ]
    }
   },
   {
@@ -1373,6 +1529,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Quality assurance system and data integrity",
+    "summary": "MFDS published the results of a post-approval GMP inspection of the Korea Atomic Energy Research Institute site, with findings in the quality management area concerning operation of the quality assurance system and data integrity.",
+    "implication": "The inspection looked beyond having data integrity guidance on paper to whether an organisation exists to operate it. Sites should confirm that an organisation and defined roles are assigned to execute and monitor the data integrity policy.",
+    "key_facts": [
+     "Finding: management and personnel shall establish and properly implement a quality assurance system to meet quality objectives (Annex 1, item 1-2; Annex 1-2, item 2)",
+     "Finding: a dedicated organisation shall be formed to operate data integrity guidance (Annex 1, item 3.1)",
+     "Classification: all graded other, with the corrective action plan accepted as reasonable",
+     "Inspection period: 2026-05-06 to 2026-05-08"
+    ],
+    "checks": [
+     "Whether a dedicated organisation and roles are assigned to operate data integrity guidance",
+     "Level of documentation evidencing operation of the quality assurance system"
+    ]
    }
   },
   {
@@ -1483,6 +1654,22 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Equipment calibration and purified water",
+    "summary": "MFDS published the results of a post-approval GMP inspection of the Dongsung Pharmaceutical finished product site, with findings in the premises and equipment area concerning equipment calibration and purified water system control.",
+    "implication": "Routine control items such as calibration, daily checks and water filters are being re-examined against the standards of critical process parameters and actual range of use. Sites should confirm that calibration ranges and balance check ranges numerically cover real operating conditions.",
+    "key_facts": [
+     "Finding: critical machinery and equipment used in manufacturing shall be calibrated covering all critical process parameters (Annex 1, item 2.1)",
+     "Finding: daily checks of balances used for weighing shall be performed considering the actual range of use (Annex 1, item 2.1)",
+     "Finding: the suitability of filters in the purified water system shall be verified periodically (Annex 1, item 2.1)",
+     "Classification: graded other, with the corrective action plan accepted as reasonable"
+    ],
+    "checks": [
+     "Whether calibration ranges for critical equipment cover all critical process parameters",
+     "Alignment between the daily balance check range and the actual weighing range",
+     "Frequency of purified water system filter suitability verification"
+    ]
    }
   },
   {
@@ -1613,6 +1800,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Equipment qualification and labelling checks",
+    "summary": "MFDS published the results of a post-approval GMP inspection of the Unimed Pharm site, with findings on calibration and qualification of premises and equipment and on inspection procedures in the packaging and labelling area.",
+    "implication": "A finding requiring qualification across the full equipment operating range appeared together with one on pre-use checks of labelling materials, putting both equipment and packaging operations under review. Sites should check that qualification reports cover all actual operating conditions and that pre-use checks of labelling materials are documented.",
+    "key_facts": [
+     "Finding: critical equipment used in manufacturing and testing shall be calibrated (Annex 1-2, item 5), closed as corrected",
+     "Finding: qualification shall be performed covering the full operating range of equipment, with the corrective action plan accepted as reasonable",
+     "Finding: a procedure shall be established for checking labelling materials before use (Annex 1-2, item 9)",
+     "Inspection period: 2026-03-09 to 2026-03-12"
+    ],
+    "checks": [
+     "Alignment between the scope of equipment qualification and the actual operating range",
+     "Whether a pre-use check procedure for labelling materials is established and recorded"
+    ]
    }
   },
   {
@@ -1736,6 +1938,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Record retention and cleaning validation",
+    "summary": "MFDS published the results of a post-approval GMP inspection of the Kyungbang Pharmaceutical site, with findings concerning retention of records from automated systems and cleaning validation of production equipment.",
+    "implication": "Retention of automated system records, which bears on data integrity, and cleaning validation of production equipment, which bears on cross-contamination control, were cited in the same inspection. Sites should confirm the storage location and retention period for electronic records from automated equipment and that the list of equipment subject to cleaning validation is current.",
+    "key_facts": [
+     "Finding: all records, including those from automated systems, shall be stored and retained (Annex 1, item 2.2)",
+     "Finding: qualification shall be performed covering the full operating range of equipment (Annex 1-2, item 5), closed as corrected",
+     "Finding: cleaning validation shall be performed for production equipment, with the corrective action plan accepted as reasonable",
+     "Inspection period: 2026-04-13 to 2026-04-16"
+    ],
+    "checks": [
+     "Storage path and retention period configured for electronic records from automated systems",
+     "List of equipment subject to cleaning validation and the record of validation performed"
+    ]
    }
   },
   {
@@ -1845,6 +2062,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Compressed air control and cleaning validation",
+    "summary": "MFDS published the results of a post-approval GMP inspection of the Eden Pharma site, with findings concerning quality control of compressed air in direct contact with drug products and cleaning validation.",
+    "implication": "Compressed air as a product-contact utility and cleaning after campaign production were cited as separate items, extending cross-contamination control beyond equipment itself. Sites should confirm the specifications and monitoring basis for product-contact utilities such as compressed air, and the cleaning verification evidence at the end of a campaign.",
+    "key_facts": [
+     "Finding: an appropriate quality control system shall be in place for compressed air in direct contact with drug products (Annex 1, item 2.1)",
+     "Finding: cleaning validation shall be performed for equipment in contact with product (Annex 1, item 6.4)",
+     "Finding: cleaning validation shall be performed for campaign production (Annex 1, item 6.4)",
+     "Inspection period: 2026-05-27 to 2026-05-29"
+    ],
+    "checks": [
+     "Whether specifications and monitoring criteria are established for product-contact compressed air",
+     "Cleaning validation evidence at the end of campaign production"
+    ]
    }
   },
   {
@@ -1903,6 +2135,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Product-level pre-approval GMP review manual",
+    "summary": "MFDS published a working manual on product-level pre-approval GMP assessment.",
+    "implication": "Setting out the working standards for product-level pre-approval GMP assessment in a manual makes the reviewer's perspective visible in a document. Regulatory affairs and quality assurance functions should compare their pre-approval GMP submission material against the structure of the manual in the source document.",
+    "key_facts": [
+     "Issuing body: MFDS, published 2026-08-31",
+     "Subject: working manual for product-level pre-approval GMP assessment",
+     "Detail: not available, the source document needs to be consulted"
+    ],
+    "checks": [
+     "Comparison of the submission package for product-level pre-approval GMP assessment",
+     "Review of the source manual"
+    ]
    }
   },
   {
@@ -1973,6 +2219,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Toothpaste assay and pH nonconformity recall",
+    "summary": "MFDS ordered a recall and sales suspension of Polmedison Whitening Silver Racha Toothpaste from Neomedical Pharm on grounds of quality nonconformity.",
+    "implication": "Nonconformity in assay and pH, both basic specification attributes, points to control at the release testing decision stage. Quality assurance functions should review the acceptance criteria for assay and pH in comparable dosage forms and the procedure for reviewing test results before release.",
+    "key_facts": [
+     "Grounds: quality nonconformity in assay testing, hydrogen peroxide (35%), pH 3.75",
+     "Product: Polmedison Whitening Silver Racha Toothpaste",
+     "Recall order date: 20260903, mandatory: Y"
+    ],
+    "checks": [
+     "Appropriateness of acceptance criteria and test methods for assay and pH",
+     "Records of review and approval of test results before release"
+    ]
    }
   },
   {
@@ -2043,6 +2303,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Disinfectant ethanol assay recall",
+    "summary": "MFDS ordered a recall and sales suspension of Meditop Disinfectant Ethanol from Meditop on grounds of quality nonconformity in assay.",
+    "implication": "For ethanol preparations, assay directly reflects whether the actual active level matches the labelled content. Quality assurance functions should confirm that the basis for the assay specification accounts for evaporative loss during packaging and storage.",
+    "key_facts": [
+     "Grounds: quality nonconformity in assay",
+     "Product: Meditop Disinfectant Ethanol",
+     "Recall order date: 20260902, mandatory: Y"
+    ],
+    "checks": [
+     "Basis for setting the assay specification for ethanol preparations",
+     "Assessment of the effect of packaging and storage conditions on assay"
+    ]
    }
   },
   {
@@ -2113,6 +2387,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Disinfectant ethanol below assay specification",
+    "summary": "MFDS ordered a recall and sales suspension of Atop Disinfectant Ethanol from Atopmed on grounds of quality nonconformity in assay.",
+    "implication": "Where an assay nonconformity is confirmed in a particular manufacturing lot, the reproducibility of the mixing and dilution process is generally the first area examined. Quality assurance functions should check that assay results are trended by lot and that evidence of process reproducibility exists.",
+    "key_facts": [
+     "Grounds: quality nonconformity in assay",
+     "Product: Atop Disinfectant Ethanol",
+     "Recall order date: 20260902, mandatory: Y"
+    ],
+    "checks": [
+     "Trending of assay results by manufacturing lot",
+     "Evidence confirming reproducibility of the mixing and dilution process"
+    ]
    }
   },
   {
@@ -2183,6 +2471,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Disinfectant ethanol assay nonconformity",
+    "summary": "MFDS ordered a recall and sales suspension of Dana Disinfectant Ethanol from Dana Pharm on grounds of quality nonconformity in assay.",
+    "implication": "An assay nonconformity in the finished product can only be narrowed down by tracing back to the measured assay of the incoming material and the basis for the batch calculation. Quality assurance functions should confirm that incoming material test results and any assay correction applied in the batch calculation are documented.",
+    "key_facts": [
+     "Grounds: quality nonconformity in assay",
+     "Product: Dana Disinfectant Ethanol",
+     "Recall order date: 20260902, mandatory: Y"
+    ],
+    "checks": [
+     "Incoming material test results and the basis for assay correction",
+     "Verification and approval records for batch calculations"
+    ]
    }
   },
   {
@@ -2253,6 +2555,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Hand sanitiser recall across 25 products",
+    "summary": "MFDS ordered a recall and sales suspension of 25 products from Korea Miracle People, including hand sanitiser gels, on grounds of quality nonconformity in assay.",
+    "implication": "An assay nonconformity confirmed in one product was handled as a recall covering 25 products. Quality assurance functions should confirm how a test result for one product feeds into the disposition of the remaining products in a range marketed under multiple names.",
+    "key_facts": [
+     "Grounds: quality nonconformity in assay, KMPC Miracle Origin Hand Sanitizer Gel (ethanol (95))",
+     "Scope: 25 products containing ethanol (95), including hand sanitiser gels, recalled together",
+     "Recall order date: 20260831, mandatory: Y"
+    ],
+    "checks": [
+     "Criteria for applying test results across products within the same range",
+     "Basis for determining recall scope in a multi-product recall"
+    ]
    }
   },
   {
@@ -2323,6 +2639,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Hand sanitiser gel assay nonconformity",
+    "summary": "MFDS ordered a recall and sales suspension of KMPC Miracle Origin Hand Sanitizer Gel (ethanol (95)) from Korea Miracle People on grounds of quality nonconformity in assay.",
+    "implication": "For gels with ethanol as the active ingredient, assay results can shift with sampling and storage conditions, so control of test conditions governs the reliability of the disposition. Quality assurance functions should confirm that sampling timing and closure conditions for assay testing of alcohol preparations are fixed by procedure.",
+    "key_facts": [
+     "Grounds: quality nonconformity in assay",
+     "Product: KMPC Miracle Origin Hand Sanitizer Gel (ethanol (95))",
+     "Recall order date: 20260831, mandatory: Y"
+    ],
+    "checks": [
+     "Sampling and storage conditions for assay testing of alcohol preparations",
+     "Basis for setting the specification relative to the labelled content"
+    ]
    }
   },
   {
@@ -2399,6 +2729,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Nitrosamine impurity above limit",
+    "summary": "Dalim BioTech carried out a voluntary recall of distributed stock of Repanum Tab (repaglinide) after the impurity N-nitroso-meglumine was detected above the limit. Three products differing in strength are covered by the same recall.",
+    "implication": "Nitrosamine impurities continue to appear as recall grounds in particular combinations of active ingredient and excipient. Quality and regulatory affairs functions should confirm that amine-containing excipient combinations are reflected in the list of products subject to nitrosamine risk assessment.",
+    "key_facts": [
+     "Grounds: voluntary recall of distributed stock following detection of the impurity N-nitroso-meglumine above the limit",
+     "Scope: three Repanum Tab products recalled together on the same grounds",
+     "Classification: mandatory N, voluntary recall; recall order date 20260819",
+     "Published: 2026-08-19"
+    ],
+    "checks": [
+     "Currency of the list of products subject to nitrosamine impurity risk assessment",
+     "Impurity testing criteria for products using amine-containing excipients"
+    ]
    }
   },
   {
@@ -2494,6 +2839,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Recall for undeclared drug ingredients",
+    "summary": "FDA published a recall of Kian Pee Wan Capsules from Buy-Herbal because the product contains undeclared drug ingredients.",
+    "implication": "A product presented as herbal containing undeclared drug ingredients was classified at the highest hazard level. Quality assurance functions should check that testing is in place to screen for undeclared ingredients entering through imported materials or contract manufacturing routes.",
+    "key_facts": [
+     "Grounds: marketed without an approved NDA or ANDA, containing the undeclared drug ingredients dexamethasone and cyproheptadine",
+     "Recall class: Class I",
+     "Product: Kian Pee Wan Capsules, 30-count bottles"
+    ],
+    "checks": [
+     "Test methods established to detect undeclared drug ingredients",
+     "Procedure for verifying that supply chain materials match their declared composition"
+    ]
    }
   },
   {
@@ -2589,6 +2948,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Injection out of endotoxin specification",
+    "summary": "FDA published a recall of Glutathione injection from Victory Medical Center Pharmacy following out-of-specification results for bacterial endotoxin.",
+    "implication": "An endotoxin excursion in a compounded injection points to failed control of endotoxin load in water and materials, not only to sterility. Sterile product sites should confirm that endotoxin limits and testing frequency for water for injection and raw materials are consistent with the product specification.",
+    "key_facts": [
+     "Grounds: microbial contamination of sterile products, with out-of-specification results obtained for bacterial endotoxin",
+     "Recall class: Class I",
+     "Product: Glutathione (MDV), 200 mg/mL, 30 mL vial"
+    ],
+    "checks": [
+     "Basis for endotoxin control limits for water for injection and raw materials",
+     "Endotoxin testing frequency and the procedure for handling out-of-specification results"
+    ]
    }
   },
   {
@@ -2702,6 +3075,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Contrast agent recalled for particulate matter",
+    "summary": "FDA published a recall of Optiray Imaging Bulk Package-350 (Ioversol Injection) from Liebel-Flarsheim Company LLC because of particulate matter.",
+    "implication": "Because the particulates span plastic, metal and glass, the source cannot be attributed to a single step and has to be traced across the whole filling line. Injectable manufacturers should confirm they can map particulate sources by material and verify the detection capability of their line inspection methods.",
+    "key_facts": [
+     "Grounds: presence of particulate matter comprising polyethylene and other plastic materials, stainless steel and glass",
+     "Recall class: Class I",
+     "Product: Optiray Imaging Bulk Package-350, Ioversol Injection 74%, 500 mL Multiple-Dose Vial"
+    ],
+    "checks": [
+     "Mapping and traceability of particulate sources by material type",
+     "Verification of the detection limit of particulate inspection methods on the filling line"
+    ]
    }
   },
   {
@@ -2777,6 +3164,21 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Temozolomide out of assay specification",
+    "summary": "Health Canada published a recall of JAMP Temozolomide capsules from JAMP Pharma Corporation for a product quality issue, with an out-of-specification assay result given as the reason.",
+    "implication": "An out-of-specification assay in an oncology product directly affects dose accuracy and carries a high clinical impact. Quality assurance functions should confirm that content uniformity testing for cytotoxic capsules is adequately designed and that assay trends are monitored through stability testing.",
+    "key_facts": [
+     "Grounds: product quality, out-of-specification assay result",
+     "Recall class: Type II",
+     "Product: JAMP Temozolomide 140 mg capsules",
+     "Action: patients advised to check whether stock on hand is affected and to consult a healthcare professional before stopping use"
+    ],
+    "checks": [
+     "Design of content uniformity testing for cytotoxic capsule products",
+     "Criteria for monitoring assay trends during stability testing"
+    ]
    }
   },
   {
@@ -2889,6 +3291,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Valsartan failed dissolution specification",
+    "summary": "FDA published a recall of Diovan (valsartan) 160 mg tablets from Novartis Pharmaceuticals Corporation for failing dissolution specifications.",
+    "implication": "Dissolution failures can arise from process variables or from change during storage, so establishing when the failure appeared is the starting point for root cause work. Quality assurance functions should review the basis for dissolution test conditions and time points for solid dosage forms and how dissolution trends are monitored through stability testing.",
+    "key_facts": [
+     "Grounds: failed dissolution specifications",
+     "Recall class: Class II",
+     "Product: Diovan (valsartan) 160 mg, 90 tablets"
+    ],
+    "checks": [
+     "Basis for dissolution test conditions and time points for solid dosage forms",
+     "Monitoring of dissolution result trends during stability testing"
+    ]
    }
   },
   {
@@ -2996,6 +3412,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Semaglutide recalled for particulate matter",
+    "summary": "FDA published a recall of 11 products from Apollo Care, LLC, including semaglutide injection, because of particulate matter. Several products were recalled together on the same grounds.",
+    "implication": "Particulates identified as nylon and proteinaceous material are generally associated with process consumables such as garments and filter media. Aseptic compounding and filling operations should confirm they have assessed the shedding characteristics of the materials used and identified control points for particulates after final filtration.",
+    "key_facts": [
+     "Grounds: presence of particulate matter identified as nylon or polyamide and silk or proteinaceous-type material",
+     "Recall class: Class II",
+     "Scope: 11 products recalled together on the same grounds"
+    ],
+    "checks": [
+     "Assessment of fibre shedding characteristics for aseptic processing consumables",
+     "Particulate inspection and control points after final filtration"
+    ]
    }
   },
   {
@@ -3095,6 +3525,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "API recalled over CGMP deviations",
+    "summary": "FDA published a recall of five products from Shoolin Pharma Chem LLP, including active pharmaceutical ingredients for compounding, because of CGMP deviations noted during an FDA inspection.",
+    "implication": "The inspection outcome alone led to a recall of distributed material, without any batch-specific test failure. Quality assurance functions should monitor the inspection history and regulatory actions affecting overseas API suppliers and maintain a plan for alternative supply should a recall occur.",
+    "key_facts": [
+     "Grounds: CGMP deviations noted during FDA inspection",
+     "Recall class: Class II",
+     "Scope: five products recalled together, including active pharmaceutical ingredients labelled for prescription compounding only"
+    ],
+    "checks": [
+     "Monitoring of inspection history and regulatory actions at overseas API suppliers",
+     "Alternative supplier and inventory impact assessment in the event of an API recall"
+    ]
    }
   },
   {
@@ -3216,6 +3660,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Eye drops lacking assurance of sterility",
+    "summary": "FDA published a recall of CLEAR EYES Maximum Itchy Eye Relief eye drops from Prestige Brands Holdings for lack of assurance of sterility.",
+    "implication": "Sterility of an ophthalmic product is judged on the evidence that the whole process assures it, not on an individual test result. Ophthalmic manufacturers should confirm that aseptic process validation and container closure integrity data actually support the sterility claim.",
+    "key_facts": [
+     "Grounds: lack of assurance of sterility, with the recall due to potential contamination",
+     "Recall class: Class II",
+     "Product: CLEAR EYES Maximum Itchy Eye Relief, 0.5 fl oz (15 mL) dropper bottle"
+    ],
+    "checks": [
+     "Evidence supporting aseptic process validation for ophthalmic products",
+     "Design and frequency of container closure integrity testing"
+    ]
    }
   },
   {
@@ -3328,6 +3786,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Particles and flakes after reconstitution",
+    "summary": "FDA published a recall of clindamycin palmitate hydrochloride for oral solution from Heritage Pharmaceuticals Inc after particles and white flakes were found in reconstituted bottles.",
+    "implication": "The foreign matter appeared only after reconstitution, so inspection of the dry powder alone would not have detected it. Quality assurance functions should confirm that appearance and particulate checks after reconstitution are included in the specification and reflected in the stability study design for dry syrup products.",
+    "key_facts": [
+     "Grounds: presence of foreign substance, with particles and white flakes found in the reconstituted bottles",
+     "Recall class: Class II",
+     "Product: CLINDAMYCIN PALMITATE HYDROCHLORIDE FOR ORAL SOLUTION, USP, 75 mg/5 mL, 100 mL"
+    ],
+    "checks": [
+     "Whether appearance and particulate testing after reconstitution is included in the specification for dry syrup products",
+     "Whether reconstituted conditions are reflected in the stability study design"
+    ]
    }
   },
   {
@@ -3449,6 +3921,20 @@
      "info": "pending",
      "official": "pending"
     }
+   },
+   "en": {
+    "title_issue": "Dabigatran impurity OOS at 12 months",
+    "summary": "FDA published a recall of three products from Ascend Laboratories, LLC, including dabigatran etexilate capsules, because of out-of-specification impurity results found at the 12-month stability time point.",
+    "implication": "Impurities moved outside specification at an intermediate stability time point, which puts the basis for the assigned shelf life itself under review. Quality assurance functions should confirm they have a system for trending stability results and a procedure for assessing the impact of a stability OOS on shelf life and distributed stock.",
+    "key_facts": [
+     "Grounds: failed impurity and degradation specification, with OOS results in related substance testing for Impurity II, Impurity III and total impurities at 12-month stability",
+     "Recall class: Class III",
+     "Scope: three products recalled together, including Dabigatran Etexilate Capsules, 150 mg"
+    ],
+    "checks": [
+     "System for trend analysis of impurity results from stability testing",
+     "Procedure for assessing shelf life and distributed stock impact when a stability OOS occurs"
+    ]
    }
   }
  ]

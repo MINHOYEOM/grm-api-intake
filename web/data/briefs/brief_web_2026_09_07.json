@@ -141,7 +141,7 @@
    "tldr": [
     "FDA issues a Class I recall of a compounded glutathione injection from Victory Medical Center Pharmacy over out-of-specification bacterial endotoxin results",
     "Two more FDA Class I recalls: particulate matter in Optiray contrast injection and undeclared drug ingredients in Kian Pee Wan capsules",
-    "MFDS suspends manufacturing for nine Mirae Bio Pharm products over unperformed mandated testing, with three months imposed on the two repeat violations"
+    "MFDS suspends manufacturing of nine products at one company for failing to carry out ordered testing, with three months imposed on the two repeat violations"
    ]
   }
  },
@@ -1160,12 +1160,12 @@
    },
    "en": {
     "title_issue": "Manufacturing suspension for unperformed testing",
-    "summary": "MFDS confirmed that Mirae Bio Pharm did not perform testing ordered by the regional office, or did not submit the results, and suspended manufacturing of the affected products.",
+    "summary": "The Ministry of Food and Drug Safety confirmed that a manufacturer did not carry out testing ordered by the regional office, or did not submit the results, and suspended manufacturing of the affected products.",
     "implication": "The action confirms an escalation structure in which repeated failure to comply with a testing order raises the suspension from one month to three. Quality assurance functions should confirm they have a control point that tracks receipt, execution and result submission for regulator-ordered testing, together with the applicable deadlines.",
     "key_facts": [
-     "Grounds: failure to comply with an order to have products tested by a designated testing institution and submit the results, covering nine products including Notec Tab (cetirizine hydrochloride)",
-     "Breakdown: seven products at first violation, two products at second violation (Imona Capsule, Rich Tab)",
-     "Action: manufacturing suspension of one month for the affected products, with periods varying by product, and three months for Imona Capsule and Rich Tab (September 16, 2026 to December 15, 2026)",
+     "Grounds: failure to comply with an order to have products tested at a designated testing institution and submit the results, covering nine products including a cetirizine hydrochloride tablet",
+     "Breakdown: seven products at first violation and two products at second violation",
+     "Action: manufacturing suspension of one month for the affected products, with the period varying by product, and three months for the two repeat products (September 16, 2026 to December 15, 2026)",
      "Published: 2026-09-02"
     ],
     "checks": [
@@ -1269,11 +1269,11 @@
    },
    "en": {
     "title_issue": "Batch record reissue procedure not followed",
-    "summary": "MFDS confirmed that Dongkwang Pharmaceutical rewrote records without following the reissue procedure set out in its own standards for manufacturing and packaging instructions and records, and suspended manufacturing.",
+    "summary": "The Ministry of Food and Drug Safety confirmed that a manufacturer rewrote records without following the reissue procedure set out in its own standards for manufacturing and packaging instructions and records, and suspended manufacturing.",
     "implication": "A failure to control record reissue led directly to output and yield figures being rewritten, making this a data integrity matter. Quality assurance functions should verify that all three steps, requesting reissue, approving it, and destroying the superseded document, leave an actual record.",
     "key_facts": [
      "Grounds: manufacturing instructions and records reissued without a completed and approved reissue request, with output, receipt quantity and yield rewritten and the superseded documents neither retrieved nor destroyed",
-     "Products: Cyone Injection (thymosin alpha 1), Dongkwang Rosuvastatin Calcium Tab 20 mg, and the contract-manufactured Asverin Capsule 100/5 mg",
+     "Products: a thymosin alpha 1 injection, a rosuvastatin calcium 20 mg tablet, and a contract-manufactured capsule product",
      "Action: one month manufacturing suspension for the affected products (September 15, 2026 to October 14, 2026) and 15 days for the affected dosage form, capsules (September 15, 2026 to September 29, 2026)",
      "Published: 2026-09-01"
     ],
@@ -1394,7 +1394,7 @@
    },
    "en": {
     "title_issue": "GMP findings across six inspection areas",
-    "summary": "MFDS published the results of a post-approval GMP inspection of the Coreapharm Bio finished product site, with deficiencies identified across six areas: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling.",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of a finished product site, with deficiencies identified across six areas: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling.",
     "implication": "When findings are spread across all six inspection areas, correcting individual items rarely explains the pattern and a quality system level diagnosis usually follows. Sites should check whether recent inspections produced findings spread widely across areas, and whether common causes across those areas have been documented.",
     "key_facts": [
      "Areas cited: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling",
@@ -1532,11 +1532,11 @@
    },
    "en": {
     "title_issue": "Quality assurance system and data integrity",
-    "summary": "MFDS published the results of a post-approval GMP inspection of the Korea Atomic Energy Research Institute site, with findings in the quality management area concerning operation of the quality assurance system and data integrity.",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection, with findings in the quality management area concerning operation of the quality assurance system and data integrity.",
     "implication": "The inspection looked beyond having data integrity guidance on paper to whether an organisation exists to operate it. Sites should confirm that an organisation and defined roles are assigned to execute and monitor the data integrity policy.",
     "key_facts": [
-     "Finding: management and personnel shall establish and properly implement a quality assurance system to meet quality objectives (Annex 1, item 1-2; Annex 1-2, item 2)",
-     "Finding: a dedicated organisation shall be formed to operate data integrity guidance (Annex 1, item 3.1)",
+     "Finding: management and personnel shall establish and properly implement a quality assurance system to meet quality objectives",
+     "Finding: a dedicated organisation shall be formed to operate data integrity guidance",
      "Classification: all graded other, with the corrective action plan accepted as reasonable",
      "Inspection period: 2026-05-06 to 2026-05-08"
     ],
@@ -1657,12 +1657,12 @@
    },
    "en": {
     "title_issue": "Equipment calibration and purified water",
-    "summary": "MFDS published the results of a post-approval GMP inspection of the Dongsung Pharmaceutical finished product site, with findings in the premises and equipment area concerning equipment calibration and purified water system control.",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of a finished product site, with findings in the premises and equipment area concerning equipment calibration and purified water system control.",
     "implication": "Routine control items such as calibration, daily checks and water filters are being re-examined against the standards of critical process parameters and actual range of use. Sites should confirm that calibration ranges and balance check ranges numerically cover real operating conditions.",
     "key_facts": [
-     "Finding: critical machinery and equipment used in manufacturing shall be calibrated covering all critical process parameters (Annex 1, item 2.1)",
-     "Finding: daily checks of balances used for weighing shall be performed considering the actual range of use (Annex 1, item 2.1)",
-     "Finding: the suitability of filters in the purified water system shall be verified periodically (Annex 1, item 2.1)",
+     "Finding: critical machinery and equipment used in manufacturing shall be calibrated covering all critical process parameters",
+     "Finding: daily checks of balances used for weighing shall be performed considering the actual range of use",
+     "Finding: the suitability of filters in the purified water system shall be verified periodically",
      "Classification: graded other, with the corrective action plan accepted as reasonable"
     ],
     "checks": [
@@ -1803,12 +1803,12 @@
    },
    "en": {
     "title_issue": "Equipment qualification and labelling checks",
-    "summary": "MFDS published the results of a post-approval GMP inspection of the Unimed Pharm site, with findings on calibration and qualification of premises and equipment and on inspection procedures in the packaging and labelling area.",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection, with findings on calibration and qualification of premises and equipment and on inspection procedures in the packaging and labelling area.",
     "implication": "A finding requiring qualification across the full equipment operating range appeared together with one on pre-use checks of labelling materials, putting both equipment and packaging operations under review. Sites should check that qualification reports cover all actual operating conditions and that pre-use checks of labelling materials are documented.",
     "key_facts": [
-     "Finding: critical equipment used in manufacturing and testing shall be calibrated (Annex 1-2, item 5), closed as corrected",
+     "Finding: critical equipment used in manufacturing and testing shall be calibrated, closed as corrected",
      "Finding: qualification shall be performed covering the full operating range of equipment, with the corrective action plan accepted as reasonable",
-     "Finding: a procedure shall be established for checking labelling materials before use (Annex 1-2, item 9)",
+     "Finding: a procedure shall be established for checking labelling materials before use",
      "Inspection period: 2026-03-09 to 2026-03-12"
     ],
     "checks": [
@@ -1941,11 +1941,11 @@
    },
    "en": {
     "title_issue": "Record retention and cleaning validation",
-    "summary": "MFDS published the results of a post-approval GMP inspection of the Kyungbang Pharmaceutical site, with findings concerning retention of records from automated systems and cleaning validation of production equipment.",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection, with findings concerning retention of records from automated systems and cleaning validation of production equipment.",
     "implication": "Retention of automated system records, which bears on data integrity, and cleaning validation of production equipment, which bears on cross-contamination control, were cited in the same inspection. Sites should confirm the storage location and retention period for electronic records from automated equipment and that the list of equipment subject to cleaning validation is current.",
     "key_facts": [
-     "Finding: all records, including those from automated systems, shall be stored and retained (Annex 1, item 2.2)",
-     "Finding: qualification shall be performed covering the full operating range of equipment (Annex 1-2, item 5), closed as corrected",
+     "Finding: all records, including those produced by automated systems, shall be stored and retained",
+     "Finding: qualification shall be performed covering the full operating range of equipment, closed as corrected",
      "Finding: cleaning validation shall be performed for production equipment, with the corrective action plan accepted as reasonable",
      "Inspection period: 2026-04-13 to 2026-04-16"
     ],
@@ -2065,12 +2065,12 @@
    },
    "en": {
     "title_issue": "Compressed air control and cleaning validation",
-    "summary": "MFDS published the results of a post-approval GMP inspection of the Eden Pharma site, with findings concerning quality control of compressed air in direct contact with drug products and cleaning validation.",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection, with findings concerning quality control of compressed air in direct contact with drug products and cleaning validation.",
     "implication": "Compressed air as a product-contact utility and cleaning after campaign production were cited as separate items, extending cross-contamination control beyond equipment itself. Sites should confirm the specifications and monitoring basis for product-contact utilities such as compressed air, and the cleaning verification evidence at the end of a campaign.",
     "key_facts": [
-     "Finding: an appropriate quality control system shall be in place for compressed air in direct contact with drug products (Annex 1, item 2.1)",
-     "Finding: cleaning validation shall be performed for equipment in contact with product (Annex 1, item 6.4)",
-     "Finding: cleaning validation shall be performed for campaign production (Annex 1, item 6.4)",
+     "Finding: an appropriate quality control system shall be in place for compressed air in direct contact with drug products",
+     "Finding: cleaning validation shall be performed for equipment in contact with product",
+     "Finding: cleaning validation shall be performed for campaign production",
      "Inspection period: 2026-05-27 to 2026-05-29"
     ],
     "checks": [
@@ -2137,17 +2137,17 @@
     }
    },
    "en": {
-    "title_issue": "Product-level pre-approval GMP review manual",
-    "summary": "MFDS published a working manual on product-level pre-approval GMP assessment.",
-    "implication": "Setting out the working standards for product-level pre-approval GMP assessment in a manual makes the reviewer's perspective visible in a document. Regulatory affairs and quality assurance functions should compare their pre-approval GMP submission material against the structure of the manual in the source document.",
+    "title_issue": "Manual on pre-approval GMP assessment",
+    "summary": "The Ministry of Food and Drug Safety published a working manual on product-level pre-approval GMP assessment. The document has no official English title, so it is described here rather than named.",
+    "implication": "Setting out the working standards for product-level pre-approval GMP assessment in a manual makes the reviewer's perspective visible in a document. Regulatory affairs and quality assurance functions should compare their pre-approval GMP submission material against the structure of the source document.",
     "key_facts": [
-     "Issuing body: MFDS, published 2026-08-31",
-     "Subject: working manual for product-level pre-approval GMP assessment",
+     "Issuing body: Ministry of Food and Drug Safety, published 2026-08-31",
+     "Subject: how product-level pre-approval GMP assessment is carried out",
      "Detail: not available, the source document needs to be consulted"
     ],
     "checks": [
      "Comparison of the submission package for product-level pre-approval GMP assessment",
-     "Review of the source manual"
+     "Review of the source document"
     ]
    }
   },
@@ -2222,11 +2222,11 @@
    },
    "en": {
     "title_issue": "Toothpaste assay and pH nonconformity recall",
-    "summary": "MFDS ordered a recall and sales suspension of Polmedison Whitening Silver Racha Toothpaste from Neomedical Pharm on grounds of quality nonconformity.",
+    "summary": "A recall and sales suspension was ordered for a toothpaste product on the ground of quality nonconformity.",
     "implication": "Nonconformity in assay and pH, both basic specification attributes, points to control at the release testing decision stage. Quality assurance functions should review the acceptance criteria for assay and pH in comparable dosage forms and the procedure for reviewing test results before release.",
     "key_facts": [
      "Grounds: quality nonconformity in assay testing, hydrogen peroxide (35%), pH 3.75",
-     "Product: Polmedison Whitening Silver Racha Toothpaste",
+     "Product: a whitening toothpaste",
      "Recall order date: 20260903, mandatory: Y"
     ],
     "checks": [
@@ -2306,11 +2306,11 @@
    },
    "en": {
     "title_issue": "Disinfectant ethanol assay recall",
-    "summary": "MFDS ordered a recall and sales suspension of Meditop Disinfectant Ethanol from Meditop on grounds of quality nonconformity in assay.",
+    "summary": "A recall and sales suspension was ordered for a disinfectant ethanol product on the ground of quality nonconformity in assay.",
     "implication": "For ethanol preparations, assay directly reflects whether the actual active level matches the labelled content. Quality assurance functions should confirm that the basis for the assay specification accounts for evaporative loss during packaging and storage.",
     "key_facts": [
      "Grounds: quality nonconformity in assay",
-     "Product: Meditop Disinfectant Ethanol",
+     "Product: a disinfectant ethanol preparation",
      "Recall order date: 20260902, mandatory: Y"
     ],
     "checks": [
@@ -2390,11 +2390,11 @@
    },
    "en": {
     "title_issue": "Disinfectant ethanol below assay specification",
-    "summary": "MFDS ordered a recall and sales suspension of Atop Disinfectant Ethanol from Atopmed on grounds of quality nonconformity in assay.",
+    "summary": "A recall and sales suspension was ordered for a disinfectant ethanol product on the ground of quality nonconformity in assay.",
     "implication": "Where an assay nonconformity is confirmed in a particular manufacturing lot, the reproducibility of the mixing and dilution process is generally the first area examined. Quality assurance functions should check that assay results are trended by lot and that evidence of process reproducibility exists.",
     "key_facts": [
      "Grounds: quality nonconformity in assay",
-     "Product: Atop Disinfectant Ethanol",
+     "Product: a disinfectant ethanol preparation",
      "Recall order date: 20260902, mandatory: Y"
     ],
     "checks": [
@@ -2474,11 +2474,11 @@
    },
    "en": {
     "title_issue": "Disinfectant ethanol assay nonconformity",
-    "summary": "MFDS ordered a recall and sales suspension of Dana Disinfectant Ethanol from Dana Pharm on grounds of quality nonconformity in assay.",
+    "summary": "A recall and sales suspension was ordered for a disinfectant ethanol product on the ground of quality nonconformity in assay.",
     "implication": "An assay nonconformity in the finished product can only be narrowed down by tracing back to the measured assay of the incoming material and the basis for the batch calculation. Quality assurance functions should confirm that incoming material test results and any assay correction applied in the batch calculation are documented.",
     "key_facts": [
      "Grounds: quality nonconformity in assay",
-     "Product: Dana Disinfectant Ethanol",
+     "Product: a disinfectant ethanol preparation",
      "Recall order date: 20260902, mandatory: Y"
     ],
     "checks": [
@@ -2558,11 +2558,11 @@
    },
    "en": {
     "title_issue": "Hand sanitiser recall across 25 products",
-    "summary": "MFDS ordered a recall and sales suspension of 25 products from Korea Miracle People, including hand sanitiser gels, on grounds of quality nonconformity in assay.",
+    "summary": "A recall and sales suspension was ordered for 25 products, including hand sanitiser gels, on the ground of quality nonconformity in assay.",
     "implication": "An assay nonconformity confirmed in one product was handled as a recall covering 25 products. Quality assurance functions should confirm how a test result for one product feeds into the disposition of the remaining products in a range marketed under multiple names.",
     "key_facts": [
-     "Grounds: quality nonconformity in assay, KMPC Miracle Origin Hand Sanitizer Gel (ethanol (95))",
-     "Scope: 25 products containing ethanol (95), including hand sanitiser gels, recalled together",
+     "Grounds: quality nonconformity in assay, identified in one hand sanitiser gel containing ethanol (95)",
+     "Scope: 25 products containing ethanol (95) recalled together",
      "Recall order date: 20260831, mandatory: Y"
     ],
     "checks": [
@@ -2642,11 +2642,11 @@
    },
    "en": {
     "title_issue": "Hand sanitiser gel assay nonconformity",
-    "summary": "MFDS ordered a recall and sales suspension of KMPC Miracle Origin Hand Sanitizer Gel (ethanol (95)) from Korea Miracle People on grounds of quality nonconformity in assay.",
+    "summary": "A recall and sales suspension was ordered for a hand sanitiser gel containing ethanol (95) on the ground of quality nonconformity in assay.",
     "implication": "For gels with ethanol as the active ingredient, assay results can shift with sampling and storage conditions, so control of test conditions governs the reliability of the disposition. Quality assurance functions should confirm that sampling timing and closure conditions for assay testing of alcohol preparations are fixed by procedure.",
     "key_facts": [
      "Grounds: quality nonconformity in assay",
-     "Product: KMPC Miracle Origin Hand Sanitizer Gel (ethanol (95))",
+     "Product: a hand sanitiser gel containing ethanol (95)",
      "Recall order date: 20260831, mandatory: Y"
     ],
     "checks": [
@@ -2732,11 +2732,11 @@
    },
    "en": {
     "title_issue": "Nitrosamine impurity above limit",
-    "summary": "Dalim BioTech carried out a voluntary recall of distributed stock of Repanum Tab (repaglinide) after the impurity N-nitroso-meglumine was detected above the limit. Three products differing in strength are covered by the same recall.",
+    "summary": "A voluntary recall of distributed stock was carried out for a repaglinide tablet product after the impurity N-nitroso-meglumine was detected above the limit. Three products differing in strength are covered by the same recall.",
     "implication": "Nitrosamine impurities continue to appear as recall grounds in particular combinations of active ingredient and excipient. Quality and regulatory affairs functions should confirm that amine-containing excipient combinations are reflected in the list of products subject to nitrosamine risk assessment.",
     "key_facts": [
      "Grounds: voluntary recall of distributed stock following detection of the impurity N-nitroso-meglumine above the limit",
-     "Scope: three Repanum Tab products recalled together on the same grounds",
+     "Scope: three repaglinide tablet products recalled together on the same grounds",
      "Classification: mandatory N, voluntary recall; recall order date 20260819",
      "Published: 2026-08-19"
     ],

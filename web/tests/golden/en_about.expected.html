@@ -53,7 +53,7 @@
   <div class="wrap page-head about-head">
     <span class="kick reveal" style="animation-delay:.02s">About Global Regulatory Monitor</span>
     <h1 class="reveal" style="animation-delay:.08s">Pharmaceutical GMP and quality regulation in one place.</h1>
-    <div class="about-lead reveal" style="animation-delay:.14s"><p>Global Regulatory Monitor is a free information service covering GMP and quality regulatory developments for medicinal products, in Korea and abroad. Built on documents that regulators publish, it offers a weekly brief, inspection information and search tools, in Korean and English.</p></div><div class="about-cta reveal" style="animation-delay:.2s"><a class="btn" href="../guide/index.html">Guide <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
+    <div class="about-lead reveal" style="animation-delay:.14s"><p>Global Regulatory Monitor is a free information service covering GMP and quality regulatory developments for medicinal products, in Korea and abroad.<br>Built on documents that regulators publish, it offers a weekly brief, inspection information and search tools, in Korean and English.</p></div><div class="about-cta reveal" style="animation-delay:.2s"><a class="btn" href="../guide/index.html">Guide <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
   </div>
   <div class="wrap about-body reveal" style="animation-delay:.26s">
     <section class="about-sec" id="sec-1">
@@ -64,18 +64,18 @@
     <section class="about-sec" id="sec-2">
       <h2>How it is run</h2>
       <div class="about-prose">
-        <p>All content is built from material published by regulators and comparable bodies. Collection, summarising, translation and publishing are automated, and generative AI is used for the summaries and translations.</p>
+        <p>All content is built from material published by regulators and comparable bodies.<br>Collection, summarising, translation and publishing are automated, and generative AI is used for the summaries and translations.</p>
 <p>Every item carries a link to its source document, so the origin and the details can be checked.</p>      </div>
     </section>
     <section class="about-sec" id="sec-3">
       <h2>Editorial principles</h2>
       <div class="about-prose">
-        <ul><li><strong>The source document governs.</strong> A summary is there to convey the main points quickly. For the exact requirement and its scope, the page points to the original.</li><li><strong>Summary and added commentary are separated.</strong> What summarises the source and what AI adds as commentary are marked apart.</li><li><strong>AI use is stated.</strong> Content produced with AI says so. Reported errors and omissions are checked by the operator.</li></ul>      </div>
+        <ul><li><strong>The source document governs.</strong> A summary is there to convey the main points quickly. For the exact requirement and its scope, the page points to the original.</li><li><strong>Summary and added commentary are separated.</strong> What summarises the source and what AI adds as commentary are marked apart.</li><li><strong>AI use is stated.</strong> Content produced with AI says so.</li></ul>      </div>
     </section>
     <section class="about-sec" id="sec-4">
       <h2>Who makes it</h2>
       <div class="about-prose">
-        <p>I work in pharmaceutical quality assurance, and I build the tools and automation my own work needs. Global Regulatory Monitor came out of that, and I design, build and run it so regulatory information is easier to find and use.</p>        <p class="about-more"><a href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener">More on LinkedIn <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>      </div>
+        <p>I work in pharmaceutical quality assurance, and I build the tools and automation my own work needs.<br>Global Regulatory Monitor came out of that, and I design, build and run it so regulatory information is easier to find and use.</p>        <p class="about-more"><a href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener">More on LinkedIn <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>      </div>
     </section>
     <section class="about-sec" id="sec-5">
       <h2>Questions and corrections</h2>
@@ -97,7 +97,7 @@
    서체·크기로 갈린다. 색으로 구분하려고 넣었던 coral 라벨은 그래서 되돌린다.
    §4 한글안전: 자간·대문자 미사용 — 그 속성 이름은 한국어로만 적는다(이 주석은 HTML 로
    나가고 `WebKoreanSafetyTest` 가 문자열로 훑어 자기 설명에 걸린 적이 있다). */
-.about-head h1{max-width:600px;text-wrap:balance;word-break:keep-all}
+.about-head h1{max-width:none;text-wrap:balance;word-break:keep-all}  /* 제목은 넓은 화면에서 한 줄로 간다(사용자 지정) — 폭을 600px 로 묶으면 무조건 두 줄이 된다. 좁아지면 어절에서 접히고, 그때 balance 가 두 줄 길이를 고르게 만든다. */
 .about-head .about-lead p{color:var(--body);margin-top:24px;font-size:17.5px;line-height:1.72;max-width:600px;word-break:keep-all;text-wrap:pretty}
 .about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 .about-cta .btn{font-size:14.5px}
@@ -167,6 +167,22 @@
   .nav nav a:hover{background:var(--soft)}
   .navmore{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line-2)}
   .navmore .navmore-cta{color:var(--coral-2);font-weight:600}
+}
+/* [헤더 CTA 2026-09-07] 901~1000px 구간에서 '이번 주 소식' 버튼이 세로로 눌렸다 —
+   906px 실측 62×87(3줄), 정상은 105×43. 원인은 두 겹이다: 버튼이 flex 기본값 그대로 줄어들
+   수 있고(shrink 1), 한글 라벨이 어절마다 접힌다. 헤더 한 줄이 모자랄 때 **가장 먼저 양보
+   하는 것이 버튼**이 돼 있었다. #935 의 서랍은 ≤900px 만 맡으므로 그 바로 위 구간이 비어
+   있었다.
+   ① 버튼과 언어 링크는 줄지도 접히지도 않게 못 박는다 — 라벨이 접히는 버튼은 어떤 폭에서도
+      옳지 않다. 모자람은 버튼이 아니라 배치가 풀어야 한다.
+   ② 그 구간이 실제로 쓰는 폭을 줄인다: 브랜드 전체 이름을 감추고(171→96px) 탭 좌우 여백을
+      12→9px 로(456→420px). 실측 요구폭 966 → 855px 이 되어, 901px(가용 886px)에서 31px
+      여유가 남는다. 두 조치 모두 ≤900px 에서 이미 쓰던 것을 위 구간으로 넓힌 것뿐이다.
+   §4 한글안전: 자간·대문자 미사용. grm.css 동결이라 스코프 인라인(footer 선례). */
+.nav-in > .btn.coral,.nav-in > .grm-lang{flex:none;white-space:nowrap}
+@media(min-width:901px) and (max-width:1000px){
+  .brand-full{display:none}
+  .nav nav a{padding-left:9px;padding-right:9px}
 }
 </style>
 <footer class="site"><div class="wrap">

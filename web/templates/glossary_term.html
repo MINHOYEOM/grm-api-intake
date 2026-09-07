@@ -25,6 +25,16 @@
   .gt-alias span{font-family:var(--sans);font-size:12.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:2px 11px}
   .gt-body{margin-top:34px;display:flex;flex-direction:column;gap:26px}
   .gt-lede{font-family:var(--serif);font-size:19.5px;line-height:1.62;color:var(--ink);margin:0;word-break:keep-all}
+  .gt-src-line{font-family:var(--sans);font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 0;word-break:keep-all}
+  .gt-src-line a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2);word-break:break-word}
+  .gt-src-line a:hover{color:var(--coral)}
+  /* 행 자체의 골격(테두리·표시 게이트)은 base.html S0 의 .grm-card-actions 를 그대로
+     상속한다. base 의 <style> 은 문서 뒤쪽이라 같은 특이도면 그쪽이 이긴다 — 여기서
+     바꾸는 값만 한 겹 더 좁게 적는다. */
+  .gt-body .gt-actions{margin-top:6px;flex-wrap:wrap}
+  .gt-save .gt-save-on{display:none}
+  .gt-save.is-on .gt-save-off{display:none}
+  .gt-save.is-on .gt-save-on{display:inline}
   .gt-sec{border-top:1px solid var(--line);padding-top:22px}
   .gt-sec-h{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 10px;font-weight:500}
   .gt-detail{font-family:var(--sans);font-size:16px;line-height:1.78;color:var(--body);margin:0;word-break:keep-all}
@@ -62,7 +72,30 @@
   </div>
 
   <div class="wrap gt-body">
-    <p class="gt-lede">{{ term.easy }}</p>
+    {#- 정의·출처·행동을 한 덩어리로 묶는다 — .gt-body 는 자식마다 26px 을 벌리는 flex
+        column 이라, 셋을 형제로 두면 출처 줄과 버튼이 정의에서 떨어져 나간다. -#}
+    <div class="gt-intro">
+      <p class="gt-lede">{{ term.easy }}</p>
+      {#- [출처를 정의 옆에] 정의를 읽은 자리에서 근거가 보여야 한다. 값은 무변형 —
+          definition_source 를 줄여 쓰지 않는다(실제 문서 이름이라 자르면 다른 문서를
+          가리킨다). 하단 출처 섹션은 그대로 둔다. 복사 스크립트가 .gt-src-name 의
+          텍스트를 그대로 읽으므로 라벨과 값은 여기서 갈라 둔다. -#}
+      <p class="gt-src-line">{{ _('출처') }} · {% if term.source_url %}<a class="gt-src-name" href="{{ term.source_url }}" target="_blank" rel="noopener">{{ term.definition_source }}</a>{% else %}<span class="gt-src-name">{{ term.definition_source }}</span>{% endif %}</p>
+      {#- [용어 저장 · 복사] 카드와 같은 골격(.grm-card-actions)이지만 셋이 다르다.
+          · [data-share] 없음 — S0 는 location+'#'+anchor 로 딥링크를 만드는데 여기
+            anchor 는 `glossary:<id>` 라 엉뚱한 URL 이 된다(S0 는 그 버튼이 없으면 건너뛴다).
+          · 하트 없음 — 용어에 인기 집계는 뜻이 없다.
+          · 아이콘만 두지 않고 글자를 붙인다 — 카드 문맥이 없는 면이라 뜻이 안 통한다.
+          card_id 는 `glossary:` + id. 한국어·영문 페이지가 같은 id 라 한 번 저장이면
+          양쪽에서 저장됨으로 보인다(의도) — 저장 계층은 카드 스크랩과 같은 reaction
+          테이블 그대로(새 테이블 0). -#}
+      <div class="grm-card-actions gt-actions" data-anchor="glossary:{{ term.id }}">
+        <button type="button" class="grm-ca" data-copy aria-label="{{ _('용어와 뜻, 출처, 주소를 복사') }}"><i class="ti ti-copy" aria-hidden="true"></i><span class="grm-ca-t">{{ _("복사") }}</span></button>
+        {% if reactions_enabled %}
+        <button type="button" class="grm-ca-react gt-save" data-react="scrap" aria-pressed="false" aria-label="{{ _('이 용어 저장') }}"><i class="ti ti-bookmark" aria-hidden="true"></i><span class="grm-ca-t"><span class="gt-save-off">{{ _("저장") }}</span><span class="gt-save-on">{{ _("저장됨") }}</span></span></button>
+        {% endif %}
+      </div>
+    </div>
 
     {% if term.detail %}
     <section class="gt-sec">
@@ -128,4 +161,44 @@
     </div>
   </div>
 </main>
+{#- [복사] 이 페이지 스코프 — reactions.js·base.html S0 는 손대지 않는다. 값은 템플릿이
+    data-* 로 다시 심지 않고 **화면 요소에서 읽는다**: 두 벌이 되면 화면과 클립보드가
+    갈라질 자리가 생긴다. 모바일 공유 시트는 쓰지 않는다 — 링크 한 줄이 아니라 용어·뜻·
+    출처·주소 네 조각이라 붙여넣을 곳이 필요하다. 결정론·네트워크 0. -#}
+<script>
+(function(){
+  var btn=document.querySelector('.gt-actions [data-copy]'); if(!btn) return;
+  var LABEL_SRC='{{ _("출처") }}', LABEL_DONE='{{ _("복사됨") }}', ASK='{{ _("아래 내용을 복사하세요") }}';
+  // 표제어 = .gt-h1 에서 부제(.gt-en)를 떼어 낸 것 + 괄호로 되붙인 부제(한국어판에만 있다).
+  function headword(){
+    var h1=document.querySelector('.gt-h1'); if(!h1) return document.title;
+    var c=h1.cloneNode(true), s=c.querySelector('.gt-en'), sub=s?s.textContent.trim():'';
+    if(s) s.parentNode.removeChild(s);
+    var head=c.textContent.trim();
+    return sub?(head+'('+sub+')'):head;
+  }
+  function payload(){
+    var lede=document.querySelector('.gt-lede'), src=document.querySelector('.gt-src-name');
+    var lines=[headword()+(lede?(' — '+lede.textContent.trim()):'')];
+    if(src) lines.push(LABEL_SRC+': '+src.textContent.trim());
+    lines.push(location.origin+location.pathname);
+    return lines.join('\n');
+  }
+  function done(){
+    var t=btn.querySelector('.grm-ca-t'); if(!t) return;
+    var o=t.getAttribute('data-o')||t.textContent; t.setAttribute('data-o',o);
+    t.textContent=LABEL_DONE; btn.classList.add('is-done');
+    setTimeout(function(){t.textContent=o;btn.classList.remove('is-done');},1600);
+  }
+  // prompt() 를 아예 지원하지 않는 뷰어(임베디드 브라우저·sandbox)가 있다 — 폴백이
+  // 던지면 catch 안이라 잡아 줄 곳이 없어 콘솔에 미처리 거부가 남는다(실측). 삼킨다.
+  function ask(s){ try { window.prompt(ASK,s); } catch(e) {} }
+  btn.addEventListener('click',function(){
+    var s=payload();
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(s).then(done).catch(function(){ask(s);});
+    } else { ask(s); }
+  });
+})();
+</script>
 {% endblock %}

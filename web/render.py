@@ -1871,6 +1871,21 @@ def build_glossary_view(
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
 
 
+def build_glossary_index(view: dict[str, Any],
+                         lang: str = DEFAULT_LANG) -> dict[str, Any]:
+    """용어 뷰모델 → id→표시 표제어·링크 인덱스(무변형 파생 — 값 재작성 0).
+
+    [용어 저장] /me '저장한 용어' 가 읽는 입력. 저장은 카드 스크랩과 **같은 reaction
+    테이블**에 `glossary:<id>` 로 들어가므로 Supabase 엔 불투명 id 만 있다 — 표제어와
+    링크는 우리 인덱스에서만 온다(search-index.json 과 동일 관례·provenance 보존).
+    순서는 뷰모델 그대로라 결정론이고, 표제어는 **뷰가 언어를 정해 넘긴 값**(`term`)을
+    그대로 쓴다(영어 인덱스에 한국어 표제어가 실리지 않는다)."""
+    root = "/" if lang == DEFAULT_LANG else f"/{lang}/"
+    return {"terms": [{"id": t["id"], "term": t["term"],
+                       "href": f"{root}glossary/{t['id']}/"}
+                      for g in view["groups"] for t in g["terms"]]}
+
+
 # ── [용어사전 낱개] 검색 유입용 per-term 페이지의 SEO 파생(결정론 — 값 무변형 절단·조립) ──
 # 색인 페이지 1건으로는 226 어가 URL 하나에 묶여 "OOS 뜻" 같은 실제 검색어에 걸릴 대상이
 # 없다. 용어당 페이지를 내고 각각에 description·JSON-LD 를 준다. 문구는 **생성하지 않고**
@@ -4858,6 +4873,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.
     # nav_active="glossary"(8차 웨이브 A 2026-07-18 — nav 에 용어사전 전용 탭 신설).
     glossary_term_ids: list[str] = []
+    # [용어 저장] /me 가 읽는 용어 인덱스 — payload 는 뷰가 서는 여기서 만들고, 파일은
+    # 검색 인덱스와 같은 자리에서 쓴다(자산 쓰기 관례를 한 곳에 모은다).
+    glossary_index: "dict[str, Any] | None" = None
+    glossary_index_en: "dict[str, Any] | None" = None
     if glossary_terms:
         # B2: 관련 조항 라벨 → 공식 원문 URL — 자료실 커밋 카탈로그 재사용(신규 수집 0).
         # [C1] 용어→사례 링크: glossary_cases.json(정본, findings_search RPC 실측치).
@@ -4870,6 +4889,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=tr(GLOSSARY_DESCRIPTION),
             glossary=glossary_view,
         )
+        glossary_index = build_glossary_index(glossary_view)
 
         # ── [다국어 2026-09-04] 영어판 용어사전 ──────────────────────────────
         # 표제어(`term_en`)는 데이터에 이미 있었고, 설명 두 필드(`easy_en`·`detail_en`)를
@@ -4889,6 +4909,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=en_tr(GLOSSARY_DESCRIPTION),
                 glossary=glossary_en_view,
             )
+            glossary_index_en = build_glossary_index(glossary_en_view, lang="en")
             # 제외된 용어에는 정본 사례가 없으므로 인용 후보도 만들지 않는다. 이 필터는
             # 결과를 바꾸지 않고, 영문 문장 탐색 범위만 정본 링크 대상에 맞춘다.
             glossary_en_case_terms = [term for term in glossary_terms
@@ -5566,6 +5587,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if search_index_en is not None:
         _write_json(dist_assets / "search-index.en.json", search_index_en)
         written.append("assets/search-index.en.json")
+
+    # [용어 저장] 용어 인덱스 — /me '저장한 용어' 가 id→표제어·링크로 푼다. 검색
+    # 인덱스와 같은 관례로 언어를 **파일 이름**으로 가른다(자산은 언어 트리 밖 공용).
+    # 용어사전 정본이 없으면 파일도 만들지 않는다 — 빈 인덱스로 폴백하지 않는다.
+    if glossary_index is not None:
+        _write_json(dist_assets / "glossary-index.json", glossary_index)
+        written.append("assets/glossary-index.json")
+    if glossary_index_en is not None:
+        _write_json(dist_assets / "glossary-index.en.json", glossary_index_en)
+        written.append("assets/glossary-index.en.json")
 
     # 마이페이지(/me) — 반응 계층 활성 시에만 생성(env-off=페이지 부재→골든 byte-diff 0).
     # 개인화 페이지라 sitemap/canonical 제외(비색인). 스크랩·관심 업체는 reactions.js 가,

@@ -808,7 +808,8 @@ LIBRARY_REGISTRY: list[dict[str, Any]] = [
 ]
 
 
-def _library_item_view(it: dict[str, Any], lang: str = DEFAULT_LANG) -> dict[str, Any]:
+def _library_item_view(it: dict[str, Any], lang: str = DEFAULT_LANG,
+                       as_of: str = "") -> dict[str, Any]:
     """카탈로그 항목 → 공통 항목 뷰 — 스키마 v2(값 무변형 통과).
 
     표시 제목은 한국어 우선: title_ko 가 있으면 주 제목, title_en 은 병기 줄(sub)로
@@ -839,6 +840,8 @@ def _library_item_view(it: dict[str, Any], lang: str = DEFAULT_LANG) -> dict[str
         "code": it.get("code") or "",
         "doc_type": it.get("doc_type") or "",
         "published_date": it.get("published_date") or "",
+        # 기준일보다 뒤면 그건 발행일이 아니라 **시행 예정일**이다(위 library_as_of 참조).
+        "published_is_future": _is_future_date(it.get("published_date") or "", as_of),
         "official_url": _safe_url(it.get("official_url") or ""),
         "ko_url": _safe_url(it.get("ko_url") or ""),
         "pdf_url": _safe_url(it.get("pdf_url") or ""),
@@ -846,7 +849,7 @@ def _library_item_view(it: dict[str, Any], lang: str = DEFAULT_LANG) -> dict[str
 
 
 def _catalog_view(entry: dict[str, Any], raw: dict[str, Any],
-                  tr: Translator = _KO) -> dict[str, Any]:
+                  tr: Translator = _KO, as_of: str = "") -> dict[str, Any]:
     """카탈로그 raw(v2 평면 items[]) → 공통 템플릿 뷰모델(결정론 — 데이터 파생, 창작 0).
 
     [다국어 2단계] registry 의 화면 카피(title·blurb·intro·desc·unit·short·link_label·
@@ -858,7 +861,7 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any],
     - groups_by_url: official_url 부분일치로 계열 그룹핑(ICH Q/M — 결정론 파생). 그룹
       공식 링크 = 그룹 내 공유 URL. 매칭 실패 항목은 무라벨 그룹으로 뒤에 둔다.
     - Tier/QA·수집일 등 내부 운영 필드는 뷰에 올리지 않는다(사용자 노출 금지)."""
-    items = [_library_item_view(it, tr.lang) for it in raw.get("items", [])]
+    items = [_library_item_view(it, tr.lang, as_of) for it in raw.get("items", [])]
     labels = entry.get("doc_type_labels") or {}
     if entry.get("sort") == "published_desc":
         items = sorted(items, key=lambda it: it["published_date"], reverse=True)
@@ -922,20 +925,55 @@ def _catalog_view(entry: dict[str, Any], raw: dict[str, Any],
         "ko_only_titles": sum(1 for it in raw.get("items", [])
                               if not (it.get("title_en") or it.get("title") or "").strip()),
         "latest_published": max(dates) if dates else "",
+        # 최신 날짜가 기준일보다 뒤면 그 카탈로그의 최신본은 **아직 시행 전**이다.
+        "latest_is_future": _is_future_date(max(dates) if dates else "", as_of),
         "grouped": bool(entry.get("groups_by_url") or entry.get("groups_by_doc_type")),
         "groups": groups,
     }
 
 
+# ── [시행 예정 2026-09-06] 미래 날짜를 "발행"이라 부르지 않는다 ────────────────
+# 원천이 **시행 예정일**을 발행일 자리에 싣는 경우가 있다(실측: picscheme.org 발간물 표의
+# `PI 006-4`(docview/11277) 날짜 속성 = 2026-10-01, 오늘 이후). 값은 원천 그대로가 맞고
+# 고칠 것이 아니다 — 틀린 것은 **라벨**이다. 아직 오지 않은 날짜에 "발행"이라고 적으면
+# 이미 나온 문서로 읽힌다.
+#
+# ★기준일은 `date.today()` 가 **아니라** 커밋 데이터에서 온다. 이 렌더러의 2번 불변식이
+#   결정론(같은 입력 JSON → 바이트 동일 HTML)이라 오늘 날짜를 끌어오면 매일 산출이
+#   흔들리고 골든 대조가 무의미해진다. 그래서 "자료실이 원천을 마지막으로 확인한 날"
+#   (`library_updates.json` 최신 이력)을 기준으로 삼는다 — 의미도 이쪽이 맞다:
+#   우리가 아는 한 아직 시행되지 않았다는 뜻이지, 지금 이 순간의 시각이 아니다.
+# ★기준일을 못 구하면 **아무것도 표시하지 않는다**(빈 문자열). 기준 없이 "미래"를 말할
+#   수 없기 때문이다. 그 상태를 침묵으로 두지 않도록 테스트가 기준일 해석을 따로 본다.
+def library_as_of(updates_file: Path | None = None) -> str:
+    """자료실 데이터의 기준일(YYYY-MM-DD) — 최근 변경 이력의 날짜. 없으면 빈 문자열."""
+    entries = load_library_update_entries(updates_file)
+    for e in entries:
+        d = str(e.get("date") or "").strip()
+        if len(d) == 10 and d[4] == "-" and d[7] == "-":
+            return d
+    return ""
+
+
+def _is_future_date(value: str, as_of: str) -> bool:
+    """`value` 가 기준일보다 뒤인가. 둘 다 `YYYY-MM-DD` 라 문자열 비교로 충분하다."""
+    return bool(as_of) and len(value) == 10 and value > as_of
+
+
 def load_library(library_dir: Path = LIBRARY_DIR,
-                 tr: Translator = _KO) -> list[dict[str, Any]]:
+                 tr: Translator = _KO, as_of: str | None = None) -> list[dict[str, Any]]:
     """[자료실] registry 순서대로 커밋 데이터를 로드해 공통 뷰 리스트로 반환 — 결정론
-    (파일 byte 파생, 네트워크 0). 파일 부재 카탈로그는 조용히 건너뛴다(허브는 존재분만)."""
+    (파일 byte 파생, 네트워크 0). 파일 부재 카탈로그는 조용히 건너뛴다(허브는 존재분만).
+
+    `as_of` 는 "시행 예정" 판정 기준일이다. None 이면 커밋 데이터에서 스스로 구한다
+    (`library_as_of`) — 호출부마다 다른 기준을 쓰면 같은 문서가 화면마다 달라진다."""
+    resolved = library_as_of() if as_of is None else as_of
     views = []
     for entry in LIBRARY_REGISTRY:
         p = library_dir / entry["file"]
         if p.is_file():
-            views.append(_catalog_view(entry, json.loads(p.read_text(encoding="utf-8")), tr))
+            views.append(_catalog_view(entry, json.loads(p.read_text(encoding="utf-8")),
+                                       tr, resolved))
     return views
 
 
@@ -4764,6 +4802,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             "unit": v["unit"],
             "blurb": v["blurb"],
             "latest_published": v["latest_published"],
+            # ★날짜와 그 날짜의 **성격**은 함께 다녀야 한다. 여기서 날짜만 옮기면 허브는
+            #   시행 예정일을 "최근 개정"이라 적고 카탈로그 페이지는 "시행 예정"이라 적어,
+            #   같은 문서가 화면마다 달라진다(실측으로 한 번 그렇게 났다).
+            "latest_is_future": v["latest_is_future"],
         } for v in catalogs]
         emit("library.html", page("library/"),
             page_title=tr("자료실 · GRM"),
@@ -5715,7 +5757,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=en_tr(LIBRARY_DESCRIPTION),
             catalogs=[{"href": f"{v['slug']}/index.html", "title": v["title"],
                        "count": v["count"], "unit": v["unit"], "blurb": v["blurb"],
-                       "latest_published": v["latest_published"]} for v in en_catalogs],
+                       "latest_published": v["latest_published"],
+                       "latest_is_future": v["latest_is_future"]} for v in en_catalogs],
             lib_update=en_library_updates["latest"],
         )
     for v in en_catalogs:

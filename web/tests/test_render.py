@@ -8393,15 +8393,82 @@ class WebLibraryRenderTest(unittest.TestCase):
 
     def test_published_desc_sort_applied(self):
         # sort="published_desc" 카탈로그는 화면 순서가 발행일 내림차순(뷰 정렬 — 값 무수정).
+        # ★[2026-09-06] 라벨이 둘로 갈렸다 — 아직 오지 않은 날짜는 "발행"이 아니라
+        #   "시행 예정"으로 찍힌다(원천이 시행 예정일을 발행일 자리에 싣는 경우가 있다).
+        #   이 검사가 보는 것은 **항목 행의 날짜가 빠짐없이·순서대로 찍히는가**이므로 두
+        #   라벨을 모두 세되, **항목 행(lib-date)으로 범위를 묶는다** — 라벨만 넓히면
+        #   카탈로그 머리의 "시행 예정"까지 세어 한 건 더 나온다(실측).
         import re as _re
         for e in render.LIBRARY_REGISTRY:
             html = self.pages[e["slug"]]
-            shown = _re.findall(r">발행 (\d{4}-\d{2}-\d{2})<", html)
+            shown = _re.findall(
+                r'<span class="lib-date">.*?</i>(?:발행|시행 예정) (\d{4}-\d{2}-\d{2})</span>',
+                html)
             n_pub = sum(1 for it in self.data[e["slug"]]["items"] if it.get("published_date"))
             self.assertEqual(len(shown), n_pub, f"{e['slug']} 발행일 표기 수 불일치")
             if e.get("sort") == "published_desc":
                 self.assertEqual(shown, sorted(shown, reverse=True),
                                  f"{e['slug']} 발행일 내림차순 위반")
+
+    # ── 날짜 라벨: 아직 오지 않은 날짜를 "발행"이라 부르지 않는다 ────────────
+    def test_as_of_reference_resolves_from_committed_data(self):
+        """기준일은 `date.today()` 가 아니라 커밋 데이터에서 온다(결정론 불변식 2).
+
+        ★기준일이 빈 문자열이면 "미래" 판정이 통째로 꺼지는데, 그건 화면상 아무 차이가
+          없어 **조용히** 지나간다. 그래서 해석 자체를 따로 못 박는다."""
+        as_of = render.library_as_of()
+        self.assertRegex(as_of, r"^\d{4}-\d{2}-\d{2}$",
+                         "자료실 기준일을 커밋 데이터에서 구하지 못했다(시행 예정 판정이 꺼진다)")
+
+    def test_future_date_predicate_boundaries(self):
+        """같은 날은 미래가 아니다. 기준일이 없으면 아무것도 미래가 아니다."""
+        self.assertTrue(render._is_future_date("2026-10-01", "2026-08-31"))
+        self.assertFalse(render._is_future_date("2026-08-31", "2026-08-31"))   # 당일
+        self.assertFalse(render._is_future_date("2026-01-01", "2026-08-31"))
+        self.assertFalse(render._is_future_date("2026-10-01", ""))             # 기준 없음
+        self.assertFalse(render._is_future_date("", "2026-08-31"))
+        self.assertFalse(render._is_future_date("2026-10", "2026-08-31"))      # 형식 미달
+
+    def test_old_publication_label_is_gone_everywhere(self):
+        """"최근 발행"은 개정판에도 붙던 이름이고, 미래 날짜에는 거짓이었다."""
+        for name, html in [("hub", self.hub)] + sorted(self.pages.items()):
+            self.assertNotIn("최근 발행", html, f"{name}: 옛 라벨이 남아 있다")
+
+    def test_future_dates_are_labelled_in_force_from(self):
+        """원천이 **시행 예정일**을 발행일 자리에 싣는 경우가 있다(실측: PIC/S PI 006-4).
+        그 날짜에 "발행"이라고 적으면 이미 나온 문서로 읽힌다.
+
+        ★기대값을 손으로 적지 않는다 — 로드된 뷰에서 미래 항목을 **파생**해 대조한다.
+          날짜가 지나 미래 항목이 0이 되면 그건 결함이 아니라 사실이므로, 그때는 라벨
+          규율(위 테스트)만 남고 이 검사는 스스로 비켜난다."""
+        cats = {c["slug"]: c for c in render.load_library()}
+        future = [(slug, it) for slug, c in cats.items()
+                  for g in c["groups"] for it in g["items"] if it["published_is_future"]]
+        if not future:
+            self.skipTest("미래 날짜 항목이 현재 데이터에 없다(사실 — 라벨 규율은 위에서 본다)")
+        for slug, it in future:
+            html = self.pages[slug]
+            self.assertIn(f"시행 예정 {it['published_date']}", html,
+                          f"{slug}/{it['code']}: 미래 날짜인데 시행 예정 표기가 없다")
+            self.assertNotIn(f">발행 {it['published_date']}<", html,
+                             f"{slug}/{it['code']}: 미래 날짜를 발행일로 적고 있다")
+        for slug, c in cats.items():
+            if c["latest_is_future"]:
+                self.assertIn(f"시행 예정 {c['latest_published']}", self.pages[slug])
+                self.assertIn(f"시행 예정 {c['latest_published']}", self.hub)
+            elif c["latest_published"]:
+                self.assertIn(f"최근 개정 {c['latest_published']}", self.pages[slug])
+
+    def test_past_dates_keep_the_publication_label(self):
+        """과잉 표기 금지 — 지난 날짜까지 "시행 예정"이 되면 그것도 거짓이다."""
+        cats = {c["slug"]: c for c in render.load_library()}
+        past = [(slug, it) for slug, c in cats.items()
+                for g in c["groups"] for it in g["items"]
+                if it["published_date"] and not it["published_is_future"]]
+        self.assertGreater(len(past), 50, "지난 날짜 항목 표본이 비정상적으로 적다")
+        for slug, it in past[:40]:
+            self.assertNotIn(f"시행 예정 {it['published_date']}", self.pages[slug],
+                             f"{slug}/{it['code']}: 지난 날짜에 시행 예정이 붙었다")
 
     def test_no_internal_ops_concepts_exposed(self):
         # [품질 기준 2026-07-18] Tier/QA·수집일 등 내부 개념 텍스트 노출 금지. doc_type

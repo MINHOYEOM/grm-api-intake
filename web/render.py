@@ -239,18 +239,36 @@ def detail_is_korean(detail: "dict[str, Any] | None") -> bool:
     return bool(_HANGUL_RE.search(json.dumps(detail, ensure_ascii=False)))
 
 
-def _detail_for_lang(detail: "dict[str, Any] | None",
-                     lang: str) -> "dict[str, Any] | None":
+def _detail_without_ko_slots(node: Any, tr: Translator) -> Any:
+    """상세에서 **국문 슬롯을 걷어내고 표시 라벨을 읽는 언어로** 옮긴 사본.
+
+    ★[2026-09-07] 종전에는 `("statement_ko","deficiency_ko","detail_ko")` × `("violations",
+      "observations","rows")` 라는 **손목록**이었다. 실제 성질은 "`_ko` 는 옆 칸(`X`)의 국문
+      렌더"이고, 그 성질을 가진 슬롯이 손목록 밖에 더 있었다 — 전 호 실측:
+      `whopir_report.outcome_ko`·`sections[].title_ko`·`text_ko`(467) ·
+      `openfda_recall_detail.status_ko`·`initiation_ko`·`notification_ko`(176) ·
+      EU/MHRA NCR 의 `nature_ko`·`action_ko`·`operations_ko`·`additional_ko`(56).
+      그래서 영어 원문이 멀쩡히 있는데도 상세가 통째로 빠지고 있었다(09-07호 영문에서
+      FDA 회수 9장·WHO 실사보고서 1장). 접미 하나로 판정한다 — 목록은 낡고 성질은 안 낡는다.
+    ★`label` 은 우리가 만든 **표시 어휘**라 카탈로그를 탄다(`facts[].label` 과 같은 규율).
+      값은 옆 칸(`value`)에 있고 이 칸은 이름이다. tr 에 항등 폴백이 없으므로 새 라벨이
+      들어오면 영어 빌드가 그 자리에서 멈춘다 — 조용히 한국어로 나가는 것보다 낫다.
+    """
+    if isinstance(node, dict):
+        return {k: (tr(v) if k == "label" and isinstance(v, str) and v.strip()
+                    else _detail_without_ko_slots(v, tr))
+                for k, v in node.items() if not k.endswith("_ko")}
+    if isinstance(node, list):
+        return [_detail_without_ko_slots(v, tr) for v in node]
+    return node
+
+
+def _detail_for_lang(detail: "dict[str, Any] | None", lang: str,
+                     tr: Translator = _KO) -> "dict[str, Any] | None":
     """읽는 언어의 결정론 상세 — 한국어 기록은 통째로 빼고, 영어 기록의 국문 패널만 뗀다."""
     if lang == DEFAULT_LANG or not detail:
         return detail
-    #: 원문(영어) 옆에 붙는 국문 번역 슬롯. 영어 화면에서는 같은 내용의 반복이다.
-    ko_slots = ("statement_ko", "deficiency_ko", "detail_ko")
-    out = dict(detail)
-    for key in ("violations", "observations", "rows"):
-        if isinstance(out.get(key), list):
-            out[key] = [{k: v for k, v in r.items() if k not in ko_slots}
-                        if isinstance(r, dict) else r for r in out[key]]
+    out = _detail_without_ko_slots(detail, tr)
     # ★국문 슬롯을 **뗀 뒤에** 판정한다. 먼저 판정하면 원문이 영어인 상세도 딸린 번역
     #   때문에 "한국어 기록"으로 잘못 걸려 통째로 사라진다(합성 입력으로 확인한 결함).
     return None if detail_is_korean(out) else out
@@ -531,12 +549,19 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         # 걷어낸다(원문이 바로 옆에 있어 중복이다). 후자는 `*_ko` 슬롯을 뷰에서 지워
         # 템플릿의 기존 분기가 저절로 원문 쪽을 타게 한다 — 템플릿 조건을 건드리면
         # 한국어 분기까지 흔들린다(실제로 그렇게 해서 한국어 9장이 바뀌었다).
-        "deterministic_detail": _detail_for_lang(detail, lang),
+        "deterministic_detail": _detail_for_lang(detail, lang, tr),
         # 고지는 **실제로 뺐을 때만** 뜬다 — 뺀 것이 없는데 "싣지 않습니다"라고 하면
-        # 거짓이다. 상세 쪽 판정은 `_detail_for_lang` 과 같은 함수를 통해 일치시킨다.
-        "deep_omitted_ko": lang != DEFAULT_LANG and (
-            (detail is not None and _detail_for_lang(detail, lang) is None)
-            or detail_is_korean(card.get("deep_analysis"))),
+        # 거짓이다. 판정은 `_detail_for_lang` 과 같은 함수를 통해 일치시킨다.
+        # ★[2026-09-07] 조건을 **규제기관 기록으로 좁혔다.** 종전에는 우리가 쓴 해설
+        #   (`deep_analysis`)이 한국어라 빠질 때도 같은 고지가 떴는데, 그 문장은 "한국
+        #   규제기관이 한국어로 공개한 기록"이라고 말한다 — FDA·WHO 카드에서 거짓이다.
+        #   실측(09-07호): 33장 중 31장에 떴고 그중 16장이 FDA 15·WHO 1 이었다.
+        # ★해설이 빠지는 쪽은 아예 말하지 않는다. 그 층은 우리가 붙인 것이라 독자가
+        #   잃는 원자료가 아니고(영어 카드엔 해설 블록이 없을 뿐이다), 고지하면 독자에게
+        #   쓸모 있는 사실이 아니라 **제작 사정**을 알리는 문장이 된다. 원자료를 뺄 때만
+        #   말한다는 규율은 그대로다(자료실 "and N more" 와 같은 결).
+        "detail_omitted_ko": (lang != DEFAULT_LANG and detail is not None
+                              and _detail_for_lang(detail, lang, tr) is None),
         # [소스확장 2026-07-02 · UI 보강] 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0).
         "deep_preview": _deep_preview(card.get("deep_analysis"), tr),
         "detail_preview": _detail_preview(card.get("deterministic_detail"), tr),
@@ -2713,6 +2738,12 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     #   검사(한글만 훑는 판)로는 안 잡혀서, 라벨 어휘는 언어와 무관하게 등록한다.
     N_("483"), N_("CGMP"), N_("GMP News"), N_("Guidance"),
     N_("Recall"), N_("Recall(HC)"), N_("Recall(UK)"), N_("Warning Letter"), N_("WHO"),
+    # [2026-09-07] 결정론 상세 안의 `label` — 값은 옆 칸(`value`·`date`)에 있고 이 칸은
+    # 우리가 붙인 **이름**이다(`openfda_recall_detail` 의 처리 경과·제품 식별 두 표).
+    # 전 호 실측 어휘 8개로 닫혀 있다. 새 라벨이 들어오면 영어 빌드가 그 자리에서
+    # 멈춘다 — 영어 표에 한국어 칸 이름이 조용히 실리는 것보다 낫다.
+    N_("회수 착수"), N_("FDA 등급 확정"), N_("FDA 공표"),
+    N_("브랜드명"), N_("성분명"), N_("주성분"), N_("투여경로"), N_("허가번호"),
 )
 
 # 카드에서 **언어에 따라 갈리는 서사 필드** — Routine 이 원문을 요약해 만든 산문이라

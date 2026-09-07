@@ -449,6 +449,10 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
 
         ★판정은 타입이 아니라 값으로 한다. 영어로 쓰인 상세(FDA 483·WL)는 남아야 한다 —
           그것까지 지우면 영어 독자가 볼 수 있는 것을 이유 없이 뺏는 것이다.
+        ★[2026-09-07] 고지는 **규제기관 기록을 뺀 카드에만** 붙는다(조건 분리는
+          `test_omission_notice_speaks_only_for_the_regulators_own_record`). 여기서는
+          라이브 산출물로 구조를 묻는다 — 상세를 그대로 실은 카드에는 붙지 않는가,
+          그리고 붙은 줄이 **같은 카드의 한국어판**을 실제로 가리키는가.
         """
         omitted = kept = 0
         for d in sorted((self.out / "en" / "briefs").iterdir()):
@@ -468,7 +472,20 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
                             if w != "한국어"]
                     self.assertEqual(left, [], f"{d.name}: 영어 상세에 한국어 산문 {left[:3]}")
                     kept += 1
-                omitted += len(re.findall(r'class="dt-omit"', body))
+                # ③ 상호참조 줄은 상세를 **실제로 뺀** 카드에만, 그리고 같은 카드의
+                #    한국어판을 가리킨다. 카드 단위로 봐야 "한 페이지에 둘 다 있다"가
+                #    아니라 "한 카드에 둘 다 있다"를 묻게 된다.
+                for art in re.split(r'(?=<article class="card)', body)[1:]:
+                    cid = re.match(r'<article class="card[^"]*" id="([^"]+)"', art)
+                    if 'class="block dt-xref"' not in art:
+                        continue
+                    omitted += 1
+                    self.assertNotIn('<details class="block detail"', art,
+                                     f"{d.name}: 상세를 실어 놓고 '한국어판에서 보기'도 붙였다")
+                    self.assertIsNotNone(cid, f"{d.name}: 카드 id 를 못 읽었다")
+                    self.assertRegex(
+                        art, r'class="dt-xref-go" href="[^"]*briefs/[^"]*#' + re.escape(cid.group(1)),
+                        f"{d.name}: 상호참조가 같은 카드의 한국어판을 가리키지 않는다")
         self.assertGreater(omitted, 5, "생략 고지가 거의 없다 — 게이트가 꺼졌나?")
         self.assertGreater(kept, 5, "영어 상세가 전부 사라졌다 — 값이 아니라 타입으로 걸렀나?")
 
@@ -495,6 +512,80 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
         # 한국어 트리는 손대지 않는다 — 같은 객체가 그대로 나간다.
         self.assertIs(render._detail_for_lang(en_detail, "ko"), en_detail)
         self.assertIs(render._detail_for_lang(ko_detail, "ko"), ko_detail)
+
+    def test_ko_slot_rule_is_the_suffix_not_a_hand_list(self):
+        """★[2026-09-07] `_ko` 는 **옆 칸의 국문 렌더**라는 성질이다 — 손목록이 아니다.
+
+        종전 규칙은 `(statement_ko·deficiency_ko·detail_ko) × (violations·observations·rows)`
+        였는데, 같은 성질의 슬롯이 목록 밖에 더 있었다. 그래서 영어 원문이 멀쩡히 있는데도
+        상세가 통째로 빠졌다 — 전 호 실측 **97블록**(FDA 회수 60 · WHO 실사보고서 21 ·
+        EU NCR 13 · MHRA NCR 3). 접미로 판정하면 그 셋이 저절로 살아난다.
+
+        같은 사본에서 `label` 은 우리가 붙인 **표시 어휘**라 읽는 언어로 옮긴다
+        (`facts[].label` 과 같은 규율 — 값은 옆 칸에 있고 이 칸은 이름이다).
+        """
+        en = grm_i18n.Translator("en")
+        # ① 목록 밖에 있던 모양 — 최상위 twin 슬롯(회수 상세)과 중첩 twin(WHOPIR).
+        recall = {"type": "openfda_recall_detail",
+                  "status": "Ongoing", "status_ko": "진행 중",
+                  "timeline": [{"label": "회수 착수", "date": "2026-03-21"}]}
+        kept = render._detail_for_lang(recall, "en", en)
+        self.assertIsNotNone(kept, "영어 원문이 있는 회수 상세가 통째로 빠졌다")
+        self.assertNotIn("status_ko", kept)
+        self.assertEqual(kept["status"], "Ongoing", "원문까지 지웠다")
+        self.assertEqual(kept["timeline"][0]["label"], "Recall initiated",
+                         "표시 라벨이 한국어로 남았다")
+        self.assertEqual(kept["timeline"][0]["date"], "2026-03-21", "값을 건드렸다")
+
+        whopir = {"type": "whopir_report", "outcome": "Acceptable.", "outcome_ko": "적합.",
+                  "sections": [{"no": 1, "title": "Quality management",
+                                "title_ko": "품질경영", "text": "QMS in place.",
+                                "text_ko": "QMS 를 수립하였다."}]}
+        kept = render._detail_for_lang(whopir, "en", en)
+        self.assertIsNotNone(kept, "영어 실사보고서가 통째로 빠졌다")
+        self.assertNotIn("title_ko", kept["sections"][0])
+        self.assertEqual(kept["sections"][0]["title"], "Quality management")
+
+        # ② 성질이 없는 것은 그대로 빠진다 — 영어 원문이 없는 한국어 기록.
+        self.assertIsNone(render._detail_for_lang(
+            {"type": "mfds_recall_detail", "enforcement": "자진회수"}, "en", en))
+
+        # ③ 한국어 트리는 사본조차 만들지 않는다(바이트 불변).
+        self.assertIs(render._detail_for_lang(recall, "ko"), recall)
+
+    def test_omission_notice_speaks_only_for_the_regulators_own_record(self):
+        """★[2026-09-07] 고지는 **규제기관이 한국어로 낸 기록**을 뺐을 때만 뜬다.
+
+        종전 조건은 우리가 쓴 해설(`deep_analysis`)이 한국어이기만 해도 참이었는데, 화면
+        문장은 "발행기관이 한국어로 낸 기록"이라고 말한다 — FDA·WHO 카드에서 거짓이다.
+        실측(09-07호 영문): 33장 중 **31장**에 떴고 그중 **16장**이 FDA 15 · WHO 1 이었다.
+        해설이 빠지는 쪽은 아무 말도 하지 않는다 — 그건 우리가 붙인 층이라 독자가 잃는
+        원자료가 아니고, 고지하면 독자에게 쓸모 있는 사실이 아니라 제작 사정을 알린다.
+        """
+        en = grm_i18n.Translator("en")
+        ko_analysis = {"key_violations": [{"description": "무균공정 관리가 미흡하다"}]}
+        ko_detail = {"type": "gmp_deficiencies",
+                     "rows": [{"area": "품질경영", "summary": "지적 요약"}]}
+        en_detail = {"type": "wl_violations",
+                     "violations": [{"number": 1, "statement": "Your firm failed to…"}]}
+
+        def says(**card):
+            base = {"id": "c1", "render_order": 1}
+            return render._card_view({**base, **card}, en, "en")["detail_omitted_ko"]
+
+        # ① 규제기관의 한국어 기록을 뺐다 → 말한다.
+        self.assertTrue(says(deterministic_detail=ko_detail))
+        self.assertTrue(says(deterministic_detail=ko_detail, deep_analysis=ko_analysis))
+        # ② 우리 해설만 한국어다(FDA 카드 16장의 실제 모양) → 말하지 않는다.
+        self.assertFalse(says(deep_analysis=ko_analysis))
+        self.assertFalse(says(deep_analysis=ko_analysis, deterministic_detail=en_detail))
+        # ③ 뺀 것이 없다 → 말하지 않는다(고지는 실제로 뺐을 때만).
+        self.assertFalse(says(deterministic_detail=en_detail))
+        self.assertFalse(says())
+        # ④ 한국어 트리는 판정 자체가 없다 — 상세가 그대로 실린다.
+        self.assertFalse(render._card_view(
+            {"id": "c1", "render_order": 1, "deterministic_detail": ko_detail},
+        )["detail_omitted_ko"])
 
     def test_english_briefs_disclose_why_korean_names_remain(self):
         """★영문 브리프에 남는 한글은 **한국 규제기관 문서의 업체·기관 실명**뿐이다
@@ -17459,7 +17550,7 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "res-orig": "영문 원제가 영어판에서는 제목 그 자체다 — 병기할 것이 없다",
         "res-sum": "한국어 요약은 영어 독자에게 읽을 수 없는 줄이라 싣지 않는다",
         "cov-note": "영어 전용 고지 — 업체·기관 실명이 한국어로 남는 이유",
-        "dt-omit": "영어 전용 고지 — 한국어로 쓰인 상세를 싣지 않는 이유",
+        "dt-xref*": "영어 전용 상호참조 — 규제기관이 한국어로 낸 상세가 어디 있는지",
         # ★[2026-09-05 결정 ①] 한국어로 쓰인 상세는 영어판에 싣지 않는다. 그 하나의 판단이
         #   블록 하위 클래스 수십 개로 드러나므로 접두로 묶어 **이유를 한 번만** 적는다.
         #   영어로 쓰인 상세(FDA 483·WL 위반항목)는 남는다 — `obs-num`·`obs-orig`·`obs-en`
@@ -17487,8 +17578,8 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         # 심층분석이 없으면 카드가 2×2 facts 그리드 대신 기존 세로 표를 쓴다(설계 그대로).
         "facts-grid": "심층 카드 전용 facts 레이아웃 — 심층분석이 없으면 세로 표로 돌아간다",
         "fcell": "위와 같음", "fk": "위와 같음", "fv": "위와 같음",
-        "ti-file-search": "생략된 블록의 아이콘", "ti-table": "위와 같음",
-        "ti-file-description": "위와 같음", "ti-arrow-narrow-right": "위와 같음",
+        "ti-file-search": "생략된 블록의 아이콘",
+        "ti-file-description": "위와 같음",
     },
     "findings/doc": {
         # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은
@@ -18447,6 +18538,73 @@ class WebGlossarySaveTest(unittest.TestCase):
                        "location.origin+location.pathname"):
             self.assertIn(needle, tmpl, f"복사 스크립트 배선 누락: {needle}")
         self.assertNotIn("data-copy-text", tmpl, "값을 data-* 로 두 번 심었다")
+class SubscribePeekLinkTest(unittest.TestCase):
+    """[구독 밴드 실물 링크 2026-09-07] 밴드 설명문 아래 '이번 주 소식 먼저 보기'.
+
+    밴드는 env-param 게이트(`GRM_NEWSLETTER_FORM_ACTION`) 뒤에 있어 **로컬·CI 빌드에서는
+    아예 렌더되지 않는다** — 구조 파리티 가드가 원리적으로 못 보는 자리다. 그래서 기존
+    `test_newsletter_form_conditional` 과 같은 방식(모듈 전역 monkeypatch → 켜진 빌드)으로
+    켜 놓고 실제 HTML 을 읽는다. 검사 대상은 **화면에 나가는 문자열**(href 전체)이지
+    템플릿 소스가 아니다.
+    """
+
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_peek_"))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _render(self, briefs: list[dict]) -> pathlib.Path:
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        for br in briefs:
+            pub = br["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        return out
+
+    def test_peek_link_points_at_latest_brief_when_band_is_on(self):
+        older, latest = "2026-06-22", "2026-06-29"      # latest_slug = max(publish_date)
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render([_minimal_brief(older), _minimal_brief(latest)])
+            landing = (out / "index.html").read_text(encoding="utf-8")
+            detail = (out / "briefs" / older / "index.html").read_text(encoding="utf-8")
+            en_landing = (out / "en" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        for name, html, root in (("랜딩", landing, ""), ("브리프 상세", detail, "../../")):
+            band = html[html.index('class="subscribe"'):html.index("<footer")]
+            self.assertIn('class="sub-peek"', band, f"{name}: 링크 줄 없음")
+            self.assertIn("이번 주 소식 먼저 보기", band, f"{name}: 문구 없음")
+            # 목적지는 **최신호**다(자기 페이지가 아니라). rel_root 를 포함한 실제 href 로 잰다.
+            self.assertIn(f'<a href="{root}briefs/{latest}/index.html">', band,
+                          f"{name}: 최신호 href 아님")
+            self.assertNotIn(f'<a href="{root}briefs/{older}/index.html">', band)
+            # 폼 **위**에 온다 — 설명문 다음, 입력 앞.
+            self.assertLess(band.index('class="sub-peek"'), band.index('class="sub-form"'),
+                            f"{name}: 링크가 폼 아래에 있다")
+            # 스타일 규칙은 밴드 **안**에 있어야 기존 한글안전 가드(같은 slice)가 재 준다.
+            self.assertIn(".subscribe .sub-peek{", band,
+                          f"{name}: 규칙이 밴드 밖 — 한글안전 가드가 못 본다")
+        # 밴드 자체가 한국어 전용이라 영어판에는 링크도 없다(게이트 재확인).
+        self.assertNotIn("sub-peek", en_landing)
+
+    def test_peek_link_absent_when_band_is_off(self):
+        # 게이트 off(기본·골든 빌드) — 링크도 <style> 도 나오지 않아야 골든 byte-diff 가 0 이다.
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = ""
+            out = self._render([_minimal_brief("2026-06-29")])
+            landing = (out / "index.html").read_text(encoding="utf-8")
+            detail = (out / "briefs" / "2026-06-29" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        for html in (landing, detail):
+            self.assertNotIn("sub-peek", html)
+            self.assertNotIn("이번 주 소식 먼저 보기", html)
 
 
 if __name__ == "__main__":

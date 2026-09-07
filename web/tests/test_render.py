@@ -19144,6 +19144,86 @@ class BriefTermLinks(unittest.TestCase):
         self.assertGreaterEqual(render._doc_term_find("RAPID test and API lot", "API"), 0)
 
 
+# ── [용어 그림 2026-09-08] 낱개 페이지(/glossary/<id>/)에 정의를 묘사만 하는 미니 SVG.
+# 링크드인 카드뉴스 "이번 주 용어" 장에서 쓴 그림을 그대로 재사용한다(partial 은
+# 컨트롤타워가 그렸다 — 이 스위트는 배선·안전·언어 파리티만 본다). 대상 용어는 손목록이
+# 아니라 web/partials/glossary_fig/*.html 의 실제 파일에서 파생한다 — 5장이 늘거나
+# 줄어도 이 스위트는 낡지 않는다.
+class GlossaryFigures(unittest.TestCase):
+    """§4 SVG partial → glossary_term.html 배선. 그림은 easy_ko 를 묘사만 한다
+    (2026-09-03 해설층 삭제 결정과 같은 규율) — partial 파일이 없으면 조용히 빠진다."""
+
+    FIG_DIR = WEB_DIR / "partials" / "glossary_fig"
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glossfig_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cls.term_ids = {t["id"] for t in cls.terms}
+        cls.fig_files = sorted(cls.FIG_DIR.glob("*.html"))
+        cls.fig_ids = sorted(p.stem for p in cls.fig_files)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def _ko_page(self, term_id: str) -> str:
+        return (self.single / "glossary" / term_id / "index.html").read_text(encoding="utf-8")
+
+    def _en_page(self, term_id: str) -> str:
+        return (self.single / "en" / "glossary" / term_id / "index.html").read_text(encoding="utf-8")
+
+    # 1. 파일↔용어 — 없는 용어를 가리키는 그림 파일은 오류.
+    def test_figure_filenames_match_glossary_ids(self):
+        self.assertTrue(self.fig_files, "그림 partial 이 하나도 없다 — 픽스처/경로 확인")
+        orphans = [tid for tid in self.fig_ids if tid not in self.term_ids]
+        self.assertEqual(orphans, [], f"정본(glossary.json)에 없는 용어의 그림: {orphans}")
+
+    # 2. 묘사만·안전 — svg 정확히 1개, viewBox·role="img"·aria-label 필수,
+    #    letter-spacing·text-transform·<script·href= 금지(§4 한글 안전 가드와 같은 규율).
+    def test_figures_are_single_safe_svg(self):
+        for p in self.fig_files:
+            src = p.read_text(encoding="utf-8")
+            with self.subTest(file=p.name):
+                self.assertEqual(src.count("<svg"), 1, "svg 는 정확히 1개여야 한다")
+                self.assertIn("viewBox", src, "viewBox 없음")
+                self.assertIn('role="img"', src, 'role="img" 없음')
+                self.assertIn("aria-label", src, "aria-label 없음")
+                for banned in ("letter-spacing", "text-transform", "<script", "href="):
+                    self.assertNotIn(banned, src, f"금지 문자열 포함: {banned!r}")
+
+    # 3. 한국어 페이지 — 골든 빌드 out/glossary/<id>/index.html 에 gt-fig·svg 가 있고,
+    #    그림이 없는 용어(capa)의 페이지엔 그림 요소가 없다.
+    def test_korean_pages_render_figure_only_when_partial_exists(self):
+        for tid in self.fig_ids:
+            html = self._ko_page(tid)
+            with self.subTest(term=tid):
+                self.assertIn('class="gt-fig"', html, f"gt-fig 미렌더: {tid}")
+                self.assertIn("<svg", html, f"svg 미렌더: {tid}")
+        self.assertNotIn("capa", self.fig_ids,
+                         "capa 는 그림이 없다는 전제(음성 대조군)가 깨졌다 — 다른 무그림 "
+                         "용어로 바꿔야 한다")
+        # 정적 스코프 <style> 은 모든 낱개 페이지에 `.gt-fig{...}` 규칙을 싣고 있어(파일
+        # 존재 여부와 무관) 문자열 "gt-fig" 자체는 항상 나타난다 — 실제로 렌더되는지는
+        # <figure class="gt-fig"> 요소로 판별해야 한다(§4 판정은 화면에 나가는 조각으로).
+        capa_html = self._ko_page("capa")
+        self.assertNotIn('<figure class="gt-fig">', capa_html,
+                         "그림이 없어야 할 capa 페이지에 그림 요소가 렌더됐다")
+
+    # 4. 영어 페이지 — <figure class="gt-fig">…</figure> 조각에 한글 0, Illustration 포함.
+    def test_english_pages_have_illustration_label_and_no_hangul(self):
+        for tid in self.fig_ids:
+            html = self._en_page(tid)
+            with self.subTest(term=tid):
+                m = re.search(r'<figure class="gt-fig">.*?</figure>', html, re.S)
+                self.assertIsNotNone(m, f"영어 페이지에 그림 조각이 없다: {tid}")
+                frag = m.group(0)
+                self.assertNotRegex(frag, "[가-힣]", f"영어 그림 조각에 한글 잔존: {tid}")
+                self.assertIn("Illustration", frag, f"Illustration 라벨 누락: {tid}")
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

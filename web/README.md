@@ -239,6 +239,9 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    `link_terms_in_text`(문서 자동링크와 동일 함수)로 링크를 건다. 선정은 브리프 아카이브
    카드 빈도 희소 우선(`build_brief_term_card_freq`)·상한 `_BRIEF_TERM_LINK_MAX`(20)·
    페이지당 용어 1회 — 제목·원문 인용·사실 표에는 링크하지 않는다.
+22. **용어 그림은 `partials/glossary_fig/<id>.html` 이 있을 때만 낱개 페이지에 렌더된다
+   (2026-09-08)** — 정의(easy)를 **묘사만** 하고(정의 밖 주장 금지), 라벨은 `_()` 로
+   한국어·영어 두 페이지가 같은 SVG 를 공유한다.
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

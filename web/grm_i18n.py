@@ -209,7 +209,7 @@ def _template_env() -> Environment:
 
 def template_files(web_dir: Path = WEB_DIR) -> list[Path]:
     files = sorted((web_dir / "templates").glob("*.html")) + \
-        sorted((web_dir / "partials").glob("*.html"))
+        sorted((web_dir / "partials").glob("**/*.html"))
     return [p for p in files if p.name not in EXCLUDED_TEMPLATES]
 
 

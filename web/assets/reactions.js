@@ -54,6 +54,7 @@
   var rows = Array.prototype.slice.call(
     document.querySelectorAll(".grm-card-actions[data-anchor]"));
   var myScrapsEl = document.getElementById("grm-my-scraps");   // /me 페이지 컨테이너(있으면 마이페이지)
+  var myTermsEl = document.getElementById("grm-my-terms");     // /me '저장한 용어'(용어사전 저장)
   var myFirmsEl = document.getElementById("grm-my-firms");     // /me 관심 업체 컨테이너(015 워치리스트)
   // [P2 관심 범위 · 067] /me 관심 범위 컨테이너 + 어휘(render 가 facets 정본에서 심음).
   var myIntEl = document.getElementById("grm-my-interests");
@@ -70,6 +71,48 @@
 
   function reactBtns(row) {
     return Array.prototype.slice.call(row.querySelectorAll(".grm-ca-react[data-react]"));
+  }
+
+  // ── [용어 저장] 용어사전 저장은 카드 스크랩과 **같은 reaction 테이블**을 쓴다 ───────
+  // card_id 는 저장 계층에 불투명한 문자열일 뿐이라(형식 검사 없음) `glossary:<id>` 를
+  // 그대로 넣는다 — 새 테이블·마이그레이션 0. 대신 두 목록을 **여기서** 갈라야 한다:
+  // /me '내 스크랩' 은 이 접두를 빼고, '저장한 용어' 는 이 접두만 센다.
+  var TERM_PREFIX = "glossary:";
+  function isTermId(id) { return String(id || "").indexOf(TERM_PREFIX) === 0; }
+  function termIdOf(id) { return String(id || "").slice(TERM_PREFIX.length); }
+
+  // 비로그인 클릭의 보류 저장 — 로그인/가입을 마치면 그 클릭을 대신 수행한다.
+  // 저장 버튼이 곧 가입 이유인데, 로그인하고 돌아왔을 때 아무 일도 안 일어나 있으면
+  // 그 이유가 사라진다. localStorage(탭·리다이렉트를 건너야 한다 — 가입 확인 메일을
+  // 거치면 다른 페이지로 돌아온다)에 **무엇을 누르려 했는지만** 둔다: 세션·토큰 미저장.
+  // 24시간이 지난 의도는 버린다(그때의 클릭을 지금 대신 눌러 줄 이유가 없다).
+  // 저장·읽기 실패(프라이빗 모드·차단)는 조용히 삼켜 기존 동작으로 폴백한다.
+  var PENDING_KEY = "grm-pending-react";
+  var PENDING_TTL_MS = 24 * 60 * 60 * 1000;
+  function savePendingReact(id, kind) {
+    try { localStorage.setItem(PENDING_KEY, JSON.stringify({ id: id, kind: kind, ts: Date.now() })); }
+    catch (e) {}
+  }
+  // 읽으면서 지운다 — 성공·충돌·오류 어느 쪽으로 끝나도 같은 클릭이 다시 되살아나지 않는다.
+  function takePendingReact() {
+    var raw = null;
+    try { raw = localStorage.getItem(PENDING_KEY); } catch (e) { return null; }
+    if (!raw) return null;
+    try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+    var d = null;
+    try { d = JSON.parse(raw); } catch (e) { return null; }   // 깨진 JSON — 조용히 버린다
+    if (!d || !d.id || !d.kind) return null;
+    if (typeof d.ts !== "number" || (Date.now() - d.ts) > PENDING_TTL_MS) return null;
+    return d;
+  }
+  // 세션이 생긴 뒤 1회 — 이미 저장돼 있으면 PK 충돌이 나는데 그건 원하던 상태라 무시한다.
+  // 그 anchor 가 이 페이지에 없어도(확인 메일을 거쳐 다른 면으로 돌아온 경우) 저장은 한다.
+  function applyPendingReact() {
+    if (!session || !session.user) return;
+    var d = takePendingReact(); if (!d) return;
+    sb.from("reaction").insert({ user_id: session.user.id, card_id: d.id, kind: d.kind })
+      .then(function () { loadMine(); renderMyScraps(); renderMyTerms(); })
+      .catch(function () {});
   }
 
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -537,7 +580,12 @@
     c.textContent = String(Math.max(0, n + delta));
   }
   function toggle(btn, row) {
-    if (!session || !session.user) { openLogin(); return; }
+    if (!session || !session.user) {
+      // 누르려던 것을 기억해 두고 연다 — 로그인/가입이 끝나면 applyPendingReact 가 대신 누른다.
+      savePendingReact(row.getAttribute("data-anchor"), btn.getAttribute("data-react"));
+      openLogin({ msg: _t("로그인하면 저장됩니다.") });
+      return;
+    }
     var kind = btn.getAttribute("data-react");
     var id = row.getAttribute("data-anchor");
     var uid = session.user.id;
@@ -567,7 +615,7 @@
       '<span class="grm-acct-av grm-acct-av-xl" aria-hidden="true"><i class="ti ti-user"></i></span>' +
       '<div class="grm-me-idbox"><div class="grm-me-label">' + _t("게스트") + '</div>' +
       '<div class="grm-me-email">' + _t("아직 로그인하지 않았어요") + '</div>' +
-      '<p class="grm-me-guest-s">' + _t("가입하면 스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓이고 있어요.") + '</p>' +
+      '<p class="grm-me-guest-s">' + _t("가입하면 저장한 용어·스크랩·관심 업체·구름이가 계정에 보관되어 어느 기기에서든 이어집니다. 아래 구름이 기록은 지금도 이 브라우저에 쌓이고 있어요.") + '</p>' +
       '<div class="grm-me-metaline">' +
       '<button type="button" class="grm-me-signup">' + _t("가입하고 시작하기") + '</button>' +
       '<button type="button" class="grm-me-out grm-me-login">' + _t("이미 계정이 있어요 · 로그인") + '</button>' +
@@ -614,7 +662,9 @@
     ]).then(function (out) {
       var res = out[0], idx = out[1];
       if (res && res.error) { myScrapsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오지 못했습니다. 잠시 후 다시 시도해 주세요.") + '</p>'; return; }
-      var scraps = (res && res.data) ? res.data.slice() : [];
+      // 용어 저장(`glossary:`)은 같은 테이블에 있지만 이 목록의 것이 아니다 — 걸러 내지
+      // 않으면 인덱스에 없는 id 라 "원문을 찾지 못함" 행이 된다(수도 같이 틀린다).
+      var scraps = ((res && res.data) || []).filter(function (r) { return !isTermId(r.card_id); });
       if (!scraps.length) {
         myScrapsEl.innerHTML =
           '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-bookmark" aria-hidden="true"></i></span>' +
@@ -662,6 +712,67 @@
       myScrapsEl.innerHTML = ""; myScrapsEl.appendChild(ul);
       renderMeHead(scraps.length);
     });
+  }
+
+  // ── /me 페이지: 저장한 용어(용어사전 [저장]) ────────────────────────────
+  // 스크랩 목록과 같은 관례다 — 본인 행만(RLS), created_at 최신순 클라이언트 정렬, 실패는
+  // 오류처럼 보이지 않는 노트로 조용히 폴백. 다른 것은 둘뿐이다: (1) 같은 reaction 테이블에서
+  // `glossary:` 접두 행만 골라내고, (2) 제목·링크를 search-index 가 아니라 용어 인덱스
+  // (glossary-index[.en].json)에서 푼다. Supabase 엔 여기서도 불투명 id 만 있다.
+  function renderMyTerms() {
+    if (!myTermsEl) return;
+    if (!session || !session.user) {
+      myTermsEl.innerHTML = '<p class="grm-my-note">' + _t("로그인하면 저장한 용어를 이곳에 모아볼 수 있어요.") + '</p>';
+      return;
+    }
+    myTermsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오는 중…") + '</p>';
+    var idxUrl = myTermsEl.getAttribute("data-index") || "/assets/glossary-index.json";
+    Promise.all([
+      sb.from("reaction").select("card_id,created_at").eq("kind", "scrap"),
+      fetch(idxUrl).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (out) {
+      var res = out[0], idx = out[1];
+      if (res && res.error) { myTermsEl.innerHTML = '<p class="grm-my-note">' + _t("불러오지 못했습니다. 잠시 후 다시 시도해 주세요.") + '</p>'; return; }
+      var saved = ((res && res.data) || []).filter(function (r) { return isTermId(r.card_id); });
+      if (!saved.length) {
+        myTermsEl.innerHTML =
+          '<div class="grm-my-empty"><span class="grm-my-empty-ic"><i class="ti ti-bookmark" aria-hidden="true"></i></span>' +
+          '<p class="grm-my-empty-t">' + _t("아직 저장한 용어가 없어요") + '</p>' +
+          '<p class="grm-my-empty-s">' + _t("용어사전에서 저장 버튼을 누르면 이곳에 모여요.") + '</p>' +
+          '<a class="grm-my-cta" href="' + esc(cfgRoot) + 'glossary/index.html">' + _t("용어사전 둘러보기") + '</a></div>';
+        return;
+      }
+      saved.sort(function (a, c) { return (c.created_at || "").localeCompare(a.created_at || ""); });
+      var byId = {};
+      if (idx && idx.terms) { idx.terms.forEach(function (e) { byId[e.id] = e; }); }
+      var ul = document.createElement("ul"); ul.className = "grm-my-list";
+      saved.forEach(function (sv) {
+        var e = byId[termIdOf(sv.card_id)], li = document.createElement("li");
+        li.className = "grm-my-item";
+        if (e) {
+          var a = document.createElement("a"); a.className = "grm-my-a"; a.href = e.href;
+          a.textContent = e.term || _t("용어 보기");
+          li.appendChild(a);
+        } else {
+          // 정본에서 사라진 용어 — 지어내지 않고 그 사실만 적는다(스크랩 목록과 동형).
+          var sp = document.createElement("span"); sp.className = "grm-my-meta";
+          sp.textContent = _t("저장된 용어 (찾지 못함)");
+          li.appendChild(sp);
+        }
+        var rm = document.createElement("button"); rm.type = "button"; rm.className = "grm-my-rm"; rm.textContent = _t("저장 해제");
+        rm.addEventListener("click", function () {
+          rm.disabled = true;
+          sb.from("reaction").delete().match({ user_id: session.user.id, card_id: sv.card_id, kind: "scrap" })
+            .then(function (d) {
+              if (d && d.error) { rm.disabled = false; return; }
+              if (li.parentNode) li.parentNode.removeChild(li);
+              if (!ul.children.length) renderMyTerms();
+            }).catch(function () { rm.disabled = false; });
+        });
+        li.appendChild(rm); ul.appendChild(li);
+      });
+      myTermsEl.innerHTML = ""; myTermsEl.appendChild(ul);
+    }).catch(function () {});
   }
 
   // [firm_name 엔티티 디코드 M5] findings.js/trends.js/firm.js 의 동명 헬퍼와 동일 계약
@@ -855,11 +966,12 @@
   });
   sb.auth.getSession().then(function (res) {
     session = (res && res.data) ? res.data.session : null;
-    renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
-  }).catch(function () { renderAuth(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent(); });
+    renderAuth(); if (rows.length) loadMine(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
+  }).catch(function () { renderAuth(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
-    session = s; renderAuth(); if (rows.length) loadMine(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
-    if (s && s.user) { clearSignupProgress(); closeLogin(); }   // 세션 성립 = 가입 흐름 종료
+    session = s; renderAuth(); if (rows.length) loadMine(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
+    // 세션 성립 = 가입 흐름 종료. 로그인하려던 이유(누르려던 저장)를 여기서 갚는다.
+    if (s && s.user) { clearSignupProgress(); closeLogin(); applyPendingReact(); }
   });
   if (rows.length) loadCounts();
 })();

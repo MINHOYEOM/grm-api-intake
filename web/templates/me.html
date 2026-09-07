@@ -19,7 +19,7 @@
     그대로 — 한 글자도 더하지 않아야 quiz 골든 byte 가 보존된다). -#}
 <main class="wrap" id="grm-me">
   <h1 class="grm-my-h">{{ _('마이페이지') }}</h1>
-  <p class="grm-my-sub">{{ _('스크랩한 카드와 구름이, 관심 업체를 한 화면에 모았습니다.') }}</p>
+  <p class="grm-my-sub">{{ _('저장한 용어와 스크랩한 카드, 구름이, 관심 업체를 한 화면에 모았습니다.') }}</p>
   <div id="grm-me-head" class="grm-me-head"></div>
 
   {#- 구름이를 스크랩보다 위에 둔다: 로그인 여부와 무관하게 항상 내용이 있는 유일한
@@ -31,6 +31,18 @@
       남지 않도록 정적 폴백 문단을 두고, 패널이 뜨면 CSS 인접 선택자로 감춘다(JS 0). -#}
   <p class="grm-my-note me-growth-fb">{{ _('성장 기록은 이 브라우저에 저장됩니다 — 표시되지 않으면 브라우저에서 저장이 차단된 상태일 수 있어요.') }}</p>
   <p class="me-growth-go"><a href="{{ rel_root }}quiz/index.html">{{ _('주간 퀴즈 풀러 가기 →') }}</a></p>
+
+  {#- [용어 저장 · 내 용어장] 용어사전 낱개 페이지의 [저장] 이 쌓이는 자리. 저장 계층은
+      카드 스크랩과 **같은 reaction 테이블**이고 card_id 만 `glossary:<id>` 다(새 테이블·
+      마이그레이션 0) — 그래서 아래 '내 스크랩' 은 그 접두 행을 빼고 세고, 여기는 그 행만
+      센다. 목록은 reactions.js(renderMyTerms)가 런타임 렌더하고, 표제어·링크는 우리
+      인덱스에서만 온다(Supabase 엔 불투명 id 만 — 스크랩 섹션과 동일 관례).
+      인덱스는 **읽는 언어**를 따라 파일 이름으로 갈린다(search-index 선례 동형). -#}
+  <h2 class="grm-my-h2">{{ _('저장한 용어') }}</h2>
+  <p class="grm-my-sub">{{ _('용어사전에서 저장한 용어입니다.') }}</p>
+  <div id="grm-my-terms" data-index="/assets/glossary-index{{ '' if lang == 'ko' else '.en' }}.json">
+    <p class="grm-my-note">{{ _('불러오는 중…') }}</p>
+  </div>
 
   <h2 class="grm-my-h2">{{ _('내 스크랩') }}</h2>
   <p class="grm-my-sub">{{ _('관심 있게 저장한 카드를 한곳에 모았습니다.') }}</p>

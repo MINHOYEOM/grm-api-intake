@@ -55,7 +55,7 @@
           {% if t.related %}
           <div class="gl-rel">
             <span class="gl-rel-k">{{ _('관련 용어') }}</span>
-            {% for r in t.related %}<a class="gl-rel-a" href="#{{ r.id }}">{{ r.label }}</a>{% endfor %}
+            {% for r in t.related %}<a class="gl-rel-a" href="{{ rel_root }}glossary/{{ r.id }}/">{{ r.label }}</a>{% endfor %}
           </div>
           {% endif %}
           {% if t.case_findings %}

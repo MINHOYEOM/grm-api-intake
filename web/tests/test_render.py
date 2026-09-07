@@ -9060,9 +9060,19 @@ class WebGlossaryRenderTest(unittest.TestCase):
         orphans = [(t["id"], r) for t in self.terms for r in t.get("related", []) if r not in ids]
         self.assertEqual(orphans, [],
                           f"related 가 존재하지 않는 용어 id 를 참조한다(고아 참조): {orphans}")
+        # [2026-09-07] 관련 용어는 색인 안 `#앵커`가 아니라 **낱개 페이지 경로**로 간다.
+        # 종전 `#<id>` 는 검색 필터가 그 카드를 hidden 으로 만든 동안 주소만 바뀌고
+        # 화면은 그대로였다(`OOS` 검색 → 「경향이탈 결과」 클릭 → 아무 일도 안 일어남).
+        # 경로 관례는 표제어 링크(gl-term-link)·낱개 페이지(glossary_term.html)와 같은
+        # 것이어야 하므로 rel_root 를 손으로 적지 않고 **렌더된 표제어 링크에서 읽어**
+        # 대조한다(픽스처 트리가 바뀌면 기대값도 따라 움직인다).
+        m = re.search(r'class="gl-term-link" href="(.*?)glossary/', self.html)
+        self.assertIsNotNone(m, "표제어 링크가 없다 — 경로 관례를 읽을 수 없다")
+        rel_root = m.group(1)
         for t in self.terms:
             for r in t.get("related", []):
-                self.assertIn(f'class="gl-rel-a" href="#{r}"', self.html)
+                self.assertIn(f'class="gl-rel-a" href="{rel_root}glossary/{r}/"', self.html)
+        self.assertNotIn('class="gl-rel-a" href="#', self.html)
 
     def test_chosung_grouping_deterministic_and_ordered(self):
         # 버킷 = 데이터 파생(term_ko 초성), 순서 = _GLOSSARY_BUCKET_ORDER 고정(가나다→A–Z→#).
@@ -18710,6 +18720,199 @@ class GurumiScrollHideTest(unittest.TestCase):
             r"localStorage\.(?:set|get|remove)Item\(\s*([A-Za-z_$][A-Za-z0-9_$]*)", self.js))
         self.assertTrue(used, "저장소 호출을 하나도 못 찾았다 — 정규식이 낡았다")
         self.assertEqual(used, {"KEY", "POS_KEY"}, f"새 저장소 키: {sorted(used)}")
+
+
+
+# ── [2026-09-07] 용어사전 검색 — 정확 일치 우선·관련 용어 이동·단어별 검색 ──────────
+# 브라우저가 없는 스위트라 JS 동작 자체는 여기서 돌릴 수 없다(조작 검증은 수동). 대신
+# 클라이언트가 판정에 쓰는 **재료**와 서버가 낸 **주소**만 본다. 아래 두 함수는
+# assets/glossary.js 의 `norm()`·`pushName()` 과 같은 규칙을 파이썬으로 옮긴 것이다 —
+# 도달 탐침 표(_FDA_ALIAS_PROBES)가 필터 판정을 옮겨 온 것과 같은 방식이다.
+_GL_CARD_RE = re.compile(
+    r'<article class="gl-term" id="([^"]+)" data-search="([^"]*)">(.*?)</article>', re.S)
+_GL_LINK_RE = re.compile(r'<a class="gl-term-link" href="[^"]*">(.*?)</a>', re.S)
+_GL_EN_RE = re.compile(r'<span class="gl-term-en">(.*?)</span>', re.S)
+_GL_ALIAS_RE = re.compile(r'<span class="gl-alias-v">(.*?)</span>', re.S)
+_GL_NORM_RE = re.compile(r"[\s.-]+")
+_GL_PAREN_RE = re.compile(r"\(([^)]+)\)")
+_GL_HANGUL_RE = re.compile(r"[가-힣]")
+
+
+def _gl_norm(s: str) -> str:
+    return _GL_NORM_RE.sub("", s.lower())
+
+
+def _gl_names(value: str) -> list[str]:
+    """이름 후보 — 원문 + 괄호 안(약어) + 괄호 밖. glossary.js `pushName` 과 같은 규칙."""
+    v = value.strip()
+    if not v:
+        return []
+    out = [v]
+    inner = _GL_PAREN_RE.findall(v)
+    if inner:
+        out.extend(inner)
+        outer = " ".join(re.sub(r"\([^)]*\)", " ", v).split())
+        if outer:
+            out.append(outer)
+    return out
+
+
+def _gl_cards(html: str) -> list[dict]:
+    """렌더된 카드에서 **화면에 나가는 이름**만 읽는다(data 속성을 새로 만들지 않는다)."""
+    cards = []
+    for cid, search, blk in _GL_CARD_RE.findall(html):
+        names: list[str] = []
+        for rx in (_GL_LINK_RE, _GL_EN_RE):
+            m = rx.search(blk)
+            if m:
+                names.extend(_gl_names(html_mod.unescape(m.group(1))))
+        m = _GL_ALIAS_RE.search(blk)
+        if m:
+            for a in re.split(r"\s+·\s+", html_mod.unescape(m.group(1))):
+                names.extend(_gl_names(a))
+        cards.append({"id": cid, "search": search, "names": names,
+                      "normed": [_gl_norm(n) for n in names]})
+    return cards
+
+
+#: (검색어, 정확 일치 구역에 반드시 있어야 할 용어 id). 근거는 실측 glossary.json —
+#: `CAPA`·`OOS` 는 영문 표제어 괄호 안 약어로, 「데이터 무결성」은 동의어로 닿는다.
+#: 이 세 경로 중 하나가 데이터 변경으로 끊기면 여기서 실패한다.
+_GL_EXACT_PROBES: tuple[tuple[str, str], ...] = (
+    ("CAPA", "capa"),
+    ("OOS", "oos"),
+    ("데이터 무결성", "data-integrity"),
+)
+
+#: 위 중 **순위가 없으면 정답이 첫 번째가 아니었던** 검색어. 「데이터 무결성」은 종전
+#: 판정으로도 1건뿐이라(실측) 이 표에 넣지 않는다 — 그 검색어가 얻는 것은 순위가 아니라
+#: 단어별 검색(아래)이다.
+_GL_RANKED_PROBES: tuple[tuple[str, str], ...] = (
+    ("CAPA", "capa"),
+    ("OOS", "oos"),
+)
+
+#: 단어별 검색 탐침 — 검색어 전체로는 **0건**이고(붙여 대조하면 어떤 카드에도 없다)
+#: 낱말로 갈라야 닿는다. 갈라도 정작 그 낱말이 표제어인 카드가 위로 오지 않으면 소용이
+#: 없으므로, 그 두 카드의 이름이 낱말과 정확히 맞는지까지 함께 본다.
+_GL_TOKEN_PROBE: tuple[str, tuple[str, ...]] = (
+    "밸리데이션 적격성평가 차이", ("validation", "qualification"),
+)
+
+
+class WebGlossarySearchRankingTest(unittest.TestCase):
+    """[2026-09-07] 검색 정확 일치 우선 · 관련 용어 링크 · 단어별 검색.
+
+    종전 필터는 순위가 없어 `CAPA` 를 치면 설명문에 CAPA 가 든 카드들이 초성 순으로
+    나오고 정작 「시정 및 예방조치(CAPA)」가 여섯 번째였다. 이 사이트 검색 노출의 86%가
+    용어사전이라(GSC 최근 28일) 사이트 안 검색이 사실상 첫 화면이다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glsearch_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.html = (cls.single / "glossary" / "index.html").read_text(encoding="utf-8")
+        cls.en_html = (cls.single / "en" / "glossary" / "index.html").read_text(encoding="utf-8")
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+        cls.js = (WEB_DIR / "assets" / "glossary.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 관련 용어 링크 ───────────────────────────────────────────────────────
+    def test_related_links_go_to_term_pages_in_both_trees(self):
+        """`#앵커` 는 검색으로 그 카드가 감춰져 있으면 아무 데도 가지 않는다 — 두 언어
+        트리 모두 낱개 페이지 경로여야 하고, 영어 트리는 `/en/` 안에 머물러야 한다."""
+        ids = {t["id"] for t in self.terms}
+        for label, html, prefix in (("ko", self.html, ""), ("en", self.en_html, "en/")):
+            hrefs = re.findall(r'<a class="gl-rel-a" href="([^"]+)"', html)
+            self.assertTrue(hrefs, f"{label}: 관련 용어 링크가 하나도 없다")
+            self.assertNotIn("#", "".join(hrefs), f"{label}: `#앵커` 관련 용어 링크가 남아 있다")
+            for href in hrefs:
+                self.assertTrue(href.endswith("/"), f"{label}: 끝 슬래시 없음 {href!r}")
+                # rel_root 는 트리 깊이가 정한다 — 절대 경로로 정규화해 대조한다.
+                resolved = posixpath.normpath(posixpath.join(f"/{prefix}glossary/", href))
+                m = re.fullmatch(rf"/{prefix}glossary/([^/]+)", resolved)
+                self.assertIsNotNone(m, f"{label}: 낱개 페이지 경로가 아니다 {href!r} → {resolved}")
+                self.assertIn(m.group(1), ids, f"{label}: 없는 용어를 가리킨다 {href!r}")
+
+    def test_related_links_match_the_headword_link_convention(self):
+        """표제어 링크와 **같은** 경로 관례여야 한다 — 한쪽만 고치면 또 갈라진다."""
+        for label, html in (("ko", self.html), ("en", self.en_html)):
+            roots = set(re.findall(r'class="gl-term-link" href="(.*?)glossary/', html))
+            rel_roots = set(re.findall(r'class="gl-rel-a" href="(.*?)glossary/', html))
+            self.assertEqual(rel_roots, roots, f"{label}: 관련 용어와 표제어의 rel_root 가 다르다")
+
+    # ── 정확 일치 재료 ───────────────────────────────────────────────────────
+    def test_exact_match_candidates_are_visible_on_the_card(self):
+        """정확 일치 판정 재료가 **화면에 나가는 문자열**에 있는지. 카드에 안 보이는 값으로
+        순위를 매기면 사용자는 왜 그 카드가 맨 위인지 알 수 없다(판정 대상과 표시 대상이
+        갈리면 가드가 눈이 머는 자리 — 2026-09-06)."""
+        for label, html in (("ko", self.html), ("en", self.en_html)):
+            cards = _gl_cards(html)
+            self.assertEqual(len(cards), len(self.terms), f"{label}: 카드 수 불일치")
+            by_id = {c["id"]: c for c in cards}
+            for q, want in _GL_EXACT_PROBES:
+                if label == "en" and _GL_HANGUL_RE.search(q):
+                    continue          # 영어 트리에 한국어 검색어의 재료는 없다(설계대로)
+                nq = _gl_norm(q)
+                exact = sorted(c["id"] for c in cards if nq in c["normed"])
+                self.assertIn(want, exact,
+                              f"{label}: {q!r} 가 {want!r} 의 이름과 정확히 맞지 않는다 "
+                              f"— 화면 후보: {by_id[want]['names']}")
+                self.assertEqual(exact, [want],
+                                 f"{label}: {q!r} 의 정확 일치가 여럿이다 {exact}")
+
+    def test_exact_match_beats_the_plain_substring_order(self):
+        """순위가 실제로 필요한 상황인지 — 종전 판정으로는 여러 카드가 걸리고 그중 정답
+        카드가 첫 번째가 아니었다. 그 전제가 사라지면 이 기능도 재검토 대상이다."""
+        cards = _gl_cards(self.html)
+        for q, want in _GL_RANKED_PROBES:
+            hits = [c["id"] for c in cards if q.lower() in c["search"]]
+            self.assertIn(want, hits, f"{q!r} 가 종전 판정으로도 안 걸린다")
+            self.assertGreater(len(hits), 1, f"{q!r} 는 순위가 필요 없는 검색어다")
+            self.assertNotEqual(hits[0], want, f"{q!r} 는 종전에도 이미 첫 번째였다")
+
+    def test_multi_word_query_needs_tokens_and_lands_the_head_terms(self):
+        """검색어 전체를 한 덩어리로 대조하면 0건인 질의가 낱말로 갈면 닿는다. 갈라서
+        닿기만 하고 정작 그 낱말이 **표제어인** 카드가 뒤로 밀리면 못 찾은 것과 같아,
+        두 카드의 이름이 낱말과 정확히 맞는지(=맨 위 구역 자격)까지 함께 본다."""
+        q, wants = _GL_TOKEN_PROBE
+        cards = _gl_cards(self.html)
+        by_id = {c["id"]: c for c in cards}
+        tokens = q.lower().split()
+        self.assertGreater(len(tokens), 1)
+        whole = [c["id"] for c in cards if q.lower() in c["search"]]
+        self.assertEqual(whole, [], f"{q!r} 가 통짜 대조로도 걸린다 — 탐침이 낡았다")
+        token_hits = [c["id"] for c in cards
+                      if any(t in c["search"] for t in tokens)]
+        self.assertGreater(len(token_hits), 1, f"{q!r} 가 낱말로도 안 걸린다")
+        for want in wants:
+            self.assertIn(want, token_hits, f"{q!r} 의 낱말이 {want!r} 에 닿지 않는다")
+            normed = by_id[want]["normed"]
+            self.assertTrue(any(_gl_norm(t) in normed for t in tokens),
+                            f"{want!r} 의 이름이 어느 낱말과도 정확히 맞지 않는다 "
+                            f"— 화면 후보: {by_id[want]['names']}")
+
+    # ── 배선(얕은 가드) ──────────────────────────────────────────────────────
+    def test_search_script_wiring(self):
+        """브라우저가 없으니 동작은 못 본다 — 배선이 통째로 사라지는 것만 막는다."""
+        for needle in ('"hashchange"', 'data-rank', 'gl-hit',
+                       '_t("일치하는 용어")', '_t("이름에 포함")', '_t("설명에 언급된 용어")'):
+            self.assertIn(needle, self.js, f"glossary.js 배선 누락: {needle}")
+        # 카드는 **옮긴다**. 복제하면 id 가 둘이 되어 해시 딥링크·퀴즈 링크가 깨진다.
+        self.assertNotIn("cloneNode", self.js)
+        # 단일 토큰 의미론 불변 — 도달 탐침 표가 재현하는 그 판정이 그대로 남아야 한다.
+        self.assertIn("c.search.indexOf(q) !== -1", self.js)
+
+    def test_rank_labels_are_translated(self):
+        catalog = grm_i18n.load_catalog("en")
+        for key in ("일치하는 용어", "이름에 포함", "설명에 언급된 용어"):
+            self.assertIn(key, catalog, f"영문 문구 없음: {key!r}")
+            self.assertIsNone(_GL_HANGUL_RE.search(catalog[key]),
+                              f"영문 문구에 한글이 남았다: {key!r}")
 
 
 if __name__ == "__main__":

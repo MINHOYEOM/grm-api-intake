@@ -160,6 +160,10 @@
 .arc-lib-tag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:4px;padding:2px 6px;margin-right:6px;white-space:nowrap}
 .arc-lib-more{color:var(--muted)!important;font-weight:500}
 @media (max-width:640px){ .arc-lib{padding:12px 14px 11px} .arc-lib-sum{flex-basis:100%} }
+/* [브리프 카드 용어 자동 링크 2026-09-08] 지적문서 페이지(findings_doc.html)와 같은
+   결의 .fd-term 스타일을 그대로 옮겨온다 — grm.css 무접촉. */
+.fd-term{color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)}
+.fd-term:hover{color:var(--coral);border-bottom-color:var(--coral)}
 {% if lang != 'ko' %}
 /* [영문 상호참조 줄 2026-09-07] 규제기관이 한국어로 낸 지적사항 상세가 영어판에서 빠진
    자리. 형제 토글(details.detail 의 "지적사항 상세 · N건")과 같은 라벨 모양에 한국어판으로

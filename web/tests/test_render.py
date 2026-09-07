@@ -18915,6 +18915,235 @@ class WebGlossarySearchRankingTest(unittest.TestCase):
                               f"영문 문구에 한글이 남았다: {key!r}")
 
 
+# ── [브리프 카드 용어 자동 링크 2026-09-08] 지적문서 페이지(`/findings/doc/<slug>/`)와
+# 같은 엔진(`_doc_term_find`·`link_terms_in_text`)을 카드 본문(summary·핵심 사실·시사점·
+# 점검 사항)에 쓴다. 선정은 브리프 아카이브 카드 빈도 희소 우선 + 상한
+# (`_BRIEF_TERM_LINK_MAX`) + 페이지당 용어 1회. 제목·원문 인용·사실 표에는 링크 없음.
+class BriefTermLinks(unittest.TestCase):
+    """골든 빌드(단독 픽스처) 결과 `out` 을 쓰는 기존 방식(`WebFindingsDocPageTest` 와
+    같은 setUpClass 관례) + 합성 카드로 짓는 순수 단위 테스트를 함께 둔다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_briefterms_"))
+        cls.out = cls._tmp / "single"
+        _build_single(cls.out)
+        cls.term_ids = {t["id"] for t in json.loads(
+            render.GLOSSARY_FILE.read_text(encoding="utf-8"))}
+        cls.brief_pages = sorted(
+            p for p in (cls.out / "briefs").iterdir()
+            if p.is_dir() and (p / "index.html").is_file())
+        cls.briefs_by_pub = {b["brief"].get("publish_date", ""): b
+                             for b in render.load_briefs(SINGLE_FIXTURES)}
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── 헬퍼 ──────────────────────────────────────────────────────────────
+    @staticmethod
+    def _cards(html_text: str) -> list[str]:
+        """페이지 HTML → 카드 `<article>` 조각 리스트(카드 경계에서 자른다)."""
+        return re.split(r'(?=<article class="card)', html_text)[1:]
+
+    @staticmethod
+    def _card_id(art: str) -> str:
+        m = re.match(r'<article class="card[^"]*" id="([^"]+)"', art)
+        return m.group(1) if m else ""
+
+    @staticmethod
+    def _fd_hrefs(html_text: str) -> list[str]:
+        return re.findall(r'<a class="fd-term" href="\.\./\.\./glossary/([^/]+)/">', html_text)
+
+    # ── 1. 배선 ───────────────────────────────────────────────────────────
+    def test_wiring_links_exist_and_point_to_real_glossary_pages(self):
+        total = 0
+        for d in self.brief_pages:
+            html_text = (d / "index.html").read_text(encoding="utf-8")
+            hrefs = self._fd_hrefs(html_text)
+            for tid in hrefs:
+                self.assertIn(tid, self.term_ids, f"없는 용어로 링크: {d.name} → {tid}")
+                self.assertTrue((self.out / "glossary" / tid / "index.html").is_file(),
+                                f"링크 대상 페이지 부재: {tid}")
+            total += len(hrefs)
+        self.assertGreater(total, 0, "브리프 카드 용어 링크가 하나도 없다(배선 확인)")
+
+    # ── 2. 한 번·상한 ─────────────────────────────────────────────────────
+    def test_links_are_unique_and_capped_per_page(self):
+        for d in self.brief_pages:
+            html_text = (d / "index.html").read_text(encoding="utf-8")
+            hrefs = self._fd_hrefs(html_text)
+            with self.subTest(issue=d.name):
+                self.assertEqual(len(hrefs), len(set(hrefs)),
+                                 f"한 페이지에서 같은 용어에 반복 링크: {d.name}")
+                self.assertLessEqual(len(hrefs), render._BRIEF_TERM_LINK_MAX,
+                                     f"링크 상한 초과: {d.name}")
+
+    # ── 3. 자리 ───────────────────────────────────────────────────────────
+    def test_links_only_in_narrative_blocks(self):
+        """링크는 `.summary`·`.facts2 li`(key_facts)·`.imp p`·`.chk li` 안에만 —
+        `c-title` 줄·`.quote`·`.facts` 표·`.merged` 안에는 없다. 카드 안 `fd-term` 총
+        개수와 네 자리에서 찾은 개수의 합이 같아야 "그 네 자리에만 있다"가 성립한다."""
+        checked = 0
+        for d in self.brief_pages:
+            html_text = (d / "index.html").read_text(encoding="utf-8")
+            for art in self._cards(html_text):
+                cid = self._card_id(art)
+                total = art.count('class="fd-term"')
+                if total == 0:
+                    continue
+                checked += 1
+                # 음성 자리 — 명시적으로 없다고 확인.
+                m_title = re.search(r'<div class="c-title">(.*?)<div class="badges">',
+                                    art, re.S)
+                if m_title:
+                    self.assertNotIn('fd-term', m_title.group(1),
+                                     f"{d.name}#{cid}: 제목 줄에 링크")
+                for m in re.finditer(r'<table class="facts">.*?</table>', art, re.S):
+                    self.assertNotIn('fd-term', m.group(0), f"{d.name}#{cid}: 사실 표에 링크")
+                for m in re.finditer(r'<div class="o">(.*?)</div>', art, re.S):
+                    self.assertNotIn('fd-term', m.group(1), f"{d.name}#{cid}: 원문 인용에 링크")
+                for m in re.finditer(r'<div class="t">(.*?)</div>', art, re.S):
+                    self.assertNotIn('fd-term', m.group(1), f"{d.name}#{cid}: 번역 인용에 링크")
+                for m in re.finditer(r'<details class="block merged">.*?</details>',
+                                     art, re.S):
+                    self.assertNotIn('fd-term', m.group(0), f"{d.name}#{cid}: 병합목록에 링크")
+                # 양성 자리 — 여기서 찾은 합이 카드 전체 총량과 같아야 "이 넷 뿐"이 성립.
+                positive = 0
+                m = re.search(r'<p class="summary">(.*?)</p>', art, re.S)
+                if m:
+                    positive += m.group(1).count('class="fd-term"')
+                m = re.search(r'ti-list-details.*?<ul class="facts2">(.*?)</ul>', art, re.S)
+                if m:
+                    positive += m.group(1).count('class="fd-term"')
+                m = re.search(r'<div class="imp">.*?<p>(.*?)</p>', art, re.S)
+                if m:
+                    positive += m.group(1).count('class="fd-term"')
+                m = re.search(r'<div class="chk">.*?<ul>(.*?)</ul>', art, re.S)
+                if m:
+                    positive += m.group(1).count('class="fd-term"')
+                self.assertEqual(positive, total,
+                                 f"{d.name}#{cid}: fd-term {total}건 중 {total - positive}건이 "
+                                 "네 자리(summary·facts2·imp·chk) 밖에 있다")
+        self.assertGreater(checked, 0, "링크 붙은 카드가 하나도 없어 자리 검사를 못 했다")
+
+    # ── 4. 무변형 ─────────────────────────────────────────────────────────
+    def test_summary_and_implication_are_byte_invariant_under_link_stripping(self):
+        """`<a class="fd-term" …>`·`</a>` 를 벗기면 카드 JSON 값을 escape 한 것과
+        바이트 동일해야 한다. escape 기준은 렌더러가 실제로 쓰는 `markupsafe.escape`
+        (`_esc` — 렌더 경로가 autoescape 로 쓰는 것과 같은 함수. 표준 `html.escape` 는
+        따옴표류를 다른 개체로 옮겨(`&#x27;` vs `&#39;`) 실제 자료의 아포스트로피
+        (`BEEKEEPER'S NATURALS` 등)에서 허위 불일치를 낸다)."""
+        strip_re = re.compile(r'<a class="fd-term" href="[^"]*">|</a>')
+        checked_summary = checked_imp = 0
+        for d in self.brief_pages:
+            b = self.briefs_by_pub.get(d.name)
+            if not b:
+                continue
+            html_text = (d / "index.html").read_text(encoding="utf-8")
+            cards_by_id = {render._card_anchor(c): c for c in (b.get("cards") or [])
+                          if render._is_renderable(c)}
+            for art in self._cards(html_text):
+                cid = self._card_id(art)
+                card = cards_by_id.get(cid)
+                if not card:
+                    continue
+                m = re.search(r'<p class="summary">(.*?)</p>', art, re.S)
+                if m and card.get("summary"):
+                    stripped = strip_re.sub("", m.group(1))
+                    self.assertEqual(stripped, str(_esc(card["summary"])),
+                                     f"{d.name}#{cid}: summary 가 무변형이 아니다")
+                    checked_summary += 1
+                mi = re.search(r'<div class="imp">.*?<p>(.*?)</p>', art, re.S)
+                if mi and card.get("implication"):
+                    stripped_i = strip_re.sub("", mi.group(1))
+                    self.assertEqual(stripped_i, str(_esc(card["implication"])),
+                                     f"{d.name}#{cid}: implication 이 무변형이 아니다")
+                    checked_imp += 1
+        self.assertGreater(checked_summary, 0, "summary 무변형 검사 대상이 없다")
+        self.assertGreaterEqual(checked_imp, 1, "implication 무변형 검사 대상이 없다")
+
+    # ── 5. 희소 우선(단위) ───────────────────────────────────────────────
+    def test_select_brief_term_links_prefers_rare_terms_and_respects_limit(self):
+        cards = [
+            {"summary": "제조 공정과 희귀조건A 및 희귀조건B 를 점검한다.",
+             "key_facts": [], "implication": "", "checks": []},
+            {"summary": "품질보증 체계와 희귀조건B 를 다시 언급한다.",
+             "key_facts": [], "implication": "", "checks": []},
+            {"summary": "제조와 품질보증, 희귀조건C 를 함께 다룬다.",
+             "key_facts": [], "implication": "", "checks": []},
+        ]
+        index = [
+            ("희귀조건A", "t-rare-a"), ("희귀조건B", "t-rare-b"), ("희귀조건C", "t-rare-c"),
+            ("품질보증", "t-common-qa"), ("제조", "t-common-mfg"),
+        ]
+        freq = {"t-rare-a": 1, "t-rare-b": 2, "t-rare-c": 1,
+                "t-common-qa": 40, "t-common-mfg": 55}
+        sel = render.select_brief_term_links(cards, index, freq, limit=3)
+        self.assertEqual([tid for _, tid in sel], ["t-rare-a", "t-rare-c", "t-rare-b"],
+                         "희소 우선(동률은 tid 순) 정렬이 어긋났다")
+        # 상한 1로 다시 — 가장 희소한 것만.
+        sel1 = render.select_brief_term_links(cards, index, freq, limit=1)
+        self.assertEqual(sel1, [("희귀조건A", "t-rare-a")])
+
+    # ── 6. 첫 등장(단위) ─────────────────────────────────────────────────
+    def test_link_card_view_terms_links_first_occurrence_only(self):
+        selected = [("희귀조건", "t-rare")]
+        cv1 = {"summary": "", "key_facts": [], "implication": "",
+              "checks": ["희귀조건 관련 점검 사항이다."]}
+        cv2 = {"summary": "희귀조건을 다시 언급하는 요약이다.", "key_facts": [],
+              "implication": "", "checks": []}
+        used: set[str] = set()
+        render._link_card_view_terms(cv1, selected, "../../", used, "ko")
+        render._link_card_view_terms(cv2, selected, "../../", used, "ko")
+        self.assertIn('class="fd-term"', str(cv1["checks"][0]),
+                      "먼저 도는 카드 1 의 checks 에 링크가 없다")
+        self.assertNotIn('class="fd-term"', str(cv2["summary"]),
+                         "이미 쓴 용어가 카드 2 의 summary 에 다시 링크됐다")
+
+    # ── 7. 영어(단위) ────────────────────────────────────────────────────
+    def test_english_narrative_links_use_english_glossary_and_no_hangul_labels(self):
+        term = {"id": "t-en-term", "term_en": "Aseptic Processing", "aliases": []}
+        index = render.build_doc_term_link_index([term], lang="en")
+        card = {
+            "summary": "한국어 요약", "key_facts": ["한국어 사실"],
+            "implication": "한국어 시사점", "checks": ["한국어 점검"],
+            "en": {
+                "title_issue": "EN issue",
+                "summary": "The aseptic processing area was deficient.",
+                "implication": "This raises risk for the aseptic processing line.",
+                "key_facts": ["Aseptic Processing controls failed."],
+                "checks": ["Review aseptic processing SOPs."],
+            },
+        }
+        self.assertTrue(render.card_has_english(card))
+        freq = {"t-en-term": 1}
+        sel = render.select_brief_term_links([card], index, freq, lang="en")
+        self.assertEqual(sel, [("Aseptic Processing", "t-en-term")])
+        en_card = render._card_with_english_narrative(card, "en")
+        cv = {"summary": en_card["summary"], "key_facts": list(en_card["key_facts"]),
+             "implication": en_card["implication"], "checks": list(en_card["checks"])}
+        used: set[str] = set()
+        render._link_card_view_terms(cv, sel, "../../", used, "en")
+        linked_html = ("".join(str(cv["summary"])) + "".join(str(x) for x in cv["key_facts"])
+                      + str(cv["implication"]) + "".join(str(x) for x in cv["checks"]))
+        self.assertIn('<a class="fd-term" href="../../glossary/t-en-term/">', linked_html)
+        labels = re.findall(r'<a class="fd-term" href="[^"]+">([^<]*)</a>', linked_html)
+        self.assertTrue(labels, "링크 라벨을 못 찾았다")
+        for label in labels:
+            self.assertNotRegex(label, "[가-힣]", "영어 카드의 용어 링크 라벨에 한글이 남았다")
+        self.assertNotRegex(linked_html, "[가-힣]", "영어 서사 링크 결과에 한글이 섞였다")
+
+    # ── 8. 한글 낱말 시작 규칙(단위) ─────────────────────────────────────
+    def test_hangul_word_start_rule(self):
+        self.assertEqual(render._doc_term_find("세척 밸리데이션 회수율 자료", "수율"), -1)
+        self.assertEqual(render._doc_term_find("기준일탈(OOS) 시험", "일탈"), -1)
+        self.assertGreaterEqual(render._doc_term_find("생산량·인수량·수율 등", "수율"), 0)
+        self.assertGreaterEqual(render._doc_term_find("교정·적격성평가와", "적격성평가"), 0)
+        # 라틴 표면형 동작 불변.
+        self.assertGreaterEqual(render._doc_term_find("RAPID test and API lot", "API"), 0)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

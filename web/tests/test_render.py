@@ -18409,6 +18409,111 @@ class SubscribePeekLinkTest(unittest.TestCase):
             self.assertNotIn("이번 주 소식 먼저 보기", html)
 
 
+class GurumiScrollHideTest(unittest.TestCase):
+    """[구름이 모바일 스크롤 은신 2026-09-07] 좁은 화면에서 스크롤하는 동안만 투명해진다.
+
+    구름이는 `position:fixed` 라 모바일에서 읽는 문장 위에 겹친다(09-06 라이브 점검·
+    09-07 Codex 점검에서 반복 관찰). 사용자 확정: **스크롤 중 숨기고 멈추면 되돌린다.**
+    위치·도킹·드래그는 그대로다.
+
+    ★이 가드가 지키는 것은 "숨는다"가 아니라 **어떻게 숨느냐**다. `setPosition`·
+    `selectNearestDock`·`savePosition` 이 전부 `root.getBoundingClientRect()` 로 재기
+    때문에 루트에 `transform`/`translate` 를 걸면 위치 저장·도킹·좌우 판정이 통째로
+    밀린다. `visibility:hidden` 은 포커스 링과 `activeElement` 판정을 흔든다. 그래서
+    허용 수단은 `opacity` + `pointer-events` 뿐이고, 규칙은 반드시 모바일 미디어쿼리
+    **안**에 있어야 한다 — 밖이면 데스크톱에서도 구름이가 사라진다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "pet.js").read_text(encoding="utf-8")
+        cls.css = (WEB_DIR / "assets" / "pet.css").read_text(encoding="utf-8")
+
+    @staticmethod
+    def _brace_block(css: str, head: str) -> str:
+        """`head` 로 시작하는 블록의 **안쪽**만 돌려준다(중괄호를 센다).
+
+        pet.css 의 미디어쿼리는 한 줄로 굳어 있어 정규식으로 끝을 잡으면 첫 `}` 에서
+        잘린다 — 그러면 "블록 안에 있다"는 판정이 사실상 아무것도 재지 않는다.
+        """
+        i = css.index(head) + len(head)
+        depth, j = 1, i
+        while depth:
+            ch = css[j]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+            j += 1
+        return css[i:j - 1]
+
+    def _hide_rule(self) -> str:
+        head = ".grm-pet.is-scroll-hidden{"
+        return self._brace_block(self.css, head)
+
+    def test_hide_is_opacity_only_never_geometry(self):
+        rule = self._hide_rule()
+        self.assertIn("opacity:0", rule)
+        self.assertIn("pointer-events:none", rule)
+        for banned in ("transform", "translate", "visibility", "display", "left", "top",
+                       "right", "bottom", "margin"):
+            self.assertNotIn(banned, rule,
+                             f"숨김 규칙에 기하/배치 속성({banned}) — rect 가 밀려 위치·도킹이 깨진다")
+        # 루트에는 opacity 전환만 건다(다른 속성에 전환이 붙으면 드래그가 미끄러진다).
+        root_rule = self._brace_block(self.css, ".grm-pet{")
+        self.assertIn("transition:opacity", root_rule)
+        self.assertNotIn("transition:all", root_rule)
+
+    def test_hide_rule_lives_inside_the_mobile_media_query(self):
+        mobile = self._brace_block(self.css, "@media(max-width:640px){")
+        marker = ".grm-pet.is-scroll-hidden{opacity:0;pointer-events:none"
+        self.assertIn(marker, mobile, "숨김 규칙이 모바일 블록 밖 — 데스크톱에서도 사라진다")
+        self.assertNotIn(marker, self.css.replace(mobile, "", 1),
+                         "숨김 규칙이 모바일 블록 밖에도 있다")
+
+    def test_reduced_motion_kills_the_root_transition(self):
+        # 기존 감속 블록은 `.grm-pet *`(자손)만 끈다 — 루트는 원리적으로 빠져 있었다.
+        rm = self._brace_block(self.css, "@media(prefers-reduced-motion:reduce){")
+        self.assertIn(".grm-pet,.grm-pet.is-scroll-hidden{transition:none", rm)
+
+    def test_scroll_hides_only_when_narrow_closed_and_unfocused(self):
+        self.assertIn("function isNarrow() { return window.innerWidth <= 640; }", self.js)
+        self.assertIn('root.classList.add("is-scroll-hidden")', self.js)
+        # 세 조건이 **한 줄의 계약**이다 — 하나라도 빠지면 데스크톱에서 사라지거나(폭),
+        # 열어 둔 패널이 통째로 없어지거나(패널), 키보드 포커스가 안 보이는 곳으로 간다(포커스).
+        self.assertIn(
+            "if (!isNarrow() || !panel.hidden || document.activeElement === toggle) return;",
+            self.js)
+        # 은신 복귀(0.7초)는 상태 라벨 복귀(1.5초)와 **별도 타이머**다.
+        self.assertIn("hideTimer", self.js)
+        self.assertIn("scrollTimer = setTimeout", self.js)
+        self.assertIn("hideTimer = setTimeout", self.js)
+        self.assertIn('root.classList.remove("is-scroll-hidden"); }, 700);', self.js)
+        self.assertIn("scrollTimer = setTimeout(function () { setPetState(restingState()); }, 1500);",
+                      self.js)
+
+    def test_pet_reappears_on_open_drag_and_widen(self):
+        self.assertIn('function showPet() { clearTimeout(hideTimer); '
+                      'root.classList.remove("is-scroll-hidden"); }', self.js)
+        self.assertIn("function openPanel() { showPet();", self.js)
+        self.assertIn("if (!drag.moved) { drag.moved = true; showPet();", self.js)
+        self.assertIn('window.addEventListener("resize", function () { if (!isNarrow()) showPet();',
+                      self.js)
+
+    def test_no_new_storage_key_or_network(self):
+        # 은신은 화면 상태일 뿐이다 — 저장하지도, 밖으로 보내지도 않는다.
+        for banned in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket"):
+            self.assertNotIn(banned, self.js)
+        # 손으로 센 호출 수는 낡는다 — **성질**로 잰다: 저장소를 만지는 모든 호출의
+        # 인자가 이미 문서화된 두 키(KEY·POS_KEY)여야 한다. 은신은 화면 상태일 뿐이라
+        # 새 키가 생기면 안 된다.
+        import re as _re
+        used = set(_re.findall(
+            r"localStorage\.(?:set|get|remove)Item\(\s*([A-Za-z_$][A-Za-z0-9_$]*)", self.js))
+        self.assertTrue(used, "저장소 호출을 하나도 못 찾았다 — 정규식이 낡았다")
+        self.assertEqual(used, {"KEY", "POS_KEY"}, f"새 저장소 키: {sorted(used)}")
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

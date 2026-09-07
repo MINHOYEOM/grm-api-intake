@@ -139,14 +139,29 @@ def _classify_reg_ref_family(label: str) -> str | None:
 # 였다. 개념(retention-sample·quality-unit 등)은 이미 사전에 있었지만, 사용자가 FDA
 # 문서에서 본 이름으로는 하나도 찾을 수 없었다.
 #
-# 판정 방법은 클라이언트(assets/glossary.js)가 실제로 하는 것과 동일하다(파일 직접
-# 확인, 08-04):
-#   var q = input.value.trim().toLowerCase();
-#   var hit = q === "" || (terms[i].getAttribute("data-search") || "").indexOf(q) !== -1;
-# data-search 는 템플릿(glossary.html)이 `{{ t.search }}` 로 채우고, build_glossary_view
-# 가 만드는 t["search"] 는 이미 소문자 결합이다 — 그래서 이 파일에서도
-# "검색어.lower() in t['search']" 로 같은 부분일치 판정을 재현한다(단어경계 아님, JS
-# indexOf 와 동일 의미론).
+# 판정 재료는 클라이언트(assets/glossary.js apply())가 보는 것과 같다 — data-search 는
+# 템플릿(glossary.html)이 `{{ t.search }}` 로 채우고, build_glossary_view 가 만드는
+# t["search"] 는 이미 소문자 결합이다. 그래서 이 파일도 "검색어.lower() in t['search']"
+# 로 판정한다(부분일치·단어경계 아님).
+#
+# [2026-09-07 갱신 — PR #948 "검색 정확 일치 우선·단어별 검색"] 종전엔 클라이언트 판정이
+# 한 줄뿐이었고(`var hit = q === "" || (...).indexOf(q) !== -1;`) 이 주석은 그 줄을
+# 그대로 인용하고 있었다. 지금은 낱말 수로 갈린다(파일 직접 확인, 09-07):
+#   } else if (tokens.length < 2) {
+#     // 단일 토큰: 종전과 같은 부분일치(단어경계 아님) — 도달 탐침 표의 의미론.
+#     hit = c.search.indexOf(q) !== -1;
+# 낱말이 하나면 위 한 줄이 전부라 종전과 글자 그대로 같다. 공백으로 갈린 낱말이 둘 이상
+# 이면 그 옆의 **OR 분기**로 간다 — 낱말 하나라도 t["search"] 에 있으면 히트다.
+#
+# 이 표의 의미론은 그대로지만, 이유가 "탐침이 전부 한 낱말이라서"는 아니다. 실측(09-07,
+# 아래 표를 그대로 세었다): 15건 중 한 낱말은 4건(cGMP·lyophilisation·CCIT·backup)뿐이고
+# 나머지 11건은 두~세 낱말이라 **OR 분기로 간다**. 그래도 결론이 안 바뀌는 건 함의가 한
+# 방향으로 서기 때문이다 — 검색어가 t["search"] 의 연속 부분문자열이면(= 이 파일의 판정)
+# 그 안의 낱말은 하나하나도 반드시 t["search"] 안에 있으므로 OR 분기도 반드시 히트한다.
+# 즉 이 파일의 판정은 이제 클라이언트와 "동일"이 아니라 **더 엄격한 하한**이다: 여기서
+# 초록이면 화면에서도 반드시 닿는다(거짓 초록 불가). 어긋날 수 있는 방향은 거짓 빨강
+# 한쪽뿐이라 도달 가드로는 안전하다. 15건 전부가 두 판정 모두에서 히트하는 것을 09-07 에
+# 두 의미론을 나란히 돌려 확인했다.
 #
 # (검색어, 닿아야 할 용어 id) 쌍 — web/data/glossary.json 에 사람이 코퍼스 실측으로
 # 하나씩 판정해 커밋한 aliases 데이터가 근거다(이 파일은 그 데이터를 고치지 않는다).
@@ -11810,9 +11825,11 @@ class WebGlossaryAliasGuardTest(unittest.TestCase):
 
     def test_fda_expressions_reach_their_terms(self):
         # 구현 전 실측(2026-08-03/04): _FDA_ALIAS_PROBES 의 15개 FDA 표현으로 검색하면
-        # 도달 0/15 였다. 판정은 클라이언트(assets/glossary.js apply())와 같은 방식 —
-        # 검색어.lower() 가 t["search"] 의 부분문자열인지(단어경계 아님, JS indexOf 와
-        # 동일 의미론 — 파일 상단 주석에 근거 인용).
+        # 도달 0/15 였다. 판정은 검색어.lower() 가 t["search"] 의 연속 부분문자열인지
+        # (단어경계 아님). 클라이언트(assets/glossary.js apply())의 단일 토큰 분기와
+        # 글자 그대로 같고, 낱말이 둘 이상인 탐침 11건에 대해서는 클라이언트의 OR 분기
+        # 보다 **엄격한 하한**이다(여기서 초록 → 화면에서도 반드시 도달) — 근거와 실측은
+        # 파일 상단 [A3] 주석.
         misses = []
         for query, expected_id in _FDA_ALIAS_PROBES:
             t = self.view_by_id.get(expected_id)

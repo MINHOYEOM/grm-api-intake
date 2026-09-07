@@ -768,6 +768,13 @@ def latest_brief_path(data_dir: Path) -> Path | None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # 좁은 콘솔 인코딩(cp949) 방어 — 저장소 관용구(tests/test_cli_stdout_encoding.py). '·'·'→' 는 되지만
+    # '—' 같은 문자가 산출 로그를 통째로 날린다.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description="링크드인 카드뉴스(PDF+본문) 생성")
     ap.add_argument("--data", default=str(WEB_DIR / "data" / "briefs"), help="브리프 JSON 디렉터리")
     ap.add_argument("--brief", help="특정 브리프 JSON 파일(미지정 시 최신)")

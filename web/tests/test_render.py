@@ -449,6 +449,10 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
 
         ★판정은 타입이 아니라 값으로 한다. 영어로 쓰인 상세(FDA 483·WL)는 남아야 한다 —
           그것까지 지우면 영어 독자가 볼 수 있는 것을 이유 없이 뺏는 것이다.
+        ★[2026-09-07] 고지는 **규제기관 기록을 뺀 카드에만** 붙는다(조건 분리는
+          `test_omission_notice_speaks_only_for_the_regulators_own_record`). 여기서는
+          라이브 산출물로 구조를 묻는다 — 상세를 그대로 실은 카드에는 붙지 않는가,
+          그리고 붙은 줄이 **같은 카드의 한국어판**을 실제로 가리키는가.
         """
         omitted = kept = 0
         for d in sorted((self.out / "en" / "briefs").iterdir()):
@@ -468,7 +472,20 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
                             if w != "한국어"]
                     self.assertEqual(left, [], f"{d.name}: 영어 상세에 한국어 산문 {left[:3]}")
                     kept += 1
-                omitted += len(re.findall(r'class="dt-omit"', body))
+                # ③ 상호참조 줄은 상세를 **실제로 뺀** 카드에만, 그리고 같은 카드의
+                #    한국어판을 가리킨다. 카드 단위로 봐야 "한 페이지에 둘 다 있다"가
+                #    아니라 "한 카드에 둘 다 있다"를 묻게 된다.
+                for art in re.split(r'(?=<article class="card)', body)[1:]:
+                    cid = re.match(r'<article class="card[^"]*" id="([^"]+)"', art)
+                    if 'class="block dt-xref"' not in art:
+                        continue
+                    omitted += 1
+                    self.assertNotIn('<details class="block detail"', art,
+                                     f"{d.name}: 상세를 실어 놓고 '한국어판에서 보기'도 붙였다")
+                    self.assertIsNotNone(cid, f"{d.name}: 카드 id 를 못 읽었다")
+                    self.assertRegex(
+                        art, r'class="dt-xref-go" href="[^"]*briefs/[^"]*#' + re.escape(cid.group(1)),
+                        f"{d.name}: 상호참조가 같은 카드의 한국어판을 가리키지 않는다")
         self.assertGreater(omitted, 5, "생략 고지가 거의 없다 — 게이트가 꺼졌나?")
         self.assertGreater(kept, 5, "영어 상세가 전부 사라졌다 — 값이 아니라 타입으로 걸렀나?")
 
@@ -495,6 +512,80 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
         # 한국어 트리는 손대지 않는다 — 같은 객체가 그대로 나간다.
         self.assertIs(render._detail_for_lang(en_detail, "ko"), en_detail)
         self.assertIs(render._detail_for_lang(ko_detail, "ko"), ko_detail)
+
+    def test_ko_slot_rule_is_the_suffix_not_a_hand_list(self):
+        """★[2026-09-07] `_ko` 는 **옆 칸의 국문 렌더**라는 성질이다 — 손목록이 아니다.
+
+        종전 규칙은 `(statement_ko·deficiency_ko·detail_ko) × (violations·observations·rows)`
+        였는데, 같은 성질의 슬롯이 목록 밖에 더 있었다. 그래서 영어 원문이 멀쩡히 있는데도
+        상세가 통째로 빠졌다 — 전 호 실측 **97블록**(FDA 회수 60 · WHO 실사보고서 21 ·
+        EU NCR 13 · MHRA NCR 3). 접미로 판정하면 그 셋이 저절로 살아난다.
+
+        같은 사본에서 `label` 은 우리가 붙인 **표시 어휘**라 읽는 언어로 옮긴다
+        (`facts[].label` 과 같은 규율 — 값은 옆 칸에 있고 이 칸은 이름이다).
+        """
+        en = grm_i18n.Translator("en")
+        # ① 목록 밖에 있던 모양 — 최상위 twin 슬롯(회수 상세)과 중첩 twin(WHOPIR).
+        recall = {"type": "openfda_recall_detail",
+                  "status": "Ongoing", "status_ko": "진행 중",
+                  "timeline": [{"label": "회수 착수", "date": "2026-03-21"}]}
+        kept = render._detail_for_lang(recall, "en", en)
+        self.assertIsNotNone(kept, "영어 원문이 있는 회수 상세가 통째로 빠졌다")
+        self.assertNotIn("status_ko", kept)
+        self.assertEqual(kept["status"], "Ongoing", "원문까지 지웠다")
+        self.assertEqual(kept["timeline"][0]["label"], "Recall initiated",
+                         "표시 라벨이 한국어로 남았다")
+        self.assertEqual(kept["timeline"][0]["date"], "2026-03-21", "값을 건드렸다")
+
+        whopir = {"type": "whopir_report", "outcome": "Acceptable.", "outcome_ko": "적합.",
+                  "sections": [{"no": 1, "title": "Quality management",
+                                "title_ko": "품질경영", "text": "QMS in place.",
+                                "text_ko": "QMS 를 수립하였다."}]}
+        kept = render._detail_for_lang(whopir, "en", en)
+        self.assertIsNotNone(kept, "영어 실사보고서가 통째로 빠졌다")
+        self.assertNotIn("title_ko", kept["sections"][0])
+        self.assertEqual(kept["sections"][0]["title"], "Quality management")
+
+        # ② 성질이 없는 것은 그대로 빠진다 — 영어 원문이 없는 한국어 기록.
+        self.assertIsNone(render._detail_for_lang(
+            {"type": "mfds_recall_detail", "enforcement": "자진회수"}, "en", en))
+
+        # ③ 한국어 트리는 사본조차 만들지 않는다(바이트 불변).
+        self.assertIs(render._detail_for_lang(recall, "ko"), recall)
+
+    def test_omission_notice_speaks_only_for_the_regulators_own_record(self):
+        """★[2026-09-07] 고지는 **규제기관이 한국어로 낸 기록**을 뺐을 때만 뜬다.
+
+        종전 조건은 우리가 쓴 해설(`deep_analysis`)이 한국어이기만 해도 참이었는데, 화면
+        문장은 "발행기관이 한국어로 낸 기록"이라고 말한다 — FDA·WHO 카드에서 거짓이다.
+        실측(09-07호 영문): 33장 중 **31장**에 떴고 그중 **16장**이 FDA 15 · WHO 1 이었다.
+        해설이 빠지는 쪽은 아무 말도 하지 않는다 — 그건 우리가 붙인 층이라 독자가 잃는
+        원자료가 아니고, 고지하면 독자에게 쓸모 있는 사실이 아니라 제작 사정을 알린다.
+        """
+        en = grm_i18n.Translator("en")
+        ko_analysis = {"key_violations": [{"description": "무균공정 관리가 미흡하다"}]}
+        ko_detail = {"type": "gmp_deficiencies",
+                     "rows": [{"area": "품질경영", "summary": "지적 요약"}]}
+        en_detail = {"type": "wl_violations",
+                     "violations": [{"number": 1, "statement": "Your firm failed to…"}]}
+
+        def says(**card):
+            base = {"id": "c1", "render_order": 1}
+            return render._card_view({**base, **card}, en, "en")["detail_omitted_ko"]
+
+        # ① 규제기관의 한국어 기록을 뺐다 → 말한다.
+        self.assertTrue(says(deterministic_detail=ko_detail))
+        self.assertTrue(says(deterministic_detail=ko_detail, deep_analysis=ko_analysis))
+        # ② 우리 해설만 한국어다(FDA 카드 16장의 실제 모양) → 말하지 않는다.
+        self.assertFalse(says(deep_analysis=ko_analysis))
+        self.assertFalse(says(deep_analysis=ko_analysis, deterministic_detail=en_detail))
+        # ③ 뺀 것이 없다 → 말하지 않는다(고지는 실제로 뺐을 때만).
+        self.assertFalse(says(deterministic_detail=en_detail))
+        self.assertFalse(says())
+        # ④ 한국어 트리는 판정 자체가 없다 — 상세가 그대로 실린다.
+        self.assertFalse(render._card_view(
+            {"id": "c1", "render_order": 1, "deterministic_detail": ko_detail},
+        )["detail_omitted_ko"])
 
     def test_english_briefs_disclose_why_korean_names_remain(self):
         """★영문 브리프에 남는 한글은 **한국 규제기관 문서의 업체·기관 실명**뿐이다
@@ -16951,6 +17042,11 @@ EN_NAMED_ORIGINAL_BLOCKS = (
     re.compile(r'<div class="gl-refs">.*?</div>', re.S),
     re.compile(r'<section class="gt-sec(?: gt-src)?">\s*<h2 class="gt-sec-h">'
                r'(?:Related sections|Source)</h2>.*?</section>', re.S),
+    # [2026-09-07 용어 저장] 정의 바로 아래 출처 한 줄 — 아래 `gt-src` 섹션과 **같은
+    # 값**(`definition_source`)을 한 번 더 보이는 자리다. 근거는 정의를 읽은 자리에서
+    # 보여야 하고, 그 값은 실제 문서 이름이라 옮기지도 빼지도 않는다(위 세 줄과 같은
+    # 판단). 왜 남는지는 `test_discloses_why_korean_names_remain` 이 따로 본다.
+    re.compile(r'<p class="gt-src-line">.*?</p>', re.S),
 )
 
 
@@ -17464,7 +17560,7 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "res-orig": "영문 원제가 영어판에서는 제목 그 자체다 — 병기할 것이 없다",
         "res-sum": "한국어 요약은 영어 독자에게 읽을 수 없는 줄이라 싣지 않는다",
         "cov-note": "영어 전용 고지 — 업체·기관 실명이 한국어로 남는 이유",
-        "dt-omit": "영어 전용 고지 — 한국어로 쓰인 상세를 싣지 않는 이유",
+        "dt-xref*": "영어 전용 상호참조 — 규제기관이 한국어로 낸 상세가 어디 있는지",
         # ★[2026-09-05 결정 ①] 한국어로 쓰인 상세는 영어판에 싣지 않는다. 그 하나의 판단이
         #   블록 하위 클래스 수십 개로 드러나므로 접두로 묶어 **이유를 한 번만** 적는다.
         #   영어로 쓰인 상세(FDA 483·WL 위반항목)는 남는다 — `obs-num`·`obs-orig`·`obs-en`
@@ -17492,8 +17588,8 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         # 심층분석이 없으면 카드가 2×2 facts 그리드 대신 기존 세로 표를 쓴다(설계 그대로).
         "facts-grid": "심층 카드 전용 facts 레이아웃 — 심층분석이 없으면 세로 표로 돌아간다",
         "fcell": "위와 같음", "fk": "위와 같음", "fv": "위와 같음",
-        "ti-file-search": "생략된 블록의 아이콘", "ti-table": "위와 같음",
-        "ti-file-description": "위와 같음", "ti-arrow-narrow-right": "위와 같음",
+        "ti-file-search": "생략된 블록의 아이콘",
+        "ti-file-description": "위와 같음",
     },
     "findings/doc": {
         # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은
@@ -18257,6 +18353,373 @@ class WebEnTreeTest(unittest.TestCase):
         for path in sorted(render.EN_SITEMAP_EXCLUDED):
             self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/en/{path}</loc>", self.sitemap)
             self.assertNotIn(f"<loc>{render.SITE_BASE_URL}/{path}</loc>", self.sitemap)
+
+
+# ── [용어 저장 · 내 용어장] 용어사전 저장·출처 줄·복사 (2026-09-07) ──────────────
+class WebGlossarySaveTest(unittest.TestCase):
+    """용어를 읽은 사람이 할 수 있는 다음 행동 — 저장하고, 복사하고, 근거를 본다.
+
+    ★이 클래스는 **env-gate 를 켠 빌드**를 따로 짓는다. 저장 버튼은
+      `{% if reactions_enabled %}` 안에 있어서 꺼진 빌드에는 렌더조차 되지 않는다 —
+      꺼진 빌드만 보고 초록을 만들면 이 기능 전체가 검사 밖이다(같은 사각지대를
+      2026-09-06 에 한 번 밟았다: 꺼진 빌드엔 링크가 없어 가드가 초록이었다).
+
+    ★검사 대상은 손으로 적은 용어 목록이 아니라 **정본(glossary.json)에서 파생**한다.
+      손목록은 반드시 낡는다(이 저장소가 여러 번 밟은 자리).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_glosave_"))
+        # 꺼진 빌드(기존 관례 — 골든 입력과 같은 상태).
+        cls.off = cls._tmp / "off"
+        _build_single(cls.off)
+        # 켠 빌드 — reactions env 를 테스트 안에서만 세우고 반드시 되돌린다.
+        u0, k0 = render.SUPABASE_URL, render.SUPABASE_ANON_KEY
+        try:
+            render.SUPABASE_URL = "https://rfwixqqdljpmtjdlblct.supabase.co"
+            render.SUPABASE_ANON_KEY = "anon-key"
+            assert render.reactions_enabled(), "게이트가 안 켜졌다 — 가드가 헛돈다"
+            cls.on = cls._tmp / "on"
+            _build_single(cls.on)
+        finally:
+            render.SUPABASE_URL, render.SUPABASE_ANON_KEY = u0, k0
+        cls.terms = json.loads(render.GLOSSARY_FILE.read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    #: 저장·복사 행만 잘라 낸다. ★문서 전체를 보면 안 된다 — base.html S0 스크립트 본문에
+    #: `querySelector('[data-share]')` 라는 **글자**가 있어서, 마크업에 공유 버튼이 없어도
+    #: 전수 검사가 걸린다(실측: 242장 전부). 가드는 화면에 나가는 마크업을 재야 한다.
+    _ROW_RE = re.compile(r'<div class="grm-card-actions gt-actions"[^>]*>.*?</div>', re.S)
+
+    def _page(self, root: pathlib.Path, term_id: str) -> str:
+        return (root / "glossary" / term_id / "index.html").read_text(encoding="utf-8")
+
+    def _row(self, html: str, term_id: str) -> str:
+        m = self._ROW_RE.search(html)
+        self.assertIsNotNone(m, f"저장·복사 행이 없다: {term_id}")
+        return m.group(0)
+
+    def _index(self, root: pathlib.Path, lang: str = "ko") -> dict:
+        name = "glossary-index.json" if lang == "ko" else "glossary-index.en.json"
+        return json.loads((root / "assets" / name).read_text(encoding="utf-8"))
+
+    # ── ① 켠 빌드: 저장 버튼이 전 용어에 있고, 공유 버튼은 없다 ──────────────
+    def test_every_term_page_carries_the_save_button_when_reactions_are_on(self):
+        """card_id 규약(`glossary:<id>`)이 페이지마다 서 있는가.
+
+        [data-share] 는 **일부러 없다** — S0 공유는 `location + '#' + anchor` 로 딥링크를
+        만드는데 여기 anchor 는 `glossary:oos` 라 `#glossary:oos` 가 붙은 엉뚱한 URL 이
+        된다. 없으면 S0 가 그 행을 조용히 건너뛴다.
+        """
+        missing_anchor, missing_save, has_share, has_heart = [], [], [], []
+        for t in self.terms:
+            row = self._row(self._page(self.on, t["id"]), t["id"])
+            if f'data-anchor="glossary:{t["id"]}"' not in row:
+                missing_anchor.append(t["id"])
+            if 'data-react="scrap"' not in row:
+                missing_save.append(t["id"])
+            if "data-share" in row:
+                has_share.append(t["id"])
+            # 하트는 두지 않는다(용어에 인기 집계는 뜻이 없다).
+            if 'data-react="heart"' in row:
+                has_heart.append(t["id"])
+        self.assertEqual(missing_anchor[:6], [], "저장 anchor(card_id 규약) 누락")
+        self.assertEqual(missing_save[:6], [], "저장 버튼 누락")
+        self.assertEqual(has_share[:6], [], "용어 페이지에 공유 버튼이 생겼다 — 앵커가 URL 을 망친다")
+        self.assertEqual(has_heart[:6], [], "용어 행에 하트가 생겼다")
+
+    def test_english_term_pages_carry_the_same_save_anchor(self):
+        """한국어·영문이 **같은 id** 를 쓰므로 한 번 저장이면 양쪽이 저장됨이다(의도)."""
+        en_root = self.on / "en" / "glossary"
+        seen = 0
+        for t in self.terms:
+            page = en_root / t["id"] / "index.html"
+            if not page.is_file():
+                continue
+            seen += 1
+            row = self._row(page.read_text(encoding="utf-8"), t["id"])
+            self.assertIn(f'data-anchor="glossary:{t["id"]}"', row,
+                          f'en 저장 anchor 누락: {t["id"]}')
+            self.assertIn('data-react="scrap"', row, f'en 저장 버튼 누락: {t["id"]}')
+        self.assertGreater(seen, 100, "영문 용어 페이지를 못 찾았다 — 추출이 깨졌나?")
+
+    # ── ② 꺼진 빌드: 복사는 남고 저장은 사라진다 ──────────────────────────────
+    def test_copy_stays_and_save_disappears_when_reactions_are_off(self):
+        """복사는 백엔드가 필요 없다 — env 와 무관하게 늘 있다. 저장은 게이트 뒤다."""
+        row = self._row(self._page(self.off, "oos"), "oos")
+        self.assertIn("data-copy", row, "복사 버튼은 env 와 무관해야 한다")
+        self.assertNotIn("data-react", row, "꺼진 빌드에 저장 버튼이 렌더됐다")
+        self.assertIn('data-anchor="glossary:oos"', row, "행 자체는 남아야 복사가 산다")
+
+    # ── ③ 인덱스는 정본과 같은 모집단인가 ────────────────────────────────────
+    def test_glossary_index_covers_exactly_the_canon(self):
+        """/me '저장한 용어' 는 이 인덱스로만 id 를 푼다 — 빠지면 화면에 '찾지 못함' 이 뜬다."""
+        canon = [t["id"] for t in self.terms]
+        idx = self._index(self.on)
+        self.assertEqual(sorted(e["id"] for e in idx["terms"]), sorted(canon),
+                         "용어 인덱스가 정본과 다른 모집단이다")
+        by_id = {e["id"]: e for e in idx["terms"]}
+        for t in self.terms:
+            e = by_id[t["id"]]
+            self.assertEqual(e["href"], f'/glossary/{t["id"]}/', f'href 형식: {t["id"]}')
+            # 표시 표제어는 **뷰가 언어를 정해 넘긴 값** 그대로여야 한다(무변형).
+            self.assertEqual(e["term"], t["term_ko"], f'표제어 무변형 위반: {t["id"]}')
+
+    def test_english_glossary_index_is_english(self):
+        """★영어 인덱스에 한국어 표제어가 실리면 /en/me/ 목록이 통째로 한국어가 된다 —
+        구조 파리티는 글자를 보지 못하므로(그 사각지대를 여러 번 밟았다) 값으로 잰다."""
+        idx_en = self._index(self.on, "en")
+        ko_ids = {t["id"] for t in self.terms}
+        self.assertEqual(sorted(e["id"] for e in idx_en["terms"]), sorted(ko_ids),
+                         "영어 인덱스가 정본과 다른 모집단이다")
+        by_id = {t["id"]: t for t in self.terms}
+        for e in idx_en["terms"]:
+            self.assertEqual(e["href"], f'/en/glossary/{e["id"]}/', f'en href 형식: {e["id"]}')
+            self.assertEqual(e["term"], by_id[e["id"]]["term_en"],
+                             f'en 표제어 무변형 위반: {e["id"]}')
+
+    # ── ④ 결정론 ─────────────────────────────────────────────────────────────
+    def test_glossary_index_is_deterministic_and_env_independent(self):
+        """서로 다른 두 실행(켠 빌드·꺼진 빌드)이 byte 동일한가.
+
+        인덱스는 용어 정본에서만 파생하므로 reactions env 와도 무관해야 한다 —
+        같은 빌드를 두 번 짓는 것보다 넓게 본다(빌드 1회 추가 없이).
+        """
+        for name in ("glossary-index.json", "glossary-index.en.json"):
+            self.assertEqual((self.on / "assets" / name).read_bytes(),
+                             (self.off / "assets" / name).read_bytes(),
+                             f"{name} 이 실행마다 다르다")
+
+    # ── ⑤ /me '저장한 용어' 섹션(양 언어) ────────────────────────────────────
+    def test_me_pages_have_the_saved_terms_section(self):
+        for rel, idx in (("me/index.html", "/assets/glossary-index.json"),
+                         ("en/me/index.html", "/assets/glossary-index.en.json")):
+            html = (self.on / rel).read_text(encoding="utf-8")
+            self.assertIn('id="grm-my-terms"', html, f"{rel}: 저장한 용어 컨테이너 없음")
+            self.assertIn(f'data-index="{idx}"', html, f"{rel}: 인덱스가 읽는 언어를 안 따른다")
+
+    # ── ⑥ 출처가 정의 옆에 있고, 하단 출처 섹션도 그대로다 ────────────────────
+    def test_source_sits_next_to_the_definition_and_also_stays_at_the_bottom(self):
+        """근거는 정의를 읽은 자리에서 보여야 한다. 하단 섹션은 **빼지 않는다** —
+        더한 것이지 옮긴 것이 아니다."""
+        for t in self.terms:
+            html = self._page(self.off, t["id"])
+            lede = html.find('class="gt-lede"')
+            line = html.find('class="gt-src-line"')
+            foot = html.find('class="gt-sec gt-src"')
+            self.assertGreater(line, lede, f'출처 줄이 정의보다 앞에 있다: {t["id"]}')
+            self.assertGreater(foot, line, f'하단 출처 섹션이 사라졌다: {t["id"]}')
+            # 값은 무변형 — 줄여 쓰지 않는다(실제 문서 이름이라 자르면 다른 문서가 된다).
+            # ★단언 범위를 **그 문단 안**으로 좁힌다: line~foot 사이에는 자세히·관련
+            #   조항·사례가 다 들어 있어, 넓게 잡으면 출처 줄이 비어도 통과할 수 있다.
+            para = html[line:html.index("</p>", line)]
+            self.assertIn(str(_esc(t["definition_source"])), para,
+                          f'출처 줄의 값이 정본과 다르다: {t["id"]}')
+
+    # ── ⑦ 런타임 층 얕은 가드(정적 검사가 원리적으로 못 보는 자리) ───────────
+    def test_reactions_js_wires_the_pending_save_and_the_terms_list(self):
+        """비로그인 클릭 보류 저장과 /me 목록은 런타임에서만 산다 — 배선의 **존재**를 잰다.
+
+        ★이 가드가 못 보는 것: 실제 insert 가 되는지, 목록이 그려지는지. 그건 로그인
+          세션이 필요해 사람이 본다.
+        """
+        js = (render.ASSETS_DIR / "reactions.js").read_text(encoding="utf-8")
+        for needle in ('"grm-pending-react"', "function applyPendingReact",
+                       "function renderMyTerms", 'var TERM_PREFIX = "glossary:"'):
+            self.assertIn(needle, js, f"reactions.js 배선 누락: {needle}")
+        # 손으로 센 개수가 아니라 **성질**로 잰다 — /me 렌더러들이 함께 불리는 자리라면
+        # 새 렌더러도 거기에 있어야 한다(배선 하나를 빠뜨리면 그 진입에서만 목록이 빈다).
+        wiring = [ln for ln in js.splitlines() if "renderMyScraps(); renderMyFirms();" in ln]
+        self.assertEqual(len(wiring), 3, "배선 지점이 3곳이 아니다 — 이 가드가 낡았다")
+        for ln in wiring:
+            self.assertIn("renderMyTerms()", ln, f"배선에서 renderMyTerms 누락: {ln.strip()[:70]}")
+        # '내 스크랩' 은 용어 행을 세면 안 된다(인덱스에 없어 '찾지 못함' 행이 된다).
+        self.assertIn("return !isTermId(r.card_id);", js, "스크랩 목록에서 용어 행을 안 거른다")
+
+    def test_copy_reads_the_screen_not_a_second_copy_of_the_values(self):
+        """복사 값은 화면 요소에서 읽는다 — 템플릿이 data-* 로 다시 심으면 화면과
+        클립보드가 갈라질 자리가 생긴다."""
+        tmpl = (render.TEMPLATES_DIR / "glossary_term.html").read_text(encoding="utf-8")
+        for needle in ("querySelector('.gt-lede')", "querySelector('.gt-src-name')",
+                       "location.origin+location.pathname"):
+            self.assertIn(needle, tmpl, f"복사 스크립트 배선 누락: {needle}")
+        self.assertNotIn("data-copy-text", tmpl, "값을 data-* 로 두 번 심었다")
+class SubscribePeekLinkTest(unittest.TestCase):
+    """[구독 밴드 실물 링크 2026-09-07] 밴드 설명문 아래 '이번 주 소식 먼저 보기'.
+
+    밴드는 env-param 게이트(`GRM_NEWSLETTER_FORM_ACTION`) 뒤에 있어 **로컬·CI 빌드에서는
+    아예 렌더되지 않는다** — 구조 파리티 가드가 원리적으로 못 보는 자리다. 그래서 기존
+    `test_newsletter_form_conditional` 과 같은 방식(모듈 전역 monkeypatch → 켜진 빌드)으로
+    켜 놓고 실제 HTML 을 읽는다. 검사 대상은 **화면에 나가는 문자열**(href 전체)이지
+    템플릿 소스가 아니다.
+    """
+
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_peek_"))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _render(self, briefs: list[dict]) -> pathlib.Path:
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        for br in briefs:
+            pub = br["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        return out
+
+    def test_peek_link_points_at_latest_brief_when_band_is_on(self):
+        older, latest = "2026-06-22", "2026-06-29"      # latest_slug = max(publish_date)
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render([_minimal_brief(older), _minimal_brief(latest)])
+            landing = (out / "index.html").read_text(encoding="utf-8")
+            detail = (out / "briefs" / older / "index.html").read_text(encoding="utf-8")
+            en_landing = (out / "en" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        for name, html, root in (("랜딩", landing, ""), ("브리프 상세", detail, "../../")):
+            band = html[html.index('class="subscribe"'):html.index("<footer")]
+            self.assertIn('class="sub-peek"', band, f"{name}: 링크 줄 없음")
+            self.assertIn("이번 주 소식 먼저 보기", band, f"{name}: 문구 없음")
+            # 목적지는 **최신호**다(자기 페이지가 아니라). rel_root 를 포함한 실제 href 로 잰다.
+            self.assertIn(f'<a href="{root}briefs/{latest}/index.html">', band,
+                          f"{name}: 최신호 href 아님")
+            self.assertNotIn(f'<a href="{root}briefs/{older}/index.html">', band)
+            # 폼 **위**에 온다 — 설명문 다음, 입력 앞.
+            self.assertLess(band.index('class="sub-peek"'), band.index('class="sub-form"'),
+                            f"{name}: 링크가 폼 아래에 있다")
+            # 스타일 규칙은 밴드 **안**에 있어야 기존 한글안전 가드(같은 slice)가 재 준다.
+            self.assertIn(".subscribe .sub-peek{", band,
+                          f"{name}: 규칙이 밴드 밖 — 한글안전 가드가 못 본다")
+        # 밴드 자체가 한국어 전용이라 영어판에는 링크도 없다(게이트 재확인).
+        self.assertNotIn("sub-peek", en_landing)
+
+    def test_peek_link_absent_when_band_is_off(self):
+        # 게이트 off(기본·골든 빌드) — 링크도 <style> 도 나오지 않아야 골든 byte-diff 가 0 이다.
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = ""
+            out = self._render([_minimal_brief("2026-06-29")])
+            landing = (out / "index.html").read_text(encoding="utf-8")
+            detail = (out / "briefs" / "2026-06-29" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        for html in (landing, detail):
+            self.assertNotIn("sub-peek", html)
+            self.assertNotIn("이번 주 소식 먼저 보기", html)
+
+
+class GurumiScrollHideTest(unittest.TestCase):
+    """[구름이 모바일 스크롤 은신 2026-09-07] 좁은 화면에서 스크롤하는 동안만 투명해진다.
+
+    구름이는 `position:fixed` 라 모바일에서 읽는 문장 위에 겹친다(09-06 라이브 점검·
+    09-07 Codex 점검에서 반복 관찰). 사용자 확정: **스크롤 중 숨기고 멈추면 되돌린다.**
+    위치·도킹·드래그는 그대로다.
+
+    ★이 가드가 지키는 것은 "숨는다"가 아니라 **어떻게 숨느냐**다. `setPosition`·
+    `selectNearestDock`·`savePosition` 이 전부 `root.getBoundingClientRect()` 로 재기
+    때문에 루트에 `transform`/`translate` 를 걸면 위치 저장·도킹·좌우 판정이 통째로
+    밀린다. `visibility:hidden` 은 포커스 링과 `activeElement` 판정을 흔든다. 그래서
+    허용 수단은 `opacity` + `pointer-events` 뿐이고, 규칙은 반드시 모바일 미디어쿼리
+    **안**에 있어야 한다 — 밖이면 데스크톱에서도 구름이가 사라진다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "pet.js").read_text(encoding="utf-8")
+        cls.css = (WEB_DIR / "assets" / "pet.css").read_text(encoding="utf-8")
+
+    @staticmethod
+    def _brace_block(css: str, head: str) -> str:
+        """`head` 로 시작하는 블록의 **안쪽**만 돌려준다(중괄호를 센다).
+
+        pet.css 의 미디어쿼리는 한 줄로 굳어 있어 정규식으로 끝을 잡으면 첫 `}` 에서
+        잘린다 — 그러면 "블록 안에 있다"는 판정이 사실상 아무것도 재지 않는다.
+        """
+        i = css.index(head) + len(head)
+        depth, j = 1, i
+        while depth:
+            ch = css[j]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+            j += 1
+        return css[i:j - 1]
+
+    def _hide_rule(self) -> str:
+        head = ".grm-pet.is-scroll-hidden{"
+        return self._brace_block(self.css, head)
+
+    def test_hide_is_opacity_only_never_geometry(self):
+        rule = self._hide_rule()
+        self.assertIn("opacity:0", rule)
+        self.assertIn("pointer-events:none", rule)
+        for banned in ("transform", "translate", "visibility", "display", "left", "top",
+                       "right", "bottom", "margin"):
+            self.assertNotIn(banned, rule,
+                             f"숨김 규칙에 기하/배치 속성({banned}) — rect 가 밀려 위치·도킹이 깨진다")
+        # 루트에는 opacity 전환만 건다(다른 속성에 전환이 붙으면 드래그가 미끄러진다).
+        root_rule = self._brace_block(self.css, ".grm-pet{")
+        self.assertIn("transition:opacity", root_rule)
+        self.assertNotIn("transition:all", root_rule)
+
+    def test_hide_rule_lives_inside_the_mobile_media_query(self):
+        mobile = self._brace_block(self.css, "@media(max-width:640px){")
+        marker = ".grm-pet.is-scroll-hidden{opacity:0;pointer-events:none"
+        self.assertIn(marker, mobile, "숨김 규칙이 모바일 블록 밖 — 데스크톱에서도 사라진다")
+        self.assertNotIn(marker, self.css.replace(mobile, "", 1),
+                         "숨김 규칙이 모바일 블록 밖에도 있다")
+
+    def test_reduced_motion_kills_the_root_transition(self):
+        # 기존 감속 블록은 `.grm-pet *`(자손)만 끈다 — 루트는 원리적으로 빠져 있었다.
+        rm = self._brace_block(self.css, "@media(prefers-reduced-motion:reduce){")
+        self.assertIn(".grm-pet,.grm-pet.is-scroll-hidden{transition:none", rm)
+
+    def test_scroll_hides_only_when_narrow_closed_and_unfocused(self):
+        self.assertIn("function isNarrow() { return window.innerWidth <= 640; }", self.js)
+        self.assertIn('root.classList.add("is-scroll-hidden")', self.js)
+        # 세 조건이 **한 줄의 계약**이다 — 하나라도 빠지면 데스크톱에서 사라지거나(폭),
+        # 열어 둔 패널이 통째로 없어지거나(패널), 키보드 포커스가 안 보이는 곳으로 간다(포커스).
+        self.assertIn(
+            "if (!isNarrow() || !panel.hidden || document.activeElement === toggle) return;",
+            self.js)
+        # 은신 복귀(0.7초)는 상태 라벨 복귀(1.5초)와 **별도 타이머**다.
+        self.assertIn("hideTimer", self.js)
+        self.assertIn("scrollTimer = setTimeout", self.js)
+        self.assertIn("hideTimer = setTimeout", self.js)
+        self.assertIn('root.classList.remove("is-scroll-hidden"); }, 700);', self.js)
+        self.assertIn("scrollTimer = setTimeout(function () { setPetState(restingState()); }, 1500);",
+                      self.js)
+
+    def test_pet_reappears_on_open_drag_and_widen(self):
+        self.assertIn('function showPet() { clearTimeout(hideTimer); '
+                      'root.classList.remove("is-scroll-hidden"); }', self.js)
+        self.assertIn("function openPanel() { showPet();", self.js)
+        self.assertIn("if (!drag.moved) { drag.moved = true; showPet();", self.js)
+        self.assertIn('window.addEventListener("resize", function () { if (!isNarrow()) showPet();',
+                      self.js)
+
+    def test_no_new_storage_key_or_network(self):
+        # 은신은 화면 상태일 뿐이다 — 저장하지도, 밖으로 보내지도 않는다.
+        for banned in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket"):
+            self.assertNotIn(banned, self.js)
+        # 손으로 센 호출 수는 낡는다 — **성질**로 잰다: 저장소를 만지는 모든 호출의
+        # 인자가 이미 문서화된 두 키(KEY·POS_KEY)여야 한다. 은신은 화면 상태일 뿐이라
+        # 새 키가 생기면 안 된다.
+        import re as _re
+        used = set(_re.findall(
+            r"localStorage\.(?:set|get|remove)Item\(\s*([A-Za-z_$][A-Za-z0-9_$]*)", self.js))
+        self.assertTrue(used, "저장소 호출을 하나도 못 찾았다 — 정규식이 낡았다")
+        self.assertEqual(used, {"KEY", "POS_KEY"}, f"새 저장소 키: {sorted(used)}")
 
 
 

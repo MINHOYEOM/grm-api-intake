@@ -58,7 +58,10 @@
         </div>
         <p>{{ c.blurb }}</p>
         <div class="lib-cat-f">
-          {% if c.latest_published %}<span class="lib-asof">{{ _("최근 발행 {date}", date=c.latest_published) }}</span>{% else %}<span class="lib-asof"></span>{% endif %}
+          {#- [시행 예정 2026-09-06] "발행"이 아니라 "개정"이다 — 이 날짜는 그 카탈로그에서
+              가장 최신인 문서의 날짜이고, 원천은 개정판에 그 날짜를 붙인다. 아직 오지 않은
+              날짜면 발행된 적이 없으므로 "시행 예정"으로 적는다(render.library_as_of 참조). -#}
+          {% if c.latest_published %}<span class="lib-asof">{% if c.latest_is_future %}{{ _("시행 예정 {date}", date=c.latest_published) }}{% else %}{{ _("최근 개정 {date}", date=c.latest_published) }}{% endif %}</span>{% else %}<span class="lib-asof"></span>{% endif %}
           <span class="lib-go">{{ _('바로가기') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
         </div>
       </a>
@@ -113,7 +116,7 @@
 .lib-cat-n .u{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
 .lib-cat p{color:var(--body);font-size:15px;line-height:1.62;margin:0;flex:1;word-break:keep-all}
 .lib-cat-f{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:2px;padding-top:14px;border-top:1px solid var(--line)}
-.lib-asof{font-family:var(--sans);font-size:12px;color:var(--lo)}  /* 한글 라벨("최근 발행") — §4 한글안전: mono 금지·자간 0 */
+.lib-asof{font-family:var(--sans);font-size:12px;color:var(--lo)}  /* 한글 라벨("최근 개정"/"시행 예정") — §4 한글안전: mono 금지·자간 0 */
 .lib-go{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13.5px;font-weight:500;color:var(--coral-2)}
 .lib-go .ti{font-size:15px;transition:transform .16s var(--ease)}
 .lib-cat:hover .lib-go .ti{transform:translateX(3px)}

@@ -20,7 +20,7 @@
   var toggle = $("grm-pet-toggle"), panel = $("grm-pet-panel"), close = $("grm-pet-close"), resetPos = $("grm-pet-reset-pos"), panelDragHandle = $("grm-pet-drag-handle");
   var sprite = $("grm-pet-sprite"), hero = $("grm-pet-hero-img"), talk = $("grm-pet-talk");
   var stateChip = root.querySelector("#grm-pet-state-chip b"), stateName = $("grm-pet-state-name"), stateCopy = $("grm-pet-state-copy");
-  var currentStage = -1, talkTimer, stateTimer, blinkTimer, scrollTimer, previewStage = null, drag = null, suppressClick = false, activeDock = null, nearDock = null;
+  var currentStage = -1, talkTimer, stateTimer, blinkTimer, scrollTimer, hideTimer, previewStage = null, drag = null, suppressClick = false, activeDock = null, nearDock = null;
   var states = {
     idle: { name: _t("쉬는 중"), copy: _t("새로운 소식을 기다리고 있어요") },
     reading: { name: _t("읽는 중"), copy: _t("지금 보고 있는 내용을 따라가고 있어요") },
@@ -33,6 +33,14 @@
   };
 
   function restingState() { return panel.hidden ? "idle" : "together"; }
+  // [모바일 스크롤 은신 2026-09-07] 좁은 화면에서 구름이가 읽는 문장 위에 떠 본문을
+  // 가린다(라이브 점검 반복 관찰). 스크롤 중에만 투명해지고 멈추면 제자리로 돌아온다.
+  // ★이동은 쓰지 않는다 — setPosition·selectNearestDock·savePosition 이 모두
+  // root.getBoundingClientRect() 로 재기 때문에 transform/translate 를 걸면 위치 저장·
+  // 도킹·좌우 판정이 통째로 밀린다. opacity + pointer-events 만 쓴다(visibility 도 금지 —
+  // 포커스 링과 activeElement 판정을 흔든다). 폭 기준은 이 파일이 이미 쓰는 640px.
+  function isNarrow() { return window.innerWidth <= 640; }
+  function showPet() { clearTimeout(hideTimer); root.classList.remove("is-scroll-hidden"); }
   function setPetState(name, ttl) {
     if (!states[name]) name = "idle";
     clearTimeout(stateTimer);
@@ -163,7 +171,7 @@
     if (evolved) { panel.classList.add("is-evolve"); openPanel(); say(_t("새로운 모습으로 성장했어요! ✨")); setTimeout(function () { panel.classList.remove("is-evolve"); }, 950); }
     if (celebrate) { party(); say(celebrate === "correct" ? _t("정답! 포인트가 쑥 올랐어요 ✨") : _t("좋은 도전이었어요. 다음 문제도 함께해요!")); }
   }
-  function openPanel() { panel.hidden = false; positionPanel(); toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", _t("구름이 펫 닫기")); setPetState("together"); }
+  function openPanel() { showPet(); panel.hidden = false; positionPanel(); toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", _t("구름이 펫 닫기")); setPetState("together"); }
   function closePanel() { panel.hidden = true; toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", _t("구름이 펫 열기")); if (previewStage !== null) refresh(); setPetState("idle"); }
   function say(text) { talk.textContent = text; talk.classList.add("show"); clearTimeout(talkTimer); talkTimer = setTimeout(function () { talk.classList.remove("show"); }, 3000); }
   function particles(count) {
@@ -198,7 +206,7 @@
     if (!drag || drag.id !== e.pointerId) return;
     var dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
     if (!drag.moved && Math.hypot(dx, dy) < 5) return;
-    if (!drag.moved) { drag.moved = true; activeDock = null; renderDocks(); dockLayer.classList.add("show"); setPetState("moving"); }
+    if (!drag.moved) { drag.moved = true; showPet(); activeDock = null; renderDocks(); dockLayer.classList.add("show"); setPetState("moving"); }
     root.classList.add("is-dragging"); e.preventDefault(); setPosition(drag.x + dx, drag.y + dy); selectNearestDock();
   }
   function endDrag(e) {
@@ -227,11 +235,22 @@
   close.addEventListener("click", closePanel); resetPos.addEventListener("click", resetPosition); $("grm-pet-pat").addEventListener("click", pat);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !panel.hidden) { closePanel(); toggle.focus(); } });
   document.addEventListener("visibilitychange", function () { setPetState(document.visibilityState === "hidden" ? "sleeping" : restingState()); });
-  document.addEventListener("scroll", function () { if (document.visibilityState === "hidden" || drag) return; clearTimeout(scrollTimer); setPetState("reading"); scrollTimer = setTimeout(function () { setPetState(restingState()); }, 1500); }, { passive: true });
+  document.addEventListener("scroll", function () {
+    if (document.visibilityState === "hidden" || drag) return;
+    clearTimeout(scrollTimer); setPetState("reading");
+    scrollTimer = setTimeout(function () { setPetState(restingState()); }, 1500);
+    // 숨기는 조건은 셋 다 참일 때뿐: 좁은 화면 · 패널이 닫혀 있음 · 오브에 포커스가
+    // 없음(키보드 사용자의 포커스를 안 보이는 곳으로 보내지 않는다). 드래그 중은
+    // 위 early return 이 이미 막는다.
+    if (!isNarrow() || !panel.hidden || document.activeElement === toggle) return;
+    root.classList.add("is-scroll-hidden");
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () { root.classList.remove("is-scroll-hidden"); }, 700);
+  }, { passive: true });
   document.addEventListener("pointerover", function (e) { if (e.target.closest && e.target.closest(".qz-choice")) setPetState("thinking", 2400); });
   document.addEventListener("focusin", function (e) { if (e.target.closest && e.target.closest(".qz-choice")) setPetState("thinking", 2400); });
   window.addEventListener("storage", function (e) { if (e.key === KEY) refresh(); });
-  window.addEventListener("resize", function () { if (activeDock) setDock(activeDock, false); else restorePosition(); renderDocks(); if (!panel.hidden) positionPanel(); });
+  window.addEventListener("resize", function () { if (!isNarrow()) showPet(); if (activeDock) setDock(activeDock, false); else restorePosition(); renderDocks(); if (!panel.hidden) positionPanel(); });
   window.addEventListener("grm:gurumi-change", function (e) { var correct = e.detail && e.detail.correct; refresh(e.detail ? (correct ? "correct" : "try") : null); setPetState(correct ? "ready" : "retry", 3200); });
   setTimeout(function () { if (panel.hidden) say(_t("저를 눌러 성장 상태를 확인해 보세요")); }, 1600);
   window.GurumiPet = { refresh: refresh, derive: derive, stages: stages, celebrate: party, setState: setPetState, setDock: setDock };

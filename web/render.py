@@ -1200,14 +1200,23 @@ def _md_inline(text: str) -> str:
     return esc
 
 
-def render_guide_html(md_text: str) -> tuple[str, list[dict[str, str]], Markup]:
+def render_guide_html(md_text: str, *,
+                      keep_line_breaks: bool = False,
+                      ) -> tuple[str, list[dict[str, str]], Markup]:
     """제한 md 서브셋 → (페이지 제목, h2 목차, 본문 HTML). 순수·결정론(같은 입력 → byte 동일).
 
     최상위 `# ` 헤딩은 페이지 제목으로 빼고 본문에는 넣지 않는다(템플릿 page-head 가 렌더).
     `## ` 헤딩은 등장 순서 기반 안정 앵커(id="sec-N")를 부여하고 목차 리스트
     [{id, title(마커 제거 평문)}] 로도 반환한다 — 템플릿 상단 목차가 소비(결정론 파생).
     반환 본문은 Markup 이라 Jinja autoescape 가 다시 이스케이프하지 않는다 — 단, 모든
-    사용자 표시 텍스트는 _md_inline 이 이미 escape 했으므로 안전(제한 태그만 raw)."""
+    사용자 표시 텍스트는 _md_inline 이 이미 escape 했으므로 안전(제한 태그만 raw).
+
+    ★`keep_line_breaks` — 문단 **안**의 원본 줄바꿈을 화면 줄바꿈으로 낸다(`<br>`).
+      기본값(False)은 종전대로 한 칸으로 이어 붙이므로 이용안내는 바이트 불변이다.
+      소개 페이지가 이걸 켠다: 어디서 줄을 나눌지는 문안을 쓰는 사람이 정하는 일이고,
+      그러려면 **정본 파일의 줄이 곧 화면의 줄**이어야 한다. 줄 끝 두 칸 같은 눈에 안
+      보이는 표식은 쓰지 않는다 — 이 변환기는 줄마다 rstrip 하므로 애초에 남지 않고,
+      보이지 않는 문자에 의미를 싣는 규칙은 다음 사람이 반드시 지운다."""
     title = ""
     toc: list[dict[str, str]] = []
     blocks: list[str] = []
@@ -1215,7 +1224,14 @@ def render_guide_html(md_text: str) -> tuple[str, list[dict[str, str]], Markup]:
 
     def flush_para() -> None:
         if para:
-            blocks.append(f"<p>{_md_inline(' '.join(para))}</p>")
+            if keep_line_breaks:
+                # `_md_inline` 은 **이미 escape 된 문자열**을 돌려준다 — `Markup.join` 으로
+                # 이으면 그것을 한 번 더 escape 해 화면에 `&lt;` 가 그대로 보인다(테스트가
+                # 잡았다). 아래 갈래와 같이 순수 str 로 잇고, `<p>` 조립도 같은 모양을 쓴다.
+                body = "<br>".join(_md_inline(ln) for ln in para)
+            else:
+                body = _md_inline(" ".join(para))
+            blocks.append(f"<p>{body}</p>")
             para.clear()
 
     lines = md_text.split("\n")
@@ -1339,10 +1355,10 @@ def render_about_html(md_text: str) -> tuple[str, Markup, list[dict[str, Any]]]:
             lead_lines.append(raw)
         else:
             cur["lines"].append(raw)
-    _, _, lead = render_guide_html("\n".join(lead_lines))
+    _, _, lead = render_guide_html("\n".join(lead_lines), keep_line_breaks=True)
     sections = []
     for c in chunks:
-        _, _, body = render_guide_html("\n".join(c["lines"]))
+        _, _, body = render_guide_html("\n".join(c["lines"]), keep_line_breaks=True)
         sections.append({"id": c["id"], "title": c["title"], "slot": c["slot"], "body": body})
     return title, lead, sections
 

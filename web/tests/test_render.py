@@ -13713,6 +13713,35 @@ class WebAboutTest(unittest.TestCase):
         # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
         self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
 
+    def test_source_line_is_the_screen_line(self):
+        """[줄바꿈 2026-09-07] 소개 면은 **정본 파일의 줄이 곧 화면의 줄**이다 — 문단 안의
+        줄바꿈을 `<br>` 로 낸다. 어디서 줄을 나눌지는 문안을 쓰는 사람이 정하는 일이라,
+        그 결정이 CSS 폭이 아니라 파일에 남아 있어야 한다(사용자가 직접 손보는 파일이다).
+
+        ★이용안내는 **영향을 받지 않는다.** 같은 변환기를 쓰지만 옵션이 꺼져 있어 종전대로
+        한 칸으로 이어 붙인다 — 공유 함수에 옵션을 다는 변경에서 가장 먼저 깨지는 것이
+        '옵션을 안 켠 쪽'이라, 그쪽을 여기서 함께 못 박는다."""
+        # md 의 문단 안 줄 수 - 1 = 그 문단의 <br> 수. 문단은 빈 줄로 갈린다.
+        expected = 0
+        for block in self.md.split("\n\n"):
+            body = [ln for ln in block.split("\n")
+                    if ln.strip() and not ln.startswith(("#", "- "))]
+            expected += max(0, len(body) - 1)
+        self.assertGreater(expected, 0, "정본에 문단 안 줄바꿈이 하나도 없다 — 계약이 무의미해진다")
+        main = self.html[self.html.index("<main>"):self.html.index("</main>")]
+        self.assertEqual(main.count("<br>"), expected)
+        # 이용안내는 같은 변환기를 쓰지만 줄바꿈을 살리지 않는다(옵션 기본값 off).
+        guide_md = "본문 첫 줄\n본문 둘째 줄\n"
+        _, _, joined = render.render_guide_html(guide_md)
+        self.assertNotIn("<br>", joined)
+        self.assertIn("본문 첫 줄 본문 둘째 줄", joined)
+        _, _, broken = render.render_guide_html(guide_md, keep_line_breaks=True)
+        self.assertIn("<br>", broken)
+        # 이스케이프는 두 갈래 모두 유지된다(줄바꿈을 살리려고 raw 로 흘리지 않았는지).
+        _, _, esc = render.render_guide_html("a <b> & c\nd\n", keep_line_breaks=True)
+        self.assertIn("&lt;b&gt;", esc)
+        self.assertIn("&amp;", esc)
+
     def test_widgets_are_placed_by_slots_declared_in_the_markdown(self):
         """[확정안 2026-09-06] 링크·버튼은 md 서브셋이 표현할 수 없어 템플릿이 그리지만,
         **어느 절에** 그릴지는 md 의 `## 제목 {slot}` 이 정한다. 문안을 손보는 사람이 절을

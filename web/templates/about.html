@@ -54,7 +54,7 @@
    서체·크기로 갈린다. 색으로 구분하려고 넣었던 coral 라벨은 그래서 되돌린다.
    §4 한글안전: 자간·대문자 미사용 — 그 속성 이름은 한국어로만 적는다(이 주석은 HTML 로
    나가고 `WebKoreanSafetyTest` 가 문자열로 훑어 자기 설명에 걸린 적이 있다). */
-.about-head h1{max-width:600px;text-wrap:balance;word-break:keep-all}
+.about-head h1{max-width:none;text-wrap:balance;word-break:keep-all}  /* 제목은 넓은 화면에서 한 줄로 간다(사용자 지정) — 폭을 600px 로 묶으면 무조건 두 줄이 된다. 좁아지면 어절에서 접히고, 그때 balance 가 두 줄 길이를 고르게 만든다. */
 .about-head .about-lead p{color:var(--body);margin-top:24px;font-size:17.5px;line-height:1.72;max-width:600px;word-break:keep-all;text-wrap:pretty}
 .about-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 .about-cta .btn{font-size:14.5px}

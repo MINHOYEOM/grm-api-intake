@@ -56,6 +56,19 @@ class QuizLintFixture:
         item.update(updates)
         return item
 
+    @staticmethod
+    def _answer_at(item, position):
+        """정답 선택지를 `position` 자리로 옮긴다 — 내용은 그대로, 자리만 바꾼다.
+
+        정답 위치 게이트(`WEEK_ANSWER_POSITION`)가 생기면서 "유효한 주차 세트" 픽스처는
+        정답 자리를 흩어야 한다.  `answer_index` 만 바꾸면 선택지 내용과 어긋나므로
+        선택지 자체를 옮겨 두 값을 함께 맞춘다.
+        """
+        choices = list(item["choices"])
+        answer = choices.pop(item["answer_index"])
+        choices.insert(position, answer)
+        return dict(item, choices=choices, answer_index=position)
+
     def _lint(self, items):
         self._write(self.quiz_path, items)
         return ql.lint_quiz_bank(self.quiz_path, self.glossary_path, self.briefs_dir)
@@ -72,22 +85,28 @@ class QuizLintTest(QuizLintFixture, unittest.TestCase):
         report = self._lint(
             [
                 self._item(),
-                self._item(id="q-202653-01", week="202653"),
-                self._item(
-                    id="q-202653-02",
-                    question_ko="카드에 명시된 조치는 무엇인가요?",
-                    source_type="brief",
-                    source_ref="https://grm-solutions.com/briefs/2026-07-12/#card-1",
-                    difficulty="easy",
-                    week="202653",
+                self._answer_at(self._item(id="q-202653-01", week="202653"), 0),
+                self._answer_at(
+                    self._item(
+                        id="q-202653-02",
+                        question_ko="카드에 명시된 조치는 무엇인가요?",
+                        source_type="brief",
+                        source_ref="https://grm-solutions.com/briefs/2026-07-12/#card-1",
+                        difficulty="easy",
+                        week="202653",
+                    ),
+                    1,
                 ),
-                self._item(
-                    id="q-202653-03",
-                    question_ko="카드에 명시된 다른 조치는 무엇인가요?",
-                    source_type="brief",
-                    source_ref="https://grm-solutions.com/briefs/2026-07-12/#카드-2",
-                    difficulty="normal",
-                    week="202653",
+                self._answer_at(
+                    self._item(
+                        id="q-202653-03",
+                        question_ko="카드에 명시된 다른 조치는 무엇인가요?",
+                        source_type="brief",
+                        source_ref="https://grm-solutions.com/briefs/2026-07-12/#카드-2",
+                        difficulty="normal",
+                        week="202653",
+                    ),
+                    2,
                 ),
                 self._item(
                     id="q-ext",
@@ -278,12 +297,15 @@ class QuizQualityGateTest(QuizLintFixture, unittest.TestCase):
         return base
 
     def _valid_week(self):
-        """게이트를 모두 통과하는 최소 세트 — 개념 1 + 브리프 3, easy 3 / normal 1."""
+        """게이트를 모두 통과하는 최소 세트 — 개념 1 + 브리프 3, easy 3 / normal 1.
+
+        정답 자리도 네 곳으로 흩는다(§3.9 `WEEK_ANSWER_POSITION`).
+        """
         return self._week_set(
-            self._concept(),
-            self._brief(1),
-            self._brief(2),
-            self._brief(3, difficulty="normal"),
+            self._answer_at(self._concept(), 0),
+            self._answer_at(self._brief(1), 1),
+            self._answer_at(self._brief(2), 2),
+            self._answer_at(self._brief(3, difficulty="normal"), 3),
         )
 
     def test_balanced_week_set_passes(self):
@@ -323,6 +345,41 @@ class QuizQualityGateTest(QuizLintFixture, unittest.TestCase):
             self._brief(3, difficulty="normal"),
         )
         self.assertIn("WEEK_LONGEST_ANSWER", self._codes(self._lint(items)))
+
+    def test_week_where_the_answer_always_sits_in_the_same_slot_is_rejected(self):
+        """정답 자리 쏠림 — 선택지는 렌더에서 섞이지 않으므로 그대로 "n번만 찍기"다.
+
+        2026-09-07 실측: 공개된 202634·202635·202636 이 연속으로 [0,0,0,0] 이었고
+        "무조건 1번" 전략이 3주 연속 100점이었다(무작위 25%).  길이 편향은 문항·세트
+        두 겹으로 막으면서 위치는 한 겹도 없었다.
+        """
+        def at(positions):
+            base = [
+                self._concept(), self._brief(1), self._brief(2),
+                self._brief(3, difficulty="normal"),
+            ]
+            return self._week_set(
+                *[self._answer_at(item, position)
+                  for item, position in zip(base, positions)]
+            )
+
+        # 전부 같은 자리 — 한 자리만 찍으면 만점이다.  0번이 아닌 자리도 같이 고정한다.
+        for stuck in ([0, 0, 0, 0], [1, 1, 1, 1], [3, 3, 3, 3]):
+            self.assertIn(
+                "WEEK_ANSWER_POSITION", self._codes(self._lint(at(stuck))),
+                f"{stuck}: 정답 자리 쏠림을 게이트가 놓쳤습니다",
+            )
+
+        # 4문항 중 3문항(75%)도 막는다 — "전부 같을 때만" 막는 게이트였다면 여기서
+        # 통과하고, 막으려던 결함이 4분의 3만큼 남는다.
+        self.assertIn("WEEK_ANSWER_POSITION", self._codes(self._lint(at([0, 0, 0, 1]))))
+
+        # 정확히 절반(과반 아님)과 완전 분산은 통과해야 한다 — off-by-one 고정.
+        for spread in ([0, 0, 1, 1], [2, 1, 3, 0], [0, 1, 2, 3]):
+            self.assertNotIn(
+                "WEEK_ANSWER_POSITION", self._codes(self._lint(at(spread))),
+                f"{spread}: 과반 미만인데 막았습니다",
+            )
 
     def test_week_size_and_difficulty_mix_are_enforced(self):
         too_many = self._valid_week() + self._week_set(self._brief(9, id="q-brief-9"))
@@ -379,6 +436,37 @@ class QuizQualityGateTest(QuizLintFixture, unittest.TestCase):
             self.assertIn(
                 "WEEK_SOURCE_MIX", self._codes(report),
                 f"{week}: 브리프 전용 세트를 게이트가 놓쳤습니다\n{report.format()}",
+            )
+
+    def test_answer_position_exemption_is_closed_to_the_past(self):
+        """위치 게이트 면제도 미래로 새면 안 된다 — 상한과 분리를 함께 고정한다."""
+        newest_exempt = max(ql.ANSWER_POSITION_GRANDFATHERED_WEEKS)
+        self.assertLessEqual(newest_exempt, "202636", "신규 주차를 면제 목록에 넣지 않는다")
+
+        # 전체 면제(GRANDFATHERED_WEEKS)와 겹치면 안 된다.  겹치는 순간 그 주차는
+        # 지금 통과하고 있는 길이·크기·난이도 게이트 4종까지 함께 잃는다.
+        self.assertFalse(
+            ql.ANSWER_POSITION_GRANDFATHERED_WEEKS & ql.GRANDFATHERED_WEEKS,
+            "규칙별 면제는 전체 면제와 겹치지 않는다",
+        )
+
+    def test_position_exempt_weeks_would_be_caught_if_they_were_new(self):
+        """역적용 증명 — 저 주차들이 통과하는 이유가 "면제"가 맞는지 확인한다.
+
+        면제 주차 세트를 그대로 신규 주차로 옮기면 반드시 걸려야 한다.  0건이면 면제가
+        아니라 **게이트가 아무것도 막지 못하는 것**이고, 그 구분은 이 역적용으로만 난다.
+        """
+        bank = json.loads(ql.DEFAULT_QUIZ_BANK.read_text(encoding="utf-8"))
+        for week in sorted(ql.ANSWER_POSITION_GRANDFATHERED_WEEKS):
+            entries = [q for q in bank if str(q.get("week", "")) == week]
+            self.assertTrue(entries, f"{week} 세트가 뱅크에 없습니다")
+            moved = [dict(q, week=self.NEW_WEEK) for q in entries]
+            report = ql.lint_quiz_bank(
+                self._materialise(moved), ql.DEFAULT_GLOSSARY, ql.DEFAULT_BRIEFS_DIR
+            )
+            self.assertIn(
+                "WEEK_ANSWER_POSITION", self._codes(report),
+                f"{week}: 정답 자리 쏠림을 게이트가 놓쳤습니다\n{report.format()}",
             )
 
     def _materialise(self, items) -> Path:

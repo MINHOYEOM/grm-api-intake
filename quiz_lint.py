@@ -68,6 +68,29 @@ WEEKLY_QUIZ_MIN = 3
 # 정답이 오답 최장보다 이만큼(문자) 길면 길이만 보고 정답을 고를 수 있다고 본다.
 ANSWER_LENGTH_LEAD_MAX = 12
 
+# ── 정답 위치 게이트(2026-09-07 신설) ──────────────────────────────────────────
+# 길이 편향은 문항(ANSWER_LENGTH_LEAD)과 세트(WEEK_LONGEST_ANSWER) 두 겹으로 막으면서
+# **위치**는 한 겹도 없었다.  answer_index 는 0~3 범위만 봤을 뿐이다.
+#
+# choices 는 렌더 시점에 섞이지 않는다 — web/assets/quiz.js 의 유일한 정렬은 문항 선택
+# 순서(a.index - b.index)이고 선택지는 저장된 순서 그대로 그려진다.  따라서 answer_index
+# 는 "내부 표현"이 아니라 **사용자가 보는 위치 그 자체**다.
+#
+# 실측(2026-09-07, 공개된 뱅크): 202634·202635·202636 이 연속으로 [0,0,0,0].
+# "무조건 1번 찍기" 전략이 3주 연속 100점이었다(무작위 25%).
+#
+# 판정 기준은 길이 게이트와 같은 잣대다 — 한 위치만 찍는 전략이 **과반을 풀면 안 된다**.
+# 전부 같은 위치(100%)만 막으면 [0,0,0,1](75%)이 그대로 통과하는데, 그것은 막으려던
+# 결함이 4분의 3만큼 남아 있는 상태다.
+#
+# 면제는 **이 규칙 전용 집합**으로 둔다.  위 GRANDFATHERED_WEEKS 에 넣지 않는 이유는
+# 두 가지다. (1) 그 집합은 "줄어들기만 한다"가 불변식이고 테스트
+# (test_grandfathered_weeks_are_closed_to_the_past)와 생성 프롬프트 §4-4 가 그것을
+# 기계로 고정한다.  (2) 그 집합은 **모든** 게이트를 면제하므로, 202634~202636 이
+# 지금 통과하고 있는 길이·크기·난이도 게이트 4종까지 함께 잃는다.  규칙마다 신설
+# 시점이 다르니 면제도 규칙별로 닫는다.  이 집합도 줄어들기만 한다.
+ANSWER_POSITION_GRANDFATHERED_WEEKS = frozenset({"202634", "202635", "202636"})
+
 # Machine-readable schema kept beside the dependency-free validator.  The manual
 # checks below implement this contract without adding jsonschema to requirements.
 QUIZ_BANK_SCHEMA: dict[str, Any] = {
@@ -531,8 +554,41 @@ def _validate_answer_length(item: dict[str, Any], index: int, report: LintReport
         )
 
 
+def _validate_week_answer_positions(
+    week: str, entries: list[dict[str, Any]], location: str, report: LintReport
+) -> None:
+    """세트 안에서 정답이 앉는 **자리**가 한쪽으로 쏠렸는가.
+
+    선택지는 렌더 시점에 섞이지 않으므로 answer_index 는 사용자가 보는 위치 그 자체다.
+    한 자리만 찍는 전략이 과반을 맞히면 그 세트는 지문을 읽지 않아도 풀린다.
+    """
+    if week in ANSWER_POSITION_GRANDFATHERED_WEEKS:
+        return
+
+    positions = [
+        item["answer_index"]
+        for item in entries
+        if type(item.get("answer_index")) is int and 0 <= item["answer_index"] <= 3
+    ]
+    # 스키마가 이미 깨진 세트는 건너뛴다 — ANSWER_INDEX/FIELD_TYPE 가 이미 보고했다.
+    if len(positions) != len(entries) or not positions:
+        return
+
+    counts = Counter(positions)
+    top_count = max(counts.values())
+    top_index = min(index for index, value in counts.items() if value == top_count)
+    if top_count * 2 > len(positions):
+        report.add(
+            "WEEK_ANSWER_POSITION",
+            location,
+            f"{len(positions)}문항 중 {top_count}문항의 정답이 {top_index + 1}번 자리입니다 "
+            f"(자리 배치 {[position + 1 for position in positions]}) — "
+            f'"{top_index + 1}번만 찍기"로 과반이 풀립니다 (과반 미만이어야 합니다)',
+        )
+
+
 def _validate_week_sets(data: list[Any], report: LintReport) -> None:
-    """주차 세트 단위 게이트 — 문항 수·출처 구성·난이도 구성·길이 편향 쏠림.
+    """주차 세트 단위 게이트 — 문항 수·출처 구성·난이도 구성·길이 편향·정답 위치 쏠림.
 
     문항 하나하나는 멀쩡해도 세트로 묶였을 때 "그 주 브리프를 안 읽으면 전부 찍기"이거나
     "가장 긴 것만 찍으면 과반"이 될 수 있다.  그 구멍은 세트 단위로만 보인다.
@@ -592,6 +648,8 @@ def _validate_week_sets(data: list[Any], report: LintReport) -> None:
                 f"{count}문항 중 {longest}문항에서 정답이 유일 최장 선택지입니다 — "
                 '"가장 긴 것 찍기"로 과반이 풀립니다 (과반 미만이어야 합니다)',
             )
+
+        _validate_week_answer_positions(week, entries, location, report)
 
 
 def lint_quiz_bank(

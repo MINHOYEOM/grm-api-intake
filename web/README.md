@@ -234,6 +234,11 @@ python web/render.py    --data /tmp/checked    --out web/dist        # enrich �
    (용어사전 출처 이름 · 자료실 카탈로그 원제): **이름은 그대로 보이고 화면이 이유를
    밝힌다.** 그래야 영어 독자가 그 문서를 실제로 찾을 수 있다. 감추는 것이 곧 정직한
    것은 아니다 — 밝히는 것이 정직한 것이다.
+21. **브리프 카드 본문의 용어 링크는 지적문서 페이지와 같은 엔진이다(2026-09-08)** —
+   summary·핵심 사실(key_facts)·시사점(implication)·점검 사항(checks)에 `_doc_term_find`·
+   `link_terms_in_text`(문서 자동링크와 동일 함수)로 링크를 건다. 선정은 브리프 아카이브
+   카드 빈도 희소 우선(`build_brief_term_card_freq`)·상한 `_BRIEF_TERM_LINK_MAX`(20)·
+   페이지당 용어 1회 — 제목·원문 인용·사실 표에는 링크하지 않는다.
 
 ## 빈 슬롯 · KO · 링크 상태 처리
 - **빈 LLM 슬롯**(title_issue·summary·key_facts·implication·checks·tldr·번역): 빈 값이면 해당 블록/줄 **생략**. 실 6/22 는 산문이 전부 빈 placeholder → 코드 필드만 렌더되는 상태가 정상(구조 골든으로 유효).

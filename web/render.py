@@ -431,12 +431,22 @@ def brief_has_english(brief: dict[str, Any]) -> bool:
     return bool(cards) and all(card_has_english(c) for c in cards)
 
 
+def _card_with_english_narrative(card: dict[str, Any], lang: str) -> dict[str, Any]:
+    """영어 트리면 `card["en"]` 의 서사 다섯을 덮어쓴 사본, 아니면 card 그대로.
+
+    [용어 자동 링크 2026-09-08] `_card_view`·`_card_index_entry`·`_card_term_link_blob`
+    이 같은 식을 세 번 따로 두지 않도록 뽑아냈다(의미 동일 — 골든이 증명한다).
+    """
+    if lang != DEFAULT_LANG and card_has_english(card):
+        return {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
+    return card
+
+
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG) -> dict[str, Any]:
     # [다국어 5단계] 서사 다섯은 언어에 따라 **다른 출력**을 쓴다(번역이 아니라 같은
     # 요약의 다른 언어판 — 설계 문서 §4). 영어 슬롯이 없으면 한국어 그대로다.
-    if lang != DEFAULT_LANG and card_has_english(card):
-        card = {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
+    card = _card_with_english_narrative(card, lang)
     quotes_in = card.get("quotes") or []
     multi = len(quotes_in) > 1
     any_trans = any(q.get("translation") for q in quotes_in)  # null·"" 둘 다 falsy
@@ -2238,7 +2248,15 @@ def _doc_term_pattern(surface: str, ignore_case: bool) -> "re.Pattern[str]":
 def _doc_term_find(
     text: str, surface: str, start: int = 0, lang: str = DEFAULT_LANG,
 ) -> int:
-    """등장 위치. 라틴 표면형은 낱말 경계를 요구한다(`API` 가 `RAPID` 안에 걸리면 안 된다)."""
+    """등장 위치. 라틴 표면형은 낱말 경계를 요구한다(`API` 가 `RAPID` 안에 걸리면 안 된다).
+
+    ★[한글 낱말 시작 규칙 2026-09-08] 한글은 낱말 경계가 없어 표면형이 다른 낱말 **중간**
+      에도 걸린다(문서 코퍼스 3,310장 매칭의 3.3%·1,138쌍 실측): `회수율`→"수율",
+      `소독용에탄올`→"소독", `기준일탈(OOS)`→"일탈", `미문서화`→"문서화",
+      `위탁제조시설`→"제조". 한국어 경로에서 표면형에 한글 음절이 하나라도 있으면
+      **매치 위치 바로 앞 글자가 한글 음절인 자리**는 건너뛴다(뒤쪽은 조사가 바로
+      붙으므로 그대로 둔다 — 기존 verbish 규칙이 이미 뒤쪽을 본다).
+    """
     if lang != DEFAULT_LANG:
         # 영어는 대소문자가 문장 안에서 바뀌어도 같은 표제어다. 다만 낱말 경계는
         # 표제어 전체에 적용해 `quality`가 `inequality` 안에 걸리는 일을 막는다.
@@ -2263,10 +2281,29 @@ def _doc_term_find(
     if _LATIN_TOKEN.match(surface):
         m = _doc_term_pattern(surface, False).search(text, start)
         return m.start() if m else -1
+    hangul_surface = bool(_HANGUL_RE.search(surface))
     pos = text.find(surface, start)
-    while pos >= 0 and _doc_term_is_verbish(text, pos, pos + len(surface)):
+    while pos >= 0 and (
+        _doc_term_is_verbish(text, pos, pos + len(surface))
+        or (hangul_surface and pos > 0 and _HANGUL_RE.match(text[pos - 1]))
+    ):
         pos = text.find(surface, pos + 1)
     return pos
+
+
+def _select_term_links_from_blob(
+    blob: str, index: list[tuple[str, str]], freq: dict[str, int],
+    limit: int, lang: str = DEFAULT_LANG,
+) -> list[tuple[str, str]]:
+    """공용 선정 로직(문서 페이지·브리프 페이지가 공유) — 텍스트 덩어리 하나에서 희소
+    (freq 낮은) 용어 우선·용어당 1 개를 뽑는다. 정렬 키는 반드시 `(freq, tid)` — 결정론
+    (같은 입력 → 같은 바이트)."""
+    best: dict[str, str] = {}
+    for surface, tid in index:                     # index 가 긴 표면형 우선이라 첫 매치가 최장
+        if tid not in best and _doc_term_find(blob, surface, lang=lang) >= 0:
+            best[tid] = surface
+    ranked = sorted(best.items(), key=lambda kv: (freq.get(kv[0], 0), kv[0]))
+    return [(surface, tid) for tid, surface in ranked[:limit]]
 
 
 def select_doc_term_links(
@@ -2282,12 +2319,7 @@ def select_doc_term_links(
     blob = "\n".join(
         (f.get("text_ko") or "") if lang == DEFAULT_LANG else finding_body(f, lang)
         for f in doc.get("findings") or [])
-    best: dict[str, str] = {}
-    for surface, tid in index:                     # index 가 긴 표면형 우선이라 첫 매치가 최장
-        if tid not in best and _doc_term_find(blob, surface, lang=lang) >= 0:
-            best[tid] = surface
-    ranked = sorted(best.items(), key=lambda kv: (doc_freq.get(kv[0], 0), kv[0]))
-    return [(surface, tid) for tid, surface in ranked[:limit]]
+    return _select_term_links_from_blob(blob, index, doc_freq, limit, lang)
 
 
 def link_terms_in_text(
@@ -2320,6 +2352,94 @@ def link_terms_in_text(
         cursor = end
     out.append(str(_escape(text[cursor:])))
     return Markup("".join(out))
+
+
+# ── [브리프 카드 용어 자동 링크 2026-09-08] 지적문서 페이지(`/findings/doc/<slug>/`)와
+# 같은 엔진(`_doc_term_find`·`link_terms_in_text`)을 카드 본문(summary·핵심 사실·시사점·
+# 점검 사항)에도 쓴다. 모집단이 문서가 아니라 브리프 아카이브 카드라 희소도 분모를
+# 새로 잰다(`build_brief_term_card_freq`) — 문서 페이지의 `build_doc_term_doc_freq` 와
+# 같은 결. 실측(최근 5개 호): 카드 본문에 표제어가 매주 45~60개 걸리는데 카드 수 기준
+# 상위는 늘 제조·규격·품질보증 같은 일반어라, 빈도 순이 아니라 **희소 우선 + 상한**으로
+# 고른다(설계 문서 §1).
+_BRIEF_TERM_LINK_MAX = 20     # 한 브리프 페이지에서 링크할 용어 수 상한(실측 45~60 히트 중 드문 20)
+
+
+def _card_term_link_blob(card: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
+    """카드에서 용어 링크 후보를 찾을 텍스트 — `summary`·`key_facts` 항목들·`implication`·
+    `checks` 항목들을 이 순서로 `"\\n"` 결합한다. `title_issue`·`headline_target`·facts
+    값·quotes·merged_items 는 넣지 않는다(제목·원문 인용·사실 표에는 링크를 걸지 않는다).
+    """
+    card = _card_with_english_narrative(card, lang)
+    parts: list[str] = []
+    if card.get("summary"):
+        parts.append(card["summary"])
+    parts += [k for k in (card.get("key_facts") or []) if k]
+    if card.get("implication"):
+        parts.append(card["implication"])
+    parts += [c for c in (card.get("checks") or []) if c]
+    return "\n".join(parts)
+
+
+def build_brief_term_card_freq(
+    index: list[tuple[str, str]], briefs: list[dict[str, Any]],
+    lang: str = DEFAULT_LANG,
+) -> dict[str, int]:
+    """term_id → 그 용어가 등장한 카드 수(이 빌드의 모든 브리프, 렌더 대상 카드만).
+
+    희소도 판정의 유일한 근거 — `build_doc_term_doc_freq` 와 같은 결이나 모집단이
+    문서가 아니라 브리프 카드다(선정도 카드 blob 기준이라 분모를 맞춘다). 영어 트리는
+    실제로 영어 페이지가 나는 호(`brief_has_english`)만 센다.
+    """
+    freq: dict[str, int] = {tid: 0 for _, tid in index}
+    for b in briefs:
+        if lang != DEFAULT_LANG and not brief_has_english(b):
+            continue
+        for card in (b.get("cards") or []):
+            if not _is_renderable(card):
+                continue
+            blob = _card_term_link_blob(card, lang)
+            hit: set[str] = set()
+            for surface, tid in index:
+                if tid not in hit and _doc_term_find(blob, surface, lang=lang) >= 0:
+                    hit.add(tid)
+            for tid in hit:
+                freq[tid] += 1
+    return freq
+
+
+def select_brief_term_links(
+    cards: list[dict[str, Any]],
+    index: list[tuple[str, str]],
+    card_freq: dict[str, int],
+    limit: int = _BRIEF_TERM_LINK_MAX,
+    lang: str = DEFAULT_LANG,
+) -> list[tuple[str, str]]:
+    """이 호의 카드들에서 링크할 [(표면형, term_id)] — 희소(card_freq 낮은) 용어 우선,
+    용어당 1 개. `select_doc_term_links` 와 같은 방식(`_select_term_links_from_blob`)을
+    호 전체 카드 blob 하나에 적용한다(구현을 두 벌 두지 않는다)."""
+    blob = "\n".join(_card_term_link_blob(c, lang) for c in cards)
+    return _select_term_links_from_blob(blob, index, card_freq, limit, lang)
+
+
+def _link_card_view_terms(
+    cv: dict[str, Any], selected: list[tuple[str, str]], rel_root: str,
+    used: set[str], lang: str = DEFAULT_LANG,
+) -> None:
+    """카드 뷰모델의 서사 필드를 **템플릿(화면) 순서대로**(summary → key_facts 각 항목 →
+    implication → checks 각 항목) 용어 링크로 바꾼다(제자리 수정) — 이 순서라야 "첫
+    등장 한 곳"이 화면의 첫 등장과 일치한다. 빈 값은 건드리지 않는다(`{% if card.summary %}`
+    게이트 보존 — `Markup("")` 도 falsy 이니 무방하나, 건드리지 않는 편이 명확하다).
+    """
+    if cv.get("summary"):
+        cv["summary"] = link_terms_in_text(cv["summary"], selected, rel_root, used, lang)
+    if cv.get("key_facts"):
+        cv["key_facts"] = [link_terms_in_text(k, selected, rel_root, used, lang)
+                           for k in cv["key_facts"]]
+    if cv.get("implication"):
+        cv["implication"] = link_terms_in_text(cv["implication"], selected, rel_root, used, lang)
+    if cv.get("checks"):
+        cv["checks"] = [link_terms_in_text(c, selected, rel_root, used, lang)
+                        for c in cv["checks"]]
 
 
 def glossary_term_page_title(term: dict[str, Any], tr: Translator = _KO) -> str:
@@ -3609,8 +3729,7 @@ def _card_index_entry(card: dict[str, Any], *, issue_no: int, date: str,
       두지 않는다). 제형 라벨은 한국어 값이 곧 사전 키라 `tr()` 을 태우고, 기관·분류는
       데이터가 이미 영문 고정값이라 그대로 둔다(다시 번역하면 사전에 없는 키가 된다).
     """
-    if lang != DEFAULT_LANG and card_has_english(card):
-        card = {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
+    card = _card_with_english_narrative(card, lang)
     # 카드 종류 라벨은 **지역 사본에** 번역해 둔다 — 그래야 아래 엔트리 필드와
     # `_card_search_text(card)` 가 같은 값을 본다(두 곳에서 따로 번역하면 검색어와
     # 화면 라벨이 갈라진다). 한국어는 항등이라 골든 바이트가 흔들리지 않는다.
@@ -5679,6 +5798,20 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             reactions_enabled=False,
         )
 
+    # [브리프 카드 용어 자동 링크 2026-09-08] 지적문서 페이지와 같은 엔진을 카드 본문에도
+    # 쓴다 — 루프 앞에서 한 번만 색인·빈도를 짓는다(호마다 다시 지으면 희소도 분모가
+    # 매번 달라진다). `glossary_terms` 가 없으면(파일 부재) 조용히 꺼진다(`load_glossary`
+    # 부재 관례와 같다 — 링크 0, 빌드는 계속된다).
+    brief_term_index_by_lang = (
+        {lg: build_doc_term_link_index(glossary_terms, lg) for lg in (DEFAULT_LANG, "en")}
+        if glossary_terms else {}
+    )
+    brief_term_freq_by_lang = (
+        {lg: build_brief_term_card_freq(brief_term_index_by_lang[lg], briefs, lg)
+         for lg in (DEFAULT_LANG, "en")}
+        if glossary_terms else {}
+    )
+
     # 브리프 상세(주차별).
     brief_tmpl = env.get_template("brief.html")
     for b in briefs:
@@ -5701,6 +5834,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             if _win else None
         )
         brief_page = page(f"briefs/{pub}/")
+        if brief_term_index_by_lang:
+            _sel = select_brief_term_links(cards_sorted, brief_term_index_by_lang[lang],
+                                           brief_term_freq_by_lang[lang], lang=lang)
+            _used: set[str] = set()
+            for cv in card_views:            # render_order 순 = 화면 순
+                _link_card_view_terms(cv, _sel, brief_page.rel_root, _used, lang)
         emit("brief.html", brief_page,
             page_title=tr("{date} 규제뉴스 · GRM", date=ctx["title_dateform"]),
             nav_active="detail",
@@ -5729,6 +5868,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             en_card_views = [_card_view(c, en_tr, "en") for c in cards_sorted]
             _annotate_toc_distinguishers(en_card_views)
             en_brief_page = en_page(f"briefs/{pub}/")
+            if brief_term_index_by_lang:
+                _en_sel = select_brief_term_links(
+                    cards_sorted, brief_term_index_by_lang["en"],
+                    brief_term_freq_by_lang["en"], lang="en")
+                _en_used: set[str] = set()
+                for cv in en_card_views:      # render_order 순 = 화면 순
+                    _link_card_view_terms(cv, _en_sel, en_brief_page.rel_root, _en_used, "en")
             en_emit("brief.html", en_brief_page,
                 page_title=en_tr("{date} 규제뉴스 · GRM", date=en_ctx["title_dateform"]),
                 nav_active="detail",

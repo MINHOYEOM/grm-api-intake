@@ -73,6 +73,14 @@ GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전�
 # 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
 # 영어 /findings/가 보여 줄 수와 카드의 수가 갈라진다.
 GLOSSARY_CASES_EN_FILE = WEB_DIR / "data" / "glossary_cases_en.json"
+GLOSSARY_FIG_DIR = WEB_DIR / "partials" / "glossary_fig"  # [용어 그림] 용어당 정의를 묘사만 하는 SVG partial(있는 것만)
+
+
+def _glossary_figure_partial(term_id: str) -> str:
+    """용어 그림 partial 경로(web/ 기준 include 이름). 파일이 없으면 "" — 섹션이 조용히 빠진다.
+    파일 존재는 커밋된 저장소 상태라 결정론이다(네트워크·난수·now() 0)."""
+    p = GLOSSARY_FIG_DIR / f"{term_id}.html"
+    return f"partials/glossary_fig/{term_id}.html" if p.is_file() else ""
 FINDINGS_FACETS_FILE = WEB_DIR / "data" / "findings_facets.json"  # [검색 유입] 분류·국가·기관 모음 페이지 정본(findings_facets_refresh.py)
 # [다국어 2026-09-04] 영어 트리용 같은 정본 — **영어 모집단으로 다시 잰 값**이다
 # (`findings_facets_refresh.py --orig-lang en`). 한국어 파일을 받아 표본에서 한글만
@@ -5074,6 +5082,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         description=glossary_term_description(term, en_tr),
                         json_ld=build_glossary_term_json_ld(term, tr=en_tr, lang="en"),
                         term=term,
+                        figure_partial=_glossary_figure_partial(term["id"]),
                         case_excerpts=glossary_en_excerpts.get(term["id"]) or [],
                         cases_asof=glossary_cases_measured_on(GLOSSARY_CASES_EN_FILE),
                     )
@@ -5094,6 +5103,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     description=glossary_term_description(term, tr),
                     json_ld=build_glossary_term_json_ld(term, tr=tr),
                     term=term,
+                    figure_partial=_glossary_figure_partial(term["id"]),
                     case_excerpts=case_excerpts.get(term["id"]) or [],
                     cases_asof=glossary_cases_measured_on(),
                 )

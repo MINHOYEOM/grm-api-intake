@@ -35,6 +35,15 @@
   .gt-save .gt-save-on{display:none}
   .gt-save.is-on .gt-save-off{display:none}
   .gt-save.is-on .gt-save-on{display:inline}
+  /* [용어 그림] 정의(easy_ko)를 묘사만 한다 — 2026-09-03 해설층 삭제 결정과 같은 규율.
+     partial 파일이 없는 용어는 render.py 가 figure_partial 을 빈 문자열로 넘겨 아래
+     조건절이 조용히 렌더를 건너뛴다. */
+  .gt-fig{float:right;width:220px;margin:6px 0 14px 28px}
+  .gt-fig svg{width:100%;height:auto;display:block}
+  .gt-fig svg text{font-family:var(--sans)}
+  .gt-fig figcaption{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-top:6px}
+  .gt-intro::after{content:"";display:block;clear:both}
+  @media (max-width:640px){ .gt-fig{float:none;width:200px;margin:0 0 18px} }
   .gt-sec{border-top:1px solid var(--line);padding-top:22px}
   .gt-sec-h{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0 0 10px;font-weight:500}
   .gt-detail{font-family:var(--sans);font-size:16px;line-height:1.78;color:var(--body);margin:0;word-break:keep-all}
@@ -75,6 +84,9 @@
     {#- 정의·출처·행동을 한 덩어리로 묶는다 — .gt-body 는 자식마다 26px 을 벌리는 flex
         column 이라, 셋을 형제로 두면 출처 줄과 버튼이 정의에서 떨어져 나간다. -#}
     <div class="gt-intro">
+      {% if figure_partial %}
+      <figure class="gt-fig">{% include figure_partial %}<figcaption>{{ _('설명용 그림') }}</figcaption></figure>
+      {% endif %}
       <p class="gt-lede">{{ term.easy }}</p>
       {#- [출처를 정의 옆에] 정의를 읽은 자리에서 근거가 보여야 한다. 값은 무변형 —
           definition_source 를 줄여 쓰지 않는다(실제 문서 이름이라 자르면 다른 문서를

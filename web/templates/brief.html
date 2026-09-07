@@ -160,6 +160,20 @@
 .arc-lib-tag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--strong);border-radius:4px;padding:2px 6px;margin-right:6px;white-space:nowrap}
 .arc-lib-more{color:var(--muted)!important;font-weight:500}
 @media (max-width:640px){ .arc-lib{padding:12px 14px 11px} .arc-lib-sum{flex-basis:100%} }
+{% if lang != 'ko' %}
+/* [영문 상호참조 줄 2026-09-07] 규제기관이 한국어로 낸 지적사항 상세가 영어판에서 빠진
+   자리. 형제 토글(details.detail 의 "지적사항 상세 · N건")과 같은 라벨 모양에 한국어판으로
+   가는 링크 하나 — 링크 모양은 위 .arc-lib-go 를 그대로 따른다(같은 결의 이동 링크).
+   card.html 의 이 줄은 기본 언어 트리에서 렌더될 일이 없어 규칙도 그 트리에는 내지 않는다
+   (한국어 페이지 바이트 불변). grm.css 무접촉 — 이 파일 페이지 스코프에만 둔다. */
+.dt-xref{margin-top:12px}
+.dt-xref .lab{flex-wrap:wrap;row-gap:4px}
+.dt-xref-go{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.dt-xref-go:hover{text-decoration:underline}
+.dt-xref-go .ti{font-size:14px;transition:transform .16s var(--ease)}
+.dt-xref-go:hover .ti{transform:translateX(3px)}
+@media (max-width:640px){ .dt-xref-go{margin-left:0} }
+{% endif %}
 </style>
 {% endblock %}
 {% block ai_disclosure %}

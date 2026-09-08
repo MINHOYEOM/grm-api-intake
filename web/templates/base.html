@@ -80,6 +80,13 @@
 {% if show_langhint %}
 <style>
   .grm-langhint{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--soft);border-bottom:1px solid var(--line-2);padding:9px 16px;font-family:var(--sans);font-size:13.5px;color:var(--body)}
+  /* ★★[2026-09-08 결함 수리] `display:flex` 가 UA 의 `[hidden]{display:none}` 을 특정도로
+     이겨서, `hidden` 을 달고 나가는 이 바가 **모든 한국어 페이지 최상단에 항상 보였다**.
+     의도는 위 주석대로 "기본 hidden, 비한국어 브라우저에만 스크립트가 벗긴다" 였다.
+     실측(라이브 /glossary/original-data/, navigator.language='ko'): hidden=true 인 채로
+     computed display=flex · 높이 71px. 토글할 원소에 display 를 주면 반드시 이 짝을 같이
+     둔다 — 속성 선택자라 특정도가 높아 순서와 무관하게 이긴다. */
+  .grm-langhint[hidden]{display:none}
   .grm-langhint a{color:var(--coral);text-decoration:none;border-bottom:1px solid var(--line-2)}
   .grm-langhint a:hover{border-bottom-color:var(--coral)}
   .grm-langhint button{background:none;border:0;color:var(--muted);font-family:var(--sans);font-size:16px;line-height:1;cursor:pointer;padding:2px 6px}
@@ -175,6 +182,12 @@
       <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
       <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      {# ★[2026-09-08 실측] `locale` 을 `ko` 로 바꾸지 말 것. Brevo 가 호스팅하는 이 폼 자체가
+         영어로 구성돼 있다(폼 페이지 GET: `LOCALE='en'` · `<html lang="en">` · 폼 이름 'GRM
+         Weekly Brief Subscribe'). 이 히든 값은 그 설정과 **일치해야** 하는 값이지 우리가 고르는
+         값이 아니다 — 어긋나면 제출이 깨질 수 있고, 지금 동작하는 유일한 전환 경로다.
+         더블 옵트인 확인 메일의 언어는 이 필드가 아니라 **Brevo 대시보드의 폼·DOI 템플릿 설정**
+         에서 정해진다. 한국어 확인 메일이 필요하면 거기서 바꾸고, 그 뒤 이 값을 맞춘다. #}
       <input type="hidden" name="locale" value="en" />
       <button class="btn coral" type="submit">{{ _("구독") }}</button>
     </form>
@@ -343,13 +356,19 @@ if(_nt&&_nm){
 // 감싸고, 실패하면 그냥 안내를 보인다(기억을 못 할 뿐 화면은 정상).
 (function(){
   var b=document.getElementById('grmLangHint'); if(!b) return;
+  // ★[2026-09-08] 닫기 핸들러를 **언어 판정보다 먼저** 붙인다. 종전엔 아래 early return
+  //   두 개가 먼저 걸려 한국어 사용자에겐 핸들러가 아예 등록되지 않았다. 같은 시기 CSS
+  //   결함(.grm-langhint 의 display:flex 가 [hidden] 을 이김)으로 바가 보이기까지 해서,
+  //   **보이는데 × 를 눌러도 안 닫히는** 상태였다. CSS 를 고쳐 바가 정상적으로 숨더라도
+  //   이 순서는 그대로 둔다 — 표시 조건과 닫기 배선은 서로 독립이어야 한다.
+  var x=document.getElementById('grmLangHintX');
+  if(x) x.addEventListener('click',function(){
+    b.hidden=true; try{ localStorage.setItem('grm-langhint','off'); }catch(e){}
+  });
   try{ if(localStorage.getItem('grm-langhint')==='off') return; }catch(e){}
   var l=(navigator.languages&&navigator.languages[0])||navigator.language||'';
   if(/^ko\b/i.test(l)) return;
   b.hidden=false;
-  document.getElementById('grmLangHintX').addEventListener('click',function(){
-    b.hidden=true; try{ localStorage.setItem('grm-langhint','off'); }catch(e){}
-  });
 })();
 {% endif %}
 </script>
@@ -662,12 +681,21 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
     el.classList.add('on');
   }
   function arm(){ shown=true; tick(); }
-  // 읽을 의사가 확인된 뒤에만 — 스크롤 55% 또는 45초.
-  var timer=setTimeout(arm,45000);
+  // 읽을 의사가 확인된 뒤에만 — 스크롤 ARM_DEPTH 또는 ARM_MS.
+  // ★★[2026-09-08 실측 재조정] 종전 값은 55% / 45초였고, 그 조합이 **밴드와 배너를
+  //   서로 지워 버렸다.** 용어 페이지(모바일 3,533px) 실측: 밴드가 1,813px(51%)에 있어
+  //   깊이 55% 지점이 곧 `bandVisible()` 이 참인 구간이다 → 무장되는 순간 곧바로 숨고,
+  //   밴드를 다 지나치는 페이지 최하단 200px 남짓에서야 뜬다. 검색으로 들어와 정의만
+  //   읽고 나가는 방문(=이 사이트 유입의 다수)은 **둘 중 어느 것도 못 본다.**
+  //   35%/25초로 낮추면 배너가 밴드보다 **먼저** 뜨고, 밴드가 화면에 들어오면 겹침
+  //   규칙대로 비켰다가, 지나치면 다시 뜬다 — 원래 의도한 순서가 그제야 실제로 일어난다.
+  //   겹침 규칙(bandVisible) 자체는 옳아서 건드리지 않는다. 같은 폼을 두 개 띄우지 않는다.
+  var ARM_DEPTH=0.35, ARM_MS=25000;
+  var timer=setTimeout(arm,ARM_MS);
   addEventListener('scroll',function(){
     var h=document.documentElement;
     var depth=(h.scrollTop+innerHeight)/Math.max(h.scrollHeight,1);
-    if(depth>=0.55){clearTimeout(timer);arm();}
+    if(depth>=ARM_DEPTH){clearTimeout(timer);arm();}
     else tick();
   },{passive:true});
   function dismiss(persist){

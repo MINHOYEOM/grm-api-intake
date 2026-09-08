@@ -42,6 +42,13 @@
 </style>
 <style>
   .grm-langhint{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--soft);border-bottom:1px solid var(--line-2);padding:9px 16px;font-family:var(--sans);font-size:13.5px;color:var(--body)}
+  /* ★★[2026-09-08 결함 수리] `display:flex` 가 UA 의 `[hidden]{display:none}` 을 특정도로
+     이겨서, `hidden` 을 달고 나가는 이 바가 **모든 한국어 페이지 최상단에 항상 보였다**.
+     의도는 위 주석대로 "기본 hidden, 비한국어 브라우저에만 스크립트가 벗긴다" 였다.
+     실측(라이브 /glossary/original-data/, navigator.language='ko'): hidden=true 인 채로
+     computed display=flex · 높이 71px. 토글할 원소에 display 를 주면 반드시 이 짝을 같이
+     둔다 — 속성 선택자라 특정도가 높아 순서와 무관하게 이긴다. */
+  .grm-langhint[hidden]{display:none}
   .grm-langhint a{color:var(--coral);text-decoration:none;border-bottom:1px solid var(--line-2)}
   .grm-langhint a:hover{border-bottom-color:var(--coral)}
   .grm-langhint button{background:none;border:0;color:var(--muted);font-family:var(--sans);font-size:16px;line-height:1;cursor:pointer;padding:2px 6px}
@@ -506,13 +513,19 @@ if(_nt&&_nm){
 // 감싸고, 실패하면 그냥 안내를 보인다(기억을 못 할 뿐 화면은 정상).
 (function(){
   var b=document.getElementById('grmLangHint'); if(!b) return;
+  // ★[2026-09-08] 닫기 핸들러를 **언어 판정보다 먼저** 붙인다. 종전엔 아래 early return
+  //   두 개가 먼저 걸려 한국어 사용자에겐 핸들러가 아예 등록되지 않았다. 같은 시기 CSS
+  //   결함(.grm-langhint 의 display:flex 가 [hidden] 을 이김)으로 바가 보이기까지 해서,
+  //   **보이는데 × 를 눌러도 안 닫히는** 상태였다. CSS 를 고쳐 바가 정상적으로 숨더라도
+  //   이 순서는 그대로 둔다 — 표시 조건과 닫기 배선은 서로 독립이어야 한다.
+  var x=document.getElementById('grmLangHintX');
+  if(x) x.addEventListener('click',function(){
+    b.hidden=true; try{ localStorage.setItem('grm-langhint','off'); }catch(e){}
+  });
   try{ if(localStorage.getItem('grm-langhint')==='off') return; }catch(e){}
   var l=(navigator.languages&&navigator.languages[0])||navigator.language||'';
   if(/^ko\b/i.test(l)) return;
   b.hidden=false;
-  document.getElementById('grmLangHintX').addEventListener('click',function(){
-    b.hidden=true; try{ localStorage.setItem('grm-langhint','off'); }catch(e){}
-  });
 })();
 </script>
 <div class="grm-pet" id="grm-pet" data-page="findings">

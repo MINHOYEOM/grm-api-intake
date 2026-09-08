@@ -7907,9 +7907,23 @@ class WebRenderHardeningTest(unittest.TestCase):
         for bad in ("position:fixed;top:0", "height:100vh", "width:100vw",
                     "backdrop", "role=\"dialog\"", "aria-modal"):
             self.assertNotIn(bad, banner, f"전면 모달 신호가 들어왔다: {bad}")
-        # 노출 조건: 즉시 뜨지 않는다(스크롤 깊이 또는 지연) + 닫기 두 종류가 있다.
+        # 노출 조건: 즉시 뜨지 않되(침입형 금지) **끝까지 읽지 않는 방문에도 닿아야** 한다.
+        # ★임계값을 리터럴로 박지 않는다 — 튜닝 값이라 바뀌고, 리터럴 대조는 의도가 아니라
+        #   철자를 잰다. 재는 것은 성질이다: 즉시가 아니고, 페이지 절반을 넘기기 전에 닿는다.
+        #   근거(2026-09-08 라이브 실측): 종전 55%/45초는 구독 밴드가 화면에 있는 구간과
+        #   겹쳐 배너가 `bandVisible()` 로 **스스로를 지웠다**(용어 페이지 밴드 51% 지점,
+        #   모바일 3,533px 중 1,813px). 검색으로 들어와 정의만 읽고 나가는 방문은 밴드도
+        #   배너도 못 봤다. 상한 0.5 는 "밴드보다 먼저 뜬다"를 보장하는 선이다.
         self.assertIn("scroll", banner)
-        self.assertIn("0.55", banner)
+        _md = re.search(r"ARM_DEPTH\s*=\s*([0-9.]+)", banner)
+        _mt = re.search(r"ARM_MS\s*=\s*([0-9]+)", banner)
+        self.assertIsNotNone(_md, "스크롤 깊이 임계값을 못 찾았다 — 배너 스크립트 변경?")
+        self.assertIsNotNone(_mt, "지연 임계값을 못 찾았다 — 배너 스크립트 변경?")
+        _depth, _ms = float(_md.group(1)), int(_mt.group(1))
+        self.assertGreater(_depth, 0.0, "깊이 0 = 즉시 노출(침입형)")
+        self.assertLess(_depth, 0.5, "밴드가 보이는 구간에서야 무장돼 배너가 스스로를 지운다")
+        self.assertGreater(_ms, 0, "지연 0 = 즉시 노출(침입형)")
+        self.assertLessEqual(_ms, 40000, "머무는 방문에도 너무 늦게 닿는다")
         self.assertIn('id="grm-cta-today"', banner)     # 오늘 하루 보지 않기
         self.assertIn('id="grm-cta-close"', banner)     # 닫기
         self.assertIn("864e5", banner)                  # 24시간
@@ -17893,6 +17907,79 @@ class WebEnTreeTest(unittest.TestCase):
         self.assertIsNotNone(m, "안내가 기본 노출이다 — 한국어 독자에게도 뜬다")
         self.assertIn("navigator.language", html)
         self.assertRegex(html, r"/\^ko\\b/i")
+
+    def test_hidden_elements_are_not_un_hidden_by_a_display_rule(self):
+        """★★이 검사가 없어서 결함이 라이브에서 **한 달 가까이** 살아 있었다.
+
+        바로 위 검사는 `hidden` **속성이 마크업에 있는가**만 물었고 그건 내내 참이었다.
+        그런데 화면에는 보였다 — `.grm-langhint{display:flex}` 가 UA 스타일시트의
+        `[hidden]{display:none}` 을 특정도로 이기기 때문이다(2026-09-08 라이브 실측:
+        hidden=true 인 채 computed display=flex · 높이 71px). 속성은 표시가 아니다.
+
+        그래서 손목록을 두지 않고 **성질**을 잰다: 이 문서가 `hidden` 을 달고 내보내는
+        원소의 클래스에 대해, 같은 문서의 인라인 CSS 가 그 클래스에 `display` 를 준다면
+        `[hidden]` 무력화 짝이 반드시 있어야 한다. 새 토글 원소가 늘어도 저절로 따라간다.
+        """
+        def _has_hidden_attr(tag):
+            # ★따옴표 안의 값을 먼저 지운다 — 안 지우면 `style="overflow: hidden "` 같은
+            #   값이 속성으로 잡힌다. `aria-hidden` 은 앞이 `-` 라 `\shidden` 에 안 걸린다.
+            bare = re.sub(r'"[^"]*"|\'[^\']*\'', "", tag)
+            return re.search(r"\shidden(?=[\s>/=])", bare) is not None
+
+        offenders = []
+        for rel, html in self.pages.items():
+            css = " ".join(re.findall(r"<style[^>]*>(.*?)</style>", html, re.S))
+            if not css:
+                continue
+            # ★여는 태그 하나만 잡는다. 종전 초안은 `...hidden[\s>/][^>]*>` 로 써서 `>` 를
+            #   소비한 뒤 **다음 태그까지 삼켰고**, 부모의 hidden 에 자식의 class 를 붙여
+            #   오탐 5건을 냈다(tr-stats·fp-head). `[^>]*` 는 태그 경계를 못 넘는다.
+            for tag in re.findall(r"<[a-z][a-z0-9]*\b[^>]*>", html):
+                if not _has_hidden_attr(tag):
+                    continue
+                cls = re.search(r'class="([^"]+)"', tag)
+                if not cls:
+                    continue
+                names = cls.group(1).split()
+                # ★판정 단위는 **원소**지 클래스가 아니다. 한 원소가 여러 클래스를 달면
+                #   display 를 준 클래스와 [hidden] 짝을 가진 클래스가 서로 다를 수 있다
+                #   (실례: `class="cl-ctl-row cl-ctl-export"` — display 는 앞이 주고 짝은
+                #   뒤가 가졌다. 클래스별로 물으면 멀쩡한 것을 결함이라 부른다).
+                #   `.X[hidden]` 은 특정도 (0,2,0) 이라 단독 클래스 규칙 (0,1,0) 을 이긴다.
+                gives_display = [n for n in names
+                                 if re.search(r"\.%s\s*\{[^}]*\bdisplay\s*:" % re.escape(n), css)]
+                if not gives_display:
+                    continue
+                has_pair = any(
+                    re.search(r"\.%s\[hidden\]\s*\{[^}]*\bdisplay\s*:\s*none" % re.escape(n), css)
+                    for n in names)
+                if not has_pair:
+                    offenders.append(f"{rel}: .{'.'.join(gives_display)}")
+        self.assertEqual(
+            sorted(set(offenders)), [],
+            "hidden 을 달고 나가지만 CSS 의 display 가 그것을 이긴다 — 화면에 그대로 보인다")
+
+    def test_language_hint_dismiss_is_wired_regardless_of_browser_language(self):
+        """× 배선은 언어 판정과 독립이어야 한다.
+
+        종전 코드는 `if(/^ko\\b/i.test(l)) return;` 이 addEventListener 보다 **앞**이라,
+        한국어 브라우저에서는 닫기 핸들러가 아예 등록되지 않았다. 같은 시기 CSS 결함으로
+        바가 보이기까지 해서 '보이는데 눌러도 안 닫히는' 상태였다 — 결함 하나가 표시와
+        닫기 두 층을 동시에 망가뜨렸다. 한쪽이 고장 나도 다른 쪽은 살아 있어야 한다.
+
+        ※이것은 구조 대조(순서)다. 브라우저 없이 '핸들러가 실제로 붙었는가'를 물을 수
+          없어, 그 필요조건인 '언어 return 보다 먼저 등록한다'를 잰다 — 대리 지표임을
+          숨기지 않는다.
+        """
+        script = re.search(r"// \[루트 진입\].*?\}\)\(\);",
+                           self.pages["index.html"], re.S)
+        self.assertIsNotNone(script, "안내 스크립트를 못 찾았다 — 마크업 변경?")
+        body = script.group(0)
+        i_listen, i_lang = body.find("addEventListener"), body.find("/^ko\\b/i")
+        self.assertGreater(i_listen, -1, "닫기 핸들러 등록이 없다")
+        self.assertGreater(i_lang, -1, "언어 판정이 없다")
+        self.assertLess(i_listen, i_lang,
+                        "언어 판정이 닫기 배선보다 앞이다 — 한국어 사용자에게 × 가 죽는다")
 
     def test_language_hint_never_redirects(self):
         """★자동 리다이렉트 금지. 브라우저 언어는 사람의 선택이 아니라 기기 설정이고

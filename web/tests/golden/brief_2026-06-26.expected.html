@@ -290,6 +290,11 @@
 /* [성장 2차] 요약 복사 버튼 — .tldr 우상단 절대배치(기존 흐름 무변형·grm.css 무접촉).
    position:static→relative 는 단독으론 시각 무변형이라 안전하다. */
 .detail-head .tldr{position:relative}
+/* [2026-09-08] `display` 를 주는 원소에는 `[hidden]` 짝을 반드시 같이 둔다 — 없으면
+   author 규칙이 UA 의 `[hidden]{display:none}` 을 이겨서, JS 가 `hidden=false` 를 못 하는
+   경로(tldr 목록이 비어 early return · JS 미실행)에서 죽은 버튼이 그대로 보인다.
+   같은 결함이 `.grm-langhint` 에서는 라이브로 드러났다(base.html 참조). */
+.tldr-copy[hidden]{display:none}
 .tldr-copy{position:absolute;top:6px;right:0;display:inline-flex;align-items:center;gap:6px;
   font-family:var(--sans);font-size:12px;color:var(--muted);background:transparent;
   border:1px solid var(--line-2,rgba(26,24,21,.14));border-radius:var(--rad-s,8px);

@@ -437,6 +437,35 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             "이 군에는 더 이상 한국어가 없다 — INTENTIONAL_KO_ON_EN 에서 지워라(낡은 "
             "예외는 그만큼 가드를 잃은 것이다): " + repr(stale))
 
+    def test_original_toggle_label_never_asserts_a_language_it_did_not_measure(self):
+        """대조 토글의 라벨이 **그 글의 언어를 단정하지 않는가** — 세 사본 모두.
+
+        ★[2026-09-06] 라이브에서 잡았다. 한국어 화면의 식약처 지적에 "원문 보기 (영문)"
+          이 붙는데 펼치면 한국어가 나온다(동성제약(주) 프로파일 실측). 원문이 한국어인
+          기록이라 라벨이 사실과 다르다 — 영어판에서 고친 "국문 번역 보기"의 거울상이고,
+          그쪽만 막은 가드는 이 방향을 보지 못했다.
+        ★토글 자체는 없애지 않는다. 본문은 정리된 국문이고 토글은 기록 그대로라 내용이
+          **실제로 다르다**(빈 상자가 아니다). 고칠 것은 라벨이 하는 주장이다.
+        ★세 자산이 같은 화면 요소를 각자 그린다 — 사본이 갈라지면 한 곳만 고쳐진다.
+          같은 식인지까지 본다(JS_BODY_SHIM 이 본문 선택에 대해 하는 일과 같은 규율).
+        """
+        expr = {}
+        for name in ("findings", "firm", "inspector"):
+            src = (WEB_DIR / "assets" / f"{name}.js").read_text(encoding="utf-8")
+            m = re.search(r"summary\.textContent = (.*?);", src, re.S)
+            self.assertIsNotNone(m, f"{name}.js: 라벨을 정하는 줄을 못 찾았다")
+            expr[name] = re.sub(r"\s+", " ", m.group(1)).strip()
+
+        one = set(expr.values())
+        self.assertEqual(len(one), 1, f"세 자산의 라벨 식이 갈라졌다: {expr}")
+        got = one.pop()
+        # 언어를 **재고** 나서 말한다 — 한국어 화면에서 원문이 한글이면 "(영문)"을 붙이지
+        # 않는다. 목록·타입이 아니라 그 글에 한글이 있는가로 가른다.
+        self.assertIn("_HANGUL.test(", got, f"라벨이 재지 않고 단정한다: {got}")
+        self.assertIn('_t("원문 보기")', got, f"한글 원문용 라벨이 없다: {got}")
+        self.assertIn('_t("원문 보기 (영문)")', got)
+        self.assertIn('_t("국문 번역 보기")', got)
+
     def test_home_is_the_same_page_in_both_languages(self):
         """★[2026-09-05] 영어 홈은 `landing_en.html` 이라는 **별도 템플릿**이었다. 그때는
         영문 브리프가 0호라 히어로에 실을 표지가 없었기 때문인데, 그 사이 10호가 서면서
@@ -3082,8 +3111,8 @@ class WebFindingsRenderTest(unittest.TestCase):
         orig_fn = orig_fn[:orig_fn.index("\n  }\n") + 4]
         # [다국어 3단계] 가드는 `_altText()` 로 옮겼다 — 두 본문이 다 있을 때만 접기를
         # 만든다는 계약은 그대로다(한쪽이 비면 "" 를 돌려주므로 조용히 no-op).
-        self.assertIn("var alt = _altText(row);", orig_fn)
-        self.assertIn("if (!alt) return;", orig_fn)
+        self.assertIn("var altText = _altText(row);", orig_fn)
+        self.assertIn("if (!altText) return;", orig_fn)
 
     def test_hide_pager_also_hides_sticky_mininav(self):
         """[단독 렌더 모드 공통] hidePager() 는 상/하단 페이저 + sticky 미니 내비
@@ -17059,7 +17088,11 @@ class WebEnFacetTest(unittest.TestCase):
         self.assertEqual(src.count('"p_orig_lang": orig_lang'), 3,
                          "root(dash)·축·조합 세 곳 전부에 실어야 한다")
         self.assertIn('ap.add_argument("--orig-lang"', src)
-        self.assertIn('"orig_lang": orig_lang,', src, "산출물이 모집단을 스스로 밝혀야 한다")
+        # ★[2026-09-09] 키는 값이 있을 때만 싣는다 — 한국어 정본에 "" 을 실으면
+        #   위 test_english_facet_data_declares_its_population 이 재는 "한국어 정본은
+        #   그 키를 갖지 않는다"와 충돌해 주간 자동 갱신이 2주 연속 죽었다.
+        self.assertIn('{"orig_lang": orig_lang} if orig_lang else {}', src,
+                      "산출물이 모집단을 스스로 밝히되, 빈 값은 싣지 않아야 한다")
 
 
 #: 영어 화면에 **한국어가 남아도 되는 유일한 자리** — 출처(`definition_source`)와

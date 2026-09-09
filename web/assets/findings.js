@@ -935,19 +935,25 @@
   function appendOrigAndNote(extra, row, query) {
     // [다국어] 접기에 들어가는 것은 **본문의 반대편**이다 — 한국어판은 영문 원문,
     // 영어판은 국문 번역. 한쪽이 없으면 접기 자체를 만들지 않는다(빈 상자 금지).
-    var alt = _altText(row);
-    if (!alt) return;
+    var altText = _altText(row);
+    if (!altText) return;
     var details = document.createElement("details");
     details.className = "fnd-orig";
     var summary = document.createElement("summary");
-    summary.textContent = _isEn ? _t("국문 번역 보기") : _t("원문 보기 (영문)");
+    // ★[2026-09-06] 한국어 화면의 라벨이 원문을 **영문이라고 단정**하고 있었다.
+    //   식약처 지적은 원문이 한국어라(공개 지적의 8.4%) "원문 보기 (영문)"을 펼치면
+    //   한국어가 나온다 — 라이브에서 동성제약(주) 프로파일이 실제로 그랬다. 토글
+    //   자체는 쓸모가 있다(본문은 정리된 국문, 이쪽은 기록 그대로라 내용이 다르다).
+    //   없앨 것이 아니라 **재서 말하면 된다** — 목록이 아니라 그 글에 한글이 있는가로.
+    summary.textContent = _isEn ? _t("국문 번역 보기")
+      : (_HANGUL.test(altText) ? _t("원문 보기") : _t("원문 보기 (영문)"));
     details.appendChild(summary);
     // 번역고지는 **번역문을 보여줄 때만** 뜬다 — 영어판의 접기 안이 번역문이고,
     // 한국어판은 본문이 번역문이라 그 자리에서 이미 고지한다(중복 노출 금지).
     if (row.translation_method === "llm_assisted") {
       details.appendChild(el("span", "fnd-tr-note", _t("AI 번역 — 원문 대조 권장")));
     }
-    var p = elHL("p", null, alt, query);
+    var p = elHL("p", null, altText, query);
     details.appendChild(p);
     extra.appendChild(details);
   }

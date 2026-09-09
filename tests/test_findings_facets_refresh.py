@@ -500,5 +500,49 @@ class NarrowConsoleEncodingTest(unittest.TestCase):
         self.assertIn("dry-run", printed)
 
 
+class PayloadPopulationKeyTest(unittest.TestCase):
+    """데이터 자신이 모집단을 말하되, **한국어 정본은 그 키를 갖지 않는다.**
+
+    ★[2026-09-09] 주간 자동 갱신 PR(#955, 그 전주 09-01 실행도)이 CI 에서 두 번 연속
+      죽었다. 생성기가 한국어 정본에 `"orig_lang": ""` 을 실었고, 렌더 가드
+      (`test_english_facet_data_declares_its_population`)는 "한국어 정본은 그 키를
+      갖지 않는다"(= 기존 파일을 건드리지 않았다는 뜻)를 재기 때문이다. 빈 문자열은
+      "전체 모집단"을 뜻하지 못한다 — 키를 아예 싣지 않는 것이 계약이다.
+    """
+
+    def setUp(self):
+        self._real = ffr.post_search
+
+        # 세 축 모두 후보 1개씩(표본 충족) — 0건 가드(SystemExit)를 지나 최상위 dict 의
+        # 모양까지 재려면 축이 비어서는 안 된다. 어느 호출이든 같은 응답으로 충분하다.
+        # 조합(분류×기관) 조회는 분류 전체보다 작게 답해야 "분류 독점" 게이트에 걸리지
+        # 않는다(ComboGateTest 의 1000 vs 400 과 같은 비율).
+        def fake(base_url, anon_key, payload, timeout=60):
+            combo = bool(payload.get("p_category")) and bool(payload.get("p_agency"))
+            n = 400 if combo else 1000
+            resp = _resp(n, max(n // 3, 1), agencies=[{"v": "FDA", "c": 400}],
+                         docs=[_doc(_finding("f1"))])
+            resp["dash"]["by_category"] = [{"v": "cat_a", "c": 1000}]
+            resp["dash"]["by_country"] = [{"v": "US", "c": 1000}]
+            return resp
+        ffr.post_search = fake
+
+    def tearDown(self):
+        ffr.post_search = self._real
+
+    def _build(self, orig_lang):
+        return ffr.build_payload("u", "k", min_findings=20, samples=3,
+                                 measured_on="2026-09-09", log=lambda m: None,
+                                 orig_lang=orig_lang)
+
+    def test_korean_payload_has_no_orig_lang_key(self):
+        payload = self._build("")
+        self.assertNotIn("orig_lang", payload)
+        self.assertEqual(payload["schema_version"], ffr.SCHEMA_VERSION)
+
+    def test_english_payload_declares_en(self):
+        self.assertEqual(self._build("en").get("orig_lang"), "en")
+
+
 if __name__ == "__main__":                                       # pragma: no cover
     unittest.main()

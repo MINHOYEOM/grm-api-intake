@@ -465,7 +465,11 @@ def build_payload(base_url: str, anon_key: str, *, min_findings: int, samples: i
         "schema_version": SCHEMA_VERSION,
         # 이 파일이 어느 모집단을 센 것인지 데이터 자신이 말한다 — 렌더가 파일 이름으로
         # 짐작하지 않게 한다(이름은 바뀌고 값은 안 바뀐다).
-        "orig_lang": orig_lang,
+        # ★한국어 정본(orig_lang 없음)은 이 키를 **갖지 않는다** — 빈 문자열을 실으면
+        #   "전체 모집단"이라는 뜻이 되지 못하고, 렌더 가드(test_english_facet_data_
+        #   declares_its_population)가 "한국어 정본은 그 키를 갖지 않는다"를 재므로
+        #   주간 자동 갱신 PR 이 2026-09-01·09-08 두 번 연속 CI 에서 죽었다.
+        **({"orig_lang": orig_lang} if orig_lang else {}),
         "measured_on": measured_on,
         "min_findings": min_findings,
         "totals": {"findings": int(totals.get("findings") or 0),

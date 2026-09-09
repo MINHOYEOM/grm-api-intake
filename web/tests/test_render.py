@@ -9305,7 +9305,11 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         over, nested = [], []
         for t in self.terms:
             title = render.glossary_term_page_title(t)
-            self.assertTrue(title.endswith(" 뜻 · GRM 용어사전"),
+            # [분야 한정어 2026-09-09] 꼬리표에 **분야**가 들어가야 한다. 검색 결과에서
+            # 이 낱말들은 소프트웨어·일반 영어 쪽 결과와 나란히 서므로, 제약 종사자가
+            # 자기 것임을 알아볼 신호가 제목에 없으면 상위권에서도 클릭이 0이다
+            # (GSC 실측: 순위 2.6~4.7 · 노출 30~95 · 클릭 0).
+            self.assertTrue(title.endswith(" 뜻 · 제약 GMP 용어사전"),
                             f'제목 꼬리 계약 위반: {t["id"]} → {title}')
             self.assertTrue(title.startswith(t["term_ko"]),
                             f'제목이 한글 표제어로 시작하지 않음: {t["id"]} → {title}')

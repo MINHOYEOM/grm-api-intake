@@ -2,14 +2,14 @@
 
 GRM (Global Regulatory Monitor) collects pharmaceutical GMP and quality regulatory news that is scattered across FDA, EMA, MHRA, PIC/S, ICH, WHO, Health Canada, MFDS and other authorities, and organises it into a card-based brief every week. This page is arranged around **how you actually use the site**, not around a feature list.
 
-A note on languages: the weekly brief, the glossary and some curated copy are published in Korean, and the English edition covers the findings database, the library, this guide and the weekly quiz. Where a section below describes a Korean-only surface, it is marked as such.
+A note on languages: the English edition covers the weekly brief, the findings database, the library, the glossary, this guide and the weekly quiz. The newsletter is sent in Korean only.
 
 ## Start here — the site at a glance
 
 Working from the top menu, each screen is used like this.
 
 - **Home**: the entrance to this week's brief. Alongside the service introduction you will find this week's collection and card status, the cards that drew reactions, and the entrance to the weekly quiz.
-- **Weekly brief**: past briefs gathered by week. You can search previous issues and cards by keyword or authority. Published in Korean.
+- **Weekly brief**: past briefs gathered by week. You can search previous issues and cards by keyword or authority.
 - **Findings**: a database for searching the **individual findings** inside regulatory documents. If the brief is "this week's newspaper", findings search is the "cumulative reference archive". It is split into a search surface and a browse surface (task shortcuts, recently published documents, exploration by axis).
 - **Trends**: a statistics screen that aggregates all findings. You can see the last 12 months of movement and what changed against the preceding 12 months, category rankings, the year-by-year mix, the most cited clauses, company rankings, source composition, and the difference between foreign and domestic US inspections — and the clause ranking leads on to the self-assessment checklist.
 - **Library**: reference documents you come back to — GMP guidance, notices and standards published by regulators and professional bodies at home and abroad — gathered into catalogues by organisation (refreshed automatically every week).
@@ -85,14 +85,14 @@ Search results are shown **grouped by document**. One document can contain sever
 
 - **Library**: unlike the brief, which flows past every week, this is a reference catalogue you come back to. GMP and quality documents published by regulators and professional bodies at home and abroad are divided into catalogues by organisation, and every item links straight to the official original. The library's front screen shows at a glance which catalogues exist and how many items each holds. It is useful when you want to find a document again later, after the brief covered it once.
 - **The library refreshes itself every week**: each organisation's public page is checked **early every Monday** and newly posted documents are taken in automatically. What arrived that week can be seen in "Recent updates" on the library's front screen, above the weekly brief archive, and — down to the document titles — in the weekly newsletter. If too much changes at once, or documents disappear, automatic adoption stops and a person checks first; and if collection fails for one organisation's page, the remaining catalogues still refresh normally.
-- **Glossary**: explains the terms that appear often in GMP and regulatory documents, with plain-language definitions and official sources. It is searchable in either Korean or English and can also be browsed through the Korean alphabetical index. Published in Korean.
+- **Glossary**: explains the terms that appear often in GMP and regulatory documents, with plain-language definitions and official sources. It is searchable in either Korean or English and can also be browsed through its alphabetical index.
 - **Weekly quiz**: a short quiz, drawn afresh each week, that revises regulatory and quality terms and recent public cases. Everyone answers the same questions in the same week, and choosing an option shows the answer, the explanation and the source link straight away. No ranking or record is kept, so it works comfortably as team study or as an ice-breaker before a meeting.
 
 ## Frequently asked questions
 
 ### When does a new brief come out?
 
-Every Monday. If you subscribe to the newsletter you also receive the key summary and shortcuts by email the same day.
+Every Monday. The English edition can be followed through the weekly brief archive and its RSS feed (`/en/rss.xml`).
 
 ### Where do I find past briefs?
 
@@ -112,7 +112,7 @@ Try a shorter key term, and try a synonym — regulators word the same problem d
 
 ## Newsletter subscription
 
-Enter your email in the subscription form at the foot of any page and we will send the key summary and shortcuts for that week's brief by email every Monday. A confirmation email is sent when you sign up, and the subscription completes only when you press the confirmation button in that email. You can unsubscribe with a single click from the foot of every email.
+Newsletter subscription is not offered in the English edition because the email itself is in Korean. You can receive English brief updates through the RSS feed (`/en/rss.xml`).
 
 ## Before you rely on this
 

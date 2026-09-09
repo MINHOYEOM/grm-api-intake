@@ -512,9 +512,20 @@ class PayloadPopulationKeyTest(unittest.TestCase):
 
     def setUp(self):
         self._real = ffr.post_search
-        # 축 후보가 비어 있으면 build_axis·combos 는 서버를 더 부르지 않는다 —
-        # 최상위 dict 의 모양만 재는 데 충분하다.
-        ffr.post_search = lambda base_url, anon_key, payload, timeout=60: _resp(100, 40)
+
+        # 세 축 모두 후보 1개씩(표본 충족) — 0건 가드(SystemExit)를 지나 최상위 dict 의
+        # 모양까지 재려면 축이 비어서는 안 된다. 어느 호출이든 같은 응답으로 충분하다.
+        # 조합(분류×기관) 조회는 분류 전체보다 작게 답해야 "분류 독점" 게이트에 걸리지
+        # 않는다(ComboGateTest 의 1000 vs 400 과 같은 비율).
+        def fake(base_url, anon_key, payload, timeout=60):
+            combo = bool(payload.get("p_category")) and bool(payload.get("p_agency"))
+            n = 400 if combo else 1000
+            resp = _resp(n, max(n // 3, 1), agencies=[{"v": "FDA", "c": 400}],
+                         docs=[_doc(_finding("f1"))])
+            resp["dash"]["by_category"] = [{"v": "cat_a", "c": 1000}]
+            resp["dash"]["by_country"] = [{"v": "US", "c": 1000}]
+            return resp
+        ffr.post_search = fake
 
     def tearDown(self):
         ffr.post_search = self._real

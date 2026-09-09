@@ -500,5 +500,38 @@ class NarrowConsoleEncodingTest(unittest.TestCase):
         self.assertIn("dry-run", printed)
 
 
+class PayloadPopulationKeyTest(unittest.TestCase):
+    """데이터 자신이 모집단을 말하되, **한국어 정본은 그 키를 갖지 않는다.**
+
+    ★[2026-09-09] 주간 자동 갱신 PR(#955, 그 전주 09-01 실행도)이 CI 에서 두 번 연속
+      죽었다. 생성기가 한국어 정본에 `"orig_lang": ""` 을 실었고, 렌더 가드
+      (`test_english_facet_data_declares_its_population`)는 "한국어 정본은 그 키를
+      갖지 않는다"(= 기존 파일을 건드리지 않았다는 뜻)를 재기 때문이다. 빈 문자열은
+      "전체 모집단"을 뜻하지 못한다 — 키를 아예 싣지 않는 것이 계약이다.
+    """
+
+    def setUp(self):
+        self._real = ffr.post_search
+        # 축 후보가 비어 있으면 build_axis·combos 는 서버를 더 부르지 않는다 —
+        # 최상위 dict 의 모양만 재는 데 충분하다.
+        ffr.post_search = lambda base_url, anon_key, payload, timeout=60: _resp(100, 40)
+
+    def tearDown(self):
+        ffr.post_search = self._real
+
+    def _build(self, orig_lang):
+        return ffr.build_payload("u", "k", min_findings=20, samples=3,
+                                 measured_on="2026-09-09", log=lambda m: None,
+                                 orig_lang=orig_lang)
+
+    def test_korean_payload_has_no_orig_lang_key(self):
+        payload = self._build("")
+        self.assertNotIn("orig_lang", payload)
+        self.assertEqual(payload["schema_version"], ffr.SCHEMA_VERSION)
+
+    def test_english_payload_declares_en(self):
+        self.assertEqual(self._build("en").get("orig_lang"), "en")
+
+
 if __name__ == "__main__":                                       # pragma: no cover
     unittest.main()

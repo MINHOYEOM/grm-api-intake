@@ -2451,14 +2451,32 @@ def _link_card_view_terms(
 
 
 def glossary_term_page_title(term: dict[str, Any], tr: Translator = _KO) -> str:
-    """`{한글}({짧은 영문}) 뜻 · GRM 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다."""
+    """`{한글}({짧은 영문}) 뜻 · 제약 GMP 용어사전` — 검색어 형태("OOS 뜻")를 앞쪽에 둔다.
+
+    [분야 한정어 2026-09-09] 꼬리표가 `GRM 용어사전` 이었는데, 그 자리는 검색 결과에서
+    **아무 정보도 주지 않는 자리**였다(브랜드 인지 0). GSC 실측이 그 대가를 보여 준다:
+
+      acceptance criteria 뜻 — 평균 순위 4.6 · 노출 95 · 클릭 **0**
+      attributable 뜻       — 평균 순위 4.7 · 노출 32 · 클릭 **0**
+      귀속성                 — 평균 순위 2.6 · 노출 30 · 클릭 **0**
+
+    순위 문제가 아니다. 이 낱말들은 일반 영어 단어라 검색 상위가 소프트웨어·기획 쪽
+    글로 채워지고(실측: "acceptance criteria 뜻" 1위가 애자일 인수기준 글), 그 검색자에게
+    `GRM 용어사전` 은 자기 분야인지 아닌지조차 알려 주지 않는다. 실제로 클릭이 난 8건은
+    전부 **제약 사람만 치는 낱말**이었다(바이오버든·역가시험·PQS·NAI VAI OAI·데이터 완전성).
+
+    그래서 같은 자리에 분야를 박는다. 제약 종사자에게는 "내 것"이라는 신호가 되고,
+    아닌 사람은 거르는데 **어차피 지금도 안 누른다** — 잃을 것이 없는 교환이다.
+    검색어가 되는 앞부분(표제어 + "뜻")은 건드리지 않으므로 위 SERP 절단 계약도 그대로다
+    (전수 실측: 평균 19.2→22.2자, 최대 31→34자, 45자 초과 0건 유지).
+    """
     # ★표시 이름은 **뷰가 정한 값**을 쓴다(불변식 #13). 영어판에는 부제가 없으므로
     #   괄호 약어를 붙이지 않는다 — 표제어 자신이 이미 영문이다.
     head = term.get("term") or term.get("term_ko") or ""
     if term.get("term_sub"):
         short_en = glossary_title_en(head, term.get("term_sub") or "")
         head = f"{head}({short_en})" if short_en else head
-    return tr("{head} 뜻 · GRM 용어사전", head=head)
+    return tr("{head} 뜻 · 제약 GMP 용어사전", head=head)
 
 
 # build_glossary_term_json_ld 는 SITE_BASE_URL 정의 이후(SEO 섹션)에 있다 — 기본 인자로

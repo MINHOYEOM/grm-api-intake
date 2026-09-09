@@ -17059,7 +17059,11 @@ class WebEnFacetTest(unittest.TestCase):
         self.assertEqual(src.count('"p_orig_lang": orig_lang'), 3,
                          "root(dash)·축·조합 세 곳 전부에 실어야 한다")
         self.assertIn('ap.add_argument("--orig-lang"', src)
-        self.assertIn('"orig_lang": orig_lang,', src, "산출물이 모집단을 스스로 밝혀야 한다")
+        # ★[2026-09-09] 키는 값이 있을 때만 싣는다 — 한국어 정본에 "" 을 실으면
+        #   위 test_english_facet_data_declares_its_population 이 재는 "한국어 정본은
+        #   그 키를 갖지 않는다"와 충돌해 주간 자동 갱신이 2주 연속 죽었다.
+        self.assertIn('{"orig_lang": orig_lang} if orig_lang else {}', src,
+                      "산출물이 모집단을 스스로 밝히되, 빈 값은 싣지 않아야 한다")
 
 
 #: 영어 화면에 **한국어가 남아도 되는 유일한 자리** — 출처(`definition_source`)와

@@ -133,6 +133,12 @@ def live_counts(base_url: str, service_key: str, tables: list[str]) -> dict[str,
 
 
 def main(argv: list[str] | None = None) -> int:
+    # 저장소 관례(tests/test_cli_stdout_encoding.py): 한국어 리포트가 cp949 콘솔에서 죽지 않게.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("counts")

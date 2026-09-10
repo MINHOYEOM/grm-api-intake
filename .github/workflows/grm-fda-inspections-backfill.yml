@@ -201,10 +201,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -297,7 +297,7 @@ jobs:
         #   `failure()` 만 걸면 하필 타임아웃(무인 월간 잡의 현실적 실패 형태)에서
         #   알림이 안 나간다. 조용한 실패를 만들지 않는다.
         if: (failure() || cancelled()) && github.event_name == 'schedule'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const title = process.env.FAILURE_ISSUE_TITLE;
@@ -372,7 +372,7 @@ jobs:
       # "적재는 여전히 깨져 있는데 알림만 사라진" 상태가 된다.
       - name: Close the failure issue on a successful apply
         if: success() && steps.backfill.outputs.mode == 'apply'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const title = process.env.FAILURE_ISSUE_TITLE;

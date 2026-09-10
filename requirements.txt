@@ -1,4 +1,19 @@
-requests>=2.32,<3
-PyMuPDF>=1.24,<2
-Jinja2>=3.1,<4
-google-auth>=2.30,<3
+# ★공급망 위생(2026-09-10) — floating range(>=,<) 대신 정확 버전(==) 고정.
+# 이 파일은 매일 도는 daily intake CI(grm-ci.yml/grm-intake.yml 등)가 설치한다 —
+# 이 워크플로는 Supabase service-role 키를 쥔 채로 돈다. 종전 range 형태는 실행할
+# 때마다 PyPI 의 "그 순간 최신" 릴리스를 그대로 받아들였다 — 상류 패키지 하나가
+# 침해당하면(공급망 공격) 그 코드가 바로 이 키를 쥔 프로세스 안에서 실행된다.
+# 정확 pin 은 "언제 새 버전으로 넘어갈지"를 사람이 정하게 만든다: Dependabot 이
+# 월간으로 새 버전을 PR 로 올리고(.github/dependabot.yml), 리뷰·머지해야 버전이 오른다.
+#
+# 값은 2026-09-10 기준 최근 성공 GRM CI 런(run 34442367892)의
+# `Successfully installed` 로그에서 그대로 옮겼다 — 추측이 아니라 실측이다.
+#
+# ★전이 의존성(urllib3·certifi·cryptography 등)은 이번 PR 범위가 아니다 — 아직
+# floating 인 채로 남는다. requirements-embed.lock(F-05, 2026-07-16)처럼
+# sha256 고정 lock 파일로 닫는 건 별도 작업이다 — 이 파일에는 `--require-hashes`
+# 를 도입하지 않는다(전이 lock 은 다음 단계).
+requests==2.34.2
+PyMuPDF==1.28.2
+Jinja2==3.1.6
+google-auth==2.58.0

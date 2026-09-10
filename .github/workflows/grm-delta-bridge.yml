@@ -60,7 +60,7 @@ jobs:
     env:
       GRM_INTAKE_DB_ID: '7784c71fb7b343749b2bee5d04db7926'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # ★핵심: ADMIN_GITHUB_ACTIONS_TOKEN(PAT) 로 push 해야 이 커밋이
           # grm-web-publish.yml 의 on: push 를 실제로 트리거한다(GITHUB_TOKEN push 는
@@ -69,7 +69,7 @@ jobs:
           token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
 

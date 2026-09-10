@@ -304,6 +304,7 @@ SINGLE_GOLDENS = [
     ("assets/search-index.json", "search-index.expected.json"),
     ("robots.txt", "robots.expected.txt"),
     ("llms.txt", "llms.expected.txt"),
+    ("_headers", "headers.expected.txt"),
     ("briefs/2026-06-26/share.txt", "brief_share.expected.txt"),
     ("sitemap.xml", "sitemap.expected.xml"),
     ("site.webmanifest", "site.expected.webmanifest"),
@@ -342,7 +343,7 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
     def test_landing_and_aggregates_built(self):
         for rel in ("index.html", "archive/index.html",
                     "assets/search-index.json", "sitemap.xml", "robots.txt",
-                    "llms.txt"):
+                    "llms.txt", "_headers"):
             self.assertTrue((self.out / rel).exists(), f"라이브 렌더 누락: {rel}")
 
     # ── 언어판 (라이브 데이터에서만 보이는 것들) ────────────────────────────
@@ -8059,6 +8060,54 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("location.search", zone_fn)
         self.assertNotIn("location.href", zone_fn)
         self.assertIn("/^[a-z0-9-]{1,24}$/", zone_fn)
+
+
+class WebHeadersFileTest(unittest.TestCase):
+    """_headers — Cloudflare Pages 보안 응답 헤더(공급망·보안 위생, 2026-09-10).
+
+    CSP 는 build_headers_txt() docstring 의 이유(jsdelivr·Google Fonts·Brevo·
+    Cloudflare RUM 로드 + 리포트 수신 엔드포인트 부재)로 의도적으로 뺀다 — 여기서는
+    나머지 다섯 규칙이 정확한 값으로, dist 루트 파일로 실제로 나가는지만 본다.
+    robots.txt/llms.txt 와 나란히 SINGLE_GOLDENS(headers.expected.txt)가 byte 회귀를
+    지키고, 이 클래스는 "값 자체가 의도한 다섯 개인지"를 단위 수준에서 고정한다.
+    """
+
+    EXPECTED_RULES = (
+        "Strict-Transport-Security: max-age=31536000; includeSubDomains",
+        "X-Content-Type-Options: nosniff",
+        "Referrer-Policy: strict-origin-when-cross-origin",
+        "X-Frame-Options: DENY",
+        "Permissions-Policy: camera=(), microphone=(), geolocation=()",
+    )
+
+    def test_build_headers_txt_has_exactly_five_rules_under_wildcard(self):
+        txt = render.build_headers_txt()
+        lines = txt.splitlines()
+        self.assertEqual(lines[0], "/*")
+        rule_lines = lines[1:]
+        self.assertEqual(len(rule_lines), len(self.EXPECTED_RULES))
+        for rule in self.EXPECTED_RULES:
+            self.assertIn(f"  {rule}", rule_lines)
+        # CSP 는 의도적 부재 — 실수로 붙었으면 여기서 잡는다.
+        self.assertNotIn("Content-Security-Policy", txt)
+
+    def test_headers_written_to_dist_root(self):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_headers_"))
+        try:
+            data, out = tmp / "data", tmp / "out"
+            data.mkdir(parents=True, exist_ok=True)
+            (data / "brief_web_2026-06-01.json").write_text(
+                json.dumps(_minimal_brief("2026-06-01"), ensure_ascii=False), encoding="utf-8")
+            render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+            headers_path = out / "_headers"
+            self.assertTrue(headers_path.exists(), "dist 루트에 _headers 가 생성돼야 함")
+            content = headers_path.read_text(encoding="utf-8")
+            self.assertTrue(content.startswith("/*\n"))
+            for rule in self.EXPECTED_RULES:
+                self.assertIn(rule, content)
+            self.assertNotIn("Content-Security-Policy", content)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
 
 class WebAdminRenderTest(unittest.TestCase):

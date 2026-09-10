@@ -409,7 +409,9 @@ def _collect_target_query(
             total_count = _total_count(root)
             nodes = _find_result_nodes(root, target)
         except Exception as e:  # noqa: BLE001
-            return [], f"MFDS law API target={target} query={query!r} page={page_no} 실패: {e}"
+            # ★ 보안 — http_get_xml 의 예외 문구는 이미 마스킹돼 오지만, 다른 경로로 생긴
+            #   예외(e.g. ET 파싱 이후 로직)가 원본 url 을 섞어 넣을 가능성에 대비해 방어적으로 재마스킹한다.
+            return [], f"MFDS law API target={target} query={query!r} page={page_no} 실패: {mask_service_key(str(e))}"
 
         if not nodes:
             break

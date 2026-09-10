@@ -3888,6 +3888,33 @@ def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = Fa
     return "\n".join(lines) + "\n"
 
 
+def build_headers_txt() -> str:
+    """_headers — Cloudflare Pages 응답 헤더 규칙(공급망·보안 위생, 2026-09-10).
+
+    Pages 는 배포 루트에 있는 `_headers` 파일을 그대로 읽어 규칙을 응답에 적용한다
+    (wrangler pages deploy 가 `web/dist` 루트 파일을 그대로 올리는 것과 같은 관례 —
+    robots.txt/llms.txt/sitemap.xml 과 나란히 이 함수도 `render_site()` 가 dist 루트에
+    쓴다). `/*` 한 블록에 다섯 규칙만 둔다: HSTS(강제 HTTPS)·MIME 스니핑 차단·리퍼러
+    최소화·클릭재킹 차단(iframe 임베드 금지)·권한(카메라·마이크·위치) 전면 차단.
+
+    ★Content-Security-Policy 는 의도적으로 뺀다. 이 사이트는 jsdelivr(supabase-js·
+    Tabler 아이콘)·Google Fonts·Brevo(뉴스레터 폼 POST)·Cloudflare RUM 스크립트를
+    로드한다 — CSP 를 걸려면 이 출처들을 전부 허용목록에 올려야 하고, 위반 리포트를
+    받을 `report-uri`/`report-to` 엔드포인트 없이 걸면 정책이 조용히 페이지를 깨뜨려도
+    아무도 모른다. 이 프로젝트엔 그 수신 엔드포인트가 없다(운영비 추가 금지 제약과도
+    맞물린다) — CSP 는 엔드포인트를 마련한 뒤 별도 작업으로 붙인다.
+    """
+    rules = [
+        "Strict-Transport-Security: max-age=31536000; includeSubDomains",
+        "X-Content-Type-Options: nosniff",
+        "Referrer-Policy: strict-origin-when-cross-origin",
+        "X-Frame-Options: DENY",
+        "Permissions-Policy: camera=(), microphone=(), geolocation=()",
+    ]
+    lines = ["/*"] + [f"  {rule}" for rule in rules]
+    return "\n".join(lines) + "\n"
+
+
 def build_llms_txt(briefs: list[dict[str, Any]],
                    base_url: str = SITE_BASE_URL,
                    *,
@@ -6108,6 +6135,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")
+    # _headers — Cloudflare Pages 보안 응답 헤더(정적·결정론, 입력 없음). 배포 루트에
+    # robots.txt 와 나란히 둔다(Pages 관례).
+    _write(out_dir / "_headers", build_headers_txt())
+    written.append("_headers")
     # llms.txt — AI 어시스턴트용 안내. sitemap 과 같은 입력에서 파생(결정론).
     _write(out_dir / "llms.txt",
            build_llms_txt(briefs, glossary_term_ids=glossary_term_ids, en_paths=en_paths,

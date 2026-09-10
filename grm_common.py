@@ -105,6 +105,9 @@ def http_get_json(
 
     last_err: Exception | None = None
     req_headers = {**DEFAULT_JSON_HEADERS, **(headers or {})}
+    # ★ 보안 — url 자체(및 params 병합 후 urllib3 예외 메시지)에 serviceKey 가 실려 올 수 있다.
+    #   로그·예외 문구에 쓰는 사본은 항상 마스킹한 것만 쓴다(원본 url 은 requests.get 에만 전달).
+    masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
             resp = requests.get(
@@ -117,25 +120,25 @@ def http_get_json(
             if resp.status_code == 429:
                 if attempt < retries:
                     sleep_s = retry_after_seconds(resp, attempt)
-                    log("WARN", f"GET 429 rate-limit url={url} sleep={sleep_s}s attempt={attempt + 1}/{retries + 1}")
+                    log("WARN", f"GET 429 rate-limit url={masked_url} sleep={sleep_s}s attempt={attempt + 1}/{retries + 1}")
                     time.sleep(sleep_s)
                     continue
-                raise HTTPClientError(resp.status_code, url, f"HTTP 429 for {url}")
+                raise HTTPClientError(resp.status_code, masked_url, f"HTTP 429 for {masked_url}")
             if 400 <= resp.status_code < 500:
-                raise HTTPClientError(resp.status_code, url, f"HTTP {resp.status_code} for {url}")
+                raise HTTPClientError(resp.status_code, masked_url, f"HTTP {resp.status_code} for {masked_url}")
             resp.raise_for_status()
             try:
                 return resp.json()
             except ValueError as e:
-                raise RuntimeError(f"JSON parse failed: {url} - {e}") from e
+                raise RuntimeError(f"JSON parse failed: {masked_url} - {mask_service_key(str(e))}") from e
         except HTTPClientError:
             raise
         except requests.RequestException as e:
             last_err = e
-            log("WARN", f"GET failed ({attempt + 1}/{retries + 1}) url={url} err={e}")
+            log("WARN", f"GET failed ({attempt + 1}/{retries + 1}) url={masked_url} err={mask_service_key(str(e))}")
             if attempt < retries:
                 time.sleep(2 ** attempt)
-    raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})")
+    raise RuntimeError(f"HTTP GET final failure: {masked_url} ({mask_service_key(str(last_err))})")
 
 
 def http_get_xml(
@@ -149,6 +152,9 @@ def http_get_xml(
 
     last_err: Exception | None = None
     req_headers = {**DEFAULT_XML_HEADERS, **(headers or {})}
+    # ★ 보안 — url 에 serviceKey 쿼리스트링이 그대로 실려 오는 호출부가 있다(예: MFDS law.go.kr).
+    #   로그·예외 문구는 항상 마스킹 사본을 쓴다(원본 url 은 requests.get 에만 전달).
+    masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
             resp = requests.get(
@@ -160,12 +166,12 @@ def http_get_xml(
             if resp.status_code == 429:
                 if attempt < retries:
                     sleep_s = retry_after_seconds(resp, attempt)
-                    log("WARN", f"XML GET 429 rate-limit url={url} sleep={sleep_s}s attempt={attempt + 1}/{retries + 1}")
+                    log("WARN", f"XML GET 429 rate-limit url={masked_url} sleep={sleep_s}s attempt={attempt + 1}/{retries + 1}")
                     time.sleep(sleep_s)
                     continue
-                raise HTTPClientError(resp.status_code, url, f"HTTP 429 for {url}")
+                raise HTTPClientError(resp.status_code, masked_url, f"HTTP 429 for {masked_url}")
             if 400 <= resp.status_code < 500:
-                raise HTTPClientError(resp.status_code, url, f"HTTP {resp.status_code} for {url}")
+                raise HTTPClientError(resp.status_code, masked_url, f"HTTP {resp.status_code} for {masked_url}")
             resp.raise_for_status()
             # 일부 피드(예: WHO Drupal RSS)는 XML 선언 앞에 theme debug 주석/BOM 등 잡음이 붙어
             # "XML or text declaration not at start of entity" 로 파싱 실패한다.
@@ -193,15 +199,15 @@ def http_get_xml(
             try:
                 return ET.fromstring(content)
             except ET.ParseError as e:
-                raise RuntimeError(f"XML parse failed: {url} - {e}") from e
+                raise RuntimeError(f"XML parse failed: {masked_url} - {mask_service_key(str(e))}") from e
         except HTTPClientError:
             raise
         except requests.RequestException as e:
             last_err = e
-            log("WARN", f"XML GET failed ({attempt + 1}/{retries + 1}) url={url} err={e}")
+            log("WARN", f"XML GET failed ({attempt + 1}/{retries + 1}) url={masked_url} err={mask_service_key(str(e))}")
             if attempt < retries:
                 time.sleep(2 ** attempt)
-    raise RuntimeError(f"HTTP XML GET final failure: {url} ({last_err})")
+    raise RuntimeError(f"HTTP XML GET final failure: {masked_url} ({mask_service_key(str(last_err))})")
 
 
 # ── data.go.kr 공통 유틸리티 ──────────────────────────────────────────────────
@@ -372,6 +378,9 @@ def http_get_html(
         **(headers or {}),
     }
     last_err: Exception | None = None
+    # ★ 보안 — 일부 호출부(라이브러리 소스 등)는 url 에 API 키가 실릴 수 있다. 로그·예외
+    #   문구는 항상 마스킹 사본을 쓴다(원본 url 은 requests.get 에만 전달).
+    masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
             resp = requests.get(
@@ -382,7 +391,7 @@ def http_get_html(
             )
             if resp.status_code == 429 and attempt < retries:
                 sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                log("WARN", f"{tag} 429 url={url} sleep={sleep_s}s")
+                log("WARN", f"{tag} 429 url={masked_url} sleep={sleep_s}s")
                 time.sleep(sleep_s)
                 continue
             resp.raise_for_status()
@@ -390,11 +399,11 @@ def http_get_html(
         except requests.RequestException as e:
             last_err = e
             if attempt < retries:
-                log("WARN", f"{tag} GET retry {attempt + 1}/{retries + 1} url={url} err={e}")
+                log("WARN", f"{tag} GET retry {attempt + 1}/{retries + 1} url={masked_url} err={mask_service_key(str(e))}")
                 time.sleep(2 ** attempt)
                 continue
-            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
-    raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})")
+            raise RuntimeError(f"HTTP GET final failure: {masked_url} ({mask_service_key(str(last_err))})") from e
+    raise RuntimeError(f"HTTP GET final failure: {masked_url} ({mask_service_key(str(last_err))})")
 
 
 def http_get_bytes(
@@ -413,6 +422,9 @@ def http_get_bytes(
         **(headers or {}),
     }
     last_err: Exception | None = None
+    # ★ 보안 — 일부 호출부(라이브러리 소스 등)는 url 에 API 키가 실릴 수 있다. 로그·예외
+    #   문구는 항상 마스킹 사본을 쓴다(원본 url 은 requests.get 에만 전달).
+    masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
             resp = requests.get(
@@ -423,7 +435,7 @@ def http_get_bytes(
             )
             if resp.status_code == 429 and attempt < retries:
                 sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                log("WARN", f"{tag} 429 url={url} sleep={sleep_s}s")
+                log("WARN", f"{tag} 429 url={masked_url} sleep={sleep_s}s")
                 time.sleep(sleep_s)
                 continue
             resp.raise_for_status()
@@ -431,11 +443,11 @@ def http_get_bytes(
         except requests.RequestException as e:
             last_err = e
             if attempt < retries:
-                log("WARN", f"{tag} GET retry {attempt + 1}/{retries + 1} url={url} err={e}")
+                log("WARN", f"{tag} GET retry {attempt + 1}/{retries + 1} url={masked_url} err={mask_service_key(str(e))}")
                 time.sleep(2 ** attempt)
                 continue
-            raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})") from e
-    raise RuntimeError(f"HTTP GET final failure: {url} ({last_err})")
+            raise RuntimeError(f"HTTP GET final failure: {masked_url} ({mask_service_key(str(last_err))})") from e
+    raise RuntimeError(f"HTTP GET final failure: {masked_url} ({mask_service_key(str(last_err))})")
 
 
 # ── [배치5 Phase0] collect_intake 에서 relocate: 소스 식별 상수 + 공용 텍스트/환경 헬퍼 ──

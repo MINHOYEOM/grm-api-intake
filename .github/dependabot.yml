@@ -1,0 +1,23 @@
+version: 2
+
+# 운영자가 1인 저장소 — 월간 + 그룹핑을 의도적으로 택한다. 주간으로 돌리면
+# 액션·pip 각각 매주 여러 건의 PR 이 쌓여 노이즈만 된다(리뷰할 사람이 한 명뿐).
+# 모든 업데이트를 액션 1묶음 + pip 1묶음, 최대 월 2건의 PR 로 합친다.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      pip:
+        patterns:
+          - "*"

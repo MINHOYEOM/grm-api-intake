@@ -24,8 +24,8 @@
 # 여기에 포함한다(requirements.txt 를 따로 설치하면 그 경로가 hash 미검증으로 남는다).
 # ★그래도 requirements.txt(매일 도는 intake) 자체는 건드리지 않는다 -- 위 경고 유지.
 requests==2.34.2
-torch==2.13.0
-sentence-transformers==3.4.1
-transformers==4.57.6
-huggingface_hub==0.36.2
-numpy==2.5.1
+torch==2.14.0+cpu
+sentence-transformers==6.0.1
+transformers==5.16.1
+huggingface_hub==1.30.0
+numpy==2.5.3

@@ -42,7 +42,7 @@ REQUIRED_FILES=(
   ".env.example"
   "GRM_SYSTEM.md"
   "docs/notion_intake_db_schema.md"
-  "docs/prompts/GRM_Prompt_v15.6.md"
+  "docs/prompts/GRM_Prompt_v16.md"
   ".github/workflows/grm-intake.yml"
 )
 
@@ -309,7 +309,7 @@ echo "     -> Run workflow -> dry_run: true"
 echo
 echo "  3) If dry-run is OK, run again with dry_run: false to write to Notion"
 echo
-echo "  4) Paste docs/prompts/GRM_Prompt_v15.6.md into your Claude Code Routine"
+echo "  4) Paste docs/prompts/GRM_Prompt_v16.md into your Claude Code Routine"
 echo
 echo "  5) Cron schedule: daily 18:17 UTC (03:17 KST next day)"
 echo "     Routine digest: Monday 07:30 KST"

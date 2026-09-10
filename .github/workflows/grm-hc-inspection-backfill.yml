@@ -1,36 +1,36 @@
 name: GRM Health Canada Inspection Deep Backfill (findings)
 
-# 캐나다 보건부 GMP 실사 리포트카드 과거분 findings 딥 백필 — 월 1회 스케줄(최근 90일 창,
+# 캐나다 보건부 GMP 실사 리포트카드 과거분 findings 딥 백필 — 주 1회 스케줄(최근 60일 창,
 # 멱등) + 수동 dispatch. [2026-09-10] 1,824건 전량이 2026-08-10 하루에만 적재되고 그 뒤로
-# 원장이 얼어붙은 게 실측으로 확인돼(수동 dispatch 뿐이라 아무도 다시 안 돌렸다) 월간
-# 스케줄을 붙였다 — 최근 90일 창을 매달 멱등 재수집하면 신규분(월 ~37건)이 자동으로 든다.
+# 원장이 얼어붙은 게 실측으로 확인돼(수동 dispatch 뿐이라 아무도 다시 안 돌렸다) 주간
+# 스케줄을 붙였다 — 최근 60일 창을 매주 멱등 재수집하면 신규분(월 ~37건)이 자동으로 든다.
 #
 # 배경: 이 소스는 **일일 크론에 붙어 있지 않다.** 일일 intake 로 붙이려면 수동 레지스트리
 #   6곳(INTAKE_SOURCE_SPECS / CollectionStats / _insert_items_map / card_scaffold._REGISTRY /
 #   grm_health.enabled_source_failures / transient 코드)을 전부 고쳐야 하고, 하나만 빠뜨리면
 #   "조용히 죽거나 월요일 발행을 멈추거나" 중 하나가 된다(둘 다 실사고 이력이 있다).
 #   백필 경로는 Notion 을 우회해 PostgREST 로 직행하므로 그 여섯 곳을 하나도 안 건드린다.
-#   HC 실사는 월 ~37건이라 일일 유입은 급하지 않다 — 월간 재수집으로 충분하다.
+#   HC 실사는 월 ~37건이라 일일 유입은 급하지 않다 — 주간 재수집으로 충분하다.
 #
 # ★핵심 제약(EU/MHRA NCR 백필과 동형):
 #   - git 쓰기 없음(checkout=read-only). Notion 무접촉 → 주간 브리프 파이프라인 무간섭.
 #   - 멱등: raw_signal_id / finding_id 는 (schema_version, source, document_id) 해시라
 #     재실행해도 중복 0. 실패 시 리포트의 failed_ins_numbers 로 잔여만 메우면 된다.
 #   - dispatch 는 dry_run=true(기본값)로 먼저 실행해 건수를 확인한 뒤 apply 로 재실행한다.
-#     스케줄 실행은 이 기본값을 안 거친다 — 최근 90일 창이 이미 좁고 멱등이라 바로 apply.
+#     스케줄 실행은 이 기본값을 안 거친다 — 최근 60일 창이 이미 좁고 멱등이라 바로 apply.
 #   - ★적재 후 번역 필수(이 워크플로 밖): findings 공개 RLS 가 finding_text_ko 를 요구하고
 #     HC 관찰문은 영어다. 적재 완료 ≠ 공개 완료 — 두 숫자를 같은 것으로 보고하지 말 것.
 #
-# ★비용: 문서당 상세 1콜이다. 전량(1,824문서 × request_delay 0.4초) ≈ 13분. 월간 스케줄은
-#   90일 창(신규 ~111건 안팎)만 돌아 훨씬 가볍다. 정부 단일 서버를 연타하므로 request_delay
+# ★비용: 문서당 상세 1콜이다. 전량(1,824문서 × request_delay 0.4초) ≈ 13분. 주간 스케줄은
+#   60일 창(신규 ~75건 안팎)만 돌아 훨씬 가볍다. 정부 단일 서버를 연타하므로 request_delay
 #   를 함부로 낮추지 마라(스케줄 실행은 이 인자를 아예 안 넘겨 수집기 기본값을 그대로 쓴다).
 on:
   schedule:
-    # 매월 3일 19:23 UTC = 4일 04:23 KST — 일일 intake(grm-intake.yml, 18:17 UTC)·findings
+    # 매주 토요일 19:23 UTC = 일요일 04:23 KST — 일일 intake(grm-intake.yml, 18:17 UTC)·findings
     # 백필(grm-findings-backfill-fetch.yml, 00/06/12:17 UTC)크론과 겹치지 않는 시각.
     # schedule 이벤트에서는 workflow_dispatch 의 inputs.* 가 전부 빈 문자열이다(default 는
     # dispatch 전용 — GitHub 사실). 실제 파라미터 계산은 아래 실행 스텝의 schedule 분기 참조.
-    - cron: '23 19 3 * *'
+    - cron: '23 19 * * 6'
   workflow_dispatch:
     inputs:
       from_date:
@@ -60,7 +60,7 @@ on:
 
 permissions:
   contents: read
-  issues: write   # 마지막 스텝(월간 스케줄 실패 표면화 이슈) 전용 — 나머지 스텝은 GitHub 에 쓰지 않는다.
+  issues: write   # 마지막 스텝(주간 스케줄 실패 표면화 이슈) 전용 — 나머지 스텝은 GitHub 에 쓰지 않는다.
 
 concurrency:
   # 자기 자신과만 직렬화한다(일일 크론에 HC 실사 채널이 없으므로 경합 대상이 없다).
@@ -96,12 +96,12 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            # [2026-09-10] 월간 스케줄 자동 재수집 — dispatch 입력(inputs.*)은 schedule
+            # [2026-09-10] 주간 스케줄 자동 재수집 — dispatch 입력(inputs.*)은 schedule
             # 이벤트에서 전부 빈 문자열이라 여기서 전혀 참조하지 않고 직접 계산한다
-            # (grm-findings-backfill-fetch.yml F2c 관용구와 동형). 최근 90일 창 · limit
+            # (grm-findings-backfill-fetch.yml F2c 관용구와 동형). 최근 60일 창 · limit
             # 무제한 · dry_run=false(실적재) · request-delay 는 인자를 생략해 수집기
             # 기본값(REQUEST_DELAY_SECONDS)을 그대로 쓴다.
-            EFF_FROM="$(date -u -d '90 days ago' +%F)"
+            EFF_FROM="$(date -u -d '60 days ago' +%F)"
             EFF_TO=""
             EFF_LIMIT="0"
             EFF_DRY_RUN="false"
@@ -165,7 +165,7 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # [2026-09-10] 월간 스케줄 실패 표면화 — 담당자 없이 도는 자동 재수집이라 실패가
+      # [2026-09-10] 주간 스케줄 실패 표면화 — 담당자 없이 도는 자동 재수집이라 실패가
       # 조용히 묻히면 다음 스케줄까지 한 달을 그냥 흘려보낸다(이 파일 header 의 실측:
       # 08-10 이후 원장이 얼어붙은 게 이런 식으로 방치됐다). dispatch 실패는 사람이 화면을
       # 보고 있으므로 대상에서 뺀다(grm-db-backup.yml 관용구와 동형 — 제목 고정 + 20h
@@ -178,14 +178,14 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const title = 'HC 실사 월간 재수집 실패';
+            const title = 'HC 실사 주간 재수집 실패';
             const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
             const { data: open } = await github.rest.issues.listForRepo({
               owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
             });
             const existing = open.find((i) => i.title === title);
             const body = [
-              '월 1회 Health Canada 실사 재수집(grm-hc-inspection-backfill.yml, schedule)이 실패했습니다.',
+              '주 1회 Health Canada 실사 재수집(grm-hc-inspection-backfill.yml, schedule)이 실패했습니다.',
               '',
               `- 실행: ${runUrl}`,
               '',

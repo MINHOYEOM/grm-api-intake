@@ -72,6 +72,7 @@ on:
 
 permissions:
   contents: read
+  issues: write   # 3연속 스케줄 실패 표면화 이슈 생성/코멘트/종료용(2026-09-10)
 
 concurrency:
   group: findings-backfill-fetch
@@ -144,6 +145,139 @@ jobs:
           if [ "${SKIPPED}" != "0" ]; then
             echo "::warning title=OCR 엔진 없음(483 적재 보류)::스캔 483 ${SKIPPED}건을 본문 없이 적재하지 않고 보류했다 — 러너 tesseract 설치를 확인하라(.github/actions/setup-ocr)."
           fi
+
+      # [2026-09-10 침묵 실패 수리] 09-09 04:48 UTC 부터 리딩룸이 Akamai 봇매니저에 막혀
+      # --auto 스케줄 런이 list-config-failed:RuntimeError 로 4연속 실패했는데(이제
+      # collect_fda_backfill.py 가 2차 전수 JSON 백본으로 자동 폴백하지만 그 2차마저
+      # 막히면 여전히 exit 2 다), 이 워크플로는 그 실패를 어디에도 표면화하지 않았다
+      # (2026-09-02 감사 지적 사항). 매 실패마다 이슈를 열면 잡음이라(하루 3회 스케줄) --
+      # "3연속"(현재 실행 포함, listWorkflowRuns 로 직전 2회 확인)일 때만 표면화하고,
+      # 제목을 고정해 중복 이슈를 만들지 않는다. dispatch 실패는 사람이 보고 있으므로
+      # 대상에서 제외한다(grm-intake.yml 의 스케줄 전용 관용구와 동형).
+      - name: Surface persistent failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM Findings Backfill Fetch 연속 실패';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const { data: runsResp } = await github.rest.actions.listWorkflowRuns({
+              owner, repo, workflow_id: 'grm-findings-backfill-fetch.yml',
+              event: 'schedule', per_page: 5,
+            });
+            const previous = runsResp.workflow_runs
+              .filter((r) => r.id !== context.runId)
+              .slice(0, 2);
+            const isThirdConsecutive = previous.length === 2
+              && previous.every((r) => r.conclusion === 'failure');
+            if (!isThirdConsecutive) {
+              console.log(
+                `not yet 3 consecutive scheduled failures (previous conclusions: `
+                + `${previous.map((r) => r.conclusion).join(',') || 'n/a'})`,
+              );
+              return;
+            }
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+            await ensureLabel('grm-findings', '0e8a16', 'GRM findings pipeline');
+            await ensureLabel('automation-failure', 'b60205', 'GRM automation failure');
+
+            let reportSection;
+            if (fs.existsSync('fetch_report.json')) {
+              try {
+                const report = JSON.parse(fs.readFileSync('fetch_report.json', 'utf8'));
+                const errors = Array.isArray(report.errors) ? report.errors : [];
+                reportSection = [
+                  `- backbone: \`${report.backbone ?? 'unknown'}\``,
+                  '- errors:',
+                  ...(errors.length ? errors.map((e) => `  - \`${e}\``) : ['  - (없음)']),
+                ].join('\n');
+              } catch (error) {
+                reportSection = `fetch_report.json 파싱 실패: ${error}`;
+              }
+            } else {
+              reportSection = 'fetch_report.json 없음 (인자/인증 단계에서 조기 종료됐을 수 있음).';
+            }
+
+            const body = [
+              'GRM Findings Backfill Fetch(F2b/F2c)가 스케줄 실행에서 3회 연속 실패했습니다.',
+              '',
+              `- 최신 실행: ${runUrl}`,
+              '',
+              reportSection,
+              '',
+              '483 목록은 DataTables 1차 → 전수 JSON 2차. 둘 다 죽었다면 fda.gov 가 러너 IP 를 막고 있는지 확인. 복구되면 이 이슈는 자동으로 닫힌다.',
+            ].join('\n');
+
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = openIssues.find((i) => i.title === title);
+            if (!existing) {
+              await github.rest.issues.create({
+                owner, repo, title, body,
+                labels: ['grm-findings', 'automation-failure'], assignees: [owner],
+              });
+              console.log('created persistent-failure issue');
+              return;
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const twentyHoursAgoMs = Date.now() - 20 * 60 * 60 * 1000;
+            const commentedRecently = comments.some(
+              (c) => new Date(c.created_at).getTime() > twentyHoursAgoMs,
+            );
+            if (commentedRecently) {
+              console.log('a comment was already posted within the last 20h -- skipping');
+              return;
+            }
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: existing.number,
+              body: `여전히 실패 중입니다 (${runUrl}).`,
+            });
+            console.log(`commented on existing issue #${existing.number}`);
+
+      # 복구 확인은 스케줄 실행이 실제로 성공했을 때만 한다(dispatch 는 사람이 보고 있으므로
+      # 제외 -- 위 표면화 스텝과 대칭). 열린 이슈가 없으면 조용히 아무 것도 하지 않는다.
+      - name: Close persistent-failure issue on recovery
+        if: success() && github.event_name == 'schedule'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM Findings Backfill Fetch 연속 실패';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = openIssues.find((i) => i.title === title);
+            if (!existing) {
+              console.log('no open persistent-failure issue; nothing to close');
+              return;
+            }
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: existing.number,
+              body: `복구 확인: ${runUrl}`,
+            });
+            await github.rest.issues.update({
+              owner, repo, issue_number: existing.number, state: 'closed',
+            });
+            console.log(`closed persistent-failure issue #${existing.number}`);
 
       # dry_run 이 아니고 이번 실행에서 raw_signals 가 실제 추가됐을 때만 M12 체인:
       # 방금 적재된 raw 를 같은 잡에서 findings 로 변환해 백필을 완결한다.

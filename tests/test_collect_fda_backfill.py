@@ -84,6 +84,48 @@ def _483_ajax_json(rows: list, total: int) -> str:
     return json.dumps({"data": rows, "recordsFiltered": total, "recordsTotal": total})
 
 
+# [2026-09-10] Normalized rows in the shape `collect_fda_483._json_norm_rows` produces
+# (2nd-tier full-JSON backbone) -- same schema as _483_NROW, `country` always "" (the
+# JSON has no country field; only the HTML/DataTables paths carry it).
+_483_JSON_ROW_A = {
+    "record_date": "05/20/2026",
+    "company": "Gamma Pharma Inc",
+    "fei": "3099999999",
+    "record_type": "483",
+    "media_id": "555002",
+    "state": "CA",
+    "country": "",
+    "establishment_type": "Pharmaceutical Manufacturer",
+    "publish_date": "06/05/2026",          # newest of the three fixtures
+}
+_483_JSON_ROW_B = {
+    "record_date": "05/10/2026",
+    "company": "Delta Labs LLC",
+    "fei": "3088888888",
+    "record_type": "483",
+    "media_id": "555003",
+    "state": "TX",
+    "country": "",
+    "establishment_type": "Pharmaceutical Manufacturer",
+    "publish_date": "06/01/2026",
+}
+_483_JSON_ROW_C = {
+    "record_date": "04/28/2026",
+    "company": "Epsilon Sterile Mfg",
+    "fei": "3077777777",
+    "record_type": "483",
+    "media_id": "555004",
+    "state": "NJ",
+    "country": "",
+    "establishment_type": "Pharmaceutical Manufacturer",
+    "publish_date": "05/20/2026",           # oldest of the three fixtures
+}
+
+# Reading-room HTML that fetches fine but carries no Drupal DataTables settings at all
+# (Akamai's block page shape observed 2026-09-09+ -- 200 OK, no `drupal-settings-json`).
+_HTML_NO_DRUPAL_SETTINGS = "<html><body>access denied / no drupal settings here</body></html>"
+
+
 _WL_PAGE_HTML = (
     '<html><script data-drupal-selector="drupal-settings-json">'
     + json.dumps({
@@ -188,6 +230,14 @@ def _run_483(**overrides):
     pdf_side_effect = overrides.pop("pdf_side_effect", None)
     post_response = overrides.pop("post_response", _FakeResponse(201, [{"raw_signal_id": "x"}]))
     post_side_effect = overrides.pop("post_side_effect", None)
+    # [2026-09-10 JSON 2차 백본] 리딩룸 HTML 응답/2차 JSON 을 오버라이드할 수 있게 한다.
+    # 기본값은 종전과 완전히 동일한 동작(1차 성공, 2차는 절대 호출되지 않음)을 유지하면서,
+    # `_fetch_legacy_json_rows` 를 **항상** 목(default 빈 결과)해 둔다 -- 이 헬퍼로 짠 어떤
+    # 시나리오가 실수로 1차를 실패시키더라도 실 네트워크(fda.gov)에 닿지 않는다.
+    reading_room_html = overrides.pop("reading_room_html", _483_READING_ROOM_HTML)
+    reading_room_side_effect = overrides.pop("reading_room_side_effect", None)
+    legacy_json_rows = overrides.pop("legacy_json_rows", [])
+    legacy_json_total = overrides.pop("legacy_json_total", 0)
     kwargs.update(overrides)
     sleeper = _Sleeper()
 
@@ -196,10 +246,14 @@ def _run_483(**overrides):
         pdf_mock.side_effect = pdf_side_effect
 
     post_kwargs = {"side_effect": post_side_effect} if post_side_effect else {"return_value": post_response}
+    html_kwargs = ({"side_effect": reading_room_side_effect} if reading_room_side_effect is not None
+                   else {"return_value": reading_room_html})
     with mock.patch("collect_fda_backfill.fetch_existing_document_ids", return_value=existing), \
-         mock.patch("collect_fda_backfill.http_get_html", return_value=_483_READING_ROOM_HTML), \
+         mock.patch("collect_fda_backfill.http_get_html", **html_kwargs), \
          mock.patch("collect_fda_483.http_get_html",
                     return_value=_483_ajax_json(ajax_rows, ajax_total)), \
+         mock.patch("collect_fda_483._fetch_legacy_json_rows",
+                    return_value=(legacy_json_rows, legacy_json_total)), \
          mock.patch("collect_fda_483._fetch_fda483_pdf_text", pdf_mock), \
          mock.patch("findings_supabase_append.requests.post", **post_kwargs) as post:
         report, exit_code = backfill.run_483(sleeper=sleeper, **kwargs)
@@ -512,16 +566,21 @@ class ErrorHandlingTest(unittest.TestCase):
         self.assertTrue(any("raw_signals-post-failed" in e for e in report.errors))
 
     def test_listing_failure_is_exit_2(self) -> None:
+        # [2026-09-10] 1차 DataTables 실패는 이제 2차 전수 JSON 으로 폴백한다 -- 그 백본도
+        # 죽었을 때만 exit 2 다. `_fetch_legacy_json_rows` 를 명시적으로 실패시켜(실 네트워크
+        # 호출 없이) 두 백본 모두 죽은 시나리오를 재현한다.
         sleeper = _Sleeper()
         with mock.patch("collect_fda_backfill.fetch_existing_document_ids", return_value=set()), \
              mock.patch("collect_fda_backfill.http_get_html",
-                        side_effect=RuntimeError("HTTP GET final failure")):
+                        side_effect=RuntimeError("HTTP GET final failure")), \
+             mock.patch("collect_fda_483._fetch_legacy_json_rows", return_value=([], 0)):
             report, exit_code = backfill.run_483(
                 offset=0, max_docs=10, delay=0, dry_run=True,
                 base_url=_BASE_URL, service_key=_SERVICE_KEY, sleeper=sleeper,
             )
         self.assertEqual(exit_code, 2)
         self.assertTrue(any("list-config-failed" in e for e in report.errors))
+        self.assertIn("json-backbone-failed", report.errors)
 
     def test_existing_ids_failure_is_exit_2_without_key_leak(self) -> None:
         sleeper = _Sleeper()
@@ -546,6 +605,161 @@ class ServiceKeySecrecyTest(unittest.TestCase):
         )
         from dataclasses import asdict
         self.assertNotIn(_SERVICE_KEY, json.dumps(asdict(report)))
+
+
+# ---------------------------------------------------------------------------
+# [2026-09-10] 483 listing JSON 2nd-tier fallback -- 09-09 Akamai bot-block took out the
+# reading-room DataTables config 4 scheduled runs in a row; run_483 now falls back to the
+# daily collector's own 2nd-tier full-JSON backbone (collect_fda_483._fetch_legacy_json_rows).
+# ---------------------------------------------------------------------------
+
+
+class Fda483JsonFallbackTest(unittest.TestCase):
+    def test_config_missing_falls_back_to_json_and_computes_remaining(self) -> None:
+        rows = [dict(_483_JSON_ROW_A), dict(_483_JSON_ROW_B), dict(_483_JSON_ROW_C)]
+        report, exit_code, post, pdf, sleeper = _run_483(
+            reading_room_html=_HTML_NO_DRUPAL_SETTINGS,
+            legacy_json_rows=rows, legacy_json_total=len(rows),
+            existing_ids={"fda483-555003"},   # ROW_B already collected
+            max_docs=1,                        # smaller than the 2 remaining candidates
+            pdf_side_effect=[("", "fetch-fail:test")],
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.backbone, "legacy-json")
+        self.assertTrue(report.exhausted)
+        self.assertEqual(report.listed, 3)
+        self.assertEqual(report.skipped_existing, 1)          # ROW_B absorbed here
+        self.assertEqual(report.source_total, 3)
+        self.assertEqual(report.remaining, 1)                  # 2 candidates - 1 fetched
+        posted = _posted_records(post)
+        self.assertEqual(len(posted), 1)
+        # newest publish_date among the candidates (ROW_A, 06/05) is fetched first.
+        self.assertEqual(posted[0]["document_id"], "fda483-555002")
+        pdf.assert_called_once()
+        # sleeper: config fetch + (no page fetch attempted) + legacy-json pre-call + 1 doc.
+        self.assertEqual(sleeper.calls, [30, 30, 30])
+
+    def test_reading_room_fetch_raising_also_falls_back_to_json(self) -> None:
+        rows = [dict(_483_JSON_ROW_A)]
+        report, exit_code, post, _pdf, _sleeper = _run_483(
+            reading_room_side_effect=RuntimeError("Akamai 403"),
+            legacy_json_rows=rows, legacy_json_total=len(rows),
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.backbone, "legacy-json")
+        posted = _posted_records(post)
+        self.assertEqual(len(posted), 1)
+        self.assertEqual(posted[0]["document_id"], "fda483-555002")
+
+    def test_both_backbones_failing_is_exit_2_with_both_error_strings(self) -> None:
+        report, exit_code, post, pdf, _sleeper = _run_483(
+            reading_room_html=_HTML_NO_DRUPAL_SETTINGS,
+            legacy_json_rows=[], legacy_json_total=0,
+        )
+        self.assertEqual(exit_code, 2)
+        self.assertTrue(any("list-config-failed" in e for e in report.errors))
+        self.assertIn("json-backbone-failed", report.errors)
+        pdf.assert_not_called()
+        post.assert_not_called()
+        from dataclasses import asdict
+        self.assertNotIn(_SERVICE_KEY, json.dumps(asdict(report)))
+
+    def test_dry_run_in_json_mode_never_fetches_or_posts(self) -> None:
+        rows = []
+        for i in range(12):
+            row = dict(_483_JSON_ROW_A)
+            row["media_id"] = f"70{i:02d}"
+            row["publish_date"] = "06/05/2026"
+            rows.append(row)
+        report, exit_code, post, pdf, _sleeper = _run_483(
+            reading_room_html=_HTML_NO_DRUPAL_SETTINGS,
+            legacy_json_rows=rows, legacy_json_total=len(rows),
+            dry_run=True,
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.backbone, "legacy-json")
+        self.assertEqual(report.listed, 12)
+        self.assertEqual(report.fetched, 0)
+        self.assertEqual(report.appended, 0)
+        self.assertEqual(len(report.would_fetch), 10)          # cap unchanged
+        pdf.assert_not_called()
+        post.assert_not_called()
+
+    def test_candidates_are_fetched_newest_publish_date_first(self) -> None:
+        # Rows handed to run_483 deliberately out of date order (oldest, newest, middle).
+        rows = [dict(_483_JSON_ROW_C), dict(_483_JSON_ROW_A), dict(_483_JSON_ROW_B)]
+        report, exit_code, _post, _pdf, _sleeper = _run_483(
+            reading_room_html=_HTML_NO_DRUPAL_SETTINGS,
+            legacy_json_rows=rows, legacy_json_total=len(rows),
+            dry_run=True,
+        )
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(
+            report.would_fetch,
+            ["fda483-555002", "fda483-555003", "fda483-555004"],  # newest -> oldest
+        )
+
+
+class Fda483JsonFallbackAutoModeTest(unittest.TestCase):
+    """[2026-09-10] run_auto orchestration around the real run_483 (only fda_wl's runner is
+    mocked, mirroring the existing run_auto tests' "WL side mocked" convention) -- proves
+    the fallback's exhausted=True terminates the per-source page loop after one attempt
+    instead of looping, and that the merged report surfaces backbone."""
+
+    def test_single_fda483_attempt_no_infinite_loop_backbone_recorded(self) -> None:
+        rows = [dict(_483_JSON_ROW_A)]
+        rwl = mock.MagicMock(return_value=(_auto_rep("fda_wl", exhausted=True), 0))
+        with mock.patch("collect_fda_backfill.fetch_existing_document_ids", return_value=set()), \
+             mock.patch("collect_fda_backfill.http_get_html", return_value=_HTML_NO_DRUPAL_SETTINGS), \
+             mock.patch("collect_fda_483._fetch_legacy_json_rows",
+                        return_value=(rows, len(rows))), \
+             mock.patch("collect_fda_483._fetch_fda483_pdf_text",
+                        return_value=("", "fetch-fail:test")), \
+             mock.patch("findings_supabase_append.requests.post",
+                        return_value=_FakeResponse(201, [{"raw_signal_id": "x"}])), \
+             mock.patch.dict(backfill._RUNNERS, {"fda_wl": rwl}):
+            merged, code = backfill.run_auto(
+                max_docs=500, delay=0, dry_run=False,
+                base_url=_BASE_URL, service_key=_SERVICE_KEY,
+            )
+        self.assertEqual(code, 0)
+        fda483_attempts = [a for a in merged["auto_attempts"] if a["source"] == "fda483"]
+        self.assertEqual(len(fda483_attempts), 1)              # no infinite loop
+        self.assertEqual(fda483_attempts[0]["backbone"], "legacy-json")
+        # Top-level "backbone" mirrors the *last* attempt (fda_wl here, per the fixed
+        # 483-then-WL order) -- same "last.X" convention as source/offset/next_offset.
+        self.assertEqual(merged["backbone"], "datatables")
+        rwl.assert_called_once()
+
+    def test_all_existing_json_candidates_report_fda483_caught_up(self) -> None:
+        rows = [dict(_483_JSON_ROW_A), dict(_483_JSON_ROW_B)]
+        existing_483 = {"fda483-555002", "fda483-555003"}
+        rwl = mock.MagicMock(return_value=(_auto_rep("fda_wl", exhausted=True), 0))
+
+        def fake_existing(base, key, source, **_kw):
+            return set(existing_483) if source == "FDA 483" else set()
+
+        with mock.patch("collect_fda_backfill.fetch_existing_document_ids",
+                        side_effect=fake_existing), \
+             mock.patch("collect_fda_backfill.http_get_html",
+                        side_effect=RuntimeError("Akamai 403")), \
+             mock.patch("collect_fda_483._fetch_legacy_json_rows",
+                        return_value=(rows, len(rows))), \
+             mock.patch.dict(backfill._RUNNERS, {"fda_wl": rwl}):
+            merged, code = backfill.run_auto(
+                max_docs=500, delay=0, dry_run=False,
+                base_url=_BASE_URL, service_key=_SERVICE_KEY,
+            )
+        self.assertEqual(code, 0)
+        fda483_attempt = next(a for a in merged["auto_attempts"] if a["source"] == "fda483")
+        self.assertEqual(fda483_attempt["skipped_existing"], 2)
+        self.assertEqual(fda483_attempt["fetched"], 0)
+        self.assertTrue(fda483_attempt["exhausted"])
+        # Rebuild the per-attempt dataclass and confirm the orchestration-level predicate
+        # (used by run_auto to decide auto_complete) agrees: nothing new + exhausted = caught up.
+        rebuilt = backfill.BackfillFetchReport(**fda483_attempt)
+        self.assertTrue(backfill._auto_caught_up(rebuilt))
+        rwl.assert_called_once()   # 483 caught up -> falls through to WL in the same run
 
 
 # ---------------------------------------------------------------------------
@@ -779,6 +993,8 @@ class AutoReportSchemaTest(unittest.TestCase):
     # merged auto report must keep at the top level with the same types.
     # `skipped_ocr_unavailable`(2026-07-30)은 순수 추가 필드다 — 기존 키·타입은 전부
     # 그대로 두고, 병합 리포트도 같은 이름으로 합산해 워크플로가 두 모드를 분기 없이 읽는다.
+    # `backbone`(2026-09-10)도 같은 방식의 순수 추가 필드다 -- 483 백필이 JSON 2차
+    # 백본으로 폴백했는지 관측하는 용도.
     # SCHEMA_VERSION 은 **올리지 않았다**: raw_signal_id = sha256({schema_version, source,
     # document_id})[:24] 라 버전을 바꾸면 기존 적재분과 dedup 동일성이 깨진다.
     _EXISTING_FIELDS = {
@@ -786,7 +1002,7 @@ class AutoReportSchemaTest(unittest.TestCase):
         "listed": int, "skipped_existing": int, "skipped_gated": int,
         "skipped_ocr_unavailable": int,
         "fetched": int, "appended": int, "invalid": int, "errors": list,
-        "next_offset": int, "exhausted": bool, "would_fetch": list,
+        "next_offset": int, "exhausted": bool, "backbone": str, "would_fetch": list,
         "source_total": (int, type(None)), "remaining": (int, type(None)),
     }
 

@@ -173,3 +173,73 @@ class WlDeviceScopeTest(unittest.TestCase):
 
     def test_no_crlf(self) -> None:
         self.assertNotIn(b"\r\n", self.path.read_bytes())
+
+
+class WlBimoDeviceScopeTest(unittest.TestCase):
+    """★2026-09-10. BIMO(Bioresearch Monitoring)가 **기기 임상시험자·IRB** 에게 보낸 경고서한이
+    제약 범위로 공개돼 있었다 — Stephen J. Fallon, Ph.D.(HIV 자가검사 기기 연구, 21 CFR 812)
+    findings 4건, MIT(IRB, Part 56 + Part 812) 2건. 내용은 informed consent·IRB 기록이지 GMP 가
+    아니다.
+
+    ★새는 구멍은 **발신 기관명**이다. CBER 소관 기기라 서한에 "Center for **Biolog**ics
+      Evaluation and Research" 가 찍히고, ① 의 `\ybiolog` 가 거기 걸려 'ok' 가 먼저 확정된다.
+      051 ⓪ 도 못 잡는다 — 임상시험자 서한은 QSR(820)·201(h) 를 인용하지 않는다.
+      해법은 051 과 같은 자리(① 앞)에 좁은 규칙 ⓪′(21 CFR 812 ∧ 약물 임상·의약품 근거 전무)를
+      두는 것이다.
+    """
+
+    def setUp(self) -> None:
+        self.path, self.sql = _latest_wl_scope_sql()
+        self.code = _strip_sql_comments(self.sql)
+
+    def _bimo_clause(self) -> str:
+        """⓪′ 분기의 본문(when … then)."""
+        at = self.code.find("812")
+        self.assertGreater(at, -1, "BIMO 기기 임상(21 CFR 812) 규칙이 없다")
+        start = self.code.rfind("when", 0, at)
+        end = self.code.find("then", at)
+        return self.code[start:end]
+
+    def test_latest_migration_carries_the_bimo_rule(self) -> None:
+        """정본이 081 이후여야 한다 — 051 이 정본이면 BIMO 규칙이 프로덕션에 없다는 뜻."""
+        self.assertIn("812", self.code, "BIMO 기기 임상 규칙(081)이 정본을 supersede 하지 못했다")
+        self.assertIn("investigational device", self.code)
+
+    def test_bimo_rule_precedes_the_pharma_allow_rule(self) -> None:
+        """★핵심 계약. ① 의 `biolog` 에 걸리기 **전에** 판정돼야 한다."""
+        bimo_at = self.code.find("812")
+        pharma_at = self.code.find("unapproved.{0,4}drug")
+        self.assertGreater(pharma_at, -1, "제약 허용 규칙이 없다")
+        self.assertLess(bimo_at, pharma_at, "BIMO 규칙이 제약 허용 규칙보다 뒤에 있다 — 도달하지 못한다")
+
+    def test_device_qsr_rule_is_kept_and_still_first(self) -> None:
+        """051 ⓪(기기 QSR)은 그대로 첫 분기다 — 081 은 그 뒤에 더할 뿐 빼지 않는다."""
+        self.assertLess(self.code.find("201\(h\)"), self.code.find("812"))
+
+    def test_bimo_rule_requires_both_conditions(self) -> None:
+        """기기 임상 근거만으로 배제하지 않는다 — 약물 임상(312)·의약품 특정 근거가 **없을 때만**.
+        약물 임상시험자 서한은 033 이 명시한 대로 ① 의 investigational drug 로 'ok' 에 남는다."""
+        clause = self._bimo_clause()
+        self.assertIn("!~*", clause, "부정 조건(약물 임상·의약품 근거 없음)이 빠졌다")
+        for token in ("21 CFR ?312", "investigational (new )?drug", "drug product"):
+            self.assertIn(token, clause, f"약물 임상·의약품 근거 토큰 누락: {token!r}")
+
+    def test_biolog_is_not_drug_evidence_in_the_bimo_rule(self) -> None:
+        """★`biolog` 를 (b) 에 넣으면 CBER 기관명 하나로 다시 보호받는다 — 그 토큰이 구멍이다.
+        생물의약품 임상은 IND(312) 를 인용하므로 312 로 보호된다."""
+        negative = self._bimo_clause().split("!~*", 1)[1]
+        self.assertNotIn("biolog", negative.lower())
+        self.assertNotIn("bioresearch", negative.lower())
+
+    def test_firm_name_is_not_used_by_the_bimo_rule(self) -> None:
+        """★상호는 판정 축이 아니다(051 과 동일 원칙)."""
+        self.assertNotIn("p_firm", self._bimo_clause())
+
+    def test_unapproved_drug_and_device_policies_are_untouched(self) -> None:
+        for token in ("unapproved.{0,4}drug", "section 505", "OTC", "201\(h\)", "503\(b\)"):
+            self.assertIn(token, self.sql, f"기존 정책 토큰이 사라졌다: {token!r}")
+
+    def test_backfill_updates_only_changed_rows(self) -> None:
+        self.assertIn("is distinct from", self.code)
+        self.assertIn("update public.findings", self.code.lower())
+        self.assertNotIn("delete from public.findings", self.code.lower())

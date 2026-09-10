@@ -569,7 +569,10 @@ def _collect_legislative(start: date, end: date,
             if api_items is not None:
                 return api_items, None
         except Exception as e:  # noqa: BLE001 — 어떤 실패든 RSS 로 안전 강등
-            log("WARN", f"data.go.kr 입법예고 API 실패 → RSS fallback: {e}")
+            # ★ 보안 — http_get_xml 의 예외 문구엔 원본 url(OC=law.go.kr 키)이 남을 수 있다
+            #   (grm_common.mask_service_key 는 data.go.kr serviceKey 만 마스킹). 이 파일 전용
+            #   _mask_oc 로 방어적 재마스킹.
+            log("WARN", f"data.go.kr 입법예고 API 실패 → RSS fallback: {_mask_oc(str(e))}")
     try:
         rss_items = _collect_rss_feed(
             TYPE_LEGISLATIVE_NOTICE, LEGISLATIVE_RSS_BRDID, start, end)

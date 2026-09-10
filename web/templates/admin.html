@@ -617,6 +617,10 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+{# ★공급망 위생(2026-09-10) — 종전 @2(floating major)는 무결성 검증 없이 jsdelivr 이 그
+   순간 반환하는 최신 버전을 그대로 신뢰했다. 정확 버전 + SRI(sha384) 로 고정한다 —
+   jsdelivr 응답이 바뀌어도 해시가 다르면 브라우저가 스크립트 실행을 거부한다.
+   버전 올릴 때: URL 의 @버전과 integrity 해시를 함께 재계산해서 같이 바꾼다. #}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha384-iLddHTLokph6Omwoyid4XKxHaWa6w41BnoEj0q5oOrzmYPpHIKt1wyjReA7s//pP" crossorigin="anonymous"></script>
 <script src="/assets/admin.js?v={{ adminjs_ver }}" defer></script>
 {% endblock %}

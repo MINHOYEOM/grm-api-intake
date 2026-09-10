@@ -85,10 +85,10 @@ jobs:
     timeout-minutes: 350
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -156,7 +156,7 @@ jobs:
       # 대상에서 제외한다(grm-intake.yml 의 스케줄 전용 관용구와 동형).
       - name: Surface persistent failure
         if: failure() && github.event_name == 'schedule'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const fs = require('fs');
@@ -254,7 +254,7 @@ jobs:
       # 제외 -- 위 표면화 스텝과 대칭). 열린 이슈가 없으면 조용히 아무 것도 하지 않는다.
       - name: Close persistent-failure issue on recovery
         if: success() && github.event_name == 'schedule'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const owner = context.repo.owner;

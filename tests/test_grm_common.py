@@ -3,9 +3,13 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import os
 import unittest
 from unittest.mock import MagicMock, patch
+
+import requests
 
 from grm_common import (
     DatagoPageError,
@@ -16,7 +20,10 @@ from grm_common import (
     parse_datago_date,
     datago_normalize_items,
     datago_extract_items,
+    http_get_bytes,
+    http_get_json,
     http_get_xml,
+    mask_service_key,
 )
 
 
@@ -310,6 +317,96 @@ class HttpGetXmlDeclarationTest(unittest.TestCase):
                 b"<channel><item><title>\xed\x95\x9c\xea\xb8\x80</title></item></channel></rss>")
         root = self._fetch(body)
         self.assertEqual(root.find("./channel/item/title").text, "한글")
+
+
+class HttpHelperServiceKeyExceptionMaskingTest(unittest.TestCase):
+    """[2026-09-10 보안] data.go.kr serviceKey 가 예외 로그로 새는 경로를 막는다.
+
+    ``mask_service_key`` 는 provenance(item.api_query)용으로만 쓰이고 있었다 — 정작
+    ``requests``/``urllib3`` 가 연결 실패 시 만드는 ``MaxRetryError`` 문구는 **요청
+    URL 전체(쿼리스트링 포함)** 를 담는데, ``http_get_json``/``http_get_xml`` 등의
+    WARN 로그(``err={e}``)와 최종 ``RuntimeError`` 는 그 문구를 그대로 이어붙였다.
+    이 로그는 매일 도는 공개 GitHub Actions 로그(collect_mfds_recall 등)에 찍힌다.
+    """
+
+    # urllib3.exceptions.MaxRetryError 문구를 흉내: 요청 URL 전체(서비스키 포함)를 담는다.
+    LEAK_URL = ("https://apis.data.go.kr/1471000/MdcinPrdlstInfoService"
+                "?serviceKey=SECRET123&pageNo=1&numOfRows=10&type=json")
+
+    @staticmethod
+    def _conn_error() -> requests.exceptions.ConnectionError:
+        msg = (
+            "HTTPSConnectionPool(host='apis.data.go.kr', port=443): "
+            "Max retries exceeded with url: /1471000/MdcinPrdlstInfoService"
+            "?serviceKey=SECRET123&pageNo=1&numOfRows=10&type=json "
+            "(Caused by NewConnectionError('<urllib3.connection.HTTPSConnection "
+            "object>: Failed to establish a new connection'))"
+        )
+        return requests.exceptions.ConnectionError(msg)
+
+    def _run_capture(self, fn, *args, **kwargs):
+        """fn(*args, **kwargs) 호출 — stdout(log 출력)과 최종 예외 메시지를 함께 반환."""
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            with self.assertRaises(RuntimeError) as ctx:
+                fn(*args, **kwargs)
+        return buf.getvalue(), str(ctx.exception)
+
+    def test_http_get_json_masks_service_key(self):
+        with patch("grm_common.requests.get", side_effect=self._conn_error()):
+            log_out, exc_msg = self._run_capture(http_get_json, self.LEAK_URL, retries=0)
+        self.assertNotIn("SECRET123", log_out)
+        self.assertNotIn("SECRET123", exc_msg)
+        self.assertIn("***REDACTED***", log_out)
+        self.assertIn("***REDACTED***", exc_msg)
+
+    def test_http_get_xml_masks_service_key(self):
+        with patch("grm_common.requests.get", side_effect=self._conn_error()):
+            log_out, exc_msg = self._run_capture(http_get_xml, self.LEAK_URL, retries=0)
+        self.assertNotIn("SECRET123", log_out)
+        self.assertNotIn("SECRET123", exc_msg)
+        self.assertIn("***REDACTED***", log_out)
+        self.assertIn("***REDACTED***", exc_msg)
+
+    def test_http_get_bytes_masks_service_key(self):
+        # http_get_bytes 는 마지막 시도에서만 예외를 던지고, WARN 로그는 "재시도 전"에만
+        # 찍는다(구현 차이) — retries=1 로 최소 1번의 WARN 로그 + 최종 예외를 모두 관측한다.
+        with patch("grm_common.requests.get", side_effect=self._conn_error()), \
+             patch("grm_common.time.sleep"):
+            log_out, exc_msg = self._run_capture(http_get_bytes, self.LEAK_URL, retries=1)
+        self.assertNotIn("SECRET123", log_out)
+        self.assertNotIn("SECRET123", exc_msg)
+        self.assertIn("***REDACTED***", log_out)
+        self.assertIn("***REDACTED***", exc_msg)
+
+    def test_paginator_retry_path_masks_service_key(self):
+        """_DatagoPaginator 가 주입받는 http_get(실전 배선=http_get_json) 이 연결 실패해도
+        DatagoPageError.cause 문구에 원본 키가 남지 않아야 한다."""
+
+        def failing_http_get(endpoint, params=None, timeout=None, retries=None):
+            return http_get_json(endpoint, params=params, timeout=timeout, retries=retries)
+
+        buf = io.StringIO()
+        with patch("grm_common.requests.get", side_effect=self._conn_error()):
+            with contextlib.redirect_stdout(buf):
+                pg = datago_paginate(
+                    "https://apis.data.go.kr/1471000/MdcinPrdlstInfoService",
+                    service_key="SECRET123", max_pages=2, retries=0,
+                    extract=lambda data: ([], 1, 10, 0, "00:OK"),
+                    http_get=failing_http_get,
+                )
+                with self.assertRaises(DatagoPageError) as ctx:
+                    list(pg)
+        self.assertNotIn("SECRET123", buf.getvalue())
+        self.assertNotIn("SECRET123", str(ctx.exception.cause))
+        self.assertIn("***REDACTED***", buf.getvalue())
+
+    def test_mask_service_key_is_idempotent_on_already_masked_text(self):
+        """방어적 재마스킹(collect_mfds_law.py 등)이 이중 마스킹으로 문구를 깨지 않아야 한다."""
+        once = mask_service_key(self.LEAK_URL)
+        twice = mask_service_key(once)
+        self.assertEqual(once, twice)
+        self.assertNotIn("SECRET123", twice)
 
 
 if __name__ == "__main__":

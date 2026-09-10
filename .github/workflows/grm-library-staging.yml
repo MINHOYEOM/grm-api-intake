@@ -141,11 +141,11 @@ jobs:
       # 전부가 대상이고, intake 의 residual(3개)을 상속하면 커버리지가 조용히 좁아진다.
       MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
           cache: pip
@@ -269,7 +269,7 @@ jobs:
         # 최초 감지일은 본문의 HTML 주석에 실어 연속 실패 주수를 계산한다(저장소 상태 없이
         # 이슈 자체가 유일 정본 — 변경 없는 주엔 커밋이 없어 파일 상태는 못 믿는다).
         if: always()
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const fs = require('fs');
@@ -414,7 +414,7 @@ jobs:
         # "발행본에 있는데 자료실에 없다"라서 격리가 없는데도 남을 수 있다(수록 규칙·필터
         # 문제 등). 한 이슈에 합치면 원인이 다른 사건이 한 카운터에 섞인다.
         if: always()
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const fs = require('fs');

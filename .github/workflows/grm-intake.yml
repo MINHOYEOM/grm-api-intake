@@ -164,10 +164,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -370,7 +370,7 @@ jobs:
       # ENABLE_WEB_BRIEF_EMIT off 면 파일 부재 → if-no-files-found:ignore 로 무해 스킵.
       - name: Upload empty-slot web brief (§1-B)
         if: ${{ always() && env.ENABLE_WEB_BRIEF_EMIT == 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: grm-web-brief
           path: ${{ env.GRM_WEB_BRIEF_DIR }}/brief_web_*.json
@@ -379,7 +379,7 @@ jobs:
 
       - name: Open issue on failure
         if: failure() && github.event_name == 'schedule'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const fs = require('fs');
@@ -470,7 +470,7 @@ jobs:
         #   ★transient 를 failure 로 올리지도 않는다 — exit 1 이면 grm-web-publish 가
         #   `--status success` 로 스캐폴드를 고르므로 월요일 발행이 막힌다(grm_health.py 주석).
         if: success() && github.event_name == 'schedule'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const fs = require('fs');

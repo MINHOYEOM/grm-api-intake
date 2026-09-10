@@ -49,10 +49,10 @@ jobs:
     timeout-minutes: 30   # 자가 복구 대기(브릿지 10분 또는 조립 15분) + 기동 여유
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       # 판정 로직(publish_watchdog.py)은 표준 라이브러리만 쓴다 — 의존성 설치 불필요.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
 
@@ -231,7 +231,7 @@ jobs:
 
       - name: 운영 경고 이슈 생성/갱신(자가 복구까지 실패했을 때만)
         if: steps.alarm.outputs.escalate == 'true'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const owner = context.repo.owner;
@@ -315,7 +315,7 @@ jobs:
 
       - name: 이슈 해소 처리(델타 확인 — 처음부터 있었거나 자가 복구로 확보)
         if: steps.check.outputs.found == 'true' || steps.recover.outputs.recovered == 'true'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const owner = context.repo.owner;

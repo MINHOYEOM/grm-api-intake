@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.244` |
+| 문서 버전 | `v1.245` |
 | 최종 수정일 | 2026-09-10 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -223,7 +223,7 @@ flowchart TD
 | 13 | ISPE iSpeak (전문지 브리핑 — GMP/품질 관련 항목만 keep_item 필터) | RSS(Drupal) | Expert Secondary · `ENABLE_ISPE`(기본 off) |
 | 14 | EU GMP NCR (EudraGMDP — EU/EEA 업체별 GMP 비준수 보고서) | Struts `.do` 서버렌더 스크래핑 + 공식 Statement PDF | 활성 · `ENABLE_EU_GMP_NCR`(기본 off) |
 | 15 | MHRA GMP NCR (영국 MHRA 업체별 GMP 비준수 성명서) | Drupal Facets 서버렌더 스크래핑(세션 독립) | 활성 · `ENABLE_MHRA_GMP_NCR`(기본 off) |
-| 16 | Health Canada GMP 실사 리포트카드 (관찰번호+조항+요약 — FDA 483 과 동형) | 무인증 JSON API(`drug-inspections.canada.ca`) | 활성 · **백필 경로 전용**(일일 크론 미편입) |
+| 16 | Health Canada GMP 실사 리포트카드 (관찰번호+조항+요약 — FDA 483 과 동형) | 무인증 JSON API(`drug-inspections.canada.ca`) | 활성 · **백필 경로 전용**(일일 크론 미편입) — `grm-hc-inspection-backfill.yml`(dispatch 전용) 적재, 마지막 적재 2026-08-10(1,824문서). 정기 재수집: 별도 PR 진행 중(2026-09-10) |
 | 17 | FDA 의약품 GMP 실사 등급 (NAI/VAI/OAI — **지적사항이 아니라 실사 건 자체**) | Data Dashboard API(DDAPI, 발급 키 인증) | 활성 · **월 1회 자동 갱신 + 수동 dispatch**(일일 크론 미편입) · 카드/Findings 미생성(맥락 표) |
 
 > **소스 14 상세(EudraGMDP GMP Non-Compliance):** FDA WL/483 과 동일하게 **News 카드(kind `eu-gmp-ncr`·Evidence A·발행 NCA·위반내용·당국조치 전문) + Findings 이중 편입**. `eudragmdp_client.py`(requests 전용·세션 쿠키 → POST 날짜창 → `action=Page&param=N` 절대 페이징 → `action=Drilldown&param=<doc_ref>` 상세 → `generateGMPCPDF.do` 공식 PDF)를 `collect_eu_gmp_ncr.py`가 IntakeItem 으로 변환. **dedup 키 = doc_ref**(1 NCR 이 다중 사이트로 여러 행 반복 가능 — report_no 부적합). 발행일 지연공개형 + 성긴 소스(4년 61건)라 enforcement 윈도우(30일) 수집. **출처 durability**: drilldown/PDF 가 세션상태 의존이라 URL 저장 불가 → 수집 시점에 공식 Statement PDF 를 Supabase Storage 공개버킷 `eudragmdp-ncr` 에 아카이브하고 그 공개 URL 을 official_url 로(아카이브 실패 시 EudraGMDP 검색 페이지 폴백). Findings 는 `grm_classify_483_scope` 우회 자동(트리거가 FDA 483/WL 만 분기 → EU NCR 은 scope_status 기본 `'ok'`). **과거분(2019~) 딥백필**: 매일 크론은 window_days 상한 [1,90] 이라 최근 90일만 봐서 과거 ~65건은 안 들어온다 → `collect_eu_ncr_backfill.py`(+`grm-eu-ncr-backfill.yml`, workflow_dispatch 1회성)가 넓은 발행일 창을 한 번에 수집해 `append_intake_item_with_findings_to_supabase` 로 raw+findings 직행 적재(멱등·Notion 무접촉). 적재 후 finding_text 는 영어라 **RLS 공개 게이트(finding_text_ko/finding_language='KO') 통과를 위해 번역 필요**.
@@ -275,6 +275,17 @@ flowchart TD
 - **Failure(exit 1 + 실패 Issue):** Notion insert 실패, handoff 실패, Federal Register+OpenFDA 동시 실패, 활성 소스 전체 실패 등.
 - **Warning(exit 0 + 경고 Issue 갱신):** 공개 endpoint 일시 오류(timeout·429·5xx·403), GMP 첨부 수동검토 필요, 미소비 New 행 잔존 등. **알림은 코드별로 신규 발생 또는 지속 사다리(1·3·7·14·30일, 이후 30일마다) 도달 때만** 보냅니다(노이즈 억제). ★종전에는 "경고 구성(코드 집합)이 바뀔 때만" 이었는데, 장애가 지속되면 그 집합은 불변이라 **지속이야말로 침묵이 보장되는 상태**였습니다 — 감쇠 논리가 거꾸로였습니다. 실제로 MFDS 가 2026-08-02~08-05 4연속 0건이었는데 첫날 한 번만 울렸고, fda483 경고 3종은 6일 넘게 침묵하며 그 안에 실제 결함(#655)을 덮고 있었습니다. 상태(코드별 최초 감지일·마지막 알림 단계)는 경고 이슈 본문의 HTML 주석에 싣습니다(`grm-library-staging.yml` 의 `first-failed` 관용구와 동형 — 저장소 상태가 없으므로 이슈가 유일 정본). 주석이 지워지거나 깨지면 "상태 없음"으로 떨어져 1회 알립니다(침묵으로 빠지는 폴백 금지).
 - **0건 판정:** 저빈도 소스의 일일 0건은 정상으로 봅니다.
+
+**클라우드 감시 워크플로(2026-09-10 기준):**
+- `grm-publish-watchdog.yml` — 월요일 07:30 KST Routine 이 조용히 미실행되는 침묵실패 탐지(델타 파일 부재). 자가 복구(브릿지 dispatch) 후에도 없으면 `GRM Intake 운영 경고` 이슈 재사용.
+- `grm-quiz-freshness.yml` — 이번 주 주간 퀴즈 문항이 실제로 생성됐는지(데스크톱 로컬 예약 태스크 침묵 감시). 이슈 `[quiz-freshness] 이번 주 퀴즈 문항이 생성되지 않았습니다`.
+- `grm-findings-backlog-monitor.yml` — 미번역 격차·검수 백로그 임계 초과 감시(`findings_stats()` RPC). 이슈 `[findings-backlog] 번역/검수 백로그가 임계를 초과했습니다`.
+- `grm-reconciliation.yml` — 소스별 주간 수집량의 과거 대비 비정상 낙차(무음 실패·피드 파손·IP 차단) 감지. 비차단 — `::warning::`·Job Summary 로만 표면화(이슈 없음).
+- `grm-source-verification.yml` — 발행된 483/WL 카드를 원문과 재대조해 "수집 실패로 처음부터 못 받은 상세"를 탐지. 이슈 `[source-verify] 발행 카드가 원문보다 적게 보여주는 항목이 있습니다`.
+- `grm-findings-taxonomy-drift.yml` — 라이브 분류(category_code)가 현행 분류기와 어긋난 행 수를 매주 재측정(적용은 사람이 별도 dispatch). 이슈 `[taxonomy-drift] 라이브 분류가 현행 분류기와 어긋나 있습니다`.
+- `grm-stranded-batch-pr.yml`(신설) — 초록인 일일 번역 배치 PR 이 3시간 넘게 안 머지되면 PAT 로 자동 머지, 검사 실패·충돌·outbox 잔류는 이슈로만. 이슈 `일일 번역 배치 PR 방치 — 검사 실패 또는 충돌`.
+- `grm-db-backup.yml` 실패 이슈(신설) — 주간 암호화 DB 백업(행 수 대조 검증) 실패 시 표면화. 이슈 `GRM DB 백업 실패`.
+- `grm-findings-backfill-fetch.yml` backfill-fetch 3연속 실패 이슈(신설) — 483/WL 백필 fetch 가 스케줄 실행에서 3회 연속 실패(예: 리딩룸 봇차단)하면 표면화. 이슈 `GRM Findings Backfill Fetch 연속 실패`.
 
 ---
 
@@ -605,25 +616,53 @@ grm-api-intake/
 ### 5.3 비밀값(Secrets) · 기능 플래그(Variables)
 **Secrets:** `NOTION_TOKEN` · `NOTION_DATABASE_ID` · `OPENFDA_API_KEY`(선택) · `BRAVE_API_KEY` · `DATA_GO_KR_SERVICE_KEY` · `MFDS_HTTP_PROXY`(선택) · `LAW_GO_KR_OC`(선택) · `CLOUDFLARE_*`(웹 배포) · `NEWSLETTER_API_KEY`(Brevo) · `SUPABASE_URL`(vars) · `SUPABASE_SERVICE_ROLE_KEY`(findings 적재·번역 반영, admin 배포와 공용) · `FDA_API_USER`/`FDA_DDAPI_KEY`(FDA Data Dashboard API — 실사 등급 백필 전용, 발급 계정 이메일 + 키) · `FDA_IRES_KEY`(FDA Enforcement Reports API 키 — **2026-08-12 현재 어느 코드도 읽지 않는다**. 회수 정보는 종전대로 OpenFDA(소스 2)가 담당하며, iRES 는 `firmfeinum`·`eventlmd` 같은 추가 필드가 있어 후보로 발급만 받아 둔 상태다).
 
-**주요 기능 플래그 (`vars.ENABLE_*`, 운영 기본):**
+**기능 플래그 전수 (`vars.ENABLE_*`)** — 2026-09-10 스냅샷(`.github/workflows/*.yml` 전수 재생성. `gh variable list` 라이브 값 대조). 미설정 변수는 코드 기본값(fallback)으로 동작합니다.
 
-| 플래그 | 상태 |
-|---|---|
-| `ENABLE_MFDS` / `_RECALL` / `_ADMIN` / `_GMP_INSPECTION` | `true` |
-| `ENABLE_ICH` / `_WHO` / `_HC` (글로벌 확장) | `true` |
-| `ENABLE_FDA_483` | `true` |
-| `ENABLE_MODALITY_TAG` | `true` |
-| `ENABLE_MFDS_LAW` / `_GMP_CERT` / `_SAFETY_LETTER` (공식 API opt-in) | `false` |
-| `ENABLE_SEARCH`(Brave) / `_SCRAPE` / `_MOLEG_API` | `false` |
-| `ENABLE_FINDINGS_SUPABASE_APPEND` (M4 raw 적재) | `true` |
-| `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND` (M4 findings 적재) | `true` (2026-07-08 활성) |
-| `ENABLE_FINDINGS_SQLITE_APPEND` / `_FINDINGS_APPEND` (로컬 개발용) | `false` |
-| `ENABLE_FINDINGS_EMBED` (S2 임베딩 cron 게이트 — `workflow_dispatch`는 플래그 무관 dry-run 가능) | `false`(CI 실측(콜드 117초·전량 적재 24분·HF 캐시 적중 시 일일 델타 1~2분 예상) 완료) |
+| 플래그 | 코드 기본값(grm-intake.yml fallback) | 라이브 값(2026-09-10) | 용도(한 줄) |
+|---|---|---|---|
+| `ENABLE_SEARCH` | `false` | `false` | Brave 보조검색(Search API) 수집 게이트 |
+| `ENABLE_MFDS` | `true` | 미설정(기본값) | 식약처 RSS 수집 전체 마스터 스위치 |
+| `ENABLE_MFDS_LAW` | `false` | 미설정(기본값) | 법제처 국가법령정보 고시/행정규칙 수집(공식 API opt-in) |
+| `ENABLE_MFDS_RECALL` | `true` | 미설정(기본값) | 식약처 회수·판매중지 API 수집 |
+| `ENABLE_MFDS_ADMIN` | `true` | 미설정(기본값) | 식약처 행정처분 API 수집 |
+| `ENABLE_MFDS_GMP_CERT` | `false` | 미설정(기본값) | 식약처 GMP 적합판정서 발급현황 API 수집(opt-in) |
+| `ENABLE_MFDS_SAFETY_LETTER` | `false` | 미설정(기본값) | 식약처 안전성서한 API 수집(opt-in) |
+| `ENABLE_MFDS_GMP_INSPECTION` | `true` | 미설정(기본값) | 식약처 GMP 실태조사 게시판 수집 |
+| `ENABLE_GMP_DEFICIENCY_TABLE` | `false` | `true` | GMP 실사 PDF 지적 표 구조화(`ENABLE_MFDS_GMP_INSPECTION` 전제, 실패는 요약카드로 강등) |
+| `ENABLE_ICH` | `false` | `true` | ICH 가이드라인·공개협의 스냅샷 수집 |
+| `ENABLE_WHO` | `false` | `true` | WHO Prequalification(WHOPIR) 수집 |
+| `ENABLE_HC` | `false` | `true` | Health Canada 회수·안전성 정보 수집 |
+| `ENABLE_FDA_483` | `true` | `true` | FDA 483 실사 Observation 수집(OII FOIA Reading Room) |
+| `ENABLE_FDA_483_OBSERVATIONS` | `false` | `true` | 483 Observation 번호 결정론 상세보기(실패 시 요약카드 유지) |
+| `ENABLE_FDA_483_DEEP` | `false` | `true` | 483 전문(全文) 확보 = deep_analysis fan-out 대상 지정 |
+| `ENABLE_ISPE` | `false` | `true` | ISPE iSpeak RSS 수집(Expert Secondary) |
+| `ENABLE_EU_GMP_NCR` | `false` | `true` | EudraGMDP EU/EEA GMP 비준수 보고서 수집 |
+| `ENABLE_MHRA_GMP_NCR` | `false` | `true` | MHRA GMP 비준수 성명서 수집 |
+| `ENABLE_MHRA_ALERT_BODY` | `false` | `true` | MHRA 회수/결함 알림 전문(gov.uk Content API) 확보 |
+| `ENABLE_MOLEG_API` | `false` | 미설정(기본값) | 법제처 ogLmPp API 수집 |
+| `ENABLE_SCRAPE` | `false` | 미설정(기본값) | (레거시) 범용 스크래핑 경로 게이트 |
+| `ENABLE_WHOPIR_EXCERPT` | `false` | `true` | WHOPIR PDF 결함 구간 구조화 추출(`ENABLE_WHO` 전제) |
+| `ENABLE_WL_BODY` | `false` | `true` | FDA Warning Letter 편지 본문 위반 서술 추출 |
+| `ENABLE_WL_BODY_FULL` | `false` | `true` | WL 편지 전문(全文) 확보 = deep_analysis fan-out 대상 |
+| `ENABLE_MFDS_ADMIN_BODY_FULL` | `false` | `true` | 행정처분 다단락 본문 확보 = deep_analysis(admin) 대상 |
+| `ENABLE_ECA_ARTICLE_EXCERPT` | `false` | `true` | ECA 기사 본문 흡수(Routine summary 입력 풍부화) |
+| `ENABLE_ISPE_ARTICLE_EXCERPT` | `false` | `true` | ISPE 기사 본문 흡수 |
+| `ENABLE_MODALITY_TAG` | `false` | `true` | Notion 'Modality' 속성 태깅(제품군 확장) |
+| `ENABLE_HANDOFF_V2` | `false` | `true` | Routine handoff v2(scaffold/slots) 스키마 |
+| `ENABLE_HANDOFF_IDEMPOTENCY_V2` | `false` | 미설정(기본값) | PL-10b/B1 멱등성 — Handoff Ref 상태기계 |
+| `ENABLE_MFDS_URL_VERIFY` | `false` | `true` | 행정처분 L1 URL 건별 실시간 검증(nedrug GET) |
+| `ENABLE_FINDINGS_SUPABASE_APPEND` | `false` | `true` | FIND-1 M4a raw_signals Supabase 직행 적재 |
+| `ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND` | `false` | `true` | FIND-1 M4a findings 까지 함께 적재(APPEND 도 true 전제) |
+| `ENABLE_WEB_BRIEF_EMIT` | `false`(job-level env) | `true` | §1-B 빈슬롯 web brief(`grm-web-card/v1`) artifact 산출 |
+| `ENABLE_FINDINGS_EMBED` | `false`(grm-intake.yml 밖 — `grm-findings-embed.yml` job `if:` 게이트) | 미설정(기본값) | S2 의미 유사도 임베딩 cron 게이트(`workflow_dispatch`는 플래그 무관 dry-run 가능) |
 
+> 위 34개는 `grm-intake.yml`의 `env:` 블록(`ENABLE_WEB_BRIEF_EMIT`는 job-level env), `ENABLE_FINDINGS_EMBED` 1개는 `grm-findings-embed.yml`의 `if:` 게이트에서 옵니다. 로컬 개발 전용 `ENABLE_FINDINGS_SQLITE_APPEND`/`_FINDINGS_APPEND`(기본 `false`)는 어느 워크플로도 `vars`로 넘기지 않아(운영은 Supabase 계열만 사용) 이 표에서 제외했습니다 — `.env.example` 참조. `ENABLE_FDA_483_OCR`(코드 기본값 `true`)도 `grm-intake.yml`의 `vars.ENABLE_*` 배선 밖이라(스캔본 OCR 폴백은 워크플로 무관 항상 on) 제외 — `grm-fda483-ocr-backfill.yml`만 하드코딩 `'true'`로 명시 전달.
+>
 > 운영 기본값은 `grm-intake.yml`의 `vars.* || 'true/false'` fallback으로 정해집니다.
 
 ### 5.4 이 저장소 작업 환경 메모
-- Python 전체경로: `C:\Users\user\AppData\Local\Programs\Python\Python313\python.exe` (`python` 별칭은 스텁이라 미동작). pytest 9.1.1.
+- Python 전체경로: `C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe`(Python 3.12 — Python313 은 2026-07-31 제거됨). `python` 별칭이 이 인터프리터로 해석됩니다. 한글 출력을 위해 `PYTHONUTF8=1`·`PYTHONIOENCODING=utf-8` 설정이 필요합니다(Windows).
+- pytest 는 설치돼 있지 않습니다 — 테스트는 `python -m unittest discover -s tests` 로 실행합니다. 웹 스위트는 `python web/tests/test_render.py`(`--freeze` 옵션은 골든을 재동결).
 - 로컬 정본 = `v15.0-implementation/`의 `main`. 작업 전 `git fetch origin --prune` → `git status` → `git worktree list` 순으로 확인합니다.
 - 기능 worktree는 동시 작업이 꼭 필요할 때만 만들고, 머지 후 즉시 제거합니다. dirty worktree와 로컬 작업공간 현황은 저장소 밖 `WORKSPACE_INDEX.md`가 관리합니다.
 - 라이브 Supabase 쓰기(마이그레이션·데이터)는 세션 권한 게이트상 사람이 SQL Editor에서 실행하거나 CI가 수행합니다(대화 세션 직접 쓰기 회피).
@@ -648,17 +687,21 @@ grm-api-intake/
 |---|---|---|
 | FIND-483-SIGNER | FDA 483 실사관(서명자) **1·2단계 전부 완료·라이브**. ①추출·표기(파서·수집 배선·findings 전달·소급 백필·문서 카드 표기·036 투영) ②프로파일(`/findings/inspector/?key=` · 037 RPC 3종) ③**주간 브리프 483 카드에도 표기**(2026-07-30 — `card_scaffold._detail_fda_483_observations()` 가 실사관 필드를 안 읽어 브리프 조립에서 조용히 버려지던 것을 수리. 발행분은 수집 시점 이후분만 실리므로 **08-03 브리프는 부분 커버리지**가 정상이고 과거분 소급은 하지 않는다) ④백필 경로 배선(2026-07-31 — `collect_fda_backfill.py` 가 `_to_item` 에 실사관을 안 넘겨 백필 유입분이 빈 채로 적재되던 결함. 일일 수집기와 **동일 입력 → 바이트 동일 산출**을 테스트로 고정). **백필 실측**: 1,546문서 중 1,102 성공(71%)·실패 5·findings 6,840행·표기 922 → **정규화 808명**. **코호트(문서 ≥5건) 95명**·최다 24건. ★**코호트 게이트는 UI 가 아니라 RPC 안**에 둬 딥링크로도 빈 프로파일이 열리지 않는다(미달·미존재를 **구분 없이** 동일 안내로 수렴). ★노출 범위 제한: `noindex,nofollow`·사이트맵 제외·nav 미등록 — 진입은 "보던 문서의 서명자" 경로뿐(실명 개인 집계라 검색 색인은 목적 밖). 순위·비교·성향 추론 없음(범위 가드 테스트로 고정). 잔여 품질 한계는 [[grm-483-inspector-names]] 의 "OCR 은 고유명사만 틀린다" 항목 참조 | ✅ 완료·라이브 |
 | FIND-WL-BACKFILL | WL 백필(3,608건, 2021년~) 완주 관찰 — 매일 07:17 UTC `--auto` 로 진행 중, 완료 시 자가 종료 확인 | 🟡 관찰 대기 |
-| ROUTINE-VISIBILITY | Claude Routine 활성·최근 실행 상태가 저장소/운영 콘솔에서 직접 관측되지 않아 사람이 주기 확인해야 함 | 🟡 관측성 보강 필요 |
+| ROUTINE-VISIBILITY | Claude Routine 활성·최근 실행 상태가 저장소/운영 콘솔에서 직접 관측되지 않아 사람이 주기 확인해야 함 — `publish_watchdog`(07-20 신설: 델타 부재 감지 + 자가 복구)와 09-03 조립 dispatch 자가복구(#882)가 실패 모드를 대부분 커버한다. Routine 자체의 on/off 상태는 사람이 claude.ai/code/routines 에서 직접 읽는다(2026-09-10 라이브 확인: 지침에 09-04 영문 슬롯 블록 포함돼 있음을 확인) | ✅ 대체 |
 | RECALL-BACKFILL | 회수 결정론 상세 **과거분 소급 — 실질 완료(2026-08-27 실측 115/116, 99%)**: openfda 51/51 · hc 19/19 · mhra 3/3 · recall-quality 42/43. ★잔여 1장(`recall-709cff0f6b75`)은 **의도적 미소급**이다 — 글로틴듀오정 2.5/500·850·1000mg **3품목을 한 장으로 덮는 카드**인데 원천은 품목마다 별개 행이고 `ITEM_SEQ`/`STD_CD` 가 전부 다르다(202001274/5/6). 상세가 화면에 내는 것은 "품목·업체 식별코드"라는 **품목 단위 주장** 이라 그중 하나를 붙이면 나머지 두 품목이 그 코드로 조회되지 않는다. 공통분만 골라 싣는 것은 운영 producer 가 만들지 않는 산출이라 이 CLI 원칙에 어긋난다 → `_covers_multiple_items` 가드로 **건너뛰고 보고**한다(카드 최상위 `merged_count` 는 1 이라 그것으로는 못 거른다 — 병합이 상류에서 일어났다). 근본 해소는 상세를 복수 레코드로 확장하는 별건 | ✅ 완료 |
 | MHRA-TIER-CLASS | MHRA 알림의 **심각도 등급(Class 1~4)을 tier 엔진이 직접 읽는다**(2026-08-27 배선). 진범은 `type_or_class` 였다 — 자리는 있었는데 gov.uk drug-device-alerts Atom 이 **`<category>` 를 아예 안 내보내서**(전건 실측: 의약품 엔트리 7건 모두 없음) 늘 리터럴 `"Medicines Recall"` 로 덮였다. 등급은 제목에 늘 있으므로 제목에서 뽑아 담는다. ★위험의 증거는 코퍼스 자신이다 — 07월 수집분 Class 4 세 건은 T2 어휘에 안 걸려 Tier 1 로 저장됐는데, **`#629`(08-03)가 "defect notification" 을 어휘에 추가하자 같은 제목이 지금은 Tier 2** 다. 문서도 등급도 안 변했는데 목록이 변해 tier 가 움직였고, 반대로도 성립한다(문구가 바뀌면 Class 2 회수가 조용히 Tier 1 로 떨어진다 — Tier 1 은 폴스루 기본값이라 소리가 안 난다). 배선은 **순수 가산**이다(`or` 로만 붙여 기존 승격을 낮추지 않음, 배치는 openFDA 형제와 동형: Class 1 은 qa_unrelated 클램프 앞·Class 2 는 뒤). 회귀 실측: **비-MHRA 10/10 · MHRA tier 6/6 동일**, 바뀐 것은 판정 근거뿐(`t2_keywords` → `recall_class_ii`). 부수 수확 — `_w2_extra_mhra_recall` 이 등급이 없어 **한 번도 못 내던 카드 "Class" 행**이 이제 렌더된다 | ✅ 완료 |
 | MHRA-CLASS34-POLICY | **결정: 내리지 않고 올린다**(2026-08-27). Class 3·4 와 **등급표기가 없는 company-led 회수**까지 Tier 2 바닥을 깔아 MHRA 의약품 알림 전체를 결정론화했다. ★근거는 전수 실측이다 — gov.uk search API 1,437건 중 의약품 회수/결함 **427건**: Class 1 = 6(1.4%) · Class 2 = 166(38.9%) · Class 3 = 68(15.9%) · Class 4 = 165(38.6%) · **등급표기 없음 = 22(5.2%)**(전부 "Company led medicines recall" 이고 수집기 keep 필터가 이미 받는 진짜 회수 — `#821` 배선만으로는 이들이 여전히 어휘에 맡겨져 있었다). ★판단의 핵심 — **MHRA 등급은 환자 위해의 긴급도지 GMP 관련성이 아니다.** 실측 내용은 Class 3 = 잘못된 PIL 동봉·GMP 일탈 예방적 회수·불순물 기준초과, Class 4 = 병 속 이물 관찰·정제 수량 오류·PIL/SmPC 안전정보 누락으로 **전부 제조·품질 일탈**이다. 이 사이트 독자(제약 GMP/품질 실무)에게는 바로 그 제조 결함 정보가 목적물이므로, 환자위해 등급으로 낮추면 **목적과 정반대로** 제조 결함 신호를 체계적으로 가리게 된다. ★현행 대비 **tier 델타 0**(발행 코퍼스 6/6 · 등급 표본 6/6 · 타 소스 10/10 동일) — 이들은 지금도 어휘로 Tier 2 에 닿고 있고, 바뀌는 것은 **어휘 의존이 사라지는 것**뿐이다. 계기 라벨은 `recall_class_ii` 와 **분리**해 `mhra_medicines_alert` 로 둔다(원인이 다른 사건을 한 카운터에 합치면 진단이 틀린다). 분량은 2026년 실측 C2=15·C3=7·C4=15 로 월 2~3건 | ✅ 완료 |
 | GMP-TABLE-EXTRACT | GMP실사 지적 표 추출 실패. ★**등록 당시 전제가 세 군데 틀렸다**(2026-08-27 전수 실측 · 근거 `docs/specs/GMP_지적표_추출불가_실측_2026-08-27.md`): ①**페이지 걸침이 아니다** — Guangdong 은 p1 표 자체가 미검출, 서울대병원은 양 페이지 모두 표 0개 ②**두 문서가 아니라 71문서** ③**두 결손의 뿌리가 다르다**(`skipped-type` vs `empty`)이고 Guangdong 쪽은 08-12 유형 게이트 반전으로 **이미 해소**. ★수리 시도 4종 전부 실패 — `strategy=text`/`lines_strict`(헤더 미검출) · 줄 단위 텍스트 파싱(48/71 '회수'되나 근거법령 칸에 지적 문장이 들어가는 **발행 불가 품질**) · 좌표 기반 칸 재구성(헤더가 단어로 온전하지 않아 경계 오류) · 허용오차 스윕 8종(**0/24**). 격자선 부족이 아니다(벡터 line/rect 중앙값 CONTROL 1,215 vs TARGET 1,169). 71건 중 10건은 0 마스킹·9건은 세로 분해로 **텍스트층 자체가 깨져** 파서 대상이 아니다. ★**발행 화면 손실은 현재 0** — 지적 표 없는 발행 GMP실사 카드 21건 중 현재 파서로 회수되는 것 0건이고, 회수 가능한 23건(63행)은 2022~2023년이라 발행 창 밖이거나 이미 반영돼 있다. 남은 경로는 **OCR 표 재구성**(이 트랙이 의도적으로 배제해 온 방향 — 채택하려면 설계 결정을 먼저 뒤집어야 한다) 또는 **원천 구조화 데이터 요청** 둘뿐이다. 회귀 코퍼스(CONTROL 194건/934행 · TARGET 97건)는 SQL 로 재생성 가능 | 🔲 보류(근거 확보) |
 | GMP-HWPX | **완료(2026-08-27)** — hwpx 첨부의 지적 표 추출 경로 신설. ★PDF 와 상황이 정반대였다: hwpx 는 표가 **명시 마크업**(`hp:tbl`/`hp:tr`/`hp:tc`)이라 좌표 추정도 어휘 휴리스틱도 필요 없고, 셀을 그대로 읽어 **PDF 와 같은 정규화기**(`_normalize_deficiency_table`)에 넘기면 끝이다(산출 모양이 갈릴 자리 없음). 막고 있던 것은 게이트 한 줄(`file_format == "pdf"`)이었다 — 본문 텍스트는 `_extract_hwpx_text` 로 이미 뽑고 있었으므로 첨부 자체는 읽히고 있었고, `gmp_deficiency_table_status` 만 16건 전건 비어 있었다. ★전건 실측(hwpx 16): 지적 `present` **7건 → 23행 회수** · `none` 6건 → 0행(**오탐 0**) · `unknown` 3건은 표는 있으나 데이터행이 전부 비어 0행이 정답. ★부수 수리 — **붕괴 colmap 가드**(`_DEFICIENCY_MIN_COLUMNS=3`): 병합 셀 하나에 페이지 전체 텍스트가 담기면 헤더 토큰 3개가 우연히 다 포함돼 모든 필드가 같은 열을 가리키고, 데이터행 한 칸이 다섯 필드에 복제된 **가짜 행**(`분야=근거법령=지적내용='한약정책과'`)이 나온다(실측 6건). 이 가드는 PDF 경로에도 적용되므로 채택 전 회귀 코퍼스 **194문서/934행 전건 산출 지문이 바이트 불변**임을 실측했다(불일치 0건) | ✅ 완료 |
 | GMP-REDACTION | **완료(2026-08-27)** — GMP실사 지적 표 **가림막 가드**. ★문제는 "추출이 안 된다"가 아니라 **"추출해도 되는 것인가"** 였다: 식약처는 일부 PDF 에서 지적(보완)사항 요약·근거법령 칸을 검은 막대로 가려 배포하는데, 그 막대는 글자를 지운 게 아니라 **살아 있는 텍스트 위에 덧그린 벡터 사각형**이라 `page.get_text()` 가 막대 **아래 글자를 그대로 돌려준다**. 즉 파서가 원천이 의도적으로 감춘 문장을 읽어 내고 있었다(육안 확인: `gmpinspect-1P0r6voXjK9` p3 — 보이는 지적 줄과 검은 막대가 섞여 있는데 우리 산출에는 가려진 줄의 문장이 들어 있다). ★실측(CONTROL 194문서/934행): 가려진 단어 보유 **17문서**, 그중 **14문서가 35행**을 낸다. **발행 브리프 카드 도달 0건**(`web/data/briefs/*.json` 전건 대조)이라 실사고는 아니고 **잠복**이다 — 그 문서가 발행·소급되는 순간 실현된다. ★★**같은 사실을 셋으로 세야 한다** — 가려진 단어를 *가진* 문서 17 · 그 단어가 지적 *행*에 걸린 문서 14 · 막대는 있으나 산출이 그대로인 문서 3(막대가 표지·머리말 등 행 밖). 조사 단계 기록은 "13문서/35행"이었는데 **행 수 35 는 정확히 일치**하고 문서 수만 하나 다르다: `1OyuoHKrL9G`·`1P2UhIKFRbG` 는 가려진 단어가 1개뿐이고 baseline 산출이 `지적사항='-'`(각각 `'b'`)인 **한 글자짜리 쓰레기 행** 하나라, "행을 낸다"에 이걸 넣느냐가 13 과 14 를 가른다(어느 쪽이든 실질 손실 0). ★탐지: `fill` 채널 평균 < 0.25 인 drawing 의 `re` 항목 중 **가로 20pt·세로 5pt 이상**(이 하한이 표 괘선·밑줄을 가른다) → 단어 rect 면적의 **절반 넘게** 한 막대와 겹치면 가려진 단어. ★★**행을 통째로 버린다**(칸만 비우지 않는다) — 지적 한 행은 「분야·근거법령·지적사항」이 묶여 하나의 규제 진술이라, 가려진 칸만 비우면 남은 칸이 **온전한 진술처럼 읽힌다**(근거법령이 빈 행 = "근거 없이 지적받았다"). 규정에 대한 거짓 진술이 되므로 없는 것보다 나쁘다 — 줄 파싱 산출물을 기각한 `GMP-TABLE-EXTRACT` 와 같은 기준. 버린 행은 기존 강등 경로(요약카드 유지)로 떨어진다. ★같은 가림을 **텍스트층에서** 하는 문서(`0000…` 런)도 같은 가드가 함께 버리며, 이쪽은 좌표가 필요 없어 **PDF·HWPX 두 경로 공통**(`_normalize_deficiency_table`)이다. ★**fail-closed 의 경계를 나눴다** — 좌표를 행에 대응 못 시키면(행 수 불일치·병합 셀·완결성 미달) 그 표 전체를 버리지만, `get_drawings()` 자체가 실패하면 `[]`(가드 미적용)로 둔다. 후자를 fail-closed 로 하면 **가림막 없는 문서 전부**가 영향을 받아 "안 가려진 문서는 바이트 불변"이라는 대전제가 깨진다. ★가드는 **표가 잡힌 페이지에서만** 돌고, 막대가 없으면 단어 추출조차 하지 않는다 → 가려지지 않은 문서의 산출은 바이트 불변. **전건 실측(2026-08-27 run 33063283255)**: 열람 194/194 · baseline 이 DB 저장값 `gmp_deficiencies` 를 **194/194 재현**(총 934행 — baseline = 지금 발행 계약이 보는 값 그대로) · **산출 지문 불변 180문서** · 가드 발동 14문서 35행(934→899) · **부분수열 위반 0**(가드가 행을 고치지 않았다). ★정밀도의 증거는 **안 버린 쪽**이다 — 막대가 있는데 산출이 그대로인 3문서와 문서 안에서 갈린 2문서(`1P2hKsqMr6T` 3→2 · `1P41wm3_bah` 5→2)가 fail-closed 광역 발화를 반증한다. ★텍스트층 `0000` 규칙은 CONTROL 에서 **완전 중복**이다(먹은 9문서 23행이 전부 막대 규칙에도 걸린다 — 원천이 막대를 그리면서 그 아래를 0 으로 채웠으니 같은 자리가 두 번 걸린다). 그래도 남기는 이유는 값이 CONTROL 이 아니라 ①막대 없이 텍스트만 `0000` 인 TARGET 10건 ②**좌표가 없어 막대 규칙 자체가 없는 HWPX 경로**에 있기 때문이다. 검증은 `verify_gmp_redaction_guard.py`(같은 바이트·같은 프로세스에서 가드만 켜고 꺼 sha256 대조 + **부분수열 판정**: 가드는 행을 버리기만 해야 하고 고치면 안 된다)와 `.github/workflows/grm-gmp-redaction-verify.yml`(dispatch 전용, `MFDS_HTTP_PROXY` 필수 — nedrug 는 러너 IP 차단). ★`gmp_deficiency_table_status` 어휘는 **손대지 않았다**(raw_payload·health 카운터 바이트 불변 유지) — "원천이 감춤"과 "우리가 못 읽음"을 상태값으로 가르는 것은 별건이고, 지금은 WARN 로그로만 남긴다. 근거 문서 `docs/specs/GMP_지적표_추출불가_실측_2026-08-27.md` | ✅ 완료 |
-| EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) | 🔲 후보 |
-| GAP-2 | 브랜드-only 생물주사제 모달리티 오분류 해소 | 🔲 후보 |
+| EVAL-1 | 발행물 내용 품질 Eval 하니스(구조 lint가 못 보는 사실정합성) (2026-09-10 현재 첫 1회도 미실행) | 🔲 후보 |
+| GAP-2 | 브랜드-only 생물주사제 모달리티 오분류 해소 — **완료(2026-06-11)**: `grm_taxonomy.py` 의 `MODALITY_BIOLOGIC_BRANDS`(`grep -n MODALITY_BIOLOGIC_BRANDS grm_taxonomy.py` 로 확인)가 브랜드명만으로는 모달리티가 안 잡히던 생물학적제제 주사제(자닥신·Hizentra 등)를 Biologic 으로 분류 | ✅ 완료 |
 | WHY-1 | 결함 내용 표출 감사(FDA 483/WHOPIR/WL/MFDS GMP로 사실상 확보, 지속 관찰) | 🟡 진행 |
 | 운영 | Bus factor 1 대비 `docs/ops_runbook.md` 인수인계·아카이브 정책 실행 | 🟡 문서 완료·실행 대기 |
+| DB-BACKUP | 주 1회 암호화 Postgres 백업 — `grm-db-backup.yml` 이 `pg_dump`(public 스키마)를 떠서 라이브와 행 수 대조 검증 후 GPG 공개키로 암호화해 Actions 아티팩트(90일 보존)로 올린다(#972) | ✅ 완료(2026-09-10) |
+| BATCH-PR-WATCHDOG | `grm-stranded-batch-pr.yml` — 초록인 채 3시간 넘게 방치된 일일 번역 배치 PR 을 PAT 로 자동 머지(GITHUB_TOKEN 은 후속 워크플로를 못 깨움), 검사 실패·충돌·outbox 잔류는 이슈로 표면화(#971) | ✅ 완료(2026-09-10) |
+| BACKFILL-483-JSON | `collect_fda_backfill.py` — FOIA 리딩룸 DataTables 가 봇차단(Akamai) 되면 전수 JSON 백본으로 폴백, 3연속 스케줄 실패는 이슈로 표면화(#969) | ✅ 완료(2026-09-10) |
+| WL-BACKFILL-BACKBONE | WL 백필 목록 조회는 DataTables 티어 하나뿐이다. 일일 WL 수집기도 소스가 WL 페이지 하나뿐이라 미러링할 2차 백본 자체가 없다 — WL 페이지가 차단되면 재검토 | 🔲 보류 |
 
 ### 6.3 정기 운영 (사람 개입 지점)
 - **매주 월요일:** Admin 콘솔에서 웹 브리프 미리보기 확인 후 **승인 버튼 1클릭**(트랙 A). Findings 번역(트랙 B)은 예약 세션이 자동 처리 — 데스크톱 앱이 열려 있어야 정시 실행(꺼져 있으면 다음 실행 시 처리).

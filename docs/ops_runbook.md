@@ -24,9 +24,17 @@
 | `BRAVE_API_KEY` | Brave 보조검색 (현재 `ENABLE_SEARCH=false`) | brave.com/search/api | 비활성 | 활성화 시점에 재확인 |
 | `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | 웹 배포 (`grm-web-deploy.yml` → Cloudflare Pages) | dash.cloudflare.com → API Tokens (Pages 편집 최소 스코프) | 토큰 만료 설정 가능. **미설정 시 배포 스킵**(빌드·아티팩트만, 비차단) | 새 토큰 발급(최소 스코프) → Secret 교체 → `web/**` push 로 preview 배포 확인 |
 | `NEWSLETTER_API_KEY` | 뉴스레터 발송 (Brevo Campaigns API v3 `api-key`, `grm-newsletter-send.yml` 전용) | brevo.com → SMTP & API → API Keys (v3) | **생성 2026-06-30 · 만료 2027-06-30**(Brevo 설정). 값 미기재(Secret UI 전용). **노출 시 즉시 폐기·재발급**(채팅 노출 이력 — MINO 판단 재발급 보류). 미설정 시 발송 불가(게이트는 PASS·발송만 스킵) | Brevo 에서 폐기·재생성 → GitHub Secret 값만 교체(코드 무변경) → `grm-newsletter-send.yml` `mode=test` 로 테스트 발송 확인 → 구 키 폐기 |
+| `ADMIN_GITHUB_ACTIONS_TOKEN` | PAT — 기본 `GITHUB_TOKEN` 이 만든 이벤트는 후속 워크플로를 재귀적으로 못 깨우므로(GitHub 공식 제약), 머지/쓰기 뒤 다른 워크플로 트리거가 필요한 곳이 이걸 쓴다: `grm-stranded-batch-pr`(PR 자동 머지) · `grm-admin-backend-deploy` · `grm-delta-bridge` · `grm-fda-inspections-backfill` · `grm-findings-docs` · `grm-findings-facets` · `grm-glossary-cases` · `grm-library-staging` · `grm-web-publish` | GitHub 개인 액세스 토큰(PAT) — Settings → Developer settings → Personal access tokens | 확인 필요(정확한 스코프·만료 설정은 워크플로 주석에 없음) | 새 PAT 재발급 → Secret 교체 → `grm-stranded-batch-pr.yml` 을 `dry_run=true` 로 dispatch 해 "ADMIN_GITHUB_ACTIONS_TOKEN 확인됨" 로그 확인 |
+| `SUPABASE_ACCESS_TOKEN` | Supabase CLI 관리 API 인증(`supabase link`) — `grm-admin-backend-deploy.yml`(마이그레이션 배포) · `grm-db-backup.yml`(주간 백업) | supabase.com → Account → Access Tokens | 확인 필요(수동 폐기 전까지 유효로 추정) | Supabase 대시보드에서 재발급 → Secret 교체 → `grm-db-backup.yml` dispatch 로 `supabase link` 성공 확인 |
+| `SUPABASE_DB_PASSWORD` | Postgres 직접 연결 비밀번호(`supabase link --password`/`db dump`) — `grm-admin-backend-deploy.yml` · `grm-db-backup.yml` | Supabase 프로젝트 Settings → Database → 비밀번호 재설정 | 명시 만료 없음(수동 변경 전까지 유효) | Supabase 대시보드에서 DB 비밀번호 재설정(**기존 연결 전부 끊김 주의**) → Secret 교체 → `grm-db-backup.yml` dispatch 로 dump 성공 확인 |
+| `SUPABASE_SERVICE_ROLE_KEY` | PostgREST service-role 인증 — findings/raw_signals 적재·번역 반영 등 20개 이상 워크플로 공용(`grm-intake.yml` 포함) | Supabase 프로젝트 Settings → API → service_role key | 명시 만료 없음. **재발급 시 이전 키 즉시 무효화**(전 워크플로 동시 영향) | Supabase 대시보드에서 키 재발급 → Secret 교체 → `grm-intake.yml` dry-run 으로 적재 확인 → 나머지 사용 워크플로 순차 확인 |
+| `CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare Web Analytics(RUM) 읽기 — `grm-rum-analytics.yml` | dash.cloudflare.com → API Tokens(Account Analytics Read 전용 스코프로 신규 발급, 워크플로 주석) | 확인 필요 | Cloudflare 에서 Account Analytics Read 스코프로 신규 토큰 발급 → Secret 교체 → `grm-rum-analytics.yml` dispatch 로 수집 확인 |
+| `GSC_SERVICE_ACCOUNT_JSON` | Google Search Console API 서비스 계정 키(JSON 전문) — `grm-rum-analytics.yml`(078 GSC 수집) | Google Cloud Console 서비스 계정 키. **서비스 계정 이메일을 GSC 속성 사용자로 추가해야 동작**(`collect_search_console.py` 주석) | 서비스 계정 키 자체는 명시 만료 없음(수동 폐기 전까지) | GCP 콘솔에서 새 키 생성 → GSC 속성에 서비스 계정 이메일 추가/확인 → Secret 값(JSON 전문) 교체 → `grm-rum-analytics.yml` dispatch 로 확인 |
+| `FDA_API_USER` / `FDA_DDAPI_KEY` | FDA Data Dashboard API(`inspections_classifications`) 인증 헤더 — `grm-fda-inspections-backfill.yml`(월 1회 GMP 실사등급 자동 갱신 + 수동 dispatch) | FDA Data Dashboard API 계정 등록(이메일+키, GRM_SYSTEM.md §3.4 소스17 상세) | 확인 필요 | FDA Data Dashboard 에서 재발급 → 두 Secret 교체 → `grm-fda-inspections-backfill.yml` 을 `dry_run=true` 로 dispatch 해 DDAPI 응답 확인 |
+| `FDA_IRES_KEY` | FDA Enforcement Reports API 키 — **코드에서 읽지 않음(2026-08-12 기준, GRM_SYSTEM.md §5.3)**. 회수 정보는 OpenFDA(소스 2)가 담당하며 이 키는 후보 발급만 돼 있는 상태 | 확인 필요 | 미사용 | 현재 로테이션 불요 — 코드가 이 키를 읽기 시작하는 시점에 재확인 |
 
 만료 의심 신호: 수집 Issue 에 401/403 비일시 오류, 특정 소스만 연속 0건.
-점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > KR-egress 잔여 3종(`MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`) > 나머지. `CLOUDFLARE_*`·`NEWSLETTER_API_KEY` 는 기능 게이트형(스케줄 수집 무영향 — 웹 배포/뉴스레터 발송 시점에만 필요, 발송은 수동·게이트). 구독자 명단·발송 기록 PII 는 SaaS(Brevo) 소유 — 락인 방지로 명단 주기적 CSV 백업만(bus-factor-1).
+점검 우선순위: `DATA_GO_KR_SERVICE_KEY`(만료 존재) > `NOTION_TOKEN`(권한 회수형) > KR-egress 잔여 3종(`MFDS_HTTP_PROXY`/`LAW_GO_KR_OC`) > 나머지. `CLOUDFLARE_*`·`NEWSLETTER_API_KEY` 는 기능 게이트형(스케줄 수집 무영향 — 웹 배포/뉴스레터 발송 시점에만 필요, 발송은 스케줄 자동·무승인 — §2 항목5). 구독자 명단·발송 기록 PII 는 SaaS(Brevo) 소유 — 락인 방지로 명단 주기적 CSV 백업만(bus-factor-1).
 
 ## 2. 정기 점검 (주간 5분)
 
@@ -35,8 +43,9 @@
 2. Weekly Brief 발행물에 대해 `GRM_Brief_Lint_실행프롬프트.md` 실행 (발행 후 독립 게이트).
 3. Intake DB 를 `Run Date (KST)` 내림차순으로 열어 최신 row 가 오늘/어제인지 확인.
 4. M2 메타에 "Status 갱신 실패" 또는 "주간 재유입 가드" 기록이 있으면 해당 doc_id 의 Status 를 수동 정리.
-5. **뉴스레터 발송** = 월 14:00 KST(05:00 UTC) `GRM Newsletter Send` 자동 트리거 + 승인 게이트 1클릭. Actions 알림이 오면 **Review deployments → Approve**(거부 시 미발송). 새 호가 없으면(이미 발송) 승인 요청 없이 클린 skip — 정상. 최초 운영 전 Settings→Environments 의 `newsletter-send` 에 reviewer(본인) 등록 확인(미등록 시 무인 발송).
-6. **라이브 사이트 합성 점검** = `GRM Site Probe (synthetic, daily)` 가 매일 03:23 UTC(12:23 KST) 방문자 입장에서 페이지 5종·최신 브리프·RPC 지연(anon, 2초 warn/3초 fail)을 잰다. 빨강이면 `사이트 합성 점검 실패` Issue 가 열린다 — Actions 로그 또는 이슈 본문의 실패 점검 행을 확인.
+5. **뉴스레터 발송** = 월 05:23/06:23/07:23 UTC(14:23/15:23/16:23 KST, 3회차) `GRM Newsletter Send` 스케줄이 최신 호를 자동 발송한다. **승인 게이트는 2026-07-05 커밋 `d92b301`로 제거됐다**(`.github/workflows/grm-newsletter-send.yml` 헤더 참조) — 예약 발송은 무인·무승인이며, 캠페인명(발행일 파생) 키로 멱등(이미 보낸 호는 재발송 0)이다. 새 호가 없으면 조용히 skip — 정상. 수동 테스트 발송은 Actions → `GRM Newsletter Send` → `Run workflow` → `mode=test`(`GRM_NEWSLETTER_TEST_EMAILS` 로만 발송) — `mode=send` 는 실발송이므로 신중히.
+6. **HC 실사 주간 재수집** = 매주 일요일 04:23 KST `GRM Health Canada Inspection Deep Backfill` 이 최근 60일 창을 자동 apply(멱등)로 재수집(2026-09-10 신설 — 그 전엔 수동 dispatch 뿐이라 2026-08-10 이후 원장이 얼어붙어 있었다). 스케줄 실패는 이슈 `HC 실사 주간 재수집 실패` 로 뜬다(20h 스로틀, 담당자 배정).
+7. **라이브 사이트 합성 점검** = `GRM Site Probe (synthetic, daily)` 가 매일 03:23 UTC(12:23 KST) 방문자 입장에서 페이지 5종·최신 브리프·RPC 지연(anon, 2초 warn/3초 fail)을 잰다. 빨강이면 `사이트 합성 점검 실패` Issue 가 열린다 — Actions 로그 또는 이슈 본문의 실패 점검 행을 확인.
 
 ## 3. 장애 대응 빠른 분기
 
@@ -89,6 +98,7 @@ handoff 조회는 `Run Date 7일 + Status=New` 필터라 직접 영향은 작지
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-09-10 | 정본·런북 스윕 — §2 항목5 뉴스레터 승인 게이트 제거 반영(2026-07-05 `d92b301`로 이미 제거됨, "Review deployments → Approve"·reviewer 등록 문구 삭제) + §1 secrets 표에 `gh secret list` 대비 누락 9종(`ADMIN_GITHUB_ACTIONS_TOKEN`·`SUPABASE_ACCESS_TOKEN`·`SUPABASE_DB_PASSWORD`·`SUPABASE_SERVICE_ROLE_KEY`·`CLOUDFLARE_ANALYTICS_TOKEN`·`GSC_SERVICE_ACCOUNT_JSON`·`FDA_API_USER`/`FDA_DDAPI_KEY`·`FDA_IRES_KEY`) 행 보강 |
 | 2026-09-10 | §6 DB 백업·복원 신설 — grm-db-backup.yml(주 1회 암호화 덤프 → Actions 아티팩트 90일), 개인키 위치·복원 절차·분기 복원 시험 |
 | 2026-06-30 | Brevo 뉴스레터 설정 완료 — NEWSLETTER_API_KEY Secret 등록, 변수 4개(GRM_NEWSLETTER_*) 등록 |
 | 2026-06-18 | KR-egress 잔여 QA 3종 운영 항목 추가 — `MFDS_HTTP_PROXY`, `LAW_GO_KR_OC`, `probe_mfds_egress.py`, `MFDS_RSS_BOARD_MODE=residual` 점검 경로 |

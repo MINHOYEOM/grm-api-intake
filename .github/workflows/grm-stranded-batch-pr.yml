@@ -65,7 +65,7 @@ jobs:
       # 실패/충돌 PR 은 코드를 고치지 않고 이슈로만 표면화한다.
       - name: Merge stranded green batch PRs, or flag failures
         id: stranded_pr
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
           script: |
@@ -218,7 +218,7 @@ jobs:
       # 죽어 있는 경우도 잡아야 하므로 Job 1 의 분기에 종속시키지 않는다).
       - name: Detect stale translate-apply chain (outbox residue)
         if: always() && steps.verify_secret.outcome == 'success'
-        uses: actions/github-script@v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
           script: |

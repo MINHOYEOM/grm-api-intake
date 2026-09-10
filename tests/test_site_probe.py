@@ -21,6 +21,7 @@ import unittest
 from unittest import mock
 
 import site_probe
+site_probe.RETRY_SLEEP_S = 0.0
 
 BASE = "https://grm-solutions.com"
 SUPABASE = "https://example.supabase.co"
@@ -275,6 +276,39 @@ class SitemapAndRootChecksTest(unittest.TestCase):
         home_rows = [c for c in report["checks"] if c["name"] == "GET / (ko)"]
         self.assertEqual(home_rows[0]["status"], "fail")
 
+
+
+class RpcRetryTest(unittest.TestCase):
+    """[2026-09-10] RPC 검사는 fail 이면 한 번만 다시 잰다 — 콜드 블립은 통과, 연속 실패만 fail."""
+
+    def _resp(self, status, secs):
+        r = mock.Mock()
+        r.status_code = status
+        r.elapsed = dt.timedelta(seconds=secs)
+        r.headers = {}
+        r.text = ""
+        return r
+
+    def test_transient_500_then_ok_is_ok_with_retry_note(self):
+        with mock.patch("site_probe.requests.post", side_effect=[self._resp(500, 0.3), self._resp(200, 0.4)]) as post:
+            res = site_probe.check_rpc("rpc", SUPABASE, "anon", "findings_stats", {}, 10.0)
+        self.assertEqual(post.call_count, 2)
+        self.assertEqual(res.status, "ok")
+        self.assertIn("재시도 통과", res.detail)
+        self.assertIn("HTTP 500", res.detail)
+
+    def test_slow_then_slow_is_fail(self):
+        with mock.patch("site_probe.requests.post", side_effect=[self._resp(200, 3.6), self._resp(200, 3.4)]) as post:
+            res = site_probe.check_rpc("rpc", SUPABASE, "anon", "findings_stats", {}, 10.0)
+        self.assertEqual(post.call_count, 2)
+        self.assertEqual(res.status, "fail")
+        self.assertIn("재시도도", res.detail)
+
+    def test_warn_does_not_retry(self):
+        with mock.patch("site_probe.requests.post", side_effect=[self._resp(200, 2.5), self._resp(200, 0.1)]) as post:
+            res = site_probe.check_rpc("rpc", SUPABASE, "anon", "findings_stats", {}, 10.0)
+        self.assertEqual(post.call_count, 1)
+        self.assertEqual(res.status, "warn")
 
 if __name__ == "__main__":
     unittest.main()

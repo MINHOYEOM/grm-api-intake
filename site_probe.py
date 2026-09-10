@@ -56,6 +56,7 @@ import datetime as dt
 import json
 import os
 import sys
+import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -169,9 +170,34 @@ def check_header_present(name: str, resp: Any, header_name: str) -> CheckResult:
     return CheckResult(name, "warn", 0.0, f"{header_name} 헤더 없음(_headers 배선 별도 PR 예정)")
 
 
+# [2026-09-10 재시도] 첫 실측에서 findings_stats 가 콜드 상태에서 한 번 500, findings_similar_to 가
+# 3.58s 로 잡혔다가 30초 뒤엔 정상이었다. 하루 1회 프로브가 그런 블립으로 이슈를 열면 경보가
+# 잡음이 되므로, RPC 검사가 fail 이면 RETRY_SLEEP_S 뒤 **한 번만** 다시 재고 두 번째 결과를
+# 채택한다(단 상세에 1차 결과를 남겨 콜드 지연이 반복되는지 추적할 수 있게 한다).
+# 두 번 연속 fail 이어야 fail 이다. 테스트는 RETRY_SLEEP_S 를 0 으로 패치한다.
+RETRY_SLEEP_S = 15.0
+
+
 def check_rpc(name: str, base_url_norm: str | None, anon_key: str, rpc_name: str,
               payload: dict[str, Any], timeout: float, *,
               warn_s: float = RPC_WARN_S, fail_s: float = RPC_FAIL_S) -> CheckResult:
+    first = _check_rpc_once(name, base_url_norm, anon_key, rpc_name, payload, timeout,
+                            warn_s=warn_s, fail_s=fail_s)
+    if first.status != "fail" or base_url_norm is None or not anon_key:
+        return first
+    time.sleep(RETRY_SLEEP_S)
+    second = _check_rpc_once(name, base_url_norm, anon_key, rpc_name, payload, timeout,
+                             warn_s=warn_s, fail_s=fail_s)
+    if second.status != "fail":
+        return CheckResult(name, second.status, second.elapsed_s,
+                           f"재시도 통과({second.detail}) · 1차 {first.detail}")
+    return CheckResult(name, "fail", second.elapsed_s,
+                       f"{first.detail} · 재시도도 {second.detail}")
+
+
+def _check_rpc_once(name: str, base_url_norm: str | None, anon_key: str, rpc_name: str,
+                    payload: dict[str, Any], timeout: float, *,
+                    warn_s: float = RPC_WARN_S, fail_s: float = RPC_FAIL_S) -> CheckResult:
     if base_url_norm is None:
         return CheckResult(name, "fail", 0.0, "SUPABASE_URL 미설정 또는 https:// 형식 아님")
     if not anon_key:

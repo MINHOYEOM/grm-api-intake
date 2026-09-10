@@ -43,6 +43,11 @@ from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import Any
 
+# grm_findings 는 stdlib-only 이고 card_scaffold 를 import 하지 않는다(순환 없음) —
+# evidence_url 품질 분류기(EVIDENCE_URL_BLOCKLIST)를 단일 진실원으로 재사용한다
+# (2026-09-10 정보출처 링크 게이트, 아래 _dual_links 주석 참조).
+from grm_findings import evidence_url_quality_error
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 0. 소스/유형 상수 (collect_intake 와 동일 문자열 — import 의존 없이 평면 복제)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1257,7 +1262,18 @@ def _dual_links(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> t
     info(📰)는 공통 산출. official(📎)은 spec.official 콜러블, 없으면 official_url 폴백(§5/§8/§12B).
     """
     raw = raw or {}
-    info = _first(row.get("api_query"), row.get("source_url"), row.get("official_url"))
+    # [정보출처 링크 품질 게이트 2026-09-10] 09-07호 발행 브리프에서 MFDS 행정처분/회수
+    # 카드 9건의 "📰 정보출처"가 api_query 원값(data.go.kr 오픈API, serviceKey= 포함)을
+    # 그대로 내보내 방문자가 클릭하면 SERVICE_KEY_IS_NOT_REGISTERED_ERROR JSON 을 봤다.
+    # api_query/source_url/official_url 후보 중 evidence_url_quality_error()(§ findings
+    # evidence_url 과 동일 분류기, 단일 진실원)를 통과하는 **첫** 값만 info 로 채택한다 —
+    # official(📎, data.go.kr 데이터셋 폴백 "(데이터셋)" 라벨)은 의도된 설계라 게이트하지 않는다.
+    info = ""
+    for candidate in (row.get("api_query"), row.get("source_url"), row.get("official_url")):
+        text = _first(candidate)
+        if text and not evidence_url_quality_error(text):
+            info = text
+            break
     fn = _spec(kind).official
     if fn:
         official, fallback = fn(row, raw)

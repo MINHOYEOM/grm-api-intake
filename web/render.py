@@ -104,6 +104,11 @@ DIST_DIR = WEB_DIR / "dist"
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
+# [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
+# 걸러도, 게이트 이전에 발행된 브리프 JSON(`web/data/briefs/*.json`)은 여전히 파일에
+# serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
+# (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
+from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -476,9 +481,15 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
     src = card.get("sources") or {}
     lc = src.get("link_check") or {}
     is_pdf = bool(src.get("official_is_pdf"))
+    # [정보출처 링크 품질 게이트 2026-09-10] 09-07호 등 게이트 이전 발행분은 브리프 JSON
+    # 에 serviceKey= API 원주소가 그대로 박혀 있다 — 매 빌드가 이 JSON 을 다시 렌더하므로
+    # (재수집 없음) 여기서 걸러야 이미 발행된 카드도 다음 빌드부터 죽은 링크를 멈춘다.
+    info_url = src.get("info_url", "")
+    if _evidence_url_quality_error(info_url):
+        info_url = ""
     sources = {
         "info": {
-            "url": _safe_url(src.get("info_url", "")),
+            "url": _safe_url(info_url),
             "state": lc.get("info", "pending"),
             "icon": "ti-database",
             "text": "data source",

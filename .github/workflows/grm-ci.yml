@@ -10,11 +10,30 @@ name: GRM CI (compile + tests)
 #   가 됐고, 대조 루프가 `sent.casefold()` 를 용어 242 개마다 다시 계산하고 있었다.
 #   접은 사본을 색인에 실어 14.8s 로 되돌린 뒤(동작·골든 바이트 불변) 상한을 30분으로
 #   둔다. 상한은 '멈춘 잡'을 잡으라고 있는 것이지 정상 실행을 자르라고 있는 것이 아니다.
+#
+# 2026-09-10: push 트리거를 `['**']` → `[main]` 으로 좁혔다. 이전엔 PR 브랜치에 커밋할
+#   때마다 push 와 pull_request 두 이벤트가 동시에 열려 같은 커밋이 5,700여 건 스위트를
+#   두 번(13~21분씩) 돌았다 — 실행 자체는 공개 저장소라 무료지만 큐가 배로 밀려 병합이
+#   늦어졌고, 그 지연 때문에 이번 달에만 timeout-minutes 상한을 두 번 올렸다(위 이력
+#   참고). PR 브랜치는 pull_request 이벤트만으로 이미 한 번 돈다 — push 를 없애도
+#   커버리지가 줄지 않는다. **PR 을 열지 않고 브랜치만 푸시하면 이제 CI 가 안 돈다 —
+#   의도된 동작이다**(dispatch 로 수동 실행 가능).
+#   병합 게이트(`supabase/functions/admin-github/index.ts`)는 PR head sha 의
+#   `/commits/{sha}/check-runs` 를 읽는데, pull_request 이벤트가 만드는 체크런도 같은
+#   head sha 에 붙는다 — push 트리거를 좁혀도 게이트가 보는 체크런은 그대로다.
+#   `concurrency.cancel-in-progress` 는 **같은 브랜치**(PR 헤드)에 연달아 푸시했을 때
+#   앞선 런만 취소한다 — main 브랜치로 향하는 런(머지 커밋)은 `cancel-in-progress` 가
+#   `false` 로 고정돼 있어 취소되지 않는다(모든 머지가 자기 자신의 CI 결과를 남긴다).
+#   서로 다른 PR 브랜치끼리는 group 이 달라 애초에 서로를 취소하지 않는다.
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: grm-ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
@@ -28,6 +47,7 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
+          cache: 'pip'
       - name: Install dependencies
         run: pip install -r requirements.txt
       # 루트 평면 배치(CLAUDE.md §구조 원칙)를 그대로 신뢰해 *.py 전수 컴파일한다.

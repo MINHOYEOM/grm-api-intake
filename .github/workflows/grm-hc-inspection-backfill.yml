@@ -1,25 +1,36 @@
 name: GRM Health Canada Inspection Deep Backfill (findings)
 
-# 캐나다 보건부 GMP 실사 리포트카드 과거분 findings 딥 백필 — 1회성 수동 실행.
+# 캐나다 보건부 GMP 실사 리포트카드 과거분 findings 딥 백필 — 주 1회 스케줄(최근 60일 창,
+# 멱등) + 수동 dispatch. [2026-09-10] 1,824건 전량이 2026-08-10 하루에만 적재되고 그 뒤로
+# 원장이 얼어붙은 게 실측으로 확인돼(수동 dispatch 뿐이라 아무도 다시 안 돌렸다) 주간
+# 스케줄을 붙였다 — 최근 60일 창을 매주 멱등 재수집하면 신규분(월 ~37건)이 자동으로 든다.
 #
 # 배경: 이 소스는 **일일 크론에 붙어 있지 않다.** 일일 intake 로 붙이려면 수동 레지스트리
 #   6곳(INTAKE_SOURCE_SPECS / CollectionStats / _insert_items_map / card_scaffold._REGISTRY /
 #   grm_health.enabled_source_failures / transient 코드)을 전부 고쳐야 하고, 하나만 빠뜨리면
 #   "조용히 죽거나 월요일 발행을 멈추거나" 중 하나가 된다(둘 다 실사고 이력이 있다).
 #   백필 경로는 Notion 을 우회해 PostgREST 로 직행하므로 그 여섯 곳을 하나도 안 건드린다.
-#   HC 실사는 월 ~37건이라 일일 유입은 급하지 않다 — 백필 먼저, 일일 편입은 별건.
+#   HC 실사는 월 ~37건이라 일일 유입은 급하지 않다 — 주간 재수집으로 충분하다.
 #
 # ★핵심 제약(EU/MHRA NCR 백필과 동형):
 #   - git 쓰기 없음(checkout=read-only). Notion 무접촉 → 주간 브리프 파이프라인 무간섭.
 #   - 멱등: raw_signal_id / finding_id 는 (schema_version, source, document_id) 해시라
 #     재실행해도 중복 0. 실패 시 리포트의 failed_ins_numbers 로 잔여만 메우면 된다.
-#   - dry_run=true(기본값)로 먼저 실행해 건수를 확인한 뒤 apply 로 재실행한다.
+#   - dispatch 는 dry_run=true(기본값)로 먼저 실행해 건수를 확인한 뒤 apply 로 재실행한다.
+#     스케줄 실행은 이 기본값을 안 거친다 — 최근 60일 창이 이미 좁고 멱등이라 바로 apply.
 #   - ★적재 후 번역 필수(이 워크플로 밖): findings 공개 RLS 가 finding_text_ko 를 요구하고
 #     HC 관찰문은 영어다. 적재 완료 ≠ 공개 완료 — 두 숫자를 같은 것으로 보고하지 말 것.
 #
-# ★비용: 문서당 상세 1콜이다. 전량(1,824문서 × request_delay 0.4초) ≈ 13분.
-#   정부 단일 서버를 연타하므로 request_delay 를 함부로 낮추지 마라.
+# ★비용: 문서당 상세 1콜이다. 전량(1,824문서 × request_delay 0.4초) ≈ 13분. 주간 스케줄은
+#   60일 창(신규 ~75건 안팎)만 돌아 훨씬 가볍다. 정부 단일 서버를 연타하므로 request_delay
+#   를 함부로 낮추지 마라(스케줄 실행은 이 인자를 아예 안 넘겨 수집기 기본값을 그대로 쓴다).
 on:
+  schedule:
+    # 매주 토요일 19:23 UTC = 일요일 04:23 KST — 일일 intake(grm-intake.yml, 18:17 UTC)·findings
+    # 백필(grm-findings-backfill-fetch.yml, 00/06/12:17 UTC)크론과 겹치지 않는 시각.
+    # schedule 이벤트에서는 workflow_dispatch 의 inputs.* 가 전부 빈 문자열이다(default 는
+    # dispatch 전용 — GitHub 사실). 실제 파라미터 계산은 아래 실행 스텝의 schedule 분기 참조.
+    - cron: '23 19 * * 6'
   workflow_dispatch:
     inputs:
       from_date:
@@ -49,6 +60,7 @@ on:
 
 permissions:
   contents: read
+  issues: write   # 마지막 스텝(주간 스케줄 실패 표면화 이슈) 전용 — 나머지 스텝은 GitHub 에 쓰지 않는다.
 
 concurrency:
   # 자기 자신과만 직렬화한다(일일 크론에 HC 실사 채널이 없으므로 경합 대상이 없다).
@@ -83,20 +95,50 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          ARGS=(--from-date "${{ inputs.from_date }}" --output backfill_report.json)
-          if [ -n "${{ inputs.to_date }}" ]; then
-            ARGS+=(--to-date "${{ inputs.to_date }}")
-          fi
-          ARGS+=(--limit "${{ inputs.limit }}")
-          ARGS+=(--request-delay "${{ inputs.request_delay }}")
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            ARGS+=(--dry-run)
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # [2026-09-10] 주간 스케줄 자동 재수집 — dispatch 입력(inputs.*)은 schedule
+            # 이벤트에서 전부 빈 문자열이라 여기서 전혀 참조하지 않고 직접 계산한다
+            # (grm-findings-backfill-fetch.yml F2c 관용구와 동형). 최근 60일 창 · limit
+            # 무제한 · dry_run=false(실적재) · request-delay 는 인자를 생략해 수집기
+            # 기본값(REQUEST_DELAY_SECONDS)을 그대로 쓴다.
+            EFF_FROM="$(date -u -d '60 days ago' +%F)"
+            EFF_TO=""
+            EFF_LIMIT="0"
+            EFF_DRY_RUN="false"
+            EFF_DELAY="(수집기 기본값)"
+            EFF_VETERINARY="false"
+            ARGS=(--from-date "${EFF_FROM}" --limit 0 --apply --output backfill_report.json)
           else
-            ARGS+=(--apply)
+            # dispatch 는 오늘까지의 동작을 그대로 유지한다(입력 그대로 사용).
+            EFF_FROM="${{ inputs.from_date }}"
+            EFF_TO="${{ inputs.to_date }}"
+            EFF_LIMIT="${{ inputs.limit }}"
+            EFF_DRY_RUN="${{ inputs.dry_run }}"
+            EFF_DELAY="${{ inputs.request_delay }}"
+            EFF_VETERINARY="${{ inputs.include_veterinary }}"
+            ARGS=(--from-date "${{ inputs.from_date }}" --output backfill_report.json)
+            if [ -n "${{ inputs.to_date }}" ]; then
+              ARGS+=(--to-date "${{ inputs.to_date }}")
+            fi
+            ARGS+=(--limit "${{ inputs.limit }}")
+            ARGS+=(--request-delay "${{ inputs.request_delay }}")
+            if [ "${{ inputs.dry_run }}" = "true" ]; then
+              ARGS+=(--dry-run)
+            else
+              ARGS+=(--apply)
+            fi
+            if [ "${{ inputs.include_veterinary }}" = "true" ]; then
+              ARGS+=(--include-veterinary)
+            fi
           fi
-          if [ "${{ inputs.include_veterinary }}" = "true" ]; then
-            ARGS+=(--include-veterinary)
-          fi
+          {
+            echo "eff_from=${EFF_FROM}"
+            echo "eff_to=${EFF_TO}"
+            echo "eff_limit=${EFF_LIMIT}"
+            echo "eff_dry_run=${EFF_DRY_RUN}"
+            echo "eff_delay=${EFF_DELAY}"
+            echo "eff_veterinary=${EFF_VETERINARY}"
+          } >> "$GITHUB_OUTPUT"
           python collect_hc_inspection_backfill.py "${ARGS[@]}"
 
       - name: Write step summary
@@ -105,14 +147,62 @@ jobs:
           {
             echo "### GRM Health Canada Inspection Deep Backfill"
             echo ""
-            echo "from_date: \`${{ inputs.from_date }}\` / to_date: \`${{ inputs.to_date }}\` / limit: \`${{ inputs.limit }}\` / dry_run: \`${{ inputs.dry_run }}\` / include_veterinary: \`${{ inputs.include_veterinary }}\`"
+            echo "event: \`${{ github.event_name }}\`"
+            echo ""
+            echo "from_date: \`${{ steps.backfill.outputs.eff_from }}\` / to_date: \`${{ steps.backfill.outputs.eff_to }}\` / limit: \`${{ steps.backfill.outputs.eff_limit }}\` / dry_run: \`${{ steps.backfill.outputs.eff_dry_run }}\` / include_veterinary: \`${{ steps.backfill.outputs.eff_veterinary }}\` / request_delay: \`${{ steps.backfill.outputs.eff_delay }}\`"
             echo ""
             if [ -f backfill_report.json ]; then
               echo '```json'
               cat backfill_report.json
               echo '```'
+              APPENDED=$(python -c "import json; print(json.load(open('backfill_report.json')).get('appended', 'N/A'))" 2>/dev/null || echo "N/A")
+              DUPLICATE=$(python -c "import json; print(json.load(open('backfill_report.json')).get('duplicate', 'N/A'))" 2>/dev/null || echo "N/A")
+              echo ""
+              echo "신규 적재(appended) **${APPENDED}건** · 기존 중복(스킵) **${DUPLICATE}건**"
             else
               echo "backfill_report.json 미생성 — 인자/인증/수집 실패로 조기 종료 가능"
               echo "(SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # [2026-09-10] 주간 스케줄 실패 표면화 — 담당자 없이 도는 자동 재수집이라 실패가
+      # 조용히 묻히면 다음 스케줄까지 한 달을 그냥 흘려보낸다(이 파일 header 의 실측:
+      # 08-10 이후 원장이 얼어붙은 게 이런 식으로 방치됐다). dispatch 실패는 사람이 화면을
+      # 보고 있으므로 대상에서 뺀다(grm-db-backup.yml 관용구와 동형 — 제목 고정 + 20h
+      # 코멘트 스로틀. automation-failure 라벨은 이미 다른 워크플로가 만들어 둬 여기선
+      # ensureLabel 없이 바로 쓴다).
+      - name: Surface scheduled failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'HC 실사 주간 재수집 실패';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = open.find((i) => i.title === title);
+            const body = [
+              '주 1회 Health Canada 실사 재수집(grm-hc-inspection-backfill.yml, schedule)이 실패했습니다.',
+              '',
+              `- 실행: ${runUrl}`,
+              '',
+              '확인 순서: ① SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 시크릿 ② HC 목록/상세 API 구조 변경(코드 주석의 원천 경로) ③ Job Summary 의 backfill_report.json(errors/failed_ins_numbers). 재실행은 멱등이라 그대로 dispatch(dry_run=false)로 다시 돌려도 안전하다. 복구되면 다음 스케줄 성공 때 사람이 닫는다.',
+            ].join('\n');
+            if (!existing) {
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: ['automation-failure'], assignees: [owner],
+              });
+              return;
+            }
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const recent = comments.some((c) => Date.now() - new Date(c.created_at).getTime() < 20 * 3600 * 1000);
+            if (!recent) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number, body: `여전히 실패 중입니다 (${runUrl}).`,
+              });
+            }

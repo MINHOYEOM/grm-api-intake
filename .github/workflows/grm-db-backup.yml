@@ -58,7 +58,7 @@ jobs:
       EXPECTED_FPR: 23C48C109F69820B410C3612F21828B7E6566191
       BACKUP_LABEL: ${{ inputs.label }}
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7.0.1
 
       # 배포 워크플로의 "없으면 skip" 과 달리 백업은 fail-fast 다 — 조용히 건너뛴 백업은
       # 없는 백업과 같고, 빨강이어야 이슈가 열린다.
@@ -82,7 +82,7 @@ jobs:
           fi
           test -f .github/db-backup-gpg.pub.asc || { echo "::error::공개키 파일 없음"; exit 1; }
 
-      - uses: actions/setup-python@v6.2.0
+      - uses: actions/setup-python@v7.0.0
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -90,7 +90,7 @@ jobs:
       - name: Install dependencies (requests only)
         run: python -m pip install --quiet "requests>=2.32,<3"
 
-      - uses: supabase/setup-cli@v2.1.1
+      - uses: supabase/setup-cli@v3.0.0
 
       - name: Link Supabase project
         shell: bash
@@ -158,7 +158,7 @@ jobs:
             echo "- 복원: 운영자 PC 에서 \`gpg --decrypt\` 후 Postgres 17(pgvector) 에 schema.sql → data.sql 순으로 psql 적용 (docs/ops_runbook.md \"DB 백업·복원\")"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.pkg.outputs.name }}
           path: '*.tar.gz.gpg'

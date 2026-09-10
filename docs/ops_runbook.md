@@ -45,6 +45,7 @@
 4. M2 메타에 "Status 갱신 실패" 또는 "주간 재유입 가드" 기록이 있으면 해당 doc_id 의 Status 를 수동 정리.
 5. **뉴스레터 발송** = 월 05:23/06:23/07:23 UTC(14:23/15:23/16:23 KST, 3회차) `GRM Newsletter Send` 스케줄이 최신 호를 자동 발송한다. **승인 게이트는 2026-07-05 커밋 `d92b301`로 제거됐다**(`.github/workflows/grm-newsletter-send.yml` 헤더 참조) — 예약 발송은 무인·무승인이며, 캠페인명(발행일 파생) 키로 멱등(이미 보낸 호는 재발송 0)이다. 새 호가 없으면 조용히 skip — 정상. 수동 테스트 발송은 Actions → `GRM Newsletter Send` → `Run workflow` → `mode=test`(`GRM_NEWSLETTER_TEST_EMAILS` 로만 발송) — `mode=send` 는 실발송이므로 신중히.
 6. **HC 실사 주간 재수집** = 매주 일요일 04:23 KST `GRM Health Canada Inspection Deep Backfill` 이 최근 60일 창을 자동 apply(멱등)로 재수집(2026-09-10 신설 — 그 전엔 수동 dispatch 뿐이라 2026-08-10 이후 원장이 얼어붙어 있었다). 스케줄 실패는 이슈 `HC 실사 주간 재수집 실패` 로 뜬다(20h 스로틀, 담당자 배정).
+7. **라이브 사이트 합성 점검** = `GRM Site Probe (synthetic, daily)` 가 매일 03:23 UTC(12:23 KST) 방문자 입장에서 페이지 5종·최신 브리프·RPC 지연(anon, 2초 warn/3초 fail)을 잰다. 빨강이면 `사이트 합성 점검 실패` Issue 가 열린다 — Actions 로그 또는 이슈 본문의 실패 점검 행을 확인.
 
 ## 3. 장애 대응 빠른 분기
 

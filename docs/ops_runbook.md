@@ -75,9 +75,19 @@ handoff 조회는 `Run Date 7일 + Status=New` 필터라 직접 영향은 작지
 - [ ] Routine 실행 방법 숙지: `docs/prompts/GRM_Prompt_v15.7.md` 를 새 채팅에 붙여넣어 실행
 - [ ] Brief Lint 실행 방법 숙지: `docs/prompts/GRM_Brief_Lint_실행프롬프트.md`
 
+## 6. DB 백업·복원 (2026-09-10 신설)
+
+- **무엇이**: `.github/workflows/grm-db-backup.yml` 이 **매주 일요일 20:37 UTC(월 05:37 KST)** `public` 스키마 전체를 `supabase db dump`(schema + data/COPY)로 떠서 **행 수를 라이브와 대조**(`db_backup_verify.py`, PostgREST `count=exact`)한 뒤 GPG 공개키로 암호화해 **Actions 아티팩트(보존 90일 ≈ 주간 사본 13개)** 로 올린다. 비용 0. `auth.users`(계정 7개)·storage 는 대상 밖.
+- **왜 아티팩트인가**: Free 플랜은 PITR·자동 백업이 없고, R2 는 결제수단이 필요해 쓰지 않는다. 공개 저장소 아티팩트는 누구나 받을 수 있으므로 **암호화본만** 올린다. 공개키 `.github/db-backup-gpg.pub.asc`, 지문 `23C48C109F69820B410C3612F21828B7E6566191`(워크플로 `EXPECTED_FPR` 와 일치해야 암호화한다).
+- **개인키(복호화 열쇠)**: 운영자 PC `private/credentials/db-backup-gpg/grm-db-backup.SECRET.asc` (키링 `C:/Users/user/.grm-db-backup-gpg`). **저장소·채팅에 올리지 않는다.** 잃으면 모든 백업을 못 연다 → 오프라인 사본 1개 권장.
+- **수동 백업**: 마이그레이션 직전엔 Actions → `GRM DB Backup` → Run workflow, `label` 에 `pre-migration-NNN`.
+- **복원 절차**(Postgres 17 + pgvector 가 있는 곳): ① 아티팩트 zip 안의 `grm-db-<날짜>.tar.gz.gpg` 를 받는다 ② `gpg --import grm-db-backup.SECRET.asc` ③ `gpg --output grm-db.tar.gz --decrypt grm-db-<날짜>.tar.gz.gpg` ④ `tar xzf` → `schema.sql`·`data.sql`·`counts.json`·`verify_report.md` ⑤ 새 DB 에 `psql -f schema.sql`(auth·확장 참조 오류는 정책·트리거 수준이라 표 생성엔 영향 없음, `ON_ERROR_STOP` 끄고 진행) → `psql -f data.sql` ⑥ 표별 `count(*)` 를 `counts.json` 과 대조.
+- **분기 1회 복원 시험**: 위 절차를 로컬 Docker `pgvector/pgvector:pg17` 에 실제로 수행하고 결과를 이 표 아래 변경 이력에 한 줄 남긴다. 스케줄 실패는 이슈 `GRM DB 백업 실패` 로 뜬다(담당자 배정·20h 스로틀).
+
 ## 📝 변경 이력
 | 날짜 | 변경 내용 |
 |---|---|
+| 2026-09-10 | §6 DB 백업·복원 신설 — grm-db-backup.yml(주 1회 암호화 덤프 → Actions 아티팩트 90일), 개인키 위치·복원 절차·분기 복원 시험 |
 | 2026-06-30 | Brevo 뉴스레터 설정 완료 — NEWSLETTER_API_KEY Secret 등록, 변수 4개(GRM_NEWSLETTER_*) 등록 |
 | 2026-06-18 | KR-egress 잔여 QA 3종 운영 항목 추가 — `MFDS_HTTP_PROXY`, `LAW_GO_KR_OC`, `probe_mfds_egress.py`, `MFDS_RSS_BOARD_MODE=residual` 점검 경로 |
 | 2026-06-04 | 최초 작성 — Secrets 인벤토리·로테이션, 주간 점검, 장애 분기, Intake 아카이브 정책(180일), 인수인계 체크리스트 |

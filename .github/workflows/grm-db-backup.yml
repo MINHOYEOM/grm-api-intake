@@ -1,0 +1,204 @@
+name: GRM DB Backup (weekly, encrypted)
+
+# [2026-09-10] 주 1회 암호화 DB 백업 — 2026-09-02 감사 운영 축 2번("Postgres 백업·복구 지점 없음").
+#
+# 왜 필요한가: Supabase Free 플랜은 PITR 도 자동 백업도 없다. 라이브 raw_signals 7,653행 중
+# 5,250행(FDA 483·경고서한·HC 실사·EU/MHRA NCR)은 Notion 을 거치지 않는 백필 수집기가 넣은
+# 것이라 **어디에도 두 번째 사본이 없고**, 483 리딩룸은 봇차단으로 재수집이 막히는 날이 있다.
+# 번역(translations/)·문서 색인(findings_docs.json)은 git 에 있으니, 잃으면 되돌릴 수 없는 것은
+# 원문 저장소(raw_signals)와 사용자 표(firm_watchlist·user_interest·reaction·rum_*·gsc_*)다.
+#
+# 왜 R2 가 아니라 Actions 아티팩트인가: 이 계정에는 R2 가 켜져 있지 않고 켜려면 결제수단이
+# 필요하다(운영 비용 0 원칙). 공개 저장소의 Actions 아티팩트는 무료지만 **누구나 내려받을 수
+# 있으므로** 덤프를 GPG 공개키로 암호화해서만 올린다 — 공개키는 `.github/db-backup-gpg.pub.asc`
+# (저장소 안, 공개해도 무해), 개인키는 운영자 PC 에만 있다(`private/credentials/db-backup-gpg/`,
+# docs/ops_runbook.md "DB 백업·복원"). 키 파일이 바꿔치기되면 암호화 전에 지문 대조에서 죽는다.
+# 보존 90일 = 주간 사본 약 13개. 복원 시험은 분기 1회 사람이 한다(런북).
+#
+# 검증은 복원이 아니라 행 수 대조다(db_backup_verify.py 도크스트링): PostgREST `count=exact` 로
+# 덤프 직전 표별 정확 행 수를 받고, data.sql 의 COPY 블록 행 수와 대조한다. 절단·누락·0행이면
+# 빨강. 백업 대상은 `public` 스키마 전체(auth.users 7계정·storage 는 제외 — 재생성 가능).
+#
+# 연결: Free 플랜의 직결 호스트(db.<ref>.supabase.co)는 IPv6 전용이라 러너에서 못 붙는다.
+# `supabase link` 뒤 `supabase db dump --linked`(pg_dump 를 컨테이너에서 실행 — 러너에 Docker 있음)
+# 가 풀러를 통해 붙는다(grm-admin-backend-deploy.yml 과 같은 링크 관용구).
+
+on:
+  schedule:
+    # 일요일 20:37 UTC = 월요일 05:37 KST — 월요일 발행 사슬(07:30 KST Routine) 전에 끝난다.
+    - cron: '37 20 * * 0'
+  workflow_dispatch:
+    inputs:
+      label:
+        description: '아티팩트 이름 꼬리표(영문·숫자·.-_ 만, 예: pre-migration-082). 비우면 날짜만.'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  issues: write    # 마지막 스텝(스케줄 실패 표면화 이슈) 전용 — 나머지 스텝은 GitHub 에 쓰지 않는다.
+
+concurrency:
+  group: grm-db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: pg_dump(public) → 행 수 대조 → GPG 암호화 → 아티팩트
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      # 암호화 대상 공개키의 지문. `.github/db-backup-gpg.pub.asc` 를 갈아 끼우려면 이 값도 같이
+      # 바꿔야 하므로, 키 파일만 몰래 바뀐 PR 은 여기서 실패한다.
+      EXPECTED_FPR: 23C48C109F69820B410C3612F21828B7E6566191
+      BACKUP_LABEL: ${{ inputs.label }}
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      # 배포 워크플로의 "없으면 skip" 과 달리 백업은 fail-fast 다 — 조용히 건너뛴 백업은
+      # 없는 백업과 같고, 빨강이어야 이슈가 열린다.
+      - name: Verify secrets and variables
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] && missing+=("SUPABASE_ACCESS_TOKEN")
+          [ -z "${SUPABASE_DB_PASSWORD:-}" ] && missing+=("SUPABASE_DB_PASSWORD")
+          [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ] && missing+=("SUPABASE_SERVICE_ROLE_KEY")
+          [ -z "${SUPABASE_URL:-}" ] && missing+=("vars.SUPABASE_URL")
+          [ -z "${SUPABASE_PROJECT_REF:-}" ] && missing+=("vars.SUPABASE_PROJECT_REF")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::DB 백업에 필요한 값 누락: ${missing[*]}"
+            exit 1
+          fi
+          if [ -n "${BACKUP_LABEL:-}" ] && ! printf '%s' "$BACKUP_LABEL" | grep -Eq '^[A-Za-z0-9._-]{1,40}$'; then
+            echo "::error::label 은 영문·숫자·.-_ 40자 이내여야 한다: '$BACKUP_LABEL'"
+            exit 1
+          fi
+          test -f .github/db-backup-gpg.pub.asc || { echo "::error::공개키 파일 없음"; exit 1; }
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies (requests only)
+        run: python -m pip install --quiet "requests>=2.32,<3"
+
+      - uses: supabase/setup-cli@v2.1.1
+
+      - name: Link Supabase project
+        shell: bash
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Dump schema (public)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          supabase db dump --linked -s public -p "$SUPABASE_DB_PASSWORD" -f work/schema.sql
+          test -s work/schema.sql
+          echo "schema.sql $(wc -c < work/schema.sql) bytes, CREATE TABLE $(grep -c '^CREATE TABLE' work/schema.sql)개"
+
+      # 덤프 직전 라이브 행 수(정확 count). 서비스키는 헤더로만 나가고 출력엔 안 찍힌다.
+      - name: Live row counts (PostgREST count=exact)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python db_backup_verify.py counts --schema work/schema.sql --out work/counts.json
+
+      - name: Dump data (public, COPY)
+        shell: bash
+        run: |
+          set -euo pipefail
+          supabase db dump --linked -s public --data-only --use-copy -p "$SUPABASE_DB_PASSWORD" -f work/data.sql
+          test -s work/data.sql
+          echo "data.sql $(wc -c < work/data.sql) bytes"
+
+      - name: Verify dump against live counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python db_backup_verify.py verify --dump work/data.sql --counts work/counts.json \
+            --report work/verify_report.md --min-ratio 0.99 --require findings,raw_signals --min-tables 20
+          cat work/verify_report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Package and encrypt (plaintext is deleted before upload)
+        id: pkg
+        shell: bash
+        run: |
+          set -euo pipefail
+          DATE="$(date -u +%Y-%m-%d)"
+          NAME="grm-db-${DATE}${BACKUP_LABEL:+-$BACKUP_LABEL}"
+          tar -C work -czf "${NAME}.tar.gz" schema.sql data.sql counts.json verify_report.md
+          PLAIN_BYTES="$(wc -c < "${NAME}.tar.gz")"
+          gpg --batch --quiet --import .github/db-backup-gpg.pub.asc
+          FPR="$(gpg --batch --with-colons --list-keys | awk -F: '/^fpr/{print $10; exit}')"
+          if [ "$FPR" != "$EXPECTED_FPR" ]; then
+            echo "::error::공개키 지문 불일치 — 파일 $FPR ≠ 기대 $EXPECTED_FPR (키 바꿔치기 의심). 암호화하지 않는다."
+            exit 1
+          fi
+          gpg --batch --yes --trust-model always --recipient "$EXPECTED_FPR" \
+              --output "${NAME}.tar.gz.gpg" --encrypt "${NAME}.tar.gz"
+          ENC_BYTES="$(wc -c < "${NAME}.tar.gz.gpg")"
+          # 평문은 업로드 스텝에 닿기 전에 지운다 — 아티팩트 경로는 아래 *.gpg 하나뿐이다.
+          rm -f "${NAME}.tar.gz" work/schema.sql work/data.sql
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### GRM DB Backup"
+            echo ""
+            echo "- 아티팩트: \`${NAME}\` (보존 90일)"
+            echo "- 평문 tar.gz: ${PLAIN_BYTES} bytes · 암호화본: ${ENC_BYTES} bytes"
+            echo "- 수신자 지문: \`${EXPECTED_FPR}\`"
+            echo "- 복원: 운영자 PC 에서 \`gpg --decrypt\` 후 Postgres 17(pgvector) 에 schema.sql → data.sql 순으로 psql 적용 (docs/ops_runbook.md \"DB 백업·복원\")"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.pkg.outputs.name }}
+          path: '*.tar.gz.gpg'
+          retention-days: 90
+          if-no-files-found: error
+
+      # 스케줄 실패만 이슈로(디스패치 실패는 사람이 보고 있다). 제목 고정 + 20h 코멘트 스로틀
+      # (grm-findings-backfill-fetch.yml 과 같은 관례).
+      - name: Surface scheduled failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM DB 백업 실패';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = open.find((i) => i.title === title);
+            const body = [
+              '주 1회 DB 백업(grm-db-backup.yml)이 스케줄 실행에서 실패했습니다.',
+              '',
+              `- 실행: ${runUrl}`,
+              '',
+              '확인 순서: ① 시크릿/변수 누락 스텝 로그 ② `supabase link`/`db dump`(풀러 연결·Docker) ③ 행 수 대조 리포트(요약 탭) ④ 공개키 지문. 복구되면 다음 스케줄 성공 때 사람이 닫는다.',
+            ].join('\n');
+            if (!existing) {
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: ['automation-failure'], assignees: [owner],
+              });
+              return;
+            }
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const recent = comments.some((c) => Date.now() - new Date(c.created_at).getTime() < 20 * 3600 * 1000);
+            if (!recent) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number, body: `여전히 실패 중입니다 (${runUrl}).`,
+              });
+            }

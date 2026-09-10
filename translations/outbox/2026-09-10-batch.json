@@ -1,0 +1,20 @@
+[
+  {
+    "finding_id": "finding-31a8e8e926030352caa1c157",
+    "finding_text": "엔탭허브행인: 정량법(아미그달린)",
+    "finding_text_ko": "'엔탭허브행인' 제품에서 정량법(아미그달린) 시험 항목이 지적사항으로 확인되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c2c8cf0b5d0e74b6ef0b60e3",
+    "finding_text": "1.네오케어엔시아센스티브치약: 품질부적합(함량(질산칼륨))",
+    "finding_text_ko": "'네오케어엔시아센스티브치약' 제품이 함량(질산칼륨) 시험 항목에서 품질부적합으로 확인되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc97c6c56330c51cd3647c76",
+    "finding_text": "1.폴메디슨미백실버라차치약: 품질부적합(함량(과산화수소), pH)",
+    "finding_text_ko": "'폴메디슨미백실버라차치약' 제품이 함량(과산화수소) 및 pH 시험 항목에서 품질부적합으로 확인되었다.",
+    "translation_method": "llm_assisted"
+  }
+]

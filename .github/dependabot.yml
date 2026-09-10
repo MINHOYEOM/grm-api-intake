@@ -3,6 +3,12 @@ version: 2
 # 운영자가 1인 저장소 — 월간 + 그룹핑을 의도적으로 택한다. 주간으로 돌리면
 # 액션·pip 각각 매주 여러 건의 PR 이 쌓여 노이즈만 된다(리뷰할 사람이 한 명뿐).
 # 모든 업데이트를 액션 1묶음 + pip 1묶음, 최대 월 2건의 PR 로 합친다.
+#
+# [2026-09-10 보정] 설정 직후 Dependabot 이 메이저 상향(actions v7/v4/v3, pip 임베드 lock 의
+# torch·transformers 등)을 한꺼번에 올려 CI 가 빨갰다(#974·#975, 닫음). 여기의 목적은
+# "보안·패치 수준을 사람 손 없이 따라가기"이지 메이저 전환이 아니다 — 메이저는 사람이
+# 개별 판단한다. 또 requirements-embed.lock(임베딩 파이프, 현재 비활성 · sha256 잠금)은
+# Dependabot 대상에서 뺀다 — 그 파일은 F-05 절차(pip-compile --generate-hashes)로만 갱신한다.
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -12,6 +18,9 @@ updates:
       actions:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "pip"
     directory: "/"
@@ -21,3 +30,12 @@ updates:
       pip:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      # 임베드 lock 전용 의존성(비활성 파이프, 해시 잠금) — Dependabot 이 건드리지 않는다.
+      - dependency-name: "torch"
+      - dependency-name: "sentence-transformers"
+      - dependency-name: "transformers"
+      - dependency-name: "huggingface-hub"
+      - dependency-name: "numpy"

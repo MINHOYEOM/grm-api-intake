@@ -1,0 +1,142 @@
+name: GRM Site Probe (synthetic, daily)
+
+# [2026-09-10] 라이브 사이트 합성 점검 — 2026-09-02 감사 운영 축("방문자가 실제로 받는 것을
+# 재는 장치가 없다")에 대응한다.
+#
+# 왜 필요한가: 이 저장소의 워크플로 43개는 전부 **저장소 자신**(골든·워치독·감사)을 검사한다.
+# `https://grm-solutions.com`(Cloudflare Pages 정적 사이트 + 브라우저가 anon 키로 직접 부르는
+# Supabase PostgREST RPC)에서 방문자가 실제로 무엇을 받는지는 어느 가드도 보지 않는다.
+# 2026-09-06 실측: "관련 사례"(`findings_similar_to`) RPC 가 며칠째 호출의 56%에서 타임아웃 났고
+# 화면은 그걸 조용히 "결과 없음"으로 삼켰다 — 저장소 안 검사는 전부 초록이었다.
+#
+# 무엇을 재는가(site_probe.py 도크스트링 참조): 정적 페이지 5종(200 + 본문 계약) · 신선도
+# (KST 기준 가장 최근 월요일 브리프가 실제로 떠 있는가, 영문판은 지연 허용) · RPC 지연
+# (anon 키로 브라우저와 같은 호출 형태 — 2초 초과 warn·3초 초과 fail, anon statement_timeout
+# 이 3초) · 보안 헤더 존재(부재는 warn — `_headers` 배선은 별도 PR).
+#
+# ★부수효과 없음: git 쓰기 없음 · curl/requests 로 공개 엔드포인트만 읽는다. anon 키는
+# 공개·RLS 로 보호되는 키이고 사이트 자신도 브라우저 번들에 그대로 심는다(시크릿이 아니다) —
+# 그래서 repo Variables(`vars.SUPABASE_URL`/`vars.SUPABASE_ANON_KEY`)를 그대로 재사용한다
+# (grm-checklist-examples-verify.yml/grm-supabase-keepalive.yml 과 동일 관례).
+on:
+  schedule:
+    # 03:23 UTC = 12:23 KST. 정각을 피한다(grm-intake.yml 의 `:17`·publish-watchdog 의
+    # `:13` 과 같은 이유 — 정각은 GitHub 러너 큐가 밀린다). 월요일 발행 사슬(07:30 KST
+    # Routine)과 그날 브리프 공개(오후)가 끝난 뒤라 신선도 점검이 그날치를 정확히 본다.
+    - cron: '23 3 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write    # 마지막 두 스텝(스케줄 실패 표면화·복구 종료) 전용.
+
+concurrency:
+  group: grm-site-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    name: 방문자 입장에서 페이지·최신 브리프·RPC 지연을 잰다
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies (requests only — requirements.txt 에 이미 있음)
+        run: python -m pip install --quiet -r requirements.txt
+
+      # 판정은 site_probe.py 가 낸다(각 점검 ok|warn|fail + 경과 + 상세). exit 1 = fail
+      # 1건 이상 — 여기서 그대로 스텝을 실패시켜 워크플로 자체가 빨강이 되게 한다(그게
+      # 이 워크플로의 존재 이유다). 표는 이 스텝 안에서 그대로 $GITHUB_STEP_SUMMARY 로도
+      # 간다(pipefail 이 기본이라 python 의 exit 코드가 파이프 뒤에도 그대로 전파된다).
+      - name: Run site probe
+        id: probe
+        env:
+          SITE_BASE_URL: https://grm-solutions.com
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+          python site_probe.py --output probe_report.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # 스케줄 실패만 이슈로(디스패치 실패는 사람이 보고 있다). 제목 고정 + 20h 코멘트
+      # 스로틀(grm-db-backup.yml 과 같은 관례). 본문은 probe_report.json 의 fail 행만 뽑는다.
+      - name: Surface scheduled failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = '사이트 합성 점검 실패';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+
+            let failLines = ['(probe_report.json 을 읽지 못함 — Actions 로그 참조)'];
+            try {
+              const report = JSON.parse(fs.readFileSync('probe_report.json', 'utf8'));
+              const failing = (report.checks || []).filter((c) => c.status === 'fail');
+              if (failing.length > 0) {
+                failLines = failing.map(
+                  (c) => `- **${c.name}**: ${c.elapsed_s}s — ${c.detail}`);
+              }
+            } catch (err) {
+              failLines = [`(probe_report.json 파싱 실패: ${err.message})`];
+            }
+
+            const body = [
+              '라이브 사이트 합성 점검(grm-site-probe.yml)이 스케줄 실행에서 실패했습니다.',
+              '',
+              `- 실행: ${runUrl}`,
+              '',
+              '실패한 점검:',
+              ...failLines,
+              '',
+              '확인 순서: ① Cloudflare Pages 배포 상태 ② Supabase 프로젝트 상태(일시정지?) '
+                + '③ RPC 지연은 079/068 마이그레이션 이력 참조.',
+            ].join('\n');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = open.find((i) => i.title === title);
+            if (!existing) {
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: ['automation-failure'], assignees: [owner],
+              });
+              return;
+            }
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const recent = comments.some((c) => Date.now() - new Date(c.created_at).getTime() < 20 * 3600 * 1000);
+            if (!recent) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number, body: `여전히 실패 중입니다.\n\n${body}`,
+              });
+            }
+
+      # 스케줄 성공 + 열린 실패 이슈가 있으면 복구를 코멘트로 알리고 닫는다.
+      - name: Close failure issue on scheduled recovery
+        if: success() && github.event_name == 'schedule'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = '사이트 합성 점검 실패';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = open.find((i) => i.title === title);
+            if (!existing) return;
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: existing.number, body: `복구 확인: ${runUrl}`,
+            });
+            await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });

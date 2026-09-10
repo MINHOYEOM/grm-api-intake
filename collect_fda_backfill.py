@@ -65,6 +65,12 @@ skip_existing/skip_gated triage, and CLI/report/exit-code plumbing.
 The service-role key is never logged, printed, or included in any report field or
 exception message -- only exception type names and HTTP status codes are surfaced,
 mirroring findings_supabase_append.py's and findings_supabase_backfill.py's convention.
+
+[2026-09-10] FDA 483 listing now falls back to the full-JSON backbone
+(`collect_fda_483._fetch_legacy_json_rows`, the daily collector's own 2nd-tier) when the
+reading-room DataTables AJAX is unreachable (Akamai bot-block) or its config is missing --
+see `run_483` and `BackfillFetchReport.backbone` for the offset-vs-full-scan tradeoff this
+forces.
 """
 
 from __future__ import annotations
@@ -90,7 +96,7 @@ import findings_supabase_append as fsa
 import grm_findings as gf
 from grm_cli import header_ci as _header_ci
 from grm_cli import parse_content_range as _parse_content_range
-from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html
+from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, http_get_html, log
 
 
 SCHEMA_VERSION = "grm-findings-backfill-fetch/v1"
@@ -137,6 +143,11 @@ class BackfillFetchReport:
     errors: list[str] = field(default_factory=list)
     next_offset: int = 0
     exhausted: bool = False
+    # [2026-09-10 483 JSON 2차 백본] 이번 실행이 실제로 쓴 목록 백본 관측용 -- 기본값
+    # "datatables" 는 기존 소비자/테스트가 전부 그대로 통과하도록 하는 no-op 기본값이고,
+    # run_483 이 2차(전수 JSON) 로 폴백했을 때만 "legacy-json" 으로 바뀐다(collect_fda_483
+    # 의 BACKBONE_* 관용구와 이름을 맞췄다). fda_wl 경로는 손대지 않으므로 계속 기본값이다.
+    backbone: str = "datatables"
     source_total: int | None = None
     remaining: int | None = None
     # dry-run only: first 10 document_ids that *would* be fetched (populated only when
@@ -262,6 +273,13 @@ def _post_raw_signals(
 # ---------------------------------------------------------------------------
 
 
+def _483_json_sort_key(row: dict[str, str]) -> tuple[str, str]:
+    """[2026-09-10] 2차 JSON 백본 정렬 키: publish_date 내림차순, 동률이면 media_id 로
+    결정론적 tie-break. JSON 목록은 offset 기반 페이지가 아니라 매번 전수 스냅샷이라
+    (see run_483) 안정적인 전역 정렬이 없으면 "새 문서부터"가 실행마다 흔들린다."""
+    return (fda483._parse_mdy(row.get("publish_date", "")), row.get("media_id", ""))
+
+
 def run_483(
     *,
     offset: int,
@@ -284,6 +302,8 @@ def run_483(
             report.errors.append(f"existing-ids-fetch-failed:{type(e).__name__}")
             return report, 2
 
+    primary_error: str | None = None
+    config: dict[str, Any] | None = None
     try:
         sleeper(delay)
         html = http_get_html(
@@ -294,29 +314,65 @@ def run_483(
         if config is None:
             raise RuntimeError("fda483-ajax-config-missing")
     except Exception as e:  # noqa: BLE001
-        report.errors.append(f"list-config-failed:{type(e).__name__}")
-        return report, 2
+        primary_error = f"list-config-failed:{type(e).__name__}"
 
-    try:
+    data: dict[str, Any] = {}
+    if primary_error is None:
+        try:
+            sleeper(delay)
+            data = fda483._fetch_datatable_page(config, start=offset, length=max_docs, draw=1)
+        except Exception as e:  # noqa: BLE001
+            primary_error = f"list-page-failed:{type(e).__name__}"
+
+    # [2026-09-10 483 백필 JSON 2차 백본] 09-09 04:48 UTC 부터 리딩룸이 Akamai 봇매니저에
+    # 막혀 list-config-failed:RuntimeError 로 스케줄 런(--auto)이 4연속 실패했다(연속 실패
+    # 표면화는 워크플로 쪽에서 처리). 일일 수집기(collect_fda_483._fetch_html_rows)는 이미
+    # 1차 DataTables -> 2차 전수 JSON -> 3차 정적 HTML 10행의 3단 백본을 갖고 있는데, 이
+    # 백필 경로는 1차만 구현돼 있어 봇차단에 그대로 무너졌다 -- 여기서 2차(전수 JSON,
+    # fda483._fetch_legacy_json_rows)까지만 추가한다(3차 정적 10행은 백필 규모에 맞지
+    # 않는 일일 수집 전용 최종 안전망이라 제외).
+    # JSON 목록은 offset 기반 서버사이드 페이지가 아니라 매 호출이 전수 스냅샷이므로
+    # DataTables 의 offset 의미론과 맞지 않는다 -- 그래서 offset 을 슬라이스에 쓰지 않고,
+    # 매 실행이 전수를 publish_date 내림차순으로 정렬해 미수집(existing_ids 에 없는)
+    # 후보만 골라내고 exhausted=True 로 표시한다(남는 후보는 remaining 에 실어 다음
+    # 스케줄 실행이 이어 집는다 -- 별도 커서 상태가 필요 없다).
+    if primary_error is not None:
+        log(
+            "WARN",
+            f"FDA 483 백필: 1차 DataTables 실패({primary_error}) -- "
+            f"2차 전수 JSON 백본({fda483.BACKBONE_LEGACY_JSON})으로 폴백 시도",
+        )
         sleeper(delay)
-        data = fda483._fetch_datatable_page(config, start=offset, length=max_docs, draw=1)
-    except Exception as e:  # noqa: BLE001
-        report.errors.append(f"list-page-failed:{type(e).__name__}")
-        return report, 2
+        json_rows, _json_total = fda483._fetch_legacy_json_rows()
+        if not json_rows:
+            report.errors.append(primary_error)
+            report.errors.append("json-backbone-failed")
+            return report, 2
 
-    raw_rows = data.get("data") if isinstance(data.get("data"), list) else []
-    total = data.get("recordsFiltered") or data.get("recordsTotal")
-    nrows = fda483._datatable_norm_rows(raw_rows)
+        report.backbone = fda483.BACKBONE_LEGACY_JSON
+        rows = sorted(json_rows, key=_483_json_sort_key, reverse=True)
+        candidates = [r for r in rows if f"fda483-{r['media_id']}" not in existing_ids]
+        report.listed = len(rows)
+        report.skipped_existing += len(rows) - len(candidates)
+        nrows = candidates[:max_docs]
+        report.source_total = len(rows)
+        report.remaining = len(candidates) - len(nrows)
+        report.next_offset = offset + len(rows)
+        report.exhausted = True
+    else:
+        raw_rows = data.get("data") if isinstance(data.get("data"), list) else []
+        total = data.get("recordsFiltered") or data.get("recordsTotal")
+        nrows = fda483._datatable_norm_rows(raw_rows)
 
-    report.listed = len(nrows)
-    report.next_offset = offset + len(raw_rows)
-    if isinstance(total, (int, float)):
-        report.source_total = int(total)
-        report.remaining = max(int(total) - report.next_offset, 0)
-    if len(raw_rows) < max_docs:
-        report.exhausted = True
-    elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
-        report.exhausted = True
+        report.listed = len(nrows)
+        report.next_offset = offset + len(raw_rows)
+        if isinstance(total, (int, float)):
+            report.source_total = int(total)
+            report.remaining = max(int(total) - report.next_offset, 0)
+        if len(raw_rows) < max_docs:
+            report.exhausted = True
+        elif isinstance(total, (int, float)) and offset + len(raw_rows) >= total:
+            report.exhausted = True
 
     to_post: list[dict[str, Any]] = []
     for nrow in nrows:
@@ -840,6 +896,10 @@ def run_auto(
         "errors": [e for r in attempts for e in r.errors],
         "next_offset": last.next_offset,
         "exhausted": last.exhausted,
+        # [2026-09-10] last attempt 의 백본을 그대로 노출 -- 스케줄 런은 --auto 만 쓰므로
+        # (워크플로 참조) 연속 실패 이슈가 fetch_report.json 최상위에서 바로 읽을 수 있어야
+        # 한다. 다른 "last.X" 필드들과 같은 관례.
+        "backbone": last.backbone,
         "would_fetch": [d for r in attempts for d in r.would_fetch][:10],
         "source_total": last.source_total,
         "remaining": last.remaining,

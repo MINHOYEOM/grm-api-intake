@@ -420,6 +420,85 @@ class FindingsExtractorsTest(unittest.TestCase):
         self.assertEqual(len(findings), 1)
         self.assertIn("제조기록서를 작업과 동시에 작성하지 않았음", findings[0]["finding_text"])
 
+    # ── MFDS 별표 인용의 흩어진 꼴 (2026-09-10 needs_review 13건 실측) ─────────────
+    # 실사결과 PDF 텍스트 추출이 표 셀을 재배열하면 `[별표 1의2] 제11.1호` 가
+    # `별표 의 [ 1 2] 11.1` 처럼 흩어진다. 정형만 알던 정규식은 mfds_refs 를 비웠고,
+    # 자동승격(P-C)이 mfds_refs 를 요구해 그 지적은 영구 needs_review 였다.
+
+    def test_mfds_refs_scattered_pdf_forms_are_normalized(self) -> None:
+        cases = {
+            "시설장비 기타 별표 [ 1] 9.3 제조설비에 대하여 청결을 유지할 것 보완완료":
+                ["[별표 1] 제9.3호"],
+            "시험실 기타 별표 의 [ 1 2] 11.1 시험에서 얻은 모든 기록을 보존할 것":
+                ["[별표 1의2] 제11.1호"],
+            "품질경영 기타 별표 의 제 호 [ 1 2] 2.1 데이터 완전성(DI) 정책문서 제출":
+                ["[별표 1의2] 제2.1호"],
+            "품질 중요 별표 제 호 [ 1] 6.3 주성분 미생물한도시험 관련 자료를 제출할 것":
+                ["[별표 1] 제6.3호"],
+            "시설장비 기타 [별표 1의 2] 제4호 나목 차압 관리 미흡":
+                ["[별표 1의2] 제4호 나목"],
+            "품질경영 기타 [별표 1의 2] 제 2.1호 데이터 완전성(DI) 정책문서 작성":
+                ["[별표 1의2] 제2.1호"],
+            # 조항 번호가 뒤따르지 않는 '별표 [ 1]' 만으로는 인용으로 보지 않는다.
+            "근거 법령 별표 [ 1] 비고 보완완료": [],
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(extractors._extract_mfds_refs(text), expected)
+
+    def test_mfds_refs_scattered_forms_keep_order_and_dedupe(self) -> None:
+        text = (
+            "평가 결과지적보완사항 있음 시설장비 기타 별표 [ 1] 9.3 세척 절차를 검토할 것 보완완료 "
+            "시설장비 기타 별표 [ 1] 2.1 저울의 점검항목 근거를 마련할 것 보완완료 "
+            "제조 기타 별표 [ 1] 6.4 세척 방법 점검 절차를 마련할 것 보완완료 "
+            "제조 기타 별표 [ 1] 6.4 모든 장비에 대하여 세척 밸리데이션을 실시할 것")
+        self.assertEqual(
+            extractors._extract_mfds_refs(text),
+            ["[별표 1] 제9.3호", "[별표 1] 제2.1호", "[별표 1] 제6.4호"])
+
+    def test_mfds_refs_canonical_form_output_is_unchanged(self) -> None:
+        # 정형은 종전 출력 그대로다(라이브 mfds_refs 실측값과 동일) — 흩어진 꼴 지원이
+        # 기존 저장값의 모양을 바꾸면 안 된다.
+        # (정형 정규식은 종전부터 '.' 에서 끊는다 — 표 경로의 legal_basis 셀과 달리 발췌
+        #  경로의 정형 인용은 '[별표1] 2' 로 저장돼 왔고, 이 수리는 그 모양을 건드리지 않는다.)
+        self.assertEqual(
+            extractors._extract_mfds_refs("시설장비 기타 [별표1] 2.1호 제품 교차오염 방지"),
+            ["[별표1] 2"])
+        self.assertEqual(
+            extractors._extract_mfds_refs("[별표 1의2] 제6.1호 제조기록서를 작업과 동시에"),
+            ["[별표 1의2] 제6"])
+        self.assertEqual(
+            extractors._extract_mfds_refs("품질 기타 [별표 1] 제14호 나목 작업원이 맡은 업무를"),
+            ["[별표 1] 제14호 나목"])
+
+    def test_gmp_excerpt_with_scattered_refs_now_reaches_auto_promotion(self) -> None:
+        # ★닫힌 고리: 발췌 폴백 → mfds_refs 채워짐 → P-C(자동승격) 가 accepted 를 낸다.
+        # 09-10 이전에는 mfds_refs=[] 라 review_verdict 가 None(영구 needs_review)이었다.
+        import findings_review_promote_service as promote
+
+        fx = _load_input("gmp_inspection_biologic")
+        fx["raw"].pop("gmp_deficiencies", None)
+        fx["raw"]["attachment_deficiency_excerpt"] = (
+            "평가 결과지적보완사항 있음 분야1) 구분2) 근거 법령 지적보완사항 요약 ( ) 3) 비고 "
+            "시설장비 기타 별표 [ 1] 9.3 제조설비에 대하여 청결 을 유지할 수 있도록 세 척 절차 및 "
+            "세척 후 점 검 방법을 검토하여 적 절히 관리할 것 보완완료 "
+            "제조 기타 별표 [ 1] 6.4 세척 방법에 대하여 주 기적으로 점검하는 절차 를 마련할 것 "
+            "보완완료 의 료 제 품 안 전 과")
+        raw_signal = gf.raw_signal_from_row(fx["row"], fx["raw"])
+        findings = extractors.findings_from_raw_signal(raw_signal)
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["review_status"], "needs_review")
+        self.assertEqual(findings[0]["mfds_refs"], ["[별표 1] 제9.3호", "[별표 1] 제6.4호"])
+        row = {
+            "finding_id": findings[0]["finding_id"],
+            "finding_text": findings[0]["finding_text"],
+            "cfr_refs": [],
+            "mfds_refs": findings[0]["mfds_refs"],
+            "source": "MFDS",
+            "review_status": "needs_review",
+        }
+        self.assertEqual(promote.review_verdict(row, enable_reject=False), "accepted")
+
     def test_gmp_table_row_with_empty_cells_is_skipped(self) -> None:
         # 표에서 왔다는 사실이 내용을 보장하지 않는다(실측: summary 가 'b' / '-' 인 1글자
         # finding 2건). 같은 실질내용 기준을 표 경로에도 적용한다.

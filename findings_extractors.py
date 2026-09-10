@@ -1084,11 +1084,47 @@ def _classify_gmp_summary(text: str) -> str:
     return gf.classify_finding_category(text)
 
 
+# 정형 `[별표 N(의M)] …` — 종전 출력 그대로(저장된 mfds_refs 와의 일관성).
+_MFDS_REF_CANONICAL_RE = re.compile(r"\[별표\s*\d+(?:의\d+)?\]\s*[^,\.;\s]*(?:\s*[가-힣]목)?")
+
+# [FIND-1 P-C 사각 수리 · 2026-09-10] 실사결과 PDF 의 텍스트 추출은 표 셀을 줄 단위로
+# 재배열하면서 `[별표 1의2] 제11.1호` 를 `별표 의 [ 1 2] 11.1` · `별표 [ 1] 9.3` ·
+# `별표 제 호 [ 1] 6.3` · `[별표 1의 2] 제 2.1호` 처럼 흩뜨린다. 정형만 알던 옛 정규식은
+# 이런 발췌에서 mfds_refs 를 비웠고, 자동승격(P-C)이 mfds_refs 를 요구하므로 그 지적은
+# needs_review 에 영구 적체했다(09-10 실측 13건 — 08-05 백필 유입분 12 + 08-25 신규 1).
+# 흩어진 꼴은 조항 번호가 바로 뒤따를 때만 인정하고 정형 `[별표 N의M] 제X호( 목)` 으로
+# 정규화한다. 라이브 rejected MFDS 행 67건에 역적용해 추가 매칭 0(정밀도 게이트).
+_MFDS_REF_SCATTERED_RE = re.compile(
+    r"(?:"
+    # 대괄호가 번호만 감싼 꼴: 별표 [ 1] 9.3 · 별표 의 [ 1 2] 11.1 · 별표 의 제 호 [ 1 2] 2.1
+    r"별표\s*(?:의\s*)?(?:제\s*호\s*)?\[\s*(?P<annex_a>\d+)(?:\s+(?P<sub_a>\d+))?\s*\]"
+    r"|"
+    # 대괄호는 정형인데 '의' 뒤에 공백이 든 꼴: [별표 1의 2] 제 2.1호
+    r"\[별표\s*(?P<annex_b>\d+)의\s+(?P<sub_b>\d+)\]"
+    r")"
+    r"\s*(?:제\s*)?(?P<clause>\d+(?:\.\d+)*)\s*호?(?:\s*(?P<mok>[가-힣])목)?"
+)
+
+
+def _normalize_scattered_mfds_ref(match: "re.Match[str]") -> str:
+    annex = match.group("annex_a") or match.group("annex_b")
+    sub = match.group("sub_a") or match.group("sub_b")
+    ref = f"[별표 {annex}{('의' + sub) if sub else ''}] 제{match.group('clause')}호"
+    if match.group("mok"):
+        ref += f" {match.group('mok')}목"
+    return ref
+
+
 def _extract_mfds_refs(text: str) -> list[str]:
+    source = text or ""
+    found: list[tuple[int, str]] = []
+    for match in _MFDS_REF_CANONICAL_RE.finditer(source):
+        found.append((match.start(), _compact(match.group(0))))
+    for match in _MFDS_REF_SCATTERED_RE.finditer(source):
+        found.append((match.start(), _normalize_scattered_mfds_ref(match)))
     refs: list[str] = []
     seen: set[str] = set()
-    for match in re.finditer(r"\[별표\s*\d+(?:의\d+)?\]\s*[^,\.;\s]*(?:\s*[가-힣]목)?", text or ""):
-        ref = _compact(match.group(0))
+    for _, ref in sorted(found, key=lambda item: item[0]):
         if ref and ref not in seen:
             seen.add(ref)
             refs.append(ref)

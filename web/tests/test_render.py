@@ -785,6 +785,33 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             self.assertTrue((self.out / "briefs" / date / "index.html").exists(),
                             f"라이브 브리프 페이지 누락: {date!r}")
 
+    def test_no_service_key_api_url_leaks_into_any_rendered_brief(self):
+        """[정보출처 링크 품질 게이트 2026-09-10] 09-07호 발행분에서 MFDS 행정처분/회수
+        카드 9건의 "📰 정보출처"가 data.go.kr 오픈API 원주소(serviceKey= 포함)를 그대로
+        노출해, 방문자가 클릭하면 SERVICE_KEY_IS_NOT_REGISTERED_ERROR JSON 을 봤다.
+        card_scaffold._dual_links(생산자)·render._card_view(렌더 최후 방어선) 양쪽 게이트가
+        실제로 걸렸는지 **손목록이 아니라 코퍼스 전수**로 잰다 — `web/data/briefs/*.json`
+        전체를 실제로 다시 지어(이 클래스 setUpClass 가 이미 `self.out`), 한국어판과(있으면)
+        영문판 양쪽의 렌더된 HTML 에 이 두 패턴이 0건인지를 직접 센다. 이 가드를 고치기
+        전에 먼저 돌려 09-07호가 RED(누출 있음)인지 확인했다(§ PR 본문 골든 재동결 근거)."""
+        briefs = render.load_briefs(DATA_DIR)
+        self.assertGreater(len(briefs), 0, "라이브 브리프 0건 — 발행 디렉터리 확인")
+        checked = 0
+        for b in briefs:
+            date = b["brief"].get("publish_date", "")
+            pages = [self.out / "briefs" / date / "index.html"]
+            if render.brief_has_english(b):
+                pages.append(self.out / "en" / "briefs" / date / "index.html")
+            for page in pages:
+                if not page.is_file():
+                    continue
+                html = page.read_text(encoding="utf-8")
+                checked += 1
+                with self.subTest(page=str(page.relative_to(self.out))):
+                    self.assertNotIn("serviceKey=", html)
+                    self.assertNotIn("apis.data.go.kr", html)
+        self.assertGreater(checked, 0, "검사한 브리프 페이지가 0장 — 가드가 헛돈다")
+
 
 # ── 골든 byte-diff ───────────────────────────────────────────────────────────
 class WebRenderGoldenTest(unittest.TestCase):
@@ -1163,13 +1190,24 @@ class WebRenderFidelityTest(unittest.TestCase):
                                     f"인용 원문 변형: {c['id']}")
 
     def test_urls_verbatim(self):
+        # [정보출처 링크 품질 게이트 2026-09-10] info_url 이 evidence_url_quality_error
+        # (serviceKey=·apis.data.go.kr 등)에 걸리면 render.py 가 의도적으로 ""로 지운다
+        # (아래 EvidenceUrlQualityGateTest 참조) — 그런 URL 은 verbatim 이 아니라 **부재**가
+        # 맞는 동작이라 이 무변형 검사에서 제외한다(official_url 은 게이트 대상이 아니라
+        # 그대로 무변형 검사).
         for c in self.cards:
             s = c["sources"]
-            for url in (s.get("info_url"), s.get("official_url")):
-                if url:
+            for key, url in (("info_url", s.get("info_url")), ("official_url", s.get("official_url"))):
+                if not url:
+                    continue
+                if key == "info_url" and grm_findings.evidence_url_quality_error(url):
                     with self.subTest(card=c["id"], url=url[:40]):
-                        self.assertTrue(self._present(url),
-                                        f"URL 변형: {c['id']} {url!r}")
+                        self.assertFalse(self._present(url),
+                                         f"품질 게이트 대상 info_url 이 렌더에 남음: {c['id']} {url!r}")
+                    continue
+                with self.subTest(card=c["id"], url=url[:40]):
+                    self.assertTrue(self._present(url),
+                                    f"URL 변형: {c['id']} {url!r}")
 
     def test_xss_escaped(self):
         # 카드 텍스트의 &·" 가 escape 됨(autoescape on).
@@ -7791,6 +7829,23 @@ class WebRenderHardeningTest(unittest.TestCase):
         # degraded → 살아있는 <a href> + ⚠️ 아이콘
         self.assertIn("ti-alert-triangle", h)                   # 글로벌 섹션이라 Recall 아이콘과 무충돌
         self.assertIn('href="https://example.org/off"', h)
+
+    def test_evidence_url_quality_gate_drops_service_key_info_link(self):
+        # [정보출처 링크 품질 게이트 2026-09-10] 09-07호 MFDS 카드 9건 재현 — info_url 이
+        # data.go.kr 오픈API 원주소(serviceKey= 포함)면 render._card_view 가 최후 방어선으로
+        # 걸러 "" 로 지운다. srclink 매크로는 url 이 비면 <a> 자체를 안 낸다(card.html:28) —
+        # 공식원본(nedrug)은 게이트 대상이 아니라 그대로 살아 있어야 한다.
+        b = _minimal_brief("2026-06-01", card={"sources": {
+            "info_url": ("https://apis.data.go.kr/1471000/MdcinExaathrService04/"
+                         "getMdcinExaathrList04?serviceKey=SECRET&pageNo=1&numOfRows=100"
+                         "&type=json&order=Y"),
+            "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=123",
+            "official_is_pdf": False,
+            "link_check": {"info": "pending", "official": "pending"}}})
+        h = self._render_detail(b)
+        self.assertNotIn("apis.data.go.kr", h)
+        self.assertNotIn("serviceKey", h)
+        self.assertIn('href="https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=123"', h)
 
     def test_disclaimer_omitted_when_false(self):
         b = _minimal_brief("2026-06-01", ai_disclosure=False)

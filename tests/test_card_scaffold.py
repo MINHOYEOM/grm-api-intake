@@ -1023,6 +1023,73 @@ class AdminL1VerifyTest(unittest.TestCase):
         self.assertEqual(official, "https://who.int/noc-page")
 
 
+class EvidenceUrlQualityGateTest(unittest.TestCase):
+    """[정보출처 링크 품질 게이트 2026-09-10] 09-07호 MFDS 카드 9건 재현 — `_dual_links`
+    가 api_query(data.go.kr 오픈API, serviceKey= 포함)를 정보출처로 그대로 내보내
+    방문자가 SERVICE_KEY_IS_NOT_REGISTERED_ERROR JSON 을 봤다. `grm_findings.
+    evidence_url_quality_error`(단일 진실원)를 재사용한 게이트가 api_query/source_url/
+    official_url 후보 중 그 분류기를 통과하는 첫 값만 info 로 채택하는지 확인한다.
+    official(📎, data.go.kr 데이터셋 폴백 "(데이터셋)" 라벨)은 의도된 설계라 게이트
+    대상이 아니다 — 이 클래스가 official 이 무변형인 것도 함께 고정한다."""
+
+    _API_URL = ("https://apis.data.go.kr/1471000/MdcinExaathrService04/"
+               "getMdcinExaathrList04?serviceKey=SECRET&pageNo=1&numOfRows=100"
+               "&type=json&order=Y")
+    _NEDRUG_URL = "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026009999"
+
+    _ROW = {
+        "date": "2026-09-01",
+        "document_id": "admin-2026009999",
+        "firm": "테스트제약",
+        "headline": "판매업무정지 처분",
+        "language": "KO",
+        "modality": "Chemical",
+        "raw_fetch_ok": True,
+        "signal_tier": "Tier 2",
+        "site_country": "대한민국",
+        "source": "MFDS",
+        "type_or_class": "admin-action",
+        "api_query": _API_URL,
+        "source_url": _NEDRUG_URL,
+        "official_url": _NEDRUG_URL,
+    }
+    _RAW = {"ADM_DISPS_SEQ": "2026009999", "ADM_DISPS_NAME": "판매업무정지 1개월",
+           "EXPOSE_CONT": "품질부적합 확인"}
+
+    def test_dual_links_drops_service_key_api_query_for_mfds_admin_action(self):
+        kind = cs.resolve_kind(self._ROW)
+        self.assertEqual(kind, "admin-action")
+        info, official, _fallback = cs._dual_links(kind, self._ROW, self._RAW)
+        self.assertNotIn("serviceKey", info)
+        self.assertNotIn("apis.data.go.kr", info)
+        self.assertEqual(info, self._NEDRUG_URL)
+        # official 은 raw.ADM_DISPS_SEQ 기반 L1(§ _official_admin) — 게이트 무관 무변형.
+        self.assertEqual(official, self._ROW["official_url"])
+
+    def test_to_web_card_drops_service_key_api_query_for_mfds_admin_action(self):
+        wc = cs.build_card_scaffold(self._ROW, self._RAW).to_web_card()
+        info_url = wc["sources"]["info_url"]
+        self.assertNotIn("serviceKey", info_url)
+        self.assertNotIn("apis.data.go.kr", info_url)
+        self.assertEqual(info_url, self._NEDRUG_URL)
+        self.assertEqual(wc["sources"]["official_url"], self._ROW["official_url"])
+
+    def test_footer_block_drops_service_key_api_query_for_mfds_admin_action(self):
+        md = cs._footer_block("admin-action", self._ROW, self._RAW, cs.DEFAULT_CONFIG)
+        self.assertNotIn("serviceKey", md)
+        self.assertNotIn("apis.data.go.kr", md)
+        self.assertIn(self._NEDRUG_URL, md)
+
+    def test_non_mfds_clean_source_url_unaffected(self):
+        # 비MFDS(FR) + 깨끗한 source_url → 게이트 통과 후보가 그대로 첫 값으로 뽑힌다
+        # (종전 `_first(...)` 동작과 바이트 동일 — 대다수 소스는 무변형).
+        row = {"source": cs.SOURCE_FR,
+              "source_url": "https://www.federalregister.gov/documents/2026/09/01/x"}
+        info, official, _fallback = cs._dual_links("guidance", row, {})
+        self.assertEqual(info, row["source_url"])
+        self.assertEqual(official, "")  # official_url 부재 → 빈 문자열(기존 동작 무변형)
+
+
 class WebCardGoldenTest(unittest.TestCase):
     """P1 — `grm-web-card/v1` 카드 직렬화 골든 + 필드 소유권/verbatim/불변식.
 

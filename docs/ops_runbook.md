@@ -48,6 +48,7 @@
 | data.go.kr 403/401 | 활용신청 만료 | §1 로테이션 절차 |
 | MFDS 가이드라인/GMP 실태조사/law.go.kr 본문만 실패 | KR proxy 차단·proxy URL 오류·law.go.kr OC 문제 | `MFDS_HTTP_PROXY` 설정 상태에서 `python probe_mfds_egress.py` 실행. RSS/nedrug/law.go.kr 3종 200 확인 후 `MFDS_RSS_BOARD_MODE=residual` 유지 여부 점검 |
 | 중복 카드 발견 | 전주 M2 의 Status 갱신 실패 기록 | PL-10b 가드 동작 여부 확인, 남은 New row Processed 처리 |
+| 일일 번역 배치 PR(`chore(findings): 일일 번역 배치 …`)이 초록인데 안 머지됨 / apply 런이 오래 없음 | Actions → `GRM Stranded Batch PR Watchdog` 최근 실행, 열린 `automation-failure` 이슈 | 이 워치독(6시간 주기)이 3시간 넘게 방치된 초록 PR 을 PAT 로 자동 머지한다(머지해야 `grm-findings-translate-apply` push 트리거가 걸린다); 검사 실패·충돌이나 outbox 48시간 잔류는 이슈로만 알린다 |
 
 상세 판정 기준(failure/warning)은 GRM_SYSTEM §3.5 운영 모니터링 health check 참조.
 

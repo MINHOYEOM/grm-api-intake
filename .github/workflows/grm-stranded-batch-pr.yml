@@ -1,0 +1,350 @@
+name: GRM Stranded Batch PR Watchdog
+
+# [2026-09-10] 09-08 사고 대응 — 데스크톱 예약 작업이 매일 여는 번역 배치 PR
+# (`chore(findings): 일일 번역 배치 YYYY-MM-DD`)이 검사 초록인 채 머지 단계에 이르지
+# 못하고 하루 종일 방치됐다. `grm-findings-translate-apply.yml` 은 main 에 대한
+# push(paths: translations/outbox/**)로만 도는데, 머지가 안 되니 push 자체가 없었고 —
+# **일어나지 않은 실행은 경보를 울리지 않는다**. 이 워치독이 그 틈을 메운다.
+#
+# ★PAT 를 쓰는 이유 — 기본 GITHUB_TOKEN 으로 머지하면 그 push 가 다른 워크플로를
+#   트리거하지 않는다(GitHub 공식 제약: GITHUB_TOKEN 이 만든 이벤트는 후속 워크플로를
+#   재귀적으로 기동하지 않는다). `secrets.ADMIN_GITHUB_ACTIONS_TOKEN`(PAT)로 머지해야
+#   push 이벤트가 정상 발생해 `grm-findings-translate-apply.yml` 이 이어서 돈다 —
+#   그래서 워크플로 레벨 permissions 는 `contents: read` 뿐이고, 실제 쓰기(머지·코멘트·
+#   이슈)는 전부 `actions/github-script` 의 `github-token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}`
+#   로만 나간다.
+# ★3시간 유예 — PR 이 막 초록이 된 순간 채가지 않는다. 데스크톱 예약 작업이 정상
+#   진행 중일 수 있고, 사람이 직접 검토·머지할 여지도 남긴다. 생성 후 3시간을 넘겨도
+#   그대로면 방치로 본다.
+# ★이슈 코멘트는 20시간에 한 번만 — 열린 이슈에 매 실행(6시간 간격)마다 코멘트하면
+#   알림 스팸이 된다(grm-findings-backfill-fetch.yml 과 같은 관례).
+# ★이 워치독은 코드를 전혀 건드리지 않는다 — checkout 조차 하지 않는다. 여기서 하는
+#   일은 열린 PR·워크플로 실행 이력·translations/outbox/ 목록을 GitHub API 로 조회해
+#   머지하거나 이슈를 여닫는 것뿐이다.
+
+on:
+  schedule:
+    # 6시간마다, :00/:17 크론 혼잡대를 피해 :41 에 실행.
+    - cron: '41 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (머지·코멘트·이슈 갱신 없이 로그만 출력). schedule 실행은 항상 실동작.'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-stranded-batch-pr-watchdog
+  cancel-in-progress: false
+
+jobs:
+  watchdog:
+    name: Watch daily translation batch PR + apply chain
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # grm-admin-backend-deploy.yml 의 "missing secrets → skip" 관례와 달리 여기는
+      # fail-fast 다 — PAT 없이 이 워치독이 도는 건 "머지해도 apply 가 안 걸리는" 상태를
+      # 그대로 반복하는 것과 같아서, 조용히 skip 하기보다 빨강으로 드러내는 편이 맞다.
+      - name: Verify ADMIN_GITHUB_ACTIONS_TOKEN is configured
+        id: verify_secret
+        shell: bash
+        env:
+          TOKEN_PRESENT: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN != '' }}
+        run: |
+          if [ "$TOKEN_PRESENT" != "true" ]; then
+            echo "::error::ADMIN_GITHUB_ACTIONS_TOKEN 시크릿이 비어 있다 — 기본 GITHUB_TOKEN 으로 머지하면 push 트리거가 걸리지 않아(GitHub 공식 제약) grm-findings-translate-apply 가 이어서 돌지 않는다. Settings > Secrets and variables > Actions 에 ADMIN_GITHUB_ACTIONS_TOKEN 을 등록한 뒤 재실행하라."
+            exit 1
+          fi
+          echo "ADMIN_GITHUB_ACTIONS_TOKEN 확인됨."
+
+      # Job 1 — 검사 초록으로 3시간 넘게 방치된 배치 PR 을 PAT 로 머지한다.
+      # 실패/충돌 PR 은 코드를 고치지 않고 이슈로만 표면화한다.
+      - name: Merge stranded green batch PRs, or flag failures
+        id: stranded_pr
+        uses: actions/github-script@v9.0.0
+        with:
+          github-token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const dryRun = context.eventName === 'workflow_dispatch'
+              ? (context.payload.inputs.dry_run === 'true')
+              : false;
+
+            const TITLE_PREFIX = 'chore(findings): 일일 번역 배치';
+            const ISSUE_TITLE = '일일 번역 배치 PR 방치 — 검사 실패 또는 충돌';
+            const LABEL_FINDINGS = 'grm-findings';
+            const LABEL_FAILURE = 'automation-failure';
+            const GRACE_MS = 3 * 60 * 60 * 1000;
+            const THROTTLE_MS = 20 * 60 * 60 * 1000;
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+
+            const { data: openPrs } = await github.rest.pulls.list({
+              owner, repo, state: 'open', base: 'main', per_page: 50,
+            });
+            const batchPrs = openPrs.filter((pr) => pr.title.startsWith(TITLE_PREFIX));
+
+            if (batchPrs.length === 0) {
+              console.log('열린 배치 PR 없음 — 할 일 없음.');
+              return;
+            }
+
+            const stuck = [];
+            let mergedCount = 0;
+
+            for (const pr of batchPrs) {
+              if (pr.draft) {
+                console.log(`#${pr.number} draft — 건너뜀.`);
+                continue;
+              }
+
+              const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+                owner, repo, ref: pr.head.sha, per_page: 100,
+              });
+              const failedRuns = checkRuns.filter((c) =>
+                ['failure', 'timed_out', 'cancelled'].includes(c.conclusion));
+
+              const { data: fresh } = await github.rest.pulls.get({ owner, repo, pull_number: pr.number });
+              const mergeableFalse = fresh.mergeable === false;
+              const mergeableTrue = fresh.mergeable === true;
+
+              // 실패 검사 또는 명시적 충돌은 검사 진행 여부와 무관하게 즉시 표면화 대상.
+              if (failedRuns.length > 0 || mergeableFalse) {
+                stuck.push({ pr, failedRuns, mergeableFalse });
+                continue;
+              }
+
+              const allCompleted = checkRuns.length > 0 && checkRuns.every((c) => c.status === 'completed');
+              const allSuccess = allCompleted && checkRuns.every((c) => c.conclusion === 'success');
+
+              if (!allSuccess || !mergeableTrue) {
+                console.log(`#${pr.number} 검사 진행 중이거나 mergeable 미확정 — 다음 실행에서 재확인.`);
+                continue;
+              }
+
+              const ageMs = Date.now() - new Date(pr.created_at).getTime();
+              if (ageMs <= GRACE_MS) {
+                console.log(`#${pr.number} 초록·머지가능이지만 생성 ${Math.round(ageMs / 60000)}분 전 — 3시간 유예 대기.`);
+                continue;
+              }
+
+              if (dryRun) {
+                console.log(`[dry_run] #${pr.number} 를 머지했을 것 (초록 + mergeable, 생성 후 ${Math.round(ageMs / 3600000)}시간 경과).`);
+                continue;
+              }
+
+              await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'merge' });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: pr.number,
+                body: `자동 머지: 배치 PR 이 검사 초록인 채 3시간 넘게 머지되지 않아 감시 워크플로가 머지했다 (${runUrl}). 머지 push 가 grm-findings-translate-apply 를 트리거한다.`,
+              });
+              mergedCount += 1;
+              console.log(`#${pr.number} 머지 완료.`);
+            }
+
+            if (stuck.length === 0) {
+              console.log(`머지 ${mergedCount}건 — 실패/충돌로 방치된 PR 없음.`);
+              return;
+            }
+
+            await ensureLabel(LABEL_FINDINGS, '0e8a16', 'GRM findings pipeline');
+            await ensureLabel(LABEL_FAILURE, 'b60205', 'GRM automation failure');
+
+            const lines = ['일일 번역 배치 PR 이 검사 실패 또는 충돌 상태로 방치돼 있다.', ''];
+            for (const { pr: p, failedRuns, mergeableFalse } of stuck) {
+              lines.push(`- #${p.number} ${p.html_url}`);
+              for (const c of failedRuns) {
+                lines.push(`  - 실패 검사: \`${c.name}\` → ${c.conclusion}`);
+              }
+              if (mergeableFalse) {
+                lines.push('  - mergeable: false (base 와 충돌 — 리베이스 필요)');
+              }
+            }
+            lines.push('', `확인: ${runUrl}`, '',
+              '워치독 워크플로 `grm-stranded-batch-pr.yml` — 이 이슈는 코드를 수정하지 않는다. ' +
+              'PR 을 직접 열어 검사 로그를 확인하거나 리베이스한 뒤 사람이 머지하라.');
+            const body = lines.join('\n');
+
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: LABEL_FAILURE, per_page: 50,
+            });
+            const existing = openIssues.find((i) => i.title === ISSUE_TITLE);
+
+            if (dryRun) {
+              console.log(`[dry_run] 이슈 ${existing ? '갱신' : '생성'}했을 것: ${ISSUE_TITLE}`);
+              return;
+            }
+
+            if (!existing) {
+              const { data: created } = await github.rest.issues.create({
+                owner, repo, title: ISSUE_TITLE, body,
+                labels: [LABEL_FINDINGS, LABEL_FAILURE], assignees: [owner],
+              });
+              console.log(`이슈 #${created.number} 생성.`);
+              return;
+            }
+
+            await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const commentedRecently = comments.some(
+              (c) => Date.now() - new Date(c.created_at).getTime() < THROTTLE_MS);
+            if (commentedRecently) {
+              console.log(`이슈 #${existing.number} 20시간 이내 코멘트 있음 — 본문만 갱신.`);
+              return;
+            }
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: existing.number,
+              body: `여전히 방치 중입니다 (${runUrl}).`,
+            });
+            console.log(`이슈 #${existing.number} 코멘트 추가.`);
+
+      # Job 2 — Job 1 의 결과(머지 성공/실패/무대상)와 무관하게 항상 돈다. outbox 잔류 +
+      # apply 워크플로 무성공을 별개 축으로 본다(배치 PR 자체는 머지됐는데 apply 가 따로
+      # 죽어 있는 경우도 잡아야 하므로 Job 1 의 분기에 종속시키지 않는다).
+      - name: Detect stale translate-apply chain (outbox residue)
+        if: always() && steps.verify_secret.outcome == 'success'
+        uses: actions/github-script@v9.0.0
+        with:
+          github-token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const dryRun = context.eventName === 'workflow_dispatch'
+              ? (context.payload.inputs.dry_run === 'true')
+              : false;
+
+            const ISSUE_TITLE = '번역 apply 런이 48시간 넘게 없다 — outbox 잔류';
+            const LABEL_FINDINGS = 'grm-findings';
+            const LABEL_FAILURE = 'automation-failure';
+            const STALE_MS = 48 * 60 * 60 * 1000;
+            const THROTTLE_MS = 20 * 60 * 60 * 1000;
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+
+            async function findOpenIssue() {
+              const { data: openIssues } = await github.rest.issues.listForRepo({
+                owner, repo, state: 'open', labels: LABEL_FAILURE, per_page: 50,
+              });
+              return openIssues.find((i) => i.title === ISSUE_TITLE);
+            }
+
+            let entries = [];
+            try {
+              const { data } = await github.rest.repos.getContent({
+                owner, repo, path: 'translations/outbox', ref: 'main',
+              });
+              entries = Array.isArray(data) ? data : [data];
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              entries = []; // 폴더가 아예 없으면 outbox 비어 있는 것과 동일하게 취급.
+            }
+            const batchFiles = entries.filter((e) => e.type === 'file' && /-batch\.json$/.test(e.name));
+
+            let stale = false;
+            let lastSuccess = null;
+            if (batchFiles.length > 0) {
+              const { data: runsResp } = await github.rest.actions.listWorkflowRuns({
+                owner, repo, workflow_id: 'grm-findings-translate-apply.yml',
+                status: 'success', per_page: 5,
+              });
+              lastSuccess = runsResp.workflow_runs[0] || null;
+              const lastSuccessMs = lastSuccess
+                ? new Date(lastSuccess.run_started_at || lastSuccess.created_at).getTime()
+                : 0;
+              stale = !lastSuccess || (Date.now() - lastSuccessMs) > STALE_MS;
+            }
+
+            if (!stale) {
+              if (batchFiles.length === 0) {
+                console.log('outbox 비어 있음 — apply 체인 정상.');
+              } else {
+                console.log(`최근 성공 apply 실행 있음 (${lastSuccess.html_url}) — 정상.`);
+              }
+
+              // 조건이 해소됐는데 이슈가 열려 있으면 닫는다.
+              const existing = await findOpenIssue();
+              if (existing) {
+                if (dryRun) {
+                  console.log(`[dry_run] 이슈 #${existing.number} 를 닫았을 것 — 조건 해소.`);
+                } else {
+                  await github.rest.issues.createComment({
+                    owner, repo, issue_number: existing.number,
+                    body: `조건이 해소돼 자동으로 닫는다 (${runUrl}).`,
+                  });
+                  await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+                  console.log(`이슈 #${existing.number} 자동 종료.`);
+                }
+              }
+              return;
+            }
+
+            await ensureLabel(LABEL_FINDINGS, '0e8a16', 'GRM findings pipeline');
+            await ensureLabel(LABEL_FAILURE, 'b60205', 'GRM automation failure');
+
+            const body = [
+              `translations/outbox/ 에 미적용 배치 파일이 ${batchFiles.length}개 남아 있다 (${batchFiles.map((f) => f.name).join(', ')}).`,
+              '',
+              lastSuccess
+                ? `마지막 성공 apply 실행: ${lastSuccess.html_url} (${lastSuccess.run_started_at || lastSuccess.created_at})`
+                : 'grm-findings-translate-apply.yml 의 성공 실행 이력이 없다.',
+              '',
+              `확인: ${runUrl}`,
+              '',
+              '워치독 워크플로 `grm-stranded-batch-pr.yml` — 이 이슈는 코드를 수정하지 않는다. ' +
+              '배치 PR 이 머지됐는지, apply 워크플로가 실패하고 있는지 직접 확인하라.',
+            ].join('\n');
+
+            const existing = await findOpenIssue();
+
+            if (dryRun) {
+              console.log(`[dry_run] 이슈 ${existing ? '갱신' : '생성'}했을 것: ${ISSUE_TITLE}`);
+              return;
+            }
+
+            if (!existing) {
+              const { data: created } = await github.rest.issues.create({
+                owner, repo, title: ISSUE_TITLE, body,
+                labels: [LABEL_FINDINGS, LABEL_FAILURE], assignees: [owner],
+              });
+              console.log(`이슈 #${created.number} 생성.`);
+              return;
+            }
+
+            await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const commentedRecently = comments.some(
+              (c) => Date.now() - new Date(c.created_at).getTime() < THROTTLE_MS);
+            if (commentedRecently) {
+              console.log(`이슈 #${existing.number} 20시간 이내 코멘트 있음 — 본문만 갱신.`);
+              return;
+            }
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: existing.number,
+              body: `여전히 잔류 중입니다 (${runUrl}).`,
+            });
+            console.log(`이슈 #${existing.number} 코멘트 추가.`);

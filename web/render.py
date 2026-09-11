@@ -4927,6 +4927,50 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 영어 둘러보기 면의 최근 문서 — 영어로 낼 문서만(정의가 위 함수라 여기서 만든다).
     en_recent_docs = _recent_doc_views(en_docs, "en", en_tr) if en_docs else []
 
+    # [검색엔진 인덱싱 2026-09-11] 검색 면(#fnd-results)의 정적 초안 — 최근 공개 문서
+    # 24건(findings.js 의 DOCS_PER_PAGE=24 와 같은 수, 1페이지 분량). 이 면은 여태 서버가
+    # 셸(로딩 상태)만 내고 findings.js 의 findings_search RPC 성공 이후에야 결과가 채워져,
+    # 구글 캐시가 "불러오는 중…" 한 줄만 본 채 멈췄다(2026-09-03 실측 — 문서 단위 페이지
+    # 3,310장은 전부 색인 가능한데 이 진입면만 없었다). 타이브레이크는 위 5건 미리보기
+    # (slug)와 **다르게 document_id** 를 쓴다 — 두 계약이 다른 이유는 없지만 여기 지시가
+    # 그렇게 못박았고, slug 도 document_id 파생값이라 실질적 순서 차이는 없다.
+    # ★안정 정렬 2회로 혼합 방향(발행일 desc·문서id asc)을 구현한다: 오름차순으로
+    # 먼저 정렬해 동률의 순서를 고정한 뒤, 발행일 내림차순으로 다시 정렬하면(Timsort는
+    # 안정 정렬) 동일 발행일 안에서 앞선 정렬(문서id 오름차순)이 그대로 보존된다.
+    def _findings_hub_static_docs(pool: "list[dict[str, Any]]", lang_: str,
+                                  tr_: Translator) -> list[dict[str, Any]]:
+        """검색 면 정적 목록(24건) — JS 이전에도 크롤러·무자바스크립트 방문자가 보는 실체.
+
+        findings.js 의 render() 는 첫 성공 응답에서 `resultsEl.textContent = ""` 로
+        #fnd-results 를 통째로 비운 뒤 다시 채운다(기존 계약 — 별도 수정 불요) — 이 목록은
+        그 순간까지만 존재하는 **초기 콘텐츠**다. 실패 시(showState("error"))엔 아무도
+        resultsEl 을 건드리지 않으므로 이 목록이 그대로 남는다.
+        """
+        ordered = sorted(pool, key=lambda x: x.get("document_id", ""))
+        ordered = sorted(ordered, key=lambda x: x.get("published_date", ""), reverse=True)
+        out: list[dict[str, Any]] = []
+        for d in ordered[:24]:
+            first = (d.get("findings") or [{}])[0]
+            snippet = " ".join(finding_body(first, lang_).split())
+            if len(snippet) > 160:
+                snippet = snippet[:160].rstrip() + "…"
+            agency = d.get("agency", "")
+            raw_label = ((facets or {}).get("agency_labels") or {}).get(agency, agency)
+            agency_label = tr_(raw_label) if raw_label != agency else agency
+            out.append({
+                "date": d.get("published_date", ""),
+                "src_label": doc_source_label(d) or agency_label,
+                "firm": d.get("firm_name", ""),
+                "slug": d.get("slug", ""),
+                "cats": [tr_(c) for c in (d.get("categories") or [])],
+                "snippet": snippet,
+            })
+        return out
+
+    static_docs = (_findings_hub_static_docs(docs_data.get("documents", []), lang, tr)
+                   if docs_data else [])
+    en_static_docs = (_findings_hub_static_docs(en_docs, "en", en_tr) if en_docs else [])
+
     # 지적사항 검색(FIND-1 M3c) — 라이브 데이터(Supabase PostgREST)라 빌드시 목록을 고정할
     # 수 없다. 서버는 셸(로딩 상태)만 렌더 — env 미설정이면 findings.js 가 "준비 중" 안내로
     # 조용히 종료한다(cfg data 속성은 위 reactions_enabled 와 무관하게 항상 주입).
@@ -4934,6 +4978,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 사용자 피드백("너무 많은 정보가 한 페이지에"). 이 면은 검색 도구 전용이다.
     emit("findings.html", page("findings/"),
         zone_totals=findings_zone,
+        static_docs=static_docs,
         page_title=tr("지적사항 검색 · GRM"),
         nav_active="findings",
         description=tr(FINDINGS_DESCRIPTION),
@@ -6002,6 +6047,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     en_emit("findings.html", en_page("findings/"),
         zone_totals=findings_zone_en,
+        static_docs=en_static_docs,
         page_title=en_tr("지적사항 검색 · GRM"),
         nav_active="findings",
         description=en_tr(FINDINGS_DESCRIPTION),

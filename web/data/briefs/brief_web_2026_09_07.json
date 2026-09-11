@@ -1298,8 +1298,8 @@
    "signal_label": "High",
    "type_tag": "GMP실사",
    "headline_target": "(주)코아팜바이오",
-   "title_issue": "GMP 감시 6개 분야 지적",
-   "summary": "식약처가 (주)코아팜바이오 완제의약품 제조소에 대한 사후 GMP 실사 결과를 공개했으며, 품질경영·시설장비·제조·시험실·원자재·포장표시 6개 분야에서 지적(보완)사항이 확인됐다.",
+   "title_issue": "재적격성평가·세척검증·시약관리 등 기타 5건",
+   "summary": "식약처가 (주)코아팜바이오 완제의약품 제조소에 대한 사후 GMP 실사 결과를 공개했으며, 시설장비·제조·시험실 3개 분야에서 기타 등급 지적(보완)사항 5건이 확인됐다.",
    "facts": [
     {
      "label": "발행일",
@@ -1326,15 +1326,16 @@
    ],
    "evidence_basis": "Intake raw",
    "key_facts": [
-    "지적 분야: 품질경영, 시설장비, 제조, 시험실, 원자재, 포장표시 6개 분야",
-    "분류 기준: 지적사항은 PIC/S 정의에 따라 중대·중요·기타로 구분되며 중대·중요 건은 행정처분 부과 대상",
-    "실사기간: 2026-04-27~2026-04-29",
-    "발행일: 2026-09-01"
+    "지적 분야: 시설장비 1건, 제조 2건, 시험실 2건 (기타 등급 5건, 중대·중요 0건)",
+    "주요 내용: 제조설비 재적격성평가 주기 근거, 일탈 시 공정변수 중요도 문서화·공정 검증, 세척 잔류물 검증, 시약·표준품 사용기한 근거, 시험 기록(전자기록 포함) 보존",
+    "후속: 5건 모두 이행계획서 타당성 인정",
+    "실사기간: 2026-04-27~2026-04-29"
    ],
-   "implication": "지적이 6개 감시 분야 전반에 걸쳐 분산된 경우 개별 항목 시정만으로는 설명이 어렵고 품질시스템 차원의 진단이 뒤따른다. 국내 제조소는 최근 실사에서 분야가 넓게 퍼진 지적이 있었는지, 분야 간 공통 원인이 정리돼 있는지 확인할 필요가 있다.",
+   "implication": "지적 5건이 전부 기타 등급이지만 재적격성평가 주기, 공정변수 중요도 판단, 세척 잔류물 검증처럼 '근거 문서가 있는가'를 묻는 항목이 반복된다. 국내 제조소는 주기·기준을 정해 둔 절차마다 그 수치를 택한 근거 자료가 실제로 남아 있는지 확인할 필요가 있다.",
    "checks": [
-    "감시 분야별 지적사항의 공통 근본원인 분석",
-    "중대·중요 분류 여부에 따른 후속 행정처분 가능성 확인"
+    "제조설비 재적격성평가 주기의 근거자료 보유 여부",
+    "일탈 조사에서 공정변수 중요도 판단 근거 문서화 여부",
+    "시약·표준품 사용기한 설정 근거와 전자기록 보존 상태"
    ],
    "deterministic_detail": {
     "type": "gmp_deficiencies",
@@ -1393,18 +1394,19 @@
     }
    },
    "en": {
-    "title_issue": "GMP findings across six inspection areas",
-    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of a finished product site, with deficiencies identified across six areas: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling.",
-    "implication": "When findings are spread across all six inspection areas, correcting individual items rarely explains the pattern and a quality system level diagnosis usually follows. Sites should check whether recent inspections produced findings spread widely across areas, and whether common causes across those areas have been documented.",
+    "title_issue": "Five minor findings on requalification, cleaning and lab records",
+    "summary": "The Ministry of Food and Drug Safety published the result of a post-approval GMP inspection of a finished product site: five deficiencies rated 'other' (minor) across three areas — premises and equipment, manufacturing, and laboratory.",
+    "implication": "All five findings are minor, but they repeatedly ask the same question: is there documented evidence behind a chosen interval, a criticality judgement, or a cleaning verification? Sites should check that each procedure with a fixed interval or criterion still holds the record that justified it.",
     "key_facts": [
-     "Areas cited: quality management, premises and equipment, manufacturing, laboratory, materials, and packaging and labelling",
-     "Classification: deficiencies are graded critical, major or other under PIC/S definitions, with critical and major findings subject to administrative action",
-     "Inspection period: 2026-04-27 to 2026-04-29",
-     "Published: 2026-09-01"
+     "Areas: premises and equipment 1, manufacturing 2, laboratory 2 (all rated 'other'; no critical or major)",
+     "Items: basis for the equipment requalification interval; documenting whether process parameters in a deviation are critical and verifying the process; verifying residue cleaning; basis for reagent and reference standard expiry; retaining all test records including electronic records",
+     "Follow-up: corrective action plans accepted for all five",
+     "Inspection period: 2026-04-27 to 2026-04-29"
     ],
     "checks": [
-     "Common root cause analysis across deficiencies in different inspection areas",
-     "Whether classification as critical or major implies follow-on administrative action"
+     "Documented basis for the equipment requalification interval",
+     "Documented criticality assessment of process parameters in deviation investigations",
+     "Basis for reagent and reference standard expiry dates, and retention of electronic test records"
     ]
    }
   },
@@ -3572,7 +3574,7 @@
     },
     {
      "label": "제품",
-     "value": "CLEAR EYES Maximum Itchy Eye Relief, 0."
+     "value": "CLEAR EYES Maximum Itchy Eye Relief, 0.5 fl oz (15 mL) per dropper bottle, Steri…"
     },
     {
      "label": "Class",

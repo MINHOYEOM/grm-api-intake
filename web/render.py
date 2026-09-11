@@ -136,6 +136,12 @@ LANG_OG_LOCALE: dict[str, str] = {"ko": "ko_KR", "en": "en_US"}
 MONO_LABELS = {"발행일", "문서번호", "실사일", "Class", "회수 등급"}
 SIG_COLOR = {"High": "var(--hi)", "Med": "var(--med)", "Low": "var(--lo)"}
 SECTION_ICON = {"글로벌": "ti-world", "국내": "ti-map-pin", "Recall": "ti-alert-triangle"}
+# [D2 2026-09-11] "Intake raw" 는 card_scaffold §13 Evidence 판정의 내부 계약 토큰
+# (docs/GRM_card_spec_v16.md:287)이지 방문자 문구가 아니다 — 08-31 발행분 21장 중 20장이
+# 그 토큰을 그대로 노출했다. 이미 발행된 브리프 JSON 도 매 빌드 재렌더되므로 프로듀서/
+# 스펙 쪽 토큰은 그대로 두고(백필 불필요) **렌더 시점에만** 사람이 읽는 문구로 바꾼다.
+# Evidence B 라벨("공식 인덱스 + 보조 출처")은 이미 방문자 문구라 그대로 둔다.
+EVIDENCE_BASIS_LABELS = {"Intake raw": N_("수집기가 보존한 공식 원문")}
 _SECTION_ICON_DEFAULT = "ti-folder"
 MARKS = "①②③④⑤"
 
@@ -558,8 +564,11 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "key_facts": card.get("key_facts") or [],
         # ★근거 라벨도 데이터로 오는 표시 문구다(불변식 #13) — 여기서 한 번 번역해
         #   넘기지 않으면 영어 카드의 "핵심 사실" 줄에 한국어가 그대로 실린다.
-        "evidence_basis": (tr(card["evidence_basis"]) if card.get("evidence_basis")
-                           else card.get("evidence_basis", "")),
+        # [D2 2026-09-11] tr() 에 넘기기 전에 내부 계약 토큰을 방문자 문구로 먼저
+        #   바꾼다(EVIDENCE_BASIS_LABELS) — card_scaffold 의 "Intake raw" 토큰 자체는
+        #   손대지 않는다.
+        "evidence_basis": (tr(EVIDENCE_BASIS_LABELS.get(card["evidence_basis"], card["evidence_basis"]))
+                           if card.get("evidence_basis") else card.get("evidence_basis", "")),
         "implication": card.get("implication", ""),
         "checks": card.get("checks") or [],
         # [WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 그대로 통과(사실/URL 무변형 원칙과
@@ -2888,8 +2897,11 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
     N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
     N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"),
-    # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다.
-    N_("공식 인덱스 + 보조 출처"), N_("Intake raw"),
+    # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다. Evidence A 원본 토큰
+    # "Intake raw" 는 EVIDENCE_BASIS_LABELS 가 여기 도달하기 전에 방문자 문구로 바꾸므로
+    # 그 문구를 등록한다(D2 2026-09-11) — 등록은 위 dict 정의에서도 이뤄지지만 이 표가
+    # evidence_basis 어휘 전체를 한눈에 보여주는 문서 역할이라 함께 적어 둔다.
+    N_("공식 인덱스 + 보조 출처"), N_("수집기가 보존한 공식 원문"),
     # ★영어처럼 보이는 값도 사전을 거친다. `tr()` 에는 항등 폴백이 없어 결손이면
     #   영어 빌드가 MissingTranslation 으로 **멈춘다** — 한글이 없으니 아래 등록
     #   검사(한글만 훑는 판)로는 안 잡혀서, 라벨 어휘는 언어와 무관하게 등록한다.

@@ -498,12 +498,52 @@ def _h3(text: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. 텍스트 유틸 (결정론)
 # ─────────────────────────────────────────────────────────────────────────────
+# [D6 2026-09-11] 한국어 날짜는 "2026. 4. 1." 처럼 연·월·일을 마침표로 구분해 적는다 —
+# 문장 분할이 이 마침표를 문장 경계로 오인하면 "…2026." / "4." / "1. 처분…" 로 쪼개져
+# 인용에 "4." 한 조각만 남는 사고가 난다(08-31 admin-2026006476 실사례). 두 겹으로 막는다:
+#   (a) 연·월·일(3단) 또는 연·월(2단) 전체 날짜 토큰을 통째로 찾아 그 구간 **안의 마침표는
+#       전부**(일 다음 마침표 포함) 경계 후보에서 뺀다 — "1. 처분"처럼 날짜 마지막 조각
+#       뒤가 숫자가 아니어도, 그 마침표는 날짜의 일부이지 문장의 끝이 아니다. 실제 문장
+#       경계는 그 뒤에 오는 진짜 종결 어미(예: "받았다.")다.
+#   (b) 연도가 없어 (a)에 안 걸리는 숫자 연쇄(예: "4. 1.")를 위한 보완 — 마침표 **바로
+#       앞 토큰이 숫자 1~4자리뿐**이고 **뒤가 숫자로 시작**하면 그 자리도 막는다. "기준
+#       98% 미만. 2차 시험 실시."처럼 **앞 토큰이 숫자가 아니면** 뒤가 숫자로 시작해도
+#       정상 분할한다 — 문장이 숫자로 시작하는 경우는 드물어, 뒷글자만으로 전부 막으면
+#       (순수 lookahead) 이런 정상 문장까지 합쳐버린다.
+_KOREAN_DATE_RE = re.compile(r"\d{4}\.\s?\d{1,2}\.\s?\d{1,2}\.|\d{4}\.\s?\d{1,2}\.")
+_BARE_NUMBER_BEFORE_RE = re.compile(r"(?<!\d)\d{1,4}\Z")
+
+
+def _korean_date_spans(text: str) -> list[tuple[int, int]]:
+    """`text` 안의 "2026. 4. 1." / "2026. 4." 날짜 토큰 [start, end) 구간 전부."""
+    return [m.span() for m in _KOREAN_DATE_RE.finditer(text)]
+
+
+def _is_protected_period(text: str, spans: list[tuple[int, int]], punct_idx: int,
+                          after_char: str) -> bool:
+    """`text[punct_idx]`(마침표류) 가 날짜/숫자 연쇄 내부라 문장 경계가 아닌가."""
+    if any(start <= punct_idx < end for start, end in spans):
+        return True                               # 날짜 토큰 내부(일 다음 마침표 포함)
+    before = text[:punct_idx]
+    return bool(after_char) and after_char.isdigit() and bool(_BARE_NUMBER_BEFORE_RE.search(before))
+
+
 def _split_sentences(text: str, max_segs: int = 2) -> list[str]:
     """문장 경계로 ≤max_segs 분할(한국어/영문). 빈 입력 → []."""
     t = (text or "").strip()
     if not t:
         return []
-    parts = re.split(r"(?<=[.。!?])\s+", t)
+    spans = _korean_date_spans(t)
+    parts: list[str] = []
+    last = 0
+    for m in re.finditer(r"(?<=[.。!?])\s+", t):
+        punct_idx = m.start() - 1                 # 마침표류 자신의 위치
+        after_char = t[m.end(): m.end() + 1]
+        if _is_protected_period(t, spans, punct_idx, after_char):
+            continue                              # 날짜/숫자 연쇄 사이 — 분할하지 않는다
+        parts.append(t[last: m.start()])
+        last = m.end()
+    parts.append(t[last:])
     parts = [p.strip() for p in parts if p.strip()]
     if len(parts) <= max_segs:
         return parts or [t]
@@ -516,10 +556,16 @@ def _truncate_at_sentence(text: str, limit: int) -> str:
     if len(t) <= limit:
         return t
     head = t[:limit]
-    # 마지막 문장부호에서 자름
-    m = list(re.finditer(r"[.。!?]", head))
-    if m:
-        return head[: m[-1].end()].strip()
+    # 마지막 문장부호에서 자름 — 날짜/숫자 연쇄 내부 마침표는 경계로 치지 않는다(위
+    # 규칙과 동일, D6 2026-09-11). 날짜 구간·뒷글자는 **원문(t)** 기준으로 본다 —
+    # limit 이 날짜 한가운데서 자르면 head 안에는 뒷글자가 아예 없어 head 만으로는
+    # 숫자 연쇄인지 판정할 수 없다.
+    spans = _korean_date_spans(t)
+    for m in reversed(list(re.finditer(r"[.。!?]", head))):
+        after_char = t[m.end(): m.end() + 1]
+        if _is_protected_period(t, spans, m.start(), after_char):
+            continue                              # 날짜/숫자 연쇄 사이 — 이 자리에서 자르지 않는다
+        return head[: m.end()].strip()
     return head.rstrip() + "…"
 
 

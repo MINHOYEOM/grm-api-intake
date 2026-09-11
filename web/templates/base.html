@@ -853,5 +853,25 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   document.head.appendChild(s);
 })();
 </script>
+{#- [D7 언어 전환 쿼리 유지 2026-09-11] a.navmore-lang(헤더 언어 드롭다운)·a.grm-lang
+    (모바일 서랍)·langhint 의 "Read in English →" 는 전부 PagePath 기준 섹션 루트로
+    가는 정적 href 라, `/findings/?q=aseptic` 같은 쿼리·해시 상태에서 언어를 바꾸면
+    그 상태를 잃고 섹션 첫 화면에 떨어진다. 서버는 런타임 필터 쿼리를 모르므로 이건
+    클라이언트 보강으로만 고칠 수 있다 — 현재 페이지에 쿼리·해시가 있고 대상 href 가
+    같은 사이트이면서 쿼리가 아직 없을 때만 그대로 이어 붙인다(외부/이미 쿼리가 있는
+    href는 손대지 않는다). 의존성 없음·전역 상태 없음·매 실행 결정론(골든 안 흔듦). -#}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
+</script>
 </body>
 </html>

@@ -58,7 +58,7 @@
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">Recall</span><span class="n">13</span></summary>        <a href="#recall-5edc1a15853b">한림제약(주)</a>        <a href="#recall-709cff0f6b75">(주)넥스팜코리아 글로틴듀오정2.5/500mg(리나글립틴, 메트포르민염산염) 외 2품목</a>        <a href="#recall-97b0f904887d">하나제약(주)</a>        <a href="#recall-ecf1e2c8f79f">(주)일화</a>        <a href="#D-0580-2026">SUN PHARMACEUTICAL INDUSTRIES INC <span class="toc-sub">· 주사제 유리 이물 Class I 회수</span></a>        <a href="#D-0582-2026">Breckenridge Pharmaceutical, Inc. <span class="toc-sub">· N-니트로소-둘록세틴 기준초과 회수</span></a>        <a href="#D-0583-2026">Breckenridge Pharmaceutical, Inc. <span class="toc-sub">· N-니트로소둘록세틴 60mg 기준초과 회수</span></a>        <a href="#D-0595-2026">Haleon US Holdings LLC</a>        <a href="#D-0586-2026">Zep Inc</a>        <a href="#D-0587-2026">Golden State Medical Supply Inc.</a>        <a href="#D-0597-2026">Ascend Laboratories, LLC</a>        <a href="#D-0607-2026">SUN PHARMACEUTICAL INDUSTRIES INC <span class="toc-sub">· 흡입현탁액 앰풀 내 이물 Class II 회수</span></a>        <a href="#N/A">BEEKEEPER&#39;S NATURALS USA INC.</a>      </details>    </div></aside>
     <div id="cards" data-issue-no="2" data-date="2026-06-26"><div id="grm-brief-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>
       <div class="brief-bar" id="briefBar">
-        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">Full</button><button type="button" data-view="summary">Summary</button></div>
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체보기</button><button type="button" data-view="summary">요약보기</button></div>
         <div class="right"><span class="count">카드 <b>27</b>장</span></div>
       </div>      <h2 class="sec-h" id="sec-글로벌"><i class="ti ti-world" style="color:var(--coral);font-size:20px"></i>글로벌 <span class="n">4장</span></h2>
       <div class="sec-body" id="secbody-글로벌">      <div class="grp-h">💊 합성의약품</div><article class="card" id="eb5152bfcf02" data-card-type="Warning Letter" data-signal-tier="3" data-evidence="B" data-firm-key="huons">
@@ -682,6 +682,18 @@ body.grm-has-share .grm-card-actions{display:flex}
   s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
   document.head.appendChild(s);
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
 </script>
 </body>
 </html>

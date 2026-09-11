@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=21c623df" defer></script>
+<script src="/assets/i18n-en.js?v=28dcbf71" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -532,7 +532,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=ac382148" defer></script>
-<script src="../../assets/findings.js?v=bedfa730" defer></script>
+<script src="../../assets/findings.js?v=c9ef8207" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}
@@ -585,6 +585,18 @@ body.grm-has-share .grm-card-actions{display:flex}
   s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
   document.head.appendChild(s);
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
 </script>
 </body>
 </html>

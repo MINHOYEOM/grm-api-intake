@@ -134,9 +134,9 @@
         <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">사실 <span class="en">Fact</span></span><span class="fblock insight">시사점 <span class="en">Insight</span></span></div></div></div>
       <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>신뢰도 및 신호 등급화</h3><p>사안별 신뢰도(A·B·C)와 신호 강도(Tier 1~3)를 모든 카드에 직관적으로 표기하여 업무 우선순위 수립을 도웁니다.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-grades">
-          <span class="grade ev" tabindex="0" title="신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=2차 보도, C=추정·미확인)" aria-label="신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 2차 보도, C는 추정·미확인."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
+          <span class="grade ev" tabindex="0" title="신뢰도 A — 공식 처분·원문으로 확인된 1차 근거 (B=공식 인덱스+보조 자료, 원문 대조 권장. C=보조 자료 단독)" aria-label="신뢰도 A: 공식 처분·원문으로 확인된 1차 근거. B는 공식 인덱스와 보조 자료(원문 대조 권장), C는 보조 자료 단독."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
           <span class="grade sig" tabindex="0" title="신호 강도 T3 (최상) — 업무 영향도 높음, 즉시 점검 권장 (T2=중간, T1=참고)" aria-label="신호 강도 T3 최상: 업무 영향도 높음, 즉시 점검 권장. T2는 중간, T1은 참고."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
-          <span class="grade-tip t-ev" aria-hidden="true"><b>신뢰도 A</b> — 공식 처분·원문으로 확인된 1차 근거. <span class="dim">B=2차 보도, C=추정·미확인.</span></span>
+          <span class="grade-tip t-ev" aria-hidden="true"><b>신뢰도 A</b> — 공식 처분·원문으로 확인된 1차 근거. <span class="dim">B=공식 인덱스+보조 자료(원문 대조 권장), C=보조 자료 단독.</span></span>
           <span class="grade-tip t-sig" aria-hidden="true"><b>신호 T3 (최상)</b> — 업무 영향도 높음, 즉시 점검 권장. <span class="dim">T2=중간, T1=참고.</span></span>
         </div></div></div>
     </div>
@@ -416,6 +416,18 @@ body.grm-has-share .grm-card-actions{display:flex}
   s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
   document.head.appendChild(s);
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
 </script>
 </body>
 </html>

@@ -50,7 +50,7 @@
     <div id="tr-content" hidden>
       <section class="tr-block tr-fda-block" id="tr-fda-block" aria-label="{{ _('FDA 의약품 GMP 실사 등급') }}" hidden>
         <h2 class="tr-h">{{ _("등급 구성") }}</h2>
-        <p class="tr-read">{{ _("<b>NAI</b>는 지적사항 없음, <b>VAI</b>는 경미한 지적, <b>OAI</b>는 시정조치가 필요한 중대한 지적입니다.") }}</p>
+        <p class="tr-read">{{ _("<b>NAI</b>는 지적사항 없음, <b>VAI</b>는 지적사항이 있으나 자발적 시정으로 충분하다고 본 실사, <b>OAI</b>는 규제 조치가 필요하다고 본 실사입니다(FDA 공식 분류).") }}</p>
         <p class="tr-fda-scope" id="tr-fda-scope"></p>
         <p class="tr-fda-asof" id="tr-fda-asof"></p>
         <div class="tr-stats tr-fda-stats" id="tr-fda-stats"></div>
@@ -103,7 +103,7 @@
           062 미적용 라이브·빈 응답이면 이 블록만 조용히 숨긴 채로 남는다. -#}
       <section class="tr-block tr-fq-block" id="tr-fq-block" aria-label="{{ _('실사일 기준 분기 추이') }}" hidden>
         <h2 class="tr-h">{{ _("실사일 기준 분기 추이") }}</h2>
-        <p class="tr-read">{{ _("위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 길이가 고르면 그 기간 동안 판정 강도가 안정적이었다는 뜻입니다.") }}</p>
+        <p class="tr-read">{{ _("위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 그 분기에 어떤 실사들이 섞였는지에 따라 달라집니다.") }}</p>
         <div id="tr-fq" class="tr-fq"></div>
         <p class="tr-note" id="tr-fq-note"></p>
       </section>

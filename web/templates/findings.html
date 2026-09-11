@@ -81,6 +81,12 @@
         <div class="fnd-field fnd-field--sort"><label for="fnd-sort">{{ _("정렬") }}</label><select id="fnd-sort"><option value="date_desc">{{ _("최신순") }}</option><option value="date_asc">{{ _("오래된순") }}</option><option value="firm_asc">{{ _("업체명순") }}</option></select></div>
       </div>
       <div class="fnd-active" id="fnd-active" hidden></div>
+      {#- [#804 본문 전용 검색] 용어사전 "본문에 이 용어가 있는 지적사례" 링크가
+          `?text=1` 로 들어오면 findings_search RPC 를 p_text_only=true 로 호출한다(082
+          마이그레이션). 언어 트리와 무관하게(한국어·영어 둘 다) 나타날 수 있으므로
+          fnd-langnote 와 달리 lang 게이트를 걸지 않는다. 내용은 findings.js
+          renderTextOnlyNote() 가 채운다(빈 상자 금지 — off 면 hidden 유지). #}
+      <p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>
       {% if lang != 'ko' %}
       {# [다국어 6단계 2026-09-04] 원문 언어 공지·해제 줄. 영어판 검색은 원문이 영어인
          지적을 기본으로 보여준다(서버 p_orig_lang, 마이그 074) — 그렇게 하지 않으면
@@ -291,6 +297,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-active-x{color:var(--muted);font-size:13px;line-height:1}
 .fnd-active-chip:hover .fnd-active-x{color:var(--coral)}
 .fnd-active-clearall{font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:0 0 0 4px;cursor:pointer}
+/* [#804 본문 전용 검색] 원문 언어 공지 줄과 같은 자리·같은 톤 — 언어 트리 게이트 없음
+   (마크업도 lang 조건 밖에 있다, 위 findings.html 주석 참조). */
+.fnd-textonlynote{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin:12px 0 0;font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.fnd-textonlynote[hidden]{display:none}
+.fnd-textonlynote a{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);text-decoration:underline;text-underline-offset:2px}
+.fnd-textonlynote a:hover{color:var(--coral)}
 {% if lang != 'ko' %}
 /* [다국어 6단계] 원문 언어 공지 줄 — 적용 필터 칩 행과 같은 자리·같은 톤. grm.css 무접촉.
    마크업과 **같은 게이트**에 둔다: 한국어판에는 그 요소가 없으므로 규칙만 남으면

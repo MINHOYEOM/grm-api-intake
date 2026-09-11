@@ -59,7 +59,7 @@
           </div>
           {% endif %}
           {% if t.case_findings %}
-          <a class="gl-case-a" href="{{ rel_root }}{{ t.case_href }}">{{ _("이 용어로 검색되는 지적사례 <b>{n}</b>건 보기", n=t.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          <a class="gl-case-a" href="{{ rel_root }}{{ t.case_href }}">{{ _("본문에 이 용어가 있는 지적사례 <b>{n}</b>건 보기", n=t.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
           {% endif %}
         </article>
         {% endfor %}

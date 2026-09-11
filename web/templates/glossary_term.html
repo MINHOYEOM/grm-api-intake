@@ -151,7 +151,7 @@
         {%- endfor %}
       </ol>
       {%- endif %}
-      <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">{{ _("이 용어로 검색되는 지적사례 <b>{n}</b>건 보기", n=term.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      <a class="gt-case" href="{{ rel_root }}{{ term.case_href }}">{{ _("본문에 이 용어가 있는 지적사례 <b>{n}</b>건 보기", n=term.case_count_label) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
       {#- [기준일 병기 2026-09-06] 이 건수는 주 1회 재측정하는 스냅샷이고 누르면 나오는
           검색은 오늘 값이라, 며칠씩 어긋난다(실측: 136 vs 137). 정의는 완전히 같으므로
           값을 맞추는 게 아니라 시점을 밝힌다. 기준일이 없으면(파일 부재) 문장도 없다. -#}

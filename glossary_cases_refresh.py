@@ -4,11 +4,19 @@
 기본 경로는 사람이 검수한 `web/data/glossary_cases.json`의 findings/documents **숫자만**
 다시 센다. `--orig-lang en` 경로는 별도 영문 정본(`glossary_cases_en.json`)을 만든다.
 
-배경: 용어사전 각 용어 카드 아래 "이 용어로 검색되는 지적사례 N건 보기 →" 링크가 달린다(C1/C2).
-그 숫자는 `public.findings_search` RPC(030, `/findings/?q=...` 화면이 쓰는 것과 **동일 함수**)를
-호출해 얻는다. 지적사례는 매일 늘어나므로 화면 숫자가 몇 달 전 것이면 거짓말이 된다 — 자료실
-(`library_staging_build.py` + `grm-library-staging.yml`)은 이미 주 1회 자동 갱신되는데 용어사전
-에는 그런 장치가 없었다. 이 모듈이 그 격차를 메운다.
+배경: 용어사전 각 용어 카드 아래 "본문에 이 용어가 있는 지적사례 N건 보기 →" 링크가 달린다
+(C1/C2). 그 숫자는 `public.findings_search` RPC(030, `/findings/?q=...` 화면이 쓰는 것과
+**동일 함수**)를 호출해 얻는다. 지적사례는 매일 늘어나므로 화면 숫자가 몇 달 전 것이면
+거짓말이 된다 — 자료실(`library_staging_build.py` + `grm-library-staging.yml`)은 이미 주 1회
+자동 갱신되는데 용어사전에는 그런 장치가 없었다. 이 모듈이 그 격차를 메운다.
+
+**[#804 본문 전용 검색]** `findings_search` 는 본문뿐 아니라 분류 코드·라벨·document_id·
+source 까지 이어붙인 문자열에 매치해, 이 스크립트가 세는 N 에 본문에 그 용어가 한 번도
+안 나오는 지적이 최대 91%(`CAPA`) 섞여 있었다. 이 모듈은 082 마이그레이션의 `p_text_only`를
+**항상 True 로** 호출해 매치 대상을 본문(finding_text/finding_text_ko)만으로 좁힌다.
+"화면과 같은 함수로 센다" 계약은 여전히 참이다 — 카드 링크(`web/render.py` case_href)도
+같은 검색 모드(`&text=1`)로 이동하도록 함께 고쳤기 때문이다(한쪽만 고치면 다시 "숫자와
+클릭 결과가 다른" 결함으로 돌아간다).
 
 **불가침 계약**:
   · `q`(검색어)는 **절대 바꾸지 않는다** — 사람이 실제 지적 문장을 읽고 판정한 값이다.
@@ -126,8 +134,12 @@ def _post_findings_search(
         "Authorization": f"Bearer {anon_key}",
         "Content-Type": "application/json",
     }
+    # [#804 본문 전용 검색] p_text_only=True 는 082 마이그레이션이 추가한 축 — ilike 매치
+    # 대상을 finding_text/finding_text_ko 로만 좁힌다(분류 코드·라벨·document_id 등은
+    # 뺀다). 언제나 True 로 보낸다 — "화면과 같은 함수로 센다" 계약을 지키려면 이 스크립트가
+    # 세는 방식과 화면 링크(web/render.py case_href 의 `&text=1`)가 같은 모드여야 한다.
     body = {"p_q": q, "p_page": 1, "p_docs_per_page": 1,
-            "p_orig_lang": orig_lang}
+            "p_orig_lang": orig_lang, "p_text_only": True}
     for attempt in range(1, _MAX_ATTEMPTS + 1):
         try:
             resp = requests.post(url, headers=headers, json=body, timeout=timeout)
@@ -514,8 +526,8 @@ def run_english_refresh(
 
     return {
         "schema": SCHEMA_VERSION,
-        "source": ("public.findings_search RPC (p_q=q, p_orig_lang=en) totals — "
-                   "/en/findings/?q=q 결과와 동일 함수"),
+        "source": ("public.findings_search RPC (p_q=q, p_orig_lang=en, p_text_only=true) "
+                   "totals — /en/findings/?q=q&text=1 결과와 동일 함수"),
         "orig_lang": "en",
         "measured_on": report["run_at"],
         "note": ("glossary.json의 term_en(0건이면 괄호·슬래시를 뗀 주 표현)을 "
@@ -586,7 +598,10 @@ def _write_payload(path: Path, payload: dict[str, Any]) -> None:
 def _print_summary(report: dict[str, Any]) -> None:
     counts = report["counts"]
     print(
-        f"glossary_cases_refresh: 총 {report['total_items']}건 — "
+        # [#804] p_text_only=True 로 얻은 값이라는 것을 리포트 문구에도 밝힌다 —
+        # "센 방식이 화면과 같다"만으론 부족하다, 그 방식 자체가 본문 일치 기준으로
+        # 바뀌었다는 사실을 사람이 리포트만 보고도 알 수 있어야 한다.
+        f"glossary_cases_refresh: 본문 일치 기준 총 {report['total_items']}건 — "
         f"갱신 {counts['updated']} · 무변동 {counts['unchanged']} · "
         f"0건유지 {counts['zero_kept']} · 변동큼(>±{report['thresholds']['large_change_pct']}%) "
         f"{counts['large_change']} · 실패 {counts['failed']}"

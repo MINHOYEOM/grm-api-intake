@@ -200,6 +200,8 @@
   // 한다 — 형식 불일치는 fetch 없이 곧장 "찾을 수 없음"으로 처리한다(§1).
   var FINDING_ID_RE = /^finding-[0-9a-f]{24}$/;
   var DEEP_LINK_PARAM = "finding_id";
+  // [#804 본문 전용 검색] 용어사전 사례 링크가 붙이는 `?text=1` — 값이 "1"일 때만 켠다.
+  var TEXT_ONLY_PARAM = "text";
 
   // [M15] 전면 재설계 — 소스·증거등급·검토상태 칩 그룹을 카테고리·발행월과 동일한
   // <select> 로 통일했다(균일 셀렉트 행). state 키 구조·URL 파라미터·매칭 로직은 M3c
@@ -244,15 +246,20 @@
   //   않는다. 빈 문자열로 두면 **사용자가 푼 필터가 URL 에 안 남아** 새로고침·공유 시
   //   조용히 되살아난다(푼 것이 되돌아오는 것은 고장이다).
   var ORIG_LANG_DEFAULT = _isEn ? "en" : "all";
+  // [#804 본문 전용 검색] `text_only` — findings_search RPC 의 p_text_only(082 마이그레이션)
+  // 를 켠 채로 검색하는 모드. 용어사전 사례 링크가 `?text=1` 로 들어올 때만 켜진다(기본
+  // false — 화면 검색은 여전히 분류 코드·document_id 등도 매치하는 넓은 검색이다).
+  // orig_lang 과 달리 URL_KEYS 제네릭 루프에 넣지 않는다 — URL 값은 "1"(불리언이 아니라
+  // 문자열)이어야 해서 syncStateToUrl/readStateFromUrl 양쪽에 개별 처리를 둔다(아래).
   var DEFAULT_STATE = {
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
     review_status: "", month: "", country: "", sort: "date_desc",
-    orig_lang: ORIG_LANG_DEFAULT,
+    orig_lang: ORIG_LANG_DEFAULT, text_only: false,
   };
   var state = {
     q: "", agency: "", category_code: "", source: "", evidence_level: "",
     review_status: "", month: "", country: "", sort: "date_desc",
-    orig_lang: ORIG_LANG_DEFAULT,
+    orig_lang: ORIG_LANG_DEFAULT, text_only: false,
   };
   var debounceTimer = null;
 
@@ -315,6 +322,7 @@
   var filtersBadgeEl = document.getElementById("fnd-filters-badge");
   var activeEl = document.getElementById("fnd-active"); // [M15] 적용 필터 칩 행
   var langNoteEl = document.getElementById("fnd-langnote"); // [다국어] 원문 언어 공지(영어 트리 전용)
+  var textOnlyNoteEl = document.getElementById("fnd-textonlynote"); // [#804] 본문 전용 검색 공지(두 트리 공통)
 
   // 숫자 표기는 읽는 언어를 따른다 — 자릿구분이 언어마다 다르다.
   function nfmt(n) { return Number(n || 0).toLocaleString(_isEn ? "en-US" : "ko-KR"); }
@@ -1462,6 +1470,11 @@
       var v = state[k];
       if (v && v !== DEFAULT_STATE[k]) params.set(URL_KEYS[k], v);
     });
+    // [#804 본문 전용 검색] 불리언이라 위 제네릭 루프(문자열 값 전용)에 넣지 않는다 —
+    // 값은 항상 "1"이어야 한다. 검색어(q)가 바뀌어도 계속 URL 에 남는다(clearAllFilters
+    // 나 text=1 없는 URL 재방문에서만 꺼진다) — glossary_cases_refresh.py 가 같은
+    // p_text_only 로 센 숫자와 화면이 계속 같은 모드를 유지해야 하기 때문이다.
+    if (state.text_only) params.set(TEXT_ONLY_PARAM, "1");
     // [문서 단위 페이지네이션] 1페이지(기본값)는 URL 을 더럽히지 않는다 — 딥링크/뒤로가기는
     // 2페이지 이상일 때만 의미가 있다.
     if (currentPage > 1) params.set("page", String(currentPage));
@@ -1497,6 +1510,11 @@
     });
     var sortRaw = params.get(URL_KEYS.sort);
     if (sortRaw !== null && SORT_VALUES.indexOf(sortRaw) !== -1) state.sort = sortRaw;
+    // [#804 본문 전용 검색] "1"일 때만 켠다 — 그 외 값(오타·구버전 링크)은 조용히 꺼진
+    // 상태로 취급한다(다른 필터처럼 서버에 그대로 보내 0건을 만들 이유가 없다 — 이건
+    // 검색 대상 자체를 바꾸는 모드 스위치다).
+    var textOnlyRaw = params.get(TEXT_ONLY_PARAM);
+    if (textOnlyRaw !== null) state.text_only = textOnlyRaw === "1";
   }
 
   // [문서 단위 페이지네이션] URL ?page= → 초기 페이지(양의 정수만, 그 외/누락은 1 —
@@ -1546,6 +1564,7 @@
       // ★"모두 지우기"는 **그 트리의 기본**으로 돌아가는 것이지 영어판을 한국어 섞인
       //   상태로 만드는 것이 아니다(DEFAULT_STATE 와 같은 값이어야 URL 도 깨끗해진다).
       orig_lang: ORIG_LANG_DEFAULT,
+      text_only: false, // [#804] 필터 전체 초기화는 본문 전용 모드도 함께 푼다.
     };
     syncControlsFromState();
     currentPage = 1; // [페이지네이션] 전체 초기화 → 1페이지로 리셋
@@ -1595,6 +1614,27 @@
     langNoteEl.hidden = false;
   }
 
+  // [#804 본문 전용 검색] 용어사전 링크(?text=1)로 들어왔을 때만 노출 — 무엇을 보고
+  // 있는지 밝히고(분류 코드·document_id 등은 매치 대상에서 빠졌다) 링크 하나로 전체
+  // 검색으로 되돌아갈 수 있게 한다(langnote 와 같은 결 — 말없이 좁히지 않는다).
+  // 실제 URL 이동이라 정적 `<a href>` 로 만든다(딥링크 배너 showDeepLinkFoundBanner()
+  // 와 동형) — state 를 직접 뒤집는 버튼(renderLangNote)과 달리, 새 요청 없이 나가는
+  // 링크는 클릭 시 그 URL 을 처음부터 다시 읽는 편이 별도 상태 전이 코드보다 단순하다.
+  function renderTextOnlyNote() {
+    if (!textOnlyNoteEl) return;
+    if (!state.text_only) {
+      textOnlyNoteEl.hidden = true;
+      return;
+    }
+    textOnlyNoteEl.innerHTML = "";
+    textOnlyNoteEl.appendChild(document.createTextNode(_t("본문 일치만 표시 중") + " · "));
+    var link = document.createElement("a");
+    link.href = urlWithoutTextOnly();
+    link.textContent = _t("전체 검색으로 보기");
+    textOnlyNoteEl.appendChild(link);
+    textOnlyNoteEl.hidden = false;
+  }
+
   function renderActiveChips() {
     if (!activeEl) return;
     activeEl.innerHTML = "";
@@ -1638,6 +1678,17 @@
     if (typeof URLSearchParams === "undefined") return location.pathname;
     var params = new URLSearchParams(location.search);
     params.delete(DEEP_LINK_PARAM);
+    var qs = params.toString();
+    return location.pathname + (qs ? "?" + qs : "") + location.hash;
+  }
+
+  // [#804 본문 전용 검색] "전체 검색으로 보기" 링크의 href — 지금 URL 에서 text=1 만 뗀다
+  // (다른 필터·검색어·페이지는 그대로 유지 — 사용자가 본문 전용 모드에서 조작해 둔
+  // 상태를 잃지 않는다).
+  function urlWithoutTextOnly() {
+    if (typeof URLSearchParams === "undefined") return location.pathname;
+    var params = new URLSearchParams(location.search);
+    params.delete(TEXT_ONLY_PARAM);
     var qs = params.toString();
     return location.pathname + (qs ? "?" + qs : "") + location.hash;
   }
@@ -2059,6 +2110,7 @@
     refreshCountrySelectUI(); // [056] 국가 셀렉트 건수 갱신
     renderActiveChips(); // [M15] 적용 필터 칩 행 재계산
     renderLangNote();    // [다국어] 원문 언어 공지·해제 줄(영어 트리에만 존재)
+    renderTextOnlyNote(); // [#804] 본문 전용 검색 공지·해제 줄(두 트리 공통)
     updateFiltersToggleBadge();
 
     // totals 는 검색·필터 적용 후 exact 다(추정치가 아니다) — "이상" 접미사 같은 불확실성
@@ -2229,6 +2281,10 @@
         // [다국어] 'en' = 원문에 한글이 없는 지적만(마이그 074). 그 밖의 값은 '' 로
         // 보내 서버 기본(제한 없음)을 쓴다 — 클라이언트가 새 값을 지어내지 않는다.
         p_orig_lang: state.orig_lang === "en" ? "en" : "",
+        // [#804 본문 전용 검색] true 면 매치 대상이 본문(finding_text/finding_text_ko)
+        // 뿐이다(082 마이그레이션) — 분류 코드·라벨·document_id 등은 빠진다. 용어사전
+        // 사례 링크(?text=1)가 이 모드로 진입해 카드에 적힌 N 과 클릭 결과를 다시 맞춘다.
+        p_text_only: !!state.text_only,
       }),
     })
       .then(function (r) {

@@ -11754,8 +11754,8 @@ _GLOSSARY_CASE_LINK_JARGON_TERMS = ("tier", "qa", "scope_status", "raw_signal", 
 
 
 class WebGlossaryCaseLinkGuardTest(unittest.TestCase):
-    """[C2] 용어사전→사례 링크(glossary_cases.json → /glossary/ "이 용어로 검색되는 지적사례
-    N건 보기" 링크) 가 거짓말하거나 조용히 사라지는 걸 막는 가드.
+    """[C2] 용어사전→사례 링크(glossary_cases.json → /glossary/ "본문에 이 용어가 있는
+    지적사례 N건 보기" 링크) 가 거짓말하거나 조용히 사라지는 걸 막는 가드.
 
     이 링크는 화면에 건수를 적는다("1,468건"). 링크를 눌렀을 때 다른 검색어로 가면 그
     숫자는 거짓말이 된다. 데이터 파일이 비거나 용어 id 가 어긋나도 화면은 멀쩡해
@@ -11874,7 +11874,10 @@ class WebGlossaryCaseLinkGuardTest(unittest.TestCase):
             tid = it["id"]
             t = self.view_by_id.get(tid)
             self.assertIsNotNone(t, f"{tid} 가 build_glossary_view 뷰모델에 없음")
-            expected_href = f"findings/index.html?q={_expected_quote(it['q'], safe='')}"
+            # [#804] &text=1 — findings_search RPC 를 p_text_only=true 로 호출하게 한다.
+            # 이 접미가 없으면 카드에 적힌 N(본문 일치 기준)과 눌렀을 때 나오는 결과(전체
+            # 검색 기준)가 다시 어긋난다.
+            expected_href = f"findings/index.html?q={_expected_quote(it['q'], safe='')}&text=1"
             self.assertTrue(
                 t["case_href"].startswith("findings/index.html?q="),
                 f"{tid} case_href 가 'findings/index.html?q=' 로 시작하지 않음: {t['case_href']!r}")
@@ -11884,8 +11887,12 @@ class WebGlossaryCaseLinkGuardTest(unittest.TestCase):
                 f"{t['case_href']!r} != {expected_href!r}")
             # 렌더된 HTML 에도 같은 href 값이 그대로 실렸는지(템플릿이 rel_root 만 앞에
             # 붙이고 값 자체는 변형하지 않는지) — 뷰모델 대조만으론 배선 유실을 못 잡는다.
+            # Jinja 오토이스케이프가 속성 안의 `&` 를 `&amp;` 로 바꾼다(기존 관례: agency
+            # 콤보 href 검사 등도 같은 이유로 &amp; 를 쓴다) — 뷰모델 값 자체(위 assertEqual)
+            # 는 이스케이프 전 원본이라 이 치환은 렌더 비교에만 적용한다.
+            rendered_href = f'href="../{expected_href}"'.replace("&", "&amp;")
             self.assertIn(
-                f'href="../{expected_href}"', self.html,
+                rendered_href, self.html,
                 f"{tid} 의 사례 링크 href 가 렌더에 없음(값이 유실됐거나 변형됨): {expected_href!r}")
 
         # 한글 검색어가 실제로 인코딩된 채 나가는지 최소 1건 이상 직접 확인(예: 품질관리).
@@ -16913,6 +16920,72 @@ class WebFindingsOrigLangTest(unittest.TestCase):
             self.assertIn(key, catalog, f"영어 사전에 없다: {key}")
 
 
+class WebFindingsTextOnlyTest(unittest.TestCase):
+    """[#804] 검색의 본문 전용 축(`?text=1` → RPC p_text_only, 082 마이그레이션).
+
+    용어사전 사례 링크가 붙이는 `&text=1` 이 실제로 무엇을 하는지 클라이언트 쪽을 고정한다.
+    langnote(원문 언어 공지)와 달리 **두 트리 모두**에 존재해야 한다 — 용어사전은 한국어판
+    에도 있고, 영어판에도 있다(WebGlossaryCaseLinkGuardTest/WebEnGlossaryTest 가 각 트리의
+    링크 자체를 본다 — 이 클래스는 그 링크를 받는 findings.js/findings.html 쪽만 본다).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_textonly_"))
+        cls.out = cls._tmp / "site"
+        _build_single(cls.out)
+        cls.ko = (cls.out / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.en = (cls.out / "en" / "findings" / "index.html").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_the_note_exists_in_both_trees(self):
+        """langnote 는 영어 전용이지만 이 공지는 두 트리 공통이다 — 용어사전은 둘 다 있다."""
+        self.assertIn('<p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>', self.ko)
+        self.assertIn('<p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>', self.en)
+
+    def test_url_param_name_is_text(self):
+        self.assertIn('var TEXT_ONLY_PARAM = "text";', self.js)
+
+    def test_state_default_is_false_in_all_three_places(self):
+        """DEFAULT_STATE · state · clearAllFilters 세 곳 모두 꺼진 상태로 시작해야 한다."""
+        self.assertEqual(self.js.count("text_only: false"), 3,
+                         "DEFAULT_STATE · state · clearAllFilters 세 곳이어야 한다")
+
+    def test_url_read_only_accepts_the_literal_1(self):
+        fn = js_function_body(self.js, "function readStateFromUrl()")
+        self.assertIn('textOnlyRaw === "1"', fn)
+
+    def test_url_write_only_emits_when_on(self):
+        fn = js_function_body(self.js, "function syncStateToUrl()")
+        self.assertIn("if (state.text_only) params.set(TEXT_ONLY_PARAM, \"1\");", fn)
+
+    def test_rpc_call_sends_p_text_only(self):
+        fn = js_function_body(self.js, "function fetchSearch(page)")
+        self.assertIn("p_text_only: !!state.text_only,", fn)
+
+    def test_release_link_drops_only_the_text_param(self):
+        """전체 검색으로 보기 링크는 다른 필터·검색어·페이지는 그대로 두고 text 만 뗀다."""
+        fn = js_function_body(self.js, "function urlWithoutTextOnly()")
+        self.assertIn("params.delete(TEXT_ONLY_PARAM);", fn)
+
+    def test_note_says_what_is_on_and_offers_one_click_release(self):
+        fn = js_function_body(self.js, "function renderTextOnlyNote()")
+        self.assertIn("urlWithoutTextOnly()", fn)
+        for key in ("본문 일치만 표시 중", "전체 검색으로 보기"):
+            self.assertIn(key, fn, f"공지 문구 누락: {key}")
+        catalog = json.loads((WEB_DIR / "data" / "i18n" / "en.json").read_text(encoding="utf-8"))
+        for key in ("본문 일치만 표시 중", "전체 검색으로 보기"):
+            self.assertIn(key, catalog, f"영어 사전에 없다: {key}")
+
+    def test_render_calls_the_note(self):
+        fn = js_function_body(self.js, "function render()")
+        self.assertIn("renderTextOnlyNote();", fn)
+
+
 class WebEnFirmPageTest(unittest.TestCase):
     """[다국어 2026-09-04] 영어판 업체 페이지 — 슬러그는 물려받고, 숫자는 다시 센다.
 
@@ -17365,11 +17438,14 @@ class WebEnGlossaryTest(unittest.TestCase):
         for item in self.case_items:
             term = by_id.get(item["id"])
             self.assertIsNotNone(term, item["id"])
-            expected_href = f"findings/index.html?q={_quote(item['q'], safe='')}"
+            expected_href = f"findings/index.html?q={_quote(item['q'], safe='')}&text=1"  # [#804]
             self.assertEqual(term["case_findings"], item["findings"], item["id"])
             self.assertEqual(term["case_href"], expected_href, item["id"])
             html = (self.dir / item["id"] / "index.html").read_text(encoding="utf-8")
-            self.assertIn(f'href="../../{expected_href}"', html, item["id"])
+            # Jinja 오토이스케이프가 속성 안의 `&` 를 `&amp;` 로 바꾼다(위 WebGlossaryCaseLinkGuardTest
+            # 와 동일 이유).
+            rendered_href = f'href="../../{expected_href}"'.replace("&", "&amp;")
+            self.assertIn(rendered_href, html, item["id"])
 
     def test_english_excerpt_selection_uses_original_body_and_english_probe(self):
         """인용도 링크와 같은 언어여야 한다 — 한국어 본문/탐침을 재사용하지 않는다."""

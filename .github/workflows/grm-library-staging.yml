@@ -47,7 +47,7 @@ jobs:
   # 복구 모드로 쓰고, 평상시엔 주 1회 그대로 유지한다(사이트 부하·PR 소음 방지).
   decide:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 60   # [2026-09-11] CI 게이트(gh run watch) 대기가 이 잡 안에 있다 — CI 가 20~40분이라 상한을 60분으로. 15분이던 09-10 주간 런이 대기 중 취소돼 후보 PR 이 영영 미머지로 남았다(#982)
     outputs:
       run: ${{ steps.check.outputs.run }}
       reason: ${{ steps.check.outputs.reason }}

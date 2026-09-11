@@ -45,7 +45,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60   # [2026-09-11] CI 게이트(gh run watch) 대기가 이 잡 안에 있다 — CI 가 20~40분이라 상한을 60분으로. 15분이던 09-10 주간 런이 대기 중 취소돼 후보 PR 이 영영 미머지로 남았다(#982)
     env:
       LARGE_CHANGE_PCT: ${{ inputs.large_change_percent || '50' }}
       FAIL_ABORT_PCT: ${{ inputs.fail_abort_percent || '20' }}

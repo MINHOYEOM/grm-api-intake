@@ -56,12 +56,12 @@
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">글로벌</span><span class="n">1</span></summary>        <a href="#wl-syn-0501">Synthetic Pharma Co.</a>      </details>      <a class="sec" href="#sec-resources">전문지 브리핑</a>    </div></aside>
     <div id="cards" data-issue-no="1" data-date="2026-05-01"><div id="grm-brief-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>
       <div class="brief-bar" id="briefBar">
-        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">Full</button><button type="button" data-view="summary">Summary</button></div>
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체보기</button><button type="button" data-view="summary">요약보기</button></div>
         <div class="right"><span class="count">카드 <b>1</b>장</span></div>
       </div>      <h2 class="sec-h" id="sec-글로벌"><i class="ti ti-world" style="color:var(--coral);font-size:20px"></i>글로벌 <span class="n">1장</span></h2>
       <div class="sec-body" id="secbody-글로벌">      <div class="grp-h">💊 합성의약품</div><article class="card evA" id="wl-syn-0501" data-card-type="Warning Letter" data-signal-tier="3" data-evidence="A" data-firm-key="synthetic pharma">
   <div class="c-title"><span class="pre">[Warning Letter · FDA]</span>Synthetic Pharma Co. — <b>데이터 무결성 결함</b></div>
-  <div class="badges"><span class="b code ev">Evidence A</span><span class="b ag">FDA</span><span class="b sig code"><span class="d" style="background:var(--hi)"></span>Signal High · T3</span><span class="b mod">💊 합성의약품</span><span class="b typ">CGMP</span></div>  <p class="summary">FDA가 무균 충전 공정의 데이터 무결성 결함을 이유로 경고장을 발부했다.</p>  <table class="facts">    <tr><td class="k">발행일</td><td class="v"><span class="mono">2026-04-28</span></td></tr>    <tr><td class="k">문서번호</td><td class="v"><span class="mono">wl-syn-0501</span></td></tr>    <tr><td class="k">업체/제조소</td><td class="v">Synthetic Pharma Co.</td></tr>  </table>  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: Intake raw</span></div>
+  <div class="badges"><span class="b code ev">Evidence A</span><span class="b ag">FDA</span><span class="b sig code"><span class="d" style="background:var(--hi)"></span>Signal High · T3</span><span class="b mod">💊 합성의약품</span><span class="b typ">CGMP</span></div>  <p class="summary">FDA가 무균 충전 공정의 데이터 무결성 결함을 이유로 경고장을 발부했다.</p>  <table class="facts">    <tr><td class="k">발행일</td><td class="v"><span class="mono">2026-04-28</span></td></tr>    <tr><td class="k">문서번호</td><td class="v"><span class="mono">wl-syn-0501</span></td></tr>    <tr><td class="k">업체/제조소</td><td class="v">Synthetic Pharma Co.</td></tr>  </table>  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: 수집기가 보존한 공식 원문</span></div>
     <ul class="facts2">      <li>데이터 무결성 결함 적발</li>    </ul></div>  <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>시사점 <span class="sub">· 편집 해석</span></div><p><a class="fd-term" href="../../glossary/electronic-record/">전자기록</a> 감사추적 체계를 재점검할 필요가 있다.</p></div>  <div class="chk"><div class="lab"><i class="ti ti-checklist"></i>점검 사항</div><ul>    <li>감사추적 비활성화 여부 점검</li>  </ul></div>  <div class="src"><a href="https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters" target="_blank" rel="noopener"><span class="t">정보출처</span><i class="ti ti-database"></i> data source <i class="ti ti-external-link" style="font-size:12px"></i></a><a href="https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/synthetic-pharma-co" target="_blank" rel="noopener"><span class="t">공식원본</span><i class="ti ti-file-text"></i> 공식 페이지 <i class="ti ti-external-link" style="font-size:12px"></i></a></div><div class="grm-card-actions" data-anchor="wl-syn-0501">
     <button type="button" class="grm-ca" data-share aria-label="이 카드 공유하기"><i class="ti ti-share-2"></i><span class="grm-ca-t">공유</span></button>
   </div>
@@ -506,6 +506,18 @@ body.grm-has-share .grm-card-actions{display:flex}
   s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
   document.head.appendChild(s);
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
 </script>
 </body>
 </html>

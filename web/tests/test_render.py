@@ -231,6 +231,17 @@ def js_function_body(src: str, header: str) -> str:
     return src[i:end]
 
 
+def fnd_results_block(html: str) -> str:
+    """`#fnd-results` 원문 슬라이스 — 검색 면 정적 목록(2026-09-11) 전용 검사 대상.
+
+    `<nav id="fnd-pager-bottom">` 앞까지로 자른다(구조상 #fnd-results 바로 다음
+    형제) — 고정폭 슬라이스가 아니라 마크업 경계로 자르는 이유는 `js_function_body`
+    와 동일(코드/데이터가 자라 창 밖으로 밀리는 거짓 실패를 피한다)."""
+    start = html.index('id="fnd-results" class="fnd-results">')
+    end = html.index('<nav class="fnd-pager" id="fnd-pager-bottom"', start)
+    return html[start:end]
+
+
 def _build_single(out: pathlib.Path, *, doc_pages: bool = _DOC_PAGES_IN_TESTS) -> None:
     render.render_site(SINGLE_FIXTURES, out, render_doc_pages=doc_pages)
 
@@ -7856,6 +7867,39 @@ class WebRenderHardeningTest(unittest.TestCase):
         h2 = self._render_detail(_minimal_brief("2026-06-02", ai_disclosure=True))
         self.assertIn("AI 자동 생성 안내", h2)
 
+    def test_evidence_basis_intake_raw_never_shown_to_visitors(self):
+        # [D2 2026-09-11] card_scaffold 는 Evidence A 카드에 계약 토큰 "Intake raw" 를
+        # evidence_basis 로 싣는다(§13, docs/GRM_card_spec_v16.md:287) — 이건 프로듀서
+        # 내부 명칭이지 방문자 문구가 아니다(08-31 발행분 21장 중 20장이 그대로 노출).
+        # 렌더가 EVIDENCE_BASIS_LABELS 로 방문자 문구로 바꿔야 하고, 원문 토큰은 ko/en
+        # 어느 쪽에도 화면에 남으면 안 된다. 영어 트리는 서사 다섯(en.*)과 브리프
+        # en.tldr 이 전부 있어야 서므로(brief_has_english) 최소로 채운다 — evidence_basis
+        # 는 서사 다섯이 아니라 카드 최상위 값 그대로 두 언어 트리에 공통으로 흐른다.
+        en_narrative = {"title_issue": "Test issue", "summary": "Test summary.",
+                        "implication": "Test implication.", "key_facts": ["Test key fact"],
+                        "checks": ["Test check"]}
+        b = _minimal_brief("2026-06-01", card={
+            "evidence_basis": "Intake raw",
+            "key_facts": ["시험 결과 부적합 확인"],
+            "en": en_narrative,
+        })
+        b["brief"]["en"] = {"tldr": ["Weekly summary."]}
+        out = self._render_site([b])
+        ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+        en = (out / "en" / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("Intake raw", ko)
+        self.assertNotIn("Intake raw", en)
+        self.assertIn("근거: 수집기가 보존한 공식 원문", ko)
+        self.assertIn("Basis: official source record kept by the collector", en)
+        # 대조: Evidence B 라벨은 그대로 방문자 문구라 손대지 않는다.
+        b2 = _minimal_brief("2026-06-02", card={
+            "evidence_basis": "공식 인덱스 + 보조 출처",
+            "key_facts": ["시험 결과 부적합 확인"],
+        })
+        out2 = self._render_site([b2])
+        ko2 = (out2 / "briefs" / "2026-06-02" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("근거: 공식 인덱스 + 보조 출처", ko2)
+
     def test_merged_into_member_excluded(self):
         # 적대 입력: 병합 멤버(merged_into)를 cards[]에 직접 주입 → 렌더 부재.
         cards = [
@@ -14957,6 +15001,7 @@ class WebDiscoveryHubTest(unittest.TestCase):
         cls.single = cls._tmp / "single"
         _build_single(cls.single)
         cls.html = (cls.single / "findings" / "index.html").read_text(encoding="utf-8")
+        cls.en_html = (cls.single / "en" / "findings" / "index.html").read_text(encoding="utf-8")
         cls.browse = (cls.single / "findings" / "browse" / "index.html").read_text(encoding="utf-8")
         cls.landing = (cls.single / "index.html").read_text(encoding="utf-8")
         cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
@@ -15035,6 +15080,80 @@ class WebDiscoveryHubTest(unittest.TestCase):
     def test_recent_section_states_date_semantics(self):
         # 공개일≠실사일 — 숫자 해석에 필요한 정직성 고지는 워딩 스윕에서도 살아남는다.
         self.assertIn("문서가 공개된 날", self.browse)
+
+    # ── [검색엔진 인덱싱 2026-09-11] 검색 면(#fnd-results) 정적 목록 24건 ──────
+    # ★왜: findings.js 가 findings_search RPC 로 채우기 전까지 #fnd-results 는 빈
+    # div 라 구글 캐시가 "불러오는 중…" 한 줄만 봤다(2026-09-03 실측). 문서 단위 정적
+    # 페이지(3,310장)는 전부 색인되는데 정작 메인 진입면만 크롤러에 실체가 없었다.
+    # 타이브레이크가 위 5건 미리보기(slug)와 다르게 **document_id** 인 것은 지시서
+    # 계약 그대로다 — slug 도 document_id 파생값이라 실질적 순서 차이는 없다.
+    def test_search_shell_static_docs_24_newest_first(self):
+        docs = json.loads(render.FINDINGS_DOCS_FILE.read_text(encoding="utf-8"))["documents"]
+        ordered = sorted(docs, key=lambda d: d["document_id"])
+        ordered = sorted(ordered, key=lambda d: d["published_date"], reverse=True)
+        expected = ordered[:24]
+        hrefs = re.findall(r'class="fnd-rc-row fnd-static-item" href="\.\./findings/doc/([^/"]+)/"',
+                           self.html)
+        self.assertEqual(len(hrefs), 24)
+        self.assertEqual(hrefs, [d["slug"] for d in expected])
+        self.assertEqual(hrefs[0], expected[0]["slug"],
+                         "첫 항목은 최신 공개 문서를 가리켜야 한다")
+
+    def test_search_shell_static_docs_no_placeholder_leak(self):
+        block = fnd_results_block(self.html)
+        self.assertIsNone(re.search(r"\bNone\b", block), "정적 항목에 None 이 새면 안 된다")
+        self.assertIsNone(re.search(r"\bnan\b", block), "정적 항목에 nan 이 새면 안 된다")
+
+    def test_search_shell_static_heading_ko(self):
+        self.assertIn("최근 지적 문서 24건", fnd_results_block(self.html))
+
+    def test_en_search_shell_static_docs_english_pool_only(self):
+        """영어 면은 원문이 실제로 영어인 문서만(doc_is_english) — 한국어판과 다른
+        모집단이라 문서 집합·순서가 갈릴 수 있다(다국어 4단계와 동일 규율)."""
+        docs = json.loads(render.FINDINGS_DOCS_FILE.read_text(encoding="utf-8"))["documents"]
+        en_pool = [d for d in docs if render.doc_is_english(d)]
+        ordered = sorted(en_pool, key=lambda d: d["document_id"])
+        ordered = sorted(ordered, key=lambda d: d["published_date"], reverse=True)
+        expected = ordered[:24]
+        hrefs = re.findall(r'class="fnd-rc-row fnd-static-item" href="\.\./findings/doc/([^/"]+)/"',
+                           self.en_html)
+        self.assertEqual(len(hrefs), 24)
+        self.assertEqual(hrefs, [d["slug"] for d in expected])
+
+    def test_en_search_shell_static_heading_and_no_korean(self):
+        block = fnd_results_block(self.en_html)
+        self.assertIn("24 most recent documents", block)
+        self.assertIsNone(render._HANGUL_RE.search(block),
+                          "영어판 검색 면 정적 목록에 한국어가 남아 있으면 안 된다")
+        self.assertIsNone(re.search(r"\bNone\b", block), "정적 항목에 None 이 새면 안 된다")
+        self.assertIsNone(re.search(r"\bnan\b", block), "정적 항목에 nan 이 새면 안 된다")
+
+    def test_static_docs_are_just_initial_content_for_deep_links(self):
+        """딥링크(`?q=`·`?doc=`)는 findings.js 런타임 state 라 정적 셸엔 아무 흔적도
+        남지 않는다 — 정적 목록 추가가 그 계약을 건드리지 않았는지 소스로 확인한다."""
+        src = (WEB_DIR / "templates" / "findings.html").read_text(encoding="utf-8")
+        self.assertNotIn("request.args", src)
+        self.assertNotIn("?q=", src)
+
+    def test_findings_js_still_replaces_results_wholesale_on_first_render(self):
+        """findings.js 의 render() 는 여전히 `resultsEl.textContent = ""` 로 #fnd-results
+        를 통째로 비운 뒤 다시 채운다 — 정적 목록이 그 자리에 있어도 첫 성공 응답이
+        오면 자동으로 사라진다(별도 정리 코드 불필요). 이 가드가 깨지면 정적 목록과
+        라이브 결과가 함께 쌓여 화면에 중복 노출된다."""
+        fn = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        render_fn = js_function_body(fn, "  function render() {")
+        self.assertIn('resultsEl.textContent = "";', render_fn)
+        self.assertLess(render_fn.index('resultsEl.textContent = "";'),
+                        render_fn.index("resultsEl.appendChild(frag);"),
+                        "비우기가 채우기보다 먼저여야 정적 목록이 새 결과와 섞이지 않는다")
+
+    def test_findings_js_error_path_does_not_touch_results(self):
+        """RPC 가 실패하면(#fnd-error 노출) 정적 목록이 그대로 남아야 한다 — showState()
+        가 로딩/오류/빈결과 세 상태만 토글하고 #fnd-results 는 건드리지 않는 것이 그
+        근거다(오류 문구만 보이는 것보다 실체 있는 24건이 남는 편이 낫다)."""
+        fn = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        state_fn = js_function_body(fn, "  function showState(which) {")
+        self.assertNotIn("resultsEl", state_fn)
 
     # ── 소스 완전성(사용자 피드백 — "다른 정보도 있는데 왜 뺐는지") ─────────
     def test_docs_snapshot_covers_every_agency(self):
@@ -16609,6 +16728,10 @@ class WebEnBriefTest(unittest.TestCase):
                             "evidence_basis"):
                     v = c.get(key)
                     if v:
+                        # [D2 2026-09-11] evidence_basis 의 내부 토큰("Intake raw")은 tr() 전에
+                        # EVIDENCE_BASIS_LABELS 로 방문자 문구가 되므로, 실제로 tr() 을 타는 값을 본다.
+                        if key == "evidence_basis":
+                            v = render.EVIDENCE_BASIS_LABELS.get(str(v), str(v))
                         seen.add(str(v))
                 for f in c.get("facts") or []:
                     if f.get("label"):
@@ -19543,6 +19666,110 @@ class GlossaryFigures(unittest.TestCase):
                 frag = m.group(0)
                 self.assertNotRegex(frag, "[가-힣]", f"영어 그림 조각에 한글 잔존: {tid}")
                 self.assertIn("Illustration", frag, f"Illustration 라벨 누락: {tid}")
+
+
+class WebVisitorCopyFixSweepTest(unittest.TestCase):
+    """[D1·D3·D4·D5·D7 방문자 문구 5건 수리 2026-09-11] 손목록이 아니라 화면에 실제로
+    나가는 문자열로 검사한다(guard-asserts-proxy-not-property 교훈) — ko/en 골든 빌드와
+    소스 파일을 함께 본다.
+
+    D1 랜딩 Evidence 툴팁: A/B/C 정의가 카드 spec(§Evidence 판정)·findings.js
+    EVIDENCE_TITLE 과 어긋났다("B=2차 보도, C=추정·미확인") — 실제 계약은 인덱스+보조/
+    보조 단독이다.
+    D3 브리프 뷰 토글: 한국어 페이지에 영어 리터럴 "Full"/"Summary" 가 그대로 남아
+    있었다. ★"전체"는 이미 필터의 "All"에 쓰이는 키라(en.json) 그대로 재사용하면
+    en 빌드에서 토글이 "All"로 잘못 나간다 — 전용 문구(전체보기/요약보기)로 새 키를
+    쓴다.
+    D4 실사 등급: VAI/OAI 를 "경미한 지적"/"중대한 지적"으로 설명해 FDA 공식 정의
+    (VAI=자발적 시정으로 충분·OAI=규제 조치 필요)와 어긋났다. 분기 추이 문단의
+    "판정 강도가 안정적이었다는 뜻"이라는 해석도 제거 — 막대는 그 분기 실사 구성에
+    따라 달라질 뿐이다.
+    D5 검토상태 배지: accepted 라벨 "검토 완료"는 사람이 검토했다는 오해를 부른다
+    (실제로는 결정론 규칙 기반 자동 게이트 통과). 라벨을 바꾸고, 전체 공개 findings의
+    보편 상태라 카드 배지에서는 억제하되 필터 facet 라벨에는 남긴다.
+    D7 언어 전환: navmore-lang·grm-lang·langhint 링크가 정적 href 라 `?q=` 쿼리
+    상태에서 언어를 바꾸면 검색 상태를 잃었다 — DOMContentLoaded 보강 스크립트로
+    같은 사이트 링크에 한해 location.search/hash 를 이어 붙인다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_copyfix_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing_ko = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.landing_en = (cls.single / "en" / "index.html").read_text(encoding="utf-8")
+        cls.insp_ko = (cls.single / "findings" / "inspections" / "index.html").read_text(encoding="utf-8")
+        cls.insp_en = (cls.single / "en" / "findings" / "inspections" / "index.html").read_text(encoding="utf-8")
+        cls.base_src = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        cls.findings_js = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── D1 ──────────────────────────────────────────────────────────────────
+    def test_landing_evidence_tooltip_defines_b_c_correctly(self):
+        self.assertNotIn("2차 보도", self.landing_ko)
+        self.assertNotIn("추정·미확인", self.landing_ko)
+        self.assertIn("공식 인덱스", self.landing_ko)
+        self.assertIn("보조 자료 단독", self.landing_ko)
+        self.assertIn("official index", self.landing_en)
+        self.assertIn("secondary sources only", self.landing_en)
+        self.assertNotIn("secondary reporting", self.landing_en)
+
+    # ── D3 ──────────────────────────────────────────────────────────────────
+    def test_brief_view_toggle_is_localized_not_english_literal(self):
+        b = WebEnBriefTest._brief()
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_copyfix_brief_"))
+        try:
+            data = tmp / "data"
+            data.mkdir(parents=True)
+            pub = b["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(b, ensure_ascii=False), encoding="utf-8")
+            out = tmp / "site"
+            render.render_site(data, out, render_doc_pages=False)
+            ko = (out / "briefs" / pub / "index.html").read_text(encoding="utf-8")
+            en = (out / "en" / "briefs" / pub / "index.html").read_text(encoding="utf-8")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        # data-view 계약은 그대로(JS 는 이 속성으로 동작, 텍스트로 동작하지 않는다).
+        self.assertIn('data-view="full"', ko)
+        self.assertIn('data-view="summary"', ko)
+        self.assertNotIn(">Full<", ko, "한국어 페이지에 영어 리터럴 Full 이 그대로 남았다")
+        self.assertNotIn(">Summary<", ko, "한국어 페이지에 영어 리터럴 Summary 가 그대로 남았다")
+        self.assertIn("전체보기", ko)
+        self.assertIn("요약보기", ko)
+        self.assertIn(">Full<", en)
+        self.assertIn(">Summary<", en)
+
+    # ── D4 ──────────────────────────────────────────────────────────────────
+    def test_inspections_classification_matches_fda_official_definition(self):
+        self.assertIn("자발적 시정", self.insp_ko)
+        self.assertNotIn("경미한 지적", self.insp_ko)
+        self.assertNotIn("중대한 지적입니다", self.insp_ko)
+        self.assertNotIn("판정 강도가 안정적이었다는", self.insp_ko)
+        self.assertIn("voluntary correction", self.insp_en)
+        self.assertNotIn("severity of classifications", self.insp_en)
+
+    # ── D5 ──────────────────────────────────────────────────────────────────
+    def test_status_label_accepted_relabeled_and_card_badge_suppressed(self):
+        self.assertNotIn("검토 완료", self.findings_js)
+        self.assertIn('accepted: _t("자동 게이트 통과")', self.findings_js)
+        # 카드 배지 렌더 분기 — accepted 는 명시적으로 배지 생성에서 제외돼야 한다.
+        self.assertIn('row.review_status !== "accepted"', self.findings_js)
+        # facet 필터 라벨(ACTIVE_FILTER_DEFS·selectOptionLabel)은 STATUS_LABEL 을 그대로
+        # 참조하므로 값 자체만 바뀌면 자동으로 새 라벨을 쓴다 — 별도 배선 불필요.
+        self.assertIn('function (v) { return STATUS_LABEL[v] || v; }', self.findings_js)
+
+    # ── D7 ──────────────────────────────────────────────────────────────────
+    def test_language_switch_script_preserves_query_and_hash(self):
+        self.assertIn("navmore-lang", self.base_src)
+        self.assertIn('a[hreflang][rel="alternate"]', self.base_src)
+        self.assertIn("location.search", self.base_src)
+        self.assertIn("location.hash", self.base_src)
+        self.assertIn("DOMContentLoaded", self.base_src)
 
 
 if __name__ == "__main__":

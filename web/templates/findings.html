@@ -144,7 +144,30 @@
           동형 — hasDash 관례 참조). 상단 바는 목록을 다시 스크롤하지 않고 페이지를
           바꿀 수 있게 해준다(과거 "더 보기" 발견성 신고 대응과 같은 취지). -#}
       <nav class="fnd-pager" id="fnd-pager-top" aria-label="{{ _('검색 결과 페이지 이동') }}" hidden></nav>
-      <div id="fnd-results" class="fnd-results"></div>
+      {#- [검색엔진 인덱싱 2026-09-11] #fnd-results 정적 초안 — 최근 공개 문서 24건
+          (findings_docs.json 정본, render.py `_findings_hub_static_docs`). 구글이 이
+          면을 열었을 때 findings.js 의 findings_search RPC 응답 전이라도(혹은 크롤러가
+          fetch 를 아예 안 밟아도) 실체 있는 문서 목록을 보게 하는 것이 유일한 목적이다
+          (실측 2026-09-03: 구글 캐시가 "불러오는 중…" 한 줄뿐이었다). findings.js 는
+          첫 성공 응답에서 `resultsEl.textContent = ""` 로 이 영역을 통째로 비우고 다시
+          채운다(기존 render() 계약 — 이 목록은 그 순간까지만 존재하는 초기 콘텐츠).
+          실패 시(#fnd-error 노출)엔 아무 코드도 resultsEl 을 건드리지 않아 이 목록이
+          그대로 남는다 — "오류만 보이는 것"보다 낫다. 마크업은 둘러보기 면(findings_
+          browse.html)의 "최근 공개된 문서" 섹션과 같은 `.fnd-rc-*` 컴포넌트를 그대로
+          재사용한다(신규 시각 언어를 만들지 않는다 — 아래 CSS 도 그 사본). -#}
+      <div id="fnd-results" class="fnd-results">
+        {%- if static_docs %}
+        <p class="fnd-static-note">{{ _("최근 지적 문서 24건 — 검색·필터를 쓰면 실시간 결과로 바뀝니다") }}</p>
+        <div class="fnd-rc-list">
+          {%- for d in static_docs %}
+          <a class="fnd-rc-row fnd-static-item" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
+            <span class="fnd-rc-head"><span class="fnd-rc-date">{{ d.date }}</span><span class="fnd-rc-src">{{ d.src_label }}</span><span class="fnd-rc-firm">{{ d.firm }}</span>{% if d.cats %}<span class="fnd-rc-cats">{{ d.cats | join(" · ") }}</span>{% endif %}</span>
+            {%- if d.snippet %}<span class="fnd-rc-snippet">{{ d.snippet }}</span>{% endif %}
+          </a>
+          {%- endfor %}
+        </div>
+        {%- endif %}
+      </div>
       <nav class="fnd-pager" id="fnd-pager-bottom" aria-label="{{ _('검색 결과 페이지 이동') }}" hidden></nav>
     </section>
   </div>
@@ -371,6 +394,20 @@ main{word-break:keep-all;overflow-wrap:anywhere}
     있다 — 같은 쿼리를 여기 하나 더 만들면 그 블록의 첫 등장을 앵커로 쓰는
     WebFindingsRenderTest(test_pager_css_touch_target…)가 깨진다. -#}
 .fnd-results{display:flex;flex-direction:column;gap:14px}
+/* [검색엔진 인덱싱] #fnd-results 정적 초안(최근 문서 24건) — findings_browse.html 의
+   "최근 공개된 문서" `.fnd-rc-*` 컴포넌트를 그대로 옮긴다(신규 시각 언어 0, grm.css
+   무접촉 — 이 페이지 자체 스코프 <style> 안이라 §요구사항과 합치). */
+.fnd-static-note{font-size:12.5px;color:var(--muted);margin:0 0 4px;word-break:keep-all}
+.fnd-rc-list{display:flex;flex-direction:column}
+.fnd-rc-row{display:block;padding:12px 4px;border-top:1px solid var(--line);text-decoration:none}
+.fnd-rc-row:last-child{border-bottom:1px solid var(--line)}
+.fnd-rc-row:hover .fnd-rc-firm{color:var(--coral-2)}
+.fnd-rc-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.fnd-rc-date{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.fnd-rc-src{font-size:11.5px;font-weight:600;color:var(--body-s);background:var(--strong);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:2px 7px}
+.fnd-rc-firm{font-family:var(--serif);font-size:15.5px;color:var(--ink)}
+.fnd-rc-cats{font-size:12px;color:var(--muted);word-break:keep-all}
+.fnd-rc-snippet{display:block;margin-top:5px;font-size:13px;line-height:1.65;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
 /* [문서 중심 열람] 문서 카드 — 기존 .fnd-card 스타일 계열(보더/라운드/배경) 재사용,
    내부에 소속 observation 카드(.fnd-card, 무변경)를 그대로 담는다. */
 .fnd-doc{border:1px solid var(--line-2);border-radius:var(--rad);padding:20px 22px;background:var(--canvas)}

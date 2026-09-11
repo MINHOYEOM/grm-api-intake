@@ -752,6 +752,47 @@ class ForbiddenMarkdownGuardTest(unittest.TestCase):
         self.assertEqual(cs.assert_no_forbidden_markdown(card.markdown), [])
 
 
+class SplitSentencesKoreanDateTest(unittest.TestCase):
+    """D6 2026-09-11 — `_split_sentences`/`_truncate_at_sentence` 가 한국어 날짜
+    "2026. 4. 1." 의 내부 마침표를 문장 경계로 오인하지 않는다(08-31
+    admin-2026006476 실사례 — 인용에 "4." 한 조각만 남는 사고)."""
+
+    def test_korean_date_kept_whole_inside_first_sentence(self) -> None:
+        text = "동 업체는 2026. 4. 1. 처분을 받았다. 이후 회수를 진행했다."
+        segs = cs._split_sentences(text)
+        self.assertEqual(len(segs), 2, segs)
+        self.assertIn("2026. 4. 1. 처분을 받았다.", segs[0])
+        self.assertEqual(segs[1], "이후 회수를 진행했다.")
+
+    def test_digit_led_second_sentence_still_splits(self) -> None:
+        # ★트레이드오프: 마침표 뒤가 숫자라는 이유만으로(순수 lookahead) 전부 막으면
+        # 이 문장처럼 앞 토큰이 숫자가 아닌 정상 2문장까지 합쳐진다 — 그래서 규칙은
+        # "앞 토큰도 숫자(≤4자리)일 때만" 막도록 좁혔다(_is_protected_period 참조).
+        # 문장이 숫자로 시작하는 경우는 드물어 이 좁힌 규칙으로도 날짜 사고는 막힌다.
+        text = "기준 98% 미만. 2차 시험 실시."
+        segs = cs._split_sentences(text)
+        self.assertEqual(segs, ["기준 98% 미만.", "2차 시험 실시."])
+
+    def test_english_sentences_unaffected(self) -> None:
+        segs = cs._split_sentences("The firm failed. It recalled lots.")
+        self.assertEqual(segs, ["The firm failed.", "It recalled lots."])
+
+    def test_truncate_at_sentence_does_not_cut_inside_korean_date(self) -> None:
+        # limit(20)이 날짜 한가운데("2026. 4." 뒤·"1." 앞)에 떨어진다 — 옛 구현은 헤드
+        # 안의 마지막 마침표(날짜 내부)에서 잘라 "…2026. 4." 처럼 날짜가 끊긴 채 남았다.
+        # 날짜 내부 마침표는 경계가 아니므로 유효한 문장 경계가 head 안에 없고, 결과는
+        # 문장부호 없이 "…" 로만 끝나야 한다.
+        text = "동 업체는 2026. 4. 1. 처분을 받았다. 이후 회수를 진행했다."
+        truncated = cs._truncate_at_sentence(text, 20)
+        self.assertEqual(truncated, "동 업체는 2026. 4. 1. 처분…")
+        self.assertNotIn("…2026.", truncated)
+        self.assertNotIn("…2026. 4.", truncated)
+        # 대조: limit 이 첫 문장 전체(26자)를 담을 만큼 넉넉하되 둘째 문장까진 못 담으면
+        # 문장 경계(온전한 날짜 포함)에서 정확히 자른다.
+        truncated_full = cs._truncate_at_sentence(text, 30)
+        self.assertEqual(truncated_full, "동 업체는 2026. 4. 1. 처분을 받았다.")
+
+
 class ExcerptProseInputGoldenTest(unittest.TestCase):
     """WHY-1 #1/#2 — WHOPIR/WL excerpt 가 prose_input 에 반영되되 Evidence 는 불변(B).
 

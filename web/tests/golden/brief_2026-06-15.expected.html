@@ -56,13 +56,13 @@
         <summary><i class="ti ti-chevron-down toc-grp-chev" aria-hidden="true"></i><span class="toc-grp-label">Recall</span><span class="n">1</span></summary>        <a href="#recall-syn-merged">한국제약(주) 아세트아미노펜정 500mg 외 2품목</a>      </details>    </div></aside>
     <div id="cards" data-issue-no="2" data-date="2026-06-15"><div id="grm-brief-firm-cfg" data-url="" data-key="" data-root="../../" hidden></div>
       <div class="brief-bar" id="briefBar">
-        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">Full</button><button type="button" data-view="summary">Summary</button></div>
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">전체보기</button><button type="button" data-view="summary">요약보기</button></div>
         <div class="right"><span class="count">카드 <b>1</b>장</span></div>
       </div>      <h2 class="sec-h" id="sec-Recall"><i class="ti ti-alert-triangle" style="color:var(--coral);font-size:20px"></i>Recall <span class="n">1장</span></h2>
       <div class="sec-body" id="secbody-Recall"><article class="card evA" id="recall-syn-merged" data-card-type="회수·판매중지" data-signal-tier="2" data-evidence="A" data-firm-key="한국제약(주)">
   <div class="c-title"><span class="pre">[회수·판매중지 · MFDS]</span>한국제약(주) 아세트아미노펜정 500mg 외 2품목 — <b>함량부적합 자진회수</b></div>
   <div class="badges"><span class="b code ev">Evidence A</span><span class="b ag">MFDS</span><span class="b sig code"><span class="d" style="background:var(--med)"></span>Signal Med · T2</span><span class="b mod">💊 합성의약품</span><span class="b typ">회수</span></div>  <p class="summary"><a class="fd-term" href="../../glossary/assay/">함량</a>부적합(98% 미만) 확인에 따라 3개 품목을 자진 회수했다.</p>  <table class="facts">    <tr><td class="k">발행일</td><td class="v"><span class="mono">2026-06-12</span></td></tr>    <tr><td class="k">문서번호</td><td class="v"><span class="mono">recall-syn-merged</span></td></tr>    <tr><td class="k">업체</td><td class="v">한국제약(주)</td></tr>    <tr><td class="k">제품</td><td class="v">아세트아미노펜정 500mg 외 2품목</td></tr>    <tr><td class="k">회수 등급</td><td class="v">1등급</td></tr>  </table>  <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>전체 3품목</summary>
-    <ul class="facts2">      <li>아세트아미노펜정 500mg</li>      <li>아세트아미노펜정 325mg</li>      <li>이부프로펜정 200mg</li>    </ul></details>  <div class="block"><div class="lab"><i class="ti ti-quote"></i>원문</div>    <div class="quote"><div class="o">함량부적합(98% 미만) 확인에 따른 자진 회수</div></div>  </div>  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: Intake raw</span></div>
+    <ul class="facts2">      <li>아세트아미노펜정 500mg</li>      <li>아세트아미노펜정 325mg</li>      <li>이부프로펜정 200mg</li>    </ul></details>  <div class="block"><div class="lab"><i class="ti ti-quote"></i>원문</div>    <div class="quote"><div class="o">함량부적합(98% 미만) 확인에 따른 자진 회수</div></div>  </div>  <div class="block"><div class="lab"><i class="ti ti-list-details"></i>핵심 사실 <span class="sub">· 근거: 수집기가 보존한 공식 원문</span></div>
     <ul class="facts2">      <li>사유: 함량부적합(98% 미만)</li>      <li>조치: 자진 회수</li>    </ul></div>  <div class="imp"><div class="lab"><i class="ti ti-bulb"></i>시사점 <span class="sub">· 편집 해석</span></div><p>동일 성분·제형 품목의 함량 시험 이력을 점검할 필요가 있다.</p></div>  <div class="chk"><div class="lab"><i class="ti ti-checklist"></i>점검 사항</div><ul>    <li>함량 시험 <a class="fd-term" href="../../glossary/oos/">OOS</a> 이력 점검</li>    <li>회수 대상 <a class="fd-term" href="../../glossary/batch/">로트</a> 추적성 확인</li>  </ul></div>  <div class="src"><a href="https://nedrug.mfds.go.kr/pbp/CCBAI01" target="_blank" rel="noopener"><span class="t">공식원본</span><i class="ti ti-file-text"></i> 공식 페이지 <i class="ti ti-external-link" style="font-size:12px"></i></a></div><div class="grm-card-actions" data-anchor="recall-syn-merged">
     <button type="button" class="grm-ca" data-share aria-label="이 카드 공유하기"><i class="ti ti-share-2"></i><span class="grm-ca-t">공유</span></button>
   </div>
@@ -484,6 +484,18 @@ body.grm-has-share .grm-card-actions{display:flex}
   s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
   document.head.appendChild(s);
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
 </script>
 </body>
 </html>

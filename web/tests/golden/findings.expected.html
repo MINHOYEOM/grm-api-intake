@@ -114,7 +114,7 @@
         <div class="fnd-field"><label for="fnd-f-month">발행월</label><select id="fnd-f-month" data-key="month"><option value="">전체</option></select></div><div class="fnd-field"><label for="fnd-f-country">국가</label><select id="fnd-f-country" data-key="country"><option value="">전체</option></select></div>
         <div class="fnd-field fnd-field--sort"><label for="fnd-sort">정렬</label><select id="fnd-sort"><option value="date_desc">최신순</option><option value="date_asc">오래된순</option><option value="firm_asc">업체명순</option></select></div>
       </div>
-      <div class="fnd-active" id="fnd-active" hidden></div>
+      <div class="fnd-active" id="fnd-active" hidden></div>      <p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>
     </section><section class="fnd-dash" id="fnd-dash" aria-label="지적사항 현황 대시보드" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
       <button class="fnd-dash-toggle" id="fnd-dash-toggle" type="button" aria-expanded="true" aria-controls="fnd-dash-grid">세부 지표<i class="ti ti-chevron-down" aria-hidden="true"></i></button>
@@ -315,6 +315,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-active-x{color:var(--muted);font-size:13px;line-height:1}
 .fnd-active-chip:hover .fnd-active-x{color:var(--coral)}
 .fnd-active-clearall{font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:0 0 0 4px;cursor:pointer}
+/* [#804 본문 전용 검색] 원문 언어 공지 줄과 같은 자리·같은 톤 — 언어 트리 게이트 없음
+   (마크업도 lang 조건 밖에 있다, 위 findings.html 주석 참조). */
+.fnd-textonlynote{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin:12px 0 0;font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.fnd-textonlynote[hidden]{display:none}
+.fnd-textonlynote a{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);text-decoration:underline;text-underline-offset:2px}
+.fnd-textonlynote a:hover{color:var(--coral)}
 .fnd-active-clearall:hover{color:var(--coral)}
 /* [M2c] 1행이 좁아지면 열 수를 줄여 접는다 — 7개를 억지로 한 줄에 눌러 담으면 셀렉트가
    글자를 자른다. 4열/3열 모두 트랙이 균등해 옛 flex-wrap 처럼 마지막 항목만 덩그러니
@@ -601,7 +607,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=ac382148" defer></script>
-<script src="../assets/findings.js?v=c9ef8207" defer></script>
+<script src="../assets/findings.js?v=13677a8c" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

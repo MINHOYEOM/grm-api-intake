@@ -261,6 +261,10 @@ class PostFindingsSearchTest(unittest.TestCase):
         _args, kwargs = posted.call_args
         self.assertEqual(kwargs["json"], {
             "p_q": "GMP", "p_page": 1, "p_docs_per_page": 1, "p_orig_lang": "",
+            # [#804] 본문 전용 검색 — 082 마이그레이션의 p_text_only 를 항상 True 로 보내
+            # 분류 코드/라벨·document_id 등은 매치 대상에서 뺀다("화면과 같은 함수로 센다"
+            # 계약을 지키려면 카드 링크의 검색 모드와 이 스크립트의 집계 모드가 같아야 한다).
+            "p_text_only": True,
         })
         self.assertEqual(kwargs["headers"]["apikey"], _ANON_KEY)
         self.assertEqual(posted.call_args[0][0], f"{_BASE_URL}/rest/v1/rpc/findings_search")
@@ -306,6 +310,8 @@ class PostFindingsSearchTest(unittest.TestCase):
                                    orig_lang="en")
         self.assertEqual(got, (5, 3, ""))
         self.assertEqual(posted.call_args.kwargs["json"]["p_orig_lang"], "en")
+        # [#804] 영문 경로도 본문 전용으로 센다 — 언어축과 본문축은 독립이다.
+        self.assertIs(posted.call_args.kwargs["json"]["p_text_only"], True)
 
 
 class EnglishRefreshTest(unittest.TestCase):

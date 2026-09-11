@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=eb386f31" defer></script>
+<script src="/assets/i18n-en.js?v=cb61371c" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -94,7 +94,7 @@
         <div class="fnd-field"><label for="fnd-f-month">Month published</label><select id="fnd-f-month" data-key="month"><option value="">All</option></select></div><div class="fnd-field"><label for="fnd-f-country">Country</label><select id="fnd-f-country" data-key="country"><option value="">All</option></select></div>
         <div class="fnd-field fnd-field--sort"><label for="fnd-sort">Sort</label><select id="fnd-sort"><option value="date_desc">Newest first</option><option value="date_asc">Oldest first</option><option value="firm_asc">Company name</option></select></div>
       </div>
-      <div class="fnd-active" id="fnd-active" hidden></div>
+      <div class="fnd-active" id="fnd-active" hidden></div>      <p class="fnd-textonlynote" id="fnd-textonlynote" hidden></p>
       <p class="fnd-langnote" id="fnd-langnote" hidden></p>
     </section><section class="fnd-dash" id="fnd-dash" aria-label="Findings dashboard" hidden>
       <div class="fnd-dash-stats" id="fnd-dash-stats"></div>
@@ -296,6 +296,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-active-x{color:var(--muted);font-size:13px;line-height:1}
 .fnd-active-chip:hover .fnd-active-x{color:var(--coral)}
 .fnd-active-clearall{font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;padding:0 0 0 4px;cursor:pointer}
+/* [#804 본문 전용 검색] 원문 언어 공지 줄과 같은 자리·같은 톤 — 언어 트리 게이트 없음
+   (마크업도 lang 조건 밖에 있다, 위 findings.html 주석 참조). */
+.fnd-textonlynote{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin:12px 0 0;font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);word-break:keep-all}
+.fnd-textonlynote[hidden]{display:none}
+.fnd-textonlynote a{font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);text-decoration:underline;text-underline-offset:2px}
+.fnd-textonlynote a:hover{color:var(--coral)}
 /* [다국어 6단계] 원문 언어 공지 줄 — 적용 필터 칩 행과 같은 자리·같은 톤. grm.css 무접촉.
    마크업과 **같은 게이트**에 둔다: 한국어판에는 그 요소가 없으므로 규칙만 남으면
    "이건 왜 있나"가 되고, 한국어판 산출 바이트도 불필요하게 흔들린다. */
@@ -570,7 +576,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=ac382148" defer></script>
-<script src="../../assets/findings.js?v=c9ef8207" defer></script>
+<script src="../../assets/findings.js?v=13677a8c" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

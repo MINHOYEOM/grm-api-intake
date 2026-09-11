@@ -1803,7 +1803,10 @@ def build_glossary_view(
     동일). 숫자 포맷(천단위 쉼표)은 여기서 만든다(템플릿 필터는 로케일 영향을 받을 수
     있다). URL 인코딩은 _url_quote(q, safe="")(urllib.parse.quote 와 byte-동일 출력을
     자체 구현 — 순수성 게이트가 render.py 안의 urllib import 를 막는다. 결정론 — 한글
-    검색어 포함)."""
+    검색어 포함). [#804] case_href 끝에는 항상 `&text=1` 이 붙는다 — findings_search RPC
+    가 분류 코드/라벨·document_id 같은 메타 필드까지 매치해 카드의 N 이 부풀려지는 결함
+    (082 마이그레이션의 p_text_only) 수정의 화면쪽 절반이다. 붙이지 않으면 카드에 적힌
+    수와 눌렀을 때 나오는 결과 수가 다시 어긋난다."""
     # 관련 용어 칩의 라벨도 읽는 언어를 따른다 — 영어 화면에 한국어 표제어가 섞이면
     # 그 칩만 번역이 덜 된 것으로 읽힌다.
     label_by_id = {t["id"]: (t["term_ko"] if lang == DEFAULT_LANG else t["term_en"])
@@ -1899,10 +1902,15 @@ def build_glossary_view(
             # 영어판은 한글이 든 동의어만 더 걸러 낸다(위 head_norms/한글 판정 참조).
             "aliases": display_aliases,
             # [C1] 용어→사례 링크: glossary_cases.json 미제공/미매칭이면 전부 빈 값.
+            # [#804 본문 전용 검색] `&text=1` 을 붙여 findings.js 가 findings_search RPC를
+            # `p_text_only=true` 로 호출하게 한다(082 마이그레이션). glossary_cases_refresh.py
+            # 도 같은 파라미터로 이 숫자를 세므로, 클릭해서 나오는 결과가 카드에 적힌 N 과
+            # 다시 일치한다 — 링크 없이 파라미터만 빼면(분류 코드·document_id 등도 매치되는
+            # 기존 전체 검색으로 이동) 화면 숫자와 클릭 결과가 다시 어긋난다.
             "case_q": case_q,
             "case_findings": case_findings,
             "case_count_label": f"{case_findings:,}" if case_findings else "",
-            "case_href": (f"findings/index.html?q={_url_quote(case_q, safe='')}"
+            "case_href": (f"findings/index.html?q={_url_quote(case_q, safe='')}&text=1"
                           if case_q else ""),
         }
 

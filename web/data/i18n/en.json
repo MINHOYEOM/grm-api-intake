@@ -981,7 +981,7 @@
   "원자재·용기 시험 및 합부 판정": "Testing and approval or rejection of components and containers",
   "원자재·용기 일반 관리": "General control of components and containers",
   "월별 추이": "Monthly trend",
-  "위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 중대 지적(OAI)이 차지한 비율이에요 &mdash; 그 분기에 어떤 실사들이 섞였는지에 따라 달라집니다.": "The yearly table above uses the <b>fiscal year</b> (starting in October); this one uses <b>the date the inspection actually ended</b>. Each bar is the share of that quarter's inspections classified OAI &mdash; it varies with which inspections happened to fall in that quarter.",
+  "위 연도별 표는 <b>회계연도</b>(10월 시작) 기준이고, 여기는 <b>실사가 실제로 끝난 날</b> 기준입니다. 막대는 그 분기 실사 중 OAI(규제 조치 필요 판정)가 차지한 비율이에요 &mdash; 그 분기에 어떤 실사들이 섞였는지에 따라 달라집니다.": "The yearly table above uses the <b>fiscal year</b> (starting in October); this one uses <b>the date the inspection actually ended</b>. Each bar is the share of that quarter's inspections classified OAI &mdash; it varies with which inspections happened to fall in that quarter.",
   "위 조항 순위를 그대로 받아 조항마다 실제 지적 문장을 붙인 점검표를 만듭니다. 인쇄하거나 엑셀에 붙여 넣어 판정·근거를 채워 쓰세요.": "Takes the section ranking above and builds a checklist with a real finding sentence for each section. Print it or paste it into Excel and fill in your verdict and evidence.",
   "위반 {n}": "Violation {n}",
   "위반 {n}건": "{n} violations",

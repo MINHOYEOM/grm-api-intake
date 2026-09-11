@@ -7867,6 +7867,39 @@ class WebRenderHardeningTest(unittest.TestCase):
         h2 = self._render_detail(_minimal_brief("2026-06-02", ai_disclosure=True))
         self.assertIn("AI 자동 생성 안내", h2)
 
+    def test_evidence_basis_intake_raw_never_shown_to_visitors(self):
+        # [D2 2026-09-11] card_scaffold 는 Evidence A 카드에 계약 토큰 "Intake raw" 를
+        # evidence_basis 로 싣는다(§13, docs/GRM_card_spec_v16.md:287) — 이건 프로듀서
+        # 내부 명칭이지 방문자 문구가 아니다(08-31 발행분 21장 중 20장이 그대로 노출).
+        # 렌더가 EVIDENCE_BASIS_LABELS 로 방문자 문구로 바꿔야 하고, 원문 토큰은 ko/en
+        # 어느 쪽에도 화면에 남으면 안 된다. 영어 트리는 서사 다섯(en.*)과 브리프
+        # en.tldr 이 전부 있어야 서므로(brief_has_english) 최소로 채운다 — evidence_basis
+        # 는 서사 다섯이 아니라 카드 최상위 값 그대로 두 언어 트리에 공통으로 흐른다.
+        en_narrative = {"title_issue": "Test issue", "summary": "Test summary.",
+                        "implication": "Test implication.", "key_facts": ["Test key fact"],
+                        "checks": ["Test check"]}
+        b = _minimal_brief("2026-06-01", card={
+            "evidence_basis": "Intake raw",
+            "key_facts": ["시험 결과 부적합 확인"],
+            "en": en_narrative,
+        })
+        b["brief"]["en"] = {"tldr": ["Weekly summary."]}
+        out = self._render_site([b])
+        ko = (out / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+        en = (out / "en" / "briefs" / "2026-06-01" / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("Intake raw", ko)
+        self.assertNotIn("Intake raw", en)
+        self.assertIn("근거: 수집기가 보존한 공식 원문", ko)
+        self.assertIn("Basis: official source record kept by the collector", en)
+        # 대조: Evidence B 라벨은 그대로 방문자 문구라 손대지 않는다.
+        b2 = _minimal_brief("2026-06-02", card={
+            "evidence_basis": "공식 인덱스 + 보조 출처",
+            "key_facts": ["시험 결과 부적합 확인"],
+        })
+        out2 = self._render_site([b2])
+        ko2 = (out2 / "briefs" / "2026-06-02" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("근거: 공식 인덱스 + 보조 출처", ko2)
+
     def test_merged_into_member_excluded(self):
         # 적대 입력: 병합 멤버(merged_into)를 cards[]에 직접 주입 → 렌더 부재.
         cards = [
@@ -16688,6 +16721,10 @@ class WebEnBriefTest(unittest.TestCase):
                             "evidence_basis"):
                     v = c.get(key)
                     if v:
+                        # [D2 2026-09-11] evidence_basis 의 내부 토큰("Intake raw")은 tr() 전에
+                        # EVIDENCE_BASIS_LABELS 로 방문자 문구가 되므로, 실제로 tr() 을 타는 값을 본다.
+                        if key == "evidence_basis":
+                            v = render.EVIDENCE_BASIS_LABELS.get(str(v), str(v))
                         seen.add(str(v))
                 for f in c.get("facts") or []:
                     if f.get("label"):

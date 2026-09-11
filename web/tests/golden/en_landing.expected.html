@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/" />
-<script src="/assets/i18n-en.js?v=565da9bb" defer></script>
+<script src="/assets/i18n-en.js?v=eb386f31" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -100,9 +100,9 @@
         <div class="feat-prev"><div class="feat-prev-in feat-split" aria-hidden="true"><span class="fblock fact">Fact <span class="en">Fact</span></span><span class="fblock insight">Insight <span class="en">Insight</span></span></div></div></div>
       <div class="feat"><span class="no">03</span><div class="ic"><i class="ti ti-stack-2"></i></div><h3>Evidence and signal grading</h3><p>Every card carries an evidence grade (A, B, C) and a signal tier (1–3) at a glance, to help you set priorities.</p>
         <div class="feat-prev"><div class="feat-prev-in feat-grades">
-          <span class="grade ev" tabindex="0" title="Evidence A — primary basis confirmed by an official action or source document (B = secondary reporting, C = inferred or unconfirmed)" aria-label="Evidence A: primary basis confirmed by an official action or source document. B is secondary reporting; C is inferred or unconfirmed."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
+          <span class="grade ev" tabindex="0" title="Evidence A — confirmed from an official action or primary document (B = official index + secondary sources, check the original; C = secondary sources only)" aria-label="Evidence A: confirmed from an official action or primary document. B is an official index plus secondary sources (check the original), C is secondary sources only."><span class="enc"><i class="dot"></i><i class="dot"></i><i class="dot"></i></span>Evidence A</span>
           <span class="grade sig" tabindex="0" title="Signal T3 (highest) — high impact on operations, immediate check recommended (T2 = medium, T1 = for reference)" aria-label="Signal T3, highest: high impact on operations, immediate check recommended. T2 is medium; T1 is for reference."><span class="enc"><i class="bar b1"></i><i class="bar b2"></i><i class="bar b3"></i></span>Signal T3</span>
-          <span class="grade-tip t-ev" aria-hidden="true"><b>Evidence A</b> — primary basis confirmed by an official action or source document. <span class="dim">B = secondary reporting, C = inferred or unconfirmed.</span></span>
+          <span class="grade-tip t-ev" aria-hidden="true"><b>Evidence A</b> — confirmed from an official action or primary document. <span class="dim">B = official index + secondary sources (check the original), C = secondary sources only.</span></span>
           <span class="grade-tip t-sig" aria-hidden="true"><b>Signal T3 (highest)</b> — high impact on operations, immediate check recommended. <span class="dim">T2 = medium, T1 = for reference.</span></span>
         </div></div></div>
     </div>
@@ -363,6 +363,18 @@ body.grm-has-share .grm-card-actions{display:flex}
   s.setAttribute('data-cf-beacon','{"token": "b6f8cfa4058b4cfd864d743f79a5e05e"}');
   document.head.appendChild(s);
 })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!location.search && !location.hash) return;
+  var links = document.querySelectorAll('a.navmore-lang, a[hreflang][rel="alternate"]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i];
+    var href = a.getAttribute('href') || '';
+    if (!href || /^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) continue; // 외부/프로토콜-상대 href 는 손대지 않는다
+    if (href.indexOf('?') !== -1 || href.indexOf('#') !== -1) continue; // 이미 쿼리·해시가 있으면 덮지 않는다
+    a.setAttribute('href', href + location.search + location.hash);
+  }
+});
 </script>
 </body>
 </html>

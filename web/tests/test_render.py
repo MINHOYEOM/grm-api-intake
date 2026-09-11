@@ -19592,6 +19592,110 @@ class GlossaryFigures(unittest.TestCase):
                 self.assertIn("Illustration", frag, f"Illustration 라벨 누락: {tid}")
 
 
+class WebVisitorCopyFixSweepTest(unittest.TestCase):
+    """[D1·D3·D4·D5·D7 방문자 문구 5건 수리 2026-09-11] 손목록이 아니라 화면에 실제로
+    나가는 문자열로 검사한다(guard-asserts-proxy-not-property 교훈) — ko/en 골든 빌드와
+    소스 파일을 함께 본다.
+
+    D1 랜딩 Evidence 툴팁: A/B/C 정의가 카드 spec(§Evidence 판정)·findings.js
+    EVIDENCE_TITLE 과 어긋났다("B=2차 보도, C=추정·미확인") — 실제 계약은 인덱스+보조/
+    보조 단독이다.
+    D3 브리프 뷰 토글: 한국어 페이지에 영어 리터럴 "Full"/"Summary" 가 그대로 남아
+    있었다. ★"전체"는 이미 필터의 "All"에 쓰이는 키라(en.json) 그대로 재사용하면
+    en 빌드에서 토글이 "All"로 잘못 나간다 — 전용 문구(전체보기/요약보기)로 새 키를
+    쓴다.
+    D4 실사 등급: VAI/OAI 를 "경미한 지적"/"중대한 지적"으로 설명해 FDA 공식 정의
+    (VAI=자발적 시정으로 충분·OAI=규제 조치 필요)와 어긋났다. 분기 추이 문단의
+    "판정 강도가 안정적이었다는 뜻"이라는 해석도 제거 — 막대는 그 분기 실사 구성에
+    따라 달라질 뿐이다.
+    D5 검토상태 배지: accepted 라벨 "검토 완료"는 사람이 검토했다는 오해를 부른다
+    (실제로는 결정론 규칙 기반 자동 게이트 통과). 라벨을 바꾸고, 전체 공개 findings의
+    보편 상태라 카드 배지에서는 억제하되 필터 facet 라벨에는 남긴다.
+    D7 언어 전환: navmore-lang·grm-lang·langhint 링크가 정적 href 라 `?q=` 쿼리
+    상태에서 언어를 바꾸면 검색 상태를 잃었다 — DOMContentLoaded 보강 스크립트로
+    같은 사이트 링크에 한해 location.search/hash 를 이어 붙인다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_copyfix_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.landing_ko = (cls.single / "index.html").read_text(encoding="utf-8")
+        cls.landing_en = (cls.single / "en" / "index.html").read_text(encoding="utf-8")
+        cls.insp_ko = (cls.single / "findings" / "inspections" / "index.html").read_text(encoding="utf-8")
+        cls.insp_en = (cls.single / "en" / "findings" / "inspections" / "index.html").read_text(encoding="utf-8")
+        cls.base_src = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
+        cls.findings_js = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    # ── D1 ──────────────────────────────────────────────────────────────────
+    def test_landing_evidence_tooltip_defines_b_c_correctly(self):
+        self.assertNotIn("2차 보도", self.landing_ko)
+        self.assertNotIn("추정·미확인", self.landing_ko)
+        self.assertIn("공식 인덱스", self.landing_ko)
+        self.assertIn("보조 자료 단독", self.landing_ko)
+        self.assertIn("official index", self.landing_en)
+        self.assertIn("secondary sources only", self.landing_en)
+        self.assertNotIn("secondary reporting", self.landing_en)
+
+    # ── D3 ──────────────────────────────────────────────────────────────────
+    def test_brief_view_toggle_is_localized_not_english_literal(self):
+        b = WebEnBriefTest._brief()
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_copyfix_brief_"))
+        try:
+            data = tmp / "data"
+            data.mkdir(parents=True)
+            pub = b["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(b, ensure_ascii=False), encoding="utf-8")
+            out = tmp / "site"
+            render.render_site(data, out, render_doc_pages=False)
+            ko = (out / "briefs" / pub / "index.html").read_text(encoding="utf-8")
+            en = (out / "en" / "briefs" / pub / "index.html").read_text(encoding="utf-8")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        # data-view 계약은 그대로(JS 는 이 속성으로 동작, 텍스트로 동작하지 않는다).
+        self.assertIn('data-view="full"', ko)
+        self.assertIn('data-view="summary"', ko)
+        self.assertNotIn(">Full<", ko, "한국어 페이지에 영어 리터럴 Full 이 그대로 남았다")
+        self.assertNotIn(">Summary<", ko, "한국어 페이지에 영어 리터럴 Summary 가 그대로 남았다")
+        self.assertIn("전체보기", ko)
+        self.assertIn("요약보기", ko)
+        self.assertIn(">Full<", en)
+        self.assertIn(">Summary<", en)
+
+    # ── D4 ──────────────────────────────────────────────────────────────────
+    def test_inspections_classification_matches_fda_official_definition(self):
+        self.assertIn("자발적 시정", self.insp_ko)
+        self.assertNotIn("경미한 지적", self.insp_ko)
+        self.assertNotIn("중대한 지적입니다", self.insp_ko)
+        self.assertNotIn("판정 강도가 안정적이었다는", self.insp_ko)
+        self.assertIn("voluntary correction", self.insp_en)
+        self.assertNotIn("severity of classifications", self.insp_en)
+
+    # ── D5 ──────────────────────────────────────────────────────────────────
+    def test_status_label_accepted_relabeled_and_card_badge_suppressed(self):
+        self.assertNotIn("검토 완료", self.findings_js)
+        self.assertIn('accepted: _t("자동 게이트 통과")', self.findings_js)
+        # 카드 배지 렌더 분기 — accepted 는 명시적으로 배지 생성에서 제외돼야 한다.
+        self.assertIn('row.review_status !== "accepted"', self.findings_js)
+        # facet 필터 라벨(ACTIVE_FILTER_DEFS·selectOptionLabel)은 STATUS_LABEL 을 그대로
+        # 참조하므로 값 자체만 바뀌면 자동으로 새 라벨을 쓴다 — 별도 배선 불필요.
+        self.assertIn('function (v) { return STATUS_LABEL[v] || v; }', self.findings_js)
+
+    # ── D7 ──────────────────────────────────────────────────────────────────
+    def test_language_switch_script_preserves_query_and_hash(self):
+        self.assertIn("navmore-lang", self.base_src)
+        self.assertIn('a[hreflang][rel="alternate"]', self.base_src)
+        self.assertIn("location.search", self.base_src)
+        self.assertIn("location.hash", self.base_src)
+        self.assertIn("DOMContentLoaded", self.base_src)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

@@ -68,7 +68,7 @@
           무관하게 항상 계산되는 전역값이다(render.py render_site 참조). -#}
       <div id="grm-brief-firm-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" hidden></div>
       <div class="brief-bar" id="briefBar">
-        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">Full</button><button type="button" data-view="summary">Summary</button></div>
+        <div class="toggle" id="briefView"><span class="slider"></span><button type="button" data-view="full" class="on">{{ _("전체보기") }}</button><button type="button" data-view="summary">{{ _("요약보기") }}</button></div>
         <div class="right"><span class="count">{{ _("카드 <b>{n}</b>장", n=brief.coverage.rendered) }}</span></div>
       </div>
       {%- for section in sections %}

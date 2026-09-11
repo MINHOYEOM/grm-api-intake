@@ -904,7 +904,7 @@
   }
 
   var EVIDENCE_LABEL = { A: "Evidence A", B: "Evidence B", C: "Evidence C" };
-  var STATUS_LABEL = { needs_review: _t("검토 필요"), accepted: _t("검토 완료"), rejected: _t("반려") };
+  var STATUS_LABEL = { needs_review: _t("검토 필요"), accepted: _t("자동 게이트 통과"), rejected: _t("반려") };
   // [M13a] 배지 의미 툴팁 — 증거등급/검토상태가 "무엇을 뜻하는지" title 로 즉답한다
   // (setAttribute("title", ...) 뿐이라 XSS 무관). accepted 는 사람이 검토를 마쳤다는
   // 뜻이 아니라 결정론 규칙 기반 자동 승인이므로, 그렇게 오해될 문구는 쓰지 않는다.
@@ -1202,7 +1202,10 @@
       var reviewBadge = el("span", "fnd-b needs-review", STATUS_LABEL.needs_review);
       reviewBadge.setAttribute("title", STATUS_TITLE.needs_review);
       head.appendChild(reviewBadge);
-    } else if (row.review_status && STATUS_LABEL[row.review_status]) {
+    } else if (row.review_status && row.review_status !== "accepted" && STATUS_LABEL[row.review_status]) {
+      // [D5 배지 정리] accepted 는 전체 공개 findings 의 사실상 보편 상태(자동 게이트
+      // 통과)라 카드마다 반복해 붙이면 신호가 아니라 소음이다 — 필터 facet 라벨
+      // (STATUS_LABEL 자체·ACTIVE_FILTER_DEFS·selectOptionLabel)에서는 그대로 쓴다.
       var statusBadge = el("span", "fnd-b", STATUS_LABEL[row.review_status]);
       var statusTitle = STATUS_TITLE[row.review_status];
       if (statusTitle) statusBadge.setAttribute("title", statusTitle);

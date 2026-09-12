@@ -393,8 +393,8 @@
   <url><loc>https://grm-solutions.com/findings/clause/211-80/</loc><lastmod>2026-02-24</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/clause/211-84/</loc><lastmod>2026-08-04</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/clause/211-94/</loc><lastmod>2025-03-11</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/docs/</loc><lastmod>2026-09-04</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/docs/fda/2026/</loc><lastmod>2026-09-03</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/docs/</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/docs/fda/2026/</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/fda/2025/</loc><lastmod>2025-12-29</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/fda/2024/</loc><lastmod>2024-12-24</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/fda/2023/</loc><lastmod>2023-12-28</lastmod></url>
@@ -405,7 +405,7 @@
   <url><loc>https://grm-solutions.com/findings/docs/fda/2018/</loc><lastmod>2018-12-10</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/fda/2017/</loc><lastmod>2017-12-08</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/fda/2016/</loc><lastmod>2016-12-15</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/docs/hc/2026/</loc><lastmod>2026-07-14</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/docs/hc/2026/</loc><lastmod>2026-08-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/hc/2025/</loc><lastmod>2025-12-16</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/hc/2024/</loc><lastmod>2024-12-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/docs/hc/2023/</loc><lastmod>2023-12-19</lastmod></url>
@@ -1816,6 +1816,11 @@
   <url><loc>https://grm-solutions.com/findings/doc/fda483-194066/</loc><lastmod>2026-08-05</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/fda483-194143/</loc><lastmod>2026-08-12</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/fda483-194570/</loc><lastmod>2026-09-03</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/fda483-194601/</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/fda483-194602/</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/fda483-194603/</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/fda483-194617/</loc><lastmod>2026-09-10</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/fda483-194618/</loc><lastmod>2026-09-08</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/fda483-69958/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/fda483-69976/</loc><lastmod>2025-06-30</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/fda483-70106/</loc><lastmod>2024-01-17</lastmod></url>
@@ -3674,6 +3679,7 @@
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88677/</loc><lastmod>2026-03-25</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88713/</loc><lastmod>2026-04-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88714/</loc><lastmod>2026-04-16</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88746/</loc><lastmod>2026-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88755/</loc><lastmod>2026-04-01</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88760/</loc><lastmod>2026-04-07</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-88772/</loc><lastmod>2026-03-26</lastmod></url>
@@ -3714,6 +3720,7 @@
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89078/</loc><lastmod>2026-06-01</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89106/</loc><lastmod>2026-06-02</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89118/</loc><lastmod>2026-06-09</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89121/</loc><lastmod>2026-07-21</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89130/</loc><lastmod>2026-06-01</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89133/</loc><lastmod>2026-06-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89142/</loc><lastmod>2026-06-02</lastmod></url>
@@ -3726,17 +3733,30 @@
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89186/</loc><lastmod>2026-06-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89196/</loc><lastmod>2026-06-15</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89197/</loc><lastmod>2026-06-19</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89219/</loc><lastmod>2026-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89235/</loc><lastmod>2026-06-09</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89240/</loc><lastmod>2026-06-24</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89257/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89273/</loc><lastmod>2026-06-16</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89290/</loc><lastmod>2026-06-24</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89297/</loc><lastmod>2026-06-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89300/</loc><lastmod>2026-07-14</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89301/</loc><lastmod>2026-07-07</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89319/</loc><lastmod>2026-07-20</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89324/</loc><lastmod>2026-07-29</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89346/</loc><lastmod>2026-07-08</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89349/</loc><lastmod>2026-07-14</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89357/</loc><lastmod>2026-08-04</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89379/</loc><lastmod>2026-07-07</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89386/</loc><lastmod>2026-07-13</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89404/</loc><lastmod>2026-07-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89421/</loc><lastmod>2026-07-14</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89428/</loc><lastmod>2026-08-03</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89432/</loc><lastmod>2026-07-28</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89484/</loc><lastmod>2026-08-11</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89542/</loc><lastmod>2026-07-30</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89620/</loc><lastmod>2026-08-17</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/doc/hc-insp-89690/</loc><lastmod>2026-08-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/pak-packaging-26e063bb/</loc><lastmod>2024-07-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/1000098888-ontario-11daff95/</loc><lastmod>2024-10-04</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/10445517-canada-north-pharmaceuticals-dac-pharmaceuticals-9c90d1b2/</loc><lastmod>2025-03-13</lastmod></url>
@@ -3775,11 +3795,12 @@
   <url><loc>https://grm-solutions.com/findings/firm/americare-compounding-72897736/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/ameridose-79543990/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/amman-pharmaceutical-industries-9061dd57/</loc><lastmod>2025-03-06</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/amorepacific-canada-5620b237/</loc><lastmod>2026-07-28</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/anazaohealth-eaea45a5/</loc><lastmod>2025-09-02</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/andone-pharmaceutical-92e2b4c0/</loc><lastmod>2025-01-07</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/angita-pharma-4a370444/</loc><lastmod>2025-01-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/annovex-pharma-174fdff7/</loc><lastmod>2025-03-25</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/firm/apollo-care-9b3144c8/</loc><lastmod>2026-04-21</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/apollo-care-9b3144c8/</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/apollo-health-and-beauty-care-e66f5161/</loc><lastmod>2024-02-22</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/apotex-e17595ab/</loc><lastmod>2026-04-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/apotex-pharmachem-73578425/</loc><lastmod>2024-09-09</lastmod></url>
@@ -3803,7 +3824,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/bausch-lomb-8c19fa13/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/bausch-lomb-7f1caf58/</loc><lastmod>2023-06-06</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/bausch-health-companies-58d51b91/</loc><lastmod>2026-06-01</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/firm/baxter-fafbd186/</loc><lastmod>2025-02-10</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/baxter-fafbd186/</loc><lastmod>2026-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/baxter-healthcare-7329b6ad/</loc><lastmod>2026-03-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/baxter-oncology-34cf7fa1/</loc><lastmod>2026-02-02</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/baycare-integrated-service-center-3b41fa25/</loc><lastmod>2026-04-22</lastmod></url>
@@ -3826,6 +3847,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/brassica-pharma-6f499087/</loc><lastmod>2024-07-25</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/brenntag-canada-71ebc262/</loc><lastmod>2022-12-19</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/british-columbia-centre-for-disease-control-and-prevention-s-16ca30f8/</loc><lastmod>2023-07-20</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/brookfield-medical-surgical-supplies-90c15ddc/</loc><lastmod>2026-09-10</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/brookfield-medical-surgical-supply-36c9f626/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/bso-a94c0219/</loc><lastmod>2025-08-14</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/buderer-drug-f5deaa6c/</loc><lastmod>2024-01-17</lastmod></url>
@@ -3851,6 +3873,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/central-admixture-pharmacy-services-caps-a4b1b4ad/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/centre-de-recherche-sur-les-biotechnologies-marines-crbm-0eef3bd4/</loc><lastmod>2024-07-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/centre-hospitalier-universitaire-de-sherbrooke-6da300bb/</loc><lastmod>2025-05-27</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/cerapie-pharma-0903d566/</loc><lastmod>2026-07-21</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/cfp-acquisitions-50d695e9/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/charles-tennant-canada-c7a7f84a/</loc><lastmod>2026-04-16</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/chen-shwezin-park-compounding-pharmacy-6ae6bbe0/</loc><lastmod>2024-01-17</lastmod></url>
@@ -3875,7 +3898,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/customceutical-compounding-bd3213ff/</loc><lastmod>2019-04-30</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/dabur-india-7871bf6f/</loc><lastmod>2026-08-04</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/dalton-chemical-laboratories-o-a-dalton-pharma-services-17cbfec8/</loc><lastmod>2025-10-22</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/firm/delmar-chemicals-les-produits-chimiques-delmar-628f4280/</loc><lastmod>2023-09-26</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/delmar-chemicals-les-produits-chimiques-delmar-628f4280/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/delpharm-boucherville-canada-39060c94/</loc><lastmod>2026-03-09</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/delpharm-montr-al-13b4272e/</loc><lastmod>2024-04-22</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/delta-pharma-8729b019/</loc><lastmod>2024-05-21</lastmod></url>
@@ -3912,6 +3935,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/empower-clinic-services-6d7435c8/</loc><lastmod>2025-02-07</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/empower-clinic-services-empower-pharma-70fd91d3/</loc><lastmod>2026-01-27</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/empower-clinic-services-empower-pharmacy-733a1204/</loc><lastmod>2025-12-18</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/equimedconnect-c14fb35e/</loc><lastmod>2026-07-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/erfa-canada-2012-a9f8605d/</loc><lastmod>2023-01-16</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/est-e-lauder-cosmetics-3bbcffcf/</loc><lastmod>2026-05-06</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/eugia-pharma-specialities-5bba89dc/</loc><lastmod>2026-04-29</lastmod></url>
@@ -3983,6 +4007,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/hugel-4ae5806d/</loc><lastmod>2024-09-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/humn-pharmaceuticals-cc951301/</loc><lastmod>2026-04-09</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/hybrid-pharma-5a657b9c/</loc><lastmod>2024-01-25</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/hydrx-farms-86cf8c2e/</loc><lastmod>2026-08-04</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/hytn-cannabis-e3da35eb/</loc><lastmod>2026-03-02</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/ichor-cc0a4bdc/</loc><lastmod>2025-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/id-biomedical-of-quebec-e2297e11/</loc><lastmod>2024-07-22</lastmod></url>
@@ -4161,7 +4186,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/pancap-pharma-b39082af/</loc><lastmod>2026-02-09</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/patheon-7509a751/</loc><lastmod>2025-10-14</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/patheon-italia-spa-924295db/</loc><lastmod>2026-04-09</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/firm/pathogenia-b04122e8/</loc><lastmod>2023-12-13</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/pathogenia-b04122e8/</loc><lastmod>2026-08-03</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/pbg-biopharma-abb97a5f/</loc><lastmod>2022-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/pbr-laboratories-d458dc27/</loc><lastmod>2024-11-19</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/pci-pharma-services-canada-6e290139/</loc><lastmod>2024-06-25</lastmod></url>
@@ -4243,6 +4268,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/shields-pharma-db68afac/</loc><lastmod>2024-08-07</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/shilpa-medicare-f74b6344/</loc><lastmod>2026-01-15</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/shiseido-canada-bd63a2b8/</loc><lastmod>2023-08-02</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/sigma-life-sciences-0f943fc5/</loc><lastmod>2026-07-13</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/sincerus-florida-c41135c5/</loc><lastmod>2026-07-22</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/sivem-pharmaceuticals-ulc-4f389ad2/</loc><lastmod>2025-02-04</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/smith-nephew-821bfcd7/</loc><lastmod>2026-02-04</lastmod></url>
@@ -4262,6 +4288,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/stokes-healthcare-68d20135/</loc><lastmod>2024-03-22</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/stokes-healthcare-epicur-pharma-d9d00896/</loc><lastmod>2025-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/stonegate-pharmacy-917b5fbc/</loc><lastmod>2024-01-17</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/stratum-canada-8588420a/</loc><lastmod>2026-08-11</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/sun-pharma-canada-ca36c8ac/</loc><lastmod>2026-06-15</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/sun-pharmaceutical-industries-c4d824b9/</loc><lastmod>2026-03-30</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/sunstar-americas-9a2e2582/</loc><lastmod>2022-08-02</lastmod></url>
@@ -4288,7 +4315,7 @@
   <url><loc>https://grm-solutions.com/findings/firm/triad-isotopes-6086703d/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/triangle-compounding-b108de8b/</loc><lastmod>2024-01-17</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/trillium-health-care-products-912acd95/</loc><lastmod>2025-02-24</lastmod></url>
-  <url><loc>https://grm-solutions.com/findings/firm/turbare-manufacturing-ad458c48/</loc><lastmod>2026-07-14</lastmod></url>
+  <url><loc>https://grm-solutions.com/findings/firm/turbare-manufacturing-ad458c48/</loc><lastmod>2026-09-08</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/unichem-laboratories-ffb2e820/</loc><lastmod>2024-09-23</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/unico-holdings-dcbb7b03/</loc><lastmod>2025-06-20</lastmod></url>
   <url><loc>https://grm-solutions.com/findings/firm/unilab-analytical-services-c390a287/</loc><lastmod>2025-11-24</lastmod></url>
@@ -5830,6 +5857,11 @@
   <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194066/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194143/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194570/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194601/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194602/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194603/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194617/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/fda483-194618/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/fda483-69958/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/fda483-69976/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/fda483-70106/</loc></url>
@@ -7553,6 +7585,7 @@
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88677/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88713/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88714/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88746/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88755/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88760/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-88772/</loc></url>
@@ -7593,6 +7626,7 @@
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89078/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89106/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89118/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89121/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89130/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89133/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89142/</loc></url>
@@ -7605,17 +7639,30 @@
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89186/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89196/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89197/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89219/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89235/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89240/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89257/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89273/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89290/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89297/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89300/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89301/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89319/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89324/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89346/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89349/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89357/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89379/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89386/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89404/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89421/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89428/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89432/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89484/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89542/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89620/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/doc/hc-insp-89690/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/docs/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/docs/ema/2019/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/docs/ema/2020/</loc></url>
@@ -7685,6 +7732,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/americare-compounding-72897736/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/ameridose-79543990/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/amman-pharmaceutical-industries-9061dd57/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/amorepacific-canada-5620b237/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/anazaohealth-eaea45a5/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/andone-pharmaceutical-92e2b4c0/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/angita-pharma-4a370444/</loc></url>
@@ -7736,6 +7784,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/brassica-pharma-6f499087/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/brenntag-canada-71ebc262/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/british-columbia-centre-for-disease-control-and-prevention-s-16ca30f8/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/brookfield-medical-surgical-supplies-90c15ddc/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/brookfield-medical-surgical-supply-36c9f626/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/bso-a94c0219/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/buderer-drug-f5deaa6c/</loc></url>
@@ -7761,6 +7810,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/central-admixture-pharmacy-services-e9d30eec/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/centre-de-recherche-sur-les-biotechnologies-marines-crbm-0eef3bd4/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/centre-hospitalier-universitaire-de-sherbrooke-6da300bb/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/cerapie-pharma-0903d566/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/cfp-acquisitions-50d695e9/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/charles-tennant-canada-c7a7f84a/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/chen-shwezin-park-compounding-pharmacy-6ae6bbe0/</loc></url>
@@ -7822,6 +7872,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/empower-clinic-services-6d7435c8/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/empower-clinic-services-empower-pharma-70fd91d3/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/empower-clinic-services-empower-pharmacy-733a1204/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/equimedconnect-c14fb35e/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/erfa-canada-2012-a9f8605d/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/est-e-lauder-cosmetics-3bbcffcf/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/eugia-pharma-specialities-5bba89dc/</loc></url>
@@ -7893,6 +7944,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/hugel-4ae5806d/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/humn-pharmaceuticals-cc951301/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/hybrid-pharma-5a657b9c/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/hydrx-farms-86cf8c2e/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/hytn-cannabis-e3da35eb/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/ichor-cc0a4bdc/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/id-biomedical-of-quebec-e2297e11/</loc></url>
@@ -8154,6 +8206,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/shields-pharma-db68afac/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/shilpa-medicare-f74b6344/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/shiseido-canada-bd63a2b8/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/sigma-life-sciences-0f943fc5/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/sincerus-florida-c41135c5/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/sivem-pharmaceuticals-ulc-4f389ad2/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/smith-nephew-821bfcd7/</loc></url>
@@ -8173,6 +8226,7 @@
   <url><loc>https://grm-solutions.com/en/findings/firm/stokes-healthcare-68d20135/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/stokes-healthcare-epicur-pharma-d9d00896/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/stonegate-pharmacy-917b5fbc/</loc></url>
+  <url><loc>https://grm-solutions.com/en/findings/firm/stratum-canada-8588420a/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/sun-pharma-canada-ca36c8ac/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/sun-pharmaceutical-industries-c4d824b9/</loc></url>
   <url><loc>https://grm-solutions.com/en/findings/firm/sunstar-americas-9a2e2582/</loc></url>

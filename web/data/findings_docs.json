@@ -1,10 +1,10 @@
 {
  "schema_version": "grm-findings-docs/v1",
- "measured_on": "2026-09-05",
+ "measured_on": "2026-09-12",
  "min_findings": 3,
  "totals": {
-  "documents": 3310,
-  "findings": 21529
+  "documents": 3330,
+  "findings": 21642
  },
  "by_agency": [
   {
@@ -13,11 +13,11 @@
   },
   {
    "v": "FDA",
-   "c": 1759
+   "c": 1764
   },
   {
    "v": "HC",
-   "c": 1330
+   "c": 1345
   },
   {
    "v": "MFDS",
@@ -31,7 +31,7 @@
  "excluded": [
   {
    "reason": "국문 지적 3건 미만",
-   "documents": 2875
+   "documents": 2886
   },
   {
    "reason": "업체명 없음(숫자뿐이거나 빈 값)",
@@ -84511,6 +84511,271 @@
    ]
   },
   {
+   "document_id": "fda483-194601",
+   "slug": "fda483-194601",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "XeCare LLC",
+   "firm_key": "xecare",
+   "published_date": "2026-09-10",
+   "inspection_date": "2026-06-17",
+   "evidence_url": "https://www.fda.gov/media/194601/download",
+   "categories": [
+    "기타 품질시스템",
+    "오염/교차오염 관리",
+    "원자재/공급업체 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0118163ee12e4fc0a016c0d4",
+     "text_ko": "비무균 의약품 제조에 의약품용으로 의도되지 않은 원료를 사용했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Use of ingredients not intended for pharmaceutical use in non-sterile drug production."
+    },
+    {
+     "finding_id": "finding-3786281b254bbbc87dd4a430",
+     "text_ko": "교차오염을 방지하기 위한 적절한 봉쇄(containment), 구획, 작업대·기구·작업자에 대한 세척 조치 없이 위해성 의약품(hazardous drugs)을 제조했다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Hazardous drugs were produced without providing adequate containment, segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination."
+    },
+    {
+     "finding_id": "finding-daca0a57003d8d98a2746b34",
+     "text_ko": "자재가 ISO 5 등급에 미치지 못하는 공기에 노출됐다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Materials were exposed to lower than ISO 5 quality air."
+    }
+   ],
+   "inspector_names": [
+    "Kara J Wright",
+    "Logan T Williams"
+   ]
+  },
+  {
+   "document_id": "fda483-194602",
+   "slug": "fda483-194602",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "CD Pharmacy LLC dba Red Rock Pharmacy",
+   "firm_key": "cd pharmacy red rock pharmacy",
+   "published_date": "2026-09-10",
+   "inspection_date": "2026-07-31",
+   "evidence_url": "https://www.fda.gov/media/194602/download",
+   "categories": [
+    "무균보증/무균공정",
+    "기타 품질시스템",
+    "원자재/공급업체 관리",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-17e4ce959c2d106a4d7bcbdd",
+     "text_ko": "최악 조건(worst-case)에서 가장 까다롭고 가혹한 조건으로 무균공정(aseptic) 제조 작업을 밀접하게 모사하는 배지충전(media fill)을 수행하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressfol conditions."
+    },
+    {
+     "finding_id": "finding-310ac02c530de3a66b1172c8",
+     "text_ko": "작업자가 장갑을 낀 손으로 ISO 5 구역 밖의 장비나 그 밖의 표면을 접촉한 뒤, 장갑을 교체하거나 소독하지 않고 무균공정(aseptic processing)을 계속 수행하는 것이 관찰됐다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Personnel were observed touching equipment or other surfaces located outside of the ISO S area with gloved hands and then proceeding with aseptic processing without changing or sanitizing gloves."
+    },
+    {
+     "finding_id": "finding-38aee95e85c334ce0617d170",
+     "text_ko": "적절한 봉쇄(containment) 조치 없이 위해성 의약품(hazardous drugs)을 제조했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Hazardous drugs were produced without providing adequate containment."
+    },
+    {
+     "finding_id": "finding-51c9efd814ac691f42378802",
+     "text_ko": "표방하거나 표시된 것과 함량이 다르거나, 순도 또는 품질이 그에 미치지 못하는 의약품을 출하했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Your firm released drug product in which the strength differs from, or its purity or quality falls below, that which it purports or is represented to possess."
+    },
+    {
+     "finding_id": "finding-640419d49dff72bd013aaa4f",
+     "text_ko": "동적 조건(dynamic conditions)에서의 기류가시화 시험(smoke study)을 부적절하게 수행했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Smoke studies were inadequately perfomed under dynamic conditions."
+    },
+    {
+     "finding_id": "finding-77f4328d04cdddfe963d5fa4",
+     "text_ko": "자재가 ISO 5 등급에 미치지 못하는 공기에 노출됐다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Materials were exposed to lower than ISO 5 quality air."
+    },
+    {
+     "finding_id": "finding-90dd26765c7f96232be23f21",
+     "text_ko": "작업자가 ISO 5 구역에서 first air(1차 공기)의 흐름이 차단되거나 교란된 상태로 무균조작(aseptic manipulation)을 수행하는 것이 관찰됐다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Personnel were observed conducting aseptic manipulations where the movement of\"first air\" in tHE ISO 5 area is blocked or disrupted."
+    },
+    {
+     "finding_id": "finding-d61b676c8daf7bdea279ef2d",
+     "text_ko": "작업자가 오염을 방지하기 위한 장갑 소독을 부적절하게 수행했다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Personnel inadequately sanitized gloves to prevent contamination."
+    },
+    {
+     "finding_id": "finding-eb09cd407ecff366ce24e95b",
+     "text_ko": "의약품 멸균에 사용한 필터에 대한 사용 후 필터 완전성 시험(filter integrity test)이 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Inadequate post-use filter-integrity testing on filters used to sterilize drug products."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-194603",
+   "slug": "fda483-194603",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Brookfield Medical Surgical Supplies Inc",
+   "firm_key": "brookfield medical surgical supplies",
+   "published_date": "2026-09-10",
+   "inspection_date": "2026-07-10",
+   "evidence_url": "https://www.fda.gov/media/194603/download",
+   "categories": [
+    "품질부서 관리감독",
+    "무균보증/무균공정",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0c3d603741c0df2e21a7f886",
+     "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차를 완전히 준수하지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
+    },
+    {
+     "finding_id": "finding-34839d536d53485c71e67a02",
+     "text_ko": "무균이라고 표방하는 의약품의 미생물 오염을 방지하기 위해 마련된 절차를 준수하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not followed."
+    },
+    {
+     "finding_id": "finding-4c51bc4f58d6b14c5f7e130f",
+     "text_ko": "설명되지 않은 불일치(discrepancy), 그리고 배치 또는 그 구성 성분이 규격에 적합하지 않은 사례를 해당 배치의 출하 여부와 관계없이 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    }
+   ],
+   "inspector_names": [
+    "Sangeeta M Khurana"
+   ]
+  },
+  {
+   "document_id": "fda483-194617",
+   "slug": "fda483-194617",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Apollo Care LLC",
+   "firm_key": "apollo care",
+   "published_date": "2026-09-10",
+   "inspection_date": "2026-07-28",
+   "evidence_url": "https://www.fda.gov/media/194617/download",
+   "categories": [
+    "일탈/CAPA/조사",
+    "무균보증/무균공정",
+    "원자재/공급업체 관리",
+    "규제보고/변경관리",
+    "설비/시설",
+    "품질부서 관리감독"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-113f43376bbc02dcd79b41d5",
+     "text_ko": "(반복 지적) 설명되지 않은 불일치(discrepancy), 그리고 배치 또는 그 구성 성분이 규격에 적합하지 않은 사례를 해당 배치의 출하 여부와 관계없이 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "(Repeat) There is a failure to thoroughly review any unexplained discrepancy, the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-27519be1c3aadd74be108587",
+     "text_ko": "(반복 지적) 적절한 규모로 명확히 구획된 구역 내에서 작업을 수행하지 않았고, 무균공정(aseptic processing) 구역에서 오염 또는 혼동을 방지하는 데 필요한 분리·구획된 구역이나 그 밖의 관리 체계를 갖추지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "(Repeat) Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas."
+    },
+    {
+     "finding_id": "finding-6812774b8d47bee55de88b57",
+     "text_ko": "각 원료가 순도·함량·품질에 대한 모든 해당 문서화된 규격에 적합한지 시험하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Each component is not tested for confonnity with all appropriate written specifications for purity, strength, and quality."
+    },
+    {
+     "finding_id": "finding-791b3be888fe50b5b4e825ce",
+     "text_ko": "(반복 지적) 무균이라고 표방하는 의약품의 미생물 오염을 방지하기 위한 적절한 문서화된 절차, 즉 모든 무균공정(aseptic) 및 멸균공정의 밸리데이션을 포함하는 절차를 수립하고 준수하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "(Repeat) Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes."
+    },
+    {
+     "finding_id": "finding-81dea714155559cb41fe7695",
+     "text_ko": "귀사의 외주조제시설(outsourcing facility)은 section 5038에 따라 조제에 사용할 수 없는 원료의약품(bulk drug substance)을 사용해 의약품을 조제하고 있다. 해당 원료의약품은 (a) Act section 506E에 따라 시행 중인 공급부족 의약품 목록(drug shortage list)에 등재된 의약품의 조제에 사용되지 않으며, (b) FDA가 임상적 필요(clinical need)가 있다고 인정해 작성한 원료의약품 목록에도 등재되어 있지 않다.",
+     "category_label_ko": "규제보고/변경관리",
+     "text_orig": "Your outsourcing facility compounds drug products using bulk drug substances that cannot be used in compounding under section 5038 because they (a) are not used to compound drug products that appear on the drug shortage list in effect under section 506E of the Act and (b) do not appear on a list developed by FDA of bulk drug substances for which there is a clinical need.",
+     "cfr_refs": [
+      "section 5038",
+      "section 506"
+     ]
+    },
+    {
+     "finding_id": "finding-8d89ab1f52fe31f773d7c4a2",
+     "text_ko": "(반복 지적) 의약품의 제조·가공·포장·보관에 사용되는 건물이 세척, 유지관리 및 적절한 작업이 용이하도록 적합하게 구조화되거나 배치되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "(Repeat) Buildings used in the manufacture, processing, packing, or holding of a drug do not have the suitable construction and location to facilitate cleaning, maintenance, and proper operations."
+    },
+    {
+     "finding_id": "finding-dba88d6e699bff7695baf2ac",
+     "text_ko": "품질관리부서(quality control unit)가 모든 원료, 의약품 용기, 마개, 공정중간품, 포장재, 표시기재를 승인 또는 불합격 처리할 책임과 권한을 확보하지 못했다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "There is a failure of the quality control unit to secure their responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging material, labeling."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-194618",
+   "slug": "fda483-194618",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Turbare Manufacturing",
+   "firm_key": "turbare manufacturing",
+   "published_date": "2026-09-08",
+   "inspection_date": "2026-05-07",
+   "evidence_url": "https://www.fda.gov/media/194618/download",
+   "categories": [
+    "품질부서 관리감독",
+    "무균보증/무균공정",
+    "일탈/CAPA/조사",
+    "교육/작업자"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-16dfb03bf9ea44853cf78659",
+     "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
+    },
+    {
+     "finding_id": "finding-8f466e479808a498989b88db",
+     "text_ko": "무균(sterile)을 표방하는 의약품의 미생물 오염을 방지하기 위해 마련된 절차가 준수되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not followed."
+    },
+    {
+     "finding_id": "finding-f3917f6858f7fb7e857e4d15",
+     "text_ko": "설명되지 않은 불일치(discrepancy)와, 배치 또는 그 구성 원료가 규격에 적합하지 않은 사례에 대해, 해당 배치의 출하 여부와 관계없이 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-f8d8417edee6d5ad6376ea49",
+     "text_ko": "제조 작업자가 적절한 위생 및 건강 관리 습관을 준수하지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Production personnel were not practicing good sanitation and health habits."
+    }
+   ],
+   "inspector_names": [
+    "Sangeeta M Khurana"
+   ]
+  },
+  {
    "document_id": "fda483-69958",
    "slug": "fda483-69958",
    "agency": "FDA",
@@ -126159,6 +126424,7 @@
    "categories": [
     "공정밸리데이션",
     "기타 품질시스템",
+    "설비/시설",
     "컴퓨터화시스템"
    ],
    "findings": [
@@ -126177,7 +126443,7 @@
     {
      "finding_id": "finding-94dd7cea60fcc9b4a4ec855b",
      "text_ko": "[시설 및 장비/기타] [별표 18] 4.2.2 '청소 및 소독' 항목과 관련하여, 제조소 총람에서 청소 및 소독에 관한 내용을 확인할 수 없었다.",
-     "category_label_ko": "기타 품질시스템",
+     "category_label_ko": "설비/시설",
      "text_orig": "시설 및 장비 기타 [별표 18] 4.2.2 청소 및 소독 제조소 총람 중 청소 및 소독에 관한 내용을 확인할 수 없었음."
     },
     {
@@ -126202,7 +126468,8 @@
     "설비/시설",
     "세척밸리데이션",
     "일탈/CAPA/조사",
-    "기타 품질시스템"
+    "기타 품질시스템",
+    "시험실/품질관리"
    ],
    "findings": [
     {
@@ -126232,7 +126499,7 @@
     {
      "finding_id": "finding-d4d3b8dc0420a4aa96087f04",
      "text_ko": "시험실 관련 기타 항목이다. [별표 1] 7.1과 관련하여, 시약 및 표준품 등의 사용기한 설정 근거를 마련하고 관리할 것이 지적되었다.",
-     "category_label_ko": "기타 품질시스템",
+     "category_label_ko": "시험실/품질관리",
      "text_orig": "시험실 기타 [별표 1] 7.1 시약 및 표준품 등의 사용기한 설정 근거를 마련하고 관리할 것"
     }
    ]
@@ -126368,6 +126635,7 @@
    "categories": [
     "세척밸리데이션",
     "밸리데이션/적격성평가",
+    "설비/시설",
     "안정성/보관"
    ],
    "findings": [
@@ -126398,7 +126666,7 @@
     {
      "finding_id": "finding-a534634de060f8445d97348a",
      "text_ko": "시설·장비 부문 지적사항이다. [별표 1] 2.2에 따라 자동화장치 등의 모든 기록을 저장 및 보관해야 한다.",
-     "category_label_ko": "안정성/보관",
+     "category_label_ko": "설비/시설",
      "text_orig": "시설장비 기타 [별표 1] 2.2 자동화장치 등 모든 기록은 저장 및 보관할 것"
     },
     {
@@ -126429,7 +126697,8 @@
     "데이터 완전성",
     "문서화/기록관리",
     "기타 품질시스템",
-    "안정성/보관"
+    "안정성/보관",
+    "시험실/품질관리"
    ],
    "findings": [
     {
@@ -126459,7 +126728,7 @@
     {
      "finding_id": "finding-ba939816334310d5f5df3bed",
      "text_ko": "시험실 분야 지적사항으로, [별표 1] 7.1 및 [별표 1의2] 11.1에 따라 표준품, 중요 시약 등에 대한 관리 상황을 기록할 것을 요구했다.",
-     "category_label_ko": "기타 품질시스템",
+     "category_label_ko": "시험실/품질관리",
      "text_orig": "시험실 기타 [별표 1] 7.1 [별표 1의2] 11.1 표준품, 중요 시약 등에 대한 관리 상황을 기록할 것"
     },
     {
@@ -126487,9 +126756,7 @@
    "inspection_date": "2026-01-30",
    "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q1fmUkaKmS",
    "categories": [
-    "설비/시설",
-    "밸리데이션/적격성평가",
-    "기타 품질시스템"
+    "설비/시설"
    ],
    "findings": [
     {
@@ -126501,19 +126768,19 @@
     {
      "finding_id": "finding-956e5b4f38fa86c33f221ac1",
      "text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 적격성평가(qualification) 수행 시 작동 범위를 포함하여 실시할 것을 요구했다.",
-     "category_label_ko": "밸리데이션/적격성평가",
+     "category_label_ko": "설비/시설",
      "text_orig": "시설장비 기타 [별표 1] 2.1 적격성평가 수행 시 작동 범위를 포함하여 실시할 것"
     },
     {
      "finding_id": "finding-95ba474d72a9714a18c003ee",
      "text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 정제수 시스템의 필터에 대한 적합성을 정기적으로 확인할 것을 요구했다.",
-     "category_label_ko": "기타 품질시스템",
+     "category_label_ko": "설비/시설",
      "text_orig": "시설장비 기타 [별표 1] 2.1 정제수 시스템의 필터에 대한 적합 성을 정기적으로 확인할 것"
     },
     {
      "finding_id": "finding-f2a1b676c4814e7e7dd23144",
      "text_ko": "시설장비 분야 지적사항으로, [별표 1] 2.1에 따라 칭량작업에 사용하는 저울의 실제 사용 범위를 고려하여 일일점검을 수행할 것을 요구했다.",
-     "category_label_ko": "기타 품질시스템",
+     "category_label_ko": "설비/시설",
      "text_orig": "시설장비 기타 [별표 1] 2.1 칭량작업에 사용하는 저울의 실제 사용 범위를 고려하여 일일점검을 수행할 것"
     },
     {
@@ -202378,6 +202645,70 @@
    ]
   },
   {
+   "document_id": "hc-insp-88746",
+   "slug": "hc-insp-88746",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Baxter Corporation",
+   "firm_key": "baxter",
+   "published_date": "2026-08-11",
+   "inspection_date": "2026-08-11",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=88746",
+   "categories": [
+    "품질부서 관리감독",
+    "설비/시설",
+    "일탈/CAPA/조사",
+    "기타 품질시스템",
+    "안정성/보관",
+    "불만/회수",
+    "표시/포장"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0055d7bd3e0d56b2f32276d4",
+     "text_ko": "연간제품품질평가(annual product quality review) 절차가 부적절했다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The annual product quality review procedure was inadequate."
+    },
+    {
+     "finding_id": "finding-6408fa109b9234287b4041b7",
+     "text_ko": "제조, 포장, 표시기재, 필수 시험, 보관, 유통 및 각각의 조건에 관한 증빙의 유지관리가 부적절했다. 문서를 사업장 내에서 확인할 수 없었다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The maintenance of evidence was inadequate for manufacturing, packaging, labelling, required testing, storage, and/or distribution, including the respective conditions. Documents were not available on the premises."
+    },
+    {
+     "finding_id": "finding-69de4df07518022c561d0def",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및 후속조치가 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate."
+    },
+    {
+     "finding_id": "finding-71373fad8b01503ed8aeac7b",
+     "text_ko": "완제품 규격 적합성을 입증하는 데 필요한 증빙이 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The evidence required to demonstrate compliance with finished product specifications was inadequate."
+    },
+    {
+     "finding_id": "finding-86e4c8966c3e2ad0e28365ab",
+     "text_ko": "의약품에 대한 지속적 안정성시험 프로그램(ongoing stability program)이 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The ongoing stability program for a drug was inadequate."
+    },
+    {
+     "finding_id": "finding-dad53fdc2967b518d7db04e8",
+     "text_ko": "불만(complaint) 및 결함 가능성이 있는 제품에 관한 그 밖의 정보에 대한 평가, 기록, 후속조치 및 조사가 부적절했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate."
+    },
+    {
+     "finding_id": "finding-dc970413dab84c3a612bee74",
+     "text_ko": "포장 이후 및 수입자 사업장 입고 이후 각 의약품 배치의 확인(positive identification)이 부적절했다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "The positive identification of each batch of drug after the packaging and/or after it was received on the importer's premises was inadequate."
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-88755",
    "slug": "hc-insp-88755",
    "agency": "HC",
@@ -204604,6 +204935,56 @@
    ]
   },
   {
+   "document_id": "hc-insp-89121",
+   "slug": "hc-insp-89121",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Cerapie Pharma Inc.",
+   "firm_key": "cerapie pharma",
+   "published_date": "2026-07-21",
+   "inspection_date": "2026-07-21",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89121",
+   "categories": [
+    "컴퓨터화시스템",
+    "기타 품질시스템",
+    "세척밸리데이션",
+    "안정성/보관",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-04c98d7cf9c1f93ef6d45c97",
+     "text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및 적격성평가(qualification)가 부적절했다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate."
+    },
+    {
+     "finding_id": "finding-11740ac5087662ca55f46a49",
+     "text_ko": "우수의약품제조·품질관리기준(GMP) 관련 표준작업지침서(SOP)의 관리가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The handling of standard operating procedures for good manufacturing practices was inadequate."
+    },
+    {
+     "finding_id": "finding-4ad16a75e1f0cf3481fbfa3f",
+     "text_ko": "세척절차의 실행, 효과성 및 밸리데이션이 비위생적 상태를 방지하기에 부적절했다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions."
+    },
+    {
+     "finding_id": "finding-52e1303d927b37d77883836e",
+     "text_ko": "온도 및 습도 관리가 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The temperature and/or humidity control was inadequate."
+    },
+    {
+     "finding_id": "finding-95d48d6d53032bab04853868",
+     "text_ko": "사업장이 오염을 방지하도록 설계·건축·운영·유지관리되지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination."
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-89130",
    "slug": "hc-insp-89130",
    "agency": "HC",
@@ -205252,6 +205633,56 @@
    ]
   },
   {
+   "document_id": "hc-insp-89219",
+   "slug": "hc-insp-89219",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "3DM Group (Division of 171840 Canada Inc.)",
+   "firm_key": "3dm group (division of 171840 canada )",
+   "published_date": "2026-08-11",
+   "inspection_date": "2026-08-11",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89219",
+   "categories": [
+    "일탈/CAPA/조사",
+    "시험실/품질관리",
+    "원자재/공급업체 관리",
+    "컴퓨터화시스템",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-13c0ee2bf237495ce55289e3",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및 후속조치가 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate."
+    },
+    {
+     "finding_id": "finding-5604d13ae29fbf08496a7280",
+     "text_ko": "품질관리부서가 GMP 문서 및 표준작업지침서(SOP)를 승인하거나 서명·날짜 기재하지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The quality control department did not approve, sign, and/or date the good manufacturing practices documents and/or the standard operating procedures."
+    },
+    {
+     "finding_id": "finding-ab739bb15937d3bdcaed2ea8",
+     "text_ko": "사전 승인된 문서화된 절차 또는 지시에 따른 원료, 제품, 포장재의 취급이 부적절했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "The handling of raw materials, products, or packaging materials in keeping with pre-approved written procedures or instructions was inadequate."
+    },
+    {
+     "finding_id": "finding-c594479e73772c59016cf19f",
+     "text_ko": "주요 공정 및 시험 작업에 사용되는 장비에 대한 예방정비(preventive maintenance) 체계가 수립되어 있지 않았다. 전산화 시스템을 포함한 장비의 교정, 점검 및 적격성평가(qualification)가 부적절했다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "A preventative maintenance system had not been established for the equipment used in significant processing and/or testing operations The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate."
+    },
+    {
+     "finding_id": "finding-d25605ef0e5e66fa5043c554",
+     "text_ko": "문서화된 자체점검(self-inspection) 절차가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The written self-inspection procedure was inadequate."
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-89235",
    "slug": "hc-insp-89235",
    "agency": "HC",
@@ -205360,6 +205791,101 @@
      "text_ko": "작업소가 해충 및/또는 이물이 건물 내로 유입되는 것을 방지하도록 설계·건축 및/또는 유지관리되지 않았다.",
      "category_label_ko": "설비/시설",
      "text_orig": "The premises were not designed, constructed, and/or maintained to prevent the entry of pests and/or foreign material into the building."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89257",
+   "slug": "hc-insp-89257",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Delmar Chemicals Inc./Les Produits Chimiques Delmar Inc.",
+   "firm_key": "delmar chemicals /les produits chimiques delmar",
+   "published_date": "2026-07-13",
+   "inspection_date": "2026-07-13",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89257",
+   "categories": [
+    "기타 품질시스템",
+    "오염/교차오염 관리",
+    "컴퓨터화시스템",
+    "원자재/공급업체 관리",
+    "설비/시설",
+    "일탈/CAPA/조사",
+    "시험실/품질관리",
+    "교육/작업자"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-08ca7d0633e0c009936a646b",
+     "text_ko": "기록의 추적성(traceability), 가독성, 문서화, 서식 및/또는 정확성이 미흡했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate."
+    },
+    {
+     "finding_id": "finding-0946f37c192ace99fe332502",
+     "text_ko": "위생관리 프로그램(sanitation program)이 오염 위험을 파악 및/또는 저감하도록 적절히 설계되지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination."
+    },
+    {
+     "finding_id": "finding-0ab26f2e2624120e0bcabdb2",
+     "text_ko": "문서화된 기준규격(written specifications)이 미흡했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The written specifications were inadequate."
+    },
+    {
+     "finding_id": "finding-0ebd00f329d7776484aee26e",
+     "text_ko": "전산화 시스템(computerized systems)을 포함한 장비의 교정(calibration), 점검 및/또는 적격성평가(qualification)가 미흡했다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate."
+    },
+    {
+     "finding_id": "finding-2325625cadf759dd85ef5971",
+     "text_ko": "원료, 포장재, 중간제품, 벌크 의약품(bulk drugs) 및/또는 완제품의 구획·분리(segregation), 재고 선입선출(rotation of stock) 및/또는 운송이 미흡했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "The segregation, rotation of stock, and/or the transportation of raw materials, packaging materials, intermediates, bulk drugs, and/or finished products was inadequate."
+    },
+    {
+     "finding_id": "finding-4a19def7d55eeff196991f12",
+     "text_ko": "데이터 거버넌스 계획(data governance plan)의 수립 및/또는 유지가 미흡했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The establishment and/or the maintenance of a data governance plan was inadequate."
+    },
+    {
+     "finding_id": "finding-4e35168ba283cc9be4f4c6de",
+     "text_ko": "기준일탈(out-of-specification, OOS) 시험 결과에 대한 조사, 처리 및/또는 보고가 미흡했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate."
+    },
+    {
+     "finding_id": "finding-5a229453d3e6f5ce06aeebfc",
+     "text_ko": "품질관리부서 책임자의 교육, 경력 및/또는 감독이 미흡했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The education, experience, and/or oversight of the individual in charge of the quality control department was inadequate."
+    },
+    {
+     "finding_id": "finding-5a9114941e8e011b63d7ec67",
+     "text_ko": "특수한 격리·봉쇄(containment)가 필요한 작업에 대해 마련된 조치가 미흡했다. 작업소(premises)가 오염을 방지하도록 설계, 시공, 운영 및/또는 유지관리되지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "For operations requiring specialized containment, the measures in place were inadequate. The premises were not designed, constructed, operated, and/or maintained to prevent contamination."
+    },
+    {
+     "finding_id": "finding-81e18d9b3de34e1fccfb9459",
+     "text_ko": "제조공정, 장비 및/또는 자재에 대한 평가가 미흡했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Evaluation of production processes, equipment, and/or materials was inadequate."
+    },
+    {
+     "finding_id": "finding-8906f9e739f4183f6f1aedbf",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속조치가 미흡했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate."
+    },
+    {
+     "finding_id": "finding-90fcfd52026c501b894f8b79",
+     "text_ko": "문서화된 위생 프로그램(hygiene program)을 제조소 인원 및/또는 방문자가 준수하지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "The written hygiene program was not being followed by plant personnel and/or visitors."
     }
    ]
   },
@@ -205638,6 +206164,137 @@
    ]
   },
   {
+   "document_id": "hc-insp-89319",
+   "slug": "hc-insp-89319",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Baxter Corporation",
+   "firm_key": "baxter",
+   "published_date": "2026-07-20",
+   "inspection_date": "2026-07-20",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89319",
+   "categories": [
+    "무균보증/무균공정",
+    "일탈/CAPA/조사",
+    "원자재/공급업체 관리",
+    "설비/시설",
+    "오염/교차오염 관리",
+    "기타 품질시스템",
+    "세척밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0515d64969cb6eb35b86dfa9",
+     "text_ko": "멸균 전 모든 공정 단계에서 오염을 최소화하기 위한 예방조치를 취하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "The company did not take precautions to minimize contamination during all processing prior to sterilization."
+    },
+    {
+     "finding_id": "finding-2aace65c057908d2a304851c",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및 후속조치가 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate."
+    },
+    {
+     "finding_id": "finding-491052c05b97dc60ab687e22",
+     "text_ko": "의약품을 포장하는 자가 사업장에서 수령한 검체에 대한 포장재 시험 또는 검사가 부적절했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "The testing or examination of packaging materials was inadequate on a sample received on the premises by a person that packages the drugs."
+    },
+    {
+     "finding_id": "finding-59c63989067768332c1fd5c1",
+     "text_ko": "장비가 의도된 목적에 부합하도록 하는 데 있어 장비의 설계, 배치 및 유지관리가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The design, location, and/or maintenance of the equipment was inadequate for allowing the equipment to serve its intended purpose"
+    },
+    {
+     "finding_id": "finding-5b8c334d6051515e4eb1ef65",
+     "text_ko": "사업장이 오염을 방지하도록 설계·건축·운영·유지관리되지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination."
+    },
+    {
+     "finding_id": "finding-6ba482a923465c99d7fe0b3c",
+     "text_ko": "기록된 정보 또는 세부 내용이 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The recorded information or details were inadequate."
+    },
+    {
+     "finding_id": "finding-6c32b9b38b182404665a9117",
+     "text_ko": "충전 용기에 대한 육안검사(visual inspection)가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The company's visual inspection of filled containers was inadequate."
+    },
+    {
+     "finding_id": "finding-7fd1be516615326a67dfde83",
+     "text_ko": "세척절차의 실행, 효과성 및 밸리데이션이 비위생적 상태를 방지하기에 부적절했다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions."
+    },
+    {
+     "finding_id": "finding-9955b9a199c001e8560c7375",
+     "text_ko": "중요 공정 및 절차가 정기적으로 평가되지 않았다. 제조공정, 장비 및 자재에 대한 평가가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Critical processes and procedures were not evaluated on a regular basis. Evaluation of production processes, equipment, and/or materials was inadequate."
+    },
+    {
+     "finding_id": "finding-ac81a9ed5c8c6595c05a5b3a",
+     "text_ko": "사전 승인된 문서화된 절차 또는 지시에 따른 원료, 제품, 포장재의 취급이 부적절했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "The handling of raw materials, products, or packaging materials in keeping with pre-approved written procedures or instructions was inadequate."
+    },
+    {
+     "finding_id": "finding-fc19f17602ef7bc841863e7d",
+     "text_ko": "원료 로트의 각 용기에 대해 내용물을 확인하기 위한 특이적·식별적 시험(specific, discriminating test)을 실시하지 않았다. 원료에 대한 시료채취 계획(sampling plan)이 미흡했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Each container of a lot of raw materials was not tested to identify its contents with a specific, discriminating test. The sampling plan for raw materials was inadequate."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89324",
+   "slug": "hc-insp-89324",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "17029594 Canada Inc.",
+   "firm_key": "17029594 canada",
+   "published_date": "2026-07-29",
+   "inspection_date": "2026-07-29",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89324",
+   "categories": [
+    "규제보고/변경관리",
+    "안정성/보관",
+    "기타 품질시스템",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1336996dc249b6d50f23c3f7",
+     "text_ko": "변경관리(change control) 체계가 변경사항의 적절한 문서화, 평가, 승인을 보장하기에 부적절했다.",
+     "category_label_ko": "규제보고/변경관리",
+     "text_orig": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved."
+    },
+    {
+     "finding_id": "finding-23ac438bd75cc50d4ab42943",
+     "text_ko": "온도 및 습도 관리가 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The temperature and/or humidity control was inadequate."
+    },
+    {
+     "finding_id": "finding-802f68a3cb3fdc21c8563a95",
+     "text_ko": "기록의 생성, 수정, 검토, 보관, 조회에 대한 관리가 부적절했다. 전자서명에 대해 마련된 관리가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The controls were inadequate for creating, modifying, reviewing, storing, and/or retrieving records. The controls put in place for electronic signatures were inadequate."
+    },
+    {
+     "finding_id": "finding-a8192a494a7606a5c364338f",
+     "text_ko": "작업자에 대한 GMP 교육훈련 및 기록 유지관리가 부적절했다. 작업자의 직무기술서, 작업자에게 부여된 권한, 업무 위임이 부적절하거나 문서화되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented."
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-89346",
    "slug": "hc-insp-89346",
    "agency": "HC",
@@ -205723,6 +206380,62 @@
    ]
   },
   {
+   "document_id": "hc-insp-89357",
+   "slug": "hc-insp-89357",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Hydrx Farms Ltd.",
+   "firm_key": "hydrx farms",
+   "published_date": "2026-08-04",
+   "inspection_date": "2026-08-04",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89357",
+   "categories": [
+    "설비/시설",
+    "컴퓨터화시스템",
+    "세척밸리데이션",
+    "시험실/품질관리",
+    "불만/회수"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-055a5822acfe30d2b347f214",
+     "text_ko": "제조공정, 장비 및 자재에 대한 평가가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Evaluation of production processes, equipment, and/or materials was inadequate."
+    },
+    {
+     "finding_id": "finding-07417b33d439d31c5516abf2",
+     "text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및 적격성평가(qualification)가 부적절했다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate."
+    },
+    {
+     "finding_id": "finding-0e91b9359d089ad4ebc35a34",
+     "text_ko": "세척절차의 실행, 효과성 및 밸리데이션이 비위생적 상태를 방지하기에 부적절했다. 위생관리 프로그램이 오염 위험을 식별하고 저감하도록 적절히 설계되지 않았다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions. The sanitation programs were not adequately designed to identify and/or reduce the risks of contamination."
+    },
+    {
+     "finding_id": "finding-34b07411656b28b1c0053548",
+     "text_ko": "품질관리부서의 원료, 포장재, 공정중간 의약품, 벌크 의약품에 대한 문서화, 표시 및 격리보관(quarantine)이 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The quality control department's documentation, labelling, and/or quarantining of raw materials, packaging materials, in-process drugs, and/or bulk drugs was inadequate."
+    },
+    {
+     "finding_id": "finding-83280d1f27813a9cf2f45cbc",
+     "text_ko": "의약품 제조에 사용되는 모든 원료에 대해 품질관리부서가 승인한 규격이 구비되어 있지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The specifications approved by the quality control department were not available for all raw materials used to produce drugs."
+    },
+    {
+     "finding_id": "finding-a31c8a6cb6745b3a7aef147c",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및 후속조치가 부적절했다. 불만(complaint) 및 결함 가능성이 있는 제품에 관한 그 밖의 정보에 대한 평가, 기록, 후속조치 및 조사가 부적절했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate. The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate."
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-89379",
    "slug": "hc-insp-89379",
    "agency": "HC",
@@ -205766,6 +206479,105 @@
    ]
   },
   {
+   "document_id": "hc-insp-89386",
+   "slug": "hc-insp-89386",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Sigma Life Sciences Inc.",
+   "firm_key": "sigma life sciences",
+   "published_date": "2026-07-13",
+   "inspection_date": "2026-07-13",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89386",
+   "categories": [
+    "컴퓨터화시스템",
+    "세척밸리데이션",
+    "설비/시설",
+    "기타 품질시스템",
+    "밸리데이션/적격성평가"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1473d38c905aa2b845c83f63",
+     "text_ko": "전산화 시스템(computerized systems)을 포함한 장비의 교정(calibration), 점검 및/또는 적격성평가(qualification)가 미흡했다. 장비의 예방정비(preventative maintenance)와 수리가 미흡했다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate. The preventative maintenance and repair of the equipment was inadequate."
+    },
+    {
+     "finding_id": "finding-6c7899a912db995b6d483ddf",
+     "text_ko": "세척 절차(cleaning procedures)의 실행, 유효성 및/또는 밸리데이션(validation)이 비위생적 상태를 방지하기에 미흡했다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "The implementation, effectiveness, and/or validation of the cleaning procedures was inadequate for preventing unsanitary conditions."
+    },
+    {
+     "finding_id": "finding-c3288ca76825befff43365b3",
+     "text_ko": "공급자, 제조자(fabricator), 시험자, 포장자, 표시자(labeller), 유통업자, 수입자 및/또는 도매상 간 품질계약서(quality agreement)의 구비, 내용 및/또는 유지관리가 미흡했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate."
+    },
+    {
+     "finding_id": "finding-c4f1e786ca6df28675f51d0f",
+     "text_ko": "GMP(good manufacturing practices) 관련 표준작업절차서(SOP)의 관리가 미흡했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The handling of standard operating procedures for good manufacturing practices was inadequate."
+    },
+    {
+     "finding_id": "finding-fea646dc2bb08344f24b5d96",
+     "text_ko": "유틸리티(utilities) 및/또는 지원설비(support systems)의 적격성평가(qualification) 및/또는 검증(verification)이 미흡했다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "The qualification and/or verification of utilities and/or support systems was inadequate."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89404",
+   "slug": "hc-insp-89404",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Equimedconnect Inc.",
+   "firm_key": "equimedconnect",
+   "published_date": "2026-07-23",
+   "inspection_date": "2026-07-23",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89404",
+   "categories": [
+    "기타 품질시스템",
+    "설비/시설",
+    "불만/회수",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-97725460236e8a6c7842773b",
+     "text_ko": "기록의 추적성, 가독성, 문서화, 양식 및 정확성이 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate."
+    },
+    {
+     "finding_id": "finding-a48bb1efa0cb8ab191c212f6",
+     "text_ko": "작업자에 대한 GMP 교육훈련 및 기록 유지관리가 부적절했다. 작업자의 직무기술서, 작업자에게 부여된 권한, 업무 위임이 부적절하거나 문서화되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented."
+    },
+    {
+     "finding_id": "finding-c0f3805d090e7ae3a00a0953",
+     "text_ko": "회수(recall)에 관한 문서화된 절차가 부적절했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "The written procedures for recalls were inadequate."
+    },
+    {
+     "finding_id": "finding-cc8eae059cb130f68e4463d4",
+     "text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및 절차가 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug."
+    },
+    {
+     "finding_id": "finding-d375c74f21d94cc09b20e414",
+     "text_ko": "GMP 관련 표준작업지침서(SOP)의 관리가 부적절했다. 공급자, 제조자, 시험자, 포장자, 표시기재자, 유통업자, 수입자, 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및 관리가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The handling of standard operating procedures for good manufacturing practices was inadequate. The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate."
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-89421",
    "slug": "hc-insp-89421",
    "agency": "HC",
@@ -205805,6 +206617,281 @@
      "text_ko": "품질관리부서(quality control unit)가 요구되는 활동을 모두 수행하지 않았다. 일탈(deviation)에 대한 조사·보고 및/또는 후속조치가 미흡했다. 수탁업체에 대한 회사의 관리·감독이 미흡했다.",
      "category_label_ko": "일탈/CAPA/조사",
      "text_orig": "The quality control department did not undertake all of the required activities. Investigations into deviations, reports, and/or follow-up actions were inadequate. The company's oversight of the contracted party was inadequate."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89428",
+   "slug": "hc-insp-89428",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Pathogenia Inc.",
+   "firm_key": "pathogenia",
+   "published_date": "2026-08-03",
+   "inspection_date": "2026-08-03",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89428",
+   "categories": [
+    "시험실/품질관리",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-34ff3f9fca83fc874d46c317",
+     "text_ko": "시험법의 밸리데이션 및 문서화가 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The validation and/or the documentation of test methods was inadequate."
+    },
+    {
+     "finding_id": "finding-65ec339fa4bf151d3562f429",
+     "text_ko": "기록의 유지관리가 부적절했다. 전자시스템이 의도된 용도에 대해 밸리데이션되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The maintenance of records was inadequate. The electronic system was not validated for its intended use."
+    },
+    {
+     "finding_id": "finding-98e8b36e76ef8b5ac263bb39",
+     "text_ko": "품질관리부서 책임자의 학력, 경력 및 감독이 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The education, experience, and/or oversight of the individual in charge of the quality control department was inadequate."
+    },
+    {
+     "finding_id": "finding-f46e8883a638f8abc21d2b30",
+     "text_ko": "기록의 추적성, 가독성, 문서화, 양식 및 정확성이 부적절했다. 품질관리부서가 요구되는 모든 업무를 수행하지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate. The quality control department did not undertake all of the required activities."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89432",
+   "slug": "hc-insp-89432",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Amorepacific Canada Inc",
+   "firm_key": "amorepacific canada",
+   "published_date": "2026-07-28",
+   "inspection_date": "2026-07-28",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89432",
+   "categories": [
+    "일탈/CAPA/조사",
+    "기타 품질시스템",
+    "품질부서 관리감독",
+    "시험실/품질관리",
+    "설비/시설",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0e88030d74233d3e9fe68553",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및 후속조치가 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate."
+    },
+    {
+     "finding_id": "finding-338c232158f6b7b6abd0e47d",
+     "text_ko": "제조지시서 원본(master production document)이 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The master production documents were inadequate."
+    },
+    {
+     "finding_id": "finding-7ac6dadfdb2ee80aca9d0847",
+     "text_ko": "품질관리부서가 연간제품품질평가(annual product quality review) 결과를 평가하지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The quality control department did not evaluate the results of the annual product quality review."
+    },
+    {
+     "finding_id": "finding-86067c8d21832d59a5b341a1",
+     "text_ko": "제조, 포장, 표시기재, 시험, 보관, 운송 방법 및 절차에 대해 시행 전 품질관리부서 책임자가 수행하는 검토 및 승인이 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate."
+    },
+    {
+     "finding_id": "finding-934fe62a0af69caab9a25776",
+     "text_ko": "작업자에 대한 GMP 교육훈련 및 기록 유지관리가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate."
+    },
+    {
+     "finding_id": "finding-b51d3dad4b9e33a4540671d1",
+     "text_ko": "의약품 각 로트 또는 배치의 운송 및 보관 조건을 입증하는 데 사용된 증빙이 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The evidence used to demonstrate the transportation and/or storage conditions of each lot or batch of the drug was inadequate."
+    },
+    {
+     "finding_id": "finding-c9c16a0ebea3b50e48661420",
+     "text_ko": "재판매를 검토 중인 반품 의약품의 평가 절차에서 지적사항이 확인됐다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Deficiencies were noted with the procedure for the assessment of returned drugs being considered for resale."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89484",
+   "slug": "hc-insp-89484",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Stratum Canada",
+   "firm_key": "stratum canada",
+   "published_date": "2026-08-11",
+   "inspection_date": "2026-08-11",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89484",
+   "categories": [
+    "규제보고/변경관리",
+    "안정성/보관",
+    "불만/회수",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-041e1d9bdd6e52c19c41b5d0",
+     "text_ko": "변경관리(change control) 체계가 변경사항의 적절한 문서화, 평가, 승인을 보장하기에 부적절했다.",
+     "category_label_ko": "규제보고/변경관리",
+     "text_orig": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved."
+    },
+    {
+     "finding_id": "finding-057ccebf23986c4e646c02b5",
+     "text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및 절차가 부적절했다. 온도 및 습도 관리가 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug. The temperature and/or humidity control was inadequate."
+    },
+    {
+     "finding_id": "finding-5056d765f448b58f98cbeb66",
+     "text_ko": "회수(recall)에 관한 문서화된 절차가 부적절했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "The written procedures for recalls were inadequate."
+    },
+    {
+     "finding_id": "finding-aefe65f11c7039ebe4318664",
+     "text_ko": "품질관리부서가 GMP 문서 및 표준작업지침서(SOP)를 승인하거나 서명·날짜 기재하지 않았다. GMP 관련 표준작업지침서(SOP)의 관리가 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The quality control department did not approve, sign, and/or date the good manufacturing practices documents and/or the standard operating procedures. The handling of standard operating procedures for good manufacturing practices was inadequate."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89542",
+   "slug": "hc-insp-89542",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Valuemed Professional Products Ltd.",
+   "firm_key": "valuemed professional products",
+   "published_date": "2026-07-30",
+   "inspection_date": "2026-07-30",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89542",
+   "categories": [
+    "안정성/보관",
+    "설비/시설",
+    "교육/작업자"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-01e977cf1a2960c44d880f59",
+     "text_ko": "온도 및 습도 관리가 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The temperature and/or humidity control was inadequate."
+    },
+    {
+     "finding_id": "finding-1741cee8266fe27b25e69f1a",
+     "text_ko": "사업장이 해충 및 이물질의 건물 내 유입을 방지하도록 설계·건축·유지관리되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The premises were not designed, constructed, and/or maintained to prevent the entry of pests and/or foreign material into the building."
+    },
+    {
+     "finding_id": "finding-387de728f05fadda8b7ce27f",
+     "text_ko": "작업자에 대한 지속적 교육훈련이 부적절했다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "The ongoing training of personnel was inadequate."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89620",
+   "slug": "hc-insp-89620",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "High North Inc.",
+   "firm_key": "high north",
+   "published_date": "2026-08-17",
+   "inspection_date": "2026-08-17",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89620",
+   "categories": [
+    "기타 품질시스템",
+    "설비/시설",
+    "컴퓨터화시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-7045baf49cb0185182724a6f",
+     "text_ko": "우수의약품제조·품질관리기준(GMP) 관련 표준작업지침서(SOP)의 관리가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The handling of standard operating procedures for good manufacturing practices was inadequate."
+    },
+    {
+     "finding_id": "finding-d36bd6304c32b8cb3123d124",
+     "text_ko": "장비가 다른 의약품이나 이물질에 의한 의약품 오염 가능성을 방지하도록 설치·설계·운전·보관·유지관리되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The equipment was not set-up, designed, operated, stored, and/or maintained to prevent potential contamination of drugs by other drugs and/or by foreign material."
+    },
+    {
+     "finding_id": "finding-dbe80273d2989eb97a78e4ec",
+     "text_ko": "전산화 시스템을 포함한 장비의 교정, 점검 및 적격성평가(qualification)가 부적절했다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "The calibration, inspection, and/or qualification of the equipment, including computerized systems, was inadequate."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89690",
+   "slug": "hc-insp-89690",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Bonita Pharmaceuticals Inc.",
+   "firm_key": "bonita pharmaceuticals",
+   "published_date": "2026-08-13",
+   "inspection_date": "2026-08-13",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89690",
+   "categories": [
+    "설비/시설",
+    "안정성/보관",
+    "규제보고/변경관리",
+    "기타 품질시스템",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0a623c165af16f8166d1cbcc",
+     "text_ko": "공급자, 제조자, 시험자, 포장자, 표시기재자, 유통업자, 수입자, 도매업자 간 품질계약서(quality agreement)의 구비, 내용 및 관리가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate."
+    },
+    {
+     "finding_id": "finding-131d4385dcfd18dc6bc0d7b0",
+     "text_ko": "보관 및 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하는 지침 및 절차가 부적절했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug."
+    },
+    {
+     "finding_id": "finding-3f8169e1545abed562188c93",
+     "text_ko": "변경관리(change control) 체계가 변경사항의 적절한 문서화, 평가, 승인을 보장하기에 부적절했다.",
+     "category_label_ko": "규제보고/변경관리",
+     "text_orig": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved."
+    },
+    {
+     "finding_id": "finding-7c4c82eba885f0276f9c7e35",
+     "text_ko": "우수의약품제조·품질관리기준(GMP) 관련 표준작업지침서(SOP)의 관리가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The handling of standard operating procedures for good manufacturing practices was inadequate."
+    },
+    {
+     "finding_id": "finding-91c132ce6e9a14373365729d",
+     "text_ko": "반품 의약품의 재판매 검토에 대한 평가, 문서화 및 절차가 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate."
+    },
+    {
+     "finding_id": "finding-e0383464db40d2720ecee302",
+     "text_ko": "일탈(deviation)에 대한 조사, 보고 및 후속조치가 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into deviations, reports, and/or follow-up actions were inadequate."
     }
    ]
   }

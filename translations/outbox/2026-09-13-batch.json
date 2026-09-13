@@ -1,0 +1,20 @@
+[
+  {
+    "finding_id": "finding-4b7c63722f00d554aaf9df23",
+    "finding_text": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate.",
+    "finding_text_ko": "기록의 추적성(traceability), 판독성(legibility), 문서화(documentation), 서식(formatting) 및/또는 정확성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6584ac9dcd03eef94cf7c9b7",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "지침 및/또는 절차가, 보관 및/또는 운송 조건이 해당 의약품의 품질과 안전한 유통을 유지하도록 보장하기에 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e57b64af80444f376dcdf8d0",
+    "finding_text": "The maintenance of the premises was inadequate.",
+    "finding_text_ko": "시설(premises)의 유지관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  }
+]

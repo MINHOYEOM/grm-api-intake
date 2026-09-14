@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import os
 import re
+import socket
 import sys
 import time
 import xml.etree.ElementTree as ET
@@ -138,6 +139,65 @@ def kr_egress_get(url: str, **kwargs: Any) -> requests.Response:
         log("WARN", f"KR egress 프록시 홉 실패 — 직결로 1회 폴백 "
                     f"url={mask_service_key(url)} err={mask_service_key(str(e))}")
         return requests.get(url, proxies=None, **kwargs)
+
+
+# ── [2026-09-14] KR egress 프록시 **도달** preflight ───────────────────────────
+# `MFDS_HTTP_PROXY_CONFIGURED` 는 값이 있느냐만 말한다. 프록시 1대가 죽어 있던 2026-09-08~14
+# 동안 이슈 #956 은 "MFDS 5종 실패"로만 보였고, 원인이 프록시인지 원 서버인지 아무도 구분하지
+# 못했다. 여기서는 TCP 연결 1회로 **도달 여부**만 잰다 — HTTP 를 태우지 않는 이유는 MFDS 가
+# 러너 IP 를 거부하는 날과 프록시가 죽은 날을 섞어 읽지 않기 위해서다(프록시 문제만 가른다).
+# 자격증명(userinfo)은 결과 문자열에 절대 싣지 않는다.
+KR_EGRESS_PROXY_UNCONFIGURED = "unconfigured"
+KR_EGRESS_PROXY_REACHABLE = "reachable"
+KR_EGRESS_PROXY_UNREACHABLE = "unreachable"
+KR_EGRESS_PROXY_PROBE_TIMEOUT_SECONDS = 10
+
+
+def kr_egress_proxy_endpoint(proxy: str | None = None) -> tuple[str, int] | None:
+    """`MFDS_HTTP_PROXY`(또는 인자)의 (host, port). 미설정·파싱 불가면 None. userinfo 는 버린다."""
+    raw = (proxy if proxy is not None else os.environ.get("MFDS_HTTP_PROXY", "")).strip()
+    if not raw:
+        return None
+    parsed = urlparse(raw if "//" in raw else f"//{raw}")
+    host = parsed.hostname or ""
+    if not host:
+        return None
+    try:
+        port = parsed.port
+    except ValueError:
+        return None
+    if port is None:
+        port = 443 if parsed.scheme == "https" else 80
+    return host, port
+
+
+def probe_kr_egress_proxy(
+    timeout: float = KR_EGRESS_PROXY_PROBE_TIMEOUT_SECONDS,
+    *,
+    connect: Any = socket.create_connection,
+) -> tuple[str, str]:
+    """KR egress 프록시 도달 여부 판정 → (status, detail).
+
+    status 는 `KR_EGRESS_PROXY_*` 셋 중 하나. detail 은 host:port 와 소요/오류만 담는다.
+    `connect` 는 테스트 주입용(`socket.create_connection` 시그니처).
+    """
+    endpoint = kr_egress_proxy_endpoint()
+    if endpoint is None:
+        return KR_EGRESS_PROXY_UNCONFIGURED, "MFDS_HTTP_PROXY 미설정"
+    host, port = endpoint
+    started = time.monotonic()
+    try:
+        conn = connect((host, port), timeout)
+    except OSError as e:
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        return (KR_EGRESS_PROXY_UNREACHABLE,
+                f"{host}:{port} TCP 연결 실패 ({type(e).__name__}: {e}) {elapsed_ms}ms")
+    try:
+        conn.close()
+    except OSError:
+        pass
+    elapsed_ms = int((time.monotonic() - started) * 1000)
+    return KR_EGRESS_PROXY_REACHABLE, f"{host}:{port} TCP 연결 {elapsed_ms}ms"
 
 
 def http_get_json(

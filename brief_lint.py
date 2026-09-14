@@ -594,27 +594,40 @@ def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
 # ─────────────────────────────────────────────────────────────────────────────
 # "Intake row {N}건 ( ... )" — 발행 커버리지 callout 의 수집 세그먼트(첫 괄호까지만 — 그 뒤
 # 병합·WebSearch 등은 수집 대상 아님).
-_COVERAGE_ANCHOR_RE = re.compile(r"Intake\s+row\s+(?P<total>\d+)\s*건\s*\((?P<body>[^)]*)\)")
-# 괄호 안 토큰: "{label} {count}[건]" — 라벨은 영문 시작·영숫자/공백/슬래시(FDA WL·PIC/S·FDA 483).
-_COVERAGE_ITEM_RE = re.compile(r"(?P<label>[A-Za-z][A-Za-z0-9/ ]*?)\s+(?P<count>\d+)\s*건?\s*$")
+# [무음 표식 2026-09-14] 무음 감시가 잡은 소스는 `PIC/S 0(점검필요)` 로 찍힌다
+# (grm_handoff.COVERAGE_SILENT_MARK — 그쪽과 짝). 그래서 본문은 **한 단계 중첩 괄호**를
+# 허용한다 — 종전 `[^)]*` 는 표식의 `)` 에서 끊겨 그 뒤 소스가 전부 "누락" 으로 오판됐다.
+_COVERAGE_ANCHOR_RE = re.compile(
+    r"Intake\s+row\s+(?P<total>\d+)\s*건\s*\((?P<body>(?:[^()]|\([^()]*\))*)\)")
+# 괄호 안 토큰: "{label} {count}[건][(표식)]" — 라벨은 영문 시작·영숫자/공백/슬래시
+# (FDA WL·PIC/S·FDA 483). 표식은 선택(무음 소스에만 붙는다).
+_COVERAGE_ITEM_RE = re.compile(
+    r"(?P<label>[A-Za-z][A-Za-z0-9/ ]*?)\s+(?P<count>\d+)\s*건?\s*"
+    r"(?:\((?P<flag>[^()]*)\))?\s*$")
 
 
 def parse_collected_coverage(published_text: str) -> "dict[str, Any] | None":
     """발행물 평문에서 수집 세그먼트('Intake row N건 (라벨 n · ...)')를 파싱.
 
-    반환 {"total": int, "items": {label: count}} 또는 None(앵커 부재 — 대조 불가).
-    괄호 안을 ' · ' 로 분리해 각 토큰 끝의 숫자를 카운트로 본다(선택적 '건' 접미 허용).
-    중복 라벨은 마지막 값. 토큰이 "label count" 형이 아니면 무시(잡음 내성).
+    반환 {"total": int, "items": {label: count}, "flagged": {label: 표식}} 또는 None(앵커
+    부재 — 대조 불가). 괄호 안을 ' · ' 로 분리해 각 토큰 끝의 숫자를 카운트로 본다(선택적
+    '건' 접미·`(점검필요)` 표식 허용). 중복 라벨은 마지막 값. 토큰이 "label count" 형이
+    아니면 무시(잡음 내성). `flagged` 는 표식이 붙은 라벨만(무음 소스 가시화 — 건수 대조엔
+    쓰지 않는다).
     """
     m = _COVERAGE_ANCHOR_RE.search(published_text or "")
     if not m:
         return None
     items: dict[str, int] = {}
+    flagged: dict[str, str] = {}
     for tok in m.group("body").split("·"):
         tm = _COVERAGE_ITEM_RE.match(tok.strip())
         if tm:
-            items[tm.group("label").strip()] = int(tm.group("count"))
-    return {"total": int(m.group("total")), "items": items}
+            label = tm.group("label").strip()
+            items[label] = int(tm.group("count"))
+            if tm.group("flag"):
+                flagged[label] = tm.group("flag").strip()
+    return {"total": int(m.group("total")), "items": items, "flagged": flagged}
 
 
 def lint_coverage_counts(expected: "dict[str, Any] | None",

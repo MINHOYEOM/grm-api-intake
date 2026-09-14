@@ -55,6 +55,7 @@ from grm_common import (
     http_get_json,
     http_get_xml,
     log,
+    kr_proxy_circuit_trip,
     probe_kr_egress_proxy,
     retry_after_seconds,
 )
@@ -3952,6 +3953,8 @@ def main() -> int:
     if kr_proxy_status == KR_EGRESS_PROXY_UNREACHABLE:
         log("WARN", f"KR egress 프록시 도달 불가 — {kr_proxy_detail} "
                     "(MFDS 계열은 직결 폴백에 기댄다 · 프록시 복구는 사람 작업)")
+        # 첫 요청부터 30초 타임아웃을 아낀다 — 회로를 미리 연다(쿨다운 뒤 자동 재시도).
+        kr_proxy_circuit_trip("preflight 도달 불가")
     elif kr_proxy_status == KR_EGRESS_PROXY_REACHABLE:
         log("INFO", f"KR egress 프록시 도달 확인 — {kr_proxy_detail}")
 

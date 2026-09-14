@@ -123,22 +123,63 @@ def _is_proxy_hop_failure(err: Exception, proxy: str) -> bool:
     return bool(host) and host in str(err)
 
 
+# ── [2026-09-14] KR egress 프록시 회로차단기 ──────────────────────────────────
+# 홉 실패 뒤에도 요청마다 프록시를 먼저 두드리면 요청당 connect timeout(20~30초)을 그대로
+# 먹는다. 실측(dry-run 34803960136): 직결 폴백으로 MFDS 전 소스가 회복됐지만 18분이 걸렸고,
+# 같은 날 자료실 갱신 잡은 20분 상한에 걸려 **취소**됐다 — 폴백이 있어도 느리면 없는 것과
+# 같다. 그래서 홉 실패를 한 번 보면 쿨다운 동안 프록시를 건너뛰고 곧장 직결로 나간다.
+# 쿨다운이 지나면 다시 프록시를 시도하고, 프록시가 응답하면 회로를 닫는다(자연 복귀).
+# 프로세스 수명 단위 상태라 워크플로 런마다 초기화된다.
+KR_PROXY_CIRCUIT_COOLDOWN_SECONDS = 600
+_kr_proxy_tripped_at: float | None = None
+
+
+def kr_proxy_circuit_trip(reason: str = "") -> None:
+    """프록시 홉 실패를 기록 — 쿨다운 동안 `kr_egress_get` 은 프록시를 건너뛴다."""
+    global _kr_proxy_tripped_at
+    if _kr_proxy_tripped_at is None:
+        log("WARN", f"KR egress 프록시 회로 차단 — {KR_PROXY_CIRCUIT_COOLDOWN_SECONDS}초 동안 "
+                    f"프록시를 건너뛰고 직결로 나간다{(' (' + reason + ')') if reason else ''}")
+    _kr_proxy_tripped_at = time.monotonic()
+
+
+def kr_proxy_circuit_reset() -> None:
+    """회로를 닫는다(프록시 정상 응답 시·테스트 격리용)."""
+    global _kr_proxy_tripped_at
+    _kr_proxy_tripped_at = None
+
+
+def kr_proxy_circuit_open(now: float | None = None) -> bool:
+    """True = 쿨다운 안이라 프록시를 건너뛴다."""
+    if _kr_proxy_tripped_at is None:
+        return False
+    now = time.monotonic() if now is None else now
+    return (now - _kr_proxy_tripped_at) < KR_PROXY_CIRCUIT_COOLDOWN_SECONDS
+
+
 def kr_egress_get(url: str, **kwargs: Any) -> requests.Response:
-    """`requests.get` + KR egress 프록시 홉 실패 시 직결 1회 폴백.
+    """`requests.get` + KR egress 프록시 홉 실패 시 직결 1회 폴백(+회로차단기).
 
     KR 호스트가 아니거나 `MFDS_HTTP_PROXY` 가 비어 있으면 `requests.get` 과 동일하다
     (`proxies=None` 을 그대로 넘기므로 종전 호출부의 동작이 보존된다).
+    회로가 열려 있으면(최근 홉 실패) 프록시 시도 없이 곧장 직결로 나간다.
     """
     proxies = proxies_for(url)
+    if proxies and kr_proxy_circuit_open():
+        return requests.get(url, proxies=None, **kwargs)
     try:
-        return requests.get(url, proxies=proxies, **kwargs)
+        resp = requests.get(url, proxies=proxies, **kwargs)
     except requests.RequestException as e:
         proxy = (proxies or {}).get("https") or (proxies or {}).get("http") or ""
         if not proxy or not _is_proxy_hop_failure(e, proxy):
             raise
         log("WARN", f"KR egress 프록시 홉 실패 — 직결로 1회 폴백 "
                     f"url={mask_service_key(url)} err={mask_service_key(str(e))}")
+        kr_proxy_circuit_trip("홉 실패")
         return requests.get(url, proxies=None, **kwargs)
+    if proxies:
+        kr_proxy_circuit_reset()     # 프록시가 응답했다 = 살아 있다
+    return resp
 
 
 # ── [2026-09-14] KR egress 프록시 **도달** preflight ───────────────────────────

@@ -612,8 +612,8 @@ class IntakeSourceSpec:
     # "한산한 주"처럼 0 으로 찍어 발행했다(2026-09-14 발견).
     #
     # `silence_days` 는 "이 정도면 확실히 이상하다" 선이지 "가장 빨리 잡는" 선이 아니다.
-    # 소스가 실제로 얼마나 자주 내는지(2026-07~09 60일 실측)에 맞춰 4단으로만 둔다 —
-    # 주 1회 이상 내는 소스 10일 · 월 1회꼴 21일 · 산발 35일 · 희소(ICH) 60일.
+    # 소스가 실제로 얼마나 자주 내는지(2026-07~09 60일 실측)에 맞춰 3단으로만 둔다 —
+    # 주 1회 이상 내는 소스 10일 · 월 1회꼴 21일 · 산발 35일. 스냅샷 diff 소스(ICH)는 0 = 제외.
     # 더 촘촘히 깎으면 한산한 주에 가짜 경고가 나고, 그러면 아무도 안 읽는다.
     notion_source: str = ""   # Notion Intake DB 의 `Source` select 값. 비우면 무음 감시 제외
     silence_days: int = 0     # 이 일수를 **초과**해 신규 0건이면 경고. 0 = 감시 안 함
@@ -655,7 +655,11 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     IntakeSourceSpec("mfds_gmp_cert", "MFDS GMP Certificate"),
     IntakeSourceSpec("mfds_safety_letter", "MFDS Safety Letter"),
     IntakeSourceSpec("mfds_gmp_inspection", "MFDS GMP Inspection"),
-    IntakeSourceSpec("ich", "ICH", notion_source=SOURCE_ICH, silence_days=60),
+    # ★ICH 는 무음 감시 **제외**(silence_days=0). ICH 수집기는 페이지 섹션 제목의 스냅샷 diff 라
+    #   (dedup 창 1095일) 페이지가 안 바뀌면 몇 달이고 신규 0건이 **설계상 정상**이다 — 여기에
+    #   임계를 두면 상시 경고가 되어 진짜 무음을 묻는다(2026-09-14 실측: 60일+ 0건이 곧 그 상태).
+    #   페이지 자체가 죽거나 파서가 깨지면 `ich_error`(핵심 페이지 섹션 0건 = error)가 잡는다.
+    IntakeSourceSpec("ich", "ICH", notion_source=SOURCE_ICH, silence_days=0),
     IntakeSourceSpec("who", "WHO", notion_source=SOURCE_WHO, silence_days=10),
     IntakeSourceSpec("hc", "Health Canada", health_code_override="health-canada",
                      notion_source=SOURCE_HC, silence_days=10),

@@ -30,10 +30,18 @@ class WatchedSourceDerivationTest(unittest.TestCase):
         watched = watched_sources()
         names = [w.notion_source for w in watched]
         self.assertEqual(len(names), len(set(names)), "Source 가 중복되면 같은 소스를 두 번 경고한다")
-        # 2026-09-14 에 무음이던 6종은 반드시 감시 대상이어야 한다.
+        # 2026-09-14 에 무음이던 소스 중 원천이 날짜 있는 항목을 내는 5종은 반드시 감시 대상이다.
         for must in ("PIC/S", "MHRA Inspectorate", "EU GMP NCR (EudraGMDP)",
-                     "WHO", "Health Canada", "ICH"):
+                     "WHO", "Health Canada"):
             self.assertIn(must, names, f"{must} 가 무음 감시에서 빠졌다")
+
+    def test_snapshot_diff_source_ich_is_exempt(self) -> None:
+        """ICH 는 섹션 제목 스냅샷 diff(dedup 창 1095일) — 페이지가 안 바뀌면 몇 달이고 0건이
+        설계상 정상이라 임계를 두면 상시 경고가 된다. 수집 고장은 `ich_error` 가 잡는다."""
+        names = [w.notion_source for w in watched_sources()]
+        self.assertNotIn("ICH", names)
+        spec = next(s for s in grm_common.INTAKE_SOURCE_SPECS if s.prefix == "ich")
+        self.assertEqual(spec.silence_days, 0)
 
     def test_shared_source_takes_the_strictest_threshold(self) -> None:
         """mhra 와 mhra_alert 는 같은 Source 다 — 둘 중 엄격한 쪽을 쓴다."""
@@ -74,10 +82,10 @@ class EvaluateSilenceTest(unittest.TestCase):
                                                  source_enabled=ALL_ON)), ["Health Canada"])
 
     def test_no_row_in_lookback_reports_at_the_cap(self) -> None:
-        """ICH 처럼 룩백 내내 0건이면 '≥cap일'로 보고한다."""
-        findings = evaluate_silence(last_seen={"ICH": None}, run_date=RUN,
+        """룩백 내내 0건이면 '≥cap일'로 보고한다."""
+        findings = evaluate_silence(last_seen={"PIC/S": None}, run_date=RUN,
                                     source_enabled=ALL_ON, lookback_cap_days=120)
-        self.assertEqual(_codes(findings), ["ICH"])
+        self.assertEqual(_codes(findings), ["PIC/S"])
         self.assertTrue(findings[0].capped)
         self.assertEqual(findings[0].days_text, "≥120일")
 
@@ -88,9 +96,9 @@ class EvaluateSilenceTest(unittest.TestCase):
 
     def test_disabled_source_is_not_judged(self) -> None:
         """이번 실행에 안 켠 소스가 조용한 건 고장이 아니다."""
-        seen = {"ICH": date(2026, 1, 1)}
+        seen = {"WHO": date(2026, 1, 1)}
         self.assertEqual(evaluate_silence(last_seen=seen, run_date=RUN,
-                                          source_enabled={"ich": False}), [])
+                                          source_enabled={"who": False}), [])
 
     def test_shared_source_stays_watched_while_any_collector_is_on(self) -> None:
         seen = {"MHRA Inspectorate": date(2026, 8, 1)}    # 44일 > 35일
@@ -115,17 +123,17 @@ class EvaluateSilenceTest(unittest.TestCase):
             "EU GMP NCR (EudraGMDP)": date(2026, 8, 25), # 20일 < 21 → 이틀 뒤
             "WHO": date(2026, 8, 29),                    # 16일 > 10 → 경고
             "Health Canada": date(2026, 9, 1),           # 13일 > 10 → 경고
-            "ICH": None,                                 # 룩백 내내 0건 → 경고
+            "ICH": None,                                 # 룩백 내내 0건 — 스냅샷 diff 라 제외(설계상 정상)
             "Federal Register": date(2026, 9, 13),       # 정상
             "FDA 483": date(2026, 9, 12),                # 정상
         }
         got = _codes(evaluate_silence(last_seen=seen, run_date=RUN, source_enabled=ALL_ON))
-        self.assertEqual(got, ["Health Canada", "ICH", "PIC/S", "WHO"])
+        self.assertEqual(got, ["Health Canada", "PIC/S", "WHO"])
 
         # 이틀만 지나도 경계 2종이 따라 울린다 — 임계가 느슨한 것이지 안 잡는 게 아니다.
         later = _codes(evaluate_silence(last_seen=seen, run_date=date(2026, 9, 16),
                                         source_enabled=ALL_ON))
-        self.assertEqual(later, ["EU GMP NCR (EudraGMDP)", "Health Canada", "ICH",
+        self.assertEqual(later, ["EU GMP NCR (EudraGMDP)", "Health Canada",
                                  "MHRA GMP NCR", "PIC/S", "WHO"])
 
 

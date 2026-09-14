@@ -113,13 +113,13 @@ class SilentSetUsesTheSameEnabledMapTest(unittest.TestCase):
         return source_enabled_map(**base)
 
     def test_disabled_source_is_not_in_the_silent_set(self) -> None:
-        seen = {ci.SOURCE_ICH: date(2026, 6, 1)}   # 105일 > 60일
+        seen = {ci.SOURCE_WHO: date(2026, 6, 1)}   # 105일 > 10일
         off = {f.notion_source for f in evaluate_silence(
-            last_seen=seen, run_date=RUN, source_enabled=self._enabled(enable_ich=False))}
+            last_seen=seen, run_date=RUN, source_enabled=self._enabled(enable_who=False))}
         on = {f.notion_source for f in evaluate_silence(
-            last_seen=seen, run_date=RUN, source_enabled=self._enabled(enable_ich=True))}
-        self.assertNotIn(ci.SOURCE_ICH, off)
-        self.assertIn(ci.SOURCE_ICH, on)
+            last_seen=seen, run_date=RUN, source_enabled=self._enabled(enable_who=True))}
+        self.assertNotIn(ci.SOURCE_WHO, off)
+        self.assertIn(ci.SOURCE_WHO, on)
 
     def test_map_covers_every_registry_prefix(self) -> None:
         """레지스트리에 prefix 를 더하고 매핑을 빠뜨리면 여기서 걸린다."""

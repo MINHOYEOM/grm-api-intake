@@ -93,6 +93,53 @@ def proxies_for(url: str) -> dict[str, str] | None:
 _proxies_for = proxies_for
 
 
+# ── [2026-09-14] KR egress 프록시 홉 실패 시 직결 1회 폴백 ────────────────────
+# 사고: `MFDS_HTTP_PROXY` 한 대(52.79.207.141:8888)가 connection timeout 으로 죽자
+# `MFDS_EGRESS_HOSTS` 4종이 **동시에** 0건이 됐다 — MFDS RSS·자료실·회수·행정처분·
+# GMP실사·법령이 한 프록시에 전부 매달려 있고 폴백 경로가 없었기 때문이다
+# (이슈 #983 "자료실 수집기 실패 — 소스 격리", #956 "Intake 운영 경고" 의 공통 원인).
+#
+# 프록시를 태우는 이유는 MFDS 가 해외 러너 IP 를 거부하기 때문이지만, 그 거부는
+# **런 단위로 오락가락한다** — apis.data.go.kr 은 2026-08-24 까지 러너에서 직접 열렸고,
+# 지금도 날에 따라 직접 열린다. 즉 "프록시가 죽었다"가 "직결도 죽었다"를 뜻하지 않는데
+# 종전 코드는 직결을 **시도조차 하지 않았다**. 그래서 프록시 홉 자체가 실패한 경우에
+# 한해 같은 요청을 1회 직결로 재시도한다. 목적은 전면 정지를 부분 성공으로 낮추는 것이고,
+# 프록시가 살아 있는 정상 경로의 동작은 바뀌지 않는다.
+#
+# ★원 서버가 준 4xx/5xx 는 폴백 대상이 **아니다** — 그건 프록시가 정상 동작했다는 뜻이다.
+#   폴백은 "프록시에 못 붙었다"에만 건다.
+def _is_proxy_hop_failure(err: Exception, proxy: str) -> bool:
+    """예외가 원 서버가 아니라 **프록시 홉**의 실패인지 판정."""
+    if isinstance(err, requests.exceptions.ProxyError):
+        return True
+    if not isinstance(err, (requests.exceptions.ConnectTimeout,
+                            requests.exceptions.ConnectionError)):
+        return False
+    # ConnectionError 는 원 서버 실패와 프록시 실패를 같은 타입으로 낸다 — urllib3 메시지에
+    # 프록시 **호스트명**이 찍혀 있을 때만 프록시 홉으로 본다. host:port 로 맞추면 안 된다:
+    # urllib3 는 `HTTPSConnectionPool(host='h', port=3128)` 처럼 둘을 떼어 찍는다.
+    host = urlparse(proxy if "//" in proxy else f"//{proxy}").hostname or ""
+    return bool(host) and host in str(err)
+
+
+def kr_egress_get(url: str, **kwargs: Any) -> requests.Response:
+    """`requests.get` + KR egress 프록시 홉 실패 시 직결 1회 폴백.
+
+    KR 호스트가 아니거나 `MFDS_HTTP_PROXY` 가 비어 있으면 `requests.get` 과 동일하다
+    (`proxies=None` 을 그대로 넘기므로 종전 호출부의 동작이 보존된다).
+    """
+    proxies = proxies_for(url)
+    try:
+        return requests.get(url, proxies=proxies, **kwargs)
+    except requests.RequestException as e:
+        proxy = (proxies or {}).get("https") or (proxies or {}).get("http") or ""
+        if not proxy or not _is_proxy_hop_failure(e, proxy):
+            raise
+        log("WARN", f"KR egress 프록시 홉 실패 — 직결로 1회 폴백 "
+                    f"url={mask_service_key(url)} err={mask_service_key(str(e))}")
+        return requests.get(url, proxies=None, **kwargs)
+
+
 def http_get_json(
     url: str,
     *,
@@ -110,12 +157,11 @@ def http_get_json(
     masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(
+            resp = kr_egress_get(
                 url,
                 params=params,
                 timeout=timeout,
                 headers=req_headers,
-                proxies=_proxies_for(url),
             )
             if resp.status_code == 429:
                 if attempt < retries:
@@ -157,11 +203,10 @@ def http_get_xml(
     masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(
+            resp = kr_egress_get(
                 url,
                 timeout=timeout,
                 headers=req_headers,
-                proxies=_proxies_for(url),
             )
             if resp.status_code == 429:
                 if attempt < retries:
@@ -383,11 +428,10 @@ def http_get_html(
     masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(
+            resp = kr_egress_get(
                 url,
                 timeout=timeout,
                 headers=req_headers,
-                proxies=_proxies_for(url),
             )
             if resp.status_code == 429 and attempt < retries:
                 sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
@@ -427,11 +471,10 @@ def http_get_bytes(
     masked_url = mask_service_key(url)
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(
+            resp = kr_egress_get(
                 url,
                 timeout=timeout,
                 headers=req_headers,
-                proxies=_proxies_for(url),
             )
             if resp.status_code == 429 and attempt < retries:
                 sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
@@ -501,6 +544,19 @@ class IntakeSourceSpec:
     # 고치면 오류 보고까지 따라온다.
     health_code_override: str = ""   # 비우면 prefix 의 `_`→`-`. 관례를 벗어난 3종만 지정
     warn_only: bool = False          # True = 오류를 경고로만(run 을 적색으로 만들지 않음)
+    # ★[무음 감시 2026-09-14] 아래 두 필드는 `source_silence` 가 쓴다. 종전 health 는
+    # **오류를 낸 소스만** 보고했다 — 피드가 200 을 주면서 빈 응답을 돌려주거나, 스키마가
+    # 바뀌어 파서가 0건을 뽑거나, 소스가 그냥 갱신을 멈추면 `*_error` 가 False 라 아무
+    # 경보도 안 났다. 그래서 PIC/S(46일)·MHRA(25/35일)·EU GMP NCR(20일)·WHO(12/16일)·
+    # Health Canada(13일)·ICH(60일+)가 **경보 0건으로** 멈춰 있었고, 주간 브리프는 그걸
+    # "한산한 주"처럼 0 으로 찍어 발행했다(2026-09-14 발견).
+    #
+    # `silence_days` 는 "이 정도면 확실히 이상하다" 선이지 "가장 빨리 잡는" 선이 아니다.
+    # 소스가 실제로 얼마나 자주 내는지(2026-07~09 60일 실측)에 맞춰 4단으로만 둔다 —
+    # 주 1회 이상 내는 소스 10일 · 월 1회꼴 21일 · 산발 35일 · 희소(ICH) 60일.
+    # 더 촘촘히 깎으면 한산한 주에 가짜 경고가 나고, 그러면 아무도 안 읽는다.
+    notion_source: str = ""   # Notion Intake DB 의 `Source` select 값. 비우면 무음 감시 제외
+    silence_days: int = 0     # 이 일수를 **초과**해 신규 0건이면 경고. 0 = 감시 안 함
 
     @property
     def health_code(self) -> str:
@@ -515,27 +571,38 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     # 표면화이므로, "이 소스가 죽어도 그 주 발행은 나가야 한다"면 warn_only=True 다.
     # fr/recall 은 둘 다 죽을 때만 `phase1-all-failed`(failure)로 남겨 두고, 단독 실패는
     # 여기서 경고로 표면화한다(종전엔 단독 실패가 완전 무음이었다).
-    IntakeSourceSpec("fr", "Federal Register", has_truncated=True, warn_only=True),
-    IntakeSourceSpec("recall", "OpenFDA Recall", has_truncated=True, warn_only=True),
-    IntakeSourceSpec("ema", "EMA RSS", warn_only=True),
-    IntakeSourceSpec("mhra", "MHRA RSS", warn_only=True),
-    IntakeSourceSpec("mhra_alert", "MHRA Drug/Device Alerts", warn_only=True),
-    IntakeSourceSpec("pics", "PIC/S RSS", warn_only=True),
-    IntakeSourceSpec("eca", "ECA Academy RSS", warn_only=True),
-    IntakeSourceSpec("wl", "FDA Warning Letters", warn_only=True),
-    IntakeSourceSpec("mfds", "MFDS RSS", health_code_override="mfds-rss"),
+    IntakeSourceSpec("fr", "Federal Register", has_truncated=True, warn_only=True,
+                     notion_source=SOURCE_FR, silence_days=10),
+    IntakeSourceSpec("recall", "OpenFDA Recall", has_truncated=True, warn_only=True,
+                     notion_source=SOURCE_RECALL, silence_days=10),
+    IntakeSourceSpec("ema", "EMA RSS", warn_only=True,
+                     notion_source=SOURCE_EMA, silence_days=10),
+    IntakeSourceSpec("mhra", "MHRA RSS", warn_only=True,
+                     notion_source=SOURCE_MHRA, silence_days=35),
+    IntakeSourceSpec("mhra_alert", "MHRA Drug/Device Alerts", warn_only=True,
+                     notion_source=SOURCE_MHRA, silence_days=35),
+    IntakeSourceSpec("pics", "PIC/S RSS", warn_only=True,
+                     notion_source=SOURCE_PICS, silence_days=35),
+    IntakeSourceSpec("eca", "ECA Academy RSS", warn_only=True,
+                     notion_source=SOURCE_ECA, silence_days=10),
+    IntakeSourceSpec("wl", "FDA Warning Letters", warn_only=True,
+                     notion_source=SOURCE_FDA_WL, silence_days=10),
+    IntakeSourceSpec("mfds", "MFDS RSS", health_code_override="mfds-rss",
+                     notion_source=SOURCE_MFDS, silence_days=10),
     IntakeSourceSpec("mfds_law", "MFDS Law/Admrul"),
     IntakeSourceSpec("mfds_recall", "MFDS Recall"),
     IntakeSourceSpec("mfds_admin", "MFDS Admin"),
     IntakeSourceSpec("mfds_gmp_cert", "MFDS GMP Certificate"),
     IntakeSourceSpec("mfds_safety_letter", "MFDS Safety Letter"),
     IntakeSourceSpec("mfds_gmp_inspection", "MFDS GMP Inspection"),
-    IntakeSourceSpec("ich", "ICH"),
-    IntakeSourceSpec("who", "WHO"),
-    IntakeSourceSpec("hc", "Health Canada", health_code_override="health-canada"),
-    IntakeSourceSpec("fda483", "FDA 483"),
+    IntakeSourceSpec("ich", "ICH", notion_source=SOURCE_ICH, silence_days=60),
+    IntakeSourceSpec("who", "WHO", notion_source=SOURCE_WHO, silence_days=10),
+    IntakeSourceSpec("hc", "Health Canada", health_code_override="health-canada",
+                     notion_source=SOURCE_HC, silence_days=10),
+    IntakeSourceSpec("fda483", "FDA 483", notion_source=SOURCE_FDA_483, silence_days=10),
     # 전문지·NCR 3종은 주당 카드가 한 자릿수라 죽어도 발행을 막을 이유가 없다 → 경고.
-    IntakeSourceSpec("ispe", "ISPE iSpeak RSS", warn_only=True),
+    IntakeSourceSpec("ispe", "ISPE iSpeak RSS", warn_only=True,
+                     notion_source=SOURCE_ISPE, silence_days=21),
     # ★[2026-08-12] Brave Search 는 23종 중 **유일하게** warn_only 도 transient 강등 자격도
     # 없어, 오류 한 번에 exit 1 = 그 주 발행 스캐폴드 배제였다. 요율 제한이 일상인 3rd-party
     # 보조 검색이고 카드 생성의 필수 경로도 아니다 — 죽어도 그 주 발행은 나가야 한다.
@@ -545,8 +612,10 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     # 테스트가 못박아 둔 계약이다(ECA·WL 선례와 같은 기구를 쓴다).
     IntakeSourceSpec("search", "Brave Search", health_code_override="brave-search",
                      warn_only=True),
-    IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)", warn_only=True),
-    IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True),
+    IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)", warn_only=True,
+                     notion_source=SOURCE_EU_GMP_NCR, silence_days=21),
+    IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True,
+                     notion_source=SOURCE_MHRA_GMP_NCR, silence_days=35),
 )
 
 

@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
-"""Probe KR-egress reachability for the blocked MFDS/nedrug/law.go.kr paths."""
+"""Probe KR-egress reachability for the blocked MFDS/nedrug/law.go.kr paths.
+
+[2026-09-14] 첫 줄에 `[PROXY] reachable|unreachable|unconfigured` 를 찍는다 — 프록시 1대의
+도달 여부와 원 서버 도달 여부를 분리해 읽기 위해서다. 프로브는 수집기와 같은
+`kr_egress_get` 을 타므로 프록시 홉이 죽어 있으면 직결 폴백 결과가 찍힌다.
+"""
 
 from __future__ import annotations
 
 import re
 import sys
 
-import requests
 
-from grm_common import DEFAULT_USER_AGENT, _proxies_for
+from grm_common import (
+    DEFAULT_USER_AGENT,
+    KR_EGRESS_PROXY_UNREACHABLE,
+    kr_egress_get,
+    probe_kr_egress_proxy,
+)
 
 
 PROBES = [
@@ -42,16 +51,25 @@ def main() -> int:
         except (AttributeError, ValueError):
             pass
 
+    # [2026-09-14] 프록시 **도달** 여부를 먼저 찍는다. 아래 프로브가 전부 실패해도 이 줄이
+    # "원 서버가 막았다"와 "프록시 1대가 죽었다"를 가른다(이슈 #983/#956 은 그걸 못 갈랐다).
+    proxy_status, proxy_detail = probe_kr_egress_proxy()
+    print(f"[PROXY] {proxy_status}: {proxy_detail}")
+    if proxy_status == KR_EGRESS_PROXY_UNREACHABLE:
+        print("[PROXY] 프록시 복구(EC2 재기동 또는 Secret MFDS_HTTP_PROXY 교체)는 사람만 할 수 있다 "
+              "— 아래 프로브는 직결 폴백 결과다.")
+
     headers = {"User-Agent": DEFAULT_USER_AGENT, "Accept": "*/*"}
     all_ok = True
     for label, url in PROBES:
         try:
-            resp = requests.get(
+            # 수집기와 같은 경로를 탄다 — 프록시 홉 실패면 직결로 1회 폴백(그 폴백이 먹혔는지는
+            # 위 [PROXY] 줄과 함께 읽는다: unreachable 인데 OK 면 "오늘은 직결이 열렸다").
+            resp = kr_egress_get(
                 url,
                 headers=headers,
                 timeout=20,
                 allow_redirects=True,
-                proxies=_proxies_for(url),
             )
             ok = resp.status_code == 200
             all_ok = all_ok and ok

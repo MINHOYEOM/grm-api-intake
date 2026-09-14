@@ -13,7 +13,7 @@ import os
 import time
 import urllib.parse
 from datetime import date, datetime, timedelta
-from typing import Any
+from typing import Any, Iterable
 
 import requests
 
@@ -516,25 +516,40 @@ def coverage_source_counts(rows: list[dict[str, Any]]) -> dict[str, int]:
     return out
 
 
-def build_coverage_collected(source_counts: dict[str, int]) -> dict[str, Any]:
+# 무음 감시가 잡은 소스의 coverage 표식. 발행 줄에 그대로 나가므로 `brief_lint` 의 파서
+# (`_COVERAGE_ITEM_RE`)와 짝이다 — 여기를 바꾸면 그쪽도 같이 바꿔야 한다.
+COVERAGE_SILENT_MARK = "(점검필요)"
+
+
+def build_coverage_collected(source_counts: dict[str, int],
+                             silent_sources: Iterable[str] = ()) -> dict[str, Any]:
     """'수집' 컬럼(소스별 수집 건수 + 총계)을 결정론 산출한다(W1).
 
-    반환 {"total": int, "items": [{"label","source","count"}...], "md": str}:
+    반환 {"total": int, "items": [{"label","source","count","silent"}...], "md": str}:
     - known 소스(COVERAGE_SOURCE_LABELS)는 고정 순서로 전부 포함(0건도 — '조용한 주' 가시화).
     - 라벨 미정의 소스(예: FDA 483)는 count>0 일 때만 원 이름으로 끝에 덧붙인다(조용한 유실 금지).
     - total = 모든 source_counts 합(= handoff row_count, 병합 멤버 포함).
     - md = 발행 callout 의 수집 세그먼트: "Intake row {total}건 ({label} {n} · ...)".
+    - `silent_sources`(무음 감시 `source_silence.evaluate_silence` 가 잡은 Notion Source 값)에
+      든 소스는 `{label} {n}(점검필요)` 로 찍고 item 에 `silent=True` 를 단다 — 2026-09-14호가
+      6개 소스 정지를 한산한 주와 구별되지 않는 `0` 으로 발행한 뒤 신설. 빈 집합이면 md 는
+      종전과 바이트 동일(골든 불변).
     LLM 은 md 를 그대로 삽입하고 병합·WebSearch·유효항목·Evidence·미확인 등 발행측 값만 채운다.
     """
     counts = {k: int(v) for k, v in (source_counts or {}).items()}
+    silent = set(silent_sources or ())
     items: list[dict[str, Any]] = []
     for source, label in COVERAGE_SOURCE_LABELS:
-        items.append({"label": label, "source": source, "count": counts.get(source, 0)})
+        items.append({"label": label, "source": source, "count": counts.get(source, 0),
+                      "silent": source in silent})
     for source in sorted(k for k in counts if k and k not in _COVERAGE_KNOWN_SOURCES):
         if counts[source] > 0:
-            items.append({"label": source, "source": source, "count": counts[source]})
+            items.append({"label": source, "source": source, "count": counts[source],
+                          "silent": source in silent})
     total = sum(counts.values())
-    seg = " · ".join(f"{it['label']} {it['count']}" for it in items)
+    seg = " · ".join(
+        f"{it['label']} {it['count']}{COVERAGE_SILENT_MARK if it['silent'] else ''}"
+        for it in items)
     return {"total": total, "items": items, "md": f"Intake row {total}건 ({seg})"}
 
 
@@ -610,8 +625,13 @@ _HANDOFF_V2_ROW_KEEP = tuple(_intake_page_snapshot({}))
 
 def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
                                      window_days: int,
-                                     generated_at: datetime) -> dict[str, Any]:
+                                     generated_at: datetime,
+                                     silent_sources: Iterable[str] = ()) -> dict[str, Any]:
     """handoff v2(additive) payload. 순수 함수 — 네트워크 없음(scaffold 조립만).
+
+    `silent_sources` = 무음 감시가 잡은 Notion Source 값(2026-09-14 §3). coverage 줄에
+    `{label} 0(점검필요)` 로 찍히고, 비어 있지 않을 때만 `coverage_silent_sources` 키가
+    additive 로 붙는다(빈 집합이면 payload 바이트 불변 — 골든 보존).
 
     `rows` 는 K2-prep(`enrich_rows_with_raw`)로 **dedupe·raw 부착**된 상태여야 한다.
     각 row 는 v1 호환 필드 whitelist 복사 + `card_scaffold`·`prose_input`·`section`·
@@ -670,7 +690,8 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
             v2row.update(card.translation_fields())
         out_rows.append(v2row)
         source_counts[row.get("source", "")] = source_counts.get(row.get("source", ""), 0) + 1
-    return {
+    silent = sorted(set(silent_sources or ()))
+    payload: dict[str, Any] = {
         "schema_version": HANDOFF_SCHEMA_VERSION_V2,
         "handoff_id": handoff_id_for(run_date),
         "run_date_kst": run_date.isoformat(),
@@ -681,9 +702,13 @@ def build_routine_handoff_payload_v2(rows: list[dict[str, Any]], run_date: date,
         "row_count": len(out_rows),
         "source_counts": source_counts,
         # 수집 현황 '수집' 컬럼 결정론 산출 — LLM 재집계 금지(W1). 발행 callout 에 그대로 전사.
-        "coverage_collected_md": build_coverage_collected(source_counts)["md"],
+        # 무음 소스는 `0(점검필요)` 로 찍힌다 — 한산한 주와 구별(§3 2026-09-14).
+        "coverage_collected_md": build_coverage_collected(source_counts, silent)["md"],
         "rows": out_rows,
     }
+    if silent:
+        payload["coverage_silent_sources"] = silent
+    return payload
 
 
 def build_web_brief_payload_v2(rows: list[dict[str, Any]], run_date: date,
@@ -1166,7 +1191,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          doc_ids: set[str] | None = None,
                          inmemory_raw: dict[str, dict[str, Any]] | None = None,
                          display_window_days: int | None = None,
-                         web_brief_dir: str | None = None
+                         web_brief_dir: str | None = None,
+                         silent_sources: Iterable[str] = (),
                          ) -> tuple[int, str]:
     # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지
     # 안전망)와 payload 의 window_start~window_end 는 역할이 다르다. 후자는 v16
@@ -1223,7 +1249,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         # 당일분은 메모리 적중(fetch 0), 과거 누적 New row 만 page children fetch 폴백.
         enriched, _stats = enrich_rows_with_raw(token, rows, inmemory_raw=inmemory_raw)
         payload = build_routine_handoff_payload_v2(enriched, run_date,
-                                                   payload_window_days, generated_at)
+                                                   payload_window_days, generated_at,
+                                                   silent_sources=silent_sources)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
                                                        generated_at, compact=True)
         log("INFO", f"Routine handoff v2 생성(ENABLE_HANDOFF_V2): rows={payload['row_count']}")

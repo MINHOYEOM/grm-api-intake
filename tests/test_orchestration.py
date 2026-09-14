@@ -591,21 +591,22 @@ class IntakeSourceGateCoverageTest(unittest.TestCase):
     """
 
     def _source_enabled_keys(self) -> set:
-        """`_evaluate_health` 소스에서 source_enabled dict 의 키를 뽑는다(AST 잠금)."""
+        """`grm_health.source_enabled_map` 이 돌려주는 dict 리터럴의 키를 뽑는다(AST 잠금).
+
+        [2026-09-14] 매핑은 `_evaluate_health` 안의 지역 리터럴에서 모듈 함수로 옮겨졌다 —
+        무음 감시(coverage 줄)가 health 와 **같은 매핑**을 써야 해서다. 리터럴을 AST 로
+        읽는 이유는 종전과 같다: 호출해서 키를 얻으면 기본값 True 로 빠진 prefix 를 못 본다.
+        """
         import ast
         import inspect as _inspect
         import textwrap as _textwrap
-        src = _textwrap.dedent(_inspect.getsource(ci._evaluate_health))
+        import grm_health
+        src = _textwrap.dedent(_inspect.getsource(grm_health.source_enabled_map))
         tree = ast.parse(src)
         for node in ast.walk(tree):
-            # `source_enabled: dict[str, bool] = {...}` 은 Assign 이 아니라 AnnAssign 이다.
-            targets = ([node.target] if isinstance(node, ast.AnnAssign)
-                       else list(node.targets) if isinstance(node, ast.Assign) else [])
-            value = getattr(node, "value", None)
-            if (targets and isinstance(targets[0], ast.Name)
-                    and targets[0].id == "source_enabled" and isinstance(value, ast.Dict)):
-                return {k.value for k in value.keys if isinstance(k, ast.Constant)}
-        self.fail("source_enabled dict 를 찾지 못함 — 파싱 기준이 낡았는지 확인할 것")
+            if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict):
+                return {k.value for k in node.value.keys if isinstance(k, ast.Constant)}
+        self.fail("source_enabled_map 의 dict 리터럴을 찾지 못함 — 파싱 기준이 낡았는지 확인할 것")
 
     def test_every_registered_source_has_a_gate(self):
         keys = self._source_enabled_keys()

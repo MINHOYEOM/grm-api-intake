@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-from grm_common import INTAKE_SOURCE_SPECS, log
+from grm_common import INTAKE_SOURCE_SPECS, KR_EGRESS_PROXY_UNREACHABLE, log
 from source_silence import evaluate_silence, watched_sources
 
 
@@ -182,6 +182,63 @@ def _source_health_rows(stats: CollectionStats) -> list[dict[str, Any]]:
     return rows
 
 
+def source_enabled_map(
+    *,
+    active: set[str],
+    enable_search: bool,
+    enable_mfds: bool,
+    enable_mfds_law: bool,
+    enable_mfds_recall: bool,
+    enable_mfds_admin: bool,
+    enable_mfds_gmp_cert: bool,
+    enable_mfds_safety_letter: bool,
+    enable_mfds_gmp_inspection: bool,
+    enable_ich: bool,
+    enable_who: bool,
+    enable_hc: bool,
+    enable_fda483: bool,
+    enable_ispe: bool = False,
+    enable_eu_gmp_ncr: bool = False,
+    enable_mhra_gmp_ncr: bool = False,
+) -> dict[str, bool]:
+    """수집 prefix → "이번 실행에서 켜져 있었나".
+
+    `_evaluate_health` 의 소스별 오류 보고와 무음 감시(health 경고 + handoff coverage 줄)가
+    **같은 매핑**을 쓴다 — 두 계기가 다른 답을 내면 사람이 어느 쪽도 못 믿는다(2026-09-14
+    §3 에서 coverage 줄 배선 때 함수로 뽑음). 정확한 커버리지는 테스트가 잠근다
+    (IntakeSourceGateCoverageTest).
+    """
+    return {
+        # feature flag 로 켜지는 소스(플래그가 이미 `or "<token>" in active` 를 포함한다)
+        "search": enable_search,
+        "mfds": enable_mfds,
+        "mfds_law": enable_mfds_law,
+        "mfds_recall": enable_mfds_recall,
+        "mfds_admin": enable_mfds_admin,
+        "mfds_gmp_cert": enable_mfds_gmp_cert,
+        "mfds_safety_letter": enable_mfds_safety_letter,
+        "mfds_gmp_inspection": enable_mfds_gmp_inspection,
+        "ich": enable_ich,
+        "who": enable_who,
+        "hc": enable_hc,
+        "fda483": enable_fda483,
+        "ispe": enable_ispe,
+        "eu_gmp_ncr": enable_eu_gmp_ncr,
+        "mhra_gmp_ncr": enable_mhra_gmp_ncr,
+        # `--sources` 토큰으로만 켜지는 소스
+        "fr": "fr" in active,
+        "recall": "recall" in active,
+        "ema": "ema" in active,
+        "mhra": "mhra" in active,
+        # MHRA 회수 채널은 별도 토큰이 없다 — "mhra" 하나로 RSS 와 함께 수집된다
+        # (collect_intake 의 `if "mhra" in active:` 블록 참조).
+        "mhra_alert": "mhra" in active,
+        "pics": "pics" in active,
+        "eca": "eca" in active,
+        "wl": "wl" in active,
+    }
+
+
 def _evaluate_health(
     *,
     stats: CollectionStats,
@@ -221,8 +278,27 @@ def _evaluate_health(
     source_last_seen: dict[str, date | None] | None = None,
     source_silence_errors: tuple[str, ...] = (),
     run_date: date | None = None,
+    # ★[KR egress preflight 2026-09-14] 프록시 **도달** 여부(설정 여부가 아니다).
+    #   `grm_common.probe_kr_egress_proxy` 산출물. 빈 문자열 = 미측정(종전 호출 호환).
+    kr_egress_proxy_status: str = "",
+    kr_egress_proxy_detail: str = "",
 ) -> HealthCheckResult:
     health = HealthCheckResult()
+
+    # ── KR egress 프록시 도달 불가 — MFDS 계열 실패의 **공통 원인**을 한 줄로 ────────
+    # 종전엔 프록시 1대가 죽으면 `transient-source-error:mfds-*` 5줄만 떴고(이슈 #956),
+    # 그 다섯이 한 원인이라는 사실은 누구도 말해 주지 않았다. 경고이지 실패가 아니다 —
+    # 프록시 사망이 그 주 발행을 막으면 안 되고, 코드가 고칠 수 있는 일도 아니다.
+    if kr_egress_proxy_status == KR_EGRESS_PROXY_UNREACHABLE:
+        health.add_warning(
+            "kr-egress-proxy-unreachable",
+            "KR egress proxy",
+            "KR egress 프록시(MFDS_HTTP_PROXY)에 연결 불가 — MFDS RSS·회수·행정처분·"
+            "GMP실사·법령 실패는 소스가 아니라 이 프록시 1대의 문제다",
+            ("복구는 사람만 할 수 있다: EC2 프록시 재기동 또는 Secret MFDS_HTTP_PROXY 교체"
+             "(코드로 대체 불가). 홉 실패 시 직결 1회 폴백은 시도되지만 MFDS 가 러너 IP 를 "
+             f"거부하는 날은 그 폴백도 못 받는다. {kr_egress_proxy_detail}")[:240],
+        )
 
     if modality_preflight_disabled:
         health.add_warning(
@@ -322,35 +398,16 @@ def _evaluate_health(
         #
         # 이제 INTAKE_SOURCE_SPECS 를 순회한다 — 레지스트리에 소스를 넣으면 오류 보고가
         # 자동으로 따라온다. 각 소스의 "이번 실행에서 켜져 있었나"만 아래에서 매핑한다.
-        source_enabled: dict[str, bool] = {
-            # feature flag 로 켜지는 소스(플래그가 이미 `or "<token>" in active` 를 포함한다)
-            "search": enable_search,
-            "mfds": enable_mfds,
-            "mfds_law": enable_mfds_law,
-            "mfds_recall": enable_mfds_recall,
-            "mfds_admin": enable_mfds_admin,
-            "mfds_gmp_cert": enable_mfds_gmp_cert,
-            "mfds_safety_letter": enable_mfds_safety_letter,
-            "mfds_gmp_inspection": enable_mfds_gmp_inspection,
-            "ich": enable_ich,
-            "who": enable_who,
-            "hc": enable_hc,
-            "fda483": enable_fda483,
-            "ispe": enable_ispe,
-            "eu_gmp_ncr": enable_eu_gmp_ncr,
-            "mhra_gmp_ncr": enable_mhra_gmp_ncr,
-            # `--sources` 토큰으로만 켜지는 소스
-            "fr": "fr" in active,
-            "recall": "recall" in active,
-            "ema": "ema" in active,
-            "mhra": "mhra" in active,
-            # MHRA 회수 채널은 별도 토큰이 없다 — "mhra" 하나로 RSS 와 함께 수집된다
-            # (collect_intake 의 `if "mhra" in active:` 블록 참조).
-            "mhra_alert": "mhra" in active,
-            "pics": "pics" in active,
-            "eca": "eca" in active,
-            "wl": "wl" in active,
-        }
+        source_enabled: dict[str, bool] = source_enabled_map(
+            active=active, enable_search=enable_search, enable_mfds=enable_mfds,
+            enable_mfds_law=enable_mfds_law, enable_mfds_recall=enable_mfds_recall,
+            enable_mfds_admin=enable_mfds_admin, enable_mfds_gmp_cert=enable_mfds_gmp_cert,
+            enable_mfds_safety_letter=enable_mfds_safety_letter,
+            enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
+            enable_ich=enable_ich, enable_who=enable_who, enable_hc=enable_hc,
+            enable_fda483=enable_fda483, enable_ispe=enable_ispe,
+            enable_eu_gmp_ncr=enable_eu_gmp_ncr, enable_mhra_gmp_ncr=enable_mhra_gmp_ncr,
+        )
         # ★기본값이 True 인 것이 의도다 — 레지스트리에 소스를 넣고 위 매핑을 깜빡하면
         # **조용히 빠지는 게 아니라 시끄럽게 보고된다**(가짜 경고 1건 > 무음 실패).
         # 정확한 커버리지는 테스트가 잠근다(IntakeSourceGateCoverageTest).

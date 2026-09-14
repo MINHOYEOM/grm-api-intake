@@ -40,8 +40,10 @@ sys.path.insert(0, REPO)
 import grm_common  # noqa: E402 — MFDS_EGRESS_HOSTS·proxies_for 의 단일 정의
 
 PROXY_ENV = "MFDS_HTTP_PROXY"
-# 옛 이름(`_proxies_for`)도 유효한 배선이다 — probe_mfds_egress 가 그걸 쓴다.
-PROXY_HELPER_RE = re.compile(r"\b_?proxies_for\s*\(")
+# 옛 이름(`_proxies_for`)도 유효한 배선이다. [2026-09-14] `kr_egress_get` 은 proxies_for 를
+# 안에서 부르고 홉 실패 시 직결로 폴백하는 상위 헬퍼라 역시 유효한 배선이다
+# (probe_mfds_egress 가 그리로 옮겨 갔다).
+PROXY_HELPER_RE = re.compile(r"\b(?:_?proxies_for|kr_egress_get)\s*\(")
 
 # grm_common 은 호스트 집합·프록시 헬퍼의 **정의처**다. seed 에 넣으면 이걸 import 하는
 # 모듈 전부가 전이로 걸려 집합이 저장소 전체가 되고, 그러면 아무것도 못 걸러낸다.
@@ -183,8 +185,10 @@ class MfdsEgressWiringTest(unittest.TestCase):
             name for name in (self.direct | self.catalog)
             if _RAW_REQUESTS_RE.search(self.sources[name])
         )
+        # 하한 2 = brief_lint · library_linkcheck. probe_mfds_egress 는 2026-09-14 에
+        # requests 직타를 버리고 kr_egress_get 으로 옮겨 이 모집단에서 빠졌다(정상).
         self.assertGreaterEqual(
-            len(candidates), 3,
+            len(candidates), 2,
             f"requests 직타 모듈 스캔이 너무 적다: {candidates}")
         offenders = [n for n in candidates if not PROXY_HELPER_RE.search(self.sources[n])]
         self.assertEqual(

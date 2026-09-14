@@ -49,10 +49,13 @@ import requests
 
 from grm_common import (
     HTTPClientError,
+    KR_EGRESS_PROXY_REACHABLE,
+    KR_EGRESS_PROXY_UNREACHABLE,
     env_flag,
     http_get_json,
     http_get_xml,
     log,
+    probe_kr_egress_proxy,
     retry_after_seconds,
 )
 from findings_store import (
@@ -88,6 +91,7 @@ from grm_health import (
     _source_health_rows,
     _write_health_json,
     _write_health_summary,
+    source_enabled_map,
 )
 
 # ── [리팩토링 배치3 Phase2] 분류 판정 순수함수 층을 grm_taxonomy 로 분리(verbatim 이동).
@@ -3939,6 +3943,18 @@ def main() -> int:
     start, end = date_window(run_date, args.window_days)
     log("INFO", f"실행일(KST)={run_date}  window={start}~{end}  dry_run={args.dry_run}")
 
+    # ── [KR egress 프록시 preflight 2026-09-14] 설정 여부가 아니라 **도달 여부** ─────
+    # `MFDS_HTTP_PROXY_CONFIGURED` 는 값이 있느냐만 말한다. 2026-09-08~14 프록시 1대가 죽었을
+    # 때 이슈 #956 은 "MFDS 5종 실패"로만 보였고 원인이 프록시인지 원 서버인지 구분이 안 됐다.
+    # TCP 연결 1회로 도달 여부를 재고, health 가 `kr-egress-proxy-unreachable` 경고로 표면화
+    # 한다. 판정만 하고 수집은 계속한다(`kr_egress_get` 이 홉 실패 시 직결로 1회 폴백).
+    kr_proxy_status, kr_proxy_detail = probe_kr_egress_proxy()
+    if kr_proxy_status == KR_EGRESS_PROXY_UNREACHABLE:
+        log("WARN", f"KR egress 프록시 도달 불가 — {kr_proxy_detail} "
+                    "(MFDS 계열은 직결 폴백에 기댄다 · 프록시 복구는 사람 작업)")
+    elif kr_proxy_status == KR_EGRESS_PROXY_REACHABLE:
+        log("INFO", f"KR egress 프록시 도달 확인 — {kr_proxy_detail}")
+
     # ── P0 개선: 지연공개 대응 윈도우(enforcement window) ─────────────────────
     # 사건일(회수명령일·최종처분일·report_date 등) 기준으로 윈도우를 거르는 소스는
     # 원천이 과거 일자 항목을 뒤늦게 일괄 공개하는 경우가 많아, 기본 7일 윈도우 밖으로
@@ -4134,6 +4150,59 @@ def main() -> int:
     else:
         log("INFO", "ENABLE_SEARCH=false — Brave Search 건너뜀")
 
+    # ── [무음 감시 2026-09-14] Source 별 마지막 수집일 조회 ──────────────────
+    # `*_error` 기반 보고는 **오류를 낸 소스만** 잡는다. 피드가 200 과 함께 빈 응답을
+    # 주거나 스키마가 바뀌어 파서가 조용히 0건을 뽑으면 아무 경보도 안 난다 — 그 상태로
+    # PIC/S 46일·MHRA 25/35일·EU GMP NCR 20일·WHO 12/16일·HC 13일·ICH 60일+ 이 멈춰
+    # 있었다. 기본값 true 인 것이 의도다: 기본 off 인 안전망은 아무도 안 켠다.
+    #
+    # 조회는 소스당 1행짜리 정렬 쿼리라 가볍고, 실패해도 수집·발행에 영향이 없다
+    # (실패한 소스는 판정에서 빠지고 그 사실만 경고로 남는다 — fail-soft).
+    #
+    # ★handoff **앞**에서 조회한다 — 무음 판정이 handoff 의 coverage 줄에도 실려야 한다
+    #   (`PIC/S 0(점검필요)`). health 직전에 두면 발행 줄이 무음과 한산한 주를 구별하지
+    #   못한다: 2026-09-14호가 6개 소스 정지를 `MHRA 0 · PIC/S 0 · …` 으로 찍어 발행했다.
+    #   당일 insert 는 이미 끝났으므로 여기서 본 마지막 수집일은 health 시점과 같다.
+    source_last_seen: dict[str, Any] | None = None
+    source_silence_errors: tuple[str, ...] = ()
+    coverage_silent_sources: set[str] = set()
+    if (env_flag("ENABLE_SOURCE_SILENCE_WATCHDOG", True)
+            and notion_token and notion_db and not args.dry_run):
+        try:
+            from source_silence import evaluate_silence, query_last_seen, watched_sources
+            _seen, _errs = query_last_seen(
+                notion_token, notion_db,
+                [w.notion_source for w in watched_sources()],
+                run_date=run_date,
+            )
+            source_last_seen, source_silence_errors = _seen, tuple(_errs)
+            # coverage 줄용 무음 집합 — health 와 **같은 판정 함수·같은 활성 매핑**을 쓴다
+            # (두 계기가 다른 답을 내면 사람이 어느 쪽도 못 믿는다).
+            coverage_silent_sources = {
+                finding.notion_source
+                for finding in evaluate_silence(
+                    last_seen=_seen, run_date=run_date,
+                    source_enabled=source_enabled_map(
+                        active=active, enable_search=enable_search,
+                        enable_mfds=enable_mfds, enable_mfds_law=enable_mfds_law,
+                        enable_mfds_recall=enable_mfds_recall,
+                        enable_mfds_admin=enable_mfds_admin,
+                        enable_mfds_gmp_cert=enable_mfds_gmp_cert,
+                        enable_mfds_safety_letter=enable_mfds_safety_letter,
+                        enable_mfds_gmp_inspection=enable_mfds_gmp_inspection,
+                        enable_ich=enable_ich, enable_who=enable_who, enable_hc=enable_hc,
+                        enable_fda483=enable_fda483, enable_ispe=enable_ispe,
+                        enable_eu_gmp_ncr=enable_eu_gmp_ncr,
+                        enable_mhra_gmp_ncr=enable_mhra_gmp_ncr,
+                    ),
+                )
+            }
+        except Exception as e:  # noqa: BLE001 — 감시가 수집을 죽이면 안 된다
+            source_last_seen = None
+            source_silence_errors = (f"watchdog: {e}",)
+            coverage_silent_sources = set()
+            log("WARN", f"무음 감시 건너뜀 — {e}")
+
     handoff_emitted = False
     handoff_failed = False
     handoff_row_count = 0
@@ -4187,7 +4256,9 @@ def main() -> int:
                     inmemory_raw=inmemory_raw,
                     # B1 조회/표시 분리: 브리프 "검색 기간"은 수집 윈도우(주간) 유지.
                     display_window_days=args.window_days,
-                    web_brief_dir=web_brief_dir)
+                    web_brief_dir=web_brief_dir,
+                    # 무음 소스는 coverage 줄에 `0(점검필요)` 로 찍힌다(§3 2026-09-14).
+                    silent_sources=coverage_silent_sources)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True
@@ -4243,33 +4314,11 @@ def main() -> int:
         "ENABLE_FINDINGS_SUPABASE_APPEND": cfg.findings_supabase_append_requested,
         "ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND": cfg.findings_supabase_findings_append_requested,
         "MFDS_HTTP_PROXY_CONFIGURED": cfg.mfds_http_proxy_configured,
+        # 설정 여부(위)와 도달 여부(아래)는 다른 질문이다 — 2026-09-14 프록시 사망 때 위는
+        # true, 아래는 unreachable 이었다. 값: unconfigured / reachable / unreachable.
+        "MFDS_HTTP_PROXY_REACHABLE": kr_proxy_status,
         "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
     }
-    # ── [무음 감시 2026-09-14] Source 별 마지막 수집일 조회 ──────────────────
-    # `*_error` 기반 보고는 **오류를 낸 소스만** 잡는다. 피드가 200 과 함께 빈 응답을
-    # 주거나 스키마가 바뀌어 파서가 조용히 0건을 뽑으면 아무 경보도 안 난다 — 그 상태로
-    # PIC/S 46일·MHRA 25/35일·EU GMP NCR 20일·WHO 12/16일·HC 13일·ICH 60일+ 이 멈춰
-    # 있었다. 기본값 true 인 것이 의도다: 기본 off 인 안전망은 아무도 안 켠다.
-    #
-    # 조회는 소스당 1행짜리 정렬 쿼리라 가볍고, 실패해도 수집·발행에 영향이 없다
-    # (실패한 소스는 판정에서 빠지고 그 사실만 경고로 남는다 — fail-soft).
-    source_last_seen: dict[str, Any] | None = None
-    source_silence_errors: tuple[str, ...] = ()
-    if (env_flag("ENABLE_SOURCE_SILENCE_WATCHDOG", True)
-            and notion_token and notion_db and not args.dry_run):
-        try:
-            from source_silence import query_last_seen, watched_sources
-            _seen, _errs = query_last_seen(
-                notion_token, notion_db,
-                [w.notion_source for w in watched_sources()],
-                run_date=run_date,
-            )
-            source_last_seen, source_silence_errors = _seen, tuple(_errs)
-        except Exception as e:  # noqa: BLE001 — 감시가 수집을 죽이면 안 된다
-            source_last_seen = None
-            source_silence_errors = (f"watchdog: {e}",)
-            log("WARN", f"무음 감시 건너뜀 — {e}")
-
     health = _evaluate_health(
         modality_preflight_disabled=modality_preflight_disabled,
         handoff_idem_preflight_disabled=handoff_idem_preflight_disabled,
@@ -4304,6 +4353,8 @@ def main() -> int:
         source_last_seen=source_last_seen,
         source_silence_errors=source_silence_errors,
         run_date=run_date,
+        kr_egress_proxy_status=kr_proxy_status,
+        kr_egress_proxy_detail=kr_proxy_detail,
     )
     health_payload = _health_payload(
         health=health,

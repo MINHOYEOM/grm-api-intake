@@ -14,6 +14,12 @@ name: GRM Source Reachability Probe
 # 그건 타깃이 막힌 게 아니라 측정 자체가 무효라는 뜻이다.
 on:
   workflow_dispatch:
+    inputs:
+      kr_egress:
+        description: 'KR egress 프록시(MFDS_HTTP_PROXY) 도달 여부 + MFDS/nedrug/law.go.kr 프로브도 함께 찍는다(secret 읽기 전용)'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -49,6 +55,23 @@ jobs:
         continue-on-error: true
         run: |
           python probe_source_reachability.py --output probe_report.json
+
+      # [2026-09-14] 옵트인 — 프록시 1대의 **도달 여부**를 러너에서 직접 잰다. 이슈 #983/#956 은
+      # "MFDS 5종 실패"만 보였고 프록시가 죽은 건지 원 서버가 막은 건지 아무도 못 갈랐다.
+      # 이 워크플로의 "secret 미사용" 원칙에서 유일한 예외이며 읽기 전용이다(값은 로그에 안 찍힘 —
+      # probe_mfds_egress 는 host:port 만 출력하고 서비스키는 마스킹한다).
+      - name: Probe KR egress proxy reachability (opt-in)
+        if: ${{ inputs.kr_egress == true }}
+        continue-on-error: true
+        env:
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+        run: |
+          {
+            echo "### KR egress proxy probe"
+            echo '```'
+            python probe_mfds_egress.py 2>&1 || true
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Write step summary
         if: always()

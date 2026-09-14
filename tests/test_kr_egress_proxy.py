@@ -31,6 +31,11 @@ class _Response:
 
 
 class EnvMixin:
+    def setUp(self) -> None:
+        # 회로차단기는 프로세스 전역 상태 — 테스트 간에 새지 않게 매번 닫고 시작한다.
+        grm_common.kr_proxy_circuit_reset()
+        self.addCleanup(grm_common.kr_proxy_circuit_reset)
+
     def set_env(self, key: str, value: str | None) -> None:
         old = os.environ.get(key)
         if value is None:
@@ -209,6 +214,86 @@ class KrEgressProxyFailoverTest(EnvMixin, unittest.TestCase):
         self.assertEqual(grm_common.http_get_json(self.URL), {"ok": True})
         self.assertEqual(len(calls), 1)
         self.assertIsNone(calls[0]["proxies"])
+
+
+class KrEgressCircuitBreakerTest(EnvMixin, unittest.TestCase):
+    """홉 실패 뒤에는 프록시를 건너뛴다 — 폴백이 있어도 요청마다 30초씩 먹으면 잡이 죽는다.
+
+    실측(2026-09-14 dry-run 34803960136): 직결 폴백으로 MFDS 전 소스가 회복됐지만 18분이
+    걸렸고, 자료실 갱신 잡은 20분 상한에 걸려 취소됐다.
+    """
+
+    PROXY = "http://kr-proxy.local:3128"
+    URL = "https://www.mfds.go.kr/www/rss/brd.do"
+
+    def _patch_get(self, fake):
+        original = grm_common.requests.get
+        grm_common.requests.get = fake
+        self.addCleanup(lambda: setattr(grm_common.requests, "get", original))
+
+    def _dead_proxy_get(self, calls: list[dict]):
+        def fake_get(url, **kwargs):
+            calls.append(kwargs)
+            if kwargs.get("proxies"):
+                raise grm_common.requests.exceptions.ProxyError(
+                    "Cannot connect to proxy kr-proxy.local:3128")
+            return _Response()
+        return fake_get
+
+    def test_second_request_skips_the_dead_proxy(self) -> None:
+        self.set_env("MFDS_HTTP_PROXY", self.PROXY)
+        calls: list[dict] = []
+        self._patch_get(self._dead_proxy_get(calls))
+        grm_common.http_get_json(self.URL)
+        grm_common.http_get_json(self.URL)
+        # 1번째: 프록시 실패 + 직결 / 2번째: 곧장 직결 — 프록시를 다시 두드리지 않는다.
+        self.assertEqual([c["proxies"] for c in calls],
+                         [{"http": self.PROXY, "https": self.PROXY}, None, None])
+        self.assertTrue(grm_common.kr_proxy_circuit_open())
+
+    def test_preflight_trip_makes_the_first_request_direct(self) -> None:
+        """preflight 가 도달 불가를 봤으면 첫 요청부터 30초를 아낀다."""
+        self.set_env("MFDS_HTTP_PROXY", self.PROXY)
+        calls: list[dict] = []
+        self._patch_get(self._dead_proxy_get(calls))
+        grm_common.kr_proxy_circuit_trip("preflight")
+        grm_common.http_get_json(self.URL)
+        self.assertEqual([c["proxies"] for c in calls], [None])
+
+    def test_proxy_is_retried_after_cooldown_and_closes_on_success(self) -> None:
+        self.set_env("MFDS_HTTP_PROXY", self.PROXY)
+        calls: list[dict] = []
+
+        def fake_get(url, **kwargs):
+            calls.append(kwargs)
+            return _Response()          # 프록시가 살아났다
+
+        self._patch_get(fake_get)
+        grm_common.kr_proxy_circuit_trip("test")
+        base = grm_common._kr_proxy_tripped_at
+        self.assertTrue(grm_common.kr_proxy_circuit_open(now=base + 1))
+        self.assertFalse(grm_common.kr_proxy_circuit_open(
+            now=base + grm_common.KR_PROXY_CIRCUIT_COOLDOWN_SECONDS + 1))
+        # 쿨다운을 지난 것처럼 시각을 뒤로 밀고 요청 → 프록시를 다시 시도하고 성공하면 닫힌다.
+        grm_common._kr_proxy_tripped_at = base - grm_common.KR_PROXY_CIRCUIT_COOLDOWN_SECONDS - 1
+        grm_common.http_get_json(self.URL)
+        self.assertEqual(calls[0]["proxies"], {"http": self.PROXY, "https": self.PROXY})
+        self.assertFalse(grm_common.kr_proxy_circuit_open())
+
+    def test_breaker_is_irrelevant_without_a_proxy(self) -> None:
+        self.set_env("MFDS_HTTP_PROXY", None)
+        calls: list[dict] = []
+
+        def fake_get(url, **kwargs):
+            calls.append(kwargs)
+            return _Response()
+
+        self._patch_get(fake_get)
+        grm_common.kr_proxy_circuit_trip("test")
+        grm_common.http_get_json(self.URL)
+        self.assertEqual([c["proxies"] for c in calls], [None])
+        # 프록시가 없으면 "응답했다" 도 아니다 — 회로 상태를 건드리지 않는다.
+        self.assertTrue(grm_common.kr_proxy_circuit_open())
 
 
 class MfdsRssBoardSelectionTest(EnvMixin, unittest.TestCase):

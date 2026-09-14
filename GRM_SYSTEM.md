@@ -509,7 +509,7 @@ grm-api-intake/
 ├─ backfill_deep_original_truncation.py  # D5b(원문 병기 절단)로 병합 보류된 483 심층분석 소급 병합 — 운영 병합 경로(inject_slots) 그대로 호출
 ├─ backfill_gmp_detail_0626.py     # 표 기능 탄생(07-02) 이전 발행 GMP실사 카드의 지적 표 소급 병합(raw_signals rows → 발행 브리프 JSON·card_scaffold 변환 함수 재사용)
 ├─ backfill_wl_violation_ko.py     # WL 위반항목 국문(violations_ko) 소급 병합 — deep 델타 → 발행 브리프 JSON(재조립 없이, inject_slots 병합 함수 재사용)
-├─ grm_common.py                   # 공통 HTTP·유틸 — KR egress 프록시(`kr_egress_get`: 홉 실패 시 직결 1회 폴백 · `probe_kr_egress_proxy`: TCP 도달 preflight)
+├─ grm_common.py                   # 공통 HTTP·유틸 — KR egress 프록시(`kr_egress_get`: 홉 실패 시 직결 1회 폴백 + 회로차단기(홉 실패 후 600초 프록시 생략) · `probe_kr_egress_proxy`: TCP 도달 preflight)
 ├─ grm_health.py, source_silence.py  # health 판정(소스 오류·`kr-egress-proxy-unreachable`·`source-silent:*` 전부 warning) · Notion 마지막 수집일 기반 무음 판정(레지스트리 `silence_days` 3단 10/21/35일 · ICH 는 제외)
 ├─ probe_mfds_egress.py            # MFDS/nedrug/law.go.kr 러너 도달 프로브 — 첫 줄 `[PROXY] reachable|unreachable|unconfigured`
 ├─ grm_cli.py                      # CLI JSON I/O·PostgREST 경계 파싱·자격증명 해석 단일 소스

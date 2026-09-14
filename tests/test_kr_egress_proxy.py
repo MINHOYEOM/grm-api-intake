@@ -132,6 +132,85 @@ class KrEgressProxyTest(EnvMixin, unittest.TestCase):
         )
 
 
+class KrEgressProxyFailoverTest(EnvMixin, unittest.TestCase):
+    """프록시 홉이 죽으면 직결로 1회 폴백한다(2026-09-14 사고 회귀 방지).
+
+    프록시 1대가 timeout 나자 MFDS_EGRESS_HOSTS 4종이 동시에 0건이 됐다. 직결이 열려
+    있는 날에도 시도조차 안 했기 때문이다. 폴백 경계(프록시 홉 실패만)도 함께 못박는다.
+    """
+
+    PROXY = "http://kr-proxy.local:3128"
+    URL = "https://www.mfds.go.kr/www/rss/brd.do"
+
+    def _patch_get(self, fake):
+        original = grm_common.requests.get
+        grm_common.requests.get = fake
+        self.addCleanup(lambda: setattr(grm_common.requests, "get", original))
+
+    def test_direct_retry_when_proxy_hop_fails(self) -> None:
+        self.set_env("MFDS_HTTP_PROXY", self.PROXY)
+        calls: list[dict] = []
+
+        def fake_get(url, **kwargs):
+            calls.append(kwargs)
+            if kwargs.get("proxies"):
+                raise grm_common.requests.exceptions.ProxyError(
+                    "Cannot connect to proxy kr-proxy.local:3128")
+            return _Response()
+
+        self._patch_get(fake_get)
+        self.assertEqual(grm_common.http_get_json(self.URL), {"ok": True})
+        self.assertEqual(len(calls), 2, "프록시 1회 + 직결 1회여야 한다")
+        self.assertEqual(calls[0]["proxies"], {"http": self.PROXY, "https": self.PROXY})
+        self.assertIsNone(calls[1]["proxies"], "폴백은 프록시를 떼고 나가야 한다")
+
+    def test_connect_timeout_naming_the_proxy_is_a_hop_failure(self) -> None:
+        self.set_env("MFDS_HTTP_PROXY", self.PROXY)
+        err = grm_common.requests.exceptions.ConnectTimeout(
+            "HTTPSConnectionPool(host='kr-proxy.local', port=3128): Read timed out")
+        self.assertTrue(grm_common._is_proxy_hop_failure(err, self.PROXY))
+
+    def test_origin_connect_timeout_is_not_a_hop_failure(self) -> None:
+        """원 서버가 늦은 것까지 직결로 다시 쏘면 차단 IP 로 두 배 두드릴 뿐이다."""
+        err = grm_common.requests.exceptions.ConnectTimeout(
+            "HTTPSConnectionPool(host='www.mfds.go.kr', port=443): Read timed out")
+        self.assertFalse(grm_common._is_proxy_hop_failure(err, self.PROXY))
+
+    def test_origin_5xx_is_not_retried_direct(self) -> None:
+        """5xx 는 프록시가 정상 동작했다는 뜻 — 폴백 대상이 아니다."""
+        self.set_env("MFDS_HTTP_PROXY", self.PROXY)
+        calls: list[dict] = []
+
+        class _Err500(_Response):
+            status_code = 500
+
+            def raise_for_status(self):
+                raise grm_common.requests.exceptions.HTTPError("500")
+
+        def fake_get(url, **kwargs):
+            calls.append(kwargs)
+            return _Err500()
+
+        self._patch_get(fake_get)
+        with self.assertRaises(RuntimeError):
+            grm_common.http_get_json(self.URL, retries=0)
+        self.assertEqual([c["proxies"] for c in calls],
+                         [{"http": self.PROXY, "https": self.PROXY}])
+
+    def test_no_proxy_configured_is_unchanged(self) -> None:
+        self.set_env("MFDS_HTTP_PROXY", None)
+        calls: list[dict] = []
+
+        def fake_get(url, **kwargs):
+            calls.append(kwargs)
+            return _Response()
+
+        self._patch_get(fake_get)
+        self.assertEqual(grm_common.http_get_json(self.URL), {"ok": True})
+        self.assertEqual(len(calls), 1)
+        self.assertIsNone(calls[0]["proxies"])
+
+
 class MfdsRssBoardSelectionTest(EnvMixin, unittest.TestCase):
     def test_board_selection_defaults_to_all_boards(self) -> None:
         self.set_env("MFDS_RSS_BOARD_MODE", None)

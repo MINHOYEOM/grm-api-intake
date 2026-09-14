@@ -15,9 +15,11 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any
 
 from grm_common import INTAKE_SOURCE_SPECS, log
+from source_silence import evaluate_silence, watched_sources
 
 
 @dataclass
@@ -214,6 +216,11 @@ def _evaluate_health(
     aged_unconsumed_new: int = 0,
     aged_new_query_error: str = "",
     handoff_window_days: int = 0,
+    # ★[무음 감시 2026-09-14] Source 별 마지막 Run Date. None = 감시 미수행(플래그 off
+    #   또는 조회 실패) → 판정 자체를 건너뛴다. `source_silence.query_last_seen` 산출물.
+    source_last_seen: dict[str, date | None] | None = None,
+    source_silence_errors: tuple[str, ...] = (),
+    run_date: date | None = None,
 ) -> HealthCheckResult:
     health = HealthCheckResult()
 
@@ -440,6 +447,34 @@ def _evaluate_health(
                         f"{source} 활성 상태에서 수집 오류",
                         detail[:240],
                     )
+
+        # ── 무음 감시 — "오류는 안 났는데 계속 0건" ──────────────────────────
+        # 위 루프는 `*_error` 가 선 소스만 본다. 피드가 200 과 함께 빈 응답을 주거나
+        # 스키마가 바뀌어 파서가 조용히 0건을 뽑으면 거기에 안 걸린다 — 그 상태로
+        # PIC/S 46일·MHRA 25/35일·EU GMP NCR 20일·WHO 12/16일·HC 13일·ICH 60일+ 가
+        # 경보 0건으로 멈춰 있었다(2026-09-14 발견). 여기서 마지막 수집일로 잡는다.
+        # 경고로만 남긴다 — 무음 감시가 그 주 발행을 막으면 안 된다.
+        if source_last_seen is not None and run_date is not None:
+            for finding in evaluate_silence(
+                last_seen=source_last_seen,
+                run_date=run_date,
+                source_enabled=source_enabled,
+            ):
+                health.add_warning(
+                    f"source-silent:{finding.notion_source}",
+                    finding.notion_source,
+                    f"{finding.notion_source} {finding.days_text}째 신규 0건 "
+                    f"— 무음 임계 {finding.threshold}일 초과",
+                    "수집 오류는 안 났다 = 피드가 빈 응답을 주거나 스키마가 바뀌어 "
+                    "파서가 0건을 뽑고 있을 수 있다. 엔드포인트를 직접 열어 확인하라.",
+                )
+        if source_silence_errors:
+            health.add_warning(
+                "source-silence-query-failed",
+                "Notion",
+                f"무음 감시 조회 실패 {len(source_silence_errors)}건 — 그 소스는 미판정",
+                "; ".join(source_silence_errors)[:240],
+            )
 
     if event_name == "schedule" and enable_moleg_api:
         health.add_warning(

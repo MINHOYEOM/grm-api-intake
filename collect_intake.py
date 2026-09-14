@@ -4245,6 +4245,31 @@ def main() -> int:
         "MFDS_HTTP_PROXY_CONFIGURED": cfg.mfds_http_proxy_configured,
         "LAW_GO_KR_OC_CONFIGURED": bool(law_go_kr_oc),
     }
+    # ── [무음 감시 2026-09-14] Source 별 마지막 수집일 조회 ──────────────────
+    # `*_error` 기반 보고는 **오류를 낸 소스만** 잡는다. 피드가 200 과 함께 빈 응답을
+    # 주거나 스키마가 바뀌어 파서가 조용히 0건을 뽑으면 아무 경보도 안 난다 — 그 상태로
+    # PIC/S 46일·MHRA 25/35일·EU GMP NCR 20일·WHO 12/16일·HC 13일·ICH 60일+ 이 멈춰
+    # 있었다. 기본값 true 인 것이 의도다: 기본 off 인 안전망은 아무도 안 켠다.
+    #
+    # 조회는 소스당 1행짜리 정렬 쿼리라 가볍고, 실패해도 수집·발행에 영향이 없다
+    # (실패한 소스는 판정에서 빠지고 그 사실만 경고로 남는다 — fail-soft).
+    source_last_seen: dict[str, Any] | None = None
+    source_silence_errors: tuple[str, ...] = ()
+    if (env_flag("ENABLE_SOURCE_SILENCE_WATCHDOG", True)
+            and notion_token and notion_db and not args.dry_run):
+        try:
+            from source_silence import query_last_seen, watched_sources
+            _seen, _errs = query_last_seen(
+                notion_token, notion_db,
+                [w.notion_source for w in watched_sources()],
+                run_date=run_date,
+            )
+            source_last_seen, source_silence_errors = _seen, tuple(_errs)
+        except Exception as e:  # noqa: BLE001 — 감시가 수집을 죽이면 안 된다
+            source_last_seen = None
+            source_silence_errors = (f"watchdog: {e}",)
+            log("WARN", f"무음 감시 건너뜀 — {e}")
+
     health = _evaluate_health(
         modality_preflight_disabled=modality_preflight_disabled,
         handoff_idem_preflight_disabled=handoff_idem_preflight_disabled,
@@ -4276,6 +4301,9 @@ def main() -> int:
         aged_unconsumed_new=aged_unconsumed_new,
         aged_new_query_error=aged_new_query_error,
         handoff_window_days=handoff_window_days,
+        source_last_seen=source_last_seen,
+        source_silence_errors=source_silence_errors,
+        run_date=run_date,
     )
     health_payload = _health_payload(
         health=health,

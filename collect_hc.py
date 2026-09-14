@@ -67,10 +67,52 @@ _COMPANY_LABELS = ("company", "recalling firm", "manufacturer", "distributor",
 _COMPANY_FALLBACK_LABELS = ("brand", "brand(s)", "brands")
 
 TARGET_ORG = "drugs and health products"     # Organization 필터 (소문자 비교)
+# [2026-09-14] Organization 필터를 단일 값에서 집합으로. HC 는 의약품 회수·경보를 **세
+# Organization** 으로 나눠 낸다:
+#   · "Drugs and health products"          — 정식 회수(등급 Type I/II/III 있음)
+#   · "Communications and Public Affairs Branch" — 공개 경보(public advisory). Teva-Pregabalin
+#     교차오염 Type I(08-15)·Teva 아세트아미노펜 이물 혼입(09-10, Novo-Gesic Forte)이 여기로 나왔다
+#   · "Marketed health products"           — 수입 허용·데이터 무결성 검토 공지(TAVNEOS 07-07)
+# 종전 필터는 첫째만 받아 2026-06~09 에 의약품 7건을 **조용히** 버렸다(오류 0·경보 0). 뒤의 두
+# 기관은 식품·소비재·의료기기도 같은 이름으로 내므로 Category 로 의약품/건강제품만 남긴다.
+TARGET_ORGS = frozenset({
+    TARGET_ORG,
+    "communications and public affairs branch",
+    "marketed health products",
+})
+# Category 는 " - " 로 복수 병기된다("Drugs - Medical devices"). 토큰 중 하나라도 이 집합에
+# 있어야 의약품/건강제품으로 본다(비-주기관에만 적용 — 주기관은 종전 배제 규칙 그대로).
+_HEALTH_PRODUCT_CATEGORY_TOKENS = frozenset({
+    "drugs", "natural health products", "biologic or vaccine", "radiopharmaceuticals",
+})
 # 같은 Organization 안에도 수의약품/의료기기가 섞여 있어 Category로 추가 배제 (CODEX 검증).
 _EXCLUDED_CATEGORIES = {
     "medical devices", "veterinary drugs", "drugs - veterinary drugs",
 }
+_EXCLUDED_CATEGORY_TOKENS = frozenset({"veterinary drugs"})
+
+
+def _category_tokens(category: str) -> set[str]:
+    return {t.strip().lower() for t in (category or "").split(" - ") if t.strip()}
+
+
+def _record_in_scope(rec: dict[str, Any]) -> bool:
+    """이 레코드가 의약품/건강제품 채널인가 — Organization + (비-주기관이면) Category.
+
+    주기관("Drugs and health products")은 종전과 동일하게 통과시킨다(Category 배제는
+    `_to_item` 의 `_EXCLUDED_CATEGORIES` 가 그대로 맡는다 — 회귀 0). 나머지 두 기관은
+    식품·소비재·기기를 같은 이름으로 내므로 Category 토큰에 의약품/건강제품이 있어야 하고,
+    수의약품이 섞이면 배제한다.
+    """
+    org = _text(rec, "Organization").lower()
+    if org == TARGET_ORG:
+        return True
+    if org not in TARGET_ORGS:
+        return False
+    tokens = _category_tokens(_text(rec, "Category"))
+    if tokens & _EXCLUDED_CATEGORY_TOKENS:
+        return False
+    return bool(tokens & _HEALTH_PRODUCT_CATEGORY_TOKENS)
 TYPE_HC_RECALL = "hc-recall"
 LANGUAGE_EN = "EN"
 REGION_HC = "Canada (Health Canada)"
@@ -294,7 +336,7 @@ def collect_hc(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     for rec in data:
         if not isinstance(rec, dict):
             continue
-        if _text(rec, "Organization").lower() != TARGET_ORG:
+        if not _record_in_scope(rec):
             continue
         org_total += 1
         item = _to_item(rec, start, end, detail_fetcher=_fetcher)
@@ -304,9 +346,9 @@ def collect_hc(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
         items.append(item)
 
     if org_total == 0:
-        # 전체 피드에 "Drugs and health products" Organization이 하나도 없음 = 필드/값 변경 의심
-        return [], (f"HC 피드에서 Organization='{TARGET_ORG}' 레코드 0건(total={total}) "
-                    f"— 필드/값 변경 의심(수동 확인 필요)")
+        # 전체 피드에 의약품/건강제품 채널(TARGET_ORGS) 레코드가 하나도 없음 = 필드/값 변경 의심
+        return [], (f"HC 피드에서 의약품/건강제품 Organization({', '.join(sorted(TARGET_ORGS))}) "
+                    f"레코드 0건(total={total}) — 필드/값 변경 의심(수동 확인 필요)")
 
     # 상세 보강 집계 요약 — 실패는 error 승격 아님(피드 단독 폴백 = 정상 수집). N>0 이면 WARN.
     attempted, failed = detail_stats["attempted"], detail_stats["failed"]

@@ -106,7 +106,7 @@ jobs:
           echo "schema.sql $(wc -c < work/schema.sql) bytes, CREATE TABLE $(grep -c '^CREATE TABLE' work/schema.sql)개"
 
       # 덤프 직전 라이브 행 수(정확 count). 서비스키는 헤더로만 나가고 출력엔 안 찍힌다.
-      - name: Live row counts (PostgREST count=exact)
+      - name: Live row counts (PostgREST count=exact, 5xx면 재시도 후 count=planned 폴백)
         shell: bash
         run: |
           set -euo pipefail

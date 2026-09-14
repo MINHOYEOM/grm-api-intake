@@ -822,6 +822,22 @@
       "doc_type": "guidance-internal",
       "published_date": "2026-08-31",
       "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15291"
+    },
+    {
+      "id": "data0011-15950",
+      "title_en": "디지털의료기기 제조 및 품질관리 기준 질의·응답집",
+      "title_ko": "디지털의료기기 제조 및 품질관리 기준 질의·응답집",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-10",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15950"
+    },
+    {
+      "id": "data0011-15949",
+      "title_en": "첨단바이오의약품 제조에 사용되는 사람 및 동물 유래 원료물질 관리 가이드라인",
+      "title_ko": "첨단바이오의약품 제조에 사용되는 사람 및 동물 유래 원료물질 관리 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-10",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15949"
     }
   ]
 }

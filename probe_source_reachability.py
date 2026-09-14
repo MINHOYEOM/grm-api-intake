@@ -44,7 +44,7 @@ import sys
 import time
 from typing import Any, Callable
 
-import requests
+from grm_common import kr_egress_get
 
 # 브라우저 UA — Akamai/WAF 계열이 기본 python-requests UA 를 막을 때만 통과시키는 값.
 # (FDA483 Akamai 차단 조사에서 확인된 계열의 게이트. TLS 위장까지는 하지 않는다 —
@@ -167,9 +167,12 @@ TARGETS: list[dict[str, Any]] = [
 # 이 그룹은 그 12개를 **수집기가 쓰는 URL 그대로** 쏘고, 피드는 항목 수와 최신 날짜를,
 # 페이지는 파서가 의지하는 표식을 검사한다. `--targets silent` 로 고른다.
 #
-# ★프록시를 태우지 않는다(이 워크플로는 secret 이 없다) — MFDS 3종의 결과는 곧 "오늘 러너
-#   직결이 열려 있나"의 답이다. 프록시 자체의 도달 여부는 grm-source-probe 의 `kr_egress`
-#   입력(probe_mfds_egress.py)이 따로 잰다.
+# ★프록시는 수집기와 **같은 규칙**으로 붙는다(`kr_egress_get` → `proxies_for`; 홉 실패 시
+#   직결 1회 폴백). grm-source-probe 워크플로는 secret 이 없으므로 러너에서는 직결이고,
+#   그래서 MFDS 3종의 결과는 곧 "오늘 러너 직결이 열려 있나"의 답이다. 프록시 자체의 도달
+#   여부는 같은 워크플로의 `kr_egress` 입력(probe_mfds_egress.py)이 따로 잰다.
+#   (MFDS 호스트를 requests 로 직접 치는 모듈은 `test_mfds_egress_wiring` 가드가 막는다 —
+#    프로브도 예외가 아니다: 로컬에서 MFDS_HTTP_PROXY 를 두고 돌리면 수집기와 같은 경로를 탄다.)
 _FEED_DATE_RES = (
     re.compile(r"<pubDate>([^<]+)</pubDate>"),
     re.compile(r"<updated>([^<]+)</updated>"),
@@ -308,7 +311,7 @@ def _one_shot(url: str, ua: str | None, timeout: int,
     headers = {"User-Agent": ua} if ua else {}
     started = time.time()
     try:
-        resp = requests.get(url, headers=headers, timeout=timeout)
+        resp = kr_egress_get(url, headers=headers, timeout=timeout)
     except Exception as exc:  # noqa: BLE001 — 예외 문자열이 곧 진단이다
         return {
             "ok": False, "status": None, "bytes": 0,

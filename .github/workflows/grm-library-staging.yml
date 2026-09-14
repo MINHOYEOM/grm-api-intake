@@ -122,7 +122,11 @@ jobs:
     needs: decide
     if: needs.decide.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # [2026-09-14] 20→60분. 이 잡 안의 "Dispatch CI gate" 가 후보 PR 의 CI(20~40분)를 `gh run watch` 로
+    # 기다린다 — 20분 상한이면 수집이 정상이어도 대기 중 취소되어 후보 PR 이 미머지로 남는다
+    # (09-14 실측 2회: 34803902398 은 프록시 타임아웃으로, 34805578776 은 CI 대기로 취소). #990 이
+    # decide 잡만 60분으로 올렸고 refresh 잡은 그대로였다.
+    timeout-minutes: 60
     env:
       MAX_CHANGE_COUNT: ${{ inputs.max_change_count || '20' }}
       MAX_CHANGE_PERCENT: ${{ inputs.max_change_percent || '30' }}

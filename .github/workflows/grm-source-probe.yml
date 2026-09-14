@@ -20,6 +20,15 @@ on:
         type: boolean
         required: false
         default: false
+      targets:
+        description: '프로브 대상 — candidates=착수 전 후보(기본) · silent=2026-09-14 무음 12종 · all=둘 다'
+        type: choice
+        options:
+          - candidates
+          - silent
+          - all
+        required: false
+        default: candidates
 
 permissions:
   contents: read
@@ -53,8 +62,10 @@ jobs:
       - name: Run reachability probe
         id: probe
         continue-on-error: true
+        env:
+          PROBE_TARGETS: ${{ inputs.targets || 'candidates' }}
         run: |
-          python probe_source_reachability.py --output probe_report.json
+          python probe_source_reachability.py --targets "$PROBE_TARGETS" --output probe_report.json
 
       # [2026-09-14] 옵트인 — 프록시 1대의 **도달 여부**를 러너에서 직접 잰다. 이슈 #983/#956 은
       # "MFDS 5종 실패"만 보였고 프록시가 죽은 건지 원 서버가 막은 건지 아무도 못 갈랐다.

@@ -167,13 +167,24 @@ jobs:
           set -euo pipefail
           if [ -f web/data/library_staging_diff.json ]; then
             LIST=$(jq -r '(.skipped_sources // {}) | keys | join(",")' web/data/library_staging_diff.json)
+            # [2026-09-14] 격리 사유가 **프록시 홉 실패**인 소스 — KR egress 프록시 1대가 죽은 것이라
+            # 새 러너로 재시도해도 같은 프록시를 타므로 무의미하다(#983 이 1주 내내 하루 3런씩 그랬다).
+            PROXY_HOP=$(jq -r '(.skipped_sources // {}) | to_entries
+                               | map(select(.value | tostring | test("ProxyError|Unable to connect to proxy")))
+                               | map(.key) | sort | join(",")' web/data/library_staging_diff.json)
           else
             LIST=""
+            PROXY_HOP=""
           fi
           echo "sources=$LIST" >> "$GITHUB_OUTPUT"
+          echo "proxy_hop=$PROXY_HOP" >> "$GITHUB_OUTPUT"
           if [ -n "$LIST" ]; then
             echo "::warning title=자료실 소스 격리::수집 실패로 이번 주 제외: $LIST"
             echo "⚠️ 격리된 소스: \`$LIST\` (해당 카탈로그는 지난주 상태 유지)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -n "$PROXY_HOP" ]; then
+            echo "::warning title=KR egress 프록시 홉 실패::$PROXY_HOP — MFDS_HTTP_PROXY 프록시가 죽어 있다. 복구(EC2 재기동 또는 Secret 교체)는 사람 작업"
+            echo "🔌 프록시 홉 실패: \`$PROXY_HOP\` — 새 러너 재시도는 건너뜀(같은 프록시를 탄다). 프록시 복구는 사람만 할 수 있다." >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Detect meaningful live changes
         id: changes
@@ -309,13 +320,23 @@ jobs:
               return;
             }
 
-            // 최초 감지일 — 기존 이슈 본문에서 승계(없으면 오늘). 주수 계산의 기준점.
+            // 최초 감지일 — 기존 이슈 본문에서 승계(없으면 오늘). 주수·일수 계산의 기준점.
             const today = new Date().toISOString().slice(0, 10);
             const marker = /<!-- first-failed: (\d{4}-\d{2}-\d{2}) -->/;
             const firstFailed =
               (existing && (existing.body || '').match(marker) || [])[1] || today;
             const weeks = Math.floor(
               (Date.parse(today) - Date.parse(firstFailed)) / (7 * 86400 * 1000)) + 1;
+            // [2026-09-14] 복구 모드는 **매일** 도니 에스컬레이션도 일 단위여야 한다 — 주 단위로는
+            // 5일 연속 실패가 "연속 1주차" 로 보여 3주가 될 때까지 아무 경보도 안 올라갔다(#983).
+            const days = Math.floor(
+              (Date.parse(today) - Date.parse(firstFailed)) / (86400 * 1000)) + 1;
+            // [2026-09-14] 원인 분류 — 실패 사유에 프록시 홉 실패가 찍혀 있으면 파서·원문 문제가
+            // 아니라 KR egress 프록시 1대의 문제다. #983 은 이 구분 없이 "파서 점검" 만 권했고 그
+            // 사이 프록시는 1주 내내 죽어 있었다. 코드·재시도가 고칠 수 없는 장애라 사람을 부른다.
+            const proxyHop = /ProxyError|Unable to connect to proxy/;
+            const proxyVictims = names.filter(n => proxyHop.test(String(skipped[n])));
+            const retryAttempt = Number(process.env.RETRY_ATTEMPT || '0') || 0;
 
             const lines = [
               `<!-- first-failed: ${firstFailed} -->`,
@@ -325,7 +346,7 @@ jobs:
               '|---|---|',
               ...names.map(n => `| \`${n}\` | ${String(skipped[n]).replace(/\|/g, '\\|')} |`),
               '',
-              `- 최초 감지: **${firstFailed}** · 연속 ${weeks}주차 · 최근 실행: ${runUrl}`,
+              `- 최초 감지: **${firstFailed}** · 연속 ${days}일째(${weeks}주차) · 최근 실행: ${runUrl}`,
               '',
               '### 지금 상태',
               '- 격리된 소스의 라이브 카탈로그는 **마지막 정상 수집 상태 그대로**입니다(삭제·손상 아님 — 이번 주 신규분만 못 받았습니다).',
@@ -342,9 +363,15 @@ jobs:
               '- 격리 감지 직후에도 **새 러너로 최대 2회** 즉시 재시도합니다(같은 프로세스의 HTTP 재시도는 같은 IP라 IP 거부에 무력).',
               '- 복구되면 이 이슈는 자동으로 닫히고 주 1회로 돌아갑니다.',
             ];
-            if (weeks >= 3) {
+            if (proxyVictims.length) {
               lines.splice(1, 0,
-                `> 🚨 **${weeks}주 연속 실패** — 일시 장애가 아니라 원문 구조 변경일 가능성이 높습니다. 파서 점검이 필요합니다.`,
+                `> 🔌 **KR egress 프록시 홉 실패** (\`${proxyVictims.join('`, `')}\`) — 파서·원문 문제가 아닙니다. `
+                + '`MFDS_HTTP_PROXY` 프록시(EC2)에 연결이 안 됩니다. **복구는 사람만 할 수 있습니다: EC2 재기동 또는 Secret `MFDS_HTTP_PROXY` 교체.** '
+                + '코드 수정·새 러너 재시도로는 살아나지 않습니다(직결 폴백은 MFDS 가 러너 IP 를 허용하는 날만 먹힙니다).',
+                '');
+            } else if (days >= 3) {
+              lines.splice(1, 0,
+                `> 🚨 **${days}일 연속 실패** — 일시 장애가 아니라 원문 구조 변경일 가능성이 높습니다. 파서 점검이 필요합니다.`,
                 '');
             }
             const body = lines.join('\n');
@@ -353,10 +380,17 @@ jobs:
               await github.rest.issues.update({
                 owner, repo, issue_number: existing.number, body,
               });
-              await github.rest.issues.createComment({
-                owner, repo, issue_number: existing.number,
-                body: `여전히 격리 중: \`${names.join('`, `')}\` (연속 ${weeks}주차 · ${runUrl})`,
-              });
+              // 같은 날 자기 재디스패치(재시도 회차)에는 코멘트를 달지 않는다 — 하루 3줄씩 쌓여
+              // #983 이 나흘 만에 11코멘트가 됐고 알림이 소음이 됐다. 본문 갱신은 그대로.
+              if (retryAttempt === 0) {
+                const cause = proxyVictims.length
+                  ? ` — 🔌 프록시 홉 실패(\`${proxyVictims.join('`, `')}\`): 프록시 복구는 사람 작업`
+                  : '';
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: existing.number,
+                  body: `여전히 격리 중: \`${names.join('`, `')}\` (연속 ${days}일째 · ${runUrl})${cause}`,
+                });
+              }
             } else {
               await github.rest.issues.create({
                 owner, repo, title, body, labels: [label], assignees: [owner],
@@ -370,7 +404,9 @@ jobs:
         # 다만 이건 **보조 방어층**이다 — 2026-08-10 실측상 MFDS 는 프록시 없이는 러너를
         # 바꿔도 두 번 다 0/21 이었다. 진짜 수리는 위의 MFDS_HTTP_PROXY 배선이고, 이
         # 재시도는 그 밖의 소스(ema·who·pics·health_canada 등)의 일시 장애를 흡수한다.
-        if: always() && steps.skipped.outputs.sources != '' && fromJSON(env.RETRY_ATTEMPT) < 2
+        # [2026-09-14] 격리 사유가 전부 프록시 홉 실패면 재시도를 건너뛴다 — 새 러너도 같은
+        # 죽은 프록시를 타므로 결과가 같다(#983: 1주 내내 하루 3런 × 0/N). 프록시 복구는 사람 작업.
+        if: always() && steps.skipped.outputs.sources != '' && steps.skipped.outputs.sources != steps.skipped.outputs.proxy_hop && fromJSON(env.RETRY_ATTEMPT) < 2
         env:
           SKIPPED_SOURCES: ${{ steps.skipped.outputs.sources }}
         run: |

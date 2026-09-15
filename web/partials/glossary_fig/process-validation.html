@@ -1,0 +1,22 @@
+{#- 용어 그림 · process-validation — 정의("설정한 변수 안에서 공정이 규격과 품질특성을 만족하는 제품을
+    효과적이고 반복적으로 생산할 수 있음을 입증")를 규격 범위 띠 안에 반복 배치 셋으로 옮긴다.
+    단계 이름(설계·PPQ·지속적 검증)이나 배치 수 요건 같은 정의 밖 주장은 넣지 않는다. -#}
+<svg class="gt-fig-svg" viewBox="0 0 180 88" role="img" aria-label="{{ _('규격 범위 안에 들어온 반복 배치 셋') }}">
+  <rect x="14" y="28" width="152" height="30" style="fill:var(--coral-tint)"/>
+  <g style="stroke:var(--coral-2);stroke-width:1.6;stroke-dasharray:5 4">
+    <line x1="14" y1="28" x2="166" y2="28"/>
+    <line x1="14" y1="58" x2="166" y2="58"/>
+  </g>
+  <text x="14" y="21" style="font-size:9px;fill:var(--coral-2)">{{ _('규격 범위') }}</text>
+  <g style="fill:var(--ink)">
+    <circle cx="48" cy="45" r="4.5"/>
+    <circle cx="90" cy="41" r="4.5"/>
+    <circle cx="132" cy="47" r="4.5"/>
+  </g>
+  <text x="8" y="80" style="font-size:9px;fill:var(--muted)">{{ _('배치') }}</text>
+  <g style="font-size:9px;fill:var(--muted);text-anchor:middle">
+    <text x="48" y="80">1</text>
+    <text x="90" y="80">2</text>
+    <text x="132" y="80">3</text>
+  </g>
+</svg>

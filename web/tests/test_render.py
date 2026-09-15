@@ -19639,22 +19639,24 @@ class GlossaryFigures(unittest.TestCase):
                     self.assertNotIn(banned, src, f"금지 문자열 포함: {banned!r}")
 
     # 3. 한국어 페이지 — 골든 빌드 out/glossary/<id>/index.html 에 gt-fig·svg 가 있고,
-    #    그림이 없는 용어(capa)의 페이지엔 그림 요소가 없다.
+    #    그림이 없는 용어의 페이지엔 그림 요소가 없다.
     def test_korean_pages_render_figure_only_when_partial_exists(self):
         for tid in self.fig_ids:
             html = self._ko_page(tid)
             with self.subTest(term=tid):
                 self.assertIn('class="gt-fig"', html, f"gt-fig 미렌더: {tid}")
                 self.assertIn("<svg", html, f"svg 미렌더: {tid}")
-        self.assertNotIn("capa", self.fig_ids,
-                         "capa 는 그림이 없다는 전제(음성 대조군)가 깨졌다 — 다른 무그림 "
-                         "용어로 바꿔야 한다")
+        # 음성 대조군은 **이름이 아니라 성질로** 고른다 — 손으로 적은 용어는 그 용어에
+        # 그림이 생기는 순간 낡는다(2026-09-15 capa 에 그림이 생기며 실제로 그랬다).
+        no_fig = sorted(self.term_ids - set(self.fig_ids))
+        self.assertTrue(no_fig, "모든 용어에 그림이 생겼다 — 음성 대조군이 사라졌다")
         # 정적 스코프 <style> 은 모든 낱개 페이지에 `.gt-fig{...}` 규칙을 싣고 있어(파일
         # 존재 여부와 무관) 문자열 "gt-fig" 자체는 항상 나타난다 — 실제로 렌더되는지는
         # <figure class="gt-fig"> 요소로 판별해야 한다(§4 판정은 화면에 나가는 조각으로).
-        capa_html = self._ko_page("capa")
-        self.assertNotIn('<figure class="gt-fig">', capa_html,
-                         "그림이 없어야 할 capa 페이지에 그림 요소가 렌더됐다")
+        for tid in no_fig:
+            with self.subTest(term=tid):
+                self.assertNotIn('<figure class="gt-fig">', self._ko_page(tid),
+                                 f"그림이 없어야 할 {tid} 페이지에 그림 요소가 렌더됐다")
 
     # 4. 영어 페이지 — <figure class="gt-fig">…</figure> 조각에 한글 0, Illustration 포함.
     def test_english_pages_have_illustration_label_and_no_hangul(self):

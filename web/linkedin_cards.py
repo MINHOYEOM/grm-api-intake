@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
-"""링크드인 카드뉴스 자동 생성 — 주간 브리프 JSON → 9장 캐러셀 PDF + 게시 본문(txt).
+"""링크드인 카드뉴스 자동 생성 — 주간 브리프 JSON → 캐러셀 PDF + 게시 본문(txt), 국문·영문 두 벌.
 
 [성장·배포 2026-09-08] 매주 월요일 발행과 함께 링크드인에 올릴 카드뉴스와 본문을 낸다.
 운영 루틴: 배포 후 `/briefs/{pub}/linkedin.pdf` 를 받고 `/briefs/{pub}/linkedin.txt` 를 복사해
 작성창에 붙이고 게시 버튼(사람). 완전 자동 게시는 LinkedIn API 승인이 필요해 하지 않는다.
+
+[영문판 2026-09-15] 같은 주 소식을 영어로도 낸다(`linkedin_en.pdf`·`linkedin_en.txt`, `--lang`).
+  · **무엇을 실을지는 한국어 정본으로 고른다** — 헤드라인 카드·용어·점검·경고서한 주제 집계는
+    한국어 본문으로 판별하고, 언어에 따라 갈리는 것은 화면에 나가는 글자뿐이다. 두 덱이 서로
+    다른 소식을 말하지 않게 하려는 것이다.
+  · 사실은 카드 JSON 의 `en` 블록과 용어사전 `*_en` 에서 **그대로** 가져온다(LLM 슬롯 0).
+    영문 블록이 없는 카드는 싣지 않고, 소식 장이 하나도 없으면 그 언어를 경고 후 건너뛴다.
+  · ★한국 업체명을 로마자로 지어내지 않는다 — 이름을 못 쓰면 그 줄을 빼고 건수로만 남긴다
+    (식약처 실사 묶음 장이 영문 덱에서 빠지는 이유다).
 
 두 층으로 나뉜다.
   · 순수 빌더(결정론·네트워크 0) — `build_deck()`: 브리프 JSON + 용어사전 → 슬라이드 스펙·본문.
@@ -85,16 +94,22 @@ def fit_size(lines: list[str], base_px: int, max_px: float = 890.0, min_px: int 
     return max(min_px, size)
 
 
-def first_sentence(text: str) -> str:
-    """'…다.' 로 끝나는 첫 문장. 없으면 전체."""
+def first_sentence(text: str, lang: str = "ko") -> str:
+    """첫 문장. 한국어는 '…다.', 영어는 마침표 뒤 공백+대문자로 끊는다(숫자·조항 표기의
+    마침표 '211.84(d)' 는 대문자가 뒤따르지 않아 걸리지 않는다). 못 끊으면 전체."""
     t = " ".join((text or "").split())
-    m = re.match(r"^(.*?다\.)(\s|$)", t)
+    if lang == "ko":
+        m = re.match(r"^(.*?다\.)(\s|$)", t)
+    else:
+        m = re.match(r"^(.*?[a-z0-9)\]”\"]\.)\s+(?=[A-Z])", t)
     return m.group(1) if m else t
 
 
-def parse_fact(s: str) -> tuple[str, str] | None:
-    """'라벨: 값' 형태의 key_facts 한 줄 → (라벨, 값). 형태가 아니면 None."""
-    m = re.match(r"^\s*([^:：]{1,12})\s*[:：]\s*(.+)$", s or "")
+def parse_fact(s: str, max_label: int = 12) -> tuple[str, str] | None:
+    """'라벨: 값' 형태의 key_facts 한 줄 → (라벨, 값). 형태가 아니면 None.
+    ★라벨 길이 상한은 언어마다 다르다 — 한국어 '관찰사항 1'(7자)과 달리 영어는
+    'Observation 1'(13자)이라 12자 상한에 걸려 **표가 통째로 비었다**(2026-09-15)."""
+    m = re.match(r"^\s*([^:：]{1,%d})\s*[:：]\s*(.+)$" % int(max_label), s or "")
     if not m:
         return None
     label, value = m.group(1).strip(), m.group(2).strip()
@@ -129,31 +144,149 @@ def window_label(window: str) -> str:
 AGENCY_LABEL = {"FDA": "FDA", "MFDS": "식약처", "WHO": "WHO", "EMA": "EMA", "MHRA": "MHRA",
                 "Health Canada": "Health Canada", "ECA": "ECA", "ISPE": "ISPE", "PIC/S": "PIC/S",
                 "EudraGMDP": "EU GMP", "EU": "EU GMP"}
+AGENCY_LABEL_EN = dict(AGENCY_LABEL, MFDS="MFDS")
 SOURCE_NOTE = {"FDA": "출처: FDA 공식 공고", "MFDS": "출처: 식약처 공식 공고"}
 CLASS1 = re.compile(r"\bClass\s*I\b")
 
-# 경고서한 공통 지적 버킷 — (표시 라벨, 짧은 라벨, 키워드)
+# 경고서한 공통 지적 버킷 — (표시 라벨, 짧은 라벨, 키워드, 영문 표시 라벨, 영문 짧은 라벨)
+# ★키워드는 **한국어 정본 본문**에 대고 센다 — 영문 덱도 같은 집계를 쓴다(두 덱이 같은 주제를
+#   말해야 한다). 언어에 따라 갈리는 건 표시 라벨뿐이다.
 WL_THEMES = [
-    ("무균공정 · 오염 방지", "무균공정", ("무균", "멸균", "오염방지", "오염 방지", "insanitary", "비위생")),
-    ("일탈 · OOS 조사", "일탈", ("일탈", "OOS", "편차", "규격 부적합")),
-    ("시험기록 · 원데이터", "시험기록", ("시험기록", "원데이터", "성적서", "데이터 완전성")),
-    ("품질부서 책임", "품질부서", ("품질관리부서", "품질부서", "QC")),
-    ("세척 · 시설 관리", "세척", ("세척", "건물", "유지관리", "시설관리", "시설 관리")),
+    ("무균공정 · 오염 방지", "무균공정", ("무균", "멸균", "오염방지", "오염 방지", "insanitary", "비위생"),
+     "Aseptic processing · contamination", "aseptic processing"),
+    ("일탈 · OOS 조사", "일탈", ("일탈", "OOS", "편차", "규격 부적합"),
+     "Deviations · OOS investigations", "deviations"),
+    ("시험기록 · 원데이터", "시험기록", ("시험기록", "원데이터", "성적서", "데이터 완전성"),
+     "Test records · raw data", "test records"),
+    ("품질부서 책임", "품질부서", ("품질관리부서", "품질부서", "QC"),
+     "Quality unit responsibilities", "the quality unit"),
+    ("세척 · 시설 관리", "세척", ("세척", "건물", "유지관리", "시설관리", "시설 관리"),
+     "Cleaning · facility upkeep", "cleaning"),
 ]
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 덱 고정 문구 — 언어별 한 벌
+# ──────────────────────────────────────────────────────────────────────────────
+# [영문판 2026-09-15] 사실(카드 본문·용어 정의)은 브리프 JSON 의 `en` 블록과 용어사전의 `*_en`
+# 에서 **그대로** 가져오고(LLM 슬롯 0), 덱이 직접 쓰는 고정 문구만 여기서 고른다.
+# ★한국 업체명은 영문 덱에서 **로마자로 지어내지 않는다** — 이름을 못 쓰면 그 자리를 비우고
+#   개수로만 남긴다(`_firm_for_lang`). 식약처 묶음 장은 업체명 목록이 본체라 영문에서는 빼고,
+#   대신 본문에 건수만 적는다.
+LANGS = ("ko", "en")
+_EN_MONTH = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+_EN_NUM = {1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six"}
+
+STR: dict[str, dict[str, Any]] = {
+    "ko": {
+        "cover_eyebrow": "주간 규제 소식 · {m}월 {wk}주차",
+        "cover_h1": ["이번 주", "규제 소식"],
+        "tile_cards": "규제 신호 카드", "tile_class1": "FDA Class I 회수", "tile_wl": "FDA 경고서한",
+        "tile_mfds_insp": "식약처 실사 결과 공개", "tile_mfds_act": "식약처 행정처분", "tile_recall": "회수 신호",
+        "source_other": "출처: {label} 공식 발표",
+        "chip_class1": "Class I 회수", "chip_recall": "회수", "chip_wl": "경고서한", "chip_483": "FDA 483",
+        "chip_mfds_stop": "제조업무정지", "chip_mfds_act": "행정처분", "chip_mfds_insp": "GMP 실사 결과",
+        "row_company": "업체", "impl_label": "시사점",
+        "wl_eyebrow": "FDA 경고서한", "wl_h1_a": "경고서한 {n}건,", "wl_h1_b": "공통점은 {theme}",
+        "wl_total": "{n}건 중", "wl_bars_head": "겹치는 지적",
+        "mfds_eyebrow": "식약처 사후 GMP 실사", "mfds_h1_a": "실사 결과 {n}곳,", "mfds_h1_b": "보완 분야는",
+        "gl_eyebrow": "이번 주 용어", "gl_h1": "이번 주 소식에 나온 용어 {num}",
+        "gl_cap": "정의는 GRM 용어사전에서 그대로 가져왔습니다.",
+        "ck_eyebrow": "이번 주 점검 포인트", "ck_h1": "우리 현장에서 확인할 것",
+        "ck_cap": "각 항목은 이번 주 카드의 '점검' 칸에서 가져왔습니다.",
+        "cl_h1_a": "전체 {n}건,", "cl_h1_b": "원문 링크와 함께",
+        "cl_body": "요약은 한국어로, 출처는 각 기관의 공식 공고입니다.",
+        "cl_note": "메일로 받아보고 싶다면, 사이트에서 뉴스레터를 구독하세요.",
+        "cl_ft": "매주 월요일 · 무료",
+        "ai_note": "이미지는 AI 도구로 생성되었습니다",
+        "doc_title": "{m}월 {wk}주차 규제 소식",
+        "cap_head": "이번 주 규제 소식, 카드 {n}장.",
+        "cap_class1": "· Class I 회수 {n}건", "cap_wl": "· 경고서한 {n}건 — {themes}",
+        "cap_mfds": "· 식약처 — {bits}", "cap_mfds_act": "행정처분 {n}건", "cap_mfds_insp": "실사 결과 {n}곳",
+        "cap_terms": "용어 {n}개", "cap_checks": "점검 포인트 {n}개",
+        "cap_link": "전체 {n}건과 원문 링크",
+        "cap_cta": ["어떤 항목이 제일 신경 쓰이시나요?", "댓글로 남겨 주시면 다음 주에 다룹니다."],
+        "cap_tags": ["#GMP #제약 #바이오 #규제 #품질관리", "#QA #FDA #식약처 #경고서한 #제약바이오"],
+    },
+    "en": {
+        "cover_eyebrow": "Weekly regulatory news · {mon}, week {wk}",
+        "cover_h1": ["This week in", "regulatory news"],
+        "tile_cards": "Regulatory signal cards", "tile_class1": "FDA Class I recalls",
+        "tile_wl": "FDA warning letters", "tile_mfds_insp": "MFDS inspection results",
+        "tile_mfds_act": "MFDS administrative actions", "tile_recall": "Recall signals",
+        "source_other": "Source: {label} official announcement",
+        "chip_class1": "Class I recall", "chip_recall": "Recall", "chip_wl": "Warning letter",
+        "chip_483": "FDA 483", "chip_mfds_stop": "Manufacturing suspension",
+        "chip_mfds_act": "Administrative action", "chip_mfds_insp": "GMP inspection result",
+        "row_company": "Company", "impl_label": "What it means",
+        "wl_eyebrow": "FDA warning letters", "wl_h1_a": "{n} warning letters,", "wl_h1_b": "most on {theme}",
+        "wl_total": "of {n}", "wl_bars_head": "Overlapping findings",
+        "mfds_eyebrow": "MFDS post-approval GMP inspections", "mfds_h1_a": "{n} sites inspected,",
+        "mfds_h1_b": "gaps were in",
+        "gl_eyebrow": "Terms this week", "gl_h1": "{num} terms from this week's news",
+        "gl_cap": "Definitions are taken verbatim from the GRM glossary.",
+        "ck_eyebrow": "Checks this week", "ck_h1": "What to check on your site",
+        "ck_cap": "Each item comes from the 'checks' field of this week's cards.",
+        "cl_h1_a": "All {n} items,", "cl_h1_b": "with links to the originals",
+        "cl_body": "Summaries in English; sources are each authority's official announcement.",
+        "cl_note": "Prefer email? Subscribe to the newsletter on the site.",
+        "cl_ft": "Every Monday · free",
+        "ai_note": "Images generated with AI tools",
+        "doc_title": "Regulatory news · {mon}, week {wk}",
+        "cap_head": "This week's regulatory news, {n} cards.",
+        "cap_class1": "· {n} Class I recalls", "cap_wl": "· {n} warning letters — {themes}",
+        "cap_mfds": "· MFDS (Korea) — {bits}", "cap_mfds_act": "{n} administrative actions",
+        "cap_mfds_insp": "{n} inspection results",
+        "cap_terms": "{n} terms", "cap_checks": "{n} checks",
+        "cap_link": "All {n} items, with links to the originals",
+        "cap_cta": ["Which item would concern you most?", "Tell us in the comments and we'll cover it next week."],
+        "cap_tags": ["#GMP #pharma #biotech #regulatory #qualityassurance",
+                     "#QA #FDA #EMA #MHRA #MFDS"],
+    },
+}
+
 # 용어별 미니 다이어그램(150x88) — 소개 덱과 같은 결. 없는 용어는 일반 문서 아이콘.
-MINI = {
-    "endotoxin": """<svg class="mini" viewBox="0 0 150 88"><rect x="22" y="30" width="66" height="28" rx="14" fill="#F4E7DF" stroke="#C2603F" stroke-width="2"/><g stroke="#C2603F" stroke-width="2" stroke-linecap="round"><path d="M36 30v-9M52 30v-10M68 30v-9M82 32v-9M36 58v9M52 58v10M68 58v9M82 56v9"/></g><path d="M96 44h26" stroke="#141413" stroke-width="2" stroke-linecap="round"/><path d="M117 38l6 6-6 6" fill="none" stroke="#141413" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="127" y="48" font-size="12" fill="#BD4B36" font-weight="700">발열</text><text x="22" y="82" font-size="10" fill="#8E8B82">그람음성균 세포벽 · LPS</text></svg>""",
+# [영문판 2026-09-15] 도형은 한 벌, 글자만 언어별로 갈린다. SVG 안의 `{key}` 자리를 MINI_LABELS
+# 에서 채운다 — 언어를 더해도 도형이 갈라지지 않고, 빠뜨린 라벨은 KeyError 로 즉시 드러난다
+# (테스트가 두 언어 전부를 실제로 채워 본다). 라틴 라벨(HEPA·Grade A)은 두 언어가 같아 그대로 둔다.
+MINI_SVG = {
+    "endotoxin": """<svg class="mini" viewBox="0 0 150 88"><rect x="22" y="30" width="66" height="28" rx="14" fill="#F4E7DF" stroke="#C2603F" stroke-width="2"/><g stroke="#C2603F" stroke-width="2" stroke-linecap="round"><path d="M36 30v-9M52 30v-10M68 30v-9M82 32v-9M36 58v9M52 58v10M68 58v9M82 56v9"/></g><path d="M92 44h16" stroke="#141413" stroke-width="2" stroke-linecap="round"/><path d="M103 38l6 6-6 6" fill="none" stroke="#141413" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="147" y="48" font-size="12" fill="#BD4B36" font-weight="700" text-anchor="end">{fever}</text><text x="22" y="82" font-size="10" fill="#8E8B82">{lps}</text></svg>""",
     "aseptic-processing": """<svg class="mini" viewBox="0 0 150 88"><rect x="30" y="6" width="90" height="12" rx="3" fill="#EFE9DE" stroke="#8E8B82" stroke-width="1.5"/><text x="62" y="15" font-size="8" fill="#6C6A64" font-weight="700">HEPA</text><g stroke="#C2603F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M45 24v22M45 46l-4-5M45 46l4-5M75 24v22M75 46l-4-5M75 46l4-5M105 24v22M105 46l-4-5M105 46l4-5"/></g><rect x="66" y="56" width="18" height="24" rx="3" fill="#fff" stroke="#141413" stroke-width="1.8"/><rect x="69" y="51" width="12" height="5" rx="1" fill="#141413"/><text x="92" y="76" font-size="10" fill="#8E8B82">Grade A</text></svg>""",
-    "cross-contamination": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="34" width="44" height="40" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><rect x="92" y="34" width="44" height="40" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><g fill="#C2603F"><circle cx="26" cy="48" r="3"/><circle cx="38" cy="60" r="3"/><circle cx="46" cy="46" r="3"/><circle cx="30" cy="66" r="3"/><circle cx="104" cy="60" r="3"/></g><path d="M60 50c10-12 20-12 30 0" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-dasharray="4 3"/><path d="M86 44l4 6-7 1" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><text x="24" y="26" font-size="10" fill="#6C6A64">제품 A</text><text x="102" y="26" font-size="10" fill="#6C6A64">제품 B</text></svg>""",
-    "oos": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="26" x2="140" y2="26" stroke="#BD4B36" stroke-width="1.8" stroke-dasharray="5 4"/><text x="12" y="20" font-size="10" fill="#BD4B36" font-weight="700">규격 상한</text><polyline points="10,66 28,62 46,65 64,58 82,63 100,18 118,62 140,60" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="100" cy="18" r="5" fill="#BD4B36"/><line x1="10" y1="76" x2="140" y2="76" stroke="#DCD3C7" stroke-width="1.5"/></svg>""",
-    "recall": """<svg class="mini" viewBox="0 0 150 88"><rect x="24" y="52" width="26" height="20" rx="3" fill="#EFE9DE"/><rect x="62" y="36" width="26" height="36" rx="3" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.5"/><rect x="100" y="14" width="26" height="58" rx="3" fill="#C2603F"/><text x="30" y="84" font-size="11" fill="#6C6A64" font-weight="700">III</text><text x="70" y="84" font-size="11" fill="#6C6A64" font-weight="700">II</text><text x="110" y="84" font-size="11" fill="#BD4B36" font-weight="800">I</text><text x="4" y="18" font-size="10" fill="#8E8B82">위해도 ↑</text></svg>""",
-    "deviation": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="44" x2="140" y2="44" stroke="#8E8B82" stroke-width="1.6" stroke-dasharray="5 4"/><polyline points="10,44 50,44 74,20 98,44 140,44" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round"/><circle cx="74" cy="20" r="5" fill="#BD4B36"/><text x="12" y="70" font-size="10" fill="#8E8B82">승인된 지시</text><text x="86" y="16" font-size="10" fill="#BD4B36" font-weight="700">일탈</text></svg>""",
-    "process-validation": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="28" width="122" height="30" fill="#F4E7DF"/><g stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"><line x1="14" y1="28" x2="136" y2="28"/><line x1="14" y1="58" x2="136" y2="58"/></g><text x="14" y="21" font-size="10" fill="#BD4B36" font-weight="700">규격 범위</text><g fill="#141413"><circle cx="40" cy="45" r="4.5"/><circle cx="75" cy="41" r="4.5"/><circle cx="110" cy="47" r="4.5"/></g><text x="6" y="80" font-size="10" fill="#8E8B82">배치</text><g font-size="10" fill="#8E8B82" text-anchor="middle"><text x="40" y="80">1</text><text x="75" y="80">2</text><text x="110" y="80">3</text></g></svg>""",
-    "shelf-life": """<svg class="mini" viewBox="0 0 150 88"><line x1="14" y1="24" x2="136" y2="24" stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"/><text x="14" y="18" font-size="10" fill="#BD4B36" font-weight="700">규격 한계</text><g stroke="#8E8B82" stroke-width="1.5"><line x1="24" y1="34" x2="24" y2="66"/><line x1="112" y1="34" x2="112" y2="66"/></g><g stroke="#C2603F" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M24 40h88"/><path d="M28 36l-4 4 4 4M108 36l4 4-4 4"/></g><text x="68" y="34" font-size="10" fill="#BD4B36" font-weight="700" text-anchor="middle">유효기간</text><polyline points="24,52 46,53 68,55 90,57 112,59" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><line x1="14" y1="66" x2="136" y2="66" stroke="#DCD3C7" stroke-width="1.5"/><text x="14" y="82" font-size="10" fill="#8E8B82">표시된 보관조건</text></svg>""",
-    "capa": """<svg class="mini" viewBox="0 0 150 88"><g fill="#fff" stroke="#141413" stroke-width="1.6"><rect x="10" y="22" width="36" height="22" rx="4"/><rect x="57" y="22" width="36" height="22" rx="4"/><rect x="104" y="22" width="36" height="22" rx="4"/></g><g font-size="10" fill="#141413" text-anchor="middle"><text x="28" y="37">원인</text><text x="75" y="37">조치</text><text x="122" y="37">확인</text></g><g stroke="#C2603F" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M46 33h9M51 29l4 4-4 4M93 33h9M98 29l4 4-4 4"/><path d="M122 44v14H28v-6"/><path d="M24 50l4-5 4 5"/></g><text x="75" y="78" font-size="10" fill="#8E8B82" text-anchor="middle">재발 방지</text></svg>""",
+    "cross-contamination": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="34" width="44" height="40" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><rect x="92" y="34" width="44" height="40" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><g fill="#C2603F"><circle cx="26" cy="48" r="3"/><circle cx="38" cy="60" r="3"/><circle cx="46" cy="46" r="3"/><circle cx="30" cy="66" r="3"/><circle cx="104" cy="60" r="3"/></g><path d="M60 50c10-12 20-12 30 0" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-dasharray="4 3"/><path d="M86 44l4 6-7 1" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><text x="24" y="26" font-size="10" fill="#6C6A64">{prod_a}</text><text x="102" y="26" font-size="10" fill="#6C6A64">{prod_b}</text></svg>""",
+    "oos": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="26" x2="140" y2="26" stroke="#BD4B36" stroke-width="1.8" stroke-dasharray="5 4"/><text x="12" y="20" font-size="10" fill="#BD4B36" font-weight="700">{spec_upper}</text><polyline points="10,66 28,62 46,65 64,58 82,63 100,18 118,62 140,60" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="100" cy="18" r="5" fill="#BD4B36"/><line x1="10" y1="76" x2="140" y2="76" stroke="#DCD3C7" stroke-width="1.5"/></svg>""",
+    "recall": """<svg class="mini" viewBox="0 0 150 88"><rect x="24" y="52" width="26" height="20" rx="3" fill="#EFE9DE"/><rect x="62" y="36" width="26" height="36" rx="3" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.5"/><rect x="100" y="14" width="26" height="58" rx="3" fill="#C2603F"/><text x="30" y="84" font-size="11" fill="#6C6A64" font-weight="700">III</text><text x="70" y="84" font-size="11" fill="#6C6A64" font-weight="700">II</text><text x="110" y="84" font-size="11" fill="#BD4B36" font-weight="800">I</text><text x="4" y="18" font-size="10" fill="#8E8B82">{risk_up}</text></svg>""",
+    "deviation": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="44" x2="140" y2="44" stroke="#8E8B82" stroke-width="1.6" stroke-dasharray="5 4"/><polyline points="10,44 50,44 74,20 98,44 140,44" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round"/><circle cx="74" cy="20" r="5" fill="#BD4B36"/><text x="12" y="70" font-size="10" fill="#8E8B82">{approved}</text><text x="86" y="16" font-size="10" fill="#BD4B36" font-weight="700">{deviation}</text></svg>""",
+    "process-validation": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="28" width="122" height="30" fill="#F4E7DF"/><g stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"><line x1="14" y1="28" x2="136" y2="28"/><line x1="14" y1="58" x2="136" y2="58"/></g><text x="14" y="21" font-size="10" fill="#BD4B36" font-weight="700">{spec_range}</text><g fill="#141413"><circle cx="40" cy="45" r="4.5"/><circle cx="75" cy="41" r="4.5"/><circle cx="110" cy="47" r="4.5"/></g><text x="6" y="80" font-size="10" fill="#8E8B82">{batch}</text><g font-size="10" fill="#8E8B82" text-anchor="middle"><text x="40" y="80">1</text><text x="75" y="80">2</text><text x="110" y="80">3</text></g></svg>""",
+    "shelf-life": """<svg class="mini" viewBox="0 0 150 88"><line x1="14" y1="24" x2="136" y2="24" stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"/><text x="14" y="18" font-size="10" fill="#BD4B36" font-weight="700">{spec_limit}</text><g stroke="#8E8B82" stroke-width="1.5"><line x1="24" y1="34" x2="24" y2="66"/><line x1="112" y1="34" x2="112" y2="66"/></g><g stroke="#C2603F" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M24 40h88"/><path d="M28 36l-4 4 4 4M108 36l4 4-4 4"/></g><text x="68" y="34" font-size="10" fill="#BD4B36" font-weight="700" text-anchor="middle">{shelf_life}</text><polyline points="24,52 46,53 68,55 90,57 112,59" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><line x1="14" y1="66" x2="136" y2="66" stroke="#DCD3C7" stroke-width="1.5"/><text x="14" y="82" font-size="10" fill="#8E8B82">{storage}</text></svg>""",
+    "capa": """<svg class="mini" viewBox="0 0 150 88"><g fill="#fff" stroke="#141413" stroke-width="1.6"><rect x="10" y="22" width="36" height="22" rx="4"/><rect x="57" y="22" width="36" height="22" rx="4"/><rect x="104" y="22" width="36" height="22" rx="4"/></g><g font-size="10" fill="#141413" text-anchor="middle"><text x="28" y="37">{cause}</text><text x="75" y="37">{action}</text><text x="122" y="37">{verify}</text></g><g stroke="#C2603F" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M46 33h9M51 29l4 4-4 4M93 33h9M98 29l4 4-4 4"/><path d="M122 44v14H28v-6"/><path d="M24 50l4-5 4 5"/></g><text x="75" y="78" font-size="10" fill="#8E8B82" text-anchor="middle">{prevent}</text></svg>""",
     "_generic": """<svg class="mini" viewBox="0 0 150 88"><path d="M52 14h30l16 16v44H52z" fill="#fff" stroke="#141413" stroke-width="1.8" stroke-linejoin="round"/><path d="M82 14v16h16" fill="none" stroke="#141413" stroke-width="1.8" stroke-linejoin="round"/><path d="M60 44h30M60 54h30M60 64h20" stroke="#C2603F" stroke-width="2" stroke-linecap="round"/></svg>""",
 }
+
+# 그림 라벨 — 언어별. 영어가 한국어보다 길어 150 폭을 넘기 쉬우니 **짧은 쪽**을 고른다
+# (덱 그림은 카드에서 작게 나와 긴 문장은 어차피 읽히지 않는다).
+MINI_LABELS = {
+    "endotoxin": {"ko": {"fever": "발열", "lps": "그람음성균 세포벽 · LPS"},
+                  "en": {"fever": "Fever", "lps": "Gram-negative wall · LPS"}},
+    "aseptic-processing": {"ko": {}, "en": {}},
+    "cross-contamination": {"ko": {"prod_a": "제품 A", "prod_b": "제품 B"},
+                            "en": {"prod_a": "Product A", "prod_b": "Product B"}},
+    "oos": {"ko": {"spec_upper": "규격 상한"}, "en": {"spec_upper": "Spec limit"}},
+    "recall": {"ko": {"risk_up": "위해도 ↑"}, "en": {"risk_up": "Risk ↑"}},
+    "deviation": {"ko": {"approved": "승인된 지시", "deviation": "일탈"},
+                  "en": {"approved": "Approved", "deviation": "Deviation"}},
+    "process-validation": {"ko": {"spec_range": "규격 범위", "batch": "배치"},
+                           "en": {"spec_range": "Spec range", "batch": "Batch"}},
+    "shelf-life": {"ko": {"spec_limit": "규격 한계", "shelf_life": "유효기간", "storage": "표시된 보관조건"},
+                   "en": {"spec_limit": "Spec limit", "shelf_life": "Shelf life", "storage": "Labelled storage"}},
+    "capa": {"ko": {"cause": "원인", "action": "조치", "verify": "확인", "prevent": "재발 방지"},
+             "en": {"cause": "Cause", "action": "Action", "verify": "Verify", "prevent": "Prevents recurrence"}},
+    "_generic": {"ko": {}, "en": {}},
+}
+
+
+def mini(fig_id: str, lang: str = "ko") -> str:
+    """용어 id → 미니 다이어그램 SVG(라벨은 lang). 그림이 없는 용어는 일반 문서 아이콘."""
+    key = fig_id if fig_id in MINI_SVG else "_generic"
+    return MINI_SVG[key].format(**MINI_LABELS[key][lang])
 
 _S = 'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"'
 ICO = {
@@ -193,8 +326,36 @@ def _agency(card: dict) -> str:
     return str(card.get("agency") or "")
 
 
-def _label(card: dict) -> str:
-    return AGENCY_LABEL.get(_agency(card), _agency(card))
+def _label(card: dict, lang: str = "ko") -> str:
+    table = AGENCY_LABEL if lang == "ko" else AGENCY_LABEL_EN
+    return table.get(_agency(card), _agency(card))
+
+
+def _card_text(card: dict, key: str, lang: str = "ko") -> str:
+    """카드의 표시 문구 한 칸. 영문은 `en` 블록에서만 가져온다 — 없으면 빈 문자열이고,
+    지어내거나 한국어를 그대로 싣지 않는다([[grm-en-korean-value-show-nothing-count-it]] 규율)."""
+    if lang == "ko":
+        return str(card.get(key) or "")
+    return str(((card.get("en") or {}).get(key)) or "")
+
+
+def _card_list(card: dict, key: str, lang: str = "ko") -> list[str]:
+    src = card.get(key) if lang == "ko" else (card.get("en") or {}).get(key)
+    return [str(x) for x in (src or []) if x]
+
+
+def has_en(card: dict) -> bool:
+    """영문 덱에 실을 수 있는 카드 — 제목과 요약이 영문 블록에 있어야 한다."""
+    en = card.get("en") or {}
+    return bool(str(en.get("title_issue") or "").strip() and str(en.get("summary") or "").strip())
+
+
+def _firm_for_lang(name: str, lang: str) -> str:
+    """영문 덱에서 한글 업체명은 **빈 문자열**. 로마자로 옮기면 없는 회사를 만든다 —
+    이름을 못 쓰면 그 줄을 빼고, 건수로만 남긴다."""
+    if lang != "ko" and _CJK.search(name or ""):
+        return ""
+    return name or ""
 
 
 def _facts(card: dict) -> list[str]:
@@ -222,20 +383,26 @@ def is_mfds_action(card: dict) -> bool:
     return _agency(card) == "MFDS" and any(k in _text_of(card) for k in ("제조업무정지", "행정처분", "판매업무정지"))
 
 
-def _kind_chip(card: dict) -> str:
+def _kind_chip(card: dict, lang: str = "ko") -> str:
+    """칩 문구. 판별은 늘 한국어 정본으로 하고 `lang` 은 라벨만 고른다."""
+    t = STR[lang]
     if is_class1_recall(card):
-        return "Class I 회수"
+        return t["chip_class1"]
     if str(card.get("group") or "") == "Recall":
-        return "회수"
+        return t["chip_recall"]
     if is_warning_letter(card):
-        return "경고서한"
+        return t["chip_wl"]
     if "483" in str(card.get("id") or "") or "483" in str(card.get("type_tag") or ""):
-        return "FDA 483"
+        return t["chip_483"]
     if is_mfds_action(card):
-        return "제조업무정지" if "제조업무정지" in _text_of(card) else "행정처분"
+        return t["chip_mfds_stop"] if "제조업무정지" in _text_of(card) else t["chip_mfds_act"]
     if is_mfds_inspection(card):
-        return "GMP 실사 결과"
-    return str(card.get("signal_label") or card.get("category") or "")
+        return t["chip_mfds_insp"]
+    # 마지막 폴백은 카드 데이터의 라벨 — 영문 덱에서 한글이면 카테고리(라틴)로 물러선다
+    fallback = str(card.get("signal_label") or card.get("category") or "")
+    if lang != "ko" and _CJK.search(fallback):
+        return str(card.get("category") or "")
+    return fallback
 
 
 def _firm_short(name: str, limit: float = 12.0) -> str:
@@ -295,11 +462,13 @@ def pick_headline_cards(brief: dict, cards: list[dict], n: int = 3) -> list[dict
     return picked[:n]
 
 
-def theme_counts(cards: list[dict]) -> list[tuple[str, str, int]]:
+def theme_counts(cards: list[dict], lang: str = "ko") -> list[tuple[str, str, int]]:
     """경고서한 카드들의 공통 지적 버킷 카운트(카드 단위) — 많은 순, 동률은 선언 순.
-    구조화된 칸(title_issue·key_facts)만 본다 — summary·implication 은 해설이라 주제어가 번진다."""
+    구조화된 칸(title_issue·key_facts)만 본다 — summary·implication 은 해설이라 주제어가 번진다.
+    집계는 늘 한국어 정본으로 하고 `lang` 은 표시 라벨만 고른다."""
     out = []
-    for order, (label, short, keys) in enumerate(WL_THEMES):
+    for order, (label_ko, short_ko, keys, label_en, short_en) in enumerate(WL_THEMES):
+        label, short = (label_ko, short_ko) if lang == "ko" else (label_en, short_en)
         n = 0
         for c in cards:
             blob = (str(c.get("title_issue") or "") + " " + " ".join(_facts(c))).lower()
@@ -370,12 +539,13 @@ def pick_glossary_terms(glossary: list[dict], cards: list[dict], n: int = 5,
         if cards and df / len(cards) > 0.4:
             score //= 3
         if score:
-            scored.append((-score, 0 if t.get("id") in MINI else 1, idx, t))
+            scored.append((-score, 0 if t.get("id") in MINI_SVG else 1, idx, t))
     scored.sort(key=lambda x: (x[0], x[1], x[2]))
     return [t for _, _, _, t in scored[:n]]
 
 
-def pick_checks(groups: list[list[dict]], n: int = 6, max_width: float = 34.0) -> list[str]:
+def pick_checks(groups: list[list[dict]], n: int = 6, max_width: float = 34.0,
+                lang: str = "ko") -> list[str]:
     """카드의 '점검' 항목 — 우선순위 그룹(헤드라인 → 경고서한 → 실사) 순서대로, 각 그룹 안에서는
     카드 순서 그대로. 한 줄에 들어오는 것(폭 34)만 먼저 채우고 모자라면 긴 것으로 보충. 중복 제거."""
     seen: set[str] = set()
@@ -383,7 +553,7 @@ def pick_checks(groups: list[list[dict]], n: int = 6, max_width: float = 34.0) -
     longs: list[str] = []
     for grp in groups:
         for c in grp:
-            for chk in c.get("checks") or []:
+            for chk in _card_list(c, "checks", lang):
                 s = " ".join(str(chk).split())
                 if not s or s in seen:
                     continue
@@ -403,13 +573,21 @@ def anonymize(cards: list[dict]) -> dict[str, str]:
 
 
 def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
-               base_url: str = SITE_BASE_URL) -> dict[str, Any]:
-    """브리프 JSON(+용어사전) → {"pub","slides","caption","doc_title"}. 순수·결정론."""
+               base_url: str = SITE_BASE_URL, lang: str = "ko") -> dict[str, Any]:
+    """브리프 JSON(+용어사전) → {"pub","slides","caption","doc_title"}. 순수·결정론.
+
+    `lang="en"` 이면 **같은 항목을 영어로** 낸다 — 무엇을 실을지(헤드라인 카드·용어·점검·주제
+    집계)는 한국어 정본으로 고르고, 화면에 나가는 글자만 영문 블록(`card["en"]`·`*_en`)에서
+    가져온다. 두 덱이 서로 다른 소식을 말하지 않게 하려는 것이다."""
+    if lang not in STR:
+        raise ValueError(f"지원하지 않는 언어: {lang!r} (가능: {', '.join(LANGS)})")
+    t = STR[lang]
     brief = brief_doc.get("brief") or {}
     cards = sorted(brief_doc.get("cards") or [], key=lambda c: int(c.get("render_order") or 0))
     pub = str(brief.get("publish_date") or "")
     y, m, wk = title_dateform(pub)
-    url = f"{base_url}/briefs/{pub}/"
+    mon = _EN_MONTH[m] if 1 <= m <= 12 else str(m)
+    url = f"{base_url}/briefs/{pub}/" if lang == "ko" else f"{base_url}/en/briefs/{pub}/"
 
     n_cards = len(cards)
     class1 = [c for c in cards if is_class1_recall(c)]
@@ -418,145 +596,177 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
     mfds_act = [c for c in cards if is_mfds_action(c) and not is_mfds_inspection(c)]
     recalls = [c for c in cards if str(c.get("group") or "") == "Recall"]
     heads = pick_headline_cards(brief, cards, 3)
+    if lang != "ko":
+        # 영문 블록이 없는 카드는 영문 덱에 실을 수 없다 — 지어내지 않고 뺀다.
+        heads = [c for c in heads if has_en(c)]
     # 가명은 화면에 나오는 순서(헤드라인 → 경고서한 → 실사 → 나머지)로 A·B·C
     names = anonymize(heads + wls + mfds_insp + cards) if anon else {}
 
     def firm(card: dict) -> str:
         tgt = str(card.get("headline_target") or "")
-        return names.get(tgt, tgt)
+        return _firm_for_lang(names.get(tgt, tgt), lang)
 
     # ── 01 표지: 통계 타일 4개(카드 수 + 0 이 아닌 축 셋)
-    tiles = [(str(n_cards), "규제 신호 카드")]
-    for cnt, lab in ((len(class1), "FDA Class I 회수"), (len(wls), "FDA 경고서한"),
-                     (len(mfds_insp), "식약처 실사 결과 공개"), (len(mfds_act), "식약처 행정처분"),
-                     (len(recalls), "회수 신호")):
-        if cnt and len(tiles) < 4 and lab not in {t[1] for t in tiles}:
+    tiles = [(str(n_cards), t["tile_cards"])]
+    for cnt, lab in ((len(class1), t["tile_class1"]), (len(wls), t["tile_wl"]),
+                     (len(mfds_insp), t["tile_mfds_insp"]), (len(mfds_act), t["tile_mfds_act"]),
+                     (len(recalls), t["tile_recall"])):
+        if cnt and len(tiles) < 4 and lab not in {x[1] for x in tiles}:
             tiles.append((str(cnt), lab))
-    agencies = [AGENCY_LABEL.get(a, a) for a in (brief.get("agencies") or [])]
+    ag_table = AGENCY_LABEL if lang == "ko" else AGENCY_LABEL_EN
+    agencies = [ag_table.get(a, a) for a in (brief.get("agencies") or [])]
+    ai_note = t["ai_note"]
     slides: list[dict] = [dict(
-        kind="cover", eyebrow=f"주간 규제 소식 · {m}월 {wk}주차", h1=["이번 주", "규제 소식"],
+        kind="cover", eyebrow=t["cover_eyebrow"].format(m=m, wk=wk, mon=mon), h1=list(t["cover_h1"]),
         tiles=tiles, sub=" · ".join(agencies), ft_right=window_label(str(brief.get("window") or "")),
-        ai=AI_NOTE)]
+        ai=ai_note)]
 
     # ── 02~04 헤드라인 카드
     for c in heads:
         rows: list[tuple[str, str]] = []
-        for f in _facts(c):
-            kv = parse_fact(f)
+        for f in _card_list(c, "key_facts", lang):
+            kv = parse_fact(f, 12 if lang == "ko" else 26)
             if not kv:
                 continue
             label, value = kv
-            if label.startswith("발행"):
+            if label.startswith(("발행", "Published", "Posted")):
                 continue
             rows.append((label, value))
             if len(rows) >= 3:
                 break
-        rows.append(("업체", firm(c) or "—"))
-        impl = first_sentence(str(c.get("implication") or ""))
-        checks = [" ".join(str(x).split()) for x in (c.get("checks") or [])][:2]
+        company = firm(c)
+        if lang == "ko":
+            rows.append((t["row_company"], company or "—"))
+        elif company:   # 이름을 못 쓰는 영문 카드는 줄 자체를 뺀다(빈칸·로마자 날조 대신)
+            rows.append((t["row_company"], company))
+        impl = first_sentence(_card_text(c, "implication", lang), lang)
+        checks = [" ".join(x.split()) for x in _card_list(c, "checks", lang)][:2]
+        title = _card_text(c, "title_issue", lang) or (firm(c) if lang == "ko" else "")
+        if lang == "ko":
+            src = SOURCE_NOTE.get(_agency(c), t["source_other"].format(label=_label(c, lang)))
+        else:
+            src = t["source_other"].format(label=_label(c, lang))
         slides.append(dict(
-            kind="headline", chips=[_label(c), _kind_chip(c)],
-            h1=split_two(str(c.get("title_issue") or c.get("headline_target") or "")),
+            kind="headline", chips=[_label(c, lang), _kind_chip(c, lang)],
+            h1=split_two(title), impl_label=t["impl_label"],
             rows=rows, impl=impl, checks=checks,
-            ft_right=SOURCE_NOTE.get(_agency(c), f"출처: {_label(c)} 공식 발표"), ai=AI_NOTE))
+            ft_right=src, ai=ai_note))
 
     # ── 05 경고서한 묶음(2건 이상일 때)
-    themes = theme_counts(wls)
+    themes = theme_counts(wls, lang)
     if len(wls) >= 2 and themes:
         top = themes[0]
         rows_wl = []
         for c in wls[:6]:
-            chips = [p.strip() for p in re.split(r"[·,]", str(c.get("title_issue") or "")) if p.strip()][:2]
-            rows_wl.append((_firm_short(firm(c), 10.0), chips))
+            if lang != "ko" and not has_en(c):
+                continue
+            name = _firm_short(firm(c), 10.0)
+            if not name:      # 이름을 못 쓰면 그 줄을 뺀다
+                continue
+            chips = [p.strip() for p in re.split(r"[·,]", _card_text(c, "title_issue", lang)) if p.strip()][:2]
+            rows_wl.append((name, chips))
         slides.append(dict(
-            kind="themes", eyebrow="FDA 경고서한", icon="doc",
-            h1=[f"경고서한 {len(wls)}건,", f"공통점은 {top[1]}"],
-            bars=[(lab, cnt) for lab, _, cnt in themes[:5]], bars_total=f"{len(wls)}건 중",
-            rows=rows_wl, ft_right=SOURCE_NOTE["FDA"], ai=AI_NOTE))
+            kind="themes", eyebrow=t["wl_eyebrow"], icon="doc",
+            h1=[t["wl_h1_a"].format(n=len(wls)), t["wl_h1_b"].format(theme=top[1])],
+            bars=[(lab, cnt) for lab, _, cnt in themes[:5]], bars_total=t["wl_total"].format(n=len(wls)),
+            bars_head=t["wl_bars_head"],
+            rows=rows_wl, ft_right=SOURCE_NOTE["FDA"] if lang == "ko"
+            else t["source_other"].format(label="FDA"), ai=ai_note))
 
-    # ── 06 식약처 실사 결과(2곳 이상일 때)
-    if len(mfds_insp) >= 2:
+    # ── 06 식약처 실사 결과(2곳 이상일 때) — 업체명 목록이 본체라 **영문 덱에서는 뺀다**.
+    #     한국 업체명을 로마자로 지어낼 수 없고, 이름 없는 표는 표가 아니다. 건수는 본문에 남는다.
+    if len(mfds_insp) >= 2 and lang == "ko":
         rows_mf = []
         for c in mfds_insp[:6]:
             chips = [p.strip() for p in re.split(r"[·,]", str(c.get("title_issue") or "")) if p.strip()][:3]
             rows_mf.append((_firm_short(firm(c), 10.0), chips))
         impl = first_sentence(str(mfds_insp[0].get("implication") or ""))
         slides.append(dict(
-            kind="rows", eyebrow="식약처 사후 GMP 실사", icon="factory",
-            h1=[f"실사 결과 {len(mfds_insp)}곳,", "보완 분야는"], rows=rows_mf, impl=impl,
-            ft_right=SOURCE_NOTE["MFDS"], ai=AI_NOTE))
+            kind="rows", eyebrow=t["mfds_eyebrow"], icon="factory", impl_label=t["impl_label"],
+            h1=[t["mfds_h1_a"].format(n=len(mfds_insp)), t["mfds_h1_b"]], rows=rows_mf, impl=impl,
+            ft_right=SOURCE_NOTE["MFDS"], ai=ai_note))
 
     # ── 07 이번 주 용어
     terms = pick_glossary_terms(glossary, cards, 5, headline_cards=heads)
     if terms:
         gl = []
-        for t in terms:
-            ko_parts = [p.strip() for p in re.split(r"[·/]", str(t.get("term_ko") or "")) if p.strip()]
+        for term in terms:   # ★루프 변수는 term — `t` 는 이 함수에서 문구표다
+            ko_parts = [p.strip() for p in re.split(r"[·/]", str(term.get("term_ko") or "")) if p.strip()]
             # 병기('무균공정·무균조작')는 이번 주 본문에 더 많이 나온 조각으로, 없으면 첫 조각
             blob = " ".join(_text_of(c) for c in cards)
-            ko = max(ko_parts, key=lambda p: (blob.count(p), -ko_parts.index(p))) if ko_parts else str(t.get("term_ko") or "")
-            en = str(t.get("term_en") or "")
+            ko = max(ko_parts, key=lambda p: (blob.count(p), -ko_parts.index(p))) if ko_parts else str(term.get("term_ko") or "")
+            en = str(term.get("term_en") or "")
             acr = re.search(r"\(([A-Z]{2,6})\)", en)
             small = acr.group(1) if acr else re.sub(r"\s*\(.*?\)\s*", " ", en).strip()
-            gl.append(dict(ko=ko, small=small, lines=[" ".join(str(t.get("easy_ko") or "").split())],
-                           mini=MINI.get(str(t.get("id") or ""), MINI["_generic"])))
-        slides.append(dict(kind="glossary", eyebrow="이번 주 용어", icon="book",
-                           h1=[f"이번 주 소식에 나온 용어 {_KO_NUM.get(len(gl), len(gl))}"],
-                           terms=gl, cap="정의는 GRM 용어사전에서 그대로 가져왔습니다.", ai=AI_NOTE))
+            head = ko if lang == "ko" else re.sub(r"\s*\(.*?\)\s*", " ", str(term.get("term_en") or "")).strip()
+            easy = " ".join(str(term.get("easy_ko" if lang == "ko" else "easy_en") or "").split())
+            if not head or not easy:      # 영문 정의가 없는 용어는 영문 덱에서 뺀다
+                continue
+            gl.append(dict(ko=head, small=small if lang == "ko" else (acr.group(1) if acr else ""),
+                           lines=[easy], mini=mini(str(term.get("id") or ""), lang)))
+        num = (_KO_NUM if lang == "ko" else _EN_NUM).get(len(gl), len(gl))
+        slides.append(dict(kind="glossary", eyebrow=t["gl_eyebrow"], icon="book",
+                           h1=[t["gl_h1"].format(num=num)],
+                           terms=gl, cap=t["gl_cap"], ai=ai_note))
 
     # ── 08 점검 포인트
-    checks = pick_checks([heads, wls, mfds_insp], 6)
+    checks = pick_checks([heads, wls, mfds_insp], 6, lang=lang)
     if checks:
-        slides.append(dict(kind="checks", eyebrow="이번 주 점검 포인트", icon="check",
-                           h1=["우리 현장에서 확인할 것"], checks=checks,
-                           cap="각 항목은 이번 주 카드의 '점검' 칸에서 가져왔습니다.", ai=AI_NOTE))
+        slides.append(dict(kind="checks", eyebrow=t["ck_eyebrow"], icon="check",
+                           h1=[t["ck_h1"]], checks=checks, cap=t["ck_cap"], ai=ai_note))
 
     # ── 09 마무리
-    slides.append(dict(kind="closing", h1=[f"전체 {n_cards}건,", "원문 링크와 함께"],
-                       body="요약은 한국어로, 출처는 각 기관의 공식 공고입니다.",
+    slides.append(dict(kind="closing", h1=[t["cl_h1_a"].format(n=n_cards), t["cl_h1_b"]],
+                       body=t["cl_body"],
                        url=url.replace("https://", "").rstrip("/"),
-                       note="메일로 받아보고 싶다면, 사이트에서 뉴스레터를 구독하세요.",
-                       ft_right="매주 월요일 · 무료", ai=AI_NOTE))
+                       note=t["cl_note"],
+                       ft_right=t["cl_ft"], ai=ai_note))
 
     # 페이지 번호
     for i, s in enumerate(slides, 1):
         s["idx"], s["total"] = i, len(slides)
 
     # ── 본문(한 줄에 한 뜻·모바일 폭 안쪽)
-    lines = [f"이번 주 규제 소식, 카드 {len(slides)}장.", ""]
+    lines = [t["cap_head"].format(n=len(slides)), ""]
     for c in heads[:2]:
-        lines.append(f"{' '.join(str(c.get('title_issue') or '').split())}.")
+        headline = " ".join(_card_text(c, "title_issue", lang).split())
+        if headline or lang == "ko":
+            lines.append(f"{headline}.")
     lines.append("")
     if class1:
-        lines.append(f"· Class I 회수 {len(class1)}건")
+        lines.append(t["cap_class1"].format(n=len(class1)))
     if len(wls) >= 2 and themes:
-        lines.append(f"· 경고서한 {len(wls)}건 — " + "·".join(s for _, s, _ in themes[:3]))
+        lines.append(t["cap_wl"].format(n=len(wls), themes="·".join(s for _, s, _ in themes[:3])))
     mf_bits = []
     if mfds_act:
-        mf_bits.append(f"행정처분 {len(mfds_act)}건")
+        mf_bits.append(t["cap_mfds_act"].format(n=len(mfds_act)))
     if mfds_insp:
-        mf_bits.append(f"실사 결과 {len(mfds_insp)}곳")
+        mf_bits.append(t["cap_mfds_insp"].format(n=len(mfds_insp)))
     if mf_bits:
-        lines.append("· 식약처 — " + ", ".join(mf_bits))
+        # 영문 덱은 식약처 장을 빼므로(업체명) 본문의 이 줄이 유일한 자리다 — 건수로 남긴다
+        lines.append(t["cap_mfds"].format(bits=", ".join(mf_bits)))
     tail = []
     if terms:
-        tail.append(f"용어 {len(terms)}개")
+        tail.append(t["cap_terms"].format(n=len(terms)))
     if checks:
-        tail.append(f"점검 포인트 {len(checks)}개")
+        tail.append(t["cap_checks"].format(n=len(checks)))
     if tail:
         lines.append("· " + " · ".join(tail))
-    lines += ["", f"전체 {n_cards}건과 원문 링크", url, "",
-              "어떤 항목이 제일 신경 쓰이시나요?", "댓글로 남겨 주시면 다음 주에 다룹니다.", "",
-              "#GMP #제약 #바이오 #규제 #품질관리", "#QA #FDA #식약처 #경고서한 #제약바이오"]
+    lines += ["", t["cap_link"].format(n=n_cards), url, "",
+              *t["cap_cta"], "", *t["cap_tags"]]
     caption = "\n".join(lines) + "\n"
-    return {"pub": pub, "slides": slides, "caption": caption,
-            "doc_title": f"{m}월 {wk}주차 규제 소식", "url": url}
+    return {"pub": pub, "lang": lang, "slides": slides, "caption": caption,
+            "doc_title": t["doc_title"].format(m=m, wk=wk, mon=mon), "url": url}
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # HTML
 # ──────────────────────────────────────────────────────────────────────────────
 
+# `.lang-en` 규칙: 영문은 같은 사실을 쓰는 데 줄이 더 들어 국문 기준 상한이면 숫자 한가운데서
+# 잘린다("about 5…"). 용어 정의는 "그대로 가져왔다"고 적어 두고 끊기면 말이 안 되니 4줄.
+# ★스타일시트 안에는 한글 주석을 넣지 않는다 — 영문 덱 HTML 에 그대로
+# 실려 "영문에 한글 0" 가드를 속인다.
 CSS = """
 @page{size:1080px 1350px;margin:0}
 *{box-sizing:border-box}
@@ -597,6 +807,9 @@ h1{margin:0;line-height:1.16;letter-spacing:-.028em;font-weight:800;word-break:k
 .kv{display:grid;grid-template-columns:minmax(72px,max-content) 1fr;gap:10px 18px;font-size:23px;line-height:1.45;color:#252523;margin:0}
 .kv dt{color:#6C6A64;font-weight:600;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
 .kv dd{margin:0;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lang-en .kv dd{-webkit-line-clamp:3}
+.lang-en .kv dt{max-width:260px}
+.lang-en .gl .g p{-webkit-line-clamp:4}
 .impl{margin-top:22px;padding:16px 20px;border-left:4px solid #C2603F;background:#FBF3EE;border-radius:0 12px 12px 0;font-size:23px;line-height:1.5;color:#252523;word-break:keep-all}
 .impl b{color:#A14B30;margin-right:8px}
 .cks{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
@@ -670,7 +883,8 @@ def _slide_html(s: dict) -> str:
             f'<span class="chip{" hi" if i else ""}">{_e(c)}</span>' for i, c in enumerate(s["chips"]) if c) + "</div>")
         parts.append(_h1(s["h1"], 78))
         kv = "".join(f"<dt>{_e(k)}</dt><dd>{_e(v)}</dd>" for k, v in s["rows"])
-        impl = f'<div class="impl"><b>시사점</b>{_e(s["impl"])}</div>' if s.get("impl") else ""
+        impl = (f'<div class="impl"><b>{_e(s.get("impl_label") or "시사점")}</b>'
+                f'{_e(s["impl"])}</div>') if s.get("impl") else ""
         cks = ('<div class="cks">' + "".join(f"<span>{_e(c)}</span>" for c in s["checks"]) + "</div>") if s.get("checks") else ""
         parts.append(f'<div class="mock"><dl class="kv">{kv}</dl>{impl}{cks}</div>')
     elif kind == "themes":
@@ -680,7 +894,9 @@ def _slide_html(s: dict) -> str:
         bars = "".join(
             f'<div class="br"><span>{_e(l)}</span><span class="bar{" top" if i == 0 else ""}"><i style="width:{int(100 * c / mx)}%"></i></span><span class="v">{c}</span></div>'
             for i, (l, c) in enumerate(s["bars"]))
-        parts.append(f'<div class="mock"><div class="mh"><b>겹치는 지적</b><span>{_e(s["bars_total"])}</span></div><div class="bars">{bars}</div></div>')
+        head = _e(s.get("bars_head") or "겹치는 지적")
+        parts.append(f'<div class="mock"><div class="mh"><b>{head}</b>'
+                     f'<span>{_e(s["bars_total"])}</span></div><div class="bars">{bars}</div></div>')
         rows = "".join(f'<div class="frow"><b>{_e(f)}</b><span class="fl">' + "".join(
             f'<span{"" if j == 0 else " class=\"g\""}>{_e(ch)}</span>' for j, ch in enumerate(chips)) + "</span></div>"
             for f, chips in s["rows"])
@@ -692,7 +908,8 @@ def _slide_html(s: dict) -> str:
             f"<span>{_e(ch)}</span>" for ch in chips) + "</span></div>" for f, chips in s["rows"])
         parts.append(f'<div class="mock">{rows}</div>')
         if s.get("impl"):
-            parts.append(f'<div class="impl"><b>시사점</b>{_e(s["impl"])}</div>')
+            parts.append(f'<div class="impl"><b>{_e(s.get("impl_label") or "시사점")}</b>'
+                         f'{_e(s["impl"])}</div>')
     elif kind == "glossary":
         parts.append(_eyebrow(s))
         parts.append(_h1(s["h1"], 64))
@@ -725,8 +942,11 @@ def _slide_html(s: dict) -> str:
 def render_html(deck: dict, *, font_links: bool = True) -> str:
     css = CSS.replace("HEX_DARK", _data_uri(_HEX.format(op="0.07"))).replace("HEX_CREAM", _data_uri(_HEX.format(op="0.16")))
     body = "".join(_slide_html(s) for s in deck["slides"])
-    return (f'<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>{_e(deck["doc_title"])}</title>'
-            f'{FONT_LINKS if font_links else ""}<style>{css}</style></head><body>{body}</body></html>')
+    lang = str(deck.get("lang") or "ko")
+    return (f'<!doctype html><html lang="{_e(lang)}"><head><meta charset="utf-8">'
+            f'<title>{_e(deck["doc_title"])}</title>'
+            f'{FONT_LINKS if font_links else ""}<style>{css}</style></head>'
+            f'<body class="lang-{_e(lang)}">{body}</body></html>')
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -786,6 +1006,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--anon", action="store_true", help="업체명을 가명(업체 A/B/C)으로")
     ap.add_argument("--html", action="store_true", help="linkedin.html 도 출력에 남긴다")
     ap.add_argument("--no-pdf", action="store_true", help="Chrome 렌더를 건너뛴다(html/txt 만)")
+    ap.add_argument("--lang", default=",".join(LANGS),
+                    help=f"낼 언어(쉼표) — 기본 {','.join(LANGS)}. ko=linkedin.*, en=linkedin_en.*")
     args = ap.parse_args(argv)
 
     brief_path = Path(args.brief) if args.brief else latest_brief_path(Path(args.data))
@@ -794,28 +1016,39 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     brief_doc = json.loads(brief_path.read_text(encoding="utf-8"))
     glossary = json.loads(Path(args.glossary).read_text(encoding="utf-8")) if Path(args.glossary).exists() else []
-    deck = build_deck(brief_doc, glossary, anon=args.anon)
-    out_dir = Path(args.out) / "briefs" / deck["pub"]
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "linkedin.txt").write_text(deck["caption"], encoding="utf-8")
-    html_text = render_html(deck)
-    html_path = out_dir / "linkedin.html"
-    html_path.write_text(html_text, encoding="utf-8")
-    print(f"linkedin: {deck['pub']} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 → {out_dir}")
-    if args.no_pdf:
-        return 0
-    chrome = find_chrome()
-    if not chrome:
+    langs = [x.strip() for x in str(args.lang).split(",") if x.strip()]
+    unknown = [x for x in langs if x not in STR]
+    if unknown:
+        print(f"::warning::모르는 언어 {unknown} — 무시", file=sys.stderr)
+        langs = [x for x in langs if x in STR]
+    chrome = None if args.no_pdf else find_chrome()
+    if not args.no_pdf and not chrome:
         print("::warning::Chrome 미발견 — linkedin.pdf 건너뜀(html/txt 만 출력)", file=sys.stderr)
-        if not args.html:
-            html_path.unlink(missing_ok=True)
-        return 0
-    try:
-        render_pdf(html_path, out_dir / "linkedin.pdf", chrome)
-        print(f"linkedin.pdf {(out_dir / 'linkedin.pdf').stat().st_size:,} bytes")
-    except Exception as exc:  # 비차단 — 배포는 카드 없이도 진행한다
-        print(f"::warning::linkedin.pdf 렌더 실패({type(exc).__name__}) — html/txt 만 출력", file=sys.stderr)
-    finally:
+
+    for lang in langs:
+        # 파일 이름: 한국어는 기존 그대로(linkedin.*), 영어는 접미(linkedin_en.*).
+        # 기존 링크·운영 루틴을 건드리지 않으려고 가산만 한다.
+        stem = "linkedin" if lang == "ko" else f"linkedin_{lang}"
+        deck = build_deck(brief_doc, glossary, anon=args.anon, lang=lang)
+        # 영문 블록이 없는 옛 브리프는 소식 장이 거의 없는 껍데기가 된다 — 조용히 내보내지 않고
+        # 경고 후 그 언어만 건너뛴다(빈 덱이 배포되면 아무도 모른다).
+        if not any(s["kind"] == "headline" for s in deck["slides"]):
+            print(f"::warning::{stem} 건너뜀 — 실을 소식 장이 0(브리프 카드에 {lang} 본문 없음)",
+                  file=sys.stderr)
+            continue
+        out_dir = Path(args.out) / "briefs" / deck["pub"]
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / f"{stem}.txt").write_text(deck["caption"], encoding="utf-8")
+        html_path = out_dir / f"{stem}.html"
+        html_path.write_text(render_html(deck), encoding="utf-8")
+        print(f"{stem}: {deck['pub']} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 → {out_dir}")
+        if chrome:
+            try:
+                render_pdf(html_path, out_dir / f"{stem}.pdf", chrome)
+                print(f"{stem}.pdf {(out_dir / f'{stem}.pdf').stat().st_size:,} bytes")
+            except Exception as exc:  # 비차단 — 배포는 카드 없이도 진행한다
+                print(f"::warning::{stem}.pdf 렌더 실패({type(exc).__name__}) — html/txt 만 출력",
+                      file=sys.stderr)
         if not args.html:
             html_path.unlink(missing_ok=True)
     return 0

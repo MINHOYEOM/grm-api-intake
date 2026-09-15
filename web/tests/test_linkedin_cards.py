@@ -13,6 +13,7 @@ from __future__ import annotations
 import io
 import json
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -278,6 +279,128 @@ class CliTest(unittest.TestCase):
                 (pathlib.Path(tmp) / name).write_text("{}", encoding="utf-8")
             self.assertEqual(lc.latest_brief_path(pathlib.Path(tmp)).name, "brief_web_2026_09_07.json")
             self.assertIsNone(lc.latest_brief_path(pathlib.Path(tmp) / "empty"))
+
+
+HANGUL = re.compile(r"[가-힣]")
+
+
+class EnglishDeckTest(unittest.TestCase):
+    """[영문판 2026-09-15] 같은 주 소식을 영어로도 낸다. 단언은 성질로 —
+    ① 영문 덱에는 한글이 한 조각도 없다(화면에 나가는 HTML·본문·문서 제목 전부),
+    ② 두 덱은 **같은 항목**을 말한다(선별은 한국어 정본으로 하므로),
+    ③ 한국 업체명은 로마자로 지어내지 않는다 — 못 쓰면 그 줄이 없다."""
+
+    @classmethod
+    def setUpClass(cls):
+        doc, gl = _load()
+        cls.doc, cls.gl = doc, gl
+        cls.ko = lc.build_deck(doc, gl, lang="ko")
+        cls.en = lc.build_deck(doc, gl, lang="en")
+
+    def test_english_deck_has_no_hangul_anywhere_on_screen(self):
+        shipped = lc.render_html(self.en) + self.en["caption"] + self.en["doc_title"]
+        found = HANGUL.findall(shipped)
+        self.assertEqual(found, [], f"영문 덱에 한글 {found[:10]}")
+
+    def test_korean_deck_still_korean(self):
+        self.assertTrue(HANGUL.search(lc.render_html(self.ko)))
+        self.assertTrue(self.ko["caption"].startswith("이번 주 규제 소식"))
+
+    def test_both_languages_carry_the_same_items(self):
+        kinds_ko = [s["kind"] for s in self.ko["slides"]]
+        kinds_en = [s["kind"] for s in self.en["slides"]]
+        # 식약처 묶음 장(rows)만 영문에서 빠진다 — 업체명 목록이 본체라서.
+        self.assertEqual([k for k in kinds_ko if k != "rows"], kinds_en)
+        self.assertEqual(kinds_ko.count("headline"), kinds_en.count("headline"))
+        gl_ko = next(s for s in self.ko["slides"] if s["kind"] == "glossary")
+        gl_en = next(s for s in self.en["slides"] if s["kind"] == "glossary")
+        self.assertEqual(len(gl_ko["terms"]), len(gl_en["terms"]))
+        ck_ko = next(s for s in self.ko["slides"] if s["kind"] == "checks")
+        ck_en = next(s for s in self.en["slides"] if s["kind"] == "checks")
+        self.assertEqual(len(ck_ko["checks"]), len(ck_en["checks"]))
+
+    def test_english_headline_rows_are_actually_parsed(self):
+        """'Observation 1:' 은 라벨이 13자라 한국어 상한(12)에 걸려 **표가 통째로 비었다**.
+        영문 헤드라인 장은 적어도 한 줄은 들고 있어야 한다."""
+        for s in (x for x in self.en["slides"] if x["kind"] == "headline"):
+            with self.subTest(h1=s["h1"]):
+                self.assertTrue(s["rows"], "영문 헤드라인 표가 비었다")
+                self.assertTrue(all(v.strip() for _, v in s["rows"]))
+
+    def test_english_implication_is_one_sentence(self):
+        for s in (x for x in self.en["slides"] if x["kind"] == "headline" and x.get("impl")):
+            with self.subTest(h1=s["h1"]):
+                # 마침표 뒤 공백+대문자가 또 있으면 한 문장으로 안 끊긴 것
+                self.assertIsNone(re.search(r"[a-z0-9)]\.\s+[A-Z]", s["impl"]), s["impl"])
+
+    def test_korean_company_names_never_romanised_in_english(self):
+        card = {"id": "x1", "render_order": 1, "agency": "MFDS", "group": "Recall",
+                "category": "Recall", "headline_target": "(주)네오메디칼제약",
+                "title_issue": "치약 질산칼륨 함량 부적합", "summary": "실사 결과",
+                "key_facts": ["제품: 치약"], "implication": "국내 회수다.", "checks": ["함량시험 기록"],
+                "en": {"title_issue": "Toothpaste assay failure", "summary": "MFDS ordered a recall.",
+                       "key_facts": ["Product: toothpaste"], "implication": "A domestic recall.",
+                       "checks": ["Assay records"]}}
+        doc = _synthetic([card], tldr=["(주)네오메디칼제약 회수"])
+        ko = lc.build_deck(doc, self.gl, lang="ko")
+        en = lc.build_deck(doc, self.gl, lang="en")
+        ko_head = next(s for s in ko["slides"] if s["kind"] == "headline")
+        en_head = next(s for s in en["slides"] if s["kind"] == "headline")
+        self.assertIn("(주)네오메디칼제약", [v for _, v in ko_head["rows"]])
+        labels = [lab for lab, _ in en_head["rows"]]
+        self.assertNotIn("Company", labels, "이름을 못 쓰는데 업체 줄이 남았다")
+        self.assertEqual(HANGUL.findall(lc.render_html(en)), [])
+
+    def test_mini_labels_fill_every_slot_in_every_language(self):
+        """라벨 사전이 그림보다 낡으면 KeyError 로 죽는다 — 두 언어 전부를 실제로 채워 본다."""
+        for fig_id in lc.MINI_SVG:
+            for lang in lc.LANGS:
+                with self.subTest(fig=fig_id, lang=lang):
+                    svg = lc.mini(fig_id, lang)
+                    self.assertNotIn("{", svg, "채우지 않은 슬롯이 남았다")
+                    self.assertEqual(svg.count("<svg"), 1)
+                    if lang != "ko":
+                        self.assertEqual(HANGUL.findall(svg), [])
+        self.assertEqual(lc.mini("없는-용어", "en"), lc.mini("_generic", "en"))
+
+    def test_unknown_language_is_refused_loudly(self):
+        with self.assertRaises(ValueError):
+            lc.build_deck(self.doc, self.gl, lang="fr")
+
+
+class EnglishCliTest(unittest.TestCase):
+    def test_cli_writes_both_languages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "dist"
+            buf = io.StringIO()
+            with redirect_stdout(buf), redirect_stderr(io.StringIO()):
+                rc = lc.main(["--brief", str(BRIEF), "--glossary", str(GLOSSARY),
+                              "--out", str(out), "--no-pdf"])
+            self.assertEqual(rc, 0)
+            d = out / "briefs" / "2026-09-07"
+            for name in ("linkedin.txt", "linkedin_en.txt"):
+                self.assertTrue((d / name).exists(), name)
+            self.assertEqual(HANGUL.findall((d / "linkedin_en.txt").read_text(encoding="utf-8")), [])
+
+    def test_brief_without_english_skips_english_with_a_warning(self):
+        """옛 브리프에는 `en` 블록이 없다 — 껍데기 덱을 조용히 내보내지 않는다."""
+        card = {"id": "k1", "render_order": 1, "agency": "FDA", "category": "Warning Letter",
+                "headline_target": "Acme Inc", "title_issue": "무균공정 미흡", "summary": "경고서한",
+                "key_facts": ["제품: 주사제"], "implication": "무균공정이 문제다.", "checks": ["무균 기록"]}
+        with tempfile.TemporaryDirectory() as tmp:
+            brief = pathlib.Path(tmp) / "brief_web_2026_09_14.json"
+            brief.write_text(json.dumps(_synthetic([card, dict(card, id="k2", render_order=2)]),
+                                        ensure_ascii=False), encoding="utf-8")
+            out = pathlib.Path(tmp) / "dist"
+            err = io.StringIO()
+            with redirect_stdout(io.StringIO()), redirect_stderr(err):
+                rc = lc.main(["--brief", str(brief), "--glossary", str(GLOSSARY),
+                              "--out", str(out), "--no-pdf"])
+            self.assertEqual(rc, 0)
+            d = out / "briefs" / "2026-09-14"
+            self.assertTrue((d / "linkedin.txt").exists())
+            self.assertFalse((d / "linkedin_en.txt").exists())
+            self.assertIn("::warning::linkedin_en 건너뜀", err.getvalue())
 
 
 if __name__ == "__main__":

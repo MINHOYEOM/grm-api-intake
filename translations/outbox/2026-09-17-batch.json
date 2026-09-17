@@ -1,0 +1,20 @@
+[
+  {
+    "finding_id": "finding-b8456cfca669ed689915f859",
+    "finding_text": "삼아록시트로마이신정: 불순물(N-nitroso-desmethyl roxithromycin) 기준 초과에 따른 시중 유통품에 대한 영업자 회수",
+    "finding_text_ko": "삼아록시트로마이신정에서 불순물(N-nitroso-desmethyl roxithromycin)이 기준을 초과하여, 시중 유통품에 대해 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-be93b0b6e5535d15098b50e0",
+    "finding_text": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음",
+    "finding_text_ko": "약사법 제47조의3제2항 및 같은 법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 한다. 그럼에도 상기 업체는 상기 3개 품목에 대한 의약품 공급내역 현황을 건강보험심사평가원 의약품관리종합정보센터에 기한 내 보고하지 않은 사실이 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a70ccf3e154200ebd7a7a02",
+    "finding_text": "벤포비타맥스정: 2차 포장지 표시기재 일부 단순 오기에 따른 영업자 회수",
+    "finding_text_ko": "벤포비타맥스정의 2차 포장지 표시기재 일부에 단순 오기가 있어, 해당 품목에 대해 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  }
+]

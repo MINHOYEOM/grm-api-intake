@@ -333,6 +333,70 @@ def _read_real_cards() -> list[dict]:
     return json.loads(REAL_FIXTURE.read_text(encoding="utf-8"))["cards"]
 
 
+class WebSourceDocumentLinkTest(unittest.TestCase):
+    """규제기관 공개 원문으로 나가는 간선 — **어느 화면에서든 있고, 한 이름이다**.
+
+    빌드가 필요 없는 소스 검사다(자산·템플릿의 배선과 문구만 본다). 라이브 렌더 스모크
+    클래스에 얹으면 전체 빌드를 기다려야 하는데, 여기서 잴 것은 산출물이 아니라 배선이다.
+    """
+    def test_the_source_document_link_has_one_name_across_the_site(self):
+        """규제기관 원문으로 나가는 링크의 이름이 **한 벌인가**.
+
+        ★[2026-09-18] 같은 것을 셋이 다르게 불렀다 — 검색 카드 "원문 보기", 분야·조항
+          모음 "공개 원문 보기", 문서 페이지 "규제기관 공개 원문 보기". 게다가 검색
+          카드에서는 **접기 토글과 링크가 둘 다 "원문 보기"** 여서, 같은 카드 안의 두
+          이름이 서로 다른 것(기록된 문장 / 규제기관이 공개한 문서)을 가리켰다. 사용자가
+          "원본은 어떻게 보느냐"고 물어서 드러났다.
+        ★이름을 세는 것이 아니라 **evidence_url 을 가리키는 앵커가 무엇이라 불리는가**를
+          잰다 — 새 화면이 넷째 이름을 들고 와도 걸린다(손목록이면 새 화면을 못 본다).
+        """
+        doc_link_label = "규제기관 공개 원문 보기"
+        labels = {}
+        for path in sorted((WEB_DIR / "templates").glob("*.html")):
+            src = path.read_text(encoding="utf-8")
+            for m in re.finditer(
+                    r"""href="\{\{\s*[\w.]*evidence_url[^"]*"[^>]*>\s*\{\{\s*_\(\s*'([^']+)'""", src):
+                labels.setdefault(m.group(1), set()).add(path.name)
+        for path in sorted((WEB_DIR / "assets").glob("*.js")):
+            src = path.read_text(encoding="utf-8")
+            for m in re.finditer(r"""\.href\s*=\s*[\w.]*evidence_url;(.{0,600}?)_t\("([^"]+)"\)""",
+                                 src, re.S):
+                labels.setdefault(m.group(2), set()).add(path.name)
+
+        self.assertGreaterEqual(len(labels.get(doc_link_label, ())), 4,
+                                f"원문 링크를 다는 화면이 줄었다(배선이 빠졌나?): {labels}")
+        stray = {k: sorted(v) for k, v in labels.items() if k != doc_link_label}
+        self.assertEqual(stray, {},
+                         "규제기관 원문 링크의 이름이 갈라졌다 — 사이트 전체에서 "
+                         f"{doc_link_label!r} 한 벌이다: {stray}")
+
+    def test_runtime_profiles_link_out_to_the_regulator_source(self):
+        """업체·실사관 프로파일의 펼친 지적에 **규제기관 원문으로 나가는 간선**이 있는가.
+
+        ★[2026-09-18] 정적 페이지(문서·분야·조항·업체)는 전부 원문 링크를 달고 있었는데
+          런타임 RPC 화면 둘만 조회 필드에서 evidence_url 을 빼고 있었다 — 그래서 업체
+          프로파일에서 실사 공문을 보려면 검색으로 되돌아 나가야 했다(라이브 문의로 확인).
+        ★링크는 **문서 단위로 하나**다. 지적마다 달면 같은 URL 이 7번 반복된다.
+        """
+        for name in ("firm", "inspector"):
+            src = (WEB_DIR / "assets" / f"{name}.js").read_text(encoding="utf-8")
+            fields = re.search(r"var OBS_FIELDS = \[(.*?)\];", src, re.S)
+            self.assertIsNotNone(fields, f"{name}.js: OBS_FIELDS 를 못 찾았다")
+            self.assertIn('"evidence_url"', fields.group(1),
+                          f"{name}.js: 조회 필드에 evidence_url 이 없다 — 값이 오지 않으면 "
+                          "링크를 세울 수 없다")
+            build = js_function_body(src, "function buildSourceLink(rows)")
+            self.assertIn("safeUrl(rows[i].evidence_url)", build,
+                          f"{name}.js: http(s) 검사 없이 href 에 값을 넣는다")
+            self.assertIn('_t("규제기관 공개 원문 보기")', build,
+                          f"{name}.js: 원문 링크의 이름이 사이트 공용 문구가 아니다")
+            self.assertIn("return null;", build,
+                          f"{name}.js: 값이 없을 때 빈 링크를 만든다(부재는 침묵이다)")
+            render_fn = js_function_body(src, "function renderDocDetail(container, rows)")
+            self.assertIn("buildSourceLink(rows)", render_fn,
+                          f"{name}.js: 링크를 만들어 놓고 붙이지 않는다")
+
+
 # ── 라이브 발행 디렉터리 비골든 스모크 ────────────────────────────────────────
 class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
     """라이브 web/data/briefs 가 크래시 없이 렌더되는지 **비골든** 스모크.
@@ -474,8 +538,8 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
         # 언어를 **재고** 나서 말한다 — 한국어 화면에서 원문이 한글이면 "(영문)"을 붙이지
         # 않는다. 목록·타입이 아니라 그 글에 한글이 있는가로 가른다.
         self.assertIn("_HANGUL.test(", got, f"라벨이 재지 않고 단정한다: {got}")
-        self.assertIn('_t("원문 보기")', got, f"한글 원문용 라벨이 없다: {got}")
-        self.assertIn('_t("원문 보기 (영문)")', got)
+        self.assertIn('_t("원문 그대로 보기")', got, f"한글 원문용 라벨이 없다: {got}")
+        self.assertIn('_t("원문 그대로 보기 (영문)")', got)
         self.assertIn('_t("국문 번역 보기")', got)
 
     def test_home_is_the_same_page_in_both_languages(self):

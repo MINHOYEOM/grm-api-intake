@@ -460,9 +460,14 @@
   }
 
   // ── 문서 이력 + 인라인 확장(anon REST, RLS 공개 게이트 통과분만) ────────────────
+  // ★[2026-09-18] evidence_url 이 빠져 있어 이 화면에서 규제기관 원문으로 나가는
+  //   간선이 없었다(업체 프로파일 firm.js 와 같은 구멍 — 정적 페이지는 전부 달고
+  //   있었다). 문서 상세 링크(아래 DOC_PAGE_IDS)는 **정적 페이지가 있는 문서에만**
+  //   걸리는 반면, 원문 링크는 모든 문서에 값이 있어 조건 없이 선다.
   var OBS_FIELDS = [
     "finding_id", "category_code", "category_label_ko",
     "finding_text", "finding_text_ko", "cfr_refs", "mfds_refs",
+    "evidence_url",
   ];
 
   function fetchDocObservations(rawSignalId) {
@@ -503,7 +508,7 @@
       //   자체는 쓸모가 있다(본문은 정리된 국문, 이쪽은 기록 그대로라 내용이 다르다).
       //   없앨 것이 아니라 **재서 말하면 된다** — 목록이 아니라 그 글에 한글이 있는가로.
       summary.textContent = _isEn ? _t("국문 번역 보기")
-        : (_HANGUL.test(altText) ? _t("원문 보기") : _t("원문 보기 (영문)"));
+        : (_HANGUL.test(altText) ? _t("원문 그대로 보기") : _t("원문 그대로 보기 (영문)"));
       details.appendChild(summary);
       details.appendChild(el("p", null, altText));
       card.appendChild(details);
@@ -528,12 +533,45 @@
     container.appendChild(el("p", "ip-doc-detail-empty", _t("지적사항을 불러오지 못했습니다.")));
   }
 
+  // http(s) 만 통과시킨다 — findings.js/firm.js safeUrl() 과 같은 계약(별도 정적
+  // 자산이라 import 불가, 계약만 복제하는 기존 관례).
+  function safeUrl(u) {
+    var s = (u || "").trim().toLowerCase();
+    return s.indexOf("http://") === 0 || s.indexOf("https://") === 0;
+  }
+
+  // 문서 단위 사실이라 문서 하나에 링크 하나(firm.js 동명 함수와 같은 계약). 값이
+  // 없으면 요소를 만들지 않는다.
+  function buildSourceLink(rows) {
+    var href = "";
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && safeUrl(rows[i].evidence_url)) { href = rows[i].evidence_url; break; }
+    }
+    if (!href) return null;
+    var p = el("p", "ip-obs-src");
+    var a = document.createElement("a");
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    var icon = document.createElement("i");
+    icon.className = "ti ti-external-link";
+    icon.setAttribute("aria-hidden", "true");
+    a.appendChild(icon);
+    a.appendChild(document.createTextNode(_t("규제기관 공개 원문 보기")));
+    p.appendChild(a);
+    return p;
+  }
+
   function renderDocDetail(container, rows) {
     container.innerHTML = "";
     if (!Array.isArray(rows) || !rows.length) {
       container.appendChild(el("p", "ip-doc-detail-empty", _t("공개된 지적사항이 없습니다.")));
       return;
     }
+    // 원문 링크가 먼저다 — 아래 카드는 우리가 옮기고 분류한 것이고, 판단의 근거는
+    // 그 문서 자체다(문서 페이지가 링크를 머리에 두는 것과 같은 자리).
+    var src = buildSourceLink(rows);
+    if (src) container.appendChild(src);
     rows.forEach(function (row) { container.appendChild(buildObsCard(row)); });
   }
 

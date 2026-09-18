@@ -954,7 +954,7 @@
     //   자체는 쓸모가 있다(본문은 정리된 국문, 이쪽은 기록 그대로라 내용이 다르다).
     //   없앨 것이 아니라 **재서 말하면 된다** — 목록이 아니라 그 글에 한글이 있는가로.
     summary.textContent = _isEn ? _t("국문 번역 보기")
-      : (_HANGUL.test(altText) ? _t("원문 보기") : _t("원문 보기 (영문)"));
+      : (_HANGUL.test(altText) ? _t("원문 그대로 보기") : _t("원문 그대로 보기 (영문)"));
     details.appendChild(summary);
     // 번역고지는 **번역문을 보여줄 때만** 뜬다 — 영어판의 접기 안이 번역문이고,
     // 한국어판은 본문이 번역문이라 그 자리에서 이미 고지한다(중복 노출 금지).
@@ -1246,7 +1246,12 @@
       icon.className = "ti ti-external-link";
       icon.setAttribute("aria-hidden", "true");
       a.appendChild(icon);
-      a.appendChild(document.createTextNode(_t("원문 보기")));
+      // ★[2026-09-18] 같은 카드 안에서 **접기 토글과 이 링크의 이름이 둘 다
+      //   "원문 보기"** 였다 — 하나는 기록된 문장, 하나는 규제기관이 공개한
+      //   문서라 가리키는 것이 아예 다른데 이름이 같았다(라이브 문의로 확인).
+      //   문서 링크의 이름은 사이트 전체에서 이 한 벌로 통일한다(문서 페이지
+      //   findings_doc.html 이 쓰던 문구 — 누가 공개한 것인지까지 말한다).
+      a.appendChild(document.createTextNode(_t("규제기관 공개 원문 보기")));
       actions.appendChild(a);
     }
     // ["이 지적과 유사한 사례"] 기존 "자세히 보기"(moreBtn) 관례와 나란히, 그 앞에 배치

@@ -272,6 +272,13 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
 .ip-doc-title:hover .ip-doc-date,.ip-doc-title:focus-visible .ip-doc-date{color:var(--coral-2)}
 
 /* 문서 인라인 확장 — 단순화한 국문+원문 details 카드(firm.html fp-obs 관례 동형). */
+/* 규제기관 공개 원문 — 문서 하나에 링크 하나, 펼친 목록의 맨 위(문서 페이지가
+   링크를 머리에 두는 것과 같은 자리). 아래 카드는 우리가 옮긴 것이고 판단의
+   근거는 그 문서다. */
+.ip-obs-src{margin:0 0 2px}
+.ip-obs-src a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--coral-2);text-decoration:none}
+.ip-obs-src a:hover,.ip-obs-src a:focus-visible{color:var(--coral);text-decoration:underline}
+.ip-obs-src .ti{font-size:12px}
 .ip-obs{border:1px solid var(--line-2);border-radius:var(--rad-s);padding:14px 16px;background:var(--canvas)}
 .ip-obs-cat{font-size:11.5px;color:var(--muted);margin:0 0 6px}
 .ip-obs-text{font-size:13.5px;line-height:1.6;color:var(--body);margin:0;white-space:pre-wrap}

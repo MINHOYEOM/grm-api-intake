@@ -288,7 +288,8 @@ class KoTranslationRenderTest(unittest.TestCase):
         page = search_page.build_search_page(self.export)
         self.assertIn("appendFindingText", page)
         self.assertIn("card-orig", page)
-        self.assertIn("원문 보기 (영문)", page)
+        self.assertIn("원문 그대로 보기", page)           # 문장 — 기록 그대로
+        self.assertIn("규제기관 공개 원문 보기", page)   # 문서 — 규제기관 공개본
         self.assertIn("AI 번역", page)
         self.assertIn(".card-orig", page)
         self.assertIn(".card-tr-note", page)

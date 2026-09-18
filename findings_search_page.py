@@ -381,7 +381,11 @@ _APP_JS = """
       var details = document.createElement("details");
       details.className = "card-orig";
       var summary = document.createElement("summary");
-      summary.textContent = "원문 보기 (영문)";
+      // ★[2026-09-18] "(영문)"은 재지 않은 단정이었다 — 식약처 기록은 원문이
+      //   한국어라 펼치면 한국어가 나온다(웹 쪽은 2026-09-06 에 같은 이유로
+      //   고쳤다). 언어를 주장하지 않는 이름으로 바꾼다. 아래 원문 **문서**
+      //   링크와도 이름이 겹치지 않는다(문장 / 문서).
+      summary.textContent = "원문 그대로 보기";
       details.appendChild(summary);
       var p = document.createElement("p");
       p.textContent = record.finding_text;
@@ -429,7 +433,7 @@ _APP_JS = """
     }
 
     var linkWrap = appendTag(card, "div", null, "card-link");
-    buildEvidenceLink(linkWrap, record.evidence_url, "원문 보기");
+    buildEvidenceLink(linkWrap, record.evidence_url, "규제기관 공개 원문 보기");
 
     return card;
   }

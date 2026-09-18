@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/findings/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/findings/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/findings/" />
-<script src="/assets/i18n-en.js?v=b7450e15" defer></script>
+<script src="/assets/i18n-en.js?v=ed4f72ec" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -54,7 +54,7 @@
     <h1 class="reveal" style="animation-delay:.08s">Findings search</h1><p class="reveal" style="animation-delay:.14s">23,012 findings (as of 2026-09-15) extracted sentence by sentence from 4,854 FDA 483, Warning Letter, Health Canada inspection, MFDS, and EU/UK GMP documents.</p>
   </div>
   <div class="wrap">
-    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div>
+    <div id="grm-findings-cfg" data-url="" data-key="" data-root="../" data-asset-root="../../" hidden></div>
 <nav class="fnd-seg" aria-label="Findings views">
   <a href="../findings/index.html" class="on" aria-current="page">Search</a>
   <a href="../findings/browse/index.html">Explore</a>
@@ -381,6 +381,9 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 0 auto}
 .fnd-doc-date{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:500}
 .fnd-doc-count{font-size:11.5px;color:var(--muted);font-weight:600}
+.fnd-doc-page{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--coral-2);text-decoration:none}
+.fnd-doc-page:hover,.fnd-doc-page:focus-visible{color:var(--coral);text-decoration:underline}
+.fnd-doc-page .ti{font-size:11px}
 .fnd-doc-obs{display:flex;flex-direction:column;gap:14px}
 .fnd-doc-obs + .fnd-doc-obs-more{margin-top:14px}
 /* [긴 문서 접기] "지적 N건 모두 보기" — 텍스트 버튼(기존 .fnd-more-btn 과 동일 어휘). */
@@ -576,7 +579,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=ac382148" defer></script>
-<script src="../../assets/findings.js?v=13677a8c" defer></script>
+<script src="../../assets/findings.js?v=89ee54f8" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

@@ -63,6 +63,14 @@
 
   var url = (cfg.getAttribute("data-url") || "").trim();
   var key = (cfg.getAttribute("data-key") || "").trim();
+  // [문서 페이지 간선 2026-09-18] 자산 경로를 계산하려면 트리 깊이가 필요하다
+  // (한국어 /findings/ 와 영어 /en/findings/ 가 같은 /assets/ 를 쓴다). 구버전
+  // 셸(이 속성이 없는 캐시 HTML)에서는 빈 문자열이라 멤버십 fetch 만 조용히
+  // 실패하고 검색 자체는 그대로 돈다.
+  var root = (cfg.getAttribute("data-root") || "").trim();
+  // 명단은 언어 무관 공유 자산이라 **사이트 루트** 기준이다(rel_root 로 받으면
+  // 영어 화면이 /en/assets/... 로 가서 404 — 실제로 그렇게 죽어 있었다).
+  var assetRoot = (cfg.getAttribute("data-asset-root") || "").trim();
 
   function showState(which) {
     loadingEl.hidden = which !== "loading";
@@ -852,6 +860,44 @@
     dashEl.hidden = false;
   }
 
+  // ── [문서 페이지 간선] 정적 문서 페이지(findings/doc/{id}/)가 **실제로 있는**
+  // 문서에만 링크한다 — 임계 미달 문서까지 링크하면 404 다. 아래 사본은 grm_i18n.
+  // JS_DOC_PAGES_SHIM 정본의 바이트 동일 복제이고(세 자산 공유 계약, lint 가 강제),
+  // 멤버십을 못 받으면 링크 없이 목록만 그대로 뜬다.
+  var _DOC_PAGES = null;
+  var _docPagesPromise = null;
+  function _fetchDocPages(assetRoot) {
+    if (_docPagesPromise) return _docPagesPromise;
+    _docPagesPromise = fetch(assetRoot + "assets/doc-pages.json")
+      .then(function (r) {
+        if (!r.ok) throw new Error("doc-pages " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || data.schema !== "grm-doc-pages/v1" ||
+            !Array.isArray(data.document_ids)) return null;
+        var map = {};
+        data.document_ids.forEach(function (id) { if (id) map[id] = id; });
+        var odd = data.slug_by_document_id;
+        if (odd && typeof odd === "object") {
+          Object.keys(odd).forEach(function (id) { if (odd[id]) map[id] = odd[id]; });
+        }
+        if (_isEn && Array.isArray(data.ko_only_document_ids)) {
+          data.ko_only_document_ids.forEach(function (id) { delete map[id]; });
+        }
+        _DOC_PAGES = map;
+        return map;
+      })
+      .catch(function () { return null; });
+    return _docPagesPromise;
+  }
+  function _docPageHref(root, documentId) {
+    var id = String(documentId || "");
+    var slug = (id && _DOC_PAGES) ? _DOC_PAGES[id] : "";
+    if (!slug) return "";
+    return root + "findings/doc/" + encodeURIComponent(slug) + "/";
+  }
+
   function safeUrl(u) {
     var s = (u || "").trim().toLowerCase();
     return s.indexOf("http://") === 0 || s.indexOf("https://") === 0;
@@ -954,7 +1000,7 @@
     //   자체는 쓸모가 있다(본문은 정리된 국문, 이쪽은 기록 그대로라 내용이 다르다).
     //   없앨 것이 아니라 **재서 말하면 된다** — 목록이 아니라 그 글에 한글이 있는가로.
     summary.textContent = _isEn ? _t("국문 번역 보기")
-      : (_HANGUL.test(altText) ? _t("원문 보기") : _t("원문 보기 (영문)"));
+      : (_HANGUL.test(altText) ? _t("원문 그대로 보기") : _t("원문 그대로 보기 (영문)"));
     details.appendChild(summary);
     // 번역고지는 **번역문을 보여줄 때만** 뜬다 — 영어판의 접기 안이 번역문이고,
     // 한국어판은 본문이 번역문이라 그 자리에서 이미 고지한다(중복 노출 금지).
@@ -1246,7 +1292,12 @@
       icon.className = "ti ti-external-link";
       icon.setAttribute("aria-hidden", "true");
       a.appendChild(icon);
-      a.appendChild(document.createTextNode(_t("원문 보기")));
+      // ★[2026-09-18] 같은 카드 안에서 **접기 토글과 이 링크의 이름이 둘 다
+      //   "원문 보기"** 였다 — 하나는 기록된 문장, 하나는 규제기관이 공개한
+      //   문서라 가리키는 것이 아예 다른데 이름이 같았다(라이브 문의로 확인).
+      //   문서 링크의 이름은 사이트 전체에서 이 한 벌로 통일한다(문서 페이지
+      //   findings_doc.html 이 쓰던 문구 — 누가 공개한 것인지까지 말한다).
+      a.appendChild(document.createTextNode(_t("규제기관 공개 원문 보기")));
       actions.appendChild(a);
     }
     // ["이 지적과 유사한 사례"] 기존 "자세히 보기"(moreBtn) 관례와 나란히, 그 앞에 배치
@@ -1384,6 +1435,21 @@
         }
       });
       meta.appendChild(inspectorSpan);
+    }
+    // [문서 페이지 간선] 이 문서를 통째로 담은 정적 페이지가 있으면 그리로 보낸다 —
+    // 검색 결과는 질의에 걸린 지적만 보여주므로, 같은 문서의 나머지 지적·실사일·조항은
+    // 그 페이지에만 있다. 명단이 아직/끝내 도착하지 않으면 링크 없이 그대로 간다.
+    var docHref = _docPageHref(root, head.document_id);
+    if (docHref) {
+      var docLink = document.createElement("a");
+      docLink.className = "fnd-doc-page";
+      docLink.href = docHref;
+      docLink.appendChild(document.createTextNode(_t("이 문서의 지적 전체 보기")));
+      var docIcon = document.createElement("i");
+      docIcon.className = "ti ti-arrow-right";
+      docIcon.setAttribute("aria-hidden", "true");
+      docLink.appendChild(docIcon);
+      meta.appendChild(docLink);
     }
     docHead.appendChild(meta);
     return docHead;
@@ -2544,6 +2610,7 @@
   // [실사관 프로파일 진입] 세션당 1회만 코호트를 받아 캐시(카드마다 재조회 금지) — 다른
   // 초기화 fetch 와 완전히 독립적이라 실패해도 검색 본기능·문서 카드 렌더에 영향 없다.
   fetchInspectorCohort();
+  _fetchDocPages(assetRoot);
   // [PR-0 딥링크] finding_id 파라미터가 있으면 목록 fetch 와 병렬로 문서 조회를 시작한다 —
   // 어느 쪽이 먼저 끝나든 maybeFinishInit() 이 둘 다 끝난 뒤 한 번만 확정 렌더한다(깜빡임
   // 없음). 파라미터 자체가 없으면 deepLinkPending=false 로 시작해 아래 로직 전체가 기존

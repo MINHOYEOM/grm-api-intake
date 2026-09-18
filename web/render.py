@@ -5472,24 +5472,34 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             agency_labels_by_lang[_lg] = {
                 k: _t(v) for k, v in doc_agency_labels.items()}
 
-        # [실사관 프로파일 문서목록 멤버십 2026-08-31] 실사관 프로파일 페이지(런타임
-        # RPC 화면)가 "이 실사관이 서명한 문서" 목록에서 정적 문서 페이지(findings/doc/
+        # [문서 페이지 멤버십 2026-08-31 · 전 화면 확장 2026-09-18] 런타임 RPC 화면
+        # (지적사항 검색·업체 프로파일·실사관 프로파일)이 정적 문서 페이지(findings/doc/
         # {slug}/)로 링크하려면, 그 페이지가 **실제로 존재하는지** 먼저 알아야 한다 —
         # 정적 페이지는 두께 임계(apply_thickness_gate, 문서당 지적 3건 등)를 넘긴
         # 문서만 있어서, 확인 없이 링크하면 그 중 일부가 404 다(실측 약 16%). `documents`
-        # 는 이미 그 게이트를 통과한 것들이므로, inspector_names 를 가진 문서의
-        # document_id 를 사전순으로 나열하면 그대로 "존재 증명" 멤버십 집합이 된다.
+        # 는 이미 그 게이트를 통과한 것들이므로 그대로 "존재 증명" 멤버십이 된다.
+        # ★2026-09-18 까지 이 명단은 inspector_names 가 있는 문서(FDA 483 813건)뿐이었다.
+        #   실사관 화면만 쓰던 시절의 범위인데, 같은 간선이 필요한 화면이 셋으로 늘어
+        #   전 기관(3,330건)으로 넓힌다. 파일명·스키마도 실사관 이름을 뗀다.
+        # ★키는 document_id(런타임 RPC 가 주는 값), 값은 slug(페이지가 실제로 있는 경로).
+        #   대부분 둘이 같아 목록 하나로 충분하지만, MHRA 8건은 document_id 에 공백·
+        #   슬래시가 있어 슬러그가 따로다 — 그 예외만 맵으로 싣는다(크기 낭비 없이).
+        # ★영어 트리에는 원문이 한국어인 문서(식약처 135건)의 페이지가 아예 없다.
+        #   영어 화면이 그 링크를 달면 404 이므로 제외 목록을 함께 싣는다.
         # ★렌더 스위치(render_doc_pages)와 무관하게 항상 쓴다 — sitemap·목록·색인과 같은
         # 이유다: 이 값은 documents 데이터에서만 파생하고 개별 HTML 3천 장을 실제로
         # 찍어내는 비용(약 27초)과 무관하므로, 테스트 빌드에서 스위치로 꺼도 이 파일은
         # 프로덕션과 같아야 한다(꺼진 채로 빠지면 멤버십 검사가 프로덕션과 달라진다).
-        inspector_doc_ids = sorted(
-            d["document_id"] for d in documents if d.get("inspector_names"))
-        _write_json(dist_assets / "inspector-doc-pages.json", {
-            "schema": "grm-inspector-doc-pages/v1",
-            "document_ids": inspector_doc_ids,
+        doc_slug_by_id = {d["document_id"]: d["slug"] for d in documents}
+        _write_json(dist_assets / "doc-pages.json", {
+            "schema": "grm-doc-pages/v1",
+            "document_ids": sorted(i for i, sl in doc_slug_by_id.items() if i == sl),
+            "slug_by_document_id": {
+                i: sl for i, sl in sorted(doc_slug_by_id.items()) if i != sl},
+            "ko_only_document_ids": sorted(
+                i for i, sl in doc_slug_by_id.items() if sl not in en_doc_slugs),
         })
-        written.append("assets/inspector-doc-pages.json")
+        written.append("assets/doc-pages.json")
 
         # 본문 → 용어 페이지 자동 링크(희소 용어 우선). 언어마다 본문·표제어가 달라
         # 색인과 문서 빈도도 같은 언어로 다시 잰다. 용어 정본이 없으면 조용히 꺼진다.

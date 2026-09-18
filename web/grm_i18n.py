@@ -194,6 +194,62 @@ JS_BODY_SHIM = (
 JS_BODY_MARKER = "finding_text"
 
 
+# ── [문서 페이지 멤버십 2026-09-18] 정적 문서 페이지로 가는 간선 ────────────────
+# 런타임 RPC 화면(지적사항 검색·업체 프로파일·실사관 프로파일)이 `/findings/doc/{id}/`
+# 로 링크하려면 **그 페이지가 실제로 있는지** 먼저 알아야 한다. 정적 페이지는 두께
+# 임계(문서당 지적 3건)를 넘긴 문서만 있고, 영어 트리에는 원문이 한국어인 문서(식약처
+# 135건)의 페이지가 아예 없다 — 확인 없이 링크하면 404 다(실측 16%).
+# ★이 계약은 세 자산이 공유한다. 사본이 갈라지면 한 화면만 고쳐지므로 본문 shim
+#   (JS_BODY_SHIM)과 같은 규율로 바이트 동일 사본을 강제한다.
+# ★멤버십을 못 받아도(네트워크 실패·구버전 자산) 링크만 없고 목록은 그대로 뜬다 —
+#   렌더를 막지 않는다.
+# ★id → slug **맵**이다. 대부분 둘이 같지만 MHRA 문서 8건은 document_id 에 공백·
+#   슬래시가 있어 슬러그가 따로 있다(`Insp GMP 17907/13988-0036` →
+#   `Insp-GMP-17907-13988-0036-342281a4`). id 를 그대로 경로에 쓰면 그 8건이 404 다.
+# ★루트가 둘이다. 명단(JSON)은 언어 무관 공유 자산이라 **사이트 루트**(asset_root)
+#   에서 받고, 문서 페이지 링크는 **언어 트리 루트**(rel_root)로 만든다. 이걸 하나로
+#   쓰면 영어 화면이 /en/assets/... 를 받으러 가서 404 다 — 2026-08-31~09-18 동안
+#   영어 실사관 프로파일의 문서 링크가 실제로 그렇게 죽어 있었다(라이브 확인).
+JS_DOC_PAGES_SHIM = (
+    '  var _DOC_PAGES = null;\n'
+    '  var _docPagesPromise = null;\n'
+    '  function _fetchDocPages(assetRoot) {\n'
+    '    if (_docPagesPromise) return _docPagesPromise;\n'
+    '    _docPagesPromise = fetch(assetRoot + "assets/doc-pages.json")\n'
+    '      .then(function (r) {\n'
+    '        if (!r.ok) throw new Error("doc-pages " + r.status);\n'
+    '        return r.json();\n'
+    '      })\n'
+    '      .then(function (data) {\n'
+    '        if (!data || data.schema !== "grm-doc-pages/v1" ||\n'
+    '            !Array.isArray(data.document_ids)) return null;\n'
+    '        var map = {};\n'
+    '        data.document_ids.forEach(function (id) { if (id) map[id] = id; });\n'
+    '        var odd = data.slug_by_document_id;\n'
+    '        if (odd && typeof odd === "object") {\n'
+    '          Object.keys(odd).forEach(function (id) { if (odd[id]) map[id] = odd[id]; });\n'
+    '        }\n'
+    '        if (_isEn && Array.isArray(data.ko_only_document_ids)) {\n'
+    '          data.ko_only_document_ids.forEach(function (id) { delete map[id]; });\n'
+    '        }\n'
+    '        _DOC_PAGES = map;\n'
+    '        return map;\n'
+    '      })\n'
+    '      .catch(function () { return null; });\n'
+    '    return _docPagesPromise;\n'
+    '  }\n'
+    '  function _docPageHref(root, documentId) {\n'
+    '    var id = String(documentId || "");\n'
+    '    var slug = (id && _DOC_PAGES) ? _DOC_PAGES[id] : "";\n'
+    '    if (!slug) return "";\n'
+    '    return root + "findings/doc/" + encodeURIComponent(slug) + "/";\n'
+    '  }\n'
+)
+
+# 위 사본을 반드시 가져야 하는 자산 = 문서 페이지로 링크하는 런타임 화면.
+JS_DOC_PAGES_MARKER = "_docPageHref("
+
+
 def build_js_catalog(catalog: dict[str, str], keys: Iterable[str]) -> str:
     """영어 페이지에 실을 사전 스크립트 — JS 가 실제로 쓰는 키만, 정렬·결정론."""
     subset = {k: catalog[k] for k in sorted(set(keys))}
@@ -518,6 +574,14 @@ def check_js_body_shim(path: Path) -> "str | None":
     return f"{path.name}: 본문 shim(JS_BODY_SHIM) 사본 없음/불일치"
 
 
+def check_js_doc_pages_shim(path: Path) -> "str | None":
+    """문서 페이지로 링크하는 자산은 멤버십 사본(JS_DOC_PAGES_SHIM)을 가져야 한다."""
+    src = path.read_text(encoding="utf-8")
+    if JS_DOC_PAGES_MARKER not in src or JS_DOC_PAGES_SHIM in src:
+        return None
+    return f"{path.name}: 문서 페이지 shim(JS_DOC_PAGES_SHIM) 사본 없음/불일치"
+
+
 def check_catalog(catalog: dict[str, str], keys: dict[str, list[str]],
                   lang: str = "en") -> list[str]:
     """결손·고아·슬롯 불일치·빈 값·미번역(한글 잔존)을 문장으로 낸다."""
@@ -552,7 +616,8 @@ def lint(web_dir: Path = WEB_DIR, langs: Iterable[str] = ("en",),
     for p in asset_files(web_dir):
         for line, snip in find_bare_hangul_js(p):
             problems.append(f"감싸지 않은 한글 {p.name}:{line}: {snip}")
-        for shim in (check_js_shim(p), check_js_body_shim(p)):
+        for shim in (check_js_shim(p), check_js_body_shim(p),
+                     check_js_doc_pages_shim(p)):
             if shim:
                 problems.append(shim)
     keys = collect_keys(web_dir)

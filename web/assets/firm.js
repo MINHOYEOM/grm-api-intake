@@ -82,6 +82,9 @@
   var url = (cfg.getAttribute("data-url") || "").trim();
   var key = (cfg.getAttribute("data-key") || "").trim();
   var root = (cfg.getAttribute("data-root") || "").trim();
+  // 명단은 언어 무관 공유 자산이라 **사이트 루트** 기준이다(rel_root 로 받으면
+  // 영어 화면이 /en/assets/... 로 가서 404 — 실제로 그렇게 죽어 있었다).
+  var assetRoot = (cfg.getAttribute("data-asset-root") || "").trim();
 
   // grm_findings.FINDING_TAXONOMY verbatim(code -> {ko, en}) — findings.js/trends.js 의
   // 동명 상수와 동일 복제본(동기화 테스트로 드리프트 차단).
@@ -393,9 +396,17 @@
   }
 
   // ── 문서 이력 + 인라인 확장(anon REST, RLS 공개 게이트 통과분만) ────────────────
+  // ★[2026-09-18] evidence_url 이 이 목록에 없어서 **프로파일에서 규제기관 원문으로
+  //   나가는 간선이 하나도 없었다** — 화면의 "원문 보기" 접기는 문서가 아니라 수집
+  //   당시 기록된 문장이라, 사용자가 실사 공문 자체를 보려면 검색으로 되돌아 나가야
+  //   했다(라이브 문의로 확인). 정적 페이지(문서·분야·조항)는 이미 전부 원문 링크를
+  //   달고 있었고 런타임 화면 둘만 빠져 있었다. RPC(findings_firm_profile)의 문서
+  //   목록에는 이 값이 없으므로 **지적 조회에 열을 하나 더해** 문서 단위로 세운다 —
+  //   RPC 반환 shape 을 바꾸면 배포 창이 열린다(가산만 한다는 기존 규율).
   var OBS_FIELDS = [
     "finding_id", "category_code", "category_label_ko",
     "finding_text", "finding_text_ko", "cfr_refs", "mfds_refs",
+    "evidence_url", "document_id",
   ];
 
   function fetchDocObservations(rawSignalId) {
@@ -444,7 +455,7 @@
       //   자체는 쓸모가 있다(본문은 정리된 국문, 이쪽은 기록 그대로라 내용이 다르다).
       //   없앨 것이 아니라 **재서 말하면 된다** — 목록이 아니라 그 글에 한글이 있는가로.
       summary.textContent = _isEn ? _t("국문 번역 보기")
-        : (_HANGUL.test(altText) ? _t("원문 보기") : _t("원문 보기 (영문)"));
+        : (_HANGUL.test(altText) ? _t("원문 그대로 보기") : _t("원문 그대로 보기 (영문)"));
       details.appendChild(summary);
       details.appendChild(el("p", null, altText));
       card.appendChild(details);
@@ -457,6 +468,94 @@
       card.appendChild(refsWrap);
     }
     return card;
+  }
+
+  // http(s) 만 통과시킨다 — findings.js safeUrl() 과 같은 계약(별도 정적 자산이라
+  // import 불가, 계약만 복제하는 기존 관례). javascript: 같은 스킴이 href 에 닿지
+  // 않게 하는 것이 전부다.
+  // ── [문서 페이지 간선] 정적 문서 페이지(findings/doc/{id}/)가 **실제로 있는**
+  // 문서에만 링크한다 — 임계 미달 문서까지 링크하면 404 다. 아래 사본은 grm_i18n.
+  // JS_DOC_PAGES_SHIM 정본의 바이트 동일 복제이고(세 자산 공유 계약, lint 가 강제),
+  // 멤버십을 못 받으면 링크 없이 목록만 그대로 뜬다.
+  var _DOC_PAGES = null;
+  var _docPagesPromise = null;
+  function _fetchDocPages(assetRoot) {
+    if (_docPagesPromise) return _docPagesPromise;
+    _docPagesPromise = fetch(assetRoot + "assets/doc-pages.json")
+      .then(function (r) {
+        if (!r.ok) throw new Error("doc-pages " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        if (!data || data.schema !== "grm-doc-pages/v1" ||
+            !Array.isArray(data.document_ids)) return null;
+        var map = {};
+        data.document_ids.forEach(function (id) { if (id) map[id] = id; });
+        var odd = data.slug_by_document_id;
+        if (odd && typeof odd === "object") {
+          Object.keys(odd).forEach(function (id) { if (odd[id]) map[id] = odd[id]; });
+        }
+        if (_isEn && Array.isArray(data.ko_only_document_ids)) {
+          data.ko_only_document_ids.forEach(function (id) { delete map[id]; });
+        }
+        _DOC_PAGES = map;
+        return map;
+      })
+      .catch(function () { return null; });
+    return _docPagesPromise;
+  }
+  function _docPageHref(root, documentId) {
+    var id = String(documentId || "");
+    var slug = (id && _DOC_PAGES) ? _DOC_PAGES[id] : "";
+    if (!slug) return "";
+    return root + "findings/doc/" + encodeURIComponent(slug) + "/";
+  }
+
+  function safeUrl(u) {
+    var s = (u || "").trim().toLowerCase();
+    return s.indexOf("http://") === 0 || s.indexOf("https://") === 0;
+  }
+
+  // 문서 단위 사실이라 지적마다가 아니라 **문서 하나에 링크 하나**다(published_date·
+  // inspector_names 를 대표값으로 쓰는 findings.js buildDocHead() 와 같은 규율).
+  // 값이 없으면 요소를 만들지 않는다 — 빈 라벨·자리표시자를 만들지 않는다.
+  function buildSourceLink(rows) {
+    var href = "";
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && safeUrl(rows[i].evidence_url)) { href = rows[i].evidence_url; break; }
+    }
+    var docHref = "";
+    for (var j = 0; j < rows.length && !docHref; j++) {
+      if (rows[j]) docHref = _docPageHref(root, rows[j].document_id);
+    }
+    if (!href && !docHref) return null;
+    var p = el("p", "fp-obs-src");
+    if (href) {
+      var a = document.createElement("a");
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      var icon = document.createElement("i");
+      icon.className = "ti ti-external-link";
+      icon.setAttribute("aria-hidden", "true");
+      a.appendChild(icon);
+      a.appendChild(document.createTextNode(_t("규제기관 공개 원문 보기")));
+      p.appendChild(a);
+    }
+    // 문서 페이지는 같은 지적을 실사일·조항·같은 업체의 다른 기록과 함께 한 장에
+    // 담는다(정적 페이지가 있는 문서만 — 없으면 이 링크만 빠진다).
+    if (docHref) {
+      var d = document.createElement("a");
+      d.className = "fp-obs-docpage";
+      d.href = docHref;
+      d.appendChild(document.createTextNode(_t("이 문서의 지적 전체 보기")));
+      var dIcon = document.createElement("i");
+      dIcon.className = "ti ti-arrow-right";
+      dIcon.setAttribute("aria-hidden", "true");
+      d.appendChild(dIcon);
+      p.appendChild(d);
+    }
+    return p;
   }
 
   function renderDocDetailLoading(container) {
@@ -486,6 +585,10 @@
            _t("이 문서는 한국 규제기관 기록이라 지적 원문이 한국어로 표시됩니다.")),
         container.firstChild);
     }
+    // 원문 링크는 **맨 위**다(문서 페이지가 머리에 두는 것과 같은 자리) — 아래 카드는
+    // 우리가 옮기고 분류한 것이고, 판단의 근거는 그 문서 자체이기 때문이다.
+    var src = buildSourceLink(rows);
+    if (src) container.insertBefore(src, container.firstChild);
   }
 
   function buildDocRow(doc) {
@@ -896,8 +999,9 @@
     if (lookInputEl) lookInputEl.focus();
   } else {
     showState("loading");
-    fetchFirmProfile(firmKeyParam)
-      .then(function (data) {
+    Promise.all([fetchFirmProfile(firmKeyParam), _fetchDocPages(assetRoot)])
+      .then(function (out) {
+        var data = out[0];
         // 013 은 미존재 firm_key 에도 에러 없이 빈 구조(display_name "")를 반환한다
         // (계약, 013_findings_firm_key.sql §(C) 참조) — 그 경우만 "찾을 수 없음".
         if (!data || typeof data !== "object" || !(data.display_name || "")) {

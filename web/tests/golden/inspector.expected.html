@@ -77,7 +77,7 @@
     <p class="reveal" style="animation-delay:.14s">공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 문서 단위로 모아 보여줍니다.</p>
   </div>
   <div class="wrap">
-    <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden></div><nav class="fnd-seg" aria-label="지적사항 면 전환">
+    <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" data-asset-root="../../" hidden></div><nav class="fnd-seg" aria-label="지적사항 면 전환">
   <a href="../../findings/index.html">검색</a>
   <a href="../../findings/browse/index.html">둘러보기</a>
   <a href="../../findings/inspector/index.html" class="on" aria-current="page">실사관</a>
@@ -273,8 +273,8 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
 .ip-doc-detail[hidden]{display:none}
 .ip-doc-detail-loading,.ip-doc-detail-empty{font-size:12.5px;color:var(--muted);margin:0 0 10px}
 
-/* [A2] 문서 상세 링크 — document_id 가 assets/inspector-doc-pages.json 집합에 있을 때만
-   날짜+소스 배지를 findings/doc/{document_id}/ 앵커로 감싼다(inspector.js appendDocTitleArea).
+/* [A2] 문서 상세 링크 — document_id 가 assets/doc-pages.json 명단에 있을 때만 날짜+소스
+   배지를 findings/doc/{slug}/ 앵커로 감싼다(inspector.js appendDocTitleArea).
    시각적으로는 기존 평문과 동일하게 두고 hover 로만 링크임을 드러낸다. */
 .ip-doc-title{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
 .ip-doc-title:hover .ip-doc-date,.ip-doc-title:focus-visible .ip-doc-date{color:var(--coral-2)}
@@ -444,7 +444,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=ac382148" defer></script>
-<script src="../../assets/inspector.js?v=42c3d8c4" defer></script>
+<script src="../../assets/inspector.js?v=ffd359f2" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

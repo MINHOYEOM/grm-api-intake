@@ -94,6 +94,9 @@
   var url = (cfg.getAttribute("data-url") || "").trim();
   var key = (cfg.getAttribute("data-key") || "").trim();
   var root = (cfg.getAttribute("data-root") || "").trim();
+  // 명단은 언어 무관 공유 자산이라 **사이트 루트** 기준이다(rel_root 로 받으면
+  // 영어 화면이 /en/assets/... 로 가서 404 — 실제로 그렇게 죽어 있었다).
+  var assetRoot = (cfg.getAttribute("data-asset-root") || "").trim();
 
   // grm_findings.FINDING_TAXONOMY verbatim(code -> {ko, en}) — findings.js/trends.js/firm.js
   // 의 동명 상수와 동일 복제본(동기화 테스트로 드리프트 차단, 별도 공유 파일로 빼지 않는다
@@ -462,7 +465,7 @@
   // ── 문서 이력 + 인라인 확장(anon REST, RLS 공개 게이트 통과분만) ────────────────
   // ★[2026-09-18] evidence_url 이 빠져 있어 이 화면에서 규제기관 원문으로 나가는
   //   간선이 없었다(업체 프로파일 firm.js 와 같은 구멍 — 정적 페이지는 전부 달고
-  //   있었다). 문서 상세 링크(아래 DOC_PAGE_IDS)는 **정적 페이지가 있는 문서에만**
+  //   있었다). 문서 상세 링크(아래 _docPageHref)는 **정적 페이지가 있는 문서에만**
   //   걸리는 반면, 원문 링크는 모든 문서에 값이 있어 조건 없이 선다.
   var OBS_FIELDS = [
     "finding_id", "category_code", "category_label_ko",
@@ -575,34 +578,45 @@
     rows.forEach(function (row) { container.appendChild(buildObsCard(row)); });
   }
 
-  // ── [A2] 문서 상세 링크 멤버십 — 다른 에이전트가 dist 에 발행하는
-  // assets/inspector-doc-pages.json({schema:"grm-inspector-doc-pages/v1",
-  // document_ids:[...]}, 사전순)을 소비한다. 이 집합은 **정적 문서 페이지가 실제
-  // 존재하는 문서 id** 뿐이다 — 임계 미달 문서까지 확인 없이 링크하면 16% 404(실측).
-  // 프로파일이 렌더될 때 한 번만 lazy fetch 하고 세션 캐시, 실패는 조용히 삼킨다(문서
-  // 목록 자체는 링크 없이 그대로 보여야 한다 — 렌더를 막지 않는다).
-  var DOC_PAGE_IDS = null; // null = 아직 모름/실패 · 객체 = {document_id: true, ...}
-  var docPagesPromise = null;
-
-  function fetchDocPageIds() {
-    if (docPagesPromise) return docPagesPromise;
-    docPagesPromise = fetch(root + "assets/inspector-doc-pages.json")
+  // ── [A2] 문서 상세 링크 멤버십 — 2026-09-18 부터 세 화면이 같은 명단을 쓴다.
+  // 옛 assets/inspector-doc-pages.json(FDA 483 813건 전용)은 전 기관 3,330건을
+  // 담는 assets/doc-pages.json 으로 갈렸다 — 업체 프로파일·검색도 같은 간선을
+  // 쓰는데 명단이 실사관용 부분집합이면 나머지 화면이 링크를 달 수 없다.
+  // 문서에만 링크한다 — 임계 미달 문서까지 링크하면 404 다. 아래 사본은 grm_i18n.
+  // JS_DOC_PAGES_SHIM 정본의 바이트 동일 복제이고(세 자산 공유 계약, lint 가 강제),
+  // 멤버십을 못 받으면 링크 없이 목록만 그대로 뜬다.
+  var _DOC_PAGES = null;
+  var _docPagesPromise = null;
+  function _fetchDocPages(assetRoot) {
+    if (_docPagesPromise) return _docPagesPromise;
+    _docPagesPromise = fetch(assetRoot + "assets/doc-pages.json")
       .then(function (r) {
-        if (!r.ok) throw new Error("inspector-doc-pages " + r.status);
+        if (!r.ok) throw new Error("doc-pages " + r.status);
         return r.json();
       })
       .then(function (data) {
-        if (!data || data.schema !== "grm-inspector-doc-pages/v1" ||
-            !Array.isArray(data.document_ids)) {
-          return null;
+        if (!data || data.schema !== "grm-doc-pages/v1" ||
+            !Array.isArray(data.document_ids)) return null;
+        var map = {};
+        data.document_ids.forEach(function (id) { if (id) map[id] = id; });
+        var odd = data.slug_by_document_id;
+        if (odd && typeof odd === "object") {
+          Object.keys(odd).forEach(function (id) { if (odd[id]) map[id] = odd[id]; });
         }
-        var set = {};
-        data.document_ids.forEach(function (id) { if (id) set[id] = true; });
-        DOC_PAGE_IDS = set;
-        return set;
+        if (_isEn && Array.isArray(data.ko_only_document_ids)) {
+          data.ko_only_document_ids.forEach(function (id) { delete map[id]; });
+        }
+        _DOC_PAGES = map;
+        return map;
       })
       .catch(function () { return null; });
-    return docPagesPromise;
+    return _docPagesPromise;
+  }
+  function _docPageHref(root, documentId) {
+    var id = String(documentId || "");
+    var slug = (id && _DOC_PAGES) ? _DOC_PAGES[id] : "";
+    if (!slug) return "";
+    return root + "findings/doc/" + encodeURIComponent(slug) + "/";
   }
 
   // document_id 가 위 집합에 있으면 날짜+소스 배지 영역을 findings/doc/{document_id}/
@@ -610,16 +624,15 @@
   // 링크 없는 평문. 업체 링크(firm_key, 아래)는 이미 정상 동작 중이라 건드리지 않는다 —
   // 이 링크는 문서 상세로 가는 **처음 생기는** 간선이다.
   function appendDocTitleArea(main, doc) {
-    var docId = doc.document_id || "";
-    var hasPage = !!(DOC_PAGE_IDS && docId && DOC_PAGE_IDS[docId]);
-    if (!hasPage) {
+    var href = _docPageHref(root, doc.document_id);
+    if (!href) {
       main.appendChild(el("span", "ip-doc-date", doc.published_date || ""));
       if (doc.source) main.appendChild(el("span", "ip-b", doc.source));
       return;
     }
     var link = document.createElement("a");
     link.className = "ip-doc-title";
-    link.href = root + "findings/doc/" + encodeURIComponent(docId) + "/";
+    link.href = href;
     link.appendChild(el("span", "ip-doc-date", doc.published_date || ""));
     if (doc.source) link.appendChild(el("span", "ip-b", doc.source));
     // 이 링크는 main 안에 중첩돼 있고 main 자체도 클릭 핸들러(지적사항 펼치기,
@@ -934,7 +947,7 @@
   } else {
     showState("loading");
     // A2: 문서 링크 멤버십은 프로파일 fetch 와 병렬로(서로 독립, 실패해도 서로 막지 않음).
-    Promise.all([fetchInspectorProfileWithRetry(inspectorKeyParam), fetchDocPageIds()])
+    Promise.all([fetchInspectorProfileWithRetry(inspectorKeyParam), _fetchDocPages(assetRoot)])
       .then(function (out) {
         var data = out[0];
         // 코호트 미달·미존재·키 형식 오류는 전부 null(계약, findings_inspector_profile

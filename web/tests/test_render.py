@@ -396,6 +396,53 @@ class WebSourceDocumentLinkTest(unittest.TestCase):
             self.assertIn("buildSourceLink(rows)", render_fn,
                           f"{name}.js: 링크를 만들어 놓고 붙이지 않는다")
 
+    def test_the_document_page_link_has_one_name_across_the_site(self):
+        """문서 페이지로 가는 링크도 **한 이름인가** — 원문 링크와 같은 규율.
+
+        정적 모음 페이지(분야·조항)가 쓰던 문구를 런타임 화면이 그대로 쓴다. 새 화면이
+        "문서 전체 보기" 같은 변종을 들고 오면 여기서 걸린다.
+        """
+        label = "이 문서의 지적 전체 보기"
+        variants = {}
+        for path in (sorted((WEB_DIR / "templates").glob("*.html"))
+                     + sorted((WEB_DIR / "assets").glob("*.js"))):
+            src = path.read_text(encoding="utf-8")
+            for m in re.finditer(r"""_t?\(\s*['"]([^'"]*지적 전체 보기[^'"]*)['"]""", src):
+                variants.setdefault(m.group(1), set()).add(path.name)
+        self.assertGreaterEqual(
+            len(variants.get(label, ())), 4,
+            f"문서 페이지 링크를 다는 화면이 줄었다(배선이 빠졌나?): {variants}")
+        stray = {k: sorted(v) for k, v in variants.items() if k != label}
+        self.assertEqual(stray, {},
+                         f"문서 페이지 링크의 이름이 갈라졌다 — {label!r} 한 벌이다: {stray}")
+
+    def test_runtime_screens_link_to_the_document_page_when_it_exists(self):
+        """세 런타임 화면이 **멤버십을 받아** 문서 페이지로 링크하는가.
+
+        ★[2026-09-18] 명단(assets/doc-pages.json)은 원래 FDA 483 813건 전용이라 실사관
+          화면 하나만 이 간선을 갖고 있었다. 명단을 전 기관으로 넓히면서 검색·업체
+          프로파일도 같은 계약으로 잇는다.
+        ★멤버십을 **가져오지 않으면** 링크는 영원히 서지 않는다(집합이 null 이라 href 가
+          빈 문자열이다) — 조용한 부재라 화면만 봐서는 모른다. 그래서 호출까지 잰다.
+        """
+        for name in ("findings", "firm", "inspector"):
+            src = (WEB_DIR / "assets" / f"{name}.js").read_text(encoding="utf-8")
+            self.assertIn(grm_i18n.JS_DOC_PAGES_SHIM, src,
+                          f"{name}.js: 멤버십 shim 정본 사본이 없다/갈라졌다")
+            # ★정본 사본을 **덜어내고** 센다 — shim 자체가 두 이름을 정의하므로, 원본
+            #   그대로 세면 "정의가 있다"를 "호출한다"로 오독한다(뮤테이션으로 확인:
+            #   호출을 지워도 통과했다). JS_BODY_SHIM 가드가 쓰는 것과 같은 관용구.
+            outside = src.replace(grm_i18n.JS_DOC_PAGES_SHIM, "")
+            self.assertIn("_fetchDocPages(assetRoot)", outside,
+                          f"{name}.js: 멤버십을 가져오지 않는다 — 링크가 영원히 서지 않는다")
+            # ★루트를 섞으면 영어 화면만 조용히 죽는다 — 명단은 사이트 루트(asset_root),
+            #   문서 페이지는 언어 트리 루트(rel_root)다. 2026-08-31~09-18 사이 영어
+            #   실사관 프로파일이 /en/assets/... 를 받으러 가 404 였다(라이브 확인).
+            self.assertIn('cfg.getAttribute("data-asset-root")', src,
+                          f"{name}.js: 명단을 언어 트리 루트로 받으면 영어 화면이 404 다")
+            self.assertGreaterEqual(outside.count("_docPageHref(root,"), 1,
+                                    f"{name}.js: 멤버십을 받아 놓고 링크를 만들지 않는다")
+
 
 # ── 라이브 발행 디렉터리 비골든 스모크 ────────────────────────────────────────
 class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
@@ -1519,7 +1566,11 @@ class WebFindingsRenderTest(unittest.TestCase):
     def test_cfg_div_env_gated_empty_by_default(self):
         # 테스트 환경엔 SUPABASE_URL/ANON_KEY 미설정 — cfg data 속성은 항상 빈 문자열
         # (reactions cfg 와 무관한 별개 게이트 — 골든 결정론 유지의 근거).
-        self.assertIn('id="grm-findings-cfg" data-url="" data-key="" hidden', self.html)
+        # ★[2026-09-18] 두 루트를 함께 싣는다 — data-root(언어 트리)는 페이지 링크용,
+        #   data-asset-root(사이트 루트)는 언어 무관 공유 자산(문서 페이지 명단)용이다.
+        self.assertIn(
+            'id="grm-findings-cfg" data-url="" data-key="" data-root="../"'
+            ' data-asset-root="../" hidden', self.html)
 
     def test_findings_js_referenced_with_content_hash(self):
         import re as _re
@@ -6485,7 +6536,8 @@ class WebFirmRenderTest(unittest.TestCase):
         # (findings.js/trends.js 계약과 동일). data-root 는 rel_root 값("../../")을 그대로
         # 담는다(카테고리 바 → findings 검색 페이지 링크 계산용, trends.js 와 동일 패턴).
         self.assertIn(
-            'id="grm-firm-cfg" data-url="" data-key="" data-root="../../" hidden',
+            'id="grm-firm-cfg" data-url="" data-key="" data-root="../../"'
+            ' data-asset-root="../../" hidden',
             self.html,
         )
 
@@ -6758,7 +6810,8 @@ class WebInspectorRenderTest(unittest.TestCase):
         # (firm.js/findings.js 계약과 동일). data-root 는 rel_root 값("../../")을 그대로
         # 담는다 — findings/inspector/index.html 은 findings/firm/index.html 과 같은 깊이.
         self.assertIn(
-            'id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" hidden',
+            'id="grm-inspector-cfg" data-url="" data-key="" data-root="../../"'
+            ' data-asset-root="../../" hidden',
             self.html,
         )
 
@@ -6862,20 +6915,24 @@ class WebInspectorRenderTest(unittest.TestCase):
 
     # ── [A2] 문서 상세 링크 멤버십 ────────────────────────────────────────────
     def test_doc_page_membership_endpoint_and_schema_gate(self):
-        """assets/inspector-doc-pages.json 은 다른 에이전트가 발행하는 자산이라 이
-        세션에 실물이 없을 수 있다 — 계약은 소스 텍스트로 고정한다: root 기준 상대
-        경로로 fetch, {schema:"grm-inspector-doc-pages/v1", document_ids:[...]} 형태만
-        신뢰하고, 스키마가 다르면(구버전·손상) null 로 수렴해 링크를 걸지 않는다."""
-        self.assertIn('fetch(root + "assets/inspector-doc-pages.json")', self.js_src)
-        self.assertIn('data.schema !== "grm-inspector-doc-pages/v1"', self.js_src)
+        """계약을 소스 텍스트로 고정한다: root 기준 상대 경로로 fetch,
+        {schema:"grm-doc-pages/v1", document_ids:[...]} 형태만 신뢰하고, 스키마가
+        다르면(구버전·손상) null 로 수렴해 링크를 걸지 않는다.
+
+        ★[2026-09-18] 옛 assets/inspector-doc-pages.json(FDA 483 813건 전용)에서
+          전 기관 3,330건을 담는 assets/doc-pages.json 으로 갈렸다 — 같은 간선이
+          필요한 화면이 셋(검색·업체·실사관)으로 늘었기 때문이다."""
+        self.assertIn('fetch(assetRoot + "assets/doc-pages.json")', self.js_src)
+        self.assertIn('data.schema !== "grm-doc-pages/v1"', self.js_src)
         self.assertIn("!Array.isArray(data.document_ids)", self.js_src)
+        self.assertNotIn("inspector-doc-pages.json\")", self.js_src)
 
     def test_doc_page_fetch_is_lazy_cached_and_swallows_failure(self):
         """세션당 1회 lazy fetch(캐시) + 실패는 조용히 삼킨다 — 문서 목록 렌더 자체를
         막지 않는다(임무 지시서 근거)."""
-        fn = self.js_src[self.js_src.index("function fetchDocPageIds()"):]
+        fn = self.js_src[self.js_src.index("function _fetchDocPages(assetRoot)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("if (docPagesPromise) return docPagesPromise;", fn)
+        self.assertIn("if (_docPagesPromise) return _docPagesPromise;", fn)
         self.assertIn(".catch(function () { return null; })", fn)
 
     def test_doc_link_gated_by_membership_else_plain_text(self):
@@ -6883,8 +6940,8 @@ class WebInspectorRenderTest(unittest.TestCase):
         현행처럼 평문(날짜+소스 배지만) — 확인 없이 링크했다가 16% 404 났던 실측 근거."""
         fn = self.js_src[self.js_src.index("function appendDocTitleArea(main, doc)"):]
         fn = fn[:fn.index("\n  }\n") + 4]
-        self.assertIn("DOC_PAGE_IDS && docId && DOC_PAGE_IDS[docId]", fn)
-        self.assertIn('root + "findings/doc/" + encodeURIComponent(docId) + "/"', fn)
+        self.assertIn("_docPageHref(root, doc.document_id)", fn)
+        self.assertIn("link.href = href;", fn)
         # 멤버십이 없을 때(hasPage=false) 링크 없이 기존과 동일한 평문 span 만 붙는다.
         self.assertIn('main.appendChild(el("span", "ip-doc-date", doc.published_date || ""));', fn)
 
@@ -7200,40 +7257,53 @@ class WebInspectorRenderTest(unittest.TestCase):
         null, (3) HTTP 실패·네트워크 오류도 null 로 조용히 수렴하는지 고정한다."""
         import subprocess
 
-        fn_src = self._extract_for_node(["fetchDocPageIds"])
+        fn_src = self._extract_for_node(["_fetchDocPages", "_docPageHref"])
+        payload = ('{schema: "grm-doc-pages/v1", document_ids: ["fda483-1", "gmpinspect-2"],'
+                   ' slug_by_document_id: {"Insp GMP 1/2-3": "Insp-GMP-1-2-3-ab12"},'
+                   ' ko_only_document_ids: ["gmpinspect-2"]}')
         driver = "\n".join([
             'var root = "../../";',
-            "var docPagesPromise = null;",
-            "var DOC_PAGE_IDS = null;",
+            'var assetRoot = "../../../";',
+            "var _isEn = false;",
+            "var _docPagesPromise = null;",
+            "var _DOC_PAGES = null;",
             fn_src,
+            "",
+            "function ok(body) {",
+            "  return function () { return Promise.resolve({ ok: true,",
+            "    json: function () { return Promise.resolve(body); } }); };",
+            "}",
             "",
             "async function run() {",
             "  var results = {};",
             "",
-            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
-            "  fetch = function () { return Promise.resolve({ ok: true,",
-            "    json: function () { return Promise.resolve(",
-            '      {schema: "grm-inspector-doc-pages/v1", document_ids: ["fda483-1", "fda483-2"]}',
-            "    ); } }); };",
-            "  results.valid_schema = await fetchDocPageIds();",
+            "  _docPagesPromise = null; _DOC_PAGES = null; _isEn = false;",
+            "  fetch = ok(" + payload + ");",
+            "  results.valid_schema = await _fetchDocPages(assetRoot);",
+            "  results.href_plain = _docPageHref(root, 'fda483-1');",
+            "  results.href_odd_slug = _docPageHref(root, 'Insp GMP 1/2-3');",
+            "  results.href_unknown = _docPageHref(root, 'not-listed');",
             "",
-            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
-            "  fetch = function () { return Promise.resolve({ ok: true,",
-            '    json: function () { return Promise.resolve({schema: "wrong/v1", document_ids: ["x"]}); } }); };',
-            "  results.wrong_schema = await fetchDocPageIds();",
+            "  _docPagesPromise = null; _DOC_PAGES = null; _isEn = true;",
+            "  fetch = ok(" + payload + ");",
+            "  results.en_map = await _fetchDocPages(assetRoot);",
+            "  results.en_href_ko_only = _docPageHref(root, 'gmpinspect-2');",
             "",
-            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
-            "  fetch = function () { return Promise.resolve({ ok: true,",
-            '    json: function () { return Promise.resolve({schema: "grm-inspector-doc-pages/v1", document_ids: "not-an-array"}); } }); };',
-            "  results.non_array_ids = await fetchDocPageIds();",
+            "  _docPagesPromise = null; _DOC_PAGES = null; _isEn = false;",
+            '  fetch = ok({schema: "wrong/v1", document_ids: ["x"]});',
+            "  results.wrong_schema = await _fetchDocPages(assetRoot);",
             "",
-            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  _docPagesPromise = null; _DOC_PAGES = null;",
+            '  fetch = ok({schema: "grm-doc-pages/v1", document_ids: "not-an-array"});',
+            "  results.non_array_ids = await _fetchDocPages(assetRoot);",
+            "",
+            "  _docPagesPromise = null; _DOC_PAGES = null;",
             "  fetch = function () { return Promise.resolve({ ok: false, status: 404 }); };",
-            "  results.http_404 = await fetchDocPageIds();",
+            "  results.http_404 = await _fetchDocPages(assetRoot);",
             "",
-            "  docPagesPromise = null; DOC_PAGE_IDS = null;",
+            "  _docPagesPromise = null; _DOC_PAGES = null;",
             "  fetch = function () { return Promise.reject(new Error('network fail')); };",
-            "  results.network_error = await fetchDocPageIds();",
+            "  results.network_error = await _fetchDocPages(assetRoot);",
             "",
             "  console.log(JSON.stringify(results));",
             "}",
@@ -7250,7 +7320,19 @@ class WebInspectorRenderTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
         out = json.loads(proc.stdout)
 
-        self.assertEqual(out["valid_schema"], {"fda483-1": True, "fda483-2": True})
+        self.assertEqual(out["valid_schema"], {
+            "fda483-1": "fda483-1", "gmpinspect-2": "gmpinspect-2",
+            "Insp GMP 1/2-3": "Insp-GMP-1-2-3-ab12"},
+            "id→slug 맵이 어긋났다(슬러그가 따로인 문서를 못 담았나?)")
+        self.assertEqual(out["href_plain"], "../../findings/doc/fda483-1/")
+        # ★document_id 를 그대로 경로에 쓰면 이 8건(MHRA)은 404 다 — 슬러그로 간다.
+        self.assertEqual(out["href_odd_slug"],
+                         "../../findings/doc/Insp-GMP-1-2-3-ab12/")
+        self.assertEqual(out["href_unknown"], "",
+                         "명단에 없는 문서에 링크를 만들었다(404 로 보낸다)")
+        # 영어 트리에는 원문이 한국어인 문서의 페이지가 없다 — 그 링크는 서지 않는다.
+        self.assertNotIn("gmpinspect-2", out["en_map"])
+        self.assertEqual(out["en_href_ko_only"], "")
         self.assertIsNone(out["wrong_schema"], "스키마 불일치를 링크 가능으로 오판했다")
         self.assertIsNone(out["non_array_ids"], "document_ids 비배열을 방어하지 못했다")
         self.assertIsNone(out["http_404"], "404 가 조용히 null 로 수렴하지 않는다")
@@ -11537,60 +11619,67 @@ class WebDocInspectorLineUnitTest(unittest.TestCase):
                          "Name 0 · Name 1 · Name 2 외 3명")
 
 
-class WebInspectorDocPagesAssetTest(unittest.TestCase):
-    """[실사관 프로파일 문서목록 멤버십 2026-08-31] assets/inspector-doc-pages.json.
+class WebDocPagesAssetTest(unittest.TestCase):
+    """[문서 페이지 멤버십 2026-08-31 · 전 화면 확장 2026-09-18] assets/doc-pages.json.
 
-    실사관 프로파일 페이지(런타임 RPC 화면)가 "이 실사관이 서명한 문서" 목록에서 정적
-    문서 페이지(findings/doc/{slug}/)로 링크하기 전에, 그 페이지가 실제로 존재하는지
-    확인하는 멤버십 집합이다 — 정적 페이지는 두께 임계를 넘긴 문서만 있어서 확인 없이
-    링크하면 일부가 404 다. render.load_findings_docs 를 합성 정본으로 바꿔치기해
-    render_site() 를 실제로 돌린다(라이브 findings_docs.json 에는 아직 inspector_names
-    가 없어 실 데이터로는 이 계약을 검사할 수 없다)."""
+    런타임 RPC 화면(검색·업체 프로파일·실사관 프로파일)이 정적 문서 페이지로 링크하기
+    전에 그 페이지가 실제로 있는지 확인하는 명단이다 — 정적 페이지는 두께 임계를 넘긴
+    문서만 있어서 확인 없이 링크하면 일부가 404 다.
+
+    ★2026-09-18 이전에는 inspector_names 가 있는 문서(FDA 483)만 실렸다. 실사관 화면
+      전용이던 시절의 범위라, 업체 프로파일·검색이 같은 간선을 쓰려 하자 나머지 기관이
+      통째로 비어 있었다. 이제 전 기관을 싣고 **실사관 유무는 조건이 아니다**.
+    ★키는 document_id(런타임이 아는 값), 값은 slug(페이지가 실제 있는 경로). 대부분
+      같지만 MHRA 문서는 id 에 공백·슬래시가 있어 다르다 — 그 예외만 맵으로 싣는다.
+    ★영어 트리에는 원문이 한국어인 문서의 페이지가 없다(doc_is_english) — 영어 화면이
+      링크하면 404 이므로 제외 목록을 따로 싣는다.
+    render.load_findings_docs 를 합성 정본으로 바꿔치기해 render_site() 를 실제로 돌린다."""
 
     @classmethod
     def setUpClass(cls):
         cls._real_load = render.load_findings_docs
 
-        def _finding(fid):
-            return {"finding_id": fid, "text_ko": "x", "category_label_ko": ""}
+        def _finding(fid, text="x"):
+            return {"finding_id": fid, "text_ko": text, "category_label_ko": ""}
 
         docs = [
-            {"document_id": "d1-with-inspectors", "slug": "d1", "agency": "FDA",
-             "source": "FDA 483", "firm_name": "Acme Pharma", "firm_key": "acme",
-             "published_date": "2026-01-01", "inspection_date": "",
-             "evidence_url": "https://www.fda.gov/1", "categories": [],
-             "findings": [_finding("f1")], "inspector_names": ["Jose F Velez"]},
-            {"document_id": "d2-no-inspectors", "slug": "d2", "agency": "FDA",
+            # 실사관 없음 — 그래도 실린다(옛 필터가 사라진 것이 이 데이터의 요지).
+            {"document_id": "b0-en", "slug": "b0-en", "agency": "FDA",
              "source": "FDA 483", "firm_name": "Beta Pharma", "firm_key": "beta",
              "published_date": "2026-01-02", "inspection_date": "",
              "evidence_url": "https://www.fda.gov/2", "categories": [],
              "findings": [_finding("f2")]},
-            # 사전순으로 "d1-with-inspectors" 보다 앞서는 id — 정렬이 삽입 순서가 아니라
-            # **값**으로 결정된다는 것을 함께 고정한다.
-            {"document_id": "a0-with-inspectors", "slug": "d0", "agency": "HC",
-             "source": "Health Canada Inspection", "firm_name": "Charlie Inc",
-             "firm_key": "charlie", "published_date": "2026-01-03", "inspection_date": "",
-             "evidence_url": "https://x.gc.ca/3", "categories": [],
-             "findings": [_finding("f3")], "inspector_names": ["Zed Zephyr"]},
+            # id 에 공백·슬래시 → 슬러그가 따로다(MHRA 실제 형태).
+            {"document_id": "Insp GMP 1/2-3", "slug": "Insp-GMP-1-2-3-ab12",
+             "agency": "MHRA", "source": "MHRA GMP NCR", "firm_name": "Gamma Ltd",
+             "firm_key": "gamma", "published_date": "2026-01-01", "inspection_date": "",
+             "evidence_url": "https://cms.mhra.gov.uk/3", "categories": [],
+             "findings": [_finding("f3")], "inspector_names": ["Jose F Velez"]},
+            # 원문이 한국어 → 영어 트리에 페이지가 없다.
+            {"document_id": "a0-ko", "slug": "a0-ko", "agency": "MFDS",
+             "source": "MFDS", "firm_name": "가나제약", "firm_key": "gana",
+             "published_date": "2026-01-03", "inspection_date": "",
+             "evidence_url": "https://nedrug.mfds.go.kr/1", "categories": [],
+             "findings": [_finding("f1", "세척밸리데이션을 실시할 것")]},
         ]
 
         def _fake_load(path=None):
             return {
-                "schema_version": "grm-findings-docs/v1", "measured_on": "2026-08-31",
+                "schema_version": "grm-findings-docs/v1", "measured_on": "2026-09-18",
                 "min_findings": 3,
                 "totals": {"documents": len(docs),
                           "findings": sum(len(d["findings"]) for d in docs)},
                 "by_agency": [], "excluded": [], "documents": docs,
-                "agency_labels": {"FDA": "FDA", "HC": "Health Canada"},
+                "agency_labels": {"FDA": "FDA", "MHRA": "MHRA", "MFDS": "식품의약품안전처"},
             }
         render.load_findings_docs = _fake_load
 
-        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_inspasset_"))
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_docpagesasset_"))
         cls.out = cls._tmp / "single"
         # render_doc_pages=False — 개별 문서 HTML 3천 장 렌더 비용과 무관하게 이 에셋이
         # 나오는지가 검사 대상이다(sitemap·목록·색인과 같은 "스위치 무관" 계약).
         render.render_site(SINGLE_FIXTURES, cls.out, render_doc_pages=False)
-        cls.asset_path = cls.out / "assets" / "inspector-doc-pages.json"
+        cls.asset_path = cls.out / "assets" / "doc-pages.json"
         cls.asset = json.loads(cls.asset_path.read_text(encoding="utf-8"))
 
     @classmethod
@@ -11602,15 +11691,27 @@ class WebInspectorDocPagesAssetTest(unittest.TestCase):
         self.assertTrue(self.asset_path.exists())
 
     def test_schema(self):
-        self.assertEqual(self.asset["schema"], "grm-inspector-doc-pages/v1")
+        self.assertEqual(self.asset["schema"], "grm-doc-pages/v1")
 
-    def test_only_documents_with_inspector_names_are_listed(self):
-        self.assertEqual(self.asset["document_ids"],
-                         ["a0-with-inspectors", "d1-with-inspectors"])
+    def test_every_document_is_listed_regardless_of_inspector_names(self):
+        """실사관 유무는 더 이상 조건이 아니다 — 빠지면 그 화면은 간선을 잃는다."""
+        listed = set(self.asset["document_ids"]) | set(self.asset["slug_by_document_id"])
+        self.assertEqual(listed, {"a0-ko", "b0-en", "Insp GMP 1/2-3"})
+
+    def test_ids_whose_page_path_differs_are_mapped_not_dropped(self):
+        self.assertEqual(self.asset["slug_by_document_id"],
+                         {"Insp GMP 1/2-3": "Insp-GMP-1-2-3-ab12"})
+        self.assertNotIn("Insp GMP 1/2-3", self.asset["document_ids"],
+                         "슬러그가 따로인 문서를 평이한 목록에 넣으면 그 링크가 404 다")
+
+    def test_korean_source_documents_are_flagged_for_the_english_tree(self):
+        self.assertEqual(self.asset["ko_only_document_ids"], ["a0-ko"])
 
     def test_sorted_lexicographically(self):
         ids = self.asset["document_ids"]
         self.assertEqual(ids, sorted(ids))
+        self.assertEqual(list(self.asset["slug_by_document_id"]),
+                         sorted(self.asset["slug_by_document_id"]))
 
     def test_trailing_newline_and_ascii_safe_json_convention(self):
         raw = self.asset_path.read_bytes()
@@ -11619,7 +11720,7 @@ class WebInspectorDocPagesAssetTest(unittest.TestCase):
     def test_listed_in_written_manifest(self):
         meta = render.render_site(SINGLE_FIXTURES, self._tmp / "single2",
                                   render_doc_pages=False)
-        self.assertIn("assets/inspector-doc-pages.json", meta["written"])
+        self.assertIn("assets/doc-pages.json", meta["written"])
 
 
 class WebGlossaryDeepFieldsTest(unittest.TestCase):

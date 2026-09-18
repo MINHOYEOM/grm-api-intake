@@ -74,7 +74,7 @@
     <h1 class="reveal" style="animation-delay:.08s">지적사항 검색</h1><p class="reveal" style="animation-delay:.14s">FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 6,238건에서 추출한 지적사항 25,143건(2026-09-15 기준)을 원문 문장 단위로 모았습니다.</p>
   </div>
   <div class="wrap">
-    <div id="grm-findings-cfg" data-url="" data-key="" hidden></div>
+    <div id="grm-findings-cfg" data-url="" data-key="" data-root="../" data-asset-root="../" hidden></div>
 <nav class="fnd-seg" aria-label="지적사항 면 전환">
   <a href="../findings/index.html" class="on" aria-current="page">검색</a>
   <a href="../findings/browse/index.html">둘러보기</a>
@@ -393,6 +393,9 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 0 auto}
 .fnd-doc-date{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:500}
 .fnd-doc-count{font-size:11.5px;color:var(--muted);font-weight:600}
+.fnd-doc-page{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--coral-2);text-decoration:none}
+.fnd-doc-page:hover,.fnd-doc-page:focus-visible{color:var(--coral);text-decoration:underline}
+.fnd-doc-page .ti{font-size:11px}
 .fnd-doc-obs{display:flex;flex-direction:column;gap:14px}
 .fnd-doc-obs + .fnd-doc-obs-more{margin-top:14px}
 /* [긴 문서 접기] "지적 N건 모두 보기" — 텍스트 버튼(기존 .fnd-more-btn 과 동일 어휘). */
@@ -607,7 +610,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=ac382148" defer></script>
-<script src="../assets/findings.js?v=f3839d55" defer></script>
+<script src="../assets/findings.js?v=89ee54f8" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

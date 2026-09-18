@@ -22,7 +22,7 @@
     <p class="reveal" style="animation-delay:.14s">{% if zone_totals %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 문서 {docs}건에서 추출한 지적사항 {n}건({asof} 기준)을 원문 문장 단위로 모았습니다.", docs=zone_totals.documents, n=zone_totals.findings, asof=zone_totals.as_of) }}{% else %}{{ _("FDA 483 · Warning Letter · 캐나다 실사 · 식약처 · EU·영국 GMP 지적사항을 원문 문장 단위로 추출해 모았습니다.") }}{% endif %}</p>
   </div>
   <div class="wrap">
-    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" hidden></div>
+    <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" hidden></div>
     {% with seg_active = "search" %}{% include "partials/findings_seg.html" %}{% endwith %}
 
     <p class="fnd-lead">{{ _("업체명·문서번호·조항·본문 문구로 검색하고, 소스·카테고리·기간·국가로 좁힙니다.") }}</p>
@@ -427,6 +427,9 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 0 auto}
 .fnd-doc-date{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:500}
 .fnd-doc-count{font-size:11.5px;color:var(--muted);font-weight:600}
+.fnd-doc-page{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--coral-2);text-decoration:none}
+.fnd-doc-page:hover,.fnd-doc-page:focus-visible{color:var(--coral);text-decoration:underline}
+.fnd-doc-page .ti{font-size:11px}
 .fnd-doc-obs{display:flex;flex-direction:column;gap:14px}
 .fnd-doc-obs + .fnd-doc-obs-more{margin-top:14px}
 /* [긴 문서 접기] "지적 N건 모두 보기" — 텍스트 버튼(기존 .fnd-more-btn 과 동일 어휘). */

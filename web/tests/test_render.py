@@ -10734,6 +10734,30 @@ class WebFirmPageTest(unittest.TestCase):
         # 각 문서 행은 그 문서 상세로 이어져야 한다(막다른 요약 금지).
         self.assertGreaterEqual(html.count("findings/doc/"), rows)
 
+    def test_each_document_row_links_to_the_regulator_source(self):
+        """문서 줄마다 **규제기관이 공개한 그 문서**로 나가는 링크가 있는가.
+
+        ★[2026-09-18] 이 페이지만 원문 링크가 없었다 — 문서 줄 전체가 문서 페이지로 가는
+          <a> 라 앵커를 중첩할 수 없었기 때문이다(구조가 만든 부재라 눈에 안 띄었다).
+          상자를 div 로 감싸고 링크 둘을 형제로 뒀다.
+        ★두 링크는 **다른 곳으로** 간다 — 하나는 우리 문서 페이지, 하나는 규제기관 사이트다.
+          목적지가 같아지면 둘 중 하나는 거짓이므로 그것도 함께 본다.
+        """
+        for slug in sorted(self._built_slugs())[:5]:
+            html = (self.root / slug / "index.html").read_text(encoding="utf-8")
+            rows = html.count('class="ff-doc-row"')
+            self.assertGreaterEqual(rows, 2, f"{slug}: 문서 줄이 없다")
+            srcs = re.findall(r'<a class="ff-doc-src" href="([^"]+)"', html)
+            self.assertEqual(len(srcs), rows,
+                             f"{slug}: 문서 {rows}줄 중 원문 링크는 {len(srcs)}개다")
+            for href in srcs:
+                self.assertRegex(href, r"^https?://",
+                                 f"{slug}: 원문 링크가 외부 주소가 아니다")
+                self.assertNotIn("findings/doc/", href,
+                                 f"{slug}: 원문 링크가 우리 문서 페이지를 가리킨다")
+            self.assertIn("규제기관 공개 원문 보기", html,
+                          f"{slug}: 원문 링크의 이름이 사이트 공용 문구가 아니다")
+
     def test_inspector_pages_are_not_created_by_this_track(self):
         """B1 은 업체만이다 — 사람에 대한 페이지는 정책이 다르다(037 · noindex 유지)."""
         self.assertFalse(list((self.out / "findings" / "inspector").glob("*/index.html")))

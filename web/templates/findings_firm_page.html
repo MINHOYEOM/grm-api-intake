@@ -35,8 +35,15 @@
   .ff-sec-h{font-family:var(--serif);font-size:19px;color:var(--ink);margin:0;font-weight:600}
   /* 문서 목록 — 한 줄이 문서 하나(공개일·기관·건수·분류). */
   .ff-docs{display:flex;flex-direction:column;margin-top:14px}
-  .ff-doc{display:block;padding:14px 6px;border-top:1px solid var(--line);text-decoration:none}
-  .ff-doc:last-child{border-bottom:1px solid var(--line)}
+  /* ★[2026-09-18] 문서 줄 **전체**가 문서 페이지로 가는 <a> 였다 — 앵커는 중첩할 수 없어
+     규제기관 원문 링크를 붙일 자리가 없었다(사이트의 다른 면은 전부 달고 있었다).
+     상자를 감싸는 div 로 옮기고 링크 둘을 형제로 둔다. ff-doc 클래스는 문서 페이지로
+     가는 앵커에 그대로 남긴다 — 그 선택자 문자열로 행 수와 목적지를 세는 가드가 있어서,
+     여기 주석에도 그 문자열을 그대로 적으면 스타일 블록이 그대로 페이지에 실려 **주석이
+     행 하나로 세어진다**(실제로 한 번 그렇게 깨뜨렸다). */
+  .ff-doc-row{padding:14px 6px;border-top:1px solid var(--line)}
+  .ff-doc-row:last-child{border-bottom:1px solid var(--line)}
+  .ff-doc{display:block;text-decoration:none}
   .ff-doc-h{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
   .ff-doc-dt{font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
   .ff-doc-ag{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--body-s)}
@@ -45,6 +52,10 @@
   .ff-doc-ex{display:block;margin-top:6px;font-family:var(--sans);font-size:14px;line-height:1.75;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
   .ff-doc:hover .ff-doc-ex{color:var(--ink)}
   .ff-doc:hover .ff-doc-ag{color:var(--coral-2)}
+  /* 원문은 규제기관 사이트로 나간다 — 문서 페이지로 가는 위 링크와 시각적으로 구분한다. */
+  .ff-doc-src{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--coral-2);text-decoration:none}
+  .ff-doc-src:hover,.ff-doc-src:focus-visible{color:var(--coral);text-decoration:underline}
+  .ff-doc-src .ti{font-size:12px}
   /* 분류 구성 — 알약 나열(막대는 조회 화면이 그린다·여긴 정적 요약). */
   .ff-cats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
   .ff-cat{font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:5px 13px}
@@ -89,6 +100,7 @@
       <h2 class="ff-sec-h">{{ _('공개된 실사 문서') }}</h2>
       <div class="ff-docs">
         {%- for d in firm.documents %}
+        <div class="ff-doc-row">
         <a class="ff-doc" href="{{ rel_root }}findings/doc/{{ d.slug }}/">
           <span class="ff-doc-h">
             <span class="ff-doc-dt">{{ d.published_date }}</span>
@@ -102,6 +114,12 @@
               종전처럼 `text_ko` 를 못박으면 영어 페이지에 한국어 문장이 실린다. -#}
           {%- if d.excerpt %}<span class="ff-doc-ex">{{ d.excerpt }}</span>{% endif %}
         </a>
+        {#- 규제기관이 공개한 그 문서. 이름은 사이트 전체 한 벌이다(문서·분야·조항 페이지,
+            검색 카드, 업체·실사관 프로파일과 같은 문구). 값이 없으면 링크를 만들지 않는다. -#}
+        {%- if d.evidence_url %}
+        <a class="ff-doc-src" href="{{ d.evidence_url }}" target="_blank" rel="noopener">{{ _('규제기관 공개 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
+        {%- endif %}
+        </div>
         {%- endfor %}
       </div>
     </section>

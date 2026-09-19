@@ -1,10 +1,10 @@
 {
  "schema_version": "grm-findings-docs/v1",
- "measured_on": "2026-09-12",
+ "measured_on": "2026-09-19",
  "min_findings": 3,
  "totals": {
-  "documents": 3330,
-  "findings": 21642
+  "documents": 3336,
+  "findings": 21691
  },
  "by_agency": [
   {
@@ -17,11 +17,11 @@
   },
   {
    "v": "HC",
-   "c": 1345
+   "c": 1346
   },
   {
    "v": "MFDS",
-   "c": 135
+   "c": 140
   },
   {
    "v": "MHRA",
@@ -31,7 +31,7 @@
  "excluded": [
   {
    "reason": "국문 지적 3건 미만",
-   "documents": 2886
+   "documents": 2907
   },
   {
    "reason": "업체명 없음(숫자뿐이거나 빈 값)",
@@ -126792,6 +126792,382 @@
    ]
   },
   {
+   "document_id": "gmpinspect-1Q2F5hAXd12",
+   "slug": "gmpinspect-1Q2F5hAXd12",
+   "agency": "MFDS",
+   "source": "MFDS",
+   "firm_name": "크로다코리아주식회사",
+   "firm_key": "크로다코리아주식회사",
+   "published_date": "2026-09-11",
+   "inspection_date": "2026-05-08",
+   "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2F5hAXd12",
+   "categories": [
+    "환경모니터링",
+    "기타 품질시스템",
+    "일탈/CAPA/조사",
+    "시험실/품질관리",
+    "불만/회수",
+    "문서화/기록관리",
+    "데이터 완전성"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0093f40226a538564e2bbbe8",
+     "text_ko": "시설장비 부문의 기타 지적사항으로, [별표 1의2] 제4호 나목 환경모니터링 보고서 작성이 미흡했다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "시설장비 기타 [별표 1의2] 제4호 나목 환경모니터링 보고서 작성 미흡"
+    },
+    {
+     "finding_id": "finding-14872104e137934173c0e372",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제2.3호 나목 제조부서책임자의 제조지시서 승인, 점검·확인, 작업자의 제조지시서 승인 확인에 대한 절차 명확화가 필요하다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제2.3호 나목 제조부서책임자의 제조지시서 승인, 점검·확인, 작업자의 제조지시서 승인 확인에 대한 절차 명확화 필요 보완 완료"
+    },
+    {
+     "finding_id": "finding-17d8b02a37c7fb1b22fae29e",
+     "text_ko": "시험실 부문의 중요 지적사항으로, [별표 1의2] 제11.2호 라목 자사 기준서에 따른 시판 후 안정성시험을 실시하지 않았다. 이에 대한 시정조치와 재발방지대책을 마련하고 안정성시험을 철저히 수행할 필요가 있다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "시험실 중요 [별표 1의2] 제11.2호 라목 자사 기준서에 따른 시판 후 안정성시험 미실시에 대한 시정조치, 재발방지대책을 마련하고, 안정성시험 철저 필요"
+    },
+    {
+     "finding_id": "finding-2a33e28da9a8baea5ae20071",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제11.1호 자목 배지성능시험 및 사용된 배지 추적관리 방안 상세 마련이 필요하다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제11.1호 자목 배지성능시험 및 사용된 배지 추적관리 방안 상세 마련 필요 보완 완료"
+    },
+    {
+     "finding_id": "finding-5b26046b676cd4a01df56d8c",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제4호 사목 청정구역 방충방서 관리가 미흡했다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제4호 사목 청정구역 방충방서 관리 미흡 보완 완료"
+    },
+    {
+     "finding_id": "finding-6c4b17e5093ad32f183c1e71",
+     "text_ko": "시험실 부문의 기타 지적사항으로, [별표 1의2] 제11.1호 가목 원료 및 완제품 시험성적서에 확인시험에 대한 시험항목, 기준 등을 포함하여 작성할 수 있도록 양식 개정이 필요하다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "시험실 기타 [별표 1의2] 제11.1호 가목 원료 및 완제품 시험성적서에 확인시험에 대한 시험항목, 기준 등을 포함하여 작성할 수 있도록 양식 개정 필요"
+    },
+    {
+     "finding_id": "finding-700f086487353a4b0f7dc674",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제11.3호 가목 원료의약품 보관검체의 보관기한 재설정이 필요하다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제11.3호 가목 원료의약품 보관검체의 보관기한 재설정 필요 보완 완료"
+    },
+    {
+     "finding_id": "finding-85e89f1c965eb03318f83e7f",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제5호 파목 표준시계, 제조 및 품질관리 관련 기기 ·설비의 시간 오차 관리방안 마련이 필요하다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제5호 파목 표준시계, 제조 및 품질관리 관련 기기 ·설비의 시간 오차 관리방안 마련 필요 보완 완료"
+    },
+    {
+     "finding_id": "finding-9e88b0d82a846e2b4584f025",
+     "text_ko": "원자재 부문의 기타 지적사항으로, [별표 1의2] 제14.3호 가목 용매의 회수 절차 상세 마련이 미흡했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "원자재 기타 [별표 1의2] 제14.3호 가목 용매의 회수 절차 상세 마련 미흡"
+    },
+    {
+     "finding_id": "finding-ab10b667278e5dd2193bda06",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제8.2호 원료의약품 혼합 공정에 대한 관리방안에 대한 자사 기준서 상세 반영이 미흡했다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제8.2호 원료의약품 혼합 공정에 대한 관리방안에 대한 자사 기준서 상세 반영 미흡 보완 완료"
+    },
+    {
+     "finding_id": "finding-b0c3ca3e661617e4166332b4",
+     "text_ko": "제조 부문의 중요 지적사항으로, [별표 1의2] 제8.1호 가목 제조지시 및 기록서를 사실과 다르게 작성하였다. 이에 대한 시정조치와 재발방지대책을 마련하고 제조 기록을 철저히 관리할 필요가 있다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "제조 중요 [별표 1의2] 제8.1호 가목 제조지시 및 기록서를 사실과 다르게 작성한 사항에 대한 시정조치, 재발방지대책을 마련하고, 제조 기록 철저 필요"
+    },
+    {
+     "finding_id": "finding-b4410b30395d2d19770dda6b",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제11.1호 아목 pH 측정기 교정, 점검을 차당하게 수행할 수 있도록 관리방안 마련이 필요하다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제11.1호 아목 pH 측정기 교정, 점검을 차당하게 수행할 수 있도록 관리방안 마련 필요 보완 완료"
+    },
+    {
+     "finding_id": "finding-d21fc5f1b161d360973dcd44",
+     "text_ko": "품질경영 부문의 기타 지적사항으로, [별표 1의2] 제3.1호 데이터 완전성 전담 조직 구성이 미흡했다.",
+     "category_label_ko": "데이터 완전성",
+     "text_orig": "품질경영 기타 [별표 1의2] 제3.1호 데이터 완전성 전담 조직 구성 미흡"
+    },
+    {
+     "finding_id": "finding-f5fd1fca87552b67377d73cd",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제6.1호 마목 제조소 총람 현행화가 필요하다. 해당 사항은 보완이 완료되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제6.1호 마목 제조소 총람 현행화 필요 보완 완료"
+    }
+   ]
+  },
+  {
+   "document_id": "gmpinspect-1Q2TqD05rgw",
+   "slug": "gmpinspect-1Q2TqD05rgw",
+   "agency": "MFDS",
+   "source": "MFDS",
+   "firm_name": "보란파마",
+   "firm_key": "보란파마",
+   "published_date": "2026-09-14",
+   "inspection_date": "2026-04-02",
+   "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2TqD05rgw",
+   "categories": [
+    "환경모니터링",
+    "기타 품질시스템",
+    "안정성/보관",
+    "문서화/기록관리",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-11e64fea2e5a642eaff9ed87",
+     "text_ko": "기타 지적사항으로, [별표 1] 제8.1호 제조단위 출하 전 조사(환경 모니터링 등)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "기타 [별표 1] 제8.1호 제조단위 출하 전 조사(환경 모니터링 등)에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-12d72916d411748d66bd1c18",
+     "text_ko": "기타 지적사항으로, [별표 1] 제7.1호 시험에서 얻은 기록의 보존에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제7.1호 시험에서 얻은 기록의 보존에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-49bf42e98c8b475446d16fc4",
+     "text_ko": "시험실 부문의 기타 지적사항으로, [별표 1] 제7.1호 완제품의 보관용 검체에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "시험실 기타 [별표 1] 제7.1호 완제품의 보관용 검체에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-4a6b77ba98ba8a6fa431080d",
+     "text_ko": "시설 장비 부문의 기타 지적사항으로, [별표 1] 제2.1호 일반제제의 이물검사 작업에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "시설 장비 기타 [별표 1] 제2.1호 일반제제의 이물검사 작업에 대한 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-958abc532351e93aeab6bf51",
+     "text_ko": "기타 지적사항으로, [별표 1] 제2.3호 작업소의 청정구역과 청정등급의 설정에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제2.3호 작업소의 청정구역과 청정등급의 설정에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-a00205ff5a4cc8c91507cd0c",
+     "text_ko": "기타 지적사항으로, [별표 1] 제2.3호 환경모니터링(부유입자 측정)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "기타 [별표 1] 제2.3호 환경모니터링(부유입자 측정)에 대한 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-aec4d45ff9f38bf4b1d91911",
+     "text_ko": "기타 지적사항으로, [별표 1] 제8.1호 반제품의 보관(밀봉 절차 등)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "기타 [별표 1] 제8.1호 반제품의 보관(밀봉 절차 등)에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-c893a224e23f2edad614fd06",
+     "text_ko": "기타 지적사항으로, [별표 1] 제6.2호 기구 등의 멸균 후 대기시간에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제6.2호 기구 등의 멸균 후 대기시간에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-d644f36f52115ca27698b0ad",
+     "text_ko": "기타 지적사항으로, [별표 1] 제8.1호 제조지시 및 기록서 작성(간섭 등)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "기타 [별표 1] 제8.1호 제조지시 및 기록서 작성(간섭 등)에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-dc83a2ca4040708bf14e5437",
+     "text_ko": "제조 부문의 기타 지적사항으로, [별표 1] 제6.2호 무균 공정 밸리데이션에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "제조 기타 [별표 1] 제6.2호 무균 공정 밸리데이션에 대한 추가 설명 자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-ebb8fdbe5b2a55fd20362701",
+     "text_ko": "기타 지적사항으로, [별표 1] 제8.1호 고무전의 엔도톡신 관리에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제8.1호 고무전의 엔도톡신 관리에 대한 추가 설명 자료를 제출할 것"
+    }
+   ]
+  },
+  {
+   "document_id": "gmpinspect-1Q2TqD05w-H",
+   "slug": "gmpinspect-1Q2TqD05w-H",
+   "agency": "MFDS",
+   "source": "MFDS",
+   "firm_name": "엠에프씨주식회사",
+   "firm_key": "엠에프씨주식회사",
+   "published_date": "2026-09-14",
+   "inspection_date": "2026-05-13",
+   "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2TqD05w-H",
+   "categories": [
+    "데이터 완전성",
+    "설비/시설",
+    "기타 품질시스템",
+    "오염/교차오염 관리",
+    "문서화/기록관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0ffc5b7cdca8ed00c73e2a48",
+     "text_ko": "품질 경영 부문의 기타 지적사항으로, [별표 1의2] 제2.1호 나목 각 제조 설비 및 품질분석기기의 데이터 완전성에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "데이터 완전성",
+     "text_orig": "품질 경영 기타 [별표 1의2] 제2.1호 나목 각 제조 설비 및 품질분석기기의 데이터 완전성 관련 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-5c23319e9f1c35aab83deee9",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제5호 타목 일부 자재와 제조 설비의 정보에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "기타 [별표 1의2] 제5호 타목 일부 자재와 제조 설비의 정보 관련 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-6054555fa3eefc23f3670f3f",
+     "text_ko": "원자재 부문의 기타 지적사항으로, [별표 1의2] 제6.2호 가목 원료약품, 원료의약품에 대해 사용기간 관련 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "원자재 기타 [별표 1의2] 제6.2호 가목 원료약품, 원료의약품에 대해 사용기간 관련 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-787cbd62a22cf116a4bc7975",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제2.2호 제품의 출하 승인 및 제조지시 업무 절차에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1의2] 제2.2호 제품의 출하 승인 및 제조지시 업무 절차 관련 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-93d4e18eb17ec85a1acd186a",
+     "text_ko": "시설 장비 부문의 기타 지적사항으로, [별표 1의2] 제5호 카목 조제 도구 및 설비에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "시설 장비 기타 [별표 1의2] 제5호 카목 조제 도구 및 설비 관련 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-9c4f54ec9b7e171078fe819b",
+     "text_ko": "기타 지적사항으로, [별표 1의2] 제12.4호 공용 제조도구에 대해 교차오염 관련 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "기타 [별표 1의2] 제12.4호 공용 제조도구에 대해 교차오염 관련 추가 설명 자료를 제출할 것."
+    },
+    {
+     "finding_id": "finding-b72e93af080db48056ee7d44",
+     "text_ko": "제조 부문의 기타 지적사항으로, [별표 1의2] 제5호 타목 캠페인 생산품목에 대한 제조 지시 및 기록서 내용 관련 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "제조 기타 [별표 1의2] 제5호 타목 캠페인 생산품목에 대한 제조 지시 및 기록서 내용 관련 추가 설명 자료를 제출할 것."
+    }
+   ]
+  },
+  {
+   "document_id": "gmpinspect-1Q2TqD05yGj",
+   "slug": "gmpinspect-1Q2TqD05yGj",
+   "agency": "MFDS",
+   "source": "MFDS",
+   "firm_name": "동국생명과학(주)",
+   "firm_key": "동국생명과학(주)",
+   "published_date": "2026-09-14",
+   "inspection_date": "2026-05-29",
+   "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2TqD05yGj",
+   "categories": [
+    "기타 품질시스템",
+    "안정성/보관",
+    "환경모니터링",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-00fb6310ebdfae659676d75d",
+     "text_ko": "기타 지적사항으로, [별표 1] 제4.2호 라목 시험장비(냉장고 등) 관리에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제4.2호 라목 시험장비(냉장고 등) 관리의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-18a7ffc034710f6e325cfb55",
+     "text_ko": "시험실 부문의 기타 지적사항으로, [별표 1] 제4.2호 마목 안정성 시험 검체 관리에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "시험실 기타 [별표 1] 제4.2호 마목 안정성 시험 검체 관리의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-30a2fb012669dd34a436d69e",
+     "text_ko": "기타 지적사항으로, [별표 1] 제7.1호 사목 완제품 보관용 검체 관리에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "기타 [별표 1] 제7.1호 사목 완제품 보관용 검체 관리의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-67a95b8befa5ed597c8c80a7",
+     "text_ko": "기타 지적사항으로, [별표 1] 제4.2호 사목 표준품 관리에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제4.2호 사목 표준품 관리의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-78f5fd4ebc0e4ce3a125156a",
+     "text_ko": "기타 지적사항으로, [별표 1] 제2.3호 가목 환경 모니터링(진행 기간, 미생물 확인 절차 등)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "기타 [별표 1] 제2.3호 가목 환경 모니터링(진행 기간, 미생물 확인 절차 등)의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-7a8e73495121fd9b1cfef690",
+     "text_ko": "기타 지적사항으로, [별표 1] 제2.3호 압축공기 및 질소가스 시험(사용점, 주기, 항목 등)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제2.3호 압축공기 및 질소가스 시험(사용점, 주기, 항목 등)의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-a7d9844fd7a968888075e0a0",
+     "text_ko": "시험실 부문의 기타 지적사항으로, [별표 1] 제4.2호 무균 검체 관리(외부 표면 오염제거 등)에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "시험실 기타 [별표 1] 제4.2호 무균 검체 관리(외부 표면 오염제거 등)의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-ae4c4ecc56f116ae05cf9a52",
+     "text_ko": "시설장비 부문의 기타 지적사항으로, [별표 1] 제2.1호 주사용수 저장 탱크 벤트필터 관리에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "시설장비 기타 [별표 1] 제2.1호 주사용수 저장 탱크 벤트필터 관리의 추가설명자료를 제출할 것"
+    },
+    {
+     "finding_id": "finding-c9b4b4575e8f43d709f30418",
+     "text_ko": "기타 지적사항으로, [별표 1] 제9.2호 제조소에서 사용하는 소독제 등에 대한 추가 설명 자료를 제출해야 한다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제9.2호 제조소에서 사용하는 소독제 등의 추가설명자료를 제출할 것"
+    }
+   ]
+  },
+  {
+   "document_id": "gmpinspect-1Q2aMMjWSti",
+   "slug": "gmpinspect-1Q2aMMjWSti",
+   "agency": "MFDS",
+   "source": "MFDS",
+   "firm_name": "FAREVA Amboise",
+   "firm_key": "fareva amboise",
+   "published_date": "2026-09-15",
+   "inspection_date": "2026-04-02",
+   "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2aMMjWSti",
+   "categories": [
+    "오염/교차오염 관리",
+    "원자재/공급업체 관리",
+    "시험실/품질관리",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-08c44706efe5081c917648a4",
+     "text_ko": "시설장비 분야의 기타 지적사항이다. [별표 1] 제2.1호와 관련하여, 멸균 공정에 사용되는 장비의 밸리데이션 및 점검 방법과 주기, 그리고 제품 오염 방지 관리 방안 등을 타당하게 마련해야 한다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "시설장비 기타 [별표 1] 제2.1호 멸균 공정에 사용되는 장비의 밸리데이션 및 점검 방법·주기와 제품 오염 방지 관리 방안 등을 타당하게 마련할 것"
+    },
+    {
+     "finding_id": "finding-32802782fed5cd116c10d6e6",
+     "text_ko": "시설장비 분야의 기타 지적사항이다. [별표 1] 제9호와 관련하여, 칭량도구의 세척과 제조설비 유지관리 등의 작업 시 오염 위험이 없도록 관리방안을 마련해야 한다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "시설장비 기타 [별표 1] 제9호 칭량도구의 세척, 제조설비 유지관리 등 작업 시 오염 위험이 없도록 관리방안을 마련할 것"
+    },
+    {
+     "finding_id": "finding-33560449ed3297f0edf46594",
+     "text_ko": "품질 분야의 기타 지적사항이다. [별표 1] 제3.3호와 관련하여, 원자재 공급업체의 제조환경 및 제조 공정 등을 적절히 평가해야 한다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "품질 기타 [별표 1] 제3.3호 원자재 공급업체의 제조환경 및 제조 공정 등을 적절히 평가할 것"
+    },
+    {
+     "finding_id": "finding-f07f40c52efd18f8f7059c93",
+     "text_ko": "제조 분야의 기타 지적사항이다. [별표 1] 제8.1호와 관련하여, 밀봉시험방법의 적합성을 확인할 수 있는 자료와 멸균 후 밀봉시험을 미수행하는 타당한 근거 등을 제출해야 한다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "제조 기타 [별표 1] 제8.1호 밀봉시험방법의 적합성을 확인할 수 있는 자료 및 멸균 후 밀봉시험을 미수행하는 타당한 근거 등을 제출할 것"
+    },
+    {
+     "finding_id": "finding-ffb7072127c6f5f8ead00660",
+     "text_ko": "시험실 분야의 기타 지적사항이다. [별표 1] 제7.1호와 관련하여, 주성분 보관검체의 품질에 영향이 없도록 보관용기 및 보관구역을 관리해야 한다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "시험실 기타 [별표 1] 제7.1호 주성분 보관검체의 품질에 영향이 없도록 보관용기 및 보관구역을 관리할 것"
+    }
+   ]
+  },
+  {
    "document_id": "hc-insp-73991",
    "slug": "hc-insp-73991",
    "agency": "HC",
@@ -206291,6 +206667,42 @@
      "text_ko": "작업자에 대한 GMP 교육훈련 및 기록 유지관리가 부적절했다. 작업자의 직무기술서, 작업자에게 부여된 권한, 업무 위임이 부적절하거나 문서화되지 않았다.",
      "category_label_ko": "설비/시설",
      "text_orig": "The training of personnel in good manufacturing practices and/or the maintenance of records was inadequate. The job descriptions for personnel, the authority given to personnel, and/or the delegation of duties was inadequate and/or undocumented."
+    }
+   ]
+  },
+  {
+   "document_id": "hc-insp-89333",
+   "slug": "hc-insp-89333",
+   "agency": "HC",
+   "source": "Health Canada Inspection",
+   "firm_name": "Skymax Health Solutions Ltd.",
+   "firm_key": "skymax health solutions",
+   "published_date": "2026-08-27",
+   "inspection_date": "2026-08-27",
+   "evidence_url": "https://www.drug-inspections.canada.ca/gmp/fullReportCard-en.html?lang=en&insNumber=89333",
+   "categories": [
+    "기타 품질시스템",
+    "안정성/보관",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-4b7c63722f00d554aaf9df23",
+     "text_ko": "기록의 추적성(traceability), 판독성(legibility), 문서화(documentation), 서식(formatting) 및/또는 정확성이 미흡했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The traceability, legibility, documentation, formatting, and/or the accuracy of records was inadequate."
+    },
+    {
+     "finding_id": "finding-6584ac9dcd03eef94cf7c9b7",
+     "text_ko": "지침 및/또는 절차가, 보관 및/또는 운송 조건이 해당 의약품의 품질과 안전한 유통을 유지하도록 보장하기에 미흡했다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug."
+    },
+    {
+     "finding_id": "finding-e57b64af80444f376dcdf8d0",
+     "text_ko": "시설(premises)의 유지관리가 미흡했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The maintenance of the premises was inadequate."
     }
    ]
   },

@@ -119,6 +119,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\n=== ITEM_SEQ {item_seq} {name or ''}".rstrip())
         if expected:
             print(f"    화면 실측 품목구분: {expected}")
+        # ★일치는 **표본당 한 번**만 센다. 오퍼레이션당 세면 한 표본이 두 오퍼레이션에서
+        #   맞았을 때 '표본 2건 일치'가 되어, 다른 표본이 어긋나도 성공으로 판정된다
+        #   (2026-09-21 1차 판정이 정확히 이렇게 틀렸다 — 허셉틴은 불일치였는데
+        #    하트만덱스액이 두 번 맞아 합계가 채워졌다).
+        sample_ok = False
         for op in OPERATIONS:
             r = _probe_one(op, item_seq, service_key)
             if r.get("error"):
@@ -139,7 +144,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"    ★품목구분으로 보이는 필드: {hits}")
                 verdict_field = verdict_field or sorted(hits)[0]
                 if expected and expected in hits.values():
-                    ok += 1
+                    sample_ok = True
                     print("    → 대조군 정답과 일치")
                 elif expected:
                     print(f"    → ⚠️ 대조군 정답({expected})과 불일치")
@@ -149,6 +154,9 @@ def main(argv: list[str] | None = None) -> int:
                 short = {k: v for k, v in row.items()
                          if isinstance(v, str) and 0 < len(v) <= 30}
                 print(f"    (짧은 값 필드: {json.dumps(short, ensure_ascii=False)[:600]})")
+
+        if sample_ok:
+            ok += 1
 
     print()
     if verdict_field and (not any(e for _, _, e in samples) or ok == len(

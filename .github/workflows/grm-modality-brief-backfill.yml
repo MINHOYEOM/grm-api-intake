@@ -81,14 +81,21 @@ jobs:
           # 앞 스텝이 tmp/modality_replay_cache.json 을 남겼으므로 네트워크 재조회 없음.
           python backfill_modality_published_briefs.py | tee modality_backfill_report.txt
 
-      - name: 적용 + 골든 재동결 + 렌더 스모크
+      - name: 적용 (브리프 JSON 갱신)
         if: ${{ inputs.apply }}
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python backfill_modality_published_briefs.py --apply
+
+      # ★freeze 는 **반드시 기본 env**(prod 변수 미주입)로 돌린다 — grm-web-publish.yml 과 동일.
+      #   같은 스텝에 SUPABASE_* 가 있으면 렌더가 라이브 데이터를 당겨 골든을 굳히고,
+      #   그 변수가 없는 CI 는 재현하지 못해 브리프와 무관한 findings·trends·firm 골든까지
+      #   깨진다(2026-09-21 실측: PR #1037 CI 가 정확히 이렇게 죽었다).
+      - name: 골든 재동결(기본 env — prod 변수 미주입) + 렌더 스모크
+        if: ${{ inputs.apply }}
         run: |
           set -euo pipefail
-          python backfill_modality_published_briefs.py --apply
           python web/tests/test_render.py --freeze
           python web/render.py --data web/data/briefs --out _dist_smoke >/dev/null
           rm -rf _dist_smoke

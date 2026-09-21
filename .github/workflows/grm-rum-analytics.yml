@@ -49,6 +49,23 @@ on:
         required: false
         default: 'false'
 
+      cross_only:
+        description: 'Only collect referrer x path; leave all legacy tables untouched'
+        required: false
+        default: 'false'
+      cross_dry_run:
+        description: 'Cross query without database writes'
+        required: false
+        default: 'false'
+      cross_api_limit:
+        description: 'Cross API limit (1-10000); lower only to verify truncation'
+        required: false
+        default: '10000'
+      cross_day_cap:
+        description: 'Cross retained pairs per UTC day (1-5000)'
+        required: false
+        default: '5000'
+
 permissions:
   contents: read
 
@@ -117,6 +134,7 @@ jobs:
           echo "end=$END" >> "$GITHUB_OUTPUT"
 
       - name: Sync
+        if: ${{ inputs.cross_only != 'true' }}
         env:
           CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'f8a15e3902ceb00a390635c040a2f551' }}
@@ -138,7 +156,7 @@ jobs:
       # RUM 동기화와 독립이라 앞 스텝이 실패해도 돈다(취소만 제외). probe 실행은 구조
       # 확인이 목적이라 적재하지 않는다. 시크릿은 뉴스레터 발송과 같은 NEWSLETTER_API_KEY.
       - name: Snapshot newsletter subscribers
-        if: ${{ !cancelled() && (inputs.probe || 'false') != 'true' }}
+        if: ${{ !cancelled() && inputs.cross_only != 'true' && (inputs.probe || 'false') != 'true' }}
         env:
           NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
           GRM_NEWSLETTER_LIST_ID: ${{ vars.GRM_NEWSLETTER_LIST_ID }}
@@ -150,7 +168,7 @@ jobs:
       # 앞 스텝과 독립이라 하나가 실패해도 돈다(취소만 제외). 확정 데이터가 2~3일 늦게
       # 오므로 창은 스크립트 기본값(16일)을 쓰고 매번 다시 적재한다.
       - name: Sync Search Console
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && inputs.cross_only != 'true' }}
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GSC_SITE_URL: ${{ vars.GSC_SITE_URL }}
@@ -162,3 +180,22 @@ jobs:
           else
             python collect_search_console.py
           fi
+
+      - name: Sync referrer x landing path
+        if: ${{ !cancelled() }}
+        env:
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || 'f8a15e3902ceb00a390635c040a2f551' }}
+          CLOUDFLARE_RUM_SITE_TAG: ${{ vars.CLOUDFLARE_RUM_SITE_TAG || 'aa495e04c95449028591a30d7e0f87b4' }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CROSS_DRY_RUN: ${{ inputs.cross_dry_run == 'true' || inputs.probe == 'true' }}
+          CROSS_API_LIMIT: ${{ inputs.cross_api_limit || '10000' }}
+          CROSS_DAY_CAP: ${{ inputs.cross_day_cap || '5000' }}
+          WINDOW_START: ${{ steps.win.outputs.start }}
+          WINDOW_END: ${{ steps.win.outputs.end }}
+        run: |
+          args=(--start "$WINDOW_START" --end "$WINDOW_END"
+                --api-limit "$CROSS_API_LIMIT" --day-cap "$CROSS_DAY_CAP")
+          if [ "$CROSS_DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+          python collect_rum_referrer_paths.py "${args[@]}"

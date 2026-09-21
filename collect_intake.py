@@ -137,6 +137,8 @@ from grm_taxonomy import (
     compute_modality,
     compute_osd_relevance,
     compute_relevance,
+    is_korean_non_pharma_domain,
+    is_veterinary_domain,
 )
 
 # ── [배치5] Phase0 공용 relocate(SOURCE_*·truncate·chunk_text·_env_int·chunk상수) — grm_common 재수출(하위호환·테스트·위성 무수정) ──

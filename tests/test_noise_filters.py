@@ -2,6 +2,7 @@ import os
 import unittest
 from unittest import mock
 
+import collect_intake as ci
 from collect_intake import (
     SOURCE_FR,
     _fda_wl_office_gate,
@@ -352,6 +353,72 @@ class VeterinaryDomainGateTest(unittest.TestCase):
         cvmp = "Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP)"
         self.assertNotEqual(compute_relevance(chmp), "Unrelated")
         self.assertEqual(compute_relevance(cvmp), "Unrelated")
+
+
+class KoreanNonPharmaDomainTest(unittest.TestCase):
+    """한국어 제외 도메인 — 제외 어휘가 전부 영어라 MFDS 문서가 그대로 통과했다.
+
+    실증(2026-09-21): `디지털의료기기 제조 및 품질관리 기준 질의·응답집` 이 제약 GMP
+    브리프 국내 구역에 실렸다. 발행본 전수(13주)에 의료기기 지침이 2건 더 있었다.
+
+        "Medical Devices"                  → Unrelated (막힘)
+        "디지털의료기기 제조 및 품질관리 기준"  → Pending   (통과)
+
+    ★목록에 한국어를 더하는 것으로는 못 고친다 — `_kw_match` 는 `\b…\b` 로 감싸는데
+    한국어엔 그 경계가 없어 "디지털**의료기기**" 안에서 성립하지 않는다. 그래서 별도
+    정규식 층으로 둔다. 아래 음성 대조군이 이 검사의 절반이다 — 제약 문서가 이
+    낱말들을 정당하게 포함하는 경우가 실제로 있다.
+    """
+
+    def test_korean_device_documents_are_excluded(self):
+        for title in (
+            "디지털의료기기 제조 및 품질관리 기준 질의·응답집",
+            "의료기기 소프트웨어 밸리데이션 가이드라인",
+            "디지털의료기기 변경관리 계획서 허가 심사 가이드라인",
+            "체외진단의료기기 허가·심사 가이드라인",
+        ):
+            self.assertEqual(compute_relevance(title), "Unrelated", title)
+
+    def test_korean_cosmetic_and_health_food_are_excluded(self):
+        self.assertEqual(compute_relevance("기능성화장품 심사 규정 개정"), "Unrelated")
+        self.assertEqual(compute_relevance("건강기능식품 GMP 운영 지침"), "Unrelated")
+
+    def test_word_boundary_does_not_apply_to_korean(self):
+        """한국어는 낱말 중간에 붙는다 — 이게 목록 방식이 실패한 이유다."""
+        self.assertTrue(ci.is_korean_non_pharma_domain("디지털의료기기 기준"))
+        self.assertTrue(ci.is_korean_non_pharma_domain("체외진단의료기기 지침"))
+
+    # ── 남아야 하는 것(음성 대조군) ──────────────────────────────────
+    def test_pharma_document_with_pesticide_residue_survives(self):
+        """`잔류농약` 은 생약·한약재 품질 사안이다 — 식품으로 보면 제약 회수가 사라진다.
+
+        실측: 2026-08-31 `(주)현진제약 잔류농약(뷰프로페진) 검출` 이 발행됐다.
+        """
+        self.assertNotEqual(
+            compute_relevance("(주)현진제약 잔류농약(뷰프로페진) 검출 회수"), "Unrelated")
+        self.assertNotEqual(
+            compute_relevance("생약(한약재) 잔류농약 기준 개정"), "Unrelated")
+
+    def test_combination_product_survives(self):
+        """의약품·의료기기 복합제는 제약 문서다."""
+        self.assertNotEqual(
+            compute_relevance("의약품·의료기기 복합제 품질평가 가이드라인"), "Unrelated")
+
+    def test_ordinary_domestic_pharma_documents_survive(self):
+        for title in (
+            "무균 주사제 제조소 정기 실태조사 결과",
+            "재심사 자료 미제출 판매업무정지",
+            "의약품 제조 및 품질관리 기준 해설서",
+        ):
+            self.assertNotEqual(compute_relevance(title), "Unrelated", title)
+
+    def test_english_path_is_unchanged(self):
+        """영어 판정은 그대로여야 한다(이 층은 가산일 뿐)."""
+        self.assertEqual(compute_relevance("Medical Devices; Orthopedic Devices"),
+                         "Unrelated")
+        self.assertNotEqual(
+            compute_relevance("Sterile Drug Products Produced by Aseptic Processing"),
+            "Unrelated")
 
 
 class MfdsGmpNoiseFilterTest(unittest.TestCase):

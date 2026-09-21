@@ -84,6 +84,41 @@ class OldClassifierBaselineTest(unittest.TestCase):
                          "구 구현(badge.get 에 빈 문자열을 그대로 넘김)이 남아 있다")
 
 
+class NormativeBadgeSuppressionTest(unittest.TestCase):
+    """★규범 문서에는 소급도 제품군 배지를 달지 않는다.
+
+    렌더(`to_web_card`)는 규범 유형의 배지를 억제한다. 소급 스크립트는 렌더를
+    거치지 않고 카드 JSON 을 직접 고치므로 그 규칙을 다시 지켜야 한다 —
+    첫 dry-run 이 '(배지 없음) → 바이오' 12장을 낸 자리가 정확히 여기다.
+    """
+
+    def setUp(self) -> None:
+        self.bf = _load_backfill()
+
+    def test_normative_labels_match_the_renderer(self) -> None:
+        import card_scaffold as cs
+        self.assertEqual(self.bf._normative_card_types(),
+                         frozenset(cs._kind_meta(k)[1] for k in cs._NORMATIVE_KINDS))
+
+    def test_no_non_normative_kind_shares_a_normative_label(self) -> None:
+        """★라벨로 가르는 것이 안전하다는 **성질**을 고정한다.
+
+        카드 JSON 에는 내부 kind 가 없고 화면 라벨(card_type)만 있다. 나중에
+        비-규범 kind 가 규범 라벨을 같이 쓰면 그 카드가 통째로 소급에서 빠진다.
+        """
+        import card_scaffold as cs
+        norm = self.bf._normative_card_types()
+        clash = sorted(k for k in cs._REGISTRY
+                       if k not in cs._NORMATIVE_KINDS and cs._kind_meta(k)[1] in norm)
+        self.assertEqual(clash, [],
+                         f"비-규범 kind 가 규범 라벨을 공유한다: {clash}")
+
+    def test_loop_skips_normative_cards(self) -> None:
+        src = _read_script()
+        self.assertIn('if (card.get("card_type") or "") in normative:', src,
+                      "소급 루프가 규범 문서를 건너뛰지 않는다")
+
+
 class BackfillSafetyTest(unittest.TestCase):
     """raw_signals 는 읽기 전용이라는 계약."""
 

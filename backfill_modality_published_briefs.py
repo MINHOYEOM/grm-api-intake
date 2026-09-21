@@ -84,6 +84,23 @@ def _badge_maps() -> tuple[dict[str, str], dict[str, str]]:
     return badge, {v: k for k, v in badge.items()}
 
 
+def _normative_card_types() -> frozenset[str]:
+    """★제품군 배지를 달면 안 되는 카드 유형(규범 문서) 라벨 집합.
+
+    `to_web_card` 는 규범 유형(지침·안내서·규제 소식·WHO·ICH·고시·입법예고)의 배지를
+    억제한다(`if self.modality and not _spec(kind).normative`). 소급 스크립트는 렌더를
+    거치지 않고 카드 JSON 을 직접 고치므로, 그 규칙을 **여기서 다시 지켜야 한다** —
+    아니면 배지가 없던 가이드라인 카드에 소급이 제품군 배지를 새로 달아 버린다
+    (첫 dry-run 에서 '(배지 없음) → 🧬 바이오' 12장이 나온 자리가 정확히 여기다).
+
+    라벨로 가리는 이유: 카드 JSON 에는 내부 kind 가 없고 화면 라벨(card_type)만 있다.
+    규범 라벨과 같은 이름을 쓰는 비-규범 kind 는 없음을 `_kind_meta` 로 확인했고,
+    tests/test_modality_backfill.py 가 그 성질을 고정한다.
+    """
+    import card_scaffold as cs
+    return frozenset(cs._kind_meta(k)[1] for k in cs._NORMATIVE_KINDS)
+
+
 def _load_briefs() -> list[tuple[Path, dict[str, Any]]]:
     out = []
     for p in sorted(BRIEF_DIR.glob("brief_web_*.json")):
@@ -136,7 +153,8 @@ def _recompute(card_id: str, inputs: dict[str, dict[str, Any]]) -> str | None:
 
 # ── 리포트 ───────────────────────────────────────────────────────────────────
 def _print_report(changes: list[dict[str, Any]], unmatched: list[str],
-                  total: int, badge: dict[str, str]) -> None:
+                  total: int, badge: dict[str, str], *,
+                  normative_skipped: int = 0) -> None:
     def name(v: str) -> str:
         # ★MODALITY_UNKNOWN 은 배지를 아예 달지 않는다 — 리포트도 그렇게 말해야 한다.
         #   (빈 문자열을 badge.get 에 넘기면 None 이 나와 "None" 으로 찍힌다.)
@@ -144,8 +162,8 @@ def _print_report(changes: list[dict[str, Any]], unmatched: list[str],
             return "(배지 없음)"
         return badge.get(v) or v
 
-    print(f"발행 카드 {total}장 · raw_signals 매칭 실패 {len(unmatched)}장 "
-          f"· 판정 변경 {len(changes)}장")
+    print(f"발행 카드 {total}장 · 규범 문서 제외 {normative_skipped}장 "
+          f"· raw_signals 매칭 실패 {len(unmatched)}장 · 판정 변경 {len(changes)}장")
     print()
     moves = Counter((c["old"], c["new"]) for c in changes)
     print("변경 내역 (이전 → 이후)")
@@ -209,9 +227,15 @@ def main(argv: list[str] | None = None) -> int:
     total = 0
     changes: list[dict[str, Any]] = []
     unmatched: list[str] = []
+    normative = _normative_card_types()
+    normative_skipped = 0
     for path, doc in briefs:
         for card in doc.get("cards", []):
             total += 1
+            # ★규범 문서는 제품군 배지를 달지 않는다(렌더 규칙과 동일) — 손대지 않는다.
+            if (card.get("card_type") or "") in normative:
+                normative_skipped += 1
+                continue
             card_id = card.get("id") or ""
             new_val = _recompute(card_id, inputs)
             if new_val is None:
@@ -233,7 +257,8 @@ def main(argv: list[str] | None = None) -> int:
             if args.apply:
                 card["modality"] = new_badge
 
-    _print_report(changes, unmatched, total, badge)
+    _print_report(changes, unmatched, total, badge,
+                  normative_skipped=normative_skipped)
 
     if args.apply:
         for path, doc in briefs:

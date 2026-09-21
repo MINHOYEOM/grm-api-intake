@@ -161,7 +161,9 @@ class DisplayWindowSeparationTest(unittest.TestCase):
             captured["query_window"] = window_days
             return []
 
-        def fake_upsert(token, db_id, payload, generated_at, compact=False):
+        # **kw: emit 경로가 넘기는 추가 인자(예: sealed_dates)를 흡수한다 — 이 mock 은
+        # Notion 호출 대역일 뿐 시그니처를 고정하는 계약이 아니다.
+        def fake_upsert(token, db_id, payload, generated_at, compact=False, **kw):
             captured["payload"] = payload
             return "pid", "url"
 

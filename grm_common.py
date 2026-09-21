@@ -653,9 +653,24 @@ class IntakeSourceSpec:
     # "한산한 주"처럼 0 으로 찍어 발행했다(2026-09-14 발견).
     #
     # `silence_days` 는 "이 정도면 확실히 이상하다" 선이지 "가장 빨리 잡는" 선이 아니다.
-    # 소스가 실제로 얼마나 자주 내는지(2026-07~09 60일 실측)에 맞춰 3단으로만 둔다 —
-    # 주 1회 이상 내는 소스 10일 · 월 1회꼴 21일 · 산발 35일. 스냅샷 diff 소스(ICH)는 0 = 제외.
+    # 소스가 실제로 얼마나 자주 내는지에 맞춰 4단으로 둔다 — 주 1회 이상 내는 소스 10일 ·
+    # 월 1회꼴 21일 · 산발 35일 · 분기 1회꼴 60~90일. 스냅샷 diff 소스(ICH)는 0 = 제외.
     # 더 촘촘히 깎으면 한산한 주에 가짜 경고가 나고, 그러면 아무도 안 읽는다.
+    #
+    # ★[임계 교정 2026-09-21] 임계는 **러너 프로브로 "원천이 건강한데 조용하다"가 확인된
+    #   무음 일수보다 반드시 길어야 한다.** 초판(2026-09-14)의 3단은 그 확인 **전에** 정한
+    #   값이었고, 같은 날 러너 프로브(`grm-source-probe.yml targets=silent`, run
+    #   34797482678)가 PIC/S·MHRA GMP NCR·EU GMP NCR **3종 전부 OPEN** 으로 판정했다:
+    #   PIC/S 는 200·항목 109건·최신 pubDate 07-30 으로, Notion 마지막 행(07-30)과 정확히
+    #   일치 = **있는 건 다 긁어온 상태**였다. 그런데 임계가 각각 35·35·21일이라 건강한
+    #   소스가 09-15~09-17 부터 매일 경고를 냈고, 09-21 에는 이슈 #956 이 🚨 7일 연속
+    #   에스컬레이션까지 갔다 — 고칠 게 없는 경고가, 같은 이슈에 올라오는 **진짜 고장**
+    #   (KR egress 프록시 사망)을 묻는 상태다. 그래서 확인된 건강 무음(PIC/S 46일 ·
+    #   MHRA GMP NCR 35일 · EU GMP NCR 20일)보다 길게 다시 잡는다.
+    #   ⚠️ 대가를 숨기지 않는다: 임계를 늘리면 이 3종이 **진짜로** 죽었을 때 표면화가
+    #   그만큼 늦는다. 그 구간은 ① `*_error` 기반 보고(하드 실패는 즉시 잡는다)와
+    #   ② 러너 프로브 수동 1회전이 메운다 — 무음 감시는 원래 마지막 그물이지 첫 그물이
+    #   아니다. 임계를 다시 줄이려면 먼저 프로브로 원천 주기를 재라.
     notion_source: str = ""   # Notion Intake DB 의 `Source` select 값. 비우면 무음 감시 제외
     silence_days: int = 0     # 이 일수를 **초과**해 신규 0건이면 경고. 0 = 감시 안 함
 
@@ -682,8 +697,9 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
                      notion_source=SOURCE_MHRA, silence_days=35),
     IntakeSourceSpec("mhra_alert", "MHRA Drug/Device Alerts", warn_only=True,
                      notion_source=SOURCE_MHRA, silence_days=35),
+    # PIC/S 90일: 러너 프로브 2026-09-14 기준 46일 무음이 **정상**(피드 109건·최신 07-30).
     IntakeSourceSpec("pics", "PIC/S RSS", warn_only=True,
-                     notion_source=SOURCE_PICS, silence_days=35),
+                     notion_source=SOURCE_PICS, silence_days=90),
     IntakeSourceSpec("eca", "ECA Academy RSS", warn_only=True,
                      notion_source=SOURCE_ECA, silence_days=10),
     IntakeSourceSpec("wl", "FDA Warning Letters", warn_only=True,
@@ -717,10 +733,12 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     # 테스트가 못박아 둔 계약이다(ECA·WL 선례와 같은 기구를 쓴다).
     IntakeSourceSpec("search", "Brave Search", health_code_override="brave-search",
                      warn_only=True),
+    # EU GMP NCR 60일: 러너 프로브 2026-09-14 기준 20일 무음이 **정상**(EudraGMDP 폼 표식 확인).
     IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)", warn_only=True,
-                     notion_source=SOURCE_EU_GMP_NCR, silence_days=21),
+                     notion_source=SOURCE_EU_GMP_NCR, silence_days=60),
+    # MHRA GMP NCR 90일: 러너 프로브 2026-09-14 기준 35일 무음이 **정상**(Drupal 목록 표식 확인).
     IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True,
-                     notion_source=SOURCE_MHRA_GMP_NCR, silence_days=35),
+                     notion_source=SOURCE_MHRA_GMP_NCR, silence_days=90),
 )
 
 

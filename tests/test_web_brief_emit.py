@@ -160,7 +160,9 @@ class EmitBranchTest(unittest.TestCase):
     """emit_routine_handoff 가 web_brief_dir 지정 + v2 경로일 때만 산출하는지(D5)."""
 
     def _run(self, *, flag: str | None, web_dir: str | None):
-        def fake_upsert(token, db_id, payload, generated_at, compact=False):
+        # **kw: emit 경로가 넘기는 추가 인자(예: sealed_dates)를 흡수한다 — 이 mock 은
+        # Notion 호출 대역일 뿐 시그니처를 고정하는 계약이 아니다.
+        def fake_upsert(token, db_id, payload, generated_at, compact=False, **kw):
             return "pid", "url"
 
         env = {} if flag is None else {"ENABLE_HANDOFF_V2": flag}

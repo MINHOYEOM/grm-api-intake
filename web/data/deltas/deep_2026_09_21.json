@@ -1,0 +1,348 @@
+{
+ "6266b6a5dbe5": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "21 CFR 211.42(c)(10)",
+     "original": "Your environmental monitoring (EM) program and personnel monitoring (PM) was inadequate for classified areas used to produce your sterile (b)(4) drug products. For example, Your program did not sufficiently monitor significant locations (e.g., phones used in the aseptic processing area). EM procedures used to evaluate the aseptic processing environment were insufficient. Media used to support your EM program was observed to be inadequate to support growth of recovered contamination (e.g., cracked media). From 2023 to 2025 you routinely recovered microorganisms from aseptic ISO 5 areas (air, surface, and personnel) that were out-of-limit (OOL). Notably, recovered microbes in the aseptic processing environment included gram-negative rods such as Serratia marcescens and Stenotrophomonas maltophilia , organisms frequently associated with water sources, suggesting a moisture-related contamination issue. You continued (b)(4) drug production without adequate corrective action and preventive action (CAPA) measures to address the persistent microbiological contamination in your ISO 5 environments that posed a risk to product sterility.",
+     "description": "귀사의 환경모니터링(EM) 프로그램과 인원모니터링(PM)은 귀사의 무균 (b)(4) 의약품을 생산하는 데 사용되는 청정등급 구역에 대하여 부적절하였습니다. 예를 들어, 귀사의 프로그램은 중요한 위치(예: 무균조작구역에서 사용되는 전화기)를 충분히 모니터링하지 않았습니다. 무균조작 환경을 평가하는 데 사용된 EM 절차가 불충분하였습니다. 귀사의 EM 프로그램을 뒷받침하는 데 사용된 배지는 회수된 오염균의 발육을 지지하기에 부적절한 것으로 관찰되었습니다(예: 균열된 배지). 2023년부터 2025년까지 귀사는 무균 ISO 5 구역(공기, 표면 및 인원)에서 기준 초과(OOL)인 미생물을 일상적으로 회수하였습니다. 특히, 무균조작 환경에서 회수된 미생물에는 Serratia marcescens 및 Stenotrophomonas maltophilia 와 같은 그람음성간균이 포함되어 있었으며, 이는 흔히 물 공급원과 연관되는 균으로 수분 관련 오염 문제를 시사합니다. 귀사는 제품의 무균성에 위험을 초래한 ISO 5 환경의 지속적인 미생물 오염을 해소하기 위한 적절한 시정조치 및 예방조치(CAPA) 없이 (b)(4) 의약품 생산을 계속하였습니다.",
+     "risk": "ISO 5 무균조작 환경에서 기준 초과 미생물이 2023년부터 2025년까지 반복 회수되었음에도 생산이 계속된 상태로, 해당 기간 제조된 무균 제품의 무균성이 담보되지 않는다. 물 공급원과 연관되는 그람음성간균이 검출된 점은 용수 계통을 경유한 지속적 오염원이 제거되지 않았을 가능성을 가리키며, 환경모니터링 자체가 오염을 검출하지 못하는 상태(부적절한 배지·모니터링 위치 누락)였다는 점에서 기존 EM 데이터로 과거 배치의 적합성을 방어하기 어렵다."
+    },
+    {
+     "citation": "21 CFR 211.113(b)",
+     "original": "Your operators were observed repeatedly exhibiting poor aseptic practices during filling operations on (b)(4) line (b)(4) , including, but not limited to, the following: Operators reached over exposed (b)(4) bottles while (b)(4) to remove jammed bottles. Operators failed to disinfect (b)(4) (e.g., prior to handling sterile supplies and between use of different (b)(4) ). (b)(4) contacted (b)(4) housing and blocked unidirectional air to open sterilized bottles. (b)(4) contacted sterile portions of aseptic tweezers used to remove jammed bottles, and operators returned those bottles back to the (b)(4) . Bags used to transfer sterile components (bottles) were exposed to the ISO 7 environment prior to manipulation with (b)(4) and contacted internal portions of the (b)(4) housing. Operators used (b)(4) to push trash into a receptacle located below the processing line rather than using equipment dedicated for this purpose.",
+     "description": "귀사의 작업자들은 (b)(4) 라인 (b)(4) 의 충전 작업 중 불량한 무균조작 관행을 반복적으로 보이는 것이 관찰되었으며, 여기에는 다음이 포함되나 이에 한정되지 않습니다: 작업자들이 걸린 병을 제거하기 위하여 (b)(4) 하는 동안 노출된 (b)(4) 병 위로 팔을 뻗었습니다. 작업자들이 (b)(4) 를 소독하지 않았습니다(예: 멸균 자재를 취급하기 전, 그리고 서로 다른 (b)(4) 의 사용 사이). (b)(4) 가 (b)(4) 하우징에 접촉하여 개방된 멸균 병으로 향하는 일방향 공기를 차단하였습니다. (b)(4) 가 걸린 병을 제거하는 데 사용된 무균 핀셋의 멸균 부위에 접촉하였고, 작업자들은 그 병을 다시 (b)(4) 로 되돌려 놓았습니다. 멸균 구성품(병)을 이송하는 데 사용된 봉지가 (b)(4) 로 취급되기 전에 ISO 7 환경에 노출되었고 (b)(4) 하우징의 내부에 접촉하였습니다. 작업자들은 이 용도로 지정된 장비를 사용하는 대신 (b)(4) 를 사용하여 처리 라인 아래에 위치한 수거함으로 쓰레기를 밀어 넣었습니다.",
+     "risk": "무균 충전 작업 중 작업자 개입이 노출된 용기 위 팔 뻗기, 미소독 취급, 일방향 기류 차단, 멸균 부위 접촉 등으로 반복 관찰된 상태여서, 해당 라인에서 충전된 배치는 개입 시점마다 오염 위험에 노출되었다고 보아야 한다. 특히 무균 핀셋의 멸균 부위에 접촉한 뒤 그 용기를 라인으로 되돌린 행위는 개별 용기 오염이 배치 전체로 확산되는 경로가 되며, 이러한 관행이 운영·품질부서에 의해 적발·시정되지 않았다는 점은 감독 체계 자체의 결함을 의미한다."
+    },
+    {
+     "citation": "21 CFR 211.113(b)",
+     "original": "In addition, your process simulations (media fill) were inadequate. Data indicated that the total number of units in your media fills were substantially smaller than your aseptically produced commercial batch sizes and did not sufficiently represent the contamination risks associated with your aseptic processing lines. Significantly, you documented a media fill failure on line 16 in July 2025, in which two units demonstrated fungal ( Neovaginatispora magiferae ) and spore forming gram-positive Geodermatophilus obscurus , contamination, respectively.",
+     "description": "또한, 귀사의 공정 모의시험(배지충진)은 부적절하였습니다. 자료에 따르면 귀사의 배지충진 총 용기 수는 귀사가 무균적으로 생산한 상업 배치 규모보다 상당히 적었으며, 귀사의 무균조작 라인과 관련된 오염 위험을 충분히 대표하지 못하였습니다. 중요하게도, 귀사는 2025년 7월 line 16 에서 배지충진 실패를 기록하였는데, 여기에서 2개 용기가 각각 진균(Neovaginatispora magiferae) 및 포자형성 그람양성균 Geodermatophilus obscurus 오염을 나타냈습니다.",
+     "risk": "배지충진 규모가 실제 상업 배치 규모에 미치지 못하면 무균조작 공정의 오염 위험이 통계적으로 과소평가되며, 배지충진 결과로 상업 배치의 무균성을 보증하는 근거가 약해진다. 2025년 7월 line 16 에서 진균과 포자형성 그람양성균이 각각 검출된 실패가 기록되었음에도 해당 라인의 상업 생산이 계속된 점은, 배지충진 실패 후 영향 배치 판정과 라인 자격 재부여 절차가 작동하지 않았을 가능성을 가리킨다."
+    }
+   ],
+   "fda_evaluation": "FDA는 귀사가 2026년 4월 10일자로 제출한 Form FDA 483 회신을 상세히 검토하였고 후속 서신의 수령을 확인하였다. FDA는 귀사의 회신이 EM 데이터·무균시험 결과·이물 불만 발생률을 근거로 무균조작 작업이 관리 상태에 있다고 주장하고, (b)(4) 적재에 대한 절차 변경과 ISO 5 및 ISO 7 구역에서 진균 또는 그람음성간균이 회수된 경우의 필수 소독 요건 도입을 시행하였다고 기술한 점은 인정하였다. 그러나 FDA는 전반적으로 그 회신이 적절한 무균조작 작업을 어떻게 보증할 것인지, EM 및 PM 데이터를 향후 어떻게 적절히 평가하여 무균 공정을 뒷받침할 것인지, 소비자 불만 검체를 어떻게 적절히 해석·평가할 것인지를 다루지 못했다고 평가하였다. 또한 중대한 설계 개선을 이행하겠다는 확약이 결여되어 있다고 지적하였다. FDA는 무균시험이 무균을 표방하는 의약품의 중요한 품질관리이기는 하나 배치 출하를 정당화하는 유일한 근거로 사용될 수 없으며, 그 시험은 안전하지 않은 배치의 유통으로부터 소비자를 보호하기 위한 일련의 설계 조치와 관리의 마지막 단계일 뿐이라고 밝혔다. 무균조작 관행에 대한 회신과 관련해서도 FDA는 귀사의 회신이 운영 및 품질부서가 이러한 중대한 무균조작 위험을 적발하고 시정을 요구하지 못한 실패를 다루지 못했다고 평가하였다. 나아가 FDA는 본 서한의 중대한 지적사항들이 귀사가 CGMP에 부합하는 효과적인 품질시스템을 운영하고 있지 않음을 보여주며, 생산 작업에 대한 효과적인 경영진 감독이 결여되어 있을 뿐 아니라 품질부서가 적절한 권한을 행사할 수 있도록 뒷받침되지 않았거나 그 책임을 충분히 이행하지 못하고 있다고 결론지었다.",
+   "required_remediation": {
+    "deadline": "본 서한 수령 후 15영업일(fifteen (15) business days) 이내에 CDER-OC-OMQ-Communications@fda.hhs.gov 로 서면 회신하며, 서신 또는 이메일 제목에 FEI 1000113778 과 ATTN: Compliance Officer Matthew R. Dionne 를 명시할 것.",
+    "items": [
+     "환경모니터링(EM) 프로그램에 대한 독립적·포괄적 검토 — 한계기준 설정, 시료채취 방법, 시료채취 위치 및 빈도, 추세 분석, 이탈 및 악화 추세에 대한 적절한 조사, 평가 결과에 근거한 CAPA 계획을 포함할 것.",
+     "제조 작업의 설계 및 관리에 대한 포괄적·독립적 평가와 모든 미생물학적 위험에 대한 상세하고 철저한 검토.",
+     "이의제기 가능한(objectionable) 오염 가능성이 있는 의약품 유통으로 인한 위험에 대한 상세 위험평가와, 그 결과에 따라 취할 고객 통보·제품 회수 등 조치의 구체화.",
+     "이의제기 가능한 미생물 오염 가능성 또는 기준 초과(OOL) 미생물 결과가 있는(이후 무효화 여부와 무관) 모든 배치에 대한 완전한 조사 — 오염의 근본원인에 관한 조사 결과를 상세히 기술할 것.",
+     "각 의약품에 대한 적절한 미생물학적 배치 출하 규격(총균수, 이의제기 가능한 균 검출을 위한 생균수 동정 포함)과 각 의약품 분석에 사용되는 모든 미생물학적 시험법.",
+     "유효기간 내 모든 의약품 배치의 보관 검체 시험 결과 요약 — 유효성분의 확인 및 함량, 미생물학적 품질을 포함한 모든 적절한 품질 특성을 시험하고, OOL 결과 발생 시 고객 통보 및 회수 착수를 포함한 시정조치를 제시할 것.",
+     "자격 있는 컨설턴트의 지원을 받아 무균 공정의 기류 일방향성에 대한 비판적 평가를 수행할 것 — 스모크 스터디를 동적 조건에서, 동적 상호작용과 무균 개입의 영향을 포함하여 철저히 수행하고, 무균 작업 개선 이후 적절한 방법(예: 중성 부력 매체)으로 실시할 것.",
+     "무균 공정·장비·시설과 관련된 모든 오염 위험에 대한 포괄적·독립적 위험평가 — ISO 5 구역 내 모든 인적 개입(가능한 경우 수동 개입의 축소 또는 제거), 장비 적합성(신뢰성·성능·인체공학·배치)과 충분한 청정실 공간, ISO 5 구역 및 주변 실의 공기질(공기량 및 기류 포함), 시설 배치, 인원 및 자재 동선, 위험평가에서 확인된 설계·관리 위험을 포괄적으로 해소할 구체적 CAPA 권고를 포함할 것.",
+     "오염 위험 평가 결과를 해소하기 위한 일정이 포함된 상세 개선계획 — 무균조작 설계 및 관리에 대한 구체적 개선사항, (b)(4) 무균조작 라인 및 청정실 설계의 포괄적 변경, 광범위하게 개선된 작업에 대한 적격성평가 및 밸리데이션 계획을 기술할 것.",
+     "적절한 무균 관행·청정실 행동·문서화된 절차의 준수를 보증할 체계적 계획 — 실제 관행의 적합성(무균조작 작업의 광범위한 후향적 검토 및 전향적 관찰 기반), 생산 관리 감독의 결함과 전 배치에 대한 효과적·상시 감독을 보장할 구체적 개선사항, 무균조작 및 지원 작업에 대한 품질부서 감독의 빈도와 깊이, 문서화된 절차의 적절성에 대한 독립적 평가와 그에 따른 CAPA 를 포함할 것."
+    ]
+   },
+   "administrative_risks": "해소되지 않은 위반사항은 다른 연방기관이 귀사에 계약을 부여하는 것을 막을 수 있다. 위반사항을 해소하지 않으면 FDA 가 수출증명서(Export Certificates) 발급을 보류할 수 있다. 또한 FDA 는 위반사항이 완전히 해소되고 CGMP 준수가 확인될 때까지, 귀사를 의약품 제조원으로 기재한 신규 신청 및 보충자료의 승인을 보류할 수 있다. FDA 는 시정조치 완료를 확인하기 위하여 재실사할 수 있다. 해당 시설에서 생산되는 의약품의 공급 차질로 이어질 가능성이 있는 조치를 고려하는 경우 FDA 는 즉시 CDER 의 Drug Shortages Staff(drugshortages@fda.hhs.gov)로 연락할 것을 요청하고 있으며, 이는 21 U.S.C. 356c(b) 에 따른 제조 중단·중단 보고 의무 이행과도 연결된다. 한편 2023~2027 회계연도 GDUFA 재승인(GDUFA III Commitment Letter) 프로그램 강화에 따라 해당 시설은 시정조치 계획의 적절성과 완전성에 대한 FDA 의 예비 의견을 받기 위한 Post-Warning Letter Meeting 대상이 될 수 있다."
+  },
+  "violations_ko": [
+   {
+    "number": "1",
+    "statement_ko": "귀사는 무균조작구역에서 오염 또는 혼동을 방지하는 데 필요한 충분한 크기의 명확히 구획된 구역 내에서 작업을 수행하지 못하였고, 분리되거나 구획된 구역 또는 그 밖의 그러한 관리 체계를 갖추지 못하였습니다 (21 CFR 211.42(c)(10))."
+   },
+   {
+    "number": "2",
+    "statement_ko": "귀사는 무균(sterility)을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 준수하지 못하였습니다 (21 CFR 211.113(b))."
+   }
+  ],
+  "source_text": "during an inspection of your drug manufacturing facility, Bausch & Lomb Inc., FDA Establishment Identifier (FEI) 1000113778, at 8500 Hidden River Parkway, Tampa, from March 12 to 20, 2026. This inspection was conducted under FDA’s statutory authority and public health responsibilities to protect the public from unsafe, ineffective, and poor quality drugs. This warning letter summarizes significant violations of Current Good Manufacturing Practice (CGMP) regulations for finished pharmaceuticals. See Title 21 Code of Federal Regulations (CFR), parts 210 and 211 (21 CFR parts 210 and 211). Because your methods, facilities, or controls for manufacturing, processing, packing, or holding do not conform to CGMP, your drug products are adulterated within the meaning of section 501(a)(2)(B) of the Federal Food, Drug, and Cosmetic Act (FD&C Act), 21 U.S.C. 351(a)(2)(B). We reviewed your April 10, 2026, response to our Form FDA 483 in detail and acknowledge receipt of your subsequent correspondence. Violations of the Federal Food, Drug, and Cosmetic Act The following are violations identified during our inspection and review. As a reminder, this is not an all-inclusive list of violations at your facility. 1. Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.42(c)(10)). Inadequate Monitoring of Aseptic Processing Your firm is a manufacturer of sterile prescription and over-the-counter (OTC) (b)(4) drug products produced by aseptic processing. Your environmental monitoring (EM) program and personnel monitoring (PM) was inadequate for classified areas used to produce your sterile (b)(4) drug products. For example, Your program did not sufficiently monitor significant locations (e.g., phones used in the aseptic processing area). EM procedures used to evaluate the aseptic processing environment were insufficient. Media used to support your EM program was observed to be inadequate to support growth of recovered contamination (e.g., cracked media). From 2023 to 2025 you routinely recovered microorganisms from aseptic ISO 5 areas (air, surface, and personnel) that were out-of-limit (OOL). Notably, recovered microbes in the aseptic processing environment included gram-negative rods such as Serratia marcescens and Stenotrophomonas maltophilia , organisms frequently associated with water sources, suggesting a moisture-related contamination issue. You continued (b)(4) drug production without adequate corrective action and preventive action (CAPA) measures to address the persistent microbiological contamination in your ISO 5 environments that posed a risk to product sterility. Manufacturing Design and Unidirectional Airflow Your restricted access barrier system (RABS) line (b)(4) included design deficiencies, including (b)(4) placement that led to ergonomic difficulties (e.g., when (b)(4) transferring sterilized components (b)(4) ). We also noted that line (b)(4) had insufficient barrier protection. In addition, your dynamic smoke studies failed to sufficiently demonstrate unidirectional airflow protection across multiple lines (e.g., during equipment setup and assembly in the filling areas). Basic design deficiencies and excessive recoveries of microorganisms from ISO 5 areas indicate that there is significant inherent contamination risk in your current operation. Your response indicates that your aseptic processing operation is in control based on EM data, sterility test results, and foreign matter complaint rates. Your response also states that you have implemented procedural changes for (b)(4) loading and added mandatory disinfection requirements following recovery of fungi or gram-negative rods from ISO 5 and ISO 7 areas. Overall, your response fails to address how you will ensure adequate aseptic processing operations, proper future assessment of your EM and PM data to support your aseptic processes, and appropriate interpretation and assessment of consumer complaint samples. You also lack a commitment to implement significant design remediations. It should be noted that a sterility test, while a critical quality control for drug products that purport to be sterile, cannot be solely relied upon as justification to release drug product batches. The test is only the last in a series of design provisions and controls intended to protect the consumer from distribution of an unsafe batch. The ISO 5 processing environments are critical because sterile products are exposed during aseptic production and therefore vulnerable to contamination if operations are not well designed and diligently controlled. Your aseptic processes should be designed, and operations executed, to prevent contamination hazards to your sterile product. Flaws in the design of cleanrooms and aseptic processing lines, or improper execution of operations, can promote influx of contamination into the critical processing area. You also failed to adequately investigate microbiological departures from action limits and adverse trends in your water for injection system and environmental and personnel monitoring programs. Your investigations did not evaluate the persistent recovery of microorganisms over time, and you did not perform adequate microorganism identification. Notably, microorganisms recovered from your facility, including Pseudomonas aeruginosa and Aspergillus brasiliensis , were the same genus and species as those recovered from several consumer complaint samples. In response to this letter, provide: An independent, comprehensive review of your EM program to ensure vigilant, timely detection and response to potential product contamination hazards in your manufacturing environment. This assessment should include, but not be limited to, the following: o Establishing appropriate limits o Sampling methods o Sampling locations and frequencies o Trend analysis o Appropriate investigation of deviations and adverse trends o A CAPA plan based on the findings of the assessment A comprehensive, independent assessment of the design and control of your firm’s manufacturing operations, with a detailed and thorough review of all microbiological hazards. A detailed risk assessment addressing the hazards posed by distributing drug products with potentially objectionable contamination. Specify actions you will take in response to the risk assessment, such as customer notifications and product recalls. Complete investigations into all batches with potential objectionable microbiological contamination or an OOL microbiological result (whether or not later invalidated). The investigations should detail your findings regarding the root causes of the contamination. Appropriate microbiological batch release specifications (i.e., total counts, identification of bioburden to detect objectionable microbes) for each of your drug products. All microbiological test methods used to analyze each of your drug products. A summary of results from testing retain samples of all drug product batches within expiry. You should test all appropriate quality attributes including, but not limited to, identity and strength of active ingredients and microbiological quality (total counts and identification of bioburden to detect any objectionable microbes) of each batch. If testing yields an OOL result, indicate the corrective actions you will take, including notifying customers and initiating recalls. Perform a critical evaluation of airflow unidirectionality in your aseptic process, with the assistance of a qualified consultant. Ensure smoke studies are conducted under dynamic conditions, with thorough and complete evaluations of aseptic processing line airflow unidirectionality, including the impact of dynamic interactions and aseptic interventions. These thorough smoke studies should be performed after you remediate your aseptic operation and conducted using proper practices (e.g., neutrally buoyant media) to appropriately visualize airflow. 2. Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Poor Aseptic Technique and Cleanroom Behavior Your operators were observed repeatedly exhibiting poor aseptic practices during filling operations on (b)(4) line (b)(4) , including, but not limited to, the following: Operators reached over exposed (b)(4) bottles while (b)(4) to remove jammed bottles. Operators failed to disinfect (b)(4) (e.g., prior to handling sterile supplies and between use of different (b)(4) ). (b)(4) contacted (b)(4) housing and blocked unidirectional air to open sterilized bottles. (b)(4) contacted sterile portions of aseptic tweezers used to remove jammed bottles, and operators returned those bottles back to the (b)(4) . Bags used to transfer sterile components (bottles) were exposed to the ISO 7 environment prior to manipulation with (b)(4) and contacted internal portions of the (b)(4) housing. Operators used (b)(4) to push trash into a receptacle located below the processing line rather than using equipment dedicated for this purpose. In your response, you commit to updating your personnel training and using (b)(4) aseptic training (b)(4) . Your response does not address the failure of the operations and quality unit to detect and require remediation of these significant aseptic processing hazards. Your response also fails to address how your operations and quality unit will proactively oversee and maintain ongoing control over aseptic conditions, processes, and finished product. Other aseptic line deficiencies were also observed during our inspection. For example, line (b)(4) included aseptic setup hazards related to personnel and line design that could compromise the sterility of product contact equipment. In addition, your process simulations (media fill) were inadequate. Data indicated that the total number of units in your media fills were substantially smaller than your aseptically produced commercial batch sizes and did not sufficiently represent the contamination risks associated with your aseptic processing lines. Significantly, you documented a media fill failure on line 16 in July 2025, in which two units demonstrated fungal ( Neovaginatispora magiferae ) and spore forming gram-positive Geodermatophilus obscurus , contamination, respectively. See FDA’s guidance document Sterile Drug Products Produced by Aseptic Processing - Current Good Manufacturing Practice to help you meet the CGMP requirements when manufacturing sterile drugs using aseptic processing at https://www.fda.gov/media/71026/download. In response to this letter, provide: A comprehensive, independent risk assessment of all contamination hazards with respect to your aseptic processes, equipment, and facilities, including but not limited to, the following: o All human interactions within the ISO 5 area (e.g., risk reduction or elimination of manual interventions wherever possible) o Equipment suitability (e.g., reliability, capability, ergonomics, placement) and sufficient cleanroom space o Air quality in the ISO 5 area and surrounding room including, but not limited to, air volume and flow o Facility layout o Personnel flow and material flow (movement throughout all rooms used to conduct and support sterile operations, and all material transfers) o Specific CAPA recommendations that will comprehensively address the design and control hazards identified in the risk assessment A detailed remediation plan with timelines to address the findings of the contamination hazards risk assessment. Describe specific tangible improvements to be made to aseptic processing operation design and control at your facility and explain how this CAPA plan will robustly remediate your deficient sterile manufacturing operations. Include comprehensive changes to the design of (b)(4) aseptic processing lines and cleanrooms. Also, describe your plans for qualification and validation of your extensively remediated operations. Your systematic plan to assure adherence to appropriate aseptic practices, cleanroom behavior, and written procedures, including but not limited to an independent assessment of the following with accompanying CAPA: o Suitability of actual practices based on extensive retrospective review and prospective observation of aseptic processing operations o Deficiencies in production management oversight, and identification of specific improvements to ensure effective and routine supervisory oversight for all batches o Frequency and depth of quality unit oversight (e.g., audit, ad hoc, daily interactions) of aseptic processing and its support operations o Adequacy of written procedures Ineffective Quality System Significant findings in this letter demonstrate that your firm does not operate an effective quality system in accord with CGMP. In addition to the lack of effective management oversight of your production operations, we found your quality unit is not enabled to exercise proper authority and/or has insufficiently implemented its responsibilities. Executive management should immediately and comprehensively assess your company’s global manufacturing operations to ensure that your systems, processes, and products conform to FDA requirements. Request for a Meeting with FDA After you submit your response to this warning letter, we recommend you reach out to this office to arrange for a teleconference to discuss your corrective actions and preventive actions in detail. Direct your request to Kathryn Hall Kathryn.Hall@fda.hhs.gov and cc: CDER-OC-OMQ-Communications@fda.hhs.gov. Conclusion You are responsible for investigating and determining the root causes of any violations and implementing corrective and preventative measures to ensure future and sustained compliance so that these violations and any others do not occur. Unresolved violations may prevent other Federal agencies from awarding contracts. Failure to address violations may also cause FDA to withhold issuance of Export Certificates. FDA may withhold approval of new applications or supplements listing your firm as a drug manufacturer until any violations are completely addressed and we confirm your compliance with CGMP. We may re-inspect to verify that you have completed corrective actions to address any violations. If you are considering an action that is likely to lead to a disruption in the supply of drugs produced at your facility, FDA requests that you contact CDER’s Drug Shortages Staff immediately, at drugshortages@fda.hhs.gov, so that FDA can work with you on the most effective way to bring your operations into compliance with the law. Contacting the Drug Shortages Staff also allows you to meet any obligations you may have to report discontinuances or interruptions in your drug manufacture under 21 U.S.C. 356c(b). This also allows FDA to consider, as soon as possible, what actions, if any, may be needed to avoid shortages and protect the health of patients who depend on your products. Send your written response to CDER-OC-OMQ-Communications@fda.hhs.gov within fifteen (15) business days of receipt of this letter1. Identify your written response with FEI 1000113778 and ATTN: Compliance Officer Matthew R. Dionne, in the letter or /in the subject line of the email. If you have information that you believe demonstrates that your products are not in violation of the FD&C Act and FDA regulations, include that information for our consideration. FDA posts warning letters to www.FDA.gov. Sincerely, /S/ Francis Godwin Director Office of Manufacturing Quality Office of Compliance Center for Drug Evaluation and Research U.S. Food and Drug Administration __________________________ 1 Under program enhancements for the Generic Drug User Fee Amendments (GDUFA) reauthorization for fiscal years (FYs) 2023-2027, also known as the GDUFA III Commitment Letter, your facility may be eligible for a Post-Warning Letter Meeting to obtain preliminary feedback from FDA on the adequacy and completeness of your corrective action plans. Content current as of: 09/15/2026 Regulated Product(s) Drugs Over-the-Counter Drugs Feedback FDA Archive About FDA Accessibility Visitor Information Website Policies / Privacy No FEAR Act Vulnerability Disclosure Policy FOIA HHS.gov USA.gov Contact FDA Follow FDA on Facebook Follow FDA on X Follow FDA on Instagram Follow FDA on LinkedIn View FDA videos on YouTube Subscribe to FDA RSS feeds Contact Number 1-888-INFO-FDA (1-888-463-6332) Back to Top"
+ },
+ "admin-2026006742": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+     "original": "의약품 ‘스타펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "description": "해당 업체가 의약품 '스타펜캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+     "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+    "items": [
+     "'스타펜캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+     "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+     "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+     "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+  },
+  "source_text": "의약품 ‘스타펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)\n처분명: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 스타펜캡슐\n적용법령: ○ 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조, 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조\n○ 구 ｢약사법｣ 제76조(법률 제20328호로 개정되기 전의 것), 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목\n최종처분일자: 20260914\n공개종료일자: 20270327\n업체주소: 경기도 용인시 처인구\n업체번호: 19690009\n사업자등록번호: 1358102638\n품목기준코드: 201902030"
+ },
+ "admin-2026006744": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+     "original": "의약품 ‘리로우펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "description": "해당 업체가 의약품 '리로우펜캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+     "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+    "items": [
+     "'리로우펜캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+     "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+     "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+     "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+  },
+  "source_text": "의약품 ‘리로우펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)\n처분명: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 리로우펜캡슐\n적용법령: ○ 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조, 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조\n○ 구 ｢약사법｣ 제76조(법률 제20328호로 개정되기 전의 것), 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목\n최종처분일자: 20260914\n공개종료일자: 20270327\n업체주소: 경기도 안양시 동안구\n업체번호: 19650018\n사업자등록번호: 1078825483\n품목기준코드: 201902027"
+ },
+ "admin-2026006746": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+     "original": "의약품 ‘업타바캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "description": "해당 업체가 의약품 '업타바캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+     "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+    "items": [
+     "'업타바캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+     "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+     "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+     "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+  },
+  "source_text": "의약품 ‘업타바캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)\n처분명: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 업타바캡슐\n적용법령: ○ 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조, 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조\n○ 구 ｢약사법｣ 제76조(법률 제20328호로 개정되기 전의 것), 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목\n최종처분일자: 20260914\n공개종료일자: 20270327\n업체주소: 경기도 화성시\n업체번호: 19580008\n사업자등록번호: 2078136336\n품목기준코드: 201902029"
+ },
+ "admin-2026006796": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+     "original": "의약품 ‘페바로에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "description": "해당 업체가 의약품 '페바로에프캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+     "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+    "items": [
+     "'페바로에프캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+     "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+     "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+     "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+  },
+  "source_text": "의약품 ‘페바로에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)\n처분명: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 페바로에프캡슐\n적용법령: ○ 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조, 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조\n○ 구 ｢약사법｣ 제76조(법률 제20328호로 개정되기 전의 것), 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목\n최종처분일자: 20260914\n공개종료일자: 20270327\n업체주소: 경기도 화성시\n업체번호: 19580004\n사업자등록번호: 1188104188\n품목기준코드: 201902026"
+ },
+ "admin-2026006797": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+     "original": "의약품 ‘뉴스타틴듀오캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "description": "해당 업체가 의약품 '뉴스타틴듀오캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+     "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+    "items": [
+     "'뉴스타틴듀오캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+     "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+     "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+     "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+  },
+  "source_text": "의약품 ‘뉴스타틴듀오캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)\n처분명: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 뉴스타틴듀오캡슐\n적용법령: ○ 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조, 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조\n○ 구 ｢약사법｣ 제76조(법률 제20328호로 개정되기 전의 것), 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목\n최종처분일자: 20260914\n공개종료일자: 20270327\n업체주소: 경기도 화성시\n업체번호: 19560011\n사업자등록번호: 1248531621\n품목기준코드: 201902024"
+ },
+ "admin-2026006798": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+     "original": "의약품 ‘피에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "description": "해당 업체가 의약품 '피에프캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+     "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+    "items": [
+     "'피에프캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+     "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+     "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+     "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+  },
+  "source_text": "의약품 ‘피에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)\n처분명: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 피에프캡슐\n적용법령: ○ 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조, 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조\n○ 구 ｢약사법｣ 제76조(법률 제20328호로 개정되기 전의 것), 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목\n최종처분일자: 20260914\n공개종료일자: 20270327\n업체주소: 서울특별시 양천구\n업체번호: 19560001\n사업자등록번호: 2018644250\n품목기준코드: 201902031"
+ },
+ "admin-2026006748": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」제31조제10항(신약 등)",
+     "original": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반\n - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나,\n - 동 업체는 ‘피타론에프캡슐’의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음",
+     "description": "의약품 제조업자가 품목허가를 받은 의약품이 「약사법」제31조제10항(신약 등)에 해당하는 경우 그 의약품은 품목허가를 받은 날로부터 4년에서 6년이 지난 날로부터 3개월 이내에 재심사를 받아야 하나, 해당 업체는 '피타론에프캡슐'의 재심사 시 필요한 자료의 일부를 제출하지 않았다는 것이 위반사실이다. 미제출된 자료의 내용은 시판 후 조사대상자 수 부족으로 기재되어 있다.",
+     "risk": "재심사 기산점이 허가일로부터 4년에서 6년이 지난 날이고 이행 기간이 3개월로 좁아, 해당 시점을 놓치면 자료를 보완할 여지가 사실상 없다. 시판 후 조사대상자 수가 부족한 상태로 기간이 종료되면 그 품목의 시판 후 안전성 근거가 미완성으로 남고, 판매업무정지로 해당 품목의 공급이 중단된다."
+    }
+   ],
+   "disposition_basis": "처분의 근거는 재심사 의무를 정한 「구약사법」제32조(법률 제20139호, 2024.1.24.) 및 「구의약품 등의 안전에 관한 규칙」제23조(총리령 제20003호, 2024.12.30.)이고, 처분 기준은 「구약사법」제76조(법률 제20139호, 2024.1.24.) 및 「구의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅱ.개별기준 제8호나목(총리령 제20003호, 2024.12.30.)이다. 「약사법」 부칙<법률 제20328호, 2024.2.20.> 제4조에 따라 재심사 기간을 부여받은 품목은 개정규정에도 불구하고 종전의 규정을 따른다는 경과규정이 함께 적시되어 있어, 이 사안에서는 개정 전 규정이 판단 기준이 되었다. 처분 대상은 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.) 한 품목이다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당 품목 판매업무정지 3개월)",
+    "items": [
+     "피타론에프캡슐의 재심사 자료 중 미제출 항목과 시판 후 조사대상자 수 부족의 규모를 확인할 것.",
+     "허가일을 기준으로 재심사 기산점(허가일로부터 4년에서 6년이 지난 날)과 이행 기한(그로부터 3개월)을 품목대장에서 산출·관리하는 체계를 정비할 것.",
+     "재심사 기간을 부여받은 다른 품목에 대하여 종전 규정이 적용되는지 여부를 확인하고 해당 품목 목록을 정리할 것.",
+     "판매업무정지 기간 중 해당 품목의 공급 중단에 따른 거래처 통보 및 재고 처리 절차를 정리할 것."
+    ]
+   },
+   "administrative_risks": "판매업무정지 기간 동안 해당 품목의 공급이 중단되며, 행정처분 사실은 공개종료일자 20270326 까지 공개된다. 경과규정에 따라 종전 규정이 적용되는 품목이 다수 남아 있는 경우 같은 유형의 위반이 반복될 수 있고, 기산점 산정 착오는 품목 단위로 독립하여 발생하므로 한 품목의 시정만으로는 재발이 차단되지 않는다."
+  },
+  "source_text": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반\n - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나,\n - 동 업체는 ‘피타론에프캡슐’의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음\n처분명: ○ 해당 품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.)\n  * (대상품목) 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.)\n적용법령: ○「구약사법」제32조(법률 제20139호, 2024.1.24.) 및「구의약품 등의 안전에 관한 규칙」제23조(총리령 제20003호, 2024.12.30.)\n ○「구약사법」제76조(법률 제20139호, 2024.1.24.) 및「구의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅱ.개별기준 제8호나목(총리령 제20003호, 2024.12.30.)\n  ※ 「약사법」 부칙<법률 제20328호, 2024.2.20.> 제4조에 따라 재심사 기간을 부여받은 품목은 개정규정에도 불구하고 종전의 규정을 따름\n최종처분일자: 20260914\n공개종료일자: 20270326\n업체주소: 서울특별시 용산구\n업체번호: 19620002\n사업자등록번호: 3018508241"
+ },
+ "admin-2026006747": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」제62조 및 제66조",
+     "original": "○ 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험)\n -「약사법」제62조 및 제66조에 따라, 누구든지 다음 각 호의 어느 하나에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘2080진지발라스가글스트롱’ 제품의 유통 의약외품 수거·검사 결과, 유효성분(염화세틸피리디늄) 함량이 기준치보다 10%이상 과부족한 제품을 제조하여 판매한 사실이 있음\n  * (규격) 표기량(0.05 g/ 100g)에 대하여 90.0% 이상 / (결과) 69.2 %",
+     "description": "「약사법」제62조 및 제66조에 따라 누구든지 해당 각 호에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나, 해당 업체는 '2080진지발라스가글스트롱' 제품의 유통 의약외품 수거·검사 결과 유효성분(염화세틸피리디늄) 함량이 기준치보다 10% 이상 과부족한 제품을 제조하여 판매한 사실이 있다는 것이 위반사실이다. 규격은 표기량(0.05 g/ 100g)에 대하여 90.0% 이상이며, 검사 결과는 69.2 % 로 확인되었다.",
+     "risk": "유효성분 함량이 표기량의 90.0% 이상이어야 하는 규격에 대하여 69.2 % 로 확인된 것은 하한 규격을 크게 벗어난 결과로, 배치 간 편차 수준이 아니라 함량 관리 체계가 하한을 담보하지 못했을 가능성을 가리킨다. 구중청량제의 유효성분은 표시된 효능의 근거가 되므로 함량 미달은 표시 효능을 뒷받침하지 못하는 상태가 되고, 해당 제품이 패키지 품목으로 묶여 있어 처분 범위가 13개 품목 전체로 확대되었다."
+    }
+   ],
+   "disposition_basis": "처분의 근거 법령은 「약사법」제62조 및 제66조이며, 처분 기준은 「약사법」제76조 및 의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅰ.일반기준 제9호 및 Ⅱ. 개별기준 제39호아목2) 이다. 처분은 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.)이며, 대상품목은 2080키즈가글딸기맛 등 13개 품목으로, 상기 제품이 패키지 품목이므로 패키지 품목 전체에 대하여 처분되었다. 위반이 유통 단계의 수거·검사에서 확인되었다는 점에서 출하 시점의 자체 시험만으로는 걸러지지 않은 사안이다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2027. 9. 27. (해당 품목 제조업무정지 1년)",
+    "items": [
+     "유효성분(염화세틸피리디늄) 함량이 표기량(0.05 g/ 100g) 대비 69.2 % 로 확인된 원인을 제조·보관·시험 단계별로 조사할 것.",
+     "함량의 하한 규격(90.0% 이상)을 담보하기 위한 공정 중 관리 기준과 출하시험 규격의 정합성을 재검토할 것.",
+     "패키지 품목으로 묶인 13개 대상품목 전체에 대하여 동일 원인의 영향 여부를 평가할 것.",
+     "유통 중 수거·검사에서 부적합이 확인될 경우의 내부 통보·회수 판단 절차를 정비할 것."
+    ]
+   },
+   "administrative_risks": "제조업무정지 1년은 이번 사안에서 확인된 처분 가운데 가장 긴 기간으로, 대상이 개별 품목이 아니라 패키지 품목 전체 13개 품목이어서 공급 영향이 품목 수만큼 확대된다. 행정처분 사실은 공개종료일자 20271226 까지 공개된다. 위반이 수거·검사라는 사후 확인 경로에서 드러난 만큼, 동일 라인에서 제조되는 다른 의약외품에 대해서도 같은 방식의 확인이 이어질 수 있다."
+  },
+  "source_text": "○ 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험)\n -「약사법」제62조 및 제66조에 따라, 누구든지 다음 각 호의 어느 하나에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘2080진지발라스가글스트롱’ 제품의 유통 의약외품 수거·검사 결과, 유효성분(염화세틸피리디늄) 함량이 기준치보다 10%이상 과부족한 제품을 제조하여 판매한 사실이 있음\n  * (규격) 표기량(0.05 g/ 100g)에 대하여 90.0% 이상 / (결과) 69.2 %\n처분명: ○ 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.) \n * (대상품목) 1. 2080키즈가글딸기맛, 2. 2080키즈가글바나나맛, 3. 2080키즈오가글딸기맛, 4. 2080키즈오가글바나나맛, 5. 2080퓨어가글, 6. 2080애플민트향가글, 7. 2080퓨어가글클린민트향, 8. 스몰란드키즈가글딸기향, 9. 스몰란드키즈가글바나나향, 10. 오라텍트마우스워시바이랩신, 11. 2080진지발리스가글스트롱, 12. 2080진지발리스가글마일드, 13. 바이컬러치어리마우스워시(허가번호: 제5042호, 허가일자: 2015.4.9.)\n ※ 상기 제품은 패키지 품목이므로, 패키지 품목 전체에 대하여 처분\n적용법령: ○「약사법」제62조 및 제66조\n○「약사법」제76조 및 의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅰ.일반기준 제9호 및 Ⅱ. 개별기준 제39호아목2)\n최종처분일자: 20260914\n공개종료일자: 20271226\n업체주소: 충청남도 청양군\n업체번호: 19930031\n사업자등록번호: 3078502513"
+ },
+ "admin-2026006740": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목",
+     "original": "- 의약품 ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나,\n  제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있음",
+     "description": "해당 업체는 의약품 '코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)'의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나, 제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있다는 것이 위반사실이다. 계획 수립 자체는 이루어졌고 특정 제조번호에 대한 시험 실행이 누락된 형태이다.",
+     "risk": "시판 후 안정성 시험은 유효기간 전 구간에 걸쳐 품질이 유지되는지를 확인하는 근거이므로, 해당 제조번호에 대해서는 그 근거가 존재하지 않는 상태가 된다. 생물학적제제인 재조합사람에리스로포이에틴 제제는 보관 조건에 따른 역가 변화가 품질에 직접 연결되는 제형이어서, 시험 누락은 해당 배치의 유효기간 내 품질을 뒷받침할 자료가 없다는 의미가 된다. 수출용 품목이라도 처분 대상에서 제외되지 않았다."
+    }
+   ],
+   "disposition_basis": "처분의 근거 법령은 「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목이며, 처분 기준은 「약사법」제76조 및 「의약품 등의 안전에 관한 규칙」제95조 관련 [별표 8] 행정처분의 기준 Ⅰ. 일반기준 제6호, Ⅱ. 개별기준 제25호 다목 3) 이다. 처분은 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.)이며, 최종처분일자는 20260825 이다. 판매가 아닌 제조업무를 정지한 처분이라는 점에서, 위반이 출하 이후의 정보 제공이 아니라 제조·품질관리 단계의 의무 미이행으로 평가되었음을 알 수 있다.",
+   "required_remediation": {
+    "deadline": "처분 효력 기간: 2026. 9. 14. ~ 2026. 10. 13. (해당 품목 제조업무정지 1개월)",
+    "items": [
+     "제조번호 24209001에 대한 시판 후 안정성 시험이 실시되지 않은 경위를 계획 수립 시점부터 확인할 것.",
+     "2024년 생산분 전체에 대하여 시판 후 안정성 시험 계획과 실제 착수·진행 기록을 제조번호 단위로 대조할 것.",
+     "수출용 품목을 포함한 시판 후 안정성 시험 대상 선정 기준과 연간 계획의 이행 점검 주기를 정비할 것.",
+     "시험 누락이 확인된 제조번호의 유통 현황과 품질 평가 가능 여부를 확인할 것."
+    ]
+   },
+   "administrative_risks": "제조업무정지 기간 동안 해당 품목의 제조가 중단되며, 행정처분 사실은 공개종료일자 20270113 까지 공개된다. 시판 후 안정성 시험은 연간 계획 단위로 운영되므로 같은 계획 아래 있는 다른 품목·제조번호에서도 동일한 누락이 존재할 수 있고, 수출용 품목이 처분 대상이 된 이상 수출 상대국 규제기관의 확인 요청으로 이어질 여지도 있다."
+  },
+  "source_text": "- 의약품 ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나,\n  제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있음\n처분명: ○ 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.)\n  - 해당 품목: ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’\n적용법령: ○「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목\n○「약사법」제76조 및 「의약품 등의 안전에 관한 규칙」제95조 관련 [별표 8] 행정처분의 기준 Ⅰ. 일반기준 제6호, Ⅱ. 개별기준 제25호 다목 3)\n최종처분일자: 20260825\n공개종료일자: 20270113\n업체주소: 서울특별시 영등포구\n업체번호: 19900018\n사업자등록번호: 2058140116\n품목기준코드: 201502765"
+ },
+ "admin-2026006815": {
+  "deep_analysis": {
+   "key_violations": [
+    {
+     "citation": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조",
+     "original": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음",
+     "description": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고, 해당 업체는 건강보험심사평가원 의약품관리종합정보센터에 3개 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있다는 것이 위반사실이다.",
+     "risk": "공급내역 보고는 의약품의 유통 경로를 파악하기 위한 정보 제공 의무로, 보고가 누락되면 해당 품목의 유통량이 공적 정보 체계에서 확인되지 않는 구간이 생긴다. 일련번호를 부착하지 않는 품목은 자동 집계 경로가 없어 보고가 수작업에 의존하므로 누락이 반복되기 쉽고, 위반이 품목 단위 처분으로 연결되어 세 품목이 동시에 대상이 되었다."
+    }
+   ],
+   "disposition_basis": "위반법령은 ｢약사법｣ 제47조의3 및 ｢약사법 시행규칙｣ 제45조이며, 처분기준은 ｢약사법｣제76조 및 의약품 등의 안전에 관한 규칙 [별표 8] 행정처분 기준 Ⅰ. 일반기준 제12호 하목, Ⅱ. 개별기준 제36호 이다. 과징금은 ｢약사법｣ 제81조, ｢약사법 시행령｣ 제33조 [별표 2] '과징금 산정기준' 및 ｢식품의약품안전처 과징금 부과처분 기준 등에 관한 규정(훈령)｣ 제3조제2항 관련 [별표] 과징금 부과대상의 세부 기준 1. 공통 기준 라목, 2. 개별 기준 라목에 따라 산정되었다. 그 결과 해당품목 판매업무정지 10일 처분을 갈음하여 과징금 750,000원이 부과되었다.",
+   "required_remediation": {
+    "deadline": "최종처분일자 20260915 (해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과)",
+    "items": [
+     "뉴흑과립(약용탄), 뉴흑산(약용탄), 뉴흑캡슐200밀리그람(약용탄) 3개 품목의 공급내역 보고가 기한 내 이루어지지 않은 경위를 확인할 것.",
+     "일련번호를 부착하지 아니하는 전문의약품 목록을 작성하고 품목별 보고 책임자를 지정할 것.",
+     "다음 달 말일이라는 보고 기한을 월별로 점검하는 절차를 수립하고 보고 이력을 보존할 것.",
+     "의약품관리종합정보센터 보고 내역과 자사 출하 기록을 주기적으로 대조할 것."
+    ]
+   },
+   "administrative_risks": "판매업무정지가 과징금으로 갈음되어 공급 중단은 발생하지 않았으나, 행정처분 사실은 공개종료일자 20270105 까지 공개된다. 공급내역 보고는 매월 반복되는 의무여서 관리 체계가 정비되지 않으면 동일 위반이 월 단위로 재발할 수 있고, 반복 위반은 일반기준에 따라 가중될 여지가 있다."
+  },
+  "source_text": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음\n처분명: 해당품목* 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과\n     * 뉴흑과립(약용탄), 뉴흑산(약용탄), 뉴흑캡슐200밀리그람(약용탄)\n적용법령: ◦ 위반법령: ｢약사법｣ 제47조의3 및 ｢약사법 시행규칙｣ 제45조\n\n◦ 처분기준\n   - ｢약사법｣제76조 및｢의약품 등의 ｣의약품 등의 안전에 관한 규칙 [별표 8] 행정처분 기준Ⅰ. 일반기준 제12호 하목, Ⅱ. 개별기준 제36호\n\n   - (과징금) ｢약사법｣ 제81조, ｢약사법 시행령｣ 제33조 [별표 2] ‘과징금 산정기준’, ｢식품의약품안전처 과징금 부과처분 기준 등에 관한 규정(훈령)｣ 제3조제2항 관련 [별표] 과징금 부과대상의 세부 기준 1. 공통 기준 라목, 2. 개별 기준 라목\n최종처분일자: 20260915\n공개종료일자: 20270105\n업체주소: 경상북도 문경시\n업체번호: 20020007\n사업자등록번호: 5118109664\n품목기준코드: 202302822,202302823,202502551"
+ },
+ "who-whopir-9b3a402e7fc3": {
+  "ncr_ko": {
+   "outcome_ko": "실사한 구역, 면담한 인원 및 검토한 문서를 근거로, 그리고 실사보고서(Inspection Report)에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 인도 Goa- 403115 Kundaim, Plot No.203-213, Kundaim Industrial Estate 에 소재한 Zydus Lifesciences Limited 는 WHO 완제의약품 제조 및 품질관리 기준(WHO Good Manufacturing Practices for Finished Pharmaceutical Products) 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판단되었다. 실사 중 관찰된 결함들은 전체 보고서에 기재된 바와 같이 WHOPIR 공개 전에 Zydus Lifesciences Limited 에 의해 만족스러운 수준으로 조치되었다. 본 WHOPIR 은 이 기간 중 실시되는 실사의 결과가 긍정적인 것을 조건으로 3년간 유효하다.",
+   "s1_title_ko": "의약품 품질시스템",
+   "s1_ko": "일반 사항. 품질보증 시스템은 완제의약품이 현행 품질기준에 적합하도록 보증하기 위하여 설계되었으며, 모든 주요 인원의 책임이 명확히 규정되어 있었다. QA 및 품질관리(Quality Control) 기능은 독립적으로 운영되어 Head Technical Services 에 보고하였고 Central Quality 의 감독을 유지하였다. 제조소의 품질 거버넌스는 제정된 SOP 를 통해 규정되어 있었다. …",
+   "s2_title_ko": "의약품에 대한 제조 및 품질관리 기준(GMP)",
+   "s2_ko": "해당 제조소는 의약품이 규제 요건 및 품목허가에 따라 일관되게 제조·관리되도록 보증하기 위한 GMP 적합 품질경영시스템을 유지하고 있었다. 이 GMP 시스템은 제조 위험을 최소화하고 제품의 품질, 안전성 및 유효성을 보증하는 것을 목적으로 하였다. 제조 공정은 명확히 규정되고 밸리데이션되었으며, 정해진 규격에 대한 적합성을 확인하기 위하여 체계적으로 검토되었다. …",
+   "s3_title_ko": "위생 및 청결 관리",
+   "s3_ko": "위생 및 청결 관리 관행은 의약품 제조의 모든 측면에서 유지되고 있었다. 이러한 관행은 OSD 구역의 청소, 소독, 훈증 및 청소 보조기구 취급에 관한 SOP 에 따라 인원, 건물, 장비, 생산 자재, 용기 및 세척제를 포괄하였다. 해당 SOP 에는 승인된 소독제 목록이 포함되어 있었고 해당하는 유효성 시험이 수행되어 있었다. 해당 문서를 선정하여 검토하였다.",
+   "s4_title_ko": "적격성평가 및 밸리데이션",
+   "s4_ko": "밸리데이션 마스터 플랜. 해당 제조소는 OSD Plant 를 포함한 제조 시설에 대한 밸리데이션 마스터 플랜(VMP)과 Formulation 및 Anticancer Plant 에 대한 컴퓨터 시스템 밸리데이션 마스터 플랜(CSVMP)을 수립하고 있었다. VMP 는 제품 품질에 영향을 줄 수 있는 시설, 유틸리티, 장비, 제품, 공정, 전산화 시스템 및 그 밖의 GMP 지원 활동에 대한 전반적인 밸리데이션 및 적격성평가 전략을 규정하였다. …",
+   "s5_title_ko": "품질 불만",
+   "s5_ko": "결함 가능성이 있는 제품과 관련된 불만은 2026년 5월 19일자로 시행된 해당 SOP 에 따라 검토되었고, 필요한 경우 시정조치 및 예방조치가 실행되었다. QA 책임자는 적절한 자격을 갖춘 인원의 지원을 받아 불만 처리 및 의사결정을 담당하였다. 해당 SOP 는 제품 회수 필요성의 평가를 포함하여 불만 관리에 필요한 조치를 기술하고 있었다. 제품 결함의 존재 여부를 판단하기 위한 조사가 수행되었고, 모든 불만은 문서화되어 품질관리 부서(Quality Control Unit)에 의해 검토되었다. …",
+   "s6_title_ko": "제품 회수",
+   "s6_ko": "결함이 있는 것으로 알려졌거나 의심되는 제품을 신속하고 효과적으로 회수할 수 있도록 보증하기 위한 시스템이 2026년 5월 2일자로 시행된 해당 SOP 에 따라 갖추어져 있었다. 회수 목록과 무작위로 선정된 문서를 검토하고 논의하였다. 모의 회수(Mock recall)는 직전 2년 동안 실제 제품 회수가 발생하지 않은 경우 2년마다 수행하도록 요구되고 있었다.",
+   "s7_title_ko": "위탁 제조·시험 및 그 밖의 활동",
+   "s7_ko": "해당 회사는 품질관리 서비스를 위탁하고 있었다. 다만 제조나 그 밖의 GMP 활동은 위탁하지 않았다. 위탁자와 수탁자 사이에 서면 계약이 체결되어 있었고, 위탁 활동, 의사소통 및 기술적 합의사항을 포함하여 각 당사자의 책임이 명확히 규정되어 있었다. 해당 계약은 위탁자가 수탁자 또는 상호 합의된 하수급자의 시설과 활동을 감사할 수 있도록 허용하고 있었다.",
+   "s8_title_ko": "자체점검, 품질감사 및 공급자 감사·승인",
+   "s8_ko": "자체점검은 2026년 2월 25일자로 시행된 해당 SOP 에 따라 수행되었다. 정기 자체점검은 6개월마다 수행되었으며, 제품 회수, 중대한 시장 불만, 중대한 일탈 또는 부적합, 품질지표 검토, 규제기관 실사와 같은 특정 사건에 대응하여 추가 점검을 개시할 수 있었다. 점검은 GMP 요건의 준수를 검증하기 위하여 독립적이고 객관적으로 활동하는 자격 있는 감사팀에 의해 수행되었다. …",
+   "s9_title_ko": "인원",
+   "s9_ko": "해당 제조소는 품질경영, 생산, 품질관리, 보관 및 배송 활동을 포괄하는 규정된 조직 체계를 유지하고 있었다. 주요 기능, 보고 관계 및 책임을 기술한 조직도가 비치되어 있었고 실사 중에 논의되었다. 조직 체계, 인력 수준 및 자격 부여 체계는 GMP 요건의 준수를 보증하면서 의약품의 제조, 시험, 보관 및 배송을 뒷받침하기에 적절한 것으로 판단되었다. …",
+   "s10_title_ko": "교육훈련",
+   "s10_ko": "인원 교육 관리와 직원 자격 부여는 교육훈련 활동의 식별, 계획, 실시, 문서화 및 평가에 관한 요건을 규정한 SOP 에 의해 관리되었다. 교육훈련 프로그램은 직원이 부여된 책임에 대한 자격을 유지하고 재직 기간 전반에 걸쳐 역량이 유지되도록 보증하기 위하여 설계되었다. 교육 요구사항은 교육필요성 식별(Training Need Identification, TNI) 절차를 통해 설정되었다. …",
+   "s11_title_ko": "개인 위생",
+   "s11_ko": "2026년 6월 25일자로 시행된, OSD-II 의 1차 작업복 교체 및 인원 위생을 수반하는 퇴출 절차에 관한 SOP 를 검토하였다. 손 세척 및 소독, 갱의 및 탈의에 관한 그림 지침이 주요 위치에 게시되어 있었다. 인원은 2026년 3월 25일자로 시행된 해당 SOP 에 따라 채용 전과 재직 중에 건강검진을 받았으며, 여기에는 육안검사 업무를 수행하는 직원에 대한 정기 시력검사가 포함되었다. …",
+   "s12_title_ko": "시설",
+   "s12_ko": "구역 등급 배치도를 포함한 제조소 배치도가 제공되어 실사 중에 논의되었다. 실사 범위는 현재 모든 경구고형제(Oral Solid Dosage) 제조 활동이 수행되는 OSD Block II 로 한정되었다. OSD Block I 은 더 이상 가동되지 않고 유지보수 및 증설 활동을 앞두고 가동이 중단되어 있었으므로 실사 범위에 포함되지 않았다. OSD Block I, OSD Block II 및 관련 제조·포장 라인을 보여주는 배치도면이 비치되어 있었고 검토되었다. …",
+   "s13_title_ko": "장비",
+   "s13_ko": "공정 장비의 운전 및 적격성평가. 공정 장비의 운전은 운전 매뉴얼에 의해 관리되었고 활동은 소프트웨어 시스템에 기록되었다. 다음의 운전 매뉴얼을 논의하였다: − 정제 코팅기의 운전 − 충전기의 운전. 칭량, 제조, 포장, 시험 및 그 밖의 공정에 사용되는 장비와 기기는 운영에 사용하기 전에 적격성평가를 받았다. …",
+   "s14_title_ko": "자재",
+   "s14_ko": "입고되는 원자재의 수령, 취급 및 보관에 관한 문서화된 절차가 해당 절차에 따라 비치되어 있었다. 자동화 창고는 원자재, 1차 포장재, 2차 포장재 및 완제품에 공통으로 사용되었다. 입고 물량은 수령 시 육안으로 검사되었다. 손상되었거나 표시가 부적절한 물품은 격리되어, 폐기 또는 반품에 관한 추가 지시를 받기 위하여 품질보증 부서로 회부되었다. …",
+   "s15_title_ko": "문서화",
+   "s15_ko": "문서 관리. 문서화 시스템은 문서의 작성, 검토, 승인, 발행, 개정, 회수, 보존 및 보관에 관한 승인된 절차를 통해 관리되었다. 문서는 전자, 종이 또는 혼합 형태로 취급되었다. 절차서와 서식의 현행 승인본이 사용 시점에 비치되어 있었고, 폐기된 문서가 의도치 않게 사용되는 것이 방지되었다. 검토한 제조 및 포장 기록서는 작업을 재구성하고 승인된 지시에 대한 적합성을 입증하기에 충분히 상세한 것으로 확인되었다. …",
+   "s16_title_ko": "제조에서의 제조 및 품질관리 기준(GMP)",
+   "s16_ko": "제조는 승인된 제조기록서(Batch Manufacturing Records, BMR)에 따라 수행되었고, 기록은 수행된 활동과 동시에 작성되었다. 수불 대조(Reconciliation)는 제조의 중요 단계와 포장 작업의 완료 시점에 수행되었다. 생산 부서는 SOP 및 마스터 BMR 의 작성과 검토, 승인된 제조기록서 및 SOP 에 따른 제조·포장, 실시간 문서의 유지, 인원 교육, 공정 중 관리의 수행, 제조기록서 검토, 일탈 보고 및 절차의 실행을 담당하였다. …",
+   "s17_title_ko": "품질관리에서의 우수기준",
+   "s17_ko": "해당 제조소는 전용 물리화학 시험실과 미생물 시험실, 보관 검체 구역 및 안정성 구역을 갖추고 있었다. 품질보증과 품질관리 기능은 독립적이었고, 그 책임과 거버넌스는 제조소 품질 거버넌스 SOP 에 규정되어 있었다. QC 시험실은 승인된 규격 및 시험방법에 대하여 원자재, 포장재, 공정 중 검체 및 완제품의 물리적·화학적·미생물학적 항목에 대한 시료채취와 시험을 담당하였다. …"
+  }
+ },
+ "who-whopir-c4e851557551": {
+  "ncr_ko": {
+   "outcome_ko": "– 결론 – 실사 결과. 실사한 구역, 면담한 인원 및 검토한 문서를 근거로, 그리고 이집트 Giza, Haram, Elmansoureya Street 에 소재한 Egyptian Drug Authority - Central Administration for Drug Control 의 실사보고서(Inspection Report)에 기재된 관찰사항을 포함한 실사 결과를 고려할 때, 해당 기관은 WHO 의약품 품질관리시험실 우수기준(WHO Good Practices for Pharmaceutical Quality Control Laboratories) 가이드라인을 수용 가능한 수준으로 준수하며 운영되고 있는 것으로 판단되었다. 실사 중 관찰된 결함들은 전체 보고서에 기재된 바와 같이 WHOPIR 공개 전에 해당 시험실에 의해 만족스러운 수준으로 조치되었다. 본 WHOPIR 은 이 기간 중 실시되는 실사의 결과가 긍정적인 것을 조건으로 3년간 유효하다.",
+   "s1_title_ko": "조직 및 관리",
+   "s1_ko": "개회 회의에서 시험실의 연혁과 활동을 상세히 설명하는 발표가 제공되었다. 1.1. 구조적 및 일반 요건. 해당 시험실은 Egyptian Drug Authority (EDA) 로부터 시험을 수행하고 시험성적서를 발행할 수 있도록 법적으로 인가받았다. 시험실은 수행된 모든 결과와 활동의 타당성에 대하여 책임을 지고 있었다. 최고경영진은 적절한 방침, 교육훈련 및 기술 기반을 제공함으로써 데이터 거버넌스 체계를 포함한 효과적인 품질경영시스템의 수립, 실행 및 유지를 보증하였다. …",
+   "s2_title_ko": "기획 및 전략 관리",
+   "s2_ko": "2.1. 외부에서 제공되는 서비스 및 물품. EDA 가 필요로 하는 위탁 서비스 또는 물품에 대한 요구사항을 규정·검토·승인하는 체계는, 서비스 제공자가 요구사항을 준수하도록 보증하기 위한 선정, 성과 모니터링, 평가 및 재평가 기준을 포함하여, 2025년 4월 23일에 최종 발행된 현행판 SOP Outsourcing and Technical Evaluation of EDA Provided Products/Services 에 기술되어 있었다. 정부 포털에 시험실이 선정하여 이용할 수 있는 사전 승인된 서비스 제공자가 모두 등재되어 있었다. …",
+   "s3_title_ko": "자원",
+   "s3_ko": "3.1. 인원. 부여된 직무에 필요한 학력, 교육훈련, 기술적 지식 및 경험을 갖춘 인원이 정규 또는 계약 형태로 고용되어 있었다. 각 직무에 대한 역량 요건이 문서화되어 있었고, 인원의 역량을 선발·평가하기 위한 절차와 기준이 품질경영시스템(QMS)에 따라 수립되어 있었다. 교육훈련 중인 직원은 감독을 받았고 수료 시 평가를 받았으며, 평가 내용은 모두 문서화되었다. …",
+   "s4_title_ko": "기술 활동",
+   "s4_ko": "4.1. 시료채취. 해당 시험실은 시료채취를 담당하지 않았다. 검체는 당국의 검사관이 약국, 유통업체 또는 제조소에서 수거하여 Agouza 소재 시험실로 전달하였다. Agouza 시험실은 검체를 품목허가 검체 또는 시판 후 검체로 구분하여, 규격 및 요구되는 시험 등 관련 정보를 포함해 LIMS 에 등록하였다. 각 검체에는 고유 식별번호가 부여되었다. 4.2. …",
+   "s5_title_ko": "안전 규정",
+   "s5_ko": "첫째 날에 시설 순회를 실시하였다. 식별된 위험을 반영한 일반 및 개별 안전 지침을 포함하는 문서화된 시험실 안전 방침이 비치되어 있었고 직원에 의해 적용되고 있었다. 지정된 직원 1인이 해당 방침의 감독과 준수 확인을 담당하였다. 화학물질, 용매 및 그 밖의 관련 물질의 안전한 폐기를 보증하기 위하여 현지 법령에 적합한 폐기물 관리 체계가 갖추어져 있었다. 안전 관련 주제에 대한 교육훈련이 QMS 에 규정된 정해진 주기로 수행되었다. …"
+  }
+ }
+}

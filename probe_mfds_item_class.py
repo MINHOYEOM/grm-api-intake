@@ -29,7 +29,7 @@ import json
 import os
 import sys
 
-from grm_common import http_get_json, mask_service_key
+from grm_common import http_get_json, kr_egress_get, mask_service_key
 
 # 식품의약품안전처_의약품 제품 허가정보 (data.go.kr 15095677, 제공기관 1471000).
 # 기존 MFDS 수집기들과 같은 제공기관·같은 서비스키를 쓴다(신규 키 발급 불필요).
@@ -64,7 +64,20 @@ def _probe_one(op: str, item_seq: str, service_key: str) -> dict:
     try:
         data = http_get_json(url, params=params, timeout=30, retries=1)
     except Exception as e:                                    # noqa: BLE001
-        return {"op": op, "error": f"{type(e).__name__}: {mask_service_key(str(e))}"}
+        # ★HTTP 상태만으로는 다음 행동이 안 정해진다. data.go.kr 은 **본문에** 사유를 적는다
+        #   (SERVICE_ACCESS_DENIED_ERROR = 이 API 에 활용신청 안 됨 /
+        #    LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR = 트래픽 초과 /
+        #    HTTP ROUTING ERROR = 엔드포인트 오류). 403 을 보고 '미등록'이라 **추측**하면
+        #   이 조사에서 이미 두 번 한 실수를 세 번째로 반복하는 것이다 — 서버에 물어본다.
+        body = ""
+        try:
+            r = kr_egress_get(url, params=params, timeout=20)
+            body = (r.text or "")[:500]
+        except Exception:                                     # noqa: BLE001
+            body = "(본문 재조회 실패)"
+        return {"op": op,
+                "error": f"{type(e).__name__}: {mask_service_key(str(e))}",
+                "body": mask_service_key(body)}
     body = ((data.get("body") or {}) if isinstance(data, dict) else {})
     items = body.get("items") or []
     if isinstance(items, dict):
@@ -110,6 +123,8 @@ def main(argv: list[str] | None = None) -> int:
             r = _probe_one(op, item_seq, service_key)
             if r.get("error"):
                 print(f"  [{op}] 실패 — {r['error']}")
+                if r.get("body"):
+                    print(f"    서버 응답 본문: {r['body']}")
                 continue
             responded += 1
             row = r.get("row")

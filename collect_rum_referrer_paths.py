@@ -34,6 +34,10 @@ def build_query(limit=API_LIMIT):
 def day_windows(start, end):
     """Keep the legacy <=3-day chunks, then narrow each to single UTC dates."""
     for ws, we, _ in rum.split_window(start, end):
+        # Legacy split_window shares the midnight endpoint with the live window.
+        # Narrow the completed part here; never ingest a one-second next day.
+        if we.endswith('T00:00:00Z') and we > ws:
+            we = (datetime.fromisoformat(we.replace('Z', '+00:00')) - timedelta(seconds=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
         for cs, ce in rum.chunk_window(ws, we, rum.CHUNK_DAYS):
             cursor = datetime.fromisoformat(cs.replace("Z", "+00:00"))
             stop = datetime.fromisoformat(ce.replace("Z", "+00:00"))

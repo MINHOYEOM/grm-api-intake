@@ -2195,8 +2195,68 @@ _ISPE_FEED_SPEC = RssFeedSpec(
 
 
 def collect_ema_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
-    """EMA 공식 RSS 피드 4개 수집. Source Type: Official API. Evidence: B 이상(RSS 요약)."""
-    return collect_rss_feed(_EMA_FEED_SPEC, start, end)
+    """EMA 공식 RSS 피드 4개 수집. Source Type: Official API. Evidence: B 이상(RSS 요약).
+
+    [EMA 본문 흡수 2026-09-21] EMA RSS 는 `<description>` 이 비어 오는 항목이 많아,
+    카드 입력이 **제목 한 줄**뿐인 채로 발행까지 가고 있었다. 그 결과 두 갈래로 갈렸다:
+      · 정직한 쪽 — "우리가 확보한 입력은 제목 수준이어서 세부 내용은 원문 확인이 필요"
+        (2026-09-21 `59e513e60f06` GMP 실사 국제협력). 카드에 남는 정보가 제목뿐이고
+        시사점 문단은 문서를 읽지 않고 쓰인다.
+      · 위험한 쪽 — 제목만 받고도 구체 수치를 단정 (같은 호 `5f5b8279859d` "CHMP 가
+        12개 의약품 허가 권고"). 실제 EMA 원문과 대조하니 12 는 맞았지만, **우리가 준
+        입력에는 그 숫자가 없었다** — 맞았는지 틀렸는지 우리 층에서 가릴 방법이 없다.
+
+    둘 다 원인이 하나다: 본문을 안 받아온 것. 그래서 받아온다. ECA/ISPE 와 같은 층·같은
+    추출기(`_fetch_article_excerpt` — 제네릭 `<p>` 결합)를 쓴다. 실측(2026-09-21): 두
+    페이지 모두 정적 HTML 200 이고 첫 문단이 곧 요지다("EMA's human medicines committee
+    (CHMP) recommended 12 medicines for approval at its September 2026 meeting.").
+
+    키는 제네릭 `article_excerpt` — `_has_source_body`/prose_input 이 이미 아는 키라
+    싣는 즉시 `source_body_captured=True` 가 되고 카드 스캐폴드 수정이 필요없다.
+
+    fetch 대상은 **카드가 될 항목만**(qa_relevance Likely/Possible)으로 좁힌다 — EMA 는
+    주당 항목이 많아 전수 fetch 는 낭비다. 기본 off(`ENABLE_EMA_ARTICLE_EXCERPT`) —
+    off 면 이 블록이 실행되지 않아 산출물이 기존과 byte 동일하다.
+    """
+    items, err = collect_rss_feed(_EMA_FEED_SPEC, start, end)
+    if items and env_flag("ENABLE_EMA_ARTICLE_EXCERPT"):
+        _enrich_ema_article_excerpts(items)
+    return items, err
+
+
+# EMA 는 ECA/ISPE(주 소수 항목)와 달리 피드 4개·주당 수십 항목이라 cap 10 이면 조용히
+# 잘려나간다. 관련 항목만 받으므로 실사용 건수는 그보다 훨씬 적지만, 상한은 넉넉히 두고
+# **도달 시 경고**한다(잘린 줄 모르는 것이 잘리는 것보다 나쁘다).
+EMA_ARTICLE_EXCERPT_CAP = 30
+
+
+def _enrich_ema_article_excerpts(items: list[IntakeItem]) -> None:
+    """관련 EMA 항목의 기사 본문을 raw_payload["article_excerpt"] 에 싣는다(in-place).
+
+    실패(403/timeout/본문 미발견)는 graceful — 그 항목만 본문 없이 남고 수집은 계속된다.
+    """
+    fetched = 0
+    capped = False
+    for item in items:
+        if item.qa_relevance not in ("Likely", "Possible"):
+            continue          # 카드가 될 항목만 — 무관 항목까지 긁지 않는다
+        if not item.official_url:
+            continue
+        if item.raw_payload.get("article_excerpt"):
+            continue
+        if fetched >= EMA_ARTICLE_EXCERPT_CAP:
+            if not capped:
+                log("WARN", f"EMA 기사 excerpt cap({EMA_ARTICLE_EXCERPT_CAP}) 도달 — "
+                            "나머지 항목은 본문 없이 유지")
+                capped = True
+            break
+        time.sleep(ECA_ARTICLE_EXCERPT_DELAY_SECONDS)
+        excerpt = _fetch_article_excerpt(item.official_url, "EMA")
+        fetched += 1
+        if excerpt:
+            item.raw_payload["article_excerpt"] = excerpt
+    if fetched:
+        log("INFO", f"EMA 기사 본문 fetch {fetched}건 시도")
 
 
 def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:

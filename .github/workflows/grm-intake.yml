@@ -287,6 +287,10 @@ jobs:
           ENABLE_ECA_ARTICLE_EXCERPT: ${{ vars.ENABLE_ECA_ARTICLE_EXCERPT || 'false' }}
           # [전문지 브리핑 소스확장] ISPE 기사 본문 흡수 — ECA_ARTICLE_EXCERPT 와 동형·기본 off(활성=repo 변수).
           ENABLE_ISPE_ARTICLE_EXCERPT: ${{ vars.ENABLE_ISPE_ARTICLE_EXCERPT || 'false' }}
+          # [EMA 본문 흡수 2026-09-21] EMA RSS 는 description 이 비어 오는 항목이 많아 카드
+          # 입력이 제목 한 줄뿐이었다 — 그 상태로 "원문 확인 필요" 카드가 나가거나, 더 나쁘게는
+          # 제목만 받고 구체 수치가 단정됐다(CHMP "12건"). 관련 항목만 받고 기본 off.
+          ENABLE_EMA_ARTICLE_EXCERPT: ${{ vars.ENABLE_EMA_ARTICLE_EXCERPT || 'false' }}
           # 제품군 확장: Notion 'Modality' 속성 생성 후 true 로. 속성 미생성 상태로 켜도
           # 수집기 preflight 가 감지해 그 실행만 태그를 끄고 수집은 계속(graceful degrade) + health warning.
           ENABLE_MODALITY_TAG: ${{ (github.event_name == 'workflow_dispatch' && inputs.enable_modality_tag != 'inherit') && inputs.enable_modality_tag || vars.ENABLE_MODALITY_TAG || 'false' }}

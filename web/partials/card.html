@@ -64,7 +64,7 @@
     </ul></details>
   {%- endif %}
   {%- if card.quotes %}
-  <div class="block"><div class="lab"><i class="ti ti-quote"></i>{{ card.quote_label }}</div>
+  <div class="block"><div class="lab"><i class="ti ti-quote"></i>{{ card.quote_label }}{% if card.merged %} <span class="sub">· {{ _("대표 1건 기준") }}</span>{% endif %}</div>
     {%- for q in card.quotes %}
     <div class="quote"><div class="o">{% if q.mark %}<span class="m">{{ q.mark }}</span>{% endif %}{{ q.original }}</div>{% if q.show_translation %}<div class="t">{% if q.mark %}{{ q.mark }} {% endif %}{{ q.translation }}</div>{% endif %}</div>
     {%- endfor %}
@@ -93,7 +93,12 @@
       그 아래 공식원문 링크(.src)로 이어짐(단계적 노출: 요약 → 심층분석 → 원문). Overview 는
       §2.5 로 제거(summary 흡수). 섹션 헤더 = 원형번호 배지(①②③④, 폰트 비의존 CSS 원)
       + 세리프 소제목으로 4섹션 위계·가시성 확보. -#}
-  <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>{{ _("상세 분석 보기") }} <span class="tag-interp">{{ _("해석") }}</span> <span class="sub">{% if card.deep_preview %}· {{ card.deep_preview }} {% endif %}· {{ _("원문 근거·검증") }}</span></summary>
+  <details class="block deep"><summary class="lab"><i class="ti ti-file-search"></i>{{ _("상세 분석 보기") }} <span class="tag-interp">{{ _("해석") }}</span> <span class="sub">{% if card.deep_preview %}· {{ card.deep_preview }} {% endif %}· {{ _("원문 근거·검증") }}{% if card.merged %} · {{ _("대표 1건 기준") }}{% endif %}</span></summary>
+    {%- if card.merged %}
+    {#- [동일 일괄 행정처분 접기 2026-09-21] 병합 카드의 분석·원문 인용은 대표 1건의 것이다.
+        묶인 건들은 위반사실·적용법령·처분이 동일하지만, 인용된 원문은 대표 1건의 고지다. -#}
+    <p class="dt-fu"><i class="ti ti-info-circle"></i>{{ _("이 카드는 {n}건을 한 건으로 묶었다. 아래 분석과 원문 인용은 <b>대표 1건</b> 기준이며, 묶인 나머지 건은 위반사실·적용법령·처분 내용이 동일하다.", n=card.merged_count) }}</p>
+    {%- endif %}
     {#- [소스확장 2026-07-02] admin-action(행정처분)은 disposition_basis, [483 분석층 2026-07-02]
         FDA 483 은 inspectional_significance 슬롯 보유 → 한글·기관중립 섹션명. 둘 다 부재인 WL 은
         기존 영문 섹션명 그대로 = 바이트 불변(da_ko 는 WL 에서 falsy). -#}

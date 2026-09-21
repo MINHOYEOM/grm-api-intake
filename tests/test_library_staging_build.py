@@ -44,7 +44,7 @@ class LibraryStagingBuildTest(unittest.TestCase):
         self.assertIsNone(builder.derive_item(excluded, "mfds"))
 
     def test_existing_curated_fields_win_for_every_source(self):
-        for source in ("mfds", "ich"):
+        for source in ("mfds", "ich", "pics"):
             with self.subTest(source=source):
                 item_id = f"{source}-curated"
                 baseline = [{
@@ -72,6 +72,18 @@ class LibraryStagingBuildTest(unittest.TestCase):
             "pdf_url": "https://new/pdf",
         }]
         self.assertEqual(builder.merge_candidate([], incoming), incoming)
+
+    def test_pics_titles_survive_collector_replay_and_guard_rejects_overwrite(self):
+        path = Path(__file__).parents[1] / "web/data/library/pics.json"
+        baseline = json.loads(path.read_text(encoding="utf-8"))["items"]
+        incoming = [{k: v for k, v in item.items() if k != "title_ko"} for item in baseline]
+        candidate = builder.merge_candidate(baseline, incoming)
+        self.assertEqual(candidate, baseline)
+        builder.assert_curation_preserved(baseline, candidate, source="pics")
+        translated = next(item for item in candidate if item.get("title_ko"))
+        translated["title_ko"] = "overwritten"
+        with self.assertRaisesRegex(ValueError, "title_ko"):
+            builder.assert_curation_preserved(baseline, candidate, source="pics")
 
     def test_unknown_catalog_fields_fail_instead_of_being_silently_dropped(self):
         with self.assertRaisesRegex(ValueError, "future_field"):

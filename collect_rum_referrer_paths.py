@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 
 import collect_rum_analytics as rum
@@ -117,6 +118,13 @@ def save(url, key, rows, run, allow_downgrade=False):
 
 def main(argv=None):
     import requests
+    # 좁은 콘솔 인코딩(cp949 등)에서 출력이 통째로 날아가는 것을 막는다 —
+    # collect_rum_analytics.main() 과 같은 관례다.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--start", required=True)
     ap.add_argument("--end", required=True)

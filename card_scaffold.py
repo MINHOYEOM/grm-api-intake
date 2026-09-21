@@ -219,6 +219,37 @@ def _kind_meta(kind: str) -> tuple[str, str, str]:
     return ("⬜", kind or "기타", "")
 
 
+# ── rss-news 유형태그: 매체가 GMP 전담인가로 가른다 (2026-09-21) ──────────────
+# `rss-news` 한 경로에 성격이 다른 둘이 함께 들어온다:
+#   · GMP 전담 매체 — ECA(GMP/GDP 협회)·PIC/S(GMP 실사 협력기구)·EMA 실사 피드
+#   · 일반 규제 뉴스 — EMA news(CHMP 허가권고·CVMP 회의결과)·scientific-guidelines
+# kind 로 태그를 고정하면 뒤엣것에도 `GMP News` 가 붙는다. 실측(2026-09-21):
+# "9월 CHMP 허가권고 12건" 카드가 `GMP News` 로 나갔다 — 허가 권고는 GMP 가 아니다.
+#
+# ★제목 키워드로 가르지 않는다. ECA 의 "FDA adopts updated ICH Q8/Q9/Q10 Q&A (R5)"·
+#   "BioPhorum Roadmap for QC Sample Test Execution" 처럼 **GMP 문서인데 제목에 gmp 가
+#   없는** 항목이 실제로 있어(발행 13주 실측) 제목으로 가르면 그것들이 오분류된다.
+#   매체(피드)의 성격은 항목마다 흔들리지 않는 안정된 신호다.
+# rss-news 로 오는 매체 중 **EMA 만** 성격이 갈린다. ECA(GMP/GDP 협회)·PIC/S(GMP 실사
+# 협력기구)·MHRA Inspectorate 블로그·ISPE(GMP 관련만 keep_item 통과)는 매체 자체가 GMP
+# 전담이라 손대지 않는다 — 기존 동작 그대로다. (MHRA 의 의약품 회수/결함은 `rss-news`
+# 가 아니라 `mhra-recall` 로 빠지므로 여기 오지 않는다.)
+# EMA 는 한 소스에 실사(GMP)와 일반 규제 뉴스가 섞여 있어 피드로 가른다.
+_GMP_SCOPED_EMA_FEEDS = frozenset({"inspections"})
+_RSS_NEWS_GENERAL_TAG = "규제 소식"
+
+
+def _rss_news_type_tag(row: dict[str, Any], raw: dict[str, Any]) -> str:
+    """rss-news 카드의 유형태그. GMP 전담 매체면 `GMP News`, 아니면 `규제 소식`.
+
+    EMA 만 피드로 가른다(나머지 매체는 전부 GMP 전담 → 기존 동작 보존)."""
+    if _regulator(row.get("source", "")) != "EMA":
+        return "GMP News"
+    return ("GMP News"
+            if str((raw or {}).get("feed", "")) in _GMP_SCOPED_EMA_FEEDS
+            else _RSS_NEWS_GENERAL_TAG)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. CardScaffold — 산출물 (markdown 문자열 + 구조 필드)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -421,7 +452,8 @@ class CardScaffold:
             "evidence_level": self.evidence,
             "signal_tier": _signal_tier_num(self.signal_tier),
             "signal_label": _signal_level(self.signal_tier),
-            "type_tag": (_kind_meta(kind)[2] or None),
+            "type_tag": (_rss_news_type_tag(row, raw) if kind == "rss-news"
+                         else (_kind_meta(kind)[2] or None)),
             "headline_target": headline_target,
             "title_issue": "",            # LLM
             "summary": "",                # LLM

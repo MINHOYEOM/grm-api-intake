@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import hashlib
 import urllib.parse
+
+from grm_mfds_item_class import enrich_raw_payload
 from datetime import date
 from typing import Any
 
@@ -298,6 +300,11 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
             f"?itemSeq={urllib.parse.quote(item_seq, safe='')}"
         )
         raw_payload["nedrug_item_candidate_note"] = "Routine 검증 후 인용 (미검증 후보 URL)"
+        # [2026-09-21] 제품군 **근거** 보강 — 품목기준코드로 MFDS 허가정보의 ATC·주성분을
+        #   받아 raw_payload 에 싣는다. 판정은 compute_modality 가 한다(여기서 결론짓지
+        #   않는다 — 판정 로직이 두 군데로 갈라지면 이번 사건이 반복된다).
+        #   조회 실패·0건은 조용히 넘어가고 근거 없이 판정하지 않는다.
+        enrich_raw_payload(raw_payload, item_seq)
 
     # E2(resolve & verify, ENABLE_MFDS_URL_VERIFY=on 일 때만): 행정처분 건별 L1 후보를
     # collect 시점에 실제 검증해 scaffold 가 검증된 L1(pass) 또는 L2 인덱스+⚠️(fail)로

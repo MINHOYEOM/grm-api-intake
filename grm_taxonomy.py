@@ -311,6 +311,40 @@ MODALITY_BIOLOGIC_TERMS = [
 ]
 
 
+# ★ATC(WHO 해부-치료-화학 분류) → 제품군. **국제 표준**이고 제형이 아니라 **물질 성격**
+# 으로 묶이므로, 이번 수리가 경계한 축 혼동이 없다. MFDS 허가정보에서 품목기준코드로
+# 받아 온다(grm_mfds_item_class). 실측(발행 카드 실 품목코드 120건): 조회되는 품목의
+# ATC 보유 85건(70%) · 전량 판정 도달.
+#
+# ⚠️ 접두 매칭이다. 더 긴 접두가 먼저 이기도록 아래 조회는 길이 내림차순으로 돈다
+#    (L04AB 가 L04A 보다 먼저 판정돼야 한다).
+MODALITY_ATC_BIOLOGIC_PREFIXES = (
+    "L01F",                      # 단클론항체·항체약물접합체
+    "L03A",                      # 면역자극제(인터페론·필그라스팀·인터루킨)
+    "L04AA", "L04AB", "L04AC", "L04AG",   # 면역억제 단클론항체·TNF 억제제
+    "J07",                       # 백신
+    "J06B",                      # 면역글로불린
+    "B02BD",                     # 혈액응고인자
+    "B06AC",                     # C1 억제제
+    "A10A",                      # 인슐린
+    "H01A", "H01B", "H01C",      # 뇌하수체·시상하부 호르몬(성장호르몬·고나도트로핀)
+    "M05BX04",                   # 데노수맙
+    "S01LA",                     # 안과용 혈관신생억제 항체
+)
+
+# 제품군 축이 무관한 ATC — 조영제·방사성의약품. 치료 물질이 아니다.
+MODALITY_ATC_OTHER_PREFIXES = ("V08", "V09")
+
+
+# 한국어 주성분명의 생물 어간 — ATC 가 없을 때의 보조 신호.
+# ★'알파'·'베타'·'페그' 같은 수식어는 넣지 않는다: '알파칼시돌'(비타민D 유도체)처럼
+#   저분자에도 붙어, 축이 다른 말을 제품군 신호로 쓰게 된다.
+MODALITY_KO_INGREDIENT_BIOLOGIC = (
+    "맙", "셉트", "인슐린", "인터페론", "백신", "톡소이드", "면역글로불린",
+    "에포에틴", "필그라스팀", "소마트로핀", "보툴리눔", "혈장분획", "응고인자",
+)
+
+
 # ★'biologic' 의 거짓 친구 — 무균 제조 설비·시험 용어. 제품군과 아무 상관이 없다.
 # MODALITY_BIOLOGIC_TERMS 는 부분문자열 매칭(_phrase_any)이라 'biologic' 이 'biological
 # indicator'(멸균 확인용 생물학적 지표)·'biological safety cabinet'(생물안전작업대)에
@@ -572,6 +606,30 @@ def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
     return "N/A"
 
 
+def _modality_from_mfds_atc(raw_payload: dict[str, Any]) -> str:
+    """MFDS 허가정보에서 받아 온 ATC·주성분으로 제품군을 판정한다(없으면 "").
+
+    ★수집기가 실어 준 **근거만** 본다. 조회 자체가 안 됐거나(`not_found`·`error`)
+      ATC 가 없으면 판정하지 않는다 — 특히 `not_found` 를 '의약외품' 으로 읽지 않는다
+      (허가정보 API 는 의약품만 담지만, 누락·지연도 같은 0건을 낸다).
+    """
+    atc = str(raw_payload.get("mfds_atc_code") or "").strip().upper()
+    if atc:
+        # 더 긴 접두가 먼저 이긴다(L04AB > L04A).
+        for pref in sorted(MODALITY_ATC_OTHER_PREFIXES, key=len, reverse=True):
+            if atc.startswith(pref):
+                return MODALITY_OTHER
+        for pref in sorted(MODALITY_ATC_BIOLOGIC_PREFIXES, key=len, reverse=True):
+            if atc.startswith(pref):
+                return MODALITY_BIOLOGIC
+        # ATC 가 있는데 생물·범위밖 묶음이 아니다 = WHO 가 분류한 저분자 계열.
+        return MODALITY_CHEMICAL
+    ingr = str(raw_payload.get("mfds_main_ingredient") or "")
+    if ingr and any(k in ingr for k in MODALITY_KO_INGREDIENT_BIOLOGIC):
+        return MODALITY_BIOLOGIC
+    return MODALITY_UNKNOWN
+
+
 def _modality_application_numbers(raw_payload: dict[str, Any]) -> list[str]:
     """openFDA `openfda.application_number` 를 대문자 문자열 리스트로 꺼낸다.
 
@@ -642,7 +700,14 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     if _phrase_any(product_type_blob, MODALITY_OUT_OF_SCOPE_FACILITY_TERMS):
         return MODALITY_OTHER
 
-    # ── 1. 생물의약품 양성 근거 ───────────────────────────────────────────────
+    # ── 1. MFDS 허가정보(ATC) — 규제기관 분류라 텍스트 추정보다 앞선다 ──────────
+    #   국내 회수·행정처분은 품목기준코드로 ATC 를 받아 둔다(grm_mfds_item_class).
+    #   제형·업체명 같은 약한 신호가 끼어들기 전에 여기서 결론이 난다.
+    _atc_verdict = _modality_from_mfds_atc(raw_payload)
+    if _atc_verdict:
+        return _atc_verdict
+
+    # ── 2. 생물의약품 양성 근거 ───────────────────────────────────────────────
     if any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
     # FDA 허가 트랙 BLA = 생물의약품(구조화 근거).
@@ -672,7 +737,7 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     if re.search(r"\b[a-z]{3,}mab\b", haystack_bio):
         return MODALITY_BIOLOGIC
 
-    # ── 2. 화학합성 양성 근거 ─────────────────────────────────────────────────
+    # ── 3. 화학합성 양성 근거 ─────────────────────────────────────────────────
     # ★여기 들어오는 근거는 전부 "합성이다"를 적극적으로 말해야 한다.
     #   "의약품이다"만 말하는 근거(product_type 의 'drug', 제형·투여경로 필드의 존재,
     #   주사·무균·바이알)는 근거가 아니다 — 이전 구현의 결함이 정확히 그것이었다.
@@ -707,7 +772,7 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
                 or _KOREAN_ORAL_FORM_SUFFIX_RE.search(pn)):
             return MODALITY_CHEMICAL
 
-    # ── 3. 판별 근거 없음 → 배지 미표시 ───────────────────────────────────────
+    # ── 4. 판별 근거 없음 → 배지 미표시 ───────────────────────────────────────
     # ★MODALITY_OTHER 로 보내지 않는다. 'Other' 는 "제품군 축이 무관"(가이드라인·동물용)
     #   이라는 적극적 의미이고, 여기는 "우리가 모른다" 이다. 둘을 같은 값에 담으면
     #   '기타' 집계가 두 모집단을 섞어 무의미해진다.

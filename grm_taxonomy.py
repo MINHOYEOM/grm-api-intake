@@ -311,6 +311,22 @@ MODALITY_BIOLOGIC_TERMS = [
 ]
 
 
+# ★MFDS `품목구분` → 제품군. 규제기관이 **같은 축에서** 부여한 확정 분류다
+# (의약품 / 생물의약품 / 첨단바이오 / 한약(생약)제제등 / 의약외품 / 마약류).
+# ATC 가 못 닿는 한약제제·의약외품을 여기서 가른다 — 발행 카드 실 품목코드 120건 실측:
+# 한약 20 + 의약외품 19 = 39건(33%)이 허가정보 API 범위 밖이었다.
+#
+# '의약품'·'마약류' 를 Chemical 로 보내지 않는 이유: 그건 "생물이 아니다"까지만 말한다.
+# 저분자라는 **양성 근거**는 ATC 가 준다. 여기서는 판정을 넘기고(아래 UNKNOWN 아님 —
+# 매핑에서 빠지면 다음 규칙으로 흘러간다) ATC·경구 고형이 마저 본다.
+MODALITY_MFDS_GUBUN_MAP = {
+    "생물의약품": MODALITY_BIOLOGIC,
+    "첨단바이오": MODALITY_BIOLOGIC,     # 세포·유전자치료제
+    "한약(생약)제제등": MODALITY_OTHER,   # 합성도 바이오도 아니다
+    "의약외품": MODALITY_OTHER,          # 의약품 범위 밖(치약·미백제 등)
+}
+
+
 # ★ATC(WHO 해부-치료-화학 분류) → 제품군. **국제 표준**이고 제형이 아니라 **물질 성격**
 # 으로 묶이므로, 이번 수리가 경계한 축 혼동이 없다. MFDS 허가정보에서 품목기준코드로
 # 받아 온다(grm_mfds_item_class). 실측(발행 카드 실 품목코드 120건): 조회되는 품목의
@@ -606,6 +622,18 @@ def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
     return "N/A"
 
 
+def _modality_from_mfds_gubun(raw_payload: dict[str, Any]) -> str:
+    """MFDS `품목구분` 으로 제품군을 판정한다(매핑에 없거나 값이 없으면 "").
+
+    ★`mfds_gubun_lookup` 이 ok 가 아니면 값을 쓰지 않는다 — 화면 파싱이 깨졌거나
+      조회를 못 한 상태를 판정으로 바꾸지 않는다.
+    """
+    if raw_payload.get("mfds_gubun_lookup") != "ok":
+        return MODALITY_UNKNOWN
+    gubun = str(raw_payload.get("mfds_item_gubun") or "").strip()
+    return MODALITY_MFDS_GUBUN_MAP.get(gubun, MODALITY_UNKNOWN)
+
+
 def _modality_from_mfds_atc(raw_payload: dict[str, Any]) -> str:
     """MFDS 허가정보에서 받아 온 ATC·주성분으로 제품군을 판정한다(없으면 "").
 
@@ -700,14 +728,19 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     if _phrase_any(product_type_blob, MODALITY_OUT_OF_SCOPE_FACILITY_TERMS):
         return MODALITY_OTHER
 
-    # ── 1. MFDS 허가정보(ATC) — 규제기관 분류라 텍스트 추정보다 앞선다 ──────────
+    # ── 1. MFDS 품목구분 — 규제기관이 같은 축에서 부여한 확정 분류. 가장 앞선다.
+    _gubun_verdict = _modality_from_mfds_gubun(raw_payload)
+    if _gubun_verdict:
+        return _gubun_verdict
+
+    # ── 2. MFDS 허가정보(ATC) — 규제기관 분류라 텍스트 추정보다 앞선다 ──────────
     #   국내 회수·행정처분은 품목기준코드로 ATC 를 받아 둔다(grm_mfds_item_class).
     #   제형·업체명 같은 약한 신호가 끼어들기 전에 여기서 결론이 난다.
     _atc_verdict = _modality_from_mfds_atc(raw_payload)
     if _atc_verdict:
         return _atc_verdict
 
-    # ── 2. 생물의약품 양성 근거 ───────────────────────────────────────────────
+    # ── 3. 생물의약품 양성 근거 ───────────────────────────────────────────────
     if any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
     # FDA 허가 트랙 BLA = 생물의약품(구조화 근거).
@@ -737,7 +770,7 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     if re.search(r"\b[a-z]{3,}mab\b", haystack_bio):
         return MODALITY_BIOLOGIC
 
-    # ── 3. 화학합성 양성 근거 ─────────────────────────────────────────────────
+    # ── 4. 화학합성 양성 근거 ─────────────────────────────────────────────────
     # ★여기 들어오는 근거는 전부 "합성이다"를 적극적으로 말해야 한다.
     #   "의약품이다"만 말하는 근거(product_type 의 'drug', 제형·투여경로 필드의 존재,
     #   주사·무균·바이알)는 근거가 아니다 — 이전 구현의 결함이 정확히 그것이었다.
@@ -772,7 +805,7 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
                 or _KOREAN_ORAL_FORM_SUFFIX_RE.search(pn)):
             return MODALITY_CHEMICAL
 
-    # ── 4. 판별 근거 없음 → 배지 미표시 ───────────────────────────────────────
+    # ── 5. 판별 근거 없음 → 배지 미표시 ───────────────────────────────────────
     # ★MODALITY_OTHER 로 보내지 않는다. 'Other' 는 "제품군 축이 무관"(가이드라인·동물용)
     #   이라는 적극적 의미이고, 여기는 "우리가 모른다" 이다. 둘을 같은 값에 담으면
     #   '기타' 집계가 두 모집단을 섞어 무의미해진다.

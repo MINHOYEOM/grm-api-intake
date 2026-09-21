@@ -16,6 +16,10 @@ on:
         description: '조회할 품목기준코드(쉼표 구분). 비우면 정답을 아는 대조군 2건.'
         type: string
         default: ''
+      measure:
+        description: 'true = 발행 카드 실 품목코드 120건으로 제품군 판정 도달률까지 측정.'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -56,6 +60,18 @@ jobs:
             for s in "${SEQS[@]}"; do ARGS+=(--item-seq "$(echo "$s" | xargs)"); done
           fi
           python probe_mfds_item_class.py "${ARGS[@]}" 2>&1 | tee probe_report.txt
+
+      # ★만들기 전에 잰다 — 발행 카드 실 품목코드 120건으로 도달률을 본다.
+      #   483 본문 되살리기는 실효 12%로 나와 접었다. 같은 규율.
+      - name: 도달률 측정 (ATC·주성분 → 제품군)
+        if: ${{ inputs.measure }}
+        continue-on-error: true
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+        run: |
+          set -o pipefail
+          python measure_mfds_modality_signal.py 2>&1 | tee -a probe_report.txt
 
       - name: Write step summary
         if: always()

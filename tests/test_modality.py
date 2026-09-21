@@ -70,10 +70,11 @@ class TestComputeModality(unittest.TestCase):
         payload = {"openfda": {"dosage_form": ["TABLET"], "route": ["ORAL"]}}
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
 
-    def test_chemical_injection_small_molecule(self):
-        # 생물 단서 없는 주사제 → 화학합성으로 분류
+    def test_injection_alone_is_not_chemical_evidence(self):
+        # [2026-09-21] 주사제는 **멸균성·제형** 축이다. 항체·백신도 주사제라서
+        # "생물 단서가 없는 주사제" 는 합성의 근거가 되지 못한다 → 판정 보류.
         payload = {"openfda": {"dosage_form": ["INJECTION"], "route": ["INTRAVENOUS"]}}
-        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_UNKNOWN)
 
     def test_chemical_oral_liquid_text(self):
         self.assertEqual(
@@ -88,16 +89,18 @@ class TestComputeModality(unittest.TestCase):
         )
 
     # ── 기타(Other) ──────────────────────────────────────────────────────
-    def test_other_guidance(self):
+    def test_guidance_has_no_modality_evidence(self):
+        # 제품군 단서가 없으면 판정하지 않는다(배지 미표시). 'Other' 로 보내지 않는
+        # 이유: 'Other' 는 "제품군 축이 무관"(동물용·혈액원)이라는 적극적 의미다.
         self.assertEqual(
             ci.compute_modality({}, "ICH Q9 quality risk management guideline"),
-            ci.MODALITY_OTHER,
+            ci.MODALITY_UNKNOWN,
         )
 
-    def test_other_general_gmp(self):
+    def test_general_gmp_has_no_modality_evidence(self):
         self.assertEqual(
             ci.compute_modality({}, "Data integrity inspection observation"),
-            ci.MODALITY_OTHER,
+            ci.MODALITY_UNKNOWN,
         )
 
     # ── MFDS 한국어 단서 (Language=KO) ──────────────────────────────────
@@ -119,10 +122,12 @@ class TestComputeModality(unittest.TestCase):
             ci.MODALITY_CHEMICAL,
         )
 
-    def test_chemical_korean_injection(self):
+    def test_korean_injection_sterile_is_not_chemical_evidence(self):
+        # ★이 검사가 결함을 13주 동안 '정답'으로 고정하고 있었다(2026-09-21 제보).
+        #   '주사제'·'무균'은 제형·멸균성 축이라 제품군을 가르지 못한다.
         self.assertEqual(
             ci.compute_modality({}, "주사제 무균 공정 지적사항"),
-            ci.MODALITY_CHEMICAL,
+            ci.MODALITY_UNKNOWN,
         )
 
     # ── top-level product_type 폴백 (openfda 구조 없는 소스) ────────────
@@ -131,12 +136,34 @@ class TestComputeModality(unittest.TestCase):
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
 
     def test_chemical_toplevel_product_type_drugs(self):
-        # OpenFDA enforcement product_type=Drugs (문자열) → 화학합성
-        self.assertEqual(ci.compute_modality({"product_type": "Drugs"}), ci.MODALITY_CHEMICAL)
+        # [2026-09-21] product_type="Drugs" 는 "의약품이다"만 말한다. 이 한 줄로
+        # Chemical 을 확정하던 것이 openFDA 회수 93%(93/100)를 합성으로 보낸 진범이다.
+        self.assertEqual(ci.compute_modality({"product_type": "Drugs"}), ci.MODALITY_UNKNOWN)
 
-    def test_chemical_human_prescription_drug(self):
+    def test_human_prescription_drug_is_not_chemical_evidence(self):
         payload = {"openfda": {"product_type": ["HUMAN PRESCRIPTION DRUG"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_UNKNOWN)
+
+    def test_application_number_bla_biologic(self):
+        # ★허가 트랙은 제품군을 직접 말하는 구조화 양성 근거다.
+        payload = {"openfda": {"application_number": ["BLA125057"],
+                               "product_type": ["HUMAN PRESCRIPTION DRUG"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
+
+    def test_application_number_nda_chemical(self):
+        payload = {"openfda": {"application_number": ["NDA050671"],
+                               "dosage_form": ["INJECTION"], "route": ["INTRAVENOUS"]}}
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+
+    def test_application_number_anda_chemical(self):
+        payload = {"openfda": {"application_number": ["ANDA040123"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
+
+    def test_bla_beats_oral_form(self):
+        # 허가 트랙(BLA)이 제형 근거보다 앞선다 — 순서 회귀 가드.
+        payload = {"openfda": {"application_number": ["BLA761234"],
+                               "dosage_form": ["TABLET"], "route": ["ORAL"]}}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_BIOLOGIC)
 
     def test_veterinary_not_chemical(self):
         # 수의/동물용은 의약품 분류 대상 아님 → Other
@@ -178,10 +205,10 @@ class TestComputeModality(unittest.TestCase):
         )
 
     def test_purified_water_not_tablet(self):
-        # '정제수'(purified water) 는 '정제'(tablet) 오탐 금지 → Other
+        # '정제수'(purified water) 는 '정제'(tablet) 오탐 금지 → 판정 보류
         self.assertEqual(
             ci.compute_modality({}, "정제수 제조설비 점검 지침"),
-            ci.MODALITY_OTHER,
+            ci.MODALITY_UNKNOWN,
         )
         # 진짜 '정제'(tablet) 는 Chemical 유지
         self.assertEqual(
@@ -190,9 +217,16 @@ class TestComputeModality(unittest.TestCase):
         )
 
     # ── Health Canada 정규화(raw_payload product_type/description) ───────
-    def test_hc_drug_recall_chemical(self):
-        # collect_hc 가 product_type=Category, product_description=Product 를 넣음
+    def test_hc_drug_recall_without_form_is_undetermined(self):
+        # collect_hc 가 product_type=Category, product_description=Product 를 넣는다.
+        # Category="Drugs" + 제형 없는 제품명 → 제품군 근거 0 → 판정 보류.
         payload = {"product_type": "Drugs", "product_description": "Some Brand 10 mg"}
+        self.assertEqual(ci.compute_modality(payload), ci.MODALITY_UNKNOWN)
+
+    def test_hc_drug_recall_with_oral_form_chemical(self):
+        # 같은 소스라도 경구 고형 단서가 오면 Chemical — 근거가 판정을 만든다.
+        payload = {"product_type": "Drugs",
+                   "product_description": "Some Brand 10 mg tablets"}
         self.assertEqual(ci.compute_modality(payload), ci.MODALITY_CHEMICAL)
 
     def test_hc_biologic_recall(self):
@@ -252,15 +286,16 @@ class TestGap2BrandOnlyBiologic(unittest.TestCase):
             ci.compute_modality({"PRDUCT": "세파클러정"}, "[회수] 세파클러정"),
             ci.MODALITY_CHEMICAL,
         )
+        # 'XX주'(주사제)는 2026-09-21 부터 제품군 근거가 아니다 → 판정 보류.
         self.assertEqual(
             ci.compute_modality({"PRDUCT": "오메프라졸주"}, "[회수] 오메프라졸주"),
-            ci.MODALITY_CHEMICAL,
+            ci.MODALITY_UNKNOWN,
         )
 
     def test_gap2_5_general_words_no_false_biologic(self):
         # 일반어는 브랜드 부분문자열 오매칭 없이 여전히 비-Biologic(Other)
         for txt in ["개정안", "행정처분", "규정 일부개정고시"]:
-            self.assertEqual(ci.compute_modality({}, txt), ci.MODALITY_OTHER, msg=txt)
+            self.assertEqual(ci.compute_modality({}, txt), ci.MODALITY_UNKNOWN, msg=txt)
 
 
 class TestSterileBioTier3Floor(unittest.TestCase):
@@ -351,8 +386,16 @@ class TestKoreanMfdsModality(unittest.TestCase):
                 ci.compute_modality({"PRDUCT": name}, f"[회수·판매중지] {name}"),
                 ci.MODALITY_CHEMICAL, msg=name)
 
-    def test_korean_injection_suffix_chemical(self):
+    def test_korean_injection_suffix_is_not_chemical_evidence(self):
+        # [2026-09-21] 'XX주'(주사제) 접미사는 제형 축이라 제품군을 가르지 못한다.
+        # 'XX정'(정제) 접미사는 경구 고형이라 여전히 Chemical (아래 검사).
         for name in ["예나스테론주", "멀티플렉스페리주"]:
+            self.assertEqual(
+                ci.compute_modality({"PRDUCT": name}, f"[회수·판매중지] {name}"),
+                ci.MODALITY_UNKNOWN, msg=name)
+
+    def test_korean_tablet_suffix_chemical(self):
+        for name in ["세파클러정", "레파넘정2밀리그람"]:
             self.assertEqual(
                 ci.compute_modality({"PRDUCT": name}, f"[회수·판매중지] {name}"),
                 ci.MODALITY_CHEMICAL, msg=name)
@@ -371,18 +414,18 @@ class TestKoreanMfdsModality(unittest.TestCase):
             ci.compute_modality({"PRDUCT": "휴마로그주"}, "인슐린 제제 회수"),
             ci.MODALITY_BIOLOGIC)
 
-    def test_korean_herbal_dental_other(self):
-        # 한약·생약·치약은 제형 접미사 없음 → Other (의약품 누수 없어야)
+    def test_korean_herbal_dental_undetermined(self):
+        # 한약·생약·치약은 제형 접미사 없음 → 판정 보류(의약품 누수 없어야)
         for name in ["갈근탕", "쌍화탕", "죽염치약"]:
             self.assertEqual(
                 ci.compute_modality({"PRDUCT": name}, f"[회수] {name}"),
-                ci.MODALITY_OTHER, msg=name)
+                ci.MODALITY_UNKNOWN, msg=name)
 
     def test_suffix_not_applied_to_general_text(self):
         # 제품명 필드가 없는 일반 규제 문서의 '개정/규정/행정처분'은 정제로 오탐 금지 → Other
         for txt in ["OO에 관한 규정 일부개정고시 행정예고",
                     "[행정처분] 업무정지 3개월", "제조방법 변경 결정 공정 개선"]:
-            self.assertEqual(ci.compute_modality({}, txt), ci.MODALITY_OTHER, msg=txt)
+            self.assertEqual(ci.compute_modality({}, txt), ci.MODALITY_UNKNOWN, msg=txt)
 
 
 class TestVetHardExclude(unittest.TestCase):
@@ -446,7 +489,8 @@ class TestModalityPreflight(unittest.TestCase):
         self._patch(boom)
         self.assertFalse(ci.notion_verify_modality_property("t", "db"))
 
-
+# ─────────────────────────────────────────────────────────────────────────────
+# 제품군 축 분리 성질 가드 (2026-09-21)
 if __name__ == "__main__":
     unittest.main()
 
@@ -680,3 +724,214 @@ class TestTierDecisionObservability(unittest.TestCase):
             self.assertIn("기본값 낙하", ci.CollectionStats().summary())
         finally:
             ci.TIER_OBSERVER.reset()
+
+# ─────────────────────────────────────────────────────────────────────────────
+class TestModalityAxisSeparation(unittest.TestCase):
+    """★제품군(원료 성격)은 제형·멸균성 축과 **직교**한다 — 그 성질 자체를 잰다.
+
+    2026-09-21 결함의 재발 방지 가드다. 사고 내용은 "무균의약품이라고 써 있는데
+    💊 합성의약품 배지가 붙었다" 였고, 진범은 `product_type` 의 'drug' 토큰과
+    제형/투여경로 필드의 **존재**를 Chemical 확정 근거로 쓴 것이었다.
+
+    ★이 검사는 **키워드 목록을 열거하지 않는다.** 목록을 세면 다음에 새 시설유형
+    문자열이 들어올 때 또 뚫린다(grm-guard-hand-lists-go-stale 계열). 대신
+    '같은 항목의 제형·멸균성 축만 바꿔치기하면 판정이 흔들리면 안 된다' 는 성질을
+    뮤테이션으로 물어본다.
+    """
+
+    # 제형·멸균성 축만 건드리는 변형들 — 제품군 정보는 0이다.
+    STERILITY_FORM_MUTATIONS = (
+        "sterile", "aseptic processing", "무균", "멸균",
+        "injection", "injectable", "for injection", "parenteral",
+        "vial", "prefilled syringe", "주사제", "주사",
+        "lyophilized", "media fill", "환경모니터링",
+    )
+
+    def _mutate(self, base_parts, extra):
+        return tuple(base_parts) + (extra,)
+
+    def test_sterility_axis_never_creates_a_modality_verdict(self):
+        """근거 0 인 항목에 멸균성·제형 어휘를 아무리 얹어도 판정이 생기면 안 된다."""
+        base = ("실사 지적사항", "환경모니터링 기록 미흡", "483", "Some Manufacturer")
+        self.assertEqual(ci.compute_modality({}, *base), ci.MODALITY_UNKNOWN)
+        for m in self.STERILITY_FORM_MUTATIONS:
+            self.assertEqual(
+                ci.compute_modality({}, *self._mutate(base, m)),
+                ci.MODALITY_UNKNOWN,
+                msg=f"'{m}' 이 제품군 판정을 만들어냈다 — 제형·멸균성 축이 샜다",
+            )
+
+    def test_sterility_axis_never_flips_a_biologic_verdict(self):
+        """생물의약품은 무균·주사 어휘가 붙어도 생물의약품이다(제형 무관)."""
+        base = ("바이오시밀러 품목 회수", "recombinant monoclonal antibody", "recall")
+        self.assertEqual(ci.compute_modality({}, *base), ci.MODALITY_BIOLOGIC)
+        for m in self.STERILITY_FORM_MUTATIONS:
+            self.assertEqual(
+                ci.compute_modality({}, *self._mutate(base, m)),
+                ci.MODALITY_BIOLOGIC, msg=m,
+            )
+
+    def test_sterility_axis_never_flips_a_chemical_verdict(self):
+        """경구 고형제는 무균·주사 어휘가 붙어도 화학합성이다."""
+        base = ("정제 함량 부적합", "extended-release tablet dissolution", "recall")
+        self.assertEqual(ci.compute_modality({}, *base), ci.MODALITY_CHEMICAL)
+        for m in self.STERILITY_FORM_MUTATIONS:
+            self.assertEqual(
+                ci.compute_modality({}, *self._mutate(base, m)),
+                ci.MODALITY_CHEMICAL, msg=m,
+            )
+
+    def test_facility_type_saying_only_drug_is_not_a_verdict(self):
+        """★시설유형 문자열이 '의약품이다'만 말하면 판정하지 않는다.
+
+        FDA 483 은 establishment_type 을 product_type 으로 실어 보낸다. 'drug' 가
+        들어 있다는 사실은 "의약품 제조소"라는 뜻이지 "합성"이라는 뜻이 아니다 —
+        무균 충전 제조소에는 바이오 fill-finish 가 다수다.
+        """
+        # 라이브 발행본에서 실제로 💊 합성 배지를 받았던 문자열들.
+        for est in ("Sterile Drug Manufacturer",
+                    "Producer of Sterile Drug Products",
+                    "Producer of Sterile and Non Sterile Drug Products",
+                    "Drug Substance Manufacturer",
+                    "Drug Product Manufacturer",
+                    "Drug Manufacturer",
+                    "Contract Drug Manufacturer",
+                    "Finished Drug Product Manufacturer",
+                    "Human Drug Manufacturer",
+                    "Prescription Drug Manufacturer"):
+            self.assertEqual(
+                ci.compute_modality({"product_type": est}, "FDA 483 실사 관찰",
+                                    f"시설 유형: {est}", "483", "Some Firm"),
+                ci.MODALITY_UNKNOWN, msg=est,
+            )
+
+    def test_facility_type_saying_biologic_is_a_verdict(self):
+        """반대 방향 — 시설유형이 제품군을 말하면 판정한다(대조군)."""
+        for est in ("Biologics Manufacturer",
+                    "Biological Drug Substance/Product Manufacturer",
+                    "Plasma Derivative Manufacturer",
+                    "Source Plasma"):
+            self.assertEqual(
+                ci.compute_modality({"product_type": est}, "FDA 483 실사 관찰",
+                                    f"시설 유형: {est}", "483", "Some Firm"),
+                ci.MODALITY_BIOLOGIC, msg=est,
+            )
+
+    def test_blood_and_tissue_facilities_are_out_of_scope(self):
+        """혈액원·인체조직(HCT/P)은 '생물'이지만 의약품이 아니다 → Other."""
+        for est in ("Blood Bank", "Tissue Testing Laboratory",
+                    "Reproductive Human Tissue", "HCT/P Reproductive Firm"):
+            self.assertEqual(
+                ci.compute_modality({"product_type": est}, "FDA 483 실사 관찰",
+                                    f"시설 유형: {est}", "483", "Some Firm"),
+                ci.MODALITY_OTHER, msg=est,
+            )
+
+    def test_out_of_scope_check_reads_facility_field_only(self):
+        """범위 밖 판정은 **구조화 시설유형 필드**만 본다.
+
+        본문에 'blood donor screening' 이 스쳐 지나간다는 이유로 의약품 제조소
+        전체가 범위 밖이 되면 안 된다(haystack 전체 검사의 함정).
+        """
+        self.assertEqual(
+            ci.compute_modality(
+                {"product_type": "Drug Manufacturer"},
+                "실사 관찰", "the firm's blood bank donor screening SOP was referenced",
+                "483", "Some Firm"),
+            ci.MODALITY_UNKNOWN,
+        )
+
+    def test_firm_name_alone_never_decides(self):
+        """★업체명만으로 판정하지 않는다 — 양방향 오탐 금지.
+
+        '(주)다림바이오텍 레파넘정'(레파글리니드)은 정당한 화학합성이고,
+        'Fujifilm Diosynth Biotechnologies' 는 바이오 CDMO 지만 업체명은 근거가
+        아니다. 근거는 제품·허가트랙·시설유형에서 온다.
+        """
+        # 업체명에 '바이오텍' 이 있어도 제품이 정제면 Chemical.
+        self.assertEqual(
+            ci.compute_modality({"ITEM_NAME": "레파넘정2밀리그람(레파글리니드)"},
+                                "니트로소 불순물 초과", "회수", "회수·판매중지",
+                                "(주)다림바이오텍"),
+            ci.MODALITY_CHEMICAL,
+        )
+        # 업체명에 'Biotechnologies' 가 있어도 그것만으로는 판정하지 않는다.
+        self.assertEqual(
+            ci.compute_modality({"product_type": "Drug Substance Manufacturer"},
+                                "FDA 483 실사 관찰", "시설 유형: Drug Substance Manufacturer",
+                                "483", "Fujifilm Diosynth Biotechnologies Texas, LLC"),
+            ci.MODALITY_UNKNOWN,
+        )
+
+    def test_biologic_false_friends_are_sterility_vocabulary(self):
+        """★'biological indicator'·'biological safety cabinet' 은 제품군이 아니다.
+
+        둘 다 무균 제조소 483·경고서한에 상시 등장하는 **설비·시험** 용어다.
+        MODALITY_BIOLOGIC_TERMS 가 부분문자열 매칭이라 'biologic' 이 'biological'에
+        그대로 걸린다 — 판정 텍스트가 넓어지는 순간 무균 기록이 통째로
+        바이오의약품이 된다(제보된 결함의 거울상).
+        """
+        for txt in ("sterilizer load release used a biological indicator",
+                    "aseptic work in the biological safety cabinet",
+                    "monthly biological monitoring of the cleanroom"):
+            self.assertEqual(ci.compute_modality({}, txt),
+                             ci.MODALITY_UNKNOWN, msg=txt)
+
+    def test_false_friend_removal_does_not_blind_real_biologics(self):
+        """거짓 친구를 도려내도 진짜 생물 신호는 그대로 살아야 한다."""
+        for txt in ("biological product license recall",
+                    "adalimumab biosimilar lot recall",
+                    "biological indicator failure during vaccine filling"):
+            self.assertEqual(ci.compute_modality({}, txt),
+                             ci.MODALITY_BIOLOGIC, msg=txt)
+
+    def test_unknown_is_not_other(self):
+        """★'모른다'와 '제품군 축이 무관하다'는 다른 값이어야 한다.
+
+        둘을 같은 값에 담으면 '기타' 집계가 두 모집단을 섞어 무의미해진다
+        (grm-findings-population-vs-classifier 와 같은 결).
+        """
+        self.assertNotEqual(ci.MODALITY_UNKNOWN, ci.MODALITY_OTHER)
+        undetermined = ci.compute_modality({}, "Data integrity inspection observation")
+        out_of_scope = ci.compute_modality({}, "veterinary drug for injection")
+        self.assertEqual(undetermined, ci.MODALITY_UNKNOWN)
+        self.assertEqual(out_of_scope, ci.MODALITY_OTHER)
+        self.assertNotEqual(undetermined, out_of_scope)
+
+    def test_unknown_renders_no_badge(self):
+        """★판별 근거가 없으면 카드 배지를 아예 달지 않는다.
+
+        `to_web_card` 의 `if self.modality` 가 가로막는다 — 분류기가 빈 문자열을
+        돌려주는 것이 그 배지 억제와 맞물려 있다. 그래서 "모른다"가 배지 문구를
+        가져서는 안 된다(가지면 화면에 "미상" 배지가 뜬다).
+        """
+        import card_scaffold as cs
+        badge = cs.DEFAULT_CONFIG.modality_badge
+        self.assertNotIn(ci.MODALITY_UNKNOWN, badge)
+        self.assertFalse(badge.get(ci.MODALITY_UNKNOWN))
+
+    def test_unknown_and_other_share_one_group_heading(self):
+        """화면에서는 '미상'과 '기타'를 가르지 않는다(사용자 결정 2026-09-21).
+
+        값 자체는 분류기 층에서 구분돼 있고(`test_unknown_is_not_other`), 합치는
+        것은 **소제목 한 군데**뿐이다 — 다시 가르고 싶으면 `_group_modality` 만 바꾼다.
+
+        다만 그룹핑은 **배지와 같은 값**을 써야 한다: 배지가 억제되는 규범 문서가
+        row 값 때문에 제품군 소제목 아래 앉으면 안 된다(ICH Q5A 가 실제로 "바이오
+        의약품" 소제목 아래 있었다).
+        """
+        import card_scaffold as cs
+
+        class _Card:
+            def __init__(self, kind, modality):
+                self.kind, self.modality = kind, modality
+
+        # 기타·미판정은 같은 소제목으로 묶인다.
+        self.assertEqual(cs._group_modality(_Card("fda-483", ci.MODALITY_UNKNOWN)),
+                         cs._group_modality(_Card("fda-483", ci.MODALITY_OTHER)))
+        # 규범 문서는 row 값이 Chemical 이어도 제품군 소제목에 들어가지 않는다.
+        self.assertEqual(cs._group_modality(_Card("ich", ci.MODALITY_CHEMICAL)),
+                         ci.MODALITY_OTHER)
+        # 근거가 있는 판정은 그대로 자기 소제목을 가진다.
+        self.assertEqual(cs._group_modality(_Card("fda-483", ci.MODALITY_BIOLOGIC)),
+                         ci.MODALITY_BIOLOGIC)

@@ -1,0 +1,145 @@
+name: GRM 발행 브리프 제품군 소급 재분류 (one-off)
+
+# 발행된 주간 브리프(web/data/briefs/*.json)의 제품군(Modality) 배지를 새 분류기로
+# 소급 재계산한다. 2026-09-21 수리 이전 구현은 `product_type` 에 'drug' 가 있거나 제형/
+# 투여경로 필드가 존재하기만 하면 Chemical 을 확정했고, 그 결과 FDA 483 의
+# `establishment_type`("Sterile Drug Manufacturer" 등)과 openFDA 회수의
+# `product_type="Drugs"` 가 통째로 💊 합성의약품으로 나갔다.
+#
+# ★재생(replay) 충실성을 먼저 증명한다.
+#   발행 시점 판정은 `compute_modality(raw_payload, headline, body, type_or_class, firm)`
+#   이고, Supabase `raw_signals` 가 그 입력을 둘 다 보관한다(raw_json / row_json).
+#   `--verify-replay` 는 **origin/main 의 구 분류기**로 재생해 발행본 배지와 전건 일치하는지
+#   확인한다. 한 장이라도 어긋나면 재생 경로가 발행 경로와 다르다는 뜻이므로 새 판정도
+#   믿을 수 없고, 워크플로가 거기서 멈춘다(숫자가 아니라 성질을 먼저 증명한다).
+#
+# ★raw_signals 는 읽기 전용이다. 쓰기 대상은 web/data/briefs/*.json 과 웹 골든뿐이고,
+#   결과는 새 브랜치 + PR 로만 나간다(force-push 없음).
+#
+# 1회성 소급이라 dispatch 전용(예약 실행 없음).
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'true = 브리프 JSON 을 실제로 갱신하고 PR 을 연다. false(기본) = dry-run 리포트만.'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modality-brief-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: 제품군 재분류 → 브리프 JSON + 골든 재동결 → PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # --verify-replay 가 `git show origin/main:grm_taxonomy.py` 로 구 분류기를
+          # 꺼내므로 얕은 클론으로는 안 된다.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ★게이트 — 재생이 발행 경로를 재현하지 못하면 여기서 멈춘다.
+      - name: 재생 충실성 증명 (구 분류기 == 발행본 배지)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python backfill_modality_published_briefs.py --verify-replay
+
+      - name: 재분류 (dry-run 리포트)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          # 앞 스텝이 tmp/modality_replay_cache.json 을 남겼으므로 네트워크 재조회 없음.
+          python backfill_modality_published_briefs.py | tee modality_backfill_report.txt
+
+      - name: 적용 + 골든 재동결 + 렌더 스모크
+        if: ${{ inputs.apply }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          python backfill_modality_published_briefs.py --apply
+          python web/tests/test_render.py --freeze
+          python web/render.py --data web/data/briefs --out _dist_smoke >/dev/null
+          rm -rf _dist_smoke
+
+      - name: 커밋 + PR
+        if: ${{ inputs.apply }}
+        env:
+          GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          BR="chore/modality-brief-backfill-$(date -u +%Y%m%d%H%M)"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BR"
+          git add web/data/briefs web/tests/golden
+          if git diff --cached --quiet; then
+            echo "::notice::재분류 결과가 발행본과 동일 — 낼 변경 없음"
+            exit 0
+          fi
+          git commit -m "chore(brief): 제품군 배지 소급 재분류 (증거 기반 분류기 적용)"
+          git push origin "$BR"
+          {
+            echo "2026-09-21 제품군 분류기 수리를 이미 발행된 주간 브리프에 소급 적용합니다."
+            echo ""
+            echo "- 재생 충실성: 구 분류기로 재생한 값이 발행본 배지와 **전건 일치**함을 워크플로가 먼저 증명했습니다."
+            echo "- 변경 대상: \`web/data/briefs/*.json\` 의 \`modality\` + 웹 골든 재동결."
+            echo "- \`raw_signals\` 는 읽기 전용입니다."
+            echo ""
+            echo "리포트는 워크플로 실행의 \`modality-backfill-report\` 아티팩트를 보세요."
+            echo ""
+            echo "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+          } > pr_body.md
+          gh pr create --base main --head "$BR" \
+            --title "chore(brief): 발행 브리프 제품군 배지 소급 재분류" \
+            --body-file pr_body.md
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM 발행 브리프 제품군 소급 재분류"
+            echo ""
+            echo "apply: \`${{ inputs.apply }}\`"
+            echo ""
+            if [ -f modality_backfill_report.txt ]; then
+              echo '```'
+              cat modality_backfill_report.txt
+              echo '```'
+            else
+              echo "리포트 미생성 — 재생 충실성 게이트에서 멈췄을 수 있습니다."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: modality-backfill-report
+          path: modality_backfill_report.txt
+          retention-days: 30
+          if-no-files-found: warn

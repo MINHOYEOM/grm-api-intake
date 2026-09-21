@@ -194,7 +194,14 @@ MODALITY_CHEMICAL = "Chemical"   # 화학합성(케미컬)의약품 — 제형 �
 MODALITY_BIOLOGIC = "Biologic"   # 생물의약품(생물학적제제) — 제형 무관
 
 
-MODALITY_OTHER = "Other"         # 기타·판별 곤란(제품군 단서 없음: 일반 가이드라인·정책 등)
+MODALITY_OTHER = "Other"         # 제품군 축 자체가 무관 — 동물용·혈액원·인체조직 등 범위 밖
+
+
+# ★판별 근거 없음 — '기타'가 아니다. 화면에 제품군 배지를 아예 달지 않는다.
+# 2026-09-21 이전에는 이 자리가 MODALITY_CHEMICAL 이었다(= 합성이 캐치올 기본값).
+# 빈 문자열인 이유: 카드/렌더/facet 이 이미 빈 modality 를 '배지 없음'으로 처리한다
+# (card_scaffold `if modality and not normative`, web/render facet `if entry["modality"]`).
+MODALITY_UNKNOWN = ""
 
 
 # 수의/동물용 텍스트 단서 — 인체 의약품 범위 밖 → 분류 전에 하드 제외(Other).
@@ -222,6 +229,40 @@ MODALITY_BIOLOGIC_TERMS = [
     "자하거", "태반추출물", "인슐린", "인터페론", "에리트로포이에틴", "에포에틴",
     "필그라스팀", "면역글로불린", "면역혈청", "톡소이드", "항독소", "보툴리눔",
     "줄기세포", "단클론",
+    # [2026-09-21] 라이브 실측으로 추가 — 아래 어휘가 없어 바이오 제조소가 기타/합성으로
+    #   새고 있었다(Baxalta 'Plasma Derivative Manufacturer' → 기타, Biomat 'Source Plasma'
+    #   → 기타). 'plasma-derived' 만 있고 'plasma derivative'·'source plasma' 가 없었다.
+    "plasma derivative", "source plasma", "plasma fractionation",
+    "biologics", "biological drug", "antivenin", "antivenom", "toxoid",
+    "allergenic extract", "conjugate vaccine", "antibody-drug conjugate",
+    "혈장분획", "항체약물접합체", "바이오로직스", "생물학적 제제",
+]
+
+
+# ★'biologic' 의 거짓 친구 — 무균 제조 설비·시험 용어. 제품군과 아무 상관이 없다.
+# MODALITY_BIOLOGIC_TERMS 는 부분문자열 매칭(_phrase_any)이라 'biologic' 이 'biological
+# indicator'(멸균 확인용 생물학적 지표)·'biological safety cabinet'(생물안전작업대)에
+# 그대로 걸린다. 둘 다 **무균 제조소 483·경고서한에 상시 등장하는 단어**라, 판정 텍스트가
+# 넓어지는 순간 무균 기록이 통째로 바이오의약품이 된다(2026-09-21 실측으로 확인).
+# 판정 전에 haystack 에서 제거한다 — 어휘를 빼는 게 아니라 **문맥을 빼는** 것이다.
+MODALITY_BIOLOGIC_FALSE_FRIENDS = [
+    "biological indicator", "biological indicators", "bi challenge",
+    "biological safety cabinet", "biosafety cabinet",
+    "biological monitoring", "biological evaluation",
+    "biological oxygen demand",
+    "생물학적 지표", "생물학적지표", "생물안전작업대", "생물학적 안전",
+]
+
+
+# ★제품군 축 자체가 무관한 시설/업종 — 인체 의약품(완제·원료) 범위 밖.
+# 혈액원·인체조직(HCT/P)·생식세포는 '생물' 이지만 의약품이 아니므로 Biologic 이 아니라
+# Other 다. 이 판정은 MODALITY_BIOLOGIC_TERMS 보다 먼저 와야 한다('blood'·'tissue' 가
+# 생물 어휘에 걸려 바이오의약품으로 승격되는 것을 막는다).
+MODALITY_OUT_OF_SCOPE_FACILITY_TERMS = [
+    "blood bank", "blood center", "blood establishment", "blood donor",
+    "tissue bank", "tissue testing", "human tissue", "hct/p",
+    "reproductive human tissue", "reproductive firm", "sperm bank",
+    "혈액원", "조직은행",
 ]
 
 
@@ -237,6 +278,10 @@ MODALITY_BIOLOGIC_BRANDS = [
 
 
 # 의약품(제품) 일반 단서 — 제형/투여경로 등으로 '약'임을 식별(화학·생물 공통 1차 신호)
+# ⚠️ 이 목록은 "의약품이다"만 말한다. "합성이다"는 말하지 않는다 — 제품군 판정 근거로
+#    쓰면 안 된다(주사제·바이알·무균은 바이오의약품에도 그대로 해당). 2026-09-21 이전
+#    구현은 이 목록을 Chemical 확정 근거로 썼고, 그 결과 무균 제조소 483 과 openFDA
+#    회수가 통째로 '합성의약품' 으로 나갔다. 하위호환을 위해 이름은 보존한다.
 MODALITY_DRUG_PRODUCT_TERMS = [
     "tablet", "capsule", "oral solid", "solid dosage",
     "oral solution", "oral suspension", "syrup", "oral liquid",
@@ -247,6 +292,25 @@ MODALITY_DRUG_PRODUCT_TERMS = [
     # MFDS 한국어 단서
     "정제", "캡슐", "주사제", "주사", "시럽", "내용액제", "현탁액",
     "점안액", "연고", "크림", "흡입제", "완제의약품", "원료의약품",
+]
+
+
+# ★화학합성(저분자) 양성 근거 — 경구 고형제/경구 투여.
+# 근거: 단백질·항체·세포/유전자 치료제는 위장관에서 분해돼 경구 고형제로 만들 수 없다.
+#       경구 투여 생물의약품(경구 로타바이러스 백신 등)은 극소수이고, 그것들은 판정
+#       순서상 앞선 MODALITY_BIOLOGIC_TERMS('vaccine'·'백신')에서 먼저 잡힌다.
+# ⚠️ 주사·무균·바이알·수액 등 '제형이 있다'만 말하는 어휘는 여기 넣지 않는다.
+MODALITY_ORAL_SOLID_TERMS = [
+    "tablet", "capsule", "oral solid", "solid dosage", "caplet", "softgel",
+    "oral solution", "oral suspension", "oral liquid", "syrup", "chewable",
+    "정제", "캡슐", "경구", "시럽", "내용액제", "츄어블", "구강붕해",
+]
+
+
+# ★화학합성 명시 표기 — 텍스트가 스스로 합성이라고 말하는 경우만.
+MODALITY_CHEMICAL_EXPLICIT_TERMS = [
+    "small molecule", "small-molecule", "synthetic api", "chemically synthesized",
+    "화학합성", "합성의약품", "저분자",
 ]
 
 
@@ -263,8 +327,20 @@ MODALITY_KOREAN_FORM_TERMS = [
 ]
 
 
+# ★제품명 제형 단서 중 '경구 고형/경구' 만 추린 것 — 화학합성 양성 근거로 쓸 수 있다.
+#   (주사제·수액·점안·연고 등은 제품군을 가르지 못하므로 제외)
+MODALITY_KOREAN_ORAL_FORM_TERMS = [
+    "캡슐", "시럽", "과립", "산제", "내용액", "환제", "트로키", "츄어블",
+]
+
+
 # 제품명 끝의 '정'(정제)/'주'(주사제) 접미사. 뒤에 한글이 오면(안정성·행정 등) 제외.
 _KOREAN_FORM_SUFFIX_RE = re.compile(r"[가-힣A-Za-z0-9][정주](?![가-힣])")
+
+
+# ★제품명 끝의 '정'(정제) 접미사만 — 경구 고형이라 화학합성 양성 근거가 된다.
+#   '주'(주사제)는 제품군을 가르지 못하므로 뺀다(구 _KOREAN_FORM_SUFFIX_RE 는 둘 다 봤다).
+_KOREAN_ORAL_FORM_SUFFIX_RE = re.compile(r"[가-힣A-Za-z0-9]정(?![가-힣])")
 
 
 def _kw_match(blob: str, keywords: list[str]) -> int:
@@ -419,28 +495,53 @@ def compute_osd_relevance(raw_payload: dict[str, Any]) -> str:
     return "N/A"
 
 
-def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
-    """수집 항목의 제품군(Modality)을 '큰 틀'(원료 성격)로 1차 자동 분류한다.
+def _modality_application_numbers(raw_payload: dict[str, Any]) -> list[str]:
+    """openFDA `openfda.application_number` 를 대문자 문자열 리스트로 꺼낸다.
 
-    특정 제품(예: 성장호르몬·항암주사)이 아니라 클래스 단위로만 본다.
-    OpenFDA 의 구조화 필드(product_type/dosage_form/route)가 있으면 우선 사용하고,
-    없으면 제목·본문·분류 텍스트의 키워드로 판정한다.
+    FDA 허가 트랙은 제품군을 직접 말하는 '구조화된 양성 근거'다.
+        BLA#######  → Biologics License Application  = 생물의약품
+        NDA/ANDA### → (Abbreviated) New Drug Application = 화학합성 트랙
+    2020 년 '생물학적제제 이관'(insulin·성장호르몬 등)이 끝나 현재 BLA/NDA 경계는
+    제품군 경계와 사실상 일치한다. 실측: openFDA 회수 211건 중 155건(73%)이 보유.
+    """
+    openfda = raw_payload.get("openfda") or {}
+    value = openfda.get("application_number") or raw_payload.get("application_number")
+    if not value:
+        return []
+    if isinstance(value, str):
+        value = [value]
+    return [str(v).strip().upper() for v in value if v]
+
+
+def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
+    """수집 항목의 제품군(Modality)을 '원료 성격' 축으로 분류한다.
+
+    ★핵심 규칙 — **양성 근거가 있을 때만 판정한다.**
+      "생물이라는 증거가 없다" 는 "합성이다" 가 아니다. 근거가 없으면 판정하지 않고
+      MODALITY_UNKNOWN("") 을 돌려 화면에 배지를 달지 않는다.
+
+    ★축을 섞지 않는다.
+      `무균/멸균`·`주사제`·`바이알`·`제형이 있다` 는 **멸균성·제형** 축이다. 제품군
+      축과 직교하므로 제품군 판정 근거가 될 수 없다. 무균 충전 제조소에는 바이오
+      fill-finish 가 다수이고, 주사제에는 항체·백신이 그대로 들어간다.
 
     반환값:
         "Biologic" — 생물의약품(생물학적제제): 재조합 단백질·항체·백신·세포/유전자
                      치료제·바이오시밀러·혈장분획제제 등 (제형 무관)
-        "Chemical" — 화학합성(케미컬)의약품: 생물 단서 없이 의약품(제형/투여경로)
-                     단서가 있는 합성 저분자 의약품 (제형 무관)
-        "Other"    — 제품군 단서 없음(일반 가이드라인·정책·실태조사 일반 등)
+        "Chemical" — 화학합성(저분자)의약품. **경구 고형/경구 투여 또는 NDA·ANDA
+                     허가 트랙 또는 명시적 합성 표기** 가 있을 때만.
+        "Other"    — 제품군 축이 무관: 동물용의약품·혈액원·인체조직(HCT/P) 등 범위 밖
+        ""         — 판별 근거 없음(MODALITY_UNKNOWN). 배지 미표시.
 
-    설계 의도:
-        제형을 잘게 나누면 오분류가 늘어나므로 원료 성격 3분류로만 단순화한다.
-        생물 단서가 우선(생물의약품은 그 자체로 하나의 군), 그 외 의약품 단서는
-        화학합성으로 본다. 세부 제형(정제/주사/액상)은 카드 본문 route/form 으로 표기.
+    [2026-09-21 재설계] 이전 구현은 2순위에서 `product_type` 에 'drug' 가 있거나
+    제형/투여경로 필드가 존재하기만 하면 Chemical 을 확정했다. 그 결과 FDA 483 의
+    `establishment_type`("Sterile Drug Manufacturer" 등)과 openFDA 회수의
+    `product_type="Drugs"` 가 통째로 합성의약품으로 나갔다 — 발행본 실측에서 483 은
+    38%(52/138), 회수는 93%(93/100)가 제품군 정보가 0인 문자열로 합성 확정이었다.
     """
     openfda = raw_payload.get("openfda") or {}
     # product_type 은 openfda.product_type 우선, 없으면 top-level product_type 폴백
-    # (HC 등 openfda 구조가 없는 소스 대응)
+    # (HC 등 openfda 구조가 없는 소스 대응). FDA 483 은 establishment_type 을 여기 싣는다.
     product_type = _as_lower_set(openfda.get("product_type") or raw_payload.get("product_type"))
     forms = _as_lower_set(openfda.get("dosage_form") or raw_payload.get("dosage_form"))
     routes = _as_lower_set(openfda.get("route") or raw_payload.get("route"))
@@ -449,21 +550,37 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
     haystack = " ".join(
         [blob, " ".join(forms), " ".join(routes), " ".join(product_type), product]
     )
+    product_type_blob = " ".join(product_type)
 
-    # 수의/동물용은 인체 의약품 범위 밖 → 모든 분류 이전에 하드 제외(Other).
+    # ── 0. 범위 밖 하드 제외 → Other ──────────────────────────────────────────
+    # 수의/동물용은 인체 의약품 범위 밖.
     #  (a) 구조화 product_type 기준  (b) 명시적 텍스트 구(phrase) 기준 — 둘 다 early-return.
     if any(("veterin" in pt or "animal" in pt) for pt in product_type):
         return MODALITY_OTHER
     if _phrase_any(haystack, MODALITY_VET_EXCLUDE_TERMS):
         return MODALITY_OTHER
+    # 혈액원·인체조직(HCT/P)·생식세포 — '생물'이지만 의약품이 아니다.
+    # ⚠️ 구조화 시설/제품 유형 필드에만 적용한다. haystack 전체에 걸면 의약품 483 본문의
+    #    'blood donor screening' 같은 스쳐가는 언급이 제조소 전체를 범위 밖으로 만든다.
+    if _phrase_any(product_type_blob, MODALITY_OUT_OF_SCOPE_FACILITY_TERMS):
+        return MODALITY_OTHER
 
-    # 1순위: 생물의약품(생물학적제제)
+    # ── 1. 생물의약품 양성 근거 ───────────────────────────────────────────────
     if any("biolog" in pt for pt in product_type):
         return MODALITY_BIOLOGIC
-    if _phrase_any(haystack, MODALITY_BIOLOGIC_TERMS):
+    # FDA 허가 트랙 BLA = 생물의약품(구조화 근거).
+    app_numbers = _modality_application_numbers(raw_payload)
+    if any(a.startswith("BLA") for a in app_numbers):
         return MODALITY_BIOLOGIC
-    # GAP-2: 브랜드명만 있는 생물의약품 — 제형 접미사(2순위 d)·product_type 'drug'에
-    #        가려지기 전에 가로챈다. 제품명 필드 + haystack 양쪽에서 브랜드 어간을 찾는다
+    # ★거짓 친구를 먼저 도려낸 사본으로 본다 — 'biological indicator' 의 'biologic' 이
+    #   무균 기록을 바이오의약품으로 만들지 않도록.
+    haystack_bio = haystack
+    for _ff in MODALITY_BIOLOGIC_FALSE_FRIENDS:
+        haystack_bio = haystack_bio.replace(_ff, " ")
+    if _phrase_any(haystack_bio, MODALITY_BIOLOGIC_TERMS):
+        return MODALITY_BIOLOGIC
+    # GAP-2: 브랜드명만 있는 생물의약품 — 제형 접미사·product_type 'drug'에 가려지기 전에
+    #        가로챈다. 제품명 필드 + haystack 양쪽에서 브랜드 어간을 찾는다
     #        (haystack 은 PRDUCT/ITEM_NAME 을 포함하지 않으므로 제품명 필드를 별도로 합친다).
     _brand_blob = haystack
     for _k in MODALITY_PRODUCT_NAME_KEYS:
@@ -475,23 +592,32 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
         return MODALITY_BIOLOGIC
     # 단클론항체 INN 접미사 '-mab'(adalimumab·rituximab 등)만 단어 끝에서 매칭.
     # (bare "mab" 부분문자열은 'Mabel' 류 오탐을 내므로 접미사 정규식으로 한정)
-    if re.search(r"\b[a-z]{3,}mab\b", haystack):
+    if re.search(r"\b[a-z]{3,}mab\b", haystack_bio):
         return MODALITY_BIOLOGIC
 
-    # 2순위: 화학합성의약품
-    #  (a) product_type 이 'drug' 계열(예: Drugs / Human prescription drug)
-    if any("drug" in pt for pt in product_type):
+    # ── 2. 화학합성 양성 근거 ─────────────────────────────────────────────────
+    # ★여기 들어오는 근거는 전부 "합성이다"를 적극적으로 말해야 한다.
+    #   "의약품이다"만 말하는 근거(product_type 의 'drug', 제형·투여경로 필드의 존재,
+    #   주사·무균·바이알)는 근거가 아니다 — 이전 구현의 결함이 정확히 그것이었다.
+    #  (a) FDA 허가 트랙 NDA/ANDA = 화학합성 트랙(구조화 근거).
+    if any(a.startswith("NDA") or a.startswith("ANDA") for a in app_numbers):
         return MODALITY_CHEMICAL
-    #  (b) 생물 단서는 없고 의약품(제형/투여경로) 단서가 있으면
-    if forms or routes:
+    #  (b) 경구 고형/경구 투여 — 단백질·항체·세포치료제는 경구로 만들 수 없다.
+    if "oral" in routes:
         return MODALITY_CHEMICAL
-    #  (c) 텍스트 제형 단서 — 단, '정제수'(purified water) 는 '정제'(tablet) 오탐이므로 제거
-    haystack_dp = haystack.replace("정제수", "")
-    if _phrase_any(haystack_dp, MODALITY_DRUG_PRODUCT_TERMS):
+    if any(term in f for f in forms for term in MODALITY_ORAL_SOLID_TERMS):
         return MODALITY_CHEMICAL
-    #  (d) MFDS 한국어 제품명 제형 단서 — 제품명 필드에만 적용(개정/규정 등 일반어 오탐 방지).
-    #      한국 의약품은 XX정(정제)/XX주(주사제)/XX캡슐 처럼 본문에 '정제'라는 단어 없이
-    #      제품명 접미사로만 제형이 드러나는 경우가 많다(라이브 검증에서 ~40% 누락 확인).
+    #  (c) 텍스트 경구 고형 단서 — '정제수'(purified water)는 '정제'(tablet) 오탐이라 제거
+    haystack_oral = haystack.replace("정제수", "")
+    if _phrase_any(haystack_oral, MODALITY_ORAL_SOLID_TERMS):
+        return MODALITY_CHEMICAL
+    #  (d) 텍스트가 스스로 합성이라고 말하는 경우
+    if _phrase_any(haystack, MODALITY_CHEMICAL_EXPLICIT_TERMS):
+        return MODALITY_CHEMICAL
+    #  (e) MFDS 한국어 제품명 경구 제형 단서 — 제품명 필드에만 적용(개정/규정 등 오탐 방지).
+    #      한국 의약품은 XX정(정제)/XX캡슐 처럼 본문에 '정제'라는 단어 없이 제품명
+    #      접미사로만 제형이 드러나는 경우가 많다(라이브 검증에서 ~40% 누락 확인).
+    #      ⚠️ 'XX주'(주사제)는 제품군을 가르지 못하므로 뺐다(구현 전에는 포함돼 있었다).
     product_name = ""
     for k in MODALITY_PRODUCT_NAME_KEYS:
         v = raw_payload.get(k)
@@ -500,9 +626,12 @@ def compute_modality(raw_payload: dict[str, Any], *text_parts: str) -> str:
             break
     if product_name:
         pn = product_name.replace("정제수", "")
-        if (_phrase_any(pn, MODALITY_KOREAN_FORM_TERMS)
-                or _KOREAN_FORM_SUFFIX_RE.search(pn)):
+        if (_phrase_any(pn, MODALITY_KOREAN_ORAL_FORM_TERMS)
+                or _KOREAN_ORAL_FORM_SUFFIX_RE.search(pn)):
             return MODALITY_CHEMICAL
 
-    # 3순위: 기타·판별 곤란(제품군 단서 없음)
-    return MODALITY_OTHER
+    # ── 3. 판별 근거 없음 → 배지 미표시 ───────────────────────────────────────
+    # ★MODALITY_OTHER 로 보내지 않는다. 'Other' 는 "제품군 축이 무관"(가이드라인·동물용)
+    #   이라는 적극적 의미이고, 여기는 "우리가 모른다" 이다. 둘을 같은 값에 담으면
+    #   '기타' 집계가 두 모집단을 섞어 무의미해진다.
+    return MODALITY_UNKNOWN

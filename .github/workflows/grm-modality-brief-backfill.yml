@@ -9,7 +9,8 @@ name: GRM 발행 브리프 제품군 소급 재분류 (one-off)
 # ★재생(replay) 충실성을 먼저 증명한다.
 #   발행 시점 판정은 `compute_modality(raw_payload, headline, body, type_or_class, firm)`
 #   이고, Supabase `raw_signals` 가 그 입력을 둘 다 보관한다(raw_json / row_json).
-#   `--verify-replay` 는 **origin/main 의 구 분류기**로 재생해 발행본 배지와 전건 일치하는지
+#   `--verify-replay` 는 **고정 커밋(OLD_CLASSIFIER_REF)의 구 분류기**로 재생해 발행본
+#   배지와 전건 일치하는지
 #   확인한다. 한 장이라도 어긋나면 재생 경로가 발행 경로와 다르다는 뜻이므로 새 판정도
 #   믿을 수 없고, 워크플로가 거기서 멈춘다(숫자가 아니라 성질을 먼저 증명한다).
 #
@@ -27,7 +28,8 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write        # 결과 브랜치 push
+  pull-requests: write   # PR 생성
 
 concurrency:
   group: modality-brief-backfill
@@ -43,9 +45,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          # --verify-replay 가 `git show origin/main:grm_taxonomy.py` 로 구 분류기를
+          # --verify-replay 가 `git show <고정 SHA>:grm_taxonomy.py` 로 구 분류기를
           # 꺼내므로 얕은 클론으로는 안 된다.
           fetch-depth: 0
+          # ★push 는 PAT(오너)로 한다. 기본 GITHUB_TOKEN(봇)은 (a) 이 저장소에서
+          #   push 가 403 으로 거부되고(2026-09-21 실측), (b) 될지라도 봇 트리거라
+          #   PR CI 가 action_required 게이트에 걸려 green 이 안 된다
+          #   (grm-web-publish.yml 이 같은 이유로 PAT 를 쓴다 — PR#243).
+          token: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0

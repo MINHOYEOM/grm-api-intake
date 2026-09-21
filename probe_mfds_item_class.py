@@ -33,8 +33,12 @@ from grm_common import http_get_json, mask_service_key
 
 # 식품의약품안전처_의약품 제품 허가정보 (data.go.kr 15095677, 제공기관 1471000).
 # 기존 MFDS 수집기들과 같은 제공기관·같은 서비스키를 쓴다(신규 키 발급 불필요).
-PERMIT_API_BASE = "https://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService06"
-OPERATIONS = ("getDrugPrdtPrmsnDtlInq05", "getDrugPrdtPrmsnInq05")
+# ★버전 접미가 붙는다. data.go.kr 활용명세의 Base URL 실측(2026-09-21):
+#   apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService08
+#   /getDrugPrdtPrmsnInq08(목록) · /getDrugPrdtPrmsnDtlInq08(상세) · /getDrugPrdtMcpnDtlInq08(주성분)
+#   1차 실행에서 06/05 로 찍었다가 전부 HTTP 400 을 받았다 — 버전은 추측하지 말 것.
+PERMIT_API_BASE = "https://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService08"
+OPERATIONS = ("getDrugPrdtPrmsnDtlInq08", "getDrugPrdtPrmsnInq08")
 
 # (ITEM_SEQ, 제품명, 화면 실측 품목구분) — 대조군.
 CONTROL_SAMPLES = (
@@ -94,6 +98,10 @@ def main(argv: list[str] | None = None) -> int:
 
     verdict_field: str | None = None
     ok = 0
+    # ★"부르지 못했다"와 "불렀는데 없었다"는 다른 결론이다. 1차 실행이 엔드포인트
+    #   버전을 틀려 HTTP 400 을 받았는데 리포트는 "API 응답에 품목구분이 없다"고 단정해
+    #   사람을 엉뚱한 설계(화면 조회)로 보낼 뻔했다. 응답을 한 번이라도 받았는지 센다.
+    responded = 0
     for item_seq, name, expected in samples:
         print(f"\n=== ITEM_SEQ {item_seq} {name or ''}".rstrip())
         if expected:
@@ -103,6 +111,7 @@ def main(argv: list[str] | None = None) -> int:
             if r.get("error"):
                 print(f"  [{op}] 실패 — {r['error']}")
                 continue
+            responded += 1
             row = r.get("row")
             print(f"  [{op}] rows={r.get('count')}")
             if not row:
@@ -135,7 +144,12 @@ def main(argv: list[str] | None = None) -> int:
     if verdict_field:
         print(f"⚠️ 필드 '{verdict_field}' 는 찾았으나 대조군이 어긋난다 — 값 의미 재확인 필요.")
         return 1
-    print("★판정: API 응답에 품목구분이 없다 — 의약품안전나라 화면 조회 경로를 설계해야 한다.")
+    if responded == 0:
+        print("★판정 불가: API 를 한 번도 부르지 못했다(엔드포인트·서비스키·egress 확인). "
+              "'품목구분이 없다'는 결론을 내릴 근거가 아니다.")
+        return 2
+    print("★판정: 응답은 받았으나 품목구분 어휘를 가진 필드가 없다 — "
+          "의약품안전나라 화면 조회 경로를 설계해야 한다.")
     return 1
 
 

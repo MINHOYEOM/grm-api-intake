@@ -2212,6 +2212,12 @@ def dedupe_news_cards(cards: list[CardScaffold]) -> list[CardScaffold]:
 # 15. assemble_brief_skeleton — 페이지 수준(목차·섹션·그룹핑·면책). 별도 순수 함수.
 # ─────────────────────────────────────────────────────────────────────────────
 _TIER_ORDER = {"Tier 3": 0, "Tier 2": 1, "Tier 1": 2}
+# 국내 구역 소제목 순서(고정 선언). 주차마다 건수로 순서가 뒤바뀌면 독자가 같은
+# 자리를 두 번 못 찾으므로 **건수가 아니라 선언 순서**로 고정한다. 발행본 13주
+# 실측상 국내 card_type 은 이 셋이 전부다(GMP실사 81 · 행정처분 51 · 지침·안내서 8).
+_DOMESTIC_GROUP_ORDER = ("GMP실사", "행정처분", "지침·안내서")
+
+
 _SECTION_ORDER = ["global", "domestic", "watch", "recall_table"]
 
 
@@ -2273,6 +2279,18 @@ def _ordered_cards_with_groups(
                 label = cfg.modality_badge.get(mod, mod)
                 seq.extend((c, label) for c in sec_cards
                            if _group_modality(c) == mod)
+        elif sec == "domestic" and len(sec_cards) >= cfg.grouping_threshold:
+            # [국내 소제목 2026-09-21] 종전엔 묶기가 `global` 에만 걸려 있어, 가장 큰
+            # 구역인 국내가 소제목 없이 통으로 흘렀다(실측: 글로벌 8장에 소제목 3개 ·
+            # **국내 28장에 0개**). 국내는 제품군으로 못 묶는다 — 국내 카드의 modality
+            # 는 대부분 비어 있다. 그래서 카드유형으로 묶고, 유형 안의 상대 순서
+            # (Tier→발행일)는 `_sort_key` 결과를 그대로 보존한다.
+            labels = [_kind_meta(c.kind)[1] for c in sec_cards]
+            for label in _DOMESTIC_GROUP_ORDER:
+                seq.extend((c, label) for c, l in zip(sec_cards, labels) if l == label)
+            # 선언에 없는 유형은 뒤에 원래 순서로(새 kind 가 조용히 사라지지 않게).
+            seq.extend((c, l) for c, l in zip(sec_cards, labels)
+                       if l not in _DOMESTIC_GROUP_ORDER)
         else:
             seq.extend((c, "") for c in sec_cards)
     return seq

@@ -1102,34 +1102,6 @@
     ]
    }
   },
-  "data0011-15950": {
-   "title_issue": "디지털의료기기 GMP 질의응답",
-   "summary": "식약처가 「디지털의료기기 제조 및 품질관리 기준 질의·응답집」을 공개했다. 우리가 확보한 입력은 제목 수준이어서 세부 내용은 원문 확인이 필요하다.",
-   "key_facts": [
-    "문서: 디지털의료기기 제조 및 품질관리 기준 질의·응답집",
-    "발행기관: 식약처 (2026-09-10)",
-    "상세: 원문에서 확인 필요"
-   ],
-   "implication": "디지털 기반 제품에 적용되는 제조·품질관리 기준을 질의응답 형식으로 정리하는 흐름이다. 소프트웨어가 제품의 일부로 들어오는 영역에서는 밸리데이션과 변경관리의 적용 방식이 기존 제조 기준과 어긋나는 지점이 생기고, 질의응답집은 대개 그 어긋남을 메우는 자료다.",
-   "checks": [
-    "원문에서 자사 제품군 해당 여부 확인",
-    "소프트웨어 변경관리·밸리데이션 적용 범위 검토"
-   ],
-   "en": {
-    "title_issue": "Digital device GMP Q&A",
-    "summary": "MFDS published a questions and answers compilation on manufacturing and quality management standards for digital medical devices. What we received is at title level, so the detail needs to be read at the source.",
-    "key_facts": [
-     "Document: questions and answers on manufacturing and quality management standards for digital medical devices",
-     "Publisher: MFDS, 10 September 2026",
-     "Detail: the body text was not captured on our side, so the source needs to be read"
-    ],
-    "implication": "Manufacturing and quality standards for digitally based products are being worked out in question-and-answer form. Where software becomes part of the product, validation and change control stop lining up cleanly with established manufacturing standards, and a Q&A compilation is typically what fills that gap.",
-    "checks": [
-     "Confirm from the source whether any of your product range falls in scope",
-     "Review how software change control and validation are applied"
-    ]
-   }
-  },
   "recall-7abe996653c7": {
    "title_issue": "니트로사민 기준초과 회수",
    "summary": "삼아제약(주)가 '삼아록시트로마이신정'의 시중 유통품에 대해 불순물 기준 초과를 이유로 영업자 회수에 들어갔다.",

@@ -34,7 +34,7 @@ REQUIRED_PLUGIN_FIELDS = ("id", "title_en", "official_url")
 MFDS_TYPES = {"guidance-industry", "guidance-internal", "notice-final"}
 SCHEMA_VERSION = "grm-library-staging-diff/v1"
 PLUGIN_PREFIX = "library_collect_"
-CURATED_FIELDS = ("code", "title_en", "pdf_url", "ko_url", "doc_type")
+CURATED_FIELDS = ("code", "title_en", "title_ko", "pdf_url", "ko_url", "doc_type")
 
 
 def _value(item: Any, name: str, default: Any = "") -> Any:

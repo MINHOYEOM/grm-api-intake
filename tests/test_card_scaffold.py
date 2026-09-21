@@ -335,6 +335,61 @@ def _recall_rows(entrps: str, reason: str, pub: str,
     return out
 
 
+class RssNewsTypeTagTest(unittest.TestCase):
+    """rss-news 유형태그 — 매체가 GMP 전담인가로 가른다 (2026-09-21).
+
+    계기: "9월 CHMP 허가권고 12건" 카드가 `GMP News` 태그로 발행됐다. CHMP 는 허가
+    권고 위원회라 GMP 와 무관한데, `rss-news` kind 전체가 레지스트리에서 `GMP News`
+    로 고정돼 있어 "RSS 로 들어왔다"는 이유만으로 붙었다.
+
+    가르는 축은 **매체**다. ECA·PIC/S·MHRA Inspectorate·ISPE 는 매체 자체가 GMP
+    전담이라 그대로 두고, 한 소스에 실사와 일반 뉴스가 섞인 EMA 만 피드로 가른다.
+
+    ★제목 키워드로 가르면 안 된다 — 발행 13주 실측에서 ECA 의
+    "FDA adopts updated ICH Q8/Q9/Q10 Questions & Answers (R5)" 와
+    "BioPhorum Publishes a Roadmap for QC Sample Test Execution" 는 GMP 문서인데
+    제목에 gmp 가 없다. 아래 검사가 그 두 제목을 그대로 들고 있는 이유다.
+    """
+
+    def test_gmp_dedicated_media_keep_the_gmp_tag(self):
+        """기존 동작 보존 — EMA 외 매체는 태그가 바뀌지 않는다."""
+        for source in ("ECA", "PIC/S", "MHRA Inspectorate", "ISPE"):
+            self.assertEqual(cs._rss_news_type_tag({"source": source}, {}),
+                             "GMP News", source)
+
+    def test_ema_inspection_feed_is_gmp(self):
+        self.assertEqual(
+            cs._rss_news_type_tag({"source": "EMA"}, {"feed": "inspections"}),
+            "GMP News")
+
+    def test_ema_general_news_is_not_gmp(self):
+        """CHMP 허가권고·CVMP 회의결과가 오는 피드."""
+        for feed in ("news", "scientific-guidelines", "regulatory-guidelines", ""):
+            self.assertEqual(
+                cs._rss_news_type_tag({"source": "EMA"}, {"feed": feed}),
+                "규제 소식", feed)
+
+    def test_tag_does_not_depend_on_title_wording(self):
+        """매체가 같으면 제목이 무엇이든 태그가 흔들리지 않아야 한다.
+
+        제목 키워드 방식으로 회귀하면 아래 ECA 두 건이 갈라지면서 깨진다.
+        """
+        for title in ("FDA adopts updated ICH Q8/Q9/Q10 Questions & Answers (R5)",
+                      "BioPhorum Publishes a Roadmap for QC Sample Test Execution"):
+            self.assertEqual(
+                cs._rss_news_type_tag({"source": "ECA", "headline": title},
+                                      {"title": title}),
+                "GMP News", title)
+
+    def test_missing_raw_payload_does_not_raise(self):
+        self.assertEqual(cs._rss_news_type_tag({"source": "EMA"}, None), "규제 소식")
+
+    def test_other_kinds_keep_their_registry_tag(self):
+        """이 분기는 rss-news 에만 붙는다 — 다른 kind 의 태그는 그대로다."""
+        self.assertEqual(cs._kind_meta("guidance")[2], "Guidance")
+        self.assertEqual(cs._kind_meta("rss-news")[2], "GMP News")
+
+
 class MergeRecallCardsTest(unittest.TestCase):
     """card_spec §14 — recall 다품목 1카드 병합 렌더 (K3 G1)."""
 

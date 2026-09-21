@@ -90,6 +90,69 @@ class NoEvidenceTest(unittest.TestCase):
                          ci.MODALITY_BIOLOGIC)
 
 
+class GubunVerdictTest(unittest.TestCase):
+    """★MFDS 품목구분 — 규제기관이 **같은 축에서** 부여한 확정 분류.
+
+    허가정보 API 는 의약품만 담아 한약(생약)제제·의약외품이 통째로 빠진다.
+    발행 카드 실 품목코드 120건 실측: 한약 20 + 의약외품 19 = 39건(33%).
+    """
+
+    def test_herbal_and_quasi_drug_are_out_of_the_modality_axis(self) -> None:
+        for g in ("한약(생약)제제등", "의약외품"):
+            self.assertEqual(_card(mfds_gubun_lookup="ok", mfds_item_gubun=g),
+                             ci.MODALITY_OTHER, msg=g)
+
+    def test_biologic_buckets(self) -> None:
+        for g in ("생물의약품", "첨단바이오"):
+            self.assertEqual(_card(mfds_gubun_lookup="ok", mfds_item_gubun=g),
+                             ci.MODALITY_BIOLOGIC, msg=g)
+
+    def test_plain_drug_defers_to_atc(self) -> None:
+        """★'의약품' 은 "생물이 아니다"까지만 말한다 — 저분자라는 양성 근거는 ATC 가 준다."""
+        self.assertEqual(_card(mfds_gubun_lookup="ok", mfds_item_gubun="의약품"),
+                         ci.MODALITY_UNKNOWN)
+        self.assertEqual(_card(mfds_gubun_lookup="ok", mfds_item_gubun="의약품",
+                               mfds_atc_code="H02AB08"), ci.MODALITY_CHEMICAL)
+
+    def test_gubun_outranks_atc(self) -> None:
+        """확정 분류가 치료 분류 추론보다 앞선다."""
+        self.assertEqual(
+            _card(mfds_gubun_lookup="ok", mfds_item_gubun="생물의약품",
+                  mfds_atc_code="C09AA05"), ci.MODALITY_BIOLOGIC)
+
+    def test_failed_lookup_is_never_a_verdict(self) -> None:
+        """★화면 파싱이 깨졌거나 조회를 못 한 상태를 판정으로 바꾸지 않는다."""
+        for state in (mic.LOOKUP_PARSE_FAILED, mic.LOOKUP_ERROR,
+                      mic.LOOKUP_NOT_FOUND, mic.LOOKUP_BUDGET_EXHAUSTED):
+            self.assertEqual(
+                _card(mfds_gubun_lookup=state, mfds_item_gubun="생물의약품"),
+                ci.MODALITY_UNKNOWN, msg=state)
+
+
+class GubunParserTest(unittest.TestCase):
+    """★열 위치가 아니라 라벨로 잡는다 — 화면에 열이 하나 늘어도 성립해야 한다."""
+
+    def _parse(self, html: str) -> str:
+        p = mic._GubunParser()
+        p.feed(html)
+        return (p.value or "").strip()
+
+    def test_label_anchor_survives_column_reorder(self) -> None:
+        a = "<table><tbody><tr><td>제품명X</td><td>품목구분생물의약품</td></tr></tbody></table>"
+        b = "<table><tbody><tr><td>품목구분생물의약품</td><td>제품명X</td></tr></tbody></table>"
+        self.assertEqual(self._parse(a), "생물의약품")
+        self.assertEqual(self._parse(b), "생물의약품")
+
+    def test_vocabulary_is_the_structure_guard(self) -> None:
+        """★파싱이 깨지면 어휘 밖 값이 나온다 — 그걸 판정에 쓰면 안 된다."""
+        v = self._parse("<table><tbody><tr><td>품목구분알수없는값</td></tr></tbody></table>")
+        self.assertNotIn(v, mic.GUBUN_VOCAB)
+
+    def test_known_values_are_in_vocabulary(self) -> None:
+        for g in ("의약품", "생물의약품", "한약(생약)제제등", "의약외품"):
+            self.assertIn(g, mic.GUBUN_VOCAB)
+
+
 class LookupContractTest(unittest.TestCase):
     """수집기↔분류기 계약 — 키 이름이 한쪽에서만 바뀌면 조용히 끊긴다."""
 

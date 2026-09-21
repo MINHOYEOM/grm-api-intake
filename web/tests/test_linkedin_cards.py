@@ -363,6 +363,63 @@ class EnglishDeckTest(unittest.TestCase):
                         self.assertEqual(HANGUL.findall(svg), [])
         self.assertEqual(lc.mini("없는-용어", "en"), lc.mini("_generic", "en"))
 
+    def test_deck_and_site_carry_the_same_figures(self):
+        """그림은 덱(MINI_SVG)과 사이트(partials/glossary_fig/*.html) 두 벌로 산다.
+        한쪽에만 그리면 다른 쪽은 조용히 문서 아이콘으로 돌아간다 — 2026-09-21 에
+        실제로 그랬다(덱에만 있던 deviation). 이름이 아니라 **두 집합의 차이**로 잰다."""
+        fig_dir = pathlib.Path(lc.WEB_DIR) / "partials" / "glossary_fig"
+        site = {p.stem for p in fig_dir.glob("*.html")}
+        deck = set(lc.MINI_SVG) - {"_generic"}      # _generic 은 폴백이라 사이트에 없다
+        self.assertEqual(deck - site, set(), "덱에만 있는 그림 — 사이트 partial 이 없다")
+        self.assertEqual(site - deck, set(), "사이트에만 있는 그림 — 덱 MINI_SVG 가 없다")
+
+    def test_every_figure_points_at_a_real_glossary_term(self):
+        """그림 id 는 정본 용어 id 여야 한다 — 오타 하나면 영영 안 뜨는 그림이 된다."""
+        terms = {t["id"] for t in json.loads(
+            (pathlib.Path(lc.WEB_DIR) / "data" / "glossary.json").read_text(encoding="utf-8"))}
+        orphans = sorted((set(lc.MINI_SVG) - {"_generic"}) - terms)
+        self.assertEqual(orphans, [], f"정본에 없는 용어의 그림: {orphans}")
+
+    def test_tie_is_broken_by_headline_evidence_not_glossary_order(self):
+        """같은 점수면 **그 주 헤드라인이 실제로 다룬 말**이 이긴다.
+        예전 규칙은 동점을 '사전 등재 순서'로 갈랐다 — 편집과 무관한 기준이라, 그림을
+        늘리자 헤드라인 용어가 사전 앞쪽 용어에 밀려났다(2026-09-21 무균공정 → 완제품).
+        여기서는 **등재 순서를 일부러 거꾸로** 두어, 순서가 아니라 근거가 이기는지 본다."""
+        glossary = [
+            # 사전 앞쪽 = 예전 규칙이라면 무조건 이기는 자리. 헤드라인 근거는 없다.
+            {"id": "early-term", "term_ko": "완제품테스트", "term_en": "Early", "easy_ko": "정의", "easy_en": "def"},
+            # 사전 뒤쪽이지만 헤드라인 카드의 구조화 칸(title_issue)에 뜬다.
+            {"id": "late-term", "term_ko": "무균공정테스트", "term_en": "Late", "easy_ko": "정의", "easy_en": "def"},
+        ]
+        # 실측으로 5점 동점을 만든 구성(2026-09-21):
+        #   late-term  = 헤드라인 구조화 칸 강신호 1회        → 5, head_strong=1
+        #   early-term = 헤드라인 본문 1회(3) + 비헤드라인 강신호 1회(2) → 5, head_strong=0
+        # 카드 5장이라 둘 다 40% 감쇠에 걸리지 않는다(df 2/5, 1/5).
+        head = {"id": "H", "title_issue": "무균공정테스트 관리 미흡",
+                "summary": "완제품테스트 항목도 함께 살폈다"}
+        cards = [head,
+                 {"id": "A", "title_issue": "완제품테스트 관련", "summary": ""},
+                 {"id": "B", "title_issue": "", "summary": ""},
+                 {"id": "C", "title_issue": "", "summary": ""},
+                 {"id": "D", "title_issue": "", "summary": ""}]
+
+        # 둘 다 점수가 살아 있어야 동점 비교가 성립한다 — 각각 혼자 두면 반드시 뽑힌다.
+        for t in glossary:
+            with self.subTest(alone=t["id"]):
+                self.assertEqual([x["id"] for x in lc.pick_glossary_terms([t], cards, 1,
+                                                                          headline_cards=[head])],
+                                 [t["id"]], "점수가 0이라 후보도 못 된다 — 픽스처가 낡았다")
+
+        # 핵심: 사전 등재 순서를 뒤집어도 **헤드라인 근거가 있는 쪽**이 이긴다.
+        # 예전 규칙(동점 → 사전 순서)이라면 [early, late] 에서 early 가 이겼다.
+        for order, why in (([glossary[0], glossary[1]], "사전에 early 가 먼저"),
+                           ([glossary[1], glossary[0]], "사전에 late 가 먼저")):
+            with self.subTest(order=why):
+                self.assertEqual([t["id"] for t in lc.pick_glossary_terms(order, cards, 1,
+                                                                          headline_cards=[head])],
+                                 ["late-term"],
+                                 f"{why} — 동점인데 등재 순서가 이겼다. 헤드라인 근거를 먼저 봐야 한다")
+
     def test_unknown_language_is_refused_loudly(self):
         with self.assertRaises(ValueError):
             lc.build_deck(self.doc, self.gl, lang="fr")

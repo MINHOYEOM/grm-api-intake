@@ -371,6 +371,100 @@ def merge_admin_batch_dispositions(cards: list[dict[str, Any]]
     return out
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 무지적 GMP 실사 접기 + 국내 구역 카드유형 소제목 (2026-09-21)
+# ─────────────────────────────────────────────────────────────────────────────
+_NO_FINDING_MARK = "지적(보완)사항(Deficiencies) 없음"
+
+
+def _is_no_finding_inspection(c: dict[str, Any]) -> bool:
+    """지적사항이 없는 GMP 실사 결과 카드인가.
+
+    판정은 **결과 문구**로 한다 — 제목(`무지적`)은 Routine 이 쓴 산문이라 표현이
+    바뀔 수 있지만, `key_facts` 의 결과 줄은 수집기가 원문에서 만든 결정론 문구다.
+    (2026-09-21 실측: 제목 기준 11장 ≡ 결과 문구 기준 11장, 오탐 0.)
+    """
+    if c.get("card_type") != "GMP실사":
+        return False
+    return any(_NO_FINDING_MARK in str(k) for k in (c.get("key_facts") or []))
+
+
+def _inspection_site_line(c: dict[str, Any]) -> str:
+    """`제조소 · 실사기간` — 목록 한 줄(사실 재작성 0, facts 에서 파생)."""
+    site = insp = ""
+    for f in (c.get("facts") or []):
+        lab = (f.get("label") or "").strip()
+        if lab in ("제조소", "제조소/업체", "업체"):
+            site = str(f.get("value") or "")
+        elif "실사" in lab:
+            insp = str(f.get("value") or "")
+    site = site or c.get("headline_target") or str(c.get("id", ""))
+    return f"{site} · {insp}" if insp else site
+
+
+def merge_no_finding_inspections(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """지적 없는 GMP 실사 결과 다건을 목록 카드 1장으로 접는다(순수·결정론).
+
+    2026-09-21 호 국내 구역 28장 중 11장이 "…제조소 무지적" 이었다(39%). 지적이
+    없다는 것도 신호이긴 하나, 거의 같은 문장 11장이 연속으로 흐르면 정작 지적이
+    있는 실사 결과가 묻힌다. 제조소·실사기간은 목록으로 전부 남으므로 유실은 없다.
+
+    2건 미만이면 무변화. 대표 = `id` 오름차순 첫 카드(483 디제스트·회수·일괄처분
+    병합과 같은 규약). 나머지 멤버는 발행본에서 제외(Notion Status 는 Routine 이 이미
+    처리 — 유실 아님)."""
+    idxs = [i for i, c in enumerate(cards) if _is_no_finding_inspection(c)]
+    if len(idxs) < 2:
+        return cards
+    idxs.sort(key=lambda i: str(cards[i].get("id", "")))
+    n = len(idxs)
+    rep_src = cards[idxs[0]]
+    sites = [_inspection_site_line(cards[i]) for i in idxs]
+    rep = dict(rep_src)
+    rep["title_issue"] = f"지적 없는 GMP 실사 결과 {n}건"
+    rep["headline_target"] = f"{rep_src.get('headline_target') or ''} 외 {n - 1}곳".strip()
+    rep["summary"] = (
+        f"식약처가 공개한 GMP 실사 결과 가운데 지적(보완)사항이 없었던 {n}건을 한 장으로 "
+        f"묶었다. 제조소와 실사기간은 이 카드의 목록에 있다.")
+    rep["key_facts"] = [
+        f"건수: {n}건 (평가 결과 지적(보완)사항 없음)",
+        "출처: 식약처 GMP 실사 결과 공개",
+    ]
+    rep["implication"] = (
+        "지적이 없었다는 것은 그 제조소가 해당 시점 실사를 통과했다는 사실까지를 말한다. "
+        "해외 위탁·수탁 후보를 볼 때 실사 이력이 공개된 제조소인지 자체가 선별 기준이 "
+        "되므로, 목록에 자사 공급망 제조소가 있는지 확인하는 용도로 쓴다.")
+    rep["checks"] = [
+        "목록에 자사 위탁·수탁 제조소가 있는지 확인",
+        "해당 시 실사 시점과 자사 실사·감사 주기의 정합성 점검",
+    ]
+    rep["merged_count"] = n
+    rep["merged_noun"] = "건"
+    rep["merged_items"] = sites
+    rep["merged_multi_firm"] = True
+    rep.pop("quotes_translation", None)
+    rep.pop("quotes", None)          # 대표 1건의 인용을 묶음 전체의 것처럼 싣지 않는다
+    en = rep_src.get("en")
+    if isinstance(en, dict):
+        rep["en"] = {
+            **en,
+            "title_issue": f"GMP inspections with no findings ({n})",
+            "summary": (f"MFDS published {n} GMP inspection results with no deficiencies "
+                        f"raised. The sites and inspection dates are listed on this card."),
+            "key_facts": [f"Count: {n} inspections with no deficiencies raised",
+                          "Source: MFDS published GMP inspection results"],
+            "checks": ["Check the list for your own contract manufacturing sites"],
+        }
+    drop = {str(cards[i].get("id")) for i in idxs[1:]}
+    rep_id = str(rep_src.get("id"))
+    out: list[dict[str, Any]] = []
+    for c in cards:
+        cid = str(c.get("id"))
+        if cid in drop:
+            continue
+        out.append(rep if cid == rep_id else c)
+    return out
+
+
 def extract_resource_notes(cards: list[dict[str, Any]]
                            ) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
     """(event_cards, resources). resource 판정 = agency ∈ RESOURCE_AGENCIES ∧
@@ -517,6 +611,10 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # 받은 행정처분 → 1장. 심층분석 주입 **뒤**여야 대표가 분석을 들고 접힌다(483 디제스트
     # 접기와 같은 이유 — 접은 뒤 주입하면 대표 아닌 카드의 분석이 갈 곳을 잃는다).
     adopted_cards = merge_admin_batch_dispositions(adopted_cards)
+
+    # [무지적 실사 접기 2026-09-21] 지적 없는 GMP 실사 결과 다건 → 목록 카드 1장.
+    adopted_cards = merge_no_finding_inspections(adopted_cards)
+
 
     # [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(ECA GMP News 등) → 이벤트 카드에서
     # 분리해 브리프 하단 전용 섹션으로. 아래 render_order 재부여·빈슬롯 게이트·adopted 집계는

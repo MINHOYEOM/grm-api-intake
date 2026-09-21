@@ -580,6 +580,83 @@ class MergeAdminBatchDispositionsTest(unittest.TestCase):
         self.assertEqual([c["id"] for c in out], ["admin-5", "admin-1"])  # 원 순서 보존
 
 
+class MergeNoFindingInspectionsTest(unittest.TestCase):
+    """지적 없는 GMP 실사 결과 접기 (2026-09-21).
+
+    계기: 2026-09-21 호 국내 구역 28장 중 **11장**이 "…제조소 무지적" 이었다(39%).
+    거의 같은 문장이 연속으로 흐르면 정작 지적이 있는 실사 결과가 묻힌다.
+
+    판정은 제목이 아니라 **결과 문구**로 한다 — 제목은 Routine 이 쓴 산문이라 표현이
+    바뀔 수 있지만 `key_facts` 의 결과 줄은 수집기가 원문에서 만든 결정론 문구다.
+    """
+
+    @staticmethod
+    def _card(cid, site, insp="2026-03-17~2026-03-19", no_finding=True, ctype="GMP실사"):
+        kf = [f"실사: {insp}, 사후 / 완제(단일)"]
+        kf.append("결과: 평가 결과 지적(보완)사항(Deficiencies) 없음" if no_finding
+                  else "결과: 지적(보완)사항 3건")
+        return {"id": cid, "card_type": ctype, "type_tag": ctype, "agency": "MFDS",
+                "title_issue": ("제조소 무지적" if no_finding else "제조소 지적 3건"),
+                "headline_target": site, "summary": f"{site} 실사 결과.",
+                "implication": "", "checks": [], "key_facts": kf,
+                "facts": [{"label": "제조소", "value": site},
+                          {"label": "실사기간", "value": insp}],
+                "en": {"title_issue": "Inspection", "summary": "s",
+                       "key_facts": ["k"], "checks": ["c"]}}
+
+    def test_no_finding_inspections_fold_into_one(self):
+        cards = [self._card("gmp-3", "다제조소"), self._card("gmp-1", "가제조소"),
+                 self._card("gmp-2", "나제조소"),
+                 self._card("gmp-9", "라제조소", no_finding=False)]   # 지적 有 → 유지
+        out = apb.merge_no_finding_inspections(cards)
+        ids = [c["id"] for c in out]
+        self.assertEqual(len(out), 2)
+        self.assertIn("gmp-1", ids)                    # 대표 = id 오름차순 첫
+        self.assertIn("gmp-9", ids)                    # 지적 있는 실사는 그대로
+        rep = next(c for c in out if c["id"] == "gmp-1")
+        self.assertEqual(rep["merged_count"], 3)
+        self.assertEqual(rep["merged_noun"], "건")
+        self.assertEqual(len(rep["merged_items"]), 3)
+        self.assertIn("3건", rep["title_issue"])
+
+    def test_sites_are_not_lost(self):
+        cards = [self._card("gmp-1", "가제조소"), self._card("gmp-2", "나제조소")]
+        rep = apb.merge_no_finding_inspections(cards)[0]
+        joined = " ".join(rep["merged_items"])
+        for site in ("가제조소", "나제조소"):
+            self.assertIn(site, joined)
+
+    def test_judged_by_result_line_not_title(self):
+        """제목이 '무지적' 이 아니어도 결과 문구가 있으면 대상이다(그 반대도)."""
+        c = self._card("gmp-1", "가제조소")
+        c["title_issue"] = "표현이 바뀐 제목"
+        self.assertTrue(apb._is_no_finding_inspection(c))
+        c2 = self._card("gmp-2", "나제조소", no_finding=False)
+        c2["title_issue"] = "무지적"
+        self.assertFalse(apb._is_no_finding_inspection(c2))
+
+    def test_non_inspection_cards_are_ignored(self):
+        c = self._card("admin-1", "가제약", ctype="행정처분")
+        self.assertFalse(apb._is_no_finding_inspection(c))
+
+    def test_single_no_finding_unchanged(self):
+        cards = [self._card("gmp-1", "가제조소")]
+        self.assertEqual(apb.merge_no_finding_inspections(cards), cards)
+
+    def test_representative_quote_is_not_presented_as_the_batch(self):
+        """대표 1건의 인용을 묶음 전체의 것처럼 싣지 않는다."""
+        cards = [self._card("gmp-1", "가제조소"), self._card("gmp-2", "나제조소")]
+        cards[0]["quotes"] = [{"original": "가제조소 원문", "translation": ""}]
+        rep = apb.merge_no_finding_inspections(cards)[0]
+        self.assertNotIn("quotes", rep)
+
+    def test_is_pure(self):
+        cards = [self._card("gmp-1", "가제조소"), self._card("gmp-2", "나제조소")]
+        snap = copy.deepcopy(cards)
+        apb.merge_no_finding_inspections(cards)
+        self.assertEqual(cards, snap)
+
+
 class ExtractResourceNotesTest(unittest.TestCase):
     """[업계 브리핑 노트 2026-07-13] extract_resource_notes 단위 테스트(순수 함수)."""
 

@@ -25,10 +25,10 @@
   ],
   "coverage": {
    "intake_total": 107,
-   "rendered": 54,
+   "rendered": 38,
    "evidence": {
-    "A": 48,
-    "B": 6,
+    "A": 33,
+    "B": 5,
     "C": 0
    },
    "resources": 3
@@ -929,7 +929,7 @@
    "id": "gmpinspect-1Q2a5UEfhl1",
    "render_order": 8,
    "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -1023,7 +1023,7 @@
    "id": "gmpinspect-1Q2aMMjWSti",
    "render_order": 9,
    "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -1146,1550 +1146,10 @@
    }
   },
   {
-   "id": "admin-2026006742",
+   "id": "gmpinspect-1Q2TqD05rgw",
    "render_order": 10,
    "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "한림제약(주)",
-   "title_issue": "재심사 자료 미제출 판매정지",
-   "summary": "식약처가 한림제약(주)에 대해 의약품 '스타펜캡슐'의 재심사에 필요한 자료의 일부를 제출하지 않은 사실을 확인하고 해당품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006742"
-    },
-    {
-     "label": "업체",
-     "value": "한림제약(주)"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 스타펜캡슐"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "의약품 ‘스타펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약품 '스타펜캡슐'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 스타펜캡슐",
-    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
-   ],
-   "implication": "결격 사유가 자료의 존재 여부가 아니라 시판 후 조사 대상자 수 부족이라는 정량 요건 미달이라는 점이 이 처분의 축이다. 조사 증례 수는 재심사 기간이 끝난 뒤에는 보완할 방법이 없어, 수집 진척을 기간 도중에 확인하는 체계가 있느냐가 판매업무정지 여부를 가른다.",
-   "checks": [
-    "재심사 대상 품목의 시판 후 조사 증례 수집 진척 관리",
-    "재심사 자료 제출 기한과 조사 종료 시점의 정합성"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
-      "original": "의약품 ‘스타펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-      "description": "해당 업체가 의약품 '스타펜캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
-      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
-     "items": [
-      "'스타펜캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
-      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
-      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
-      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006742",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Re-examination data shortfall",
-    "summary": "MFDS suspended sales of one prescription capsule product for three months at a domestic pharmaceutical manufacturer, after finding that part of the data required for the product's re-examination had not been submitted.",
-    "implication": "What failed here is a quantitative requirement - the number of post-marketing surveillance subjects - rather than the existence of a dossier. Case numbers cannot be made up once the re-examination period has closed, so whether enrolment progress is checked mid-period is what separates a clean filing from a sales suspension.",
-    "key_facts": [
-     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
-     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
-    ],
-    "checks": [
-     "Tracking of post-marketing surveillance case accrual for products subject to re-examination",
-     "Alignment between the re-examination submission deadline and the close of the surveillance period"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006744",
-   "render_order": 11,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "지엘팜텍(주)",
-   "title_issue": "재심사 자료 미제출 판매정지",
-   "summary": "식약처가 지엘팜텍(주)에 대해 의약품 '리로우펜캡슐'의 재심사에 필요한 자료의 일부를 제출하지 않은 사실을 확인하고 해당품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006744"
-    },
-    {
-     "label": "업체",
-     "value": "지엘팜텍(주)"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 리로우펜캡슐"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "의약품 ‘리로우펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약품 '리로우펜캡슐'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 리로우펜캡슐",
-    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
-   ],
-   "implication": "시판 후 조사는 실행을 외부에 맡기더라도 자료 제출 책임은 품목허가권자에게 남는다는 점이 이 처분에서 드러난다. 대상자 수라는 정량 요건은 위탁 상대방의 진척 보고만으로는 담보되지 않아, 등록 현황을 허가권자가 직접 확인하는 절차가 있어야 기간 종료 전에 미달을 잡아낼 수 있다.",
-   "checks": [
-    "시판 후 조사 위탁 시 대상자 등록 현황의 직접 확인 절차",
-    "재심사 요구 자료 목록과 실제 확보 자료의 대조"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
-      "original": "의약품 ‘리로우펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-      "description": "해당 업체가 의약품 '리로우펜캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
-      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
-     "items": [
-      "'리로우펜캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
-      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
-      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
-      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006744",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Re-examination data shortfall",
-    "summary": "MFDS suspended sales of one prescription capsule product for three months at a domestic pharmaceutical manufacturer, after finding that part of the data required for the product's re-examination had not been submitted.",
-    "implication": "Post-marketing surveillance can be contracted out, but responsibility for the submitted data stays with the marketing authorisation holder. A subject-count requirement is not secured by a contractor's progress report alone, so the holder needs its own sight of enrolment status to catch a shortfall before the period closes.",
-    "key_facts": [
-     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
-     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
-    ],
-    "checks": [
-     "Direct verification of subject enrolment status where post-marketing surveillance is outsourced",
-     "Reconciliation of the required re-examination data list against what has actually been obtained"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006746",
-   "render_order": 12,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "대원제약(주)",
-   "title_issue": "재심사 자료 미제출 판매정지",
-   "summary": "식약처가 대원제약(주)에 대해 의약품 '업타바캡슐'의 재심사에 필요한 자료의 일부를 제출하지 않은 사실을 확인하고 해당품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006746"
-    },
-    {
-     "label": "업체",
-     "value": "대원제약(주)"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 업타바캡슐"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "의약품 ‘업타바캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약품 '업타바캡슐'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 업타바캡슐",
-    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
-   ],
-   "implication": "품질 결함이 아니라 허가 후 관리 의무의 미이행에서 비롯된 처분이지만 결과는 3개월간의 출하 중단이라는 점이 이 사안의 성격이다. 재심사 일정이 공급 계획과 같은 표에서 관리되지 않으면 정지 개시일이 다가올 때까지 공급 영향이 파악되지 않는다.",
-   "checks": [
-    "재심사 일정과 품목별 공급 계획의 연계 관리",
-    "판매업무정지 기간 중 재고·유통 대응 절차"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
-      "original": "의약품 ‘업타바캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-      "description": "해당 업체가 의약품 '업타바캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
-      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
-     "items": [
-      "'업타바캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
-      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
-      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
-      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006746",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Re-examination data shortfall",
-    "summary": "MFDS suspended sales of one prescription capsule product for three months at a domestic pharmaceutical manufacturer, after finding that part of the data required for the product's re-examination had not been submitted.",
-    "implication": "The trigger is a post-approval administrative obligation rather than a quality defect, yet the outcome is three months without shipment. Where the re-examination calendar is not held on the same sheet as the supply plan, the supply impact is not visible until the suspension start date is close.",
-    "key_facts": [
-     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
-     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
-    ],
-    "checks": [
-     "Linking the re-examination calendar to the product-level supply plan",
-     "Inventory and distribution response during a sales suspension period"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006747",
-   "render_order": 13,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "▫️ 기타",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "애경산업(주)",
-   "title_issue": "가글제 함량 부적합 제조정지",
-   "summary": "식약처가 애경산업(주)에 대해 유통 의약외품 수거·검사에서 구중청량제의 유효성분 함량이 기준을 벗어난 제품을 제조·판매한 사실을 확인하고, 해당 품목 제조업무정지 1년 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006747"
-    },
-    {
-     "label": "업체",
-     "value": "애경산업(주)"
-    },
-    {
-     "label": "처분",
-     "value": "○ 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.) \n * (대상품목) 1. 2080키즈가글딸기맛, 2. 2080키즈가글바나나맛, 3. 2080키즈오가글딸기맛, 4. 2080키즈오가글바나나맛, 5. 2080퓨어가글, 6. 2080애플민트향가글, 7. 2080퓨어가글클린민트향, 8. 스몰란드키즈가글딸기향, 9. 스몰란드키즈가글바나나향, 10. 오라텍트마우스워시바이랩신, 11. 2080진지발리스가글스트롱, 12. 2080진지발리스가글마일드, 13. 바이컬러치어리마우스워시(허가번호: 제5042호, 허가일자: 2015.4.9.)\n ※ 상기 제품은 패키지 품목이므로, 패키지 품목 전체에 대하여 처분"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "○ 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험)\n -「약사법」제62조 및 제66조에 따라, 누구든지 다음 각 호의 어느 하나에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘2080진지발라스가글스트롱’ 제품의 유통 의약외품 수거·검사 결과, 유효성분(염화세틸피리디늄) 함량이 기준치보다 10%이상 과부족한 제품을 제조하여 판매한 사실이 있음\n  * (규격) 표기량(0.05 g/ 100g)에 대하여 9…",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험) — '2080진지발라스가글스트롱'의 유효성분(염화세틸피리디늄) 함량이 기준치보다 10% 이상 과부족",
-    "수치: (규격) 표기량(0.05 g/ 100g)에 대하여 90.0% 이상 / (결과) 69.2 %",
-    "처분: 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.) — 패키지 품목이므로 13개 품목 전체에 대하여 처분",
-    "적용법령: 「약사법」 제62조 및 제66조"
-   ],
-   "implication": "표기량의 90.0% 이상이어야 할 유효성분이 69.2%로 확인된 것은 배치 간 편차가 아니라 함량 관리 자체가 규격 하한을 담보하지 못한 결과로 읽힌다. 패키지 품목이라는 이유로 처분이 13개 품목 전체로 확대된 점도 함께 읽히는데, 한 품목의 함량 일탈이 같은 허가 단위로 묶인 품목군 전체의 제조 중단으로 번지는 구조다.",
-   "checks": [
-    "유효성분 함량의 공정 중 관리 기준과 출하시험 규격의 정합성",
-    "패키지 품목으로 묶인 허가 단위의 처분 파급 범위 확인",
-    "수거·검사 부적합 발생 시 동일 허가 단위 품목의 영향 평가 절차"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "「약사법」제62조 및 제66조",
-      "original": "○ 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험)\n -「약사법」제62조 및 제66조에 따라, 누구든지 다음 각 호의 어느 하나에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘2080진지발라스가글스트롱’ 제품의 유통 의약외품 수거·검사 결과, 유효성분(염화세틸피리디늄) 함량이 기준치보다 10%이상 과부족한 제품을 제조하여 판매한 사실이 있음\n  * (규격) 표기량(0.05 g/ 100g)에 대하여 90.0% 이상 / (결과) 69.2 %",
-      "description": "「약사법」제62조 및 제66조에 따라 누구든지 해당 각 호에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나, 해당 업체는 '2080진지발라스가글스트롱' 제품의 유통 의약외품 수거·검사 결과 유효성분(염화세틸피리디늄) 함량이 기준치보다 10% 이상 과부족한 제품을 제조하여 판매한 사실이 있다는 것이 위반사실이다. 규격은 표기량(0.05 g/ 100g)에 대하여 90.0% 이상이며, 검사 결과는 69.2 % 로 확인되었다.",
-      "risk": "유효성분 함량이 표기량의 90.0% 이상이어야 하는 규격에 대하여 69.2 % 로 확인된 것은 하한 규격을 크게 벗어난 결과로, 배치 간 편차 수준이 아니라 함량 관리 체계가 하한을 담보하지 못했을 가능성을 가리킨다. 구중청량제의 유효성분은 표시된 효능의 근거가 되므로 함량 미달은 표시 효능을 뒷받침하지 못하는 상태가 되고, 해당 제품이 패키지 품목으로 묶여 있어 처분 범위가 13개 품목 전체로 확대되었다."
-     }
-    ],
-    "disposition_basis": "처분의 근거 법령은 「약사법」제62조 및 제66조이며, 처분 기준은 「약사법」제76조 및 의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅰ.일반기준 제9호 및 Ⅱ. 개별기준 제39호아목2) 이다. 처분은 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.)이며, 대상품목은 2080키즈가글딸기맛 등 13개 품목으로, 상기 제품이 패키지 품목이므로 패키지 품목 전체에 대하여 처분되었다. 위반이 유통 단계의 수거·검사에서 확인되었다는 점에서 출하 시점의 자체 시험만으로는 걸러지지 않은 사안이다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2027. 9. 27. (해당 품목 제조업무정지 1년)",
-     "items": [
-      "유효성분(염화세틸피리디늄) 함량이 표기량(0.05 g/ 100g) 대비 69.2 % 로 확인된 원인을 제조·보관·시험 단계별로 조사할 것.",
-      "함량의 하한 규격(90.0% 이상)을 담보하기 위한 공정 중 관리 기준과 출하시험 규격의 정합성을 재검토할 것.",
-      "패키지 품목으로 묶인 13개 대상품목 전체에 대하여 동일 원인의 영향 여부를 평가할 것.",
-      "유통 중 수거·검사에서 부적합이 확인될 경우의 내부 통보·회수 판단 절차를 정비할 것."
-     ]
-    },
-    "administrative_risks": "제조업무정지 1년은 이번 사안에서 확인된 처분 가운데 가장 긴 기간으로, 대상이 개별 품목이 아니라 패키지 품목 전체 13개 품목이어서 공급 영향이 품목 수만큼 확대된다. 행정처분 사실은 공개종료일자 20271226 까지 공개된다. 위반이 수거·검사라는 사후 확인 경로에서 드러난 만큼, 동일 라인에서 제조되는 다른 의약외품에 대해서도 같은 방식의 확인이 이어질 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006747",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Mouthwash assay failure",
-    "summary": "MFDS found that a domestic manufacturer had produced and sold a mouthwash quasi-drug whose active ingredient content fell outside specification on post-market sampling and testing, and suspended manufacture of the products concerned for one year.",
-    "implication": "An active ingredient found at 69.2% against a floor of 90.0% of label reads as content control that does not hold the lower limit, not as batch-to-batch variation. The second half of the case is the spread: because the item sits in a package listing, one product's assay failure stops manufacture across all 13 products under that listing.",
-    "key_facts": [
-     "Violation: post-market sampling and testing of a mouthwash quasi-drug failed the assay for active ingredient content, with cetylpyridinium chloride more than 10% off the specified level",
-     "Result: specification is not less than 90.0% of the labelled amount (0.05 g/100 g); the result was 69.2%",
-     "Action: one-year suspension of manufacture, from 28 September 2026 to 27 September 2027; because the item is a package listing, the action applies to all 13 products in it",
-     "Legal basis: Pharmaceutical Affairs Act Articles 62 and 66"
-    ],
-    "checks": [
-     "Consistency between in-process content controls and the release specification for active ingredient assay",
-     "Scope of products grouped under one approval listing and the reach of an action against it",
-     "Impact assessment across products in the same listing when post-market testing fails"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006748",
-   "render_order": 14,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "동국제약(주)",
-   "title_issue": "신약 재심사 규정 위반",
-   "summary": "식약처가 동국제약(주)에 대해 의약품 제조업자의 신약 등의 재심사 규정 위반을 확인하고, '피타론에프캡슐'에 대해 해당 품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006748"
-    },
-    {
-     "label": "업체",
-     "value": "동국제약(주)"
-    },
-    {
-     "label": "처분",
-     "value": "○ 해당 품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.)\n  * (대상품목) 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.)"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반\n - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나,\n - 동 업체는 ‘피타론에프캡슐’의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: '피타론에프캡슐'의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않음",
-    "기한 규정: 품목허가를 받은 날로부터 4년에서 6년이 지난 날로부터 3개월 이내에 재심사",
-    "처분: 해당 품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.) — 대상품목 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.)"
-   ],
-   "implication": "재심사는 허가일로부터 4년에서 6년이 지난 날을 기산점으로 삼아 3개월이라는 좁은 창구 안에서 이뤄져야 한다는 것이 이 처분의 전제다. 허가일이 오래된 품목일수록 이 기산점이 일정표에서 빠지기 쉬워, 재심사 도래 시점을 품목대장에서 자동으로 짚어내는 관리가 실효를 갖는다.",
-   "checks": [
-    "품목별 재심사 도래 시점의 대장 관리",
-    "허가일 기준 재심사 기산점 산정의 정확성"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "「약사법」제31조제10항(신약 등)",
-      "original": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반\n - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나,\n - 동 업체는 ‘피타론에프캡슐’의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음",
-      "description": "의약품 제조업자가 품목허가를 받은 의약품이 「약사법」제31조제10항(신약 등)에 해당하는 경우 그 의약품은 품목허가를 받은 날로부터 4년에서 6년이 지난 날로부터 3개월 이내에 재심사를 받아야 하나, 해당 업체는 '피타론에프캡슐'의 재심사 시 필요한 자료의 일부를 제출하지 않았다는 것이 위반사실이다. 미제출된 자료의 내용은 시판 후 조사대상자 수 부족으로 기재되어 있다.",
-      "risk": "재심사 기산점이 허가일로부터 4년에서 6년이 지난 날이고 이행 기간이 3개월로 좁아, 해당 시점을 놓치면 자료를 보완할 여지가 사실상 없다. 시판 후 조사대상자 수가 부족한 상태로 기간이 종료되면 그 품목의 시판 후 안전성 근거가 미완성으로 남고, 판매업무정지로 해당 품목의 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 「구약사법」제32조(법률 제20139호, 2024.1.24.) 및 「구의약품 등의 안전에 관한 규칙」제23조(총리령 제20003호, 2024.12.30.)이고, 처분 기준은 「구약사법」제76조(법률 제20139호, 2024.1.24.) 및 「구의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅱ.개별기준 제8호나목(총리령 제20003호, 2024.12.30.)이다. 「약사법」 부칙<법률 제20328호, 2024.2.20.> 제4조에 따라 재심사 기간을 부여받은 품목은 개정규정에도 불구하고 종전의 규정을 따른다는 경과규정이 함께 적시되어 있어, 이 사안에서는 개정 전 규정이 판단 기준이 되었다. 처분 대상은 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.) 한 품목이다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당 품목 판매업무정지 3개월)",
-     "items": [
-      "피타론에프캡슐의 재심사 자료 중 미제출 항목과 시판 후 조사대상자 수 부족의 규모를 확인할 것.",
-      "허가일을 기준으로 재심사 기산점(허가일로부터 4년에서 6년이 지난 날)과 이행 기한(그로부터 3개월)을 품목대장에서 산출·관리하는 체계를 정비할 것.",
-      "재심사 기간을 부여받은 다른 품목에 대하여 종전 규정이 적용되는지 여부를 확인하고 해당 품목 목록을 정리할 것.",
-      "판매업무정지 기간 중 해당 품목의 공급 중단에 따른 거래처 통보 및 재고 처리 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "판매업무정지 기간 동안 해당 품목의 공급이 중단되며, 행정처분 사실은 공개종료일자 20270326 까지 공개된다. 경과규정에 따라 종전 규정이 적용되는 품목이 다수 남아 있는 경우 같은 유형의 위반이 반복될 수 있고, 기산점 산정 착오는 품목 단위로 독립하여 발생하므로 한 품목의 시정만으로는 재발이 차단되지 않는다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006748",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "New-drug re-examination breach",
-    "summary": "MFDS found a breach of the re-examination requirement for new drugs by a domestic pharmaceutical manufacturer and suspended sales of the capsule product concerned for three months.",
-    "implication": "The premise of the action is that re-examination has to land inside a narrow three-month window measured from a point four to six years after approval. The older the approval, the more easily that anchor date drops off a schedule, which is why deriving the due date automatically from the product register is what makes the control work.",
-    "key_facts": [
-     "Violation: part of the data required at re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Timing rule: re-examination must take place within three months of the point falling four to six years after product approval",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026; the product was approved on 3 April 2019"
-    ],
-    "checks": [
-     "Product-register tracking of re-examination due dates",
-     "Accuracy of the anchor-date calculation from the approval date"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006796",
-   "render_order": 15,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "안국약품(주)",
-   "title_issue": "재심사 자료 미제출 판매정지",
-   "summary": "식약처가 안국약품(주)에 대해 의약품 '페바로에프캡슐'의 재심사에 필요한 자료의 일부를 제출하지 않은 사실을 확인하고 해당품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006796"
-    },
-    {
-     "label": "업체",
-     "value": "안국약품(주)"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 페바로에프캡슐"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "의약품 ‘페바로에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약품 '페바로에프캡슐'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 페바로에프캡슐",
-    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
-   ],
-   "implication": "재심사 자료는 제출했다는 사실이 아니라 필요한 자료가 빠짐없이 갖춰졌는지로 판정된다는 점이 이 처분에서 확인된다. 제출 직전에 요구 자료 목록과 확보분을 항목별로 대조하는 절차가 없으면 대상자 수 같은 정량 요건의 미달이 제출 이후에야 드러난다.",
-   "checks": [
-    "재심사 제출 전 요구 자료 목록 대비 확보 현황 대조",
-    "조사 대상자 수 등 정량 요건 충족 여부의 사전 판정"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
-      "original": "의약품 ‘페바로에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-      "description": "해당 업체가 의약품 '페바로에프캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
-      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
-     "items": [
-      "'페바로에프캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
-      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
-      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
-      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006796",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Re-examination data shortfall",
-    "summary": "MFDS suspended sales of one prescription capsule product for three months at a domestic pharmaceutical manufacturer, after finding that part of the data required for the product's re-examination had not been submitted.",
-    "implication": "A re-examination is judged on whether every required element is present, not on the act of filing. Without an item-by-item reconciliation of the required list against what is in hand shortly before submission, a quantitative gap such as subject numbers only surfaces after filing.",
-    "key_facts": [
-     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
-     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
-    ],
-    "checks": [
-     "Item-by-item reconciliation of required versus available data before a re-examination filing",
-     "Pre-assessment of whether quantitative requirements such as subject numbers are met"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006797",
-   "render_order": 16,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "삼진제약(주)",
-   "title_issue": "재심사 자료 미제출 판매정지",
-   "summary": "식약처가 삼진제약(주)에 대해 의약품 '뉴스타틴듀오캡슐'의 재심사에 필요한 자료의 일부를 제출하지 않은 사실을 확인하고 해당품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006797"
-    },
-    {
-     "label": "업체",
-     "value": "삼진제약(주)"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 뉴스타틴듀오캡슐"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "의약품 ‘뉴스타틴듀오캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약품 '뉴스타틴듀오캡슐'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 뉴스타틴듀오캡슐",
-    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
-   ],
-   "implication": "결격이 시험·품질 단계가 아니라 시판 후 조사의 설계·수행 단계에서 생겼다는 점이 이 처분의 성격이다. 목표 증례 수를 실제 처방 규모와 맞추지 않은 채 계획을 세우면 기간이 끝난 뒤에는 회복할 수 없는 미달로 남는다.",
-   "checks": [
-    "시판 후 조사 계획의 목표 증례 수 산정 근거",
-    "조사 기간 중 증례 확보율의 주기적 점검"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
-      "original": "의약품 ‘뉴스타틴듀오캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-      "description": "해당 업체가 의약품 '뉴스타틴듀오캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
-      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
-     "items": [
-      "'뉴스타틴듀오캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
-      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
-      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
-      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006797",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Re-examination data shortfall",
-    "summary": "MFDS suspended sales of one prescription capsule product for three months at a domestic pharmaceutical manufacturer, after finding that part of the data required for the product's re-examination had not been submitted.",
-    "implication": "The failure sits in the design and conduct of post-marketing surveillance rather than in testing or quality. A target case number set without reference to real prescribing volume leaves a shortfall that cannot be recovered once the period ends.",
-    "key_facts": [
-     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
-     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
-    ],
-    "checks": [
-     "Basis on which the target case number in the surveillance plan was set",
-     "Periodic review of case accrual rate during the surveillance period"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006798",
-   "render_order": 17,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "동광제약(주)",
-   "title_issue": "재심사 자료 미제출 판매정지",
-   "summary": "식약처가 동광제약(주)에 대해 의약품 '피에프캡슐'의 재심사에 필요한 자료의 일부를 제출하지 않은 사실을 확인하고 해당품목 판매업무정지 3개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006798"
-    },
-    {
-     "label": "업체",
-     "value": "동광제약(주)"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 피에프캡슐"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "의약품 ‘피에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 의약품 '피에프캡슐'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 피에프캡슐",
-    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
-   ],
-   "implication": "품질 결함이 없어도 허가 후 관리 의무의 미이행만으로 품목 단위 판매업무정지가 성립한다는 점이 이 처분에서 확인된다. 재심사를 허가부서 단독 과제로 두면 자료 미비가 출하에 미치는 영향이 품질부서에 늦게 전달되어 대응 여지가 줄어든다.",
-   "checks": [
-    "허가 후 관리 의무의 부서 간 책임 분담 명확화",
-    "재심사 진행 상황의 품질부서 공유 체계"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
-      "original": "의약품 ‘피에프캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
-      "description": "해당 업체가 의약품 '피에프캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
-      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
-     }
-    ],
-    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
-     "items": [
-      "'피에프캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
-      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
-      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
-      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
-     ]
-    },
-    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006798",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Re-examination data shortfall",
-    "summary": "MFDS suspended sales of one prescription capsule product for three months at a domestic pharmaceutical manufacturer, after finding that part of the data required for the product's re-examination had not been submitted.",
-    "implication": "A product-level sales suspension can stand on an unmet post-approval obligation alone, with no quality defect involved. Where re-examination is owned solely by regulatory affairs, the shipment impact of a data gap reaches quality late and leaves less room to respond.",
-    "key_facts": [
-     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
-     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
-     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
-    ],
-    "checks": [
-     "Clear allocation of post-approval obligations between regulatory affairs and quality",
-     "Routine sharing of re-examination status with the quality unit"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006740",
-   "render_order": 18,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "🧬 바이오의약품",
-   "evidence_level": "A",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "행정처분",
-   "headline_target": "한국코러스(주)",
-   "title_issue": "시판 후 안정성시험 미실시",
-   "summary": "식약처가 한국코러스(주)에 대해 수출용 재조합사람에리스로포이에틴 프리필드시린지 제품의 2024년 생산분 가운데 특정 제조번호에 시판 후 안정성시험을 실시하지 않은 사실을 확인하고, 해당 품목 제조업무정지 1개월 처분을 내렸다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-08-25"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006740"
-    },
-    {
-     "label": "업체",
-     "value": "한국코러스(주)"
-    },
-    {
-     "label": "처분",
-     "value": "○ 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.)\n  - 해당 품목: ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "- 의약품 ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나,\n  제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있음",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 2024년 생산분에 대하여 시판 후 안정성 시험 계획을 수립하였으나 제조번호 24209001에 대하여 시험을 실시하지 않음",
-    "처분: 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.) — 코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)",
-    "적용법령: 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제3호, 제48조제9호 가목"
-   ],
-   "implication": "계획은 수립됐으나 특정 제조번호가 실행 단계에서 빠졌다는 점이 이 처분의 축이다. 시판 후 안정성시험은 연간 계획과 실제 착수 기록을 제조번호 단위로 맞춰 보지 않으면 누락이 시험 종료 시점까지 드러나지 않고, 수출용 품목이라 해서 처분 대상에서 비껴가지도 않는다.",
-   "checks": [
-    "시판 후 안정성시험 연간 계획 대비 제조번호별 착수·진행 기록 대조",
-    "수출용 품목의 시판 후 안정성시험 대상 선정 기준"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목",
-      "original": "- 의약품 ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나,\n  제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있음",
-      "description": "해당 업체는 의약품 '코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)'의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나, 제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있다는 것이 위반사실이다. 계획 수립 자체는 이루어졌고 특정 제조번호에 대한 시험 실행이 누락된 형태이다.",
-      "risk": "시판 후 안정성 시험은 유효기간 전 구간에 걸쳐 품질이 유지되는지를 확인하는 근거이므로, 해당 제조번호에 대해서는 그 근거가 존재하지 않는 상태가 된다. 생물학적제제인 재조합사람에리스로포이에틴 제제는 보관 조건에 따른 역가 변화가 품질에 직접 연결되는 제형이어서, 시험 누락은 해당 배치의 유효기간 내 품질을 뒷받침할 자료가 없다는 의미가 된다. 수출용 품목이라도 처분 대상에서 제외되지 않았다."
-     }
-    ],
-    "disposition_basis": "처분의 근거 법령은 「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목이며, 처분 기준은 「약사법」제76조 및 「의약품 등의 안전에 관한 규칙」제95조 관련 [별표 8] 행정처분의 기준 Ⅰ. 일반기준 제6호, Ⅱ. 개별기준 제25호 다목 3) 이다. 처분은 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.)이며, 최종처분일자는 20260825 이다. 판매가 아닌 제조업무를 정지한 처분이라는 점에서, 위반이 출하 이후의 정보 제공이 아니라 제조·품질관리 단계의 의무 미이행으로 평가되었음을 알 수 있다.",
-    "required_remediation": {
-     "deadline": "처분 효력 기간: 2026. 9. 14. ~ 2026. 10. 13. (해당 품목 제조업무정지 1개월)",
-     "items": [
-      "제조번호 24209001에 대한 시판 후 안정성 시험이 실시되지 않은 경위를 계획 수립 시점부터 확인할 것.",
-      "2024년 생산분 전체에 대하여 시판 후 안정성 시험 계획과 실제 착수·진행 기록을 제조번호 단위로 대조할 것.",
-      "수출용 품목을 포함한 시판 후 안정성 시험 대상 선정 기준과 연간 계획의 이행 점검 주기를 정비할 것.",
-      "시험 누락이 확인된 제조번호의 유통 현황과 품질 평가 가능 여부를 확인할 것."
-     ]
-    },
-    "administrative_risks": "제조업무정지 기간 동안 해당 품목의 제조가 중단되며, 행정처분 사실은 공개종료일자 20270113 까지 공개된다. 시판 후 안정성 시험은 연간 계획 단위로 운영되므로 같은 계획 아래 있는 다른 품목·제조번호에서도 동일한 누락이 존재할 수 있고, 수출용 품목이 처분 대상이 된 이상 수출 상대국 규제기관의 확인 요청으로 이어질 여지도 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006740",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "On-going stability test missed",
-    "summary": "MFDS found that a domestic manufacturer had not carried out post-marketing stability testing on one batch of an export-only recombinant human erythropoietin pre-filled syringe product from its 2024 production, and suspended manufacture of that product for one month.",
-    "implication": "The plan existed; a specific batch dropped out at execution. On-going stability work only shows a gap if the annual plan is reconciled batch by batch against actual start records, and being an export-only product does not put it outside the scope of enforcement.",
-    "key_facts": [
-     "Violation: a post-marketing stability testing plan was established for 2024 production, but the test was not performed on batch 24209001",
-     "Action: one-month suspension of manufacture of the product concerned, from 14 September 2026 to 13 October 2026",
-     "Legal basis: Pharmaceutical Affairs Act Articles 37(1) and 38(1), and Rules on the Safety of Drugs Articles 43(1)3 and 48(9)(a)"
-    ],
-    "checks": [
-     "Batch-level reconciliation of the annual stability plan against actual initiation records",
-     "Criteria for selecting export-only products into the on-going stability programme"
-    ]
-   }
-  },
-  {
-   "id": "admin-2026006815",
-   "render_order": 19,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "행정처분",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "행정처분",
-   "headline_target": "(주)돌나라한농제약",
-   "title_issue": "공급내역 미보고 과징금",
-   "summary": "식약처가 (주)돌나라한농제약에 대해 전문의약품 3개 품목의 의약품 공급내역 현황을 기한 내 보고하지 않은 사실을 확인하고, 해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원을 부과했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "admin-2026006815"
-    },
-    {
-     "label": "업체",
-     "value": "(주)돌나라한농제약"
-    },
-    {
-     "label": "처분",
-     "value": "해당품목* 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과\n     * 뉴흑과립(약용탄), 뉴흑산(약용탄), 뉴흑캡슐200밀리그람(약용탄)"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "위반: 일련번호를 부착하지 아니하는 전문의약품의 의약품 공급내역 현황을 다음 달 말일까지 의약품관리종합정보센터의 장에게 보고하지 않음(3개 품목)",
-    "처분: 해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과",
-    "적용법령: 「약사법」 제47조의3 및 「약사법 시행규칙」 제45조"
-   ],
-   "implication": "제품 품질과 무관한 정보 제출 의무이지만 미이행이 품목 단위 처분으로 이어진다는 점이 이 사안의 성격이다. 일련번호를 부착하지 않는 품목은 자동 집계 경로가 없어 다음 달 말일이라는 기한을 사람이 관리해야 하고, 누락은 그 지점에서 생긴다.",
-   "checks": [
-    "일련번호 미부착 품목의 공급내역 보고 기한 관리 주체 지정",
-    "의약품관리종합정보센터 보고 이력의 월별 확인"
-   ],
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "citation": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조",
-      "original": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음",
-      "description": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고, 해당 업체는 건강보험심사평가원 의약품관리종합정보센터에 3개 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있다는 것이 위반사실이다.",
-      "risk": "공급내역 보고는 의약품의 유통 경로를 파악하기 위한 정보 제공 의무로, 보고가 누락되면 해당 품목의 유통량이 공적 정보 체계에서 확인되지 않는 구간이 생긴다. 일련번호를 부착하지 않는 품목은 자동 집계 경로가 없어 보고가 수작업에 의존하므로 누락이 반복되기 쉽고, 위반이 품목 단위 처분으로 연결되어 세 품목이 동시에 대상이 되었다."
-     }
-    ],
-    "disposition_basis": "위반법령은 ｢약사법｣ 제47조의3 및 ｢약사법 시행규칙｣ 제45조이며, 처분기준은 ｢약사법｣제76조 및 의약품 등의 안전에 관한 규칙 [별표 8] 행정처분 기준 Ⅰ. 일반기준 제12호 하목, Ⅱ. 개별기준 제36호 이다. 과징금은 ｢약사법｣ 제81조, ｢약사법 시행령｣ 제33조 [별표 2] '과징금 산정기준' 및 ｢식품의약품안전처 과징금 부과처분 기준 등에 관한 규정(훈령)｣ 제3조제2항 관련 [별표] 과징금 부과대상의 세부 기준 1. 공통 기준 라목, 2. 개별 기준 라목에 따라 산정되었다. 그 결과 해당품목 판매업무정지 10일 처분을 갈음하여 과징금 750,000원이 부과되었다.",
-    "required_remediation": {
-     "deadline": "최종처분일자 20260915 (해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과)",
-     "items": [
-      "뉴흑과립(약용탄), 뉴흑산(약용탄), 뉴흑캡슐200밀리그람(약용탄) 3개 품목의 공급내역 보고가 기한 내 이루어지지 않은 경위를 확인할 것.",
-      "일련번호를 부착하지 아니하는 전문의약품 목록을 작성하고 품목별 보고 책임자를 지정할 것.",
-      "다음 달 말일이라는 보고 기한을 월별로 점검하는 절차를 수립하고 보고 이력을 보존할 것.",
-      "의약품관리종합정보센터 보고 내역과 자사 출하 기록을 주기적으로 대조할 것."
-     ]
-    },
-    "administrative_risks": "판매업무정지가 과징금으로 갈음되어 공급 중단은 발생하지 않았으나, 행정처분 사실은 공개종료일자 20270105 까지 공개된다. 공급내역 보고는 매월 반복되는 의무여서 관리 체계가 정비되지 않으면 동일 위반이 월 단위로 재발할 수 있고, 반복 위반은 일반기준에 따라 가중될 여지가 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "",
-    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006815",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Supply reporting default fined",
-    "summary": "MFDS found that a domestic manufacturer had failed to report supply records for three prescription products to the national drug information centre within the deadline, and imposed a fine of KRW 750,000 in lieu of a ten-day suspension of sales.",
-    "implication": "This is an information-submission duty unrelated to product quality, yet failing it lands as a product-level action. Products without a serial number have no automatic aggregation path, so the end-of-following-month deadline is carried by a person, and that is where the omission occurs.",
-    "key_facts": [
-     "Violation: supply records for prescription products not carrying a serial number must be reported to the head of the drug information centre by the last day of the following month; this was not done for three products",
-     "Action: a fine of KRW 750,000 imposed in lieu of a ten-day suspension of sales of the products concerned",
-     "Legal basis: Pharmaceutical Affairs Act Article 47-3 and its Enforcement Rule Article 45"
-    ],
-    "checks": [
-     "Named ownership of the supply-reporting deadline for products without serial numbers",
-     "Monthly confirmation that reports to the drug information centre were filed"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2a5UEfjK2",
-   "render_order": 20,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "Otsuka Pharmaceutical Co., Ltd. Tokushima Wajiki Factory",
-   "title_issue": "무균 주사제 제조소 무지적",
-   "summary": "식약처가 일본 소재 Otsuka Pharmaceutical Co., Ltd. Tokushima Wajiki Factory를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2a5UEfjK2"
-    },
-    {
-     "label": "제조소",
-     "value": "Otsuka Pharmaceutical Co., Ltd. Tokushima Wajiki Factory"
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-03-17~2026-03-19"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 무균-일반제제-주사제 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-03-17~2026-03-19, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 무균-일반제제-주사제 완제"
-   ],
-   "implication": "무균 주사제 제조소가 지적 없이 사후 실사를 통과했다는 점이 이 건의 내용이다. 무균 제조소는 환경관리·무균조작 항목이 많아 무지적 결과가 드문 편이므로, 해외 위탁 후보를 평가할 때 실사 결과가 있는 제조소인지 자체가 선별 기준으로 쓰인다.",
-   "checks": [
-    "해외 위탁 후보 제조소의 식약처 실사 이력 확인",
-    "무균 제조소 평가 시 실사 결과 공개 여부의 활용"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2a5UEfjK2",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Sterile injectable site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of Otsuka Pharmaceutical Co., Ltd. Tokushima Wajiki Factory in Japan. No deficiencies were raised.",
-    "implication": "A sterile injectable site cleared a follow-up inspection with no findings. Sterile sites carry a dense set of environmental and aseptic requirements, so a no-finding result is comparatively uncommon and the existence of a published inspection outcome becomes a screening criterion in its own right when assessing an overseas contract site.",
-    "key_facts": [
-     "Inspection: 17-19 March 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: sterile conventional injectable finished product"
-    ],
-    "checks": [
-     "Check the MFDS inspection history of candidate overseas contract sites",
-     "Use published inspection outcomes when assessing sterile manufacturing sites"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2a5UEfksV",
-   "render_order": 21,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "Encube Ethicals Private Limited",
-   "title_issue": "연고제 겸업 제조소 무지적",
-   "summary": "식약처가 인도 소재 Encube Ethicals Private Limited를 사후 실사한 결과를 공개했다. 완제와 원료를 겸업하는 제조소이며 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2a5UEfksV"
-    },
-    {
-     "label": "제조소",
-     "value": "Encube Ethicals Private Limited"
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-03-17~2026-03-19"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-일반제제-연고제 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-03-17~2026-03-19, 사후 / 완제+원료(겸업)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-일반제제-연고제 완제"
-   ],
-   "implication": "완제와 원료를 한 제조소에서 함께 다루는 겸업 구조가 실사에서 그대로 확인됐다는 점이 이 건의 특징이다. 겸업 제조소는 원료 공정과 완제 공정 사이의 구역·동선 분리가 평가 대상이 되므로, 위탁 시에도 두 공정이 공유하는 설비 범위를 확인해 두는 편이 실질적이다.",
-   "checks": [
-    "완제·원료 겸업 제조소의 구역·동선 분리 확인",
-    "겸업 제조소가 공유하는 설비 및 세척 관리 범위"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2a5UEfksV",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Dual-licence ointment site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of Encube Ethicals Private Limited in India. The site holds both finished-product and API scope, and no deficiencies were raised.",
-    "implication": "The inspection confirms a site running finished-product and API operations under one roof. For such combined sites, the separation of areas and flows between API and finished-product operations is itself what gets assessed, so establishing which equipment the two share is the practical question before outsourcing.",
-    "key_facts": [
-     "Inspection: 17-19 March 2026, follow-up inspection of a combined finished-product and API site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile conventional ointment finished product"
-    ],
-    "checks": [
-     "Separation of areas and material/personnel flows at combined finished-product and API sites",
-     "Scope of shared equipment and its cleaning controls at such sites"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2a5UEfm7A",
-   "render_order": 22,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "Liaoning Daewoong Pharmaceutical Co., Ltd.",
-   "title_issue": "내용액제 제조소 무지적",
-   "summary": "식약처가 중국 소재 Liaoning Daewoong Pharmaceutical Co., Ltd.를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2a5UEfm7A"
-    },
-    {
-     "label": "제조소",
-     "value": "Liaoning Daewoong Pharmaceutical Co., Ltd."
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-03-24~2026-03-26"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-일반제제-내용액제 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-03-24~2026-03-26, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-일반제제-내용액제 완제"
-   ],
-   "implication": "비무균 내용액제 제조소의 사후 실사가 무지적으로 마무리됐다. 내용액제는 비무균 제형이라도 용수와 미생물 한도가 품질에 직접 닿는 제형이라, 실사 결과가 공개된 제조소는 용수 계통 관리가 한 차례 외부 확인을 거친 셈이 된다.",
-   "checks": [
-    "내용액제 제조소의 제조용수 계통 관리 상태 확인",
-    "비무균 액제의 미생물 한도 시험 주기"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2a5UEfm7A",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Oral liquid site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of Liaoning Daewoong Pharmaceutical Co., Ltd. in China. No deficiencies were raised.",
-    "implication": "A non-sterile oral liquid site closed its follow-up inspection with no findings. Oral liquids are non-sterile but sit close to water quality and microbial limits, so a published inspection outcome means the water system has had one round of external scrutiny.",
-    "key_facts": [
-     "Inspection: 24-26 March 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile conventional oral liquid finished product"
-    ],
-    "checks": [
-     "Status of the process water system at oral liquid manufacturing sites",
-     "Microbial limit testing intervals for non-sterile liquid preparations"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2aMMjWO2f",
-   "render_order": 23,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "▫️ 기타",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "Siegfried El Masnou, S.A.",
-   "title_issue": "점이제 제조소 무지적",
-   "summary": "식약처가 스페인 소재 Siegfried El Masnou, S.A.를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2aMMjWO2f"
-    },
-    {
-     "label": "제조소",
-     "value": "Siegfried El Masnou, S.A."
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-03-03~2026-03-05"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-일반제제-외용액제(점이제) 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-03-03~2026-03-05, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-일반제제-외용액제(점이제) 완제"
-   ],
-   "implication": "점이제라는 좁은 제형을 다루는 해외 제조소가 무지적으로 실사를 통과했다. 생산 품목이 한정된 제조소는 공급이 한 곳에 묶이기 쉬워, 실사 결과가 공개돼 있다는 사실이 공급 지속성 평가에서 갖는 무게가 상대적으로 크다.",
-   "checks": [
-    "단일 제형 위탁 제조소의 공급 지속성 평가",
-    "해외 제조소 실사 결과의 정기 재확인 주기"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2aMMjWO2f",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Ear drop site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of Siegfried El Masnou, S.A. in Spain. No deficiencies were raised.",
-    "implication": "An overseas site working in a narrow dosage form cleared its inspection without findings. Sites with a limited product range tend to concentrate supply in one place, which gives a published inspection outcome comparatively more weight in a supply continuity assessment.",
-    "key_facts": [
-     "Inspection: 3-5 March 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile conventional topical solution (ear drops) finished product"
-    ],
-    "checks": [
-     "Supply continuity assessment for single-dosage-form contract sites",
-     "Interval at which overseas site inspection outcomes are re-confirmed"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2aMMjWPTs",
-   "render_order": 24,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "▫️ 기타",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "McNeil Consumer Healthcare",
-   "title_issue": "고형제 제조소 무지적",
-   "summary": "식약처가 캐나다 소재 McNeil Consumer Healthcare를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2aMMjWPTs"
-    },
-    {
-     "label": "제조소",
-     "value": "McNeil Consumer Healthcare"
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-03-24~2026-03-26"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-일반제제-내용고형제 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-03-24~2026-03-26, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-일반제제-내용고형제 완제"
-   ],
-   "implication": "대량 생산 성격이 강한 내용고형제 제조소가 무지적으로 사후 실사를 마쳤다. 고형제는 배치 규모가 커 한 번의 공정 이탈이 넓은 수량에 걸리므로, 공정 중 관리와 배치 기록 검토가 실사에서 반복적으로 확인되는 축이 된다.",
-   "checks": [
-    "고형제 위탁 제조소의 공정 중 관리 항목 확인",
-    "대용량 배치의 배치기록 검토 절차"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2aMMjWPTs",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Solid oral site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of McNeil Consumer Healthcare in Canada. No deficiencies were raised.",
-    "implication": "A solid oral site of the kind that runs at volume closed its follow-up inspection with no findings. Batch sizes in solid dosage manufacture are large enough that a single process excursion reaches a wide quantity, which is why in-process control and batch record review are the axes inspections keep returning to.",
-    "key_facts": [
-     "Inspection: 24-26 March 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile conventional solid oral finished product"
-    ],
-    "checks": [
-     "In-process control points at contract solid oral sites",
-     "Batch record review procedure for large-volume batches"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2aMMjWRl3",
-   "render_order": 25,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "🧬 바이오의약품",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "Abbott Biologicals B.V.",
-   "title_issue": "성호르몬제제 제조소 무지적",
-   "summary": "식약처가 네덜란드 소재 Abbott Biologicals B.V.를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-15"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2aMMjWRl3"
-    },
-    {
-     "label": "제조소",
-     "value": "Abbott Biologicals B.V."
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-03-31~2026-04-02"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-성호르몬제제-내용고형제 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-03-31~2026-04-02, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-성호르몬제제-내용고형제 완제"
-   ],
-   "implication": "성호르몬제제로 분류된 고형제 제조소가 무지적으로 실사를 통과했다. 성호르몬제제는 교차오염 관리에서 별도 취급을 받는 제형군이라, 같은 건물에서 다른 품목을 함께 만드는지가 위탁 검토에서 먼저 확인되는 항목이 된다.",
-   "checks": [
-    "성호르몬제제 전용 구역·설비 운영 여부 확인",
-    "교차오염 위험 품목군의 위탁 제조 시 건물 공유 범위"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2aMMjWRl3",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Sex hormone site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of Abbott Biologicals B.V. in the Netherlands. No deficiencies were raised.",
-    "implication": "A solid oral site classified under sex hormone products cleared its inspection without findings. Sex hormone products are handled as a separate category for cross-contamination purposes, so whether other products are made in the same building is the first item checked in an outsourcing review.",
-    "key_facts": [
-     "Inspection: 31 March to 2 April 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile sex hormone solid oral finished product"
-    ],
-    "checks": [
-     "Whether dedicated areas and equipment are operated for sex hormone products",
-     "Extent of building sharing when outsourcing products in a cross-contamination risk category"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2TqD05pzy",
-   "render_order": 26,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "▫️ 기타",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "삼덕가스공업(주)",
-   "title_issue": "국내 제조소 1일 실사 무지적",
-   "summary": "식약처가 삼덕가스공업(주)를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2TqD05pzy"
-    },
-    {
-     "label": "제조소",
-     "value": "삼덕가스공업(주)"
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-07-01~2026-07-01"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과 지적(보완)사항(Deficiencies) 없음 의 료 제 품 안 전 과",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-07-01~2026-07-01(1일), 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "소재: 경기도 김포시"
-   ],
-   "implication": "실사 기간이 하루로 잡힌 사후 실사가 무지적으로 종결됐다. 실사 일수는 제조소의 공정 범위와 품목 수에 따라 달라지므로, 공개된 실사 결과를 비교할 때 결론만이 아니라 실사 범위가 어디까지였는지가 함께 읽혀야 한다.",
-   "checks": [
-    "공개된 실사 결과의 실사 기간·범위 확인",
-    "사후 실사 주기와 제조소 위험도 평가의 연계"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2TqD05pzy",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "One-day inspection clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of a domestic finished-product manufacturing site in Gyeonggi Province. No deficiencies were raised.",
-    "implication": "A follow-up inspection scheduled for a single day closed with no findings. Inspection duration follows the site's process scope and product count, so when comparing published outcomes the scope covered has to be read alongside the conclusion rather than the conclusion alone.",
-    "key_facts": [
-     "Inspection: 1 July 2026, a single day, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Location: Gyeonggi Province, Republic of Korea"
-    ],
-    "checks": [
-     "Check the duration and scope behind a published inspection outcome",
-     "How follow-up inspection frequency is tied to site risk assessment"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q2TqD05rgw",
-   "render_order": 27,
-   "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -2851,9 +1311,9 @@
   },
   {
    "id": "gmpinspect-1Q2TqD05w-H",
-   "render_order": 28,
+   "render_order": 11,
    "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -2995,9 +1455,9 @@
   },
   {
    "id": "gmpinspect-1Q2TqD05yGj",
-   "render_order": 29,
+   "render_order": 12,
    "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -3148,88 +1608,10 @@
    }
   },
   {
-   "id": "gmpinspect-1Q2TqD05zTo",
-   "render_order": 30,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "💊 합성의약품",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "안국약품(주)",
-   "title_issue": "국내 완제 제조소 무지적",
-   "summary": "식약처가 안국약품(주) 제조소를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-14"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q2TqD05zTo"
-    },
-    {
-     "label": "제조소",
-     "value": "안국약품(주)"
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-06-15~2026-06-18"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 의 료 제 품 안 전 과",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-06-15~2026-06-18, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "소재: 경기도 화성시"
-   ],
-   "implication": "국내 완제 제조소가 나흘간의 사후 실사를 지적 없이 마쳤다. 국내 제조소의 실사 결과도 해외 제조소와 같은 형식으로 공개되므로, 국내 위수탁 상대를 평가할 때도 공개 실사 결과가 1차 자료로 쓰일 수 있다.",
-   "checks": [
-    "국내 위수탁 상대 제조소의 공개 실사 결과 확인",
-    "위수탁 계약 갱신 시 최신 실사 결과 반영"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q2TqD05zTo",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Domestic finished site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of a domestic finished-product manufacturing site in Gyeonggi Province. No deficiencies were raised.",
-    "implication": "A domestic finished-product site closed a four-day follow-up inspection with no findings. Domestic inspection outcomes are published in the same format as overseas ones, so the published record can serve as first-line evidence when assessing a domestic contract partner as well.",
-    "key_facts": [
-     "Inspection: 15-18 June 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Location: Gyeonggi Province, Republic of Korea"
-    ],
-    "checks": [
-     "Check published inspection outcomes for domestic contract manufacturing partners",
-     "Incorporate the latest inspection outcome when renewing a manufacturing agreement"
-    ]
-   }
-  },
-  {
    "id": "gmpinspect-1Q2F5hAXd12",
-   "render_order": 31,
+   "render_order": 13,
    "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -3424,82 +1806,10 @@
    }
   },
   {
-   "id": "data0011-15950",
-   "render_order": 32,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "지침·안내서",
-   "category": "Guidance",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "Guidance",
-   "headline_target": "디지털의료기기 제조 및 품질관리 기준 질의·응답집",
-   "title_issue": "디지털의료기기 GMP 질의응답",
-   "summary": "식약처가 「디지털의료기기 제조 및 품질관리 기준 질의·응답집」을 공개했다. 우리가 확보한 입력은 제목 수준이어서 세부 내용은 원문 확인이 필요하다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-10"
-    },
-    {
-     "label": "문서번호",
-     "value": "data0011-15950"
-    },
-    {
-     "label": "발행기관",
-     "value": "MFDS"
-    },
-    {
-     "label": "주제",
-     "value": "디지털의료기기 제조 및 품질관리 기준 질의·응답집"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "문서: 디지털의료기기 제조 및 품질관리 기준 질의·응답집",
-    "발행기관: 식약처 (2026-09-10)",
-    "상세: 원문에서 확인 필요"
-   ],
-   "implication": "디지털 기반 제품에 적용되는 제조·품질관리 기준을 질의응답 형식으로 정리하는 흐름이다. 소프트웨어가 제품의 일부로 들어오는 영역에서는 밸리데이션과 변경관리의 적용 방식이 기존 제조 기준과 어긋나는 지점이 생기고, 질의응답집은 대개 그 어긋남을 메우는 자료다.",
-   "checks": [
-    "원문에서 자사 제품군 해당 여부 확인",
-    "소프트웨어 변경관리·밸리데이션 적용 범위 검토"
-   ],
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.mfds.go.kr/www/rss/brd.do?brdId=data0011",
-    "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15950",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Digital device GMP Q&A",
-    "summary": "MFDS published a questions and answers compilation on manufacturing and quality management standards for digital medical devices. What we received is at title level, so the detail needs to be read at the source.",
-    "implication": "Manufacturing and quality standards for digitally based products are being worked out in question-and-answer form. Where software becomes part of the product, validation and change control stop lining up cleanly with established manufacturing standards, and a Q&A compilation is typically what fills that gap.",
-    "key_facts": [
-     "Document: questions and answers on manufacturing and quality management standards for digital medical devices",
-     "Publisher: MFDS, 10 September 2026",
-     "Detail: the body text was not captured on our side, so the source needs to be read"
-    ],
-    "checks": [
-     "Confirm from the source whether any of your product range falls in scope",
-     "Review how software change control and validation are applied"
-    ]
-   }
-  },
-  {
    "id": "gmpinspect-1Q28uemXbNI",
-   "render_order": 33,
+   "render_order": 14,
    "group": "국내",
-   "group_label": null,
+   "group_label": "GMP실사",
    "agency": "MFDS",
    "card_type": "GMP실사",
    "category": "Other",
@@ -3508,9 +1818,9 @@
    "signal_tier": 2,
    "signal_label": "Med",
    "type_tag": "GMP실사",
-   "headline_target": "Bausch Health Companies Inc.",
-   "title_issue": "캐나다 고형제 제조소 무지적",
-   "summary": "식약처가 캐나다 소재 Bausch Health Companies Inc. 제조소를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
+   "headline_target": "Bausch Health Companies Inc. 외 10곳",
+   "title_issue": "지적 없는 GMP 실사 결과 11건",
+   "summary": "식약처가 공개한 GMP 실사 결과 가운데 지적(보완)사항이 없었던 11건을 한 장으로 묶었다. 제조소와 실사기간은 이 카드의 목록에 있다.",
    "facts": [
     {
      "label": "발행일",
@@ -3529,26 +1839,31 @@
      "value": "2026-02-24~2026-02-26"
     }
    ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-일반제제-내용고형제 완제",
-     "translation": null
-    }
-   ],
    "evidence_basis": "Intake raw",
    "key_facts": [
-    "실사: 2026-02-24~2026-02-26, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-일반제제-내용고형제 완제"
+    "건수: 11건 (평가 결과 지적(보완)사항 없음)",
+    "출처: 식약처 GMP 실사 결과 공개"
    ],
-   "implication": "해외 내용고형제 제조소가 사후 실사에서 지적 없이 마무리됐다. 실사일과 등록일 사이에 약 6개월의 간격이 있어, 공개 시점의 결과가 현재 상태를 그대로 보증하지는 않는다는 점도 함께 읽히는 자료다.",
+   "implication": "지적이 없었다는 것은 그 제조소가 해당 시점 실사를 통과했다는 사실까지를 말한다. 해외 위탁·수탁 후보를 볼 때 실사 이력이 공개된 제조소인지 자체가 선별 기준이 되므로, 목록에 자사 공급망 제조소가 있는지 확인하는 용도로 쓴다.",
    "checks": [
-    "실사일과 결과 등록일 사이 간격을 고려한 자료 해석",
-    "해외 제조소 상태의 주기적 재확인 경로"
+    "목록에 자사 위탁·수탁 제조소가 있는지 확인",
+    "해당 시 실사 시점과 자사 실사·감사 주기의 정합성 점검"
    ],
    "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
+   "merged_count": 11,
+   "merged_items": [
+    "Bausch Health Companies Inc. · 2026-02-24~2026-02-26",
+    "Zydus Hospira Oncology Private Limited · 2026-02-24~2026-02-26",
+    "JW Euvipharm Joint Stock Company · 2026-02-10~2026-02-12",
+    "삼덕가스공업(주) · 2026-07-01~2026-07-01",
+    "안국약품(주) · 2026-06-15~2026-06-18",
+    "Otsuka Pharmaceutical Co., Ltd. Tokushima Wajiki Factory · 2026-03-17~2026-03-19",
+    "Encube Ethicals Private Limited · 2026-03-17~2026-03-19",
+    "Liaoning Daewoong Pharmaceutical Co., Ltd. · 2026-03-24~2026-03-26",
+    "Siegfried El Masnou, S.A. · 2026-03-03~2026-03-05",
+    "McNeil Consumer Healthcare · 2026-03-24~2026-03-26",
+    "Abbott Biologicals B.V. · 2026-03-31~2026-04-02"
+   ],
    "sources": {
     "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
     "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q28uemXbNI",
@@ -3559,77 +1874,507 @@
     }
    },
    "en": {
-    "title_issue": "Canadian solid oral site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of a Bausch Health Companies Inc. site in Canada. No deficiencies were raised.",
+    "title_issue": "GMP inspections with no findings (11)",
+    "summary": "MFDS published 11 GMP inspection results with no deficiencies raised. The sites and inspection dates are listed on this card.",
     "implication": "An overseas solid oral site closed its follow-up inspection with no findings. There is roughly a six-month gap between the inspection dates and the publication date, so the record is best read as a snapshot rather than a warranty of the site's current state.",
     "key_facts": [
-     "Inspection: 24-26 February 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile conventional solid oral finished product"
+     "Count: 11 inspections with no deficiencies raised",
+     "Source: MFDS published GMP inspection results"
     ],
     "checks": [
-     "Read published outcomes with the gap between inspection and publication in mind",
-     "Route for periodic re-confirmation of an overseas site's status"
+     "Check the list for your own contract manufacturing sites"
+    ]
+   },
+   "merged_noun": "건",
+   "merged_multi_firm": true
+  },
+  {
+   "id": "admin-2026006742",
+   "render_order": 15,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "한림제약(주) 외 5개사",
+   "title_issue": "재심사 자료 미제출 판매정지 (6개사 일괄)",
+   "summary": "식약처가 6개사에 대해 같은 날 동일한 위반사실·적용법령·처분으로 일괄 행정처분을 내렸다. 각 사의 처분 대상은 품목 1건씩이며, 업체별 대상 품목은 이 카드의 목록에 있다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-09-14"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026006742 외 5건"
+    },
+    {
+     "label": "업체",
+     "value": "한림제약(주) 외 5개사"
+    },
+    {
+     "label": "처분",
+     "value": "해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 업체별 대상 품목"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "의약품 ‘스타펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 의약품 '업체별 대상 품목'의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+    "처분: 해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.): 업체별 대상 품목",
+    "적용법령: 구 「약사법」 제32조, 구 「의약품 등의 안전에 관한 규칙」 제23조"
+   ],
+   "implication": "결격 사유가 자료의 존재 여부가 아니라 시판 후 조사 대상자 수 부족이라는 정량 요건 미달이라는 점이 이 처분의 축이다. 조사 증례 수는 재심사 기간이 끝난 뒤에는 보완할 방법이 없어, 수집 진척을 기간 도중에 확인하는 체계가 있느냐가 판매업무정지 여부를 가른다.",
+   "checks": [
+    "재심사 대상 품목의 시판 후 조사 증례 수집 진척 관리",
+    "재심사 자료 제출 기한과 조사 종료 시점의 정합성"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조",
+      "original": "의약품 ‘스타펜캡슐’의 재심사에 필요한 자료의 일부를 제출하지 아니함(시판 후 조사 대상자 수 부족)",
+      "description": "해당 업체가 의약품 '스타펜캡슐'의 재심사에 필요한 자료 가운데 일부를 제출하지 않았다는 것이 위반사실이다. 미제출의 구체적 내용은 시판 후 조사 대상자 수가 부족하여 재심사에 요구되는 자료 요건을 충족하지 못한 것으로 기재되어 있다.",
+      "risk": "재심사는 허가 이후 일정 기간의 사용 경험을 근거로 유효성·안전성을 재확인하는 절차이므로, 조사 대상자 수가 부족하면 그 기간의 시판 후 자료로 품목의 안전성 프로파일을 확인했다고 보기 어렵다. 조사 기간이 종료된 뒤에는 증례를 추가로 확보할 방법이 없어 사후 보완이 불가능하고, 처분은 품목 단위 판매업무정지로 이어져 해당 기간 공급이 중단된다."
+     }
+    ],
+    "disposition_basis": "처분의 근거는 재심사 의무를 정한 구 ｢약사법｣(법률 제20328호로 개정되기 전의 것) 제32조 및 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제23조이며, 처분 기준은 구 ｢의약품 등의 안전에 관한 규칙｣(총리령 제2017호로 개정되기 전의 것) 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제8호 나목 이 적용되었다. 적용 법령이 모두 개정 전 구법으로 특정되어 있다는 점에서, 재심사 기간을 부여받은 시점의 규정이 그대로 판단 기준이 되었음을 알 수 있다. 위반의 성격은 품질 결함이 아니라 허가 이후 관리 의무의 미이행이며, 그에 따라 제조 전반이 아닌 해당 품목의 판매업무만 정지되었다.",
+    "required_remediation": {
+     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당품목 판매업무정지 3개월)",
+     "items": [
+      "'스타펜캡슐'의 재심사에 필요한 자료 가운데 미제출 항목의 범위와 부족 사유(시판 후 조사 대상자 수 부족)를 확인할 것.",
+      "재심사 대상 품목 전체에 대하여 시판 후 조사 계획의 목표 증례 수와 실제 확보 증례 수를 대조하고, 부족분이 발생한 시점을 확인할 것.",
+      "재심사 기간 중 증례 확보 진척을 정기적으로 점검하는 절차를 수립하여 기간 종료 전에 미달을 식별할 수 있도록 할 것.",
+      "판매업무정지 기간 중 해당 품목의 재고·유통 및 거래처 통보 절차를 정리할 것."
+     ]
+    },
+    "administrative_risks": "해당 품목의 판매업무가 정지되는 동안 그 품목의 공급이 중단되며, 재심사 자료의 미비 상태가 해소되지 않으면 이후 동일 의무와 관련한 추가 조치의 대상이 될 수 있다. 행정처분 사실은 일정 기간 공개되며(공개종료일자 20270327), 공개 기간 중에는 해당 이력이 거래처·입찰·해외 등록 심사 과정에서 확인될 수 있다. 위반의 원인이 품질시험이 아니라 허가 후 관리 의무의 실행 체계에 있으므로, 동일한 관리 체계 아래 있는 다른 재심사 대상 품목에서도 같은 형태의 미달이 반복될 수 있다."
+   },
+   "source_body_captured": true,
+   "merged_count": 6,
+   "merged_items": [
+    "한림제약(주) · 스타펜캡슐",
+    "지엘팜텍(주) · 리로우펜캡슐",
+    "대원제약(주) · 업타바캡슐",
+    "안국약품(주) · 페바로에프캡슐",
+    "삼진제약(주) · 뉴스타틴듀오캡슐",
+    "동광제약(주) · 피에프캡슐"
+   ],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006742",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Re-examination data shortfall (6 companies)",
+    "summary": "MFDS issued the same administrative action against 6 domestic manufacturers on the same date. The violation, legal basis and suspension period are identical across all 6 cases; each company was penalised for a single product, listed on this card.",
+    "implication": "What failed here is a quantitative requirement - the number of post-marketing surveillance subjects - rather than the existence of a dossier. Case numbers cannot be made up once the re-examination period has closed, so whether enrolment progress is checked mid-period is what separates a clean filing from a sales suspension.",
+    "key_facts": [
+     "Violation: part of the data required for the product's re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
+     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026",
+     "Legal basis: former Pharmaceutical Affairs Act Article 32 and former Rules on the Safety of Drugs Article 23"
+    ],
+    "checks": [
+     "Tracking of post-marketing surveillance case accrual for products subject to re-examination",
+     "Alignment between the re-examination submission deadline and the close of the surveillance period"
+    ]
+   },
+   "merged_noun": "건",
+   "merged_multi_firm": true
+  },
+  {
+   "id": "admin-2026006747",
+   "render_order": 16,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "▫️ 기타",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "애경산업(주)",
+   "title_issue": "가글제 함량 부적합 제조정지",
+   "summary": "식약처가 애경산업(주)에 대해 유통 의약외품 수거·검사에서 구중청량제의 유효성분 함량이 기준을 벗어난 제품을 제조·판매한 사실을 확인하고, 해당 품목 제조업무정지 1년 처분을 내렸다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-09-14"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026006747"
+    },
+    {
+     "label": "업체",
+     "value": "애경산업(주)"
+    },
+    {
+     "label": "처분",
+     "value": "○ 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.) \n * (대상품목) 1. 2080키즈가글딸기맛, 2. 2080키즈가글바나나맛, 3. 2080키즈오가글딸기맛, 4. 2080키즈오가글바나나맛, 5. 2080퓨어가글, 6. 2080애플민트향가글, 7. 2080퓨어가글클린민트향, 8. 스몰란드키즈가글딸기향, 9. 스몰란드키즈가글바나나향, 10. 오라텍트마우스워시바이랩신, 11. 2080진지발리스가글스트롱, 12. 2080진지발리스가글마일드, 13. 바이컬러치어리마우스워시(허가번호: 제5042호, 허가일자: 2015.4.9.)\n ※ 상기 제품은 패키지 품목이므로, 패키지 품목 전체에 대하여 처분"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험)\n -「약사법」제62조 및 제66조에 따라, 누구든지 다음 각 호의 어느 하나에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘2080진지발라스가글스트롱’ 제품의 유통 의약외품 수거·검사 결과, 유효성분(염화세틸피리디늄) 함량이 기준치보다 10%이상 과부족한 제품을 제조하여 판매한 사실이 있음\n  * (규격) 표기량(0.05 g/ 100g)에 대하여 9…",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험) — '2080진지발라스가글스트롱'의 유효성분(염화세틸피리디늄) 함량이 기준치보다 10% 이상 과부족",
+    "수치: (규격) 표기량(0.05 g/ 100g)에 대하여 90.0% 이상 / (결과) 69.2 %",
+    "처분: 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.) — 패키지 품목이므로 13개 품목 전체에 대하여 처분",
+    "적용법령: 「약사법」 제62조 및 제66조"
+   ],
+   "implication": "표기량의 90.0% 이상이어야 할 유효성분이 69.2%로 확인된 것은 배치 간 편차가 아니라 함량 관리 자체가 규격 하한을 담보하지 못한 결과로 읽힌다. 패키지 품목이라는 이유로 처분이 13개 품목 전체로 확대된 점도 함께 읽히는데, 한 품목의 함량 일탈이 같은 허가 단위로 묶인 품목군 전체의 제조 중단으로 번지는 구조다.",
+   "checks": [
+    "유효성분 함량의 공정 중 관리 기준과 출하시험 규격의 정합성",
+    "패키지 품목으로 묶인 허가 단위의 처분 파급 범위 확인",
+    "수거·검사 부적합 발생 시 동일 허가 단위 품목의 영향 평가 절차"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "「약사법」제62조 및 제66조",
+      "original": "○ 의약외품(구중청량제) 수거·검사 부적합(유효성분 함량시험)\n -「약사법」제62조 및 제66조에 따라, 누구든지 다음 각 호의 어느 하나에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나,\n - 동 업체는 ‘2080진지발라스가글스트롱’ 제품의 유통 의약외품 수거·검사 결과, 유효성분(염화세틸피리디늄) 함량이 기준치보다 10%이상 과부족한 제품을 제조하여 판매한 사실이 있음\n  * (규격) 표기량(0.05 g/ 100g)에 대하여 90.0% 이상 / (결과) 69.2 %",
+      "description": "「약사법」제62조 및 제66조에 따라 누구든지 해당 각 호에 해당하는 의약외품을 판매할 목적으로 제조하여서는 아니 되나, 해당 업체는 '2080진지발라스가글스트롱' 제품의 유통 의약외품 수거·검사 결과 유효성분(염화세틸피리디늄) 함량이 기준치보다 10% 이상 과부족한 제품을 제조하여 판매한 사실이 있다는 것이 위반사실이다. 규격은 표기량(0.05 g/ 100g)에 대하여 90.0% 이상이며, 검사 결과는 69.2 % 로 확인되었다.",
+      "risk": "유효성분 함량이 표기량의 90.0% 이상이어야 하는 규격에 대하여 69.2 % 로 확인된 것은 하한 규격을 크게 벗어난 결과로, 배치 간 편차 수준이 아니라 함량 관리 체계가 하한을 담보하지 못했을 가능성을 가리킨다. 구중청량제의 유효성분은 표시된 효능의 근거가 되므로 함량 미달은 표시 효능을 뒷받침하지 못하는 상태가 되고, 해당 제품이 패키지 품목으로 묶여 있어 처분 범위가 13개 품목 전체로 확대되었다."
+     }
+    ],
+    "disposition_basis": "처분의 근거 법령은 「약사법」제62조 및 제66조이며, 처분 기준은 「약사법」제76조 및 의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅰ.일반기준 제9호 및 Ⅱ. 개별기준 제39호아목2) 이다. 처분은 해당 품목 제조업무정지 1년(2026. 9. 28. ~ 2027. 9. 27.)이며, 대상품목은 2080키즈가글딸기맛 등 13개 품목으로, 상기 제품이 패키지 품목이므로 패키지 품목 전체에 대하여 처분되었다. 위반이 유통 단계의 수거·검사에서 확인되었다는 점에서 출하 시점의 자체 시험만으로는 걸러지지 않은 사안이다.",
+    "required_remediation": {
+     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2027. 9. 27. (해당 품목 제조업무정지 1년)",
+     "items": [
+      "유효성분(염화세틸피리디늄) 함량이 표기량(0.05 g/ 100g) 대비 69.2 % 로 확인된 원인을 제조·보관·시험 단계별로 조사할 것.",
+      "함량의 하한 규격(90.0% 이상)을 담보하기 위한 공정 중 관리 기준과 출하시험 규격의 정합성을 재검토할 것.",
+      "패키지 품목으로 묶인 13개 대상품목 전체에 대하여 동일 원인의 영향 여부를 평가할 것.",
+      "유통 중 수거·검사에서 부적합이 확인될 경우의 내부 통보·회수 판단 절차를 정비할 것."
+     ]
+    },
+    "administrative_risks": "제조업무정지 1년은 이번 사안에서 확인된 처분 가운데 가장 긴 기간으로, 대상이 개별 품목이 아니라 패키지 품목 전체 13개 품목이어서 공급 영향이 품목 수만큼 확대된다. 행정처분 사실은 공개종료일자 20271226 까지 공개된다. 위반이 수거·검사라는 사후 확인 경로에서 드러난 만큼, 동일 라인에서 제조되는 다른 의약외품에 대해서도 같은 방식의 확인이 이어질 수 있다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006747",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Mouthwash assay failure",
+    "summary": "MFDS found that a domestic manufacturer had produced and sold a mouthwash quasi-drug whose active ingredient content fell outside specification on post-market sampling and testing, and suspended manufacture of the products concerned for one year.",
+    "implication": "An active ingredient found at 69.2% against a floor of 90.0% of label reads as content control that does not hold the lower limit, not as batch-to-batch variation. The second half of the case is the spread: because the item sits in a package listing, one product's assay failure stops manufacture across all 13 products under that listing.",
+    "key_facts": [
+     "Violation: post-market sampling and testing of a mouthwash quasi-drug failed the assay for active ingredient content, with cetylpyridinium chloride more than 10% off the specified level",
+     "Result: specification is not less than 90.0% of the labelled amount (0.05 g/100 g); the result was 69.2%",
+     "Action: one-year suspension of manufacture, from 28 September 2026 to 27 September 2027; because the item is a package listing, the action applies to all 13 products in it",
+     "Legal basis: Pharmaceutical Affairs Act Articles 62 and 66"
+    ],
+    "checks": [
+     "Consistency between in-process content controls and the release specification for active ingredient assay",
+     "Scope of products grouped under one approval listing and the reach of an action against it",
+     "Impact assessment across products in the same listing when post-market testing fails"
     ]
    }
   },
   {
-   "id": "gmpinspect-1Q28uemXd55",
-   "render_order": 34,
+   "id": "admin-2026006748",
+   "render_order": 17,
    "group": "국내",
-   "group_label": null,
+   "group_label": "행정처분",
    "agency": "MFDS",
-   "card_type": "GMP실사",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "💊 합성의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "동국제약(주)",
+   "title_issue": "신약 재심사 규정 위반",
+   "summary": "식약처가 동국제약(주)에 대해 의약품 제조업자의 신약 등의 재심사 규정 위반을 확인하고, '피타론에프캡슐'에 대해 해당 품목 판매업무정지 3개월 처분을 내렸다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-09-14"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026006748"
+    },
+    {
+     "label": "업체",
+     "value": "동국제약(주)"
+    },
+    {
+     "label": "처분",
+     "value": "○ 해당 품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.)\n  * (대상품목) 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.)"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반\n - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나,\n - 동 업체는 ‘피타론에프캡슐’의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: '피타론에프캡슐'의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않음",
+    "기한 규정: 품목허가를 받은 날로부터 4년에서 6년이 지난 날로부터 3개월 이내에 재심사",
+    "처분: 해당 품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.) — 대상품목 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.)"
+   ],
+   "implication": "재심사는 허가일로부터 4년에서 6년이 지난 날을 기산점으로 삼아 3개월이라는 좁은 창구 안에서 이뤄져야 한다는 것이 이 처분의 전제다. 허가일이 오래된 품목일수록 이 기산점이 일정표에서 빠지기 쉬워, 재심사 도래 시점을 품목대장에서 자동으로 짚어내는 관리가 실효를 갖는다.",
+   "checks": [
+    "품목별 재심사 도래 시점의 대장 관리",
+    "허가일 기준 재심사 기산점 산정의 정확성"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "「약사법」제31조제10항(신약 등)",
+      "original": "○ 의약품 제조업자의 신약 등의 재심사 규정 위반\n - 의약품 제조업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하나,\n - 동 업체는 ‘피타론에프캡슐’의 재심사 시 필요한 자료의 일부(시판 후 조사대상자 수 부족)를 제출하지 않은 사실이 있음",
+      "description": "의약품 제조업자가 품목허가를 받은 의약품이 「약사법」제31조제10항(신약 등)에 해당하는 경우 그 의약품은 품목허가를 받은 날로부터 4년에서 6년이 지난 날로부터 3개월 이내에 재심사를 받아야 하나, 해당 업체는 '피타론에프캡슐'의 재심사 시 필요한 자료의 일부를 제출하지 않았다는 것이 위반사실이다. 미제출된 자료의 내용은 시판 후 조사대상자 수 부족으로 기재되어 있다.",
+      "risk": "재심사 기산점이 허가일로부터 4년에서 6년이 지난 날이고 이행 기간이 3개월로 좁아, 해당 시점을 놓치면 자료를 보완할 여지가 사실상 없다. 시판 후 조사대상자 수가 부족한 상태로 기간이 종료되면 그 품목의 시판 후 안전성 근거가 미완성으로 남고, 판매업무정지로 해당 품목의 공급이 중단된다."
+     }
+    ],
+    "disposition_basis": "처분의 근거는 재심사 의무를 정한 「구약사법」제32조(법률 제20139호, 2024.1.24.) 및 「구의약품 등의 안전에 관한 규칙」제23조(총리령 제20003호, 2024.12.30.)이고, 처분 기준은 「구약사법」제76조(법률 제20139호, 2024.1.24.) 및 「구의약품 등의 안전에 관한 규칙」제95조 관련 [별표8] Ⅱ.개별기준 제8호나목(총리령 제20003호, 2024.12.30.)이다. 「약사법」 부칙<법률 제20328호, 2024.2.20.> 제4조에 따라 재심사 기간을 부여받은 품목은 개정규정에도 불구하고 종전의 규정을 따른다는 경과규정이 함께 적시되어 있어, 이 사안에서는 개정 전 규정이 판단 기준이 되었다. 처분 대상은 피타론에프캡슐(허가번호: 제506호, 허가일자: 2019.4.3.) 한 품목이다.",
+    "required_remediation": {
+     "deadline": "처분 효력 기간: 2026. 9. 28. ~ 2026. 12. 27. (해당 품목 판매업무정지 3개월)",
+     "items": [
+      "피타론에프캡슐의 재심사 자료 중 미제출 항목과 시판 후 조사대상자 수 부족의 규모를 확인할 것.",
+      "허가일을 기준으로 재심사 기산점(허가일로부터 4년에서 6년이 지난 날)과 이행 기한(그로부터 3개월)을 품목대장에서 산출·관리하는 체계를 정비할 것.",
+      "재심사 기간을 부여받은 다른 품목에 대하여 종전 규정이 적용되는지 여부를 확인하고 해당 품목 목록을 정리할 것.",
+      "판매업무정지 기간 중 해당 품목의 공급 중단에 따른 거래처 통보 및 재고 처리 절차를 정리할 것."
+     ]
+    },
+    "administrative_risks": "판매업무정지 기간 동안 해당 품목의 공급이 중단되며, 행정처분 사실은 공개종료일자 20270326 까지 공개된다. 경과규정에 따라 종전 규정이 적용되는 품목이 다수 남아 있는 경우 같은 유형의 위반이 반복될 수 있고, 기산점 산정 착오는 품목 단위로 독립하여 발생하므로 한 품목의 시정만으로는 재발이 차단되지 않는다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006748",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "New-drug re-examination breach",
+    "summary": "MFDS found a breach of the re-examination requirement for new drugs by a domestic pharmaceutical manufacturer and suspended sales of the capsule product concerned for three months.",
+    "implication": "The premise of the action is that re-examination has to land inside a narrow three-month window measured from a point four to six years after approval. The older the approval, the more easily that anchor date drops off a schedule, which is why deriving the due date automatically from the product register is what makes the control work.",
+    "key_facts": [
+     "Violation: part of the data required at re-examination was not submitted, the shortfall being an insufficient number of post-marketing surveillance subjects",
+     "Timing rule: re-examination must take place within three months of the point falling four to six years after product approval",
+     "Action: three-month suspension of sales of the product concerned, from 28 September 2026 to 27 December 2026; the product was approved on 3 April 2019"
+    ],
+    "checks": [
+     "Product-register tracking of re-examination due dates",
+     "Accuracy of the anchor-date calculation from the approval date"
+    ]
+   }
+  },
+  {
+   "id": "admin-2026006740",
+   "render_order": 18,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "A",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "행정처분",
+   "headline_target": "한국코러스(주)",
+   "title_issue": "시판 후 안정성시험 미실시",
+   "summary": "식약처가 한국코러스(주)에 대해 수출용 재조합사람에리스로포이에틴 프리필드시린지 제품의 2024년 생산분 가운데 특정 제조번호에 시판 후 안정성시험을 실시하지 않은 사실을 확인하고, 해당 품목 제조업무정지 1개월 처분을 내렸다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-08-25"
+    },
+    {
+     "label": "문서번호",
+     "value": "admin-2026006740"
+    },
+    {
+     "label": "업체",
+     "value": "한국코러스(주)"
+    },
+    {
+     "label": "처분",
+     "value": "○ 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.)\n  - 해당 품목: ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’"
+    }
+   ],
+   "quotes": [
+    {
+     "original": "- 의약품 ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나,\n  제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있음",
+     "translation": null
+    }
+   ],
+   "evidence_basis": "Intake raw",
+   "key_facts": [
+    "위반: 2024년 생산분에 대하여 시판 후 안정성 시험 계획을 수립하였으나 제조번호 24209001에 대하여 시험을 실시하지 않음",
+    "처분: 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.) — 코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)",
+    "적용법령: 「약사법」 제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」 제43조제1항제3호, 제48조제9호 가목"
+   ],
+   "implication": "계획은 수립됐으나 특정 제조번호가 실행 단계에서 빠졌다는 점이 이 처분의 축이다. 시판 후 안정성시험은 연간 계획과 실제 착수 기록을 제조번호 단위로 맞춰 보지 않으면 누락이 시험 종료 시점까지 드러나지 않고, 수출용 품목이라 해서 처분 대상에서 비껴가지도 않는다.",
+   "checks": [
+    "시판 후 안정성시험 연간 계획 대비 제조번호별 착수·진행 기록 대조",
+    "수출용 품목의 시판 후 안정성시험 대상 선정 기준"
+   ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목",
+      "original": "- 의약품 ‘코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)’의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나,\n  제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있음",
+      "description": "해당 업체는 의약품 '코로몬프리필드시린지4000IU(재조합사람에리스로포이에틴)(수출용)'의 2024년 생산분에 대하여 시판 후 안정성 시험을 실시할 계획을 수립하였으나, 제조번호 24209001에 대하여 시험을 실시하지 않은 사실이 있다는 것이 위반사실이다. 계획 수립 자체는 이루어졌고 특정 제조번호에 대한 시험 실행이 누락된 형태이다.",
+      "risk": "시판 후 안정성 시험은 유효기간 전 구간에 걸쳐 품질이 유지되는지를 확인하는 근거이므로, 해당 제조번호에 대해서는 그 근거가 존재하지 않는 상태가 된다. 생물학적제제인 재조합사람에리스로포이에틴 제제는 보관 조건에 따른 역가 변화가 품질에 직접 연결되는 제형이어서, 시험 누락은 해당 배치의 유효기간 내 품질을 뒷받침할 자료가 없다는 의미가 된다. 수출용 품목이라도 처분 대상에서 제외되지 않았다."
+     }
+    ],
+    "disposition_basis": "처분의 근거 법령은 「약사법」제37조제1항, 제38조제1항 및 「의약품 등의 안전에 관한 규칙」제43조제1항제3호, 제48조제9호 가목이며, 처분 기준은 「약사법」제76조 및 「의약품 등의 안전에 관한 규칙」제95조 관련 [별표 8] 행정처분의 기준 Ⅰ. 일반기준 제6호, Ⅱ. 개별기준 제25호 다목 3) 이다. 처분은 해당 품목 제조업무정지 1개월(2026. 9. 14. ~ 2026. 10. 13.)이며, 최종처분일자는 20260825 이다. 판매가 아닌 제조업무를 정지한 처분이라는 점에서, 위반이 출하 이후의 정보 제공이 아니라 제조·품질관리 단계의 의무 미이행으로 평가되었음을 알 수 있다.",
+    "required_remediation": {
+     "deadline": "처분 효력 기간: 2026. 9. 14. ~ 2026. 10. 13. (해당 품목 제조업무정지 1개월)",
+     "items": [
+      "제조번호 24209001에 대한 시판 후 안정성 시험이 실시되지 않은 경위를 계획 수립 시점부터 확인할 것.",
+      "2024년 생산분 전체에 대하여 시판 후 안정성 시험 계획과 실제 착수·진행 기록을 제조번호 단위로 대조할 것.",
+      "수출용 품목을 포함한 시판 후 안정성 시험 대상 선정 기준과 연간 계획의 이행 점검 주기를 정비할 것.",
+      "시험 누락이 확인된 제조번호의 유통 현황과 품질 평가 가능 여부를 확인할 것."
+     ]
+    },
+    "administrative_risks": "제조업무정지 기간 동안 해당 품목의 제조가 중단되며, 행정처분 사실은 공개종료일자 20270113 까지 공개된다. 시판 후 안정성 시험은 연간 계획 단위로 운영되므로 같은 계획 아래 있는 다른 품목·제조번호에서도 동일한 누락이 존재할 수 있고, 수출용 품목이 처분 대상이 된 이상 수출 상대국 규제기관의 확인 요청으로 이어질 여지도 있다."
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006740",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "On-going stability test missed",
+    "summary": "MFDS found that a domestic manufacturer had not carried out post-marketing stability testing on one batch of an export-only recombinant human erythropoietin pre-filled syringe product from its 2024 production, and suspended manufacture of that product for one month.",
+    "implication": "The plan existed; a specific batch dropped out at execution. On-going stability work only shows a gap if the annual plan is reconciled batch by batch against actual start records, and being an export-only product does not put it outside the scope of enforcement.",
+    "key_facts": [
+     "Violation: a post-marketing stability testing plan was established for 2024 production, but the test was not performed on batch 24209001",
+     "Action: one-month suspension of manufacture of the product concerned, from 14 September 2026 to 13 October 2026",
+     "Legal basis: Pharmaceutical Affairs Act Articles 37(1) and 38(1), and Rules on the Safety of Drugs Articles 43(1)3 and 48(9)(a)"
+    ],
+    "checks": [
+     "Batch-level reconciliation of the annual stability plan against actual initiation records",
+     "Criteria for selecting export-only products into the on-going stability programme"
+    ]
+   }
+  },
+  {
+   "id": "admin-2026006815",
+   "render_order": 19,
+   "group": "국내",
+   "group_label": "행정처분",
+   "agency": "MFDS",
+   "card_type": "행정처분",
    "category": "Other",
    "modality": "💊 합성의약품",
    "evidence_level": "A",
    "signal_tier": 2,
    "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "Zydus Hospira Oncology Private Limited",
-   "title_issue": "세포독성항암 주사제 무지적",
-   "summary": "식약처가 인도 소재 Zydus Hospira Oncology Private Limited를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
+   "type_tag": "행정처분",
+   "headline_target": "(주)돌나라한농제약",
+   "title_issue": "공급내역 미보고 과징금",
+   "summary": "식약처가 (주)돌나라한농제약에 대해 전문의약품 3개 품목의 의약품 공급내역 현황을 기한 내 보고하지 않은 사실을 확인하고, 해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원을 부과했다.",
    "facts": [
     {
      "label": "발행일",
-     "value": "2026-09-10"
+     "value": "2026-09-15"
     },
     {
      "label": "문서번호",
-     "value": "gmpinspect-1Q28uemXd55"
+     "value": "admin-2026006815"
     },
     {
-     "label": "제조소",
-     "value": "Zydus Hospira Oncology Private Limited"
+     "label": "업체",
+     "value": "(주)돌나라한농제약"
     },
     {
-     "label": "실사기간",
-     "value": "2026-02-24~2026-02-26"
+     "label": "처분",
+     "value": "해당품목* 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과\n     * 뉴흑과립(약용탄), 뉴흑산(약용탄), 뉴흑캡슐200밀리그람(약용탄)"
     }
    ],
    "quotes": [
     {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 무균-세포독성항암제제-주사제 완제",
+     "original": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음",
      "translation": null
     }
    ],
    "evidence_basis": "Intake raw",
    "key_facts": [
-    "실사: 2026-02-24~2026-02-26, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 무균-세포독성항암제제-주사제 완제"
+    "위반: 일련번호를 부착하지 아니하는 전문의약품의 의약품 공급내역 현황을 다음 달 말일까지 의약품관리종합정보센터의 장에게 보고하지 않음(3개 품목)",
+    "처분: 해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과",
+    "적용법령: 「약사법」 제47조의3 및 「약사법 시행규칙」 제45조"
    ],
-   "implication": "무균성과 봉쇄를 동시에 요구하는 세포독성항암제 주사제 제조소가 지적 없이 실사를 통과했다. 이 제형은 제품을 오염으로부터 보호하는 설계와 작업자를 약물로부터 보호하는 설계가 서로 반대 방향으로 작동해, 두 요구를 한 라인에서 맞춘 제조소인지가 위탁 판단의 핵심이 된다.",
+   "implication": "제품 품질과 무관한 정보 제출 의무이지만 미이행이 품목 단위 처분으로 이어진다는 점이 이 사안의 성격이다. 일련번호를 부착하지 않는 품목은 자동 집계 경로가 없어 다음 달 말일이라는 기한을 사람이 관리해야 하고, 누락은 그 지점에서 생긴다.",
    "checks": [
-    "세포독성 주사제 위탁 시 무균성과 봉쇄 설계의 양립 확인",
-    "전용 설비·공조 분리 운영 여부"
+    "일련번호 미부착 품목의 공급내역 보고 기한 관리 주체 지정",
+    "의약품관리종합정보센터 보고 이력의 월별 확인"
    ],
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조",
+      "original": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고 상기 업체는 건강보험심사평가원 의약품관리종합정보센터에 상기 3개의 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있음",
+      "description": "약사법 제47조의3제2항 및 같은법 시행규칙 제45조에 따라 일련번호를 부착하지 아니하는 전문의약품을 공급하는 경우에는 다음 달 말일까지 의약품 공급내역 현황을 의약품관리종합정보센터의 장에게 보고하여야 함에도 불구하고, 해당 업체는 건강보험심사평가원 의약품관리종합정보센터에 3개 품목에 대한 의약품 공급내역 현황을 기한 내 보고하지 않은 사실이 있다는 것이 위반사실이다.",
+      "risk": "공급내역 보고는 의약품의 유통 경로를 파악하기 위한 정보 제공 의무로, 보고가 누락되면 해당 품목의 유통량이 공적 정보 체계에서 확인되지 않는 구간이 생긴다. 일련번호를 부착하지 않는 품목은 자동 집계 경로가 없어 보고가 수작업에 의존하므로 누락이 반복되기 쉽고, 위반이 품목 단위 처분으로 연결되어 세 품목이 동시에 대상이 되었다."
+     }
+    ],
+    "disposition_basis": "위반법령은 ｢약사법｣ 제47조의3 및 ｢약사법 시행규칙｣ 제45조이며, 처분기준은 ｢약사법｣제76조 및 의약품 등의 안전에 관한 규칙 [별표 8] 행정처분 기준 Ⅰ. 일반기준 제12호 하목, Ⅱ. 개별기준 제36호 이다. 과징금은 ｢약사법｣ 제81조, ｢약사법 시행령｣ 제33조 [별표 2] '과징금 산정기준' 및 ｢식품의약품안전처 과징금 부과처분 기준 등에 관한 규정(훈령)｣ 제3조제2항 관련 [별표] 과징금 부과대상의 세부 기준 1. 공통 기준 라목, 2. 개별 기준 라목에 따라 산정되었다. 그 결과 해당품목 판매업무정지 10일 처분을 갈음하여 과징금 750,000원이 부과되었다.",
+    "required_remediation": {
+     "deadline": "최종처분일자 20260915 (해당품목 판매업무정지 10일 처분을 갈음한 과징금 750,000원 부과)",
+     "items": [
+      "뉴흑과립(약용탄), 뉴흑산(약용탄), 뉴흑캡슐200밀리그람(약용탄) 3개 품목의 공급내역 보고가 기한 내 이루어지지 않은 경위를 확인할 것.",
+      "일련번호를 부착하지 아니하는 전문의약품 목록을 작성하고 품목별 보고 책임자를 지정할 것.",
+      "다음 달 말일이라는 보고 기한을 월별로 점검하는 절차를 수립하고 보고 이력을 보존할 것.",
+      "의약품관리종합정보센터 보고 내역과 자사 출하 기록을 주기적으로 대조할 것."
+     ]
+    },
+    "administrative_risks": "판매업무정지가 과징금으로 갈음되어 공급 중단은 발생하지 않았으나, 행정처분 사실은 공개종료일자 20270105 까지 공개된다. 공급내역 보고는 매월 반복되는 의무여서 관리 체계가 정비되지 않으면 동일 위반이 월 단위로 재발할 수 있고, 반복 위반은 일반기준에 따라 가중될 여지가 있다."
+   },
    "source_body_captured": true,
    "merged_count": 1,
    "merged_items": [],
    "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q28uemXd55",
+    "info_url": "",
+    "official_url": "https://nedrug.mfds.go.kr/pbp/CCBAO01/getItem?dispsApplySeq=2026006815",
     "official_is_pdf": false,
     "link_check": {
      "info": "pending",
@@ -3637,101 +2382,23 @@
     }
    },
    "en": {
-    "title_issue": "Cytotoxic injectable site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of Zydus Hospira Oncology Private Limited in India. No deficiencies were raised.",
-    "implication": "A site making cytotoxic oncology injectables, which has to satisfy sterility and containment at once, cleared its inspection without findings. In this dosage form the design that protects product from contamination and the design that protects operators from the drug pull in opposite directions, so whether a site has reconciled both on one line is the core outsourcing question.",
+    "title_issue": "Supply reporting default fined",
+    "summary": "MFDS found that a domestic manufacturer had failed to report supply records for three prescription products to the national drug information centre within the deadline, and imposed a fine of KRW 750,000 in lieu of a ten-day suspension of sales.",
+    "implication": "This is an information-submission duty unrelated to product quality, yet failing it lands as a product-level action. Products without a serial number have no automatic aggregation path, so the end-of-following-month deadline is carried by a person, and that is where the omission occurs.",
     "key_facts": [
-     "Inspection: 24-26 February 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: sterile cytotoxic oncology injectable finished product"
+     "Violation: supply records for prescription products not carrying a serial number must be reported to the head of the drug information centre by the last day of the following month; this was not done for three products",
+     "Action: a fine of KRW 750,000 imposed in lieu of a ten-day suspension of sales of the products concerned",
+     "Legal basis: Pharmaceutical Affairs Act Article 47-3 and its Enforcement Rule Article 45"
     ],
     "checks": [
-     "Whether sterility and containment designs coexist at a cytotoxic injectable contract site",
-     "Operation of dedicated equipment and segregated air handling"
-    ]
-   }
-  },
-  {
-   "id": "gmpinspect-1Q28uemXeC9",
-   "render_order": 35,
-   "group": "국내",
-   "group_label": null,
-   "agency": "MFDS",
-   "card_type": "GMP실사",
-   "category": "Other",
-   "modality": "▫️ 기타",
-   "evidence_level": "A",
-   "signal_tier": 2,
-   "signal_label": "Med",
-   "type_tag": "GMP실사",
-   "headline_target": "JW Euvipharm Joint Stock Company",
-   "title_issue": "베트남 고형제 제조소 무지적",
-   "summary": "식약처가 베트남 소재 JW Euvipharm Joint Stock Company를 사후 실사한 결과를 공개했다. 평가 결과 지적(보완)사항은 없었다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-09-10"
-    },
-    {
-     "label": "문서번호",
-     "value": "gmpinspect-1Q28uemXeC9"
-    },
-    {
-     "label": "제조소",
-     "value": "JW Euvipharm Joint Stock Company"
-    },
-    {
-     "label": "실사기간",
-     "value": "2026-02-10~2026-02-12"
-    }
-   ],
-   "quotes": [
-    {
-     "original": "평가 결과: 지적(보완)사항(Deficiencies) 없음 제형 비고 비무균-일반제제-내용고형제 완제",
-     "translation": null
-    }
-   ],
-   "evidence_basis": "Intake raw",
-   "key_facts": [
-    "실사: 2026-02-10~2026-02-12, 사후 / 완제(단일)",
-    "결과: 평가 결과 지적(보완)사항(Deficiencies) 없음",
-    "제형: 비무균-일반제제-내용고형제 완제"
-   ],
-   "implication": "동남아시아 생산 거점의 내용고형제 제조소가 사후 실사에서 무지적으로 확인됐다. 생산 기지가 여러 나라로 분산될수록 같은 품목이라도 제조소별 실사 이력이 달라지므로, 품목 단위가 아니라 제조소 단위로 실사 결과를 관리하는 편이 실효를 갖는다.",
-   "checks": [
-    "품목별이 아닌 제조소별 실사 이력 관리 체계",
-    "다국가 생산 품목의 제조소별 품질 이력 비교"
-   ],
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100",
-    "official_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q28uemXeC9",
-    "official_is_pdf": false,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Vietnamese solid oral site clean",
-    "summary": "MFDS published the outcome of a follow-up inspection of JW Euvipharm Joint Stock Company in Vietnam. No deficiencies were raised.",
-    "implication": "A solid oral site at a South-East Asian production base was confirmed without findings. The more production spreads across countries, the more inspection histories diverge between sites making the same product, which makes holding the record at site level rather than product level the arrangement that actually works.",
-    "key_facts": [
-     "Inspection: 10-12 February 2026, follow-up inspection of a single finished-product site",
-     "Outcome: no deficiencies identified",
-     "Dosage form: non-sterile conventional solid oral finished product"
-    ],
-    "checks": [
-     "Maintaining inspection history per manufacturing site rather than per product",
-     "Comparing quality history across sites for products made in multiple countries"
+     "Named ownership of the supply-reporting deadline for products without serial numbers",
+     "Monthly confirmation that reports to the drug information centre were filed"
     ]
    }
   },
   {
    "id": "recall-7abe996653c7",
-   "render_order": 36,
+   "render_order": 20,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -3816,7 +2483,7 @@
   },
   {
    "id": "recall-4ebbb116d467",
-   "render_order": 37,
+   "render_order": 21,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -3901,7 +2568,7 @@
   },
   {
    "id": "recall-55a6caf685eb",
-   "render_order": 38,
+   "render_order": 22,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -3985,7 +2652,7 @@
   },
   {
    "id": "recall-9942c438cdeb",
-   "render_order": 39,
+   "render_order": 23,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4069,7 +2736,7 @@
   },
   {
    "id": "recall-14d219f042fe",
-   "render_order": 40,
+   "render_order": 24,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4154,7 +2821,7 @@
   },
   {
    "id": "recall-1df50b1152ce",
-   "render_order": 41,
+   "render_order": 25,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4239,7 +2906,7 @@
   },
   {
    "id": "recall-6a78ec1de46f",
-   "render_order": 42,
+   "render_order": 26,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4326,7 +2993,7 @@
   },
   {
    "id": "hc-82496",
-   "render_order": 43,
+   "render_order": 27,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -4414,7 +3081,7 @@
   },
   {
    "id": "df8ca708060a",
-   "render_order": 44,
+   "render_order": 28,
    "group": "Recall",
    "group_label": null,
    "agency": "MHRA",
@@ -4496,7 +3163,7 @@
   },
   {
    "id": "hc-82628",
-   "render_order": 45,
+   "render_order": 29,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -4586,7 +3253,7 @@
   },
   {
    "id": "hc-82618",
-   "render_order": 46,
+   "render_order": 30,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -4676,7 +3343,7 @@
   },
   {
    "id": "hc-82615",
-   "render_order": 47,
+   "render_order": 31,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -4764,7 +3431,7 @@
   },
   {
    "id": "D-0805-2026",
-   "render_order": 48,
+   "render_order": 32,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -4910,7 +3577,7 @@
   },
   {
    "id": "D-0823-2026",
-   "render_order": 49,
+   "render_order": 33,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5026,7 +3693,7 @@
   },
   {
    "id": "D-0828-2026",
-   "render_order": 50,
+   "render_order": 34,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5140,7 +3807,7 @@
   },
   {
    "id": "D-0830-2026",
-   "render_order": 51,
+   "render_order": 35,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5267,7 +3934,7 @@
   },
   {
    "id": "D-0833-2026",
-   "render_order": 52,
+   "render_order": 36,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5392,7 +4059,7 @@
   },
   {
    "id": "D-0834-2026",
-   "render_order": 53,
+   "render_order": 37,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

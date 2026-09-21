@@ -156,6 +156,40 @@ def is_veterinary_domain(*text_parts: str) -> bool:
     return bool(_VET_DOMAIN_RE.search(blob))
 
 
+# ── 한국어 제외 도메인 (2026-09-21) ──────────────────────────────────────────
+# 위 제외 어휘는 **전부 영어**다. MFDS 는 한국어 원천이라 그대로 통과한다:
+#   "Medical Devices"                  → Unrelated (막힘)
+#   "디지털의료기기 제조 및 품질관리 기준"  → Pending   (통과)
+# 실증: 2026-09-21 호에 `디지털의료기기 제조 및 품질관리 기준 질의·응답집` 이 실렸고,
+# 발행본 전수(13주)에도 의료기기 지침이 2건 더 있었다(07-06 변경관리·08-03 SW 밸리데이션).
+#
+# ★목록(`_kw_match`)에 한국어를 더하는 것으로는 못 고친다 — `_kw_match` 는 키워드를
+#   `\b…\b` 로 감싸는데 한국어에는 그 경계가 없다. `\b의료기기\b` 는 "디지털의료기기"
+#   안에서 성립하지 않아(앞 글자 '털'도 단어문자) 한 번도 안 걸린다.
+#   그래서 별도 정규식 층으로 둔다(수의 판정과 같은 구조).
+#
+# 의약품 단서가 함께 있으면 구제한다 — 복합제·겸업 제조소·생약 잔류농약처럼 제약
+# 문서가 이 낱말을 정당하게 포함하는 경우가 실제로 있다(실측: `(주)현진제약
+# 잔류농약(뷰프로페진) 검출 회수` 는 남아야 한다).
+#
+# 실측(발행본 13주 574장 + 경계사례 12건): 경계사례 불일치 0건, 코퍼스에서 새로
+# 차단되는 것은 MFDS 의료기기 지침 3건뿐이다(영어 원천인 FDA 483 은 이 층을 타지
+# 않는다 — `compute_relevance` 가 받는 것이 영어 본문이라 한국어 정규식이 안 걸린다).
+_KO_NON_PHARMA_RE = re.compile(
+    r"의료기기|체외진단기기|의료용구|화장품|건강기능식품|식품위생|축산물|식품첨가물")
+_KO_PHARMA_GUARD_RE = re.compile(
+    r"의약품|원료의약품|완제의약품|복합제|의약외품|생물학적제제|한약|생약|신약|"
+    r"제네릭|무균|제조소|주사제|경구|정제|캡슐|회수")
+
+
+def is_korean_non_pharma_domain(*text_parts: str) -> bool:
+    """한국어 표제가 기기·화장품·식품 도메인인가(의약품 단서가 함께면 False)."""
+    blob = " ".join(t for t in text_parts if t)
+    if not _KO_NON_PHARMA_RE.search(blob):
+        return False
+    return not _KO_PHARMA_GUARD_RE.search(blob)
+
+
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
 # GRM의 1차 사용자는 경구 고형제 중심 제약 QA이므로, 명시적 식품/보충제 도메인은
 # Intake 단계에서 제외한다. 단, CDER/OPQ/finished pharmaceutical 등 human drug 단서가
@@ -457,7 +491,10 @@ def compute_relevance(*text_parts: str) -> str:
     # 동작 보존용이고, 실제로 잡는 일은 `is_veterinary_domain` 이 한다.
     if _kw_any(blob, QA_HARD_EXCLUDE_TERMS) or is_veterinary_domain(blob):
         return "Unrelated"
-    if _kw_any(blob, QA_EXCLUDE_KEYWORDS):
+    # 한국어 원천(MFDS)은 위 영어 목록에 안 걸린다 — 같은 성격의 제외를 한국어로도
+    # 한 번 본다. 이 함수는 자체 의약품 구제를 이미 거친 결과라 device_guarded 를
+    # 다시 태우지 않는다(영어 가드 어휘는 한국어 표제에 어차피 없다).
+    if _kw_any(blob, QA_EXCLUDE_KEYWORDS) or is_korean_non_pharma_domain(blob):
         # 가드: 의료기기 단서로 인한 제외라도 약물/복합제 단서가 함께면 약물전달기기·
         # combination product 정당 항목으로 보고 일반 분류로 진행(오배제 방지, C-2 G4).
         device_guarded = (_kw_any(blob, QA_DEVICE_EXCLUDE_TERMS)

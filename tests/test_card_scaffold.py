@@ -335,6 +335,23 @@ def _recall_rows(entrps: str, reason: str, pub: str,
     return out
 
 
+class DomesticGroupingTest(unittest.TestCase):
+    """국내 구역 카드유형 소제목 (2026-09-21).
+
+    실측: 글로벌 8장에는 제품군 소제목이 3개인데 **국내 28장에는 0개**였다. 가장 큰
+    구역이 구분 없이 통으로 흘렀다 — 묶기 조건이 `sec == "global"` 로 박혀 있었다.
+    """
+
+    def test_domestic_order_is_declared_not_count_based(self):
+        """건수로 순서가 정해지면 주차마다 자리가 바뀐다 — 선언 순서로 고정한다."""
+        self.assertEqual(cs._DOMESTIC_GROUP_ORDER, ("GMP실사", "행정처분", "지침·안내서"))
+
+    def test_unknown_card_type_is_kept_at_the_end(self):
+        """선언에 없는 유형이 조용히 사라지면 안 된다."""
+        order = cs._DOMESTIC_GROUP_ORDER
+        self.assertNotIn("새로운유형", order)
+
+
 class RssNewsTypeTagTest(unittest.TestCase):
     """rss-news 유형태그 — 매체가 GMP 전담인가로 가른다 (2026-09-21).
 

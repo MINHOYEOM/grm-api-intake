@@ -23,7 +23,7 @@ item.firm)` 로 계산해 Notion 에 적은 값이다. Supabase `raw_signals` �
 그대로 보관한다 — `raw_json` = raw_payload, `row_json` = IntakeItem(headline/body/
 type_or_class/firm). 따라서 같은 입력으로 함수를 다시 부르면 그 시점 판정이 재현된다.
 
-★`--verify-replay` 가 그것을 **증명**한다: origin/main 의 구 분류기로 재생한 값이
+★`--verify-replay` 가 그것을 **증명**한다: 수리 직전 커밋(OLD_CLASSIFIER_REF)의 구 분류기로 재생한 값이
 발행본 배지와 한 장도 빠짐없이 일치해야 한다. 일치하지 않으면 재생 경로가 발행 경로와
 다르다는 뜻이므로, 새 판정도 믿을 수 없고 스크립트는 실패한다. (성질을 재는 검사 —
 "몇 장 바뀌었다" 같은 숫자는 재생이 맞다는 증거가 못 된다.)
@@ -52,6 +52,24 @@ from grm_taxonomy import (
     MODALITY_OTHER,
     MODALITY_UNKNOWN,
     compute_modality,
+)
+
+# ★재생 기준(구 분류기)은 **고정 커밋**이어야 한다 — 움직이는 ref 를 쓰면 안 된다.
+#   첫 실행(2026-09-21)이 `origin/main` 을 썼다가, 바로 직전에 수리가 main 에 머지되는
+#   바람에 "구 분류기" 자리에 **새 분류기**가 들어왔다. 재생값이 전부 ""(무배지)로 나와
+#   466장 중 308장이 불일치로 찍혔고, 게이트는 데이터가 아니라 기준을 의심하게 만들었다.
+#   = PR #1026 머지 커밋의 부모(수리 직전 main).
+OLD_CLASSIFIER_REF = "e44db92a963acc18891166ce01a11507f231d0b7"
+
+# 구 분류기가 맞는지 확인하는 앵커 — (입력, 그 시점 기대 판정).
+# 'Sterile Drug Manufacturer' 는 구 구현이 `product_type` 의 'drug' 토큰만으로 Chemical 을
+# 확정하던 대표 입력이다(이 사건의 발단). 새 분류기는 "" 를 돌려준다.
+# ★앵커가 맞지 않으면 비교를 시작하지 않고 실패한다 — 잘못된 기준으로 308장을 찍어
+#   사람에게 "데이터가 틀렸다"고 오인시키느니, 기준이 틀렸다고 바로 말하는 편이 낫다.
+_OLD_CLASSIFIER_ANCHOR = (
+    {"product_type": "Sterile Drug Manufacturer"},
+    ("[FDA 483] Some Firm", "시설 유형: Sterile Drug Manufacturer", "483", "Some Firm"),
+    "Chemical",
 )
 
 BRIEF_DIR = Path(__file__).resolve().parent / "web" / "data" / "briefs"
@@ -159,6 +177,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--cache", default=str(CACHE_PATH),
                     help="raw_signals 재생 입력 캐시(JSON). 있으면 네트워크 없이 쓴다.")
     ap.add_argument("--refresh-cache", action="store_true")
+    ap.add_argument("--old-ref", default=OLD_CLASSIFIER_REF,
+                    help="재생 기준(구 분류기) 커밋. 기본은 수리 직전 main 고정 SHA.")
     args = ap.parse_args(argv)
 
     badge, _ = _badge_maps()
@@ -184,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[fetch] raw_signals {len(inputs)}건 → {cache}")
 
     if args.verify_replay:
-        return _verify_replay(briefs, inputs, badge)
+        return _verify_replay(briefs, inputs, badge, args.old_ref)
 
     total = 0
     changes: list[dict[str, Any]] = []
@@ -235,12 +255,21 @@ def _value_of(badge_str: str | None, badge: dict[str, str]) -> str:
     return rev.get(badge_str, badge_str)
 
 
-def _verify_replay(briefs, inputs, badge) -> int:
-    """★구 분류기(origin/main)로 재생 → 발행본 배지와 전건 일치해야 한다."""
+def _verify_replay(briefs, inputs, badge, old_ref: str) -> int:
+    """★구 분류기(고정 커밋)로 재생 → 발행본 배지와 전건 일치해야 한다."""
     try:
-        old_mod = _load_old_classifier()
+        old_mod = _load_old_classifier(old_ref)
     except Exception as e:                                   # noqa: BLE001
-        print(f"구 분류기 로드 실패: {e}", file=sys.stderr)
+        print(f"구 분류기 로드 실패({old_ref}): {e}", file=sys.stderr)
+        return 2
+
+    # ★앵커 — 기준 커밋이 정말 '구 분류기'인지 먼저 확인한다.
+    anchor_raw, anchor_parts, anchor_expect = _OLD_CLASSIFIER_ANCHOR
+    got = old_mod(anchor_raw, *anchor_parts)
+    if got != anchor_expect:
+        print(f"★기준 커밋({old_ref})이 구 분류기가 아니다 — "
+              f"앵커 기대 {anchor_expect!r}, 실제 {got!r}. 비교를 시작하지 않는다.",
+              file=sys.stderr)
         return 2
 
     checked = mismatch = skipped = 0
@@ -258,7 +287,10 @@ def _verify_replay(briefs, inputs, badge) -> int:
                 skipped += 1
                 continue
             raw_payload, parts = _replay_args(entry)
-            replayed = badge.get(old_mod(raw_payload, *parts))
+            # ★빈 판정은 "배지 없음"(카드 modality=None)이다. badge.get("") 이 우연히
+            #   None 을 돌려주는 데 기대지 않고 명시한다.
+            replayed_value = old_mod(raw_payload, *parts)
+            replayed = badge.get(replayed_value) if replayed_value else None
             checked += 1
             if replayed != published:
                 mismatch += 1
@@ -277,13 +309,13 @@ def _verify_replay(briefs, inputs, badge) -> int:
     return 0
 
 
-def _load_old_classifier():
-    """origin/main 의 grm_taxonomy.compute_modality 를 독립 모듈로 적재."""
+def _load_old_classifier(ref: str):
+    """`ref` 시점의 grm_taxonomy.compute_modality 를 독립 모듈로 적재."""
     import importlib.util
     import subprocess
     import tempfile
     src = subprocess.run(
-        ["git", "show", "origin/main:grm_taxonomy.py"],
+        ["git", "show", f"{ref}:grm_taxonomy.py"],
         capture_output=True, check=True, cwd=str(Path(__file__).resolve().parent),
     ).stdout.decode("utf-8")
     with tempfile.TemporaryDirectory() as d:

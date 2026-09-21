@@ -272,6 +272,88 @@ class FederalRegisterDeviceNoiseFilterTest(unittest.TestCase):
                 )
 
 
+class VeterinaryDomainGateTest(unittest.TestCase):
+    """수의/동물용 hard exclude — 낱말쌍 목록이 아니라 **성질**로 재는지.
+
+    계기(2026-09-21): FDA CVM 의 `Target Animal Safety Evaluation for Veterinary
+    Monoclonal Antibody Products`(GFI #298, VICH GL62)가 주간 브리프에 실렸다.
+    표제에 veterinary 도 animal 도 있는데 `QA_HARD_EXCLUDE_TERMS` 8개 문구 중
+    아무것과도 안 맞아 Unrelated 가 아니라 **Likely** 로 통과했다.
+
+    겹친 결함이 둘이다:
+      ① `_kw_match` 가 `\b…\b` 로 감싸 **복수형이 통째로 빠진다**
+         ("animal drug" 은 걸리고 "animal drugs" 는 안 걸린다).
+      ② 목록이 인접 낱말쌍이라 새 조합("veterinary <신조어> products")을 못 잡는다.
+
+    그래서 아래 검사는 "GFI #298 이 막히나" 한 건이 아니라 **복수형·새 조합 전반**과
+    **과차단 음성 대조군**을 함께 묻는다.
+    """
+
+    # ── 막혀야 하는 것 ────────────────────────────────────────────────
+    def test_the_case_that_leaked_is_blocked(self):
+        title = ("Target Animal Safety Evaluation for Veterinary Monoclonal "
+                 "Antibody Products; Draft Guidance for Industry; Availability")
+        self.assertEqual(compute_relevance(title), "Unrelated")
+
+    def test_plural_forms_are_blocked(self):
+        """복수형이 단수형과 같은 판정을 받아야 한다 — ①이 되살아나면 여기서 깨진다."""
+        for singular, plural in (
+            ("Emergency Use for an Animal Drug", "Emergency Use for Two Animal Drugs"),
+            ("Guidance on veterinary drug", "Guidance on veterinary drugs"),
+            ("Guidance on veterinary medicine", "Guidance on veterinary medicines"),
+            ("Guidance on veterinary product", "Guidance on veterinary products"),
+        ):
+            self.assertEqual(compute_relevance(singular), "Unrelated", singular)
+            self.assertEqual(compute_relevance(plural), "Unrelated", plural)
+
+    def test_novel_noun_combinations_are_blocked(self):
+        """②가 되살아나면(목록으로 회귀하면) 여기서 깨진다."""
+        for title in (
+            "Veterinary Monoclonal Antibody Products",
+            "Veterinary Gene Therapy Products",          # 목록에 없는 새 조합
+            "Committee for Veterinary Medicinal Products (CVMP) meeting highlights",
+            "in-use stability claims for veterinary vaccines",
+            "VICH GL62 harmonised guideline",
+            "GFI #298 draft guidance for industry",
+        ):
+            self.assertEqual(compute_relevance(title), "Unrelated", title)
+
+    def test_hard_exclude_is_not_rescued_by_boost_keywords(self):
+        """hard 의 뜻 — GMP 가산 키워드가 잔뜩 있어도 구제되지 않는다."""
+        title = ("Target Animal Safety Evaluation for Veterinary Monoclonal Antibody "
+                 "Products — aseptic processing, data integrity, process validation, CGMP")
+        self.assertEqual(compute_relevance(title), "Unrelated")
+
+    # ── 남아야 하는 것(과차단 음성 대조군) ────────────────────────────
+    def test_firm_name_alone_does_not_make_a_document_veterinary(self):
+        """`compute_relevance` 는 업체명도 함께 받는다(collect_fda_483).
+
+        업체명에 Veterinary 가 들었다는 이유로 무균조제·배지충진·엔도톡신 483 을
+        버리면 안 된다 — 실제 발행분(2026-08-17 fda483-194143)이 이 경우다.
+        """
+        self.assertNotEqual(
+            compute_relevance("Veterinary Pharmacy Corporation",
+                              "Compounding Outsourcing Facility", "483",
+                              "amoxicillin compounding area contamination, "
+                              "media fill design, endotoxin testing"),
+            "Unrelated")
+
+    def test_human_drug_documents_are_untouched(self):
+        for title in (
+            "Sterile Drug Products Produced by Aseptic Processing",
+            "Data Integrity and Compliance With Drug CGMP",
+            "Control of Nitrosamine Impurities in Human Drugs",
+        ):
+            self.assertNotEqual(compute_relevance(title), "Unrelated", title)
+
+    def test_human_committee_is_not_mistaken_for_the_veterinary_one(self):
+        """CHMP(인체용)와 CVMP(동물용)는 표제가 한 낱말 차이다."""
+        chmp = "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP)"
+        cvmp = "Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP)"
+        self.assertNotEqual(compute_relevance(chmp), "Unrelated")
+        self.assertEqual(compute_relevance(cvmp), "Unrelated")
+
+
 class MfdsGmpNoiseFilterTest(unittest.TestCase):
     def test_medical_gas_companies_are_low_value_for_osd_digest(self) -> None:
         for manufacturer in ("밀성산업가스", "에어퍼스트", "한국수소"):

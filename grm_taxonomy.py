@@ -117,6 +117,44 @@ QA_HARD_EXCLUDE_TERMS = [
     "animal health product", "medicated feed",
 ]
 
+# ★이 목록만으로는 못 잡는다(2026-09-21 실측). 두 가지가 겹쳐 있었다.
+#
+#  ① `_kw_match` 는 키워드를 `\b…\b` 로 감싸므로 **복수형이 통째로 빠진다**.
+#     "animal drug" 은 걸리는데 "Animal Drug**s**" 는 안 걸린다(뒤 \b 가 s 앞에서
+#     성립하지 않음). 표제는 거의 항상 복수형이라 목록 전체가 사실상 헛돈다.
+#     실증: 2026-06-22 "Emergency Use for Two Animal Drugs" 가 그대로 발행됐다.
+#  ② 목록은 **인접 낱말쌍**을 손으로 나열한 것이라 새 조합을 못 잡는다.
+#     실증: 2026-09-21 "Veterinary **Monoclonal Antibody** Products"(GFI #298,
+#     FDA CVM) — veterinary 도 animal 도 표제에 있는데 8개 중 아무것도 안 맞아
+#     Unrelated 가 아니라 **Likely** 로 통과했다.
+#
+# 그래서 낱말쌍 목록이 아니라 **성질**로 판정한다: 이 문서의 *주제*가 수의인가.
+# 업체명에 우연히 Veterinary 가 든 것(예: 483 대상 "Veterinary Pharmacy
+# Corporation" — 무균조제·배지충진·엔도톡신 지적이라 GMP 로 유효)과 구분해야
+# 하므로, bare `veterinary` 가 아니라 **수의 + 제품/제형 명사**를 본다.
+# `compute_relevance` 는 업체명도 함께 받으므로(collect_fda_483) 이 구분이 필수다.
+#
+# 실측 근거(발행본 13주·카드 520장 전수 + 경계사례 13건): 경계사례 불일치 0건,
+# 코퍼스에서 새로 차단되는 카드는 2장이고 둘 다 실제 수의 문서다
+# (EMA CVMP 회의결과 · FDA 동물용의약품 긴급사용승인). 위 483 은 그대로 남는다.
+_VET_DOMAIN_RE = re.compile(
+    r"\bveterinary\s+(?:\w+\s+){0,3}products?\b"
+    r"|\bveterinary\s+(?:medicinal\s+)?"
+    r"(?:drugs?|medicines?|medicinal|vaccines?|monoclonal|biologics?|use)\b"
+    r"|\bcommittee\s+for\s+veterinary\b"
+    r"|\banimal\s+(?:drugs?|health)\b"
+    r"|\btarget\s+animal\b"
+    r"|\bmedicated\s+feeds?\b"
+    r"|\bvich\b"                    # 동물용의약품 국제조화(ICH 의 수의 대응)
+    r"|\bgfi\s*#?\s*\d+",           # FDA CVM 의 Guidance for Industry 번호 체계
+    re.I)
+
+
+def is_veterinary_domain(*text_parts: str) -> bool:
+    """문서 주제가 수의/동물용인가(순수 함수). 업체명 단독 일치로는 참이 되지 않는다."""
+    blob = " ".join(t for t in text_parts if t).lower()
+    return bool(_VET_DOMAIN_RE.search(blob))
+
 
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
 # GRM의 1차 사용자는 경구 고형제 중심 제약 QA이므로, 명시적 식품/보충제 도메인은
@@ -338,8 +376,10 @@ def compute_relevance(*text_parts: str) -> str:
     blob = " ".join(t for t in text_parts if t).lower()
     if not blob.strip():
         return "Pending"
-    # 수의/동물용 등 hard exclude 는 boost 구제 없이 무조건 Unrelated
-    if _kw_any(blob, QA_HARD_EXCLUDE_TERMS):
+    # 수의/동물용 등 hard exclude 는 boost 구제 없이 무조건 Unrelated.
+    # 낱말쌍 목록(복수형·새 조합에 약함)과 성질 판정을 함께 본다 — 목록은 기존
+    # 동작 보존용이고, 실제로 잡는 일은 `is_veterinary_domain` 이 한다.
+    if _kw_any(blob, QA_HARD_EXCLUDE_TERMS) or is_veterinary_domain(blob):
         return "Unrelated"
     if _kw_any(blob, QA_EXCLUDE_KEYWORDS):
         # 가드: 의료기기 단서로 인한 제외라도 약물/복합제 단서가 함께면 약물전달기기·

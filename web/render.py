@@ -567,7 +567,12 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         # ★단위 명사도 **표시 문구**다 — 데이터로 실려온 값(`건`)을 tr() 없이 통과시키면
         #   영어 카드에 "All 6 건" 이 그대로 나간다(483 디제스트에서 이미 그랬다).
         #   한국어는 tr() 이 항등이라 회수 골든은 바이트 불변.
-        "merged_noun": tr(card.get("merged_noun") or "품목"),
+        # ★데이터로 온 단위 명사도 tr() 을 태운다 — 안 태우면 영어 카드에 "All 6 건" 이
+        #   그대로 나간다(483 디제스트에서 이미 그랬다). 한국어는 tr() 항등이라 골든 불변.
+        #   기본값은 `tr("품목")` **리터럴 호출로 남겨 둔다** — `tr(x or "품목")` 로 접으면
+        #   i18n 스캐너가 리터럴을 못 보고 `품목` 이 사전 고아로 잡힌다(실측 1회 실패).
+        "merged_noun": (tr(card["merged_noun"]) if card.get("merged_noun")
+                        else tr("품목")),
         "quotes": quotes,
         "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
         "key_facts": card.get("key_facts") or [],

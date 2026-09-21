@@ -1621,5 +1621,101 @@
       "A medicine that has completed all stages of production, including filling into the final container and packaging"
     ],
     "explanation_en": "Quarantine is the status of materials or products held physically, or by another effective means, apart pending a decision on release, rejection or reprocessing. The others describe batch release, reprocessing and a finished product respectively."
+  },
+  {
+    "id": "q-202639-01",
+    "question_ko": "FDA 가 미국 플로리다 탬파 소재 Bausch & Lomb Inc. 제조소에 무균공정 오염관리 위반을 지적하는 경고서한을 발부했습니다. 위반의 근거로 제시된 실사 확인 사항은 무엇인가요?",
+    "choices": [
+      "멸균등급 필터의 사용 후 완전성시험 기록이 남아 있지 않음",
+      "무균 충전실의 차압 기록이 연속으로 기준을 벗어났으나 원인을 조사하지 않음",
+      "ISO 5 구역에서 그람음성균이 기준 초과로 반복 검출되고 배지충진이 실패함",
+      "최종멸균 공정의 생물학적 지표 검증을 실시하지 않음"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "경고서한은 2023~2025년 ISO 5 구역에서 Serratia marcescens·Stenotrophomonas maltophilia 등이 기준을 초과해 반복 검출되고 2025년 7월 line 16 배지충진이 실패한 점을 근거로, 무균조작구역의 구획·관리체계 미비(21 CFR 211.42(c)(10))와 미생물 오염 방지 절차 미수립·미준수(21 CFR 211.113(b))를 지적했습니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-09-21/#6266b6a5dbe5",
+    "difficulty": "normal",
+    "week": "202639",
+    "question_en": "FDA issued a Warning Letter to Bausch & Lomb Inc. in Tampa, Florida, citing failures of contamination control in aseptic processing. Which inspection findings were given as the basis?",
+    "choices_en": [
+      "No record of post-use integrity testing of the sterilising-grade filters",
+      "Pressure differential records for the aseptic filling room were repeatedly out of limits and the cause was never investigated",
+      "Gram-negative organisms were repeatedly recovered above limits in the ISO 5 area, and a media fill failed",
+      "Biological indicator qualification of the terminal sterilisation process was not performed"
+    ],
+    "explanation_en": "The letter rested on repeated above-limit recoveries of organisms such as Serratia marcescens and Stenotrophomonas maltophilia in the ISO 5 area between 2023 and 2025, together with the line 16 media fill failure of July 2025, to cite the lack of adequately defined areas and control systems in aseptic processing (21 CFR 211.42(c)(10)) and the failure to establish and follow procedures preventing microbiological contamination (21 CFR 211.113(b))."
+  },
+  {
+    "id": "q-202639-02",
+    "question_ko": "Teva Pharmaceuticals USA 가 traZODone Hydrochloride Tablets USP 50 mg 을 회수했습니다. FDA 가 공표한 회수 사유는 무엇인가요?",
+    "choices": [
+      "이종 정제·캡슐의 혼입",
+      "용출 규격 부적합",
+      "제조 공정의 CGMP 일탈",
+      "다른 유효성분과의 교차오염"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "회수 사유는 이종 정제·캡슐의 혼입(Presence of Foreign Tablets/Capsules)이고 등급은 Class II 입니다. 제품 자체의 시험 부적합이 아니라 포장 단계에서 혼동을 막는 관리가 무너진 유형입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-09-21/#D-0834-2026",
+    "difficulty": "easy",
+    "week": "202639",
+    "question_en": "Teva Pharmaceuticals USA recalled traZODone Hydrochloride Tablets USP 50 mg. What reason did FDA publish for the recall?",
+    "choices_en": [
+      "Presence of foreign tablets/capsules",
+      "Failed dissolution specifications",
+      "CGMP deviations in manufacturing",
+      "Cross-contamination with another active ingredient"
+    ],
+    "explanation_en": "The recall was published for the presence of foreign tablets/capsules and was classified as Class II. Nothing failed on test; what broke down was the control that prevents mix-ups at packaging."
+  },
+  {
+    "id": "q-202639-03",
+    "question_ko": "의약품 GMP 에서 말하는 ‘무균공정 모의시험(배지충전)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "청정실과 청정공기설비의 입자와 미생물 상태를 정한 위치와 주기로 계속 확인하는 활동",
+      "약전에 정한 방법으로 검체에 살아 있는 미생물이 검출되는지 확인하는 시험",
+      "제품을 최종 용기에 넣어 밀봉한 뒤 멸균공정을 적용하는 방식",
+      "실제 제품 대신 배지나 대체물질을 사용해 일상 무균제조공정 전체를 모의하는 시험"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "무균공정 모의시험(배지충전)은 실제 제품 대신 배지나 대체물질을 사용해 일상 무균제조공정 전체를 모의하는 시험입니다(EU GMP Annex 1). 나머지는 각각 환경 모니터링, 무균시험, 최종멸균에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "aseptic-process-simulation",
+    "difficulty": "easy",
+    "week": "202639",
+    "question_en": "Which statement about aseptic process simulation (media fill) in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "Continuing checks on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies",
+      "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample",
+      "Applying a sterilisation process to the product after it has been filled and sealed in its final container",
+      "A test that simulates the entire routine aseptic manufacturing process using a growth medium or a substitute in place of the actual product"
+    ],
+    "explanation_en": "Aseptic process simulation, or media fill, simulates the entire routine aseptic manufacturing process using a growth medium or a substitute in place of the actual product (EU GMP Annex 1). The others describe environmental monitoring, the sterility test and terminal sterilisation."
+  },
+  {
+    "id": "q-202639-04",
+    "question_ko": "의약품 GMP 에서 말하는 ‘혼동(Mix-up)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "한 물질 또는 제품이 다른 물질이나 제품에 의해 오염되는 것",
+      "성분·용기·표시재료·제품이 서로 뒤바뀌거나 섞여 잘못 쓰이는 사고",
+      "새 작업 전에 작업구역과 설비에 이전 제품·자재·문서가 남지 않았는지 확인하는 절차",
+      "표시·포장 자재를 받고 보관·불출·사용하는 전 과정을 통제하고 그 기록을 배치기록에 남기는 관리"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "혼동은 성분·용기·표시재료·제품이 서로 뒤바뀌거나 섞여 잘못 쓰이는 사고로, 오염과 함께 시설 설계·구획·관리로 예방해야 합니다(21 CFR 211.42). 나머지는 각각 교차오염, 라인 클리어런스, 표시자재 관리에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "mix-up",
+    "difficulty": "normal",
+    "week": "202639",
+    "question_en": "Which statement about a mix-up in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "Contamination of one material or product by another material or product",
+      "An incident in which components, containers, labelling, or products are interchanged or intermingled and used in error",
+      "The procedure confirming, before new work starts, that no previous product, material, or document remains in the working area or on the equipment",
+      "Control of the whole path by which labelling and packaging materials are received, stored, issued, and used, with the records kept in the batch record"
+    ],
+    "explanation_en": "A mix-up is an incident in which components, containers, labelling, or products are interchanged or intermingled and used in error; like contamination, it is prevented by facility design, segregation and control (21 CFR 211.42). The others describe cross-contamination, line clearance and labeling control."
   }
 ]

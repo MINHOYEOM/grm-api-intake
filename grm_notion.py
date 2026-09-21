@@ -508,7 +508,10 @@ def build_notion_properties(item: IntakeItem, run_date: date,
             item.raw_payload, item.headline, item.body,
             item.type_or_class, item.firm,
         )
-        props[PROP_MODALITY] = _select(modality)
+        # [2026-09-21] 판별 근거가 없으면 MODALITY_UNKNOWN("") 이 온다. Notion select 는
+        # 빈 이름을 거부하므로 속성 자체를 싣지 않는다(= Modality 미지정 → 배지 미표시).
+        if modality:
+            props[PROP_MODALITY] = _select(modality)
 
     if item.date_iso:
         d = _date_iso(item.date_iso)

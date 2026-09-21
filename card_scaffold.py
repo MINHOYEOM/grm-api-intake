@@ -48,6 +48,11 @@ from typing import Any
 # (2026-09-10 정보출처 링크 게이트, 아래 _dual_links 주석 참조).
 from grm_findings import evidence_url_quality_error
 
+# grm_taxonomy 는 stdlib-only 순수함수 층이고 card_scaffold 를 import 하지 않는다(순환 없음).
+# 제품군 값은 분류기와 렌더가 같은 문자열을 써야 하므로 평면 복제하지 않고 직접 가져온다
+# (특히 MODALITY_UNKNOWN 은 빈 문자열이라 복제본이 어긋나면 조용히 어긋난다).
+from grm_taxonomy import MODALITY_OTHER
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 0. 소스/유형 상수 (collect_intake 와 동일 문자열 — import 의존 없이 평면 복제)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2225,6 +2230,27 @@ def _neg_date(d: str) -> tuple[int, ...]:
     return tuple(-ord(ch) for ch in d) if d else (0,)
 
 
+def _group_modality(card: CardScaffold) -> str:
+    """브리프 글로벌 섹션의 **소제목** 묶음에 쓰일 제품군 값.
+
+    [2026-09-21] 그룹핑이 배지와 다른 값을 쓰고 있었다 — 규범 문서(지침·입법예고·규제
+    소식)는 `to_web_card` 가 배지를 억제하는데(`if self.modality and not
+    _spec(kind).normative`) 그룹핑만 row 값을 그대로 써서, 배지 없는 ICH 가이드라인이
+    "💊 합성의약품" 소제목 아래 앉을 수 있었다. 그룹핑은 화면에 나가는 값을 따른다.
+
+    ★화면에서는 '제품군 축 무관'(규범 문서·동물용·혈액원)과 '판별 근거 없음'
+    (MODALITY_UNKNOWN)을 **가르지 않는다** — 둘 다 "▫️ 기타" 소제목으로 묶인다.
+    독자에게는 "합성도 바이오도 아니다" 하나면 충분하고, 소제목을 하나 더 만들면
+    화면 어휘만 늘어난다(사용자 결정). 다만 **카드 배지**는 여전히 다르다 — 판별
+    근거가 없으면 배지를 아예 달지 않는다(분류기가 "" 를 돌려주고 `to_web_card` 의
+    `if self.modality` 가 가로막는다). 값 자체는 분류기 층에서 구분돼 있으므로,
+    나중에 화면에서 다시 가르고 싶으면 여기만 바꾸면 된다.
+    """
+    if _spec(card.kind).normative:
+        return MODALITY_OTHER
+    return card.modality or MODALITY_OTHER
+
+
 def _ordered_cards_with_groups(
         cards: list[CardScaffold],
         cfg: FixedConfig = DEFAULT_CONFIG) -> list[tuple[CardScaffold, str]]:
@@ -2242,9 +2268,11 @@ def _ordered_cards_with_groups(
         if not sec_cards:
             continue
         if sec == "global" and len(sec_cards) >= cfg.grouping_threshold:
-            for mod in ("Chemical", "Biologic", "Other"):
+            # [2026-09-21] 그룹핑은 **배지와 같은 값**을 쓴다 — `_group_modality` 참조.
+            for mod in ("Chemical", "Biologic", MODALITY_OTHER):
                 label = cfg.modality_badge.get(mod, mod)
-                seq.extend((c, label) for c in sec_cards if (c.modality or "Other") == mod)
+                seq.extend((c, label) for c in sec_cards
+                           if _group_modality(c) == mod)
         else:
             seq.extend((c, "") for c in sec_cards)
     return seq

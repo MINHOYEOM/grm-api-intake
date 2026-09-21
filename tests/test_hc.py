@@ -98,13 +98,18 @@ class TestP7ChemicalNotMisclassified(unittest.TestCase):
         item = hc._to_item(rec, START, END, detail_fetcher=det)
         self.assertEqual(_modality(item), ci.MODALITY_CHEMICAL)
 
-    def test_small_molecule_injection_stays_chemical(self):
+    def test_injection_is_not_misclassified_as_biologic(self):
+        # [2026-09-21] 주사제는 **제형** 축이라 제품군을 가르지 못한다. 구 구현은 이걸
+        # Chemical 근거로 썼지만(그래서 무균 주사제 전반이 합성으로 갔다), 이 클래스가
+        # 지키려는 성질은 "화학 제품이 Biologic 으로 오분류되지 않는다" 이다 —
+        # 그 성질은 그대로 유지되고, 근거가 없으므로 판정을 보류한다.
         det = lambda u: {"strength": "Heparin sodium 25000 unit/500 mL",
                          "dosage form": "Solution for injection"}
         rec = _rec(Product="Heparin Sodium in 5% Dextrose injection",
                    Title="Heparin Sodium: out of specification")
         item = hc._to_item(rec, START, END, detail_fetcher=det)
-        self.assertEqual(_modality(item), ci.MODALITY_CHEMICAL)
+        self.assertNotEqual(_modality(item), ci.MODALITY_BIOLOGIC)
+        self.assertEqual(_modality(item), ci.MODALITY_UNKNOWN)
 
 
 class TestP8FirmMapping(unittest.TestCase):

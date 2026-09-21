@@ -102,22 +102,25 @@ class LiveRevalidation(unittest.TestCase):
         raw, parts = mfds_recall("트라플엠세미정", "유통제품 품질부적합 우려", "(주)마더스제약")
         self.assertEqual(compute_modality(raw, *parts), "Chemical")
 
-    # ─── Korean injection suffix (XX주) — previously Other, must be Chemical ──
-    def test_admin_예나스테론주_testosterone_chemical(self):
+    # ─── Korean injection suffix (XX주) ──
+    # [2026-09-21] 'XX주'(주사제) 접미사는 **제형** 축이라 제품군을 가르지 못한다.
+    #   구 구현은 이걸 Chemical 근거로 썼고, 그 결과 무균 주사제 전반이 합성으로 갔다.
+    #   업체명 '제이텍바이오젠'의 '바이오' 도 근거가 아니다(반대 방향 오탐 금지).
+    def test_admin_예나스테론주_testosterone_undetermined(self):
         raw, parts = mfds_admin(
             "예나스테론주(테스토스테론에난테이트)",
             "의약품을 판매할 수 있는 자 외의 자에게 의약품 판매",
             "제이텍바이오젠",
         )
-        self.assertEqual(compute_modality(raw, *parts), "Chemical")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
-    def test_admin_생리식염수_멀티플렉스페리주_chemical(self):
+    def test_admin_생리식염수_멀티플렉스페리주_undetermined(self):
         raw, parts = mfds_admin(
             "대한관류용멸균생리식염수,멀티플렉스페리주",
             "기준서 미준수 — 충전공정 시 과잉충전 및 손실량, 포장공정 시 불량 수량 추후 기록",
             "대한약품공업(주)",
         )
-        self.assertEqual(compute_modality(raw, *parts), "Chemical")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
     # ─── Biologic — body 본문에 한국어 원료 단서 ──
     def test_admin_자닥신주_자하거추출물_biologic(self):
@@ -140,23 +143,23 @@ class LiveRevalidation(unittest.TestCase):
     # ─── Other — 한약·생약·치약·식품류 ──
     def test_recall_엔탭허브오약_other(self):
         raw, parts = mfds_recall("엔탭허브오약", "중금속(카드뮴) 부적합", "(주)엔탭허브")
-        self.assertEqual(compute_modality(raw, *parts), "Other")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
     def test_recall_네츄럴블랙치약_other(self):
         raw, parts = mfds_recall("네츄럴블랙치약", "품질부적합 우려", "우리생활건강")
-        self.assertEqual(compute_modality(raw, *parts), "Other")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
     def test_recall_풍산강황_other(self):
         raw, parts = mfds_recall("풍산강황", "품질부적합 우려", "풍산주식회사")
-        self.assertEqual(compute_modality(raw, *parts), "Other")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
     def test_recall_허브팜곡기생_other(self):
         raw, parts = mfds_recall("허브팜곡기생", "품질부적합 우려", "(주)허브팜")
-        self.assertEqual(compute_modality(raw, *parts), "Other")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
     def test_recall_씨케이당귀_other(self):
         raw, parts = mfds_recall("씨케이당귀", "품질부적합 우려", "씨케이(주)")
-        self.assertEqual(compute_modality(raw, *parts), "Other")
+        self.assertEqual(compute_modality(raw, *parts), "")
 
     # ─── 일반 규제 문서가 정제로 오탐되지 않는지 ──
     def test_fr_guidance_revision_not_chemical(self):
@@ -170,7 +173,7 @@ class LiveRevalidation(unittest.TestCase):
         # 의약품/drug 등 명시적 단서가 본문에 있으면 Chemical 가능, 단 '개정' 자체가 정제로
         # 오탐되어서는 안 됨. 본문에 '의약품 품질' 명시되어 Chemical 매칭(MODALITY_DRUG_PRODUCT_TERMS에 의약품 포함)
         # — 이 케이스는 Chemical OK이지만 핵심은 '정제'로 오해된 게 아닌지 확인.
-        self.assertIn(compute_modality(raw, *parts), {"Chemical", "Other"})
+        self.assertIn(compute_modality(raw, *parts), {"Chemical", "Other", ""})
 
     def test_admin_action_keyword_not_falsely_chemical(self):
         """'행정처분' 본문 단독으로는 정제 오탐 X — 의약품 단서 없으면 Other."""
@@ -187,7 +190,7 @@ class LiveRevalidation(unittest.TestCase):
             "본 행정처분은 규정 위반에 따른 조치",
             "regulatory-notice",
         )
-        self.assertEqual(compute_modality({}, *parts_clean), "Other")
+        self.assertEqual(compute_modality({}, *parts_clean), "")
 
 
 if __name__ == "__main__":

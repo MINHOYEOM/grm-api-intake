@@ -167,7 +167,13 @@ def _firm_key_for_card(card: dict[str, Any]) -> str:
     placeholder("원문 미기재")면 다른 fact 로 넘어가지 않고 바로 실패(빈 문자열)
     처리한다. 실패 시 card.html 이 data-firm-key 속성 자체를 생략한다.
 
-    순수 함수(로컬 카드 JSON 값만 참조, 네트워크 0) — 빌드 결정론(골든) 계약 유지."""
+    순수 함수(로컬 카드 JSON 값만 참조, 네트워크 0) — 빌드 결정론(골든) 계약 유지.
+
+    ★여러 **업체**를 묶은 카드(`merged_multi_firm`)는 업체 프로파일로 잇지 않는다 —
+    업체 칸이 `A 외 N개사` 라서 그대로 키를 만들면 어느 업체와도 안 맞는 죽은 키가 된다
+    (2026-09-21 동일 일괄 행정처분 접기). 회수·483 병합은 이 플래그가 없어 무변화."""
+    if card.get("merged_multi_firm"):
+        return ""
     for f in (card.get("facts") or []):
         if f.get("label", "") not in _FIRM_FACT_LABELS:
             continue
@@ -558,7 +564,15 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "merged_count": card.get("merged_count", 1),
         "merged_items": card.get("merged_items") or [],
         # 병합 목록 단위 명사(기본 '품목' — 회수 골든 불변). 483 실사기록 다건 공개 디제스트는 '건'.
-        "merged_noun": card.get("merged_noun") or tr("품목"),
+        # ★단위 명사도 **표시 문구**다 — 데이터로 실려온 값(`건`)을 tr() 없이 통과시키면
+        #   영어 카드에 "All 6 건" 이 그대로 나간다(483 디제스트에서 이미 그랬다).
+        #   한국어는 tr() 이 항등이라 회수 골든은 바이트 불변.
+        # ★데이터로 온 단위 명사도 tr() 을 태운다 — 안 태우면 영어 카드에 "All 6 건" 이
+        #   그대로 나간다(483 디제스트에서 이미 그랬다). 한국어는 tr() 항등이라 골든 불변.
+        #   기본값은 `tr("품목")` **리터럴 호출로 남겨 둔다** — `tr(x or "품목")` 로 접으면
+        #   i18n 스캐너가 리터럴을 못 보고 `품목` 이 사전 고아로 잡힌다(실측 1회 실패).
+        "merged_noun": (tr(card["merged_noun"]) if card.get("merged_noun")
+                        else tr("품목")),
         "quotes": quotes,
         "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
         "key_facts": card.get("key_facts") or [],

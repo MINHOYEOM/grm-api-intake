@@ -403,6 +403,183 @@ class MergeFda483DisclosuresTest(unittest.TestCase):
         self.assertIn("공개돼 있", rep["summary"])
 
 
+class MergeAdminBatchDispositionsTest(unittest.TestCase):
+    """[동일 일괄 행정처분 접기 2026-09-21] merge_admin_batch_dispositions 단위 테스트.
+
+    계기: 2026-09-21 호에 위반사실·적용법령·처분기간이 **글자까지 같은** 행정처분 6장이
+    업체명만 바꿔 연속으로 실렸다(공동개발 제네릭 묶음의 같은 날 일괄 처분). 독자에겐 같은
+    문단이 6번 반복될 뿐, 한 건의 사건이라는 사실이 어디에도 없었다.
+
+    이 검사의 핵심은 '6장이 1장이 되더라'가 아니라 **내용이 다르면 절대 안 묶인다**는
+    안전성이다(아래 뮤테이션 검사군) — 병합은 사실을 지우는 연산이므로, 틀리게 묶이는
+    쪽이 안 묶이는 쪽보다 훨씬 위험하다.
+    """
+
+    @staticmethod
+    def _card(cid, firm, product, *, issued="2026-09-14",
+              action="해당품목 판매업무정지 3개월(2026. 9. 28. ~ 2026. 12. 27.)",
+              violation="의약품 ‘{p}’의 재심사에 필요한 자료의 일부를 제출하지 아니함",
+              law="구 「약사법」 제32조", deep=None, en=None):
+        action_value = f"{action}: {product}"
+        return {
+            "id": cid, "type_tag": "행정처분", "agency": "MFDS",
+            "title_issue": "재심사 자료 미제출 판매정지",
+            "headline_target": firm,
+            "summary": f"식약처가 {firm}에 대해 의약품 ‘{product}’ 처분을 내렸다.",
+            "implication": "허가 후 관리 의무의 문제다.",
+            "checks": ["재심사 증례 확보 진척 점검"],
+            "key_facts": [
+                "위반: " + violation.replace("{p}", product),
+                f"처분: {action_value}",
+                f"적용법령: {law}",
+            ],
+            "facts": [{"label": "발행일", "value": issued},
+                      {"label": "문서번호", "value": cid},
+                      {"label": "업체", "value": firm},
+                      {"label": "처분", "value": action_value}],
+            "deep_analysis": deep,
+            "en": en or {"title_issue": "Re-examination data shortfall",
+                         "summary": "MFDS suspended sales.",
+                         "key_facts": ["Violation: data not submitted"],
+                         "checks": ["Track PMS accrual"]},
+        }
+
+    # ── 접힘 ──────────────────────────────────────────────────────────────
+    def test_identical_batch_folds_into_one(self):
+        cards = [self._card("admin-3", "다제약", "다캡슐"),
+                 self._card("admin-1", "가제약", "가캡슐",
+                            deep={"key_violations": [{"citation": "구 「약사법」 제32조"}]}),
+                 self._card("admin-2", "나제약", "나캡슐")]
+        out = apb.merge_admin_batch_dispositions(cards)
+        self.assertEqual(len(out), 1)
+        rep = out[0]
+        self.assertEqual(rep["id"], "admin-1")          # 대표 = id 오름차순 첫
+        self.assertEqual(rep["merged_count"], 3)
+        self.assertEqual(rep["merged_noun"], "건")
+        self.assertEqual(rep["merged_items"],
+                         ["가제약 · 가캡슐", "나제약 · 나캡슐", "다제약 · 다캡슐"])
+        self.assertIsNotNone(rep["deep_analysis"])      # 대표의 심층분석 보존
+
+    def test_merged_card_names_the_batch_not_one_firm(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐")]
+        rep = apb.merge_admin_batch_dispositions(cards)[0]
+        self.assertIn("2개사", rep["title_issue"])
+        self.assertEqual(rep["headline_target"], "가제약 외 1개사")
+        self.assertIn("2개사", rep["summary"])
+        facts = {f["label"]: f["value"] for f in rep["facts"]}
+        self.assertEqual(facts["업체"], "가제약 외 1개사")
+        self.assertEqual(facts["문서번호"], "admin-1 외 1건")
+
+    def test_representative_product_name_is_not_presented_as_the_whole_batch(self):
+        """대표 품목명이 묶음 전체의 사실인 양 남으면 안 된다(표시 슬롯 전수)."""
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐")]
+        rep = apb.merge_admin_batch_dispositions(cards)[0]
+        shown = " ".join([rep["title_issue"], rep["summary"], rep["implication"],
+                          *rep["key_facts"], *rep["checks"],
+                          *[str(f["value"]) for f in rep["facts"]]])
+        self.assertNotIn("가캡슐", shown)
+        # 품목은 지워지는 게 아니라 목록으로 옮겨간다.
+        self.assertIn("가캡슐", " ".join(rep["merged_items"]))
+        self.assertIn("나캡슐", " ".join(rep["merged_items"]))
+
+    def test_english_slot_is_rewritten_without_romanised_korean_names(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐")]
+        rep = apb.merge_admin_batch_dispositions(cards)[0]
+        en = rep["en"]
+        self.assertIn("2", en["title_issue"])
+        self.assertIn("2", en["summary"])
+        blob = " ".join([en["title_issue"], en["summary"], *en["key_facts"]])
+        for ko in ("가제약", "나제약", "가캡슐", "나캡슐"):
+            self.assertNotIn(ko, blob)
+
+    # ── 안 접힘(뮤테이션 — 안전성 불변식) ───────────────────────────────
+    def test_single_card_unchanged(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐")]
+        self.assertEqual(apb.merge_admin_batch_dispositions(cards), cards)
+
+    def test_different_issue_date_never_merges(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐", issued="2026-09-14"),
+                 self._card("admin-2", "나제약", "나캡슐", issued="2026-09-15")]
+        self.assertEqual(len(apb.merge_admin_batch_dispositions(cards)), 2)
+
+    def test_different_violation_never_merges(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐",
+                            violation="의약품 ‘{p}’의 안정성시험을 실시하지 아니함")]
+        self.assertEqual(len(apb.merge_admin_batch_dispositions(cards)), 2)
+
+    def test_different_legal_basis_never_merges(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐", law="「약사법」 제31조")]
+        self.assertEqual(len(apb.merge_admin_batch_dispositions(cards)), 2)
+
+    def test_different_action_period_never_merges(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐",
+                            action="해당품목 판매업무정지 1개월(2026. 9. 28. ~ 2026. 10. 27.)")]
+        self.assertEqual(len(apb.merge_admin_batch_dispositions(cards)), 2)
+
+    def test_one_character_difference_never_merges(self):
+        """뮤테이션: 표시 문구 한 글자만 달라도 다른 처분으로 본다(보수적 기본값)."""
+        base = self._card("admin-1", "가제약", "가캡슐")
+        other = self._card("admin-2", "나제약", "나캡슐")
+        other["key_facts"][0] = other["key_facts"][0] + "."
+        self.assertEqual(len(apb.merge_admin_batch_dispositions([base, other])), 2)
+
+    def test_multi_product_disposition_is_not_mergeable(self):
+        """다품목·개조식 처분은 품목을 하나로 특정할 수 없어 키가 없다 → 무변화."""
+        a = self._card("admin-1", "가제약", "가캡슐")
+        b = self._card("admin-2", "나제약", "나캡슐")
+        for c in (a, b):
+            c["facts"][3]["value"] = "○ 해당 품목 판매업무정지 3개월\n  * (대상품목) 1. 가, 2. 나"
+        self.assertEqual(len(apb.merge_admin_batch_dispositions([a, b])), 2)
+
+    def test_non_admin_cards_are_untouched(self):
+        other = {"id": "fda483-1", "type_tag": "483", "facts": []}
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐"), other]
+        out = apb.merge_admin_batch_dispositions(cards)
+        self.assertEqual(len(out), 2)
+        self.assertIn(other, out)
+
+    def test_two_independent_batches_fold_separately(self):
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐"),
+                 self._card("admin-8", "마제약", "마캡슐", law="「약사법」 제31조"),
+                 self._card("admin-9", "바제약", "바캡슐", law="「약사법」 제31조")]
+        out = apb.merge_admin_batch_dispositions(cards)
+        self.assertEqual([c["id"] for c in out], ["admin-1", "admin-8"])
+        self.assertEqual([c["merged_count"] for c in out], [2, 2])
+
+    def test_multi_firm_merge_drops_the_firm_profile_bridge(self):
+        """업체 칸이 `A 외 N개사` 가 되므로 업체 프로파일 키를 만들면 안 된다.
+
+        만들면 어느 업체와도 안 맞는 **죽은 키**가 조용히 실린다 — 링크가 깨진 게
+        아니라 '있는데 아무 데도 안 가는' 상태라 눈에 안 띈다."""
+        import sys as _sys, pathlib as _pl
+        _sys.path.insert(0, str(_pl.Path(__file__).resolve().parent.parent / "web"))
+        import render as _render
+        cards = [self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐")]
+        rep = apb.merge_admin_batch_dispositions(cards)[0]
+        self.assertTrue(rep["merged_multi_firm"])
+        self.assertEqual(_render._firm_key_for_card(rep), "")
+        # 음성 대조군: 병합 안 된 카드는 여전히 업체 프로파일로 이어진다.
+        self.assertNotEqual(_render._firm_key_for_card(cards[0]), "")
+
+    def test_is_pure_and_order_preserving(self):
+        cards = [self._card("admin-5", "마제약", "마캡슐", law="「약사법」 제31조"),
+                 self._card("admin-1", "가제약", "가캡슐"),
+                 self._card("admin-2", "나제약", "나캡슐")]
+        snapshot = copy.deepcopy(cards)
+        out = apb.merge_admin_batch_dispositions(cards)
+        self.assertEqual(cards, snapshot)                 # 입력 무변형
+        self.assertEqual([c["id"] for c in out], ["admin-5", "admin-1"])  # 원 순서 보존
+
+
 class ExtractResourceNotesTest(unittest.TestCase):
     """[업계 브리핑 노트 2026-07-13] extract_resource_notes 단위 테스트(순수 함수)."""
 

@@ -221,6 +221,156 @@ def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]
     return out
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 동일 일괄 행정처분 접기 (2026-09-21)
+# ─────────────────────────────────────────────────────────────────────────────
+# 배경: 2026-09-21 호에 `재심사 자료 미제출` 행정처분 6장이 실렸는데, 6건 모두 최종처분일자
+# ·위반사실·적용법령·처분기간이 **글자까지 동일**했다(원문 대조 확인 — 공동개발 제네릭
+# 묶음이 같은 시판후조사 미달로 같은 날 일괄 처분). 독자 화면에는 업체명만 다른 같은
+# 문단이 연속 6번 나왔고, 그 6장이 한 건의 사건이라는 사실은 어디에도 표시되지 않았다.
+#
+# 판정은 **형식이 아니라 성질**로 한다: 자기 품목명을 지운 뒤 발행일·처분·핵심사실이
+# 전부 같으면 같은 일괄 처분이다. 형식이 바뀌면 키가 안 맞아 **접히지 않을 뿐**이고
+# (fail-safe), 내용이 다른 처분이 잘못 묶일 길은 없다.
+
+_MERGED_PRODUCT_LABEL = "업체별 대상 품목"
+
+
+def _admin_action_fact(c: dict[str, Any]) -> str:
+    """행정처분 카드의 `처분` 사실값(없으면 빈 문자열)."""
+    for f in (c.get("facts") or []):
+        if (f.get("label") or "").strip() == "처분":
+            return str(f.get("value") or "")
+    return ""
+
+
+def _admin_single_product(c: dict[str, Any]) -> str:
+    """`처분` 이 `…: {품목}` **한 줄** 형식일 때의 품목명. 아니면 빈 문자열.
+
+    다품목·개조식(`○`/`*`/줄바꿈) 처분은 대상이 아니다 — 품목명을 한 개로 특정할 수
+    없으면 키를 만들 수 없고, 키를 못 만들면 병합 후보에서 빠진다(보수적 기본값)."""
+    v = _admin_action_fact(c)
+    if not v or "\n" in v or "○" in v or "*" in v:
+        return ""
+    head, sep, tail = v.rpartition(":")
+    if not sep:
+        return ""
+    return tail.strip()
+
+
+def _admin_batch_key(c: dict[str, Any], product: str) -> "tuple[str, ...] | None":
+    """같은 일괄 처분인지 가르는 키 — **자기 품목명을 지운 뒤** 남는 표시 문구 전체.
+
+    발행일(=최종처분일자) + 처분 + 핵심사실(위반·처분·적용법령)이 품목명을 빼고 전부
+    같아야 한 묶음이다. 업체명은 키에 넣지 않는다(업체가 다른 것이 바로 '일괄'의 정의).
+    `summary` 도 넣지 않는다 — 업체명이 들어 있어 절대 안 맞는다."""
+    if not product:
+        return None
+    issued = ""
+    for f in (c.get("facts") or []):
+        if (f.get("label") or "").strip() == "발행일":
+            issued = str(f.get("value") or "")
+    kfs = [str(k) for k in (c.get("key_facts") or [])]
+    if not issued or not kfs:
+        return None
+    blank = lambda s: s.replace(product, "▮")  # noqa: E731
+    return (issued, blank(_admin_action_fact(c)), *[blank(k) for k in kfs])
+
+
+def _sub_product(value: Any, product: str) -> Any:
+    """문자열/리스트 안의 품목명을 병합 표기로 치환(사실 재작성 0 — 치환만)."""
+    if isinstance(value, str):
+        return value.replace(product, _MERGED_PRODUCT_LABEL)
+    if isinstance(value, list):
+        return [_sub_product(v, product) for v in value]
+    return value
+
+
+def merge_admin_batch_dispositions(cards: list[dict[str, Any]]
+                                   ) -> list[dict[str, Any]]:
+    """같은 날·같은 사유·같은 처분으로 여러 업체가 받은 행정처분을 1장으로 접는다.
+
+    순수·결정론·순서보존. 대표 = 그룹 내 `id` 오름차순 첫 카드(483/회수 병합과 같은 규약).
+    대표의 6슬롯·심층분석은 그대로 쓰되 **대표 자신의 품목명만** 병합 표기로 치환한다
+    (그 외 문구는 6건 공통이라 치환할 것이 없다). 멤버는 발행본에서 제외 — 그 카드들의
+    Notion Status 는 이미 Processed 라 유실이 아니고, 업체·품목은 `merged_items` 로 전부
+    남는다. 2건 미만·키 부재(다품목/개조식 처분)는 무변화."""
+    groups: dict[tuple, list[int]] = {}
+    for i, c in enumerate(cards):
+        if c.get("type_tag") != "행정처분":
+            continue
+        product = _admin_single_product(c)
+        key = _admin_batch_key(c, product)
+        if key is not None:
+            groups.setdefault(key, []).append(i)
+
+    drop_ids: set[str] = set()
+    replaced: dict[str, dict[str, Any]] = {}
+    for idxs in groups.values():
+        if len(idxs) < 2:
+            continue
+        members = sorted(idxs, key=lambda i: str(cards[i].get("id", "")))
+        rep_src = cards[members[0]]
+        n = len(members)
+        rep_product = _admin_single_product(rep_src)
+        rep = dict(rep_src)
+        for slot in ("title_issue", "summary", "implication", "key_facts", "checks"):
+            if slot in rep:
+                rep[slot] = _sub_product(rep[slot], rep_product)
+        rep["title_issue"] = f"{rep.get('title_issue') or ''} ({n}개사 일괄)".strip()
+        firm = rep_src.get("headline_target") or ""
+        rep["headline_target"] = f"{firm} 외 {n - 1}개사" if firm else f"{n}개사"
+        rep["summary"] = (
+            f"식약처가 {n}개사에 대해 같은 날 동일한 위반사실·적용법령·처분으로 일괄 "
+            f"행정처분을 내렸다. 각 사의 처분 대상은 품목 1건씩이며, 업체별 대상 품목은 "
+            f"이 카드의 목록에 있다.")
+        rep["merged_count"] = n
+        rep["merged_noun"] = "건"
+        # 여러 업체를 묶은 카드라는 표시 — 렌더가 업체 프로파일 브릿지를 생략한다
+        # (업체 칸 `A 외 N개사` 로 키를 만들면 어느 업체와도 안 맞는다).
+        rep["merged_multi_firm"] = True
+        rep["merged_items"] = [
+            f"{cards[i].get('headline_target') or ''} · {_admin_single_product(cards[i])}".strip(" ·")
+            for i in members]
+        # 사실 표도 대표 1건이 아니라 묶음 전체를 가리켜야 한다 — 업체·문서번호는 범위
+        # 표기로, 나머지(처분 등)는 대표 품목명만 병합 표기로 치환한다.
+        facts_out: list[dict[str, Any]] = []
+        for f in (rep_src.get("facts") or []):
+            label = (f.get("label") or "").strip()
+            g = dict(f)
+            if label == "문서번호":
+                g["value"] = f"{f.get('value')} 외 {n - 1}건"
+            elif label == "업체":
+                g["value"] = f"{f.get('value')} 외 {n - 1}개사"
+            else:
+                g["value"] = _sub_product(f.get("value"), rep_product)
+            facts_out.append(g)
+        rep["facts"] = facts_out
+        en = rep_src.get("en")
+        if isinstance(en, dict):
+            en_out = {k: _sub_product(v, rep_product) for k, v in en.items()}
+            if en_out.get("title_issue"):
+                en_out["title_issue"] = f"{en_out['title_issue']} ({n} companies)"
+            en_out["summary"] = (
+                f"MFDS issued the same administrative action against {n} domestic "
+                f"manufacturers on the same date. The violation, legal basis and "
+                f"suspension period are identical across all {n} cases; each company "
+                f"was penalised for a single product, listed on this card.")
+            rep["en"] = en_out
+        replaced[str(rep_src.get("id"))] = rep
+        drop_ids.update(str(cards[i].get("id")) for i in members[1:])
+
+    if not replaced:
+        return cards
+    out: list[dict[str, Any]] = []
+    for c in cards:
+        cid = str(c.get("id"))
+        if cid in drop_ids:
+            continue
+        out.append(replaced.get(cid, c))
+    return out
+
+
 def extract_resource_notes(cards: list[dict[str, Any]]
                            ) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
     """(event_cards, resources). resource 판정 = agency ∈ RESOURCE_AGENCIES ∧
@@ -362,6 +512,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
 
     # [FDA 483 공개 디제스트 2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장.
     adopted_cards = merge_fda483_disclosures(adopted_cards)
+
+    # [동일 일괄 행정처분 접기 2026-09-21] 같은 날·같은 사유·같은 처분으로 여러 업체가
+    # 받은 행정처분 → 1장. 심층분석 주입 **뒤**여야 대표가 분석을 들고 접힌다(483 디제스트
+    # 접기와 같은 이유 — 접은 뒤 주입하면 대표 아닌 카드의 분석이 갈 곳을 잃는다).
+    adopted_cards = merge_admin_batch_dispositions(adopted_cards)
 
     # [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(ECA GMP News 등) → 이벤트 카드에서
     # 분리해 브리프 하단 전용 섹션으로. 아래 render_order 재부여·빈슬롯 게이트·adopted 집계는

@@ -1,0 +1,20 @@
+[
+  {
+    "finding_id": "finding-41912bb0eeff6e86c85793c0",
+    "finding_text": "The inspection team identified 18 deficiencies (grouped) against EU GMP, of which 11 were classified as Major. The major deficiencies were related to: - Inadequacy of Quality Assurance oversight and Quality management system - Inadequate design, poor maintenance/cleaning, lack of contamination control in intermediates manufacturing facilities - Solvent recovery, lack of traceability and risk of cross-contamination - Risk of supplying non-GMP APIs for production of medicinal products for human or animal use - Change control - Data integrity of documentation and records - Traceability and control of material throughout the manufacturing process - Cleaning and process validation - Material management - Insufficient control of analytical methods - Incomplete understanding and incorrect application of fundamental GMP principles\n\nAction taken/proposed by the NCA: Suspension or voiding of CEP (action to be taken by EDQM) CEP 2023-042 / Dexamethasone sodium phosphate CEP 2023-086 / Betamethasone CEP 2023-244 / Dexamethasone Crystalline Form-B CEP 2023-305 / Dexamethasone Crystalline Form-A were suspended on July 29, 2026 by EDQM",
+    "finding_text_ko": "실사팀은 EU GMP 기준으로 18건의 미비사항(그룹화 기준)을 확인하였으며, 그중 11건을 Major 로 분류하였다. Major 미비사항은 다음과 관련된 것이다: - 품질보증(Quality Assurance) 감독 및 품질경영시스템의 미흡 - 중간체 제조시설의 부적절한 설계, 미흡한 유지관리·세척, 오염관리(contamination control) 부재 - 용매 회수(solvent recovery), 추적성(traceability) 부재 및 교차오염(cross-contamination) 위험 - 인체용 또는 동물용 의약품 제조를 위한 비(非)GMP 원료의약품(API) 공급 위험 - 변경관리(change control) - 문서 및 기록의 데이터 완전성(data integrity) - 제조공정 전반에 걸친 자재의 추적성 및 관리 - 세척 및 공정 밸리데이션(cleaning and process validation) - 자재관리(material management) - 시험방법(analytical methods)에 대한 불충분한 관리 - GMP 기본 원칙에 대한 불완전한 이해 및 잘못된 적용\n\nNCA 가 취하였거나 제안한 조치: CEP 의 효력정지 또는 무효화(EDQM 이 조치 예정) CEP 2023-042 / Dexamethasone sodium phosphate CEP 2023-086 / Betamethasone CEP 2023-244 / Dexamethasone Crystalline Form-B CEP 2023-305 / Dexamethasone Crystalline Form-A 는 2026년 7월 29일 EDQM 에 의해 효력이 정지되었다",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7db0eaabab5f2d63f758e526",
+    "finding_text": "품질 기타 [별표 1] 제1의2호 일탈 등 조사 시 근본 원인을 파악하기 위한 조사 및 적정한 시정·예방조치를 실시할 것",
+    "finding_text_ko": "품질 부문의 기타 지적사항이다. [별표 1] 제1의2호에 따라, 일탈(deviation) 등을 조사할 때 근본 원인을 파악하기 위한 조사를 실시하고 적정한 시정·예방조치를 시행할 것을 요구받았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d2ab910f17cb931caa8d6b93",
+    "finding_text": "시설장비 기타 [별표 1] 제4.4호 제조 기계·설비가 적절히 세척 및 유지·관리될 수 있도록 관리방안을 마련하여 제출할 것",
+    "finding_text_ko": "시설·장비 부문의 기타 지적사항이다. [별표 1] 제4.4호에 따라, 제조 기계·설비가 적절히 세척 및 유지·관리될 수 있도록 관리방안을 마련하여 제출할 것을 요구받았다.",
+    "translation_method": "llm_assisted"
+  }
+]

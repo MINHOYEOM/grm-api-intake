@@ -52,6 +52,16 @@ SITE_BASE_URL = "https://grm-solutions.com"
 _CJK = re.compile(r"[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af\u3000-\u303f\uff00-\uffef\u4e00-\u9fff]")
 
 
+def nfmt(tmpl: str, n: int, **kw) -> str:
+    """`{n}` 과 복수 표지 `{s}` 를 함께 채운다.
+
+    영문은 수에 따라 명사가 변한다 — 문구표에 `s` 를 박아 두면 1건일 때 "1 inspection
+    results" 가 나간다(2026-09-21 링크드인 영문 캡션에서 실제로 그랬다). 한국어 문구표는
+    `{s}` 를 쓰지 않으므로 같은 호출로 안전하다(str.format 은 안 쓰는 인자를 무시한다).
+    """
+    return tmpl.format(n=n, s="" if n == 1 else "s", **kw)
+
+
 def text_width(s: str) -> float:
     """대략의 폭(em 단위). 한글 1.0 · 라틴/숫자 0.56 · 공백 0.3 · 문장부호 0.35."""
     w = 0.0
@@ -218,26 +228,26 @@ STR: dict[str, dict[str, Any]] = {
         "chip_483": "FDA 483", "chip_mfds_stop": "Manufacturing suspension",
         "chip_mfds_act": "Administrative action", "chip_mfds_insp": "GMP inspection result",
         "row_company": "Company", "impl_label": "What it means",
-        "wl_eyebrow": "FDA warning letters", "wl_h1_a": "{n} warning letters,", "wl_h1_b": "most on {theme}",
+        "wl_eyebrow": "FDA warning letters", "wl_h1_a": "{n} warning letter{s},", "wl_h1_b": "most on {theme}",
         "wl_total": "of {n}", "wl_bars_head": "Overlapping findings",
-        "mfds_eyebrow": "MFDS post-approval GMP inspections", "mfds_h1_a": "{n} sites inspected,",
+        "mfds_eyebrow": "MFDS post-approval GMP inspections", "mfds_h1_a": "{n} site{s} inspected,",
         "mfds_h1_b": "gaps were in",
         "gl_eyebrow": "Terms this week", "gl_h1": "{num} terms from this week's news",
         "gl_cap": "Definitions are taken verbatim from the GRM glossary.",
         "ck_eyebrow": "Checks this week", "ck_h1": "What to check on your site",
         "ck_cap": "Each item comes from the 'checks' field of this week's cards.",
-        "cl_h1_a": "All {n} items,", "cl_h1_b": "with links to the originals",
+        "cl_h1_a": "All {n} item{s},", "cl_h1_b": "with links to the originals",
         "cl_body": "Summaries in English; sources are each authority's official announcement.",
         "cl_note": "Prefer email? Subscribe to the newsletter on the site.",
         "cl_ft": "Every Monday · free",
         "ai_note": "Images generated with AI tools",
         "doc_title": "Regulatory news · {mon}, week {wk}",
-        "cap_head": "This week's regulatory news, {n} cards.",
-        "cap_class1": "· {n} Class I recalls", "cap_wl": "· {n} warning letters — {themes}",
-        "cap_mfds": "· MFDS (Korea) — {bits}", "cap_mfds_act": "{n} administrative actions",
-        "cap_mfds_insp": "{n} inspection results",
-        "cap_terms": "{n} terms", "cap_checks": "{n} checks",
-        "cap_link": "All {n} items, with links to the originals",
+        "cap_head": "This week's regulatory news, {n} card{s}.",
+        "cap_class1": "· {n} Class I recall{s}", "cap_wl": "· {n} warning letter{s} — {themes}",
+        "cap_mfds": "· MFDS (Korea) — {bits}", "cap_mfds_act": "{n} administrative action{s}",
+        "cap_mfds_insp": "{n} inspection result{s}",
+        "cap_terms": "{n} term{s}", "cap_checks": "{n} check{s}",
+        "cap_link": "All {n} item{s}, with links to the originals",
         "cap_cta": ["Which item would concern you most?", "Tell us in the comments and we'll cover it next week."],
         "cap_tags": ["#GMP #pharma #biotech #regulatory #qualityassurance",
                      "#QA #FDA #EMA #MHRA #MFDS"],
@@ -742,8 +752,8 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
             rows_wl.append((name, chips))
         slides.append(dict(
             kind="themes", eyebrow=t["wl_eyebrow"], icon="doc",
-            h1=[t["wl_h1_a"].format(n=len(wls)), t["wl_h1_b"].format(theme=top[1])],
-            bars=[(lab, cnt) for lab, _, cnt in themes[:5]], bars_total=t["wl_total"].format(n=len(wls)),
+            h1=[nfmt(t["wl_h1_a"], len(wls)), t["wl_h1_b"].format(theme=top[1])],
+            bars=[(lab, cnt) for lab, _, cnt in themes[:5]], bars_total=nfmt(t["wl_total"], len(wls)),
             bars_head=t["wl_bars_head"],
             rows=rows_wl, ft_right=SOURCE_NOTE["FDA"] if lang == "ko"
             else t["source_other"].format(label="FDA"), ai=ai_note))
@@ -758,7 +768,7 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
         impl = first_sentence(str(mfds_insp[0].get("implication") or ""))
         slides.append(dict(
             kind="rows", eyebrow=t["mfds_eyebrow"], icon="factory", impl_label=t["impl_label"],
-            h1=[t["mfds_h1_a"].format(n=len(mfds_insp)), t["mfds_h1_b"]], rows=rows_mf, impl=impl,
+            h1=[nfmt(t["mfds_h1_a"], len(mfds_insp)), t["mfds_h1_b"]], rows=rows_mf, impl=impl,
             ft_right=SOURCE_NOTE["MFDS"], ai=ai_note))
 
     # ── 07 이번 주 용어
@@ -791,7 +801,7 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
                            h1=[t["ck_h1"]], checks=checks, cap=t["ck_cap"], ai=ai_note))
 
     # ── 09 마무리
-    slides.append(dict(kind="closing", h1=[t["cl_h1_a"].format(n=n_cards), t["cl_h1_b"]],
+    slides.append(dict(kind="closing", h1=[nfmt(t["cl_h1_a"], n_cards), t["cl_h1_b"]],
                        body=t["cl_body"],
                        url=url.replace("https://", "").rstrip("/"),
                        note=t["cl_note"],
@@ -802,32 +812,32 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
         s["idx"], s["total"] = i, len(slides)
 
     # ── 본문(한 줄에 한 뜻·모바일 폭 안쪽)
-    lines = [t["cap_head"].format(n=len(slides)), ""]
+    lines = [nfmt(t["cap_head"], len(slides)), ""]
     for c in heads[:2]:
         headline = " ".join(_card_text(c, "title_issue", lang).split())
         if headline or lang == "ko":
             lines.append(f"{headline}.")
     lines.append("")
     if class1:
-        lines.append(t["cap_class1"].format(n=len(class1)))
+        lines.append(nfmt(t["cap_class1"], len(class1)))
     if len(wls) >= 2 and themes:
-        lines.append(t["cap_wl"].format(n=len(wls), themes="·".join(s for _, s, _ in themes[:3])))
+        lines.append(nfmt(t["cap_wl"], len(wls), themes="·".join(x for _, x, _ in themes[:3])))
     mf_bits = []
     if mfds_act:
-        mf_bits.append(t["cap_mfds_act"].format(n=len(mfds_act)))
+        mf_bits.append(nfmt(t["cap_mfds_act"], len(mfds_act)))
     if mfds_insp:
-        mf_bits.append(t["cap_mfds_insp"].format(n=len(mfds_insp)))
+        mf_bits.append(nfmt(t["cap_mfds_insp"], len(mfds_insp)))
     if mf_bits:
         # 영문 덱은 식약처 장을 빼므로(업체명) 본문의 이 줄이 유일한 자리다 — 건수로 남긴다
         lines.append(t["cap_mfds"].format(bits=", ".join(mf_bits)))
     tail = []
     if terms:
-        tail.append(t["cap_terms"].format(n=len(terms)))
+        tail.append(nfmt(t["cap_terms"], len(terms)))
     if checks:
-        tail.append(t["cap_checks"].format(n=len(checks)))
+        tail.append(nfmt(t["cap_checks"], len(checks)))
     if tail:
         lines.append("· " + " · ".join(tail))
-    lines += ["", t["cap_link"].format(n=n_cards), url, "",
+    lines += ["", nfmt(t["cap_link"], n_cards), url, "",
               *t["cap_cta"], "", *t["cap_tags"]]
     caption = "\n".join(lines) + "\n"
     return {"pub": pub, "lang": lang, "slides": slides, "caption": caption,

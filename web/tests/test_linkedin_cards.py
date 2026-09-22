@@ -252,6 +252,65 @@ class BuildDeckSyntheticTest(unittest.TestCase):
         self.assertEqual([k for k, _ in s["rows"]], ["a", "b", "c", "업체"])
 
 
+class EnglishPluralTest(unittest.TestCase):
+    """영문 문구표에 복수형 's' 를 박아 두면 1건일 때 "1 inspection results" 가 나간다.
+    2026-09-21 링크드인 영문 캡션에 실제로 그렇게 나갔다(식약처 실사 1곳).
+
+    판정은 **고친 문구 목록이 아니라 성질**로 한다 — 캡션·제목 어디에도 "1 <복수명사>" 가
+    없어야 한다. 새 문구가 늘어도 이 검사는 낡지 않는다."""
+
+    # 복수 명사는 "1" 바로 뒤가 아니라 **명사구 끝**에 온다("1 inspection results").
+    # 그래서 1 다음에 낱말을 최대 두 개까지 건너뛰고, 그 다음 낱말이 s 로 끝나는지 본다.
+    # 마지막 낱말만 **소문자**로 제한한다 — 안 그러면 "1 Class I recall" 의 `Class` 가
+    # s 로 끝나 거짓 경보가 난다(실제로 났다). 우리 복수 명사는 전부 소문자다.
+    # 앞의 `(?<![0-9])` 가 없으면 "21 items" 속의 "1 items" 를 잡는다.
+    # 쉼표·마침표에서 멈추므로 "All 1 item, with links…" 의 links 는 걸리지 않는다.
+    ONE_PLURAL = re.compile(r"(?<![0-9])1(?: [A-Za-z]+){0,2} [a-z]+s\b")
+
+    def _one_of_everything(self):
+        """모든 갈래를 정확히 1건씩 만든다 — 복수형이 틀릴 수 있는 자리를 전부 켠다."""
+        return _synthetic([
+            _card(1, group="Recall", key_facts=["사유: 이물", "회수 등급: Class I"]),
+            _card(2, category="Warning Letter"),
+            _card(3, agency="MFDS", summary="실사 결과 공개", key_facts=["사유: 기준서 미준수"]),
+            _card(4, agency="MFDS", summary="제조업무정지 1개월", key_facts=["사유: 제조업무정지"]),
+        ])
+
+    def test_regex_catches_a_real_one_plural_but_not_lookalikes(self):
+        """가드 자신을 먼저 시험한다 — 안 그러면 아무것도 못 잡는 정규식이 조용히 초록이 된다
+        (2026-09-22 실제로 첫 판이 그랬다: 복수형이 두 번째 낱말이라 하나도 안 걸렸다)."""
+        for bad in ("· 1 inspection results", "· 1 administrative actions",
+                    "1 warning letters,", "· 1 Class I recalls", "1 site inspecteds"):
+            with self.subTest(bad=bad):
+                self.assertTrue(self.ONE_PLURAL.search(bad), bad)
+        for ok in ("· 1 inspection result", "· 1 administrative action",
+                   "1 warning letter,", "· 1 Class I recall", "All 21 items",
+                   "All 1 item, with links to the originals", "2 inspection results"):
+            with self.subTest(ok=ok):
+                self.assertIsNone(self.ONE_PLURAL.search(ok), ok)
+
+    def test_english_caption_has_no_one_plural(self):
+        brief = self._one_of_everything()
+        gl = json.loads(GLOSSARY.read_text(encoding="utf-8"))
+        cap = lc.build_deck(brief, gl, lang="en")["caption"]
+        bad = self.ONE_PLURAL.findall(cap)
+        self.assertEqual(bad, [], "1건인데 복수형이 나갔다: %r\n---\n%s" % (bad, cap))
+
+    def test_english_slide_headlines_have_no_one_plural(self):
+        brief = self._one_of_everything()
+        deck = lc.build_deck(brief, json.loads(GLOSSARY.read_text(encoding="utf-8")), lang="en")
+        for s in deck["slides"]:
+            for line in s.get("h1", []):
+                with self.subTest(kind=s["kind"], line=line):
+                    self.assertEqual(self.ONE_PLURAL.findall(line), [])
+
+    def test_plural_marker_still_pluralises_above_one(self):
+        """1 만 고치고 2 를 망가뜨리면 안 된다 — 2건이면 's' 가 붙어야 한다."""
+        self.assertEqual(lc.nfmt("{n} inspection result{s}", 1), "1 inspection result")
+        self.assertEqual(lc.nfmt("{n} inspection result{s}", 2), "2 inspection results")
+        self.assertEqual(lc.nfmt("실사 결과 {n}곳", 1), "실사 결과 1곳")   # 한국어는 영향 없음
+
+
 class CliTest(unittest.TestCase):
     def test_no_pdf_path_writes_txt_and_html(self):
         with tempfile.TemporaryDirectory() as tmp:

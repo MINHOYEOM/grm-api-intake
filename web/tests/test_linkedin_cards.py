@@ -363,6 +363,52 @@ class EnglishDeckTest(unittest.TestCase):
                         self.assertEqual(HANGUL.findall(svg), [])
         self.assertEqual(lc.mini("없는-용어", "en"), lc.mini("_generic", "en"))
 
+    # ── [영문 정의 잘림 2026-09-22] 카드는 "정의를 그대로 가져왔다"고 적어 둔다. 그래 놓고
+    # CSS 클램프가 문장 한가운데를 "…" 로 끊으면 그 문구가 거짓이 된다.
+    #
+    # 판정은 **줄 수가 아니라 폭**으로 한다 — 줄바꿈은 브라우저가 하고 단어 경계 때문에 들쭉
+    # 날쭉해서(실측 줄당 20.5~26.4em) 파이썬이 줄 수를 맞힐 수 없다. 칸 기하에서 예산을 낸다:
+    #   .slide 1080px - padding(88×2) = 904px
+    #   .gl .g grid = 200px + 16 + 1fr + 16 + 150px  →  본문 칸 1fr = 522px
+    #   .gl .g p font-size 21px                      →  한 줄 약 522/21 = 24.86 em
+    #
+    # ★이 예산은 **증명이 아니라 어림**이다. `text_width` 의 라틴 0.56em 가정이 이 글꼴의
+    # 실제 평균보다 커서 **폭을 높게 잡는다** — 클램프 4줄 기준으로 돌려 보면 5건을 잡는데
+    # 브라우저 실측으로 실제 넘친 것은 2건뿐이었다(returned-product 는 예산을 7% 넘고도
+    # 4줄에 들어갔다). 그러니:
+    #   · 통과 = "들어간다"는 보장이 아니다.
+    #   · 실패 = "거의 확실히 잘린다" — 브라우저로 확인하고 정의를 줄이거나 클램프를 올려라.
+    # 엄격한 쪽으로 틀리므로 조용한 잘림을 놓치는 일은 드물다. 그게 이 검사의 목적이다.
+    EN_COLUMN_EM = 522 / 21
+
+    def _en_clamp_lines(self) -> int:
+        m = re.search(r"\.lang-en \.gl \.g p\{-webkit-line-clamp:(\d+)\}", lc.CSS)
+        self.assertIsNotNone(m, "영문 클램프 규칙을 못 찾았다 — CSS 가 바뀌었다")
+        return int(m.group(1))
+
+    def test_no_english_definition_can_exceed_the_card_clamp(self):
+        lines = self._en_clamp_lines()
+        budget = lines * self.EN_COLUMN_EM
+        terms = json.loads((pathlib.Path(lc.WEB_DIR) / "data" / "glossary.json")
+                           .read_text(encoding="utf-8"))
+        too_wide = []
+        for t in terms:
+            en = " ".join(str(t.get("easy_en") or "").split())
+            if en and lc.text_width(en) > budget:
+                too_wide.append((t["id"], round(lc.text_width(en), 1)))
+        self.assertEqual(too_wide, [],
+                         f"영문 정의가 {lines}줄 예산({budget:.0f}em)을 넘는다 — 카드에서 "
+                         f"문장 한가운데가 잘릴 값이다. 브라우저로 확인하고 정의를 줄이거나 "
+                         f"클램프를 올려라: {too_wide}")
+
+    def test_clamp_budget_actually_rejects_an_over_long_definition(self):
+        """상한이 무엇도 거르지 못하는 값이면 위 검사는 영원히 초록이다 — 실제로 거르는지 본다."""
+        budget = self._en_clamp_lines() * self.EN_COLUMN_EM
+        fits = "A short definition."
+        never = "word " * 200
+        self.assertLess(lc.text_width(fits), budget)
+        self.assertGreater(lc.text_width(never), budget)
+
     def test_deck_and_site_carry_the_same_figures(self):
         """그림은 덱(MINI_SVG)과 사이트(partials/glossary_fig/*.html) 두 벌로 산다.
         한쪽에만 그리면 다른 쪽은 조용히 문서 아이콘으로 돌아간다 — 2026-09-21 에

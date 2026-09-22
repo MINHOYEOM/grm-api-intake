@@ -839,7 +839,13 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
 # ──────────────────────────────────────────────────────────────────────────────
 
 # `.lang-en` 규칙: 영문은 같은 사실을 쓰는 데 줄이 더 들어 국문 기준 상한이면 숫자 한가운데서
-# 잘린다("about 5…"). 용어 정의는 "그대로 가져왔다"고 적어 두고 끊기면 말이 안 되니 4줄.
+# 잘린다("about 5…"). 용어 정의는 "그대로 가져왔다"고 적어 두고 끊기면 말이 안 되니 넉넉히 준다.
+# ★2026-09-22 4→5줄: 4줄에서 `business-operator-recall` 이 문장 한가운데서 끊겼다
+# ("…without waiting for an order from the…"). 브라우저 실측으로 확인한 사실 둘 —
+#   ⓐ 정의 242개 중 4줄을 넘는 것은 2개뿐이다(business-operator-recall·reconciliation).
+#      국문(3줄 상한)은 넘는 것이 0개다. 영문만의 문제다.
+#   ⓑ 5줄로 올려도 **최악의 경우(다섯 줄 전부 5줄)에 60px 남기고 들어간다** — 슬라이드가
+#      `overflow:hidden` 이라 넘치면 조용히 잘리는데, 넘치지 않는다는 것을 재서 확인했다.
 # ★스타일시트 안에는 한글 주석을 넣지 않는다 — 영문 덱 HTML 에 그대로
 # 실려 "영문에 한글 0" 가드를 속인다.
 CSS = """
@@ -884,7 +890,7 @@ h1{margin:0;line-height:1.16;letter-spacing:-.028em;font-weight:800;word-break:k
 .kv dd{margin:0;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lang-en .kv dd{-webkit-line-clamp:3}
 .lang-en .kv dt{max-width:260px}
-.lang-en .gl .g p{-webkit-line-clamp:4}
+.lang-en .gl .g p{-webkit-line-clamp:5}
 .impl{margin-top:22px;padding:16px 20px;border-left:4px solid #C2603F;background:#FBF3EE;border-radius:0 12px 12px 0;font-size:23px;line-height:1.5;color:#252523;word-break:keep-all}
 .impl b{color:#A14B30;margin-right:8px}
 .cks{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}

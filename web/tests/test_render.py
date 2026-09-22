@@ -1701,9 +1701,23 @@ class WebFindingsRenderTest(unittest.TestCase):
         — 발췌를 넣어 전문을 감추는 꼴이 된다. 그래서 버튼 표시 판정이 발췌 여부를
         반드시 함께 본다. (소스 마커 검사다 — 이 조건이 지워지는 것을 막는 용도이고,
         동작 자체는 브라우저 레이아웃이라 여기서 재지 않는다.)"""
+        import re as _re
         js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
-        self.assertIn("var snipped = !!item.textEl && !!item.textEl.grmFullText;", js_src)
-        self.assertIn("if (overflow || hasExtra || snipped) {", js_src)
+
+        # ★판정 자리가 **둘**이다 — render() 와 renderDeepLinkDoc(). 한 곳만 고치면 다른
+        #   곳에서 같은 실패가 조용히 산다(실제로 처음엔 render() 만 고쳤고, 딥링크 경로가
+        #   빈 검색어를 넘기는 덕분에 우연히 무사했다). 그래서 자리를 손으로 세지 않고
+        #   **전부 찾아 하나하나** 같은 조건을 쓰는지 본다 — 세 번째 자리가 생겨도 걸린다.
+        decisions = _re.findall(r"if \(overflow \|\| hasExtra[^)]*\)", js_src)
+        self.assertGreaterEqual(len(decisions), 2,
+                                f"버튼 판정 자리를 {len(decisions)}개만 찾았다 — 검사가 무력하다")
+        for cond in decisions:
+            self.assertIn("snipped", cond,
+                          f"발췌를 보지 않는 버튼 판정이 있다: {cond}")
+        # 각 자리가 같은 근거(grmFullText)로 snipped 를 정의한다.
+        self.assertEqual(len(decisions),
+                         js_src.count("var snipped = !!item.textEl && !!item.textEl.grmFullText;"),
+                         "판정 자리 수와 snipped 정의 수가 다르다")
         # 펼치면 반드시 전문으로 되돌아온다(발췌가 최종 표시본이 되어선 안 된다).
         self.assertIn("fillText(p, expanded ? p.grmFullText : p.grmSnippet, p.grmQuery);", js_src)
 

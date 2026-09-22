@@ -1634,6 +1634,79 @@ class WebFindingsRenderTest(unittest.TestCase):
         self.assertIn('cat.ko + " · " + cat.en', js_src)
         self.assertIn('if (key2 === "category_code")', js_src)
 
+    @unittest.skipUnless(shutil.which("node"), "node 미설치 환경 — CI 에서 수행")
+    def test_collapsed_card_shows_the_matched_word_not_just_the_opening(self) -> None:
+        """★접힘 3줄이 **언제나 본문 앞머리**라, 용어사전에서 "본문에 이 용어가 있는
+        지적사례 N건"을 눌러 온 방문자가 첫 카드에서 그 용어를 못 찾았다(실측
+        2026-09-21 q=CAPA: 첫 카드에 무균공정 문장만 보이고 CAPA 는 한 글자도 없다).
+        숫자는 #804 로 본문 기준이 됐는데 화면이 그 근거를 안 보여주던 것이다.
+
+        snippetFor 를 원본 그대로 node 로 실행해 성질 셋을 고정한다:
+          (1) 일치가 앞쪽이면 발췌하지 않는다 — 접힘 창 안에 이미 보인다.
+          (2) 일치가 뒤쪽이면 **반환 문자열 안에 검색어가 들어 있다.**
+          (3) 검색어가 없거나 본문에 없으면 발췌하지 않는다.
+        ★(2)가 이 수리의 성질이다. 발췌 길이·시작 위치 같은 대리 지표가 아니라
+          "화면에 나갈 문자열에 그 낱말이 있는가"를 직접 묻는다 — 구현을 바꿔도
+          이 성질이 유지되면 통과해야 하고, 깨지면 결함이다."""
+        import subprocess
+
+        src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        parts = []
+        for const in ("SNIPPET_LEAD", "SNIPPET_MIN_IDX", "SNIPPET_SNAP"):
+            i = src.index("var " + const + " = ")
+            parts.append(src[i:src.index(";", i) + 1])
+        parts.append(js_function_body(src, "function snippetFor("))
+
+        lead = "가" * 200                      # 접힘 3줄 밖으로 밀어낼 앞머리
+        cases = {
+            "late": [lead + " CAPA 미흡이 반복 확인되었다", "capa"],
+            "early": ["CAPA 미흡이 반복 확인되었다" + lead, "capa"],
+            "absent": [lead + " 무균공정 관련 지적", "capa"],
+            "no_query": [lead + " CAPA 미흡", ""],
+        }
+        driver = "\n".join(parts) + "\n" + "\n".join([
+            "var cases = " + json.dumps(cases, ensure_ascii=False) + ";",
+            "var out = {};",
+            "for (var k in cases) out[k] = snippetFor(cases[k][0], cases[k][1]);",
+            "console.log(JSON.stringify(out));",
+        ])
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_snip_"))
+        try:
+            drv = tmp / "driver.js"
+            drv.write_text(driver, encoding="utf-8")
+            proc = subprocess.run(["node", str(drv)], capture_output=True,
+                                  encoding="utf-8", timeout=30)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        self.assertEqual(proc.returncode, 0, f"node 실행 실패: {proc.stderr}")
+        out = json.loads(proc.stdout)
+
+        # (2) 성질 — 발췌본에 검색어가 실제로 들어 있다.
+        self.assertIsNotNone(out["late"], "뒤쪽 일치인데 발췌하지 않았다")
+        self.assertIn("CAPA", out["late"],
+                      "발췌본에 검색어가 없다 — 접힘 화면이 여전히 근거를 감춘다")
+        self.assertTrue(out["late"].startswith("… "),
+                        "앞을 잘라냈으면 잘렸다는 표시가 있어야 한다")
+        self.assertLess(len(out["late"]), len(cases["late"][0]),
+                        "발췌가 전문보다 짧지 않다 — 잘라낸 것이 없다")
+
+        # (1)·(3) 발췌하지 않아야 하는 경우 — 전문을 그대로 쓰라는 뜻의 null.
+        self.assertIsNone(out["early"], "앞쪽 일치는 접힘 창 안이라 전문을 그대로 써야 한다")
+        self.assertIsNone(out["absent"], "본문에 없는 검색어로 발췌하면 안 된다")
+        self.assertIsNone(out["no_query"], "검색어가 없으면 발췌하지 않는다")
+
+    def test_snippet_cards_always_keep_their_expand_button(self):
+        """★발췌 카드는 3줄을 안 넘길 수 있다. 그때 overflow 판정이 false 가 되어
+        "자세히 보기"가 DOM 에서 제거되면, 잘라낸 앞부분으로 돌아갈 길이 영영 사라진다
+        — 발췌를 넣어 전문을 감추는 꼴이 된다. 그래서 버튼 표시 판정이 발췌 여부를
+        반드시 함께 본다. (소스 마커 검사다 — 이 조건이 지워지는 것을 막는 용도이고,
+        동작 자체는 브라우저 레이아웃이라 여기서 재지 않는다.)"""
+        js_src = (WEB_DIR / "assets" / "findings.js").read_text(encoding="utf-8")
+        self.assertIn("var snipped = !!item.textEl && !!item.textEl.grmFullText;", js_src)
+        self.assertIn("if (overflow || hasExtra || snipped) {", js_src)
+        # 펼치면 반드시 전문으로 되돌아온다(발췌가 최종 표시본이 되어선 안 된다).
+        self.assertIn("fillText(p, expanded ? p.grmFullText : p.grmSnippet, p.grmQuery);", js_src)
+
     def test_fnd_orig_and_translation_note_styles_present(self):
         # findings/index.html 은 정적 셸이라 .fnd-orig/.fnd-tr-note 스타일 규칙만 여기 있고,
         # 실제 <details>/<span> 마크업은 findings.js 가 런타임에 생성한다(별도 마커 테스트).
@@ -8166,6 +8239,31 @@ class WebRenderHardeningTest(unittest.TestCase):
             render.NEWSLETTER_FORM_ACTION = a0
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
+
+    def test_mobile_keeps_the_sentence_that_says_what_the_subscription_is(self):
+        """★하단 고정 구독창(.grm-cta)은 `newsletter_form_action` **env 게이트 뒤**에 있어
+        평소 테스트 빌드에서는 렌더조차 되지 않는다 — 골든이 전부 초록인 채로 이 영역의
+        결함을 못 본다(실제로 못 봤다: 모바일 ≤720px 에서 설명 줄이 display:none 이었고
+        골든 diff 는 0 이었다). 그래서 이 검사는 **게이트를 켜고** 실출력을 본다.
+
+        성질: 모바일 폭에서 "어느 기관을 / 무슨 언어로 / 얼마에" 받는지를 알려주는 줄이
+        화면에서 사라지지 않는다. 네이버 유입의 절반이 모바일이라(실측 2026-09-21:
+        모바일 44 : PC 44) 이 문장이 숨으면 제안의 알맹이가 절반에게 안 간다.
+        ★새 배너를 만들자는 것이 아니다 — 있는 문구가 읽히는지만 잰다."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render_site([_minimal_brief("2026-06-04")])
+            html = (out / "briefs/2026-06-04/index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+
+        # 게이트가 실제로 켜졌는지 먼저 확인한다 — 안 켜지면 아래 단언이 공허하게 통과한다.
+        self.assertIn('class="grm-cta"', html, "구독창이 렌더되지 않았다 — 이 검사는 무력하다")
+        self.assertIn("FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료", html)
+        # 회귀 지점: 좁은 폭에서 이 줄을 통째로 숨기는 규칙이 다시 생기면 실패한다.
+        self.assertNotIn(".grm-cta-txt span{display:none}", html,
+                         "모바일에서 구독 설명이 숨겨졌다 — 무엇을 받는지 못 읽는다")
 
     def test_engage_banner_is_gated_and_non_intrusive(self):
         """[성장 4차] 하단 참여 배너 — 같은 env 게이트 · 전면 모달이 아닐 것.

@@ -635,7 +635,13 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   .grm-cta-in{padding:12px 16px;gap:10px}
   .grm-cta-form{flex:1 1 100%}
   .grm-cta-form input{min-width:0;flex:1}
-  .grm-cta-txt span{display:none}
+  /* ★[모바일 구독 설명] 종전에는 이 줄을 통째로 숨겼다(display:none). 그러면 모바일
+     방문자는 "매주 새로운 규제소식"만 보고, **어느 기관을 / 무슨 언어로 / 얼마에**
+     받는지를 그 자리에서 읽을 수 없다. 네이버 유입의 절반이 모바일이라(실측
+     2026-09-21: 모바일 44 : PC 44) 제안의 알맹이가 절반에게 안 가던 셈이다.
+     새 배너를 만드는 것이 아니라, 있는 문구를 읽히게 한다 — 높이를 늘리지 않으려고
+     글자만 줄인다. 이 영역은 env 게이트 뒤라 골든이 못 본다(전용 검사로 지킨다). */
+  .grm-cta-txt span{font-size:11.5px;margin-top:1px;opacity:.8}
 }
 </style>
 <aside class="grm-cta" id="grm-cta" role="complementary" aria-label="{{ _('뉴스레터 구독 안내') }}" hidden>

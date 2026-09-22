@@ -424,7 +424,12 @@ main{word-break:keep-all;overflow-wrap:anywhere}
 .fnd-doc-firm a::after{content:"→";display:inline-block;margin-left:5px;font-size:.7em;color:var(--coral-2);opacity:.75}
 .fnd-doc-firm a:hover,.fnd-doc-firm a:focus-visible{color:var(--coral-2);text-decoration-color:var(--coral-2)}
 .fnd-doc-firm a:hover::after,.fnd-doc-firm a:focus-visible::after{opacity:1}
-.fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 0 auto}
+/* ★[모바일 가로 넘침] flex:0 0 auto + min-width:auto 는 "줄어들지 않는다"는 뜻이라,
+   이 묶음이 제 내용 너비(실측 428px)를 그대로 고집해 375px 화면을 가로로 넘겼다.
+   그 결과 "이 문서의 지적 전체 보기" 가 오른쪽으로 잘려 나갔다(실측 2026-09-21).
+   자기 flex-wrap 은 이미 있었으므로, 줄어들 수 있게만 해 주면 children 이 줄을 바꾼다.
+   ★min-width:0 이 핵심이다 — 이게 없으면 flex 항목은 min-content 아래로 안 줄어든다. */
+.fnd-doc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;flex:0 1 auto;min-width:0}
 .fnd-doc-date{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:500}
 .fnd-doc-count{font-size:11.5px;color:var(--muted);font-weight:600}
 .fnd-doc-page{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--coral-2);text-decoration:none}

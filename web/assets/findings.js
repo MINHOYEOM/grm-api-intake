@@ -974,10 +974,48 @@
 
   // [M10b P1] 본문(국문 우선, 없으면 원문). 접힘 상태에서도 항상 보이므로 card 에 직접
   // 붙인다(부가 섹션과 분리) — 반환한 엘리먼트로 render() 가 오버플로 판정을 한다.
+  // ★[검색어 발췌] 접힘 상태의 본문은 3줄로 잘린다(.fnd-text 의 line-clamp). 그 3줄이
+  //   **언제나 본문 앞머리**였기 때문에, 용어사전에서 "본문에 이 용어가 있는 지적사례
+  //   N건"을 눌러 들어온 방문자가 첫 카드에서 그 용어를 못 찾는 일이 생겼다(실측
+  //   2026-09-21: q=CAPA 의 첫 카드는 무균공정 문장만 보이고 CAPA 는 한 글자도 없다).
+  //   숫자는 #804 로 본문 기준이 됐는데 **그 근거를 화면이 안 보여주던 것**이다.
+  //   그래서 첫 일치가 접힘 창 밖이면 그 앞뒤를 잘라 보여주고, 펼치면 전문으로 되돌린다.
+  //   ★발췌는 표시층 전용이다 — 검색·집계·하이라이트 규칙은 건드리지 않는다.
+  var SNIPPET_LEAD = 40;      // 일치 앞에 남겨 맥락을 주는 글자 수
+  var SNIPPET_MIN_IDX = 90;   // 이보다 앞의 일치는 접힘 3줄 안에 이미 보인다 — 전문 유지
+  var SNIPPET_SNAP = 12;      // 낱말 중간 절단 완화용 공백 탐색 폭(한글은 공백이 드물어 제한)
+
+  function snippetFor(text, query) {
+    if (!query) return null;
+    var idx = text.toLowerCase().indexOf(query);   // query 는 호출부에서 trim+소문자
+    if (idx < SNIPPET_MIN_IDX) return null;        // -1(무일치) 포함 — 전문 그대로
+    var start = idx - SNIPPET_LEAD;
+    if (start < 0) start = 0;
+    if (start > 0) {
+      var sp = text.indexOf(" ", start);
+      if (sp !== -1 && sp - start <= SNIPPET_SNAP && sp < idx) start = sp + 1;
+    }
+    return start > 0 ? "… " + text.slice(start) : null;
+  }
+
+  function fillText(p, text, query) {
+    while (p.firstChild) p.removeChild(p.firstChild);
+    if (query) appendHighlighted(p, text, query);
+    else p.appendChild(document.createTextNode(text));
+  }
+
   function appendMainText(card, row, query) {
     var text = _bodyText(row);          // [다국어] 읽는 언어를 먼저(영어판=규제기관 원문)
     if (!text) return null;
-    var p = elHL("p", "fnd-text", text, query);
+    var snippet = snippetFor(text, query);
+    var p = elHL("p", "fnd-text", snippet || text, query);
+    if (snippet) {
+      // 펼치기가 전문으로 되돌릴 수 있게 원본을 붙여 둔다. dataset 이 아니라 JS 속성인
+      // 이유는 본문이 길어 DOM 속성으로 싣는 값이 아니기 때문이다.
+      p.grmFullText = text;
+      p.grmSnippet = snippet;
+      p.grmQuery = query;
+    }
     card.appendChild(p);
     return p;
   }
@@ -1059,6 +1097,12 @@
       var expanded = !stillCollapsed;
       btn.setAttribute("aria-expanded", expanded ? "true" : "false");
       btn.textContent = expanded ? _t("접기") : _t("자세히 보기");
+      // ★[검색어 발췌] 접힘일 때만 발췌를 쓴다 — 펼치면 반드시 전문이어야 한다.
+      //   발췌가 없는 카드(grmFullText 부재)는 아무것도 하지 않는다.
+      var p = card.querySelector(".fnd-text");
+      if (p && p.grmFullText) {
+        fillText(p, expanded ? p.grmFullText : p.grmSnippet, p.grmQuery);
+      }
     });
     return btn;
   }
@@ -2238,7 +2282,11 @@
         built.forEach(function (item) {
           var overflow = !!item.textEl && item.textEl.scrollHeight - item.textEl.clientHeight > 1;
           var hasExtra = !!item.extraEl && item.extraEl.childNodes.length > 0;
-          if (overflow || hasExtra) {
+          // ★[검색어 발췌] 발췌 카드는 **반드시** 버튼을 남긴다. 발췌가 3줄을 안 넘기면
+          //   overflow 가 false 가 되어 버튼이 제거되고, 그러면 잘라낸 앞부분으로 돌아갈
+          //   길이 영영 사라진다(발췌를 넣어서 전문을 감추는 꼴).
+          var snipped = !!item.textEl && !!item.textEl.grmFullText;
+          if (overflow || hasExtra || snipped) {
             item.moreBtn.hidden = false;
           } else {
             item.moreBtn.remove();
@@ -2650,5 +2698,35 @@
     .catch(function () {
       // [PR-0 딥링크] 목록 fetch 가 실패해도 이미 확정된 딥링크 단건 렌더는 덮어쓰지 않는다.
       if (deepLinkStatus !== "found") showState("error");
+      // ★[첫 응답 실패] syncControlsFromState()·wire() 는 성공 분기에만 있다. 그래서 첫
+      //   응답이 실패하면 **URL 의 검색어가 입력창에 들어가지 못한 채** 빈 안내 문구만
+      //   남았다 — 용어사전에서 "이 용어로 185건" 을 눌러 온 방문자가 자기가 뭘 찾던
+      //   중이었는지조차 화면에서 잃는다(실측 2026-09-21, q=CAPA).
+      //   ★실패 원인은 여기서 고치지 않는다(재현 안 됨·간헐). 원인과 무관하게 언제나
+      //   옳은 것만 한다: 검색어를 되살리고, 다시 시도할 길을 준다.
+      restoreQueryAfterBootFailure();
     });
+
+  // 성공 분기의 syncControlsFromState() 를 부르지 않는다 — 그 함수는 facet 골격(응답
+  // 데이터로 세운다)이 있어야 셀렉트에 값을 넣을 수 있다. 실패 시점엔 그 골격이 없다.
+  // 그래서 **실패해도 확실히 성립하는 것 하나**, 검색어 입력값만 되돌린다.
+  function restoreQueryAfterBootFailure() {
+    try {
+      var input = document.getElementById("fnd-q");
+      if (input && !input.value && state.q) input.value = state.q;
+      var box = document.getElementById("fnd-error");
+      if (!box || box.querySelector(".fnd-boot-retry")) return;
+      var retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "fnd-boot-retry";
+      retry.textContent = _t("다시 시도");   // en.json 기존 키 재사용(새 문구 없음)
+      retry.style.cssText =
+        "font:inherit;font-size:12.5px;font-weight:600;color:var(--coral-2);" +
+        "background:transparent;border:0;padding:0;margin-left:8px;cursor:pointer;" +
+        "text-decoration:underline";
+      // 같은 주소를 다시 연다 — 상태가 전부 URL 에 있으므로 재적재가 곧 동일 조건 재시도다.
+      retry.addEventListener("click", function () { location.reload(); });
+      box.appendChild(retry);
+    } catch (e) {}
+  }
 })();

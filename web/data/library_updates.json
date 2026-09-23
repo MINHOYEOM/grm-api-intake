@@ -2,6 +2,32 @@
   "schema_version": "grm-library-updates/v1",
   "entries": [
     {
+      "date": "2026-09-23",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0011-15955"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 103,
+          "truncated": false
+        },
+        "pics": {
+          "new_ids": [
+            "pics-pe-009-18-annexes",
+            "pics-pe-009-18-intro",
+            "pics-pe-009-18-part-i",
+            "pics-pe-009-18-part-ii"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 51,
+          "truncated": false
+        }
+      }
+    },
+    {
       "date": "2026-09-20",
       "sources": {
         "mfds": {

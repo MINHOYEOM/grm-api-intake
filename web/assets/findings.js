@@ -1985,7 +1985,14 @@
       doc.built.forEach(function (item) {
         var overflow = !!item.textEl && item.textEl.scrollHeight - item.textEl.clientHeight > 1;
         var hasExtra = !!item.extraEl && item.extraEl.childNodes.length > 0;
-        if (overflow || hasExtra) { item.moreBtn.hidden = false; } else { item.moreBtn.remove(); }
+        // ★[검색어 발췌] render() 와 **같은 조건**이어야 한다. 지금 이 경로는
+        //   buildDocCard(deepLinkDocRows, "") — 빈 검색어라 발췌가 생기지 않으므로
+        //   snipped 는 언제나 false 이고 동작은 달라지지 않는다. 그래도 넣어 두는 이유는,
+        //   여기 검색어를 넘기는 변경이 훗날 생기면 **발췌 카드가 펼치기 버튼을 잃고
+        //   전문이 영영 잠기는** 실패가 조용히 살아나기 때문이다(발췌는 3줄을 안 넘길 수
+        //   있어 overflow 가 false 가 된다). 판정이 두 곳인 한 두 곳 다 같은 조건을 쓴다.
+        var snipped = !!item.textEl && !!item.textEl.grmFullText;
+        if (overflow || hasExtra || snipped) { item.moreBtn.hidden = false; } else { item.moreBtn.remove(); }
       });
       revealAndFocusTarget(doc.built, targetId);
     }

@@ -8315,6 +8315,41 @@ class WebRenderHardeningTest(unittest.TestCase):
         # about — 밴드는 기존 동작대로 없다(nav_active != 'about' 게이트, 소개 2026-09-06).
         self.assertNotIn('class="subscribe"', about, "about 페이지에 밴드가 있으면 안 된다")
 
+    def test_subscribe_band_remembers_completed_subscription(self):
+        """[2026-09-23 마케팅 계획 C-06 감사] 배너는 `grm-sub-ok` 를 읽어 다시 뜨지 않는데
+        밴드는 안 그랬다 — 이미 구독한 방문자도 다음 페이지에서 빈 폼을 또 만난다(이중
+        요청). 같은 감사에서 나온 나머지 두 결함(배너 모바일 탭 크기·확인메일 발신자
+        미표기)도 함께 잰다."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            html = self._render_detail(_minimal_brief("2026-06-06"))
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+
+        # 밴드 스크립트 — 구독 완료 확인(grm-sub-ok)이 폼 가로채기 배선보다 먼저 나와야
+        # 한다(index order) — 늦으면 이미 구독한 방문자도 빈 폼을 계속 본다.
+        band_script = html[html.index('id="grm-sub-done"'):]
+        band_script = band_script[:band_script.index("</script>") + 9]
+        i_check = band_script.find("localStorage.getItem('grm-sub-ok')")
+        i_intercept = band_script.find("addEventListener('submit'")
+        self.assertGreater(i_check, -1, "밴드 스크립트에 구독 완료 확인이 없다")
+        self.assertGreater(i_intercept, -1, "밴드 폼 가로채기 배선을 못 찾았다")
+        self.assertLess(i_check, i_intercept,
+                        "구독 완료 확인이 폼 가로채기보다 뒤다 — 이미 구독한 방문자도 폼을 본다")
+        # [hidden] 무력화 짝 — 이 파일의 알려진 함정(author display 가 hidden 속성을 이긴다).
+        self.assertIn(".subscribe[hidden]{display:none}", html)
+
+        # 배너 모바일 탭 크기 — 720px 블록 안에 44px 최소 높이(계산치 37/35px 는 권고 미달).
+        banner = html[html.index(".grm-cta{"):]
+        banner = banner[:banner.index("</script>") + 9]
+        self.assertIn("min-height:44px", banner)
+
+        # 확인메일 발신자 안내 — 밴드·배너 인라인 성공문 둘 다 같은 문장을 쓴다.
+        sentence = "발신자는 GRM Solutions Brief 입니다"
+        self.assertEqual(html.count(sentence), 2,
+                         "발신자 안내가 밴드·배너 중 한쪽에만 있거나 중복이다")
+
     def test_mobile_keeps_the_sentence_that_says_what_the_subscription_is(self):
         """★하단 고정 구독창(.grm-cta)은 `newsletter_form_action` **env 게이트 뒤**에 있어
         평소 테스트 빌드에서는 렌더조차 되지 않는다 — 골든이 전부 초록인 채로 이 영역의

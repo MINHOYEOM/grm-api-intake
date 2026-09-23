@@ -1,0 +1,72 @@
+{
+  "week_end": "2026-09-20",
+  "week_start": "2026-09-14",
+  "generated_at_kst": "2026-09-23 17:09",
+  "persisted": false,
+  "visits": {
+    "this_week": {"start": "2026-09-14", "end": "2026-09-20", "visits": 371, "page_views": 868, "days_with_data": 7, "sample_interval_max": 1.1096774193548387, "precision_unknown": false},
+    "prev_week": {"start": "2026-09-07", "end": "2026-09-13", "visits": 352, "page_views": 838, "days_with_data": 7, "sample_interval_max": 1.2142857142857142, "precision_unknown": false},
+    "daily": [
+      {"date": "2026-09-14", "weekday": "월", "visits": 64, "sample_interval": 1.088},
+      {"date": "2026-09-15", "weekday": "화", "visits": 74, "sample_interval": 1.037037037037037},
+      {"date": "2026-09-16", "weekday": "수", "visits": 72, "sample_interval": 1.0326086956521738},
+      {"date": "2026-09-17", "weekday": "목", "visits": 39, "sample_interval": 1.1096774193548387},
+      {"date": "2026-09-18", "weekday": "금", "visits": 41, "sample_interval": 1.047244094488189},
+      {"date": "2026-09-19", "weekday": "토", "visits": 37, "sample_interval": 1.0819672131147542},
+      {"date": "2026-09-20", "weekday": "일", "visits": 44, "sample_interval": 1.0}
+    ]
+  },
+  "subscribers": {
+    "now": {"snap_date": "2026-09-21", "total": 13, "blacklisted": 0},
+    "week_start": {"snap_date": "2026-09-14", "total": 10},
+    "prev_week_start": {"snap_date": "2026-09-07", "total": 11},
+    "new_this_week": 3,
+    "new_prev_week": -1
+  },
+  "submits": {
+    "this_week": {"submits": 3, "band": 2, "cta": 1, "snap_end": "2026-09-20", "snap_start": "2026-09-13"},
+    "prev_week": {"submits": 0, "snap_end": "2026-09-13", "snap_start": "2026-09-06"}
+  },
+  "touch": {"rows": [], "first_kst": null, "by_channel": [], "distinct_rows": 0, "total_submits": 0},
+  "touch_week": null,
+  "zone": {
+    "since": "2026-09-04",
+    "zones": [
+      {"zone": "findings", "visits": 181, "submits": 2, "band": 1, "cta": 1, "rate_pct": 1.10, "sample_interval_max": 10.0, "precision_unknown": false, "last_kst": "2026-09-22 13:44"},
+      {"zone": "glossary", "visits": 253, "submits": 1, "band": 1, "cta": 0, "rate_pct": 0.40, "sample_interval_max": 10.0, "precision_unknown": false, "last_kst": "2026-09-22 17:01"},
+      {"zone": "briefs", "visits": 47, "submits": 1, "band": 1, "cta": 0, "rate_pct": 2.13, "sample_interval_max": 2.0, "precision_unknown": false, "last_kst": "2026-09-16 15:02"},
+      {"zone": "guide", "visits": 2, "submits": 1, "band": 1, "cta": 0, "rate_pct": 50.00, "sample_interval_max": 2.0, "precision_unknown": false, "last_kst": "2026-09-19 23:53"},
+      {"zone": "home", "visits": 94, "submits": 0, "band": 0, "cta": 0, "rate_pct": 0.00, "sample_interval_max": 2.0, "precision_unknown": false, "last_kst": null},
+      {"zone": "library", "visits": 27, "submits": 0, "band": 0, "cta": 0, "rate_pct": 0.00, "sample_interval_max": 2.0, "precision_unknown": false, "last_kst": null}
+    ],
+    "total_visits": 617,
+    "total_submits": 5,
+    "visits_latest_date": "2026-09-22",
+    "path_precision_note": "경로 표는 표본 실행에서 거칠다(10단위) — 작은 구역의 방문은 0 으로 보일 수 있다. 전환율은 방향만 읽는다."
+  },
+  "paths": {"paths": [], "first_kst": null, "total_submits": 0, "distinct_paths": 0},
+  "paths_week": null,
+  "gsc": {
+    "latest_date": "2026-09-20",
+    "this_week": {"clicks": 87, "impressions": 10734, "ctr_pct": 0.81, "avg_position": 17.8, "days_with_data": 7},
+    "prev_week": {"clicks": 107, "impressions": 16839, "ctr_pct": 0.64, "avg_position": 23.6, "days_with_data": 7},
+    "glossary_this_week": {"clicks": 5, "impressions": 1490, "ctr_pct": 0.34},
+    "glossary_prev_week": {"clicks": 0, "impressions": 1311, "ctr_pct": 0.00},
+    "top_pages": [
+      {"page": "/en/library/who/", "clicks": 0, "impressions": 299, "ctr_pct": 0.00, "avg_position": 8.4},
+      {"page": "/en/findings/doc/76ed6c327d1e/", "clicks": 0, "impressions": 284, "ctr_pct": 0.00, "avg_position": 8.6},
+      {"page": "/glossary/expiry-date/", "clicks": 1, "impressions": 175, "ctr_pct": 0.57, "avg_position": 8.8},
+      {"page": "/glossary/contamination/", "clicks": 0, "impressions": 84, "ctr_pct": 0.00, "avg_position": 9.5}
+    ]
+  },
+  "members": {"total": 8, "new_this_week": 1, "new_prev_week": 0, "signed_in_this_week": 2},
+  "data_quality": {
+    "rum_days_this_week": 7,
+    "gsc_latest_date": "2026-09-20",
+    "gsc_lag_days": 0,
+    "newsletter_snapshot_date": "2026-09-21",
+    "funnel_snapshot_end": "2026-09-20",
+    "prev_week_snapshot_present": true,
+    "basis": "방문=Cloudflare RUM(bot:0·운영자 제외), 날짜는 UTC 기준. 구독자=Brevo 리스트 아침 스냅샷. 신청=깔때기 23:55 KST 스냅샷 차분. 채널·경로 주간값=직전 주 리포트 스냅샷과의 차분(첫 주는 null). 검색=GSC 확정 데이터(2~3일 지연). 노출(view) 카운터는 크롤러 오염이라 쓰지 않는다."
+  }
+}

@@ -19,10 +19,11 @@
   | 카카오톡          | kakao        | share     | `{경로}`                       |
   | 커뮤니티          | community    | post      | `monthly_{YYYY-MM}`            |
 
-★뉴스레터 본문 안의 우리 사이트 링크에는 이 헬퍼를 쓰지 않는다 — `newsletter.gate_provenance`
-가 본문 링크에 쿼리 문자열이 붙으면 발송을 막는다(무변형 불변식, `grm-web-publish` 와 별개
-규율). 이 모듈은 뉴스레터 "전달" 같은 **본문 밖** 채널과 링크드인처럼 본문이 곧 채널인
-경우에만 쓴다.
+★주간 메일 자체의 본문 링크(섹션 앵커·전체보기 CTA 등)는 여전히 깨끗하게 둔다 — 유일한
+예외가 **전달/구독 링크**(`newsletter/forward/brief_{date}`)다. 이 링크는 `gate_provenance`
+가 명시적으로 허용한다(2026-09-23 Task N-03) — 우리 호스트고 `utm_*` 세 키뿐이라 카드
+출처 URL·외부 링크 차단(무변형 불변식)과 충돌하지 않는다. 나머지 채널(링크드인 등)은
+종전대로 본문이 곧 채널인 경우에만 쓴다.
 """
 from __future__ import annotations
 

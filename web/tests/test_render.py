@@ -8254,6 +8254,67 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
 
+    def test_subscribe_copy_varies_by_zone(self):
+        """[2026-09-23 마케팅 계획 C-02] 방문의 대다수가 용어사전·지적사항이고 대부분 검색
+        유입이라 "주간 브리프 구독"은 방문 목적과 먼 제안이었다 — 구역별로 문안이 갈린다.
+        base.html 의 `sub_zone` 은 render.py 가 정하는 `nav_active` 를 본다(템플릿이 언어·
+        구역을 스스로 판단하지 않는다). render_site() 전체 파이프라인으로 실제 페이지를
+        지어, 판정이 나뉘는 두 자리(밴드·배너)를 각각 직접 본다 — 하나만 고치고 다른 자리를
+        놓치는 사고(과거 판정 2곳 결함 사례, #1054/#1056)를 막는다."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render_site([_minimal_brief("2026-06-05")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+
+        home = (out / "index.html").read_text(encoding="utf-8")               # nav_active=home
+        glossary = (out / "glossary/index.html").read_text(encoding="utf-8")  # nav_active=glossary
+        findings = (out / "findings/index.html").read_text(encoding="utf-8")  # nav_active=findings
+        trends = (out / "findings/trends/index.html").read_text(encoding="utf-8")  # nav_active=trends
+        about = (out / "about/index.html").read_text(encoding="utf-8")        # nav_active=about
+
+        consent = "사이트에 새로운 기능이 생기면 함께 안내드립니다"
+        h2_glossary = "용어는 실제 사례와 함께 볼 때 남습니다"
+        h2_findings = "이런 지적, 매주 월요일 한국어로 받아보세요"
+        h2_default = "글로벌 GMP 규제 소식, 매주 월요일 한국어로"
+        all_h2 = (h2_glossary, h2_findings, h2_default)
+
+        # 밴드 — 세 h2 는 각자 구역에서만 나오고, 동의 범위 문장은 세 갈래 모두에 남는다.
+        for zone_name, html, expect_h2 in (
+                ("glossary", glossary, h2_glossary),
+                ("findings", findings, h2_findings),
+                ("home", home, h2_default)):
+            self.assertIn('class="subscribe"', html, f"{zone_name} 페이지에 밴드가 없다")
+            self.assertIn(f"<h2>{expect_h2}</h2>", html, f"{zone_name} 밴드 h2 가 어긋난다")
+            for other_h2 in all_h2:
+                if other_h2 != expect_h2:
+                    self.assertNotIn(f"<h2>{other_h2}</h2>", html,
+                                     f"{zone_name} 페이지에 다른 구역 h2 가 샜다: {other_h2!r}")
+            self.assertIn(consent, html, f"{zone_name} 페이지에서 동의 범위 문장이 빠졌다")
+        # trends 는 findings 구역으로 묶인다(nav_active in ('findings', 'trends')).
+        self.assertIn(f"<h2>{h2_findings}</h2>", trends, "trends 밴드가 findings 구역이 아니다")
+
+        # 배너 <b> — 같은 sub_zone 판정을 밴드와 공유한다(위 정의 한 곳).
+        def banner_b(html: str) -> str:
+            seg = html[html.index('id="grm-cta"'):]
+            return seg[seg.index("<b>") + 3: seg.index("</b>")]
+
+        self.assertEqual(banner_b(home), h2_default)
+        self.assertEqual(banner_b(glossary), "이번 주 용어와 지적 사례, 매주 월요일 메일로")
+        self.assertEqual(banner_b(findings), h2_findings)
+        self.assertEqual(banner_b(trends), h2_findings)
+
+        # 배너 실물 링크(C-03) — grm-cta-side 안에 정확히 한 번(밴드의 sub-peek 링크와 같은 낱말).
+        for html in (home, glossary, findings, trends):
+            side = html[html.index('<div class="grm-cta-side">'):]
+            side = side[:side.index("</div>")]
+            self.assertEqual(side.count("이번 주 소식 먼저 보기"), 1,
+                             "배너 side 링크가 0 또는 중복이다")
+
+        # about — 밴드는 기존 동작대로 없다(nav_active != 'about' 게이트, 소개 2026-09-06).
+        self.assertNotIn('class="subscribe"', about, "about 페이지에 밴드가 있으면 안 된다")
+
     def test_mobile_keeps_the_sentence_that_says_what_the_subscription_is(self):
         """★하단 고정 구독창(.grm-cta)은 `newsletter_form_action` **env 게이트 뒤**에 있어
         평소 테스트 빌드에서는 렌더조차 되지 않는다 — 골든이 전부 초록인 채로 이 영역의
@@ -8274,7 +8335,9 @@ class WebRenderHardeningTest(unittest.TestCase):
 
         # 게이트가 실제로 켜졌는지 먼저 확인한다 — 안 켜지면 아래 단언이 공허하게 통과한다.
         self.assertIn('class="grm-cta"', html, "구독창이 렌더되지 않았다 — 이 검사는 무력하다")
-        self.assertIn("FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료", html)
+        # [2026-09-23 C-02 구역 분기] 이 브리프 상세 페이지는 nav_active='detail' →
+        # sub_zone='default'. 3분기 문안은 test_subscribe_copy_varies_by_zone 이 따로 본다.
+        self.assertIn("공식 원문 링크와 함께 · 언제든 해지 · 무료", html)
         # 회귀 지점: 좁은 폭에서 이 줄을 통째로 숨기는 규칙이 다시 생기면 실패한다.
         self.assertNotIn(".grm-cta-txt span{display:none}", html,
                          "모바일에서 구독 설명이 숨겨졌다 — 무엇을 받는지 못 읽는다")

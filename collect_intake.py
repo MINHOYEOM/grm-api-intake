@@ -275,6 +275,7 @@ from grm_handoff import (
     notion_revert_refs_for_handoff,
     notion_stale_prior_open_handoffs,
     notion_upsert_routine_handoff,
+    unconsumed_publish_handoffs,
     resolve_handoff_window_days,
     resolve_web_brief_dir,
     web_brief_filename,
@@ -4274,6 +4275,9 @@ def main() -> int:
             coverage_silent_sources = set()
             log("WARN", f"무음 감시 건너뜀 — {e}")
 
+    # ★[handoff 마감 누락 감시 2026-09-21] emit 경로가 STALE 봉인한 handoff 날짜를 여기에
+    #   받는다. 발행일(월) 것이 섞여 있으면 그 주 Routine 이 마감을 안 한 것 — health 경고.
+    handoff_sealed_dates: list[str] = []
     handoff_emitted = False
     handoff_failed = False
     handoff_row_count = 0
@@ -4329,7 +4333,8 @@ def main() -> int:
                     display_window_days=args.window_days,
                     web_brief_dir=web_brief_dir,
                     # 무음 소스는 coverage 줄에 `0(점검필요)` 로 찍힌다(§3 2026-09-14).
-                    silent_sources=coverage_silent_sources)
+                    silent_sources=coverage_silent_sources,
+                    sealed_dates=handoff_sealed_dates)
                 handoff_emitted = True
             except NotionHandoffError as e:
                 handoff_failed = True
@@ -4423,6 +4428,8 @@ def main() -> int:
         handoff_window_days=handoff_window_days,
         source_last_seen=source_last_seen,
         source_silence_errors=source_silence_errors,
+        unconsumed_publish_handoff_dates=tuple(
+            unconsumed_publish_handoffs(handoff_sealed_dates)),
         run_date=run_date,
         kr_egress_proxy_status=kr_proxy_status,
         kr_egress_proxy_detail=kr_proxy_detail,

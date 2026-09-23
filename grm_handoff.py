@@ -862,7 +862,8 @@ def notion_find_handoff_page(token: str, db_id: str, handoff_id: str,
 def notion_stale_prior_open_handoffs(token: str, db_id: str,
                                      keep_handoff_id: str,
                                      superseded_by: str,
-                                     revert_refs: bool = False) -> int:
+                                     revert_refs: bool = False,
+                                     sealed_dates: list[str] | None = None) -> int:
     """새 OPEN handoff emit 전, 직전 미소비 OPEN handoff 를 STALE 로 봉인한다(K4-1).
 
     Type or Class=`routine-handoff` 이고 Status=`New`(=OPEN) 인 handoff page 중
@@ -879,6 +880,10 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
     STALE 봉인한 handoff 의 **미발행(Status=New) row 만** `Handoff Ref` 를 비워
     다음 emit 에 재투입한다(B1 revert — 누락 0). row 의 Status 는 여기서도 불변 —
     Processed/Skipped row 는 ref 포함 일절 건드리지 않는다.
+
+    `sealed_dates`(선택): 봉인한 handoff 의 날짜(`YYYY-MM-DD`)를 여기에 append 한다.
+    반환값(건수)을 바꾸지 않기 위한 out-param 이다 — 호출부는 이걸 받아
+    `unconsumed_publish_handoffs` 로 "발행일 handoff 가 마감 없이 봉인됐는지"를 판정한다.
     """
     url = NOTION_DB_QUERY_URL_TPL.format(db_id=db_id)
     body: dict[str, Any] = {
@@ -916,6 +921,8 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
             )
             staled += 1
             staled_ids.append(prior_id)
+            if sealed_dates is not None:
+                sealed_dates.append(prior_date)
             time.sleep(0.34)
         if not data.get("has_more"):
             break
@@ -927,6 +934,41 @@ def notion_stale_prior_open_handoffs(token: str, db_id: str,
         for prior_id in staled_ids:
             notion_revert_refs_for_handoff(token, db_id, prior_id)
     return staled
+
+
+# 발행 요일(월=0). 그날의 handoff 는 Routine 이 소비해 CONSUMED(Processed)로 끝나야 하고,
+# 다음 날 수집기가 STALE 로 봉인한다면 그 주 Routine 이 **마감을 안 한 것**이다.
+PUBLISH_WEEKDAY = 0
+
+
+def unconsumed_publish_handoffs(sealed_dates: Iterable[str],
+                                *, publish_weekday: int = PUBLISH_WEEKDAY) -> list[str]:
+    """STALE 봉인된 handoff 날짜 중 **발행일(월)** 것만 — 그 주 Routine 이 마감을 안 했다.
+
+    배경(2026-09-14 실측): 그 주 브리프는 정상 발행됐는데(델타 커밋 + web-publish 성공)
+    handoff page 는 CONSUMED 가 아니라 `STALE ... (superseded by 2026-09-15)` / Skipped
+    로 끝나 있었다. 다른 월요일(08-17·08-24·08-31·09-07·09-21)은 전부 CONSUMED 였으니
+    **"월요일 handoff 가 STALE 됐다" 는 것 자체가 정확한 고장 신호**다.
+
+    왜 위험한가: `notion_reconcile_handoff_refs` 에서 CONSUMED 는 라우틴이 못 찍은 row 를
+    **마감**하는 경로인데, STALE 은 반대로 미발행 row 의 ref 를 비워 **재투입**한다.
+    2026-09-14 에는 재투입될 New row 가 없어 피해가 0 이었지만(카드 중복 0건·잔존 New 0건),
+    구조적으로는 다음 주 중복 카드가 되는 자리다. 그리고 그때 **아무것도 경보하지 않았다** —
+    publish 워치독은 "델타 파일이 있나"만 보지 "handoff 가 닫혔나"는 보지 않는다.
+
+    경고이지 실패가 아니다: 이미 지나간 주의 기록 문제라 이번 수집·발행을 막을 이유가 없다.
+
+    날짜 파싱 불가(`"?"` 등)는 조용히 버린다 — 판정 근거가 없는 것을 고장이라 부르지 않는다.
+    """
+    out: list[str] = []
+    for raw in sealed_dates:
+        try:
+            when = date.fromisoformat(str(raw)[:10])
+        except ValueError:
+            continue
+        if when.weekday() == publish_weekday:
+            out.append(when.isoformat())
+    return sorted(set(out))
 
 
 _HANDOFF_REF_ROWS_MAX_PAGES = 10  # ref 잔존 New row 는 소수(미마감 handoff 분량) — 안전 상한
@@ -1132,7 +1174,8 @@ _NOTION_CHILDREN_CREATE_LIMIT = 90  # 요청당 100 한도 방어(단계 D, Code
 def notion_upsert_routine_handoff(token: str, db_id: str,
                                   payload: dict[str, Any],
                                   generated_at: datetime,
-                                  compact: bool = False) -> tuple[str, str]:
+                                  compact: bool = False,
+                                  sealed_dates: list[str] | None = None) -> tuple[str, str]:
     """New-only handoff page 를 생성/갱신하고 (page_id, page_url) 반환.
 
     compact=True(v2) 면 payload JSON 을 compact 직렬화한다. children 이 한도(90)를
@@ -1146,6 +1189,7 @@ def notion_upsert_routine_handoff(token: str, db_id: str,
         token, db_id,
         keep_handoff_id=payload["handoff_id"],
         superseded_by=payload.get("run_date_kst") or payload["handoff_id"].split("::", 1)[-1],
+        sealed_dates=sealed_dates,
     )
     existing = notion_find_handoff_page(token, db_id, payload["handoff_id"])
     if existing:
@@ -1193,6 +1237,7 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                          display_window_days: int | None = None,
                          web_brief_dir: str | None = None,
                          silent_sources: Iterable[str] = (),
+                         sealed_dates: list[str] | None = None,
                          ) -> tuple[int, str]:
     # B1 조회/표시 분리: window_days(조회 lookback, 기본 30 — 미소비 New 누락 방지
     # 안전망)와 payload 의 window_start~window_end 는 역할이 다르다. 후자는 v16
@@ -1212,7 +1257,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
     if idem_v2:
         notion_stale_prior_open_handoffs(
             token, db_id, keep_handoff_id=handoff_id,
-            superseded_by=run_date.isoformat(), revert_refs=True)
+            superseded_by=run_date.isoformat(), revert_refs=True,
+            sealed_dates=sealed_dates)
         # Codex P1: 오늘 handoff 의 종결 여부를 소비 쿼리 전에 확인 — 이미
         # CONSUMED(Processed)/STALE(Skipped)면 잔존 New(ref=오늘)는 reconcile 이
         # 마감/재투입하고, page 재기록·재유입·ref 기록은 전부 생략한다(아래).
@@ -1252,7 +1298,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
                                                    payload_window_days, generated_at,
                                                    silent_sources=silent_sources)
         _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload,
-                                                       generated_at, compact=True)
+                                                       generated_at, compact=True,
+                                                       sealed_dates=sealed_dates)
         log("INFO", f"Routine handoff v2 생성(ENABLE_HANDOFF_V2): rows={payload['row_count']}")
         # §1-B 영구배선: raw 가 살아있는 이 지점(enriched)에서 빈슬롯 web brief 를 결정론
         # 산출한다(handoff 와 동일 cards·소스). 비파괴·비차단 — 실패해도 handoff/수집은 계속.
@@ -1268,7 +1315,8 @@ def emit_routine_handoff(token: str, db_id: str, run_date: date,
         # 기존 v1 경로 — scheduled 운영 기본. 바이트 동일 보장(변경 없음).
         payload = build_routine_handoff_payload(rows, run_date,
                                                 payload_window_days, generated_at)
-        _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at)
+        _pid, page_url = notion_upsert_routine_handoff(token, db_id, payload, generated_at,
+                                                       sealed_dates=sealed_dates)
     if idem_v2:
         # emit 표시는 handoff page 확정(upsert 성공) **후** — page 없는 ref 가 생기지
         # 않게 한다. 대상은 dedupe 전 전체 rows(중복 row 도 이 handoff 가 가져감).

@@ -277,6 +277,9 @@ def _evaluate_health(
     #   또는 조회 실패) → 판정 자체를 건너뛴다. `source_silence.query_last_seen` 산출물.
     source_last_seen: dict[str, date | None] | None = None,
     source_silence_errors: tuple[str, ...] = (),
+    # ★[handoff 마감 누락 2026-09-21] 이번 실행이 STALE 봉인한 handoff 중 **발행일(월)** 의
+    #   것. `grm_handoff.unconsumed_publish_handoffs` 산출물. 빈 튜플 = 정상.
+    unconsumed_publish_handoff_dates: tuple[str, ...] = (),
     run_date: date | None = None,
     # ★[KR egress preflight 2026-09-14] 프록시 **도달** 여부(설정 여부가 아니다).
     #   `grm_common.probe_kr_egress_proxy` 산출물. 빈 문자열 = 미측정(종전 호출 호환).
@@ -532,6 +535,23 @@ def _evaluate_health(
                 f"무음 감시 조회 실패 {len(source_silence_errors)}건 — 그 소스는 미판정",
                 "; ".join(source_silence_errors)[:240],
             )
+
+    # ── handoff 마감 누락 — "발행은 됐는데 handoff 가 안 닫혔다" ────────────────
+    # 2026-09-14 실측: 브리프는 정상 발행됐는데 그 주 handoff 는 CONSUMED 가 아니라
+    # STALE/Skipped 로 끝나 있었고, **아무 경보도 없었다**(publish 워치독은 델타 파일
+    # 존재만 본다). 월요일 handoff 가 STALE 됐다는 것 자체가 그 신호다.
+    # 경고이지 실패가 아니다 — 지나간 주의 기록 문제가 이번 수집·발행을 막을 이유가 없다.
+    for when in unconsumed_publish_handoff_dates:
+        health.add_warning(
+            f"handoff-not-consumed:{when}",
+            "GRM Handoff",
+            f"{when}(발행일) handoff 가 CONSUMED 없이 STALE 봉인됨 "
+            "— 그 주 Routine 이 마감 단계를 건너뛰었다",
+            ("브리프 자체는 발행됐을 수 있다(델타 커밋·web-publish 성공은 별개 신호). "
+             "다만 CONSUMED 는 라우틴이 못 찍은 row 를 마감하는 경로이고 STALE 은 반대로 "
+             "미발행 row 의 ref 를 비워 재투입한다 — 그 주에 미발행 row 가 남아 있었다면 "
+             "다음 주 중복 카드가 된다. 해당 주 Intake row 의 Status 잔존 New 를 확인하라."),
+        )
 
     if event_name == "schedule" and enable_moleg_api:
         health.add_warning(

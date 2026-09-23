@@ -1,0 +1,158 @@
+name: GRM Findings Search Cache Sync
+
+# [R2 · 087] 086 검색 캐시의 daily 목록(용어사전 "사례 N건 보기" 링크의 검색어)을 저장소의
+# web/data/glossary_cases.json 과 같게 맞춘다. 주간 용어 재측정(grm-glossary-cases.yml → PR →
+# 자동 머지)이 그 파일을 main 에 바꿔 넣는 순간(push 트리거)과 매주 금요일 백스톱에 돈다.
+# 표에 직접 쓰지 않는다 — findings_search_cache_sync.py 가 q 목록을 RPC 하나에 넘기고, 넣고
+# 지우는 판단(정규화·hot 보호·삭제 상한·형식 게이트)은 DB 함수(087)가 한다. 새로 들어간 행은
+# 다음 daily 갱신(pg_cron 12:10 KST)이 채운다. git 쓰기 전무. SUPABASE_SERVICE_ROLE_KEY 재사용.
+on:
+  push:
+    branches: [main]
+    paths:
+      - web/data/glossary_cases.json
+  schedule:
+    # 매주 금 00:10 UTC = 09:10 KST — 목요일 용어 재측정 PR 이 그 밤 안에 머지되지 못한 주의 백스톱.
+    - cron: '10 0 * * 5'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true=목록만 세고 RPC 호출 없음, false=실제 동기화. push/schedule 은 항상 apply."
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+  issues: write        # 실패 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: findings-search-cache-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync daily cache term list with glossary_cases.json
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # push/schedule 이벤트는 inputs 가 비어 apply 로 실행된다. dispatch 는 dry_run 기본 true.
+      - name: Sync term list (one RPC call — no git writes)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS="--output cache_sync_report.json"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python findings_search_cache_sync.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Search Cache Sync"
+            echo ""
+            echo "event=${{ github.event_name }} dry_run=${{ inputs.dry_run }}"
+            echo ""
+            if [ -f cache_sync_report.json ]; then
+              echo '```json'
+              cat cache_sync_report.json
+              echo '```'
+            else
+              echo "cache_sync_report.json 이 생성되지 않았습니다 — 목록 읽기 실패 또는 자격증명 미설정."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # continue-on-error 를 쓰지 않는다 — 잡이 red 로 남는 게 1차 가시성, 이슈는 2차 가시성이다.
+      - name: Open or update cache-sync issue
+        if: failure()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-search-cache-sync] 검색 캐시 용어 목록 동기화가 실패했습니다';
+            const label = 'findings-search-cache-sync';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              '검색 캐시 daily 목록 동기화(`grm-findings-search-cache-sync.yml`)가 실패했습니다.',
+              '',
+              '**왜 이 알림이 중요한가**: 실패해도 화면은 죽지 않는다(캐시가 없으면 원 계산으로 폴백). ' +
+                '그래서 이 이슈가 없으면 새 용어의 사례 링크가 조용히 종전 속도(0.8s)로 남는다.',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '흔한 원인: SUPABASE_URL(repo Variables)/SUPABASE_SERVICE_ROLE_KEY(secret) 미설정 · ' +
+                'glossary_cases.json 형식 변경 · 서버 삭제 상한(현재 daily 의 25%·최소 20행) 초과 — ' +
+                '용어가 그만큼 줄어든 주라면 두 번에 나눠 dispatch 하라. step summary 의 report 참조.',
+              '',
+              '_다음 실행이 성공하면 자동으로 닫힙니다._',
+            ].join('\n');
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '검색 캐시 용어 목록 동기화 실패');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 실패했습니다 — 실행 ${context.runId}`,
+              });
+              core.notice(`기존 이슈 #${existing.number} 에 댓글`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close cache-sync issue on recovery
+        if: success()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-search-cache-sync] 검색 캐시 용어 목록 동기화가 실패했습니다';
+            const label = 'findings-search-cache-sync';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `복구됐습니다 — 실행 ${context.runId}`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 닫음`);
+            }

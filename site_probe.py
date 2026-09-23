@@ -21,6 +21,11 @@
    warn, 3초 초과(anon `statement_timeout`)는 fail 로 본다.
 4. 보안 헤더 존재 여부(`strict-transport-security`·`x-frame-options`) — 별도 PR 이
    `_headers` 로 추가할 예정이라 여기서는 부재를 fail 이 아니라 warn 으로만 남긴다.
+5. RPC 스냅샷 신선도(085) — 무인자 집계 RPC 7종은 `rpc_snapshot` 표를 읽고, 표가
+   낡으면 **원 계산으로 조용히 폴백**한다. 그래서 pg_cron 갱신이 죽어도 화면은 살아
+   있고 3)의 지연 점검도 한동안 초록이다 — 폴백 뒤에 숨는 고장을 여기서 밖으로 낸다.
+   `rpc_snapshot_status` 로 항목 수와 최고령을 읽어 40분(20분 주기 2회 결손) 초과는
+   warn, 2시간 초과·항목 부족·JSON 아님은 fail.
 
 각 점검은 ok|warn|fail 과 경과 초, 한 줄 상세를 기록한다. warn 은 전체를 fail 로
 만들지 않는다 — exit 1 은 fail 이 하나라도 있을 때만.
@@ -78,6 +83,14 @@ RPC_FAIL_S = 3.0
 # web/data/findings_docs.json 의 documents[0].findings[0] — 위 "고정 finding_id 선택
 # 근거" 참조. document_id=009ffad3df01, agency=FDA(경고서한), firm=Lex Inc.
 FIXED_FINDING_ID = "finding-3234e2d59f2c100dedb30684"
+
+# [085] rpc_snapshot — refresh 가 채우는 항목 수(7종 고정: stats·inspector_index·zone_category·
+# category_matrix·fda_inspection_stats·cfr_ranking(12)·recent_window(12)). 갱신 주기는
+# pg_cron 20분. 두 번 연속 놓치면(40분) warn, 2시간이면 fail — 공개 RPC 의 폴백 창(24h)보다
+# 훨씬 앞에서 울려야 폴백이 고장을 가리는 동안에도 사람이 안다.
+SNAPSHOT_EXPECTED_ROWS = 7
+SNAPSHOT_WARN_AGE_S = 40 * 60
+SNAPSHOT_FAIL_AGE_S = 2 * 60 * 60
 
 
 @dataclass
@@ -222,6 +235,53 @@ def _check_rpc_once(name: str, base_url_norm: str | None, anon_key: str, rpc_nam
     return CheckResult(name, "ok", elapsed, f"HTTP 200, {elapsed:.2f}s")
 
 
+def check_rpc_snapshot_fresh(name: str, base_url_norm: str | None, anon_key: str,
+                             timeout: float, *,
+                             expected_rows: int = SNAPSHOT_EXPECTED_ROWS,
+                             warn_age_s: int = SNAPSHOT_WARN_AGE_S,
+                             fail_age_s: int = SNAPSHOT_FAIL_AGE_S) -> CheckResult:
+    """[085] `rpc_snapshot_status()` 를 읽어 스냅샷이 살아 있는지 본다.
+
+    폴백이 있어 화면은 죽지 않으므로, 이 검사가 없으면 cron 사망을 아무도 모른다.
+    항목 수 부족 = refresh 가 중간에 죽었거나 085 미적용 · 최고령 초과 = cron 정지.
+    """
+    if base_url_norm is None:
+        return CheckResult(name, "fail", 0.0, "SUPABASE_URL 미설정 또는 https:// 형식 아님")
+    if not anon_key:
+        return CheckResult(name, "fail", 0.0, "SUPABASE_ANON_KEY 미설정")
+    url = f"{base_url_norm}/rest/v1/rpc/rpc_snapshot_status"
+    headers = {
+        "apikey": anon_key,
+        "Authorization": f"Bearer {anon_key}",
+        "Content-Type": "application/json",
+    }
+    resp, err = _post(url, headers, {}, timeout)
+    if err is not None:
+        return CheckResult(name, "fail", 0.0, f"요청 실패: {err}")
+    elapsed = _resp_elapsed(resp)
+    if resp.status_code != 200:
+        return CheckResult(name, "fail", elapsed, f"HTTP {resp.status_code}")
+    try:
+        rows = json.loads(resp.text)
+    except (TypeError, ValueError):
+        return CheckResult(name, "fail", elapsed, "응답이 JSON 이 아님")
+    if not isinstance(rows, list):
+        return CheckResult(name, "fail", elapsed, "응답이 배열이 아님")
+    if len(rows) < expected_rows:
+        return CheckResult(name, "fail", elapsed,
+                           f"항목 {len(rows)}/{expected_rows} — refresh 가 중간에 죽었거나 085 미적용")
+    ages = [int(r.get("age_s") or 0) for r in rows if isinstance(r, dict)]
+    computed = [int(r.get("computed_ms") or 0) for r in rows if isinstance(r, dict)]
+    oldest = max(ages) if ages else 0
+    slowest = max(computed) if computed else 0
+    detail = f"항목 {len(rows)} · 최고령 {oldest}s · 최장 계산 {slowest}ms"
+    if oldest > fail_age_s:
+        return CheckResult(name, "fail", elapsed, f"{detail} > {fail_age_s}s(pg_cron 갱신 정지 의심)")
+    if oldest > warn_age_s:
+        return CheckResult(name, "warn", elapsed, f"{detail} > {warn_age_s}s(갱신 2회 결손)")
+    return CheckResult(name, "ok", elapsed, detail)
+
+
 def _overall_status(checks: list[CheckResult]) -> str:
     if any(c.status == "fail" for c in checks):
         return "fail"
@@ -282,6 +342,10 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
     checks.append(check_rpc(
         "RPC findings_similar_to", base_norm, anon_key, "findings_similar_to",
         {"p_finding_id": finding_id, "p_limit": 5}, timeout))
+
+    # 4) [085] 스냅샷 신선도 — 폴백이 가리는 cron 사망을 밖으로 낸다
+    checks.append(check_rpc_snapshot_fresh(
+        "RPC 스냅샷 신선도(rpc_snapshot_status)", base_norm, anon_key, timeout))
 
     return {
         "schema_version": SCHEMA_VERSION,

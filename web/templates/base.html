@@ -160,6 +160,12 @@
    자리에 구독 요청이 상시로 끼면 읽는 흐름을 끊는다. 구독 경로는 아래 스크롤 배너
    하나로 남는다(사용자 확정: '하단 한 곳'). ※env-param 으로 켜지므로 로컬·CI 빌드에서는
    원래 꺼져 있어 골든 byte-diff 가 0 이다 — 이 게이트는 라이브에서만 눈에 보인다. #}
+{# [구독 문안 구역화 2026-09-23] 마케팅 계획 C-02 — 방문의 대다수가 용어사전·지적사항이고
+   대부분 검색 유입이라 "주간 브리프 구독"은 방문 목적과 먼 제안이었다. 구역은 render.py 가
+   정하는 `nav_active` 로 고른다(템플릿이 언어·구역을 스스로 판단하지 않는다). 용어사전
+   구역도 회원이 아니라 **구독**을 제안한다(회원 계층은 별도 결정 대기). 밴드·배너 두 블록이
+   모두 이 값을 보므로 어느 `{% if %}` 에도 갇히지 않는 이 자리(최상위)에서 정의한다. #}
+{% set sub_zone = 'glossary' if nav_active == 'glossary' else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
 {% if newsletter_form_action and lang == 'ko' and nav_active != 'about' %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
@@ -173,9 +179,20 @@
   {# 구독 전 상태(입력) — 제출 성공 시 아래 스크립트가 이 블록 전체를 감추고 .sub-done 만 표시. div 는 display 미지정이라 hidden 속성이 정상 동작(폼과 달리). #}
   <div id="grm-sub-intro">
     <span class="kick">Weekly Newsletter</span>
-    <h2>{{ _("매주 새로운 규제소식을 이메일로 받아보세요") }}</h2>
-    {# 동의 범위 문안 — 주간 클리핑 + 서비스 업데이트 안내(web/announce.py) 두 종류를 모두 포괄한다. 공지 메일은 이 문장에 근거해 같은 리스트로 나간다. 좁히면 공지 발송 근거가 사라지므로 함부로 줄이지 말 것. #}
-    <p>{{ _("매주 모아드리는 규제 클리핑의 핵심 요약과 바로가기를 메일로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
+    {# [구독 문안 구역화 2026-09-23] C-02 — h2·본문을 위 `sub_zone` 3분기로 나눈다. 세
+       갈래 모두 동의 범위 문장("사이트에 새로운 기능이 생기면...")을 남긴다 — 공지 메일
+       (web/announce.py)이 이 문장에 근거해 같은 수신자 목록으로 나가므로, 갈래마다 좁혀
+       쓰면 공지 발송 근거가 사라진다. #}
+    {% if sub_zone == 'glossary' %}
+    <h2>{{ _("용어는 실제 사례와 함께 볼 때 남습니다") }}</h2>
+    <p>{{ _("매주 월요일, 그 주의 규제 소식과 지적 사례를 한국어로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
+    {% elif sub_zone == 'findings' %}
+    <h2>{{ _("이런 지적, 매주 월요일 한국어로 받아보세요") }}</h2>
+    <p>{{ _("FDA·EMA·식약처의 새 지적과 조치를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
+    {% else %}
+    <h2>{{ _("글로벌 GMP 규제 소식, 매주 월요일 한국어로") }}</h2>
+    <p>{{ _("FDA·EMA·PIC/S·식약처의 주요 변화를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
+    {% endif %}
     {# 메일 내용의 실물 — 최신 브리프 페이지. 헤더 CTA 와 같은 `latest_slug` 를 쓴다. #}
     <p class="sub-peek"><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
     <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
@@ -191,7 +208,7 @@
       <input type="hidden" name="locale" value="en" />
       <button class="btn coral" type="submit">{{ _("구독") }}</button>
     </form>
-    <p class="note">{{ _("구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.") }}</p>
+    <p class="note">{{ _("매주 월요일 발송 · 구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.") }}</p>
   </div>
   {# 인라인 성공 상태(방식 A) — 제출 시 intro 를 감추고 이 패널만 표시. 페이지 이동 없음. 아이콘=코랄 원형 + SVG 체크(웹폰트 비의존). #}
   <div id="grm-sub-done" class="sub-done" role="status" aria-live="polite" hidden>
@@ -647,8 +664,15 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 <aside class="grm-cta" id="grm-cta" role="complementary" aria-label="{{ _('뉴스레터 구독 안내') }}" hidden>
   <div class="grm-cta-in">
     <div class="grm-cta-txt">
-      <b>{{ _("매주 새로운 규제소식을 메일로 받아보세요") }}</b>
-      <span>{{ _("FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료") }}</span>
+      {# [구독 문안 구역화 2026-09-23] C-02 — 밴드와 같은 `sub_zone`(base.html 상단 정의)을 본다. #}
+      {% if sub_zone == 'glossary' %}
+      <b>{{ _("이번 주 용어와 지적 사례, 매주 월요일 메일로") }}</b>
+      {% elif sub_zone == 'findings' %}
+      <b>{{ _("이런 지적, 매주 월요일 한국어로 받아보세요") }}</b>
+      {% else %}
+      <b>{{ _("글로벌 GMP 규제 소식, 매주 월요일 한국어로") }}</b>
+      {% endif %}
+      <span>{{ _("공식 원문 링크와 함께 · 언제든 해지 · 무료") }}</span>
     </div>
     <form class="grm-cta-form" id="grm-cta-form" action="{{ newsletter_form_action }}" method="post">
       <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
@@ -657,6 +681,10 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       <button type="submit">{{ _("구독") }}</button>
     </form>
     <div class="grm-cta-side">
+      {# [구독 밴드 실물 링크 2026-09-07] 주석 참조 — 밴드는 09-07 부터 최신 브리프로 가는
+         실물 링크(`sub-peek`)를 갖고 있었는데 배너에는 없었다(2026-09-23 C-03). 같은 낱말
+         '이번 주 소식 먼저 보기' 를 재사용한다(새 낱말을 만들지 않는다). #}
+      <a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식 먼저 보기") }}</a>
       {% if reactions_enabled %}<a href="{{ rel_root }}index.html#watchlist">{{ _("관심 업체 알림") }}</a>{% endif %}
       <button type="button" id="grm-cta-today">{{ _("오늘 하루 보지 않기") }}</button>
       <button type="button" id="grm-cta-close" class="grm-cta-x" aria-label="{{ _('닫기') }}">&times;</button>

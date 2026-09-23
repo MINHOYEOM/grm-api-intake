@@ -1071,6 +1071,7 @@
   "이 링크를 복사하세요": "Copy this link",
   "이 목록의 {n}건은 공식 영문 제목이 없어 한국어 원제를 그대로 표시합니다.": "{n} document{s} in this list have no official English title, so the Korean title is shown as published.",
   "이 문서는 한국 규제기관 기록이라 지적 원문이 한국어로 표시됩니다.": "This document is a Korean regulator record, so the findings are shown in Korean as they appear on the official record.",
+  "이 문서의 지적 {n}건 전체 보기": "See all {n} finding{s} in this document",
   "이 문서의 지적 전체 보기": "See every finding in this document",
   "이 분류로": "in this category",
   "이 브라우저에서는 복사가 지원되지 않습니다. CSV 내려받기를 이용해 주세요.": "Copying is not supported in this browser. Please use Download CSV instead.",

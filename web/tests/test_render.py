@@ -8931,9 +8931,33 @@ class WebSeoMetaTest(unittest.TestCase):
         for n in data:
             self.assertEqual(n["url"], self.BASE)
         self.assertEqual(data[0]["logo"], f"{self.BASE}/assets/favicon-512.png")
-        # 상세·아카이브엔 JSON-LD 미출력(랜딩 한정).
+        # 아카이브(목록)엔 여전히 JSON-LD 미출력 — 브리프 상세만 [S-05] NewsArticle 을 낸다.
         self.assertNotIn("application/ld+json", self.archive)
-        self.assertNotIn("application/ld+json", self.detail)
+
+    def test_brief_detail_emits_newsarticle_json_ld(self):
+        """[S-05 2026-09-23] 브리프 상세 페이지 NewsArticle — headline/canonical 재사용,
+        publisher·author 는 랜딩과 같은 Organization name·url."""
+        import re as _re
+        for html, pub in ((self.detail, "2026-06-26"), (self.detail22, "2026-06-22")):
+            m = _re.search(r'<script type="application/ld\+json">(.*?)</script>',
+                           html, _re.S)
+            self.assertIsNotNone(m, f"브리프 상세({pub}) NewsArticle JSON-LD 부재")
+            node = json.loads(m.group(1))                    # 유효 JSON
+            self.assertEqual(node["@type"], "NewsArticle")
+            self.assertEqual(node["datePublished"], pub)
+            self.assertEqual(node["dateModified"], pub)
+            self.assertEqual(node["inLanguage"], "ko")
+            self.assertEqual(node["mainEntityOfPage"], f"{self.BASE}/briefs/{pub}/")
+            # headline 은 <title> 과 같은 문자열(새 문구를 짓지 않는다).
+            title_m = _re.search(r"<title>(.*?)</title>", html, _re.S)
+            self.assertIsNotNone(title_m)
+            self.assertEqual(node["headline"], title_m.group(1))
+            self.assertEqual(node["publisher"]["name"], "Global Regulatory Monitor")
+            self.assertEqual(node["publisher"]["url"], self.BASE)
+            self.assertEqual(node["author"]["name"], "Global Regulatory Monitor")
+            self.assertIn("og-image.png", node["image"])
+            # 페이지엔 이 NewsArticle 스크립트 딱 하나뿐이다(중복 없음).
+            self.assertEqual(html.count("application/ld+json"), 1)
 
     def test_brief_description_tldr_or_dateform(self):
         # 06-26(tldr 채움) → tldr[0]; 06-22(빈 tldr) → 날짜 파생 한 줄.
@@ -17771,6 +17795,144 @@ class WebEnBriefFactTableTest(unittest.TestCase):
         ko_by_label = {f["label"]: f["value"] for f in ko_view["facts"]}
         self.assertEqual(ko_by_label["발행일"], "미확인")
         self.assertEqual(ko_view["facts_ko_count"], 0)
+
+
+class WebBriefDocLinkTest(unittest.TestCase):
+    """[브리프→문서 페이지 내부링크 2026-09-23 · S-06] 카드 공식원본 == 문서 evidence_url
+    (정규화 후 정확 일치)일 때만 `doc_href`/`doc_findings` 가 선다. 단위(`_card_view`
+    직접)와 배선(실 렌더) 둘 다 본다 — 단위만 보면 emit() 이 인덱스를 실제로 안 넘겨도
+    통과할 수 있다(과거 유사 결함 — grm_full_authority 계열)."""
+
+    def test_build_doc_evidence_url_index_normalizes_and_is_unique_per_url(self):
+        docs = {"documents": [
+            {"slug": "a1", "evidence_url": "HTTPS://Example.com/Doc/1/",
+             "findings": [{}, {}]},
+            {"slug": "a2", "evidence_url": "  https://example.com/doc/2  ",
+             "findings": [{}]},
+            {"slug": "a3", "evidence_url": "", "findings": [{}]},   # 빈 URL 은 제외
+        ]}
+        idx = render.build_doc_evidence_url_index(docs)
+        self.assertEqual(idx, {
+            "https://example.com/doc/1": ("a1", 2),
+            "https://example.com/doc/2": ("a2", 1),
+        })
+
+    def test_card_view_sets_doc_href_on_match_none_otherwise(self):
+        idx = {"https://example.com/doc/1": ("acme-1", 5)}
+        matched = {"id": "c1", "render_order": 1,
+                   "sources": {"official_url": "https://EXAMPLE.com/doc/1/"}}
+        unmatched = {"id": "c2", "render_order": 2,
+                     "sources": {"official_url": "https://example.com/doc/999"}}
+        mv = render._card_view(matched, doc_url_index=idx)
+        self.assertEqual(mv["doc_href"], "findings/doc/acme-1/")
+        self.assertEqual(mv["doc_findings"], 5)
+        uv = render._card_view(unmatched, doc_url_index=idx)
+        self.assertEqual(uv["doc_href"], "")
+        self.assertEqual(uv["doc_findings"], 0)
+        # 인덱스를 아예 안 넘기면(과거 호출부) 조용히 무링크 — 렌더가 죽지 않는다.
+        nv = render._card_view(matched)
+        self.assertEqual(nv["doc_href"], "")
+
+    def test_english_only_links_when_the_english_doc_page_exists(self):
+        """en_paths 에 없는 문서(원문이 한국어 등)는 영어 카드에서 링크하지 않는다 —
+        없는 페이지로 보내는 링크는 무링크보다 나쁘다는 저장소 규율."""
+        idx = {"https://example.com/doc/en": ("en-doc", 4),
+               "https://example.com/doc/ko-only": ("ko-doc", 3)}
+        en_paths = {"findings/doc/en-doc/"}         # ko-doc 은 영어 트리에 없다
+        en_card = {"id": "c1", "render_order": 1,
+                   "sources": {"official_url": "https://example.com/doc/en"}}
+        ko_only_card = {"id": "c2", "render_order": 2,
+                        "sources": {"official_url": "https://example.com/doc/ko-only"}}
+        en_v = render._card_view(en_card, lang="en", doc_url_index=idx, en_paths=en_paths)
+        self.assertEqual(en_v["doc_href"], "findings/doc/en-doc/")
+        gated_v = render._card_view(ko_only_card, lang="en", doc_url_index=idx,
+                                    en_paths=en_paths)
+        self.assertEqual(gated_v["doc_href"], "",
+                         "영어 문서 페이지가 없는데 영어 카드가 링크했다")
+        # 한국어 트리는 en_paths 와 무관하게 링크한다(ko 는 늘 superset).
+        ko_v = render._card_view(ko_only_card, lang="ko", doc_url_index=idx,
+                                 en_paths=set())
+        self.assertEqual(ko_v["doc_href"], "findings/doc/ko-doc/")
+
+    @staticmethod
+    def _brief(pub="2026-07-27"):
+        # 실 문서(findings_docs.json) evidence_url 을 그대로 쓴다 — fda483-192438(영문·
+        # 8건)·gmpinspect-1Pxznco5TX7(식약처 원문 한국어·5건, 영어 문서 페이지 없음).
+        def _card(cid, order, official_url, headline):
+            return {
+                "id": cid, "render_order": order, "group": "국내",
+                "group_label": "💊 합성의약품", "agency": "FDA", "card_type": "483",
+                "modality": "💊 합성의약품", "type_tag": "483",
+                "evidence_level": "A", "signal_tier": 1, "signal_label": "High",
+                "headline_target": headline,
+                "title_issue": "지적사항 확인",
+                "summary": f"{headline} 요약.",
+                "implication": f"{headline} 시사점.",
+                "key_facts": [f"{headline} 핵심"],
+                "checks": [f"{headline} 점검"],
+                "sources": {"info_url": "https://example.org/info",
+                            "official_url": official_url},
+                "en": {
+                    "title_issue": "Findings confirmed",
+                    "summary": f"{headline} summary.",
+                    "implication": f"{headline} implication.",
+                    "key_facts": [f"{headline} key fact"],
+                    "checks": [f"{headline} check"],
+                },
+            }
+        cards = [
+            _card("c-matched-en", 1, "https://www.fda.gov/media/192438/download",
+                  "Matched EN Doc Co."),
+            _card("c-matched-koonly", 2,
+                  "https://nedrug.mfds.go.kr/cmn/edms/down/1Pxznco5TX7",
+                  "Matched KO-only Doc Co."),
+            _card("c-unmatched", 3, "https://example.org/no-such-document",
+                  "Unmatched Co."),
+        ]
+        meta = {"run_date_kst": pub, "publish_date": pub,
+                "window": f"{pub}~{pub}", "agencies": ["FDA"],
+                "tldr": ["국문 요약 한 줄"], "ai_disclosure": True,
+                "en": {"tldr": ["One-line English summary"]},
+                "coverage": {"rendered": 3, "intake_total": 3,
+                             "evidence": {"A": 3, "B": 0, "C": 0}}}
+        return {"schema": "grm-web-card/v1", "brief": meta, "cards": cards}
+
+    def _build(self):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_doclink_"))
+        data = tmp / "data"
+        data.mkdir(parents=True)
+        brief = self._brief()
+        (data / f"brief_web_{brief['brief']['publish_date']}.json").write_text(
+            json.dumps(brief, ensure_ascii=False), encoding="utf-8")
+        out = tmp / "site"
+        render.render_site(data, out, render_doc_pages=False)
+        return tmp, out
+
+    def test_wired_end_to_end_in_korean_and_english_trees(self):
+        tmp, out = self._build()
+        try:
+            ko = (out / "briefs" / "2026-07-27" / "index.html").read_text(
+                encoding="utf-8")
+            en = (out / "en" / "briefs" / "2026-07-27" / "index.html").read_text(
+                encoding="utf-8")
+            # 한국어 — 매치 2장 모두 링크(문서 언어 무관), 무매치 1장은 링크 없음.
+            # href 는 `rel_root`(이 페이지 깊이의 상대경로) 접두가 붙는다.
+            self.assertIn(
+                '<a class="c-doclink" href="../../findings/doc/fda483-192438/">'
+                "이 문서의 지적 8건 전체 보기", ko)
+            self.assertIn(
+                '<a class="c-doclink" href="../../findings/doc/gmpinspect-1Pxznco5TX7/">'
+                "이 문서의 지적 5건 전체 보기", ko)
+            self.assertEqual(ko.count('<a class="c-doclink"'), 2)
+            # 영어 — 원문이 영어인 문서만 링크(en_paths 게이트). 식약처 문서(원문 한국어)는
+            # 영어 문서 페이지가 없으므로 영어 카드에서도 무링크.
+            self.assertIn(
+                '<a class="c-doclink" href="../../findings/doc/fda483-192438/">'
+                "See all 8 findings in this document", en)
+            self.assertNotIn("gmpinspect-1Pxznco5TX7", en)
+            self.assertEqual(en.count('<a class="c-doclink"'), 1)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
 
 
 class WebEnFirmPageTest(unittest.TestCase):

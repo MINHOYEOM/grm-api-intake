@@ -18426,9 +18426,13 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "gt-case-meta": "위와 같음",
         "gt-quote": "위와 같음",
         "ti-arrow-right": "사례 링크에 딸린 아이콘 — 사례 유무를 따라간다",
+        # [영문 용어 출처 2026-09-23] 기관명을 MFDS 로 바꾼 뒤에도 문서 제목이 한글로
+        # 남는 용어에만 붙는 마커 — 한국어판은 원문이 곧 그 언어라 밝힐 것이 없다.
+        "gt-src-ko": "영어 전용 마커 — 출처에 남은 한국어 원문임을 밝힌다",
     },
     "glossary/": {
         "gl-note": "영어 전용 고지 — 출처·조항 이름이 한국어로 남는 이유를 밝힌다",
+        "gl-src-ko": "위와 같음(카드별 출처 옆 마커) — gt-src-ko 와 동형",
     },
     "findings/": {
         "fnd-langnote": "영어 전용 고지 — 원문 영어만 보고 있다는 것과 해제 방법",
@@ -18488,6 +18492,9 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "fcell": "위와 같음", "fk": "위와 같음", "fv": "위와 같음",
         "ti-file-search": "생략된 블록의 아이콘",
         "ti-file-description": "위와 같음",
+        # [영문 사실표 2026-09-23] 고유명사가 아닌 사실값이 한글로 남은 카드에만 붙는
+        # 고지 — 한국어판은 판정 자체가 없다(facts_ko_count 항상 0).
+        "facts-ko-note": "영어 전용 고지 — 사실표의 한국어 원문 값 개수를 밝힌다",
     },
     "findings/doc": {
         # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은

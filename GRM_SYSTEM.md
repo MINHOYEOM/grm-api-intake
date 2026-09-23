@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.259` |
+| 문서 버전 | `v1.260` |
 | 최종 수정일 | 2026-09-23 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -197,7 +197,7 @@ flowchart TD
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
 | 보조 | **뉴스레터 발송 누락 감시**(발행 PR 머지 뒤 Admin 발송이 빠진 주를 Brevo 캠페인 상태로 탐지 — dispatch_log 는 진실이 아니다) | `grm-newsletter-freshness.yml` | cron 월 20:13 · 화 09:13 KST + dispatch | 없음 |
 | 보조 | **주간 성장 리포트 메일**(지난주 구독자·방문·신청·채널/구역/경로별·검색·회원·뉴스레터 발송 여부 — 공개 저장소라 이슈가 아니라 운영자 메일로) | `grm-growth-weekly.yml` → `web/growth_weekly.py` | cron 월 09:23 KST + dispatch | 없음 |
-| 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt` **+ 영문판 `linkedin_en.*`**, 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0 · 영문은 카드의 `en` 블록에서만 — 한국 업체명은 로마자로 옮기지 않고 건수로만 남긴다) · 게시 본문은 **'이번 주 한 건'**(헤드라인 카드 1건의 사실·시사점·점검 2개, 2026-09-23 마케팅 계획 L-02) 이 기본이고 `--caption summary` 로 종전 요약형을 낸다 · 본문 URL 에만 UTM(`linkedin/social/{date}_weekly`, `web/utm.py`) — 슬라이드 URL 은 깨끗하게 | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
+| 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt` **+ 영문판 `linkedin_en.*`**, 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0 · 영문은 카드의 `en` 블록에서만 — 한국 업체명은 로마자로 옮기지 않고 건수로만 남긴다) · 게시 본문은 **'이번 주 한 건'**(헤드라인 카드 1건의 사실·시사점·점검 2개, 2026-09-23 마케팅 계획 L-02) 이 기본이고 `--caption summary` 로 종전 요약형을 낸다 · 본문 URL 에만 UTM(`linkedin/social/{date}_weekly`, `web/utm.py`) — 슬라이드 URL 은 깨끗하게 · **월간 결산 덱**(`--months auto` — 최신 호의 달과 그 전 달, `/monthly/{YYYY-MM}/linkedin.pdf`, 달마다 헤드라인 1건씩 최대 5 + 카드 유형 숫자 1장) | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
 | 보조 | 관심업체 통지 자동 발송(멱등 로그·상한) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | 없음 |
 | 보조 | 서비스 업데이트 안내 발송(멱등·마일스톤에만) | `grm-announce-send.yml` | **수동 dispatch만**(스케줄 없음 — 의도적) | 없음 |
 | 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST + 발행 머지 직후 | 없음 |
@@ -728,7 +728,7 @@ grm-api-intake/
 ### 6.3 정기 운영 (사람 개입 지점)
 - **매주 월요일:** Admin 콘솔에서 웹 브리프 미리보기 확인 후 **승인 버튼 1클릭**(트랙 A). Findings 번역(트랙 B)은 예약 세션이 자동 처리 — 데스크톱 앱이 열려 있어야 정시 실행(꺼져 있으면 다음 실행 시 처리).
 - **매일 07:17 UTC:** 외부 백필(F2) cron이 `--auto` 로 483→WL 순 1청크씩 자동 소진(사람 개입 없음, 완료 시 자가 종료 후 신규 문서 안전망으로 전환).
-- **매주 월요일(선택, 2분):** 라이브 반영 후 `/briefs/{date}/linkedin.pdf`+`linkedin.txt`(국문)와 `linkedin_en.pdf`+`linkedin_en.txt`(영문)를 받아 **같은 날 두 편**으로 게시한다(첨부·붙여넣기·버튼은 사람). 소개 카드는 `tmp/cardnews_2026-09-07/`(로컬 빌더) 참조.
+- **매주 월요일(선택, 2분):** 라이브 반영 후 `/briefs/{date}/linkedin.pdf`+`linkedin.txt`(국문)와 `linkedin_en.pdf`+`linkedin_en.txt`(영문)를 받아 **같은 날 두 편**으로 게시한다(첨부·붙여넣기·버튼은 사람). 소개 카드는 `tmp/cardnews_2026-09-07/`(로컬 빌더) 참조. 매달 첫 게시는 `/monthly/{YYYY-MM}/linkedin.pdf`(월간 결산 덱)도 같은 방식으로 함께 받아 올린다.
 - **가끔:** health 경고 Issue 확인, Secrets 로테이션.
 
 ### 6.4 FIND-1 전략 로드맵 대비 현황 (공모전 목표)

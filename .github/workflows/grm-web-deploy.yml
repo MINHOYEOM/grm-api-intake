@@ -110,11 +110,22 @@ jobs:
       #   (share.txt 와 같은 관례로 sitemap 비등록). 영문은 카드 JSON 의 `en` 블록이 있어야 나온다 —
       #   없으면 그 언어만 경고 후 건너뛴다. 운영: 배포 후 두 벌을 받아 같은 날 두 편으로 게시(사람).
       #   Chrome 이 없거나 렌더가 실패해도 txt 는 남고 배포는 진행한다 — render.py 와 파일이 달라
-      #   골든·결정론에 영향 0(Chrome 은 이 스텝만 쓴다).
+      #   골든·결정론에 영향 0(Chrome 은 이 스텝만 쓴다). 월간 결산 덱은 바로 아래 별도 스텝.
       - name: LinkedIn cards (non-blocking)
         continue-on-error: true
         timeout-minutes: 5
         run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist
+
+      # ── C2c: 링크드인 월간 결산 덱([마케팅 2026-09-23 L-06]) — 비차단. ──────────────────
+      #   같은 스크립트를 `--months auto` 로 다시 불러 **최신 호가 속한 달 + 그 전 달** 두 편을
+      #   낸다(둘 다 데이터에서 결정론 파생 — 지난달 회고가 이번 달 초까지 계속 재생성된다) →
+      #   web/dist/monthly/{YYYY-MM}/linkedin.pdf·linkedin.txt + linkedin_en.*. 위 주간 스텝과
+      #   **별도 스텝**으로 두어 이 스텝이 실패해도(continue-on-error) 주간 카드뉴스 스텝의
+      #   성패에 영향을 주지 않는다(한 run: 블록에 몰아넣지 않는다). 운영은 위와 동일(사람 게시).
+      - name: LinkedIn cards — monthly recap (non-blocking)
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist --months auto
 
       # 미리보기 산출물(시크릿 미등록·호스트 미연결 시에도 D5 육안검토 가능).
       - name: Upload dist artifact (preview)

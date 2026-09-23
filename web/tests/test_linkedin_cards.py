@@ -39,6 +39,14 @@ def _synthetic(cards: list[dict], tldr: list[str] | None = None) -> dict:
             "cards": cards}
 
 
+def _month_brief(pub: str, cards: list[dict]) -> dict:
+    """[마케팅 2026-09-23 L-06] `_synthetic` 의 발행일 가변판 — 월간 덱은 발행일이 다른
+    여러 호를 한 번에 넘겨야 하는데 `_synthetic` 은 발행일이 고정이다."""
+    return {"schema_version": "grm-web-card/v1",
+            "brief": {"publish_date": pub, "window": f"{pub} ~ {pub}", "agencies": ["FDA"], "tldr": []},
+            "cards": cards}
+
+
 def _card(i: int, **over) -> dict:
     base = {"id": f"c{i}", "render_order": i, "group": "글로벌", "agency": "FDA", "category": "Other",
             "signal_tier": 2, "headline_target": f"Firm {i} Inc.", "title_issue": "무균구역 구획 미흡",
@@ -820,6 +828,252 @@ class WrapWidthBalanceTest(unittest.TestCase):
         만들 수는 없다(문장을 지어내거나 글자를 버리지 않는다)."""
         t = "a" * 80
         self.assertEqual(lc.wrap_width(t, 26.0), [t])
+
+
+class MonthItemSelectionTest(unittest.TestCase):
+    """[마케팅 2026-09-23 L-06] `pick_month_items` — 합성 데이터로 규칙 자체를 시험한다
+    (호마다 첫 헤드라인 → 모자라면 최신 호부터 다음 헤드라인으로 라운드로빈 → 중복은
+    id 나 제목 어느 한쪽만 같아도 스킵). 실데이터 대조는 아래 BuildMonthDeckRealDataTest."""
+
+    def test_one_per_brief_then_round_robin_fill_from_newest(self):
+        # 호 셋, 호마다 카드 둘(신호도差로 어느 쪽이 '첫 헤드라인'인지 결정론 고정).
+        briefs = [
+            _month_brief("2026-05-04", [_card(1, title_issue="A1", signal_tier=3, render_order=1),
+                                        _card(2, title_issue="A2", signal_tier=1, render_order=2)]),
+            _month_brief("2026-05-11", [_card(3, title_issue="B1", signal_tier=3, render_order=1),
+                                        _card(4, title_issue="B2", signal_tier=1, render_order=2)]),
+            _month_brief("2026-05-18", [_card(5, title_issue="C1", signal_tier=3, render_order=1),
+                                        _card(6, title_issue="C2", signal_tier=1, render_order=2)]),
+        ]
+        items = lc.pick_month_items(briefs, "ko", 5)
+        got = [(c["title_issue"], pub, rank) for c, pub, rank in items]
+        # 1차: 호마다 첫 헤드라인(A1·B1·C1). 2차: 5장 채우려 **최신 호부터** 두 번째 헤드라인을
+        # 한 바퀴(C2 다음 B2) — A2 는 이미 5장을 채워 차례가 오지 않는다.
+        self.assertEqual(got, [
+            ("A1", "2026-05-04", 0),
+            ("B1", "2026-05-11", 0), ("B2", "2026-05-11", 1),
+            ("C1", "2026-05-18", 0), ("C2", "2026-05-18", 1),
+        ])
+        self.assertNotIn("A2", [t for t, _, _ in got], "5장이 다 찼는데 더 채웠다")
+
+    def test_no_duplicates_when_fewer_briefs_than_the_limit(self):
+        briefs = [_month_brief("2026-05-04", [_card(1, signal_tier=3, render_order=1)])]
+        items = lc.pick_month_items(briefs, "ko", 5)
+        self.assertEqual(len(items), 1, "카드가 하나뿐인데 지어내 채우면 안 된다")
+
+    def test_duplicate_skipped_by_id_or_by_title_either_one(self):
+        briefs = [
+            _month_brief("2026-05-04", [_card(1, id="dup-id", title_issue="같은 제목", signal_tier=3, render_order=1),
+                                        _card(2, id="a2", title_issue="원본B", signal_tier=1, render_order=2)]),
+            _month_brief("2026-05-11", [_card(3, id="dup-id", title_issue="다른 제목", signal_tier=3, render_order=1),
+                                        _card(4, id="b4", title_issue="같은 제목", signal_tier=1, render_order=2)]),
+        ]
+        items = lc.pick_month_items(briefs, "ko", 5)
+        ids = [c["id"] for c, _, _ in items]
+        titles = [c["title_issue"] for c, _, _ in items]
+        self.assertEqual(ids.count("dup-id"), 1, "같은 id 가 두 번 실렸다(2호의 dup-id 는 id 로 걸러야 한다)")
+        self.assertEqual(titles.count("같은 제목"), 1, "같은 제목이 두 번 실렸다(2호의 b4 는 제목으로 걸러야 한다)")
+        self.assertNotIn("b4", ids, "제목이 겹치는데도 실렸다")
+
+    def test_english_drops_cards_without_en_block(self):
+        en_card = _card(1, title_issue="영문 있음", signal_tier=3, render_order=1,
+                        en={"title_issue": "EN title", "summary": "EN summary",
+                            "key_facts": ["Fact: x"], "implication": "EN impl.", "checks": ["EN check"]})
+        ko_only = _card(2, title_issue="영문 없음", signal_tier=1, render_order=2)   # en 블록 없음
+        briefs = [_month_brief("2026-05-04", [en_card, ko_only])]
+        items_en = lc.pick_month_items(briefs, "en", 5)
+        self.assertEqual(len(items_en), 1)
+        self.assertEqual(items_en[0][0]["id"], "c1")
+        items_ko = lc.pick_month_items(briefs, "ko", 5)
+        self.assertEqual(len(items_ko), 2, "국문은 en 블록 유무와 무관하게 둘 다 실려야 한다")
+
+
+class BuildMonthDeckRealDataTest(unittest.TestCase):
+    """[마케팅 2026-09-23 L-06] 실제 발행본 전체로 월간 덱을 짓는다 — 값이 아니라 성질로
+    단언한다(브리프가 늘어도 안 낡게). 픽스처는 `web/data/briefs/*.json` 전체."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.all_briefs = [json.loads(p.read_text(encoding="utf-8"))
+                          for p in sorted((WEB_DIR / "data" / "briefs").glob("brief_web_*.json"))]
+        cls.glossary = json.loads(GLOSSARY.read_text(encoding="utf-8"))
+        counts: dict[str, int] = {}
+        for b in cls.all_briefs:
+            pub = str(b.get("brief", {}).get("publish_date") or "")
+            if pub:
+                counts[pub[:7]] = counts.get(pub[:7], 0) + 1
+        # 발행본이 2건 이상인 달을 고른다 — 라운드로빈 채움·필터링을 실측으로 보려면
+        # 한 호짜리 달로는 아무것도 증명 못 한다.
+        cls.month = max(counts, key=lambda mo: counts[mo])
+        cls.issues_in_month = counts[cls.month]
+        cls.deck = lc.build_month_deck(cls.all_briefs, cls.glossary, cls.month)
+
+    def _month_briefs(self) -> list[dict]:
+        return [b for b in self.all_briefs
+                if str(b.get("brief", {}).get("publish_date") or "").startswith(self.month + "-")]
+
+    def test_month_filtering_by_publish_date_prefix(self):
+        expected_cards = sum(len(b.get("cards") or []) for b in self._month_briefs())
+        other_month_cards = sum(len(b.get("cards") or []) for b in self.all_briefs) - expected_cards
+        self.assertGreater(other_month_cards, 0, "픽스처에 다른 달 데이터가 없어 필터링을 실측 못 한다")
+        closing = next(s for s in self.deck["slides"] if s["kind"] == "closing")
+        self.assertIn(str(expected_cards), closing["h1"][0],
+                     "마무리 장의 총 건수가 그 달 카드 수와 다르다 — 달 밖 카드가 샜다")
+
+    def test_slide_count_equals_items_plus_three(self):
+        n_items = sum(1 for s in self.deck["slides"] if s["kind"] == "headline")
+        self.assertGreater(n_items, 0)
+        self.assertLessEqual(n_items, 5)
+        self.assertEqual(len(self.deck["slides"]), n_items + 3)
+        self.assertEqual(self.deck["slides"][0]["kind"], "cover")
+        self.assertEqual(self.deck["slides"][-2]["kind"], "numbers")
+        self.assertEqual(self.deck["slides"][-1]["kind"], "closing")
+
+    def test_cover_and_number_slide_texts(self):
+        cover = self.deck["slides"][0]
+        n_items = sum(1 for s in self.deck["slides"] if s["kind"] == "headline")
+        m = int(self.month.split("-")[1])
+        self.assertEqual(cover["eyebrow"], "월간 규제 결산")
+        self.assertIn(f"{m}월", "".join(cover["h1"]))
+        self.assertIn(str(n_items), "".join(cover["h1"]))
+        self.assertFalse(cover["tiles"], "월간 표지는 통계 타일을 두지 않는다 — 숫자 장과 중복")
+        self.assertIn(f"{self.issues_in_month}호", cover["sub"])
+        numbers = next(s for s in self.deck["slides"] if s["kind"] == "numbers")
+        self.assertGreater(len(numbers["bars"]), 0)
+        self.assertLessEqual(len(numbers["bars"]), 4, "상위 4개까지만")
+        counts = [c for _, c in numbers["bars"]]
+        self.assertEqual(counts, sorted(counts, reverse=True), "많은 순이 아니다")
+        self.assertIn(f"{m}월", numbers["cap"])
+
+    def test_caption_lines_fit_mobile_width_and_utm(self):
+        lines = self.deck["caption"].splitlines()
+        for ln in lines:
+            if ln.startswith("http") or ln.startswith("#"):
+                continue
+            self.assertLessEqual(lc.text_width(ln), 26.0, ln)
+        self.assertIn(self.deck["caption_url"], lines)
+        self.assertIn(f"utm_campaign=monthly_{self.month}", self.deck["caption_url"])
+        self.assertIn("utm_source=linkedin&utm_medium=social", self.deck["caption_url"])
+        self.assertTrue([ln for ln in lines if ln][-1].startswith("#"))
+
+    def test_deterministic(self):
+        again = lc.build_month_deck(self.all_briefs, self.glossary, self.month)
+        self.assertEqual(json.dumps(again, ensure_ascii=False, sort_keys=True),
+                         json.dumps(self.deck, ensure_ascii=False, sort_keys=True))
+        self.assertEqual(lc.render_html(again), lc.render_html(self.deck))
+
+    def test_unknown_month_format_is_refused_loudly(self):
+        with self.assertRaises(ValueError):
+            lc.build_month_deck(self.all_briefs, self.glossary, "2026-9")
+
+    def test_empty_month_is_refused_loudly(self):
+        with self.assertRaises(ValueError):
+            lc.build_month_deck(self.all_briefs, self.glossary, "1999-01")
+
+    def test_unknown_language_is_refused_loudly(self):
+        with self.assertRaises(ValueError):
+            lc.build_month_deck(self.all_briefs, self.glossary, self.month, lang="fr")
+
+
+class MonthlyDeckEnglishTest(unittest.TestCase):
+    """[마케팅 2026-09-23 L-06] 영문 월간 덱 — 화면에 나가는 글자에 한글이 한 조각도
+    없어야 한다(카드 유형 집계처럼 원문이 한글뿐인 값은 그 항목만 빠진다)."""
+
+    HANGUL = re.compile(r"[가-힣]")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.all_briefs = [json.loads(p.read_text(encoding="utf-8"))
+                          for p in sorted((WEB_DIR / "data" / "briefs").glob("brief_web_*.json"))]
+        cls.glossary = json.loads(GLOSSARY.read_text(encoding="utf-8"))
+        counts: dict[str, int] = {}
+        for b in cls.all_briefs:
+            pub = str(b.get("brief", {}).get("publish_date") or "")
+            if pub:
+                counts[pub[:7]] = counts.get(pub[:7], 0) + 1
+        cls.month = max(counts, key=lambda mo: counts[mo])
+        cls.deck = lc.build_month_deck(cls.all_briefs, cls.glossary, cls.month, lang="en")
+
+    def test_no_hangul_anywhere_on_screen(self):
+        shipped = lc.render_html(self.deck) + self.deck["caption"] + self.deck["doc_title"]
+        found = self.HANGUL.findall(shipped)
+        self.assertEqual(found, [], f"영문 월간 덱에 한글 {found[:10]}")
+
+    def test_card_type_bars_never_carry_hangul(self):
+        numbers = next(s for s in self.deck["slides"] if s["kind"] == "numbers")
+        for label, _ in numbers["bars"]:
+            self.assertEqual(self.HANGUL.findall(label), [], label)
+
+    def test_url_uses_english_archive_when_it_exists(self):
+        # 이 저장소의 실측 데이터는 영문으로 낼 수 있는 호가 있으므로 `/en/archive/` 가 있어야 한다.
+        self.assertTrue(any(lc.render.brief_has_english(b) for b in self.all_briefs),
+                        "픽스처에 영문 브리프가 없다 — 이 시험의 전제가 낡았다")
+        self.assertEqual(self.deck["url"], "https://grm-solutions.com/en/archive/")
+        self.assertIn("https://grm-solutions.com/en/archive/", self.deck["caption_url"])
+
+
+class MonthlyCliTest(unittest.TestCase):
+    """[마케팅 2026-09-23 L-06] CLI `--month`/`--months auto`."""
+
+    def test_months_auto_produces_latest_and_previous_month(self):
+        all_briefs = [json.loads(p.read_text(encoding="utf-8"))
+                     for p in sorted((WEB_DIR / "data" / "briefs").glob("brief_web_*.json"))]
+        pubs = sorted(str(b.get("brief", {}).get("publish_date") or "") for b in all_briefs)
+        pubs = [p for p in pubs if p]
+        latest_y, latest_m = int(pubs[-1][:4]), int(pubs[-1][5:7])
+        cur = f"{latest_y:04d}-{latest_m:02d}"
+        py, pm = (latest_y, latest_m - 1) if latest_m > 1 else (latest_y - 1, 12)
+        prev = f"{py:04d}-{pm:02d}"
+        self.assertEqual(lc.auto_months(all_briefs), [prev, cur])
+        # 실데이터 전제(2026-09-23 기준: 9월·8월 둘 다 발행본이 있다) — 낡으면 이 assert 가 먼저 죽는다.
+        self.assertIn("2026-09", [prev, cur])
+        self.assertIn("2026-08", [prev, cur])
+
+    def test_cli_months_auto_writes_two_months_two_languages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "dist"
+            buf, err = io.StringIO(), io.StringIO()
+            with redirect_stdout(buf), redirect_stderr(err):
+                rc = lc.main(["--data", str(BRIEF.parent), "--glossary", str(GLOSSARY),
+                              "--out", str(out), "--no-pdf", "--months", "auto"])
+            self.assertEqual(rc, 0)
+            months = [p.name for p in (out / "monthly").iterdir()]
+            self.assertEqual(len(months), 2, months)
+            for month in months:
+                self.assertTrue((out / "monthly" / month / "linkedin.txt").exists())
+                self.assertTrue((out / "monthly" / month / "linkedin_en.txt").exists())
+            self.assertFalse((out / "briefs").exists(), "주간 브리프 경로가 생기면 안 된다(월간 전용 실행)")
+
+    def test_cli_explicit_month_writes_only_that_month(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "dist"
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                rc = lc.main(["--data", str(BRIEF.parent), "--glossary", str(GLOSSARY),
+                              "--out", str(out), "--no-pdf", "--month", "2026-09", "--lang", "ko"])
+            self.assertEqual(rc, 0)
+            self.assertTrue((out / "monthly" / "2026-09" / "linkedin.txt").exists())
+            self.assertFalse((out / "monthly" / "2026-09" / "linkedin_en.txt").exists())
+
+    def test_cli_month_with_no_data_is_a_clean_skip(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "dist"
+            err = io.StringIO()
+            with redirect_stdout(io.StringIO()), redirect_stderr(err):
+                rc = lc.main(["--data", str(BRIEF.parent), "--glossary", str(GLOSSARY),
+                              "--out", str(out), "--no-pdf", "--month", "1999-01"])
+            self.assertEqual(rc, 0)
+            self.assertIn("::warning::1999-01 건너뜀", err.getvalue())
+            self.assertFalse(out.exists())
+
+    def test_weekly_behaviour_unchanged_when_neither_flag_given(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = pathlib.Path(tmp) / "dist"
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                rc = lc.main(["--data", str(BRIEF.parent), "--brief", str(BRIEF), "--glossary", str(GLOSSARY),
+                              "--out", str(out), "--no-pdf"])
+            self.assertEqual(rc, 0)
+            self.assertTrue((out / "briefs" / "2026-09-07" / "linkedin.txt").exists())
+            self.assertFalse((out / "monthly").exists())
 
 
 if __name__ == "__main__":

@@ -1,25 +1,25 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-09-20",
+  "generated_on": "2026-09-23",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 101,
-      "candidate_count": 102,
+      "baseline_count": 102,
+      "candidate_count": 103,
       "new_count": 1,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0011-15953"
+        "data0011-15955"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 44,
-      "derived_items": 29,
+      "collector_items": 45,
+      "derived_items": 30,
       "dropped_items": 15,
       "collector_error": null,
       "change_count": 1,
-      "change_percent": 0.99
+      "change_percent": 0.98
     },
     "ich": {
       "baseline_count": 31,
@@ -135,19 +135,24 @@
     },
     "pics": {
       "baseline_count": 47,
-      "candidate_count": 47,
-      "new_count": 0,
+      "candidate_count": 51,
+      "new_count": 4,
       "changed_count": 0,
       "removed_count": 0,
-      "new_ids": [],
+      "new_ids": [
+        "pics-pe-009-18-annexes",
+        "pics-pe-009-18-intro",
+        "pics-pe-009-18-part-i",
+        "pics-pe-009-18-part-ii"
+      ],
       "changed_ids": [],
       "removed_ids": [],
       "collector_items": 47,
       "derived_items": 47,
       "dropped_items": 0,
       "collector_error": null,
-      "change_count": 0,
-      "change_percent": 0.0
+      "change_count": 4,
+      "change_percent": 8.51
     },
     "pmda": {
       "baseline_count": 15,

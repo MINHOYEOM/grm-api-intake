@@ -409,6 +409,38 @@
       "doc_type": "Guidance",
       "published_date": "2026-10-01",
       "official_url": "https://picscheme.org/docview/11277"
+    },
+    {
+      "id": "pics-pe-009-18-part-ii",
+      "code": "PE 009-18 (Part II)",
+      "title_en": "PIC/S GMP Guide (PE 009-18) Part II",
+      "doc_type": "GMP Guide",
+      "published_date": "2026-09-23",
+      "official_url": "https://picscheme.org/docview/11334"
+    },
+    {
+      "id": "pics-pe-009-18-part-i",
+      "code": "PE 009-18 (Part I)",
+      "title_en": "PIC/S GMP Guide (PE 009-18) Part I",
+      "doc_type": "GMP Guide",
+      "published_date": "2026-09-23",
+      "official_url": "https://picscheme.org/docview/11332"
+    },
+    {
+      "id": "pics-pe-009-18-intro",
+      "code": "PE 009-18 (Intro)",
+      "title_en": "PIC/S GMP Guide (PE 009-18) Introduction",
+      "doc_type": "GMP Guide",
+      "published_date": "2026-09-23",
+      "official_url": "https://picscheme.org/docview/11331"
+    },
+    {
+      "id": "pics-pe-009-18-annexes",
+      "code": "PE 009-18 (Annexes)",
+      "title_en": "PIC/S GMP Guide (PE 009-18) Annexes",
+      "doc_type": "GMP Guide",
+      "published_date": "2026-09-23",
+      "official_url": "https://picscheme.org/docview/11333"
     }
   ]
 }

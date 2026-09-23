@@ -8435,6 +8435,28 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn("slice(0,4)", sub_fn)
         # index.html 은 디렉터리로 접는다 — 같은 페이지가 두 줄로 갈리면 판독이 쪼개진다.
         self.assertIn("index", sub_fn)
+        # [087] 유입 축 — 경로/구역 위에 first touch(utm·리퍼러·착지 구역) 한 줄 더.
+        # 076/084 와 같은 이유로 제출 두 키 안에서만 나가야 한다(구역 bump 와 같은
+        # if 블록 안에 있는지 위치로 본다).
+        self.assertIn("rpc/funnel_touch_bump", fscript)
+        self.assertIn("rpc/funnel_touch_bump", submit_only.split("var band=", 1)[0],
+                      "유입 축 bump 가 제출 조건 블록 밖에 있다 — 노출에서도 나간다")
+        self.assertIn(
+            "JSON.stringify({p_key:key,p_source:t.s,p_medium:t.m,p_campaign:t.c,"
+            "p_ref_host:t.r,p_landing_zone:t.z})", fscript)
+        # first touch 캡처는 subPath()/zone() 보다 앞에 있어야 위 두 슬라이스(zone_fn·
+        # sub_fn)가 이 코드를 걸러낸다는 전제가 성립한다 — touchCapture() 는 URLSearchParams
+        # 로 쿼리를 읽으므로(location.search 사용) 저 슬라이스 안에 있으면 안 된다.
+        self.assertIn("function touchCapture()", fscript)
+        touch_fn = fscript.split("function touchCapture()", 1)[1].split("function touchRead()", 1)[0]
+        self.assertIn("localStorage", touch_fn)
+        self.assertIn("utm_source", touch_fn)
+        self.assertIn("document.referrer", touch_fn)
+        # ★무PII — 쿼리는 URLSearchParams 로 읽어 형식 제약(regex)으로 접을 뿐, 원문
+        # 전체(location.href)는 절대 참조하지 않는다.
+        self.assertNotIn("location.href", touch_fn)
+        self.assertIn("'grm-touch'", fscript, "first touch 저장 키가 없다")
+        self.assertIn("7*864e5", fscript, "7일 TTL 이 없다 — 세션 단위면 직접 유입에 섞인다")
 
 
 class WebHeadersFileTest(unittest.TestCase):
@@ -15843,6 +15865,13 @@ class WebProfileInterpretationTest(unittest.TestCase):
             self.assertNotIn(word, self.insp, word)
 
 
+# 087 유입 축 마이그레이션 파일명 — 내용으로 부르는 상수. 처음 착수 때 086 으로 붙였다가
+# 다른 PR(#1066 findings_search_cache)이 같은 번호를 먼저 merge 해 087 로 재배번했다.
+# 테스트 메서드명·변수명에 번호를 그대로 박으면 이런 충돌마다 이름까지 함께 갈아야 하므로,
+# 파일명은 이 상수 하나에서만 참조한다(관례: 이후 신설 마이그도 이 꼴을 따른다).
+MIG_TOUCH = "087_funnel_touch_counts.sql"
+
+
 class WebAdminGrowthPanelTest(unittest.TestCase):
     """/admin 성장·유입 패널 + 깔때기 일별 스냅샷(071) 계약.
 
@@ -15866,6 +15895,7 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
                       "076_funnel_zone_counts.sql").read_text(encoding="utf-8")
         cls.mig084 = (WEB_DIR / "migrations" /
                       "084_funnel_path_counts.sql").read_text(encoding="utf-8")
+        cls.mig_touch = (WEB_DIR / "migrations" / MIG_TOUCH).read_text(encoding="utf-8")
 
     def _check_keys(self, sql):
         m = re.search(r"key in \(([^)]*)\)", sql)
@@ -15962,6 +15992,51 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         # 소급 불가를 읽는 쪽이 알 수 있어야 한다 — 0 건이 "유입 없음"이 아니라 "관측
         # 시작 전"일 수 있다(배선 이전 제출은 이 표에 영영 없다).
         self.assertIn("first_kst", self.mig084)
+
+    def test_touch_axis_answers_which_channel_the_subscribe_came_from(self):
+        """★2026-09-23 실측: 21일 표본에서 방문 리퍼러의 46%가 '직접'이었는데, 그중 상당수가
+        앱 내장 브라우저(링크드인 등)가 리퍼러를 안 보내 섞인 것이다(같은 기간 링크드인
+        리퍼러 직접 측정은 4회뿐 — 실제 유입은 더 많다는 뜻). 084 가 "어느 페이지에서"에
+        답했다면, 087 은 "어느 채널에서"에 답한다 — 우리가 링크드인에 뿌린 링크로 온
+        구독이 몇 건인지 076/084 로는 알 수 없었다.
+
+        ★키가 제출 두 개뿐인 이유는 084 와 같다 — 노출까지 실으면 utm·리퍼러·구역의 곱만큼
+        차원이 커져 표가 못 읽힌다. 그래서 이 표도
+        test_funnel_vocabulary_synced_three_ways(060/071/076 의 5키 어휘 대조)에 끼우지
+        않는다 — 그 대조는 일부러 넓은 어휘고, 087 은 일부러 좁은 어휘라 함께 대조하면
+        정상 설계가 실패로 잡힌다.
+        """
+        self.assertEqual(self._check_keys(self.mig_touch), {"band_submit", "cta_submit"},
+                         "087 은 제출 두 키만 받아야 한다")
+        for frag in (
+            "source ~ '^[a-z0-9._-]{1,40}$'",
+            "medium ~ '^[a-z0-9._-]{1,40}$'",
+            "campaign ~ '^[a-z0-9._-]{1,60}$'",
+            "ref_host ~ '^[a-z0-9.-]{1,80}$'",
+            "landing_zone ~ '^[a-z0-9-]{1,24}$'",
+        ):
+            self.assertIn(frag, self.mig_touch, f"형식 제약 누락 — anon RPC 가 열린 문자열을 받는다: {frag}")
+        self.assertIn("cap constant integer", self.mig_touch,
+                      "행 수 상한이 없다 — 쓰레기 조합을 무한히 만들 수 있다")
+        self.assertIn("grant select on public.funnel_touch_counts to authenticated", self.mig_touch)
+        self.assertNotIn("grant insert", self.mig_touch)
+        self.assertIn(
+            "grant execute on function public.funnel_touch_bump"
+            "(text, text, text, text, text, text) to anon, authenticated", self.mig_touch)
+        # 판독 함수 둘 다 로그인만 — 성장 탭·성장 일보가 서비스 키/세션으로 읽는다.
+        self.assertIn("grant execute on function public.funnel_touch_report() to authenticated",
+                      self.mig_touch)
+        self.assertIn("grant execute on function public.funnel_zone_report() to authenticated",
+                      self.mig_touch)
+        # 화면은 읽기만 한다 — insert/upsert/delete 가 있으면 계약 위반.
+        self.assertIn('rpc("funnel_touch_report")', self.admin_js)
+        self.assertIn('rpc("funnel_zone_report")', self.admin_js)
+        for banned in ('from("funnel_touch_counts").insert',
+                       'from("funnel_touch_counts").upsert',
+                       'from("funnel_touch_counts").delete'):
+            self.assertNotIn(banned, self.admin_js)
+        self.assertIn('id="grm-funnel-touch"', self.admin_html)
+        self.assertIn('id="grm-funnel-zone-rate"', self.admin_html)
 
     def test_snapshot_write_path_is_cron_only(self):
         self.assertIn("enable row level security", self.mig071)

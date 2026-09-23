@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  issues: write        # 낙차 감지 알림 이슈 생성/갱신/종료
 
 concurrency:
   group: grm-reconciliation-${{ github.run_id }}
@@ -39,10 +40,124 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
+      # ★reconciliation_audit.py 는 의도적으로 비차단이다(도크스트링 참조) — 이상 낙차나
+      # evidence_url 오염이 있어도 항상 exit 0 이고, `::warning::`/"⚠️" 로만 표면화한다.
+      # 그래서 exit 코드로는 "낙차가 있었는지" 를 알 수 없다. continue-on-error 는 이
+      # 스텝을 **스크립트 자체가 죽었을 때**(미처리 예외 등 이례적 크래시)만 실패로 남기기
+      # 위함이고, 낙차 판정은 바로 다음 스텝에서 출력 텍스트의 "⚠️" 마커로 한다.
       - name: 주간 reconciliation 실행(비차단)
+        id: reconcile
+        continue-on-error: true
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
-          python reconciliation_audit.py | tee "$GITHUB_STEP_SUMMARY"
+          python reconciliation_audit.py | tee reconciliation_report.txt | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # exit 코드가 항상 0 이므로 리포트 본문에서 판정한다("⚠️" 는 이상 낙차·오염 두
+      # 갈래 모두에서 스크립트가 실제로 찍는 마커 — reconciliation_audit.py 참조).
+      - name: Detect breach from report text
+        id: breach
+        if: always()
+        run: |
+          if [ -f reconciliation_report.txt ] && grep -q '⚠️' reconciliation_report.txt; then
+            echo "낙차/오염 마커 발견"
+            echo "detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "마커 없음"
+            echo "detected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update reconciliation issue
+        if: steps.reconcile.outcome == 'failure' || steps.breach.outputs.detected == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          RECONCILE_OUTCOME: ${{ steps.reconcile.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const title = '[reconciliation] 원천 대비 수집량 낙차가 감지됐습니다';
+            const label = 'reconciliation';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const crashed = process.env.RECONCILE_OUTCOME === 'failure';
+
+            let report = '(reconciliation_report.txt 를 읽지 못함 — Actions 로그 참조)';
+            try { report = fs.readFileSync('reconciliation_report.txt', 'utf8'); } catch (e) { /* keep default */ }
+            const excerpt = report.length > 4000 ? report.slice(0, 4000) + '\n...(생략 — 전문은 Actions 로그/스텝 요약 참조)' : report;
+
+            const lines = [];
+            if (crashed) {
+              lines.push('reconciliation_audit.py 실행 자체가 실패했습니다(미처리 예외 등 이례적 크래시 — 원래 이 스크립트는 비차단이라 이 자체가 이상 신호입니다).');
+            } else {
+              lines.push('원천(raw_signals) 대비 이번 주 수집량 낙차 또는 evidence_url 오염이 감지됐습니다.');
+            }
+            lines.push('');
+            lines.push('**왜 이 알림이 중요한가**: 소스별 주간 수집량이 원천 대비 비정상 낙차(무음 실패·피드 파손·IP 차단)를 보여도 발행 파이프라인은 막지 않는다 — 감사에서 MHRA 회수 전건 누락이 이렇게 조용히 방치됐던 게 이 잡의 존재 이유다.');
+            lines.push('');
+            lines.push(`실행: ${runUrl}`);
+            lines.push('');
+            lines.push('```');
+            lines.push(excerpt);
+            lines.push('```');
+            lines.push('');
+            lines.push('_정상 범위로 복귀하면 자동으로 닫힙니다._');
+            const body = lines.join('\n');
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '원천 대비 수집량 낙차 감지');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 감지됐습니다 — 실행 ${context.runId}`,
+              });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      # ★복귀 종료는 스크립트가 실제로 정상 실행됐고(outcome success) 마커도 없을 때만.
+      # 크래시(outcome failure)를 success 로 오독해 알람을 스스로 끄는 사고를 막는다.
+      - name: Close reconciliation issue on recovery
+        if: steps.reconcile.outcome == 'success' && steps.breach.outputs.detected == 'false'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[reconciliation] 원천 대비 수집량 낙차가 감지됐습니다';
+            const label = 'reconciliation';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `낙차/오염이 정상 범위로 복귀해 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }

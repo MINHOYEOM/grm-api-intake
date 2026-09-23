@@ -9,7 +9,8 @@ on:
     - cron: "0 6 * * 1,3,5"   # 월·수·금 06:00 UTC — 최대 간격 3일(<7일), 1회 실패해도 여유
   workflow_dispatch: {}
 
-permissions: {}
+permissions:
+  issues: write    # 실패 시 알림 이슈 생성/갱신, 복구 시 종료 — 그 외 권한 없음
 
 concurrency:
   group: supabase-keepalive
@@ -20,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase (heart_counts read)
+        id: ping
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
@@ -40,3 +42,80 @@ jobs:
             exit 1
           fi
           echo "keep-alive OK — pause 타이머 리셋"
+
+      # 이 워크플로는 continue-on-error 를 쓰지 않는다 — ping 이 실패하면 잡 자체가
+      # 오늘처럼 그대로 red 로 남아야 한다(1차 가시성). 이슈는 2차 가시성일 뿐이다.
+      - name: Open or update keepalive issue
+        if: failure()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[keepalive] Supabase keep-alive 요청이 실패했습니다';
+            const label = 'keepalive';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              'Supabase keep-alive 핑(`grm-supabase-keepalive.yml`)이 연결 실패(000)로 종료했습니다.',
+              '',
+              '**왜 이 알림이 중요한가**: Supabase 무료 프로젝트는 7일간 API 요청이 없으면 ' +
+                '자동 일시정지되는데(데이터는 보존되고 요청 시 재개), 이 워크플로가 그 ' +
+                '일시정지를 막는 유일한 장치입니다.',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '월·수·금 3일 간격(<7일)이라 1회 실패는 여유가 있지만, 연속 실패가 이어지면 ' +
+                '7일 안에 프로젝트가 일시정지됩니다.',
+              '',
+              '_다음 실행이 성공하면 자동으로 닫힙니다._',
+            ].join('\n');
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', 'Supabase keep-alive 요청 실패');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 실패했습니다 — 실행 ${context.runId}`,
+              });
+              core.notice(`기존 이슈 #${existing.number} 에 댓글`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close keepalive issue on recovery
+        if: success()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[keepalive] Supabase keep-alive 요청이 실패했습니다';
+            const label = 'keepalive';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `keep-alive 가 정상 복귀해 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }

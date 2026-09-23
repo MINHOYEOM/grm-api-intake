@@ -45,6 +45,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -58,6 +59,12 @@ SITE_BASE_URL = "https://grm-solutions.com"
 if str(WEB_DIR) not in sys.path:
     sys.path.insert(0, str(WEB_DIR))
 from utm import LINKEDIN_WEEKLY, linkedin_weekly_campaign, with_utm  # noqa: E402
+# [마케팅 2026-09-23 L-06] 월간 결산 덱의 마무리 장은 아카이브 페이지로 링크한다. 영문
+# 아카이브(`/en/archive/`)는 **영문으로 낼 수 있는 호가 하나라도 있을 때만** 존재한다
+# (`render.py` `brief_has_english()` + `en_paths.add("archive/")`, 4880줄 부근) — 그 계약을
+# 다시 베끼지 않고 함수를 그대로 재사용한다(정본 하나). render.py 최상위는 상수·함수 정의뿐이라
+# import 부작용 0(자신도 grm_findings·grm_i18n 을 같은 방식으로 재사용 — 010 계열 검증됨).
+import render  # noqa: E402
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 텍스트 유틸(결정론)
@@ -74,6 +81,13 @@ def nfmt(tmpl: str, n: int, **kw) -> str:
     `{s}` 를 쓰지 않으므로 같은 호출로 안전하다(str.format 은 안 쓰는 인자를 무시한다).
     """
     return tmpl.format(n=n, s="" if n == 1 else "s", **kw)
+
+
+def plural_s(n: int) -> str:
+    """`nfmt` 와 같은 규칙(1건은 무표지)의 단독 판정 — [마케팅 2026-09-23 L-06] 월간 덱의
+    본문 한 줄에 카드 수·호 수 **두 개**가 함께 들어가면(`{c} card{cs} · {k} issue{ks}`)
+    `nfmt` 는 `{n}`/`{s}` 자리가 하나뿐이라 못 쓴다 — 그 자리에 이 함수로 직접 채운다."""
+    return "" if n == 1 else "s"
 
 
 def text_width(s: str) -> float:
@@ -319,6 +333,21 @@ STR: dict[str, dict[str, Any]] = {
         "one_checks_head": "현장 점검 포인트",
         "one_link_head": "공식 원문과 이번 주 브리프 전체",
         "one_tags": "#GMP #QA #품질보증 #FDA #제약",
+        # [마케팅 2026-09-23 L-06] 월간 결산 덱("이달의 변화 5개 + 숫자 1개") 전용 고정 문구.
+        "month_eyebrow": "월간 규제 결산",
+        # 제목 줄바꿈은 `|` 로 **구 경계를 직접** 정한다 — split_two 는 폭으로 자르다 "꼭 봐야 /
+        # 할 변화" 처럼 구 중간을 끊었다(2026-09-23 검수 · 줄바꿈 반려 이력 3회).
+        "month_h1": "{m}월에 꼭 볼|변화 {n}가지",
+        "month_meta": "{k}호 · 카드 {c}장",
+        "month_num_eyebrow": "이번 달 숫자 하나",
+        "month_num_h1": "가장 많이 나온 소식 유형",
+        "month_num_bars_head": "카드 유형별 건수",
+        "month_num_bars_total": "카드 {c}장 중",
+        "month_num_cap": "{m}월 발행 카드 {c}장 기준",
+        "month_doc_title": "{m}월 규제 결산",
+        "month_cap_head": "{m}월 규제 결산, 꼭 볼 변화 {n}가지.",
+        "month_count": "이번 달 카드 {c}장 · 브리프 {k}호",
+        "month_link_head": "지난 호 전체 보기",
     },
     "en": {
         "cover_eyebrow": "Weekly regulatory news · {mon}, week {wk}",
@@ -357,6 +386,18 @@ STR: dict[str, dict[str, Any]] = {
         "one_checks_head": "What to check on site",
         "one_link_head": "Official sources and the full weekly brief",
         "one_tags": "#GMP #QA #QualityAssurance #FDA #pharma",
+        "month_eyebrow": "Monthly regulatory recap",
+        "month_h1": "{mon}:|{n} change{s} worth your time",
+        "month_meta": "{k} issue{ks} · {c} card{cs}",
+        "month_num_eyebrow": "This month in one number",
+        "month_num_h1": "Most common card types",
+        "month_num_bars_head": "Cards by type",
+        "month_num_bars_total": "of {c} card{s}",
+        "month_num_cap": "Based on {c} card{s} published in {mon}",
+        "month_doc_title": "{mon} regulatory recap",
+        "month_cap_head": "{mon} recap: {n} change{s} worth your time.",
+        "month_count": "{c} card{cs} this month · {k} issue{ks}",
+        "month_link_head": "See all past issues",
     },
 }
 
@@ -1082,6 +1123,272 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# 월간 결산 덱 — "이달의 변화 5개 + 숫자 1개" ([마케팅 2026-09-23 계획 L-06])
+# ──────────────────────────────────────────────────────────────────────────────
+# 매주 덱(위 build_deck)과 같은 규율 — 순수·결정론·LLM 0. 다른 점은 입력 단위뿐이다: 브리프
+# 한 호가 아니라 그 달에 발행된 **여러 호**를 묶어, 호마다 헤드라인 1건씩(모자라면 다음
+# 헤드라인으로 채움)과 카드 유형 집계 한 장을 낸다.
+
+
+# 숫자 장의 유형 표시 이름(2026-09-23 검수). `card_type` 값은 수집 채널 이름이라 한 장에
+# "Recall" 과 "회수·판매중지" 가 나란히 서면 둘 다 회수인데 무엇이 다른지(어느 기관인지)가 안
+# 보인다. 값 자체는 바꾸지 않고 **표시할 때만** 기관을 붙인다. 닫힌 어휘(카드 유형 13종)의
+# 표시 이름이지 사실을 옮기는 번역이 아니다 — 영문 덱도 이 표로 한글 유형을 잃지 않는다.
+# 표에 없는 유형은 종전 규칙 그대로(국문=원래 값, 영문=한글이 섞였으면 뺀다).
+_MONTH_TYPE_LABEL = {
+    "ko": {
+        "Recall": "회수(FDA)", "Recall(HC)": "회수(캐나다)", "Recall(UK)": "회수(영국)",
+        "회수·판매중지": "회수(식약처)", "Warning Letter": "경고서한(FDA)",
+        "FDA 483 실사 관찰": "FDA 483", "GMP실사": "GMP 실사(식약처)",
+        "행정처분": "행정처분(식약처)", "EU GMP 비준수": "GMP 비준수(EU)",
+        "UK GMP 비준수": "GMP 비준수(영국)",
+    },
+    "en": {
+        "Recall": "FDA recall", "Recall(HC)": "Health Canada recall", "Recall(UK)": "MHRA recall",
+        "회수·판매중지": "MFDS recall", "Warning Letter": "FDA warning letter",
+        "FDA 483 실사 관찰": "FDA Form 483", "GMP실사": "MFDS GMP inspection",
+        "행정처분": "MFDS administrative action", "EU GMP 비준수": "EU GMP non-compliance",
+        "UK GMP 비준수": "UK GMP non-compliance", "지침·안내서": "Guidance",
+        "규제 소식": "Regulatory news", "WHO": "WHO",
+    },
+}
+
+
+def _month_card_type_counts(month_briefs: list[dict], lang: str) -> list[tuple[str, int]]:
+    """그 달 카드의 `card_type` 값별 건수 — 값은 **그대로**(재라벨 0), 많은 순·동률은 라벨
+    오름차순(결정론). ★영문 덱에서는 한글이 섞인 유형('GMP실사'·'회수·판매중지' 등)을
+    **뺀다** — 옮기면 지어낸 번역이고 놔두면 '영문 덱에 한글 0' 규율을 깬다. 이름을 못 쓰는
+    유형은 이 집계에서 세지 않는다(카드 자체는 다른 장의 총 건수에는 그대로 남는다)."""
+    counts: Counter[str] = Counter()
+    for b in month_briefs:
+        for c in (b.get("cards") or []):
+            raw = str(c.get("card_type") or "").strip()
+            if not raw:
+                continue
+            label = _MONTH_TYPE_LABEL.get(lang, {}).get(raw, raw)
+            if lang != "ko" and _CJK.search(label):
+                continue
+            counts[label] += 1
+    return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+
+
+def pick_month_items(month_briefs: list[dict], lang: str, limit: int = 5) -> list[tuple[dict, str, int]]:
+    """그 달 헤드라인 항목 — 호마다(오래된 순) 첫 헤드라인 1건, 모자라면(호 수 < limit)
+    **최신 호부터 옛 호 순으로** 그 호의 다음 헤드라인을 라운드로빈 채운다(2번째 헤드라인을
+    한 바퀴, 그래도 모자라면 3번째). 같은 카드 id·같은 제목은 건너뛴다(중복 0).
+
+    반환은 `(card, publish_date, rank)` — rank 는 그 호 안에서 몇 번째 헤드라인이었는지
+    (0=첫 번째)로, 같은 호에서 두 항목이 나오는 드문 경우의 결정론 정렬 키다.
+    `month_briefs` 는 이미 그 달로 걸러 오래된 순으로 정렬돼 있다고 가정한다
+    (`build_month_deck` 이 그렇게 넘긴다)."""
+
+    def pub_of(b: dict) -> str:
+        return str((b.get("brief") or {}).get("publish_date") or "")
+
+    def card_id(c: dict) -> str:
+        return str(c.get("id") or c.get("headline_target") or "")
+
+    def card_title(c: dict) -> str:
+        return " ".join(str(c.get("title_issue") or "").split())
+
+    per_brief_heads: dict[str, list[dict]] = {}
+    for b in month_briefs:
+        cards_b = sorted(b.get("cards") or [], key=lambda c: int(c.get("render_order") or 0))
+        heads3 = pick_headline_cards(b.get("brief") or {}, cards_b, 3)
+        if lang != "ko":
+            heads3 = [c for c in heads3 if has_en(c)]
+        per_brief_heads[pub_of(b)] = heads3
+
+    # 중복 판정은 **id 나 제목 어느 한쪽만 같아도** 스킵한다(둘 다 같아야 하는 AND 가 아니다) —
+    # 같은 사건을 다른 카드 id 로 다시 실었거나(병합 전 잔여), 다른 사건인데 제목 문구가
+    # 우연히 겹치는 두 경우 모두 같은 항목을 두 번 보여주는 것으로 친다.
+    items: list[tuple[dict, str, int]] = []
+    seen_ids: set[str] = set()
+    seen_titles: set[str] = set()
+
+    def is_dup(c: dict) -> bool:
+        cid, title = card_id(c), card_title(c)
+        return (bool(cid) and cid in seen_ids) or (bool(title) and title in seen_titles)
+
+    def mark_seen(c: dict) -> None:
+        cid, title = card_id(c), card_title(c)
+        if cid:
+            seen_ids.add(cid)
+        if title:
+            seen_titles.add(title)
+
+    for b in month_briefs:
+        heads = per_brief_heads[pub_of(b)]
+        if heads and not is_dup(heads[0]):
+            items.append((heads[0], pub_of(b), 0))
+            mark_seen(heads[0])
+    if len(items) < limit:
+        for rank in (1, 2):
+            if len(items) >= limit:
+                break
+            for b in reversed(month_briefs):
+                if len(items) >= limit:
+                    break
+                heads = per_brief_heads[pub_of(b)]
+                if rank < len(heads) and not is_dup(heads[rank]):
+                    items.append((heads[rank], pub_of(b), rank))
+                    mark_seen(heads[rank])
+    items.sort(key=lambda it: (it[1], it[2]))   # 발행일 오름차순, 같은 호는 헤드라인 순위로
+    return items[:limit]
+
+
+def _month_archive_url(briefs: list[dict], base_url: str, lang: str) -> str:
+    """월간 덱 마무리 장의 링크. 국문은 늘 아카이브. 영문은 `/en/archive/` 가 **실제로
+    존재할 때만** 쓴다 — render.py 의 계약(`brief_has_english()` 인 호가 하나라도 있으면
+    그 페이지를 낸다, 4880줄 부근)과 같은 기준을 그 함수로 그대로 물어본다(베끼지 않는다).
+    없으면 없는 페이지로 보내지 않고, 카드 단위로라도 영문이 있는 가장 최근 브리프로
+    대신한다(둘 다 없으면 영문 항목 자체가 0 이라 이 함수를 부르는 쪽에서 그 언어를 이미
+    걸렀을 상황 — `/en/` 최후 폴백은 사실상 도달하지 않는다)."""
+    if lang == "ko":
+        return f"{base_url}/archive/"
+    full_en_pubs = sorted(str((b.get("brief") or {}).get("publish_date") or "")
+                          for b in briefs if render.brief_has_english(b))
+    if full_en_pubs:
+        return f"{base_url}/en/archive/"
+    partial_en_pubs = sorted(str((b.get("brief") or {}).get("publish_date") or "")
+                             for b in briefs
+                             if any(has_en(c) for c in (b.get("cards") or [])))
+    if partial_en_pubs:
+        return f"{base_url}/en/briefs/{partial_en_pubs[-1]}/"
+    return f"{base_url}/en/"
+
+
+def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, anon: bool = False,
+                     base_url: str = SITE_BASE_URL, lang: str = "ko") -> dict[str, Any]:
+    """달력 월(`month`, `"YYYY-MM"`) 안에 발행된 브리프 전부 → 월간 결산 덱. 순수·결정론.
+
+    `briefs` 는 **그 달로 미리 거르지 않은** 전체 브리프 문서 목록이다 — 이 함수가 안에서
+    `publish_date` 접두사로 거른다(호출부가 CLI 든 테스트든 그냥 로드한 전부를 넘기면 된다).
+    영문 아카이브 존재 여부 판정(`_month_archive_url`)도 **그 달 밖의** 호를 봐야 하므로
+    같은 이유로 전체 목록이 필요하다.
+
+    `glossary` 는 현재 슬라이드에 쓰지 않지만(월간 덱은 용어 장이 없다) 매주 덱과 같은
+    서명을 유지해 호출부가 분기하지 않게 한다."""
+    if lang not in STR:
+        raise ValueError(f"지원하지 않는 언어: {lang!r} (가능: {', '.join(LANGS)})")
+    if not re.match(r"^\d{4}-\d{2}$", month or ""):
+        raise ValueError(f"월 형식 오류: {month!r} (예: '2026-09')")
+    t = STR[lang]
+
+    month_briefs = sorted(
+        (b for b in briefs if str((b.get("brief") or {}).get("publish_date") or "").startswith(month + "-")),
+        key=lambda b: str((b.get("brief") or {}).get("publish_date") or ""))
+    if not month_briefs:
+        raise ValueError(f"발행본 없음: {month!r}")
+
+    y, m = int(month[:4]), int(month[5:7])
+    mon = _EN_MONTH[m] if 1 <= m <= 12 else str(m)
+    k_issues = len(month_briefs)
+    n_cards_month = sum(len(b.get("cards") or []) for b in month_briefs)
+
+    items = pick_month_items(month_briefs, lang, 5)
+    n = len(items)
+
+    names = anonymize([c for c, _, _ in items]) if anon else {}
+
+    def firm(card: dict) -> str:
+        tgt = str(card.get("headline_target") or "")
+        return _firm_for_lang(names.get(tgt, tgt), lang)
+
+    archive_url = _month_archive_url(briefs, base_url, lang)
+    ai_note = t["ai_note"]
+
+    # ── 01 표지 — eyebrow + 제목 + '{k}호 · 카드 {c}장' 한 줄. 통계 타일은 두지 않는다
+    # (그 자리는 (n+2) 숫자 장이 맡는다 — 표지에서 또 세면 같은 수를 두 번 보여준다).
+    cover_h1 = nfmt(t["month_h1"], n, m=m, mon=mon)
+    meta_line = t["month_meta"].format(k=k_issues, c=n_cards_month,
+                                       ks=plural_s(k_issues), cs=plural_s(n_cards_month))
+    slides: list[dict] = [dict(
+        kind="cover", eyebrow=t["month_eyebrow"], h1=cover_h1.split("|"),
+        tiles=[], sub=meta_line, ft_right="", ai=ai_note)]
+
+    # ── 02..n+1 항목 — 매주 덱의 'headline' 장을 그대로 재사용(사실 표·시사점·점검 칩 동형),
+    # 그 호를 밝히는 작은 날짜 칩만 더한다(연도는 뺀다 — 표지가 이미 그 달을 말한다).
+    for card, pub, _rank in items:
+        rows: list[tuple[str, str]] = []
+        for f in _card_list(card, "key_facts", lang):
+            kv = parse_fact(f, 12 if lang == "ko" else 26)
+            if not kv:
+                continue
+            label, value = kv
+            if label.startswith(("발행", "Published", "Posted")):
+                continue
+            rows.append((label, value))
+            if len(rows) >= 3:
+                break
+        company = firm(card)
+        if lang == "ko":
+            rows.append((t["row_company"], company or "—"))
+        elif company:
+            rows.append((t["row_company"], company))
+        impl = first_sentence(_card_text(card, "implication", lang), lang)
+        checks = [" ".join(x.split()) for x in _card_list(card, "checks", lang)][:2]
+        title = _card_text(card, "title_issue", lang) or (firm(card) if lang == "ko" else "")
+        if lang == "ko":
+            src = SOURCE_NOTE.get(_agency(card), t["source_other"].format(label=_label(card, lang)))
+        else:
+            src = t["source_other"].format(label=_label(card, lang))
+        m_d = re.match(r"^\d{4}-(\d{2})-(\d{2})$", pub)
+        date_chip = f"{int(m_d.group(1))}/{int(m_d.group(2))}" if m_d else pub
+        slides.append(dict(
+            kind="headline", chips=[c for c in (_label(card, lang), _kind_chip(card, lang), date_chip) if c],
+            h1=split_two(title), impl_label=t["impl_label"],
+            rows=rows, impl=impl, checks=checks,
+            ft_right=src, ai=ai_note))
+
+    # ── n+2 숫자 1개 — 그 달 카드를 유형별로 세어 상위 4개만 막대로.
+    type_counts = _month_card_type_counts(month_briefs, lang)[:4]
+    slides.append(dict(
+        kind="numbers", eyebrow=t["month_num_eyebrow"], h1=[t["month_num_h1"]],
+        bars=type_counts, bars_head=t["month_num_bars_head"],
+        bars_total=t["month_num_bars_total"].format(c=n_cards_month, s=plural_s(n_cards_month)),
+        cap=t["month_num_cap"].format(m=m, mon=mon, c=n_cards_month, s=plural_s(n_cards_month)),
+        ai=ai_note))
+
+    # ── 마지막 마무리 — 매주 덱과 같은 장이지만 URL 은 이 달 링크가 아니라 아카이브.
+    slides.append(dict(kind="closing", h1=[nfmt(t["cl_h1_a"], n_cards_month), t["cl_h1_b"]],
+                       body=t["cl_body"],
+                       url=archive_url.replace("https://", "").rstrip("/"),
+                       note=t["cl_note"],
+                       ft_right=t["cl_ft"], ai=ai_note))
+
+    for i, s in enumerate(slides, 1):
+        s["idx"], s["total"] = i, len(slides)
+
+    caption_url = with_utm(archive_url, "linkedin", "social", f"monthly_{month}")
+
+    # ── 게시 본문 — '이번 주 한 건'과 같은 결(항목마다 한 줄+들여쓰기 이어짐), 항목이 여럿이라
+    # 카드 하나 전체가 아니라 제목 한 줄(첫 문장)만 싣는다.
+    bullet_w = text_width("· ")
+    lines: list[str] = [nfmt(t["month_cap_head"], n, m=m, mon=mon), ""]
+    for card, _pub, _rank in items:
+        title = first_sentence(_card_text(card, "title_issue", lang), lang)
+        wrapped = wrap_width(title, 26.0 - bullet_w)
+        if not wrapped:
+            continue
+        lines.append(f"· {wrapped[0]}")
+        lines += [f"  {ln}" for ln in wrapped[1:]]
+    lines.append("")
+    lines.append(t["month_count"].format(c=n_cards_month, k=k_issues,
+                                         cs=plural_s(n_cards_month), ks=plural_s(k_issues)))
+    lines.append("")
+    lines.append(t["month_link_head"])
+    lines.append(caption_url)
+    lines.append("")
+    lines.append(t["one_tags"])
+    caption = "\n".join(lines) + "\n"
+
+    return {"pub": month, "lang": lang, "slides": slides, "caption": caption,
+            "doc_title": t["month_doc_title"].format(m=m, mon=mon), "url": archive_url,
+            "caption_url": caption_url}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # HTML
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -1195,6 +1502,19 @@ def _eyebrow(s: dict) -> str:
     return f'<div class="eyebrow">{ico}{_e(s["eyebrow"])}</div>' if s.get("eyebrow") else ""
 
 
+def _bars_block(s: dict) -> str:
+    """막대 목록 하나(`.mock`) — 경고서한 '겹치는 지적'(themes)과 월간 덱 '숫자 1개'
+    (numbers) 두 장이 같은 모양을 쓴다([마케팅 2026-09-23 L-06] 중복 제거). `bars_total`
+    은 선택([마케팅 2026-09-23 이전] themes 는 늘 채워 왔으므로 그쪽 출력은 바이트 불변)."""
+    mx = max((c for _, c in s["bars"]), default=1)
+    bars = "".join(
+        f'<div class="br"><span>{_e(l)}</span><span class="bar{" top" if i == 0 else ""}"><i style="width:{int(100 * c / mx)}%"></i></span><span class="v">{c}</span></div>'
+        for i, (l, c) in enumerate(s["bars"]))
+    head = _e(s.get("bars_head") or "겹치는 지적")
+    total = f'<span>{_e(s["bars_total"])}</span>' if s.get("bars_total") else ""
+    return f'<div class="mock"><div class="mh"><b>{head}</b>{total}</div><div class="bars">{bars}</div></div>'
+
+
 def _slide_html(s: dict) -> str:
     kind = s["kind"]
     cls = {"cover": " coral", "closing": " dark"}.get(kind, "")
@@ -1202,8 +1522,9 @@ def _slide_html(s: dict) -> str:
     if kind == "cover":
         parts.append(_eyebrow(s))
         parts.append(_h1(s["h1"], 96))
-        parts.append('<div class="stats">' + "".join(
-            f'<div class="stat"><b>{_e(n)}</b><span>{_e(l)}</span></div>' for n, l in s["tiles"]) + "</div>")
+        if s.get("tiles"):
+            parts.append('<div class="stats">' + "".join(
+                f'<div class="stat"><b>{_e(n)}</b><span>{_e(l)}</span></div>' for n, l in s["tiles"]) + "</div>")
         if s.get("sub"):
             parts.append(f'<p class="sub">{_e(s["sub"])}</p>')
     elif kind == "headline":
@@ -1218,17 +1539,17 @@ def _slide_html(s: dict) -> str:
     elif kind == "themes":
         parts.append(_eyebrow(s))
         parts.append(_h1(s["h1"], 78))
-        mx = max((c for _, c in s["bars"]), default=1)
-        bars = "".join(
-            f'<div class="br"><span>{_e(l)}</span><span class="bar{" top" if i == 0 else ""}"><i style="width:{int(100 * c / mx)}%"></i></span><span class="v">{c}</span></div>'
-            for i, (l, c) in enumerate(s["bars"]))
-        head = _e(s.get("bars_head") or "겹치는 지적")
-        parts.append(f'<div class="mock"><div class="mh"><b>{head}</b>'
-                     f'<span>{_e(s["bars_total"])}</span></div><div class="bars">{bars}</div></div>')
+        parts.append(_bars_block(s))
         rows = "".join(f'<div class="frow"><b>{_e(f)}</b><span class="fl">' + "".join(
             f'<span{"" if j == 0 else " class=\"g\""}>{_e(ch)}</span>' for j, ch in enumerate(chips)) + "</span></div>"
             for f, chips in s["rows"])
         parts.append(f'<div class="mock small">{rows}</div>')
+    elif kind == "numbers":
+        # [마케팅 2026-09-23 L-06] 월간 덱 '숫자 1개' 장 — 카드 유형별 상위 4개를 막대로.
+        parts.append(_eyebrow(s))
+        parts.append(_h1(s["h1"], 78))
+        parts.append(_bars_block(s))
+        parts.append(f'<p class="cap">{_e(s["cap"])}</p>')
     elif kind == "rows":
         parts.append(_eyebrow(s))
         parts.append(_h1(s["h1"], 78))
@@ -1318,6 +1639,55 @@ def latest_brief_path(data_dir: Path) -> Path | None:
     return files[-1] if files else None
 
 
+def load_all_briefs(data_dir: Path) -> list[dict]:
+    """[마케팅 2026-09-23 L-06] `--months auto`·월간 덱이 필요로 하는 전체 브리프 목록
+    (파일명 = 발행일 오름차순). 파일 하나가 깨져 있어도(JSON 파싱 실패) 그 한 파일만
+    건너뛴다 — 한 파일 사고로 나머지 달까지 못 내지 않는다."""
+    docs: list[dict] = []
+    for p in sorted(Path(data_dir).glob("brief_web_*.json")):
+        try:
+            docs.append(json.loads(p.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, OSError) as exc:
+            print(f"::warning::{p.name} 파싱 실패({type(exc).__name__}) — 건너뜀", file=sys.stderr)
+    return docs
+
+
+def auto_months(briefs: list[dict]) -> list[str]:
+    """`--months auto` → [최신 호가 속한 달의 **바로 전 달력 월**, 최신 호가 속한 달] —
+    둘 다 데이터(최신 발행일)에서만 결정론 파생된다. 전 달에 실제 발행본이 없어도(연초·
+    서비스 첫 달 등) 여기서는 걸러내지 않는다 — 호출부(main)가 그 달 발행본 유무를 따로
+    확인해 없으면 경고 후 건너뛴다."""
+    pubs = sorted(p for p in (str((b.get("brief") or {}).get("publish_date") or "") for b in briefs) if p)
+    if not pubs:
+        return []
+    latest = pubs[-1]
+    y, m = int(latest[:4]), int(latest[5:7])
+    cur = f"{y:04d}-{m:02d}"
+    py, pm = (y, m - 1) if m > 1 else (y - 1, 12)
+    prev = f"{py:04d}-{pm:02d}"
+    return [prev, cur]
+
+
+def _emit_deck(deck: dict, stem: str, out_dir: Path, chrome: str | None, keep_html: bool) -> None:
+    """덱 하나를 txt(+html)로 쓰고, Chrome 이 있으면 pdf 도 낸다 — 매주 덱·월간 덱
+    ([마케팅 2026-09-23 L-06]) 공용(산출 로직 한 벌). PDF 실패는 비차단(배포는 카드
+    없이도 진행)."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / f"{stem}.txt").write_text(deck["caption"], encoding="utf-8")
+    html_path = out_dir / f"{stem}.html"
+    html_path.write_text(render_html(deck), encoding="utf-8")
+    print(f"{stem}: {deck['pub']} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 → {out_dir}")
+    if chrome:
+        try:
+            render_pdf(html_path, out_dir / f"{stem}.pdf", chrome)
+            print(f"{stem}.pdf {(out_dir / f'{stem}.pdf').stat().st_size:,} bytes")
+        except Exception as exc:  # 비차단 — 배포는 카드 없이도 진행한다
+            print(f"::warning::{stem}.pdf 렌더 실패({type(exc).__name__}) — html/txt 만 출력",
+                  file=sys.stderr)
+    if not keep_html:
+        html_path.unlink(missing_ok=True)
+
+
 def main(argv: list[str] | None = None) -> int:
     # 좁은 콘솔 인코딩(cp949) 방어 — 저장소 관용구(tests/test_cli_stdout_encoding.py). '·'·'→' 는 되지만
     # '—' 같은 문자가 산출 로그를 통째로 날린다.
@@ -1339,13 +1709,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--caption", choices=("one", "summary"), default="one",
                     help="게시 본문 형식 — 기본 one('이번 주 한 건', 마케팅 2026-09-23 계획). "
                          "summary 는 종전 요약형. 파일 이름(linkedin.txt 등)은 그대로다.")
+    ap.add_argument("--month", help="YYYY-MM — 그 달의 월간 결산 덱만 낸다(마케팅 2026-09-23 L-06, 주간 대신)")
+    ap.add_argument("--months", choices=("auto",),
+                    help="'auto' — 최신 호가 속한 달 + 그 전 달, 둘 다 월간 결산 덱(주간 대신)")
     args = ap.parse_args(argv)
 
-    brief_path = Path(args.brief) if args.brief else latest_brief_path(Path(args.data))
-    if not brief_path or not brief_path.exists():
-        print("::warning::브리프 JSON 없음 — 카드 생성 건너뜀", file=sys.stderr)
-        return 0
-    brief_doc = json.loads(brief_path.read_text(encoding="utf-8"))
     glossary = json.loads(Path(args.glossary).read_text(encoding="utf-8")) if Path(args.glossary).exists() else []
     langs = [x.strip() for x in str(args.lang).split(",") if x.strip()]
     unknown = [x for x in langs if x not in STR]
@@ -1355,6 +1723,46 @@ def main(argv: list[str] | None = None) -> int:
     chrome = None if args.no_pdf else find_chrome()
     if not args.no_pdf and not chrome:
         print("::warning::Chrome 미발견 — linkedin.pdf 건너뜀(html/txt 만 출력)", file=sys.stderr)
+
+    # ── 월간 결산 덱([마케팅 2026-09-23 L-06]) — --month/--months 가 있으면 주간 대신 이것만
+    # 낸다(둘 다 없으면 아래 종전 주간 경로 — "neither flag" 는 바이트 불변).
+    if args.month or args.months:
+        all_briefs = load_all_briefs(Path(args.data))
+        if not all_briefs:
+            print("::warning::브리프 JSON 없음 — 월간 덱 생성 건너뜀", file=sys.stderr)
+            return 0
+        months: list[str] = []
+        if args.month:
+            months.append(args.month)
+        if args.months == "auto":
+            for mo in auto_months(all_briefs):
+                if mo not in months:
+                    months.append(mo)
+        for month in months:
+            if not any(str((b.get("brief") or {}).get("publish_date") or "").startswith(month + "-")
+                      for b in all_briefs):
+                print(f"::warning::{month} 건너뜀 — 그 달 발행본 없음", file=sys.stderr)
+                continue
+            for lang in langs:
+                stem = "linkedin" if lang == "ko" else f"linkedin_{lang}"
+                try:
+                    deck = build_month_deck(all_briefs, glossary, month, anon=args.anon, lang=lang)
+                except ValueError as exc:
+                    print(f"::warning::{month}/{lang} 월간 덱 생성 실패({exc}) — 건너뜀", file=sys.stderr)
+                    continue
+                # 영문 항목이 0 인 달(카드에 en 블록이 없음)은 조용히 내보내지 않는다.
+                if not any(s["kind"] == "headline" for s in deck["slides"]):
+                    print(f"::warning::{stem} 건너뜀 — {month} 에 실을 항목이 0({lang} 본문 없음)",
+                          file=sys.stderr)
+                    continue
+                _emit_deck(deck, stem, Path(args.out) / "monthly" / month, chrome, args.html)
+        return 0
+
+    brief_path = Path(args.brief) if args.brief else latest_brief_path(Path(args.data))
+    if not brief_path or not brief_path.exists():
+        print("::warning::브리프 JSON 없음 — 카드 생성 건너뜀", file=sys.stderr)
+        return 0
+    brief_doc = json.loads(brief_path.read_text(encoding="utf-8"))
 
     for lang in langs:
         # 파일 이름: 한국어는 기존 그대로(linkedin.*), 영어는 접미(linkedin_en.*).
@@ -1367,21 +1775,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"::warning::{stem} 건너뜀 — 실을 소식 장이 0(브리프 카드에 {lang} 본문 없음)",
                   file=sys.stderr)
             continue
-        out_dir = Path(args.out) / "briefs" / deck["pub"]
-        out_dir.mkdir(parents=True, exist_ok=True)
-        (out_dir / f"{stem}.txt").write_text(deck["caption"], encoding="utf-8")
-        html_path = out_dir / f"{stem}.html"
-        html_path.write_text(render_html(deck), encoding="utf-8")
-        print(f"{stem}: {deck['pub']} · {len(deck['slides'])}장 · 본문 {len(deck['caption'])}자 → {out_dir}")
-        if chrome:
-            try:
-                render_pdf(html_path, out_dir / f"{stem}.pdf", chrome)
-                print(f"{stem}.pdf {(out_dir / f'{stem}.pdf').stat().st_size:,} bytes")
-            except Exception as exc:  # 비차단 — 배포는 카드 없이도 진행한다
-                print(f"::warning::{stem}.pdf 렌더 실패({type(exc).__name__}) — html/txt 만 출력",
-                      file=sys.stderr)
-        if not args.html:
-            html_path.unlink(missing_ok=True)
+        _emit_deck(deck, stem, Path(args.out) / "briefs" / deck["pub"], chrome, args.html)
     return 0
 
 

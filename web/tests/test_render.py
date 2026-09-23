@@ -19930,6 +19930,74 @@ class SubscribePeekLinkTest(unittest.TestCase):
             self.assertNotIn("이번 주 소식 먼저 보기", html)
 
 
+class BriefFeedbackToastTest(unittest.TestCase):
+    """[1클릭 피드백 도착 확인 토스트 2026-09-23] 마케팅 계획 N-04 — 메일의 #fb-up/#fb-down
+    앵커로 온 방문자에게 짧은 확인을 준다. `SubscribePeekLinkTest` 와 같은 방식(env-param
+    게이트를 monkeypatch 로 켠 뒤 실제 HTML 을 읽는다)."""
+
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_fbtoast_"))
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _render(self, briefs: list[dict]) -> pathlib.Path:
+        data, out = self.tmp / "data", self.tmp / "out"
+        data.mkdir(parents=True, exist_ok=True)
+        for br in briefs:
+            pub = br["brief"]["publish_date"]
+            (data / f"brief_web_{pub}.json").write_text(
+                json.dumps(br, ensure_ascii=False), encoding="utf-8")
+        render.render_site(data, out, render_doc_pages=_DOC_PAGES_IN_TESTS)
+        return out
+
+    def test_toast_markup_present_when_band_is_on(self):
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render([_minimal_brief("2026-06-29")])
+            detail = (out / "briefs" / "2026-06-29" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        self.assertIn('id="grmFbToast"', detail)
+        self.assertIn('id="grmFbToastMsg"', detail)
+        self.assertIn("의견 보내기", detail)
+        # [hidden] 이 CSS display 규칙을 이겨야 한다(반복 결함 — grm-langhint 선례).
+        self.assertIn(".grm-fbtoast[hidden]{display:none}", detail)
+        self.assertRegex(detail, r'<div class="grm-fbtoast"[^>]*\bhidden\b[^>]*>')
+
+    def test_toast_absent_when_band_is_off(self):
+        # 게이트 off(기본·골든 빌드) — 로컬·CI 빌드는 발송 링크 자체가 없으므로 byte-diff 0.
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = ""
+            out = self._render([_minimal_brief("2026-06-29")])
+            detail = (out / "briefs" / "2026-06-29" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        self.assertNotIn("grmFbToast", detail)
+        self.assertNotIn("grm-fbtoast", detail)
+
+    def test_toast_script_falls_back_to_footer_slot_when_trigger_absent(self):
+        """새 모달을 만들지 않는다 — feedback.js 의 기존 트리거를 클릭으로 재사용하고,
+        그 트리거가 없을 수 있는 경로(reactions_enabled 게이트 뒤)의 폴백도 배선돼 있는지."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render([_minimal_brief("2026-06-29")])
+            detail = (out / "briefs" / "2026-06-29" / "index.html").read_text(encoding="utf-8")
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        self.assertIn("getElementById('grm-feedback-open')", detail)
+        self.assertIn("[data-feedback-slot]", detail)
+        # 포커스 이동 0 — 자동 표시 경로(show())에 .focus( 호출이 없어야 한다. 스크립트
+        # 경계는 렌더된 HTML 에서 찾는다(`{% endif %}` 는 이미 소비돼 안 남는다).
+        i_start = detail.index("grmFbToast'); if(!box) return;")
+        i_end = detail.index("</script>", i_start)
+        script = detail[i_start:i_end]
+        self.assertNotIn(".focus(", script)
+
+
 class GurumiScrollHideTest(unittest.TestCase):
     """[구름이 모바일 스크롤 은신 2026-09-07] 좁은 화면에서 스크롤하는 동안만 투명해진다.
 

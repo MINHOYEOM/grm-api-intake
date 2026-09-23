@@ -328,6 +328,27 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         'color:#A14B30;text-decoration:none;font-size:14px;font-weight:500;'
         'border:1px solid #DCD3C7;border-radius:9999px;padding:7px 15px">'
         '이번 주 브리프 보고 구독하기 →</a></div>')
+    # 1클릭 피드백(마케팅 계획 N-04, 2026-09-23) — "팀 동료에게 전달" 카드 바로 뒤·
+    # updates_html 앞. **새 수신 엔드포인트를 만들지 않는다**: 두 선택지는 같은 브리프
+    # 페이지의 앵커만 다른 링크(`#fb-up`/`#fb-down`)이고, Brevo 가 캠페인 링크별 클릭 수
+    # (linksStats)를 이미 센다 — N-05 수집기(`collect_newsletter_campaigns.py`)가 그 수를
+    # 앵커로 갈라 `newsletter_campaign_stats.links` 에 쌓는다. 쿼리 파라미터가 아니라
+    # **앵커**를 쓰는 이유: `gate_provenance` 는 쿼리 문자열만 검사하므로(앵커는 서버에
+    # 전송되지도 않는다) 발송 게이트가 그대로 통과하고, 개인 식별자·클릭한 사람도 전혀
+    # 남지 않는다(집계뿐). 카드가 아니라 박스 없는 가운데 정렬 한 줄 — 퀴즈·워치리스트·
+    # 전달 카드처럼 매번 세 개를 늘어놓으면 메일이 길어져서다. 같은 폰트·색상 재사용,
+    # 한글에 자간 없음.
+    fb_up_href = e(f"{brief_url}#fb-up")
+    fb_down_href = e(f"{brief_url}#fb-down")
+    parts.append(
+        '<div style="text-align:center;margin:0 0 24px;font-size:13px;color:#6C6A64">'
+        '이번 호, 유용했나요? '
+        f'<a href="{fb_up_href}" style="display:inline-block;margin:0 4px;color:#A14B30;'
+        'text-decoration:none;font-weight:600;font-size:13px;border:1px solid #DCD3C7;'
+        'border-radius:9999px;padding:5px 12px">👍 유용했어요</a>'
+        f'<a href="{fb_down_href}" style="display:inline-block;margin:0 4px;color:#A14B30;'
+        'text-decoration:none;font-weight:600;font-size:13px;border:1px solid #DCD3C7;'
+        'border-radius:9999px;padding:5px 12px">👎 아쉬웠어요</a></div>')
     if updates_html:
         parts.append(updates_html)
     # 면책 캐논(brief.html 과 동일) + 수신거부(SaaS 주입).

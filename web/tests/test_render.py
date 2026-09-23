@@ -20075,6 +20075,147 @@ class WebVisitorCopyFixSweepTest(unittest.TestCase):
         self.assertIn("DOMContentLoaded", self.base_src)
 
 
+# ── [2026-09-23 클라이언트 런타임 버그 6종] ──────────────────────────────────────
+class WebTrendsOpenFirmRaceTest(unittest.TestCase):
+    """업체 상세 패널도 조항/카테고리 사례 패널과 같은 비동기 경쟁 문제를 갖는다 —
+    fetchFirmStats 응답이 도착하기 전에 사용자가 다른 업체를 클릭하면, 늦게 온 응답이
+    새로 연 업체의 패널 위에 얹힌다. openRecentCat/openCfr 은 이미 이 가드
+    (state.openCat !== code / state.openCfr !== section)가 있었는데 openFirm 만 빠져
+    있었다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "trends.js").read_text(encoding="utf-8")
+
+    def test_open_firm_fetch_race_is_guarded(self):
+        fn = self.js[self.js.index("function openFirm(name, firmKey)"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertEqual(
+            fn.count("if (state.openFirm !== name) return;"), 2,
+            "openFirm 의 fetchFirmStats().then()/.catch() 양쪽에 stale 응답 가드가 있어야 한다")
+
+
+class WebEnCategoryFallbackGuardTest(unittest.TestCase):
+    """분류 코드가 CATEGORY_LABELS 표에 없을 때의 폴백은 DB 원본 한국어 라벨
+    (category_label_ko)이다 — firm.js buildObsCard() 는 영어 화면에서 이 폴백을 감추는
+    _isEn/_HANGUL 가드가 있는데(★09-07 계열 결함과 동형), findings.js buildCard()·
+    inspector.js buildObsCard() 는 그 가드 없이 한국어 값을 그대로 내보내고 있었다."""
+
+    def _assert_guarded(self, path):
+        js = (WEB_DIR / "assets" / path).read_text(encoding="utf-8")
+        self.assertIn("var _isEn = ", js, f"{path} 에 _isEn 정의가 없다")
+        self.assertIn("var _HANGUL = ", js, f"{path} 에 _HANGUL 정의가 없다")
+        self.assertIn(
+            'var fallbackCat = row.category_label_ko || "";', js,
+            f"{path} 에 fallbackCat 가드 변수가 없다")
+        self.assertIn(
+            '(_isEn && _HANGUL.test(fallbackCat) ? "" : fallbackCat)', js,
+            f"{path} 가 영어 화면에서 한국어 카테고리 폴백을 그대로 쓴다")
+
+    def test_findings_js_card_category_fallback(self):
+        self._assert_guarded("findings.js")
+
+    def test_inspector_js_obs_card_category_fallback(self):
+        self._assert_guarded("inspector.js")
+
+
+class WebFindingCountParentheticalSpacingTest(unittest.TestCase):
+    """"지적 {n}건" + "(국문 열람 가능 {n}건)"을 그냥 이어 붙이면 한국어는 "지적 5건(국문…"
+    처럼 어색하고 영어는 "5 findings(3 available)"로 숫자와 괄호가 그대로 붙어버린다.
+    괄호 앞에 공백 하나만 있으면 한국어는 "지적 5건 (국문 열람 가능 3건)"으로 여전히
+    자연스럽고 영어는 정상 간격이 생긴다."""
+
+    def _assert_spaced(self, path):
+        js = (WEB_DIR / "assets" / path).read_text(encoding="utf-8")
+        self.assertIn(
+            '(partiallyPublic ? " " + _t("(국문 열람 가능 {n}건)", '
+            '{ n: fmtNum(doc.public_obs_cnt) }) : "");',
+            js, f"{path} 의 병기 괄호 앞에 공백이 없다")
+
+    def test_firm_js_count_text_spacing(self):
+        self._assert_spaced("firm.js")
+
+    def test_inspector_js_count_text_spacing(self):
+        self._assert_spaced("inspector.js")
+
+
+class WebLoginModalKeyboardTrapTest(unittest.TestCase):
+    """로그인/가입 팝업(role="dialog" aria-modal="true")은 ESC 로 닫히고 Tab 이 카드
+    안에서만 순환해야 한다 — feedback.js 의 문의 팝업은 이미 이 트랩이 있는데
+    (pop.addEventListener("keydown", …)), reactions.js 의 로그인 팝업만 빠져 있어
+    키보드 사용자가 모달 밖으로 포커스가 새거나 ESC 로 닫지 못했다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
+
+    def test_build_pop_has_escape_and_tab_trap(self):
+        fn = self.js[self.js.index("function buildPop()"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn('pop.addEventListener("keydown", function (e) {', fn)
+        # 팝업이 실제로 열려 있을 때만 반응한다(빌드는 지연 1회뿐이라 리스너는 항상 붙어 있다).
+        self.assertIn('if (!pop.classList.contains("show")) return;', fn)
+        self.assertIn('if (e.key === "Escape") { closeLogin(); return; }', fn)
+        self.assertIn(
+            'var f = pop.querySelectorAll("button, select, textarea, input, a[href]");', fn)
+        self.assertIn(
+            'if (e.shiftKey && document.activeElement === first) '
+            '{ e.preventDefault(); last.focus(); }', fn)
+        self.assertIn(
+            'else if (!e.shiftKey && document.activeElement === last) '
+            '{ e.preventDefault(); first.focus(); }', fn)
+
+
+class WebChecklistBuildReentrancyTest(unittest.TestCase):
+    """build()는 findings_cfr_ranking → findings_checklist 순으로 두 번 왕복하는데,
+    연타 방어 토큰이 없어 "만들기"를 두 번 누르면 먼저 나간 요청이 늦게 도착해 나중
+    요청의 결과(또는 실패 상태)를 덮어쓸 수 있었다. findings.js 의 navToken 관례와
+    동형으로 buildToken 세대 카운터를 둔다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "checklist.js").read_text(encoding="utf-8")
+
+    def test_build_token_declared(self):
+        self.assertIn("var buildToken = 0;", self.js)
+
+    def test_build_increments_token_and_guards_both_rpc_legs_and_catch(self):
+        fn = self.js[self.js.index("function build() {"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn("buildToken += 1;", fn)
+        self.assertIn("var my = buildToken;", fn)
+        # 두 번의 await(042 랭킹 응답 · 043 상세 응답)과 최종 catch 전부 가드해야 한다.
+        self.assertEqual(fn.count("if (my !== buildToken) return;"), 3,
+                          "build() 의 두 RPC .then 과 .catch 세 곳 모두 토큰 가드가 있어야 한다")
+
+
+class WebPetNameEnglishStripTest(unittest.TestCase):
+    """구름이 성장 도감(atlas)의 라벨은 " 구름이" 접미를 떼어 "아기"·"소년" 처럼 짧게
+    보여준다. 영어 이름은 "Baby Gurumi"·"Young Gurumi" 처럼 접미가 아니라 " Gurumi"가
+    뒤에 붙는 형태라 기존 replace(" 구름이", "") 하나만으로는 영어 화면에서 no-op —
+    "Baby Gurumi" 가 그대로 남는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.js = (WEB_DIR / "assets" / "pet.js").read_text(encoding="utf-8")
+
+    def test_atlas_strips_both_korean_and_english_suffix(self):
+        fn = self.js[self.js.index("function atlas() {"):]
+        fn = fn[:fn.index("\n  }\n")]
+        self.assertIn(
+            's.name.replace(" 구름이", "").replace(" Gurumi", "") /* i18n-ignore */', fn)
+
+    def test_english_stage_names_actually_end_with_gurumi_suffix(self):
+        """en.json 정본 대조 — 접미 형태가 실측과 어긋나면 이 가드 자체가 거짓말이 된다."""
+        en_path = WEB_DIR / "data" / "i18n" / "en.json"
+        en = json.loads(en_path.read_text(encoding="utf-8"))
+        for ko in ("아기 구름이", "소년 구름이", "어른 구름이", "전설 구름이"):
+            self.assertIn(ko, en, f"en.json 에 {ko} 번역이 없다")
+            self.assertTrue(
+                en[ko].endswith(" Gurumi"),
+                f"{ko} 의 영어 번역 '{en[ko]}' 이 ' Gurumi' 로 끝나지 않는다")
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

@@ -1335,11 +1335,13 @@
     firmDetailEl.hidden = false;
     renderFirmDetailLoading();
     fetchFirmStats(name).then(function (data) {
+      if (state.openFirm !== name) return;          // 그 사이 다른 업체를 열었으면 버린다
       renderFirmDetail(data);
       if (typeof firmDetailEl.scrollIntoView === "function") {
         firmDetailEl.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }).catch(function () {
+      if (state.openFirm !== name) return;
       renderFirmDetailError();
     });
   }

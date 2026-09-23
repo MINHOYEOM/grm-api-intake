@@ -1314,7 +1314,11 @@
 
     if (row.firm_name) card.appendChild(elHL("h3", "fnd-firm", decodeFirmDisplay(row.firm_name), query));
     var cat = CATEGORY_LABELS[row.category_code];
-    var catText = cat ? cat.ko : row.category_label_ko;
+    // 표에 없는 코드일 때의 폴백은 DB 의 한국어 라벨이라, 영어 화면에는 싣지 않는다
+    // — 라벨 하나를 잃는 것보다 영어 화면에 한국어를 남기는 쪽이 나쁘다(firm.js 와 동일 계약).
+    var fallbackCat = row.category_label_ko || "";
+    var catText = cat ? cat.ko
+      : (_isEn && _HANGUL.test(fallbackCat) ? "" : fallbackCat);
     if (catText) card.appendChild(el("p", "fnd-cat", catText));
 
     var textEl = appendMainText(card, row, query);

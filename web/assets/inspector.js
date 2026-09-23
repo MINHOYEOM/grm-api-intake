@@ -493,7 +493,11 @@
   function buildObsCard(row) {
     var card = el("article", "ip-obs");
     var label = CATEGORY_LABELS[row.category_code];
-    var catText = label ? label.ko : (row.category_label_ko || "");
+    // 표에 없는 코드일 때의 폴백은 DB 의 한국어 라벨이라, 영어 화면에는 싣지 않는다
+    // — 라벨 하나를 잃는 것보다 영어 화면에 한국어를 남기는 쪽이 나쁘다(firm.js 와 동일 계약).
+    var fallbackCat = row.category_label_ko || "";
+    var catText = label ? label.ko
+      : (_isEn && _HANGUL.test(fallbackCat) ? "" : fallbackCat);
     if (catText) card.appendChild(el("p", "ip-obs-cat", catText));
 
     // [다국어 3단계] 본문은 읽는 언어 먼저(영어판=규제기관 원문), 접기는 반대편.
@@ -675,7 +679,8 @@
     // M건)"을 남긴다(firm.js 와 동일 계약).
     var partiallyPublic = canExpand && (doc.public_obs_cnt || 0) < obsCnt;
     var countText = _t("지적 {n}건", { n: fmtNum(obsCnt) }) +
-      (partiallyPublic ? _t("(국문 열람 가능 {n}건)", { n: fmtNum(doc.public_obs_cnt) }) : "");
+      // 병기 괄호 앞에 공백 하나 — 영어에서 "5 findings(3 available)" 처럼 붙어버리는 것을 막는다.
+      (partiallyPublic ? " " + _t("(국문 열람 가능 {n}건)", { n: fmtNum(doc.public_obs_cnt) }) : "");
     main.appendChild(el("span", "ip-doc-count", countText));
 
     var detail = document.createElement("div");

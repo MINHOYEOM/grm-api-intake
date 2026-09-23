@@ -14,6 +14,12 @@
   · ★한국 업체명을 로마자로 지어내지 않는다 — 이름을 못 쓰면 그 줄을 빼고 건수로만 남긴다
     (식약처 실사 묶음 장이 영문 덱에서 빠지는 이유다).
 
+[마케팅 2026-09-23 계획 L-02] 게시 본문(캡션)은 두 형식 — `--caption one`(기본, "이번 주 한
+건": 헤드라인 카드 1건의 사실·시사점·점검 2개만) · `--caption summary`(종전 전체 요약형). 슬라이드
+는 두 형식이 동일하고, 파일 이름(`linkedin.txt` 등)도 그대로다 — 월요일 태스크가 이 이름에
+의존한다. 본문 안 URL 에만 UTM 을 붙인다(`deck["caption_url"]`, `web/utm.py`) — 슬라이드 URL
+(`deck["url"]`)은 깨끗하게 둔다.
+
 두 층으로 나뉜다.
   · 순수 빌더(결정론·네트워크 0) — `build_deck()`: 브리프 JSON + 용어사전 → 슬라이드 스펙·본문.
     `render_html()`: 스펙 → 단일 HTML(장마다 page-break). 테스트는 이 층만 본다.
@@ -44,6 +50,14 @@ from typing import Any
 
 WEB_DIR = Path(__file__).resolve().parent
 SITE_BASE_URL = "https://grm-solutions.com"
+
+# [마케팅 2026-09-23] 게시 본문 URL 에만 UTM 을 붙인다 — 슬라이드 안의 URL(`deck["url"]`)은
+# 깨끗하게 두고 캡션 전용 `deck["caption_url"]`만 태그를 단다. 이 파일은 보통 스크립트로 직접
+# 실행돼(`python web/linkedin_cards.py`) sys.path[0] 이 이미 web/ 디렉터리지만, render.py 와
+# 같은 방어적 삽입을 둬 다른 실행 컨텍스트(테스트 등)에서도 같은 디렉터리의 utm.py 를 찾는다.
+if str(WEB_DIR) not in sys.path:
+    sys.path.insert(0, str(WEB_DIR))
+from utm import LINKEDIN_WEEKLY, linkedin_weekly_campaign, with_utm  # noqa: E402
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 텍스트 유틸(결정론)
@@ -95,6 +109,91 @@ def split_two(text: str, max_width: float = 11.0) -> list[str]:
     cands.sort(key=lambda c: (c[0], c[1]))
     _, left, right = cands[0]
     return [left, right]
+
+
+def _wrap_cuts(t: str, max_width: float) -> list[tuple[int, float]]:
+    """`t` 안에서 끊을 수 있는 모든 자리 — (그 자리까지 문자열의 컷 오프셋, 그 왼쪽 부분의 폭).
+    자리는 공백·'·'·',' **뒤**뿐(단어 중간 금지). 끝(`len(t)`)도 하나의 '컷'으로 넣는다."""
+    cuts: list[tuple[int, float]] = []
+    for i, ch in enumerate(t):
+        if ch in " ·,":
+            cut = i if ch == " " else i + 1
+            left = t[:cut].rstrip()
+            if left:
+                cuts.append((cut, text_width(left)))
+    cuts.append((len(t), text_width(t)))
+    return cuts
+
+
+def _greedy_wrap(t: str, cuts: list[tuple[int, float]], max_width: float) -> list[int] | None:
+    """줄마다 상한 안에서 최대한 채우는 그리디 컷 — 임의의 최대폭 줄바꿈 문제에서 **줄 수를
+    최소화하는** 고전적 방법이다(균형 배분의 목표 줄 수 N 을 여기서 얻는다). 한 조각이 폭을
+    넘겨 못 끊으면 None."""
+    chosen: list[int] = []
+    pos_off, pos_w = 0, 0.0
+    i, n = 0, len(cuts)
+    while pos_off < len(t):
+        best = None
+        while i < n and cuts[i][1] - pos_w <= max_width:
+            best = cuts[i]
+            i += 1
+        if best is None:
+            return None
+        chosen.append(best[0])
+        pos_off, pos_w = best
+    return chosen
+
+
+def wrap_width(text: str, max_width: float = 26.0) -> list[str]:
+    """`text` 를 폭 max_width(text_width 단위) 안에 들어오는 여러 줄로 **균형 있게** 감싼다
+    (`split_two` 의 다줄 버전, [마케팅 2026-09-23 개정] '한눈에 한 줄' 피드백 3연속 반려 — 앞줄을
+    상한까지 욱여넣고 뒷줄에 짧은 나머지를 남기는 그리디 줄바꿈이 "문장을 잘못 끊는다"는 지적의
+    실제 원인이었다). 끊는 자리는 공백·'·'·',' 뒤뿐이라 단어 중간을 자르지 않고, 어떤 글자도
+    지어내거나 버리지 않는다.
+
+    방법: ①그리디로 최소 줄 수 N 을 구한다(줄 수 자체는 이 값을 넘기지 않는다) ②경계마다
+    "전체 폭 × k/N"에 가장 가까운 컷을 고른다(상한은 계속 지킨다) — 앞줄이 다 채우고 마지막
+    줄만 짧게 남는 대신, N 줄이 고르게 나뉜다. 균형 배분이 어느 경계에서 막히면(드묾) 그리디로
+    물러선다 — 상한을 넘기는 일은 없다. 끊을 자리가 아예 없는 한 덩어리(예: 긴 라틴 단어)는
+    그 줄만 상한을 넘긴 채로 낸다 — 없는 공백을 만들 수는 없다."""
+    t = " ".join(text.split())
+    if not t:
+        return []
+    total_w = text_width(t)
+    if total_w <= max_width:
+        return [t]
+
+    cuts = _wrap_cuts(t, max_width)
+    greedy = _greedy_wrap(t, cuts, max_width)
+    if greedy is None:
+        return [t]                          # 끊을 자리가 없다 — 한 덩어리가 폭을 넘는다
+    n_lines = len(greedy)
+    if n_lines <= 1:
+        return [t]
+
+    offsets = greedy
+    pos_off, pos_w = 0, 0.0
+    boundaries: list[int] = []
+    for k in range(1, n_lines):
+        target = total_w * k / n_lines
+        window = [c for c in cuts if c[0] > pos_off and c[1] - pos_w <= max_width]
+        if not window:
+            boundaries = []
+            break
+        chosen = min(window, key=lambda c: abs(c[1] - target))
+        boundaries.append(chosen[0])
+        pos_off, pos_w = chosen
+    if boundaries and total_w - pos_w <= max_width:
+        offsets = boundaries + [len(t)]
+
+    lines: list[str] = []
+    prev = 0
+    for cut in offsets:
+        seg = t[prev:cut].strip()
+        if seg:
+            lines.append(seg)
+        prev = cut
+    return lines
 
 
 def fit_size(lines: list[str], base_px: int, max_px: float = 890.0, min_px: int = 48) -> int:
@@ -216,6 +315,10 @@ STR: dict[str, dict[str, Any]] = {
         "cap_link": "전체 {n}건과 원문 링크",
         "cap_cta": ["어떤 항목이 제일 신경 쓰이시나요?", "댓글로 남겨 주시면 다음 주에 다룹니다."],
         "cap_tags": ["#GMP #제약 #바이오 #규제 #품질관리", "#QA #FDA #식약처 #경고서한 #제약바이오"],
+        # [마케팅 2026-09-23] '이번 주 한 건' 캡션(기본, `--caption one`) 전용 고정 문구.
+        "one_checks_head": "현장 점검 포인트",
+        "one_link_head": "공식 원문과 이번 주 브리프 전체",
+        "one_tags": "#GMP #QA #품질보증 #FDA #제약",
     },
     "en": {
         "cover_eyebrow": "Weekly regulatory news · {mon}, week {wk}",
@@ -251,6 +354,9 @@ STR: dict[str, dict[str, Any]] = {
         "cap_cta": ["Which item would concern you most?", "Tell us in the comments and we'll cover it next week."],
         "cap_tags": ["#GMP #pharma #biotech #regulatory #qualityassurance",
                      "#QA #FDA #EMA #MHRA #MFDS"],
+        "one_checks_head": "What to check on site",
+        "one_link_head": "Official sources and the full weekly brief",
+        "one_tags": "#GMP #QA #QualityAssurance #FDA #pharma",
     },
 }
 
@@ -657,15 +763,133 @@ def anonymize(cards: list[dict]) -> dict[str, str]:
     return mapping
 
 
+# [마케팅 2026-09-23 개정] 헤드라인 표 rows 빌드(위 build_deck 의 facts 루프)가 이미 이 라벨을
+# 인식해 표에서는 빼는 그 자리 — 캡션 헤더 줄에서는 값(날짜)으로 쓴다. 재정의하지 않게 상수로 뺀다.
+_DATE_FACT_PREFIXES = ("발행", "Published", "Posted")
+_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4}")
+
+
+def _card_date(card: dict, lang: str) -> str:
+    """카드 key_facts 의 '발행 부서/일자'류 사실에서 날짜만 뽑는다. 값에 발행 부서명이 섞여
+    있으면(FDA '…(CDER) · 08/18/2026') 날짜 조각만 취하고, 그런 라벨 자체가 없는 카드
+    (회수 등)는 빈 문자열 — 지어내지 않는다."""
+    for f in _card_list(card, "key_facts", lang):
+        kv = parse_fact(f)
+        if kv and kv[0].startswith(_DATE_FACT_PREFIXES):
+            m = _DATE_RE.search(kv[1])
+            return m.group(0) if m else ""
+    return ""
+
+
+def _fact_header(card: dict, lang: str, firm_fn) -> str:
+    """`{기관} · {문서 유형} · {업체} · {날짜}` 한 줄 — '지적 1/지적 2' 처럼 여러 줄로 감싸야
+    하던 사실 대신, 감싸지 않고 한 줄로 들어오게 **구성 단계에서** 짧게 짓는다(2026-09-23 반려
+    피드백: 긴 사실을 wrap 하면 "충분한 / 크기의" 처럼 문장 중간이 끊긴다 — 짧은 헤더는 애초에
+    끊을 일이 없다). 기관·문서유형은 필수, 업체·날짜는 폭이 넘치면 순서대로(업체 먼저) 뺀다."""
+    agency = _label(card, lang)          # 국문 덱은 '식약처', 영문 덱은 'MFDS' — 덱 본문과 같은 표기
+    kind = _kind_chip(card, lang)
+    firm_name = _firm_short(firm_fn(card))
+    date = _card_date(card, lang)
+    mandatory = [p for p in (agency, kind) if p]
+    for extra in ([firm_name, date], [date], []):
+        parts = mandatory + [p for p in extra if p]
+        line = " · ".join(parts)
+        if text_width(line) <= 26.0 or not extra:
+            return line
+    return " · ".join(mandatory)   # 도달 불가(위 루프의 extra=[] 가지가 항상 먼저 반환) — 방어용
+
+
+def _one_extra_fact(card: dict, lang: str) -> str:
+    """key_facts 중 줄바꿈 없이 폭 안에 들어오는 **첫 한 줄**('라벨: 값') — 없으면 빈 문자열.
+    긴 지적문(citation·observation)은 폭을 넘으므로 애초에 고르지 않는다(감싸지 않는다 — 감싸면
+    또 문장 중간이 끊긴다). 헤더가 이미 쓴 날짜 사실은 중복이라 건너뛴다."""
+    for f in _card_list(card, "key_facts", lang):
+        kv = parse_fact(f)
+        if not kv or kv[0].startswith(_DATE_FACT_PREFIXES):
+            continue
+        line = f"{kv[0]}: {kv[1]}"
+        if text_width(line) <= 26.0:
+            return line
+    return ""
+
+
+def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str | None:
+    """'이번 주 한 건' 캡션([마케팅 2026-09-23 계획 L-02, 09-23 개정] 게시 본문 기본형,
+    `--caption one`).
+
+    헤드라인 카드([`pick_headline_cards`][pick_headline_cards]) 중 **시사점과 점검을 모두 가진
+    첫 카드**를 고른다 — 없으면 시사점만 있는 첫 카드로 점검 칸을 생략하고, 그마저 없으면
+    `None`(호출부가 종전 요약형 캡션으로 물러선다). 사실 관계는 카드 JSON 에서 **그대로**
+    (LLM 슬롯 0). 줄바꿈은 `wrap_width`(모바일 폭 상한 26, 균형 배분) — 2줄을 넘으면
+    `first_sentence` 로 줄인 뒤 다시 감싼다. 불릿("• ")·들여쓰기("  ")도 폭에 넣어야 붙인 뒤에도
+    26 안쪽이다. ★'무슨 일' 블록은 감싼 사실 여러 줄 대신 **한 줄 헤더**(`_fact_header`) +
+    선택적 한 줄(`_one_extra_fact`)이다 — 긴 지적문을 wrap 하면 문장 중간이 끊긴다는 반려
+    피드백을 감싸기가 아니라 구성으로 없앤다."""
+    t = STR[lang]
+    bullet_w = text_width("• ")
+
+    def item(text: str, max_width: float = 26.0) -> list[str]:
+        lines = wrap_width(text, max_width)
+        if len(lines) > 2:
+            # 2줄에 안 들어오면 먼저 문장을 줄인다(first_sentence) — 그래도 안 들어오면
+            # **문장 중간을 자르지 않고** 그대로 낸다(2줄은 목표이지 상한이 아니다).
+            lines = wrap_width(first_sentence(text, lang), max_width)
+        return lines
+
+    card: dict | None = None
+    checks: list[str] = []
+    for c in heads:
+        impl = _card_text(c, "implication", lang).strip()
+        if not impl:
+            continue
+        if card is None:      # 시사점 있는 첫 카드 — 점검 없는 카드만 만나면 이 폴백을 쓴다
+            card = c
+        cks = [" ".join(str(x).split()) for x in _card_list(c, "checks", lang) if str(x).strip()]
+        if cks:
+            card, checks = c, cks[:2]
+            break
+    if card is None:
+        return None
+
+    lines: list[str] = list(item(_card_text(card, "title_issue", lang)))
+    lines.append("")
+    lines.append(_fact_header(card, lang, firm_fn))
+    extra = _one_extra_fact(card, lang)
+    if extra:
+        lines.append(extra)
+    lines += item(first_sentence(_card_text(card, "implication", lang), lang))
+    lines.append("")
+    if checks:
+        lines.append(t["one_checks_head"])
+        for chk in checks:
+            wrapped = item(chk, 26.0 - bullet_w)
+            if not wrapped:
+                continue
+            lines.append(f"• {wrapped[0]}")
+            lines += [f"  {ln}" for ln in wrapped[1:]]
+        lines.append("")
+    lines.append(t["one_link_head"])
+    lines.append(caption_url)
+    lines.append("")
+    lines.append(t["one_tags"])
+    return "\n".join(lines) + "\n"
+
+
 def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
-               base_url: str = SITE_BASE_URL, lang: str = "ko") -> dict[str, Any]:
-    """브리프 JSON(+용어사전) → {"pub","slides","caption","doc_title"}. 순수·결정론.
+               base_url: str = SITE_BASE_URL, lang: str = "ko",
+               caption_style: str = "one") -> dict[str, Any]:
+    """브리프 JSON(+용어사전) → {"pub","slides","caption","caption_url","doc_title","url"}. 순수·결정론.
 
     `lang="en"` 이면 **같은 항목을 영어로** 낸다 — 무엇을 실을지(헤드라인 카드·용어·점검·주제
     집계)는 한국어 정본으로 고르고, 화면에 나가는 글자만 영문 블록(`card["en"]`·`*_en`)에서
-    가져온다. 두 덱이 서로 다른 소식을 말하지 않게 하려는 것이다."""
+    가져온다. 두 덱이 서로 다른 소식을 말하지 않게 하려는 것이다.
+
+    `caption_style`([마케팅 2026-09-23 계획] `"one"` 기본 · `"summary"` 종전형) 은 게시 본문
+    (`caption`)만 가른다 — 슬라이드는 어느 쪽이든 동일하다."""
     if lang not in STR:
         raise ValueError(f"지원하지 않는 언어: {lang!r} (가능: {', '.join(LANGS)})")
+    if caption_style not in ("one", "summary"):
+        raise ValueError(f"지원하지 않는 캡션 형식: {caption_style!r} (가능: one, summary)")
     t = STR[lang]
     brief = brief_doc.get("brief") or {}
     cards = sorted(brief_doc.get("cards") or [], key=lambda c: int(c.get("render_order") or 0))
@@ -811,7 +1035,12 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
     for i, s in enumerate(slides, 1):
         s["idx"], s["total"] = i, len(slides)
 
-    # ── 본문(한 줄에 한 뜻·모바일 폭 안쪽)
+    # ── 본문 URL — [마케팅 2026-09-23] 슬라이드 URL(위 `url`)은 깨끗하게 두고, 캡션에만 UTM 을
+    # 붙인다(`web/utm.py`). RUM 은 쿼리를 안 읽으므로 이 태그의 소비자는 사이트 first-touch
+    # 계측뿐 — 슬라이드 안 표시용 URL 을 더럽히지 않는다.
+    caption_url = with_utm(url, *LINKEDIN_WEEKLY, linkedin_weekly_campaign(pub))
+
+    # ── 본문 A: 요약형(종전 기본, `--caption summary`) — 한 줄에 한 뜻·모바일 폭 안쪽
     lines = [nfmt(t["cap_head"], len(slides)), ""]
     for c in heads[:2]:
         headline = " ".join(_card_text(c, "title_issue", lang).split())
@@ -837,11 +1066,19 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
         tail.append(nfmt(t["cap_checks"], len(checks)))
     if tail:
         lines.append("· " + " · ".join(tail))
-    lines += ["", nfmt(t["cap_link"], n_cards), url, "",
+    lines += ["", nfmt(t["cap_link"], n_cards), caption_url, "",
               *t["cap_cta"], "", *t["cap_tags"]]
-    caption = "\n".join(lines) + "\n"
+    summary_caption = "\n".join(lines) + "\n"
+
+    # ── 본문 B: '이번 주 한 건'(기본, `--caption one`) — 적합한 카드가 없으면 A 로 물러선다.
+    if caption_style == "summary":
+        caption = summary_caption
+    else:
+        caption = _caption_one(heads, caption_url, lang, firm) or summary_caption
+
     return {"pub": pub, "lang": lang, "slides": slides, "caption": caption,
-            "doc_title": t["doc_title"].format(m=m, wk=wk, mon=mon), "url": url}
+            "doc_title": t["doc_title"].format(m=m, wk=wk, mon=mon), "url": url,
+            "caption_url": caption_url}
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1099,6 +1336,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-pdf", action="store_true", help="Chrome 렌더를 건너뛴다(html/txt 만)")
     ap.add_argument("--lang", default=",".join(LANGS),
                     help=f"낼 언어(쉼표) — 기본 {','.join(LANGS)}. ko=linkedin.*, en=linkedin_en.*")
+    ap.add_argument("--caption", choices=("one", "summary"), default="one",
+                    help="게시 본문 형식 — 기본 one('이번 주 한 건', 마케팅 2026-09-23 계획). "
+                         "summary 는 종전 요약형. 파일 이름(linkedin.txt 등)은 그대로다.")
     args = ap.parse_args(argv)
 
     brief_path = Path(args.brief) if args.brief else latest_brief_path(Path(args.data))
@@ -1120,7 +1360,7 @@ def main(argv: list[str] | None = None) -> int:
         # 파일 이름: 한국어는 기존 그대로(linkedin.*), 영어는 접미(linkedin_en.*).
         # 기존 링크·운영 루틴을 건드리지 않으려고 가산만 한다.
         stem = "linkedin" if lang == "ko" else f"linkedin_{lang}"
-        deck = build_deck(brief_doc, glossary, anon=args.anon, lang=lang)
+        deck = build_deck(brief_doc, glossary, anon=args.anon, lang=lang, caption_style=args.caption)
         # 영문 블록이 없는 옛 브리프는 소식 장이 거의 없는 껍데기가 된다 — 조용히 내보내지 않고
         # 경고 후 그 언어만 건너뛴다(빈 덱이 배포되면 아무도 모른다).
         if not any(s["kind"] == "headline" for s in deck["slides"]):

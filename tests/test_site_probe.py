@@ -77,6 +77,14 @@ def _snapshot_status_text(*, rows: int = 7, oldest_age_s: int = 300,
     return json.dumps(items)
 
 
+def _cache_status_text(*, rows: int = 194, fresh: int = 194, hot_age_s: int = 300,
+                       errors: int = 0, table_bytes: int = 20_000_000) -> str:
+    """[086] findings_search_cache_status() 응답 모양 — 단일 객체."""
+    return json.dumps({"rows": rows, "fresh": fresh, "hot_rows": 2, "hot_oldest_age_s": hot_age_s,
+                       "daily_rows": rows - 2, "daily_oldest_age_s": 3600, "errors": errors,
+                       "max_computed_ms": 900, "table_bytes": table_bytes})
+
+
 def _ok_post_map(*, supabase: str = SUPABASE) -> dict[str, FakeResponse]:
     return {
         f"{supabase}/rest/v1/rpc/fda_inspection_stats": FakeResponse(200, elapsed_s=0.2),
@@ -84,6 +92,9 @@ def _ok_post_map(*, supabase: str = SUPABASE) -> dict[str, FakeResponse]:
         f"{supabase}/rest/v1/rpc/findings_similar_to": FakeResponse(200, elapsed_s=0.4),
         f"{supabase}/rest/v1/rpc/rpc_snapshot_status": FakeResponse(
             200, text=_snapshot_status_text(), elapsed_s=0.1),
+        f"{supabase}/rest/v1/rpc/findings_search": FakeResponse(200, elapsed_s=0.3),
+        f"{supabase}/rest/v1/rpc/findings_search_cache_status": FakeResponse(
+            200, text=_cache_status_text(), elapsed_s=0.1),
     }
 
 
@@ -141,6 +152,70 @@ class RpcSnapshotFreshnessTest(unittest.TestCase):
         rows = [c for c in report["checks"] if c["name"].startswith("RPC 스냅샷 신선도")]
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["status"], "fail")
+        self.assertEqual(report["overall"], "fail")
+
+
+class FindingsSearchCacheFreshnessTest(unittest.TestCase):
+    """[086] 검색 캐시 신선도 — 폴백이 가리는 cron 사망을 probe 가 밖으로 내는가.
+
+    경계는 site_probe 상수 그대로(신선 150행 · hot 45분 warn · 3시간 fail). 뮤테이션: 검사가
+    fresh 대신 rows 를 보거나 hot 최고령을 안 보면 아래가 각각 초록으로 돌아선다.
+    """
+
+    def _run(self, resp: FakeResponse):
+        with mock.patch("site_probe.requests.post", return_value=resp):
+            return site_probe.check_findings_search_cache_fresh("cache", SUPABASE, "anon-key", 5.0)
+
+    def test_fresh_is_ok(self):
+        r = self._run(FakeResponse(200, text=_cache_status_text()))
+        self.assertEqual(r.status, "ok")
+        self.assertIn("신선 194", r.detail)
+
+    def test_hot_two_missed_refreshes_is_warn(self):
+        r = self._run(FakeResponse(200, text=_cache_status_text(hot_age_s=50 * 60)))
+        self.assertEqual(r.status, "warn")
+
+    def test_hot_four_hours_stale_is_fail(self):
+        r = self._run(FakeResponse(200, text=_cache_status_text(hot_age_s=4 * 3600)))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("정지 의심", r.detail)
+
+    def test_too_few_fresh_rows_is_fail_even_if_rows_present(self):
+        # 행은 194 그대로인데 신선이 100 — rows 를 보면 초록이 되는 함정.
+        r = self._run(FakeResponse(200, text=_cache_status_text(fresh=100)))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("100/150", r.detail)
+
+    def test_non_json_body_is_fail(self):
+        r = self._run(FakeResponse(200, text="<html>cloudflare</html>"))
+        self.assertEqual(r.status, "fail")
+
+    def test_array_body_is_fail(self):
+        r = self._run(FakeResponse(200, text="[]"))
+        self.assertEqual(r.status, "fail")
+
+    def test_http_error_is_fail(self):
+        r = self._run(FakeResponse(404, text='{"message":"function not found"}'))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("HTTP 404", r.detail)
+
+    def test_run_probe_includes_cache_and_default_search_checks(self):
+        today = dt.date(2026, 3, 10)
+        get_map = _ok_get_map(today)
+        post_map = _ok_post_map()
+        post_map[f"{SUPABASE}/rest/v1/rpc/findings_search_cache_status"] = FakeResponse(
+            200, text=_cache_status_text(fresh=10))
+        with mock.patch("site_probe.requests.get", side_effect=_dispatch(get_map)), \
+             mock.patch("site_probe.requests.post", side_effect=_dispatch(post_map)):
+            report = site_probe.run_probe(
+                base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
+                today=today, timeout=5.0)
+        cache_rows = [c for c in report["checks"] if c["name"].startswith("RPC 검색 캐시 신선도")]
+        self.assertEqual(len(cache_rows), 1)
+        self.assertEqual(cache_rows[0]["status"], "fail")
+        search_rows = [c for c in report["checks"] if c["name"].startswith("RPC findings_search(")]
+        self.assertEqual(len(search_rows), 1)
+        self.assertEqual(search_rows[0]["status"], "ok")
         self.assertEqual(report["overall"], "fail")
 
 

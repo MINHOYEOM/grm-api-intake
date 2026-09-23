@@ -92,6 +92,13 @@ SNAPSHOT_EXPECTED_ROWS = 7
 SNAPSHOT_WARN_AGE_S = 40 * 60
 SNAPSHOT_FAIL_AGE_S = 2 * 60 * 60
 
+# [086] findings_search 결과 캐시(findings_search_cache_status). 시드 194행(hot 2 = 기본 목록 ·
+# daily 192 = 용어사전 사례 링크). hot 은 20분 갱신이라 스냅샷과 같은 결로 최고령을 보고,
+# daily 는 하루 1회라 "신선한 행 수"로 본다 — 신선이 150 아래면 daily 갱신이 죽었거나 086 미적용.
+CACHE_MIN_FRESH_ROWS = 150
+CACHE_HOT_WARN_AGE_S = 45 * 60
+CACHE_HOT_FAIL_AGE_S = 3 * 60 * 60
+
 
 @dataclass
 class CheckResult:
@@ -282,6 +289,55 @@ def check_rpc_snapshot_fresh(name: str, base_url_norm: str | None, anon_key: str
     return CheckResult(name, "ok", elapsed, detail)
 
 
+def check_findings_search_cache_fresh(name: str, base_url_norm: str | None, anon_key: str,
+                                      timeout: float, *,
+                                      min_fresh_rows: int = CACHE_MIN_FRESH_ROWS,
+                                      warn_age_s: int = CACHE_HOT_WARN_AGE_S,
+                                      fail_age_s: int = CACHE_HOT_FAIL_AGE_S) -> CheckResult:
+    """[086] `findings_search_cache_status()` 를 읽어 검색 캐시가 살아 있는지 본다.
+
+    캐시는 폴백이 있어 죽어도 화면은 느려질 뿐이다 — 그래서 이 검사가 없으면 cron 사망을
+    아무도 모른다(085 스냅샷과 같은 이유). 신선 행 부족 = daily 갱신 정지·086 미적용,
+    hot 최고령 초과 = 20분 갱신 정지.
+    """
+    if base_url_norm is None:
+        return CheckResult(name, "fail", 0.0, "SUPABASE_URL 미설정 또는 https:// 형식 아님")
+    if not anon_key:
+        return CheckResult(name, "fail", 0.0, "SUPABASE_ANON_KEY 미설정")
+    url = f"{base_url_norm}/rest/v1/rpc/findings_search_cache_status"
+    headers = {
+        "apikey": anon_key,
+        "Authorization": f"Bearer {anon_key}",
+        "Content-Type": "application/json",
+    }
+    resp, err = _post(url, headers, {}, timeout)
+    if err is not None:
+        return CheckResult(name, "fail", 0.0, f"요청 실패: {err}")
+    elapsed = _resp_elapsed(resp)
+    if resp.status_code != 200:
+        return CheckResult(name, "fail", elapsed, f"HTTP {resp.status_code}")
+    try:
+        st = json.loads(resp.text)
+    except (TypeError, ValueError):
+        return CheckResult(name, "fail", elapsed, "응답이 JSON 이 아님")
+    if not isinstance(st, dict):
+        return CheckResult(name, "fail", elapsed, "응답이 객체가 아님")
+    rows = int(st.get("rows") or 0)
+    fresh = int(st.get("fresh") or 0)
+    hot_age = int(st.get("hot_oldest_age_s") or 0)
+    errors = int(st.get("errors") or 0)
+    table_mb = int(st.get("table_bytes") or 0) / 1_000_000
+    detail = f"행 {rows} · 신선 {fresh} · hot 최고령 {hot_age}s · 오류 {errors} · {table_mb:.1f} MB"
+    if fresh < min_fresh_rows:
+        return CheckResult(name, "fail", elapsed,
+                           f"{detail} — 신선 {fresh}/{min_fresh_rows} 미만(daily 갱신 정지 또는 086 미적용)")
+    if hot_age > fail_age_s:
+        return CheckResult(name, "fail", elapsed, f"{detail} > {fail_age_s}s(hot 갱신 정지 의심)")
+    if hot_age > warn_age_s:
+        return CheckResult(name, "warn", elapsed, f"{detail} > {warn_age_s}s(hot 갱신 2회 결손)")
+    return CheckResult(name, "ok", elapsed, detail)
+
+
 def _overall_status(checks: list[CheckResult]) -> str:
     if any(c.status == "fail" for c in checks):
         return "fail"
@@ -346,6 +402,12 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
     # 4) [085] 스냅샷 신선도 — 폴백이 가리는 cron 사망을 밖으로 낸다
     checks.append(check_rpc_snapshot_fresh(
         "RPC 스냅샷 신선도(rpc_snapshot_status)", base_norm, anon_key, timeout))
+
+    # 5) [086] 검색 캐시 — 첫 화면이 매번 쏘는 기본 목록의 가용성·지연 + 캐시 신선도
+    checks.append(check_rpc(
+        "RPC findings_search(기본 목록)", base_norm, anon_key, "findings_search", {}, timeout))
+    checks.append(check_findings_search_cache_fresh(
+        "RPC 검색 캐시 신선도(findings_search_cache_status)", base_norm, anon_key, timeout))
 
     return {
         "schema_version": SCHEMA_VERSION,

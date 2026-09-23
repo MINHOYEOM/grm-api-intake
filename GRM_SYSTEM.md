@@ -196,7 +196,7 @@ flowchart TD
 | 보조 | **주간 퀴즈 미생성 감시**(로컬 태스크의 침묵을 클라우드에서 본다 — 이번 주 세트 부재 시 `quiz-freshness` 이슈, 생기면 자동 종료) | `grm-quiz-freshness.yml` | cron 화 13:10 KST | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
 | 보조 | **뉴스레터 발송 누락 감시**(발행 PR 머지 뒤 Admin 발송이 빠진 주를 Brevo 캠페인 상태로 탐지 — dispatch_log 는 진실이 아니다) | `grm-newsletter-freshness.yml` | cron 월 20:13 · 화 09:13 KST + dispatch | 없음 |
-| 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt` **+ 영문판 `linkedin_en.*`**, 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0 · 영문은 카드의 `en` 블록에서만 — 한국 업체명은 로마자로 옮기지 않고 건수로만 남긴다) | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
+| 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt` **+ 영문판 `linkedin_en.*`**, 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0 · 영문은 카드의 `en` 블록에서만 — 한국 업체명은 로마자로 옮기지 않고 건수로만 남긴다) · 게시 본문은 **'이번 주 한 건'**(헤드라인 카드 1건의 사실·시사점·점검 2개, 2026-09-23 마케팅 계획 L-02) 이 기본이고 `--caption summary` 로 종전 요약형을 낸다 · 본문 URL 에만 UTM(`linkedin/social/{date}_weekly`, `web/utm.py`) — 슬라이드 URL 은 깨끗하게 | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
 | 보조 | 관심업체 통지 자동 발송(멱등 로그·상한) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | 없음 |
 | 보조 | 서비스 업데이트 안내 발송(멱등·마일스톤에만) | `grm-announce-send.yml` | **수동 dispatch만**(스케줄 없음 — 의도적) | 없음 |
 | 보조 | 발행 후 provenance 감사 | `grm-brief-audit.yml` | cron 월 11:00 KST + 발행 머지 직후 | 없음 |
@@ -558,6 +558,7 @@ grm-api-intake/
 ├─ web/
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
+│  ├─ utm.py                     # [성장 2026-09-23] UTM 부착 헬퍼 + 채널 규약(링크드인·뉴스레터·공유). RUM 은 쿼리를 안 읽으므로 소비자는 base.html 의 first-touch 계측(087)뿐
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본
 │  ├─ quiz_en_merge.py           # [다국어 2026-09-05] 주간 퀴즈 영문 문항 병합기 — 정본에 `question_en`·`choices_en`·`explanation_en` 을 **가산**한다(기존 키·들여쓰기 무변형·멱등). 게이트 3중 = 세 필드 전부거나 전부 없거나 · `choices_en` 길이 일치(`answer_index` 공유) · **EN_INVENTED_NUMBER**(`render.validate_quiz_en_facts` — 렌더와 같은 함수를 불러 사본 0)
 │  ├─ templates/  (landing·archive·brief·findings·**findings_browse**(둘러보기 면)·trends·**inspections**·**coverage**·**checklist**·firm·**inspector**·me·admin·base·library·library_catalog·guide·**about**(소개 /about/ — 2026-09-06)·glossary·**glossary_term**·**findings_facet**·**findings_facet_index**·**findings_doc**·**findings_doc_list**·quiz·**landing_en**(영어판 홈 — 주간 브리프 히어로가 없는 별도 면))

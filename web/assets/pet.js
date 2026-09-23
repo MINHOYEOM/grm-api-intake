@@ -157,7 +157,7 @@
   function asset(i) { return "/assets/gurumi-" + stages[i].slug + ".png"; }
   function atlas() {
     var host = $("grm-pet-atlas"), html = "";
-    stages.forEach(function (s, i) { html += '<button class="grm-pet-stage" type="button" data-stage="' + i + '" aria-label="' + _t("{name} 미리보기", { name: s.name }) + '"><img src="' + asset(i) + '" width="512" height="512" loading="lazy" decoding="async" alt=""><span>' + s.name.replace(" 구름이", "") /* i18n-ignore */ + "</span></button>"; });
+    stages.forEach(function (s, i) { html += '<button class="grm-pet-stage" type="button" data-stage="' + i + '" aria-label="' + _t("{name} 미리보기", { name: s.name }) + '"><img src="' + asset(i) + '" width="512" height="512" loading="lazy" decoding="async" alt=""><span>' + s.name.replace(" 구름이", "").replace(" Gurumi", "") /* i18n-ignore */ + "</span></button>"; });
     host.innerHTML = html;
     host.addEventListener("click", function (e) { var b = e.target.closest("[data-stage]"); if (!b) return; preview(parseInt(b.getAttribute("data-stage"), 10)); });
   }

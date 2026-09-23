@@ -613,7 +613,8 @@
     // "(국문 열람 가능 M건)"을 남긴다.
     var partiallyPublic = canExpand && (doc.public_obs_cnt || 0) < obsCnt;
     var countText = _t("지적 {n}건", { n: fmtNum(obsCnt) }) +
-      (partiallyPublic ? _t("(국문 열람 가능 {n}건)", { n: fmtNum(doc.public_obs_cnt) }) : "");
+      // 병기 괄호 앞에 공백 하나 — 영어에서 "5 findings(3 available)" 처럼 붙어버리는 것을 막는다.
+      (partiallyPublic ? " " + _t("(국문 열람 가능 {n}건)", { n: fmtNum(doc.public_obs_cnt) }) : "");
     main.appendChild(el("span", "fp-doc-count", countText));
 
     var detail = document.createElement("div");

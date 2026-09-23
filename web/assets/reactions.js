@@ -297,6 +297,23 @@
     pop.querySelector(".grm-login-x").addEventListener("click", closeLogin);
     pop.addEventListener("click", function (e) { if (e.target === pop) closeLogin(); });
 
+    // 접근성: ESC 로 닫고, Tab 은 카드 안에 가둔다(모달 밖 요소로 포커스가 새지 않게 —
+    // feedback.js 의 동일 트랩과 같은 계약). 팝업이 실제로 열려 있을 때만 반응한다.
+    pop.addEventListener("keydown", function (e) {
+      if (!pop.classList.contains("show")) return;
+      if (e.key === "Escape") { closeLogin(); return; }
+      if (e.key !== "Tab") return;
+      var f = pop.querySelectorAll("button, select, textarea, input, a[href]");
+      var vis = [];
+      for (var i = 0; i < f.length; i++) {
+        if (f[i].offsetParent !== null && !f[i].disabled) vis.push(f[i]);
+      }
+      if (!vis.length) return;
+      var first = vis[0], last = vis[vis.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
     // 비밀번호 표시/숨김 토글
     Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-toggle"), function (tg) {
       tg.addEventListener("click", function () {

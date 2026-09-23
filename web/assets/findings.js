@@ -35,6 +35,10 @@
   var _t = function (s, v) {
     var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;
     return v ? r.replace(/\{(\w+)\}/g, function (m, k) {
+      if (k === "s" && !Object.prototype.hasOwnProperty.call(v, "s")) {
+        var pn = v.n;
+        return (pn === 1 || pn === "1") ? "" : "s";
+      }
       return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;
   };
   var _isEn = (typeof document !== "undefined"

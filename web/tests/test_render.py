@@ -17230,8 +17230,9 @@ class WebEnBriefTest(unittest.TestCase):
                                      "한국어판에 불필요한 고지가 떴다")
                 # 요약 줄의 건수는 언어와 무관하다 — 한국어 "N건" 과 영어 "N items" 의
                 # 숫자가 같아야 한다(거르는 것은 제목 줄뿐이라는 계약).
+                # `{s}` 복수 표지(2026-09-23) 이후 1건은 "1 item" 이다 — 단·복수 모두 잡는다.
                 self.assertEqual(
-                    re.findall(r"</b> · .*?(\d+) items", en_b),
+                    re.findall(r"</b> · .*?(\d+) items?\b", en_b),
                     re.findall(r"</b> · .*?(\d+)건", ko_b),
                     "요약 줄의 건수가 언어에 따라 달라졌다")
             finally:

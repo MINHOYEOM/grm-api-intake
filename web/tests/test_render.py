@@ -8789,6 +8789,18 @@ class WebSeoMetaTest(unittest.TestCase):
             self.assertIn('<link rel="apple-touch-icon" href="/assets/favicon-180.png">', h)
             self.assertIn('<link rel="manifest" href="/site.webmanifest">', h)
 
+    def test_glossary_term_json_ld_escapes_angle_bracket(self):
+        """`build_glossary_term_json_ld` 도 `build_json_ld`·`build_breadcrumb_json_ld`
+        와 같은 `<` → `\\u003c` 계약을 따라야 한다 — 셋 다 `<script>` 안에 raw 로 박히므로
+        (base.html `{{ json_ld | safe }}`), 정의문(easy)에 `<` 가 있으면 `</script` 조기
+        종료 위험이 있다. json.dumps 는 그 문자를 그대로 두므로 수동 치환이 유일한 방어선."""
+        term = {"id": "t1", "term_ko": "용어", "term": "Term <A>",
+                "easy": "Compares a<b values."}
+        raw = render.build_glossary_term_json_ld(term)
+        self.assertNotIn("<", raw, "이스케이프 없이 '<' 가 그대로 샜다")
+        node = json.loads(raw)                            # 이스케이프해도 유효 JSON
+        self.assertEqual(node["description"], "Compares a<b values.")
+
     def test_json_ld_landing_only_and_valid(self):
         import re as _re
         m = _re.search(r'<script type="application/ld\+json">(.*?)</script>',
@@ -17468,6 +17480,126 @@ class WebFindingsTextOnlyTest(unittest.TestCase):
         self.assertIn("renderTextOnlyNote();", fn)
 
 
+class WebEnBriefFactTableTest(unittest.TestCase):
+    """[영문 사실표 2026-09-23] 라이브 `/en/briefs/2026-07-27/` 에서 실측된 결함 —
+    사실표 값이 `Published: 미확인`·`Issuing authority: MHRA (영국)` 처럼 한글째로
+    떴다. 세 갈래를 합성 카드로 고정한다: (a) 고정 어휘 토큰(`미확인`)은 tr() 로 실제
+    번역, (b) 고유명사 라벨(업체)은 그대로 두고 세지 않음, (c) 그 외 한글 사실값은
+    원문 그대로 두되 개수를 밝힌다.
+    """
+
+    @staticmethod
+    def _brief(pub="2026-07-27"):
+        card = {
+            "id": "c-en-facts-1", "render_order": 1, "group": "국내",
+            "group_label": "💊 합성의약품", "agency": "MFDS", "card_type": "행정처분",
+            "category": "Other", "modality": "💊 합성의약품", "type_tag": "행정처분",
+            "evidence_level": "A", "signal_tier": 1, "signal_label": "High",
+            "headline_target": "동아제약(주)",
+            "title_issue": "품목 제조업무정지",
+            "summary": "품목 제조업무정지 처분이 확인됐다.",
+            "implication": "해당 품목의 유통이 제한된다.",
+            "key_facts": ["제조업무정지 1개월"],
+            "checks": ["재발방지대책 확인"],
+            "facts": [
+                {"label": "발행일", "value": "미확인"},
+                {"label": "업체", "value": "동아제약(주)"},
+                {"label": "처분",
+                 "value": "해당 품목 제조업무정지 1개월(2026. 7. 1. ~ 2026. 7. 31.)"},
+            ],
+            "sources": {"info_url": "https://example.org/a",
+                        "official_url": "https://example.org/b"},
+            "en": {
+                "title_issue": "Manufacturing suspension",
+                "summary": "A one-month manufacturing suspension was confirmed.",
+                "implication": "Distribution of the item is restricted.",
+                "key_facts": ["One-month manufacturing suspension"],
+                "checks": ["Confirm corrective action plan"],
+            },
+        }
+        meta = {"run_date_kst": pub, "publish_date": pub,
+                "window": f"{pub}~{pub}", "agencies": ["MFDS"],
+                "tldr": ["국문 요약 한 줄"], "ai_disclosure": True,
+                "en": {"tldr": ["One-line English summary"]},
+                "coverage": {"rendered": 1, "intake_total": 1,
+                             "evidence": {"A": 1, "B": 0, "C": 0}}}
+        return {"schema": "grm-web-card/v1", "brief": meta, "cards": [card]}
+
+    def _build(self, brief):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enfacts_"))
+        data = tmp / "data"
+        data.mkdir(parents=True)
+        (data / f"brief_web_{brief['brief']['publish_date']}.json").write_text(
+            json.dumps(brief, ensure_ascii=False), encoding="utf-8")
+        out = tmp / "site"
+        render.render_site(data, out, render_doc_pages=False)
+        return tmp, out
+
+    def test_sentinel_translated_proper_noun_kept_notice_counts_remainder(self):
+        tmp, out = self._build(self._brief())
+        try:
+            page = out / "en" / "briefs" / "2026-07-27" / "index.html"
+            self.assertTrue(page.is_file(), "영문 브리프가 렌더되지 않았다")
+            html = page.read_text(encoding="utf-8")
+            # (a) 고정 어휘 토큰("미확인")은 tr() 로 실제 번역된다 — 한글이 남지 않는다.
+            self.assertIn("Unknown", html)
+            self.assertNotIn("미확인", html)
+            # (b) 고유명사 라벨(업체)의 값은 그대로 남는다 — 존재하지 않는 이름을
+            #     지어내지 않는다.
+            self.assertIn("동아제약(주)", html)
+            # (c) 그 외 한글 사실값(처분)은 원문 그대로 남고, 고지가 정확한 개수(1)를
+            #     말한다 — 고유명사(업체)는 세지 않으므로 1이어야 한다.
+            self.assertIn(
+                "해당 품목 제조업무정지 1개월(2026. 7. 1. ~ 2026. 7. 31.)", html)
+            self.assertIn(
+                "Shown in the original Korean: 1 value in this table.", html,
+                "한글 잔존 개수 고지가 없거나 개수가 틀렸다")
+            self.assertNotIn("1 values", html, "단수 처리({s})가 깨졌다")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_korean_tree_is_byte_untouched(self):
+        """한국어 트리는 이 기능 자체가 없다 — 사실값·고지 모두 종전과 같다."""
+        tmp, out = self._build(self._brief())
+        try:
+            ko = (out / "briefs" / "2026-07-27" / "index.html").read_text(
+                encoding="utf-8")
+            self.assertIn("미확인", ko, "한국어판 사실값이 바뀌었다")
+            self.assertNotIn("Unknown", ko)
+            self.assertNotIn("한국어 원문 그대로입니다", ko,
+                             "한국어판에 새 고지가 떴다 — facts_ko_count 는 한국어 "
+                             "트리에서 항상 0 이어야 한다")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_card_view_unit_rules(self):
+        """`_card_view` 단위 — 세 갈래(고정 어휘·고유명사·그 외 한글)와 `facts_ko_count`."""
+        card = {
+            "id": "c1", "render_order": 1,
+            "facts": [
+                {"label": "발행일", "value": "미확인"},
+                {"label": "업체", "value": "동아제약(주)"},
+                {"label": "처분", "value": "해당 품목 제조업무정지 1개월"},
+            ],
+        }
+        en_tr = grm_i18n.Translator("en")
+        en_view = render._card_view(card, en_tr, "en")
+        by_label = {f["label"]: f["value"] for f in en_view["facts"]}
+        # (a) 고정 어휘 토큰은 tr() 를 태운다 — 라벨이 "발행일"이라 English label
+        #     은 "Published"(en.json)로 바뀌지만 여기선 값만 확인한다.
+        self.assertEqual(by_label[en_tr("발행일")], "Unknown")
+        # (b) 고유명사 라벨(업체)의 값은 그대로다.
+        self.assertEqual(by_label[en_tr("업체")], "동아제약(주)")
+        # (c) 그 외 한글 사실값(처분)은 그대로 두되 세어진다.
+        self.assertEqual(by_label[en_tr("처분")], "해당 품목 제조업무정지 1개월")
+        self.assertEqual(en_view["facts_ko_count"], 1)
+        # 한국어 트리는 값·개수 모두 변형이 없다(facts_ko_count 는 항상 0).
+        ko_view = render._card_view(card)
+        ko_by_label = {f["label"]: f["value"] for f in ko_view["facts"]}
+        self.assertEqual(ko_by_label["발행일"], "미확인")
+        self.assertEqual(ko_view["facts_ko_count"], 0)
+
+
 class WebEnFirmPageTest(unittest.TestCase):
     """[다국어 2026-09-04] 영어판 업체 페이지 — 슬러그는 물려받고, 숫자는 다시 센다.
 
@@ -17890,6 +18022,42 @@ class WebEnGlossaryTest(unittest.TestCase):
         # 한국어판에는 이 문구가 없다(거기서는 원문이 곧 그 언어다).
         ko = (self.out / "glossary" / "index.html").read_text(encoding="utf-8")
         self.assertNotIn("gl-note", ko)
+
+    # ── [영문 용어 출처 2026-09-23] 기관명 약칭 + "Korean original" 마커 ────────
+    def test_source_agency_name_shown_as_mfds_acronym(self):
+        """★출처의 **기관명만** 공식 약칭으로 바꾼다 — 문서 제목(「」 안)은 그대로 둔다.
+
+        실측: 242 용어 중 67건이 `식품의약품안전처`(식약처)를 출처로 인용한다. 영어
+        색인에는 그 한글 기관명이 그대로 남으면 안 되고, 국문 색인은 손대지 않는다.
+        """
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertIn("MFDS", idx)
+        self.assertNotIn("식품의약품안전처", idx, "영문 색인에 한글 기관명이 그대로 남았다")
+        # 문서 제목은 지어내지 않는다 — 「알기 쉬운 GMP 용어집」은 그대로 한글이다.
+        self.assertIn("알기 쉬운 GMP 용어집", idx, "문서 제목까지 지워지거나 옮겨졌다")
+        # 한국어판은 이 매핑 자체가 없다(항등).
+        ko = (self.out / "glossary" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("식품의약품안전처", ko, "한국어 색인의 기관명이 바뀌었다")
+        self.assertNotIn("MFDS", ko)
+
+    def test_remaining_korean_source_gets_a_marker(self):
+        """MFDS 로 바꾼 뒤에도 한글(문서 제목)이 남으면 "Korean original" 로 밝힌다."""
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Korean original", idx)
+        self.assertGreater(idx.count('class="gl-src-ko"'), 0)
+        # 색인 카드가 아니라 낱말 페이지(gt-*)에서도 같은 마커가 떠야 한다 — 한글
+        # 출처를 가진 실제 용어 하나로 확인한다.
+        ko_sourced = next(
+            t for t in self.terms
+            if re.search(r"[가-힣]", t.get("definition_source") or ""))
+        page = (self.dir / ko_sourced["id"] / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Korean original", page, ko_sourced["id"])
+        self.assertNotIn("한국어 원문", page, "키가 번역되지 않고 그대로 샜다")
+        # 한국어판에는 이 마커가 없다(원문이 곧 그 언어라 밝힐 것이 없다).
+        ko_page = (self.out / "glossary" / ko_sourced["id"] / "index.html").read_text(
+            encoding="utf-8")
+        self.assertNotIn("Korean original", ko_page)
+        self.assertNotIn("gt-src-ko", ko_page)
 
     def test_index_splits_english_by_letter_not_one_latin_bucket(self):
         """★라틴을 한 덩어리로 두면 242개가 한 칸에 들어가 색인이 아무것도 가르지 못한다."""

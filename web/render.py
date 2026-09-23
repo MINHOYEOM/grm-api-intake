@@ -160,6 +160,17 @@ _FIRM_FACT_LABELS = frozenset({"업체", "제조소", "제조소/업체", "업�
 _FIRM_VALUE_SEPS = (" (", " · ")
 _FIRM_PLACEHOLDER = "원문 미기재"
 
+# [영문 사실표 2026-09-23] 사실값 중 **고정 어휘 토큰**(실명이 아니라 상태값)은 영어
+# 트리에서 tr() 을 태워 실제로 번역한다 — "미확인"이 업체/제조소 라벨 아래 있어도
+# 그 값은 "이름이 없다"는 뜻이지 실제 이름이 아니다. 목록은 실측(web/data/briefs 전량
+# 스캔)으로 반복 등장한 것만 싣는다 — 손목록 확장 금지(그때그때 하나씩 실측으로 추가).
+_FACT_SENTINEL_VALUES = frozenset({"미확인"})
+# 고유명사 사실 라벨 — `_FIRM_FACT_LABELS`(firm_key 매칭 4종)에 `제품`·`대상`·
+# `대상품목`을 더한 것. 이 라벨의 값은 그 조직/제품의 **실제 이름**이라 옮기면 존재하지
+# 않는 것을 가리키게 되므로 영어 트리에서도 그대로 두고 "한국어 원문" 카운트에서 뺀다
+# (README 불변식 #8·#20 과 같은 판단).
+_FACT_PROPER_NOUN_LABELS = _FIRM_FACT_LABELS | frozenset({"제품", "대상", "대상품목"})
+
 
 def _firm_key_for_card(card: dict[str, Any]) -> str:
     """카드 facts → firm_key(013 grm_normalize_firm_name 파리티, grm_findings.py 정본
@@ -467,6 +478,27 @@ def _card_with_english_narrative(card: dict[str, Any], lang: str) -> dict[str, A
     return card
 
 
+def _fact_value_for_lang(label: str, value: str, lang: str,
+                          tr: Translator) -> "tuple[str, bool]":
+    """영어 트리의 사실값 1개 → (표시값, "한국어 원문 그대로" 카운트 대상인가).
+
+    한국어 트리는 항상 `(value, False)` — 이 판정 자체가 영어 트리 전용이라 한국어
+    골든은 이 함수를 타도 바이트 불변이다.
+    (a) 고정 어휘 토큰(`_FACT_SENTINEL_VALUES`)은 tr() 을 태운다 — 실명이 아니라
+        상태값이라 "미확인"→"Unknown"(라벨이 업체·제조소여도 마찬가지).
+    (b) 고유명사 라벨(`_FACT_PROPER_NOUN_LABELS`)의 값은 그대로 두고 세지 않는다.
+    (c) 그 외 한글이 남은 값은 그대로 두되 센다 — 카드가 화면에서 그 사실을 밝힌다
+        (지어내지도 감추지도 않는다 — 자료실 "and N more"·용어사전 출처와 같은 판단).
+    """
+    if lang == DEFAULT_LANG:
+        return value, False
+    if value in _FACT_SENTINEL_VALUES:
+        return tr(value), False
+    if label in _FACT_PROPER_NOUN_LABELS:
+        return value, False
+    return value, bool(_HANGUL_RE.search(value))
+
+
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG) -> dict[str, Any]:
     # [다국어 5단계] 서사 다섯은 언어에 따라 **다른 출력**을 쓴다(번역이 아니라 같은
@@ -529,6 +561,24 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         else:
             detail.pop("inspectors", None)
 
+    # [영문 사실표 2026-09-23] 값 자체는 `_fact_value_for_lang` 이 언어별로 정한다
+    # (한국어 트리는 항등이라 아래 루프를 타도 값·개수 모두 종전과 바이트 동일).
+    # 카운트는 "이 표의 {n}개 값은 한국어 원문 그대로입니다" 고지(card.html)가 쓴다.
+    facts: list[dict[str, Any]] = []
+    facts_ko_count = 0
+    for f in (card.get("facts") or []):
+        raw_label = f.get("label", "")
+        value, counted = _fact_value_for_lang(raw_label, f.get("value", ""), lang, tr)
+        if counted:
+            facts_ko_count += 1
+        facts.append({
+            # ★`mono` 판정은 **원본 라벨**로 한다 — 번역된 라벨로 보면 한글 상수 집합과
+            #   영영 안 맞아 날짜 칸의 모노 서체가 조용히 사라진다.
+            "label": tr(raw_label) if raw_label else "",
+            "value": value,
+            "mono": raw_label in MONO_LABELS,
+        })
+
     return {
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
@@ -551,12 +601,11 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "modality": tr(card["modality"]) if card.get("modality") else card.get("modality"),
         "type_tag": tr(card["type_tag"]) if card.get("type_tag") else card.get("type_tag"),
         "summary": card.get("summary", ""),
-        # ★`mono` 판정은 **원본 라벨**로 한다 — 번역된 라벨로 보면 한글 상수 집합과
-        #   영영 안 맞아 날짜 칸의 모노 서체가 조용히 사라진다.
-        "facts": [{"label": tr(f["label"]) if f.get("label") else "",
-                   "value": f.get("value", ""),
-                   "mono": f.get("label", "") in MONO_LABELS}
-                  for f in (card.get("facts") or [])],
+        "facts": facts,
+        # 영어 트리에서 한국어 원문 그대로 남은 사실값 개수(고유명사 라벨 제외) —
+        # card.html 이 0이면 고지를 생략하고, 그 외엔 "이 표의 {n}개 값은 한국어
+        # 원문 그대로입니다"를 낸다. 한국어 트리는 항상 0(바이트 불변).
+        "facts_ko_count": facts_ko_count,
         # [브리프→업체 프로파일 브릿지] 파생 키(사실 재작성 0 — facts 값에서 결정론
         # 파생만). 빈 문자열이면 card.html 이 data-firm-key 속성을 생략한다.
         "firm_key": _firm_key_for_card(card),
@@ -1785,6 +1834,28 @@ def _glossary_case_count(case: "dict[str, Any] | None") -> int:
     return n if n > 0 else 0
 
 
+# [영문 용어 출처 2026-09-23] `definition_source` 의 **기관명만** 공식 약칭으로 바꾼다 —
+# 문서 제목·조항 인용은 그대로 둔다(옮기면 존재하지 않는 문서를 가리키게 된다, 불변식
+# #8 과 같은 판단). 손목록은 실측(glossary.json 242건)에서 반복 등장한 기관명 1개뿐이다
+# (일반 번역기가 아니라 이 작은 사전 하나로 충분하다 — 새 기관명이 생기면 실측 후 추가).
+_GLOSSARY_SOURCE_AGENCY_EN = {"식품의약품안전처": "MFDS"}
+
+
+def _glossary_source_for_lang(source: str, lang: str) -> "tuple[str, bool]":
+    """영어 트리의 출처 문자열 1개 → (표시 문자열, 한국어 원문이 남아 있는가).
+
+    한국어 트리는 항상 `(source, False)`. 기관명만 공식 약칭으로 바꾼 뒤에도 한글이
+    남으면(「」 안 실제 문서·법령 이름) 화면이 "Korean original" 로 밝힌다 — 문서
+    제목을 지어내지도, 남은 한글을 감추지도 않는다(README 불변식 #20 과 같은 판단).
+    """
+    if lang == DEFAULT_LANG:
+        return source, False
+    text = source
+    for ko, en in _GLOSSARY_SOURCE_AGENCY_EN.items():
+        text = text.replace(ko, en)
+    return text, bool(_HANGUL_RE.search(text))
+
+
 def build_glossary_view(
     terms: list[dict[str, Any]],
     reg_ref_catalogs: dict[str, list[dict[str, Any]]] | None = None,
@@ -1890,6 +1961,11 @@ def build_glossary_view(
         case = cases.get(t["id"]) or {}
         case_q = str(case.get("q") or "")
         case_findings = _glossary_case_count(case)
+        # [영문 용어 출처 2026-09-23] 기관명만 공식 약칭으로 바꾸고, 그래도 한글이
+        # 남으면(문서 제목·조항은 옮기지 않는다) 화면이 "Korean original" 로 밝힌다.
+        # 한국어 트리는 항상 (원문, False) — 골든 바이트 불변.
+        definition_source, source_has_ko_original = _glossary_source_for_lang(
+            t["definition_source"], lang)
         return {
             "id": t["id"],
             # 표시용(언어가 정해진 값) — 템플릿은 이것만 쓴다.
@@ -1902,7 +1978,8 @@ def build_glossary_view(
             "term_ko": t["term_ko"],
             "term_en": t["term_en"],
             "easy_ko": t["easy_ko"],
-            "definition_source": t["definition_source"],
+            "definition_source": definition_source,
+            "source_has_ko_original": source_has_ko_original,
             # v2: 출처 공식 링크(있으면 출처 표기를 새 탭 링크로 — 값 무변형·안전 URL 만).
             "source_url": _safe_url(t.get("source_url") or ""),
             "related": related,
@@ -1935,12 +2012,14 @@ def build_glossary_view(
     # 출처만이 아니라 **관련 조항**도 한국어 법령 이름이다(「약사법」 제39조,
     # 「의약품 제조 및 품질관리에 관한 규정 [별표 1]」 …). 둘 다 실제 문서·법령의
     # 이름이라 옮기면 존재하지 않는 것을 가리키게 되므로 원문 그대로 두고 함께 센다.
-    def _ko_named(t: dict[str, Any]) -> bool:
-        if _HANGUL_RE.search(t.get("definition_source") or ""):
+    # ★출처 판정은 **화면에 실제로 뜨는 값**(기관명을 MFDS 로 바꾼 뒤)을 본다 — view 의
+    #   `source_has_ko_original` 이 이미 그 판정이다(_glossary_source_for_lang).
+    def _ko_named(t: dict[str, Any], v: dict[str, Any]) -> bool:
+        if v.get("source_has_ko_original"):
             return True
         return any(_HANGUL_RE.search(str(r)) for r in (t.get("reg_refs") or []))
 
-    ko_only_sources = sum(1 for t in terms if _ko_named(t))
+    ko_only_sources = sum(1 for t, v in zip(terms, views) if _ko_named(t, v))
     order = {b: i for i, b in enumerate(_glossary_bucket_order(lang))}
     groups_map: dict[str, list[dict[str, Any]]] = {}
     for v in views:
@@ -4298,6 +4377,9 @@ def build_glossary_term_json_ld(term: dict[str, Any],
     동의어(한글 표기는 뷰가 이미 걸러 냈다 — 영어 구조화 데이터에 한국어를 넣지
     않는다는 판단은 그대로다).
     값은 전부 정본 무변형이고 json.dumps 가 이스케이프를 책임진다(수동 문자열 결합 0).
+    '<' 만 \\u003c 로 추가 치환한다 — `build_json_ld`·`build_breadcrumb_json_ld` 와 같은
+    계약(`<script>` 안에 박히므로 정의문(easy) 값에 '<' 가 있으면 `</script` 조기종료
+    위험이 있다. json.dumps 는 그 문자 자체를 이스케이프하지 않는다).
     """
     # 한국어판은 영문 표제어를 대체명 맨 앞에 싣는다(term_sub 는 한국어판에만 있다).
     # 두 트리 모두 그 뒤에 **화면과 같은 동의어 목록**을 잇는다 — 구조화 데이터가
@@ -4320,7 +4402,7 @@ def build_glossary_term_json_ld(term: dict[str, Any],
             "url": f"{base_url}/{LANG_PREFIXES[lang]}glossary/",
         },
     }
-    return json.dumps(node, ensure_ascii=False, sort_keys=True)
+    return json.dumps(node, ensure_ascii=False, sort_keys=True).replace("<", "\\u003c")
 
 
 # ── SEO 메타·구조화데이터(description·canonical·OG·JSON-LD — 정적·결정론·한글안전) ──

@@ -55,6 +55,12 @@
     {%- endfor %}
   </table>
   {%- endif %}
+  {#- [영문 사실표 2026-09-23] 고유명사가 아닌 사실값이 한글로 남으면(영어 트리만 —
+      한국어 트리는 card.facts_ko_count 가 항상 0) 지어내지도 감추지도 않고 개수로
+      밝힌다(자료실 "and N more"·용어사전 출처와 같은 판단). -#}
+  {%- if card.facts_ko_count %}
+  <p class="facts-ko-note">{{ _("이 표의 {n}개 값은 한국어 원문 그대로입니다.", n=card.facts_ko_count) }}</p>
+  {%- endif %}
   {%- if card.merged %}
   <details class="block merged"><summary class="lab"><i class="ti ti-stack-2"></i>{{ _("전체 {n}{noun}", n=card.merged_count, noun=card.merged_noun) }}</summary>
     <ul class="facts2">

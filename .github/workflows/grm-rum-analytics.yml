@@ -18,6 +18,9 @@ name: GRM RUM Analytics Sync
 #
 # [077] 2026-09-05: 같은 실행이 국가·기기(수집기 그룹 2개)와 Brevo 구독자 수(두 번째
 # 스텝)까지 적재한다. 매일 아침 예약 태스크가 growth_daily_report() 로 읽어 보고한다.
+# [090] 2026-09-23: 구독자 스냅샷 바로 다음 스텝이 Brevo 캠페인 통계(발송·열람·클릭·해지·
+# 링크별 클릭)를 적재한다 — 마케팅 계획 N-05. 1클릭 피드백(N-04, 메일 하단 #fb-up/#fb-down
+# 링크)은 여기서 받는 링크별 클릭 수로 판독한다(새 수집 경로 없음).
 # [078] 2026-09-05: 세 번째 스텝이 Search Console(검색어·노출·순위)을 적재한다.
 # RUM 은 "google.com 에서 왔다"까지만 알고 **무엇을 검색했는지**는 여기서만 온다.
 # 확정 데이터가 2~3일 늦으므로 이 표의 최신 날짜는 RUM 보다 뒤처진다(정상).
@@ -163,6 +166,17 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python collect_newsletter_subscribers.py
+
+      # [090] Brevo 캠페인 통계(발송·열람·클릭·해지·링크별 클릭) 일별 적재 — 마케팅 계획
+      # N-05. 구독자 스냅샷과 독립이라 앞 스텝이 실패해도 돈다(취소만 제외). 1클릭 피드백
+      # (N-04)은 새 엔드포인트 없이 이 표의 링크별 클릭(#fb-up/#fb-down)으로 판독한다.
+      - name: Snapshot newsletter campaign stats
+        if: ${{ !cancelled() && inputs.cross_only != 'true' && (inputs.probe || 'false') != 'true' }}
+        env:
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python collect_newsletter_campaigns.py
 
       # [078] Search Console — "무엇을 검색해 들어왔나". RUM 은 google.com 까지만 안다.
       # 앞 스텝과 독립이라 하나가 실패해도 돈다(취소만 제외). 확정 데이터가 2~3일 늦게

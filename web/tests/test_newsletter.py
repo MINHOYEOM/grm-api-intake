@@ -192,6 +192,35 @@ class NewsletterTeaserTest(unittest.TestCase):
         self.assertNotIn("{{ unsubscribe }}", no_unsub["html"])
         self.assertIn("{{ unsubscribe }}", with_unsub["html"])
 
+    # ── 1클릭 피드백(N-04 2026-09-23) — #fb-up/#fb-down 앵커, 새 엔드포인트 0 ───────
+    def test_feedback_line_between_share_and_disclosure(self):
+        i_share = self.html.index("팀 동료에게 전달")
+        i_feedback = self.html.index("이번 호, 유용했나요?")
+        i_disclosure = self.html.index("AI 자동 생성 안내")
+        self.assertLess(i_share, i_feedback, "피드백 줄이 전달 카드보다 앞에 있음")
+        self.assertLess(i_feedback, i_disclosure, "피드백 줄이 면책 문구보다 뒤에 있음")
+
+    def test_feedback_hrefs_are_brief_url_anchors_only(self):
+        self.assertIn(f'href="{self.t["brief_url"]}#fb-up"', self.html)
+        self.assertIn(f'href="{self.t["brief_url"]}#fb-down"', self.html)
+        self.assertIn("👍 유용했어요", self.html)
+        self.assertIn("👎 아쉬웠어요", self.html)
+
+    def test_feedback_links_carry_no_query_string(self):
+        # 앵커뿐(쿼리 파라미터 0) — gate_provenance 가 쿼리 문자열만 보므로 이 링크는
+        # 애초에 검사 대상에 안 걸린다(N-05 는 Brevo linksStats 의 앵커로 두 수를 가른다).
+        for h in (f'{self.t["brief_url"]}#fb-up', f'{self.t["brief_url"]}#fb-down'):
+            self.assertNotIn("?", h)
+
+    def test_feedback_links_pass_provenance_gate(self):
+        self.assertEqual(newsletter.gate_provenance(self.t, BASE), [])
+
+    def test_run_gates_still_passes_with_feedback_line(self):
+        report, _ = newsletter.run_gates(
+            self.brief, expected_date=self.brief["brief"]["publish_date"],
+            site_base_url=BASE, issue_no=2, checker=lambda u: linkcheck.OK)
+        self.assertTrue(report.ok, report.text())
+
 
 # ── 로그 마스킹(공개 저장소) ──────────────────────────────────────────────────
 class NewsletterLogMaskingTest(unittest.TestCase):

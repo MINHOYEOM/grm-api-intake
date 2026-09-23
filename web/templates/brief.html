@@ -113,6 +113,44 @@
   </div>
   <button class="toc-fab" type="button" id="tocFab" aria-controls="toc" aria-expanded="false"><i class="ti ti-list-search"></i>{{ _("목차") }}</button>
   <div class="toc-backdrop" id="tocBackdrop"></div>
+{% if newsletter_form_action and lang == 'ko' %}
+  {#- [1클릭 피드백 도착 확인 토스트 2026-09-23] 마케팅 계획 N-04 — 주간 메일 하단의
+      "유용했나요?" 👍/👎 는 이 페이지의 #fb-up/#fb-down 앵커로 오는 링크일 뿐이다(새
+      엔드포인트 0 · web/newsletter.py build_teaser 참조). Brevo 가 링크별 클릭 수를 이미
+      세므로(linksStats) 여기서는 "눌렸다"는 확인만 짧게 준다 — 판정·집계는 N-05 수집기
+      (collect_newsletter_campaigns.py)가 맡는다. 포커스 이동 0(자동 등장이 키보드 위치를
+      뺏지 않는다)·자동 숨김 약 8초·× 로 즉시 닫힘. "의견 보내기"는 새 모달을 만들지
+      않고 feedback.js 가 푸터에 심는 기존 트리거(#grm-feedback-open)를 클릭으로 재사용
+      한다(그 트리거는 reactions_enabled 게이트 뒤라 없을 수 있다 — 그때는 푸터 '서비스
+      안내' 열로 스크롤만 한다). ★이 블록은 뉴스레터 env 게이트 안에만 둔다 — 게이트가
+      꺼진 로컬·CI 빌드는 애초에 #fb-up/#fb-down 로 올 발송 링크가 없으므로(newsletter.py
+      쪽도 같은 게이트) 골든 byte-diff 는 그대로 0. -#}
+  <div class="grm-fbtoast" id="grmFbToast" role="status" aria-live="polite" hidden>
+    <p class="grm-fbtoast-msg" id="grmFbToastMsg"></p>
+    <div class="grm-fbtoast-act">
+      <button type="button" id="grmFbToastFb">{{ _("의견 보내기") }}</button>
+      <button type="button" id="grmFbToastX" aria-label="{{ _('닫기') }}">&times;</button>
+    </div>
+  </div>
+  <style>
+  .grm-fbtoast{position:fixed;left:16px;right:16px;bottom:16px;z-index:70;max-width:420px;
+    margin:0 auto;display:flex;align-items:flex-start;gap:12px;background:var(--ink,#1A1815);
+    color:#fff;border-radius:var(--rad,12px);box-shadow:0 -8px 28px rgba(0,0,0,.18);
+    padding:14px 16px;font-family:var(--sans);opacity:0;transform:translateY(8px);
+    transition:opacity .2s ease,transform .2s ease}
+  .grm-fbtoast[hidden]{display:none}
+  .grm-fbtoast.on{opacity:1;transform:translateY(0)}
+  .grm-fbtoast-msg{flex:1;margin:0;font-size:13.5px;line-height:1.6;word-break:keep-all}
+  .grm-fbtoast-act{display:flex;align-items:center;gap:10px;flex:none}
+  .grm-fbtoast-act button{background:none;border:0;color:inherit;font-family:var(--sans);
+    cursor:pointer;padding:0}
+  #grmFbToastFb{font-size:12.5px;font-weight:600;color:var(--coral,#E08A63);
+    text-decoration:underline;white-space:nowrap}
+  #grmFbToastX{font-size:18px;line-height:1;opacity:.7}
+  #grmFbToastX:hover{opacity:1}
+  @media(max-width:480px){.grm-fbtoast{left:12px;right:12px;bottom:12px;padding:12px 14px}}
+  </style>
+{% endif %}
 </main>
 <style>
 /* [전문지 브리핑 v2 §1] TOC 대목차 — 섹션 링크 묶음을 <details> 로 접어 초기 전부 접힘
@@ -397,4 +435,45 @@
     } else { window.prompt('{{ _("아래 내용을 복사하세요") }}', text); }
   });
 })();
+{% if newsletter_form_action and lang == 'ko' %}
+/* [1클릭 피드백 도착 확인 토스트 2026-09-23] 마크업 주석 참조. DOMContentLoaded 까지
+   미루는 이유: 이 스크립트는 (defer 없이) 파싱 중 즉시 실행돼 아직 feedback.js(defer)가
+   #grm-feedback-open 트리거를 만들기 전이다 — defer 스크립트는 파싱 완료 후·
+   DOMContentLoaded 이전에 실행되므로, DOMContentLoaded 시점에는 트리거가 이미 있다. */
+(function(){
+  var box=document.getElementById('grmFbToast'); if(!box) return;
+  var h=(location.hash||'').toLowerCase();
+  if(h!=='#fb-up'&&h!=='#fb-down') return;
+  var msgUp='{{ _("의견 고맙습니다. 다음 호에도 이어서 준비하겠습니다.") }}';
+  var msgDown='{{ _("의견 고맙습니다. 무엇이 아쉬웠는지 알려 주시면 다음 호에 반영하겠습니다.") }}';
+  function show(){
+    var m=document.getElementById('grmFbToastMsg');
+    if(m) m.textContent = (h==='#fb-down') ? msgDown : msgUp;
+    box.hidden=false;
+    var raf=window.requestAnimationFrame||function(f){setTimeout(f,16);};
+    raf(function(){box.classList.add('on');});
+    var closed=false;
+    function hide(){
+      if(closed) return; closed=true;
+      box.classList.remove('on');
+      setTimeout(function(){box.hidden=true;},220);
+    }
+    var timer=setTimeout(hide,8000);
+    var x=document.getElementById('grmFbToastX');
+    if(x) x.addEventListener('click',function(){clearTimeout(timer);hide();});
+    var fb=document.getElementById('grmFbToastFb');
+    if(fb) fb.addEventListener('click',function(){
+      /* 새 모달 0 — feedback.js 가 푸터에 심는 기존 트리거를 그대로 누른다. 그 트리거는
+         reactions_enabled 게이트 뒤라 없을 수 있어(feedback.js 자체가 그 게이트 뒤), 없으면
+         푸터 '서비스 안내' 열로 스크롤만 한다(programmatic open API 가 없다 — 클릭 재현뿐). */
+      var trigger=document.getElementById('grm-feedback-open');
+      if(trigger){ trigger.click(); return; }
+      var slot=document.querySelector('footer.site .foot [data-feedback-slot]');
+      if(slot&&slot.scrollIntoView) slot.scrollIntoView({block:'center',behavior:'smooth'});
+    });
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',show); }
+  else { show(); }
+})();
+{% endif %}
 </script>{% endblock %}

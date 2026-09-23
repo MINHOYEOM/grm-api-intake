@@ -1,10 +1,10 @@
 name: GRM Findings Search Cache Sync
 
-# [R2 · 087] 086 검색 캐시의 daily 목록(용어사전 "사례 N건 보기" 링크의 검색어)을 저장소의
+# [R2 · 088] 086 검색 캐시의 daily 목록(용어사전 "사례 N건 보기" 링크의 검색어)을 저장소의
 # web/data/glossary_cases.json 과 같게 맞춘다. 주간 용어 재측정(grm-glossary-cases.yml → PR →
 # 자동 머지)이 그 파일을 main 에 바꿔 넣는 순간(push 트리거)과 매주 금요일 백스톱에 돈다.
 # 표에 직접 쓰지 않는다 — findings_search_cache_sync.py 가 q 목록을 RPC 하나에 넘기고, 넣고
-# 지우는 판단(정규화·hot 보호·삭제 상한·형식 게이트)은 DB 함수(087)가 한다. 새로 들어간 행은
+# 지우는 판단(정규화·hot 보호·삭제 상한·형식 게이트)은 DB 함수(088)가 한다. 새로 들어간 행은
 # 다음 daily 갱신(pg_cron 12:10 KST)이 채운다. git 쓰기 전무. SUPABASE_SERVICE_ROLE_KEY 재사용.
 on:
   push:

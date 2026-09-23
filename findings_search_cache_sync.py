@@ -2,7 +2,7 @@
 """findings_search_cache_sync — 086 검색 캐시의 daily 목록을 용어사전 사례 링크(glossary_cases.json)와 맞춘다.
 
 무엇을: `web/data/glossary_cases.json` 의 `items[].q`(용어사전 "사례 N건 보기" 링크의 검색어)를
-모아 RPC `findings_search_cache_sync(p_qs)`(087) 에 넘긴다. 표에 직접 쓰지 않는다 — 넣고 지우는
+모아 RPC `findings_search_cache_sync(p_qs)`(088) 에 넘긴다. 표에 직접 쓰지 않는다 — 넣고 지우는
 판단(정규화·hot 보호·삭제 상한·형식 게이트)은 전부 DB 함수가 한다. 이 스크립트는 목록을 읽어
 넘기고 결과를 보고할 뿐이다.
 
@@ -29,7 +29,7 @@ from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
 DEFAULT_GLOSSARY_CASES = Path("web") / "data" / "glossary_cases.json"
 RPC_NAME = "findings_search_cache_sync"
 DEFAULT_TIMEOUT_SECONDS = 60.0
-MAX_TERMS = 400          # 087 의 상한과 같다 — 넘으면 서버가 거부하므로 먼저 막는다
+MAX_TERMS = 400          # 088 의 상한과 같다 — 넘으면 서버가 거부하므로 먼저 막는다
 MAX_TERM_LEN = 64
 
 

@@ -6,6 +6,7 @@ CI(`unittest discover -s tests`)는 `tests/test_web_newsletter.py` shim 으로 �
 """
 from __future__ import annotations
 
+import datetime as dt
 import json
 import pathlib
 import re
@@ -582,6 +583,212 @@ class NewsletterScheduleSendTest(unittest.TestCase):
         rc, val = self._run_precheck(api_key=None)
         self.assertEqual(rc, 0)
         self.assertEqual(val, "should_send=false")
+
+
+# ── 발송 누락 감시(freshness, N-01 2026-09-23) — 순수 판정 ────────────────────
+class NewsletterFreshnessDecisionTest(unittest.TestCase):
+    """decide_freshness — brief-missing/not-sent/ok 3가지 verdict(네트워크 0)."""
+
+    @staticmethod
+    def _monday(as_of: dt.date) -> dt.date:
+        return as_of - dt.timedelta(days=as_of.weekday())
+
+    def test_ok_when_sent_brief_dated_this_monday(self):
+        as_of = dt.date(2026, 9, 21)
+        monday = self._monday(as_of)
+        verdict, reason = newsletter.decide_freshness(
+            monday.isoformat(), as_of, {"id": "7", "status": "sent"})
+        self.assertEqual(verdict, "ok")
+        self.assertIn(monday.isoformat(), reason)
+
+    def test_ok_on_tuesday_as_of(self):
+        # as_of 가 화요일이어도 "이번 주 월요일" 파생은 동일해야(발송일이 아니라 검사일 요일 무관).
+        as_of = dt.date(2026, 9, 22)
+        monday = self._monday(as_of)
+        verdict, _ = newsletter.decide_freshness(
+            monday.isoformat(), as_of, {"id": "1", "status": "queued"})
+        self.assertEqual(verdict, "ok")
+
+    def test_brief_missing_when_latest_is_last_week(self):
+        as_of = dt.date(2026, 9, 21)
+        monday = self._monday(as_of)
+        last_week = (monday - dt.timedelta(days=7)).isoformat()
+        verdict, reason = newsletter.decide_freshness(last_week, as_of, None)
+        self.assertEqual(verdict, "brief-missing")
+        self.assertIn(last_week, reason)
+
+    def test_brief_missing_when_none(self):
+        as_of = dt.date(2026, 9, 21)
+        verdict, _ = newsletter.decide_freshness(None, as_of, None)
+        self.assertEqual(verdict, "brief-missing")
+
+    def test_not_sent_when_campaign_none(self):
+        as_of = dt.date(2026, 9, 21)
+        monday = self._monday(as_of)
+        verdict, reason = newsletter.decide_freshness(monday.isoformat(), as_of, None)
+        self.assertEqual(verdict, "not-sent")
+        self.assertIn(monday.isoformat(), reason)
+
+    def test_not_sent_when_status_draft(self):
+        as_of = dt.date(2026, 9, 21)
+        monday = self._monday(as_of)
+        verdict, reason = newsletter.decide_freshness(
+            monday.isoformat(), as_of, {"id": "9", "status": "draft"})
+        self.assertEqual(verdict, "not-sent")
+        self.assertIn("draft", reason)
+
+    def test_sunday_dated_brief_allowed(self):
+        # 과거 한 호가 일요일 발행 이력이 있어 1일 허용 — 이번 주 월요일-1일까지는 정상.
+        as_of = dt.date(2026, 9, 21)
+        monday = self._monday(as_of)
+        sunday = (monday - dt.timedelta(days=1)).isoformat()
+        verdict, _ = newsletter.decide_freshness(sunday, as_of, {"id": "2", "status": "sent"})
+        self.assertEqual(verdict, "ok")
+
+
+# ── 발송 누락 감시 — CLI(--mode freshness) 엔드투엔드 ─────────────────────────
+class NewsletterFreshnessCLITest(unittest.TestCase):
+    """precheck 테스트와 동일 패턴(BrevoSender 클래스 스왑)으로 fake sender 주입."""
+
+    AS_OF = "2026-09-21"           # 임의 고정일 — decide_freshness 는 weekday() 로 계산해 요일 무관
+
+    def _monday(self) -> dt.date:
+        d = dt.date.fromisoformat(self.AS_OF)
+        return d - dt.timedelta(days=d.weekday())
+
+    def _write_brief(self, data_dir: pathlib.Path, pub: str) -> None:
+        data_dir.mkdir(parents=True, exist_ok=True)
+        (data_dir / "brief_web_x.json").write_text(
+            json.dumps(_minimal(pub, tldr=["헤드라인"]), ensure_ascii=False), encoding="utf-8")
+
+    def _run(self, *, data_dir, api_key, sender_cls=None, as_of=None):
+        orig = newsletter.BrevoSender
+        if sender_cls is not None:
+            newsletter.BrevoSender = sender_cls
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                out = pathlib.Path(td) / "report.json"
+                with _env_patch(NEWSLETTER_API_KEY=api_key):
+                    rc = newsletter.main([
+                        "--mode", "freshness", "--data", str(data_dir),
+                        "--as-of", as_of or self.AS_OF, "--output", str(out)])
+                report = json.loads(out.read_text(encoding="utf-8")) if out.exists() else None
+        finally:
+            newsletter.BrevoSender = orig
+        return rc, report
+
+    def test_ok_exit_0(self):
+        pub = self._monday().isoformat()
+
+        class _Sent(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                pass
+
+            def find_campaign(self, n):
+                return {"id": "7", "status": "sent"}
+
+        with tempfile.TemporaryDirectory() as td:
+            data_dir = pathlib.Path(td)
+            self._write_brief(data_dir, pub)
+            rc, report = self._run(data_dir=data_dir, api_key="key-123", sender_cls=_Sent)
+        self.assertEqual(rc, 0)
+        self.assertEqual(report["verdict"], "ok")
+        self.assertEqual(report["latest_publish_date"], pub)
+        self.assertEqual(report["campaign_status"], "sent")
+        self.assertIsNotNone(report["campaign_name"])
+        self.assertIn("checked_at_kst", report)
+
+    def test_not_sent_exit_1(self):
+        pub = self._monday().isoformat()
+
+        class _Missing(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                pass
+
+            def find_campaign(self, n):
+                return None
+
+        with tempfile.TemporaryDirectory() as td:
+            data_dir = pathlib.Path(td)
+            self._write_brief(data_dir, pub)
+            rc, report = self._run(data_dir=data_dir, api_key="key-123", sender_cls=_Missing)
+        self.assertEqual(rc, 1)
+        self.assertEqual(report["verdict"], "not-sent")
+
+    def test_brief_missing_exit_1_skips_api_call(self):
+        # brief-missing 은 API 없이 판정돼야 — fake sender 생성 자체를 못하게 막아 확인한다.
+        class _Boom(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                raise AssertionError("brief-missing 인데 Brevo 조회를 시도했다")
+
+        with tempfile.TemporaryDirectory() as td:
+            data_dir = pathlib.Path(td)      # 빈 디렉터리 — 브리프 0건
+            rc, report = self._run(data_dir=data_dir, api_key="key-123", sender_cls=_Boom)
+        self.assertEqual(rc, 1)
+        self.assertEqual(report["verdict"], "brief-missing")
+        self.assertIsNone(report["campaign_name"])
+        self.assertIsNone(report["latest_publish_date"])
+
+    def test_api_error_exit_2_no_message_leak(self):
+        pub = self._monday().isoformat()
+        secret_detail = "api-key-abcd1234-should-not-leak"
+
+        class _Raising(newsletter.NewsletterSender):
+            def __init__(self, *a, **k):
+                pass
+
+            def find_campaign(self, n):
+                raise RuntimeError(secret_detail)
+
+        with tempfile.TemporaryDirectory() as td:
+            data_dir = pathlib.Path(td)
+            self._write_brief(data_dir, pub)
+            rc, report = self._run(data_dir=data_dir, api_key="key-123", sender_cls=_Raising)
+        self.assertEqual(rc, 2)
+        self.assertEqual(report["verdict"], "api-error")
+        self.assertIn("RuntimeError", report["reason"])
+        self.assertNotIn(secret_detail, report["reason"])
+        self.assertNotIn(secret_detail, json.dumps(report, ensure_ascii=False))
+
+    def test_api_error_when_key_missing_exit_2(self):
+        pub = self._monday().isoformat()
+        with tempfile.TemporaryDirectory() as td:
+            data_dir = pathlib.Path(td)
+            self._write_brief(data_dir, pub)
+            rc, report = self._run(data_dir=data_dir, api_key=None)
+        self.assertEqual(rc, 2)
+        self.assertEqual(report["verdict"], "api-error")
+
+
+# ── 발송 누락 감시 — 워크플로 텍스트 계약(grm-newsletter-freshness.yml) ────────
+class NewsletterFreshnessWorkflowTest(unittest.TestCase):
+    """YAML 텍스트 대조 — 스케줄·모드·시크릿·권한·이슈 제목·continue-on-error 존재.
+    (YAML 파싱까지는 하지 않는다 — 그건 Task 5 verify 단계 소관.)"""
+
+    WORKFLOW = WEB_DIR.parent / ".github" / "workflows" / "grm-newsletter-freshness.yml"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = cls.WORKFLOW.read_text(encoding="utf-8")
+
+    def test_both_cron_schedules_present(self):
+        self.assertIn("'13 11 * * 1'", self.text)     # 월 20:13 KST
+        self.assertIn("'13 0 * * 2'", self.text)       # 화 09:13 KST
+
+    def test_runs_freshness_mode(self):
+        self.assertIn("--mode freshness", self.text)
+
+    def test_uses_newsletter_api_key_secret(self):
+        self.assertIn("secrets.NEWSLETTER_API_KEY", self.text)
+
+    def test_issues_write_permission(self):
+        self.assertIn("issues: write", self.text)
+
+    def test_issue_title_present(self):
+        self.assertIn("[newsletter-freshness] 이번 주 뉴스레터가 발송되지 않았습니다", self.text)
+
+    def test_monitor_step_continues_on_error(self):
+        self.assertIn("continue-on-error: true", self.text)
 
 
 if __name__ == "__main__":

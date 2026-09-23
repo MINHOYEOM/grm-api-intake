@@ -1,5 +1,5 @@
--- 087 findings_search_cache_sync — 086 검색 캐시의 daily 목록(용어사전 사례 링크)을 목록 한 벌로 맞추는 RPC.
--- Max local web/migrations prefix was 086 on main aa1cda8. Additive only — 086 의 표·함수·cron 무변경.
+-- 088 findings_search_cache_sync — 086 검색 캐시의 daily 목록(용어사전 사례 링크)을 목록 한 벌로 맞추는 RPC.
+-- Max local web/migrations prefix was 087 on main 75068a7 (087 = funnel_touch_counts, #1071). Additive only — 086 의 표·함수·cron 무변경.
 --
 -- ★왜: 086 은 daily 계층(용어사전 "사례 N건 보기" 링크 = `p_q`+`p_text_only=true`) 192종을 **시드로**
 --   굳혔다. 용어사전은 매주 목요일 `grm-glossary-cases.yml` 이 `web/data/glossary_cases.json` 을 다시

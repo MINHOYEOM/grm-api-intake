@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""findings_search_cache_sync.py + 087 마이그레이션 정적 계약 — 실 네트워크·실 DB 없음.
+"""findings_search_cache_sync.py + 088 마이그레이션 정적 계약 — 실 네트워크·실 DB 없음.
 
 지키려는 것:
   · 스크립트는 표에 직접 쓰지 않고 RPC 하나만 부른다 · dry-run 은 네트워크 0
   · 빈 목록·상한 초과는 네트워크 전에 막는다(서버 거부와 같은 규칙)
   · 키는 어떤 출력에도 나오지 않는다 · 5xx 는 1회 재시도, 그래도 실패면 exit 1
-  · 087: definer + service_role 만 · hot 행 불가침 · 삭제 상한 · 빈 목록 거부 · 086 정규화 함수 재사용
+  · 088: definer + service_role 만 · hot 행 불가침 · 삭제 상한 · 빈 목록 거부 · 086 정규화 함수 재사용
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from unittest import mock
 import findings_search_cache_sync as svc
 
 _ROOT = Path(__file__).resolve().parents[1]
-_MIG = _ROOT / "web" / "migrations" / "087_findings_search_cache_sync.sql"
+_MIG = _ROOT / "web" / "migrations" / "088_findings_search_cache_sync.sql"
 _SERVICE_KEY = "service-role-secret-token"
 _BASE = "https://example.supabase.co"
 

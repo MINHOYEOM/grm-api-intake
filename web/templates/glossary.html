@@ -45,9 +45,9 @@
           <p class="gl-def">{{ t.easy }}</p>
           {% if t.detail %}<p class="gl-detail"><span class="gl-detail-k">{{ _('실무 맥락') }}</span>{{ t.detail }}</p>{% endif %}
           {% if t.source_url %}
-          <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span><a class="gl-src-a" href="{{ t.source_url }}" target="_blank" rel="noopener">{{ t.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a></p>
+          <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span><a class="gl-src-a" href="{{ t.source_url }}" target="_blank" rel="noopener">{{ t.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% if t.source_has_ko_original %} <span class="gl-src-ko">{{ _("한국어 원문") }}</span>{% endif %}</p>
           {% else %}
-          <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span>{{ t.definition_source }}</p>
+          <p class="gl-src"><span class="gl-src-k">{{ _('출처') }}</span>{{ t.definition_source }}{% if t.source_has_ko_original %} <span class="gl-src-ko">{{ _("한국어 원문") }}</span>{% endif %}</p>
           {% endif %}
           {% if t.reg_refs %}
           <div class="gl-refs"><span class="gl-refs-k">{{ _('관련 조항') }}</span>{% for r in t.reg_refs %}{% if r.url %}<a class="gl-refs-a" href="{{ r.url }}" target="_blank" rel="noopener">{{ r.label }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% else %}<span class="gl-refs-a">{{ r.label }}</span>{% endif %}{% endfor %}</div>

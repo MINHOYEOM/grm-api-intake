@@ -456,6 +456,37 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </div>
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
+            <h3>구독은 어느 채널에서 왔나 — first touch (087)</h3>
+            <p class="admin-section-sub">구독 제출 때 함께 보낸 첫 방문 유입 정보(utm 값·리퍼러 호스트)를 채널로 묶었습니다. 세션이 아니라 이 브라우저에 7일 보관한 값이라, 링크드인 게시물을 보고 며칠 뒤 구독해도 잡힙니다. 노출(view)은 보내지 않습니다.</p>
+            <p class="admin-section-sub" id="grm-funnel-touch-note">불러오는 중</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>채널</th><th>제출</th></tr></thead>
+                <tbody id="grm-funnel-touch"><tr><td colspan="2"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+            <details class="admin-recovery">
+              <summary>세부 내역 — source/medium/campaign/리퍼러/착지 구역별</summary>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead><tr><th>source</th><th>medium</th><th>campaign</th><th>리퍼러</th><th>착지 구역</th><th>제출</th><th>마지막</th></tr></thead>
+                  <tbody id="grm-funnel-touch-rows"><tr><td colspan="7"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
+            <h3>구역별 전환 — 방문 대비 제출 (2026-09-04 이후, 087)</h3>
+            <p class="admin-section-sub">RUM 착지 방문(봇 제외)을 분모로, 076 구역별 제출을 분자로 묶었습니다. 노출은 구역별로 보내지 않습니다 — 크롤러 오염이라 갈라도 못 읽습니다(2026-09-01 실측). 경로 표는 표본 실행에서 거칠어(10단위) 작은 구역의 방문이 0으로 보일 수 있습니다 — 전환율은 방향만 읽으세요.</p>
+            <p class="admin-section-sub" id="grm-funnel-zone-rate-note">불러오는 중</p>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>구역</th><th>방문</th><th>제출</th><th>전환율</th><th>정밀도</th></tr></thead>
+                <tbody id="grm-funnel-zone-rate"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-monitor-section" style="margin-top:16px">
             <h3>일별 깔때기 — 스냅샷 차분</h3>
             <p class="admin-section-sub">매일 23:55(KST)에 누적 카운터를 동결해 전일 스냅샷과의 차이를 계산합니다. '오늘' 행은 마지막 스냅샷 이후의 진행분입니다.</p>
             <div class="admin-table-wrap">

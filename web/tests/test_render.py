@@ -8254,6 +8254,67 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
 
+    def test_subscribe_copy_varies_by_zone(self):
+        """[2026-09-23 마케팅 계획 C-02] 방문의 대다수가 용어사전·지적사항이고 대부분 검색
+        유입이라 "주간 브리프 구독"은 방문 목적과 먼 제안이었다 — 구역별로 문안이 갈린다.
+        base.html 의 `sub_zone` 은 render.py 가 정하는 `nav_active` 를 본다(템플릿이 언어·
+        구역을 스스로 판단하지 않는다). render_site() 전체 파이프라인으로 실제 페이지를
+        지어, 판정이 나뉘는 두 자리(밴드·배너)를 각각 직접 본다 — 하나만 고치고 다른 자리를
+        놓치는 사고(과거 판정 2곳 결함 사례, #1054/#1056)를 막는다."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render_site([_minimal_brief("2026-06-05")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+
+        home = (out / "index.html").read_text(encoding="utf-8")               # nav_active=home
+        glossary = (out / "glossary/index.html").read_text(encoding="utf-8")  # nav_active=glossary
+        findings = (out / "findings/index.html").read_text(encoding="utf-8")  # nav_active=findings
+        trends = (out / "findings/trends/index.html").read_text(encoding="utf-8")  # nav_active=trends
+        about = (out / "about/index.html").read_text(encoding="utf-8")        # nav_active=about
+
+        consent = "사이트에 새로운 기능이 생기면 함께 안내드립니다"
+        h2_glossary = "용어는 실제 사례와 함께 볼 때 남습니다"
+        h2_findings = "이런 지적, 매주 월요일 한국어로 받아보세요"
+        h2_default = "글로벌 GMP 규제 소식, 매주 월요일 한국어로"
+        all_h2 = (h2_glossary, h2_findings, h2_default)
+
+        # 밴드 — 세 h2 는 각자 구역에서만 나오고, 동의 범위 문장은 세 갈래 모두에 남는다.
+        for zone_name, html, expect_h2 in (
+                ("glossary", glossary, h2_glossary),
+                ("findings", findings, h2_findings),
+                ("home", home, h2_default)):
+            self.assertIn('class="subscribe"', html, f"{zone_name} 페이지에 밴드가 없다")
+            self.assertIn(f"<h2>{expect_h2}</h2>", html, f"{zone_name} 밴드 h2 가 어긋난다")
+            for other_h2 in all_h2:
+                if other_h2 != expect_h2:
+                    self.assertNotIn(f"<h2>{other_h2}</h2>", html,
+                                     f"{zone_name} 페이지에 다른 구역 h2 가 샜다: {other_h2!r}")
+            self.assertIn(consent, html, f"{zone_name} 페이지에서 동의 범위 문장이 빠졌다")
+        # trends 는 findings 구역으로 묶인다(nav_active in ('findings', 'trends')).
+        self.assertIn(f"<h2>{h2_findings}</h2>", trends, "trends 밴드가 findings 구역이 아니다")
+
+        # 배너 <b> — 같은 sub_zone 판정을 밴드와 공유한다(위 정의 한 곳).
+        def banner_b(html: str) -> str:
+            seg = html[html.index('id="grm-cta"'):]
+            return seg[seg.index("<b>") + 3: seg.index("</b>")]
+
+        self.assertEqual(banner_b(home), h2_default)
+        self.assertEqual(banner_b(glossary), "이번 주 용어와 지적 사례, 매주 월요일 메일로")
+        self.assertEqual(banner_b(findings), h2_findings)
+        self.assertEqual(banner_b(trends), h2_findings)
+
+        # 배너 실물 링크(C-03) — grm-cta-side 안에 정확히 한 번(밴드의 sub-peek 링크와 같은 낱말).
+        for html in (home, glossary, findings, trends):
+            side = html[html.index('<div class="grm-cta-side">'):]
+            side = side[:side.index("</div>")]
+            self.assertEqual(side.count("이번 주 소식 먼저 보기"), 1,
+                             "배너 side 링크가 0 또는 중복이다")
+
+        # about — 밴드는 기존 동작대로 없다(nav_active != 'about' 게이트, 소개 2026-09-06).
+        self.assertNotIn('class="subscribe"', about, "about 페이지에 밴드가 있으면 안 된다")
+
     def test_mobile_keeps_the_sentence_that_says_what_the_subscription_is(self):
         """★하단 고정 구독창(.grm-cta)은 `newsletter_form_action` **env 게이트 뒤**에 있어
         평소 테스트 빌드에서는 렌더조차 되지 않는다 — 골든이 전부 초록인 채로 이 영역의
@@ -8274,7 +8335,9 @@ class WebRenderHardeningTest(unittest.TestCase):
 
         # 게이트가 실제로 켜졌는지 먼저 확인한다 — 안 켜지면 아래 단언이 공허하게 통과한다.
         self.assertIn('class="grm-cta"', html, "구독창이 렌더되지 않았다 — 이 검사는 무력하다")
-        self.assertIn("FDA·EMA·MHRA·식약처 지적사항을 한국어 요약으로 · 무료", html)
+        # [2026-09-23 C-02 구역 분기] 이 브리프 상세 페이지는 nav_active='detail' →
+        # sub_zone='default'. 3분기 문안은 test_subscribe_copy_varies_by_zone 이 따로 본다.
+        self.assertIn("공식 원문 링크와 함께 · 언제든 해지 · 무료", html)
         # 회귀 지점: 좁은 폭에서 이 줄을 통째로 숨기는 규칙이 다시 생기면 실패한다.
         self.assertNotIn(".grm-cta-txt span{display:none}", html,
                          "모바일에서 구독 설명이 숨겨졌다 — 무엇을 받는지 못 읽는다")
@@ -8435,6 +8498,28 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertIn("slice(0,4)", sub_fn)
         # index.html 은 디렉터리로 접는다 — 같은 페이지가 두 줄로 갈리면 판독이 쪼개진다.
         self.assertIn("index", sub_fn)
+        # [087] 유입 축 — 경로/구역 위에 first touch(utm·리퍼러·착지 구역) 한 줄 더.
+        # 076/084 와 같은 이유로 제출 두 키 안에서만 나가야 한다(구역 bump 와 같은
+        # if 블록 안에 있는지 위치로 본다).
+        self.assertIn("rpc/funnel_touch_bump", fscript)
+        self.assertIn("rpc/funnel_touch_bump", submit_only.split("var band=", 1)[0],
+                      "유입 축 bump 가 제출 조건 블록 밖에 있다 — 노출에서도 나간다")
+        self.assertIn(
+            "JSON.stringify({p_key:key,p_source:t.s,p_medium:t.m,p_campaign:t.c,"
+            "p_ref_host:t.r,p_landing_zone:t.z})", fscript)
+        # first touch 캡처는 subPath()/zone() 보다 앞에 있어야 위 두 슬라이스(zone_fn·
+        # sub_fn)가 이 코드를 걸러낸다는 전제가 성립한다 — touchCapture() 는 URLSearchParams
+        # 로 쿼리를 읽으므로(location.search 사용) 저 슬라이스 안에 있으면 안 된다.
+        self.assertIn("function touchCapture()", fscript)
+        touch_fn = fscript.split("function touchCapture()", 1)[1].split("function touchRead()", 1)[0]
+        self.assertIn("localStorage", touch_fn)
+        self.assertIn("utm_source", touch_fn)
+        self.assertIn("document.referrer", touch_fn)
+        # ★무PII — 쿼리는 URLSearchParams 로 읽어 형식 제약(regex)으로 접을 뿐, 원문
+        # 전체(location.href)는 절대 참조하지 않는다.
+        self.assertNotIn("location.href", touch_fn)
+        self.assertIn("'grm-touch'", fscript, "first touch 저장 키가 없다")
+        self.assertIn("7*864e5", fscript, "7일 TTL 이 없다 — 세션 단위면 직접 유입에 섞인다")
 
 
 class WebHeadersFileTest(unittest.TestCase):
@@ -8788,6 +8873,18 @@ class WebSeoMetaTest(unittest.TestCase):
             self.assertIn('<link rel="icon" type="image/svg+xml" href="/favicon.svg">', h)
             self.assertIn('<link rel="apple-touch-icon" href="/assets/favicon-180.png">', h)
             self.assertIn('<link rel="manifest" href="/site.webmanifest">', h)
+
+    def test_glossary_term_json_ld_escapes_angle_bracket(self):
+        """`build_glossary_term_json_ld` 도 `build_json_ld`·`build_breadcrumb_json_ld`
+        와 같은 `<` → `\\u003c` 계약을 따라야 한다 — 셋 다 `<script>` 안에 raw 로 박히므로
+        (base.html `{{ json_ld | safe }}`), 정의문(easy)에 `<` 가 있으면 `</script` 조기
+        종료 위험이 있다. json.dumps 는 그 문자를 그대로 두므로 수동 치환이 유일한 방어선."""
+        term = {"id": "t1", "term_ko": "용어", "term": "Term <A>",
+                "easy": "Compares a<b values."}
+        raw = render.build_glossary_term_json_ld(term)
+        self.assertNotIn("<", raw, "이스케이프 없이 '<' 가 그대로 샜다")
+        node = json.loads(raw)                            # 이스케이프해도 유효 JSON
+        self.assertEqual(node["description"], "Compares a<b values.")
 
     def test_json_ld_landing_only_and_valid(self):
         import re as _re
@@ -15843,6 +15940,13 @@ class WebProfileInterpretationTest(unittest.TestCase):
             self.assertNotIn(word, self.insp, word)
 
 
+# 087 유입 축 마이그레이션 파일명 — 내용으로 부르는 상수. 처음 착수 때 086 으로 붙였다가
+# 다른 PR(#1066 findings_search_cache)이 같은 번호를 먼저 merge 해 087 로 재배번했다.
+# 테스트 메서드명·변수명에 번호를 그대로 박으면 이런 충돌마다 이름까지 함께 갈아야 하므로,
+# 파일명은 이 상수 하나에서만 참조한다(관례: 이후 신설 마이그도 이 꼴을 따른다).
+MIG_TOUCH = "087_funnel_touch_counts.sql"
+
+
 class WebAdminGrowthPanelTest(unittest.TestCase):
     """/admin 성장·유입 패널 + 깔때기 일별 스냅샷(071) 계약.
 
@@ -15866,6 +15970,7 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
                       "076_funnel_zone_counts.sql").read_text(encoding="utf-8")
         cls.mig084 = (WEB_DIR / "migrations" /
                       "084_funnel_path_counts.sql").read_text(encoding="utf-8")
+        cls.mig_touch = (WEB_DIR / "migrations" / MIG_TOUCH).read_text(encoding="utf-8")
 
     def _check_keys(self, sql):
         m = re.search(r"key in \(([^)]*)\)", sql)
@@ -15962,6 +16067,51 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         # 소급 불가를 읽는 쪽이 알 수 있어야 한다 — 0 건이 "유입 없음"이 아니라 "관측
         # 시작 전"일 수 있다(배선 이전 제출은 이 표에 영영 없다).
         self.assertIn("first_kst", self.mig084)
+
+    def test_touch_axis_answers_which_channel_the_subscribe_came_from(self):
+        """★2026-09-23 실측: 21일 표본에서 방문 리퍼러의 46%가 '직접'이었는데, 그중 상당수가
+        앱 내장 브라우저(링크드인 등)가 리퍼러를 안 보내 섞인 것이다(같은 기간 링크드인
+        리퍼러 직접 측정은 4회뿐 — 실제 유입은 더 많다는 뜻). 084 가 "어느 페이지에서"에
+        답했다면, 087 은 "어느 채널에서"에 답한다 — 우리가 링크드인에 뿌린 링크로 온
+        구독이 몇 건인지 076/084 로는 알 수 없었다.
+
+        ★키가 제출 두 개뿐인 이유는 084 와 같다 — 노출까지 실으면 utm·리퍼러·구역의 곱만큼
+        차원이 커져 표가 못 읽힌다. 그래서 이 표도
+        test_funnel_vocabulary_synced_three_ways(060/071/076 의 5키 어휘 대조)에 끼우지
+        않는다 — 그 대조는 일부러 넓은 어휘고, 087 은 일부러 좁은 어휘라 함께 대조하면
+        정상 설계가 실패로 잡힌다.
+        """
+        self.assertEqual(self._check_keys(self.mig_touch), {"band_submit", "cta_submit"},
+                         "087 은 제출 두 키만 받아야 한다")
+        for frag in (
+            "source ~ '^[a-z0-9._-]{1,40}$'",
+            "medium ~ '^[a-z0-9._-]{1,40}$'",
+            "campaign ~ '^[a-z0-9._-]{1,60}$'",
+            "ref_host ~ '^[a-z0-9.-]{1,80}$'",
+            "landing_zone ~ '^[a-z0-9-]{1,24}$'",
+        ):
+            self.assertIn(frag, self.mig_touch, f"형식 제약 누락 — anon RPC 가 열린 문자열을 받는다: {frag}")
+        self.assertIn("cap constant integer", self.mig_touch,
+                      "행 수 상한이 없다 — 쓰레기 조합을 무한히 만들 수 있다")
+        self.assertIn("grant select on public.funnel_touch_counts to authenticated", self.mig_touch)
+        self.assertNotIn("grant insert", self.mig_touch)
+        self.assertIn(
+            "grant execute on function public.funnel_touch_bump"
+            "(text, text, text, text, text, text) to anon, authenticated", self.mig_touch)
+        # 판독 함수 둘 다 로그인만 — 성장 탭·성장 일보가 서비스 키/세션으로 읽는다.
+        self.assertIn("grant execute on function public.funnel_touch_report() to authenticated",
+                      self.mig_touch)
+        self.assertIn("grant execute on function public.funnel_zone_report() to authenticated",
+                      self.mig_touch)
+        # 화면은 읽기만 한다 — insert/upsert/delete 가 있으면 계약 위반.
+        self.assertIn('rpc("funnel_touch_report")', self.admin_js)
+        self.assertIn('rpc("funnel_zone_report")', self.admin_js)
+        for banned in ('from("funnel_touch_counts").insert',
+                       'from("funnel_touch_counts").upsert',
+                       'from("funnel_touch_counts").delete'):
+            self.assertNotIn(banned, self.admin_js)
+        self.assertIn('id="grm-funnel-touch"', self.admin_html)
+        self.assertIn('id="grm-funnel-zone-rate"', self.admin_html)
 
     def test_snapshot_write_path_is_cron_only(self):
         self.assertIn("enable row level security", self.mig071)
@@ -17468,6 +17618,126 @@ class WebFindingsTextOnlyTest(unittest.TestCase):
         self.assertIn("renderTextOnlyNote();", fn)
 
 
+class WebEnBriefFactTableTest(unittest.TestCase):
+    """[영문 사실표 2026-09-23] 라이브 `/en/briefs/2026-07-27/` 에서 실측된 결함 —
+    사실표 값이 `Published: 미확인`·`Issuing authority: MHRA (영국)` 처럼 한글째로
+    떴다. 세 갈래를 합성 카드로 고정한다: (a) 고정 어휘 토큰(`미확인`)은 tr() 로 실제
+    번역, (b) 고유명사 라벨(업체)은 그대로 두고 세지 않음, (c) 그 외 한글 사실값은
+    원문 그대로 두되 개수를 밝힌다.
+    """
+
+    @staticmethod
+    def _brief(pub="2026-07-27"):
+        card = {
+            "id": "c-en-facts-1", "render_order": 1, "group": "국내",
+            "group_label": "💊 합성의약품", "agency": "MFDS", "card_type": "행정처분",
+            "category": "Other", "modality": "💊 합성의약품", "type_tag": "행정처분",
+            "evidence_level": "A", "signal_tier": 1, "signal_label": "High",
+            "headline_target": "동아제약(주)",
+            "title_issue": "품목 제조업무정지",
+            "summary": "품목 제조업무정지 처분이 확인됐다.",
+            "implication": "해당 품목의 유통이 제한된다.",
+            "key_facts": ["제조업무정지 1개월"],
+            "checks": ["재발방지대책 확인"],
+            "facts": [
+                {"label": "발행일", "value": "미확인"},
+                {"label": "업체", "value": "동아제약(주)"},
+                {"label": "처분",
+                 "value": "해당 품목 제조업무정지 1개월(2026. 7. 1. ~ 2026. 7. 31.)"},
+            ],
+            "sources": {"info_url": "https://example.org/a",
+                        "official_url": "https://example.org/b"},
+            "en": {
+                "title_issue": "Manufacturing suspension",
+                "summary": "A one-month manufacturing suspension was confirmed.",
+                "implication": "Distribution of the item is restricted.",
+                "key_facts": ["One-month manufacturing suspension"],
+                "checks": ["Confirm corrective action plan"],
+            },
+        }
+        meta = {"run_date_kst": pub, "publish_date": pub,
+                "window": f"{pub}~{pub}", "agencies": ["MFDS"],
+                "tldr": ["국문 요약 한 줄"], "ai_disclosure": True,
+                "en": {"tldr": ["One-line English summary"]},
+                "coverage": {"rendered": 1, "intake_total": 1,
+                             "evidence": {"A": 1, "B": 0, "C": 0}}}
+        return {"schema": "grm-web-card/v1", "brief": meta, "cards": [card]}
+
+    def _build(self, brief):
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_enfacts_"))
+        data = tmp / "data"
+        data.mkdir(parents=True)
+        (data / f"brief_web_{brief['brief']['publish_date']}.json").write_text(
+            json.dumps(brief, ensure_ascii=False), encoding="utf-8")
+        out = tmp / "site"
+        render.render_site(data, out, render_doc_pages=False)
+        return tmp, out
+
+    def test_sentinel_translated_proper_noun_kept_notice_counts_remainder(self):
+        tmp, out = self._build(self._brief())
+        try:
+            page = out / "en" / "briefs" / "2026-07-27" / "index.html"
+            self.assertTrue(page.is_file(), "영문 브리프가 렌더되지 않았다")
+            html = page.read_text(encoding="utf-8")
+            # (a) 고정 어휘 토큰("미확인")은 tr() 로 실제 번역된다 — 한글이 남지 않는다.
+            self.assertIn("Unknown", html)
+            self.assertNotIn("미확인", html)
+            # (b) 고유명사 라벨(업체)의 값은 그대로 남는다 — 존재하지 않는 이름을
+            #     지어내지 않는다.
+            self.assertIn("동아제약(주)", html)
+            # (c) 그 외 한글 사실값(처분)은 원문 그대로 남고, 고지가 정확한 개수(1)를
+            #     말한다 — 고유명사(업체)는 세지 않으므로 1이어야 한다.
+            self.assertIn(
+                "해당 품목 제조업무정지 1개월(2026. 7. 1. ~ 2026. 7. 31.)", html)
+            self.assertIn(
+                "Shown in the original Korean: 1 value in this table.", html,
+                "한글 잔존 개수 고지가 없거나 개수가 틀렸다")
+            self.assertNotIn("1 values", html, "단수 처리({s})가 깨졌다")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_korean_tree_is_byte_untouched(self):
+        """한국어 트리는 이 기능 자체가 없다 — 사실값·고지 모두 종전과 같다."""
+        tmp, out = self._build(self._brief())
+        try:
+            ko = (out / "briefs" / "2026-07-27" / "index.html").read_text(
+                encoding="utf-8")
+            self.assertIn("미확인", ko, "한국어판 사실값이 바뀌었다")
+            self.assertNotIn("Unknown", ko)
+            self.assertNotIn("한국어 원문 그대로입니다", ko,
+                             "한국어판에 새 고지가 떴다 — facts_ko_count 는 한국어 "
+                             "트리에서 항상 0 이어야 한다")
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_card_view_unit_rules(self):
+        """`_card_view` 단위 — 세 갈래(고정 어휘·고유명사·그 외 한글)와 `facts_ko_count`."""
+        card = {
+            "id": "c1", "render_order": 1,
+            "facts": [
+                {"label": "발행일", "value": "미확인"},
+                {"label": "업체", "value": "동아제약(주)"},
+                {"label": "처분", "value": "해당 품목 제조업무정지 1개월"},
+            ],
+        }
+        en_tr = grm_i18n.Translator("en")
+        en_view = render._card_view(card, en_tr, "en")
+        by_label = {f["label"]: f["value"] for f in en_view["facts"]}
+        # (a) 고정 어휘 토큰은 tr() 를 태운다 — 라벨이 "발행일"이라 English label
+        #     은 "Published"(en.json)로 바뀌지만 여기선 값만 확인한다.
+        self.assertEqual(by_label[en_tr("발행일")], "Unknown")
+        # (b) 고유명사 라벨(업체)의 값은 그대로다.
+        self.assertEqual(by_label[en_tr("업체")], "동아제약(주)")
+        # (c) 그 외 한글 사실값(처분)은 그대로 두되 세어진다.
+        self.assertEqual(by_label[en_tr("처분")], "해당 품목 제조업무정지 1개월")
+        self.assertEqual(en_view["facts_ko_count"], 1)
+        # 한국어 트리는 값·개수 모두 변형이 없다(facts_ko_count 는 항상 0).
+        ko_view = render._card_view(card)
+        ko_by_label = {f["label"]: f["value"] for f in ko_view["facts"]}
+        self.assertEqual(ko_by_label["발행일"], "미확인")
+        self.assertEqual(ko_view["facts_ko_count"], 0)
+
+
 class WebEnFirmPageTest(unittest.TestCase):
     """[다국어 2026-09-04] 영어판 업체 페이지 — 슬러그는 물려받고, 숫자는 다시 센다.
 
@@ -17891,6 +18161,42 @@ class WebEnGlossaryTest(unittest.TestCase):
         ko = (self.out / "glossary" / "index.html").read_text(encoding="utf-8")
         self.assertNotIn("gl-note", ko)
 
+    # ── [영문 용어 출처 2026-09-23] 기관명 약칭 + "Korean original" 마커 ────────
+    def test_source_agency_name_shown_as_mfds_acronym(self):
+        """★출처의 **기관명만** 공식 약칭으로 바꾼다 — 문서 제목(「」 안)은 그대로 둔다.
+
+        실측: 242 용어 중 67건이 `식품의약품안전처`(식약처)를 출처로 인용한다. 영어
+        색인에는 그 한글 기관명이 그대로 남으면 안 되고, 국문 색인은 손대지 않는다.
+        """
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertIn("MFDS", idx)
+        self.assertNotIn("식품의약품안전처", idx, "영문 색인에 한글 기관명이 그대로 남았다")
+        # 문서 제목은 지어내지 않는다 — 「알기 쉬운 GMP 용어집」은 그대로 한글이다.
+        self.assertIn("알기 쉬운 GMP 용어집", idx, "문서 제목까지 지워지거나 옮겨졌다")
+        # 한국어판은 이 매핑 자체가 없다(항등).
+        ko = (self.out / "glossary" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("식품의약품안전처", ko, "한국어 색인의 기관명이 바뀌었다")
+        self.assertNotIn("MFDS", ko)
+
+    def test_remaining_korean_source_gets_a_marker(self):
+        """MFDS 로 바꾼 뒤에도 한글(문서 제목)이 남으면 "Korean original" 로 밝힌다."""
+        idx = (self.dir / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Korean original", idx)
+        self.assertGreater(idx.count('class="gl-src-ko"'), 0)
+        # 색인 카드가 아니라 낱말 페이지(gt-*)에서도 같은 마커가 떠야 한다 — 한글
+        # 출처를 가진 실제 용어 하나로 확인한다.
+        ko_sourced = next(
+            t for t in self.terms
+            if re.search(r"[가-힣]", t.get("definition_source") or ""))
+        page = (self.dir / ko_sourced["id"] / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Korean original", page, ko_sourced["id"])
+        self.assertNotIn("한국어 원문", page, "키가 번역되지 않고 그대로 샜다")
+        # 한국어판에는 이 마커가 없다(원문이 곧 그 언어라 밝힐 것이 없다).
+        ko_page = (self.out / "glossary" / ko_sourced["id"] / "index.html").read_text(
+            encoding="utf-8")
+        self.assertNotIn("Korean original", ko_page)
+        self.assertNotIn("gt-src-ko", ko_page)
+
     def test_index_splits_english_by_letter_not_one_latin_bucket(self):
         """★라틴을 한 덩어리로 두면 242개가 한 칸에 들어가 색인이 아무것도 가르지 못한다."""
         idx = (self.dir / "index.html").read_text(encoding="utf-8")
@@ -18258,9 +18564,13 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "gt-case-meta": "위와 같음",
         "gt-quote": "위와 같음",
         "ti-arrow-right": "사례 링크에 딸린 아이콘 — 사례 유무를 따라간다",
+        # [영문 용어 출처 2026-09-23] 기관명을 MFDS 로 바꾼 뒤에도 문서 제목이 한글로
+        # 남는 용어에만 붙는 마커 — 한국어판은 원문이 곧 그 언어라 밝힐 것이 없다.
+        "gt-src-ko": "영어 전용 마커 — 출처에 남은 한국어 원문임을 밝힌다",
     },
     "glossary/": {
         "gl-note": "영어 전용 고지 — 출처·조항 이름이 한국어로 남는 이유를 밝힌다",
+        "gl-src-ko": "위와 같음(카드별 출처 옆 마커) — gt-src-ko 와 동형",
     },
     "findings/": {
         "fnd-langnote": "영어 전용 고지 — 원문 영어만 보고 있다는 것과 해제 방법",
@@ -18320,6 +18630,9 @@ INTENTIONAL_PRESENCE_DIFFS: dict[str, dict[str, str]] = {
         "fcell": "위와 같음", "fk": "위와 같음", "fv": "위와 같음",
         "ti-file-search": "생략된 블록의 아이콘",
         "ti-file-description": "위와 같음",
+        # [영문 사실표 2026-09-23] 고유명사가 아닌 사실값이 한글로 남은 카드에만 붙는
+        # 고지 — 한국어판은 판정 자체가 없다(facts_ko_count 항상 0).
+        "facts-ko-note": "영어 전용 고지 — 사실표의 한국어 원문 값 개수를 밝힌다",
     },
     "findings/doc": {
         # 문서마다 본문에 표제어가 실제로 등장하는지가 갈린다(영어 3,174장 중 37장은

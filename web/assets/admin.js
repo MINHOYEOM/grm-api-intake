@@ -279,7 +279,9 @@
     backendProbe: null,
     publishPr: null,
     growth: null,
-    rum: null
+    rum: null,
+    funnelTouch: null,
+    funnelZoneRate: null
   };
 
   if (!window.supabase || !window.supabase.createClient || !supabaseUrl || !anonKey) {
@@ -738,7 +740,7 @@
   };
   function loadGrowth() {
     // 읽기 전용 select 셋 뿐 — 스냅샷 쓰기는 DB cron(funnel_snapshot)만 한다.
-    return Promise.all([
+    var main = Promise.all([
       state.client.from("funnel_counts").select("key,total"),
       state.client.from("funnel_counts_daily").select("snap_date,key,total")
         .order("snap_date", { ascending: false }).limit(FUNNEL_KEYS.length * (GROWTH_SNAPSHOT_DAYS + 1)),
@@ -766,6 +768,25 @@
       renderGrowth(errText(error) || "깔때기 데이터를 불러오지 못했습니다.");
       renderFunnelZones(errText(error) || "깔때기 데이터를 불러오지 못했습니다.");
     });
+    // [087] 유입 채널·구역별 전환 — 위 세 표와 실패를 묶지 않는다. 표 하나가 막혀도(예:
+    // 087 마이그 미적용 환경) 나머지 성장 표는 그대로 보여야 한다 — 표마다 따로 잡는다.
+    var touch = state.client.rpc("funnel_touch_report").then(function (res) {
+      if (res.error) throw res.error;
+      state.funnelTouch = res.data || null;
+      renderFunnelTouch();
+    }).catch(function (error) {
+      state.funnelTouch = null;
+      renderFunnelTouch(errText(error) || "유입 채널 데이터를 불러오지 못했습니다.");
+    });
+    var zoneRate = state.client.rpc("funnel_zone_report").then(function (res) {
+      if (res.error) throw res.error;
+      state.funnelZoneRate = res.data || null;
+      renderFunnelZoneRate();
+    }).catch(function (error) {
+      state.funnelZoneRate = null;
+      renderFunnelZoneRate(errText(error) || "구역별 전환 데이터를 불러오지 못했습니다.");
+    });
+    return Promise.all([main, touch, zoneRate]);
   }
   function renderFunnelZones(errorMessage) {
     var host = byId("grm-funnel-zones");
@@ -788,6 +809,84 @@
       var label = ZONE_LABELS[r.zone] || r.zone;
       return "<tr><td>" + esc(label) + " <span class=\"mono\">/" + esc(r.zone) + "/</span></td><td>" +
         number(r.band) + "</td><td>" + number(r.cta) + "</td><td><b>" + number(r.sum) + "</b></td></tr>";
+    }).join("");
+  }
+  // [087] 유입 채널 — funnel_touch_report() 는 by_channel(요약) 과 rows(source/medium/
+  // campaign/리퍼러/착지 구역별 세부) 를 함께 낸다. 표는 요약을 보여주고, 세부는 details
+  // 안에 접어 둔다(채널 하나가 조합 수십 개로 쪼개지면 요약 표가 못 읽힌다).
+  function renderFunnelTouch(errorMessage) {
+    var host = byId("grm-funnel-touch");
+    var rowsHost = byId("grm-funnel-touch-rows");
+    var note = byId("grm-funnel-touch-note");
+    if (!host) return;
+    if (errorMessage || !state.funnelTouch) {
+      host.innerHTML = emptyRow(2, errorMessage || "데이터 없음");
+      if (rowsHost) rowsHost.innerHTML = emptyRow(7, errorMessage || "데이터 없음");
+      if (note) note.textContent = "";
+      return;
+    }
+    var data = state.funnelTouch;
+    var byChannel = data.by_channel || [];
+    var rows = data.rows || [];
+    if (note) {
+      // 소급 불가 — 배선 이전 제출은 이 표에 영영 없다(084 와 같은 이유).
+      note.textContent = data.first_kst
+        ? "첫 기록일 " + data.first_kst + " — 이전 제출은 유입 채널 정보가 없습니다."
+        : "";
+    }
+    if (!byChannel.length) {
+      host.innerHTML = emptyRow(2, "아직 채널이 기록된 제출이 없습니다(087 배선 이후 제출부터).");
+    } else {
+      host.innerHTML = byChannel.map(function (c) {
+        return "<tr><td>" + esc(c.channel) + "</td><td><b>" + number(c.submits) + "</b></td></tr>";
+      }).join("");
+    }
+    if (!rowsHost) return;
+    if (!rows.length) {
+      rowsHost.innerHTML = emptyRow(7, "데이터 없음");
+      return;
+    }
+    rowsHost.innerHTML = rows.map(function (r) {
+      return "<tr><td>" + esc(r.source) + "</td><td>" + esc(r.medium) + "</td><td>" +
+        esc(r.campaign) + "</td><td>" + esc(r.ref_host) + "</td><td>" + esc(r.landing_zone) +
+        "</td><td>" + number(r.total) + "</td><td>" + esc(r.last_kst || "") + "</td></tr>";
+    }).join("");
+  }
+  // [087] 구역별 전환 — funnel_zone_report() 는 RUM 착지 방문(분모)과 076 제출(분자)을
+  // 이미 조인해서 낸다. 화면은 비율 계산을 다시 하지 않는다(서버 값을 그대로 표시).
+  function renderFunnelZoneRate(errorMessage) {
+    var host = byId("grm-funnel-zone-rate");
+    var note = byId("grm-funnel-zone-rate-note");
+    if (!host) return;
+    if (errorMessage || !state.funnelZoneRate) {
+      host.innerHTML = emptyRow(5, errorMessage || "데이터 없음");
+      if (note) note.textContent = "";
+      return;
+    }
+    var data = state.funnelZoneRate;
+    var zones = data.zones || [];
+    if (note) {
+      note.textContent = (data.since ? data.since + " 이후 누적입니다. " : "") +
+        (data.path_precision_note || "");
+    }
+    if (!zones.length) {
+      host.innerHTML = emptyRow(5, "데이터 없음");
+      return;
+    }
+    host.innerHTML = zones.map(function (z) {
+      var label = ZONE_LABELS[z.zone] || z.zone;
+      var rate = (z.rate_pct === null || z.rate_pct === undefined) ? "—" : Number(z.rate_pct).toFixed(2) + "%";
+      var precision;
+      if (z.precision_unknown || z.sample_interval_max === null || z.sample_interval_max === undefined) {
+        precision = "미상";
+      } else if (z.sample_interval_max <= 1.5) {
+        precision = "정확";
+      } else {
+        precision = "표본 약 " + Number(z.sample_interval_max).toFixed(1) + "배";
+      }
+      return "<tr><td>" + esc(label) + " <span class=\"mono\">/" + esc(z.zone) + "/</span></td><td>" +
+        number(z.visits || 0) + "</td><td>" + number(z.submits || 0) + "</td><td>" + esc(rate) +
+        "</td><td>" + esc(precision) + "</td></tr>";
     }).join("");
   }
   function growthDelta(cur, prev) {

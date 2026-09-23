@@ -1,0 +1,187 @@
+name: GRM Newsletter Freshness Monitor
+
+# [뉴스레터 발송 감시 · N-01 2026-09-23] "이번 주 뉴스레터가 실제로 나갔나"를 클라우드에서
+# 감시한다.
+#
+# `grm-newsletter-send.yml` 의 스케줄 크론(월 05:23·06:23·07:23 UTC = 14:23·15:23·16:23
+# KST)은 **보통 조용히 스킵한다** — 그 주 브리프 PR 은 Routine 발행(월 07:30 KST) 뒤 사람이
+# 미리보기를 확인하고 나서야 머지되는데, 그 머지가 크론 시각보다 늦어지는 주가 잦기
+# 때문이다(스케줄이 돌 때 아직 "새 호"가 없으면 조용히 아무 일도 하지 않는다 — 무해
+# 설계이지 보장이 아니다). 실제 발송은 **월요일 오후 Admin 콘솔의 수동 `workflow_dispatch`**
+# 다. 즉 "grm-newsletter-send.yml 의 최근 실행이 success" ≠ "이번 주 호가 발송됐다".
+#
+# `newsletter_dispatch_log`(Supabase) 는 Admin 콘솔에서 dispatch 버튼을 눌렀다는 기록만
+# 남기고 그 뒤 실제 발송 성공/실패로 상태를 갱신하지 않는다 — **진실이 아니다**. 오직
+# Brevo 캠페인 상태(`web/newsletter.py` 의 `_DISPATCHED_STATUSES`)만이 "정말 나갔는가"의
+# 진실이다. 그래서 이 감시는 저장소 상태가 아니라 Brevo 를 직접 읽는다.
+#
+# 검사 시각을 하루에 두 번 두는 이유 — **월요일 저녁**(20:13 KST)에 먼저 확인하면 운영자가
+# 그날 안에 Admin 발송 버튼을 눌러 "같은 날 발송"을 만회할 수 있다. **화요일 아침**
+# (09:13 KST)은 월요일 저녁까지도 안 나간 경우의 최종 확인이다(2차 알림이 아니라 이슈
+# 갱신 — 같은 제목·라벨의 이슈를 재사용한다).
+#
+# ★읽기 전용 저장소 — 네트워크는 Brevo(멱등 조회와 동일한 `find_campaign`, GET 만) 뿐.
+# issues:write 는 미발송 알림 이슈 생성/갱신/종료용.
+on:
+  schedule:
+    # 월 11:13 UTC = 20:13 KST · 화 00:13 UTC = 09:13 KST. 정각/30분은 GitHub 예약 크론의
+    # 부하 피크라 지각한다(`grm-newsletter-send.yml`·`grm-intake.yml` 과 같은 사유로 이미
+    # 비정각 관행 — 여기서도 :13 을 쓴다).
+    - cron: '13 11 * * 1'
+    - cron: '13 0 * * 2'
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: 'KST 기준 검사일(YYYY-MM-DD). 비우면 오늘 — 과거 주차 재현용.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write        # 미발송 주 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: newsletter-freshness
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    name: Check this week's newsletter was actually sent
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 미발송(exit 1)·API 오류(exit 2)는 job 하드 실패가 아니라 이슈/요약으로 처리한다 —
+      # outcome 을 뒤에서 분기.
+      - name: Check newsletter freshness (read-only Brevo query)
+        id: monitor
+        continue-on-error: true
+        env:
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
+          # 입력은 env 로 전달(쉘 ${{ }} 직접 보간 금지 — 스크립트 인젝션 회피).
+          AS_OF_INPUT: ${{ inputs.as_of }}
+        run: |
+          ARGS="--mode freshness --output newsletter_freshness.json"
+          if [ -n "$AS_OF_INPUT" ]; then
+            ARGS="$ARGS --as-of $AS_OF_INPUT"
+          fi
+          python web/newsletter.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Newsletter Freshness Monitor"
+            echo ""
+            if [ -f newsletter_freshness.json ]; then
+              echo '```json'
+              cat newsletter_freshness.json
+              echo '```'
+            else
+              echo "newsletter_freshness.json 이 생성되지 않았습니다 (인자 오류로 조기 종료했을 수 있습니다)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update freshness issue
+        if: steps.monitor.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try { report = JSON.parse(fs.readFileSync('newsletter_freshness.json', 'utf8')); }
+            catch (e) { report = { verdict: 'unknown', reason: 'newsletter_freshness.json 파싱 실패' }; }
+
+            // api-error 는 "미발송"의 증거가 아니라 감시 자체가 판정하지 못한 것 — 잘못된
+            // "미발송" 이슈를 열지 않는다. 요약에 경고만 남긴다.
+            if (report.verdict === 'api-error') {
+              core.warning(`뉴스레터 신선도 감시 — Brevo 조회 실패로 판정하지 못했습니다: ${report.reason || '(사유 없음)'}`);
+              return;
+            }
+
+            const title = '[newsletter-freshness] 이번 주 뉴스레터가 발송되지 않았습니다';
+            const label = 'newsletter-freshness';
+
+            const lines = [];
+            lines.push(`- 판정: **${report.verdict}**`);
+            lines.push(`- 사유: ${report.reason || '(없음)'}`);
+            lines.push(`- 검사 기준일(KST): ${report.as_of || '?'}`);
+            lines.push(`- 최신 브리프 발행일: ${report.latest_publish_date || '(없음)'}`);
+            if (report.campaign_name) {
+              lines.push(`- 캠페인: ${report.campaign_name} (상태: ${report.campaign_status || '?'})`);
+            }
+            lines.push('');
+            if (report.verdict === 'not-sent') {
+              lines.push('**확인할 것** — Admin 콘솔 뉴스레터 발송 버튼, 또는:');
+              lines.push('```');
+              lines.push('gh workflow run grm-newsletter-send.yml -f publish_date=<날짜> -f mode=send');
+              lines.push('```');
+            } else if (report.verdict === 'brief-missing') {
+              lines.push('**확인할 것** — 이번 주 브리프 발행 PR 이 머지됐는지(`grm-publish-watchdog` 상태 확인).');
+            }
+            const body = lines.join('\n')
+              + `\n\n검사 시각(KST): ${report.checked_at_kst || '?'} · 실행: ${context.runId}`
+              + `\n워크플로 \`grm-newsletter-freshness.yml\` · 발송이 확인되면 자동으로 닫힙니다.`;
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '이번 주 뉴스레터 발송이 Brevo 에서 확인되지 않음');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close freshness issue on recovery
+        if: steps.monitor.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[newsletter-freshness] 이번 주 뉴스레터가 발송되지 않았습니다';
+            const label = 'newsletter-freshness';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `이번 주 호 발송이 Brevo 에서 확인되어 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }

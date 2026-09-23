@@ -175,6 +175,9 @@
 .subscribe .sub-peek a{color:var(--coral-2);text-decoration:none}
 .subscribe .sub-peek a:hover{color:var(--coral)}
 .subscribe .sub-peek .ti{font-size:13px;vertical-align:-1px}
+/* 2026-09-23 C-06 — 이미 구독한 방문자에게 밴드 스크립트가 hidden 을 다는데, [hidden]
+   은 author display 규칙에 진다(이 파일의 알려진 함정) — 짝을 미리 박아 둔다. */
+.subscribe[hidden]{display:none}
 </style>
   {# 구독 전 상태(입력) — 제출 성공 시 아래 스크립트가 이 블록 전체를 감추고 .sub-done 만 표시. div 는 display 미지정이라 hidden 속성이 정상 동작(폼과 달리). #}
   <div id="grm-sub-intro">
@@ -215,13 +218,24 @@
     <span class="sub-done-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
     <h2>{{ _("확인 메일을 보냈습니다") }}</h2>
     <p class="sub-done-mail"><b id="grm-sub-dest"></b></p>
-    <p>{{ _("메일에서 <b>구독 확인</b> 버튼을 눌러 구독을 완료해 주세요.") }}</p>
-    <p class="sub-done-sub">{{ _("메일이 보이지 않으면 스팸함도 확인해 주세요.") }}</p>
+    {# 2026-09-23 C-06 — 발신자 미표기 결함 수리. 종전 두 문장(확인 버튼 안내·스팸함 안내)을
+       하나로 합치며 "발신자는 GRM Solutions Brief" 를 더한다 — 수신함에서 낯선 이름이면
+       구독 확인 자체를 놓친다. 같은 말을 두 번 하지 않도록 sub-done-sub 문단은 걷어 낸다. #}
+    <p>{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}</p>
   </div>
 </div></section>
 {# 방식 A 배선: 폼 제출을 가로채 fetch(no-cors)로 Brevo endpoint 에 백그라운드 POST → 페이지를 떠나지 않고 intro 를 성공 패널로 교체. 스크립트 미실행(JS off)·fetch 미지원이면 preventDefault 가 안 걸려 네이티브 POST 로 자연 폴백(=기존 동작). 밴드 한글안전(§4): 아래 스크립트에 letter-spacing/text-transform/mono 미사용. #}
 <script>
 (function(){
+  // 2026-09-23 C-06 감사 — 배너는 억제되는데 밴드는 안 됐다; 같은 키를 본다; 숨긴 밴드는
+  // bandVisible() 이 false 지만 배너도 같은 DONE 키로 숨으므로 겹침 규칙은 그대로 맞는다.
+  try{
+    if(localStorage.getItem('grm-sub-ok')){
+      var sec=document.querySelector('.subscribe');
+      if(sec)sec.hidden=true;
+      return;
+    }
+  }catch(_){}
   var f=document.getElementById('grm-sub-form');
   if(!f||!window.fetch)return;
   f.addEventListener('submit',function(e){
@@ -652,6 +666,11 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   .grm-cta-in{padding:12px 16px;gap:10px}
   .grm-cta-form{flex:1 1 100%}
   .grm-cta-form input{min-width:0;flex:1}
+  /* 2026-09-23 C-06 — 계산치 37/35px 로 44px 권고 미달(밴드는 52px). 글자 크기는 그대로 두고
+     터치 높이만 키운다. 옆 링크·버튼도 패딩으로 히트 영역을 넓힌다(× 닫기는 .grm-cta-x 의
+     !important 패딩이 더 세서 그대로 남는다 — 좁은 폭에서 계속 읽히던 크기다). */
+  .grm-cta-form input,.grm-cta-form button{min-height:44px}
+  .grm-cta-side button,.grm-cta-side a{padding:8px 6px}
   /* ★[모바일 구독 설명] 종전에는 이 줄을 통째로 숨겼다(display:none). 그러면 모바일
      방문자는 "매주 새로운 규제소식"만 보고, **어느 기관을 / 무슨 언어로 / 얼마에**
      받는지를 그 자리에서 읽을 수 없다. 네이버 유입의 절반이 모바일이라(실측
@@ -757,7 +776,8 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');
-      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{{ _("메일에서 구독 확인 버튼을 눌러 주세요.") }}</span>';}
+      // 2026-09-23 C-06 — 밴드와 같은 문장(발신자 GRM Solutions Brief 명시)으로 맞춘다.
+      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}</span>';}
       f.hidden=true;
       setTimeout(function(){dismiss(true);},4000);
     });

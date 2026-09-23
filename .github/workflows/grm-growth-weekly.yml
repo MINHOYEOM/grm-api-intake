@@ -1,0 +1,134 @@
+name: GRM Growth Weekly Report
+
+# [성장 2026-09-23 · 마케팅 계획 M-04] 매주 월요일 아침, 지난주(월~일 KST) 성장 리포트
+# (구독자·방문·구독 신청 채널/구역/경로별·검색(GSC)·회원·지난주 뉴스레터 발송 여부)를
+# 운영자 1인에게 이메일로 보낸다. `growth_weekly_report(089)` RPC → `web/growth_weekly.py`
+# 가 한국어 HTML 로 만들고 Brevo 트랜잭션 이메일(`v3/smtp/email`)로 발송한다.
+#
+# ★왜 월요일 09:23 KST 인가 — 정각/30분은 GitHub 예약 크론의 부하 피크라 지각한다
+#   (`grm-newsletter-send.yml`·`grm-intake.yml`·`grm-newsletter-freshness.yml` 과 같은 사유로
+#   이미 저장소 전반의 비정각 관행). 01:30 KST RUM 동기화(`grm-rum-analytics.yml`)와
+#   23:55 KST 깔때기 일별 스냅샷(071 pg_cron) 뒤여야 그 주 데이터가 완결돼 있고, 월요일
+#   14:00 KST 뉴스레터 자동 발송(`grm-newsletter-send.yml`)보다 먼저 돌아 "지난주 뉴스레터가
+#   나갔나" 판정에 이번 주 발송이 섞이지 않는다.
+#
+# ★왜 이슈가 아니라 메일인가 — 이 저장소는 PUBLIC 이고 Actions 로그도 공개다. 방문·구독자·
+#   전환 수치를 이슈 본문에 적으면 영구 공개 기록이 된다(`grm-newsletter-freshness.yml` 의
+#   이슈는 "발송됐다/안 됐다"만 말하지 숫자를 담지 않는 것과 같은 원칙). 그래서 실패 시
+#   여는 이슈도 실행 링크만 담고 숫자는 0건이다 — 리포트 본문은 오직 Brevo 트랜잭션
+#   메일로만 운영자 사서함에 간다.
+#
+# ★왜 p_persist=true 는 실발송에만 — `growth_weekly_report` 는 매 호출마다 자기 결과를
+#   `growth_weekly_reports` 에 스냅샷으로 남겨 **다음 주 채널/경로 차분의 기준**이 된다
+#   (089 마이그레이션 주석 참조). dry-run(수동 재현·리허설)까지 스냅샷을 남기면 실제
+#   집계 주기와 어긋난 행이 다음 주 차분을 오염시킨다 — 그래서 `--mode dry-run` 은
+#   `p_persist=false` 로 호출하고(리포트만 만들고 흔적을 남기지 않음), 실발송(`send`)만
+#   `p_persist=true` 다.
+on:
+  schedule:
+    - cron: '23 0 * * 1'          # 00:23 UTC = 월 09:23 KST
+  workflow_dispatch:
+    inputs:
+      week_end:
+        description: '지난주 일요일(YYYY-MM-DD). 비우면 RPC 기본값(직전 일요일) — 과거 주차 재현용.'
+        required: false
+        default: ''
+      mode:
+        description: '실발송(send, p_persist=true) 또는 리허설(dry-run, p_persist=false).'
+        required: false
+        type: choice
+        options: ['send', 'dry-run']
+        default: 'send'
+
+permissions:
+  contents: read
+  issues: write        # 발송 실패 알림 이슈 생성/갱신/종료용
+
+concurrency:
+  group: growth-weekly
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Build and send weekly growth report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 스케줄 이벤트는 inputs 가 빈 문자열(dispatch flag 3-상태 관용구) — ${MODE_INPUT:-send}
+      # 로 기본값 send 를 받는다. workflow_dispatch 는 사람이 고른 mode 를 그대로 쓴다.
+      - name: Send growth weekly report
+        id: send
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+          GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME }}
+          GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
+          GRM_NEWSLETTER_TEST_EMAILS: ${{ vars.GRM_NEWSLETTER_TEST_EMAILS }}
+          GRM_GROWTH_REPORT_TO: ${{ vars.GRM_GROWTH_REPORT_TO }}
+          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL }}
+          # 입력은 env 로 전달(쉘 ${{ }} 직접 보간 금지 — 스크립트 인젝션 회피).
+          MODE_INPUT: ${{ inputs.mode }}
+          WEEK_END_INPUT: ${{ inputs.week_end }}
+        run: |
+          MODE="${MODE_INPUT:-send}"
+          ARGS="--mode $MODE"
+          if [ -n "$WEEK_END_INPUT" ]; then
+            ARGS="$ARGS --week-end $WEEK_END_INPUT"
+          fi
+          python web/growth_weekly.py $ARGS
+
+      - name: Open or update failure issue
+        if: steps.send.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[growth-weekly] 주간 성장 리포트 발송 실패';
+            const label = 'growth-weekly';
+            // ★숫자는 이슈에 남기지 않는다(공개 저장소) — 실행 링크만.
+            const body = `주간 성장 리포트 발송이 실패했습니다. 로그를 확인하세요.\n\n`
+              + `실행: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '주간 성장 리포트 발송 실패');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Fail the job if the report step failed
+        if: steps.send.outcome == 'failure'
+        run: exit 1

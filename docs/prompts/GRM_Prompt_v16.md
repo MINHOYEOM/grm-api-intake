@@ -133,6 +133,15 @@ scaffold 가 만든 빈 슬롯 `grm-web-card/v1` 브리프에 `card.id` 로 주�
   금지**, 길이 규약(W5 3/max4·W7 2~3·W6 2문장·tldr 3), 사실과 해석 분리.
 · ⛔ **한국어판·표·인용에 없는 숫자를 영문에 쓰면 발행이 멈춘다**(`validate_brief_en_facts`,
   `EN_INVENTED_NUMBER`). 덜 말하는 것은 괜찮고, **없는 것을 말하는 것**만 막는다.
+· ⛔ **한국 업체·제품·문서 이름을 로마자로 옮기지 않는다.** 옮기는 순간 존재하지 않는 회사·품목을
+  가리킨다(`미래바이오제약(주)` → "Mirae Bio Pharm" 금지, `노텍정` → "Notec Tab" 금지).
+  영문 서사에서는 **일반명사로 가리킨다** — "a manufacturer" · "a disinfectant ethanol product" ·
+  "a repaglinide tablet product". 정체는 코드 verbatim 필드 `headline_target`(한국어 원문)이
+  밝히고, 화면이 왜 한국어인지 고지한다. 원문에 **공식 영문 상호가 있는 경우만** 그것을 쓴다
+  (예: `PHIL Inter Pharma Co., Ltd.`). 성분·제형은 일반명으로 쓴다(repaglinide·ethanol·
+  cetirizine hydrochloride). 공식 영문 제목이 없는 문서도 제목을 지어내지 말고 내용으로 설명한다.
+  ★이 규칙은 **어떤 가드도 검사하지 못한다** — 영어로 지어낸 이름은 언어 검사도 구조 파리티도
+  전부 통과한다(2026-09-07 실측: 검사 17건 전부 초록인 채 14사·12품목이 지어내져 있었다).
 · 다섯 슬롯(`title_issue`·`summary`·`key_facts`·`implication`·`checks`)과 `tldr_en` 은
   **전부 채우거나 전부 비운다.** 하나라도 비면 그 호는 영어로 발행되지 않는다(반쪽 영어 금지).
   자신 없으면 `en` 을 통째로 생략하라 — 한국어판은 평소대로 나간다.
@@ -662,6 +671,18 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
     별도 페이지 `OPEN GRM Web Deep Delta {date}` + `Type or Class`=`web-deep-delta` 로 대신해도 됨).
     `source_text`(원문 전사)는 **넣지 않는다** — 브릿지가 handoff 에서 직접 읽는다([2단계] ③).
     심층분석·번역 대상이 없으면(그런 주) 이 블록은 생략 — 정상.
+  - ★**블록 경계 공백 소실 — 예치 후 반드시 검증한다(2026-09-21 실측)**: Notion 은 긴 코드
+    블록을 ~1,800~1,900자에서 **자동 분할**하고, 그 분할 경계의 **앞뒤 공백 한 칸을 깎는다.**
+    compact JSON 에는 구조용 공백이 없으므로 **JSON 파싱은 멀쩡히 통과하고**, 대신 문장
+    한가운데가 경계에 걸린 자리에서 `biosimilars in the` → `biosimilars inthe` 처럼
+    **단어 둘이 붙은 채 발행된다** — 결정론 게이트가 못 잡는 종류의 손상이다.
+    - **검증(생략 금지)**: 예치 직후 그 페이지를 **다시 읽어** 네가 보낸 원본 문자열과 글자
+      단위로 대조한다. 공백이 깎였으면 읽어온 쪽이 `inthe` 로 보이므로 이 대조에서 **반드시
+      드러난다**(읽기 뷰도 경계 공백을 깎지만, 그건 "더 생긴 공백"을 가릴 뿐 "사라진 공백"은
+      못 가린다).
+    - **수리**: 그 자리에 공백을 다시 넣지 말고(또 경계라 또 깎인다) 경계를 넘겨 **글자 하나를
+      옮겨** 공백이 블록 **내부**로 들어오게 한다 — 경계에 닿지 않는 공백은 깎이지 않는다.
+      고친 뒤 다시 읽어 **원본과 완전히 일치**할 때까지 반복한다.
   - **멱등**: 같은 주에 이 단계를 다시 수행하게 되면(재실행) 새 페이지를 또 만들지 말고
     **기존 `OPEN GRM Web Delta {date}` 페이지 본문을 덮어쓴다**(handoff 의 upsert 규약과 동형).
   - 이 예치는 [Status 갱신]·handoff CONSUMED 처리와 **별개**다 — 델타 페이지의 CONSUMED 전환은
@@ -718,3 +739,5 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 | 2026-07-02 | **fan-out 절 FDA 483 반영(§B `[2단계]` 절 유형 추가 — 6슬롯·나머지 절 무접촉)**: `ENABLE_FDA_483_DEEP=true` 활성 시 FDA 483 카드(`fda483-…`)도 `deep_analysis_ready=true` 로 fan-out 에 유입 → 대상 목록에 **FDA 483** 추가, ②단계 생성 프롬프트 매핑에 **483=`GRM_Prompt_DeepFda483_v1.md`**(신규) 추가, 스키마 자동선택에 483 ②섹션=`inspectional_significance`(WL/Import Alert 승격 가능성) 추가. 483 은 실사 종료 문서라 응답 평가 없음. ★483 D2 = CFR 인용이 원문(관찰사항)에 없어도 **WARN(비차단)** — 정당한 규제 해석 허용(WL 하드 FAIL 과 다름). build-jobs 가 job 에 `card_type`(kind) 동봉해 오케스트레이터가 유형별 프롬프트 선택. 483 = 결정론 Observation 상세 + 분석층 둘 다(층 혼용). 지시 `GRM_CC지시문_FDA483_분석층_2026-07-02.md`. 순수 doc 문구 수정 — 6슬롯 규칙·코드·골든 불변. 7/6 자동 Routine 반영 목표(머지+`ENABLE_FDA_483_DEEP=true`+운영 Routine 프롬프트 재-붙여넣기). |
 | 2026-07-07 | **클라우드 델타 브릿지 연동 — 델타 Notion 예치 지시 추가(§B `[산출물]` 절 순수 추가 — 기존 6슬롯·[출력]·[2단계] 지시문 무접촉)**: "카드는 만들어졌지만 웹사이트에 자동으로 올라가지 못한" 근본 원인(Routine 산출 델타를 git 으로 옮기는 다리의 부재) 해소 — 클라우드 Routine 은 git 에 못 쓰므로, 완성한 슬롯 델타 JSON 을 Notion Intake DB 페이지(`OPEN GRM Web Delta {date}`, `Type or Class`=`web-delta`, handoff 예치와 동형)에 남기면 신규 자동화(`grm-delta-bridge.yml`+`delta_bridge.py`, GitHub Actions·매주 월 09:30 KST)가 그 반대편에서 읽어 `web/data/deltas/delta_{date}.json` 을 git 커밋하고 발행 파이프(`grm-web-publish.yml`)를 자동 기동한다(사람 컴퓨터가 꺼져 있어도 발행 준비 진행). [산출물] 절에 "델타 Notion 예치" 지시 블록만 추가(본문 코드 블록 1개=슬롯 델타·심층분석 있으면 2번째 블록=deep 델타·같은 주 재실행은 페이지 덮어쓰기). 6슬롯 계약·코드 verbatim 필드·[출력]/[2단계]/기존 [산출물] 운영 흐름 불변(예치는 additive 후행 단계일 뿐). 무인 라이브 0 불변 — 브릿지는 델타 커밋까지만, 사람 승인(Admin 머지 버튼, 별도 트랙)이 유일한 라이브 게이트. 설계 `GRM_웹발행_클라우드자동화_설계_2026-07-07.md` §2(Fix A). 코드=`delta_bridge.py`·`.github/workflows/grm-delta-bridge.yml`·`tests/test_delta_bridge.py`. branch `feat/web-publish-cloud-bridge-2026-07-07`. 사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 클라우드 미반영). |
 | 2026-08-17 | **deep 델타에서 `source_text` 전사 요구 제거 — 브릿지가 handoff 원문을 직접 읽는다(§B `[2단계]` ③ · `[산출물 예치]` deep 블록 줄만 · 6슬롯·[출력]·4섹션 스키마·`observations_ko` 규칙 불변)**: 종전 계약은 카드마다 `body_full` 원문(483 은 12~14k자)을 **그대로 옮겨 적어** deep 델타의 `source_text` 로 예치하라고 요구했다. 그 문자열은 장식이 아니라 **근거 대조의 기준선**이다 — `verify_deep_analysis` 의 D2(조항 인용)·D4(원문 verbatim)·D5b(483 절단)가 전부 그 안에서 근거를 찾고, 조립 단계의 `assemble_publish_brief._refresh_483_observations`·`_refresh_wl_violations` 가 그 문자열을 **다시 파싱**해 발행 카드의 결정론 블록을 만든다. 즉 옮겨 적다 흘린 만큼이 그대로 '원문에 없음'이 된다. **실측(2026-08-17)**: Routine 이 예치한 6건이 **6건 전부** handoff `body_full` 과 달랐다(각 51~241자 누락 — 말미 업체주소·업체번호·사업자등록번호 블록이 통째로 빠짐). 같은 주 483 3장은 아예 산출되지 않아 사람이 백필했고, 그때 합성한 `source_text` 가 조립 재파싱에서 관찰 4건→1건으로 잘려 **발행본에 관찰 3건이 빠진 채 나갔다**(#749). 무인 실행에는 대조할 사람이 없다. → `body_full` 은 애초에 **같은 Notion DB 의 그 주 handoff 페이지**에 `rows[].deep_analysis_input.body_full` 로 이미 있으므로(Routine 이 그걸 읽고 분석했다), 브릿지가 `web_card_id` 로 조회해 채운다 — **전사 경로 자체가 사라진다**. 게이트가 보는 원문 = **분석기가 실제로 받은 입력**이 되어 판정도 정확해진다. 프롬프트는 `source_text` 를 **넣지 말라**로 개정(넣어도 브릿지가 원문으로 덮어쓰고 드리프트 WARN 을 남긴다 — 호환 유지). 코드=`delta_bridge.fetch_handoff_body_full`·`apply_handoff_source_text`(+`grm_handoff.handoff_id_for` 산식 단일화), 비차단(handoff 조회 실패 시 예치본 폴백으로 종전 동작). **사람 운영 routine 재-붙여넣기 후 적용**(repo 편집만으론 클라우드 미반영 — 반영 전에도 브릿지가 정본화하므로 발행은 막히지 않는다). |
+| 2026-09-21 | **저장소 사본 낡음 수리 — 클라우드 Routine 에만 있던 `en` 로마자 금지 규칙 역이관(§B [출력] 다국어 절 · 다른 절 무접촉)**: 이 파일은 2026-09-09 에 통째로 추가됐는데 그때 **2026-09-07 자 클라우드 규칙 한 덩어리가 빠졌다** — "한국 업체·제품·문서 이름을 로마자로 옮기지 않는다"(미래바이오제약(주)→"Mirae Bio Pharm" 금지 · 일반명사로 가리킨다 · 공식 영문 상호가 있을 때만 사용). `git log -S"로마자" -- docs/prompts/` 0건으로 확인. 이 규칙은 스스로 밝히듯 **어떤 가드도 검사하지 못한다**(2026-09-07 실측: 검사 17건 전부 초록인 채 14사·12품목이 지어내져 있었다) — 즉 저장소 사본을 정본으로 믿고 Routine 에 덮어쓰면 그 규칙이 **조용히 삭제되고 아무 경보도 없다**. 2026-09-21 에 실제 클라우드 프롬프트와 대조하다 발견했고, 대조 결과 diff 는 이 한 덩어리뿐이었다(나머지 647줄 완전 일치). 이제 §B 는 운영 중인 클라우드 프롬프트와 동일하다 — 다음부터 이 파일을 그대로 붙여넣어도 규칙이 사라지지 않는다. |
+| 2026-09-21 | **델타 예치 — Notion 블록 경계 공백 소실 검증·수리 절차 추가(§B `[산출물]` 델타 예치 절만 · 6슬롯 계약·[출력]·[2단계] 무접촉)**: Notion 은 긴 코드 블록을 ~1,800~1,900자에서 자동 분할하면서 **분할 경계의 앞뒤 공백 한 칸을 깎는다.** compact JSON 에는 구조용 공백이 없어 **JSON 파싱과 결정론 게이트를 전부 통과하고**, 문장 한가운데가 경계에 걸린 자리만 `biosimilars in the` → `biosimilars inthe` 로 **단어가 붙은 채 발행된다** — 2026-09-21 예치에서 슬롯 페이지 7곳·deep 페이지 3곳 실측. 지시 = ① 예치 직후 페이지를 **다시 읽어 원본과 글자 단위 대조**(읽기 뷰도 경계 공백을 깎지만 그건 '더 생긴 공백'만 가리고 '사라진 공백'은 못 가리므로 이 대조로 반드시 드러난다) ② 수리는 공백을 다시 넣는 게 아니라(또 경계라 또 깎인다) **경계 너머로 글자 하나를 옮겨** 공백을 블록 내부로 들인다 ③ 원본과 완전 일치할 때까지 반복. 2026-09-21 실측: 수리 후 브릿지 커밋본과 원본이 리프 974개(delta)·185개(deep) **전건 일치**. 사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 클라우드 미반영) — 사본 `docs/prompts/GRM_Routine_델타예치_스니펫.md` 도 함께 갱신. |

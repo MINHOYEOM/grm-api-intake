@@ -31,6 +31,7 @@ permissions:
   actions: write
   contents: write
   pull-requests: write
+  issues: write   # refresh 스텝 실패 알림 이슈 생성/갱신/종료 전용 — PR 경로는 그대로
 
 concurrency:
   group: grm-findings-facets-auto-refresh
@@ -79,6 +80,7 @@ jobs:
       # 스크립트가 0건 가드·표본 미달 제외·모르는 기관 코드·실패율 상한을 스스로 판정하고,
       # 위반이면 아무것도 쓰지 않은 채 exit 1 한다(잡 상태 빨강으로 드러난다).
       - name: Refresh facet data (findings_search RPC, anon)
+        id: refresh
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
@@ -222,3 +224,88 @@ jobs:
             jq -r '"측정일 \(.measured_on) · 공개 지적 \(.totals.findings)건", (.axes[] | "\(.axis): 페이지 \(.items | length) · 제외 \(.excluded | length)")' \
               "$DATA_PATH" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      # continue-on-error 를 refresh 스텝에 걸지 않는다 — 지금처럼 refresh 가 죽으면
+      # 이후 스텝(커밋·PR·CI 게이트·머지)이 전부 스킵돼야 한다(정본 없이 PR 을 열면 안
+      # 된다). 그래서 여기 두 스텝은 `failure()`/`always()` 로 직접 열어 두고,
+      # `steps.refresh.outcome` 으로 "실패 원인이 refresh 자신인가" 만 좁힌다 — CI 게이트
+      # 실패·머지 실패 같은 다른 원인은 이 알림의 대상이 아니다(PR 이 이미 그 신호다).
+      - name: Open or update facets-refresh issue
+        if: failure() && steps.refresh.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[facets] 주간 facet 갱신이 실패했습니다';
+            const label = 'findings-facets';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              '분류·국가·기관 모음 페이지 정본 갱신(`grm-findings-facets.yml`)이 한국어/영어 ' +
+                '각 3회 재시도 후에도 실패했습니다.',
+              '',
+              '**왜 이 알림이 중요한가**: 이 파일이 `/findings/{c|country|agency}/` 페이지에 ' +
+                '박히는 건수·최근 사례의 정본이다 — 갱신이 멈추면 화면이 조용히 낡는다 ' +
+                '(틀린 숫자가 검색 결과 설명문에 그대로 나간다).',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '결정론적 실패(0건 가드·표본 미달·모르는 기관 코드·실패율 상한)라면 데이터 ' +
+                '문제이니 findings_facets_refresh.py 의 게이트 사유를 로그에서 확인하고, ' +
+                '3회 모두 같은 방식으로 실패했다면 Supabase 지속 장애일 수 있습니다.',
+              '',
+              '_다음 주 갱신이 성공하면 자동으로 닫힙니다._',
+            ].join('\n');
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '주간 findings facet 갱신 실패');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 실패했습니다 — 실행 ${context.runId}`,
+              });
+              core.notice(`기존 이슈 #${existing.number} 에 댓글`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      # always() 필수 — refresh 는 성공했는데 그 뒤(CI 게이트·머지)가 실패하면 job 은
+      # failure 지만 refresh 자체는 복구된 것이다. always() 없이 success() 만 쓰면 그런
+      # 주에는 이 스텝 자체가 스킵되어 이미 해소된 refresh 이슈가 안 닫힌 채 남는다.
+      - name: Close facets-refresh issue on recovery
+        if: always() && steps.refresh.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[facets] 주간 facet 갱신이 실패했습니다';
+            const label = 'findings-facets';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `갱신이 정상 복귀해 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }

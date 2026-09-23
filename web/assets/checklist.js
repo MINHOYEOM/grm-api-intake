@@ -120,6 +120,9 @@
   }
 
   var state = { rows: [], meta: null };
+  // 연타 방어용 세대 카운터(findings.js 의 navToken 관례와 동형) — "만들기"를 두 번 누르면
+  // 먼저 나간 요청이 늦게 도착해 나중 요청의 결과를 덮어쓸 수 있다.
+  var buildToken = 0;
 
   function el(tag, className, text) {
     var e = document.createElement(tag);
@@ -357,6 +360,8 @@
     var count = selectedInt(countEl, 15);
     var examples = selectedInt(examplesEl, 2);
     var sortKey = sortEl && sortEl.value === "recent" ? "recent_docs" : "docs";
+    buildToken += 1;
+    var my = buildToken;
 
     docEl.hidden = true;
     if (exportEl) exportEl.hidden = true;
@@ -366,6 +371,7 @@
     flashCopyMsg("");
 
     rpc("findings_cfr_ranking", { p_months: 12 }).then(function (rank) {
+      if (my !== buildToken) return;   // 그 사이 다시 눌렀으면 이 응답은 버린다
       var scope = (rank && rank.scope) || {};
       var items = ((rank && rank.items) || []).filter(function (i) {
         return (i[sortKey] || 0) > 0;
@@ -385,6 +391,7 @@
       var sections = items.map(function (i) { return i.section; });
       return rpc("findings_checklist", { p_sections: sections, p_examples: examples })
         .then(function (detail) {
+          if (my !== buildToken) return;   // 그 사이 다시 눌렀으면 이 응답은 버린다
           var bySection = {};
           ((detail && detail.sections) || []).forEach(function (s) {
             bySection[s.section] = s.examples || [];
@@ -414,6 +421,7 @@
           renderDoc();
         });
     }).catch(function () {
+      if (my !== buildToken) return;   // 그 사이 다시 눌렀으면 이 실패는 버린다
       loadingEl.hidden = true;
       docEl.hidden = true;
       if (exportEl) exportEl.hidden = true;

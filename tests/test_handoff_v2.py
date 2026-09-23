@@ -169,7 +169,9 @@ class EmitBranchTest(unittest.TestCase):
     def _run_emit(self, flag: str | None):
         captured = {}
 
-        def fake_upsert(token, db_id, payload, generated_at, compact=False):
+        # **kw: emit 경로가 넘기는 추가 인자(예: sealed_dates)를 흡수한다 — 이 mock 은
+        # Notion 호출 대역일 뿐 시그니처를 고정하는 계약이 아니다.
+        def fake_upsert(token, db_id, payload, generated_at, compact=False, **kw):
             captured["payload"] = payload
             captured["compact"] = compact
             return "pid", "url"

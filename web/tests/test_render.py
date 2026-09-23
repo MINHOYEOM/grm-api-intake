@@ -8417,6 +8417,24 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("location.search", zone_fn)
         self.assertNotIn("location.href", zone_fn)
         self.assertIn("/^[a-z0-9-]{1,24}$/", zone_fn)
+        # [084] 구역 위에 경로 한 줄 더 — "어느 용어·어느 문서에서 눌렀나".
+        self.assertIn("rpc/funnel_path_bump", fscript)
+        self.assertIn("JSON.stringify({p_key:key,p_path:subPath()})", fscript)
+        # ★경로도 제출 두 키 안에서만 나가야 한다 — 노출까지 보내면 4천 쪽 차원이
+        # 표를 덮는다. 구역 bump 와 같은 if 블록 안에 있는지 위치로 본다.
+        submit_only = fscript.split("key==='band_submit'||key==='cta_submit'", 1)[1]
+        self.assertIn("rpc/funnel_path_bump", submit_only.split("var band=", 1)[0],
+                      "경로 bump 가 제출 조건 블록 밖에 있다 — 노출에서도 나간다")
+        # ★무PII — 경로만 읽고 쿼리는 절대 싣지 않는다(실사관·업체 실명이 `?key=` 로만
+        # 들어온다). zone() 과 같은 근거·같은 검사.
+        sub_fn = fscript.split("function subPath()", 1)[1].split("function zone()", 1)[0]
+        self.assertIn("location.pathname", sub_fn)
+        self.assertNotIn("location.search", sub_fn)
+        self.assertNotIn("location.href", sub_fn)
+        # 깊이 상한이 있어야 표의 차원이 유한하다.
+        self.assertIn("slice(0,4)", sub_fn)
+        # index.html 은 디렉터리로 접는다 — 같은 페이지가 두 줄로 갈리면 판독이 쪼개진다.
+        self.assertIn("index", sub_fn)
 
 
 class WebHeadersFileTest(unittest.TestCase):
@@ -15846,6 +15864,8 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
                       "071_funnel_counts_daily.sql").read_text(encoding="utf-8")
         cls.mig076 = (WEB_DIR / "migrations" /
                       "076_funnel_zone_counts.sql").read_text(encoding="utf-8")
+        cls.mig084 = (WEB_DIR / "migrations" /
+                      "084_funnel_path_counts.sql").read_text(encoding="utf-8")
 
     def _check_keys(self, sql):
         m = re.search(r"key in \(([^)]*)\)", sql)
@@ -15905,6 +15925,43 @@ class WebAdminGrowthPanelTest(unittest.TestCase):
         self.assertIn("renderFunnelZones", self.admin_js)
         # 라벨이 낡아도 값이 사라지면 안 된다 — 모르는 슬러그는 그대로 보여준다.
         self.assertIn("ZONE_LABELS[r.zone] || r.zone", self.admin_js)
+
+    def test_path_axis_answers_which_page_not_just_which_zone(self):
+        """★2026-09-22 실측: 구독 2건(13:44 · 17:01)의 구역이 findings·glossary 라는 것까지는
+        076 이 바로 답했는데 **어느 지적사항이고 어느 용어인지는 어디에도 없었다.** Brevo
+        연락처 속성도 기본 항목뿐이라 거기에도 없다. 084 가 그 한 칸을 더 메운다.
+
+        ★무PII 가 성립하는 근거는 zone() 과 같다 — 실사관·업체 실명은 `?key=` 쿼리로만
+        들어오고 **경로에는 없다**(inspector 는 셸 한 장만 렌더하고 조회는 JS 가 한다).
+        그래서 쿼리를 버리고 경로만 실으면 076 이 지키던 성질이 그대로 유지된다. 이
+        전제가 깨지는 날(경로에 사람 이름이 들어오는 라우트가 생기는 날) 이 축도 같이
+        재검토해야 하므로 근거를 여기 적어 둔다.
+
+        ★076 을 고치지 않고 **가산**한다 — funnel_zone_bump 의 인자를 바꾸면 이미 라이브에
+        나가 있는 페이지의 호출이 깨진다(반환·인자 shape 변경 = 배포 창).
+        """
+        self.assertIn("create table if not exists public.funnel_path_counts", self.mig084)
+        # 키는 제출 둘뿐 — 노출(view)까지 실으면 4천 쪽 차원이 표를 덮는다. 076 의 5키
+        # 어휘 대조(test_funnel_vocabulary_synced_three_ways)에 084 를 끼우지 말 것:
+        # 일부러 좁힌 어휘라 그 대조에 넣으면 정상 설계가 실패로 잡힌다.
+        self.assertEqual(self._check_keys(self.mig084), {"band_submit", "cta_submit"},
+                         "084 는 제출 두 키만 받아야 한다")
+        self.assertIn("path ~ '^[a-z0-9-]{1,40}(/[a-z0-9-]{1,40}){0,3}$'", self.mig084,
+                      "경로 형식 제약이 없다 — anon RPC 가 열린 문자열을 받는다")
+        self.assertIn("cap constant integer", self.mig084,
+                      "경로 수 상한이 없다 — 쓰레기 경로를 무한히 만들 수 있다")
+        self.assertIn("grant select on public.funnel_path_counts to authenticated", self.mig084)
+        self.assertNotIn("grant insert", self.mig084)
+        self.assertIn("grant execute on function public.funnel_path_bump(text, text) "
+                      "to anon, authenticated", self.mig084)
+        # 판독 함수는 로그인만 — 성장 일보가 서비스 키로 읽는다.
+        self.assertIn("grant execute on function public.funnel_paths_report() to authenticated",
+                      self.mig084)
+        # ★"걸어 뒀다"≠"관측된다" — 쌓기만 하고 읽는 곳이 없으면 이 축은 없는 것과 같다.
+        self.assertIn("create or replace function public.funnel_paths_report", self.mig084)
+        # 소급 불가를 읽는 쪽이 알 수 있어야 한다 — 0 건이 "유입 없음"이 아니라 "관측
+        # 시작 전"일 수 있다(배선 이전 제출은 이 표에 영영 없다).
+        self.assertIn("first_kst", self.mig084)
 
     def test_snapshot_write_path_is_cron_only(self):
         self.assertIn("enable row level security", self.mig071)
@@ -17173,8 +17230,9 @@ class WebEnBriefTest(unittest.TestCase):
                                      "한국어판에 불필요한 고지가 떴다")
                 # 요약 줄의 건수는 언어와 무관하다 — 한국어 "N건" 과 영어 "N items" 의
                 # 숫자가 같아야 한다(거르는 것은 제목 줄뿐이라는 계약).
+                # `{s}` 복수 표지(2026-09-23) 이후 1건은 "1 item" 이다 — 단·복수 모두 잡는다.
                 self.assertEqual(
-                    re.findall(r"</b> · .*?(\d+) items", en_b),
+                    re.findall(r"</b> · .*?(\d+) items?\b", en_b),
                     re.findall(r"</b> · .*?(\d+)건", ko_b),
                     "요약 줄의 건수가 언어에 따라 달라졌다")
             finally:

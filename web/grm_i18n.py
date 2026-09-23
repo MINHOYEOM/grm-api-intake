@@ -88,11 +88,26 @@ def slots_of(text: str) -> frozenset[str]:
     return frozenset(SLOT_RE.findall(text))
 
 
+# [2026-09-23] 복수 표지 `{s}` — 영문은 수에 따라 명사가 변한다. 문구표에 `s` 를 그대로
+# 박아 두면 1건일 때 "1 items"·"1 observations" 가 나간다(링크드인 캡션의 66b4573 과
+# 같은 결함이 en.json 에도 있었다). `{s}` 는 일반 슬롯이 아니라 **호출부가 준 `n` 값에서
+# 계산**한다 — 호출자가 `s=` 를 직접 넘길 필요가 없고, 한국어 키에는 `{s}` 가 아예 없으므로
+# 한국어 출력은 이 로직을 절대 타지 않는다(바이트 불변 유지).
+def plural_suffix(n: Any) -> str:
+    """`n` 이 정확히 1(int 1 또는 문자열 "1")이면 빈 문자열, 그 외(부재 포함)는 "s"."""
+    return "" if n in (1, "1") else "s"
+
+
 def fill(text: str, slots: dict[str, Any],
          convert: Callable[[Any], str] = str) -> str:
-    """`{name}` 슬롯 치환. 없는 이름은 KeyError(조용히 `{name}` 을 남기지 않는다)."""
+    """`{name}` 슬롯 치환. 없는 이름은 KeyError(조용히 `{name}` 을 남기지 않는다).
+
+    예외가 `{s}`(복수 표지) — 호출부가 `s` 를 직접 주지 않는 한 슬롯 `n` 의 값으로 계산해
+    채운다(`n` 이 없으면 "s" — 복수가 기본값)."""
     def _sub(m: "re.Match[str]") -> str:
         name = m.group(1)
+        if name == "s" and "s" not in slots:
+            return convert(plural_suffix(slots.get("n")))
         if name not in slots:
             raise KeyError(f"치환 슬롯 값 없음: {{{name}}} in {text!r}")
         return convert(slots[name])
@@ -150,10 +165,17 @@ KO = Translator(DEFAULT_LANG)
 # 무관하게 돌아야 하므로(`_t("{n}건", {n: 5})` 은 한국어에서도 치환이 필요) shim 이 직접 한다.
 # 파일마다 사본을 두는 이유: 공유 스크립트 하나에 의존하면 그 로드 실패가 전 페이지의
 # 문구를 `{n}건` 그대로 노출시킨다. 사본은 검사기가 바이트 동일을 강제한다.
+# [2026-09-23] `k === "s"` 분기 — 복수 표지 `{s}`(Python 층 `fill()`·`plural_suffix()` 와
+# 같은 규칙). 값 객체가 `s` 를 직접 안 주면 `n` 에서 계산한다(`n` 도 없으면 "s" — 복수
+# 기본값). 한국어 문구표는 `{s}` 를 쓰지 않으므로 이 분기는 영어 페이지에서만 걸린다.
 JS_SHIM = (
     "  var _t = function (s, v) {\n"
     "    var d = window.GRM_I18N, r = (d && Object.prototype.hasOwnProperty.call(d, s)) ? d[s] : s;\n"
     "    return v ? r.replace(/\\{(\\w+)\\}/g, function (m, k) {\n"
+    "      if (k === \"s\" && !Object.prototype.hasOwnProperty.call(v, \"s\")) {\n"
+    "        var pn = v.n;\n"
+    "        return (pn === 1 || pn === \"1\") ? \"\" : \"s\";\n"
+    "      }\n"
     "      return Object.prototype.hasOwnProperty.call(v, k) ? String(v[k]) : m; }) : r;\n"
     "  };\n"
 )
@@ -599,7 +621,12 @@ def check_catalog(catalog: dict[str, str], keys: dict[str, list[str]],
             problems.append(f"[{lang}] 번역에 한글 잔존: {key!r} → {val!r}")
         # 번역은 키의 슬롯 **일부만** 써도 된다(영어에 조사가 없듯 값을 버릴 수 있다).
         # 키에 없는 슬롯을 쓰는 것은 결손 — 렌더 시 KeyError 로 죽기 전에 여기서 잡는다.
-        extra = slots_of(val) - slots_of(key)
+        # 예외 — 복수 표지 `{s}`: 키에 `{n}` 이 있으면 영문 값에만 `{s}` 를 더 쓸 수 있다
+        # (`fill()` 이 `n` 값에서 계산해 채운다 — 호출부가 `s=` 를 따로 줄 필요가 없다).
+        key_slots = slots_of(key)
+        extra = slots_of(val) - key_slots
+        if "s" in extra and "n" in key_slots:
+            extra = extra - {"s"}
         if extra:
             problems.append(f"[{lang}] 키에 없는 슬롯 {sorted(extra)}: {key!r} → {val!r}")
     return problems

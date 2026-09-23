@@ -16,6 +16,7 @@ from __future__ import annotations
 import contextlib
 import datetime as dt
 import io
+import json
 import os
 import unittest
 from unittest import mock
@@ -62,12 +63,85 @@ def _ok_get_map(today: dt.date, *, base: str = BASE) -> dict[str, FakeResponse]:
     }
 
 
+def _snapshot_status_text(*, rows: int = 7, oldest_age_s: int = 300,
+                          computed_ms: int = 200) -> str:
+    """[085] rpc_snapshot_status() 응답 모양 — 항목 배열. 최고령 하나만 oldest_age_s."""
+    names = ["findings_stats", "findings_inspector_index", "findings_zone_category",
+             "findings_category_matrix", "fda_inspection_stats", "findings_cfr_ranking",
+             "findings_recent_window"][:rows]
+    items = []
+    for i, n in enumerate(names):
+        age = oldest_age_s if i == 0 else min(oldest_age_s, 120)
+        items.append({"rpc": n, "args": {}, "computed_ms": computed_ms, "age_s": age,
+                      "refreshed_at": "2026-09-23T00:00:00+00:00"})
+    return json.dumps(items)
+
+
 def _ok_post_map(*, supabase: str = SUPABASE) -> dict[str, FakeResponse]:
     return {
         f"{supabase}/rest/v1/rpc/fda_inspection_stats": FakeResponse(200, elapsed_s=0.2),
         f"{supabase}/rest/v1/rpc/findings_stats": FakeResponse(200, elapsed_s=0.3),
         f"{supabase}/rest/v1/rpc/findings_similar_to": FakeResponse(200, elapsed_s=0.4),
+        f"{supabase}/rest/v1/rpc/rpc_snapshot_status": FakeResponse(
+            200, text=_snapshot_status_text(), elapsed_s=0.1),
     }
+
+
+class RpcSnapshotFreshnessTest(unittest.TestCase):
+    """[085] 스냅샷 신선도 — 폴백이 가리는 cron 사망을 probe 가 밖으로 내는가.
+
+    경계는 site_probe 상수 그대로(40분 warn · 2시간 fail · 항목 7). 뮤테이션: 검사가
+    최고령 대신 최연소를 보거나 항목 수를 안 세면 아래 세 개가 각각 초록으로 돌아선다.
+    """
+
+    def _run(self, resp: FakeResponse):
+        with mock.patch("site_probe.requests.post", return_value=resp):
+            return site_probe.check_rpc_snapshot_fresh("snap", SUPABASE, "anon-key", 5.0)
+
+    def test_fresh_seven_rows_is_ok(self):
+        r = self._run(FakeResponse(200, text=_snapshot_status_text(oldest_age_s=600)))
+        self.assertEqual(r.status, "ok")
+        self.assertIn("최고령 600s", r.detail)
+
+    def test_two_missed_refreshes_is_warn(self):
+        r = self._run(FakeResponse(200, text=_snapshot_status_text(oldest_age_s=45 * 60)))
+        self.assertEqual(r.status, "warn")
+
+    def test_two_hours_stale_is_fail_even_if_others_fresh(self):
+        # 최고령 하나만 낡고 나머지 여섯은 신선 — 최연소를 보면 초록이 되는 함정.
+        r = self._run(FakeResponse(200, text=_snapshot_status_text(oldest_age_s=3 * 3600)))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("정지 의심", r.detail)
+
+    def test_missing_rows_is_fail(self):
+        r = self._run(FakeResponse(200, text=_snapshot_status_text(rows=6)))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("6/7", r.detail)
+
+    def test_non_json_body_is_fail(self):
+        r = self._run(FakeResponse(200, text="<html>cloudflare</html>"))
+        self.assertEqual(r.status, "fail")
+
+    def test_http_error_is_fail(self):
+        r = self._run(FakeResponse(404, text='{"message":"function not found"}'))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("HTTP 404", r.detail)
+
+    def test_run_probe_includes_snapshot_check(self):
+        today = dt.date(2026, 3, 10)
+        get_map = _ok_get_map(today)
+        post_map = _ok_post_map()
+        post_map[f"{SUPABASE}/rest/v1/rpc/rpc_snapshot_status"] = FakeResponse(
+            200, text=_snapshot_status_text(oldest_age_s=3 * 3600))
+        with mock.patch("site_probe.requests.get", side_effect=_dispatch(get_map)), \
+             mock.patch("site_probe.requests.post", side_effect=_dispatch(post_map)):
+            report = site_probe.run_probe(
+                base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
+                today=today, timeout=5.0)
+        rows = [c for c in report["checks"] if c["name"].startswith("RPC 스냅샷 신선도")]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["status"], "fail")
+        self.assertEqual(report["overall"], "fail")
 
 
 class MostRecentPublishedMondayTest(unittest.TestCase):

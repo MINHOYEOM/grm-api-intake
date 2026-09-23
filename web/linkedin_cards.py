@@ -335,7 +335,9 @@ STR: dict[str, dict[str, Any]] = {
         "one_tags": "#GMP #QA #품질보증 #FDA #제약",
         # [마케팅 2026-09-23 L-06] 월간 결산 덱("이달의 변화 5개 + 숫자 1개") 전용 고정 문구.
         "month_eyebrow": "월간 규제 결산",
-        "month_h1": "{m}월, 꼭 봐야 할 변화 {n}가지",
+        # 제목 줄바꿈은 `|` 로 **구 경계를 직접** 정한다 — split_two 는 폭으로 자르다 "꼭 봐야 /
+        # 할 변화" 처럼 구 중간을 끊었다(2026-09-23 검수 · 줄바꿈 반려 이력 3회).
+        "month_h1": "{m}월에 꼭 볼|변화 {n}가지",
         "month_meta": "{k}호 · 카드 {c}장",
         "month_num_eyebrow": "이번 달 숫자 하나",
         "month_num_h1": "가장 많이 나온 소식 유형",
@@ -385,7 +387,7 @@ STR: dict[str, dict[str, Any]] = {
         "one_link_head": "Official sources and the full weekly brief",
         "one_tags": "#GMP #QA #QualityAssurance #FDA #pharma",
         "month_eyebrow": "Monthly regulatory recap",
-        "month_h1": "{mon}: {n} change{s} worth your time",
+        "month_h1": "{mon}:|{n} change{s} worth your time",
         "month_meta": "{k} issue{ks} · {c} card{cs}",
         "month_num_eyebrow": "This month in one number",
         "month_num_h1": "Most common card types",
@@ -1128,6 +1130,30 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
 # 헤드라인으로 채움)과 카드 유형 집계 한 장을 낸다.
 
 
+# 숫자 장의 유형 표시 이름(2026-09-23 검수). `card_type` 값은 수집 채널 이름이라 한 장에
+# "Recall" 과 "회수·판매중지" 가 나란히 서면 둘 다 회수인데 무엇이 다른지(어느 기관인지)가 안
+# 보인다. 값 자체는 바꾸지 않고 **표시할 때만** 기관을 붙인다. 닫힌 어휘(카드 유형 13종)의
+# 표시 이름이지 사실을 옮기는 번역이 아니다 — 영문 덱도 이 표로 한글 유형을 잃지 않는다.
+# 표에 없는 유형은 종전 규칙 그대로(국문=원래 값, 영문=한글이 섞였으면 뺀다).
+_MONTH_TYPE_LABEL = {
+    "ko": {
+        "Recall": "회수(FDA)", "Recall(HC)": "회수(캐나다)", "Recall(UK)": "회수(영국)",
+        "회수·판매중지": "회수(식약처)", "Warning Letter": "경고서한(FDA)",
+        "FDA 483 실사 관찰": "FDA 483", "GMP실사": "GMP 실사(식약처)",
+        "행정처분": "행정처분(식약처)", "EU GMP 비준수": "GMP 비준수(EU)",
+        "UK GMP 비준수": "GMP 비준수(영국)",
+    },
+    "en": {
+        "Recall": "FDA recall", "Recall(HC)": "Health Canada recall", "Recall(UK)": "MHRA recall",
+        "회수·판매중지": "MFDS recall", "Warning Letter": "FDA warning letter",
+        "FDA 483 실사 관찰": "FDA Form 483", "GMP실사": "MFDS GMP inspection",
+        "행정처분": "MFDS administrative action", "EU GMP 비준수": "EU GMP non-compliance",
+        "UK GMP 비준수": "UK GMP non-compliance", "지침·안내서": "Guidance",
+        "규제 소식": "Regulatory news", "WHO": "WHO",
+    },
+}
+
+
 def _month_card_type_counts(month_briefs: list[dict], lang: str) -> list[tuple[str, int]]:
     """그 달 카드의 `card_type` 값별 건수 — 값은 **그대로**(재라벨 0), 많은 순·동률은 라벨
     오름차순(결정론). ★영문 덱에서는 한글이 섞인 유형('GMP실사'·'회수·판매중지' 등)을
@@ -1136,9 +1162,10 @@ def _month_card_type_counts(month_briefs: list[dict], lang: str) -> list[tuple[s
     counts: Counter[str] = Counter()
     for b in month_briefs:
         for c in (b.get("cards") or []):
-            label = str(c.get("card_type") or "").strip()
-            if not label:
+            raw = str(c.get("card_type") or "").strip()
+            if not raw:
                 continue
+            label = _MONTH_TYPE_LABEL.get(lang, {}).get(raw, raw)
             if lang != "ko" and _CJK.search(label):
                 continue
             counts[label] += 1
@@ -1277,7 +1304,7 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
     meta_line = t["month_meta"].format(k=k_issues, c=n_cards_month,
                                        ks=plural_s(k_issues), cs=plural_s(n_cards_month))
     slides: list[dict] = [dict(
-        kind="cover", eyebrow=t["month_eyebrow"], h1=split_two(cover_h1),
+        kind="cover", eyebrow=t["month_eyebrow"], h1=cover_h1.split("|"),
         tiles=[], sub=meta_line, ft_right="", ai=ai_note)]
 
     # ── 02..n+1 항목 — 매주 덱의 'headline' 장을 그대로 재사용(사실 표·시사점·점검 칩 동형),

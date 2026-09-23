@@ -945,6 +945,28 @@ class BuildMonthDeckRealDataTest(unittest.TestCase):
         self.assertEqual(counts, sorted(counts, reverse=True), "많은 순이 아니다")
         self.assertIn(f"{m}월", numbers["cap"])
 
+    def test_cover_title_breaks_at_a_phrase_boundary(self):
+        """2026-09-23 검수: 폭으로 자르던 split_two 가 "꼭 봐야 / 할 변화" 로 구 중간을 끊었다.
+        표지 제목은 문구 표의 `|` 가 정한 두 구로만 나뉜다."""
+        cover = self.deck["slides"][0]
+        n_items = sum(1 for s in self.deck["slides"] if s["kind"] == "headline")
+        m = int(self.month.split("-")[1])
+        self.assertEqual(cover["h1"], [f"{m}월에 꼭 볼", f"변화 {n_items}가지"])
+
+    def test_number_slide_names_the_agency_not_the_channel(self):
+        """2026-09-23 검수: 'Recall' 과 '회수·판매중지' 가 나란히 서면 둘 다 회수인데 어느 기관인지
+        안 보였다. 표시할 때만 기관을 붙인다(값은 그대로)."""
+        numbers = next(s for s in self.deck["slides"] if s["kind"] == "numbers")
+        labels = [name for name, _ in numbers["bars"]]
+        for raw in ("Recall", "회수·판매중지", "Warning Letter", "GMP실사"):
+            self.assertNotIn(raw, labels, f"채널 이름 '{raw}' 이 그대로 나왔다")
+        en = lc.build_month_deck(self.all_briefs, self.glossary, self.month, lang="en")
+        en_numbers = next(s for s in en["slides"] if s["kind"] == "numbers")
+        for name, _ in en_numbers["bars"]:
+            self.assertIsNone(lc._CJK.search(name), name)
+        self.assertEqual(len(en_numbers["bars"]), len(numbers["bars"]),
+                         "영문 덱이 한글 유형을 버려 상위 유형 수가 국문과 달라졌다")
+
     def test_caption_lines_fit_mobile_width_and_utm(self):
         lines = self.deck["caption"].splitlines()
         for ln in lines:

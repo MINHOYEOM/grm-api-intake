@@ -108,6 +108,12 @@ def _write_report(path: str | None, report: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # 러너·Windows 콘솔의 좁은 인코딩에서 한국어 로그가 죽지 않게(저장소 공통 가드 — test_cli_stdout_encoding).
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     args = build_arg_parser().parse_args(argv)
     try:
         terms = load_terms(args.glossary_cases)

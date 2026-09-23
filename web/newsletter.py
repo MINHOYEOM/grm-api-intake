@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from datetime import date as _date, datetime as _datetime, timedelta as _timedelta, timezone as _timezone
 from pathlib import Path
 from typing import Any, Callable
-from urllib.parse import quote, urlsplit
+from urllib.parse import parse_qsl, quote, urlsplit
 
 WEB_DIR = Path(__file__).resolve().parent
 DATA_DIR = WEB_DIR / "data" / "briefs"
@@ -49,6 +49,9 @@ KST = _timezone(_timedelta(hours=9))
 
 # render.py(같은 디렉터리·순수·네트워크 0) — issue 번호/제목/섹션/SITE_BASE_URL 단일 파생원.
 import render  # noqa: E402
+# utm.py(같은 디렉터리) — 전달 링크(newsletter/forward/brief_{date}) 태그 부착 전용
+# (2026-09-23 마케팅 N-03). 주간 메일 본문의 다른 링크는 여전히 이 헬퍼를 쓰지 않는다.
+import utm  # noqa: E402
 
 # ── 면책 캐논(brief.html 상단 배지와 **동일 문안** — drift 가드 테스트가 일치 강제) ──
 DISCLOSURE_KO = ("요약·번역·시사점·점검·심층분석은 생성형 AI가 작성하였으며, "
@@ -302,6 +305,29 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         'color:#A14B30;text-decoration:none;font-size:14px;font-weight:500;'
         'border:1px solid #DCD3C7;border-radius:9999px;padding:7px 15px">'
         '관심 업체 등록하기 →</a></div>')
+    # 팀 동료에게 전달(성장 3차 N-03, 2026-09-23) — 매주 구독자 전원에게 닿는 채널은 이
+    # 메일뿐인데 "전달해 주세요" 요청·전달받은 사람의 구독 경로가 없었다. 구독 링크에만
+    # UTM(newsletter/forward/brief_{date})을 붙인다 — gate_provenance 가 우리 호스트의
+    # utm_* 만 허용하도록 열어 뒀으므로(무변형 불변식과 충돌 없음), 전달받은 사람이 구독하면
+    # 사이트 첫 진입 퍼널(087)이 이 채널로 귀속한다. 퀴즈·워치리스트 카드와 동일 골격,
+    # 한글에 자간 없음.
+    # share_href 는 e() 로 감싸지 않는다 — `&`(쿼리 구분자)를 `&amp;` 로 바꾸면
+    # `gate_provenance`(naive `href="..."` 정규식 파서)와 여기 값 자체가 어긋난다. base_url
+    # 은 SITE_BASE_URL(고정)이고 태그 값은 utm._TAG_RE(`^[a-z0-9._-]{1,60}$`)로 이미
+    # 검증돼 attribute 를 깨뜨릴 문자(따옴표·꺾쇠)가 애초에 나올 수 없다.
+    share_href = utm.with_utm(brief_url, "newsletter", "forward", f"brief_{pub}")
+    parts.append(
+        '<div style="border:1px solid #DCD3C7;border-radius:12px;padding:16px 18px;'
+        'margin:0 0 24px;background:#FBF8F4">'
+        '<div style="font-size:13px;font-weight:600;color:#A14B30;'
+        'margin-bottom:6px">팀 동료에게 전달</div>'
+        '<div style="font-size:14px;line-height:1.7;color:#3D3D3A">'
+        '이번 호가 도움이 됐다면 팀 동료에게 전달해 주세요. 전달받은 분은 아래 링크에서 '
+        '바로 구독할 수 있습니다.</div>'
+        f'<a href="{share_href}" style="display:inline-block;margin-top:10px;'
+        'color:#A14B30;text-decoration:none;font-size:14px;font-weight:500;'
+        'border:1px solid #DCD3C7;border-radius:9999px;padding:7px 15px">'
+        '이번 주 브리프 보고 구독하기 →</a></div>')
     if updates_html:
         parts.append(updates_html)
     # 면책 캐논(brief.html 과 동일) + 수신거부(SaaS 주입).
@@ -392,10 +418,36 @@ def gate_publishable(brief_obj: dict[str, Any], expected_date: str) -> list[str]
     return fails
 
 
+# provenance 게이트가 쿼리 문자열을 허용하는 유일한 키 집합(값 형식은 utm._TAG_RE 재사용
+# — 정본은 web/utm.py 하나, 여기서 따로 정규식을 복제하지 않는다).
+_UTM_ALLOWED_KEYS = {"utm_source", "utm_medium", "utm_campaign"}
+
+
+def _is_clean_utm_query(query: str) -> bool:
+    """쿼리 문자열이 `utm_source`/`utm_medium`/`utm_campaign` 만으로 이뤄지고 각 값이
+    `web/utm.py` 태그 문법(`^[a-z0-9._-]{1,60}$`)을 지키는지. 빈 쿼리는 호출부에서 먼저
+    걸러지므로 여기선 "파라미터가 있는데 전부 규약을 지키는가"만 본다."""
+    params = parse_qsl(query, keep_blank_values=True)
+    return bool(params) and all(
+        k in _UTM_ALLOWED_KEYS and bool(utm._TAG_RE.match(v)) for k, v in params)
+
+
 def gate_provenance(teaser: dict[str, Any], site_base_url: str) -> list[str]:
-    """provenance/무변형 게이트 — 메일이 우리 페이지만 링크하고 추적 파라미터를 부착하지
-    않는지. 카드 출처 URL(보호 대상)은 애초에 본문에 없음 → 우리 산출 링크의 청결만 확인.
-    (SaaS 가 발송 시점에 자기 도메인으로 래핑하는 것은 우리 산출물 밖 — 무변형 보존.)"""
+    """provenance/무변형 게이트 — 메일이 우리 페이지만 링크하고, 쿼리 문자열은 **우리 자체
+    호스트의 utm_* 태그**(전달 링크)만 허용하는지 확인한다. 카드 출처 URL(보호 대상)은
+    애초에 본문에 없음 → 우리 산출 링크의 청결만 확인.
+    (SaaS 가 발송 시점에 자기 도메인으로 래핑하는 것은 우리 산출물 밖 — 무변형 보존.)
+
+    종전 규칙은 "추적 파라미터 부착 링크"를 무조건 차단했다 — 독자 개개인을 우리 서버가
+    되읽는 트래커를 막기 위해서다. 2026-09-23 마케팅 계획 N-03 은 그 규칙과 충돌하지 않는
+    좁은 예외를 연다: **우리 구독 랜딩 링크**(`with_utm(brief_url, "newsletter", "forward",
+    f"brief_{date}")`)에 `utm_source`/`utm_medium`/`utm_campaign` 만 붙이는 것은 "누가 이
+    링크로 들어왔는지"를 세는 **집계용 채널 귀속**이지 개인 추적이 아니다(PII 0·쿠키 0).
+    `web/utm.py` 모듈독스트링대로 **RUM 은 쿼리 문자열을 아예 읽지 않고**, 이 태그를 실제로
+    소비하는 소비자는 사이트 최초 진입(first-touch) 퍼널 카운터(087 마이그레이션)뿐이며
+    그마저 규약 밖 형식은 전부 `other` 로 접어 오분류를 만들지 않는다. Brevo 캠페인 링크는
+    발송 시점에 어차피 자기 도메인으로 다시 래핑하므로 우리 산출 URL 은 여기서도 불변이다.
+    **외부 호스트 링크와 utm_* 이외의 파라미터는 종전대로 전면 차단한다.**"""
     fails: list[str] = []
     base_host = (urlsplit(site_base_url).hostname or "").lower()
     hrefs = re.findall(r'href="([^"]*)"', teaser.get("html", ""))
@@ -404,7 +456,10 @@ def gate_provenance(teaser: dict[str, Any], site_base_url: str) -> list[str]:
         host = (sp.hostname or "").lower()
         if host and host != base_host:
             fails.append(f"외부 호스트 링크(우리 페이지 아님): {h}")
-        if sp.query:
+            continue
+        if not sp.query:
+            continue
+        if host != base_host or not _is_clean_utm_query(sp.query):
             fails.append(f"추적/쿼리 파라미터 부착 링크(무변형 위반): {h}")
     return fails
 
@@ -450,7 +505,7 @@ def run_gates(brief_obj: dict[str, Any], *, expected_date: str, site_base_url: s
     struct_fails = gate_publishable(brief_obj, expected_date)
     reasons.append(f"구조 검증: {'OK' if not struct_fails else 'FAIL'}")
     prov_fails = gate_provenance(teaser, site_base_url)
-    reasons.append(f"provenance(우리 페이지·추적 파라미터 0): {'OK' if not prov_fails else 'FAIL'}")
+    reasons.append(f"provenance(우리 페이지·전달 링크 외 추적 파라미터 0): {'OK' if not prov_fails else 'FAIL'}")
     fails = struct_fails + prov_fails
     if run_linkcheck:
         lc_fails, tally = gate_linkcheck(brief_obj, checker=checker)

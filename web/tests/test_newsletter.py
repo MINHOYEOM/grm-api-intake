@@ -17,6 +17,7 @@ WEB_DIR = pathlib.Path(__file__).resolve().parent.parent          # …/web
 sys.path.insert(0, str(WEB_DIR))
 import newsletter  # noqa: E402  (web/newsletter.py)
 import linkcheck   # noqa: E402  (상태 상수)
+import utm         # noqa: E402  (web/utm.py — 전달 링크 기대값 계산용)
 
 TESTS_DIR = pathlib.Path(__file__).resolve().parent
 DATA_DIR = WEB_DIR / "data" / "briefs"
@@ -131,8 +132,44 @@ class NewsletterTeaserTest(unittest.TestCase):
                     self.assertNotIn(u, self.html, f"카드 출처 URL 누출: {u}")
 
     def test_no_tracking_query_on_our_links(self):
+        """[N-03 2026-09-23 이후] 전달 링크(팀 동료에게 전달 카드) 하나만 예외 — 나머지
+        모든 링크는 여전히 쿼리 0(무변형 불변식 그대로)."""
+        pub = self.brief["brief"]["publish_date"]
+        expected_share_href = utm.with_utm(self.t["brief_url"], "newsletter", "forward", f"brief_{pub}")
         for h in re.findall(r'href="([^"]*)"', self.html):
+            if h == expected_share_href:
+                continue
             self.assertNotIn("?", h, f"추적/쿼리 파라미터 부착: {h}")
+
+    # ── 팀 동료에게 전달(N-03 2026-09-23) ─────────────────────────────────────
+    def test_share_block_copy_present(self):
+        self.assertIn("팀 동료에게 전달", self.html)
+        self.assertIn(
+            "이번 호가 도움이 됐다면 팀 동료에게 전달해 주세요. 전달받은 분은 아래 링크에서 "
+            "바로 구독할 수 있습니다.", self.html)
+        self.assertIn("이번 주 브리프 보고 구독하기 →", self.html)
+
+    def test_share_link_carries_forward_utm(self):
+        pub = self.brief["brief"]["publish_date"]
+        expected = f'{self.t["brief_url"]}?utm_source=newsletter&utm_medium=forward&utm_campaign=brief_{pub}'
+        self.assertEqual(expected, utm.with_utm(self.t["brief_url"], "newsletter", "forward", f"brief_{pub}"))
+        self.assertIn(f'href="{expected}"', self.html)
+
+    def test_share_block_between_watchlist_and_disclosure(self):
+        i_watchlist = self.html.index("관심 업체 알림")
+        i_share = self.html.index("팀 동료에게 전달")
+        i_disclosure = self.html.index("AI 자동 생성 안내")
+        self.assertLess(i_watchlist, i_share, "전달 카드가 관심 업체 카드보다 앞에 있음")
+        self.assertLess(i_share, i_disclosure, "전달 카드가 면책 문구보다 뒤에 있음")
+
+    def test_share_link_passes_provenance_gate(self):
+        self.assertEqual(newsletter.gate_provenance(self.t, BASE), [])
+
+    def test_run_gates_still_passes_with_share_block(self):
+        report, _ = newsletter.run_gates(
+            self.brief, expected_date=self.brief["brief"]["publish_date"],
+            site_base_url=BASE, issue_no=2, checker=lambda u: linkcheck.OK)
+        self.assertTrue(report.ok, report.text())
 
     def test_disclaimer_present_ko_en(self):
         self.assertIn("AI 자동 생성 안내", self.html)
@@ -206,12 +243,45 @@ class NewsletterGateTest(unittest.TestCase):
         self.assertTrue(newsletter.gate_publishable(empty, "2026-06-01"))                   # 빈 호
 
     def test_provenance_clean_vs_dirty(self):
+        # 이 픽스처는 tldr 1건뿐이지만 build_teaser 가 항상 붙이는 "팀 동료에게 전달" 카드
+        # 때문에 정본 티저에도 자기 호스트 utm_* 쿼리가 하나 들어간다(N-03) — 그래도 통과.
         t = newsletter.build_teaser(_minimal("2026-06-01", tldr=["요약"]), site_base_url=BASE, issue_no=1)
         self.assertEqual(newsletter.gate_provenance(t, BASE), [])
-        dirty = {"html": f'<a href="{BASE}/briefs/x/?utm_source=a">x</a>'
+        # utm_* 아닌 파라미터(`ref`)가 붙은 우리 호스트 링크 + 외부 호스트 링크 — 둘 다 실패.
+        dirty = {"html": f'<a href="{BASE}/briefs/x/?ref=a">x</a>'
                          '<a href="https://evil.example/track">y</a>'}
         fails = newsletter.gate_provenance(dirty, BASE)
         self.assertEqual(len(fails), 2)                                    # 쿼리 1 + 외부 호스트 1
+
+    # ── N-03(2026-09-23) — utm_* 자기 호스트 예외 세부 판정 ──────────────────────
+    def test_provenance_allows_own_host_utm_triplet(self):
+        t = {"html": f'<a href="{BASE}/briefs/x/?utm_source=newsletter&utm_medium=forward'
+                     f'&utm_campaign=brief_2026-06-01">x</a>'}
+        self.assertEqual(newsletter.gate_provenance(t, BASE), [])
+
+    def test_provenance_allows_own_host_utm_source_only(self):
+        t = {"html": f'<a href="{BASE}/briefs/x/?utm_source=newsletter">x</a>'}
+        self.assertEqual(newsletter.gate_provenance(t, BASE), [])
+
+    def test_provenance_rejects_own_host_extra_param(self):
+        for bad in (f'{BASE}/briefs/x/?ref=x', f'{BASE}/briefs/x/?utm_source=a&foo=b'):
+            t = {"html": f'<a href="{bad}">x</a>'}
+            self.assertTrue(newsletter.gate_provenance(t, BASE), bad)
+
+    def test_provenance_rejects_malformed_utm_value(self):
+        for bad_value in ("Newsletter", "for ward", "a@b"):     # 대문자·공백·`@`
+            t = {"html": f'<a href="{BASE}/briefs/x/?utm_source={bad_value}">x</a>'}
+            self.assertTrue(newsletter.gate_provenance(t, BASE), bad_value)
+
+    def test_provenance_rejects_external_host_even_with_clean_utm(self):
+        t = {"html": '<a href="https://evil.example/x?utm_source=newsletter'
+                     '&utm_medium=forward&utm_campaign=brief_2026-06-01">x</a>'}
+        self.assertTrue(newsletter.gate_provenance(t, BASE))
+
+    def test_provenance_still_passes_no_query_links(self):
+        t = {"html": f'<a href="{BASE}/briefs/2026-06-01/">x</a>'
+                     f'<a href="{BASE}/briefs/2026-06-01/#sec-Recall">y</a>'}
+        self.assertEqual(newsletter.gate_provenance(t, BASE), [])
 
     def test_linkcheck_gate_broken_holds(self):
         brief = _minimal("2026-06-01")

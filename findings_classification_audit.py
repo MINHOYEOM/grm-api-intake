@@ -222,7 +222,9 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description="findings 분류 표류 상시 감사(read-only)")
     parser.add_argument("--supabase-url", default="")
-    parser.add_argument("--service-key", default="")
+    # 자매 스크립트(findings_backlog_monitor 등)와 같은 플래그 이름 -- grm_cli 의
+    # resolve_supabase_service_credentials(args) 가 args.service_role_key 를 읽는다.
+    parser.add_argument("--service-role-key", default="")
     parser.add_argument("--output", help="리포트 JSON 출력 경로(기본 stdout)")
     parser.add_argument(
         "--fail-on-breach", action="store_true",
@@ -230,11 +232,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    # ★2026-09-23 수리: 종전엔 `_resolve_credentials(args.supabase_url, args.service_key)` 로
+    # 불러 grm_cli 시그니처(인자 1개)와 어긋났고, 08-03 첫 배포부터 매주 TypeError 로 즉시
+    # 종료(exit 2)했다. 워크플로의 continue-on-error 가 그걸 "success" 로 가려 8주간 감사가
+    # 한 번도 돌지 않았다. 자격증명 부재도 예외가 아니라 None 이라 명시적으로 가른다.
     try:
-        base_url, service_key = _resolve_credentials(args.supabase_url, args.service_key)
+        creds = _resolve_credentials(args)
     except Exception as exc:  # 키 값은 절대 싣지 않는다 -- 예외 타입만.
         print(json.dumps({"error": type(exc).__name__}, ensure_ascii=False))
         return 2
+    if creds is None:
+        print(json.dumps({"error": "MissingCredentials",
+                          "hint": "--supabase-url/--service-role-key or $SUPABASE_URL/$SUPABASE_SERVICE_ROLE_KEY"},
+                         ensure_ascii=False))
+        return 2
+    base_url, service_key = creds
 
     rows = fetch_findings(base_url, service_key)
     report = build_report(rows)

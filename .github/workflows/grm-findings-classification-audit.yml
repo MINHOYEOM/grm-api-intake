@@ -31,6 +31,7 @@ on:
 
 permissions:
   contents: read
+  issues: write        # 감사기 자체가 죽었을 때 이슈 생성/갱신/종료 (아래 outcome 분기)
 
 concurrency:
   group: findings-classification-audit
@@ -70,6 +71,74 @@ jobs:
             ARGS="$ARGS --fail-on-breach"
           fi
           python findings_classification_audit.py $ARGS > /dev/null
+
+      # ★2026-09-23: continue-on-error 는 "의심 행이 있어도 잡을 red 로 만들지 않는다"는
+      # 뜻이지 "감사기가 죽어도 모른 척한다"는 뜻이 아니다. 08-03~09-22 스케줄 8회가 전부
+      # 자격증명 해석 TypeError 로 즉시 종료(exit 2)했는데 success 로만 남았다. 리포트
+      # 파일이 없으면 = 감사기가 돌지 못한 것 -- 이슈로 올린다(정상 복귀 시 자동 종료).
+      - name: Open or update audit-crash issue
+        if: steps.audit.outcome == 'failure' && hashFiles('classification_audit.json') == ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[classification-audit] 분류 감사기가 실행되지 못했습니다';
+            const label = 'classification-audit';
+            const body = [
+              '분류 표류 감사(`grm-findings-classification-audit.yml`)가 리포트를 남기지 못하고 종료했습니다.',
+              '감사기 자신이 죽은 것이므로 **0건 보고가 없다 = 이상 없음** 으로 읽으면 안 됩니다.',
+              '',
+              `- 실행: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              '- 흔한 원인: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 미설정, 스크립트 인자 계약 변경, PostgREST 장애',
+              '',
+              '정상 실행(리포트 생성)이 확인되면 자동으로 닫힙니다.',
+            ].join('\n');
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', 'findings 분류 표류 감사기 실행 실패');
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 실패했습니다 — 실행 ${context.runId}`,
+              });
+              core.notice(`기존 이슈 #${existing.number} 에 댓글`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close audit-crash issue on recovery
+        if: hashFiles('classification_audit.json') != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[classification-audit] 분류 감사기가 실행되지 못했습니다';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'classification-audit', per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `감사기가 정상 실행됐습니다(리포트 생성) — 실행 ${context.runId}. 닫습니다.`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+            }
 
       - name: Upload full report
         if: always()

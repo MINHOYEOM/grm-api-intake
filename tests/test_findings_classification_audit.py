@@ -197,5 +197,51 @@ class ReportContractTest(unittest.TestCase):
             self.assertNotIn(verb, source)
 
 
+class MainEntryTest(unittest.TestCase):
+    """★2026-09-23: main() 이 자격증명 해석에서 TypeError 로 죽던 회귀를 막는다.
+
+    08-03 첫 배포부터 `_resolve_credentials(url, key)` 두 인자 호출이 grm_cli 시그니처
+    (인자 1개)와 어긋나 매주 exit 2 로 즉시 종료했고, 워크플로 continue-on-error 가 그걸
+    success 로 가렸다. 여기서는 fetch 를 막고 main() 이 실제로 build_report 까지 도달하는지
+    (= 자격증명 단계를 통과하는지) 를 잰다. 뮤테이션: 호출을 두 인자로 되돌리면 첫 테스트가
+    TypeError 를 삼킨 exit 2 로 떨어져 FAIL.
+    """
+
+    def _run_main(self, argv: list[str], env: dict[str, str]) -> tuple[int, str]:
+        import io
+        import os
+        import contextlib
+        from unittest import mock
+        buf = io.StringIO()
+        with mock.patch.dict(os.environ, env, clear=False), \
+             mock.patch.object(audit, "fetch_findings", return_value=[
+                 _row("f-1", "The stability program is deficient.", "stability_storage"),
+             ]), \
+             contextlib.redirect_stdout(buf):
+            code = audit.main(argv)
+        return code, buf.getvalue()
+
+    def test_env_credentials_reach_the_report(self) -> None:
+        code, out = self._run_main([], {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_SERVICE_ROLE_KEY": "service-key",
+        })
+        self.assertEqual(code, 0, out)
+        self.assertIn('"twin_clusters": 0', out)
+
+    def test_cli_flags_match_sibling_scripts(self) -> None:
+        code, out = self._run_main(
+            ["--supabase-url", "https://example.supabase.co", "--service-role-key", "k"],
+            {"SUPABASE_URL": "", "SUPABASE_SERVICE_ROLE_KEY": ""},
+        )
+        self.assertEqual(code, 0, out)
+
+    def test_missing_credentials_exit_2_without_leaking(self) -> None:
+        code, out = self._run_main([], {"SUPABASE_URL": "", "SUPABASE_SERVICE_ROLE_KEY": ""})
+        self.assertEqual(code, 2)
+        self.assertIn("MissingCredentials", out)
+        self.assertNotIn("service-key", out)
+
+
 if __name__ == "__main__":
     unittest.main()

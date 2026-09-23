@@ -500,7 +500,9 @@ def _fact_value_for_lang(label: str, value: str, lang: str,
 
 
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
-               lang: str = DEFAULT_LANG) -> dict[str, Any]:
+               lang: str = DEFAULT_LANG,
+               doc_url_index: "dict[str, tuple[str, int]] | None" = None,
+               en_paths: "set[str] | None" = None) -> dict[str, Any]:
     # [다국어 5단계] 서사 다섯은 언어에 따라 **다른 출력**을 쓴다(번역이 아니라 같은
     # 요약의 다른 언어판 — 설계 문서 §4). 영어 슬롯이 없으면 한국어 그대로다.
     card = _card_with_english_narrative(card, lang)
@@ -545,6 +547,25 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
             "text": (tr("PDF 원문") if is_pdf else tr("공식 페이지")),
         },
     }
+
+    # [브리프→문서 페이지 내부링크 2026-09-23 · S-06] 카드의 공식원본이 문서 정본의
+    # evidence_url 과 정확히 일치하면 그 문서의 정적 페이지(모든 지적을 실은 통짜 목록)로
+    # 가는 링크를 단다 — 카드는 그 문서에서 뽑은 지적 중 한둘뿐이라, 독자가 나머지를 보려면
+    # 검색으로 다시 찾아야 했다(있는 페이지로 못 가는 링크 부재는 자료실 카탈로그의
+    # "and N more"와 같은 결의 결손). 정규화는 문서 인덱스와 동일 계약(strip·trailing
+    # slash 제거·소문자화) — 한쪽만 바꾸면 일치가 깨진다.
+    doc_href, doc_findings = "", 0
+    if doc_url_index:
+        official_norm = (sources["official"]["url"] or "").strip().rstrip("/").lower()
+        hit = official_norm and doc_url_index.get(official_norm)
+        if hit:
+            _slug, _n = hit
+            _href = f"findings/doc/{_slug}/"
+            # 영어 트리는 **그 문서의 영문 페이지가 실제로 나올 때만** 잇는다(en_paths 가
+            # 최종 판정 — doc_is_english() 모집단과 같은 값). 없는 페이지로 보내는 링크는
+            # 무링크보다 나쁘다는 저장소 규율 그대로.
+            if lang == DEFAULT_LANG or (en_paths is not None and _href in en_paths):
+                doc_href, doc_findings = _href, _n
 
     # [실사관 표기 2026-07-30] `/findings/` 화면과 동일 형식("실사관: A · B")을 브리프
     # 카드에도 낸다. card_scaffold 는 raw.fda483_inspectors 를 그대로 옮기므로(무변형
@@ -667,6 +688,10 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "deep_preview": _deep_preview(card.get("deep_analysis"), tr),
         "detail_preview": _detail_preview(card.get("deterministic_detail"), tr),
         "sources": sources,
+        # [S-06] 빈 문자열/0 이 기본값 — card.html 은 `{% if card.doc_href %}` 로만 연다
+        # (firm_key 와 같은 관례: 매치 없으면 키가 있어도 항상 falsy).
+        "doc_href": doc_href,
+        "doc_findings": doc_findings,
     }
 
 
@@ -3092,6 +3117,29 @@ def load_findings_docs(path: Path = FINDINGS_DOCS_FILE) -> "dict[str, Any] | Non
     return obj
 
 
+def build_doc_evidence_url_index(
+        docs_data: "dict[str, Any] | None") -> "dict[str, tuple[str, int]]":
+    """[브리프→문서 페이지 내부링크 2026-09-23 · S-06] `evidence_url(정규화) → (slug, 지적건수)`.
+
+    브리프 카드의 `sources.official_url` 과 문서 정본의 `evidence_url` 은 같은 1차 공식
+    URL 을 가리키는 두 값이다(카드는 수집 당시 원문 링크, 문서는 그 문서 페이지의 근거
+    링크) — 정규화(strip·trailing slash 제거·소문자화)해 맞대면 **정확히 일치하는 건만**
+    잇는다(실측: 발행 카드 558장 중 161장). 문서 정본 안에서 evidence_url 은 유일하므로
+    (실측 — 두 문서가 같은 URL 을 공유한 사례 0) 딕셔너리 하나로 충분하다.
+
+    한 번만 지어 카드 뷰 루프마다 재사용한다(`_card_view` 호출부가 넘겨받는다) — 문서
+    3천여 장을 카드마다 다시 스캔하면 브리프 108장 × 카드 수만큼 비용이 곱해진다.
+    """
+    index: dict[str, tuple[str, int]] = {}
+    for doc in (docs_data or {}).get("documents") or []:
+        url = (doc.get("evidence_url") or "").strip().rstrip("/").lower()
+        slug = doc.get("slug") or ""
+        if not url or not slug:
+            continue
+        index[url] = (slug, len(doc.get("findings") or []))
+    return index
+
+
 _FIRM_SLUG_KEEP = re.compile(r"[^a-z0-9]+")
 
 
@@ -4570,6 +4618,41 @@ def build_breadcrumb_json_ld(trail: "list[tuple[str, str]]",
                       ensure_ascii=False, indent=1).replace("<", "\\u003c")
 
 
+def build_brief_article_json_ld(headline: str, canonical: str, publish_date: str,
+                                base_url: str = SITE_BASE_URL,
+                                lang: str = DEFAULT_LANG) -> str:
+    """브리프 페이지 NewsArticle JSON-LD(S-05 2026-09-23) — 검색결과 리치 리절트용.
+
+    값은 전부 **그 페이지가 이미 쓰는 값의 재사용**이다 — `headline` 은 호출부가 넘기는
+    `page_title`(<title>/og:title 과 같은 문자열)이고 `mainEntityOfPage` 는 그 페이지의
+    canonical(<link rel=canonical> 과 같은 값)이다. 여기서 새 문구를 짓지 않는다(사실/URL
+    무변형 원칙과 동형).
+
+    `publisher`/`author` 는 랜딩 Organization(build_json_ld)과 같은 name·url 을 그대로
+    반복한다 — 브리프 페이지는 랜딩과 달리 별도 Organization/WebSite 블록을 내지 않으므로
+    `@id` 로 참조할 기존 노드가 없다(있었다면 `{"@id": …}` 로 가리켰을 자리). `image` 는
+    전 페이지 공용 og:image(env.globals["og_image"] 와 동일 산식)를 그대로 쓴다 — 브리프
+    페이지도 이미 그 메타 태그를 갖고 있으므로 "og:image 가 있을 때만 image 를 낸다"는
+    조건을 항상 만족한다.
+
+    build_json_ld·build_breadcrumb_json_ld 와 동일 직렬화 계약('<' → \\u003c, </script>
+    조기종료 차단). 정적 입력만 쓴다(now() 없음 — publish_date 는 브리프 데이터의 값).
+    """
+    node = {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": headline,
+        "datePublished": publish_date,
+        "dateModified": publish_date,
+        "inLanguage": lang,
+        "mainEntityOfPage": canonical,
+        "image": f"{base_url}/assets/og-image.png",
+        "publisher": {"@type": "Organization", "name": SITE_NAME, "url": base_url},
+        "author": {"@type": "Organization", "name": SITE_NAME, "url": base_url},
+    }
+    return json.dumps(node, ensure_ascii=False, indent=1).replace("<", "\\u003c")
+
+
 def build_site_webmanifest() -> str:
     """site.webmanifest — 정적·결정론(PWA 아이콘 메타). dict 삽입순 보존."""
     manifest = {
@@ -4861,6 +4944,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     clause_views_en = build_clause_views(docs_data, load_cfr_catalog(), load_glossary(),
                                          lang="en")
     doc_slugs: set[str] = {d["slug"] for d in (docs_data or {}).get("documents", [])}
+    # [S-06 2026-09-23] 브리프 카드 → 문서 페이지 링크용 색인. 한 번만 짓고 브리프 루프의
+    # 모든 카드(ko·en)가 재사용한다(build_doc_evidence_url_index 참조).
+    doc_url_index = build_doc_evidence_url_index(docs_data)
 
     # ── [다국어 4단계 2026-09-04] 영어 트리에 실사 문서 표면을 더한다 ─────────────
     # 3단계는 조회 화면(런타임 RPC)만 영어로 냈다. 정적 문서 페이지는 그때 `findings_docs.json`
@@ -6058,7 +6144,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
-        card_views = [_card_view(c, tr, lang) for c in cards_sorted]
+        card_views = [_card_view(c, tr, lang, doc_url_index, en_paths) for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
         sections = _build_sections(card_views, tr)
         ctx = _brief_context(b, issue_no, tr)
@@ -6077,13 +6163,18 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             _used: set[str] = set()
             for cv in card_views:            # render_order 순 = 화면 순
                 _link_card_view_terms(cv, _sel, brief_page.rel_root, _used, lang)
+        # [S-05 2026-09-23] headline 은 <title>/og:title 과 **같은 문자열**을 재사용한다
+        # (새 문구를 짓지 않는다 — 변수 하나에 담아 page_title 과 json_ld 양쪽에 넣는다).
+        _brief_page_title = tr("{date} 규제뉴스 · GRM", date=ctx["title_dateform"])
         emit("brief.html", brief_page,
-            page_title=tr("{date} 규제뉴스 · GRM", date=ctx["title_dateform"]),
+            page_title=_brief_page_title,
             nav_active="detail",
             description=_brief_description(b["brief"], tr),
             brief=ctx,
             sections=sections,
             lib_update_week=lib_update_week,
+            json_ld=build_brief_article_json_ld(
+                _brief_page_title, brief_page.canonical, pub, lang=lang),
         )
         # [성장 3차] 링크드인/커뮤니티 공유 초안 — tldr(큐레이션된 핵심)+절대 URL 을 고정
         # 경로(briefs/{pub}/share.txt)로 낸다. 운영 루틴: 발행 후 이 URL 을 열어 복사·
@@ -6102,7 +6193,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         # 않고, 다음 주 발행부터 Routine 이 채우면 저절로 생긴다(전향적 — 설계 문서 §4).
         if pub in en_brief_slugs:
             en_ctx = _brief_context(b, issue_no, en_tr, "en")
-            en_card_views = [_card_view(c, en_tr, "en") for c in cards_sorted]
+            en_card_views = [_card_view(c, en_tr, "en", doc_url_index, en_paths)
+                             for c in cards_sorted]
             _annotate_toc_distinguishers(en_card_views)
             en_brief_page = en_page(f"briefs/{pub}/")
             if brief_term_index_by_lang:
@@ -6112,8 +6204,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 _en_used: set[str] = set()
                 for cv in en_card_views:      # render_order 순 = 화면 순
                     _link_card_view_terms(cv, _en_sel, en_brief_page.rel_root, _en_used, "en")
+            _en_brief_page_title = en_tr("{date} 규제뉴스 · GRM", date=en_ctx["title_dateform"])
             en_emit("brief.html", en_brief_page,
-                page_title=en_tr("{date} 규제뉴스 · GRM", date=en_ctx["title_dateform"]),
+                page_title=_en_brief_page_title,
                 nav_active="detail",
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
@@ -6127,6 +6220,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         lib_entries, en_catalogs, _win[0], _win[1], lang="en")
                     if _win else None
                 ),
+                json_ld=build_brief_article_json_ld(
+                    _en_brief_page_title, en_brief_page.canonical, pub, lang="en"),
             )
 
     # ── [다국어 3단계 2026-09-04] 영어 트리 `/en/` ────────────────────────────────

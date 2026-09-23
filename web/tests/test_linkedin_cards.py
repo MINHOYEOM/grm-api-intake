@@ -170,10 +170,17 @@ class BuildDeckRealBriefTest(unittest.TestCase):
         self.assertEqual(len(set(s["checks"])), 6)
 
     def test_caption_one_idea_per_line_mobile_width(self):
-        cap = self.deck["caption"]
+        # [마케팅 2026-09-23] 기본 캡션은 이제 caption_style="one" — 종전 요약형은
+        # summary 로 명시해야 나온다. URL 줄은 UTM 이 붙은 caption_url 로 바뀌었다.
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="summary")
+        cap = deck["caption"]
         lines = cap.splitlines()
         self.assertEqual(lines[0], "이번 주 규제 소식, 카드 9장.")
-        self.assertIn("https://grm-solutions.com/briefs/2026-09-07/", lines)
+        self.assertEqual(deck["caption_url"],
+                         "https://grm-solutions.com/briefs/2026-09-07/"
+                         "?utm_source=linkedin&utm_medium=social&utm_campaign=2026-09-07_weekly")
+        self.assertIn(deck["caption_url"], lines)
+        self.assertEqual(deck["url"], "https://grm-solutions.com/briefs/2026-09-07/")   # 슬라이드 URL 은 깨끗하게
         for ln in lines:
             if ln.startswith("http") or ln.startswith("#"):
                 continue
@@ -362,8 +369,9 @@ class EnglishDeckTest(unittest.TestCase):
         self.assertEqual(found, [], f"영문 덱에 한글 {found[:10]}")
 
     def test_korean_deck_still_korean(self):
+        # [마케팅 2026-09-23] 기본 캡션(one)은 고정 문구로 시작하지 않는다 — 성질(한글 포함)로 본다.
         self.assertTrue(HANGUL.search(lc.render_html(self.ko)))
-        self.assertTrue(self.ko["caption"].startswith("이번 주 규제 소식"))
+        self.assertTrue(HANGUL.search(self.ko["caption"]))
 
     def test_both_languages_carry_the_same_items(self):
         kinds_ko = [s["kind"] for s in self.ko["slides"]]
@@ -563,6 +571,255 @@ class EnglishCliTest(unittest.TestCase):
             self.assertTrue((d / "linkedin.txt").exists())
             self.assertFalse((d / "linkedin_en.txt").exists())
             self.assertIn("::warning::linkedin_en 건너뜀", err.getvalue())
+
+
+class CaptionStyleTest(unittest.TestCase):
+    """[마케팅 2026-09-23 계획 L-02] 게시 본문 두 형식 — `one`(기본, '이번 주 한 건')과
+    `summary`(종전 요약형). 기대값은 픽스처를 직접 읽어 **파생**한다(하드코딩 추측 금지) —
+    `pick_headline_cards`·`_card_text`·`_card_list` 로 프로덕션과 같은 규칙을 재현한다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.brief, cls.glossary = _load()
+        cls.cards = sorted(cls.brief["cards"], key=lambda c: int(c.get("render_order") or 0))
+
+    def _expected_one_card(self, lang: str = "ko"):
+        """`_caption_one` 의 선택 규칙(시사점+점검 모두 있는 첫 카드, 없으면 시사점만 있는
+        첫 카드)을 공개 헬퍼로 재현 — 내부 함수를 그대로 부르면 자기 자신을 시험하는
+        동어반복이 된다."""
+        heads = lc.pick_headline_cards(self.brief["brief"], self.cards, 3)
+        if lang != "ko":
+            heads = [c for c in heads if lc.has_en(c)]
+        with_checks = [c for c in heads if lc._card_text(c, "implication", lang).strip()
+                       and lc._card_list(c, "checks", lang)]
+        if with_checks:
+            return with_checks[0]
+        with_impl = [c for c in heads if lc._card_text(c, "implication", lang).strip()]
+        return with_impl[0] if with_impl else None
+
+    def test_one_is_the_default_caption_style(self):
+        default = lc.build_deck(self.brief, self.glossary)
+        explicit = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        self.assertEqual(default["caption"], explicit["caption"])
+
+    def test_one_caption_first_lines_are_headline_card_title_wrapped(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        card = self._expected_one_card("ko")
+        self.assertIsNotNone(card, "픽스처에 시사점 있는 헤드라인 카드가 없다 — 가정이 낡았다")
+        expected = lc.wrap_width(lc._card_text(card, "title_issue", "ko"))
+        self.assertEqual(deck["caption"].splitlines()[: len(expected)], expected)
+
+    def test_one_caption_checks_section_matches_card_checks(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        card = self._expected_one_card("ko")
+        cks = lc._card_list(card, "checks", "ko")
+        lines = deck["caption"].splitlines()
+        self.assertTrue(cks, "픽스처 카드에 점검이 없다 — '점검 있음' 갈래를 시험하지 못한다")
+        self.assertIn("현장 점검 포인트", lines)
+        bullets = [ln for ln in lines if ln.startswith("• ")]
+        self.assertEqual(len(bullets), min(2, len(cks)))
+
+    def test_one_caption_has_utm_url_on_its_own_line(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        lines = deck["caption"].splitlines()
+        self.assertIn(deck["caption_url"], lines)
+        self.assertIn("utm_source=linkedin&utm_medium=social&utm_campaign=2026-09-07_weekly",
+                      deck["caption_url"])
+        self.assertNotIn("?", deck["url"])            # 슬라이드 URL 은 깨끗하게
+
+    def test_one_caption_lines_fit_mobile_width(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        lines = deck["caption"].splitlines()
+        for ln in lines:
+            if ln.startswith("http") or ln.startswith("#"):
+                continue
+            self.assertLessEqual(lc.text_width(ln), 26.0, ln)
+
+    def test_one_caption_last_line_is_hashtags(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        non_blank = [ln for ln in deck["caption"].splitlines() if ln]
+        self.assertTrue(non_blank[-1].startswith("#"), non_blank[-1])
+
+    def test_one_caption_is_deterministic(self):
+        a = lc.build_deck(self.brief, self.glossary, caption_style="one")["caption"]
+        b = lc.build_deck(self.brief, self.glossary, caption_style="one")["caption"]
+        self.assertEqual(a, b)
+
+    def test_english_one_caption_has_no_hangul_and_uses_english_headings(self):
+        deck = lc.build_deck(self.brief, self.glossary, lang="en", caption_style="one")
+        self.assertEqual(HANGUL.findall(deck["caption"]), [])
+        self.assertIn("What to check on site", deck["caption"])
+        self.assertIn("Official sources and the full weekly brief", deck["caption"])
+        for ln in deck["caption"].splitlines():
+            if ln.startswith("http") or ln.startswith("#"):
+                continue
+            self.assertLessEqual(lc.text_width(ln), 26.0, ln)
+
+    def test_closing_slide_url_stays_clean_and_deck_url_unchanged(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        closing = next(s for s in deck["slides"] if s["kind"] == "closing")
+        self.assertNotIn("?", closing["url"])
+        self.assertEqual(deck["url"], "https://grm-solutions.com/briefs/2026-09-07/")
+
+    def test_summary_caption_url_line_carries_utm(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="summary")
+        lines = deck["caption"].splitlines()
+        self.assertIn(deck["caption_url"], lines)
+        self.assertTrue(deck["caption_url"].startswith(
+            "https://grm-solutions.com/briefs/2026-09-07/"
+            "?utm_source=linkedin&utm_medium=social&utm_campaign=2026-09-07_weekly"))
+
+    def test_unknown_caption_style_is_refused_loudly(self):
+        with self.assertRaises(ValueError):
+            lc.build_deck(self.brief, self.glossary, caption_style="fancy")
+
+    def test_fallback_to_summary_when_no_headline_card_has_implication(self):
+        """헤드라인 카드 전부 시사점이 비면 '한 건' 캡션을 못 만든다 — 조용히 빈 본문을
+        내는 대신 종전 요약형으로 물러선다."""
+        brief = _synthetic([_card(1, implication="", checks=[]),
+                            _card(2, implication="", checks=[]),
+                            _card(3, implication="", checks=[])])
+        one = lc.build_deck(brief, [], caption_style="one")
+        summary = lc.build_deck(brief, [], caption_style="summary")
+        self.assertEqual(one["caption"], summary["caption"])
+
+    def test_cli_default_writes_one_and_flag_writes_summary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_default = pathlib.Path(tmp) / "default"
+            out_summary = pathlib.Path(tmp) / "summary"
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                lc.main(["--brief", str(BRIEF), "--glossary", str(GLOSSARY),
+                        "--out", str(out_default), "--no-pdf"])
+                lc.main(["--brief", str(BRIEF), "--glossary", str(GLOSSARY),
+                        "--out", str(out_summary), "--no-pdf", "--caption", "summary"])
+            txt_default = (out_default / "briefs" / "2026-09-07" / "linkedin.txt").read_text(encoding="utf-8")
+            txt_summary = (out_summary / "briefs" / "2026-09-07" / "linkedin.txt").read_text(encoding="utf-8")
+            self.assertNotEqual(txt_default, txt_summary)
+            self.assertTrue(txt_summary.startswith("이번 주 규제 소식"))
+            self.assertFalse(txt_default.startswith("이번 주 규제 소식"))
+
+    # ── [09-23 반려 피드백 재수정] '지적 1/지적 2' 다줄 사실 → 한 줄 헤더 + 선택적 한 줄 ──────
+
+    def test_one_caption_has_compact_fact_header_instead_of_multiline_citations(self):
+        """경고서한 카드는 실제로 '지적 1/지적 2' 처럼 폭을 훌쩍 넘는 key_facts 를 가진다 —
+        그 카드로 직접 캡션을 만들어 그 문구가 **전혀** 안 나오는지 본다(감싸서 죽이는 게
+        아니라 애초에 안 고른다)."""
+        wl = next(c for c in self.cards if c.get("category") == "Warning Letter")
+        self.assertTrue(any(f.startswith(("지적", "관찰사항")) for f in wl.get("key_facts") or []),
+                        "픽스처 가정이 낡았다 — 경고서한 카드에 '지적 N:' 사실이 없다")
+        cap = lc._caption_one([wl], "https://x/?utm", "ko", lambda c: c.get("headline_target", ""))
+        self.assertIsNotNone(cap)
+        for ln in cap.splitlines():
+            self.assertFalse(re.match(r"^(지적|관찰사항|Citation|Observation)\s*\d*\s*[:：]", ln), ln)
+
+    def test_one_caption_fact_header_line_present_and_fits_width(self):
+        deck = lc.build_deck(self.brief, self.glossary, caption_style="one")
+        card = self._expected_one_card("ko")
+        agency, kind = lc._agency(card), lc._kind_chip(card, "ko")
+        lines = deck["caption"].splitlines()
+        header = next((ln for ln in lines if ln.startswith(agency + " · ")), None)
+        self.assertIsNotNone(header, lines)
+        self.assertIn(kind, header)
+        self.assertLessEqual(lc.text_width(header), 26.0, header)
+
+    def test_fact_header_drops_firm_before_date_when_too_wide(self):
+        long_firm = "A Very Extremely Long Pharmaceutical Manufacturing Corporation Name Ltd"
+        card = {"agency": "FDA", "category": "Warning Letter", "headline_target": long_firm,
+                "key_facts": ["발행 부서/일자: Center for Drug Evaluation and Research (CDER) · 08/18/2026"]}
+        header = lc._fact_header(card, "ko", lambda c: c.get("headline_target", ""))
+        self.assertLessEqual(lc.text_width(header), 26.0, header)
+        self.assertNotIn(long_firm, header)             # 업체명이 먼저 빠진다
+        self.assertIn("08/18/2026", header)              # 날짜는 남는다
+
+    def test_fact_header_omits_missing_date_without_inventing_one(self):
+        card = {"agency": "FDA", "group": "Recall", "category": "Recall", "headline_target": "Acme",
+                "key_facts": ["회수 등급: Class II"]}   # Class II — Class I 회수 칩으로 안 갈린다
+        header = lc._fact_header(card, "ko", lambda c: c.get("headline_target", ""))
+        self.assertEqual(header, "FDA · 회수 · Acme")
+
+    def test_one_extra_fact_skips_facts_that_do_not_fit_unwrapped(self):
+        card = {"key_facts": ["지적 1: " + "무균공정 구역 오염 방지 절차 미수립 " * 5,
+                              "회수 등급: Class I"]}
+        extra = lc._one_extra_fact(card, "ko")
+        self.assertEqual(extra, "회수 등급: Class I")   # 긴 지적문은 건너뛰고 짧은 사실을 쓴다
+
+    def test_one_extra_fact_empty_when_nothing_fits(self):
+        card = {"key_facts": ["지적 1: " + "무균공정 구역 오염 방지 절차 미수립 " * 5]}
+        self.assertEqual(lc._one_extra_fact(card, "ko"), "")
+
+
+class WrapWidthBalanceTest(unittest.TestCase):
+    """[09-23 반려 피드백 재수정] wrap_width 균형 배분 — 그리디(앞줄을 상한까지 욱여넣고
+    마지막 줄에 짧은 나머지를 남김)가 "문장을 잘못 끊는다"는 반려의 실제 원인이었다. 여기서는
+    균형 배분 자체를(실제 카드 문구·합성 문구 양쪽으로) 단위 시험한다 — `_caption_one` 통합
+    시험과 달리 픽스처가 바뀌어도 낡지 않는다."""
+
+    SAMPLES = [
+        "무균공정 구역에서 오염·혼동을 막기 위한 충분한 크기의 구획과 관리체계 미비",
+        "조제 주사제의 내독소 규격 이탈은 무균성뿐 아니라 용수·원료의 내독소 부하 관리 "
+        "실패를 함께 가리키는 지표다.",
+        "failure to perform operations within specifically defined areas of adequate "
+        "size and to have controls necessary to prevent contamination or mix-ups in "
+        "aseptic processing areas",
+        "An endotoxin excursion in a compounded injection points to failed control of "
+        "endotoxin load in water and materials, not only to sterility.",
+        "one two three four five six seven eight nine ten eleven twelve thirteen",
+    ]
+
+    def test_single_line_when_it_already_fits(self):
+        self.assertEqual(lc.wrap_width("짧은 문장"), ["짧은 문장"])
+        self.assertEqual(lc.wrap_width(""), [])
+        self.assertEqual(lc.wrap_width("   "), [])
+
+    def test_lines_never_exceed_the_cap(self):
+        for t in self.SAMPLES:
+            for line in lc.wrap_width(t, 26.0):
+                with self.subTest(t=t, line=line):
+                    self.assertLessEqual(lc.text_width(line), 26.0, line)
+
+    def test_never_drops_or_invents_characters(self):
+        for t in self.SAMPLES:
+            lines = lc.wrap_width(t, 26.0)
+            with self.subTest(t=t):
+                self.assertEqual(re.sub(r"\s+", "", "".join(lines)), re.sub(r"\s+", "", t))
+
+    def test_balances_lines_within_40_percent_of_the_longest(self):
+        """N≥2 줄일 때 가장 짧은 줄이 가장 긴 줄의 40% 아래로 떨어지지 않는다."""
+        checked_multiline = 0
+        for t in self.SAMPLES:
+            lines = lc.wrap_width(t, 26.0)
+            if len(lines) < 2:
+                continue
+            checked_multiline += 1
+            widths = [lc.text_width(ln) for ln in lines]
+            with self.subTest(t=t, widths=widths):
+                self.assertGreaterEqual(min(widths), 0.4 * max(widths))
+        self.assertGreater(checked_multiline, 0, "샘플 전부 한 줄이라 균형 배분을 시험 못 했다")
+
+    def test_balanced_beats_naive_greedy_on_a_real_lopsided_case(self):
+        """2026-09-21 실사례 — 그리디는 마지막 줄에 '절차'(2.0 폭)만 남겼다(최댓값의 8%)."""
+        t = "ISO 5 환경·인원 모니터링 이탈 시 균 동정 및 추세 조사 절차"
+        cuts = lc._wrap_cuts(t, 26.0)
+        greedy_offsets = lc._greedy_wrap(t, cuts, 26.0)
+        prev, greedy_lines = 0, []
+        for cut in greedy_offsets:
+            greedy_lines.append(t[prev:cut].strip())
+            prev = cut
+        greedy_widths = [lc.text_width(ln) for ln in greedy_lines]
+        self.assertLess(min(greedy_widths), 0.4 * max(greedy_widths),
+                        "그리디 자체가 더는 치우치지 않는다 — 대조 표본이 낡았다")
+
+        balanced = lc.wrap_width(t, 26.0)
+        balanced_widths = [lc.text_width(ln) for ln in balanced]
+        self.assertGreaterEqual(len(balanced), 2)
+        self.assertGreaterEqual(min(balanced_widths), 0.4 * max(balanced_widths),
+                                (balanced, balanced_widths))
+
+    def test_cannot_break_a_single_overlong_token(self):
+        """끊을 자리가 아예 없는 한 덩어리는 상한을 넘긴 채 한 줄로 낸다 — 없는 공백을
+        만들 수는 없다(문장을 지어내거나 글자를 버리지 않는다)."""
+        t = "a" * 80
+        self.assertEqual(lc.wrap_width(t, 26.0), [t])
 
 
 if __name__ == "__main__":

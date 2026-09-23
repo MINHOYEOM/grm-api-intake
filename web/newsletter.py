@@ -36,13 +36,16 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
-from datetime import date as _date
+from datetime import date as _date, datetime as _datetime, timedelta as _timedelta, timezone as _timezone
 from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import quote, urlsplit
 
 WEB_DIR = Path(__file__).resolve().parent
 DATA_DIR = WEB_DIR / "data" / "briefs"
+
+# 발송 누락 감시(freshness 모드, N-01 2026-09-23) — quiz_freshness_check.py 와 같은 관용구.
+KST = _timezone(_timedelta(hours=9))
 
 # render.py(같은 디렉터리·순수·네트워크 0) — issue 번호/제목/섹션/SITE_BASE_URL 단일 파생원.
 import render  # noqa: E402
@@ -593,6 +596,45 @@ def decide_should_send(sender: "NewsletterSender", publish_date: str,
     return True, f"신규 호 — 발송 필요: {name}"
 
 
+# ── 발송 누락 감시(freshness, N-01 2026-09-23) ────────────────────────────────
+# "이번 주 뉴스레터가 실제로 나갔나"를 클라우드에서 판정한다(§CLI --mode freshness,
+# `grm-newsletter-freshness.yml`). 스케줄 크론(`grm-newsletter-send.yml`)은 보통
+# 스킵한다 — 그 주 브리프 PR 이 크론 시각 이후 사람이 머지하기 때문이라 스케줄이 돌
+# 때 아직 "새 호"가 없다. 실제 발송은 월요일 오후 Admin 콘솔 `workflow_dispatch` 다 —
+# 그래서 "run success"≠"sent". `newsletter_dispatch_log`(Supabase)는 Admin dispatch
+# 기록만 남기고 상태를 갱신하지 않아 "발송됐다"의 증거가 못 된다 — Brevo 캠페인 상태
+# (`_DISPATCHED_STATUSES`)만이 진실이다.
+def decide_freshness(latest_publish_date: "str | None", as_of: _date,
+                     campaign: "dict | None") -> "tuple[str, str]":
+    """순수 판정(네트워크 0). verdict ∈ {brief-missing, not-sent, ok}.
+
+    brief-missing — 이번 주 호가 아직 없음(latest 가 없거나, 이번 주 월요일(as_of 파생)
+      보다 하루 넘게 오래됨). 브리프는 월요일 발행이 원칙이나 과거 한 호가 일요일
+      발행 이력이 있어 1일 허용을 둔다. 캠페인 조회가 필요 없는 판정 — 호출부(CLI)는
+      이 경우 Brevo 호출 자체를 건너뛴다.
+    not-sent — 이번 주 호는 있으나 캠페인이 없거나(Admin 발송 전) 상태가
+      `_DISPATCHED_STATUSES` 밖(예: draft — create 후 sendNow 실패 잔여).
+    ok — 이번 주 호가 있고 캠페인이 발송/예약 상태.
+    """
+    monday = as_of - _timedelta(days=as_of.weekday())
+    threshold = monday - _timedelta(days=1)        # 일요일 발행 이력 1일 허용
+    if not latest_publish_date or not _DATE_RE.match(latest_publish_date):
+        return "brief-missing", f"발행된 브리프가 없습니다(as_of={as_of.isoformat()})"
+    if latest_publish_date < threshold.isoformat():
+        return "brief-missing", (
+            f"최신 브리프 {latest_publish_date} 가 이번 주(월요일 {monday.isoformat()}) "
+            f"발행분보다 오래됨 — 이번 주 호 미발행(as_of={as_of.isoformat()})")
+    if campaign is None:
+        return "not-sent", f"브리프 {latest_publish_date} 는 있으나 Brevo 캠페인이 없습니다(미발송)"
+    status = str(campaign.get("status", "")).lower()
+    if status not in _DISPATCHED_STATUSES:
+        return "not-sent", (
+            f"브리프 {latest_publish_date} 캠페인 {campaign.get('id')} 상태={status!r} "
+            f"— 발송/예약 상태가 아닙니다")
+    return "ok", (
+        f"브리프 {latest_publish_date} 캠페인 {campaign.get('id')} 상태={status!r} — 발송 확인")
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
@@ -621,13 +663,16 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--publish-date", default=None,
                     help="발송할 호의 발행일(YYYY-MM-DD). latest-date 모드는 불필요(최신 자동 선택).")
     ap.add_argument("--data", type=Path, default=DATA_DIR, help="브리프 JSON 디렉터리")
-    ap.add_argument("--mode", choices=["validate", "test", "send", "latest-date", "precheck"],
+    ap.add_argument("--mode", choices=["validate", "test", "send", "latest-date", "precheck", "freshness"],
                     default="validate",
                     help="validate=게이트만(네트워크는 링크체크) · test=테스트발송 · send=실발송 · "
                          "latest-date=최신 발행일만 출력(스케줄 해석) · "
-                         "precheck=멱등 사전점검(should_send 방출, 발송 0)")
+                         "precheck=멱등 사전점검(should_send 방출, 발송 0) · "
+                         "freshness=발송 누락 감시(Brevo 캠페인 상태로 판정, 발송 0)")
     ap.add_argument("--out", type=Path, default=None, help="렌더된 메일 HTML 저장(D5 사람 검토 아티팩트)")
     ap.add_argument("--no-linkcheck", action="store_true", help="링크체크 게이트 건너뜀(오프라인 검증)")
+    ap.add_argument("--as-of", default="", help="freshness 모드 전용 — KST 기준 검사일(YYYY-MM-DD). 비우면 오늘")
+    ap.add_argument("--output", type=Path, default=None, help="freshness 모드 전용 — 판정 리포트 JSON 저장 경로")
     args = ap.parse_args(argv)
 
     # 스케줄 해석 보조 — 최신 발행일만 결정론으로 출력(게이트·로딩·네트워크 0).
@@ -635,8 +680,49 @@ def main(argv: "list[str] | None" = None) -> int:
         print(resolve_latest_publish_date(args.data))
         return 0
 
+    # 발송 누락 감시(N-01) — publish_date 불필요(최신 호를 스스로 찾는다). 발송 0.
+    if args.mode == "freshness":
+        as_of = _date.fromisoformat(args.as_of) if args.as_of else _datetime.now(KST).date()
+        try:
+            latest = resolve_latest_publish_date(args.data)
+        except SystemExit:
+            latest = None           # 브리프 디렉터리 없음/빈 디렉터리 → brief-missing 판정으로 흡수
+
+        # brief-missing 은 API 없이 판정된다(설계: 이번 주 호가 없으면 캠페인 조회가 무의미) —
+        # 여기서 먼저 걸러 불필요한 Brevo 호출을 피한다.
+        verdict, reason = decide_freshness(latest, as_of, None)
+        campaign_name = None
+        campaign_status = None
+        if verdict != "brief-missing":
+            _brief_obj, issue_no = load_issue(args.data, latest)
+            campaign_name = idempotency_campaign_name(latest, issue_no)
+            api_key = _env("NEWSLETTER_API_KEY")
+            if not api_key:
+                verdict, reason = "api-error", "NEWSLETTER_API_KEY 미설정 — 캠페인 상태 조회 불가"
+            else:
+                try:
+                    campaign = BrevoSender(api_key).find_campaign(campaign_name)
+                except Exception as exc:
+                    # 이 저장소는 PUBLIC — 응답 본문(메시지)은 공개 로그에 남을 수 있어 클래스명만.
+                    verdict, reason = "api-error", f"Brevo 조회 실패: {type(exc).__name__}"
+                else:
+                    verdict, reason = decide_freshness(latest, as_of, campaign)
+                    campaign_status = campaign.get("status") if campaign else None
+
+        report = {
+            "verdict": verdict, "reason": reason, "as_of": as_of.isoformat(),
+            "latest_publish_date": latest, "campaign_name": campaign_name,
+            "campaign_status": campaign_status,
+            "checked_at_kst": _datetime.now(KST).isoformat(timespec="seconds"),
+        }
+        print(f"뉴스레터 신선도: {verdict} — {reason}")
+        if args.output is not None:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+        return 0 if verdict == "ok" else (2 if verdict == "api-error" else 1)
+
     if not args.publish_date:
-        ap.error("--publish-date 필요(latest-date 모드 제외)")
+        ap.error("--publish-date 필요(latest-date·freshness 모드 제외)")
 
     site_base_url = render.SITE_BASE_URL
     brief_obj, issue_no = load_issue(args.data, args.publish_date)

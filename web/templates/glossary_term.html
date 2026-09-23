@@ -92,7 +92,7 @@
           definition_source 를 줄여 쓰지 않는다(실제 문서 이름이라 자르면 다른 문서를
           가리킨다). 하단 출처 섹션은 그대로 둔다. 복사 스크립트가 .gt-src-name 의
           텍스트를 그대로 읽으므로 라벨과 값은 여기서 갈라 둔다. -#}
-      <p class="gt-src-line">{{ _('출처') }} · {% if term.source_url %}<a class="gt-src-name" href="{{ term.source_url }}" target="_blank" rel="noopener">{{ term.definition_source }}</a>{% else %}<span class="gt-src-name">{{ term.definition_source }}</span>{% endif %}</p>
+      <p class="gt-src-line">{{ _('출처') }} · {% if term.source_url %}<a class="gt-src-name" href="{{ term.source_url }}" target="_blank" rel="noopener">{{ term.definition_source }}</a>{% else %}<span class="gt-src-name">{{ term.definition_source }}</span>{% endif %}{% if term.source_has_ko_original %} <span class="gt-src-ko">{{ _("한국어 원문") }}</span>{% endif %}</p>
       {#- [용어 저장 · 복사] 카드와 같은 골격(.grm-card-actions)이지만 셋이 다르다.
           · [data-share] 없음 — S0 는 location+'#'+anchor 로 딥링크를 만드는데 여기
             anchor 는 `glossary:<id>` 라 엉뚱한 URL 이 된다(S0 는 그 버튼이 없으면 건너뛴다).
@@ -165,7 +165,7 @@
       <a href="{{ term.source_url }}" target="_blank" rel="noopener">{{ term.definition_source }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
       {%- else %}
       <span class="gt-detail">{{ term.definition_source }}</span>
-      {%- endif %}
+      {%- endif %}{% if term.source_has_ko_original %} <span class="gt-src-ko">{{ _("한국어 원문") }}</span>{% endif %}
     </section>
 
     <div class="gt-foot">

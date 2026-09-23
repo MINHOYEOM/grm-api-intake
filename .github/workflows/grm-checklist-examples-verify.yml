@@ -33,6 +33,7 @@ on:
 
 permissions:
   contents: read
+  issues: write        # 검증 실패 알림 이슈 생성/갱신/종료
 
 concurrency:
   group: grm-checklist-examples-verify
@@ -93,3 +94,83 @@ jobs:
           name: checklist-examples-verify
           path: checklist-examples-verify.json
           if-no-files-found: warn
+
+      # continue-on-error 를 쓰지 않는다 — 잡 자체가 오늘처럼 red 로 남는 게 1차 가시성이고
+      # 이슈는 2차 가시성이다. failure()/success() 는 이 잡의 앞선 스텝(오프라인 회귀·
+      # 자격증명 선점검·전수 검사) 중 무엇이 실패했든 동일하게 잡는다.
+      - name: Open or update checklist-verify issue
+        if: failure()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[checklist-verify] 체크리스트 조항=인용문 일치 검증이 실패했습니다';
+            const label = 'checklist-verify';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              '체크리스트 사례 전수 가드(`grm-checklist-examples-verify.yml`)가 실패했습니다.',
+              '',
+              '**왜 이 알림이 중요한가**: `/findings/checklist/` 는 조항마다 실린 문장이 그 ' +
+                '조항의 실제 지적이라는 걸 약속한다 — 인쇄해서 쓰는 산출물이라 이게 깨지면 ' +
+                '표시 결함이 아니라 정직성 결함이고, 코드가 아니라 데이터에서 매일 새로 날 ' +
+                '수 있어 계속 지켜봐야 한다.',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '흔한 원인: 판정기 오프라인 회귀 실패 · SUPABASE_URL/SUPABASE_ANON_KEY(repo ' +
+                'Variables) 미설정 · 라이브 전수 검사에서 조항=인용문 불일치 발견. ' +
+                '`checklist-examples-verify` 아티팩트/step summary 에서 상세를 확인하세요.',
+              '',
+              '_다음 실행이 성공하면 자동으로 닫힙니다._',
+            ].join('\n');
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '체크리스트 조항=인용문 일치 검증 실패');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 실패했습니다 — 실행 ${context.runId}`,
+              });
+              core.notice(`기존 이슈 #${existing.number} 에 댓글`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close checklist-verify issue on recovery
+        if: success()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[checklist-verify] 체크리스트 조항=인용문 일치 검증이 실패했습니다';
+            const label = 'checklist-verify';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `검증이 정상 복귀해 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }

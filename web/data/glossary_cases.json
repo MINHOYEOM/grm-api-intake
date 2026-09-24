@@ -1,27 +1,27 @@
 {
   "schema": "grm-glossary-cases/v1",
   "source": "public.findings_search RPC (p_q=q) totals — /findings/?q=q 결과와 동일 함수",
-  "measured_on": "2026-09-17",
+  "measured_on": "2026-09-24",
   "curated_on": "2026-08-04",
   "note": "q 는 사람이 실제 문장을 읽고 정한 값이다. 자동 갱신은 건수만 다시 센다(q 불변).",
   "items": [
     {
       "id": "gmp",
       "q": "GMP",
-      "findings": 1389,
-      "documents": 1159
+      "findings": 1394,
+      "documents": 1162
     },
     {
       "id": "active-ingredient",
       "q": "Active Ingredient",
-      "findings": 621,
-      "documents": 599
+      "findings": 623,
+      "documents": 601
     },
     {
       "id": "api",
       "q": "원료의약품",
-      "findings": 285,
-      "documents": 225,
+      "findings": 286,
+      "documents": 226,
       "note": "'API' 343건 중 29%가 therAPIes·rAPId·업체명 Apicore 등 우연한 포함 — 국문으로 교체"
     },
     {
@@ -39,8 +39,8 @@
     {
       "id": "batch",
       "q": "Batch",
-      "findings": 2031,
-      "documents": 1463
+      "findings": 2039,
+      "documents": 1469
     },
     {
       "id": "batch-number",
@@ -63,20 +63,20 @@
     {
       "id": "intermediate",
       "q": "중간체",
-      "findings": 82,
-      "documents": 63
+      "findings": 83,
+      "documents": 64
     },
     {
       "id": "intermediate-product",
       "q": "중간제품",
-      "findings": 35,
-      "documents": 35
+      "findings": 37,
+      "documents": 36
     },
     {
       "id": "finished-product",
       "q": "완제품",
-      "findings": 513,
-      "documents": 482
+      "findings": 516,
+      "documents": 484
     },
     {
       "id": "starting-material",
@@ -87,33 +87,33 @@
     {
       "id": "raw-material",
       "q": "Raw Material",
-      "findings": 442,
-      "documents": 375,
+      "findings": 444,
+      "documents": 376,
       "note": "'원료' 470건 중 50%가 '원료의약품'(API) 문맥 — 두 개념이 섞여 영문으로 교체"
     },
     {
       "id": "packaging-material",
       "q": "Packaging Material",
-      "findings": 272,
-      "documents": 249
+      "findings": 273,
+      "documents": 250
     },
     {
       "id": "production",
       "q": "생산",
-      "findings": 1705,
-      "documents": 1166
+      "findings": 1708,
+      "documents": 1169
     },
     {
       "id": "packaging",
       "q": "포장",
-      "findings": 1826,
-      "documents": 1443
+      "findings": 1832,
+      "documents": 1449
     },
     {
       "id": "manufacturer",
       "q": "Manufacturer",
-      "findings": 152,
-      "documents": 141
+      "findings": 154,
+      "documents": 142
     },
     {
       "id": "marketing-authorization",
@@ -136,8 +136,8 @@
     {
       "id": "quarantine",
       "q": "Quarantine",
-      "findings": 106,
-      "documents": 101,
+      "findings": 107,
+      "documents": 102,
       "note": "'격리' 86건 중 49%가 containment(물리적 구획) 번역 — 영문으로 교체"
     },
     {
@@ -155,14 +155,14 @@
     {
       "id": "recall",
       "q": "Recall",
-      "findings": 535,
-      "documents": 524
+      "findings": 537,
+      "documents": 526
     },
     {
       "id": "expiry-date",
       "q": "Expiration Date",
-      "findings": 231,
-      "documents": 221
+      "findings": 232,
+      "documents": 222
     },
     {
       "id": "retest-date",
@@ -179,26 +179,26 @@
     {
       "id": "specification",
       "q": "Specification",
-      "findings": 2261,
-      "documents": 1588
+      "findings": 2270,
+      "documents": 1594
     },
     {
       "id": "quality-assurance",
       "q": "Quality Assurance",
-      "findings": 85,
-      "documents": 82
+      "findings": 86,
+      "documents": 83
     },
     {
       "id": "quality-control",
       "q": "품질관리",
-      "findings": 1504,
-      "documents": 1252
+      "findings": 1509,
+      "documents": 1257
     },
     {
       "id": "quality-unit",
       "q": "품질부서",
-      "findings": 319,
-      "documents": 302
+      "findings": 323,
+      "documents": 304
     },
     {
       "id": "pharmaceutical-quality-system",
@@ -233,14 +233,14 @@
     {
       "id": "risk",
       "q": "위험",
-      "findings": 723,
-      "documents": 656
+      "findings": 729,
+      "documents": 660
     },
     {
       "id": "hazard",
       "q": "Hazard",
-      "findings": 150,
-      "documents": 141
+      "findings": 151,
+      "documents": 142
     },
     {
       "id": "risk-analysis",
@@ -257,8 +257,8 @@
     {
       "id": "risk-assessment",
       "q": "Risk Assessment",
-      "findings": 62,
-      "documents": 53
+      "findings": 65,
+      "documents": 54
     },
     {
       "id": "risk-reduction",
@@ -275,40 +275,40 @@
     {
       "id": "capa",
       "q": "CAPA",
-      "findings": 185,
-      "documents": 156
+      "findings": 187,
+      "documents": 157
     },
     {
       "id": "corrective-action",
       "q": "Corrective Action",
-      "findings": 476,
-      "documents": 415
+      "findings": 481,
+      "documents": 419
     },
     {
       "id": "preventive-action",
       "q": "Preventive Action",
-      "findings": 167,
-      "documents": 161
+      "findings": 168,
+      "documents": 162
     },
     {
       "id": "root-cause-analysis",
       "q": "root cause",
-      "findings": 110,
-      "documents": 106,
+      "findings": 112,
+      "documents": 108,
       "note": "'RCA' 7건 전부 무관(lorcaserin·Onchocerca 등) — 규제 원문은 'root cause'로 풀어 씀"
     },
     {
       "id": "deviation",
       "q": "Deviation",
-      "findings": 961,
-      "documents": 907,
+      "findings": 966,
+      "documents": 912,
       "note": "'일탈' 1,004건 중 79%가 본문 없이 카테고리 태그로만 매칭 — 영문으로 교체"
     },
     {
       "id": "change-control",
       "q": "변경관리",
-      "findings": 544,
-      "documents": 538
+      "findings": 547,
+      "documents": 541
     },
     {
       "id": "change-management",
@@ -349,20 +349,20 @@
     {
       "id": "sop",
       "q": "written procedure",
-      "findings": 1170,
-      "documents": 906
+      "findings": 1177,
+      "documents": 911
     },
     {
       "id": "record",
       "q": "기록",
-      "findings": 3331,
-      "documents": 2277
+      "findings": 3343,
+      "documents": 2286
     },
     {
       "id": "raw-data",
       "q": "원자료",
-      "findings": 30,
-      "documents": 28
+      "findings": 31,
+      "documents": 29
     },
     {
       "id": "electronic-record",
@@ -373,8 +373,8 @@
     {
       "id": "data-integrity",
       "q": "데이터 완전성",
-      "findings": 77,
-      "documents": 74
+      "findings": 78,
+      "documents": 75
     },
     {
       "id": "alcoa-plus",
@@ -385,20 +385,20 @@
     {
       "id": "audit-trail",
       "q": "Audit Trail",
-      "findings": 36,
-      "documents": 33
+      "findings": 37,
+      "documents": 34
     },
     {
       "id": "computerised-system",
       "q": "computerized system",
-      "findings": 536,
-      "documents": 505
+      "findings": 539,
+      "documents": 508
     },
     {
       "id": "validation",
       "q": "Validation",
-      "findings": 1266,
-      "documents": 1085
+      "findings": 1273,
+      "documents": 1092
     },
     {
       "id": "validation-protocol",
@@ -415,8 +415,8 @@
     {
       "id": "qualification",
       "q": "Qualification",
-      "findings": 730,
-      "documents": 655
+      "findings": 733,
+      "documents": 658
     },
     {
       "id": "installation-qualification",
@@ -439,8 +439,8 @@
     {
       "id": "process-validation",
       "q": "Process Validation",
-      "findings": 118,
-      "documents": 114
+      "findings": 119,
+      "documents": 115
     },
     {
       "id": "revalidation",
@@ -463,8 +463,8 @@
     {
       "id": "calibration",
       "q": "교정",
-      "findings": 663,
-      "documents": 637
+      "findings": 666,
+      "documents": 640
     },
     {
       "id": "worst-case",
@@ -475,14 +475,14 @@
     {
       "id": "analytical-procedure",
       "q": "test method",
-      "findings": 303,
-      "documents": 292
+      "findings": 304,
+      "documents": 293
     },
     {
       "id": "accuracy",
       "q": "Accuracy",
-      "findings": 466,
-      "documents": 433
+      "findings": 467,
+      "documents": 434
     },
     {
       "id": "precision",
@@ -523,14 +523,14 @@
     {
       "id": "identification-test",
       "q": "확인시험",
-      "findings": 383,
-      "documents": 340
+      "findings": 392,
+      "documents": 345
     },
     {
       "id": "impurity",
       "q": "불순물",
-      "findings": 230,
-      "documents": 227
+      "findings": 231,
+      "documents": 228
     },
     {
       "id": "impurity-profile",
@@ -547,27 +547,27 @@
     {
       "id": "oos",
       "q": "Out-of-Specification",
-      "findings": 367,
-      "documents": 356,
+      "findings": 368,
+      "documents": 357,
       "note": "'OOS' 203건 중 44%가 bOOSt·lOOSe·tattOOS 등 — 전체 표기로 교체"
     },
     {
       "id": "oot",
       "q": "Out-of-Trend",
-      "findings": 31,
-      "documents": 30
+      "findings": 32,
+      "documents": 31
     },
     {
       "id": "stability-testing",
       "q": "Stability Testing",
-      "findings": 236,
-      "documents": 227
+      "findings": 238,
+      "documents": 228
     },
     {
       "id": "cleanroom",
       "q": "Cleanroom",
-      "findings": 148,
-      "documents": 112
+      "findings": 150,
+      "documents": 114
     },
     {
       "id": "cleanroom-classification",
@@ -602,20 +602,20 @@
     {
       "id": "aseptic-processing",
       "q": "Aseptic Processing",
-      "findings": 1534,
-      "documents": 851
+      "findings": 1540,
+      "documents": 855
     },
     {
       "id": "aseptic-process-simulation",
       "q": "Media Fill",
-      "findings": 178,
-      "documents": 158
+      "findings": 180,
+      "documents": 159
     },
     {
       "id": "environmental-monitoring",
       "q": "Environmental Monitoring",
-      "findings": 139,
-      "documents": 123
+      "findings": 141,
+      "documents": 125
     },
     {
       "id": "alert-limit",
@@ -632,8 +632,8 @@
     {
       "id": "hepa-filter",
       "q": "HEPA",
-      "findings": 164,
-      "documents": 146
+      "findings": 165,
+      "documents": 147
     },
     {
       "id": "isolator",
@@ -656,8 +656,8 @@
     {
       "id": "sterilization",
       "q": "멸균",
-      "findings": 672,
-      "documents": 552
+      "findings": 676,
+      "documents": 556
     },
     {
       "id": "sterility",
@@ -674,8 +674,8 @@
     {
       "id": "sterility-test",
       "q": "무균시험",
-      "findings": 85,
-      "documents": 71
+      "findings": 87,
+      "documents": 72
     },
     {
       "id": "contamination-control-strategy",
@@ -686,14 +686,14 @@
     {
       "id": "contamination",
       "q": "오염",
-      "findings": 2767,
-      "documents": 1788
+      "findings": 2783,
+      "documents": 1798
     },
     {
       "id": "cross-contamination",
       "q": "교차오염",
-      "findings": 233,
-      "documents": 221
+      "findings": 235,
+      "documents": 223
     },
     {
       "id": "depyrogenation",
@@ -710,8 +710,8 @@
     {
       "id": "disinfection",
       "q": "소독",
-      "findings": 887,
-      "documents": 758
+      "findings": 888,
+      "documents": 759
     },
     {
       "id": "line-clearance",
@@ -746,26 +746,26 @@
     {
       "id": "first-air",
       "q": "First Air",
-      "findings": 30,
-      "documents": 24
+      "findings": 31,
+      "documents": 25
     },
     {
       "id": "critical-zone",
       "q": "critical area",
-      "findings": 50,
-      "documents": 43
+      "findings": 51,
+      "documents": 44
     },
     {
       "id": "unidirectional-airflow",
       "q": "Unidirectional Airflow",
-      "findings": 58,
-      "documents": 49
+      "findings": 59,
+      "documents": 50
     },
     {
       "id": "airflow-visualization-study",
       "q": "smoke study",
-      "findings": 58,
-      "documents": 53
+      "findings": 60,
+      "documents": 54
     },
     {
       "id": "critical-intervention",
@@ -776,8 +776,8 @@
     {
       "id": "personnel-monitoring",
       "q": "Personnel Monitoring",
-      "findings": 27,
-      "documents": 25
+      "findings": 28,
+      "documents": 26
     },
     {
       "id": "non-viable-particle-monitoring",
@@ -916,8 +916,8 @@
     {
       "id": "harm",
       "q": "위해성",
-      "findings": 38,
-      "documents": 35,
+      "findings": 39,
+      "documents": 36,
       "note": "'위해' 1,980건 대부분이 '~하기 위해'라는 문법 표현 — 명사형으로 교체"
     },
     {
@@ -929,26 +929,26 @@
     {
       "id": "written-procedure",
       "q": "written procedure",
-      "findings": 1170,
-      "documents": 906
+      "findings": 1177,
+      "documents": 911
     },
     {
       "id": "quality-control-unit",
       "q": "quality control unit",
-      "findings": 1156,
-      "documents": 980
+      "findings": 1161,
+      "documents": 985
     },
     {
       "id": "laboratory-controls",
       "q": "laboratory controls",
-      "findings": 317,
-      "documents": 313
+      "findings": 320,
+      "documents": 316
     },
     {
       "id": "sampling-plan",
       "q": "sampling plan",
-      "findings": 200,
-      "documents": 197
+      "findings": 202,
+      "documents": 199
     },
     {
       "id": "adverse-event",
@@ -978,8 +978,8 @@
     {
       "id": "visual-inspection",
       "q": "visual inspection",
-      "findings": 86,
-      "documents": 78
+      "findings": 87,
+      "documents": 79
     },
     {
       "id": "field-alert",
@@ -996,8 +996,8 @@
     {
       "id": "quality-agreement",
       "q": "quality agreement",
-      "findings": 445,
-      "documents": 442
+      "findings": 446,
+      "documents": 443
     },
     {
       "id": "business-operator-recall",
@@ -1015,8 +1015,8 @@
     {
       "id": "shelf-life",
       "q": "shelf life",
-      "findings": 26,
-      "documents": 26
+      "findings": 27,
+      "documents": 27
     },
     {
       "id": "preventive-maintenance",
@@ -1091,8 +1091,8 @@
     {
       "id": "pest-control",
       "q": "해충",
-      "findings": 85,
-      "documents": 78
+      "findings": 86,
+      "documents": 79
     },
     {
       "id": "master-production-record",
@@ -1115,8 +1115,8 @@
     {
       "id": "mix-up",
       "q": "mix-up",
-      "findings": 194,
-      "documents": 190
+      "findings": 196,
+      "documents": 192
     },
     {
       "id": "training",
@@ -1127,8 +1127,8 @@
     {
       "id": "certificate-of-analysis",
       "q": "시험성적서",
-      "findings": 144,
-      "documents": 139
+      "findings": 145,
+      "documents": 140
     },
     {
       "id": "returned-product",

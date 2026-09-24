@@ -85,6 +85,12 @@ def _cache_status_text(*, rows: int = 194, fresh: int = 194, hot_age_s: int = 30
                        "max_computed_ms": 900, "table_bytes": table_bytes})
 
 
+def _similar_status_text(*, target: int = 2192, fresh: int = 2192) -> str:
+    """[092] findings_similar_cache_status() 응답 모양 — 단일 객체."""
+    return json.dumps({"target": target, "fresh_target": fresh, "rows": fresh,
+                       "oldest_age_s": 3600, "max_computed_ms": 2500, "table_bytes": 6_000_000})
+
+
 def _ok_post_map(*, supabase: str = SUPABASE) -> dict[str, FakeResponse]:
     return {
         f"{supabase}/rest/v1/rpc/fda_inspection_stats": FakeResponse(200, elapsed_s=0.2),
@@ -95,6 +101,8 @@ def _ok_post_map(*, supabase: str = SUPABASE) -> dict[str, FakeResponse]:
         f"{supabase}/rest/v1/rpc/findings_search": FakeResponse(200, elapsed_s=0.3),
         f"{supabase}/rest/v1/rpc/findings_search_cache_status": FakeResponse(
             200, text=_cache_status_text(), elapsed_s=0.1),
+        f"{supabase}/rest/v1/rpc/findings_similar_cache_status": FakeResponse(
+            200, text=_similar_status_text(), elapsed_s=0.1),
     }
 
 
@@ -216,6 +224,55 @@ class FindingsSearchCacheFreshnessTest(unittest.TestCase):
         search_rows = [c for c in report["checks"] if c["name"].startswith("RPC findings_search(")]
         self.assertEqual(len(search_rows), 1)
         self.assertEqual(search_rows[0]["status"], "ok")
+        self.assertEqual(report["overall"], "fail")
+
+
+class FindingsSimilarCacheFreshnessTest(unittest.TestCase):
+    """[092] 유사 사례 캐시 — 판정은 행 수가 아니라 대상 중 신선한 비율(90% warn · 50% fail).
+
+    뮤테이션: 검사가 rows 를 보면 test_rows_present_but_stale_is_fail 이, 대상 0 을 통과시키면
+    test_zero_target_is_fail 이 초록으로 돌아선다.
+    """
+
+    def _run(self, resp: FakeResponse):
+        with mock.patch("site_probe.requests.post", return_value=resp):
+            return site_probe.check_findings_similar_cache_fresh("sim", SUPABASE, "anon-key", 5.0)
+
+    def test_full_coverage_is_ok(self):
+        r = self._run(FakeResponse(200, text=_similar_status_text()))
+        self.assertEqual(r.status, "ok")
+        self.assertIn("100%", r.detail)
+
+    def test_lagging_is_warn(self):
+        r = self._run(FakeResponse(200, text=_similar_status_text(fresh=1800)))
+        self.assertEqual(r.status, "warn")
+
+    def test_rows_present_but_stale_is_fail(self):
+        r = self._run(FakeResponse(200, text=_similar_status_text(fresh=500)))
+        self.assertEqual(r.status, "fail")
+        self.assertIn("정지 의심", r.detail)
+
+    def test_zero_target_is_fail(self):
+        r = self._run(FakeResponse(200, text=_similar_status_text(target=0, fresh=0)))
+        self.assertEqual(r.status, "fail")
+
+    def test_http_error_is_fail(self):
+        r = self._run(FakeResponse(404, text='{"message":"function not found"}'))
+        self.assertEqual(r.status, "fail")
+
+    def test_run_probe_includes_similar_cache_check(self):
+        today = dt.date(2026, 3, 10)
+        post_map = _ok_post_map()
+        post_map[f"{SUPABASE}/rest/v1/rpc/findings_similar_cache_status"] = FakeResponse(
+            200, text=_similar_status_text(fresh=100))
+        with mock.patch("site_probe.requests.get", side_effect=_dispatch(_ok_get_map(today))), \
+             mock.patch("site_probe.requests.post", side_effect=_dispatch(post_map)):
+            report = site_probe.run_probe(
+                base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
+                today=today, timeout=5.0)
+        rows = [c for c in report["checks"] if c["name"].startswith("RPC 유사 사례 캐시 신선도")]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["status"], "fail")
         self.assertEqual(report["overall"], "fail")
 
 

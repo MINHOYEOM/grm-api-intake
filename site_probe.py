@@ -99,6 +99,12 @@ CACHE_MIN_FRESH_ROWS = 150
 CACHE_HOT_WARN_AGE_S = 45 * 60
 CACHE_HOT_FAIL_AGE_S = 3 * 60 * 60
 
+# [092] 유사 사례 캐시(findings_similar_cache_status). 대상 = 086 검색 캐시에 실린 지적(약 2,200건).
+# 20분마다 20초 예산으로 3일 주기 갱신 — 정상이면 대상 거의 전부가 8일 안에 계산돼 있다.
+# 90% 아래는 갱신이 밀리는 중(warn), 50% 아래는 cron 사망·092 미적용(fail).
+SIMILAR_WARN_RATIO = 0.9
+SIMILAR_FAIL_RATIO = 0.5
+
 
 @dataclass
 class CheckResult:
@@ -338,6 +344,51 @@ def check_findings_search_cache_fresh(name: str, base_url_norm: str | None, anon
     return CheckResult(name, "ok", elapsed, detail)
 
 
+def check_findings_similar_cache_fresh(name: str, base_url_norm: str | None, anon_key: str,
+                                       timeout: float, *,
+                                       warn_ratio: float = SIMILAR_WARN_RATIO,
+                                       fail_ratio: float = SIMILAR_FAIL_RATIO) -> CheckResult:
+    """[092] `findings_similar_cache_status()` — 유사 사례 캐시가 대상을 덮고 있는지 본다.
+
+    캐시는 폴백이 있어 비어도 버튼은 느려질 뿐이다 — 그래서 이 검사가 없으면 cron 사망을 모른다.
+    판정은 행 수가 아니라 **대상 중 신선한 비율**이다(행은 남아 있어도 낡을 수 있다).
+    """
+    if base_url_norm is None:
+        return CheckResult(name, "fail", 0.0, "SUPABASE_URL 미설정 또는 https:// 형식 아님")
+    if not anon_key:
+        return CheckResult(name, "fail", 0.0, "SUPABASE_ANON_KEY 미설정")
+    url = f"{base_url_norm}/rest/v1/rpc/findings_similar_cache_status"
+    headers = {
+        "apikey": anon_key,
+        "Authorization": f"Bearer {anon_key}",
+        "Content-Type": "application/json",
+    }
+    resp, err = _post(url, headers, {}, timeout)
+    if err is not None:
+        return CheckResult(name, "fail", 0.0, f"요청 실패: {err}")
+    elapsed = _resp_elapsed(resp)
+    if resp.status_code != 200:
+        return CheckResult(name, "fail", elapsed, f"HTTP {resp.status_code}")
+    try:
+        st = json.loads(resp.text)
+    except (TypeError, ValueError):
+        return CheckResult(name, "fail", elapsed, "응답이 JSON 이 아님")
+    if not isinstance(st, dict):
+        return CheckResult(name, "fail", elapsed, "응답이 객체가 아님")
+    target = int(st.get("target") or 0)
+    fresh = int(st.get("fresh_target") or 0)
+    table_mb = int(st.get("table_bytes") or 0) / 1_000_000
+    if target <= 0:
+        return CheckResult(name, "fail", elapsed, "대상 0 — 086 검색 캐시가 비었거나 092 미적용")
+    ratio = fresh / target
+    detail = f"대상 {target} · 신선 {fresh} ({ratio:.0%}) · {table_mb:.1f} MB"
+    if ratio < fail_ratio:
+        return CheckResult(name, "fail", elapsed, f"{detail} < {fail_ratio:.0%}(갱신 정지 의심)")
+    if ratio < warn_ratio:
+        return CheckResult(name, "warn", elapsed, f"{detail} < {warn_ratio:.0%}(갱신 밀림)")
+    return CheckResult(name, "ok", elapsed, detail)
+
+
 def _overall_status(checks: list[CheckResult]) -> str:
     if any(c.status == "fail" for c in checks):
         return "fail"
@@ -408,6 +459,10 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
         "RPC findings_search(기본 목록)", base_norm, anon_key, "findings_search", {}, timeout))
     checks.append(check_findings_search_cache_fresh(
         "RPC 검색 캐시 신선도(findings_search_cache_status)", base_norm, anon_key, timeout))
+
+    # 6) [092] 유사 사례 캐시 — 대상 중 신선한 비율
+    checks.append(check_findings_similar_cache_fresh(
+        "RPC 유사 사례 캐시 신선도(findings_similar_cache_status)", base_norm, anon_key, timeout))
 
     return {
         "schema_version": SCHEMA_VERSION,

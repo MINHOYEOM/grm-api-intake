@@ -311,6 +311,11 @@ class ExistingKeys(NamedTuple):
     url_keys: set[str]  # "{source}::{정규화 official_url}"
 
 
+# dedup 조회의 페이지당 시도 수(첫 시도 + 재시도 3회). 네트워크 오류 대기는 2·4·8초라
+# 매번 30초 timeout 이 나도 페이지당 최악 약 2분 — job 상한(35분) 안이다.
+_DEDUP_ATTEMPTS = 4
+
+
 def notion_query_existing_doc_ids(token: str, db_id: str, run_date: date,
                                   window_days: int = 7,
                                   source_names: set[str] | None = None) -> set[str]:
@@ -367,17 +372,35 @@ def notion_query_existing_keys(token: str, db_id: str, run_date: date,
             elif "start_cursor" in body:
                 del body["start_cursor"]
             data: dict[str, Any] | None = None
-            for attempt in range(3):
-                resp = requests.post(url, json=body, headers=notion_headers(token), timeout=30)
-                if resp.status_code == 429 and attempt < 2:
-                    sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
-                    log("WARN", f"Notion dedupe 429 rate-limit — {sleep_s}s 후 재시도 "
-                                f"({attempt + 1}/3)")
+            for attempt in range(_DEDUP_ATTEMPTS):
+                last = attempt == _DEDUP_ATTEMPTS - 1
+                try:
+                    resp = requests.post(url, json=body, headers=notion_headers(token),
+                                         timeout=30)
+                except requests.RequestException as e:
+                    # ★[2026-09-27] 네트워크 예외도 재시도한다. 종전 루프는 **응답이 온 경우**
+                    #   (429·5xx)만 재시도해서, ReadTimeout·ConnectionError 는 첫 시도에서 곧장
+                    #   아래 except 로 빠져 insert 전면 중단이 됐다 — run 36272185568: 평소 2~4초
+                    #   걸리는 첫 페이지가 30초 무응답 1회 → 그날 적재 0건·handoff 미생성.
+                    #   이 조회는 읽기라 되풀이해도 부작용이 없다(timeout 을 재시도하지 않는
+                    #   `notion_create_page` 는 쓰기라서 중복 row 가 생길 수 있는 경우다).
+                    #   다 쓰면 종전대로 예외 — 불완전한 dedup 으로 insert 하지 않는다.
+                    if last:
+                        raise
+                    sleep_s = 2 ** (attempt + 1)
+                    log("WARN", f"Notion dedupe 네트워크 오류 — {sleep_s}s 후 재시도 "
+                                f"({attempt + 1}/{_DEDUP_ATTEMPTS}) page={page_count} err={e}")
                     time.sleep(sleep_s)
                     continue
-                if resp.status_code >= 500 and attempt < 2:
+                if resp.status_code == 429 and not last:
+                    sleep_s = retry_after_seconds(resp, attempt, max_sleep=30)
+                    log("WARN", f"Notion dedupe 429 rate-limit — {sleep_s}s 후 재시도 "
+                                f"({attempt + 1}/{_DEDUP_ATTEMPTS})")
+                    time.sleep(sleep_s)
+                    continue
+                if resp.status_code >= 500 and not last:
                     log("WARN", f"Notion dedupe 조회 실패 ({resp.status_code}) "
-                                f"attempt={attempt + 1}/3 body={resp.text[:200]}")
+                                f"attempt={attempt + 1}/{_DEDUP_ATTEMPTS} body={resp.text[:200]}")
                     time.sleep(2 ** attempt)
                     continue
                 resp.raise_for_status()

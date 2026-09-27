@@ -3207,6 +3207,43 @@ def _health_payload(
     }
 
 
+def _dedupe_abort_health_payload(
+    *,
+    error: Exception,
+    stats: CollectionStats,
+    run_date: date,
+    start: date,
+    end: date,
+    event_name: str,
+    dry_run: bool,
+    requested_sources: list[str],
+    active: set[str],
+) -> dict[str, Any]:
+    """중복 조회 실패로 insert 전에 멈출 때 쓰는 health JSON.
+
+    ★[2026-09-27] 이 경로는 health JSON 을 쓰기 전에 `return 1` 했다. 그래서 실패 이슈
+      #1084 에는 "Health status: unavailable · health JSON 없음"만 찍혀 원인이 없었고,
+      실행일도 UTC 날짜 폴백(09-26)으로 적혔다(실제 KST 실행일은 09-27). 판정은 그대로
+      failure(exit 1) — 불완전한 dedup 으로 insert 하지 않는 설계는 두고, 왜 멈췄는지와
+      어떻게 되살리는지만 이슈까지 보낸다. 수집 결과(sources)는 이미 나와 있으니 함께 싣는다.
+    """
+    health = HealthCheckResult()
+    health.add_failure(
+        "notion-dedupe-query-failed", "Notion",
+        "Notion 중복 조회 실패 — 중복 삽입을 막으려고 적재 전에 중단(이날 수집분 미적재·"
+        "handoff 미생성). 일시 장애면 실패 job 재실행으로 복구(KST 같은 날이면 그날 "
+        "handoff 까지 복구, 넘기면 다음 정기 실행이 수집 윈도우로 되받는다)",
+        str(error),
+    )
+    health.finalize()
+    return _health_payload(
+        health=health, stats=stats, run_date=run_date, start=start, end=end,
+        event_name=event_name, dry_run=dry_run, requested_sources=requested_sources,
+        active=active, flags={}, handoff_emitted=False, handoff_failed=False,
+        handoff_row_count=0, handoff_url="", handoff_error_msg="",
+    )
+
+
 def _fda483_prefetch_enabled(cfg: RunConfig, dry_run: bool) -> bool:
     """483 기보유 사전조회를 돌릴지 — **수집 게이트와 반드시 같은 조건**이어야 한다.
 
@@ -4083,6 +4120,10 @@ def main() -> int:
         except NotionDedupeQueryError as e:
             # 중복 조회 실패 시 빈 set으로 진행하면 대량 중복 insert 위험 → 중단
             log("ERROR", f"중복 조회 실패 — duplicate insert 방지를 위해 insert 단계 중단: {e}")
+            _write_health_json(health_json_path, _dedupe_abort_health_payload(
+                error=e, stats=stats, run_date=run_date, start=start, end=end,
+                event_name=event_name, dry_run=args.dry_run,
+                requested_sources=list(requested_sources), active=active))
             return 1
         snapshot_active = ({SOURCE_ICH} if enable_ich else set()) | ({SOURCE_WHO} if enable_who else set())
         if snapshot_active:
@@ -4096,6 +4137,10 @@ def main() -> int:
                             f"(최근 {_SNAPSHOT_DEDUP_WINDOW_DAYS}일)")
             except NotionDedupeQueryError as e:
                 log("ERROR", f"snapshot dedup 조회 실패 — 중복 삽입 방지를 위해 중단: {e}")
+                _write_health_json(health_json_path, _dedupe_abort_health_payload(
+                    error=e, stats=stats, run_date=run_date, start=start, end=end,
+                    event_name=event_name, dry_run=args.dry_run,
+                    requested_sources=list(requested_sources), active=active))
                 return 1
 
     collected_at = now_k

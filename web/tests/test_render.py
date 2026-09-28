@@ -14722,8 +14722,9 @@ class WebAboutTest(unittest.TestCase):
         self.assertNotIn('id="grm-pet"', self.en_html)
         self.assertIn('id="grm-pet"', self.landing)          # 다른 면에서는 그대로
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
-        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' %}",
-                      base)
+        # [2026-09-28] 구독 확인 도착 페이지(/welcome/)도 밴드를 접는다(hide_subscribe) — about 조건은 그대로.
+        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about'"
+                      " and not hide_subscribe %}", base)
         self.assertIn("{% if nav_active != 'about' %}\n<div class=\"grm-pet\"", base)
 
     def test_hero_offers_the_next_step(self):

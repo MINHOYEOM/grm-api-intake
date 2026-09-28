@@ -1,0 +1,18 @@
+{#- 용어 그림 · stability-testing — 정의("시간 등에 따른 품질 변화를 평가해 재시험기간·유효기간을 정하는 시험")를
+    시간축 위 품질 곡선·측정 시점(점)·규격선, 그리고 규격선에 닿기까지의 구간(유효기간)으로 옮긴다.
+    2026-09-28: 09-08 초안의 교점 라벨 "유효기한"(날짜)을 정의대로 "유효기간"(구간)으로 바꾸고 측정점을 더했다.
+    같은 그림이 링크드인 카드뉴스 '이번 주 용어' 장에도 쓰인다(linkedin_cards.MINI_SVG) — 한쪽만 고치면
+    다른 쪽이 문서 아이콘으로 되돌아간다(2026-09-28, 09-08 배치1 착륙). -#}
+<svg class="gt-fig-svg" viewBox="0 0 176 88" role="img" aria-label="{{ _('시간에 따른 품질 변화로 유효기간을 정하는 곡선') }}">
+  <path d="M14 14v54h148" style="fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"/>
+  <line x1="14" y1="48" x2="162" y2="48" style="stroke:var(--coral-2);stroke-width:1.6;stroke-dasharray:5 4"/>
+  <path d="M14 24C60 26 100 34 140 60" style="fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round"/>
+  <circle cx="34" cy="25.3" r="2.6" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.4"/><circle cx="58" cy="28.4" r="2.6" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.4"/><circle cx="82" cy="33.7" r="2.6" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.4"/><circle cx="104" cy="41.2" r="2.6" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.4"/>
+  <line x1="119.1" y1="48" x2="119.1" y2="68" style="stroke:var(--coral-2);stroke-width:1.4;stroke-dasharray:3 3"/>
+  <circle cx="119.1" cy="48" r="4.5" style="fill:var(--coral-2)"/>
+  <path d="M16 73H117.1M20 70l-4 3 4 3M113.1 70l4 3-4 3" style="fill:none;stroke:var(--coral);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"/>
+  <text x="18" y="12" style="font-size:9px;fill:var(--muted)">{{ _('품질') }}</text>
+  <text x="162" y="63" text-anchor="end" style="font-size:9px;fill:var(--muted)">{{ _('시간') }}</text>
+  <text x="18" y="44" style="font-size:9px;fill:var(--muted)">{{ _('규격') }}</text>
+  <text x="67.5" y="85" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--coral-2)">{{ _('유효기간') }}</text>
+</svg>

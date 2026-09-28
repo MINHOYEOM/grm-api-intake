@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.262` |
+| 문서 버전 | `v1.263` |
 | 최종 수정일 | 2026-09-23 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -193,6 +193,7 @@ flowchart TD
 | 보조 | 델타 부재 감지 → **브릿지 자가 기동 후 재확인**, 복구 실패 시에만 경보 | `grm-publish-watchdog.yml` | cron 월 09:13·11:13·13:13 KST | 없음 |
 | 보조 | 발행 준비 검증+가속(클라우드 산출 확인·부재 시만 백필) | 로컬 태스크 `grm-monday-brief-publish` | 월 09:05 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | 주간 퀴즈 자동 출제(그 주 브리프 2 + 용어사전 개념 1~2 생성→quiz_lint→PR→CI 머지, 미라이브 시 스킵) | 로컬 태스크 `grm-monday-quiz-gen` | 월 13:00 KST(데스크톱 ON 전제) | 없음 |
+| 보조 | **주간 용어 추가**(최근 4호 브리프가 스스로 병기한 짝 중 사전에 없는 말 → `glossary_candidates.py` 후보 → 세션이 **공식 문서에 정의가 있는 것만** 0~5개 작성 + 사례 결정 → `glossary_lint`·용어 테스트·골든 재동결 → PR → CI 머지. 좋은 후보가 없는 주는 0개가 정상 — 사이트에 '매주 추가'를 약속하지 않는다. 다음 배포에서 용어집 PDF 도 새 판) | 로컬 태스크 `grm-glossary-weekly` · 규율 `docs/prompts/GRM_주간용어추가_프롬프트_v1.md` | 화 10:17 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | **주간 퀴즈 미생성 감시**(로컬 태스크의 침묵을 클라우드에서 본다 — 이번 주 세트 부재 시 `quiz-freshness` 이슈, 생기면 자동 종료) | `grm-quiz-freshness.yml` | cron 화 13:10 KST | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
 | 보조 | **뉴스레터 발송 누락 감시**(발행 PR 머지 뒤 Admin 발송이 빠진 주를 Brevo 캠페인 상태로 탐지 — dispatch_log 는 진실이 아니다) | `grm-newsletter-freshness.yml` | cron 월 20:13 · 화 09:13 KST + dispatch | 없음 |
@@ -550,6 +551,7 @@ grm-api-intake/
 ├─ library_updates.py              # 자료실 변경 이력 누적(id·개수만 · 같은 날 합집합 멱등 · 52주 보관)
 ├─ library_linkcheck.py            # 자료실 전 링크 실검증(HTTP) → web/data/library_health.json
 ├─ library_brief_reconcile.py      # 발행 브리프 ↔ 자료실 카탈로그 대조(수록 대상 보드는 수집기×MFDS_TYPES 에서 유도)
+├─ glossary_candidates.py         # [마케팅 2026-09-28] 주간 용어 추가 후보 — 최근 브리프의 괄호 병기 짝 중 사전에 없는 말(후보만, 정의는 세션이 공식 출처로)
 ├─ glossary_cases_refresh.py       # [트랙 C] 용어사전 사례연결 건수 주간 재측정(findings_search RPC · q/excluded 무변형 · 0건은 종전 값 유지 · 20% 실패 시 중단)
 ├─ findings_facets_refresh.py      # [검색 유입] 분류·국가·기관 모음 페이지 정본 재측정(findings_search RPC · anon=공개 RLS · 표본 미달 제외·모르는 기관 코드는 실패)
 ├─ findings_docs_refresh.py        # [검색 유입] 문서 단위 페이지 정본 재측정(지적 3건 이상 · 발행일/원문링크 필수 · 본문 무절단 · 문서 id 정렬로 작은 diff)
@@ -581,6 +583,7 @@ grm-api-intake/
 │  ├─ specs/GRM_인기카드_구르미위젯_설계조사_2026-07-18.md   # 인기 카드 랭킹·구르미 위젯 설계 조사(위젯=라이브, 인기카드=RPC 적용 완료·웹 통합 대기)
 │  ├─ specs/GRM_031_적용검증계획_2026-07-18.md             # 031 RPC 적용 전 검증 절차·롤백(2026-07-18 적용 완료)
 │  ├─ specs/GRM_퀴즈_운영설계_addendum_week회전_성장시스템_2026-07-18.md  # week 회전·성장 시스템 운영 규칙
+│  ├─ prompts/GRM_주간용어추가_프롬프트_v1.md              # 화 10:17 예약 용어 추가 세션 정본 규율
 │  ├─ prompts/GRM_주간퀴즈생성_프롬프트_v1.md              # 월 13:00 예약 퀴즈 생성 세션 정본 규율
 │  └─ copilot/  (grm_findings_connector.swagger.json, COPILOT_SETUP_GUIDE.md, QA_SCENARIOS.md)  # [FIND-1 F4a]
 └─ .github/workflows/

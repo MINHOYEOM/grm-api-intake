@@ -103,6 +103,29 @@ class GlossaryPdfHelpersTest(unittest.TestCase):
         self.assertTrue(render.GLOSSARY_PDF_PATH.endswith(".pdf"))
 
 
+class GlossaryPdfCoverPngTest(unittest.TestCase):
+    def test_cover_png_is_first_page_at_requested_width(self):
+        import fitz
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grm_gcover_"))
+        try:
+            pdf = tmp / "a.pdf"
+            with fitz.open() as doc:
+                doc.new_page(width=595, height=842)     # A4 pt
+                doc.new_page(width=595, height=842)
+                doc.save(pdf)
+            png = tmp / "cover.png"
+            glossary_pdf.write_cover_png(pdf, png, width_px=360)
+            pix = fitz.Pixmap(str(png))
+            self.assertEqual(pix.width, 360)
+            self.assertAlmostEqual(pix.height, 360 * 842 / 595, delta=1)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    def test_cover_path_is_next_to_the_pdf(self):
+        self.assertEqual(pathlib.PurePosixPath(render.GLOSSARY_PDF_COVER_PATH).parent,
+                         pathlib.PurePosixPath(render.GLOSSARY_PDF_PATH).parent)
+
+
 class GlossaryPdfCliTest(unittest.TestCase):
     def test_without_chrome_writes_html_at_the_shared_path_and_exits_2(self):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grm_gpdf_"))

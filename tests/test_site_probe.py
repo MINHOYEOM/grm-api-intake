@@ -59,6 +59,7 @@ def _ok_get_map(today: dt.date, *, base: str = BASE) -> dict[str, FakeResponse]:
         f"{base}/welcome/": FakeResponse(
             200, text='<a href="../files/grm-gmp-glossary.pdf" download>'),
         f"{base}/files/grm-gmp-glossary.pdf": FakeResponse(200, text="%PDF-1.7"),
+        f"{base}/files/grm-gmp-glossary-cover.png": FakeResponse(200, text="PNG"),
         f"{base}/sitemap.xml": FakeResponse(
             200, text=f"<urlset><url><loc>{base}/briefs/2020-01-01/</loc></url></urlset>"),
         f"{base}/briefs/{date_str}/": FakeResponse(200, text="brief"),
@@ -186,6 +187,7 @@ class GlossaryWelcomeProbeTest(unittest.TestCase):
         report = self._report(_ok_get_map(dt.date(2026, 3, 10)))
         self.assertEqual(self._row(report, "GET /welcome/")["status"], "ok")
         self.assertEqual(self._row(report, "GET 용어집 PDF")["status"], "ok")
+        self.assertEqual(self._row(report, "GET 용어집 표지")["status"], "ok")
 
     def test_missing_pdf_fails(self):
         get_map = _ok_get_map(dt.date(2026, 3, 10))

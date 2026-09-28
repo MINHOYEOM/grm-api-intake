@@ -2,7 +2,7 @@
 """GRM 주간 성장 리포트 — 마케팅 계획 M-04(2026-09-23) — growth_weekly_report(089) JSON →
 한국어 HTML → Brevo 트랜잭션 메일(운영자 1인 전용).
 
-매주 월요일 09:23 KST, 지난주(월~일, KST) 성과 한 페이지를 운영자에게 이메일로 보낸다:
+매주 월요일 09:23 KST(빠지면 11:23·13:23 재시도), 지난주(월~일, KST) 성과 한 페이지를 운영자에게 이메일로 보낸다:
 구독자·방문·구독 신청(채널/구역/경로별)·검색(GSC)·회원·지난주 뉴스레터 발송 여부.
 
 ## 왜 이슈가 아니라 메일인가
@@ -404,6 +404,25 @@ def fetch_payload(supabase_url: str, service_key: str, week_end: "str | None", p
     return r.json()
 
 
+def default_week_end(today_kst: "_datetime.date") -> str:
+    """RPC 기본값과 같은 '직전 일요일' — 089 `today_kst - extract(isodow from today_kst)`.
+    월요일=어제, 일요일=7일 전(그날은 아직 안 끝난 주라서). 순수(날짜를 인자로 받는다)."""
+    return (today_kst - _timedelta(days=today_kst.isoweekday())).isoformat()
+
+
+def already_sent(supabase_url: str, service_key: str, week_end: str) -> bool:
+    """그 주 행이 `growth_weekly_reports` 에 있으면 True — 행은 `p_persist=true`(= send 모드)
+    에서만 생기므로 '이미 발송 시도했다'의 표지다. 실패 시 상태코드만 담아 raise."""
+    import requests
+    url = f"{supabase_url.rstrip('/')}/rest/v1/growth_weekly_reports"
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    r = requests.get(url, params={"select": "week_end", "week_end": f"eq.{week_end}"},
+                     headers=headers, timeout=30)
+    if not (200 <= r.status_code < 300):
+        raise RuntimeError(f"growth_weekly_reports 조회 실패: status={r.status_code}")
+    return bool(r.json())
+
+
 def newsletter_status_for_week(data_dir: Path, week_start: str, week_end: str,
                                api_key: str) -> dict[str, Any]:
     """그 주(월~일)에 발행된 브리프 + 그 호 뉴스레터 캠페인 상태(Brevo 가 진실).
@@ -488,6 +507,8 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--payload", type=Path, default=None, help="RPC 대신 저장된 payload JSON 사용")
     ap.add_argument("--out", type=Path, default=None, help="렌더된 리포트 HTML 저장")
     ap.add_argument("--data", type=Path, default=DATA_DIR, help="브리프 JSON 디렉터리")
+    ap.add_argument("--skip-if-sent", action="store_true",
+                    help="send 모드에서 그 주 행이 이미 있으면 건너뜀(월요일 예약 다회차의 멱등 — 수동 실행엔 안 씀)")
     args = ap.parse_args(argv)
 
     if args.payload is not None:
@@ -498,6 +519,17 @@ def main(argv: "list[str] | None" = None) -> int:
         if not supabase_url or not service_key:
             print("SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 미설정 — RPC 호출 불가", file=sys.stderr)
             return 2
+        if args.skip_if_sent and args.mode == "send":
+            target = args.week_end or default_week_end(_datetime.now(KST).date())
+            try:
+                sent = already_sent(supabase_url, service_key, target)
+            except Exception as exc:
+                # 판정 불가면 보낸다 — 중복 1통이 누락 1주보다 싸다.
+                print(f"발송 이력 조회 실패({type(exc).__name__}) — 그대로 발송", file=sys.stderr)
+                sent = False
+            if sent:
+                print(f"{target} 주는 이미 발송됨 — 이번 예약 회차는 건너뜀")
+                return 0
         try:
             payload = fetch_payload(supabase_url, service_key, args.week_end, args.mode == "send")
         except Exception as exc:

@@ -26,7 +26,12 @@ name: GRM Growth Weekly Report
 #   `p_persist=true` 다.
 on:
   schedule:
-    - cron: '23 0 * * 1'          # 00:23 UTC = 월 09:23 KST
+    # ★2026-09-28 다회차 — 첫 주(09-28) 00:23 UTC 1회 슬롯이 13:25 KST 까지 발화하지 않았다
+    #   (같은 날 다른 예약은 정상 발화 = 그 슬롯만 빠짐. `grm-watchlist-notify.yml` 도 월요일
+    #   5시간 지각이 매주 반복). 뉴스레터(`23 5,6,7 * * 1`)처럼 회차를 3회로 넓히고, 예약 실행은
+    #   `--skip-if-sent`(그 주 `growth_weekly_reports` 행 존재 = 이미 발송)로 중복 메일을 막는다.
+    #   수동 실행(workflow_dispatch)은 이 플래그 없이 늘 보낸다 — 재발송·재현용.
+    - cron: '23 0,2,4 * * 1'      # 00:23 / 02:23 / 04:23 UTC = 월 09:23 / 11:23 / 13:23 KST
   workflow_dispatch:
     inputs:
       week_end:
@@ -82,9 +87,13 @@ jobs:
           # 입력은 env 로 전달(쉘 ${{ }} 직접 보간 금지 — 스크립트 인젝션 회피).
           MODE_INPUT: ${{ inputs.mode }}
           WEEK_END_INPUT: ${{ inputs.week_end }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           MODE="${MODE_INPUT:-send}"
           ARGS="--mode $MODE"
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            ARGS="$ARGS --skip-if-sent"
+          fi
           if [ -n "$WEEK_END_INPUT" ]; then
             ARGS="$ARGS --week-end $WEEK_END_INPUT"
           fi

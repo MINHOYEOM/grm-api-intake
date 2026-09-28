@@ -16,6 +16,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
+from datetime import date
 from unittest import mock
 
 WEB_DIR = pathlib.Path(__file__).resolve().parent.parent          # …/web
@@ -293,14 +294,110 @@ class CliTest(unittest.TestCase):
         self.assertEqual(rc, 3)
 
 
+class DefaultWeekEndTest(unittest.TestCase):
+    """089 `today_kst - extract(isodow from today_kst)` 와 같은 값이어야 멱등 조회가 맞는 행을 본다."""
+
+    def test_monday_is_yesterday(self):
+        self.assertEqual(growth_weekly.default_week_end(date(2026, 9, 28)), "2026-09-27")
+
+    def test_sunday_is_previous_sunday(self):
+        self.assertEqual(growth_weekly.default_week_end(date(2026, 9, 27)), "2026-09-20")
+
+    def test_midweek(self):
+        self.assertEqual(growth_weekly.default_week_end(date(2026, 9, 30)), "2026-09-27")
+
+
+class AlreadySentTest(unittest.TestCase):
+    def test_request_shape_and_true_when_row(self):
+        fake = mock.Mock(status_code=200)
+        fake.json.return_value = [{"week_end": "2026-09-27"}]
+        with mock.patch("requests.get", return_value=fake) as get:
+            self.assertTrue(growth_weekly.already_sent("https://x.supabase.co/", "k", "2026-09-27"))
+        args, kwargs = get.call_args
+        self.assertEqual(args[0], "https://x.supabase.co/rest/v1/growth_weekly_reports")
+        self.assertEqual(kwargs["params"]["week_end"], "eq.2026-09-27")
+
+    def test_false_when_empty(self):
+        fake = mock.Mock(status_code=200)
+        fake.json.return_value = []
+        with mock.patch("requests.get", return_value=fake):
+            self.assertFalse(growth_weekly.already_sent("https://x.supabase.co", "k", "2026-09-27"))
+
+    def test_raises_on_error_status(self):
+        with mock.patch("requests.get", return_value=mock.Mock(status_code=503)):
+            with self.assertRaises(RuntimeError):
+                growth_weekly.already_sent("https://x.supabase.co", "k", "2026-09-27")
+
+
+class SkipIfSentCliTest(unittest.TestCase):
+    def setUp(self):
+        self._env_patch = mock.patch.dict(os.environ, {
+            "SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"}, clear=False)
+        self._env_patch.start()
+
+    def tearDown(self):
+        self._env_patch.stop()
+
+    def _run(self, argv):
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            rc = growth_weekly.main(argv)
+        return rc, out.getvalue(), err.getvalue()
+
+    def test_skips_without_rpc_when_already_sent(self):
+        with (
+            mock.patch.object(growth_weekly, "already_sent", return_value=True) as sent,
+            mock.patch.object(growth_weekly, "fetch_payload") as fetch,
+        ):
+            rc, out, _ = self._run(["--mode", "send", "--skip-if-sent", "--week-end", "2026-09-27"])
+        self.assertEqual(rc, 0)
+        sent.assert_called_once_with("https://x.supabase.co", "k", "2026-09-27")
+        fetch.assert_not_called()          # RPC(=persist) 도 안 부른다
+        self.assertIn("건너뜀", out)
+
+    def test_lookup_failure_still_sends(self):
+        # 판정 불가면 보낸다 — RPC 까지 진행(여기선 RPC 실패로 rc=2 에서 멈추게 해 발송 0).
+        with (
+            mock.patch.object(growth_weekly, "already_sent", side_effect=RuntimeError("x")),
+            mock.patch.object(growth_weekly, "fetch_payload", side_effect=RuntimeError("y")) as fetch,
+        ):
+            rc, _, err = self._run(["--mode", "send", "--skip-if-sent", "--week-end", "2026-09-27"])
+        fetch.assert_called_once()
+        self.assertEqual(rc, 2)
+        self.assertIn("그대로 발송", err)
+
+    def test_flag_absent_never_looks_up(self):
+        # 수동 실행(플래그 없음)은 조회 없이 곧장 RPC — 재발송이 막히지 않는다.
+        with (
+            mock.patch.object(growth_weekly, "already_sent") as sent,
+            mock.patch.object(growth_weekly, "fetch_payload", side_effect=RuntimeError("y")),
+        ):
+            rc, _, _ = self._run(["--mode", "send", "--week-end", "2026-09-27"])
+        sent.assert_not_called()
+        self.assertEqual(rc, 2)
+
+    def test_dry_run_ignores_flag(self):
+        with (
+            mock.patch.object(growth_weekly, "already_sent") as sent,
+            mock.patch.object(growth_weekly, "fetch_payload", side_effect=RuntimeError("y")),
+        ):
+            self._run(["--mode", "dry-run", "--skip-if-sent"])
+        sent.assert_not_called()
+
+
 # ── 워크플로 YAML 텍스트 가드 ────────────────────────────────────────────────────
 class WorkflowYamlTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.text = WORKFLOW.read_text(encoding="utf-8")
 
-    def test_cron_is_monday_0923_kst(self):
-        self.assertIn("'23 0 * * 1'", self.text)
+    def test_cron_is_monday_three_slots_from_0923_kst(self):
+        self.assertIn("'23 0,2,4 * * 1'", self.text)
+
+    def test_schedule_passes_skip_if_sent(self):
+        # 다회차 예약이 같은 주를 두 번 보내지 않게 — 예약 실행에만 멱등 플래그.
+        self.assertIn('if [ "$EVENT_NAME" = "schedule" ]; then', self.text)
+        self.assertIn("--skip-if-sent", self.text)
 
     def test_mode_flag_present(self):
         self.assertIn("--mode", self.text)

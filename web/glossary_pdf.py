@@ -6,7 +6,7 @@ PDF 주소는 사이트 어디에도 링크하지 않고(_headers 가 noindex), 
 용어가 더해지면 다음 배포에서 새 판이 된다(표지의 판 날짜·개수도 그때 다시 센다).
 
 구성: 표지 → 이 용어집·GRM 소개(QR) → 전체 색인 → 초성별 본문(용어마다 '온라인에서 보기')
-→ 뒤표지(QR). 본문 사이에 GRM 기능 안내 네 칸. QR 은 UTM 을 달아 "용어집을 보고 들어와
+→ 뒤표지(QR). 표지는 PNG 로도 따로 떠서(`/files/…-cover.png`) 구독 확인 메일이 싣는다. 본문 사이에 GRM 기능 안내 네 칸. QR 은 UTM 을 달아 "용어집을 보고 들어와
 구독했다"를 first-touch(087)로 셀 수 있게 한다.
 
 재사용: 용어 뷰모델·사례 수는 `render`(색인 페이지와 같은 정렬·같은 값), 브랜드 부엉이·
@@ -303,6 +303,16 @@ def verify_pdf(pdf: Path, n_terms: int) -> list[str]:
     return problems
 
 
+def write_cover_png(pdf: Path, png: Path, width_px: int = 360) -> None:
+    """PDF 첫 쪽(표지) → PNG. 구독 확인 메일이 이 그림을 싣는다 — 메일 본문 폭 120px 의 3배로
+    그려 고해상도 화면에서도 선명하게. 이미지가 차단된 메일함에서는 alt 문구만 보인다."""
+    import fitz
+    with fitz.open(pdf) as doc:
+        page = doc[0]
+        zoom = width_px / page.rect.width
+        doc[0].get_pixmap(matrix=fitz.Matrix(zoom, zoom)).save(png)
+
+
 def main(argv: "list[str] | None" = None) -> int:
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -333,7 +343,10 @@ def main(argv: "list[str] | None" = None) -> int:
     if problems:
         print("::warning::용어집 PDF 확인 실패 — " + " / ".join(problems), file=sys.stderr)
         return 1
-    print(f"용어집 PDF: 용어 {view['total']}개 · {pdf.stat().st_size:,} bytes → {pdf}")
+    cover_png = args.out / render.GLOSSARY_PDF_COVER_PATH
+    write_cover_png(pdf, cover_png)
+    print(f"용어집 PDF: 용어 {view['total']}개 · {pdf.stat().st_size:,} bytes → {pdf}"
+          f" · 표지 {cover_png.stat().st_size:,} bytes")
     return 0
 
 

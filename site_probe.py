@@ -437,6 +437,10 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
     glossary_pdf_check, _ = _page_check(
         "GET 용어집 PDF", f"{base_url}/files/grm-gmp-glossary.pdf", timeout)
     checks.append(glossary_pdf_check)
+    # 확인 메일이 싣는 표지 그림 — 끊기면 메일에 깨진 그림이 뜬다.
+    glossary_cover_check, _ = _page_check(
+        "GET 용어집 표지", f"{base_url}/files/grm-gmp-glossary-cover.png", timeout)
+    checks.append(glossary_cover_check)
 
     # 2) 신선도 — 가장 최근에 발행됐어야 할 월요일 브리프
     monday = most_recent_published_monday(today)

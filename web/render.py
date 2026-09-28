@@ -79,6 +79,9 @@ GLOSSARY_CASES_EN_FILE = WEB_DIR / "data" / "glossary_cases_en.json"
 # 않는다 — 그 아래 디렉터리는 전부 용어 페이지여야 한다(WebGlossaryTermPageTest 의 유령
 # 페이지 가드).
 GLOSSARY_PDF_PATH = "files/grm-gmp-glossary.pdf"
+# 같은 PDF 의 표지 이미지 — 구독 확인 메일(Brevo)이 이 주소의 그림을 싣는다. PDF 와 함께
+# 배포마다 다시 그려 표지의 판 날짜·개수가 메일에서도 낡지 않는다.
+GLOSSARY_PDF_COVER_PATH = "files/grm-gmp-glossary-cover.png"
 GLOSSARY_FIG_DIR = WEB_DIR / "partials" / "glossary_fig"  # [용어 그림] 용어당 정의를 묘사만 하는 SVG partial(있는 것만)
 
 

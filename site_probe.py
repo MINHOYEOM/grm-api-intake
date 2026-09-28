@@ -427,6 +427,17 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
         body_contains=f"<loc>{base_url}/briefs/")
     checks.append(sitemap_check)
 
+    # [마케팅 2026-09-28] 구독 확인 도착 페이지와 GMP 용어집 PDF — 사이트 어디에도 링크되지
+    # 않고(구독 확인 메일로만 간다) 배포 스텝도 비차단이라, 끊겨도 화면에서는 아무도 모른다.
+    # 확인 메일이 약속한 자료가 살아 있는지 매일 본다.
+    welcome_check, _ = _page_check(
+        "GET /welcome/", f"{base_url}/welcome/", timeout,
+        body_contains="grm-gmp-glossary.pdf")
+    checks.append(welcome_check)
+    glossary_pdf_check, _ = _page_check(
+        "GET 용어집 PDF", f"{base_url}/files/grm-gmp-glossary.pdf", timeout)
+    checks.append(glossary_pdf_check)
+
     # 2) 신선도 — 가장 최근에 발행됐어야 할 월요일 브리프
     monday = most_recent_published_monday(today)
     date_str = monday.isoformat()

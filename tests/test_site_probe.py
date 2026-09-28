@@ -56,6 +56,9 @@ def _ok_get_map(today: dt.date, *, base: str = BASE) -> dict[str, FakeResponse]:
         f"{base}/en/": FakeResponse(200, text='<html lang="en"><body>home</body></html>'),
         f"{base}/findings/": FakeResponse(200, text="findings app shell"),
         f"{base}/rss.xml": FakeResponse(200, text="<rss></rss>"),
+        f"{base}/welcome/": FakeResponse(
+            200, text='<a href="../files/grm-gmp-glossary.pdf" download>'),
+        f"{base}/files/grm-gmp-glossary.pdf": FakeResponse(200, text="%PDF-1.7"),
         f"{base}/sitemap.xml": FakeResponse(
             200, text=f"<urlset><url><loc>{base}/briefs/2020-01-01/</loc></url></urlset>"),
         f"{base}/briefs/{date_str}/": FakeResponse(200, text="brief"),
@@ -161,6 +164,41 @@ class RpcSnapshotFreshnessTest(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["status"], "fail")
         self.assertEqual(report["overall"], "fail")
+
+
+class GlossaryWelcomeProbeTest(unittest.TestCase):
+    """[마케팅 2026-09-28] 구독 확인 도착 페이지·용어집 PDF — 어디에도 링크되지 않아 probe 만 본다."""
+
+    def _report(self, get_map):
+        with (
+            mock.patch("site_probe.requests.get", side_effect=_dispatch(get_map)),
+            mock.patch("site_probe.requests.post", side_effect=_dispatch(_ok_post_map())),
+        ):
+            return site_probe.run_probe(base_url=BASE, supabase_url=SUPABASE, anon_key="anon-key",
+                                        today=dt.date(2026, 3, 10), timeout=5.0)
+
+    def _row(self, report, name):
+        rows = [c for c in report["checks"] if c["name"] == name]
+        self.assertEqual(len(rows), 1, name)
+        return rows[0]
+
+    def test_both_ok_when_live(self):
+        report = self._report(_ok_get_map(dt.date(2026, 3, 10)))
+        self.assertEqual(self._row(report, "GET /welcome/")["status"], "ok")
+        self.assertEqual(self._row(report, "GET 용어집 PDF")["status"], "ok")
+
+    def test_missing_pdf_fails(self):
+        get_map = _ok_get_map(dt.date(2026, 3, 10))
+        get_map[f"{BASE}/files/grm-gmp-glossary.pdf"] = FakeResponse(404)
+        report = self._report(get_map)
+        row = self._row(report, "GET 용어집 PDF")
+        self.assertEqual(row["status"], "fail")
+        self.assertIn("HTTP 404", row["detail"])
+
+    def test_welcome_without_pdf_link_fails(self):
+        get_map = _ok_get_map(dt.date(2026, 3, 10))
+        get_map[f"{BASE}/welcome/"] = FakeResponse(200, text="<html>no link</html>")
+        self.assertEqual(self._row(self._report(get_map), "GET /welcome/")["status"], "fail")
 
 
 class FindingsSearchCacheFreshnessTest(unittest.TestCase):

@@ -166,7 +166,7 @@
    구역도 회원이 아니라 **구독**을 제안한다(회원 계층은 별도 결정 대기). 밴드·배너 두 블록이
    모두 이 값을 보므로 어느 `{% if %}` 에도 갇히지 않는 이 자리(최상위)에서 정의한다. #}
 {% set sub_zone = 'glossary' if nav_active == 'glossary' else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
-{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' %}
+{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' and not hide_subscribe %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
 {# [구독 밴드 실물 링크 2026-09-07] 밴드는 "메일로 보내드립니다"라고 말할 뿐 무엇이 오는지 보여 주지 않는다. 메일 본문은 주간 브리프의 핵심 요약과 바로가기라서 **최신 브리프 페이지가 곧 메일 내용의 실물**이다 — 링크 한 줄이면 구독 판단이 선다. 낱말은 헤더 CTA 와 같은 '이번 주 소식'을 재사용한다(새 낱말 만들지 않는다). 스타일은 grm.css(디자인 동결) 대신 하단 배너와 같은 관례로 이 게이트 안에 두되, **밴드 안**(`<section class="subscribe">` 뒤)에 둔다 — 기존 한글안전 가드가 재는 범위가 거기서 시작하기 때문이다. 게이트가 꺼진 로컬·CI 빌드에서는 이 <style> 도 함께 생략되므로 골든 byte-diff 는 그대로 0. #}
@@ -644,7 +644,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
    따로 있어야 한다 — 그때 이 게이트를 푼다.
    ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
    파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
-{% if newsletter_form_action and lang == 'ko' %}
+{% if newsletter_form_action and lang == 'ko' and not hide_subscribe %}
 <style>
 .grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}
 .grm-cta.on{transform:translateY(0)}

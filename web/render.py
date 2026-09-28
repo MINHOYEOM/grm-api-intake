@@ -73,6 +73,12 @@ GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전�
 # 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
 # 영어 /findings/가 보여 줄 수와 카드의 수가 갈라진다.
 GLOSSARY_CASES_EN_FILE = WEB_DIR / "data" / "glossary_cases_en.json"
+# [마케팅 2026-09-28] GMP 용어집 PDF 의 사이트 내 경로(루트 상대). glossary_pdf.py 가 배포 때
+# `dist/` 아래 이 경로로 쓰고, 도착 페이지(welcome/)가 이 경로로 링크한다 — 두 곳이 같은
+# 상수를 본다. 목록에 없는 파일이라 _headers 가 noindex 를 건다. ★glossary/ 아래에 두지
+# 않는다 — 그 아래 디렉터리는 전부 용어 페이지여야 한다(WebGlossaryTermPageTest 의 유령
+# 페이지 가드).
+GLOSSARY_PDF_PATH = "files/grm-gmp-glossary.pdf"
 GLOSSARY_FIG_DIR = WEB_DIR / "partials" / "glossary_fig"  # [용어 그림] 용어당 정의를 묘사만 하는 SVG partial(있는 것만)
 
 
@@ -2058,6 +2064,17 @@ def build_glossary_view(
             # 한국어 출처명이 남는 건수 — 영어판에서만 화면이 밝힌다(0 이면 문구 없음).
             "ko_only_sources": ko_only_sources if lang != DEFAULT_LANG else 0,
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
+
+
+def build_glossary_size(view: dict[str, Any]) -> dict[str, Any]:
+    """용어 뷰모델 → 낱개 페이지 하단 '사전 전체 규모' 블록 입력(무변형 파생 — 값 재작성 0).
+
+    [마케팅 2026-09-28] 검색으로 용어 하나만 보고 나가는 방문자에게 사전이 얼마나 큰지
+    보여 준다 — 다음에 모르는 용어가 나오면 여기서 찾게. 숫자는 전부 같은 뷰모델에서
+    세므로 색인 페이지의 개수·버킷과 갈라질 수 없고, 배포마다 다시 세니 낡지 않는다."""
+    return {"total": view["total"],
+            "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"], "count": len(g["terms"])}
+                        for g in view["groups"] if g["terms"]]}
 
 
 def build_glossary_index(view: dict[str, Any],
@@ -4084,6 +4101,11 @@ def build_headers_txt() -> str:
         "Permissions-Policy: camera=(), microphone=(), geolocation=()",
     ]
     lines = ["/*"] + [f"  {rule}" for rule in rules]
+    # [마케팅 2026-09-28] 구독 확인 뒤에만 가는 두 경로 — 링크가 사이트 어디에도 없고
+    # sitemap 에도 없지만, 주소가 퍼지면 검색엔진이 주울 수 있어 헤더로도 막는다
+    # (도착 페이지는 템플릿 meta 로도 한 겹 더). PDF 는 meta 를 달 수 없어 헤더가 유일한 길.
+    for path in ("/files/*", "/welcome/*"):
+        lines += [path, "  X-Robots-Tag: noindex"]
     return "\n".join(lines) + "\n"
 
 
@@ -5377,6 +5399,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                       if term["id"] in glossary_en_cases]
             glossary_en_excerpts = build_glossary_case_excerpts(
                 glossary_en_case_terms, docs_data, glossary_en_cases, lang="en")
+            glossary_en_size = build_glossary_size(glossary_en_view)
             for group in glossary_en_view["groups"]:
                 for term in group["terms"]:
                     en_emit("glossary_term.html", en_page(f"glossary/{term['id']}/"),
@@ -5388,6 +5411,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         figure_partial=_glossary_figure_partial(term["id"]),
                         case_excerpts=glossary_en_excerpts.get(term["id"]) or [],
                         cases_asof=glossary_cases_measured_on(GLOSSARY_CASES_EN_FILE),
+                        glossary_size=glossary_en_size,
                     )
 
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
@@ -5398,6 +5422,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         #   · case_excerpts 는 커밋된 문서 정본에서 파생한 실제 지적 문장(순위 트랙).
         case_excerpts = build_glossary_case_excerpts(
             glossary_terms, docs_data, load_glossary_cases())
+        glossary_size = build_glossary_size(glossary_view)
         for group in glossary_view["groups"]:
             for term in group["terms"]:
                 emit("glossary_term.html", page(f"glossary/{term['id']}/"),
@@ -5409,8 +5434,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     figure_partial=_glossary_figure_partial(term["id"]),
                     case_excerpts=case_excerpts.get(term["id"]) or [],
                     cases_asof=glossary_cases_measured_on(),
+                    glossary_size=glossary_size,
                 )
                 glossary_term_ids.append(term["id"])
+
+        # [마케팅 2026-09-28] 구독 확인 뒤 도착 페이지(/welcome/) — Brevo 더블 옵트인의 '확인 후 이동'
+        # 주소가 여기를 가리키고, 여기서 GMP 용어집 PDF(glossary_pdf.py 가 배포 때 만든다)를
+        # 받는다. 목록에 없는 페이지다: sitemap·llms·색인 어디에도 넣지 않고, noindex 는
+        # 템플릿(meta_robots)과 _headers(X-Robots-Tag) 두 겹으로 건다. 구독 띠·배너는 방금
+        # 구독을 마친 사람에게 다시 권하지 않도록 끈다(hide_subscribe). 한국어판만 — 영문
+        # 뉴스레터가 없다.
+        emit("glossary_welcome.html", page("welcome/"),
+            page_title=tr("구독이 확인되었습니다 · GRM"),
+            nav_active="welcome",
+            description=tr("GRM 뉴스레터 구독이 확인되었습니다."),
+            glossary_pdf_href=GLOSSARY_PDF_PATH,
+            hide_subscribe=True,
+        )
 
     # [검색 유입] 분류·국가·기관 모음 페이지 — 축 색인 3장 + 항목 페이지 N장.
     # 축 색인을 함께 내는 이유: 항목 페이지가 sitemap 에만 있으면 사이트 구조에서 그

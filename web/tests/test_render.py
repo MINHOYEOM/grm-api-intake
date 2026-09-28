@@ -8575,16 +8575,36 @@ class WebHeadersFileTest(unittest.TestCase):
         "Permissions-Policy: camera=(), microphone=(), geolocation=()",
     )
 
+    @staticmethod
+    def _blocks(txt: str) -> dict[str, list[str]]:
+        """Pages `_headers` 문법 — 들여쓰지 않은 줄이 경로, 그 밑 들여쓴 줄이 그 경로의 규칙."""
+        blocks: dict[str, list[str]] = {}
+        cur = None
+        for ln in txt.splitlines():
+            if not ln.startswith(" "):
+                cur = ln
+                blocks[cur] = []
+            else:
+                blocks[cur].append(ln)
+        return blocks
+
     def test_build_headers_txt_has_exactly_five_rules_under_wildcard(self):
         txt = render.build_headers_txt()
         lines = txt.splitlines()
         self.assertEqual(lines[0], "/*")
-        rule_lines = lines[1:]
+        rule_lines = self._blocks(txt)["/*"]
         self.assertEqual(len(rule_lines), len(self.EXPECTED_RULES))
         for rule in self.EXPECTED_RULES:
             self.assertIn(f"  {rule}", rule_lines)
         # CSP 는 의도적 부재 — 실수로 붙었으면 여기서 잡는다.
         self.assertNotIn("Content-Security-Policy", txt)
+
+    def test_unlisted_subscriber_paths_are_noindex_only(self):
+        """[마케팅 2026-09-28] 구독 확인 도착 페이지·용어집 PDF — noindex 한 줄씩, 그 밖의 규칙 없음."""
+        blocks = self._blocks(render.build_headers_txt())
+        self.assertEqual(set(blocks), {"/*", "/files/*", "/welcome/*"})
+        for path in ("/files/*", "/welcome/*"):
+            self.assertEqual(blocks[path], ["  X-Robots-Tag: noindex"], path)
 
     def test_headers_written_to_dist_root(self):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_headers_"))
@@ -9847,6 +9867,63 @@ class WebGlossaryTermPageTest(unittest.TestCase):
             self.assertIn(
                 f'<loc>{render.SITE_BASE_URL}/glossary/{t["id"]}/</loc>', self.sitemap,
                 f'sitemap 미등록: {t["id"]}')
+
+    # ── [마케팅 2026-09-28] 사전 전체 규모 블록 · 구독 확인 도착 페이지 ──────────────────
+    def test_size_block_on_every_term_page(self):
+        """검색으로 용어 하나만 보고 나가려는 방문자에게 사전 규모를 보여 준다 — 숫자와 초성
+        버튼은 색인과 같은 뷰모델에서 센다(손으로 적은 개수 0)."""
+        view = render.build_glossary_view(self.terms)
+        size = render.build_glossary_size(view)
+        self.assertEqual(size["total"], len(self.terms))
+        self.assertEqual(sum(b["count"] for b in size["buckets"]), len(self.terms))
+        head = f'GMP 용어 <b>{len(self.terms)}</b>개를 한곳에'
+        for t in self.terms:
+            html = self._page(t["id"])
+            self.assertIn('<section class="gt-more"', html, t["id"])
+            self.assertIn(head, html, t["id"])
+            self.assertIn('<form class="gt-more-q" action="../../glossary/" method="get"', html, t["id"])
+            for b in size["buckets"]:
+                self.assertIn(f'href="../../glossary/#{b["anchor"]}"><b>{b["bucket"]}</b><span>{b["count"]}</span></a>',
+                              html, (t["id"], b["bucket"]))
+            self.assertNotIn('class="gt-foot"', html, t["id"])
+
+    def test_size_block_on_english_term_pages(self):
+        en_root = self.single / "en" / "glossary"
+        pages = sorted(en_root.glob("*/index.html"))
+        self.assertTrue(pages, "영문 용어 페이지가 없다")
+        for fp in pages[:20]:
+            html = fp.read_text(encoding="utf-8")
+            self.assertIn('<section class="gt-more"', html, fp)
+            self.assertIn(f'<b>{len(self.terms)}</b> GMP terms in one place', html, fp)
+
+    def test_index_search_accepts_q_param(self):
+        js = (render.WEB_DIR / "assets" / "glossary.js").read_text(encoding="utf-8")
+        self.assertIn('new URLSearchParams(location.search).get("q")', js)
+
+    def test_welcome_page_is_unlisted(self):
+        """구독 확인 도착 페이지 — 용어집 PDF 로 링크하고, 색인·sitemap·용어 트리 어디에도 없다."""
+        page = self.single / "welcome" / "index.html"
+        self.assertTrue(page.is_file(), page)
+        html = page.read_text(encoding="utf-8")
+        self.assertIn('<meta name="robots" content="noindex, nofollow">', html)
+        self.assertIn(f'href="../{render.GLOSSARY_PDF_PATH}" download', html)
+        self.assertIn("localStorage.setItem('grm-sub-ok','1')", html)
+        self.assertNotIn("/welcome/", self.sitemap)
+        self.assertFalse((self.root / "welcome").exists(), "glossary/ 아래에 두지 않는다")
+        headers = (self.single / "_headers").read_text(encoding="utf-8")
+        for path in ("/files/*", "/welcome/*"):
+            self.assertIn(f"{path}\n  X-Robots-Tag: noindex", headers)
+
+    def test_welcome_is_not_linked_from_any_page(self):
+        """주소가 확인 메일로만 가야 '구독해야 받는다'가 성립한다 — 사이트 어디에서도 링크 0."""
+        linked = []
+        for fp in self.single.rglob("*.html"):
+            if fp.parent.name == "welcome":
+                continue
+            text = fp.read_text(encoding="utf-8", errors="ignore")
+            if "welcome/" in text or render.GLOSSARY_PDF_PATH in text:
+                linked.append(str(fp.relative_to(self.single)))
+        self.assertEqual(linked, [])
 
     def test_json_ld_is_defined_term(self):
         """검색엔진에 '사전 항목'임을 알리는 구조화데이터 — 파싱 가능한 JSON 이어야 한다."""

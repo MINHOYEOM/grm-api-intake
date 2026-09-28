@@ -469,10 +469,12 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             self.assertTrue((self.out / rel).exists(), f"라이브 렌더 누락: {rel}")
 
     # ── 언어판 (라이브 데이터에서만 보이는 것들) ────────────────────────────
-    #: 영어 짝이 **없어도 되는** 한국어 최상위 섹션. 지금은 비어 있다(§7 완료).
-    #: 여기에 무언가를 더할 때는 왜 영어로 낼 수 없는지를 함께 적는다 — 빈 채로 두는
-    #: 것이 정상이고, 채워지는 순간 그건 되돌릴 일이 생겼다는 뜻이다.
-    KO_ONLY_SECTIONS: tuple[str, ...] = ()
+    #: 영어 짝이 **없어도 되는** 한국어 최상위 섹션.
+    #: 여기에 무언가를 더할 때는 왜 영어로 낼 수 없는지를 함께 적는다 — 콘텐츠 섹션이
+    #: 여기 들어오는 순간 그건 되돌릴 일이 생겼다는 뜻이다.
+    #:   · `welcome/` (2026-09-28) — 뉴스레터 구독 확인 도착 페이지. 영문 뉴스레터가 없어
+    #:     영어 구독 확인이라는 사건 자체가 없다(콘텐츠가 아니라 구독 흐름의 한 칸).
+    KO_ONLY_SECTIONS: tuple[str, ...] = ("welcome/",)
 
     def test_every_korean_section_has_an_english_counterpart(self):
         """★[2026-09-05] 종전엔 "영어에 아직 없는 섹션" **손목록**을 픽스처 빌드에서 봤다.
@@ -8575,16 +8577,36 @@ class WebHeadersFileTest(unittest.TestCase):
         "Permissions-Policy: camera=(), microphone=(), geolocation=()",
     )
 
+    @staticmethod
+    def _blocks(txt: str) -> dict[str, list[str]]:
+        """Pages `_headers` 문법 — 들여쓰지 않은 줄이 경로, 그 밑 들여쓴 줄이 그 경로의 규칙."""
+        blocks: dict[str, list[str]] = {}
+        cur = None
+        for ln in txt.splitlines():
+            if not ln.startswith(" "):
+                cur = ln
+                blocks[cur] = []
+            else:
+                blocks[cur].append(ln)
+        return blocks
+
     def test_build_headers_txt_has_exactly_five_rules_under_wildcard(self):
         txt = render.build_headers_txt()
         lines = txt.splitlines()
         self.assertEqual(lines[0], "/*")
-        rule_lines = lines[1:]
+        rule_lines = self._blocks(txt)["/*"]
         self.assertEqual(len(rule_lines), len(self.EXPECTED_RULES))
         for rule in self.EXPECTED_RULES:
             self.assertIn(f"  {rule}", rule_lines)
         # CSP 는 의도적 부재 — 실수로 붙었으면 여기서 잡는다.
         self.assertNotIn("Content-Security-Policy", txt)
+
+    def test_unlisted_subscriber_paths_are_noindex_only(self):
+        """[마케팅 2026-09-28] 구독 확인 도착 페이지·용어집 PDF — noindex 한 줄씩, 그 밖의 규칙 없음."""
+        blocks = self._blocks(render.build_headers_txt())
+        self.assertEqual(set(blocks), {"/*", "/files/*", "/welcome/*"})
+        for path in ("/files/*", "/welcome/*"):
+            self.assertEqual(blocks[path], ["  X-Robots-Tag: noindex"], path)
 
     def test_headers_written_to_dist_root(self):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_headers_"))
@@ -9847,6 +9869,63 @@ class WebGlossaryTermPageTest(unittest.TestCase):
             self.assertIn(
                 f'<loc>{render.SITE_BASE_URL}/glossary/{t["id"]}/</loc>', self.sitemap,
                 f'sitemap 미등록: {t["id"]}')
+
+    # ── [마케팅 2026-09-28] 사전 전체 규모 블록 · 구독 확인 도착 페이지 ──────────────────
+    def test_size_block_on_every_term_page(self):
+        """검색으로 용어 하나만 보고 나가려는 방문자에게 사전 규모를 보여 준다 — 숫자와 초성
+        버튼은 색인과 같은 뷰모델에서 센다(손으로 적은 개수 0)."""
+        view = render.build_glossary_view(self.terms)
+        size = render.build_glossary_size(view)
+        self.assertEqual(size["total"], len(self.terms))
+        self.assertEqual(sum(b["count"] for b in size["buckets"]), len(self.terms))
+        head = f'GMP 용어 <b>{len(self.terms)}</b>개를 한곳에'
+        for t in self.terms:
+            html = self._page(t["id"])
+            self.assertIn('<section class="gt-more"', html, t["id"])
+            self.assertIn(head, html, t["id"])
+            self.assertIn('<form class="gt-more-q" action="../../glossary/" method="get"', html, t["id"])
+            for b in size["buckets"]:
+                self.assertIn(f'href="../../glossary/#{b["anchor"]}"><b>{b["bucket"]}</b><span>{b["count"]}</span></a>',
+                              html, (t["id"], b["bucket"]))
+            self.assertNotIn('class="gt-foot"', html, t["id"])
+
+    def test_size_block_on_english_term_pages(self):
+        en_root = self.single / "en" / "glossary"
+        pages = sorted(en_root.glob("*/index.html"))
+        self.assertTrue(pages, "영문 용어 페이지가 없다")
+        for fp in pages[:20]:
+            html = fp.read_text(encoding="utf-8")
+            self.assertIn('<section class="gt-more"', html, fp)
+            self.assertIn(f'<b>{len(self.terms)}</b> GMP terms in one place', html, fp)
+
+    def test_index_search_accepts_q_param(self):
+        js = (render.WEB_DIR / "assets" / "glossary.js").read_text(encoding="utf-8")
+        self.assertIn('new URLSearchParams(location.search).get("q")', js)
+
+    def test_welcome_page_is_unlisted(self):
+        """구독 확인 도착 페이지 — 용어집 PDF 로 링크하고, 색인·sitemap·용어 트리 어디에도 없다."""
+        page = self.single / "welcome" / "index.html"
+        self.assertTrue(page.is_file(), page)
+        html = page.read_text(encoding="utf-8")
+        self.assertIn('<meta name="robots" content="noindex, nofollow">', html)
+        self.assertIn(f'href="../{render.GLOSSARY_PDF_PATH}" download', html)
+        self.assertIn("localStorage.setItem('grm-sub-ok','1')", html)
+        self.assertNotIn("/welcome/", self.sitemap)
+        self.assertFalse((self.root / "welcome").exists(), "glossary/ 아래에 두지 않는다")
+        headers = (self.single / "_headers").read_text(encoding="utf-8")
+        for path in ("/files/*", "/welcome/*"):
+            self.assertIn(f"{path}\n  X-Robots-Tag: noindex", headers)
+
+    def test_welcome_is_not_linked_from_any_page(self):
+        """주소가 확인 메일로만 가야 '구독해야 받는다'가 성립한다 — 사이트 어디에서도 링크 0."""
+        linked = []
+        for fp in self.single.rglob("*.html"):
+            if fp.parent.name == "welcome":
+                continue
+            text = fp.read_text(encoding="utf-8", errors="ignore")
+            if "welcome/" in text or render.GLOSSARY_PDF_PATH in text:
+                linked.append(str(fp.relative_to(self.single)))
+        self.assertEqual(linked, [])
 
     def test_json_ld_is_defined_term(self):
         """검색엔진에 '사전 항목'임을 알리는 구조화데이터 — 파싱 가능한 JSON 이어야 한다."""
@@ -14645,8 +14724,9 @@ class WebAboutTest(unittest.TestCase):
         self.assertNotIn('id="grm-pet"', self.en_html)
         self.assertIn('id="grm-pet"', self.landing)          # 다른 면에서는 그대로
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
-        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' %}",
-                      base)
+        # [2026-09-28] 구독 확인 도착 페이지(/welcome/)도 밴드를 접는다(hide_subscribe) — about 조건은 그대로.
+        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about'"
+                      " and not hide_subscribe %}", base)
         self.assertIn("{% if nav_active != 'about' %}\n<div class=\"grm-pet\"", base)
 
     def test_hero_offers_the_next_step(self):
@@ -15177,6 +15257,8 @@ class WebZoneIaTest(unittest.TestCase):
         "404.html": "존재하지 않는 경로에 서버가 띄우는 페이지 — 링크 대상이 아니다.",
         "en/404.html": "위와 같다. 영어 트리에서도 Cloudflare 가 상태코드로 띄운다.",
         "admin/index.html": "운영자 전용 콘솔 — 공개 링크를 두지 않는 것이 의도다.",
+        "welcome/index.html": "구독 확인 도착 페이지(2026-09-28) — Brevo 확인 메일의 버튼으로만 온다. "
+                              "사이트에서 링크하면 '구독해야 용어집 PDF 를 받는다'가 무너진다.",
     }
 
     #: 세그먼트에 서는 면. [컨셉 재정의] '데이터 현황'은 세그먼트에서 내렸다 — 그 면이

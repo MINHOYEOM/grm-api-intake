@@ -127,6 +127,17 @@ jobs:
         timeout-minutes: 8
         run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist --months auto
 
+      # ── C2d: GMP 규제 용어집 PDF([마케팅 2026-09-28]) — 비차단. ─────────────────────────
+      #   web/glossary_pdf.py 가 용어사전 정본으로 A4 용어집을 짓고 위와 같은 Chrome 으로
+      #   인쇄한다 → web/dist/files/grm-gmp-glossary.pdf. 구독 확인 메일 → 도착
+      #   페이지(/welcome/)에서만 링크되는 구독자 자료라 sitemap 비등록·_headers 가
+      #   noindex. 만든 뒤 PyMuPDF 로 다시 읽어 용어가 전부 실렸는지 확인한다(모자라면 경고).
+      #   실패해도 배포는 진행한다 — 대신 site_probe 가 라이브 주소의 200 을 매일 본다.
+      - name: Glossary PDF (non-blocking)
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python web/glossary_pdf.py --out web/dist
+
       # 미리보기 산출물(시크릿 미등록·호스트 미연결 시에도 D5 육안검토 가능).
       - name: Upload dist artifact (preview)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

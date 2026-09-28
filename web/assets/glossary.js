@@ -210,6 +210,12 @@
 
   input.addEventListener("input", apply);
   window.addEventListener("hashchange", revealHash);
+  // [2026-09-28] 용어 페이지 하단 '다른 용어 찾기'가 `glossary/?q=…` 로 넘긴다 — 받은
+  // 검색어로 바로 거른다. 폼 복원 값이 이미 있으면(뒤로가기) 그쪽을 존중한다.
+  try {
+    var qp = new URLSearchParams(location.search).get("q");
+    if (qp && !input.value.trim()) input.value = qp.slice(0, 64);
+  } catch (e) { /* 구형 브라우저 — 검색창만 비어 있다 */ }
   // 뒤로가기로 돌아오면 브라우저가 검색창 값만 되살리고 필터는 안 건 상태일 수 있다(폼 복원).
   // 그러면 `OOS` 라고 적힌 창 밑에 242개가 다 보인다 — 말과 화면이 어긋난다.
   if (input.value.trim()) apply();

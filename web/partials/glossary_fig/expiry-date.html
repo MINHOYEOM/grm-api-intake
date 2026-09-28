@@ -1,0 +1,14 @@
+{#- 용어 그림 · expiry-date — 정의("규격을 유지할 것으로 기대되어 그 이후에는 사용할 수 없는 날짜")를 시간선 위 한 점으로 옮긴다.
+    같은 그림이 링크드인 카드뉴스 '이번 주 용어' 장에도 쓰인다(linkedin_cards.MINI_SVG) — 한쪽만 고치면
+    다른 쪽이 문서 아이콘으로 되돌아간다(2026-09-28, 09-08 배치1 착륙). -#}
+<svg class="gt-fig-svg" viewBox="0 0 176 88" role="img" aria-label="{{ _('유효기한 뒤로는 쓸 수 없음을 보이는 시간선') }}">
+  <rect x="108" y="40" width="58" height="24" style="fill:var(--soft)"/>
+  <g style="stroke:var(--line-2);stroke-width:1.2"><path d="M118 40l-6 24M128 40l-6 24M138 40l-6 24M148 40l-6 24M158 40l-6 24M168 40l-6 24"/></g>
+  <line x1="12" y1="52" x2="166" y2="52" style="stroke:var(--ink);stroke-width:2;stroke-linecap:round"/>
+  <g style="stroke:var(--line-2);stroke-width:1.5"><path d="M36 47v10M60 47v10M84 47v10M132 47v10M156 47v10"/></g>
+  <line x1="108" y1="30" x2="108" y2="66" style="stroke:var(--coral-2);stroke-width:2"/>
+  <circle cx="108" cy="52" r="5" style="fill:var(--coral-2)"/>
+  <text x="108" y="22" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--coral-2)">{{ _('유효기한') }}</text>
+  <text x="56" y="80" text-anchor="middle" style="font-size:9px;fill:var(--muted)">{{ _('규격 유지') }}</text>
+  <text x="137" y="80" text-anchor="middle" style="font-size:9px;fill:var(--muted)">{{ _('사용 불가') }}</text>
+</svg>

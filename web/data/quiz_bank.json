@@ -1717,5 +1717,101 @@
       "Control of the whole path by which labelling and packaging materials are received, stored, issued, and used, with the records kept in the batch record"
     ],
     "explanation_en": "A mix-up is an incident in which components, containers, labelling, or products are interchanged or intermingled and used in error; like contamination, it is prevented by facility design, segregation and control (21 CFR 211.42). The others describe cross-contamination, line clearance and labeling control."
+  },
+  {
+    "id": "q-202640-01",
+    "question_ko": "Baxter Healthcare Corporation 이 Dextrose Injection, USP, 70 %, 2000 mL 백 제품을 Class I 으로 회수했습니다. 용액에서 발견된 이물은 무엇으로 확인됐나요?",
+    "choices": [
+      "유리섬유",
+      "유리 입자",
+      "스테인리스강 입자",
+      "플라스틱 용기 조각"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "FDA 회수 공고의 사유는 용액 내 스테인리스강(stainless steel) 입자로 확인된 이물 혼입이며 등급은 Class I 입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-09-28/#D-0850-2026",
+    "difficulty": "easy",
+    "week": "202640",
+    "question_en": "Baxter Healthcare Corporation recalled Dextrose Injection, USP, 70%, 2000 mL bags as Class I. What was the foreign matter found in the solution identified as?",
+    "choices_en": [
+      "Fiberglass",
+      "Glass particles",
+      "Stainless steel particles",
+      "Fragments of the plastic container"
+    ],
+    "explanation_en": "FDA's recall notice gives the reason as foreign matter in the solution identified as stainless steel particles, classified as Class I."
+  },
+  {
+    "id": "q-202640-02",
+    "question_ko": "Ajanta Pharma USA 가 Fluphenazine Hydrochloride Tablets, USP 1 mg 을 회수했습니다. FDA 가 공표한 회수 사유는 무엇인가요?",
+    "choices": [
+      "장기안정성 시험 중 유기 불순물 규격 외 결과",
+      "안정성 시험 중 용출 규격 부적합",
+      "다른 제품과의 교차오염",
+      "이종 정제의 혼입"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "18개월 장기안정성 시험에서 HPLC 유기 불순물(Impurity-A)이 1.1 percent 로 규격 1.0 percent 를 벗어나 Class III 로 회수됐습니다. 출하 시험이 아니라 유효기간 중 안정성 시험에서 드러난 규격 외(OOS) 결과입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-09-28/#D-0836-2026",
+    "difficulty": "normal",
+    "week": "202640",
+    "question_en": "Ajanta Pharma USA recalled Fluphenazine Hydrochloride Tablets, USP 1 mg. What reason did FDA publish for the recall?",
+    "choices_en": [
+      "An out-of-specification organic impurity result during long-term stability testing",
+      "Failed dissolution specifications during stability testing",
+      "Cross-contamination with other products",
+      "Presence of foreign tablets"
+    ],
+    "explanation_en": "In 18-month long-term stability testing, the HPLC organic impurity (Impurity-A) came in at 1.1 percent against a 1.0 percent specification, and the product was recalled as Class III. The out-of-specification (OOS) result surfaced in stability testing during shelf life, not at release."
+  },
+  {
+    "id": "q-202640-03",
+    "question_ko": "의약품 GMP 에서 말하는 ‘시험용 검체·참고품(Reference Sample)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "완제품 배치의 표시·포장 상태를 확인할 목적으로 보관하는 완전 포장 단위의 검체",
+      "시간과 온도·습도·빛 등의 영향에 따른 품질 변화를 평가해 재시험기간, 유효기간과 보관조건을 정하는 시험",
+      "하나의 공정 또는 일련의 공정에서 처리되어 정해진 범위 안에서 균질할 것으로 기대되는 일정량",
+      "배치의 사용기간 중 필요할 때 분석하기 위해 보관하는 출발물질·포장자재·중간체 또는 완제품 검체"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "시험용 검체·참고품은 배치의 사용기간 중 필요할 때 분석하기 위해 보관하는 출발물질·포장자재·중간체 또는 완제품 검체입니다(EU GMP Annex 19). 나머지는 각각 보관용 검체·보존품, 안정성시험, 제조단위(배치)에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "reference-sample",
+    "difficulty": "normal",
+    "week": "202640",
+    "question_en": "Which statement about a reference sample in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "A fully packaged unit from a finished product batch, retained so that its labelling and packaging can be checked",
+      "Testing that evaluates how quality changes with time and with temperature, humidity, and light, in order to set the retest period, shelf life, and storage conditions",
+      "A defined quantity produced in a process or series of processes and expected to be homogeneous within specified limits",
+      "A sample of a starting material, packaging material, intermediate, or finished product retained so that it can be analysed if needed during the life of the batch"
+    ],
+    "explanation_en": "A reference sample is a sample of a starting material, packaging material, intermediate, or finished product retained so that it can be analysed if needed during the life of the batch (EU GMP Annex 19). The others describe a retention sample, stability testing and a batch."
+  },
+  {
+    "id": "q-202640-04",
+    "question_ko": "의약품 GMP 에서 말하는 ‘엔도톡신·내독소(Endotoxin)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "제품 접촉 표면이나 물질에서 발열성물질을 정해진 수준까지 제거하거나 불활성화하는 공정",
+      "그람음성균 세포벽의 지질다당류 성분으로, 의약품에 존재하면 발열 반응을 일으킬 수 있는 것",
+      "물질, 제품, 작업자, 표면 또는 환경에 존재하는 미생물의 수와 종류",
+      "약전에 정한 방법으로 검체에 살아 있는 미생물이 검출되는지 확인하는 시험"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "엔도톡신·내독소는 그람음성균 세포벽의 지질다당류 성분으로, 의약품에 존재하면 발열 반응을 일으킬 수 있습니다(EU GMP Annex 1, 21 CFR 211.113). 나머지는 각각 발열성물질 제거, 바이오버든, 무균시험에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "endotoxin",
+    "difficulty": "easy",
+    "week": "202640",
+    "question_en": "Which statement about endotoxin in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "A process that removes or inactivates pyrogens on product contact surfaces or materials to a defined level",
+      "A lipopolysaccharide component of the cell wall of Gram-negative bacteria which, if present in a medicine, can cause a pyrogenic response",
+      "The number and type of microorganisms present on a material, product, person, surface, or in the environment",
+      "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample"
+    ],
+    "explanation_en": "Endotoxin is a lipopolysaccharide component of the cell wall of Gram-negative bacteria which, if present in a medicine, can cause a pyrogenic response (EU GMP Annex 1, 21 CFR 211.113). The others describe depyrogenation, bioburden and the sterility test."
   }
 ]

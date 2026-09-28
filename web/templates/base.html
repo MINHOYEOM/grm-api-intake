@@ -187,8 +187,11 @@
        (web/announce.py)이 이 문장에 근거해 같은 수신자 목록으로 나가므로, 갈래마다 좁혀
        쓰면 공지 발송 근거가 사라진다. #}
     {% if sub_zone == 'glossary' %}
-    <h2>{{ _("용어는 실제 사례와 함께 볼 때 남습니다") }}</h2>
-    <p>{{ _("매주 월요일, 그 주의 규제 소식과 지적 사례를 한국어로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
+    {#- [마케팅 2026-09-28] 용어를 찾아온 사람에게 맞는 제안 — 구독하면 확인 메일의 버튼이 구독을
+        확정하고 도착 페이지(/welcome/)로 보내 GMP 용어집 PDF 를 준다(Brevo 확인 메일·이동 주소
+        설정과 짝). 동의 범위 문장은 그대로 남긴다(위 주석 — 공지 메일의 근거). #}
+    <h2>{{ _("구독하면 GMP 규제 용어집 PDF를 드립니다") }}</h2>
+    <p>{{ _("구독 확인 메일의 버튼을 누르면 한·영 대조로 정리한 용어집 PDF를 바로 받을 수 있습니다. 매주 월요일에는 그 주의 규제 소식과 지적 사례를 한국어로 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     {% elif sub_zone == 'findings' %}
     <h2>{{ _("이런 지적, 매주 월요일 한국어로 받아보세요") }}</h2>
     <p>{{ _("FDA·EMA·식약처의 새 지적과 조치를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
@@ -221,7 +224,7 @@
     {# 2026-09-23 C-06 — 발신자 미표기 결함 수리. 종전 두 문장(확인 버튼 안내·스팸함 안내)을
        하나로 합치며 "발신자는 GRM Solutions Brief" 를 더한다 — 수신함에서 낯선 이름이면
        구독 확인 자체를 놓친다. 같은 말을 두 번 하지 않도록 sub-done-sub 문단은 걷어 낸다. #}
-    <p>{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}</p>
+    {% if sub_zone == 'glossary' %}<p>{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}</p>{% else %}<p>{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}</p>{% endif %}
   </div>
 </div></section>
 {# 방식 A 배선: 폼 제출을 가로채 fetch(no-cors)로 Brevo endpoint 에 백그라운드 POST → 페이지를 떠나지 않고 intro 를 성공 패널로 교체. 스크립트 미실행(JS off)·fetch 미지원이면 preventDefault 가 안 걸려 네이티브 POST 로 자연 폴백(=기존 동작). 밴드 한글안전(§4): 아래 스크립트에 letter-spacing/text-transform/mono 미사용. #}
@@ -685,7 +688,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
     <div class="grm-cta-txt">
       {# [구독 문안 구역화 2026-09-23] C-02 — 밴드와 같은 `sub_zone`(base.html 상단 정의)을 본다. #}
       {% if sub_zone == 'glossary' %}
-      <b>{{ _("이번 주 용어와 지적 사례, 매주 월요일 메일로") }}</b>
+      <b>{{ _("구독하면 GMP 규제 용어집 PDF를 드립니다") }}</b>
       {% elif sub_zone == 'findings' %}
       <b>{{ _("이런 지적, 매주 월요일 한국어로 받아보세요") }}</b>
       {% else %}
@@ -777,7 +780,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');
       // 2026-09-23 C-06 — 밴드와 같은 문장(발신자 GRM Solutions Brief 명시)으로 맞춘다.
-      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}</span>';}
+      if(t){t.innerHTML='<b>{{ _("확인 메일을 보냈습니다") }}</b><span>{% if sub_zone == 'glossary' %}{{ _("메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% else %}{{ _("메일에서 구독 확인 버튼을 눌러 주세요. 발신자는 GRM Solutions Brief 입니다. 메일이 안 보이면 스팸함을 확인해 주세요.") }}{% endif %}</span>';}
       f.hidden=true;
       setTimeout(function(){dismiss(true);},4000);
     });

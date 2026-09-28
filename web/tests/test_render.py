@@ -8277,7 +8277,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         about = (out / "about/index.html").read_text(encoding="utf-8")        # nav_active=about
 
         consent = "사이트에 새로운 기능이 생기면 함께 안내드립니다"
-        h2_glossary = "용어는 실제 사례와 함께 볼 때 남습니다"
+        h2_glossary = "구독하면 GMP 규제 용어집 PDF를 드립니다"   # [마케팅 2026-09-28] 용어집 PDF 제안
         h2_findings = "이런 지적, 매주 월요일 한국어로 받아보세요"
         h2_default = "글로벌 GMP 규제 소식, 매주 월요일 한국어로"
         all_h2 = (h2_glossary, h2_findings, h2_default)
@@ -8303,7 +8303,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             return seg[seg.index("<b>") + 3: seg.index("</b>")]
 
         self.assertEqual(banner_b(home), h2_default)
-        self.assertEqual(banner_b(glossary), "이번 주 용어와 지적 사례, 매주 월요일 메일로")
+        self.assertEqual(banner_b(glossary), h2_glossary)
         self.assertEqual(banner_b(findings), h2_findings)
         self.assertEqual(banner_b(trends), h2_findings)
 
@@ -8316,6 +8316,36 @@ class WebRenderHardeningTest(unittest.TestCase):
 
         # about — 밴드는 기존 동작대로 없다(nav_active != 'about' 게이트, 소개 2026-09-06).
         self.assertNotIn('class="subscribe"', about, "about 페이지에 밴드가 있으면 안 된다")
+
+    def test_glossary_pdf_offer_is_wired_end_to_end(self):
+        """[마케팅 2026-09-28] 용어사전 구역의 제안(용어집 PDF)이 폼이 켜진 빌드에서 실제로
+        나가는지 — 밴드 성공 문구·배너 성공 문구가 PDF 로 가는 길을 말하고, 색인 상단 카드가
+        밴드 폼으로 이어지며, 도착 페이지(/welcome/)에는 구독 권유가 하나도 없다."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render_site([_minimal_brief("2026-06-05")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        index = (out / "glossary/index.html").read_text(encoding="utf-8")
+        term = next((out / "glossary").glob("*/index.html")).read_text(encoding="utf-8")
+        home = (out / "index.html").read_text(encoding="utf-8")
+        welcome = (out / "welcome/index.html").read_text(encoding="utf-8")
+        done_pdf = "메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다."
+        for name, html in (("색인", index), ("용어", term)):
+            band = html[html.index('class="subscribe"'):html.index("<footer")]
+            self.assertIn(done_pdf, band, f"{name}: 밴드 성공 문구가 PDF 를 말하지 않는다")
+            cta = html[html.index('id="grm-cta"'):]
+            self.assertIn(done_pdf, cta, f"{name}: 배너 성공 문구가 PDF 를 말하지 않는다")
+        self.assertNotIn(done_pdf, home, "용어사전 밖 구역에 PDF 성공 문구가 샜다")
+        # 색인 상단 카드 — 밴드 폼으로 가는 링크 + [hidden] 짝(author display 에 지지 않게)
+        self.assertIn('<a class="gl-pdf" id="grm-gl-pdf" href="#grm-sub-form">', index)
+        self.assertIn(".gl-pdf[hidden]{display:none}", index)
+        self.assertIn('id="grm-sub-form"', index, "카드가 가리키는 밴드 폼이 없다")
+        self.assertNotIn('id="grm-gl-pdf"', term, "안내 카드는 색인에만 둔다")
+        # 도착 페이지 — 방금 구독을 마친 사람에게 다시 권하지 않는다
+        self.assertNotIn('class="subscribe"', welcome)
+        self.assertNotIn('id="grm-cta"', welcome)
 
     def test_subscribe_band_remembers_completed_subscription(self):
         """[2026-09-23 마케팅 계획 C-06 감사] 배너는 `grm-sub-ok` 를 읽어 다시 뜨지 않는데

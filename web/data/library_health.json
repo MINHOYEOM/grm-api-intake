@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-21T08:11:24+00:00",
+  "checked_at": "2026-09-28T08:56:32+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -29,11 +29,11 @@
   ],
   "summary": {
     "blocked": 63,
-    "broken": 0,
-    "needs_review": 107,
-    "ok": 421,
-    "references": 713,
-    "unique_urls": 591
+    "broken": 1,
+    "needs_review": 106,
+    "ok": 426,
+    "references": 718,
+    "unique_urls": 596
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -1451,6 +1451,66 @@
       ],
       "status": "ok"
     },
+    "https://picscheme.org/docview/11331": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/11331",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-18-intro"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/11332": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/11332",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-18-part-i"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/11333": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/11333",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-18-annexes"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/11334": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/11334",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pe-009-18-part-ii"
+        }
+      ],
+      "status": "ok"
+    },
     "https://picscheme.org/docview/1947": {
       "attempts": 1,
       "final_url": "https://picscheme.org/docview/1947",
@@ -2183,7 +2243,7 @@
     },
     "https://picscheme.org/docview/6605": {
       "attempts": 1,
-      "final_url": "https://picscheme.org/docview/6605",
+      "final_url": "https://picscheme.org/en/members-area-login",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2203,7 +2263,7 @@
     },
     "https://picscheme.org/docview/6606": {
       "attempts": 1,
-      "final_url": "https://picscheme.org/docview/6606",
+      "final_url": "https://picscheme.org/en/members-area-login",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2223,7 +2283,7 @@
     },
     "https://picscheme.org/docview/6607": {
       "attempts": 1,
-      "final_url": "https://picscheme.org/docview/6607",
+      "final_url": "https://picscheme.org/en/members-area-login",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -2243,7 +2303,7 @@
     },
     "https://picscheme.org/docview/8881": {
       "attempts": 1,
-      "final_url": "https://picscheme.org/docview/8881",
+      "final_url": "https://picscheme.org/en/members-area-login",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -8191,6 +8251,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15955": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15955",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15955"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8704,9 +8779,9 @@
     "https://www.pmda.go.jp/files/000266954.pdf": {
       "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000266954.pdf",
-      "http_status": null,
-      "method": "GET",
-      "reason": "network_or_tls:ConnectTimeout",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -8714,7 +8789,7 @@
           "item_id": "pmda-000266954"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266955.pdf": {
       "attempts": 2,
@@ -8749,9 +8824,9 @@
     "https://www.pmda.go.jp/files/000273637.pdf": {
       "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
-      "http_status": null,
+      "http_status": 416,
       "method": "GET",
-      "reason": "network_or_tls:ConnectTimeout",
+      "reason": "http_416",
       "references": [
         {
           "field": "official_url",
@@ -8759,10 +8834,10 @@
           "item_id": "pmda-000273637"
         }
       ],
-      "status": "needs_review"
+      "status": "broken"
     },
     "https://www.pmda.go.jp/files/000276919.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000276919.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -8777,7 +8852,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280043.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000280043.pdf",
       "http_status": 200,
       "method": "HEAD",

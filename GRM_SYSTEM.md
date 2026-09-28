@@ -196,7 +196,7 @@ flowchart TD
 | 보조 | **주간 퀴즈 미생성 감시**(로컬 태스크의 침묵을 클라우드에서 본다 — 이번 주 세트 부재 시 `quiz-freshness` 이슈, 생기면 자동 종료) | `grm-quiz-freshness.yml` | cron 화 13:10 KST | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
 | 보조 | **뉴스레터 발송 누락 감시**(발행 PR 머지 뒤 Admin 발송이 빠진 주를 Brevo 캠페인 상태로 탐지 — dispatch_log 는 진실이 아니다) | `grm-newsletter-freshness.yml` | cron 월 20:13 · 화 09:13 KST + dispatch | 없음 |
-| 보조 | **주간 성장 리포트 메일**(지난주 구독자·방문·신청·채널/구역/경로별·검색·회원·뉴스레터 발송 여부 — 공개 저장소라 이슈가 아니라 운영자 메일로) | `grm-growth-weekly.yml` → `web/growth_weekly.py` | cron 월 09:23 KST + dispatch | 없음 |
+| 보조 | **주간 성장 리포트 메일**(지난주 구독자·방문·신청·채널/구역/경로별·검색·회원·뉴스레터 발송 여부 — 공개 저장소라 이슈가 아니라 운영자 메일로) | `grm-growth-weekly.yml` → `web/growth_weekly.py` | dispatch 만(09-28 예약 해제 — 매일 성장 일보·/admin 과 중복) | 없음 |
 | 보조 | **링크드인 카드뉴스 자동 생성**(최신 브리프 → 캐러셀 PDF + 게시 본문 txt · `/briefs/{date}/linkedin.pdf`·`linkedin.txt` **+ 영문판 `linkedin_en.*`**, 카드 JSON 의 key_facts·시사점·점검 + 용어사전 정의 그대로 · LLM 0 · 영문은 카드의 `en` 블록에서만 — 한국 업체명은 로마자로 옮기지 않고 건수로만 남긴다) · 게시 본문은 **'이번 주 한 건'**(헤드라인 카드 1건의 사실·시사점·점검 2개, 2026-09-23 마케팅 계획 L-02) 이 기본이고 `--caption summary` 로 종전 요약형을 낸다 · 본문 URL 에만 UTM(`linkedin/social/{date}_weekly`, `web/utm.py`) — 슬라이드 URL 은 깨끗하게 · **월간 결산 덱**(`--months auto` — 최신 호의 달과 그 전 달, `/monthly/{YYYY-MM}/linkedin.pdf`, 달마다 헤드라인 1건씩 최대 5 + 카드 유형 숫자 1장) | `grm-web-deploy.yml` 안 `web/linkedin_cards.py` 스텝(비차단·러너 Chrome 인쇄) | ⑤·⑦ 렌더 직후 | **게시만 사람**(PDF 첨부·txt 복붙·버튼 — API 자동 게시는 LinkedIn 승인 필요라 미채택) |
 | 보조 | 관심업체 통지 자동 발송(멱등 로그·상한) | `grm-watchlist-notify.yml` | cron 월 10:30 KST | 없음 |
 | 보조 | 서비스 업데이트 안내 발송(멱등·마일스톤에만) | `grm-announce-send.yml` | **수동 dispatch만**(스케줄 없음 — 의도적) | 없음 |
@@ -586,7 +586,7 @@ grm-api-intake/
 └─ .github/workflows/
    ├─ grm-intake.yml, grm-ci.yml
    ├─ grm-rum-analytics.yml              # [성장·유입] RUM → Supabase 동기화 매일 16:30 UTC(01:30 KST) · 최근 8일 재적재 · 토큰 미설정은 클린 skip
-   ├─ grm-growth-weekly.yml               # [성장·유입] 주간 성장 리포트 메일 매주 월 09:23 KST
+   ├─ grm-growth-weekly.yml               # [성장·유입] 주간 성장 리포트 메일 — 수동 실행만(09-28 예약 해제: 매일 성장 일보·/admin 과 중복)
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
    ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-reconciliation.yml, grm-supabase-keepalive.yml

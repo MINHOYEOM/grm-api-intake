@@ -24,9 +24,13 @@ name: GRM Growth Weekly Report
 #   집계 주기와 어긋난 행이 다음 주 차분을 오염시킨다 — 그래서 `--mode dry-run` 은
 #   `p_persist=false` 로 호출하고(리포트만 만들고 흔적을 남기지 않음), 실발송(`send`)만
 #   `p_persist=true` 다.
+#
+# ★2026-09-28 예약 해제 — 수동 실행만 남긴다. 매일 07:30 성장 일보(로컬 예약작업)가 이미
+#   최근 7일 대 직전 7일(방문·유입·신청·구독자·회원·검색)을 매일 보여 주고, 신청 채널·구역별
+#   전환은 /admin 성장·유입 탭(087 funnel_touch_report·funnel_zone_report)에 있다. 뉴스레터
+#   발송 여부는 `grm-newsletter-freshness.yml` 이 본다. 이 메일만의 몫이 남지 않아 운영자가
+#   끄기로 했다. 첫 예약(09-28 00:23 UTC)은 발화하지도 않았다.
 on:
-  schedule:
-    - cron: '23 0 * * 1'          # 00:23 UTC = 월 09:23 KST
   workflow_dispatch:
     inputs:
       week_end:

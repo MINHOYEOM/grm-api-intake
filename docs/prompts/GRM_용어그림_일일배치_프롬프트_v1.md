@@ -100,7 +100,8 @@ python glossary_figs.py queue --top 8
 ## 5. 검증 — 전부 통과해야 PR
 
 1. **실측**: `python glossary_figs.py check <이번 회차 id…>` → 문제 0(viewBox 밖·글자 겹침·상자 경계 걸침·
-   상자 여백·점 덮음). exit 2(Pretendard 미로드 = 측정 무효)면 한 번 더 돌리고, 그래도면 중단·보고.
+   상자 여백·점이나 작은 표식에 붙음/덮음 — 2 단위 안). ★영문 라벨이 국문보다 길어 **영문에서만** 붙는 일이 많다
+   (09-29 첫 회차 무균조작: "particles" 끝이 막대 표식과 0.9 단위 — 사람 눈엔 'particles—'로 읽혔다). exit 2(Pretendard 미로드 = 측정 무효)면 한 번 더 돌리고, 그래도면 중단·보고.
 2. **검토(눈으로 + 독립 검토자)**:
    `python glossary_figs.py sheet <이번 회차 id…> <그 용어들의 related 중 그림 있는 id…> --out <스크래치>/review.png`
    로 시트를 만들어 **직접 먼저 본다**. 그다음 Agent 도구로 검토자 **1명**(model: sonnet)에게 부록의

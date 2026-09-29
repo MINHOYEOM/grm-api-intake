@@ -135,31 +135,59 @@ PAGE_HEAD = ('<!doctype html><html><head><meta charset="utf-8">' + lc.FONT_LINKS
 # 규칙(모두 SVG 사용자 단위, 즉 viewBox 좌표):
 #  R1 글자가 viewBox 밖으로 나감            R2 글자끼리 겹침(1 단위 여유)
 #  R3 글자가 상자(rect) 경계에 걸침         R4 상자 안 글자는 좌우 여백 2 이상
-#  R5 글자가 점(circle)을 덮음              F  Pretendard 가 실제로 로드되지 않았으면 판정 무효
+#  R5 글자가 점(circle)에 붙거나 덮음       R6 글자가 작은 표식(16 이하 rect)에 붙거나 덮음
+#     (R5·R6 은 두 상자 사이 **실제 거리** < 2 — 대각선으로 떨어진 것은 붙은 게 아니다)
+#  F  Pretendard 가 실제로 로드되지 않았으면 판정 무효
+# ★모든 상자는 **viewBox 좌표로 환산**해 잰다(회전·부모 g 의 transform 포함). getBBox 는 자기 transform 을
+#   빼고 돌려주므로, 회전한 막대 표식은 그대로 쓰면 엉뚱한 자리에 있는 것으로 잰다.
+# ★R6(2026-09-29): 무균조작 다시 그림에서 영문 라벨 "Microbes, endotoxin, particles" 가 오른쪽 위 막대 표식을
+#   덮었는데 R1~R5 가 통과시켰다 — 점(circle)만 보고 작은 막대(rect)는 안 봤기 때문이다. 국문은 짧아 멀쩡했다.
 MEASURE_JS = r"""
 (async () => {
   await document.fonts.ready;
   const out = {fonts: document.fonts.check("700 10px Pretendard") && document.fonts.check("400 10px Pretendard"), items: []};
   const inter = (a, b, p = 0) => a.x < b.x + b.width + p && b.x < a.x + a.width + p && a.y < b.y + b.height + p && b.y < a.y + a.height + p;
+  // 두 상자 사이의 실제 거리(겹치면 0) — 가로·세로 여유를 따로 보면 대각선으로 떨어진 것까지 붙었다고 잰다
+  const gap = (a, b) => Math.hypot(Math.max(0, b.x - (a.x + a.width), a.x - (b.x + b.width)),
+                                   Math.max(0, b.y - (a.y + a.height), a.y - (b.y + b.height)));
   const inside = (a, b) => a.x >= b.x && a.y >= b.y && a.x + a.width <= b.x + b.width && a.y + a.height <= b.y + b.height;
   const r1 = n => Math.round(n * 10) / 10;
   for (const box of document.querySelectorAll(".box")) {
     const svg = box.querySelector("svg"), vb = svg.viewBox.baseVal, probs = [];
-    const T = [...svg.querySelectorAll("text")].map(t => ({s: t.textContent.trim(), b: t.getBBox()})).filter(t => t.s);
-    const R = [...svg.querySelectorAll("rect")].map(e => e.getBBox()).filter(b => !(b.width >= vb.width - 1 && b.height >= vb.height - 1));
-    const C = [...svg.querySelectorAll("circle")].map(e => e.getBBox());
+    const toVb = svg.getScreenCTM().inverse();
+    const bb = e => {           // 요소의 상자를 viewBox 좌표로(자기·조상 transform 포함)
+      const b = e.getBBox(), m = toVb.multiply(e.getScreenCTM());
+      const pts = [[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]]
+        .map(([x, y]) => [m.a * x + m.c * y + m.e, m.b * x + m.d * y + m.f]);
+      const xs = pts.map(q => q[0]), ys = pts.map(q => q[1]);
+      return {x: Math.min(...xs), y: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys)};
+    };
+    const T = [...svg.querySelectorAll("text")].map(t => ({s: t.textContent.trim(), b: bb(t)})).filter(t => t.s);
+    const R = [...svg.querySelectorAll("rect")].map(bb).filter(b => !(b.width >= vb.width - 1 && b.height >= vb.height - 1));
+    // 점은 네모가 아니라 **원**으로 잰다 — 네모 상자의 모서리는 원보다 훨씬 바깥이라 거짓으로 붙었다고 나온다
+    const C = [...svg.querySelectorAll("circle")].map(e => {
+      const m = toVb.multiply(e.getScreenCTM()), x = e.cx.baseVal.value, y = e.cy.baseVal.value;
+      return {cx: m.a * x + m.c * y + m.e, cy: m.b * x + m.d * y + m.f,
+              r: e.r.baseVal.value * Math.sqrt(Math.abs(m.a * m.d - m.b * m.c))};
+    });
+    const gapCircle = (a, c) => Math.max(0, Math.hypot(Math.max(0, a.x - c.cx, c.cx - (a.x + a.width)),
+                                                       Math.max(0, a.y - c.cy, c.cy - (a.y + a.height))) - c.r);
     for (const t of T) {
       const b = t.b;
       if (b.x < vb.x - 0.5 || b.y < vb.y - 0.5 || b.x + b.width > vb.x + vb.width + 0.5 || b.y + b.height > vb.y + vb.height + 0.5)
         probs.push(`R1 viewBox 밖: "${t.s}" (${r1(b.x)}..${r1(b.x + b.width)}, ${r1(b.y)}..${r1(b.y + b.height)} / ${vb.width}x${vb.height})`);
       for (const rb of R) {
-        if (!inter(b, rb)) continue;
         const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
         const centred = cx > rb.x && cx < rb.x + rb.width && cy > rb.y && cy < rb.y + rb.height;
+        if (rb.width <= 16 && rb.height <= 16 && !centred) {   // 작은 표식 — 2 단위 안으로 붙어도 글자의 일부로 읽힌다
+          if (gap(b, rb) < 2) probs.push(`R6 작은 표식에 붙음/덮음: "${t.s}" (${r1(rb.x)},${r1(rb.y)})`);
+          continue;
+        }
+        if (!inter(b, rb)) continue;
         if (!inside(b, rb)) { if (centred) probs.push(`R3 상자 경계에 걸침: "${t.s}"`); }
         else if (b.x - rb.x < 2 || rb.x + rb.width - (b.x + b.width) < 2) probs.push(`R4 상자 안 여백 2 미만: "${t.s}"`);
       }
-      for (const cb of C) if (inter(b, cb)) probs.push(`R5 점을 덮음: "${t.s}"`);
+      for (const c of C) if (gapCircle(b, c) < 2) probs.push(`R5 점에 붙음/덮음: "${t.s}" (${r1(c.cx)},${r1(c.cy)})`);
     }
     for (let i = 0; i < T.length; i++) for (let j = i + 1; j < T.length; j++)
       if (inter(T[i].b, T[j].b, 1)) probs.push(`R2 글자 겹침: "${T[i].s}" ↔ "${T[j].s}"`);

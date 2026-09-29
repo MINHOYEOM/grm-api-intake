@@ -1,25 +1,26 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-09-23",
+  "generated_on": "2026-09-29",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 102,
-      "candidate_count": 103,
-      "new_count": 1,
+      "baseline_count": 103,
+      "candidate_count": 105,
+      "new_count": 2,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0011-15955"
+        "data0010-15296",
+        "data0010-15297"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 45,
-      "derived_items": 30,
+      "collector_items": 44,
+      "derived_items": 29,
       "dropped_items": 15,
       "collector_error": null,
-      "change_count": 1,
-      "change_percent": 0.98
+      "change_count": 2,
+      "change_percent": 1.94
     },
     "ich": {
       "baseline_count": 31,
@@ -48,22 +49,6 @@
       "removed_ids": [],
       "collector_items": 63,
       "derived_items": 63,
-      "dropped_items": 0,
-      "collector_error": null,
-      "change_count": 0,
-      "change_percent": 0.0
-    },
-    "ema": {
-      "baseline_count": 33,
-      "candidate_count": 33,
-      "new_count": 0,
-      "changed_count": 0,
-      "removed_count": 0,
-      "new_ids": [],
-      "changed_ids": [],
-      "removed_ids": [],
-      "collector_items": 28,
-      "derived_items": 28,
       "dropped_items": 0,
       "collector_error": null,
       "change_count": 0,
@@ -134,25 +119,20 @@
       "change_percent": 0.0
     },
     "pics": {
-      "baseline_count": 47,
+      "baseline_count": 51,
       "candidate_count": 51,
-      "new_count": 4,
+      "new_count": 0,
       "changed_count": 0,
       "removed_count": 0,
-      "new_ids": [
-        "pics-pe-009-18-annexes",
-        "pics-pe-009-18-intro",
-        "pics-pe-009-18-part-i",
-        "pics-pe-009-18-part-ii"
-      ],
+      "new_ids": [],
       "changed_ids": [],
       "removed_ids": [],
       "collector_items": 47,
       "derived_items": 47,
       "dropped_items": 0,
       "collector_error": null,
-      "change_count": 4,
-      "change_percent": 8.51
+      "change_count": 0,
+      "change_percent": 0.0
     },
     "pmda": {
       "baseline_count": 15,
@@ -187,8 +167,12 @@
       "change_percent": 0.0
     }
   },
-  "collector_errors": {},
-  "skipped_sources": {},
+  "collector_errors": {
+    "ema": "EMA 과학 가이드라인 링크 0건(<5) — 페이지 구조 변경 의심"
+  },
+  "skipped_sources": {
+    "ema": "EMA 과학 가이드라인 링크 0건(<5) — 페이지 구조 변경 의심"
+  },
   "gate": {
     "max_change_count": 20,
     "max_change_percent": 30.0,

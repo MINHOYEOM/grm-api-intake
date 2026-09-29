@@ -1,22 +1,25 @@
 {#- 용어 그림 · process-validation — 정의("설정한 변수 안에서 공정이 규격과 품질특성을 만족하는 제품을
-    효과적이고 반복적으로 생산할 수 있음을 입증")를 규격 범위 띠 안에 반복 배치 셋으로 옮긴다.
-    단계 이름(설계·PPQ·지속적 검증)이나 배치 수 요건 같은 정의 밖 주장은 넣지 않는다. -#}
-<svg class="gt-fig-svg" viewBox="0 0 180 88" role="img" aria-label="{{ _('규격 범위 안에 들어온 반복 배치 셋') }}">
-  <rect x="14" y="28" width="152" height="30" style="fill:var(--coral-tint)"/>
+    효과적이고 반복적으로 생산할 수 있음을 입증")를 설정 범위 안의 변수 → 공정 → 규격 띠 안에 거듭 놓이는 같은 제품으로 옮긴다.
+    2026-09-29 다시 그림: '배치 1·2·3' 번호(정의 밖 개수)를 번호 없는 반복 표식 + '…'로 바꾸고, 적합기준 그림(범위 띠 + 점)과
+    갈리도록 점 대신 제품 용기를 두고 앞에 '설정 변수 → 공정'을 붙였다. 단계 이름·배치 수 요건 같은 정의 밖 주장은 넣지 않는다. -#}
+<svg class="gt-fig-svg" viewBox="0 0 184 88" role="img" aria-label="{{ _('설정한 변수 안에서 공정이 규격 안의 제품을 거듭 만들어 냄') }}">
+  <rect x="8" y="28" width="26" height="32" rx="3" style="fill:var(--coral-tint);stroke:var(--coral-2);stroke-width:1.6;stroke-dasharray:4 3"/>
+  <circle cx="21" cy="44" r="4" style="fill:var(--ink)"/>
+  <text x="6" y="80" style="font-size:9px;fill:var(--muted)">{{ _('설정 변수') }}</text>
+  <g style="stroke:var(--coral);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round">
+    <path d="M36 44h8M40 40l4 4-4 4M90 44h8M94 40l4 4-4 4"/>
+  </g>
+  <rect x="47" y="32" width="41" height="24" rx="4" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.6"/>
+  <text x="67.5" y="48" text-anchor="middle" style="font-size:10px;fill:var(--ink)">{{ _('공정') }}</text>
+  <rect x="102" y="26" width="76" height="36" style="fill:var(--coral-tint)"/>
   <g style="stroke:var(--coral-2);stroke-width:1.6;stroke-dasharray:5 4">
-    <line x1="14" y1="28" x2="166" y2="28"/>
-    <line x1="14" y1="58" x2="166" y2="58"/>
+    <line x1="102" y1="26" x2="178" y2="26"/>
+    <line x1="102" y1="62" x2="178" y2="62"/>
   </g>
-  <text x="14" y="21" style="font-size:9px;fill:var(--coral-2)">{{ _('규격 범위') }}</text>
-  <g style="fill:var(--ink)">
-    <circle cx="48" cy="45" r="4.5"/>
-    <circle cx="90" cy="41" r="4.5"/>
-    <circle cx="132" cy="47" r="4.5"/>
+  <text x="102" y="18" style="font-size:9px;fill:var(--coral-2)">{{ _('규격') }}</text>
+  <g style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.6">
+    <rect x="108" y="36" width="12" height="18" rx="2"/><rect x="128" y="36" width="12" height="18" rx="2"/><rect x="148" y="36" width="12" height="18" rx="2"/>
   </g>
-  <text x="8" y="80" style="font-size:9px;fill:var(--muted)">{{ _('배치') }}</text>
-  <g style="font-size:9px;fill:var(--muted);text-anchor:middle">
-    <text x="48" y="80">1</text>
-    <text x="90" y="80">2</text>
-    <text x="132" y="80">3</text>
-  </g>
+  <g style="fill:var(--ink)"><rect x="110" y="32" width="8" height="4" rx="1"/><rect x="130" y="32" width="8" height="4" rx="1"/><rect x="150" y="32" width="8" height="4" rx="1"/></g>
+  <text x="164" y="50" style="font-size:10px;fill:var(--ink)">…</text>
 </svg>

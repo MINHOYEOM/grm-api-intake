@@ -90,6 +90,9 @@ def build_queue(top: int) -> dict:
 
     redo = [dict(row(tid), reason=v.get("reason"), since=v.get("since"))
             for tid, v in sorted(review["redo"].items()) if tid in figs]
+    # 다시 그릴 그림도 **카드에 자주 실린 것부터** — 이름순이면 15주 중 8주 실린 무균조작이 한 번도 안 실린
+    # 적합기준 뒤로 밀린다(2026-09-29 실측). 매주 나가는 칸의 결함을 먼저 고친다.
+    redo.sort(key=lambda r: (-r["card_weeks_top5"], -r["card_weeks_scored"], r["id"]))
     todo = [t["id"] for t in glossary if t["id"] not in figs and t["id"] not in review["skip"]]
     todo.sort(key=lambda tid: (-exp.get(tid, {}).get("top5", 0), -exp.get(tid, {}).get("scored", 0),
                                exp.get(tid, {}).get("best") or 10**6, order[tid]))

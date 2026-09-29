@@ -41,6 +41,11 @@ class QueueTest(unittest.TestCase):
         for r in self.q["redo"]:
             self.assertTrue(r["reason"])
 
+    def test_redo_is_ordered_by_card_exposure(self):
+        """다시 그릴 그림도 카드에 자주 실린 것부터 — 매주 나가는 칸의 결함을 먼저 고친다."""
+        keys = [(-r["card_weeks_top5"], -r["card_weeks_scored"], r["id"]) for r in self.q["redo"]]
+        self.assertEqual(keys, sorted(keys))
+
     def test_new_candidates_are_ordered_by_card_exposure(self):
         keys = [(-r["card_weeks_top5"], -r["card_weeks_scored"]) for r in self.q["new"]]
         self.assertEqual(keys, sorted(keys))

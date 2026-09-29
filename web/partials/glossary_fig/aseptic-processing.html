@@ -1,12 +1,14 @@
-{#- 용어 그림 · aseptic-processing — 정의("멸균된 제품·용기·기구를 다루는 동안 … 오염을 막도록 관리하는 공정")를
-    여과 공기 아래에서 다루는 멸균 제품 하나로 옮긴다. 등급·설비 이름 같은 정의 밖 주장은 넣지 않는다. -#}
-<svg class="gt-fig-svg" viewBox="0 0 180 88" role="img" aria-label="{{ _('여과 공기 아래에서 다루는 멸균된 제품') }}">
-  <rect x="30" y="6" width="90" height="12" rx="3" style="fill:var(--card);stroke:var(--muted);stroke-width:1.5"/>
-  <text x="34" y="30" style="font-size:9px;fill:var(--muted)">{{ _('여과 공기') }}</text>
-  <g style="stroke:var(--coral);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none">
-    <path d="M45 34v14M45 48l-4-5M45 48l4-5M75 34v14M75 48l-4-5M75 48l4-5M105 34v14M105 48l-4-5M105 48l4-5"/>
-  </g>
-  <rect x="66" y="58" width="18" height="24" rx="3" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.8"/>
-  <rect x="69" y="53" width="12" height="5" rx="1" style="fill:var(--ink)"/>
-  <text x="92" y="76" style="font-size:9px;fill:var(--muted)">{{ _('멸균된 제품') }}</text>
+{#- 용어 그림 · aseptic-processing — 정의("멸균된 제품·용기·기구를 다루는 동안 미생물, 엔도톡신과 입자 오염을
+    막도록 관리하는 공정")를 멸균된 물품을 다루는 구역 안은 깨끗하고, 오염원(미생물·입자)은 그 밖에 머무는 안/밖 대비로 옮긴다.
+    2026-09-29 다시 그림: '여과 공기'(정의 밖 수단·HEPA 그림과 같은 모티프)를 빼고 정의의 핵심인 '오염을 막음'을 그렸다.
+    화살표·필터·설비 이름은 쓰지 않는다. -#}
+<svg class="gt-fig-svg" viewBox="0 0 184 88" role="img" aria-label="{{ _('미생물·엔도톡신·입자가 멸균된 물품에 닿지 못하게 막음') }}">
+  <text x="92" y="12" text-anchor="middle" style="font-size:8.5px;fill:var(--muted)">{{ _('미생물·엔도톡신·입자') }}</text>
+  <g style="fill:var(--muted)"><circle cx="16" cy="30" r="1.8"/><circle cx="26" cy="62" r="1.8"/><circle cx="160" cy="26" r="1.8"/><circle cx="170" cy="58" r="1.8"/><circle cx="12" cy="74" r="1.8"/><circle cx="174" cy="40" r="1.8"/></g>
+  <g style="fill:var(--coral)"><circle cx="22" cy="44" r="3"/><circle cx="164" cy="70" r="2.6"/><circle cx="36" cy="22" r="2.6"/><rect x="10" y="54" width="11" height="4" rx="2" transform="rotate(-25 15.5 56)"/><rect x="156" y="46" width="11" height="4" rx="2" transform="rotate(20 161.5 48)"/><rect x="150" y="10" width="11" height="4" rx="2"/></g>
+  <rect x="46" y="20" width="92" height="62" rx="6" style="fill:var(--canvas);stroke:var(--coral-2);stroke-width:2"/>
+  <rect x="68" y="30" width="12" height="5" rx="1" style="fill:var(--ink)"/>
+  <rect x="64" y="35" width="20" height="26" rx="3" style="fill:var(--card);stroke:var(--ink);stroke-width:1.8"/>
+  <path d="M96 42h24l-3 19h-18z" style="fill:var(--card);stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round"/>
+  <text x="92" y="75" text-anchor="middle" style="font-size:9px;fill:var(--muted)">{{ _('멸균된 물품') }}</text>
 </svg>

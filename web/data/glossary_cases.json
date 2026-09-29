@@ -1424,6 +1424,11 @@
       "id": "management-review",
       "term_ko": "경영검토",
       "reason": "'management review' 7건이 전부 경고서한 시정요구 상용구('…and improved systems for ongoing management review')에 걸린 것 — 지적 자체는 천장 도장 벗겨짐·배치기록 훼손 등 경영검토와 무관한 주제라 링크하면 경영검토 지적사례로 오인된다"
+    },
+    {
+      "id": "summary-of-product-characteristics",
+      "term_ko": "제품특성요약",
+      "reason": "지적사항 본문 검색 'summary of product characteristics'·'SmPC'·'제품특성요약' 모두 0건(2026-09-29)"
     }
   ],
   "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."

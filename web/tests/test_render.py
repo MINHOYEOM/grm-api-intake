@@ -9781,7 +9781,8 @@ class WebGlossaryRenderTest(unittest.TestCase):
         # mix-up·training·certificate-of-analysis·returned-product·pressure-differential·
         # sporicidal-agent·time-limits-on-production·yield·reconciliation·equipment-use-log·
         # distribution-record·pest-control).
-        self.assertEqual(len(self.terms), 242)
+        # 242 → 243: 2026-09-29 주간 용어 추가 202640(summary-of-product-characteristics).
+        self.assertEqual(len(self.terms), 243)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).

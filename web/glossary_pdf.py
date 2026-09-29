@@ -207,7 +207,7 @@ def index_pages(view: dict[str, Any]) -> str:
 
 
 def entry(t: dict[str, Any]) -> str:
-    fig = f'<div class="fig">{lc.mini(t["id"])}</div>' if t["id"] in lc.MINI_SVG else ""
+    fig = f'<div class="fig">{lc.mini(t["id"])}</div>' if lc.has_figure(t["id"]) else ""
     en = f'<span class="en">{_e(t["term_sub"])}</span>' if t.get("term_sub") else ""
     detail = f'<p class="detail">{_e(t["detail"])}</p>' if t.get("detail") else ""
     refs = " · ".join(r["label"] for r in (t.get("reg_refs") or []) if r.get("label"))
@@ -276,7 +276,7 @@ def load_view() -> dict[str, Any]:
 
 def build_html(view: dict[str, Any], edition: str, *, font_links: bool = True) -> str:
     all_terms = [t for g in view["groups"] for t in g["terms"]]
-    n_figs = sum(1 for t in all_terms if t["id"] in lc.MINI_SVG)
+    n_figs = sum(1 for t in all_terms if lc.has_figure(t["id"]))
     n_cases = sum(1 for t in all_terms if _case_count(t))
     css = (CSS.replace("HEX_DARK", lc._data_uri(lc._HEX.format(op="0.07")))
               .replace("HEX_CREAM", lc._data_uri(lc._HEX.format(op="0.07"))))

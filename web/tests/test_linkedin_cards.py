@@ -426,17 +426,24 @@ class EnglishDeckTest(unittest.TestCase):
         self.assertNotIn("Company", labels, "이름을 못 쓰는데 업체 줄이 남았다")
         self.assertEqual(HANGUL.findall(lc.render_html(en)), [])
 
-    def test_mini_labels_fill_every_slot_in_every_language(self):
-        """라벨 사전이 그림보다 낡으면 KeyError 로 죽는다 — 두 언어 전부를 실제로 채워 본다."""
-        for fig_id in lc.MINI_SVG:
+    def test_every_figure_renders_in_every_language(self):
+        """모든 그림을 두 언어로 실제 렌더해 본다 — 영문 카탈로그 결손·모르는 색 변수는 여기서 죽는다."""
+        ids = lc.figure_ids()
+        self.assertGreater(len(ids), 0)
+        for fig_id in ids:
             for lang in lc.LANGS:
                 with self.subTest(fig=fig_id, lang=lang):
                     svg = lc.mini(fig_id, lang)
-                    self.assertNotIn("{", svg, "채우지 않은 슬롯이 남았다")
                     self.assertEqual(svg.count("<svg"), 1)
+                    self.assertIn('class="mini"', svg)
+                    self.assertNotIn("{{", svg, "렌더되지 않은 Jinja 가 남았다")
+                    self.assertNotIn("var(--", svg, "카드 팔레트로 바뀌지 않은 색 변수")
+                    self.assertNotEqual(svg, lc.GENERIC_MINI)
                     if lang != "ko":
                         self.assertEqual(HANGUL.findall(svg), [])
-        self.assertEqual(lc.mini("없는-용어", "en"), lc.mini("_generic", "en"))
+        self.assertEqual(lc.mini("없는-용어", "en"), lc.GENERIC_MINI)
+        self.assertFalse(lc.has_figure("없는-용어"))
+        self.assertFalse(lc.has_figure(None))
 
     # ── [영문 정의 잘림 2026-09-22] 카드는 "정의를 그대로 가져왔다"고 적어 둔다. 그래 놓고
     # CSS 클램프가 문장 한가운데를 "…" 로 끊으면 그 문구가 거짓이 된다.
@@ -484,22 +491,45 @@ class EnglishDeckTest(unittest.TestCase):
         self.assertLess(lc.text_width(fits), budget)
         self.assertGreater(lc.text_width(never), budget)
 
-    def test_deck_and_site_carry_the_same_figures(self):
-        """그림은 덱(MINI_SVG)과 사이트(partials/glossary_fig/*.html) 두 벌로 산다.
-        한쪽에만 그리면 다른 쪽은 조용히 문서 아이콘으로 돌아간다 — 2026-09-21 에
-        실제로 그랬다(덱에만 있던 deviation). 이름이 아니라 **두 집합의 차이**로 잰다."""
-        fig_dir = pathlib.Path(lc.WEB_DIR) / "partials" / "glossary_fig"
-        site = {p.stem for p in fig_dir.glob("*.html")}
-        deck = set(lc.MINI_SVG) - {"_generic"}      # _generic 은 폴백이라 사이트에 없다
-        self.assertEqual(deck - site, set(), "덱에만 있는 그림 — 사이트 partial 이 없다")
-        self.assertEqual(site - deck, set(), "사이트에만 있는 그림 — 덱 MINI_SVG 가 없다")
+    def test_card_figure_is_the_site_figure(self):
+        """그림은 사이트 partial 한 벌뿐이다 — 카드는 그것을 렌더해 쓴다(2026-09-29).
+        예전엔 덱에 사본(MINI_SVG)을 따로 들고 있었고, id 만 맞추는 파리티 검사를 통과한 채
+        **그림 자체가** 9장 갈라져 있었다(카드에만 남은 "Grade A"·"I·II·III"). 그래서 id 가 아니라
+        **글자와 도형**이 사이트 렌더와 같은지 잰다. 색만 카드 팔레트로 바뀐다."""
+        site_env = lc.render._make_env("en")
+        for fig_id in lc.figure_ids():
+            with self.subTest(fig=fig_id):
+                site = site_env.get_template(f"partials/glossary_fig/{fig_id}.html").render()
+                card = lc.mini(fig_id, "en")
+                strip = lambda s: re.sub(r"var\(--[a-z0-9-]+\)|#[0-9A-Fa-f]{6}|\s+", "", s)
+                self.assertEqual(strip(card).replace('class="mini"', ""),
+                                 strip(site[site.index("<svg"):]).replace('class="gt-fig-svg"', ""))
 
     def test_every_figure_points_at_a_real_glossary_term(self):
         """그림 id 는 정본 용어 id 여야 한다 — 오타 하나면 영영 안 뜨는 그림이 된다."""
         terms = {t["id"] for t in json.loads(
             (pathlib.Path(lc.WEB_DIR) / "data" / "glossary.json").read_text(encoding="utf-8"))}
-        orphans = sorted((set(lc.MINI_SVG) - {"_generic"}) - terms)
+        orphans = sorted(set(lc.figure_ids()) - terms)
         self.assertEqual(orphans, [], f"정본에 없는 용어의 그림: {orphans}")
+
+    def test_figure_review_ledger_is_consistent(self):
+        """검토 장부(glossary_fig_review.json)는 일일 배치가 매일 읽는다 — 낡으면 배치가 헛돈다.
+        redo 는 **있는 그림**을 다시 그리라는 뜻이고, skip 은 **그리지 않기로 한** 용어다.
+        skip 인데 그림이 생겼거나, redo 인데 그림이 없으면 장부가 현실과 어긋난 것이다."""
+        data = json.loads((pathlib.Path(lc.WEB_DIR) / "data" / "glossary_fig_review.json")
+                          .read_text(encoding="utf-8"))
+        terms = {t["id"] for t in json.loads(
+            (pathlib.Path(lc.WEB_DIR) / "data" / "glossary.json").read_text(encoding="utf-8"))}
+        figs = set(lc.figure_ids())
+        for section in ("redo", "skip"):
+            for tid, v in (data.get(section) or {}).items():
+                with self.subTest(section=section, id=tid):
+                    self.assertIn(tid, terms, "정본에 없는 용어 id")
+                    self.assertTrue(str(v.get("reason") or "").strip(), "사유가 비었다")
+                    self.assertRegex(str(v.get("since") or ""), r"^\d{4}-\d{2}-\d{2}$")
+        self.assertEqual(sorted(set(data.get("redo") or {}) - figs), [], "redo 인데 그림이 없다")
+        self.assertEqual(sorted(set(data.get("skip") or {}) & figs), [],
+                         "skip 인데 그림이 있다 — 그렸으면 장부에서 빼라")
 
     def test_tie_is_broken_by_headline_evidence_not_glossary_order(self):
         """같은 점수면 **그 주 헤드라인이 실제로 다룬 말**이 이긴다.

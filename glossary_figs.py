@@ -231,6 +231,12 @@ def sheet(ids: list[str], out: Path, *, blank_names: bool = False) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows 콘솔(cp949)에서 한글·em-dash 출력으로 죽지 않게 — 배치는 PowerShell 에서 돈다
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description="용어 그림 일일 배치 도구")
     sub = ap.add_subparsers(dest="cmd", required=True)
     q = sub.add_parser("queue", help="다시 볼 그림 → 새 후보(카드 노출 순)")

@@ -870,6 +870,54 @@
       "doc_type": "guidance-internal",
       "published_date": "2026-09-28",
       "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15296"
+    },
+    {
+      "id": "data0011-15966",
+      "title_en": "의약외품 표시 광고 가이드라인",
+      "title_ko": "의약외품 표시 광고 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15966"
+    },
+    {
+      "id": "data0011-15963",
+      "title_en": "소기업·연구개발자를 위한 알기 쉬운 제품화 가이드(의약품, 의료기기, 임상통계 분야)",
+      "title_ko": "소기업·연구개발자를 위한 알기 쉬운 제품화 가이드(의약품, 의료기기, 임상통계 분야)",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15963"
+    },
+    {
+      "id": "data0011-15962",
+      "title_en": "의약품 품목 갱신 업무 민원인을 위한 가이드라인",
+      "title_ko": "의약품 품목 갱신 업무 민원인을 위한 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15962"
+    },
+    {
+      "id": "data0011-15960",
+      "title_en": "의약품의 위해성 관리 계획 가이드라인",
+      "title_ko": "의약품의 위해성 관리 계획 가이드라인",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15960"
+    },
+    {
+      "id": "data0011-15958",
+      "title_en": "한약(생약)제제 품질심사 주요 보완사례집",
+      "title_ko": "한약(생약)제제 품질심사 주요 보완사례집",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15958"
+    },
+    {
+      "id": "data0011-15957",
+      "title_en": "바이러스 표적 단클론항체의약품 및 기타 치료용 단백질의 역가시험법 개발 시 고려사항",
+      "title_ko": "바이러스 표적 단클론항체의약품 및 기타 치료용 단백질의 역가시험법 개발 시 고려사항",
+      "doc_type": "guidance-industry",
+      "published_date": "2026-09-30",
+      "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15957"
     }
   ]
 }

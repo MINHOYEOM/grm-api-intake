@@ -1,5 +1,20 @@
-{#- 용어 그림 · qualification — easy_ko 정의를 묘사만 한다(정의 밖 주장 금지).
+{#- 용어 그림 · qualification — 정의("시설·시스템과 설비가 올바르게 설치되고 제대로 작동해 기대한 결과를 낸다는 점을
+    입증하고 문서화")를 설비 옆 기록지에 차례로 확인된 설치 → 작동 → 기대한 결과로 옮긴다.
+    2026-09-30 다시 그림: 설비 상자의 '+'(뜻이 정해지지 않은 기호)를 빼고 화면·손잡이가 있는 일반 설비로 바꿨다.
+    확인 항목을 기록지 안에 넣어 정의의 '문서화'를 살렸다.
     링크드인 카드 '이번 주 용어' 장·용어집 PDF 도 이 파일을 그대로 렌더한다(2026-09-29 단일 원천 — 사본 없음). -#}
-<svg class="gt-fig-svg" viewBox="0 0 150 88" role="img" aria-label="{{ _('설치와 작동, 결과를 차례로 확인한 설비') }}">
-  <rect x="10" y="22" width="44" height="44" rx="5" fill="var(--canvas)" stroke="var(--ink)" stroke-width="1.7"/><path d="M20 44h24M32 34v20" stroke="var(--muted)" stroke-width="1.5"/><path d="M67 28l3.5 3.5L78 23" fill="none" stroke="var(--coral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="32" font-size="9" fill="var(--muted)">{{ _('설치') }}</text><path d="M67 46l3.5 3.5L78 41" fill="none" stroke="var(--coral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="50" font-size="9" fill="var(--muted)">{{ _('작동') }}</text><path d="M67 64l3.5 3.5L78 59" fill="none" stroke="var(--coral)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="68" font-size="9" fill="var(--coral-2)" font-weight="700">{{ _('기대한 결과') }}</text>
+<svg class="gt-fig-svg" viewBox="0 0 176 88" role="img" aria-label="{{ _('설치와 작동, 결과를 차례로 확인한 설비') }}">
+  <rect x="6" y="26" width="40" height="40" rx="4" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.7"/>
+  <rect x="12" y="32" width="18" height="11" rx="1.5" style="fill:var(--soft);stroke:var(--muted);stroke-width:1.3"/>
+  <circle cx="38" cy="37.5" r="3" style="fill:var(--card);stroke:var(--muted);stroke-width:1.3"/>
+  <path d="M12 56h28" style="stroke:var(--line-2);stroke-width:1.5"/>
+  <path d="M50 46h10M56 42l4 4-4 4" style="fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"/>
+  <path d="M64 6h94l12 12v66H64z" style="fill:var(--card);stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round"/>
+  <path d="M158 6v12h12" style="fill:none;stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round"/>
+  <g style="fill:none;stroke:var(--coral);stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+    <path d="M72 26l3.5 3.5L83 21"/><path d="M72 45l3.5 3.5L83 40"/><path d="M72 64l3.5 3.5L83 59"/>
+  </g>
+  <text x="89" y="30" style="font-size:9px;fill:var(--muted)">{{ _('설치') }}</text>
+  <text x="89" y="49" style="font-size:9px;fill:var(--muted)">{{ _('작동') }}</text>
+  <text x="89" y="68" style="font-size:9px;font-weight:700;fill:var(--coral-2)">{{ _('기대한 결과') }}</text>
 </svg>

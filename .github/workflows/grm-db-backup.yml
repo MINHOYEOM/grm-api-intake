@@ -90,7 +90,7 @@ jobs:
       - name: Install dependencies (requests only)
         run: python -m pip install --quiet "requests>=2.32,<3"
 
-      - uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
+      - uses: supabase/setup-cli@afb1b15109756ea5cf9d8985a359d9095235ca2b # v2.1.2
 
       - name: Link Supabase project
         shell: bash

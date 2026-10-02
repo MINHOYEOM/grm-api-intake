@@ -926,6 +926,14 @@
       "doc_type": "guidance-industry",
       "published_date": "2026-10-01",
       "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15967"
+    },
+    {
+      "id": "data0010-15302",
+      "title_en": "동등생물의약품 심사 검토서 작성 요령",
+      "title_ko": "동등생물의약품 심사 검토서 작성 요령",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-10-02",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15302"
     }
   ]
 }

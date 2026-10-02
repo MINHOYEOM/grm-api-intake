@@ -1,0 +1,236 @@
+[
+  {
+    "finding_id": "finding-05fc3bc355c53cc06e7cf6d5",
+    "finding_text": "품질 기타 [별표 1의2] 제2.2호 문서의 승인 및 일탈의 조사·기록과 관련된 품질부서의 책임을 명확히 수립하고 관련된 시정·예방조치 계획을 제출할 것",
+    "finding_text_ko": "[품질] [별표 1의2] 제2.2호 관련: 문서 승인과 일탈(deviation)의 조사·기록에 관한 품질부서의 책임을 명확히 수립하고, 관련 시정·예방조치(CAPA) 계획을 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0616cef6a188cf7b8b864205",
+    "finding_text": "Sterile drugs were exposed to lower than ISO 5 quality air.",
+    "finding_text_ko": "무균 의약품이 ISO 5 미만 품질의 공기에 노출되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0d7895966bb400186b0245e3",
+    "finding_text": "제조 기타 [별표 1의2] 제5호 시간 허용 오차 범위와 오차 발생 시 동기화 수행 절차를 명확히 설정할 것",
+    "finding_text_ko": "[제조] [별표 1의2] 제5호 관련: 시간 허용 오차 범위와, 오차가 발생했을 때의 시간 동기화 수행 절차를 명확히 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1487e47fb2635462fac7fdfa",
+    "finding_text": "Use of ingredients not intended for pharmaceutical use in sterile drug production.",
+    "finding_text_ko": "무균 의약품 생산에 의약품 용도가 아닌 원료(ingredients)를 사용했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-216afbc220495f2a01665074",
+    "finding_text": "시설 장비 기타 [별표 1의2] 제3.2호 작업복을 절차서와 동일하게 관리하고, 신발 등 세탁 절차를 명확히 설정할 것",
+    "finding_text_ko": "[시설·장비] [별표 1의2] 제3.2호 관련: 작업복을 절차서에 규정된 대로 관리하고, 신발 등의 세탁 절차를 명확히 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-38ac8840d7bb7c370ad17294",
+    "finding_text": "Written production and process control procedures are not followed in the execution of production and process control functions and documented at the time of performance.",
+    "finding_text_ko": "생산 및 공정 관리 업무를 수행할 때 문서화된 생산·공정 관리 절차를 따르지 않았고, 수행 시점에 기록하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4589d996bf7a2da8139d816b",
+    "finding_text": "Component testing is deficient in that each component is not tested for conformity with all appropriate written specifications for purity, strength, and quality.",
+    "finding_text_ko": "원료(component) 시험이 미흡하다. 각 원료에 대해 순도, 함량(strength), 품질에 관한 모든 적절한 문서화된 규격(specifications)에의 적합 여부를 시험하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51c1aba8f7034e8d0ea2e353",
+    "finding_text": "시설장비 기타 [별표 1] 제2호 정제수 저장탱크 센서에 대한 교정을 정기적으로 수행할 것",
+    "finding_text_ko": "[시설·장비] [별표 1] 제2호 관련: 정제수 저장탱크 센서에 대한 교정을 정기적으로 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-52a618b398b85a4f8909bcc8",
+    "finding_text": "Sterile products were exposed to non-sterile or non-depyrogenated supplies.",
+    "finding_text_ko": "무균 제품이 비멸균 또는 탈발열(depyrogenation) 처리되지 않은 소모품에 노출되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-565e4e75578a105e8b2c6cc5",
+    "finding_text": "Inadequate <Redacted B4> testin g on <Redacted B4> used to sterilize drug products.",
+    "finding_text_ko": "의약품 멸균에 사용하는 <Redacted B4>에 대한 <Redacted B4> 시험이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5cf0b887718e7b4772c32010",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+    "finding_text_ko": "무균공정(aseptic processing) 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-69fb22afae72b87f935bfcd9",
+    "finding_text": "제조 기타 [별표 1의2] 제8호 포장 공정 시 사용하는 장갑의 세척 및 관리 절차를 명확히 수립하여 관리할 것",
+    "finding_text_ko": "[제조] [별표 1의2] 제8호 관련: 포장 공정에서 사용하는 장갑의 세척 및 관리 절차를 명확히 수립하여 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-73d57aac04acfe5acc291495",
+    "finding_text": "Separate or defined areas to prevent contamination or mix-ups are deficient regarding operations related to aseptic processing of drug products.",
+    "finding_text_ko": "의약품 무균공정(aseptic processing) 관련 작업에서 오염 또는 혼동(mix-up)을 방지하기 위한 분리 구역 또는 구획된 구역이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7e6089aa405fc4c6ff68e0f3",
+    "finding_text": "제조 기타 [별표 1의2] 제12호 공정밸리데이션 내 중요품질속성에 대한 사항을 포함하여 관리할 것",
+    "finding_text_ko": "[제조] [별표 1의2] 제12호 관련: 공정밸리데이션에 중요품질속성(CQA)에 관한 사항을 포함하여 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7fd606cc37436a3e7a580e5b",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차를 수립하지 않았고 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-86f1c9970ad2c129910018a4",
+    "finding_text": "시험실 기타 [별표 1] 제2호 안정성챔버의 온도분포시험을 적절하게 수행할 것",
+    "finding_text_ko": "[시험실] [별표 1] 제2호 관련: 안정성 챔버의 온도분포시험을 적절하게 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8d107b56ca00480126c2b343",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하거나 표시한 확인(identity), 함량(strength), 순도, 품질을 갖추도록 보증하기 위한 생산 및 공정 관리에 관한 적절한 문서화된 절차를 수립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8fe04bf25ca1b259c193bd9e",
+    "finding_text": "Your firm is not storing active pharmaceutical ingredients (API) per the labeled storage conditions.",
+    "finding_text_ko": "귀사는 원료의약품(API)을 표시된 보관 조건에 따라 보관하지 않고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9804e8b3ef0aa4aebcde233c",
+    "finding_text": "시험실 기타 [별표 1의2] 제11호 1차 포장자재의 무게 측정 허용 오차 범위 설정에 대한 타당한 근거를 제출할 것",
+    "finding_text_ko": "[시험실] [별표 1의2] 제11호 관련: 1차 포장자재의 무게 측정 허용 오차 범위 설정에 대한 타당한 근거를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a343d81df3f3d601f88bd402",
+    "finding_text": "A pattern of frequent or acute pressure reversals was observed from areas of less clean air to areas of higher air cleanliness.",
+    "finding_text_ko": "청정도가 낮은 구역에서 청정도가 높은 구역 방향으로 차압 역전(pressure reversal)이 빈번하거나 급격하게 일어나는 양상이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a9945e4ea118669125e5ba6f",
+    "finding_text": "품질 기타 [별표 1의2] 제13호 변경관리에 대한 타당한 자료 및 변경사항 통보 절차 등을 적절히 마련할 것",
+    "finding_text_ko": "[품질] [별표 1의2] 제13호 관련: 변경관리(change control)에 대한 타당한 자료와 변경사항 통보 절차 등을 적절히 마련할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-aafb1fa09d38f5fb39624da7",
+    "finding_text": "시험실 기타 [별표 1] 제7.1호 주성분 입고시험을 적절히 수행할 것",
+    "finding_text_ko": "[시험실] [별표 1] 제7.1호 관련: 주성분 입고시험을 적절히 수행할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc8207eed95007f176de9b9e",
+    "finding_text": "시험실 기타 [별표 1] 제2.1호 무균시험용 장비의 오염 방지 성능을 확인할 수 있는 자료를 제출할 것",
+    "finding_text_ko": "[시험실] [별표 1] 제2.1호 관련: 무균시험용 장비의 오염 방지 성능을 확인할 수 있는 자료를 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bd75e3593a6f2ae82200916f",
+    "finding_text": "The written stability program for drug products does not include reliable, meaningful and specific test methods.",
+    "finding_text_ko": "의약품에 대한 문서화된 안정성 프로그램에 신뢰할 수 있고 유의미하며 특이적인 시험방법이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-be7ddc31cdd06afd17029826",
+    "finding_text": "Each component is not added to the batch by one person and verified by a second person ..",
+    "finding_text_ko": "각 원료를 한 사람이 배치에 투입하고 다른 한 사람이 확인하는 방식으로 하지 않았다..",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c06ab0c94621dba7d8478296",
+    "finding_text": "시설 장비 기타 [별표 1의2] 제10호 품목의 보관 조건을 고려하여, 온도 기준이 설정된 보관소에서 보관할 것",
+    "finding_text_ko": "[시설·장비] [별표 1의2] 제10호 관련: 품목의 보관 조건을 고려하여 온도 기준이 설정된 보관소에서 보관할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c510ec26ab93a2c126cb1dea",
+    "finding_text": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions.",
+    "finding_text_ko": "최악 조건(worst-case), 가장 도전적이고 스트레스가 큰 조건에서 무균 생산 작업을 근접하게 모사하는 배지충전(media fill)을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cf8de6088becf3e9aa37b870",
+    "finding_text": "The facility is designed and/or operated in a way that permits poor flow of personnel or materials.",
+    "finding_text_ko": "시설이 인원 또는 물품의 흐름(flow)을 부적절하게 허용하는 방식으로 설계되었거나 운영되고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d08b1215b05768931537de6a",
+    "finding_text": "Personnel were observed manually contacting the inner surface of a sterile container or closure and manually touching a sterile product contact surface.",
+    "finding_text_ko": "작업자가 멸균 용기 또는 마개의 내면을 손으로 접촉하고, 멸균 제품 접촉면을 손으로 만지는 것이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d3978f4789b873f6e2abefc5",
+    "finding_text": "Personnel performed aseptic manipulations with exposed hair or skin.",
+    "finding_text_ko": "작업자가 머리카락 또는 피부가 노출된 상태로 무균 조작(aseptic manipulation)을 수행했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d3bbeff5191d024a8a0ffc71",
+    "finding_text": "품질 기타 [별표 1의2] 제6호 주요 문서 및 기록에 대한 백업 절차를 명확히 수립하여 관리할 것",
+    "finding_text_ko": "[품질] [별표 1의2] 제6호 관련: 주요 문서 및 기록에 대한 백업 절차를 명확히 수립하여 관리할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d40d7fc06b6e9e13745cc701",
+    "finding_text": "Microbial contamination was present in the ISO 5 area.",
+    "finding_text_ko": "ISO 5 구역에 미생물 오염이 존재했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dac62b92640c87a05f035ebd",
+    "finding_text": "Contamination was observed in your areas adjacent to production areas.",
+    "finding_text_ko": "생산 구역에 인접한 구역에서 오염이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ed003296354bcc3811907838",
+    "finding_text": "Use of cleaning and disinfecting agents that may leave residues or not adequately rinsing such agents from containers, closures, or equipment that come into direct contact with drug products.",
+    "finding_text_ko": "잔류물을 남길 수 있는 세척제·소독제를 사용했거나, 의약품과 직접 접촉하는 용기, 마개 또는 설비에서 그러한 세척제·소독제를 적절히 헹궈내지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eddd1bb90b92e45509425514",
+    "finding_text": "원자재 기타 [별표 1] 제10.2호 냉장원료 보관소의 온도 점검 지점을 적절하게 설정할 것",
+    "finding_text_ko": "[원자재] [별표 1] 제10.2호 관련: 냉장원료 보관소의 온도 점검 지점을 적절하게 설정할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fcefb8c0542dad83b85e3b41",
+    "finding_text": "Biological indicators were not used to verify the adequacy of the sterilization cycle.",
+    "finding_text_ko": "멸균 사이클의 적절성을 검증하는 데 생물학적 지표(biological indicator)를 사용하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-18de7bd1cbe993a1a7a74c5c",
+    "finding_text": "○ 의약품 수입업자의 신약 등의 재심사 규정 위반 - 의약품 수업업자가 품목허가를 받은 의약품이「약사법」제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은날로부터 4년에서 6년이 지난날로부터 3개월이내에 재심사를 받아야 하고, 재심사에 필요한 사항은 총리령으로 정한 사항을 준수하여야 하나, - 동 업체는 ‘네폭실캡슐 500mg’의 재심사를 진행하면서 시판 후 조사계획서의 총 대상자 수를 20%이상 변경하는 경우 변경된 조사계획서를 미리 제출해야 하나, 이를 제출하지 않은 사실이 있음",
+    "finding_text_ko": "의약품 수입업자의 신약 등 재심사 규정 위반. 의약품 수입업자가 품목허가를 받은 의약품이 「약사법」 제31조제10항(신약 등)에 해당하는 경우, 그 의약품은 품목허가를 받은 날부터 4년에서 6년이 지난 날부터 3개월 이내에 재심사를 받아야 하며, 재심사에 필요한 사항은 총리령으로 정한 사항을 준수해야 한다. 그러나 동 업체는 ‘네폭실캡슐 500mg’의 재심사를 진행하면서 시판 후 조사계획서의 총 대상자 수를 20% 이상 변경하는 경우 변경된 조사계획서를 미리 제출해야 함에도 이를 제출하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b5ea9fca9dce65e54a6660e9",
+    "finding_text": "Your firm failed to establish adequate control procedures to monitor the output and to validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug. Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.110(a) and 21 CFR 211.42(c)(10)). Inadequate Visual Inspection Program Your visual inspection program is inadequate to ensure your sterile injectable drug products are essentially free of visible particulates and defects. For example: You categorized all non-glass particulate, regardless of material type (i.e., hair) as major, which means more severe particulates of biological origin are not considered critical. (b)(4) visible particulate inspection systems often exhibited low detectability and high variability regardless of particle type (e.g., glass, white particulate, black particulate) and size. Your probability of detection (POD) of particulates using (b)(4) visual inspection was inadequate. Your methods often exhibit PODs significantly less than (b)(4) % for particulate matter defects. In addition, glass particulates in the visible range were not consistently detected. You lacked defect limits for specific types of non-glass particulate matter in the visual inspection program. In your response, you recognize that studies did not generate sufficient data across increasing particulate sizes to adequately qualify your visual inspection program and that comparison reports were not completed. Additionally, you indicated that all extrinsic particulates are now classified as critical defects and acknowledge the potential loss of sterility often associated with such particulates. Your response is inadequate. Although you commit to evaluating the visual inspection program with the assistance of an independent third-party consultant, your response lacks a sufficient assessment of products currently on the market. Visual detection of particulates is a probabilistic process that depends on, among other things, ensuring that visible particulates can be reproducibly detected by highly capable systems including, but not limited to, trained personnel with appropriate visual acuity. At a minimum, your visual inspection systems should reliably be capable of detecting particulates of 150 microns or greater at a 70% probability of detection. Furthermore, written procedures governing 100% inspections for visual particulates should clearly define the number of times re-inspection may be performed. You should limit and justify re-inspections. Generally, FDA does not recommend more than one re-inspection in an attempt to release a batch with atypical defect levels 1 . Inadequate Design of Facility and Equipment We observed your (b)(4) processing lines (b)(4) surrounded by barrier (b)(4) under ceiling-fed high efficiency particulate air (HEPA) systems. These processing lines required frequent (b)(4) activities during equipment setup and throughout routine production and did not provide appropriate separation and protection of the ISO 5 areas. For example, we observed the following regarding these aseptic processing lines: The use of (b)(4) tubing, (b)(4) clamps, and hand tools when making critical aseptic connections within the ISO 5 area that risk interruption of first-pass air and introduce contamination hazards The use of barrier (b)(4) of varying lengths across each line, which provided inadequate protection of the ISO 5 processing line Frequent high-risk corrective interventions In your response, you emphasize that your firm has been focused on your plan to transition production from your current aseptic manufacturing lines (b)(4) to your (b)(4) lines rather than updating the sterility assurance controls on your original lines. You further commit to re-evaluating and improving your aseptic processing lines with the assistance of a third-party. Your response is inadequate. Your response lacks sufficient detail and corrective actions for sterility assurance improvements while you continue to use your (b)(4) processing lines with their inherent design flaws. In response to this letter, provide: A comprehensive, independent assessment and remediation plan for your visual inspection program to ensure compliance with CGMP. The assessment and remediation should include, but not be limited to, the following: o Implementing enhancements to your 100% visible inspection program, including defining critical, major, and minor defects and the individual defect limits for drug products. o Ensuring adequate methods, equipment, and personnel qualifications to reproducibly detect visible particulates, including particulates which historically have been identified in your operation. o Conducting rigorous qualification studies to ensure your (b)(4) visible particulate inspection systems consistently and reproducibly detects the variety of visible particulates encountered in your drug products. o For drug products that are difficult to inspect (e.g., (b)(4) containers), implementing destructive testing or other advanced technologies (e.g., (b)(4) ) as appropriate, with statistically significant sample sizes to test for defects. o Incorporating product-specific knowledge, process experience, deviation investigation analysis, recall/complaint data, and quality risk management to improve the visual inspection program. Your associated remediations to your visual inspection program, including any newly established written procedures, equipment, and methods. Include a summary of the review and recommendations made by your independent consultant. Visible Particulate Contamination We encourage the use of suitable (b)(4) visual inspection for particulates to augment the (b)(4) visual inspection program.…",
+    "finding_text_ko": "귀사는 공정 중 물질과 의약품의 특성에 변동을 일으킬 수 있는 제조 공정의 산출물을 모니터링하고 그 성능을 밸리데이션하기 위한 적절한 관리 절차를 수립하지 않았다. 귀사는 무균공정 구역에서 적절한 크기의 명확히 규정된 구역 내에서 작업을 수행하지 않았고, 오염 또는 혼동(mix-up)을 방지하는 데 필요한 분리 구역·구획된 구역 또는 그 밖의 관리 시스템을 갖추지 않았다(21 CFR 211.110(a) 및 21 CFR 211.42(c)(10)). 부적절한 육안검사 프로그램: 귀사의 육안검사(visual inspection) 프로그램은 무균 주사제가 육안으로 보이는 이물(visible particulates)과 결함이 본질적으로 없음을 보증하기에 부적절하다. 예를 들어 다음과 같다. 귀사는 재질 유형(예: 머리카락)과 관계없이 모든 비유리 이물을 중(major) 결함으로 분류했으며, 이는 생물학적 기원의 더 심각한 이물이 치명(critical) 결함으로 간주되지 않는다는 뜻이다. (b)(4) 가시 이물 검사 시스템은 이물 유형(예: 유리, 흰색 이물, 검은색 이물)과 크기에 관계없이 검출력이 낮고 변동성이 큰 경우가 많았다. (b)(4) 육안검사를 이용한 이물 검출확률(POD)이 부적절했다. 귀사의 방법은 이물 결함에 대해 POD 가 (b)(4) %보다 현저히 낮은 경우가 많았다. 또한 가시 범위의 유리 이물이 일관되게 검출되지 않았다. 귀사는 육안검사 프로그램에서 특정 유형의 비유리 이물에 대한 결함 한도를 두지 않았다. 회신에서 귀사는 육안검사 프로그램을 적절히 적격성 평가하기 위해 이물 크기를 늘려 가며 충분한 데이터를 생성하는 연구가 이루어지지 않았고 비교 보고서가 완료되지 않았음을 인정했다. 또한 모든 외인성(extrinsic) 이물을 이제 치명 결함으로 분류한다고 밝히고, 그러한 이물과 흔히 연관되는 무균성 상실 가능성을 인정했다. 귀사의 회신은 부적절하다. 독립적인 제3자 컨설턴트의 도움을 받아 육안검사 프로그램을 평가하겠다고 약속했으나, 현재 시판 중인 제품에 대한 충분한 평가가 없다. 이물의 육안 검출은 확률적 과정으로, 무엇보다도 적절한 시력을 갖추고 교육훈련을 받은 인원 등(이에 한정되지 않음) 고성능 시스템이 가시 이물을 재현성 있게 검출할 수 있도록 보장하는 데 달려 있다. 최소한 육안검사 시스템은 150 microns 이상의 이물을 70% 검출확률로 신뢰성 있게 검출할 수 있어야 한다. 또한 가시 이물에 대한 100% 검사를 규정하는 문서화된 절차에는 재검사를 몇 회까지 수행할 수 있는지 명확히 규정해야 한다. 재검사는 제한하고 그 타당성을 입증해야 한다. 일반적으로 FDA 는 비정형적 결함 수준을 보이는 배치를 출하하기 위한 목적의 재검사를 1회를 초과하여 수행하는 것을 권장하지 않는다 1 . 시설 및 설비의 부적절한 설계: 우리는 천장 공급식 고효율 미립자 공기(HEPA) 시스템 아래에 barrier (b)(4)로 둘러싸인 귀사의 (b)(4) 공정 라인 (b)(4)을 관찰했다. 이 공정 라인은 설비 셋업 중과 일상 생산 전반에 걸쳐 빈번한 (b)(4) 활동이 필요했으며, ISO 5 구역에 대한 적절한 분리와 보호를 제공하지 않았다. 예를 들어 이 무균공정 라인과 관련하여 다음을 관찰했다. ISO 5 구역 내에서 중요한 무균 연결 작업을 할 때 (b)(4) 튜빙, (b)(4) 클램프 및 수공구를 사용하여 first-pass air 를 차단하고 오염 위험을 유발할 우려가 있었다. 각 라인에 걸쳐 길이가 제각각인 barrier (b)(4)를 사용하여 ISO 5 공정 라인을 부적절하게 보호했다. 고위험 시정 개입(corrective intervention)이 빈번했다. 회신에서 귀사는 원래 라인의 무균성 보증 관리를 개선하기보다는 현재의 무균 제조 라인 (b)(4)에서 (b)(4) 라인으로 생산을 이전하는 계획에 집중해 왔다고 강조했다. 또한 제3자의 도움을 받아 무균공정 라인을 재평가하고 개선하겠다고 약속했다. 귀사의 회신은 부적절하다. 내재적 설계 결함이 있는 (b)(4) 공정 라인을 계속 사용하는 동안의 무균성 보증 개선에 관한 충분한 세부 내용과 시정조치가 회신에 없다. 이 서한에 대한 회신으로 다음을 제출하라. CGMP 준수를 보장하기 위한 육안검사 프로그램에 대한 포괄적이고 독립적인 평가 및 개선 계획. 평가와 개선에는 다음 사항이 포함되어야 하나 이에 한정되지 않는다. o 100% 가시 이물 검사 프로그램의 강화 시행(의약품의 치명·중·경 결함 정의 및 개별 결함 한도 포함). o 귀사 공정에서 과거에 확인된 이물을 포함하여 가시 이물을 재현성 있게 검출할 수 있도록 적절한 방법, 설비 및 인원 적격성 확보. o (b)(4) 가시 이물 검사 시스템이 의약품에서 발견되는 다양한 가시 이물을 일관되고 재현성 있게 검출하는지 확인하기 위한 엄격한 적격성 평가 연구 수행. o 검사가 어려운 의약품(예: (b)(4) 용기)에 대해서는 결함을 시험하기 위해 통계적으로 유의한 검체 수로 파괴 시험 또는 그 밖의 첨단 기술(예: (b)(4))을 적절히 도입. o 육안검사 프로그램 개선을 위해 제품 특이적 지식, 공정 경험, 일탈 조사 분석, 회수/불만 데이터 및 품질위험관리를 반영. 새로 수립한 문서화된 절차, 설비 및 방법을 포함한 육안검사 프로그램 관련 개선 조치. 독립 컨설턴트의 검토 내용과 권고 사항의 요약을 포함하라. 가시 이물 오염: (b)(4) 육안검사 프로그램을 보강하기 위해 적절한 (b)(4) 이물 육안검사를 사용할 것을 권장한다.…",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f0d60bd076622ae6ffce6dd9",
+    "finding_text": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your firm is a manufacturer of sterile injectable drug products produced primarily through aseptic processing, including but not limited to, products for intravenous (b)(4) use. You failed to adequately investigate drug product failures and discrepancies. Your investigations lacked data-supported root causes, formal documentation, expansion to all potentially affected products, and corrective action effectiveness checks. In multiple investigations, you inappropriately concluded there was no product impact based on overreliance on passing finished drug product test results (e.g., sterility, endotoxin, and environmental monitoring). The following examples illustrate these failures: Endotoxin Test Failures In 2025 and 2026, your firm received reports of patients experiencing adverse drug events, including apparent pyrogenic reactions, following administration of famotidine for injection. Notably, famotidine injection manufacturing had experienced multiple (b)(4) bioburden action limit failures. However, your firm failed to sufficiently investigate this critical deviation and permitted batch release following passing finished drug product test results (i.e., sterility, endotoxin). Subsequent testing of finished product retains, as part of the investigation into the adverse event complaints, revealed an endotoxin failure. Your firm ultimately recalled three famotidine injection batches. Your response acknowledges that (b)(4) bioburden samples showed gram-negative confluent growth. You state that, at the time of disposition of the affected batches, your firm did not consider the excessive bioburden to constitute an elevated endotoxin risk. You commit to revising procedures to ensure enhanced endotoxin sampling and testing whenever action-level gram-negative bacteria are identified during (b)(4) bioburden testing. Your response is inadequate. You do not commit to comprehensive review and CAPA of your complaint system to increase vigilance, or to extensive CAPA effectiveness checks. In order to prevent parenteral drug contamination with pyrogenic substances, including endotoxins, it is critical that your firm build quality into manufacturing operations and maintain ongoing robust upstream control. It should be noted that endotoxins are not retained by (b)(4) . Any batch testing that reveals atypical bioburden levels is a signal that necessitates prompt attention. Pyrogen contamination in parenteral drug products can lead to significant adverse events such as fever, hypotension, inflammatory reactions, anaphylactic shock or death. For more information about pyrogen and endotoxin testing, see FDA’s Guidance for Industry Pyrogen and Endotoxins Testing: Questions and Answers https://www.fda.gov/media/83477/download. Media Fill Failures Your firm experienced media fill failures on your aseptic manufacturing Line (b)(4) with limited barrier protection in September and October 2024. Media fill failures also occurred on (b)(4) Restricted Access Barrier System manufacturing Line (b)(4) in April and October 2025. In each case, you determined the most probable contributing factors for each failure were deficient aseptic techniques by your operators. Your investigations did not consider how the poor aseptic practices went undetected by your firm’s aseptic observer program during commercial operations. Your response includes your ongoing effort to improve aseptic practices, especially on your aseptic processing lines with limited barrier protection. You commit to an aseptic operations program assessment, updating procedures, and training operators. Your response is inadequate because it does not provide clear timelines for addressing the fundamental design flaws of your aseptic processing lines with limited barrier protection which are inherently vulnerable to excessive contamination risk. Following your media fill failures, you placed (b)(4) commercial batches on hold, however, you did not act similarly for liquid products produced on your (b)(4) aseptic manufacturing lines with limited barrier protection. Notably, those processing lines shared operators from the processing lines associated with deficient aseptic techniques and media fill failures. Extrinsic Biological Contamination (e.g., hair) Beginning in May 2022, you documented at least nine incidences of extrinsic contamination (e.g., hair) during your visible particulate inspection. This contamination was described as free-floating and in direct contact with the drug product. Drug products contaminated with hair can have microbial contamination and are generally considered adulterated. You did not initiate timely investigations in response to this contamination. Your response acknowledges the significance of issues involving extrinsic biological particulates and recognizes a procedural gap in how you classified critical defects such as extrinsic biological contamination. You commit to continuous improvement of your investigations program. Additionally, you commit to revising your particulate management system, conducting targeted supplier audits, and discontinuing tailgate samples for incoming stopper lots. Your response is inadequate. You did not address why your quality unit (QU), your Corporate Expert Circle, and your Corporate Emergency Committee did not reject commercial batches associated with the extrinsic biological contamination and instead released them for distribution to your customers. Also, you did not provide details of your heightened incoming quality control of stoppers. Additionally, your response does not indicate that you examined retains of your distributed drug products for the presence of hair.…",
+    "finding_text_ko": "귀사는 배치 또는 그 구성 원료가 규격 중 어느 하나라도 충족하지 못한 경우, 해당 배치의 출하 여부와 관계없이, 설명되지 않는 불일치 또는 부적합을 철저히 조사하지 않았다(21 CFR 211.192). 귀사는 주로 무균공정(aseptic processing)으로 생산하는 무균 주사제의 제조업체로, 정맥 (b)(4) 용 제품 등(이에 한정되지 않음)을 제조한다. 귀사는 의약품 부적합과 불일치를 적절히 조사하지 않았다. 귀사의 조사에는 데이터로 뒷받침된 근본 원인, 공식 문서화, 영향받을 가능성이 있는 모든 제품으로의 조사 확대, 시정조치 유효성 확인이 없었다. 여러 조사에서 귀사는 완제의약품 시험 적합 결과(예: 무균, 엔도톡신, 환경 모니터링)에 과도하게 의존하여 제품 영향이 없다고 부적절하게 결론 내렸다. 다음 사례는 이러한 실패를 보여 준다. 엔도톡신 시험 부적합: 2025년과 2026년에 귀사는 famotidine for injection 투여 후 명백한 발열성 반응을 포함한 이상사례를 겪은 환자에 대한 보고를 받았다. 특히 famotidine 주사제 제조에서는 (b)(4) 바이오버든 조치 한도(action limit) 초과가 여러 차례 발생했었다. 그러나 귀사는 이 중대한 일탈을 충분히 조사하지 않았고, 완제의약품 시험(즉, 무균, 엔도톡신) 적합 결과를 근거로 배치 출하를 허용했다. 이후 이상사례 불만 조사의 일환으로 완제품 보관검체를 시험한 결과 엔도톡신 부적합이 확인되었다. 귀사는 결국 famotidine 주사제 3개 배치를 회수했다. 회신에서 귀사는 (b)(4) 바이오버든 검체에서 그람음성균의 융합성(confluent) 증식이 나타났음을 인정했다. 귀사는 해당 배치의 처리 결정 당시 과도한 바이오버든이 엔도톡신 위험 상승에 해당한다고 보지 않았다고 밝혔다. 귀사는 (b)(4) 바이오버든 시험 중 조치 수준의 그람음성균이 확인될 때마다 엔도톡신 검체 채취 및 시험을 강화하도록 절차를 개정하겠다고 약속했다. 귀사의 회신은 부적절하다. 경계를 강화하기 위한 불만 처리 시스템의 포괄적 검토와 CAPA, 또는 광범위한 CAPA 유효성 확인을 약속하지 않았다. 엔도톡신을 포함한 발열성 물질로 인한 주사제 오염을 방지하려면 제조 작업에 품질을 내재화하고 상류(upstream) 단계에서 지속적으로 견고한 관리를 유지하는 것이 중요하다. 엔도톡신은 (b)(4)에 의해 걸러지지 않는다는 점에 유의해야 한다. 배치 시험에서 비정형적 바이오버든 수준이 확인되면 이는 즉각적인 주의가 필요한 신호이다. 주사제의 발열성 물질 오염은 발열, 저혈압, 염증 반응, 아나필락시스 쇼크 또는 사망과 같은 중대한 이상사례를 초래할 수 있다. 발열성 물질 및 엔도톡신 시험에 관한 자세한 내용은 FDA 의 Guidance for Industry Pyrogen and Endotoxins Testing: Questions and Answers https://www.fda.gov/media/83477/download 를 참조하라. 배지충전 부적합: 귀사는 2024년 9월과 10월에 barrier 보호가 제한적인 무균 제조 Line (b)(4)에서 배지충전(media fill) 부적합을 겪었다. 2025년 4월과 10월에는 (b)(4) 제한접근차단시스템(RABS) 제조 Line (b)(4)에서도 배지충전 부적합이 발생했다. 각 경우 귀사는 각 부적합의 가장 가능성 높은 기여 요인을 작업자의 미흡한 무균 기법으로 판단했다. 귀사의 조사는 상업 생산 중 이러한 불량한 무균 작업 관행이 귀사의 무균 관찰자(aseptic observer) 프로그램에 의해 어떻게 발견되지 않았는지를 고려하지 않았다. 회신에는 특히 barrier 보호가 제한적인 무균공정 라인에서 무균 작업 관행을 개선하기 위한 진행 중인 노력이 포함되어 있다. 귀사는 무균 작업 프로그램 평가, 절차 개정 및 작업자 교육훈련을 약속했다. 귀사의 회신은 본질적으로 과도한 오염 위험에 취약한, barrier 보호가 제한적인 무균공정 라인의 근본적 설계 결함을 해결하기 위한 명확한 일정을 제시하지 않으므로 부적절하다. 배지충전 부적합 이후 귀사는 (b)(4) 상업 배치를 보류(hold)했으나, barrier 보호가 제한적인 (b)(4) 무균 제조 라인에서 생산된 액상 제품에 대해서는 유사한 조치를 하지 않았다. 특히 해당 공정 라인은 미흡한 무균 기법 및 배지충전 부적합과 관련된 공정 라인의 작업자를 공유했다. 외인성 생물학적 오염(예: 머리카락): 2022년 5월부터 귀사는 가시 이물 검사 중 외인성 오염(예: 머리카락) 사례를 최소 9건 기록했다. 이 오염은 부유 상태로 의약품과 직접 접촉하고 있는 것으로 기술되었다. 머리카락에 오염된 의약품은 미생물 오염이 있을 수 있으며 일반적으로 불량(adulterated)으로 간주된다. 귀사는 이 오염에 대응하여 적시에 조사를 개시하지 않았다. 회신에서 귀사는 외인성 생물학적 이물과 관련된 문제의 중대성을 인정하고, 외인성 생물학적 오염과 같은 치명 결함을 분류하는 방식에 절차상 공백이 있었음을 인정했다. 귀사는 조사 프로그램의 지속적 개선을 약속했다. 또한 이물 관리 시스템 개정, 표적 공급업체 감사 실시, 입고 마개(stopper) 로트에 대한 tailgate 검체 사용 중단을 약속했다. 귀사의 회신은 부적절하다. 귀사의 품질부서(QU), Corporate Expert Circle 및 Corporate Emergency Committee 가 외인성 생물학적 오염과 관련된 상업 배치를 불합격 처리하지 않고 고객에게 유통하도록 출하한 이유를 설명하지 않았다. 또한 마개에 대한 강화된 입고 품질관리의 세부 내용을 제공하지 않았다. 아울러 회신에는 유통된 의약품의 보관검체에서 머리카락 존재 여부를 조사했다는 내용이 없다.…",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -1,0 +1,158 @@
+[
+  {
+    "finding_id": "finding-b7948e56a019e10713699a7c",
+    "finding_text": "No deficiencies were recorded.",
+    "finding_text_ko": "기록된 결함사항(deficiency)이 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b0f31e9c77c243141b8c78ba",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c6cd1c677423fac6d5fa5a3d",
+    "finding_text": "The importer and/or the distributor's compliance with the current master production documents and/or the marketing authorization was inadequate. The assessment to release finished products was inadequate.",
+    "finding_text_ko": "수입자 및/또는 유통자가 현행 마스터 제조문서(master production documents) 및/또는 판매허가(marketing authorization)를 준수하는지에 대한 관리가 부적절했다. 완제품 출하 승인을 위한 평가가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd6e604b2acd46fb9f2e896e",
+    "finding_text": "The ongoing stability program for a drug was inadequate.",
+    "finding_text_ko": "의약품의 지속 안정성 프로그램(ongoing stability program)이 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0dd60500b3c1941b9cc375b1",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속 조치가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0f916f165006400686af5c1f",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항을 적절히 문서화, 평가 및/또는 승인하도록 보장하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1cc2ba4c8d921094dfb3885d",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만(complaint) 및/또는 결함 가능성이 있는 제품에 관한 기타 정보의 평가, 기록, 후속 조치 및/또는 조사가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3593d09a6faf9800ef860fe4",
+    "finding_text": "The ongoing stability program for a drug was inadequate. The company did not adequately validate the analytical test procedures used in the stability program.",
+    "finding_text_ko": "의약품의 지속 안정성 프로그램(ongoing stability program)이 부적절했다. 회사는 안정성 프로그램에 사용되는 분석 시험법을 적절히 밸리데이션(validation)하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-511630936603e452e437b54a",
+    "finding_text": "The qualification and/or verification of utilities and/or support systems was inadequate.",
+    "finding_text_ko": "유틸리티 및/또는 지원 시스템의 적격성평가(qualification) 및/또는 검증(verification)이 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-58f4b64eebde26ea142f86d4",
+    "finding_text": "The evaluation was inadequate for cases where there was a deviation from the norm and/or where products were on the borderline of the acceptable range.",
+    "finding_text_ko": "기준에서 벗어난 경우 및/또는 제품이 허용 범위의 경계선(borderline)에 있는 경우에 대한 평가가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5da0d296f58da64b254bd084",
+    "finding_text": "The examination and/or approval of fabrication, packaging, labelling, testing, storage, and/or the transportation method and procedures by the person in charge of the quality control department before implementation was inadequate. The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate. The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "품질관리 부서 책임자가 제조(fabrication), 포장, 표시(labelling), 시험, 보관 및/또는 운송 방법과 절차를 시행 전에 검토 및/또는 승인하는 것이 부적절했다. 기준일탈(out-of-specification) 시험 결과의 조사, 처리 및/또는 보고가 부적절했다. 불만(complaint) 및/또는 결함 가능성이 있는 제품에 관한 기타 정보의 평가, 기록, 후속 조치 및/또는 조사가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-693709452ef980949d9fb81e",
+    "finding_text": "The premises were not designed, constructed, operated, and/or maintained to prevent contamination.",
+    "finding_text_ko": "시설(premises)이 오염을 방지하도록 설계, 건설, 운영 및/또는 유지되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-78ea2350e5d747267662bc2d",
+    "finding_text": "The monitoring procedures for microbial and/or environmental conditions were inadequate.",
+    "finding_text_ko": "미생물 및/또는 환경 조건에 대한 모니터링 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8251b13e759cfdb44259849d",
+    "finding_text": "Confirmatory testing was not performed by an alternate laboratory.",
+    "finding_text_ko": "대체 시험실(alternate laboratory)에서 확인시험(confirmatory testing)을 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-967dfb8567ca0eea2c9b2593",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성, 유지, 처리 및/또는 검토가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9d9e285f1bb25d39b18ec6ca",
+    "finding_text": "The availability, content and/or maintenance of the quality agreements between the supplier, fabricator, tester, packager, labeller, distributor, importer, and/or wholesaler was inadequate.",
+    "finding_text_ko": "공급자, 제조자(fabricator), 시험자, 포장자, 표시자(labeller), 유통자, 수입자 및/또는 도매상 간 품질협정서(quality agreement)의 구비, 내용 및/또는 유지가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-af8f83bc53ccd3d4c0e9071e",
+    "finding_text": "The guidelines and/or procedures were inadequate in ensuring storage and/or transportation conditions would maintain the quality and safe distribution of the drug.",
+    "finding_text_ko": "보관 및/또는 운송 조건이 의약품의 품질과 안전한 유통을 유지하도록 보장하기에 지침 및/또는 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b223ab8517ad8201a70ec00a",
+    "finding_text": "The investigation, handling, and/or reporting of test results that were out-of-specification was inadequate.",
+    "finding_text_ko": "기준일탈(out-of-specification) 시험 결과의 조사, 처리 및/또는 보고가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cfebdaa6f1dec73582b26b3e",
+    "finding_text": "The evidence used to demonstrate the transportation and/or storage conditions of each lot or batch of the drug was inadequate.",
+    "finding_text_ko": "의약품 각 로트 또는 배치(lot or batch)의 운송 및/또는 보관 조건을 입증하는 데 사용된 근거가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2b60ac42a128ee06439132b2",
+    "finding_text": "Complete testing was not performed according to the requirements.",
+    "finding_text_ko": "요구사항에 따른 전체 시험(complete testing)을 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3c76ec9d2eef8d23c04c669e",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항을 적절히 문서화, 평가 및/또는 승인하도록 보장하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-42051c95bd1cc22a76040e79",
+    "finding_text": "Investigations into deviations, reports, and/or follow-up actions were inadequate.",
+    "finding_text_ko": "일탈(deviation)에 대한 조사, 보고 및/또는 후속 조치가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6fe58df4b0cc9a21d10aef37",
+    "finding_text": "The assessment, recording, follow-up, and/or investigation of complaints and/or other information about potentially defective products was inadequate.",
+    "finding_text_ko": "불만(complaint) 및/또는 결함 가능성이 있는 제품에 관한 기타 정보의 평가, 기록, 후속 조치 및/또는 조사가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7773053878ba318eceb9d5b6",
+    "finding_text": "The maintenance of evidence was inadequate for manufacturing, packaging, labelling, required testing, storage, and/or distribution, including the respective conditions.",
+    "finding_text_ko": "제조, 포장, 표시(labelling), 필수 시험, 보관 및/또는 유통에 대해 각각의 조건을 포함한 근거(evidence)의 유지가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dbf29fc267198de7602ab70f",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 관한 서면 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e26c81882b92a9e83760db0f",
+    "finding_text": "The annual product quality review procedure was inadequate.",
+    "finding_text_ko": "연간 제품품질평가(annual product quality review) 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  }
+]

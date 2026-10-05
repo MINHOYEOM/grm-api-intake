@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-09-28T08:56:32+00:00",
+  "checked_at": "2026-10-05T09:35:32+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -29,11 +29,11 @@
   ],
   "summary": {
     "blocked": 63,
-    "broken": 1,
-    "needs_review": 106,
-    "ok": 426,
-    "references": 718,
-    "unique_urls": 596
+    "broken": 2,
+    "needs_review": 114,
+    "ok": 428,
+    "references": 729,
+    "unique_urls": 607
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -4243,7 +4243,7 @@
     },
     "https://www.ema.europa.eu/en/ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-guideline-q13-continuous-manufacturing-drug-substances-drug-products",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4258,7 +4258,7 @@
     },
     "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/ich-q10-pharmaceutical-quality-system-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q10-pharmaceutical-quality-system",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4278,7 +4278,7 @@
     },
     "https://www.ema.europa.eu/en/ich-q8-q9-q10-questions-answers-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/ich-q8-q9-q10-questions-answers-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q8-q9-q10-questions-answers",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4293,7 +4293,7 @@
     },
     "https://www.ema.europa.eu/en/ich-q8-r2-pharmaceutical-development-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/ich-q8-r2-pharmaceutical-development-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q8-r2-pharmaceutical-development",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4308,7 +4308,7 @@
     },
     "https://www.ema.europa.eu/en/ich-q9-quality-risk-management-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/ich-q9-quality-risk-management-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/ich-q9-quality-risk-management",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4323,7 +4323,7 @@
     },
     "https://www.ema.europa.eu/en/manufacture-finished-dosage-form-human-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/manufacture-finished-dosage-form-human-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/manufacture-finished-dosage-form-human",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4338,7 +4338,7 @@
     },
     "https://www.ema.europa.eu/en/process-validation-finished-products-information-data-be-provided-regulatory-submissions-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/process-validation-finished-products-information-data-be-provided-regulatory-submissions-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/process-validation-finished-products-information-data-be-provided-regulatory-submissions",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4353,7 +4353,7 @@
     },
     "https://www.ema.europa.eu/en/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/setting-health-based-exposure-limits-use-risk-identification-manufacture-different-medicinal-products-shared-facilities",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4373,7 +4373,7 @@
     },
     "https://www.ema.europa.eu/en/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/start-shelf-life-finished-dosage-form-annex-note-guidance-manufacture-finished-dosage-form",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4388,7 +4388,7 @@
     },
     "https://www.ema.europa.eu/en/sterilisation-medicinal-product-active-substance-excipient-primary-container-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/sterilisation-medicinal-product-active-substance-excipient-primary-container-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/sterilisation-medicinal-product-active-substance-excipient-primary-container",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -4403,7 +4403,7 @@
     },
     "https://www.ema.europa.eu/en/use-ionizing-radiation-manufacture-medicinal-products-scientific-guideline": {
       "attempts": 1,
-      "final_url": "https://www.ema.europa.eu/en/use-ionizing-radiation-manufacture-medicinal-products-scientific-guideline",
+      "final_url": "https://www.ema.europa.eu/en/scientific-guidelines/use-ionizing-radiation-manufacture-medicinal-products",
       "http_status": 200,
       "method": "HEAD",
       "reason": "reachable",
@@ -6541,6 +6541,51 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15296": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15296",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15296"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15297": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15297",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15297"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15302": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15302",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15302"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/down.do?brd_id=data0011&seq=14290&data_tp=A&file_seq=1",
@@ -8266,6 +8311,111 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15957": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15957",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15957"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15958": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15958",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15958"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15960": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15960",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15960"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15962": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15962",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15962"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15963": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15963",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15963"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15966": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15966",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15966"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15967": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15967",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15967"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8794,36 +8944,6 @@
     "https://www.pmda.go.jp/files/000266955.pdf": {
       "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
-      "http_status": null,
-      "method": "GET",
-      "reason": "network_or_tls:ConnectTimeout",
-      "references": [
-        {
-          "field": "official_url",
-          "file": "pmda.json",
-          "item_id": "pmda-000266955"
-        }
-      ],
-      "status": "needs_review"
-    },
-    "https://www.pmda.go.jp/files/000267517.pdf": {
-      "attempts": 2,
-      "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
-      "http_status": null,
-      "method": "GET",
-      "reason": "network_or_tls:ConnectTimeout",
-      "references": [
-        {
-          "field": "official_url",
-          "file": "pmda.json",
-          "item_id": "pmda-000267517"
-        }
-      ],
-      "status": "needs_review"
-    },
-    "https://www.pmda.go.jp/files/000273637.pdf": {
-      "attempts": 2,
-      "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 416,
       "method": "GET",
       "reason": "http_416",
@@ -8831,10 +8951,40 @@
         {
           "field": "official_url",
           "file": "pmda.json",
-          "item_id": "pmda-000273637"
+          "item_id": "pmda-000266955"
         }
       ],
       "status": "broken"
+    },
+    "https://www.pmda.go.jp/files/000267517.pdf": {
+      "attempts": 2,
+      "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
+      "http_status": 416,
+      "method": "GET",
+      "reason": "http_416",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000267517"
+        }
+      ],
+      "status": "broken"
+    },
+    "https://www.pmda.go.jp/files/000273637.pdf": {
+      "attempts": 2,
+      "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000273637"
+        }
+      ],
+      "status": "ok"
     },
     "https://www.pmda.go.jp/files/000276919.pdf": {
       "attempts": 2,
@@ -8892,6 +9042,21 @@
           "field": "official_url",
           "file": "pmda.json",
           "item_id": "pmda-000280046"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://www.pmda.go.jp/files/000283019.pdf": {
+      "attempts": 1,
+      "final_url": "https://www.pmda.go.jp/files/000283019.pdf",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pmda.json",
+          "item_id": "pmda-000283019"
         }
       ],
       "status": "ok"

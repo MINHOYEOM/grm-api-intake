@@ -1813,5 +1813,101 @@
       "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample"
     ],
     "explanation_en": "Endotoxin is a lipopolysaccharide component of the cell wall of Gram-negative bacteria which, if present in a medicine, can cause a pyrogenic response (EU GMP Annex 1, 21 CFR 211.113). The others describe depyrogenation, bioburden and the sterility test."
+  },
+  {
+    "id": "q-202641-01",
+    "question_ko": "FDA 가 무균 의약품 생산시설인 Houston Rx LLC 를 실사한 뒤 Form 483 을 발부했습니다. 첫 번째 관찰사항으로 기록된 내용은 무엇인가요?",
+    "choices": [
+      "ISO 5 구역에서 미생물 오염이 확인됨",
+      "작업자가 머리카락·피부가 노출된 상태로 무균 조작을 수행함",
+      "청정도가 낮은 구역에서 높은 구역 쪽으로 차압이 역전됨",
+      "최악조건을 반영하지 않은 배지충전을 수행함"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "첫 관찰은 작업자가 머리카락이나 피부가 노출된 상태로 무균 조작을 수행했다는 내용으로, ISO 5 층류 후드에서 이마 피부를 노출한 작업자가 충전된 바이알에 마개를 올리는 것이 관찰됐습니다. 나머지 셋도 같은 483 에 실린 실제 관찰이지만 첫 관찰은 아닙니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-05/#fda483-195122",
+    "difficulty": "easy",
+    "week": "202641",
+    "question_en": "FDA issued a Form 483 to Houston Rx LLC, a producer of sterile drug products, after an inspection. What was recorded as the first observation?",
+    "choices_en": [
+      "Microbial contamination was found in the ISO 5 area",
+      "Personnel performed aseptic manipulations with exposed hair or skin",
+      "Pressure differentials reversed from less clean areas toward cleaner areas",
+      "Media fills did not reflect worst-case conditions"
+    ],
+    "explanation_en": "The first observation is that personnel performed aseptic manipulations with exposed hair or skin: an operator with exposed skin on her forehead was seen placing stoppers on freshly filled vials in the ISO 5 laminar flow hood. The other three are also real observations in the same 483, but not the first."
+  },
+  {
+    "id": "q-202641-02",
+    "question_ko": "FDA 가 Bentley Laboratories LLC 에 CGMP 위반 경고서한을 발부했습니다. 이 중 21 CFR 211.192 위반으로 지적된 내용은 무엇인가요?",
+    "choices": [
+      "원료 확인·규격 시험 미흡 및 공급업체 시험성적 신뢰성 미검증",
+      "제조·공정 관리에 관한 문서화된 절차 미흡",
+      "여드름 관련 OTC 제품의 미승인 신약·부정표시",
+      "미해명 불일치·규격 부적합에 대한 조사 미흡"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "경고서한은 배치나 구성성분의 미해명 불일치·규격 부적합을 출하 여부와 관계없이 철저히 조사하지 않은 점을 21 CFR 211.192 위반으로 인용했습니다. 원료 시험 미흡은 211.84(d), 제조·공정 관리 절차 미흡은 211.100(a)로 인용됐고, 여드름 관련 OTC 2개 제품은 별도로 미승인 신약·부정표시로 판단됐습니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-05/#87beb6242ff0",
+    "difficulty": "normal",
+    "week": "202641",
+    "question_en": "FDA issued a CGMP Warning Letter to Bentley Laboratories LLC. Which finding was cited as a violation of 21 CFR 211.192?",
+    "choices_en": [
+      "Inadequate component identity and specification testing, with supplier test results not validated",
+      "Inadequate written procedures for production and process control",
+      "Unapproved new drug and misbranding status of acne-related OTC products",
+      "Inadequate investigation of unexplained discrepancies and specification failures"
+    ],
+    "explanation_en": "The letter cited 21 CFR 211.192 for failing to thoroughly investigate unexplained discrepancies and specification failures of a batch or its components, whether or not the batch had been distributed. Inadequate component testing was cited under 211.84(d) and inadequate production and process control procedures under 211.100(a), while two acne-related OTC products were separately found to be unapproved new drugs and misbranded."
+  },
+  {
+    "id": "q-202641-03",
+    "question_ko": "의약품 GMP 에서 말하는 ‘변경관리(Change Control)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "밸리데이션 상태에 영향을 줄 수 있는 변경을 관련 분야 담당자가 공식적으로 검토하고 승인하는 체계",
+      "승인된 지시사항이나 정해진 기준에서 벗어난 상황",
+      "발생한 문제의 재발과 잠재적 문제의 발생을 막기 위해 원인을 조사하고 조치를 실행·확인하는 체계",
+      "절차·공정·설비·물질·활동 또는 시스템이 실제로 기대한 결과를 낸다는 점을 입증하고 문서화하는 활동"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "변경관리는 밸리데이션 상태에 영향을 줄 수 있는 변경을 관련 분야 담당자가 공식적으로 검토하고 승인하는 체계입니다(ICH Q10 §§3.2.2–3.2.3). 나머지는 각각 일탈, 시정 및 예방조치(CAPA), 밸리데이션에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "change-control",
+    "difficulty": "easy",
+    "week": "202641",
+    "question_en": "Which statement about change control in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "A formal system in which representatives of the relevant disciplines review and approve changes that could affect the validated state",
+      "A departure from an approved instruction or an established standard",
+      "A system for investigating causes and implementing and verifying actions so that problems that occurred do not recur and potential problems do not arise",
+      "Demonstrating and documenting that a procedure, process, equipment, material, activity, or system actually gives the expected result"
+    ],
+    "explanation_en": "Change control is a formal system in which representatives of the relevant disciplines review and approve changes that could affect the validated state (ICH Q10 §§3.2.2–3.2.3). The others describe a deviation, corrective and preventive action (CAPA) and validation."
+  },
+  {
+    "id": "q-202641-04",
+    "question_ko": "의약품 GMP 에서 말하는 ‘품질부서(Quality Unit)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "의약품이 의도한 용도에 필요한 품질을 갖도록 영향을 주는 모든 사항을 포괄적으로 마련한 체계",
+      "원료·중간체·포장자재·완제품이 정한 규격에 맞는지 확인하기 위한 규격 설정, 검체채취, 시험과 승인 활동",
+      "생산과 독립되어 품질보증과 품질관리 책임을 수행하는 조직 단위",
+      "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "품질부서는 생산과 독립되어 품질보증과 품질관리 책임을 수행하는 조직 단위입니다(ICH Q10, 21 CFR 211.22). 나머지는 각각 품질보증, 품질관리, 의약품 품질시스템에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "quality-unit",
+    "difficulty": "easy",
+    "week": "202641",
+    "question_en": "Which statement about the quality unit in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "The total arrangement of everything that bears on ensuring a medicine has the quality required for its intended use",
+      "Setting specifications, sampling, testing, and approving so that materials, intermediates, packaging materials, and finished products conform to the defined specifications",
+      "The organisational unit, independent of production, that carries out both quality assurance and quality control responsibilities",
+      "The management system that links organisation, responsibilities, procedures, processes, and resources so that quality objectives are achieved across the product lifecycle"
+    ],
+    "explanation_en": "The quality unit is the organisational unit, independent of production, that carries out both quality assurance and quality control responsibilities (ICH Q10, 21 CFR 211.22). The others describe quality assurance, quality control and the pharmaceutical quality system."
   }
 ]

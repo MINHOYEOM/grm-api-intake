@@ -1,0 +1,13 @@
+{#- 용어 그림 · repeatability — 정의("짧은 시간 동안 같은 조건에서 분석절차를 반복했을 때 나타나는 정밀성")를
+    시간축의 짧은 한 구간에 거듭 찍힌 결과가 한 값 둘레에 모인 모습과, 그 퍼짐 폭에 붙인 '정밀성' 괄호로 옮긴다.
+    구간 양 끝은 결과 묶음 양 끝과 세로선으로 맞춘다. 반복 횟수·허용 RSD 는 정의 밖이라 넣지 않는다. 2026-10-05 -#}
+<svg class="gt-fig-svg" viewBox="0 0 176 88" role="img" aria-label="{{ _('짧은 시간 같은 조건에서 반복한 결과가 모인 정도') }}">
+  <path d="M26 30v42M68 30v42" style="stroke:var(--line-2);stroke-width:1.2;stroke-dasharray:3 3"/>
+  <path d="M26 72h42" style="stroke:var(--coral-2);stroke-width:3;stroke-linecap:butt"/>
+  <g style="fill:var(--ink)"><circle cx="33" cy="43" r="3"/><circle cx="43" cy="46" r="3"/><circle cx="53" cy="41" r="3"/><circle cx="62" cy="45" r="3"/></g>
+  <path d="M76 38h5M76 49h5M78.5 38v11" style="fill:none;stroke:var(--coral-2);stroke-width:1.6;stroke-linecap:round"/>
+  <text x="87" y="47" style="font-size:9.5px;font-weight:700;fill:var(--coral-2)">{{ _('정밀성') }}</text>
+  <path d="M8 72h158M162 68l4 4-4 4" style="fill:none;stroke:var(--muted);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"/>
+  <text x="22" y="20" style="font-size:8.5px;fill:var(--ink)">{{ _('짧은 시간·같은 조건') }}</text>
+  <text x="166" y="86" text-anchor="end" style="font-size:8.5px;fill:var(--muted)">{{ _('시간') }}</text>
+</svg>

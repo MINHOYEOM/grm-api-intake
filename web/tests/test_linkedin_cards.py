@@ -1077,9 +1077,11 @@ class MonthlyCliTest(unittest.TestCase):
         py, pm = (latest_y, latest_m - 1) if latest_m > 1 else (latest_y - 1, 12)
         prev = f"{py:04d}-{pm:02d}"
         self.assertEqual(lc.auto_months(all_briefs), [prev, cur])
-        # 실데이터 전제(2026-09-23 기준: 9월·8월 둘 다 발행본이 있다) — 낡으면 이 assert 가 먼저 죽는다.
-        self.assertIn("2026-09", [prev, cur])
-        self.assertIn("2026-08", [prev, cur])
+        # 실데이터 전제: 두 달 모두 발행본이 있다. 달 이름을 박아 두면 새 달 첫 호가
+        # 발행 PR 에 들어오는 순간 이 시험이 죽는다(2026-10-05 호에서 실제로 죽었다).
+        months_with_briefs = {p[:7] for p in pubs}
+        self.assertIn(cur, months_with_briefs)
+        self.assertIn(prev, months_with_briefs)
 
     def test_cli_months_auto_writes_two_months_two_languages(self):
         with tempfile.TemporaryDirectory() as tmp:

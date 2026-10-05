@@ -44,7 +44,7 @@ python -m deep_analysis_fanout build-jobs --handoff <handoff.json> --out jobs.js
 ```
 python -m deep_analysis_fanout assemble --jobs jobs.json --responses responses.json --out deep_deltas.json
 ```
-→ 각 응답을 그 카드 `body_full` 로 `verify_deep_analysis` 게이트(D1 구조·D2 인용 근거대조·D3 숫자)에 통과시켜 **PASS 만** `deep_deltas.json` 에 싣는다. stderr 에 `병합 N · 보류 M` 리포트가 카드별 사유(FAIL 게이트 report)와 함께 찍힌다 — **이 리포트를 실행 로그에 반드시 남길 것**(어떤 카드가 왜 빠졌는지 추적 = 지시문 §2 요구).
+→ 각 응답을 그 카드 `body_full` 로 `verify_deep_analysis` 게이트(D1 구조·D2 인용 근거대조·D3 숫자)에 통과시켜 **PASS 만** `deep_deltas.json` 에 싣는다(4섹션 기준 — 게이트 FAIL 인 483 카드도 `observations_ko` 는 `{observations_ko, source_text}` 번역 전용 항목으로 남는다. 관찰 번역이 빠지면 브리프 전체 발행이 막히기 때문). stderr 에 `병합 N · 보류 M` 리포트가 카드별 사유(FAIL 게이트 report)와 함께 찍힌다 — **이 리포트를 실행 로그에 반드시 남길 것**(어떤 카드가 왜 빠졌는지 추적 = 지시문 §2 요구).
 
 **5) 브리프에 병합**
 ```

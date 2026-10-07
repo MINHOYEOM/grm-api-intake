@@ -1,0 +1,18 @@
+{#- 용어 그림 · reference-sample — 정의("배치의 사용기간 중 필요할 때 분석하기 위해 보관하는 … 검체")를
+    배치 → 떼어 둔 검체 → 사용기간 내내 보관(띠, 위의 양끝 화살표가 그 길이 = 배치 사용기간) → 그 사이 어느 때든 분석으로 옮긴다.
+    분석은 보관 띠 위 한 점에서 갈라져 나간다(검토 1차: 화살표가 띠와 이어지지 않음 → 점 추가).
+    자재 종류(출발물질·포장자재·중간체·완제품)·수량·분석 시점은 넣지 않는다. 2026-10-07 -#}
+<svg class="gt-fig-svg" viewBox="0 0 184 88" role="img" aria-label="{{ _('배치 사용기간 동안 보관했다가 필요할 때 분석하는 검체') }}">
+  <rect x="6" y="6" width="42" height="22" rx="4" style="fill:var(--card);stroke:var(--ink);stroke-width:1.6"/>
+  <text x="27" y="21" text-anchor="middle" style="font-size:9px;fill:var(--ink)">{{ _('배치') }}</text>
+  <path d="M27 30v8M23.5 34.5l3.5 3.5 3.5-3.5" style="fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"/>
+  <rect x="23" y="41" width="8" height="3" rx="1" style="fill:var(--coral-2)"/>
+  <rect x="20" y="44" width="14" height="20" rx="3" style="fill:var(--coral-tint);stroke:var(--coral);stroke-width:1.8"/>
+  <path d="M38 54H176" style="fill:none;stroke:var(--coral);stroke-width:4;stroke-linecap:round"/>
+  <path d="M40 40H176M44 37l-4 3 4 3M172 37l4 3-4 3" style="fill:none;stroke:var(--muted);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"/>
+  <text x="108" y="33" text-anchor="middle" style="font-size:8.5px;fill:var(--muted)">{{ _('배치 사용기간') }}</text>
+  <circle cx="124" cy="54" r="4" style="fill:var(--coral-2);stroke:var(--card);stroke-width:1.2"/>
+  <path d="M124 60v8M120.5 64.5l3.5 3.5 3.5-3.5" style="fill:none;stroke:var(--coral-2);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"/>
+  <text x="124" y="80" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:var(--coral-2)">{{ _('필요할 때 분석') }}</text>
+  <text x="27" y="77" text-anchor="middle" style="font-size:8.5px;fill:var(--ink)">{{ _('보관 검체') }}</text>
+</svg>

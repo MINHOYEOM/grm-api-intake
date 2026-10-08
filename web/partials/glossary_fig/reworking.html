@@ -1,0 +1,19 @@
+{#- 용어 그림 · reworking — 정의("규격에 맞지 않은 물질을 통상 공정과 다른 하나 이상의 처리단계에 투입해 품질을 적합하게 만드는 것")를
+    규격 부적합 물질에서 두 길이 갈라지는 대비로 옮긴다 — 위 통상 공정(흐린 점선 칸, 가지 않음) / 아래 다른 처리단계(강조 칸) → 적합한 품질.
+    통상 공정으로 되돌아가는지는 정의에 없어 잇지 않는다. 단계 수·처리 이름은 쓰지 않는다. 2026-10-08
+    같은 날 검토 1차 수정: 점선 화살표가 어디에도 닿지 않는다(B) → 통상 공정을 다른 처리단계와 같은 꼴의 칸으로 바꿔 둘을 나란히 비교한다. -#}
+<svg class="gt-fig-svg" viewBox="0 0 184 88" role="img" aria-label="{{ _('규격에 맞지 않은 물질을 통상 공정과 다른 처리단계에 넣어 적합하게 만듦') }}">
+  <text x="8" y="12" style="font-size:8.5px;font-weight:700;fill:var(--coral-2)">{{ _('규격 부적합') }}</text>
+  <circle cx="16" cy="44" r="5" style="fill:var(--coral-2)"/>
+  <path d="M16 38V28H32" style="fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:3 3"/>
+  <rect x="34" y="18" width="88" height="20" rx="4" style="fill:var(--canvas);stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 3"/>
+  <text x="78" y="31" text-anchor="middle" style="font-size:8.5px;fill:var(--muted)">{{ _('통상 공정') }}</text>
+  <path d="M16 50V66H28" style="fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round"/>
+  <path d="M28 62l6 4-6 4z" style="fill:var(--ink)"/>
+  <rect x="34" y="56" width="88" height="20" rx="4" style="fill:var(--coral-tint);stroke:var(--coral-2);stroke-width:1.8"/>
+  <text x="78" y="69" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:var(--ink)">{{ _('다른 처리단계') }}</text>
+  <line x1="122" y1="66" x2="140" y2="66" style="stroke:var(--ink);stroke-width:2"/>
+  <path d="M140 62l6 4-6 4z" style="fill:var(--ink)"/>
+  <circle cx="154" cy="66" r="5" style="fill:var(--card);stroke:var(--ink);stroke-width:2"/>
+  <text x="154" y="52" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:var(--ink)">{{ _('적합한 품질') }}</text>
+</svg>

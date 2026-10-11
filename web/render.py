@@ -65,7 +65,7 @@ GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
 # 영문 파일은 번역본이 아니라 또 하나의 정본이며 h2 순서가 같아야 한다(WebAboutTest 가 고정).
 ABOUT_FILE = WEB_DIR / "data" / "about_content.md"
 ABOUT_EN_FILE = WEB_DIR / "data" / "about_content_en.md"
-# [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 LinkedIn·이메일. 값이 비어 있으면
+# [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 이메일. 값이 비어 있으면
 # 그 링크는 **그리지 않는다**(죽은 링크 금지). 사이트에 그대로 실리므로 공개 주소만 넣는다.
 CONTACT_FILE = WEB_DIR / "data" / "contact.json"
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
@@ -1484,15 +1484,15 @@ def load_guide(path: Path = GUIDE_FILE) -> str | None:
 def load_contact(path: Path = CONTACT_FILE) -> dict[str, str]:
     """[소개] 연락처 로드 — 비어 있지 않은 값만 남긴다(빈 값 = 그 링크 미출력).
 
-    허용 키는 linkedin·email 둘뿐이고 값은 문자열이어야 한다. 모르는 키·다른 형·모양이
-    아닌 값은 조용히 무시하지 않고 실패한다 — 운영자가 오타를 낸 자리를 렌더가 숨기면
-    사이트에 잘못된 주소가 그대로 실린다.
+    허용 키는 email 하나뿐이고 값은 문자열이어야 한다(LinkedIn 은 2026-10-11 사이트에서
+    걷었다). 모르는 키·다른 형·모양이 아닌 값은 조용히 무시하지 않고 실패한다 — 운영자가
+    오타를 낸 자리를 렌더가 숨기면 사이트에 잘못된 주소가 그대로 실린다.
     """
     if not path.is_file():
         return {}
     data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict) or set(data) - {"linkedin", "email"}:
-        raise ValueError(f"contact.json 은 linkedin·email 두 키만 허용한다: {path}")
+    if not isinstance(data, dict) or set(data) - {"email"}:
+        raise ValueError(f"contact.json 은 email 키만 허용한다: {path}")
     out: dict[str, str] = {}
     for key, val in data.items():
         if not isinstance(val, str):
@@ -1500,20 +1500,18 @@ def load_contact(path: Path = CONTACT_FILE) -> dict[str, str]:
         val = val.strip()
         if not val:
             continue
-        if key == "linkedin" and not val.startswith("https://"):
-            raise ValueError(f"linkedin 은 https:// 절대 URL 이어야 한다: {val!r}")
         if key == "email" and ("@" not in val or any(c in val for c in " /<>\"'")):
             raise ValueError(f"email 모양이 아니다: {val!r}")
         out[key] = val
     return out
 
 
-# [소개] 본문 md 가 템플릿 위젯을 부르는 자리 — `## 만든 사람 {linkedin}` 처럼 제목 끝에
+# [소개] 본문 md 가 템플릿 위젯을 부르는 자리 — `## 문의 및 정정 요청 {contact}` 처럼 제목 끝에
 # 적는다. 링크·버튼은 md 서브셋이 표현할 수 없어(링크 문법 없음) 템플릿이 그리는데, 그리는
 # **위치**까지 템플릿이 정하면 문안을 손보는 사람이 순서를 못 바꾼다. 슬롯은 섹션에 붙어
 # 다니므로 md 에서 절을 옮기면 위젯도 함께 옮겨간다. 모르는 이름은 조용히 무시하지 않고
 # 즉시 실패한다 — 오타 하나로 연락처가 통째로 사라지는 것이 가장 나쁜 결과다.
-ABOUT_SLOTS: frozenset[str] = frozenset({"linkedin", "contact"})
+ABOUT_SLOTS: frozenset[str] = frozenset({"contact"})
 _ABOUT_SLOT_RE = re.compile(r"\s*\{([a-z][a-z0-9-]*)\}\s*$")
 
 
@@ -4756,7 +4754,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"
     env.globals["og_locale"] = LANG_OG_LOCALE[lang]
-    # [소개 2026-09-06] 연락처(LinkedIn·이메일) — 푸터 법적 줄(전 페이지)과 소개 페이지가
+    # [소개 2026-09-06] 연락처(이메일) —푸터 법적 줄(전 페이지)과 소개 페이지가
     # 같은 값을 본다. 빈 값은 load_contact 가 걸러 내므로 템플릿의 {% if %} 가 링크를
     # 통째로 생략한다(죽은 링크 금지). 영어 env 는 아래 setdefault 복사로 같은 값을 받는다.
     env.globals["contact"] = load_contact()
@@ -5343,7 +5341,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # [소개 2026-09-06] 소개 페이지 — about_content.md(정본). 이용안내와 같은 관례(커밋
     # 콘텐츠·골든 고정·파일 부재 시 조용히 생략). nav 탭은 늘리지 않는다 — 진입은 전 페이지
-    # 푸터 '서비스' 열의 '소개'다. 연락처(LinkedIn·이메일)는 env.globals["contact"] 가 준다.
+    # 푸터 '서비스' 열의 '소개'다. 연락처(이메일)는 env.globals["contact"] 가 준다.
     if about_md:
         about_title, about_lead, about_sections = render_about_html(about_md)
         emit("about.html", page("about/"),

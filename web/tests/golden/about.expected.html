@@ -95,7 +95,7 @@
     <section class="about-sec" id="sec-4">
       <h2>만든 사람</h2>
       <div class="about-prose">
-        <p>제약회사 품질보증(QA) 분야에서 일하며, 업무에 필요한 도구와 자동화 서비스를 직접 개발하고 있습니다.<br>규제 정보를 더 쉽게 찾아보고 활용할 수 있도록 Global Regulatory Monitor를 기획·개발하고 운영하고 있습니다.</p>        <p class="about-more"><a href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener">LinkedIn에서 더 알아보기 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>      </div>
+        <p>제약회사 품질보증(QA) 분야에서 일하며, 업무에 필요한 도구와 자동화 서비스를 직접 개발하고 있습니다.<br>규제 정보를 더 쉽게 찾아보고 활용할 수 있도록 Global Regulatory Monitor를 기획·개발하고 운영하고 있습니다.</p>      </div>
     </section>
     <section class="about-sec" id="sec-5">
       <h2>문의 및 정정 요청</h2>
@@ -143,11 +143,6 @@
 .about-prose strong{font-weight:600;color:var(--ink)}
 /* 목록 항목은 '이름 한 줄 + 설명 한 줄' — 굵은 머리말을 블록으로 떨어뜨려 둘을 가른다. */
 .about-prose li strong{display:block;font-size:17px;line-height:1.5;margin-bottom:5px}
-.about-more{margin-top:22px}
-.about-more a{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--coral-2);border-bottom:1px solid var(--line-2);padding-bottom:2px;transition:border-color .16s var(--ease)}
-.about-more a:hover{border-bottom-color:var(--coral-2)}
-.about-more .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
-.about-more a:hover .ti{transform:translateX(3px)}
 .about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .about-acts:empty{display:none}
 .about-act,.about-fb{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:10px 17px;background:transparent;cursor:pointer;transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease)}
@@ -155,8 +150,8 @@
 .about-act .ti,.about-fb .ti{font-size:16px;line-height:1}
 .about-fb{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
 .about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
-.about-act:focus-visible,.about-fb:focus-visible,.about-more a:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti,.about-more a:hover .ti{transform:none} }
+.about-act:focus-visible,.about-fb:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti{transform:none} }
 /* 좁은 폭은 폭만 줄어들 뿐 구조가 같다 — 기준선이 하나라 재배치할 것이 없다. 제목은 375px
    에서 36px 이면 둘째 줄이 오른쪽 여백을 다 먹어(331 중 330px 실측) 한 단 줄인다. */
 @media (max-width:900px){ .about-sec{padding:36px 0} .about-sec h2{font-size:22px;margin-bottom:14px} .about-head h1{font-size:36px} .about-prose{font-size:16px} .about-body{padding-top:40px} }
@@ -220,7 +215,7 @@
   </div>
   <div class="foot-legal">
     <div class="foot-copy">
-      <span>© 2026 Global Regulatory Monitor</span><span class="foot-contact"><a class="foot-ico" href="https://www.linkedin.com/in/minhoyeom/" target="_blank" rel="me noopener" aria-label="LinkedIn" title="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a><a class="foot-ico" href="mailto:yeomminho1472@gmail.com" aria-label="이메일" title="이메일"><i class="ti ti-mail" aria-hidden="true"></i></a></span></div>
+      <span>© 2026 Global Regulatory Monitor</span><span class="foot-contact"><a class="foot-ico" href="mailto:yeomminho1472@gmail.com" aria-label="이메일" title="이메일"><i class="ti ti-mail" aria-hidden="true"></i></a></span></div>
     <p class="foot-disclaimer">본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.</p>
   </div>
 </div></footer>

@@ -4,7 +4,7 @@
     이 제목·리드·블록으로 잘라 넘긴다(about_title·about_lead·about_sections). 이용안내처럼
     목차가 달린 긴 문서가 아니라 절 제목 + 본문 블록 몇 개이며, 전부 한 기준선에 선다.
     ★링크·버튼은 md 서브셋이 표현할 수 없어(링크 문법 없음) 여기서 그리되, **어느 절에**
-    그릴지는 md 가 정한다(`## 만든 사람 {linkedin}` — render.ABOUT_SLOTS). 문안을 손보는
+    그릴지는 md 가 정한다(`## 문의 및 정정 요청 {contact}` — render.ABOUT_SLOTS). 문안을 손보는
     사람이 절을 옮기면 위젯도 따라간다.
     싣지 않는 것: 운영자 실명, 문서·지적 수 같은 낡는 숫자, 소속 회사와의 관계·게시 전
     개별 검토 여부에 관한 문장(사용자 확정 2026-09-06).
@@ -27,9 +27,6 @@
       <h2>{{ s.title }}</h2>
       <div class="about-prose">
         {{ s.body }}
-        {%- if s.slot == 'linkedin' and contact.linkedin %}
-        <p class="about-more"><a href="{{ contact.linkedin }}" target="_blank" rel="me noopener">{{ _("LinkedIn에서 더 알아보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
-        {%- endif %}
         {%- if s.slot == 'contact' %}
         {#- '문의 및 제안'(주 버튼)은 feedback.js 가 목록 맨 앞에 얹는다 — JS 미실행이면 흔적 0
             (죽은 링크 금지). 문안은 `data-fb-name` 으로 여기서 넘겨 연락 문구가 JS 로 새지
@@ -80,11 +77,6 @@
 .about-prose strong{font-weight:600;color:var(--ink)}
 /* 목록 항목은 '이름 한 줄 + 설명 한 줄' — 굵은 머리말을 블록으로 떨어뜨려 둘을 가른다. */
 .about-prose li strong{display:block;font-size:17px;line-height:1.5;margin-bottom:5px}
-.about-more{margin-top:22px}
-.about-more a{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--coral-2);border-bottom:1px solid var(--line-2);padding-bottom:2px;transition:border-color .16s var(--ease)}
-.about-more a:hover{border-bottom-color:var(--coral-2)}
-.about-more .ti{font-size:16px;line-height:1;transition:transform .16s var(--ease)}
-.about-more a:hover .ti{transform:translateX(3px)}
 .about-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .about-acts:empty{display:none}
 .about-act,.about-fb{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:10px 17px;background:transparent;cursor:pointer;transition:border-color .16s var(--ease),color .16s var(--ease),background .16s var(--ease)}
@@ -92,8 +84,8 @@
 .about-act .ti,.about-fb .ti{font-size:16px;line-height:1}
 .about-fb{background:var(--coral);border-color:var(--coral);color:var(--on-coral);font-weight:600}
 .about-fb:hover{background:var(--coral-2);border-color:var(--coral-2)}
-.about-act:focus-visible,.about-fb:focus-visible,.about-more a:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti,.about-more a:hover .ti{transform:none} }
+.about-act:focus-visible,.about-fb:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){ .about-cta .btn:hover .ti{transform:none} }
 /* 좁은 폭은 폭만 줄어들 뿐 구조가 같다 — 기준선이 하나라 재배치할 것이 없다. 제목은 375px
    에서 36px 이면 둘째 줄이 오른쪽 여백을 다 먹어(331 중 330px 실측) 한 단 줄인다. */
 @media (max-width:900px){ .about-sec{padding:36px 0} .about-sec h2{font-size:22px;margin-bottom:14px} .about-head h1{font-size:36px} .about-prose{font-size:16px} .about-body{padding-top:40px} }

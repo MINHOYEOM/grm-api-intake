@@ -14675,13 +14675,12 @@ class WebAboutTest(unittest.TestCase):
         잊으면 가드가 낡는다 — 이 저장소의 손목록 금지 규율)."""
         contact = render.load_contact()
         self.assertTrue(contact, "contact.json 이 비었다 — 값을 지우려면 이 테스트도 함께 본다")
-        for value, page in ((contact["linkedin"], self.html), (contact["linkedin"], self.landing)):
-            self.assertIn(f'href="{value}" target="_blank" rel="me noopener"', page)
         for page in (self.html, self.landing):
             self.assertIn(f'href="mailto:{contact["email"]}"', page)
+            # [2026-10-11] LinkedIn 은 사이트에서 걷었다 — 푸터 아이콘·'만든 사람' 링크 모두 0.
+            self.assertNotIn("linkedin", page.lower())
         self.assertIn('class="foot-ico"', self.landing)      # 푸터 법적 줄 아이콘
         self.assertIn('class="about-act"', self.html)        # 소개 페이지 이메일 버튼
-        self.assertIn('class="about-more"', self.html)       # '만든 사람' 절의 LinkedIn 줄
         # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
         self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
 
@@ -14719,21 +14718,20 @@ class WebAboutTest(unittest.TestCase):
         **어느 절에** 그릴지는 md 의 `## 제목 {slot}` 이 정한다. 문안을 손보는 사람이 절을
         옮기면 위젯도 따라가야 한다 — 위치까지 템플릿에 박으면 md 만 고친 결과가 어긋난다.
         슬롯 이름은 제목에서 떼어 화면에 남지 않는다."""
-        self.assertRegex(self.md, r"(?m)^## .+\{linkedin\}\s*$")
         self.assertRegex(self.md, r"(?m)^## .+\{contact\}\s*$")
-        self.assertRegex(self.md_en, r"(?m)^## .+\{linkedin\}\s*$")
         self.assertRegex(self.md_en, r"(?m)^## .+\{contact\}\s*$")
-        self.assertNotIn("{linkedin}", self.html)     # 마커가 제목에 새어나오지 않는다
-        self.assertNotIn("{contact}", self.html)
+        self.assertNotIn("{contact}", self.html)      # 마커가 제목에 새어나오지 않는다
         _, _, secs = render.render_about_html(self.md)
-        self.assertEqual([s["slot"] for s in secs if s["slot"]], ["linkedin", "contact"])
-        # LinkedIn 줄은 `{linkedin}` 을 단 절 **안**에 있다(다음 절로 밀리지 않는다).
-        linked = next(s for s in secs if s["slot"] == "linkedin")
+        self.assertEqual([s["slot"] for s in secs if s["slot"]], ["contact"])
+        # 연락 버튼 줄은 `{contact}` 를 단 절 **안**에 있다(다음 절로 밀리지 않는다).
+        linked = next(s for s in secs if s["slot"] == "contact")
         after = self.html[self.html.index(f'id="{linked["id"]}"'):]
-        self.assertLess(after.index("about-more"), after.index("</section>"))
+        self.assertLess(after.index("data-feedback-mount"), after.index("</section>"))
         # 모르는 슬롯은 조용히 무시하지 않고 즉시 실패한다(오타로 연락처가 사라지는 것 방지).
-        with self.assertRaises(ValueError):
-            render.render_about_html("# t\n\n## 어떤 절 {sponsors}\n\n본문\n")
+        # 걷어 낸 `{linkedin}` 도 이제 모르는 이름이다 — md 에 되살아나면 렌더가 멈춘다.
+        for bad in ("sponsors", "linkedin"):
+            with self.assertRaises(ValueError):
+                render.render_about_html(f"# t\n\n## 어떤 절 {{{bad}}}\n\n본문\n")
 
     def test_feedback_button_copy_lives_in_the_template(self):
         """문의 버튼의 라벨은 **템플릿이 정한다**(`data-fb-name`). feedback.js 가 그 버튼을
@@ -14781,7 +14779,6 @@ class WebAboutTest(unittest.TestCase):
             render.load_contact = c0
             shutil.rmtree(tmp, ignore_errors=True)
         for page in (about, landing):
-            self.assertNotIn("ti-brand-linkedin", page)
             self.assertNotIn("mailto:", page)
             self.assertNotIn('class="foot-contact"', page)
         self.assertIn("data-feedback-mount", about)   # 문의 버튼 자리는 남는다(JS 주입)
@@ -14790,12 +14787,12 @@ class WebAboutTest(unittest.TestCase):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_contact_"))
         try:
             p = tmp / "contact.json"
-            p.write_text('{"linkedin": "", "email": "  "}', encoding="utf-8")
+            p.write_text('{"email": "  "}', encoding="utf-8")
             self.assertEqual(render.load_contact(p), {})           # 빈 값 = 없음
-            p.write_text('{"linkedin": "linkedin.com/in/x", "email": ""}', encoding="utf-8")
+            p.write_text('{"linkedin": "https://www.linkedin.com/in/x"}', encoding="utf-8")
             with self.assertRaises(ValueError):
-                render.load_contact(p)                             # https:// 없는 주소
-            p.write_text('{"linkedin": "", "email": "not-an-email"}', encoding="utf-8")
+                render.load_contact(p)                             # 걷어 낸 키(2026-10-11)
+            p.write_text('{"email": "not-an-email"}', encoding="utf-8")
             with self.assertRaises(ValueError):
                 render.load_contact(p)
             p.write_text('{"twitter": "x"}', encoding="utf-8")

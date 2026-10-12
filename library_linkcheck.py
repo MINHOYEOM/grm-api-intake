@@ -171,11 +171,14 @@ def _request(
     timeout: float,
     sleeper: Callable[[float], None],
     delay: float,
+    ranged: bool = True,
 ) -> requests.Response:
     sleeper(delay)
     kwargs: dict[str, Any] = {"allow_redirects": True, "timeout": timeout}
     if method == "GET":
-        kwargs.update({"stream": True, "headers": {"Range": "bytes=0-1023"}})
+        kwargs["stream"] = True
+        if ranged:
+            kwargs["headers"] = {"Range": "bytes=0-1023"}
     # MFDS 계열 호스트만 KR egress 프록시를 태운다. 이 모듈은 grm_common 의 HTTP 헬퍼를
     # 쓰지 않고 requests 를 직접 잡으므로, 여기서 명시적으로 거치지 않으면 워크플로가
     # MFDS_HTTP_PROXY 를 넘겨도 **아무 효과가 없다**(env 전달 ≠ 배선).
@@ -216,9 +219,20 @@ def probe_url(
                 response = _request(
                     session, method, url, timeout=timeout, sleeper=sleeper, delay=delay,
                 )
+                unranged = False
+                if method == "GET" and response.status_code == 416:
+                    # 416 은 "그 바이트 범위를 못 준다"이지 링크가 죽었다는 뜻이 아니다 —
+                    # PMDA 는 Range 요청에 늘 416 을 준다(2026-10-12 #1098 오탐, 일반 GET 은 200).
+                    # Range 없이 한 번 더 묻는다(stream 이라 본문은 받지 않는다).
+                    response.close()
+                    response = _request(
+                        session, method, url, timeout=timeout, sleeper=sleeper, delay=delay,
+                        ranged=False,
+                    )
+                    unranged = True
                 last_code = response.status_code
                 final_url = str(response.url or url)
-                if method == "GET" and sensitive:
+                if method == "GET" and sensitive and not unranged:
                     body_sample = _read_body_sample(response)
                 response.close()
                 if method == "HEAD" and last_code in (404, 410):

@@ -108,6 +108,30 @@ jobs:
               core.notice(`이슈 #${created.number} 생성`);
             }
 
+      # 대조가 깨끗하면 열린 이슈를 닫는다 — 없으면 해소된 이슈가 영구히 남는다
+      # (#638: 08-11 이후 매주 통과했는데 2달 열려 있었다).
+      - name: 일치 시 열린 이슈 자동 종료
+        if: steps.verify.outcome == 'success'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const title = '[source-verify] 발행 카드가 원문보다 적게 보여주는 항목이 있습니다';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'source-verify', per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number,
+                body: `최근 발행분 원문 대조가 일치해 자동으로 닫는다 (실행: ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }
+
       - name: 요약
         if: always()
         run: |

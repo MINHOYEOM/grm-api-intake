@@ -332,7 +332,6 @@ STR: dict[str, dict[str, Any]] = {
         # [마케팅 2026-09-23] '이번 주 한 건' 캡션(기본, `--caption one`) 전용 고정 문구.
         "one_checks_head": "현장 점검 포인트",
         "one_link_head": "공식 원문과 이번 주 브리프 전체",
-        "one_tags": "#GMP #QA #품질보증 #FDA #제약",
         # [마케팅 2026-09-23 L-06] 월간 결산 덱("이달의 변화 5개 + 숫자 1개") 전용 고정 문구.
         "month_eyebrow": "월간 규제 결산",
         # 제목 줄바꿈은 `|` 로 **구 경계를 직접** 정한다 — split_two 는 폭으로 자르다 "꼭 봐야 /
@@ -385,7 +384,6 @@ STR: dict[str, dict[str, Any]] = {
                      "#QA #FDA #EMA #MHRA #MFDS"],
         "one_checks_head": "What to check on site",
         "one_link_head": "Official sources and the full weekly brief",
-        "one_tags": "#GMP #QA #QualityAssurance #FDA #pharma",
         "month_eyebrow": "Monthly regulatory recap",
         "month_h1": "{mon}:|{n} change{s} worth your time",
         "month_meta": "{k} issue{ks} · {c} card{cs}",
@@ -791,6 +789,83 @@ def _one_extra_fact(card: dict, lang: str) -> str:
     return ""
 
 
+# [마케팅 2026-10-12] 게시물 해시태그 — 고정 5개 대신 그 주 카드에 맞춘 태그(검색·피드 노출용).
+# 기본 태그(넓은 독자) + 기관 + 문서 유형 + 주제(정본 한국어 문구에서 키워드로 판별) 순, 최대 8개.
+# 판별은 늘 한국어 정본으로 하고 `lang` 은 표기만 고른다(`_kind_chip` 와 같은 규칙).
+_TAG_BASE = {"ko": ["#GMP", "#QA", "#제약바이오"], "en": ["#GMP", "#QualityAssurance", "#pharma"]}
+_TAG_MAX = 8
+_TAG_AGENCY = {"FDA": ("#FDA", "#FDA"), "MFDS": ("#식약처", "#MFDS"), "EMA": ("#EMA", "#EMA"),
+               "MHRA": ("#MHRA", "#MHRA"), "Health Canada": ("#HealthCanada", "#HealthCanada"),
+               "WHO": ("#WHO", "#WHO"), "EudraGMDP": ("#EUGMP", "#EUGMP"), "EU": ("#EUGMP", "#EUGMP")}
+# (정규식, 국문 태그, 영문 태그) — 앞에 있을수록 먼저 고른다. 세척 밸리데이션은 밸리데이션보다 앞.
+_TAG_TOPICS: list[tuple[re.Pattern, str, str]] = [
+    (re.compile(r"무균s?시험|sterility test", re.I), "#무균시험", "#SterilityTesting"),
+    (re.compile(r"무균|aseptic", re.I), "#무균공정", "#AsepticProcessing"),
+    (re.compile(r"데이터\s?(완전성|무결성)|감사\s?추적|audit trail", re.I), "#데이터완전성", "#DataIntegrity"),
+    (re.compile(r"\bOOS\b|규격\s?이탈"), "#OOS", "#OOS"),
+    (re.compile(r"\bCAPA\b|시정\s?(및\s?)?예방"), "#CAPA", "#CAPA"),
+    (re.compile(r"세척"), "#세척밸리데이션", "#CleaningValidation"),
+    (re.compile(r"밸리데이션|적격성\s?평가|공정\s?검증"), "#밸리데이션", "#Validation"),
+    (re.compile(r"교차\s?오염"), "#교차오염", "#CrossContamination"),
+    (re.compile(r"환경\s?모니터링"), "#환경모니터링", "#EnvironmentalMonitoring"),
+    (re.compile(r"엔도톡신|내독소"), "#엔도톡신", "#Endotoxin"),
+    (re.compile(r"일탈"), "#일탈관리", "#DeviationManagement"),
+    (re.compile(r"안정성\s?시험"), "#안정성시험", "#StabilityTesting"),
+    (re.compile(r"임상시험(용)?\s?의?약"), "#임상시험약", "#ClinicalTrials"),
+    (re.compile(r"위탁|수탁|\bCDMO\b|\bCMO\b"), "#CDMO", "#CDMO"),
+    (re.compile(r"원료\s?의약품|\bAPI\b"), "#원료의약품", "#API"),
+    (re.compile(r"바이오\s?의약품"), "#바이오의약품", "#Biologics"),
+]
+
+
+def _kind_tag(card: dict, lang: str) -> str:
+    i = 0 if lang == "ko" else 1
+    if str(card.get("group") or "") == "Recall":
+        return ("#의약품회수", "#DrugRecall")[i]
+    if is_warning_letter(card):
+        return ("#경고서한", "#WarningLetter")[i]
+    if "483" in str(card.get("id") or "") or "483" in str(card.get("type_tag") or ""):
+        return "#FDA483"
+    if is_mfds_action(card):
+        return ("#행정처분", "#RegulatoryAction")[i]
+    if is_mfds_inspection(card) or "실사" in str(card.get("type_tag") or ""):
+        return ("#GMP실사", "#GMPInspection")[i]
+    if "비준수" in str(card.get("type_tag") or "") or "비준수" in str(card.get("card_type") or ""):
+        return ("#GMP비준수", "#GMPNonCompliance")[i]
+    return ""
+
+
+def hashtags(cards: list[dict], lang: str = "ko") -> str:
+    """카드들(한 건 캡션이면 1장, 월간 결산이면 여러 장)에 맞춘 해시태그 한 줄.
+    기관·유형은 가장 많이 나온 것 하나씩, 주제는 많이 나온 순(동률은 `_TAG_TOPICS` 순)으로 채운다."""
+    i = 0 if lang == "ko" else 1
+    agencies: dict[str, int] = {}
+    kinds: dict[str, int] = {}
+    topics: dict[int, int] = {}
+    for c in cards:
+        a = _TAG_AGENCY.get(_agency(c))
+        if a:
+            agencies[a[i]] = agencies.get(a[i], 0) + 1
+        k = _kind_tag(c, lang)
+        if k:
+            kinds[k] = kinds.get(k, 0) + 1
+        text = " ".join([_text_of(c), " ".join(_card_list(c, "checks")), " ".join(_card_list(c, "key_facts")),
+                         str(c.get("modality") or ""), str(c.get("type_tag") or "")])
+        for n, (pat, _ko, _en) in enumerate(_TAG_TOPICS):
+            if pat.search(text):
+                topics[n] = topics.get(n, 0) + 1
+    tags = list(_TAG_BASE[lang])
+    top = lambda d: sorted(d, key=lambda k: -d[k])     # dict 는 삽입순 — 동률이면 먼저 나온 것
+    picks = top(agencies)[:1] + top(kinds)[:1] + \
+        [_TAG_TOPICS[n][1 + i] for n in sorted(topics, key=lambda n: (-topics[n], n))]
+    for tg in picks:
+        if len(tags) >= _TAG_MAX:
+            break
+        if tg.lower() not in {x.lower() for x in tags}:
+            tags.append(tg)
+    return " ".join(tags)
+
+
 def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str | None:
     """'이번 주 한 건' 캡션([마케팅 2026-09-23 계획 L-02, 09-23 개정] 게시 본문 기본형,
     `--caption one`).
@@ -849,7 +924,7 @@ def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str
     lines.append(t["one_link_head"])
     lines.append(caption_url)
     lines.append("")
-    lines.append(t["one_tags"])
+    lines.append(hashtags([card], lang))
     return "\n".join(lines) + "\n"
 
 
@@ -1317,7 +1392,7 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
     lines.append(t["month_link_head"])
     lines.append(caption_url)
     lines.append("")
-    lines.append(t["one_tags"])
+    lines.append(hashtags([card for card, _pub, _rank in items], lang))
     caption = "\n".join(lines) + "\n"
 
     return {"pub": month, "lang": lang, "slides": slides, "caption": caption,

@@ -1909,5 +1909,101 @@
       "The management system that links organisation, responsibilities, procedures, processes, and resources so that quality objectives are achieved across the product lifecycle"
     ],
     "explanation_en": "The quality unit is the organisational unit, independent of production, that carries out both quality assurance and quality control responsibilities (ICH Q10, 21 CFR 211.22). The others describe quality assurance, quality control and the pharmaceutical quality system."
+  },
+  {
+    "id": "q-202642-01",
+    "question_ko": "FDA가 대만의 OTC 의약품 수탁제조소 TCI Co., Ltd BioCosme PABP BRANCH에 보낸 Warning Letter에서 21 CFR 211.165(a) 위반으로 지적된 내용은?",
+    "choices": [
+      "입고 원료의 확인시험을 하지 않고 공급사 시험성적서에 그대로 의존함",
+      "완제품 출하시험에서 유효성분 함량(assay) 시험을 하지 않고 미국에 출하함",
+      "생산·공정 관리에 관한 적절한 서면 절차를 수립하지 않고 제조함",
+      "품질부서가 제품의 CGMP 준수와 규격 충족을 보장할 책임을 이행하지 않음"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "Warning Letter는 완제품 출하 전 유효성분 함량 시험 없이 미국에 출하한 것을 21 CFR 211.165(a) 위반으로 적었습니다. 나머지는 같은 서한의 다른 위반으로, 각각 211.84(d)(1)·(d)(2), 211.100(a), 211.22에 해당합니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-12/#4ca9202786d6",
+    "difficulty": "normal",
+    "week": "202642",
+    "question_en": "In its Warning Letter to TCI Co., Ltd BioCosme PABP BRANCH, a contract manufacturer of OTC drugs in Taiwan, which finding did FDA cite under 21 CFR 211.165(a)?",
+    "choices_en": [
+      "Relying on the supplier's certificate of analysis without performing identity testing on incoming components",
+      "Shipping finished product to the US without testing the active ingredient content (assay) at release",
+      "Manufacturing without establishing adequate written procedures for production and process controls",
+      "The quality unit failing to ensure that products comply with CGMP and meet their specifications"
+    ],
+    "explanation_en": "The Warning Letter cited shipping finished product to the US without testing the active ingredient content before release as a violation of 21 CFR 211.165(a). The other options are separate violations in the same letter, under 211.84(d)(1)/(d)(2), 211.100(a) and 211.22 respectively."
+  },
+  {
+    "id": "q-202642-02",
+    "question_ko": "FDA가 아웃소싱시설 Imprimis NJOF LLC에 발부한 483에서 ‘testing into compliance’라고 규정한 관행은?",
+    "choices": [
+      "무균 안과제품 규격이 공정서 범위를 벗어나는데 과학적 근거를 제시하지 못함",
+      "목시플록사신 주사제에서 관찰된 섬유상 이물의 근본원인을 규명하지 않음",
+      "검증된 불순물·분해산물 시험법 없이 제품 출하를 승인함",
+      "100% 육안검사에 실패한 배치를 조사 완료 전에 재검사·AQL로 출하할 수 있게 함"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "FDA는 100% 육안검사 실패 배치를 조사가 끝나기 전에 재검사와 AQL로 출하할 수 있게 한 절차를 testing into compliance로 지적했습니다(관찰 4). 나머지는 같은 483의 관찰 1·3·6입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-12/#fda483-195190",
+    "difficulty": "easy",
+    "week": "202642",
+    "question_en": "In the Form 483 FDA issued to the outsourcing facility Imprimis NJOF LLC, which practice did FDA describe as 'testing into compliance'?",
+    "choices_en": [
+      "Failing to justify scientifically specifications for sterile ophthalmic products that fall outside compendial ranges",
+      "Not identifying the root cause of fibrous foreign matter seen in moxifloxacin injection products",
+      "Approving product release without validated impurity and degradant test methods",
+      "Allowing batches that failed 100% visual inspection to be re-inspected and released by AQL before the investigation was complete"
+    ],
+    "explanation_en": "FDA cited, as testing into compliance, the procedure that allowed batches failing 100% visual inspection to be re-inspected and released by AQL before the investigation was finished (Observation 4). The other options are Observations 1, 3 and 6 of the same 483."
+  },
+  {
+    "id": "q-202642-03",
+    "question_ko": "무균 주사제 GMP에서 말하는 ‘외관검사(Visual Inspection)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "충전을 마친 용기를 한 개씩 살펴 이물이나 결함이 있는 것을 가려내는 일",
+      "시험결과의 적합 여부를 판단하는 수치 한도, 범위 또는 그 밖의 적절한 기준",
+      "약전에 정한 방법으로 검체에 살아 있는 미생물이 검출되는지 확인하는 시험",
+      "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "외관검사는 충전을 마친 용기를 한 개씩 살펴 이물이나 결함을 가려내는 검사이며, Annex 1은 결함 유형을 분류해 추세를 보고 검사원 적격성을 평가하도록 요구합니다(EU GMP Annex 1 §§8.30–8.32). 나머지는 각각 적합기준, 무균시험, 배치 출하승인에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "visual-inspection",
+    "difficulty": "easy",
+    "week": "202642",
+    "question_en": "In GMP for sterile injectables, which statement correctly describes visual inspection?",
+    "choices_en": [
+      "Examining filled containers one by one to detect and remove those with foreign matter or defects",
+      "Numerical limits, ranges or other suitable measures used to judge whether a test result is acceptable",
+      "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample",
+      "Reviewing a batch's manufacturing and testing records and compliance with requirements to approve it for sale"
+    ],
+    "explanation_en": "Visual inspection means examining filled containers one by one to detect foreign matter or defects, and Annex 1 expects defects to be classified and trended and inspectors to be qualified (EU GMP Annex 1 §§8.30–8.32). The others describe acceptance criteria, the sterility test and batch release."
+  },
+  {
+    "id": "q-202642-04",
+    "question_ko": "의약품 품질관리에서 말하는 ‘시험성적서(Certificate of Analysis, CoA)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "시험항목, 분석절차와 허용기준을 정해 물질이 의도한 용도에 적합한지 판단하는 기준의 집합",
+      "공급업체가 품질요건에 맞는 자재를 지속적으로 제공할 능력이 있는지 평가·승인하는 활동",
+      "배치마다 수행한 시험과 기준, 결과를 적어 품질부서가 날짜·서명해 발행하는 문서",
+      "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "시험성적서는 배치마다 어떤 시험을 어떤 기준으로 했고 결과가 얼마였는지를 적어 품질부서가 날짜·서명해 발행하는 문서입니다(ICH Q7 §§11.40–11.44). 나머지는 각각 규격, 공급업체 적격성평가, 배치 출하승인에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "certificate-of-analysis",
+    "difficulty": "easy",
+    "week": "202642",
+    "question_en": "In pharmaceutical quality control, which statement correctly describes a certificate of analysis (CoA)?",
+    "choices_en": [
+      "The set of tests, analytical procedures and acceptance criteria used to judge whether a material is fit for its intended use",
+      "Evaluating and approving whether a supplier can consistently provide materials that meet quality requirements",
+      "A document issued, dated and signed by the quality unit for each batch, setting out the tests, criteria and results",
+      "Reviewing a batch's manufacturing and testing records and compliance with requirements to approve it for sale"
+    ],
+    "explanation_en": "A certificate of analysis is a document issued, dated and signed by the quality unit for each batch, setting out which tests were performed, against what criteria, and what the results were (ICH Q7 §§11.40–11.44). The others describe a specification, supplier qualification and batch release."
   }
 ]

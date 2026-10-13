@@ -934,6 +934,22 @@
       "doc_type": "guidance-internal",
       "published_date": "2026-10-02",
       "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15302"
+    },
+    {
+      "id": "data0010-15307",
+      "title_en": "(GRP-MaPP-심사기준-03) 의약품 안전성·유효성 검토서 작성기준",
+      "title_ko": "(GRP-MaPP-심사기준-03) 의약품 안전성·유효성 검토서 작성기준",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-10-13",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15307"
+    },
+    {
+      "id": "data0010-15306",
+      "title_en": "CTD에 의한 품질평가자료 검토서 작성기준",
+      "title_ko": "CTD에 의한 품질평가자료 검토서 작성기준",
+      "doc_type": "guidance-internal",
+      "published_date": "2026-10-13",
+      "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15306"
     }
   ]
 }

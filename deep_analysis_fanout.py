@@ -13,7 +13,8 @@ Claude Code 세션에서 이뤄진다 — `docs/prompts/GRM_DeepWL_fanout_실행
   assemble_deltas() — 서브에이전트가 돌려준 카드별 4섹션 JSON 을 `verify_deep_analysis` 게이트에
                       통과시켜 **PASS 만** `inject_slots.inject_deep_analysis` 델타 포맷으로 모으고,
                       FAIL/누락은 사유(`GateResult.report`)와 함께 보고(카드 단위 graceful degrade —
-                      FAIL 카드는 6슬롯만으로 조용히 발행, 전체 브리프는 안 막힌다).
+                      FAIL 카드는 6슬롯만으로 조용히 발행, 전체 브리프는 안 막힌다). FAIL 이어도
+                      483 관찰 국문 번역(`observations_ko`)은 번역 전용 항목으로 남긴다.
 
 산출 델타는 `inject_slots.py --deep-analysis-deltas <deltas.json>` 로 브리프에 병합한다.
 
@@ -322,6 +323,8 @@ class CardOutcome:
     document_id: str
     status: str      # MERGED | GATE_FAILED | MISSING_RESPONSE | INVALID_RESPONSE
     detail: str = ""  # 게이트 report 또는 사유
+    # GATE_FAILED 여도 델타에 남긴 번역 전용 항목의 키(분석만 drop). 비었으면 카드 통째 보류.
+    kept_layers: tuple[str, ...] = ()
 
 
 @dataclass
@@ -337,13 +340,23 @@ class AssembleResult:
     def held(self) -> int:
         return sum(1 for o in self.outcomes if o.status != MERGED)
 
+    @property
+    def translation_kept(self) -> int:
+        """분석은 보류됐지만 번역 전용 항목으로 델타에 남은 카드 수(held 의 부분집합)."""
+        return sum(1 for o in self.outcomes if o.kept_layers)
+
     def report(self) -> str:
         head = f"[WL 심층분석 fan-out] 병합 {self.merged} · 보류 {self.held} (총 {len(self.outcomes)})"
+        if self.translation_kept:
+            head += f" · 보류 중 번역 층 보존 {self.translation_kept}"
         lines = [head]
         label = {MERGED: "✓ 병합", GATE_FAILED: "✖ 게이트 FAIL",
                  MISSING_RESPONSE: "· 응답 누락", INVALID_RESPONSE: "· 응답 형식오류"}
         for o in self.outcomes:
-            lines.append(f"  {label.get(o.status, o.status)} — {o.document_id}")
+            line = f"  {label.get(o.status, o.status)} — {o.document_id}"
+            if o.kept_layers:
+                line += f" · 분석 drop·번역 층 보존({', '.join(o.kept_layers)})"
+            lines.append(line)
             if o.status != MERGED and o.detail:
                 for dl in o.detail.splitlines():
                     lines.append(f"      {dl}")
@@ -357,6 +370,10 @@ def assemble_deltas(jobs: Any, responses: dict[str, Any] | None) -> AssembleResu
     **PASS 만** 델타에 싣는다. 델타 포맷 = `inject_slots.inject_deep_analysis` 계약과 동일:
     `{document_id: {"deep_analysis": {...}, "source_text": body_full}}`. FAIL/누락/형식오류는
     outcome 에 사유(게이트 report)를 남긴다 — 비차단(그 카드는 6슬롯만으로 발행).
+
+    게이트 FAIL(게이트 실행 오류 포함)이어도 관찰 국문 번역은 버리지 않는다 — 분석만 drop 하고
+    `{"observations_ko": [...], "source_text": body_full}` 번역 전용 항목을 남긴다(outcome 은
+    GATE_FAILED 그대로, 남긴 키는 `kept_layers`). 판정은 브릿지와 같은 `vda.translation_residue`.
     """
     responses = responses or {}
     result = AssembleResult()
@@ -376,17 +393,31 @@ def assemble_deltas(jobs: Any, responses: dict[str, Any] | None) -> AssembleResu
         # deep_analysis(4섹션)와 분리한다 — 게이트는 4섹션만 검증하고, 번역은 별도 델타 키로
         # 실어 inject_slots 가 deterministic_detail.observations 에 번호로 병합한다(선택·비게이트).
         obs_ko = da.pop("observations_ko", None) if isinstance(da, dict) else None
+        entry: dict[str, Any] = {"deep_analysis": da, "source_text": job.body_full}
+        if isinstance(obs_ko, list) and obs_ko:
+            entry["observations_ko"] = obs_ko
         # card_type 을 넘겨 필수 섹션·D2 성격을 확정(483=CFR 인용 WARN). 빈값이면 게이트가
         # 산출물 키로 자동판별(WL·admin 후방호환 — Job.card_type 미설정 옛 jobs.json 도 안전).
-        gate = vda.run_deep_analysis_gate(da, job.body_full, card_type=job.card_type or None)
-        if gate.ok:
-            delta: dict[str, Any] = {"deep_analysis": da, "source_text": job.body_full}
-            if isinstance(obs_ko, list) and obs_ko:
-                delta["observations_ko"] = obs_ko
-            result.deltas[doc] = delta
-            result.outcomes.append(CardOutcome(doc, MERGED, gate.report))
+        try:
+            gate = vda.run_deep_analysis_gate(da, job.body_full, card_type=job.card_type or None)
+        except Exception as e:  # noqa: BLE001 — 게이트 자체 오류는 그 카드만 FAIL(브리프 비차단)
+            ok, detail = False, f"[ERROR] 심층분석 게이트 실행 오류 — {type(e).__name__}: {e}"
         else:
-            result.outcomes.append(CardOutcome(doc, GATE_FAILED, gate.report))
+            ok, detail = gate.ok, gate.report
+        if ok:
+            result.deltas[doc] = entry
+            result.outcomes.append(CardOutcome(doc, MERGED, detail))
+            continue
+        # [번역층 독립 2026-09-28] 분석이 FAIL 해도 관찰 국문 번역은 살린다. 종전엔 이 분기가
+        # 항목을 통째로 버려, 483 은 번역 1건만 빠져도 fail-closed 인
+        # `render.validate_483_observations` 가 그 주 브리프 전체를 막았다(2026-07-20·08-10 발행
+        # 차단과 같은 층). 클라우드 경로 `delta_bridge._gate_deep_analysis` 는 2026-08-24 에 같은
+        # 수리를 받았고, 무엇을 남길지는 두 경로가 `vda.translation_residue` 한 곳을 공유한다.
+        residue = vda.translation_residue(entry)
+        if residue is not None:
+            result.deltas[doc] = residue
+        result.outcomes.append(CardOutcome(doc, GATE_FAILED, detail,
+                                            kept_layers=tuple(residue or ())))
     return result
 
 
@@ -437,7 +468,8 @@ def main(argv: "list[str] | None" = None) -> int:
     result = assemble_deltas(_load(args.jobs), _load(args.responses))
     _dump(result.deltas, args.out)
     print(result.report(), file=sys.stderr)
-    print(f"[assemble] 델타 {len(result.deltas)}건 → {args.out} "
+    kept = f"(번역 전용 {result.translation_kept}건 포함) " if result.translation_kept else ""
+    print(f"[assemble] 델타 {len(result.deltas)}건 {kept}→ {args.out} "
           f"(다음: inject_slots.py --deep-analysis-deltas {args.out})", file=sys.stderr)
     return 0  # 항상 0 — fan-out FAIL 은 비차단(카드 단위 graceful degrade)
 

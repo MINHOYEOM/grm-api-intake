@@ -848,6 +848,36 @@ def run_deep_analysis_gate(deep_analysis: dict[str, Any], source_text: str, *,
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 게이트 밖의 층 — 분석이 FAIL 해도 델타에 남는 번역/원문 층 (브릿지·fanout 공용)
+# ─────────────────────────────────────────────────────────────────────────────
+# deep 델타 항목 중 이 게이트의 검증 대상이 **아닌** 키. 번역층은 결정론 원문의 국문 병기라
+# 분석(4섹션)과 독립이고, `source_text` 는 조립의 결정론 재추출·병합 짝의 기준선이다.
+# ★ 새 번역층을 만들면 여기에 반드시 추가할 것 — 빠뜨리면 분석 FAIL 때 그 번역이 조용히
+#   사라지고, 브릿지의 번역 전용 항목 통과(`deep_analysis` 없는 entry)에서도 그 카드가 drop 된다.
+# 대응 병합층: observations_ko/violations_ko → inject_slots._merge_*_translations,
+# ncr_ko → _merge_ncr_translations, source_text → assemble._refresh_* 결정론 재추출.
+TRANSLATION_LAYER_KEYS: tuple[str, ...] = ("observations_ko", "ncr_ko", "violations_ko")
+TRANSLATION_ONLY_KEYS: tuple[str, ...] = TRANSLATION_LAYER_KEYS + ("source_text",)
+
+
+def translation_residue(entry: dict[str, Any]) -> "dict[str, Any] | None":
+    """분석 게이트 FAIL/오류 항목에서 번역층(+동반 `source_text`)만 추린 번역 전용 항목.
+
+    번역층이 하나도 없으면 None(종전대로 카드 통째 drop) — `source_text` 만 남기면 어느
+    계층도 소비하지 않는 빈 껍데기가 델타에 쌓인다. 소비 측 `inject_slots.inject_deep_analysis`
+    는 `deep_analysis` 없는 이 항목을 정상으로 받아 번역만 병합한다.
+
+    호출처 두 곳이 이 판정을 공유한다 — 클라우드 `delta_bridge._gate_deep_analysis` 와 로컬
+    `deep_analysis_fanout.assemble_deltas`. 483 은 관찰 번역이 하나만 빠져도
+    `render.validate_483_observations`(fail-closed)가 **그 주 브리프 전체**를 막으므로, 분석
+    FAIL 이 번역까지 끌고 가면 카드 단위 degrade 가 브리프 단위 차단으로 번진다.
+    """
+    if not any(k in entry for k in TRANSLATION_LAYER_KEYS):
+        return None
+    return {k: entry[k] for k in TRANSLATION_ONLY_KEYS if k in entry}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 def main(argv: "list[str] | None" = None) -> int:

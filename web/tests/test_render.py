@@ -8256,6 +8256,49 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
 
+    def test_english_pages_subscribe_only_to_the_english_list(self):
+        """[영문 구독 2026-10-18] 영어 페이지의 구독 문은 **영문 리스트 폼**만 쓴다.
+        한국어 폼만 설정된 빌드에서 영어 페이지에 구독 문이 생기면, 영어 독자가 한국어 메일
+        리스트에 들어간다 — 그래서 영문 폼 값이 비면 영어 페이지엔 아무 구독 문도 없어야 한다."""
+        a0, e0 = render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN
+        ko_action = "https://ko.example.com/subscribe"
+        en_action = "https://en.example.com/subscribe"
+        try:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, ""
+            out_ko_only = self._render_site([_minimal_brief("2026-06-07")])
+            en_home_off = (out_ko_only / "en/index.html").read_text(encoding="utf-8")
+            render.NEWSLETTER_FORM_ACTION_EN = en_action
+            out = self._render_site([_minimal_brief("2026-06-08")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
+        self.assertNotIn('class="subscribe"', en_home_off)
+        self.assertNotIn('id="grm-cta"', en_home_off)
+        self.assertNotIn(ko_action, en_home_off)
+
+        ko_home = (out / "index.html").read_text(encoding="utf-8")
+        en_home = (out / "en/index.html").read_text(encoding="utf-8")
+        en_glossary = (out / "en/glossary/index.html").read_text(encoding="utf-8")
+        en_findings = (out / "en/findings/index.html").read_text(encoding="utf-8")
+        # 각 언어는 자기 리스트 폼만(밴드·배너 두 자리 모두).
+        self.assertIn(f'action="{ko_action}"', ko_home)
+        self.assertNotIn(en_action, ko_home)
+        for name, html in (("home", en_home), ("glossary", en_glossary), ("findings", en_findings)):
+            self.assertIn('class="subscribe"', html, f"en {name}: 밴드가 없다")
+            self.assertIn('id="grm-cta"', html, f"en {name}: 배너가 없다")
+            self.assertEqual(html.count(f'action="{en_action}"'), 2, f"en {name}: 영문 폼 두 자리")
+            self.assertNotIn(ko_action, html, f"en {name}: 한국어 리스트 폼이 샜다")
+            # 구독 문안이 "한국어로 보내 드린다"고 말하면 안 된다(푸터의 "in Korean and English"
+            # 서비스 소개는 다른 문장이라 이 문구로 좁혀 본다).
+            self.assertNotIn("Monday in Korean", html, f"en {name}: 구독 문안이 '한국어로'라고 말한다")
+            self.assertNotIn("findings in Korean", html, f"en {name}: 구독 문안이 '한국어로'라고 말한다")
+        # 영어 용어사전 구역은 한국어 리스트 전용 PDF 제안이 아니라 기본 문안으로 접힌다.
+        self.assertNotIn("Glossary PDF", en_glossary)
+        self.assertIn("<h2>New GMP inspection findings, every Monday</h2>", en_glossary)
+        self.assertIn("<h2>Get new findings like these every Monday</h2>", en_findings)
+        # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로.
+        self.assertIn("See recent findings first", en_home)
+        self.assertNotIn("최근 지적 기록 먼저 보기", ko_home)
+
     def test_subscribe_copy_varies_by_zone(self):
         """[2026-09-23 마케팅 계획 C-02] 방문의 대다수가 용어사전·지적사항이고 대부분 검색
         유입이라 "주간 브리프 구독"은 방문 목적과 먼 제안이었다 — 구역별로 문안이 갈린다.

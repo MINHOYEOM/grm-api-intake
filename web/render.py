@@ -4506,6 +4506,10 @@ NAVER_SITE_VERIFICATION = _env_or_default(
 # 'email' 이 아닌 SaaS 면 템플릿 input name 도 함께 맞춘다). 추적 파라미터는 발송 시점에 SaaS
 # 가 부착 — 우리 카드 원문/공식 URL(provenance 가드 대상)과 무관한 별개 endpoint.
 NEWSLETTER_FORM_ACTION = os.environ.get("GRM_NEWSLETTER_FORM_ACTION", "").strip()
+# [영문 구독 2026-10-18] 영어 페이지의 구독 폼 — 영문 리스트(별도 Brevo 폼·영문 확인 메일)로
+# 들어간다. 비어 있으면 영어 페이지에는 구독 문을 내지 않는다(한국어 리스트로 받지 않는다 —
+# 한국어 메일을 영어 독자에게 보내는 일이 된다).
+NEWSLETTER_FORM_ACTION_EN = os.environ.get("GRM_NEWSLETTER_FORM_ACTION_EN", "").strip()
 
 # 웹 카드 반응 계층(하트·스크랩·회원, S1) — env-param(공개값). SUPABASE_URL·SUPABASE_ANON_KEY
 # 둘 다 설정돼야 활성(reactions_enabled). 미설정(기본·테스트)이면 반응 블록 전체 미출력 →
@@ -4764,6 +4768,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
+    # 용어사전 구역의 "구독하면 용어집 PDF" 제안과 실물 링크(이번 주 소식) — 한국어 리스트의
+    # 확인 메일·도착 페이지(/welcome/)와 짝이라 한국어 환경에서만 켠다. 영어 환경은 아래에서 끈다.
+    env.globals["sub_offer_glossary_pdf"] = True
+    env.globals["sub_peek_findings"] = False
     # 자산 캐시버스팅 — grm.css/archive.js content-hash 쿼리(재배포 시 stale CSS 방지·결정론).
     def _asset_ver(name: str) -> str:
         p = assets_dir / name
@@ -4903,6 +4911,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         en_env.globals.setdefault(_k, _v)
     en_env.globals["_"] = en_tr.template_gettext()
     en_env.globals["og_locale"] = LANG_OG_LOCALE["en"]
+    # [영문 구독 2026-10-18] 영어 페이지는 영문 리스트 폼만 본다(비면 구독 문 없음). 영문 메일의
+    # 주인공은 그 주 새 지적 기록이라 실물 링크도 지적사항 면으로 보낸다.
+    en_env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION_EN)
+    en_env.globals["sub_offer_glossary_pdf"] = False
+    en_env.globals["sub_peek_findings"] = True
     en_page, _en_render, en_emit = _make_tree("en", en_env)
     # (언어, page 팩토리, emit, 번역기) — 한국어가 **먼저**여야 산출 순서가 종전과 같다.
     trees: list[tuple[str, Any, Any, Translator]] = [

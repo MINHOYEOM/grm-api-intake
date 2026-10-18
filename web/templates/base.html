@@ -146,14 +146,11 @@
 </div></header>
 
 {% block content %}{% endblock %}
-{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 권유하지 않는다.
-   ★[2026-09-05 이유 정정] 종전 근거는 "영문 브리프는 §7 5단계(미착수)"였는데 그 전제는
-   사라졌다 — 영문 브리프 10호와 영어 피드(`/en/rss.xml`)가 라이브다. 그런데도 게이트는
-   그대로 둔다. **이유가 바뀌었을 뿐 결론은 같다: 메일 자체가 한국어다.**
-   `newsletter.py:teaser_subject` 는 한국어 `tldr` 로 제목을 만들고 접두도 "[GRM 규제뉴스]"
-   다. 영어 독자를 한국어 메일에 초대하는 것은 읽을 수 없는 것을 구독시키는 일이다.
-   영어 뉴스레터를 내려면 `newsletter.py` 가 `brief.en` 에서 본문을 짓고 발송 리스트도
-   따로 있어야 한다 — 그때 이 게이트를 푼다.
+{# [영문 구독 2026-10-18] 구독 밴드·배너는 언어마다 **다른 폼**을 본다 — 한국어 페이지는
+   한국어 리스트 폼(GRM_NEWSLETTER_FORM_ACTION), 영어 페이지는 영문 리스트 폼
+   (GRM_NEWSLETTER_FORM_ACTION_EN). 어느 폼인지는 render.py 가 언어 환경마다 넣는다(템플릿이
+   언어를 고르지 않는다). 영문 폼 값이 비어 있으면 영어 페이지에는 구독 문이 없다(종전과 같다).
+   영문 메일은 `web/newsletter_en.py`(그 주 새 지적 기록 중심)다.
    ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
    파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
 {# [소개 2026-09-06] 소개 면에서는 고정 구독 밴드를 접는다 — 서비스가 무엇인지 읽는
@@ -165,8 +162,8 @@
    정하는 `nav_active` 로 고른다(템플릿이 언어·구역을 스스로 판단하지 않는다). 용어사전
    구역도 회원이 아니라 **구독**을 제안한다(회원 계층은 별도 결정 대기). 밴드·배너 두 블록이
    모두 이 값을 보므로 어느 `{% if %}` 에도 갇히지 않는 이 자리(최상위)에서 정의한다. #}
-{% set sub_zone = 'glossary' if nav_active == 'glossary' else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
-{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' and not hide_subscribe %}
+{% set sub_zone = 'glossary' if (nav_active == 'glossary' and sub_offer_glossary_pdf) else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
+{% if newsletter_form_action and nav_active != 'about' and not hide_subscribe %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
 {# [구독 밴드 실물 링크 2026-09-07] 밴드는 "메일로 보내드립니다"라고 말할 뿐 무엇이 오는지 보여 주지 않는다. 메일 본문은 주간 브리프의 핵심 요약과 바로가기라서 **최신 브리프 페이지가 곧 메일 내용의 실물**이다 — 링크 한 줄이면 구독 판단이 선다. 낱말은 헤더 CTA 와 같은 '이번 주 소식'을 재사용한다(새 낱말 만들지 않는다). 스타일은 grm.css(디자인 동결) 대신 하단 배너와 같은 관례로 이 게이트 안에 두되, **밴드 안**(`<section class="subscribe">` 뒤)에 둔다 — 기존 한글안전 가드가 재는 범위가 거기서 시작하기 때문이다. 게이트가 꺼진 로컬·CI 빌드에서는 이 <style> 도 함께 생략되므로 골든 byte-diff 는 그대로 0. #}
@@ -200,7 +197,12 @@
     <p>{{ _("FDA·EMA·PIC/S·식약처의 주요 변화를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     {% endif %}
     {# 메일 내용의 실물 — 최신 브리프 페이지. 헤더 CTA 와 같은 `latest_slug` 를 쓴다. #}
+    {# [영문 구독 2026-10-18] 영문 메일의 주인공은 그 주 새 지적 기록이라 실물 링크도 지적사항 면이다. 어느 쪽을 보일지는 render.py 가 언어 환경마다 정한다(`sub_peek_findings`). #}
+    {% if sub_peek_findings %}
+    <p class="sub-peek"><a href="{{ rel_root }}findings/index.html">{{ _("최근 지적 기록 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
+    {% else %}
     <p class="sub-peek"><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
+    {% endif %}
     <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
       <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
@@ -637,17 +639,14 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
      · 구독 밴드가 이미 화면에 보이는 동안에는 숨는다(같은 요청을 두 번 하지 않는다).
    env-off(테스트·기본 빌드)면 블록 전체가 생략돼 골든 byte-diff 0 — 게이트가 그 증명이다.
    §4 한글안전: letter-spacing/text-transform/mono 미사용. 결정론: now()/난수 0. #}
-{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 권유하지 않는다.
-   ★[2026-09-05 이유 정정] 종전 근거는 "영문 브리프는 §7 5단계(미착수)"였는데 그 전제는
-   사라졌다 — 영문 브리프 10호와 영어 피드(`/en/rss.xml`)가 라이브다. 그런데도 게이트는
-   그대로 둔다. **이유가 바뀌었을 뿐 결론은 같다: 메일 자체가 한국어다.**
-   `newsletter.py:teaser_subject` 는 한국어 `tldr` 로 제목을 만들고 접두도 "[GRM 규제뉴스]"
-   다. 영어 독자를 한국어 메일에 초대하는 것은 읽을 수 없는 것을 구독시키는 일이다.
-   영어 뉴스레터를 내려면 `newsletter.py` 가 `brief.en` 에서 본문을 짓고 발송 리스트도
-   따로 있어야 한다 — 그때 이 게이트를 푼다.
+{# [영문 구독 2026-10-18] 구독 밴드·배너는 언어마다 **다른 폼**을 본다 — 한국어 페이지는
+   한국어 리스트 폼(GRM_NEWSLETTER_FORM_ACTION), 영어 페이지는 영문 리스트 폼
+   (GRM_NEWSLETTER_FORM_ACTION_EN). 어느 폼인지는 render.py 가 언어 환경마다 넣는다(템플릿이
+   언어를 고르지 않는다). 영문 폼 값이 비어 있으면 영어 페이지에는 구독 문이 없다(종전과 같다).
+   영문 메일은 `web/newsletter_en.py`(그 주 새 지적 기록 중심)다.
    ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
    파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
-{% if newsletter_form_action and lang == 'ko' and not hide_subscribe %}
+{% if newsletter_form_action and not hide_subscribe %}
 <style>
 .grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}
 .grm-cta.on{transform:translateY(0)}

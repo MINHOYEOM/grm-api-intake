@@ -8280,13 +8280,14 @@ class WebRenderHardeningTest(unittest.TestCase):
         en_glossary = (out / "en/glossary/index.html").read_text(encoding="utf-8")
         en_findings = (out / "en/findings/index.html").read_text(encoding="utf-8")
         # 각 언어는 자기 리스트 폼만(밴드·배너 두 자리 모두).
-        self.assertIn(f'action="{ko_action}"', ko_home)
-        self.assertNotIn(en_action, ko_home)
+        self.assertIn(f' action="{ko_action}"', ko_home)
+        # 기본 action 은 페이지 언어 리스트 — 다른 리스트 주소는 언어 선택지(data-action)에만 있다.
+        self.assertNotIn(f' action="{en_action}"', ko_home)
         for name, html in (("home", en_home), ("glossary", en_glossary), ("findings", en_findings)):
             self.assertIn('class="subscribe"', html, f"en {name}: 밴드가 없다")
             self.assertIn('id="grm-cta"', html, f"en {name}: 배너가 없다")
-            self.assertEqual(html.count(f'action="{en_action}"'), 2, f"en {name}: 영문 폼 두 자리")
-            self.assertNotIn(ko_action, html, f"en {name}: 한국어 리스트 폼이 샜다")
+            self.assertEqual(html.count(f' action="{en_action}"'), 2, f"en {name}: 영문 폼 두 자리")
+            self.assertNotIn(f' action="{ko_action}"', html, f"en {name}: 한국어 리스트 폼이 기본값이 됐다")
             # 구독 문안이 "한국어로 보내 드린다"고 말하면 안 된다(푸터의 "in Korean and English"
             # 서비스 소개는 다른 문장이라 이 문구로 좁혀 본다).
             self.assertNotIn("Monday in Korean", html, f"en {name}: 구독 문안이 '한국어로'라고 말한다")
@@ -8298,6 +8299,44 @@ class WebRenderHardeningTest(unittest.TestCase):
         # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로.
         self.assertIn("See recent findings first", en_home)
         self.assertNotIn("최근 지적 기록 먼저 보기", ko_home)
+
+    def test_subscriber_chooses_mail_language_when_both_lists_exist(self):
+        """[구독 언어 선택 2026-10-18] 두 리스트 폼이 모두 있으면 밴드·배너 양쪽에 '받을 메일
+        언어' 선택지가 생긴다. 기본 선택 = 페이지 언어, 각 선택지는 자기 리스트 폼 주소를 갖는다.
+        한쪽 폼만 있으면 선택지는 없다(고를 게 없다). 라디오 값은 Brevo 로 보내지 않는다."""
+        import re as _re
+        a0, e0 = render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN
+        ko_action = "https://ko.example.com/subscribe"
+        en_action = "https://en.example.com/subscribe"
+        try:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, ""
+            only_ko = (self._render_site([_minimal_brief("2026-06-09")]) / "index.html").read_text(encoding="utf-8")
+            render.NEWSLETTER_FORM_ACTION_EN = en_action
+            out = self._render_site([_minimal_brief("2026-06-10")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
+        self.assertIn('class="subscribe"', only_ko)
+        self.assertNotIn("data-sub-lang", only_ko)
+
+        for path, default, legend in (("index.html", "ko", "받을 메일 언어"),
+                                      ("en/index.html", "en", "Email language"),
+                                      ("en/findings/index.html", "en", "Email language")):
+            html = (out / path).read_text(encoding="utf-8")
+            self.assertEqual(html.count('<fieldset class="sub-lang" data-sub-lang hidden>'), 2,
+                             f"{path}: 밴드·배너 두 자리에 선택지")
+            self.assertIn(f"<legend>{legend}</legend>", html)
+            radios = _re.findall(r'<input type="radio" name="grm_sub_lang"[^>]*>', html)
+            self.assertEqual(len(radios), 4, path)
+            for r in radios:
+                lg = _re.search(r'value="(\w+)"', r).group(1)
+                self.assertIn(f'data-action="{ko_action if lg == "ko" else en_action}"', r)
+                self.assertEqual(" checked" in r, lg == default, f"{path}: 기본 선택은 페이지 언어")
+            # 스크립트가 없으면 선택지를 보이지 않는다(그때는 페이지 언어 폼으로 간다).
+            self.assertIn(".sub-lang[hidden]{display:none}", html)
+            # 선택 값은 Brevo 본문에서 뺀다(밴드·배너 두 제출 스크립트 모두).
+            self.assertEqual(html.count("if(k!=='grm_sub_lang')body.append(k,v);"), 2, path)
+            self.assertIn('<span lang="ko">한국어</span>', html)
+            self.assertIn('<span lang="en">English</span>', html)
 
     def test_subscribe_copy_varies_by_zone(self):
         """[2026-09-23 마케팅 계획 C-02] 방문의 대다수가 용어사전·지적사항이고 대부분 검색

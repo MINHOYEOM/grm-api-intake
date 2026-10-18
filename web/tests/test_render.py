@@ -14797,7 +14797,8 @@ class WebAboutTest(unittest.TestCase):
         self.assertIn('id="grm-pet"', self.landing)          # 다른 면에서는 그대로
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
         # [2026-09-28] 구독 확인 도착 페이지(/welcome/)도 밴드를 접는다(hide_subscribe) — about 조건은 그대로.
-        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about'"
+        # [2026-10-18] 언어 조건은 빠졌다 — 영어 페이지는 영문 리스트 폼을 render.py 가 넣는다.
+        self.assertIn("{% if newsletter_form_action and nav_active != 'about'"
                       " and not hide_subscribe %}", base)
         self.assertIn("{% if nav_active != 'about' %}\n<div class=\"grm-pet\"", base)
 

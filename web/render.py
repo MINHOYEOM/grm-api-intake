@@ -4771,6 +4771,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 용어사전 구역의 "구독하면 용어집 PDF" 제안과 실물 링크(이번 주 소식) — 한국어 리스트의
     # 확인 메일·도착 페이지(/welcome/)와 짝이라 한국어 환경에서만 켠다. 영어 환경은 아래에서 끈다.
     env.globals["sub_offer_glossary_pdf"] = True
+    # [구독 언어 선택 2026-10-18] 두 리스트 폼 주소를 양쪽 언어 환경이 모두 받는다 — 구독자가
+    # 받을 메일 언어를 고르면 그 폼으로 보낸다. 기본 선택은 페이지 언어(아래 영어 환경에서 덮는다).
+    env.globals["sub_action_ko"] = _safe_url(NEWSLETTER_FORM_ACTION)
+    env.globals["sub_action_en"] = _safe_url(NEWSLETTER_FORM_ACTION_EN)
+    env.globals["sub_lang_default"] = DEFAULT_LANG
+    env.globals["lang_endonym"] = LANG_ENDONYM
     env.globals["sub_peek_findings"] = False
     # 자산 캐시버스팅 — grm.css/archive.js content-hash 쿼리(재배포 시 stale CSS 방지·결정론).
     def _asset_ver(name: str) -> str:
@@ -4916,6 +4922,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION_EN)
     en_env.globals["sub_offer_glossary_pdf"] = False
     en_env.globals["sub_peek_findings"] = True
+    en_env.globals["sub_lang_default"] = "en"
     en_page, _en_render, en_emit = _make_tree("en", en_env)
     # (언어, page 팩토리, emit, 번역기) — 한국어가 **먼저**여야 산출 순서가 종전과 같다.
     trees: list[tuple[str, Any, Any, Translator]] = [

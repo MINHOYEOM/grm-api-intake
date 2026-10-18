@@ -163,6 +163,15 @@
    구역도 회원이 아니라 **구독**을 제안한다(회원 계층은 별도 결정 대기). 밴드·배너 두 블록이
    모두 이 값을 보므로 어느 `{% if %}` 에도 갇히지 않는 이 자리(최상위)에서 정의한다. #}
 {% set sub_zone = 'glossary' if (nav_active == 'glossary' and sub_offer_glossary_pdf) else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
+{# [구독 언어 선택 2026-10-18] 받을 메일 언어를 구독할 때 고른다 — 한국어 리스트와 영문 리스트는
+   Brevo 폼이 서로 다르고(확인 메일 언어도 폼마다 다르다), 고른 쪽 폼으로 보낸다. 두 폼 주소가
+   모두 있을 때만 그린다. 기본 선택 = 지금 페이지 언어(render.py 가 `sub_lang_default` 로 정한다).
+   `hidden` 으로 내보내고 스크립트가 켤 때만 보인다 — 스크립트가 없으면 고를 수 없으므로
+   보여 주지 않는 것이 맞다(그때는 페이지 언어 폼으로 그대로 간다). 라디오 값은 Brevo 로
+   보내지 않는다(제출 스크립트가 `grm_sub_lang` 을 뺀다). #}
+{% macro sub_lang_picker(id_prefix) %}{% if sub_action_ko and sub_action_en %}
+<fieldset class="sub-lang" data-sub-lang hidden><legend>{{ _("받을 메일 언어") }}</legend>{% for lg in ('ko', 'en') %}<label><input type="radio" name="grm_sub_lang" id="{{ id_prefix }}-{{ lg }}" value="{{ lg }}" data-action="{{ sub_action_ko if lg == 'ko' else sub_action_en }}"{% if lg == sub_lang_default %} checked{% endif %} /> <span lang="{{ lg }}">{{ lang_endonym[lg] }}</span></label>{% endfor %}</fieldset>
+{% endif %}{% endmacro %}
 {% if newsletter_form_action and nav_active != 'about' and not hide_subscribe %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
@@ -175,6 +184,12 @@
 /* 2026-09-23 C-06 — 이미 구독한 방문자에게 밴드 스크립트가 hidden 을 다는데, [hidden]
    은 author display 규칙에 진다(이 파일의 알려진 함정) — 짝을 미리 박아 둔다. */
 .subscribe[hidden]{display:none}
+/* [구독 언어 선택 2026-10-18] 폼 안 첫 줄 — 입력·버튼 줄 위에 한 줄. [hidden] 짝을 미리 박는다. */
+.subscribe .sub-form{flex-wrap:wrap}
+.subscribe .sub-lang{flex:1 0 100%;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;border:0;margin:0 0 4px;padding:0;font-family:var(--sans);font-size:14px}
+.subscribe .sub-lang[hidden]{display:none}
+.subscribe .sub-lang legend{float:left;margin-right:4px;padding:0;color:var(--ink-3,#6C6A64)}
+.subscribe .sub-lang label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 </style>
   {# 구독 전 상태(입력) — 제출 성공 시 아래 스크립트가 이 블록 전체를 감추고 .sub-done 만 표시. div 는 display 미지정이라 hidden 속성이 정상 동작(폼과 달리). #}
   <div id="grm-sub-intro">
@@ -204,6 +219,7 @@
     <p class="sub-peek"><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
     {% endif %}
     <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
+      {{ sub_lang_picker('grm-sub-lang') }}
       <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
       <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -248,7 +264,7 @@
     if(!email||!f.checkValidity())return;
     e.preventDefault();
     var fd=new FormData(f),body=new URLSearchParams();
-    fd.forEach(function(v,k){body.append(k,v);});
+    fd.forEach(function(v,k){if(k!=='grm_sub_lang')body.append(k,v);});
     fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
     // 하단 참여 배너가 이 표시를 보고 다시 뜨지 않는다(구독한 사람에게 또 권하지 않는다).
     try{localStorage.setItem('grm-sub-ok','1');}catch(_){}
@@ -269,6 +285,23 @@
   });
 })();
 </script>
+{# [구독 언어 선택] 고른 언어의 폼 주소로 action 을 바꾼다(밴드·배너 공통). 스크립트가 돌 때만 선택지를 보인다. #}
+{% if sub_action_ko and sub_action_en %}
+<script>
+(function(){
+  var sets=document.querySelectorAll('[data-sub-lang]');
+  for(var i=0;i<sets.length;i++){(function(fs){
+    var form=fs.form||fs.closest&&fs.closest('form');
+    if(!form)return;
+    fs.hidden=false;
+    var rs=fs.querySelectorAll('input[type=radio]');
+    function apply(){for(var j=0;j<rs.length;j++){if(rs[j].checked&&rs[j].getAttribute('data-action'))form.action=rs[j].getAttribute('data-action');}}
+    for(var j=0;j<rs.length;j++)rs[j].addEventListener('change',apply);
+    apply();
+  })(sets[i]);}
+})();
+</script>
+{% endif %}
 {% endif %}
 {% block ai_disclosure %}{% endblock %}
 {# [푸터 정리 2026-09-06] 5열 23항목 → 4열 17링크. 종전 '바로가기'(헤더 탭과 6개 중복·'소개'는 홈 앵커)·'수집 소스'(클릭 안 되는 텍스트 5줄)·'안내'(두 링크가 같은 앵커)를 콘텐츠·도구·서비스 셋으로 다시 묶고, 소스 목록은 브랜드 열 아래 한 줄로 내린다. 4열은 grm.css 기본값(`.foot{grid-template-columns:1.6fr 1fr 1fr 1fr}`)이라 종전 5열 override 는 걷어 내고, 새 요소(소스 줄·법적 줄 가로 배치·연락 아이콘)만 같은 스코프 인라인 관례로 덮는다(grm.css 는 디자인 동결). 반응형(≤1024px 2열 / ≤900px 1열)은 grm.css 미디어쿼리가 그대로 이긴다 — 법적 줄 가로 배치도 ≥901px 에서만. 한글 word-break:keep-all. #}
@@ -664,6 +697,12 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-cta-side a:hover,.grm-cta-side button:hover{color:#fff}
 .grm-cta-x{font-size:20px!important;line-height:1;padding:0 2px!important}
 .grm-cta-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+/* [구독 언어 선택 2026-10-18] 배너는 높이를 아끼려고 입력 줄 위에 작게 한 줄. */
+.grm-cta-form{flex-wrap:wrap}
+.grm-cta .sub-lang{flex:1 0 100%;display:flex;gap:4px 14px;border:0;margin:0;padding:0;font-family:var(--sans);font-size:12.5px;color:rgba(255,255,255,.78)}
+.grm-cta .sub-lang[hidden]{display:none}
+.grm-cta .sub-lang legend{float:left;margin-right:2px;padding:0}
+.grm-cta .sub-lang label{display:inline-flex;align-items:center;gap:4px;cursor:pointer}
 @media(max-width:720px){
   .grm-cta-in{padding:12px 16px;gap:10px}
   .grm-cta-form{flex:1 1 100%}
@@ -696,6 +735,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       <span>{{ _("공식 원문 링크와 함께 · 언제든 해지 · 무료") }}</span>
     </div>
     <form class="grm-cta-form" id="grm-cta-form" action="{{ newsletter_form_action }}" method="post">
+      {{ sub_lang_picker('grm-cta-lang') }}
       <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       <input type="text" name="email_address_check" value="" class="grm-cta-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="locale" value="en" />
@@ -774,7 +814,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       // 인코딩은 구독 밴드와 동일해야 한다 — Brevo 로 실제 전송이 검증된 형태가 그쪽이다
       // (FormData 는 multipart 로 나가 밴드와 다른 경로가 된다).
       var fd=new FormData(f),body=new URLSearchParams();
-      fd.forEach(function(v,k){body.append(k,v);});
+      fd.forEach(function(v,k){if(k!=='grm_sub_lang')body.append(k,v);});
       fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');

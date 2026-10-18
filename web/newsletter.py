@@ -589,6 +589,21 @@ class BrevoSender(NewsletterSender):
     def _url(self, path: str) -> str:
         return f"{self.base}{path}"
 
+    @staticmethod
+    def _check(r: Any) -> None:
+        """`raise_for_status` 대신 — 4xx 면 Brevo 가 돌려준 오류 `code`·`message` 를 예외에 싣는다.
+        종전엔 "400 Bad Request" 만 남아 원인을 알 수 없었다(2026-10-18 영문 캠페인 생성 실패).
+        Brevo 오류 본문은 필드 검증 문구라 키·주소를 담지 않는다 — 그래도 200자로 자른다."""
+        if getattr(r, "status_code", 200) < 400:
+            return
+        detail = ""
+        try:
+            body = r.json() or {}
+            detail = f" — code={body.get('code')!s} message={str(body.get('message') or '')[:200]}"
+        except Exception:
+            pass
+        raise RuntimeError(f"Brevo HTTP {r.status_code}{detail}")
+
     def find_campaign(self, name: str) -> "dict | None":
         """이름 일치 캠페인 {'id','status'} 또는 None. 페이지네이션 순회(최신 우선)."""
         offset, limit = 0, 100
@@ -596,7 +611,7 @@ class BrevoSender(NewsletterSender):
             r = self.s.get(self._url("/emailCampaigns"),
                            params={"type": "classic", "limit": limit, "offset": offset,
                                    "sort": "desc"}, timeout=self.timeout)
-            r.raise_for_status()
+            self._check(r)
             data = r.json() or {}
             camps = data.get("campaigns") or []
             for c in camps:
@@ -616,17 +631,17 @@ class BrevoSender(NewsletterSender):
             "inlineImageActivation": False,
         }
         r = self.s.post(self._url("/emailCampaigns"), data=json.dumps(body), timeout=self.timeout)
-        r.raise_for_status()
+        self._check(r)
         return str((r.json() or {}).get("id"))
 
     def send_campaign(self, campaign_id: str) -> None:
         r = self.s.post(self._url(f"/emailCampaigns/{campaign_id}/sendNow"), timeout=self.timeout)
-        r.raise_for_status()
+        self._check(r)
 
     def send_test(self, campaign_id: str, emails: list[str]) -> None:
         r = self.s.post(self._url(f"/emailCampaigns/{campaign_id}/sendTest"),
                         data=json.dumps({"emailTo": emails}), timeout=self.timeout)
-        r.raise_for_status()
+        self._check(r)
 
 
 # ── 로드 헬퍼 ─────────────────────────────────────────────────────────────────

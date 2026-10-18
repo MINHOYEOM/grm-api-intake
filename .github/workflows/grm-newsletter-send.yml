@@ -179,3 +179,106 @@ jobs:
           python web/newsletter.py \
             --publish-date "$PUBLISH_DATE" \
             --mode "$MODE"
+
+  # ── 영문 주간 메일(별도 리스트) — 그 주 새 지적 기록 중심 + 영문 브리프 요약 ─────────
+  #   한국어 잡과 **같은 트리거·같은 발행일**로 돈다(Admin 1클릭이 두 메일을 함께 낸다).
+  #   한국어 잡에 의존하지 않는다 — 어느 한쪽 실패가 다른 쪽 발송을 막지 않는다.
+  #   `GRM_NEWSLETTER_LIST_ID_EN` 이 비어 있으면 게이트·미리보기까지만 하고 발송은 클린 skip.
+  #   한 잡 안에서 스냅샷→게이트→미리보기→멱등→발송을 끝낸다(스냅샷을 잡 사이로 옮기지
+  #   않는다 — 미리보기와 발송이 같은 파일을 본다).
+  newsletter-en:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      GRM_NEWSLETTER_LIST_ID_EN: ${{ vars.GRM_NEWSLETTER_LIST_ID_EN }}
+      GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
+      GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME || 'Global Regulatory Monitor' }}
+      GRM_NEWSLETTER_SENDER_NAME_EN: ${{ vars.GRM_NEWSLETTER_SENDER_NAME_EN }}
+      GRM_NEWSLETTER_TEST_EMAILS: ${{ vars.GRM_NEWSLETTER_TEST_EMAILS }}
+      GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL || 'https://grm-solutions.com' }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Resolve mode + publish_date
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_DATE: ${{ github.event.inputs.publish_date }}
+          INPUT_MODE: ${{ github.event.inputs.mode }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            MODE=send
+            PDATE="$(python web/newsletter.py --mode latest-date)"
+          else
+            MODE="$INPUT_MODE"
+            PDATE="$INPUT_DATE"
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "publish_date=$PDATE" >> "$GITHUB_OUTPUT"
+          echo "해석: event=$EVENT_NAME → mode=$MODE · publish_date=$PDATE"
+
+      - name: Snapshot this week's findings (read-only)
+        env:
+          PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
+        run: |
+          mkdir -p email_preview_en
+          python web/newsletter_en.py --mode fetch --publish-date "$PUBLISH_DATE" \
+            --snapshot "email_preview_en/findings_${PUBLISH_DATE}.json"
+
+      - name: Validate + build English mail
+        env:
+          PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
+        run: |
+          python web/newsletter_en.py --mode validate --publish-date "$PUBLISH_DATE" \
+            --snapshot "email_preview_en/findings_${PUBLISH_DATE}.json" \
+            --out "email_preview_en/newsletter_en_${PUBLISH_DATE}.html"
+
+      - name: Upload English preview
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: grm-newsletter-en-preview
+          path: email_preview_en
+          if-no-files-found: error
+
+      - name: Idempotency precheck
+        id: precheck
+        env:
+          MODE: ${{ steps.resolve.outputs.mode }}
+          PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
+        run: |
+          case "$MODE" in
+            send)
+              python web/newsletter_en.py --mode precheck --publish-date "$PUBLISH_DATE" \
+                --snapshot "email_preview_en/findings_${PUBLISH_DATE}.json"
+              ;;
+            test)
+              if [ -n "$GRM_NEWSLETTER_LIST_ID_EN" ]; then
+                echo "should_send=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "should_send=false" >> "$GITHUB_OUTPUT"
+                echo "GRM_NEWSLETTER_LIST_ID_EN 미설정 — 테스트 발송도 건너뜀"
+              fi
+              ;;
+            *)
+              echo "should_send=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - name: Send English mail
+        if: ${{ steps.precheck.outputs.should_send == 'true' }}
+        env:
+          MODE: ${{ steps.resolve.outputs.mode }}
+          PUBLISH_DATE: ${{ steps.resolve.outputs.publish_date }}
+        run: |
+          python web/newsletter_en.py --mode "$MODE" --publish-date "$PUBLISH_DATE" \
+            --snapshot "email_preview_en/findings_${PUBLISH_DATE}.json"

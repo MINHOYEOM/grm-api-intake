@@ -83,6 +83,8 @@ jobs:
           # 미설정 시 빈 문자열 → 폼 생략(골든·기존 빌드 영향 0). SITE_BASE_URL 은 render.py
           # 기본값으로 동작하므로(빌드가 신도메인 기본값 사용) 여기선 미배선 유지한다.
           GRM_NEWSLETTER_FORM_ACTION: ${{ vars.GRM_NEWSLETTER_FORM_ACTION }}
+          # 영어 페이지 구독 폼(영문 리스트) — 비어 있으면 영어 페이지엔 구독 문이 없다.
+          GRM_NEWSLETTER_FORM_ACTION_EN: ${{ vars.GRM_NEWSLETTER_FORM_ACTION_EN }}
           # 소유권 인증 토큰 — 배선해 두면 회전 시 repo var 만 바꾸면 됨(코드 수정 0). 미설정
           # var=빈 문자열 전달이지만 render._env_or_default 가 빈 값을 기본 토큰으로 흡수하므로
           # 미설정 시 메타가 사라지지 않는다(무회귀). 설정 시 그 값이 라이브 <head> 에 노출.

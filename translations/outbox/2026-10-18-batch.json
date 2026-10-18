@@ -1,0 +1,68 @@
+[
+  {
+    "finding_id": "finding-20be05dcbda7a2101c73047a",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP(우수제조관리기준) 표준작업절차서(SOP)의 관리가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-375115fd5941f77b9141dda3",
+    "finding_text": "The written procedures for recalls were inadequate.",
+    "finding_text_ko": "회수(recall)에 관한 서면 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6d6d4f3f32d750bb6795cbfc",
+    "finding_text": "The assessment, documentation, and/or procedures for considering the resale of returned drugs were inadequate.",
+    "finding_text_ko": "반품 의약품의 재판매 여부 검토에 관한 평가, 문서화 및/또는 절차가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bcbfd1430714c336a27b0ee0",
+    "finding_text": "The change control system was inadequate for ensuring changes are properly documented, evaluated, and/or approved.",
+    "finding_text_ko": "변경관리(change control) 시스템이 변경사항을 적절히 문서화, 평가 및/또는 승인하도록 보장하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bf1a9d81808528f7026b9697",
+    "finding_text": "The handling of standard operating procedures for good manufacturing practices was inadequate.",
+    "finding_text_ko": "GMP(우수제조관리기준) 표준작업절차서(SOP)의 관리가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3583035dc56cf32cac528c96",
+    "finding_text": "The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "작업자의 무균 작업 관행(aseptic practices)이 무균성을 유지하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-53d98bf9cb4fd20b7ce136b0",
+    "finding_text": "The creation, maintenance, processing, and/or review of laboratory data was inadequate.",
+    "finding_text_ko": "시험실 데이터의 생성, 유지, 처리 및/또는 검토가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-545141aa3302d51f7e83cd7f",
+    "finding_text": "When the particulate and microbiological limits were exceeded, the company's operating procedures did not prescribe an investigation and implementation of corrective actions.",
+    "finding_text_ko": "미립자 및 미생물 한도를 초과했을 때, 회사의 작업 절차는 조사(investigation) 및 시정조치(corrective actions) 이행을 규정하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-70c73848c92db7de12efce18",
+    "finding_text": "Evaluation of production processes, equipment, and/or materials was inadequate. The operators'aseptic practices were inadequate to maintain sterility.",
+    "finding_text_ko": "제조 공정, 설비 및/또는 원자재에 대한 평가가 부적절했다. 작업자의 무균 작업 관행(aseptic practices)이 무균성을 유지하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a0cc2709f88d8184e6b6af59",
+    "finding_text": "The samples taken for sterility testing were not representative of the whole batch.",
+    "finding_text_ko": "무균시험(sterility testing)용으로 채취한 검체가 배치 전체를 대표하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e661102b4bdcf941fcf7de2c",
+    "finding_text": "The training of personnel before new or revised standard operating procedures were implemented was inadequate.",
+    "finding_text_ko": "신규 또는 개정 표준작업절차서(SOP) 시행 전 직원 교육이 부적절했다.",
+    "translation_method": "llm_assisted"
+  }
+]

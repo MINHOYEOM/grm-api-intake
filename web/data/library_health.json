@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-15T03:56:26+00:00",
+  "checked_at": "2026-10-19T08:04:08+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -28,9 +28,9 @@
     "who.json"
   ],
   "summary": {
-    "blocked": 63,
+    "blocked": 61,
     "broken": 0,
-    "needs_review": 116,
+    "needs_review": 118,
     "ok": 430,
     "references": 731,
     "unique_urls": 609
@@ -3384,9 +3384,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.34": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": 206,
+      "http_status": null,
       "method": "GET",
-      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
+      "reason": "network_or_tls:ReadTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3394,7 +3394,7 @@
           "item_id": "cfr-211-34"
         }
       ],
-      "status": "blocked"
+      "status": "needs_review"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.42": {
       "attempts": 2,
@@ -3549,9 +3549,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.67": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": 206,
+      "http_status": null,
       "method": "GET",
-      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
+      "reason": "network_or_tls:ReadTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3559,7 +3559,7 @@
           "item_id": "cfr-211-67"
         }
       ],
-      "status": "blocked"
+      "status": "needs_review"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.68": {
       "attempts": 2,

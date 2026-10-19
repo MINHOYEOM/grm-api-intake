@@ -19,3 +19,5 @@ jobs:
           sudo systemctl start postgresql
           sudo -u postgres createdb mfds_attendees_test
           sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d mfds_attendees_test -f tests/sql/mfds_attendees_ingest.sql
+      - name: Prove policy guards fail on mutations and pass after restoration
+        run: python3 tests/run_mfds_sql_mutations.py

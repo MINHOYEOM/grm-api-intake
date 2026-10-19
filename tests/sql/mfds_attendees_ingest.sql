@@ -6,11 +6,13 @@ create role authenticated;
 create role service_role bypassrls;
 create table public.raw_signals (
   raw_signal_id text primary key, document_id text not null,
-  source text not null, source_kind text not null, raw_sha256 text not null
+  source text not null, source_kind text not null, raw_sha256 text not null,
+  firm_name text not null default '', raw_json text not null default '{}',
+  published_date text not null default '', ingested_at timestamptz not null default now()
 );
 grant usage on schema public to service_role;
 grant select on public.raw_signals to service_role;
-insert into public.raw_signals values
+insert into public.raw_signals(raw_signal_id,document_id,source,source_kind,raw_sha256) values
   ('raw-a','doc-a','MFDS','gmp-inspection',repeat('a',64)),
   ('raw-fda','doc-fda','FDA 483','483',repeat('b',64));
 \ir ../../web/migrations/093_mfds_inspection_attendees.sql
@@ -64,4 +66,5 @@ select public.mfds_inspection_attendees_replace('doc-a',repeat('a',64),'{"table_
 reset role;
 select pg_temp.assert_true((select count(*) = 1 and min(table_status)='failed' and min(parse_reason)='missing_text' from public.mfds_inspection_attendees), 'failure state persisted');
 select pg_temp.assert_true((select count(*)=2 and bool_and(raw_sha256 = case source when 'MFDS' then repeat('a',64) else repeat('b',64) end) from public.raw_signals), 'sources untouched');
+\ir mfds_attendees_profiles.sql
 rollback;

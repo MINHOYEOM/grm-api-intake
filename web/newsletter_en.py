@@ -377,6 +377,11 @@ def run_gates(snapshot: dict[str, Any], *, publish_date: str, site_base_url: str
     return newsletter.GateReport(ok=not fails, reasons=reasons, label="영문 뉴스레터"), mail
 
 
+def lists_have_contacts(sender: Any, list_ids: list[int]) -> bool:
+    """대상 리스트 중 하나라도 연락처가 있나. Brevo 는 빈 리스트로 캠페인을 못 만든다."""
+    return any(sender.list_contact_count(i) > 0 for i in list_ids)
+
+
 def campaign_name(publish_date: str, issue_no: int) -> str:
     """멱등 키 — 한국어 캠페인명과 겹치지 않는다(같은 호를 두 리스트로 각각 한 번씩)."""
     return f"GRM Weekly EN — {publish_date} (No.{issue_no})"
@@ -465,7 +470,11 @@ def main(argv: "list[str] | None" = None) -> int:
         if not api_key:
             newsletter._emit_should_send(False, "NEWSLETTER_API_KEY 미설정 — 멱등 조회 불가(클린 skip)")
             return 0
-        existing = newsletter.BrevoSender(api_key).find_campaign(name)
+        sender = newsletter.BrevoSender(api_key)
+        if not lists_have_contacts(sender, list_ids):
+            newsletter._emit_should_send(False, f"영문 리스트 {list_ids} 구독자 0명 — 보낼 사람이 없다(클린 skip)")
+            return 0
+        existing = sender.find_campaign(name)
         if existing and existing.get("status", "").lower() in newsletter._DISPATCHED_STATUSES:
             newsletter._emit_should_send(False, f"이미 발송/예약(status={existing.get('status')}) — {name}")
         else:
@@ -493,6 +502,11 @@ def main(argv: "list[str] | None" = None) -> int:
     _r, final = run_gates(snapshot, publish_date=args.publish_date, site_base_url=site,
                           brief_obj=brief_obj, unsubscribe_html=BREVO_UNSUBSCRIBE_HTML_EN)
     sender = newsletter.BrevoSender(api_key)
+    if not lists_have_contacts(sender, list_ids):
+        # Brevo 는 빈 리스트로 캠페인을 만들지 못한다(테스트 발송도 캠페인이 있어야 한다).
+        # 실패로 빨갛게 남기지 않고 이유를 밝히고 끝낸다 — 첫 영문 구독자가 생기면 저절로 나간다.
+        print(f"영문 리스트 {list_ids} 구독자 0명 — Brevo 가 캠페인을 만들 수 없어 {args.mode} 발송을 건너뜀.")
+        return 0
     if args.mode == "test":
         emails = [x.strip() for x in _env("GRM_NEWSLETTER_TEST_EMAILS").replace(";", ",").split(",") if x.strip()]
         if not emails:

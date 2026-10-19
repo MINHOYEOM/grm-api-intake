@@ -350,6 +350,8 @@ flowchart TD
 - **canonical search RPC(`findings_search`/`findings_document`, 026→027→028 supersede 체인):** `/findings/` 목록의 유일 데이터원. 계약 4가지가 테스트로 고정돼 있다(`tests/test_findings_search_rpc.py`). ①**`security invoker`(의도적 관례 이탈)** — 기존 findings RPC는 전부 definer라 공개 게이트 술어를 각자 복제하는데(정책 1곳+RPC 5곳=6중복), 이 두 함수는 findings만 읽으므로 invoker로 만들어 RLS(010)가 게이트의 단일 진실이 되게 했다. 따라서 **게이트 검증은 반드시 anon 키로 PostgREST를 통해** 한다(SQL Editor는 service_role이라 RLS 미적용 — 라이브 실증: anon totals 8,168 = 공개분 정확 일치·비공개 누출 0). ②**검색은 ILIKE 부분일치, FTS 금지** — `simple` 사전은 한국어 형태소를 몰라 `무균`이 `무균실`·`무균의`를 놓친다(조용한 검색 축소). 018의 FTS 인덱스는 유사 문구 검색 전용. LIKE 와일드카드(`%`·`_`·`\`)는 이스케이프(클라이언트 `indexOf` 리터럴 semantics와 일치). ③**문서 단위 정렬의 전제** — `raw_signal_id` 하나가 단일 published_date/firm_name/source를 가진다(라이브 실측 위반 0건). ④**행 투영 패리티** — 렌더러가 행 객체에서 읽는 필드는 두 RPC의 `findings[]` 투영에 전부 실려야 한다. 026/027이 `firm_key`/`translation_method`/`confidence`를 빠뜨려 업체 링크·**AI 번역 고지**·신뢰도가 조용히 소실될 뻔했다(전부 방어적 분기 뒤라 크래시 없음, 028이 수리) — `jsonb_build_object`는 키를 빠뜨려도 조용하고 클라이언트 방어 분기도 조용해서 두 침묵이 겹치면 기능이 소리 없이 사라지므로, 가드는 클라이언트 소스에서 실제 읽기를 파싱해 서버 투영과 대조한다. 성능: 랜딩 서버 127ms(왕복 p50 ~0.5s) — `searched` CTE에 본문 텍스트를 싣지 않고 페이지 24문서분만 PK로 되읽는 좁은 작업집합이 계약(본문을 실으면 무검색 랜딩에서 temp 스필로 659ms, 검색 시엔 안 터져 숨는 함정). trgm 인덱스는 의도적 보류(ILIKE semantics 불변 가속이라 언제든 추가 가능 — 라이브 p95가 나빠지면 별도 마이그레이션).
 - **`findings_similar_to` RPC(021, S1 렉시컬, finding_id 기준):** 웹 카드의 "이 지적과 유사한 사례" 버튼이 소비하는 실제 서빙 경로(라이브 적용 완료). 기준 finding 의 공개 게이트를 재확인한 뒤 같은 문서(raw_signal_id)를 **붕괴 전에** 제외하고, 018 과 동일한 trigram+FTS 재랭킹·동일 문구 그룹 붕괴(`dup_documents`/`dup_findings`)·결정론 정렬을 적용해 상위 N건을 반환한다. **제외 순서가 계약의 핵심** — 018 을 그대로 호출하고 클라이언트가 같은 문서를 걸러내면, 기준이 자기 중복 그룹의 대표로 뽑힌 경우 그 그룹 전체가 사라진다(평가셋 40건 실측: top-1 이 같은 문서라 버려짐 21건, 그중 5건은 동일 위반 보유 문서 최대 12곳이 통째 소실). 반환 필드·안전 계약은 018 과 동일(서지+본문+score/중복 카운트뿐, evidence_url/raw_json 미반환).
 
+**MFDS 실사자 공개 이력 적재(093):** `mfds_inspection_attendees.py`는 저장된 PyMuPDF/HWPX 텍스트에서 실사자·실태조사자 표와 다음 절 경계를 확인한다. 복수 표를 모두 읽고 동일 행은 중복 제거하되, 이름별 문서 수는 문서당 한 번만 센다. 이름 정규화는 공백·참관 표지 분리뿐이며 기관 오기로 의심되는 표기도 보존한다. `mfds_inspection_attendees`는 문서 상태(named/named_none/absent/failed)와 기관·부서·성명·참관을 저장한다. 성명 없는 표의 이름·참관 여부는 NULL이고, 표 없음·실패는 seq=0 상태 행으로 남긴다. RLS와 명시적 권한 회수로 서비스만 직접 접근한다. `mfds_inspection_attendees_replace`는 원문 해시를 검사한 뒤 문서 단위 upsert·잔여 행 제거를 한 트랜잭션으로 수행한다. 일일 `findings_supabase_append`의 MFDS GMP 분기에서 호출하며 실패는 경고·상태로 남기고 원문·기존 findings 적재를 중단시키지 않는다. `backfill_mfds_inspection_attendees.py`는 같은 파서를 쓰고 기본 dry-run이며, `grm-mfds-attendees-backfill.yml`이 기준선 대조 후 apply한다. 화면·공개 조회 RPC는 후속 단계다. 검증은 익명화 텍스트 픽스처·표적 unittest와 별도 PostgreSQL CI(`grm-mfds-attendees-check.yml`)가 맡는다.
+
 ### 4.4 구현 마일스톤 요약 (M1~M14, 전부 완료·라이브)
 
 > **번호 체계 주의:** 아래 M1~M14는 **구현 작업 단위**(스키마→적재→UX→품질개선 순으로 세션마다 이어 붙인 번호)이며, §6.4의 **전략 로드맵 M1~M5**(공모전 5개월 계획)와는 다른 체계다. 이 표 전체가 전략 로드맵의 "M1(스키마+내부 백필)" 한 칸에 해당한다.
@@ -518,6 +520,8 @@ grm-api-intake/
 ├─ collect_fda_inspections.py      # FDA 실사 등급(NAI/VAI/OAI) DDAPI 수집기 → public.fda_inspections 직행(findings/카드 미생성·GMP 외 ProjectArea 클라이언트 배제·회계연도 창 실행일 계산·월 1회 크론 + 수동 dispatch)
 ├─ probe_source_reachability.py    # 후보 소스에 러너가 닿는지 착수 전 1회 판정(기본 UA/브라우저 UA 2회 → OPEN·UA_GATED·BLOCKED) · `--targets silent` = 무음 12종(피드 항목 수·최신 날짜·파서 표식 검사)
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
+├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
+├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
 ├─ backfill_483_ocr_recovery.py    # OCR 엔진 부재로 빈 본문 적재된 스캔 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert)
 ├─ backfill_deep_483_past_weeks.py  # 483 심층분석 과거주차(07-12~07-27, 69장) 소급 — 과거 델타 → fan-out 작업 생성 / 응답 병합(placeholder 표지 삽입 + 운영 병합 경로 호출)
 ├─ backfill_deep_original_truncation.py  # D5b(원문 병기 절단)로 병합 보류된 483 심층분석 소급 병합 — 운영 병합 경로(inject_slots) 그대로 호출
@@ -582,11 +586,14 @@ grm-api-intake/
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
+│  ├─ fixtures/mfds_attendees/      # 실사자 표 익명화 텍스트(정답 2건·복수 표 3건)
+│  └─ sql/mfds_attendees_ingest.sql # 격리 PostgreSQL 적재·권한·멱등성 검증
 ├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
 │  ├─ specs/GRM_규제인텔리전스_업그레이드_설계_2026-07-15.md  # 승인 대기 중인 다음 구현 설계
 │  ├─ specs/GRM_퀴즈_운영설계_2026-07-18.md               # 주간 퀴즈 v1 운영 설계(/quiz/ 라이브)
 │  ├─ specs/GRM_인기카드_구르미위젯_설계조사_2026-07-18.md   # 인기 카드 랭킹·구르미 위젯 설계 조사(위젯=라이브, 인기카드=RPC 적용 완료·웹 통합 대기)
+│  ├─ specs/mfds_attendees_baseline_20261019.json # 합의한 전체 표 집계 기준선
 │  ├─ specs/GRM_031_적용검증계획_2026-07-18.md             # 031 RPC 적용 전 검증 절차·롤백(2026-07-18 적용 완료)
 │  ├─ specs/GRM_퀴즈_운영설계_addendum_week회전_성장시스템_2026-07-18.md  # week 회전·성장 시스템 운영 규칙
 │  ├─ prompts/GRM_주간용어추가_프롬프트_v1.md              # 화 10:17 예약 용어 추가 세션 정본 규율

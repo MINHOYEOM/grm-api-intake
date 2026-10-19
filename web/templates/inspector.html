@@ -43,7 +43,7 @@
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Inspector Profile</span>
     <h1 class="reveal" style="animation-delay:.08s">{{ _("실사관 프로파일") }}</h1>
-    <p class="reveal" style="animation-delay:.14s">{{ _("공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 문서 단위로 모아 보여줍니다.") }}</p>
+    <p class="reveal" style="animation-delay:.14s">{{ _("공개된 FDA 483·MFDS 보고서의 참여 이력을 문서 단위로 모아 보여줍니다.") }}</p>
   </div>
   <div class="wrap">
     <div id="grm-inspector-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-asset-root="{{ asset_root }}" hidden></div>
@@ -52,6 +52,11 @@
         html)의 마크업을 그대로 이식한다. rel_root 는 이 페이지가 findings/browse 와 같은
         깊이("../../")라 파셜을 손대지 않고 그대로 include 할 수 있다. -#}
     {% with seg_active = "inspector" %}{% include "partials/findings_seg.html" %}{% endwith %}
+    <nav class="fnd-seg" aria-label="{{ _('실사 보고서 구분') }}">
+      <a id="ip-source-fda" href="?source=fda" class="on" aria-current="page">FDA 483</a>
+      <a id="ip-source-mfds" href="?source=mfds">MFDS</a>
+    </nav>
+    {% include "partials/mfds_inspector.html" %}
 
     <div class="ip-state" id="ip-loading" role="status" aria-live="polite">{{ _("불러오는 중…") }}</div>
     <div class="ip-state" id="ip-unavailable" hidden>
@@ -303,8 +308,9 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
   <span class="kick">AI Disclosure</span>
   <h2>{{ _("콘텐츠 생성 방식 및 유의사항") }}</h2>
   <div class="disc-body">
-    <div class="disc-sec"><p>{{ _("이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.") }}</p></div>
-    <div class="disc-sec"><p>{{ _("실사 문서 목록에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.") }}</p></div>
+    <div class="disc-sec" id="ip-fda-ai-facts"><p>{{ _("이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.") }}</p></div>
+    <div class="disc-sec" id="ip-fda-ai-translation"><p>{{ _("실사 문서 목록에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.") }}</p></div>
+    <div class="disc-sec" id="mfds-ai-facts" hidden><p>{{ _('MFDS 참여 이력은 공개 보고서의 표에서 추출한 성명·기관·부서·참관 표기를 문서 단위로 모은 정보입니다.') }}</p></div>
     <div class="disc-sec"><p>{{ _("본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.") }}</p></div>
   </div>
 </div></section>

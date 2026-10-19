@@ -380,6 +380,42 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
     return out, reject
 
 
+def enrich_mfds_attendees(base_url: str, anon_key: str, docs: list[dict[str, Any]], *, post=None) -> int:
+    """공개 문서 사실만 보강한다. 코호트 여부·프로파일 링크는 정적 정본에 저장하지 않는다."""
+    targets = {d["document_id"]: d for d in docs if d.get("agency") == "MFDS"}
+    ids = sorted(targets)
+    enriched = 0
+    for start in range(0, len(ids), 200):
+        batch = ids[start:start + 200]
+        if post is None:
+            response = requests.post(
+                f"{base_url}/rest/v1/rpc/mfds_inspection_document_attendees",
+                headers={"apikey": anon_key, "Authorization": f"Bearer {anon_key}", "Content-Type": "application/json"},
+                json={"p_document_ids": batch}, timeout=60,
+            )
+            response.raise_for_status()
+            rows = response.json()
+        else:
+            rows = post(batch)
+        if not isinstance(rows, list):
+            raise RuntimeError("invalid MFDS document attendee response")
+        seen = set()
+        for row in rows:
+            doc_id = row.get("document_id")
+            attendees = row.get("attendees")
+            if doc_id not in batch or doc_id in seen or not isinstance(attendees, list) or not attendees:
+                raise RuntimeError("invalid MFDS document attendee row")
+            seen.add(doc_id)
+            for attendee in attendees:
+                if not isinstance(attendee, dict) or not re.fullmatch(r"[가-힣]{2,5}", str(attendee.get("name", ""))) or type(attendee.get("is_observer")) is not bool:
+                    raise RuntimeError("invalid MFDS attendee fact")
+            targets[doc_id]["mfds_attendees"] = attendees
+            enriched += 1
+        if start + 200 < len(ids):
+            time.sleep(1)
+    return enriched
+
+
 def main(argv: "list[str] | None" = None) -> int:
     # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — 아래 요약의 em-dash
     # 한 글자가 cp949 에서 UnicodeEncodeError 를 낸다. findings_facets_refresh.py 와 동형.
@@ -409,6 +445,7 @@ def main(argv: "list[str] | None" = None) -> int:
     docs, reject = collect_documents(base_url, args.supabase_anon_key,
                                      min_findings=args.min_findings,
                                      page_size=args.page_size, log=log)
+    mfds_enriched = enrich_mfds_attendees(base_url, args.supabase_anon_key, docs)
 
     by_agency = Counter(d["agency"] for d in docs)
     payload = {
@@ -436,6 +473,7 @@ def main(argv: "list[str] | None" = None) -> int:
         wrote = args.out
 
     log(f"문서 {len(docs):,}건 · 지적 {payload['totals']['findings']:,}건")
+    log(f"MFDS 실사자 표 보강 문서 {mfds_enriched:,}건")
     for a, c in sorted(by_agency.items()):
         log(f"  {a}: {c:,}건")
     for r, c in sorted(reject.items()):

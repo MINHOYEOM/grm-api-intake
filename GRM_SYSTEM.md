@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.267` |
+| 문서 버전 | `v1.268` |
 | 최종 수정일 | 2026-10-19 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -350,7 +350,7 @@ flowchart TD
 - **canonical search RPC(`findings_search`/`findings_document`, 026→027→028 supersede 체인):** `/findings/` 목록의 유일 데이터원. 계약 4가지가 테스트로 고정돼 있다(`tests/test_findings_search_rpc.py`). ①**`security invoker`(의도적 관례 이탈)** — 기존 findings RPC는 전부 definer라 공개 게이트 술어를 각자 복제하는데(정책 1곳+RPC 5곳=6중복), 이 두 함수는 findings만 읽으므로 invoker로 만들어 RLS(010)가 게이트의 단일 진실이 되게 했다. 따라서 **게이트 검증은 반드시 anon 키로 PostgREST를 통해** 한다(SQL Editor는 service_role이라 RLS 미적용 — 라이브 실증: anon totals 8,168 = 공개분 정확 일치·비공개 누출 0). ②**검색은 ILIKE 부분일치, FTS 금지** — `simple` 사전은 한국어 형태소를 몰라 `무균`이 `무균실`·`무균의`를 놓친다(조용한 검색 축소). 018의 FTS 인덱스는 유사 문구 검색 전용. LIKE 와일드카드(`%`·`_`·`\`)는 이스케이프(클라이언트 `indexOf` 리터럴 semantics와 일치). ③**문서 단위 정렬의 전제** — `raw_signal_id` 하나가 단일 published_date/firm_name/source를 가진다(라이브 실측 위반 0건). ④**행 투영 패리티** — 렌더러가 행 객체에서 읽는 필드는 두 RPC의 `findings[]` 투영에 전부 실려야 한다. 026/027이 `firm_key`/`translation_method`/`confidence`를 빠뜨려 업체 링크·**AI 번역 고지**·신뢰도가 조용히 소실될 뻔했다(전부 방어적 분기 뒤라 크래시 없음, 028이 수리) — `jsonb_build_object`는 키를 빠뜨려도 조용하고 클라이언트 방어 분기도 조용해서 두 침묵이 겹치면 기능이 소리 없이 사라지므로, 가드는 클라이언트 소스에서 실제 읽기를 파싱해 서버 투영과 대조한다. 성능: 랜딩 서버 127ms(왕복 p50 ~0.5s) — `searched` CTE에 본문 텍스트를 싣지 않고 페이지 24문서분만 PK로 되읽는 좁은 작업집합이 계약(본문을 실으면 무검색 랜딩에서 temp 스필로 659ms, 검색 시엔 안 터져 숨는 함정). trgm 인덱스는 의도적 보류(ILIKE semantics 불변 가속이라 언제든 추가 가능 — 라이브 p95가 나빠지면 별도 마이그레이션).
 - **`findings_similar_to` RPC(021, S1 렉시컬, finding_id 기준):** 웹 카드의 "이 지적과 유사한 사례" 버튼이 소비하는 실제 서빙 경로(라이브 적용 완료). 기준 finding 의 공개 게이트를 재확인한 뒤 같은 문서(raw_signal_id)를 **붕괴 전에** 제외하고, 018 과 동일한 trigram+FTS 재랭킹·동일 문구 그룹 붕괴(`dup_documents`/`dup_findings`)·결정론 정렬을 적용해 상위 N건을 반환한다. **제외 순서가 계약의 핵심** — 018 을 그대로 호출하고 클라이언트가 같은 문서를 걸러내면, 기준이 자기 중복 그룹의 대표로 뽑힌 경우 그 그룹 전체가 사라진다(평가셋 40건 실측: top-1 이 같은 문서라 버려짐 21건, 그중 5건은 동일 위반 보유 문서 최대 12곳이 통째 소실). 반환 필드·안전 계약은 018 과 동일(서지+본문+score/중복 카운트뿐, evidence_url/raw_json 미반환).
 
-**MFDS 실사자 공개 이력 적재(093):** `mfds_inspection_attendees.py`는 저장된 PyMuPDF/HWPX 텍스트에서 실사자·실태조사자 표와 다음 절 경계를 확인한다. 복수 표를 모두 읽고 동일 행은 중복 제거하되, 이름별 문서 수는 문서당 한 번만 센다. 이름 정규화는 공백·참관 표지 분리뿐이며 기관 오기로 의심되는 표기도 보존한다. `mfds_inspection_attendees`는 문서 상태(named/named_none/absent/failed)와 기관·부서·성명·참관을 저장한다. 성명 없는 표의 이름·참관 여부는 NULL이고, 표 없음·실패는 seq=0 상태 행으로 남긴다. RLS와 명시적 권한 회수로 서비스만 직접 접근한다. `mfds_inspection_attendees_replace`는 원문 해시를 검사한 뒤 문서 단위 upsert·잔여 행 제거를 한 트랜잭션으로 수행한다. 일일 `findings_supabase_append`의 MFDS GMP 분기에서 호출하며 실패는 경고·상태로 남기고 원문·기존 findings 적재를 중단시키지 않는다. `backfill_mfds_inspection_attendees.py`는 같은 파서를 쓰고 기본 dry-run이며, `grm-mfds-attendees-backfill.yml`이 기준선 대조 후 apply한다. 화면·공개 조회 RPC는 후속 단계다. 검증은 익명화 텍스트 픽스처·표적 unittest와 별도 PostgreSQL CI(`grm-mfds-attendees-check.yml`)가 맡는다.
+**MFDS 실사자 공개 이력 적재(093):** `mfds_inspection_attendees.py`는 저장된 PyMuPDF/HWPX 텍스트에서 실사자·실태조사자 표와 다음 절 경계를 확인한다. 복수 표를 모두 읽고 동일 행은 중복 제거하되, 이름별 문서 수는 문서당 한 번만 센다. 이름 정규화는 공백·참관 표지 분리뿐이며 기관 오기로 의심되는 표기도 보존한다. `mfds_inspection_attendees`는 문서 상태(named/named_none/absent/failed)와 기관·부서·성명·참관을 저장한다. 성명 없는 표의 이름·참관 여부는 NULL이고, 표 없음·실패는 seq=0 상태 행으로 남긴다. RLS와 명시적 권한 회수로 서비스만 직접 접근한다. `mfds_inspection_attendees_replace`는 원문 해시를 검사한 뒤 문서 단위 upsert·잔여 행 제거를 한 트랜잭션으로 수행한다. 일일 `findings_supabase_append`의 MFDS GMP 분기에서 호출하며 실패는 경고·상태로 남기고 원문·기존 findings 적재를 중단시키지 않는다. `backfill_mfds_inspection_attendees.py`는 같은 파서를 쓰고 기본 dry-run이며, `grm-mfds-attendees-backfill.yml`이 기준선 대조 후 apply한다. 공개 조회는 094의 `mfds_inspector_index`·`mfds_inspector_profile`·`mfds_inspection_departments`가 맡는다. 코호트는 `mfds_inspector_cohort` 한 곳에서 참관을 제외한 고유 문서 5건으로 판정한다. 색인은 이름순·건수 없음이며 프로파일·기관/부서는 연도별 성명 공개/전체 문서 분모를 함께 반환한다. 연도는 문서 메타데이터의 실사 시작일, 분모는 PDF·HWPX·미확인 형식을 포함한 전체 수집 공개 문서다. 기관·부서명과 제조소명은 원문 표기를 보존하고 이름순으로 표시한다. 참관은 프로파일의 별도 문서 목록이다. 기존 FDA RPC는 가드가 적용 전후 응답·함수 정의 md5를 비교해 변경을 막는다. 검증은 익명화 텍스트 픽스처·표적 unittest와 별도 PostgreSQL CI(`grm-mfds-attendees-check.yml`)가 맡는다. 화면은 기존 `/findings/inspector/` 안에서 FDA 483·MFDS 탭으로 전환하고, MFDS 안에서 이름순 색인과 기관·부서 보기를 제공한다(`inspector.js`·`partials/mfds_inspector.html`). 성명 표기·동명이인 가정·최근 비공개 확대를 짧게 고지한다. 문서 상세는 `findings_docs_refresh.py`가 공개 문서 사실 RPC(`mfds_inspection_document_attendees`, anon·공개 findings 술어)로 이름·참관만 정본에 싣고, `mfds-doc-inspectors.js`가 런타임 코호트 색인에 있는 이름만 프로파일 링크로 바꾼다. 정적 빌드는 코호트를 재현하지 않는다. 정본 갱신은 코드 PR과 분리해 `GRM Findings Doc Pages Refresh`로 수행한다.
 
 ### 4.4 구현 마일스톤 요약 (M1~M14, 전부 완료·라이브)
 
@@ -569,6 +569,8 @@ grm-api-intake/
 ├─ collect_search_console.py      # [성장·유입] Google Search Console → Supabase(078 `gsc_daily`/`gsc_query_daily`/`gsc_page_daily`). RUM 은 "google.com 에서 왔다"까지만 알고 **무엇을 검색했는지**는 여기서만 온다. dataState=final(확정 데이터가 2~3일 늦게 도착) · CTR 은 저장하지 않고 파생(평균의 평균 방지) · 위치 병합은 노출수 가중 · 경로에서 스킴/호스트/쿼리스트링 제거. 서비스 계정 키(GSC_SERVICE_ACCOUNT_JSON) 미설정이면 클린 skip
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
+│  ├─ partials/mfds_inspector.html · assets/mfds-doc-inspectors.js # MFDS 보기·동적 코호트 링크
+│  ├─ migrations/094_mfds_inspector_profiles.sql # MFDS 조회 RPC·FDA 응답 불변 가드
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -587,7 +589,9 @@ grm-api-intake/
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
 │  ├─ fixtures/mfds_attendees/      # 실사자 표 익명화 텍스트(정답 2건·복수 표 3건)
-│  └─ sql/mfds_attendees_ingest.sql # 격리 PostgreSQL 적재·권한·멱등성 검증
+│  ├─ js/mfds_inspector_ui.js       # 네트워크 없는 UI 계약 검증
+│  ├─ run_mfds_sql_mutations.py     # 정책 위반 주입 FAIL → 원복 PASS 검증
+│  └─ sql/mfds_attendees*.sql       # 격리 PostgreSQL 적재·조회·권한·멱등성 검증
 ├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
 │  ├─ specs/GRM_규제인텔리전스_업그레이드_설계_2026-07-15.md  # 승인 대기 중인 다음 구현 설계

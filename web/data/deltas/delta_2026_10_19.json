@@ -365,7 +365,7 @@
     "소재지 등 허가사항 변경 신고 이력"
    ],
    "en": {
-    "title_issue": "Import suspension for no import manager and no QC testing",
+    "title_issue": "Import suspension: no import manager or QC tests",
     "summary": "An importer received a full import business suspension of 4 months 15 days (2026.10.27 to 2027.3.13) for not updating its registered location, operating without an import manager, and not performing quality testing.",
     "key_facts": [
      "Violations: registered location not updated, import business operated without an import manager, quality testing not performed",
@@ -395,7 +395,7 @@
     "무균시험 결과 인용 시 원자료 대조 기록"
    ],
    "en": {
-    "title_issue": "Import suspension for test certificate issued before sterility verdict",
+    "title_issue": "Test certificate issued before sterility verdict",
     "summary": "An importer issued a test certificate including sterility results for a sterile gauze product on 2026.1.5, before the sterility test certificate's final judgment date of 2026.1.6, and received a 1 month 15 days import suspension for that item.",
     "key_facts": [
      "Product: an imported sterile gauze product (expiry 2028.11.26)",
@@ -426,7 +426,7 @@
     "출하 전 시험성적 검토 기록"
    ],
    "en": {
-    "title_issue": "Sulfur dioxide and appearance failures, manufacturing suspension",
+    "title_issue": "Sulfur dioxide and appearance test failures",
     "summary": "Two products of a manufacturer failed testing, a Moutan root bark herbal product for sulfur dioxide (86 ppm) and a Saposhnikovia root herbal product for organoleptic appearance, leading to a 3-month manufacturing suspension for the items (2026.11.02 to 2027.02.01).",
     "key_facts": [
      "Moutan root bark product: appearance passed, sulfur dioxide failed (86 ppm)",
@@ -457,7 +457,7 @@
     "출하 전 표시사항 대조 기록"
    ],
    "en": {
-    "title_issue": "Sales suspension for missing production region on origin label",
+    "title_issue": "Sales suspension for missing origin region label",
     "summary": "A manufacturer received a 15-day sales suspension (2026.11.02 to 2026.11.16) for a processed Rehmannia root herbal product because it was made and sold without stating the production region alongside the country of origin.",
     "key_facts": [
      "Product: a processed Rehmannia root herbal product",
@@ -488,7 +488,7 @@
     "출하승인서 작성 후 출하 여부"
    ],
    "en": {
-    "title_issue": "Manufacturing suspension for unapproved active ingredient supplier change",
+    "title_issue": "Unapproved change of active ingredient supplier",
     "summary": "A medical gas manufacturer made and sold a medical oxygen product using oxygen from a new active ingredient supplier without change approval, and shipped products without release approval forms, resulting in a 1 month 15 days manufacturing suspension for the item.",
     "key_facts": [
      "Product: a medical oxygen product",
@@ -519,7 +519,7 @@
     "부적합 품목의 동일 제조번호 재고 확인"
    ],
    "en": {
-    "title_issue": "Appearance failure from unremoved rootlets and outer bark",
+    "title_issue": "Appearance failure from rootlets and bark left on",
     "summary": "A herbal medicine manufacturer received a 3-month manufacturing suspension for the item (2026.10.22 to 2027.01.21) after a market sample failed the appearance test because rootlets and outer bark had not been removed.",
     "key_facts": [
      "Violation: appearance failure in a market sample test of a herbal material (rootlets and outer bark not removed)",
@@ -550,7 +550,7 @@
     "동결건조기 멸균 주기 간 유지 시간 설정 근거"
    ],
    "en": {
-    "title_issue": "Major labeling finding and OOS investigation deficiencies",
+    "title_issue": "Major labeling finding and OOS investigation gaps",
     "summary": "A post-approval GMP inspection of a domestic finished-product (single) manufacturing site resulted in a major finding on container labeling items plus deficiencies on out-of-specification investigation, airflow pattern testing and the hold time between freeze-dryer sterilization cycles.",
     "key_facts": [
      "Labeling (major): additional data on container labeling items, remark: corrected",
@@ -582,7 +582,7 @@
     "보관 장소별 재고 이동 기록"
    ],
    "en": {
-    "title_issue": "Fine for storing medicines at an unreported location",
+    "title_issue": "Fine for storing medicines at unreported site",
     "summary": "An importer stored medicines at a location it had not reported and received a fine of KRW 70,200,000 in lieu of a 3-month import suspension for treprostinil injection products in three strengths.",
     "key_facts": [
      "Violation: medicines stored at an unreported location",
@@ -612,7 +612,7 @@
     "약물감시·허가 부서 간 기한 관리 책임"
    ],
    "en": {
-    "title_issue": "Sales suspension for late post-marketing surveillance report",
+    "title_issue": "Sales suspension for late post-marketing report",
     "summary": "A company received a 1-month sales suspension (2026.11.3 to 2026.12.2) for pirfenidone 200 mg and 400 mg tablets after not submitting the final post-marketing surveillance report under its risk management plan within 3 months of the end of the 4-year surveillance period.",
     "key_facts": [
      "Violation: final post-marketing surveillance report under the risk management plan not submitted within 3 months after the 4-year period ended",
@@ -735,7 +735,7 @@
     "수동 세척 장비 세척 효율성 입증 자료"
    ],
    "en": {
-    "title_issue": "Contractor oversight and manual cleaning deficiencies",
+    "title_issue": "Contractor oversight and manual cleaning gaps",
     "summary": "A post-approval GMP inspection of a domestic finished-product (single) manufacturing site required additional explanation on contractor-related matters, operator disinfection procedures and the cleaning effectiveness of manually cleaned equipment.",
     "key_facts": [
      "Quality management (other): additional explanation on contractor-related matters, remark: corrected",

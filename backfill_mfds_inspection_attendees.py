@@ -72,6 +72,11 @@ def fetch_rows(base_url: str, service_key: str) -> list[dict]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--input-json", type=Path, help="로컬 스냅샷으로 dry-run만 수행")

@@ -2005,5 +2005,101 @@
       "Reviewing a batch's manufacturing and testing records and compliance with requirements to approve it for sale"
     ],
     "explanation_en": "A certificate of analysis is a document issued, dated and signed by the quality unit for each batch, setting out which tests were performed, against what criteria, and what the results were (ICH Q7 §§11.40–11.44). The others describe a specification, supplier qualification and batch release."
+  },
+  {
+    "id": "q-202643-01",
+    "question_ko": "FDA가 경기도 용인의 Hanlim Pharm Co., Ltd.에 보낸 Warning Letter에서 21 CFR 211.113(b) 위반으로 지적한 내용은?",
+    "choices": [
+      "원료별 확인(identity)·규격 적합성 시험을 하지 않음",
+      "무균공정 구역에 HEPA 여과 양압 공기를 확보하지 않음",
+      "무균을 표방하는 제품의 미생물 오염 방지 절차가 미흡함",
+      "배치·원료 규격 부적합에 대한 조사가 미흡함"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "Warning Letter는 무균을 표방하는 제품의 미생물 오염 방지 절차 미흡을 21 CFR 211.113(b) 위반으로 지적했습니다. 나머지는 같은 주 다른 Warning Letter에서 지적된 별개의 항목입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-19/#8a404f9eaaf8",
+    "difficulty": "normal",
+    "week": "202643",
+    "question_en": "In its Warning Letter to Hanlim Pharm Co., Ltd. in Yongin, Gyeonggi-do, which finding did FDA cite as a violation of 21 CFR 211.113(b)?",
+    "choices_en": [
+      "Not performing identity and specification-conformance testing for each component",
+      "Not providing HEPA-filtered positive-pressure air in the aseptic processing area",
+      "Inadequate procedures to prevent microbial contamination of products purporting to be sterile",
+      "Inadequate investigation of batch and component specification failures"
+    ],
+    "explanation_en": "The Warning Letter cited inadequate procedures to prevent microbial contamination of products purporting to be sterile as a violation of 21 CFR 211.113(b). The other options are separate findings from other Warning Letters issued the same week."
+  },
+  {
+    "id": "q-202643-02",
+    "question_ko": "FDA가 펜실베이니아주 Horsham의 위탁시험기관 Eurofins SF Analytical Laboratories, Inc.에 보낸 Warning Letter에서 21 CFR 211.194(a) 위반으로 지적한 내용은?",
+    "choices": [
+      "시험기록에 데이터가 완전하게 갖춰지지 않음",
+      "원료별 확인시험을 하지 않음",
+      "오염·혼동을 막을 구역을 확보하지 않음",
+      "무균공정 구역에 HEPA 여과 양압 공기를 확보하지 않음"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "Warning Letter는 시험기록의 데이터가 불완전한 점을 21 CFR 211.194(a) 위반으로 지적했습니다. 나머지는 같은 주 다른 Warning Letter에서 지적된 별개의 항목입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-19/#060af7eeccbf",
+    "difficulty": "easy",
+    "week": "202643",
+    "question_en": "In its Warning Letter to Eurofins SF Analytical Laboratories, Inc., a contract testing laboratory in Horsham, Pennsylvania, which finding did FDA cite as a violation of 21 CFR 211.194(a)?",
+    "choices_en": [
+      "Laboratory records that did not include complete data",
+      "Not performing identity testing on each component",
+      "Not providing areas that prevent contamination and mix-ups",
+      "Not providing HEPA-filtered positive-pressure air in the aseptic processing area"
+    ],
+    "explanation_en": "The Warning Letter cited incomplete data in laboratory records as a violation of 21 CFR 211.194(a). The other options are separate findings from other Warning Letters issued the same week."
+  },
+  {
+    "id": "q-202643-03",
+    "question_ko": "의약품 GMP에서 말하는 ‘데이터 완전성(Data Integrity)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "전자기록의 생성·변경·삭제와 그 이유를 시간순으로 재구성할 수 있게 하는 보안된 기록",
+      "활동을 완전히 재구성하고 평가하는 데 필요한 최초 관찰과 그 후의 원본 기록·데이터",
+      "귀속성·가독성·동시성·원본성·정확성을 갖추고 완전성·일관성·영속성·가용성도 유지해야 한다는 원칙",
+      "데이터가 생성부터 폐기까지 완전하고 일관되며 정확하고 신뢰할 수 있는 상태를 유지하는 정도"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "데이터 완전성은 데이터가 생성부터 폐기까지 완전하고 일관되며 정확하고 신뢰할 수 있는 상태를 유지하는 정도입니다(PIC/S PI 041-1, EU GMP Annex 11). 나머지는 각각 감사추적기록, 원자료, ALCOA+ 원칙에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "data-integrity",
+    "difficulty": "easy",
+    "week": "202643",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes data integrity?",
+    "choices_en": [
+      "A secure record that allows the creation, change and deletion of electronic records, and the reasons for them, to be reconstructed in time order",
+      "The original observations and the subsequent original records and data needed to reconstruct and evaluate an activity completely",
+      "The principle that data must be attributable, legible, contemporaneous, original and accurate, and must also stay complete, consistent, enduring and available",
+      "The degree to which data stays complete, consistent, accurate and trustworthy from creation to disposal"
+    ],
+    "explanation_en": "Data integrity is the degree to which data stays complete, consistent, accurate and trustworthy from creation to disposal (PIC/S PI 041-1, EU GMP Annex 11). The others describe an audit trail, raw data and the ALCOA+ principle."
+  },
+  {
+    "id": "q-202643-04",
+    "question_ko": "의약품 품질시스템에서 말하는 ‘근본원인분석(Root Cause Analysis)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "승인된 지시사항이나 정해진 기준에서 벗어난 상황",
+      "문제가 발생한 근본 원인과 기여요인을 찾아 원인에 맞는 시정·예방조치를 정하는 분석",
+      "허가자료, 약전 또는 제조자가 정한 규격이나 허용기준을 벗어난 시험결과",
+      "시험항목, 분석절차와 허용기준을 정해 물질이 의도한 용도에 적합한지 판단하는 기준의 집합"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "근본원인분석은 문제가 발생한 근본 원인과 기여요인을 찾아 원인에 맞는 시정·예방조치를 정하는 분석입니다(ICH Q10 §§3.2.2–3.2.3, 21 CFR 211.192). 나머지는 각각 일탈, 기준 이탈(OOS) 시험결과, 규격에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "root-cause-analysis",
+    "difficulty": "normal",
+    "week": "202643",
+    "question_en": "In a pharmaceutical quality system, which statement correctly describes root cause analysis (RCA)?",
+    "choices_en": [
+      "A departure from an approved instruction or an established standard",
+      "Analysis that finds the underlying cause and contributing factors of a problem so that corrective and preventive action can be matched to the cause",
+      "A test result that falls outside the specification or acceptance criteria in the marketing application, the pharmacopoeia or the manufacturer's own standard",
+      "The set of tests, analytical procedures and acceptance criteria used to judge whether a material is fit for its intended use"
+    ],
+    "explanation_en": "Root cause analysis finds the underlying cause and contributing factors of a problem so that corrective and preventive action can be matched to the cause (ICH Q10 §§3.2.2–3.2.3, 21 CFR 211.192). The others describe a deviation, an out-of-specification (OOS) result and a specification."
   }
 ]

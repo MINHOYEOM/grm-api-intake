@@ -1,0 +1,21 @@
+name: MFDS attendee SQL checks
+on:
+  pull_request:
+    paths:
+      - 'web/migrations/*mfds*'
+      - 'tests/sql/mfds_attendees*'
+      - '.github/workflows/grm-mfds-attendees-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Check ingestion in an isolated PostgreSQL database
+        run: |
+          sudo systemctl start postgresql
+          sudo -u postgres createdb mfds_attendees_test
+          sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d mfds_attendees_test -f tests/sql/mfds_attendees_ingest.sql

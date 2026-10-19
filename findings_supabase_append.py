@@ -173,6 +173,15 @@ def _append_raw_signal(
         return SupabaseRawSignalAppendResult(
             "error", raw_signal_id=raw_signal_id, errors=(f"raw_signals POST failed: {err}",),
         )
+    if (record.get("source"), record.get("source_kind")) == ("MFDS", "gmp-inspection"):
+        # 파생 표의 오류가 원문·findings 적재를 중단시키지 않게 격리한다.
+        # 중복 수집 때 입력이 저장 원문과 다르면 RPC의 원문 해시 검사가 거부한다.
+        from grm_common import log
+        try:
+            from mfds_inspection_attendees_store import sync_attendees
+            sync_attendees(base_url, service_key, record)
+        except Exception as exc:
+            log("WARN", f"MFDS 실사자 경로: {type(exc).__name__}")
     if rows:
         return SupabaseRawSignalAppendResult("inserted", raw_signal_id=raw_signal_id)
     return SupabaseRawSignalAppendResult("duplicate", raw_signal_id=raw_signal_id)

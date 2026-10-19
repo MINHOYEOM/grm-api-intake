@@ -622,6 +622,15 @@ class BrevoSender(NewsletterSender):
             offset += limit
         return None
 
+    def list_contact_count(self, list_id: int) -> int:
+        """리스트의 연락처 수(`GET /contacts/lists/{id}/contacts?limit=1` 의 `count`).
+        Brevo 는 연락처가 0명인 리스트로는 캠페인 생성 자체를 400 으로 거절한다
+        (`invalid_parameter` · "There are no contacts associated with the given recipients info")."""
+        r = self.s.get(self._url(f"/contacts/lists/{int(list_id)}/contacts"),
+                       params={"limit": 1, "offset": 0}, timeout=self.timeout)
+        self._check(r)
+        return int((r.json() or {}).get("count") or 0)
+
     def create_campaign(self, *, name: str, subject: str, html: str, list_ids: list[int],
                         sender_name: str, sender_email: str) -> str:
         body = {

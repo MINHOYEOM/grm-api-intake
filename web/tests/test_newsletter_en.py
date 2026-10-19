@@ -173,6 +173,46 @@ class EmailAndGateTest(unittest.TestCase):
         self.assertNotIn("수신거부", mail["html"])
 
 
+class EmptyListTest(unittest.TestCase):
+    """Brevo 는 연락처 0명 리스트로 캠페인을 못 만든다(400 invalid_parameter, 2026-10-19 실측).
+    영문 리스트가 비어 있는 동안 영문 잡은 실패하지 않고 건너뛴다."""
+
+    class _Sender:
+        def __init__(self, counts): self.counts, self.created = counts, []
+        def list_contact_count(self, i): return self.counts.get(i, 0)
+        def find_campaign(self, name): return None
+        def create_campaign(self, **kw): self.created.append(kw); return "1"
+        def send_campaign(self, cid): pass
+        def send_test(self, cid, emails): pass
+
+    def test_lists_have_contacts(self):
+        self.assertFalse(ne.lists_have_contacts(self._Sender({4: 0}), [4]))
+        self.assertTrue(ne.lists_have_contacts(self._Sender({4: 1}), [4]))
+
+    def _run(self, mode, counts, tmp):
+        import os
+        from unittest import mock
+        snap = tmp / "snap.json"
+        snap.write_text(json.dumps(_snap([_row("a")])), encoding="utf-8")
+        sender = self._Sender(counts)
+        env = {"NEWSLETTER_API_KEY": "k", "GRM_NEWSLETTER_SENDER_EMAIL": "s@example.com",
+               "GRM_NEWSLETTER_LIST_ID_EN": "4", "GRM_NEWSLETTER_TEST_EMAILS": "t@example.com"}
+        with mock.patch.dict(os.environ, env), \
+             mock.patch.object(ne.newsletter, "BrevoSender", lambda key: sender):
+            rc = ne.main(["--publish-date", PUB, "--mode", mode, "--snapshot", str(snap)])
+        return rc, sender
+
+    def test_empty_list_skips_send_and_test_without_failing(self):
+        import tempfile
+        tmp = pathlib.Path(tempfile.mkdtemp())
+        for mode in ("send", "test", "precheck"):
+            rc, sender = self._run(mode, {4: 0}, tmp)
+            self.assertEqual(rc, 0, mode)
+            self.assertEqual(sender.created, [], f"{mode}: 빈 리스트로 캠페인을 만들면 안 된다")
+        rc, sender = self._run("send", {4: 2}, tmp)
+        self.assertEqual((rc, len(sender.created)), (0, 1))
+
+
 class FetchTest(unittest.TestCase):
     def test_fetch_is_read_only_and_bounded_by_window(self):
         calls = []

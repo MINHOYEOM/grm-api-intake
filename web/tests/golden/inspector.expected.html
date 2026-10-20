@@ -74,7 +74,7 @@
   <div class="wrap page-head">
     <span class="kick reveal" style="animation-delay:.02s">Inspector Profile</span>
     <h1 class="reveal" style="animation-delay:.08s">실사관 프로파일</h1>
-    <p class="reveal" style="animation-delay:.14s">공개된 FDA 483 문서에 서명한 실사관의 지적사항 이력을 문서 단위로 모아 보여줍니다.</p>
+    <p class="reveal" style="animation-delay:.14s">공개된 FDA 483·MFDS 보고서의 참여 이력을 문서 단위로 모아 보여줍니다.</p>
   </div>
   <div class="wrap">
     <div id="grm-inspector-cfg" data-url="" data-key="" data-root="../../" data-asset-root="../../" hidden></div><nav class="fnd-seg" aria-label="지적사항 면 전환">
@@ -88,6 +88,64 @@
 .fnd-seg a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--coral)}
 .fnd-seg a:focus-visible{outline:2px solid var(--coral);outline-offset:2px;border-radius:4px}
 @media(max-width:520px){.fnd-seg a{padding:9px 11px 11px;font-size:13.5px}}
+</style>
+    <nav class="fnd-seg" aria-label="실사 보고서 구분">
+      <a id="ip-source-fda" href="?source=fda" class="on" aria-current="page">FDA 483</a>
+      <a id="ip-source-mfds" href="?source=mfds">MFDS</a>
+    </nav>
+<section id="mfds-panel" hidden>
+  <nav class="mfds-views" aria-label="MFDS 이력 보기">
+    <a id="mfds-view-people" href="?source=mfds">실사자</a>
+    <a id="mfds-view-units" href="?source=mfds&amp;view=departments">기관·부서</a>
+  </nav>
+  <p class="mfds-notice">성명은 MFDS 공개 보고서 표기입니다. 같은 이름을 같은 사람으로 묶었으며 동명이인이 있을 수 있습니다. 2026년부터 성명 공개가 급감해 최근 이력은 반영되지 않을 수 있습니다.</p>
+  <p class="ip-note">제조소·기관·부서명은 원문 표기입니다. 집계 단위는 실사 횟수가 아닌 공개 문서입니다.</p>
+  <p id="mfds-state" role="status" aria-live="polite">불러오는 중…</p>
+  <div id="mfds-lookup" hidden>
+    <p class="ip-note">공개 문서 5건 이상에서 확인된 실사자의 이름순 색인입니다. 참관은 이 기준에서 제외합니다.</p>
+    <form id="mfds-look-form" class="tr-look-form" role="search">
+      <label class="sr-only" for="mfds-look-input">실사자 이름</label>
+      <input id="mfds-look-input" class="tr-look-input" type="search" placeholder="이름 검색" autocomplete="off" />
+      <button class="tr-look-btn" type="submit">찾기</button>
+    </form>
+    <div id="mfds-index" aria-live="polite"></div>
+  </div>
+  <div id="mfds-profile" hidden>
+    <div class="ip-head"><h2 id="mfds-name" class="ip-name"></h2><p class="ip-sub">공개 문서 기준 참여 이력</p></div>
+    <p id="mfds-total"></p>
+    <div id="mfds-years"></div>
+    <section class="ip-block"><h2 class="ip-h">확인한 제조소</h2><ul id="mfds-firms" class="mfds-list"></ul></section>
+    <section class="ip-block"><h2 class="ip-h">기관·부서</h2><ul id="mfds-profile-units" class="mfds-list"></ul></section>
+    <section class="ip-block"><h2 class="ip-h">공개 문서 목록</h2><ul id="mfds-docs" class="mfds-list"></ul></section>
+    <section id="mfds-observer-block" class="ip-block" hidden><h2 class="ip-h">참관 문서</h2><ul id="mfds-observer-docs" class="mfds-list"></ul></section>
+    <a class="ip-back-link" href="?source=mfds">이름순 색인으로</a>
+  </div>
+  <div id="mfds-departments" hidden>
+    <h2 class="ip-h">기관·부서의 공개 참여 이력</h2>
+    <div id="mfds-department-years"></div>
+    <div id="mfds-department-list"></div>
+  </div>
+</section>
+<style>
+.mfds-views{display:flex;gap:18px;margin:0 0 22px}
+.mfds-views a{color:var(--muted);font-size:14px;padding:5px 0;text-decoration:none}
+.mfds-views a[aria-current]{color:var(--ink);font-weight:600;border-bottom:2px solid var(--coral)}
+.mfds-notice{font-size:13px;color:var(--body-s);line-height:1.8;max-width:850px;margin:0 0 12px}
+#mfds-panel .ip-note{font-size:12.5px;color:var(--muted);line-height:1.7}
+#mfds-panel .tr-look-form{margin:22px 0}
+.mfds-table-wrap{overflow-x:auto;margin:20px 0 30px}
+.mfds-table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:13px}
+.mfds-table caption{text-align:left;font-size:14px;font-weight:600;padding:0 0 12px;color:var(--ink)}
+.mfds-table th,.mfds-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.mfds-table th{font-weight:500;color:var(--muted)}
+.mfds-list{list-style:none;margin:0;padding:0}
+.mfds-list li{padding:10px 0;border-bottom:1px solid var(--line);line-height:1.7;font-size:14px}
+.mfds-list a{color:var(--coral-2);text-decoration:none}
+.mfds-list a:hover{text-decoration:underline}
+.mfds-doc-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.mfds-unit{border-bottom:1px solid var(--line);padding:14px 0}
+.mfds-unit summary{cursor:pointer;font-size:14px;line-height:1.7}
+.mfds-views a:focus-visible,.mfds-unit summary:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
 </style>
 
     <div class="ip-state" id="ip-loading" role="status" aria-live="polite">불러오는 중…</div>
@@ -309,8 +367,9 @@ a.ip-doc-firm:hover{color:var(--coral);text-decoration:underline}
   <span class="kick">AI Disclosure</span>
   <h2>콘텐츠 생성 방식 및 유의사항</h2>
   <div class="disc-body">
-    <div class="disc-sec"><p>이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.</p></div>
-    <div class="disc-sec"><p>실사 문서 목록에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
+    <div class="disc-sec" id="ip-fda-ai-facts"><p>이 페이지는 공개된 FDA Form 483 문서의 서명란에서 기계적으로 추출한 사실만 집계합니다. 실사관 개인에 대한 평가나 성향 판단이 아니며, 문서 5건 이상이 확인된 경우에만 제공됩니다.</p></div>
+    <div class="disc-sec" id="ip-fda-ai-translation"><p>실사 문서 목록에서 펼쳐 보는 개별 지적사항의 국문 해석은 생성형 AI 번역이며 원문(영문)을 함께 제공합니다. 법적 판단은 반드시 원문을 기준으로 하시기 바랍니다.</p></div>
+    <div class="disc-sec" id="mfds-ai-facts" hidden><p>MFDS 참여 이력은 공개 보고서의 표에서 추출한 성명·기관·부서·참관 표기를 문서 단위로 모은 정보입니다.</p></div>
     <div class="disc-sec"><p>본 서비스는 규제 동향 파악을 지원하는 참고자료이며, 법률·규제·품질·컴플라이언스 자문으로 간주되어서는 안 됩니다. 중요한 의사결정은 공식 원문과 전문 자문을 통해 검토하시기 바랍니다.</p></div>
   </div>
 </div></section>
@@ -444,7 +503,7 @@ if(_nt&&_nm){
   </section>
 </div>
 <script src="/assets/pet.js?v=e470de1f" defer></script>
-<script src="../../assets/inspector.js?v=f2c1da9f" defer></script>
+<script src="../../assets/inspector.js?v=da42583e" defer></script>
 <style>
 .grm-card-actions{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2,rgba(26,24,21,.09));gap:8px;align-items:center}
 body.grm-has-share .grm-card-actions{display:flex}

@@ -3429,6 +3429,24 @@ def doc_inspector_line(doc: dict[str, Any], tr: Translator = _KO) -> str:
     return line
 
 
+def doc_mfds_attendees(doc: dict[str, Any]) -> list[dict[str, Any]]:
+    """정적 층은 원문 사실인 이름·참관만 보존한다. 공개 코호트는 재계산하지 않는다."""
+    if doc.get("agency") != "MFDS" or not isinstance(doc.get("mfds_attendees"), list):
+        return []
+    rows, seen = [], set()
+    for row in doc["mfds_attendees"]:
+        if not isinstance(row, dict):
+            continue
+        name, observer = row.get("name"), row.get("is_observer")
+        if not isinstance(name, str) or not re.fullmatch(r"[가-힣]{2,5}", name) or type(observer) is not bool:
+            continue
+        pair = (name, observer)
+        if pair not in seen:
+            seen.add(pair)
+            rows.append({"name": name, "is_observer": observer})
+    return rows
+
+
 def combo_description(combo: dict[str, Any], tr: Translator = _KO) -> str:
     """분류 × 기관 조합 페이지의 meta description — 데이터에서 조립(문구 생성 0).
 
@@ -4789,6 +4807,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["firmjs_ver"] = _asset_ver("firm.js")
     env.globals["checklistjs_ver"] = _asset_ver("checklist.js")
     env.globals["inspectorjs_ver"] = _asset_ver("inspector.js")
+    env.globals["mfdsdocjs_ver"] = _asset_ver("mfds-doc-inspectors.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
     env.globals["quizjs_ver"] = _asset_ver("quiz.js")
     env.globals["growthjs_ver"] = _asset_ver("growth.js")
@@ -6036,6 +6055,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
                     inspector_line=doc_inspector_line(doc, _tr),
+                    mfds_attendees=doc_mfds_attendees(doc),
                     # ★없는 페이지로 보내지 않는다 — 분류 모음은 아직 한국어 트리에만
                     #   있다. 영어판에서는 그 링크를 만들지 않고, 같은 업체 기록은
                     #   **영어로 낸 문서만** 남긴다.

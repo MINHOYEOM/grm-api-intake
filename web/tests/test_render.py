@@ -10237,7 +10237,13 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         docs = render.load_findings_docs() or {}
         firms = {d.get("firm_name") for d in docs.get("documents", []) if d.get("firm_name")}
         checked = 0
-        for tid, items in list(ex.items())[:10]:
+        # 인용 블록은 사례 스냅샷(glossary_cases)에 항목이 있는 용어 페이지에만 실린다
+        # (glossary_term.html 의 `term.case_href` 게이트). 스냅샷에 없는 용어는 인용이 계산돼도
+        # 화면에 나오지 않으므로 이 검사 대상이 아니다. 희소한 용어부터 정렬되는 ex 의 앞 10개에
+        # 그런 용어가 섞이면(갱신 데이터에서 `accurate`) 데이터만 바뀌어도 실패했다.
+        cases = render.load_glossary_cases() or {}
+        shown = [(tid, items) for tid, items in ex.items() if tid in cases]
+        for tid, items in shown[:10]:
             html = self._page(tid)
             self.assertIn("이 용어가 등장한", html, f'문구 규율 위반/미배선: {tid}')
             for bad in ("이 용어에 관한 지적", "이 용어에 대한 지적"):

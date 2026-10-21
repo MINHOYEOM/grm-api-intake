@@ -33,6 +33,7 @@ import html as _html
 import json
 import re
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -309,6 +310,31 @@ def build_announcement(ann: dict[str, Any], *, site_base_url: str,
 
 
 # ── 멱등 ──────────────────────────────────────────────────────────────────────
+# 예약 발송 — 사람이 정한 시각에 Brevo 가 보낸다(데스크톱 예약작업은 실측 10분 넘게 늦는다).
+# 하한은 dispatch→캠페인 생성까지의 여유, 상한은 "잊힌 예약"을 막는 선.
+SCHEDULE_MIN_LEAD = timedelta(minutes=10)
+SCHEDULE_MAX_LEAD = timedelta(days=7)
+
+
+def parse_schedule_at(text: str, now: datetime) -> str:
+    """ISO 8601 시각(오프셋 필수) → Brevo `scheduledAt` 형식 UTC 문자열. 순수(now 주입).
+
+    오프셋 없는 시각은 거절한다 — 러너는 UTC 라 `08:00` 이 KST 17:00 으로 나간다."""
+    raw = (text or "").strip()
+    try:
+        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        raise ValueError(f"예약 시각 형식 오류: {text!r} (예: 2026-10-22T08:00:00+09:00)") from None
+    if dt.tzinfo is None:
+        raise ValueError(f"예약 시각에 시간대 오프셋이 없다: {text!r} (예: +09:00)")
+    lead = dt - now
+    if lead < SCHEDULE_MIN_LEAD:
+        raise ValueError(f"예약 시각이 너무 가깝거나 지났다: {text!r} (최소 {SCHEDULE_MIN_LEAD} 뒤)")
+    if lead > SCHEDULE_MAX_LEAD:
+        raise ValueError(f"예약 시각이 너무 멀다: {text!r} (최대 {SCHEDULE_MAX_LEAD.days}일 뒤)")
+    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+
 def idempotency_campaign_name(ann_id: str) -> str:
     """발송 멱등 키 = 캠페인명(결정론). 주간호(`GRM Weekly Brief — …`)와 네임스페이스 분리."""
     return f"GRM Update — {ann_id}"
@@ -373,7 +399,20 @@ def main(argv: "list[str] | None" = None) -> int:
                          "precheck=멱등 사전점검(should_send 방출, 발송 0) · list=보유 공지 목록")
     ap.add_argument("--out", type=Path, default=None, help="렌더된 메일 HTML 저장(사람 검토 아티팩트)")
     ap.add_argument("--no-linkcheck", action="store_true", help="링크 실존 게이트 건너뜀(오프라인 검증)")
+    ap.add_argument("--schedule-at", default="",
+                    help="send 전용 — 이 시각에 Brevo 가 발송(ISO 8601, 오프셋 필수: 2026-10-22T08:00:00+09:00)")
     args = ap.parse_args(argv)
+
+    scheduled_at = ""
+    if args.schedule_at.strip():
+        if args.mode not in ("send", "validate"):
+            ap.error("--schedule-at 은 send(또는 확인용 validate) 모드에서만 쓴다")
+        try:
+            scheduled_at = parse_schedule_at(args.schedule_at, datetime.now(timezone.utc))
+        except ValueError as exc:
+            print(f"→ 발송 보류: {exc}", file=sys.stderr)
+            return 1
+        print(f"예약 시각: {scheduled_at} (UTC)")
 
     if args.mode == "list":
         for a in load_all(args.data):
@@ -455,11 +494,21 @@ def main(argv: "list[str] | None" = None) -> int:
         return 2
     if existing:                       # 이전 실패로 남은 미발송 draft → 재사용(중복 생성 방지)
         cid = existing["id"]
-        print(f"이전 미발송 캠페인 재사용(status={existing.get('status')}) → sendNow: {cid}")
+        print(f"이전 미발송 캠페인 재사용(status={existing.get('status')}): {cid}")
     else:
         cid = sender.create_campaign(name=name, subject=mail2["subject"], html=mail2["html"],
                                      list_ids=list_ids, sender_name=sender_name,
                                      sender_email=sender_email)
+    if scheduled_at:
+        sender.schedule_campaign(cid, scheduled_at)
+        # 예약이 실제로 걸렸는지 상태로 확인한다 — draft 로 남으면 아무도 모르게 안 나간다.
+        after = sender.find_campaign(name) or {}
+        status = str(after.get("status", "")).lower()
+        if status not in newsletter._DISPATCHED_STATUSES:
+            print(f"⚠️  예약 후 상태가 {status!r} — 예약이 걸리지 않았다(캠페인 {cid}).", file=sys.stderr)
+            return 1
+        print(f"예약 완료: 캠페인 {cid}({name}) → 리스트 {list_ids} · {scheduled_at} UTC 발송(status={status})")
+        return 0
     sender.send_campaign(cid)
     print(f"발송 완료: 캠페인 {cid}({name}) → 리스트 {list_ids}")
     return 0

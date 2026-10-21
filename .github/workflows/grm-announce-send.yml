@@ -35,6 +35,11 @@ on:
           - validate
           - test
           - send
+      schedule_at:
+        description: 'send 전용 — 예약 발송 시각(ISO 8601, 오프셋 필수 예: 2026-10-22T08:00:00+09:00). 비우면 즉시 발송'
+        required: false
+        default: ''
+        type: string
 
 # 최소권한 — 콘텐츠 read 만(발송은 SaaS 시크릿으로, GitHub 쓰기 권한 불필요).
 permissions:
@@ -128,7 +133,11 @@ jobs:
         env:
           ANNOUNCE_ID: ${{ github.event.inputs.announce_id }}
           MODE: ${{ github.event.inputs.mode }}
+          SCHEDULE_AT: ${{ github.event.inputs.schedule_at }}
         run: |
-          python web/announce.py \
-            --id "$ANNOUNCE_ID" \
-            --mode "$MODE"
+          # 예약은 send 에만 — test 는 늘 즉시(테스트 수신자에게 바로 보이는 게 목적).
+          if [ "$MODE" = "send" ] && [ -n "$SCHEDULE_AT" ]; then
+            python web/announce.py --id "$ANNOUNCE_ID" --mode send --schedule-at "$SCHEDULE_AT"
+          else
+            python web/announce.py --id "$ANNOUNCE_ID" --mode "$MODE"
+          fi

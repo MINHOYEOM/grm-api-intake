@@ -4813,6 +4813,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["growthjs_ver"] = _asset_ver("growth.js")
     env.globals["petcss_ver"] = _asset_ver("pet.css")
     env.globals["petjs_ver"] = _asset_ver("pet.js")
+    env.globals["sitepopupjs_ver"] = _asset_ver("site-popup.js")
     env.globals["popularjs_ver"] = _asset_ver("popular.js")
     # 반응 계층 공개 설정 주입 — url 이 https(_safe_url 통과)이고 anon key 가 있을 때만 활성.
     # 미설정이면 base.html/card.html 의 {% if reactions_enabled %} 가 반응 블록 전체 생략.

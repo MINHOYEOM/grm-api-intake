@@ -21051,6 +21051,61 @@ class WebPetNameEnglishStripTest(unittest.TestCase):
                 f"{ko} 의 영어 번역 '{en[ko]}' 이 ' Gurumi' 로 끝나지 않는다")
 
 
+class WebSitePopupTest(unittest.TestCase):
+    """사이트 공지 팝업(2026-10-21) — 내용은 assets/site-popup.json 한 곳, 페이지에는 스크립트
+    태그 한 줄만. 공지를 바꾸거나 꺼도 페이지 HTML(골든)은 그대로여야 하고, 한국어 트리에만
+    걸린다. 설정이 잘못 들어가면 팝업이 조용히 안 뜨거나 바깥으로 링크하므로 여기서 막는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_popup_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.ko = (cls.single / "index.html").read_text(encoding="utf-8")
+        en_home = cls.single / "en" / "index.html"
+        cls.en = en_home.read_text(encoding="utf-8") if en_home.is_file() else ""
+        cls.js = (WEB_DIR / "assets" / "site-popup.js").read_text(encoding="utf-8")
+        cls.cfg_path = WEB_DIR / "assets" / "site-popup.json"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_script_only_on_korean_tree(self):
+        self.assertIn('src="/assets/site-popup.js?v=', self.ko)
+        self.assertTrue(self.en, "영어 홈이 빌드되지 않았다")
+        self.assertNotIn("site-popup.js", self.en)
+
+    def test_assets_copied_verbatim(self):
+        for name in ("site-popup.js", "site-popup.json"):
+            self.assertEqual((self.single / "assets" / name).read_bytes(),
+                             (WEB_DIR / "assets" / name).read_bytes())
+
+    def test_config_is_valid_when_present(self):
+        if not self.cfg_path.is_file():
+            return  # 공지가 없으면 팝업도 없다(스크립트는 조용히 끝난다)
+        c = json.loads(self.cfg_path.read_text(encoding="utf-8"))
+        self.assertRegex(c["id"], r"^[a-z0-9][a-z0-9-]{2,63}$")
+        self.assertRegex(c["until"], r"^\d{4}-\d{2}-\d{2}$")
+        self.assertEqual(c.get("lang", "ko"), "ko")
+        for key in ("title", "cta_text"):
+            self.assertTrue(str(c.get(key, "")).strip(), f"{key} 가 비었다")
+        # 우리 사이트 안 경로만 — `//host` 는 프로토콜-상대 외부 주소다.
+        self.assertRegex(c["cta_path"], r"^/(?!/)")
+        if c.get("accent"):
+            self.assertIn(c["accent"], c["title"], "accent 가 제목에 없으면 강조가 조용히 빠진다")
+        for p in c.get("skip_paths", []):
+            self.assertRegex(p, r"^/(?!/)")
+
+    def test_three_close_paths_and_local_fetch_only(self):
+        for label in ("오늘 하루 보지 않기", "다시 보지 않기", 'aria-label", "닫기"'):
+            self.assertIn(label, self.js)
+        self.assertIn('fetch("/assets/site-popup.json"', self.js)
+        self.assertEqual(self.js.count("fetch("), 1)
+        for banned in ("XMLHttpRequest", "sendBeacon", "WebSocket", "http://", "https://"):
+            self.assertNotIn(banned, self.js)
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

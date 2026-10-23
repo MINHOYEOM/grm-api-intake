@@ -4950,5 +4950,40 @@
     ],
     "source_url": "https://www.ema.europa.eu/en/glossary-terms/summary-product-characteristics",
     "easy_en": "A document describing the properties and the officially approved conditions of use of a medicine."
+  },
+  {
+    "id": "adulterated-drug",
+    "term_ko": "불량 의약품",
+    "term_en": "Adulterated Drug",
+    "easy_ko": "미국 FD&C Act 제501조가 정한 조건에 해당해 '불량(adulterated)'으로 간주되는 의약품입니다. 제조·가공·포장·보관에 쓰인 방법이나 시설·관리가 CGMP 에 맞지 않아도 여기에 해당합니다.",
+    "definition_source": "Federal Food, Drug, and Cosmetic Act, §501 [21 U.S.C. 351] Adulterated drugs and devices, (a)(2)(B)",
+    "related": [
+      "gmp",
+      "recall"
+    ],
+    "source_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title21-section351&num=0&edition=prelim",
+    "aliases": [
+      "adulterated",
+      "adulteration"
+    ],
+    "easy_en": "A drug deemed adulterated under section 501 of the FD&C Act, including when the methods, facilities or controls used for its manufacture, processing, packing or holding do not conform to current good manufacturing practice."
+  },
+  {
+    "id": "package-leaflet",
+    "term_ko": "환자설명서",
+    "term_en": "Package Leaflet (PIL)",
+    "easy_ko": "의약품 포장마다 들어 있는, 환자 등 최종 사용자를 위한 의약품 정보 안내문입니다.",
+    "definition_source": "European Medicines Agency, Glossary: Package leaflet",
+    "related": [
+      "summary-of-product-characteristics",
+      "labeling-control",
+      "marketing-authorization"
+    ],
+    "source_url": "https://www.ema.europa.eu/en/glossary-terms/package-leaflet",
+    "aliases": [
+      "Patient Information Leaflet",
+      "package leaflet"
+    ],
+    "easy_en": "The leaflet in every pack of medicine that contains information on the medicine for end-users, such as patients and animal owners."
   }
 ]

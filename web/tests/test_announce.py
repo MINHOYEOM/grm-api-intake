@@ -7,7 +7,10 @@ CI(`unittest discover -s tests`)는 `tests/test_web_announce.py` shim 으로 순
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import json
+import os
 import pathlib
 import re
 import sys
@@ -354,6 +357,79 @@ class WeeklyUpdatesBlockTest(unittest.TestCase):
             run_linkcheck=False, updates_html=block)
         self.assertTrue(report.ok, report.text())
         self.assertIn("서비스 소식", teaser["html"])
+
+
+# ── 예약 발송(scheduledAt) ────────────────────────────────────────────────────
+class AnnounceScheduleTest(unittest.TestCase):
+    """예약 발송 — 시각 해석(오프셋 필수·범위)과 send 경로가 sendNow 대신 예약을 거는지."""
+
+    NOW = announce.datetime(2026, 10, 21, 16, 30, tzinfo=announce.timezone.utc)
+
+    def test_kst_offset_converts_to_utc(self):
+        self.assertEqual(announce.parse_schedule_at("2026-10-22T08:00:00+09:00", self.NOW),
+                         "2026-10-21T23:00:00.000Z")
+        self.assertEqual(announce.parse_schedule_at("2026-10-21T23:00:00Z", self.NOW),
+                         "2026-10-21T23:00:00.000Z")
+
+    def test_rejects_naive_past_far_and_garbage(self):
+        for bad in ("2026-10-22T08:00:00",            # 오프셋 없음 → 러너 UTC 로 9시간 어긋남
+                    "2026-10-21T16:35:00Z",           # 10분 이내
+                    "2026-10-20T08:00:00+09:00",      # 과거
+                    "2026-11-05T08:00:00+09:00",      # 7일 초과
+                    "내일 8시"):
+            with self.assertRaises(ValueError, msg=bad):
+                announce.parse_schedule_at(bad, self.NOW)
+
+    def _run_send(self, status_after: str, schedule: bool):
+        calls = []
+
+        class _Fake:
+            def __init__(self, key): pass
+            def find_campaign(self, name):
+                calls.append(("find", name))
+                n_find = sum(1 for c in calls if c[0] == "find")
+                return None if n_find == 1 else {"id": "77", "status": status_after}
+            def create_campaign(self, **kw):
+                calls.append(("create", kw["name"])); return "77"
+            def schedule_campaign(self, cid, at):
+                calls.append(("schedule", cid, at))
+            def send_campaign(self, cid):
+                calls.append(("sendNow", cid))
+
+        env = {"NEWSLETTER_API_KEY": "k", "GRM_NEWSLETTER_SENDER_EMAIL": "s@example.com",
+               "GRM_NEWSLETTER_LIST_ID": "3"}
+        when = (announce.datetime.now(announce.timezone.utc)
+                + announce.timedelta(days=1)).isoformat()
+        argv = ["--id", "2026-10-mfds-inspectors", "--mode", "send", "--no-linkcheck"]
+        if schedule:
+            argv += ["--schedule-at", when]
+        orig, orig_env = newsletter.BrevoSender, dict(os.environ)
+        newsletter.BrevoSender = _Fake
+        os.environ.update(env)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                rc = announce.main(argv)
+        finally:
+            newsletter.BrevoSender = orig
+            os.environ.clear(); os.environ.update(orig_env)
+        return rc, [c[0] for c in calls]
+
+    def test_scheduled_send_never_calls_send_now(self):
+        rc, kinds = self._run_send("queued", schedule=True)
+        self.assertEqual(rc, 0)
+        self.assertIn("schedule", kinds)
+        self.assertNotIn("sendNow", kinds)
+
+    def test_schedule_that_did_not_stick_fails_loudly(self):
+        rc, kinds = self._run_send("draft", schedule=True)
+        self.assertEqual(rc, 1)
+        self.assertNotIn("sendNow", kinds)
+
+    def test_without_schedule_sends_now(self):
+        rc, kinds = self._run_send("sent", schedule=False)
+        self.assertEqual(rc, 0)
+        self.assertIn("sendNow", kinds)
+        self.assertNotIn("schedule", kinds)
 
 
 if __name__ == "__main__":

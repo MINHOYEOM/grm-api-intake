@@ -2,6 +2,20 @@
   "schema_version": "grm-library-updates/v1",
   "entries": [
     {
+      "date": "2026-10-21",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0011-15969"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 116,
+          "truncated": false
+        }
+      }
+    },
+    {
       "date": "2026-10-13",
       "sources": {
         "mfds": {

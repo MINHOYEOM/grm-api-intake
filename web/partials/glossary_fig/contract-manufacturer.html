@@ -1,0 +1,18 @@
+{#- 용어 그림 · contract-manufacturer — 정의("다른 제조업자와의 서면계약에 따라 일부 또는 전부의 제조 작업을 수행하는 제조업자")를
+    두 당사자를 잇는 서면계약 문서 + 다른 제조업자에서 수탁제조업자로 넘어가는 제조 작업 화살표로 옮긴다.
+    작업 단계 수·업체 이름은 쓰지 않는다. 영문 라벨이 길어 두 상자를 세로로 쌓았다. 2026-10-09
+    같은 날 검토 1차 수정: 점선이 두 상자를 감싸는 테두리처럼 보여 문서가 어디에 걸리는지 모호(B) → 두 상자를 문서로 잇는 실선 연결로. -#}
+<svg class="gt-fig-svg" viewBox="0 0 184 88" role="img" aria-label="{{ _('서면계약에 따라 다른 제조업자의 제조 작업을 수행하는 수탁제조업자') }}">
+  <rect x="80" y="4" width="98" height="20" rx="4" style="fill:var(--canvas);stroke:var(--ink);stroke-width:1.6"/>
+  <text x="129" y="17" text-anchor="middle" style="font-size:8px;fill:var(--ink)">{{ _('다른 제조업자') }}</text>
+  <rect x="80" y="62" width="98" height="22" rx="4" style="fill:var(--coral-tint);stroke:var(--coral-2);stroke-width:1.8"/>
+  <text x="129" y="76" text-anchor="middle" style="font-size:8px;font-weight:700;fill:var(--ink)">{{ _('수탁제조업자') }}</text>
+  <line x1="96" y1="24" x2="96" y2="54" style="stroke:var(--coral-2);stroke-width:2"/>
+  <path d="M92 54l4 7 4-7z" style="fill:var(--coral-2)"/>
+  <text x="103" y="40" style="font-size:8.5px;font-weight:700;fill:var(--coral-2)">{{ _('제조 작업') }}</text>
+  <text x="103" y="51" style="font-size:8px;fill:var(--muted)">{{ _('(일부 또는 전부)') }}</text>
+  <rect x="6" y="34" width="16" height="20" rx="2" style="fill:var(--card);stroke:var(--ink);stroke-width:1.6"/>
+  <path d="M10 40h8M10 44h8M10 48h5" style="fill:none;stroke:var(--muted);stroke-width:1.2"/>
+  <text x="26" y="47" style="font-size:8px;fill:var(--muted)">{{ _('서면계약') }}</text>
+  <path d="M14 34V14H80M14 54V73H80" style="fill:none;stroke:var(--ink);stroke-width:1.6"/>
+</svg>

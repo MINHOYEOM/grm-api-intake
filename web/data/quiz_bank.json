@@ -1813,5 +1813,293 @@
       "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample"
     ],
     "explanation_en": "Endotoxin is a lipopolysaccharide component of the cell wall of Gram-negative bacteria which, if present in a medicine, can cause a pyrogenic response (EU GMP Annex 1, 21 CFR 211.113). The others describe depyrogenation, bioburden and the sterility test."
+  },
+  {
+    "id": "q-202641-01",
+    "question_ko": "FDA 가 무균 의약품 생산시설인 Houston Rx LLC 를 실사한 뒤 Form 483 을 발부했습니다. 첫 번째 관찰사항으로 기록된 내용은 무엇인가요?",
+    "choices": [
+      "ISO 5 구역에서 미생물 오염이 확인됨",
+      "작업자가 머리카락·피부가 노출된 상태로 무균 조작을 수행함",
+      "청정도가 낮은 구역에서 높은 구역 쪽으로 차압이 역전됨",
+      "최악조건을 반영하지 않은 배지충전을 수행함"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "첫 관찰은 작업자가 머리카락이나 피부가 노출된 상태로 무균 조작을 수행했다는 내용으로, ISO 5 층류 후드에서 이마 피부를 노출한 작업자가 충전된 바이알에 마개를 올리는 것이 관찰됐습니다. 나머지 셋도 같은 483 에 실린 실제 관찰이지만 첫 관찰은 아닙니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-05/#fda483-195122",
+    "difficulty": "easy",
+    "week": "202641",
+    "question_en": "FDA issued a Form 483 to Houston Rx LLC, a producer of sterile drug products, after an inspection. What was recorded as the first observation?",
+    "choices_en": [
+      "Microbial contamination was found in the ISO 5 area",
+      "Personnel performed aseptic manipulations with exposed hair or skin",
+      "Pressure differentials reversed from less clean areas toward cleaner areas",
+      "Media fills did not reflect worst-case conditions"
+    ],
+    "explanation_en": "The first observation is that personnel performed aseptic manipulations with exposed hair or skin: an operator with exposed skin on her forehead was seen placing stoppers on freshly filled vials in the ISO 5 laminar flow hood. The other three are also real observations in the same 483, but not the first."
+  },
+  {
+    "id": "q-202641-02",
+    "question_ko": "FDA 가 Bentley Laboratories LLC 에 CGMP 위반 경고서한을 발부했습니다. 이 중 21 CFR 211.192 위반으로 지적된 내용은 무엇인가요?",
+    "choices": [
+      "원료 확인·규격 시험 미흡 및 공급업체 시험성적 신뢰성 미검증",
+      "제조·공정 관리에 관한 문서화된 절차 미흡",
+      "여드름 관련 OTC 제품의 미승인 신약·부정표시",
+      "미해명 불일치·규격 부적합에 대한 조사 미흡"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "경고서한은 배치나 구성성분의 미해명 불일치·규격 부적합을 출하 여부와 관계없이 철저히 조사하지 않은 점을 21 CFR 211.192 위반으로 인용했습니다. 원료 시험 미흡은 211.84(d), 제조·공정 관리 절차 미흡은 211.100(a)로 인용됐고, 여드름 관련 OTC 2개 제품은 별도로 미승인 신약·부정표시로 판단됐습니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-05/#87beb6242ff0",
+    "difficulty": "normal",
+    "week": "202641",
+    "question_en": "FDA issued a CGMP Warning Letter to Bentley Laboratories LLC. Which finding was cited as a violation of 21 CFR 211.192?",
+    "choices_en": [
+      "Inadequate component identity and specification testing, with supplier test results not validated",
+      "Inadequate written procedures for production and process control",
+      "Unapproved new drug and misbranding status of acne-related OTC products",
+      "Inadequate investigation of unexplained discrepancies and specification failures"
+    ],
+    "explanation_en": "The letter cited 21 CFR 211.192 for failing to thoroughly investigate unexplained discrepancies and specification failures of a batch or its components, whether or not the batch had been distributed. Inadequate component testing was cited under 211.84(d) and inadequate production and process control procedures under 211.100(a), while two acne-related OTC products were separately found to be unapproved new drugs and misbranded."
+  },
+  {
+    "id": "q-202641-03",
+    "question_ko": "의약품 GMP 에서 말하는 ‘변경관리(Change Control)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "밸리데이션 상태에 영향을 줄 수 있는 변경을 관련 분야 담당자가 공식적으로 검토하고 승인하는 체계",
+      "승인된 지시사항이나 정해진 기준에서 벗어난 상황",
+      "발생한 문제의 재발과 잠재적 문제의 발생을 막기 위해 원인을 조사하고 조치를 실행·확인하는 체계",
+      "절차·공정·설비·물질·활동 또는 시스템이 실제로 기대한 결과를 낸다는 점을 입증하고 문서화하는 활동"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "변경관리는 밸리데이션 상태에 영향을 줄 수 있는 변경을 관련 분야 담당자가 공식적으로 검토하고 승인하는 체계입니다(ICH Q10 §§3.2.2–3.2.3). 나머지는 각각 일탈, 시정 및 예방조치(CAPA), 밸리데이션에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "change-control",
+    "difficulty": "easy",
+    "week": "202641",
+    "question_en": "Which statement about change control in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "A formal system in which representatives of the relevant disciplines review and approve changes that could affect the validated state",
+      "A departure from an approved instruction or an established standard",
+      "A system for investigating causes and implementing and verifying actions so that problems that occurred do not recur and potential problems do not arise",
+      "Demonstrating and documenting that a procedure, process, equipment, material, activity, or system actually gives the expected result"
+    ],
+    "explanation_en": "Change control is a formal system in which representatives of the relevant disciplines review and approve changes that could affect the validated state (ICH Q10 §§3.2.2–3.2.3). The others describe a deviation, corrective and preventive action (CAPA) and validation."
+  },
+  {
+    "id": "q-202641-04",
+    "question_ko": "의약품 GMP 에서 말하는 ‘품질부서(Quality Unit)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "의약품이 의도한 용도에 필요한 품질을 갖도록 영향을 주는 모든 사항을 포괄적으로 마련한 체계",
+      "원료·중간체·포장자재·완제품이 정한 규격에 맞는지 확인하기 위한 규격 설정, 검체채취, 시험과 승인 활동",
+      "생산과 독립되어 품질보증과 품질관리 책임을 수행하는 조직 단위",
+      "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "품질부서는 생산과 독립되어 품질보증과 품질관리 책임을 수행하는 조직 단위입니다(ICH Q10, 21 CFR 211.22). 나머지는 각각 품질보증, 품질관리, 의약품 품질시스템에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "quality-unit",
+    "difficulty": "easy",
+    "week": "202641",
+    "question_en": "Which statement about the quality unit in pharmaceutical GMP is correct?",
+    "choices_en": [
+      "The total arrangement of everything that bears on ensuring a medicine has the quality required for its intended use",
+      "Setting specifications, sampling, testing, and approving so that materials, intermediates, packaging materials, and finished products conform to the defined specifications",
+      "The organisational unit, independent of production, that carries out both quality assurance and quality control responsibilities",
+      "The management system that links organisation, responsibilities, procedures, processes, and resources so that quality objectives are achieved across the product lifecycle"
+    ],
+    "explanation_en": "The quality unit is the organisational unit, independent of production, that carries out both quality assurance and quality control responsibilities (ICH Q10, 21 CFR 211.22). The others describe quality assurance, quality control and the pharmaceutical quality system."
+  },
+  {
+    "id": "q-202642-01",
+    "question_ko": "FDA가 대만의 OTC 의약품 수탁제조소 TCI Co., Ltd BioCosme PABP BRANCH에 보낸 Warning Letter에서 21 CFR 211.165(a) 위반으로 지적된 내용은?",
+    "choices": [
+      "입고 원료의 확인시험을 하지 않고 공급사 시험성적서에 그대로 의존함",
+      "완제품 출하시험에서 유효성분 함량(assay) 시험을 하지 않고 미국에 출하함",
+      "생산·공정 관리에 관한 적절한 서면 절차를 수립하지 않고 제조함",
+      "품질부서가 제품의 CGMP 준수와 규격 충족을 보장할 책임을 이행하지 않음"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "Warning Letter는 완제품 출하 전 유효성분 함량 시험 없이 미국에 출하한 것을 21 CFR 211.165(a) 위반으로 적었습니다. 나머지는 같은 서한의 다른 위반으로, 각각 211.84(d)(1)·(d)(2), 211.100(a), 211.22에 해당합니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-12/#4ca9202786d6",
+    "difficulty": "normal",
+    "week": "202642",
+    "question_en": "In its Warning Letter to TCI Co., Ltd BioCosme PABP BRANCH, a contract manufacturer of OTC drugs in Taiwan, which finding did FDA cite under 21 CFR 211.165(a)?",
+    "choices_en": [
+      "Relying on the supplier's certificate of analysis without performing identity testing on incoming components",
+      "Shipping finished product to the US without testing the active ingredient content (assay) at release",
+      "Manufacturing without establishing adequate written procedures for production and process controls",
+      "The quality unit failing to ensure that products comply with CGMP and meet their specifications"
+    ],
+    "explanation_en": "The Warning Letter cited shipping finished product to the US without testing the active ingredient content before release as a violation of 21 CFR 211.165(a). The other options are separate violations in the same letter, under 211.84(d)(1)/(d)(2), 211.100(a) and 211.22 respectively."
+  },
+  {
+    "id": "q-202642-02",
+    "question_ko": "FDA가 아웃소싱시설 Imprimis NJOF LLC에 발부한 483에서 ‘testing into compliance’라고 규정한 관행은?",
+    "choices": [
+      "무균 안과제품 규격이 공정서 범위를 벗어나는데 과학적 근거를 제시하지 못함",
+      "목시플록사신 주사제에서 관찰된 섬유상 이물의 근본원인을 규명하지 않음",
+      "검증된 불순물·분해산물 시험법 없이 제품 출하를 승인함",
+      "100% 육안검사에 실패한 배치를 조사 완료 전에 재검사·AQL로 출하할 수 있게 함"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "FDA는 100% 육안검사 실패 배치를 조사가 끝나기 전에 재검사와 AQL로 출하할 수 있게 한 절차를 testing into compliance로 지적했습니다(관찰 4). 나머지는 같은 483의 관찰 1·3·6입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-12/#fda483-195190",
+    "difficulty": "easy",
+    "week": "202642",
+    "question_en": "In the Form 483 FDA issued to the outsourcing facility Imprimis NJOF LLC, which practice did FDA describe as 'testing into compliance'?",
+    "choices_en": [
+      "Failing to justify scientifically specifications for sterile ophthalmic products that fall outside compendial ranges",
+      "Not identifying the root cause of fibrous foreign matter seen in moxifloxacin injection products",
+      "Approving product release without validated impurity and degradant test methods",
+      "Allowing batches that failed 100% visual inspection to be re-inspected and released by AQL before the investigation was complete"
+    ],
+    "explanation_en": "FDA cited, as testing into compliance, the procedure that allowed batches failing 100% visual inspection to be re-inspected and released by AQL before the investigation was finished (Observation 4). The other options are Observations 1, 3 and 6 of the same 483."
+  },
+  {
+    "id": "q-202642-03",
+    "question_ko": "무균 주사제 GMP에서 말하는 ‘외관검사(Visual Inspection)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "충전을 마친 용기를 한 개씩 살펴 이물이나 결함이 있는 것을 가려내는 일",
+      "시험결과의 적합 여부를 판단하는 수치 한도, 범위 또는 그 밖의 적절한 기준",
+      "약전에 정한 방법으로 검체에 살아 있는 미생물이 검출되는지 확인하는 시험",
+      "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "외관검사는 충전을 마친 용기를 한 개씩 살펴 이물이나 결함을 가려내는 검사이며, Annex 1은 결함 유형을 분류해 추세를 보고 검사원 적격성을 평가하도록 요구합니다(EU GMP Annex 1 §§8.30–8.32). 나머지는 각각 적합기준, 무균시험, 배치 출하승인에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "visual-inspection",
+    "difficulty": "easy",
+    "week": "202642",
+    "question_en": "In GMP for sterile injectables, which statement correctly describes visual inspection?",
+    "choices_en": [
+      "Examining filled containers one by one to detect and remove those with foreign matter or defects",
+      "Numerical limits, ranges or other suitable measures used to judge whether a test result is acceptable",
+      "A test that checks by the pharmacopoeial method whether viable microorganisms are detected in a sample",
+      "Reviewing a batch's manufacturing and testing records and compliance with requirements to approve it for sale"
+    ],
+    "explanation_en": "Visual inspection means examining filled containers one by one to detect foreign matter or defects, and Annex 1 expects defects to be classified and trended and inspectors to be qualified (EU GMP Annex 1 §§8.30–8.32). The others describe acceptance criteria, the sterility test and batch release."
+  },
+  {
+    "id": "q-202642-04",
+    "question_ko": "의약품 품질관리에서 말하는 ‘시험성적서(Certificate of Analysis, CoA)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "시험항목, 분석절차와 허용기준을 정해 물질이 의도한 용도에 적합한지 판단하는 기준의 집합",
+      "공급업체가 품질요건에 맞는 자재를 지속적으로 제공할 능력이 있는지 평가·승인하는 활동",
+      "배치마다 수행한 시험과 기준, 결과를 적어 품질부서가 날짜·서명해 발행하는 문서",
+      "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "시험성적서는 배치마다 어떤 시험을 어떤 기준으로 했고 결과가 얼마였는지를 적어 품질부서가 날짜·서명해 발행하는 문서입니다(ICH Q7 §§11.40–11.44). 나머지는 각각 규격, 공급업체 적격성평가, 배치 출하승인에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "certificate-of-analysis",
+    "difficulty": "easy",
+    "week": "202642",
+    "question_en": "In pharmaceutical quality control, which statement correctly describes a certificate of analysis (CoA)?",
+    "choices_en": [
+      "The set of tests, analytical procedures and acceptance criteria used to judge whether a material is fit for its intended use",
+      "Evaluating and approving whether a supplier can consistently provide materials that meet quality requirements",
+      "A document issued, dated and signed by the quality unit for each batch, setting out the tests, criteria and results",
+      "Reviewing a batch's manufacturing and testing records and compliance with requirements to approve it for sale"
+    ],
+    "explanation_en": "A certificate of analysis is a document issued, dated and signed by the quality unit for each batch, setting out which tests were performed, against what criteria, and what the results were (ICH Q7 §§11.40–11.44). The others describe a specification, supplier qualification and batch release."
+  },
+  {
+    "id": "q-202643-01",
+    "question_ko": "FDA가 경기도 용인의 Hanlim Pharm Co., Ltd.에 보낸 Warning Letter에서 21 CFR 211.113(b) 위반으로 지적한 내용은?",
+    "choices": [
+      "원료별 확인(identity)·규격 적합성 시험을 하지 않음",
+      "무균공정 구역에 HEPA 여과 양압 공기를 확보하지 않음",
+      "무균을 표방하는 제품의 미생물 오염 방지 절차가 미흡함",
+      "배치·원료 규격 부적합에 대한 조사가 미흡함"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "Warning Letter는 무균을 표방하는 제품의 미생물 오염 방지 절차 미흡을 21 CFR 211.113(b) 위반으로 지적했습니다. 나머지는 같은 주 다른 Warning Letter에서 지적된 별개의 항목입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-19/#8a404f9eaaf8",
+    "difficulty": "normal",
+    "week": "202643",
+    "question_en": "In its Warning Letter to Hanlim Pharm Co., Ltd. in Yongin, Gyeonggi-do, which finding did FDA cite as a violation of 21 CFR 211.113(b)?",
+    "choices_en": [
+      "Not performing identity and specification-conformance testing for each component",
+      "Not providing HEPA-filtered positive-pressure air in the aseptic processing area",
+      "Inadequate procedures to prevent microbial contamination of products purporting to be sterile",
+      "Inadequate investigation of batch and component specification failures"
+    ],
+    "explanation_en": "The Warning Letter cited inadequate procedures to prevent microbial contamination of products purporting to be sterile as a violation of 21 CFR 211.113(b). The other options are separate findings from other Warning Letters issued the same week."
+  },
+  {
+    "id": "q-202643-02",
+    "question_ko": "FDA가 펜실베이니아주 Horsham의 위탁시험기관 Eurofins SF Analytical Laboratories, Inc.에 보낸 Warning Letter에서 21 CFR 211.194(a) 위반으로 지적한 내용은?",
+    "choices": [
+      "시험기록에 데이터가 완전하게 갖춰지지 않음",
+      "원료별 확인시험을 하지 않음",
+      "오염·혼동을 막을 구역을 확보하지 않음",
+      "무균공정 구역에 HEPA 여과 양압 공기를 확보하지 않음"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "Warning Letter는 시험기록의 데이터가 불완전한 점을 21 CFR 211.194(a) 위반으로 지적했습니다. 나머지는 같은 주 다른 Warning Letter에서 지적된 별개의 항목입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-19/#060af7eeccbf",
+    "difficulty": "easy",
+    "week": "202643",
+    "question_en": "In its Warning Letter to Eurofins SF Analytical Laboratories, Inc., a contract testing laboratory in Horsham, Pennsylvania, which finding did FDA cite as a violation of 21 CFR 211.194(a)?",
+    "choices_en": [
+      "Laboratory records that did not include complete data",
+      "Not performing identity testing on each component",
+      "Not providing areas that prevent contamination and mix-ups",
+      "Not providing HEPA-filtered positive-pressure air in the aseptic processing area"
+    ],
+    "explanation_en": "The Warning Letter cited incomplete data in laboratory records as a violation of 21 CFR 211.194(a). The other options are separate findings from other Warning Letters issued the same week."
+  },
+  {
+    "id": "q-202643-03",
+    "question_ko": "의약품 GMP에서 말하는 ‘데이터 완전성(Data Integrity)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "전자기록의 생성·변경·삭제와 그 이유를 시간순으로 재구성할 수 있게 하는 보안된 기록",
+      "활동을 완전히 재구성하고 평가하는 데 필요한 최초 관찰과 그 후의 원본 기록·데이터",
+      "귀속성·가독성·동시성·원본성·정확성을 갖추고 완전성·일관성·영속성·가용성도 유지해야 한다는 원칙",
+      "데이터가 생성부터 폐기까지 완전하고 일관되며 정확하고 신뢰할 수 있는 상태를 유지하는 정도"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "데이터 완전성은 데이터가 생성부터 폐기까지 완전하고 일관되며 정확하고 신뢰할 수 있는 상태를 유지하는 정도입니다(PIC/S PI 041-1, EU GMP Annex 11). 나머지는 각각 감사추적기록, 원자료, ALCOA+ 원칙에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "data-integrity",
+    "difficulty": "easy",
+    "week": "202643",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes data integrity?",
+    "choices_en": [
+      "A secure record that allows the creation, change and deletion of electronic records, and the reasons for them, to be reconstructed in time order",
+      "The original observations and the subsequent original records and data needed to reconstruct and evaluate an activity completely",
+      "The principle that data must be attributable, legible, contemporaneous, original and accurate, and must also stay complete, consistent, enduring and available",
+      "The degree to which data stays complete, consistent, accurate and trustworthy from creation to disposal"
+    ],
+    "explanation_en": "Data integrity is the degree to which data stays complete, consistent, accurate and trustworthy from creation to disposal (PIC/S PI 041-1, EU GMP Annex 11). The others describe an audit trail, raw data and the ALCOA+ principle."
+  },
+  {
+    "id": "q-202643-04",
+    "question_ko": "의약품 품질시스템에서 말하는 ‘근본원인분석(Root Cause Analysis)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "승인된 지시사항이나 정해진 기준에서 벗어난 상황",
+      "문제가 발생한 근본 원인과 기여요인을 찾아 원인에 맞는 시정·예방조치를 정하는 분석",
+      "허가자료, 약전 또는 제조자가 정한 규격이나 허용기준을 벗어난 시험결과",
+      "시험항목, 분석절차와 허용기준을 정해 물질이 의도한 용도에 적합한지 판단하는 기준의 집합"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "근본원인분석은 문제가 발생한 근본 원인과 기여요인을 찾아 원인에 맞는 시정·예방조치를 정하는 분석입니다(ICH Q10 §§3.2.2–3.2.3, 21 CFR 211.192). 나머지는 각각 일탈, 기준 이탈(OOS) 시험결과, 규격에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "root-cause-analysis",
+    "difficulty": "normal",
+    "week": "202643",
+    "question_en": "In a pharmaceutical quality system, which statement correctly describes root cause analysis (RCA)?",
+    "choices_en": [
+      "A departure from an approved instruction or an established standard",
+      "Analysis that finds the underlying cause and contributing factors of a problem so that corrective and preventive action can be matched to the cause",
+      "A test result that falls outside the specification or acceptance criteria in the marketing application, the pharmacopoeia or the manufacturer's own standard",
+      "The set of tests, analytical procedures and acceptance criteria used to judge whether a material is fit for its intended use"
+    ],
+    "explanation_en": "Root cause analysis finds the underlying cause and contributing factors of a problem so that corrective and preventive action can be matched to the cause (ICH Q10 §§3.2.2–3.2.3, 21 CFR 211.192). The others describe a deviation, an out-of-specification (OOS) result and a specification."
   }
 ]

@@ -478,8 +478,11 @@ def has_failures(findings: Iterable[LintFinding]) -> bool:
 # card_scaffold._FORBIDDEN_REPLACEMENTS 와 동일 어휘 + 메타 toggle 회귀 시그니처.
 _FORBIDDEN_LITERALS = (
     "[!NOTE]", "[!WARNING]", "[!IMPORTANT]", "[!TIP]", "[!CAUTION]",
-    "[TOC]", "[toc]", "+++", "<toggle>", "</toggle>",
+    "[TOC]", "[toc]", "<toggle>", "</toggle>",
 )
+# `+++` 토글은 **줄 머리**에 올 때만 문법이다(`+++ 제목`). 문장 속 `+++` 는 실제 표기일 수
+# 있다 — 2026-10-12 #1154: FDA 회수 제품명 "SPF35 PA+++"(자외선 차단 등급)가 FAIL 로 잡혔다.
+_TOGGLE_PLUS_RE = re.compile(r"(?m)^[ \t>]*\+\+\+")
 _TOGGLE_OPEN_RE = re.compile(r"<toggle\b", re.I)   # <toggle> 또는 속성형 <toggle ...>
 _RESIDUAL_TOKEN_RE = re.compile(r"\{\{")
 # 카드 제목 H3 + bold TITLE_ISSUE:  ### [유형 · 기관] 대상 — **핵심이슈**
@@ -526,6 +529,11 @@ def lint_publish_structure(published_markdown: str) -> list[LintFinding]:
                 SEV_FAIL, "PL3-FORBIDDEN-MD", "",
                 f"금지 문법 리터럴 `{lit}` 노출 — 메타는 <details>/<summary>, 목차는 "
                 "<table_of_contents/> 로만(06-15 toggle 회귀 차단)."))
+    if _TOGGLE_PLUS_RE.search(md):
+        findings.append(LintFinding(
+            SEV_FAIL, "PL3-FORBIDDEN-MD", "",
+            "금지 문법 `+++` 토글(줄 머리) 노출 — 메타는 <details>/<summary> 로만"
+            "(06-15 toggle 회귀 차단)."))
     if _TOGGLE_OPEN_RE.search(md) and "<toggle>" not in md:  # 속성형 <toggle ...>
         findings.append(LintFinding(
             SEV_FAIL, "PL3-FORBIDDEN-MD", "",

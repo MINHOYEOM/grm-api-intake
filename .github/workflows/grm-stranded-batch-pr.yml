@@ -263,25 +263,50 @@ jobs:
             }
             const batchFiles = entries.filter((e) => e.type === 'file' && /-batch\.json$/.test(e.name));
 
+            // ★"파일이 남아 있다"≠"미적용"(2026-10-12 #1150 오경보): 적용된 배치는 다음 일일
+            // 배치가 translations/applied/ 로 옮길 때까지 outbox 에 남는다. 일일 배치가 쉬면
+            // (백로그 0·예약작업 정지) 적용 끝난 파일 1개가 48h 를 넘겨 경보가 울렸다.
+            // 그래서 경과 시간이 아니라 "마지막 성공 apply 의 커밋이 그 파일의 마지막 커밋을
+            // 포함하는가"로 판정한다. 포함 안 된 파일이 48h 넘게 묵었을 때만 잔류다.
             let stale = false;
             let lastSuccess = null;
+            let unapplied = [];
             if (batchFiles.length > 0) {
               const { data: runsResp } = await github.rest.actions.listWorkflowRuns({
                 owner, repo, workflow_id: 'grm-findings-translate-apply.yml',
                 status: 'success', per_page: 5,
               });
               lastSuccess = runsResp.workflow_runs[0] || null;
-              const lastSuccessMs = lastSuccess
-                ? new Date(lastSuccess.run_started_at || lastSuccess.created_at).getTime()
-                : 0;
-              stale = !lastSuccess || (Date.now() - lastSuccessMs) > STALE_MS;
+              for (const f of batchFiles) {
+                const { data: commits } = await github.rest.repos.listCommits({
+                  owner, repo, sha: 'main', path: f.path, per_page: 1,
+                });
+                const fileCommit = commits[0] || null;
+                let covered = false;
+                if (lastSuccess && fileCommit) {
+                  const { data: cmp } = await github.rest.repos.compareCommits({
+                    owner, repo, base: fileCommit.sha, head: lastSuccess.head_sha,
+                  });
+                  covered = cmp.status === 'ahead' || cmp.status === 'identical';
+                }
+                if (!covered) {
+                  unapplied.push({
+                    name: f.name,
+                    committedAt: fileCommit ? fileCommit.commit.committer.date : null,
+                  });
+                }
+              }
+              stale = unapplied.some((u) =>
+                !u.committedAt || (Date.now() - new Date(u.committedAt).getTime()) > STALE_MS);
             }
 
             if (!stale) {
               if (batchFiles.length === 0) {
                 console.log('outbox 비어 있음 — apply 체인 정상.');
+              } else if (unapplied.length === 0) {
+                console.log(`outbox ${batchFiles.length}개 전부 적용됨 (${lastSuccess.html_url}) — 아카이브 대기, 정상.`);
               } else {
-                console.log(`최근 성공 apply 실행 있음 (${lastSuccess.html_url}) — 정상.`);
+                console.log(`미적용 ${unapplied.length}개가 48h 이내 — 아직 대기.`);
               }
 
               // 조건이 해소됐는데 이슈가 열려 있으면 닫는다.
@@ -305,7 +330,7 @@ jobs:
             await ensureLabel(LABEL_FAILURE, 'b60205', 'GRM automation failure');
 
             const body = [
-              `translations/outbox/ 에 미적용 배치 파일이 ${batchFiles.length}개 남아 있다 (${batchFiles.map((f) => f.name).join(', ')}).`,
+              `translations/outbox/ 에 마지막 성공 apply 가 포함하지 않은 배치 파일이 ${unapplied.length}개 있다 (${unapplied.map((u) => u.name).join(', ')}).`,
               '',
               lastSuccess
                 ? `마지막 성공 apply 실행: ${lastSuccess.html_url} (${lastSuccess.run_started_at || lastSuccess.created_at})`

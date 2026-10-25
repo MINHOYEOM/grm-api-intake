@@ -131,14 +131,14 @@ class EvaluateSilenceTest(unittest.TestCase):
             "PIC/S": date(2026, 7, 30),                  # 46일 < 90 → 침묵(프로브 OPEN 확인)
             "MHRA GMP NCR": date(2026, 8, 10),           # 35일 < 90 → 침묵(프로브 OPEN 확인)
             "EU GMP NCR (EudraGMDP)": date(2026, 8, 25), # 20일 < 60 → 침묵(프로브 OPEN 확인)
-            "WHO": date(2026, 8, 29),                    # 16일 > 10 → 경고(진짜 신호)
+            "WHO": date(2026, 8, 29),                    # 16일 < 35 → 침묵(피드 08-28→10-01 공백 = 건강, #1160)
             "Health Canada": date(2026, 9, 1),           # 13일 > 10 → 경고(진짜 신호)
             "ICH": None,                                 # 룩백 내내 0건 — 스냅샷 diff 라 제외(설계상 정상)
             "Federal Register": date(2026, 9, 13),       # 정상
             "FDA 483": date(2026, 9, 12),                # 정상
         }
         got = _codes(evaluate_silence(last_seen=seen, run_date=RUN, source_enabled=ALL_ON))
-        self.assertEqual(got, ["Health Canada", "WHO"])
+        self.assertEqual(got, ["Health Canada"])
 
         # 일주일 뒤(2026-09-21, 이슈 #956 이 🚨 7일 연속을 찍던 날)에도 셋은 조용해야 한다.
         week_later = _codes(evaluate_silence(last_seen=seen, run_date=date(2026, 9, 21),
@@ -164,6 +164,7 @@ class EvaluateSilenceTest(unittest.TestCase):
             "PIC/S": 46,
             "MHRA GMP NCR": 35,
             "EU GMP NCR (EudraGMDP)": 20,
+            "WHO": 16,   # 09-03→09-19 — 피드에 새 글 없음(2026-10-15 피드 직접 확인)
         }
         by_source = {w.notion_source: w.silence_days for w in watched_sources()}
         for source, healthy_days in probe_verified_healthy_days.items():

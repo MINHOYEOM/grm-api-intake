@@ -930,6 +930,147 @@
     renderNameIndex(lookInputEl ? lookInputEl.value : "");
   }
 
+  // MFDS는 같은 조회 면·이름순 그룹·문서 멤버십을 사용한다. FDA 호출 계약은 그대로다.
+  function mfdsRpc(name, args) {
+    return fetch(rpcEndpoint(name), {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify(args || {}),
+    }).then(function (response) {
+      if (!response.ok) throw new Error(name + " " + response.status);
+      return response.json();
+    });
+  }
+
+  function mfdsAnnual(target, rows, withDocuments) {
+    target.innerHTML = "";
+    var wrap = el("div", "mfds-table-wrap");
+    var table = el("table", "mfds-table");
+    table.appendChild(el("caption", "", _t("연도별 공개 범위")));
+    var head = el("tr");
+    var labels = [_t("실사연도")];
+    if (withDocuments) labels.push(_t("참여 문서"));
+    labels.push(_t("성명 공개 / 전체 문서"), _t("기관·부서 공개 / 전체 문서"));
+    labels.forEach(function (label) {
+      var th = el("th", "", label); th.setAttribute("scope", "col"); head.appendChild(th);
+    });
+    var thead = el("thead"); thead.appendChild(head); table.appendChild(thead);
+    var tbody = el("tbody");
+    (Array.isArray(rows) ? rows : []).forEach(function (row) {
+      var tr = el("tr");
+      tr.appendChild(el("td", "", row.year || _t("연도 미확인")));
+      if (withDocuments) tr.appendChild(el("td", "", fmtNum(row.documents)));
+      tr.appendChild(el("td", "", fmtNum(row.named_documents) + " / " + fmtNum(row.total_documents)));
+      tr.appendChild(el("td", "", fmtNum(row.table_documents) + " / " + fmtNum(row.total_documents)));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody); wrap.appendChild(table); target.appendChild(wrap);
+  }
+
+  function mfdsCountRow(target, label, count) {
+    target.appendChild(el("li", "", label + " · " + _t("문서 {n}건", { n: fmtNum(count) })));
+  }
+
+  function mfdsDocuments(target, rows) {
+    target.innerHTML = "";
+    (Array.isArray(rows) ? rows : []).forEach(function (doc) {
+      var li = el("li");
+      var href = _docPageHref(root, doc.document_id);
+      var title = el(href ? "a" : "span", "", doc.manufacturer || doc.document_id);
+      if (href) title.href = href;
+      li.appendChild(title);
+      var period = doc.inspection_start || _t("실사일 미확인");
+      if (doc.inspection_end && doc.inspection_end !== doc.inspection_start) period += " – " + doc.inspection_end;
+      li.appendChild(el("span", "mfds-doc-meta", _t("문서 기준 실사기간: {period}", { period: period })));
+      target.appendChild(li);
+    });
+  }
+
+  function runMFDS(params) {
+    var byId = function (id) { return document.getElementById(id); };
+    var panel = byId("mfds-panel");
+    if (!panel) { showState("unavailable"); return; }
+    [loadingEl, unavailableEl, contentEl, lookupEl].forEach(function (node) { if (node) node.hidden = true; });
+    panel.hidden = false;
+    [byId("ip-fda-ai-facts"), byId("ip-fda-ai-translation")].forEach(function (node) { if (node) node.hidden = true; });
+    var mfdsFacts = byId("mfds-ai-facts"); if (mfdsFacts) mfdsFacts.hidden = false;
+    var fdaTab = byId("ip-source-fda"), mfdsTab = byId("ip-source-mfds");
+    if (fdaTab) { fdaTab.classList.remove("on"); fdaTab.removeAttribute("aria-current"); }
+    if (mfdsTab) { mfdsTab.classList.add("on"); mfdsTab.setAttribute("aria-current", "page"); }
+    var unitsView = params.get("view") === "departments";
+    byId(unitsView ? "mfds-view-units" : "mfds-view-people").setAttribute("aria-current", "page");
+    var state = byId("mfds-state");
+    var fail = function () {
+      state.hidden = false;
+      state.textContent = _t("공개 이력을 표시할 수 없습니다.");
+    };
+    if (!url || !key) { fail(); return; }
+    if (unitsView) {
+      mfdsRpc("mfds_inspection_departments").then(function (data) {
+        if (!data || !Array.isArray(data.departments)) throw new Error("invalid departments");
+        mfdsAnnual(byId("mfds-department-years"), data.by_year, false);
+        var list = byId("mfds-department-list"); list.innerHTML = "";
+        data.departments.forEach(function (unit) {
+          var details = el("details", "mfds-unit");
+          details.appendChild(el("summary", "", unit.agency + " · " + unit.dept + " · " +
+            _t("문서 {n}건", { n: fmtNum(unit.documents) })));
+          var years = el("div"); mfdsAnnual(years, unit.by_year, true); details.appendChild(years);
+          list.appendChild(details);
+        });
+        byId("mfds-departments").hidden = false; state.hidden = true;
+      }).catch(fail);
+      return;
+    }
+    var person = params.get("key") || "";
+    if (person) {
+      Promise.all([mfdsRpc("mfds_inspector_profile", { p_inspector_key: person }), _fetchDocPages(assetRoot)])
+        .then(function (out) {
+          var data = out[0];
+          if (!data || !data.display_name) { fail(); return; }
+          byId("mfds-name").textContent = data.display_name;
+          byId("mfds-total").textContent = _t("공개 문서 {n}건", { n: fmtNum(data.totals.documents) });
+          mfdsAnnual(byId("mfds-years"), data.by_year, true);
+          var firms = byId("mfds-firms"); firms.innerHTML = "";
+          (data.manufacturers || []).forEach(function (firm) { mfdsCountRow(firms, firm.manufacturer, firm.documents); });
+          var units = byId("mfds-profile-units"); units.innerHTML = "";
+          (data.by_agency_department || []).forEach(function (unit) { mfdsCountRow(units, unit.agency + " · " + unit.dept, unit.documents); });
+          mfdsDocuments(byId("mfds-docs"), data.documents);
+          var observers = data.observer_documents || [];
+          mfdsDocuments(byId("mfds-observer-docs"), observers);
+          byId("mfds-observer-block").hidden = !observers.length;
+          byId("mfds-profile").hidden = false; state.hidden = true;
+        }).catch(fail);
+      return;
+    }
+    mfdsRpc("mfds_inspector_index").then(function (rows) {
+      var input = byId("mfds-look-input"), target = byId("mfds-index");
+      var draw = function () {
+        target.innerHTML = "";
+        // buildIndexGroups는 이름·키만 남긴다. 건수는 색인의 DOM으로 전달하지 않는다.
+        var groups = buildIndexGroups(filterIndexRows(rows, String(input.value || "").replace(/\s+/g, "")));
+        groups.forEach(function (group, index) {
+          var section = el("section", "ip-idx-group");
+          var heading = el("h3", "ip-idx-letter", group.letter); heading.id = "mfds-letter-" + index;
+          section.appendChild(heading);
+          var ul = el("ul", "ip-idx-list"); ul.setAttribute("aria-labelledby", heading.id);
+          group.items.forEach(function (item) {
+            var li = el("li"), a = el("a", "ip-idx-link", item.display_name);
+            a.href = "?source=mfds&key=" + encodeURIComponent(item.inspector_key);
+            li.appendChild(a); ul.appendChild(li);
+          });
+          section.appendChild(ul); target.appendChild(section);
+        });
+        if (!groups.length) target.appendChild(el("p", "ip-note", _t("표시할 이름이 없습니다.")));
+      };
+      byId("mfds-look-form").addEventListener("submit", function (event) { event.preventDefault(); draw(); });
+      input.addEventListener("input", draw);
+      byId("mfds-lookup").hidden = false; state.hidden = true; draw();
+    }).catch(fail);
+  }
+
+  var sourceParams = new URLSearchParams(window.location.search);
+  if (sourceParams.get("source") === "mfds") { runMFDS(sourceParams); return; }
+
   if (lookFormEl) {
     lookFormEl.addEventListener("submit", function (ev) {
       ev.preventDefault();

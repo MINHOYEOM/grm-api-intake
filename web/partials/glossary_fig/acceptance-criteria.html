@@ -1,11 +1,21 @@
-{#- 용어 그림 · acceptance-criteria — 정의("적합 여부를 판단하는 수치 한도, 범위")를 상한·하한 사이의 띠로 옮긴다.
-    링크드인 카드 '이번 주 용어' 장·용어집 PDF 도 이 파일을 그대로 렌더한다(2026-09-29 단일 원천 — 사본 없음). -#}
-<svg class="gt-fig-svg" viewBox="0 0 176 88" role="img" aria-label="{{ _('상한과 하한 사이의 허용 범위') }}">
-  <rect x="12" y="30" width="152" height="28" style="fill:var(--coral-tint)"/>
-  <line x1="12" y1="30" x2="164" y2="30" style="stroke:var(--coral-2);stroke-width:1.8;stroke-dasharray:5 4"/>
-  <line x1="12" y1="58" x2="164" y2="58" style="stroke:var(--coral-2);stroke-width:1.8;stroke-dasharray:5 4"/>
-  <text x="14" y="24" style="font-size:9px;fill:var(--muted)">{{ _('상한') }}</text>
-  <text x="14" y="70" style="font-size:9px;fill:var(--muted)">{{ _('하한') }}</text>
-  <text x="16" y="47" style="font-size:9px;font-weight:700;fill:var(--coral-2)">{{ _('허용 범위') }}</text>
-  <g style="fill:var(--ink)"><circle cx="106" cy="44" r="3.5"/><circle cx="124" cy="38" r="3.5"/><circle cx="142" cy="48" r="3.5"/><circle cx="158" cy="42" r="3.5"/></g>
+{#- 용어 그림 · acceptance-criteria — 정의("시험결과의 적합 여부를 판단하는 수치 한도, 범위")를 한 눈금 위 허용 범위와,
+    그 범위에 견준 두 결과가 적합·부적합으로 갈리는 판정으로 옮긴다.
+    2026-10-05 다시 그림: 점이 전부 범위 안이라 판정 장면이 없고 공정 밸리데이션(가로 범위 띠 + 점)과 같던 것을,
+    세로 눈금 하나에 안/밖 두 결과를 두고 각각 적합·부적합으로 잇는 판정으로 바꿨다. -#}
+<svg class="gt-fig-svg" viewBox="0 0 150 88" role="img" aria-label="{{ _('허용 범위에 견주어 시험 결과를 적합과 부적합으로 판정') }}">
+  <line x1="30" y1="4" x2="30" y2="68" style="stroke:var(--line-2);stroke-width:1.5"/>
+  <rect x="18" y="30" width="24" height="32" style="fill:var(--coral-tint)"/>
+  <g style="stroke:var(--coral-2);stroke-width:1.8;stroke-dasharray:4 3">
+    <line x1="12" y1="30" x2="48" y2="30"/>
+    <line x1="12" y1="62" x2="48" y2="62"/>
+  </g>
+  <circle cx="30" cy="46" r="4" style="fill:var(--ink)"/>
+  <circle cx="30" cy="14" r="4" style="fill:var(--coral-2)"/>
+  <g style="fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round">
+    <path d="M54 46h30M80 42l4 4-4 4" style="stroke:var(--ink)"/>
+    <path d="M54 14h30M80 10l4 4-4 4" style="stroke:var(--coral-2)"/>
+  </g>
+  <text x="90" y="50" style="font-size:10px;fill:var(--ink)">{{ _('적합') }}</text>
+  <text x="90" y="18" style="font-size:10px;font-weight:700;fill:var(--coral-2)">{{ _('부적합') }}</text>
+  <text x="8" y="81" style="font-size:9px;fill:var(--muted)">{{ _('허용 범위') }}</text>
 </svg>

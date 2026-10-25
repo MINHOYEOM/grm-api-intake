@@ -1,0 +1,24 @@
+{
+  "schema_version": "grm-announce/v1",
+  "id": "2026-10-mfds-inspectors",
+  "date": "2026-10-21",
+  "title": "식약처 실사 통보, 받으셨나요? 실사관 이름만 알면 됩니다",
+  "lede": "그 실사관이 그동안 어느 제조소를 다녀갔는지, 이제 GRM에서 바로 찾아볼 수 있습니다. FDA 483 실사관처럼 식약처 실사관도 이름 하나로 이력을 모아 보여드립니다. 식약처가 공개한 GMP 실태조사 보고서에 적힌 그대로입니다.",
+  "weekly_publish_date": null,
+  "items": [
+    {
+      "label": "이름 하나로, 다녀간 곳 전부",
+      "text": "실사관 이름을 찾으면 그 실사관이 참여한 실태조사가 한 화면에 모입니다. 어느 제조소에 언제 나갔는지 바로 보입니다.",
+      "path": "/findings/inspector/"
+    },
+    {
+      "label": "지방청·부서별로도",
+      "text": "서울·경인·대전 등 지방청과 담당 부서별로, 해마다 어떤 실태조사에 나갔는지 볼 수 있습니다.",
+      "path": "/findings/inspector/"
+    }
+  ],
+  "cta": {
+    "text": "식약처 실사관 찾아보기",
+    "path": "/findings/inspector/"
+  }
+}

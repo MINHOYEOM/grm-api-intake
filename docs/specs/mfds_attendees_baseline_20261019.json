@@ -1,0 +1,19 @@
+{
+  "documents": 682,
+  "by_format": {
+    "pdf": {
+      "documents": 663,
+      "status_counts": {"named": 438, "named_none": 54, "absent": 171, "failed": 0},
+      "document_name_links_including_observers": 1008,
+      "name_keys_including_observers": 127
+    },
+    "hwpx": {
+      "documents": 17,
+      "status_counts": {"named": 14, "named_none": 0, "absent": 3, "failed": 0}
+    },
+    "unknown": {
+      "documents": 2,
+      "status_counts": {"named": 0, "named_none": 0, "absent": 0, "failed": 2}
+    }
+  }
+}

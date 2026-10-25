@@ -447,7 +447,10 @@ class CommittedDataTest(unittest.TestCase):
     # #653)인데 이 둘은 5,985·5,551 자로 군집 밖이고, 1,000 자 넘는 절단은 2021-08-17
     # 부터 있어 온 18 건짜리 기존 계열이다(전부 경고서한 한 소스). 원문(finding_text)
     # 자체가 말줄임표로 끝나므로 번역층 결함도 아니다.
-    BASELINE_UPSTREAM_TRUNCATED = 1340
+    # [2026-10-20] 1340 → 1354. 09-03 이후 주간 갱신이 문서를 더하며 14건 순증했고(사라진 절단 0건)
+    # 전부 FDA 경고서한이다(483 12건은 불변). 기존 건이 새로 잘린 것이 아니라 모집단이 늘어난
+    # 몫이다. 기준선이 09-03 에 멈춰 있어 10-20 갱신 후보(#1181)가 이 가드에서 1354 > 1340 으로 막혔다.
+    BASELINE_UPSTREAM_TRUNCATED = 1354
 
     def test_upstream_truncation_does_not_grow(self):
         bad = [f["finding_id"] for d in self.data["documents"] for f in d["findings"]

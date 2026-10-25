@@ -717,7 +717,12 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     #   임계를 두면 상시 경고가 되어 진짜 무음을 묻는다(2026-09-14 실측: 60일+ 0건이 곧 그 상태).
     #   페이지 자체가 죽거나 파서가 깨지면 `ich_error`(핵심 페이지 섹션 0건 = error)가 잡는다.
     IntakeSourceSpec("ich", "ICH", notion_source=SOURCE_ICH, silence_days=0),
-    IntakeSourceSpec("who", "WHO", notion_source=SOURCE_WHO, silence_days=10),
+    # ★[임계 교정 2026-10-15] WHO 는 "주 1회 이상" 단(10일)이 아니라 **산발** 단이다.
+    #   PQ RSS 게시 간격 실측: 02-09→06-12(123일)·06-12→08-07·08-07→08-28·08-28→10-01.
+    #   신규 적재(RSS+WHOPIR+NOC) 간격도 08-29→09-03→09-19(16일)→…→10-02→(10-15 현재 13일).
+    #   10일 임계로는 건강한 소스가 2~3주마다 경고를 냈다(#1160 — 10-01 글은 10-02 에 정상 적재,
+    #   피드 직접 확인 결과 그 뒤 새 글 없음). 하드 고장은 `who_error`·WHOPIR 0건이 먼저 잡는다.
+    IntakeSourceSpec("who", "WHO", notion_source=SOURCE_WHO, silence_days=35),
     IntakeSourceSpec("hc", "Health Canada", health_code_override="health-canada",
                      notion_source=SOURCE_HC, silence_days=10),
     IntakeSourceSpec("fda483", "FDA 483", notion_source=SOURCE_FDA_483, silence_days=10),

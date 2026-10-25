@@ -83,6 +83,8 @@ jobs:
           # 미설정 시 빈 문자열 → 폼 생략(골든·기존 빌드 영향 0). SITE_BASE_URL 은 render.py
           # 기본값으로 동작하므로(빌드가 신도메인 기본값 사용) 여기선 미배선 유지한다.
           GRM_NEWSLETTER_FORM_ACTION: ${{ vars.GRM_NEWSLETTER_FORM_ACTION }}
+          # 영어 페이지 구독 폼(영문 리스트) — 비어 있으면 영어 페이지엔 구독 문이 없다.
+          GRM_NEWSLETTER_FORM_ACTION_EN: ${{ vars.GRM_NEWSLETTER_FORM_ACTION_EN }}
           # 소유권 인증 토큰 — 배선해 두면 회전 시 repo var 만 바꾸면 됨(코드 수정 0). 미설정
           # var=빈 문자열 전달이지만 render._env_or_default 가 빈 값을 기본 토큰으로 흡수하므로
           # 미설정 시 메타가 사라지지 않는다(무회귀). 설정 시 그 값이 라이브 <head> 에 노출.
@@ -126,6 +128,17 @@ jobs:
         continue-on-error: true
         timeout-minutes: 8
         run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist --months auto
+
+      # ── C2d: GMP 규제 용어집 PDF([마케팅 2026-09-28]) — 비차단. ─────────────────────────
+      #   web/glossary_pdf.py 가 용어사전 정본으로 A4 용어집을 짓고 위와 같은 Chrome 으로
+      #   인쇄한다 → web/dist/files/grm-gmp-glossary.pdf. 구독 확인 메일 → 도착
+      #   페이지(/welcome/)에서만 링크되는 구독자 자료라 sitemap 비등록·_headers 가
+      #   noindex. 만든 뒤 PyMuPDF 로 다시 읽어 용어가 전부 실렸는지 확인한다(모자라면 경고).
+      #   실패해도 배포는 진행한다 — 대신 site_probe 가 라이브 주소의 200 을 매일 본다.
+      - name: Glossary PDF (non-blocking)
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python web/glossary_pdf.py --out web/dist
 
       # 미리보기 산출물(시크릿 미등록·호스트 미연결 시에도 D5 육안검토 가능).
       - name: Upload dist artifact (preview)

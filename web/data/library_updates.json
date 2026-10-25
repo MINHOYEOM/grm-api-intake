@@ -2,6 +2,106 @@
   "schema_version": "grm-library-updates/v1",
   "entries": [
     {
+      "date": "2026-10-21",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0011-15969"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 116,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "date": "2026-10-13",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0010-15306",
+            "data0010-15307"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 115,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "date": "2026-10-02",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0010-15302"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 113,
+          "truncated": false
+        },
+        "pmda": {
+          "new_ids": [
+            "pmda-000283019"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 16,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "date": "2026-10-01",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0011-15967"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 112,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "date": "2026-09-30",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0011-15957",
+            "data0011-15958",
+            "data0011-15960",
+            "data0011-15962",
+            "data0011-15963",
+            "data0011-15966"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 111,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "date": "2026-09-29",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0010-15296",
+            "data0010-15297"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 105,
+          "truncated": false
+        }
+      }
+    },
+    {
       "date": "2026-09-23",
       "sources": {
         "mfds": {

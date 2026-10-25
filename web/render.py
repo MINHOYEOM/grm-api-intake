@@ -65,7 +65,7 @@ GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
 # 영문 파일은 번역본이 아니라 또 하나의 정본이며 h2 순서가 같아야 한다(WebAboutTest 가 고정).
 ABOUT_FILE = WEB_DIR / "data" / "about_content.md"
 ABOUT_EN_FILE = WEB_DIR / "data" / "about_content_en.md"
-# [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 LinkedIn·이메일. 값이 비어 있으면
+# [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 이메일. 값이 비어 있으면
 # 그 링크는 **그리지 않는다**(죽은 링크 금지). 사이트에 그대로 실리므로 공개 주소만 넣는다.
 CONTACT_FILE = WEB_DIR / "data" / "contact.json"
 GLOSSARY_FILE = WEB_DIR / "data" / "glossary.json"   # [용어사전] GMP/규제 용어 커밋 데이터
@@ -73,6 +73,15 @@ GLOSSARY_CASES_FILE = WEB_DIR / "data" / "glossary_cases.json"  # [용어사전�
 # 영어 트리 전용: p_orig_lang=en 모집단에서 다시 센 값. 전체 코퍼스 정본을 재사용하면
 # 영어 /findings/가 보여 줄 수와 카드의 수가 갈라진다.
 GLOSSARY_CASES_EN_FILE = WEB_DIR / "data" / "glossary_cases_en.json"
+# [마케팅 2026-09-28] GMP 용어집 PDF 의 사이트 내 경로(루트 상대). glossary_pdf.py 가 배포 때
+# `dist/` 아래 이 경로로 쓰고, 도착 페이지(welcome/)가 이 경로로 링크한다 — 두 곳이 같은
+# 상수를 본다. 목록에 없는 파일이라 _headers 가 noindex 를 건다. ★glossary/ 아래에 두지
+# 않는다 — 그 아래 디렉터리는 전부 용어 페이지여야 한다(WebGlossaryTermPageTest 의 유령
+# 페이지 가드).
+GLOSSARY_PDF_PATH = "files/grm-gmp-glossary.pdf"
+# 같은 PDF 의 표지 이미지 — 구독 확인 메일(Brevo)이 이 주소의 그림을 싣는다. PDF 와 함께
+# 배포마다 다시 그려 표지의 판 날짜·개수가 메일에서도 낡지 않는다.
+GLOSSARY_PDF_COVER_PATH = "files/grm-gmp-glossary-cover.png"
 GLOSSARY_FIG_DIR = WEB_DIR / "partials" / "glossary_fig"  # [용어 그림] 용어당 정의를 묘사만 하는 SVG partial(있는 것만)
 
 
@@ -1475,15 +1484,15 @@ def load_guide(path: Path = GUIDE_FILE) -> str | None:
 def load_contact(path: Path = CONTACT_FILE) -> dict[str, str]:
     """[소개] 연락처 로드 — 비어 있지 않은 값만 남긴다(빈 값 = 그 링크 미출력).
 
-    허용 키는 linkedin·email 둘뿐이고 값은 문자열이어야 한다. 모르는 키·다른 형·모양이
-    아닌 값은 조용히 무시하지 않고 실패한다 — 운영자가 오타를 낸 자리를 렌더가 숨기면
-    사이트에 잘못된 주소가 그대로 실린다.
+    허용 키는 email 하나뿐이고 값은 문자열이어야 한다(LinkedIn 은 2026-10-11 사이트에서
+    걷었다). 모르는 키·다른 형·모양이 아닌 값은 조용히 무시하지 않고 실패한다 — 운영자가
+    오타를 낸 자리를 렌더가 숨기면 사이트에 잘못된 주소가 그대로 실린다.
     """
     if not path.is_file():
         return {}
     data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict) or set(data) - {"linkedin", "email"}:
-        raise ValueError(f"contact.json 은 linkedin·email 두 키만 허용한다: {path}")
+    if not isinstance(data, dict) or set(data) - {"email"}:
+        raise ValueError(f"contact.json 은 email 키만 허용한다: {path}")
     out: dict[str, str] = {}
     for key, val in data.items():
         if not isinstance(val, str):
@@ -1491,20 +1500,18 @@ def load_contact(path: Path = CONTACT_FILE) -> dict[str, str]:
         val = val.strip()
         if not val:
             continue
-        if key == "linkedin" and not val.startswith("https://"):
-            raise ValueError(f"linkedin 은 https:// 절대 URL 이어야 한다: {val!r}")
         if key == "email" and ("@" not in val or any(c in val for c in " /<>\"'")):
             raise ValueError(f"email 모양이 아니다: {val!r}")
         out[key] = val
     return out
 
 
-# [소개] 본문 md 가 템플릿 위젯을 부르는 자리 — `## 만든 사람 {linkedin}` 처럼 제목 끝에
+# [소개] 본문 md 가 템플릿 위젯을 부르는 자리 — `## 문의 및 정정 요청 {contact}` 처럼 제목 끝에
 # 적는다. 링크·버튼은 md 서브셋이 표현할 수 없어(링크 문법 없음) 템플릿이 그리는데, 그리는
 # **위치**까지 템플릿이 정하면 문안을 손보는 사람이 순서를 못 바꾼다. 슬롯은 섹션에 붙어
 # 다니므로 md 에서 절을 옮기면 위젯도 함께 옮겨간다. 모르는 이름은 조용히 무시하지 않고
 # 즉시 실패한다 — 오타 하나로 연락처가 통째로 사라지는 것이 가장 나쁜 결과다.
-ABOUT_SLOTS: frozenset[str] = frozenset({"linkedin", "contact"})
+ABOUT_SLOTS: frozenset[str] = frozenset({"contact"})
 _ABOUT_SLOT_RE = re.compile(r"\s*\{([a-z][a-z0-9-]*)\}\s*$")
 
 
@@ -2058,6 +2065,17 @@ def build_glossary_view(
             # 한국어 출처명이 남는 건수 — 영어판에서만 화면이 밝힌다(0 이면 문구 없음).
             "ko_only_sources": ko_only_sources if lang != DEFAULT_LANG else 0,
             "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"]} for g in groups]}
+
+
+def build_glossary_size(view: dict[str, Any]) -> dict[str, Any]:
+    """용어 뷰모델 → 낱개 페이지 하단 '사전 전체 규모' 블록 입력(무변형 파생 — 값 재작성 0).
+
+    [마케팅 2026-09-28] 검색으로 용어 하나만 보고 나가는 방문자에게 사전이 얼마나 큰지
+    보여 준다 — 다음에 모르는 용어가 나오면 여기서 찾게. 숫자는 전부 같은 뷰모델에서
+    세므로 색인 페이지의 개수·버킷과 갈라질 수 없고, 배포마다 다시 세니 낡지 않는다."""
+    return {"total": view["total"],
+            "buckets": [{"bucket": g["bucket"], "anchor": g["anchor"], "count": len(g["terms"])}
+                        for g in view["groups"] if g["terms"]]}
 
 
 def build_glossary_index(view: dict[str, Any],
@@ -3411,6 +3429,24 @@ def doc_inspector_line(doc: dict[str, Any], tr: Translator = _KO) -> str:
     return line
 
 
+def doc_mfds_attendees(doc: dict[str, Any]) -> list[dict[str, Any]]:
+    """정적 층은 원문 사실인 이름·참관만 보존한다. 공개 코호트는 재계산하지 않는다."""
+    if doc.get("agency") != "MFDS" or not isinstance(doc.get("mfds_attendees"), list):
+        return []
+    rows, seen = [], set()
+    for row in doc["mfds_attendees"]:
+        if not isinstance(row, dict):
+            continue
+        name, observer = row.get("name"), row.get("is_observer")
+        if not isinstance(name, str) or not re.fullmatch(r"[가-힣]{2,5}", name) or type(observer) is not bool:
+            continue
+        pair = (name, observer)
+        if pair not in seen:
+            seen.add(pair)
+            rows.append({"name": name, "is_observer": observer})
+    return rows
+
+
 def combo_description(combo: dict[str, Any], tr: Translator = _KO) -> str:
     """분류 × 기관 조합 페이지의 meta description — 데이터에서 조립(문구 생성 0).
 
@@ -4084,6 +4120,11 @@ def build_headers_txt() -> str:
         "Permissions-Policy: camera=(), microphone=(), geolocation=()",
     ]
     lines = ["/*"] + [f"  {rule}" for rule in rules]
+    # [마케팅 2026-09-28] 구독 확인 뒤에만 가는 두 경로 — 링크가 사이트 어디에도 없고
+    # sitemap 에도 없지만, 주소가 퍼지면 검색엔진이 주울 수 있어 헤더로도 막는다
+    # (도착 페이지는 템플릿 meta 로도 한 겹 더). PDF 는 meta 를 달 수 없어 헤더가 유일한 길.
+    for path in ("/files/*", "/welcome/*"):
+        lines += [path, "  X-Robots-Tag: noindex"]
     return "\n".join(lines) + "\n"
 
 
@@ -4483,6 +4524,10 @@ NAVER_SITE_VERIFICATION = _env_or_default(
 # 'email' 이 아닌 SaaS 면 템플릿 input name 도 함께 맞춘다). 추적 파라미터는 발송 시점에 SaaS
 # 가 부착 — 우리 카드 원문/공식 URL(provenance 가드 대상)과 무관한 별개 endpoint.
 NEWSLETTER_FORM_ACTION = os.environ.get("GRM_NEWSLETTER_FORM_ACTION", "").strip()
+# [영문 구독 2026-10-18] 영어 페이지의 구독 폼 — 영문 리스트(별도 Brevo 폼·영문 확인 메일)로
+# 들어간다. 비어 있으면 영어 페이지에는 구독 문을 내지 않는다(한국어 리스트로 받지 않는다 —
+# 한국어 메일을 영어 독자에게 보내는 일이 된다).
+NEWSLETTER_FORM_ACTION_EN = os.environ.get("GRM_NEWSLETTER_FORM_ACTION_EN", "").strip()
 
 # 웹 카드 반응 계층(하트·스크랩·회원, S1) — env-param(공개값). SUPABASE_URL·SUPABASE_ANON_KEY
 # 둘 다 설정돼야 활성(reactions_enabled). 미설정(기본·테스트)이면 반응 블록 전체 미출력 →
@@ -4731,7 +4776,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["naver_site_verification"] = NAVER_SITE_VERIFICATION
     env.globals["og_image"] = f"{SITE_BASE_URL}/assets/og-image.png"
     env.globals["og_locale"] = LANG_OG_LOCALE[lang]
-    # [소개 2026-09-06] 연락처(LinkedIn·이메일) — 푸터 법적 줄(전 페이지)과 소개 페이지가
+    # [소개 2026-09-06] 연락처(이메일) —푸터 법적 줄(전 페이지)과 소개 페이지가
     # 같은 값을 본다. 빈 값은 load_contact 가 걸러 내므로 템플릿의 {% if %} 가 링크를
     # 통째로 생략한다(죽은 링크 금지). 영어 env 는 아래 setdefault 복사로 같은 값을 받는다.
     env.globals["contact"] = load_contact()
@@ -4741,6 +4786,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
+    # 용어사전 구역의 "구독하면 용어집 PDF" 제안과 실물 링크(이번 주 소식) — 한국어 리스트의
+    # 확인 메일·도착 페이지(/welcome/)와 짝이라 한국어 환경에서만 켠다. 영어 환경은 아래에서 끈다.
+    env.globals["sub_offer_glossary_pdf"] = True
+    # [구독 언어 선택 2026-10-18] 두 리스트 폼 주소를 양쪽 언어 환경이 모두 받는다 — 구독자가
+    # 받을 메일 언어를 고르면 그 폼으로 보낸다. 기본 선택은 페이지 언어(아래 영어 환경에서 덮는다).
+    env.globals["sub_action_ko"] = _safe_url(NEWSLETTER_FORM_ACTION)
+    env.globals["sub_action_en"] = _safe_url(NEWSLETTER_FORM_ACTION_EN)
+    env.globals["sub_lang_default"] = DEFAULT_LANG
+    env.globals["lang_endonym"] = LANG_ENDONYM
+    env.globals["sub_peek_findings"] = False
     # 자산 캐시버스팅 — grm.css/archive.js content-hash 쿼리(재배포 시 stale CSS 방지·결정론).
     def _asset_ver(name: str) -> str:
         p = assets_dir / name
@@ -4752,11 +4807,13 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["firmjs_ver"] = _asset_ver("firm.js")
     env.globals["checklistjs_ver"] = _asset_ver("checklist.js")
     env.globals["inspectorjs_ver"] = _asset_ver("inspector.js")
+    env.globals["mfdsdocjs_ver"] = _asset_ver("mfds-doc-inspectors.js")
     env.globals["glossaryjs_ver"] = _asset_ver("glossary.js")
     env.globals["quizjs_ver"] = _asset_ver("quiz.js")
     env.globals["growthjs_ver"] = _asset_ver("growth.js")
     env.globals["petcss_ver"] = _asset_ver("pet.css")
     env.globals["petjs_ver"] = _asset_ver("pet.js")
+    env.globals["sitepopupjs_ver"] = _asset_ver("site-popup.js")
     env.globals["popularjs_ver"] = _asset_ver("popular.js")
     # 반응 계층 공개 설정 주입 — url 이 https(_safe_url 통과)이고 anon key 가 있을 때만 활성.
     # 미설정이면 base.html/card.html 의 {% if reactions_enabled %} 가 반응 블록 전체 생략.
@@ -4880,6 +4937,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         en_env.globals.setdefault(_k, _v)
     en_env.globals["_"] = en_tr.template_gettext()
     en_env.globals["og_locale"] = LANG_OG_LOCALE["en"]
+    # [영문 구독 2026-10-18] 영어 페이지는 영문 리스트 폼만 본다(비면 구독 문 없음). 영문 메일의
+    # 주인공은 그 주 새 지적 기록이라 실물 링크도 지적사항 면으로 보낸다.
+    en_env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION_EN)
+    en_env.globals["sub_offer_glossary_pdf"] = False
+    en_env.globals["sub_peek_findings"] = True
+    en_env.globals["sub_lang_default"] = "en"
     en_page, _en_render, en_emit = _make_tree("en", en_env)
     # (언어, page 팩토리, emit, 번역기) — 한국어가 **먼저**여야 산출 순서가 종전과 같다.
     trees: list[tuple[str, Any, Any, Translator]] = [
@@ -5318,7 +5381,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     # [소개 2026-09-06] 소개 페이지 — about_content.md(정본). 이용안내와 같은 관례(커밋
     # 콘텐츠·골든 고정·파일 부재 시 조용히 생략). nav 탭은 늘리지 않는다 — 진입은 전 페이지
-    # 푸터 '서비스' 열의 '소개'다. 연락처(LinkedIn·이메일)는 env.globals["contact"] 가 준다.
+    # 푸터 '서비스' 열의 '소개'다. 연락처(이메일)는 env.globals["contact"] 가 준다.
     if about_md:
         about_title, about_lead, about_sections = render_about_html(about_md)
         emit("about.html", page("about/"),
@@ -5377,6 +5440,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                       if term["id"] in glossary_en_cases]
             glossary_en_excerpts = build_glossary_case_excerpts(
                 glossary_en_case_terms, docs_data, glossary_en_cases, lang="en")
+            glossary_en_size = build_glossary_size(glossary_en_view)
             for group in glossary_en_view["groups"]:
                 for term in group["terms"]:
                     en_emit("glossary_term.html", en_page(f"glossary/{term['id']}/"),
@@ -5388,6 +5452,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         figure_partial=_glossary_figure_partial(term["id"]),
                         case_excerpts=glossary_en_excerpts.get(term["id"]) or [],
                         cases_asof=glossary_cases_measured_on(GLOSSARY_CASES_EN_FILE),
+                        glossary_size=glossary_en_size,
                     )
 
         # [용어사전 낱개] 용어당 1 페이지 — 검색 유입 트랙. 색인 페이지와 **같은 뷰모델**을
@@ -5398,6 +5463,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         #   · case_excerpts 는 커밋된 문서 정본에서 파생한 실제 지적 문장(순위 트랙).
         case_excerpts = build_glossary_case_excerpts(
             glossary_terms, docs_data, load_glossary_cases())
+        glossary_size = build_glossary_size(glossary_view)
         for group in glossary_view["groups"]:
             for term in group["terms"]:
                 emit("glossary_term.html", page(f"glossary/{term['id']}/"),
@@ -5409,8 +5475,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     figure_partial=_glossary_figure_partial(term["id"]),
                     case_excerpts=case_excerpts.get(term["id"]) or [],
                     cases_asof=glossary_cases_measured_on(),
+                    glossary_size=glossary_size,
                 )
                 glossary_term_ids.append(term["id"])
+
+        # [마케팅 2026-09-28] 구독 확인 뒤 도착 페이지(/welcome/) — Brevo 더블 옵트인의 '확인 후 이동'
+        # 주소가 여기를 가리키고, 여기서 GMP 용어집 PDF(glossary_pdf.py 가 배포 때 만든다)를
+        # 받는다. 목록에 없는 페이지다: sitemap·llms·색인 어디에도 넣지 않고, noindex 는
+        # 템플릿(meta_robots)과 _headers(X-Robots-Tag) 두 겹으로 건다. 구독 띠·배너는 방금
+        # 구독을 마친 사람에게 다시 권하지 않도록 끈다(hide_subscribe). 한국어판만 — 영문
+        # 뉴스레터가 없다.
+        emit("glossary_welcome.html", page("welcome/"),
+            page_title=tr("구독이 확인되었습니다 · GRM"),
+            nav_active="welcome",
+            description=tr("GRM 뉴스레터 구독이 확인되었습니다."),
+            glossary_pdf_href=GLOSSARY_PDF_PATH,
+            hide_subscribe=True,
+        )
 
     # [검색 유입] 분류·국가·기관 모음 페이지 — 축 색인 3장 + 항목 페이지 N장.
     # 축 색인을 함께 내는 이유: 항목 페이지가 sitemap 에만 있으면 사이트 구조에서 그
@@ -5975,6 +6056,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
                     inspector_line=doc_inspector_line(doc, _tr),
+                    mfds_attendees=doc_mfds_attendees(doc),
                     # ★없는 페이지로 보내지 않는다 — 분류 모음은 아직 한국어 트리에만
                     #   있다. 영어판에서는 그 링크를 만들지 않고, 같은 업체 기록은
                     #   **영어로 낸 문서만** 남긴다.

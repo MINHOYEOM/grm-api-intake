@@ -654,7 +654,9 @@
     "term_ko": "의약품 품질시스템",
     "term_en": "Pharmaceutical Quality System (PQS)",
     "aliases": [
-      "quality management system"
+      "quality management system",
+      "품질경영시스템",
+      "QMS"
     ],
     "easy_ko": "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계입니다.",
     "definition_source": "ICH Q10, Pharmaceutical Quality System, §§1.2–1.8 and Glossary",
@@ -2416,7 +2418,11 @@
       "21 CFR 211.113"
     ],
     "easy_en": "A test that simulates the entire routine aseptic manufacturing process using a growth medium or a substitute in place of the actual product.",
-    "detail_en": "An APS uses a growth medium to simulate all critical steps, interventions, shifts, and worst case conditions of the routine aseptic process, and so assesses whether the process can be carried out aseptically. Inspections cite omission of genuine interventions and inadequate incubation, growth promotion testing, investigation of contaminated units, or requalification of personnel. Check the APS protocol, video, and batch record, the intervention list, incubation and growth promotion results, failure investigations, and personnel qualification records."
+    "detail_en": "An APS uses a growth medium to simulate all critical steps, interventions, shifts, and worst case conditions of the routine aseptic process, and so assesses whether the process can be carried out aseptically. Inspections cite omission of genuine interventions and inadequate incubation, growth promotion testing, investigation of contaminated units, or requalification of personnel. Check the APS protocol, video, and batch record, the intervention list, incubation and growth promotion results, failure investigations, and personnel qualification records.",
+    "aliases": [
+      "media fill",
+      "배지충진"
+    ]
   },
   {
     "id": "environmental-monitoring",
@@ -4931,5 +4937,18 @@
     ],
     "easy_en": "The record of which lot of which product went to whom, when, and in what quantity — the basis for finding where product is if a recall becomes necessary.",
     "detail_en": "21 CFR 211.196 requires distribution records to contain the name, strength, and dosage form of the product, the name and address of the consignee, the date and quantity shipped, and the lot or control number; 211.150(b) requires a system by which the distribution of each lot can be readily determined to facilitate recall if necessary, and (a) requires a procedure whereby the oldest approved stock is distributed first. If a return is the record of product that came back and a recall is the decision to call product in, the distribution record is the only basis for answering which lot is where and in what quantity when a recall has to be executed — without it the scope of a recall cannot be set. Inspections cite distribution records missing the lot number or the consignee's address, records kept by product rather than by lot, and, in a Canadian finding, a computerised system managing distribution records that had not been validated."
+  },
+  {
+    "id": "summary-of-product-characteristics",
+    "term_ko": "제품특성요약",
+    "term_en": "Summary of Product Characteristics (SmPC)",
+    "easy_ko": "의약품의 특성과 공식적으로 승인된 사용 조건을 적은 문서입니다.",
+    "definition_source": "European Medicines Agency, Glossary: Summary of product characteristics",
+    "related": [
+      "marketing-authorization",
+      "labeling-control"
+    ],
+    "source_url": "https://www.ema.europa.eu/en/glossary-terms/summary-product-characteristics",
+    "easy_en": "A document describing the properties and the officially approved conditions of use of a medicine."
   }
 ]

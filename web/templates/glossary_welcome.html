@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block meta_robots %}
+{#- 구독 확인 뒤에만 오는 페이지 — 목록에 없고 색인하지 않는다(_headers 의 X-Robots-Tag 와 두 겹). -#}
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+{% block content %}
+{#- [마케팅 2026-09-28] 구독 확인 도착 페이지(/welcome/). Brevo 더블 옵트인 확인
+    메일의 버튼이 구독을 확정한 뒤 이리로 보낸다 — 여기서 GMP 용어집 PDF 를 받는다.
+    '구독해야 받는다'가 성립하는 건 이 주소와 PDF 주소가 사이트 어디에도 링크되지 않고
+    확인 메일로만 전달되기 때문이다(잠금이 아니라 비공개 — 받은 사람이 주소를 넘기면 그
+    사람도 받는다. 그건 퍼지는 것이라 막지 않는다). PDF 는 glossary_pdf.py 가 배포 때 만든다.
+    구독 띠·배너는 base.html 이 hide_subscribe 로 접는다. grm.css 프리즈 보존 — 기존 토큰만
+    쓰는 스코프 <style>. §4 한글안전: 자간·대문자·mono 미사용 + 어절 줄바꿈. -#}
+<style>
+  .gw{max-width:620px;margin:0 auto;padding:72px 0 56px;text-align:center}
+  .gw-ic{display:inline-grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--coral);color:var(--on-coral)}
+  .gw h1{font-family:var(--serif);font-size:clamp(26px,4vw,36px);line-height:1.3;color:var(--ink);margin:22px 0 10px;word-break:keep-all}
+  .gw-lede{font-family:var(--sans);font-size:16px;line-height:1.7;color:var(--body);margin:0 0 30px;word-break:keep-all}
+  .gw-card{display:flex;align-items:center;gap:20px;text-align:left;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad);padding:22px 24px;margin:0 0 28px}
+  .gw-cover{flex:none;width:74px;height:104px;border-radius:6px;background:var(--coral);color:var(--on-coral);display:flex;flex-direction:column;justify-content:flex-end;padding:9px;font-family:var(--sans);font-size:11px;line-height:1.35;font-weight:700;word-break:keep-all}
+  .gw-card b{display:block;font-family:var(--sans);font-size:17px;color:var(--ink);margin-bottom:5px}
+  .gw-card p{margin:0 0 14px;font-family:var(--sans);font-size:14px;line-height:1.6;color:var(--muted);word-break:keep-all}
+  .gw-links{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-family:var(--sans);font-size:14px}
+  .gw-links a{color:var(--body);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .gw-links a:hover{color:var(--coral)}
+  @media (max-width:520px){ .gw{padding-top:48px} .gw-card{flex-direction:column;align-items:flex-start} }
+</style>
+<main>
+  <div class="wrap">
+    <div class="gw">
+      <span class="gw-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <h1>{{ _("구독이 확인되었습니다") }}</h1>
+      <p class="gw-lede">{{ _("매주 월요일, 그 주의 글로벌 GMP 규제 소식을 한국어로 보내드립니다.") }}</p>
+      <div class="gw-card">
+        <div class="gw-cover" aria-hidden="true">{{ _("GMP 규제 용어집") }}</div>
+        <div>
+          <b>{{ _("GMP 규제 용어집 PDF") }}</b>
+          <p>{{ _("한·영 대조 · 쉬운 우리말 풀이 · 공식 출처. 구독해 주셔서 드리는 자료입니다.") }}</p>
+          <a class="btn coral" href="{{ rel_root }}{{ glossary_pdf_href }}" download>{{ _("PDF 받기") }} <i class="ti ti-download" aria-hidden="true"></i></a>
+        </div>
+      </div>
+      <nav class="gw-links" aria-label="{{ _('둘러보기') }}">
+        <a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식") }}</a>
+        <a href="{{ rel_root }}glossary/">{{ _("규제 용어사전") }}</a>
+        <a href="{{ rel_root }}findings/index.html">{{ _("지적사항") }}</a>
+      </nav>
+    </div>
+  </div>
+</main>
+{#- 확인까지 마친 사람이다 — 이 브라우저에서는 구독 띠·배너를 다시 권하지 않는다(밴드 스크립트와 같은 키). -#}
+<script>try{localStorage.setItem('grm-sub-ok','1');}catch(_){}</script>
+{% endblock %}

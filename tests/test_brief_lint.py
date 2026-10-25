@@ -464,10 +464,19 @@ class TestPublishStructure(unittest.TestCase):
         self.assertTrue(bl.has_failures(f))
 
     def test_forbidden_toc_and_admonition_fail(self):
-        for bad in ("[toc]", "[TOC]", "[!NOTE]", "[!WARNING]", "+++"):
+        for bad in ("[toc]", "[TOC]", "[!NOTE]", "[!WARNING]"):
             with self.subTest(bad=bad):
                 f = bl.lint_publish_structure(f"text {bad} more")
                 self.assertTrue(any(x.code == "PL3-FORBIDDEN-MD" for x in f))
+
+    def test_plus_toggle_fails_only_at_line_start(self):
+        for bad in ("+++ 메타\n본문\n+++", "본문\n  +++ 메타", "> +++ 메타"):
+            with self.subTest(bad=bad):
+                f = bl.lint_publish_structure(bad)
+                self.assertTrue(any(x.code == "PL3-FORBIDDEN-MD" for x in f))
+        # #1154: 제품명 속 자외선 차단 등급 표기는 문법이 아니다.
+        f = bl.lint_publish_structure("제품: MENOW SUNSCREEN PRESSED POWDER SPF35 PA+++(중국 제조)")
+        self.assertFalse(any(x.code == "PL3-FORBIDDEN-MD" for x in f))
 
     def test_toggle_attribute_form_fails(self):
         f = bl.lint_publish_structure('<toggle open="true">x</toggle>')

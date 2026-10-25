@@ -17,6 +17,39 @@
     </div>
     <p class="gl-count" id="grm-gl-count" data-total="{{ glossary.total }}">{{ _("전체 <b>{n}</b>개 용어", n=glossary.total) }}</p>
   </div>
+  {# [마케팅 2026-09-28] 용어집 PDF 안내 — 구독 폼은 아래 밴드 하나(계측·성공 패널 공유)이고
+      이 카드는 그리로 가는 길이다. 밴드와 같은 게이트(폼 action·한국어) 안에서만 나오고, 이미
+      구독한 브라우저(grm-sub-ok)에서는 밴드가 숨으니 이 카드도 숨는다. #}
+  {% if newsletter_form_action and lang == 'ko' %}
+  {#- 스타일도 게이트 안 — 폼이 꺼진 로컬·CI 빌드에서는 생략돼 골든 byte-diff 0(밴드와 같은 관례). -#}
+  <style>
+/* [마케팅 2026-09-28] 용어집 PDF 안내 카드 — [hidden] 은 author display 에 지므로 짝을 박아 둔다. */
+.gl-pdf{display:flex;align-items:center;gap:16px;margin:4px 0 18px;padding:14px 18px;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad);text-decoration:none;color:var(--body)}
+.gl-pdf[hidden]{display:none}
+.gl-pdf:hover{border-color:var(--coral)}
+.gl-pdf-cv{flex:none;width:44px;height:60px;border-radius:4px;background:var(--coral);color:var(--on-coral);display:flex;align-items:flex-end;padding:5px;font-family:var(--sans);font-size:8.5px;line-height:1.3;font-weight:700;word-break:keep-all}
+.gl-pdf-tx{flex:1;min-width:0;font-family:var(--sans)}
+.gl-pdf-tx b{display:block;font-size:15.5px;color:var(--ink);margin-bottom:2px}
+.gl-pdf-tx span{display:block;font-size:13.5px;line-height:1.55;color:var(--muted);word-break:keep-all}
+.gl-pdf-go{flex:none;font-family:var(--sans);font-size:14px;font-weight:600;color:var(--coral);white-space:nowrap}
+@media (max-width:560px){ .gl-pdf{flex-wrap:wrap} .gl-pdf-go{width:100%} }
+  </style>
+  <div class="wrap"><a class="gl-pdf" id="grm-gl-pdf" href="#grm-sub-form">
+    <span class="gl-pdf-cv" aria-hidden="true">{{ _("GMP 규제 용어집") }}</span>
+    <span class="gl-pdf-tx"><b>{{ _("GMP 규제 용어집 PDF") }}</b><span>{{ _("한·영 대조 · 쉬운 우리말 풀이 · 공식 출처. 구독하면 확인 메일에서 바로 받을 수 있습니다.") }}</span></span>
+    <span class="gl-pdf-go">{{ _("구독하고 받기") }} <i class="ti ti-arrow-down" aria-hidden="true"></i></span>
+  </a></div>
+  <script>
+  (function(){
+    var c=document.getElementById('grm-gl-pdf'); if(!c) return;
+    try{ if(localStorage.getItem('grm-sub-ok')){ c.hidden=true; return; } }catch(_){}
+    c.addEventListener('click',function(){
+      var i=document.getElementById('grm-sub-email');
+      if(i) setTimeout(function(){ try{ i.focus({preventScroll:true}); }catch(_){ i.focus(); } },350);
+    });
+  })();
+  </script>
+  {% endif %}
   {% if glossary.ko_only_sources %}  <p class="wrap gl-note">{{ _("이 사전의 {n}건은 출처나 관련 조항이 한국어 문서·법령이라 그 이름을 원문 그대로 표시합니다.", n=glossary.ko_only_sources) }}</p>
   {% endif %}
   <nav class="wrap gl-index" id="grm-gl-index" aria-label="{{ _('초성 색인') }}">

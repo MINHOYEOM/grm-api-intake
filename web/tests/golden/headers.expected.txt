@@ -4,3 +4,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+/files/*
+  X-Robots-Tag: noindex
+/welcome/*
+  X-Robots-Tag: noindex

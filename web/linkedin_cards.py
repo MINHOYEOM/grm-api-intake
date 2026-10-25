@@ -332,7 +332,6 @@ STR: dict[str, dict[str, Any]] = {
         # [마케팅 2026-09-23] '이번 주 한 건' 캡션(기본, `--caption one`) 전용 고정 문구.
         "one_checks_head": "현장 점검 포인트",
         "one_link_head": "공식 원문과 이번 주 브리프 전체",
-        "one_tags": "#GMP #QA #품질보증 #FDA #제약",
         # [마케팅 2026-09-23 L-06] 월간 결산 덱("이달의 변화 5개 + 숫자 1개") 전용 고정 문구.
         "month_eyebrow": "월간 규제 결산",
         # 제목 줄바꿈은 `|` 로 **구 경계를 직접** 정한다 — split_two 는 폭으로 자르다 "꼭 봐야 /
@@ -385,7 +384,6 @@ STR: dict[str, dict[str, Any]] = {
                      "#QA #FDA #EMA #MHRA #MFDS"],
         "one_checks_head": "What to check on site",
         "one_link_head": "Official sources and the full weekly brief",
-        "one_tags": "#GMP #QA #QualityAssurance #FDA #pharma",
         "month_eyebrow": "Monthly regulatory recap",
         "month_h1": "{mon}:|{n} change{s} worth your time",
         "month_meta": "{k} issue{ks} · {c} card{cs}",
@@ -401,115 +399,52 @@ STR: dict[str, dict[str, Any]] = {
     },
 }
 
-# 용어별 미니 다이어그램(150x88) — 소개 덱과 같은 결. 없는 용어는 일반 문서 아이콘.
-# [영문판 2026-09-15] 도형은 한 벌, 글자만 언어별로 갈린다. SVG 안의 `{key}` 자리를 MINI_LABELS
-# 에서 채운다 — 언어를 더해도 도형이 갈라지지 않고, 빠뜨린 라벨은 KeyError 로 즉시 드러난다
-# (테스트가 두 언어 전부를 실제로 채워 본다). 라틴 라벨(HEPA·Grade A)은 두 언어가 같아 그대로 둔다.
-MINI_SVG = {
-    "endotoxin": """<svg class="mini" viewBox="0 0 150 88"><rect x="22" y="30" width="66" height="28" rx="14" fill="#F4E7DF" stroke="#C2603F" stroke-width="2"/><g stroke="#C2603F" stroke-width="2" stroke-linecap="round"><path d="M36 30v-9M52 30v-10M68 30v-9M82 32v-9M36 58v9M52 58v10M68 58v9M82 56v9"/></g><path d="M92 44h16" stroke="#141413" stroke-width="2" stroke-linecap="round"/><path d="M103 38l6 6-6 6" fill="none" stroke="#141413" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="147" y="48" font-size="12" fill="#BD4B36" font-weight="700" text-anchor="end">{fever}</text><text x="22" y="82" font-size="10" fill="#8E8B82">{lps}</text></svg>""",
-    "aseptic-processing": """<svg class="mini" viewBox="0 0 150 88"><rect x="30" y="6" width="90" height="12" rx="3" fill="#EFE9DE" stroke="#8E8B82" stroke-width="1.5"/><text x="62" y="15" font-size="8" fill="#6C6A64" font-weight="700">HEPA</text><g stroke="#C2603F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M45 24v22M45 46l-4-5M45 46l4-5M75 24v22M75 46l-4-5M75 46l4-5M105 24v22M105 46l-4-5M105 46l4-5"/></g><rect x="66" y="56" width="18" height="24" rx="3" fill="#fff" stroke="#141413" stroke-width="1.8"/><rect x="69" y="51" width="12" height="5" rx="1" fill="#141413"/><text x="92" y="76" font-size="10" fill="#8E8B82">Grade A</text></svg>""",
-    "cross-contamination": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="34" width="44" height="40" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><rect x="92" y="34" width="44" height="40" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><g fill="#C2603F"><circle cx="26" cy="48" r="3"/><circle cx="38" cy="60" r="3"/><circle cx="46" cy="46" r="3"/><circle cx="30" cy="66" r="3"/><circle cx="104" cy="60" r="3"/></g><path d="M60 50c10-12 20-12 30 0" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-dasharray="4 3"/><path d="M86 44l4 6-7 1" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><text x="24" y="26" font-size="10" fill="#6C6A64">{prod_a}</text><text x="102" y="26" font-size="10" fill="#6C6A64">{prod_b}</text></svg>""",
-    "oos": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="26" x2="140" y2="26" stroke="#BD4B36" stroke-width="1.8" stroke-dasharray="5 4"/><text x="12" y="20" font-size="10" fill="#BD4B36" font-weight="700">{spec_upper}</text><polyline points="10,66 28,62 46,65 64,58 82,63 100,18 118,62 140,60" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="100" cy="18" r="5" fill="#BD4B36"/><line x1="10" y1="76" x2="140" y2="76" stroke="#DCD3C7" stroke-width="1.5"/></svg>""",
-    "recall": """<svg class="mini" viewBox="0 0 150 88"><rect x="24" y="52" width="26" height="20" rx="3" fill="#EFE9DE"/><rect x="62" y="36" width="26" height="36" rx="3" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.5"/><rect x="100" y="14" width="26" height="58" rx="3" fill="#C2603F"/><text x="30" y="84" font-size="11" fill="#6C6A64" font-weight="700">III</text><text x="70" y="84" font-size="11" fill="#6C6A64" font-weight="700">II</text><text x="110" y="84" font-size="11" fill="#BD4B36" font-weight="800">I</text><text x="4" y="18" font-size="10" fill="#8E8B82">{risk_up}</text></svg>""",
-    "deviation": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="44" x2="140" y2="44" stroke="#8E8B82" stroke-width="1.6" stroke-dasharray="5 4"/><polyline points="10,44 50,44 74,20 98,44 140,44" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round"/><circle cx="74" cy="20" r="5" fill="#BD4B36"/><text x="12" y="70" font-size="10" fill="#8E8B82">{approved}</text><text x="86" y="16" font-size="10" fill="#BD4B36" font-weight="700">{deviation}</text></svg>""",
-    "process-validation": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="28" width="122" height="30" fill="#F4E7DF"/><g stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"><line x1="14" y1="28" x2="136" y2="28"/><line x1="14" y1="58" x2="136" y2="58"/></g><text x="14" y="21" font-size="10" fill="#BD4B36" font-weight="700">{spec_range}</text><g fill="#141413"><circle cx="40" cy="45" r="4.5"/><circle cx="75" cy="41" r="4.5"/><circle cx="110" cy="47" r="4.5"/></g><text x="6" y="80" font-size="10" fill="#8E8B82">{batch}</text><g font-size="10" fill="#8E8B82" text-anchor="middle"><text x="40" y="80">1</text><text x="75" y="80">2</text><text x="110" y="80">3</text></g></svg>""",
-    "shelf-life": """<svg class="mini" viewBox="0 0 150 88"><line x1="14" y1="24" x2="136" y2="24" stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"/><text x="14" y="18" font-size="10" fill="#BD4B36" font-weight="700">{spec_limit}</text><g stroke="#8E8B82" stroke-width="1.5"><line x1="24" y1="34" x2="24" y2="66"/><line x1="112" y1="34" x2="112" y2="66"/></g><g stroke="#C2603F" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M24 40h88"/><path d="M28 36l-4 4 4 4M108 36l4 4-4 4"/></g><text x="68" y="34" font-size="10" fill="#BD4B36" font-weight="700" text-anchor="middle">{shelf_life}</text><polyline points="24,52 46,53 68,55 90,57 112,59" fill="none" stroke="#141413" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><line x1="14" y1="66" x2="136" y2="66" stroke="#DCD3C7" stroke-width="1.5"/><text x="14" y="82" font-size="10" fill="#8E8B82">{storage}</text></svg>""",
-    "capa": """<svg class="mini" viewBox="0 0 150 88"><g fill="#fff" stroke="#141413" stroke-width="1.6"><rect x="10" y="22" width="36" height="22" rx="4"/><rect x="57" y="22" width="36" height="22" rx="4"/><rect x="104" y="22" width="36" height="22" rx="4"/></g><g font-size="10" fill="#141413" text-anchor="middle"><text x="28" y="37">{cause}</text><text x="75" y="37">{action}</text><text x="122" y="37">{verify}</text></g><g stroke="#C2603F" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M46 33h9M51 29l4 4-4 4M93 33h9M98 29l4 4-4 4"/><path d="M122 44v14H28v-6"/><path d="M24 50l4-5 4 5"/></g><text x="75" y="78" font-size="10" fill="#8E8B82" text-anchor="middle">{prevent}</text></svg>""",
-    "master-standard-documents": """<svg class="mini" viewBox="0 0 150 88"><path d="M9 7v72M9 7h4M9 79h4M9 43h-5" fill="none" stroke="#C2603F" stroke-width="1.5" stroke-linecap="round"/><path d="M14 5h10l5 5v12H14z" fill="#fff" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><path d="M24 5v5h5" fill="none" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><text x="36" y="17" font-size="8" fill="#141413">{d1}</text><path d="M14 26h10l5 5v12H14z" fill="#fff" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><path d="M24 26v5h5" fill="none" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><text x="36" y="38" font-size="8" fill="#141413">{d2}</text><path d="M14 47h10l5 5v12H14z" fill="#fff" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><path d="M24 47v5h5" fill="none" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><text x="36" y="59" font-size="8" fill="#141413">{d3}</text><path d="M14 68h10l5 5v12H14z" fill="#fff" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><path d="M24 68v5h5" fill="none" stroke="#141413" stroke-width="1.3" stroke-linejoin="round"/><text x="36" y="80" font-size="8" fill="#141413">{d4}</text></svg>""",
-    "certificate-of-analysis": """<svg class="mini" viewBox="0 0 150 88"><path d="M30 8h80l10 10v52H30z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M110 8v10h10" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><g stroke="#DCD3C7" stroke-width="1.2"><path d="M38 30h74M38 42h74"/></g><text x="38" y="26" font-size="9" fill="#8E8B82">{test}</text><text x="38" y="38" font-size="9" fill="#8E8B82">{crit}</text><text x="38" y="50" font-size="9" fill="#BD4B36" font-weight="700">{res}</text><path d="M84 58q6-6 11 0t11-3" fill="none" stroke="#C2603F" stroke-width="1.6" stroke-linecap="round"/><text x="75" y="84" font-size="10" fill="#8E8B82" text-anchor="middle">{signed}</text></svg>""",
-    "drug-product": """<svg class="mini" viewBox="0 0 150 88"><rect x="38" y="12" width="74" height="48" rx="5" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><g fill="#fff" stroke="#141413" stroke-width="1.5"><circle cx="58" cy="36" r="7"/><circle cx="75" cy="36" r="7"/><circle cx="92" cy="36" r="7"/></g><path d="M51 36h14M68 36h14M85 36h14" stroke="#141413" stroke-width="1.2" opacity="0.5"/><text x="75" y="74" font-size="10" fill="#BD4B36" text-anchor="middle" font-weight="700">{form}</text><text x="75" y="86" font-size="8" fill="#8E8B82" text-anchor="middle">{packed}</text></svg>""",
-    "impurity": """<svg class="mini" viewBox="0 0 150 88"><rect x="14" y="18" width="122" height="44" rx="8" fill="#EFE9DE" stroke="#DCD3C7" stroke-width="1.5"/><g fill="#8E8B82"><circle cx="32" cy="32" r="4"/><circle cx="52" cy="46" r="4"/><circle cx="72" cy="30" r="4"/><circle cx="96" cy="44" r="4"/><circle cx="118" cy="32" r="4"/><circle cx="40" cy="52" r="4"/></g><circle cx="86" cy="52" r="5.5" fill="#BD4B36"/><path d="M86 58v8" fill="none" stroke="#BD4B36" stroke-width="1.5"/><text x="75" y="80" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{not_intended}</text></svg>""",
-    "finished-product": """<svg class="mini" viewBox="0 0 150 88"><g fill="#EFE9DE" stroke="#8E8B82" stroke-width="1.6"><rect x="6" y="22" width="36" height="26" rx="4"/></g><path d="M45 35h12M52 31l5 4-5 4" fill="none" stroke="#8E8B82" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="60" y="22" width="36" height="26" rx="4" fill="#EFE9DE" stroke="#8E8B82" stroke-width="1.6"/><rect x="70" y="27" width="16" height="16" rx="2" fill="#fff" stroke="#141413" stroke-width="1.4"/><path d="M99 35h12M106 31l5 4-5 4" fill="none" stroke="#C2603F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="114" y="22" width="30" height="26" rx="4" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><path d="M114 32h30" stroke="#C2603F" stroke-width="1.3" stroke-dasharray="3 2"/><text x="24" y="60" font-size="8" fill="#8E8B82" text-anchor="middle">{bulk}</text><text x="78" y="60" font-size="8" fill="#8E8B82" text-anchor="middle">{fill}</text><text x="129" y="60" font-size="8" fill="#BD4B36" text-anchor="middle" font-weight="700">{pack}</text><text x="75" y="82" font-size="9" fill="#8E8B82" text-anchor="middle">{done}</text></svg>""",
-    "qualification": """<svg class="mini" viewBox="0 0 150 88"><rect x="10" y="22" width="44" height="44" rx="5" fill="#EFE9DE" stroke="#141413" stroke-width="1.7"/><path d="M20 44h24M32 34v20" stroke="#8E8B82" stroke-width="1.5"/><path d="M67 28l3.5 3.5L78 23" fill="none" stroke="#C2603F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="32" font-size="9" fill="#8E8B82">{installed}</text><path d="M67 46l3.5 3.5L78 41" fill="none" stroke="#C2603F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="50" font-size="9" fill="#8E8B82">{works}</text><path d="M67 64l3.5 3.5L78 59" fill="none" stroke="#C2603F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="68" font-size="9" fill="#BD4B36" font-weight="700">{results}</text></svg>""",
-    "data-integrity": """<svg class="mini" viewBox="0 0 150 88"><text x="46" y="14" font-size="8" fill="#8E8B82" text-anchor="middle">{created}</text><text x="130" y="14" font-size="8" fill="#8E8B82" text-anchor="middle">{disposed}</text><circle cx="46" cy="30" r="5.5" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><circle cx="74" cy="30" r="5.5" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><circle cx="102" cy="30" r="5.5" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><circle cx="130" cy="30" r="5.5" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><path d="M51.5 30h17" stroke="#C2603F" stroke-width="1.8"/><path d="M79.5 30h17" stroke="#C2603F" stroke-width="1.8"/><path d="M107.5 30h17" stroke="#C2603F" stroke-width="1.8"/><text x="8" y="33" font-size="8" fill="#BD4B36" font-weight="700">{kept}</text><circle cx="46" cy="60" r="5.5" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><circle cx="74" cy="60" r="5.5" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><circle cx="102" cy="60" r="5.5" fill="#fff" stroke="#8E8B82" stroke-width="1.8" stroke-dasharray="3 2"/><circle cx="130" cy="60" r="5.5" fill="#fff" stroke="#8E8B82" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M51.5 60h17" stroke="#C2603F" stroke-width="1.8"/><path d="M107.5 60h17" stroke="#8E8B82" stroke-width="1.8"/><path d="M83 55 l10 10M93 55 l-10 10" stroke="#BD4B36" stroke-width="1.8" stroke-linecap="round"/><text x="8" y="63" font-size="8" fill="#8E8B82">{broken}</text><text x="75" y="82" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{cap}</text></svg>""",
-    "sterility": """<svg class="mini" viewBox="0 0 150 88"><rect x="52" y="18" width="46" height="52" rx="5" fill="#fff" stroke="#141413" stroke-width="1.8"/><rect x="64" y="11" width="22" height="7" rx="2" fill="#141413"/><text x="75" y="54" font-size="30" fill="#BD4B36" text-anchor="middle" font-weight="800">0</text><text x="75" y="84" font-size="10" fill="#8E8B82" text-anchor="middle">{no_micro}</text></svg>""",
-    "documentation": """<svg class="mini" viewBox="0 0 150 88"><path d="M8 22h22l8 8v32H8z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M30 22v8h8" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 36h18M14 43h18M14 50h18" stroke="#C2603F" stroke-width="1.8" stroke-linecap="round"/><path d="M43 42h14M52 38l5 4-5 4" fill="none" stroke="#141413" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 22h22l8 8v32H62z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M84 22v8h8" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M72 44l3.5 3.5L83 39" fill="none" stroke="#C2603F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M97 42h14M106 38l5 4-5 4" fill="none" stroke="#141413" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M116 22h18l8 8v32H116z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M134 22v8h8" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M121 36h15M121 43h15M121 50h15" stroke="#8E8B82" stroke-width="1.8" stroke-linecap="round"/><text x="23" y="78" font-size="9" fill="#8E8B82" text-anchor="middle">{prepare}</text><text x="77" y="78" font-size="9" fill="#8E8B82" text-anchor="middle">{approve}</text><text x="129" y="78" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{control}</text></svg>""",
-    "quality-unit": """<svg class="mini" viewBox="0 0 150 88"><rect x="8" y="22" width="52" height="44" rx="5" fill="#EFE9DE" stroke="#8E8B82" stroke-width="1.6"/><line x1="70" y1="12" x2="70" y2="76" stroke="#DCD3C7" stroke-width="1.6" stroke-dasharray="5 4"/><rect x="80" y="22" width="60" height="44" rx="5" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><g fill="#fff" stroke="#C2603F" stroke-width="1.4"><rect x="87" y="34" width="22" height="18" rx="3"/><rect x="112" y="34" width="22" height="18" rx="3"/></g><text x="98" y="47" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">QA</text><text x="123" y="47" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">QC</text><text x="34" y="78" font-size="9" fill="#8E8B82" text-anchor="middle">{production}</text><text x="110" y="78" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{quality}</text></svg>""",
-    "cleaning-validation": """<svg class="mini" viewBox="0 0 150 88"><line x1="10" y1="26" x2="140" y2="26" stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="5 4"/><text x="10" y="20" font-size="9" fill="#BD4B36" font-weight="700">{limit}</text><rect x="16" y="34" width="38" height="30" rx="4" fill="#fff" stroke="#141413" stroke-width="1.7"/><g fill="#8E8B82"><circle cx="26" cy="44" r="3"/><circle cx="38" cy="52" r="3"/><circle cx="46" cy="42" r="3"/></g><path d="M62 48h20M77 44l5 4-5 4" fill="none" stroke="#141413" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="90" y="34" width="38" height="30" rx="4" fill="#fff" stroke="#141413" stroke-width="1.7"/><circle cx="109" cy="49" r="3" fill="#C2603F"/><text x="35" y="78" font-size="9" fill="#8E8B82" text-anchor="middle">{before}</text><text x="109" y="78" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{after}</text></svg>""",
-    "master-production-record": """<svg class="mini" viewBox="0 0 150 88"><path d="M8 14h30l10 10v36H8z" fill="#F4E7DF" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M38 14v10h10" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 28h22M16 35h22M16 42h22" stroke="#C2603F" stroke-width="1.8" stroke-linecap="round"/><path d="M23 52l3.5 3.5L34 47" fill="none" stroke="#BD4B36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M52 37h12" stroke="#8E8B82" stroke-width="1.5"/><path d="M64 37v-20h8M64 37h8M64 37v20h8" fill="none" stroke="#8E8B82" stroke-width="1.5"/><path d="M82 6h18l6 6v16H82z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M100 6v6h6" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M82 30h18l6 6v16H82z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M100 30v6h6" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M82 54h18l6 6v16H82z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M100 54v6h6" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><text x="28" y="78" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{master}</text><text x="94" y="84" font-size="9" fill="#8E8B82" text-anchor="middle">{each}</text></svg>""",
-    "procedure": """<svg class="mini" viewBox="0 0 150 88"><path d="M40 8h60l10 10v54H40z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M100 8v10h10" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><g fill="#C2603F" font-size="9" font-weight="700"><text x="48" y="30">1</text><text x="48" y="45">2</text><text x="48" y="60">3</text></g><g stroke="#8E8B82" stroke-width="1.6" stroke-linecap="round"><path d="M58 27h42M58 42h42M58 57h30"/></g><text x="75" y="84" font-size="10" fill="#8E8B82" text-anchor="middle">{steps}</text></svg>""",
-    "in-process-control": """<svg class="mini" viewBox="0 0 150 88"><path d="M10 38h130M135 34l5 4-5 4" fill="none" stroke="#8E8B82" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="38" r="9" fill="#fff" stroke="#C2603F" stroke-width="1.8"/><path d="M57 38l3.5 3.5L68 33" fill="none" stroke="#C2603F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 47v12H34v-9" fill="none" stroke="#BD4B36" stroke-width="1.6" stroke-dasharray="4 3"/><path d="M30 52l4-5 4 5" fill="none" stroke="#BD4B36" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="10" y="26" font-size="9" fill="#8E8B82">{during}</text><text x="70" y="64" font-size="9" fill="#BD4B36" font-weight="700">{adjust}</text><text x="140" y="26" font-size="9" fill="#8E8B82" text-anchor="end">{spec}</text></svg>""",
-    "pharmaceutical-quality-system": """<svg class="mini" viewBox="0 0 150 88"><rect x="4" y="3" width="142" height="55" rx="9" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><path d="M18 15v32" stroke="#BD4B36" stroke-width="1.6" stroke-linecap="round"/><circle cx="18" cy="15" r="3.6" fill="#fff" stroke="#BD4B36" stroke-width="1.5"/><text x="29" y="18" font-size="8" fill="#141413">{n1}</text><circle cx="18" cy="31" r="3.6" fill="#fff" stroke="#BD4B36" stroke-width="1.5"/><text x="29" y="34" font-size="8" fill="#141413">{n2}</text><circle cx="18" cy="47" r="3.6" fill="#fff" stroke="#BD4B36" stroke-width="1.5"/><text x="29" y="50" font-size="8" fill="#141413">{n3}</text><path d="M8 70h134M137 66l5 4-5 4" fill="none" stroke="#8E8B82" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="8" y="84" font-size="8" fill="#8E8B82">{cycle}</text><text x="142" y="84" font-size="8" fill="#BD4B36" text-anchor="end" font-weight="700">{goal}</text></svg>""",
-    "quality-risk-management": """<svg class="mini" viewBox="0 0 150 88"><g fill="none" stroke="#C2603F" stroke-width="1.8"><rect x="5" y="14" width="62" height="24" rx="4"/><rect x="79" y="14" width="62" height="24" rx="4"/><rect x="79" y="50" width="62" height="24" rx="4"/><rect x="5" y="50" width="62" height="24" rx="4"/></g><g font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700"><text x="36" y="30">{assess}</text><text x="110" y="30">{control}</text><text x="110" y="66">{communicate}</text><text x="36" y="66">{review}</text></g><g fill="none" stroke="#8E8B82" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M67 26h12m-4-4 4 4-4 4"/><path d="M110 38v12m-4-4 4 4 4-4"/><path d="M79 62H67m4 4-4-4 4-4"/><path d="M36 50v-12m4 4-4-4-4 4"/></g></svg>""",
-    "batch-record": """<svg class="mini" viewBox="0 0 150 88"><path d="M8 10h14l6 6v18H8z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M22 10v6h6" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><text x="33" y="25" font-size="8" fill="#141413">{made}</text><path d="M8 52h14l6 6v18H8z" fill="#fff" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><path d="M22 52v6h6" fill="none" stroke="#141413" stroke-width="1.6" stroke-linejoin="round"/><text x="33" y="67" font-size="8" fill="#141413">{quality}</text><path d="M84 22h4q4 0 4 4v10M84 64h4q4 0 4-4V40" fill="none" stroke="#8E8B82" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M92 38h6M95 34l5 4-5 4" fill="none" stroke="#C2603F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="98" y="24" width="50" height="28" rx="4" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><text x="123" y="41" font-size="8" fill="#BD4B36" text-anchor="middle" font-weight="700">{batch}</text></svg>""",
-    "identification-test": """<svg class="mini" viewBox="0 0 150 88"><rect x="16" y="26" width="26" height="36" rx="3" fill="#fff" stroke="#141413" stroke-width="1.7"/><rect x="22" y="20" width="14" height="6" rx="1.5" fill="#141413"/><rect x="16" y="46" width="26" height="16" rx="0" fill="#8E8B82" opacity="0.35"/><g stroke="#C2603F" stroke-width="2" stroke-linecap="round"><path d="M56 38h22M56 48h22"/></g><rect x="92" y="26" width="26" height="36" rx="3" fill="#fff" stroke="#8E8B82" stroke-width="1.7" stroke-dasharray="4 3"/><rect x="98" y="20" width="14" height="6" rx="1.5" fill="#8E8B82"/><path d="M128 42l3.5 3.5L139 37" fill="none" stroke="#BD4B36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="29" y="78" font-size="9" fill="#8E8B82" text-anchor="middle">{sample}</text><text x="105" y="78" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{intended}</text></svg>""",
-    "batch-number": """<svg class="mini" viewBox="0 0 150 88"><rect x="16" y="16" width="52" height="40" rx="4" fill="#EFE9DE" stroke="#141413" stroke-width="1.7"/><rect x="22" y="28" width="40" height="16" rx="2" fill="#fff" stroke="#C2603F" stroke-width="1.5"/><text x="42" y="40" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="800">LOT</text><text x="42" y="68" font-size="9" fill="#8E8B82" text-anchor="middle">{unique}</text><g fill="none" stroke="#C2603F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M74 36h56m-6-4 6 4-6 4"/></g><g fill="#C2603F"><circle cx="88" cy="36" r="3"/><circle cx="106" cy="36" r="3"/><circle cx="124" cy="36" r="3"/></g><text x="106" y="68" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{trace}</text></svg>""",
-    "starting-material": """<svg class="mini" viewBox="0 0 150 88"><g fill="#EFE9DE" stroke="#141413" stroke-width="1.7"><rect x="10" y="16" width="24" height="30" rx="4"/><rect x="40" y="16" width="24" height="30" rx="4"/></g><path d="M10 24h24M40 24h24" stroke="#8E8B82" stroke-width="1.4"/><path d="M72 31h18M85 27l5 4-5 4" fill="none" stroke="#141413" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="98" y="14" width="38" height="34" rx="5" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><text x="75" y="62" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{used}</text><g stroke="#8E8B82" stroke-width="1.5" fill="none"><rect x="30" y="70" width="16" height="13" rx="2"/><path d="M30 70l16 13M46 70l-16 13"/></g><text x="52" y="80" font-size="9" fill="#8E8B82">{excl_pack}</text></svg>""",
-    "active-ingredient": """<svg class="mini" viewBox="0 0 150 88"><circle cx="40" cy="34" r="24" fill="#EFE9DE" stroke="#141413" stroke-width="1.8"/><path d="M40 10a24 24 0 0 1 0 48z" fill="#C2603F"/><path d="M40 10v48" stroke="#141413" stroke-width="1.6"/><path d="M72 34h20M87 30l5 4-5 4" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M102 24c9 0 9 10 0 10s-9 10 0 10" fill="none" stroke="#BD4B36" stroke-width="1.8" stroke-linecap="round"/><text x="114" y="56" font-size="9" fill="#BD4B36" text-anchor="middle">{effect}</text><rect x="14" y="70" width="9" height="9" rx="2" fill="#C2603F"/><text x="27" y="78" font-size="9" fill="#BD4B36" font-weight="700">{active}</text><rect x="78" y="70" width="9" height="9" rx="2" fill="#EFE9DE" stroke="#8E8B82" stroke-width="1.2"/><text x="91" y="78" font-size="9" fill="#8E8B82">{other}</text></svg>""",
-    "business-operator-recall": """<svg class="mini" viewBox="0 0 150 88"><g stroke="#DCD3C7" stroke-width="1.5" fill="none"><rect x="12" y="6" width="18" height="13" rx="2"/><path d="M12 6l18 13M30 6L12 19"/></g><text x="36" y="17" font-size="9" fill="#8E8B82">{no_order}</text><rect x="10" y="32" width="36" height="32" rx="4" fill="#F4E7DF" stroke="#C2603F" stroke-width="1.8"/><text x="28" y="80" font-size="9" fill="#BD4B36" text-anchor="middle" font-weight="700">{operator}</text><g fill="none" stroke="#C2603F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M108 48H54m6-5-6 5 6 5"/></g><g fill="#8E8B82"><rect x="112" y="30" width="10" height="13" rx="1.5"/><rect x="126" y="30" width="10" height="13" rx="1.5"/><rect x="119" y="52" width="10" height="13" rx="1.5"/></g><text x="124" y="80" font-size="9" fill="#8E8B82" text-anchor="middle">{market}</text></svg>""",
-    "_generic": """<svg class="mini" viewBox="0 0 150 88"><path d="M52 14h30l16 16v44H52z" fill="#fff" stroke="#141413" stroke-width="1.8" stroke-linejoin="round"/><path d="M82 14v16h16" fill="none" stroke="#141413" stroke-width="1.8" stroke-linejoin="round"/><path d="M60 44h30M60 54h30M60 64h20" stroke="#C2603F" stroke-width="2" stroke-linecap="round"/></svg>""",
+# 용어 그림 — ★한 벌뿐이다: 사이트 partial `web/partials/glossary_fig/<id>.html`.
+# [단일 원천 2026-09-29] 카드는 그 partial 을 **사이트와 같은 번역기**(render._make_env)로 렌더하고
+# 색 변수만 카드 팔레트로 바꿔 쓴다. 그 전엔 여기 MINI_SVG 에 사본을 따로 들고 있었는데, 사이트에서
+# 고친 그림 9장이 카드에는 옛 모습 그대로였다 — 정의 밖이라 사이트에서 뺀 "HEPA·Grade A"(무균조작)와
+# "I·II·III 등급 사다리"(회수)가 카드에만 살아 있었다. 두 벌이면 한 벌은 반드시 낡는다.
+# 라벨 번역은 사이트와 같은 en.json 을 쓰고, 카탈로그 결손은 사이트처럼 즉시 실패한다.
+FIG_DIR = WEB_DIR / "partials" / "glossary_fig"
+
+# 사이트 CSS 변수 → 카드 팔레트(2026-09-28 기계 변환 때 쓴 대응표 그대로). 사이트 실제 값과 다르다
+# (사이트 --muted #6C6A64 · 카드 #8E8B82) — 카드는 카드의 결을 따른다. ★표에 없는 변수가 partial 에
+# 나오면 KeyError 로 죽는다 — 모르는 색을 조용히 검정으로 떨어뜨리지 않기 위해서다.
+MINI_COLORS = {
+    "canvas": "#EFE9DE", "card": "#E8E0D2", "soft": "#E8E0D2",
+    "coral": "#C2603F", "coral-2": "#BD4B36", "coral-tint": "#F4E7DF",
+    "ink": "#141413", "line-2": "#DCD3C7", "muted": "#8E8B82",
 }
 
-# 그림 라벨 — 언어별. 영어가 한국어보다 길어 150 폭을 넘기 쉬우니 **짧은 쪽**을 고른다
-# (덱 그림은 카드에서 작게 나와 긴 문장은 어차피 읽히지 않는다).
-MINI_LABELS = {
-    "endotoxin": {"ko": {"fever": "발열", "lps": "그람음성균 세포벽 · LPS"},
-                  "en": {"fever": "Fever", "lps": "Gram-negative wall · LPS"}},
-    "aseptic-processing": {"ko": {}, "en": {}},
-    "cross-contamination": {"ko": {"prod_a": "제품 A", "prod_b": "제품 B"},
-                            "en": {"prod_a": "Product A", "prod_b": "Product B"}},
-    "oos": {"ko": {"spec_upper": "규격 상한"}, "en": {"spec_upper": "Spec limit"}},
-    "recall": {"ko": {"risk_up": "위해도 ↑"}, "en": {"risk_up": "Risk ↑"}},
-    "deviation": {"ko": {"approved": "승인된 지시", "deviation": "일탈"},
-                  "en": {"approved": "Approved", "deviation": "Deviation"}},
-    "process-validation": {"ko": {"spec_range": "규격 범위", "batch": "배치"},
-                           "en": {"spec_range": "Spec range", "batch": "Batch"}},
-    "shelf-life": {"ko": {"spec_limit": "규격 한계", "shelf_life": "유효기간", "storage": "표시된 보관조건"},
-                   "en": {"spec_limit": "Spec limit", "shelf_life": "Shelf life", "storage": "Labelled storage"}},
-    "capa": {"ko": {"cause": "원인", "action": "조치", "verify": "확인", "prevent": "재발 방지"},
-             "en": {"cause": "Cause", "action": "Action", "verify": "Verify", "prevent": "Prevents recurrence"}},
-    "master-standard-documents": {"ko": {"d1": "제품표준서", "d2": "제조관리기준서", "d3": "품질관리기준서", "d4": "제조위생관리기준서"},
-                                 "en": {"d1": "Product standard", "d2": "Manufacturing control", "d3": "Quality control", "d4": "Manufacturing hygiene"}},
-    "certificate-of-analysis": {"ko": {"test": "시험", "crit": "판정 기준", "res": "결과", "signed": "품질부서 날짜·서명"},
-                               "en": {"test": "Test", "crit": "Criteria", "res": "Result", "signed": "Dated and signed by QU"}},
-    "drug-product": {"ko": {"form": "투여형태", "packed": "최종 포장까지"},
-                    "en": {"form": "Dosage form", "packed": "Through final packaging"}},
-    "impurity": {"ko": {"not_intended": "의도하지 않은 성분"},
-                "en": {"not_intended": "Unintended component"}},
-    "finished-product": {"ko": {"bulk": "벌크", "fill": "최종 용기 충전", "pack": "포장", "done": "모든 생산 단계 완료"},
-                        "en": {"bulk": "Bulk", "fill": "Filling", "pack": "Packaging", "done": "All stages complete"}},
-    "qualification": {"ko": {"installed": "설치", "works": "작동", "results": "기대한 결과"},
-                     "en": {"installed": "Installed", "works": "Operates", "results": "As expected"}},
-    "data-integrity": {"ko": {"created": "생성", "disposed": "폐기", "kept": "유지", "broken": "끊김", "cap": "끊김 없이 유지되는 정도"},
-                      "en": {"created": "Creation", "disposed": "Disposal", "kept": "Kept", "broken": "Broken", "cap": "The degree it stays unbroken"}},
-    "sterility": {"ko": {"no_micro": "살아 있는 미생물 없음"},
-                 "en": {"no_micro": "No viable microorganisms"}},
-    "documentation": {"ko": {"prepare": "작성", "approve": "승인", "control": "관리"},
-                     "en": {"prepare": "Prepare", "approve": "Approve", "control": "Control"}},
-    "quality-unit": {"ko": {"production": "생산", "quality": "품질부서"},
-                    "en": {"production": "Production", "quality": "Quality unit"}},
-    "cleaning-validation": {"ko": {"limit": "잔류 한계", "before": "세척 전", "after": "세척 뒤"},
-                           "en": {"limit": "Residue limit", "before": "Before", "after": "After cleaning"}},
-    "master-production-record": {"ko": {"master": "승인된 원본", "each": "배치 기록"},
-                                "en": {"master": "Approved", "each": "Batch records"}},
-    "procedure": {"ko": {"steps": "작업·주의사항·조치"},
-                 "en": {"steps": "Operations and precautions"}},
-    "in-process-control": {"ko": {"during": "제조 중", "adjust": "조정", "spec": "규격"},
-                          "en": {"during": "In process", "adjust": "Adjust", "spec": "Spec"}},
-    "pharmaceutical-quality-system": {"ko": {"n1": "조직·책임", "n2": "절차·공정", "n3": "자원", "cycle": "전 생애주기", "goal": "품질목표"},
-                                     "en": {"n1": "Organisation & roles", "n2": "Procedures & processes", "n3": "Resources", "cycle": "Product lifecycle", "goal": "Quality goals"}},
-    "quality-risk-management": {"ko": {"assess": "평가", "control": "통제", "communicate": "소통", "review": "검토"},
-                               "en": {"assess": "Assess", "control": "Control", "communicate": "Communicate", "review": "Review"}},
-    "batch-record": {"ko": {"made": "제조 과정", "quality": "최종 품질", "batch": "한 배치"},
-                    "en": {"made": "Manufacture", "quality": "Final quality", "batch": "One batch"}},
-    "identification-test": {"ko": {"sample": "검체", "intended": "의도한 물질"},
-                           "en": {"sample": "Sample", "intended": "Intended substance"}},
-    "batch-number": {"ko": {"unique": "고유 번호", "trace": "제조·유통 이력"},
-                    "en": {"unique": "Unique number", "trace": "Traceable"}},
-    "starting-material": {"ko": {"used": "생산에 쓰는 물질", "excl_pack": "포장자재 제외"},
-                         "en": {"used": "Used in production", "excl_pack": "Packaging excluded"}},
-    "active-ingredient": {"ko": {"other": "그 밖의 성분", "active": "유효성분", "effect": "약리작용"},
-                         "en": {"other": "Other", "active": "Active", "effect": "Action"}},
-    "business-operator-recall": {"ko": {"operator": "영업자", "market": "유통품", "no_order": "명령을 기다리지 않고"},
-                                "en": {"operator": "The operator", "market": "Distributed", "no_order": "Without an order"}},
-    "_generic": {"ko": {}, "en": {}},
-}
+# 그림이 없는 용어의 자리 — 일반 문서 아이콘.
+GENERIC_MINI = """<svg class="mini" viewBox="0 0 150 88"><path d="M52 14h30l16 16v44H52z" fill="#fff" stroke="#141413" stroke-width="1.8" stroke-linejoin="round"/><path d="M82 14v16h16" fill="none" stroke="#141413" stroke-width="1.8" stroke-linejoin="round"/><path d="M60 44h30M60 54h30M60 64h20" stroke="#C2603F" stroke-width="2" stroke-linecap="round"/></svg>"""
+
+
+def figure_ids() -> list[str]:
+    """그림이 있는 용어 id 전부(파일 존재 = 커밋된 저장소 상태라 결정론)."""
+    return sorted(p.stem for p in FIG_DIR.glob("*.html"))
+
+
+def has_figure(term_id: str | None) -> bool:
+    return bool(term_id) and (FIG_DIR / f"{term_id}.html").is_file()
+
+
+_FIG_ENVS: dict[str, Any] = {}
 
 
 def mini(fig_id: str, lang: str = "ko") -> str:
-    """용어 id → 미니 다이어그램 SVG(라벨은 lang). 그림이 없는 용어는 일반 문서 아이콘."""
-    key = fig_id if fig_id in MINI_SVG else "_generic"
-    return MINI_SVG[key].format(**MINI_LABELS[key][lang])
+    """용어 id → 카드용 그림 SVG(라벨은 lang). 그림이 없는 용어는 일반 문서 아이콘."""
+    if not has_figure(fig_id):
+        return GENERIC_MINI
+    if lang not in _FIG_ENVS:
+        _FIG_ENVS[lang] = render._make_env(lang)
+    out = _FIG_ENVS[lang].get_template(f"partials/glossary_fig/{fig_id}.html").render()
+    m = re.search(r"<svg\b.*</svg>", out, re.S)
+    if not m:
+        raise ValueError(f"용어 그림 partial 에 <svg> 가 없다: {fig_id}")
+    svg = m.group(0).replace('class="gt-fig-svg"', 'class="mini"', 1)
+    svg = re.sub(r"var\(--([a-z0-9-]+)\)", lambda v: MINI_COLORS[v.group(1)], svg)
+    return re.sub(r">\s+<", "><", svg)
 
 _S = 'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"'
 ICO = {
@@ -771,7 +706,7 @@ def pick_glossary_terms(glossary: list[dict], cards: list[dict], n: int = 5,
         if cards and df / len(cards) > 0.4:
             score //= 3
         if score:
-            scored.append((-score, -head_strong, 0 if t.get("id") in MINI_SVG else 1, idx, t))
+            scored.append((-score, -head_strong, 0 if has_figure(t.get("id")) else 1, idx, t))
     scored.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
     return [t for _, _, _, _, t in scored[:n]]
 
@@ -854,6 +789,83 @@ def _one_extra_fact(card: dict, lang: str) -> str:
     return ""
 
 
+# [마케팅 2026-10-12] 게시물 해시태그 — 고정 5개 대신 그 주 카드에 맞춘 태그(검색·피드 노출용).
+# 기본 태그(넓은 독자) + 기관 + 문서 유형 + 주제(정본 한국어 문구에서 키워드로 판별) 순, 최대 8개.
+# 판별은 늘 한국어 정본으로 하고 `lang` 은 표기만 고른다(`_kind_chip` 와 같은 규칙).
+_TAG_BASE = {"ko": ["#GMP", "#QA", "#제약바이오"], "en": ["#GMP", "#QualityAssurance", "#pharma"]}
+_TAG_MAX = 8
+_TAG_AGENCY = {"FDA": ("#FDA", "#FDA"), "MFDS": ("#식약처", "#MFDS"), "EMA": ("#EMA", "#EMA"),
+               "MHRA": ("#MHRA", "#MHRA"), "Health Canada": ("#HealthCanada", "#HealthCanada"),
+               "WHO": ("#WHO", "#WHO"), "EudraGMDP": ("#EUGMP", "#EUGMP"), "EU": ("#EUGMP", "#EUGMP")}
+# (정규식, 국문 태그, 영문 태그) — 앞에 있을수록 먼저 고른다. 세척 밸리데이션은 밸리데이션보다 앞.
+_TAG_TOPICS: list[tuple[re.Pattern, str, str]] = [
+    (re.compile(r"무균s?시험|sterility test", re.I), "#무균시험", "#SterilityTesting"),
+    (re.compile(r"무균|aseptic", re.I), "#무균공정", "#AsepticProcessing"),
+    (re.compile(r"데이터\s?(완전성|무결성)|감사\s?추적|audit trail", re.I), "#데이터완전성", "#DataIntegrity"),
+    (re.compile(r"\bOOS\b|규격\s?이탈"), "#OOS", "#OOS"),
+    (re.compile(r"\bCAPA\b|시정\s?(및\s?)?예방"), "#CAPA", "#CAPA"),
+    (re.compile(r"세척"), "#세척밸리데이션", "#CleaningValidation"),
+    (re.compile(r"밸리데이션|적격성\s?평가|공정\s?검증"), "#밸리데이션", "#Validation"),
+    (re.compile(r"교차\s?오염"), "#교차오염", "#CrossContamination"),
+    (re.compile(r"환경\s?모니터링"), "#환경모니터링", "#EnvironmentalMonitoring"),
+    (re.compile(r"엔도톡신|내독소"), "#엔도톡신", "#Endotoxin"),
+    (re.compile(r"일탈"), "#일탈관리", "#DeviationManagement"),
+    (re.compile(r"안정성\s?시험"), "#안정성시험", "#StabilityTesting"),
+    (re.compile(r"임상시험(용)?\s?의?약"), "#임상시험약", "#ClinicalTrials"),
+    (re.compile(r"위탁|수탁|\bCDMO\b|\bCMO\b"), "#CDMO", "#CDMO"),
+    (re.compile(r"원료\s?의약품|\bAPI\b"), "#원료의약품", "#API"),
+    (re.compile(r"바이오\s?의약품"), "#바이오의약품", "#Biologics"),
+]
+
+
+def _kind_tag(card: dict, lang: str) -> str:
+    i = 0 if lang == "ko" else 1
+    if str(card.get("group") or "") == "Recall":
+        return ("#의약품회수", "#DrugRecall")[i]
+    if is_warning_letter(card):
+        return ("#경고서한", "#WarningLetter")[i]
+    if "483" in str(card.get("id") or "") or "483" in str(card.get("type_tag") or ""):
+        return "#FDA483"
+    if is_mfds_action(card):
+        return ("#행정처분", "#RegulatoryAction")[i]
+    if is_mfds_inspection(card) or "실사" in str(card.get("type_tag") or ""):
+        return ("#GMP실사", "#GMPInspection")[i]
+    if "비준수" in str(card.get("type_tag") or "") or "비준수" in str(card.get("card_type") or ""):
+        return ("#GMP비준수", "#GMPNonCompliance")[i]
+    return ""
+
+
+def hashtags(cards: list[dict], lang: str = "ko") -> str:
+    """카드들(한 건 캡션이면 1장, 월간 결산이면 여러 장)에 맞춘 해시태그 한 줄.
+    기관·유형은 가장 많이 나온 것 하나씩, 주제는 많이 나온 순(동률은 `_TAG_TOPICS` 순)으로 채운다."""
+    i = 0 if lang == "ko" else 1
+    agencies: dict[str, int] = {}
+    kinds: dict[str, int] = {}
+    topics: dict[int, int] = {}
+    for c in cards:
+        a = _TAG_AGENCY.get(_agency(c))
+        if a:
+            agencies[a[i]] = agencies.get(a[i], 0) + 1
+        k = _kind_tag(c, lang)
+        if k:
+            kinds[k] = kinds.get(k, 0) + 1
+        text = " ".join([_text_of(c), " ".join(_card_list(c, "checks")), " ".join(_card_list(c, "key_facts")),
+                         str(c.get("modality") or ""), str(c.get("type_tag") or "")])
+        for n, (pat, _ko, _en) in enumerate(_TAG_TOPICS):
+            if pat.search(text):
+                topics[n] = topics.get(n, 0) + 1
+    tags = list(_TAG_BASE[lang])
+    top = lambda d: sorted(d, key=lambda k: -d[k])     # dict 는 삽입순 — 동률이면 먼저 나온 것
+    picks = top(agencies)[:1] + top(kinds)[:1] + \
+        [_TAG_TOPICS[n][1 + i] for n in sorted(topics, key=lambda n: (-topics[n], n))]
+    for tg in picks:
+        if len(tags) >= _TAG_MAX:
+            break
+        if tg.lower() not in {x.lower() for x in tags}:
+            tags.append(tg)
+    return " ".join(tags)
+
+
 def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str | None:
     """'이번 주 한 건' 캡션([마케팅 2026-09-23 계획 L-02, 09-23 개정] 게시 본문 기본형,
     `--caption one`).
@@ -912,7 +924,7 @@ def _caption_one(heads: list[dict], caption_url: str, lang: str, firm_fn) -> str
     lines.append(t["one_link_head"])
     lines.append(caption_url)
     lines.append("")
-    lines.append(t["one_tags"])
+    lines.append(hashtags([card], lang))
     return "\n".join(lines) + "\n"
 
 
@@ -1380,7 +1392,7 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
     lines.append(t["month_link_head"])
     lines.append(caption_url)
     lines.append("")
-    lines.append(t["one_tags"])
+    lines.append(hashtags([card for card, _pub, _rank in items], lang))
     caption = "\n".join(lines) + "\n"
 
     return {"pub": month, "lang": lang, "slides": slides, "caption": caption,

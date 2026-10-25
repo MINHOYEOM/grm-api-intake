@@ -299,8 +299,10 @@ class WorkflowYamlTest(unittest.TestCase):
     def setUpClass(cls):
         cls.text = WORKFLOW.read_text(encoding="utf-8")
 
-    def test_cron_is_monday_0923_kst(self):
-        self.assertIn("'23 0 * * 1'", self.text)
+    def test_no_schedule_manual_only(self):
+        # 2026-09-28 예약 해제 — 매일 성장 일보·/admin 과 겹쳐 수동 실행만 남겼다.
+        self.assertNotIn("schedule:", self.text)
+        self.assertIn("workflow_dispatch:", self.text)
 
     def test_mode_flag_present(self):
         self.assertIn("--mode", self.text)

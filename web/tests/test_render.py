@@ -469,10 +469,12 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             self.assertTrue((self.out / rel).exists(), f"라이브 렌더 누락: {rel}")
 
     # ── 언어판 (라이브 데이터에서만 보이는 것들) ────────────────────────────
-    #: 영어 짝이 **없어도 되는** 한국어 최상위 섹션. 지금은 비어 있다(§7 완료).
-    #: 여기에 무언가를 더할 때는 왜 영어로 낼 수 없는지를 함께 적는다 — 빈 채로 두는
-    #: 것이 정상이고, 채워지는 순간 그건 되돌릴 일이 생겼다는 뜻이다.
-    KO_ONLY_SECTIONS: tuple[str, ...] = ()
+    #: 영어 짝이 **없어도 되는** 한국어 최상위 섹션.
+    #: 여기에 무언가를 더할 때는 왜 영어로 낼 수 없는지를 함께 적는다 — 콘텐츠 섹션이
+    #: 여기 들어오는 순간 그건 되돌릴 일이 생겼다는 뜻이다.
+    #:   · `welcome/` (2026-09-28) — 뉴스레터 구독 확인 도착 페이지. 영문 뉴스레터가 없어
+    #:     영어 구독 확인이라는 사건 자체가 없다(콘텐츠가 아니라 구독 흐름의 한 칸).
+    KO_ONLY_SECTIONS: tuple[str, ...] = ("welcome/",)
 
     def test_every_korean_section_has_an_english_counterpart(self):
         """★[2026-09-05] 종전엔 "영어에 아직 없는 섹션" **손목록**을 픽스처 빌드에서 봤다.
@@ -8254,6 +8256,88 @@ class WebRenderHardeningTest(unittest.TestCase):
         self.assertNotIn("javascript:alert", h_bad)
         self.assertNotIn('class="subscribe"', h_bad)
 
+    def test_english_pages_subscribe_only_to_the_english_list(self):
+        """[영문 구독 2026-10-18] 영어 페이지의 구독 문은 **영문 리스트 폼**만 쓴다.
+        한국어 폼만 설정된 빌드에서 영어 페이지에 구독 문이 생기면, 영어 독자가 한국어 메일
+        리스트에 들어간다 — 그래서 영문 폼 값이 비면 영어 페이지엔 아무 구독 문도 없어야 한다."""
+        a0, e0 = render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN
+        ko_action = "https://ko.example.com/subscribe"
+        en_action = "https://en.example.com/subscribe"
+        try:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, ""
+            out_ko_only = self._render_site([_minimal_brief("2026-06-07")])
+            en_home_off = (out_ko_only / "en/index.html").read_text(encoding="utf-8")
+            render.NEWSLETTER_FORM_ACTION_EN = en_action
+            out = self._render_site([_minimal_brief("2026-06-08")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
+        self.assertNotIn('class="subscribe"', en_home_off)
+        self.assertNotIn('id="grm-cta"', en_home_off)
+        self.assertNotIn(ko_action, en_home_off)
+
+        ko_home = (out / "index.html").read_text(encoding="utf-8")
+        en_home = (out / "en/index.html").read_text(encoding="utf-8")
+        en_glossary = (out / "en/glossary/index.html").read_text(encoding="utf-8")
+        en_findings = (out / "en/findings/index.html").read_text(encoding="utf-8")
+        # 각 언어는 자기 리스트 폼만(밴드·배너 두 자리 모두).
+        self.assertIn(f' action="{ko_action}"', ko_home)
+        # 기본 action 은 페이지 언어 리스트 — 다른 리스트 주소는 언어 선택지(data-action)에만 있다.
+        self.assertNotIn(f' action="{en_action}"', ko_home)
+        for name, html in (("home", en_home), ("glossary", en_glossary), ("findings", en_findings)):
+            self.assertIn('class="subscribe"', html, f"en {name}: 밴드가 없다")
+            self.assertIn('id="grm-cta"', html, f"en {name}: 배너가 없다")
+            self.assertEqual(html.count(f' action="{en_action}"'), 2, f"en {name}: 영문 폼 두 자리")
+            self.assertNotIn(f' action="{ko_action}"', html, f"en {name}: 한국어 리스트 폼이 기본값이 됐다")
+            # 구독 문안이 "한국어로 보내 드린다"고 말하면 안 된다(푸터의 "in Korean and English"
+            # 서비스 소개는 다른 문장이라 이 문구로 좁혀 본다).
+            self.assertNotIn("Monday in Korean", html, f"en {name}: 구독 문안이 '한국어로'라고 말한다")
+            self.assertNotIn("findings in Korean", html, f"en {name}: 구독 문안이 '한국어로'라고 말한다")
+        # 영어 용어사전 구역은 한국어 리스트 전용 PDF 제안이 아니라 기본 문안으로 접힌다.
+        self.assertNotIn("Glossary PDF", en_glossary)
+        self.assertIn("<h2>New GMP inspection findings, every Monday</h2>", en_glossary)
+        self.assertIn("<h2>Get new findings like these every Monday</h2>", en_findings)
+        # 실물 링크 — 영문 메일의 주인공(지적 기록) 면으로.
+        self.assertIn("See recent findings first", en_home)
+        self.assertNotIn("최근 지적 기록 먼저 보기", ko_home)
+
+    def test_subscriber_chooses_mail_language_when_both_lists_exist(self):
+        """[구독 언어 선택 2026-10-18] 두 리스트 폼이 모두 있으면 밴드·배너 양쪽에 '받을 메일
+        언어' 선택지가 생긴다. 기본 선택 = 페이지 언어, 각 선택지는 자기 리스트 폼 주소를 갖는다.
+        한쪽 폼만 있으면 선택지는 없다(고를 게 없다). 라디오 값은 Brevo 로 보내지 않는다."""
+        import re as _re
+        a0, e0 = render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN
+        ko_action = "https://ko.example.com/subscribe"
+        en_action = "https://en.example.com/subscribe"
+        try:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = ko_action, ""
+            only_ko = (self._render_site([_minimal_brief("2026-06-09")]) / "index.html").read_text(encoding="utf-8")
+            render.NEWSLETTER_FORM_ACTION_EN = en_action
+            out = self._render_site([_minimal_brief("2026-06-10")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION, render.NEWSLETTER_FORM_ACTION_EN = a0, e0
+        self.assertIn('class="subscribe"', only_ko)
+        self.assertNotIn("data-sub-lang", only_ko)
+
+        for path, default, legend in (("index.html", "ko", "받을 메일 언어"),
+                                      ("en/index.html", "en", "Email language"),
+                                      ("en/findings/index.html", "en", "Email language")):
+            html = (out / path).read_text(encoding="utf-8")
+            self.assertEqual(html.count('<fieldset class="sub-lang" data-sub-lang hidden>'), 2,
+                             f"{path}: 밴드·배너 두 자리에 선택지")
+            self.assertIn(f"<legend>{legend}</legend>", html)
+            radios = _re.findall(r'<input type="radio" name="grm_sub_lang"[^>]*>', html)
+            self.assertEqual(len(radios), 4, path)
+            for r in radios:
+                lg = _re.search(r'value="(\w+)"', r).group(1)
+                self.assertIn(f'data-action="{ko_action if lg == "ko" else en_action}"', r)
+                self.assertEqual(" checked" in r, lg == default, f"{path}: 기본 선택은 페이지 언어")
+            # 스크립트가 없으면 선택지를 보이지 않는다(그때는 페이지 언어 폼으로 간다).
+            self.assertIn(".sub-lang[hidden]{display:none}", html)
+            # 선택 값은 Brevo 본문에서 뺀다(밴드·배너 두 제출 스크립트 모두).
+            self.assertEqual(html.count("if(k!=='grm_sub_lang')body.append(k,v);"), 2, path)
+            self.assertIn('<span lang="ko">한국어</span>', html)
+            self.assertIn('<span lang="en">English</span>', html)
+
     def test_subscribe_copy_varies_by_zone(self):
         """[2026-09-23 마케팅 계획 C-02] 방문의 대다수가 용어사전·지적사항이고 대부분 검색
         유입이라 "주간 브리프 구독"은 방문 목적과 먼 제안이었다 — 구역별로 문안이 갈린다.
@@ -8275,7 +8359,7 @@ class WebRenderHardeningTest(unittest.TestCase):
         about = (out / "about/index.html").read_text(encoding="utf-8")        # nav_active=about
 
         consent = "사이트에 새로운 기능이 생기면 함께 안내드립니다"
-        h2_glossary = "용어는 실제 사례와 함께 볼 때 남습니다"
+        h2_glossary = "구독하면 GMP 규제 용어집 PDF를 드립니다"   # [마케팅 2026-09-28] 용어집 PDF 제안
         h2_findings = "이런 지적, 매주 월요일 한국어로 받아보세요"
         h2_default = "글로벌 GMP 규제 소식, 매주 월요일 한국어로"
         all_h2 = (h2_glossary, h2_findings, h2_default)
@@ -8301,7 +8385,7 @@ class WebRenderHardeningTest(unittest.TestCase):
             return seg[seg.index("<b>") + 3: seg.index("</b>")]
 
         self.assertEqual(banner_b(home), h2_default)
-        self.assertEqual(banner_b(glossary), "이번 주 용어와 지적 사례, 매주 월요일 메일로")
+        self.assertEqual(banner_b(glossary), h2_glossary)
         self.assertEqual(banner_b(findings), h2_findings)
         self.assertEqual(banner_b(trends), h2_findings)
 
@@ -8314,6 +8398,36 @@ class WebRenderHardeningTest(unittest.TestCase):
 
         # about — 밴드는 기존 동작대로 없다(nav_active != 'about' 게이트, 소개 2026-09-06).
         self.assertNotIn('class="subscribe"', about, "about 페이지에 밴드가 있으면 안 된다")
+
+    def test_glossary_pdf_offer_is_wired_end_to_end(self):
+        """[마케팅 2026-09-28] 용어사전 구역의 제안(용어집 PDF)이 폼이 켜진 빌드에서 실제로
+        나가는지 — 밴드 성공 문구·배너 성공 문구가 PDF 로 가는 길을 말하고, 색인 상단 카드가
+        밴드 폼으로 이어지며, 도착 페이지(/welcome/)에는 구독 권유가 하나도 없다."""
+        a0 = render.NEWSLETTER_FORM_ACTION
+        try:
+            render.NEWSLETTER_FORM_ACTION = "https://newsletter.example.com/subscribe"
+            out = self._render_site([_minimal_brief("2026-06-05")])
+        finally:
+            render.NEWSLETTER_FORM_ACTION = a0
+        index = (out / "glossary/index.html").read_text(encoding="utf-8")
+        term = next((out / "glossary").glob("*/index.html")).read_text(encoding="utf-8")
+        home = (out / "index.html").read_text(encoding="utf-8")
+        welcome = (out / "welcome/index.html").read_text(encoding="utf-8")
+        done_pdf = "메일의 구독 확인 버튼을 누르면 용어집 PDF를 받는 페이지로 이동합니다."
+        for name, html in (("색인", index), ("용어", term)):
+            band = html[html.index('class="subscribe"'):html.index("<footer")]
+            self.assertIn(done_pdf, band, f"{name}: 밴드 성공 문구가 PDF 를 말하지 않는다")
+            cta = html[html.index('id="grm-cta"'):]
+            self.assertIn(done_pdf, cta, f"{name}: 배너 성공 문구가 PDF 를 말하지 않는다")
+        self.assertNotIn(done_pdf, home, "용어사전 밖 구역에 PDF 성공 문구가 샜다")
+        # 색인 상단 카드 — 밴드 폼으로 가는 링크 + [hidden] 짝(author display 에 지지 않게)
+        self.assertIn('<a class="gl-pdf" id="grm-gl-pdf" href="#grm-sub-form">', index)
+        self.assertIn(".gl-pdf[hidden]{display:none}", index)
+        self.assertIn('id="grm-sub-form"', index, "카드가 가리키는 밴드 폼이 없다")
+        self.assertNotIn('id="grm-gl-pdf"', term, "안내 카드는 색인에만 둔다")
+        # 도착 페이지 — 방금 구독을 마친 사람에게 다시 권하지 않는다
+        self.assertNotIn('class="subscribe"', welcome)
+        self.assertNotIn('id="grm-cta"', welcome)
 
     def test_subscribe_band_remembers_completed_subscription(self):
         """[2026-09-23 마케팅 계획 C-06 감사] 배너는 `grm-sub-ok` 를 읽어 다시 뜨지 않는데
@@ -8575,16 +8689,36 @@ class WebHeadersFileTest(unittest.TestCase):
         "Permissions-Policy: camera=(), microphone=(), geolocation=()",
     )
 
+    @staticmethod
+    def _blocks(txt: str) -> dict[str, list[str]]:
+        """Pages `_headers` 문법 — 들여쓰지 않은 줄이 경로, 그 밑 들여쓴 줄이 그 경로의 규칙."""
+        blocks: dict[str, list[str]] = {}
+        cur = None
+        for ln in txt.splitlines():
+            if not ln.startswith(" "):
+                cur = ln
+                blocks[cur] = []
+            else:
+                blocks[cur].append(ln)
+        return blocks
+
     def test_build_headers_txt_has_exactly_five_rules_under_wildcard(self):
         txt = render.build_headers_txt()
         lines = txt.splitlines()
         self.assertEqual(lines[0], "/*")
-        rule_lines = lines[1:]
+        rule_lines = self._blocks(txt)["/*"]
         self.assertEqual(len(rule_lines), len(self.EXPECTED_RULES))
         for rule in self.EXPECTED_RULES:
             self.assertIn(f"  {rule}", rule_lines)
         # CSP 는 의도적 부재 — 실수로 붙었으면 여기서 잡는다.
         self.assertNotIn("Content-Security-Policy", txt)
+
+    def test_unlisted_subscriber_paths_are_noindex_only(self):
+        """[마케팅 2026-09-28] 구독 확인 도착 페이지·용어집 PDF — noindex 한 줄씩, 그 밖의 규칙 없음."""
+        blocks = self._blocks(render.build_headers_txt())
+        self.assertEqual(set(blocks), {"/*", "/files/*", "/welcome/*"})
+        for path in ("/files/*", "/welcome/*"):
+            self.assertEqual(blocks[path], ["  X-Robots-Tag: noindex"], path)
 
     def test_headers_written_to_dist_root(self):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_headers_"))
@@ -9729,7 +9863,8 @@ class WebGlossaryRenderTest(unittest.TestCase):
         # mix-up·training·certificate-of-analysis·returned-product·pressure-differential·
         # sporicidal-agent·time-limits-on-production·yield·reconciliation·equipment-use-log·
         # distribution-record·pest-control).
-        self.assertEqual(len(self.terms), 242)
+        # 242 → 243: 2026-09-29 주간 용어 추가 202640(summary-of-product-characteristics).
+        self.assertEqual(len(self.terms), 243)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).
@@ -9847,6 +9982,63 @@ class WebGlossaryTermPageTest(unittest.TestCase):
             self.assertIn(
                 f'<loc>{render.SITE_BASE_URL}/glossary/{t["id"]}/</loc>', self.sitemap,
                 f'sitemap 미등록: {t["id"]}')
+
+    # ── [마케팅 2026-09-28] 사전 전체 규모 블록 · 구독 확인 도착 페이지 ──────────────────
+    def test_size_block_on_every_term_page(self):
+        """검색으로 용어 하나만 보고 나가려는 방문자에게 사전 규모를 보여 준다 — 숫자와 초성
+        버튼은 색인과 같은 뷰모델에서 센다(손으로 적은 개수 0)."""
+        view = render.build_glossary_view(self.terms)
+        size = render.build_glossary_size(view)
+        self.assertEqual(size["total"], len(self.terms))
+        self.assertEqual(sum(b["count"] for b in size["buckets"]), len(self.terms))
+        head = f'GMP 용어 <b>{len(self.terms)}</b>개를 한곳에'
+        for t in self.terms:
+            html = self._page(t["id"])
+            self.assertIn('<section class="gt-more"', html, t["id"])
+            self.assertIn(head, html, t["id"])
+            self.assertIn('<form class="gt-more-q" action="../../glossary/" method="get"', html, t["id"])
+            for b in size["buckets"]:
+                self.assertIn(f'href="../../glossary/#{b["anchor"]}"><b>{b["bucket"]}</b><span>{b["count"]}</span></a>',
+                              html, (t["id"], b["bucket"]))
+            self.assertNotIn('class="gt-foot"', html, t["id"])
+
+    def test_size_block_on_english_term_pages(self):
+        en_root = self.single / "en" / "glossary"
+        pages = sorted(en_root.glob("*/index.html"))
+        self.assertTrue(pages, "영문 용어 페이지가 없다")
+        for fp in pages[:20]:
+            html = fp.read_text(encoding="utf-8")
+            self.assertIn('<section class="gt-more"', html, fp)
+            self.assertIn(f'<b>{len(self.terms)}</b> GMP terms in one place', html, fp)
+
+    def test_index_search_accepts_q_param(self):
+        js = (render.WEB_DIR / "assets" / "glossary.js").read_text(encoding="utf-8")
+        self.assertIn('new URLSearchParams(location.search).get("q")', js)
+
+    def test_welcome_page_is_unlisted(self):
+        """구독 확인 도착 페이지 — 용어집 PDF 로 링크하고, 색인·sitemap·용어 트리 어디에도 없다."""
+        page = self.single / "welcome" / "index.html"
+        self.assertTrue(page.is_file(), page)
+        html = page.read_text(encoding="utf-8")
+        self.assertIn('<meta name="robots" content="noindex, nofollow">', html)
+        self.assertIn(f'href="../{render.GLOSSARY_PDF_PATH}" download', html)
+        self.assertIn("localStorage.setItem('grm-sub-ok','1')", html)
+        self.assertNotIn("/welcome/", self.sitemap)
+        self.assertFalse((self.root / "welcome").exists(), "glossary/ 아래에 두지 않는다")
+        headers = (self.single / "_headers").read_text(encoding="utf-8")
+        for path in ("/files/*", "/welcome/*"):
+            self.assertIn(f"{path}\n  X-Robots-Tag: noindex", headers)
+
+    def test_welcome_is_not_linked_from_any_page(self):
+        """주소가 확인 메일로만 가야 '구독해야 받는다'가 성립한다 — 사이트 어디에서도 링크 0."""
+        linked = []
+        for fp in self.single.rglob("*.html"):
+            if fp.parent.name == "welcome":
+                continue
+            text = fp.read_text(encoding="utf-8", errors="ignore")
+            if "welcome/" in text or render.GLOSSARY_PDF_PATH in text:
+                linked.append(str(fp.relative_to(self.single)))
+        self.assertEqual(linked, [])
 
     def test_json_ld_is_defined_term(self):
         """검색엔진에 '사전 항목'임을 알리는 구조화데이터 — 파싱 가능한 JSON 이어야 한다."""
@@ -10045,7 +10237,13 @@ class WebGlossaryTermPageTest(unittest.TestCase):
         docs = render.load_findings_docs() or {}
         firms = {d.get("firm_name") for d in docs.get("documents", []) if d.get("firm_name")}
         checked = 0
-        for tid, items in list(ex.items())[:10]:
+        # 인용 블록은 사례 스냅샷(glossary_cases)에 항목이 있는 용어 페이지에만 실린다
+        # (glossary_term.html 의 `term.case_href` 게이트). 스냅샷에 없는 용어는 인용이 계산돼도
+        # 화면에 나오지 않으므로 이 검사 대상이 아니다. 희소한 용어부터 정렬되는 ex 의 앞 10개에
+        # 그런 용어가 섞이면(갱신 데이터에서 `accurate`) 데이터만 바뀌어도 실패했다.
+        cases = render.load_glossary_cases() or {}
+        shown = [(tid, items) for tid, items in ex.items() if tid in cases]
+        for tid, items in shown[:10]:
             html = self._page(tid)
             self.assertIn("이 용어가 등장한", html, f'문구 규율 위반/미배선: {tid}')
             for bad in ("이 용어에 관한 지적", "이 용어에 대한 지적"):
@@ -14565,13 +14763,12 @@ class WebAboutTest(unittest.TestCase):
         잊으면 가드가 낡는다 — 이 저장소의 손목록 금지 규율)."""
         contact = render.load_contact()
         self.assertTrue(contact, "contact.json 이 비었다 — 값을 지우려면 이 테스트도 함께 본다")
-        for value, page in ((contact["linkedin"], self.html), (contact["linkedin"], self.landing)):
-            self.assertIn(f'href="{value}" target="_blank" rel="me noopener"', page)
         for page in (self.html, self.landing):
             self.assertIn(f'href="mailto:{contact["email"]}"', page)
+            # [2026-10-11] LinkedIn 은 사이트에서 걷었다 — 푸터 아이콘·'만든 사람' 링크 모두 0.
+            self.assertNotIn("linkedin", page.lower())
         self.assertIn('class="foot-ico"', self.landing)      # 푸터 법적 줄 아이콘
         self.assertIn('class="about-act"', self.html)        # 소개 페이지 이메일 버튼
-        self.assertIn('class="about-more"', self.html)       # '만든 사람' 절의 LinkedIn 줄
         # 영어 트리도 같은 값을 본다(연락처는 언어와 무관 — 사전을 타지 않는다).
         self.assertIn(f'href="mailto:{contact["email"]}"', self.en_html)
 
@@ -14609,21 +14806,20 @@ class WebAboutTest(unittest.TestCase):
         **어느 절에** 그릴지는 md 의 `## 제목 {slot}` 이 정한다. 문안을 손보는 사람이 절을
         옮기면 위젯도 따라가야 한다 — 위치까지 템플릿에 박으면 md 만 고친 결과가 어긋난다.
         슬롯 이름은 제목에서 떼어 화면에 남지 않는다."""
-        self.assertRegex(self.md, r"(?m)^## .+\{linkedin\}\s*$")
         self.assertRegex(self.md, r"(?m)^## .+\{contact\}\s*$")
-        self.assertRegex(self.md_en, r"(?m)^## .+\{linkedin\}\s*$")
         self.assertRegex(self.md_en, r"(?m)^## .+\{contact\}\s*$")
-        self.assertNotIn("{linkedin}", self.html)     # 마커가 제목에 새어나오지 않는다
-        self.assertNotIn("{contact}", self.html)
+        self.assertNotIn("{contact}", self.html)      # 마커가 제목에 새어나오지 않는다
         _, _, secs = render.render_about_html(self.md)
-        self.assertEqual([s["slot"] for s in secs if s["slot"]], ["linkedin", "contact"])
-        # LinkedIn 줄은 `{linkedin}` 을 단 절 **안**에 있다(다음 절로 밀리지 않는다).
-        linked = next(s for s in secs if s["slot"] == "linkedin")
+        self.assertEqual([s["slot"] for s in secs if s["slot"]], ["contact"])
+        # 연락 버튼 줄은 `{contact}` 를 단 절 **안**에 있다(다음 절로 밀리지 않는다).
+        linked = next(s for s in secs if s["slot"] == "contact")
         after = self.html[self.html.index(f'id="{linked["id"]}"'):]
-        self.assertLess(after.index("about-more"), after.index("</section>"))
+        self.assertLess(after.index("data-feedback-mount"), after.index("</section>"))
         # 모르는 슬롯은 조용히 무시하지 않고 즉시 실패한다(오타로 연락처가 사라지는 것 방지).
-        with self.assertRaises(ValueError):
-            render.render_about_html("# t\n\n## 어떤 절 {sponsors}\n\n본문\n")
+        # 걷어 낸 `{linkedin}` 도 이제 모르는 이름이다 — md 에 되살아나면 렌더가 멈춘다.
+        for bad in ("sponsors", "linkedin"):
+            with self.assertRaises(ValueError):
+                render.render_about_html(f"# t\n\n## 어떤 절 {{{bad}}}\n\n본문\n")
 
     def test_feedback_button_copy_lives_in_the_template(self):
         """문의 버튼의 라벨은 **템플릿이 정한다**(`data-fb-name`). feedback.js 가 그 버튼을
@@ -14645,8 +14841,10 @@ class WebAboutTest(unittest.TestCase):
         self.assertNotIn('id="grm-pet"', self.en_html)
         self.assertIn('id="grm-pet"', self.landing)          # 다른 면에서는 그대로
         base = (WEB_DIR / "templates" / "base.html").read_text(encoding="utf-8")
-        self.assertIn("{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' %}",
-                      base)
+        # [2026-09-28] 구독 확인 도착 페이지(/welcome/)도 밴드를 접는다(hide_subscribe) — about 조건은 그대로.
+        # [2026-10-18] 언어 조건은 빠졌다 — 영어 페이지는 영문 리스트 폼을 render.py 가 넣는다.
+        self.assertIn("{% if newsletter_form_action and nav_active != 'about'"
+                      " and not hide_subscribe %}", base)
         self.assertIn("{% if nav_active != 'about' %}\n<div class=\"grm-pet\"", base)
 
     def test_hero_offers_the_next_step(self):
@@ -14670,7 +14868,6 @@ class WebAboutTest(unittest.TestCase):
             render.load_contact = c0
             shutil.rmtree(tmp, ignore_errors=True)
         for page in (about, landing):
-            self.assertNotIn("ti-brand-linkedin", page)
             self.assertNotIn("mailto:", page)
             self.assertNotIn('class="foot-contact"', page)
         self.assertIn("data-feedback-mount", about)   # 문의 버튼 자리는 남는다(JS 주입)
@@ -14679,12 +14876,12 @@ class WebAboutTest(unittest.TestCase):
         tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_contact_"))
         try:
             p = tmp / "contact.json"
-            p.write_text('{"linkedin": "", "email": "  "}', encoding="utf-8")
+            p.write_text('{"email": "  "}', encoding="utf-8")
             self.assertEqual(render.load_contact(p), {})           # 빈 값 = 없음
-            p.write_text('{"linkedin": "linkedin.com/in/x", "email": ""}', encoding="utf-8")
+            p.write_text('{"linkedin": "https://www.linkedin.com/in/x"}', encoding="utf-8")
             with self.assertRaises(ValueError):
-                render.load_contact(p)                             # https:// 없는 주소
-            p.write_text('{"linkedin": "", "email": "not-an-email"}', encoding="utf-8")
+                render.load_contact(p)                             # 걷어 낸 키(2026-10-11)
+            p.write_text('{"email": "not-an-email"}', encoding="utf-8")
             with self.assertRaises(ValueError):
                 render.load_contact(p)
             p.write_text('{"twitter": "x"}', encoding="utf-8")
@@ -15177,6 +15374,8 @@ class WebZoneIaTest(unittest.TestCase):
         "404.html": "존재하지 않는 경로에 서버가 띄우는 페이지 — 링크 대상이 아니다.",
         "en/404.html": "위와 같다. 영어 트리에서도 Cloudflare 가 상태코드로 띄운다.",
         "admin/index.html": "운영자 전용 콘솔 — 공개 링크를 두지 않는 것이 의도다.",
+        "welcome/index.html": "구독 확인 도착 페이지(2026-09-28) — Brevo 확인 메일의 버튼으로만 온다. "
+                              "사이트에서 링크하면 '구독해야 용어집 PDF 를 받는다'가 무너진다.",
     }
 
     #: 세그먼트에 서는 면. [컨셉 재정의] '데이터 현황'은 세그먼트에서 내렸다 — 그 면이
@@ -20850,6 +21049,61 @@ class WebPetNameEnglishStripTest(unittest.TestCase):
             self.assertTrue(
                 en[ko].endswith(" Gurumi"),
                 f"{ko} 의 영어 번역 '{en[ko]}' 이 ' Gurumi' 로 끝나지 않는다")
+
+
+class WebSitePopupTest(unittest.TestCase):
+    """사이트 공지 팝업(2026-10-21) — 내용은 assets/site-popup.json 한 곳, 페이지에는 스크립트
+    태그 한 줄만. 공지를 바꾸거나 꺼도 페이지 HTML(골든)은 그대로여야 하고, 한국어 트리에만
+    걸린다. 설정이 잘못 들어가면 팝업이 조용히 안 뜨거나 바깥으로 링크하므로 여기서 막는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_popup_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        cls.ko = (cls.single / "index.html").read_text(encoding="utf-8")
+        en_home = cls.single / "en" / "index.html"
+        cls.en = en_home.read_text(encoding="utf-8") if en_home.is_file() else ""
+        cls.js = (WEB_DIR / "assets" / "site-popup.js").read_text(encoding="utf-8")
+        cls.cfg_path = WEB_DIR / "assets" / "site-popup.json"
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_script_only_on_korean_tree(self):
+        self.assertIn('src="/assets/site-popup.js?v=', self.ko)
+        self.assertTrue(self.en, "영어 홈이 빌드되지 않았다")
+        self.assertNotIn("site-popup.js", self.en)
+
+    def test_assets_copied_verbatim(self):
+        for name in ("site-popup.js", "site-popup.json"):
+            self.assertEqual((self.single / "assets" / name).read_bytes(),
+                             (WEB_DIR / "assets" / name).read_bytes())
+
+    def test_config_is_valid_when_present(self):
+        if not self.cfg_path.is_file():
+            return  # 공지가 없으면 팝업도 없다(스크립트는 조용히 끝난다)
+        c = json.loads(self.cfg_path.read_text(encoding="utf-8"))
+        self.assertRegex(c["id"], r"^[a-z0-9][a-z0-9-]{2,63}$")
+        self.assertRegex(c["until"], r"^\d{4}-\d{2}-\d{2}$")
+        self.assertEqual(c.get("lang", "ko"), "ko")
+        for key in ("title", "cta_text"):
+            self.assertTrue(str(c.get(key, "")).strip(), f"{key} 가 비었다")
+        # 우리 사이트 안 경로만 — `//host` 는 프로토콜-상대 외부 주소다.
+        self.assertRegex(c["cta_path"], r"^/(?!/)")
+        if c.get("accent"):
+            self.assertIn(c["accent"], c["title"], "accent 가 제목에 없으면 강조가 조용히 빠진다")
+        for p in c.get("skip_paths", []):
+            self.assertRegex(p, r"^/(?!/)")
+
+    def test_three_close_paths_and_local_fetch_only(self):
+        for label in ("오늘 하루 보지 않기", "다시 보지 않기", 'aria-label", "닫기"'):
+            self.assertIn(label, self.js)
+        self.assertIn('fetch("/assets/site-popup.json"', self.js)
+        self.assertEqual(self.js.count("fetch("), 1)
+        for banned in ("XMLHttpRequest", "sendBeacon", "WebSocket", "http://", "https://"):
+            self.assertNotIn(banned, self.js)
 
 
 if __name__ == "__main__":

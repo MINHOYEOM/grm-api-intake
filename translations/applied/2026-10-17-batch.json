@@ -1,0 +1,26 @@
+[
+  {
+    "finding_id": "finding-0504fdbd7dd598418ed3703d",
+    "finding_text": "The inspection resulted in a critical deficiency related to contamination risk in the Fluid Bed Coating (FBC) equipment due to an observed pool of liquid and residue in a section of the inlet air plenum of a fully cleaned FBC. The flaws were due to common design between FBCs (inclination of plenum not allowing gravity draining) and inadequate cleaning procedure. In addition, there was no detectability of a failure in HEPA filter integrity through real-time monitoring of pressure differential before and after the supply air HEPA filter of the Air Handling Units of the FBCs. There were eleven (11) major findings relating to: Inadequate Master Batch Record instructions and production documentation; Deficient process validation, including insufficient coverage of process, demonstration of its reproducibility and pellet homogeneity; Incomplete cleaning validation; Differential pressure excursions; Deficient warehouse, sampling and dispensing controls; Inadequate vendor qualification; Inadequate identification testing of incoming starting materials, Excipient risk assessments, Out-of-Specification handling, Equipment qualification and Pest control.\n\nAction taken/proposed by the NCA: Revocation of the marketing authorisation(s) Member states should consider not initiating or authorising new marketing authorisations with this site listed as an intermediate product manufacturer until the recommended non-compliance statement to be issued remains in place or is not superseded with a GMP certificate. Prohibition of supply No products batches manufactured at the site should be released to EEA markets until this non-compliance remains in place or is superseded by an EU GMP certificate.",
+    "finding_text_ko": "실사 결과 유동층 코팅(Fluid Bed Coating, FBC) 설비의 오염 위험과 관련한 치명적(critical) 결함이 확인되었다. 세척이 완료된 FBC의 흡기 플레넘(inlet air plenum) 일부 구간에서 고인 액체와 잔류물이 관찰되었기 때문이다. 이러한 결함은 FBC 간 공통된 설계(플레넘의 경사가 중력 배수를 허용하지 않음)와 부적절한 세척 절차에 기인했다. 또한 FBC 공조기(Air Handling Units)의 급기 HEPA 필터 전후 차압을 실시간 모니터링하여 HEPA 필터 완전성(integrity) 이상을 검출할 수 있는 수단이 없었다. 다음 사항과 관련하여 11건의 중대(major) 지적사항이 있었다: 부적절한 마스터 제조기록(Master Batch Record) 지시사항 및 생산 문서; 공정의 포괄 범위, 재현성 입증 및 펠릿 균질성(pellet homogeneity) 입증이 불충분한 것을 포함한 공정 밸리데이션 미흡; 불완전한 세척 밸리데이션; 차압 이탈(excursion); 창고·검체채취·칭량(dispensing) 관리 미흡; 부적절한 공급업체 적격성평가(vendor qualification); 입고 출발물질의 확인시험 부적절, 첨가제 위험평가, 기준일탈(Out-of-Specification) 처리, 설비 적격성평가 및 방충·방서(pest control).\n\nNCA(국가 관할당국)의 조치/제안 사항: 판매허가(marketing authorisation) 취소. 회원국은 권고된 부적합 선언(non-compliance statement)이 유지되는 동안 또는 GMP 인증서로 대체되지 않는 한, 이 제조소를 중간제품 제조소로 기재한 신규 판매허가를 개시하거나 허가하지 않는 것을 고려해야 한다. 공급 금지: 이 부적합 상태가 유지되거나 EU GMP 인증서로 대체되기 전까지는 이 제조소에서 제조된 어떠한 제품 배치도 EEA 시장에 출하되어서는 안 된다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7a735e0fe2ad6a36fe93746c",
+    "finding_text": "○ ｢마약류 관리에 관한 법률｣ 제11조 및 같은 법 시행규칙 제21조에 따라 마약류 취급자는 마약류의 제조·판매 등 취급내역을 마약류통합시스템을 통해 식품의약품안전처장에게 보고하여야 하나, - '메타맥스정(펜터민염산염) 등’ 50건에 대하여 보고기한 내 보고하지 않은 사실이 있음.",
+    "finding_text_ko": "｢마약류 관리에 관한 법률｣ 제11조 및 같은 법 시행규칙 제21조에 따라 마약류 취급자는 마약류의 제조·판매 등 취급내역을 마약류통합시스템을 통해 식품의약품안전처장에게 보고해야 하나, '메타맥스정(펜터민염산염) 등' 50건에 대해 보고기한 내 보고하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-27249442fe48ac46d9f99111",
+    "finding_text": "신고하지 않은 장소에 의약품 보관",
+    "finding_text_ko": "신고하지 않은 장소에 의약품을 보관했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b641dadab5758122a372137a",
+    "finding_text": "소재지 미변경, 수입관리자 없이 수입업 영업, 품질검사 미실시",
+    "finding_text_ko": "소재지 변경을 하지 않았고, 수입관리자 없이 수입업 영업을 했으며, 품질검사를 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  }
+]

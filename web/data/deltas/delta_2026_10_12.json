@@ -1,0 +1,923 @@
+{
+ "publish_date": "2026-10-12",
+ "cards": {
+  "188001": {
+   "title_issue": "임상시험약 제조 GMP 비준수",
+   "summary": "네덜란드 당국이 병원약국인 NKI-AVL의 임상시험용의약품 제조·포장 활동에 대해 GMP 비준수를 판정했다. 치명 결함 1건(OOS 처리 부적절)과 주요 결함 7건이 근거이며 EU 임상시험 1건(M22BOL)이 중지 대상이 됐다.",
+   "key_facts": [
+    "판정 근거: 치명 결함 1건·주요 결함 7건·기타 결함 14건",
+    "치명 결함: 수분·함량 규격 부적합 배치 출하, 공정중 무균시험 실패 ATMP 출하",
+    "조치: EU CT 2023-505039-11-00(M22BOL) 임상시험 중지, GMP 인증서 4건 철회",
+    "범위: 무균 동결건조·소용량 액제·세포/유전자치료제, 정제·경질캡슐 제조·포장"
+   ],
+   "implication": "EU 당국이 병원약국의 임상시험약 활동까지 상업 제조와 같은 OOS·품질시스템 기준으로 판정해 임상 중지까지 연결했다. 임상시험약을 위탁 재포장·라벨링하는 경우 수탁처의 OOS 절차와 배치 인증 근거를 직접 확인할 필요가 있다.",
+   "checks": [
+    "임상시험약 수탁처의 OOS 조사·배치 인증 절차",
+    "임상시험약 재라벨링·재포장 수탁처 GMP 인증 유효성"
+   ],
+   "quotes_translation": [
+    "GMP 실사는 2026년 2월 10~12일과 2026년 4월 22~23일에 수행되었다."
+   ],
+   "en": {
+    "title_issue": "GMP non-compliance in IMP manufacture",
+    "summary": "The Dutch authority found the investigational medicinal product activities of a hospital pharmacy, Het Nederlands Kanker Instituut-Antoni van Leeuwenhoek Ziekenhuis, GMP non-compliant. The decision rests on 1 critical deficiency (inadequate OOS handling) and 7 major deficiencies, and one EU clinical trial (M22BOL) is suspended.",
+    "key_facts": [
+     "Basis: 1 critical, 7 major and 14 other deficiencies",
+     "Critical: batches released despite failing moisture or assay limits; an ATMP released after a failed in-process sterility test",
+     "Action: suspension of clinical trial EU CT 2023-505039-11-00 (M22BOL); withdrawal of four GMP certificates",
+     "Scope: aseptic lyophilisates, small volume liquids, cell and gene therapy products, tablets and hard capsules"
+    ],
+    "implication": "The authority applied the same OOS and quality system standard to a hospital pharmacy's investigational products as to commercial manufacture, and tied it to a trial suspension. Sponsors that outsource IMP relabeling or repackaging should verify the contractor's OOS procedure and batch certification basis directly.",
+    "checks": [
+     "OOS investigation and batch certification procedure at IMP contractors",
+     "Validity of GMP certificates held by IMP relabeling and repackaging contractors"
+    ]
+   }
+  },
+  "187962": {
+   "title_issue": "무균 동결건조·고형제 GMP 비준수",
+   "summary": "네덜란드 당국이 NKI-AVL의 허가 의약품 제조 활동(무균 동결건조·기타 고형제·포장)에 GMP 비준수를 판정하고 해당 GMP 인증서를 철회했다. 수분·함량 부적합 배치 출하 등 OOS 처리 부적절이 치명 결함으로 지목됐다.",
+   "key_facts": [
+    "대상 운영: 무균 동결건조제, 기타 고형제 제조, 1차·2차 포장",
+    "조치: GMP 인증서 NL/H 24/2051740A·B 철회(Plesmanlaan 121 소재 C·D 포함)",
+    "주요 결함: 무균조작 관리 미흡, 무균공정 모의시험(배지충진) 부적절, 클린룸 작업자 행동·더스트복 착의 부적절",
+    "재실사: 업체 시정계획에 따라 실시 예정(일정 미정)"
+   ],
+   "implication": "Annex 1 gap 평가와 오염관리전략(CCS) 미완성이 무균 허가 제품의 GMP 비준수로 직결된 사례다. 무균 동결건조 라인은 CCS 완결성과 배지충진 설계가 실사의 우선 확인 대상이 된다.",
+   "checks": [
+    "Annex 1 gap 평가·오염관리전략 문서 완결성",
+    "무균공정 모의시험의 대표성(개입·작업자 포함)"
+   ],
+   "quotes_translation": [
+    "GMP 실사는 2026년 2월 10~12일과 2026년 4월 22~23일에 수행되었다."
+   ],
+   "en": {
+    "title_issue": "Aseptic lyophilisate GMP non-compliance",
+    "summary": "The Dutch authority found the authorised-product operations of Het Nederlands Kanker Instituut-Antoni van Leeuwenhoek Ziekenhuis (aseptic lyophilisates, other solid dosage forms, packaging) GMP non-compliant and withdrew the related GMP certificates. Inadequate OOS handling, including release of batches failing moisture or assay limits, was the critical deficiency.",
+    "key_facts": [
+     "Operations covered: aseptic lyophilisates, other solid dosage forms, primary and secondary packaging",
+     "Action: withdrawal of GMP certificates NL/H 24/2051740A and B (including C and D at Plesmanlaan 121)",
+     "Major deficiencies: insufficient control of aseptic practices, inadequate aseptic process simulation (media fill), inadequate cleanroom behaviour and gowning",
+     "Re-inspection: planned on the basis of the company's action plan (not yet scheduled)"
+    ],
+    "implication": "An incomplete Annex 1 gap assessment and contamination control strategy translated directly into non-compliance for authorised sterile products. For aseptic lyophilisation lines, CCS completeness and media fill design are first-line inspection targets.",
+    "checks": [
+     "Completeness of Annex 1 gap assessment and contamination control strategy",
+     "Representativeness of aseptic process simulation, including interventions and operators"
+    ]
+   }
+  },
+  "187963": {
+   "title_issue": "배치 인증·품질시험 GMP 비준수",
+   "summary": "네덜란드 당국이 NKI-AVL의 무균·비무균 제품 배치 인증과 품질관리 시험(무균·미생물·이화학·생물학적 시험) 활동에 GMP 비준수를 판정했다. OOS 절차가 충분한 조사 없이 배치 인증·출하로 이어질 수 있다는 점이 치명 결함으로 지적됐다.",
+   "key_facts": [
+    "대상 운영: 무균·비무균 제품 배치 인증, 무균시험·미생물시험·이화학시험·생물학적 시험",
+    "치명 결함: OOS 절차가 모호해 충분한 조사·근거 없이 배치 인증·출하 가능",
+    "주요 결함: 미생물 시험결과 설계·조사·경향분석 미흡(A등급 작업자 손 미생물 초과 다수)",
+    "조치: GMP 인증서 NL/H 24/2051740C·D 철회(Louwesweg 6 소재 A·B 포함)"
+   ],
+   "implication": "당국이 QC 시험과 배치 인증 자체를 비준수 운영으로 명시해, 시험실 OOS 판정이 출하 결정에 미치는 통제를 직접 문제 삼았다. 환경 모니터링 초과의 경향분석이 조사로 이어지는지가 QC 쪽 핵심 확인점이다.",
+   "checks": [
+    "OOS 확정 전 배치 인증 차단 장치",
+    "작업자 손·장갑 환경모니터링 초과의 경향분석·조사 연계"
+   ],
+   "quotes_translation": [
+    "GMP 실사는 2026년 2월 10~12일과 2026년 4월 22~23일에 수행되었다."
+   ],
+   "en": {
+    "title_issue": "Batch certification and QC non-compliance",
+    "summary": "The Dutch authority found the batch certification and quality control testing activities (sterility, microbiological, chemical/physical and biological testing) of Het Nederlands Kanker Instituut-Antoni van Leeuwenhoek Ziekenhuis GMP non-compliant. The critical deficiency was an ambiguous OOS procedure that can lead to batch certification and release without thorough investigation.",
+    "key_facts": [
+     "Operations covered: batch certification of sterile and non-sterile products; sterility, microbiological, chemical/physical and biological testing",
+     "Critical: ambiguous OOS procedure allowing certification and release without thorough investigation or justification",
+     "Major: insufficient design, investigation and trending of microbiological results (multiple exceedances on operators' hands in class A)",
+     "Action: withdrawal of GMP certificates NL/H 24/2051740C and D (including A and B at Louwesweg 6)"
+    ],
+    "implication": "By naming QC testing and batch certification themselves as non-compliant operations, the authority targeted the control between a laboratory OOS result and the release decision. Whether environmental monitoring exceedances are trended and investigated is a key QC checkpoint.",
+    "checks": [
+     "Controls that block batch certification before an OOS is resolved",
+     "Linking operator hand and glove EM exceedances to trending and investigation"
+    ]
+   }
+  },
+  "187964": {
+   "title_issue": "ATMP 무균제조·출하 GMP 비준수",
+   "summary": "네덜란드 당국이 NKI-AVL의 세포·유전자치료제 등 임상시험용 ATMP 무균 제조, 배치 인증, 품질관리 시험에 GMP 비준수를 판정했다. 공정중 무균시험에 실패한 ATMP가 출하된 사실이 치명 결함에 포함됐다.",
+   "key_facts": [
+    "대상 운영: 세포·유전자치료제 무균 제조, 생물의약품 배치 인증, 2차 포장, 품질관리 시험",
+    "치명 결함: 공정중 무균시험 실패 ATMP 출하 포함 OOS 처리 부적절",
+    "주요 결함: ATMP 공정 다수 측면 관리 미흡, A등급 ATMP 작업자 손 미생물 초과 다수",
+    "조치: GMP 인증서 NL/H 24/2051740C·D 철회, M22BOL 임상시험 중지"
+   ],
+   "implication": "무균시험이 공정중 관리시험이라 해도 실패 결과를 무시한 ATMP 출하는 치명 결함으로 판정된다는 점이 확인됐다. 세포·유전자치료제 제조소는 공정중 무균시험 실패의 처리 기준을 출하 판정 절차에 명시해 둘 필요가 있다.",
+   "checks": [
+    "공정중 무균시험 실패 시 ATMP 출하 판정 기준",
+    "ATMP 무균조작 작업자 손 모니터링 결과 처리"
+   ],
+   "quotes_translation": [
+    "GMP 실사는 2026년 2월 10~12일과 2026년 4월 22~23일에 수행되었다."
+   ],
+   "en": {
+    "title_issue": "ATMP aseptic manufacture non-compliance",
+    "summary": "The Dutch authority found the investigational ATMP operations of Het Nederlands Kanker Instituut-Antoni van Leeuwenhoek Ziekenhuis (aseptic manufacture of cell and gene therapy products, batch certification, QC testing) GMP non-compliant. The critical deficiency includes the release of an ATMP despite a failed in-process sterility test.",
+    "key_facts": [
+     "Operations covered: aseptic manufacture of cell and gene therapy products, batch certification of biologicals, secondary packaging, QC testing",
+     "Critical: inadequate OOS handling, including release of an ATMP after a failed in-process sterility test",
+     "Major: multiple aspects of ATMP production not under control; multiple microbial exceedances on operators' hands in class A",
+     "Action: withdrawal of GMP certificates NL/H 24/2051740C and D; suspension of the M22BOL trial"
+    ],
+    "implication": "Even when the sterility test is an in-process control, releasing an ATMP over a failed result is judged a critical deficiency. Cell and gene therapy sites should state explicitly in their release procedure how an in-process sterility failure is dispositioned.",
+    "checks": [
+     "ATMP release criteria after an in-process sterility failure",
+     "Handling of hand monitoring results for ATMP aseptic operators"
+    ]
+   }
+  },
+  "fda483-195189": {
+   "title_issue": "무균공정 검증·무균시험 실패 조사",
+   "summary": "FDA가 아웃소싱시설 RC Outsourcing LLC 실사에서 8개 관찰사항을 담은 483을 발부했다. 기류 시각화(smoke study) 문서 부재, 재포장 Avastin 무균시험 실패 조사 미흡, 클린룸 동선·청소 주기 문제가 포함됐다.",
+   "key_facts": [
+    "관찰 1: ISO 5 후드 기류 시각화 시험의 프로토콜·보고서 부재",
+    "관찰 2: 재포장 Avastin 1.25 mg/0.05 mL 무균시험 실패로 2025년 10월 이후 4배치 부적합, 같은 날·같은 후드 배치는 근거 없이 출하",
+    "관찰 4: 클린룸 청소 간격 49일 공백, 과학적 근거 없는 청소 주기",
+    "관찰 6: Avastin 1.75 mg/0.07 mL 미세입자 규격 근거 부재(반복 관찰, 안내염 이상사례 관련 로트 출하)"
+   ],
+   "implication": "무균시험 실패 배치만 폐기하고 같은 날·같은 후드 배치를 출하한 판단이 핵심 지적이 됐다. 무균 재포장·조제 시설은 무균시험 실패 시 영향 범위(동일 일자·장비 배치) 평가를 조사 절차에 넣어둘 필요가 있다.",
+   "checks": [
+    "무균시험 실패 시 동일 일자·동일 후드 배치 영향평가",
+    "기류 시각화 시험 프로토콜·보고서 구비",
+    "클린룸 청소 주기의 데이터 근거"
+   ],
+   "en": {
+    "title_issue": "Aseptic validation and sterility failures",
+    "summary": "FDA issued a Form 483 with eight observations to the outsourcing facility RC Outsourcing LLC. The observations include undocumented airflow visualization (smoke) studies, inadequate sterility failure investigations for repackaged Avastin, and problems with cleanroom flow and cleaning intervals.",
+    "key_facts": [
+     "Observation 1: no protocols or reports for airflow visualization studies of the ISO 5 hoods",
+     "Observation 2: four batches of repackaged Avastin 1.25 mg/0.05 mL rejected for sterility failures since October 2025, while same-day, same-hood batches were released without justification",
+     "Observation 4: a 49-day gap in cleanroom cleaning and no scientifically based cleaning intervals",
+     "Observation 6: no rationale for the subvisible particle specification of Avastin 1.75 mg/0.07 mL (repeat observation; lots linked to endophthalmitis events were released)"
+    ],
+    "implication": "The key finding is the decision to reject only the failed batches while releasing others made the same day in the same hood. Sterile repackaging and compounding sites should build impact assessment of same-day and same-equipment batches into their sterility failure investigations.",
+    "checks": [
+     "Impact assessment of same-day and same-hood batches after a sterility failure",
+     "Protocols and reports for airflow visualization studies",
+     "Data basis for cleanroom cleaning intervals"
+    ]
+   }
+  },
+  "fda483-195190": {
+   "title_issue": "안과 무균제품 규격·이물 조사 미흡",
+   "summary": "FDA가 아웃소싱시설 Imprimis NJOF LLC에 4개 관찰사항(관찰 1·3·4·6)을 담은 483을 발부했다. 무균 안과제품 규격의 과학적 근거 부재, 목시플록사신 주사제 섬유상 이물의 근본원인 미규명, 육안검사 재검사 관행, 품질부서의 미검증 상태 출하가 지적됐다.",
+   "key_facts": [
+    "관찰 1: 다수 무균 안과제품의 출하·안정성 규격이 공정서 범위를 벗어나는데 과학적 근거 부재",
+    "관찰 3: 2023년부터 목시플록사신 원료 사용 주사제에서 셀룰로스 등 섬유상 이물 관찰, 근본원인 미규명",
+    "관찰 4: 100% 육안검사 실패 배치를 조사 완료 전 재검사·AQL로 출하 가능(testing into compliance)",
+    "관찰 6: 1개 제품 외에는 검증된 불순물·분해산물 시험법 없이 출하 승인"
+   ],
+   "implication": "FDA가 육안검사 실패 후 재검사로 통과시키는 절차를 testing into compliance로 규정해, 재검사 전 근본원인 조사 완료를 요구했다. 무균 주사제·안과제 제조소는 육안검사 실패 배치의 재검사 허용 조건과 이물 특성분석 절차를 점검해 둘 필요가 있다.",
+   "checks": [
+    "육안검사 실패 배치 재검사 전 조사 완료 요건",
+    "섬유상 이물의 원료 공급처 연계 조사",
+    "출하시험 내 불순물·분해산물 시험법 검증 여부"
+   ],
+   "en": {
+    "title_issue": "Ophthalmic specs and particulate probes",
+    "summary": "FDA issued a Form 483 with four observations (Observations 1, 3, 4 and 6) to the outsourcing facility Imprimis NJOF LLC. They cover specifications for sterile ophthalmic products without scientific basis, unresolved root cause of fiber-like particles in moxifloxacin injectables, a visual inspection reinspection practice, and quality unit release without validated methods.",
+    "key_facts": [
+     "Observation 1: release and stability specifications for multiple sterile ophthalmic products extend beyond compendial ranges without scientific justification",
+     "Observation 3: cellulose and other fiber-like material observed since 2023 in injectables made with moxifloxacin bulk powder; root cause not identified",
+     "Observation 4: batches failing 100% visual inspection can proceed to reinspection and AQL release before the investigation is complete (testing into compliance)",
+     "Observation 6: products released without validated impurity or degradant methods, with the exception of one product"
+    ],
+    "implication": "FDA characterized passing a batch through reinspection after a visual inspection failure as testing into compliance and expects the root-cause investigation to be complete first. Sterile injectable and ophthalmic sites should review the conditions under which failed batches may be reinspected and how particulates are characterized.",
+    "checks": [
+     "Investigation completion before reinspecting a failed visual inspection batch",
+     "Supplier-linked investigation of fiber-like particulates",
+     "Validation status of impurity and degradant methods in release testing"
+    ]
+   }
+  },
+  "4ca9202786d6": {
+   "title_issue": "출하시험·원료 확인시험 누락",
+   "summary": "FDA가 대만 소재 OTC 의약품 수탁제조소 TCI Co., Ltd. - BioCosme PABP BRANCH에 CGMP 위반 4건으로 Warning Letter를 발부했다. 완제품 함량시험 없이 미국 출하, 원료 확인시험 미실시와 공급사 COA 무검증 의존, 공정 밸리데이션 부적절, 품질부서 관리 미흡이 지적됐다.",
+   "key_facts": [
+    "위반 1: 완제품 출하시험에서 API 함량(assay) 시험 미실시 후 미국 출하(21 CFR 211.165(a))",
+    "위반 2: 입고 API·원료 확인시험 미실시, 공급사 COA 신뢰성 검증 없이 의존(21 CFR 211.84(d)(1)·(d)(2))",
+    "위반 3·4: 공정 밸리데이션 부적절, 변경관리 절차 없이 공정 파라미터 변경(21 CFR 211.100(a)·211.22)",
+    "후속: 의약품 등록 만료 결정, 재개 전 FDA 통지·21 CFR 211.34 자격 컨설턴트 활용 권고"
+   ],
+   "implication": "FDA가 수탁제조소에 대해 위탁사와의 계약과 무관하게 출하시험 누락 책임을 직접 묻고 품질협약 부재를 함께 지적했다. 국내 수탁·위탁 제조 관계에서도 시험 항목·규격 책임을 품질협약에 명시했는지 점검할 필요가 있다.",
+   "checks": [
+    "품질협약 내 출하시험 항목·규격 책임 분담",
+    "공급사 COA 의존 원료의 주기적 신뢰성 검증",
+    "R&D 인력의 공정 파라미터 변경 시 변경관리 적용"
+   ],
+   "en": {
+    "title_issue": "Missing release and identity testing",
+    "summary": "FDA issued a Warning Letter citing four CGMP violations to TCI Co., Ltd. - BioCosme PABP BRANCH, an OTC drug contract manufacturer in Taiwan. The letter cites US distribution without finished-product assay testing, missing identity testing of components with unverified reliance on supplier COAs, inadequate process validation, and weak quality unit oversight.",
+    "key_facts": [
+     "Violation 1: API assay not performed in finished-product release testing before US distribution (21 CFR 211.165(a))",
+     "Violation 2: no identity testing of incoming APIs and raw materials; reliance on supplier COAs without establishing their reliability (21 CFR 211.84(d)(1) and (d)(2))",
+     "Violations 3 and 4: inadequate process validation; process parameters changed without following change management (21 CFR 211.100(a), 211.22)",
+     "Follow-up: firm decided to let its drug registration expire; FDA must be notified before resuming, and a consultant qualified under 21 CFR 211.34 is recommended"
+    ],
+    "implication": "FDA held the contract manufacturer directly responsible for missing release tests regardless of agreements with product owners, and also cited the absence of a quality agreement. Contract manufacturing relationships should state test and specification responsibilities explicitly in the quality agreement.",
+    "checks": [
+     "Allocation of release testing and specification responsibilities in quality agreements",
+     "Periodic reliability verification for components accepted on supplier COAs",
+     "Change control applied when R&D staff adjust process parameters"
+    ]
+   }
+  },
+  "511a2f6e48e7": {
+   "title_issue": "무균 조제 비위생 조건·CGMP 위반",
+   "summary": "FDA가 503B 아웃소싱시설 Pine Pharmaceuticals, LLC에 비위생 조건과 CGMP 위반으로 Warning Letter를 발부했다. ISO 7에서 ISO 5 후드로의 자재 반입 시 소독 미실시, 고접촉 트레이 환경모니터링 누락, 이물 불만 조사 미흡과 육안검사 결함 분류 문제가 지적됐다.",
+   "key_facts": [
+    "비위생 조건: ISO 5 후드 반입 자재·장비·손 소독 미실시, 소매 소독 없이 ISO 5 구역 진입",
+    "환경모니터링: 최종 용기마개를 다루는 고접촉 스테이징 트레이 미모니터링",
+    "CGMP 위반: 21 CFR 211.192·211.113(b)·211.25(a)·211.103·211.100(a)",
+    "반복성: 무균조작 결함은 2021년 5월·2023년 9월·2024년 9월 실사에 이은 반복 지적"
+   ],
+   "implication": "FDA가 환경모니터링·무균시험 적합 결과를 근거로 한 '제품 영향 없음' 결론을 과학적으로 불충분하다고 판단했다. 무균 조제·충전 시설은 작업자 무균조작 일탈의 영향평가를 시험 결과가 아닌 공정 관리 관점에서 수행하는지 점검할 필요가 있다.",
+   "checks": [
+    "ISO 7→ISO 5 반입 자재 소독 절차 준수 기록",
+    "고접촉 트레이 등 취급 표면의 환경모니터링 포함 여부",
+    "육안검사 결함 분류(이물·미세 결함) 기준의 SOP 정의"
+   ],
+   "en": {
+    "title_issue": "Insanitary aseptic compounding",
+    "summary": "FDA issued a Warning Letter to the 503B outsourcing facility Pine Pharmaceuticals, LLC for insanitary conditions and CGMP violations. The letter cites failure to disinfect materials moved from ISO 7 into the ISO 5 hood, no environmental monitoring of high-touch staging trays, inadequate particulate complaint investigation, and visual inspection defect classification problems.",
+    "key_facts": [
+     "Insanitary conditions: materials, equipment and hands not sanitized before entering the ISO 5 hood; sleeves extended into the ISO 5 area without sanitizing",
+     "Environmental monitoring: high-touch staging trays used for final container closures not monitored",
+     "CGMP violations: 21 CFR 211.192, 211.113(b), 211.25(a), 211.103, 211.100(a)",
+     "Repeat: aseptic technique deficiencies follow FDA inspections in May 2021, September 2023 and September 2024"
+    ],
+    "implication": "FDA found a 'no product impact' conclusion based on passing environmental monitoring and sterility results scientifically insufficient. Aseptic compounding and filling sites should assess operator technique deviations from a process control perspective rather than from test results.",
+    "checks": [
+     "Records of material disinfection when moving from ISO 7 to ISO 5",
+     "Inclusion of handled surfaces such as staging trays in environmental monitoring",
+     "SOP definitions for visual inspection defect categories"
+    ]
+   }
+  },
+  "0f36b5974282": {
+   "title_issue": "ADC 세척 밸리데이션 접근법",
+   "summary": "ISPE가 항체-약물 접합체(ADC)·단일클론항체·고활성 API(HPAPI)의 세척 공정 밸리데이션 방법을 다룬 글을 게재했다. 분해 연구, 세척제 선정, 분석시험이 밸리데이션 리스크 감소와 규제 기대 충족에 어떤 역할을 하는지가 주제다.",
+   "key_facts": [
+    "대상: ADC, 단일클론항체(mAb), 고활성 API(HPAPI) 세척 공정",
+    "주제: 분해 연구 평가, 분석법 선정, 밸리데이션 리스크 감소",
+    "구성 요소: 분해 연구·세척제 선정·분석시험의 역할"
+   ],
+   "implication": "ADC처럼 고활성 페이로드와 단백질이 결합된 제품은 세척 후 잔류물이 분해된 형태로 남을 수 있어 분해 연구가 세척 밸리데이션 설계의 출발점으로 다뤄진다. 다품목 공용 설비에서 ADC·HPAPI를 취급하는 제조소는 잔류 평가 대상과 분석법 선정 근거를 확인할 필요가 있다.",
+   "checks": [
+    "ADC·HPAPI 세척 잔류 평가 대상(분해산물 포함) 설정 근거",
+    "세척 밸리데이션 분석법의 특이성·검출한계 적정성"
+   ],
+   "en": {
+    "title_issue": "ADC cleaning validation approach",
+    "summary": "ISPE published an article on validating cleaning processes for antibody-drug conjugates (ADCs), monoclonal antibodies and highly potent APIs (HPAPIs). It addresses the role of degradation studies, cleaning-agent selection and analytical testing in reducing validation risk and meeting regulatory expectations.",
+    "key_facts": [
+     "Scope: cleaning processes for ADCs, monoclonal antibodies (mAbs) and HPAPIs",
+     "Topics: evaluating degradation, selecting analytical methods, reducing validation risk",
+     "Elements: the role of degradation studies, cleaning-agent selection and analytical testing"
+    ],
+    "implication": "For products combining a potent payload with a protein, residues may remain in degraded form after cleaning, so degradation studies are treated as the starting point of cleaning validation design. Multi-product sites handling ADCs or HPAPIs should confirm the basis for residue targets and analytical method selection.",
+    "checks": [
+     "Basis for ADC and HPAPI residue targets, including degradants",
+     "Specificity and detection limits of cleaning validation methods"
+    ]
+   }
+  },
+  "3d377cd87bcb": {
+   "title_issue": "EDQM CEP 사용 지침 개정",
+   "summary": "ECA가 EDQM이 적합성 인증서(CEP) 사용에 관한 지침 문서 PA/PH/CEP (14) 06을 개정했다고 보도했다. CEP 2.0 체계와 관련된 개정이다.",
+   "key_facts": [
+    "발행 주체: 유럽의약품품질위원회(EDQM)",
+    "대상 문서: PA/PH/CEP (14) 06(CEP 사용 지침)",
+    "맥락: CEP 2.0",
+    "세부 개정 내용: 원문 확인 필요"
+   ],
+   "implication": "CEP를 원료 허가 근거로 쓰는 완제의약품 제조사에게는 CEP 사용 지침 개정이 허가 서류와 공급사 관리 방식에 영향을 줄 수 있다. 개정 지침의 시행 시점과 변경 항목을 EDQM 원문으로 확인하는 것이 우선이다.",
+   "checks": [
+    "CEP 근거 원료의 허가 서류 반영 방식 영향",
+    "EDQM 개정 지침 원문·시행 시점 확인"
+   ],
+   "en": {
+    "title_issue": "EDQM revises CEP use guidance",
+    "summary": "ECA reported that EDQM has revised guidance document PA/PH/CEP (14) 06 on the use of Certificates of Suitability (CEPs). The revision relates to the CEP 2.0 framework.",
+    "key_facts": [
+     "Issuer: European Directorate for the Quality of Medicines & HealthCare (EDQM)",
+     "Document: PA/PH/CEP (14) 06 (guidance on the use of CEPs)",
+     "Context: CEP 2.0",
+     "Details of the revision: check the original"
+    ],
+    "implication": "For finished-product manufacturers that rely on CEPs for their API documentation, a revision to the CEP use guidance can affect dossiers and supplier management. The first step is to confirm the changes and effective date in the EDQM original.",
+    "checks": [
+     "Impact on how CEP-based APIs are reflected in dossiers",
+     "EDQM original text and effective date of the revised guidance"
+    ]
+   }
+  },
+  "d8450fa95965": {
+   "title_issue": "EDQM CEP 자매파일 지침 개정",
+   "summary": "ECA가 EDQM이 CEP '자매파일(sister file)' 신청에 관한 지침의 개정판을 발행했다고 보도했다.",
+   "key_facts": [
+    "발행 주체: 유럽의약품품질위원회(EDQM)",
+    "대상: CEP 자매파일 신청 지침 개정판",
+    "세부 개정 내용: 원문 확인 필요"
+   ],
+   "implication": "자매파일은 동일 원료에 대해 별도 CEP를 신청하는 경로라, 개정 지침은 원료 공급사의 CEP 보유 구조에 영향을 줄 수 있다. 자매파일 기반 CEP 원료를 쓰는 경우 공급사에 개정 대응 여부를 확인할 필요가 있다.",
+   "checks": [
+    "자매파일 기반 CEP 원료 보유 현황",
+    "공급사의 개정 지침 대응 계획 확인"
+   ],
+   "en": {
+    "title_issue": "EDQM revises CEP sister file guidance",
+    "summary": "ECA reported that EDQM has published a revised version of its guidance on applications for CEP 'sister files'.",
+    "key_facts": [
+     "Issuer: European Directorate for the Quality of Medicines & HealthCare (EDQM)",
+     "Subject: revised guidance on CEP sister file applications",
+     "Details of the revision: check the original"
+    ],
+    "implication": "Sister files are a route to separate CEPs for the same substance, so the revised guidance can affect how API suppliers hold their CEPs. Users of sister-file CEP APIs should confirm the supplier's response to the revision.",
+    "checks": [
+     "Inventory of APIs supplied under sister-file CEPs",
+     "Supplier plans in response to the revised guidance"
+    ]
+   }
+  },
+  "fe351eb8d10e": {
+   "title_issue": "FDA 경고서한 2건 OOS 조사 주목",
+   "summary": "ECA가 새로 공개된 FDA Warning Letter 2건이 OOS 조사를 집중적으로 다뤘다고 보도했다.",
+   "key_facts": [
+    "주제: FDA Warning Letter 2건의 OOS 조사 지적",
+    "발행: ECA GMP 뉴스",
+    "대상 업체·세부 지적: 원문 확인 필요"
+   ],
+   "implication": "FDA 집행에서 OOS 조사가 반복 주제로 다뤄지고 있다는 2차 보도다. 개별 서한 원문을 확인해 지적된 OOS 조사 결함 유형이 자사 절차와 겹치는지 대조할 만하다.",
+   "checks": [
+    "보도된 Warning Letter 2건 원문 확인",
+    "OOS 1단계·2단계 조사 절차 대조"
+   ],
+   "en": {
+    "title_issue": "Two FDA WLs spotlight OOS probes",
+    "summary": "ECA reported that two newly published FDA Warning Letters focus on OOS investigations.",
+    "key_facts": [
+     "Topic: OOS investigation findings in two FDA Warning Letters",
+     "Source: ECA GMP News",
+     "Firms and specific findings: check the original"
+    ],
+    "implication": "This secondary report indicates that OOS investigations remain a recurring theme in FDA enforcement. Reading the two letters to compare the cited OOS investigation gaps with in-house procedures is worthwhile.",
+    "checks": [
+     "Original text of the two reported Warning Letters",
+     "Comparison with phase I and phase II OOS investigation procedures"
+    ]
+   }
+  },
+  "c6e902b696c4": {
+   "title_issue": "FDA 실사 준비의 출발점",
+   "summary": "ISPE가 FDA 조사관은 일탈 기록부에서 실사를 시작하지 않는다는 관점의 글 'The Second Question'을 게재했다. 대부분의 시설이 일탈 검토와 CAPA 종결 위주로 실사를 준비한다는 점을 짚었다.",
+   "key_facts": [
+    "주장: FDA 조사관은 일탈 기록부가 아닌 다른 곳에서 시작한다",
+    "관행: 다수 시설이 일탈 검토·CAPA 종결 확인으로 실사 준비",
+    "조사관의 실제 출발점: 원문 확인 필요"
+   ],
+   "implication": "실사 준비를 일탈·CAPA 종결 여부 점검에 한정하면 조사관의 질문 경로를 놓칠 수 있다는 실무 관점이다. 모의실사 시나리오가 일탈 목록 외의 진입점을 포함하는지 볼 만하다.",
+   "checks": [
+    "모의실사 시나리오의 진입점 다양성",
+    "CAPA 종결 외 효과성 검증 기록"
+   ],
+   "en": {
+    "title_issue": "Where FDA inspections begin",
+    "summary": "ISPE published 'The Second Question', an article arguing that FDA investigators do not start an inspection with the deviation log. It notes that most facilities prepare by reviewing deviations and making sure CAPAs are closed.",
+    "key_facts": [
+     "Claim: FDA investigators start somewhere other than the deviation log",
+     "Practice: many facilities prepare by reviewing deviations and confirming CAPA closure",
+     "Investigators' actual starting point: check the original"
+    ],
+    "implication": "This practitioner view suggests that limiting inspection readiness to deviation and CAPA closure checks can miss the investigator's line of questioning. It is worth checking whether mock inspection scenarios include entry points beyond the deviation list.",
+    "checks": [
+     "Range of entry points in mock inspection scenarios",
+     "CAPA effectiveness records beyond closure"
+    ]
+   }
+  },
+  "admin-2026007236": {
+   "title_issue": "품질부적합 품목 제조업무정지",
+   "summary": "식약처가 (주)바른한방제약의 '바른구척'에 대해 품질부적합을 사유로 해당품목 제조업무정지 3개월(2026. 10. 20. ~ 2027. 1. 19.) 처분을 내렸다.",
+   "key_facts": [
+    "사유: 품질부적합",
+    "처분: 해당품목 제조업무정지 3개월(2026. 10. 20. ~ 2027. 1. 19.)",
+    "적용법령: 「약사법」제62조제11호, 제76조제1항제4호"
+   ],
+   "implication": "품질부적합 1건이 해당품목 제조업무정지로 이어지는 집행 수위가 확인된다. 한약재·생약 제조소는 출하 전 시험 결과와 기준 적합 판정 근거를 품목별로 재확인해 둘 필요가 있다.",
+   "checks": [
+    "품목별 출하승인 시험 항목·기준 적합 근거",
+    "부적합 발생 시 동일 원료 사용 품목 영향평가"
+   ],
+   "en": {
+    "title_issue": "Product manufacturing suspension",
+    "summary": "MFDS imposed a 3-month manufacturing suspension on one product of a manufacturer for a quality nonconformity.",
+    "key_facts": [
+     "Reason: quality nonconformity",
+     "Action: 3-month suspension of manufacturing of the product",
+     "Legal basis: Pharmaceutical Affairs Act Article 62 and Article 76"
+    ],
+    "implication": "A single quality nonconformity led to a product-level manufacturing suspension. Herbal and botanical manufacturers should reconfirm, product by product, the test results and conformity basis used at release.",
+    "checks": [
+     "Release test items and conformity basis for each product",
+     "Impact assessment of products sharing the same raw material after a nonconformity"
+    ]
+   }
+  },
+  "admin-2026007296": {
+   "title_issue": "직접용기 제품명 표시 위반 과징금",
+   "summary": "식약처가 (주)한국멜스몬에 수입 의약품 '멜스몬주(자하거추출물)'의 직접 용기에 제품명 중 일부 내용을 기재하지 않은 사실로 판매업무정지 15일을 갈음한 과징금 2,325,000원을 부과했다.",
+   "key_facts": [
+    "위반: 직접 용기에 '제품명 중 일부 내용'을 기재하지 않음",
+    "처분: 판매업무정지 15일 갈음 과징금 2,325,000원",
+    "적용법령: 「약사법」제56조제1항제2호"
+   ],
+   "implication": "표시기재 위반이 수입 품목의 판매업무정지(과징금 갈음)로 이어진 사례로, 수입사의 표시 검수가 처분 대상이 된다는 점이 드러난다. 수입 의약품은 직접 용기 표시 항목이 허가 제품명 전체와 일치하는지 입고 검수에서 확인할 필요가 있다.",
+   "checks": [
+    "수입품 직접 용기 표시의 허가 제품명 일치 검수",
+    "표시기재 변경 시 해외 제조원과의 문안 승인 절차"
+   ],
+   "en": {
+    "title_issue": "Container labeling penalty",
+    "summary": "MFDS imposed a fine in lieu of a 15-day sales suspension on an importer because part of the product name was not stated on the immediate container of an imported human placenta extract injection.",
+    "key_facts": [
+     "Violation: part of the product name not stated on the immediate container",
+     "Action: fine of 2,325,000 won in lieu of a 15-day sales suspension",
+     "Legal basis: Pharmaceutical Affairs Act Article 56(1)2"
+    ],
+    "implication": "A labeling violation on an imported product led to a fine in lieu of a sales suspension, showing that the importer's label review is itself subject to enforcement. Importers should verify at receipt that immediate container labeling matches the full approved product name.",
+    "checks": [
+     "Receipt check that immediate container labels match the approved product name",
+     "Text approval process with the foreign manufacturer when labeling changes"
+    ]
+   }
+  },
+  "recall-4204db70bc4c": {
+   "title_issue": "확인시험 부적합 회수",
+   "summary": "식약처가 (주)현진제약의 '현진골쇄보'에 대해 확인시험 사유로 회수를 명령했다(강제 회수).",
+   "key_facts": [
+    "사유: 확인시험",
+    "회수 구분: 강제 회수(회수명령일자 20261008)",
+    "제품: 현진골쇄보"
+   ],
+   "implication": "확인시험 부적합은 일반적으로 원료 기원 확인이나 혼입과 연관될 수 있어 생약 원료 입고 관리가 쟁점이 된다. 생약 제조소는 원료 입고 시 확인시험 실시 근거와 공급처 관리 기록을 점검할 필요가 있다.",
+   "checks": [
+    "생약 원료 입고 확인시험 실시 기록",
+    "원료 공급처별 기원 확인 자료"
+   ],
+   "en": {
+    "title_issue": "Identification test recall",
+    "summary": "MFDS ordered a mandatory recall of a herbal medicine product over the identification test.",
+    "key_facts": [
+     "Reason: identification test",
+     "Type: mandatory recall (order dated 20261008)",
+     "Product: a herbal medicine product"
+    ],
+    "implication": "Identification test failures can generally be associated with the origin of the raw material or admixture, which puts raw material receipt control in focus. Herbal manufacturers should review identification testing at receipt and supplier control records.",
+    "checks": [
+     "Identification testing records for incoming herbal materials",
+     "Origin documentation by raw material supplier"
+    ]
+   }
+  },
+  "recall-4663bf86acaa": {
+   "title_issue": "성상 부적합 회수",
+   "summary": "식약처가 주식회사올본의 '올본부자'에 대해 성상 부적합으로 회수를 명령했다(강제 회수).",
+   "key_facts": [
+    "사유: 성상 부적합",
+    "회수 구분: 강제 회수(회수명령일자 20261008)",
+    "제품: 올본부자"
+   ],
+   "implication": "성상 부적합은 외관·색·냄새 등 기본 규격 항목에서 확인되는 결함이라 원료 품질이나 보관 상태와 연관될 수 있다. 생약 제조소는 성상 판정 기준의 구체성과 보관 조건 관리를 점검할 필요가 있다.",
+   "checks": [
+    "성상 판정 기준·비교 표준품 운영",
+    "원료·완제품 보관 조건 기록"
+   ],
+   "en": {
+    "title_issue": "Description nonconformity recall",
+    "summary": "MFDS ordered a mandatory recall of a herbal medicine product for nonconformity in description.",
+    "key_facts": [
+     "Reason: nonconformity in description",
+     "Type: mandatory recall (order dated 20261008)",
+     "Product: a herbal medicine product"
+    ],
+    "implication": "Description failures concern basic attributes such as appearance, colour or odour and can be associated with raw material quality or storage conditions. Herbal manufacturers should check how specific their description criteria are and how storage conditions are controlled.",
+    "checks": [
+     "Description criteria and reference samples",
+     "Storage condition records for raw materials and products"
+    ]
+   }
+  },
+  "recall-66aaecf07125": {
+   "title_issue": "잔류농약 부적합 회수",
+   "summary": "식약처가 (주)허브팜의 '허브팜차전자'에 대해 잔류농약(프로사이미돈) 부적합으로 회수를 명령했다(강제 회수).",
+   "key_facts": [
+    "사유: 잔류농약(프로사이미돈) 부적합",
+    "회수 구분: 강제 회수(회수명령일자 20261008)",
+    "제품: 허브팜차전자"
+   ],
+   "implication": "잔류농약 부적합은 재배 단계 오염이 원료로 유입된 경우와 연관될 수 있어 원료 입고 시험의 범위가 관건이다. 생약 제조소는 입고 원료의 잔류농약 시험 항목과 공급처 이력 관리를 점검할 필요가 있다.",
+   "checks": [
+    "입고 원료 잔류농약 시험 항목(프로사이미돈 포함)",
+    "원료 공급처·산지별 이력 관리"
+   ],
+   "en": {
+    "title_issue": "Pesticide residue recall",
+    "summary": "MFDS ordered a mandatory recall of a herbal medicine product for a pesticide residue (procymidone) nonconformity.",
+    "key_facts": [
+     "Reason: pesticide residue (procymidone) nonconformity",
+     "Type: mandatory recall (order dated 20261008)",
+     "Product: a herbal medicine product"
+    ],
+    "implication": "Pesticide residue failures can be associated with contamination at cultivation carried into the raw material, making the scope of incoming testing the key question. Herbal manufacturers should review pesticide residue test items for incoming materials and supplier history.",
+    "checks": [
+     "Pesticide residue test items for incoming materials, including procymidone",
+     "Supplier and origin history for raw materials"
+    ]
+   }
+  },
+  "recall-5c1b0c75c945": {
+   "title_issue": "품질부적합 우려 치약 회수",
+   "summary": "(주)성원제약이 품질부적합 우려로 치약 2품목을 자진 회수한다. 동일 사유 2품목 일괄 회수다.",
+   "key_facts": [
+    "사유: 품질부적합 우려",
+    "회수 구분: 영업자 자진 회수(강제여부 N, 회수명령일자 20261007)",
+    "범위: 동일 사유 2품목 일괄 회수"
+   ],
+   "implication": "구체적 부적합 항목 대신 '우려'를 사유로 한 예방적 회수라 원인은 회수 공고만으로 특정되지 않는다. 동일 제조사 복수 품목 회수는 공통 원료나 공정의 영향일 수 있으므로 공용 원료 사용 품목을 함께 확인할 필요가 있다.",
+   "checks": [
+    "공용 원료·공정 사용 품목 영향 범위",
+    "예방적 회수 판단 근거 기록"
+   ],
+   "en": {
+    "title_issue": "Toothpaste recall on quality concern",
+    "summary": "A manufacturer is voluntarily recalling two toothpaste products over a possible quality nonconformity. It is a single recall covering two products for the same reason.",
+    "key_facts": [
+     "Reason: possible quality nonconformity",
+     "Type: voluntary recall by the company (order dated 20261007)",
+     "Scope: two products recalled together for the same reason"
+    ],
+    "implication": "This is a precautionary recall citing a concern rather than a specific failed attribute, so the cause cannot be identified from the notice. A recall of several products from one manufacturer may reflect a shared material or process, so products using common materials should be checked together.",
+    "checks": [
+     "Impact scope across products sharing materials or processes",
+     "Records supporting the precautionary recall decision"
+    ]
+   }
+  },
+  "recall-c191f480bcb5": {
+   "title_issue": "이취 발생 예방적 자진 회수",
+   "summary": "(주)한풍제약이 '페인싹트리플정'에서 이취가 확인돼 사전 예방 차원에서 자진 회수한다.",
+   "key_facts": [
+    "사유: 제품 내 이취로 인한 사전 예방 차원의 영업자 자진 회수",
+    "회수 구분: 자진 회수(강제여부 N, 회수명령일자 20261007)",
+    "제품: 페인싹트리플정"
+   ],
+   "implication": "정제의 이취는 일반적으로 원료·부형제 분해나 포장 재질과 연관될 수 있어 안정성·포장 적합성이 함께 검토 대상이 된다. 정제 제조소는 이취 불만 접수 시 안정성 시료와 포장 자재 이력을 함께 확인하는 절차가 있는지 볼 필요가 있다.",
+   "checks": [
+    "이취 불만 시 안정성 시료·보관 검체 확인 절차",
+    "포장 자재 변경 이력과 냄새 전이 평가"
+   ],
+   "en": {
+    "title_issue": "Odour-related voluntary recall",
+    "summary": "A manufacturer is voluntarily recalling a tablet product as a precaution after an off-odour was found in the product.",
+    "key_facts": [
+     "Reason: precautionary voluntary recall due to an off-odour in the product",
+     "Type: voluntary recall (order dated 20261007)",
+     "Product: a tablet product"
+    ],
+    "implication": "An off-odour in tablets can generally be associated with degradation of the active or excipients or with packaging materials, so stability and packaging suitability come under review. Tablet manufacturers should check whether odour complaints trigger review of stability and retained samples and packaging history.",
+    "checks": [
+     "Review of stability and retained samples after odour complaints",
+     "Packaging material change history and odour transfer assessment"
+    ]
+   }
+  },
+  "hc-82725": {
+   "title_issue": "카르베딜롤 불순물 규격 일탈 회수",
+   "summary": "Health Canada가 Pharmascience의 PMS-Carvedilol 25 MG 정제를 불순물 규격 일탈(Out-of-specification)로 회수했다(Type II).",
+   "key_facts": [
+    "사유: 제품 품질(불순물 규격 일탈)",
+    "회수 등급: Type II",
+    "제품: PMS-Carvedilol 25 MG 정제"
+   ],
+   "implication": "같은 주에 카르베딜롤 25 mg 정제가 복수 업체에서 불순물 규격 일탈로 회수돼, 공통 원료 또는 공급망 요인일 가능성이 제기된다. 카르베딜롤 제품을 취급하는 제조사는 원료 공급처와 불순물 시험 결과 추이를 확인할 필요가 있다.",
+   "checks": [
+    "카르베딜롤 원료 공급처 중복 여부",
+    "불순물 시험 결과 추이(안정성 포함)"
+   ],
+   "quotes_translation": [
+    "제품 품질"
+   ],
+   "en": {
+    "title_issue": "Carvedilol impurity OOS recall",
+    "summary": "Health Canada recalled PMS-Carvedilol 25 MG tablets from Pharmascience as out-of-specification for an impurity (Type II).",
+    "key_facts": [
+     "Reason: product quality (impurity out of specification)",
+     "Recall class: Type II",
+     "Product: PMS-Carvedilol 25 MG tablets"
+    ],
+    "implication": "Carvedilol 25 mg tablets from several companies were recalled the same week for an impurity out of specification, raising the possibility of a shared API or supply chain factor. Manufacturers handling carvedilol should check their API source and impurity trend data.",
+    "checks": [
+     "Overlap of carvedilol API suppliers",
+     "Impurity result trends, including stability"
+    ]
+   }
+  },
+  "hc-82726": {
+   "title_issue": "카르베딜롤 정제 불순물 회수",
+   "summary": "Health Canada가 Pro Doc의 Carvedilol 25 MG 정제를 불순물 규격 일탈(Out-of-specification)로 회수했다(Type II).",
+   "key_facts": [
+    "사유: 제품 품질(불순물 규격 일탈)",
+    "회수 등급: Type II",
+    "제품: Carvedilol 25 MG 정제"
+   ],
+   "implication": "Pro Doc 제품도 동일 함량·동일 사유로 회수돼 카르베딜롤 불순물 문제가 개별 제조소를 넘어선 것인지가 관건이다. 위탁·수입 카르베딜롤 제품은 제조원과 원료 로트 정보를 확인해 영향 여부를 판단할 필요가 있다.",
+   "checks": [
+    "위탁·수입 카르베딜롤 제품의 제조원 확인",
+    "원료 로트별 불순물 결과 대조"
+   ],
+   "quotes_translation": [
+    "제품 품질"
+   ],
+   "en": {
+    "title_issue": "Carvedilol tablet impurity recall",
+    "summary": "Health Canada recalled Carvedilol 25 MG tablets from Pro Doc as out-of-specification for an impurity (Type II).",
+    "key_facts": [
+     "Reason: product quality (impurity out of specification)",
+     "Recall class: Type II",
+     "Product: Carvedilol 25 MG tablets"
+    ],
+    "implication": "A Pro Doc product was also recalled at the same strength for the same reason, so the question is whether the carvedilol impurity issue extends beyond a single site. For contract or imported carvedilol products, manufacturer and API lot information should be checked to judge impact.",
+    "checks": [
+     "Identification of the manufacturer for contract or imported carvedilol",
+     "Comparison of impurity results by API lot"
+    ]
+   }
+  },
+  "hc-82722": {
+   "title_issue": "카르베딜롤 불순물 일탈 회수",
+   "summary": "Health Canada가 Sanis의 CARVEDILOL 25 MG 정제를 불순물 규격 일탈(Out-of-specification)로 회수했다(Type II).",
+   "key_facts": [
+    "사유: 제품 품질(불순물 규격 일탈)",
+    "회수 등급: Type II",
+    "제품: CARVEDILOL 25 MG 정제"
+   ],
+   "implication": "Sanis 제품까지 포함해 같은 주 카르베딜롤 25 mg 회수가 이어졌다. 불순물 규격 일탈이 출하 후 확인된 것이라면 안정성 중 불순물 증가 여부를 함께 살펴야 한다.",
+   "checks": [
+    "안정성 시험 중 불순물 증가 경향",
+    "출하 후 규격 일탈 시 회수 판단 절차"
+   ],
+   "quotes_translation": [
+    "제품 품질"
+   ],
+   "en": {
+    "title_issue": "Carvedilol impurity recall",
+    "summary": "Health Canada recalled CARVEDILOL 25 MG tablets from Sanis as out-of-specification for an impurity (Type II).",
+    "key_facts": [
+     "Reason: product quality (impurity out of specification)",
+     "Recall class: Type II",
+     "Product: CARVEDILOL 25 MG tablets"
+    ],
+    "implication": "With the Sanis product, carvedilol 25 mg recalls continued through the same week. If the impurity was found after release, impurity growth during stability should be examined as well.",
+    "checks": [
+     "Impurity growth trends in stability studies",
+     "Recall decision procedure for post-release OOS results"
+    ]
+   }
+  },
+  "hc-82720": {
+   "title_issue": "디펜히드라민 캡슐 불순물 회수",
+   "summary": "Health Canada가 Pendopharm의 PDP-DIPHENHYDRAMINE 25 MG 캡슐을 불순물 규격 일탈(Out-of-specification)로 회수했다(Type II).",
+   "key_facts": [
+    "사유: 제품 품질(불순물 규격 일탈)",
+    "회수 등급: Type II",
+    "제품: PDP-DIPHENHYDRAMINE 25 MG 캡슐"
+   ],
+   "implication": "디펜히드라민 캡슐의 불순물 규격 일탈 회수로, 캡슐 제형에서는 원료뿐 아니라 캡슐 기제와의 상호작용도 불순물 요인이 될 수 있다. 캡슐 제품은 불순물 규격 일탈 시 원료·기제 양쪽을 조사 범위에 넣는지 점검할 필요가 있다.",
+   "checks": [
+    "불순물 일탈 조사 범위(원료·캡슐 기제)",
+    "안정성 중 불순물 추이"
+   ],
+   "quotes_translation": [
+    "제품 품질"
+   ],
+   "en": {
+    "title_issue": "Diphenhydramine impurity recall",
+    "summary": "Health Canada recalled PDP-DIPHENHYDRAMINE 25 MG capsules from Pendopharm as out-of-specification for an impurity (Type II).",
+    "key_facts": [
+     "Reason: product quality (impurity out of specification)",
+     "Recall class: Type II",
+     "Product: PDP-DIPHENHYDRAMINE 25 MG capsules"
+    ],
+    "implication": "This is an impurity out-of-specification recall for diphenhydramine capsules; in capsules, interaction with the shell as well as the API can contribute to impurities. Capsule manufacturers should check that impurity investigations cover both the API and the shell.",
+    "checks": [
+     "Scope of impurity investigations (API and capsule shell)",
+     "Impurity trends during stability"
+    ]
+   }
+  },
+  "3c24cd12096b": {
+   "title_issue": "주성분 함량 이상 예방 회수",
+   "summary": "MHRA가 Norgine Limited의 MOVICOL Plain 13.7g 경구용액용 산제 특정 배치에 대한 Class 3 회수를 공지했다. 일부 단위에 주성분이 잘못된 양으로 들어 있어 예방 차원에서 회수한다.",
+   "key_facts": [
+    "사유: 일부 단위의 주성분 함량 오류",
+    "회수 등급: Class 3",
+    "제품: MOVICOL Plain 13.7g powder for oral solution(EL(26)A/41)"
+   ],
+   "implication": "분할 포장 산제에서 단위별 주성분량 오류는 일반적으로 충전·혼합 균일성과 연관될 수 있다. 산제·과립 소포장 제품은 충전 중량 관리와 단위 함량 균일성 확인 방식을 점검할 필요가 있다.",
+   "checks": [
+    "소포장 산제 충전 중량 공정중 관리",
+    "단위 함량 균일성 시험 검체 수·빈도"
+   ],
+   "quotes_translation": [
+    "Norgine Limited는 일부 단위에 주성분이 잘못된 양으로 들어 있어 예방 차원에서 특정 배치를 회수하고 있다."
+   ],
+   "en": {
+    "title_issue": "Incorrect active content recall",
+    "summary": "MHRA announced a Class 3 recall of specific batches of MOVICOL Plain 13.7g powder for oral solution from Norgine Limited. Some units contain incorrect amounts of the active ingredients, and the batches are recalled as a precaution.",
+    "key_facts": [
+     "Reason: incorrect amounts of active ingredients in some units",
+     "Recall class: Class 3",
+     "Product: MOVICOL Plain 13.7g powder for oral solution (EL(26)A/41)"
+    ],
+    "implication": "In unit-dose powders, incorrect active content per unit can generally be associated with filling or blend uniformity. Sachet powder and granule products should review fill weight control and how content uniformity is confirmed.",
+    "checks": [
+     "In-process fill weight control for sachet powders",
+     "Sample size and frequency for content uniformity testing"
+    ]
+   }
+  },
+  "D-0854-2026": {
+   "title_issue": "cGMP 일탈 자외선차단 파우더 회수",
+   "summary": "FDA가 SHANTOU Qiwei industrial Co., Ltd의 MENOW SUNSCREEN PRESSED POWDER SPF35 PA+++ 회수를 cGMP 일탈 사유로 Class II로 분류했다.",
+   "key_facts": [
+    "사유: cGMP 일탈(cGMP Deviations)",
+    "회수 등급: Class II",
+    "제품: MENOW SUNSCREEN PRESSED POWDER SPF35 PA+++(중국 산터우 제조)"
+   ],
+   "implication": "자외선차단제는 미국에서 OTC 의약품으로 관리돼 화장품형 제품도 cGMP 일탈이 회수 사유가 된다. 자외선차단제를 미국에 수출하는 경우 의약품 cGMP 기준 적용 범위를 확인할 필요가 있다.",
+   "checks": [
+    "미국 수출 자외선차단제의 OTC 의약품 cGMP 적용",
+    "수탁 제조원 cGMP 감사 기록"
+   ],
+   "quotes_translation": [
+    "cGMP 일탈"
+   ],
+   "en": {
+    "title_issue": "Sunscreen powder cGMP recall",
+    "summary": "FDA classified the recall of MENOW SUNSCREEN PRESSED POWDER SPF35 PA+++ from SHANTOU Qiwei industrial Co., Ltd as Class II for cGMP deviations.",
+    "key_facts": [
+     "Reason: cGMP Deviations",
+     "Recall class: Class II",
+     "Product: MENOW SUNSCREEN PRESSED POWDER SPF35 PA+++ (made in Shantou, China)"
+    ],
+    "implication": "Sunscreens are regulated as OTC drugs in the US, so cGMP deviations are a recall reason even for cosmetic-style products. Exporters of sunscreen to the US should confirm the scope of drug cGMP requirements that apply.",
+    "checks": [
+     "Application of OTC drug cGMP to sunscreens exported to the US",
+     "cGMP audit records for contract manufacturers"
+    ]
+   }
+  },
+  "D-0855-2026": {
+   "title_issue": "점안제 무균성 보증 결여 회수",
+   "summary": "FDA가 Sterling Pharmaceutical Services LLC의 AvKare 카르복시메틸셀룰로스나트륨 점안액 0.5% 등 동일 사유 9품목 일괄 회수를 무균성 보증 결여로 Class II로 분류했다.",
+   "key_facts": [
+    "사유: 무균성 보증 결여(Lack of Assurance of Sterility)",
+    "회수 등급: Class II",
+    "범위: 동일 사유 9품목 일괄 회수(대표: AvKare 카르복시메틸셀룰로스나트륨 점안액 0.5%)"
+   ],
+   "implication": "한 수탁 제조원의 점안제 다품목이 같은 무균성 보증 사유로 묶여 회수된 것은 공정·시설 수준의 무균보증 문제를 시사할 수 있다. 점안제를 위탁 생산하는 경우 수탁처 무균공정 밸리데이션과 환경모니터링 기록을 확인할 필요가 있다.",
+   "checks": [
+    "점안제 수탁처 무균공정 밸리데이션 현황",
+    "수탁처 환경모니터링 일탈 이력"
+   ],
+   "quotes_translation": [
+    "무균성 보증 결여"
+   ],
+   "en": {
+    "title_issue": "Eye drop sterility assurance recall",
+    "summary": "FDA classified as Class II a recall of nine products from Sterling Pharmaceutical Services LLC, including AvKare carboxymethylcellulose sodium ophthalmic solution 0.5%, for lack of assurance of sterility.",
+    "key_facts": [
+     "Reason: Lack of Assurance of Sterility",
+     "Recall class: Class II",
+     "Scope: nine products recalled together for the same reason (lead item: AvKare carboxymethylcellulose sodium ophthalmic solution 0.5%)"
+    ],
+    "implication": "Multiple eye drop products from one contract manufacturer recalled for the same sterility assurance reason may point to a process or facility-level issue. Companies outsourcing eye drops should check the contractor's aseptic process validation and environmental monitoring records.",
+    "checks": [
+     "Aseptic process validation status at the eye drop contractor",
+     "Environmental monitoring excursion history at the contractor"
+    ]
+   }
+  },
+  "D-0868-2026": {
+   "title_issue": "프리필드 펜 약물 누락 가능성",
+   "summary": "FDA가 Amneal Pharmaceuticals of New York, LLC의 엑세나타이드 주사 프리필드 펜 회수를 전달 시스템 결함(펜에 약물이 없을 가능성)으로 Class II로 분류했다.",
+   "key_facts": [
+    "사유: 전달 시스템 결함 — 프리필드 펜에 약물이 없을 가능성",
+    "회수 등급: Class II",
+    "제품: Exenatide Injection, USP, 250 mcg/mL, 1.2 mL 프리필드 펜"
+   ],
+   "implication": "약물·기기 조합 제품에서 펜 내 약물 부재 가능성은 충전·조립 공정의 검사 누락과 연관될 수 있다. 프리필드 펜·시린지 제품은 충전량 확인과 조립 후 검사 방식을 점검할 필요가 있다.",
+   "checks": [
+    "프리필드 펜 충전량 100% 확인 방식",
+    "조립 후 기능·외관 검사 기준"
+   ],
+   "quotes_translation": [
+    "전달 시스템 결함: 프리필드 펜에 약물이 없을 가능성."
+   ],
+   "en": {
+    "title_issue": "Prefilled pen may lack drug",
+    "summary": "FDA classified the recall of exenatide injection prefilled pens from Amneal Pharmaceuticals of New York, LLC as Class II for a defective delivery system (possibility of no medication in the pen).",
+    "key_facts": [
+     "Reason: defective delivery system; possibility of no medication in the prefilled pen",
+     "Recall class: Class II",
+     "Product: Exenatide Injection, USP, 250 mcg/mL, 1.2 mL prefilled pen"
+    ],
+    "implication": "In drug-device combination products, the possibility of an empty pen can be associated with gaps in fill or assembly inspection. Prefilled pen and syringe products should review fill verification and post-assembly inspection.",
+    "checks": [
+     "Method for 100% fill verification of prefilled pens",
+     "Post-assembly functional and visual inspection criteria"
+    ]
+   }
+  },
+  "D-0870-2026": {
+   "title_issue": "충혈완화 점안제 무균성 회수",
+   "summary": "FDA가 Insight Pharmaceuticals LLC의 Clear Eyes Redness Relief 점안액 등 동일 사유 2품목 일괄 회수를 무균성 보증 결여로 Class II로 분류했다.",
+   "key_facts": [
+    "사유: 무균성 보증 결여(Lack of Assurance of Sterility)",
+    "회수 등급: Class II",
+    "범위: 동일 사유 2품목 일괄 회수(대표: Clear Eyes Redness Relief, 글리세린 0.25%·나파졸린염산염 0.012%)"
+   ],
+   "implication": "OTC 점안제 브랜드 제품도 무균성 보증 결여로 회수돼, 다회용 점안 용기 제품의 무균보증 근거가 집행 대상임이 드러난다. OTC 점안제를 위탁 생산하는 경우 무균 충전 공정과 용기 완전성 자료를 확인할 필요가 있다.",
+   "checks": [
+    "OTC 점안제 무균 충전 공정 자료",
+    "점안 용기 완전성(CCI) 평가 자료"
+   ],
+   "quotes_translation": [
+    "무균성 보증 결여"
+   ],
+   "en": {
+    "title_issue": "Redness relief drops sterility recall",
+    "summary": "FDA classified as Class II a recall of two products from Insight Pharmaceuticals LLC, including Clear Eyes Redness Relief eye drops, for lack of assurance of sterility.",
+    "key_facts": [
+     "Reason: Lack of Assurance of Sterility",
+     "Recall class: Class II",
+     "Scope: two products recalled together for the same reason (lead item: Clear Eyes Redness Relief, glycerin 0.25%, naphazoline hydrochloride 0.012%)"
+    ],
+    "implication": "A branded OTC eye drop was also recalled for lack of sterility assurance, showing that the sterility basis of multi-dose eye drop containers is an enforcement target. Companies outsourcing OTC eye drops should check aseptic filling and container closure integrity data.",
+    "checks": [
+     "Aseptic filling process data for OTC eye drops",
+     "Container closure integrity (CCI) data for dropper bottles"
+    ]
+   }
+  },
+  "N/A": {
+   "title_issue": "안정성 규격 부적합 크림 회수",
+   "summary": "SUN PHARMACEUTICAL INDUSTRIES INC가 Taro Pharmaceutical Industries Ltd. 제조 니스타틴 크림(15 g 튜브)을 안정성 규격 부적합으로 회수한다. FDA 회수 등급은 아직 분류되지 않았다.",
+   "key_facts": [
+    "사유: 안정성 규격 부적합(Failed Stability Specifications)",
+    "회수 등급: Not Yet Classified",
+    "제품: Nystatin Cream, USP, 15 g 튜브(Taro Pharmaceutical Industries Ltd. 제조)"
+   ],
+   "implication": "안정성 규격 부적합은 유통기한 내 품질 유지 근거가 흔들렸다는 뜻이라, 진행 중 안정성 시험의 OOS·OOT 관리가 직접 쟁점이 된다. 반고형제 제조소는 안정성 OOT 경향이 회수 판단으로 이어지는 기준을 점검할 필요가 있다.",
+   "checks": [
+    "진행 중 안정성 시험 OOT 경향 관리",
+    "안정성 OOS 발생 시 시판 로트 영향평가 절차"
+   ],
+   "quotes_translation": [
+    "안정성 규격 부적합"
+   ],
+   "en": {
+    "title_issue": "Cream stability failure recall",
+    "summary": "SUN PHARMACEUTICAL INDUSTRIES INC is recalling Nystatin Cream (15 g tube) made by Taro Pharmaceutical Industries Ltd. for failed stability specifications. FDA has not yet classified the recall.",
+    "key_facts": [
+     "Reason: Failed Stability Specifications",
+     "Recall class: Not Yet Classified",
+     "Product: Nystatin Cream, USP, 15 g tube (made by Taro Pharmaceutical Industries Ltd.)"
+    ],
+    "implication": "A stability failure means the basis for quality through shelf life has been undermined, putting OOS and OOT management in ongoing stability studies directly in focus. Semi-solid manufacturers should check the criteria by which stability OOT trends lead to recall decisions.",
+    "checks": [
+     "OOT trend management in ongoing stability studies",
+     "Impact assessment of marketed lots after a stability OOS"
+    ]
+   }
+  }
+ },
+ "tldr": [
+  "네덜란드 당국, 병원약국 NKI-AVL에 무균시험 실패 ATMP 출하 등 치명 결함으로 EU GMP 비준수 판정·임상시험 중지",
+  "FDA 483, RC Outsourcing의 재포장 Avastin 무균시험 실패 4배치 조사 미흡과 같은 날·같은 후드 배치 출하 지적",
+  "식약처, (주)바른한방제약 '바른구척' 품질부적합으로 해당품목 제조업무정지 3개월 처분"
+ ],
+ "tldr_en": [
+  "The Dutch authority found a hospital pharmacy GMP non-compliant over critical deficiencies including release of an ATMP after a failed sterility test, and suspended a clinical trial.",
+  "An FDA 483 to RC Outsourcing cites inadequate investigation of four repackaged Avastin batches that failed sterility and release of same-day, same-hood batches.",
+  "MFDS imposed a 3-month manufacturing suspension on one product of a manufacturer for a quality nonconformity."
+ ]
+}

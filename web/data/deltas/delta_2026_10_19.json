@@ -1,0 +1,1333 @@
+{
+ "publish_date": "2026-10-19",
+ "cards": {
+  "188112": {
+   "title_issue": "유동층 코팅설비 오염위험 중대결함",
+   "summary": "Malta 규제당국이 인도 소재 Glukem Biocare Private Limited 제조소에 EU GMP 비준수 판정을 내렸다. 완전 세척된 유동층 코팅(FBC) 설비의 흡기 플레넘 일부에서 액체 고임과 잔류물이 관찰되어 오염 위험 관련 중대(critical) 결함이 지적되었다.",
+   "key_facts": [
+    "발행기관(NCA): Malta",
+    "중대 결함: 완전 세척된 FBC 설비 흡기 플레넘 일부의 액체 고임 및 잔류물로 인한 오염 위험",
+    "비준수 운영: 비무균 제품 중간체(펠릿) 제조, 품질관리시험(미생물: 비무균, 이화학)",
+    "제품범위: Human Medicinal Products"
+   ],
+   "implication": "세척 완료로 판정된 설비 내부에서 액체와 잔류물이 확인된 점은 세척 후 육안 점검 범위가 설비의 숨은 구간까지 미치는지가 실사 쟁점이 될 수 있다는 신호로 볼 수 있다. 펠릿 등 중간체를 해외 제조소에서 조달하는 업체는 해당 제조소의 EU GMP 상태와 공급 연속성을 점검할 필요가 있다.",
+   "checks": [
+    "유동층 코팅설비 흡기 플레넘 등 사각 구간의 세척 후 점검 절차",
+    "설비 내 액체 잔류 여부 확인 기준",
+    "중간체(펠릿) 공급 제조소의 EU GMP 적합 상태"
+   ],
+   "quotes_translation": [
+    "점검 결과, 완전히 세척된 FBC의 흡기 플레넘(inlet air plenum) 일부 구간에서 액체 고임과 잔류물이 관찰되어 유동층 코팅(Fluid Bed Coating, FBC) 설비의 오염 위험과 관련된 중대(critical) 결함이 확인되었다."
+   ],
+   "en": {
+    "title_issue": "Critical contamination risk in fluid bed coater",
+    "summary": "The Malta authority issued an EU GMP non-compliance statement for Glukem Biocare Private Limited in India. The inspection found a critical deficiency on contamination risk after liquid pooling and residue were observed in the inlet air plenum of a fully cleaned Fluid Bed Coating (FBC) unit.",
+    "key_facts": [
+     "Issuing authority (NCA): Malta",
+     "Critical deficiency: pool of liquid and residue in the inlet air plenum of a fully cleaned FBC",
+     "Non-compliant operations: manufacture of non-sterile intermediates (pellets) and QC testing (microbiological non-sterility, chemical/physical)",
+     "Product scope: Human Medicinal Products"
+    ],
+    "implication": "Residue found inside equipment already released as clean suggests that inspectors may probe whether post-cleaning visual checks reach hidden sections of process equipment. Firms sourcing pellets or other intermediates from overseas sites may need to review the EU GMP status and supply continuity of those sites.",
+    "checks": [
+     "Post-cleaning inspection of hidden sections such as FBC inlet air plenums",
+     "Acceptance criteria for residual liquid in equipment",
+     "EU GMP status of intermediate (pellet) suppliers"
+    ]
+   }
+  },
+  "060af7eeccbf": {
+   "title_issue": "시험기록 불완전·일탈 조사 미흡",
+   "summary": "FDA CDER가 미국 Pennsylvania주 Horsham 소재 위탁시험기관 Eurofins SF Analytical Laboratories, Inc.에 Warning Letter를 발행했다. 2026년 6월 1~3일 실사에 따른 조치로 CGMP 위반과 adulterated(불량) 분류가 적용되었다.",
+   "key_facts": [
+    "시설 유형: 위탁시험기관(contract testing laboratory)",
+    "실사 기간: 2026년 6월 1~3일",
+    "FEI: 3014704316",
+    "지적 항목: 시험기록 데이터 불완전(21 CFR 211.194(a)), 일탈·규격 부적합 조사 미흡, 품질부서 책임 미이행"
+   ],
+   "implication": "위탁시험기관이 시험기록의 완전성과 부적합 조사 미흡으로 Warning Letter를 받은 사례로, FDA가 시험 데이터 무결성 책임을 수탁 시험소에도 직접 묻고 있다는 신호로 볼 수 있다. 시험을 외부에 위탁하는 국내 제조사는 수탁 시험소의 원자료 보존·부적합 조사 관리를 공급자 평가에서 확인할 필요가 있다.",
+   "checks": [
+    "위탁 시험소 원자료(raw data) 완전성 감사",
+    "수탁 시험 부적합 결과 조사·보고 절차",
+    "위탁 시험 계약서상 품질 책임 분담"
+   ],
+   "en": {
+    "title_issue": "Incomplete lab records and investigations",
+    "summary": "FDA CDER issued a Warning Letter to Eurofins SF Analytical Laboratories, Inc., a contract testing laboratory in Horsham, Pennsylvania. It follows an inspection held June 1 to 3, 2026, and is classified as CGMP/Finished Pharmaceuticals/Adulterated.",
+    "key_facts": [
+     "Facility type: contract testing laboratory",
+     "Inspection: June 1 to 3, 2026",
+     "FEI: 3014704316",
+     "Cited items: incomplete laboratory records (21 CFR 211.194(a)), inadequate investigation of discrepancies, quality unit failures"
+    ],
+    "implication": "A contract testing laboratory being cited for incomplete records and weak failure investigations suggests FDA holds contract labs directly accountable for data integrity. Manufacturers that outsource testing may need to verify raw data retention and failure investigation practices in supplier audits.",
+    "checks": [
+     "Audit of contract lab raw data completeness",
+     "Contract lab OOS investigation and reporting procedure",
+     "Quality responsibilities in the testing agreement"
+    ]
+   }
+  },
+  "870193c29cc1": {
+   "title_issue": "일탈 조사 미흡·미승인 신약",
+   "summary": "FDA CDER가 Silgan Dispensing Systems에 Warning Letter를 발행했다. 2026년 3월 26일~4월 2일 Washington주 Spokane 소재 의약품 제조시설 Silgan Unicep Packaging, LLC 실사에 따른 조치로, CGMP 위반·adulterated(불량)·미승인 신약(Unapproved New Drug) 분류가 적용되었다.",
+   "key_facts": [
+    "실사 시설: Silgan Unicep Packaging, LLC (Spokane, Washington)",
+    "실사 기간: 2026년 3월 26일~4월 2일",
+    "FEI: 3011913386",
+    "지적 항목: 배치·원료 규격 부적합 조사 미흡, 품질부서 책임 미이행"
+   ],
+   "implication": "용기 시스템 제조사가 일탈 조사 미흡과 함께 미승인 신약 판매로 지적된 사례로, 의약품 해당 여부 판단과 CGMP 적용 범위를 FDA가 함께 본다는 신호로 볼 수 있다. 의약품 성격 제품을 함께 생산하는 제조소는 품목별 허가 지위와 부적합 조사 체계를 점검할 필요가 있다.",
+   "checks": [
+    "품목별 의약품 해당 여부·허가 지위 확인",
+    "배치 부적합 발생 시 조사 범위 확대 기준",
+    "품질부서의 출하 판정 권한 운영"
+   ],
+   "en": {
+    "title_issue": "Weak investigations and unapproved drug",
+    "summary": "FDA CDER issued a Warning Letter to Silgan Dispensing Systems following a March 26 to April 2, 2026 inspection of its drug manufacturing facility, Silgan Unicep Packaging, LLC, in Spokane, Washington. The letter is classified as CGMP/Finished Pharmaceuticals/Adulterated/Unapproved New Drug.",
+    "key_facts": [
+     "Inspected facility: Silgan Unicep Packaging, LLC (Spokane, Washington)",
+     "Inspection: March 26 to April 2, 2026",
+     "FEI: 3011913386",
+     "Cited items: inadequate investigation of batch or component failures, quality unit failures"
+    ],
+    "implication": "The citation of weak investigations alongside an unapproved new drug charge suggests FDA reviews both product status and CGMP scope together. Sites making drug-like products may need to confirm each product's approval status and their investigation system.",
+    "checks": [
+     "Drug status and approval check for each product",
+     "Criteria for extending investigations to other batches",
+     "Quality unit release authority"
+    ]
+   }
+  },
+  "8a404f9eaaf8": {
+   "title_issue": "무균 오염 방지 절차·구역 관리 미흡",
+   "summary": "FDA CDER가 경기도 용인 소재 의약품 제조시설을 운영하는 Hanlim Pharm Co., Ltd.에 Warning Letter를 발행했다. 2026년 4월 16일~24일 실사에 따른 조치로 CGMP 위반과 adulterated(불량) 분류가 적용되었다.",
+   "key_facts": [
+    "실사 시설: Hanlim Pharm Co., Ltd. 의약품 제조시설(경기도 용인)",
+    "실사 기간: 2026년 4월 16일~24일",
+    "FEI: 3004886113",
+    "지적 항목: 무균 표방 제품의 미생물 오염 방지 절차 미흡(21 CFR 211.113(b)), 오염·혼동 방지 구역 미확보(21 CFR 211.42(c)), 품질부서 책임 미이행"
+   ],
+   "implication": "국내 제조소가 무균 표방 제품의 오염 방지 절차와 구역 관리로 Warning Letter를 받은 사례로, FDA가 무균 공정 밸리데이션과 시설 구획을 핵심 결함으로 보고 있다는 신호로 볼 수 있다. 미국 수출 무균 제품을 생산하는 국내 제조소는 무균공정 밸리데이션과 구역 분리 관리 수준을 점검할 필요가 있다.",
+   "checks": [
+    "무균공정 밸리데이션(배지충전 포함) 범위 적정성",
+    "오염·혼동 방지를 위한 작업구역 분리",
+    "품질부서의 무균 공정 감독 기록"
+   ],
+   "en": {
+    "title_issue": "Sterile contamination control gaps",
+    "summary": "FDA CDER issued a Warning Letter to Hanlim Pharm Co., Ltd. following an April 16 to 24, 2026 inspection of its drug manufacturing facility in Korea. The letter is classified as CGMP/Finished Pharmaceuticals/Adulterated.",
+    "key_facts": [
+     "Inspected facility: drug manufacturing facility of Hanlim Pharm Co., Ltd. in Korea",
+     "Inspection: April 16 to 24, 2026",
+     "FEI: 3004886113",
+     "Cited items: inadequate procedures to prevent microbial contamination of products purporting to be sterile (21 CFR 211.113(b)), lack of defined areas to prevent contamination or mix-ups (21 CFR 211.42(c)), quality unit failures"
+    ],
+    "implication": "A Korean site cited for contamination prevention procedures and area control on products purporting to be sterile suggests FDA treats aseptic validation and facility segregation as core deficiencies. Korean sites making sterile products for the US may need to review aseptic process validation and area segregation.",
+    "checks": [
+     "Scope of aseptic process validation including media fills",
+     "Segregation of operations to prevent contamination or mix-ups",
+     "Quality unit oversight records for aseptic operations"
+    ]
+   }
+  },
+  "8e57053f3edb": {
+   "title_issue": "원료 확인시험 미실시·QC 책임 미흡",
+   "summary": "FDA CDER가 중국 Guangdong 소재 Jiangmen Shuizirun Sanitary Articles Co., Ltd.에 Warning Letter를 발행했다. 2025년 11월 3~7일 의약품 제조시설 실사에 따른 조치로 CGMP 위반과 adulterated(불량) 분류가 적용되었다.",
+   "key_facts": [
+    "실사 시설: Jiangmen Shuizirun Sanitary Articles Co., Ltd. 의약품 제조시설(중국 Guangdong)",
+    "실사 기간: 2025년 11월 3~7일",
+    "FEI: 3014159182",
+    "지적 항목: 원료별 확인(identity)·규격 적합성 시험 미실시, 품질관리부서 책임 미이행"
+   ],
+   "implication": "원료 확인시험 미실시와 품질관리부서 책임 미이행이 함께 지적된 사례로, FDA가 입고 원료 시험을 공급자 성적서에 의존하는 관행을 계속 문제 삼고 있다는 신호로 볼 수 있다. 원료를 수입해 쓰는 제조소는 입고 원료별 확인시험 수행과 공급자 성적서 검증 근거를 점검할 필요가 있다.",
+   "checks": [
+    "입고 원료별 확인(identity) 시험 수행 여부",
+    "공급자 시험성적서 신뢰성 검증 근거",
+    "품질관리부서의 원료 판정 기록"
+   ],
+   "en": {
+    "title_issue": "No component identity testing",
+    "summary": "FDA CDER issued a Warning Letter to Jiangmen Shuizirun Sanitary Articles Co., Ltd. in Guangdong, China, following a November 3 to 7, 2025 inspection of its drug manufacturing facility. The letter is classified as CGMP/Finished Pharmaceuticals/Adulterated.",
+    "key_facts": [
+     "Inspected facility: drug manufacturing facility of Jiangmen Shuizirun Sanitary Articles Co., Ltd. (Guangdong, China)",
+     "Inspection: November 3 to 7, 2025",
+     "FEI: 3014159182",
+     "Cited items: failure to test each component for identity and conformity with specifications, quality control unit failures"
+    ],
+    "implication": "Missing component identity testing cited alongside quality unit failures suggests FDA continues to challenge reliance on supplier certificates. Sites using imported components may need to confirm identity testing on each component and the basis for trusting supplier certificates.",
+    "checks": [
+     "Identity testing for each incoming component",
+     "Basis for validating supplier certificates of analysis",
+     "Quality control unit records for component release"
+    ]
+   }
+  },
+  "9dd054b471ea": {
+   "title_issue": "무균 조제 오염 방지·HEPA 관리 미흡",
+   "summary": "FDA CDER가 SCA Pharmaceuticals, LLC에 Warning Letter를 발행했다. 실사에서 무균이어야 하는 의약품 생산 관행에 환자를 위험에 빠뜨리는 중대한 결함이 확인되었고, FDA는 2025년 10월 30일 Form FDA 483을 발부했다.",
+   "key_facts": [
+    "지적 내용: 무균이어야 하는(intended or expected to be sterile) 의약품 생산 관행의 중대한 결함",
+    "위해 평가: 환자를 위험에 빠뜨리는 결함",
+    "Form FDA 483 발부일: 2025년 10월 30일",
+    "지적 항목: 무균 오염 방지 절차 미흡, 무균공정 구역 HEPA 여과 양압 공기 미확보(21 CFR 211.42(c)(10)(iii)), 일탈 조사·시험 관리·품질관리부서 절차 미흡"
+   ],
+   "implication": "외주 조제시설(503B)이 무균 오염 방지 절차와 HEPA 양압 공기 공급 미흡으로 지적된 사례로, FDA가 무균 조제 환경의 기본 설비 요건을 엄격히 보고 있다는 신호로 볼 수 있다. 무균 제품을 생산하는 제조소는 무균 구역 공기 공급 설계와 차압 관리 기록을 점검할 필요가 있다.",
+   "checks": [
+    "무균 구역 HEPA 여과 공기 공급·양압 유지 확인",
+    "무균 공정 오염 방지 절차 밸리데이션",
+    "일탈 조사 범위와 품질관리부서 절차 준수"
+   ],
+   "en": {
+    "title_issue": "Aseptic contamination and HEPA gaps",
+    "summary": "FDA CDER issued a Warning Letter to SCA Pharmaceuticals, LLC. The investigator noted serious deficiencies in practices for producing drug products intended or expected to be sterile, putting patients at risk, and FDA issued a Form FDA 483 on October 30, 2025.",
+    "key_facts": [
+     "Finding: serious deficiencies in practices for producing drugs intended or expected to be sterile",
+     "Risk: deficiencies put patients at risk",
+     "Form FDA 483 issued: October 30, 2025",
+     "Cited items: inadequate procedures to prevent microbial contamination, no adequate HEPA-filtered air under positive pressure in aseptic areas (21 CFR 211.42(c)(10)(iii)), weak investigations, laboratory controls and quality control unit procedures"
+    ],
+    "implication": "An outsourcing facility cited for contamination prevention and HEPA-filtered positive pressure air suggests FDA is strict on basic facility requirements for aseptic compounding. Sites making sterile products may need to review air supply design and pressure differential records in aseptic areas.",
+    "checks": [
+     "HEPA-filtered air supply and positive pressure in aseptic areas",
+     "Validation of contamination prevention procedures",
+     "Investigation scope and quality control unit procedure compliance"
+    ]
+   }
+  },
+  "recall-0b25266a69e1": {
+   "title_issue": "카드뮴 부적합 회수",
+   "summary": "주식회사퓨어마인드농업회사법인의 한약재 제품이 카드뮴 기준 초과로 부적합 판정되어 회수·판매중지되었다. 동일 사유 3품목 일괄 회수이며 강제 회수 대상이다.",
+   "key_facts": [
+    "회수 사유: 카드뮴 부적합 (기준 초과)",
+    "회수 범위: 동일 사유 3품목 일괄 회수",
+    "강제여부: 강제 회수",
+    "회수명령일자: 2026-10-13"
+   ],
+   "implication": "같은 업체의 한약재 3품목이 카드뮴 부적합으로 동시에 회수된 점은 중금속 관리가 한약재 회수의 반복 사유임을 보여준다. 일반적으로 중금속 부적합은 원료 재배 환경과 연관될 수 있어, 입고 단계의 중금속 시험 관리를 점검할 필요가 있다.",
+   "checks": [
+    "한약재 입고 시 카드뮴 등 중금속 시험 수행",
+    "원료 공급처·산지별 중금속 부적합 이력 관리"
+   ],
+   "en": {
+    "title_issue": "Cadmium out-of-specification recall",
+    "summary": "Herbal medicine products from a domestic herbal supplier were recalled and suspended from sale after failing the cadmium limit. The mandatory recall covers 3 products for the same reason.",
+    "key_facts": [
+     "Recall reason: cadmium out of specification (limit exceeded)",
+     "Scope: 3 products recalled together for the same reason",
+     "Recall type: mandatory",
+     "Recall order date: 2026-10-13"
+    ],
+    "implication": "Three herbal products from one supplier being recalled together for cadmium failure shows that heavy metal control remains a recurring recall reason for herbal materials. Heavy metal failures can generally be linked to cultivation conditions, so heavy metal testing at receipt may need review.",
+    "checks": [
+     "Heavy metal (cadmium) testing at herbal material receipt",
+     "Tracking of heavy metal failures by supplier and origin"
+    ]
+   }
+  },
+  "recall-8daa6af6fa4e": {
+   "title_issue": "용출 부적합 제품 출하 회수",
+   "summary": "(주)일화가 품질 부적합(용출) 제품이 출하된 트리나정5밀리그램(리나글립틴)을 영업자 회수했다. 회수명령일자는 2026-10-12이며 강제 회수가 아닌 영업자 자진 회수이다.",
+   "key_facts": [
+    "회수 사유: 품질 부적합(용출) 제품의 출하로 인한 영업자 회수",
+    "제품: 트리나정5밀리그램(리나글립틴)",
+    "강제여부: 영업자 회수(비강제)",
+    "회수명령일자: 2026-10-12"
+   ],
+   "implication": "용출 부적합 제품이 출하까지 이어진 점은 출하 전 시험 판정이나 안정성 모니터링 단계에서 이상이 걸러지지 않았을 가능성을 점검해야 한다는 신호로 볼 수 있다. 일반적으로 용출 변동은 제제 처방이나 공정 조건과 연관될 수 있으므로 정제 제품의 용출 추세 관리를 점검할 필요가 있다.",
+   "checks": [
+    "출하 전 용출시험 결과 판정 및 승인 절차",
+    "정제 제품의 안정성 시험 중 용출 추세 분석",
+    "용출 OOS 발생 시 조사 및 출하 보류 기준"
+   ],
+   "en": {
+    "title_issue": "Recall of shipped dissolution-failing lots",
+    "summary": "A manufacturer voluntarily recalled a linagliptin 5 mg tablet product after product that failed quality (dissolution) was shipped. The recall order date is 2026-10-12.",
+    "key_facts": [
+     "Recall reason: shipment of product failing quality (dissolution)",
+     "Product: a linagliptin 5 mg tablet",
+     "Recall type: voluntary (firm-initiated)",
+     "Recall order date: 2026-10-12"
+    ],
+    "implication": "Dissolution-failing product reaching the market suggests a need to check whether release testing or stability monitoring failed to catch the issue. Dissolution shifts can generally be linked to formulation or process conditions, so dissolution trending for tablet products may need review.",
+    "checks": [
+     "Release dissolution result review and approval",
+     "Dissolution trend analysis in stability studies",
+     "OOS investigation and hold criteria for dissolution failures"
+    ]
+   }
+  },
+  "recall-a0ff6f82b670": {
+   "title_issue": "이산화황 사유 한약재 회수",
+   "summary": "농업회사법인다온허브주식회사의 한약재 다온목단피가 이산화황 사유로 회수·판매중지되었다. 회수명령일자 2026-10-12의 강제 회수이다.",
+   "key_facts": [
+    "회수 사유: 이산화황",
+    "제품: 다온목단피",
+    "강제여부: 강제 회수",
+    "회수명령일자: 2026-10-12"
+   ],
+   "implication": "이산화황 사유의 강제 회수는 한약재 잔류 이산화황 관리가 지속적인 규제 점검 대상이라는 신호로 볼 수 있다. 일반적으로 이산화황 잔류는 건조·보관 등 가공 단계와 연관될 수 있으므로 한약재 가공 공급처 관리와 입고 시험을 점검할 필요가 있다.",
+   "checks": [
+    "한약재 입고 시 잔류 이산화황 시험",
+    "한약재 가공 공급처의 건조·보관 공정 관리 확인"
+   ],
+   "en": {
+    "title_issue": "Sulfur dioxide recall of herbal material",
+    "summary": "A herbal medicine product (Moutan root bark) from a domestic supplier was recalled and suspended from sale for sulfur dioxide. It is a mandatory recall with an order date of 2026-10-12.",
+    "key_facts": [
+     "Recall reason: sulfur dioxide",
+     "Product: a herbal medicine product (Moutan root bark)",
+     "Recall type: mandatory",
+     "Recall order date: 2026-10-12"
+    ],
+    "implication": "A mandatory recall for sulfur dioxide suggests residual sulfur dioxide in herbal materials remains an ongoing regulatory focus. Sulfur dioxide residues can generally be linked to drying or storage steps, so oversight of herbal processors and receipt testing may need review.",
+    "checks": [
+     "Residual sulfur dioxide testing at herbal material receipt",
+     "Review of drying and storage controls at herbal processors"
+    ]
+   }
+  },
+  "recall-a742c14c2b57": {
+   "title_issue": "성상 부적합 한약재 회수",
+   "summary": "풍산주식회사의 한약재 풍산골쇄보가 성상 부적합으로 회수·판매중지되었다. 회수명령일자 2026-10-13의 강제 회수이다.",
+   "key_facts": [
+    "회수 사유: 성상 부적합",
+    "제품: 풍산골쇄보",
+    "강제여부: 강제 회수",
+    "회수명령일자: 2026-10-13"
+   ],
+   "implication": "성상 부적합은 외관·형태 등 기본 감별 항목에서 기준을 벗어난 것으로, 입고 단계 관능검사의 실효성을 점검해야 한다는 신호로 볼 수 있다. 일반적으로 한약재 성상 부적합은 기원 혼동이나 보관 중 변질과 연관될 수 있으므로 감별 기준과 보관 조건을 점검할 필요가 있다.",
+   "checks": [
+    "한약재 입고 시 성상(관능) 검사 기준 및 판정",
+    "한약재 기원 감별 절차",
+    "한약재 보관 조건 관리"
+   ],
+   "en": {
+    "title_issue": "Appearance failure recall of herbal material",
+    "summary": "A herbal medicine product (Drynaria rhizome) from a domestic supplier was recalled and suspended from sale for failing the appearance (description) test. It is a mandatory recall with an order date of 2026-10-13.",
+    "key_facts": [
+     "Recall reason: appearance (description) out of specification",
+     "Product: a herbal medicine product (Drynaria rhizome)",
+     "Recall type: mandatory",
+     "Recall order date: 2026-10-13"
+    ],
+    "implication": "An appearance failure is a deviation in basic identification attributes, suggesting a need to check how effective organoleptic inspection at receipt is. Such failures can generally be linked to origin mix-ups or deterioration in storage, so identification criteria and storage conditions may need review.",
+    "checks": [
+     "Appearance (organoleptic) inspection criteria at receipt",
+     "Botanical origin identification procedure",
+     "Storage condition control for herbal materials"
+    ]
+   }
+  },
+  "recall-b0efe4614244": {
+   "title_issue": "수입자 주소 표시 오기 회수",
+   "summary": "바이엘코리아(주)가 카네스텐산제(클로트리마졸)의 표시기재 사항 중 수입자 주소 오기로 영업자 회수를 진행했다. 회수명령일자는 2026-10-12이며 강제 회수가 아닌 영업자 회수이다.",
+   "key_facts": [
+    "회수 사유: 표시기재 사항 오기(수입자 주소)에 따른 영업자 회수",
+    "제품: 카네스텐산제(클로트리마졸)",
+    "강제여부: 영업자 회수(비강제)",
+    "회수명령일자: 2026-10-12"
+   ],
+   "implication": "품질 자체가 아닌 수입자 주소 표시 오류만으로도 회수가 이루어진 점은 표시기재 사항이 회수 사유로 직결될 수 있다는 신호로 볼 수 있다. 수입 의약품을 취급하는 업체는 주소 등 영업자 정보 변경 시 표시자재 개정이 누락되지 않는지 점검할 필요가 있다.",
+   "checks": [
+    "영업자 정보(주소) 변경 시 표시자재 개정 연계 절차",
+    "수입 의약품 표시기재 사항 출하 전 검토"
+   ],
+   "en": {
+    "title_issue": "Recall for wrong importer address",
+    "summary": "An importer voluntarily recalled a clotrimazole powder product because the labeling contained an error in the importer address. The recall order date is 2026-10-12.",
+    "key_facts": [
+     "Recall reason: labeling error (importer address)",
+     "Product: a clotrimazole powder product",
+     "Recall type: voluntary (firm-initiated)",
+     "Recall order date: 2026-10-12"
+    ],
+    "implication": "A recall triggered solely by an importer address error, not product quality, suggests that labeling particulars can directly lead to recalls. Firms handling imported drugs may need to check that label revisions are not missed when company details such as addresses change.",
+    "checks": [
+     "Linking company detail (address) changes to label revision",
+     "Pre-release review of labeling particulars for imported drugs"
+    ]
+   }
+  },
+  "admin-2026007256": {
+   "title_issue": "수입관리자 부재·품질검사 미실시 수입업무정지",
+   "summary": "(주)가모다부티가 소재지 미변경, 수입관리자 없이 수입업 영업, 품질검사 미실시로 전 수입업무정지 4개월 15일(2026.10.27. ~ 2027.3.13.) 처분을 받았다.",
+   "key_facts": [
+    "위반 내용: 소재지 미변경, 수입관리자 없이 수입업 영업, 품질검사 미실시",
+    "처분: 전 수입업무정지 4개월 15일(2026.10.27. ~ 2027.3.13.)",
+    "적용법령: 「약사법」 제31조제9항, 제36조, 제42조 및 「의약품 등의 안전에 관한 규칙」 제8조제1항제2의2호"
+   ],
+   "implication": "수입관리자 부재와 품질검사 미실시가 함께 적발된 것은 수입 의약품의 출하 전 품질 책임 체계가 작동하지 않은 사례로 볼 수 있다. 수입업자는 관리자 선임 상태와 소재지 등 허가사항 변경 신고가 실제 운영과 일치하는지 점검할 필요가 있다.",
+   "checks": [
+    "수입관리자 선임·근무 현황",
+    "수입 제품별 품질검사 실시 기록",
+    "소재지 등 허가사항 변경 신고 이력"
+   ],
+   "en": {
+    "title_issue": "Import suspension: no import manager or QC tests",
+    "summary": "An importer received a full import business suspension of 4 months 15 days (2026.10.27 to 2027.3.13) for not updating its registered location, operating without an import manager, and not performing quality testing.",
+    "key_facts": [
+     "Violations: registered location not updated, import business operated without an import manager, quality testing not performed",
+     "Action: full import business suspension of 4 months 15 days (2026.10.27 to 2027.3.13)",
+     "Legal basis: Pharmaceutical Affairs Act and the Rules on the Safety of Medicinal Products"
+    ],
+    "implication": "The combination of a missing import manager and skipped quality testing can be seen as a breakdown of pre-release quality accountability for imported products. Importers should check that manager appointments and registered details such as location match actual operations.",
+    "checks": [
+     "Import manager appointment and presence",
+     "Quality testing records per imported product",
+     "Change notification history for registered details such as location"
+    ]
+   }
+  },
+  "admin-2026007415": {
+   "title_issue": "무균시험 판정 전 성적서 발급 수입업무정지",
+   "summary": "수성위생재료공업사가 수입 멸균거즈 제품의 무균시험성적서 최종판정일(2026.1.6.) 이전인 2026.1.5.자에 무균시험 결과를 포함한 시험성적서를 발급해 해당 품목 수입업무정지 1개월15일 처분을 받았다.",
+   "key_facts": [
+    "대상 제품: 수성멸균거즈-엔(제조번호 20251127, 사용기한 2028.11.26.)",
+    "위반 내용: 무균시험성적서(최종판정일 2026.1.6.) 발급 전인 2026.1.5.자에 무균시험 결과 포함 시험성적서 발급",
+    "처분: 해당 품목 수입업무정지 1개월15일 (2026.10.29.~2026.12.13.)"
+   ],
+   "implication": "무균시험 최종판정보다 하루 앞서 그 결과를 포함한 성적서가 발급된 것은 시험 결과 확정 전에 문서가 선발행된 데이터 완결성 문제로 볼 수 있다. 수입 품질검사에서 근거 성적서를 인용하는 경우 근거 성적서의 최종판정일과 자사 시험성적서 발급일의 선후관계를 점검할 필요가 있다.",
+   "checks": [
+    "근거 성적서 최종판정일 대비 시험성적서 발급일",
+    "시험성적서 발급 전 결과 확정 승인 절차",
+    "무균시험 결과 인용 시 원자료 대조 기록"
+   ],
+   "en": {
+    "title_issue": "Test certificate issued before sterility verdict",
+    "summary": "An importer issued a test certificate including sterility results for a sterile gauze product on 2026.1.5, before the sterility test certificate's final judgment date of 2026.1.6, and received a 1 month 15 days import suspension for that item.",
+    "key_facts": [
+     "Product: an imported sterile gauze product (expiry 2028.11.26)",
+     "Violation: test certificate with sterility results issued on 2026.1.5, before the sterility certificate's final judgment on 2026.1.6",
+     "Action: import suspension of the item for 1 month 15 days (2026.10.29 to 2026.12.13)"
+    ],
+    "implication": "Issuing a certificate one day before the sterility result was finalized can be seen as a data integrity issue in which documents were released ahead of confirmed results. Importers relying on underlying certificates should check that their own certificate issue dates never precede the final judgment dates of those certificates.",
+    "checks": [
+     "Certificate issue date versus underlying final judgment date",
+     "Result confirmation approval before certificate issue",
+     "Raw data cross-check when citing sterility results"
+    ]
+   }
+  },
+  "admin-2026007421": {
+   "title_issue": "이산화황·성상 부적합 제조업무정지",
+   "summary": "삼의제약의 2개 품목이 시험검사 결과 부적합(삼의목단피 이산화황 86ppm, 삼의방풍 관능(성상))으로 판정되어 해당품목 제조업무정지 3개월(2026.11.02~2027.02.01) 처분을 받았다.",
+   "key_facts": [
+    "삼의목단피(제40호): 관능(성상) 적합, 이산화황 부적합(86ppm)",
+    "삼의방풍(제51호): 관능(성상) 부적합, 이산화황 적합(4ppm)",
+    "처분: 해당품목 제조업무정지 3개월(2026.11.02~2027.02.01)",
+    "위반법령: 「약사법」 제62조"
+   ],
+   "implication": "같은 업체의 두 품목이 이산화황과 성상이라는 서로 다른 항목에서 부적합 판정을 받은 것은 특정 시험항목이 아닌 출하 전 시험 전반의 관리 신호로 볼 수 있다. 이산화황 잔류는 일반적으로 원료 입고 단계의 처리 이력과 연관될 수 있으므로 입고 시험과 출하 시험의 기준 적용을 함께 점검할 필요가 있다.",
+   "checks": [
+    "원료 입고 시 이산화황 시험 실시 여부",
+    "관능(성상) 판정 기준과 판정자 교육",
+    "출하 전 시험성적 검토 기록"
+   ],
+   "en": {
+    "title_issue": "Sulfur dioxide and appearance test failures",
+    "summary": "Two products of a manufacturer failed testing, a Moutan root bark herbal product for sulfur dioxide (86 ppm) and a Saposhnikovia root herbal product for organoleptic appearance, leading to a 3-month manufacturing suspension for the items (2026.11.02 to 2027.02.01).",
+    "key_facts": [
+     "Moutan root bark product: appearance passed, sulfur dioxide failed (86 ppm)",
+     "Saposhnikovia root product: appearance failed, sulfur dioxide passed (4 ppm)",
+     "Action: 3-month manufacturing suspension for the items (2026.11.02 to 2027.02.01)"
+    ],
+    "implication": "Failures on two different test items across two products can be read as a signal about overall pre-release testing control rather than a single test. Sulfur dioxide residue can generally be associated with processing history at raw material receipt, so receipt testing and release testing criteria should be checked together.",
+    "checks": [
+     "Sulfur dioxide testing at raw material receipt",
+     "Organoleptic appearance criteria and analyst training",
+     "Review records of pre-release test results"
+    ]
+   }
+  },
+  "admin-2026007422": {
+   "title_issue": "원산지 생산지역명 미병기 판매업무정지",
+   "summary": "계림제약이 '계림숙지황'을 제조·판매하면서 원산지명에 '생산지역명'을 병기하지 않아 해당 품목 판매업무정지 15일(2026.11.02~2026.11.16) 처분을 받았다.",
+   "key_facts": [
+    "대상 품목: 계림숙지황(신고번호 제35호)",
+    "위반 내용: 원산지명 기재 시 '생산지역명'을 병기하지 않고 제조·판매",
+    "처분: 해당 품목 판매업무정지 15일(2026.11.02~2026.11.16)",
+    "위반법령: 「약사법」 제56조제1항제10호, 「한약재 안전 및 품질관리규정」 제7조제1항제10호 등"
+   ],
+   "implication": "원산지명에 생산지역명을 병기하지 않은 표시 위반만으로 판매업무정지가 내려진 것은 한약재 표시 형식 자체가 처분 대상이 된다는 점을 보여주는 사례로 볼 수 있다. 한약재 표시사항 검토 시 원산지 표기 형식이 규정 요구 항목을 모두 충족하는지 점검할 필요가 있다.",
+   "checks": [
+    "원산지명과 생산지역명 병기 여부",
+    "표시자재 승인 시 규정 항목 체크리스트",
+    "출하 전 표시사항 대조 기록"
+   ],
+   "en": {
+    "title_issue": "Sales suspension for missing origin region label",
+    "summary": "A manufacturer received a 15-day sales suspension (2026.11.02 to 2026.11.16) for a processed Rehmannia root herbal product because it was made and sold without stating the production region alongside the country of origin.",
+    "key_facts": [
+     "Product: a processed Rehmannia root herbal product",
+     "Violation: production region not stated together with the origin name on labeling",
+     "Action: 15-day sales suspension for the item (2026.11.02 to 2026.11.16)"
+    ],
+    "implication": "A suspension based solely on the origin labeling format can be seen as showing that herbal material labeling form itself is enforceable. Labeling reviews for herbal materials should check that origin statements include every element the regulation requires.",
+    "checks": [
+     "Production region stated with origin name",
+     "Regulatory checklist at labeling material approval",
+     "Pre-release labeling cross-check records"
+    ]
+   }
+  },
+  "admin-2026007423": {
+   "title_issue": "주성분 제조원 변경 미허가 제조업무정지",
+   "summary": "(주)신라충전소가 의료용 산소 품목의 주성분(산소) 제조원 변경에 대한 변경 허가 없이 제조·판매하고 출하승인서 없이 출하해 해당 품목 제조업무정지 1개월 15일(2026.11.02~2026.12.16) 처분을 받았다.",
+   "key_facts": [
+    "대상 품목: 신라의료용산소(허가번호 제2호)",
+    "변경허가 위반: 주성분(산소) 제조원이 '디아이지에어가스'에서 '주식회사 코리아에어텍'으로 변경되었음에도 변경 허가 없이 해당 원료로 제조·판매",
+    "기준서 미준수: 자사 의료용가스 제품관리 규정상 출하승인서를 작성하지 않고 제품 출하",
+    "처분: 해당 품목 제조업무정지 1개월 15일(2026.11.02~2026.12.16)"
+   ],
+   "implication": "주성분 공급처 변경을 허가 변경 없이 적용한 것은 공급업체 변경이 변경관리와 인허가 절차로 연결되지 않은 사례로 볼 수 있다. 출하승인서 없는 출하도 함께 지적되었으므로 의료용가스 제조소는 공급처 변경과 출하승인 절차가 문서상 연결되어 있는지 점검할 필요가 있다.",
+   "checks": [
+    "주성분 제조원 변경 시 변경허가 필요성 검토",
+    "공급업체 변경관리 기록",
+    "출하승인서 작성 후 출하 여부"
+   ],
+   "en": {
+    "title_issue": "Unapproved change of active ingredient supplier",
+    "summary": "A medical gas manufacturer made and sold a medical oxygen product using oxygen from a new active ingredient supplier without change approval, and shipped products without release approval forms, resulting in a 1 month 15 days manufacturing suspension for the item.",
+    "key_facts": [
+     "Product: a medical oxygen product",
+     "Change violation: active ingredient (oxygen) supplier changed without obtaining a change approval",
+     "SOP non-compliance: products shipped without completing the release approval form required by the company's own procedure",
+     "Action: manufacturing suspension of the item for 1 month 15 days (2026.11.02 to 2026.12.16)"
+    ],
+    "implication": "Switching the active ingredient supplier without a licence change can be seen as a supplier change that never reached change control or regulatory filing. Because shipments without release approval were also cited, medical gas sites should check that supplier changes and release approval are linked in their documentation.",
+    "checks": [
+     "Regulatory impact assessment for active ingredient supplier changes",
+     "Supplier change control records",
+     "Release approval form completed before shipment"
+    ]
+   }
+  },
+  "admin-2026007424": {
+   "title_issue": "잔뿌리·주피 미제거 성상부적합 제조업무정지",
+   "summary": "영천약초도매시장주식회사의 한약재가 수거검사에서 잔뿌리 및 주피 미제거로 '성상' 부적합 판정을 받아 해당 품목 제조업무정지 3개월(2026.10.22~2027.01.21) 처분을 받았다.",
+   "key_facts": [
+    "위반 내용: 한약재 수거검사결과 '성상' 부적합 판정(잔뿌리 및 주피 미제거)",
+    "처분: 해당 품목 제조업무정지 3개월(2026.10.22~2027.01.21)",
+    "위반법령: 「약사법」 제62조"
+   ],
+   "implication": "잔뿌리와 주피가 제거되지 않은 상태가 수거검사에서 적발된 것은 출하 전 성상 확인이 비약용 부위 제거 여부를 걸러내지 못한 사례로 볼 수 있다. 이는 일반적으로 정선 공정 관리와 연관될 수 있으므로 제조사는 출하 전 성상 검사 기준에 잔뿌리·주피 제거 확인이 포함되어 있는지 점검할 필요가 있다.",
+   "checks": [
+    "정선 공정 후 잔뿌리·주피 제거 확인",
+    "출하 전 성상 검사 판정 기준",
+    "부적합 품목의 동일 제조번호 재고 확인"
+   ],
+   "en": {
+    "title_issue": "Appearance failure from rootlets and bark left on",
+    "summary": "A herbal medicine manufacturer received a 3-month manufacturing suspension for the item (2026.10.22 to 2027.01.21) after a market sample failed the appearance test because rootlets and outer bark had not been removed.",
+    "key_facts": [
+     "Violation: appearance failure in a market sample test of a herbal material (rootlets and outer bark not removed)",
+     "Action: 3-month manufacturing suspension for the item (2026.10.22 to 2027.01.21)",
+     "Legal basis: Pharmaceutical Affairs Act"
+    ],
+    "implication": "Detection of unremoved rootlets and bark in market sampling can be seen as pre-release appearance checks failing to screen non-medicinal parts. This can generally be associated with cleaning and sorting control, so manufacturers should check that release appearance criteria explicitly cover removal of rootlets and outer bark.",
+    "checks": [
+     "Rootlet and outer bark removal check after sorting",
+     "Pre-release appearance test acceptance criteria",
+     "Inventory check of the same batch as the failed item"
+    ]
+   }
+  },
+  "gmpinspect-1Q4ptriITv1": {
+   "title_issue": "포장표시 중요 지적·기준일탈 조사 보완",
+   "summary": "일동제약(주) 완제(단일) 제조소의 사후 GMP 실사(2026-06-15~2026-06-19) 결과, 의약품 용기 기재사항 관련 '중요' 지적과 기준일탈 조사·공기흐름 패턴 시험·동결건조기 멸균 주기 간 유지 시간 관련 보완사항이 통보되었다.",
+   "key_facts": [
+    "포장표시(중요): 의약품 용기 등의 기재사항 관련 추가 자료 제출, 비고 보완 완료",
+    "품질경영(기타): 기준일탈의 조사 관련 추가 설명자료 제출, 비고 이행계획서 타당성 인정",
+    "시설장비(기타): 공기흐름 패턴 시험 추가 자료 제출, 비고 이행계획서 타당성 인정",
+    "제조(기타): 동결건조기 시스템의 멸균 주기 간 유지 시간 설정 관련 지적, 세부 내용은 원문 확인 필요"
+   ],
+   "implication": "기준일탈 조사, 공기흐름 패턴 시험, 동결건조기 멸균 주기 간 유지 시간이 함께 지적된 것은 조사 근거와 설비 적격성 데이터의 설명 충분성이 실사 초점이었음을 보여주는 신호로 볼 수 있다. 동결건조기를 운영하는 제조소는 멸균 주기 간 유지 시간 설정 근거가 문서화되어 있는지 점검할 필요가 있다.",
+   "checks": [
+    "기준일탈 조사 보고서의 원인 판단 근거",
+    "공기흐름 패턴 시험 자료의 최신성",
+    "동결건조기 멸균 주기 간 유지 시간 설정 근거"
+   ],
+   "en": {
+    "title_issue": "Major labeling finding and OOS investigation gaps",
+    "summary": "A post-approval GMP inspection of a domestic finished-product (single) manufacturing site resulted in a major finding on container labeling items plus deficiencies on out-of-specification investigation, airflow pattern testing and the hold time between freeze-dryer sterilization cycles.",
+    "key_facts": [
+     "Labeling (major): additional data on container labeling items, remark: corrected",
+     "Quality management (other): additional explanation on out-of-specification investigation, remark: action plan accepted",
+     "Facilities and equipment (other): additional airflow pattern test data, remark: action plan accepted",
+     "Manufacturing (other): hold time setting between freeze-dryer sterilization cycles, details need source confirmation"
+    ],
+    "implication": "Findings spanning OOS investigation, airflow pattern testing and freeze-dryer hold times can be read as a signal that the sufficiency of investigation rationale and equipment qualification data was the inspection focus. Sites operating freeze-dryers should check that the rationale for hold times between sterilization cycles is documented.",
+    "checks": [
+     "Root cause rationale in OOS investigation reports",
+     "Currency of airflow pattern test data",
+     "Rationale for freeze-dryer hold time between sterilization cycles"
+    ]
+   }
+  },
+  "admin-2026007216": {
+   "title_issue": "미신고 장소 의약품 보관 과징금",
+   "summary": "(주)안트로젠이 신고하지 않은 장소에 의약품을 보관해 트레프로스티닐 주사제 3개 함량 품목에 대해 수입업무정지 3개월에 갈음한 과징금 금70,200,000원 처분을 받았다.",
+   "key_facts": [
+    "위반 내용: 신고하지 않은 장소에 의약품 보관",
+    "대상 품목: 레모둘린주사(트레프로스티닐) 1mg/mL·2.5mg/mL·5mg/mL",
+    "처분: 수입업무정지 3개월에 갈음한 과징금 금70,200,000원(납부기한 2026. 11. 2.까지)",
+    "적용법령: 「약사법」 제42조제3항·제5항, 「의약품 등의 제조업 및 수입자의 시설기준령」 제6조제1항제1호 등"
+   ],
+   "implication": "신고하지 않은 장소에 보관한 사실만으로 품목 단위 과징금이 부과된 것은 보관 장소가 신고 시설 범위에 묶인 관리 대상이라는 점을 보여주는 사례로 볼 수 있다. 수입자는 임시 보관소를 포함한 실제 보관 장소가 신고 내용과 일치하는지 점검할 필요가 있다.",
+   "checks": [
+    "실제 보관 장소와 신고 시설 일치 여부",
+    "보관 장소 추가·변경 시 신고 절차",
+    "보관 장소별 재고 이동 기록"
+   ],
+   "en": {
+    "title_issue": "Fine for storing medicines at unreported site",
+    "summary": "An importer stored medicines at a location it had not reported and received a fine of KRW 70,200,000 in lieu of a 3-month import suspension for treprostinil injection products in three strengths.",
+    "key_facts": [
+     "Violation: medicines stored at an unreported location",
+     "Products: treprostinil injection 1mg/mL, 2.5mg/mL and 5mg/mL",
+     "Action: fine of KRW 70,200,000 in lieu of a 3-month import suspension (due 2026.11.2)"
+    ],
+    "implication": "A product-level fine based only on an unreported storage site can be seen as showing that storage locations are bound to the reported facility scope. Importers should check that every actual storage location, including temporary ones, matches their facility notification.",
+    "checks": [
+     "Actual storage sites versus reported facilities",
+     "Notification procedure when adding or changing storage sites",
+     "Inventory movement records per storage site"
+    ]
+   }
+  },
+  "admin-2026007395": {
+   "title_issue": "시판후조사 보고서 기한 내 미제출 판매정지",
+   "summary": "한국유니온제약(주)이 위해성 관리계획에 따른 시판 후 조사 최종결과보고서를 조사기간(4년) 종료 후 3개월 이내에 제출하지 않아 피르페니돈 정제 2개 품목에 해당 품목 판매업무정지 1개월(2026.11.3.~2026.12.2.) 처분을 받았다.",
+   "key_facts": [
+    "위반 내용: 위해성 관리계획에 따른 시판 후 조사 최종결과보고서를 조사기간(4년) 종료 후 3개월 이내에 제출하지 않음",
+    "대상 품목: 유니페니돈정200밀리그램·유니페니돈정400밀리그램(피르페니돈)",
+    "처분: 해당 품목 판매업무정지 1개월(2026.11.3.~2026.12.2.)"
+   ],
+   "implication": "시판 후 조사 최종결과보고서의 기한 내 미제출에 판매업무정지가 내려진 것은 위해성 관리계획 이행 기한이 품목 판매에 직접 영향을 주는 의무라는 신호로 볼 수 있다. 위해성 관리계획 대상 품목을 보유한 업체는 조사기간 종료일과 보고서 제출 기한을 품목별로 관리하고 있는지 점검할 필요가 있다.",
+   "checks": [
+    "위해성 관리계획 대상 품목별 조사기간 종료일",
+    "최종결과보고서 제출 기한 알림 체계",
+    "약물감시·허가 부서 간 기한 관리 책임"
+   ],
+   "en": {
+    "title_issue": "Sales suspension for late post-marketing report",
+    "summary": "A company received a 1-month sales suspension (2026.11.3 to 2026.12.2) for pirfenidone 200 mg and 400 mg tablets after not submitting the final post-marketing surveillance report under its risk management plan within 3 months of the end of the 4-year surveillance period.",
+    "key_facts": [
+     "Violation: final post-marketing surveillance report under the risk management plan not submitted within 3 months after the 4-year period ended",
+     "Products: pirfenidone 200 mg and 400 mg tablets",
+     "Action: 1-month sales suspension for the items (2026.11.3 to 2026.12.2)"
+    ],
+    "implication": "A sales suspension for missing the report deadline can be seen as a signal that risk management plan timelines directly affect a product's ability to stay on the market. Companies holding RMP products should check that surveillance end dates and report deadlines are tracked per product.",
+    "checks": [
+     "Surveillance period end date per RMP product",
+     "Deadline alert system for final reports",
+     "Deadline ownership between pharmacovigilance and regulatory teams"
+    ]
+   }
+  },
+  "admin-2026007459": {
+   "title_issue": "마약류 취급내역 보고기한 미준수 경고",
+   "summary": "구주제약(주)이 '메타맥스정(펜터민염산염) 등' 50건의 마약류 취급내역을 마약류통합시스템에 보고기한 내 보고하지 않아 (마약류제조업자) 경고 처분을 받았다.",
+   "key_facts": [
+    "위반 내용: 마약류 제조·판매 등 취급내역을 마약류통합시스템에 보고기한 내 보고하지 않음",
+    "대상: '메타맥스정(펜터민염산염) 등' 50건",
+    "처분: (마약류제조업자) 경고",
+    "근거: 「마약류 관리에 관한 법률」 제11조, 같은 법 시행규칙 제21조"
+   ],
+   "implication": "50건의 기한 내 미보고가 경고로 처분된 것은 마약류통합시스템 보고가 건별 기한으로 관리되는 의무라는 점을 보여주는 사례로 볼 수 있다. 마약류 취급 제조업자는 제조·판매 내역 발생 시점과 시스템 보고 시점의 차이를 정기적으로 대조해 점검할 필요가 있다.",
+   "checks": [
+    "마약류통합시스템 보고기한 준수 현황",
+    "취급내역 발생 대비 보고 누락 대조",
+    "보고 담당자 부재 시 대체 절차"
+   ],
+   "en": {
+    "title_issue": "Warning for late narcotics handling reports",
+    "summary": "A narcotics manufacturer received a warning for not reporting 50 handling records, including a phentermine hydrochloride tablet product, to the integrated narcotics reporting system within the deadline.",
+    "key_facts": [
+     "Violation: narcotics manufacturing and sales records not reported to the integrated system within the deadline",
+     "Scope: 50 records, including a phentermine hydrochloride tablet product",
+     "Action: warning (as a narcotics manufacturer)"
+    ],
+    "implication": "Issuing a warning for 50 late reports can be seen as showing that system reporting is enforced as a per-transaction deadline obligation. Narcotics manufacturers should periodically reconcile the timing of manufacturing and sales events against system reporting.",
+    "checks": [
+     "Compliance with system reporting deadlines",
+     "Reconciliation of handling events against reports",
+     "Backup procedure when the reporting staff is absent"
+    ]
+   }
+  },
+  "data0010-15306": {
+   "title_issue": "CTD 품질평가자료 검토서 작성기준",
+   "summary": "식약처가 'CTD에 의한 품질평가자료 검토서 작성기준'을 지침·안내서로 게시했다. 세부 내용과 개정 사항은 원문 확인이 필요하다.",
+   "key_facts": [
+    "발행기관: MFDS",
+    "주제: CTD에 의한 품질평가자료 검토서 작성기준",
+    "문서 구분: 지침·안내서",
+    "본문 내용: 원문 확인 필요"
+   ],
+   "implication": "검토서 작성기준은 심사 단계에서 CTD 품질평가자료를 어떤 틀로 검토·기술하는지를 다루는 문서로, 허가 신청자에게는 심사 관점을 파악하는 참고자료로 볼 수 있다. 개정 여부와 변경 항목은 원문 확인이 필요하므로 CTD 품질 자료 작성 담당자는 원문을 확인해 자사 작성 관행과 차이가 있는지 점검할 필요가 있다.",
+   "checks": [
+    "원문 확인 후 개정 여부와 변경 항목 파악",
+    "CTD 품질 자료 작성 관행과 검토서 기준 대조"
+   ],
+   "en": {
+    "title_issue": "Criteria for CTD quality data review reports",
+    "summary": "MFDS posted a guidance on criteria for writing review reports on CTD-based quality evaluation data. Details and any revisions require confirmation in the source.",
+    "key_facts": [
+     "Issuer: MFDS",
+     "Topic: criteria for writing review reports on CTD-based quality evaluation data",
+     "Document type: guidance",
+     "Content: source confirmation needed"
+    ],
+    "implication": "Criteria for review reports describe how reviewers assess and document CTD quality data, so they can be seen as a reference for applicants to understand the review perspective. Since revisions need source confirmation, CTD quality authors should check the source for differences from their current drafting practice.",
+    "checks": [
+     "Confirm revisions and changed items in the source",
+     "Compare in-house CTD quality drafting with the review criteria"
+    ]
+   }
+  },
+  "gmpinspect-1Q4ptriIQPs": {
+   "title_issue": "필터·세척 밸리데이션 등 보완 지적",
+   "summary": "삼천당제약(주) 완제(단일) 제조소의 사후 GMP 실사(2026-06-09~2026-06-12) 결과, 필터 밸리데이션·배지충전시험·장비 체인, 세척 밸리데이션, 낙하균 환경모니터링에 대한 추가 설명자료 제출이 요구되었다.",
+   "key_facts": [
+    "품질경영(기타): 필터 밸리데이션, 배지충전시험, 장비 체인에 대한 추가 설명자료 제출, 비고 이행계획서 타당성 인정",
+    "기타: 세척 밸리데이션(재 밸리데이션 및 검체 채취 방법)에 대한 추가 설명자료 제출, 비고 이행계획서 타당성 인정",
+    "시설장비(기타): 낙하균 환경모니터링에 대한 추가 설명자료 제출",
+    "실사 구분: 사후 / 완제(단일)"
+   ],
+   "implication": "필터 밸리데이션·배지충전시험과 낙하균 환경모니터링이 함께 지적된 것은 밸리데이션 결과와 환경 관리 데이터의 설명 충분성이 실사 초점이었음을 보여주는 신호로 볼 수 있다. 세척 밸리데이션에서는 재 밸리데이션과 검체 채취 방법이 명시적으로 지적되었으므로 재 밸리데이션 주기와 검체 채취 방법의 근거를 점검할 필요가 있다.",
+   "checks": [
+    "필터 밸리데이션·배지충전시험과 장비 체인 연계 자료",
+    "세척 재 밸리데이션 주기와 검체 채취 방법 근거",
+    "낙하균 환경모니터링 위치·빈도 설정 근거"
+   ],
+   "en": {
+    "title_issue": "Filter and cleaning validation deficiencies",
+    "summary": "A post-approval GMP inspection of a domestic finished-product (single) manufacturing site required additional explanation on filter validation, media fill and equipment chain, cleaning validation, and settle plate environmental monitoring.",
+    "key_facts": [
+     "Quality management (other): additional explanation on filter validation, media fill and equipment chain, remark: action plan accepted",
+     "Other: additional explanation on cleaning validation (revalidation and sampling method), remark: action plan accepted",
+     "Facilities and equipment (other): additional explanation on settle plate environmental monitoring"
+    ],
+    "implication": "Findings combining filter validation, media fill and settle plate monitoring can be read as a signal that the sufficiency of validation and environmental data explanations was the inspection focus. Because revalidation and sampling methods were explicitly cited for cleaning validation, sites should check the rationale for revalidation frequency and sampling methods.",
+    "checks": [
+     "Linkage of filter validation and media fill to the equipment chain",
+     "Rationale for cleaning revalidation frequency and sampling method",
+     "Rationale for settle plate locations and frequency"
+    ]
+   }
+  },
+  "gmpinspect-1Q4ptriIR3w": {
+   "title_issue": "수탁자 관리·세척 효율성 보완 지적",
+   "summary": "(주)태준제약 완제(단일) 제조소의 사후 GMP 실사(2026-06-08~2026-06-12) 결과, 수탁자 관련 사항, 작업자 소독 절차, 수동 세척 장비의 세척 효율성에 대한 추가 설명 자료 제출이 요구되었다.",
+   "key_facts": [
+    "품질경영(기타): 수탁자 관련 추가 설명 자료 제출, 비고 보완 완료",
+    "기타: 제조공정에 참여하는 작업자의 소독 절차 관련 추가 설명 자료 제출, 비고 이행계획서 타당성 인정",
+    "시설장비(기타): 수동으로 세척하는 장비의 세척 효율성 관련 추가 설명 자료 제출",
+    "실사 구분: 사후 / 완제(단일)"
+   ],
+   "implication": "수탁자 관리, 작업자 소독 절차, 수동 세척 장비의 세척 효율성이 지적된 것은 사람과 수작업에 의존하는 절차의 근거 자료 충분성이 실사에서 확인되었음을 보여주는 신호로 볼 수 있다. 수동 세척 장비를 운영하는 제조소는 세척 효율성 입증 자료가 작업자별 편차까지 고려하고 있는지 점검할 필요가 있다.",
+   "checks": [
+    "수탁자 관리 계약·평가 자료",
+    "작업자 소독 절차 문서와 실제 수행 일치",
+    "수동 세척 장비 세척 효율성 입증 자료"
+   ],
+   "en": {
+    "title_issue": "Contractor oversight and manual cleaning gaps",
+    "summary": "A post-approval GMP inspection of a domestic finished-product (single) manufacturing site required additional explanation on contractor-related matters, operator disinfection procedures and the cleaning effectiveness of manually cleaned equipment.",
+    "key_facts": [
+     "Quality management (other): additional explanation on contractor-related matters, remark: corrected",
+     "Other: additional explanation on disinfection procedures for operators in manufacturing, remark: action plan accepted",
+     "Facilities and equipment (other): additional explanation on cleaning effectiveness of manually cleaned equipment"
+    ],
+    "implication": "Findings on contractor oversight, operator disinfection and manual cleaning can be read as a signal that evidence for people-dependent procedures was examined. Sites using manually cleaned equipment should check whether their cleaning effectiveness evidence accounts for operator-to-operator variation.",
+    "checks": [
+     "Contractor agreements and evaluation records",
+     "Operator disinfection procedure versus actual practice",
+     "Cleaning effectiveness evidence for manually cleaned equipment"
+    ]
+   }
+  },
+  "gmpinspect-1Q4ptriISvf": {
+   "title_issue": "제조장비 성능적격성·공정 밸리데이션 보완",
+   "summary": "(주)대웅제약 완제+원료(겸업) 제조소의 사후 GMP 실사(2026-04-20~2026-04-24) 결과, 제조장비 성능적격성평가, 공정 밸리데이션, 원액 투입량에 대한 추가 설명자료 제출이 요구되었다.",
+   "key_facts": [
+    "시설장비(기타): 제조장비(성능적격성평가 등)의 추가 설명 자료 제출, 비고 이행계획서 타당성 인정",
+    "제조(기타): 공정 밸리데이션 등 추가 설명자료 제출, 비고 이행계획서 타당성 인정",
+    "기타: 원액 투입량의 추가 설명자료 제출, 비고 이행계획서 타당성 인정",
+    "실사 구분: 사후 / 완제+원료(겸업)"
+   ],
+   "implication": "제조장비 성능적격성평가, 공정 밸리데이션, 원액 투입량이 함께 지적된 것은 제조 공정 설정값과 그 입증 자료 간 연결이 실사 초점이었음을 보여주는 신호로 볼 수 있다. 완제와 원료를 겸업하는 제조소는 원액 투입량 설정 근거가 공정 밸리데이션 결과와 일치하는지 점검할 필요가 있다.",
+   "checks": [
+    "제조장비 성능적격성평가 보고서",
+    "공정 밸리데이션 범위와 결과",
+    "원액 투입량 산출 근거"
+   ],
+   "en": {
+    "title_issue": "Equipment PQ and process validation deficiencies",
+    "summary": "A post-approval GMP inspection of a domestic finished-product and drug substance manufacturing site required additional explanation on manufacturing equipment performance qualification, process validation and the input quantity of drug substance.",
+    "key_facts": [
+     "Facilities and equipment (other): additional explanation on manufacturing equipment, including performance qualification, remark: action plan accepted",
+     "Manufacturing (other): additional explanation on process validation, remark: action plan accepted",
+     "Other: additional explanation on drug substance input quantity, remark: action plan accepted"
+    ],
+    "implication": "Findings combining equipment performance qualification, process validation and drug substance input quantity can be read as a signal that the link between process set points and supporting evidence was the inspection focus. Sites making both finished products and drug substance should check that the rationale for input quantity matches process validation results.",
+    "checks": [
+     "Manufacturing equipment performance qualification reports",
+     "Scope and results of process validation",
+     "Rationale for drug substance input quantity"
+    ]
+   }
+  },
+  "32a03933c2ab": {
+   "title_issue": "무균 표시 동물약 미생물 오염 경고장",
+   "summary": "ECA는 무균으로 표시된 동물용 의약품이 미생물에 오염된 것으로 확인되고 중대한 이상사례와 연관되어 FDA Warning Letter가 발부된 사례를 소개했다. 제목은 사망 사례 이후 발부된 경고장임을 강조한다.",
+   "key_facts": [
+    "발행일: 2026-10-12",
+    "대상: 무균으로 표시된 동물용 의약품",
+    "문제: 미생물 오염 확인 및 중대한 이상사례와의 연관",
+    "조치: FDA Warning Letter 발부"
+   ],
+   "implication": "무균 표시가 실제 무균 보증으로 뒷받침되지 않을 때 이상사례와 규제 조치로 곧바로 이어질 수 있다는 신호로 볼 수 있다. 무균 제품을 다루는 사업장은 표시 주장과 무균 보증 근거가 일치하는지 점검할 필요가 있다.",
+   "checks": [
+    "무균 표시 제품의 무균 보증 근거 자료 정합성",
+    "미생물 오염 관련 이상사례 접수 시 조사 연계 절차"
+   ],
+   "en": {
+    "title_issue": "Contaminated 'sterile' veterinary drug WL",
+    "summary": "ECA reports on an FDA Warning Letter issued after a veterinary drug labeled as sterile was found to be microbiologically contaminated and associated with serious adverse events.",
+    "key_facts": [
+     "Published: 2026-10-12",
+     "Product: veterinary drug labeled as sterile",
+     "Issue: microbial contamination linked to serious adverse events",
+     "Action: FDA Warning Letter"
+    ],
+    "implication": "This can be read as a signal that a sterility claim not backed by actual sterility assurance can quickly lead to adverse events and enforcement. Sites handling sterile products may need to verify that label claims match their sterility assurance evidence.",
+    "checks": [
+     "Consistency of sterility assurance evidence for products labeled sterile",
+     "Link between contamination-related adverse event intake and investigations"
+    ]
+   }
+  },
+  "849c74630745": {
+   "title_issue": "USP 바이오어세이 2개 장 시행",
+   "summary": "ECA는 바이오어세이 관련 USP 2개 장(chapter)이 봄에 시행된다고 전했다. ECA는 2024년 9월과 2025년 1월 해당 장의 초안을 소개한 바 있다.",
+   "key_facts": [
+    "발행일: 2026-10-12",
+    "주제: USP 바이오어세이 관련 2개 장의 봄 시행",
+    "경과: 2024년 9월·2025년 1월 초안 단계 보도"
+   ],
+   "implication": "초안 단계였던 USP 바이오어세이 장이 확정·시행 단계로 넘어가면서 시험법 운영 기준을 맞춰야 할 시점이 다가오고 있다는 신호로 볼 수 있다. USP를 참조하는 바이오어세이 운영 사업장은 시행 전 현행 절차와의 차이를 점검할 필요가 있다.",
+   "checks": [
+    "USP 바이오어세이 장 시행본과 현행 시험 절차 간 차이 분석",
+    "시행 시점에 맞춘 SOP 개정 일정"
+   ],
+   "en": {
+    "title_issue": "Two USP bioassay chapters take effect",
+    "summary": "ECA reports that two USP chapters on bioassays come into force in spring, following earlier coverage of the draft chapters.",
+    "key_facts": [
+     "Published: 2026-10-12",
+     "Topic: two USP bioassay chapters coming into force in spring",
+     "Background: drafts covered by ECA in September 2024 and January 2025"
+    ],
+    "implication": "This signals that USP bioassay chapters are moving from draft to enforceable text, so alignment of test methods is becoming time-bound. Sites running bioassays against USP may need to gap-assess current procedures before the chapters take effect.",
+    "checks": [
+     "Gap analysis between the final USP bioassay chapters and current methods",
+     "SOP revision timeline aligned with the effective date"
+    ]
+   }
+  },
+  "8ac38ffe9a97": {
+   "title_issue": "EU GMP 실사 내 무균공정모의시험 점검",
+   "summary": "ECA는 무균공정모의시험(Media Fill)이 유럽 GMP 실사에서도 집중 점검 대상이 되고 있다고 전했다. ECA는 그간 FDA 실사 후 Warning Letter로 공개된 결함사항을 정기적으로 소개해 왔다.",
+   "key_facts": [
+    "발행일: 2026-10-12",
+    "주제: 유럽 GMP 실사에서의 Aseptic Process Simulation/Media Fill 점검",
+    "배경: ECA의 FDA Warning Letter 결함사항 정기 소개"
+   ],
+   "implication": "Media Fill이 FDA뿐 아니라 유럽 실사에서도 주요 점검 항목으로 다뤄지고 있다는 신호로 볼 수 있다. 무균공정을 운영하는 사업장은 EU 실사 대비 관점에서 Media Fill 설계·평가 근거를 점검할 필요가 있다.",
+   "checks": [
+    "Media Fill 시나리오 설계의 실제 공정 대표성 근거",
+    "Media Fill 결과 평가 및 실패 시 조사 절차"
+   ],
+   "en": {
+    "title_issue": "Media fill scrutiny in EU inspections",
+    "summary": "ECA reports that aseptic process simulation (media fill) is also under scrutiny during European GMP inspections, beyond deficiencies it regularly covers from FDA Warning Letters.",
+    "key_facts": [
+     "Published: 2026-10-12",
+     "Topic: aseptic process simulation/media fill in European GMP inspections",
+     "Context: ECA regularly covers deficiencies from FDA Warning Letters"
+    ],
+    "implication": "This suggests media fill is a focus item in European inspections as well as FDA ones. Sites running aseptic processes may need to review the design and evaluation rationale of their media fills with EU inspections in mind.",
+    "checks": [
+     "Rationale that media fill scenarios represent the actual process",
+     "Media fill evaluation and failure investigation procedure"
+    ]
+   }
+  },
+  "e53f08bc2504": {
+   "title_issue": "CEP 전자제출 가이던스 개정",
+   "summary": "ECA는 EDQM이 CEP(Certificate of Suitability) 신청의 전자제출 가이던스를 개정했다고 전했다.",
+   "key_facts": [
+    "발행일: 2026-10-12",
+    "발행 주체: EDQM",
+    "주제: CEP 신청 전자제출 가이던스 개정"
+   ],
+   "implication": "CEP 신청·변경 서류의 전자제출 요건이 바뀌었을 수 있어 제출 실무에 영향이 있을 수 있다는 신호로 볼 수 있다. CEP를 보유하거나 신청 예정인 원료의약품 관련 부서는 개정 가이던스 원문을 확인해 제출 절차를 점검할 필요가 있다.",
+   "checks": [
+    "CEP 전자제출 개정 가이던스와 현행 제출 절차 비교",
+    "원료 공급사 CEP 관련 제출 일정 영향 확인"
+   ],
+   "en": {
+    "title_issue": "CEP e-submission guidance revised",
+    "summary": "ECA reports that EDQM has updated its guidance on electronic submission of applications for a Certificate of Suitability (CEP).",
+    "key_facts": [
+     "Published: 2026-10-12",
+     "Issuer: EDQM",
+     "Topic: revised guidance on electronic submission of CEP applications"
+    ],
+    "implication": "This may signal changes in how CEP dossiers must be submitted electronically. Teams holding or planning CEPs may need to check the revised guidance against their current submission practice.",
+    "checks": [
+     "Comparison of revised CEP e-submission guidance with current practice",
+     "Impact on CEP submission timelines of API suppliers"
+    ]
+   }
+  },
+  "bdac3d030aaf": {
+   "title_issue": "CHMP 10월 회의 6개 품목 승인 권고",
+   "summary": "EMA는 2026년 10월 12~15일 CHMP 회의 결과를 공개했으며, CHMP는 이번 회의에서 6개 의약품의 승인을 권고했다.",
+   "key_facts": [
+    "발행일: 2026-10-16",
+    "회의: CHMP 2026년 10월 12~15일",
+    "결과: 6개 의약품 승인 권고"
+   ],
+   "implication": "CHMP 권고는 EU 허가 결정으로 이어지는 단계이므로 관련 품목의 시장 동향을 파악하는 참고 신호로 볼 수 있다. EU 시장 품목을 다루는 사업장은 권고 품목 목록에 자사 관련 성분이나 경쟁 품목이 있는지 확인할 필요가 있다.",
+   "checks": [
+    "CHMP 권고 품목 중 자사 관련 성분 여부",
+    "EU 허가 일정 변동에 따른 공급 계획 영향"
+   ],
+   "en": {
+    "title_issue": "CHMP October meeting: six positive opinions",
+    "summary": "EMA published highlights of the CHMP meeting of 12-15 October 2026, at which the committee recommended six medicines for approval.",
+    "key_facts": [
+     "Published: 2026-10-16",
+     "Meeting: CHMP, 12-15 October 2026",
+     "Outcome: six medicines recommended for approval"
+    ],
+    "implication": "CHMP recommendations precede EU authorisation decisions, so they can be read as an early market signal. Companies active in the EU may want to check whether the recommended products involve related substances or competing products.",
+    "checks": [
+     "Whether recommended products involve related substances",
+     "Impact of upcoming EU authorisations on supply planning"
+    ]
+   }
+  },
+  "2026-20817": {
+   "title_issue": "바이오시밀러 허가 후 제조변경 Q&A",
+   "summary": "FDA는 바이오시밀러 및 상호교환 가능 바이오시밀러의 허가 후 제조변경에 관한 Q&A 형식의 최종 업계 가이던스 발행을 Federal Register에 공지했다.",
+   "key_facts": [
+    "발행일: 2026-10-13",
+    "발행기관: FDA",
+    "문서 성격: 최종 업계 가이던스(Questions and Answers)",
+    "대상: 바이오시밀러 및 상호교환 가능 바이오시밀러의 허가 후 제조변경"
+   ],
+   "implication": "바이오시밀러의 허가 후 제조변경 관리에 대해 FDA가 최종 입장을 정리했다는 신호로 볼 수 있다. 세부 요구사항은 원문 확인이 필요하며, 해당 품목 보유 사업장은 변경관리 절차와의 차이를 점검할 필요가 있다.",
+   "checks": [
+    "허가 후 제조변경 분류·보고 절차와 가이던스 Q&A 비교",
+    "바이오시밀러 변경 시 비교동등성 평가 근거 문서화"
+   ],
+   "quotes_translation": [
+    "FDA는 \"Postapproval Manufacturing Changes to Biosimilar and Interchangeable Biosimilar Products: Questions and Answers\"라는 제목의 최종 업계 가이던스 발행을 공지한다."
+   ],
+   "en": {
+    "title_issue": "Biosimilar postapproval change Q&A",
+    "summary": "FDA announced in the Federal Register the availability of a final guidance for industry in Q&A form on postapproval manufacturing changes to biosimilar and interchangeable biosimilar products.",
+    "key_facts": [
+     "Published: 2026-10-13",
+     "Issuer: FDA",
+     "Document type: final guidance for industry (Questions and Answers)",
+     "Scope: postapproval manufacturing changes to biosimilar and interchangeable biosimilar products"
+    ],
+    "implication": "This signals that FDA has finalized its position on managing postapproval manufacturing changes for biosimilars. Detailed requirements should be confirmed in the source document, and holders of such products may need to compare it with their change control procedures.",
+    "checks": [
+     "Comparison of change categorization and reporting with the guidance Q&A",
+     "Documentation of comparability rationale for biosimilar changes"
+    ]
+   }
+  },
+  "hc-82781": {
+   "title_issue": "Aleve 캐플릿 유통 오류 회수",
+   "summary": "Health Canada는 Aleve 캐플릿을(를) 유통 오류(Distribution Error)를 이유로 도매 단계에서 회수한다고 공지했다. 회수 등급은 Type III이며 사유 항목은 Other로 분류됐다.",
+   "key_facts": [
+    "회수 등급: Type III",
+    "제품: Aleve",
+    "사유: Other (제목상 Distribution Error)",
+    "회수 범위: 도매 단계"
+   ],
+   "implication": "품질 결함이 아닌 유통 오류로 도매 단계 회수가 이뤄진 사례로, 출하·배송 관리 미흡도 회수로 이어질 수 있다는 신호로 볼 수 있다. 위탁 유통을 운영하는 사업장은 출하 지시와 실제 배송 간 대조 절차를 점검할 필요가 있다.",
+   "checks": [
+    "출하 지시와 실제 배송처·수량 대조 절차",
+    "유통 오류 확인 시 도매 단계 회수 범위 결정 기준"
+   ],
+   "quotes_translation": [
+    "기타"
+   ],
+   "en": {
+    "title_issue": "Aleve caplets distribution error recall",
+    "summary": "Health Canada announced a wholesale-level recall of Aleve caplets due to a distribution error; the recall is Type III and the issue is classified as Other.",
+    "key_facts": [
+     "Recall class: Type III",
+     "Product: Aleve",
+     "Issue: Other (titled Distribution Error)",
+     "Scope: wholesale level"
+    ],
+    "implication": "This is a recall driven by a distribution error rather than a quality defect, signalling that shipping control gaps alone can trigger a recall. Companies using contract distribution may need to check reconciliation between shipping orders and actual deliveries.",
+    "checks": [
+     "Reconciliation of shipping orders against actual consignees and quantities",
+     "Criteria for setting wholesale recall scope after a distribution error"
+    ]
+   }
+  },
+  "hc-82783": {
+   "title_issue": "Claritin 정 유통 오류 회수",
+   "summary": "Health Canada는 Claritin Allergy Tablets을(를) 유통 오류(Distribution Error)를 이유로 도매 단계에서 회수한다고 공지했다. 회수 등급은 Type III이며 사유 항목은 Other로 분류됐다.",
+   "key_facts": [
+    "회수 등급: Type III",
+    "제품: Claritin Allergy Tablets",
+    "사유: Other (제목상 Distribution Error)",
+    "회수 범위: 도매 단계"
+   ],
+   "implication": "일반의약품 정제가 유통 오류로 도매 단계에서 회수된 사례로, 품질과 무관한 출하 관리 문제도 회수로 이어질 수 있다는 신호로 볼 수 있다. 다수 도매상에 출하하는 사업장은 도매처별 출하 기록 추적성을 점검할 필요가 있다.",
+   "checks": [
+    "도매처별 출하 기록 추적성",
+    "유통 오류 발견 시 도매처 통보 절차"
+   ],
+   "quotes_translation": [
+    "기타"
+   ],
+   "en": {
+    "title_issue": "Claritin tablets distribution error recall",
+    "summary": "Health Canada announced a wholesale-level recall of Claritin Allergy Tablets due to a distribution error; the recall is Type III and the issue is classified as Other.",
+    "key_facts": [
+     "Recall class: Type III",
+     "Product: Claritin Allergy Tablets",
+     "Issue: Other (titled Distribution Error)",
+     "Scope: wholesale level"
+    ],
+    "implication": "An allergy tablet product was recalled from wholesalers over a distribution error, signalling that shipping control issues unrelated to quality can still trigger recalls. Companies shipping to multiple wholesalers may need to check traceability of shipment records per wholesaler.",
+    "checks": [
+     "Traceability of shipment records per wholesaler",
+     "Wholesaler notification procedure on distribution errors"
+    ]
+   }
+  },
+  "hc-82786": {
+   "title_issue": "종합비타민 유통 오류 회수",
+   "summary": "Health Canada는 천연건강제품(Natural health products)으로 분류된 Flintstones Complete Multivitamins and Minerals를 유통 오류(Distribution Error)를 이유로 도매 단계에서 회수한다고 공지했다. 회수 등급은 Type III이며 사유 항목은 Other로 분류됐다.",
+   "key_facts": [
+    "회수 등급: Type III",
+    "제품: Flintstones Complete Multivitamins and Minerals",
+    "분류: Natural health products",
+    "사유: Other (제목상 Distribution Error)"
+   ],
+   "implication": "천연건강제품에서도 유통 오류만으로 도매 단계 회수가 이뤄질 수 있다는 신호로 볼 수 있다. 의약품과 건강제품을 함께 출하하는 사업장은 제품군별 출하 관리 기준이 일관되게 적용되는지 점검할 필요가 있다.",
+   "checks": [
+    "제품군별 출하 관리 기준의 일관 적용",
+    "출하 지시와 실제 배송처·수량 대조 절차"
+   ],
+   "quotes_translation": [
+    "기타"
+   ],
+   "en": {
+    "title_issue": "Multivitamin distribution error recall",
+    "summary": "Health Canada announced a wholesale-level recall of Flintstones Complete Multivitamins and Minerals, a natural health product, due to a distribution error; the recall is Type III and the issue is classified as Other.",
+    "key_facts": [
+     "Recall class: Type III",
+     "Product: Flintstones Complete Multivitamins and Minerals",
+     "Category: Natural health products",
+     "Issue: Other (titled Distribution Error)"
+    ],
+    "implication": "This signals that natural health products can also be recalled from wholesale over a distribution error alone. Companies shipping both drugs and health products may need to check that shipping controls apply consistently across product categories.",
+    "checks": [
+     "Consistent shipping controls across product categories",
+     "Reconciliation of shipping orders against actual consignees and quantities"
+    ]
+   }
+  },
+  "29b53b55cbd1": {
+   "title_issue": "이물(미립자) 혼입 위험 회수",
+   "summary": "MHRA는 Norgine Pharmaceuticals Limited가 Pedmarqsi 80 mg/mL 주입용 용액의 해당 배치를 회수한다고 공지했다. 정기 안정성 조사 중 제품 내 미립자(particulate matter) 존재 위험이 확인된 데 따른 Class 2 회수다.",
+   "key_facts": [
+    "회수 등급: Class 2",
+    "업체: Norgine Pharmaceuticals Limited",
+    "제품: Pedmarqsi 80 mg/mL solution for infusion",
+    "사유: 정기 안정성 조사 중 미립자 존재 위험 확인"
+   ],
+   "implication": "출하 시점이 아닌 정기 안정성 조사에서 미립자 위험이 확인됐다는 점에서, 보관 기간 중 발생하는 품질 변화를 안정성 프로그램이 포착한 사례로 볼 수 있다. 주입용 제품을 다루는 사업장은 안정성 시료의 미립자 평가와 이상 발견 시 시판 배치 영향 평가 절차를 점검할 필요가 있다.",
+   "checks": [
+    "안정성 시험 중 미립자 평가 항목 및 판정 기준",
+    "안정성 이상 발견 시 시판 배치 영향 평가 및 회수 판단 절차"
+   ],
+   "quotes_translation": [
+    "Norgine Pharmaceuticals Limited는 정기 안정성 조사 중 확인된 제품 내 미립자 존재 위험으로 인해 표에 기재된 배치를 회수한다."
+   ],
+   "en": {
+    "title_issue": "Particulate matter risk recall",
+    "summary": "MHRA announced that Norgine Pharmaceuticals Limited is recalling batches of Pedmarqsi 80 mg/mL solution for infusion due to a risk of particulate matter identified during routine stability investigations; this is a Class 2 recall.",
+    "key_facts": [
+     "Recall class: Class 2",
+     "Company: Norgine Pharmaceuticals Limited",
+     "Product: Pedmarqsi 80 mg/mL solution for infusion",
+     "Reason: risk of particulate matter identified during routine stability investigations"
+    ],
+    "implication": "Because the risk was found in routine stability investigations rather than at release, this can be seen as a case of the stability programme catching changes during storage. Sites handling infusion products may need to review particulate assessment of stability samples and impact assessment on marketed batches.",
+    "checks": [
+     "Particulate assessment items and criteria in stability testing",
+     "Impact assessment and recall decision for marketed batches after stability findings"
+    ]
+   }
+  },
+  "D-0010-2027": {
+   "title_issue": "용출 규격 미달 회수",
+   "summary": "Ajanta Pharma USA Inc는 Ranolazine 서방정 1000 mg을 용출 규격 미달(below specification)을 이유로 회수했다. FDA 분류 Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: Ajanta Pharma USA Inc",
+    "제품: Ranolazine Extended-Release Tablets, 1000 mg",
+    "사유: Failed Dissolution Specifications: below specification"
+   ],
+   "implication": "서방정에서 용출이 규격보다 낮게 나온 것은 약물 방출 프로파일이 설계대로 유지되지 않았다는 신호로 볼 수 있다. 서방 제형 보유 사업장은 용출 추세와 안정성 기간 중 용출 변화를 점검할 필요가 있다.",
+   "checks": [
+    "서방정 용출 시험 결과의 배치별 추세 분석",
+    "안정성 시험 중 용출 저하 경향 모니터링"
+   ],
+   "quotes_translation": [
+    "용출 규격 부적합: 규격 미만"
+   ],
+   "en": {
+    "title_issue": "Below-spec dissolution recall",
+    "summary": "Ajanta Pharma USA Inc recalled Ranolazine Extended-Release Tablets 1000 mg for failing dissolution specifications (below specification); FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: Ajanta Pharma USA Inc",
+     "Product: Ranolazine Extended-Release Tablets, 1000 mg",
+     "Reason: Failed Dissolution Specifications: below specification"
+    ],
+    "implication": "Low dissolution in an extended-release tablet can signal that the release profile is not being maintained as designed. Holders of extended-release products may need to review dissolution trends, including changes over the stability period.",
+    "checks": [
+     "Batch-to-batch trend analysis of extended-release dissolution results",
+     "Monitoring of dissolution decline during stability studies"
+    ]
+   }
+  },
+  "D-0873-2026": {
+   "title_issue": "충전량 미달 파우치 결함 회수",
+   "summary": "Amneal Pharmaceuticals, LLC는 Estradiol Gel 0.1% 파우치 제품을 일부 파우치가 비어 있거나 부분적으로만 충전된 용기 결함을 이유로 회수했다. FDA 분류 Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: Amneal Pharmaceuticals, LLC",
+    "제품: Estradiol Gel, 0.1%",
+    "사유: Defective Container, 파우치가 비어 있거나 부분 충전된 상태로 발견"
+   ],
+   "implication": "빈 파우치나 부분 충전 파우치가 출하됐다는 점은 충전 공정의 중량 관리나 포장 검사가 결함을 걸러내지 못했다는 신호로 볼 수 있다. 일회분 포장 제품 보유 사업장은 충전량 검사 방식과 불량 배제 기능을 점검할 필요가 있다.",
+   "checks": [
+    "파우치 충전량(중량) 공정 중 검사 빈도와 기준",
+    "빈 파우치·부분 충전 파우치 자동 배제 기능 검증"
+   ],
+   "quotes_translation": [
+    "용기 결함, 파우치가 비어 있거나 부분적으로만 충전된 것으로 확인됨."
+   ],
+   "en": {
+    "title_issue": "Empty or partially filled packet recall",
+    "summary": "Amneal Pharmaceuticals, LLC recalled Estradiol Gel 0.1% packets because some packets were found empty or partially full (defective container); FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: Amneal Pharmaceuticals, LLC",
+     "Product: Estradiol Gel, 0.1%",
+     "Reason: defective container, packets found empty or partially full"
+    ],
+    "implication": "Shipping empty or underfilled packets suggests that fill weight control or packaging inspection did not catch the defect. Holders of unit-dose packaged products may need to review fill checks and reject functions.",
+    "checks": [
+     "In-process fill weight check frequency and limits",
+     "Verification of automatic rejection for empty or underfilled packets"
+    ]
+   }
+  },
+  "D-0874-2026": {
+   "title_issue": "무균성 보증 결여 회수",
+   "summary": "Aurolab Trust는 STERILE로 표시된 FOCUS PI Hypromellose 0.7% Formula 바이알 제품을 무균성 보증 결여(Lack of Assurance of Sterility)를 이유로 회수했다. FDA 분류 Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: Aurolab Trust",
+    "제품: FOCUS PI Hypromellose 0.7% Formula, STERILE 표시 바이알",
+    "사유: Lack of Assurance of Sterility"
+   ],
+   "implication": "무균 표시 제품에서 무균성 보증이 결여됐다는 판단은 제조 공정 전반의 무균 보증 체계에 대한 의문으로 이어질 수 있는 신호로 볼 수 있다. 무균 제품 보유 사업장은 무균 보증 근거 자료가 배치 출하 판단에 충분히 연결되는지 점검할 필요가 있다.",
+   "checks": [
+    "무균 표시 제품의 무균 보증 근거 자료 완결성",
+    "배치 출하 시 무균 관련 기록 검토 범위"
+   ],
+   "quotes_translation": [
+    "무균성 보증 결여"
+   ],
+   "en": {
+    "title_issue": "Lack of sterility assurance recall",
+    "summary": "Aurolab Trust recalled FOCUS PI Hypromellose 0.7% Formula vials labeled STERILE due to lack of assurance of sterility; FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: Aurolab Trust",
+     "Product: FOCUS PI Hypromellose 0.7% Formula, vials labeled STERILE",
+     "Reason: Lack of Assurance of Sterility"
+    ],
+    "implication": "A finding of lack of sterility assurance for a product labeled sterile can signal doubts about the overall sterility assurance system. Holders of sterile products may need to check that sterility assurance evidence is adequately tied to batch release decisions.",
+    "checks": [
+     "Completeness of sterility assurance evidence for products labeled sterile",
+     "Scope of sterility-related record review at batch release"
+    ]
+   }
+  },
+  "D-0875-2026": {
+   "title_issue": "운송 중 온도 일탈 회수",
+   "summary": "TerSera Therapeutics LLC는 Zoladex(goserelin) implant 3.6 mg을 운송 중 온도 일탈을 이유로 회수했다. 제품이 온도 관리되지 않는 FedEx 트레일러에서 외기 조건으로 25.5시간 방치된 데 따른 FDA Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: TerSera Therapeutics LLC",
+    "제품: Zoladex (goserelin) implant, 3.6 mg",
+    "사유: Temperature Abuse, 온도 비관리 FedEx 트레일러에서 외기 조건 25.5시간 방치"
+   ],
+   "implication": "운송사 트레일러에서의 장시간 온도 비관리 노출이 회수로 이어진 사례로, 유통 단계 온도 관리가 위탁 운송사 수준까지 통제돼야 한다는 신호로 볼 수 있다. 위탁 운송을 이용하는 사업장은 운송 중 온도 모니터링과 지연 발생 시 대응 절차를 점검할 필요가 있다.",
+   "checks": [
+    "위탁 운송사 차량·트레일러 온도 관리 요건과 품질협약 반영",
+    "운송 지연·온도 일탈 발생 시 제품 처리 판단 절차"
+   ],
+   "quotes_translation": [
+    "온도 일탈: 제품이 온도 관리되지 않는 FedEx 트레일러에서 외기 조건으로 25.5시간 방치됨."
+   ],
+   "en": {
+    "title_issue": "Temperature excursion in transit recall",
+    "summary": "TerSera Therapeutics LLC recalled Zoladex (goserelin) implant 3.6 mg after product sat in a non-temperature-controlled FedEx trailer at ambient outdoor conditions for 25.5 hours; FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: TerSera Therapeutics LLC",
+     "Product: Zoladex (goserelin) implant, 3.6 mg",
+     "Reason: Temperature Abuse, 25.5 hours in a non-temperature-controlled FedEx trailer"
+    ],
+    "implication": "Prolonged uncontrolled exposure in a carrier trailer led to a recall, signalling that temperature control must extend to contracted carriers. Companies using contract transport may need to review in-transit temperature monitoring and handling of delays.",
+    "checks": [
+     "Carrier vehicle and trailer temperature requirements in quality agreements",
+     "Disposition procedure for transit delays and temperature excursions"
+    ]
+   }
+  },
+  "D-0876-2026": {
+   "title_issue": "주사제 결정화 회수",
+   "summary": "Par Health USA, LLC는 Buprenorphine Hydrochloride 주사제 0.3 mg/mL 단회용 바이알을 결정화(Crystallization)를 이유로 회수했다. FDA 분류 Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: Par Health USA, LLC",
+    "제품: Buprenorphine Hydrochloride Injection 0.3 mg/mL, 단회용 바이알",
+    "사유: Crystallization"
+   ],
+   "implication": "주사제에서 결정화가 확인된 것은 용액 상태의 물리적 안정성이 유지되지 않았다는 신호로 볼 수 있다. 일반적으로 결정화는 보관 온도나 처방 조성과 연관될 수 있으므로, 용액 주사제 보유 사업장은 육안검사와 안정성 중 석출 관찰 기준을 점검할 필요가 있다.",
+   "checks": [
+    "용액 주사제 육안검사 시 결정·석출 판정 기준",
+    "안정성 시험 중 결정화 관찰 항목 및 보관 조건 검토"
+   ],
+   "quotes_translation": [
+    "결정화"
+   ],
+   "en": {
+    "title_issue": "Injection crystallization recall",
+    "summary": "Par Health USA, LLC recalled Buprenorphine Hydrochloride Injection 0.3 mg/mL single-dose vials due to crystallization; FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: Par Health USA, LLC",
+     "Product: Buprenorphine Hydrochloride Injection 0.3 mg/mL, single-dose vials",
+     "Reason: Crystallization"
+    ],
+    "implication": "Crystallization in an injection signals that the physical stability of the solution was not maintained. Since crystallization can generally be associated with storage temperature or formulation, holders of solution injections may need to review visual inspection and stability criteria for precipitation.",
+    "checks": [
+     "Visual inspection criteria for crystals or precipitate in solution injections",
+     "Crystallization observations and storage conditions in stability studies"
+    ]
+   }
+  },
+  "D-0877-2026": {
+   "title_issue": "서방정 용출 규격 부적합 회수",
+   "summary": "Apotex Corp.는 Paroxetine 서방정 37.5mg을 용출 규격 부적합을 이유로 회수했다. FDA 분류 Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: Apotex Corp.",
+    "제품: Paroxetine Extended-Release Tablets, 37.5mg",
+    "사유: Failed dissolution specifications"
+   ],
+   "implication": "서방정 용출 부적합은 방출 제어 성능이 허가 기준을 벗어났다는 신호로 볼 수 있다. 서방 제형 보유 사업장은 용출 OOS 발생 시 조사 범위와 타 배치 영향 평가 절차를 점검할 필요가 있다.",
+   "checks": [
+    "서방정 용출 OOS 조사 시 원인 범위 설정",
+    "동일 공정 타 배치 용출 영향 평가"
+   ],
+   "quotes_translation": [
+    "용출 규격 부적합."
+   ],
+   "en": {
+    "title_issue": "ER tablet dissolution failure recall",
+    "summary": "Apotex Corp. recalled Paroxetine Extended-Release Tablets 37.5mg for failed dissolution specifications; FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: Apotex Corp.",
+     "Product: Paroxetine Extended-Release Tablets, 37.5mg",
+     "Reason: Failed dissolution specifications"
+    ],
+    "implication": "A dissolution failure in an extended-release tablet signals that release control fell outside approved limits. Holders of extended-release products may need to review the scope of dissolution OOS investigations and impact assessment on other batches.",
+    "checks": [
+     "Scope of root cause in dissolution OOS investigations",
+     "Dissolution impact assessment for other batches from the same process"
+    ]
+   }
+  },
+  "D-0878-2026": {
+   "title_issue": "외용제 미생물 오염 2품목 회수",
+   "summary": "SV Labs Toronto Corporation은 Benzoyl Peroxide Wash 5% 등 동일 사유 2품목을 외용제 미생물 오염을 이유로 일괄 회수했다. FDA 분류 Class II 회수다.",
+   "key_facts": [
+    "회수 등급: Class II",
+    "업체: SV Labs Toronto Corporation",
+    "회수 범위: 동일 사유 2품목 일괄 회수",
+    "사유: Microbial contamination of topical product"
+   ],
+   "implication": "외용제에서 미생물 오염으로 2품목이 함께 회수된 것은 제조 환경 전반의 미생물 관리 문제를 시사하는 신호로 볼 수 있으며, 일반적으로 이러한 오염은 공용 설비나 공정수 관리와 연관될 수 있다. 비무균 외용제 보유 사업장은 미생물 한도 시험과 공용 설비 세척·위생 관리를 점검할 필요가 있다.",
+   "checks": [
+    "비무균 외용제 미생물 한도 시험 및 특정 미생물 관리",
+    "공용 설비·공정수의 미생물 관리 상태"
+   ],
+   "quotes_translation": [
+    "외용제 미생물 오염."
+   ],
+   "en": {
+    "title_issue": "Topical microbial contamination recall",
+    "summary": "SV Labs Toronto Corporation recalled two products, including Benzoyl Peroxide Wash 5%, in a single recall for the same reason, microbial contamination of a topical product; FDA classified it as Class II.",
+    "key_facts": [
+     "Recall class: Class II",
+     "Company: SV Labs Toronto Corporation",
+     "Scope: two products recalled together for the same reason",
+     "Reason: Microbial contamination of topical product"
+    ],
+    "implication": "Two products recalled together for microbial contamination may signal a broader microbial control issue, which can generally be associated with shared equipment or process water. Holders of non-sterile topical products may need to review microbial limit testing and hygiene of shared equipment.",
+    "checks": [
+     "Microbial limit testing and objectionable organism control for non-sterile topicals",
+     "Microbial control of shared equipment and process water"
+    ]
+   }
+  }
+ },
+ "tldr": [
+  "FDA, 국내 Hanlim Pharm에 무균 오염 방지 절차·구역 관리 미흡으로 Warning Letter 발행",
+  "식약처, 멸균거즈 무균시험 최종판정 전 성적서를 발급한 수입업체에 수입업무정지 1개월15일",
+  "EU, 인도 Glukem Biocare 제조소에 유동층 코팅설비 오염위험 중대결함으로 GMP 비준수 판정"
+ ],
+ "tldr_en": [
+  "FDA issues a Warning Letter to Hanlim Pharm Co., Ltd. in Korea over sterile contamination control and area segregation gaps",
+  "MFDS suspends a sterile gauze importer after it issued test certificates before the final sterility test decision",
+  "EU finds Glukem Biocare Private Limited in India GMP non-compliant over a critical contamination risk in fluid bed coating equipment"
+ ]
+}

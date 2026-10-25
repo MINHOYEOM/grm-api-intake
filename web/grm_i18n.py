@@ -44,7 +44,9 @@ SUPPORTED_LANGS = ("ko", "en")
 
 # 운영자 전용 화면 — 한국어 고정(영어 트리에 실리지 않는다).
 EXCLUDED_TEMPLATES = frozenset({"admin.html"})
-EXCLUDED_ASSETS = frozenset({"admin.js"})
+# site-popup.js 는 base.html 이 한국어 트리에만 싣고 스크립트도 `lang` 이 다르면 아무것도
+# 띄우지 않는다(WebSitePopupTest 가 두 조건을 고정). 문구는 site-popup.json 데이터라 사전에 없다.
+EXCLUDED_ASSETS = frozenset({"admin.js", "site-popup.js"})
 
 IGNORE_MARK = "i18n-ignore"
 TEMPLATE_FUNCS = ("_",)

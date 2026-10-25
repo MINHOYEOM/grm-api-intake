@@ -91,6 +91,23 @@ class PlanReclassificationTest(unittest.TestCase):
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["old_category"], plan[0]["new_category"])
 
+    def test_ingest_owned_sources_are_never_reclassified(self) -> None:
+        # #1015: WL(480자 절단본 분류)·MFDS(요약문 분류)는 finding_text 로 다시 분류하면
+        # 적재 계약을 덮어쓴다 — 카테고리·버전이 어긋나 보여도 계획에 넣지 않는다.
+        text = (
+            "Your firm failed to establish adequate written procedures for "
+            "production and process controls."
+        )
+        rows = [
+            {**_row("w-1", text, "documentation_records", "grm-finding-taxonomy/v2"),
+             "source": "FDA Warning Letter"},
+            {**_row("m-1", text, "contamination_control", gf.TAXONOMY_VERSION), "source": "MFDS"},
+            {**_row("h-1", text, "documentation_records", gf.TAXONOMY_VERSION),
+             "source": "Health Canada Inspection"},
+        ]
+        plan = svc.plan_reclassification(rows)
+        self.assertEqual([item["finding_id"] for item in plan], ["h-1"])
+
     def test_already_current_version_and_category_yields_empty_plan(self) -> None:
         rows = [
             _row("f-1", "The stability program is deficient.", "stability_storage", gf.TAXONOMY_VERSION),

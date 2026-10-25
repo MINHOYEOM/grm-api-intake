@@ -22,7 +22,7 @@ Every item carries a link to its source document, so the origin and the details 
 - **Summary and added commentary are separated.** What summarises the source and what AI adds as commentary are marked apart.
 - **AI use is stated.** Content produced with AI says so.
 
-## Who makes it {linkedin}
+## Who makes it
 
 I work in pharmaceutical quality assurance, and I build the tools and automation my own work needs.
 Global Regulatory Monitor came out of that, and I design, build and run it so regulatory information is easier to find and use.

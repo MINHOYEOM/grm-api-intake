@@ -1,0 +1,44 @@
+[
+  {
+    "finding_id": "finding-1e78a2542efac17edebdde74",
+    "finding_text": "리나틴플러스정2.5/850밀리그램: 불순물(N-nitroso-meglumine) 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "리나틴플러스정2.5/850밀리그램에서 불순물(N-nitroso-meglumine)이 기준을 초과해 검출되어 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4b86e01ae8e3ee2061e5bbb8",
+    "finding_text": "리나틴플러스정2.5/1000밀리그램: 불순물(N-nitroso-meglumine) 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "리나틴플러스정2.5/1000밀리그램에서 불순물(N-nitroso-meglumine)이 기준을 초과해 검출되어 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4d12b1e24b6e8c18c6aefbcd",
+    "finding_text": "제조판매품목신고를 하지 않은 의약품 제조",
+    "finding_text_ko": "제조판매품목신고를 하지 않은 상태로 의약품을 제조했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ce45877d558f565d39beac7",
+    "finding_text": "리나틴플러스정2.5/500밀리그램: 불순물(N-nitroso-meglumine) 초과 검출에 따른 영업자 회수",
+    "finding_text_ko": "리나틴플러스정2.5/500밀리그램에서 불순물(N-nitroso-meglumine)이 기준을 초과해 검출되어 영업자 회수를 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c3e5fb3d98203a1fa43358ee",
+    "finding_text": "대한메디압축탈지면: 품질부적합(형광증백제)",
+    "finding_text_ko": "대한메디압축탈지면이 형광증백제 항목에서 품질부적합으로 판정되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0359f08bc8455adabf34f995",
+    "finding_text": "○ 품질 부적합 1) 제품명: 에이탑소독용에탄올 2) 제조번호 / 사용기한: 26020202 / 2029.02.08. 3) 부적합 항목: 함량시험",
+    "finding_text_ko": "에이탑소독용에탄올(제조번호 26020202, 사용기한 2029.02.08.)이 함량시험에서 부적합으로 판정되어 품질 부적합에 해당했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2ca66e7539f57f7a86aa0d56",
+    "finding_text": "○ 품질 부적합 1) 제품명: 메디탑소독용에탄올 2) 제조번호 / 사용기한: 26020201 / 2029.02.05. 3) 부적합 항목: 함량시험",
+    "finding_text_ko": "메디탑소독용에탄올(제조번호 26020201, 사용기한 2029.02.05.)이 함량시험에서 부적합으로 판정되어 품질 부적합에 해당했다.",
+    "translation_method": "llm_assisted"
+  }
+]

@@ -786,6 +786,47 @@ class CaptionStyleTest(unittest.TestCase):
         self.assertEqual(lc._one_extra_fact(card, "ko"), "")
 
 
+class HashtagTest(unittest.TestCase):
+    """[마케팅 2026-10-12] 게시물 해시태그는 카드에 맞춰 바뀐다 — 고정 5개 시절엔 무균공정 483 이든
+    식약처 행정처분이든 같은 태그였다."""
+
+    WL = {"id": "wl-1", "agency": "FDA", "category": "Warning Letter", "group": "글로벌",
+          "title_issue": "무균공정 환경모니터링 미흡", "summary": "무균 충전 구역의 환경모니터링 일탈을 조사하지 않았다.",
+          "implication": "데이터 완전성 문제로 이어졌다.", "checks": ["환경모니터링 일탈 조사"]}
+    MFDS = {"id": "m-1", "agency": "MFDS", "group": "국내", "type_tag": "행정처분",
+            "title_issue": "제조기록서 거짓 작성", "summary": "원료의약품 제조업무정지 행정처분.",
+            "implication": "", "checks": []}
+
+    def test_tags_follow_the_card(self):
+        tags = lc.hashtags([self.WL], "ko").split()
+        self.assertEqual(tags[:3], ["#GMP", "#QA", "#제약바이오"])
+        for t in ("#FDA", "#경고서한", "#무균공정", "#환경모니터링"):
+            self.assertIn(t, tags)
+        mf = lc.hashtags([self.MFDS], "ko").split()
+        for t in ("#식약처", "#행정처분", "#원료의약품"):
+            self.assertIn(t, mf)
+        self.assertNotIn("#FDA", mf)
+        self.assertNotIn("#무균공정", mf)
+
+    def test_cap_dedupe_and_english_has_no_hangul(self):
+        many = dict(self.WL, summary=self.WL["summary"] + " OOS CAPA 세척 교차오염 엔도톡신 안정성시험 위탁")
+        for lang in ("ko", "en"):
+            tags = lc.hashtags([many, self.MFDS], lang).split()
+            self.assertLessEqual(len(tags), 8)
+            self.assertEqual(len({t.lower() for t in tags}), len(tags))
+            self.assertTrue(all(re.fullmatch(r"#\w+", t) for t in tags), tags)
+        en = lc.hashtags([many], "en")
+        self.assertNotRegex(en, r"[가-힣]")
+        self.assertIn("#WarningLetter", en.split())
+
+    def test_one_caption_ends_with_card_tags(self):
+        brief, glossary = _load()
+        for lang in ("ko", "en"):
+            last = lc.build_deck(brief, glossary, lang=lang)["caption"].splitlines()[-1]
+            self.assertTrue(last.startswith("#GMP "), last)
+            self.assertGreater(len(last.split()), 3, last)
+
+
 class WrapWidthBalanceTest(unittest.TestCase):
     """[09-23 반려 피드백 재수정] wrap_width 균형 배분 — 그리디(앞줄을 상한까지 욱여넣고
     마지막 줄에 짧은 나머지를 남김)가 "문장을 잘못 끊는다"는 반려의 실제 원인이었다. 여기서는
@@ -1077,9 +1118,11 @@ class MonthlyCliTest(unittest.TestCase):
         py, pm = (latest_y, latest_m - 1) if latest_m > 1 else (latest_y - 1, 12)
         prev = f"{py:04d}-{pm:02d}"
         self.assertEqual(lc.auto_months(all_briefs), [prev, cur])
-        # 실데이터 전제(2026-09-23 기준: 9월·8월 둘 다 발행본이 있다) — 낡으면 이 assert 가 먼저 죽는다.
-        self.assertIn("2026-09", [prev, cur])
-        self.assertIn("2026-08", [prev, cur])
+        # 실데이터 전제: 두 달 모두 발행본이 있다. 달 이름을 박아 두면 새 달 첫 호가
+        # 발행 PR 에 들어오는 순간 이 시험이 죽는다(2026-10-05 호에서 실제로 죽었다).
+        months_with_briefs = {p[:7] for p in pubs}
+        self.assertIn(cur, months_with_briefs)
+        self.assertIn(prev, months_with_briefs)
 
     def test_cli_months_auto_writes_two_months_two_languages(self):
         with tempfile.TemporaryDirectory() as tmp:

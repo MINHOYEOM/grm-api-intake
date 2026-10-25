@@ -67,8 +67,17 @@ _FILE_TITLE_RE = re.compile(r'<p class="file-title[^"]*"[^>]*>(.*?)</p>', re.S)
 _PDF_HREF_RE = re.compile(r'href="(/en/documents/[^"]+?\.pdf)"')
 _FIRST_PUBLISHED_RE = re.compile(r"First published")
 _DATETIME_RE = re.compile(r'datetime="(\d{4})-(\d{2})-(\d{2})')
+# 2026-09 말 EMA 가 과학 가이드라인 URL 을 `/en/<slug>-scientific-guideline` →
+# `/en/scientific-guidelines/<slug>` 로 옮겼다(옛 URL 은 301). 두 형식을 다 받는다.
 _GUIDELINE_LINK_RE = re.compile(
-    r'<a[^>]+href="(/en/[^"]*-scientific-guideline)"[^>]*>(.*?)</a>', re.S)
+    r'<a[^>]+href="(/en/(?:scientific-guidelines/[^"/#?]+|[^"]*-scientific-guideline))"'
+    r'[^>]*>(.*?)</a>', re.S)
+_NEW_GUIDELINE_PATH_RE = re.compile(r"/en/scientific-guidelines/([^/?#]+)/?$")
+# 새 경로로 옮기며 슬러그 자체가 바뀐 항목: 새 형식 환산 슬러그 → 옛 슬러그(id 보존).
+_LEGACY_SLUG_ALIASES: dict[str, str] = {
+    "ich-guideline-q13-continuous-manufacturing-drug-substances-drug-products-scientific-guideline":
+        "ich-guideline-q13-continuous-manufacturing-drug-substances-and-drug-products-scientific-guideline",
+}
 _GDP_RE = re.compile(r"good distribution|(?<![a-z])gdp(?![a-z])|wholesale", re.I)
 _GMP_RE = re.compile(r"good manufacturing|(?<![a-z])gmp(?![a-z])|manufactur", re.I)
 
@@ -126,6 +135,17 @@ def _text(raw: str) -> str:
 
 def _slug(url: str) -> str:
     return url.split("?")[0].split("#")[0].rstrip("/").rsplit("/", 1)[-1]
+
+
+def _guideline_id_slug(url: str) -> str:
+    """가이드라인 URL → id 계산용 슬러그. 새 경로는 옛 `<slug>-scientific-guideline` 형식으로
+    환산해 기존 카탈로그 id(앵커·해시)를 그대로 유지한다."""
+    path = url.split("?")[0].split("#")[0]
+    match = _NEW_GUIDELINE_PATH_RE.search(path)
+    if not match:
+        return _slug(url)
+    legacy = match.group(1) + "-scientific-guideline"
+    return _LEGACY_SLUG_ALIASES.get(legacy, legacy)
 
 
 def _item_id(slug: str) -> str:
@@ -210,7 +230,7 @@ def parse_guideline_links(html_text: str) -> list[tuple[str, str]]:
 def build_guideline_item(url: str, title: str, page_html: str) -> dict[str, str]:
     """가이드라인 링크 + 상세 페이지 HTML → 카탈로그 항목(네트워크 없음)."""
     item = {
-        "id": _item_id(_slug(url)),
+        "id": _item_id(_guideline_id_slug(url)),
         "title_en": title,
         "doc_type": _doc_type_for(TYPE_SCIENTIFIC, title),
         "official_url": url,

@@ -1,5 +1,16 @@
-{#- 용어 그림 · pharmaceutical-quality-system — easy_ko 정의를 묘사만 한다(정의 밖 주장 금지).
-    링크드인 카드 '이번 주 용어' 장·용어집 PDF 도 이 파일을 그대로 렌더한다(2026-09-29 단일 원천 — 사본 없음). -#}
-<svg class="gt-fig-svg" viewBox="0 0 150 88" role="img" aria-label="{{ _('조직과 절차, 자원을 하나로 이은 관리체계') }}">
-  <rect x="4" y="3" width="142" height="55" rx="9" fill="var(--coral-tint)" stroke="var(--coral)" stroke-width="1.8"/><path d="M18 15v32" stroke="var(--coral-2)" stroke-width="1.6" stroke-linecap="round"/><circle cx="18" cy="15" r="3.6" fill="var(--card)" stroke="var(--coral-2)" stroke-width="1.5"/><text x="29" y="18" font-size="8" fill="var(--ink)">{{ _('조직·책임') }}</text><circle cx="18" cy="31" r="3.6" fill="var(--card)" stroke="var(--coral-2)" stroke-width="1.5"/><text x="29" y="34" font-size="8" fill="var(--ink)">{{ _('절차·공정') }}</text><circle cx="18" cy="47" r="3.6" fill="var(--card)" stroke="var(--coral-2)" stroke-width="1.5"/><text x="29" y="50" font-size="8" fill="var(--ink)">{{ _('자원') }}</text><path d="M8 70h134M137 66l5 4-5 4" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="8" y="84" font-size="8" fill="var(--muted)">{{ _('전 생애주기') }}</text><text x="142" y="84" font-size="8" fill="var(--coral-2)" text-anchor="end" font-weight="700">{{ _('품질목표') }}</text>
+{#- 용어 그림 · pharmaceutical-quality-system — 정의("제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과
+    자원을 연결한 관리체계")를 이어진 구성 요소들을 하나로 묶은 관리체계 → 품질목표로, 체계 폭 전체에 걸친 생애주기 괄호로 옮긴다.
+    2026-10-05 다시 그림: 정의 낱말(조직·책임/절차·공정/자원)을 상자에 옮겨 적던 것(글자 목록)을 지우고 서로 이은 요소 표식만 남겼다
+    (요소 이름은 정의 문장이 말한다). 떠 있던 생애주기 화살표는 체계 아래 괄호로, 체계 상자에서 품질목표로 화살표를 직접 이었다. -#}
+<svg class="gt-fig-svg" viewBox="0 0 184 88" role="img" aria-label="{{ _('여러 요소를 이은 하나의 관리체계가 전 생애주기에서 품질목표로') }}">
+  <rect x="4" y="4" width="104" height="52" rx="8" style="fill:var(--coral-tint);stroke:var(--coral);stroke-width:1.8"/>
+  <text x="56" y="22" text-anchor="middle" style="font-size:9.5px;font-weight:700;fill:var(--ink)">{{ _('관리체계') }}</text>
+  <path d="M30 40h52" style="stroke:var(--coral-2);stroke-width:1.6;stroke-linecap:round"/>
+  <g style="fill:var(--card);stroke:var(--coral-2);stroke-width:1.6">
+    <circle cx="30" cy="40" r="5"/><circle cx="56" cy="40" r="5"/><circle cx="82" cy="40" r="5"/>
+  </g>
+  <path d="M112 30h10M118 26l4 4-4 4" style="fill:none;stroke:var(--coral-2);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"/>
+  <text x="125" y="33" style="font-size:9px;font-weight:700;fill:var(--coral-2)">{{ _('품질목표') }}</text>
+  <path d="M4 62v6h176v-6" style="fill:none;stroke:var(--muted);stroke-width:1.5;stroke-linejoin:round"/>
+  <text x="92" y="82" text-anchor="middle" style="font-size:9px;fill:var(--muted)">{{ _('전 생애주기') }}</text>
 </svg>

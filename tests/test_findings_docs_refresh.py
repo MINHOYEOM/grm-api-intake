@@ -450,11 +450,20 @@ class CommittedDataTest(unittest.TestCase):
     # [2026-10-20] 1340 → 1354. 09-03 이후 주간 갱신이 문서를 더하며 14건 순증했고(사라진 절단 0건)
     # 전부 FDA 경고서한이다(483 12건은 불변). 기존 건이 새로 잘린 것이 아니라 모집단이 늘어난
     # 몫이다. 기준선이 09-03 에 멈춰 있어 10-20 갱신 후보(#1181)가 이 가드에서 1354 > 1340 으로 막혔다.
-    BASELINE_UPSTREAM_TRUNCATED = 1354
+    # [2026-10-26] 1354 → 1288, 세는 대상을 바꿨다. 말줄임표는 결함의 대리 지표일 뿐이다 —
+    # 경고서한 표시 상한(findings_extractors._WL_BLOCK_CHAR_CAP = 6000, 문장 경계 절단)도
+    # 설계대로 "…" 를 붙인다. 09-03 이후 순증분(1338→1361)은 전부 그쪽이었다(원문 4,504~5,986자,
+    # 10-20 경고서한 3통의 7건 등). 그래서 매주 신규 경고서한이 늘 때마다 이 가드가 주간 갱신을
+    # 막았고(#1085·#1127·#1149·#1169·#1198 미머지), 손으로 기준선을 올리는 일이 반복됐다.
+    # 이제 원문 길이 ≤485 자(480 절단 군집 473~485 + 그 아래 짧은 꼬리)만 센다 — 10-26 실측
+    # 1,288건, 10-20 대비 증감 0, 08-05 이후 발행분은 1건뿐. 480 상한이 되살아나면 이 숫자가 다시 는다.
+    BASELINE_UPSTREAM_TRUNCATED = 1288
+    LEGACY_CAP_MAX_ORIG_CHARS = 485
 
     def test_upstream_truncation_does_not_grow(self):
         bad = [f["finding_id"] for d in self.data["documents"] for f in d["findings"]
-               if f["text_ko"].rstrip().endswith(("…", "..."))]
+               if f["text_ko"].rstrip().endswith(("…", "..."))
+               and len(f["text_orig"]) <= self.LEGACY_CAP_MAX_ORIG_CHARS]
         self.assertLessEqual(
             len(bad), self.BASELINE_UPSTREAM_TRUNCATED,
             f"상류 절단이 늘었다({len(bad)} > {self.BASELINE_UPSTREAM_TRUNCATED}): {bad[:5]}")

@@ -350,25 +350,27 @@ def normalize_deep_key_namespace(deep: "dict[str, Any] | None") -> int:
 
 
 # deep 델타 항목이 `deep_analysis` 없이 실려도 **정상**인 키들(번역/재추출 입력 전용).
-# 새 번역층을 만들면 여기에 반드시 추가할 것 — 빠뜨리면 그 카드가 조용히 drop 된다.
-# 대응 병합층: observations_ko/violations_ko → inject_slots._merge_*_translations,
-# ncr_ko → _merge_ncr_translations, source_text → assemble._refresh_* 결정론 재추출.
-_TRANSLATION_ONLY_KEYS = ("observations_ko", "ncr_ko", "violations_ko", "source_text")
-
-
-_TRANSLATION_LAYER_KEYS = ("observations_ko", "ncr_ko", "violations_ko")
+# ★ 목록의 정본은 `verify_deep_analysis.TRANSLATION_ONLY_KEYS` — 로컬 fanout 경로
+#   (`deep_analysis_fanout.assemble_deltas`)와 공용이다. 새 번역층은 거기에 추가할 것
+#   (빠뜨리면 그 카드가 조용히 drop 된다). 게이트 모듈이 없으면 `_gate_deep_analysis` 가
+#   이 목록을 보기 전에 원본을 그대로 돌려주므로 빈 튜플이어도 안전하다.
+_TRANSLATION_ONLY_KEYS = _vda.TRANSLATION_ONLY_KEYS if _vda is not None else ()
 
 
 def _keep_translation_residue(kept: dict[str, Any], doc: str, entry: dict[str, Any]) -> bool:
     """분석 게이트 FAIL/오류 entry 에서 번역층(+동반 `source_text`)만 추려 살린다. 살렸으면 True.
 
-    번역(`_TRANSLATION_LAYER_KEYS`)은 결정론 원문의 국문 병기라 분석과 독립이고, 함께 실린
-    `source_text` 는 조립의 결정론 재추출(`_refresh_*`)·병합 짝의 기준선이라 같이 남긴다.
-    **번역층이 하나도 없으면 종전대로 통째 drop**(False) — source_text 만 남기면 어느 계층도
-    소비하지 않는 빈 껍데기 항목이 deep 파일에 쌓이고 "PASS 0건 → None" 계약도 깨진다."""
-    if not any(k in entry for k in _TRANSLATION_LAYER_KEYS):
+    번역은 결정론 원문의 국문 병기라 분석과 독립이고, 함께 실린 `source_text` 는 조립의
+    결정론 재추출(`_refresh_*`)·병합 짝의 기준선이라 같이 남긴다. **번역층이 하나도 없으면
+    종전대로 통째 drop**(False) — source_text 만 남기면 어느 계층도 소비하지 않는 빈 껍데기
+    항목이 deep 파일에 쌓이고 "PASS 0건 → None" 계약도 깨진다.
+
+    판정·추림은 `verify_deep_analysis.translation_residue` 한 곳에 있다 — 로컬 fanout 경로
+    (`deep_analysis_fanout.assemble_deltas`)도 같은 함수를 부른다."""
+    residue = _vda.translation_residue(entry)
+    if residue is None:
         return False
-    kept[doc] = {k: entry[k] for k in _TRANSLATION_ONLY_KEYS if k in entry}
+    kept[doc] = residue
     return True
 
 

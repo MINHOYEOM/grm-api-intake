@@ -556,6 +556,9 @@ class NewsletterSender:
     def send_campaign(self, campaign_id: str) -> None:
         raise NotImplementedError
 
+    def schedule_campaign(self, campaign_id: str, scheduled_at: str) -> None:
+        raise NotImplementedError
+
     def send_test(self, campaign_id: str, emails: list[str]) -> None:
         raise NotImplementedError
 
@@ -645,6 +648,13 @@ class BrevoSender(NewsletterSender):
 
     def send_campaign(self, campaign_id: str) -> None:
         r = self.s.post(self._url(f"/emailCampaigns/{campaign_id}/sendNow"), timeout=self.timeout)
+        self._check(r)
+
+    def schedule_campaign(self, campaign_id: str, scheduled_at: str) -> None:
+        """미발송 캠페인에 발송 시각을 건다(`scheduledAt`, UTC). Brevo 서버가 그 시각에 보낸다 —
+        러너·PC 가 꺼져 있어도 된다. 상태는 queued 가 되고 멱등(`_DISPATCHED_STATUSES`)에 잡힌다."""
+        r = self.s.put(self._url(f"/emailCampaigns/{campaign_id}"),
+                       data=json.dumps({"scheduledAt": scheduled_at}), timeout=self.timeout)
         self._check(r)
 
     def send_test(self, campaign_id: str, emails: list[str]) -> None:

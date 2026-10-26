@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-19T08:04:08+00:00",
+  "checked_at": "2026-10-26T08:05:49+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -30,10 +30,10 @@
   "summary": {
     "blocked": 61,
     "broken": 0,
-    "needs_review": 118,
+    "needs_review": 119,
     "ok": 430,
-    "references": 731,
-    "unique_urls": 609
+    "references": 732,
+    "unique_urls": 610
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -3219,9 +3219,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.188": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": 206,
+      "http_status": null,
       "method": "GET",
-      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
+      "reason": "network_or_tls:ReadTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3229,7 +3229,7 @@
           "item_id": "cfr-211-188"
         }
       ],
-      "status": "blocked"
+      "status": "needs_review"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.192": {
       "attempts": 2,
@@ -3384,9 +3384,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.34": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": null,
+      "http_status": 206,
       "method": "GET",
-      "reason": "network_or_tls:ReadTimeout",
+      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
       "references": [
         {
           "field": "official_url",
@@ -3394,7 +3394,7 @@
           "item_id": "cfr-211-34"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.42": {
       "attempts": 2,
@@ -3549,9 +3549,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.67": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": null,
+      "http_status": 206,
       "method": "GET",
-      "reason": "network_or_tls:ReadTimeout",
+      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
       "references": [
         {
           "field": "official_url",
@@ -3559,7 +3559,7 @@
           "item_id": "cfr-211-67"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.68": {
       "attempts": 2,
@@ -3609,9 +3609,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.82": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": 206,
+      "http_status": null,
       "method": "GET",
-      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
+      "reason": "network_or_tls:ReadTimeout",
       "references": [
         {
           "field": "official_url",
@@ -3619,7 +3619,7 @@
           "item_id": "cfr-211-82"
         }
       ],
-      "status": "blocked"
+      "status": "needs_review"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.84": {
       "attempts": 2,
@@ -8446,6 +8446,21 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15969": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15969",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15969"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8990,7 +9005,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -9005,7 +9020,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -9020,7 +9035,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000276919.pdf",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -9050,7 +9065,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280045.pdf",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -9062,7 +9077,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280046.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
       "http_status": 200,
       "method": "HEAD",

@@ -2147,6 +2147,10 @@ def collect_fda_483(
         # 종전엔 "cap 도달" 한 줄만 남아 몇 건이 통째로 빠졌는지 아무도 몰랐고, 그 문서들이
         # "원문 없음" 카드로 발행됐다. 숫자를 남겨야 사각이 보인다.
         "skipped_no_attempt": 0,
+        # [2026-10-26 #1168] PDF 를 받았지만 _to_item 이 범위 밖(기기·식품·수의)으로 버린 문서 수.
+        # 이 문서들의 추출 실패는 아래에서 failed/warnings 에서 되돌린다 — 버릴 문서의 OCR
+        # 품질이 7일 연속 "degraded" 경보로 올라왔다(10-20~26, 의료기기·FSVP 483 3건).
+        "dropped_out_of_scope": 0,
     }
     observations_enabled = _observations_enabled()
     observations_health: dict[str, Any] = {
@@ -2216,6 +2220,10 @@ def collect_fda_483(
         # (디제스트가 "스캔·비공개로 상세가 제공되지 않아" 라고 단정한 사례). cap 에 걸려 아예
         # 시도하지 못한 경우도 결손이므로 사유를 남긴다.
         text_status = "not-attempted"
+        fetched = False
+        health_marks = [(h, h["failed"], len(h["warnings"]))
+                        for h in (excerpt_health, observations_health, deep_health,
+                                  inspectors_health)]
         pdf_url = _pdf_url(media_id)
         # [FIND-1 M10a] Observation 추출의 페이지헤더 스크럽 힌트 — 이 행(nrow)의 시설유형/
         # FEI/업체명을 strip_fda483_page_header 에 그대로 넘겨 OCR 공백변형까지 흡수한다.
@@ -2239,6 +2247,7 @@ def collect_fda_483(
                 # 뒤 Observation 까지 담기게(공유 엔진 12000 기본이 절단하던 것 보완). excerpt 는
                 # 이 text 에서 앵커 뒤 1500자만 다시 잘라 산출물 불변.
                 text, status = _fetch_fda483_pdf_text(pdf_url)
+                fetched = True
                 text_status = status if not text else "ok"
                 # [실사관 추출 2026-07-30] 반드시 **청소 이전** 원시 text 에서 추출한다 —
                 # `_clean_observation_detail`/`_FDA483_FOOTER_RE` 는 서명블록을 지우는 것이
@@ -2295,6 +2304,13 @@ def collect_fda_483(
 
         item = _to_item(nrow, excerpt, observations, body_full, text_status,
                         inspectors=inspectors)
+        if item is None and fetched:
+            # 버린 문서의 추출 실패는 수집 품질이 아니다 — 시도(attempted)는 실제 비용이라 남기고
+            # 실패·경고만 되돌린다. 경보 판정(grm_health)은 failed>0 만 본다.
+            excerpt_health["dropped_out_of_scope"] += 1
+            for h, failed0, nwarn0 in health_marks:
+                h["failed"] = failed0
+                del h["warnings"][nwarn0:]
         if item is not None:             # dedup 은 위 media_id seen 으로 보장(doc_id=fda483-<id>)
             items.append(item)
 
@@ -2333,6 +2349,7 @@ def collect_fda_483(
                 f"· excerpt attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "
                 f"failed={excerpt_health['failed']} "
                 f"미시도={excerpt_health['skipped_no_attempt']} "
+                f"범위밖드롭={excerpt_health['dropped_out_of_scope']} "
                 f"· OCR {_OCR_BUDGET['used']}/{FDA483_OCR_PAGE_BUDGET}쪽 "
                 f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
                 f"예산초과={_OCR_HEALTH['budget_skipped']} "

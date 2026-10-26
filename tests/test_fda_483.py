@@ -508,6 +508,21 @@ class ExcerptTest(unittest.TestCase):
         self.assertNotIn("fda483_excerpt", items[0].raw_payload)
         self.assertEqual(f.LAST_HEALTH["fda483_excerpt"]["failed"], 1)
 
+    def test_out_of_scope_drop_does_not_count_as_degraded(self):
+        # #1168: 의료기기 483 의 OCR 실패가 7일 연속 degraded 경보로 올라왔다 — 버릴 문서다.
+        rows = [_json_row(6101, est="Medical Device Manufacturer", company="Zoll Lifecor"),
+                _json_row(6102)]
+        with _Patched(json_rows=rows, html_rows=[], pdf_text="cover page only"):
+            items, _ = f.collect_fda_483(START, END)
+        self.assertEqual(len(items), 1)
+        h = f.LAST_HEALTH["fda483_excerpt"]
+        self.assertEqual(h["attempted"], 2)
+        self.assertEqual(h["dropped_out_of_scope"], 1)
+        self.assertEqual(h["failed"], 1)                    # 남은 약품 483 의 실패만
+        self.assertEqual(len(h["warnings"]), 1)
+        self.assertNotIn("6101", h["warnings"][0])
+        self.assertEqual(f.LAST_HEALTH["fda483_inspectors"]["failed"], 1)
+
     def test_excerpt_cap(self):
         json_rows = [_json_row(7000 + i, publish="05/2%d/2026" % (i % 9)) for i in range(3)]
         with _Patched(json_rows=json_rows, html_rows=[]), \

@@ -453,6 +453,34 @@ class NoiseGateTest(unittest.TestCase):
             items, _ = f.collect_fda_483(START, END)
         self.assertEqual(len(items), 1)
 
+    def test_out_of_scope_establishment_skipped_before_pdf(self):
+        # [2026-10-26] 10-26 호에 혈장센터·난임클리닉·임상의사·제과점 483 이 Possible 로 들어왔다.
+        rows = [_json_row(4100 + i, est=est) for i, est in enumerate(
+            ("Plasmapheresis Center", "Human Reproductive Tissue Establishment",
+             "Clinical Investigator", "Bakery", "Device Manufacturer"))]
+        rows.append(_json_row(4199, est="Biologics & Medical Device Manufacturer"))
+        with _Patched(json_rows=rows, html_rows=[]):
+            items, _ = f.collect_fda_483(START, END)
+        self.assertEqual([i.raw_payload["media_id"] for i in items], ["4199"])
+        h = f.LAST_HEALTH["fda483_excerpt"]
+        self.assertEqual(h["skipped_out_of_scope_type"], 5)
+        self.assertEqual(h["attempted"], 1)                 # 범위 밖 5건은 PDF 를 받지 않았다
+
+    def test_generic_manufacturer_dropped_by_device_observations(self):
+        text = ("OBSERVATION 1 Design validation did not ensure the device conforms to defined "
+                "user needs. The device master record is incomplete.")
+        with _Patched(json_rows=[_json_row(4201, est="Manufacturer", company="Sauna Works")],
+                      html_rows=[], pdf_text=text):
+            items, _ = f.collect_fda_483(START, END)
+        self.assertEqual(items, [])
+
+    def test_generic_manufacturer_with_drug_observations_kept(self):
+        text = ("OBSERVATION 1 Design validation of the aseptic filling line was not performed. "
+                "Media fill failures were not investigated for the drug product.")
+        with _Patched(json_rows=[_json_row(4202, est="Manufacturer")], html_rows=[], pdf_text=text):
+            items, _ = f.collect_fda_483(START, END)
+        self.assertEqual(len(items), 1)
+
 
 class DedupTest(unittest.TestCase):
     def test_dedup_by_media_id(self):
@@ -510,7 +538,8 @@ class ExcerptTest(unittest.TestCase):
 
     def test_out_of_scope_drop_does_not_count_as_degraded(self):
         # #1168: 의료기기 483 의 OCR 실패가 7일 연속 degraded 경보로 올라왔다 — 버릴 문서다.
-        rows = [_json_row(6101, est="Medical Device Manufacturer", company="Zoll Lifecor"),
+        # 유형만으론 못 거르고(Manufacturer) PDF 를 받은 뒤 업체명(cosmetics)으로 드롭되는 경로.
+        rows = [_json_row(6101, est="Manufacturer", company="Acme Cosmetics Ltd"),
                 _json_row(6102)]
         with _Patched(json_rows=rows, html_rows=[], pdf_text="cover page only"):
             items, _ = f.collect_fda_483(START, END)

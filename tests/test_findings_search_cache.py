@@ -152,15 +152,20 @@ class CacheMigrationFileTest(unittest.TestCase):
         self.assertIn("(public.findings_search_cache_args(), 'hot')", self.code)
         self.assertIn("(public.findings_search_cache_args(p_orig_lang := 'en'), 'hot')", self.code)
 
-    def test_seed_covers_every_glossary_case_query(self) -> None:
+    # [2026-10-26] 086 시드는 09-23 시점 스냅샷이다. 그 뒤 용어사전에 새로 생긴 q 는 088 의
+    # findings_search_cache_sync 가 glossary_cases.json push 때마다 daily 목록에 넣는다
+    # (grm-findings-search-cache-sync.yml). 예전 검사는 "현재 파일의 q ⊆ 086 시드"를 요구해
+    # 이미 적용된 마이그레이션을 고치라고 했고, 새 사례 q 를 넣는 주간 용어 PR(#1137)을 전부 막았다.
+    # 이제 시드는 스냅샷 크기만, 현재 목록과의 일치는 sync 쪽이 맡는다.
+    def test_seed_has_glossary_snapshot(self) -> None:
+        n_daily = len(re.findall(r"p_text_only := true\), 'daily'\)", self.code))
+        self.assertGreaterEqual(n_daily, 190)
+
+    def test_glossary_case_queries_are_sql_safe(self) -> None:
         data = json.loads(_GLOSSARY_CASES.read_text(encoding="utf-8"))
         items = data["items"] if isinstance(data["items"], list) else list(data["items"].values())
         qs = sorted({it["q"] for it in items if isinstance(it, dict) and it.get("q")})
         self.assertGreaterEqual(len(qs), 100)
-        missing = [q for q in qs
-                   if f"(public.findings_search_cache_args(p_q := '{q}', p_text_only := true), 'daily')"
-                   not in self.code]
-        self.assertEqual(missing, [], f"시드에 없는 용어 사례 질의 {len(missing)}건 — 086 시드를 다시 생성하라")
         for q in qs:
             self.assertNotIn("'", q)
             self.assertNotIn("\\", q)

@@ -1,0 +1,596 @@
+[
+  {
+    "finding_id": "finding-00a400c157840afa54f39237",
+    "finding_text": "Smoke studies were not performed under dynamic conditions.",
+    "finding_text_ko": "기류 시각화 시험(smoke study)을 동적 조건(dynamic conditions)에서 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-06ffbccf95e5466c064d2773",
+    "finding_text": "로수탄정10밀리그램(로수바스타틴칼슘): 유연물질 기준 초과 검출 우려에 따른 사전예방적 조치로 인한 영업자 회수",
+    "finding_text_ko": "로수탄정10밀리그램(로수바스타틴칼슘)에 대해 유연물질 기준 초과 검출 우려에 따른 사전예방적 조치로 영업자 회수가 실시되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0ec81e98db6cf2a798a35f6d",
+    "finding_text": "Personnel infrequently changed and sanitized gloves to prevent contamination.",
+    "finding_text_ko": "작업자가 오염 방지를 위한 장갑 교체 및 소독을 드물게 실시했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-14098f48a08dafc4cea30169",
+    "finding_text": "Compounding with components, containers or other materials that have not been verified to assure that they do not contribute endotoxin contamination that may be objectionable given the product's intended use.",
+    "finding_text_ko": "제품의 사용 목적상 문제가 될 수 있는 엔도톡신(endotoxin) 오염을 유발하지 않는지 검증되지 않은 원료, 용기 또는 기타 자재를 사용해 조제(compounding)했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-177ba86b6788ad07a52f8e88",
+    "finding_text": "현진산수유: 성상",
+    "finding_text_ko": "현진산수유: 성상 항목이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2a79cb94e6be826797c59f0e",
+    "finding_text": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions.",
+    "finding_text_ko": "최악 조건(worst-case), 가장 도전적이고 스트레스가 큰 조건에서 무균 생산 공정(aseptic production operations)을 충실히 모사하는 배지충전(media fill)을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2bff35d322ce41dc57701e41",
+    "finding_text": "The facility design was observed to allow the influx of lesser quality air into a classified area containing higher quality air.",
+    "finding_text_ko": "시설 설계가 더 높은 등급의 공기가 있는 청정 등급 구역(classified area)으로 낮은 등급의 공기가 유입되도록 허용하는 것으로 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-35c1cc1acbc4efc4640ddfbb",
+    "finding_text": "푸른무약골쇄보: 성상",
+    "finding_text_ko": "푸른무약골쇄보: 성상 항목이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3886774ca9a1cb2452147521",
+    "finding_text": "Personnel donned gowning apparel improperly, in a way that may have caused the gowning apparel to become contaminated.",
+    "finding_text_ko": "작업자가 무균복(gowning apparel)을 부적절하게 착용하여 무균복이 오염되었을 수 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3a061f81e1f33bee394c6441",
+    "finding_text": "Your firm produced drugs while construction was underway in an adjacent area without adequate controls to prevent contamination of the production environment and product.",
+    "finding_text_ko": "귀사는 인접 구역에서 공사가 진행되는 동안 생산 환경과 제품의 오염을 방지하기 위한 적절한 관리 없이 의약품을 생산했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-3ef40d39e212a75c95d73fd3",
+    "finding_text": "Personnel were observed moving quickly in a critical area or in an area immediately adjacent to a critical area likely causing disrnption ofunidirectional airflow.",
+    "finding_text_ko": "작업자가 청정구역(critical area) 또는 그에 바로 인접한 구역에서 빠르게 움직이는 것이 관찰되었으며, 이로 인해 일방향 기류(unidirectional airflow)가 교란되었을 가능성이 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4f9b839a0e3f22d767794255",
+    "finding_text": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하거나 표시된 확인(identity), 함량(strength), 순도(purity) 및 품질(quality)을 갖추도록 보증하기 위한 생산 및 공정 관리 서면 절차를 수립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-534492255a4feb1bb4178607",
+    "finding_text": "오마프원페리주: 자진회수",
+    "finding_text_ko": "오마프원페리주에 대해 자진회수가 실시되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-64d2be31b4a9a0d1da9c92d2",
+    "finding_text": "허브팜석창포: 확인시험",
+    "finding_text_ko": "허브팜석창포: 확인시험 항목이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6fe6c039382d93a8f599004b",
+    "finding_text": "현진절패모: 중금속(카드뮴)",
+    "finding_text_ko": "현진절패모: 중금속(카드뮴) 항목이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7654765d169fcd796f665d7d",
+    "finding_text": "Laboratory records are deficient in that they do not include a complete record of all data obtained during testing.",
+    "finding_text_ko": "시험 기록이 시험 중 얻은 모든 데이터의 완전한 기록을 포함하지 않는 점에서 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-80885170a88f08146b0bc030",
+    "finding_text": "Microbial contamination was present in the ISO 5 area and areas adjacent to production areas.",
+    "finding_text_ko": "ISO 5 구역 및 생산 구역에 인접한 구역에서 미생물 오염이 존재했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8ea9bdff9e55c8742ca82cfa",
+    "finding_text": "Procedures were not designed to ensure compliance with the donor eligibility requirements.",
+    "finding_text_ko": "절차가 공여자 적격성(donor eligibility) 요건 준수를 보장하도록 설계되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-943013099bc874284c55b21d",
+    "finding_text": "Donors were not screened by a review of relevant medical records for risk factors and clinical evidence of communicable disease agents and diseases.",
+    "finding_text_ko": "공여자에 대해 감염성 질병 인자 및 질병의 위험 요인과 임상적 증거를 확인하기 위한 관련 의무기록 검토를 통한 선별(screening)을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9ba0954d5ab238d11d880695",
+    "finding_text": "Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted.",
+    "finding_text_ko": "작업자가 ISO 5 구역에서 \"first air\"의 흐름이 차단되거나 교란되는 위치에서 무균 조작(aseptic manipulation)을 수행하는 것이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a9406e29764ec6db4179be7b",
+    "finding_text": "Inadequate <Redacted B4> testing on <Redacted B4> used to sterilize drug products.",
+    "finding_text_ko": "의약품 멸균에 사용하는 <Redacted B4>에 대한 <Redacted B4> 시험이 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ab11e51d03f9357191670236",
+    "finding_text": "Written procedures for cleaning and maintenance fail to include description in sufficient detail of methods, equipment and materials used.",
+    "finding_text_ko": "세척 및 유지관리 서면 절차에 사용하는 방법, 장비 및 자재에 대한 충분히 상세한 기술이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ac1be9b914e5e3f9cd263307",
+    "finding_text": "현진강활: 이산화황",
+    "finding_text_ko": "현진강활: 이산화황 항목이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ae324b9ac1f308ce643c5c61",
+    "finding_text": "The batch production and control records are deficient in that they do not include documentation of the accomplishment of each significant step in manufacturing.",
+    "finding_text_ko": "제조 및 관리 기록(batch production and control records)이 제조의 각 주요 단계 수행에 대한 문서화를 포함하지 않는 점에서 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c015f7238dabe769afefc304",
+    "finding_text": "Use of ingredients not intended for pharmaceutical use in sterile drug production.",
+    "finding_text_ko": "무균 의약품 생산에 의약품용으로 의도되지 않은 원료를 사용했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d9d62e6bb20ac10c09c3044d",
+    "finding_text": "A pattern of frequent or acute pressure reversals was observed from areas of less clean air to areas of higher air cleanliness.",
+    "finding_text_ko": "청정도가 낮은 구역에서 청정도가 높은 구역 방향으로 빈번하거나 급격한 차압 역전(pressure reversal)이 발생하는 양상이 관찰되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e68a5f266f6a23781d596380",
+    "finding_text": "The summary of records for HCT/Ps did not contain the address of the establishment that made the donor-eligibility determination.",
+    "finding_text_ko": "HCT/P 기록 요약에 공여자 적격성 판정을 내린 시설의 주소가 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ea572e0616fbb6d400602fa1",
+    "finding_text": "Donor eligibility records are not accurate and legible.",
+    "finding_text_ko": "공여자 적격성(donor eligibility) 기록이 정확하지 않고 판독 가능하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eac803537d1d58585e50d04c",
+    "finding_text": "Lack of disinfection of supplies at each transition from areas of lower quality air to areas of higher quality air.",
+    "finding_text_ko": "공기 등급이 낮은 구역에서 높은 구역으로 이동하는 각 전환 지점에서 물품을 소독하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f36ecc751938c38ca2fde542",
+    "finding_text": "A standard operating procedure for the release of HCT/Ps from donors that test reactive for cytomegalovirus (CMV) was not maintained, defined and documented.",
+    "finding_text_ko": "거대세포바이러스(cytomegalovirus, CMV) 반응성 검사 결과가 나온 공여자의 HCT/P 출하에 관한 표준작업절차(SOP)를 유지·규정·문서화하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f3c17a64947aea72738455bb",
+    "finding_text": "현진독활: 회분, 확인시험, 정량법(카우레노산 및 콘티넨탈산의 합)",
+    "finding_text_ko": "현진독활: 회분, 확인시험, 정량법(카우레노산 및 콘티넨탈산의 합) 항목이 부적합했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f696b4509d4fb0e0c8550cdb",
+    "finding_text": "바른금은화: 품질 부적합(성상)",
+    "finding_text_ko": "바른금은화: 성상 항목에서 품질 부적합이 확인되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fe6b3af5cbf1d3c187064ec5",
+    "finding_text": "엑스프리벤정: 타 제품(도스티넨정0.5밀리그램(카베르골린)) 혼입 우려에 따른 영업자회수",
+    "finding_text_ko": "엑스프리벤정에 대해 타 제품(도스티넨정0.5밀리그램(카베르골린)) 혼입 우려에 따른 영업자회수가 실시되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6500ff20f478a44253d314d2",
+    "finding_text": "마그액트스피드액: 안정성 시험 일부 항목(벤포티아민 함량 시험) 기준일탈로 인한 영업자 회수",
+    "finding_text_ko": "마그액트스피드액에 대해 안정성 시험 일부 항목(벤포티아민 함량 시험)의 기준일탈로 영업자 회수가 실시되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-925a756e41e5ed26fa8e7f52",
+    "finding_text": "The quality control unit lacks responsibility to approve all procedures or specifications impacting on the identity, strength, quality and purity of drug products.",
+    "finding_text_ko": "품질관리부서(quality control unit)가 의약품의 확인, 함량, 품질 및 순도에 영향을 미치는 모든 절차 또는 규격을 승인할 책임을 갖고 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9313686ebd246aca11bfb200",
+    "finding_text": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room to produce aseptic conditions.",
+    "finding_text_ko": "무균 공정 구역(aseptic processing areas)에서 무균 상태를 조성하기 위한 실내 세척 및 소독 체계가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-933c0531259d34321e0757d3",
+    "finding_text": "Written procedures are not followed for the storage of components.",
+    "finding_text_ko": "원료 보관에 관한 서면 절차를 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-94154f3c2fd8e075492f7b90",
+    "finding_text": "Failure to review all records required under the regulations to identify previously donated blood and blood components within 3 calendar days after a donor tests reactive for evidence of HIV infection indicating evidence of HIV infection.",
+    "finding_text_ko": "공여자가 HIV 감염 증거를 나타내는 반응성 검사 결과를 보인 후 3 역일(calendar days) 이내에 이전에 공여된 혈액 및 혈액 성분을 식별하기 위해 규정상 요구되는 모든 기록을 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-956eb88ab0f402689e63d743",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization process.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위해 설계된 절차에 무균 공정 및 멸균 공정의 적절한 밸리데이션이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-95bafeb10510f2e8a55e6955",
+    "finding_text": "The firm did not conduct a Performance Qualification (PQ) study ofthe) ,, Thermo | mw (Freezers, prior to use, to determine the ‘i for units ofSource Plasma placed into the a +~——~—s~«~«*é«diRreezerrs, The freezers have been used to initially —_., Source Plasma units collected since the center opened on February 20, 2024 without completing the freezer qualification to demonstrate this equipment performs as it was designed, to ensure compliance with manufacturing requirements for Source Plasma.",
+    "finding_text_ko": "회사는 [원문 일부 판독 불가] Thermo [원문 일부 판독 불가] 냉동고(Freezers)에 대해 사용 전에 성능적격성평가(Performance Qualification, PQ) 연구를 실시하지 않았으며, 이는 냉동고에 넣는 원료혈장(Source Plasma) 단위의 [원문 일부 판독 불가]을(를) 확인하기 위한 것이었다. 해당 냉동고는 센터 개소일인 2024년 2월 20일 이후 채취된 원료혈장 단위를 처음 [원문 일부 판독 불가]하는 데 사용되어 왔으며, 이 장비가 설계대로 성능을 발휘함을 입증하여 원료혈장 제조 요건 준수를 보장하기 위한 냉동고 적격성평가를 완료하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-96d0f63b788058f32697ccd2",
+    "finding_text": "Routine checking of electronic equipment is not performed according to a written program designed to assure proper performance.",
+    "finding_text_ko": "전자 장비의 정기 점검을 적절한 성능을 보증하도록 설계된 서면 프로그램에 따라 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-98cf521d9aac6ede8368bcad",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용하는 장비가 의도된 용도의 작업을 용이하게 하는 적절한 설계를 갖추지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-998b328fe5371ec6f2569dde",
+    "finding_text": "Decontamination is incomplete or not adequately demonstrated to ensure prevention of cross-contamination.",
+    "finding_text_ko": "교차오염(cross-contamination) 방지를 보장하기 위한 오염 제거(decontamination)가 불완전하거나 적절히 입증되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9a63e6390d4fd986640e5c79",
+    "finding_text": "Laboratory records do not include a complete record of all data secured in the course of each test, including all graphs, charts and spectra from laboratory instrumentation, properly identified to show the specific component and drug product tested.",
+    "finding_text_ko": "시험 기록에 각 시험 과정에서 확보한 모든 데이터의 완전한 기록이 포함되어 있지 않았으며, 여기에는 시험 대상인 특정 원료 및 의약품을 나타내도록 적절히 식별된 시험 장비의 모든 그래프, 차트 및 스펙트럼이 포함된다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c82904dddedb84dc0ceeb82",
+    "finding_text": "Records are not concurrently maintained with the performance of each significant step in the collection of each unit of blood and blood components so that all steps can be clearly traced.",
+    "finding_text_ko": "혈액 및 혈액 성분의 각 단위 채취 시 각 주요 단계의 수행과 동시에 기록을 작성하지 않아 모든 단계를 명확히 추적할 수 없었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9df43eb6bd44855f87809169",
+    "finding_text": "Pest control program is deficient.",
+    "finding_text_ko": "방충·방서(pest control) 프로그램이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9f8ad49421ad8199adc4b0f7",
+    "finding_text": "Failure to establish and follow adequate written procedures for cleaning and maintenance of equipment to prevent contamination or carryover of materials.",
+    "finding_text_ko": "오염 또는 물질의 이월(carryover)을 방지하기 위한 장비 세척 및 유지관리에 관한 적절한 서면 절차를 수립하고 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a10ede845b6c6eff2529ce00",
+    "finding_text": "Procedures for the acceptance and rejection of components and materials utilized within drug substance manufacturing are not adequate.",
+    "finding_text_ko": "원료의약품(drug substance) 제조에 사용하는 원료 및 자재의 적합·부적합 판정 절차가 적절하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a2aec78bc40825a344d87e4c",
+    "finding_text": "Failure to make reasonable attempts to notify a donor who has been determined not be to eligible as a donor based on eligibility criteria.",
+    "finding_text_ko": "적격성 기준에 따라 공여자로서 부적격으로 판정된 공여자에게 통보하기 위한 합리적인 시도를 하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a3eab4186faa8e96b49af7d9",
+    "finding_text": "Each component is not tested for conformity with all appropriate written specifications for purity, strength, and quality.",
+    "finding_text_ko": "각 원료에 대해 순도, 함량 및 품질에 관한 모든 적절한 서면 규격에 대한 적합성 시험을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a44c34c5794f31e6be6945ec",
+    "finding_text": "One or more processes for risk management in product realization have not been adequately documented.",
+    "finding_text_ko": "제품 실현(product realization)에서의 위험관리를 위한 하나 이상의 프로세스가 적절히 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a5bcd742bb6834a7c819d7f0",
+    "finding_text": "Records including signature by the physician requesting the procedure are not maintained of all emergency transfusions.",
+    "finding_text_ko": "모든 응급 수혈에 대해 해당 시술을 요청한 의사의 서명을 포함한 기록을 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a5d614b68cccfb49a05053ca",
+    "finding_text": "Batch production and control records do not include complete information relating to the production and control of each batch.",
+    "finding_text_ko": "제조 및 관리 기록(batch production and control records)에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a75c8400d03ff3d0de39271f",
+    "finding_text": "The sensitivity of test methods have not been established.",
+    "finding_text_ko": "시험법의 감도(sensitivity)가 확립되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a7c3abedc4c5fab462414a69",
+    "finding_text": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design, of adequate size and suitably located to facilitate operations for its intended use and cleaning and maintenance.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용하는 장비가 의도된 용도의 작업과 세척 및 유지관리를 용이하게 하도록 적절한 설계와 충분한 크기를 갖추고 적절한 위치에 배치되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a8cf55dcc8d9a403169ac453",
+    "finding_text": "Environmental monitoring and control are deficient.",
+    "finding_text_ko": "환경 모니터링(environmental monitoring) 및 관리가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a994ce5d21d6d0adb3125eba",
+    "finding_text": "Written standard operating procedures including all steps to be followed in the collection, processing and storage of blood and blood components for further manufacturing purposes were not always followed.",
+    "finding_text_ko": "추가 제조 목적의 혈액 및 혈액 성분 채취, 처리 및 보관에서 따라야 할 모든 단계를 포함한 서면 표준작업절차(SOP)를 항상 준수하지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ad975d83ec5dbc6eb4e1060d",
+    "finding_text": "Failure to maintain equipment used in the collection of blood and blood products in a clean and orderly manner and so as to facilitate cleaning and maintenance.",
+    "finding_text_ko": "혈액 및 혈액 제품 채취에 사용하는 장비를 청결하고 정돈된 상태로, 그리고 세척 및 유지관리가 용이하도록 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b04726551bc5773378a69925",
+    "finding_text": "Records associated with drug product components, production, control and distribution and within the retention period for such records, were not made readily available for authorized inspection.",
+    "finding_text_ko": "의약품 원료, 생산, 관리 및 유통에 관련되고 해당 기록의 보존 기간 내에 있는 기록을 허가된 실사(authorized inspection)를 위해 즉시 제공하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b20aaf9a3686e0fb3b8fff0c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed.",
+    "finding_text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위해 설계된 절차를 수립·문서화·준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b2d44f2c11c1bd973ecc146c",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that components and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험 관리(laboratory controls)에 원료 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b3b87cf0eb206e61b47db958",
+    "finding_text": "Failure to review all records required under the regulations to identify previously donated blood and blood components within 3 calendar days after a donor tests reactive for evidence ofHCV infection indicating evidence of HCV infection.",
+    "finding_text_ko": "공여자가 HCV 감염 증거를 나타내는 반응성 검사 결과를 보인 후 3 역일(calendar days) 이내에 이전에 공여된 혈액 및 혈액 성분을 식별하기 위해 규정상 요구되는 모든 기록을 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b47980204824b6e9d5f5dcd3",
+    "finding_text": "Aseptic processing ofCASGEVY drug product is deficient.",
+    "finding_text_ko": "CASGEVY 완제의약품의 무균 공정(aseptic processing)이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4add32dcbcf1944278e7e20",
+    "finding_text": "Facilities must provide adequate lighting and ventilation to facilitate operations.",
+    "finding_text_ko": "시설은 작업을 용이하게 하기 위해 적절한 조명과 환기를 갖추어야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b4e92b5eb37d76d6833ed261",
+    "finding_text": "Input to and output from the computer and related systems of formulas are not checked for accuracy.",
+    "finding_text_ko": "컴퓨터 및 관련 시스템의 처방(formulas) 입력값과 출력값에 대해 정확성 확인을 하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b55b38a80f3ce3a8a85c4680",
+    "finding_text": "Failure to ensure proper documentation and verification of training records.",
+    "finding_text_ko": "교육훈련 기록의 적절한 문서화 및 검증을 보장하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b6a151e99ae34ae1b4daf8ce",
+    "finding_text": "Equipment cleaning processes are inadequate.",
+    "finding_text_ko": "장비 세척 공정이 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b76ce207117ce7dfa4d71774",
+    "finding_text": "Buildings used in the manufacture, in a clean and sanitary condition.",
+    "finding_text_ko": "제조에 사용하는 건물, 청결하고 위생적인 상태로 [원문 일부 누락].",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b8870bf7c9ac748daeb4595f",
+    "finding_text": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm manufactures OTC drug products, such as (b)(4) . Based on the records and information you provided, you did not demonstrate that you tested each shipment of each lot of incoming components adequately before their use in manufacturing. For example, the documentation provided did not include adequate identity and impurities testing for (b)(4) , a component at risk for (b)(4) contamination, or adequate identity and impurities testing for (b)(4) , a component at high risk for (b)(4) contamination. Your firm also relied on the supplier’s certificate of analysis (COA) and accepted the active pharmaceutical ingredients (API) based on your supplier’s COA without establishing the reliability of your supplier’s test analyses at appropriate intervals. Without adequate testing and confirmation of the reliability of supplier test results, you lack scientific evidence that the components or drug products conform to the appropriate specifications before its use in the drug products you manufacture. The use of ingredients contaminated with (b)(4) has resulted in various lethal poisoning incidents in humans worldwide. See FDA’s guidance document (b)(4) to help you meet the CGMP requirements when manufacturing drugs containing ingredients at high-risk for (b)(4) contamination at (b)(4) You manufacture drugs that contain (b)(4) . (b)(4) substitution in (b)(4) has resulted in various lethal poisoning incidents in humans worldwide. See FDA’s guidance document (b)(4) In response to this letter, provide: A description of how you will test each component lot for conformity with all appropriate specifications for identity, strength, quality, and purity. If you intend to accept any results from your supplier’s COA instead of testing each component lot for strength, quality, and purity, specify how you will robustly establish the reliability of your supplier’s results through initial validation and periodic revalidation. In addition, include a commitment to always conduct at least one specific identity test for each incoming component lot. A summary of your program for qualifying and overseeing the contract facilities that test the components and drug products you manufacture. A commitment to provide (b)(4) test results from testing retains for all lots of high-risk drug components used in the manufacture of drug products, no later than 30 calendar days from the date of this letter. Alternatively, if a retain of a component lot is unavailable, perform retain sample testing of all implicated finished drug product batches for the presence of (b)(4) . A full risk assessment for drug products that are within expiry containing any ingredient at risk for (b)(4) contamination (including but not limited to (b)(4) ). Take prompt and appropriate actions to determine the safety of all lots of the component(s) and any related drug product that could contain (b)(4) , including customer notifications and product recalls for any contaminated lots. Identify additional appropriate corrective action and preventive action (CAPA) that secure supply chains in the future, including but not limited to ensuring that all incoming raw material lots are from fully qualified manufacturers and free from unsafe impurities. Detail these actions in your response to this letter. A comprehensive, independent review of your material system to determine whether all suppliers of components, containers, and closures, are each qualified and the materials are assigned appropriate expiration or retest dates. The review should also determine whether incoming material controls are adequate to prevent use of unsuitable components, containers, and closures.",
+    "finding_text_ko": "귀사는 의약품의 각 원료에 대해 확인(identity)을 검증하기 위한 시험을 최소 1회 이상 실시하지 않았다. 또한 원료 공급업체의 시험 분석 결과의 신뢰성을 적절한 주기로 밸리데이션하고 확립하지 않았다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 (b)(4) 등 OTC 의약품을 제조한다. 귀사가 제출한 기록과 정보에 근거할 때, 귀사는 입고 원료의 각 로트의 각 선적분을 제조에 사용하기 전에 적절히 시험했음을 입증하지 못했다. 예를 들어, 제출된 문서에는 (b)(4) 오염 위험이 있는 원료인 (b)(4)에 대한 적절한 확인 및 불순물 시험, 또는 (b)(4) 오염 고위험 원료인 (b)(4)에 대한 적절한 확인 및 불순물 시험이 포함되어 있지 않았다. 귀사는 또한 공급업체 시험 분석 결과의 신뢰성을 적절한 주기로 확립하지 않은 채 공급업체의 시험성적서(certificate of analysis, COA)에 의존하여 해당 COA를 근거로 원료의약품(API)을 적합 판정했다. 적절한 시험과 공급업체 시험 결과의 신뢰성 확인이 없으면, 귀사가 제조하는 의약품에 사용하기 전에 원료 또는 의약품이 적절한 규격에 적합하다는 과학적 근거가 없다. (b)(4)에 오염된 원료의 사용은 전 세계적으로 사람에게 여러 건의 치명적 중독 사고를 초래했다. (b)(4) 오염 고위험 원료를 함유한 의약품 제조 시 CGMP 요건 충족에 도움이 되는 FDA 가이던스 문서 (b)(4)를 (b)(4)에서 참고하라. 귀사는 (b)(4)를 함유한 의약품을 제조한다. (b)(4)에서의 (b)(4) 대체는 전 세계적으로 사람에게 여러 건의 치명적 중독 사고를 초래했다. FDA 가이던스 문서 (b)(4)를 참고하라. 이 서한에 대한 회신으로 다음을 제출하라: 확인, 함량, 품질 및 순도에 관한 모든 적절한 규격에 대한 적합성을 확인하기 위해 각 원료 로트를 어떻게 시험할 것인지에 대한 설명. 각 원료 로트의 함량, 품질 및 순도를 시험하는 대신 공급업체 COA의 결과를 수용하려는 경우, 초기 밸리데이션과 주기적 재밸리데이션을 통해 공급업체 결과의 신뢰성을 어떻게 확고하게 확립할 것인지 구체적으로 기술할 것. 또한 각 입고 원료 로트에 대해 최소 1회의 특이적 확인시험을 항상 실시하겠다는 약속을 포함할 것. 귀사가 제조하는 원료 및 의약품을 시험하는 위탁 시설의 적격성 평가 및 관리 감독 프로그램 요약. 의약품 제조에 사용된 모든 고위험 의약품 원료 로트의 보관검체(retains) 시험에서 얻은 (b)(4) 시험 결과를 이 서한 일자로부터 30 역일 이내에 제출하겠다는 약속. 또는 원료 로트의 보관검체를 확보할 수 없는 경우, 관련된 모든 완제의약품 배치의 보관검체에 대해 (b)(4) 존재 여부 시험을 실시할 것. (b)(4) 오염 위험이 있는 원료(단, (b)(4)에 국한되지 않음)를 함유하고 유효기간 내에 있는 의약품에 대한 전면적인 위험 평가. (b)(4)를 함유할 수 있는 원료의 모든 로트 및 관련 의약품의 안전성을 판단하기 위해, 오염된 로트에 대한 고객 통보 및 제품 회수를 포함한 신속하고 적절한 조치를 취할 것. 향후 공급망을 확보하기 위한 추가적인 적절한 시정조치 및 예방조치(CAPA)를 파악할 것. 여기에는 모든 입고 원자재 로트가 완전히 적격성이 평가된 제조업체로부터 공급되고 안전하지 않은 불순물이 없음을 보장하는 것이 포함되나 이에 국한되지 않는다. 이러한 조치를 이 서한에 대한 회신에 상세히 기술할 것. 원료, 용기 및 마개의 모든 공급업체가 각각 적격성이 평가되었고 자재에 적절한 유효기간 또는 재시험일이 지정되었는지 판단하기 위한 자재 시스템에 대한 포괄적이고 독립적인 검토. 이 검토에서는 또한 부적합한 원료, 용기 및 마개의 사용을 방지하기에 입고 자재 관리가 적절한지도 판단해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bb0cdfdb36f2bbf3746f90f8",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "설명되지 않은 불일치(unexplained discrepancy) 및 배치 또는 그 원료가 규격에 부적합한 경우에 대해, 해당 배치의 기출하 여부와 관계없이 철저한 검토를 하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc878faf7667405b622ce508",
+    "finding_text": "After the completion of the donor-eligibility determination, HCT/Ps were not accompanied with a statement whether the donor has been determined to be eligible or ineligible, based on the results of screening and testing.",
+    "finding_text_ko": "공여자 적격성 판정 완료 후, HCT/P에 선별 및 검사 결과에 근거하여 공여자가 적격 또는 부적격으로 판정되었는지에 관한 진술서가 첨부되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bd12f800c7492b3a6d5bb875",
+    "finding_text": "Investigations into pest control deviations are deficient.",
+    "finding_text_ko": "방충·방서(pest control) 관련 일탈(deviation)에 대한 조사가 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bd900d519b3cc262667d3fe3",
+    "finding_text": "기타 [별표 1] 제5.1호 나목 일부 문서에 품질(보증)부서 책임자의 승인 연월일 기록 미흡",
+    "finding_text_ko": "기타 [별표 1] 제5.1호 나목 관련, 일부 문서에 품질(보증)부서 책임자의 승인 연월일 기록이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bda2dbd5bc06b53e4b5cd3cd",
+    "finding_text": "Information on of donors of HCT/Ps were not in English and not accompanied by a statement of authenticity by the translator that specifically identifies the translated document.",
+    "finding_text_ko": "HCT/P 공여자에 관한 정보가 영어로 작성되지 않았으며, 번역 대상 문서를 구체적으로 특정한 번역자의 진정성 진술서(statement of authenticity)도 첨부되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-be5970e71cca6a952d47ad8c",
+    "finding_text": "Failure to perform a thorough investigation of an unexplained discrepancy anda failure of a lot or unit to meet any of its specifications.",
+    "finding_text_ko": "설명되지 않은 불일치(unexplained discrepancy) 및 로트 또는 단위가 규격에 부적합한 경우에 대해 철저한 조사를 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bea97fa05737778bbb66d032",
+    "finding_text": "Procedures describing the warehousing of drug products are not followed.",
+    "finding_text_ko": "의약품 창고 보관(warehousing)에 관한 절차를 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bf1784fdaf1499bfa9c56b44",
+    "finding_text": "Written standard operating procedures including all steps to be followed in the processing of blood and blood components for further manufacturing purposes were not always established.",
+    "finding_text_ko": "추가 제조 목적의 혈액 및 혈액 성분 처리에서 따라야 할 모든 단계를 포함한 서면 표준작업절차(SOP)를 항상 수립하지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c1f5816b419de906d4c0dc45",
+    "finding_text": "Written procedures are not followed.",
+    "finding_text_ko": "서면 절차를 준수하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4067c84b9d0a3273caa3d16",
+    "finding_text": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods of disassembly and reassembling equipment as necessary to assure proper clea...",
+    "finding_text_ko": "장비 세척 및 유지관리 절차가 세척 및 유지관리 작업에 사용하는 방법, 장비 및 자재, 그리고 적절한 세척을 보증하기 위해 필요에 따라 장비를 분해 및 재조립하는 방법에 대한 충분한 세부 내용 측면에서 미흡했다(원문 이후 생략).",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c4943d38cc5661d400c894b4",
+    "finding_text": "The standard operating procedure fails to include written descriptions of methods for performing donor qualifying tests and measurements, including minimum and maximum values for a test or procedure whena factor in determining acceptability.",
+    "finding_text_ko": "표준작업절차(SOP)에 공여자 적격 판정 검사 및 측정의 수행 방법에 대한 서면 기술이 포함되어 있지 않았으며, 여기에는 적격성 판정 요소가 되는 검사 또는 절차의 최솟값과 최댓값이 포함된다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-caf48e4a349b4172ddffe5cc",
+    "finding_text": "Individuals responsible for supervising the manufacture, processing, packing and holding of a drug product lack the education, training and experience to perform their assigned functions in such a manner as to assure the drug product has the safety, identity, strength, quality and purity that it purports or is represented to possess.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 및 보관을 감독하는 책임자가 의약품이 표방하거나 표시된 안전성, 확인, 함량, 품질 및 순도를 갖추도록 보증하는 방식으로 담당 업무를 수행하는 데 필요한 학력, 교육훈련 및 경험을 갖추지 못했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cb9e667e5fb2a913e78124a8",
+    "finding_text": "Deviation management is inadequate to demonstrate quality oversight ofthe manufacturing process.",
+    "finding_text_ko": "일탈(deviation) 관리가 제조 공정에 대한 품질 감독을 입증하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cd64561ba51cdc93f2a649de",
+    "finding_text": "기타 [별표 1] 제5.2호 가목 밸리데이션 문서 보존기간 설정의 타당성 미흡",
+    "finding_text_ko": "기타 [별표 1] 제5.2호 가목 관련, 밸리데이션 문서 보존기간 설정의 타당성이 미흡했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ce843a047cb3e23de87b0540",
+    "finding_text": "Your firm failed to establish an adequate quality control unit with the responsibility and authority to approve or reject all components, drug product containers, closures, in-process materials, packaging materials, labeling, and drug products (21 CFR 211.22(a)). The records and information you provided demonstrate that your quality unit (QU) did not exercise its responsibilities to oversee the quality of your drug-manufacturing operations effectively. For example, your QU failed to ensure appropriate batch-production records with complete details. Your QU also failed to ensure that adequate stability data supported the expiry of your drug products. Your QU is responsible for fully exercising its authority and responsibilities. FDA is concerned that your QU may not be conducting appropriate oversight regarding CGMP operations. In response to this letter, provide: A comprehensive assessment and remediation plan to ensure your QU is given the authority and resources to effectively function. The assessment should also include, but not be limited to: o A determination of whether procedures used by your firm are robust and appropriate. o Provisions for QU oversight throughout your operations to evaluate adherence to appropriate practices. o A complete and final review of each batch and its related information before the QU disposition decision. o Oversight and approval of investigations and discharging of all other QU duties to ensure identity, strength, quality, and purity of all products. CGMP Consultant Recommended Based upon the nature of the violations we identified at your firm, you should engage a consultant qualified as set forth in 21 CFR 211.34 to assist your firm in meeting CGMP requirements. The qualified consultant should also perform a comprehensive six-system audit of your entire operation for CGMP compliance and evaluate the completion and efficacy of your corrective actions and preventive actions before you pursue resolution of your firm’s compliance status with FDA. See FDA’s guidance document Quality Systems Approach to Pharmaceutical CGMP Regulations at https://www.fda.gov/media/71023/download. Your use of a consultant does not relieve your firm’s obligation to comply with CGMP. Your firm’s executive management remains responsible for resolving all deficiencies and systemic flaws to ensure ongoing CGMP compliance. Cosmetics Manufactured for Distribution in the United States In addition, some of the products you manufacture may be regulated as cosmetics, as defined in section 201(i) of the FD&C Act (21 U.S.C. 321(i)). Any cosmetics you manufacture must comply with applicable statutory and regulatory requirements, including the FD&C Act. We note that under section 301(a) of the FD&C Act (21 U.S.C. 331(a)), it is a prohibited act to introduce or deliver for introduction into interstate commerce a cosmetic that is adulterated or misbranded. We also note that the Modernization of Cosmetics Regulation Act of 2022 (MoCRA) provides new requirements with which facilities that manufacture cosmetic products must comply. You may find the FD&C Act, MoCRA, and FDA’s regulations through links on FDA’s website at www.fda.gov.",
+    "finding_text_ko": "귀사는 모든 원료, 의약품 용기, 마개, 공정 중 물질, 포장자재, 표시자재 및 의약품을 승인 또는 거부할 책임과 권한을 갖춘 적절한 품질관리부서(quality control unit)를 수립하지 않았다(21 CFR 211.22(a)). 귀사가 제출한 기록과 정보는 귀사의 품질부서(QU)가 의약품 제조 작업의 품질을 효과적으로 감독하는 책임을 수행하지 않았음을 보여준다. 예를 들어, QU는 완전한 세부 내용을 갖춘 적절한 제조기록(batch-production records)을 보장하지 않았다. QU는 또한 의약품의 유효기간을 뒷받침하는 적절한 안정성 데이터를 보장하지 않았다. QU는 그 권한과 책임을 충분히 행사할 책임이 있다. FDA는 귀사의 QU가 CGMP 작업에 대한 적절한 감독을 수행하지 않고 있을 수 있다고 우려한다. 이 서한에 대한 회신으로 다음을 제출하라: QU가 효과적으로 기능할 수 있는 권한과 자원을 부여받도록 보장하기 위한 포괄적 평가 및 개선 계획. 이 평가에는 다음이 포함되어야 하나 이에 국한되지 않는다: o 귀사가 사용하는 절차가 견고하고 적절한지에 대한 판단. o 적절한 관행 준수 여부를 평가하기 위한 전체 운영에 걸친 QU 감독 규정. o QU의 처분(disposition) 결정 전 각 배치 및 관련 정보에 대한 완전하고 최종적인 검토. o 모든 제품의 확인, 함량, 품질 및 순도를 보장하기 위한 조사(investigations)의 감독 및 승인과 기타 모든 QU 업무 수행. CGMP 컨설턴트 권고: 귀사에서 확인된 위반 사항의 성격에 근거하여, 귀사는 CGMP 요건 충족을 지원받기 위해 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 고용해야 한다. 자격을 갖춘 컨설턴트는 또한 FDA와의 준수 상태 해소를 추진하기 전에 CGMP 준수에 대해 전체 운영에 대한 포괄적인 6개 시스템(six-system) 감사를 수행하고, 시정조치 및 예방조치의 완료 여부와 효과성을 평가해야 한다. FDA 가이던스 문서 Quality Systems Approach to Pharmaceutical CGMP Regulations(https://www.fda.gov/media/71023/download)를 참고하라. 컨설턴트를 활용하더라도 CGMP를 준수할 귀사의 의무는 면제되지 않는다. 지속적인 CGMP 준수를 보장하기 위해 모든 결함과 시스템적 결함을 해결할 책임은 여전히 귀사 경영진에게 있다. 미국 유통용으로 제조되는 화장품: 또한 귀사가 제조하는 일부 제품은 FD&C Act section 201(i)(21 U.S.C. 321(i))에 정의된 화장품으로 규제될 수 있다. 귀사가 제조하는 모든 화장품은 FD&C Act를 포함하여 적용되는 법령 및 규정 요건을 준수해야 한다. FD&C Act section 301(a)(21 U.S.C. 331(a))에 따라 불량(adulterated)이거나 허위표시(misbranded)된 화장품을 주간 상거래(interstate commerce)에 도입하거나 도입을 위해 인도하는 것은 금지 행위임을 밝힌다. 또한 2022년 화장품 규제 현대화법(Modernization of Cosmetics Regulation Act of 2022, MoCRA)은 화장품을 제조하는 시설이 준수해야 하는 새로운 요건을 규정하고 있다. FD&C Act, MoCRA 및 FDA 규정은 FDA 웹사이트(www.fda.gov)의 링크를 통해 확인할 수 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d1487c52425072f93b7afb2e",
+    "finding_text": "Design and development procedures were not adequately documented.",
+    "finding_text_ko": "설계 및 개발 절차가 적절히 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d37b5c14812dae0b1522a342",
+    "finding_text": "Management of deviations and anomalous events is inadequate to identify root causes and appropriate corrective § actions.",
+    "finding_text_ko": "일탈(deviation) 및 이상 사건(anomalous events) 관리가 근본 원인과 적절한 시정조치를 파악하기에 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d67ae5c1f75de6d51c6a9bbb",
+    "finding_text": "Written standard operating procedures including all steps to be followed in the collection and storage of blood and blood components for were not always followed.",
+    "finding_text_ko": "[원문 일부 누락] 목적의 혈액 및 혈액 성분 채취 및 보관에서 따라야 할 모든 단계를 포함한 서면 표준작업절차(SOP)를 항상 준수하지는 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d6de377cb118fcbcc58b2f47",
+    "finding_text": "Heating, ventilation, and air conditioning maintenance and controls are inadequate.",
+    "finding_text_ko": "공조 설비(heating, ventilation, and air conditioning, HVAC)의 유지관리 및 관리가 부적절했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d8999d42f0bae7b49bd3cd57",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하거나 표시된 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위한 생산 및 공정 관리에 관한 적절한 서면 절차를 수립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-db49fd7c54f7da23001c3cf9",
+    "finding_text": "Documentation of the receipt of supplies was not maintained.",
+    "finding_text_ko": "소모품(supplies) 입고 기록을 유지하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dc823ba3ea76d7ada3c1abbe",
+    "finding_text": "Employees are not given training in the particular operations they perform as part of their function and written procedures required by current good manufacturing practice regulations.",
+    "finding_text_ko": "직원이 자신의 직무로 수행하는 특정 작업 및 CGMP 규정에서 요구하는 서면 절차에 대한 교육훈련을 받지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dd7b41e74386477487fc8054",
+    "finding_text": "A standard operating procedure for the release of HCT/Ps from donors that test reactive for cytomegalovirus (CMV) was not established, defined, documented and implemented.",
+    "finding_text_ko": "거대세포바이러스(cytomegalovirus, CMV) 반응성 검사 결과가 나온 공여자의 HCT/P 출하에 관한 표준작업절차(SOP)를 수립·규정·문서화·이행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ddd35ef00ccc55d198d89d8a",
+    "finding_text": "Input to and output from the computer are not checked for accuracy.",
+    "finding_text_ko": "컴퓨터 입력값과 출력값에 대해 정확성 확인을 하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dde272b36f8dc2f48c2b576f",
+    "finding_text": "Deviations from written production and process control procedures are not justified.",
+    "finding_text_ko": "서면 생산 및 공정 관리 절차로부터의 일탈(deviation)에 대한 타당성을 입증하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de1eab62324062a5c5372c66",
+    "finding_text": "Donors were not screened by a review of relevant medical records for risk factors and clinical evidence of communicable disease agents and diseases.",
+    "finding_text_ko": "공여자에 대해 감염성 질병 인자 및 질병의 위험 요인과 임상적 증거를 확인하기 위한 관련 의무기록 검토를 통한 선별(screening)을 실시하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-df88f50649cdcdf242e16eda",
+    "finding_text": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+    "finding_text_ko": "귀사는 의약품이 표방하거나 표시된 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위한 생산 및 공정 관리에 관한 적절한 서면 절차를 수립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e24ad76b853a8f9dad92dfbc",
+    "finding_text": "You did not ensure that establishment(s) that by contract, agreement or arrangement, perform manufacturing steps for you were in compliance with applicable CGTP requirements prior to the initiation of the contract, agreement of arrangement.",
+    "finding_text_ko": "귀사는 계약, 합의 또는 약정에 따라 귀사를 위해 제조 단계를 수행하는 시설이 해당 계약, 합의 또는 약정 개시 전에 적용되는 CGTP 요건을 준수하고 있는지 확인하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e553df0ffa3b889bde4c76f5",
+    "finding_text": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). Your manual visual inspection program was inadequate to reliably detect defects and ensure your sterile injectable drug products were essentially free of visible particulates. For example, operators performing (b)(4) visual inspection were not properly qualified, as evidenced by the following: Operators were not appropriately challenged to ensure they were capable of reliably detecting particulates within the lower end of the visible spectrum. Particulates in challenge kits were excessively large (e.g., greater than (b)(4) microns), approximately (b)(4) times larger than what operators should be capable of reliably detecting. Operators’ rate of inspection was excessively fast (e.g., (b)(4) per unit) and did not align with the standards referenced in your procedures. Notably, you also demonstrated poor detection rates when you used significantly longer inspection times during Acceptable Quality Limit (AQL) sampling. Your approach to identifying product defects compromises reliable detection and the quality of data inputs to support batch release and CAPA decisions made by your quality unit. In addition, the significant particulate matter complaints received between 2023 to 2025 indicate an inadequate visual inspection program. For example, on May 9, 2025, after testing a returned cefazolin complainant sample you confirmed foreign particulate contamination was consistent with cardboard (approximately (b)(4) mm). Your investigation concluded that inadequacies of visual inspection were a contributing cause, but you did not implement sufficient CAPA to ensure remediation of your visual inspection program. Your investigation specifically cited potential for compromised product quality and potential patient safety risks, but stated that field action was not warranted. We acknowledge that on July 17, 2026, you agreed to voluntarily recall cefazolin, Lot LD175708, only after the Agency contacted you. In your response you commit to enhancing your visual inspection program including performing probability of detection (PoD) studies using the (b)(4) per unit inspection duration. Your response is inadequate. You indicate that data from post-market complaint evaluations and retain sample reviews confirm that your controls remain effective. However, you have identified particulate matter in retain and complaint samples after product was released. In addition, your response does not adequately address the spike in particulate matter defects from 2024 ( (b)(4) defects) to 2025 ( (b)(4) defects). There remains a lack of assurance that your injectable drug products are essentially free from visible particulates while you work on long-term remediation. Visual detection of particulates is a probabilistic process that depends on, among other things, ensuring that visible particulates can be reproducibly detected by trained personnel with appropriate visual acuity. At a minimum, personnel should reliably be capable of detecting particulates of (b)(4) microns or greater at a (b)(4) % probability of detection. It is important that any visible particulate contamination is appropriately evaluated and investigated. Particulates in injectable products should be avoided through appropriate preventive measures built into your design and production controls. When categorizing any visible particles, extrinsic or foreign matter should receive special attention, as it may indicate possible microbial contamination. Extrinsic or foreign particulate contamination should occur very infrequently and trigger a thorough investigation and appropriate CAPA. In response to this letter, provide: A comprehensive, independent assessment and remediation plan of your systems for the visual inspection of sterile injectable drugs for defects, including the presence of particulate matter. The assessment should include acceptance and rejection criteria, personnel training, supervision, equipment and personnel qualification, equipment maintenance, and process validation, and the procedures governing them. Also include product-specific knowledge, process experience (e.g., thorough assessment of the spike of (b)(4) particulate matter defects in 2025), deviation investigation analysis, and recall/complaint data. Provide your detailed remediation action plan that includes dates by which each remediation activity will be completed and a periodic independent reassessment of the plan’s effectiveness. Include a summary of the review and recommendations made by your independent consultant. A comprehensive, independent assessment of each lot of sterile injectable drugs distributed from your facility that remains within expiry to meet the requirement of being essentially free of visible particles. This comprehensive review should include a review of all relevant in-process and finished product data obtained by your firm including all batch records. An interim plan for risk mitigation while you perform broader studies to improve your visual inspection program. Provide a detailed list of your risk mitigations (e.g., sampling plans and methods for your proposed destructive testing).",
+    "finding_text_ko": "귀사는 원료, 의약품 용기, 마개, 공정 중 물질, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 규격, 기준, 검체채취 계획 및 시험 절차를 포함하는 시험 관리(laboratory controls)를 수립하지 않았다(21 CFR 211.160(b)). 귀사의 수동 육안검사(manual visual inspection) 프로그램은 결함을 신뢰성 있게 검출하고 무균 주사제가 육안으로 보이는 미립자(visible particulates)로부터 본질적으로 자유로움을 보장하기에 부적절했다. 예를 들어, (b)(4) 육안검사를 수행하는 작업자는 다음과 같이 적절히 적격성이 평가되지 않았다: 작업자가 가시 범위의 하한에 해당하는 미립자를 신뢰성 있게 검출할 수 있는지 확인하기 위한 적절한 도전 시험을 받지 않았다. 도전 키트(challenge kits)의 미립자가 지나치게 컸으며(예: (b)(4) 마이크론 초과), 이는 작업자가 신뢰성 있게 검출할 수 있어야 하는 크기보다 약 (b)(4)배 컸다. 작업자의 검사 속도가 지나치게 빨랐으며(예: 단위당 (b)(4)), 귀사 절차에 인용된 기준과 일치하지 않았다. 특히 귀사는 허용품질한계(Acceptable Quality Limit, AQL) 검체채취 시 훨씬 긴 검사 시간을 적용했을 때에도 낮은 검출률을 보였다. 귀사의 제품 결함 식별 방식은 신뢰성 있는 검출을 저해하며, 품질부서가 내리는 배치 출하 및 CAPA 결정을 뒷받침하는 데이터 입력의 품질을 저해한다. 또한 2023년부터 2025년 사이에 접수된 상당한 미립자 관련 불만은 육안검사 프로그램이 부적절함을 보여준다. 예를 들어, 2025년 5월 9일 반품된 cefazolin 불만 검체를 시험한 후 귀사는 이물 미립자 오염이 골판지(cardboard)와 일치함(약 (b)(4) mm)을 확인했다. 귀사의 조사는 육안검사의 부적절성이 기여 원인이라고 결론지었으나, 육안검사 프로그램의 개선을 보장하기 위한 충분한 CAPA를 이행하지 않았다. 귀사의 조사는 제품 품질 저해 가능성과 잠재적 환자 안전 위험을 구체적으로 언급했으나, 현장 조치(field action)는 필요하지 않다고 기술했다. 귀사가 2026년 7월 17일, 기관이 연락한 이후에야 cefazolin Lot LD175708을 자발적으로 회수하기로 동의했음을 확인한다. 귀사는 회신에서 단위당 (b)(4) 검사 시간을 사용한 검출 확률(probability of detection, PoD) 연구 수행을 포함하여 육안검사 프로그램을 강화하겠다고 약속했다. 귀사의 회신은 부적절하다. 귀사는 시판 후 불만 평가 및 보관검체 검토 데이터가 관리가 여전히 효과적임을 확인한다고 기술했다. 그러나 귀사는 제품 출하 후 보관검체와 불만 검체에서 미립자를 확인했다. 또한 귀사의 회신은 2024년((b)(4)건 결함)에서 2025년((b)(4)건 결함)으로의 미립자 결함 급증을 적절히 다루지 않았다. 귀사가 장기 개선 작업을 진행하는 동안 주사제가 육안으로 보이는 미립자로부터 본질적으로 자유롭다는 보증이 여전히 부족하다. 미립자의 육안 검출은 확률적 과정으로, 무엇보다도 적절한 시력을 갖춘 숙련된 인원이 육안으로 보이는 미립자를 재현성 있게 검출할 수 있도록 보장하는 데 달려 있다. 최소한 인원은 (b)(4) 마이크론 이상의 미립자를 (b)(4)% 검출 확률로 신뢰성 있게 검출할 수 있어야 한다. 육안으로 보이는 모든 미립자 오염을 적절히 평가하고 조사하는 것이 중요하다. 주사제의 미립자는 설계 및 생산 관리에 반영된 적절한 예방 조치를 통해 방지해야 한다. 육안으로 보이는 입자를 분류할 때, 외인성(extrinsic) 또는 이물(foreign matter)은 미생물 오염 가능성을 나타낼 수 있으므로 특별한 주의를 기울여야 한다. 외인성 또는 이물 미립자 오염은 매우 드물게 발생해야 하며, 철저한 조사와 적절한 CAPA를 촉발해야 한다. 이 서한에 대한 회신으로 다음을 제출하라: 미립자 존재를 포함한 결함에 대한 무균 주사제 육안검사 시스템의 포괄적이고 독립적인 평가 및 개선 계획. 이 평가에는 적합·부적합 판정 기준, 인원 교육훈련, 감독, 장비 및 인원 적격성 평가, 장비 유지관리, 공정 밸리데이션 및 이를 관장하는 절차가 포함되어야 한다. 또한 제품별 지식, 공정 경험(예: 2025년 (b)(4) 미립자 결함 급증에 대한 철저한 평가), 일탈 조사 분석, 회수·불만 데이터를 포함할 것. 각 개선 활동의 완료 일자와 계획 효과성에 대한 주기적인 독립 재평가를 포함한 상세한 개선 조치 계획을 제출할 것. 독립 컨설턴트가 수행한 검토 및 권고 사항의 요약을 포함할 것. 귀사 시설에서 유통되어 유효기간 내에 있는 무균 주사제의 각 로트가 육안으로 보이는 입자로부터 본질적으로 자유로워야 한다는 요건을 충족하는지에 대한 포괄적이고 독립적인 평가. 이 포괄적 검토에는 모든 배치 기록을 포함하여 귀사가 확보한 모든 관련 공정 중 및 완제품 데이터의 검토가 포함되어야 한다. 육안검사 프로그램 개선을 위한 광범위한 연구를 수행하는 동안의 위험 완화를 위한 임시 계획. 위험 완화 조치의 상세 목록(예: 제안된 파괴 시험을 위한 검체채취 계획 및 방법)을 제출할 것.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e57eec6edb0f2d80fa1e819e",
+    "finding_text": "Verification of the suitability of the testing methods is deficient in that they are not performed under actual conditions of use.",
+    "finding_text_ko": "시험법의 적합성 확인(verification of suitability)이 실제 사용 조건에서 수행되지 않는다는 점에서 미흡했다.",
+    "translation_method": "llm_assisted"
+  }
+]

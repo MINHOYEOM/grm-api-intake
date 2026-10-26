@@ -62,7 +62,16 @@ DEFAULT_TIMEOUT_SECONDS = fsb.DEFAULT_TIMEOUT_SECONDS
 _MAX_ATTEMPTS = 2  # initial try + 1 retry, for 5xx/timeout only
 _DEFAULT_PAGE_SIZE = 1000
 
-_SELECT_COLUMNS = "finding_id,finding_text,category_code,category_label_ko,taxonomy_version"
+_SELECT_COLUMNS = "finding_id,source,finding_text,category_code,category_label_ko,taxonomy_version"
+
+# ★적재 시 분류 입력이 finding_text 가 아닌 소스(2026-10-12 #1015 오경보의 진범).
+#   · FDA Warning Letter: 표시문은 6000자인데 분류는 옛 480자 절단본으로 한다 — 뒷부분 FDA
+#     표준 시정권고 정형문이 분류를 뒤집기 때문(findings_extractors._legacy_cap_for_classify).
+#   · MFDS: 실사표 요약/EXPOSE_CONT 로 분류하고 '오염' 어휘를 우선한다(_classify_gmp_summary).
+# 이 둘을 finding_text 로 다시 분류하면 "표류"가 아니라 적재 계약을 덮어쓰는 것이다 — 실측:
+# 표류로 보고된 46행이 전부 이 두 소스였고, 전부 적재 계약대로 분류돼 있었다. 그래서 여기선
+# 손대지 않고 세기만 한다. 이 소스들의 taxonomy 갱신은 raw_signals 재추출로 해야 한다.
+_INGEST_OWNED_SOURCES = frozenset({"FDA Warning Letter", "MFDS"})
 
 
 def _normalize_base_url(base_url: str) -> str | None:
@@ -101,6 +110,8 @@ def plan_reclassification(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     plan: list[dict[str, Any]] = []
     for row in rows:
+        if str(row.get("source") or "") in _INGEST_OWNED_SOURCES:
+            continue
         finding_id = str(row.get("finding_id") or "")
         text = str(row.get("finding_text") or "")
         old_category = str(row.get("category_code") or "")
@@ -213,6 +224,7 @@ def run_reclassify(
         "mode": "dry_run" if dry_run else "apply",
         "taxonomy_version": gf.TAXONOMY_VERSION,
         "rows_scanned": 0,
+        "ingest_owned_skipped": 0,
         "changes_planned": 0,
         "category_changes": 0,
         "version_only_stamps": 0,
@@ -232,6 +244,8 @@ def run_reclassify(
         return report
 
     report["rows_scanned"] = len(rows)
+    report["ingest_owned_skipped"] = sum(
+        1 for row in rows if str(row.get("source") or "") in _INGEST_OWNED_SOURCES)
 
     plan = plan_reclassification(rows)
     if limit is not None and limit >= 0:

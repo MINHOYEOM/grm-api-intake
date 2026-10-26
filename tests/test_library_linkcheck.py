@@ -55,6 +55,20 @@ class LibraryLinkcheckTest(unittest.TestCase):
         self.assertEqual(session.request.call_count, 1)
         self.assertEqual(sleeps, [1])
 
+    def test_range_416_retries_get_without_range(self):
+        # PMDA: Range GET → 416, 일반 GET → 200. 링크는 살아 있다(#1098 오탐).
+        session = mock.MagicMock()
+        session.request.side_effect = [_Response(503), _Response(416), _Response(200)]
+        result = lc.probe_url(
+            "https://www.pmda.go.jp/files/000273637.pdf", session=session, delay=0,
+            timeout=3, sleeper=lambda _: None,
+        )
+        self.assertEqual(result.status, "ok")
+        self.assertEqual(result.http_status, 200)
+        calls = session.request.call_args_list
+        self.assertEqual(calls[1].kwargs["headers"], {"Range": "bytes=0-1023"})
+        self.assertNotIn("headers", calls[2].kwargs)
+
     def test_head_failure_uses_get_fallback_and_retry(self):
         session = mock.MagicMock()
         session.request.side_effect = [

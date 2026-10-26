@@ -146,14 +146,11 @@
 </div></header>
 
 {% block content %}{% endblock %}
-{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 권유하지 않는다.
-   ★[2026-09-05 이유 정정] 종전 근거는 "영문 브리프는 §7 5단계(미착수)"였는데 그 전제는
-   사라졌다 — 영문 브리프 10호와 영어 피드(`/en/rss.xml`)가 라이브다. 그런데도 게이트는
-   그대로 둔다. **이유가 바뀌었을 뿐 결론은 같다: 메일 자체가 한국어다.**
-   `newsletter.py:teaser_subject` 는 한국어 `tldr` 로 제목을 만들고 접두도 "[GRM 규제뉴스]"
-   다. 영어 독자를 한국어 메일에 초대하는 것은 읽을 수 없는 것을 구독시키는 일이다.
-   영어 뉴스레터를 내려면 `newsletter.py` 가 `brief.en` 에서 본문을 짓고 발송 리스트도
-   따로 있어야 한다 — 그때 이 게이트를 푼다.
+{# [영문 구독 2026-10-18] 구독 밴드·배너는 언어마다 **다른 폼**을 본다 — 한국어 페이지는
+   한국어 리스트 폼(GRM_NEWSLETTER_FORM_ACTION), 영어 페이지는 영문 리스트 폼
+   (GRM_NEWSLETTER_FORM_ACTION_EN). 어느 폼인지는 render.py 가 언어 환경마다 넣는다(템플릿이
+   언어를 고르지 않는다). 영문 폼 값이 비어 있으면 영어 페이지에는 구독 문이 없다(종전과 같다).
+   영문 메일은 `web/newsletter_en.py`(그 주 새 지적 기록 중심)다.
    ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
    파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
 {# [소개 2026-09-06] 소개 면에서는 고정 구독 밴드를 접는다 — 서비스가 무엇인지 읽는
@@ -165,8 +162,17 @@
    정하는 `nav_active` 로 고른다(템플릿이 언어·구역을 스스로 판단하지 않는다). 용어사전
    구역도 회원이 아니라 **구독**을 제안한다(회원 계층은 별도 결정 대기). 밴드·배너 두 블록이
    모두 이 값을 보므로 어느 `{% if %}` 에도 갇히지 않는 이 자리(최상위)에서 정의한다. #}
-{% set sub_zone = 'glossary' if nav_active == 'glossary' else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
-{% if newsletter_form_action and lang == 'ko' and nav_active != 'about' and not hide_subscribe %}
+{% set sub_zone = 'glossary' if (nav_active == 'glossary' and sub_offer_glossary_pdf) else ('findings' if nav_active in ('findings', 'trends') else 'default') %}
+{# [구독 언어 선택 2026-10-18] 받을 메일 언어를 구독할 때 고른다 — 한국어 리스트와 영문 리스트는
+   Brevo 폼이 서로 다르고(확인 메일 언어도 폼마다 다르다), 고른 쪽 폼으로 보낸다. 두 폼 주소가
+   모두 있을 때만 그린다. 기본 선택 = 지금 페이지 언어(render.py 가 `sub_lang_default` 로 정한다).
+   `hidden` 으로 내보내고 스크립트가 켤 때만 보인다 — 스크립트가 없으면 고를 수 없으므로
+   보여 주지 않는 것이 맞다(그때는 페이지 언어 폼으로 그대로 간다). 라디오 값은 Brevo 로
+   보내지 않는다(제출 스크립트가 `grm_sub_lang` 을 뺀다). #}
+{% macro sub_lang_picker(id_prefix) %}{% if sub_action_ko and sub_action_en %}
+<fieldset class="sub-lang" data-sub-lang hidden><legend>{{ _("받을 메일 언어") }}</legend>{% for lg in ('ko', 'en') %}<label><input type="radio" name="grm_sub_lang" id="{{ id_prefix }}-{{ lg }}" value="{{ lg }}" data-action="{{ sub_action_ko if lg == 'ko' else sub_action_en }}"{% if lg == sub_lang_default %} checked{% endif %} /> <span lang="{{ lg }}">{{ lang_endonym[lg] }}</span></label>{% endfor %}</fieldset>
+{% endif %}{% endmacro %}
+{% if newsletter_form_action and nav_active != 'about' and not hide_subscribe %}
 {# 뉴스레터 구독 밴드(T1) — env-param(GRM_NEWSLETTER_FORM_ACTION) 설정 시에만 출력. 미설정(기본·테스트 빌드)이면 if 블록 전체 생략 → 전 페이지 골든 byte-diff 0. 폼은 브라우저가 SaaS 호스팅 endpoint 로 직접 POST(사이트 정적·런타임 서버 0). 더블 옵트인·수신거부·구독자 PII 는 SaaS 가 처리·소유(우리 비복제). 회원/로그인 아님 — 이메일 1칸. 한글 안전(§4): 문안에 mono/자간/대문자 미적용(영문 .kick eyebrow 만). #}
 <section class="subscribe"><div class="wrap">
 {# [구독 밴드 실물 링크 2026-09-07] 밴드는 "메일로 보내드립니다"라고 말할 뿐 무엇이 오는지 보여 주지 않는다. 메일 본문은 주간 브리프의 핵심 요약과 바로가기라서 **최신 브리프 페이지가 곧 메일 내용의 실물**이다 — 링크 한 줄이면 구독 판단이 선다. 낱말은 헤더 CTA 와 같은 '이번 주 소식'을 재사용한다(새 낱말 만들지 않는다). 스타일은 grm.css(디자인 동결) 대신 하단 배너와 같은 관례로 이 게이트 안에 두되, **밴드 안**(`<section class="subscribe">` 뒤)에 둔다 — 기존 한글안전 가드가 재는 범위가 거기서 시작하기 때문이다. 게이트가 꺼진 로컬·CI 빌드에서는 이 <style> 도 함께 생략되므로 골든 byte-diff 는 그대로 0. #}
@@ -178,6 +184,12 @@
 /* 2026-09-23 C-06 — 이미 구독한 방문자에게 밴드 스크립트가 hidden 을 다는데, [hidden]
    은 author display 규칙에 진다(이 파일의 알려진 함정) — 짝을 미리 박아 둔다. */
 .subscribe[hidden]{display:none}
+/* [구독 언어 선택 2026-10-18] 폼 안 첫 줄 — 입력·버튼 줄 위에 한 줄. [hidden] 짝을 미리 박는다. */
+.subscribe .sub-form{flex-wrap:wrap}
+.subscribe .sub-lang{flex:1 0 100%;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;border:0;margin:0 0 4px;padding:0;font-family:var(--sans);font-size:14px}
+.subscribe .sub-lang[hidden]{display:none}
+.subscribe .sub-lang legend{float:left;margin-right:4px;padding:0;color:var(--ink-3,#6C6A64)}
+.subscribe .sub-lang label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 </style>
   {# 구독 전 상태(입력) — 제출 성공 시 아래 스크립트가 이 블록 전체를 감추고 .sub-done 만 표시. div 는 display 미지정이라 hidden 속성이 정상 동작(폼과 달리). #}
   <div id="grm-sub-intro">
@@ -200,8 +212,14 @@
     <p>{{ _("FDA·EMA·PIC/S·식약처의 주요 변화를 공식 원문 링크와 함께 보내드립니다. 사이트에 새로운 기능이 생기면 함께 안내드립니다. 구독은 언제든 한 번의 클릭으로 해지할 수 있습니다.") }}</p>
     {% endif %}
     {# 메일 내용의 실물 — 최신 브리프 페이지. 헤더 CTA 와 같은 `latest_slug` 를 쓴다. #}
+    {# [영문 구독 2026-10-18] 영문 메일의 주인공은 그 주 새 지적 기록이라 실물 링크도 지적사항 면이다. 어느 쪽을 보일지는 render.py 가 언어 환경마다 정한다(`sub_peek_findings`). #}
+    {% if sub_peek_findings %}
+    <p class="sub-peek"><a href="{{ rel_root }}findings/index.html">{{ _("최근 지적 기록 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
+    {% else %}
     <p class="sub-peek"><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 소식 먼저 보기") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
+    {% endif %}
     <form class="sub-form" id="grm-sub-form" action="{{ newsletter_form_action }}" method="post">
+      {{ sub_lang_picker('grm-sub-lang') }}
       <input id="grm-sub-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       {# Brevo 실제 폼 필드 정합(라이브 폼 검증): 이메일=EMAIL · 봇방지 허니팟 email_address_check(빈값·.sub-hp 로 시각 숨김, 사람 미입력·봇만 채움→Brevo 거름) · locale 히든. 사람에게 보이는 입력은 이메일 1칸 그대로. #}
       <input type="text" name="email_address_check" value="" class="sub-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -246,7 +264,7 @@
     if(!email||!f.checkValidity())return;
     e.preventDefault();
     var fd=new FormData(f),body=new URLSearchParams();
-    fd.forEach(function(v,k){body.append(k,v);});
+    fd.forEach(function(v,k){if(k!=='grm_sub_lang')body.append(k,v);});
     fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
     // 하단 참여 배너가 이 표시를 보고 다시 뜨지 않는다(구독한 사람에게 또 권하지 않는다).
     try{localStorage.setItem('grm-sub-ok','1');}catch(_){}
@@ -267,6 +285,23 @@
   });
 })();
 </script>
+{# [구독 언어 선택] 고른 언어의 폼 주소로 action 을 바꾼다(밴드·배너 공통). 스크립트가 돌 때만 선택지를 보인다. #}
+{% if sub_action_ko and sub_action_en %}
+<script>
+(function(){
+  var sets=document.querySelectorAll('[data-sub-lang]');
+  for(var i=0;i<sets.length;i++){(function(fs){
+    var form=fs.form||fs.closest&&fs.closest('form');
+    if(!form)return;
+    fs.hidden=false;
+    var rs=fs.querySelectorAll('input[type=radio]');
+    function apply(){for(var j=0;j<rs.length;j++){if(rs[j].checked&&rs[j].getAttribute('data-action'))form.action=rs[j].getAttribute('data-action');}}
+    for(var j=0;j<rs.length;j++)rs[j].addEventListener('change',apply);
+    apply();
+  })(sets[i]);}
+})();
+</script>
+{% endif %}
 {% endif %}
 {% block ai_disclosure %}{% endblock %}
 {# [푸터 정리 2026-09-06] 5열 23항목 → 4열 17링크. 종전 '바로가기'(헤더 탭과 6개 중복·'소개'는 홈 앵커)·'수집 소스'(클릭 안 되는 텍스트 5줄)·'안내'(두 링크가 같은 앵커)를 콘텐츠·도구·서비스 셋으로 다시 묶고, 소스 목록은 브랜드 열 아래 한 줄로 내린다. 4열은 grm.css 기본값(`.foot{grid-template-columns:1.6fr 1fr 1fr 1fr}`)이라 종전 5열 override 는 걷어 내고, 새 요소(소스 줄·법적 줄 가로 배치·연락 아이콘)만 같은 스코프 인라인 관례로 덮는다(grm.css 는 디자인 동결). 반응형(≤1024px 2열 / ≤900px 1열)은 grm.css 미디어쿼리가 그대로 이긴다 — 법적 줄 가로 배치도 ≥901px 에서만. 한글 word-break:keep-all. #}
@@ -349,10 +384,10 @@
     {# [존 재편 2026-08-26] 조회·산출 도구 열. 근거는 도달성 감사 실측이다 — 홈에서 링크만 따라가 세어 보면 nav·footer 에 있는 라우트는 전부 3,500장 이상에서 링크되는데, 완성돼 있는 도구 셋은 자가점검 체크리스트 1장 · 업체 조회 0장 · 실사관 조회 0장이었다. 기능이 없는 게 아니라 **닿는 길이 없었다.** nav 탭은 늘리지 않는다('nav 과밀 금지' 원칙)는 대신, footer 열로 전 페이지에서 닿게 한다. 실사관 조회는 sitemap 미등록·noindex 를 그대로 유지한다(검색엔진에는 계속 비노출, 우리 사용자에게만 내부 링크로 연다) — 내부 링크는 noindex 와 무관하다. 데이터 현황은 도구가 아니라 서비스 투명성 면이라 서비스 안내 열로(2026-09-06). #}
     <div><h5>{{ _("도구") }}</h5><a href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}</a><a href="{{ rel_root }}findings/firm/index.html">{{ _("업체 조회") }}</a><a href="{{ rel_root }}findings/inspector/index.html">{{ _("실사관 조회") }}</a><a href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}</a>{% if lang == 'ko' or 'findings/docs/' in en_paths %}<a href="{{ rel_root }}findings/docs/index.html">{{ _("문서로 찾기") }}</a>{% endif %}</div>
   </div>
-  {# [푸터 정리 2026-09-06] 법적 줄 — 종전 영문 prov 문장("AI-generated from primary sources…")은 아래 한글 면책과 같은 말이라 걷어 냈다(AI 고지는 위 '서비스' 열 링크가 맡는다). 연락 아이콘(LinkedIn·이메일)은 contact.json 에 값이 있을 때만(load_contact — 빈 값이면 아이콘도 span 도 없다). #}
+  {# [푸터 정리 2026-09-06] 법적 줄 — 종전 영문 prov 문장("AI-generated from primary sources…")은 아래 한글 면책과 같은 말이라 걷어 냈다(AI 고지는 위 '서비스' 열 링크가 맡는다). 연락 아이콘(이메일)은 contact.json 에 값이 있을 때만(load_contact — 빈 값이면 아이콘도 span 도 없다). #}
   <div class="foot-legal">
     <div class="foot-copy">
-      <span>© 2026 Global Regulatory Monitor</span>{% if contact %}<span class="foot-contact">{% if contact.linkedin %}<a class="foot-ico" href="{{ contact.linkedin }}" target="_blank" rel="me noopener" aria-label="LinkedIn" title="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a>{% endif %}{% if contact.email %}<a class="foot-ico" href="mailto:{{ contact.email }}" aria-label="{{ _('이메일') }}" title="{{ _('이메일') }}"><i class="ti ti-mail" aria-hidden="true"></i></a>{% endif %}</span>{% endif %}</div>
+      <span>© 2026 Global Regulatory Monitor</span>{% if contact %}<span class="foot-contact">{% if contact.email %}<a class="foot-ico" href="mailto:{{ contact.email }}" aria-label="{{ _('이메일') }}" title="{{ _('이메일') }}"><i class="ti ti-mail" aria-hidden="true"></i></a>{% endif %}</span>{% endif %}</div>
     <p class="foot-disclaimer">{{ _("본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.") }}</p>
   </div>
 </div></footer>
@@ -433,6 +468,10 @@ if(_nt&&_nm){
 </div>
 {% endif %}
 <script src="/assets/pet.js?v={{ petjs_ver }}" defer></script>
+{# [사이트 팝업 2026-10-21] 새 기능 공지. 내용·기간은 assets/site-popup.json 한 곳 — 공지를 바꿔도 이 줄은 그대로다(골든 불변). 한국어 트리만. #}
+{% if lang == 'ko' %}
+<script src="/assets/site-popup.js?v={{ sitepopupjs_ver }}" defer></script>
+{% endif %}
 {% block scripts %}{% endblock %}
 
 {# 카드 반응 계층 S0 — 공유하기(하트·스크랩 서버 계층의 무백엔드 선행 단계). 순수 클라이언트: 모바일 OS(Android/iOS)에서만 navigator.share, 그 외(데스크톱 — Windows Chrome 등도 navigator.share 를 노출하지만 OS 공유 시트가 불안정/에러 다수)는 클립보드 복사(그마저 없으면 prompt 폴백). 카드 콘텐츠·원문 URL 미참조 — 불투명 anchor 로 우리 페이지 딥링크(location+'#'+anchor)만 조립 → provenance 보존. grm.css 무편집(디자인 프리즈) 위해 마스코트·구독밴드 선례처럼 스코프 스타일을 base 인라인으로 둠. progressive enhancement: 스크립트 실행 시에만 body.grm-has-share 로 노출(JS off → 버튼 미표시, 정적 카드 열람 무영향). §4 한글안전: letter-spacing/text-transform/class=mono 미사용. 결정론: now()/난수 0. #}
@@ -637,17 +676,14 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
      · 구독 밴드가 이미 화면에 보이는 동안에는 숨는다(같은 요청을 두 번 하지 않는다).
    env-off(테스트·기본 빌드)면 블록 전체가 생략돼 골든 byte-diff 0 — 게이트가 그 증명이다.
    §4 한글안전: letter-spacing/text-transform/mono 미사용. 결정론: now()/난수 0. #}
-{# [다국어 3단계] 구독은 한국어 주간 브리프 채널이다 — 영어판에는 권유하지 않는다.
-   ★[2026-09-05 이유 정정] 종전 근거는 "영문 브리프는 §7 5단계(미착수)"였는데 그 전제는
-   사라졌다 — 영문 브리프 10호와 영어 피드(`/en/rss.xml`)가 라이브다. 그런데도 게이트는
-   그대로 둔다. **이유가 바뀌었을 뿐 결론은 같다: 메일 자체가 한국어다.**
-   `newsletter.py:teaser_subject` 는 한국어 `tldr` 로 제목을 만들고 접두도 "[GRM 규제뉴스]"
-   다. 영어 독자를 한국어 메일에 초대하는 것은 읽을 수 없는 것을 구독시키는 일이다.
-   영어 뉴스레터를 내려면 `newsletter.py` 가 `brief.en` 에서 본문을 짓고 발송 리스트도
-   따로 있어야 한다 — 그때 이 게이트를 푼다.
+{# [영문 구독 2026-10-18] 구독 밴드·배너는 언어마다 **다른 폼**을 본다 — 한국어 페이지는
+   한국어 리스트 폼(GRM_NEWSLETTER_FORM_ACTION), 영어 페이지는 영문 리스트 폼
+   (GRM_NEWSLETTER_FORM_ACTION_EN). 어느 폼인지는 render.py 가 언어 환경마다 넣는다(템플릿이
+   언어를 고르지 않는다). 영문 폼 값이 비어 있으면 영어 페이지에는 구독 문이 없다(종전과 같다).
+   영문 메일은 `web/newsletter_en.py`(그 주 새 지적 기록 중심)다.
    ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
    파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
-{% if newsletter_form_action and lang == 'ko' and not hide_subscribe %}
+{% if newsletter_form_action and not hide_subscribe %}
 <style>
 .grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}
 .grm-cta.on{transform:translateY(0)}
@@ -665,6 +701,12 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
 .grm-cta-side a:hover,.grm-cta-side button:hover{color:#fff}
 .grm-cta-x{font-size:20px!important;line-height:1;padding:0 2px!important}
 .grm-cta-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+/* [구독 언어 선택 2026-10-18] 배너는 높이를 아끼려고 입력 줄 위에 작게 한 줄. */
+.grm-cta-form{flex-wrap:wrap}
+.grm-cta .sub-lang{flex:1 0 100%;display:flex;gap:4px 14px;border:0;margin:0;padding:0;font-family:var(--sans);font-size:12.5px;color:rgba(255,255,255,.78)}
+.grm-cta .sub-lang[hidden]{display:none}
+.grm-cta .sub-lang legend{float:left;margin-right:2px;padding:0}
+.grm-cta .sub-lang label{display:inline-flex;align-items:center;gap:4px;cursor:pointer}
 @media(max-width:720px){
   .grm-cta-in{padding:12px 16px;gap:10px}
   .grm-cta-form{flex:1 1 100%}
@@ -697,6 +739,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       <span>{{ _("공식 원문 링크와 함께 · 언제든 해지 · 무료") }}</span>
     </div>
     <form class="grm-cta-form" id="grm-cta-form" action="{{ newsletter_form_action }}" method="post">
+      {{ sub_lang_picker('grm-cta-lang') }}
       <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       <input type="text" name="email_address_check" value="" class="grm-cta-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="locale" value="en" />
@@ -775,7 +818,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       // 인코딩은 구독 밴드와 동일해야 한다 — Brevo 로 실제 전송이 검증된 형태가 그쪽이다
       // (FormData 는 multipart 로 나가 밴드와 다른 경로가 된다).
       var fd=new FormData(f),body=new URLSearchParams();
-      fd.forEach(function(v,k){body.append(k,v);});
+      fd.forEach(function(v,k){if(k!=='grm_sub_lang')body.append(k,v);});
       fetch(f.action,{method:'POST',mode:'no-cors',body:body}).catch(function(){});
       try{ localStorage.setItem(DONE,'1'); }catch(_){}
       var t=el.querySelector('.grm-cta-txt');

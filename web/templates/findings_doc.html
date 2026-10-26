@@ -104,6 +104,13 @@
     {%- if inspector_line %}
     <p class="fd-insp">{{ _("실사관 <b>{name}</b>", name=inspector_line) }}<span>{{ _('공개 문서에 서명한 실사관입니다.') }}</span><a class="fd-insp-go" href="{{ rel_root }}findings/inspector/index.html">{{ _('실사관 이력 조회') }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></p>
     {%- endif %}
+    {% if mfds_attendees %}
+    <div class="fd-insp" id="mfds-doc-attendees" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}">
+      <b>{{ _('실사자') }}</b>
+      {% for attendee in mfds_attendees %}<span><span data-mfds-name="{{ attendee.name }}">{{ attendee.name }}</span>{% if attendee.is_observer %} ({{ _('참관') }}){% endif %}</span>{% endfor %}
+      <a class="fd-insp-go" href="{{ rel_root }}findings/inspector/index.html?source=mfds">{{ _('MFDS 공개 이력') }}</a>
+    </div>
+    {% endif %}
     <p class="fd-src">
       <a href="{{ doc.evidence_url }}" target="_blank" rel="noopener">{{ _('규제기관 공개 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>
       <span>{{ _('판단의 근거는 언제나 원문입니다.') }}</span>
@@ -168,3 +175,4 @@
   </div>
 </main>
 {% endblock %}
+{% block scripts %}{% if mfds_attendees %}<script src="{{ asset_root }}assets/mfds-doc-inspectors.js?v={{ mfdsdocjs_ver }}" defer></script>{% endif %}{% endblock %}

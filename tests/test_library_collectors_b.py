@@ -219,6 +219,23 @@ class EmaTest(unittest.TestCase):
         self.assertEqual(ema.first_published(EMA_GUIDELINE_PAGE_HTML), "2019-03-08")
         self.assertEqual(ema.first_published("<p>no dates here</p>"), "")
 
+    def test_relocated_guideline_urls_keep_existing_ids(self):
+        # 2026-09 말 EMA URL 이동: /en/<slug>-scientific-guideline → /en/scientific-guidelines/<slug>
+        listing = (
+            '<a href="/en/scientific-guidelines/manufacture-finished-dosage-form-human">'
+            'Manufacture of the finished dosage form</a>'
+            '<a href="/en/scientific-guidelines/ich-q9-quality-risk-management">ICH Q9</a>'
+            '<a href="/en/scientific-guidelines/ich-guideline-q13-continuous-manufacturing-'
+            'drug-substances-drug-products">ICH Q13</a>'
+            '<a href="/en/human-regulatory/research-development/scientific-guidelines">nav</a>'
+            '<a href="/en/documents/scientific-guideline/q-and-a_en.pdf">pdf</a>'
+        )
+        links = ema.parse_guideline_links(listing)
+        self.assertEqual(len(links), 3)
+        ids = [ema.build_guideline_item(url, title, "")["id"] for url, title in links]
+        # ema-gmp-017 = 앵커, 나머지 둘 = 옛 슬러그 해시(라이브 카탈로그 id)
+        self.assertEqual(ids, ["ema-gmp-017", "ema-da8e168adf7c", "ema-355a641be612"])
+
     def test_new_guideline_gets_stable_hash_id(self):
         url = ema.SITE_BASE + "/en/brand-new-topic-scientific-guideline"
         first = ema.build_guideline_item(url, "Brand new topic", "")

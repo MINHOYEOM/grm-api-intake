@@ -2101,5 +2101,101 @@
       "The set of tests, analytical procedures and acceptance criteria used to judge whether a material is fit for its intended use"
     ],
     "explanation_en": "Root cause analysis finds the underlying cause and contributing factors of a problem so that corrective and preventive action can be matched to the cause (ICH Q10 §§3.2.2–3.2.3, 21 CFR 211.192). The others describe a deviation, an out-of-specification (OOS) result and a specification."
+  },
+  {
+    "id": "q-202644-01",
+    "question_ko": "식약처가 에스케이케미칼(주)에 옴나리스나잘스프레이(미분화시클레소니드) 품목 수입업무정지 3개월을 처분한 위반 사유는?",
+    "choices": [
+      "주성분 제조원 소재지를 변경허가 없이 바꿈",
+      "한 제조번호를 품질검사 승인 이전에 출하승인해 출하함",
+      "원료의약품 제조 기준서를 준수하지 않음",
+      "마약류 제조 내역을 보고기한 내 보고하지 않음"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "식약처는 한 제조번호를 품질검사 승인(2025.11.6.) 이전인 2025.10.22.에 출하승인해 출하한 것을 수입자 준수사항 위반으로 보고 해당 품목 수입업무정지 3개월을 처분했습니다. 나머지는 같은 주 다른 업체의 행정처분 사유입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-26/#admin-2026007579",
+    "difficulty": "easy",
+    "week": "202644",
+    "question_en": "For what violation did the MFDS suspend an importer's import business for a micronized ciclesonide nasal spray for three months?",
+    "choices_en": [
+      "Changing the location of the active ingredient manufacturer without a variation approval",
+      "Approving one batch number for release and shipping it before its quality test was approved",
+      "Not following the manufacturing standard operating documents for an active pharmaceutical ingredient",
+      "Not reporting narcotic manufacturing records within the reporting deadline"
+    ],
+    "explanation_en": "The MFDS found that one batch number was approved for release on 2025.10.22., before its quality test was approved on 2025.11.6., which breached the importer's obligations, and suspended import of the product for three months. The other options are grounds for other firms' administrative actions in the same week."
+  },
+  {
+    "id": "q-202644-02",
+    "question_ko": "FDA가 Rohto Pharmaceutical Co., Ltd.의 베트남 점안제 제조소에 보낸 Warning Letter에서 데이터 조작으로 지적한 내용은?",
+    "choices": [
+      "미보고 HPLC 시료 주입을 시험기록에서 누락함",
+      "OOS 결과를 조사 없이 적합이 나올 때까지 재시험함",
+      "무균시험 부적합 결과를 무효화하고 로트를 출하함",
+      "미노출 배지를 제출하고 미수행 세척을 완료로 기록함"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "Warning Letter는 노출하지 않은 배지를 모니터링 검체로 제출하고 수행하지 않은 세척을 완료로 기록한 점을 데이터 조작으로 지적했습니다. 나머지는 같은 주 다른 FDA 문서(Shimoga Chemicals 483, SnugZ USA·Baxter Warning Letter)에서 지적된 별개의 항목입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-10-26/#e68818062d22",
+    "difficulty": "normal",
+    "week": "202644",
+    "question_en": "In its Warning Letter to Rohto Pharmaceutical Co., Ltd.'s eye-drop facility in Vietnam, what did FDA cite as data falsification?",
+    "choices_en": [
+      "Leaving unreported HPLC sample injections out of the laboratory records",
+      "Retesting OOS results without investigation until a passing result was obtained",
+      "Invalidating failing sterility test results and releasing the lot",
+      "Submitting unexposed plates and recording unperformed cleaning as done"
+    ],
+    "explanation_en": "The Warning Letter cited the submission of unexposed plates as monitoring samples and the recording of unperformed cleaning as done as data falsification. The other options are separate findings from other FDA documents the same week (the Shimoga Chemicals 483 and the SnugZ USA and Baxter Warning Letters)."
+  },
+  {
+    "id": "q-202644-03",
+    "question_ko": "의약품 GMP에서 말하는 ‘배치 출하승인(Batch Release)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정",
+      "출하·부적합·재가공 결정이 내려질 때까지 자재나 제품을 물리적 또는 효과적인 방법으로 분리한 상태",
+      "각 배치가 법규에 따라 제조·시험되고 출하 승인되도록 책임지는 규제당국 인정 책임자",
+      "특정 배치의 제조 과정과 최종 품질에 관련된 상황을 보여 주는 모든 문서"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "배치 출하승인은 배치의 제조·시험 기록과 요건 충족 여부를 검토해 판매 가능한 상태로 승인하는 과정입니다(ICH Q7 §§10, 14–15, EU GMP Part I Chapter 8). 나머지는 각각 격리, 출하승인책임자, 제조기록서에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "batch-release",
+    "difficulty": "easy",
+    "week": "202644",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes batch release?",
+    "choices_en": [
+      "The process of reviewing a batch's manufacturing and testing records and its compliance with requirements, and then approving it for sale",
+      "The status of materials or products held physically or by another effective means apart, pending a decision on release, rejection, or reprocessing",
+      "The person recognised by the regulatory authority who is responsible for ensuring that each batch is manufactured and tested in accordance with the law and approved for release",
+      "All the documents that show how a particular batch was made and the circumstances bearing on its final quality"
+    ],
+    "explanation_en": "Batch release is the process of reviewing a batch's manufacturing and testing records and its compliance with requirements, and then approving it for sale (ICH Q7 §§10, 14–15, EU GMP Part I Chapter 8). The others describe quarantine, an authorized person and batch records."
+  },
+  {
+    "id": "q-202644-04",
+    "question_ko": "무균 의약품 제조에서 말하는 ‘환경 모니터링(Environmental Monitoring)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "총입자 농도를 측정해 청정실 또는 청정공기설비가 정해진 청정도 등급에 맞는지 평가하는 방법",
+      "분류된 청정실 또는 청정공기 설비가 의도된 용도에 적합한지 종합 평가하는 과정",
+      "청정실과 청정공기설비의 입자와 미생물 상태를 정한 위치와 주기로 계속 확인하는 활동",
+      "정상 운전조건에서 벗어날 가능성을 조기에 알리고 조사나 주의가 필요함을 나타내는 설정 수준"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "환경 모니터링은 청정실과 청정공기설비의 입자와 미생물 상태를 정한 위치와 주기로 계속 확인하는 활동입니다(EU GMP Annex 1 §§9.1–9.32). 나머지는 각각 청정실 등급분류, 청정실 적격성평가, 경고한계에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "environmental-monitoring",
+    "difficulty": "normal",
+    "week": "202644",
+    "question_en": "In sterile medicine manufacturing, which statement correctly describes environmental monitoring?",
+    "choices_en": [
+      "The method of assessing whether a cleanroom or clean air equipment meets a specified cleanliness grade by measuring total particle concentration",
+      "The overall assessment of whether a classified cleanroom or clean air equipment is fit for its intended use",
+      "Continuing checks on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies",
+      "An established level that gives early warning of a possible drift from normal operating conditions and signals that investigation or attention is needed"
+    ],
+    "explanation_en": "Environmental monitoring is the continuing check on the particle and microbial condition of cleanrooms and clean air equipment, at defined locations and frequencies (EU GMP Annex 1 §§9.1–9.32). The others describe cleanroom classification, cleanroom qualification and an alert limit."
   }
 ]

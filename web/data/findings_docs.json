@@ -1,10 +1,10 @@
 {
  "schema_version": "grm-findings-docs/v1",
- "measured_on": "2026-10-20",
+ "measured_on": "2026-10-26",
  "min_findings": 3,
  "totals": {
-  "documents": 3410,
-  "findings": 22062
+  "documents": 3456,
+  "findings": 22300
  },
  "by_agency": [
   {
@@ -13,7 +13,7 @@
   },
   {
    "v": "FDA",
-   "c": 1802
+   "c": 1847
   },
   {
    "v": "HC",
@@ -21,7 +21,7 @@
   },
   {
    "v": "MFDS",
-   "c": 146
+   "c": 147
   },
   {
    "v": "MHRA",
@@ -30,8 +30,12 @@
  ],
  "excluded": [
   {
+   "reason": "국문 지적 0건",
+   "documents": 12
+  },
+  {
    "reason": "국문 지적 3건 미만",
-   "documents": 2983
+   "documents": 3029
   },
   {
    "reason": "업체명 없음(숫자뿐이거나 빈 값)",
@@ -18680,6 +18684,61 @@
    ]
   },
   {
+   "document_id": "8b9b6af44436",
+   "slug": "8b9b6af44436",
+   "agency": "FDA",
+   "source": "FDA Warning Letter",
+   "firm_name": "Baxter International Inc.",
+   "firm_key": "baxter international",
+   "published_date": "2026-10-20",
+   "inspection_date": "",
+   "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/baxter-international-inc-733231-09292026",
+   "categories": [
+    "설비/시설",
+    "무균보증/무균공정",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-004093dc2b71a9dab6cad3f9",
+     "text_ko": "귀사는 오염이나 혼동(mix-up)을 방지하는 데 필요한, 적절한 크기의 명확히 규정된 구역에서 작업을 수행하지 않았고 분리되거나 규정된 구역 또는 그 밖의 관리 시스템을 갖추지 않았다(21 CFR 211.42(c)). 귀사는 시설에서 세팔로스포린(베타락탐 의약품) 및 (b)(4) 의약품을 포함한 다양한 주사제를 제조한다. 귀사는 이 공용 시설에서 세팔로스포린과 (b)(4) 의약품의 완전하고 포괄적인 분리를 보장하지 않았다. 완전하고 포괄적인 분리의 결여: 귀사의 시설과 관리는 (b)(4) 의약품의 세팔로스포린 오염을 허용할 수 있는 조건을 방지하기에 부적절했다. 귀사 건물은 (b)(4) 베타락탐, (b)(4) 생산으로 구분되어 있다. 이 건물 구획은 귀사가 완전히 밀폐되었다고 간주하는 물리적 벽과 전용 HVAC 장치로 분리되어 있다. 그러나 2025년 1월 이후 베타락탐 의약품의 봉쇄(containment)를 모니터링하는 데 사용하는 환경모니터링(EM) 프로그램이 건물의 (b)(4) 측 여러 구역에서 수차례 세팔로스포린을 검출했다. 부적절한 세팔로스포린 모니터링: 귀사의 모니터링 프로그램은 반복적인 교차오염을 검출했지만, 시설 내 봉쇄 실패와 세팔로스포린 오염을 신속하게 검출하기에는 부적절했다. 예를 들어 다음과 같다. EM 검체 채취가 수와 위치 모두에서 불충분했다. 스왑(swab) 검체 채취 적격성평가가 저농도 회수를 보증하기에 부적절했다. 검체가 설정된 용액 안정성 허용 시간을 넘겨 평가되었다. 이러한 부적절성은 시설 전반의 실제 오염 위해요소가 과소 대표될 위험을 만들고, 위음성 결과의 가능성을 만들며, 품질부서(QU)가 건전한 위험 기반 결정을 내릴 근거가 되는 의미 있는 데이터 수집을 저해한다. 엄격한 모니터링 프로그램은 시설 적격성평가, 오염 위해요소의 조기 검출, 적시의 시정조치 및 예방조치(CAPA)에 필수적이다. 또한 잠재적 오염에 대한 (b)(4) 의약품 시험은 배치 크기와 관계없이 단 1개 단위로 이루어졌다. 그러나 오염은 일반적으로 불균일하게 분포한다. 소량 검체 시험에서 얻은 결과로는 귀사에서 확인된 오염 위해요소에 노출된 배치에 존재할 수 있는 오염을 검출할 가능성이 낮다. 결과적으로 귀사가 생산하는 배치에 존재할 수 있는 오염의 실제 변동성에 관해 상당한 잔여 불확실성이 남아 있다. 또한 귀사가 추가 분석을 수행하기 전에 부적합한 세팔로스포린 환경 검체 여러 건을 실수로 폐기했음을 확인했다. 귀사는 회신에서 세팔로스포린 양성 결과에 대한 조사를 강화하고, 누락 검체를 방지하기 위한 추적 양식을 만들며, 저농도 회수를 개선하겠다고 약속했다. 회신은 또한 시설 오염이 반복 검출되는 원인에 관해 상당한 불확실성이 남아 있음을 시사한다. 귀사는 인원 이동이 봉쇄 전략의 약점이었다고 밝히면서도 인원 이동이 유일한 기여 요인은 아닐 가능성이 높다고 덧붙였다. 완전하고 포괄적인 분리를 어떻게 보장할지 적절히 다루지 않았으므로 귀사의 회신은 부적절하다. 또한 귀사는 베타락탐 교차오염 방지를 보장하기 위해 뒷받침 위험평가와 관련 위험 관리수단을 포함한 기존 위험관리 결정을 철저히 재평가하지 않았다. 세팔로스포린 구역과 (b)(4) 구역이 동일한 외부 건물 구조 내에 있고 귀사가 (b)(4) 로 완전하고 포괄적으로 분리되었다고 주장하더라도, 설계가 오염 매개체가 될 수 있는 공기, 인원, 자재, 설비 또는 그 밖의 부수적 상호작용의 가능성을 완전히 차단하는 것이 필수적이다. 엄격한 품질위험관리 프로그램은 설계를 포괄적으로 평가하고, 그것이 별도 건물에서 제조할 때 달성되는 수준만큼 교차오염에 대한 보호를 제공하는지 판단해야 한다. 회수(recall) 논의 중 공유된 데이터에서 (b)(4) 구역의 추가 세팔로스포린 오염 사례가 확인되었으며, 가장 최근 사례는 (b)(4) 이다. (b)(4) 가 베타락탐 의약품으로 오염되면 잠재적으로 생명을 위협하는 (b)(4) 를 포함해 환자 안전에 심각한 위험이 된다. (b)(4) 베타락탐에 노출된 감수성 환자에서는 (b)(4) 반응이 발생할 수 있다. 따라서 허용 가능한 위험으로 판단된 베타락탐 오염의 안전 수준은 정해진 바가 없다. 이 서한에 대한 회신으로 다음을 제출하라. 세팔로스포린 구역과 (b)(4) 구역 간 완전하고 포괄적인 분리를 달성하려고 시행한 시설 변경(예: 물리적 벽, 전용 공조)의 충분성에 대한 포괄적이고 독립적인 평가. 귀사의 절차, 설비 및 시설과 관련한 모든 베타락탐 오염 위해요소에 대한 갱신된 포괄적·독립적 위험평가로서 다음을 포함하되 이에 한정되지 않는 것: o 모든 오염 위해요소의 식별(예: 인원, 자재, 공조 시스템, 기반시설 취약점). o 공식적인 위해요소 식별 도구를 사용한 위해요소 식별. o 관련된 모든 봉쇄 요소를 고려한, 적절하고 과학적으로 타당한 검체 채취 방법·위치·빈도(예: 생산실 내부, 설비 표면, 벽, 협력업체 직원 및 작업자의 작업복, 부츠, 공용 지게차, 공용 실험실 캐비닛, 그 밖의 잠재적 교차오염 위치)를 포함한 위험 기반 EM 확대. o 강화된 경향 분석 시스템을 포함해 모든 오염에 경계심을 갖고 대응할 수 있는 더 대응성 높은 시스템. o 인원 흐름 및 자재 흐름(잠재적 위해요소를 유입할 수 있는 모든 시설 간 상호작용의 포괄적 매핑). o (b)(4) 완제의약품 배치에 대한 과학적으로 타당한 검체 채취.…",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups (21 CFR 211.42(c)). You manufacture various injectable drugs products including cephalosporins (a beta-lactam drug product) and (b)(4) drug products at your facility. You failed to ensure complete and comprehensive separation of cephalosporin and (b)(4) drug products in this shared facility. Lack of Complete and Comprehensive Separation Your facilities and controls were inadequate to prevent the conditions that would allow for cephalosporin contamination of (b)(4) drugs. Your building is divided into (b)(4) beta lactams, (b)(4) production. These building segments are separated by a physical wall that you consider to be fully sealed, along with dedicated HVAC units. However, since January 2025, your environmental monitoring (EM) program used to monitor containment of beta-lactam drug products has detected cephalosporin in several instances and in multiple areas of the (b)(4) side of the building. Inadequate Cephalosporin Monitoring While your monitoring program detected recurring cross-contamination, it was inadequate to promptly detect loss of containment and cephalosporin contamination in your facility. For example: EM sampling was insufficient in both number and location. Swab sampling qualification was inadequate to assure low-level recovery. Samples were evaluated beyond established solution stability time allowances. These inadequacies create risk for underrepresentation of true contamination hazards throughout your facility, create potential for false negative results, and inhibit meaningful data collection upon which your quality unit (QU) can make sound risk-based decisions. A rigorous monitoring program is essential for facility qualification, early detection of contamination hazards, and timely corrective action and preventive action (CAPA). In addition, your testing of (b)(4) drug products for potential contamination consisted of a single unit regardless of batch size. However, contamination is generally nonuniformly distributed. Results obtained from testing a small sample size are unlikely to detect contamination that may exist in a batch exposed to the contamination hazards identified at your firm. Consequently, substantial residual uncertainty remains regarding the actual variability of contamination that may exist in batches you produce. We also note that you mistakenly discarded multiple failing cephalosporin environmental samples before further analysis could be conducted. In your response, you commit to strengthen investigations into positive cephalosporin findings, create a tracking form to help prevent missed samples, and improve low-level recovery. Your response also indicates that significant uncertainty remains regarding the causes of the recurring findings of facility contamination. You indicate that personnel movement was a weakness in your containment strategy while adding that personnel movement is likely not the sole contributing factor. Your response is inadequate because it fails to adequately address how you will ensure complete and comprehensive separation. You also failed to thoroughly reevaluate your original risk management decisions, including supportive risk assessments and associated risk controls, to ensure prevention of beta-lactam cross-contamination. Although your cephalosporin and (b)(4) areas exist within the same external building structure that you claim is completely and comprehensively separated by a (b)(4) , it is essential that your design completely precludes any potential for incidental air, personnel, materials, equipment, or other interaction that could be a vector of contamination. A rigorous quality risk management program should comprehensively assess the design and determine if it provides as much protection against cross-contamination as is achieved by manufacturing in a separate building. We note that data shared during our recall discussions revealed additional cephalosporin contamination events in the (b)(4) area, including as recently as (b)(4) . Contamination of (b)(4) with beta-lactam drugs presents a serious risk to patient safety, including potential life-threatening (b)(4) . (b)(4) responses can occur in susceptible patients exposed to (b)(4) beta-lactams. Therefore, no safe level of beta-lactam contamination has been determined to be a tolerable risk. In response to this letter, provide: A comprehensive, independent evaluation of the sufficiency of facility modifications implemented in an attempt to achieve complete and comprehensive separation (e.g., physical wall, dedicated air handling) between cephalosporin and (b)(4) areas. An updated comprehensive, independent risk assessment of all beta-lactam contamination hazards with respect to your procedures, equipment, and facilities, including but not limited to, the following: o Identification of all contamination hazards (e.g., personnel, material, air systems, infrastructure vulnerabilities). o Hazard identification using formal hazard identification tools. o Expanded risk-based EM including appropriate, scientifically justified, sampling methods, locations, and frequencies (e.g., inside production rooms, equipment surfaces, walls, contractor and operator garments, boots, shared forklifts trucks, shared lab cabinet, other potential cross-contamination locations), with consideration of all associated containment elements. o More responsive systems to vigilantly respond to any contamination, including enhanced trending systems. o Personnel flow and material flow (comprehensive mapping of all such potential interactions between all facilities that may introduce a potential hazard). o Scientifically justified sampling of (b)(4) finished drug product batches.…",
+     "cfr_refs": [
+      "21 CFR 211.42(c)"
+     ]
+    },
+    {
+     "finding_id": "finding-0410c3dccb7ee14795b9b1e3",
+     "text_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균공정(aseptic) 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 준수하지 않았다(21 CFR 211.113(b)). 또한 귀사는 무균공정 구역에서 오염이나 혼동을 방지하는 데 필요한, 적절한 크기의 명확히 규정된 구역에서 작업을 수행하지 않았고 분리되거나 규정된 구역 또는 그 밖의 관리 시스템을 갖추지 않았다(21 CFR 211.42(c)(10)). 귀사는 미국 시장용 무균 주사제를 무균적으로 제조하는 데 사용하는 (b)(4) 공정 라인을 운영한다. 귀사의 (b)(4) 는 무균 생산 준비를 위해 (b)(4) 라인의 내부 표면을 일관되게 (b)(4) 할 수 있음을 보장하도록 적절히 밸리데이션되지 않았다. 또한 무균공정 모의시험(aseptic process simulation)이 최악 조건(worst-case)을 충분히 대표하지 않았고, ISO 5(Grade A) 구역의 검체 채취가 부적절했다. 생물학적 지표 회수 및 부적절한 (b)(4) 밸리데이션: (b)(4) 이후 (b)(4) 사이클 재적격성평가(밸리데이션) 런 종료 시 생물학적 지표(BI) 증식이 일상적으로 회수되는 경향을 통해 귀사 (b)(4) 공정의 부적절성이 드러났다. 특히 허용기준이 재적격성평가 런마다 여러 개의 BI 생존균이 일상적으로 회수되는 것을 허용했다는 점에서 부적절했다. 여러 (b)(4) 라인에 걸친 여러 재적격성평가 사이클에서 다수의 BI 양성이라는 불리한 경향이 확인되었다. 예를 들어 라인 (b)(4) 에서는 다수의 위치((b)(4) 개 위치 중 (b)(4) 개)에서 BI 양성이 발생했고, 양성 결과에는 위치당 여러 반복 시료가 포함되었다((b)(4) 개 반복 시료 중 (b)(4) 건 회수). 다른 라인에서도 이와 유사한 상당한 BI 양성 결과가 있었다. 그러나 귀사는 모든 재적격성평가 연구를 적합한 것으로 간주했고, 제품에 대한 잠재적 영향을 포함해 귀사 (b)(4) 의 과도한 변동성을 추가로 평가하지 않았다. 이처럼 유의미하게 반복되는 BI 부적합은 (b)(4) 방법의 효능이 낮음을 나타내며 추가 조사가 필요하다. (b)(4) 신뢰성과 관련한 추가 결함도 확인했다. 예를 들어 다음과 같다. BI 위치에 대한 적절한 과학적 근거가 없었다. 관찰된 BI 증식에 대한 적절한 조사 없이 재적격성평가 사이클의 반복을 허용했다. 절차서에 인용한 기술 참고자료에 부합하지 않았다. 또한 생산 중 귀사 (b)(4) 내부의 (b)(4) 에서 (b)(4) 를 회수했음을 확인했다. 귀사는 회신에서 (b)(4) 개선을 위해 (b)(4) 를 참여시키고, 허용기준을 업계 표준에 맞게 개정하며, 관찰된 BI 증식을 조사하기 위한 부적합 보고서를 발행하겠다고 약속했다. 또한 대체 (b)(4) 기술을 평가하겠다고 약속했다. 장기 개선 조치가 완료되기 전 중간 기간 동안 적절한 (b)(4) 를 어떻게 달성할지 설명하는 충분한 세부 내용이나 근거 문서를 제공하지 않았다는 점에서 귀사의 회신은 부적절하다. 내부 표면이 (b)(4) 에 불완전하게 노출되면 (b)(4) 효과가 손상되고 귀사의 (b)(4) 환경이 위험에 처한다. (b)(4) (Grade A) 구역은 무균 생산 중 무균 제품이 노출되므로 작업이 잘 설계되고 철저히 관리되지 않으면 오염에 취약하기 때문에 중요하다. 무균공정 작업은 제조 작업에서 무균 물품이 잠재적 오염 위해요소에 노출되는 것을 최소화하도록 설계·수행되어야 한다. 청정실과 무균공정 작업의 설계나 관리에 결함이 있으면 오염물질이 중요 (b)(4) 공정 구역에 유입되어 제품 오염으로 이어질 수 있다. 부적절한 무균공정 모의시험: (b)(4) 개입(intervention)은 배지충전(media fill) 중 약 (b)(4) 회 모의되었으나, 생산 기록에서는 이 개입이 훨씬 더 자주 발생한 것으로 나타났다. 귀사는 회신에서 약 (b)(4) 만을 대상으로 한 2026년 회고적 검토를 근거로 (b)(4) 모의 최소 횟수를 (b)(4) 로 갱신하겠다고 약속했다. 귀사의 회신은 모든 (b)(4) 라인에서 최악 조건의 생산 활동과 조건이 도전받도록 보장하지 못하므로 부적절하다. 배지충전 프로그램이 오염 위험 요인을 반영하지 않고 실제 의약품 생산을 면밀히 모의하지 않으면 공정 관리 상태와 무균성 보증을 정확히 평가할 수 없다. 부적절한 환경모니터링: 귀사의 (b)(4) 공정 라인에는 (b)(4) 에서 수행되는 중요 작업 단계가 포함된다. 그러나 이들 (b)(4) 중 한 곳에만 (b)(4) 가 있었다. 또한 표면에 대해 미생물 오염 모니터링을 하지 않았다. 경계심 있고 대응성 높은 환경모니터링 프로그램은 무균공정 작업의 관리 상태에 관한 의미 있는 정보를 제공하고, 무균성이 손상되기 전에 새로 나타나는 오염 위해요소를 식별하는 조기 경보 체계를 가능하게 한다. 부적절한 기류: 귀사의 (b)(4) 구성은 다양할 수 있음에도(예: (b)(4) 백 용량, (b)(4) 구성) (b)(4) 라인 중 (b)(4) 에 대해 기류 시각화 연구가 없었다. 또한 기류 시각화 연구가 불충분했다(예: 최악 조건의 (b)(4) 조건). 귀사에는 2013년 이후 산발적인 무균시험 양성 이력(시험은 일상적으로 (b)(4) 에서 수행)과 지속적인 미립자 오염 문제가 있었음을 확인했다. 기류 시각화 연구에서는 중요 공정 단계가 수행되는 귀사 (b)(4) 에서 상당한 난류도 드러났다. 귀사는 공정 설비가 설치된 (b)(4) 내에 비일방향(non-unidirectional) 난류가 있음을 인정했다. 전반적인 관찰 결과는 귀사 무균공정 작업 설계에 중대한 결함이 있음을 나타낸다. 귀사의 현재 설비, 공정 및 기류 설계는 과도한 오염 위험을 초래한다. 난류는 무균공정 설비가 설치되지 않은 (b)(4) 에는 적절할 수 있다.…",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Your firm also failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.42(c)(10)). You operate (b)(4) processing lines used to aseptically manufacture sterile injectable drug products for the U.S. market. Your (b)(4) were inadequately validated to ensure that they were capable of consistently (b)(4) interior surfaces of your (b)(4) lines in preparation for aseptic production. In addition, your aseptic process simulations did not sufficiently represent worst-case conditions, and you lacked adequate sampling of your ISO 5 (Grade A) area. Biological Indicator Recoveries and Inadequate (b)(4) Validation Inadequacies in your (b)(4) process were demonstrated through a trend of routine recoveries of biological indicator (BI) growth at the completion of (b)(4) cycle re-qualification (validation) runs since (b)(4) . Notably, your acceptance criteria were inappropriate in that they allowed routine recovery of multiple BI survivors per re-qualification run. An adverse trend of numerous positive BIs were identified in multiple re-qualification cycles across multiple (b)(4) lines. For example, for line (b)(4) , positive BIs occurred at numerous locations ( (b)(4) of (b)(4) locations) and the positive findings included multiple replicates per location ( (b)(4) recoveries of (b)(4) replicates). In addition, other lines had similar substantial findings of positive BIs. However, you considered all re-qualification studies to be acceptable and did not further evaluate the excessive variability of your (b)(4) , including the potential impact to product. These significant recurring BI failures indicate poor (b)(4) method efficacy and require further investigation. We also noted additional deficiencies in your (b)(4) reliability. For example: You lacked adequate scientific justification for BI locations. You allowed repetition of re-qualification cycles without proper investigation into observed BI growth. You did not align with technical references you cited in your procedures. We note that you recovered (b)(4) , from an (b)(4) inside your (b)(4) during production. In your response, you commit to engaging a (b)(4) to help improve (b)(4) , revising acceptance criteria to align with industry standards, and initiating non-conformance reports to investigate the observed BI growth. You also commit to evaluating alternative (b)(4) technology. Your response is inadequate in that it does not provide sufficient detail or supporting documentation to describe how adequate (b)(4) will be achieved during the interim period prior to completion of long-term remediation. Incomplete exposure of interior surfaces to (b)(4) compromises (b)(4) effectiveness and places your (b)(4) environment at risk. The (b)(4) (Grade A) area is critical because sterile products are exposed during aseptic production and therefore vulnerable to contamination if operations are not well designed and diligently controlled. Aseptic processing operations should be designed and executed to minimize exposure of sterile articles to potential contamination hazards in the manufacturing operation. Flaws in the design or control of cleanrooms and aseptic processing operations can enable entry of contaminants into the critical (b)(4) processing area and lead to product contamination. Inadequate Aseptic Process Simulation The intervention of (b)(4) was simulated approximately (b)(4) times during a media fill, but production records indicate a significantly higher occurrence of this intervention. In your response you commit to updating the minimum number of (b)(4) simulations to (b)(4) based on your 2026 retrospective review, which only covered approximately (b)(4) . Your response is inadequate as it does not ensure worst-case production activities and conditions are challenged across all (b)(4) lines. If a media fill program fails to incorporate contamination risk factors and closely simulate actual drug production, the state of process control and assurance of sterility cannot be accurately assessed. Inadequate Environmental Monitoring Your (b)(4) processing lines include critical operational steps conducted in (b)(4) . However, there was only a (b)(4) in one of these (b)(4) . In addition, surfaces were not monitored for microbiological contamination. Vigilant and responsive environmental monitoring programs provide meaningful information on the state of control of the aseptic processing operation and enable an early warning system that identifies emerging contamination hazards before sterility is compromised. Inadequate Airflow Although your (b)(4) configurations can vary (e.g., (b)(4) bag capacity, (b)(4) configuration), you lacked airflow visualization studies in (b)(4) of your (b)(4) lines. In addition, your airflow visualization studies were insufficient (e.g., worst-case (b)(4) conditions). We note that you have had a history of sporadic sterility test positives since 2013 (testing is routinely performed in a (b)(4) ) and persistent particulate contamination issues. Your airflow visualization studies also revealed substantial turbulence in your (b)(4) , in which critical process steps are performed. Your firm acknowledged turbulent non-unidirectional airflow within your (b)(4) , which houses processing equipment. Our overall findings indicate significant deficiencies in the design of your aseptic processing operation. Your current equipment, process, and airflow design pose excessive contamination risk. Turbulent airflow may be appropriate for a (b)(4) that does not house aseptic processing equipment.…",
+     "cfr_refs": [
+      "21 CFR 211.113(b)",
+      "21 CFR 211.42(c)(10)"
+     ]
+    },
+    {
+     "finding_id": "finding-20444885b3cae13821d6b3d6",
+     "text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 설명되지 않은 불일치 또는 배치나 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 조사하지 않았다(21 CFR 211.192). 의약품 누설과 무균 부적합을 포함한 중요 사안에 대해 부적절한 조사가 반복되는 양상이 있었다. 누설 단위: 용기-마개 완전성(container-closure integrity) 부적합의 체계적 성격(“systemic nature”)에 대한 귀사의 조사에는 주사제의 누설 결함 발생률이 크게 증가한 문제를 해결할 효과적인 CAPA가 없었다. 귀사는 최종 검사 프로그램의 개선을 보장할 충분한 CAPA를 시행하지 않았다. 또한 2023년 이후 배지충전(media fill) 단위가 배양 중 누설된 것으로 확인되었고, 시판 제품에 대해 다수의 누설 불만을 접수했다. 모든 무균 의약품은 미생물 유입을 방지하는 견고한 보호 기능을 갖춘 용기-마개 시스템으로 포장되어야 한다. 제조, 보관, 유통 및 소비자 사용 중 예상되는 스트레스와 외부 요인 전반에 걸쳐 완전성을 유지하는 제품의 능력은 제품 품질과 안전성 보장에 매우 중요하다. 용기-마개 완전성의 상실은 비무균의 직접적 원인이다. 귀사는 회신에서 조사 시스템 강화가 필요하다고 인정하고, (b)(4) 용기-마개 완전성 시험(CCIT)이 효과적인 다층 관리수단이 될 수 있는지 평가하겠다고 밝혔다. 또한 지난 1년간의 중요 부적합 보고서(NCR) 및 시험실 조사에 대한 회고적 검토를 약속했다. 귀사의 회신은 부적절하다. 누설 경향 데이터에서 누설률이 2023년부터 2026년까지 매년 지속적으로 증가한 것으로 나타났으므로, 회고적 검토를 (b)(4) 로 한정하는 것은 적절한 과학적 근거가 없다. 또한 성능이 높은 누설 검출 시스템의 부재가 이미 생산된 제품에 어떤 영향을 미치는지 충분히 다루지 않았고, CAPA 시스템 개선 사항도 충분히 상세히 기술하지 않았다. 아울러 귀사 데이터에 따르면 누설률은 증가했지만 개시된 NCR 수는 감소했다. 무균 부적합: cefazolin 로트 (b)(4) 의 2025년 무균 부적합에 대한 귀사의 조사는 근본원인을 완전성이 확보되지 않은 시험 용기로 지정했다. 시험 기록에는 용기 완전성이 처음에 확인되었음을 나타내는 서명과 날짜가 기재되어 있었다. 그러나 혼탁을 관찰한 후 귀사는 조사에서 용기 완전성이 확인되지 않았다고 진술하고 이를 “no-test”로 분류했다. 2단계(Phase II) 조사를 수행하지 않은 채 제조 공정이나 완제품에 대한 위험이 없다고 결론지었다. 귀사는 적절한 과학적 근거 없이 무균시험 결과를 무효화하고 2025년 7월에 이 로트를 출하했다. 특히 동일한 용기 완전성 문제가 (b)(4) 에 (b)(4) 로트 (b)(4) 의 무균시험에서도 관찰되었고, 귀사는 그 로트를 부적합 처리했다. 또한 다수의 BI 양성 결과가 나온 (b)(4) 사이클 재적격성평가 시도에도 “no-test” 판정이 사용되었다. 귀사는 회신에서 완전성이 확보되지 않은 무균시험 용기를 배양한 시험실 오류가 확정적인 근본원인이라고 믿는다고 밝혔다. 시험실 기록에 시험 용기가 완전한 것으로 기재된 이유를 다루지 않았으므로 귀사의 회신은 부적절하다. 또한 이론적으로 발생할 수 있었던 후속 일탈에 대한 동시 기록이 없다는 점도 철저히 다루지 않았다. 귀사는 향후 폐쇄형 멤브레인 무균시험 시스템을 도입하겠다고 약속했으나, 이 제안은 적시 개선을 보장하지 못한다. 귀사가 신뢰할 수 없는 무균시험 관행을 사용하면 제품 오염이 상당 기간 검출되지 않을 수 있다. 또한 무균시험 양성 결과는 모두 중대한 CGMP 문제로서, 문제의 원인과 범위에 대한 포괄적인 조사와 무균공정 적격성 상태에 대한 신속한 검토가 필요하다는 점에 유의해야 한다. 귀사의 품질 시스템은 부적절하다. CGMP에 부합하는 품질 시스템의 수립 및 유지에 관한 지침은 FDA 가이던스 문서 Q8(R2) Pharmaceutical Development(https://www.fda.gov/media/71535/download), Q9(R1) Quality Risk Management(https://www.fda.gov/media/167721/download), Q10 Pharmaceutical Quality System(https://www.fda.gov/media/71553/download)을 참조하라. 이 서한에 대한 회신으로 다음을 제출하라. QU가 효과적으로 기능할 수 있는 권한, 독립성 및 자원을 갖도록 보장하는 포괄적인 평가 및 개선 계획. 평가에는 다음을 포함하되 이에 한정되지 않아야 한다. o 귀사가 사용하는 절차가 견고하고 적절한지에 대한 판단 o 만족스러운 절차와 적절한 관행의 준수를 보장하기 위한 CGMP 작업 전반에 걸친 독립적 QU 감독 조항 o QU의 처분 결정 전, 모든 조사를 포함한 각 배치와 관련 정보에 대한 완전한 최종 검토 o 모든 제품의 확인, 함량, 품질 및 순도를 보장하기 위한 모든 QU 직무 수행의 감독 및 승인 o 또한 지속적인 관리 상태를 보증하기 위해 새로 나타나는 제조/품질 문제의 선제적 검출과 해결을 가능하게 하는 자원의 적시 제공을 포함하되 이에 한정되지 않는, 경영진이 귀사의 견고한 품질보증을 어떻게 지원하는지 기술하라. 일탈, 불일치, 불만, 규격 외(out-of-specifi…)를 조사하는 전반적인 시스템에 대한 포괄적이고 독립적인 평가",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). There was a pattern of inadequate investigations into critical issues, including leaking drug products and sterility failures. Leaking Units Your investigations into the “systemic nature” of container-closure integrity failures lacked effective CAPA to address the significantly increased rate of leak defects in your injectable drug products. You did not implement sufficient CAPA to ensure remediation of your final inspection program. Further, since 2023, media fill units were found leaking during incubation and you have received numerous leak complaints for marketed products. All sterile drugs must be packaged using container-closure systems with robust protection that prevents the ingress of microorganisms. A product’s ability to maintain integrity throughout anticipated stresses and external factors during manufacture, storage, distribution, and consumer use is critical to ensure product quality and safety. Loss of container-closure integrity is a direct cause of non-sterility. In your response, you acknowledge that strengthening your investigation system is warranted and you will evaluate whether (b)(4) container closure integrity testing (CCIT) could be an effective layered control. You also commit to a retrospective review of critical non-conformance reports (NCR) and laboratory investigations for the last year. Your response is inadequate. Limiting a retrospective review to (b)(4) lacks adequate scientific justification as your leak trending data illustrated the leak rate has consistently increased annually from 2023 to 2026. You also do not sufficiently address how a lack of highly capable leak detection systems impacts already produced products, or sufficiently detail improvements to your CAPA system. In addition, data from your firm indicates that although leak rate has increased, the number of NCRs opened has decreased. Sterility Failure Your investigation into a 2025 sterility failure for cefazolin, lot (b)(4) , assigned the root cause as a non-integral test container. Test records had been signed and dated indicating that container integrity was initially verified. However, after observing turbidity, you subsequently stated in your investigation that container integrity was not verified, classifying it as a “no-test.” Without conducting a Phase II investigation, you concluded there was no risk to the manufacturing process or finished product. You invalidated the sterility result without adequate scientific justification and released this lot in July 2025. Notably, the same container integrity problem had been observed in the sterility test of (b)(4) , lot (b)(4) , in (b)(4) , which you rejected. In addition, a “no-test” designation was used for an (b)(4) cycle requalification attempt that resulted in numerous positive BIs. In your response, you state your belief that the laboratory error of incubating non-integral sterility test containers was the definitive root cause. Your response is inadequate as it fails to address why your lab records described the test container as integral. It also fails to thoroughly address the lack of contemporaneous documentation of any subsequent deviation that could have theoretically occurred. You also commit to implementing a closed membrane sterility testing system in the future, but your proposal does not ensure timely remediation. Product contamination may go undetected for substantial periods if your firm employs unreliable sterility testing practices. It should also be noted that any positive sterility test result represents a serious CGMP issue that requires a comprehensive investigation into the cause and extent of the problem, and a prompt review of the qualification status of the aseptic process. Your firm’s quality systems are inadequate. For guidance on establishing and maintaining CGMP-compliant quality systems, see FDA guidance documents: Q8(R2) Pharmaceutical Development at https://www.fda.gov/media/71535/download, Q9(R1) Quality Risk Management at https://www.fda.gov/media/167721/download, and Q10 Pharmaceutical Quality System at https://www.fda.gov/media/71553/download. In response to this letter, provide: A comprehensive assessment and remediation plan to ensure your QU is given the authority, independence, and resources to effectively function. The assessment should also include, but not be limited to, the following: o A determination of whether procedures used by your firm are robust and appropriate o Provisions for independent QU oversight throughout your CGMP operations to ensure satisfactory procedures and adherence to appropriate practices o A complete and final review of each batch and its related information before the QU disposition decision, including all investigations o Oversight and approval of discharging of all QU duties to ensure identity, strength, quality, and purity of all products o Also, describe how executive management supports robust quality assurance at your firm, including, but not limited to, timely provision of resources that enable proactive detection and resolution of emerging manufacturing/quality issues to assure a continuing state of control A comprehensive, independent assessment of your overall system for investigating deviations, discrepancies, complaints, out-of-specifi…",
+     "cfr_refs": [
+      "21 CFR 211.192"
+     ]
+    },
+    {
+     "finding_id": "finding-e553df0ffa3b889bde4c76f5",
+     "text_ko": "귀사는 원료, 의약품 용기, 마개, 공정 중 물질, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 규격, 기준, 검체채취 계획 및 시험 절차를 포함하는 시험 관리(laboratory controls)를 수립하지 않았다(21 CFR 211.160(b)). 귀사의 수동 육안검사(manual visual inspection) 프로그램은 결함을 신뢰성 있게 검출하고 무균 주사제가 육안으로 보이는 미립자(visible particulates)로부터 본질적으로 자유로움을 보장하기에 부적절했다. 예를 들어, (b)(4) 육안검사를 수행하는 작업자는 다음과 같이 적절히 적격성이 평가되지 않았다: 작업자가 가시 범위의 하한에 해당하는 미립자를 신뢰성 있게 검출할 수 있는지 확인하기 위한 적절한 도전 시험을 받지 않았다. 도전 키트(challenge kits)의 미립자가 지나치게 컸으며(예: (b)(4) 마이크론 초과), 이는 작업자가 신뢰성 있게 검출할 수 있어야 하는 크기보다 약 (b)(4)배 컸다. 작업자의 검사 속도가 지나치게 빨랐으며(예: 단위당 (b)(4)), 귀사 절차에 인용된 기준과 일치하지 않았다. 특히 귀사는 허용품질한계(Acceptable Quality Limit, AQL) 검체채취 시 훨씬 긴 검사 시간을 적용했을 때에도 낮은 검출률을 보였다. 귀사의 제품 결함 식별 방식은 신뢰성 있는 검출을 저해하며, 품질부서가 내리는 배치 출하 및 CAPA 결정을 뒷받침하는 데이터 입력의 품질을 저해한다. 또한 2023년부터 2025년 사이에 접수된 상당한 미립자 관련 불만은 육안검사 프로그램이 부적절함을 보여준다. 예를 들어, 2025년 5월 9일 반품된 cefazolin 불만 검체를 시험한 후 귀사는 이물 미립자 오염이 골판지(cardboard)와 일치함(약 (b)(4) mm)을 확인했다. 귀사의 조사는 육안검사의 부적절성이 기여 원인이라고 결론지었으나, 육안검사 프로그램의 개선을 보장하기 위한 충분한 CAPA를 이행하지 않았다. 귀사의 조사는 제품 품질 저해 가능성과 잠재적 환자 안전 위험을 구체적으로 언급했으나, 현장 조치(field action)는 필요하지 않다고 기술했다. 귀사가 2026년 7월 17일, 기관이 연락한 이후에야 cefazolin Lot LD175708을 자발적으로 회수하기로 동의했음을 확인한다. 귀사는 회신에서 단위당 (b)(4) 검사 시간을 사용한 검출 확률(probability of detection, PoD) 연구 수행을 포함하여 육안검사 프로그램을 강화하겠다고 약속했다. 귀사의 회신은 부적절하다. 귀사는 시판 후 불만 평가 및 보관검체 검토 데이터가 관리가 여전히 효과적임을 확인한다고 기술했다. 그러나 귀사는 제품 출하 후 보관검체와 불만 검체에서 미립자를 확인했다. 또한 귀사의 회신은 2024년((b)(4)건 결함)에서 2025년((b)(4)건 결함)으로의 미립자 결함 급증을 적절히 다루지 않았다. 귀사가 장기 개선 작업을 진행하는 동안 주사제가 육안으로 보이는 미립자로부터 본질적으로 자유롭다는 보증이 여전히 부족하다. 미립자의 육안 검출은 확률적 과정으로, 무엇보다도 적절한 시력을 갖춘 숙련된 인원이 육안으로 보이는 미립자를 재현성 있게 검출할 수 있도록 보장하는 데 달려 있다. 최소한 인원은 (b)(4) 마이크론 이상의 미립자를 (b)(4)% 검출 확률로 신뢰성 있게 검출할 수 있어야 한다. 육안으로 보이는 모든 미립자 오염을 적절히 평가하고 조사하는 것이 중요하다. 주사제의 미립자는 설계 및 생산 관리에 반영된 적절한 예방 조치를 통해 방지해야 한다. 육안으로 보이는 입자를 분류할 때, 외인성(extrinsic) 또는 이물(foreign matter)은 미생물 오염 가능성을 나타낼 수 있으므로 특별한 주의를 기울여야 한다. 외인성 또는 이물 미립자 오염은 매우 드물게 발생해야 하며, 철저한 조사와 적절한 CAPA를 촉발해야 한다. 이 서한에 대한 회신으로 다음을 제출하라: 미립자 존재를 포함한 결함에 대한 무균 주사제 육안검사 시스템의 포괄적이고 독립적인 평가 및 개선 계획. 이 평가에는 적합·부적합 판정 기준, 인원 교육훈련, 감독, 장비 및 인원 적격성 평가, 장비 유지관리, 공정 밸리데이션 및 이를 관장하는 절차가 포함되어야 한다. 또한 제품별 지식, 공정 경험(예: 2025년 (b)(4) 미립자 결함 급증에 대한 철저한 평가), 일탈 조사 분석, 회수·불만 데이터를 포함할 것. 각 개선 활동의 완료 일자와 계획 효과성에 대한 주기적인 독립 재평가를 포함한 상세한 개선 조치 계획을 제출할 것. 독립 컨설턴트가 수행한 검토 및 권고 사항의 요약을 포함할 것. 귀사 시설에서 유통되어 유효기간 내에 있는 무균 주사제의 각 로트가 육안으로 보이는 입자로부터 본질적으로 자유로워야 한다는 요건을 충족하는지에 대한 포괄적이고 독립적인 평가. 이 포괄적 검토에는 모든 배치 기록을 포함하여 귀사가 확보한 모든 관련 공정 중 및 완제품 데이터의 검토가 포함되어야 한다. 육안검사 프로그램 개선을 위한 광범위한 연구를 수행하는 동안의 위험 완화를 위한 임시 계획. 위험 완화 조치의 상세 목록(예: 제안된 파괴 시험을 위한 검체채취 계획 및 방법)을 제출할 것.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). Your manual visual inspection program was inadequate to reliably detect defects and ensure your sterile injectable drug products were essentially free of visible particulates. For example, operators performing (b)(4) visual inspection were not properly qualified, as evidenced by the following: Operators were not appropriately challenged to ensure they were capable of reliably detecting particulates within the lower end of the visible spectrum. Particulates in challenge kits were excessively large (e.g., greater than (b)(4) microns), approximately (b)(4) times larger than what operators should be capable of reliably detecting. Operators’ rate of inspection was excessively fast (e.g., (b)(4) per unit) and did not align with the standards referenced in your procedures. Notably, you also demonstrated poor detection rates when you used significantly longer inspection times during Acceptable Quality Limit (AQL) sampling. Your approach to identifying product defects compromises reliable detection and the quality of data inputs to support batch release and CAPA decisions made by your quality unit. In addition, the significant particulate matter complaints received between 2023 to 2025 indicate an inadequate visual inspection program. For example, on May 9, 2025, after testing a returned cefazolin complainant sample you confirmed foreign particulate contamination was consistent with cardboard (approximately (b)(4) mm). Your investigation concluded that inadequacies of visual inspection were a contributing cause, but you did not implement sufficient CAPA to ensure remediation of your visual inspection program. Your investigation specifically cited potential for compromised product quality and potential patient safety risks, but stated that field action was not warranted. We acknowledge that on July 17, 2026, you agreed to voluntarily recall cefazolin, Lot LD175708, only after the Agency contacted you. In your response you commit to enhancing your visual inspection program including performing probability of detection (PoD) studies using the (b)(4) per unit inspection duration. Your response is inadequate. You indicate that data from post-market complaint evaluations and retain sample reviews confirm that your controls remain effective. However, you have identified particulate matter in retain and complaint samples after product was released. In addition, your response does not adequately address the spike in particulate matter defects from 2024 ( (b)(4) defects) to 2025 ( (b)(4) defects). There remains a lack of assurance that your injectable drug products are essentially free from visible particulates while you work on long-term remediation. Visual detection of particulates is a probabilistic process that depends on, among other things, ensuring that visible particulates can be reproducibly detected by trained personnel with appropriate visual acuity. At a minimum, personnel should reliably be capable of detecting particulates of (b)(4) microns or greater at a (b)(4) % probability of detection. It is important that any visible particulate contamination is appropriately evaluated and investigated. Particulates in injectable products should be avoided through appropriate preventive measures built into your design and production controls. When categorizing any visible particles, extrinsic or foreign matter should receive special attention, as it may indicate possible microbial contamination. Extrinsic or foreign particulate contamination should occur very infrequently and trigger a thorough investigation and appropriate CAPA. In response to this letter, provide: A comprehensive, independent assessment and remediation plan of your systems for the visual inspection of sterile injectable drugs for defects, including the presence of particulate matter. The assessment should include acceptance and rejection criteria, personnel training, supervision, equipment and personnel qualification, equipment maintenance, and process validation, and the procedures governing them. Also include product-specific knowledge, process experience (e.g., thorough assessment of the spike of (b)(4) particulate matter defects in 2025), deviation investigation analysis, and recall/complaint data. Provide your detailed remediation action plan that includes dates by which each remediation activity will be completed and a periodic independent reassessment of the plan’s effectiveness. Include a summary of the review and recommendations made by your independent consultant. A comprehensive, independent assessment of each lot of sterile injectable drugs distributed from your facility that remains within expiry to meet the requirement of being essentially free of visible particles. This comprehensive review should include a review of all relevant in-process and finished product data obtained by your firm including all batch records. An interim plan for risk mitigation while you perform broader studies to improve your visual inspection program. Provide a detailed list of your risk mitigations (e.g., sampling plans and methods for your proposed destructive testing).",
+     "cfr_refs": [
+      "21 CFR 211.160(b)"
+     ]
+    }
+   ]
+  },
+  {
    "document_id": "8bf480ac89ae",
    "slug": "8bf480ac89ae",
    "agency": "FDA",
@@ -19989,6 +20048,67 @@
      "text_orig": "Your firm failed to establish and follow adequate written procedures for cleaning and maintenance of equipment (21 CFR 211.67(b)). You manufacture drug products using the same equipment that you use to manufacture non-drug industrial products such as (b)(4) and (b)(4) . Inadequate removal of residues from manufacturing equipment during cleaning can lead to contamination of drug products subsequently manufactured on the non-dedicated equipment. In your response, you provided…",
      "cfr_refs": [
       "21 CFR 211.67(b)"
+     ]
+    }
+   ]
+  },
+  {
+   "document_id": "9995c30e33c0",
+   "slug": "9995c30e33c0",
+   "agency": "FDA",
+   "source": "FDA Warning Letter",
+   "firm_name": "SnugZ USA, Inc.",
+   "firm_key": "snugz usa",
+   "published_date": "2026-10-20",
+   "inspection_date": "",
+   "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/snugz-usa-inc-735284-09282026",
+   "categories": [
+    "원자재/공급업체 관리",
+    "품질부서 관리감독",
+    "시험실/품질관리",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1503cd9706a03ef3c89bff92",
+     "text_ko": "귀사는 의약품의 각 원료(component)의 확인(identity)을 검증하기 위한 시험을 최소 1개 이상 수행하지 않았다. 또한 귀사는 원료 공급업체 시험 분석의 신뢰성을 적절한 주기로 밸리데이션하고 확립하지 않았다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 OTC 의약품 제조에 사용하는 입고 원료에 대해 적절한 확인시험을 수행하지 않았다. 또한 각 원료 로트에서 대표 검체를 채취하지 않았다. 일부 경우에는 동일 원료 로트의 새 선적분을 입고할 때 이전에 시험한 원료 로트의 확인시험 결과에 의존했다. 아울러 공급업체 시험성적서(COA)의 신뢰성을 적절한 주기로 확립하지 않았고, 확인 시험 없이 COA를 수용했다. 귀사는 회신에서 공급업체 적격성평가 및 원자재 검체 채취 SOP를 개정하겠다고 약속했다. 귀사는 시험 기준을 축소하고 공급업체 COA에 대한 확인 시험을 수행할 외부 시험기관을 지정하겠다고 약속했다. 또한 입고되는 각 원료 선적분을 사용 전에 시험하겠다고 약속했다. 귀사의 회신은 부적절하다. 계획한 절차 개선, 수행할 시험, 시험 축소 전략에 관해 충분한 세부 내용을 제공하지 않았고, 원료 보관 검체(retain)를 평가하겠다는 약속도 하지 않았다. 공급업체 결과에 대한 적절한 시험과 검증 없이는 입고 원료가 의약품 제조에 사용되기 전 적절한 규격에 적합하다는 과학적 근거가 없다. 제조업자로서 귀사는 적절한 품질을 보증하기 위해 입고 자재를 생산에 사용하기 전에 검체 채취·시험·검사할 책임이 있다. 이 서한에 대한 회신으로 다음을 제출하라. 다음을 포함하되 이에 한정되지 않는, 자재 시스템에 대한 포괄적이고 독립적인 검토: o 모든 자재(원료, 용기 및 마개) 공급업체가 신뢰할 수 있고 적절히 적격성이 확인되었는지 판단하기 위한 평가 o 모든 자재가 일관되게 허용 가능한 품질인지 판단하기 위한 평가 o 지정된 사용기한 또는 재시험일이 적절하고 데이터로 뒷받침되는지 확인하기 위한 검토 o 공급업체 적격성평가 프로그램과 그 선정·적격성평가·적격성 박탈 조항의 적절성. 철저한 검토를 바탕으로, 공급업체 적격성평가 프로그램을 개선하고 부적합한 원료, 용기 및 마개의 사용을 방지하기 위한 시스템 CAPA 요약. 각 입고 원료 로트를 시험하고 제조 사용을 위해 출고 승인하는 데 사용하는 이화학적 및 미생물학적 품질관리 규격. 각 원료 로트가 확인, 함량(strength), 품질 및 순도에 관한 모든 적절한 규격에 적합한지 어떻게 시험할 것인지에 대한 설명. 각 원료 로트의 함량, 품질 및 순도를 시험하는 대신 공급업체 COA의 결과를 수용하려는 경우, 초기 밸리데이션과 주기적 재밸리데이션을 통해 공급업체 결과의 신뢰성을 어떻게 견고하게 확립할 것인지 명시하라. 또한 입고되는 각 원료 로트에 대해 항상 최소 1개 이상의 특이적 확인시험을 수행하겠다는 약속을 포함하라. 각 원료 제조업체 COA의 신뢰성을 평가하기 위해 모든 원료를 시험하여 얻은 결과의 요약. 이 COA 밸리데이션 프로그램을 기술한 SOP를 포함하라. 귀사가 제조하는 원료와 의약품을 시험하는 위탁 시설의 적격성평가 및 감독 프로그램의 요약.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). You failed to perform adequate identity testing of incoming components used in the manufacture of your OTC drug products. You also failed to collect representative samples from each lot of components. In some cases, you relied on identity test results from previously tested component lots when receiving new shipments of the same component lot. Additionally, you failed to establish the reliability of your suppliers’ certificates of analyses (COAs) at appropriate intervals and accepted COAs without confirmatory testing. In your response, you commit to revising your supplier qualification and raw material sampling SOPs. You commit to reducing testing criteria and identifying an outside laboratory to perform confirmatory testing for your suppliers’ COAs. You also commit to testing each shipment of components received prior to use. Your response is inadequate. You did not provide sufficient details about your planned procedural improvements, the testing to be performed, your strategy for reduced testing, nor did you commit to evaluating component retains. Without adequate testing and verification of supplier results, you do not have scientific evidence that your incoming components conform to appropriate specifications prior to use in the manufacture of your drugs. As a manufacturer, you have a responsibility to sample, test, and examine incoming materials before use in production to assure adequate quality. In response to this letter, provide: A comprehensive, independent review of your material system including, but not limited to: o Evaluating all suppliers of materials (components, containers, and closures) to determine whether they are reliable and appropriately qualified o An assessment of all materials to determine whether they are consistently of acceptable quality o A review to ensure assigned expiration or retest dates are appropriate and supported by data o Adequacy of the supplier qualification program and its selection, qualification, and disqualification provisions. Based on a thorough review, provide a summary of your systems CAPA to remediate the vendor qualification program and prevent use of unsuitable components, containers, and closures. The chemical and microbiological quality control specifications you use to test and release each incoming lot of components for use in manufacturing. A description of how you will test each component lot for conformity with all appropriate specifications for identity, strength, quality, and purity. If you intend to accept any results from your supplier’s COA instead of testing each component lot for strength, quality, and purity, specify how you will robustly establish the reliability of your supplier’s results through initial validation as well as periodic re-validation. In addition, include a commitment to always conduct at least one specific identity test for each incoming component lot. A summary of results obtained from testing all components to evaluate the reliability of the COA from each component manufacturer. Include your SOP that describes this COA validation program. A summary of your program for qualifying and overseeing contract facilities that test the components and drug products you manufacture.",
+     "cfr_refs": [
+      "21 CFR 211.84(d)(1)"
+     ]
+    },
+    {
+     "finding_id": "finding-3e8600e3adf0bd0b7c6f1959",
+     "text_ko": "귀사의 품질부서는 제조된 의약품이 CGMP를 준수하고 확인, 함량, 품질 및 순도에 관해 수립된 규격을 충족하도록 보장할 책임을 이행하지 않았다(21 CFR 211.22). 귀사의 QU는 OTC 의약품의 제조, 시험, 포장, 보관, 검토 및 출하를 적절히 감독할 권한을 수립하고 행사하지 않았다. 부적절한 품질 감독으로 인해 CGMP 요건 준수를 보장하기 위한 분석 및 생산 기록 검토, 조사, 품질 시스템 관리에 중대한 결함이 발생했다. 예를 들어 귀사의 QU는 다음을 보장하지 않았다. 생산 및 시험 기록의 적절한 문서 관리를 보장하는 적절한 절차(21 CFR 211.22(d)). 세척 절차의 적절한 밸리데이션(21 CFR 211.67(b)). 주기적(즉, 최소 연 1회) 제품품질평가 수행(21 CFR 211.180(e)). 배치 생산 기록에 각 중요 단계의 적절한 기록(21 CFR 211.188(b)). 의약품을 시장에 출하하기 전 일탈, OOS 결과 및 감사추적(audit trail)을 포함한 모든 생산 및 시험 기록의 적절한 검토(21 CFR 211.192). 이 서한의 중대한 지적사항은 귀사가 CGMP에 따른 효과적인 품질 시스템을 운영하지 않고 있음을 보여준다. 생산 및 시험실 작업에 대한 효과적인 경영진 감독이 부족할 뿐 아니라, 귀사 QU가 적절한 권한을 행사할 수 없거나 그 책임을 불충분하게 이행하고 있음을 확인했다. 경영진은 귀사의 시스템, 공정 및 제품이 FDA 요건에 부합하도록 귀사의 전 세계 제조 작업을 즉시 포괄적으로 평가해야 한다. 귀사의 품질 시스템은 부적절하다. CGMP 규정 21 CFR, parts 210 및 211의 요건을 충족하기 위한 품질 시스템 및 위험관리 접근법 도입에 도움이 필요하면 FDA 가이던스 문서 Quality Systems Approach to Pharmaceutical CGMP Regulations(https://www.fda.gov/media/71023/download)를 참조하라. 시설의 반복 위반: 이전 2022년 4월 1일 규제 회의(Regulatory Meeting)에서 FDA는 유사한 CGMP 위반을 지적했다. 귀사는 회신에서 이러한 위반에 대한 구체적인 개선 조치를 제안했다. 반복된 실패는 의약품 제조에 대한 경영진의 감독과 관리가 부적절함을 보여준다. CGMP 컨설턴트: 귀사에서 확인한 위반의 성격에 비추어, 귀사는 운영을 평가하고 CGMP 요건 충족을 지원하도록 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 참여시켜야 한다. 적격 컨설턴트는 또한 귀사가 FDA와 준수 상태 해소를 추진하기 전에 전체 운영에 대해 CGMP 준수 여부에 관한 포괄적인 6개 시스템 감사를 수행하고, 시정조치 및 예방조치의 완료와 효과를 평가해야 한다. 컨설턴트를 활용한다고 해서 CGMP 준수 의무가 면제되지는 않는다. 지속적인 CGMP 준수를 보장하기 위해 모든 결함과 체계적 결함을 해결할 책임은 여전히 귀사 경영진에게 있다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Your firm’s quality unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your QU failed to establish and exercise its authority to adequately oversee the manufacturing, testing, packing, holding, review, and release of your OTC drug products. Your firm’s inadequate quality oversight resulted in significant deficiencies in analytical and production record review, investigations, and quality system controls to ensure compliance with CGMP requirements. For example, your QU failed to ensure: Adequate procedures ensuring appropriate document controls of production and test records. (21 CFR 211.22(d)). Adequate validation of cleaning procedures (21 CFR 211.67(b)). Performance of periodic (i.e. at least annual) product quality reviews (21 CFR 211.180(e)). Adequate documentation of each significant step in batch production records (21 CFR 211.188(b)). Adequate review of all production and test records, including deviations, OOS results, and audit trails, prior to releasing drug product to the market (21 CFR 211.192). Significant findings in this letter demonstrate that your firm does not operate an effective quality system in accord with CGMP. In addition to the lack of effective management oversight of your production and laboratory operations, we found your QU is not enabled to exercise proper authority and/or has insufficiently implemented its responsibilities. Executive management should immediately and comprehensively assess your company’s global manufacturing operations to ensure that your systems, processes, and products conform to FDA requirements. Your firm’s quality systems are inadequate. For help implementing quality systems and risk management approaches to meet the requirements of CGMP regulations 21 CFR, parts 210 and 211, see FDA’s guidance documents Quality Systems Approach to Pharmaceutical CGMP Regulations at https://www.fda.gov/media/71023/download. Repeat Violations at Facility In a previous April 1, 2022 Regulatory Meeting, FDA cited similar CGMP violations. You proposed specific remediation for these violations in your responses. Repeated failures demonstrate that executive management oversight and control over the manufacture of drugs is inadequate. CGMP Consultant Based upon the nature of the violations we identified at your firm, you should engage a consultant qualified as set forth in 21 CFR 211.34 to evaluate your operations and to assist your firm in meeting CGMP requirements. The qualified consultant should also perform a comprehensive six-system audit of your entire operation for CGMP compliance and evaluate the completion and efficacy of your corrective actions and preventive actions before you pursue resolution of your firm’s compliance status with FDA. Your use of a consultant does not relieve your firm’s obligation to comply with CGMP. Your firm’s executive management remains responsible for resolving all deficiencies and systemic flaws to ensure ongoing CGMP compliance.",
+     "cfr_refs": [
+      "21 CFR 211.22",
+      "21 CFR 211.22(d)",
+      "21 CFR 211.67(b)",
+      "21 CFR 211.180(e)",
+      "21 CFR 211.188(b)",
+      "21 CFR 211.192",
+      "21 CFR 211.34"
+     ]
+    },
+    {
+     "finding_id": "finding-6082cc3f8d31a2736be85c7a",
+     "text_ko": "귀사는 원료, 의약품 용기, 마개, 공정 중 물질, 표시자재 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격, 기준, 검체 채취 계획 및 시험 절차를 포함하는 시험실 관리를 수립하지 않았다(21 CFR 211.160(b)). 귀사의 시험법 절차는 OOS 결과 후 검체를 여러 번 재시험하는 것을 허용했으며, 흔히 허용 가능한 결과가 나올 때까지 재시험했다. 예를 들어 귀사의 (b)(4) 표준작업절차서(SOP)는 조사를 요구하지 않고 OOS 검체를 다시 조제해 여러 번 재시험하는 것을 기술했다. 이 SOP는 (b)(4) 회의 OOS 결과가 나온 후에야 품질관리 책임자에게 통보하도록 요구한다. 또한 절차서에는 크로마토그래피 분석 중 미확인 피크가 관찰되면 추가 조치가 필요한지 판단하기 위해 품질관리 책임자와 상의할지를 분석자 재량에 맡긴다고 기재되어 있었다. 아울러 귀사의 (b)(4) 미생물 시험 SOP는 최초 부적합 후 재시험을 허용한다. 또한 이 SOP는 재시험이 부적합하면 분석자가 두 번째 미생물 시험 기기인 (b)(4) 를 사용하도록 규정한다. 귀사는 (b)(4) 시스템의 부적합한 배치 출하 시험 결과를 일상적으로 무효화하고, 과학적 근거 없이 적합한 (b)(4) 결과를 사용해 제품을 시장에 출하했다. 귀사는 이러한 단계적 시험 방식이나 한 방법이 다른 방법보다 우수하다는 밸리데이션을 뒷받침하는 데이터를 전혀 제시하지 못했다. 귀사는 회신에서 모든 최초 부적합 결과에 대해 OOS 조사를 개시하도록 하는 임시 요건을 시행하겠다고 약속했다. 또한 OOS 절차를 개정해 반복 시험, 재주입, 바이알 재충전 등이 허용되는 경우와 품질보증 승인이 필요한 경우를 규정하고, 생성된 모든 데이터에 대해 과학적 근거와 기록을 요구하겠다고 약속했다. 귀사의 회신은 불량한 분석 관행의 범위를 인식하지 못했으므로 부적절하다. 귀사는 특정 분석법의 개정, 교육훈련, 또는 OOS 결과를 무효화하고 재시험하는 일상적 관행의 체계적 개선을 다루지 않았다. 부적절한 시험실 관리는 이전에도 귀사에서 관찰되었으며, 이를 시정하고 재발을 방지하겠다는 귀사의 이전 약속은 효과가 없었다. 이는 비과학적인 관행이며 CGMP상 부적절하다. 필수 품질관리 단계인 이화학 및 미생물 출하 시험은 안전하지 않은 제품의 유통을 방지하는 데 핵심적이다. 의약품 시험과 관련된 시험 결과나 조건에 대한 완전하고 정확한 기록을 작성하거나 유지하지 않으면 데이터의 완전성이 근본적으로 손상된다. 또한 신뢰할 수 있는 데이터가 없으면 해당 기준의 준수를 보장하는 품질부서(QU)의 기능 수행 능력이 손상된다. 이 서한에 대한 회신으로 다음을 제출하라. 시험실 관행, 절차, 방법, 설비, 문서화 및 분석자 역량에 대한 포괄적이고 독립적인 평가. 이 검토를 바탕으로 시험실 시스템을 개선하고 그 효과를 평가하기 위한 상세한 계획을 제출하라. 로트 처분 결정 전에 각 의약품 배치를 분석하는 데 사용하는 시험법을 포함한 이화학 및 미생물 규격 목록. 이 서한 일자 기준 사용기한 이내인, 미국에 유통된 모든 의약품 배치의 품질을 판단하기 위해 보관 검체에 대해 이화학 및 미생물 전체 시험을 수행하는 조치 계획과 일정. 각 배치의 보관 검체 시험에서 얻은 모든 결과의 요약. 이러한 시험에서 품질 기준에 미달하는 의약품이 확인되면 고객 통보 및 제품 회수 등 신속한 시정조치를 취하라. OOS 결과 조사 시스템에 대한 포괄적인 검토 및 개선 계획. CAPA에는 다음을 다루는 내용을 포함하되 이에 한정되지 않아야 한다. o 시험실 조사에 대한 품질부서의 감독 o 시험실 관리의 불리한 경향 식별 o 시험실 변동 원인의 해소 o 시험실 원인을 확정적으로 식별할 수 없는 경우 잠재적 제조 원인에 대한 철저한 조사 개시 o 각 조사 및 그 CAPA의 적절한 범위 설정 o 이러한 개선 사항과 그 밖의 개선 사항을 반영한 개정 OOS 조사 절차 o 기준 외(out-of-limit) 결과(즉, 조치 기준을 벗어난 데이터) 처리 시스템에 대한 유사한 검토 및 개선…",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm failed to establish laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures designed to assure that components, drug product containers, closures, in-process materials, labeling, and drug products conform to appropriate standards of identity, strength, quality, and purity (21 CFR 211.160(b)). Your test method procedures allowed multiple retesting of samples following an OOS result, often until an acceptable result is obtained. For example, your (b)(4) standard operating procedure (SOP) described repreparing OOS samples and retesting multiple times without requiring investigations. The SOP requires notifying quality control management only after (b)(4) OOS results. Your procedure also stated that if an unidentified peak is observed during chromatographic analysis, it is at the discretion of the analyst to consult the Quality Control manager to determine whether further action is needed. Additionally, your (b)(4) Microbial Testing SOP allows retesting following an initial failure. Also, your SOP says that if the retest fails, your analysts are to use the (b)(4) , a second microbiological testing instrument. You routinely invalidated failing batch release results from the (b)(4) system and used the passing (b)(4) results to release product to the market without scientific justification. You could not provide any data to support this tiered testing approach or the validation of one method as superior to the other. In your response, you commit to implementing an interim requirement to open an OOS investigation for all initial failing results. You also commit to revising your OOS procedure to define when repeat testing, re-injection, re-vialing, etc. are allowed, when Quality Assurance authorization is required, and to require scientific justification and documentation of all data generated. Your response is inadequate because it fails to recognize the scope of your poor analytical practices. You did not address revisions to specific analytical methods, training, or systemic remediation of your routine practice of invalidating OOS results and retesting. Inadequate laboratory controls have previously been observed at your firm, and your earlier commitments to correct them and prevent their recurrence were not effective. These are unscientific practices and objectionable under CGMP. Chemical and microbial release testing, an essential quality control step, is integral in preventing distribution of unsafe products. Integrity of data is fundamentally compromised when there is a failure to record or maintain complete and accurate records of test results or conditions associated with drug testing. Furthermore, the lack of reliable data compromises the Quality Unit’s (QU) ability to exercise its function of ensuring compliance with applicable standards. In response to this letter, provide: A comprehensive independent assessment of your laboratory practices, procedures, methods, equipment, documentation, and analyst competencies. Based on this review, provide a detailed plan to remediate and evaluate the effectiveness of your laboratory system. A list of chemical and microbial specifications, including test methods, used to analyze each batch of your drug products before a lot disposition decision. An action plan and timelines for conducting full chemical and microbiological testing of retain samples to determine the quality of all batches of drug product distributed in the United States that are within expiry as of the date of this letter. A summary of all results obtained from testing retain samples from each batch. If such testing reveals substandard quality drug products, take rapid corrective actions, such as notifying customers and product recalls. A comprehensive review and remediation plan for your OOS result investigation systems. The CAPA should include but not be limited to addressing the following: o Quality unit oversight of laboratory investigations o Identification of adverse laboratory control trends o Resolution of causes of laboratory variation o Initiation of thorough investigations of potential manufacturing causes whenever a laboratory cause cannot be conclusively identified o Adequate scoping of each investigation and its CAPA o Revised OOS investigation procedures with these and other remediations o A similar review and remediation of your system for handling out-of-limit findings (i.e., data that falls outside action limits)…",
+     "cfr_refs": [
+      "21 CFR 211.160(b)"
+     ]
+    },
+    {
+     "finding_id": "finding-8d28fbd8d5f95de5eafac5fc",
+     "text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 설명되지 않은 불일치 또는 배치나 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 조사하지 않았다(21 CFR 211.192). 귀사는 주로 고객사가 판촉물로 유통하는 (b)(4) 및 (b)(4) 같은 일반의약품(OTC)을 제조한다. 귀사는 의약품 및 (b)(4) 시스템 모니터링 검체의 이화학 및 미생물 규격 외(OOS) 결과를 일상적으로 조사하지 않았다. 귀사는 분석자가 적합 결과를 얻을 때까지 근거 없이 부적합 검체를 재시험하거나 새 검체를 조제해 시험했다. 귀사는 최초 부적합 결과에 대한 적절한 조사 없이 이 결과들을 사용해 의약품을 시장에 출하했다. 또한 귀사는 불만에 대해 적절한 조사를 수행하지 않았다. 귀사의 조사는 주로 이메일 교신으로 이루어졌고, 적절한 근본원인 규명과 시정조치 및 예방조치(CAPA)의 시행이 없었다. 부적절한 조사는 귀사에서 반복 지적된 사항이다. 귀사는 회신에서 OOS 결과에 대한 회고적 검토를 약속했고, 최초 OOS 결과 발생 시 임시 “full stop”(전면 중단)을 시행했다. 또한 제품 영향을 판단하고 출하 결정이 과학적으로 타당했는지 확인하기 위해 이전 OOS 결과와 고객 불만을 검토하겠다고 밝혔다. 귀사의 회신은 부적절하다. OOS 결과와 불만이 항상 적절히 처리되도록 어떻게 보장할지에 대한 계획을 제시하지 않았다. 또한 반복 위반을 방지하도록 개선 조치가 지속 가능함을 보장할 적절한 세부 내용을 제시하지 않았다. 재시험 적합 결과만으로는 OOS 결과를 무효화하는 근거가 될 수 없다. 제조업자로서 귀사는 의약품 품질에 영향을 미칠 수 있는 비정상적인 이화학 및 미생물 시험 결과를 완전히 조사할 책임이 있다. 규격 외 및 부적합 시험 결과의 처리와 조사 기록에 관한 자세한 내용은 FDA 가이던스 문서 Investigating Out-of-Specification (OOS) Test Results for Pharmaceutical Production(https://www.fda.gov/media/158416/download)을 참조하라. 이 서한에 대한 회신으로 다음을 제출하라. 일탈, 불일치, 불만, OOS 결과 및 부적합을 조사하는 전반적인 시스템에 대한 포괄적이고 독립적인 평가. 이 시스템을 개선하기 위한 상세한 조치 계획을 제출하라. 조치 계획에는 조사 역량, 범위 결정, 근본원인 평가, CAPA 효과성, 품질부서 감독 및 문서화된 절차의 대폭 개선을 포함하되 이에 한정되지 않아야 한다. 조사의 모든 단계가 적절히 수행되도록 어떻게 보장할지 다루어라. 이 서한 일자 기준 현재 미국 시장에 있고 사용기한 이내인 제품에 대해 무효화된 모든 OOS 결과(공정 중 시험 및 출하/안정성 시험 포함)의 회고적·독립적 검토와, 각 OOS 결과에 대해 다음을 포함하여 분석 결과를 요약한 보고서: o 무효화된 OOS 결과와 관련된 과학적 근거 및 증거가 원인이 된 시험실 오류를 확정적으로 입증하는지 또는 확정적으로 입증하지 못하는지 판단하라. o 시험실 근본원인을 확정적으로 확립한 조사에 대해서는 근거를 제시하고, 동일하거나 유사한 근본원인에 취약한 다른 모든 시험법을 식별해 개선하도록 보장하라. o 회고적 검토에서 시험실 근본원인이 확정되지 않았거나 확인되지 않은 모든 OOS 결과에 대해서는 생산에 대한 철저한 검토(예: 배치 제조 기록, 제조 단계의 적절성, 설비/시설의 적합성, 원자재 변동성, 공정 능력, 일탈 이력, 불만 이력, 배치 부적합 이력)를 포함하라. 각 조사에 대한 잠재적 제조 근본원인과 모든 제조 작업 개선 사항의 요약을 제출하라. CAPA 프로그램에 대한 독립적인 평가 및 개선 계획. 프로그램이 효과적인 근본원인 분석을 포함하는지, CAPA 효과성을 보장하는지, 조사 경향을 분석하는지, 필요할 때마다 CAPA 프로그램을 개선하는지, 품질부서의 최종 결정 권한을 보장하는지, 경영진의 전폭적인 지원을 받는지를 평가하는 보고서를 제출하라. 실사 최초 일자로부터 지난 3년간의 모든 불만에 대한 회고적 검토를 포함한 전반적인 불만 시스템의 포괄적이고 독립적인 검토로서, 다음을 포함하되 이에 한정되지 않는 평가: o 불만의 성격 및 관련 잠재 위험 o 최초 통보일 및 이후 불만 제기자와의 연락 o 사진과 불만 검체, 그리고 추가적인 상황 정보를 확보하기 위한 불만 제기자 후속 연락의 시기와 충분성. 관련 불만 검체 확보 가능 여부 및 불만 검체 확보 노력의 정도에 대한 판단. 시도가 불충분했다면 반송을 적절히 추진하지 않은 근본원인을 식별하라. o 유사하거나 동일한 결함의 장기 이력 검토. o 불만으로 이어진 결함의 잠재적 원인 식별로서, 확인된 근본원인과 관련된 과학적 근거 및 증거가 적절히 문서화되었는지에 대한 평가 포함. 불만이 업체 통제 밖의 요인(예: 사용자 오류)에 기인한 것으로 판단된 경우, 그 판단의 확실성과 그것이 확정적 정보에 근거했는지 비확정적 정보에 근거했는지 평가하라. o 제조/품질 개선(예: 제조 작업, 원자재, 공급업체, 품질관리)과 회수 또는 강화된 품질 감시(추가 시험/검사, 안정성 프로그램에 배치 추가)를 포함하되 이에 한정되지 않는, 취해진 CAPA 단계.…",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your firm manufactures over-the-counter (OTC) drug products such as (b)(4) and (b)(4) , primarily distributed by your customers as promotional items. Your firm routinely failed to investigate out-of-specification (OOS) chemical and microbiological results for drug products and for (b)(4) system monitoring samples. Your firm retested failing samples or prepared and tested new samples without justification until your analysts obtained passing results. Your firm used these results to release drug product to the market without appropriate investigations into the original failing results. Additionally, your firm failed to conduct adequate complaint investigations. Your investigations consisted largely of email correspondence and lacked proper root cause determination and implementation of corrective actions and preventive actions (CAPA). Inadequate investigations are a repeat observation identified at your firm. In your response, you commit to a retrospective review of the OOS results and implemented an interim “full stop” for any initial OOS result. You also state you will review prior OOS results and customer complaints to determine product impact and ensure release decisions were scientifically justified. Your response is inadequate. You failed to provide plans on how you will ensure that OOS results and complaints are always appropriately handled. You also failed to provide adequate details of your remediations to ensure they are sustainable to prevent repeat violations. Passing retest results alone cannot serve as the basis for invalidating OOS results. As a manufacturer, you have a responsibility to fully investigate aberrant chemical and microbial test results that may impact drug product quality. For more information about handling out-of-specification and failing test results and documenting your investigations, see FDA’s guidance document Investigating Out-of-Specification (OOS) Test Results for Pharmaceutical Production at https://www.fda.gov/media/158416/download. In response to this letter, provide: A comprehensive, independent assessment of your overall system for investigating deviations, discrepancies, complaints, OOS results, and failures. Provide a detailed action plan to remediate this system. Your action plan should include, but not be limited to, significant improvements in investigation competencies, scope determination, root cause evaluation, CAPA effectiveness, quality unit oversight, and written procedures. Address how your firm will ensure all phases of investigations are appropriately conducted. A retrospective, independent review of all invalidated OOS (including in-process and release/stability testing) results for products currently in the U.S. market and within expiry as of the date of this letter and a report summarizing the findings of the analysis, including the following for each OOS result: o Determine whether the scientific justification and evidence relating to the invalidated OOS result conclusively or inconclusively demonstrates causative laboratory error. o For investigations that conclusively establish laboratory root cause, provide rationale and ensure that all other laboratory methods vulnerable to the same or similar root cause are identified for remediation. o For all OOS results found by the retrospective review to have an inconclusive or no root cause identified in the laboratory, include a thorough review of production (e.g., batch manufacturing records, adequacy of the manufacturing steps, suitability of equipment/facilities, variability of raw materials, process capability, deviation history, complaint history, batch failure history). Provide a summary of potential manufacturing root causes for each investigation, and any manufacturing operation improvements. An independent assessment and remediation plan for your CAPA program. Provide a report that evaluates whether the program includes effective root cause analysis, ensures CAPA effectiveness, analyzes investigations trends, improves the CAPA program whenever needed, ensures final quality unit decision authority, and is fully supported by executive management. A comprehensive, independent review of your overall complaint system, including a retrospective review of all complaints for the last three years from the initial date of inspection with an assessment that includes, but is not limited to: o Nature of complaint, and potential associated risk o Date of first notification and subsequent contacts with complainant o Timing and sufficiency of follow-ups with the complainant to obtain photographs and the complaint sample, as well as to obtain any additional contextual information. Determination of whether relevant complaint samples were available and extent of efforts to obtain the complaint sample. If insufficient attempts were made, identify the root cause(s) for not adequately pursuing their return. o Review of long-term history for similar or same defects. o Identification of potential causes of the defect that led to the complaint, including evaluation of whether the scientific justification and evidence relating to the identified root cause(s) were adequately documented. In the event a complaint was attributed to factors outside of the firm’s control(e.g., user error), assess the strength of this determination and whether it was based on conclusive or inconclusive information. o CAPA steps taken including, but not limited to, manufacturing/quality improvements (e.g., manufacturing operation, raw materials, supplier, quality control), as well as recalls or heightened quality surveillance (additional testing/examinations, adding batch to stability program).…",
+     "cfr_refs": [
+      "21 CFR 211.192"
      ]
     }
    ]
@@ -28814,6 +28934,62 @@
      "text_ko": "예비 시험대상자 또는 그 대리인이 참여 여부를 고려할 충분한 기회를 얻고 강압이나 부당한 영향의 가능성이 최소화되는 상황에서, 사람을 연구 시험대상자로 참여시키기 전에 법적으로 유효한 설명에 근거한 동의를 받지 않았습니다…[21 CFR § 50.20]. A. IRB 시험계획서 신청서에 따르면 서면 동의는 시험대상자에게서만 받도록 되어 있었습니다. 다음과 같은 여러 사례가 있었습니다…",
      "category_label_ko": "기타 품질시스템",
      "text_orig": "Failure to obtain legally effective informed consent prior to involving a human being as a subject in research … under circumstances that provide the prospective subject or the representative sufficient opportunity to consider whether or not to participate and that minimize the possibility of coercion or undue influence. [21 CFR § 50.20]. A. According to the IRB protocol application, written consent would only be obtained from study subjects. There were several instances…"
+    }
+   ]
+  },
+  {
+   "document_id": "e68818062d22",
+   "slug": "e68818062d22",
+   "agency": "FDA",
+   "source": "FDA Warning Letter",
+   "firm_name": "Rohto Pharmaceutical Co., Ltd.",
+   "firm_key": "rohto pharmaceutical",
+   "published_date": "2026-10-20",
+   "inspection_date": "",
+   "evidence_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/rohto-pharmaceutical-co-ltd-733215-10142026",
+   "categories": [
+    "무균보증/무균공정",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-093ba1a4baca3e14af4a3ef8",
+     "text_ko": "귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균공정(aseptic) 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립하고 준수하지 않았다. 또한 귀사는 의약품의 제조, 가공, 포장 또는 보관에 의도된 용도의 작업과 세척·유지관리를 용이하게 하도록 적절히 설계되고 적절한 크기이며 적절한 위치에 있는 설비를 사용하지 않았다(21 CFR 211.113(b) 및 21 CFR 211.63). 귀사는 무균공정 라인을 적절히 설계·관리·감독하지 않았다. 불량한 무균 작업 관행 및 청정실 행동: 미국 시판 안과용 의약품 제조 중 여러 배치, 작업자 및 일자에 걸쳐 다음을 포함하되 이에 한정되지 않는 다수의 불량한 무균 작업 관행을 관찰했다. 무균복을 착용한 작업자가 (b)(4) 근처 ISO 5 구역 안에 서서 노출된 개봉 상태의 무균 병을 (b)(4) 로 집어 들어 폐기하지 않고 병 공급 라인에 다시 투입했다. 작업자들이 기록되지 않은 개입(intervention) 중 개봉된 병과 중요 표면 바로 위에서, 그리고 이에 접촉한 상태로 (b)(4) 를 반복 사용하고도 노출된 용기를 폐기하지 않았다. 작업자들이 배치 제조 후 일부 사용한 개봉 상태의 무균 (b)(4) 포장자재 백을 ISO 5 구역에서 꺼내 ISO 7 구역에 최대 (b)(4) 동안 보관한 뒤, 내용물의 무균 상태를 보장하는 적절한 관행을 따르지 않고 이후 배치에 다시 투입했다. 이러한 개입은 제조기록(batch record)에 기록되지 않았다. 많은 개입이 (b)(4) 및 컨베이어를 포함한 설비가 무균 개봉 병에 직접 접촉하는 (b)(4) 구역에서 발생했다. 이 구역에서 (b)(4) 개입이 빈번했음에도 귀사는 무균공정 라인의 무균 (b)(4) 구역에 대해 드물게만(예: (b)(4)) 제염(decontamination)을 수행했다. 또한 무균공정 작업자의 무균복 착의에서 여러 결함을 관찰했다. 이러한 결과와 그 밖의 실사 결과는 무균공정 작업에 대한 적절한 감독이 부족했음을 나타냈다. 부적절한 설비 설계: 설비 설계 결함과 일방향 기류(unidirectional airflow)의 결여도 확인했다. 예를 들어 (b)(4) 의 위치가 (b)(4) 내 무균 (b)(4) 로 향하는 일방향 기류를 가로막아 무균 (b)(4) 포장자재에 대한 ISO 5 보호가 부적절했다. 귀사의 무균 제조 공정은 무균 제품에 대한 오염 위해요소를 방지하도록 설계되고 작업이 수행되어야 한다. 청정실과 무균공정 라인의 설계 결함이나 무균 작업의 부적절한 수행은 중요 공정 구역으로의 오염 유입을 촉진할 수 있다. 무균공정과 소독에서의 이러한 중대한 일탈은 의약품의 무균성을 보증하기 위한 무균공정 작업 관리가 불충분하다는 추가적인 징후이다. 귀사는 회신에서 작업자 관행이 절차와 일관되게 부합하지 않았으며 작업자와 직속 감독자 모두에 대한 적격성평가 프로그램을 개선하겠다고 밝혔다. 또한 연기 시험(smoke study)의 결함을 인정했다. 이러한 결함을 해결하기 위해 귀사는 무균 작업 관행을 포함한 운영 평가에 독립적인 제3자 전문가를 참여시키겠다고 약속했다. 또한 향후 모든 연기 시험을 적격성이 확인된 중성 부력 연기제로 수행하고, 기류 평가 결과에 따라 잠재적 설계 변경을 포함한 시정조치를 시행하겠다고 약속했다. 회신은 또한 무균 제품용 ISO 5(grade A) 구역 전체를 (b)(4) 제염할 수 있도록 공급업체와 협력하겠다고 약속했다. 관찰된 불량한 무균 작업 관행의 범위와 근본원인을 적절히 다루지 않았으므로 귀사의 회신은 부적절하다. 무균공정으로 무균 의약품을 제조할 때 CGMP 요건을 충족하는 데 도움이 되도록 FDA 가이던스 문서 Sterile Drug Products Produced by Aseptic Processing—Current Good Manufacturing Practice(https://www.fda.gov/media/71026/download)를 참조하라. 이 서한에 대한 회신으로 다음을 제출하라. 귀사의 무균공정, 설비 및 시설과 관련한 모든 오염 위해요소에 대한 포괄적이고 독립적인 위험평가로서 다음을 포함하되 이에 한정되지 않는 것: o ISO 5 구역 내 모든 인적 상호작용(예: 가능한 모든 경우 (b)(4) 개입의 위험 감소 또는 제거) o 설비 적합성(예: 신뢰성, 능력, 인체공학, 배치) 및 충분한 청정실 공간 o 공기량 및 기류를 포함하되 이에 한정되지 않는 ISO 5 구역 및 주변 실의 공기 품질 o 시설 배치 o 인원 흐름 및 자재 흐름(무균 작업을 수행·지원하는 모든 실에서의 이동 및 모든 자재 이송) o 소독 관행 및 절차 o 위험평가에서 확인된 설계 및 관리 위해요소를 포괄적으로 해결할 구체적 CAPA 권고. 오염 위해요소 위험평가 결과를 해결하기 위한 일정이 포함된 상세한 개선 계획. 귀사 시설의 무균공정 작업 설계 및 관리에 대해 이루어질 구체적이고 실질적인 개선 사항을 기술하고, CAPA 계획이 결함 있는 무균 제조 작업을 어떻게 견고하게 개선할지 설명하라. 무균공정 라인과 청정실 설계 모두에 대한 포괄적인 변경 사항을 포함하라. 또한 대대적으로 개선된 작업의 적격성평가 및 밸리데이션 계획을 기술하라.…",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes. Your firm also failed to use equipment in the manufacture, processing, packing, or holding of drug products that is of appropriate design, adequate size, and suitably located to facilitate operations for its intended use and for its cleaning and maintenance (21 CFR 211.113(b) and 21 CFR 211.63). Your firm failed to adequately design, control, and supervise your aseptic processing line. Poor Aseptic Practices and Cleanroom Behavior We observed numerous poor aseptic practices across multiple batches, operators, and dates during the manufacture of U.S.-marketed ophthalmic drug products including, but not limited to, the following: A gowned operator stood inside the ISO 5 area near the (b)(4) , picking up exposed open sterile bottles with (b)(4) and reintroducing them into the bottle supply rather than rejecting them. Operators repeatedly used (b)(4) directly above and in contact with open bottles and critical surfaces during undocumented interventions without rejecting the exposed containers. Operators removed partially used open sterile (b)(4) packaging component bags from the ISO 5 area following batch manufacture, stored in the ISO 7 area for up to (b)(4) , and reintroduced to future batches without following appropriate practices to ensure the contents remained sterile. These interventions were not documented in the batch record. Many interventions occurred in the (b)(4) area where equipment, including the (b)(4) and conveyer, directly contacted sterile open bottles. Despite the frequency of (b)(4) interventions in this area, you only performed infrequent decontamination (e.g., (b)(4) ) of the sterile (b)(4) area of the aseptic processing line. In addition, we observed multiple deficiencies in aseptic processing operator gowning. These and other inspectional findings indicated a lack of adequate supervisory oversight of your aseptic processing operations. Inadequate Equipment Design We also noted equipment design deficiencies and a lack of unidirectional airflow. For example, the position of the (b)(4) obstructed unidirectional airflow to the sterile (b)(4) in the (b)(4) , leading to inadequate ISO 5 protection of sterile (b)(4) packaging components. Your aseptic manufacturing processes should be designed, and operations executed, to prevent contamination hazards to your sterile product. Flaws in the design of cleanrooms and aseptic processing lines, or improper execution of aseptic operations, can promote influx of contamination into the critical processing area. These significant deviations in aseptic processes and disinfection are a further indication of insufficient control of aseptic processing operations to assure drug product sterility. In your response, you state that operator practices did not consistently align with your procedures, and that you will be remediating your qualification program for both operators and direct supervisors. You also acknowledge deficiencies in your smoke studies. To help address these deficiencies, you commit to engaging independent third-party experts to assess your operation, including aseptic practices. You also commit to conducting all future smoke studies using a qualified, neutrally buoyant smoke agent and to implementing corrective actions, including potential design modifications, based on the outcome of airflow evaluation. Your response also commits to working with the vendor to ensure the entire ISO 5 (grade A) zone for the sterile product can be decontaminated (b)(4) . Your response is inadequate because it does not adequately address the scope and root cause of the poor aseptic practices observed. See FDA’s guidance document Sterile Drug Products Produced by Aseptic Processing—Current Good Manufacturing Practice to help you meet the CGMP requirements when manufacturing sterile drugs using aseptic processing at https://www.fda.gov/media/71026/download. In response to this letter, provide: A comprehensive, independent risk assessment of all contamination hazards with respect to your aseptic processes, equipment, and facilities, including but not limited to, the following: o All human interactions within the ISO 5 area (e.g., risk reduction or elimination of (b)(4) interventions wherever possible) o Equipment suitability (e.g., reliability, capability, ergonomics, placement) and sufficient cleanroom space o Air quality in the ISO 5 area and surrounding room including, but not limited to, air volume and flow o Facility layout o Personnel flow and material flow (movement throughout all rooms used to conduct and support sterile operations, and all material transfers) o Disinfection practices and procedures o Specific CAPA recommendations that will comprehensively address the design and control hazards identified in the risk assessment A detailed remediation plan with timelines to address the findings of the contamination hazards risk assessment. Describe specific tangible improvements to be made to aseptic processing operation design and control at your facility and explain how CAPA plan will robustly remediate your deficient sterile manufacturing operations. Include comprehensive changes to the design of both your aseptic processing lines and cleanrooms. Also, describe your plans for qualification and validation of your extensively remediated operations.…",
+     "cfr_refs": [
+      "21 CFR 211.113(b)",
+      "21 CFR 211.63"
+     ]
+    },
+    {
+     "finding_id": "finding-2f42b3a63c15b5e5acd9047a",
+     "text_ko": "귀사는 수립된 규격과 기준의 준수를 보장하는 데 필요한 모든 시험에서 얻은 완전한 데이터를 시험실 기록에 포함하도록 보장하지 않았다. 또한 귀사는 의약품의 안전성, 확인, 함량, 품질 또는 순도를 공식 요건이나 그 밖의 수립된 요건을 벗어나 변경할 수 있는 오작동이나 오염을 방지하기 위해, 설비와 기구를 적절한 주기로 세척·유지관리하고 의약품 특성에 따라 적절히 위생처리 및/또는 멸균하지 않았다(21 CFR 211.194(a) 및 21 CFR 211.67(a)). 귀사는 무균공정(aseptic processing)으로 일반의약품(OTC) 국소 점안제를 제조한다. 실사 결과 체계적인 데이터 조작(falsification)이 드러났다. 특히 환경모니터링(EM), 인원모니터링(PM) 및 세척 기록에서 중대한 데이터 완전성 위반을 관찰했다. 조작된 환경모니터링 기록: 실사에서 표면 모니터링 기록의 중대한 불일치를 확인했다. 귀사의 표준작업절차서(SOP)는 배치 종료 후 (b)(4) 개 위치에서 표면 검체를 채취하도록 요구했다. 귀사는 노출되지 않은 배지를 시험실에 반복 제출했음을 인정했고, 실제 검체 채취를 수행하지 않았음을 확인했다. 다른 경우에는 검체 채취가 일부만 수행되었다. 마찬가지로 무균공정실에서 작업한 생산 및 엔지니어링 인원에 대한 인원모니터링 검체도 채취되지 않았다. 대신 노출되지 않은 배지가 시험실에 제출되었고, 관련 기록에는 인원 검체 채취가 수행된 것으로 기재되었다. 또한 별도의 사례에서는 한 배치의 능동 공기 검체가 잘못된 위치에서 채취되었으나 요구된 위치에서 채취된 것으로 허위 기록되었다. 이러한 조작 관행은 귀사 미생물 데이터에 대한 신뢰를 근본적으로 훼손한다. 특히 귀사에는 무균공정 작업에 환경 관리가 존재했음을 나타내고 미국 시장으로의 배치 출하를 뒷받침할 신뢰할 수 있는 데이터가 없었다. 이 기간 동안 귀사는 누수 사고 후 발생한 단 1건의 일탈을 제외하고 모든 EM 및 PM 검체에서 집락형성단위(CFU) 0을 보고했다. 이와 극명하게 대조적으로, 업체 경영진과 결함을 논의한 후 실사 기간(2026년 4월 10일~14일) 중 실시한 실제 배지 판독에서는 약 25건의 ISO 5 기준 초과를 포함해 다수의 EM 및 PM 검체에서 미생물 증식이 확인되었다. 조작된 세척 기록: 귀사의 SOP는 ISO 5 표면 세척 (b)(4) 실 제염(decontamination)을 요구했다. 세척 기록에는 이러한 활동이 2026년 1월 23일, 1월 30일, 3월 10일 및 3월 21일에 완료된 것으로 기록되어 있었으나, 실사에서 세척 활동이 수행되었다는 증거를 찾지 못했다. 귀사 경영진은 기록된 세척 활동이 수행되지 않았고 기록에 허위 정보가 기재되었음을 확인했다. 귀사의 심각한 데이터 완전성 위반은 미국에 유통된 의약품의 무균성 보증을 결정적으로 훼손했다. 귀사는 회신에서 미국 시장용 의약품 생산을 중단하고 미국 유통업체에 유통 중단이 필요함을 통보했다고 밝혔다. 귀사는 EM, PM 및 세척 기록이 조작되었음을 인정했다. 귀사는 품질보증 인원의 독립적 감독 부재와 세척 수행에 대한 실시간 감독 부족을 포함한 여러 근본원인을 언급했다. 귀사는 관련된 모든 인원을 직무 정지하고 데이터 완전성 문제의 범위를 평가하기 위해 독립적인 제3자를 참여시켰다고 밝혔다. 특히 회신 전반에 걸쳐 귀사는 불리한 경향이 없었다는 점을 들어 과거 생균 EM 데이터를 초기 제품 영향 평가를 뒷받침하는 핵심 “quality indicator data” 출처로 언급했다. 귀사의 회신은 부적절하다. 조작된 EM 데이터는 경향 분석에 사용할 수 없다. 따라서 신뢰할 수 없는 것으로 확인된 EM 데이터에 의존하는 귀사의 초기 제품 영향 평가는 뒷받침될 수 없다. 또한 귀사는 절차상 공백이나 개인의 위법 행위를 훨씬 넘어서는 체계적 데이터 완전성 위반의 잠재적 범위를 충분히 인정하지 않았다. 다수의 직원, 여러 기록 유형에 걸쳐 장기간 광범위한 조작이 견제되지 않은 채 이루어졌으며, 이는 체계적인 품질 실패를 반영하고 귀사 고위 관리자들이 제조 및 시험실 기록의 완전성을 보장할 책임을 전반적으로 이행하지 못했음을 보여준다. 이 서한에 대한 회신으로 다음을 제출하라. 시험실 관행, 절차, 방법, 설비, 문서화, 감독 및 분석자 역량에 대한 포괄적이고 독립적인 평가. 이 검토를 바탕으로 시험실 시스템을 개선하고 그 효과를 평가하기 위한 상세한 계획을 제출하라. 문서화 관행이 불충분한 부분을 파악하기 위해 제조 및 시험실 작업 전반에 사용되는 문서화 시스템에 대한 포괄적이고 독립적인 평가. 작업 전반에 걸쳐 동시적이고, 귀속 가능하며, 판독 가능하고, 완전하며, 원본이고, 정확한 기록을 보존하도록 귀사의 문서화 관행을 포괄적으로 개선하는 상세한 시정조치 및 예방조치(CAPA) 계획을 포함하라. 견고하고 신뢰할 수 있는 데이터를 보장하기 위해 적격 컨설턴트의 감독하에 미생물 검체 채취 배지 취급에 관한 포괄적인 CAPA. 다음을 포함하되 이에 한정되지 않는, 모든 미생물 검체의 완전한 대사(reconciliation)를 통해 손상되지 않고 중단 없는 관리 연속성(custody)을 보장하는 시스템을 수립하라. o 각 검체의 고유 표시 o 검체를 취급하는 모든 직원의 서명 o 손상되지 않은 검체 완전성 및 관리 연속성의 완전한 추적 o 각 활동의 날짜와 시간(예:…",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards. Your firm also failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements (21 CFR 211.194(a) and 21 CFR 211.67(a)). Your firm manufactures over-the-counter (OTC) topical ophthalmic drug products using aseptic processing. Our inspection revealed systemic data falsification. Notably, we observed critical data integrity breaches in your environmental monitoring (EM), personnel monitoring (PM), and cleaning records. Falsified Environmental Monitoring Records Our inspection identified critical discrepancies in your surface monitoring records. Your standard operating procedure (SOP) required post-batch surface sampling at (b)(4) locations. Your firm acknowledged repeatedly submitting unexposed plates to the laboratory and confirmed that you did not perform the actual sampling. In other instances, only partial sampling was performed. Similarly, personnel monitoring samples were not collected for production and engineering personnel who worked in the aseptic processing room. Instead, unexposed plates were submitted to the laboratory and the associated records reflected that personnel sampling had been performed. Further, in a separate instance, active air samples for a batch were collected at incorrect locations but falsely documented as having been collected at the required locations. These falsification practices fundamentally undermine any confidence in your microbiology data. Notably, you lacked reliable data indicating that environmental control existed in your aseptic processing operations and to support release of batches to the U.S. market. During this period, you reported 0 colony-forming unit findings across all EM and PM sampling with the exception of a single deviation following a water leakage event. In stark contrast, following discussion of deficiencies with firm management, actual plate readings conducted during the inspection (April 10 to 14, 2026) yielded numerous EM and PM samples with microbial growth, including approximately 25 ISO 5 excursions. Falsified Cleaning Records Your SOP required cleaning ISO 5 surfaces (b)(4) decontamination of the room. Although cleaning records documented that these activities were completed on January 23, January 30, March 10, and March 21, 2026, our inspection found no evidence that the cleaning activities were performed. Your management confirmed that the documented cleaning activities were not performed and that the records reported false information. The profound data integrity breaches at your firm critically undermined assurance of sterility for U.S.-distributed drug products. In your response, you state that you suspended drug production for the U.S. market and notified your U.S. distributor of the need to halt distribution. You acknowledge that EM, PM, and cleaning records were falsified. You note several root causes, including a lack of independent oversight by quality assurance personnel and insufficient real-time supervision of cleaning execution. You state that you suspended all personnel involved and engaged an independent third-party to assess the scope of the data integrity issues. Notably, throughout your response, you reference your historical viable EM data, citing the absence of adverse trends, as a key “quality indicator data” source to support your initial product impact assessment. Your response is inadequate. Falsified EM data cannot be used for trending analysis. Therefore, your initial product impact assessment is not supportable as it relies on EM data confirmed to be unreliable. Furthermore, you have not sufficiently acknowledged the potential scope of the systemic data integrity breaches, which extended well beyond procedural gaps or individual misconduct. Widespread falsification across many staff members, multiple record types, and over an extended period of time went unchecked, reflecting a systemic quality failure and demonstrating a general failure of senior managers in your company to exercise their responsibility to ensure integrity of manufacturing and laboratory records. In response to this letter, provide: A comprehensive, independent assessment of your laboratory practices, procedures, methods, equipment, documentation, supervisory oversight, and analyst competencies. Based on this review, provide a detailed plan to remediate and evaluate the effectiveness of your laboratory system. A comprehensive, independent assessment of documentation systems used throughout your manufacturing and laboratory operations to determine where documentation practices are insufficient. Include a detailed corrective action and preventive action (CAPA) plan that comprehensively remediates your firm’s documentation practices to ensure you retain contemporaneous, attributable, legible, complete, original, and accurate records throughout your operation. A comprehensive CAPA, overseen by a qualified consultant, for handling microbiological sampling media to ensure robust and reliable data. Establish a system that ensures uncompromised and uninterrupted custody, with full reconciliation of all microbiological samples including, but not limited to, the following: o Unique labeling of each sample o Signatures of all staff who handle the sample o Complete tracking of uncompromised sample integrity and custody o Date and time of each activity (e.g.…",
+     "cfr_refs": [
+      "21 CFR 211.194(a)",
+      "21 CFR 211.67(a)"
+     ]
+    },
+    {
+     "finding_id": "finding-620902a6c793b7e0694e4e78",
+     "text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 설명되지 않은 불일치 또는 배치나 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 조사하지 않았다(21 CFR 211.192). 귀사는 총 불량 기준 (b)(4) %를 초과한 무균 안과용 의약품 2개 배치의 100% 육안검사 기준 외(out-of-limit) 결과를 적절히 조사하지 않았다. 100% 재검사를 전면 수행하지 않고 배치당 (b)(4) 개 단위만 재검사했으며, 조사에서 입자의 특성, 조성 또는 출처를 규명하지 않았다. 두 배치 모두 입자가 내인성(intrinsic), 외인성(extrinsic) 또는 고유성(inherent)인지 판단하지 않은 채 출하되어 미국 시장으로 선적되었다. 안과용 제품 작업은 입자 오염을 방지하고 잠재적으로 유해한 입자가 눈에 점안될 위험으로부터 소비자를 보호하도록 설계되어야 한다. 또한 가시성 입자를 분류할 때 외인성 물질이나 이물은 미생물 오염 가능성을 나타낼 수 있으므로 특별히 주의해야 한다. 눈에 직접 유입된 미생물은 소비자에게 심각한 위험이 될 수 있다. 부분적 시력 상실이나 실명을 포함한 비가역적 손상이 발생할 수 있고, 일부 경우에는 생명을 위협하는 전신 감염으로 진행될 수 있다. 귀사는 회신에서 조사가 부적절했으며, 푸리에 변환 적외선 분광 분석을 위해 외부 시험기관에 보낸 검체로도 입자의 조성이나 출처를 확정적으로 판단할 수 없었다고 인정했다. 귀사는 높은 불량률 로트와 특정 (b)(4) 용기 공급업체 사이의 통계적 상관관계를 확인했으나, 입자 출처는 분석 시험으로 확인되지 않았다. 귀사의 회신은 부적절하다. 최초 회신 시점에 입자와 그 출처의 식별은 결론이 나지 않았고 불완전한 상태였다. 또한 회신은 중대한 불리한 품질 결함 경향에도 불구하고 배치를 출하한 결정을 다루지 않았다. 2019년 이후 누설, 화끈거림 및 따가움, 눈 충혈 악화, 시야 흐림, 이물 또는 “floating matter” 보고를 포함해 상당수의 소비자 불만이 접수되었다. 귀사는 이러한 고객 불만에 대해 시정조치란에 \"no need\" 또는 “NA”로 기록했다. 이 서한에 대한 회신으로 다음을 제출하라. 일탈, 불일치, 불만, 규격 외 결과, 기준 외 결과 및 부적합을 조사하는 전반적인 시스템에 대한 포괄적이고 독립적인 평가. 이 시스템을 개선하기 위한 상세한 조치 계획을 제출하라. 조치 계획에는 조사 역량, 범위 결정, 근본원인 평가, CAPA 효과성, QU 감독 및 문서화된 절차의 대폭 개선을 포함하되 이에 한정되지 않아야 한다. 조사의 모든 단계가 적절히 수행되도록 어떻게 보장할지 다루어라. CGMP 준수를 보장하기 위한 육안검사 프로그램에 대한 포괄적이고 독립적인 평가 및 개선 계획. 평가와 개선에는 다음을 포함하되 이에 한정되지 않아야 한다. o 의약품의 치명(critical)·중(major)·경(minor) 결함과 개별 결함 기준의 규정을 포함한 100% 육안검사 프로그램 강화 시행. o 과거 귀사 작업에서 발견된 입자를 포함해 가시성 입자를 재현성 있게 검출할 수 있는 적절한 방법, 설비 및 인원 자격 보장. o 귀사 (b)(4) 가시성 입자 검사 시스템이 의약품에서 나타나는 다양한 가시성 입자를 일관되고 재현성 있게 검출하도록 보장하기 위한 엄격한 적격성평가 연구 수행. o 검사가 어려운 의약품(예: (b)(4) 용기)에 대해 통계적으로 유의한 검체 수로 파괴 시험과 그 밖의 첨단 기술(예: (b)(4))을 적절히 도입. o 육안검사 프로그램 개선을 위해 제품 고유 지식, 공정 경험, 일탈 조사 분석, 회수/불만 데이터 및 품질위험관리 반영. o 새로운 문서화된 절차, 설비 및 방법의 수립을 포함한 육안검사 프로그램 개선. 독립 컨설턴트의 검토 요약과 권고 사항을 포함하라. 다음은 검토 중 확인된 위반 사항이다. 참고로 이는 귀사 제품이나 운영과 관련해 존재할 수 있는 위반을 모두 망라한 목록이 아니다. 미승인 신약 위반: 제품 표시 자재를 검토한 결과, “ROHTO® Cooling Eye Drops COOL RELIEF,” “ROHTO® Cooling Eye Drops ALL-IN-ONE,” “ROHTO® Cooling Eye Drops MAX STRENGTH,” “ROHTO® Cooling Eye Drops DIGI EYE,” “ROHTO® Cooling Eye Drops OPTIC GLOW,” “ROHTO® Cooling Eye Drops DRY AID,” 및 “ROHTO® Cooling Eye Drops DUAL LIGHT RELIEF”(이하 통칭 “ROHTO® Cooling Eye Drops products”)는 질병의 진단, 치료, 경감, 처치 또는 예방에 사용하도록 의도되었거나 신체의 구조 또는 기능에 영향을 미치도록 의도되었으므로 FD&C Act section 201(g)(1), 21 U.S.C. 321(g)(1)에 따른 의약품이다. 웹사이트와 소셜미디어를 포함한 귀사 제품 표시 자재 중 이들 제품이 의약품으로서의 의도된 용도(21 CFR 201.128에 정의됨)를 갖는다는 증거가 되는 예는 다음을 포함하되 이에 한정되지 않을 수 있다. 모든 ROHTO® Cooling Eye Drops 제품: ““Our cooling eye drops additionally strengthen eye’s lipid film, promoting better stability of the tear film…” [귀사 “About” 웹페이지, https://rohtoeyedrops.com/pages/about에서 발췌] “ROHTO® Cooling Eye Drops COOL RELIEF”: “ROHTO® Cooling Eye Drops COOL RELIEF . . . Drug Facts . . . Purpose…Redness reliever…Lubricant . . . soothes up to 8 hrs. with CoolSense™ Technology . . . Proprietary formula cools…eyes….” [제품 라벨에서 발췌] “ROHTO® Cooling Eye Drops ALL-IN-ONE”: “ROHTO® Cooling Eye Drops ALL-IN-ONE . . . Drug Facts . . .…",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your firm failed to adequately investigate out-of-limit 100% visual inspection findings for two batches of sterile ophthalmic drug products that exceeded the (b)(4) % total reject limit. Rather than conducting a full 100% re-inspection, only (b)(4) units per batch were re-inspected, and the investigations did not characterize the nature, composition, or source of the particles. Both batches were released and shipped to the U.S. market without determining whether the particles were intrinsic, extrinsic, or inherent. Ophthalmic products operations should be designed to prevent particle contamination and to protect consumers from the risk of instilling potentially harmful particles into the eye. In addition, when categorizing any visible particles, extrinsic or foreign matter should receive special attention, as it may indicate possible microbial contamination. Microbes introduced directly into the eye can pose a serious risk to consumers. Irreversible damage, including partial vision loss or blindness, can occur and, in some cases, may progress to life-threatening systemic infection. In your response, you acknowledge that your investigations were inadequate and that samples sent to an external laboratory for Fourier-Transform Infrared spectroscopic analysis could not conclusively determine the composition or source of the particles. While you identified a statistical correlation between high reject rates lots and a specific (b)(4) container supplier, the particle source(s) was not confirmed through analytical testing. Your response is inadequate. The identification of particles and their sources remained inconclusive and incomplete at the time of your initial response. Your response also did not address your decision to release batches despite your significant adverse quality defect trends. A substantial number of consumer complaints have been received since 2019, including reports of leakage, burning and stinging sensation, worsening eye redness, blurry vision, and reports of foreign matter or “floating matter.” Your firm recorded \"no need\" or “NA” for corrective action for those customer complaints. In response to this letter, provide: A comprehensive, independent assessment of your overall system for investigating deviations, discrepancies, complaints, out-of-specification results, out-of-limit results, and failures. Provide a detailed action plan to remediate this system. Your action plan should include, but not be limited to, significant improvements in investigation competencies, scope determination, root cause evaluation, CAPA effectiveness, QU oversight, and written procedures. Address how your firm will ensure all phases of investigations are appropriately conducted. A comprehensive, independent assessment and remediation plan for your visual inspection program to ensure compliance with CGMP. The assessment and remediation should include, but not be limited to, the following: o Implementing enhancements to your 100% visible inspection program, including defining critical, major, and minor defects and the individual defect limits for drug products. o Ensuring adequate methods, equipment, and personnel qualifications to reproducibly detect visible particulates, including particulates historically found in your operation. o Conducting rigorous qualification studies to ensure your (b)(4) visible particulate inspection systems consistently and reproducibly detect the variety of visible particulates encountered in your drug products. o Implementing destructive testing and other advanced technologies (e.g., (b)(4) ) as appropriate, with statistically significant sample sizes, for drug products that are difficult to inspect (e.g., (b)(4) containers). o Incorporating product-specific knowledge, process experience, deviation investigation analysis, recall/complaint data, and quality risk management to improve the visual inspection program. o Remediating your visual inspection program, including establishing new written procedures, equipment, and methods. Include a summary of the review and recommendations made by your independent consultant. The following are violations identified during our review. As a reminder, this is not an all-inclusive list of violations that may exist in connection with your products or operations. Unapproved New Drug Violations Based on a review of the product labeling, “ROHTO® Cooling Eye Drops COOL RELIEF,” “ROHTO® Cooling Eye Drops ALL-IN-ONE,” “ROHTO® Cooling Eye Drops MAX STRENGTH,” “ROHTO® Cooling Eye Drops DIGI EYE,” “ROHTO® Cooling Eye Drops OPTIC GLOW,” “ROHTO® Cooling Eye Drops DRY AID,” and “ROHTO® Cooling Eye Drops DUAL LIGHT RELIEF” (collectively, “ROHTO® Cooling Eye Drops products”) are drugs under section 201(g)(1) of the FD&C Act, 21 U.S.C. 321(g)(1), because they are intended for use in the diagnosis, cure, mitigation, treatment, or prevention of disease, and/or intended to affect the structure or any function of the body. Examples from your product labeling, including your website and social media, that provide evidence of the intended uses (as defined in 21 CFR 201.128) of these products as drugs include, but may not be limited to, the following: All ROHTO® Cooling Eye Drops products ““Our cooling eye drops additionally strengthen eye’s lipid film, promoting better stability of the tear film…” [from your “About” webpage, https://rohtoeyedrops.com/pages/about] “ROHTO® Cooling Eye Drops COOL RELIEF” “ROHTO® Cooling Eye Drops COOL RELIEF . . . Drug Facts . . . Purpose…Redness reliever…Lubricant . . . soothes up to 8 hrs. with CoolSense™ Technology . . . Proprietary formula cools…eyes….” [from product label] “ROHTO® Cooling Eye Drops ALL-IN-ONE” “ROHTO® Cooling Eye Drops ALL-IN-ONE . . . Drug Facts . . .…",
+     "cfr_refs": [
+      "21 CFR 211.192",
+      "21 CFR 201.128",
+      "21 U.S.C. § 321(g)(1)",
+      "21 U.S.C. § 321(p)",
+      "21 U.S.C. § 355(a)",
+      "21 U.S.C. § 355",
+      "section 201(g)(1)",
+      "section 505(a)",
+      "section 301(d)",
+      "section 201(p)",
+      "section 505"
+     ]
     }
    ]
   },
@@ -86952,6 +87128,2096 @@
    ]
   },
   {
+   "document_id": "fda483-195255",
+   "slug": "fda483-195255",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "BioSensics LLC",
+   "firm_key": "biosensics",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-02-09",
+   "evidence_url": "https://www.fda.gov/media/195255/download",
+   "categories": [
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-3fee86f394713ad53472e5b0",
+     "text_ko": "제품 요건에 적합하지 않은 제품을 의도하지 않은 사용 또는 인도를 방지하도록 적절히 식별·관리하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Product which does not conform to product requirements was not adequately identified and controlled to prevent its unintended use or delivery.",
+     "cfr_refs": [
+      "section 6",
+      "section 5"
+     ]
+    },
+    {
+     "finding_id": "finding-506c156ec8bad2f0f9101f09",
+     "text_ko": "재발 방지를 위해 부적합의 원인을 제거하는 시정조치를 적절히 취하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Corrective action was not adequately taken to eliminate the cause of nonconformities in order to prevent recurrence.",
+     "cfr_refs": [
+      "section 6"
+     ]
+    },
+    {
+     "finding_id": "finding-d1487c52425072f93b7afb2e",
+     "text_ko": "설계 및 개발 절차가 적절히 문서화되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Design and development procedures were not adequately documented.",
+     "cfr_refs": [
+      "section 6"
+     ]
+    }
+   ],
+   "inspector_names": [
+    "James P Finn"
+   ]
+  },
+  {
+   "document_id": "fda483-195258",
+   "slug": "fda483-195258",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Snap Diagnostics, LLC.",
+   "firm_key": "snap diagnostics",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-02-13",
+   "evidence_url": "https://www.fda.gov/media/195258/download",
+   "categories": [
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-12bb3b2735d9647fc72a05ec",
+     "text_ko": "재발 방지를 위해 부적합의 원인을 제거하는 시정조치를 적절히 취하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Corrective action was not adequately taken to eliminate the cause of nonconformities in order to prevent recurrence."
+    },
+    {
+     "finding_id": "finding-40682da776bf92051958e30c",
+     "text_ko": "부적합 제품의 식별, 기록, 격리, 평가 및 처리에 관한 관리와 관련 책임·권한을 규정하는 절차가 적절히 문서화되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Procedures to define the controls and related responsibilities and authorities for the identification, documentation, segregation, evaluation, and disposition of nonconforming product were not adequately documented."
+    },
+    {
+     "finding_id": "finding-a44c34c5794f31e6be6945ec",
+     "text_ko": "제품 실현(product realization)에서의 위험관리를 위한 하나 이상의 프로세스가 적절히 문서화되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "One or more processes for risk management in product realization have not been adequately documented."
+    }
+   ],
+   "inspector_names": [
+    "Shuana H Xiong"
+   ]
+  },
+  {
+   "document_id": "fda483-195260",
+   "slug": "fda483-195260",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Fresenius Kabi USA, LLC",
+   "firm_key": "fresenius kabi usa",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-05-14",
+   "evidence_url": "https://www.fda.gov/media/195260/download",
+   "categories": [
+    "무균보증/무균공정",
+    "공정밸리데이션",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-956eb88ab0f402689e63d743",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위해 설계된 절차에 무균 공정 및 멸균 공정의 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization process."
+    },
+    {
+     "finding_id": "finding-d8999d42f0bae7b49bd3cd57",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위한 생산 및 공정 관리에 관한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-e57eec6edb0f2d80fa1e819e",
+     "text_ko": "시험법의 적합성 확인(verification of suitability)이 실제 사용 조건에서 수행되지 않는다는 점에서 미흡했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Verification of the suitability of the testing methods is deficient in that they are not performed under actual conditions of use."
+    }
+   ],
+   "inspector_names": [
+    "Mindy M Chou"
+   ]
+  },
+  {
+   "document_id": "fda483-195277",
+   "slug": "fda483-195277",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Tropical Seas, Inc.",
+   "firm_key": "tropical seas",
+   "published_date": "2026-10-20",
+   "inspection_date": "2018-05-30",
+   "evidence_url": "https://www.fda.gov/media/195277/download",
+   "categories": [
+    "설비/시설",
+    "일탈/CAPA/조사",
+    "공정밸리데이션",
+    "원자재/공급업체 관리",
+    "시험실/품질관리",
+    "교육/작업자"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-20d1c76d77ee9579ef4db14d",
+     "text_ko": "의약품의 안전성, 확인, 함량, 품질 또는 순도를 변경할 수 있는 오작동과 오염을 방지하기 위해 설비와 기구를 적절한 주기로 유지관리하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not maintained at appropriate intervals to prevent malfunctions and contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    },
+    {
+     "finding_id": "finding-434ad7d26abdd9f67543b677",
+     "text_ko": "설명되지 않은 불일치에 대한 조사를 수행하지 않은 경우, 조사가 필요하지 않다고 판단한 사유를 문서 기록에 포함하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "The written record did not include the reason an investigation was found not to be necessary when an investigation into unexplained discrepancies was not conducted."
+    },
+    {
+     "finding_id": "finding-86f3fd29207a7e3d75c0413a",
+     "text_ko": "의약품이 표방하거나 표시한 확인, 함량, 품질 및 순도를 갖추도록 보증하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차가 없다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "There are no written procedures for production and process controls designed to assure that the drug products have the identity, strength, quality, and purity they purport or are represented to possess."
+    },
+    {
+     "finding_id": "finding-8c21e56e517e0b6bd417ba48",
+     "text_ko": "각 원료를 한 사람이 배치에 투입하고 다른 한 사람이 확인하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Each component is not added to the batch by one person and verified by a second person.."
+    },
+    {
+     "finding_id": "finding-8e0e03c243b733e8b08e70bf",
+     "text_ko": "각 배치의 공정 중 물질의 적절한 검체에 대해 수행할 공정 중 관리 및 검사를 기술한 문서화된 절차를 준수하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Written procedures are not followed that describe the in-process controls and examinations to be conducted on appropriate samples of in-process materials of each batch."
+    },
+    {
+     "finding_id": "finding-9a63e6390d4fd986640e5c79",
+     "text_ko": "시험 기록에 각 시험 과정에서 확보한 모든 데이터의 완전한 기록이 포함되어 있지 않았으며, 여기에는 시험 대상인 특정 원료 및 의약품을 나타내도록 적절히 식별된 시험 장비의 모든 그래프, 차트 및 스펙트럼이 포함된다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include a complete record of all data secured in the course of each test, including all graphs, charts and spectra from laboratory instrumentation, properly identified to show the specific component and drug product tested."
+    },
+    {
+     "finding_id": "finding-b2d44f2c11c1bd973ecc146c",
+     "text_ko": "시험 관리(laboratory controls)에 원료 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that components and drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-dc823ba3ea76d7ada3c1abbe",
+     "text_ko": "직원이 자신의 직무로 수행하는 특정 작업 및 CGMP 규정에서 요구하는 서면 절차에 대한 교육훈련을 받지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees are not given training in the particular operations they perform as part of their function and written procedures required by current good manufacturing practice regulations."
+    }
+   ],
+   "inspector_names": [
+    "Saundrea A Munroe"
+   ]
+  },
+  {
+   "document_id": "fda483-195282",
+   "slug": "fda483-195282",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "LCC Ltd.",
+   "firm_key": "lcc",
+   "published_date": "2026-10-20",
+   "inspection_date": "2024-03-22",
+   "evidence_url": "https://www.fda.gov/media/195282/download",
+   "categories": [
+    "안정성/보관",
+    "공정밸리데이션",
+    "시험실/품질관리",
+    "품질부서 관리감독",
+    "원자재/공급업체 관리",
+    "문서화/기록관리",
+    "설비/시설",
+    "교육/작업자",
+    "불만/회수"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1b80501152ff53e033d48015",
+     "text_ko": "의약품에 사용 시점에 해당 확인, 함량, 품질 및 순도 기준을 충족함을 보증하는 적절한 안정성 데이터로 결정된 사용기한이 표시되어 있지 않다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity, strength, quality and purity at the time of use."
+    },
+    {
+     "finding_id": "finding-602404db522ab2fa5ff2b86c",
+     "text_ko": "공정 중 물질과 의약품 특성의 변동을 유발할 수 있는 제조 공정의 산출물을 모니터링하고 성능을 밸리데이션하는 관리 절차가 수립되지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Control procedures are not established which monitor the output and validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in- process material and the drug product."
+    },
+    {
+     "finding_id": "finding-7d6f152badcf8ba8ec4fe521",
+     "text_ko": "시험실 관리에 원료, 공정 중 물질 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격과 시험 절차의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that components, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-925a756e41e5ed26fa8e7f52",
+     "text_ko": "품질관리부서(quality control unit)가 의약품의 확인, 함량, 품질 및 순도에 영향을 미치는 모든 절차 또는 규격을 승인할 책임을 갖고 있지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The quality control unit lacks responsibility to approve all procedures or specifications impacting on the identity, strength, quality and purity of drug products."
+    },
+    {
+     "finding_id": "finding-a3eab4186faa8e96b49af7d9",
+     "text_ko": "각 원료에 대해 순도, 함량 및 품질에 관한 모든 적절한 서면 규격에 대한 적합성 시험을 실시하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Each component is not tested for conformity with all appropriate written specifications for purity, strength, and quality."
+    },
+    {
+     "finding_id": "finding-a5d614b68cccfb49a05053ca",
+     "text_ko": "제조 및 관리 기록(batch production and control records)에 각 배치의 생산 및 관리에 관한 완전한 정보가 포함되어 있지 않았다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "Batch production and control records do not include complete information relating to the production and control of each batch."
+    },
+    {
+     "finding_id": "finding-a7c3abedc4c5fab462414a69",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용하는 장비가 의도된 용도의 작업과 세척 및 유지관리를 용이하게 하도록 적절한 설계와 충분한 크기를 갖추고 적절한 위치에 배치되어 있지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design, of adequate size and suitably located to facilitate operations for its intended use and cleaning and maintenance."
+    },
+    {
+     "finding_id": "finding-b04726551bc5773378a69925",
+     "text_ko": "의약품 원료, 생산, 관리 및 유통에 관련되고 해당 기록의 보존 기간 내에 있는 기록을 허가된 실사(authorized inspection)를 위해 즉시 제공하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Records associated with drug product components, production, control and distribution and within the retention period for such records, were not made readily available for authorized inspection."
+    },
+    {
+     "finding_id": "finding-c4067c84b9d0a3273caa3d16",
+     "text_ko": "장비 세척 및 유지관리 절차가 세척 및 유지관리 작업에 사용하는 방법, 장비 및 자재, 그리고 적절한 세척을 보증하기 위해 필요에 따라 장비를 분해 및 재조립하는 방법에 대한 충분한 세부 내용 측면에서 미흡했다(원문 이후 생략).",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods of disassembly and reassembling equipment as necessary to assure proper clea..."
+    },
+    {
+     "finding_id": "finding-caf48e4a349b4172ddffe5cc",
+     "text_ko": "의약품의 제조, 가공, 포장 및 보관을 감독하는 책임자가 의약품이 표방하거나 표시된 안전성, 확인, 함량, 품질 및 순도를 갖추도록 보증하는 방식으로 담당 업무를 수행하는 데 필요한 학력, 교육훈련 및 경험을 갖추지 못했다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Individuals responsible for supervising the manufacture, processing, packing and holding of a drug product lack the education, training and experience to perform their assigned functions in such a manner as to assure the drug product has the safety, identity, strength, quality and purity that it purports or is represented to possess."
+    },
+    {
+     "finding_id": "finding-e782f806df1ca0d15f8dee5d",
+     "text_ko": "불만 기록에 조사 결과와 후속 조치(follow-up)가 포함되지 않아 부적절했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Complaint records are deficient in that they do not include the findings of the investigation and follow- up."
+    }
+   ],
+   "inspector_names": [
+    "Arsen Karapetyan",
+    "Brittny C Cargo"
+   ]
+  },
+  {
+   "document_id": "fda483-195284",
+   "slug": "fda483-195284",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Gland Pharma Limited",
+   "firm_key": "gland pharma",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-02-25",
+   "evidence_url": "https://www.fda.gov/media/195284/download",
+   "categories": [
+    "무균보증/무균공정",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-06ce915b6f8aaac3c5fbb3ab",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차가 수립·문서화되어 있지 않고 준수되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
+    },
+    {
+     "finding_id": "finding-9313686ebd246aca11bfb200",
+     "text_ko": "무균 공정 구역(aseptic processing areas)에서 무균 상태를 조성하기 위한 실내 세척 및 소독 체계가 미흡했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for cleaning and disinfecting the room to produce aseptic conditions."
+    },
+    {
+     "finding_id": "finding-df88f50649cdcdf242e16eda",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위한 생산 및 공정 관리에 관한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    }
+   ],
+   "inspector_names": [
+    "Ashar P Parikh"
+   ]
+  },
+  {
+   "document_id": "fda483-195287",
+   "slug": "fda483-195287",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "HEC Pharm Co. Ltd.",
+   "firm_key": "hec pharm",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-11-21",
+   "evidence_url": "https://www.fda.gov/media/195287/download",
+   "categories": [
+    "설비/시설",
+    "기타 품질시스템",
+    "환경모니터링",
+    "밸리데이션/적격성평가",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-2b15365fa983426658d06fb9",
+     "text_ko": "제조 설비를 오작동 방지를 위해 유지관리하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Manufacturing equipment are not maintained to prevent malfunctions."
+    },
+    {
+     "finding_id": "finding-42744cd71a0481cb23e83f37",
+     "text_ko": "API 중 불순물 정량에 사용하는 분석법의 밸리데이션이 부적절하다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Analytical method used for determination of impurities in API is inadequately validated."
+    },
+    {
+     "finding_id": "finding-495d13986768254d51f7f0c9",
+     "text_ko": "미생물 계수 및 환경모니터링에 사용하는 배지 (b)(4) 가 특정 미생물의 증식 지원 능력을 확인하기 위해 밸리데이션되지 않았거나 적절히 밸리데이션되지 않았다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "The culture media ®@® used for microbial enumeration and environmental monitoring is not validated or adequately validated to determine its capability to support the growth of specific microorganisms."
+    },
+    {
+     "finding_id": "finding-72e8eb84557fd604f4fc6349",
+     "text_ko": "제조용 컴퓨터 및/또는 관련 시스템이 의도된 용도에 대해 적절히 적격성평가되지 않았다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "Manufacturing computer and or related system is not adequately qualified for their intended use."
+    },
+    {
+     "finding_id": "finding-e5ee431e7d314a372cb91ee7",
+     "text_ko": "시험실 기기가 의도된 용도에 대해 적절히 적격성평가(qualification)되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory instruments are inadequately qualified for their intended use."
+    }
+   ],
+   "inspector_names": [
+    "Adetutu M Gidado"
+   ]
+  },
+  {
+   "document_id": "fda483-195295",
+   "slug": "fda483-195295",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Unilab Chemicals and Pharmaceuticals Private Ltd.",
+   "firm_key": "unilab chemicals and pharmaceuticals",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-02-27",
+   "evidence_url": "https://www.fda.gov/media/195295/download",
+   "categories": [
+    "원자재/공급업체 관리",
+    "품질부서 관리감독",
+    "세척밸리데이션",
+    "일탈/CAPA/조사",
+    "교육/작업자"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-210e7ee687c92a16e276148a",
+     "text_ko": "원료(component) 공급업체 시험성적서(report of analyses)의 신뢰성을 확립하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "There is a failure to establish the reliability of the component supplier's report of analyses."
+    },
+    {
+     "finding_id": "finding-2d4b7171c6ab3eb778e9cf02",
+     "text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않거나 완전히 준수되지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing or fully followed."
+    },
+    {
+     "finding_id": "finding-77531f03299d85f2af561d1c",
+     "text_ko": "API의 품질을 공식 규격 또는 기타 설정된 규격을 벗어나도록 변화시킬 수 있는 오염 또는 자재의 이월(carry-over)을 방지하기 위한 설비 및 기구의 세척을 하지 않았다.",
+     "category_label_ko": "세척밸리데이션",
+     "text_orig": "There is a failure to clean equipment and utensils to prevent contamination or carry-over of a material that would alter the quality of the API beyond the official or other established specifications."
+    },
+    {
+     "finding_id": "finding-7b1925942e522e61895b95cf",
+     "text_ko": "API 배치가 이미 유통되었는지 여부와 관계없이 원인 불명의 불일치를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy whether or not the API batch has already been distributed."
+    },
+    {
+     "finding_id": "finding-7ed77ac5760999d3d94a3107",
+     "text_ko": "직원이 자신에게 적용되는 cGMP 요건을 숙지한 상태를 유지하도록 보장할 만큼 충분한 빈도로 GMP 교육훈련이 실시되지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "GMP training is not conducted with sufficient frequency to assure that employees remain familiar with cGMP requirements applicable to them."
+    }
+   ],
+   "inspector_names": [
+    "Guerlain Ulysse"
+   ]
+  },
+  {
+   "document_id": "fda483-195298",
+   "slug": "fda483-195298",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "The Mentholatum Company",
+   "firm_key": "the mentholatum",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-03-23",
+   "evidence_url": "https://www.fda.gov/media/195298/download",
+   "categories": [
+    "품질부서 관리감독",
+    "시험실/품질관리",
+    "원자재/공급업체 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-3447ab724e09b970175807c8",
+     "text_ko": "각 의약품의 품질 기준을 평가하여 규격 또는 제조·관리 절차의 변경 필요성을 판단할 수 있도록 최소 연 1회 데이터를 검토할 수 있는 방식으로 기록이 유지되지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Records are not maintained so that data therein can be reviewed at least annually to evaluate the quality standards of each drug product to determine the need for changes in specifications or manufacturing or control procedures."
+    },
+    {
+     "finding_id": "finding-408ba7304d0bf5f3553d8f9c",
+     "text_ko": "시험실 기록에 검체의 수량이 포함되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include the quantity of the sample."
+    },
+    {
+     "finding_id": "finding-9df1d17b5b1d8cd1331d36d8",
+     "text_ko": "의약품에 대해 적절한 서면 승인 규격에의 적합성 판정이 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Determinations of conformance to appropriate written specifications for acceptance are deficient for drug products."
+    },
+    {
+     "finding_id": "finding-bd72aeb50f1ebcbc195f64d9",
+     "text_ko": "배치가 이미 유통되었는지 여부와 관계없이, 배치 또는 그 구성 성분이 규격에 부적합한 경우를 철저히 검토하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "There is a failure to thoroughly review the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    }
+   ],
+   "inspector_names": [
+    "Lauren H Augustyniak"
+   ]
+  },
+  {
+   "document_id": "fda483-195300",
+   "slug": "fda483-195300",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Newton Laboratories, Inc.",
+   "firm_key": "newton laboratories",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-03-26",
+   "evidence_url": "https://www.fda.gov/media/195300/download",
+   "categories": [
+    "불만/회수",
+    "오염/교차오염 관리",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-9843ddc271a6bb76aa63f26c",
+     "text_ko": "불만 처리 절차에 품질관리부서가 조사 여부를 검토·결정할 수 있도록 하는 규정이 포함되지 않아 부적절했다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Complaint procedures are deficient in that they do not include provisions that allow for the review and determination of an investigation by the quality control unit."
+    },
+    {
+     "finding_id": "finding-9bed72dc948e9075288dce32",
+     "text_ko": "용기·마개 시스템(container closure systems)이 보관 및 사용 중 의약품의 변질 또는 오염을 일으킬 수 있는 예견 가능한 외부 요인으로부터 적절한 보호를 제공하지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Container closure systems do not provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination of the drug product."
+    },
+    {
+     "finding_id": "finding-b62a4bd10611d87453fcf2a5",
+     "text_ko": "서면 안정성시험 프로그램이 준수되지 않았다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "The written stability testing program is not followed."
+    }
+   ],
+   "inspector_names": [
+    "Martin M Kimani",
+    "John D Mcintosh"
+   ]
+  },
+  {
+   "document_id": "fda483-195301",
+   "slug": "fda483-195301",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Veterinary Pharmacy Corporation",
+   "firm_key": "veterinary pharmacy",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-03-19",
+   "evidence_url": "https://www.fda.gov/media/195301/download",
+   "categories": [
+    "무균보증/무균공정",
+    "오염/교차오염 관리",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-9bfa047d9319e1061ade9cc7",
+     "text_ko": "최악조건(worst-case)·가장 도전적이고 부하가 큰 조건에서 무균 생산 작업을 근접하게 모사하는 배지충전(media fill)을 실시하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions."
+    },
+    {
+     "finding_id": "finding-af3193e17bb6953937ea94b9",
+     "text_ko": "귀사의 생산구역 및 생산구역에 인접한 구역에서 오염이 관찰되었다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Contamination was observed in your production area and areas adjacent to production areas."
+    },
+    {
+     "finding_id": "finding-b62355729a94b857842245c1",
+     "text_ko": "금지명령 동의판결(decree of injunction)의 절차 요건에서 벗어났다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviation from the procedural requirements of a decree of injunction."
+    }
+   ],
+   "inspector_names": [
+    "Nicholas J Presto",
+    "Beatrix D Hippe",
+    "Vaishali J Patel"
+   ]
+  },
+  {
+   "document_id": "fda483-195303",
+   "slug": "fda483-195303",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Shilpa Medicare Limited",
+   "firm_key": "shilpa medicare",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-05-29",
+   "evidence_url": "https://www.fda.gov/media/195303/download",
+   "categories": [
+    "설비/시설",
+    "컴퓨터화시스템",
+    "일탈/CAPA/조사",
+    "공정밸리데이션",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-3a85583c6bdd75226a67de12",
+     "text_ko": "귀사는 다음의 공용 설비(전용이 아닌 설비)에 대해 청정 보관시간(Clean Hold Time, CHT) 및 오염 보관시간(Dirty Hold Time, DHT) 시험을 설정했으나, 이는 최악조건(worst-case) 분자를 근거로 하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "You established for Clean Hold Time (CHT) and Dirty Hold Time Study (DHT) for the following shared equipment (non-dedicated) that is used to manufacture : which was not based on the worst-case molecules."
+    },
+    {
+     "finding_id": "finding-79e18cbf41231747504bb552",
+     "text_ko": "기본 제조·관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지지 않았다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
+     "cfr_refs": [
+      "section 704(b)"
+     ]
+    },
+    {
+     "finding_id": "finding-7af1ec7081b8e69fb156cb07",
+     "text_ko": "원인 불명의 불일치(unexplained discrepancies)에 대한 조사가 항상 서면으로 기록되지는 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Written records are not always made of investigations into unexplained discrepancies."
+    },
+    {
+     "finding_id": "finding-a0f194cfb6611f9bcefdad2d",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위한 제조 및 공정 관리에 대한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-f3281967ceafc2484fd8f4e5",
+     "text_ko": "제조기록(production records)에 각 배치의 제조 및 관리에 관한 완전한 정보가 포함되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Production records do not contain complete information relating to the production and control of each batch."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195304",
+   "slug": "fda483-195304",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Jiangsu Hansoh Pharmaceutical Group Co Ltd.",
+   "firm_key": "jiangsu hansoh pharmaceutical group",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-04-24",
+   "evidence_url": "https://www.fda.gov/media/195304/download",
+   "categories": [
+    "공정밸리데이션",
+    "무균보증/무균공정",
+    "일탈/CAPA/조사",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-40fea6790150f3c1acd70a97",
+     "text_ko": "공정 중 자재 및 의약품의 특성에 변동을 일으킬 수 있는 제조공정의 성능을 검증하는 공정 중 관리(in-process controls)를 기술한 관리 절차가 수립되지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Control procedures are not established that describe in process controls which validate the performance ofthose manufacturing processes that may be responsible for causing variably in the characteristics of in-process materials and the drug product."
+    },
+    {
+     "finding_id": "finding-5109307ee8a40b0f3841b3fa",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established."
+    },
+    {
+     "finding_id": "finding-a3714fb71dbc5445fbbc704d",
+     "text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 원인 불명의 불일치 또는 배치나 그 구성 성분이 규격에 부적합한 경우를 철저히 조사하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure ofa batch or any of its components to meet any of its specifications whether or not the batch has already been distributed."
+    },
+    {
+     "finding_id": "finding-e0d5533906a2515ee32ca3e9",
+     "text_ko": "자동·기계·전자 설비의 정기 교정, 점검 및 확인이 적절한 성능을 보증하도록 설계된 서면 프로그램에 따라 수행되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Routine calibration, inspection, checking ofautomatic, mechanical, electronic equipment is not performed according to a written program designed to assure proper performance."
+    },
+    {
+     "finding_id": "finding-ea56b0caabbd997340a19e31",
+     "text_ko": "무균공정 구역의 환경조건 모니터링 시스템이 부적절했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas -ate deficient regarding the system for monitoring environmental conditions."
+    },
+    {
+     "finding_id": "finding-ffda94ad812780e7a9d33240",
+     "text_ko": "귀사는 무균 조건을 조성하기 위해 작업실과 설비를 세척·소독하는 적절한 시스템을 수립하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Your firm failed to establish an adequate system for cleaning and disinfecting the room and equipment to produce aseptic conditions."
+    }
+   ],
+   "inspector_names": [
+    "Sandra A Boyd",
+    "Karen A Briggs"
+   ]
+  },
+  {
+   "document_id": "fda483-195307",
+   "slug": "fda483-195307",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "PACKAGE SOLUTIONS LLC",
+   "firm_key": "package solutions",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-02-10",
+   "evidence_url": "https://www.fda.gov/media/195307/download",
+   "categories": [
+    "기타 품질시스템",
+    "불만/회수",
+    "표시/포장",
+    "안정성/보관"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-13816517b9aa94f0e7a69312",
+     "text_ko": "고유기기식별자(UDI)를 표시해야 하는 각 의료기기 버전 또는 모델에 대해 Global Unique Device Identification Database(GUDID)가 요구하는 정보를 제출하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The information required by the Global Unique Device Identification Database for each medical device version or model required to bear a unique device identifier (UDI) was not provided."
+    },
+    {
+     "finding_id": "finding-3b4549c77e74a7e19475d0ce",
+     "text_ko": "의료기기 파일(device files)이 수립·유지되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Medical device files have not been established and maintained."
+    },
+    {
+     "finding_id": "finding-582169383b95f353c6778966",
+     "text_ko": "적시 불만 처리(complaint handling) 절차에 정보의 접수·기록, 피드백이 불만에 해당하는지 판단하기 위한 정보 평가, 불만 조사, FDA 보고 필요성 판단, 불만 관련 제품의 처리, 시정(corrections) 또는 시정조치(corrective actions) 착수 필요성 판단에 대한 요건과 책임이 적절히 포함되지 않았다.",
+     "category_label_ko": "불만/회수",
+     "text_orig": "Procedures for timely complaint handling do not adequately include requirements and responsibilities for receiving and recording information, evaluating information to determine if the feedback constitutes a complaint, investigating complaints, determining the need to report the information to FDA, handling of complaint-related product and determining the need to initiate corrections or corrective actions."
+    },
+    {
+     "finding_id": "finding-859b1a72670a074edf8a32a0",
+     "text_ko": "품질경영시스템(QMS)에 필요한 적절한 프로세스의 관리에 위험 기반 접근법(risk-based approach)이 적절히 적용되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "A risk-based approach to the control of the appropriate processes needed for the quality management system has not been adequately applied."
+    },
+    {
+     "finding_id": "finding-b618171e63e1cd1043703196",
+     "text_ko": "의료기기 표시(label)에 801 Subpart B 및 21 CFR 830의 요건을 충족하는 고유기기식별자(UDI)가 표시되지 않았다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "The labels of the medical device(s) do not bear a unique device identifier (UDI) that meet the requirements of 801 Subpart B and 21 CFR 830.",
+     "cfr_refs": [
+      "21 CFR 830"
+     ]
+    },
+    {
+     "finding_id": "finding-c485eadc1e8ba58340f8d4d0",
+     "text_ko": "경영검토(management review)의 출력물에 검토한 입력 사항과, 품질경영시스템 및 그 프로세스의 적합성·적절성·효과성을 유지하는 데 필요한 개선 관련 결정 및 조치가 적절히 포함되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The output from management review did not adequately include the input reviewed and any decisions and actions related to improvement needed to maintain the suitability, adequacy, and effectiveness of the quality management system and its processes."
+    },
+    {
+     "finding_id": "finding-cdea62707dc4790ac082bc31",
+     "text_ko": "공정, 보관, 취급 및 유통 중 제품의 요건 적합성을 보존하기 위한 절차가 적절히 문서화되지 않았다.",
+     "category_label_ko": "안정성/보관",
+     "text_orig": "Procedures were not adequately documented for preserving the conformity ofproduct to requirements during processing, storage, handling, and distribution.",
+     "cfr_refs": [
+      "section 6"
+     ]
+    },
+    {
+     "finding_id": "finding-fe713078e2587c75d50df988",
+     "text_ko": "QMS가 효과적으로 실행·유지되고 있는지 판단하기 위한 내부감사(internal audits)를 계획된 주기로 실시하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Internal audits have not been conducted at planned intervals to determine whether the QMS is effectively implemented and maintained."
+    }
+   ],
+   "inspector_names": [
+    "Ebony D Sanon",
+    "Lorraine N Williams"
+   ]
+  },
+  {
+   "document_id": "fda483-195314",
+   "slug": "fda483-195314",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Blossom Pharmaceuticals",
+   "firm_key": "blossom pharmaceuticals",
+   "published_date": "2026-10-22",
+   "inspection_date": "2025-04-11",
+   "evidence_url": "https://www.fda.gov/media/195314/download",
+   "categories": [
+    "시험실/품질관리",
+    "설비/시설",
+    "품질부서 관리감독",
+    "교육/작업자",
+    "공정밸리데이션"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-33729bb459fd87032c274ad3",
+     "text_ko": "시험실 관리에 공정 중 자재(in-process materials)와 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격·기준 및 시험법의 수립이 포함되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards and test procedures designed to assure that in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-7276e5fd0bd867d52e0bee1b",
+     "text_ko": "설비와 기구가 의약품의 안전성, 확인, 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하도록 적절한 주기로 세척·유지관리·위생처리(sanitize)되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment and utensils are not cleaned, maintained and sanitized at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product."
+    },
+    {
+     "finding_id": "finding-76f7fe00895d2a7d0982bc65",
+     "text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지도 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
+    },
+    {
+     "finding_id": "finding-7bb162fbd89427958f71af1f",
+     "text_ko": "직원에게 담당 직무로 수행하는 특정 작업과 cGMP(current good manufacturing practices)에 대한 교육훈련이 제공되지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees are not given training in the particular operations they perform as part of their function and current good manufacturing practices.",
+     "cfr_refs": [
+      "21 CFR 211"
+     ]
+    },
+    {
+     "finding_id": "finding-87c020bf3008af5bbf214b49",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 대한 서면 절차가 수립·준수되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established and followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    },
+    {
+     "finding_id": "finding-92d2011f88049e4ad9f3940a",
+     "text_ko": "제조 및 공정 관리 기능을 수행할 때 서면 제조·공정 관리 절차를 준수하지 않았고, 수행 시점에 문서화하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Written production and process control procedures are not followed in the execution of production and process control functions and documented at the time of performance."
+    },
+    {
+     "finding_id": "finding-96f10d8125c0c6046d3d0f11",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물이 세척, 유지관리 및 적절한 작업을 용이하게 하기에 적합한 상태를 갖추지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Buildings used in the manufacture, processing, packing, or holding of a drug product do not have the suitable to facilitate cleaning, maintenance, and proper operations."
+    }
+   ],
+   "inspector_names": [
+    "Kellia N Hicks"
+   ]
+  },
+  {
+   "document_id": "fda483-195316",
+   "slug": "fda483-195316",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Apotek Production & Laboratorier AB",
+   "firm_key": "apotek production & laboratorier ab",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-01-29",
+   "evidence_url": "https://www.fda.gov/media/195316/download",
+   "categories": [
+    "무균보증/무균공정",
+    "시험실/품질관리",
+    "설비/시설",
+    "공정밸리데이션",
+    "컴퓨터화시스템",
+    "문서화/기록관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-17a9f1e39219fa29860f6ace",
+     "text_ko": "무균(sterile)으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정(aseptic process)의 적절한 밸리데이션이 포함되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-1b0a973414378c507129a78b",
+     "text_ko": "시험실 관리(laboratory controls)에 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 시험법의 수립이 포함되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-1bbe9832d9bc84a62fd8de72",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비가 의도된 용도의 작업을 용이하게 하도록 적절히 설계되거나 적절한 위치에 배치되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design and suitably located to facilitate operations for its intended use."
+    },
+    {
+     "finding_id": "finding-74cf098a90663eb04b88ebd9",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화·준수되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
+    },
+    {
+     "finding_id": "finding-a1bf0fb9076d9091a5712747",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위한 제조 및 공정 관리에 대한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-aaecb0248df6bf49ab5e3ebd",
+     "text_ko": "기본 제조·관리 기록 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지지 않았다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel."
+    },
+    {
+     "finding_id": "finding-b791fac20ea39682f95a7ac7",
+     "text_ko": "배치 제조·관리 기록(batch production and control records)에 제조 및 가공의 각 주요 단계 수행에 대한 문서화가 포함되지 않아 부적절했다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "The batch production and control records are deficient in that they do not include documentation of the accomplishment of each significant step in manufacturing and processing."
+    },
+    {
+     "finding_id": "finding-d175955f6e4cd27795cd8001",
+     "text_ko": "무균공정 구역의 환경조건 모니터링 시스템이 부적절했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions."
+    },
+    {
+     "finding_id": "finding-d8443f6758deb6fe932e1277",
+     "text_ko": "무균 및 발열성물질 부재(pyrogen-free)로 표방되는 의약품의 각 배치에 대해 해당 요건 적합 여부를 판정하기 위한 시험실 시험을 실시하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such requirements."
+    }
+   ],
+   "inspector_names": [
+    "Anastasia M Shields"
+   ]
+  },
+  {
+   "document_id": "fda483-195317",
+   "slug": "fda483-195317",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Q-Med AB",
+   "firm_key": "q-med ab",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-03-27",
+   "evidence_url": "https://www.fda.gov/media/195317/download",
+   "categories": [
+    "설비/시설",
+    "품질부서 관리감독",
+    "환경모니터링",
+    "일탈/CAPA/조사",
+    "무균보증/무균공정",
+    "기타 품질시스템",
+    "원자재/공급업체 관리",
+    "오염/교차오염 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-0986592cacae3dfdd3f688f4",
+     "text_ko": "귀사의 세척·소독(cleaning and disinfection) 프로그램은 원료의약품 및 완제의약품 제조시설의 (b)(4)를 제염(decontaminate)하고, 관리된 제조 환경에서의 미생물 오염 위험에 대응하기에 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Your firm’s cleaning and disinfection program is inadequate to decontaminate a@ ©) @) in drug substance and drug product manufacturing facilities and to address the risk of microbial contamination in controlled manufacturing environments."
+    },
+    {
+     "finding_id": "finding-218ffc9f013c6cd738133f10",
+     "text_ko": "품질부서(Quality Unit)가 자재 상태와 최종 제품의 처분(disposition)에 대한 관리를 보장하지 않아 귀사의 품질 시스템이 부적절했으며, 그 결과 출하승인되지 않은 자재가 제조에 사용되고 표시가 잘못된 의약품이 유통되었다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Your firm’s quality system is inadequate because the Quality Unit does not ensure control over material status and final product disposition, resulting in the use of unreleased materials for manufacturing and the distribution of incorrectly labelled drug products."
+    },
+    {
+     "finding_id": "finding-2daa84f313918814827a6602",
+     "text_ko": "환경모니터링(environmental monitoring) 프로그램이 (b)(4) 원료의약품(DS) 및 완제의약품(DP) 제조구역이 미생물 관리 상태로 유지됨을 보장하기에 적절하지 않았다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "The environmental monitoring program is not adequate to ensure that the manufacturing areas for ©) (4) DS and DP are maintained in a state of microbial control."
+    },
+    {
+     "finding_id": "finding-431fd6746a61c6d006607786",
+     "text_ko": "업체의 육안검사(visual inspection)가 육안검사 공정이 관리 상태에 있고 반복되는 일탈(deviation)이 효과적으로 조사 또는 시정됨을 보장하기에 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "The firm’s visual inspection is inadequate to ensure that the visual inspection process is under a state of control and that recurring deviations are effectively investigated or corrected."
+    },
+    {
+     "finding_id": "finding-4b0d7e01559bfe4e96a03a9e",
+     "text_ko": "귀사의 품질부서는 적절한 감독, 서면 문서화, 절차 준수 및 문서 관리를 유지하지 못했다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Your firm's quality unit has failed to maintain adequate oversight, written documentation, procedural adherence, and document control."
+    },
+    {
+     "finding_id": "finding-504ef3eec29e99bf8d1ec464",
+     "text_ko": "(b)(4)에 포함된 정보와 제조시설에서의 실제 시험 작업 사이에 불일치가 있었다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "There are discrepancies between the information included in the w@ and the testing operations at the manufacturing facility."
+    },
+    {
+     "finding_id": "finding-65309e0354d2f1e396f544bc",
+     "text_ko": "무균공정을 모사(simulate)하도록 설계된 절차가 의약품의 무균성을 보증하기에 부적절했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to simulate aseptic processes are inadequate to assure the sterility of the drug product."
+    },
+    {
+     "finding_id": "finding-817957f1df502632fc69b077",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 (b)(4) 완제의약품(DP)의 무균충전 준비(aseptic filling setup) 중 적절한 무균 기법(aseptic techniques)이 포함되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate aseptic techniques during aseptic filling setup fora@ ©) (4) DP."
+    },
+    {
+     "finding_id": "finding-8b7758e6b3db9dc3cce85add",
+     "text_ko": "무효 처리된 시험(invalid assays)을 조사하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "There is a failure to investigate invalid assays."
+    },
+    {
+     "finding_id": "finding-c7d203ebd1425660bbbcaea8",
+     "text_ko": "원료(components) 및 원자재(raw materials)를 제조에 사용하기 전에 적절히 시험·승인하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Components and raw materials are not adequately tested and approved prior to their use in manufacturing."
+    },
+    {
+     "finding_id": "finding-cc539f34708747796b0643c3",
+     "text_ko": "업체의 오염관리전략(contamination control strategy)이 (b)(4)가 상류(upstream) 원료의약품(DS) 제조구역 내에 일관되게 봉쇄(contained)된다는 적절한 보증을 제공하지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "The firm’s contamination control strategy does not provide adequate assurance that @@ ©) @) are consistently contained within the upstream drug substance (DS) manufacturing areas."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195318",
+   "slug": "fda483-195318",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "WuXi Biologics Ireland Limited",
+   "firm_key": "wuxi biologics ireland",
+   "published_date": "2026-10-22",
+   "inspection_date": "2025-12-16",
+   "evidence_url": "https://www.fda.gov/media/195318/download",
+   "categories": [
+    "설비/시설",
+    "시험실/품질관리",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-04ed792bedf41fbd1539e21d",
+     "text_ko": "(b)(4) 원료의약품(drug substance) 제조공정에 사용되는 설비가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "(4) equipment utilized in the mw drug substance manufacturing process is deficient."
+    },
+    {
+     "finding_id": "finding-69c6b1d873a15780f233ee40",
+     "text_ko": "[483 양식 머리말 정보: 10903 New Hampshire Avenue; White Oak Building 51, Room 2269, Silver Spring, MD 20993 / 실사기간 12/08/2025-12/16/2025 / Email: OPMABLA Inspection483Responses@fda.hhs.gov / FEI 3026506583 / 수신: Brendan McGrath, VP of Manufacturing and Ireland Site Lead / 업체: Wuxi Biologics Ireland Limited, Dundalk Science and Technology Park, Mullagharlin, Dundalk, County Louth, A91 X56F, Ireland / 실사 시설 유형: 원료의약품(Drug Substance) 제조업체] 제조 작업을 적절히 문서화하기에 서면 문서가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "10903 New Hampshire Avenue; White Oak Building 51, Room 2269 12/08/2025-12/16/2025 Silver Spring, MD 20993 Email: OPMABLA Inspection483Responses@fda.hhs.gov 3026506583 SUED Brendan McGrath, VP of Manufacturing and Ireland Site Lead Wuxi Biologics Ireland Limited Dundalk Science and Technology Park CITY, STATE, ZIP CODE, COUNTRY TYPE ESTABLISHMENT INSPECTED Mullagharlin, Dundalk, County Louth, A91 X56F, Ireland Drug Substance Manufacturer Written documents are inadequate to ensure proper documentation of manufacturing operations."
+    },
+    {
+     "finding_id": "finding-83057ce36ef0077e1d7b92a7",
+     "text_ko": "시험실 관리가 핵심 품질 및 안전성 특성에 대한 신뢰할 수 있는 분석 시험을 보장하기에 부적절했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls are inadequate to ensure reliable analytical testing of critical quality and safety attributes."
+    },
+    {
+     "finding_id": "finding-8b727ad8303dee8d252994dd",
+     "text_ko": "기준일탈(Out of Specification, OOS) 결과에 대한 시험실 조사 절차가 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Laboratory investigation procedures for Out of Specification (OOS) results are inadequate.",
+     "cfr_refs": [
+      "section 5"
+     ]
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195320",
+   "slug": "fda483-195320",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Steriscience Specialties Private Limited",
+   "firm_key": "steriscience specialties",
+   "published_date": "2026-10-22",
+   "inspection_date": "2024-11-22",
+   "evidence_url": "https://www.fda.gov/media/195320/download",
+   "categories": [
+    "컴퓨터화시스템",
+    "무균보증/무균공정",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-194dff8be6948f65c700fe23",
+     "text_ko": "기본 제조·관리 기록(master production and control records) 또는 기타 기록의 변경이 권한 있는 인원에 의해서만 이루어지도록 보장하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 관리가 이루어지지 않았다.",
+     "category_label_ko": "컴퓨터화시스템",
+     "text_orig": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel."
+    },
+    {
+     "finding_id": "finding-93228ab43d5b6400daac0dab",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정의 적절한 밸리데이션이 포함되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic process."
+    },
+    {
+     "finding_id": "finding-c2ab8d6da0774ad4d8ec61cd",
+     "text_ko": "서면 절차의 변경이 적절한 조직 단위에 의해 작성·검토·승인되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Changes to written procedures are not drafted, reviewed and approved by the appropriate organizational unit."
+    }
+   ],
+   "inspector_names": [
+    "Anastasia M Shields",
+    "Clinton J Lott"
+   ]
+  },
+  {
+   "document_id": "fda483-195321",
+   "slug": "fda483-195321",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Biomylz Private Limited",
+   "firm_key": "biomylz",
+   "published_date": "2026-10-22",
+   "inspection_date": "2026-02-09",
+   "evidence_url": "https://www.fda.gov/media/195321/download",
+   "categories": [
+    "설비/시설",
+    "품질부서 관리감독",
+    "시험실/품질관리",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-2502b20f2b7a0450001b0bc0",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구(utensils)를 포함한 설비의 세척 및 유지관리에 대한 서면 절차가 수립되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures are not established for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product."
+    },
+    {
+     "finding_id": "finding-28042f2a0891d0ccfe0f360c",
+     "text_ko": "품질관리부서(quality control unit)에 적용되는 책임과 절차가 완전히 준수되지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
+    },
+    {
+     "finding_id": "finding-8c6c37686a607e9258f6e04d",
+     "text_ko": "허용 가능한 통계적 절차로 선정된 대표 로트 또는 배치의 의약품 보관검체(reserve samples)를 변질 징후 확인을 위해 최소 연 1회 육안 검사하지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Reserve samples from representative sample lots or batches of drug products selected by acceptable statistical procedures are not examined visually at least once a year for evidence of deterioration.",
+     "cfr_refs": [
+      "section 5"
+     ]
+    },
+    {
+     "finding_id": "finding-dc4537bbc48118fbba8dc32b",
+     "text_ko": "귀사는 배치가 이미 유통되었는지 여부와 관계없이, 원인 불명의 불일치 또는 배치나 그 구성 성분이 규격에 부적합한 경우를 철저히 조사하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed."
+    },
+    {
+     "finding_id": "finding-f7299642b43a48b4cd30b102",
+     "text_ko": "시험실 기록에 설정된 규격 및 기준에의 적합을 보증하는 데 필요한 모든 시험, 검사 및 정량(assay)에서 얻은 완전한 데이터가 포함되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards."
+    },
+    {
+     "finding_id": "finding-fcfa8805648787860143eb08",
+     "text_ko": "귀사는 의약품의 제조, 가공, 포장 또는 보관에 사용되는 건물을 양호한 수리 상태로 유지하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Your firm failed to maintain buildings used in the manufacture, processing, packing, or holding of drug products in a good state of repair."
+    }
+   ],
+   "inspector_names": [
+    "Alan A. Rivera"
+   ]
+  },
+  {
+   "document_id": "fda483-195380",
+   "slug": "fda483-195380",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Collaborative Care Diagnostics, LLC",
+   "firm_key": "collaborative care diagnostics",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-02-09",
+   "evidence_url": "https://www.fda.gov/media/195380/download",
+   "categories": [
+    "기타 품질시스템",
+    "표시/포장"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-246ad676292008b4fe50815a",
+     "text_ko": "고유기기식별자(UDI)를 표시해야 하는 각 의료기기 버전 또는 모델에 대해 Global Unique Device Identification Database에 요구되는 정보를 제출하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The information required by the Global Unique Device Identification Database for each medical device version or model required to bear a unique device identifier (UDI) was not provided."
+    },
+    {
+     "finding_id": "finding-2e2fc0ca73c8c3ab0a2c3da0",
+     "text_ko": "제품 실현(product realization)에서의 위험관리 프로세스 중 하나 이상이 적절히 문서화되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "One or more processes for risk management in product realization have not been adequately documented."
+    },
+    {
+     "finding_id": "finding-761ec0d5adfc57bbd70042fc",
+     "text_ko": "의료기기 라벨에 고유기기식별자(UDI)가 쉽게 읽을 수 있는 평문(plain-text) 형식과 자동 식별 및 데이터 수집(AIDC) 기술 형식으로 표시되어 있지 않았다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "The medical device(s) label did not have a unique device identifier (UDI) present in easily readable plain-text and automatic identification and data capture (AIDC) technology."
+    }
+   ],
+   "inspector_names": [
+    "Tyler R Courtney"
+   ]
+  },
+  {
+   "document_id": "fda483-195513",
+   "slug": "fda483-195513",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Laboratorios Grifols, S.A.",
+   "firm_key": "laboratorios grifols",
+   "published_date": "2026-10-21",
+   "inspection_date": "2024-07-26",
+   "evidence_url": "https://www.fda.gov/media/195513/download",
+   "categories": [
+    "공정밸리데이션",
+    "시험실/품질관리",
+    "설비/시설",
+    "문서화/기록관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-4f9b839a0e3f22d767794255",
+     "text_ko": "귀사는 의약품이 표방하거나 표시된 확인(identity), 함량(strength), 순도(purity) 및 품질(quality)을 갖추도록 보증하기 위한 생산 및 공정 관리 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-7654765d169fcd796f665d7d",
+     "text_ko": "시험 기록이 시험 중 얻은 모든 데이터의 완전한 기록을 포함하지 않는 점에서 미흡했다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory records are deficient in that they do not include a complete record of all data obtained during testing."
+    },
+    {
+     "finding_id": "finding-ab11e51d03f9357191670236",
+     "text_ko": "세척 및 유지관리 서면 절차에 사용하는 방법, 장비 및 자재에 대한 충분히 상세한 기술이 포함되어 있지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures for cleaning and maintenance fail to include description in sufficient detail of methods, equipment and materials used."
+    },
+    {
+     "finding_id": "finding-ae324b9ac1f308ce643c5c61",
+     "text_ko": "제조 및 관리 기록(batch production and control records)이 제조의 각 주요 단계 수행에 대한 문서화를 포함하지 않는 점에서 미흡했다.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "The batch production and control records are deficient in that they do not include documentation of the accomplishment of each significant step in manufacturing."
+    }
+   ],
+   "inspector_names": [
+    "Irina Gaberman"
+   ]
+  },
+  {
+   "document_id": "fda483-195591",
+   "slug": "fda483-195591",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Axogen Corporation",
+   "firm_key": "axogen",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-04-29",
+   "evidence_url": "https://www.fda.gov/media/195591/download",
+   "categories": [
+    "설비/시설",
+    "환경모니터링",
+    "표시/포장",
+    "일탈/CAPA/조사",
+    "시험실/품질관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-29ef5ced6178e4c8fafba55e",
+     "text_ko": "AVANCE 제조에 사용하는 제조 건물에 오염을 방지하기 위한 적절한 관리수단이 없다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Manufacturing building used in the manufacture ofAVANCE does not have the adequate controls to prevent contamination."
+    },
+    {
+     "finding_id": "finding-3c95adcc9444ca85b6c1c906",
+     "text_ko": "환경모니터링 프로그램이 등급 구역(classified environment)을 보장하기에 미흡하다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "Environmental monitoring program is deficient to ensure classified environments."
+    },
+    {
+     "finding_id": "finding-4d37387e441da02dcd4e9045",
+     "text_ko": "AVANCE 최종 제품, 인쇄된 제품 라벨 및 보관 검체(retain sample)의 창고 보관을 기술하는 절차가 수립되지 않았다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "Procedures describing the warehousing ofAVANCE final product, printed product labels, and retain samples are not established."
+    },
+    {
+     "finding_id": "finding-bd12f800c7492b3a6d5bb875",
+     "text_ko": "방충·방서(pest control) 관련 일탈(deviation)에 대한 조사가 미흡했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Investigations into pest control deviations are deficient."
+    },
+    {
+     "finding_id": "finding-cb9e667e5fb2a913e78124a8",
+     "text_ko": "일탈(deviation) 관리가 제조 공정에 대한 품질 감독을 입증하기에 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviation management is inadequate to demonstrate quality oversight ofthe manufacturing process."
+    },
+    {
+     "finding_id": "finding-e66d4e47d60424c5cff834d6",
+     "text_ko": "시험실 관리가 적절히 수립되지 않았으며, AVANCE 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당한 시험법과 검체채취 계획이 포함되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls are not adequately established and do not include scientifically sound test procedures and sampling plans designed to assure that AVANCE drug product conform to appropriate standards of identity, strength, quality, and purity."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195592",
+   "slug": "fda483-195592",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Capricor, Inc.",
+   "firm_key": "capricor",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-05-30",
+   "evidence_url": "https://www.fda.gov/media/195592/download",
+   "categories": [
+    "품질부서 관리감독",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-4281863d279466354fa73eb0",
+     "text_ko": "품질관리부서에 적용되는 절차의 문서화(원문 문장 일부 누락).",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "Procedures applicable to the quality control unit in writing."
+    },
+    {
+     "finding_id": "finding-8eace48b1d1b6a0ba662fbba",
+     "text_ko": "(b)(4) 시설과 (b)(4) 간에 CGMP 준수를 보장하기 위해 각자의 역할, 운영 활동 및 책임을 규정하는 품질 계약(quality agreement)이 체결되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Quality agreements are not established between(b) (4)racilities and (B)(4) to delineate the roles, operational activities and responsibilities of each ensure compliance with CGMP."
+    },
+    {
+     "finding_id": "finding-c1f5816b419de906d4c0dc45",
+     "text_ko": "서면 절차를 준수하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Written procedures are not followed."
+    }
+   ],
+   "inspector_names": [
+    "Carl Perez",
+    "Ivey Choi"
+   ]
+  },
+  {
+   "document_id": "fda483-195593",
+   "slug": "fda483-195593",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Fort Worth Fertility P.A.",
+   "firm_key": "fort worth fertility pa",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-04-24",
+   "evidence_url": "https://www.fda.gov/media/195593/download",
+   "categories": [
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-070e2cfc50d3b679ce2436ee",
+     "text_ko": "HCT/P 기록 요약서에 수행한 모든 감염성 질환 검사의 목록과 결과 해석이 포함되어 있지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The summary of records for HCT/Ps did not contain a listing and an interpretation of results of all communicable disease tests performed."
+    },
+    {
+     "finding_id": "finding-0b991d24994ae0c1fb274651",
+     "text_ko": "HCT/P 공여자의 적격성을 공여자 선별 및 공여자 검사 결과에 근거하여 책임자가 판정하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The eligibility of an HCT/P donor was not determined by a responsible person, based on results of donor screening and donor testing."
+    },
+    {
+     "finding_id": "finding-3f41e8c778b540acff00fb59",
+     "text_ko": "공여자 적격성 판정이 요구되지 않았고 해당 공여자 적격성 요건이 충족되지 않은 HCT/P에 적절한 경고 문구를 눈에 띄게 표시하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "HCT/Ps for which the donor eligibility determination was not required and applicable donor eligibility requirements were not met were not prominently labeled with the appropriate warning statements."
+    },
+    {
+     "finding_id": "finding-de1eab62324062a5c5372c66",
+     "text_ko": "공여자에 대해 감염성 질병 인자 및 질병의 위험 요인과 임상적 증거를 확인하기 위한 관련 의무기록 검토를 통한 선별(screening)을 실시하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Donors were not screened by a review of relevant medical records for risk factors and clinical evidence of communicable disease agents and diseases."
+    },
+    {
+     "finding_id": "finding-f63a8536059e939eedb031c6",
+     "text_ko": "공여자 적격성(donor eligibility) 기록이 정확하지 않고, 지워지지 않는 방식으로 작성되지 않았으며, 판독 가능하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Donor eligibility records are not accurate, indelible and legible."
+    }
+   ],
+   "inspector_names": [
+    "Michelle Paxon"
+   ]
+  },
+  {
+   "document_id": "fda483-195594",
+   "slug": "fda483-195594",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Innovative Transfusion Medicine, Inc.",
+   "firm_key": "innovative transfusion medicine",
+   "published_date": "2026-10-20",
+   "inspection_date": "2024-10-07",
+   "evidence_url": "https://www.fda.gov/media/195594/download",
+   "categories": [
+    "기타 품질시스템",
+    "원자재/공급업체 관리"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-5edcfc563ead492def4976f7",
+     "text_ko": "일반 기록을 유지하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Failure to maintain general records."
+    },
+    {
+     "finding_id": "finding-94154f3c2fd8e075492f7b90",
+     "text_ko": "공여자가 HIV 감염 증거를 나타내는 반응성 검사 결과를 보인 후 3 역일(calendar days) 이내에 이전에 공여된 혈액 및 혈액 성분을 식별하기 위해 규정상 요구되는 모든 기록을 검토하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Failure to review all records required under the regulations to identify previously donated blood and blood components within 3 calendar days after a donor tests reactive for evidence of HIV infection indicating evidence of HIV infection."
+    },
+    {
+     "finding_id": "finding-a994ce5d21d6d0adb3125eba",
+     "text_ko": "추가 제조 목적의 혈액 및 혈액 성분 채취, 처리 및 보관에서 따라야 할 모든 단계를 포함한 서면 표준작업절차(SOP)를 항상 준수하지는 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Written standard operating procedures including all steps to be followed in the collection, processing and storage of blood and blood components for further manufacturing purposes were not always followed."
+    },
+    {
+     "finding_id": "finding-b3b87cf0eb206e61b47db958",
+     "text_ko": "공여자가 HCV 감염 증거를 나타내는 반응성 검사 결과를 보인 후 3 역일(calendar days) 이내에 이전에 공여된 혈액 및 혈액 성분을 식별하기 위해 규정상 요구되는 모든 기록을 검토하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Failure to review all records required under the regulations to identify previously donated blood and blood components within 3 calendar days after a donor tests reactive for evidence ofHCV infection indicating evidence of HCV infection."
+    }
+   ],
+   "inspector_names": [
+    "Sergio E Delgado",
+    "Nerming V Briones"
+   ]
+  },
+  {
+   "document_id": "fda483-195595",
+   "slug": "fda483-195595",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Lonza Portsmouth, Inc.",
+   "firm_key": "lonza portsmouth",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-06-06",
+   "evidence_url": "https://www.fda.gov/media/195595/download",
+   "categories": [
+    "기타 품질시스템",
+    "무균보증/무균공정",
+    "문서화/기록관리",
+    "환경모니터링",
+    "일탈/CAPA/조사",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-10985082c59f42d32c3298dd",
+     "text_ko": "CASGEVY 의약품 제조에 사용되는 (b)(4) 등급(Grade) 구역의 세척이 미흡하다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "(o) (4 Cleaning ofGrade areas used in the manufacture ofCASGEVY drug product is deficient."
+    },
+    {
+     "finding_id": "finding-42aa29cce2be69df5b6d0b33",
+     "text_ko": "무균 및/또는 무발열성을 표방하는 의약품의 각 배치에 대해 해당 요건 적합 여부를 판단하기 위한 시험을 적절히 수행하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Each batch of drug product purporting to be sterile and/or pyrogen-free is not adequately tested to determine conformance to such requirements."
+    },
+    {
+     "finding_id": "finding-8bda5b7f0ceda9f045c9c7d6",
+     "text_ko": "우수 문서화 관행(Good Documentation Practices)에 부합하지 않는 다음 관행이 관찰되었다. a.",
+     "category_label_ko": "문서화/기록관리",
+     "text_orig": "The following practices that are inconsistent with Good Documentation Practices were observed: a."
+    },
+    {
+     "finding_id": "finding-9df43eb6bd44855f87809169",
+     "text_ko": "방충·방서(pest control) 프로그램이 미흡했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Pest control program is deficient."
+    },
+    {
+     "finding_id": "finding-a8cf55dcc8d9a403169ac453",
+     "text_ko": "환경 모니터링(environmental monitoring) 및 관리가 미흡했다.",
+     "category_label_ko": "환경모니터링",
+     "text_orig": "Environmental monitoring and control are deficient."
+    },
+    {
+     "finding_id": "finding-b47980204824b6e9d5f5dcd3",
+     "text_ko": "CASGEVY 완제의약품의 무균 공정(aseptic processing)이 미흡했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing ofCASGEVY drug product is deficient."
+    },
+    {
+     "finding_id": "finding-d37b5c14812dae0b1522a342",
+     "text_ko": "일탈(deviation) 및 이상 사건(anomalous events) 관리가 근본 원인과 적절한 시정조치를 파악하기에 부적절했다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Management of deviations and anomalous events is inadequate to identify root causes and appropriate corrective § actions."
+    },
+    {
+     "finding_id": "finding-d6de377cb118fcbcc58b2f47",
+     "text_ko": "공조 설비(heating, ventilation, and air conditioning, HVAC)의 유지관리 및 관리가 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Heating, ventilation, and air conditioning maintenance and controls are inadequate."
+    },
+    {
+     "finding_id": "finding-f99fba289cf79736a04b9dd8",
+     "text_ko": "생물안전작업대(biological safety cabinet) 내에서 (b) (4)하도록 설계된 구역에 대해, 의약품 무균공정을 위한 구역 및 작업의 특성 분석(characterization)과 매핑(mapping)이 부적절했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Areas designed to (b) (4) in a biological safety cabinet are deficient regarding characterization and mapping of the areas and operations for aseptic processing ofdrug products."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195597",
+   "slug": "fda483-195597",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "FinVector Oy",
+   "firm_key": "finvector oy",
+   "published_date": "2026-10-20",
+   "inspection_date": "2024-05-28",
+   "evidence_url": "https://www.fda.gov/media/195597/download",
+   "categories": [
+    "기타 품질시스템",
+    "원자재/공급업체 관리",
+    "설비/시설",
+    "품질부서 관리감독"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1bae6e8abdafc9ab86cf25d9",
+     "text_ko": "시험성적서(COA)의 신뢰성을 정기적으로 확인하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Failure to check the reliability of Certificate of Analysis (COA) at Regular Intervals."
+    },
+    {
+     "finding_id": "finding-385733c2a5a4f4461e993ee6",
+     "text_ko": "용기 및 마개 공급업체 분석 성적서의 신뢰성 확립이 미흡하다. 시험 결과를 적절한 주기로 적절히 밸리데이션하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Establishment of the reliability of the container and closure supplier's report of analyses is deficient in that the test results are not appropriately validated at appropriate intervals."
+    },
+    {
+     "finding_id": "finding-505d925133645fcbc5213714",
+     "text_ko": "세척 및 유지관리에 관한 문서화된 절차에 유지관리 및 세척 일정이 포함되어 있지 않다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures for cleaning and maintenance fail to include maintenance and cleaning schedules."
+    },
+    {
+     "finding_id": "finding-8fab0a1a1ae2358d290cc2f5",
+     "text_ko": "귀사는 세포 감염과 관련하여 부착(adherent) (b)(4) 를 적절히 밸리데이션하지 않았다. 중요 파라미터의 특정 조합을 평가하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Your firm has not adequately validated your adherent (b) (4) regarding cell infection in that certain combinations of critical parameters have not been assessed."
+    },
+    {
+     "finding_id": "finding-f8ca49a6cb5258ebe244a973",
+     "text_ko": "품질관리부서가 의약품의 확인, 함량, 품질 및 순도에 영향을 미치는 모든 절차 또는 규격을 승인할 책임을 갖고 있지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The quality control unit lacks responsibility to approve all procedures or specifications impacting on the identity, strength, quality and purity of drug products."
+    }
+   ],
+   "inspector_names": [
+    "Gene D Arcy",
+    "Lewis K Antwi"
+   ]
+  },
+  {
+   "document_id": "fda483-195600",
+   "slug": "fda483-195600",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "CMC lCOS Biologics, Inc.",
+   "firm_key": "cmc lcos biologics",
+   "published_date": "2026-10-20",
+   "inspection_date": "2016-04-18",
+   "evidence_url": "https://www.fda.gov/media/195600/download",
+   "categories": [
+    "일탈/CAPA/조사",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-01f671371dac4ae1bb83a83f",
+     "text_ko": "생산 중 발생한 일탈(deviation)을 철저히 조사하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviations during production have not been thoroughly investigated."
+    },
+    {
+     "finding_id": "finding-6322ff3a8d924b0b78f07ad8",
+     "text_ko": "중요 설비의 예방 유지관리를 문서화된 절차에 따라 수행하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Preventative maintenance ofcritical equipment is not performed per written procedures."
+    },
+    {
+     "finding_id": "finding-f3dfb3ac151db863251640e7",
+     "text_ko": "일탈 관리(deviation management)에 대한 표준작업절차(SOP)를 준수하지 않았다. 구체적으로, a.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Failure to follow standard operating procedure for deviation management, Specifically, a."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195601",
+   "slug": "fda483-195601",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Genlbet Biopbarmaceuticals SA",
+   "firm_key": "genlbet biopbarmaceuticals",
+   "published_date": "2026-10-20",
+   "inspection_date": "2023-01-31",
+   "evidence_url": "https://www.fda.gov/media/195601/download",
+   "categories": [
+    "오염/교차오염 관리",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-998b328fe5371ec6f2569dde",
+     "text_ko": "교차오염(cross-contamination) 방지를 보장하기 위한 오염 제거(decontamination)가 불완전하거나 적절히 입증되지 않았다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Decontamination is incomplete or not adequately demonstrated to ensure prevention of cross-contamination."
+    },
+    {
+     "finding_id": "finding-b6a151e99ae34ae1b4daf8ce",
+     "text_ko": "장비 세척 공정이 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment cleaning processes are inadequate."
+    },
+    {
+     "finding_id": "finding-faf3af0057f11b42577373bf",
+     "text_ko": "설비의 제염, 세척 및 유지관리에 대한 서면 절차에 사용 전 설비를 오염으로부터 보호하기 위한 충분한 세부사항이 포함되지 않아 부적절했다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Written procedures for decontamination, cleaning, and maintenance of equipment are deficient regarding sufficient details to protect equipment from contamination prior to use."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195604",
+   "slug": "fda483-195604",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "AVEM Labs LLC",
+   "firm_key": "avem labs",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-05-21",
+   "evidence_url": "https://www.fda.gov/media/195604/download",
+   "categories": [
+    "설비/시설",
+    "표시/포장",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-214b1e3a3edebe962a2e441d",
+     "text_ko": "측정에 사용하는 설비를 정해진 일정에 따라 교정하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used for measuring was not calibrated according to established schedules."
+    },
+    {
+     "finding_id": "finding-56df7e07d952bc41426672c6",
+     "text_ko": "표시(labeling) 절차에 라벨 정확성 확인이 포함되어 있지 않았다.",
+     "category_label_ko": "표시/포장",
+     "text_orig": "Labeling procedures did not include verification of label accuracy."
+    },
+    {
+     "finding_id": "finding-5d358956b2c6bfc26b5aadb4",
+     "text_ko": "검사와 시험으로 결과를 완전히 검증할 수 없는 공정을 수립된 절차에 따라 밸리데이션·승인하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Processes with results which could not be fully verified by inspection and tests, were not validated and approved according to established procedures."
+    },
+    {
+     "finding_id": "finding-8e3b8e3ad66a0fe13515e4a8",
+     "text_ko": "HCT/P 투여일을 알 수 없는 경우, HCT/P 관련 기록을 유통일, 처분일 또는 만료일 중 가장 늦은 날로부터 최소 10년간 보존하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Records pertaining to HCT/Ps were not retained at least 10 years after the date of distribution, disposition, or expiration, whichever was latest when the date of administration of the HCT/P was unknown."
+    },
+    {
+     "finding_id": "finding-db49fd7c54f7da23001c3cf9",
+     "text_ko": "소모품(supplies) 입고 기록을 유지하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Documentation of the receipt of supplies was not maintained."
+    }
+   ],
+   "inspector_names": [
+    "Garrad R Poole",
+    "Laurissa S Flowers"
+   ]
+  },
+  {
+   "document_id": "fda483-195605",
+   "slug": "fda483-195605",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Conceive Fertility Center",
+   "firm_key": "conceive fertility center",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-06-13",
+   "evidence_url": "https://www.fda.gov/media/195605/download",
+   "categories": [
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1b8f0c28ae4da1159b881810",
+     "text_ko": "HCT/P 공여자의 검사, 선별 및 적격성 판정 절차를 수립·유지하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "You did not establish and maintain procedures for testing, screening and determining the eligibility of HCT/P donors."
+    },
+    {
+     "finding_id": "finding-bc878faf7667405b622ce508",
+     "text_ko": "공여자 적격성 판정 완료 후, HCT/P에 선별 및 검사 결과에 근거하여 공여자가 적격 또는 부적격으로 판정되었는지에 관한 진술서가 첨부되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "After the completion of the donor-eligibility determination, HCT/Ps were not accompanied with a statement whether the donor has been determined to be eligible or ineligible, based on the results of screening and testing."
+    },
+    {
+     "finding_id": "finding-bda2dbd5bc06b53e4b5cd3cd",
+     "text_ko": "HCT/P 공여자에 관한 정보가 영어로 작성되지 않았으며, 번역 대상 문서를 구체적으로 특정한 번역자의 진정성 진술서(statement of authenticity)도 첨부되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Information on of donors of HCT/Ps were not in English and not accompanied by a statement of authenticity by the translator that specifically identifies the translated document."
+    },
+    {
+     "finding_id": "finding-dd7b41e74386477487fc8054",
+     "text_ko": "거대세포바이러스(cytomegalovirus, CMV) 반응성 검사 결과가 나온 공여자의 HCT/P 출하에 관한 표준작업절차(SOP)를 수립·규정·문서화·이행하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "A standard operating procedure for the release of HCT/Ps from donors that test reactive for cytomegalovirus (CMV) was not established, defined, documented and implemented."
+    },
+    {
+     "finding_id": "finding-fb37e9f73f07af1449a29be8",
+     "text_ko": "HCT/P 공여자의 적격성이 공여자 선별(donor screening) 및 공여자 검사(donor testing) 결과에 근거하여 책임자에 의해 판정·문서화되지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The eligibility of an HCT/P donor was not determined and documented by a responsible person, based on results of donor screening and donor testing.",
+     "cfr_refs": [
+      "section 5"
+     ]
+    }
+   ],
+   "inspector_names": [
+    "Ramon L Gonzalez-Prieto"
+   ]
+  },
+  {
+   "document_id": "fda483-195607",
+   "slug": "fda483-195607",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Lonza Biologics, Inc.",
+   "firm_key": "lonza biologics",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-04-16",
+   "evidence_url": "https://www.fda.gov/media/195607/download",
+   "categories": [
+    "공정밸리데이션",
+    "기타 품질시스템",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-21c330825a35afbc794848c6",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-bea97fa05737778bbb66d032",
+     "text_ko": "의약품 창고 보관(warehousing)에 관한 절차를 준수하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Procedures describing the warehousing of drug products are not followed."
+    },
+    {
+     "finding_id": "finding-f6eac234c4622968deb39004",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위한 절차가 준수되지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not followed."
+    }
+   ],
+   "inspector_names": [
+    "Christian Lynch",
+    "Laurel A Beer"
+   ]
+  },
+  {
+   "document_id": "fda483-195614",
+   "slug": "fda483-195614",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "BioLife Plasma Services L.P.",
+   "firm_key": "biolife plasma services",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-03-20",
+   "evidence_url": "https://www.fda.gov/media/195614/download",
+   "categories": [
+    "원자재/공급업체 관리",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1524f8b144690f03a87509c5",
+     "text_ko": "부적합한 혈액 및 혈액성분이 추가 제조용으로 출고되는 것을 방지하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Failure to prevent the release of unsuitable blood and blood components for further manufacturing."
+    },
+    {
+     "finding_id": "finding-29acaebcd54187dea2ee282b",
+     "text_ko": "채혈 전에 혈액 또는 혈액성분 공여자의 적격성을 판정하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Failure to determine the eligibility of a donor of blood or blood components before collection."
+    },
+    {
+     "finding_id": "finding-7d2f9ec8049fd3545b16d84f",
+     "text_ko": "책임 의사가 혈액 및 혈액성분 채취 관련 업무를 부적절하게 위임했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "The responsible physician improperly delegated activities related to the collection of blood and blood components."
+    },
+    {
+     "finding_id": "finding-a2aec78bc40825a344d87e4c",
+     "text_ko": "적격성 기준에 따라 공여자로서 부적격으로 판정된 공여자에게 통보하기 위한 합리적인 시도를 하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Failure to make reasonable attempts to notify a donor who has been determined not be to eligible as a donor based on eligibility criteria."
+    },
+    {
+     "finding_id": "finding-c4943d38cc5661d400c894b4",
+     "text_ko": "표준작업절차(SOP)에 공여자 적격 판정 검사 및 측정의 수행 방법에 대한 서면 기술이 포함되어 있지 않았으며, 여기에는 적격성 판정 요소가 되는 검사 또는 절차의 최솟값과 최댓값이 포함된다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "The standard operating procedure fails to include written descriptions of methods for performing donor qualifying tests and measurements, including minimum and maximum values for a test or procedure whena factor in determining acceptability."
+    }
+   ],
+   "inspector_names": [
+    "Shelley H Beausoleil"
+   ]
+  },
+  {
+   "document_id": "fda483-195620",
+   "slug": "fda483-195620",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Biomat USA, Inc.",
+   "firm_key": "biomat usa",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-01-09",
+   "evidence_url": "https://www.fda.gov/media/195620/download",
+   "categories": [
+    "설비/시설",
+    "원자재/공급업체 관리",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-175049a5b62a82b3cad8069f",
+     "text_ko": "21 CFR 606에 규정된 공식 요건의 준수를 보증할 수 있도록 설계된 대로 설비가 작동하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Failure of equipment to perform in the manner for which it was designed so as to assure compliance with the official requirements prescribed in 21 CFR 606.",
+     "cfr_refs": [
+      "21 CFR 606"
+     ]
+    },
+    {
+     "finding_id": "finding-9016ea5484ab6a9231c9b293",
+     "text_ko": "추가 제조 목적의 혈액 및 혈액성분 채취 시 따라야 할 모든 단계를 포함한 문서화된 표준작업절차를 항상 수립하지는 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Written standard operating procedures including all steps to be followed in the collection of blood and blood components for further manufacturing purposes were not always established."
+    },
+    {
+     "finding_id": "finding-9c82904dddedb84dc0ceeb82",
+     "text_ko": "혈액 및 혈액 성분의 각 단위 채취 시 각 주요 단계의 수행과 동시에 기록을 작성하지 않아 모든 단계를 명확히 추적할 수 없었다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Records are not concurrently maintained with the performance of each significant step in the collection of each unit of blood and blood components so that all steps can be clearly traced."
+    },
+    {
+     "finding_id": "finding-be5970e71cca6a952d47ad8c",
+     "text_ko": "설명되지 않은 불일치(unexplained discrepancy) 및 로트 또는 단위가 규격에 부적합한 경우에 대해 철저한 조사를 실시하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Failure to perform a thorough investigation of an unexplained discrepancy anda failure of a lot or unit to meet any of its specifications."
+    }
+   ],
+   "inspector_names": [
+    "Emily B Camire"
+   ]
+  },
+  {
+   "document_id": "fda483-195622",
+   "slug": "fda483-195622",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "GlaxoSmithKline Biologicals SA",
+   "firm_key": "glaxosmithkline biologicals",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-02-27",
+   "evidence_url": "https://www.fda.gov/media/195622/download",
+   "categories": [
+    "공정밸리데이션",
+    "무균보증/무균공정",
+    "기타 품질시스템",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-75e69ba7cc4c304953bcf0f6",
+     "text_ko": "귀사는 의약품이 표방하거나 표시한 확인, 함량, 순도 및 품질을 갖추도록 보증하기 위해 설계된 생산 및 공정 관리에 관한 문서화된 절차를 수립하지 않았다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess."
+    },
+    {
+     "finding_id": "finding-77b51442cadc9ca9bc13a04c",
+     "text_ko": "무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions."
+    },
+    {
+     "finding_id": "finding-89bc00c39c464db2d2f7eb35",
+     "text_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계된 절차에 무균공정 및 멸균 공정의 적절한 밸리데이션이 포함되어 있지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization process.",
+     "cfr_refs": [
+      "section 6"
+     ]
+    },
+    {
+     "finding_id": "finding-b20aaf9a3686e0fb3b8fff0c",
+     "text_ko": "무균으로 표방되는 의약품의 미생물 오염을 방지하기 위해 설계된 절차를 수립·문서화·준수하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written and followed."
+    },
+    {
+     "finding_id": "finding-b4e92b5eb37d76d6833ed261",
+     "text_ko": "컴퓨터 및 관련 시스템의 처방(formulas) 입력값과 출력값에 대해 정확성 확인을 하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Input to and output from the computer and related systems of formulas are not checked for accuracy."
+    },
+    {
+     "finding_id": "finding-dde272b36f8dc2f48c2b576f",
+     "text_ko": "서면 생산 및 공정 관리 절차로부터의 일탈(deviation)에 대한 타당성을 입증하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Deviations from written production and process control procedures are not justified."
+    }
+   ]
+  },
+  {
+   "document_id": "fda483-195627",
+   "slug": "fda483-195627",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Kamada Ltd.",
+   "firm_key": "kamada",
+   "published_date": "2026-10-20",
+   "inspection_date": "2023-03-02",
+   "evidence_url": "https://www.fda.gov/media/195627/download",
+   "categories": [
+    "설비/시설",
+    "공정밸리데이션",
+    "무균보증/무균공정"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-4c649752629b9e694e6011d4",
+     "text_ko": "시설이 양호한 수리 상태로 유지되지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Facilities are not in state of good repair."
+    },
+    {
+     "finding_id": "finding-6746cec6402daf6fac5d0f23",
+     "text_ko": "(b)(4) 단계에서 사용하는 (b)(4) 에 대한 적절한 공정 밸리데이션이 (b)(4) 에 대해 이루어지지 않았으며(원문 OCR 일부 손상), (b)(4) 의 부적절한 취급(mishandling)을 초래했다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Adequate process validation for (b) (4) used during the (b) (4) =E step was not for(b) (4) Jr resulted in mishandling of (b) ("
+    },
+    {
+     "finding_id": "finding-70ba7983e7c09b4d28035254",
+     "text_ko": "무균 충전 셋업 절차를 관찰하는 동안 충전실(실 (b)(4))에서 다음 사항이 확인되었다. a.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "During observation of aseptic filling setup procedure, the followings were noted in filling suite\"(room(b) ( a."
+    },
+    {
+     "finding_id": "finding-8c7f8bdfe32bcf82e988f8a0",
+     "text_ko": "각종 생산 및 공정 관리 업무를 수행할 때 사내 SOP, 설비 제조사 권고사항 및 공정 관리 절차를 준수하지 않았고, 설비와 공정에 문제가 발생하면 밸리데이션되지 않은 \"amended\"(수정) 절차를 사용했다.",
+     "category_label_ko": "공정밸리데이션",
+     "text_orig": "Internal SOPs, recommendations of the equipment's manufacturer and process control procedures in execution of various production and process control functions are not followed, and non -validated \"amended\" procedures are used when equipment and processes fail."
+    },
+    {
+     "finding_id": "finding-ea560bce77e87a107e20e5f1",
+     "text_ko": "다품목 시설에 보관되는 원료의약품의 적절한 표시를 보장하고 혼동(mix-up)을 방지하기 위한 (b) (4) 원료의약품의 표시(labelling)에 대한 적절한 서면 절차를 수립하지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Failure to establish adequate written procedures for the labelling of the (b) (4) drug substance) to assure the proper labelling and to prevent mix ups of the drug substance stored in multi -product facility."
+    }
+   ],
+   "inspector_names": [
+    "Pete Amin",
+    "Olga Simakova"
+   ]
+  },
+  {
+   "document_id": "fda483-195629",
+   "slug": "fda483-195629",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "CoreRX Inc.",
+   "firm_key": "corerx",
+   "published_date": "2026-10-20",
+   "inspection_date": "2025-03-20",
+   "evidence_url": "https://www.fda.gov/media/195629/download",
+   "categories": [
+    "품질부서 관리감독",
+    "원자재/공급업체 관리",
+    "설비/시설",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1ac8d7c79972cbe0ae7ac30c",
+     "text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing."
+    },
+    {
+     "finding_id": "finding-6bd0b146ad6bf4172a026b74",
+     "text_ko": "원료 및 의약품 보관에 관한 문서화된 절차를 준수하지 않았다. 구체적으로, (원문 판독 불가) A.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Written procedures are not followed for the storage of components and dnig product Specifically, MO) MWD A."
+    },
+    {
+     "finding_id": "finding-b76ce207117ce7dfa4d71774",
+     "text_ko": "제조에 사용하는 건물, 청결하고 위생적인 상태로 [원문 일부 누락].",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Buildings used in the manufacture, in a clean and sanitary condition."
+    },
+    {
+     "finding_id": "finding-bb0cdfdb36f2bbf3746f90f8",
+     "text_ko": "설명되지 않은 불일치(unexplained discrepancy) 및 배치 또는 그 원료가 규격에 부적합한 경우에 대해, 해당 배치의 기출하 여부와 관계없이 철저한 검토를 하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    }
+   ],
+   "inspector_names": [
+    "Peng Zhou",
+    "Thai D Truong"
+   ]
+  },
+  {
+   "document_id": "fda483-195630",
+   "slug": "fda483-195630",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "GlaxoSmithKline Vaccines Srl",
+   "firm_key": "glaxosmithkline vaccines",
+   "published_date": "2026-10-20",
+   "inspection_date": "2024-01-26",
+   "evidence_url": "https://www.fda.gov/media/195630/download",
+   "categories": [
+    "시험실/품질관리",
+    "일탈/CAPA/조사",
+    "교육/작업자",
+    "품질부서 관리감독"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-1d5ceb2c4937a73a8531fa98",
+     "text_ko": "수립된 시험실 관리 체계를 준수하지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Established laboratory control mechanisms are not followed."
+    },
+    {
+     "finding_id": "finding-406d1c44b6314d2ed22e0435",
+     "text_ko": "배치가 이미 유통되었는지 여부와 관계없이, 설명되지 않은 불일치 및 배치나 그 구성 성분이 규격을 충족하지 못한 경우를 철저히 검토하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed."
+    },
+    {
+     "finding_id": "finding-5205877fc29770d5353219d8",
+     "text_ko": "의약품 제조 및 가공에 종사하는 직원이 배정된 업무 수행에 필요한 교육훈련을 받지 않았다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Employees engaged in the manufacture and processing of a drug product lack the training required to perform their assigned functions."
+    },
+    {
+     "finding_id": "finding-80cc8bfec1e4e91c91bf19c4",
+     "text_ko": "품질관리부서에 적용되는 책임과 절차를 완전히 준수하지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not fully followed."
+    }
+   ],
+   "inspector_names": [
+    "Roger F Zabinski"
+   ]
+  },
+  {
+   "document_id": "fda483-195632",
+   "slug": "fda483-195632",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Biomat USA Inc",
+   "firm_key": "biomat usa",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-04-14",
+   "evidence_url": "https://www.fda.gov/media/195632/download",
+   "categories": [
+    "기타 품질시스템",
+    "원자재/공급업체 관리",
+    "일탈/CAPA/조사"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-033c6626c3140d0fbfa9d8da",
+     "text_ko": "공여자 기록, 처리 기록 및 일반 기록을 유지하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Failure to maintain donor, processing and general records."
+    },
+    {
+     "finding_id": "finding-1df06f792d570511c66ae661",
+     "text_ko": "공여자에게 교육 자료를 적절한 형태로, 공여자가 이해할 수 있도록 고안된 방식으로 제시하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Failure to present educational material to the donor in an appropriate form and in a manner designed to be understood by the donor."
+    },
+    {
+     "finding_id": "finding-31c215e26e81b6f1285ba674",
+     "text_ko": "설명되지 않은 불일치에 대해 철저한 조사를 수행하지 않았고 결론 및 후속 조치를 기록하지 않았다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Failure to perform a thorough investigation and makea record of the conclusions and follow-up of an unexplained discrepancy."
+    },
+    {
+     "finding_id": "finding-d67ae5c1f75de6d51c6a9bbb",
+     "text_ko": "[원문 일부 누락] 목적의 혈액 및 혈액 성분 채취 및 보관에서 따라야 할 모든 단계를 포함한 서면 표준작업절차(SOP)를 항상 준수하지는 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Written standard operating procedures including all steps to be followed in the collection and storage of blood and blood components for were not always followed."
+    }
+   ],
+   "inspector_names": [
+    "Elyshia Q Danaher"
+   ]
+  },
+  {
    "document_id": "fda483-195634",
    "slug": "fda483-195634",
    "agency": "FDA",
@@ -87325,6 +89591,188 @@
      "category_label_ko": "기타 품질시스템",
      "text_orig": "A standard operating procedure is not available or is deficient in support of©® drug substance manufacture."
     }
+   ]
+  },
+  {
+   "document_id": "fda483-195673",
+   "slug": "fda483-195673",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Jubilant HollisterStier LLC",
+   "firm_key": "jubilant hollisterstier",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-06-17",
+   "evidence_url": "https://www.fda.gov/media/195673/download",
+   "categories": [
+    "품질부서 관리감독",
+    "일탈/CAPA/조사",
+    "시험실/품질관리",
+    "원자재/공급업체 관리",
+    "설비/시설"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-10532f100fd49ba96c5e243c",
+     "text_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지 않았다.",
+     "category_label_ko": "품질부서 관리감독",
+     "text_orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed."
+    },
+    {
+     "finding_id": "finding-2fdf8e171a70ab2b27f5afeb",
+     "text_ko": "설명되지 않은 불일치에 대한 조사의 문서 기록에 결론과 후속 조치가 항상 포함되어 있지는 않다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "Written records of investigations into unexplained discrepancies do not always include the conclusions and follow-up."
+    },
+    {
+     "finding_id": "finding-5880a1efd029adbd40f8e974",
+     "text_ko": "수립된 시험 절차를 준수하지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Established test procedures are not followed."
+    },
+    {
+     "finding_id": "finding-672cac838024ce05c969ed26",
+     "text_ko": "시험실 관리에 원료가 확인, 함량, 품질 및 순도에 관한 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 검체 채취 계획의 수립이 포함되어 있지 않다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate sampling plans designed to assure that components conform to appropriate standards of identity, strength, quality and purity."
+    },
+    {
+     "finding_id": "finding-6ef91396071891f2787dc3e6",
+     "text_ko": "원료 시험이 미흡하다. 각 원료를 순도, 함량 및 품질에 관한 모든 적절한 문서화된 규격에 대한 적합성을 시험하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Component testing is deficient in that each component is not tested for conformity with all appropriate written specifications for purity, strength, and quality."
+    },
+    {
+     "finding_id": "finding-933c0531259d34321e0757d3",
+     "text_ko": "원료 보관에 관한 서면 절차를 준수하지 않았다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Written procedures are not followed for the storage of components."
+    },
+    {
+     "finding_id": "finding-98cf521d9aac6ede8368bcad",
+     "text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용하는 장비가 의도된 용도의 작업을 용이하게 하는 적절한 설계를 갖추지 않았다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "Equipment used in the manufacture, processing, packing or holding of drug products is not of appropriate design to facilitate operations for its intended use."
+    },
+    {
+     "finding_id": "finding-a75c8400d03ff3d0de39271f",
+     "text_ko": "시험법의 감도(sensitivity)가 확립되지 않았다.",
+     "category_label_ko": "시험실/품질관리",
+     "text_orig": "The sensitivity of test methods have not been established."
+    }
+   ],
+   "inspector_names": [
+    "Katherine E Jacobitz",
+    "Walden H Lee",
+    "Homero W Aguilar",
+    "Bryan L Mcguckin"
+   ]
+  },
+  {
+   "document_id": "fda483-195802",
+   "slug": "fda483-195802",
+   "agency": "FDA",
+   "source": "FDA 483",
+   "firm_name": "Greenwich Rx",
+   "firm_key": "greenwich rx",
+   "published_date": "2026-10-21",
+   "inspection_date": "2026-09-09",
+   "evidence_url": "https://www.fda.gov/media/195802/download",
+   "categories": [
+    "무균보증/무균공정",
+    "오염/교차오염 관리",
+    "원자재/공급업체 관리",
+    "설비/시설",
+    "교육/작업자",
+    "기타 품질시스템"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-00a400c157840afa54f39237",
+     "text_ko": "기류 시각화 시험(smoke study)을 동적 조건(dynamic conditions)에서 실시하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Smoke studies were not performed under dynamic conditions."
+    },
+    {
+     "finding_id": "finding-0ec81e98db6cf2a798a35f6d",
+     "text_ko": "작업자가 오염 방지를 위한 장갑 교체 및 소독을 드물게 실시했다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Personnel infrequently changed and sanitized gloves to prevent contamination."
+    },
+    {
+     "finding_id": "finding-14098f48a08dafc4cea30169",
+     "text_ko": "제품의 사용 목적상 문제가 될 수 있는 엔도톡신(endotoxin) 오염을 유발하지 않는지 검증되지 않은 원료, 용기 또는 기타 자재를 사용해 조제(compounding)했다.",
+     "category_label_ko": "원자재/공급업체 관리",
+     "text_orig": "Compounding with components, containers or other materials that have not been verified to assure that they do not contribute endotoxin contamination that may be objectionable given the product's intended use."
+    },
+    {
+     "finding_id": "finding-2a79cb94e6be826797c59f0e",
+     "text_ko": "최악 조건(worst-case), 가장 도전적이고 스트레스가 큰 조건에서 무균 생산 공정(aseptic production operations)을 충실히 모사하는 배지충전(media fill)을 실시하지 않았다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Failure to conduct media fills that closely simulate aseptic production operations under the worst-case, most-challenging, and stressful conditions."
+    },
+    {
+     "finding_id": "finding-2bff35d322ce41dc57701e41",
+     "text_ko": "시설 설계가 더 높은 등급의 공기가 있는 청정 등급 구역(classified area)으로 낮은 등급의 공기가 유입되도록 허용하는 것으로 관찰되었다.",
+     "category_label_ko": "설비/시설",
+     "text_orig": "The facility design was observed to allow the influx of lesser quality air into a classified area containing higher quality air."
+    },
+    {
+     "finding_id": "finding-3886774ca9a1cb2452147521",
+     "text_ko": "작업자가 무균복(gowning apparel)을 부적절하게 착용하여 무균복이 오염되었을 수 있다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Personnel donned gowning apparel improperly, in a way that may have caused the gowning apparel to become contaminated."
+    },
+    {
+     "finding_id": "finding-3a061f81e1f33bee394c6441",
+     "text_ko": "귀사는 인접 구역에서 공사가 진행되는 동안 생산 환경과 제품의 오염을 방지하기 위한 적절한 관리 없이 의약품을 생산했다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Your firm produced drugs while construction was underway in an adjacent area without adequate controls to prevent contamination of the production environment and product."
+    },
+    {
+     "finding_id": "finding-3ef40d39e212a75c95d73fd3",
+     "text_ko": "작업자가 청정구역(critical area) 또는 그에 바로 인접한 구역에서 빠르게 움직이는 것이 관찰되었으며, 이로 인해 일방향 기류(unidirectional airflow)가 교란되었을 가능성이 있다.",
+     "category_label_ko": "교육/작업자",
+     "text_orig": "Personnel were observed moving quickly in a critical area or in an area immediately adjacent to a critical area likely causing disrnption ofunidirectional airflow."
+    },
+    {
+     "finding_id": "finding-80885170a88f08146b0bc030",
+     "text_ko": "ISO 5 구역 및 생산 구역에 인접한 구역에서 미생물 오염이 존재했다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "Microbial contamination was present in the ISO 5 area and areas adjacent to production areas."
+    },
+    {
+     "finding_id": "finding-9ba0954d5ab238d11d880695",
+     "text_ko": "작업자가 ISO 5 구역에서 \"first air\"의 흐름이 차단되거나 교란되는 위치에서 무균 조작(aseptic manipulation)을 수행하는 것이 관찰되었다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Personnel were observed conducting aseptic manipulations where the movement of \"first air\" in the ISO 5 area is blocked or disrupted."
+    },
+    {
+     "finding_id": "finding-a9406e29764ec6db4179be7b",
+     "text_ko": "의약품 멸균에 사용하는 <Redacted B4>에 대한 <Redacted B4> 시험이 부적절했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Inadequate <Redacted B4> testing on <Redacted B4> used to sterilize drug products."
+    },
+    {
+     "finding_id": "finding-c015f7238dabe769afefc304",
+     "text_ko": "무균 의약품 생산에 의약품용으로 의도되지 않은 원료를 사용했다.",
+     "category_label_ko": "무균보증/무균공정",
+     "text_orig": "Use of ingredients not intended for pharmaceutical use in sterile drug production."
+    },
+    {
+     "finding_id": "finding-d9d62e6bb20ac10c09c3044d",
+     "text_ko": "청정도가 낮은 구역에서 청정도가 높은 구역 방향으로 빈번하거나 급격한 차압 역전(pressure reversal)이 발생하는 양상이 관찰되었다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "A pattern of frequent or acute pressure reversals was observed from areas of less clean air to areas of higher air cleanliness."
+    },
+    {
+     "finding_id": "finding-eac803537d1d58585e50d04c",
+     "text_ko": "공기 등급이 낮은 구역에서 높은 구역으로 이동하는 각 전환 지점에서 물품을 소독하지 않았다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "Lack of disinfection of supplies at each transition from areas of lower quality air to areas of higher quality air."
+    }
+   ],
+   "inspector_names": [
+    "Camerson E Moore"
    ]
   },
   {
@@ -130568,6 +133016,55 @@
      "text_ko": "[별표 1] 제7.1호 다목 관련하여 원자재의 시험에 관한 추가 설명자료를 제출하도록 요구받았다(분류: 기타).",
      "category_label_ko": "원자재/공급업체 관리",
      "text_orig": "기타 [별표 1] 제7.1호 다목 원자재의 시험과 관련하여 추가 설명자료를 제출할 것"
+    }
+   ]
+  },
+  {
+   "document_id": "gmpinspect-1Q5NxQxCVnP",
+   "slug": "gmpinspect-1Q5NxQxCVnP",
+   "agency": "MFDS",
+   "source": "MFDS",
+   "firm_name": "의료법인한라의료재단",
+   "firm_key": "의료법인한라의료재단",
+   "published_date": "2026-10-20",
+   "inspection_date": "2026-06-24",
+   "evidence_url": "https://nedrug.mfds.go.kr/cmn/edms/down/1Q5NxQxCVnP",
+   "categories": [
+    "오염/교차오염 관리",
+    "일탈/CAPA/조사",
+    "기타 품질시스템",
+    "밸리데이션/적격성평가"
+   ],
+   "findings": [
+    {
+     "finding_id": "finding-3ce06326f3c9715520a9e197",
+     "text_ko": "품질경영 기타 사항으로, [별표 1] 제1의2호 자사 품질보증시스템에 관한 사항의 자사 기준서 반영이 미흡했고, 자사 오염관리전략 수립이 미흡했으며, 데이터완전성 관련 카메라·표준시계 등의 관리방안 마련이 필요하다.",
+     "category_label_ko": "오염/교차오염 관리",
+     "text_orig": "품질경영 기타 [별표 1] 제1의2호 자사 품질보증시스템에 관한 사항 자사 기준서 반영 미흡, 자사 오염관리전략 수립 미흡, 데이터완전성 관련 카메라, 표준시계 등 관리방안 마련 필요"
+    },
+    {
+     "finding_id": "finding-9130c1a6f2f8c63345ca8488",
+     "text_ko": "기타 사항으로, [별표 1] 제3.3호 나목과 관련하여 기준일탈 건에 대한 미흡 사항의 재검토가 필요하다.",
+     "category_label_ko": "일탈/CAPA/조사",
+     "text_orig": "기타 [별표 1] 제3.3호 나목 기준일탈 건에 대한 미흡 사항 재검토 필요"
+    },
+    {
+     "finding_id": "finding-bd900d519b3cc262667d3fe3",
+     "text_ko": "기타 [별표 1] 제5.1호 나목 관련, 일부 문서에 품질(보증)부서 책임자의 승인 연월일 기록이 미흡했다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제5.1호 나목 일부 문서에 품질(보증)부서 책임자의 승인 연월일 기록 미흡"
+    },
+    {
+     "finding_id": "finding-cd64561ba51cdc93f2a649de",
+     "text_ko": "기타 [별표 1] 제5.2호 가목 관련, 밸리데이션 문서 보존기간 설정의 타당성이 미흡했다.",
+     "category_label_ko": "밸리데이션/적격성평가",
+     "text_orig": "기타 [별표 1] 제5.2호 가목 밸리데이션 문서 보존기간 설정의 타당성 미흡"
+    },
+    {
+     "finding_id": "finding-ef5d4b0da67338e27f5a1fdd",
+     "text_ko": "기타: [별표 1] 제5.2호 나목에 따라 전자문서의 백업과 관련한 상세한 절차를 마련할 필요가 있다.",
+     "category_label_ko": "기타 품질시스템",
+     "text_orig": "기타 [별표 1] 제5.2호 나목 전자문서의 백업 관련 상세한 절차 마련 필요"
     }
    ]
   },

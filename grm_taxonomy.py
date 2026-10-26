@@ -190,6 +190,66 @@ def is_korean_non_pharma_domain(*text_parts: str) -> bool:
     return not _KO_PHARMA_GUARD_RE.search(blob)
 
 
+# ── FDA 483 시설 유형 범위 (2026-10-26) ─────────────────────────────────────
+# 483 목록의 Establishment Type 은 FDA 가 직접 적은 시설 분류다. 키워드 관련성 판정
+# (compute_relevance)은 판단이 안 서면 Pending → "보수적 보존"이라, "Bakery"·"Plasmapheresis
+# Center"·"Clinical Investigator" 처럼 제외 어휘에 없는 유형이 그대로 통과했다. 평소엔 주
+# 몇 건이라 안 보였는데, 10-19~23 FDA 일괄 게시 172건 중 약 69건이 이 경로로 들어와
+# 10-26 브리프가 카드 172장(평소 25~47)이 됐다.
+#
+# 범위 밖(사용자 결정 10-26): 혈액·혈장 채취(혈장분획제 **제조소**는 남는다), 인체조직·생식,
+# 임상시험(BIMO), 식품·보충제, 의료기기·체외진단. 기기는 의약품·생물의약품 단서가 같이
+# 있으면 남긴다("Biologics & Medical Device Manufacturer", "Drug Product Packager, Medical
+# Device Packager"). 수의 판정은 위 is_veterinary_domain 이 따로 맡는다(동물약국 483 은
+# 무균조제 지적이라 남기기로 한 09-21 결정 유지).
+_FDA483_OUT_OF_SCOPE_EST_RE = re.compile(
+    r"\bblood\b|\btransfusion|\bdonor\b|\bdonation\b|plasmapheresis"
+    r"|\bsource\s+plasma\b|\bplasma\s+(?:center|collection|firm|establishment)"
+    r"|\btissue\b|\breproductive\b|hct/?p|\bfertility\b|\bcryobank|\bsperm\b|\beye\s+bank"
+    r"|clinical\s+investigator|\bsponsor\b|institutional\s+review\s+board|\birb\b"
+    r"|contract\s+research\s+organi[sz]ation"
+    r"|\bbakery\b|\bfood\b|dietary\s+supplement|\bbeverage|\bseafood\b|\bdairy\b"
+    r"|infant\s+formula",
+    re.I)
+_FDA483_DEVICE_EST_RE = re.compile(
+    r"\bdevices?\b|\bivd\b|in\s+vitro\s+diagnostic|specification\s+developer", re.I)
+_FDA483_PHARMA_GUARD_RE = re.compile(r"\bdrugs?\b|biologic|pharma|\bapi\b|vaccine", re.I)
+
+
+def is_out_of_scope_483_establishment(establishment_type: str) -> bool:
+    """FDA 483 의 Establishment Type 이 브리프 범위 밖 시설인가(순수 함수). 빈 값은 False."""
+    est = (establishment_type or "").strip()
+    if not est:
+        return False
+    if _FDA483_OUT_OF_SCOPE_EST_RE.search(est):
+        return True
+    return bool(_FDA483_DEVICE_EST_RE.search(est) and not _FDA483_PHARMA_GUARD_RE.search(est))
+
+
+# 유형이 그냥 "Manufacturer" 인 483 이 10-26 호 83장 중 23장이었고, 그중 기기 업체(사우나·
+# 미용기기·검체키트 등)가 섞였다. 유형으로는 못 가르므로 관찰 본문을 본다 — 기기 전용 어휘가
+# 있고 의약품 어휘가 하나도 없을 때만 기기로 본다. "complaint"·"batch"·"nonconforming" 은
+# 의약품 483 에도 흔해 판정에 쓰지 않는다(10-26 실측: 이 규칙으로 9장 제외, 의약품 오제외 0).
+_FDA483_DEVICE_TEXT_RE = re.compile(
+    r"\b820\.\d+|design\s+(?:controls?|validation|verification|history)"
+    r"|device\s+(?:master|history)\s+record|\bmedical\s+devices?\b|\bmdrs?\b"
+    r"|quality\s+system\s+regulation|unique\s+device\s+identif", re.I)
+_FDA483_DRUG_TEXT_RE = re.compile(
+    r"\bdrug\s+(?:products?|substances?)\b|\bapis?\b|active\s+pharmaceutical|\baseptic"
+    r"|\bsterility\b|\bstability\b|out[\s-]+of[\s-]+specification|\boos\b|\b211\.\d+"
+    r"|\bmedia\s+fill", re.I)
+
+
+def is_out_of_scope_483(establishment_type: str, text: str = "") -> bool:
+    """FDA 483 이 브리프 범위 밖인가 — 시설 유형, 그다음 (유형에 의약품 단서가 없을 때) 관찰 본문."""
+    if is_out_of_scope_483_establishment(establishment_type):
+        return True
+    if _FDA483_PHARMA_GUARD_RE.search(establishment_type or ""):
+        return False
+    body = text or ""
+    return bool(_FDA483_DEVICE_TEXT_RE.search(body) and not _FDA483_DRUG_TEXT_RE.search(body))
+
+
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.
 # GRM의 1차 사용자는 경구 고형제 중심 제약 QA이므로, 명시적 식품/보충제 도메인은
 # Intake 단계에서 제외한다. 단, CDER/OPQ/finished pharmaceutical 등 human drug 단서가

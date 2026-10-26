@@ -204,6 +204,58 @@ class TestGuards(unittest.TestCase):
         self.assertEqual(d1, d2)
 
 
+class OutOfScope483Test(unittest.TestCase):
+    """[2026-10-26] 델타가 채택해도 범위 밖 483(혈액·조직·임상·식품·기기)은 발행본에서 뺀다.
+
+    10-26 호: FDA 일괄 게시 172건 중 범위 밖 시설이 스캐폴드에 그대로 들어와 Tier 3(반드시
+    채택)로 카드 172장이 됐다. 수집기 수리는 그 주 스캐폴드에 소급되지 않으므로 조립에서 거른다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.delta = json.loads(DELTA_PATH.read_text(encoding="utf-8"))
+        cls.truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def _483(cid, est, obs=""):
+        c = _fake_tier1_card(cid, 999)
+        c.update({"agency": "FDA", "type_tag": "483", "evidence_level": "B",
+                  "facts": [{"label": "제조소/업체", "value": f"{cid} Inc."},
+                            {"label": "시설 · 유형", "value": f"{est} · 483"}]})
+        if obs:
+            c["deterministic_detail"] = {"type": "fda_483_observations",
+                                         "observations": [{"number": "1", "deficiency": obs}]}
+        return c
+
+    def test_out_of_scope_483_dropped_and_counted(self):
+        s = _blank_scaffold_from(self.truth)
+        cards = {
+            "fda483-1": self._483("fda483-1", "Plasmapheresis Center"),
+            "fda483-2": self._483("fda483-2", "Bakery"),
+            "fda483-3": self._483("fda483-3", "Manufacturer",
+                                  "Design validation did not ensure the device conforms to user needs."),
+            "fda483-4": self._483("fda483-4", "Sterile Drug Manufacturer"),
+            "fda483-5": self._483("fda483-5", "Manufacturer",
+                                  "Aseptic processing areas are deficient; media fill failed."),
+        }
+        s["cards"].extend(cards.values())
+        d = copy.deepcopy(self.delta)
+        slots = next(iter(d["cards"].values()))
+        for cid in cards:
+            d["cards"][cid] = copy.deepcopy(slots)
+        base_out, base_report = apb.assemble_publish_brief(_blank_scaffold_from(self.truth), self.delta)
+        out, report = apb.assemble_publish_brief(s, d, strict=True)
+        ids = {c["id"] for c in out["cards"]}
+        self.assertEqual(sorted(report.out_of_scope_483_ids), ["fda483-1", "fda483-2", "fda483-3"])
+        self.assertTrue({"fda483-4", "fda483-5"} <= ids)
+        self.assertFalse({"fda483-1", "fda483-2", "fda483-3"} & ids)
+        self.assertEqual(out["brief"]["coverage"]["rendered"], len(out["cards"]))
+        self.assertTrue(any("범위 밖 483 3장" in w for w in report.warnings))
+        # 범위 밖이 없는 기존 발행본(07-06 fixture)은 한 장도 빠지지 않는다.
+        self.assertEqual(base_report.out_of_scope_483_ids, [])
+        self.assertEqual(len(out["cards"]), len(base_out["cards"]) + 2)
+
+
 class TestDeepAnalysisWiring(unittest.TestCase):
     """assemble_publish_brief(deep_deltas=...) — additive 배선 검증. 실제 게이트 로직은
     verify_deep_analysis 자체 테스트가 담당하므로, 여기선 '연결이 되는지'만 검증한다."""

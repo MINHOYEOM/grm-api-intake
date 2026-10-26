@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import inject_slots
+from grm_taxonomy import is_out_of_scope_483
 
 # 발행 카드가 반드시 채워야 하는 LLM 슬롯(빈값이면 발행 불가).
 _REQUIRED_STR_SLOTS = ("title_issue", "summary", "implication")
@@ -125,6 +126,8 @@ class AssembleReport:
     # 국문 병기 게이트(`_lint_483_observation_ko`)의 **적용 범위**다 — 손대지 않고 통과시킨
     # 과거 발행분까지 소급 검사하면 병기 기능(2026-07-09) 이전 브리프가 통째로 막힌다.
     refreshed_483_ids: list[str] = field(default_factory=list)
+    # 델타가 채택했지만 범위 밖이라 뺀 483 카드 id(dropped_ids 의 부분집합).
+    out_of_scope_483_ids: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -149,6 +152,24 @@ def _is_content_less_483(c: dict[str, Any]) -> bool:
     보유)과 구별해 목록카드 1장으로 접는 대상(2026-07-13)."""
     is483 = (c.get("type_tag") == "483") or str(c.get("id", "")).startswith("fda483-")
     return bool(is483 and not c.get("deterministic_detail") and not c.get("deep_analysis"))
+
+
+def _is_out_of_scope_483_card(c: dict[str, Any]) -> bool:
+    """[2026-10-26] 이미 수집된 범위 밖 483(혈액·조직·임상·식품·기기)을 조립에서 거른다.
+
+    수집기(collect_fda_483)가 같은 판정(grm_taxonomy.is_out_of_scope_483)으로 앞으로의
+    유입을 막지만, 그 전에 들어온 스캐폴드 카드는 여기서만 뺄 수 있다(10-26 호 49장).
+    시설 유형은 facts 의 "시설 · 유형" 값(`<Establishment Type> · 483`)에서 읽는다."""
+    if not ((c.get("type_tag") == "483") or str(c.get("id", "")).startswith("fda483-")):
+        return False
+    est = ""
+    for f in c.get("facts") or []:
+        if f.get("label") == "시설 · 유형":
+            est = str(f.get("value", "")).rsplit(" · ", 1)[0]
+    dd = c.get("deterministic_detail") or {}
+    body = " ".join(f"{o.get('deficiency', '')} {o.get('detail', '')}"
+                    for o in (dd.get("observations") or []) if isinstance(o, dict))
+    return is_out_of_scope_483(est, body)
 
 
 def _fda483_facility_line(c: dict[str, Any]) -> str:
@@ -572,11 +593,18 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     ordered = sorted(all_cards, key=lambda c: c.get("render_order", 0))
     adopted_cards: list[dict[str, Any]] = []
     for c in ordered:
-        if c.get("id") in adopted_ids:
+        if c.get("id") in adopted_ids and not _is_out_of_scope_483_card(c):
             adopted_cards.append(c)
         else:
             report.dropped += 1
             report.dropped_ids.append(c.get("id"))
+            if c.get("id") in adopted_ids:
+                report.out_of_scope_483_ids.append(c.get("id"))
+    if report.out_of_scope_483_ids:
+        report.warnings.append(
+            f"범위 밖 483 {len(report.out_of_scope_483_ids)}장 제외(혈액·조직·임상·식품·기기): "
+            + ", ".join(report.out_of_scope_483_ids[:8])
+            + (" …" if len(report.out_of_scope_483_ids) > 8 else ""))
 
     # 낡은 스캐폴드가 들고 있는 구 어휘를 **가장 먼저** 교정한다 — 아래 483 디제스트 접기가
     # facts 에서 시설 줄(`merged_items`)을 만들어내므로, 여기서 안 고치면 구 어휘가 목록으로

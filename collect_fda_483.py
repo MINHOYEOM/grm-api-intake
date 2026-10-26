@@ -50,6 +50,7 @@ from typing import Any
 from urllib.parse import urlencode, urljoin
 
 import grm_findings as gf
+from grm_taxonomy import is_out_of_scope_483, is_out_of_scope_483_establishment
 from grm_common import _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
     IntakeItem,
@@ -2041,6 +2042,11 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     gate_blob = " ".join([company, establishment_type, country, record_type, excerpt])
     if _kw_any(gate_blob.lower(), QA_HARD_EXCLUDE_TERMS):   # 수의/동물용 하드 드롭
         return None
+    # [2026-10-26] 시설 유형·관찰 본문으로 범위 밖(혈액·조직·임상·식품·기기) 드롭.
+    obs_text = " ".join(f"{o.get('deficiency', '')} {o.get('detail', '')}"
+                        for o in (observations or []))
+    if is_out_of_scope_483(establishment_type, f"{excerpt} {obs_text}"):
+        return None
     relevance = compute_relevance(company, establishment_type, record_type, excerpt)
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
         return None
@@ -2151,6 +2157,8 @@ def collect_fda_483(
         # 이 문서들의 추출 실패는 아래에서 failed/warnings 에서 되돌린다 — 버릴 문서의 OCR
         # 품질이 7일 연속 "degraded" 경보로 올라왔다(10-20~26, 의료기기·FSVP 483 3건).
         "dropped_out_of_scope": 0,
+        # 시설 유형(혈액·조직·임상·식품·기기)만으로 범위 밖이라 PDF 를 받지 않은 문서 수.
+        "skipped_out_of_scope_type": 0,
     }
     observations_enabled = _observations_enabled()
     observations_health: dict[str, Any] = {
@@ -2207,6 +2215,11 @@ def collect_fda_483(
         # ★이미 저장된 문서는 PDF 를 아예 받지 않는다. 적재 dedup 과 **동일한 키**를 쓴다.
         if known and f"{SOURCE_FDA_483}::fda483-{media_id}" in known:
             skipped_known += 1
+            continue
+        # 시설 유형만으로 범위 밖이면 PDF 도 받지 않는다(유형은 FDA 가 적은 확정값 — 본문이
+        # 판정을 뒤집지 않는다). 본문이 필요한 기기 판정은 _to_item 에서 한다.
+        if is_out_of_scope_483_establishment(nrow.get("establishment_type", "")):
+            excerpt_health["skipped_out_of_scope_type"] += 1
             continue
 
         # 483 PDF 결함 excerpt + Observation 상세 + (deep on) 전문 보존(cap 내 시도).
@@ -2350,6 +2363,7 @@ def collect_fda_483(
                 f"failed={excerpt_health['failed']} "
                 f"미시도={excerpt_health['skipped_no_attempt']} "
                 f"범위밖드롭={excerpt_health['dropped_out_of_scope']} "
+                f"범위밖유형={excerpt_health['skipped_out_of_scope_type']} "
                 f"· OCR {_OCR_BUDGET['used']}/{FDA483_OCR_PAGE_BUDGET}쪽 "
                 f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
                 f"예산초과={_OCR_HEALTH['budget_skipped']} "

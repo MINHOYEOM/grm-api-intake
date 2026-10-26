@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html as _html
 import json
 import os
 import functools
@@ -583,6 +584,12 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
     # 정제 결과가 빈 리스트면 키를 아예 지운다 → card.html 이 `{% if dd.inspectors %}` 로
     # 요소를 만들지 않는다(빈 라벨 금지) — 이 필드가 없던 기존 카드는 애초에 변형이 없다.
     detail = card.get("deterministic_detail") or None
+    # [#308 2026-10-26] 이미 발행된 브리프 JSON 에 HC 권고 조치의 `&nbsp;` 가 글자로 남아 있다
+    # (215곳 — 템플릿이 다시 이스케이프해 화면에 "&nbsp;" 가 보였다). 새 카드는
+    # card_scaffold.unescape_entities 가 막고, 과거 호는 여기서 같은 규칙으로 고친다.
+    if isinstance(detail, dict) and detail.get("type") == "hc_recall_detail":
+        detail = {k: (_html.unescape(v).replace("\xa0", " ") if isinstance(v, str) else v)
+                  for k, v in detail.items()}
     if isinstance(detail, dict) and detail.get("type") == "fda_483_observations":
         detail = dict(detail)
         inspectors = _sanitize_inspector_names(detail.get("inspectors"))

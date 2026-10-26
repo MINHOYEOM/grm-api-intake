@@ -38,6 +38,7 @@ kind 레지스트리와 직교)에도 추가, (b) 새 deep-analysis body 키는 
 from __future__ import annotations
 
 import json
+import html
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
@@ -1217,6 +1218,11 @@ def _detail_mhra_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, A
     return detail
 
 
+def unescape_entities(text: str) -> str:
+    """HTML 엔티티를 글자로 되돌리고 NBSP 는 보통 공백으로. 렌더러(web/render.py)도 이것을 쓴다."""
+    return html.unescape(text).replace("\xa0", " ")
+
+
 def _detail_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
     """Health Canada 회수 레코드의 미사용 사실층 — 결정론 상세슬롯.
 
@@ -1232,7 +1238,9 @@ def _detail_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any
     for key, out_key in (("medicinal_ingredient", "ingredient"),
                          ("dosage_form_detail", "dosage_form"),
                          ("What you should do", "action")):
-        value = str(raw.get(key) or "").strip()
+        # [#308 2026-10-26] HC 피드의 "What you should do" 에는 `&nbsp;` 가 글자로 들어 있다.
+        # 템플릿이 다시 이스케이프하므로 화면에 "&nbsp;" 가 그대로 보였다(브리프 JSON 215곳).
+        value = unescape_entities(str(raw.get(key) or "")).strip()
         if value:
             detail[out_key] = value
 

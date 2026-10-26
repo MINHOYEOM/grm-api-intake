@@ -2176,6 +2176,11 @@ class RecallDetailTest(unittest.TestCase):
                                             "what_you_should_do_ko": "해당 로트 사용을 중지한다."})
         self.assertEqual(with_ko["action_ko"], "해당 로트 사용을 중지한다.")
 
+    def test_hc_action_entities_decoded(self):
+        """#308: HC 피드 원문의 `&nbsp;` 가 화면까지 글자로 갔다."""
+        d = cs._detail_hc_recall({}, {"What you should do": "Report&nbsp;side effects&nbsp;to HC."})
+        self.assertEqual(d["action"], "Report side effects to HC.")
+
     def test_no_usable_field_means_no_block(self):
         """★음성 검사 — 쓸 값이 하나도 없으면 `type` 만 남기지 않고 블록 자체가 없다."""
         for fn, raw in ((cs._detail_openfda_recall, {"recall_number": "Z-1", "classification": "Class II"}),

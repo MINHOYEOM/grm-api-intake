@@ -13244,6 +13244,14 @@ class WebRecallDetailRenderTest(unittest.TestCase):
         self.assertIn("국문 해석", h_ko)
         self.assertIn("해당 로트 사용을 중지한다.", h_ko)
 
+    def test_hc_action_entities_from_published_json_are_decoded(self):
+        """#308: 발행된 브리프 JSON 의 `&nbsp;` 가 화면에 "&nbsp;" 글자로 보였다(215곳)."""
+        h = self._render({"type": "hc_recall_detail",
+                          "action": "Report any health product related&nbsp;side effects."},
+                         card_type="Recall(HC)")
+        self.assertIn("related side effects.", h)
+        self.assertNotIn("&amp;nbsp;", h)
+
     def test_recall_blocks_introduce_no_new_css_classes(self):
         """★상세 블록이 쓰는 클래스는 전부 grm.css 에 이미 있다.
 

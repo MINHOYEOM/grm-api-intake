@@ -1177,6 +1177,12 @@
       "q": "distribution record",
       "findings": 54,
       "documents": 54
+    },
+    {
+      "id": "adulterated-drug",
+      "q": "adulterated",
+      "findings": 121,
+      "documents": 119
     }
   ],
   "excluded": [
@@ -1429,6 +1435,11 @@
       "id": "summary-of-product-characteristics",
       "term_ko": "제품특성요약",
       "reason": "지적사항 본문 검색 'summary of product characteristics'·'SmPC'·'제품특성요약' 모두 0건(2026-09-29)"
+    },
+    {
+      "id": "package-leaflet",
+      "term_ko": "환자설명서",
+      "reason": "지적사항 본문 검색 'package leaflet'·'patient information leaflet' 0건, '첨부문서' 11건은 국내 첨부문서 기재사항 위반이라 EU 환자설명서와 같은 말이 아님(2026-10-06)"
     }
   ],
   "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."

@@ -24,11 +24,11 @@
    "FDA Warning Letter Huons Co., Ltd.(국내) — 완제의약품 CGMP 위반 집행 확인"
   ],
   "coverage": {
-   "intake_total": 27,
-   "rendered": 27,
+   "intake_total": 28,
+   "rendered": 28,
    "evidence": {
     "A": 23,
-    "B": 4,
+    "B": 5,
     "C": 0
    }
   },
@@ -145,8 +145,102 @@
    }
   },
   {
-   "id": "fda483-193232",
+   "id": "9a4546da5523",
    "render_order": 1,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Jubilant HollisterStier General Partnership",
+   "title_issue": "무균공정 설계·스모크 시험 결함",
+   "summary": "FDA가 무균 주사제 제조소 Jubilant HollisterStier General Partnership에 CGMP 위반으로 경고서한을 발부했다. 스모크 시험에서 작업자 개입이 ISO 5 구역 보호를 깨뜨린 무균공정 설계 결함과 환경 모니터링 일탈 조사 지연이 지적됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-23"
+    },
+    {
+     "label": "문서번호",
+     "value": "9a4546da5523"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Jubilant HollisterStier General Partnership"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 05/28/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "위반 1: 무균공정 설계·스모크 시험·배지충전 결함으로 미생물 오염 방지 절차 미흡(21 CFR 211.113(b))",
+    "위반 2: ISO 5·7 구역 환경 모니터링 조치기준 초과와 작업자 곰팡이 검출 추세 조사 지연(21 CFR 211.192)",
+    "반복 지적: 2023년 2월·2024년 6월 실사에서 배지충전 결함 지적, 2024년 11월 15일 규제 회의에서 논의",
+    "발행 부서/일자: Center for Drug Evaluation and Research (CDER) · 05/28/2026"
+   ],
+   "implication": "FDA가 앞선 실사·규제 회의에서 이미 짚은 무균공정 결함이 고쳐지지 않은 점을 경고서한으로 끌어올린 사례다. 무균 제조소라면 스모크 시험이 실제 개입 동작을 반영하는지, 환경 모니터링 추세가 제때 조사로 이어지는지 볼 만하다.",
+   "checks": [
+    "스모크 시험의 개입 동작·기류 영향 평가",
+    "배지충전의 최대 개입 시간·횟수 반영 여부",
+    "환경 모니터링 추세 조사 착수 기준"
+   ],
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 2,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.113(b)",
+      "statement_ko": "귀사는 무균이라 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립·준수하지 않았다 (21 CFR 211.113(b))."
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192",
+      "statement_ko": "귀사는 배치가 이미 유통되었는지와 관계없이, 설명되지 않은 불일치나 배치 또는 그 구성성분의 규격 부적합을 철저히 조사하지 않았다 (21 CFR 211.192)."
+     }
+    ]
+   },
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/jubilant-hollisterstier-general-partnership-723537-05282026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Aseptic design and smoke study failures",
+    "summary": "FDA issued a Warning Letter to sterile injectable manufacturer Jubilant HollisterStier General Partnership for CGMP violations, citing aseptic design flaws in which operator interventions disrupted protection of the ISO 5 zone during smoke studies, and delayed investigation of environmental monitoring excursions.",
+    "implication": "FDA escalated to a warning letter aseptic processing deficiencies it had already raised at earlier inspections and a regulatory meeting. Sterile sites may want to confirm that smoke studies reflect actual intervention movements and that environmental monitoring trends lead to timely investigations.",
+    "key_facts": [
+     "Violation 1: aseptic design, smoke study and media fill deficiencies; inadequate procedures to prevent microbiological contamination (21 CFR 211.113(b))",
+     "Violation 2: delayed investigation of action-level excursions in ISO 5 and 7 areas and an adverse trend of mold on personnel (21 CFR 211.192)",
+     "Repeat: media fill deficiencies cited at the February 2023 and June 2024 inspections and discussed at a November 15, 2024 regulatory meeting",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 05/28/2026"
+    ],
+    "checks": [
+     "Assessment of intervention movements and airflow impact in smoke studies",
+     "Whether media fills cover the maximum intervention duration and count",
+     "Trigger criteria for opening environmental monitoring trend investigations"
+    ]
+   }
+  },
+  {
+   "id": "fda483-193232",
+   "render_order": 2,
    "group": "글로벌",
    "group_label": "💊 합성의약품",
    "agency": "FDA",
@@ -222,7 +316,7 @@
   },
   {
    "id": "82657c278940",
-   "render_order": 2,
+   "render_order": 3,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -294,7 +388,7 @@
   },
   {
    "id": "47ea6a0dde35",
-   "render_order": 3,
+   "render_order": 4,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -366,7 +460,7 @@
   },
   {
    "id": "gmpinspect-1Pxznco5TX7",
-   "render_order": 4,
+   "render_order": 5,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -491,7 +585,7 @@
   },
   {
    "id": "gmpinspect-1Pxznco5UBw",
-   "render_order": 5,
+   "render_order": 6,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -614,7 +708,7 @@
   },
   {
    "id": "gmpinspect-1PxtsjZTS6w",
-   "render_order": 6,
+   "render_order": 7,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -714,7 +808,7 @@
   },
   {
    "id": "admin-2026004594",
-   "render_order": 7,
+   "render_order": 8,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -787,7 +881,7 @@
   },
   {
    "id": "gmpinspect-1Px_jsc10ws",
-   "render_order": 8,
+   "render_order": 9,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -864,7 +958,7 @@
   },
   {
    "id": "gmpinspect-1Px_jsc118o",
-   "render_order": 9,
+   "render_order": 10,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -957,7 +1051,7 @@
   },
   {
    "id": "gmpinspect-1PxzwRCkCdX",
-   "render_order": 10,
+   "render_order": 11,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1037,7 +1131,7 @@
   },
   {
    "id": "admin-2026004034",
-   "render_order": 11,
+   "render_order": 12,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1114,7 +1208,7 @@
   },
   {
    "id": "gmpinspect-1PxteXRZ-ht",
-   "render_order": 12,
+   "render_order": 13,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1191,7 +1285,7 @@
   },
   {
    "id": "gmpinspect-1PxtsjZTGIp",
-   "render_order": 13,
+   "render_order": 14,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1268,7 +1362,7 @@
   },
   {
    "id": "recall-5edc1a15853b",
-   "render_order": 14,
+   "render_order": 15,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1352,7 +1446,7 @@
   },
   {
    "id": "recall-709cff0f6b75",
-   "render_order": 15,
+   "render_order": 16,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1429,7 +1523,7 @@
   },
   {
    "id": "recall-97b0f904887d",
-   "render_order": 16,
+   "render_order": 17,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1513,7 +1607,7 @@
   },
   {
    "id": "recall-ecf1e2c8f79f",
-   "render_order": 17,
+   "render_order": 18,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -1597,7 +1691,7 @@
   },
   {
    "id": "D-0580-2026",
-   "render_order": 18,
+   "render_order": 19,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -1725,7 +1819,7 @@
   },
   {
    "id": "D-0582-2026",
-   "render_order": 19,
+   "render_order": 20,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -1853,7 +1947,7 @@
   },
   {
    "id": "D-0583-2026",
-   "render_order": 20,
+   "render_order": 21,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -1981,7 +2075,7 @@
   },
   {
    "id": "D-0595-2026",
-   "render_order": 21,
+   "render_order": 22,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2091,7 +2185,7 @@
   },
   {
    "id": "D-0586-2026",
-   "render_order": 22,
+   "render_order": 23,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2223,7 +2317,7 @@
   },
   {
    "id": "D-0587-2026",
-   "render_order": 23,
+   "render_order": 24,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2351,7 +2445,7 @@
   },
   {
    "id": "D-0597-2026",
-   "render_order": 24,
+   "render_order": 25,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2479,7 +2573,7 @@
   },
   {
    "id": "D-0607-2026",
-   "render_order": 25,
+   "render_order": 26,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2606,7 +2700,7 @@
   },
   {
    "id": "N/A",
-   "render_order": 26,
+   "render_order": 27,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

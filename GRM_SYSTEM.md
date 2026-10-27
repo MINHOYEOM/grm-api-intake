@@ -227,7 +227,7 @@ flowchart TD
 | 1 | Federal Register (FDA 규칙·고시) | 공식 API | 운영 |
 | 2 | OpenFDA Drug Enforcement (회수) | 공식 API | 운영 |
 | 3~6 | EMA · MHRA · PIC/S · ECA Academy | RSS | 운영 |
-| 7 | FDA Warning Letters | 웹 스크래핑 | 운영 (부서 노이즈 필터 적용) |
+| 7 | FDA Warning Letters | 웹 스크래핑 — 목록은 **DataTables 전수 뷰**(`warning_letter_solr_index`, 백필과 같은 뷰) 1차 · 정적 HTML 표(최신 10행) 폴백 | 운영 (부서 노이즈 필터 적용) · 폴백이 창을 다 못 덮으면 `wl-listing-truncated` 경고 — 정적 표만 읽던 시절 화요일 게시가 10건을 넘으면 나머지가 조용히 빠졌다(10-05 호 cGMP WL 4건 누락, 2026-10-27 수리) |
 | 8 | MFDS 식약처 (지침·고시·법령·안전성서한·행정처분·회수·GMP 실태조사·적합판정) | RSS + data.go.kr API + nedrug | 운영 (일부 opt-in) |
 | 9 | ICH (가이드라인·공개협의) | 스냅샷 + Routine 검색 | 활성 |
 | 10 | WHO Prequalification (WHOPIR 실사보고서 등) | RSS + Drupal + PDF **구조화 추출**(결론·항목별 요약) | 활성 |

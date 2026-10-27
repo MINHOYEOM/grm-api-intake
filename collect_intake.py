@@ -615,6 +615,15 @@ class CollectionStats:
     # 아니며, _evaluate_health 가 warning 으로만 표면화한다(flag off 면 0 → 무발생).
     wl_body_attempted: int = 0
     wl_body_failed: int = 0
+    # [WL 전문 결손 표면화 2026-10-27] 전문(심층분석 입력) 실패는 종전 어디에도 집계되지
+    # 않았다 — excerpt 와 같은 warning-only 관측.
+    wl_body_full_attempted: int = 0
+    wl_body_full_failed: int = 0
+    # [WL 목록 절단 2026-10-27] 목록을 어느 경로로 읽었는가 · 정적 HTML 폴백이 창을 다 못
+    # 덮었을 가능성(절단 의심). 정적 페이지는 최신 10행만 준다.
+    wl_listing_backbone: str = ""
+    wl_listing_truncated: bool = False
+    wl_listing_detail: str = ""
     # ── Phase 2a: Search ────────────────────────────────────────────────────
     search_fetched: int = 0
     search_inserted: int = 0
@@ -2697,6 +2706,128 @@ def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
 LAST_WL_HEALTH: dict[str, Any] = {}
 
 
+# ── [WL 목록 절단 수리 2026-10-27] ───────────────────────────────────────────────
+# 정적 WL 페이지(`FDA_WL_URL`)의 HTML 표는 **최신 10행만** 서버 렌더한다(나머지는 브라우저
+# DataTables 가 AJAX 로 채운다). FDA 는 화요일에 한꺼번에 게시하는데 그 수가 10건을 넘는다
+# (실측 게시일별 총수: 09/22 17 · 09/29 21 · 10/06 19 · 10/13 16). 10행 밖 편지는 수집기가
+# **존재조차 몰랐다** — 경고 0건. 실사고: 10-05 호에서 09/29 게시 cGMP 경고서한 8건 중 4건
+# (Fresenius Kabi USA · Fresenius Kabi AG · Kellin Chemicals · VeganicSKN)이 Notion 에 적재되지
+# 않아 브리프에서 빠졌다(findings 백필은 같은 페이지의 DataTables 뷰를 써서 받았다).
+#
+# 그래서 목록은 백필(`collect_fda_backfill.run_wl`)과 같은 DataTables 뷰를 먼저 읽고, 그게 죽을
+# 때만 정적 HTML 로 폴백한다. 폴백이 창을 다 덮었는지 확인할 수 없으면(10행 전부 창 안)
+# **절단 의심**으로 health 경고를 남긴다 — 조용한 폴백 금지. 행 형식은 정적 파서와 같은
+# `_cols`(셀 문자열, 업체 셀은 `|HREF:` 접미)로 맞춰 아래 판정 루프를 그대로 쓴다.
+WL_LISTING_VIEW_NAME = "warning_letter_solr_index"
+WL_LISTING_PAGE_LENGTH = 100
+WL_LISTING_MAX_PAGES = 5          # 500행 ≈ 수개월치 — 7일 창은 1쪽이면 끝난다
+WL_LISTING_NUM_COLUMNS = 6
+WL_LISTING_BACKBONE_DATATABLES = "datatables"
+WL_LISTING_BACKBONE_STATIC = "static-html"
+_WL_HREF_ATTR_RE = re.compile(r'href="([^"]+)"', re.I)
+
+
+def _wl_datatable_config(html_text: str) -> dict[str, Any] | None:
+    """정적 WL 페이지의 drupal-settings JSON 에서 WL DataTables AJAX 설정을 찾는다."""
+    import collect_fda_483 as fda483   # 지연 import — 오케스트레이터와 같은 관례
+    m = fda483._DRUPAL_SETTINGS_RE.search(html_text or "")
+    if not m:
+        return None
+    try:
+        settings = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return None
+    for dt in (settings.get("datatables") or {}).values():
+        if not isinstance(dt, dict):
+            continue
+        ajax = dt.get("ajax") or {}
+        params = ajax.get("data") or {}
+        if params.get("view_name") == WL_LISTING_VIEW_NAME:
+            return {
+                "url": urllib.parse.urljoin(fda483.FDA_MEDIA_BASE,
+                                            ajax.get("url") or fda483.DATATABLE_AJAX_PATH),
+                "params": dict(params),
+            }
+    return None
+
+
+def _wl_datatable_cols(raw: Any) -> list[str] | None:
+    """DataTables 행(HTML 셀 리스트) → 정적 파서와 같은 `_cols`. 데이터 행이 아니면 None."""
+    import collect_fda_483 as fda483
+    if not isinstance(raw, list) or len(raw) < 5:
+        return None
+    cols = [fda483._strip(cell) for cell in raw]
+    href_m = _WL_HREF_ATTR_RE.search(str(raw[2]))
+    if href_m:
+        cols[2] = f"{cols[2]}|HREF:{_html_unescape(href_m.group(1))}"
+    return cols
+
+
+def _fetch_wl_listing_datatables(html_text: str, start: date) -> list[dict[str, Any]]:
+    """WL DataTables 뷰를 게시일 내림차순으로 창 시작일까지 읽는다. 실패는 예외로 올린다.
+
+    창 시작일보다 오래된 행이 나오거나 원천이 끝나면 멈춘다. 쪽 상한에 걸리면 절단이므로
+    RuntimeError — 호출부가 정적 폴백·경고로 처리한다(부분 목록을 정상으로 넘기지 않는다).
+    """
+    config = _wl_datatable_config(html_text)
+    if config is None:
+        raise RuntimeError("wl-datatables-config-missing")
+    rows: list[dict[str, Any]] = []
+    for page in range(WL_LISTING_MAX_PAGES):
+        params = dict(config["params"])
+        params.update({
+            "draw": str(page + 1), "start": str(page * WL_LISTING_PAGE_LENGTH),
+            "length": str(WL_LISTING_PAGE_LENGTH),
+            "search[value]": "", "search[regex]": "false",
+            "order[0][column]": "0", "order[0][dir]": "desc",
+        })
+        for i in range(WL_LISTING_NUM_COLUMNS):
+            params[f"columns[{i}][data]"] = str(i)
+            params[f"columns[{i}][name]"] = ""
+            params[f"columns[{i}][searchable]"] = "true"
+            params[f"columns[{i}][orderable]"] = "true"
+            params[f"columns[{i}][search][value]"] = ""
+            params[f"columns[{i}][search][regex]"] = "false"
+        resp = requests.get(config["url"] + "?" + urllib.parse.urlencode(params), timeout=30,
+                            headers={
+                                "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+                                "Accept": "application/json, text/javascript, */*; q=0.01",
+                                "Referer": FDA_WL_URL,
+                                "X-Requested-With": "XMLHttpRequest",
+                            })
+        resp.raise_for_status()
+        data = json.loads(resp.text)
+        raw_rows = data.get("data") if isinstance(data, dict) else None
+        if not isinstance(raw_rows, list):
+            raise RuntimeError("wl-datatables-bad-payload")
+        oldest = ""
+        for raw in raw_rows:
+            cols = _wl_datatable_cols(raw)
+            if cols is None:
+                continue
+            rows.append({"_cols": cols})
+            posted = _parse_wl_date(cols[0])
+            if posted and (not oldest or posted < oldest):
+                oldest = posted
+        if len(raw_rows) < WL_LISTING_PAGE_LENGTH or (oldest and oldest < start.isoformat()):
+            return rows
+    raise RuntimeError(f"wl-datatables-page-cap({WL_LISTING_MAX_PAGES}) — 창 시작일 미도달")
+
+
+def wl_static_listing_may_be_truncated(rows: list[dict[str, Any]], start: date) -> bool:
+    """정적 표가 창 전체를 덮었다고 확인할 수 없는가(순수 함수).
+
+    정적 표는 최신 N행만 준다. 가장 오래된 행이 창 시작일보다 이르면 창은 다 덮였다.
+    전부 창 안이면(또는 날짜를 하나도 못 읽으면) 그 뒤에 창 안 편지가 더 있을 수 있다.
+    """
+    cells = [(r.get("_cols") or [""])[0].split("|HREF:")[0].strip() for r in rows]
+    # 헤더 행(`Posted Date`)은 날짜가 아니다 — 파서에 넣으면 파싱 실패 WARN 만 늘린다.
+    dates = [d for d in (_parse_wl_date(c) for c in cells if re.match(r"^\d", c)) if d]
+    if not dates:
+        return bool(rows)
+    return min(dates) >= start.isoformat()
+
+
 # [사유 전파 2026-07-20] 수집기는 본문을 왜 확보 못했는지 정확히 안다(403·timeout·앵커
 # 미발견)인데 그 사유가 하류로 전달되지 않아 코드/LLM 이 이유를 지어내는 사고가 있었다
 # (예: "스캔·비공개로 상세가 제공되지 않아" — 우리가 못 받았다는 사실에서 원문 상태까지
@@ -2781,7 +2912,9 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
     wl_body_full_health: dict[str, Any] = {
         "enabled": wl_body_full_enabled, "attempted": 0, "failed": 0,
     }
-    LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health}
+    listing_health: dict[str, Any] = {"backbone": "", "rows": 0, "truncated": False, "detail": ""}
+    LAST_WL_HEALTH = {"wl_body": wl_body_health, "wl_body_full": wl_body_full_health,
+                      "listing": listing_health}
     try:
         resp = requests.get(FDA_WL_URL, timeout=30, headers={
             "User-Agent": "GRM-Intake/1.1 (+github-actions)",
@@ -2796,16 +2929,33 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         log("WARN", f"FDA WL HTTP 실패: {e}")
         return [], str(e)
 
-    parser = _FDAWLTableParser()
-    parser.feed(html_text)
+    # [WL 목록 절단 수리 2026-10-27] DataTables 전수 뷰 1차 → 정적 HTML(최신 10행) 폴백.
+    listing_rows: list[dict[str, Any]] = []
+    try:
+        listing_rows = _fetch_wl_listing_datatables(html_text, start)
+        listing_health["backbone"] = WL_LISTING_BACKBONE_DATATABLES
+    except (requests.RequestException, ValueError, RuntimeError) as e:
+        listing_health["detail"] = truncate(f"{type(e).__name__}: {e}", 160)
+        log("WARN", f"FDA WL DataTables 목록 실패 — 정적 HTML(최신 10행)로 폴백: "
+                    f"{listing_health['detail']}")
+    if not listing_rows:
+        parser = _FDAWLTableParser()
+        parser.feed(html_text)
+        listing_rows = parser.rows
+        listing_health["backbone"] = WL_LISTING_BACKBONE_STATIC
+        listing_health["truncated"] = wl_static_listing_may_be_truncated(listing_rows, start)
+        if listing_health["truncated"]:
+            log("WARN", f"FDA WL 정적 표 {len(listing_rows)}행이 전부 수집 창 안 — 창 안 "
+                        "편지가 더 있어도 보이지 않는다(목록 절단 의심)")
+    listing_health["rows"] = len(listing_rows)
 
-    if not parser.rows:
+    if not listing_rows:
         msg = "FDA WL HTML 테이블 미발견 — 구조 변경 또는 JS-rendered 가능성"
         log("WARN", msg)
         return [], msg
 
     items: list[IntakeItem] = []
-    for row in parser.rows:
+    for row in listing_rows:
         cols = row.get("_cols", [])
         if len(cols) < 4:
             continue
@@ -3393,6 +3543,13 @@ def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
         wl_body_health = LAST_WL_HEALTH.get("wl_body") or {}
         stats.wl_body_attempted = int(wl_body_health.get("attempted") or 0)
         stats.wl_body_failed = int(wl_body_health.get("failed") or 0)
+        wl_body_full_health = LAST_WL_HEALTH.get("wl_body_full") or {}
+        stats.wl_body_full_attempted = int(wl_body_full_health.get("attempted") or 0)
+        stats.wl_body_full_failed = int(wl_body_full_health.get("failed") or 0)
+        wl_listing = LAST_WL_HEALTH.get("listing") or {}
+        stats.wl_listing_backbone = str(wl_listing.get("backbone") or "")
+        stats.wl_listing_truncated = bool(wl_listing.get("truncated"))
+        stats.wl_listing_detail = str(wl_listing.get("detail") or "")
         if wl_err:
             stats.wl_error = True
             stats.wl_error_msg = wl_err

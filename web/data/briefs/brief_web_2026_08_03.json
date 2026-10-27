@@ -145,7 +145,7 @@
      {
       "number": "6",
       "deficiency": "There is no written testing program designed to assess the stability characteristics of drug products.",
-      "detail": "Specifically, Your firm does not have written stability testing program to determine the beyond use date for each drug product. Your firm assigns beyond use date based on the <Redacted B4>, which is based on either stability testing performed by other entity for in-process stock, or based on the dosage form and the storage condition. *DATES OF INSPECTION 7/06/2026 (Mon), 7/07/2026 (Tue), 7/08/2026 (Wed), 7/09/2026 (Thu), 7/10/2026 (Fri), 7/13/2026 (Mon), 7/14/2026 (Tue), 7/15/2026 (Wed), 7/16/2026 (Thu), 7/17/2026 (Fri) ,_... ..",
+      "detail": "Specifically, Your firm does not have written stability testing program to determine the beyond use date for each drug product. Your firm assigns beyond use date based on the <Redacted B4>, which is based on either stability testing performed by other entity for in-process stock, or based on the dosage form and the storage condition.",
       "deficiency_ko": "의약품의 안정성 특성을 평가하기 위해 설계된 문서화된 시험 프로그램이 없다.",
       "detail_ko": "구체적으로, 귀사는 각 의약품의 사용기한(beyond use date)을 결정하기 위한 문서화된 안정성 시험 프로그램을 보유하고 있지 않다. 귀사는 <Redacted B4> 에 근거하여 사용기한을 부여하며, 이는 공정중 stock 에 대해 타 기관이 수행한 안정성 시험 또는 제형 및 보관조건에 근거한 것이다."
      }
@@ -2760,7 +2760,7 @@
      {
       "number": "25",
       "deficiency": "You did not establish packaging specifications.",
-      "detail": "Specifically, You procure the packaging for finished dietary supplements. Packaging specifications were requested, and you stated that you do not have packaging specifications. *DATES OF INSPECTION 1/13/2026(Tue), 1/14/2026(Wed), 1/15/2026(Thu), 1/16/2026(Fri), 1/21/2026(Wed), 1/23/2026(Fri), 1/27/2026(Tue) Apouds Janet A. Rajan",
+      "detail": "Specifically, You procure the packaging for finished dietary supplements. Packaging specifications were requested, and you stated that you do not have packaging specifications.",
       "deficiency_ko": "귀사는 포장 규격을 설정하지 않았다.",
       "detail_ko": "구체적으로, 귀사는 완제 건강기능식품의 포장재를 외부에서 구매한다. 포장 규격을 요청했으나, 귀사는 포장 규격을 보유하고 있지 않다고 진술했다."
      }

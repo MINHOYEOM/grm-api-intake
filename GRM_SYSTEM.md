@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.269` |
-| 최종 수정일 | 2026-10-21 |
+| 문서 버전 | `v1.270` |
+| 최종 수정일 | 2026-10-27 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -523,7 +523,7 @@ grm-api-intake/
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
-├─ backfill_483_ocr_recovery.py    # OCR 엔진 부재로 빈 본문 적재된 스캔 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert)
+├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_deep_483_past_weeks.py  # 483 심층분석 과거주차(07-12~07-27, 69장) 소급 — 과거 델타 → fan-out 작업 생성 / 응답 병합(placeholder 표지 삽입 + 운영 병합 경로 호출)
 ├─ backfill_deep_original_truncation.py  # D5b(원문 병기 절단)로 병합 보류된 483 심층분석 소급 병합 — 운영 병합 경로(inject_slots) 그대로 호출
 ├─ backfill_gmp_detail_0626.py     # 표 기능 탄생(07-02) 이전 발행 GMP실사 카드의 지적 표 소급 병합(raw_signals rows → 발행 브리프 JSON·card_scaffold 변환 함수 재사용)
@@ -621,7 +621,7 @@ grm-api-intake/
    ├─ grm-hc-inspection-backfill.yml     # [FIND-1] Health Canada GMP 실사 리포트카드 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-fda-inspections-backfill.yml   # FDA 실사 등급(NAI/VAI/OAI) DDAPI 적재(월 1일 15:47 UTC 크론 = 항상 --apply · 8/15/22일은 실패 이슈가 열렸을 때만 복구 재시도 · workflow_dispatch 는 dry_run 기본 true)
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
-   ├─ grm-fda483-ocr-recovery.yml        # 엔진 부재로 빈 본문 적재된 스캔 483 소급 복구(workflow_dispatch 1회성·apply 기본 false·OCR 필수·M12 체인)
+   ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483 복구(cron 매일 23:37 UTC=collection-capped apply / dispatch 1회성·apply 기본 false·OCR 필수·M12 체인)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지 · decide 게이트가 주간 결손도 복구(2026-08-11)
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검(status 4값: ok·broken·needs_review·blocked)
    ├─ grm-glossary-cases.yml             # [트랙 C] 용어사전 사례연결 건수 주간 재측정(금 03:15 KST) — q·excluded 무변형·건수만·PR→CI green→자동 머지
@@ -651,7 +651,7 @@ grm-api-intake/
 - **용어사전 사례연결 갱신:** `glossary_cases_refresh.py` — 워크플로 `grm-glossary-cases.yml`(금 03:15 KST, 자료실 갱신과 요일 분리 = 골든 재동결 커밋 충돌 회피)이 **한 잡에서 한국어·영어 정본을 연달아** 만든다. 한국어 `web/data/glossary_cases.json`은 기존처럼 사람이 판정한 `q`·`excluded`를 보존하고 전체 코퍼스 `findings_search` RPC의 건수(`findings`/`documents`)만 anon 권한으로 다시 센다. 영어 `web/data/glossary_cases_en.json`은 `--orig-lang en`으로 **후보 단계부터** 영어 원문 모집단을 물으며, 각 `term_en`을 실제 RPC로 확인해 hit가 있는 용어만 싣고 자기 모집단을 `orig_lang: "en"`으로 밝힌다(0건은 오류가 아니라 링크를 만들지 않는 판정). service-role은 쓰지 않는다 — RLS를 우회해 공개 화면에 없는 수를 광고하면 안 된다. 두 파일은 변경 감지·합산 축소 가드·커밋 대상도 함께라 한 언어만 다른 주의 수치를 말할 수 없다. 한국어 경로의 0건 전환·±50% 변동·항목별 실패·20% 이상 실패 중단 가드와 `--dry-run`은 유지한다.
 - **FDA 실사 등급 적재:** `collect_fda_inspections.py`(+ `grm-fda-inspections-backfill.yml` — **매월 1일 크론은 항상 `--apply`**, 수동 dispatch 는 `--dry-run` 기본) — DDAPI 를 5,000행씩 페이징해 `public.fda_inspections` 로 upsert 한다. 세 가지가 이 스크립트의 계약이다. ① **모집단**: 서버측 필터는 `ProductType=Drugs` + `FiscalYear` 뿐이고 GMP 여부(`ProjectArea`)는 **반환 전용 컬럼이라 클라이언트에서 거른다**(요청에 넣으면 413). ② **회계연도 창을 실행일에서 계산한다**(`fiscal_year_window()` — 10/1 시작·기본 7년·`--fiscal-years`). 창을 하드코딩하면 해가 바뀌는 순간 조용히 낡고, 아예 안 걸면 39,783건을 받아 승인 범위를 넘긴다. ③ **적재 대상이 findings 가 아니다** — 카드도 지적사항도 만들지 않는다(§3.4 소스 17). ★스케줄 실행의 모드는 **`github.event_name` 으로 명시 판정**한다 — 스케줄에서 dispatch 입력은 전부 빈 문자열이라, 그 빈 값이 어디로 떨어지는지에 기대면 (a) `--max-pages ""` 가 argparse 를 exit 2 로 죽이거나 (b) `dry_run` 게이트가 우연히 else 로 빠져 사람 승인 없이 적재된다. `tests/test_fda_inspections.py` 가 워크플로 안의 셸을 **실제로 실행해** 스케줄이 dry-run 으로 떨어지지 않는지, 빈 인자를 넘기지 않는지, 그 판정이 dispatch 입력값과 무관한지를 고정한다.
 - **Findings 번역 루프:** `findings_translate.py`(export/apply) + `findings_translate_apply_service.py`(CI 반영).
-- **스캔 483 OCR 소급 복구:** `backfill_483_ocr_recovery.py`(+ `grm-fda483-ocr-recovery.yml`, dispatch 전용·apply 기본 false) — 엔진 부재로 `raw_json.fda483_text_status = scan-ocr-unavailable:…` 상태로 적재된 483 행을 되찾는다. raw_json 을 부분 패치하지 않고 **라이브 수집과 같은 함수**(`_to_item` → `findings_store.raw_signal_from_intake_item`)로 행 전체를 재구성해 `raw_signal_id`(= document_id 에만 의존) 그대로 upsert(`merge-duplicates`)한다 — DELETE 를 쓰지 않으므로 findings CASCADE 위험이 없다. 본문을 못 얻으면 **아무것도 쓰지 않는다**(빈손을 빈손으로 덮지 않음). `collected_at` 은 원본 보존. nrow 무손실 복원 전제는 `tests/test_483_ocr_recovery.py` 의 왕복 동일성 테스트가 고정한다.
+- **483 본문 결손 복구:** `backfill_483_ocr_recovery.py`(+ `grm-fda483-ocr-recovery.yml`) — 본문 없이 적재된 483 행을 되찾는다. **매일 예약 실행(23:37 UTC, `collection-capped` 모드, apply)** 이 일일 수집의 상한(실행당 PDF `FDA483_PDF_MAX_ITEMS`=60건 — 본문 수령 후 범위 밖으로 버린 문서는 세지 않고 총 요청은 `FDA483_PDF_MAX_FETCHES`=120 으로 닫음 · OCR `FDA483_OCR_PAGE_BUDGET`=200쪽)에 걸려 `not-attempted`/`scan-ocr-budget` 으로 적재된 행을 다음 날 다시 읽는다 — 일일 수집은 이미 저장된 document_id 를 다시 받지 않으므로 이 경로가 없으면 그 문서들은 영구히 findings 0건이다(2026-10-26 FDA 대량 공개 51건). 다시 읽어도 본문이 없으면(404·텍스트층 없음) 상한 표식만 실제 사유로 교체해 무한 재시도를 끊는다. dispatch(apply 기본 false)는 1회성 모드 — `ocr-unavailable`(엔진 부재 `scan-ocr-unavailable:…`)·`missing-observations`(관찰 키 부재). raw_json 을 부분 패치하지 않고 **라이브 수집과 같은 함수**(`_to_item` → `findings_store.raw_signal_from_intake_item`)로 행 전체를 재구성해 `raw_signal_id`(= document_id 에만 의존) 그대로 upsert(`merge-duplicates`)한다 — DELETE 를 쓰지 않으므로 findings CASCADE 위험이 없다. 본문을 못 얻으면 **아무것도 쓰지 않는다**(빈손을 빈손으로 덮지 않음). `collected_at` 은 원본 보존. nrow 무손실 복원 전제는 `tests/test_483_ocr_recovery.py` 의 왕복 동일성 테스트가 고정한다.
 - **스캔 483 OCR 엔진:** `.github/actions/setup-ocr`(복합 액션) — 483 PDF 텍스트 경로(`collect_fda_483._fetch_fda483_pdf_text`)를 실행하는 워크플로 **6종**(`grm-intake` · `grm-findings-backfill-fetch` · `grm-fda483-ocr-backfill` · `grm-fda483-inspector-backfill` · `grm-fda483-ocr-recovery` · `grm-source-verification`)이 공유하는 단일 정의. 설치 정의를 호출지마다 복제하면 한쪽이 뒤처진다(2026-07-30 실장애: 백필·원문대조 2종이 엔진 없이 돌았다). 엔진 부재는 조용히 지나가지 않는다 — 워크플로 주석·잡 요약 + 수집 health 경보(`fda483-ocr-engine-missing`)로 드러나고, 백필은 빈 본문을 적재하지 않고 **보류**한다(`skipped_ocr_unavailable`). 배선 표류는 `tests/test_ocr_engine_wiring.py` 가 호출 그래프에서 유도해 막는다.
 
 ### 5.3 비밀값(Secrets) · 기능 플래그(Variables)

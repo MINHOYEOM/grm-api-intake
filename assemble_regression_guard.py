@@ -50,8 +50,10 @@ def _card_key(card: dict[str, Any], i: int) -> str:
 
 
 def _bundle_items(card: dict[str, Any] | None) -> list[str] | None:
+    """묶음 카드의 항목 목록. 묶음이 아니면 None — 스캐폴드 스키마가 **모든** 카드에
+    `merged_items: []` 기본값을 싣으므로 빈 목록은 묶음이 아니다."""
     items = (card or {}).get("merged_items")
-    return [str(x) for x in items] if isinstance(items, list) else None
+    return [str(x) for x in items] if isinstance(items, list) and items else None
 
 
 def compare(published: dict[str, Any], assembled: dict[str, Any],

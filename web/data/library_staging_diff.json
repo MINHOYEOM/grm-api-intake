@@ -1,25 +1,25 @@
 {
   "schema_version": "grm-library-staging-diff/v1",
-  "generated_on": "2026-10-21",
+  "generated_on": "2026-10-27",
   "live_catalog_swapped": true,
   "sources": {
     "mfds": {
-      "baseline_count": 115,
-      "candidate_count": 116,
+      "baseline_count": 116,
+      "candidate_count": 117,
       "new_count": 1,
       "changed_count": 0,
       "removed_count": 0,
       "new_ids": [
-        "data0011-15969"
+        "data0011-15973"
       ],
       "changed_ids": [],
       "removed_ids": [],
-      "collector_items": 47,
-      "derived_items": 30,
+      "collector_items": 48,
+      "derived_items": 31,
       "dropped_items": 17,
       "collector_error": null,
       "change_count": 1,
-      "change_percent": 0.87
+      "change_percent": 0.86
     },
     "ich": {
       "baseline_count": 31,
@@ -133,6 +133,22 @@
       "change_count": 0,
       "change_percent": 0.0
     },
+    "pics": {
+      "baseline_count": 51,
+      "candidate_count": 51,
+      "new_count": 0,
+      "changed_count": 0,
+      "removed_count": 0,
+      "new_ids": [],
+      "changed_ids": [],
+      "removed_ids": [],
+      "collector_items": 47,
+      "derived_items": 47,
+      "dropped_items": 0,
+      "collector_error": null,
+      "change_count": 0,
+      "change_percent": 0.0
+    },
     "pmda": {
       "baseline_count": 16,
       "candidate_count": 16,
@@ -166,12 +182,8 @@
       "change_percent": 0.0
     }
   },
-  "collector_errors": {
-    "pics": "robots.txt 확인 실패(https://picscheme.org/robots.txt): HTTP GET final failure: https://picscheme.org/robots.txt (503 Server Error: Service Unavailable for url: https://picscheme.org/robots.txt)"
-  },
-  "skipped_sources": {
-    "pics": "robots.txt 확인 실패(https://picscheme.org/robots.txt): HTTP GET final failure: https://picscheme.org/robots.txt (503 Server Error: Service Unavailable for url: https://picscheme.org/robots.txt)"
-  },
+  "collector_errors": {},
+  "skipped_sources": {},
   "gate": {
     "max_change_count": 20,
     "max_change_percent": 30.0,

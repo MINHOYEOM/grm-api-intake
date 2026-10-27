@@ -632,6 +632,28 @@ def _evaluate_health(
             f"WL 본문 excerpt {stats.wl_body_failed}건 추출 실패 — 메타 카드 유지",
             f"attempted={stats.wl_body_attempted} failed={stats.wl_body_failed}",
         )
+    # [FDA 결손 감사 2026-10-27] 전문(심층분석·위반항목 상세의 유일한 입력) 실패는 종전
+    # 집계조차 안 됐다 — excerpt 와 같은 warning-only 로 표면화한다.
+    if stats.wl_body_full_failed > 0:
+        health.add_warning(
+            "wl-body-full-degraded",
+            "FDA WL",
+            f"WL 본문 전문 {stats.wl_body_full_failed}건 확보 실패 — 위반항목 상세·심층분석 없이 "
+            "메타 카드로 적재(재수집 없음)",
+            f"attempted={stats.wl_body_full_attempted} failed={stats.wl_body_full_failed}",
+        )
+    # [WL 목록 절단 2026-10-27] DataTables 전수 뷰가 죽어 정적 표(최신 10행)로 폴백했고, 그
+    # 10행이 전부 수집 창 안이라 창 안 편지가 더 있는지 알 수 없다. 화요일 게시가 10건을
+    # 넘으면 나머지는 Notion 에 들어오지 않는다(10-05 호 cGMP WL 4건 누락의 원인).
+    if stats.wl_listing_truncated:
+        health.add_warning(
+            "wl-listing-truncated",
+            "FDA WL",
+            "WL 목록을 정적 표(최신 10행)로만 읽었고 그 10행이 전부 수집 창 안 — "
+            "창 안 경고서한 일부가 수집되지 않았을 수 있음",
+            f"backbone={stats.wl_listing_backbone} detail={stats.wl_listing_detail} — "
+            "FDA WL 페이지의 DataTables(warning_letter_solr_index) 응답 확인",
+        )
     # WHY-1 #3 P1: 483 excerpt 실패/cap 표면화(WHOPIR/WL 와 동형 warning-only·flag off 면
     # 카운터 0 → 미발생). 카드 자체는 graceful degrade(메타 카드 유지)라 failure 승격 금지.
     if stats.fda483_excerpt_failed > 0 or stats.fda483_excerpt_capped > 0:

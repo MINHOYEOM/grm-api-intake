@@ -6552,7 +6552,7 @@ _FOOTER_GARBAGE_RE = re.compile(
     # [2026-10-27] 수집기 `collect_fda_483._FDA483_FOOTER_RE` 와 같은 날 맞춘 3종 — 전자서명
     # 스탬프, 양식 뒷면 704(b) 고지문, Y→V 오인식 EMPLOVEE(S). 셋 다 위 마커를 빠져나가
     # 발행분 25관찰(07-20·08-03·09-28·10-26)에 그대로 실렸다(소급 청소 완료).
-    r"|(?-i:Digitally\s+signed\s+by(?:\s*[A-Z]|\s*$))"     # 스탬프 형태만 — 산문 "digitally signed by the …" 제외
+    r"|(?-i:Digitally\s+signed\s+by)"     # 대문자 D 스탬프만 — 산문 "digitally signed by the …" 제외
     r"|observations\s+of\s+objectionable\s+conditions"
     r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
     r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])",

@@ -440,9 +440,10 @@ _FDA483_FOOTER_RE = re.compile(
     #   (render._FOOTER_GARBAGE_RE)에도 같은 마커를 넣어 둘을 맞춘다. 발행분 실측 25관찰.
     #   ① 전자서명 스탬프 "Muna Algharibeh -S Digitally signed by Muna Algharibeh -S Date: …"
     #      — 스탬프 앞 서명자 이름(대문자 시작 토큰 ≤3개 + 선택적 `-S`)까지 함께 자른다.
-    #      대소문자 고정이라 앞 문장의 소문자 끝("For example:")에서 멈추고, 스탬프 형태(대문자
-    #      D + 뒤에 대문자 이름)만 잡아 산문 "…was digitally signed by the analyst" 는 오탐하지 않는다.
-    r"|(?-i:(?:[A-Z][A-Za-z.'\-]*\s+){0,3}(?:-S\s+)?Digitally\s+signed\s+by(?:\s*[A-Z]|\s*$))"
+    #      대소문자 고정이라 앞 문장의 소문자 끝("For example:")에서 멈추고, 대문자 D 로 시작하는
+    #      스탬프만 잡아 산문 "…was digitally signed by the analyst" 는 오탐하지 않는다. 스탬프 뒤
+    #      서명자 표기는 OCR 로 제각각이라(대문자 이름·소문자·`_ '`·줄바꿈 — 원문 실측) 조건을 두지 않는다.
+    r"|(?-i:(?:[A-Z][A-Za-z.'\-]*\s+){0,3}(?:-S\s+)?Digitally\s+signed\s+by)"
     #   ② 양식 뒷면 법령 고지문 "The observations of objectionable conditions and practices
     #      listed on the front of this form are reported: 1. Pursuant to Section 704(b)…"
     r"|(?:The\s+)?observations\s+of\s+objectionable\s+conditions"

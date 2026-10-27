@@ -255,6 +255,42 @@ class OutOfScope483Test(unittest.TestCase):
         self.assertEqual(base_report.out_of_scope_483_ids, [])
         self.assertEqual(len(out["cards"]), len(base_out["cards"]) + 2)
 
+    @staticmethod
+    def _src(deficiency, detail):
+        return f"I/WE OBSERVED:\n\nOBSERVATION 1: {deficiency} Specifically, {detail}\n\n"
+
+    def test_out_of_scope_judged_again_after_refresh(self):
+        """[2026-10-27] 본문 없이 들어온 스캐폴드 카드는 채택 필터를 통과한다 — 관찰이 재추출로
+        생긴 뒤 다시 판정해 기기·식품이면 뺀다(10-26 OCR 복구 7건). 의약품은 남는다."""
+        s = _blank_scaffold_from(self.truth)
+        cards = {cid: self._483(cid, "Manufacturer")
+                 for cid in ("fda483-11", "fda483-12", "fda483-13")}
+        s["cards"].extend(cards.values())
+        d = copy.deepcopy(self.delta)
+        slots = next(iter(d["cards"].values()))
+        for cid in cards:
+            d["cards"][cid] = copy.deepcopy(slots)
+        deep = {
+            "fda483-11": {"source_text": self._src(
+                "Design and development changes were not adequately reviewed before implementation.",
+                "your firm did not control design changes made to correct cybersecurity issues.")},
+            "fda483-12": {"source_text": self._src(
+                "You did not implement your sanitation preventive control procedures.",
+                "your food safety plan identifies recontamination with environmental pathogens.")},
+            "fda483-13": {"source_text": self._src(
+                "Aseptic processing areas are deficient regarding environmental monitoring.",
+                "settle plates were not qualified for incubation at the required temperature."),
+                "observations_ko": [{"number": "1", "deficiency_ko": "무균공정 구역 모니터링 미흡.",
+                                     "detail_ko": "낙하균 배지 적격성 미평가."}]},
+        }
+        out, report = apb.assemble_publish_brief(s, d, strict=True, deep_deltas=deep)
+        ids = {c["id"] for c in out["cards"]}
+        self.assertIn("fda483-13", ids)
+        self.assertFalse({"fda483-11", "fda483-12"} & ids)
+        self.assertEqual(sorted(report.out_of_scope_483_ids), ["fda483-11", "fda483-12"])
+        self.assertTrue(any("추가 제외" in w for w in report.warnings))
+        self.assertEqual(out["brief"]["coverage"]["rendered"], len(out["cards"]))
+
 
 class TestDeepAnalysisWiring(unittest.TestCase):
     """assemble_publish_brief(deep_deltas=...) — additive 배선 검증. 실제 게이트 로직은

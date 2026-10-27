@@ -113,15 +113,31 @@ jobs:
             # ★ headBranch=main 필수(2026-07-20) — 작업 브랜치에서 dispatch 한 intake run 이 더 최신이면
             #   그쪽이 뽑혔고, 그런 run 에는 grm-web-brief 아티팩트가 없어 "no valid artifacts found" 로
             #   죽었다. 스캐폴드는 main 스케줄 run 이 내는 것이 정본이다.
+            #
+            # ★ 최신 1건이 아니라 **그 날짜 스캐폴드를 실제로 가진** 최신 run 을 고른다(2026-10-27).
+            #   발행 후 델타를 정정해 재조립하면, 그 사이 돈 **다음 날 일일 run**(UTC 로는 여전히
+            #   발행일 날짜 — 10-26 22:42Z)이 최신으로 뽑혔고, 그 run 의 아티팩트는 다음 주
+            #   스캐폴드라 "스캐폴드에 2026_10_26 없음"으로 죽었다(#1213 머지 직후 run 40512875379).
+            #   후보를 최신순으로 내려받아 파일 존재로 판정한다 — 날짜 창은 후보를 좁히는 데만 쓴다.
             PREV=$(date -u -d "${{ steps.r.outputs.pub }} -1 day" +%Y-%m-%d)
-            RID=$(gh run list -R "${{ github.repository }}" --workflow grm-intake.yml \
+            CANDS=$(gh run list -R "${{ github.repository }}" --workflow grm-intake.yml \
                     --status success --branch main --json databaseId,createdAt -L 40 \
-                    -q "[.[] | select((.createdAt|startswith(\"$PREV\")) or (.createdAt|startswith(\"${{ steps.r.outputs.pub }}\")))][0].databaseId")
+                    -q ".[] | select((.createdAt|startswith(\"$PREV\")) or (.createdAt|startswith(\"${{ steps.r.outputs.pub }}\"))) | .databaseId")
+            for C in $CANDS; do
+              rm -rf _scaffold && mkdir -p _scaffold
+              if gh run download "$C" -R "${{ github.repository }}" -n grm-web-brief -D _scaffold \
+                   && [ -f "_scaffold/brief_web_${{ steps.r.outputs.under }}.json" ]; then
+                RID="$C"
+                break
+              fi
+              echo "::notice::intake run $C 에 brief_web_${{ steps.r.outputs.under }}.json 없음 — 다음 후보"
+            done
+            [ -n "$RID" ] || { echo "::error::${{ steps.r.outputs.under }} 스캐폴드를 가진 intake run 미발견 — intake_run_id 입력으로 지정"; exit 1; }
+          else
+            mkdir -p _scaffold
+            gh run download "$RID" -R "${{ github.repository }}" -n grm-web-brief -D _scaffold
           fi
-          [ -n "$RID" ] || { echo "::error::intake run 미발견 — intake_run_id 입력으로 지정"; exit 1; }
           echo "intake run: $RID"
-          mkdir -p _scaffold
-          gh run download "$RID" -R "${{ github.repository }}" -n grm-web-brief -D _scaffold
           test -f "_scaffold/brief_web_${{ steps.r.outputs.under }}.json" \
             || { echo "::error::스캐폴드에 ${{ steps.r.outputs.under }} 없음 — run/날짜 확인"; exit 1; }
 

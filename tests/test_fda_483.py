@@ -2357,6 +2357,47 @@ class Fda483PageHeaderFooterCutTest(unittest.TestCase):
         self.assertIsNotNone(f._FDA483_FOOTER_RE.search("DISTRICT OFFICE ADDRESS AND PHONE"))
 
 
+class Fda483SignatureStampFooterTest(unittest.TestCase):
+    """[2026-10-27] 기존 마커를 전부 빠져나가 발행분 25관찰에 실린 서명블록 3종.
+
+    수집기 `_FDA483_FOOTER_RE` 가 자르고 게이트 `render._FOOTER_GARBAGE_RE` 가 잡는다 — 두
+    정규식은 같은 마커 집합을 가져야 한다(한쪽만 있으면 "발행 직전에야 터지는 차단")."""
+
+    CASES = {
+        # 전자서명 스탬프 — 앞 서명자 이름까지 함께 잘린다(fda483-195264 obs#1 실측).
+        "Specifically, many CAPAs remain open. For example: Muna Algharibeh -S "
+        "Digitally signed by Muna Algharibeh -S Date: 2026.02.24":
+            "Specifically, many CAPAs remain open. For example",
+        # 1200자 상한에 이름이 잘려 스탬프만 남은 꼴(fda483-193573 실측).
+        "Specifically, the reports were reviewed without adequate justification. Digitally signed by":
+            "Specifically, the reports were reviewed without adequate justification.",
+        # 양식 뒷면 704(b) 고지문(fda483-195303 obs#5 실측).
+        "Specifically, the cleaning records were incomplete for several lots. The observations of "
+        "objectionable conditions and practices listed on the front of this form are reported":
+            "Specifically, the cleaning records were incomplete for several lots.",
+        # Y→V 오인식 EMPLOYEE(S)(fda483-195629 obs#2 실측).
+        "Specifically, the batch was released to your client for further processing EMPLOVEE(S)":
+            "Specifically, the batch was released to your client for further processing",
+    }
+
+    def test_collector_cuts_and_gate_agrees(self):
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                        "web"))
+        import render
+        for raw, want in self.CASES.items():
+            with self.subTest(raw=raw[-40:]):
+                self.assertTrue(render._FOOTER_GARBAGE_RE.search(raw), "게이트가 잔재를 못 잡는다")
+                got = f._clean_observation_detail(raw)
+                self.assertEqual(got, want)
+                self.assertIsNone(render._FOOTER_GARBAGE_RE.search(got))
+
+    def test_prose_is_not_cut(self):
+        for prose in ("Specifically, the record was digitally signed by the analyst after review.",
+                      "Specifically, employees were not trained on the procedure."):
+            with self.subTest(prose=prose):
+                self.assertIsNone(f._FDA483_FOOTER_RE.search(prose))
+
+
 class Fda483GlyphNumberedHeadingTest(unittest.TestCase):
     """★스캔 OCR 이 표제 번호 `1` 을 글자 `I`·`l`·`|` 로 읽는다.
 

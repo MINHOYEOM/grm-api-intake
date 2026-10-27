@@ -233,7 +233,16 @@ def is_out_of_scope_483_establishment(establishment_type: str) -> bool:
 _FDA483_DEVICE_TEXT_RE = re.compile(
     r"\b820\.\d+|design\s+(?:controls?|validation|verification|history)"
     r"|device\s+(?:master|history)\s+record|\bmedical\s+devices?\b|\bmdrs?\b"
-    r"|quality\s+system\s+regulation|unique\s+device\s+identif", re.I)
+    r"|quality\s+system\s+regulation|unique\s+device\s+identif"
+    # [2026-10-27] 10-26 OCR 복구분 Gobiquity(기기·사이버보안)가 위 어휘를 하나도 안 써 통과했다
+    #   — 설계관리 조항(820.30)의 다른 표현 "design and development"·"design changes".
+    r"|design\s+(?:and\s+development|changes?)\b", re.I)
+# 식품 483(21 CFR 117 예방관리) 전용 어휘 — 시설 유형이 그냥 "Manufacturer" 인 식품 업체를
+# 본문으로 가른다(10-26 OCR 복구분 Krispy Kreme). 의약품 어휘가 같이 있으면 남기는 조건은
+# 기기와 같다.
+_FDA483_FOOD_TEXT_RE = re.compile(
+    r"\bfood\s+(?:safety\s+plan|plant|contact\s+surfaces?)\b|preventive\s+controls?\b"
+    r"|\b117\.\d+|\bready[\s-]+to[\s-]+eat\b", re.I)
 _FDA483_DRUG_TEXT_RE = re.compile(
     r"\bdrug\s+(?:products?|substances?)\b|\bapis?\b|active\s+pharmaceutical|\baseptic"
     r"|\bsterility\b|\bstability\b|out[\s-]+of[\s-]+specification|\boos\b|\b211\.\d+"
@@ -247,7 +256,8 @@ def is_out_of_scope_483(establishment_type: str, text: str = "") -> bool:
     if _FDA483_PHARMA_GUARD_RE.search(establishment_type or ""):
         return False
     body = text or ""
-    return bool(_FDA483_DEVICE_TEXT_RE.search(body) and not _FDA483_DRUG_TEXT_RE.search(body))
+    non_pharma = _FDA483_DEVICE_TEXT_RE.search(body) or _FDA483_FOOD_TEXT_RE.search(body)
+    return bool(non_pharma and not _FDA483_DRUG_TEXT_RE.search(body))
 
 
 # FDA Warning Letter 페이지는 식품 HACCP/FSVP/건기식까지 함께 노출한다.

@@ -631,6 +631,24 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
             report.warnings.append(f"[deep] {w}")
         for e in deep_report.errors:
             report.warnings.append(f"[deep] {e}")
+        # [범위 밖 재판정 2026-10-27] 위 채택 필터는 **스캐폴드 카드**로 판정한다. 그런데 관찰
+        # 블록이 재추출로 **새로 생긴** 카드는 그 시점에 본문이 없어, 시설 유형이 그냥
+        # "Manufacturer" 인 기기·식품 483 이 판정을 통과했다(10-26 호 OCR 복구 7건 — 기기 6·
+        # 식품 1). 본문이 생긴 지금 같은 판정을 한 번 더 한다. 재추출한 카드만 본다 — 나머지는
+        # 위에서 같은 입력으로 이미 판정됐다.
+        refreshed = set(report.refreshed_483_ids)
+        late_oos = [c for c in adopted_cards
+                    if str(c.get("id")) in refreshed and _is_out_of_scope_483_card(c)]
+        if late_oos:
+            late_ids = [c.get("id") for c in late_oos]
+            adopted_cards = [c for c in adopted_cards if c.get("id") not in set(late_ids)]
+            report.dropped += len(late_ids)
+            report.dropped_ids.extend(late_ids)
+            report.out_of_scope_483_ids.extend(late_ids)
+            report.warnings.append(
+                f"범위 밖 483 {len(late_ids)}장 추가 제외(재추출 본문 기준 — 기기·식품 등): "
+                + ", ".join(str(i) for i in late_ids[:8])
+                + (" …" if len(late_ids) > 8 else ""))
 
     # [FDA 483 공개 디제스트 2026-07-13] 관찰 원문 없는 483 공개 카드 다건 → 목록카드 1장.
     adopted_cards = merge_fda483_disclosures(adopted_cards)
@@ -788,9 +806,13 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         after = [(o["number"], o["deficiency"], o["detail"]) for o in fresh]
         if before == after:
             continue
+        # 관찰과 무관한 블록 필드(실사관 이름 `inspectors` 등)는 그대로 물려준다 — 관찰만 바꾼다.
+        # [2026-10-27] 종전엔 블록을 새로 만들어 `inspectors` 가 재추출 때마다 사라졌다.
         refreshed: dict[str, Any] = {
             "type": "fda_483_observations", "count": len(fresh), "observations": fresh,
         }
+        refreshed.update({k: v for k, v in (dd or {}).items()
+                          if k not in refreshed and k != "text_source"})
         # [OCR 출처 표기 2026-07-27] 이 `source_text` 가 원문 텍스트층인지 우리 OCR 판독인지
         # 그대로 물려준다 — 판독물을 "원문"이라고 표시하지 않기 위해서다. 소급 복구 패치
         # (`fda483_ocr_backfill.py`)가 `source_text_status` 를 함께 싣는다. 없으면 기존과 동일

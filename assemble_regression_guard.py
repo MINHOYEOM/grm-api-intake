@@ -45,18 +45,65 @@ def _cards_by_id(doc: dict[str, Any]) -> dict[str, str]:
     return out
 
 
+def _card_key(card: dict[str, Any], i: int) -> str:
+    return str(card.get("id") or f"__noid_{card.get('render_order', i)}")
+
+
+def _bundle_items(card: dict[str, Any] | None) -> list[str] | None:
+    items = (card or {}).get("merged_items")
+    return [str(x) for x in items] if isinstance(items, list) else None
+
+
 def compare(published: dict[str, Any], assembled: dict[str, Any],
             max_shrink_pct: float = DEFAULT_MAX_SHRINK_PCT) -> dict[str, Any]:
-    """발행본 대비 조립본의 회귀를 판정한다. 반환=결과 dict(순수 함수)."""
+    """발행본 대비 조립본의 회귀를 판정한다. 반환=결과 dict(순수 함수).
+
+    [묶음 카드 축소 2026-10-27] 묶음 카드(`merged_items` 보유 — 483 본문 미확보 디제스트 등)는
+    소급 복구로 항목이 **빠지는 것이 정상**이다 — 빠진 건은 정식 카드로 풀리거나 범위 밖으로
+    제외된다. 종전엔 그 축소를 그대로 '내용 소실'로 세어, 10-26 호 25건 중 20건을 되살리자
+    묶음이 −32.5% 가 돼 자동 재조립 PR 이 막혔다. 그래서 묶음 카드는 "발행본에서 **빠진 항목만**
+    뺀 모습"을 기준선으로 잰다 — 항목 제거 외의 축소(수기 보정 소실)는 여전히 잡힌다. 남은
+    항목이 발행본 항목의 부분집합일 때만 적용한다(새 항목이 끼면 종전 판정 그대로).
+    대표 카드가 바뀌어 발행본 id 가 사라진 경우(대표가 복구·제외됨)도, 그 항목의 부분집합을
+    든 묶음이 조립본에 있으면 같은 묶음으로 보고 소실로 세지 않는다."""
     old = _cards_by_id(published)
     new = _cards_by_id(assembled)
+    old_cards = {_card_key(c, i): c for i, c in enumerate(published.get("cards") or [])}
+    new_cards = {_card_key(c, i): c for i, c in enumerate(assembled.get("cards") or [])}
+    new_bundles = {k: _bundle_items(c) for k, c in new_cards.items()
+                   if _bundle_items(c) is not None}
 
-    missing = sorted(set(old) - set(new))
+    def _successor(key: str) -> str | None:
+        """발행본 묶음 카드 key 에 대응하는 조립본 묶음 카드 key(항목이 부분집합인 것)."""
+        old_items = _bundle_items(old_cards.get(key))
+        if old_items is None:
+            return None
+        if key in new_bundles and set(new_bundles[key]) <= set(old_items):
+            return key
+        for k, items in new_bundles.items():
+            if k not in old and items and set(items) <= set(old_items):
+                return k
+        return None
+
+    missing: list[str] = []
     shrunk: list[dict[str, Any]] = []
+    unbundled: list[dict[str, Any]] = []
     for key, old_text in old.items():
-        new_text = new.get(key)
+        succ = _successor(key)
+        new_text = new.get(succ or key)
         if new_text is None:
+            missing.append(key)
             continue
+        if succ is not None:
+            old_items = _bundle_items(old_cards[key]) or []
+            new_items = new_bundles[succ]
+            if len(new_items) < len(old_items) or succ != key:
+                unbundled.append({"id": key, "now": succ, "before_items": len(old_items),
+                                  "after_items": len(new_items)})
+            baseline = dict(old_cards[key])
+            baseline["merged_items"] = new_items
+            baseline["merged_count"] = new_cards[succ].get("merged_count")
+            old_text = json.dumps(baseline, ensure_ascii=False, sort_keys=True)
         before, after = len(old_text), len(new_text)
         if after >= before:
             continue
@@ -64,6 +111,7 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
         if pct >= max_shrink_pct:
             shrunk.append({"id": key, "before": before, "after": after, "shrink_pct": round(pct, 1)})
     shrunk.sort(key=lambda r: r["shrink_pct"], reverse=True)
+    missing.sort()
 
     total_before = sum(len(v) for v in old.values())
     total_after = sum(len(v) for v in new.values())
@@ -73,6 +121,7 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
         "assembled_cards": len(new),
         "missing_cards": missing,
         "shrunk_cards": shrunk,
+        "unbundled_cards": unbundled,
         "total_before": total_before,
         "total_after": total_after,
         "total_delta": total_after - total_before,
@@ -89,6 +138,10 @@ def render_markdown(result: dict[str, Any], out_path: str) -> str:
             f"발행본 {result['published_cards']}장 → 조립본 {result['assembled_cards']}장 · "
             f"본문 총 길이 {result['total_delta']:+,}자. 되돌려진 내용 없음."
         )
+        for row in result.get("unbundled_cards") or []:
+            moved = f" (대표 → `{row['now']}`)" if row["now"] != row["id"] else ""
+            lines.append(f"- 묶음 축소 `{row['id']}`: {row['before_items']}건 → "
+                         f"{row['after_items']}건{moved} — 빠진 항목은 정식 카드로 풀렸거나 범위 밖 제외")
         return "\n".join(lines)
 
     lines.append("### 발행 회귀 가드 — 차단")

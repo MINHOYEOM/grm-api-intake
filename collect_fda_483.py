@@ -120,6 +120,16 @@ FDA483_PDF_MAX_FETCHES = _env_int("FDA483_PDF_MAX_FETCHES", FDA483_EXCERPT_MAX_I
 # 실행 1회당 OCR 페이지 예산 — 실측 ≈2.2s/쪽. 200쪽 ≈ 7분으로 intake 전체 예산 안에 든다.
 # 소진 후 문서는 OCR 없이 진행(상태 `scan-ocr-budget`)해 **왜** 비었는지가 카드까지 전달된다.
 FDA483_OCR_PAGE_BUDGET = _env_int("FDA483_OCR_PAGE_BUDGET", 200)
+# [발행일 추가 예산 2026-10-27] 위 상한 밖 문서는 다음 날 grm-fda483-ocr-recovery 예약 실행
+# (23:37 UTC = 08:37 KST)이 회수한다. 그런데 **월요일 수집분만은** 그 회수가 07:30 KST
+# Routine 보다 늦다 — 월요일 실행이 상한에 걸리면 그 문서들은 그 주 브리프에 본문 없이 실린다
+# (10-20 실행: OCR 예산 소진 1건). 그래서 발행일 실행에만 상한을 넓히되, 넓힌 몫은 **마감
+# 시각(epoch 초)까지만** 쓴다 — 마감이 지나면 기본 상한으로 돌아가 handoff 생성이 Routine
+# 뒤로 밀리지 않게 한다. 마감 전에도 기본 상한은 항상 보장된다(늦게 시작한 실행이 손해 보지
+# 않는다). 셋 다 0(기본)이면 종전과 같다 — 워크플로가 발행일에만 env 로 켠다.
+FDA483_BURST_PDF_MAX_ITEMS = _env_int("FDA483_BURST_PDF_MAX_ITEMS", 0)
+FDA483_BURST_OCR_PAGE_BUDGET = _env_int("FDA483_BURST_OCR_PAGE_BUDGET", 0)
+FDA483_BURST_DEADLINE_EPOCH = _env_int("FDA483_BURST_DEADLINE_EPOCH", 0)
 FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
 FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
@@ -219,6 +229,21 @@ LAST_HEALTH: dict[str, Any] = {}
 # 실행 1회당 OCR 페이지 예산(모듈 전역 — collect_fda_483() 진입 시 리셋). 예산 밖 문서는
 # OCR 없이 진행하고 사유를 남긴다 — 조용히 빈 카드가 되지 않게.
 _OCR_BUDGET: dict[str, int] = {"remaining": FDA483_OCR_PAGE_BUDGET, "used": 0}
+
+
+def _burst_active(now: float | None = None) -> bool:
+    """발행일 추가 예산이 지금 유효한가 — 마감 epoch 가 설정됐고 아직 안 지났을 때만."""
+    if FDA483_BURST_DEADLINE_EPOCH <= 0:
+        return False
+    return (time.time() if now is None else now) < FDA483_BURST_DEADLINE_EPOCH
+
+
+def _pdf_caps(burst: bool) -> tuple[int, int]:
+    """(범위 안 문서 상한, 총 PDF 요청 상한). 추가 예산은 기본 상한을 **넓히기만** 한다."""
+    if burst and FDA483_BURST_PDF_MAX_ITEMS > FDA483_EXCERPT_MAX_ITEMS:
+        return FDA483_BURST_PDF_MAX_ITEMS, max(FDA483_PDF_MAX_FETCHES,
+                                               FDA483_BURST_PDF_MAX_ITEMS * 2)
+    return FDA483_EXCERPT_MAX_ITEMS, FDA483_PDF_MAX_FETCHES
 
 # [OCR 엔진 부재 표면화 2026-07-30] OCR 결과를 **상태코드별로 센다**.
 #
@@ -2164,7 +2189,11 @@ def collect_fda_483(
     """
     global LAST_HEALTH, _LAST_BACKBONE
     _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
-    _OCR_BUDGET["remaining"] = FDA483_OCR_PAGE_BUDGET   # 실행별 리셋(위와 동일 이유)
+    # [발행일 추가 예산] 진입 시점에 마감 전이면 넓힌 예산으로 시작하고, 루프에서 마감이
+    # 지나는 순간 기본 예산으로 되돌린다(이미 쓴 만큼은 기본 예산에서 차감).
+    burst_granted = _burst_active()
+    _OCR_BUDGET["remaining"] = (max(FDA483_OCR_PAGE_BUDGET, FDA483_BURST_OCR_PAGE_BUDGET)
+                                if burst_granted else FDA483_OCR_PAGE_BUDGET)   # 실행별 리셋
     _OCR_BUDGET["used"] = 0
     reset_ocr_health()
     excerpt_health: dict[str, Any] = {
@@ -2179,6 +2208,8 @@ def collect_fda_483(
         "dropped_out_of_scope": 0,
         # 시설 유형(혈액·조직·임상·식품·기기)만으로 범위 밖이라 PDF 를 받지 않은 문서 수.
         "skipped_out_of_scope_type": 0,
+        # [발행일 추가 예산] 넓힌 예산을 받았는가 · 실행 도중 마감이 지나 기본 상한으로 돌아갔는가.
+        "burst_granted": burst_granted, "burst_deadline_hit": False,
     }
     observations_enabled = _observations_enabled()
     observations_health: dict[str, Any] = {
@@ -2271,8 +2302,17 @@ def collect_fda_483(
         if pdf_url:
             in_scope_attempted = (excerpt_health["attempted"]
                                   - excerpt_health["dropped_out_of_scope"])
-            if (in_scope_attempted >= FDA483_EXCERPT_MAX_ITEMS
-                    or excerpt_health["attempted"] >= FDA483_PDF_MAX_FETCHES):
+            burst = burst_granted and _burst_active()
+            if burst_granted and not burst and not excerpt_health["burst_deadline_hit"]:
+                excerpt_health["burst_deadline_hit"] = True
+                _OCR_BUDGET["remaining"] = min(
+                    _OCR_BUDGET["remaining"],
+                    max(0, FDA483_OCR_PAGE_BUDGET - _OCR_BUDGET["used"]))
+                log("INFO", "FDA 483 발행일 추가 예산 마감 — 이후 문서는 기본 상한"
+                            f"({FDA483_EXCERPT_MAX_ITEMS}건·OCR {FDA483_OCR_PAGE_BUDGET}쪽)으로")
+            max_items, max_fetches = _pdf_caps(burst)
+            if (in_scope_attempted >= max_items
+                    or excerpt_health["attempted"] >= max_fetches):
                 excerpt_health["capped"] = True
                 excerpt_health["skipped_no_attempt"] += 1
             else:
@@ -2388,6 +2428,8 @@ def collect_fda_483(
                 f"범위밖드롭={excerpt_health['dropped_out_of_scope']} "
                 f"범위밖유형={excerpt_health['skipped_out_of_scope_type']} "
                 f"· OCR {_OCR_BUDGET['used']}/{FDA483_OCR_PAGE_BUDGET}쪽 "
+                f"발행일추가예산={'on' if burst_granted else 'off'}"
+                f"{'(마감 도달)' if excerpt_health['burst_deadline_hit'] else ''} "
                 f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
                 f"예산초과={_OCR_HEALTH['budget_skipped']} "
                 f"· observations enabled={observations_enabled} "

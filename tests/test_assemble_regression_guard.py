@@ -87,6 +87,46 @@ class ThresholdTest(unittest.TestCase):
         self.assertFalse(g.compare(pub, asm, max_shrink_pct=5.0)["ok"])
 
 
+class BundleShrinkTest(unittest.TestCase):
+    """[2026-10-27] 묶음 카드(`merged_items`)는 소급 복구로 항목이 빠지는 것이 정상이다.
+
+    10-26 호: 25건 묶음에서 20건을 정식 카드로 풀자 묶음이 −32.5% 가 돼 자동 재조립 PR 이
+    막혔다. 빠진 항목만큼은 축소로 세지 않되, 그 외 내용이 줄면 종전대로 막는다."""
+
+    ITEMS = [f"Firm {i} · FEI {1000 + i} · 실사 01/0{i % 9 + 1}/2026" for i in range(25)]
+
+    def _bundle(self, cid, items, note="n" * 200):
+        return {"id": cid, "render_order": 0, "merged_items": items,
+                "merged_count": len(items), "summary": note}
+
+    def test_items_removed_is_not_regression(self):
+        pub = _doc([self._bundle("b", self.ITEMS)])
+        asm = _doc([self._bundle("b", self.ITEMS[:5]),
+                    *[_card(f"full-{i}", "z" * 300, i + 1) for i in range(20)]])
+        r = g.compare(pub, asm)
+        self.assertTrue(r["ok"], r)
+        self.assertEqual(r["unbundled_cards"][0]["after_items"], 5)
+        self.assertIn("묶음 축소", g.render_markdown(r, "x.json"))
+
+    def test_other_content_loss_still_blocked(self):
+        pub = _doc([self._bundle("b", self.ITEMS, note="n" * 4000)])
+        asm = _doc([self._bundle("b", self.ITEMS[:5], note="n")])
+        self.assertFalse(g.compare(pub, asm)["ok"])
+
+    def test_new_item_disables_exemption(self):
+        pub = _doc([self._bundle("b", self.ITEMS)])
+        asm = _doc([self._bundle("b", ["Unrelated Firm · FEI 1"])])
+        self.assertFalse(g.compare(pub, asm)["ok"])
+
+    def test_representative_change_is_not_missing(self):
+        """대표(가장 작은 id)가 복구·제외돼 묶음 id 가 바뀌어도 같은 묶음으로 본다."""
+        pub = _doc([self._bundle("b-1", self.ITEMS)])
+        asm = _doc([self._bundle("b-2", self.ITEMS[1:6])])
+        r = g.compare(pub, asm)
+        self.assertTrue(r["ok"], r)
+        self.assertEqual(r["unbundled_cards"][0]["now"], "b-2")
+
+
 class NoIdCardTest(unittest.TestCase):
     def test_cards_without_id_use_render_order(self):
         pub = _doc([{"render_order": 3, "body": "x" * 400}])

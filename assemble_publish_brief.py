@@ -806,9 +806,13 @@ def _refresh_483_observations(out: dict[str, Any], deep_deltas: dict[str, Any],
         after = [(o["number"], o["deficiency"], o["detail"]) for o in fresh]
         if before == after:
             continue
+        # 관찰과 무관한 블록 필드(실사관 이름 `inspectors` 등)는 그대로 물려준다 — 관찰만 바꾼다.
+        # [2026-10-27] 종전엔 블록을 새로 만들어 `inspectors` 가 재추출 때마다 사라졌다.
         refreshed: dict[str, Any] = {
             "type": "fda_483_observations", "count": len(fresh), "observations": fresh,
         }
+        refreshed.update({k: v for k, v in (dd or {}).items()
+                          if k not in refreshed and k != "text_source"})
         # [OCR 출처 표기 2026-07-27] 이 `source_text` 가 원문 텍스트층인지 우리 OCR 판독인지
         # 그대로 물려준다 — 판독물을 "원문"이라고 표시하지 않기 위해서다. 소급 복구 패치
         # (`fda483_ocr_backfill.py`)가 `source_text_status` 를 함께 싣는다. 없으면 기존과 동일

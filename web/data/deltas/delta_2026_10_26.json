@@ -458,30 +458,34 @@
    }
   },
   "fda483-195260": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Fresenius Kabi USA, LLC 실사(05/14/2026)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "육안검사 검출력 저하·무균 밸리데이션 미흡",
+   "summary": "FDA가 미국 무균 의약품 제조소 Fresenius Kabi USA, LLC 실사(실사일 05/14/2026) 후 관찰사항 3건을 담은 483을 발부했다. 자사 적격성평가에서 현행 컨베이어 방식 바이알 육안검사의 미립자 검출률이 100% 수동 검사보다 크게 낮게 나왔는데도 검사 공정의 적절성을 재평가하지 않은 점이 핵심이다.",
    "key_facts": [
     "제조소/업체: Fresenius Kabi USA, LLC · FEI 3001833549",
-    "시설 유형: Sterile Drug Manufacturer",
-    "실사일: 05/14/2026"
+    "시설 · 유형: Sterile Drug Manufacturer · 483",
+    "관찰사항: 3건(육안검사 공정 관리, 무균·멸균 밸리데이션, 분석법 이전)",
+    "검출률 예: 마개 미립자 수동 93.3% 대 현행 방식 10.0%, 섬유 미립자 70.0% 대 13.3%"
    ],
-   "implication": "Sterile Drug Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "육안검사 방법 적격성평가 결과가 현행 검사 방식의 한계를 보여 줬는데도 공정에 반영되지 않은 것이 지적됐다. 적격성평가를 수행한 것만으로는 부족하고, 그 결과가 검사 속도·검사원 적격성 시료 구성 같은 일상 운영 조건에 반영됐는지가 검토 대상이 될 수 있음을 보여 주는 사례로 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "자동·반자동 육안검사의 검출확률과 수동 검사 대비 차이 평가 여부",
+    "검사원 적격성평가 시료에 검출 하한 크기 결함 포함 여부",
+    "분석법 이전 시 이전·수령 시험실 비교시험 수행 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 05/14/2026 inspection of Fresenius Kabi USA, LLC.",
+    "title_issue": "Weak visual inspection and aseptic validation",
+    "summary": "FDA issued a Form 483 with three observations to Fresenius Kabi USA, LLC, a US sterile drug manufacturer, after an inspection ending 05/14/2026. The key issue is that the firm's own qualification studies showed its current conveyor-based vial inspection detected particulates far less often than 100% manual inspection, yet the process was not reassessed.",
     "key_facts": [
-     "Facility: Fresenius Kabi USA, LLC - FEI 3001833549",
-     "Facility type: Sterile Drug Manufacturer",
-     "Inspection date: 05/14/2026"
+     "Facility: Fresenius Kabi USA, LLC, FEI 3001833549",
+     "Establishment type: Sterile Drug Manufacturer",
+     "Observations: visual inspection process control, aseptic and sterilization validation, analytical method transfer",
+     "Detection example: stopper particulates 93.3% manual vs. 10.0% current method; fibers 70.0% vs. 13.3%"
     ],
-    "implication": "This is a public record of an FDA inspection at a Sterile Drug Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "The citation targets a qualification study whose findings on the limits of the current inspection method were never carried into the process. Running the study is not enough; whether its results shaped routine conditions such as conveyor speed and the defect sets used to qualify inspectors appears to be a point worth noting.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Probability of detection for automated or semi-automated inspection versus manual inspection",
+     "Inclusion of defects at the detection limit in inspector qualification sets",
+     "Comparative testing between sending and receiving labs in method transfers"
     ]
    }
   },
@@ -542,58 +546,66 @@
    }
   },
   "fda483-195264": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 RayzeBio, Inc 실사(02/24/2026)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "시험 완료 전 출하 허용·EMPQ 조사 미흡",
+   "summary": "FDA가 미국 제조소 RayzeBio, Inc 실사(실사일 02/24/2026) 후 483을 발부했다. 판독된 관찰사항은 2건(1·4번)으로, 분석시험과 배치기록 검토가 끝나기 전 무균 주사제를 고객에게 출하하도록 허용하면서 부적합 시 조치를 정하지 않은 절차와, 환경 성능적격성평가의 CFU 조치기준 초과에 대한 조사 미흡이다.",
    "key_facts": [
     "제조소/업체: RayzeBio, Inc · FEI 3030530655",
-    "시설 유형: Manufacturer",
-    "실사일: 02/24/2026"
+    "시설 · 유형: Manufacturer · 483",
+    "관찰사항: 2건 판독(1번 품질부서 절차, 4번 불일치 조사)",
+    "EMPQ: 조치기준 초과 시료 14건, 합계 315 CFU — 미생물 유래 추적 미흡"
    ],
-   "implication": "Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "격리 상태 출하(시험 완료 전 출하)를 절차로 허용하면서 부적합 시 회수 단계를 정하지 않은 점이 품질부서 책임 결함으로 지적됐다. 유효기간이 짧아 출하 후 시험이 끝나는 제품군에서는 조건부 출하 절차와 부적합 시 회수 절차가 짝을 이뤄 있는지가 실사에서 확인될 수 있는 대목으로 읽힌다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "시험 완료 전 출하 허용 시 부적합 대응·회수 절차 연계 여부",
+    "환경 성능적격성평가 중 조치기준 초과의 조사·미생물 유래 추적 여부",
+    "기한 경과 CAPA 의 연장 사유 기록 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 02/24/2026 inspection of RayzeBio, Inc.",
+    "title_issue": "Early release and weak EMPQ investigation",
+    "summary": "FDA issued a Form 483 to RayzeBio, Inc, a US manufacturer, after an inspection ending 02/24/2026. Two observations (1 and 4) were legible: a procedure that allows sterile injectables to ship to customers before analytical testing and batch record review are complete without defining what happens if the product fails, and an inadequate investigation of CFU action limit excursions during environmental performance qualification.",
     "key_facts": [
-     "Facility: RayzeBio, Inc - FEI 3030530655",
-     "Facility type: Manufacturer",
-     "Inspection date: 02/24/2026"
+     "Facility: RayzeBio, Inc, FEI 3030530655",
+     "Establishment type: Manufacturer",
+     "Observations legible: 1 (quality unit procedures) and 4 (discrepancy investigations)",
+     "EMPQ: 14 samples above action limits, 315 CFU in total, sources not traced"
     ],
-    "implication": "This is a public record of an FDA inspection at a Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "Allowing quarantine shipment by procedure without defined failure and recall steps was cited as a quality unit failure. For short-shelf-life products released before testing ends, whether conditional release is paired with a recall procedure looks like a point inspectors may check.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Link between release-before-testing and failure handling or recall procedures",
+     "Investigation and source tracing of action limit excursions during EMPQ",
+     "Documented justification for overdue CAPAs"
     ]
    }
   },
   "fda483-195265": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Spirit Pharmaceuticals 실사(01/25/2017)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "포장라인 PQ 기록 결함·금속검출기 점검",
+   "summary": "FDA가 미국 의약품 포장·유통업체 Spirit Pharmaceuticals 실사(실사일 01/25/2017) 후 관찰사항 2건을 담은 483을 발부했다. 병 포장라인 성능적격성평가에서 사용 로트를 확인하지 않았고, 연질캡슐 혼탁·결정화 불만이 반복됐는데 품질부서 대응이 미흡했으며, 금속검출기 점검에 비철금속 챌린지를 쓰지 않았다.",
    "key_facts": [
     "제조소/업체: Spirit Pharmaceuticals · FEI 3011773798",
-    "시설 유형: Pharmaceutical Packager/Distributer",
-    "실사일: 01/25/2017"
+    "시설 · 유형: Pharmaceutical Packager/Distributer · 483",
+    "관찰사항: 2건(품질부서 책임·절차, 전자 장비 정기 점검)",
+    "실사일: 01/25/2017 — 이번에 공개된 과거 실사기록"
    ],
-   "implication": "Pharmaceutical Packager/Distributer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "2017년 실사 기록이지만 지적 유형은 지금도 흔하다. 포장라인 적격성평가에서 사용 로트와 불량품 처리가 추적되지 않은 점, 공급업체가 근본원인을 찾았다고 한 반복 불만을 품질부서가 어떻게 관리했는지가 함께 지적돼, 위탁 포장·유통 단계에서도 공급업체 품질 문제의 추적 책임이 확인 대상이 될 수 있음을 보여 준다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "포장라인 PQ 사용 로트·불량품 기록 추적 가능 여부",
+    "반복 불만에 대한 공급업체 근본원인 조치 확인 기록",
+    "금속검출기 점검 시 비철금속 시편 포함 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 01/25/2017 inspection of Spirit Pharmaceuticals.",
+    "title_issue": "Packaging PQ record gaps, metal detector checks",
+    "summary": "FDA issued a Form 483 with two observations to Spirit Pharmaceuticals, a US pharmaceutical packager and distributor, after an inspection ending 01/25/2017. The firm did not identify the lot used in bottle packaging line performance qualification, its quality unit response to repeated cloudiness and crystallization complaints on a softgel product was inadequate, and metal detector checks did not use non-ferrous challenges.",
     "key_facts": [
-     "Facility: Spirit Pharmaceuticals - FEI 3011773798",
-     "Facility type: Pharmaceutical Packager/Distributer",
-     "Inspection date: 01/25/2017"
+     "Facility: Spirit Pharmaceuticals, FEI 3011773798",
+     "Establishment type: Pharmaceutical Packager/Distributer",
+     "Observations: quality unit responsibilities and procedures, routine checks of electronic equipment",
+     "Inspection date: 01/25/2017, a past inspection record released now"
     ],
-    "implication": "This is a public record of an FDA inspection at a Pharmaceutical Packager/Distributer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "This is a 2017 record, but the findings remain common. Untraceable lots and rejects in packaging line qualification were cited alongside how the quality unit handled recurring complaints for which the supplier claimed a root cause, suggesting that packagers and distributors may also be held to account for tracking supplier quality issues.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Traceability of lots and rejects used in packaging line PQ",
+     "Records confirming supplier root cause actions for recurring complaints",
+     "Non-ferrous test pieces in metal detector checks"
     ]
    }
   },
@@ -752,30 +764,30 @@
    }
   },
   "fda483-195279": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Linde Inc 실사(03/26/2023)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "의료용 가스 안정성 프로그램 부재",
+   "summary": "FDA가 미국 의료용 가스 제조소 Linde Inc 실사 후 관찰사항 1건을 담은 483을 발부했다. USP 등급 의료용 가스에 대한 안정성 프로그램을 수립하지 않았고 안정성 시험도 수행하지 않은 채 제조·출하·유통을 이어 온 점이 지적됐다.",
    "key_facts": [
     "제조소/업체: Linde Inc · FEI 2523830",
-    "시설 유형: Medical Gas Manufacturer",
-    "실사일: 03/26/2023"
+    "시설 · 유형: Medical Gas Manufacturer · 483",
+    "관찰사항: 1건(USP 등급 가스 안정성 시험 프로그램 부재)"
    ],
-   "implication": "Medical Gas Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "의료용 가스도 의약품으로서 안정성 특성을 평가하는 문서화된 시험 프로그램이 요구된다는 점이 확인되는 사례다. 가스 제품군은 안정성 시험이 생략되기 쉬운 영역이라, 의료용 가스를 제조하거나 조달하는 업체는 해당 제품의 안정성 근거 자료가 갖춰져 있는지 확인해 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "의료용 가스 제품의 안정성 시험 프로그램 수립 여부",
+    "가스 공급업체의 안정성 근거 자료 확보 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 03/26/2023 inspection of Linde Inc.",
+    "title_issue": "No stability program for medical gases",
+    "summary": "FDA issued a Form 483 with one observation to Linde Inc, a US medical gas manufacturer. The firm had not established a stability program or performed stability studies for USP grade medical gases while continuing to manufacture, release and distribute them.",
     "key_facts": [
-     "Facility: Linde Inc - FEI 2523830",
-     "Facility type: Medical Gas Manufacturer",
-     "Inspection date: 03/26/2023"
+     "Facility: Linde Inc, FEI 2523830",
+     "Establishment type: Medical Gas Manufacturer",
+     "Observation: no written stability testing program for USP grade gases"
     ],
-    "implication": "This is a public record of an FDA inspection at a Medical Gas Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "The case confirms that medical gases, as drugs, need a written program to assess their stability characteristics. Stability testing is easily skipped for gas products, so firms that make or source medical gases may want to check that stability data exist for them.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Stability testing program for medical gas products",
+     "Stability data from gas suppliers"
     ]
    }
   },
@@ -2872,58 +2884,66 @@
    }
   },
   "fda483-195591": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Axogen Corporation 실사(04/29/2025)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "AVANCE 보관·환경모니터링 관리 미흡",
+   "summary": "FDA가 미국 원료·완제의약품 제조소 Axogen Corporation 실사(실사일 04/29/2025) 후 483을 발부했다. 판독된 관찰사항 6건은 AVANCE 최종 제품·인쇄 라벨 보관구역 출입 통제 부재, 등급 구역 환경모니터링 성능적격성평가 누락, 소독제 유효성 근거 부재, 역가 시험 인력 부족, 반복 해충 목격, 일탈 개시 권한 제한에 걸쳐 있다.",
    "key_facts": [
     "제조소/업체: Axogen Corporation · FEI 3023488176",
-    "시설 유형: Drug Substance and Drug product Manufacturer",
-    "실사일: 04/29/2025"
+    "시설 · 유형: Drug Substance and Drug product Manufacturer · 483",
+    "관찰사항: 6건 판독(보관 관리, 환경모니터링, 오염 관리, 시험실 관리, 해충 조사, 일탈 관리)",
+    "해충: 2025년 1월 이후 통제구역 목격 12건(등급 구역 4건), 시정조치 후에도 5건"
    ],
-   "implication": "Drug Substance and Drug product Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "최종 제품이 잠기지 않은 냉동고에 있고 청소 용역 인원까지 출입할 수 있다는 지적과, 교육받은 일부 인원만 일탈을 개시할 수 있는 체계가 함께 나왔다. 기본적인 접근 통제와 일탈 보고 경로가 품질 감독의 근거로 검토된다는 점에서, 조직·인프라가 성장 단계인 제조소에서 우선 점검할 항목으로 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "최종 제품·인쇄 라벨 보관구역의 출입 권한 통제",
+    "환경모니터링 성능적격성평가의 정적·동적 조건 항목 누락 여부",
+    "현장 직원이 일탈을 직접 개시할 수 있는 경로"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 04/29/2025 inspection of Axogen Corporation.",
+    "title_issue": "AVANCE storage and environmental monitoring gaps",
+    "summary": "FDA issued a Form 483 to Axogen Corporation, a US drug substance and drug product manufacturer, after an inspection ending 04/29/2025. Six legible observations cover uncontrolled access to AVANCE final product and printed label storage, gaps in environmental monitoring performance qualification of classified areas, no disinfectant efficacy support, too few staff qualified for potency testing, recurring pest sightings and restricted deviation initiation.",
     "key_facts": [
-     "Facility: Axogen Corporation - FEI 3023488176",
-     "Facility type: Drug Substance and Drug product Manufacturer",
-     "Inspection date: 04/29/2025"
+     "Facility: Axogen Corporation, FEI 3023488176",
+     "Establishment type: Drug Substance and Drug product Manufacturer",
+     "Observations legible: warehousing, environmental monitoring, contamination control, laboratory controls, pest investigations, deviation management",
+     "Pests: 12 sightings in controlled areas since January 2025 (4 in classified areas), 5 more after corrective action"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Substance and Drug product Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "Final product in unlocked freezers open to cleaning contractors was cited alongside a system where only a few trained staff can raise deviations. Basic access control and deviation reporting routes are reviewed as evidence of quality oversight, which makes them early items to check at sites whose organization and infrastructure are still growing.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Access control for final product and printed label storage",
+     "Static and dynamic conditions covered in environmental monitoring PQ",
+     "Route for floor staff to raise deviations directly"
     ]
    }
   },
   "fda483-195592": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Capricor, Inc. 실사(05/30/2025)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "일탈·NCP 기한 관리와 품질협정 부재",
+   "summary": "FDA가 미국 원료·완제의약품 제조소 Capricor, Inc. 실사(실사일 05/30/2025) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 데이터 누락 관련 일탈 27건의 추세 분석 미흡과 기한을 넘긴 NCP·CAR, 시험 위탁처 등과의 품질협정 부재, 불만·반품 처리 절차 미수립이다.",
    "key_facts": [
     "제조소/업체: Capricor, Inc. · FEI 3021247180",
-    "시설 유형: Drug Substance and Drug product Manufacturer",
-    "실사일: 05/30/2025"
+    "시설 · 유형: Drug Substance and Drug product Manufacturer · 483",
+    "관찰사항: 3건 판독(2번 절차 미준수, 3번 품질협정, 4번 품질부서 절차)",
+    "일탈: 2년간 데이터 누락 관련 27건 — 추세 분석 미흡"
    ],
-   "implication": "Drug Substance and Drug product Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "같은 유형의 데이터 누락 일탈이 2년간 27건 쌓였는데 추세 분석으로 이어지지 않은 점과, 출하시험 등을 맡은 외부 기관과 품질협정이 없는 점이 함께 지적됐다. 외부 시험·위탁 의존도가 높은 제조소에서는 일탈 추세 관리와 위탁처 품질협정이 품질 시스템의 기본 점검 항목으로 다뤄질 수 있음을 보여 준다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "반복 일탈의 추세 분석·조치 연계 여부",
+    "NCP·CAR 기한 경과 시 연장 요청 기록",
+    "출하시험 위탁처 등과의 품질협정 체결 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 05/30/2025 inspection of Capricor, Inc..",
+    "title_issue": "Overdue deviations and NCPs, no quality agreements",
+    "summary": "FDA issued a Form 483 to Capricor, Inc., a US drug substance and drug product manufacturer, after an inspection ending 05/30/2025. Three legible observations (2 to 4) cover weak trending of 27 missing-data deviations and overdue NCPs and CARs, no quality agreements with outside parties including release testing, and no procedures for complaints and returned product.",
     "key_facts": [
-     "Facility: Capricor, Inc. - FEI 3021247180",
-     "Facility type: Drug Substance and Drug product Manufacturer",
-     "Inspection date: 05/30/2025"
+     "Facility: Capricor, Inc., FEI 3021247180",
+     "Establishment type: Drug Substance and Drug product Manufacturer",
+     "Observations legible: 2 (procedures not followed), 3 (quality agreements), 4 (quality unit procedures)",
+     "Deviations: 27 missing-data deviations over 2 years without adequate trending"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Substance and Drug product Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "Twenty-seven deviations of the same missing-data type over two years without trend analysis were cited together with missing quality agreements for outside release testing. For sites that rely heavily on outside testing and contractors, deviation trending and contractor quality agreements may be treated as baseline checks of the quality system.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Trending of recurring deviations and the actions it drives",
+     "Extension requests on record for overdue NCPs and CARs",
+     "Quality agreements with release testing and other contractors"
     ]
    }
   },
@@ -2984,30 +3004,34 @@
    }
   },
   "fda483-195595": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Lonza Portsmouth, Inc. 실사(06/06/2025)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "CASGEVY 무균공정·청소·GDP 결함",
+   "summary": "FDA가 미국 세포치료제 제조소 Lonza Portsmouth, Inc. 실사(실사일 06/06/2025) 후 483을 발부했다. 판독된 관찰사항 9건은 CCTV 검토로 확인된 무균 행위 이탈, 등급 구역 청소 누락, 쓰레기통에서 발견된 기록·서명 대체 같은 문서관리 결함, 반복 차압 상실, 취소 후 삭제되는 일탈 정보 등 CASGEVY 제조 전반에 걸쳐 있다.",
    "key_facts": [
     "제조소/업체: Lonza Portsmouth, Inc. · FEI 3001451441",
-    "시설 유형: Drug Product Manufacturer",
-    "실사일: 06/06/2025"
+    "시설 · 유형: Drug Product Manufacturer · 483",
+    "관찰사항: 9건 판독(무균공정, 청소, GDP, 공조, 기류, 일탈, 환경모니터링, 무균시험, 해충)",
+    "일탈: 문서화된 사유 없이 취소되고 전자 시스템에서 관련 정보 삭제"
    ],
-   "implication": "Drug Product Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "FDA가 CCTV 영상을 근거로 작업자의 무균 행위를 지적했고, 일탈을 취소하면서 전자 시스템의 정보까지 지운 관행이 함께 나왔다. 영상 기록이 무균 행위 평가 자료로 쓰일 수 있고 일탈 취소 이력도 검토 대상이 된다는 점에서, 자사 CCTV 검토 체계와 일탈 취소 기록 보존 방식을 점검해 볼 만한 사례다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "무균 작업 CCTV 영상의 정기 검토 체계",
+    "일탈 취소 시 사유 기록·원래 정보 보존 여부",
+    "반복 차압 상실의 일탈 처리·근본원인 조사 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 06/06/2025 inspection of Lonza Portsmouth, Inc..",
+    "title_issue": "CASGEVY aseptic, cleaning and GDP failures",
+    "summary": "FDA issued a Form 483 to Lonza Portsmouth, Inc., a US cell therapy manufacturer, after an inspection ending 06/06/2025. Nine legible observations span CASGEVY manufacturing, including poor aseptic behavior found on CCTV review, missed cleaning of classified areas, documentation failures such as records found in the trash and replaced signatures, repeated pressure differential losses, and deviation data deleted on cancellation.",
     "key_facts": [
-     "Facility: Lonza Portsmouth, Inc. - FEI 3001451441",
-     "Facility type: Drug Product Manufacturer",
-     "Inspection date: 06/06/2025"
+     "Facility: Lonza Portsmouth, Inc., FEI 3001451441",
+     "Establishment type: Drug Product Manufacturer",
+     "Observations legible: aseptic processing, cleaning, GDP, HVAC, airflow, deviations, environmental monitoring, sterility testing, pests",
+     "Deviations: cancelled without documented justification and deleted from the electronic system"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Product Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "FDA cited operator aseptic behavior on the basis of CCTV footage, alongside a practice of deleting deviation data from the electronic system when cancelling it. Since video can serve as evidence of aseptic practice and deviation cancellation history is reviewed, this is a case worth noting for how firms review their own CCTV and keep cancelled deviation records.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Routine review of CCTV footage of aseptic work",
+     "Recorded reasons and retained data when deviations are cancelled",
+     "Deviation handling and root cause work for repeated pressure losses"
     ]
    }
   },
@@ -3040,30 +3064,34 @@
    }
   },
   "fda483-195597": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 FinVector Oy 실사(05/28/2024)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "바이알·원료 COA 검증과 MOI 밸리데이션",
+   "summary": "FDA가 핀란드 바이러스 벡터 제조소 FinVector Oy 실사(실사일 05/28/2024) 후 관찰사항 5건을 담은 483을 발부했다. Adstiladrin 1차 용기 바이알과 원료·첨가제의 공급업체 COA 를 검증하지 않았고, 핵심공정변수인 감염다중도(MOI)와 감염 기간(DOI)의 조합을 밸리데이션하지 않은 점이 핵심이다.",
    "key_facts": [
     "제조소/업체: FinVector Oy · FEI 3010227150",
-    "시설 유형: Biologics/Viral Vector",
-    "실사일: 05/28/2024"
+    "시설 · 유형: Biologics/Viral Vector · 483",
+    "관찰사항: 5건(용기 COA 검증, 보관 검체 육안검사, 청소 일정, 공정 밸리데이션, 원료 COA 검증)",
+    "공정: MOI 목표 163 VP/Cell 이지만 범위 내 다른 값 사용을 금지하지 않음"
    ],
-   "implication": "Biologics/Viral Vector 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "MOI 와 DOI 를 각각 핵심공정변수로 정하고도 범위 안의 조합(극단값 포함)을 밸리데이션하지 않은 것이 지적됐다. 운전 범위를 허용하는 바이오 공정에서는 개별 변수 범위뿐 아니라 변수 조합의 밸리데이션 근거가 검토될 수 있다는 점을 보여 주는 사례로 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "핵심공정변수 조합(극단값 포함)의 밸리데이션 근거",
+    "1차 용기·원료 공급업체 COA 의 주기적 검증 여부",
+    "보관 검체 연 1회 육안검사 절차 보유 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 05/28/2024 inspection of FinVector Oy.",
+    "title_issue": "Unverified supplier COAs and MOI validation",
+    "summary": "FDA issued a Form 483 with five observations to FinVector Oy, a viral vector manufacturer in Finland, after an inspection ending 05/28/2024. Key issues are unverified supplier COAs for the Adstiladrin primary container vial and for components and excipients, and no validation of combinations of multiplicity of infection (MOI) and duration of infection (DOI), both critical process parameters.",
     "key_facts": [
-     "Facility: FinVector Oy - FEI 3010227150",
-     "Facility type: Biologics/Viral Vector",
-     "Inspection date: 05/28/2024"
+     "Facility: FinVector Oy, FEI 3010227150",
+     "Establishment type: Biologics/Viral Vector",
+     "Observations: container COA verification, reserve sample inspection, cleaning schedules, process validation, component COA verification",
+     "Process: MOI target is 163 VP/Cell, but other values within the range are not prohibited"
     ],
-    "implication": "This is a public record of an FDA inspection at a Biologics/Viral Vector facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "MOI and DOI were each designated critical process parameters, yet combinations within their ranges, including extremes, were never validated. For biologics processes that allow an operating range, the validation basis for parameter combinations, not just individual ranges, appears to be open to review.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Validation basis for combinations of critical process parameters, including extremes",
+     "Periodic verification of primary container and component supplier COAs",
+     "Procedure for annual visual inspection of reserve samples"
     ]
    }
   },
@@ -3124,58 +3152,64 @@
    }
   },
   "fda483-195600": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 CMC lCOS Biologics, Inc. 실사(04/18/2016)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "예방정비 누락·일탈 조사 지연",
+   "summary": "FDA가 미국 바이오의약품 제조소 CMC lCOS Biologics, Inc. 실사(실사일 04/18/2016) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 이전 배치 영향평가 없는 일탈 조사, 필수 주간 예방정비 47건 중 15건 누락·8건 지연, 중대 일탈의 공식 개시 기한 초과다.",
    "key_facts": [
     "제조소/업체: CMC lCOS Biologics, Inc. · FEI 3000209996",
-    "시설 유형: Biologics Manufactuter",
-    "실사일: 04/18/2016"
+    "시설 · 유형: Biologics Manufactuter · 483",
+    "관찰사항: 3건 판독(2번 일탈 조사, 3번 예방정비, 4번 일탈 관리 SOP)",
+    "예방정비: 주간 47건 중 8건 지연·15건 누락·2건 미일정"
    ],
-   "implication": "Biologics Manufactuter 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "2016년 실사 기록이지만, 핵심 설비 예방정비를 일정대로 하지 않은 사실이 건수로 정리돼 지적됐다. 고객사 통지와 초기 조사는 기한 안에 했어도 공식 일탈 문서화가 늦으면 별도 관찰사항이 된다는 점에서, 위탁생산(CMO) 시설의 일탈 개시 기한 관리가 확인 대상이 될 수 있음을 보여 준다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "핵심 설비 예방정비 일정 준수율 모니터링",
+    "일탈 발생 시 이전 배치 영향평가 수행 여부",
+    "중대 일탈의 공식 문서화 개시 기한 준수 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 04/18/2016 inspection of CMC lCOS Biologics, Inc..",
+    "title_issue": "Missed preventive maintenance and late deviations",
+    "summary": "FDA issued a Form 483 to CMC lCOS Biologics, Inc., a US biologics manufacturer, after an inspection ending 04/18/2016. Three legible observations (2 to 4) cover a deviation investigation without impact assessment on earlier batches, 15 of 47 required weekly preventive maintenance tasks missed and 8 late, and critical deviations formally opened past the required window.",
     "key_facts": [
-     "Facility: CMC lCOS Biologics, Inc. - FEI 3000209996",
-     "Facility type: Biologics Manufactuter",
-     "Inspection date: 04/18/2016"
+     "Facility: CMC lCOS Biologics, Inc., FEI 3000209996",
+     "Establishment type: Biologics Manufactuter",
+     "Observations legible: 2 (deviation investigation), 3 (preventive maintenance), 4 (deviation management SOP)",
+     "Preventive maintenance: of 47 weekly tasks, 8 late, 15 missed, 2 not scheduled"
     ],
-    "implication": "This is a public record of an FDA inspection at a Biologics Manufactuter facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "This is a 2016 record, but missed preventive maintenance on critical equipment was cited with exact counts. Formal deviation documentation opened late became a separate observation even though the client was notified and investigations started on time, suggesting that deviation initiation deadlines at contract manufacturers may draw scrutiny.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Monitoring of preventive maintenance adherence on critical equipment",
+     "Impact assessment on earlier batches when a deviation occurs",
+     "Timely formal documentation of critical deviations"
     ]
    }
   },
   "fda483-195601": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Genlbet Biopbarmaceuticals SA 실사(01/31/2023)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "세척 밸리데이션·제염 근거 미흡",
+   "summary": "FDA가 포르투갈 원료·완제의약품 제조소 Genlbet Biopbarmaceuticals SA 실사(실사일 01/31/2023) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 세척 밸리데이션이 세척 난해 부위·최대 로트 크기·보관시간을 대표하지 못한 점, 제염 유효성 연구 부재, 세척 후 노출 시간을 정하지 않은 절차서다.",
    "key_facts": [
     "제조소/업체: Genlbet Biopbarmaceuticals SA · FEI 3011160795",
-    "시설 유형: Drug Substance/Drug Product Manufacturer",
-    "실사일: 01/31/2023"
+    "시설 · 유형: Drug Substance/Drug Product Manufacturer · 483",
+    "관찰사항: 3건 판독(2번 설비 세척, 3번 제염, 4번 세척·유지관리 절차서)"
    ],
-   "implication": "Drug Substance/Drug Product Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "세척 밸리데이션이 실제 공정의 세척 후 보관시간과 최대 로트 크기를 반영하지 못했다는 지적은 다품목 공용 설비에서 교차오염 방지 근거를 묻는 전형적인 형태다. 자사 세척 밸리데이션이 세척 난해 부위, 최악 로트 크기, 실제 보관시간을 포함하는지 확인해 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "세척 밸리데이션의 세척 난해 부위·최대 로트 크기 포함 여부",
+    "세척 후 보관시간(clean hold time) 설정 근거",
+    "제염제 유효성 연구 수행 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 01/31/2023 inspection of Genlbet Biopbarmaceuticals SA.",
+    "title_issue": "Weak cleaning validation and decontamination",
+    "summary": "FDA issued a Form 483 to Genlbet Biopbarmaceuticals SA, a drug substance and drug product manufacturer in Portugal, after an inspection ending 01/31/2023. Three legible observations (2 to 4) cover cleaning validation that did not represent hard-to-clean areas, maximum lot size or hold times, no decontamination efficacy study, and procedures that do not set how long cleaned equipment may stay exposed.",
     "key_facts": [
-     "Facility: Genlbet Biopbarmaceuticals SA - FEI 3011160795",
-     "Facility type: Drug Substance/Drug Product Manufacturer",
-     "Inspection date: 01/31/2023"
+     "Facility: Genlbet Biopbarmaceuticals SA, FEI 3011160795",
+     "Establishment type: Drug Substance/Drug Product Manufacturer",
+     "Observations legible: 2 (equipment cleaning), 3 (decontamination), 4 (cleaning and maintenance procedures)"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Substance/Drug Product Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "Cleaning validation that did not reflect real post-cleaning hold times and maximum lot size is a typical way inspectors probe cross-contamination controls on shared equipment. Firms may want to check that their own cleaning validation covers hard-to-clean areas, worst-case lot size and actual hold times.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Hard-to-clean areas and maximum lot size in cleaning validation",
+     "Basis for clean hold time limits",
+     "Decontaminant efficacy studies"
     ]
    }
   },
@@ -3292,30 +3326,34 @@
    }
   },
   "fda483-195607": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Lonza Biologics, Inc. 실사(04/16/2026)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "CASGEVY 공정 관리 상태 미입증",
+   "summary": "FDA가 미국 제조소 Lonza Biologics, Inc. 실사(실사일 04/16/2026) 후 관찰사항 3건을 담은 483을 발부했다. CASGEVY 제조공정이 관리 상태에 있음을 입증하지 못했다는 지적이 핵심으로, 무균 실수 추세로 APS 를 재수행했고 공여자 시험 배치와 상업 배치가 불합격됐으며, 미립자·환경모니터링 일탈의 CAPA 이행도 지연됐다.",
    "key_facts": [
     "제조소/업체: Lonza Biologics, Inc. · FEI 3001451441",
-    "시설 유형: Drug Manufacturer",
-    "실사일: 04/16/2026"
+    "시설 · 유형: Drug Manufacturer · 483",
+    "관찰사항: 3건(공정 관리 상태, 무균 오염 방지 절차, 보관 관리)",
+    "같은 FEI 시설의 06/06/2025 실사 483(Lonza Portsmouth)도 이번 호에 함께 공개"
    ],
-   "implication": "Drug Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "같은 시설은 2025년 실사에서도 CASGEVY 무균공정 결함을 지적받았고, 2026년 실사에서는 APS 재수행·배치 불합격·CAPA 지연이 이어져 공정 관리 상태 자체가 문제로 제기됐다. 상업 생산 착수 직후 실사에서는 APS 결과뿐 아니라 무균 행위 추세와 후속 CAPA 진척이 함께 검토될 수 있음을 보여 주는 사례로 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "APS 재수행 사유와 무균 행위 추세 관리 기록",
+    "미립자 추세 일탈의 CAPA 이행 진척",
+    "최종 제품 바이알 보관 유닛별 수량 기록"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 04/16/2026 inspection of Lonza Biologics, Inc..",
+    "title_issue": "CASGEVY process state of control not shown",
+    "summary": "FDA issued a Form 483 with three observations to Lonza Biologics, Inc., a US manufacturer, after an inspection ending 04/16/2026. The core finding is that the firm had not shown its CASGEVY manufacturing process was in a state of control: APS runs were repeated after a trend of aseptic lapses, healthy donor and commercial batches were rejected, and CAPAs for particulate and environmental monitoring deviations were behind schedule.",
     "key_facts": [
-     "Facility: Lonza Biologics, Inc. - FEI 3001451441",
-     "Facility type: Drug Manufacturer",
-     "Inspection date: 04/16/2026"
+     "Facility: Lonza Biologics, Inc., FEI 3001451441",
+     "Establishment type: Drug Manufacturer",
+     "Observations: process state of control, sterile contamination prevention procedures, warehousing",
+     "A 483 from the 06/06/2025 inspection of the same FEI (Lonza Portsmouth) is also in this issue"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "The same site was cited for CASGEVY aseptic processing failures in 2025, and the 2026 inspection found repeated APS runs, rejected batches and delayed CAPAs, raising the state of control itself. Inspections soon after commercial launch may look at aseptic behavior trends and CAPA progress, not just APS results.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Reasons for repeated APS runs and records of aseptic behavior trends",
+     "CAPA progress for particulate trend deviations",
+     "Vial counts recorded per final product storage unit"
     ]
    }
   },
@@ -3376,30 +3414,34 @@
    }
   },
   "fda483-195611": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 GlaxoSmithKline Biologicals Kft. 실사(01/31/2025)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "백신 원료 일탈 최악조건 미평가",
+   "summary": "FDA가 헝가리 생물의약품 제조소 GlaxoSmithKline Biologicals Kft. 실사(실사일 01/31/2025) 후 관찰사항 2건을 담은 483을 발부했다. 미립자 오염과 온도 이탈 일탈을 최악 조건까지 넓혀 조사하지 않은 채 해당 배치를 INFANRIX·BOOSTRIX 후속 제조에 출하했고, 시정조치로 만든 절차도 위험평가 근거가 없었다.",
    "key_facts": [
     "제조소/업체: GlaxoSmithKline Biologicals Kft. · FEI 3008322822",
-    "시설 유형: Licensed Biological Drug Manufacturer",
-    "실사일: 01/31/2025"
+    "시설 · 유형: Licensed Biological Drug Manufacturer · 483",
+    "관찰사항: 2건(최악 조건 미평가 일탈 조사, 구성성분 적합 판정 절차)",
+    "관련 제품: INFANRIX·BOOSTRIX 후속 제조에 사용된 배치"
    ],
-   "implication": "Licensed Biological Drug Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "일탈 조사가 최악 조건을 평가하지 않은 상태로 배치가 출하됐고, 그 일탈의 시정조치로 만든 절차마저 위험평가 없이 사용을 허용한 점이 함께 지적됐다. 원료 단계 일탈이 여러 완제품으로 이어지는 생물의약품에서는 시정조치 자체의 근거도 실사 검토 대상이 될 수 있음을 보여 준다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "일탈 조사 시 최악 조건 포함 위험분석 수행 여부",
+    "온도 이탈 시 전체 대상 품목 영향평가 여부",
+    "시정조치로 도입한 절차의 위험평가 근거"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 01/31/2025 inspection of GlaxoSmithKline Biologicals Kft..",
+    "title_issue": "Vaccine deviations not assessed for worst case",
+    "summary": "FDA issued a Form 483 with two observations to GlaxoSmithKline Biologicals Kft., a licensed biological drug manufacturer in Hungary, after an inspection ending 01/31/2025. Particulate contamination and temperature excursion deviations were not expanded to worst-case conditions before the batches were released for further manufacture of INFANRIX and BOOSTRIX, and a procedure created as a corrective action had no risk assessment behind it.",
     "key_facts": [
-     "Facility: GlaxoSmithKline Biologicals Kft. - FEI 3008322822",
-     "Facility type: Licensed Biological Drug Manufacturer",
-     "Inspection date: 01/31/2025"
+     "Facility: GlaxoSmithKline Biologicals Kft., FEI 3008322822",
+     "Establishment type: Licensed Biological Drug Manufacturer",
+     "Observations: deviation investigations without worst-case assessment, component acceptance procedures",
+     "Products: batches used in further manufacture of INFANRIX and BOOSTRIX"
     ],
-    "implication": "This is a public record of an FDA inspection at a Licensed Biological Drug Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "Batches were released while deviation investigations had not assessed worst-case conditions, and the procedure written as the corrective action allowed use without a risk assessment. Where an upstream deviation feeds several finished products, the basis for the corrective action itself may come under review.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Worst-case risk analysis in deviation investigations",
+     "Impact assessment across all affected items after temperature excursions",
+     "Risk assessment behind procedures introduced as corrective actions"
     ]
    }
   },
@@ -4456,30 +4498,30 @@
    }
   },
   "fda483-195646": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Corixa Corporation 실사(03/12/2026)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "환경모니터링 배지 적격성 미평가",
+   "summary": "FDA가 미국 의약품 제조소 Corixa Corporation 실사(실사일 03/12/2026) 후 관찰사항 1건을 담은 483을 발부했다. 무균공정 구역 환경모니터링 절차는 검체를 20-25°C 와 30-35°C 에서 배양하도록 요구하지만, 사용하는 낙하균·접촉 배지를 20-25°C 사용 목적에 대해 적격성평가하지 않았다.",
    "key_facts": [
     "제조소/업체: Corixa Corporation · FEI 3007726770",
-    "시설 유형: Drug Manufacturer",
-    "실사일: 03/12/2026"
+    "시설 · 유형: Drug Manufacturer · 483",
+    "관찰사항: 1건(무균공정 구역 환경모니터링 시스템)"
    ],
-   "implication": "Drug Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "이중 온도 배양을 절차로 정해 두고도 그 온도에서 배지의 회수 성능을 확인하지 않은 점이 지적됐다. 절차서 개정이 여러 차례 이어졌는데도 배지 적격성은 다뤄지지 않았다는 점에서, 자사 환경모니터링 배지가 실제 배양 조건별로 적격성평가됐는지 확인해 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "환경모니터링 배지의 배양 온도별 적격성평가 여부",
+    "낙하균·접촉 배지의 회수율 시험 기록"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 03/12/2026 inspection of Corixa Corporation.",
+    "title_issue": "Environmental monitoring media not qualified",
+    "summary": "FDA issued a Form 483 with one observation to Corixa Corporation, a US drug manufacturer, after an inspection ending 03/12/2026. The aseptic area environmental monitoring procedure requires incubation at 20-25°C and 30-35°C, but the settle and contact plates used had not been qualified for use at 20-25°C.",
     "key_facts": [
-     "Facility: Corixa Corporation - FEI 3007726770",
-     "Facility type: Drug Manufacturer",
-     "Inspection date: 03/12/2026"
+     "Facility: Corixa Corporation, FEI 3007726770",
+     "Establishment type: Drug Manufacturer",
+     "Observation: environmental monitoring system in aseptic processing areas"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "The procedure set dual-temperature incubation without confirming the media's recovery at that temperature, and several revisions of the procedure never addressed it. Firms may want to check that their environmental monitoring media are qualified for each incubation condition actually used.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Qualification of environmental monitoring media at each incubation temperature",
+     "Recovery test records for settle and contact plates"
     ]
    }
   },

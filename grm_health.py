@@ -671,7 +671,8 @@ def _evaluate_health(
             "fda483-ocr-budget-exhausted",
             "FDA 483",
             f"OCR 페이지 예산 소진 — 이후 스캔 483 {stats.fda483_ocr_budget_skipped}건이 "
-            "본문 없이 처리됨(dedup 때문에 재시도 기회 없음)",
+            "본문 없이 처리됨(findings DB 는 다음 날 grm-fda483-ocr-recovery 예약 실행이 회수 · "
+            "Notion 행·브리프 카드는 회수되지 않음)",
             f"pages_used={stats.fda483_ocr_pages_used} "
             f"budget_skipped={stats.fda483_ocr_budget_skipped} — "
             # ★처방 순서가 중요하다(2026-08-02 실측). 종전 문구는 "예산 상향"만 말했는데,

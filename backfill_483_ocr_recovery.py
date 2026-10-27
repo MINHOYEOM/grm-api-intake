@@ -90,7 +90,12 @@ OCR_UNAVAILABLE_PREFIX = "scan-ocr-unavailable"
 # 선택 모드. 기본은 종전 그대로(엔진 부재로 본문을 못 받은 행) — 새 모드는 명시해야 켜진다.
 MODE_OCR_UNAVAILABLE = "ocr-unavailable"
 MODE_MISSING_OBSERVATIONS = "missing-observations"
-RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS)
+MODE_COLLECTION_CAPPED = "collection-capped"
+RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS, MODE_COLLECTION_CAPPED)
+# [2026-10-27 #1209] 수집 **상한** 때문에 본문 없이 적재된 행의 상태값. 문서 사정이 아니라
+# 그날 실행의 사정(PDF 건수 상한·OCR 페이지 예산)이라 다시 읽으면 대개 본문이 나온다.
+# collect_fda_483 가 기록하는 문자열과 같아야 한다 — tests 가 두 값이 같음을 고정한다.
+CAPPED_TEXT_STATUSES = ("not-attempted", "scan-ocr-budget")
 _OBSERVATIONS_KEY = "fda_483_observations"
 
 Sleeper = Callable[[float], None]
@@ -121,6 +126,9 @@ class OcrRecoveryReport:
     id_mismatch: int = 0                # 재구성 id != 기존 id — 건너뜀(0 이어야 정상)
     failed: int = 0                     # fetch/재구성/upsert 실패
     observations_recovered: int = 0     # 되찾은 관찰 항목 총수(findings 예상 규모)
+    # collection-capped 모드 전용: 다시 읽어도 본문이 없어서(404·텍스트층 없음 등) 상한 표식을
+    # **실제 사유로 교체**한 행. 교체하지 않으면 그 문서는 매 실행 후보로 남아 영원히 다시 읽힌다.
+    status_resolved: int = 0
     failure_reasons: dict[str, int] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
     samples: list[dict[str, Any]] = field(default_factory=list)
@@ -186,10 +194,23 @@ def is_missing_observations_row(raw: dict[str, Any]) -> bool:
     return _OBSERVATIONS_KEY not in raw
 
 
+def is_collection_capped_row(raw: dict[str, Any]) -> bool:
+    """이 raw_payload 가 "수집 상한 때문에 본문 없이 적재된" 행인가(순수 함수).
+
+    일일 수집은 실행 1회당 PDF 건수(`FDA483_PDF_MAX_ITEMS`)와 OCR 페이지 예산
+    (`FDA483_OCR_PAGE_BUDGET`)으로 벽시계를 닫는다. 상한 밖 문서는 `not-attempted` /
+    `scan-ocr-budget` 으로 적재되고, 이후 수집은 이미 저장된 document_id 를 건너뛰므로
+    **다시는 읽히지 않았다**(2026-10-26 FDA 대량 공개 때 51건 · 이슈 #1209).
+    """
+    return str(raw.get("fda483_text_status") or "") in CAPPED_TEXT_STATUSES
+
+
 def is_recovery_candidate(raw: dict[str, Any], mode: str) -> bool:
     """모드별 후보 판정 — `run()` 이 서버 like 로 좁힌 행을 여기서 정확히 재확인한다."""
     if mode == MODE_MISSING_OBSERVATIONS:
         return is_missing_observations_row(raw)
+    if mode == MODE_COLLECTION_CAPPED:
+        return is_collection_capped_row(raw)
     return is_ocr_unavailable_row(raw)
 
 
@@ -278,6 +299,9 @@ def _fetch_raw_signals(
     if mode == MODE_MISSING_OBSERVATIONS:
         # 관찰 키가 **없는** 행. `not.like` 로 서버에서 1차로 좁힌다.
         narrow = {"raw_json": f"not.like.*{_OBSERVATIONS_KEY}*"}
+    elif mode == MODE_COLLECTION_CAPPED:
+        narrow = {"or": "(" + ",".join(
+            f"raw_json.like.*{status}*" for status in CAPPED_TEXT_STATUSES) + ")"}
     else:
         narrow = {"raw_json": f"like.*{OCR_UNAVAILABLE_PREFIX}*"}
     return fsb._fetch_all_pages(
@@ -305,6 +329,66 @@ def _upsert_raw_signal(
         [fsa._raw_signal_payload(record)], "raw_signal_id",
         timeout=timeout, resolution="merge-duplicates",
     )
+
+
+def _is_definitive_empty(status: str) -> bool:
+    """다시 읽은 결과가 "이 문서는 본문이 없다"는 **확정** 사유인가.
+
+    상한 표식이 다시 나오면(회수 실행도 예산 소진) 확정이 아니다. fetch 실패는 404 만 확정이다 —
+    5xx·타임아웃으로 표식을 `fetch-fail` 로 바꿔 버리면 일시 장애 하나로 재시도가 영구히 끊긴다.
+    """
+    if not status or status in CAPPED_TEXT_STATUSES:
+        return False
+    if status.startswith("fetch-fail"):
+        return "404" in status
+    return True
+
+
+def _resolve_capped_status(
+    report: OcrRecoveryReport,
+    row: dict[str, Any],
+    raw: dict[str, Any],
+    status: str,
+    *,
+    label: str,
+    base: str,
+    service_key: str,
+    dry_run: bool,
+    rebuild_fn: Callable[..., Any],
+    upsert_fn: Callable[..., tuple[int, list[dict[str, Any]] | None, str]],
+) -> None:
+    """상한 표식을 실제 사유로 교체한다 — 본문 복구와 같은 재구성·id 검증·upsert 경로."""
+    try:
+        item = rebuild_fn(nrow_from_raw_payload(raw), "", status)
+    except Exception as exc:  # noqa: BLE001
+        report.failed += 1
+        _bump(report, f"rebuild_raised:{type(exc).__name__}")
+        report.errors.append(f"{label}: rebuild_raised:{type(exc).__name__}")
+        return
+    if item is None:
+        report.gate_dropped += 1
+        return
+    record = findings_store.raw_signal_from_intake_item(
+        item, collected_at=str(row.get("collected_at") or ""),
+    )
+    if str(record.get("raw_signal_id") or "") != str(row.get("raw_signal_id") or ""):
+        report.id_mismatch += 1
+        _bump(report, "raw_signal_id_mismatch")
+        report.errors.append(f"{label}: raw_signal_id_mismatch")
+        return
+    if dry_run:
+        report.status_resolved += 1
+        return
+    try:
+        _status, _returned, err = upsert_fn(base, service_key, record)
+    except Exception as exc:  # noqa: BLE001
+        err = f"raised:{type(exc).__name__}"
+    if err:
+        report.failed += 1
+        _bump(report, f"upsert_failed:{err}")
+        report.errors.append(f"{label}: upsert_failed:{err}")
+        return
+    report.status_resolved += 1
 
 
 def _is_broad_failure(report: OcrRecoveryReport) -> bool:
@@ -409,6 +493,15 @@ def run(
             report.still_empty += 1
             report.no_text += 1
             _bump(report, status or "empty_text")
+            # ★예외 하나: 상한 표식(not-attempted·scan-ocr-budget)은 "아직 안 읽었다"는 뜻이지
+            #   문서의 사실이 아니다. 실제로 읽어 본 결과가 상한이 아닌 사유(404·텍스트층 없음)면
+            #   그 사유로 바꿔 적는다 — 잃는 본문은 없고(둘 다 빈손), 바꾸지 않으면 그 문서가
+            #   매 예약 실행마다 후보로 남아 같은 PDF 를 영원히 다시 받는다.
+            if mode == MODE_COLLECTION_CAPPED and _is_definitive_empty(status):
+                _resolve_capped_status(
+                    report, r, raw, status, label=label, base=base, service_key=service_key,
+                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
+                )
             continue
 
         nrow = nrow_from_raw_payload(raw)
@@ -485,7 +578,8 @@ def run(
                 f"·발췌만 {report.recovered_excerpt_only}건) "
                 f"· 본문확보실패 {report.no_text}건 "
                 f"· 본문있으나추출0 {report.text_without_extraction}건 "
-                f"· 게이트드롭 {report.gate_dropped}건 · 실패 {report.failed}건")
+                f"· 게이트드롭 {report.gate_dropped}건 · 실패 {report.failed}건"
+                f"{f' · 상한표식→실제사유 {report.status_resolved}건' if report.status_resolved else ''}")
     if report.text_without_extraction or report.recovered_excerpt_only:
         log("INFO", f"↑ 파서 신호: 본문을 확보하고도 지적사항을 못 뽑은 문서 "
                     f"{report.text_without_extraction + report.recovered_excerpt_only}건 "
@@ -503,7 +597,7 @@ def run(
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="OCR 엔진 부재로 빈 본문 적재된 스캔 483 소급 복구 — raw_signals 행을 "
-        "라이브 수집과 같은 함수로 재구성해 제자리 upsert. 1회성 dispatch 전용.",
+        "라이브 수집과 같은 함수로 재구성해 제자리 upsert. 예약 실행은 collection-capped 모드.",
     )
     p.add_argument(
         "--apply", action="store_true", default=False,
@@ -526,7 +620,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help=(
             "후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. "
             "missing-observations=본문 유무와 무관하게 관찰 키가 없는 행 — 상태 키가 없어 "
-            "지금까지 어떤 복구 잡에도 걸리지 않던 사각지대(2026-08-01 실측 417건)."
+            "지금까지 어떤 복구 잡에도 걸리지 않던 사각지대(2026-08-01 실측 417건). "
+            "collection-capped=수집 상한(PDF 건수·OCR 예산) 때문에 본문 없이 적재된 행 — "
+            "예약 실행이 매일 쓰는 모드(#1209)."
         ),
     )
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
@@ -573,6 +669,7 @@ __all__ = [
     "main",
     "build_arg_parser",
     "is_ocr_unavailable_row",
+    "is_collection_capped_row",
     "nrow_from_raw_payload",
 ]
 

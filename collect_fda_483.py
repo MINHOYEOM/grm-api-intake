@@ -112,6 +112,11 @@ FDA483_EXCERPT_DELAY_SECONDS = 0.5
 # 시도되지 않은" 문서**였다(OCR 로 살린 14건과 별개의 원인). 상한을 올리되 무한정 늘리지 않고
 # OCR 페이지 예산으로 실행시간을 닫는다.
 FDA483_EXCERPT_MAX_ITEMS = _env_int("FDA483_PDF_MAX_ITEMS", 60)
+# [2026-10-27 #1209] 위 상한은 **범위 안 문서** 수로 센다. 본문을 받아 봐야 범위 밖(기기·식품)
+# 으로 판정되는 문서가 상한을 갉아먹었다 — 10-26 실행은 60건 중 11건을 버릴 문서에 쓰고 34건을
+# 미시도로 남겼다. 다만 그러면 범위 밖 문서가 몰릴 때 요청 수가 무한정 늘 수 있으므로, 버린
+# 문서까지 포함한 **총 PDF 요청 수**에도 별도 안전 상한을 둔다(OCR 시간은 예산이 따로 막는다).
+FDA483_PDF_MAX_FETCHES = _env_int("FDA483_PDF_MAX_FETCHES", FDA483_EXCERPT_MAX_ITEMS * 2)
 # 실행 1회당 OCR 페이지 예산 — 실측 ≈2.2s/쪽. 200쪽 ≈ 7분으로 intake 전체 예산 안에 든다.
 # 소진 후 문서는 OCR 없이 진행(상태 `scan-ocr-budget`)해 **왜** 비었는지가 카드까지 전달된다.
 FDA483_OCR_PAGE_BUDGET = _env_int("FDA483_OCR_PAGE_BUDGET", 200)
@@ -2263,7 +2268,10 @@ def collect_fda_483(
         #   첫 문서에서만 분기를 평가해 **몇 건이 통째로 빠졌는지 셀 수 없었다**. 이제 전건을
         #   지나가며 미시도 수를 센다(작업은 여전히 상한까지만 — 비용 불변).
         if pdf_url:
-            if excerpt_health["attempted"] >= FDA483_EXCERPT_MAX_ITEMS:
+            in_scope_attempted = (excerpt_health["attempted"]
+                                  - excerpt_health["dropped_out_of_scope"])
+            if (in_scope_attempted >= FDA483_EXCERPT_MAX_ITEMS
+                    or excerpt_health["attempted"] >= FDA483_PDF_MAX_FETCHES):
                 excerpt_health["capped"] = True
                 excerpt_health["skipped_no_attempt"] += 1
             else:

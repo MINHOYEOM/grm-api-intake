@@ -1,4 +1,10 @@
-name: GRM FDA 483 OCR Recovery (one-off)
+name: GRM FDA 483 OCR Recovery
+
+# ★예약 실행(2026-10-27 #1209): 매일 `collection-capped` 모드로 apply 한다. 일일 수집은 실행당
+# PDF 건수 상한·OCR 페이지 예산으로 벽시계를 닫고, 상한 밖 문서를 `not-attempted` /
+# `scan-ocr-budget` 으로 **본문 없이** 적재한다. 이후 수집은 이미 저장된 document_id 를 다시
+# 받지 않으므로 그 문서들은 영구히 findings 0건이었다(10-26 FDA 대량 공개 때 51건). 이 예약이
+# 다음 날 그 행들을 다시 읽어 제자리 교체한다. dispatch(아래 입력)는 종전 그대로 1회성 복구용.
 
 # OCR 엔진 부재로 **빈 본문 적재된** 스캔 483 을 소급 복구한다(2026-07-30 진단 · PR #487).
 # 대상은 `raw_signals` 중 source='FDA 483' 이고 `raw_json.fda483_text_status` 가
@@ -23,6 +29,10 @@ name: GRM FDA 483 OCR Recovery (one-off)
 # 멱등: 복구에 성공한 행은 fda483_text_status 가 사라져 다음 실행의 후보에서 자연히 빠진다.
 
 on:
+  # 일일 수집(grm-intake, 18:17 UTC 예약 · 실측 시작 21~22시 UTC)이 끝난 뒤, 백로그 모니터
+  # (00:13 UTC) 전에 돌도록 둔다.
+  schedule:
+    - cron: '37 23 * * *'
   workflow_dispatch:
     inputs:
       apply:
@@ -42,7 +52,7 @@ on:
         type: string
         default: ''
       ocr_page_budget:
-        description: 'OCR 페이지 예산(실행 1회당). 기본 200 은 **일일 수집**의 벽시계 보호용이라, 1회성 회수에서는 스캔본 ~20건에서 소진되고 나머지는 다음 실행으로 밀린다(실측: 429건 중 42건이 scan-ocr-budget). 배치를 키우려면 올린다 — 300dpi 페이지당 수 초라 워크플로 타임아웃(120분)을 넘지 않게.'
+        description: 'OCR 페이지 예산(실행 1회당, 예약 실행은 600). 기본 200 은 **일일 수집**의 벽시계 보호용이라, 1회성 회수에서는 스캔본 ~20건에서 소진되고 나머지는 다음 실행으로 밀린다(실측: 429건 중 42건이 scan-ocr-budget). 배치를 키우려면 올린다 — 300dpi 페이지당 수 초라 워크플로 타임아웃(120분)을 넘지 않게.'
         type: string
         default: '200'
       ocr_dpi:
@@ -50,11 +60,12 @@ on:
         type: string
         default: '300'
       mode:
-        description: '후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. missing-observations=관찰 키가 없는 행 — 상태 키가 없어 지금까지 어떤 복구 잡에도 안 걸리던 사각지대(2026-08-01 실측 417건). ★이 모드는 멱등이 아니다: 본문은 있는데 파서가 여전히 0건인 문서는 다음 실행에서도 후보로 남아 PDF 를 다시 읽는다.'
+        description: '후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. missing-observations=관찰 키가 없는 행 — 상태 키가 없어 지금까지 어떤 복구 잡에도 안 걸리던 사각지대(2026-08-01 실측 417건). ★이 모드는 멱등이 아니다: 본문은 있는데 파서가 여전히 0건인 문서는 다음 실행에서도 후보로 남아 PDF 를 다시 읽는다. collection-capped=수집 상한(PDF 건수·OCR 예산)으로 본문 없이 적재된 행(not-attempted·scan-ocr-budget) — 예약 실행이 매일 쓰는 모드(#1209).'
         type: choice
         options:
           - ocr-unavailable
           - missing-observations
+          - collection-capped
         default: ocr-unavailable
 
 permissions:
@@ -93,18 +104,20 @@ jobs:
           required: 'true'
 
       # dispatch 입력은 **env 로만** 받는다 — 셸 본문 직접 삽입 금지(저장소 관례).
+      # 예약 실행에는 inputs 가 비어 있으므로 여기서 예약용 값을 정한다(apply·collection-capped·
+      # OCR 600쪽 ≈ 22분 — 타임아웃 120분 안). 상한 결손은 하루 수십 건 규모라 limit 은 두지 않는다.
       - name: Run FDA 483 OCR recovery
         id: recover
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          IN_APPLY: ${{ inputs.apply }}
+          IN_APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           IN_LIMIT: ${{ inputs.limit }}
-          IN_DELAY: ${{ inputs.delay_seconds }}
+          IN_DELAY: ${{ inputs.delay_seconds || '0.5' }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
-          IN_MODE: ${{ inputs.mode }}
-          FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
-          FDA483_OCR_DPI: ${{ inputs.ocr_dpi }}
+          IN_MODE: ${{ github.event_name == 'schedule' && 'collection-capped' || inputs.mode }}
+          FDA483_OCR_PAGE_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
+          FDA483_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
         run: |
           set -euo pipefail
           ARGS=(--report-path ocr_recovery_report.json --delay-seconds "${IN_DELAY}" --mode "${IN_MODE}")
@@ -125,26 +138,40 @@ jobs:
       # 없는 raw_signal" 만 처리하므로 이번에 살아난 행이 그대로 대상이 된다 —
       # grm-findings-backfill-fetch.yml 이 쓰는 체인과 동일 배관(신규 로직 없음).
       - name: Chain M12 findings backfill (raw -> findings)
-        if: ${{ inputs.apply && steps.recover.outputs.recovered != '0' && steps.recover.outputs.recovered != '' }}
+        if: ${{ (github.event_name == 'schedule' || inputs.apply) && steps.recover.outputs.recovered != '0' && steps.recover.outputs.recovered != '' }}
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           python findings_supabase_backfill.py | tee m12_report.json
 
+      # [#1209] 주간 브리프는 Notion 의 미소비(New) 행에서 만들어진다. 위 회수는 Supabase 만
+      # 고치므로, 본문 없이 들어간 Notion 483 행의 raw 를 Supabase 의 본문 있는 raw 로 채운다
+      # (백필 페치가 먼저 받아 둔 문서 포함 — recovered=0 이어도 돌린다). 속성·Status 는 무접촉.
+      - name: Sync empty Notion 483 rows from Supabase (weekly brief input)
+        if: ${{ github.event_name == 'schedule' || inputs.apply }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: |
+          python fda483_notion_raw_sync.py --apply --report-path notion_sync_report.json
+
       - name: Write step summary
         if: always()
         env:
-          IN_APPLY: ${{ inputs.apply }}
+          IN_EVENT: ${{ github.event_name }}
+          IN_APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           IN_LIMIT: ${{ inputs.limit }}
-          IN_DELAY: ${{ inputs.delay_seconds }}
+          IN_DELAY: ${{ inputs.delay_seconds || '0.5' }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
-          IN_MODE: ${{ inputs.mode }}
-          IN_OCR_BUDGET: ${{ inputs.ocr_page_budget }}
-          IN_OCR_DPI: ${{ inputs.ocr_dpi }}
+          IN_MODE: ${{ github.event_name == 'schedule' && 'collection-capped' || inputs.mode }}
+          IN_OCR_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
+          IN_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
         run: |
           {
-            echo "### GRM FDA 483 OCR Recovery"
+            echo "### GRM FDA 483 OCR Recovery (\`${IN_EVENT}\`)"
             echo ""
             echo "apply: \`${IN_APPLY}\` / mode: \`${IN_MODE}\` / ocr_budget: \`${IN_OCR_BUDGET}\` / ocr_dpi: \`${IN_OCR_DPI}\` / limit: \`${IN_LIMIT}\` / delay_seconds: \`${IN_DELAY}\` / doc_ids: \`${IN_DOC_IDS}\`"
             echo ""
@@ -166,6 +193,13 @@ jobs:
             else
               echo "(M12 체인 미실행 — dry-run 이거나 recovered=0)"
             fi
+            echo ""
+            if [ -f notion_sync_report.json ]; then
+              echo "#### Notion 483 raw 동기화 리포트 (fda483_notion_raw_sync.py)"
+              echo '```json'
+              cat notion_sync_report.json
+              echo '```'
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload report artifact
@@ -176,5 +210,6 @@ jobs:
           path: |
             ocr_recovery_report.json
             m12_report.json
+            notion_sync_report.json
           retention-days: 30
           if-no-files-found: warn

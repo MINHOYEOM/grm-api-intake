@@ -1410,6 +1410,58 @@ class FetchCoverageTest(unittest.TestCase):
         self.assertEqual(health["skipped_no_attempt"], 4,
                          "상한 밖 문서가 전건 집계되지 않았다")
 
+    @staticmethod
+    def _rows_with_cosmetics(n_drop, n_keep):
+        """앞쪽 n_drop 건은 본문 수령 후 범위 밖(cosmetics)으로 버려지는 행."""
+        raw = []
+        for i in range(n_drop + n_keep):
+            firm = f"Acme Cosmetics {i}" if i < n_drop else f"Firm {i}"
+            raw.append(["04/17/2026", firm, f"100000{i}",
+                        f'<a href="/media/{9200 + i}/download">483</a>', "Wisconsin", "",
+                        "Manufacturer", "05/27/2026", ""])
+        return f._datatable_norm_rows(raw)
+
+    def _collect(self, rows, *, max_items, max_fetches=None):
+        fetches = []
+
+        def fake_fetch(url):
+            fetches.append(url)
+            return "OBSERVATION 1 x", "pdf-ok"
+
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
+                                     "ENABLE_FDA_483_DEEP": "false",
+                                     "ENABLE_FDA_483_OCR": "false"}), \
+                patch.object(f, "FDA483_EXCERPT_MAX_ITEMS", max_items), \
+                patch.object(f, "FDA483_PDF_MAX_FETCHES",
+                             max_fetches if max_fetches is not None else max_items * 2), \
+                patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \
+                patch.object(f, "_fetch_fda483_pdf_text", fake_fetch), \
+                patch.object(f, "_fetch_html_rows",
+                             lambda start_date=None: (list(rows), len(rows), False)):
+            items, _ = f.collect_fda_483(START, END)
+        return items, fetches, f.LAST_HEALTH["fda483_excerpt"]
+
+    def test_out_of_scope_drops_do_not_consume_cap(self):
+        """#1209: 버린 문서가 상한을 갉아먹어 범위 안 문서가 미시도로 남던 결함."""
+        rows = self._rows_with_cosmetics(n_drop=2, n_keep=3)
+        items, fetches, health = self._collect(rows, max_items=3)
+        self.assertEqual(health["dropped_out_of_scope"], 2)
+        self.assertEqual(health["skipped_no_attempt"], 0,
+                         "범위 밖 드롭이 상한을 소모해 범위 안 문서가 미시도로 남았다")
+        self.assertEqual(len(fetches), 5)
+        self.assertEqual(len(items), 3)
+        self.assertTrue(all("fda483_text_status" not in it.raw_payload for it in items))
+
+    def test_total_fetch_ceiling_bounds_out_of_scope_flood(self):
+        """범위 밖 문서가 몰려도 총 PDF 요청 수는 안전 상한을 넘지 않는다."""
+        rows = self._rows_with_cosmetics(n_drop=6, n_keep=2)
+        items, fetches, health = self._collect(rows, max_items=3, max_fetches=5)
+        self.assertEqual(len(fetches), 5)
+        self.assertTrue(health["capped"])
+        self.assertEqual(health["skipped_no_attempt"], 3)
+        self.assertEqual([it.raw_payload.get("fda483_text_status") for it in items],
+                         ["not-attempted", "not-attempted"])
+
     def test_health_exposes_ocr_budget_usage(self):
         rows = self._norm_rows(1)
         with patch.dict(os.environ, {"ENABLE_FDA_483_OBSERVATIONS": "false",
@@ -2681,7 +2733,8 @@ class Fda483OcrReasonPropagationTest(unittest.TestCase):
                            ".github", "workflows", "grm-fda483-ocr-recovery.yml"))
         src = open(wf, encoding="utf-8").read()
         self.assertIn("ocr_page_budget:", src)
-        self.assertIn("FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}", src)
+        self.assertIn("FDA483_OCR_PAGE_BUDGET: ${{ github.event_name == 'schedule' && '600' "
+                      "|| inputs.ocr_page_budget }}", src)
 
 
 # ── [표제 선행 잡음 2026-08-01] 관찰 표제 앞 OCR/양식 파편 제거 ────────────────
@@ -3051,5 +3104,5 @@ class Fda483OcrDpiKnobTest(unittest.TestCase):
                           ".github", "workflows", "grm-fda483-ocr-recovery.yml")
         src = open(wf, encoding="utf-8").read()
         self.assertIn("ocr_dpi:", src)
-        self.assertIn("FDA483_OCR_DPI: ${{ inputs.ocr_dpi }}", src)
+        self.assertIn("FDA483_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}", src)
         self.assertIn("default: '300'", src)

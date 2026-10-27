@@ -297,6 +297,104 @@ class PostResolutionTest(unittest.TestCase):
         self.assertIn("resolution=merge-duplicates", post.call_args[1]["headers"]["Prefer"])
 
 
+class CollectionCappedModeTest(unittest.TestCase):
+    """[#1209] 수집 상한(PDF 건수·OCR 예산)으로 본문 없이 적재된 행을 예약 실행이 회수한다.
+
+    일일 수집은 이미 저장된 document_id 를 다시 받지 않으므로, 상한 밖 문서는 이 경로가
+    없으면 영구히 빈손이다(2026-10-26 FDA 대량 공개 때 51건)."""
+
+    def test_capped_statuses_match_what_the_collector_writes(self):
+        """상태 문자열이 수집기와 어긋나면 후보가 조용히 0건이 된다 — 실제 산출물로 고정."""
+        with mock.patch.object(f, "_OCR_BUDGET", {"remaining": 0, "used": 0}):
+            _text, budget_status = f._ocr_483_pdf_text_uncounted(b"", 1000)
+        self.assertIn(budget_status, rec.CAPPED_TEXT_STATUSES)
+        not_attempted = rec._rebuild_item(_nrow(), "", "not-attempted").raw_payload
+        self.assertTrue(rec.is_collection_capped_row(not_attempted))
+
+    def test_predicate_targets_only_cap_statuses(self):
+        for status in rec.CAPPED_TEXT_STATUSES:
+            self.assertTrue(rec.is_collection_capped_row({"fda483_text_status": status}))
+        for other in ("scan-no-text", "scan-ocr-unavailable:x", "fetch-fail:404", "pdf-ok", ""):
+            self.assertFalse(rec.is_collection_capped_row({"fda483_text_status": other}), other)
+        self.assertFalse(rec.is_collection_capped_row({"fda483_excerpt": "OBSERVATION 1"}))
+
+    def test_fetch_narrows_on_server(self):
+        seen = {}
+
+        def fake_pages(base, key, table, **kw):
+            seen.update(kw.get("extra_params") or {})
+            return []
+
+        with mock.patch.object(rec.fsb, "_fetch_all_pages", fake_pages):
+            rec._fetch_raw_signals("https://x", "k", mode=rec.MODE_COLLECTION_CAPPED)
+        self.assertEqual(
+            seen.get("or"),
+            "(raw_json.like.*not-attempted*,raw_json.like.*scan-ocr-budget*)")
+
+    def _capped_run(self, **over):
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            rec._rebuild_item(_nrow(), "", "not-attempted"), collected_at="",
+        )["raw_signal_id"]
+        over.setdefault("rows", [_row(rid, status="not-attempted")])
+        return _run(mode=rec.MODE_COLLECTION_CAPPED, **over)
+
+    def test_capped_row_is_recovered_with_observations(self):
+        report, code, upsert, _rid = self._capped_run(dry_run=False)
+        self.assertEqual(code, 0)
+        self.assertEqual(report.marked, 1)
+        self.assertEqual(report.recovered, 1)
+        self.assertEqual(report.observations_recovered, 2)
+        record = upsert.call_args[0][2]
+        self.assertNotIn("fda483_text_status", record["raw_json"])
+        self.assertEqual(record["collected_at"], "2026-07-28T01:02:03Z")
+
+    def test_definitive_empty_result_replaces_cap_marker(self):
+        """404·텍스트층 없음이면 상한 표식을 실제 사유로 바꿔 매 실행 재시도를 끊는다."""
+        report, _code, upsert, rid = self._capped_run(
+            dry_run=False, fetch_text=lambda url: ("", "scan-no-text"))
+        self.assertEqual(report.no_text, 1)
+        self.assertEqual(report.status_resolved, 1)
+        upsert.assert_called_once()
+        record = upsert.call_args[0][2]
+        self.assertEqual(record["raw_signal_id"], rid)
+        self.assertEqual(rec._json_object(record["raw_json"])["fda483_text_status"],
+                         "scan-no-text")
+
+    def test_transient_fetch_failure_keeps_cap_marker(self):
+        """5xx·타임아웃은 확정 사유가 아니다 — 표식을 바꾸면 일시 장애로 재시도가 끊긴다."""
+        report, _code, upsert, _rid = self._capped_run(
+            dry_run=False,
+            fetch_text=lambda url: ("", "fetch-fail:HTTP GET final failure: 503 Server Error"))
+        self.assertEqual(report.status_resolved, 0)
+        upsert.assert_not_called()
+
+    def test_cap_hit_again_leaves_row_for_next_run(self):
+        """회수 실행도 예산에 걸리면 표식을 그대로 둔다 — 다음 실행이 다시 시도한다."""
+        report, _code, upsert, _rid = self._capped_run(
+            dry_run=False, fetch_text=lambda url: ("", "scan-ocr-budget"))
+        self.assertEqual(report.status_resolved, 0)
+        upsert.assert_not_called()
+
+    def test_dry_run_counts_resolution_without_writing(self):
+        report, _code, upsert, _rid = self._capped_run(
+            fetch_text=lambda url: ("", "fetch-fail:HTTP GET final failure: (404 Client Error)"))
+        self.assertEqual(report.status_resolved, 1)
+        upsert.assert_not_called()
+
+    def test_other_modes_never_rewrite_empty_rows(self):
+        """종전 모드의 '빈손을 빈손으로 덮지 않는다' 계약은 그대로다."""
+        report, _code, upsert, _rid = _run(
+            dry_run=False, fetch_text=lambda url: ("", "scan-no-text"))
+        self.assertEqual(report.status_resolved, 0)
+        upsert.assert_not_called()
+
+    def test_cli_accepts_mode(self):
+        self.assertEqual(
+            rec.build_arg_parser().parse_args(["--mode", "collection-capped"]).mode,
+            rec.MODE_COLLECTION_CAPPED)
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -2371,6 +2371,9 @@ class Fda483SignatureStampFooterTest(unittest.TestCase):
         # 1200자 상한에 이름이 잘려 스탬프만 남은 꼴(fda483-193573 실측).
         "Specifically, the reports were reviewed without adequate justification. Digitally signed by":
             "Specifically, the reports were reviewed without adequate justification.",
+        # 서명자 앞에 OCR 잡음이 낀 스탬프(fda483-193540 obs#4 실측 — 1차 수리가 놓쳐 라이브에 남았다).
+        "Specifically, there is no trigger to evaluate the methods. Digitally signed by _ ' Saundrea A.":
+            "Specifically, there is no trigger to evaluate the methods.",
         # 양식 뒷면 704(b) 고지문(fda483-195303 obs#5 실측).
         "Specifically, the cleaning records were incomplete for several lots. The observations of "
         "objectionable conditions and practices listed on the front of this form are reported":

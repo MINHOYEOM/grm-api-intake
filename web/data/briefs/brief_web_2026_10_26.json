@@ -24,10 +24,10 @@
   ],
   "coverage": {
    "intake_total": 276,
-   "rendered": 123,
+   "rendered": 136,
    "evidence": {
     "A": 41,
-    "B": 82,
+    "B": 95,
     "C": 0
    },
    "resources": 5
@@ -396,8 +396,446 @@
    }
   },
   {
-   "id": "fda483-195622",
+   "id": "fda483-195597",
    "render_order": 2,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "FinVector Oy",
+   "title_issue": "바이알·원료 COA 검증과 MOI 밸리데이션",
+   "summary": "FDA가 핀란드 바이러스 벡터 제조소 FinVector Oy 실사(실사일 05/28/2024) 후 관찰사항 5건을 담은 483을 발부했다. Adstiladrin 1차 용기 바이알과 원료·첨가제의 공급업체 COA 를 검증하지 않았고, 핵심공정변수인 감염다중도(MOI)와 감염 기간(DOI)의 조합을 밸리데이션하지 않은 점이 핵심이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195597"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "FinVector Oy · FEI 3010227150"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Biologics/Viral Vector · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "05/28/2024"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: FinVector Oy · FEI 3010227150",
+    "시설 · 유형: Biologics/Viral Vector · 483",
+    "관찰사항: 5건(용기 COA 검증, 보관 검체 육안검사, 청소 일정, 공정 밸리데이션, 원료 COA 검증)",
+    "공정: MOI 목표 163 VP/Cell 이지만 범위 내 다른 값 사용을 금지하지 않음"
+   ],
+   "implication": "MOI 와 DOI 를 각각 핵심공정변수로 정하고도 범위 안의 조합(극단값 포함)을 밸리데이션하지 않은 것이 지적됐다. 운전 범위를 허용하는 바이오 공정에서는 개별 변수 범위뿐 아니라 변수 조합의 밸리데이션 근거가 검토될 수 있다는 점을 보여 주는 사례로 볼 만하다.",
+   "checks": [
+    "핵심공정변수 조합(극단값 포함)의 밸리데이션 근거",
+    "1차 용기·원료 공급업체 COA 의 주기적 검증 여부",
+    "보관 검체 연 1회 육안검사 절차 보유 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195597/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Unverified supplier COAs and MOI validation",
+    "summary": "FDA issued a Form 483 with five observations to FinVector Oy, a viral vector manufacturer in Finland, after an inspection ending 05/28/2024. Key issues are unverified supplier COAs for the Adstiladrin primary container vial and for components and excipients, and no validation of combinations of multiplicity of infection (MOI) and duration of infection (DOI), both critical process parameters.",
+    "implication": "MOI and DOI were each designated critical process parameters, yet combinations within their ranges, including extremes, were never validated. For biologics processes that allow an operating range, the validation basis for parameter combinations, not just individual ranges, appears to be open to review.",
+    "key_facts": [
+     "Facility: FinVector Oy, FEI 3010227150",
+     "Establishment type: Biologics/Viral Vector",
+     "Observations: container COA verification, reserve sample inspection, cleaning schedules, process validation, component COA verification",
+     "Process: MOI target is 163 VP/Cell, but other values within the range are not prohibited"
+    ],
+    "checks": [
+     "Validation basis for combinations of critical process parameters, including extremes",
+     "Periodic verification of primary container and component supplier COAs",
+     "Procedure for annual visual inspection of reserve samples"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 5,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Establishment of the reliability of the container and closure supplier's report of analyses is deficient in that the test results are not appropriately validated at appropriate intervals.",
+      "detail": "Specifically, your firm has not conducted at least one specific identity test and has not established the reliability of the suppliers analyses through appropriate validation of the supplier's test result at appropriate intervals for © vial used as primary container for Adstiladrin drug product. Between ” (b) (4) , your firm has shipped/distributed approximately (©) (4) Adstiladrin vials to the US market. In addition, you have not established a written procedure describing the sampling and testing of© vial.",
+      "deficiency_ko": "용기·마개 공급업체 분석 성적의 신뢰성 확립이 미흡하다 — 시험 결과를 적절한 주기로 적절히 검증하지 않는다.",
+      "detail_ko": "구체적으로, 귀사는 Adstiladrin 의약품의 1차 용기로 쓰이는 (비공개) 바이알에 대해 최소 1건의 특이적 확인시험을 수행하지 않았고, 적절한 주기로 공급업체 시험 결과를 적절히 검증해 공급업체 분석의 신뢰성을 확립하지도 않았다. (비공개) 사이에 귀사는 약 (비공개)개의 Adstiladrin 바이알을 미국 시장에 출하·유통했다. 또한 (비공개) 바이알의 검체채취와 시험을 기술한 문서화된 절차를 수립하지 않았다."
+     },
+     {
+      "number": "2",
+      "deficiency": "The quality control unit lacks responsibility to approve all procedures or specifications impacting on the identity, strength, quality and purity of drug products.",
+      "detail": "Specifically, your quality control unit has not established a procedure that governs the performance of visual inspection on reserve samples from representative sample lots at least once a year for evidence of deterioration.",
+      "deficiency_ko": "품질관리부서가 의약품의 확인·함량·품질·순도에 영향을 미치는 모든 절차나 규격을 승인할 책임을 갖고 있지 않다.",
+      "detail_ko": "구체적으로, 귀사 품질관리부서는 대표 검체 로트의 보관 검체를 적어도 연 1회 육안검사해 변질 징후를 확인하는 절차를 수립하지 않았다."
+     },
+     {
+      "number": "3",
+      "deficiency": "Written procedures for cleaning and maintenance fail to include maintenance and cleaning schedules.",
+      "detail": "",
+      "deficiency_ko": "청소 및 유지관리 절차서에 유지관리·청소 일정이 포함되어 있지 않다."
+     },
+     {
+      "number": "4",
+      "deficiency": "Your firm has not adequately validated your adherent (b) (4) regarding cell infection in that certain combinations of critical parameters have not been assessed.",
+      "detail": "The Multiplicity of Infection (MOI) is used in a calculation in step ©@ of master batch record (b) (4) (b) (4) , for determining a correct volume of virus particle concentrate. The MOI is a critical process parameter with a target of ™® viral particles per cell (VP/Cell) and a range of (b) (4) VP/Cell. The Duration of Infection (DOI) pertains to the time taken from infection to harvest and has a normal/acceptable range of (1b) (4) = (page 157, master batch record (b) (4) )) The DOI is a critical process parameter. Although the MOI target is 163 VP/Cell, there is no prohibition on using any other value within the range. Your firm has not validated combinations (including extremes) of MOls and DOls for acceptability regarding two (b) (4) , which were observed in operation in building (6) (4) and include (b) (4) and (b) (4) (b) (4). (b) (4) was observed but reported undergoing an upgrade. Drug products batches",
+      "deficiency_ko": "세포 감염에 관한 귀사의 부착형 (비공개)를 적절히 밸리데이션하지 않았다 — 핵심 파라미터의 일부 조합이 평가되지 않았다.",
+      "detail_ko": "감염다중도(MOI)는 마스터 배치기록 (비공개) 단계 (비공개)의 계산에 쓰여 바이러스 입자 농축액의 정확한 부피를 정한다. MOI 는 목표 (비공개) 바이러스 입자/세포(VP/Cell), 범위 (비공개) VP/Cell 인 핵심공정변수다. 감염 기간(DOI)은 감염부터 수확까지 걸리는 시간으로 정상·허용 범위는 (비공개)다(마스터 배치기록 (비공개) 157쪽). DOI 도 핵심공정변수다. MOI 목표는 163 VP/Cell 이지만 범위 안의 다른 값을 쓰는 것을 금지하지 않는다. 귀사는 (비공개) 건물에서 가동 중인 것으로 관찰된 두 (비공개)((비공개)와 (비공개) 포함)에 대해 MOI 와 DOI 조합(극단값 포함)의 허용 가능성을 밸리데이션하지 않았다. (비공개)도 관찰되었으나 업그레이드 중인 것으로 보고되었다. 의약품 배치 …"
+     },
+     {
+      "number": "5",
+      "deficiency": "Failure to check the reliability of Certificate of Analysis (COA) at Regular Intervals.",
+      "detail": "Specifically, your firm has not established the reliability of suppliers COA through appropriate validation of the supplier’s test result at appropriate intervals for the following components/excipients: pecification Number Material Name (b) (4) (b) (4) (b) (4) (b) (4) ” (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4)",
+      "deficiency_ko": "시험성적서(COA)의 신뢰성을 정기적으로 확인하지 않았다.",
+      "detail_ko": "구체적으로, 귀사는 다음 구성성분·첨가제에 대해 공급업체 시험 결과를 적절한 주기로 적절히 검증해 공급업체 COA 의 신뢰성을 확립하지 않았다: 규격번호·원료명 (비공개)"
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195600",
+   "render_order": 3,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "CMC lCOS Biologics, Inc.",
+   "title_issue": "예방정비 누락·일탈 조사 지연",
+   "summary": "FDA가 미국 바이오의약품 제조소 CMC lCOS Biologics, Inc. 실사(실사일 04/18/2016) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 이전 배치 영향평가 없는 일탈 조사, 필수 주간 예방정비 47건 중 15건 누락·8건 지연, 중대 일탈의 공식 개시 기한 초과다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195600"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "CMC lCOS Biologics, Inc. · FEI 3000209996"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Biologics Manufactuter · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/18/2016"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: CMC lCOS Biologics, Inc. · FEI 3000209996",
+    "시설 · 유형: Biologics Manufactuter · 483",
+    "관찰사항: 3건 판독(2번 일탈 조사, 3번 예방정비, 4번 일탈 관리 SOP)",
+    "예방정비: 주간 47건 중 8건 지연·15건 누락·2건 미일정"
+   ],
+   "implication": "2016년 실사 기록이지만, 핵심 설비 예방정비를 일정대로 하지 않은 사실이 건수로 정리돼 지적됐다. 고객사 통지와 초기 조사는 기한 안에 했어도 공식 일탈 문서화가 늦으면 별도 관찰사항이 된다는 점에서, 위탁생산(CMO) 시설의 일탈 개시 기한 관리가 확인 대상이 될 수 있음을 보여 준다.",
+   "checks": [
+    "핵심 설비 예방정비 일정 준수율 모니터링",
+    "일탈 발생 시 이전 배치 영향평가 수행 여부",
+    "중대 일탈의 공식 문서화 개시 기한 준수 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195600/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Missed preventive maintenance and late deviations",
+    "summary": "FDA issued a Form 483 to CMC lCOS Biologics, Inc., a US biologics manufacturer, after an inspection ending 04/18/2016. Three legible observations (2 to 4) cover a deviation investigation without impact assessment on earlier batches, 15 of 47 required weekly preventive maintenance tasks missed and 8 late, and critical deviations formally opened past the required window.",
+    "implication": "This is a 2016 record, but missed preventive maintenance on critical equipment was cited with exact counts. Formal deviation documentation opened late became a separate observation even though the client was notified and investigations started on time, suggesting that deviation initiation deadlines at contract manufacturers may draw scrutiny.",
+    "key_facts": [
+     "Facility: CMC lCOS Biologics, Inc., FEI 3000209996",
+     "Establishment type: Biologics Manufactuter",
+     "Observations legible: 2 (deviation investigation), 3 (preventive maintenance), 4 (deviation management SOP)",
+     "Preventive maintenance: of 47 weekly tasks, 8 late, 15 missed, 2 not scheduled"
+    ],
+    "checks": [
+     "Monitoring of preventive maintenance adherence on critical equipment",
+     "Impact assessment on earlier batches when a deviation occurs",
+     "Timely formal documentation of critical deviations"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "2",
+      "deficiency": "Deviations during production have not been thoroughly investigated.",
+      "detail": "Specifically, a. (b) (4) documented in deviation DEV-1498 did not trigger impact assessment on previous batches manufactured (b) (4) The impact on product quality of (BD) (4) hat might have been damaged | . Add Contirwation Page",
+      "deficiency_ko": "생산 중 발생한 일탈을 철저히 조사하지 않았다.",
+      "detail_ko": "구체적으로, a. 일탈 DEV-1498 에 기록된 (비공개)가 (비공개) 제조된 이전 배치에 대한 영향평가로 이어지지 않았다. 손상되었을 수 있는 (비공개)가 제품 품질에 미치는 영향은 (판독 불가)"
+     },
+     {
+      "number": "3",
+      "deficiency": "Preventative maintenance ofcritical equipment is not performed per written procedures.",
+      "detail": "Specifically, a. Preventative maintenance for (b} (4) was not performed as scheduled. Daily tasks are not documented, Between June 7, 2015 and April 21, 2016, of 47 required weekly PM activities, eight that were late, 15 were missed, and two were not scheduled. Over the ten month period, only one ofthree quarterly j Maintenance activities was performed, due on August 31, 2015, completed on April 19, 2016, Semi-annual }preventative maintenance performance was two months overdue,",
+      "deficiency_ko": "핵심 설비의 예방정비가 문서화된 절차에 따라 수행되지 않는다.",
+      "detail_ko": "구체적으로, a. (비공개)의 예방정비가 일정대로 수행되지 않았다. 일일 작업은 기록되지 않는다. 2015년 6월 7일부터 2016년 4월 21일까지 필수 주간 예방정비 47건 중 8건은 지연, 15건은 누락, 2건은 일정에 잡히지 않았다. 10개월 동안 분기 유지관리 3건 중 1건만 수행되었는데, 이 건도 기한은 2015년 8월 31일이었으나 2016년 4월 19일에 완료되었다. 반기 예방정비는 두 달 지연되었다 …"
+     },
+     {
+      "number": "4",
+      "deficiency": "Failure to follow standard operating procedure for deviation management, Specifically, a.",
+      "detail": "Critical deviations DEV-1484, DEV-1632, and DEV-2081 were initiated, respectively, 1, 5, and 2, days past the yoy 4 * . ® : . (DY (4) window as required by the deviation management procedure, GMP-0263, Rev 16. In all cases, the client was notified and initial investigations started within (0) (4) but the official documentation of the deviations were not initiated within the (8) (4) window. Wie - : ee ee tae Peete Tree 1 EMPLOVEE(S Ppa JRE , EMPLOVEE(S) NAMEAND TITLE (Pant or Type) BATEISSUED VER rshey DE BALDBORD, LE FET, REVERSE ; Jott Tatasey, CSD . _ OF THiS petro WiKHAWL CVANESOV pee ab @AbLOG 1ST 1G PAGE oe bien Yiveng LIANly stiff Fellow : an oe Oy bre ise VES he",
+      "deficiency_ko": "일탈 관리 표준작업절차(SOP)를 따르지 않았다.",
+      "detail_ko": "구체적으로, a. 중대 일탈 DEV-1484, DEV-1632, DEV-2081 은 일탈 관리 절차 GMP-0263 Rev 16 이 요구하는 (비공개) 기한보다 각각 1일, 5일, 2일 늦게 개시되었다. 모든 경우 고객사에는 통지되었고 초기 조사도 (비공개) 이내에 시작되었으나, 일탈의 공식 문서화는 (비공개) 기한 안에 개시되지 않았다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195607",
+   "render_order": 4,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Lonza Biologics, Inc.",
+   "title_issue": "CASGEVY 공정 관리 상태 미입증",
+   "summary": "FDA가 미국 제조소 Lonza Biologics, Inc. 실사(실사일 04/16/2026) 후 관찰사항 3건을 담은 483을 발부했다. CASGEVY 제조공정이 관리 상태에 있음을 입증하지 못했다는 지적이 핵심으로, 무균 실수 추세로 APS 를 재수행했고 공여자 시험 배치와 상업 배치가 불합격됐으며, 미립자·환경모니터링 일탈의 CAPA 이행도 지연됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195607"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Lonza Biologics, Inc. · FEI 3001451441"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/16/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Lonza Biologics, Inc. · FEI 3001451441",
+    "시설 · 유형: Drug Manufacturer · 483",
+    "관찰사항: 3건(공정 관리 상태, 무균 오염 방지 절차, 보관 관리)",
+    "같은 FEI 시설의 06/06/2025 실사 483(Lonza Portsmouth)도 이번 호에 함께 공개"
+   ],
+   "implication": "같은 시설은 2025년 실사에서도 CASGEVY 무균공정 결함을 지적받았고, 2026년 실사에서는 APS 재수행·배치 불합격·CAPA 지연이 이어져 공정 관리 상태 자체가 문제로 제기됐다. 상업 생산 착수 직후 실사에서는 APS 결과뿐 아니라 무균 행위 추세와 후속 CAPA 진척이 함께 검토될 수 있음을 보여 주는 사례로 볼 만하다.",
+   "checks": [
+    "APS 재수행 사유와 무균 행위 추세 관리 기록",
+    "미립자 추세 일탈의 CAPA 이행 진척",
+    "최종 제품 바이알 보관 유닛별 수량 기록"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195607/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "CASGEVY process state of control not shown",
+    "summary": "FDA issued a Form 483 with three observations to Lonza Biologics, Inc., a US manufacturer, after an inspection ending 04/16/2026. The core finding is that the firm had not shown its CASGEVY manufacturing process was in a state of control: APS runs were repeated after a trend of aseptic lapses, healthy donor and commercial batches were rejected, and CAPAs for particulate and environmental monitoring deviations were behind schedule.",
+    "implication": "The same site was cited for CASGEVY aseptic processing failures in 2025, and the 2026 inspection found repeated APS runs, rejected batches and delayed CAPAs, raising the state of control itself. Inspections soon after commercial launch may look at aseptic behavior trends and CAPA progress, not just APS results.",
+    "key_facts": [
+     "Facility: Lonza Biologics, Inc., FEI 3001451441",
+     "Establishment type: Drug Manufacturer",
+     "Observations: process state of control, sterile contamination prevention procedures, warehousing",
+     "A 483 from the 06/06/2025 inspection of the same FEI (Lonza Portsmouth) is also in this issue"
+    ],
+    "checks": [
+     "Reasons for repeated APS runs and records of aseptic behavior trends",
+     "CAPA progress for particulate trend deviations",
+     "Vial counts recorded per final product storage unit"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+      "detail": "Specifically, your firm has not demonstrated a state of control over the CASGEVY manufacturing process: a) ()() Aseptic Process Simulation (APS) runs were executed from (b) (4) in Grade ® suites (b) (4) _ APS runs (®)@) were executed in Suite ©)@ with results that met specifications, however, these runs were repeated due to a trend of aseptic lapses and inconsistent aseptic practices that were not considered representative of your firm’s process quality standards. Additionally, a total of 4) deviations (including major) were initiated during execution ofthe®™APs runs. b) © healthy donor (HD) (b) (4) runs were executed in (b) (4) to support (b) (4) CASGEVY production capacity. HD Batch Nos. (b) (4) were ™rejected for failure to meet production control specifications in the HD protocol. The (©) @) disposition for Batch No. (b) (4) was also rejected due to an out of specification (OOS) result for (BD) (4). c) Commercial production of CASGEVY was initiated in November 2025 with manufacture of®® batches. Batch No. (b) (4) was rejected for ©) observed in the BSC (6) (4)",
+      "deficiency_ko": "귀사는 의약품이 표방하는 확인·함량·순도·품질을 보증하도록 설계된 생산·공정관리 절차서를 수립하지 않았다.",
+      "detail_ko": "구체적으로, 귀사는 CASGEVY 제조공정이 관리 상태에 있음을 입증하지 못했다: a) (비공개) 무균공정 모의시험(APS)이 (비공개)부터 (비공개)등급 제조실 (비공개)에서 수행되었다. APS (비공개)회는 제조실 (비공개)에서 규격에 적합한 결과로 수행되었으나, 귀사의 공정 품질 기준을 대표하지 않는 것으로 판단된 무균 실수(aseptic lapse)와 일관되지 않은 무균 행위의 추세 때문에 재수행되었다. 또한 APS 수행 중 총 (비공개)건의 일탈(중대 일탈 포함)이 개시되었다. b) CASGEVY 생산능력 (비공개)를 뒷받침하기 위해 (비공개)에서 건강한 공여자(HD) (비공개) 수행이 (비공개)회 실시되었다. HD 배치 (비공개)는 HD 프로토콜의 생산 관리 규격에 부적합해 불합격되었다. 배치 (비공개)의 (비공개) 판정도 (비공개)에 대한 규격외(OOS) 결과로 불합격되었다. c) CASGEVY 상업 생산은 2025년 11월 (비공개) 배치 제조로 시작되었다. 배치 (비공개)는 BSC (비공개)에서 관찰된 (비공개)로 불합격되었다."
+     },
+     {
+      "number": "2",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not followed.",
+      "detail": "Specifically, a)DEV-1358321 was initiated on 5/30/2025 for an identified trend of particulates (b) (4) for the CASGEVY manufacturing process. In response to this event, CAPA-1420656 was opened on 10/2/2025 for initiation of a (b) (4) for (b) (4) was created on (Bb) (4) to update (b) (4). the software for (Bb) (4) in-process monitoring of particulates and develop an SOP for governing (b) (4) . However, in-process monitoring of particulates is still being implemented, and updates to (Bb) (4) and creation of a| (Bb) (4) SOP have yet to be completed. Additionally, ©)@ other deviations have been initiated (subsequent to the trend investigation) for investigation of particulates identified in APS runs and commercial batches. b)DEV-1435080 was initiated on 10/29/2025 after a trend was identified for EM good documentation practices (GDP) assay errors and incorrect performance of critical in operation (CIO) EM. CAPA-1447250 was opened on 11/18/2025 to include an action plan for initiation of a (b) (4) for establishment of a| (B) (4) SOP for (b) (4) and training guidelines. However, a has yet to be initiated for development and implementation of a (b) (4) SOP and training guidelines. Additio",
+      "deficiency_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 준수되지 않는다.",
+      "detail_ko": "구체적으로, a) CASGEVY 제조공정에서 (비공개) 미립자 추세가 확인되어 2025년 5월 30일 DEV-1358321 이 개시되었다. 이에 대응해 2025년 10월 2일 CAPA-1420656 이 개시되었고, 미립자 공정 중 모니터링을 위한 (비공개) 소프트웨어 업데이트와 (비공개)를 관리하는 SOP 개발을 위한 (비공개)가 (비공개)에 생성되었다. 그러나 미립자 공정 중 모니터링은 아직 도입 중이며, (비공개) 업데이트와 (비공개) SOP 작성도 완료되지 않았다. 또한 (추세 조사 이후) APS 수행과 상업 배치에서 확인된 미립자를 조사하기 위한 다른 일탈이 (비공개)건 개시되었다. b) 환경모니터링 GDP 분석 오류와 핵심 작업 중(CIO) 환경모니터링의 부정확한 수행 추세가 확인되어 2025년 10월 29일 DEV-1435080 이 개시되었다. 2025년 11월 18일 CAPA-1447250 이 개시되어, (비공개)에 대한 (비공개) SOP 수립과 교육 지침을 위한 (비공개) 개시 실행계획을 포함했다. 그러나 (비공개) SOP 와 교육 지침의 개발·이행을 위한 (비공개)는 아직 개시되지 않았다 …"
+     },
+     {
+      "number": "3",
+      "deficiency": "Procedures describing the warehousing of drug products are not followed.",
+      "detail": "Specifically, a review of the use log form (_ (Db) (4) _ ) for (b) (4) of CASGEVY final drug product vials in’ (b) (4) revealed that your firm failed to capture the number of vials transferred to this unit for Batch Nos. (b) (4) . Additionally, the’ (1b) (4) __ inventory list for CASGEVY final drug product vials (1B) (4) — units only reports the final product batch number and not the actual number of vials placed in the (0) units. *DATES OF INSPECTION 4/08/2026(Wed), 4/09/2026(Thu), 4/10/2026(Fri), 4/13/2026(Mon), 4/14/2026(Tue), 4/15/2026(Wed), 4/16/2026(Thu) iestgaut",
+      "deficiency_ko": "의약품 보관 관리 절차가 준수되지 않는다.",
+      "detail_ko": "구체적으로, (비공개) 내 CASGEVY 최종 의약품 바이알의 (비공개) 사용 기록서((비공개))를 검토한 결과, 귀사는 배치 (비공개)에 대해 이 유닛으로 옮긴 바이알 수를 기록하지 않았다. 또한 CASGEVY 최종 의약품 바이알의 (비공개) 유닛 재고 목록에는 최종 제품 배치번호만 적혀 있고 실제로 유닛에 넣은 바이알 수는 적혀 있지 않다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195611",
+   "render_order": 5,
+   "group": "글로벌",
+   "group_label": "🧬 바이오의약품",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": "🧬 바이오의약품",
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "GlaxoSmithKline Biologicals Kft.",
+   "title_issue": "백신 원료 일탈 최악조건 미평가",
+   "summary": "FDA가 헝가리 생물의약품 제조소 GlaxoSmithKline Biologicals Kft. 실사(실사일 01/31/2025) 후 관찰사항 2건을 담은 483을 발부했다. 미립자 오염과 온도 이탈 일탈을 최악 조건까지 넓혀 조사하지 않은 채 해당 배치를 INFANRIX·BOOSTRIX 후속 제조에 출하했고, 시정조치로 만든 절차도 위험평가 근거가 없었다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195611"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "GlaxoSmithKline Biologicals Kft. · FEI 3008322822"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Licensed Biological Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "01/31/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: GlaxoSmithKline Biologicals Kft. · FEI 3008322822",
+    "시설 · 유형: Licensed Biological Drug Manufacturer · 483",
+    "관찰사항: 2건(최악 조건 미평가 일탈 조사, 구성성분 적합 판정 절차)",
+    "관련 제품: INFANRIX·BOOSTRIX 후속 제조에 사용된 배치"
+   ],
+   "implication": "일탈 조사가 최악 조건을 평가하지 않은 상태로 배치가 출하됐고, 그 일탈의 시정조치로 만든 절차마저 위험평가 없이 사용을 허용한 점이 함께 지적됐다. 원료 단계 일탈이 여러 완제품으로 이어지는 생물의약품에서는 시정조치 자체의 근거도 실사 검토 대상이 될 수 있음을 보여 준다.",
+   "checks": [
+    "일탈 조사 시 최악 조건 포함 위험분석 수행 여부",
+    "온도 이탈 시 전체 대상 품목 영향평가 여부",
+    "시정조치로 도입한 절차의 위험평가 근거"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195611/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Vaccine deviations not assessed for worst case",
+    "summary": "FDA issued a Form 483 with two observations to GlaxoSmithKline Biologicals Kft., a licensed biological drug manufacturer in Hungary, after an inspection ending 01/31/2025. Particulate contamination and temperature excursion deviations were not expanded to worst-case conditions before the batches were released for further manufacture of INFANRIX and BOOSTRIX, and a procedure created as a corrective action had no risk assessment behind it.",
+    "implication": "Batches were released while deviation investigations had not assessed worst-case conditions, and the procedure written as the corrective action allowed use without a risk assessment. Where an upstream deviation feeds several finished products, the basis for the corrective action itself may come under review.",
+    "key_facts": [
+     "Facility: GlaxoSmithKline Biologicals Kft., FEI 3008322822",
+     "Establishment type: Licensed Biological Drug Manufacturer",
+     "Observations: deviation investigations without worst-case assessment, component acceptance procedures",
+     "Products: batches used in further manufacture of INFANRIX and BOOSTRIX"
+    ],
+    "checks": [
+     "Worst-case risk analysis in deviation investigations",
+     "Impact assessment across all affected items after temperature excursions",
+     "Risk assessment behind procedures introduced as corrective actions"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 2,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Discrepancy and failure investigations related to manufacturing were not expanded to assess worst case conditions.",
+      "detail": "Specifically, a) Deviation 201042740 initiated on 09JAN2024, pertaining to particulate contamination of was not adequately investigated. Your (b) (4) identified an within a (b) (4) sent for analysis during the deviation investigation. However, you failed to perform an adequate risk analysis that included worst case conditions to support the utilization of during manufacturing of (6)i(4)i ll lll | lll batch “This batch was released and distributed for further manufacture of final drug products INFANRIX (lots (BY (4) 9) and BOOSTRIX (lot(6))). b) Deviation 201079963 was initiated on 25JUL2024 pertaining to a (b) (4) 7) This batch was identified as out of controlled temperature fol) hrs with the warmest temperature reachin ). You failed to evaluate product impact for all 17 and failed to adequately investigate and justify your viability testing sample was representative of worst-case conditions. This was released for further manufacture of and (6) 4) batches ad",
+      "deficiency_ko": "제조 관련 불일치 및 실패 조사를 최악 조건까지 평가하도록 확장하지 않았다.",
+      "detail_ko": "구체적으로, a) 2024년 1월 9일 개시된 (판독 불가)의 미립자 오염 관련 일탈 201042740 이 적절히 조사되지 않았다. 귀사의 (비공개)는 일탈 조사 중 분석 의뢰한 (비공개) 안에서 (판독 불가)를 확인했다. 그러나 (비공개) 배치 제조 중 (판독 불가) 사용을 뒷받침하기 위해 최악 조건을 포함한 적절한 위험분석을 수행하지 않았다. 이 배치는 출하되어 최종 의약품 INFANRIX(로트 (비공개))와 BOOSTRIX(로트 (비공개))의 후속 제조에 사용되었다. b) 2024년 7월 25일 (비공개) 관련 일탈 201079963 이 개시되었다. 이 (판독 불가)는 (비공개)시간 동안 관리 온도를 벗어났고 최고 온도는 (판독 불가)에 이르렀다. 귀사는 17개 전체에 대한 제품 영향을 평가하지 않았고, 생존율 시험 검체가 최악 조건을 대표한다는 점을 적절히 조사·정당화하지 않았다. 이는 (판독 불가)와 (비공개) 배치의 후속 제조용으로 출하되었다 …"
+     },
+     {
+      "number": "2",
+      "deficiency": "Procedures for the acceptance and rejection of components and materials utilized within drug substance manufacturing are not adequate.",
+      "detail": "Procedure LSOP 9000087267 (ver. 01 — approved 20MAR2024), titled “FILT.UF (B)(4) Pi was implemented as a corrective action in response to deviation 201042740 and requires visual inspection of the prior to use within manufacturing. The procedure allows for the acceptance and use o containing ,” however, no risk assessment or study was conducted to assess the impact of utilizing with (b) (4) ” within your process. *DATES OF INSPECTION 1/23/2025(Thu), 1/24/2025(Fri), 1/27/2025(Mon), 1/28/2025(Tue), 1/29/2025(Wed), 1/30/2025(Thu), 1/31/2025(Fri) Travis S Bradley",
+      "deficiency_ko": "원료의약품 제조에 쓰이는 구성성분과 자재의 적합·부적합 판정 절차가 적절하지 않다.",
+      "detail_ko": "절차 LSOP 9000087267(ver. 01, 2024년 3월 20일 승인) \"FILT.UF (비공개)\"는 일탈 201042740 에 대한 시정조치로 도입되었으며, 제조에 사용하기 전 (판독 불가)를 육안검사하도록 요구한다. 이 절차는 (판독 불가)를 포함한 (판독 불가)의 합격·사용을 허용하나, 공정 내에서 (비공개)가 있는 (판독 불가)를 사용할 때의 영향을 평가하는 위험평가나 연구는 수행되지 않았다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195622",
+   "render_order": 6,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "FDA",
@@ -557,7 +995,7 @@
   },
   {
    "id": "fda483-195629",
-   "render_order": 3,
+   "render_order": 7,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "FDA",
@@ -714,7 +1152,7 @@
   },
   {
    "id": "fda483-195630",
-   "render_order": 4,
+   "render_order": 8,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "FDA",
@@ -870,7 +1308,7 @@
   },
   {
    "id": "fda483-195637",
-   "render_order": 5,
+   "render_order": 9,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "FDA",
@@ -1039,7 +1477,7 @@
   },
   {
    "id": "fda483-195651",
-   "render_order": 6,
+   "render_order": 10,
    "group": "글로벌",
    "group_label": "🧬 바이오의약품",
    "agency": "FDA",
@@ -1226,7 +1664,7 @@
   },
   {
    "id": "fda483-195322",
-   "render_order": 7,
+   "render_order": 11,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1417,7 +1855,7 @@
   },
   {
    "id": "fda483-195323",
-   "render_order": 8,
+   "render_order": 12,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1537,7 +1975,7 @@
   },
   {
    "id": "fda483-195324",
-   "render_order": 9,
+   "render_order": 13,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1686,7 +2124,7 @@
   },
   {
    "id": "fda483-195325",
-   "render_order": 10,
+   "render_order": 14,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1834,7 +2272,7 @@
   },
   {
    "id": "fda483-195326",
-   "render_order": 11,
+   "render_order": 15,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1981,7 +2419,7 @@
   },
   {
    "id": "fda483-195327",
-   "render_order": 12,
+   "render_order": 16,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2111,7 +2549,7 @@
   },
   {
    "id": "fda483-195328",
-   "render_order": 13,
+   "render_order": 17,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2294,7 +2732,7 @@
   },
   {
    "id": "fda483-195329",
-   "render_order": 14,
+   "render_order": 18,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2459,7 +2897,7 @@
   },
   {
    "id": "fda483-195332",
-   "render_order": 15,
+   "render_order": 19,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2601,7 +3039,7 @@
   },
   {
    "id": "fda483-195336",
-   "render_order": 16,
+   "render_order": 20,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2718,7 +3156,7 @@
   },
   {
    "id": "fda483-195338",
-   "render_order": 17,
+   "render_order": 21,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2835,7 +3273,7 @@
   },
   {
    "id": "fda483-195342",
-   "render_order": 18,
+   "render_order": 22,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2972,7 +3410,7 @@
   },
   {
    "id": "fda483-195344",
-   "render_order": 19,
+   "render_order": 23,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3095,7 +3533,7 @@
   },
   {
    "id": "fda483-195345",
-   "render_order": 20,
+   "render_order": 24,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3243,7 +3681,7 @@
   },
   {
    "id": "fda483-195346",
-   "render_order": 21,
+   "render_order": 25,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3400,7 +3838,7 @@
   },
   {
    "id": "fda483-195347",
-   "render_order": 22,
+   "render_order": 26,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3537,7 +3975,7 @@
   },
   {
    "id": "fda483-195348",
-   "render_order": 23,
+   "render_order": 27,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3707,7 +4145,7 @@
   },
   {
    "id": "fda483-195349",
-   "render_order": 24,
+   "render_order": 28,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3884,7 +4322,7 @@
   },
   {
    "id": "fda483-195352",
-   "render_order": 25,
+   "render_order": 29,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4033,7 +4471,7 @@
   },
   {
    "id": "fda483-195354",
-   "render_order": 26,
+   "render_order": 30,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4194,7 +4632,7 @@
   },
   {
    "id": "fda483-195356",
-   "render_order": 27,
+   "render_order": 31,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4321,7 +4759,7 @@
   },
   {
    "id": "2026-21669",
-   "render_order": 28,
+   "render_order": 32,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4400,7 +4838,7 @@
   },
   {
    "id": "fda483-195295",
-   "render_order": 29,
+   "render_order": 33,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4556,7 +4994,7 @@
   },
   {
    "id": "fda483-195297",
-   "render_order": 30,
+   "render_order": 34,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4676,7 +5114,7 @@
   },
   {
    "id": "fda483-195298",
-   "render_order": 31,
+   "render_order": 35,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4825,7 +5263,7 @@
   },
   {
    "id": "fda483-195299",
-   "render_order": 32,
+   "render_order": 36,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4947,7 +5385,7 @@
   },
   {
    "id": "fda483-195300",
-   "render_order": 33,
+   "render_order": 37,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5089,7 +5527,7 @@
   },
   {
    "id": "fda483-195301",
-   "render_order": 34,
+   "render_order": 38,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5232,7 +5670,7 @@
   },
   {
    "id": "fda483-195303",
-   "render_order": 35,
+   "render_order": 39,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5384,7 +5822,7 @@
   },
   {
    "id": "fda483-195304",
-   "render_order": 36,
+   "render_order": 40,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5547,7 +5985,7 @@
   },
   {
    "id": "fda483-195309",
-   "render_order": 37,
+   "render_order": 41,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5682,7 +6120,7 @@
   },
   {
    "id": "fda483-195312",
-   "render_order": 38,
+   "render_order": 42,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5813,7 +6251,7 @@
   },
   {
    "id": "fda483-195314",
-   "render_order": 39,
+   "render_order": 43,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5983,7 +6421,7 @@
   },
   {
    "id": "fda483-195315",
-   "render_order": 40,
+   "render_order": 44,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6099,7 +6537,7 @@
   },
   {
    "id": "fda483-195316",
-   "render_order": 41,
+   "render_order": 45,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6282,7 +6720,7 @@
   },
   {
    "id": "fda483-195317",
-   "render_order": 42,
+   "render_order": 46,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6475,7 +6913,7 @@
   },
   {
    "id": "fda483-195320",
-   "render_order": 43,
+   "render_order": 47,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6618,7 +7056,7 @@
   },
   {
    "id": "fda483-195321",
-   "render_order": 44,
+   "render_order": 48,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6780,7 +7218,7 @@
   },
   {
    "id": "fda483-195513",
-   "render_order": 45,
+   "render_order": 49,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6928,7 +7366,7 @@
   },
   {
    "id": "fda483-195802",
-   "render_order": 46,
+   "render_order": 50,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7147,7 +7585,7 @@
   },
   {
    "id": "fda483-195258",
-   "render_order": 47,
+   "render_order": 51,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7284,8 +7722,317 @@
    }
   },
   {
+   "id": "fda483-195260",
+   "render_order": 52,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Fresenius Kabi USA, LLC",
+   "title_issue": "육안검사 검출력 저하·무균 밸리데이션 미흡",
+   "summary": "FDA가 미국 무균 의약품 제조소 Fresenius Kabi USA, LLC 실사(실사일 05/14/2026) 후 관찰사항 3건을 담은 483을 발부했다. 자사 적격성평가에서 현행 컨베이어 방식 바이알 육안검사의 미립자 검출률이 100% 수동 검사보다 크게 낮게 나왔는데도 검사 공정의 적절성을 재평가하지 않은 점이 핵심이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195260"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Fresenius Kabi USA, LLC · FEI 3001833549"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Sterile Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "05/14/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Fresenius Kabi USA, LLC · FEI 3001833549",
+    "시설 · 유형: Sterile Drug Manufacturer · 483",
+    "관찰사항: 3건(육안검사 공정 관리, 무균·멸균 밸리데이션, 분석법 이전)",
+    "검출률 예: 마개 미립자 수동 93.3% 대 현행 방식 10.0%, 섬유 미립자 70.0% 대 13.3%"
+   ],
+   "implication": "육안검사 방법 적격성평가 결과가 현행 검사 방식의 한계를 보여 줬는데도 공정에 반영되지 않은 것이 지적됐다. 적격성평가를 수행한 것만으로는 부족하고, 그 결과가 검사 속도·검사원 적격성 시료 구성 같은 일상 운영 조건에 반영됐는지가 검토 대상이 될 수 있음을 보여 주는 사례로 볼 만하다.",
+   "checks": [
+    "자동·반자동 육안검사의 검출확률과 수동 검사 대비 차이 평가 여부",
+    "검사원 적격성평가 시료에 검출 하한 크기 결함 포함 여부",
+    "분석법 이전 시 이전·수령 시험실 비교시험 수행 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195260/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Weak visual inspection and aseptic validation",
+    "summary": "FDA issued a Form 483 with three observations to Fresenius Kabi USA, LLC, a US sterile drug manufacturer, after an inspection ending 05/14/2026. The key issue is that the firm's own qualification studies showed its current conveyor-based vial inspection detected particulates far less often than 100% manual inspection, yet the process was not reassessed.",
+    "implication": "The citation targets a qualification study whose findings on the limits of the current inspection method were never carried into the process. Running the study is not enough; whether its results shaped routine conditions such as conveyor speed and the defect sets used to qualify inspectors appears to be a point worth noting.",
+    "key_facts": [
+     "Facility: Fresenius Kabi USA, LLC, FEI 3001833549",
+     "Establishment type: Sterile Drug Manufacturer",
+     "Observations: visual inspection process control, aseptic and sterilization validation, analytical method transfer",
+     "Detection example: stopper particulates 93.3% manual vs. 10.0% current method; fibers 70.0% vs. 13.3%"
+    ],
+    "checks": [
+     "Probability of detection for automated or semi-automated inspection versus manual inspection",
+     "Inclusion of defects at the detection limit in inspector qualification sets",
+     "Comparative testing between sending and receiving labs in method transfers"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Your firm failed to establish adequate written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+      "detail": "Specifically, in 2024 your firm conducted studies to qualify the defect standards for your visible particulate container challenge™®. However, you failed to assess the appropriateness of your current (b) (4) sterile vial inspection process after these Visual Inspection Method Qualification studies revealed significant degradation in visual inspection quality and capabilities when the vials were inspected by the (b) (4) method compared to 100% manual visual inspection. Your firm’s current (b) (4) visual inspection process entails vials which are presented to inspectors via a conveyor system at pre-determined speeds (without ever determining how conveyor speed impacts visual inspection performance). For example: 1. Protocol #US-PU-1027-MVD-EQP-000116815 (Determination of Probability of Detection (b) (4) with (b) (4) Fill of(b) (4) ), initiated in 8/2024. Examples of results from 100% manual inspection vs. the firm’s current (b) (4) inspection, are as follows: a. (b) (4) stopper particulate (Unit ID:©@): 93.3% vs. 10.0% b. (b) (4) stopper particulate (Unit ID: © @): 83.3% vs. 0.0% c. (b) (4) fiber particulate (Unit ID: © @): 70.0% vs.13.3% d. (b) (4) particulate (Unit ID:®): 70.0% vs.",
+      "deficiency_ko": "의약품이 표방하는 확인·함량·순도·품질을 보증하도록 설계된 생산·공정관리 절차서를 적절히 수립하지 않았다.",
+      "detail_ko": "구체적으로, 귀사는 2024년 가시성 미립자 용기 챌린지(비공개)의 결함 표준을 적격성평가하기 위한 연구를 수행했다. 그러나 이 육안검사 방법 적격성평가 연구에서 바이알을 (비공개) 방식으로 검사할 때 100% 수동 육안검사 대비 육안검사 품질과 역량이 크게 떨어지는 것으로 나타났음에도, 현행 (비공개) 무균 바이알 검사 공정의 적절성을 평가하지 않았다. 귀사의 현행 (비공개) 육안검사 공정은 바이알을 미리 정한 속도의 컨베이어로 검사원에게 제시하는 방식이다(컨베이어 속도가 육안검사 성능에 미치는 영향은 한 번도 평가하지 않았다). 예를 들어, 1. 프로토콜 #US-PU-1027-MVD-EQP-000116815(Determination of Probability of Detection (비공개) with (비공개) Fill of (비공개)), 2024년 8월 개시. 100% 수동 검사와 귀사 현행 (비공개) 검사의 결과 예시는 다음과 같다: a. (비공개) 마개 미립자(Unit ID: (비공개)): 93.3% 대 10.0% b. (비공개) 마개 미립자(Unit ID: (비공개)): 83.3% 대 0.0% c. (비공개) 섬유 미립자(Unit ID: (비공개)): 70.0% 대 13.3% d. (비공개) 미립자(Unit ID: (비공개)): 70.0% 대 …"
+     },
+     {
+      "number": "2",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the aseptic and sterilization process.",
+      "detail": "Specifically, (A) The qualification™™® used to qualify visual inspectors do not always include defect samples at the lower limits of visual detection established during threshold studies. For example, Test (b) (4) ((b) (4) vial), which was used to requalify visual inspector fim on 1/21/2026, contains (b) (4) accept units and defect units. Of the defect units, \"contain foreign material particulates of the following types and sizes: (b) (4) . Your threshold study established a PoD of >(®)(4) % for (b) (4) (po stopper) particulates; however, defects at this size are not represented in Test (b) (4) (B) Your firm uses fog generated from (b) (4) and (b) (4) for airflow visualization studies in cleanrooms, including sterile drug product filling lines. However, Study/CC # (03) 26-016.V6, conducted on March 13, 2026, does not provide adequate evidence that the fog is neutrally buoyant. Video observations show the fog was discharged upward in bursts, reversed direction, and fell back. (C) Your(b) (4) _ Sterilization Qualification Study #(©))17-025 for the (b) (4) vial established a minimum validated Fo of (b) (4) and (b) (4) at the worst-case location. However, per SOP US-PU-1027-SOP-OT-0000",
+      "deficiency_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차에 무균공정과 멸균공정의 적절한 밸리데이션이 포함되지 않았다.",
+      "detail_ko": "구체적으로, (A) 육안검사원 적격성평가에 사용하는 (비공개)에 역치 연구에서 설정한 육안 검출 하한 수준의 결함 시료가 항상 포함되지는 않는다. 예를 들어, 2026년 1월 21일 육안검사원 (비공개)의 재적격성평가에 사용한 Test (비공개)((비공개) 바이알)는 (비공개)개의 적합 단위와 결함 단위로 구성되며, 결함 단위에는 \"다음 유형과 크기의 이물 미립자: (비공개)\"가 들어 있다. 귀사의 역치 연구는 (비공개)(마개) 미립자에 대해 검출확률(PoD) >(비공개)%를 설정했으나, 이 크기의 결함은 Test (비공개)에 포함되어 있지 않다. (B) 귀사는 무균 의약품 충전라인을 포함한 클린룸의 기류 가시화 연구에 (비공개)와 (비공개)로 발생시킨 포그를 사용한다. 그러나 2026년 3월 13일 수행된 Study/CC # (비공개) 26-016.V6 는 포그가 중성 부력임을 보여주는 충분한 근거를 제공하지 않는다. 영상 관찰 결과 포그가 위쪽으로 분출되듯 방출되고, 방향이 바뀌어 다시 아래로 떨어졌다. (C) (비공개) 바이알에 대한 귀사의 (비공개) 멸균 적격성평가 연구 #(비공개)17-025 는 최악 위치에서 최소 밸리데이션 Fo 를 (비공개) 및 (비공개)로 설정했다. 그러나 SOP US-PU-1027-SOP-OT-0000 …"
+     },
+     {
+      "number": "3",
+      "deficiency": "Verification of the suitability of the testing methods is deficient in that they are not performed under actual conditions of use.",
+      "detail": "Specifically, your firm does not perform comparative testing for all in-house analytical method transfer studies that compare analytical results between the transferring lab and your receiving lab to determine a successful method transfer. For example, you did not compare the results of the transferring lab with the results of your receiving lab for the transfer of the external labs in-house method ((b) (4) ) for the Determination of Impurities in (b) (4) Injection ((b) (4) ) frorr(b) (4) to FK Grand Island, executed under Protocol: NAM-MVD-FG-000111207. *DATES OF INSPECTION 5/05/2026(Tue), 5/06/2026(Wed), 5/07/2026(Thu), 5/08/2026(Fri), 5/11/2026(Mon), 5/12/2026(Tue), 5/13/2026(Wed), 5/14/2026(Thu) JeshRenzo N Ramilo",
+      "deficiency_ko": "시험방법의 적합성 확인이 실제 사용 조건에서 수행되지 않아 미흡하다.",
+      "detail_ko": "구체적으로, 귀사는 모든 사내 분석법 이전 연구에서 이전 시험실(transferring lab)과 귀사 수령 시험실(receiving lab)의 분석 결과를 비교하는 비교시험을 수행해 분석법 이전 성공 여부를 판정하지 않는다. 예를 들어, (비공개) 주사제((비공개)) 중 불순물 정량을 위한 외부 시험실의 사내 시험법((비공개))을 (비공개)에서 FK Grand Island 로 이전할 때(프로토콜 NAM-MVD-FG-000111207 로 수행), 이전 시험실의 결과와 귀사 수령 시험실의 결과를 비교하지 않았다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195264",
+   "render_order": 53,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "RayzeBio, Inc",
+   "title_issue": "시험 완료 전 출하 허용·EMPQ 조사 미흡",
+   "summary": "FDA가 미국 제조소 RayzeBio, Inc 실사(실사일 02/24/2026) 후 483을 발부했다. 판독된 관찰사항은 2건(1·4번)으로, 분석시험과 배치기록 검토가 끝나기 전 무균 주사제를 고객에게 출하하도록 허용하면서 부적합 시 조치를 정하지 않은 절차와, 환경 성능적격성평가의 CFU 조치기준 초과에 대한 조사 미흡이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195264"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "RayzeBio, Inc · FEI 3030530655"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "02/24/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: RayzeBio, Inc · FEI 3030530655",
+    "시설 · 유형: Manufacturer · 483",
+    "관찰사항: 2건 판독(1번 품질부서 절차, 4번 불일치 조사)",
+    "EMPQ: 조치기준 초과 시료 14건, 합계 315 CFU — 미생물 유래 추적 미흡"
+   ],
+   "implication": "격리 상태 출하(시험 완료 전 출하)를 절차로 허용하면서 부적합 시 회수 단계를 정하지 않은 점이 품질부서 책임 결함으로 지적됐다. 유효기간이 짧아 출하 후 시험이 끝나는 제품군에서는 조건부 출하 절차와 부적합 시 회수 절차가 짝을 이뤄 있는지가 실사에서 확인될 수 있는 대목으로 읽힌다.",
+   "checks": [
+    "시험 완료 전 출하 허용 시 부적합 대응·회수 절차 연계 여부",
+    "환경 성능적격성평가 중 조치기준 초과의 조사·미생물 유래 추적 여부",
+    "기한 경과 CAPA 의 연장 사유 기록 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195264/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Early release and weak EMPQ investigation",
+    "summary": "FDA issued a Form 483 to RayzeBio, Inc, a US manufacturer, after an inspection ending 02/24/2026. Two observations (1 and 4) were legible: a procedure that allows sterile injectables to ship to customers before analytical testing and batch record review are complete without defining what happens if the product fails, and an inadequate investigation of CFU action limit excursions during environmental performance qualification.",
+    "implication": "Allowing quarantine shipment by procedure without defined failure and recall steps was cited as a quality unit failure. For short-shelf-life products released before testing ends, whether conditional release is paired with a recall procedure looks like a point inspectors may check.",
+    "key_facts": [
+     "Facility: RayzeBio, Inc, FEI 3030530655",
+     "Establishment type: Manufacturer",
+     "Observations legible: 1 (quality unit procedures) and 4 (discrepancy investigations)",
+     "EMPQ: 14 samples above action limits, 315 CFU in total, sources not traced"
+    ],
+    "checks": [
+     "Link between release-before-testing and failure handling or recall procedures",
+     "Investigation and source tracing of action limit excursions during EMPQ",
+     "Documented justification for overdue CAPAs"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 2,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+      "detail": "Specifically, A. Your firm's procedure SOP-00013 (\"Batch Review and Release Process,\" v. 5, effective 10/31/2025) for shipping drug products under quarantine is inadequate. The procedure allows shipment of sterile injectable drug products to end customers before the completion of analytical tests and quality review of batch manufacturing records, but it does not specify the steps to be taken if the product fails to meet finished product quality specification(s). This procedure does not ensure the quality of products prior to distribution. B. Your firm lacked a procedure for recalls that details the steps to follow, within the shelf life of the products, in the case of batch failures due to analytical test failures or manufacturing deviations. C. Per SOP-00012 (\"Corrective and Preventive Action (CAPA) Handling,\" v. 2, effective 04/14/2025), Quality Assurance (QA) is responsible for tracking CAPA quality events, and CAPA due dates can be extended during the Implementation phase with appropriate justification. A review of the firm's list of CAPAs revealed that many remain open past their due dates without justification. For example: Muna Algharibeh -S Digitally signed by Muna Algharib",
+      "deficiency_ko": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지 않는다.",
+      "detail_ko": "구체적으로, A. 격리(quarantine) 상태 의약품의 출하에 관한 귀사 절차 SOP-00013(\"Batch Review and Release Process\", v.5, 2025년 10월 31일 시행)은 부적절하다. 이 절차는 분석시험과 배치제조기록 품질 검토가 끝나기 전에 무균 주사제를 최종 고객에게 출하하도록 허용하면서도, 제품이 완제품 품질 규격에 부적합할 경우 취할 조치를 규정하지 않는다. 이 절차는 유통 전 제품 품질을 보장하지 못한다. B. 귀사에는 분석시험 부적합이나 제조 일탈로 배치가 부적합할 경우 제품 유효기간 내에 따라야 할 단계를 상세히 기술한 회수(recall) 절차가 없었다. C. SOP-00012(\"Corrective and Preventive Action (CAPA) Handling\", v.2, 2025년 4월 14일 시행)에 따르면 품질보증(QA)이 CAPA 품질 이벤트를 추적할 책임이 있으며, CAPA 기한은 이행 단계에서 적절한 사유가 있으면 연장할 수 있다. 귀사의 CAPA 목록을 검토한 결과 다수가 사유 없이 기한을 넘겨 미완료 상태였다. 예를 들어: …"
+     },
+     {
+      "number": "4",
+      "deficiency": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet to any of its specifications Specifically, A.",
+      "detail": "A review of the EMPQ (REC-00703, \"Environmental Performance Qualification Summary Report,\" v0, approved 08/23/2024) showed that protocol deviations were inadequately investigated. Protocol Deviation Reports 11-16 identified 14 samples exceeding CFU action limits, totaling 315 CFUs. The Quality Unit failed to adequately investigate and implement corrective actions after identifying the CFUs, determine microorganism sources or trace them to Muna Algharibeh -S Digitally signed by Muna Algharibeh -S Date: 2026.02.24 13:08:16 -05'00' (b)(4) The observations of objectionable conditions and practices listed on the front of this form are reported: 1. Pursuant to Section 704(b) of the Federal Food, Drug and Cosmetic Act, or 2. To assist firms inspected in complying with the Acts and regulations enforced by the Food and Drug Administration. Section 704(b) of the Federal Food, Drug, and Cosmetic Act (21 USC 374(b)) provides: \"Upon completion of any such inspection of a factory, warehouse, consulting laboratory, or other establishment, and prior to leaving the premises, the officer or employee making the inspection shall give to the owner, operator, or agent in charge a report in writing setti",
+      "deficiency_ko": "설명되지 않은 불일치와, 배치 또는 그 구성성분의 규격 부적합에 대해 철저한 검토가 이루어지지 않는다.",
+      "detail_ko": "구체적으로, A. 환경 성능적격성평가(EMPQ) 요약 보고서(REC-00703, \"Environmental Performance Qualification Summary Report\", v0, 2024년 8월 23일 승인)를 검토한 결과 프로토콜 일탈이 부적절하게 조사되었다. 프로토콜 일탈 보고서 11~16 에서 CFU 조치기준을 초과한 시료 14건, 합계 315 CFU 가 확인되었다. 품질부서는 CFU 를 확인한 뒤 적절히 조사하고 시정조치를 이행하지 않았으며, 미생물의 유래를 규명하거나 추적하지 않았다 …"
+     }
+    ]
+   }
+  },
+  {
+   "id": "fda483-195265",
+   "render_order": 54,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Spirit Pharmaceuticals",
+   "title_issue": "포장라인 PQ 기록 결함·금속검출기 점검",
+   "summary": "FDA가 미국 의약품 포장·유통업체 Spirit Pharmaceuticals 실사(실사일 01/25/2017) 후 관찰사항 2건을 담은 483을 발부했다. 병 포장라인 성능적격성평가에서 사용 로트를 확인하지 않았고, 연질캡슐 혼탁·결정화 불만이 반복됐는데 품질부서 대응이 미흡했으며, 금속검출기 점검에 비철금속 챌린지를 쓰지 않았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195265"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Spirit Pharmaceuticals · FEI 3011773798"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Pharmaceutical Packager/Distributer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "01/25/2017"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Spirit Pharmaceuticals · FEI 3011773798",
+    "시설 · 유형: Pharmaceutical Packager/Distributer · 483",
+    "관찰사항: 2건(품질부서 책임·절차, 전자 장비 정기 점검)",
+    "실사일: 01/25/2017 — 이번에 공개된 과거 실사기록"
+   ],
+   "implication": "2017년 실사 기록이지만 지적 유형은 지금도 흔하다. 포장라인 적격성평가에서 사용 로트와 불량품 처리가 추적되지 않은 점, 공급업체가 근본원인을 찾았다고 한 반복 불만을 품질부서가 어떻게 관리했는지가 함께 지적돼, 위탁 포장·유통 단계에서도 공급업체 품질 문제의 추적 책임이 확인 대상이 될 수 있음을 보여 준다.",
+   "checks": [
+    "포장라인 PQ 사용 로트·불량품 기록 추적 가능 여부",
+    "반복 불만에 대한 공급업체 근본원인 조치 확인 기록",
+    "금속검출기 점검 시 비철금속 시편 포함 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195265/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Packaging PQ record gaps, metal detector checks",
+    "summary": "FDA issued a Form 483 with two observations to Spirit Pharmaceuticals, a US pharmaceutical packager and distributor, after an inspection ending 01/25/2017. The firm did not identify the lot used in bottle packaging line performance qualification, its quality unit response to repeated cloudiness and crystallization complaints on a softgel product was inadequate, and metal detector checks did not use non-ferrous challenges.",
+    "implication": "This is a 2017 record, but the findings remain common. Untraceable lots and rejects in packaging line qualification were cited alongside how the quality unit handled recurring complaints for which the supplier claimed a root cause, suggesting that packagers and distributors may also be held to account for tracking supplier quality issues.",
+    "key_facts": [
+     "Facility: Spirit Pharmaceuticals, FEI 3011773798",
+     "Establishment type: Pharmaceutical Packager/Distributer",
+     "Observations: quality unit responsibilities and procedures, routine checks of electronic equipment",
+     "Inspection date: 01/25/2017, a past inspection record released now"
+    ],
+    "checks": [
+     "Traceability of lots and rejects used in packaging line PQ",
+     "Records confirming supplier root cause actions for recurring complaints",
+     "Non-ferrous test pieces in metal detector checks"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 2,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
+      "detail": "Specifically: 1) Review of the firm's qualification report for bottle packaging line® found that the performance qualification failed to identify the lot number ofproduct used in the qualification operations. Further, when the rejection log was examined for a recording of the lot used in the qualification, there was no record of the rejected product. Finally, review of the inventory card which was requested found that the responsible individual reportedly recorded the wrong lot number. 2) The firm has had a large number of complaints of cloudiness/ crystallization in the softgel product (b)(4) and for specific lots such as manufacturer lot (64) there was a large percentage of rejects and four customer complaints for lot (6)(4) However, although Spirit Pharmaceuticals, LLC internal communication dated April 5, 2016 states in reference to the supplier efforts that \"Based on the evaluation done so far they have found the root cause that might be causing the re-crystallization and are in the process of making permissible manufacturing changes on (6)(4) and will implement the required changes to manufacturing process after evaluating pilot scale batches\", review of quality system files",
+      "deficiency_ko": "품질관리부서에 적용되는 책임과 절차가 완전히 준수되지 않는다.",
+      "detail_ko": "구체적으로, 1) 병 포장라인 (비공개)의 적격성평가 보고서를 검토한 결과, 성능적격성평가(PQ)에서 적격성평가 작업에 사용한 제품의 로트번호를 확인하지 않았다. 또한 적격성평가에 사용된 로트의 기록이 있는지 불량품 기록(rejection log)을 검토했으나 불량 제품에 대한 기록이 없었다. 마지막으로, 요청한 재고 카드를 검토한 결과 담당자가 잘못된 로트번호를 기록한 것으로 나타났다. 2) 귀사는 연질캡슐 제품 (비공개)의 혼탁·결정화 불만을 다수 접수했으며, 제조사 로트 (비공개) 같은 특정 로트는 불량률이 높았고 로트 (비공개)에 대해서는 고객 불만이 4건 있었다. 그러나 2016년 4월 5일자 Spirit Pharmaceuticals, LLC 내부 문서는 공급업체의 대응과 관련해 \"지금까지의 평가로 재결정화를 일으킬 수 있는 근본원인을 찾았으며, (비공개)에 대해 허용 가능한 제조 변경을 진행 중이고 파일럿 규모 배치를 평가한 뒤 제조공정에 필요한 변경을 적용할 예정\"이라고 적고 있음에도, 품질시스템 파일을 검토한 결과 …"
+     },
+     {
+      "number": "2",
+      "deficiency": "Routine checking of electronic equipment is not performed according to a written program designed to assure proper performance.",
+      "detail": "Specifically: (6)(4)) checking of the metal detectors employed on packaging lines does not employ non-ferrous metal challenges. *DATES OF INSPECTION 1/18/2017(Wed),1/19/2017(Thu), 1/23/2017(Mon), 1/24/2017(Tue), 1/25/2017(Wed)",
+      "deficiency_ko": "전자 장비의 정기 점검이 적절한 성능을 보장하도록 설계된 문서화된 프로그램에 따라 수행되지 않는다.",
+      "detail_ko": "구체적으로, 포장라인에 사용하는 금속검출기의 (비공개) 점검에 비철금속 챌린지를 사용하지 않는다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
    "id": "fda483-195277",
-   "render_order": 48,
+   "render_order": 55,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7462,7 +8209,7 @@
   },
   {
    "id": "fda483-195278",
-   "render_order": 49,
+   "render_order": 56,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7580,8 +8327,98 @@
    }
   },
   {
+   "id": "fda483-195279",
+   "render_order": 57,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Linde Inc",
+   "title_issue": "의료용 가스 안정성 프로그램 부재",
+   "summary": "FDA가 미국 의료용 가스 제조소 Linde Inc 실사 후 관찰사항 1건을 담은 483을 발부했다. USP 등급 의료용 가스에 대한 안정성 프로그램을 수립하지 않았고 안정성 시험도 수행하지 않은 채 제조·출하·유통을 이어 온 점이 지적됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195279"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Linde Inc · FEI 2523830"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Medical Gas Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "03/26/2023"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Linde Inc · FEI 2523830",
+    "시설 · 유형: Medical Gas Manufacturer · 483",
+    "관찰사항: 1건(USP 등급 가스 안정성 시험 프로그램 부재)"
+   ],
+   "implication": "의료용 가스도 의약품으로서 안정성 특성을 평가하는 문서화된 시험 프로그램이 요구된다는 점이 확인되는 사례다. 가스 제품군은 안정성 시험이 생략되기 쉬운 영역이라, 의료용 가스를 제조하거나 조달하는 업체는 해당 제품의 안정성 근거 자료가 갖춰져 있는지 확인해 볼 만하다.",
+   "checks": [
+    "의료용 가스 제품의 안정성 시험 프로그램 수립 여부",
+    "가스 공급업체의 안정성 근거 자료 확보 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195279/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "No stability program for medical gases",
+    "summary": "FDA issued a Form 483 with one observation to Linde Inc, a US medical gas manufacturer. The firm had not established a stability program or performed stability studies for USP grade medical gases while continuing to manufacture, release and distribute them.",
+    "implication": "The case confirms that medical gases, as drugs, need a written program to assess their stability characteristics. Stability testing is easily skipped for gas products, so firms that make or source medical gases may want to check that stability data exist for them.",
+    "key_facts": [
+     "Facility: Linde Inc, FEI 2523830",
+     "Establishment type: Medical Gas Manufacturer",
+     "Observation: no written stability testing program for USP grade gases"
+    ],
+    "checks": [
+     "Stability testing program for medical gas products",
+     "Stability data from gas suppliers"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 1,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "here is no written testing program designed to access the stability characteristic of USP grade (b) (4) and (b) (4) gases.",
+      "detail": "Specifically, our firm has not established a stability program, nor you have performed stability studies to assess the stability characteristics of USP grade (b) (4) (b) (4)(b) (4) . & (b) (4) (b) (4) as well as (b) (4) (b) (4) (b) (4), 8(b) (4) (b) (4) | Currently you have manufactured, released and distributed approximately lots from 12/01/2025.",
+      "deficiency_ko": "USP 등급 (비공개) 및 (비공개) 가스의 안정성 특성을 평가하도록 설계된 문서화된 시험 프로그램이 없다.",
+      "detail_ko": "구체적으로, 귀사는 USP 등급 (비공개)와 (비공개), (비공개)의 안정성 특성을 평가하기 위한 안정성 프로그램을 수립하지 않았고 안정성 시험도 수행하지 않았다. 현재 귀사는 2025년 12월 1일 이후 약 (판독 불가) 로트를 제조·출하·유통했다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
    "id": "fda483-195280",
-   "render_order": 50,
+   "render_order": 58,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7706,7 +8543,7 @@
   },
   {
    "id": "fda483-195281",
-   "render_order": 51,
+   "render_order": 59,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7826,7 +8663,7 @@
   },
   {
    "id": "fda483-195282",
-   "render_order": 52,
+   "render_order": 60,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8024,7 +8861,7 @@
   },
   {
    "id": "fda483-195284",
-   "render_order": 53,
+   "render_order": 61,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8162,7 +8999,7 @@
   },
   {
    "id": "fda483-195285",
-   "render_order": 54,
+   "render_order": 62,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8294,7 +9131,7 @@
   },
   {
    "id": "fda483-195286",
-   "render_order": 55,
+   "render_order": 63,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8414,7 +9251,7 @@
   },
   {
    "id": "fda483-195287",
-   "render_order": 56,
+   "render_order": 64,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8570,7 +9407,7 @@
   },
   {
    "id": "fda483-195289",
-   "render_order": 57,
+   "render_order": 65,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8694,8 +9531,501 @@
    }
   },
   {
+   "id": "fda483-195591",
+   "render_order": 66,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Axogen Corporation",
+   "title_issue": "AVANCE 보관·환경모니터링 관리 미흡",
+   "summary": "FDA가 미국 원료·완제의약품 제조소 Axogen Corporation 실사(실사일 04/29/2025) 후 483을 발부했다. 판독된 관찰사항 6건은 AVANCE 최종 제품·인쇄 라벨 보관구역 출입 통제 부재, 등급 구역 환경모니터링 성능적격성평가 누락, 소독제 유효성 근거 부재, 역가 시험 인력 부족, 반복 해충 목격, 일탈 개시 권한 제한에 걸쳐 있다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195591"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Axogen Corporation · FEI 3023488176"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Substance and Drug product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "04/29/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Axogen Corporation · FEI 3023488176",
+    "시설 · 유형: Drug Substance and Drug product Manufacturer · 483",
+    "관찰사항: 6건 판독(보관 관리, 환경모니터링, 오염 관리, 시험실 관리, 해충 조사, 일탈 관리)",
+    "해충: 2025년 1월 이후 통제구역 목격 12건(등급 구역 4건), 시정조치 후에도 5건"
+   ],
+   "implication": "최종 제품이 잠기지 않은 냉동고에 있고 청소 용역 인원까지 출입할 수 있다는 지적과, 교육받은 일부 인원만 일탈을 개시할 수 있는 체계가 함께 나왔다. 기본적인 접근 통제와 일탈 보고 경로가 품질 감독의 근거로 검토된다는 점에서, 조직·인프라가 성장 단계인 제조소에서 우선 점검할 항목으로 볼 만하다.",
+   "checks": [
+    "최종 제품·인쇄 라벨 보관구역의 출입 권한 통제",
+    "환경모니터링 성능적격성평가의 정적·동적 조건 항목 누락 여부",
+    "현장 직원이 일탈을 직접 개시할 수 있는 경로"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195591/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "AVANCE storage and environmental monitoring gaps",
+    "summary": "FDA issued a Form 483 to Axogen Corporation, a US drug substance and drug product manufacturer, after an inspection ending 04/29/2025. Six legible observations cover uncontrolled access to AVANCE final product and printed label storage, gaps in environmental monitoring performance qualification of classified areas, no disinfectant efficacy support, too few staff qualified for potency testing, recurring pest sightings and restricted deviation initiation.",
+    "implication": "Final product in unlocked freezers open to cleaning contractors was cited alongside a system where only a few trained staff can raise deviations. Basic access control and deviation reporting routes are reviewed as evidence of quality oversight, which makes them early items to check at sites whose organization and infrastructure are still growing.",
+    "key_facts": [
+     "Facility: Axogen Corporation, FEI 3023488176",
+     "Establishment type: Drug Substance and Drug product Manufacturer",
+     "Observations legible: warehousing, environmental monitoring, contamination control, laboratory controls, pest investigations, deviation management",
+     "Pests: 12 sightings in controlled areas since January 2025 (4 in classified areas), 5 more after corrective action"
+    ],
+    "checks": [
+     "Access control for final product and printed label storage",
+     "Static and dynamic conditions covered in environmental monitoring PQ",
+     "Route for floor staff to raise deviations directly"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 6,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Procedures describing the warehousing ofAVANCE final product, printed product labels, and retain samples are not established.",
+      "detail": "Specifically: a. Areas where AVANCE final product is stored are not controlled. All personnel including contractors for cleaning services with access to the controlled not classified (CNC) areas have access to Rooms © ® and ©® where AVANCE final product are stored in unlocked freezers. b. Access to the storage area for labels is not limited to authorized personnel. Specifically, printed serial barcode labels are stored unsecured in Rooms (b) (4) which are accessible to all personnel including contractors for cleaning services. c. There is no documentation including sample identification or location of the inventory of (b) (4) (b) (4) samples for the potency assay.",
+      "deficiency_ko": "AVANCE 최종 제품, 인쇄된 제품 라벨, 보관 검체의 보관 관리에 관한 절차가 수립되어 있지 않다.",
+      "detail_ko": "구체적으로, a. AVANCE 최종 제품을 보관하는 구역이 통제되지 않는다. 비등급 통제구역(CNC)에 출입할 수 있는 인원은 청소 용역 업체 인원을 포함해 모두 AVANCE 최종 제품이 잠기지 않은 냉동고에 보관된 (비공개)호실과 (비공개)호실에 출입할 수 있다. b. 라벨 보관구역 출입이 권한 있는 인원으로 제한되지 않는다. 구체적으로, 인쇄된 일련번호 바코드 라벨이 청소 용역 업체 인원을 포함한 모든 인원이 출입할 수 있는 (비공개)호실에 잠금 없이 보관되어 있다. c. 역가 시험용 (비공개) 검체 재고에 대해 검체 식별이나 위치를 포함한 어떤 기록도 없다."
+     },
+     {
+      "number": "2",
+      "deficiency": "Environmental monitoring program is deficient to ensure classified environments.",
+      "detail": "For example: a. Monitoring of viable and nonviable particulates under static and dynamic conditions during the environmental monitoring performance qualification (EMPQ) of ISO classified manufacturing areas was inadequate to support routine environmental monitoring. Specifically, the following monitoring was not performed: i. Microbiological surface monitoring ofISO & ISO &, and ISO& classified areas under static condition was performed (b) (4) to prevent recovery ofmicroorganisms present. ii. Monitoring ofnonviable particles in ISO' classified areas under static and dynamic conditions, and in ISO & classified areas under dynamic conditions was not performed. iii. Microbiological active air monitoring in ISO § classified areas under static and dynamic conditions, and in ISO & and ISO& classified areas under dynamic conditions was not performed. Further, passive air monitoring using microbiological settling plates in ISO & classified areas under static conditions, and ISO % and ISO & classified under static and dynamic conditions was not performed. Additionally, microbiological surface monitoring was not performed in ISO §, ISO §, and ISO & classified areas",
+      "deficiency_ko": "등급 환경을 보장하기 위한 환경모니터링 프로그램이 미흡하다.",
+      "detail_ko": "예를 들어, a. ISO 등급 제조구역의 환경모니터링 성능적격성평가(EMPQ) 중 정적·동적 조건의 생균·비생균 입자 모니터링이 일상 환경모니터링을 뒷받침하기에 불충분했다. 구체적으로 다음 모니터링이 수행되지 않았다: i. ISO (판독 불가), ISO (판독 불가), ISO (판독 불가) 등급 구역의 정적 조건 미생물 표면 모니터링은 (비공개) 수행되어, 존재하는 미생물이 회수되지 않도록 했다. ii. ISO (판독 불가) 등급 구역의 정적·동적 조건과 ISO (판독 불가) 등급 구역의 동적 조건에서 비생균 입자 모니터링이 수행되지 않았다. iii. ISO (판독 불가) 등급 구역의 정적·동적 조건과 ISO (판독 불가)·ISO (판독 불가) 등급 구역의 동적 조건에서 미생물 능동 공기 모니터링이 수행되지 않았다. 또한 ISO (판독 불가) 등급 구역의 정적 조건, ISO (판독 불가)·ISO (판독 불가) 등급 구역의 정적·동적 조건에서 낙하균 배지를 이용한 수동 공기 모니터링이 수행되지 않았다. 아울러 ISO (판독 불가), ISO (판독 불가), ISO (판독 불가) 등급 구역에서 미생물 표면 모니터링이 수행되지 않았다 …"
+     },
+     {
+      "number": "3",
+      "deficiency": "Manufacturing building used in the manufacture ofAVANCE does not have the adequate controls to prevent contamination.",
+      "detail": "For example: a. There is no disinfectant efficacy study to support the use of (b) (4) which is approved for use as a routine |(b) (4) disinfectant for (b) (4) per SOP-0540 R11 (©) (4) Environmental and (b) (4) Equipment Cleaning and Disinfection Program.” Specifically, in Reports RPT-0514 ROO “Summary for the Disinfectant Efficacy Testing for the (b) (4) (b) (4) ” and RPT-0573 “Summary Report for the Axogen Processing Center Disinfectant Study for Cleanroom Surfaces,” the effectiveness of (b) (4) was not assessed against (b)(4) _, whichis commonly used to hold (b) (4) materials that are (D)(4) into classified areas. b. Written procedures are not established to disinfect materials when (b)(4) materials from (b) (4): (b) (4) classified areas. For example, on April 28, 2025, your firm explained that (b) (4) manufacturing materials used for manufacturing in ISO & are disinfected with (b) (4) (b) (4) c. The residual level of (b) (4) on sterilized equipment was not established nor monitored. d. The “shelf-life post-sterilization” for equipment sterilized using (b) (4) and an (b) (4) is not supported. In report RPT-1045 ROO “Summary Report for Performance Qualification for (b) (4) ,” you",
+      "deficiency_ko": "AVANCE 제조에 사용하는 제조 건물에 오염을 방지하기 위한 적절한 관리가 갖춰져 있지 않다.",
+      "detail_ko": "예를 들어, a. SOP-0540 R11 \"(비공개) Environmental and (비공개) Equipment Cleaning and Disinfection Program\"에 따라 (비공개)의 일상 (비공개) 소독제로 승인된 (비공개)의 사용을 뒷받침하는 소독제 유효성 연구가 없다. 구체적으로, 보고서 RPT-0514 R00 \"Summary for the Disinfectant Efficacy Testing for the (비공개)\"와 RPT-0573 \"Summary Report for the Axogen Processing Center Disinfectant Study for Cleanroom Surfaces\"에서는, 등급 구역으로 (비공개)되는 (비공개) 자재를 담는 데 흔히 쓰이는 (비공개)에 대해 (비공개)의 유효성을 평가하지 않았다. b. (비공개) 자재를 (비공개)에서 (비공개) 등급 구역으로 옮길 때 자재를 소독하는 절차서가 수립되어 있지 않다. 예를 들어, 2025년 4월 28일 귀사는 ISO (판독 불가)에서 제조에 사용하는 (비공개) 제조 자재를 (비공개)로 소독한다고 설명했다. c. 멸균된 설비의 (비공개) 잔류 수준을 설정하지도 모니터링하지도 않았다. d. (비공개)와 (비공개)로 멸균한 설비의 \"멸균 후 유효기간(shelf-life post-sterilization)\"이 근거로 뒷받침되지 않는다. 보고서 RPT-1045 R00 \"Summary Report for Performance Qualification for (비공개)\"에서 귀사는 …"
+     },
+     {
+      "number": "5",
+      "deficiency": "Laboratory controls are not adequately established and do not include scientifically sound test procedures and sampling plans designed to assure that AVANCE drug product conform to appropriate standards of identity, strength, quality, and purity.",
+      "detail": "Specifically: a. The number of qualified personnel to perform drug product potency release testing is inadequate. Specifically, there is only© personnel qualified to perform the potency assay ofAVANCE drug product. b. (b) (4) is inadequate. For example, (b) (4) using the (b) (4) is not performed on the sterilized bulk drug product or returned drug product after receipt at your facility.",
+      "deficiency_ko": "실험실 관리가 적절히 수립되어 있지 않으며, AVANCE 의약품이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당한 시험 절차와 검체채취 계획을 포함하지 않는다.",
+      "detail_ko": "구체적으로, a. 의약품 역가 출하시험을 수행할 적격 인원이 부족하다. 구체적으로, AVANCE 의약품의 역가 시험을 수행할 수 있는 적격 인원이 (비공개)명뿐이다. b. (비공개)가 부적절하다. 예를 들어, (비공개)를 사용하는 (비공개)가 멸균된 벌크 의약품이나 귀사 시설로 반품 접수된 의약품에 대해 수행되지 않는다."
+     },
+     {
+      "number": "6",
+      "deficiency": "Investigations into pest control deviations are deficient.",
+      "detail": "Specifically, twelve incidences of pest sightings were observed in controlled areas since 01 January 2025, four ofwhich were in classified areas, and no CAPAs were opened prior to 23 April 2025. Corrective actions were implemented from DEV-2024-1511, which was opened on 27 November 2024. However, the corrective actions were not effective as five pest sightings have been identified in (b) (4) since 26 March 2025.",
+      "deficiency_ko": "방충·방서(해충 관리) 일탈에 대한 조사가 미흡하다.",
+      "detail_ko": "구체적으로, 2025년 1월 1일 이후 통제구역에서 해충 목격이 12건 있었고 그중 4건은 등급 구역이었으나, 2025년 4월 23일 이전에는 CAPA 를 개시하지 않았다. 2024년 11월 27일 개시된 DEV-2024-1511 에 따른 시정조치가 이행되었다. 그러나 2025년 3월 26일 이후 (비공개)에서 해충 목격이 5건 확인되어 시정조치는 효과가 없었다."
+     },
+     {
+      "number": "7",
+      "deficiency": "Deviation management is inadequate to demonstrate quality oversight ofthe manufacturing process.",
+      "detail": "For example, the process to document and report deviations per ®®-0013 R23 “Deviation Procedure” lacks the assurance that all deviations are recorded, because only select individuals who are trained in the deviation process can initiate deviations. Deviations cannot be initiated directly by manufacturing or laboratory staff who are not trained to the deviation process even if staff may be most knowledgeable about a specific deviation. / wy Pp; / .)",
+      "deficiency_ko": "일탈 관리가 제조공정에 대한 품질 감독을 입증하기에 부적절하다.",
+      "detail_ko": "예를 들어, (비공개)-0013 R23 \"Deviation Procedure\"에 따른 일탈 기록·보고 절차는 일탈 절차 교육을 받은 일부 인원만 일탈을 개시할 수 있어 모든 일탈이 기록된다는 보증이 없다. 제조 또는 시험실 직원은 특정 일탈을 가장 잘 알고 있더라도 일탈 절차 교육을 받지 않았다면 일탈을 직접 개시할 수 없다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195592",
+   "render_order": 67,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Capricor, Inc.",
+   "title_issue": "일탈·NCP 기한 관리와 품질협정 부재",
+   "summary": "FDA가 미국 원료·완제의약품 제조소 Capricor, Inc. 실사(실사일 05/30/2025) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 데이터 누락 관련 일탈 27건의 추세 분석 미흡과 기한을 넘긴 NCP·CAR, 시험 위탁처 등과의 품질협정 부재, 불만·반품 처리 절차 미수립이다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195592"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Capricor, Inc. · FEI 3021247180"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Substance and Drug product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "05/30/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Capricor, Inc. · FEI 3021247180",
+    "시설 · 유형: Drug Substance and Drug product Manufacturer · 483",
+    "관찰사항: 3건 판독(2번 절차 미준수, 3번 품질협정, 4번 품질부서 절차)",
+    "일탈: 2년간 데이터 누락 관련 27건 — 추세 분석 미흡"
+   ],
+   "implication": "같은 유형의 데이터 누락 일탈이 2년간 27건 쌓였는데 추세 분석으로 이어지지 않은 점과, 출하시험 등을 맡은 외부 기관과 품질협정이 없는 점이 함께 지적됐다. 외부 시험·위탁 의존도가 높은 제조소에서는 일탈 추세 관리와 위탁처 품질협정이 품질 시스템의 기본 점검 항목으로 다뤄질 수 있음을 보여 준다.",
+   "checks": [
+    "반복 일탈의 추세 분석·조치 연계 여부",
+    "NCP·CAR 기한 경과 시 연장 요청 기록",
+    "출하시험 위탁처 등과의 품질협정 체결 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195592/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Overdue deviations and NCPs, no quality agreements",
+    "summary": "FDA issued a Form 483 to Capricor, Inc., a US drug substance and drug product manufacturer, after an inspection ending 05/30/2025. Three legible observations (2 to 4) cover weak trending of 27 missing-data deviations and overdue NCPs and CARs, no quality agreements with outside parties including release testing, and no procedures for complaints and returned product.",
+    "implication": "Twenty-seven deviations of the same missing-data type over two years without trend analysis were cited together with missing quality agreements for outside release testing. For sites that rely heavily on outside testing and contractors, deviation trending and contractor quality agreements may be treated as baseline checks of the quality system.",
+    "key_facts": [
+     "Facility: Capricor, Inc., FEI 3021247180",
+     "Establishment type: Drug Substance and Drug product Manufacturer",
+     "Observations legible: 2 (procedures not followed), 3 (quality agreements), 4 (quality unit procedures)",
+     "Deviations: 27 missing-data deviations over 2 years without adequate trending"
+    ],
+    "checks": [
+     "Trending of recurring deviations and the actions it drives",
+     "Extension requests on record for overdue NCPs and CARs",
+     "Quality agreements with release testing and other contractors"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "2",
+      "deficiency": "Written procedures are not followed.",
+      "detail": "Specifically: a. According to CORP-QA-SOP-0166, ‘Deviations and CAPA Management SOP’, the trending and analysis of deviations should be performed by the quality unit to identi t issues; however, over a 2-year period, there have been 27 deviations related to missin data incidents observed on the (b) (4) which are used for in the(b) (4). b. According to -OA-SOP- ‘Deviations and CAPA Management SOP’, nonconforming products (NCPs) must be orccrricesteal an extension is issued; however, there are outstanding NCPs without extension requests. Specitically, -582, NCP-580, and NCP-86 were past due, with the oldest outstanding initiated on May 10, 2023, with no record of extension requests. NCP-535, initiated on June 03, 2024, had one extension request that was past due and no additional extension requests. c. According to CORP-QA-SOP-0166, ‘Deviations and CAPA Management SOP’, corrective action reports (CARs) must be unless an extension is issued; however, CAR-212, CAR-244, CAR-246 were past due with no record of a requested extension. d. According to CORP-QA-SOP-0109, ‘Good Documentation Practices’, individuals creating, correcting, and presenting data generated during GxP must comply with",
+      "deficiency_ko": "문서화된 절차가 준수되지 않는다.",
+      "detail_ko": "구체적으로, a. CORP-QA-SOP-0166 \"Deviations and CAPA Management SOP\"에 따르면 품질부서가 (판독 불가) 문제를 파악하기 위해 일탈의 추세 분석을 수행해야 하나, 2년 동안 (비공개)에 사용하는 (비공개)에서 관찰된 데이터 누락 사고 관련 일탈이 27건 발생했다. b. (판독 불가)-QA-SOP-(판독 불가) \"Deviations and CAPA Management SOP\"에 따르면 부적합 제품(NCP)은 연장이 승인되지 않는 한 (판독 불가)되어야 하나, 연장 요청 없이 미결 상태인 NCP 가 있다. 구체적으로, (판독 불가)-582, NCP-580, NCP-86 은 기한을 넘겼고 가장 오래된 건은 2023년 5월 10일 개시되었으며 연장 요청 기록이 없다. 2024년 6월 3일 개시된 NCP-535 는 연장 요청이 1회 있었으나 그 기한도 지났고 추가 연장 요청은 없었다. c. CORP-QA-SOP-0166 \"Deviations and CAPA Management SOP\"에 따르면 시정조치 보고서(CAR)는 연장이 승인되지 않는 한 (판독 불가)되어야 하나, CAR-212, CAR-244, CAR-246 은 연장 요청 기록 없이 기한을 넘겼다. d. CORP-QA-SOP-0109 \"Good Documentation Practices\"에 따르면 GxP 중 생성된 데이터를 작성·수정·제시하는 개인은 …"
+     },
+     {
+      "number": "3",
+      "deficiency": "Quality agreements are not established between(b) (4)racilities and (B)(4) to delineate the roles, operational activities and responsibilities of each ensure compliance with CGMP.",
+      "detail": "Specifically, no quality agreements have been established with multiple including the fe for t release esting, testing, and",
+      "deficiency_ko": "(비공개) 시설과 (비공개) 사이에 각자의 역할, 운영 활동, 책임을 규정해 CGMP 준수를 보장하는 품질협정이 체결되어 있지 않다.",
+      "detail_ko": "구체적으로, 출하시험 등 (판독 불가) 시험을 담당하는 곳을 포함한 다수의 (판독 불가)와 품질협정이 체결되어 있지 않다."
+     },
+     {
+      "number": "4",
+      "deficiency": "Procedures applicable to the quality control unit in writing.",
+      "detail": "Specifically, procedures for the receiving, evaluating, and documenting complaints related t d for the handling, evaluation, and disposition ofreturned(6) (4) have not been established. Si is not maintained in a state ofgood repair. specitically,(D) (4) ws: ahserved onthe inside theIS con hsnutastring suite (ProductionoF /S/",
+      "deficiency_ko": "품질관리부서에 적용되는 절차가 문서화되어 있지 않다.",
+      "detail_ko": "구체적으로, (판독 불가) 관련 불만의 접수·평가·기록 절차와 반품된 (비공개)의 취급·평가·처리 절차가 수립되어 있지 않다. (판독 불가)가 양호한 보수 상태로 유지되지 않는다. 구체적으로, (비공개) (판독 불가) 생산 구역 내부에서 (판독 불가)가 관찰되었다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195595",
+   "render_order": 68,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Lonza Portsmouth, Inc.",
+   "title_issue": "CASGEVY 무균공정·청소·GDP 결함",
+   "summary": "FDA가 미국 세포치료제 제조소 Lonza Portsmouth, Inc. 실사(실사일 06/06/2025) 후 483을 발부했다. 판독된 관찰사항 9건은 CCTV 검토로 확인된 무균 행위 이탈, 등급 구역 청소 누락, 쓰레기통에서 발견된 기록·서명 대체 같은 문서관리 결함, 반복 차압 상실, 취소 후 삭제되는 일탈 정보 등 CASGEVY 제조 전반에 걸쳐 있다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195595"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Lonza Portsmouth, Inc. · FEI 3001451441"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "06/06/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Lonza Portsmouth, Inc. · FEI 3001451441",
+    "시설 · 유형: Drug Product Manufacturer · 483",
+    "관찰사항: 9건 판독(무균공정, 청소, GDP, 공조, 기류, 일탈, 환경모니터링, 무균시험, 해충)",
+    "일탈: 문서화된 사유 없이 취소되고 전자 시스템에서 관련 정보 삭제"
+   ],
+   "implication": "FDA가 CCTV 영상을 근거로 작업자의 무균 행위를 지적했고, 일탈을 취소하면서 전자 시스템의 정보까지 지운 관행이 함께 나왔다. 영상 기록이 무균 행위 평가 자료로 쓰일 수 있고 일탈 취소 이력도 검토 대상이 된다는 점에서, 자사 CCTV 검토 체계와 일탈 취소 기록 보존 방식을 점검해 볼 만한 사례다.",
+   "checks": [
+    "무균 작업 CCTV 영상의 정기 검토 체계",
+    "일탈 취소 시 사유 기록·원래 정보 보존 여부",
+    "반복 차압 상실의 일탈 처리·근본원인 조사 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195595/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "CASGEVY aseptic, cleaning and GDP failures",
+    "summary": "FDA issued a Form 483 to Lonza Portsmouth, Inc., a US cell therapy manufacturer, after an inspection ending 06/06/2025. Nine legible observations span CASGEVY manufacturing, including poor aseptic behavior found on CCTV review, missed cleaning of classified areas, documentation failures such as records found in the trash and replaced signatures, repeated pressure differential losses, and deviation data deleted on cancellation.",
+    "implication": "FDA cited operator aseptic behavior on the basis of CCTV footage, alongside a practice of deleting deviation data from the electronic system when cancelling it. Since video can serve as evidence of aseptic practice and deviation cancellation history is reviewed, this is a case worth noting for how firms review their own CCTV and keep cancelled deviation records.",
+    "key_facts": [
+     "Facility: Lonza Portsmouth, Inc., FEI 3001451441",
+     "Establishment type: Drug Product Manufacturer",
+     "Observations legible: aseptic processing, cleaning, GDP, HVAC, airflow, deviations, environmental monitoring, sterility testing, pests",
+     "Deviations: cancelled without documented justification and deleted from the electronic system"
+    ],
+    "checks": [
+     "Routine review of CCTV footage of aseptic work",
+     "Recorded reasons and retained data when deviations are cancelled",
+     "Deviation handling and root cause work for repeated pressure losses"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 9,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Aseptic processing ofCASGEVY drug product is deficient.",
+      "detail": "Through review ofclosed-circuit television (CCTV) footage on June 04, 2025, during the processing for batch em sn May 26, 2025, the following was observed: : ; (b) (4) : P (b A). ie) a. Throughout aseptic processing, Grade operators routinely change sterile ) (Ain the Grade area where manufacturing is conducted. It was observed that an operator, on multiple occasions, proceeded to perform manufacturing activities following (®) (4)changes without (b) (4) ofthe (b) (4) Per procedure USPO-15643 titled “Gowning and Personne! Movement for Cell Therapy,” (®) (4)changes should be conducted in the (BD) (4) —_ Similarly, operators routinely adjusted’ (b) (4) including the (b) (4) in direct proximity to open manufacturing activities, as opposed to utilizing the (1) (4) as mandated by the aforementioned procedure. — b. Throughout aseptic processing, a Grade© operator on multiple occasions reached into the Grade biological safety cabinet (BSC) without taking special precautions (b) (4) as prescribed by procedure USPO-16621 titled “Operation of the Biosafety Cabinet in Cell Therapy” to prevent contamination. - c. Throughout aseptic processing, multiple Grade _ operators rested/leaned their uppe",
+      "deficiency_ko": "CASGEVY 의약품의 무균공정이 미흡하다.",
+      "detail_ko": "2025년 6월 4일, 2025년 5월 26일 배치 (비공개) 공정의 폐쇄회로(CCTV) 영상을 검토한 결과 다음이 관찰되었다: a. 무균공정 전반에 걸쳐 (비공개)등급 작업자들이 제조가 이루어지는 (비공개)등급 구역에서 멸균 (비공개)를 일상적으로 교체한다. 한 작업자는 여러 차례 (비공개) 교체 후 (비공개)의 (비공개) 없이 제조 작업을 이어갔다. 절차 USPO-15643 \"Gowning and Personnel Movement for Cell Therapy\"에 따르면 (비공개) 교체는 (비공개)에서 해야 한다. 마찬가지로 작업자들은 위 절차가 요구하는 (비공개)를 쓰지 않고 개방된 제조 작업 바로 옆에서 (비공개)를 포함한 (비공개)를 일상적으로 조정했다. b. 무균공정 전반에 걸쳐 (비공개)등급 작업자가 여러 차례, 오염 방지를 위해 절차 USPO-16621 \"Operation of the Biosafety Cabinet in Cell Therapy\"가 규정한 특별 예방조치((비공개)) 없이 (비공개)등급 생물안전작업대(BSC) 안으로 손을 넣었다. c. 무균공정 전반에 걸쳐 여러 (비공개)등급 작업자가 상체를 …"
+     },
+     {
+      "number": "2",
+      "deficiency": "(o) (4 Cleaning ofGrade areas used in the manufacture ofCASGEVY drug product is deficient.",
+      "detail": "For example, during an evaluation ofcleaning conducted on (b) (4) ofrooms (1) (4) _ respectively, the following deficiencies were noted: + a. During) @):jeaning operations, a cleaning operator retrieved an item from the Grade’ floor with their (1D) (4)hands, and proceeded to operation without (b) (4) as prescribed in procedure USPO-15643 titled “Gowning and Personnel Movement for Cell Therapy”. b, (b) (4) and BSC were largely omitted as a part of cleaning. These areas | appeared to be inaccessible to cleaning staff. c. Cleaning throughout the rooms failed to apply (b) (4) as described in the corresponding work instruction USPO-16065 titled “Cleaning ofGrade d, During the cleaning ofRoom (©) (4) a dirty mop was left on a multi-use cart, and subsequently removed without disinfecting the multi-use cart. e. Cleaning activities are (b) (4) without verification of cleaning activities by your firm.",
+      "deficiency_ko": "CASGEVY 의약품 제조에 사용하는 (비공개)등급 구역의 청소가 미흡하다.",
+      "detail_ko": "예를 들어, (비공개)호실에서 (비공개)에 수행된 청소를 평가한 결과 다음 결함이 확인되었다: a. (비공개) 청소 작업 중 청소 작업자가 (비공개)등급 바닥에서 물건을 (비공개) 손으로 집어 든 뒤, 절차 USPO-15643 \"Gowning and Personnel Movement for Cell Therapy\"가 규정한 (비공개) 없이 작업을 계속했다. b. (비공개)와 BSC 는 청소에서 대부분 빠졌다. 이 구역들은 청소 인원이 접근할 수 없는 것으로 보였다. c. 각 호실 전반의 청소에서 해당 작업지침 USPO-16065 \"Cleaning of Grade (비공개)\"에 기술된 (비공개)를 적용하지 않았다. d. (비공개)호실 청소 중 더러운 걸레를 다용도 카트 위에 두었다가, 이후 카트를 소독하지 않은 채 걸레만 치웠다. e. 청소 작업은 귀사의 청소 확인(verification) 없이 (비공개)된다."
+     },
+     {
+      "number": "3",
+      "deficiency": "The following practices that are inconsistent with Good Documentation Practices were observed: a.",
+      "detail": "Your firm uses (b) (4) to instruct quality control analysts to review/ revise environmental monitoring records. On June 05, 2025, (b) (4) 2ncompassing review comments were observed on a laboratory record and in the trash can to the (b) (4) (Room (6) (4), For example, one (fb) (4) reads (b) (4) b. Five original (b) (4) were identified in the aforementioned trash. — C3 oy he authenticity of documents cannot be established. Specifically, the comment on page 48 of ofbatch records for lot indicates that spreadsheet was reprinted for clarity on December 18, 2024. The performer’s signature dated October 4, 2024, for Step 10.3 was crossed out and replaced j with the reviewer’s signature dated December 18, 2024. The original excel spreadsheet was not attached to the batch records and remains missing.",
+      "deficiency_ko": "우수문서관리기준(GDP)에 부합하지 않는 다음 관행이 관찰되었다: a.",
+      "detail_ko": "귀사는 품질관리 분석자에게 환경모니터링 기록의 검토·수정을 지시하는 데 (비공개)를 사용한다. 2025년 6월 5일, 검토 의견이 담긴 (비공개)가 시험 기록 위와 (비공개)((비공개)호실)의 쓰레기통에서 관찰되었다. 예를 들어, 한 (비공개)에는 (비공개)라고 적혀 있다. b. 위 쓰레기통에서 원본 (비공개) 5개가 확인되었다. c. 문서의 진정성을 확인할 수 없다. 구체적으로, 로트 (비공개) 배치기록 48쪽의 의견에는 스프레드시트를 명확성을 위해 2024년 12월 18일에 재출력했다고 적혀 있다. 단계 10.3 의 2024년 10월 4일자 수행자 서명이 줄로 지워지고 2024년 12월 18일자 검토자 서명으로 대체되었다. 원본 엑셀 스프레드시트는 배치기록에 첨부되지 않았고 여전히 소재가 확인되지 않는다."
+     },
+     {
+      "number": "4",
+      "deficiency": "Heating, ventilation, and air conditioning maintenance and controls are inadequate.",
+      "detail": "For example: a. There have been repeated losses in differential pressure within the Grade Marcas for extended periods of time (e.g., July 11, 2024, August 19, 2024, October 08, 2024, October 14, 2024). These events were not deemed deviations, and no root cause orcorrective and preventive actions (CAPA) were identified. The pressure differentials within the Grade areas are completely lost. Upon retrospective evaluation in response to FDA request, your firm tabulated that a repeated (b) (4) ofthe respective fan unit led to the loss of pressure differentials. Nevertheless, you failed to holistically identify or rectify the cause ofthe (b) (4) b. Grade areas to Cell Therapy contain HEPA air supply vents adjacent to (b) (4) which lack installation of a (b) (4)",
+      "deficiency_ko": "공조(HVAC) 시스템의 유지관리와 관리가 부적절하다.",
+      "detail_ko": "예를 들어, a. (비공개)등급 구역 내 차압이 장시간에 걸쳐 반복적으로 상실되었다(예: 2024년 7월 11일, 8월 19일, 10월 8일, 10월 14일). 이 사건들은 일탈로 판단되지 않았고 근본원인이나 시정·예방조치(CAPA)도 도출되지 않았다. (비공개)등급 구역 내 차압이 완전히 상실된다. FDA 요청에 따른 소급 평가에서 귀사는 해당 팬 유닛의 반복적인 (비공개)가 차압 상실을 일으켰다고 정리했다. 그럼에도 귀사는 (비공개)의 원인을 총체적으로 규명하거나 바로잡지 않았다. b. 세포치료(Cell Therapy)의 (비공개)등급 구역에는 (비공개) 옆에 (비공개)가 설치되지 않은 HEPA 급기구가 있다."
+     },
+     {
+      "number": "5",
+      "deficiency": "Areas designed to (b) (4) in a biological safety cabinet are deficient regarding characterization and mapping of the areas and operations for aseptic processing ofdrug products.",
+      "detail": "Specifically, a. Turbulent upward airflow was observed in Grade o®-ooms when operators opened (b) (4) in (b) (4) b. During operations in the BSC, turbulent airflow was observed in the prevailing Grade” environment near the operator’s (b) (4) c. Worst-case operations were not challenged during the full dynamic smoke study supporting operations in the BSC, including maximum number of (b) (4) (b) (4) |",
+      "deficiency_ko": "생물안전작업대(BSC)에서 (비공개)하도록 설계된 구역이, 의약품 무균공정을 위한 구역·작업의 특성 분석과 맵핑 측면에서 미흡하다.",
+      "detail_ko": "구체적으로, a. 작업자가 (비공개)에서 (비공개)를 열었을 때 (비공개)등급 호실에서 위로 향하는 난류가 관찰되었다. b. BSC 작업 중 작업자의 (비공개) 근처 주변 (비공개)등급 환경에서 난류가 관찰되었다. c. BSC 작업을 뒷받침하는 전체 동적 스모크 스터디에서 최대 (비공개) 수 등 최악 조건 작업을 챌린지하지 않았다."
+     },
+     {
+      "number": "6",
+      "deficiency": "Management of deviations and anomalous events is inadequate to identify root causes and appropriate corrective § actions.",
+      "detail": "For example: a. Deviations are cancelled without documented justification. Furthermore, upon cancellation of deviations, your firm deletes the associated deviation information and context from the applicable electronic system, (6) (4) For example, On June 3, 2025, your firm failed to provide adequate reasoning for cancellation of the following deviations: n during inspection 1260276 (©) (4) Missed witness signature at step | Missing signature can be addressed as 5.7 ofOOOO or LotMMUOMMO | a comment in the (D) (4) 1297910 | Two (b)(4) workflows (b) (4) | Manufacturing team later located the (b) (4) had the same (b) (4) printout | correct printout. attachment. Manufacturing team could not locate the correct printout. 1348179 (b) (4) did not have (b) (4) counts were zero count verification prior to site | successfully performed sampling 1338142 (b) (4) Operator immediately left Grade (b) (4) The operator removed | area. Closed per alignment with \"°°\" (b) (4) when exiting | (©)(@),(©)(6), (©) (Chand (b) (4) from Grade”toGrade 1328448 | Room (b) (4) outemergency release | Pulling an emergency lever is not a oe pulled allowing opening (©) @)doors at | deviation per (1D) (4) (b) (4)",
+      "deficiency_ko": "일탈과 이상 사건 관리가 근본원인과 적절한 시정조치를 파악하기에 부적절하다.",
+      "detail_ko": "예를 들어, a. 일탈이 문서화된 사유 없이 취소된다. 더욱이 일탈을 취소하면 귀사는 해당 전자 시스템((비공개))에서 관련 일탈 정보와 맥락을 삭제한다. 예를 들어, 2025년 6월 3일 귀사는 다음 일탈들의 취소에 대해 적절한 사유를 제시하지 못했다(판독이 불완전한 표 — 일탈 1260276: 단계 (판독 불가)의 입회 서명 누락 / 1297910: 두 (비공개) 워크플로의 (비공개) 출력물 관련 / 1348179: 현장 검체채취 전 (비공개) 계수 확인 관련 / 1338142: 작업자의 (비공개)등급 구역 즉시 이탈 관련 / 1328448: (비공개)호실 비상 해제 레버를 당겨 (비공개) 문을 연 건 — 취소 사유는 \"비상 레버를 당기는 것은 (비공개)에 따른 일탈이 아님\")."
+     },
+     {
+      "number": "7",
+      "deficiency": "Environmental monitoring and control are deficient.",
+      "detail": "For example: a. The non-viable particulate monitoring on (b) (4) exceeded the prospective allowable limits. Nonetheless, your firm deemed the results in specification. The determination that the results were in specification was based on an assignment ofan (fb) (4) _ status despite no ongoing manufacturing operations. b. Procedure USPO-1637 titled “Remedial Action for Environmental, Water, Clean Steam, and Gas Monitoring Data” stipulates (b) (4) (b) (4) Thus, your response to (b) (4) does not include the appropriate scrutiny and follow-up to address the potential problem. OBSERVATION 8 () (4) . Your firm routinely downgrades Grade suites intended for commercial CASGEVY manufacturing (b) (4) (b) (4) to.Grade environmental status for the purposes of personnel training. The procedures followed to restore Grade status are inadequate to ensure purported safety of products manufactured in (b) (4) and (b) (4) The following deficiencies were observed: a. USPO-5217 indicates that (b) (4) However, the limits applied tothe EM data collected, were set at Grade (Db) (4) limits, as opposed to (b) (4)limits as required per USPO-5217. The total particulates (per m*) data collected for (b) (4) (b)",
+      "deficiency_ko": "환경모니터링과 관리가 미흡하다.",
+      "detail_ko": "예를 들어, a. (비공개)의 비생균 입자 모니터링이 사전 설정한 허용기준을 초과했다. 그럼에도 귀사는 결과를 적합으로 판정했다. 이 판정은 진행 중인 제조 작업이 없었는데도 (비공개) 상태를 부여한 데 근거했다. b. 절차 USPO-1637 \"Remedial Action for Environmental, Water, Clean Steam, and Gas Monitoring Data\"는 (비공개)를 규정한다. 따라서 (비공개)에 대한 귀사의 대응에는 잠재적 문제를 다루기 위한 적절한 검토와 후속조치가 포함되지 않는다. 관찰사항 8 (비공개). 귀사는 상업용 CASGEVY 제조를 위한 (비공개)등급 제조실을 인원 교육 목적으로 (비공개)등급 환경 상태로 일상적으로 하향 조정한다. (비공개)등급 상태를 복원하기 위해 따르는 절차는 (비공개)와 (비공개)에서 제조되는 제품의 안전성을 보장하기에 부적절하다. 다음 결함이 관찰되었다: a. USPO-5217 은 (비공개)를 규정한다. 그러나 수집된 환경모니터링 데이터에 적용한 기준은 USPO-5217 이 요구하는 (비공개) 기준이 아니라 (비공개)등급 기준이었다. (비공개)에서 수집된 총 입자(㎥당) 데이터는 …"
+     },
+     {
+      "number": "9",
+      "deficiency": "Each batch of drug product purporting to be sterile and/or pyrogen-free is not adequately tested to determine conformance to such requirements.",
+      "detail": "Specifically, sterility samples ofCASGEVY drug product are stored frozen under liquid nitrogen per procedure USPO-3046| titled ' (b) (4) Analytical Testing - QC Monograph for(®) (4) Product Samples”, and shipped in liquid nitrogen prior to sterility testing.",
+      "deficiency_ko": "무균 및/또는 발열성물질 부재를 표방하는 의약품의 각 배치가 해당 요건 적합 여부를 판정하기 위한 시험을 적절히 거치지 않는다.",
+      "detail_ko": "구체적으로, CASGEVY 의약품의 무균시험 검체는 절차 USPO-3046(판독 불가) \"(비공개) Analytical Testing - QC Monograph for (비공개) Product Samples\"에 따라 액체질소에서 동결 보관되고, 무균시험 전에 액체질소 상태로 운송된다."
+     },
+     {
+      "number": "10",
+      "deficiency": "Pest control program is deficient.",
+      "detail": "The pest contro] trending report for Q1 2025 indicated numerous incidences of insects (same type) in (b) (4) and Grade” storage room (6) (4) which are : (b) (4) corridor and Grade” corridor, respectively. The same insect species was reported to be persistently seen in the facility with incidences varying seasonally. No source for the insect entry has been identified, and no deviation has been initiated.",
+      "deficiency_ko": "방충·방서(해충 관리) 프로그램이 미흡하다.",
+      "detail_ko": "2025년 1분기 해충 관리 추세 보고서에 따르면 (비공개)와 (비공개)등급 보관실((비공개))에서 같은 종의 곤충이 여러 차례 발견되었으며, 이 두 곳은 각각 (비공개) 복도와 (비공개)등급 복도에 (비공개)한다. 같은 곤충 종이 계절에 따라 빈도를 달리하며 시설에서 지속적으로 목격된 것으로 보고되었다. 곤충 유입 경로는 규명되지 않았고 일탈도 개시되지 않았다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
+   "id": "fda483-195601",
+   "render_order": 69,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Genlbet Biopbarmaceuticals SA",
+   "title_issue": "세척 밸리데이션·제염 근거 미흡",
+   "summary": "FDA가 포르투갈 원료·완제의약품 제조소 Genlbet Biopbarmaceuticals SA 실사(실사일 01/31/2023) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 세척 밸리데이션이 세척 난해 부위·최대 로트 크기·보관시간을 대표하지 못한 점, 제염 유효성 연구 부재, 세척 후 노출 시간을 정하지 않은 절차서다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-20"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195601"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Genlbet Biopbarmaceuticals SA · FEI 3011160795"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Substance/Drug Product Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "01/31/2023"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Genlbet Biopbarmaceuticals SA · FEI 3011160795",
+    "시설 · 유형: Drug Substance/Drug Product Manufacturer · 483",
+    "관찰사항: 3건 판독(2번 설비 세척, 3번 제염, 4번 세척·유지관리 절차서)"
+   ],
+   "implication": "세척 밸리데이션이 실제 공정의 세척 후 보관시간과 최대 로트 크기를 반영하지 못했다는 지적은 다품목 공용 설비에서 교차오염 방지 근거를 묻는 전형적인 형태다. 자사 세척 밸리데이션이 세척 난해 부위, 최악 로트 크기, 실제 보관시간을 포함하는지 확인해 볼 만하다.",
+   "checks": [
+    "세척 밸리데이션의 세척 난해 부위·최대 로트 크기 포함 여부",
+    "세척 후 보관시간(clean hold time) 설정 근거",
+    "제염제 유효성 연구 수행 여부"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195601/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Weak cleaning validation and decontamination",
+    "summary": "FDA issued a Form 483 to Genlbet Biopbarmaceuticals SA, a drug substance and drug product manufacturer in Portugal, after an inspection ending 01/31/2023. Three legible observations (2 to 4) cover cleaning validation that did not represent hard-to-clean areas, maximum lot size or hold times, no decontamination efficacy study, and procedures that do not set how long cleaned equipment may stay exposed.",
+    "implication": "Cleaning validation that did not reflect real post-cleaning hold times and maximum lot size is a typical way inspectors probe cross-contamination controls on shared equipment. Firms may want to check that their own cleaning validation covers hard-to-clean areas, worst-case lot size and actual hold times.",
+    "key_facts": [
+     "Facility: Genlbet Biopbarmaceuticals SA, FEI 3011160795",
+     "Establishment type: Drug Substance/Drug Product Manufacturer",
+     "Observations legible: 2 (equipment cleaning), 3 (decontamination), 4 (cleaning and maintenance procedures)"
+    ],
+    "checks": [
+     "Hard-to-clean areas and maximum lot size in cleaning validation",
+     "Basis for clean hold time limits",
+     "Decontaminant efficacy studies"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 3,
+    "observations": [
+     {
+      "number": "2",
+      "deficiency": "Equipment cleaning processes are inadequate.",
+      "detail": "Specifically: a. The cleaning validation study dm | Cleaning Validation Summary Report) performed on we | ye |Contact equipment does not ensure removal of the| Specifically: _ was not performed to ensure that the product is removed from the difficult to clean areas. ii. _ was not assessed. iii. The cleaning validation did not include the maximum lot size of oe b, ~ hold time is not representative ofthewe |manufacturing rocess, which includes Pr that equipment are exposed to the Grade environment after cleaning) _ . c.|~ |hold time is not representative of the ,, manufacturing process, which includes a hold) - | manufacturing) ,. decontamination.",
+      "deficiency_ko": "설비 세척 공정이 부적절하다.",
+      "detail_ko": "구체적으로, a. (판독 불가) 접촉 설비에 대해 수행한 세척 밸리데이션 연구((판독 불가) Cleaning Validation Summary Report)는 (판독 불가)의 제거를 보장하지 못한다. 구체적으로, i. 세척이 어려운 부위에서 제품이 제거되는지 확인하기 위한 (판독 불가)가 수행되지 않았다. ii. (판독 불가)가 평가되지 않았다. iii. 세척 밸리데이션에 최대 로트 크기 (판독 불가)가 포함되지 않았다. b. (판독 불가) 보관시간(hold time)이 세척 후 설비가 (판독 불가)등급 환경에 노출되는 것을 포함한 실제 (판독 불가) 제조공정을 대표하지 않는다. c. (판독 불가) 보관시간이 (판독 불가) 보관과 (판독 불가) 제염을 포함한 (판독 불가) 제조공정을 대표하지 않는다."
+     },
+     {
+      "number": "3",
+      "deficiency": "Decontamination is incomplete or not adequately demonstrated to ensure prevention of cross-contamination.",
+      "detail": "Specifically: a. A decontamination study was not performed to evaluate the effectiveness of _ ,,,, which is used to decontaminate) ... parts, against! so ; | we , Report on the Cleaning Validation Strategy and Results did not evaluate the material of construction of all equipment or| materialsincluding == lay sts—~s—sY",
+      "deficiency_ko": "제염이 불완전하거나, 교차오염 방지를 보장할 만큼 적절히 입증되지 않았다.",
+      "detail_ko": "구체적으로, a. (판독 불가) 부품 제염에 쓰이는 (판독 불가)의 (판독 불가)에 대한 유효성을 평가하는 제염 연구가 수행되지 않았다. (판독 불가) 세척 밸리데이션 전략 및 결과 보고서(Report on the Cleaning Validation Strategy and Results)는 (판독 불가)를 포함한 모든 설비·자재의 재질을 평가하지 않았다 …"
+     },
+     {
+      "number": "4",
+      "deficiency": "Written procedures for decontamination, cleaning, and maintenance of equipment are deficient regarding sufficient details to protect equipment from contamination prior to use.",
+      "detail": "For example: a. (eye) one , do not specify the duration that equipment may be exposed to the environment after cleaning. a , Cleaning Validation Summary Report, does not specify how the) - _hold time is determined. c. Protocols governing decontamination of - —_|containing equipment that - the manufacturing suites are deficient regarding sufficient details such as the locations in order to prevent contamination.",
+      "deficiency_ko": "설비의 제염·세척·유지관리 절차서에 사용 전 설비 오염을 방지할 만큼 충분한 세부사항이 없다.",
+      "detail_ko": "예를 들어, a. (판독 불가)는 세척 후 설비가 환경에 노출될 수 있는 기간을 규정하지 않는다. b. (판독 불가) 세척 밸리데이션 요약 보고서(Cleaning Validation Summary Report)는 (판독 불가) 보관시간을 어떻게 정하는지 규정하지 않는다. c. 제조실 (판독 불가) (판독 불가) 함유 설비의 제염을 규정하는 프로토콜에 오염 방지를 위한 위치 등 충분한 세부사항이 없다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
    "id": "fda483-195627",
-   "render_order": 58,
+   "render_order": 70,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8850,7 +10180,7 @@
   },
   {
    "id": "fda483-195673",
-   "render_order": 59,
+   "render_order": 71,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9028,7 +10358,7 @@
   },
   {
    "id": "2bfc7f4cc17f",
-   "render_order": 60,
+   "render_order": 72,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9150,7 +10480,7 @@
   },
   {
    "id": "7eb14a246e9e",
-   "render_order": 61,
+   "render_order": 73,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9265,7 +10595,7 @@
   },
   {
    "id": "8b9b6af44436",
-   "render_order": 62,
+   "render_order": 74,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9411,7 +10741,7 @@
   },
   {
    "id": "9995c30e33c0",
-   "render_order": 63,
+   "render_order": 75,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9557,7 +10887,7 @@
   },
   {
    "id": "e68818062d22",
-   "render_order": 64,
+   "render_order": 76,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9697,7 +11027,7 @@
   },
   {
    "id": "fda483-195241",
-   "render_order": 65,
+   "render_order": 77,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9857,7 +11187,7 @@
   },
   {
    "id": "fda483-195242",
-   "render_order": 66,
+   "render_order": 78,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9993,7 +11323,7 @@
   },
   {
    "id": "fda483-195243",
-   "render_order": 67,
+   "render_order": 79,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10149,7 +11479,7 @@
   },
   {
    "id": "fda483-195244",
-   "render_order": 68,
+   "render_order": 80,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10285,7 +11615,7 @@
   },
   {
    "id": "fda483-195245",
-   "render_order": 69,
+   "render_order": 81,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10298,7 +11628,7 @@
    "type_tag": "483",
    "headline_target": "Berkshire Sterile Manufacturing",
    "title_issue": "483 실사기록 다건 공개",
-   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 25건이 공개됐다. 원문 PDF 는 공개돼 있으나 개별 관찰 본문을 자동으로 확보하지 못해 시설·실사일 목록만 정리했다.",
+   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 12건이 공개됐다. 원문 PDF 는 공개돼 있으나 개별 관찰 본문을 자동으로 확보하지 못해 시설·실사일 목록만 정리했다.",
    "facts": [
     {
      "label": "발행일",
@@ -10324,8 +11654,8 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "공개 건수: 25건 (관찰 본문 자동 확보 실패 — 원문 PDF 는 공개돼 있음)",
-    "대표 시설: Berkshire Sterile Manufacturing · FEI 3012144557 외 24곳",
+    "공개 건수: 12건 (관찰 본문 자동 확보 실패 — 원문 PDF 는 공개돼 있음)",
+    "대표 시설: Berkshire Sterile Manufacturing · FEI 3012144557 외 11곳",
     "출처: FDA OII FOIA 전자열람실"
    ],
    "implication": "관찰 본문을 확보하지 못한 실사기록 공개는 그 자체로 조치 신호는 아니다. 국내 업체는 목록에 자사 공급망 시설이 있는지 확인하고, 있으면 원문(PDF)을 직접 열람할 필요가 있다.",
@@ -10333,30 +11663,17 @@
     "목록에 자사 공급망·수급처 시설이 있는지 확인",
     "해당 시 FDA FOIA 원문(PDF) 직접 열람"
    ],
-   "merged_count": 25,
+   "merged_count": 12,
    "merged_items": [
     "Berkshire Sterile Manufacturing · FEI 3012144557 · 실사 10/21/2024",
     "BioSensics LLC · FEI 3010331770 · 실사 02/09/2026",
     "Gobiquity, Inc. · FEI 3010539401 · 실사 02/12/2026",
     "C Czarnikow Sugar Inc · FEI 3014394431 · 실사 03/02/2026",
-    "Fresenius Kabi USA, LLC · FEI 3001833549 · 실사 05/14/2026",
     "PETNET Solutions Inc · FEI 3008769593 · 실사 03/19/2026",
     "Pharmalogic Salt Lake City, LLC · FEI 3029497444 · 실사 02/24/2026",
-    "RayzeBio, Inc · FEI 3030530655 · 실사 02/24/2026",
-    "Spirit Pharmaceuticals · FEI 3011773798 · 실사 01/25/2017",
-    "Linde Inc · FEI 2523830 · 실사 03/26/2023",
     "Viant San Antonio, Inc. · FEI 3003640911 · 실사 03/19/2026",
     "Solomon Park Research Laboratories, Inc. · FEI 3023437 · 실사 01/08/2026",
-    "Axogen Corporation · FEI 3023488176 · 실사 04/29/2025",
-    "Capricor, Inc. · FEI 3021247180 · 실사 05/30/2025",
-    "Lonza Portsmouth, Inc. · FEI 3001451441 · 실사 06/06/2025",
-    "FinVector Oy · FEI 3010227150 · 실사 05/28/2024",
-    "CMC lCOS Biologics, Inc. · FEI 3000209996 · 실사 04/18/2016",
-    "Genlbet Biopbarmaceuticals SA · FEI 3011160795 · 실사 01/31/2023",
-    "Lonza Biologics, Inc. · FEI 3001451441 · 실사 04/16/2026",
-    "GlaxoSmithKline Biologicals Kft. · FEI 3008322822 · 실사 01/31/2025",
     "Grand River Aseptic Manufacturing Inc · FEI 3008716173 · 실사 09/19/2024",
-    "Corixa Corporation · FEI 3007726770 · 실사 03/12/2026",
     "Hatch Product Development LLC · FEI 3030438338 · 실사 12/11/2025",
     "Krispy Kreme Doughnut Corporation · FEI 1081922 · 실사 07/17/2024",
     "SALUDA MEDICAL PTY. LTD. · FEI 3021836309 · 실사 05/16/2025"
@@ -10388,7 +11705,7 @@
   },
   {
    "id": "fda483-195249",
-   "render_order": 70,
+   "render_order": 82,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10530,7 +11847,7 @@
   },
   {
    "id": "fda483-195251",
-   "render_order": 71,
+   "render_order": 83,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10672,7 +11989,7 @@
   },
   {
    "id": "fda483-195252",
-   "render_order": 72,
+   "render_order": 84,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10867,7 +12184,7 @@
   },
   {
    "id": "fda483-195253",
-   "render_order": 73,
+   "render_order": 85,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10980,7 +12297,7 @@
   },
   {
    "id": "fda483-195634",
-   "render_order": 74,
+   "render_order": 86,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11137,7 +12454,7 @@
   },
   {
    "id": "fda483-195638",
-   "render_order": 75,
+   "render_order": 87,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11287,8 +12604,98 @@
    }
   },
   {
+   "id": "fda483-195646",
+   "render_order": 88,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "FDA 483 실사 관찰",
+   "category": "Other",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "483",
+   "headline_target": "Corixa Corporation",
+   "title_issue": "환경모니터링 배지 적격성 미평가",
+   "summary": "FDA가 미국 의약품 제조소 Corixa Corporation 실사(실사일 03/12/2026) 후 관찰사항 1건을 담은 483을 발부했다. 무균공정 구역 환경모니터링 절차는 검체를 20-25°C 와 30-35°C 에서 배양하도록 요구하지만, 사용하는 낙하균·접촉 배지를 20-25°C 사용 목적에 대해 적격성평가하지 않았다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-10-19"
+    },
+    {
+     "label": "문서번호",
+     "value": "fda483-195646"
+    },
+    {
+     "label": "제조소/업체",
+     "value": "Corixa Corporation · FEI 3007726770"
+    },
+    {
+     "label": "시설 · 유형",
+     "value": "Drug Manufacturer · 483"
+    },
+    {
+     "label": "실사일",
+     "value": "03/12/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "제조소/업체: Corixa Corporation · FEI 3007726770",
+    "시설 · 유형: Drug Manufacturer · 483",
+    "관찰사항: 1건(무균공정 구역 환경모니터링 시스템)"
+   ],
+   "implication": "이중 온도 배양을 절차로 정해 두고도 그 온도에서 배지의 회수 성능을 확인하지 않은 점이 지적됐다. 절차서 개정이 여러 차례 이어졌는데도 배지 적격성은 다뤄지지 않았다는 점에서, 자사 환경모니터링 배지가 실제 배양 조건별로 적격성평가됐는지 확인해 볼 만하다.",
+   "checks": [
+    "환경모니터링 배지의 배양 온도별 적격성평가 여부",
+    "낙하균·접촉 배지의 회수율 시험 기록"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
+    "official_url": "https://www.fda.gov/media/195646/download",
+    "official_is_pdf": true,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Environmental monitoring media not qualified",
+    "summary": "FDA issued a Form 483 with one observation to Corixa Corporation, a US drug manufacturer, after an inspection ending 03/12/2026. The aseptic area environmental monitoring procedure requires incubation at 20-25°C and 30-35°C, but the settle and contact plates used had not been qualified for use at 20-25°C.",
+    "implication": "The procedure set dual-temperature incubation without confirming the media's recovery at that temperature, and several revisions of the procedure never addressed it. Firms may want to check that their environmental monitoring media are qualified for each incubation condition actually used.",
+    "key_facts": [
+     "Facility: Corixa Corporation, FEI 3007726770",
+     "Establishment type: Drug Manufacturer",
+     "Observation: environmental monitoring system in aseptic processing areas"
+    ],
+    "checks": [
+     "Qualification of environmental monitoring media at each incubation temperature",
+     "Recovery test records for settle and contact plates"
+    ]
+   },
+   "deterministic_detail": {
+    "type": "fda_483_observations",
+    "count": 1,
+    "observations": [
+     {
+      "number": "1",
+      "deficiency": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
+      "detail": "Specifically, Aseptic processing areas are deficient regarding the system for monitoring environmental conditions. Specifically, LSOP-9000004973, Environmental Monitoring, version 34, effective 08Dec2025, and previous versions 30, 31, 32, and 33, effective 31Jan2024, 03Jul2024, 06Nov2024, and 270ct2025, respectively, requires that environmental monitoring samples are to be incubated at 20-25°C and 30-35°C for the recovery of viable microorganisms. These samples are collected in (b) (4) (b) (4) settle plates and (6) (4) contact plates. The (©)@) plates have not been properly qualified for their intended use at 20-25°C. *DATES OF INSPECTION 3/04/2026(Wed), 3/05/2026(Thu), 3/06/2026(Fri), 3/09/2026(Mon), 3/10/2026(Tue), 3/11/2026(Wed), 3/12/2026(Thu) Laurel A Beer Annette Melendez Investigator Investigator X BBeStes cs 12-2020 15:38:36 X Boe Sted cs 12-2000 15.3018",
+      "deficiency_ko": "무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
+      "detail_ko": "구체적으로, 무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다. 구체적으로, LSOP-9000004973 \"Environmental Monitoring\" 34판(2025년 12월 8일 시행)과 이전 30·31·32·33판(각각 2024년 1월 31일, 2024년 7월 3일, 2024년 11월 6일, 2025년 10월 27일 시행)은 생균 회수를 위해 환경모니터링 검체를 20-25°C 와 30-35°C 에서 배양하도록 요구한다. 이 검체는 (비공개) 낙하균 배지와 (비공개) 접촉 배지로 채취한다. 이 (비공개) 배지는 20-25°C 에서의 사용 목적에 대해 적절히 적격성평가되지 않았다."
+     }
+    ],
+    "text_source": "ocr"
+   }
+  },
+  {
    "id": "fda483-195655",
-   "render_order": 76,
+   "render_order": 89,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11407,7 +12814,7 @@
   },
   {
    "id": "fda483-195665",
-   "render_order": 77,
+   "render_order": 90,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11591,7 +12998,7 @@
   },
   {
    "id": "fda483-195666",
-   "render_order": 78,
+   "render_order": 91,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11751,7 +13158,7 @@
   },
   {
    "id": "9e8a6f534dc5",
-   "render_order": 79,
+   "render_order": 92,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -11826,7 +13233,7 @@
   },
   {
    "id": "who-whopir-96b76d34d79b",
-   "render_order": 80,
+   "render_order": 93,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -12009,7 +13416,7 @@
   },
   {
    "id": "who-whopir-8bac486f0f4c",
-   "render_order": 81,
+   "render_order": 94,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -12199,7 +13606,7 @@
   },
   {
    "id": "who-whopir-af4a56516228",
-   "render_order": 82,
+   "render_order": 95,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -12389,7 +13796,7 @@
   },
   {
    "id": "gmpinspect-1Q5NxQxCVnP",
-   "render_order": 83,
+   "render_order": 96,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -12515,7 +13922,7 @@
   },
   {
    "id": "gmpinspect-1Q5Nv9G4oko",
-   "render_order": 84,
+   "render_order": 97,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -12595,7 +14002,7 @@
   },
   {
    "id": "admin-2026007579",
-   "render_order": 85,
+   "render_order": 98,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -12697,7 +14104,7 @@
   },
   {
    "id": "admin-2026007497",
-   "render_order": 86,
+   "render_order": 99,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -12801,7 +14208,7 @@
   },
   {
    "id": "admin-2026007515",
-   "render_order": 87,
+   "render_order": 100,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -12909,7 +14316,7 @@
   },
   {
    "id": "admin-2026007516",
-   "render_order": 88,
+   "render_order": 101,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13013,7 +14420,7 @@
   },
   {
    "id": "admin-2026007495",
-   "render_order": 89,
+   "render_order": 102,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13119,7 +14526,7 @@
   },
   {
    "id": "admin-2026007595",
-   "render_order": 90,
+   "render_order": 103,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13228,7 +14635,7 @@
   },
   {
    "id": "admin-2026007596",
-   "render_order": 91,
+   "render_order": 104,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13337,7 +14744,7 @@
   },
   {
    "id": "admin-2026007597",
-   "render_order": 92,
+   "render_order": 105,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13446,7 +14853,7 @@
   },
   {
    "id": "admin-2026007598",
-   "render_order": 93,
+   "render_order": 106,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13553,7 +14960,7 @@
   },
   {
    "id": "admin-2026007599",
-   "render_order": 94,
+   "render_order": 107,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13658,7 +15065,7 @@
   },
   {
    "id": "admin-2026007600",
-   "render_order": 95,
+   "render_order": 108,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13759,7 +15166,7 @@
   },
   {
    "id": "admin-2026007601",
-   "render_order": 96,
+   "render_order": 109,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13868,7 +15275,7 @@
   },
   {
    "id": "admin-2026007602",
-   "render_order": 97,
+   "render_order": 110,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -13976,7 +15383,7 @@
   },
   {
    "id": "admin-2026007615",
-   "render_order": 98,
+   "render_order": 111,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14082,7 +15489,7 @@
   },
   {
    "id": "admin-2026007603",
-   "render_order": 99,
+   "render_order": 112,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14191,7 +15598,7 @@
   },
   {
    "id": "recall-00b44c39f0ef",
-   "render_order": 100,
+   "render_order": 113,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14277,7 +15684,7 @@
   },
   {
    "id": "recall-076361226898",
-   "render_order": 101,
+   "render_order": 114,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14362,7 +15769,7 @@
   },
   {
    "id": "recall-5b9a6ba180fb",
-   "render_order": 102,
+   "render_order": 115,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14450,7 +15857,7 @@
   },
   {
    "id": "recall-5d277daeab3d",
-   "render_order": 103,
+   "render_order": 116,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14536,7 +15943,7 @@
   },
   {
    "id": "recall-64e592fa696e",
-   "render_order": 104,
+   "render_order": 117,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14621,7 +16028,7 @@
   },
   {
    "id": "recall-6e6ea956ba8b",
-   "render_order": 105,
+   "render_order": 118,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14706,7 +16113,7 @@
   },
   {
    "id": "recall-86aedfb4b757",
-   "render_order": 106,
+   "render_order": 119,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14791,7 +16198,7 @@
   },
   {
    "id": "recall-9c61534d3fcd",
-   "render_order": 107,
+   "render_order": 120,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14876,7 +16283,7 @@
   },
   {
    "id": "recall-a3321198dd9f",
-   "render_order": 108,
+   "render_order": 121,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -14961,7 +16368,7 @@
   },
   {
    "id": "recall-ac0329439ba5",
-   "render_order": 109,
+   "render_order": 122,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -15046,7 +16453,7 @@
   },
   {
    "id": "recall-f03bf31e9833",
-   "render_order": 110,
+   "render_order": 123,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -15133,7 +16540,7 @@
   },
   {
    "id": "recall-bb7341be805b",
-   "render_order": 111,
+   "render_order": 124,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -15220,7 +16627,7 @@
   },
   {
    "id": "hc-82808",
-   "render_order": 112,
+   "render_order": 125,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -15312,7 +16719,7 @@
   },
   {
    "id": "recall-4691559975d0",
-   "render_order": 113,
+   "render_order": 126,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -15397,7 +16804,7 @@
   },
   {
    "id": "recall-7ce217fb8ea2",
-   "render_order": 114,
+   "render_order": 127,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -15482,7 +16889,7 @@
   },
   {
    "id": "hc-82831",
-   "render_order": 115,
+   "render_order": 128,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -15572,7 +16979,7 @@
   },
   {
    "id": "D-0002-2027",
-   "render_order": 116,
+   "render_order": 129,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -15716,7 +17123,7 @@
   },
   {
    "id": "D-0012-2027",
-   "render_order": 117,
+   "render_order": 130,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -15829,7 +17236,7 @@
   },
   {
    "id": "D-0013-2027",
-   "render_order": 118,
+   "render_order": 131,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -15939,7 +17346,7 @@
   },
   {
    "id": "D-0014-2027",
-   "render_order": 119,
+   "render_order": 132,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -16069,7 +17476,7 @@
   },
   {
    "id": "D-0016-2027",
-   "render_order": 120,
+   "render_order": 133,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -16204,7 +17611,7 @@
   },
   {
    "id": "D-0017-2027",
-   "render_order": 121,
+   "render_order": 134,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -16334,7 +17741,7 @@
   },
   {
    "id": "D-0036-2027",
-   "render_order": 122,
+   "render_order": 135,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

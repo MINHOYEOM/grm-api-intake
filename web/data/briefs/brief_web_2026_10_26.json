@@ -724,7 +724,7 @@
      {
       "number": "3",
       "deficiency": "Procedures describing the warehousing of drug products are not followed.",
-      "detail": "Specifically, a review of the use log form (_ (Db) (4) _ ) for (b) (4) of CASGEVY final drug product vials in’ (b) (4) revealed that your firm failed to capture the number of vials transferred to this unit for Batch Nos. (b) (4) . Additionally, the’ (1b) (4) __ inventory list for CASGEVY final drug product vials (1B) (4) — units only reports the final product batch number and not the actual number of vials placed in the (0) units. *DATES OF INSPECTION 4/08/2026(Wed), 4/09/2026(Thu), 4/10/2026(Fri), 4/13/2026(Mon), 4/14/2026(Tue), 4/15/2026(Wed), 4/16/2026(Thu) iestgaut",
+      "detail": "Specifically, a review of the use log form (_ (Db) (4) _ ) for (b) (4) of CASGEVY final drug product vials in’ (b) (4) revealed that your firm failed to capture the number of vials transferred to this unit for Batch Nos. (b) (4) . Additionally, the’ (1b) (4) __ inventory list for CASGEVY final drug product vials (1B) (4) — units only reports the final product batch number and not the actual number of vials placed in the (0) units.",
       "deficiency_ko": "의약품 보관 관리 절차가 준수되지 않는다.",
       "detail_ko": "구체적으로, (비공개) 내 CASGEVY 최종 의약품 바이알의 (비공개) 사용 기록서((비공개))를 검토한 결과, 귀사는 배치 (비공개)에 대해 이 유닛으로 옮긴 바이알 수를 기록하지 않았다. 또한 CASGEVY 최종 의약품 바이알의 (비공개) 유닛 재고 목록에는 최종 제품 배치번호만 적혀 있고 실제로 유닛에 넣은 바이알 수는 적혀 있지 않다."
      }
@@ -825,7 +825,7 @@
      {
       "number": "2",
       "deficiency": "Procedures for the acceptance and rejection of components and materials utilized within drug substance manufacturing are not adequate.",
-      "detail": "Procedure LSOP 9000087267 (ver. 01 — approved 20MAR2024), titled “FILT.UF (B)(4) Pi was implemented as a corrective action in response to deviation 201042740 and requires visual inspection of the prior to use within manufacturing. The procedure allows for the acceptance and use o containing ,” however, no risk assessment or study was conducted to assess the impact of utilizing with (b) (4) ” within your process. *DATES OF INSPECTION 1/23/2025(Thu), 1/24/2025(Fri), 1/27/2025(Mon), 1/28/2025(Tue), 1/29/2025(Wed), 1/30/2025(Thu), 1/31/2025(Fri) Travis S Bradley",
+      "detail": "Procedure LSOP 9000087267 (ver. 01 — approved 20MAR2024), titled “FILT.UF (B)(4) Pi was implemented as a corrective action in response to deviation 201042740 and requires visual inspection of the prior to use within manufacturing. The procedure allows for the acceptance and use o containing ,” however, no risk assessment or study was conducted to assess the impact of utilizing with (b) (4) ” within your process.",
       "deficiency_ko": "원료의약품 제조에 쓰이는 구성성분과 자재의 적합·부적합 판정 절차가 적절하지 않다.",
       "detail_ko": "절차 LSOP 9000087267(ver. 01, 2024년 3월 20일 승인) \"FILT.UF (비공개)\"는 일탈 201042740 에 대한 시정조치로 도입되었으며, 제조에 사용하기 전 (판독 불가)를 육안검사하도록 요구한다. 이 절차는 (판독 불가)를 포함한 (판독 불가)의 합격·사용을 허용하나, 공정 내에서 (비공개)가 있는 (판독 불가)를 사용할 때의 영향을 평가하는 위험평가나 연구는 수행되지 않았다."
      }
@@ -1590,7 +1590,7 @@
      {
       "number": "9",
       "deficiency": "Reprocessing was performed without the review and approval of the quality control unit.",
-      "detail": "Specifically, employees engaging in the manufacturing operation of your (b) (4) determines whether ashould be reprocessed during packaging operations. Reprocessing can occur because of (b) (4) , (b) (4) , or incorrect color () (4), Furthermore, your firm does not have a written procedure for reprocess or rework. For example: a) (b) (4) Lot # (b) (4) had (b) (4) reprocessed inline during the packaging operation. b) (b) (4) Lot # (b) (4) had (b) (4) reprocessed inline during the packaging operation. c) (b) (4) Lot # (b) (4) had (b) (4) reprocessed inline during the packaging operation. = There is no quality unit oversight for approval of reprocessing of the ae *DATES OF INSPECTION 3/16/2026(Mon), 3/17/2026(Tue), 3/18/2026(Wed), 3/19/2026(Thu), 3/20/2026(Fri), 3/23/2026(Mon), 3/24/2026(Tue), 3/25/2026(Wed) ews Camire Secortohey — > Signed By EMLY.8 CAME 4 BS er Ean o5 poe 1630-20 xX Signed By 2004219010 19:31:32",
+      "detail": "Specifically, employees engaging in the manufacturing operation of your (b) (4) determines whether ashould be reprocessed during packaging operations. Reprocessing can occur because of (b) (4) , (b) (4) , or incorrect color () (4), Furthermore, your firm does not have a written procedure for reprocess or rework. For example: a) (b) (4) Lot # (b) (4) had (b) (4) reprocessed inline during the packaging operation. b) (b) (4) Lot # (b) (4) had (b) (4) reprocessed inline during the packaging operation. c) (b) (4) Lot # (b) (4) had (b) (4) reprocessed inline during the packaging operation. = There is no quality unit oversight for approval of reprocessing of the ae",
       "deficiency_ko": "품질관리부서의 검토 및 승인 없이 재가공이 수행되었다.",
       "detail_ko": "구체적으로, 귀사 (b) (4) 제조 작업에 종사하는 직원이 포장 공정 중 (b) (4)를 재가공할지 여부를 결정한다. 재가공은 (b) (4), (b) (4) 또는 잘못된 색상 (b) (4) 때문에 발생할 수 있다. 또한 귀사는 재가공 또는 재작업에 대한 서면 절차가 없다. 예를 들어 a) (b) (4) Lot # (b) (4)는 포장 공정 중 (b) (4)가 인라인으로 재가공되었다. b) (b) (4) Lot # (b) (4)는 포장 공정 중 (b) (4)가 인라인으로 재가공되었다. c) (b) (4) Lot # (b) (4)는 포장 공정 중 (b) (4)가 인라인으로 재가공되었다. 재가공 승인에 대한 품질부서의 감독이 없다."
      }
@@ -2053,7 +2053,7 @@
      {
       "number": "4",
       "deficiency": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
-      "detail": "Specifically, the(b) (4) Microbial Limits/Bioburden testing procedure do not contain sufficient control to ensure (b) (4) have reached the required (b) (4) , prior to use. There are no defined methods to identify the (b) (4) of the (b) (4) and insufficient controls to ensure sufficient (b) (4) . Exceeding the (b) (4) requirements could destroy/attenuate the microorganisms on test, resulting in reduced or false negative test results. *DATES OF INSPECTION 4/08/2026(Wed), 4/09/2026(Thu), 4/10/2026(Fri), 4/13/2026(Mon), 4/14/2026(Tue)",
+      "detail": "Specifically, the(b) (4) Microbial Limits/Bioburden testing procedure do not contain sufficient control to ensure (b) (4) have reached the required (b) (4) , prior to use. There are no defined methods to identify the (b) (4) of the (b) (4) and insufficient controls to ensure sufficient (b) (4) . Exceeding the (b) (4) requirements could destroy/attenuate the microorganisms on test, resulting in reduced or false negative test results.",
       "deficiency_ko": "시험실 관리에 의약품이 확인(identity)·함량(strength)·품질(quality)·순도(purity)의 적절한 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
       "detail_ko": "구체적으로, (비공개) 미생물한도/바이오버든 시험 절차에는 (비공개)가 사용 전에 요구되는 (비공개)에 도달했음을 보장하는 충분한 통제가 포함되어 있지 않다. (비공개)의 (비공개)를 확인하는 정의된 방법이 없으며, 충분한 (비공개)를 보장하는 통제가 불충분하다. (비공개) 요건을 초과하면 시험 대상 미생물이 사멸·약화되어 결과가 낮게 나오거나 위음성 결과가 나올 수 있다."
      }
@@ -4251,7 +4251,7 @@
      {
       "number": "8",
       "deficiency": "Laboratory controls do not include the establishment of scientifically sound and appropriate test procedures designed to assure that in-process materials conform to appropriate standards of identity, strength, quality and purity.",
-      "detail": "Microbial analysis of © (SOP-KBPROC-00370) utilizes only abi pl portion via ®@) (b) (4) method. Larger sample portion quantities, e.g., mil, are not following your firm's analytical method, in order to gain assurance that colony counts detected are statistically representative, especially when results are low to undetectable using® | ml volumes. *DATES OF INSPECTION 7/11/2016(Mon),7/12/2016(Tue),7/13/2016(Wed),7/15/2016(Fri),7/18/2016(Mon),7/19/2016(Tue)",
+      "detail": "Microbial analysis of © (SOP-KBPROC-00370) utilizes only abi pl portion via ®@) (b) (4) method. Larger sample portion quantities, e.g., mil, are not following your firm's analytical method, in order to gain assurance that colony counts detected are statistically representative, especially when results are low to undetectable using® | ml volumes.",
       "deficiency_ko": "실험실 관리에 공정 중 물질이 확인·함량·품질·순도의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 시험 절차의 수립이 포함되어 있지 않다.",
       "detail_ko": "(비공개)의 미생물 분석(SOP-KBPROC-00370)은 (비공개) 방법을 통해 (비공개) 분량만 사용한다. 검출된 집락 수가 통계적으로 대표성이 있다는 보증을 얻기 위해, 특히 (비공개) ml 부피를 사용할 때 결과가 낮거나 검출되지 않는 경우에 대비해, 귀사의 분석법에 따라 더 큰 시료 분량(예: (비공개) ml)을 사용하지 않는다."
      }
@@ -4923,9 +4923,9 @@
      {
       "number": "5",
       "deficiency": "There is a failure to clean equipment and utensils to prevent contamination or carry-over of a material that would alter the quality of the API beyond the official or other established specifications.",
-      "detail": "Specifically, There are no standard operating procedures or established instructions to perform and document a visual inspection of equipment subsequent to cleaning operations. For example: During my walkthrough of the Bulk Drug (API) Manufacturing Area on February 23, 2026, I observed that thes, ofBi UNI)@ 06 had visible g)4) | residue product material all throughout the surfaces and gq gasket area. This is despite full equipment cleaning documented as already being completed on February 16, 2026. . ***This is a Repeat Observation*** *DATES OF INSPECTION 02/23/2026 (Mon), 02/24/2026 (Tue), 02/25/2026 (Weds), 02/26/2026 (Thurs), 02/27/2026 (Fri).",
+      "detail": "Specifically, There are no standard operating procedures or established instructions to perform and document a visual inspection of equipment subsequent to cleaning operations. For example: During my walkthrough of the Bulk Drug (API) Manufacturing Area on February 23, 2026, I observed that thes, ofBi UNI)@ 06 had visible g)4) | residue product material all throughout the surfaces and gq gasket area. This is despite full equipment cleaning documented as already being completed on February 16, 2026. . ***This is a Repeat Observation***",
       "deficiency_ko": "API 품질을 공식 또는 기타 설정된 규격 밖으로 변경시킬 수 있는 물질의 오염이나 이월을 방지하도록 설비와 기구를 세척하지 않았다.",
-      "detail_ko": "구체적으로, 세척 작업 후 설비의 육안 검사를 수행하고 기록하기 위한 표준작업절차서나 수립된 지침이 없다. 예를 들어: 2026년 2월 23일 원료의약품(API) 제조 구역 순회 중, (비공개) 설비(UNI(비공개)06)의 표면 전체와 가스켓 부위에 (비공개) 잔류 제품 물질이 보이는 것을 관찰했다. 이는 2026년 2월 16일에 설비 전체 세척이 이미 완료된 것으로 기록되어 있었음에도 그러하다. ***이는 반복 관찰사항이다*** *실사일: 02/23/2026(월), 02/24/2026(화), 02/25/2026(수), 02/26/2026(목), 02/27/2026(금)."
+      "detail_ko": "구체적으로, 세척 작업 후 설비의 육안 검사를 수행하고 기록하기 위한 표준작업절차서나 수립된 지침이 없다. 예를 들어: 2026년 2월 23일 원료의약품(API) 제조 구역 순회 중, (비공개) 설비(UNI(비공개)06)의 표면 전체와 가스켓 부위에 (비공개) 잔류 제품 물질이 보이는 것을 관찰했다. 이는 2026년 2월 16일에 설비 전체 세척이 이미 완료된 것으로 기록되어 있었음에도 그러하다. ***이는 반복 관찰사항이다***"
      }
     ],
     "inspectors": [
@@ -5754,7 +5754,7 @@
      {
       "number": "5",
       "deficiency": "Appropriate controls are not exercised over computers or related systems to assure that changes in master production and control records or other records are instituted only by authorized personnel.",
-      "detail": "Specifically, Per your Production Manager your firm does not review data, audit trails and alarm reports generated by the HMIs (GT-2708) and SCADA of your non-dedicated equipment ID #PR-E016) and (ID #MB-E030) utilized in the Micro Lab. Alarms generated for the (Production) and (Micro) including sterilization load cycles are not backed up and automatically overwritten by the system. *DATES OF INSPECTION 05/25/2026 (Mon), 05/26/2026 (Tue), 05/27/2026 (Wed), 05/28/2026 (Thu), and 05/29/2026. (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (6) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4) (b) (4)",
+      "detail": "Specifically, Per your Production Manager your firm does not review data, audit trails and alarm reports generated by the HMIs (GT-2708) and SCADA of your non-dedicated equipment ID #PR-E016) and (ID #MB-E030) utilized in the Micro Lab. Alarms generated for the (Production) and (Micro) including sterilization load cycles are not backed up and automatically overwritten by the system.",
       "deficiency_ko": "마스터 생산·관리 기록 또는 기타 기록의 변경이 승인된 인원에 의해서만 이루어지도록 보증하기 위한 컴퓨터 또는 관련 시스템에 대한 적절한 통제가 시행되지 않는다.",
       "detail_ko": "구체적으로, 귀사 생산 관리자에 따르면 귀사는 Micro Lab에서 사용하는 비전용 설비 (비공개)(ID #PR-E016) 및 (비공개)(ID #MB-E030)의 HMI(GT-2708)와 SCADA가 생성하는 데이터, 감사추적, 알람 보고서를 검토하지 않는다. 멸균 로드 사이클을 포함하여 (비공개)(생산) 및 (비공개)(미생물)에서 발생한 알람은 백업되지 않으며 시스템에 의해 자동으로 덮어쓰인다."
      }
@@ -6649,7 +6649,7 @@
      {
       "number": "9",
       "deficiency": "Each batch of drug product purporting to be sterile and pyrogen-free is not laboratory tested to determine conformance to such requirements.",
-      "detail": "Specifically, there is no requirement for stratification or distinct timepoints throughout the filling process at which BET samples are to be collected. A single vial is randomly collected from each batch ofgy and is used for Bacterial Endotoxin Testing (BET) per SOP 1525, “Kontrollomfattning Steril Produktion”. There are approximately@g)@ ampoules filled in one commercial scale batch ofg@ *DATES OF INSPECTION 1/21/2026(Wed), 1/22/2026(Thu), 1/23/2026(Fri), 1/26/2026(Mon), 1/27/2026(Tue), 1/28/2026(Wed), 1/29/2026(Thu)",
+      "detail": "Specifically, there is no requirement for stratification or distinct timepoints throughout the filling process at which BET samples are to be collected. A single vial is randomly collected from each batch ofgy and is used for Bacterial Endotoxin Testing (BET) per SOP 1525, “Kontrollomfattning Steril Produktion”. There are approximately@g)@ ampoules filled in one commercial scale batch ofg@",
       "deficiency_ko": "무균 및 발열성물질 부재로 표방되는 의약품의 각 배치가 해당 요건 적합 여부를 판정하기 위한 시험실 시험을 받지 않는다.",
       "detail_ko": "구체적으로, 충전 공정 전반에 걸쳐 BET 검체를 채취해야 하는 층화 또는 별도 시점에 대한 요구사항이 없다. SOP 1525 “Kontrollomfattning Steril Produktion”에 따라 (비공개) 각 배치에서 바이알 1개를 무작위로 채취해 세균 엔도톡신 시험(BET)에 사용한다. (비공개) 상업 규모 1개 배치에서 충전되는 앰플은 약 (비공개)개이다."
      }
@@ -7821,7 +7821,7 @@
      {
       "number": "3",
       "deficiency": "Verification of the suitability of the testing methods is deficient in that they are not performed under actual conditions of use.",
-      "detail": "Specifically, your firm does not perform comparative testing for all in-house analytical method transfer studies that compare analytical results between the transferring lab and your receiving lab to determine a successful method transfer. For example, you did not compare the results of the transferring lab with the results of your receiving lab for the transfer of the external labs in-house method ((b) (4) ) for the Determination of Impurities in (b) (4) Injection ((b) (4) ) frorr(b) (4) to FK Grand Island, executed under Protocol: NAM-MVD-FG-000111207. *DATES OF INSPECTION 5/05/2026(Tue), 5/06/2026(Wed), 5/07/2026(Thu), 5/08/2026(Fri), 5/11/2026(Mon), 5/12/2026(Tue), 5/13/2026(Wed), 5/14/2026(Thu) JeshRenzo N Ramilo",
+      "detail": "Specifically, your firm does not perform comparative testing for all in-house analytical method transfer studies that compare analytical results between the transferring lab and your receiving lab to determine a successful method transfer. For example, you did not compare the results of the transferring lab with the results of your receiving lab for the transfer of the external labs in-house method ((b) (4) ) for the Determination of Impurities in (b) (4) Injection ((b) (4) ) frorr(b) (4) to FK Grand Island, executed under Protocol: NAM-MVD-FG-000111207.",
       "deficiency_ko": "시험방법의 적합성 확인이 실제 사용 조건에서 수행되지 않아 미흡하다.",
       "detail_ko": "구체적으로, 귀사는 모든 사내 분석법 이전 연구에서 이전 시험실(transferring lab)과 귀사 수령 시험실(receiving lab)의 분석 결과를 비교하는 비교시험을 수행해 분석법 이전 성공 여부를 판정하지 않는다. 예를 들어, (비공개) 주사제((비공개)) 중 불순물 정량을 위한 외부 시험실의 사내 시험법((비공개))을 (비공개)에서 FK Grand Island 로 이전할 때(프로토콜 NAM-MVD-FG-000111207 로 수행), 이전 시험실의 결과와 귀사 수령 시험실의 결과를 비교하지 않았다."
      }
@@ -8022,7 +8022,7 @@
      {
       "number": "2",
       "deficiency": "Routine checking of electronic equipment is not performed according to a written program designed to assure proper performance.",
-      "detail": "Specifically: (6)(4)) checking of the metal detectors employed on packaging lines does not employ non-ferrous metal challenges. *DATES OF INSPECTION 1/18/2017(Wed),1/19/2017(Thu), 1/23/2017(Mon), 1/24/2017(Tue), 1/25/2017(Wed)",
+      "detail": "Specifically: (6)(4)) checking of the metal detectors employed on packaging lines does not employ non-ferrous metal challenges.",
       "deficiency_ko": "전자 장비의 정기 점검이 적절한 성능을 보장하도록 설계된 문서화된 프로그램에 따라 수행되지 않는다.",
       "detail_ko": "구체적으로, 포장라인에 사용하는 금속검출기의 (비공개) 점검에 비철금속 챌린지를 사용하지 않는다."
      }
@@ -8600,7 +8600,7 @@
      {
       "number": "1",
       "deficiency": "Your firm failed to properly maintain buildings and facilities used in the manufacture of API in a clean condition.",
-      "detail": "Specifically, during a walkthrough ofyour facility on March 18, 2024, I observed what appeared to be water staining and unknown residue on ceiling tiles located above retain samples, as well as on the baseboard behind the retains, in your API Reserve Sample Storage Room. Examples of retain samples stored in the API : oa ow Reserve Sample Storage Room on March 18, 2024 include: lot OO, OC) OX) OG) ot and © \\ot On March 18, 2024, I also observed what appeared to be water staining on ceiling tiles above retain samples in your KSM and Intermediate Reserve Sample Storage Room, which your firm uses to store retain samples from lots of key starting raw material and from lots of intermediates during API production. *DATES OF INSPECTION 03/18/2024(Mon), 03/19/2024(Tue), 03/20/2024(Wed), 03/21/2024(Thu), 03/22/2024(Fri)",
+      "detail": "Specifically, during a walkthrough ofyour facility on March 18, 2024, I observed what appeared to be water staining and unknown residue on ceiling tiles located above retain samples, as well as on the baseboard behind the retains, in your API Reserve Sample Storage Room. Examples of retain samples stored in the API : oa ow Reserve Sample Storage Room on March 18, 2024 include: lot OO, OC) OX) OG) ot and © \\ot On March 18, 2024, I also observed what appeared to be water staining on ceiling tiles above retain samples in your KSM and Intermediate Reserve Sample Storage Room, which your firm uses to store retain samples from lots of key starting raw material and from lots of intermediates during API production.",
       "deficiency_ko": "귀사는 API 제조에 사용되는 건물 및 시설을 청결한 상태로 적절히 유지하지 않았다.",
       "detail_ko": "구체적으로, 2024년 3월 18일 귀사 시설을 둘러보는 동안, API 보관검체실(API Reserve Sample Storage Room)에서 보관검체 위에 위치한 천장 타일과 보관검체 뒤 걸레받이에 물얼룩으로 보이는 흔적과 미확인 잔류물을 관찰했다. 2024년 3월 18일 API 보관검체실에 보관된 보관검체의 예는 다음과 같다: 로트 (비공개). 2024년 3월 18일, KSM 및 중간체 보관검체실(KSM and Intermediate Reserve Sample Storage Room)에서도 보관검체 위 천장 타일에 물얼룩으로 보이는 흔적을 관찰했다. 귀사는 이 보관실을 API 생산 중 핵심 출발물질(key starting raw material) 로트와 중간체 로트의 보관검체를 보관하는 데 사용한다."
      }
@@ -9063,7 +9063,7 @@
      {
       "number": "2",
       "deficiency": "Failure to ensure proper documentation and verification of training records.",
-      "detail": "Specifically, your firm failed to adequately document and verify training records for personnel involved in manufacturing, equipment, and cGMP training. For example, e The current training system does not require individual trainees to electronically sign and verify their completion ofANY group training. e Training records for ALL group trainings are entered by the trainer for all attendees without individual authentication or verification. e There is no supporting documentation ensuring that each trainee received and understood the training. *DATES OF INSPECTION 02/19/2025 (Wed), 02/20/2025 (Thu), 02/21/2025 (Fri), 02/22/2025 (Sat), 02/24/2025 (Mon), 02/25/2025 (Tue)",
+      "detail": "Specifically, your firm failed to adequately document and verify training records for personnel involved in manufacturing, equipment, and cGMP training. For example, e The current training system does not require individual trainees to electronically sign and verify their completion ofANY group training. e Training records for ALL group trainings are entered by the trainer for all attendees without individual authentication or verification. e There is no supporting documentation ensuring that each trainee received and understood the training.",
       "deficiency_ko": "교육 기록의 적절한 문서화와 확인을 보장하지 않았다.",
       "detail_ko": "구체적으로, 귀사는 제조, 설비 및 cGMP 교육에 관여하는 인원의 교육 기록을 적절히 문서화하고 확인하지 않았다. 예를 들어, 현행 교육 시스템은 어떠한 집체 교육에 대해서도 교육생 개인이 이수를 전자서명하고 확인하도록 요구하지 않는다. 모든 집체 교육의 교육 기록은 개인별 인증이나 확인 없이 교육자가 전체 참석자에 대해 입력한다. 각 교육생이 교육을 받고 이해했음을 보장하는 근거 문서가 없다."
      }
@@ -9336,7 +9336,7 @@
      {
       "number": "5",
       "deficiency": "Manufacturing computer and or related system is not adequately qualified for their intended use.",
-      "detail": "Svecificallv. the distributed control system (DCS) software used to automate and monitor the operation the (b) @) production process system did not detect that a value was open during manufacturing, which led to partial product loss for a batch# o @ *DATES OF INSPECTION 11/17/2025 (Mon), 11/18/2025 (Tue), 11/19/2025 (Wed), 11/20/2025 (Thu), 11/21/2025 (Fri).",
+      "detail": "Svecificallv. the distributed control system (DCS) software used to automate and monitor the operation the (b) @) production process system did not detect that a value was open during manufacturing, which led to partial product loss for a batch# o @",
       "deficiency_ko": "제조용 컴퓨터 및/또는 관련 시스템이 의도된 용도에 맞게 적절히 적격성 평가되지 않았다.",
       "detail_ko": "구체적으로, (비공개) 생산 공정 시스템의 운전을 자동화하고 모니터링하는 데 사용하는 분산제어시스템(DCS) 소프트웨어가 제조 중 밸브가 열려 있는 것을 감지하지 못했으며, 이로 인해 배치# (비공개)의 일부 제품이 손실되었다."
      }
@@ -11408,7 +11408,7 @@
      {
       "number": "5",
       "deficiency": "Employees are not trained in cleaning procedures.",
-      "detail": "Specifically, Your firm failed to train your employees who perform cleaning, verify that cleaning is adequate and recheck and approve cleaning equipment and sign final cleaning batch to batch or product to product documentation. In reviewing employee’s training records, approximately six (6) employees were deficient in training on cleaning SOP, TR/15/05/013. During the inspection, six (6) equipment were found with product residue. This includes equipment such as the and e® *DATES OF INSPECTION 03/23/2023 (Thu), 03/25/2023 (Sat), 03/26/2023 (Sun), 03/27/2023 (Mon), 03/28/2023 (Tue) . Dates ots Goverment tS.0u-FDA",
+      "detail": "Specifically, Your firm failed to train your employees who perform cleaning, verify that cleaning is adequate and recheck and approve cleaning equipment and sign final cleaning batch to batch or product to product documentation. In reviewing employee’s training records, approximately six (6) employees were deficient in training on cleaning SOP, TR/15/05/013. During the inspection, six (6) equipment were found with product residue. This includes equipment such as the and e®",
       "deficiency_ko": "직원이 세척 절차에 대해 교육받지 않았다.",
       "detail_ko": "구체적으로, 귀사는 세척을 수행하고, 세척이 적절한지 확인하며, 세척 설비를 재확인·승인하고, 최종 배치 간 또는 품목 간 세척 기록에 서명하는 직원을 교육하지 않았다. 직원 교육 기록을 검토한 결과 약 6명의 직원이 세척 SOP TR/15/05/013 교육이 미흡하였다. 실사 중 6대의 설비에서 제품 잔류물이 발견되었다. 여기에는 (비공개) 등의 설비가 포함된다."
      }
@@ -11918,7 +11918,7 @@
      {
       "number": "3",
       "deficiency": "Failure to have the procedures and processes necessary to ensure the API and intermediates manufactured at your facility meet established specifications for quality and purity.",
-      "detail": "Specifically, Your firm's procedure SOP No. 001480: SOPfor Environmental Monitoring ofww Content, Revision No. 12, Effective Date: 07/09/2025, is deficient. Your firm failed to monitor critical entry points; outside/exterior door handles from the external environment into the manufacturing facilities. (This is repeat observation from June-July 2022 inspection) *DATES OF INSPECTION 01/19/2026(Mon), 01/20/2026(Tue), 01/21/2026(Wed), 01/22/2026(Thu), 01/23/2026(Fr), 01/27/2026(Mon) PRATIKS. paris UPADHVAY-s SEE Pratik S. Upadhyay",
+      "detail": "Specifically, Your firm's procedure SOP No. 001480: SOPfor Environmental Monitoring ofww Content, Revision No. 12, Effective Date: 07/09/2025, is deficient. Your firm failed to monitor critical entry points; outside/exterior door handles from the external environment into the manufacturing facilities. (This is repeat observation from June-July 2022 inspection)",
       "deficiency_ko": "귀사 시설에서 제조되는 API와 중간체가 설정된 품질 및 순도 규격을 충족하도록 보장하는 데 필요한 절차와 공정을 갖추지 않았다.",
       "detail_ko": "구체적으로, 귀사의 절차서 SOP No. 001480: (비공개) 함량 환경모니터링 SOP(개정번호 12, 시행일 07/09/2025)가 미흡하다. 귀사는 외부 환경에서 제조시설로 들어가는 중요 출입 지점인 외부 문손잡이를 모니터링하지 않았다. (2022년 6~7월 실사의 반복 관찰사항이다.)"
      }
@@ -12239,7 +12239,7 @@
      {
       "number": "1",
       "deficiency": "Written procedures are not established for the cleaning of equipment used in the manufacture API.",
-      "detail": "Specifically, SOP)© CLEANING PROCEDURES”, SOP NO: PD/OP/0017, REV NO: 000, EFFECTIVE DATE: 01/01/2021, does not include provisions to clean or visually inspect the area hi SS SS A wetnhemnt *DATES OF INSPECTION 7/11/2024(Thu), 7/12/2024(Fri), 7/15/2024(Mon), 7/16/2024(Tue), 7/17/2024(Wed), 7/18/2024(Thu), 7/19/2024(Fri) Andrew Le",
+      "detail": "Specifically, SOP)© CLEANING PROCEDURES”, SOP NO: PD/OP/0017, REV NO: 000, EFFECTIVE DATE: 01/01/2021, does not include provisions to clean or visually inspect the area hi SS SS A wetnhemnt",
       "deficiency_ko": "API 제조에 사용되는 설비의 세척에 대한 문서화된 절차가 수립되어 있지 않다.",
       "detail_ko": "구체적으로, SOP (비공개) \"세척 절차\"(SOP 번호: PD/OP/0017, 개정 번호: 000, 시행일: 01/01/2021)에는 해당 구역(비공개)을 세척하거나 육안 점검하는 규정이 포함되어 있지 않다."
      }
@@ -12382,7 +12382,7 @@
      {
       "number": "5",
       "deficiency": "The responsibilities and procedures applicable to the quality control unit are not fully followed.",
-      "detail": "Specifically, a. Deviations are not always closed in a timely manner and the timeframe to open a deviation from the date discovered is not properly justified. US-SOP-QA-0004, Deviation Management System, rev. 03, eff 21Jun2024, allows | vou to initiate a deviation in your vn This means there is the potential for, = sfto ona before a deviation is opened after it has been discovered. Additionally, the SOP allows for = to close a deviation. From 10/01/2022 to 12/10/2024, approximately 49% of 346 deviations were closed sas of which were classified as critical or major. b. Out of specifications (OOS) for chemistry are not always closed in a timely manner. SOP-LAB- 0053, Procedure for Handling Out ofSpecification Laboratory Testing, rev. 10, eff. 20Aug2024, allows for a ” timeframe during which to close chemistry related OOSs and no closure date extensions are allowed. From 10/01/2022 to 12/10/2024, 35 out of 133 OOSs were closed after wa — 18 of which remained open longer than /_,,,, *DATES OF INSPECTION 12/10/2024(Tue), 12/11/2024(Wed), 12/12/2024(Thu), 12/13/2024(Fri), 12/16/2024(Mon), 12/17/2024(Tue), 12/18/2024(Wed) Peng Zhou X SPS can",
+      "detail": "Specifically, a. Deviations are not always closed in a timely manner and the timeframe to open a deviation from the date discovered is not properly justified. US-SOP-QA-0004, Deviation Management System, rev. 03, eff 21Jun2024, allows | vou to initiate a deviation in your vn This means there is the potential for, = sfto ona before a deviation is opened after it has been discovered. Additionally, the SOP allows for = to close a deviation. From 10/01/2022 to 12/10/2024, approximately 49% of 346 deviations were closed sas of which were classified as critical or major. b. Out of specifications (OOS) for chemistry are not always closed in a timely manner. SOP-LAB- 0053, Procedure for Handling Out ofSpecification Laboratory Testing, rev. 10, eff. 20Aug2024, allows for a ” timeframe during which to close chemistry related OOSs and no closure date extensions are allowed. From 10/01/2022 to 12/10/2024, 35 out of 133 OOSs were closed after wa — 18 of which remained open longer than /_,,,,",
       "deficiency_ko": "품질관리 부서에 적용되는 책임과 절차를 완전히 준수하지 않는다.",
       "detail_ko": "구체적으로, a. 일탈이 항상 적시에 종결되지 않으며, 발견일로부터 일탈을 개시하기까지의 기간이 적절히 정당화되지 않았다. US-SOP-QA-0004, Deviation Management System, rev. 03, eff 21Jun2024는 시스템에서 일탈을 개시하는 데 (비공개)를 허용한다. 이는 일탈이 발견된 후 개시되기 전까지 (비공개)가 발생할 가능성이 있음을 의미한다. 또한 이 SOP는 일탈 종결에 (비공개)를 허용한다. 10/01/2022부터 12/10/2024까지 일탈 346건 중 약 49%가 (비공개) 이후 종결되었으며, 그중 (비공개)는 중대(critical) 또는 주요(major)로 분류되었다. b. 화학 관련 규격외(OOS) 결과가 항상 적시에 종결되지 않는다. SOP-LAB-0053, Procedure for Handling Out of Specification Laboratory Testing, rev. 10, eff. 20Aug2024는 화학 관련 OOS 종결에 (비공개) 기한을 허용하며 종결일 연장은 허용하지 않는다. 10/01/2022부터 12/10/2024까지 OOS 133건 중 35건이 (비공개) 이후 종결되었고, 그중 18건은 (비공개)보다 오래 미결 상태였다."
      }
@@ -12685,7 +12685,7 @@
      {
       "number": "1",
       "deficiency": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
-      "detail": "Specifically, Aseptic processing areas are deficient regarding the system for monitoring environmental conditions. Specifically, LSOP-9000004973, Environmental Monitoring, version 34, effective 08Dec2025, and previous versions 30, 31, 32, and 33, effective 31Jan2024, 03Jul2024, 06Nov2024, and 270ct2025, respectively, requires that environmental monitoring samples are to be incubated at 20-25°C and 30-35°C for the recovery of viable microorganisms. These samples are collected in (b) (4) (b) (4) settle plates and (6) (4) contact plates. The (©)@) plates have not been properly qualified for their intended use at 20-25°C. *DATES OF INSPECTION 3/04/2026(Wed), 3/05/2026(Thu), 3/06/2026(Fri), 3/09/2026(Mon), 3/10/2026(Tue), 3/11/2026(Wed), 3/12/2026(Thu) Laurel A Beer Annette Melendez Investigator Investigator X BBeStes cs 12-2020 15:38:36 X Boe Sted cs 12-2000 15.3018",
+      "detail": "Specifically, Aseptic processing areas are deficient regarding the system for monitoring environmental conditions. Specifically, LSOP-9000004973, Environmental Monitoring, version 34, effective 08Dec2025, and previous versions 30, 31, 32, and 33, effective 31Jan2024, 03Jul2024, 06Nov2024, and 270ct2025, respectively, requires that environmental monitoring samples are to be incubated at 20-25°C and 30-35°C for the recovery of viable microorganisms. These samples are collected in (b) (4) (b) (4) settle plates and (6) (4) contact plates. The (©)@) plates have not been properly qualified for their intended use at 20-25°C.",
       "deficiency_ko": "무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다.",
       "detail_ko": "구체적으로, 무균공정 구역의 환경 조건 모니터링 시스템이 미흡하다. 구체적으로, LSOP-9000004973 \"Environmental Monitoring\" 34판(2025년 12월 8일 시행)과 이전 30·31·32·33판(각각 2024년 1월 31일, 2024년 7월 3일, 2024년 11월 6일, 2025년 10월 27일 시행)은 생균 회수를 위해 환경모니터링 검체를 20-25°C 와 30-35°C 에서 배양하도록 요구한다. 이 검체는 (비공개) 낙하균 배지와 (비공개) 접촉 배지로 채취한다. 이 (비공개) 배지는 20-25°C 에서의 사용 목적에 대해 적절히 적격성평가되지 않았다."
      }

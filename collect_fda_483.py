@@ -495,6 +495,13 @@ _FDA483_FOOTER_RE = re.compile(
     #   ③ OCR 이 Y 를 V 로 읽은 EMPLOYEE(S) — "EMPLOVEE(S" (위 EMP..OY 마커가 OY 를 못 찾는다).
     #      대문자 고정 — 산문의 "employees" 는 오탐하지 않는다.
     r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    #   ④ [2026-10-27] 연속 기재 양식(Continuation Sheet) 마지막 줄 "*DATES OF INSPECTION
+    #      1/21/2026(Wed), … <실사관 이름>" — 발행분 42관찰의 detail 끝에 실사일 나열과 서명자
+    #      이름이 그대로 실렸다. 대문자 고정이고 괄호 없는 "DATES" 만 잡는다 — 페이지 머리말 칸
+    #      이름 "DATE(S) OF INSPECTION" 은 관찰 중간 쪽 경계에도 찍히므로 여기서 자르면 다음
+    #      쪽으로 이어지는 본문이 잘린다. 산문 끝에 붙은 "Dates of inspection: June 12, …"
+    #      (fda483-193759 obs#8 실측)은 콜론을 요구해 산문의 "dates of inspection" 언급과 가른다.
+    r"|(?-i:[*\"]?\s*DATES\s+OF\s+INSPECTION)|Dates\s+of\s+inspection\s*:"
     r"|\bDATE\s+ISSUED\b"
     r"|\bPAGE\s+\d+\s+OF\s+\d+\b"
     r"|\bAdd\s+Continuation\s+Page\b",           # Observation 별 연속페이지 마커(2026-07-12 실측)

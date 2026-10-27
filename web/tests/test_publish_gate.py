@@ -97,7 +97,8 @@ class WebFda483PublishGateTest(unittest.TestCase):
         발행분 25관찰에 실렸다. 산문 속 소문자 'digitally signed by the …' 는 통과."""
         for detail in ("Specifically, real content. Muna Algharibeh -S Digitally signed by Muna",
                        "Specifically, real content. The observations of objectionable conditions",
-                       "Specifically, real content for further processing EMPLOVEE(S)"):
+                       "Specifically, real content for further processing EMPLOVEE(S)",
+                       "Specifically, real content. *DATES OF INSPECTION 1/21/2026(Wed)"):
             with self.subTest(detail=detail[-30:]):
                 card = _card([_obs(1, detail=detail, detail_ko="번역문.")])
                 violations = render.validate_483_observations([_brief([card])])

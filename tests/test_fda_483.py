@@ -2378,6 +2378,14 @@ class Fda483SignatureStampFooterTest(unittest.TestCase):
         "Specifically, the cleaning records were incomplete for several lots. The observations of "
         "objectionable conditions and practices listed on the front of this form are reported":
             "Specifically, the cleaning records were incomplete for several lots.",
+        # 연속 기재 양식 마지막 줄의 실사일·서명자 나열 — 앞 별표까지 자른다(발행분 42관찰 실측).
+        "Specifically, the master batch record lacks theoretical yield specifications. "
+        "*DATES OF INSPECTION 1/28/2026(Wed), 1/30/2026(Fri) Laurel A Beer Investigator":
+            "Specifically, the master batch record lacks theoretical yield specifications.",
+        # 산문 끝에 붙은 소문자 변형(fda483-193759 obs#8 실측).
+        "Specifically, the reference material was not calibrated against the standard. "
+        "Dates of inspection: June 12, 2025 (Thursday), June 13, 2025 (Friday).":
+            "Specifically, the reference material was not calibrated against the standard.",
         # Y→V 오인식 EMPLOYEE(S)(fda483-195629 obs#2 실측).
         "Specifically, the batch was released to your client for further processing EMPLOVEE(S)":
             "Specifically, the batch was released to your client for further processing",
@@ -2396,6 +2404,8 @@ class Fda483SignatureStampFooterTest(unittest.TestCase):
 
     def test_prose_is_not_cut(self):
         for prose in ("Specifically, the record was digitally signed by the analyst after review.",
+                      "Specifically, the logbook lists the dates of inspection for each filter.",
+                      "DATE(S) OF INSPECTION 3/17/2026-3/19/2026 page header continues the text",
                       "Specifically, employees were not trained on the procedure."):
             with self.subTest(prose=prose):
                 self.assertIsNone(f._FDA483_FOOTER_RE.search(prose))

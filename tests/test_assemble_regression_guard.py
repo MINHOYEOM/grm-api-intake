@@ -118,6 +118,18 @@ class BundleShrinkTest(unittest.TestCase):
         asm = _doc([self._bundle("b", ["Unrelated Firm · FEI 1"])])
         self.assertFalse(g.compare(pub, asm)["ok"])
 
+    def test_representative_promoted_to_full_card(self):
+        """대표가 정식 카드로 풀려 같은 id 가 묶음 아닌 카드로 남는 경우(10-26 2차 복구 실측).
+        스캐폴드 스키마상 모든 카드가 `merged_items: []` 를 들고 있다 — 빈 목록은 묶음이 아니다."""
+        pub = _doc([self._bundle("b-1", self.ITEMS[:12])])
+        full = {"id": "b-1", "render_order": 0, "merged_items": [], "merged_count": 1,
+                "summary": "f" * 2000}
+        asm = _doc([full, self._bundle("b-2", self.ITEMS[1:8])])
+        r = g.compare(pub, asm)
+        self.assertTrue(r["ok"], r)
+        self.assertEqual((r["unbundled_cards"][0]["now"], r["unbundled_cards"][0]["after_items"]),
+                         ("b-2", 7))
+
     def test_representative_change_is_not_missing(self):
         """대표(가장 작은 id)가 복구·제외돼 묶음 id 가 바뀌어도 같은 묶음으로 본다."""
         pub = _doc([self._bundle("b-1", self.ITEMS)])

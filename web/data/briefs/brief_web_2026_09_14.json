@@ -200,7 +200,7 @@
      {
       "number": "3",
       "deficiency": "Use of ingredients not intended for pharmaceutical use in non-sterile drug production.",
-      "detail": "Specifically, Your firm makes Minoxidil 1.5mg + Biotin 2.5mg chewable gummy products using <Redacted B4> water that has not been tested. This water is used in your firm's formulation of the gummy product. Untested <Redacted B4> water was used in the production of Minoxidil 1.5mg + Biotin 2.5mg chewable gummy lot UGDFEUSJHFGJ. *DATES OF INSPECTION 6/08/2026 (Mon), 6/09/2026 (Tue), 6/10/2026 (Wed), 6/11/2026 (Thu), 6/12/2026 (Fri), 6/15/2026 (Mon), 6/16/2026 (Tue), 6/17/2026 (Wed)",
+      "detail": "Specifically, Your firm makes Minoxidil 1.5mg + Biotin 2.5mg chewable gummy products using <Redacted B4> water that has not been tested. This water is used in your firm's formulation of the gummy product. Untested <Redacted B4> water was used in the production of Minoxidil 1.5mg + Biotin 2.5mg chewable gummy lot UGDFEUSJHFGJ.",
       "deficiency_ko": "비무균 의약품 생산에 의약품용으로 의도되지 않은 원료를 사용하였다.",
       "detail_ko": "귀사는 시험하지 않은 <Redacted B4> 용수를 사용하여 Minoxidil 1.5mg + Biotin 2.5mg 츄어블 구미 제품을 제조한다. 이 용수는 귀사의 구미 제품 배합에 사용된다. 시험하지 않은 <Redacted B4> 용수가 Minoxidil 1.5mg + Biotin 2.5mg 츄어블 구미 로트 UGDFEUSJHFGJ 의 생산에 사용되었다."
      }
@@ -385,7 +385,7 @@
      {
       "number": "10",
       "deficiency": "Hazardous drugs were produced without providing adequate containment.",
-      "detail": "segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination. Specifically, A. The technician did not change wipes with sufficient frequency during the deactivation and decontamination process of capsule equipment, utensils and the BSC after producing Clomiphene Capsules, lot 07282026RW01. The technician used one approximately <Redacted B4> inch wipe to decontaminate the entire interior of the BSC and used one wipe to decontaminate all the parts of the capsule equipment. B. The technician did not deactivate and decontaminate the pen used to record capsule weights in the batch record during production of Clomiphene Capsules, lot 07282026RW0 1. *DATES OF INSPECTION 7/21/2025 (Tue), 7/22/2026 (Wed), 7/23/2026 (Thu), 7/24/2026 (Fri), 7/27/2026 (Mon), 7/28/2026 (Tue), 7/29/2026 (Wed), 7/30/2026 (Thu), 7/31/2026 (Fri)",
+      "detail": "segregation, and/or cleaning of work surfaces, utensils, and/or personnel to prevent cross-contamination. Specifically, A. The technician did not change wipes with sufficient frequency during the deactivation and decontamination process of capsule equipment, utensils and the BSC after producing Clomiphene Capsules, lot 07282026RW01. The technician used one approximately <Redacted B4> inch wipe to decontaminate the entire interior of the BSC and used one wipe to decontaminate all the parts of the capsule equipment. B. The technician did not deactivate and decontaminate the pen used to record capsule weights in the batch record during production of Clomiphene Capsules, lot 07282026RW0 1.",
       "deficiency_ko": "위험의약품이 교차오염을 방지하기 위한 적절한 봉쇄, 구획 및/또는 작업 표면·기구·인원에 대한 세척 없이 생산되었다.",
       "detail_ko": "A. Clomiphene Capsules 로트 07282026RW01 생산 후 캡슐 설비, 기구 및 생물안전작업대(BSC)의 비활성화·제거 과정에서 기술자가 와이프를 충분한 빈도로 교체하지 않았다. 기술자는 약 <Redacted B4> 인치 크기의 와이프 한 장으로 BSC 내부 전체를 제거 처리하였고, 또 한 장으로 캡슐 설비의 모든 부품을 제거 처리하였다. B. 같은 로트의 생산 중 배치기록에 캡슐 중량을 기재하는 데 사용한 펜은 비활성화·제거 처리를 하지 않았다."
      }

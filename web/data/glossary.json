@@ -4985,5 +4985,24 @@
       "package leaflet"
     ],
     "easy_en": "The leaflet in every pack of medicine that contains information on the medicine for end-users, such as patients and animal owners."
+  },
+  {
+    "id": "advanced-therapy-medicinal-product",
+    "term_ko": "첨단치료의약품",
+    "term_en": "Advanced Therapy Medicinal Product (ATMP)",
+    "easy_ko": "유전자, 세포 또는 조직공학을 바탕으로 한 사람용 의약품입니다.",
+    "definition_source": "European Medicines Agency, Glossary: Advanced therapy medicinal product",
+    "related": [
+      "drug-product",
+      "marketing-authorization",
+      "aseptic-processing"
+    ],
+    "source_url": "https://www.ema.europa.eu/en/glossary-terms/advanced-therapy-medicinal-product",
+    "aliases": [
+      "advanced therapy medicinal product",
+      "advanced therapy medicinal products",
+      "ATMPs"
+    ],
+    "easy_en": "A medicine for human use that is based on genes, cells or tissue engineering."
   }
 ]

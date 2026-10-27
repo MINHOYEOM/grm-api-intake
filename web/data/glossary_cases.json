@@ -1440,6 +1440,11 @@
       "id": "package-leaflet",
       "term_ko": "환자설명서",
       "reason": "지적사항 본문 검색 'package leaflet'·'patient information leaflet' 0건, '첨부문서' 11건은 국내 첨부문서 기재사항 위반이라 EU 환자설명서와 같은 말이 아님(2026-10-06)"
+    },
+    {
+      "id": "advanced-therapy-medicinal-product",
+      "term_ko": "첨단치료의약품",
+      "reason": "지적사항 본문 검색 'ATMP'·'advanced therapy' 4건이 모두 같은 병원약국 1곳의 EU NCR 이고, 문장은 실사 개요(제조 품목 범위 소개)라 ATMP 관련 지적 사례가 아님(2026-10-27)"
     }
   ],
   "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."

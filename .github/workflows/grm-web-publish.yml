@@ -178,6 +178,20 @@ jobs:
             --assembled "$OUT" \
             --summary "$GITHUB_STEP_SUMMARY"
 
+      # [2026-10-27 FDA 결손 감사] 승인 전에 이 발행본의 FDA 본문 결손을 보이게 한다 — 조립은
+      # 결손 483 을 "본문 미확보" 묶음 카드로 조용히 접는다. 발행을 막지는 않는다(묶음 카드는
+      # 정직한 표기다). 결손 경보·자동 회수는 grm-fda-coverage-gate, 재확인은 워치독 담당.
+      - name: FDA 본문 결손 요약(발행본 기준)
+        id: fdacov
+        # 가시화 전용 — 이 스텝의 실패가 발행 PR 생성을 막아서는 안 된다.
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python fda_body_coverage.py check \
+            --brief "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" \
+            --intake-event publish --summary-md "$GITHUB_STEP_SUMMARY" \
+            --issue-md fda_coverage_lines.md | tee -a "$GITHUB_OUTPUT"
+
       - name: 커밋 + PR (프리뷰 트리거)
         env:
           GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
@@ -217,12 +231,20 @@ jobs:
           git push -u origin "$BR" --force
           # 열린 PR 이 있으면 재사용(force-push 로 갱신됨), 닫혀 있으면 재오픈, 없으면 생성.
           STATE=$(gh pr view "$BR" --json state -q .state 2>/dev/null || echo NONE)
+          BODY="assemble_publish_brief 자동 조립(채택 필터·render_order 재배열·coverage/agencies/categories/evidence 재계산) + 골든 재동결. 프리뷰 확인 후 머지 = 라이브(D5)."
+          if [ -s fda_coverage_lines.md ] && grep -q '\[fda-body-coverage\]' fda_coverage_lines.md; then
+            BODY="${BODY}
+
+          ⚠️ **FDA 본문 결손(이 발행본 기준)** — 아래 카드는 본문·상세 없이 나갑니다(483 은 '본문 미확보' 묶음 카드). 승인 전 확인:
+          $(cat fda_coverage_lines.md)"
+          fi
           if [ "$STATE" = "OPEN" ]; then
             echo "::notice::기존 열린 발행 PR 재사용(force-push 로 갱신) — $BR"
+            gh pr edit "$BR" -R "${{ github.repository }}" --body "$BODY" || echo "::warning::PR 본문 갱신 실패(무해)"
           elif [ "$STATE" = "CLOSED" ]; then
             gh pr reopen "$BR" && echo "::notice::닫힌 발행 PR 재오픈 — $BR"
           else
             gh pr create -R "${{ github.repository }}" -B main -H "$BR" \
               -t "publish(web): ${{ steps.r.outputs.pub }} 주간 브리프" \
-              -b "assemble_publish_brief 자동 조립(채택 필터·render_order 재배열·coverage/agencies/categories/evidence 재계산) + 골든 재동결. 프리뷰 확인 후 머지 = 라이브(D5)."
+              -b "$BODY"
           fi

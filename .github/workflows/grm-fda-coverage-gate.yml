@@ -1,0 +1,346 @@
+name: GRM FDA Coverage Gate (발행 전 FDA 본문 결손 점검)
+
+# ★2026-10-27 FDA 결손 감사 — 10-26 호에서 FDA 483 25건이 관찰 본문 없이 "본문 미확보"
+# 묶음 카드로 발행됐다. 결손을 알리는 health 경고는 **수집 실행 단위**라, 발행 직전에
+# "이번 주 브리프 기준으로 FDA 카드 몇 장이 본문 없이 나가는가"를 세는 장치가 없었다.
+#
+# 이 게이트는 월요일(KST) 정기 수집이 끝나면 그 실행의 스캐폴드(grm-web-brief 아티팩트 —
+# 그 주 브리프의 정본 입력)를 읽어 FDA 카드 본문 결손을 센다(판정 = fda_body_coverage.py).
+#   ① 임계 미만 → 끝(요약만 남김, 열린 경고 이슈가 있으면 닫음).
+#   ② 483 결손이 임계 이상이고 Routine(07:30 KST) 전 여유가 있으면 → **자동 회수**:
+#      grm-fda483-ocr-recovery(recoverable · 그 문서들만 · apply)를 돌려 Supabase 를 고치고
+#      미소비 Notion 483 행을 동기화한 뒤, 그 날짜 handoff 가 아직 OPEN(New)이면 grm-intake 를
+#      다시 돌려 **handoff·스캐폴드를 재생성**한다. 그 결과를 다시 센다.
+#   ③ 그래도 남거나(파서 0건·스캔 판독 실패 등) 자동 경로가 없는 결손(WL·회수)이면 →
+#      `automation-warning` 경고 이슈(Admin 운영 상태 센터에 그대로 뜬다).
+#
+# 안전 계약(publish_watchdog 와 같은 규율):
+#   · 멱등 — 재생성은 handoff 가 `New`(OPEN)일 때만. 소비된 handoff 를 다시 쓰면 발행이 끝난
+#     주가 OPEN 으로 되살아난다(멱등성 v1 경로는 재패치한다). 상태를 모르면 하지 않는다.
+#   · 유한 — 회수·재생성은 정기(schedule) 실행 산출물에 대해 1회. 재생성된 수집(dispatch)은
+#     이 게이트를 다시 태우지 않는다(아래 if) — 이 잡이 직접 기다렸다가 다시 센다.
+#   · 관측성 — 판단·결과를 step summary 와 경고 이슈에 남긴다. 조용한 복구 금지.
+#   · 발행 승인 흐름은 불변 — 이 게이트는 막지 않고, 결손을 사람 눈앞(이슈·Admin)에 올린다.
+#
+# ⚠️ 한계: 월요일 수집이 07:00 KST 이후에 끝나면(크론 지각) 재생성할 시간이 없어 경보만 한다.
+
+on:
+  workflow_run:
+    workflows: ["GRM API Intake (Daily)"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      intake_run_id:
+        description: '점검할 grm-intake run id(그 run 의 grm-web-brief 아티팩트를 센다). 수동 실행은 회수·재생성 없이 점검·경보만 한다.'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: write   # 회수·수집 workflow_dispatch + 아티팩트 내려받기
+  issues: write
+
+concurrency:
+  group: grm-fda-coverage-gate
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: 이번 주 FDA 카드 본문 결손 점검 → 회수 → 경보
+    # 정기 수집(main)의 성공 실행만 자동으로 본다. 재생성으로 dispatch 된 수집은 이 잡이
+    # 직접 기다려 다시 세므로 여기서 다시 타지 않는다(무한 루프 방지).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.event == 'schedule')
+    runs-on: ubuntu-latest
+    # 회수 대기(≤55분) + 재수집 대기(≤60분) + 여유. 타임아웃으로 죽으면 경보 스텝도 못 돈다.
+    timeout-minutes: 150
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 대상 수집 run · 발행일 판정
+        id: ctx
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IN_RUN_ID: ${{ inputs.intake_run_id }}
+          WR_ID: ${{ github.event.workflow_run.id }}
+          WR_EVENT: ${{ github.event.workflow_run.event }}
+          WR_CREATED: ${{ github.event.workflow_run.created_at }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            printf '%s' "$IN_RUN_ID" | grep -qE '^[0-9]+$' || { echo "::error::intake_run_id 는 숫자"; exit 1; }
+            RID="$IN_RUN_ID"
+            read -r EVENT CREATED < <(gh run view "$RID" -R "$GITHUB_REPOSITORY" \
+              --json event,createdAt -q '.event + " " + .createdAt')
+            EVENT="manual-gate"   # 수동 점검은 회수·재생성 없이 점검·경보만
+          else
+            RID="$WR_ID"; EVENT="$WR_EVENT"; CREATED="$WR_CREATED"
+          fi
+          RUN_DATE=$(TZ='Asia/Seoul' date -d "$CREATED" '+%Y-%m-%d')
+          DOW=$(TZ='Asia/Seoul' date -d "$CREATED" '+%u')
+          # 주간 브리프는 월요일(KST) 수집의 handoff 로 만들어진다 — 다른 요일 산출물은 발행
+          # 입력이 아니다(그 날 결손은 그날 밤 회수 예약이 처리한다).
+          if [ "$DOW" != "1" ] && [ "${GITHUB_EVENT_NAME}" != "workflow_dispatch" ]; then
+            echo "::notice::발행일(월, KST) 수집이 아님($RUN_DATE) — 점검 생략"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "skip=false"
+            echo "rid=$RID"
+            echo "event=$EVENT"
+            echo "run_date=$RUN_DATE"
+            echo "under=$(echo "$RUN_DATE" | tr '-' '_')"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 스캐폴드 내려받기
+        id: scaffold
+        if: steps.ctx.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ steps.ctx.outputs.rid }}
+          UNDER: ${{ steps.ctx.outputs.under }}
+        run: |
+          set -euo pipefail
+          rm -rf _scaffold && mkdir -p _scaffold
+          if gh run download "$RID" -R "$GITHUB_REPOSITORY" -n grm-web-brief -D _scaffold \
+               && [ -f "_scaffold/brief_web_${UNDER}.json" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::run $RID 에 brief_web_${UNDER}.json 없음 — 점검 불가(ENABLE_WEB_BRIEF_EMIT 확인)"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 1차 점검 — fda_body_coverage
+        id: check1
+        if: steps.scaffold.outputs.found == 'true'
+        env:
+          EVENT: ${{ steps.ctx.outputs.event }}
+          UNDER: ${{ steps.ctx.outputs.under }}
+        run: |
+          set -euo pipefail
+          echo "## FDA 본문 결손 — 1차(수집 직후 스캐폴드)" >> "$GITHUB_STEP_SUMMARY"
+          python fda_body_coverage.py check --brief "_scaffold/brief_web_${UNDER}.json" \
+            --intake-event "$EVENT" \
+            --kst-hour "$(TZ='Asia/Seoul' date '+%-H')" --kst-minute "$(TZ='Asia/Seoul' date '+%-M')" \
+            --report-json coverage_1.json --summary-md "$GITHUB_STEP_SUMMARY" --issue-md issue.md \
+            | tee -a "$GITHUB_OUTPUT"
+
+      - name: 자동 회수 — grm-fda483-ocr-recovery(recoverable · 결손 문서만 · apply)
+        id: recover
+        if: steps.check1.outputs.action == 'recover'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IDS: ${{ steps.check1.outputs.recover_ids }}
+        run: |
+          set -euo pipefail
+          T0=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          if ! gh workflow run grm-fda483-ocr-recovery.yml -R "$GITHUB_REPOSITORY" --ref main \
+                 -f apply=true -f mode=recoverable -f ocr_page_budget=600 -f doc_ids="$IDS"; then
+            echo "::warning::회수 dispatch 실패 — 경보로 전환"
+            echo "done=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          REC=""
+          for i in $(seq 1 20); do
+            sleep 15
+            REC=$(gh run list -R "$GITHUB_REPOSITORY" --workflow grm-fda483-ocr-recovery.yml \
+                    --event workflow_dispatch -L 5 --json databaseId,createdAt \
+                    -q "[.[] | select(.createdAt >= \"$T0\")] | last | .databaseId // empty")
+            [ -n "$REC" ] && break
+          done
+          [ -n "$REC" ] || { echo "::warning::회수 run 미발견 — 경보로 전환"; echo "done=false" >> "$GITHUB_OUTPUT"; exit 0; }
+          echo "recovery run: $REC"
+          # 같은 concurrency 그룹의 예약 회수가 돌고 있으면 그 뒤에 줄 선다 — 넉넉히 기다린다.
+          if timeout 55m gh run watch "$REC" -R "$GITHUB_REPOSITORY" --interval 30 --exit-status >/dev/null; then
+            echo "done=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::회수 run $REC 실패/시간 초과 — 재생성 없이 경보로 전환"
+            echo "done=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "recovery_run=$REC" >> "$GITHUB_OUTPUT"
+
+      - name: handoff 상태 확인(재생성 안전 조건)
+        id: handoff
+        if: steps.recover.outputs.done == 'true'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          RUN_DATE: ${{ steps.ctx.outputs.run_date }}
+        run: |
+          set -euo pipefail
+          python fda_body_coverage.py handoff-status --date "$RUN_DATE" | tee -a "$GITHUB_OUTPUT"
+
+      - name: handoff·스캐폴드 재생성 — grm-intake 재실행 후 대기
+        id: regen
+        if: steps.handoff.outputs.handoff_status == 'New'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UNDER: ${{ steps.ctx.outputs.under }}
+        run: |
+          set -euo pipefail
+          # 회수가 끝난 지금도 Routine(07:30 KST) 전 여유가 있어야 한다 — 수집 1회 ≈15~25분.
+          NOW_HM=$(TZ='Asia/Seoul' date '+%H%M')
+          if [ "$NOW_HM" -ge 0700 ]; then
+            echo "::warning::${NOW_HM} KST — Routine 전에 재생성할 시간이 없음, 경보로 전환"
+            echo "done=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          T0=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          if ! gh workflow run grm-intake.yml -R "$GITHUB_REPOSITORY" --ref main; then
+            echo "::warning::수집 dispatch 실패 — 경보로 전환"
+            echo "done=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          RUN=""
+          for i in $(seq 1 20); do
+            sleep 15
+            RUN=$(gh run list -R "$GITHUB_REPOSITORY" --workflow grm-intake.yml \
+                    --event workflow_dispatch -L 5 --json databaseId,createdAt \
+                    -q "[.[] | select(.createdAt >= \"$T0\")] | last | .databaseId // empty")
+            [ -n "$RUN" ] && break
+          done
+          [ -n "$RUN" ] || { echo "::warning::재수집 run 미발견"; echo "done=false" >> "$GITHUB_OUTPUT"; exit 0; }
+          echo "regen intake run: $RUN"
+          if ! timeout 60m gh run watch "$RUN" -R "$GITHUB_REPOSITORY" --interval 30 --exit-status >/dev/null; then
+            echo "::warning::재수집 run $RUN 실패/시간 초과"
+            echo "done=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          rm -rf _scaffold2 && mkdir -p _scaffold2
+          if gh run download "$RUN" -R "$GITHUB_REPOSITORY" -n grm-web-brief -D _scaffold2 \
+               && [ -f "_scaffold2/brief_web_${UNDER}.json" ]; then
+            echo "done=true" >> "$GITHUB_OUTPUT"
+            echo "regen_run=$RUN" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::재수집 run $RUN 에 스캐폴드 없음"
+            echo "done=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 2차 점검 — 회수·재생성 후 스캐폴드
+        id: check2
+        if: steps.regen.outputs.done == 'true'
+        env:
+          UNDER: ${{ steps.ctx.outputs.under }}
+        run: |
+          set -euo pipefail
+          echo "## FDA 본문 결손 — 2차(자동 회수 + handoff 재생성 후)" >> "$GITHUB_STEP_SUMMARY"
+          python fda_body_coverage.py check --brief "_scaffold2/brief_web_${UNDER}.json" \
+            --intake-event schedule --recovery-attempted \
+            --report-json coverage_2.json --summary-md "$GITHUB_STEP_SUMMARY" --issue-md issue.md \
+            | tee -a "$GITHUB_OUTPUT"
+
+      - name: 최종 판정
+        id: final
+        if: steps.check1.outputs.action != ''
+        env:
+          A1: ${{ steps.check1.outputs.action }}
+          A2: ${{ steps.check2.outputs.action }}
+          REC_DONE: ${{ steps.recover.outputs.done }}
+          HANDOFF: ${{ steps.handoff.outputs.handoff_status }}
+          REGEN_DONE: ${{ steps.regen.outputs.done }}
+        run: |
+          set -euo pipefail
+          # 2차가 있으면 2차가 정본. 없으면 1차 — 1차가 recover 였는데 재생성까지 못 갔으면
+          # 이번 주 스캐폴드는 결손 그대로이므로 경보다.
+          FINAL="${A2:-$A1}"
+          [ "$FINAL" = "recover" ] && FINAL=alert
+          echo "action=$FINAL" >> "$GITHUB_OUTPUT"
+          {
+            echo ""
+            echo "| 단계 | 결과 |"
+            echo "|---|---|"
+            echo "| 1차 판정 | \`${A1}\` |"
+            echo "| 자동 회수 | \`${REC_DONE:-n/a}\` |"
+            echo "| handoff 상태 | \`${HANDOFF:-n/a}\` |"
+            echo "| handoff·스캐폴드 재생성 | \`${REGEN_DONE:-n/a}\` |"
+            echo "| 2차 판정 | \`${A2:-n/a}\` |"
+            echo "| **최종** | \`${FINAL}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 경고 이슈 생성/갱신(최종 alert) · 해소 시 닫기
+        if: steps.final.outputs.action != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          FINAL: ${{ steps.final.outputs.action }}
+          RUN_DATE: ${{ steps.ctx.outputs.run_date }}
+          RID: ${{ steps.ctx.outputs.rid }}
+          REC_RUN: ${{ steps.recover.outputs.recovery_run }}
+          REGEN_RUN: ${{ steps.regen.outputs.regen_run }}
+          REASON: ${{ steps.check2.outputs.reason || steps.check1.outputs.reason }}
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM FDA 본문 결손 경고(발행 전 점검)';
+            const env = process.env;
+            const server = env.GITHUB_SERVER_URL;
+            const runUrl = `${server}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`;
+            const runLink = (id) => id ? `${server}/${env.GITHUB_REPOSITORY}/actions/runs/${id}` : 'n/a';
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner, repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'grm-fda-coverage', per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+
+            if (env.FINAL !== 'alert') {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: `✅ ${env.RUN_DATE} 점검에서 FDA 카드 본문 결손이 임계 미만입니다. 이슈를 닫습니다.\n\n${runUrl}` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+              }
+              return;
+            }
+
+            await ensureLabel('automation-warning', 'fbca04', 'GRM automation warning');
+            await ensureLabel('grm-fda-coverage', 'b60205', 'GRM pre-publish FDA body coverage gate');
+            const lines = fs.existsSync('issue.md') ? fs.readFileSync('issue.md', 'utf8').trim() : '';
+            const body = [
+              `이번 주(발행일 ${env.RUN_DATE}) 브리프 입력(스캐폴드)에 **본문·상세를 확보하지 못한 FDA 카드**가 임계 이상 남아 있습니다. 승인 전에 확인하세요 — 그대로 승인하면 이 카드들은 "본문 미확보" 묶음 카드로 발행됩니다.`,
+              '',
+              `- 최신 Run: ${runUrl}`,
+              `- 최신 Run date (KST): ${env.RUN_DATE}`,
+              '',
+              '현재 경고:',
+              lines,
+              '',
+              `판정 사유: ${env.REASON}`,
+              '',
+              '**자동 처리 내역**',
+              `- 점검한 수집 run: ${runLink(env.RID)}`,
+              `- 자동 회수 run: ${runLink(env.REC_RUN)}`,
+              `- handoff·스캐폴드 재생성 run: ${runLink(env.REGEN_RUN)}`,
+              '',
+              '확인할 것:',
+              '- 회수 run 리포트의 `no_text`(PDF 를 못 읽음) / `text_without_extraction`(본문은 있는데 관찰 0건 — **파서 문제**) 구분',
+              '- Routine 이 이미 돌았다면: 발행 PR 미리보기에서 묶음 카드 확인 → 필요 시 `grm-fda483-ocr-backfill.yml` 로 발행본 소급',
+              '- 수동 회수: `gh workflow run grm-fda483-ocr-recovery.yml -f apply=true -f mode=recoverable`',
+            ].join('\n');
+
+            if (!existing) {
+              await github.rest.issues.create({ owner, repo, title, body,
+                labels: ['automation-warning', 'grm-fda-coverage'], assignees: [owner] });
+              return;
+            }
+            await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+            await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+              body: `⚠️ ${env.RUN_DATE} 발행 전 점검: FDA 본문 결손 임계 초과\n\n${lines}\n\n${runUrl}` });

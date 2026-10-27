@@ -431,6 +431,20 @@ _FDA483_FOOTER_RE = re.compile(
     #   "OEPARTIIENT"로 깨져 위 마커가 실패). 이 토큰은 블록 맨 앞이라 더 이르게 자른다.
     #   대문자 고정 + 전 코퍼스 실측(137문서 중 46문서 112회) 결과 **전부 양식 라벨**이고
     #   산문 용례가 0이라 오탐면이 없다.
+    # [2026-10-27] 10-26 호 OCR 복구분에서 위 마커를 전부 빠져나간 서명블록 3종 — 게이트
+    #   (render._FOOTER_GARBAGE_RE)에도 같은 마커를 넣어 둘을 맞춘다. 발행분 실측 25관찰.
+    #   ① 전자서명 스탬프 "Muna Algharibeh -S Digitally signed by Muna Algharibeh -S Date: …"
+    #      — 스탬프 앞 서명자 이름(대문자 시작 토큰 ≤3개 + 선택적 `-S`)까지 함께 자른다.
+    #      대소문자 고정이라 앞 문장의 소문자 끝("For example:")에서 멈추고, 스탬프 형태(대문자
+    #      D + 뒤에 대문자 이름)만 잡아 산문 "…was digitally signed by the analyst" 는 오탐하지 않는다.
+    r"|(?-i:(?:[A-Z][A-Za-z.'\-]*\s+){0,3}(?:-S\s+)?Digitally\s+signed\s+by(?:\s*[A-Z]|\s*$))"
+    #   ② 양식 뒷면 법령 고지문 "The observations of objectionable conditions and practices
+    #      listed on the front of this form are reported: 1. Pursuant to Section 704(b)…"
+    r"|(?:The\s+)?observations\s+of\s+objectionable\s+conditions"
+    r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
+    #   ③ OCR 이 Y 를 V 로 읽은 EMPLOYEE(S) — "EMPLOVEE(S" (위 EMP..OY 마커가 OY 를 못 찾는다).
+    #      대문자 고정 — 산문의 "employees" 는 오탐하지 않는다.
+    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
     r"|\bDATE\s+ISSUED\b"
     r"|\bPAGE\s+\d+\s+OF\s+\d+\b"
     r"|\bAdd\s+Continuation\s+Page\b",           # Observation 별 연속페이지 마커(2026-07-12 실측)

@@ -92,6 +92,20 @@ class WebFda483PublishGateTest(unittest.TestCase):
         violations = render.validate_483_observations([_brief([card])])
         self.assertTrue(any("FOOTER_GARBAGE" in v for v in violations), violations)
 
+    def test_signature_stamp_and_notice_residue_raise_code(self):
+        """[2026-10-27] 전자서명 스탬프·704(b) 고지문·EMPLOVEE(S) — 종전 마커를 전부 빠져나가
+        발행분 25관찰에 실렸다. 산문 속 소문자 'digitally signed by the …' 는 통과."""
+        for detail in ("Specifically, real content. Muna Algharibeh -S Digitally signed by Muna",
+                       "Specifically, real content. The observations of objectionable conditions",
+                       "Specifically, real content for further processing EMPLOVEE(S)"):
+            with self.subTest(detail=detail[-30:]):
+                card = _card([_obs(1, detail=detail, detail_ko="번역문.")])
+                violations = render.validate_483_observations([_brief([card])])
+                self.assertTrue(any("FOOTER_GARBAGE" in v for v in violations), violations)
+        card = _card([_obs(1, detail="Specifically, the record was digitally signed by the analyst.",
+                           detail_ko="번역문.")])
+        self.assertEqual(render.validate_483_observations([_brief([card])]), [])
+
     def test_non_483_card_is_ignored(self):
         card = {
             "id": "wl-1",

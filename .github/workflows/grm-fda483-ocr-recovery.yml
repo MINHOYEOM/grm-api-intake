@@ -145,6 +145,19 @@ jobs:
         run: |
           python findings_supabase_backfill.py | tee m12_report.json
 
+      # [#1209] 주간 브리프는 Notion 의 미소비(New) 행에서 만들어진다. 위 회수는 Supabase 만
+      # 고치므로, 본문 없이 들어간 Notion 483 행의 raw 를 Supabase 의 본문 있는 raw 로 채운다
+      # (백필 페치가 먼저 받아 둔 문서 포함 — recovered=0 이어도 돌린다). 속성·Status 는 무접촉.
+      - name: Sync empty Notion 483 rows from Supabase (weekly brief input)
+        if: ${{ github.event_name == 'schedule' || inputs.apply }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: |
+          python fda483_notion_raw_sync.py --apply --report-path notion_sync_report.json
+
       - name: Write step summary
         if: always()
         env:
@@ -180,6 +193,13 @@ jobs:
             else
               echo "(M12 체인 미실행 — dry-run 이거나 recovered=0)"
             fi
+            echo ""
+            if [ -f notion_sync_report.json ]; then
+              echo "#### Notion 483 raw 동기화 리포트 (fda483_notion_raw_sync.py)"
+              echo '```json'
+              cat notion_sync_report.json
+              echo '```'
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload report artifact
@@ -190,5 +210,6 @@ jobs:
           path: |
             ocr_recovery_report.json
             m12_report.json
+            notion_sync_report.json
           retention-days: 30
           if-no-files-found: warn

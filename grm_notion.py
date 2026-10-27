@@ -589,7 +589,12 @@ def build_notion_properties(item: IntakeItem, run_date: date,
 
 def build_notion_children(item: IntakeItem) -> list[dict[str, Any]]:
     """페이지 본문에 raw API JSON 을 code block 으로 저장."""
-    raw_json = json.dumps(item.raw_payload, ensure_ascii=False, indent=2)
+    return build_raw_payload_children(item.raw_payload)
+
+
+def build_raw_payload_children(raw_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """raw dict → 'Raw API payload' 블록들(`grm_handoff.fetch_intake_raw_payload` 의 역)."""
+    raw_json = json.dumps(raw_payload, ensure_ascii=False, indent=2)
     blocks: list[dict[str, Any]] = [
         {
             "object": "block",

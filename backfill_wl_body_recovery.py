@@ -129,6 +129,8 @@ class WlBodyRecoveryReport:
     failure_reasons: dict[str, int] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
     samples: list[dict[str, Any]] = field(default_factory=list)
+    # --rebuild-body-start 에서 본문이 바뀐 행 전부의 길이 변화(apply 전 짧아지는 행을 가려낸다).
+    body_changes: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _default_sleep(seconds: float) -> None:
@@ -475,6 +477,10 @@ def run(
             continue
         violations = (getattr(item, "raw_payload", {}) or {}).get("wl_violations") or []
         report.recovered += 1
+        if rebuild_body_start:
+            report.body_changes.append({
+                "raw_signal_id": str(r.get("raw_signal_id") or ""),
+                "old_chars": len(old_full), "new_chars": len(full)})
         report.violations_recovered += len(violations)
         if len(report.samples) < _MAX_SAMPLES:
             report.samples.append({

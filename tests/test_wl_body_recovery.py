@@ -234,6 +234,10 @@ class RebuildBodyStartTest(unittest.TestCase):
         self.assertEqual(written["raw_json"], good["raw_json"])
         self.assertEqual(written["raw_signal_id"], good["raw_signal_id"])
         self.assertEqual(report.samples[0]["old_head"][:10], "violations")
+        self.assertEqual(report.body_changes, [{
+            "raw_signal_id": good["raw_signal_id"],
+            "old_chars": len("violations including, but not limited to, the following."),
+            "new_chars": len(json.loads(good["raw_json"])["wl_body_full"])}])
 
     def test_capitalised_row_is_not_a_candidate_unless_named(self):
         row, _good = self._row("During our inspection, something.")

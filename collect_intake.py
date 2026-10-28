@@ -2616,9 +2616,16 @@ def _extract_wl_body_span(html_text: str, max_chars: int) -> str:
             start = opening
     if start is None:
         return ""
+    head = _wl_sentence_start(text, start, opening or 0)
     moved = _skip_wl_leadin(text, start)
-    start = moved if moved != start else _wl_sentence_start(text, start, opening or 0)
-    return text[start:start + max_chars].strip()
+    if moved == start:
+        return text[head:head + max_chars].strip()
+    # [도입구만 잘라 내기 2026-10-28] 앵커 문장과 도입구 문장 사이의 실질 문장("We note that you
+    # continue to ship …"·등록 취소·회신 미수신)은 남기고 도입구 문장만 뺀다. 종전엔 앵커부터
+    # 도입구 끝까지 통째로 버려 06fdb805·568589dc 가 실질 문장을 잃었다(라이브 수집도 같음).
+    kept = text[head:_wl_leadin_sentence_start(text, start, head)].strip()
+    rest = text[moved:]
+    return ((kept + " " + rest) if kept else rest)[:max_chars].strip()
 
 
 # [본문 시작점 2026-10-28] 앵커는 **문장 안의 낱말**을 찾는다. 그 위치에서 자르면 본문이 문장
@@ -2677,6 +2684,17 @@ def _skip_wl_leadin(text: str, start: int) -> int:
     if len(text) - m.end() < _WL_LEADIN_MIN_TAIL:
         return start
     return m.end()
+
+
+def _wl_leadin_sentence_start(text: str, start: int, head: int) -> int:
+    """도입구가 든 문장의 첫머리(`head` 보다 앞으로는 가지 않는다).
+
+    문장 경계를 못 찾으면 `head` — 도입구 조각을 남기느니 앞 문장을 남기지 않는 쪽을 고른다."""
+    m = _WL_LEADIN_RE.search(text, start, start + _WL_LEADIN_MAX_OFFSET)
+    if not m:
+        return head
+    s = _wl_sentence_start(text, m.start(), head)
+    return head if s >= m.start() else s
 
 
 def _extract_wl_body_excerpt(html_text: str) -> str:

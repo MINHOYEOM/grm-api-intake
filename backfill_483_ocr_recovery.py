@@ -381,6 +381,49 @@ def _upsert_raw_signal(
     )
 
 
+def _patch_raw_json(
+    base_url: str, service_key: str, raw_signal_id: str, raw: dict[str, Any],
+    *, timeout: int = DEFAULT_TIMEOUT_SECONDS,
+) -> None:
+    """raw_json 한 칸만 제자리 교체(PATCH) — 재구성이 게이트에 드롭되는 행의 표식 갱신용."""
+    import requests
+    resp = requests.patch(
+        f"{base_url}/rest/v1/raw_signals",
+        params={"raw_signal_id": f"eq.{raw_signal_id}", "source": f"eq.{SOURCE_FDA_483}"},
+        headers={"apikey": service_key, "Authorization": f"Bearer {service_key}",
+                 "Content-Type": "application/json", "Prefer": "return=minimal"},
+        json={"raw_json": json.dumps(raw, ensure_ascii=False)},
+        timeout=timeout,
+    )
+    if resp.status_code >= 400:
+        raise RuntimeError(f"PATCH HTTP {resp.status_code}")
+
+
+def _mark_out_of_scope_in_place(
+    report: OcrRecoveryReport,
+    rid: str,
+    raw: dict[str, Any],
+    *,
+    label: str,
+    base: str,
+    service_key: str,
+    dry_run: bool,
+    patch_fn: Callable[[str, str, str, dict[str, Any]], None],
+) -> None:
+    """시설 유형으로 범위 밖인 행의 표식을 `out-of-scope` 로 — 다른 키는 그대로 둔다."""
+    if dry_run:
+        report.status_resolved += 1
+        return
+    try:
+        patch_fn(base, service_key, rid, {**raw, "fda483_text_status": OUT_OF_SCOPE_STATUS})
+    except Exception as exc:  # noqa: BLE001
+        report.failed += 1
+        _bump(report, f"patch_failed:{type(exc).__name__}")
+        report.errors.append(f"{label}: patch_failed:{type(exc).__name__}")
+        return
+    report.status_resolved += 1
+
+
 def _is_definitive_empty(status: str) -> bool:
     """다시 읽은 결과가 "이 문서는 본문이 없다"는 **확정** 사유인가.
 
@@ -501,6 +544,7 @@ def run(
     fetch_text: Callable[[str], tuple[str, str]] | None = None,
     rebuild_item: Callable[..., Any] | None = None,
     upsert_raw_signal: Callable[..., tuple[int, list[dict[str, Any]] | None, str]] | None = None,
+    patch_raw_json: Callable[[str, str, str, dict[str, Any]], None] | None = None,
     sleeper: Sleeper | None = None,
 ) -> tuple[OcrRecoveryReport, int]:
     """지연 바인딩 설계(collect_eu_ncr_backfill.run·backfill_483_inspectors.run 과 동일):
@@ -509,6 +553,7 @@ def run(
     text_fn = fetch_text or _fetch_text
     rebuild_fn = rebuild_item or _rebuild_item
     upsert_fn = upsert_raw_signal or _upsert_raw_signal
+    patch_fn = patch_raw_json or _patch_raw_json
     sleep_fn = sleeper or _default_sleep
 
     report = OcrRecoveryReport(
@@ -566,6 +611,14 @@ def run(
         if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE) and \
                 is_out_of_scope_483_establishment(str(raw.get("establishment_type") or "")):
             report.skipped_out_of_scope_type += 1
+            # ★[2026-10-28] 받지 않고 넘기기만 하면 상한 표식이 그대로 남아 추출 격차 감시
+            #   (`extraction_gap_by_source`)가 이 행을 결손으로 센다. 재구성은 게이트가 드롭하므로
+            #   표식만 `out-of-scope` 로 제자리 PATCH 한다(PDF fetch 없음 · 다른 키 불변).
+            if str(raw.get("fda483_text_status") or "") != OUT_OF_SCOPE_STATUS:
+                _mark_out_of_scope_in_place(
+                    report, rid, raw, label=label, base=base, service_key=service_key,
+                    dry_run=dry_run, patch_fn=patch_fn,
+                )
             continue
 
         report.attempted += 1

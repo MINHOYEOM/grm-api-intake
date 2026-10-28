@@ -251,11 +251,20 @@ _FDA483_DRUG_TEXT_RE = re.compile(
     r"|\bmedia\s+fill", re.I)
 
 
+def is_pharma_establishment_483(establishment_type: str) -> bool:
+    """시설 유형만으로 범위 안(의약품·생물의약품)이 확정되는가(순수 함수).
+
+    참이면 `is_out_of_scope_483` 는 본문과 무관하게 False 다. 그래서 이런 문서가 다른 경로에서
+    '범위 밖'으로 찍혀 있으면 범위 규칙이 아니라 다른 게이트(관련성 키워드 등)가 판정한 것이다."""
+    est = establishment_type or ""
+    return (not is_out_of_scope_483_establishment(est)) and bool(_FDA483_PHARMA_GUARD_RE.search(est))
+
+
 def is_out_of_scope_483(establishment_type: str, text: str = "") -> bool:
     """FDA 483 이 브리프 범위 밖인가 — 시설 유형, 그다음 (유형에 의약품 단서가 없을 때) 관찰 본문."""
     if is_out_of_scope_483_establishment(establishment_type):
         return True
-    if _FDA483_PHARMA_GUARD_RE.search(establishment_type or ""):
+    if is_pharma_establishment_483(establishment_type):
         return False
     body = text or ""
     non_pharma = _FDA483_DEVICE_TEXT_RE.search(body) or _FDA483_FOOD_TEXT_RE.search(body)

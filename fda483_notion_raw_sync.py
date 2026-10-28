@@ -24,6 +24,21 @@ Status=New 인 FDA 483 Notion 행마다:
   2. 같은 document_id 의 Supabase raw_signals.raw_json 을 읽어 본문이 **있을 때만** 교체한다.
      Supabase 쪽도 비었으면 손대지 않는다(빈손을 빈손으로 덮지 않는다).
   3. 페이지 children 을 Supabase raw 로 교체한다. Status·Handoff Ref 등 속성은 건드리지 않는다.
+  4. 단, 회수가 다시 읽어 **범위 밖**(기기·식품 등)으로 확정한 문서(Supabase
+     `fda483_text_status == out-of-scope`, #1228)는 raw 를 채울 본문이 없다. 그대로 두면 다음
+     주 스캐폴드가 "관찰 본문 미확보" 묶음 카드에 넣는다(10-26 호 범위 밖 7건 — 조립의
+     범위 밖 필터는 시설 유형·관찰 본문으로 판정하는데 둘 다 없다). 그런 행은 **Status 만
+     Skipped 로 마감**한다 — 수집기가 처음부터 범위 밖으로 버린 문서와 같은 결과다(Notion
+     Status=New 조회에서 빠져 handoff·스캐폴드·조립 어디에도 들어가지 않는다).
+     ★단 시설 유형에 의약품 단서가 있으면(`is_pharma_establishment_483` — "Drug Manufacturer"·
+     "Producer of Sterile … Drug Products") 마감하지 않고 세기만 한다. 범위 규칙
+     (`is_out_of_scope_483`)은 그런 문서를 범위 밖으로 보지 않으므로, 표식은 다른 게이트가 낸
+     것이고 오판일 수 있다(2026-10-28 실측: OCR 본문의 483 양식 상용구 "Federal Food, Drug,
+     and Cosmetic Act" 가 관련성 게이트의 'cosmetic' 제외어에 걸려 Corixa·Victory Medical
+     Center Pharmacy 가 범위 밖으로 찍혔다). 되돌릴 수 없는 마감은 확실한 쪽에만 쓴다 —
+     남긴 행은 종전처럼 묶음 카드에 들어간다(퇴행 없음).
+     Skipped 는 종결 상태라 멱등성 v2 의 revert·reconcile(Status=New 만 대상)이 되살리지
+     않고, Routine 은 handoff 에 실린 행만 갱신하므로 계약이 겹치지 않는다.
 
 Notion 행이 소비(Status≠New)된 뒤에는 대상이 아니다 — 이미 발행된 주는 발행본 소급 수리
 (`grm-fda483-ocr-backfill.yml`) 경로다.
@@ -52,6 +67,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import findings_supabase_backfill as fsb
+from backfill_483_ocr_recovery import OUT_OF_SCOPE_STATUS
 from card_scaffold import _has_source_body
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
@@ -59,10 +75,14 @@ from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, log
 from grm_handoff import fetch_intake_raw_payload, notion_query_new_intake_rows
 from grm_notion import (
     NOTION_BLOCK_CHILDREN_URL_TPL,
+    NOTION_PAGE_URL_TPL,
+    PROP_STATUS,
     NotionHandoffError,
+    _select,
     build_raw_payload_children,
     notion_api_request,
 )
+from grm_taxonomy import is_pharma_establishment_483
 
 SCHEMA_VERSION = "grm-483-notion-raw-sync/v2"
 
@@ -100,6 +120,8 @@ class NotionRawSyncReport:
     supabase_missing: int = 0           # 같은 document_id 의 Supabase 행 없음
     supabase_also_empty: int = 0        # Supabase 도 본문 없음 — 회수 대기
     synced: int = 0                     # Notion children 교체(dry-run=교체 예정)
+    skipped_out_of_scope: int = 0       # 483 범위 밖 확정 → Status=Skipped 마감(dry-run=예정)
+    out_of_scope_kept_pharma: int = 0   # 483 범위 밖 표식이나 시설 유형이 의약품 — 마감 보류(오판 의심)
     observations_synced: int = 0        # 교체로 생긴 관찰(483)·위반 표제(WL) 수(브리프 카드 규모)
     failed: int = 0
     errors: list[str] = field(default_factory=list)
@@ -161,6 +183,13 @@ def _replace_page_raw(token: str, page_id: str, raw: dict[str, Any]) -> None:
         time.sleep(_NOTION_SLEEP_SECONDS)
 
 
+def _mark_row_skipped(token: str, page_id: str) -> None:
+    """행의 Status 한 속성만 Skipped 로 — raw(children)·Handoff Ref 는 건드리지 않는다."""
+    notion_api_request("PATCH", NOTION_PAGE_URL_TPL.format(page_id=page_id), token,
+                       body={"properties": {PROP_STATUS: _select("Skipped")}})
+    time.sleep(_NOTION_SLEEP_SECONDS)
+
+
 def run(
     *,
     notion_token: str,
@@ -175,11 +204,13 @@ def run(
     fetch_notion_raw: Callable[[str, str], dict[str, Any] | None] | None = None,
     fetch_supabase_raw: Callable[..., dict[str, dict[str, Any]]] | None = None,
     replace_page_raw: Callable[[str, str, dict[str, Any]], None] | None = None,
+    mark_row_skipped: Callable[[str, str], None] | None = None,
 ) -> tuple[NotionRawSyncReport, int]:
     query_fn = query_rows or notion_query_new_intake_rows
     notion_raw_fn = fetch_notion_raw or fetch_intake_raw_payload
     supa_fn = fetch_supabase_raw or _fetch_supabase_raw
     replace_fn = replace_page_raw or _replace_page_raw
+    skip_fn = mark_row_skipped or _mark_row_skipped
     spec = SOURCE_SPECS[source_key]
     source = spec["source"]
     has_body = spec["has_body"]
@@ -229,7 +260,29 @@ def run(
             report.supabase_missing += 1
             continue
         if not has_body(raw):
-            report.supabase_also_empty += 1
+            if (source != SOURCE_FDA_483
+                    or str(raw.get("fda483_text_status") or "") != OUT_OF_SCOPE_STATUS):
+                report.supabase_also_empty += 1
+                continue
+            if is_pharma_establishment_483(str(raw.get("establishment_type") or "")):
+                report.out_of_scope_kept_pharma += 1
+                if len(report.samples) < 20:
+                    report.samples.append({"document_id": doc_id, "page_id": page_id,
+                                           "action": "out_of_scope_kept_pharma",
+                                           "establishment_type": raw.get("establishment_type")})
+                continue
+            if not dry_run:
+                try:
+                    skip_fn(notion_token, page_id)
+                except (NotionHandoffError, RuntimeError) as exc:
+                    report.failed += 1
+                    report.errors.append(f"{doc_id}: skip_failed: {exc}")
+                    log("WARN", f"Notion 범위 밖 483 Skipped 실패 {doc_id} page={page_id}: {exc}")
+                    continue
+            report.skipped_out_of_scope += 1
+            if len(report.samples) < 20:
+                report.samples.append({"document_id": doc_id, "page_id": page_id,
+                                       "action": "skipped_out_of_scope"})
             continue
         observations = raw.get(spec["items_key"]) or []
         if len(report.samples) < 20:
@@ -248,6 +301,8 @@ def run(
 
     head = "[DRY] 교체 예정" if dry_run else "교체 완료"
     log("INFO", f"Notion {source} raw 동기화 {head} {report.synced}건(관찰 {report.observations_synced}건) "
+                f"· 범위 밖 Skipped {report.skipped_out_of_scope}"
+                f"(의약품 유형 보류 {report.out_of_scope_kept_pharma}) "
                 f"· 대상 {report.candidates}/New {report.new_rows} "
                 f"· Supabase 도 빈손 {report.supabase_also_empty} · Supabase 없음 "
                 f"{report.supabase_missing} · 실패 {report.failed}")

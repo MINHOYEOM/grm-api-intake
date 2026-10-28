@@ -16,6 +16,8 @@ from grm_notion import NotionHandoffError, build_raw_payload_children  # noqa: E
 
 _EMPTY = {"media_id": "195591", "firm": "Axogen Corporation",
           "fda483_text_status": "not-attempted"}
+_OUT_OF_SCOPE = {"media_id": "195591", "firm": "Krispy Kreme Doughnut Corporation",
+                 "establishment_type": "Manufacturer", "fda483_text_status": "out-of-scope"}
 _FULL = {"media_id": "195591", "firm": "Axogen Corporation",
          "fda483_excerpt": "OBSERVATION 1 Procedures were not followed.",
          "fda_483_observations": [{"number": "1", "deficiency": "Procedures were not followed."},
@@ -27,11 +29,12 @@ def _row(doc_id: str = "fda483-195591", page_id: str = "page-1") -> dict:
 
 
 def _run(*, rows=None, notion_raw=None, supa=None, dry_run=False, replace=None,
-         source_key="fda483"):
+         source_key="fda483", skip=None):
     rows = [_row()] if rows is None else rows
     notion_raw = notion_raw if notion_raw is not None else {"page-1": _EMPTY}
     supa = supa if supa is not None else {"fda483-195591": _FULL}
     replace = replace or mock.MagicMock()
+    skip = skip or mock.MagicMock()
     seen_query = {}
     seen_supa_source = []
 
@@ -47,8 +50,10 @@ def _run(*, rows=None, notion_raw=None, supa=None, dry_run=False, replace=None,
         fetch_supabase_raw=lambda base, key, ids, source: (
             seen_supa_source.append(source) or {i: supa[i] for i in ids if i in supa}),
         replace_page_raw=replace,
+        mark_row_skipped=skip,
         source_key=source_key,
     )
+    _run.skip = skip
     seen_query["_supa_source"] = seen_supa_source
     return report, code, replace, seen_query
 
@@ -82,6 +87,59 @@ class NotionRawSyncTest(unittest.TestCase):
         self.assertEqual(report.synced, 0)
         replace.assert_not_called()
 
+    def test_out_of_scope_row_is_closed_as_skipped(self):
+        """회수가 범위 밖으로 확정한 문서는 Notion 행을 Skipped 로 마감한다(#1228 후속).
+
+        본문 없는 New 행으로 남으면 다음 주 스캐폴드가 '관찰 본문 미확보' 묶음 카드에 넣는다
+        (10-26 호 범위 밖 7건). Skipped 면 Status=New 조회에서 빠져 handoff·스캐폴드·조립
+        어디에도 들어가지 않는다 — 수집기가 처음부터 범위 밖으로 버린 문서와 같은 결과다."""
+        report, code, replace, _q = _run(supa={"fda483-195591": _OUT_OF_SCOPE})
+        self.assertEqual(code, 0)
+        self.assertEqual(report.skipped_out_of_scope, 1)
+        self.assertEqual(report.supabase_also_empty, 0)
+        self.assertEqual(report.synced, 0)
+        _run.skip.assert_called_once_with("t", "page-1")
+        replace.assert_not_called()   # raw 는 그대로 — Status 만 바꾼다
+        self.assertEqual(report.samples[0]["action"], "skipped_out_of_scope")
+
+    def test_out_of_scope_marker_on_drug_establishment_is_not_closed(self):
+        """[2026-10-28 실측] 시설 유형이 의약품인데 범위 밖으로 찍힌 문서(Victory Medical Center
+        Pharmacy 등)는 Skipped 로 마감하지 않는다 — 범위 규칙은 그런 문서를 범위 밖으로 보지
+        않으므로 표식이 오판일 수 있다. 종전처럼 New 로 남아 묶음 카드에 들어간다."""
+        oos_drug = dict(_OUT_OF_SCOPE, firm="Victory Medical Center Pharmacy",
+                        establishment_type="Producer of Sterile and Non Sterile Drug Products")
+        report, _code, replace, _q = _run(supa={"fda483-195591": oos_drug})
+        self.assertEqual(report.skipped_out_of_scope, 0)
+        self.assertEqual(report.out_of_scope_kept_pharma, 1)
+        _run.skip.assert_not_called()
+        replace.assert_not_called()
+
+    def test_out_of_scope_marker_on_device_establishment_is_closed(self):
+        oos_dev = dict(_OUT_OF_SCOPE, establishment_type="Software Manufacturer")
+        report, _code, _replace, _q = _run(supa={"fda483-195591": oos_dev})
+        self.assertEqual(report.skipped_out_of_scope, 1)
+        _run.skip.assert_called_once_with("t", "page-1")
+
+    def test_out_of_scope_dry_run_does_not_write(self):
+        report, _code, replace, _q = _run(supa={"fda483-195591": _OUT_OF_SCOPE}, dry_run=True)
+        self.assertEqual(report.skipped_out_of_scope, 1)
+        _run.skip.assert_not_called()
+        replace.assert_not_called()
+
+    def test_out_of_scope_skip_failure_is_counted(self):
+        boom = mock.MagicMock(side_effect=NotionHandoffError("Notion API 500"))
+        report, code, _replace, _q = _run(supa={"fda483-195591": _OUT_OF_SCOPE}, skip=boom)
+        self.assertEqual(report.failed, 1)
+        self.assertEqual(report.skipped_out_of_scope, 0)
+        self.assertEqual(code, 1)
+
+    def test_out_of_scope_with_body_in_notion_is_left_alone(self):
+        """Notion 에 이미 본문이 있으면(사람이 고친 행 등) 판정 대상이 아니다 — 종전 규칙 그대로."""
+        report, _code, _replace, _q = _run(notion_raw={"page-1": _FULL},
+                                           supa={"fda483-195591": _OUT_OF_SCOPE})
+        self.assertEqual(report.skipped_out_of_scope, 0)
+        _run.skip.assert_not_called()
+
     def test_unreadable_notion_raw_is_not_touched(self):
         report, _code, replace, _q = _run(notion_raw={})
         self.assertEqual(report.notion_raw_unreadable, 1)
@@ -105,6 +163,37 @@ class NotionRawSyncTest(unittest.TestCase):
             dry_run=True, run_date=date(2026, 10, 27), query_rows=lambda *a, **k: [])
         self.assertEqual(code, 2)
         self.assertTrue(report.errors)
+
+
+class PharmaEstablishmentTest(unittest.TestCase):
+    """`is_pharma_establishment_483` 가 참이면 범위 규칙은 본문과 무관하게 범위 안이다."""
+
+    def test_cases(self):
+        from grm_taxonomy import is_out_of_scope_483, is_pharma_establishment_483
+        for est in ("Drug Manufacturer", "Producer of Sterile and Non Sterile Drug Products",
+                    "Biologics & Medical Device Manufacturer"):
+            self.assertTrue(is_pharma_establishment_483(est), est)
+            self.assertFalse(is_out_of_scope_483(est, "21 CFR 820.30 design controls"), est)
+        for est in ("Manufacturer", "Software Manufacturer", "Contract Sterilizer", "",
+                    "Blood Bank Drug Manufacturer"):
+            self.assertFalse(is_pharma_establishment_483(est), est)
+
+
+class MarkRowSkippedTest(unittest.TestCase):
+    """Skipped 마감은 그 행의 Status 한 속성만 PATCH 한다(Handoff Ref·raw 무접촉)."""
+
+    def test_patches_only_status(self):
+        calls = []
+
+        def fake_request(method, url, token, body=None, retries=2):
+            calls.append((method, url, body))
+            return {}
+
+        with mock.patch.object(sync, "notion_api_request", fake_request), \
+                mock.patch.object(sync.time, "sleep", lambda s: None):
+            sync._mark_row_skipped("t", "page-1")
+        self.assertEqual(calls, [("PATCH", "https://api.notion.com/v1/pages/page-1",
+                                  {"properties": {"Status": {"select": {"name": "Skipped"}}}})])
 
 
 class ReplacePageRawTest(unittest.TestCase):

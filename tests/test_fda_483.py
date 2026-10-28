@@ -3358,3 +3358,18 @@ class Fda483FullPageOcrFallbackTest(unittest.TestCase):
         ok = [{"number": n, "deficiency": "x", "detail": ""} for n in ("9", "10", "11")]
         self.assertEqual([r["number"] for r in f._repair_ocr_leading_digit(ok)],
                          ["9", "10", "11"])
+
+    def test_line_head_heading_with_trailing_dot(self):
+        """줄 머리 `Observation 1. There is…`(116184) — 번호 뒤 마침표를 상호참조로 오인하지 않는다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED:\n"
+                "Observation 1. There is an unacceptably high number of mold recoveries in the "
+                "classified rooms.\nObservation 2. Written procedures to prevent contamination of "
+                "drug substance are not followed.\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertTrue(rows[0]["deficiency"].startswith("There is an unacceptably"))
+        # 줄 중간 상호참조 뒤 마침표는 종전대로 표제가 아니다.
+        xref = ("OBSERVATION 1\nThe cleaning procedure was not followed, as noted in "
+                "Observation 2. The quality unit did not review it.\n")
+        self.assertEqual([r["number"] for r in f._extract_483_observations_from_text(xref)],
+                         ["1"])

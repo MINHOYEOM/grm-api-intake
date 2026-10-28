@@ -1778,6 +1778,15 @@ def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:
     }
 
 
+# 줄 머리 표제가 `Observation 1. There is…` 처럼 번호 뒤 마침표로 끝나는 꼴(실측 116184).
+# 상호참조("…refer to Observation 3.")는 줄 중간에 오므로 줄 머리일 때만 마침표를 걷는다.
+_LINE_HEAD_DOT_RE = re.compile(r"\.[ \t]+(?-i:[A-Z])")
+
+
+def _at_line_start(body: str, pos: int) -> bool:
+    return not body[max(0, body.rfind("\n", 0, pos) + 1):pos].strip()
+
+
 def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list[re.Match[str]]:
     """`OBSERVATION N` 매치 중 **진짜 항목 표제**만 남긴다(순수 함수).
 
@@ -1819,7 +1828,10 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
         if _XREF_PREFIX_RE.search(before) and not _XREF_FORMPRINT_RE.search(before):
             continue                                   # ① 문장 속 상호참조
         nxt = matches[i + 1].start() if i + 1 < len(matches) else len(body)
-        head, _ = _first_sentence(body[m.end():nxt].lstrip(" :\t\r\n"))
+        after = body[m.end():nxt]
+        if _LINE_HEAD_DOT_RE.match(after) and _at_line_start(body, m.start()):
+            after = after.lstrip(" .")             # 줄 머리 `Observation 1. There is…` 꼴
+        head, _ = _first_sentence(after.lstrip(" :\t\r\n"))
         if len(re.sub(r"[^A-Za-z]", "", head)) < _HEADING_MIN_ALPHA:
             continue                                   # ② 뒤따르는 실질 문장 없음
         first_alpha = next((c for c in head if c.isalpha()), "")
@@ -1942,7 +1954,10 @@ def _observations_from_anchors(
     for i, obs in enumerate(matches):
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
-        chunk = _clean_observation_chunk(_skip_pagebreak_block(body[start:end]))
+        seg = body[start:end]
+        if _LINE_HEAD_DOT_RE.match(seg) and _at_line_start(body, obs.start()):
+            seg = seg.lstrip(" .")                 # 줄 머리 `Observation 1. There is…` 꼴
+        chunk = _clean_observation_chunk(_skip_pagebreak_block(seg))
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
         # [표제 선행 잡음] **모든 경로**에 적용한다(회수 경로 전용 게이트와 달리) — OCR 로

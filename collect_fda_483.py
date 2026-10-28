@@ -1456,11 +1456,18 @@ def _deficiency_garble(text: str) -> tuple[int, float]:
       사실상 0이라 **절대 건수**로 봐야 한다 — 비율로 보면 긴 문장에서 희석돼(1/40=0.025)
       기각되지 않는다(실측으로 확인한 실패). 반면 한 글자 조각("Eac h batc h")은 정상
       문장에도 드물게 나오므로 비율로 본다.
+    ★표제 **끝**의 `!` 하나는 기호로 세지 않는다. 표제는 `_first_sentence` 가 `.!?` 에서 자른
+      것이라 마지막 `!` 는 그 함수가 고른 문장 끝 부호다. 리댁션 상자 테두리가 `!` 로 읽혀
+      표제가 거기서 끊기면 단어 속 기호 1개로 기각돼 관찰이 통째로 사라졌다(실측
+      fda483-195490: "…did not extend into the review ofthe! (b)(4) …"). 끝 하나만 빼므로
+      `th:1!!!!l!!!Isolators` 같은 단어 속 깨짐은 그대로 잡힌다.
     """
     cleaned = _strip_redaction_markers(text)
     tokens = [t for t in re.split(r"\s+", cleaned.strip()) if t]
     if not tokens:
         return (0, 1.0)
+    if re.search(r"[A-Za-z]!$", tokens[-1]):
+        tokens[-1] = tokens[-1][:-1]
     symbols = 0
     fragments = 0
     for tok in tokens:

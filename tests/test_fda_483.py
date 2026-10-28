@@ -2262,6 +2262,26 @@ class Fda483ObservationRecoveryTest(unittest.TestCase):
         self.assertEqual(f._deficiency_garble(long_clean + " ass~re")[0], 1)
         self.assertFalse(f._is_recovered_deficiency_publishable(long_clean + " ass~re"))
 
+    def test_terminal_bang_before_redaction_is_sentence_end_not_garble(self):
+        """실측 fda483-195490: 리댁션 상자 테두리가 `!` 로 읽혀 표제가 `ofthe!` 에서 끊겼고,
+        회수 게이트가 그 `!` 를 단어 속 기호로 세어 유일한 관찰을 버렸다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM I) (EfOBSERVED OBSERVATION | The investigation "
+                "into the out of specification test result and the corresponding manufacturing "
+                "investigation w inadequate in that the investigation did not extend into the "
+                "review ofthe! (6) (4) Sanitization of th Specifically, Laboratory investigation "
+                "#0202-001 and deviation DEV-00031 were initiated on 2 é S endotoxin result. "
+                "EMPLOYEE(S) SIGNATURE EMPLOYEE(S) NAME AND TITLE (Print orType) DATE ISSUED "
+                "FORM FDA 483 (9/08) PREVIOUS EDITION OBSOLETE INSPECTIONAL OBSERVATIONS Page 1 of 1")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["number"], "1")
+        self.assertTrue(rows[0]["deficiency"].startswith("The investigation into the out of specification"))
+        # 끝 하나만 뺀다 — 단어 속·연속 `!` 는 여전히 깨짐이다.
+        self.assertEqual(f._deficiency_garble("the review ofthe!")[0], 0)
+        self.assertEqual(f._deficiency_garble("perfonned for th:1!!!!l!!!Isolators")[0], 1)
+        self.assertEqual(f._deficiency_garble("the contro!unit was not qualified")[0], 1)
+        self.assertEqual(f._deficiency_garble("the contro! unit was not qualified")[0], 1)
+
     def test_redaction_stripper_is_pure(self):
         self.assertNotIn("Redacted", f._strip_redaction_markers("a <Redacted B4> b"))
         self.assertNotIn("(b) (4)", f._strip_redaction_markers("a (b) (4) b"))

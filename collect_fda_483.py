@@ -42,6 +42,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
+import subprocess
 import time
 from datetime import date
 from html import unescape as _html_unescape
@@ -151,6 +153,9 @@ FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
 # 만들어내지 못한다(업스케일은 정보를 늘리지 않는다).
 FDA483_OCR_DPI = min(max(_env_int("FDA483_OCR_DPI", 300), 72), 600)
 FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 은 10쪽 내외
+# [CLI 판독 2026-10-28] 관찰 0건 문서의 전면 재판독(`_full_ocr_fallback`)은 tesseract **CLI** 로
+# 쪽을 읽는다. 쪽당 상한 — 멈춘 프로세스가 잡을 붙잡지 않게.
+FDA483_REOCR_PAGE_TIMEOUT = 120
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
 # [2026-10-27] 식품 실사(FD&C Act **805**조) 양식의 고지문은 "conditions" 가 아니라
@@ -295,7 +300,8 @@ def _pdf_caps(burst: bool) -> tuple[int, int]:
 #
 # `engine_reason` 은 첫 실패 사유만 보관한다 — 전건이 같은 원인이므로 목록은 잡음이다.
 _OCR_HEALTH: dict[str, Any] = {"ok": 0, "engine_unavailable": 0, "engine_reason": "",
-                               "budget_skipped": 0, "empty": 0}
+                               "budget_skipped": 0, "empty": 0,
+                               "reocr_tried": 0, "reocr_adopted": 0}
 
 # 엔진 부재를 뜻하는 status 접두사 — 이 판정을 문자열 비교로 흩뿌리지 않는다(백필 경로도 쓴다).
 _OCR_ENGINE_UNAVAILABLE_PREFIX = "scan-ocr-unavailable"
@@ -314,7 +320,8 @@ def is_ocr_engine_unavailable(status: str) -> bool:
 def reset_ocr_health() -> None:
     """OCR 관측 카운터를 실행 시작 상태로 되돌린다(collect_fda_483·백필 진입점이 호출)."""
     _OCR_HEALTH.update({"ok": 0, "engine_unavailable": 0, "engine_reason": "",
-                        "budget_skipped": 0, "empty": 0})
+                        "budget_skipped": 0, "empty": 0,
+                        "reocr_tried": 0, "reocr_adopted": 0})
 
 
 def ocr_health() -> dict[str, Any]:
@@ -328,6 +335,8 @@ def ocr_health() -> dict[str, Any]:
         "engine_reason": _OCR_HEALTH["engine_reason"],
         "budget_skipped": _OCR_HEALTH["budget_skipped"],
         "empty": _OCR_HEALTH["empty"],
+        "reocr_tried": _OCR_HEALTH["reocr_tried"],
+        "reocr_adopted": _OCR_HEALTH["reocr_adopted"],
     }
 
 
@@ -1048,15 +1057,10 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     #     오버레이 글자만 남은 PDF(106455·111291·161809 …) — 글자가 충분해 OCR 이 안 돈다.
     #   · 스캔본에 접근성 대체문구("redacted text"·"FDA Form page 2")나 깨진 내장 OCR 층만
     #     있는 PDF(102220·102644·162340 …) — 역시 "본문 있음"으로 통과한다.
-    # 두 경우 모두 **쪽 전체를 렌더링해 OCR** 하면 관찰이 나온다. 그 결과로 관찰이 1건 이상
-    # 나올 때만 채택하고, 아니면 원래 텍스트를 그대로 돌려준다 — 지금 관찰이 나오는 문서는
+    # 두 경우 모두 **쪽 전체를 렌더링해 OCR** 하면 관찰이 나온다(`_full_ocr_fallback`). 그 결과로
+    # 관찰이 1건 이상 나올 때만 채택하고, 아니면 원래 텍스트를 그대로 돌려준다 — 지금 관찰이 나오는 문서는
     # 이 분기에 오지 않으므로 출력이 바뀌지 않는다(제어 흐름의 성질).
-    full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
-    full_text = normalize_pdf_ligatures(full_text)
-    if full_text and _extract_483_observations_from_text(full_text):
-        _record_ocr_outcome(full_status)
-        return full_text, full_status
-    return text, status
+    return _full_ocr_fallback(data, text, status, max_chars)
 
 
 def _read_fda483_pdf_text(
@@ -1230,6 +1234,108 @@ def _ensure_tessdata_prefix() -> None:
         found = _tessdata_dir()
         if found:
             os.environ["TESSDATA_PREFIX"] = found
+
+
+def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+    """본문은 있는데 관찰 0건 → 모든 쪽을 렌더링해 다시 판독, 관찰이 나올 때만 채택한다.
+
+    `_fetch_fda483_pdf_text` 의 마지막 단계(호출부가 "본문 있음·관찰 0건·OCR on"을 보장한다).
+    지금 관찰이 나오는 문서는 여기 오지 않으므로 출력이 바뀌지 않는다. 관찰이 안 나오면 입력을
+    그대로 돌려준다(산출을 줄이지 않는다).
+
+    ★엔진은 apt `tesseract` **CLI** 가 우선이고, CLI 가 없을 때만 PyMuPDF 내장 엔진
+      (`_ocr_483_pdf_text_uncounted(force_all=True)`, #1235 의 원래 경로)으로 같은 일을 한다.
+      [2026-10-28 벤치마크 — docs/specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md] findings
+      0건·본문 있음 47건을 수집 경로 그대로 재현했다. 같은 fast 모델·같은 DPI·같은 쪽수(159쪽)
+      에서 CLI 는 28문서·관찰 92개, 내장 엔진은 26문서·87개를 냈다. 내장 엔진이 회수한 문서를
+      CLI 가 잃은 것은 0건이고, 시간은 18% 짧았다(578s → 475s). 내장 경로는 페이지를 텍스트층으로
+      재구성하며 단어 사이 공백을 자주 잃는다("ofthe"·"ofdrug") — 표제·번역·검색 품질에 직결된다.
+    ★두 엔진을 **연달아** 돌리지 않는다 — CLI 가 0건인 문서에 내장 엔진을 다시 돌려도 회수
+      문서가 늘지 않았고(벤치: CLI ⊇ 내장) 쪽 예산만 두 배로 쓴다.
+    """
+    _OCR_HEALTH["reocr_tried"] += 1
+    full_text, full_status = _reocr_483_pdf_text(data, max_chars)
+    if is_ocr_engine_unavailable(full_status):
+        full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
+    full_text = normalize_pdf_ligatures(full_text)
+    if full_text and _extract_483_observations_from_text(full_text):
+        _record_ocr_outcome(full_status)
+        _OCR_HEALTH["reocr_adopted"] += 1
+        return full_text, full_status
+    return text, status
+
+
+# tesseract CLI(fast)는 단어 끝 `l` 을 `!` 로 읽는 일이 잦다 — "quality contro! unit",
+# "Michae! R. Shanks", "settle plate near Stopper bow!". 관찰 파서의 `_first_sentence` 는 `!` 를
+# 문장 끝으로 보므로 표제가 거기서 잘린 채 공개 게이트를 통과했다(실측 191121 "…applicable to
+# the quality contro!", 161809 "…critical utility used for the!"). 483 산문에는 느낌표가 쓰이지
+# 않으므로, **글자 바로 뒤 `!` 다음에 소문자가 이어지는** 경우만(= 문장이 계속된다) 고친다:
+# 앞 단어가 기능어면 `!` 를 지우고("the! manufacturing"), 아니면 `l` 로 바꾼다. CLI 출력에만 건다.
+_CLI_BANG_RE = re.compile(r"([A-Za-z]+)!(?=\s*[a-z])")
+
+
+def _repair_cli_bang(text: str) -> str:
+    """CLI 판독 텍스트의 `l`→`!` 오독을 되돌린다(순수 함수)."""
+    def _fix(m: re.Match[str]) -> str:
+        word = m.group(1)
+        return word if word.lower() in _FUNCTION_WORDS else word + "l"
+    return _CLI_BANG_RE.sub(_fix, text or "")
+
+
+def _reocr_483_pdf_text(data: bytes, max_chars: int) -> tuple[str, str]:
+    """모든 쪽을 렌더링해 tesseract CLI 로 판독한다(텍스트층 무시). (text, status).
+
+    전면 OCR 폴백(`force_all`)과 같은 이유로 이미지 유무로 거르지 않는다 — 표제가 벡터 윤곽선인
+    쪽은 이미지가 아니다. `_ocr_483_pdf_text` 와 같은 OCR 페이지 예산(`_OCR_BUDGET`)·문서당
+    상한을 쓴다 — 벽시계를 지키는 장치는 하나여야 한다. 예산·상한 밖 쪽은 원래 텍스트층을 쓴다.
+
+    status: `pdf-ok-ocr` | `scan-ocr-budget` | `scan-ocr-unavailable:tesseract-cli` |
+            `scan-ocr-empty` | `pdf-encrypted` | `pdf-parse-fail:<Err>`
+    """
+    if _OCR_BUDGET["remaining"] <= 0:
+        return "", "scan-ocr-budget"
+    exe = shutil.which("tesseract")
+    if not exe:
+        return "", "scan-ocr-unavailable:tesseract-cli"
+    try:
+        import fitz  # type: ignore[import-not-found]
+    except ImportError:
+        return "", "scan-ocr-unavailable:pymupdf"
+    args = [exe, "stdin", "stdout", "-l", "eng", "--dpi", str(FDA483_OCR_DPI)]
+    tessdata = _tessdata_dir()
+    if tessdata:
+        args += ["--tessdata-dir", tessdata]
+    # apt tesseract 는 OpenMP 빌드다. 단일 스레드로 고정한다 — 다른 프로세스와 CPU 를 나눠
+    # 쓰는 러너에서 OpenMP 스레드가 경합하면 쪽당 수 초가 수 분으로 늘어난다(실측).
+    env = {**os.environ, "OMP_THREAD_LIMIT": os.environ.get("OMP_THREAD_LIMIT") or "1"}
+    try:
+        parts: list[str] = []
+        ocr_pages = 0
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            if doc.needs_pass or doc.is_encrypted:
+                return "", "pdf-encrypted"
+            for page in doc:
+                native = page.get_text("text")
+                if ocr_pages >= FDA483_OCR_MAX_PAGES or _OCR_BUDGET["remaining"] <= 0:
+                    parts.append(native)
+                    continue
+                ocr_pages += 1
+                _OCR_BUDGET["remaining"] -= 1
+                _OCR_BUDGET["used"] += 1
+                png = page.get_pixmap(dpi=FDA483_OCR_DPI, colorspace=fitz.csGRAY).tobytes("png")
+                proc = subprocess.run(args, input=png, capture_output=True, env=env,
+                                      timeout=FDA483_REOCR_PAGE_TIMEOUT, check=False)
+                ocr_native = _repair_cli_bang(proc.stdout.decode("utf-8", "replace"))
+                parts.append(ocr_native if ocr_native.strip() else native)
+    except Exception as e:  # noqa: BLE001 — 재판독 실패는 앞 단계 산출을 건드리지 않는다
+        return "", f"pdf-parse-fail:{type(e).__name__}"
+    if not ocr_pages:
+        return "", "scan-ocr-budget"
+    from collect_mfds_gmp_inspection import _normalize_extracted_text
+    text = _normalize_extracted_text("\n".join(parts))
+    if not text.strip():
+        return "", "scan-ocr-empty"
+    return text[:max_chars], "pdf-ok-ocr"
 
 
 def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:
@@ -2626,6 +2732,7 @@ def collect_fda_483(
                 f"{'(마감 도달)' if excerpt_health['burst_deadline_hit'] else ''} "
                 f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
                 f"예산초과={_OCR_HEALTH['budget_skipped']} "
+                f"전면재판독={_OCR_HEALTH['reocr_adopted']}/{_OCR_HEALTH['reocr_tried']} "
                 f"· observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "
                 f"extracted={observations_health['extracted']} "

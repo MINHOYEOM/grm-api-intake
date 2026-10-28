@@ -3258,9 +3258,13 @@ class Fda483FullPageOcrFallbackTest(unittest.TestCase):
         def _forced(data, max_chars, force_all=False):
             calls.append(force_all)
             return forced
+        # 전면 재판독은 tesseract CLI 가 우선이다(`_full_ocr_fallback`, CLI 경로는
+        # tests/test_fda483_ocr_second_chance.py). 여기서는 CLI 가 없는 러너의 내장 엔진 경로를 본다.
         with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 vector"), \
                 patch.object(g, "_extract_pdf_text",
                              lambda data, max_chars=None: (native, "pdf-ok")), \
+                patch.object(f, "_reocr_483_pdf_text",
+                             lambda data, max_chars: ("", "scan-ocr-unavailable:tesseract-cli")), \
                 patch.object(f, "_ocr_483_pdf_text_uncounted", _forced), \
                 patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
             text, status = f._fetch_fda483_pdf_text("https://x/media/1/download")

@@ -639,7 +639,7 @@ def _evaluate_health(
             "wl-body-full-degraded",
             "FDA WL",
             f"WL 본문 전문 {stats.wl_body_full_failed}건 확보 실패 — 위반항목 상세·심층분석 없이 "
-            "메타 카드로 적재(재수집 없음)",
+            "메타 카드로 적재(다음 날 예약 회수 grm-fda483-ocr-recovery · recover-wl 이 다시 받는다)",
             f"attempted={stats.wl_body_full_attempted} failed={stats.wl_body_full_failed}",
         )
     # [WL 목록 절단 2026-10-27] DataTables 전수 뷰가 죽어 정적 표(최신 10행)로 폴백했고, 그

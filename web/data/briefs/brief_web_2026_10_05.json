@@ -1405,8 +1405,8 @@
    "signal_label": "High",
    "type_tag": "CGMP",
    "headline_target": "Kellin Chemicals Co., Ltd. - Zhangjiagang",
-   "title_issue": "FDA 실사 지연·거부",
-   "summary": "FDA가 중국 Kellin Chemicals Co., Ltd. - Zhangjiagang에 경고서한을 발부했다. 소유자·운영자가 FDA 실사를 지연·거부·제한했다고 보고, 이 제조소에서 만든 의약품을 불량(adulterated)으로 판단했다.",
+   "title_issue": "사전 통보 FDA 실사 거부",
+   "summary": "FDA가 미국 시장용 완제의약품 제조사에 원료의약품을 공급하는 중국 Kellin Chemicals Co., Ltd. - Zhangjiagang에 경고서한을 발부했다. 2025년 7월 7~11일로 예정·통보된 실사를 회사가 거부해, FD&C Act 501(j)에 따라 이 제조소의 의약품을 불량(adulterated)으로 판단했다.",
    "facts": [
     {
      "label": "발행일",
@@ -1428,9 +1428,9 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "판단: 실사를 지연·거부·제한·거절한 제조소의 의약품은 불량(adulterated)에 해당",
-    "조치: 실사로 CGMP 준수가 확인될 때까지 해당 제조소를 기재한 신규 신청·변경 승인 보류 가능",
-    "조치: 미국 수입 시 801(a)(3)에 따른 억류·수입 거부 가능, 15영업일 내 서면 회신 요구",
+    "지적: 2025년 7월 7~11일 사전 통보된 실사를 거부(미국 대리인 Registrar Corp. 통해 통보)",
+    "판단: 실사를 지연·거부·제한·거절한 제조소의 의약품은 FD&C Act 501(j)에 따른 불량(adulterated)",
+    "조치: 실사로 CGMP 준수가 확인될 때까지 신규 신청·변경 승인 보류 가능, 801(a)(3)에 따른 억류·수입 거부 가능",
     "발행 부서/일자: Center for Drug Evaluation and Research (CDER) · 11/06/2025"
    ],
    "implication": "실사 지연·거부만으로 제조소 전체가 불량 판정을 받고 그 원료를 쓰는 완제 제조사까지 301(c) 위반 위험에 놓인다는 점이 드러난다. 해외 원료 공급처를 쓴다면 FDA 실사 수용 이력과 경고서한·수입경보 여부를 확인해 둘 필요가 있다.",
@@ -1452,13 +1452,13 @@
     }
    },
    "en": {
-    "title_issue": "FDA inspection delayed and refused",
-    "summary": "FDA issued a Warning Letter to Kellin Chemicals Co., Ltd. - Zhangjiagang in China, finding that the owner or operator delayed, denied, limited or refused an FDA inspection and that drugs from the site are therefore adulterated.",
+    "title_issue": "Preannounced FDA inspection refused",
+    "summary": "FDA issued a Warning Letter to Kellin Chemicals Co., Ltd. - Zhangjiagang in China, an API supplier to finished drug manufacturers serving the U.S. market. The firm refused an inspection preannounced for July 7 to July 11, 2025, so FDA deemed its drugs adulterated under section 501(j) of the FD&C Act.",
     "implication": "Delaying or refusing an inspection alone makes the whole site's output adulterated, and finished-dose manufacturers using its APIs face exposure under section 301(c). Firms using overseas API suppliers should check their FDA inspection history and whether they have a warning letter or import alert.",
     "key_facts": [
-     "Determination: drugs from a site that delayed, denied, limited or refused inspection are adulterated",
-     "Action: approval of new applications or supplements listing the site may be withheld until FDA inspects and confirms CGMP compliance",
-     "Action: shipments may be detained or refused admission under section 801(a)(3); written response required within 15 working days",
+     "Finding: the firm refused the inspection preannounced for July 7 to July 11, 2025 (notified through its U.S. Agent, Registrar Corp.)",
+     "Determination: drugs from a site that delayed, denied, limited or refused inspection are adulterated under section 501(j) of the FD&C Act",
+     "Action: approval of new applications or supplements may be withheld until FDA confirms CGMP compliance; shipments may be detained or refused admission under section 801(a)(3)",
      "Issuing office and date: Center for Drug Evaluation and Research (CDER), 11/06/2025"
     ],
     "checks": [
@@ -1466,6 +1466,39 @@
      "Monitoring suppliers for warning letters and import alerts",
      "Backup supplier plan if an API source is found adulterated"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "section 501(j) of the Federal Food, Drug, and Cosmetic Act (FD&C Act)",
+      "original": "The United States Food and Drug Administration (FDA) notified your site, Kellin Chemicals (Zhangjiagang) Co., Ltd., FEI 3017343300, at No. 5 Changjiang North Road, Yangzijiang Chemical Industrial Park, Zhangjiagana, Jiangsu, of a planned inspection of your drug manufacturing facility from July 7 to July 11, 2025. Your United States (U.S.) Agent, Registrar Corp., notified us that your firm refused the preannounced inspection. Under section 501(j) of the Federal Food, Drug, and Cosmetic Act (FD&C Act), 21 U.S.C. 351(j), your drugs are adulterated in that they have been manufactured, processed, packed, or held in an establishment where the owner or operator has delayed, denied, limited, and/or refused to permit inspection.",
+      "description": "미국 식품의약국(FDA)은 귀사 사업장인 Kellin Chemicals (Zhangjiagang) Co., Ltd.(FEI 3017343300, 소재지: No. 5 Changjiang North Road, Yangzijiang Chemical Industrial Park, Zhangjiagana, Jiangsu)에 2025년 7월 7일부터 7월 11일까지 의약품 제조시설에 대한 실사를 계획하고 있음을 통지했다. 그러나 귀사의 미국 대리인(U.S. Agent)인 Registrar Corp.는 귀사가 사전 통보된 이 실사를 거부했다고 FDA에 알려왔다. 연방 식품·의약품·화장품법(FD&C Act) 제501(j)조(21 U.S.C. 351(j))에 따라, 소유자 또는 운영자가 실사를 지연·거부·제한하거나 허용을 거절한 시설에서 제조·가공·포장 또는 보관된 귀사의 의약품은 불량(adulterated) 의약품에 해당한다.",
+      "risk": "실사 거부 자체만으로 해당 시설의 모든 의약품(API)이 CGMP 위반 입증 없이도 불량 의약품으로 간주되어, 미국향 공급 전체가 수입 차단·허가 보류 대상이 된다."
+     },
+     {
+      "citation": "section 301(a) of the FD&C Act",
+      "original": "Introduction into interstate commerce of adulterated drugs violates section 301(a) of the FD&C Act, 21 U.S.C. 331(a)",
+      "description": "불량 의약품을 주(州) 간 상거래에 유입시키는 행위는 FD&C Act 제301(a)조(21 U.S.C. 331(a))를 위반한다.",
+      "risk": "실사 거부 시설에서 생산된 API를 미국 시장에 출하하는 행위 자체가 법 위반이 되어, 업체가 직접 법적 책임을 지게 된다."
+     },
+     {
+      "citation": "section 301(c) of the FD&C Act",
+      "original": "receipt in interstate commerce of adulterated drugs, and the delivery or proffered delivery thereof, such as by drug product manufacturers using adulterated API as a component, is a violation of section 301(c) of the FD&C Act, 21 U.S.C. 331(c).",
+      "description": "불량 의약품을 주 간 상거래에서 수령하는 행위, 그리고 이를 인도하거나 인도를 제안하는 행위 — 예컨대 완제의약품 제조업자가 불량 API를 원료(구성성분)로 사용하는 경우 — 는 FD&C Act 제301(c)조(21 U.S.C. 331(c)) 위반에 해당한다.",
+      "risk": "이 API를 원료로 쓰는 미국 완제의약품 제조사도 위반 주체가 되므로, 고객사의 공급처 변경·완제품 출하 영향 등 공급망 전반으로 리스크가 전이된다."
+     }
+    ],
+    "fda_evaluation": "이 서한은 번호 매긴 CGMP 위반 항목이나 업체의 이전 회신에 대한 평가를 담고 있지 않다. FDA의 판단 근거는 단 하나로, 2025년 7월 7일~11일로 계획·사전 통보된 실사를 업체가 거부했다는 사실(미국 대리인 Registrar Corp.를 통해 통보됨)이며, 이에 따라 FD&C Act 제501(j)조상 해당 시설의 의약품을 불량 의약품으로 판정했다. FDA는 실사가 허용되어 CGMP 준수가 확인될 때까지 해당 업체에 대한 평가를 계속하겠다는 입장이다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(CDER-OC-OMQ-Communications@fda.hhs.gov, FEI 3017343300 및 ATTN: Maria Pavco 명기)",
+     "items": [
+      "15영업일 이내에 FDA(CDER Office of Manufacturing Quality)에 서면으로 회신한다.",
+      "FDA 실사 일정 수립을 요청(submit a request to schedule an FDA inspection)하여 시설 실사를 허용하고 CGMP 준수 확인을 받는다.",
+      "FDA가 업체의 활동·관행을 계속 평가하는 데 고려할 추가 정보를 회신에 포함해 제출한다.",
+      "FDA 권고에 따라 미국 고객사에 이 Warning Letter 수령 사실을 통지한다."
+     ]
+    },
+    "administrative_risks": "FDA가 실사를 허용받아 CGMP 준수를 확인할 때까지, 이 업체를 의약품 제조원으로 기재한 신규 허가신청(new applications) 또는 변경신청(supplements)의 승인이 보류될 수 있다. 또한 이 시설(Kellin Chemicals (Zhangjiagang) Co., Ltd.)에서 제조되어 미국으로 반입되는 물품 중 불량 또는 부정표시로 보이는 것은 FD&C Act 제801(a)(3)조(21 U.S.C. 381(a)(3))에 따라 억류되거나 수입이 거부될 수 있다. 아울러 불량 의약품의 주 간 상거래 유입(제301(a)조)과 이를 원료로 수령·사용하는 행위(제301(c)조)도 위반에 해당하므로, 미국 고객사(완제의약품 제조사)까지 법적 리스크가 미친다."
    }
   },
   {
@@ -1567,6 +1600,39 @@
      "Procedure blocking batch release before an investigation closes",
      "Lot-by-lot identity test records for high-risk components"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.192",
+      "original": "1. Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your firm failed to conduct an adequate and timely out-of- specification (OOS) investigation for your (b)(4) drug product. Your contract testing laboratory reported an OOS result for (b)(4) on August 28, 2024, but you did not initiate the Phase II investigation until December 4, 2024. Despite the ongoing investigation, your quality unit (QU) released the batch on (b)(4) , and subsequently shipped the batch for the U.S. market on (b)(4) , after your firm retested the sample and obtained passing results. A root cause was not determined for the OOS result, and the investigation was closed on July 11, 2025.",
+      "description": "1. 귀사는 배치 또는 그 구성성분이 규격에 부적합한 원인불명의 불일치나 실패에 대해, 해당 배치가 이미 유통되었는지 여부와 관계없이 철저히 조사하지 않았다(21 CFR 211.192). 귀사는 (b)(4) 의약품에 대해 적절하고 시의적절한 규격외(OOS) 조사를 수행하지 않았다. 귀사의 위탁시험기관은 2024년 8월 28일 (b)(4)에 대한 OOS 결과를 보고했으나, 귀사는 2024년 12월 4일에야 Phase II 조사를 개시했다. 조사가 진행 중이었음에도 귀사의 품질부서(QU)는 시료를 재시험해 적합 결과를 얻은 뒤 (b)(4)에 해당 배치를 출하승인했고, 이어서 (b)(4)에 미국 시장으로 배치를 출하했다. OOS 결과의 근본원인은 규명되지 않았으며, 조사는 2025년 7월 11일 종결되었다.",
+      "risk": "원인 미규명 OOS 배치가 재시험 적합 결과만으로 조사 중에 출하승인·미국 출하되어, 규격 부적합 의심 제품이 시장에 유통되고 동일 문제가 재발할 위험이 있다."
+     },
+     {
+      "citation": "21 CFR 211.84(d)(1)",
+      "original": "2. Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm did not adequately test your incoming component, (b)(4) , for identity prior to use in manufacturing. (b)(4) is a component that is at high risk for (b)(4) contamination. Your firm also accepted the (b)(4) raw material based on the supplier’s certificate of analysis (COA), without establishing the reliability of each of your component suppliers’ analyses at appropriate intervals. Additionally, the (b)(4) lot you utilized for drug product production had expired.",
+      "description": "2. 귀사는 의약품 각 구성성분의 확인을 위한 시험을 최소 1개 이상 수행하지 않았다. 또한 귀사는 구성성분 공급업체의 시험분석에 대해 적절한 주기로 밸리데이션을 수행하고 신뢰성을 확립하지 않았다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 입고 구성성분인 (b)(4)를 제조에 사용하기 전에 확인시험을 적절히 수행하지 않았다. (b)(4)는 (b)(4) 오염 위험이 높은 구성성분이다. 귀사는 또한 각 구성성분 공급업체 분석의 신뢰성을 적절한 주기로 확립하지 않은 채, 공급업체의 시험성적서(COA)에 근거해 (b)(4) 원료를 수용했다. 아울러 귀사가 의약품 생산에 사용한 (b)(4) 로트는 유효기간이 지난 상태였다.",
+      "risk": "고위험 오염 가능 원료를 확인시험 없이 공급사 COA만으로, 그것도 유효기간이 지난 로트로 사용해 유해 불순물 혼입에 따른 중대한 환자안전 위험이 있다."
+     },
+     {
+      "citation": "21 CFR 211.22",
+      "original": "3. Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your QU did not adequately exercise its authority and responsibilities, including but not limited to, implementing effective procedures and conducting adequate oversight of the drug products you manufacture. For example, your QU failed to ensure: Establishment of adequate procedures describing their roles, responsibilities, authorities, and oversight (e.g., production personnel perform functions that should be QA responsibilities (21 CFR 211.22(a) and 21 CFR 211.22(d)). That production and process control procedures are designed to assure the quality of drug products (e.g., completion of bulk hold time validation studies) (21 CFR 211.100(a)).",
+      "description": "3. 귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인·함량·품질·순도에 대한 설정 규격을 충족하도록 보장할 책임을 이행하지 않았다(21 CFR 211.22). 귀사의 QU는 효과적인 절차의 시행과 귀사가 제조하는 의약품에 대한 적절한 감독을 포함해(이에 국한되지 않음) 그 권한과 책임을 적절히 행사하지 않았다. 예를 들어 귀사의 QU는 다음을 보장하지 못했다: 자신의 역할·책임·권한 및 감독을 기술한 적절한 절차의 수립(예: QA 책임이어야 할 기능을 생산 인원이 수행함)(21 CFR 211.22(a) 및 21 CFR 211.22(d)). 생산 및 공정관리 절차가 의약품 품질을 보증하도록 설계되었는지 여부(예: 벌크 보관시간 밸리데이션 시험의 완료)(21 CFR 211.100(a)).",
+      "risk": "품질부서의 권한·감독 기능이 생산 인원에 의해 잠식되고 벌크 보관시간 밸리데이션이 미완료되어, 출하 판단 전반의 신뢰성이 훼손된다."
+     }
+    ],
+    "fda_evaluation": "FDA는 업체의 회신을 불충분하다고 평가했다. OOS 건과 관련해 업체는 제품 출하 절차 개정을 포함한 CAPA를 개시하고 해당 로트의 최종 처리를 위한 위험평가를 수행했다고 밝혔으나, FDA는 약 11개월간 OOS 조사를 완료하지 않은 데 대한 정당화가 없고, 출하 절차 붕괴만 언급했을 뿐 실제 OOS 결과의 근본원인을 규명하지 않았으며, 모든 OOS 조사가 적절히 이루어졌는지 품질시스템 전반을 포괄적으로 평가하지 않았다고 지적했다. 원료 확인시험 건에서는 위험평가가 이론적이며 영향받은 모든 로트의 실제 시험결과와 연계되지 않았고, 공급사 COA와 FTIR 기반 확인시험이 고위험 물질에 부적절했음을 인정하면서도 과거 수용 결정을 정당화 근거로 인용했다고 비판했다. 또한 잔여 드럼의 소급 시험만 기술했을 뿐 이미 제조·유통되었을 수 있는 의약품에 대한 영향평가나 시장 조치 언급이 없고, 재제형 계획 외에 시중 유통 중인 유효기간 내 제품에 대한 소급 평가, 다른 위험 구성성분 평가, 재제형 전까지의 잠정 관리·위험완화 전략이 빠져 있다고 평가했다. 컨설턴트 고용은 인정했으나 이것이 CGMP 준수 의무를 면제하지 않으며 경영진이 모든 결함 해결에 책임이 있다고 명시했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(기한 내 완료 불가 시 지연 사유와 완료 일정 제시). 고위험 원료 보관검체 (b)(4) 시험결과는 서한 일자로부터 30일(역일) 이내 제출 약속.",
+     "items": [
+      "미국 시장 유통 중·유효기간 내 제품의 무효 처리된 모든 OOS 결과(공정 중·출하·안정성 시험 포함)에 대한 소급적·독립적 검토와, 시험실 원인이 결정적으로 입증되지 않은 건에 대한 제조 원인 검토 및 OOS 조사 시스템 전반의 개선계획(CAPA·개정 절차 포함) 제출",
+      "의약품 제조에 사용된 고위험 구성성분 전 로트의 보관검체 (b)(4) 시험(불가 시 관련 완제품 배치 시험), 유효기간 내 제품의 전면 위험평가, 오염 로트에 대한 고객 통지·회수 등 신속한 조치",
+      "각 구성성분 로트의 확인·함량·품질·순도 시험 방안, 공급사 COA 신뢰성 확립(초기 밸리데이션·주기적 재밸리데이션) 및 USP 모노그래프 A·B·C 시험 수행 약속, 자재 시스템과 위탁시험기관 관리 프로그램에 대한 포괄적·독립적 검토",
+      "QU가 효과적으로 기능할 권한과 자원을 갖도록 하는 포괄적 평가·개선계획 수립, 그리고 밀접하게 통합 운영되는 관계 법인과의 관계를 해명하고 각 법인이 제조·품질시스템·규제준수를 독립적으로 관리함을 입증"
+     ]
+    },
+    "administrative_risks": "FDA는 2026년 1월 9일 이 업체가 미국으로 수입 신청하는 모든 의약품을 Import Alert 66-40에 등재했다. 위반이 완전히 해결되고 CGMP 준수가 확인될 때까지 이 업체를 의약품 제조소로 기재한 신규 허가신청 또는 변경신청의 승인이 보류될 수 있으며, FDA는 시정조치 완료 확인을 위해 재실사할 수 있다. 위반을 해결하지 않으면 FD&C Act 801(a)(3)조(21 U.S.C. 381(a)(3))에 따라 VeganicSKN Limited 제조 물품의 미국 반입 거부가 계속될 수 있고, 제조 방법·관리가 CGMP에 부합하지 않아 불량의약품으로 보이는 물품은 억류 또는 반입 거부될 수 있다."
    }
   },
   {
@@ -1668,6 +1734,39 @@
      "Whether media fills reflect maximum intervention counts",
      "Visual inspection detection capability and assessment of marketed product"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.192",
+      "original": "1. Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your firm is a manufacturer of sterile injectable drug products produced primarily through aseptic processing, including but not limited to, products for intravenous (b)(4) use. You failed to adequately investigate drug product failures and discrepancies. Your investigations lacked data-supported root causes, formal documentation, expansion to all potentially affected products, and corrective action effectiveness checks. In multiple investigations, you inappropriately concluded there was no product impact based on overreliance on passing finished drug product test results (e.g., sterility, endotoxin, and environmental monitoring). The following examples illustrate these failures: Endotoxin Test Failures In 2025 and 2026, your firm received reports of patients experiencing adverse drug events, including apparent pyrogenic reactions, following administration of famotidine for injection. Notably, famotidine injection manufacturing had experienced multiple (b)(4) bioburden action limit failures. However, your firm failed to sufficiently investigate this critical deviation and permitted batch release following passing finished drug product test results (i.e., sterility, endotoxin). Subsequent testing of finished product retains, as part of the investigation into the adverse event complaints, revealed an endotoxin failure. Your firm ultimately recalled three famotidine injection batches.",
+      "description": "1. 귀사는 배치 또는 그 구성성분이 규격에 부합하지 않는 설명되지 않은 불일치나 실패에 대해, 해당 배치의 출하 여부와 관계없이 철저히 조사하지 않았다(21 CFR 211.192). 귀사는 주로 무균공정으로 생산되는 무균 주사제 제조업체이며, 정맥 투여용 (b)(4) 제품 등이 이에 포함된다. 귀사는 의약품의 실패와 불일치를 적절히 조사하지 않았다. 조사에는 데이터로 뒷받침된 근본 원인, 공식 문서화, 잠재적으로 영향을 받은 모든 제품으로의 조사 확대, 시정조치 유효성 확인이 결여되어 있었다. 여러 조사에서 귀사는 완제품 시험 결과(예: 무균, 엔도톡신, 환경모니터링) 적합에 과도하게 의존해 제품 영향이 없다고 부적절하게 결론지었다. 다음 사례들이 이러한 실패를 보여준다. [엔도톡신 시험 실패] 2025년과 2026년에 귀사는 famotidine 주사제 투여 후 명백한 발열성 반응을 포함한 이상사례를 겪은 환자 보고를 접수했다. 특히 famotidine 주사제 제조 과정에서는 (b)(4) 바이오버든 조치기준(action limit) 초과가 여러 차례 발생했었다. 그러나 귀사는 이 중대한 일탈을 충분히 조사하지 않았고, 완제품 시험(무균, 엔도톡신) 적합 결과를 근거로 배치 출하를 허용했다. 이후 이상사례 불만 조사의 일환으로 완제품 보관검체를 시험한 결과 엔도톡신 부적합이 확인되었다. 귀사는 결국 famotidine 주사제 3개 배치를 회수했다.",
+      "risk": "바이오버든 조치기준 초과를 완제품 시험 적합만으로 덮고 출하해 엔도톡신 오염 배치가 환자에게 투여되었고(발열성 반응 보고), 결국 회수로 이어졌다 — 조사 체계 실패가 직접적 환자 위해로 연결된 사례."
+     },
+     {
+      "citation": "21 CFR 211.113(b)",
+      "original": "2. Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). Inadequate Aseptic Process Simulations (Media Fills) Your media fills failed to accurately simulate aseptic manufacturing operations. At the time of the inspection, your firm used a sampling approach to determine a representative number of each intervention necessary to simulate your aseptic processes. A review showed that your media fill simulations did not adequately represent your maximum aseptic intervention counts (e.g., clearing stoppers in the (b)(4) /track, (b)(4) application, (b)(4) adjustment, removing vials from the (b)(4) ). Additionally, inherent interventions (e.g., stopper additions, vial loading) are not documented in your batch records, which has the consequence of inadequate assessment of the risks these interventions present during actual aseptic production. Also, data indicated that the number of units in your media fills was insufficient. Inadequate documentation of interventions was the subject of findings from FDA’s 2022 inspection.",
+      "description": "2. 귀사는 무균을 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 및 멸균 공정의 밸리데이션을 포함하는 적절한 서면 절차를 수립·준수하지 않았다(21 CFR 211.113(b)). [부적절한 무균공정 모의시험(배지충전)] 귀사의 배지충전은 무균 제조 작업을 정확하게 모사하지 못했다. 실사 당시 귀사는 무균공정 모사에 필요한 각 개입(intervention)의 대표 횟수를 정하기 위해 샘플링 방식을 사용했다. 검토 결과, 배지충전 모의시험은 최대 무균 개입 횟수(예: (b)(4)/트랙 내 고무마개 걸림 해소, (b)(4) 적용, (b)(4) 조정, (b)(4) 에서 바이알 제거)를 적절히 반영하지 못했다. 또한 고유 개입(예: 고무마개 추가, 바이알 적재)이 배치기록에 문서화되지 않아, 실제 무균 생산 중 이러한 개입이 초래하는 위험을 제대로 평가하지 못하는 결과를 낳았다. 아울러 데이터상 배지충전의 충전 단위 수가 불충분했다. 개입의 부적절한 문서화는 FDA 2022년 실사에서도 지적된 사항이었다.",
+      "risk": "최대 개입 횟수·충전 단위 수를 반영하지 못한 배지충전은 무균보증 수준을 과대평가하게 하며, 2022년 실사 지적의 반복이라는 점에서 품질시스템의 시정 실패를 드러낸다."
+     },
+     {
+      "citation": "21 CFR 211.110(a)",
+      "original": "3. Your firm failed to establish adequate control procedures to monitor the output and to validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug. Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.110(a) and 21 CFR 211.42(c)(10)). Inadequate Visual Inspection Program Your visual inspection program is inadequate to ensure your sterile injectable drug products are essentially free of visible particulates and defects. For example: You categorized all non-glass particulate, regardless of material type (i.e., hair) as major, which means more severe particulates of biological origin are not considered critical. (b)(4) visible particulate inspection systems often exhibited low detectability and high variability regardless of particle type (e.g., glass, white particulate, black particulate) and size. Your probability of detection (POD) of particulates using (b)(4) visual inspection was inadequate. Your methods often exhibit PODs significantly less than (b)(4) % for particulate matter defects. In addition, glass particulates in the visible range were not consistently detected. You lacked defect limits for specific types of non-glass particulate matter in the visual inspection program.",
+      "description": "3. 귀사는 공정 중 원료와 의약품 특성의 변동을 유발할 수 있는 제조공정의 산출물을 모니터링하고 그 성능을 밸리데이션하기 위한 적절한 관리 절차를 수립하지 않았다. 또한 무균공정 구역에서 오염이나 혼동을 방지하는 데 필요한, 적절한 크기의 구체적으로 정의된 구역 내에서 작업하지 않았고 분리 또는 정의된 구역이나 그 밖의 관리 시스템을 갖추지 않았다(21 CFR 211.110(a) 및 21 CFR 211.42(c)(10)). [부적절한 육안검사 프로그램] 귀사의 육안검사 프로그램은 무균 주사제가 가시성 이물과 결함으로부터 본질적으로 자유로움을 보장하기에 부적절하다. 예를 들면 다음과 같다. 귀사는 물질 유형(예: 머리카락)과 관계없이 유리 이외의 모든 이물을 중결함(major)으로 분류했으며, 이는 더 심각한 생물학적 기원 이물이 치명결함(critical)으로 간주되지 않음을 의미한다. (b)(4) 가시성 이물 검사 시스템은 이물 유형(예: 유리, 흰색 이물, 검은색 이물)과 크기에 관계없이 낮은 검출력과 높은 변동성을 자주 보였다. (b)(4) 육안검사를 이용한 이물 검출 확률(POD)이 부적절했다. 귀사의 방법은 이물 결함에 대해 (b)(4) %보다 현저히 낮은 POD를 자주 보였다. 또한 가시 범위의 유리 이물이 일관되게 검출되지 않았다. 귀사의 육안검사 프로그램에는 특정 유형의 비유리 이물에 대한 결함 한도가 없었다.",
+      "risk": "머리카락 등 생물학적 이물을 치명결함으로 다루지 않고 검출 확률도 낮아, 이물·미생물 오염 가능성이 있는 무균 주사제가 시장에 출하될 위험이 크다."
+     }
+    ],
+    "fda_evaluation": "FDA는 업체의 2026년 3월 11일자 483 회신을 전 항목에서 '부적절(inadequate)'하다고 평가했다. famotidine 엔도톡신 건에서는 고바이오버든 시 엔도톡신 시험 강화 절차 개정만 약속했을 뿐 불만처리 시스템 전반의 검토·CAPA와 광범위한 CAPA 유효성 확인을 약속하지 않았다고 지적했다. 배지충전 실패 건에서는 차단 보호가 제한된 무균 라인의 근본적 설계 결함을 해결할 명확한 일정이 없고, 결함 작업자와 작업자를 공유한 라인의 액상 제품은 보류하지 않았다고 지적했다. 머리카락 이물 건에서는 품질부서(QU)와 Corporate Expert Circle·Corporate Emergency Committee 가 해당 배치를 거부하지 않고 출하한 이유를 설명하지 않았고, 고무마개 입고검사 강화 상세와 출하 제품 보관검체 검사 여부도 제시하지 않았다고 보았다. 배지충전 모의시험은 충분한 배치 크기와 개입 문서화·추적 방안이 빠졌고, 무균 작업 관행 회신은 라인 배치·인체공학·차단 보호 부족 등 설계 결함을 충분히 인정하지 않았으며, 육안검사는 현재 시판 제품에 대한 평가가 부족하고, 설비 설계는 기존 라인을 계속 쓰는 동안의 무균보증 개선 조치가 불충분하다고 평가했다. 또한 반복 위반을 시정하지 못했다는 이유로 21 CFR 211.34 에 따른 자격 있는 CGMP 컨설턴트 고용을 권고했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내(within fifteen (15) business days) CDER-OC-OMQ-Communications@fda.hhs.gov 로 서면 회신(제목에 FEI 1450022 및 ATTN: Carrie A. Hughes 기재)",
+     "items": [
+      "일탈·불일치·불만·OOS/OOL 결과·실패 조사 시스템 전반에 대한 포괄적·독립적 평가와 개선 실행계획, 그리고 서한일 기준 최근 3년간 모든 중대 조사(공정 중·출하·안정성 규격 실패 포함)에 대한 독립적 소급 검토를 제출한다.",
+      "CAPA 프로그램, 엔도톡신 오염 방지 프로그램, 환경모니터링(EM) 프로그램, 최악조건을 반영한 공정 모의시험(배지충전) 프로그램에 대해 각각 독립적 평가와 개선계획을 제출한다.",
+      "무균공정·설비·시설의 모든 오염 위해에 대한 독립적 위험평가와 일정이 포함된 개선계획, 무균 작업 관행·클린룸 행동 준수 계획, 그리고 의약품 부족 없이 기존 Building (b)(4) 충전 라인에서 신규 라인으로 제조를 이전하는 계획(백업 CMO 목록 포함)을 표 형식으로 제출한다.",
+      "치명·중·경결함 정의와 개별 결함 한도를 포함한 육안검사 프로그램의 독립적 평가·재적격성평가, 머리카락 오염으로 불량 처리된 바이알 및 이물 분석 결과, 고무마개 공급업체 품질조사 현황을 제출한다."
+     ]
+    },
+    "administrative_risks": "위반이 해소되지 않으면 다른 연방기관의 계약 수주가 제한될 수 있고, FDA 가 수출증명서(Export Certificates) 발급을 보류할 수 있다. 또한 모든 위반이 완전히 해소되고 CGMP 준수가 확인될 때까지 이 업체를 제조소로 기재한 신규 허가신청·변경신청의 승인이 보류될 수 있으며, 시정조치 완료 확인을 위한 재실사가 이뤄질 수 있다. 이미 FDA 와의 회수 논의 후 생물학적 이물이 포함된 6개 배치(Glycopyrrolate, Lidocaine HCl, Ropivacaine 주사제 등)에 대한 회수가 2026년 7월 16일 개시되었으며, 공급 중단 가능성이 있는 조치를 검토할 경우 CDER Drug Shortages Staff 에 즉시 연락하도록 요청받았다."
    }
   },
   {

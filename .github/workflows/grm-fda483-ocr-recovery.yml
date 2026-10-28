@@ -1,6 +1,7 @@
 name: GRM FDA 483 OCR Recovery
 
-# ★예약 실행(2026-10-27 #1209): 매일 `collection-capped` 모드로 apply 한다. 일일 수집은 실행당
+# ★예약 실행(2026-10-27 #1209): 매일 `recoverable` 모드로 apply 한다(상한 표식 + 엔진 부재 +
+# 일시 fetch 실패 — 2026-10-27 FDA 결손 감사로 collection-capped 에서 확장). 일일 수집은 실행당
 # PDF 건수 상한·OCR 페이지 예산으로 벽시계를 닫고, 상한 밖 문서를 `not-attempted` /
 # `scan-ocr-budget` 으로 **본문 없이** 적재한다. 이후 수집은 이미 저장된 document_id 를 다시
 # 받지 않으므로 그 문서들은 영구히 findings 0건이었다(10-26 FDA 대량 공개 때 51건). 이 예약이
@@ -60,16 +61,18 @@ on:
         type: string
         default: '300'
       mode:
-        description: '후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. missing-observations=관찰 키가 없는 행 — 상태 키가 없어 지금까지 어떤 복구 잡에도 안 걸리던 사각지대(2026-08-01 실측 417건). ★이 모드는 멱등이 아니다: 본문은 있는데 파서가 여전히 0건인 문서는 다음 실행에서도 후보로 남아 PDF 를 다시 읽는다. collection-capped=수집 상한(PDF 건수·OCR 예산)으로 본문 없이 적재된 행(not-attempted·scan-ocr-budget) — 예약 실행이 매일 쓰는 모드(#1209).'
+        description: '후보 선정 기준. ocr-unavailable(기본)=엔진 부재로 본문을 못 받은 행. missing-observations=관찰 키가 없는 행 — 상태 키가 없어 지금까지 어떤 복구 잡에도 안 걸리던 사각지대(2026-08-01 실측 417건). ★이 모드는 멱등이 아니다: 본문은 있는데 파서가 여전히 0건인 문서는 다음 실행에서도 후보로 남아 PDF 를 다시 읽는다. collection-capped=수집 상한(PDF 건수·OCR 예산)으로 본문 없이 적재된 행(not-attempted·scan-ocr-budget). recoverable=collection-capped + 엔진 부재(scan-ocr-unavailable) + 일시 fetch 실패(404 제외) — 다시 읽으면 본문이 나올 수 있는 결손 전부. 예약 실행·발행 전 게이트(grm-fda-coverage-gate)가 쓰는 모드.'
         type: choice
         options:
           - ocr-unavailable
           - missing-observations
           - collection-capped
+          - recoverable
         default: ocr-unavailable
 
 permissions:
   contents: read
+  issues: write   # 예약 실행 실패 경보(automation-warning)
 
 concurrency:
   group: fda483-ocr-backfill      # 기존 483 백필들과 동일 그룹(fda.gov 동시 요청 방지)
@@ -115,7 +118,7 @@ jobs:
           IN_LIMIT: ${{ inputs.limit }}
           IN_DELAY: ${{ inputs.delay_seconds || '0.5' }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
-          IN_MODE: ${{ github.event_name == 'schedule' && 'collection-capped' || inputs.mode }}
+          IN_MODE: ${{ github.event_name == 'schedule' && 'recoverable' || inputs.mode }}
           FDA483_OCR_PAGE_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
           FDA483_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
         run: |
@@ -166,7 +169,7 @@ jobs:
           IN_LIMIT: ${{ inputs.limit }}
           IN_DELAY: ${{ inputs.delay_seconds || '0.5' }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
-          IN_MODE: ${{ github.event_name == 'schedule' && 'collection-capped' || inputs.mode }}
+          IN_MODE: ${{ github.event_name == 'schedule' && 'recoverable' || inputs.mode }}
           IN_OCR_BUDGET: ${{ github.event_name == 'schedule' && '600' || inputs.ocr_page_budget }}
           IN_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}
         run: |
@@ -213,3 +216,59 @@ jobs:
             notion_sync_report.json
           retention-days: 30
           if-no-files-found: warn
+
+      # [2026-10-27 FDA 결손 감사] 예약 회수가 실패하면 종전엔 Actions 실패 표시뿐이었다 —
+      # 이 잡이 죽으면 그날 상한 밖 483 이 다음 회수까지 본문 없이 남는다. 운영 경고 채널
+      # (automation-warning → Admin 운영 상태 센터)로 올린다. 성공하면 열린 이슈를 닫는다.
+      - name: 예약 실행 실패 경보 / 해소
+        if: always() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          JOB_STATUS: ${{ job.status }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM FDA 483 예약 회수 실패';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'grm-fda-coverage', per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+            if (process.env.JOB_STATUS === 'success') {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: `✅ 예약 회수가 다시 성공했습니다. 이슈를 닫습니다.\n\n${runUrl}` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+              }
+              return;
+            }
+            for (const [name, color, description] of [
+              ['automation-warning', 'fbca04', 'GRM automation warning'],
+              ['grm-fda-coverage', 'b60205', 'GRM pre-publish FDA body coverage gate']]) {
+              try { await github.rest.issues.getLabel({ owner, repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+            const kstDate = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+            const body = [
+              '매일 23:37 UTC 예약 회수(본문 없이 적재된 FDA 483 → Supabase·Notion)가 실패했습니다. 다음 성공까지 상한 밖 483 이 본문 없이 남고, 월요일 handoff 전이면 그 주 브리프에 묶음 카드로 실립니다.',
+              '',
+              `- 최신 Run: ${runUrl}`,
+              `- 최신 Run date (KST): ${kstDate}`,
+              '',
+              '현재 경고:',
+              `- [fda483-recovery-failed] 예약 회수 실패(job status: ${process.env.JOB_STATUS}) — 리포트 아티팩트·로그 확인`,
+              '',
+              '수동 재실행: `gh workflow run grm-fda483-ocr-recovery.yml -f apply=true -f mode=recoverable`',
+            ].join('\n');
+            if (!existing) {
+              await github.rest.issues.create({ owner, repo, title, body,
+                labels: ['automation-warning', 'grm-fda-coverage'], assignees: [owner] });
+            } else {
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                body: `⚠️ 예약 회수 다시 실패 — ${runUrl}` });
+            }

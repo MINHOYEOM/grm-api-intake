@@ -229,6 +229,84 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # [2026-10-27 FDA 결손 감사] 발행 PR 이 있으면 그 발행본의 FDA 본문 결손을 다시 센다 —
+      # grm-fda-coverage-gate(월요일 수집 직후)의 백스톱이다. 게이트가 못 돌았거나(수집 지각·
+      # workflow_run 누락) 그 뒤 조립에서 결손이 생겼어도 승인 전에 경고 이슈로 올라오게 한다.
+      # 판정은 같은 함수(fda_body_coverage.py — 표준 라이브러리만 씀).
+      - name: FDA 본문 결손 재확인(발행 브랜치 기준)
+        id: fdacov
+        if: steps.check.outputs.pr_exists == 'true'
+        # 백스톱 전용 — 이 스텝이 실패해도 아래 본 경보(델타 부재) 스텝은 반드시 돌아야 한다.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUB_DATE: ${{ steps.check.outputs.pub_date }}
+        run: |
+          set -euo pipefail
+          UNDER=$(echo "$PUB_DATE" | tr '-' '_')
+          if ! gh api "repos/${GITHUB_REPOSITORY}/contents/web/data/briefs/brief_web_${UNDER}.json?ref=publish/brief-${PUB_DATE}" \
+                 -H "Accept: application/vnd.github.raw" > _fda_cov_brief.json 2>/dev/null; then
+            echo "::notice::발행 브랜치에서 브리프를 못 읽음 — FDA 결손 재확인 생략"
+            exit 0
+          fi
+          echo "## FDA 본문 결손 — 발행 브랜치 재확인" >> "$GITHUB_STEP_SUMMARY"
+          python fda_body_coverage.py check --brief _fda_cov_brief.json --intake-event publish \
+            --summary-md "$GITHUB_STEP_SUMMARY" --issue-md _fda_cov_issue.md | tee -a "$GITHUB_OUTPUT"
+
+      - name: FDA 본문 결손 경고 이슈 갱신/해소(발행 브랜치 기준)
+        if: steps.fdacov.outputs.action != ''
+        continue-on-error: true
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          OVER: ${{ steps.fdacov.outputs.over }}
+          PUB_DATE: ${{ steps.check.outputs.pub_date }}
+        with:
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'GRM FDA 본문 결손 경고(발행 전 점검)';   // grm-fda-coverage-gate 와 같은 이슈
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'grm-fda-coverage', per_page: 100,
+            });
+            const existing = issues.find((issue) => issue.title === title);
+            if (!process.env.OVER) {
+              if (existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: `✅ 발행 브랜치(${process.env.PUB_DATE}) 재확인 — FDA 본문 결손 임계 미만. 이슈를 닫습니다.\n\n${runUrl}` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+              }
+              return;
+            }
+            const lines = fs.existsSync('_fda_cov_issue.md') ? fs.readFileSync('_fda_cov_issue.md', 'utf8').trim() : '';
+            if (existing) {
+              console.log(`게이트 이슈 #${existing.number} 이미 열림 — 코멘트 생략(과알림 방지)`);
+              return;
+            }
+            for (const [name, color, description] of [
+              ['automation-warning', 'fbca04', 'GRM automation warning'],
+              ['grm-fda-coverage', 'b60205', 'GRM pre-publish FDA body coverage gate']]) {
+              try { await github.rest.issues.getLabel({ owner, repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color, description });
+              }
+            }
+            const body = [
+              `발행 PR(publish/brief-${process.env.PUB_DATE})의 발행본에 **본문·상세를 확보하지 못한 FDA 카드**가 임계 이상입니다(발행 워치독 재확인). 승인 전에 확인하세요.`,
+              '',
+              `- 최신 Run: ${runUrl}`,
+              `- 최신 Run date (KST): ${process.env.PUB_DATE}`,
+              '',
+              '현재 경고:',
+              lines,
+              '',
+              '발행 전 게이트(grm-fda-coverage-gate)가 이 주에 돌았는지 확인하세요. 발행본 소급은 `grm-fda483-ocr-backfill.yml`.',
+            ].join('\n');
+            await github.rest.issues.create({ owner, repo, title, body,
+              labels: ['automation-warning', 'grm-fda-coverage'], assignees: [owner] });
+
       - name: 운영 경고 이슈 생성/갱신(자가 복구까지 실패했을 때만)
         if: steps.alarm.outputs.escalate == 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0

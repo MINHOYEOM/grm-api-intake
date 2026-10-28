@@ -91,7 +91,18 @@ OCR_UNAVAILABLE_PREFIX = "scan-ocr-unavailable"
 MODE_OCR_UNAVAILABLE = "ocr-unavailable"
 MODE_MISSING_OBSERVATIONS = "missing-observations"
 MODE_COLLECTION_CAPPED = "collection-capped"
-RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS, MODE_COLLECTION_CAPPED)
+# [2026-10-27 FDA 결손 감사] 예약 실행·발행 전 게이트가 쓰는 모드. `collection-capped` 의
+# 상위집합으로, **다시 읽으면 본문이 나올 수 있는** 결손 표식을 전부 고른다:
+#   · not-attempted / scan-ocr-budget  — 그날 실행의 상한(collection-capped 와 동일)
+#   · scan-ocr-unavailable:…          — 그 실행의 러너에 엔진이 없었다(이 워크플로는 엔진 필수)
+#   · fetch-fail:… (404 제외)          — 일시 장애(5xx·타임아웃). 수집기는 재시도하지 않는다
+# 감사 실측(2026-10-27 raw_signals): 엔진 부재 8건(07-17~07-28)·fetch-fail 2건이 어떤 예약
+# 잡의 후보에도 걸리지 않아 석 달째 본문 없이 남아 있었다. 확정 사유(404·텍스트층 없음·
+# OCR 이 글자 0)는 대상이 아니고, 다시 읽어 확정 사유가 나오면 표식을 그 사유로 바꿔
+# 무한 재시도를 끊는다(collection-capped 와 같은 규칙).
+MODE_RECOVERABLE = "recoverable"
+RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS, MODE_COLLECTION_CAPPED,
+                  MODE_RECOVERABLE)
 # [2026-10-27 #1209] 수집 **상한** 때문에 본문 없이 적재된 행의 상태값. 문서 사정이 아니라
 # 그날 실행의 사정(PDF 건수 상한·OCR 페이지 예산)이라 다시 읽으면 대개 본문이 나온다.
 # collect_fda_483 가 기록하는 문자열과 같아야 한다 — tests 가 두 값이 같음을 고정한다.
@@ -205,8 +216,21 @@ def is_collection_capped_row(raw: dict[str, Any]) -> bool:
     return str(raw.get("fda483_text_status") or "") in CAPPED_TEXT_STATUSES
 
 
+def is_recoverable_row(raw: dict[str, Any]) -> bool:
+    """다시 읽으면 본문이 나올 수 있는 결손 표식인가(순수 함수 — `MODE_RECOVERABLE`).
+
+    상한 표식 · 엔진 부재 · 404 가 아닌 fetch 실패. 404 는 원문이 없다는 확정 사유다.
+    """
+    status = str(raw.get("fda483_text_status") or "")
+    if status in CAPPED_TEXT_STATUSES or status.startswith(OCR_UNAVAILABLE_PREFIX):
+        return True
+    return status.startswith("fetch-fail") and "404" not in status
+
+
 def is_recovery_candidate(raw: dict[str, Any], mode: str) -> bool:
     """모드별 후보 판정 — `run()` 이 서버 like 로 좁힌 행을 여기서 정확히 재확인한다."""
+    if mode == MODE_RECOVERABLE:
+        return is_recoverable_row(raw)
     if mode == MODE_MISSING_OBSERVATIONS:
         return is_missing_observations_row(raw)
     if mode == MODE_COLLECTION_CAPPED:
@@ -302,6 +326,10 @@ def _fetch_raw_signals(
     elif mode == MODE_COLLECTION_CAPPED:
         narrow = {"or": "(" + ",".join(
             f"raw_json.like.*{status}*" for status in CAPPED_TEXT_STATUSES) + ")"}
+    elif mode == MODE_RECOVERABLE:
+        narrow = {"or": "(" + ",".join(
+            f"raw_json.like.*{status}*" for status in
+            (*CAPPED_TEXT_STATUSES, OCR_UNAVAILABLE_PREFIX, "fetch-fail")) + ")"}
     else:
         narrow = {"raw_json": f"like.*{OCR_UNAVAILABLE_PREFIX}*"}
     return fsb._fetch_all_pages(
@@ -338,6 +366,10 @@ def _is_definitive_empty(status: str) -> bool:
     5xx·타임아웃으로 표식을 `fetch-fail` 로 바꿔 버리면 일시 장애 하나로 재시도가 영구히 끊긴다.
     """
     if not status or status in CAPPED_TEXT_STATUSES:
+        return False
+    # 엔진 부재는 문서가 아니라 **그 러너**의 사정이다 — 확정으로 보고 표식을 바꾸면
+    # collection-capped 후보에서 영영 빠진다(엔진 없는 실행 한 번이 결손을 영구화한다).
+    if status.startswith(OCR_UNAVAILABLE_PREFIX):
         return False
     if status.startswith("fetch-fail"):
         return "404" in status
@@ -497,7 +529,8 @@ def run(
             #   문서의 사실이 아니다. 실제로 읽어 본 결과가 상한이 아닌 사유(404·텍스트층 없음)면
             #   그 사유로 바꿔 적는다 — 잃는 본문은 없고(둘 다 빈손), 바꾸지 않으면 그 문서가
             #   매 예약 실행마다 후보로 남아 같은 PDF 를 영원히 다시 받는다.
-            if mode == MODE_COLLECTION_CAPPED and _is_definitive_empty(status):
+            if (mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE)
+                    and _is_definitive_empty(status)):
                 _resolve_capped_status(
                     report, r, raw, status, label=label, base=base, service_key=service_key,
                     dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,

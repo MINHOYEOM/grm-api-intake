@@ -26,6 +26,29 @@ WL 편지 본문(`wl_body_full`)은 일일 수집(`collect_intake.collect_fda_wa
 사유가 아닌 행(403·fetch-fail(404 제외)·사유 없음 — 사유 없음은 전문 플래그 도입 전 적재분과
 백필 페치의 예외 경로다).
 
+## 영구 403 — 언제 포기하고 누구에게 알리나 (2026-10-28)
+
+fda.gov 의 403 은 러너 IP 봇 차단이다. GitHub 러너 IP 는 날마다 바뀌므로 하루 403 은 포기
+사유가 아니다 — 그러나 같은 편지가 몇 주째 403 이면 매일 GET 은 차단만 길게 만든다.
+  · 첫 403 관측일을 표식에 남긴다: 라이브 수집이 남긴 `fetch-403`(첫 관측 = 적재일)은 그대로,
+    사유가 없거나 다른 사유였던 행은 처음 403 을 본 날 `fetch-403:since=YYYY-MM-DD` 로 한 번 쓴다.
+  · 첫 관측일부터 `PERMANENT_403_AFTER_DAYS`(14일 = 매일 회수 14회) 동안 본문을 한 번도 못 받았고
+    오늘도 403 이면 `fetch-403:permanent since=YYYY-MM-DD` 로 바꿔 **확정 사유**로 만든다 —
+    이후 매일 회수 대상에서 빠진다. `:` 앞 토큰이 `fetch-403` 그대로라 하류 사유 매핑
+    (`card_scaffold._ABSENT_REASON_LABELS`)은 바뀌지 않는다.
+  · 사람에게는 주간 reconciliation 요약(`reconciliation_audit.py`, 월 06:00 KST)이 포기 건수와
+    문서 id 를 한 줄로 알린다. 다시 시도하려면 `--doc-ids` 로 그 문서를 지정한다(지정하면 영구
+    표식도 후보가 된다).
+
+## 본문 시작점 재구성 `--rebuild-body-start` (2026-10-28, 수동 전용)
+
+본문 시작 앵커가 문장 안 낱말에서 잘라 `wl_body_full` 이 문장 중간(소문자)에서 시작하는 행이
+있었다(수리: `collect_intake._wl_sentence_start`·`_wl_letter_opening`). 이 모드는 **본문이 이미
+있는** 행 중 소문자로 시작하는 행(+ `--doc-ids` 로 지정한 행)을 다시 받아 같은 `build_wl_item`
+으로 재구성한다. 다시 받은 본문이 없거나(403 등) 기존과 같으면 쓰지 않는다 — 있는 본문을 표식으로
+덮지 않는다. 예약 실행은 이 모드를 쓰지 않는다. findings 는 M12 가 "findings 없는 행"만 보므로
+이 모드로 바뀐 행의 findings 는 재생성되지 않는다(필요하면 별도 재변환).
+
 findings 재생성은 이 스크립트가 하지 않는다 — 본문이 채워지면 M12(`findings_supabase_backfill.py`)
 가 "findings 없는 raw_signal" 로 보고 변환한다. 워크플로가 그 체인을 잇는다.
 
@@ -41,6 +64,7 @@ import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -71,6 +95,12 @@ KNOWN_RAW_KEYS = frozenset({
 # 다시 읽어도 결과가 같을 사유. 이 표식이 붙은 행은 후보가 아니다(재시도가 끊긴다).
 DEFINITIVE_STATUSES = ("no-anchor",)
 
+# 영구 403 정책(모듈 docstring). 표식은 모두 `fetch-403` 토큰으로 시작한다 — 하류 사유 매핑 계약.
+STATUS_403 = "fetch-403"
+PERMANENT_403_AFTER_DAYS = 14
+_403_PERMANENT_PREFIX = "fetch-403:permanent"
+_403_SINCE_RE = re.compile(r"since=(\d{4}-\d{2}-\d{2})$")
+
 Sleeper = Callable[[float], None]
 
 
@@ -86,7 +116,12 @@ class WlBodyRecoveryReport:
     attempted: int = 0                  # 편지 페이지 fetch 시도
     recovered: int = 0                  # 본문 확보(dry-run=교체 예정, apply=upsert 성공)
     violations_recovered: int = 0       # 되찾은 위반 표제 수
-    still_empty: int = 0                # 이번에도 못 받음(403·5xx 등) — 손대지 않음, 다음 실행 재시도
+    still_empty: int = 0                # 이번에도 못 받음(403·5xx 등) — 본문은 손대지 않음, 다음 실행 재시도
+    blocked_403_marked: int = 0         # 첫 403 관측일 표식(fetch-403:since=)을 새로 남김
+    permanent_403: int = 0              # 영구 403 으로 확정 — 이후 매일 회수에서 빠진다
+    permanent_403_docs: list[str] = field(default_factory=list)
+    rebuild_body_start: bool = False    # --rebuild-body-start 모드
+    body_start_unchanged: int = 0       # 그 모드에서 다시 받은 본문이 기존과 같음 — 쓰지 않음
     status_resolved: int = 0            # 확정 사유(404·no-anchor)로 표식만 교체
     unknown_keys: int = 0               # 저장 raw 에 모르는 키 — 손대지 않음
     id_mismatch: int = 0                # 재구성 id ≠ 기존 — 손대지 않음(0 이어야 정상)
@@ -123,19 +158,67 @@ def _parse_doc_ids(value: str) -> list[str]:
     return [p for p in re.split(r"[,\s]+", value.strip()) if p]
 
 
+def is_permanent_403(status: str) -> bool:
+    return str(status or "").startswith(_403_PERMANENT_PREFIX)
+
+
 def is_definitive_status(status: str) -> bool:
-    """다시 읽어도 본문이 나오지 않을 사유인가 — 404 와 no-anchor(페이지는 받았는데 앵커 없음)."""
+    """다시 읽어도 본문이 나오지 않을 사유인가 — 404·no-anchor(페이지는 받았는데 앵커 없음)·영구 403."""
     status = str(status or "")
-    if status in DEFINITIVE_STATUSES:
+    if status in DEFINITIVE_STATUSES or is_permanent_403(status):
         return True
     return status.startswith("fetch-fail") and "404" in status
 
 
-def is_recovery_candidate(raw: dict[str, Any]) -> bool:
-    """본문 전문이 없고, 다시 읽으면 나올 수 있는 행인가(순수 함수)."""
+def is_recovery_candidate(raw: dict[str, Any], *, include_permanent_403: bool = False) -> bool:
+    """본문 전문이 없고, 다시 읽으면 나올 수 있는 행인가(순수 함수).
+
+    `include_permanent_403` 은 사람이 `--doc-ids` 로 문서를 지정했을 때만 켠다(수동 재시도)."""
     if raw.get("wl_body_full"):
         return False
-    return not is_definitive_status(str(raw.get("wl_body_status") or ""))
+    status = str(raw.get("wl_body_status") or "")
+    if include_permanent_403 and is_permanent_403(status):
+        return True
+    return not is_definitive_status(status)
+
+
+def starts_mid_sentence(body: str) -> bool:
+    """본문이 문장 중간(소문자)에서 시작하는가 — 시작 앵커 절단의 흔적."""
+    return bool(re.match(r"[a-z]", str(body or "")))
+
+
+def is_body_start_candidate(raw: dict[str, Any], *, explicit: bool = False) -> bool:
+    """`--rebuild-body-start` 대상: 본문이 있고, 소문자로 시작하거나 사람이 지정한 행."""
+    full = str(raw.get("wl_body_full") or "")
+    return bool(full) and (explicit or starts_mid_sentence(full))
+
+
+def first_403_date(raw: dict[str, Any], collected_at: str) -> date | None:
+    """이 행에서 403 을 처음 본 날. 모르면 None(→ 오늘을 첫 관측일로 표식한다).
+
+    `fetch-403:since=D`·`fetch-403:permanent since=D` → D · 라이브 수집이 남긴 맨 `fetch-403`
+    → 적재일(그때 403 이었다) · 사유가 없거나 다른 사유면 None."""
+    status = str(raw.get("wl_body_status") or "")
+    text = ""
+    if status.startswith(STATUS_403 + ":"):
+        m = _403_SINCE_RE.search(status)
+        text = m.group(1) if m else ""
+    elif status == STATUS_403:
+        text = str(collected_at or "")[:10]
+    try:
+        return date.fromisoformat(text) if text else None
+    except ValueError:
+        return None
+
+
+def next_403_status(raw: dict[str, Any], collected_at: str, today: date) -> str:
+    """오늘 또 403 을 받은 행의 새 표식(순수 함수). 저장 표식과 같으면 쓸 필요가 없다."""
+    since = first_403_date(raw, collected_at)
+    if since is None:
+        return f"{STATUS_403}:since={today.isoformat()}"
+    if (today - since).days >= PERMANENT_403_AFTER_DAYS:
+        return f"{_403_PERMANENT_PREFIX} since={since.isoformat()}"
+    return str(raw.get("wl_body_status") or "")
 
 
 # ---------------------------------------------------------------------------
@@ -180,15 +263,17 @@ def _rebuild_item(raw: dict[str, Any], excerpt: tuple[str, str], full: tuple[str
 # ---------------------------------------------------------------------------
 
 
-def _fetch_raw_signals(base_url: str, service_key: str, *,
+def _fetch_raw_signals(base_url: str, service_key: str, *, with_body: bool = False,
                        page_size: int = _DEFAULT_PAGE_SIZE) -> list[dict[str, Any]]:
-    """source='FDA Warning Letter' 중 raw_json 에 `wl_body_full` 문자열이 없는 행(서버 좁히기)."""
+    """source='FDA Warning Letter' 중 raw_json 에 `wl_body_full` 문자열이 없는 행(서버 좁히기).
+
+    `with_body` 면 반대로 본문이 있는 행(`--rebuild-body-start`)."""
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
         select="raw_signal_id,document_id,collected_at,raw_json",
         page_size=page_size, order="raw_signal_id.asc",
         extra_params={"source": f"eq.{SOURCE_FDA_WL}",
-                      "raw_json": "not.like.*wl_body_full*"},
+                      "raw_json": ("like" if with_body else "not.like") + ".*wl_body_full*"},
     )
 
 
@@ -258,40 +343,51 @@ def run(
     rebuild_item: Callable[..., Any] | None = None,
     upsert_raw_signal: Callable[..., tuple[int, list[dict[str, Any]] | None, str]] | None = None,
     sleeper: Sleeper | None = None,
+    today: date | None = None,
+    rebuild_body_start: bool = False,
 ) -> tuple[WlBodyRecoveryReport, int]:
     fetch_raw = fetch_raw_signals or _fetch_raw_signals
     letter_fn = fetch_letter or _fetch_letter
     rebuild_fn = rebuild_item or _rebuild_item
     upsert_fn = upsert_raw_signal or _upsert_raw_signal
     sleep_fn = sleeper or _default_sleep
+    today = today or datetime.now(timezone.utc).date()
 
     report = WlBodyRecoveryReport(mode="dry_run" if dry_run else "apply", limit=limit,
-                                  delay_seconds=delay_seconds)
+                                  delay_seconds=delay_seconds,
+                                  rebuild_body_start=rebuild_body_start)
     base = _normalize_base_url(base_url)
     if base is None:
         report.errors.append("SUPABASE_URL must start with https://")
         return report, 2
 
     try:
-        rows = fetch_raw(base, service_key)
+        rows = (fetch_raw(base, service_key, with_body=True) if rebuild_body_start
+                else fetch_raw(base, service_key))
     except (RuntimeError, ValueError) as exc:
         report.errors.append(str(exc))
         log("ERROR", f"WL 본문 회수 조회 실패: {exc}")
         return report, 2
     report.scanned = len(rows)
 
+    wanted = set(doc_ids or [])
+
+    def _named(r: dict[str, Any]) -> bool:
+        return (str(r.get("raw_signal_id") or "") in wanted
+                or str(r.get("document_id") or "") in wanted)
+
     targets: list[dict[str, Any]] = []
     for r in rows:
         raw = _json_object(r.get("raw_json"))
-        if is_recovery_candidate(raw):
+        if rebuild_body_start:
+            if is_body_start_candidate(raw, explicit=bool(wanted) and _named(r)):
+                targets.append(r)
+        elif is_recovery_candidate(raw, include_permanent_403=bool(doc_ids)):
             targets.append(r)
         elif not raw.get("wl_body_full"):
             report.skipped_definitive += 1
-    if doc_ids:
-        wanted = set(doc_ids)
-        targets = [r for r in targets
-                   if str(r.get("raw_signal_id") or "") in wanted
-                   or str(r.get("document_id") or "") in wanted]
+    if wanted:
+        targets = [r for r in targets if _named(r)]
     targets.sort(key=lambda r: str(r.get("raw_signal_id") or ""))
     if limit is not None and limit > 0:     # 0 이하 = 전건(형제 백필과 같은 규약)
         targets = targets[:limit]
@@ -322,24 +418,47 @@ def run(
             report.errors.append(f"{label}: fetch_raised:{type(exc).__name__}")
             continue
 
+        if not full and rebuild_body_start:
+            # 있는 본문을 표식으로 덮지 않는다 — 이번에 못 받았으면 그대로 둔다.
+            report.still_empty += 1
+            _bump(report, status.split(":", 1)[0] or "empty")
+            continue
+        old_full = str(raw.get("wl_body_full") or "")
+        if rebuild_body_start and full == old_full:
+            report.body_start_unchanged += 1
+            continue
         if not full:
+            new_status = status
             if not is_definitive_status(status):
-                # 403·5xx 가 또 났다 — 손대지 않고 다음 실행에 다시 본다.
+                # 403·5xx 가 또 났다 — 본문은 손대지 않고 다음 실행에 다시 본다.
                 report.still_empty += 1
                 _bump(report, status.split(":", 1)[0] or "empty")
-                continue
-            # 확정 사유 — 기존 발췌는 살리고 사유 표식만 남겨 재시도를 끊는다.
+                if status != STATUS_403:
+                    continue
+                # 403 만 표식을 관리한다(영구 403 정책 — 모듈 docstring).
+                new_status = next_403_status(raw, str(r.get("collected_at") or ""), today)
+                if new_status == str(raw.get("wl_body_status") or ""):
+                    continue
+            # 확정 사유·403 표식 — 기존 발췌는 살리고 사유 표식만 바꾼다.
             old_excerpt = str(raw.get("wl_body_excerpt") or "")
-            excerpt_arg = (old_excerpt or excerpt, status)
+            excerpt_arg = (old_excerpt or excerpt, new_status)
             try:
-                item = rebuild_fn(raw, excerpt_arg, ("", status))
+                item = rebuild_fn(raw, excerpt_arg, ("", new_status))
             except Exception as exc:  # noqa: BLE001
                 report.failed += 1
                 _bump(report, f"rebuild_raised:{type(exc).__name__}")
                 report.errors.append(f"{label}: rebuild_raised:{type(exc).__name__}")
                 continue
-            if _write(report, label=label, row=r, item=item, base=base,
-                      service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn):
+            if not _write(report, label=label, row=r, item=item, base=base,
+                          service_key=service_key, dry_run=dry_run, upsert_fn=upsert_fn):
+                continue
+            if is_permanent_403(new_status):
+                report.permanent_403 += 1
+                report.permanent_403_docs.append(label)
+                log("WARN", f"WL 본문 영구 403 확정(매일 회수 중단) {label}: {new_status}")
+            elif new_status != status:
+                report.blocked_403_marked += 1
+            else:
                 report.status_resolved += 1
             continue
 
@@ -362,12 +481,14 @@ def run(
                 "raw_signal_id": str(r.get("raw_signal_id") or ""), "document_id": label,
                 "previous_status": str(raw.get("wl_body_status") or ""),
                 "full_chars": len(full), "violations": len(violations),
+                **({"old_head": old_full[:60], "new_head": full[:60]} if rebuild_body_start else {}),
             })
 
     head = "[DRY] 교체 예정" if dry_run else "회수 upsert"
     log("INFO", f"WL 본문 {head} {report.recovered}건(위반 표제 {report.violations_recovered}건) "
                 f"· 대상 {report.candidates}건 · 이번에도 못 받음 {report.still_empty}건 "
-                f"· 확정 사유로 표식 교체 {report.status_resolved}건 · 실패 {report.failed}건")
+                f"· 확정 사유로 표식 교체 {report.status_resolved}건 · 영구 403 확정 "
+                f"{report.permanent_403}건 · 실패 {report.failed}건")
     return report, (1 if _is_broad_failure(report) else 0)
 
 
@@ -382,7 +503,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--delay-seconds", type=float, default=_DEFAULT_DELAY_SECONDS,
                    help=f"편지 요청 간 대기(초) — fda.gov 예의(기본 {_DEFAULT_DELAY_SECONDS:g}).")
     p.add_argument("--doc-ids", default="",
-                   help="선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분).")
+                   help="선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). "
+                        "지정하면 영구 403 표식 행도 다시 시도한다.")
+    p.add_argument("--rebuild-body-start", action="store_true", default=False,
+                   help="본문이 있지만 문장 중간(소문자)에서 시작하는 행(+ --doc-ids 지정 행)을 다시 "
+                        "받아 재구성한다(수동 전용 — 모듈 docstring).")
     p.add_argument("--report-path", help="JSON 리포트를 이 경로에도 기록.")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
@@ -404,6 +529,7 @@ def main(argv: list[str] | None = None) -> int:
         base_url=base_url, service_key=service_key, dry_run=not args.apply,
         limit=args.limit, delay_seconds=args.delay_seconds,
         doc_ids=_parse_doc_ids(args.doc_ids),
+        rebuild_body_start=args.rebuild_body_start,
     )
     payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)
     print(payload)

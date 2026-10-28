@@ -2607,13 +2607,58 @@ def _extract_wl_body_span(html_text: str, max_chars: int) -> str:
     text = _wl_html_to_text(html_text)
     if not text:
         return ""
+    opening = _wl_letter_opening(text)
     start = _earliest_anchor(text, _WL_BODY_ANCHORS_PRIMARY)
     if start is None:
         start = _earliest_anchor(text, _WL_BODY_ANCHORS_FALLBACK)
+        if start is not None and opening is not None and opening <= start:
+            # 1차 앵커가 없는 양식(실사 거부·기록 요청·온라인 판매 등)은 첫 단락부터가 본문이다.
+            start = opening
     if start is None:
         return ""
-    start = _skip_wl_leadin(text, start)
+    moved = _skip_wl_leadin(text, start)
+    start = moved if moved != start else _wl_sentence_start(text, start, opening or 0)
     return text[start:start + max_chars].strip()
+
+
+# [본문 시작점 2026-10-28] 앵커는 **문장 안의 낱말**을 찾는다. 그 위치에서 자르면 본문이 문장
+# 중간에서 시작한다 — Supabase WL 1,372행 중 478행(35%)이 소문자로 시작했다("violation of
+# section …" 265 · "violations cited in …" 45 · "significant violations were …" 32 · "during the
+# inspection …" 29 …). 1차 앵커가 없는 양식은 더 나빴다: 10-05 호 Kellin Chemicals(실사 거부
+# 서한)는 폴백 앵커 `adulterated` 가 셋째 문장에서 걸려 첫 단락("Your firm is currently
+# registered as a supplier …")을 통째로 잃었다. 그래서 ① 폴백 층은 서한 첫머리(`Dear …:`
+# 인사말 뒤)부터, ② 그 밖에는 앵커가 든 문장의 첫머리로 물러선다.
+_WL_SALUTATION_RE = re.compile(r"\bDear\s+[^:]{1,120}?:\s*")
+_WL_SENTENCE_BREAK_RE = re.compile(r"[.!?:][\"”')\]]?\s+(?=[\"“(\[]?[A-Z0-9])")
+# 마침표가 문장 끝이 아닌 약어(뒤에 대문자가 와도 문장이 이어진다).
+_WL_ABBREV_TAIL_RE = re.compile(
+    r"(?:^|[\s(])(?:[A-Z]|[A-Za-z]\.[A-Za-z]|U\.S|Inc|Co|Corp|Ltd|LLC|No|Nos|Mr|Mrs|Ms|Dr|St|Jr"
+    r"|vs|al|etc|Sec|Fig|approx|U\.S\.C|C\.F\.R|e\.g|i\.e)$")
+_WL_SENTENCE_LOOKBACK = 500   # 이보다 먼 마침표는 같은 문장이 아니다 — 못 찾으면 앵커 그대로
+
+
+def _wl_letter_opening(text: str) -> int | None:
+    """서한 인사말(`Dear Mr. X:`) 바로 뒤 위치. 없으면 None."""
+    m = _WL_SALUTATION_RE.search(text)
+    return m.end() if m else None
+
+
+def _wl_sentence_start(text: str, start: int, floor: int = 0) -> int:
+    """`start` 가 든 문장의 첫 글자 위치(`floor` 보다 앞으로는 가지 않는다).
+
+    `_WL_SENTENCE_LOOKBACK` 안에서 문장 경계를 못 찾으면 — 인사말이 그 안에 있으면 인사말 뒤,
+    아니면 `start` 그대로(오늘보다 나빠지지 않는다)."""
+    lo = max(floor, start - _WL_SENTENCE_LOOKBACK)
+    best: int | None = None
+    for m in _WL_SENTENCE_BREAK_RE.finditer(text, lo, start + 1):
+        if m.end() > start:
+            break
+        if text[m.start()] == "." and _WL_ABBREV_TAIL_RE.search(text, lo, m.start()):
+            continue
+        best = m.end()
+    if best is not None:
+        return best
+    return floor if floor and start - floor <= _WL_SENTENCE_LOOKBACK else start
 
 
 def _skip_wl_leadin(text: str, start: int) -> int:

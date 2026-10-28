@@ -111,5 +111,27 @@ class ReportCoversExpectedSourcesTest(unittest.TestCase):
         self.assertTrue(any(ln.startswith("- Mystery Source:") for ln in lines))
 
 
+class WlPermanent403LineTest(unittest.TestCase):
+    """영구 403 으로 회수를 포기한 WL 은 주간 요약에 한 줄로 남는다(backfill_wl_body_recovery)."""
+
+    def test_zero_is_still_reported(self):
+        self.assertEqual(ra.wl_permanent_403_line([]),
+                         "- FDA WL 본문 회수 포기(영구 403): 0건")
+
+    def test_lists_ids_and_caps_at_ten(self):
+        rows = [{"document_id": f"doc{i:02d}"} for i in range(12)]
+        line = ra.wl_permanent_403_line(rows)
+        self.assertIn("12건", line)
+        self.assertIn("doc09 …", line)
+        self.assertNotIn("doc10", line)
+
+    def test_marker_matches_recovery_prefix(self):
+        import backfill_wl_body_recovery as rec
+        status = rec.next_403_status({"wl_body_status": "fetch-403:since=2026-01-01"}, "",
+                                     datetime(2026, 2, 1).date())
+        # 조회 필터 `like.*fetch-403:permanent*` 가 회수 스크립트의 표식을 실제로 잡는다.
+        self.assertTrue(status.startswith("fetch-403:permanent"))
+
+
 if __name__ == "__main__":
     unittest.main()

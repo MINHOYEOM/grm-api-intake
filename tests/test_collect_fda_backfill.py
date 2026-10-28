@@ -23,6 +23,7 @@ import collect_fda_backfill as backfill
 import collect_intake as ci
 import findings_store
 import findings_supabase_append as fsa
+import grm_findings as gf
 
 
 _BASE_URL = "https://example.supabase.co"
@@ -193,6 +194,17 @@ _WL_LETTER_HTML_WITH_BODY = (
     "<html><body><p>During our inspection of your firm, investigators observed "
     "significant CGMP violations in aseptic processing areas.</p></body></html>"
 )
+_WL_LETTER_HTML_VIOLATIONS = (
+    "<html><body><p>Dear Mr. Doe:</p><p>During our inspection of your drug manufacturing "
+    "facility, our investigator observed specific violations including, but not limited to, "
+    "the following.</p><p>1. Your firm failed to thoroughly investigate any unexplained "
+    "discrepancy or failure of a batch to meet its specifications (21 CFR 211.192).</p>"
+    "<p>Your response is inadequate because it did not include a retrospective review of all "
+    "batches within expiry and the associated investigation records.</p>"
+    "<p>2. Your firm failed to establish adequate written procedures for production and "
+    "process control (21 CFR 211.100(a)).</p><p>Within fifteen working days, respond in "
+    "writing describing the corrective actions you have taken.</p></body></html>"
+)
 
 
 class _FakeResponse:
@@ -328,45 +340,90 @@ class Fda483IdentityTest(unittest.TestCase):
 
 
 class FdaWlIdentityTest(unittest.TestCase):
-    def _daily_record(self) -> dict:
+    """[2026-10-28] backfill rows are built by `collect_intake.build_wl_item` — byte-identical
+    to a live row (ENABLE_WL_BODY + ENABLE_WL_BODY_FULL on) for the same letter page."""
+
+    def _daily_record(self, letter: object = _WL_LETTER_HTML_NO_ANCHOR, *,
+                      flags_on: bool = True) -> dict:
         # Daily path: drive collect_intake.collect_fda_warning_letters itself against
-        # the same document rendered as its static HTML table.
+        # the same document rendered as its static HTML table, letter page by URL.
         env = {k: v for k, v in os.environ.items()
                if k not in ("ENABLE_WL_BODY", "ENABLE_WL_BODY_FULL")}
+        if flags_on:
+            env.update({"ENABLE_WL_BODY": "true", "ENABLE_WL_BODY_FULL": "true"})
+
+        def fake_get(url, **_kwargs):
+            if url == ci.FDA_WL_URL:
+                return _FakeResponse(200, text=_WL_DAILY_HTML)
+            if isinstance(letter, int):
+                return _FakeResponse(letter, text="")
+            return _FakeResponse(200, text=letter)
+
         with mock.patch.dict(os.environ, env, clear=True), \
-             mock.patch("collect_intake.requests.get",
-                        return_value=_FakeResponse(200, text=_WL_DAILY_HTML)):
+             mock.patch("collect_intake.requests.get", side_effect=fake_get):
             items, err = ci.collect_fda_warning_letters(date(2024, 6, 1), date(2024, 6, 30))
         assert err is None
         assert len(items) == 1
         return findings_store.raw_signal_from_intake_item(items[0])
 
-    def test_backfill_raw_signal_identical_to_daily_collector_path(self) -> None:
-        daily_record = self._daily_record()
-
-        report, exit_code, post, _html, _sleeper = _run_wl(letter_html=_WL_LETTER_HTML_NO_ANCHOR)
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(report.invalid, 0)
-        posted = _posted_records(post)
-        self.assertEqual(len(posted), 1)
-        backfill_record = posted[0]
-
-        self.assertEqual(backfill_record["raw_signal_id"], daily_record["raw_signal_id"])
-        self.assertEqual(backfill_record["document_id"], daily_record["document_id"])
+    def _assert_identical(self, daily_record: dict, backfill_record: dict) -> None:
         self.assertEqual(backfill_record["source"], "FDA Warning Letter")
-        # With no wl_body_full extracted, the records must be fully identical
-        # (collected_at is the only allowed difference).
+        # collected_at is the only allowed difference.
         for key, value in daily_record.items():
             if key == "collected_at":
                 continue
             self.assertEqual(backfill_record.get(key), value, f"field mismatch: {key}")
+        self.assertEqual(set(backfill_record), set(daily_record))
 
-    def test_raw_signal_id_stable_even_when_backfill_adds_wl_body_full(self) -> None:
-        daily_record = self._daily_record()
-        _report, _code, post, _html, _sleeper = _run_wl(letter_html=_WL_LETTER_HTML_WITH_BODY)
-        backfill_record = _posted_records(post)[0]
-        self.assertIn("wl_body_full", json.loads(backfill_record["raw_json"]))
-        self.assertEqual(backfill_record["raw_signal_id"], daily_record["raw_signal_id"])
+    def _backfill_record(self, letter_html: object) -> dict:
+        report, exit_code, post, _html, _sleeper = _run_wl(letter_html=letter_html)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(report.invalid, 0)
+        posted = _posted_records(post)
+        self.assertEqual(len(posted), 1)
+        return posted[0]
+
+    def test_no_anchor_letter_is_byte_identical(self) -> None:
+        backfill_record = self._backfill_record(_WL_LETTER_HTML_NO_ANCHOR)
+        self._assert_identical(self._daily_record(_WL_LETTER_HTML_NO_ANCHOR), backfill_record)
+        self.assertEqual(json.loads(backfill_record["raw_json"])["wl_body_status"], "no-anchor")
+
+    def test_letter_with_body_is_byte_identical(self) -> None:
+        backfill_record = self._backfill_record(_WL_LETTER_HTML_WITH_BODY)
+        self._assert_identical(self._daily_record(_WL_LETTER_HTML_WITH_BODY), backfill_record)
+        raw = json.loads(backfill_record["raw_json"])
+        self.assertIn("wl_body_full", raw)
+        self.assertIn("wl_body_excerpt", raw)
+
+    def test_violations_letter_carries_wl_violations_identically(self) -> None:
+        backfill_record = self._backfill_record(_WL_LETTER_HTML_VIOLATIONS)
+        self._assert_identical(self._daily_record(_WL_LETTER_HTML_VIOLATIONS), backfill_record)
+        violations = json.loads(backfill_record["raw_json"])["wl_violations"]
+        self.assertEqual([v["number"] for v in violations], ["1", "2"])
+
+    def test_letter_403_is_byte_identical(self) -> None:
+        resp = _requests.Response()
+        resp.status_code = 403
+        http_err = _requests.exceptions.HTTPError("403 Client Error", response=resp)
+        final = RuntimeError("HTTP GET final failure")
+        final.__cause__ = http_err
+        backfill_record = self._backfill_record(final)
+        self._assert_identical(self._daily_record(403), backfill_record)
+        self.assertEqual(json.loads(backfill_record["raw_json"])["wl_body_status"], "fetch-403")
+
+    def test_raw_signal_id_unchanged_from_pre_build_wl_item_formula(self) -> None:
+        # raw_signal_id = sha256({schema_version, source, document_id}) — and document_id is
+        # the same `_stable_doc_id(...)` the old hand-built row used. Rows already in Supabase
+        # keep their id, so a rerun is still ignore-duplicates idempotent.
+        doc_id = ci._stable_doc_id("FDA Warning Letter", "Acme Pharma LLC",
+                                   "https://www.fda.gov" + _WL_HREF, "2024-06-15")
+        expected = "rawsig-" + gf.stable_hash({
+            "schema_version": gf.RAW_SIGNAL_SCHEMA_VERSION,
+            "source": "FDA Warning Letter", "document_id": doc_id})[:24]
+        for letter in (_WL_LETTER_HTML_NO_ANCHOR, _WL_LETTER_HTML_VIOLATIONS):
+            record = self._backfill_record(letter)
+            self.assertEqual(record["document_id"], doc_id)
+            self.assertEqual(record["raw_signal_id"], expected)
 
 
 # ---------------------------------------------------------------------------

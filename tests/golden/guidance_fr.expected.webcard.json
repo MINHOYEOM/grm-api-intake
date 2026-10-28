@@ -45,6 +45,7 @@
   "render_order": null,
   "signal_label": "Med",
   "signal_tier": 2,
+  "source_body_captured": true,
   "sources": {
     "info_url": "https://www.federalregister.gov/api/v1/documents/2026-04578",
     "link_check": {

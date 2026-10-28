@@ -28,13 +28,15 @@ def _row(doc_id: str = "fda483-195591", page_id: str = "page-1") -> dict:
     return {"page_id": page_id, "document_id": doc_id, "source": "FDA 483"}
 
 
-def _run(*, rows=None, notion_raw=None, supa=None, dry_run=False, replace=None, skip=None):
+def _run(*, rows=None, notion_raw=None, supa=None, dry_run=False, replace=None,
+         source_key="fda483", skip=None):
     rows = [_row()] if rows is None else rows
     notion_raw = notion_raw if notion_raw is not None else {"page-1": _EMPTY}
     supa = supa if supa is not None else {"fda483-195591": _FULL}
     replace = replace or mock.MagicMock()
     skip = skip or mock.MagicMock()
     seen_query = {}
+    seen_supa_source = []
 
     def query(token, db, run_date, **kw):
         seen_query.update(kw)
@@ -45,11 +47,14 @@ def _run(*, rows=None, notion_raw=None, supa=None, dry_run=False, replace=None, 
         dry_run=dry_run, run_date=date(2026, 10, 27),
         query_rows=query,
         fetch_notion_raw=lambda token, page_id: notion_raw.get(page_id),
-        fetch_supabase_raw=lambda base, key, ids: {i: supa[i] for i in ids if i in supa},
+        fetch_supabase_raw=lambda base, key, ids, source: (
+            seen_supa_source.append(source) or {i: supa[i] for i in ids if i in supa}),
         replace_page_raw=replace,
         mark_row_skipped=skip,
+        source_key=source_key,
     )
     _run.skip = skip
+    seen_query["_supa_source"] = seen_supa_source
     return report, code, replace, seen_query
 
 
@@ -219,6 +224,48 @@ class ReplacePageRawTest(unittest.TestCase):
         with mock.patch("grm_handoff.notion_api_request",
                         lambda *a, **k: {"results": appended, "has_more": False}):
             self.assertEqual(fetch_intake_raw_payload("t", "page-1"), _FULL)
+
+
+
+_WL_EXCERPT_ONLY = {"firm": "Acme", "url": "https://www.fda.gov/x", "wl_body_excerpt": "During ...",
+                    "wl_body_status": "fetch-503"}
+_WL_FULL = {"firm": "Acme", "url": "https://www.fda.gov/x", "wl_body_excerpt": "During ...",
+            "wl_body_full": "During our inspection ... 1. Your firm failed ...",
+            "wl_violations": [{"number": "1", "statement": "Your firm failed ..."}]}
+
+
+class NotionRawSyncWarningLetterTest(unittest.TestCase):
+    """[2026-10-28] `--source wl` — WL 의 본문 판정은 `wl_body_full`(fan-out 입력)이다."""
+
+    def _wl(self, **kw):
+        kw.setdefault("rows", [{"page_id": "page-1", "document_id": "abc123", "source": "FDA Warning Letter"}])
+        kw.setdefault("notion_raw", {"page-1": _WL_EXCERPT_ONLY})
+        kw.setdefault("supa", {"abc123": _WL_FULL})
+        return _run(source_key="wl", **kw)
+
+    def test_excerpt_only_row_is_synced_with_full_body(self):
+        """발췌만 있는 행은 카드 신호로는 '본문 있음'이지만 fan-out 입력이 없다 — 동기화 대상."""
+        report, code, replace, query = self._wl()
+        self.assertEqual(code, 0)
+        self.assertEqual(query.get("source_names"), {"FDA Warning Letter"})
+        self.assertEqual(query["_supa_source"], ["FDA Warning Letter"])
+        self.assertEqual(report.source, "FDA Warning Letter")
+        self.assertEqual((report.candidates, report.synced, report.observations_synced), (1, 1, 1))
+        replace.assert_called_once_with("t", "page-1", _WL_FULL)
+
+    def test_row_with_full_body_is_left_alone(self):
+        report, _code, replace, _q = self._wl(notion_raw={"page-1": _WL_FULL})
+        self.assertEqual(report.already_has_body, 1)
+        replace.assert_not_called()
+
+    def test_supabase_without_full_body_is_not_written(self):
+        report, _code, replace, _q = self._wl(supa={"abc123": _WL_EXCERPT_ONLY})
+        self.assertEqual(report.supabase_also_empty, 1)
+        replace.assert_not_called()
+
+    def test_cli_accepts_source_wl(self):
+        self.assertEqual(sync.build_arg_parser().parse_args(["--source", "wl"]).source, "wl")
+        self.assertEqual(sync.build_arg_parser().parse_args([]).source, "fda483")
 
 
 if __name__ == "__main__":

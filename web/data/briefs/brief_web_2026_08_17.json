@@ -1065,6 +1065,45 @@
      "Cleaning procedures and records for shared equipment",
      "Microbial control of water used for cleaning"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.42(b)",
+      "original": "1. Your firm failed to have buildings used in the manufacture, processing, packing, or holding of drug products with adequate space for the orderly placement of equipment and materials to prevent mix-ups and contamination; and failed to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups (21 CFR 211.42(b) and 21 CFR 211.42(c)). Your firm contract manufactures over-the-counter (OTC) drug products as well as non-drug products. Your firm lacked adequate space and defined areas for equipment and materials to prevent mix-ups and contamination in the manufacturing of drug products. For example, our investigators observed inadequate material storage throughout your facility, with components and raw materials stored haphazardly on floors, along walls, and in hallways between packaging lines used for the manufacturing of drug products. In addition, materials lacked clear identification of contents, designated status (e.g., quarantined, approved, or rejected), intended use, or production run association. Your facility also lacked designated areas for quarantining incoming materials and segregating approved from rejected materials. Your lack of designated areas further compromises inventory control and increases the risk of mix-ups and contamination.",
+      "description": "귀사는 의약품의 제조·가공·포장·보관에 사용되는 건물에 혼동과 오염을 방지하기 위해 설비와 자재를 질서 있게 배치할 수 있는 충분한 공간을 확보하지 않았고, 오염이나 혼동을 방지하는 데 필요한 분리·지정 구역 또는 그 밖의 관리 체계를 갖추지 않았다(21 CFR 211.42(b) 및 21 CFR 211.42(c)). 귀사는 일반의약품(OTC)과 비의약품을 위탁 제조한다. 귀사는 의약품 제조 시 혼동과 오염을 방지하기 위한 설비·자재용 공간과 지정 구역이 부족했다. 예를 들어 FDA 조사관은 시설 전반에서 부적절한 자재 보관을 관찰했는데, 원료와 구성성분이 바닥, 벽면, 그리고 의약품 제조에 쓰이는 포장 라인 사이 복도에 무질서하게 놓여 있었다. 또한 자재에는 내용물, 지정 상태(예: 격리·적합·부적합), 용도, 생산 배치와의 연관성에 대한 명확한 식별 표시가 없었다. 시설에는 입고 자재를 격리하고 적합 자재와 부적합 자재를 분리하기 위한 지정 구역도 없었다. 이러한 지정 구역 부재는 재고 관리를 더욱 약화시키고 혼동과 오염의 위험을 높인다.",
+      "risk": "자재 상태 미표시·격리구역 부재로 부적합·미시험 원료가 의약품에 혼입되거나 비의약품과 혼동될 위험이 크다."
+     },
+     {
+      "citation": "21 CFR 211.67(b)",
+      "original": "2. Your firm failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements; and failed to establish and follow adequate written procedures for cleaning and maintenance of equipment (21 CFR 211.67(a) and 21 CFR 211.67(b)). Your firm failed to ensure that appropriate procedures are established and followed for cleaning and maintenance of your equipment used to manufacture drug products. Specifically, your firm’s cleaning and maintenance procedure lacked critical details, including types of cleaning agents, cleaning agent concentrations or dilutions, contact times, sampling requirements, and testing specifications. This deficiency is particularly concerning because your firm manufactures OTC drug products on the same non-dedicated equipment used to manufacture non-drug products. Additionally, per your cleaning procedure, equipment cleaning should be documented in a designated logbook and verified by a supervisor. However, your firm could not provide any cleaning or sanitization logs to demonstrate that cleaning was performed on your equipment. Additionally, while your batch records contained a designated step for documenting equipment cleaning, this step was not completed for multiple drug product lots. You lacked appropriate evidence that cleaning was performed or verified, including when cleaning was performed, who performed the cleaning, and what product was cleaned from the equipment. Furthermore, your cleaning practices were inadequate. For example, the (b)(4) you used in equipment cleaning repeatedly yielded too-numerous-to-count bioburden results during routine sampling. Despite these recurring out-of-limit bioburden results, your firm failed to take appropriate corrective actions and continued using this (b)(4) for equipment cleaning without remediation.",
+      "description": "귀사는 의약품의 안전성·확인·함량·품질·순도를 공식 또는 기타 설정 기준을 벗어나게 변화시킬 수 있는 오작동이나 오염을 방지하기 위해 설비와 기구를 적절한 주기로 세척·유지하고 의약품 특성에 맞게 위생처리 및/또는 멸균하지 않았으며, 설비 세척·유지를 위한 적절한 서면 절차를 수립·준수하지 않았다(21 CFR 211.67(a) 및 21 CFR 211.67(b)). 귀사는 의약품 제조 설비의 세척·유지를 위한 적절한 절차가 수립·준수되도록 보장하지 못했다. 구체적으로 귀사의 세척·유지 절차에는 세척제 종류, 세척제 농도 또는 희석 비율, 접촉 시간, 샘플링 요건, 시험 규격 등 핵심 세부사항이 빠져 있었다. 귀사가 비의약품 제조에 쓰는 동일한 비전용 설비에서 OTC 의약품을 제조하기 때문에 이 결함은 특히 우려된다. 또한 귀사의 세척 절차상 설비 세척은 지정된 로그북에 기록되고 감독자가 확인해야 하지만, 귀사는 설비 세척이 수행되었음을 입증할 세척·위생처리 기록을 전혀 제시하지 못했다. 아울러 배치 기록에 설비 세척을 기록하는 지정 단계가 있었으나 여러 의약품 로트에서 이 단계가 작성되지 않았다. 귀사는 세척이 언제, 누구에 의해 수행되었는지, 설비에서 어떤 제품이 세척되었는지를 포함해 세척 수행·확인에 대한 적절한 증거가 없었다. 더 나아가 세척 관행 자체도 부적절했다. 예를 들어 설비 세척에 사용한 (b)(4)는 정기 샘플링에서 반복적으로 계수 불가(too-numerous-to-count) 수준의 바이오버든 결과를 보였다. 이처럼 기준을 벗어난 바이오버든 결과가 반복되었음에도 귀사는 적절한 시정조치를 취하지 않고 개선 없이 이 (b)(4)를 설비 세척에 계속 사용했다.",
+      "risk": "비전용 설비에서 세척 미검증 상태로 생산하고 미생물 오염된 (b)(4)로 세척해 후속 의약품의 미생물 오염·교차오염 위험이 높다."
+     },
+     {
+      "citation": "21 CFR 211.22",
+      "original": "3. Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). Your firm failed to establish an adequate quality unit (QU) with the responsibilities and authority to oversee the manufacturing of drug products. For example, your QU failed to ensure: Adequate procedures ensuring appropriate production and process controls for drug product manufacturing and qualification of equipment used to manufacture drug products (21 CFR 211.100(a)). Establishment of an adequate, ongoing stability program (21 CFR 211.166(a)). Establishment of adequate written responsibilities and procedures applicable to the quality control unit (21 CFR 211.22(d)).",
+      "description": "귀사의 품질관리 부서는 제조된 의약품이 CGMP를 준수하고 확인·함량·품질·순도에 대한 설정 규격을 충족하도록 보장할 책임을 이행하지 않았다(21 CFR 211.22). 귀사는 의약품 제조를 감독할 책임과 권한을 가진 적절한 품질부서(QU)를 수립하지 않았다. 예를 들어 QU는 다음을 보장하지 못했다: 의약품 제조를 위한 적절한 생산·공정 관리와 의약품 제조 설비의 적격성 평가를 보장하는 적절한 절차(21 CFR 211.100(a)), 적절하고 지속적인 안정성 프로그램의 수립(21 CFR 211.166(a)), 품질관리 부서에 적용되는 적절한 서면 책임 및 절차의 수립(21 CFR 211.22(d)).",
+      "risk": "QU 권한·절차 부재로 공정·설비 적격성과 안정성 근거 없이 제품이 출하되어 유효기간·품질 보증이 불가능하다."
+     },
+     {
+      "citation": "sections 505(a) and 301(d) of the FD&C Act",
+      "original": "Thus, “FROYA, Instant Rosacea, Acne & Redness Stopper,” “[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM,” “[Norse], BODY ACNE KILLER, BODY BALM,” “FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face,” and “PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM” products do not comply with the applicable conditions specified in their corresponding monographs, nor have they otherwise been found to be GRASE. 4 Accordingly, these products are new drugs within the meaning of section 201(p) of the FD&C Act, 21 U.S.C. 321(p), and there is no basis under section 505G of the FD&C Act under which these products would be legally marketed without an approved application. Because there are no applications in effect for these products, these products are unapproved new drugs. The introduction or delivery for introduction of these unapproved new drug products into interstate commerce violates sections 505(a) and 301(d) of the FD&C Act, 21 U.S.C. 355(a) and 331(d).",
+      "description": "따라서 “FROYA, Instant Rosacea, Acne & Redness Stopper”, “[Norse], ACNE SCARS HEALER & PREVENTER 2.0, FACE BALM”, “[Norse], BODY ACNE KILLER, BODY BALM”, “FROYA, Hyper Fast Eczema & Psoriasis Stopper for Body & Face”, “PRIMAL VIKING, ULTIMATE JOINT & MUSCLE REPAIR BALM” 제품은 해당 모노그래프에 명시된 적용 조건을 충족하지 않으며, 달리 GRASE(일반적으로 안전·유효하다고 인정됨)로 판정된 바도 없다. 이에 따라 이 제품들은 FD&C Act 201(p)항(21 U.S.C. 321(p))이 정의하는 신약에 해당하며, 승인된 신청 없이 합법적으로 판매될 수 있는 FD&C Act 505G항상의 근거도 없다. 이 제품들에 대해 유효한 신청이 없으므로 이 제품들은 미승인 신약이다. 이러한 미승인 신약을 주간 거래에 도입하거나 도입을 위해 인도하는 것은 FD&C Act 505(a)항 및 301(d)항(21 U.S.C. 355(a) 및 331(d))을 위반한다.",
+      "risk": "모노그래프 비적합 표시·성분으로 판매된 5개 제품 전체가 미승인 신약·부정표시 의약품이 되어 판매 중단·회수 대상이 될 수 있다."
+     }
+    ],
+    "fda_evaluation": "FDA는 귀사가 추가 공간 확장을 위해 Autumn 2026까지 새 창고를 확보할 계획이라고 밝혔으나, 현재 환경(콘크리트 바닥, 블록 벽 위 금속판, 노출된 천장 환기구·배관·장선, 천장 선풍기)이 의약품 제조에 필요한 적절한 세척·유지를 가능하게 하는 구조나 설계가 아니라고 지적해 향후 이전 계획만으로는 현 위반이 해소되지 않는다고 보았다. 또한 반복적인 기준 초과 바이오버든 결과에도 시정조치 없이 (b)(4)를 계속 사용한 점, 세척 기록을 전혀 제시하지 못한 점을 들어 품질시스템 전반이 부적절하다고 평가했다. 위반의 성격을 고려해 21 CFR 211.34에 따른 자격을 갖춘 컨설턴트를 고용하고, 컨설턴트가 전체 운영에 대한 6대 시스템 감사를 수행하고 CAPA의 완료·유효성을 평가한 뒤 FDA와의 준수 상태 해소를 추진하라고 권고했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(기한 내 시정 완료가 불가하면 지연 사유와 완료 일정 제시)",
+     "items": [
+      "제조·보관·포장·표시 운영과 시설의 의약품 제조 적합성(배치 소급 검토, 시설 배치·인원/자재 동선, 바닥·벽·천장 개선 또는 확장·이전 필요성, 환기·공조, 표면 세척성)에 대한 포괄적 독립 평가와, 격리·적합·부적합 자재 지정 구역 및 자재 식별·분리·상태관리 절차에 대한 독립 평가를 제출한다.",
+      "최악 조건(고독성·고역가·저용해도·난세척 제품, 난세척 스왑 위치, 세척 전 최대 보관시간)을 반영한 세척 밸리데이션 프로그램 개선, 갱신된 SOP 요약, 세척 프로그램 소급 평가에 근거한 CAPA 계획(완료 일정 포함)을 제출한다.",
+      "(b)(4) 시스템의 설계·관리·유지에 대한 포괄적 개선 계획과, 배치별 사용 적합성을 보장하는 정기 미생물 시험 및 총균수·objectionable organism 조치/경고 기준을 포함한 모니터링 절차를 수립한다.",
+      "QU 권한·자원 확보를 위한 평가·개선 계획, 판매 중인 각 제품의 공정 성능 적격성 평가(PPQ) 일정 및 공정 밸리데이션 없이 유통된 제품에 대한 위험평가, 안정성 지시 시험법·출하 전 안정성 시험·연간 지속 안정성 프로그램을 포함한 안정성 프로그램 독립 평가와 CAPA를 제출한다."
+     ]
+    },
+    "administrative_risks": "위반을 신속·적절히 해결하지 않으면 추가 통지 없이 압류(seizure)·금지명령(injunction)을 포함한 규제·법적 조치가 내려질 수 있다. 미해결 위반은 다른 연방기관의 계약 체결을 막을 수 있고, FDA가 수출증명서(Export Certificates) 발급을 보류할 수 있으며, 위반이 완전히 해결되어 CGMP 준수가 확인될 때까지 귀사를 의약품 제조소로 기재한 신규 신청·변경 신청의 승인이 보류될 수 있다. FDA는 시정조치 완료 확인을 위해 재실사할 수 있다. 아울러 5개 제품은 미승인 신약(505(a)·301(d))이자 FD&C Act 502(ee)항상 부정표시 의약품으로, 이를 주간 거래에 도입하는 것은 301(a)항 위반에 해당한다."
    }
   },
   {
@@ -1159,6 +1198,33 @@
      "Cleaning verification of tubing and crevices on non-dedicated filling lines",
      "Adherence to preventive maintenance schedules"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.22(a) and (d)",
+      "original": "1. Your firm failed to establish an adequate quality unit, and the responsibilities and procedures applicable to the quality control unit are not in writing and fully followed (21 CFR 211.22(a) and (d)). Your quality unit (QU) failed to establish and exercise its authority to adequately oversee the manufacture, packing, holding, review, and release of your (b)(4) over-the-counter (OTC) drug products, such as (b)(4) . Your firm’s inadequate quality oversight resulted in significant deficiencies in documentation practices, batch record review, investigations, and quality system controls to ensure compliance with CGMP requirements. For example, your QU failed to ensure: Investigation of any unexplained discrepancy or failure of a batch or any of its components to meet any specifications (21 CFR 211.192). Establishment of suitable quality oversight procedures (e.g., raw material handling, review of production records, and recalls) (21 CFR 211.22(a)). Batch production and control records that include documentation of the accomplishment of each significant step in the manufacture, processing, packing, or holding of the batch, for each batch of drug product (21 CFR 211.188(b)). Establishment of written procedures describing the handling of all written and oral complaints regarding a drug product (21 CFR 211.198(a)).",
+      "description": "귀사는 적절한 품질 부서를 구축하지 않았으며, 품질관리 부서에 적용되는 책임과 절차가 문서화되어 있지 않고 완전히 준수되지도 않았다(21 CFR 211.22(a) 및 (d)). 귀사의 품질 부서(QU)는 (b)(4) 등 귀사 (b)(4) 일반의약품(OTC)의 제조·포장·보관·검토·출하를 적절히 감독할 권한을 확립하고 행사하지 못했다. 이러한 부적절한 품질 감독은 CGMP 요건 준수를 보장하기 위한 문서화 관행, 배치 기록 검토, 조사(investigation), 품질시스템 관리 전반의 중대한 결함으로 이어졌다. 예를 들어 귀사 QU는 다음을 보장하지 못했다: 배치 또는 그 구성성분이 규격에 부적합한 경우 또는 설명되지 않은 불일치에 대한 조사(21 CFR 211.192); 원료 취급, 제조기록 검토, 회수 등 적절한 품질 감독 절차의 수립(21 CFR 211.22(a)); 각 의약품 배치마다 제조·가공·포장·보관의 각 중요 단계 수행을 기록한 배치 제조·관리 기록(21 CFR 211.188(b)); 의약품에 관한 모든 서면·구두 불만 처리 절차를 기술한 문서화된 절차의 수립(21 CFR 211.198(a)).",
+      "risk": "QU가 실질적 권한 없이 운영되어 조사·배치기록·불만처리가 통제되지 않으므로, 규격 부적합이나 미확인 결함이 있는 OTC 제품이 검증 없이 출하될 수 있다."
+     },
+     {
+      "citation": "21 CFR 211.67(a)",
+      "original": "2. Your firm failed to clean, maintain, and, as appropriate for the nature of the drug, sanitize and/or sterilize equipment and utensils at appropriate intervals to prevent malfunctions or contamination that would alter the safety, identity, strength, quality, or purity of the drug product beyond the official or other established requirements (21 CFR 211.67(a)). Your firm failed to adequately clean and maintain non-dedicated drug manufacturing equipment used to fill OTC drug products. For example, our investigator observed stagnant (b)(4) product residue inside the tubing on the filling line with residue accumulating in crevices and on surfaces that come into direct contact with the drug product.",
+      "description": "귀사는 의약품의 안전성·확인·함량·품질 또는 순도를 공식 또는 기타 확립된 요건을 벗어나게 변화시킬 수 있는 오작동이나 오염을 방지하기 위해, 설비와 기구를 적절한 주기로 세척·유지관리하고 의약품 특성에 따라 필요 시 위생처리 및/또는 멸균하지 않았다(21 CFR 211.67(a)). 귀사는 OTC 의약품 충전에 사용되는 비전용(non-dedicated) 의약품 제조설비를 적절히 세척·유지관리하지 않았다. 예를 들어 FDA 조사관은 충전 라인의 튜빙 내부에 정체된 (b)(4) 제품 잔류물이 있고, 의약품과 직접 접촉하는 표면과 틈새에 잔류물이 축적되어 있는 것을 관찰했다.",
+      "risk": "여러 제품에 공용되는 충전 라인의 잔류물 축적으로 교차오염 및 미생물 오염 위험이 있으며, 이미 유통된 제품에도 오염 영향이 미쳤을 수 있다."
+     }
+    ],
+    "fda_evaluation": "FDA는 2026년 3월 10일자 483 회신을 상세 검토했으나 불충분하다고 평가했다. 품질 부서 항목에 대해 업체는 수정액(white-out) 사용 중단, 온도 모니터링 관행 개선 등 배치기록 관련 절차 변경을 약속했으나, CGMP 기록의 정확성·무결성·검토·승인을 보장해야 할 QU의 책임·권한 행사 실패를 인정하거나 다루지 않았다. 특히 품질 출하 라벨의 소급 기재(backdating), 온도계가 작동하지 않을 때의 온도 데이터 기입, 제조활동을 기록한 배치기록 부재 등 시설에서 확인된 중대한 데이터 완전성 결함을 다루지 않았다. 세척 항목에 대해서는 종합 세척 절차 수립과 세척 밸리데이션 프로그램 도입을 회신했으나, 부적절한 세척 관행이 유통 중인 제품에 미친 영향을 평가하지 않았고 세척을 배치기록에 어떻게 기록할지도 다루지 않았다. 또한 FDA는 완제 비무균 OTC 제품의 미생물 시험이 호기성 평판계수(aerobic plate count)로만 제한되고 비의약품 용도의 방법을 사용하는 등 규격·시험법이 미흡하다고 지적했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 CDER-OC-OMQ-Communications@fda.hhs.gov 로 서면 회신(FEI 3003411169 및 ATTN: Niketa Patel 표기)",
+     "items": [
+      "제조·시험 전반의 문서화 시스템을 종합 평가하고, 귀속성·가독성·완전성·원본성·정확성·동시성을 갖춘 기록을 보장하는 상세 CAPA 계획을 제출한다.",
+      "QU가 실효적으로 기능할 권한과 자원을 갖도록 하는 종합 평가·개선 계획(절차의 적절성 판단, 전 공정 QU 감독, QU 판정 전 배치별 최종 검토, 조사 감독·승인 포함)과 일탈·불일치·불만·OOS·실패 조사 시스템 개선 계획을 수립한다.",
+      "다품목 공용 설비 전체를 대상으로 독립적 소급 세척 효과성 평가(잔류물 확인, 교차오염 제품의 출하 가능성 평가 포함)를 수행하고, 이에 기반한 세척 CAPA 및 자격 있는 독립 컨설턴트 감독하의 설비·시설 관리 CAPA를 제출한다.",
+      "미국 유통 의약품에 대한 데이터 부정확성의 범위·근본원인 조사, 각 데이터 완전성 일탈의 환자 위험 소급 평가, 전사적 CAPA를 포함한 관리 전략을 제출한다(자격 있는 컨설턴트 활용 강력 권고)."
+     ]
+    },
+    "administrative_risks": "위반이 해결되지 않으면 다른 연방기관의 계약 수주가 제한될 수 있고, FDA가 수출증명서 발급을 보류할 수 있다. 위반이 완전히 해결되고 CGMP 준수가 확인될 때까지 귀사를 의약품 제조소로 기재한 신규 신청 또는 변경신청의 승인이 보류될 수 있으며, FDA는 시정조치 완료 확인을 위해 재실사를 실시할 수 있다."
    }
   },
   {

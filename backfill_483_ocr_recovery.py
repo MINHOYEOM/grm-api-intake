@@ -107,6 +107,9 @@ RECOVERY_MODES = (MODE_OCR_UNAVAILABLE, MODE_MISSING_OBSERVATIONS, MODE_COLLECTI
 # 그날 실행의 사정(PDF 건수 상한·OCR 페이지 예산)이라 다시 읽으면 대개 본문이 나온다.
 # collect_fda_483 가 기록하는 문자열과 같아야 한다 — tests 가 두 값이 같음을 고정한다.
 CAPPED_TEXT_STATUSES = ("not-attempted", "scan-ocr-budget")
+# 다시 읽어 보니 범위 밖(기기·식품 등)이었던 행의 확정 사유. 회수 후보 어느 모드에도 걸리지
+# 않는 값이어야 한다(그래야 재시도가 끊긴다) — tests 가 고정한다.
+OUT_OF_SCOPE_STATUS = "out-of-scope"
 _OBSERVATIONS_KEY = "fda_483_observations"
 
 Sleeper = Callable[[float], None]
@@ -551,6 +554,18 @@ def run(
             # 도메인 게이트(수의/기기/식품) 드롭 — 애초에 적재되지 말았어야 할 행일 수 있으나
             # 이 스크립트는 삭제하지 않는다(범위 밖). 세어서 드러내기만 한다.
             report.gate_dropped += 1
+            if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE):
+                # ★[2026-10-28 실측] 본문을 받아 보니 범위 밖이면 상한 표식이 그대로 남아,
+                #   예약 회수가 **매일 같은 문서를 다시 받아 OCR 한다**(첫 회수 실행: 152건 중
+                #   71건이 범위 밖 — 상한 표식 38건이 그대로 남음). 예산 600쪽을 버릴 문서가
+                #   갉아먹으므로 표식을 확정 사유 `out-of-scope` 로 바꿔 재시도를 끊는다.
+                counted = report.gate_dropped
+                _resolve_capped_status(
+                    report, r, raw, OUT_OF_SCOPE_STATUS, label=label, base=base,
+                    service_key=service_key, dry_run=dry_run, rebuild_fn=rebuild_fn,
+                    upsert_fn=upsert_fn,
+                )
+                report.gate_dropped = counted   # 재구성도 드롭이면 이미 센 1건 — 중복 계수 방지
             continue
 
         record = findings_store.raw_signal_from_intake_item(

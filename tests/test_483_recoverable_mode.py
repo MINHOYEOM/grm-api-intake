@@ -16,19 +16,21 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # 형제 테스트의 픽스처 재사용
 
 import backfill_483_ocr_recovery as rec
-from test_483_ocr_recovery import _nrow, _row, _run  # noqa: E402
+from test_483_ocr_recovery import _TEXT, _nrow, _row, _run  # noqa: E402
 
 
 class RecoverablePredicateTest(unittest.TestCase):
     def test_targets_every_retryable_marker(self):
         for status in ("not-attempted", "scan-ocr-budget", "scan-ocr-unavailable:no tessdata",
                        "fetch-fail:HTTP GET final failure: 503 Server Error",
-                       "fetch-fail:ReadTimeout"):
+                       "fetch-fail:ReadTimeout",
+                       # [2026-10-28] FDA 가 같은 media id 로 다시 올린 404 사례(164956) — 재확인
+                       "fetch-fail:HTTP GET final failure: (404 Client Error)"):
             self.assertTrue(rec.is_recoverable_row({"fda483_text_status": status}), status)
 
     def test_skips_definitive_reasons(self):
         for status in ("scan-no-text", "scan-ocr-empty", "pdf-encrypted",
-                       "fetch-fail:HTTP GET final failure: (404 Client Error)", "pdf-ok", ""):
+                       "pdf-ok", ""):
             self.assertFalse(rec.is_recoverable_row({"fda483_text_status": status}), status)
         self.assertFalse(rec.is_recoverable_row({"fda483_excerpt": "OBSERVATION 1"}))
 
@@ -137,6 +139,68 @@ class OutOfScopeMarkerTest(unittest.TestCase):
         upsert.assert_called_once()
 
     def test_other_modes_do_not_write(self):
-        report, _code, upsert, _ = self._run(rec.MODE_MISSING_OBSERVATIONS)
+        """ocr-unavailable 모드는 종전대로 쓰지 않는다. (missing-observations 는 2026-10-28 부터
+        범위 밖 표식을 쓴다 — test_483_ocr_recovery.MissingObservationsMarkerTest.)"""
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            rec._rebuild_item(_nrow(), "", "scan-ocr-unavailable:x"),
+            collected_at="")["raw_signal_id"]
+        report, _code, upsert, _ = self._run(
+            rec.MODE_OCR_UNAVAILABLE, rows=[_row(rid, status="scan-ocr-unavailable:x")])
         self.assertEqual(report.gate_dropped, 1)
+        upsert.assert_not_called()
+
+
+class OutOfScopeEstablishmentSkipTest(unittest.TestCase):
+    """[2026-10-28 정리 회수 실측] 시설 유형만으로 범위 밖인 행은 상한 표식 모드에서 PDF 를 받지 않는다.
+
+    빈 본문 재구성도 게이트가 드롭해 표식을 못 바꾸므로, 받으면 매일 같은 OCR 을 반복한다."""
+
+    def _run(self, mode):
+        import json
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            rec._rebuild_item(_nrow(), "", "not-attempted"), collected_at="")["raw_signal_id"]
+        row = _row(rid, status="not-attempted")
+        raw = json.loads(row["raw_json"])
+        raw["establishment_type"] = "Source Plasma Collection Facility"
+        row["raw_json"] = json.dumps(raw)
+        fetched = []
+        report, _code, upsert, _ = _run(
+            mode=mode, dry_run=False, rows=[row],
+            fetch_text=lambda url: fetched.append(url) or ("", "scan-no-text"))
+        return report, fetched, upsert
+
+    def test_recoverable_skips_fetch(self):
+        report, fetched, upsert = self._run(rec.MODE_RECOVERABLE)
+        self.assertEqual(fetched, [])
+        self.assertEqual(report.skipped_out_of_scope_type, 1)
+        self.assertEqual(report.attempted, 0)
+        upsert.assert_not_called()
+
+    def test_other_modes_still_fetch(self):
+        _report, fetched, _ = self._run(rec.MODE_MISSING_OBSERVATIONS)
+        self.assertEqual(len(fetched), 1)
+
+
+class NotFoundRecheckTest(unittest.TestCase):
+    """[2026-10-28] 404 도 recoverable 후보다 — FDA 가 같은 media id 로 다시 올린다(164956)."""
+
+    _404 = "fetch-fail:HTTP GET final failure: (404 Client Error)"
+
+    def _run(self, fetch_text):
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            rec._rebuild_item(_nrow(), "", self._404), collected_at="")["raw_signal_id"]
+        return _run(mode=rec.MODE_RECOVERABLE, dry_run=False,
+                    rows=[_row(rid, status=self._404)], fetch_text=fetch_text)
+
+    def test_republished_pdf_is_recovered(self):
+        report, _code, upsert, _ = self._run(lambda url: (_TEXT, "pdf-ok"))
+        self.assertEqual(report.recovered, 1)
+        self.assertNotIn("fda483_text_status", upsert.call_args[0][2]["raw_json"])
+
+    def test_still_404_is_not_rewritten(self):
+        report, _code, upsert, _ = self._run(lambda url: ("", self._404))
+        self.assertEqual(report.status_resolved, 0)
         upsert.assert_not_called()

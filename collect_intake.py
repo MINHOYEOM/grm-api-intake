@@ -2837,26 +2837,66 @@ WL_BODY_STATUS_403 = "fetch-403"
 WL_BODY_STATUS_NO_ANCHOR = "no-anchor"
 
 
+# [WL 본문 재시도 2026-10-28] 편지 페이지 GET 은 종전 **한 번**이었다. 일시 장애(5xx·429·
+# 타임아웃·연결 오류) 한 번이면 그 편지는 본문 없이 적재되고, 이후 수집은 이미 저장된
+# document_id 를 다시 받지 않으므로 영구 결손이 된다(#1218 이 health 경고로 드러내기만 했다).
+# 그래서 일시 장애에 한해 짧게 재시도한다. **403 은 재시도하지 않는다** — fda.gov 의 403 은
+# 같은 러너 IP 에 대한 봇 차단이라 몇 초 뒤 같은 IP 로 다시 두드려도 결과가 같고 차단만
+# 길어진다. 403 은 다음 날 다른 러너에서 도는 예약 회수(`backfill_wl_body_recovery.py`)가 맡는다.
+WL_BODY_FETCH_ATTEMPTS = 3
+WL_BODY_RETRY_BACKOFF_SECONDS = (2.0, 5.0)
+_WL_RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+_wl_retry_sleep: Callable[[float], None] = time.sleep   # 테스트가 패치한다
+
+
+def _fetch_wl_letter_html(url: str, label: str = "") -> tuple[str, str]:
+    """WL 편지 페이지 GET → (html, status). 실패는 graceful(("", status)) — 예외를 올리지 않는다.
+
+    status 고정 어휘: "ok" | "fetch-403" | "fetch-fail:<예외 요약 120자>". 일시 장애는
+    `WL_BODY_FETCH_ATTEMPTS` 회까지 재시도하고, 끝내 실패하면 마지막 사유를 돌려준다.
+    `_fetch_wl_body_excerpt`·`_fetch_wl_body_full`·예약 회수가 모두 이 한 함수를 쓴다.
+    """
+    last_error = ""
+    for attempt in range(1, WL_BODY_FETCH_ATTEMPTS + 1):
+        transient = False
+        try:
+            resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
+                "User-Agent": "GRM-Intake/1.1 (+github-actions)",
+                "Accept": "text/html",
+            })
+            if resp.status_code == 403:
+                log("WARN", f"FDA WL 본문{label} 403 — 건너뜀(메타 카드 유지): {truncate(url, 80)}")
+                return "", WL_BODY_STATUS_403
+            transient = resp.status_code in _WL_RETRYABLE_STATUS
+            resp.raise_for_status()
+            if attempt > 1:
+                log("INFO", f"FDA WL 본문{label} 재시도 {attempt}회차 성공: {truncate(url, 80)}")
+            return resp.text, WL_BODY_STATUS_OK
+        except (requests.Timeout, requests.ConnectionError) as e:
+            transient = True
+            last_error = truncate(str(e), 120)
+        except requests.RequestException as e:
+            last_error = truncate(str(e), 120)
+        if not transient or attempt >= WL_BODY_FETCH_ATTEMPTS:
+            break
+        wait = WL_BODY_RETRY_BACKOFF_SECONDS[min(attempt - 1, len(WL_BODY_RETRY_BACKOFF_SECONDS) - 1)]
+        log("WARN", f"FDA WL 본문{label} 일시 장애 — {wait:g}초 뒤 재시도"
+                    f"({attempt}/{WL_BODY_FETCH_ATTEMPTS}): {last_error}")
+        _wl_retry_sleep(wait)
+    log("WARN", f"FDA WL 본문{label} fetch 실패(메타 카드 유지): {last_error}")
+    return "", f"fetch-fail:{last_error}"
+
+
 def _fetch_wl_body_excerpt(url: str) -> tuple[str, str]:
     """WL 편지 페이지 fetch → (위반 excerpt, status). 실패(403/timeout/네트워크)는 graceful(("", status)).
 
     status 고정 어휘: "ok"(성공) | "fetch-403" | "fetch-fail:<예외 요약 120자>" |
-    "no-anchor"(fetch 는 성공했으나 위반 앵커 미발견). 기존 로그(WARN/INFO)와 graceful
-    동작(예외를 올리지 않음)은 그대로 유지 — 반환 형태만 str → tuple[str, str] 로 바뀐다.
+    "no-anchor"(fetch 는 성공했으나 위반 앵커 미발견). 예외를 올리지 않는다.
     """
-    try:
-        resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
-            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
-            "Accept": "text/html",
-        })
-        if resp.status_code == 403:
-            log("WARN", f"FDA WL 본문 403 — excerpt 건너뜀(메타 카드 유지): {truncate(url, 80)}")
-            return "", WL_BODY_STATUS_403
-        resp.raise_for_status()
-    except requests.RequestException as e:
-        log("WARN", f"FDA WL 본문 fetch 실패(메타 카드 유지): {truncate(str(e), 120)}")
-        return "", f"fetch-fail:{truncate(str(e), 120)}"
-    excerpt = _extract_wl_body_excerpt(resp.text)
+    html_text, status = _fetch_wl_letter_html(url)
+    if not html_text:
+        return "", status
+    excerpt = _extract_wl_body_excerpt(html_text)
     if not excerpt:
         log("INFO", f"FDA WL 본문 위반 앵커 미발견 — 메타 카드 유지: {truncate(url, 80)}")
         return "", WL_BODY_STATUS_NO_ANCHOR
@@ -2870,23 +2910,121 @@ def _fetch_wl_body_full(url: str) -> tuple[str, str]:
     중복 fetch 비용 무시 가능). 두 플래그가 모두 켜져도 서로 독립적으로 동작한다.
     status 어휘는 `_fetch_wl_body_excerpt` 와 동일(고정 어휘 — 하류 매핑 계약).
     """
-    try:
-        resp = requests.get(url, timeout=WL_BODY_FETCH_TIMEOUT, headers={
-            "User-Agent": "GRM-Intake/1.1 (+github-actions)",
-            "Accept": "text/html",
-        })
-        if resp.status_code == 403:
-            log("WARN", f"FDA WL 본문(전문) 403 — 건너뜀(메타 카드 유지): {truncate(url, 80)}")
-            return "", WL_BODY_STATUS_403
-        resp.raise_for_status()
-    except requests.RequestException as e:
-        log("WARN", f"FDA WL 본문(전문) fetch 실패(메타 카드 유지): {truncate(str(e), 120)}")
-        return "", f"fetch-fail:{truncate(str(e), 120)}"
-    full = _extract_wl_body_full(resp.text)
+    html_text, status = _fetch_wl_letter_html(url, "(전문)")
+    if not html_text:
+        return "", status
+    full = _extract_wl_body_full(html_text)
     if not full:
         log("INFO", f"FDA WL 본문(전문) 위반 앵커 미발견 — 메타 카드 유지: {truncate(url, 80)}")
         return "", WL_BODY_STATUS_NO_ANCHOR
     return full, WL_BODY_STATUS_OK
+
+
+def build_wl_item(
+    *,
+    firm: str,
+    posted_raw: str,
+    letter_date_raw: str,
+    issuing_office: str,
+    subject: str,
+    wl_href: str,
+    office_verdict: str,
+    excerpt: tuple[str, str] | None,
+    full: tuple[str, str] | None,
+) -> IntakeItem:
+    """WL 목록 행 + 본문 fetch 결과 → IntakeItem (네트워크 0 · 결정론).
+
+    라이브 수집(`collect_fda_warning_letters`)과 예약 회수(`backfill_wl_body_recovery.py`)가
+    **같은 이 함수**로 행을 만든다 — 회수가 raw 를 손으로 기워 `raw_sha256`·tier 가 어긋나는
+    일을 막는다. `excerpt`/`full` 은 (본문, status) 또는 None(시도 안 함 — 플래그 off·URL 없음).
+    `wl_href` 는 절대 URL(정규화 후)이어야 한다 — document_id 가 이 값에 의존한다.
+    """
+    date_iso = _parse_wl_date(posted_raw) or _parse_wl_date(letter_date_raw)
+    headline = subject or firm or "FDA Warning Letter"
+    doc_id = _stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso)
+    relevance = compute_relevance(headline, subject, issuing_office)
+    # [WL tier 2단 판정 2026-08-31] 1차 = 인덱스 행(subject·부서)만. 최종 판정은 본문을 본
+    # 뒤 내리므로 여기서는 **기록하지 않는 순수 함수**를 쓴다 — `record_tier_decision` 참조.
+    tier_decision = compute_signal_tier_detail(
+        SOURCE_FDA_WL, issuing_office or "Warning Letter",
+        relevance, "N/A", headline, subject, issuing_office)
+
+    wl_raw: dict[str, Any] = {
+        "firm": firm, "posted_date": posted_raw,
+        "letter_date": letter_date_raw,
+        "issuing_office": issuing_office,
+        "subject": subject, "url": wl_href,
+    }
+    # P2: 확정 제외/유지가 아닌 verdict(review·unknown)는 관측 가능하게 raw 에 남긴다.
+    if office_verdict in ("review", "unknown"):
+        wl_raw["office_gate_verdict"] = office_verdict
+
+    # [사유 전파 2026-07-20] 본문을 확보하지 못한 경우에만 wl_body_status 를 남긴다 —
+    # 성공은 사유가 없다(골든 additive, 기존 카드는 키가 안 생겨 불변).
+    if excerpt is not None:
+        body_excerpt, wl_body_status = excerpt
+        if body_excerpt:
+            wl_raw["wl_body_excerpt"] = body_excerpt
+        else:
+            wl_raw.setdefault("wl_body_status", wl_body_status)   # 왜 비었는지 — 하류가 이유를 지어내지 않게
+    if full is not None:
+        body_full, wl_body_full_status = full
+        if body_full:
+            wl_raw["wl_body_full"] = body_full
+            # [WL 위반항목 결정론 추출 2026-07-20] 전문에서 위반 표제를 결정론 추출해
+            # 함께 싣는다(FDA 483 의 `fda_483_observations` 동형 — 네트워크 0·순수 함수).
+            # 카드 상세 슬롯의 입력. 형식이 달라 못 뽑으면 키 자체를 달지 않는다.
+            violations = extract_wl_violations_from_text(body_full)
+            if violations:
+                wl_raw["wl_violations"] = violations
+        else:
+            # excerpt 가 이미 사유를 남겼으면 덮어쓰지 않는다(setdefault) — 같은 편지
+            # 이니 사유도 같을 확률이 높지만, excerpt 쪽 사유가 우선(먼저 시도됨).
+            wl_raw.setdefault("wl_body_status", wl_body_full_status)
+
+    # ── [WL tier 2차 판정 2026-08-31] 본문 cGMP floor(올리기만) ────────────────────
+    # 왜: FDA WL 인덱스의 Subject 열은 사실상 통제어휘라 cGMP 서한은 "CGMP/…" 접두를
+    # 단다. 그래서 1차 판정(인덱스 행만)이 `wl_cgmp` 규칙으로 대부분 잘 걸린다. 그런데
+    # 표제가 다른 축(미승인의약품·미허가 생물의약품 등)인데 **본문에는 21 CFR 210/211
+    # 위반이 들어 있는** 편지가 있다 — 2026-08-31 R3 Medical Companies(표제 "Unapproved
+    # New Drugs/Unlicensed Biological Product Violations", 본문에 CGMP 위반 6건·무균공정
+    # 밸리데이션·안정성·품질부서 미문서화)가 Tier 1 로 떨어져 그 주 브리프에서 빠졌다.
+    # 본문은 이미 위에서 확보해 두고도 판정에 쓰지 않고 있었다(값은 있는데 안 읽는 슬롯).
+    #
+    # 본문에서 읽는 신호는 **cGMP 하나뿐**이다 — 전문을 일반 어휘층에 통째로 먹이면
+    # 노이즈가 폭발한다(`fda_wl_body_cgmp_floor` docstring 의 실측 참조).
+    # **올리기만 한다(floor, 내리지 않음).** 본문 확보 실패(403·no-anchor)가 기존 판정을
+    # 조용히 강등시켜서는 안 되므로, 본문이 없으면 1차 판정이 그대로 최종이다.
+    body_for_tier = wl_raw.get("wl_body_full") or wl_raw.get("wl_body_excerpt") or ""
+    tier_blob_parts = [headline, subject, issuing_office]
+    if (_TIER_RANK.get(tier_decision.tier, 0) < 3
+            and fda_wl_body_cgmp_floor(issuing_office, body_for_tier)):
+        log("INFO",
+            f"FDA WL tier 본문 cGMP floor {tier_decision.tier}→Tier 3: "
+            f"{truncate(firm or headline, 60)}")
+        tier_decision = TierDecision(
+            "Tier 3", "wl_cgmp_body",
+            t2_matches=tier_decision.t2_matches, t3_matches=tier_decision.t3_matches)
+        tier_blob_parts.append(body_for_tier)
+    record_tier_decision(tier_decision, SOURCE_FDA_WL,
+                         " ".join(p for p in tier_blob_parts if p))
+
+    return IntakeItem(
+        source=SOURCE_FDA_WL,
+        document_id=doc_id,
+        date_iso=date_iso,
+        headline=headline,
+        official_url=wl_href or FDA_WL_URL,
+        type_or_class=issuing_office or "Warning Letter",
+        firm=firm,
+        body=subject,
+        api_query=FDA_WL_URL,
+        qa_relevance=relevance,
+        osd_relevance="N/A",
+        source_type=SRC_TYPE_OFFICIAL_PAGE,
+        signal_tier=tier_decision.tier,
+        raw_payload=wl_raw,
+    )
 
 
 def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -3008,105 +3146,36 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         # keep / review / unknown(본문 폴백 통과) → 유지. review(OII 맥락 모호)는
         # 보수적 비-드롭(약품 WL 오삭제 방지). 전용 Status 마킹은 인프라 부재로 K4 이월.
 
-        doc_id = _stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso)
-        relevance = compute_relevance(headline, subject, issuing_office)
-        # [WL tier 2단 판정 2026-08-31] 1차 = 인덱스 행(subject·부서)만. 본문은 아직 없다
-        # (아래 wl_body_* 블록이 네트워크로 가져온다). 최종 판정은 본문 확보 뒤 내리므로
-        # 여기서는 **기록하지 않는 순수 함수**를 쓴다 — `record_tier_decision` 참조.
-        tier_decision = compute_signal_tier_detail(
-            SOURCE_FDA_WL, issuing_office or "Warning Letter",
-            relevance, "N/A", headline, subject, issuing_office)
-
-        wl_raw: dict[str, Any] = {
-            "firm": firm, "posted_date": posted_raw,
-            "letter_date": letter_date_raw,
-            "issuing_office": issuing_office,
-            "subject": subject, "url": wl_href,
-        }
         # P2: 확정 제외/유지가 아닌 verdict(review·unknown)는 관측 가능하게 raw 에 남긴다
         # (머지 후 부서 게이트 오판 모니터링용). keep/exclude 는 자명하므로 기록 생략.
         if office_verdict in ("review", "unknown"):
-            wl_raw["office_gate_verdict"] = office_verdict
             log("INFO", f"FDA WL 부서 게이트 {office_verdict}(유지·관측): "
                         f"{truncate(issuing_office or '부서결측', 40)} | "
                         f"{truncate(firm or headline, 50)}")
 
         # WHY-1 #2: 게이트 통과(유지) WL 의 편지 본문에서 위반 excerpt 추출(flag on 시).
         # 실패는 graceful(키 미기록 → 목록 메타 카드 유지). in-window 유지 WL 은 소수라 부담 낮음.
-        # [사유 전파 2026-07-20] 본문을 확보하지 못한 경우에만 wl_body_status 를 남긴다 —
-        # 성공은 사유가 없다(골든 additive, 기존 카드는 키가 안 생겨 불변).
+        excerpt_result: tuple[str, str] | None = None
         if wl_body_enabled and wl_href:
             wl_body_health["attempted"] += 1
-            body_excerpt, wl_body_status = _fetch_wl_body_excerpt(wl_href)
-            if body_excerpt:
-                wl_raw["wl_body_excerpt"] = body_excerpt
-            else:
+            excerpt_result = _fetch_wl_body_excerpt(wl_href)
+            if not excerpt_result[0]:
                 wl_body_health["failed"] += 1
-                wl_raw.setdefault("wl_body_status", wl_body_status)   # 왜 비었는지 — 하류가 이유를 지어내지 않게
 
         # [WL 심층분석 fan-out 2026-07-01] 전문 확보(flag on 시) — 카드별 fan-out 심층분석
         # (docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력. wl_body_enabled 와 완전
         # 독립 — 기존 excerpt 플로우는 이 블록의 영향을 받지 않는다(additive).
+        full_result: tuple[str, str] | None = None
         if wl_body_full_enabled and wl_href:
             wl_body_full_health["attempted"] += 1
-            body_full, wl_body_full_status = _fetch_wl_body_full(wl_href)
-            if body_full:
-                wl_raw["wl_body_full"] = body_full
-                # [WL 위반항목 결정론 추출 2026-07-20] 전문에서 위반 표제를 결정론 추출해
-                # 함께 싣는다(FDA 483 의 `fda_483_observations` 동형 — 네트워크 0·순수 함수).
-                # 카드 상세 슬롯의 입력. 형식이 달라 못 뽑으면 키 자체를 달지 않는다.
-                violations = extract_wl_violations_from_text(body_full)
-                if violations:
-                    wl_raw["wl_violations"] = violations
-            else:
+            full_result = _fetch_wl_body_full(wl_href)
+            if not full_result[0]:
                 wl_body_full_health["failed"] += 1
-                # excerpt 가 이미 사유를 남겼으면 덮어쓰지 않는다(setdefault) — 같은 편지
-                # 이니 사유도 같을 확률이 높지만, excerpt 쪽 사유가 우선(먼저 시도됨).
-                wl_raw.setdefault("wl_body_status", wl_body_full_status)
 
-        # ── [WL tier 2차 판정 2026-08-31] 본문 cGMP floor(올리기만) ────────────────────
-        # 왜: FDA WL 인덱스의 Subject 열은 사실상 통제어휘라 cGMP 서한은 "CGMP/…" 접두를
-        # 단다. 그래서 1차 판정(인덱스 행만)이 `wl_cgmp` 규칙으로 대부분 잘 걸린다. 그런데
-        # 표제가 다른 축(미승인의약품·미허가 생물의약품 등)인데 **본문에는 21 CFR 210/211
-        # 위반이 들어 있는** 편지가 있다 — 2026-08-31 R3 Medical Companies(표제 "Unapproved
-        # New Drugs/Unlicensed Biological Product Violations", 본문에 CGMP 위반 6건·무균공정
-        # 밸리데이션·안정성·품질부서 미문서화)가 Tier 1 로 떨어져 그 주 브리프에서 빠졌다.
-        # 본문은 이미 위에서 확보해 두고도 판정에 쓰지 않고 있었다(값은 있는데 안 읽는 슬롯).
-        #
-        # 본문에서 읽는 신호는 **cGMP 하나뿐**이다 — 전문을 일반 어휘층에 통째로 먹이면
-        # 노이즈가 폭발한다(`fda_wl_body_cgmp_floor` docstring 의 실측 참조).
-        # **올리기만 한다(floor, 내리지 않음).** 본문 확보 실패(403·no-anchor)가 기존 판정을
-        # 조용히 강등시켜서는 안 되므로, 본문이 없으면 1차 판정이 그대로 최종이다.
-        body_for_tier = wl_raw.get("wl_body_full") or wl_raw.get("wl_body_excerpt") or ""
-        tier_blob_parts = [headline, subject, issuing_office]
-        if (_TIER_RANK.get(tier_decision.tier, 0) < 3
-                and fda_wl_body_cgmp_floor(issuing_office, body_for_tier)):
-            log("INFO",
-                f"FDA WL tier 본문 cGMP floor {tier_decision.tier}→Tier 3: "
-                f"{truncate(firm or headline, 60)}")
-            tier_decision = TierDecision(
-                "Tier 3", "wl_cgmp_body",
-                t2_matches=tier_decision.t2_matches, t3_matches=tier_decision.t3_matches)
-            tier_blob_parts.append(body_for_tier)
-        tier = tier_decision.tier
-        record_tier_decision(tier_decision, SOURCE_FDA_WL,
-                             " ".join(p for p in tier_blob_parts if p))
-
-        items.append(IntakeItem(
-            source=SOURCE_FDA_WL,
-            document_id=doc_id,
-            date_iso=date_iso,
-            headline=headline,
-            official_url=wl_href or FDA_WL_URL,
-            type_or_class=issuing_office or "Warning Letter",
-            firm=firm,
-            body=subject,
-            api_query=FDA_WL_URL,
-            qa_relevance=relevance,
-            osd_relevance="N/A",
-            source_type=SRC_TYPE_OFFICIAL_PAGE,
-            signal_tier=tier,
-            raw_payload=wl_raw,
+        items.append(build_wl_item(
+            firm=firm, posted_raw=posted_raw, letter_date_raw=letter_date_raw,
+            issuing_office=issuing_office, subject=subject, wl_href=wl_href,
+            office_verdict=office_verdict, excerpt=excerpt_result, full=full_result,
         ))
 
     log("INFO", f"FDA WL 수집 완료: {len(items)}건")

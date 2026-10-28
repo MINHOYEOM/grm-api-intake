@@ -1,14 +1,17 @@
-"""[2차 판독 2026-10-28] 본문은 받았는데 관찰 0건인 483 — 이미지 페이지를 tesseract CLI 로 다시 읽는다.
+"""[CLI 판독 2026-10-28] 본문은 있는데 관찰 0건인 483 — 전면 재판독 엔진은 tesseract CLI.
 
-배경(벤치마크 실측): findings 0건·본문 있음 47건 중 28건은 FDA 가 Adobe "Paper Capture" 로
-OCR 해 넣은 **깨진 텍스트층**을 가진 스캔본이었다. 글자가 많아 `_needs_ocr` 가 "본문 있음"으로
-판정하므로 우리 OCR 은 한 번도 돌지 않았고, 관찰 번호 "1." 이 "I." 로 깨져 파서가 0건을 냈다.
+`_fetch_fda483_pdf_text` 의 판독 사다리:
+  텍스트층 → (빈 쪽) 내장 OCR → [관찰 0건] **전면 재판독 `_full_ocr_fallback`**
+  전면 재판독은 tesseract CLI 가 우선이고, CLI 가 없는 러너에서만 PyMuPDF 내장 엔진
+  (`force_all`, #1235)으로 같은 일을 한다.
 
-픽스처 `fda483_164192_paper_capture.pdf` 는 FOIA 열람실의 실제 공개 483(media 164192, 1쪽,
-Recipharm Monts)이다. 텍스트층에는 "I. Records of the inspections…" 가 들어 있어 관찰이
-0건이고, 같은 쪽 이미지를 tesseract CLI(fast 모델, 300dpi)로 읽으면 "1. Records…" 가 나온다.
-`fda483_164192_tesseract_cli.txt` 는 그 CLI 출력을 기록한 것이다(CI 러너에는 tesseract 가 없어
-엔진 호출만 기록값으로 대체한다 — 판단 로직·PDF 파싱·관찰 추출은 전부 실제 코드가 돈다).
+픽스처 `fda483_104952_scan.pdf` 는 FOIA 열람실의 실제 공개 483(media 104952, 1쪽 스캔본,
+HPLC 실험실 기록)이다. 텍스트층이 없고, PyMuPDF 내장 엔진(`get_textpage_ocr`)은 쪽 머리의
+양식 블록을 통째로 놓쳐(`fda483_104952_builtin_ocr.txt` — "DURING AN INSPECTION … OBSERVED"
+마커가 없다) 관찰이 0건이다. 같은 fast 모델·같은 DPI 로 CLI 가 읽으면 마커와 함께 쪽 전체가
+나와 관찰이 추출된다(`fda483_104952_tesseract_cli.txt`). 두 텍스트 파일은 실제 엔진 출력을
+기록한 것이다 — 단위 테스트는 엔진 호출만 그 기록으로 대체하고 판단·PDF 파싱·관찰 추출은
+실제 코드로 돈다. 실엔진 테스트는 tesseract 가 있는 환경(로컬·CI 러너)에서 그대로 돈다.
 """
 from __future__ import annotations
 
@@ -23,13 +26,13 @@ from unittest.mock import patch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import collect_fda_483 as f  # noqa: E402
-import collect_mfds_gmp_inspection as g  # noqa: E402
 
 FIXTURES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
-PDF_PATH = os.path.join(FIXTURES, "fda483_164192_paper_capture.pdf")
-CLI_TEXT_PATH = os.path.join(FIXTURES, "fda483_164192_tesseract_cli.txt")
-URL = "https://www.fda.gov/media/164192/download"
-EXPECTED_HEADING = "Records of the inspections of automatic, mechanical or electronic equipment"
+PDF_PATH = os.path.join(FIXTURES, "fda483_104952_scan.pdf")
+BUILTIN_TEXT_PATH = os.path.join(FIXTURES, "fda483_104952_builtin_ocr.txt")
+CLI_TEXT_PATH = os.path.join(FIXTURES, "fda483_104952_tesseract_cli.txt")
+URL = "https://www.fda.gov/media/104952/download"
+EXPECTED_HEADING = "Laboratory records do not include a complete record of all data"
 
 try:
     import fitz  # noqa: F401
@@ -38,13 +41,8 @@ except ImportError:  # pragma: no cover — requirements.txt 가 PyMuPDF 를 고
     HAVE_FITZ = False
 
 
-def _read_pdf() -> bytes:
-    with open(PDF_PATH, "rb") as fh:
-        return fh.read()
-
-
-def _recorded_cli_text() -> str:
-    with open(CLI_TEXT_PATH, encoding="utf-8") as fh:
+def _read(path: str, mode: str = "r"):
+    with open(path, mode, **({} if "b" in mode else {"encoding": "utf-8"})) as fh:
         return fh.read()
 
 
@@ -54,14 +52,17 @@ class _FakeTesseract:
     def __init__(self, stdout: str):
         self.stdout = stdout
         self.calls: list[list[str]] = []
+        self.kwargs: list[dict] = []
 
     def __call__(self, args, **kwargs):
         self.calls.append(list(args))
+        self.kwargs.append(kwargs)
         return subprocess.CompletedProcess(args, 0, self.stdout.encode("utf-8"), b"")
 
 
 @unittest.skipUnless(HAVE_FITZ, "PyMuPDF 필요")
-class SecondChanceOcrTest(unittest.TestCase):
+class CliFallbackTest(unittest.TestCase):
+    """내장 엔진 출력은 기록값으로 고정하고(환경 무관), 전면 재판독의 엔진 선택을 검증한다."""
 
     def setUp(self):
         self._budget = dict(f._OCR_BUDGET)
@@ -75,149 +76,142 @@ class SecondChanceOcrTest(unittest.TestCase):
         f._OCR_BUDGET.update(self._budget)
         f.reset_ocr_health()
 
-    def _fetch(self, fake: _FakeTesseract, which: str | None = "/usr/bin/tesseract"):
-        data = _read_pdf()
+    def _fetch(self, fake, which: str | None = "/usr/bin/tesseract"):
+        data = _read(PDF_PATH, "rb")
+        builtin = _read(BUILTIN_TEXT_PATH)
+        self.builtin_full_calls: list[bool] = []
+
+        def _builtin_full(data, max_chars, force_all=False):
+            self.builtin_full_calls.append(force_all)
+            return builtin, "pdf-ok-ocr"
         with patch.object(f, "http_get_bytes", lambda *a, **k: data), \
+                patch.object(f, "_ocr_483_pdf_text",
+                             lambda data, max_chars=None: (builtin, "pdf-ok-ocr")), \
+                patch.object(f, "_ocr_483_pdf_text_uncounted", _builtin_full), \
                 patch.object(f.shutil, "which", lambda name: which), \
                 patch.object(f.subprocess, "run", fake):
             return f._fetch_fda483_pdf_text(URL)
 
-    def test_fixture_text_layer_is_the_defect(self):
-        """전제 고정: FDA 텍스트층만으로는 관찰이 0건이고, 그래서 1차 OCR 도 돌지 않는다."""
-        native, status = g._extract_pdf_text(_read_pdf(), max_chars=f.FDA483_TEXT_MAX_CHARS)
-        self.assertEqual(status, "pdf-ok")
-        self.assertFalse(f._needs_ocr(native), "Paper Capture 텍스트층은 '본문 있음'으로 판정된다")
-        self.assertEqual(f._extract_483_observations_from_text(native), [])
+    def test_fixture_premise_builtin_zero_cli_recovers(self):
+        """전제 고정: 내장 엔진 판독은 관찰 0건, CLI 판독은 관찰이 나온다."""
+        self.assertEqual(f._extract_483_observations_from_text(_read(BUILTIN_TEXT_PATH)), [])
+        cli = f._extract_483_observations_from_text(_read(CLI_TEXT_PATH))
+        self.assertTrue(cli and cli[0]["deficiency"].startswith(EXPECTED_HEADING))
 
-    def test_garbled_paper_capture_layer_is_reread_and_observation_recovered(self):
-        """★수정 전 코드에서 실패한다 — 텍스트층을 그대로 돌려줘 관찰이 0건이었다."""
-        fake = _FakeTesseract(_recorded_cli_text())
+    def test_full_reread_uses_cli_and_recovers(self):
+        """★수정 전 코드에서 실패한다 — 내장 엔진 전면 재판독도 0건이라 관찰이 없었다."""
+        fake = _FakeTesseract(_read(CLI_TEXT_PATH))
         text, status = self._fetch(fake)
         observations = f._extract_483_observations_from_text(text)
         self.assertEqual(status, "pdf-ok-ocr")
         self.assertEqual(len(observations), 1)
-        self.assertTrue(observations[0]["deficiency"].startswith(EXPECTED_HEADING))
-        self.assertTrue(f._is_publishable_deficiency(observations[0]["deficiency"]))
-        self.assertEqual(f._deficiency_garble(observations[0]["deficiency"])[0], 0)
-        self.assertEqual(len(fake.calls), 1, "이미지 페이지 1쪽만 다시 읽는다")
+        heading = observations[0]["deficiency"]
+        self.assertTrue(heading.startswith(EXPECTED_HEADING))
+        self.assertTrue(f._is_publishable_deficiency(heading))
+        self.assertEqual(f._deficiency_garble(heading)[0], 0)
+        self.assertEqual(len(fake.calls), 1, "1쪽 문서 — CLI 호출 1회")
+        self.assertEqual(self.builtin_full_calls, [], "CLI 가 있으면 내장 엔진 전면 재판독은 돌지 않는다")
         health = f.ocr_health()
         self.assertEqual((health["reocr_tried"], health["reocr_adopted"]), (1, 1))
-        self.assertEqual(health["pages_used"], 1, "2차 판독도 같은 OCR 페이지 예산을 쓴다")
+        self.assertEqual(health["pages_used"], 1, "CLI 판독도 같은 OCR 페이지 예산을 쓴다")
+
+    def test_cli_zero_does_not_rerun_builtin(self):
+        """CLI 로 0건이면 내장 엔진을 또 돌리지 않는다(벤치: CLI ⊇ 내장 — 예산만 두 배)."""
+        self._fetch(_FakeTesseract("unreadable smudge\n"))
+        self.assertEqual(self.builtin_full_calls, [])
 
     def test_cli_invocation_contract(self):
-        """stdin→stdout · eng · 1차 OCR 과 같은 DPI · 단일 스레드(OpenMP 경합 방지)."""
-        seen: dict = {}
-
-        def _run(args, **kwargs):
-            seen["args"], seen["env"] = list(args), kwargs.get("env") or {}
-            seen["timeout"] = kwargs.get("timeout")
-            return subprocess.CompletedProcess(args, 0, _recorded_cli_text().encode(), b"")
-
-        self._fetch(_run)
-        args = seen["args"]
+        """stdin→stdout · eng · 1차 OCR 과 같은 DPI · 단일 스레드(OpenMP 경합 방지) · 쪽당 타임아웃."""
+        fake = _FakeTesseract(_read(CLI_TEXT_PATH))
+        self._fetch(fake)
+        args, kwargs = fake.calls[0], fake.kwargs[0]
         self.assertEqual(args[1:3], ["stdin", "stdout"])
         self.assertIn("eng", args)
         self.assertEqual(args[args.index("--dpi") + 1], str(f.FDA483_OCR_DPI))
-        self.assertEqual(seen["env"].get("OMP_THREAD_LIMIT"), os.environ.get("OMP_THREAD_LIMIT") or "1")
-        self.assertEqual(seen["timeout"], f.FDA483_REOCR_PAGE_TIMEOUT)
+        self.assertEqual(kwargs["env"].get("OMP_THREAD_LIMIT"),
+                         os.environ.get("OMP_THREAD_LIMIT") or "1")
+        self.assertEqual(kwargs["timeout"], f.FDA483_REOCR_PAGE_TIMEOUT)
 
-    def test_reread_without_observations_keeps_original_text(self):
-        """다시 읽어도 0건이면 원래 텍스트·status 를 그대로 둔다(산출 축소 금지)."""
-        native, _ = g._extract_pdf_text(_read_pdf(), max_chars=f.FDA483_TEXT_MAX_CHARS)
+    def test_cli_without_observations_keeps_original(self):
+        """CLI 로도 0건이면 원래 텍스트·status 를 그대로 둔다(산출 축소 금지)."""
         text, status = self._fetch(_FakeTesseract("unreadable smudge\n"))
-        self.assertEqual(status, "pdf-ok")
-        self.assertEqual(text, f.normalize_pdf_ligatures(native))
+        self.assertEqual(status, "pdf-ok-ocr")
+        self.assertEqual(text, f.normalize_pdf_ligatures(_read(BUILTIN_TEXT_PATH)))
         self.assertEqual(f.ocr_health()["reocr_adopted"], 0)
 
-    def test_missing_cli_binary_degrades_to_original(self):
-        fake = _FakeTesseract(_recorded_cli_text())
-        text, status = self._fetch(fake, which=None)
-        self.assertEqual(status, "pdf-ok")
+    def test_missing_cli_binary_falls_back_to_builtin_engine(self):
+        """CLI 가 없는 러너는 #1235 의 내장 엔진 전면 재판독으로 같은 일을 한다."""
+        fake = _FakeTesseract(_read(CLI_TEXT_PATH))
+        text, _status = self._fetch(fake, which=None)
         self.assertEqual(fake.calls, [])
+        self.assertEqual(self.builtin_full_calls, [True])
+        self.assertEqual(f._extract_483_observations_from_text(text), [])
 
-    def test_exhausted_budget_skips_reread(self):
+    def test_exhausted_budget_skips_cli(self):
         f._OCR_BUDGET.update({"remaining": 0})
-        fake = _FakeTesseract(_recorded_cli_text())
-        _text, status = self._fetch(fake)
-        self.assertEqual(status, "pdf-ok")
+        fake = _FakeTesseract(_read(CLI_TEXT_PATH))
+        self._fetch(fake)
         self.assertEqual(fake.calls, [])
 
-    def test_ocr_disabled_skips_reread(self):
-        fake = _FakeTesseract(_recorded_cli_text())
+    def test_ocr_disabled_skips_cli(self):
+        fake = _FakeTesseract(_read(CLI_TEXT_PATH))
         with patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "false"}):
-            _text, status = self._fetch(fake)
-        self.assertEqual(status, "pdf-ok")
+            self._fetch(fake)
         self.assertEqual(fake.calls, [])
 
     def test_engine_timeout_keeps_original(self):
         def _hang(args, **kwargs):
             raise subprocess.TimeoutExpired(args, kwargs.get("timeout"))
-        _text, status = self._fetch(_hang)
-        self.assertEqual(status, "pdf-ok")
+        text, _status = self._fetch(_hang)
+        self.assertEqual(text, f.normalize_pdf_ligatures(_read(BUILTIN_TEXT_PATH)))
 
 
 @unittest.skipUnless(HAVE_FITZ, "PyMuPDF 필요")
-class SecondChanceScopeTest(unittest.TestCase):
-    """관찰이 1건이라도 나오는 문서는 2차 판독에 닿지 않는다 — 정상 문서 출력 바이트 불변."""
+class CliFallbackScopeTest(unittest.TestCase):
+    """관찰이 1건이라도 나오는 문서는 전면 재판독에 닿지 않는다 — 정상 문서 출력 바이트 불변."""
 
-    def setUp(self):
-        f.reset_ocr_health()
-
-    def test_document_with_observations_never_rereads(self):
+    def test_document_with_observations_never_reaches_cli(self):
         def _boom(*a, **k):
-            raise AssertionError("관찰이 있는 문서에서 2차 판독이 돌면 안 된다")
+            raise AssertionError("관찰이 있는 문서에서 CLI 판독이 돌면 안 된다")
         real = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED:\nOBSERVATION 1\n"
                 "Procedures designed to prevent microbiological contamination of sterile drug "
                 "products are not established and followed.\nSpecifically, the firm did not.")
         self.assertTrue(f._extract_483_observations_from_text(real))
-        with patch.object(f, "_reocr_483_pdf_text", _boom), \
+        with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7"), \
+                patch.object(f, "_read_fda483_pdf_text", lambda *a, **k: (real, "pdf-ok")), \
+                patch.object(f, "_reocr_483_pdf_text", _boom), \
                 patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
-            self.assertEqual(f._second_chance_ocr(b"%PDF", real, "pdf-ok", 200000),
-                             (real, "pdf-ok"))
-        self.assertEqual(f.ocr_health()["reocr_tried"], 0)
-
-    def test_empty_text_is_not_second_chance_territory(self):
-        """본문이 아예 없는 경우는 1차 OCR 경로의 몫이다(사유 코드 보존)."""
-        def _boom(*a, **k):
-            raise AssertionError("빈 본문에서 2차 판독이 돌면 안 된다")
-        with patch.object(f, "_reocr_483_pdf_text", _boom), \
-                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
-            self.assertEqual(f._second_chance_ocr(b"%PDF", "", "scan-ocr-empty", 10),
-                             ("", "scan-ocr-empty"))
-
-    def test_text_only_pdf_has_nothing_to_reread(self):
-        """이미지가 없는 PDF(디지털 원본)는 OCR 하지 않는다 — 관찰 0건은 파서의 몫이다."""
-        import fitz
-        doc = fitz.open()
-        doc.new_page().insert_text((72, 72), "No observations here at all.")
-        data = doc.tobytes()
-        with patch.object(f.shutil, "which", lambda name: "/usr/bin/tesseract"), \
-                patch.object(f.subprocess, "run",
-                             lambda *a, **k: self.fail("이미지 없는 페이지를 OCR 했다")):
-            self.assertEqual(f._reocr_483_pdf_text(data, 1000), ("", "reocr-no-image"))
+            self.assertEqual(f._fetch_fda483_pdf_text(URL), (real, "pdf-ok"))
 
 
 @unittest.skipUnless(HAVE_FITZ and shutil.which("tesseract"), "tesseract CLI 가 있는 환경에서만")
-class SecondChanceRealEngineTest(unittest.TestCase):
-    """실제 엔진 판독(로컬·OCR 워크플로 러너). CI 에는 tesseract 가 없어 건너뛴다."""
+class CliFallbackRealEngineTest(unittest.TestCase):
+    """실제 엔진 — 내장 엔진 판독은 실제로 0건이고, CLI 전면 재판독이 실제로 관찰을 되찾는다(CI 러너에서도 돈다)."""
 
-    def test_real_cli_recovers_observation(self):
-        data = _read_pdf()
+    def test_real_engines_builtin_fails_cli_recovers(self):
+        data = _read(PDF_PATH, "rb")
         budget = dict(f._OCR_BUDGET)
-        f._OCR_BUDGET.update({"remaining": 5, "used": 0})
+        f._OCR_BUDGET.update({"remaining": 10, "used": 0})
+        f.reset_ocr_health()
         started = time.monotonic()
         try:
             with patch.object(f, "http_get_bytes", lambda *a, **k: data), \
                     patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
                 text, status = f._fetch_fda483_pdf_text(URL)
+            pages = f._OCR_BUDGET["used"]
+            health = f.ocr_health()
         finally:
             f._OCR_BUDGET.update(budget)
-        # 러너 실측용 — CI 로그에 쪽당 시간이 남는다(성공 판정에는 쓰지 않는다).
-        print(f"\n[2차 판독 실엔진] 1쪽 {time.monotonic() - started:.2f}s · status={status}",
-              file=sys.stderr)
-        self.assertEqual(status, "pdf-ok-ocr")
+            f.reset_ocr_health()
+        # 러너 실측용 — CI 로그에 시간이 남는다(성공 판정에는 쓰지 않는다).
+        print(f"\n[CLI 판독 실엔진] 1쪽 문서 · OCR {pages}쪽(빈 쪽 내장 + 전면 CLI) · "
+              f"{time.monotonic() - started:.2f}s · status={status}", file=sys.stderr)
         observations = f._extract_483_observations_from_text(text)
+        self.assertTrue(observations, "내장 엔진 판독만으로는 관찰이 0건이다 — CLI 단계가 회수해야 한다")
         self.assertTrue(observations[0]["deficiency"].startswith(EXPECTED_HEADING))
+        self.assertEqual(status, "pdf-ok-ocr")
+        self.assertEqual(health.get("reocr_adopted"), 1, "전면 재판독(CLI)이 회수했다")
+        self.assertEqual(pages, 2, "빈 쪽 1차 OCR 1쪽 + CLI 전면 재판독 1쪽(내장 전면 재판독은 안 돈다)")
 
 
 if __name__ == "__main__":

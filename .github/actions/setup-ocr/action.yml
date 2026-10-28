@@ -1,8 +1,8 @@
 name: 'Setup OCR engine (tesseract)'
 description: >
   스캔 483 OCR 이 요구하는 tesseract(+eng 언어팩)를 러너에 설치하고, 설치 결과를 반드시
-  관측 가능하게 남긴다. 소비자 둘 — 1차 판독 `_ocr_483_pdf_text`(PyMuPDF get_textpage_ocr,
-  tessdata 사용)와 2차 판독 `_reocr_483_pdf_text`(관찰 0건 문서만, `tesseract` CLI 직접 실행).
+  관측 가능하게 남긴다. 소비자 둘 — 빈 쪽 판독 `_ocr_483_pdf_text`(PyMuPDF get_textpage_ocr,
+  tessdata 사용)와 관찰 0건 문서의 전면 재판독 `_reocr_483_pdf_text`(`tesseract` CLI 직접 실행).
 
 # 모델 = apt `tesseract-ocr-eng`(tessdata_fast 계열). 2026-10-28 벤치마크에서 tessdata_best 는
 #   쪽당 3.5s → 26.6s(7.5배)인데 판독 실패 44건 회수가 늘지 않아 채택하지 않았다

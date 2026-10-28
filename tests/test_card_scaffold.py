@@ -2245,6 +2245,18 @@ class RecallDetailTest(unittest.TestCase):
                 self.assertTrue(cs._has_source_body(fx["raw"]),
                                 f"{name}: 인용 가능한 원문을 갖고도 신호가 꺼져 있다")
 
+    def test_federal_register_abstract_carries_source_body_signal(self):
+        """★FR 카드는 초록(`abstract`)을 인용하는데 `source_body_captured` 가 False 였다.
+
+        FR API 의 `abstract` 는 기관이 문서에 붙인 공식 초록(원문 그 자체)이라 회수 계열의
+        사유 필드와 같은 처지다. raw_signals 실측(2026-10-28): `abstract` 키는 Federal
+        Register 243행에만 있다 — 다른 소스의 같은 이름 키가 뒤집힐 위험이 없다."""
+        fx = _load_input("guidance_fr")
+        self.assertTrue(cs._has_source_body(fx["raw"]),
+                        "FR 초록을 인용하고도 원문 신호가 꺼져 있다")
+        self.assertFalse(cs._has_source_body({"abstract": ""}),
+                         "빈 초록은 원문 확보가 아니다")
+
     def test_mhra_recall_source_body_stays_off_on_purpose(self):
         """★MHRA 회수만 신호가 꺼진 채로 남는 것이 **맞다** — 형제와 처지가 다르다.
 

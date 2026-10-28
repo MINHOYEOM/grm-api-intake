@@ -688,6 +688,39 @@
      "Up-to-date contact and owner for receiving and answering FDA records requests",
      "Route for regulatory correspondence with the U.S. Agent"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "section 301(e) of the FD&C Act (21 U.S.C. 331(e))",
+      "original": "The FDA sent several requests for records and other information, pursuant to section 704(a)(4) of the Federal Food, Drug, and Cosmetic Act (FD&C Act), 21 U.S.C. 374(a)(4), to the contact email address provided in your registration file. These requests went unanswered by your firm. It is a prohibited act under section 301(e) of the FD&C Act (21 U.S.C. 331(e)) to refuse to permit access to or copying of any record, as required by section 704(a). Because your firm failed to respond to the section 704(a)(4) records requests and associated communication attempts, we have no indication of the level of quality assurance for drugs listed as having been manufactured at your facility.",
+      "description": "FDA는 연방 식품·의약품·화장품법(FD&C Act) section 704(a)(4)(21 U.S.C. 374(a)(4))에 따라 귀사의 등록 파일에 기재된 연락처 이메일 주소로 기록 및 기타 정보를 여러 차례 요청했다. 귀사는 이 요청들에 응답하지 않았다. section 704(a)에 따라 요구되는 기록에 대한 접근 또는 복사를 허용하기를 거부하는 것은 FD&C Act section 301(e)(21 U.S.C. 331(e))에 따른 금지행위다. 귀사가 section 704(a)(4) 기록 요청과 그에 수반된 연락 시도에 응답하지 않았기 때문에, FDA는 귀사 시설에서 제조된 것으로 등재된 의약품의 품질보증 수준을 전혀 파악할 수 없다.",
+      "risk": "기록 제출 거부 자체가 금지행위로 규정되어, FDA가 제조 품질을 확인할 수단이 없어진 상태에서 미국 시장에 OTC 의약품이 계속 유통되는 것은 품질 미확인 제품에 의한 환자 안전 리스크와 직결된다."
+     },
+     {
+      "citation": "section 704(a)(4)",
+      "original": "On January 20, 2026, the FDA sent an initial electronic request for records and other information, pursuant to section 704(a)(4) to the contact email address provided in your registration file and your U.S. Agent. This request went unanswered. A second request to your firm and to your U.S. Agent was sent via email on February 4, 2026. Your U.S. Agent responded on February 9, 2026, requesting an extension until March 5, 2026. FDA responded that the deadline for providing records would be extended only until February 17, 2026. FDA received no response to this communication.",
+      "description": "2026년 1월 20일 FDA는 section 704(a)(4)에 따라 귀사의 등록 파일에 기재된 연락처 이메일 주소와 귀사의 미국 대리인(U.S. Agent)에게 기록 및 기타 정보에 대한 최초 전자 요청을 발송했다. 이 요청은 응답되지 않았다. 2026년 2월 4일 귀사와 미국 대리인에게 이메일로 두 번째 요청이 발송되었다. 미국 대리인은 2026년 2월 9일 회신하여 2026년 3월 5일까지 기한 연장을 요청했다. FDA는 기록 제출 기한을 2026년 2월 17일까지만 연장하겠다고 회신했다. FDA는 이 연락에 대해 아무런 응답도 받지 못했다.",
+      "risk": "미국 대리인을 통한 연장 요청 후에도 FDA가 허용한 연장 기한까지 무응답으로 일관해, 단순 연락 누락이 아닌 의도적 기록 제출 거부로 평가될 소지가 크다."
+     },
+     {
+      "citation": "section 704(a)(4)",
+      "original": "FDA sent a follow-up written request for such records and other information on March 2, 2026. The shipper confirmed delivery of the written request to your firm1, but you failed to respond to these attempted communications or to provide the requested records or information. Pursuant to section 704(a)(4), FDA’s request and follow-up communication included a sufficient and clear description of the records being sought.",
+      "description": "FDA는 2026년 3월 2일 해당 기록 및 기타 정보에 대한 후속 서면 요청을 발송했다. 운송업체는 서면 요청이 귀사에 배달되었음을 확인했으나(각주 1), 귀사는 이러한 연락 시도에 응답하지 않았고 요청된 기록이나 정보도 제공하지 않았다. section 704(a)(4)에 따라, FDA의 요청과 후속 연락에는 요구하는 기록에 대한 충분하고 명확한 설명이 포함되어 있었다.",
+      "risk": "배달이 확인된 서면 요청까지 무시했고 FDA 요청 내용이 충분히 명확했다고 명시되어, 업체가 요청 불명확성이나 미수령을 항변할 여지가 사라졌다."
+     }
+    ],
+    "fda_evaluation": "이 서한에는 번호 매긴 CGMP 위반 항목이 없으며, FDA는 section 704(a)(4) 기록 요청에 대한 업체의 대응 자체가 전무했다고 평가했다. 원문에 따르면 귀사는 2016년 10월 의약품 제조업체로 최초 등록했다가 2019년 7월 폐업(out-of-business) 상태로 전환했고, 2023년 7월 FDA 연락 시 수년간 미국 시장용 의약품을 제조·선적하지 않았으며 향후 계획도 없다고 진술했다. 그러나 2025년 6월 재등록 후 그 다음 달 미국 선적을 재개했다. 이후 FDA의 전자 요청·이메일 재요청·서면 요청에 모두 응답하지 않았고, 미국 대리인의 연장 요청 이후 FDA가 허용한 기한도 지키지 않았다. FDA는 이 무응답 때문에 귀사 시설에서 제조된 것으로 등재된 의약품의 품질보증 수준을 전혀 알 수 없다고 명시했으며, 서한에 열거된 위반이 귀사 시설 위반의 전부가 아니라고 밝혔다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(CDER-OC-OMQ-Communications@fda.hhs.gov, 제목란에 FEI 3013166766 및 ATTN: Ernest Bizjak 기재)",
+     "items": [
+      "FDA가 section 704(a)(4)에 따라 요청한 기록 및 기타 정보를 제출하고, 향후 기록 요청에 즉시 응답할 수 있도록 등록 파일의 연락처 이메일과 미국 대리인 연락 체계를 정비한다.",
+      "FDA가 귀사의 활동과 관행을 계속 평가하는 데 고려할 수 있는 정보를 서면 회신에 포함해 제출한다.",
+      "필요 시 FDA 실사(inspection) 일정 요청을 제출해 CGMP 준수 여부를 FDA가 확인할 수 있게 한다.",
+      "미국 시장에 선적된 OTC 의약품의 제조 품질을 입증할 수 있도록 CGMP 및 기타 적용 요건 준수 체계를 점검하고 그 근거를 회신에 반영한다."
+     ]
+    },
+    "administrative_risks": "FDA는 2026년 6월 3일 귀사가 미국으로 수입 신청하는 모든 의약품을 Import Alert 66-79에 등재했다. FDA가 CGMP 및 기타 적용 요건 준수를 확인할 때까지 귀사를 의약품 제조업체로 기재한 신규 신청 또는 변경 신청(supplement)의 승인이 보류될 수 있다. 또한 귀사 시설에서 제조되어 미국 시장으로 반입되는 물품 중 불량(adulterated) 또는 부정표시(misbranded)로 보이는 것은 FD&C Act section 801(a)(3)(21 U.S.C. 381(a)(3))에 따라 억류 또는 통관 거부 대상이 된다. 기록 접근·복사 거부는 section 301(e)상 금지행위로 규정되어 있다."
    }
   },
   {

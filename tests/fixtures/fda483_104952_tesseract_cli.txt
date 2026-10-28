@@ -1,0 +1,50 @@
+DEPARTMENT OF HEALTH AND HUMAN SERVICES
+FOOD AND DRUG ADMINISTRATION
+
+‘DISTRICT OFFICE ADDRESS AND PHONE NUMBER DATE(S) OF INSPECTION
+JU.S. Food & Drug Administration CDER/OC/OMPQ/DIDQ White Oak Bldg. 51, 3/27/2017 - 4/04/2017
+
+Room 4234 10903 New Hampshire Ave FE| NUMBER
+Silver Spring, MD 20993 Tel: 301-796-3206 3002949085
+
+NAME AND TITLE OF INDIVIDUAL TO WHOM REPORT {S ISSUED
+
+To: Arun Gupta, Senior Director and Location Head
+FIRM NAME STREET ADDRESS
+
+Dr. Reddy’s Laboratones Limited CTO VI APIIC Industrial Estate, Pydibhimavarma (Village)
+CITY, STATE AND ZIP CODE TYPE OF ESTABLISHMENT INSPECTED
+
+Srikakulam District, Andhra Pradesh, India Drug Manufacturer
+
+DURING AN INSPECTION OF YOUR FIRM(|) (WE) OBSERVED:
+
+1.Complete records are not always maintained for periodic calibration of laboratory instruments, apparatus, gauges, and
+Irccording devices.
+
+For all High Performance Liquid Chromatography systems (HPLC), the firm failed to monitor the lamp hours of their UV
+detectors. In addition, monitoring of the QC laboratory’s HPLC units does not include a periodic check of the hours of the UV-
+Vis lamps after 2000 hours of operation as recommended by the manufacturer. For example, six (6) of the HPLC units, QC-
+170, QC-169, QC-024, QC-026, QC-122 and QC-021, showed operational hours of 13,003 hours, 11,132 hours, 5,106 hours,
+3,475 hours, 3,198 hours, and 2,371 hours respectively without the lamps being replaced or being reset to zero after changing of
+
+r" lamp.
+
+2. Laboratory records do not include a complete record of all data secured in the course of each test, including all
+chromatograms from laboratory instrumentation, properly identified to show the specific components of the drug substance
+
+ese Specifically, ee records do not always contain the HPLC standard and sample chromatograms. For example, the
+laboratory records for™ USP Batch #4 manufactured 2/25/2017, #2 manufactured
+2/23/2017 &™ manufactured 2/22/2017, did not include the HPLC standard and sample chromatograms for Assay
+
+jand Related Substances instead only results summary reports are attached. The chromatographic data was limited to calculated
+results for last 3 months.
+
+EMPLOYEE(S) SIGNATURE EMPLOYEE(S) NAME AND TITLE (Print or Type) DATE ISSUED
+SEE lees th QLELO RS
+eae Gayle S. Lawson, Investigator 4/04/2017
+PAGE Ke i Aff (ter Kenneth H. Williams, Chemist
+
+FORM FDA 483 (8/00) PREVIOUS EDITION OBSOLETE INSPECTIONAL OBSERVATIONS PAGE | OF | PAGES
+
+EF

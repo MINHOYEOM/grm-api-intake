@@ -236,6 +236,45 @@
      "Whether media fills cover the maximum intervention duration and count",
      "Trigger criteria for opening environmental monitoring trend investigations"
     ]
+   },
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 211.113(b)",
+      "original": "1. Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)). A. Our inspection identified aseptic processing design deficiencies which pose significant hazards to drug product sterility, as well as multiple inadequacies in your smoke studies. For example: During a smoke study simulating an aseptic intervention of the (b)(4) line, an operator extended their upper body over the conveyor. This design flaw disrupted (b)(4) air and compromised protection of the critical ISO 5 zone. Smoke studies demonstrated air movement across the operator’s body and flowing toward exposed vials. You also performed a smoke study on the (b)(4) filling line to evaluate removal of vials from the (b)(4) at the (b)(4) . During this study an operator (b)(4) the large (b)(4) and placed their upper torso inside the ISO 5 classified area. The operator also used gloved hands instead of sterile tools to remove vials. In order to (b)(4) the (b)(4) , operators opened a small (b)(4) by reaching their entire forearm inside the ISO 5 classified area and manually turning a (b)(4) . These and other hazardous interventions occurred at critical locations in your aseptic processing area. Any compromise of (b)(4) protection exposes sterile drug product to potential microbiological contamination.",
+      "description": "귀사는 무균으로 표시된 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 서면 절차를 수립·준수하지 않았다(21 CFR 211.113(b)). A. 실사에서 의약품 무균성에 중대한 위해를 초래하는 무균 공정 설계상 결함과 함께 스모크 스터디의 여러 미비점이 확인되었다. 예컨대 (b)(4) 라인의 무균 개입(intervention)을 모사한 스모크 스터디에서 작업자가 컨베이어 위로 상체를 뻗었다. 이 설계 결함은 (b)(4) 기류를 교란하고 핵심 ISO 5 구역의 보호를 훼손했다. 스모크 스터디에서 기류가 작업자의 몸을 가로질러 노출된 바이알 쪽으로 흐르는 것이 확인되었다. 귀사는 또한 (b)(4) 충전 라인에서 (b)(4)의 (b)(4)에서 바이알을 제거하는 작업을 평가하기 위한 스모크 스터디를 수행했다. 이 스터디 중 작업자는 대형 (b)(4)를 (b)(4)하고 상체를 ISO 5 등급 구역 안으로 넣었다. 작업자는 또한 멸균 도구 대신 장갑 낀 손으로 바이알을 제거했다. (b)(4)를 (b)(4)하기 위해 작업자들은 팔뚝 전체를 ISO 5 등급 구역 안으로 넣어 작은 (b)(4)를 열고 (b)(4)를 수동으로 돌렸다. 이러한 개입과 그 밖의 위험한 개입들이 무균 공정 구역의 핵심 위치에서 발생했다. (b)(4) 보호가 조금이라도 훼손되면 무균 의약품이 잠재적 미생물 오염에 노출된다.",
+      "risk": "작업자 신체가 ISO 5 핵심 구역에 침투해 노출 바이알 쪽으로 기류가 흐르므로, 출하된 무균 주사제의 미생물 오염(무균성 상실) 가능성을 배제할 수 없다."
+     },
+     {
+      "citation": "21 CFR 211.113(b)",
+      "original": "B. Your aseptic process simulations (media fills) failed to demonstrate the maximum duration of (b)(4) interventions observed during commercial aseptic filling operations. They also did not sufficiently represent the risk to your aseptic process posed by lengthy interventions. For example, the duration of (b)(4) was nearly (b)(4) for (b)(4) injection commercial batch (b)(4) . In contrast, the (b)(4) simulation for (b)(4) during the (b)(4) media fill was between (b)(4) . We also cited deficient aseptic process simulations during our February 2023 and June 2024 inspections. You have failed to adequately correct this deficiency.",
+      "description": "B. 귀사의 무균 공정 시뮬레이션(배지충전, media fill)은 상업용 무균 충전 작업 중 관찰된 (b)(4) 개입의 최대 지속시간을 입증하지 못했다. 또한 장시간 개입이 무균 공정에 주는 위험을 충분히 대표하지 못했다. 예를 들어 (b)(4) 주사제 상업 배치 (b)(4)에서 (b)(4)의 지속시간은 거의 (b)(4)였다. 이에 반해 (b)(4) 배지충전에서 (b)(4)에 대한 (b)(4) 시뮬레이션은 (b)(4) 사이였다. FDA 는 2023년 2월 및 2024년 6월 실사에서도 미흡한 무균 공정 시뮬레이션을 지적한 바 있다. 귀사는 이 결함을 적절히 시정하지 못했다.",
+      "risk": "실제 상업 생산의 장시간 개입이 배지충전에서 재현되지 않아 무균 공정 밸리데이션이 실제 오염 위험을 입증하지 못하며, 반복 지적(2023·2024 실사)으로 규제 신뢰도가 크게 훼손된다."
+     },
+     {
+      "citation": "21 CFR 211.192",
+      "original": "2. Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192). Your firm lacked adequate systems to ensure sufficient and timely investigations. A. Your firm failed to investigate multiple action-level environmental monitoring excursions that occurred between January and June 2025 in the ISO 5 and 7 areas. Your environmental monitoring revealed an adverse trend of mold recoveries on personnel for the months of February, March, May, and June. However, you did not open a trend investigation until August 27, 2025. For example, you recovered 83 colony forming units, including mold, from sampling an operator’s neck in the ISO 7 area in (b)(4) . Your action level is (b)(4) or more colony forming units, but you did not initiate a deviation investigation.",
+      "description": "귀사는 배치 또는 그 구성성분이 규격에 부적합한 경우 및 설명되지 않는 불일치에 대해, 해당 배치의 출하 여부와 관계없이 철저히 조사하지 않았다(21 CFR 211.192). 귀사는 충분하고 적시적인 조사를 보장할 적절한 시스템을 갖추지 못했다. A. 귀사는 2025년 1월부터 6월 사이 ISO 5 및 ISO 7 구역에서 발생한 다수의 조치기준(action-level) 환경모니터링 일탈을 조사하지 않았다. 환경모니터링 결과 2월·3월·5월·6월에 작업자에서 곰팡이 검출이 증가하는 부정적 경향이 나타났다. 그러나 귀사는 2025년 8월 27일에서야 경향 조사를 개시했다. 예를 들어 (b)(4)에 ISO 7 구역에서 작업자의 목 부위를 채취한 시료에서 곰팡이를 포함해 83 CFU(집락형성단위)가 검출되었다. 귀사의 조치기준은 (b)(4) CFU 이상인데도 일탈 조사를 개시하지 않았다.",
+      "risk": "작업자 유래 곰팡이 오염 경향이 수개월간 방치되어 청정구역 내 미생물 오염원이 지속·악화될 수 있고, 무균 제품 오염으로 이어질 위험이 있다."
+     },
+     {
+      "citation": "21 CFR 211.192",
+      "original": "B. Your investigation into visible particulate (e.g. (b)(4) ) contamination of (b)(4) batches of (b)(4) was not conducted in a timely manner. You opened the investigation on June 4, 2025, and the status of the investigation on November 3, 2025, five months later, was still in progress. You continued to manufacture additional batches on the same processing line without definitive root causes identified.",
+      "description": "B. (b)(4)의 (b)(4) 배치에서 발생한 가시성 이물(예: (b)(4)) 오염에 대한 귀사의 조사는 적시에 수행되지 않았다. 귀사는 2025년 6월 4일 조사를 개시했으나, 5개월 후인 2025년 11월 3일 시점에도 조사는 여전히 진행 중이었다. 귀사는 확정된 근본원인이 규명되지 않은 상태에서 동일 공정 라인에서 추가 배치를 계속 제조했다.",
+      "risk": "근본원인 미규명 상태로 동일 라인 생산을 지속해 이물 오염이 추가 배치로 확산될 수 있으며, 주사제의 가시성 이물은 환자 안전에 직접적인 위해가 된다."
+     }
+    ],
+    "fda_evaluation": "FDA 는 지적 항목 전반에 대한 회신을 '불충분(inadequate)'으로 평가했다. 스모크 스터디의 경우 다른 Jubilant 사업장 QA 와 제3자 컨설턴트가 종합 평가하겠다는 회신에 대해, 재수행의 구체성과 제3자 감독 책임이 부족하고 개입 인체공학 등 위해 식별 미흡의 위험을 다루지 않았다고 지적했다. 배지충전은 외부 기술단체 문헌이 최대 개입시간 모사를 요구하지 않는다는 회신을 받아들이지 않았고, 2026년 6월 30일 기한의 CAPA 를 제시했지만 개정 절차가 없고 일탈 PR 256484 의 불일치도 다루지 않았다고 했다. 무균 구역 표면 변색은 원인을 설명하지 않은 채 절차상 공백으로 돌렸고, 출하 배치 영향평가에 가시성 이물 검사 데이터 검토가 빠졌다고 평가했다. 환경모니터링 미조사에 대해서는 셧다운 연장·배치 부적합 처리 등 노력은 인정하면서도 품질부서의 책임을 다루지 않았다고 했고, 이물 조사는 완료 여부와 최종 근본원인 분석이 담긴 갱신 보고서가 없다고 지적했다. 아울러 품질부서가 적절한 권한을 행사하지 못하는 등 효과적인 품질시스템이 운영되지 않는다고 판단했다.",
+    "required_remediation": {
+     "deadline": "서한 수령 후 15영업일 이내 서면 회신(기한 내 시정 불가 시 지연 사유와 완료 일정 명시)",
+     "items": [
+      "자격 있는 독립 컨설턴트가 ISO 5 구역 내 모든 인적 개입·설비 배치·기류(라인별 스모크 스터디 검토)·시설 배치·인원/자재 동선 등 무균 공정 전반의 오염 위해를 평가하고, 일정이 포함된 개선계획(배리어 시스템 등 라인·클린룸 설계 변경, 적격성평가·밸리데이션 계획)을 제출한다.",
+      "무균 작업 관행·클린룸 행동·서면 절차 준수 보증 계획과, 생산관리 및 품질부서 감독의 빈도·깊이에 대한 독립 평가 및 CAPA 를 제출한다.",
+      "표면 변색 관련 일탈·CAPA 보고서와 무균생산부서 점검(walkthrough) 결과, 시설·설비 유지관리에 대한 운영관리 감독 CAPA 계획을 제출한다.",
+      "일탈·OOS·조치기준 초과 등 조사 시스템과 CAPA 프로그램 전반에 대한 독립 평가·개선계획, 곰팡이 검출 경향의 유효성 확인, 이물 오염에 대한 제품 영향평가를 제출한다."
+     ]
+    },
+    "administrative_risks": "위반이 완전히 해소되고 CGMP 준수가 확인될 때까지 FDA 는 이 업체를 제조소로 기재한 신규 허가신청 및 변경신청의 승인을 보류할 수 있으며, 시정조치 확인을 위해 재실사할 수 있다. 위반을 해소하지 못하면 FD&C Act 801(a)(3)조(21 U.S.C. 381(a)(3))에 따라 Kirkland 소재 Jubilant HollisterStier General Partnership 에서 제조된 제품의 미국 수입이 거부될 수 있고, 제조 방법·관리가 CGMP 에 부합하지 않아 불량의약품으로 보이는 제품은 억류되거나 통관이 거부될 수 있다. 또한 공급 중단 가능성이 있는 조치를 고려하는 경우 CDER 의약품부족대응팀(Drug Shortages Staff)에 즉시 연락하도록 요청받았다."
    }
   },
   {

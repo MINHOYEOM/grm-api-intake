@@ -238,8 +238,17 @@ def is_recoverable_row(raw: dict[str, Any]) -> bool:
     return status.startswith("fetch-fail")
 
 
-def is_recovery_candidate(raw: dict[str, Any], mode: str) -> bool:
-    """모드별 후보 판정 — `run()` 이 서버 like 로 좁힌 행을 여기서 정확히 재확인한다."""
+def is_recovery_candidate(raw: dict[str, Any], mode: str, *, explicit: bool = False) -> bool:
+    """모드별 후보 판정 — `run()` 이 서버 like 로 좁힌 행을 여기서 정확히 재확인한다.
+
+    `explicit`(= `--doc-ids` 로 문서를 **이름으로** 지목)이면 상한 표식 모드에서 `out-of-scope`
+    행도 후보로 받는다. 그 표식은 게이트 판정의 산물이라 게이트가 고쳐지면 틀린 표식이 된다
+    (2026-10-28: 양식 상용구 오판으로 의약품 483 이 out-of-scope 로 찍힘). 이름 지목일 때만
+    여는 이유 — 예약 실행(doc-ids 없음)이 진짜 범위 밖 문서를 매일 다시 받지 않게.
+    """
+    if (explicit and mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE)
+            and str(raw.get("fda483_text_status") or "") == OUT_OF_SCOPE_STATUS):
+        return True
     if mode == MODE_RECOVERABLE:
         return is_recoverable_row(raw)
     if mode == MODE_MISSING_OBSERVATIONS:
@@ -323,24 +332,26 @@ def _rebuild_item(nrow: dict[str, str], text: str, status: str) -> Any:
 
 def _fetch_raw_signals(
     base_url: str, service_key: str, *, page_size: int = _DEFAULT_PAGE_SIZE,
-    mode: str = MODE_OCR_UNAVAILABLE,
+    mode: str = MODE_OCR_UNAVAILABLE, include_out_of_scope: bool = False,
 ) -> list[dict[str, Any]]:
     """source='FDA 483' raw_signals 중 이번 모드의 후보 행만.
 
     서버에서 `raw_json`(TEXT) 부분일치로 좁히고, 호출부가 파싱해 조건을 정확히 재확인한다
     (like 는 좁히기용 · 판정은 `is_recovery_candidate`). collected_at 은 upsert 시 원본을
-    보존해야 하므로 함께 읽는다.
+    보존해야 하므로 함께 읽는다. `include_out_of_scope` 면 상한 표식 모드의 좁히기에
+    `out-of-scope` 표식도 넣는다(`--doc-ids` 재회수 — `is_recovery_candidate(explicit=)` 참조).
     """
+    extra = (OUT_OF_SCOPE_STATUS,) if include_out_of_scope else ()
     if mode == MODE_MISSING_OBSERVATIONS:
         # 관찰 키가 **없는** 행. `not.like` 로 서버에서 1차로 좁힌다.
         narrow = {"raw_json": f"not.like.*{_OBSERVATIONS_KEY}*"}
     elif mode == MODE_COLLECTION_CAPPED:
         narrow = {"or": "(" + ",".join(
-            f"raw_json.like.*{status}*" for status in CAPPED_TEXT_STATUSES) + ")"}
+            f"raw_json.like.*{status}*" for status in (*CAPPED_TEXT_STATUSES, *extra)) + ")"}
     elif mode == MODE_RECOVERABLE:
         narrow = {"or": "(" + ",".join(
             f"raw_json.like.*{status}*" for status in
-            (*CAPPED_TEXT_STATUSES, OCR_UNAVAILABLE_PREFIX, "fetch-fail")) + ")"}
+            (*CAPPED_TEXT_STATUSES, OCR_UNAVAILABLE_PREFIX, "fetch-fail", *extra)) + ")"}
     else:
         narrow = {"raw_json": f"like.*{OCR_UNAVAILABLE_PREFIX}*"}
     return fsb._fetch_all_pages(
@@ -510,8 +521,9 @@ def run(
         report.errors.append("SUPABASE_URL must start with https://")
         return report, 2
 
+    explicit = bool(doc_ids)
     try:
-        rows = fetch_raw(base, service_key, mode=mode)
+        rows = fetch_raw(base, service_key, mode=mode, include_out_of_scope=explicit)
     except (RuntimeError, ValueError) as exc:
         report.errors.append(str(exc))
         log("ERROR", f"483 OCR 복구 조회 실패: {exc}")
@@ -520,7 +532,8 @@ def run(
     report.scanned = len(rows)
 
     # 서버 like 는 좁히기용 — 상태값을 실제로 파싱해 대상만 남긴다.
-    marked = [r for r in rows if is_recovery_candidate(_json_object(r.get("raw_json")), mode)]
+    marked = [r for r in rows
+              if is_recovery_candidate(_json_object(r.get("raw_json")), mode, explicit=explicit)]
     report.marked = len(marked)
 
     if doc_ids:
@@ -720,7 +733,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--doc-ids", default="",
-        help="선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분).",
+        help="선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). "
+        "collection-capped·recoverable 모드에서 지목하면 out-of-scope 표식 행도 다시 읽는다 "
+        "(게이트 수정 후 오판 표식 재회수용 — 예약 실행은 지목이 없어 해당 없음).",
     )
     p.add_argument(
         "--mode", choices=list(RECOVERY_MODES), default=MODE_OCR_UNAVAILABLE,

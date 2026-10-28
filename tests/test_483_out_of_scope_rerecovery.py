@@ -33,9 +33,15 @@ class ExplicitCandidateTest(unittest.TestCase):
         self.assertFalse(rec.is_recovery_candidate(_OOS, rec.MODE_OCR_UNAVAILABLE, explicit=True))
 
     def test_explicit_does_not_open_other_definitive_reasons(self):
-        for status in ("scan-no-text", "fetch-fail:HTTP GET final failure: (404 Client Error)"):
-            self.assertFalse(rec.is_recovery_candidate(
-                {"fda483_text_status": status}, rec.MODE_RECOVERABLE, explicit=True), status)
+        # 지목은 out-of-scope 만 연다 — 모드가 확정 사유로 보는 표식은 지목해도 닫힌 채다.
+        # (#1235 이후 recoverable 은 404 를 재확인 대상으로 보므로 404 는 collection-capped 로 본다.)
+        self.assertFalse(rec.is_recovery_candidate(
+            {"fda483_text_status": "scan-no-text"}, rec.MODE_RECOVERABLE, explicit=True))
+        status_404 = {"fda483_text_status": "fetch-fail:HTTP GET final failure: (404 Client Error)"}
+        self.assertFalse(rec.is_recovery_candidate(
+            status_404, rec.MODE_COLLECTION_CAPPED, explicit=True))
+        self.assertEqual(rec.is_recovery_candidate(status_404, rec.MODE_RECOVERABLE, explicit=True),
+                         rec.is_recovery_candidate(status_404, rec.MODE_RECOVERABLE))
 
     def test_server_narrowing_includes_marker_only_when_explicit(self):
         seen = {}

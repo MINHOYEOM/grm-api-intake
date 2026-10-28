@@ -156,19 +156,21 @@ class OutOfScopeEstablishmentSkipTest(unittest.TestCase):
 
     빈 본문 재구성도 게이트가 드롭해 표식을 못 바꾸므로, 받으면 매일 같은 OCR 을 반복한다."""
 
-    def _run(self, mode):
+    def _run(self, mode, *, status="not-attempted", dry_run=False, patch=None):
         import json
         import findings_store
         rid = findings_store.raw_signal_from_intake_item(
             rec._rebuild_item(_nrow(), "", "not-attempted"), collected_at="")["raw_signal_id"]
-        row = _row(rid, status="not-attempted")
+        row = _row(rid, status=status)
         raw = json.loads(row["raw_json"])
         raw["establishment_type"] = "Source Plasma Collection Facility"
         row["raw_json"] = json.dumps(raw)
         fetched = []
+        self.patch = patch or mock.MagicMock(return_value=None)
         report, _code, upsert, _ = _run(
-            mode=mode, dry_run=False, rows=[row],
+            mode=mode, dry_run=dry_run, rows=[row], patch_raw_json=self.patch,
             fetch_text=lambda url: fetched.append(url) or ("", "scan-no-text"))
+        self.rid, self.raw = rid, raw
         return report, fetched, upsert
 
     def test_recoverable_skips_fetch(self):
@@ -181,6 +183,38 @@ class OutOfScopeEstablishmentSkipTest(unittest.TestCase):
     def test_other_modes_still_fetch(self):
         _report, fetched, _ = self._run(rec.MODE_MISSING_OBSERVATIONS)
         self.assertEqual(len(fetched), 1)
+        self.patch.assert_not_called()
+
+    def test_skip_marks_out_of_scope_in_place(self):
+        """[2026-10-28 실측] 넘기기만 하면 상한 표식이 남아 추출 격차 감시가 결손으로 센다
+        (FDA 483 0건 82건 중 ~18건). 표식만 바꾸고 다른 키는 그대로 둔다."""
+        report, fetched, _ = self._run(rec.MODE_RECOVERABLE, status="scan-ocr-budget")
+        self.assertEqual(fetched, [])
+        self.assertEqual(report.status_resolved, 1)
+        self.patch.assert_called_once()
+        _base, _key, rid, raw = self.patch.call_args[0]
+        self.assertEqual(rid, self.rid)
+        self.assertEqual(raw["fda483_text_status"], rec.OUT_OF_SCOPE_STATUS)
+        self.assertEqual({k: v for k, v in raw.items() if k != "fda483_text_status"},
+                         {k: v for k, v in self.raw.items() if k != "fda483_text_status"})
+        self.assertFalse(rec.is_recoverable_row(raw))       # 다음 예약 실행 후보에서 빠진다
+
+    def test_dry_run_counts_without_patch(self):
+        report, _fetched, _ = self._run(rec.MODE_COLLECTION_CAPPED, dry_run=True)
+        self.assertEqual(report.status_resolved, 1)
+        self.patch.assert_not_called()
+
+    def test_already_marked_is_not_rewritten(self):
+        report, _fetched, _ = self._run(rec.MODE_RECOVERABLE, status=rec.OUT_OF_SCOPE_STATUS)
+        self.assertEqual(report.status_resolved, 0)
+        self.patch.assert_not_called()
+
+    def test_patch_failure_is_counted(self):
+        report, _fetched, _ = self._run(
+            rec.MODE_RECOVERABLE, patch=mock.MagicMock(side_effect=RuntimeError("PATCH HTTP 500")))
+        self.assertEqual(report.failed, 1)
+        self.assertEqual(report.status_resolved, 0)
+        self.assertTrue(any("patch_failed" in e for e in report.errors))
 
 
 class NotFoundRecheckTest(unittest.TestCase):

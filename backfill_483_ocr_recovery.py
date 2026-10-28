@@ -69,6 +69,7 @@ import findings_supabase_backfill as fsb
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_483, log
+from grm_taxonomy import is_out_of_scope_483_establishment
 
 
 SCHEMA_VERSION = "grm-483-ocr-recovery/v2"
@@ -143,6 +144,8 @@ class OcrRecoveryReport:
     # collection-capped 모드 전용: 다시 읽어도 본문이 없어서(404·텍스트층 없음 등) 상한 표식을
     # **실제 사유로 교체**한 행. 교체하지 않으면 그 문서는 매 실행 후보로 남아 영원히 다시 읽힌다.
     status_resolved: int = 0
+    # 상한 표식 모드에서 시설 유형만으로 범위 밖이라 PDF 를 받지 않은 행(비용 0 — 재시도 낭비 차단).
+    skipped_out_of_scope_type: int = 0
     failure_reasons: dict[str, int] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
     samples: list[dict[str, Any]] = field(default_factory=list)
@@ -528,6 +531,16 @@ def run(
         label = doc_id or rid
         raw = _json_object(r.get("raw_json"))
         pdf_url = str(raw.get("pdf_url") or "").strip()
+
+        # ★[2026-10-28 정리 회수 실측] 시설 유형만으로 범위 밖(혈액·IRB·조직·생식·사료 등)인
+        #   행은 **본문 없이 재구성해도** 게이트가 드롭해 표식을 바꿀 수 없다 — 그대로 두면
+        #   예약 회수가 매일 PDF 를 받아 OCR 한다(정리 회수 46건 중 18건이 이 경우). 수집기가
+        #   같은 판정으로 PDF 를 받지 않는 것(`collect_fda_483` 의 시설 유형 사전 차단)과 맞춰,
+        #   상한 표식 모드에서는 받지 않고 센다. 행은 남지만 비용은 0 이다.
+        if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE) and \
+                is_out_of_scope_483_establishment(str(raw.get("establishment_type") or "")):
+            report.skipped_out_of_scope_type += 1
+            continue
 
         report.attempted += 1
 

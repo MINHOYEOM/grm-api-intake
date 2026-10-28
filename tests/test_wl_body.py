@@ -44,6 +44,18 @@ _WL_LIST_HTML = (
     "</table>"
 )
 _WIN_START = date(2026, 6, 1)
+
+
+def setUpModule() -> None:
+    # 재시도 백오프(실시간 sleep)를 테스트에서 끈다 — 일시 장애 케이스가 수 초씩 잡아먹지 않게.
+    # (재시도 전에 존재하던 timeout 케이스들도 이제 재시도 경로를 지난다.)
+    global _SLEEP_PATCH
+    _SLEEP_PATCH = patch.object(ci, "_wl_retry_sleep", lambda _s: None)
+    _SLEEP_PATCH.start()
+
+
+def tearDownModule() -> None:
+    _SLEEP_PATCH.stop()
 _WIN_END = date(2026, 6, 30)
 
 
@@ -371,6 +383,90 @@ class WlCollectBodyFullGateTest(unittest.TestCase):
         self.assertNotIn("wl_body_full", items[0].raw_payload)
         self.assertEqual(ci.LAST_WL_HEALTH["wl_body_full"],
                          {"enabled": False, "attempted": 0, "failed": 0})
+
+
+class WlFetchRetryTest(unittest.TestCase):
+    """[WL 본문 재시도 2026-10-28] 일시 장애(5xx·429·타임아웃·연결 오류)만 짧게 재시도한다.
+
+    종전엔 한 번 실패하면 본문 없이 적재됐고, 이후 수집은 같은 document_id 를 다시 받지
+    않아 영구 결손이었다. 403 은 같은 러너 IP 의 봇 차단이라 즉시 재시도가 무의미하다 —
+    다음 날 예약 회수(다른 러너)가 맡는다. 404 는 원문이 없다는 확정 사유다.
+    """
+
+    def _run(self, responses, fn=ci._fetch_wl_body_full):
+        calls: list[str] = []
+        sleeps: list[float] = []
+        seq = list(responses)
+
+        def _get(url, *args, **kwargs):
+            calls.append(url)
+            r = seq.pop(0)
+            if isinstance(r, Exception):
+                raise r
+            return r
+
+        with patch.object(ci.requests, "get", side_effect=_get), \
+                patch.object(ci, "_wl_retry_sleep", side_effect=sleeps.append):
+            out = fn("https://www.fda.gov/.../acme-660999")
+        return out, calls, sleeps
+
+    def test_5xx_then_success_recovers_body(self) -> None:
+        (full, status), calls, sleeps = self._run([_Resp("", 503), _Resp(_WL_BODY_HTML)])
+        self.assertTrue(full.startswith("During our inspection"))
+        self.assertEqual(status, "ok")
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(len(sleeps), 1)
+
+    def test_timeout_then_success_recovers_excerpt(self) -> None:
+        (ex, status), calls, _ = self._run(
+            [requests.Timeout("slow"), _Resp(_WL_BODY_HTML)], fn=ci._fetch_wl_body_excerpt)
+        self.assertTrue(ex.startswith("During our inspection"))
+        self.assertEqual(status, "ok")
+        self.assertEqual(len(calls), 2)
+
+    def test_connection_error_and_429_are_retried(self) -> None:
+        (full, status), calls, _ = self._run(
+            [requests.ConnectionError("reset"), _Resp("", 429), _Resp(_WL_BODY_HTML)])
+        self.assertEqual(status, "ok")
+        self.assertEqual(len(calls), 3)
+
+    def test_persistent_5xx_gives_up_after_bounded_attempts(self) -> None:
+        (full, status), calls, sleeps = self._run([_Resp("", 502)] * ci.WL_BODY_FETCH_ATTEMPTS)
+        self.assertEqual(full, "")
+        self.assertTrue(status.startswith("fetch-fail:"))
+        self.assertEqual(len(calls), ci.WL_BODY_FETCH_ATTEMPTS)
+        self.assertEqual(len(sleeps), ci.WL_BODY_FETCH_ATTEMPTS - 1)   # 마지막 실패 뒤엔 안 잔다
+
+    def test_403_is_not_retried(self) -> None:
+        (full, status), calls, sleeps = self._run([_Resp("", 403)])
+        self.assertEqual(status, "fetch-403")
+        self.assertEqual((len(calls), sleeps), (1, []))
+
+    def test_404_is_not_retried(self) -> None:
+        (full, status), calls, sleeps = self._run([_Resp("", 404)])
+        self.assertTrue(status.startswith("fetch-fail:"))
+        self.assertIn("404", status)
+        self.assertEqual((len(calls), sleeps), (1, []))
+
+    def test_collect_recovers_after_transient_failure(self) -> None:
+        """수집 경로 전체: 편지 GET 첫 시도가 503 이어도 본문이 실리고 실패로 세지 않는다."""
+        state = {"n": 0}
+
+        def _get(url, *args, **kwargs):
+            if url == ci.FDA_WL_URL:
+                return _Resp(_WL_LIST_HTML)
+            state["n"] += 1
+            return _Resp("", 503) if state["n"] == 1 else _Resp(_WL_BODY_HTML)
+
+        with patch.dict(os.environ, {"ENABLE_WL_BODY_FULL": "true", "ENABLE_WL_BODY": "false"}):
+            with patch.object(ci.requests, "get", side_effect=_get):
+                items, err = ci.collect_fda_warning_letters(_WIN_START, _WIN_END)
+        self.assertIsNone(err)
+        raw = items[0].raw_payload
+        self.assertIn("wl_body_full", raw)
+        self.assertNotIn("wl_body_status", raw)
+        self.assertEqual(ci.LAST_WL_HEALTH["wl_body_full"],
+                         {"enabled": True, "attempted": 1, "failed": 0})
 
 
 if __name__ == "__main__":

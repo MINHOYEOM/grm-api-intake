@@ -985,6 +985,33 @@ def _extract_fda483_excerpt(text: str) -> str:
     return ""
 
 
+# [2026-10-28] 483 양식 상용구 — 관련성 게이트 입력에서만 지운다(저장 excerpt·관찰 파서 불변).
+# 뒷면 Section 704(b) 인용문("any food, drug, device, or cosmetic …")과 머리 체크박스 안내문
+# ("… required 483 statement on page 1 for medical device observations.")은 모든 483 에
+# 인쇄된다. OCR excerpt 에 섞이면 제외어 `cosmetic`·`medical device` 에 걸려 boost 2개 미만인
+# 의약품 483 이 Unrelated 로 버려지고(Corixa·Linde 실측), 회수는 그걸 out-of-scope 로 찍었다.
+# 뒷면 인용문은 ~1100자라 1500자 상한 안에서 끝("Secretary.")을 찾고, excerpt 절단으로 끝이
+# 없으면 문자열 끝까지 지운다. 둘 다 아니면(OCR 훼손) 아래 구절 단위 패턴이 남은 조각을 지운다.
+_FDA483_BOILERPLATE_RES = (
+    re.compile(r"the observations of objectionable conditions and practices listed on the "
+               r"front of this form.{0,1500}?(?:sent promptly to the secretary\.?\"?|$)", re.I),
+    re.compile(r"use this check\s?box to generate", re.I),
+    re.compile(r"(?:(?:the )?required 483 statement on page \S{1,3} )?"
+               r"for medical device observations\.?", re.I),
+    re.compile(r"(?:federal )?food,? drug,? (?:and|&) cosmetic act", re.I),
+    re.compile(r"\bfd ?& ?c act\b", re.I),
+    re.compile(r"food,? drug,? device,? (?:or|and) cosmetic", re.I),
+)
+
+
+def strip_483_form_boilerplate(text: str) -> str:
+    """483 텍스트 → 양식 상용구를 지운 평탄화 텍스트(관련성 게이트 입력 전용)."""
+    compact = re.sub(r"\s+", " ", text or "").strip()
+    for pat in _FDA483_BOILERPLATE_RES:
+        compact = pat.sub(" ", compact)
+    return re.sub(r"\s+", " ", compact).strip()
+
+
 def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
     """483 PDF fetch → 평탄화 텍스트. fetch 는 grm_common.http_get_bytes(404 포함 retry/backoff).
 
@@ -2160,16 +2187,19 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     record_date = nrow["record_date"]                    # 실사일(원문 MM/DD/YYYY 유지)
     publish_iso = _parse_mdy(nrow["publish_date"])
 
-    # 노이즈/관련성 게이트 — gate_blob 으로 도메인 판정.
-    gate_blob = " ".join([company, establishment_type, country, record_type, excerpt])
+    # 노이즈/관련성 게이트 — gate_blob 으로 도메인 판정. 입력에서 양식 상용구를 먼저 지운다
+    # (뒷면 704(b) 인용문의 cosmetic·체크박스의 medical device 가 의약품 483 을 버리던 결함).
+    gate_excerpt = strip_483_form_boilerplate(excerpt)
+    gate_blob = " ".join([company, establishment_type, country, record_type, gate_excerpt])
     if _kw_any(gate_blob.lower(), QA_HARD_EXCLUDE_TERMS):   # 수의/동물용 하드 드롭
         return None
     # [2026-10-26] 시설 유형·관찰 본문으로 범위 밖(혈액·조직·임상·식품·기기) 드롭.
     obs_text = " ".join(f"{o.get('deficiency', '')} {o.get('detail', '')}"
                         for o in (observations or []))
-    if is_out_of_scope_483(establishment_type, f"{excerpt} {obs_text}"):
+    if is_out_of_scope_483(establishment_type,
+                           f"{gate_excerpt} {strip_483_form_boilerplate(obs_text)}"):
         return None
-    relevance = compute_relevance(company, establishment_type, record_type, excerpt)
+    relevance = compute_relevance(company, establishment_type, record_type, gate_excerpt)
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
         return None
     if relevance == "Pending":

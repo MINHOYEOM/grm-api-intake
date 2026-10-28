@@ -49,7 +49,7 @@ on:
         type: string
         default: '0.5'
       doc_ids:
-        description: '선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). 비우면 대상 전건.'
+        description: '선택: 처리할 raw_signal_id 또는 document_id 목록(공백/쉼표 구분). 비우면 대상 전건. collection-capped·recoverable 모드에서 지목하면 out-of-scope 표식 행도 다시 읽는다(게이트 수정 후 오판 표식 재회수).'
         type: string
         default: ''
       ocr_page_budget:

@@ -130,30 +130,34 @@
    }
   },
   "fda483-195245": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Berkshire Sterile Manufacturing 실사(10/21/2024)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "무균 충전 개구부·조제 공정 오염 위험",
+   "summary": "FDA가 미국 무균 의약품 제조소 Berkshire Sterile Manufacturing 실사(실사일 10/21/2024) 후 관찰사항 7건을 담은 483을 발부했다. A등급 충전라인과 D등급 실을 잇는 마우스홀의 양압 미모니터링, 기류 가시화 연구의 핵심 개입 누락, 조제 탱크 라이너를 장갑으로 만지는 작업, 장갑 모니터링 미흡이 핵심이다.",
    "key_facts": [
     "제조소/업체: Berkshire Sterile Manufacturing · FEI 3012144557",
-    "시설 유형: Drug Product",
-    "실사일: 10/21/2024"
+    "시설 · 유형: Drug Product · 483",
+    "관찰사항: 7건(오염 방지 절차, 조제 공정, 환경모니터링, 육안검사, SOP·교육, 일탈 조사, 시설 유지)",
+    "교육: 2023년 SOP 교육 기한 초과 비율 부서별 9~22%"
    ],
-   "implication": "Drug Product 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "A등급 충전 챔버와 D등급 실을 잇는 개구부, 셋업 중 멸균 덮개 제거처럼 기류 가시화 연구에서 빠진 개입 단계가 함께 지적됐다. 무균 충전 공정의 오염 경로를 평가할 때 일상 작업뿐 아니라 셋업·교체 같은 허용 개입까지 모사됐는지가 검토될 수 있음을 보여 주는 사례로 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "등급 경계 개구부의 차압 연속 모니터링 여부",
+    "기류 가시화 연구의 셋업·교체 개입 포함 여부",
+    "장갑 모니터링 접촉 시간·양손 사용 반영 여부"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 10/21/2024 inspection of Berkshire Sterile Manufacturing.",
+    "title_issue": "Aseptic opening and formulation risks",
+    "summary": "FDA issued a Form 483 with seven observations to Berkshire Sterile Manufacturing, a US sterile drug product manufacturer, after an inspection ending 10/21/2024. Key issues are an opening between the Grade A filling line and a Grade D room without continuous overpressure monitoring, airflow studies that left out critical interventions, operators touching the inside of a formulation tank liner, and weak glove monitoring.",
     "key_facts": [
-     "Facility: Berkshire Sterile Manufacturing - FEI 3012144557",
-     "Facility type: Drug Product",
-     "Inspection date: 10/21/2024"
+     "Facility: Berkshire Sterile Manufacturing, FEI 3012144557",
+     "Establishment type: Drug Product",
+     "Observations: contamination prevention, formulation process, environmental monitoring, visual inspection, SOPs and training, investigations, facility maintenance",
+     "Training: 9-22% of SOP training overdue by department in 2023"
     ],
-    "implication": "This is a public record of an FDA inspection at a Drug Product facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "An opening between the Grade A filling chamber and a Grade D room was cited together with interventions, such as removing a sterile cover during setup, that the airflow studies never simulated. When assessing contamination routes in aseptic filling, whether permitted interventions like setup and changeovers were simulated, not just routine operations, appears open to review.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Continuous pressure monitoring at openings between grades",
+     "Setup and changeover interventions in airflow visualization studies",
+     "Contact time and two-handed glove use in glove monitoring"
     ]
    }
   },
@@ -490,58 +494,60 @@
    }
   },
   "fda483-195262": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 PETNET Solutions Inc 실사(03/19/2026)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "무균시험 배양 기간 미준수",
+   "summary": "FDA가 미국 PET 의약품 제조소 PETNET Solutions Inc 실사(실사일 03/19/2026) 후 483을 발부했다. 판독된 관찰사항 1건은 무균시험 검체를 규정된 배양 기간이 끝나기 전에 판독·기록하고, 핫셀 ISO 5 구역 환경모니터링 배지도 규정 배양을 채우기 전에 꺼낸 점이다.",
    "key_facts": [
     "제조소/업체: PETNET Solutions Inc · FEI 3008769593",
-    "시설 유형: Manufacturer",
-    "실사일: 03/19/2026"
+    "시설 · 유형: Manufacturer · 483",
+    "관찰사항: 1건 판독(시험실 절차 미준수 — 무균시험·환경모니터링 배양)"
    ],
-   "implication": "Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "반감기가 짧은 PET 의약품은 무균시험 결과 전에 출하되는 구조라, 사후 무균시험의 배양 기간 준수가 품질 근거로 더 무겁게 검토될 수 있다. 시험 결과를 일찍 기록한 것이 절차 위반으로 지적된 사례로, 배양 완료 시점과 판독 기록의 대조가 확인 대상이 될 수 있음을 보여 준다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "무균시험 판독 시점과 배양 완료 시점 대조",
+    "환경모니터링 배지의 배양 단계별 소요시간 기록"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 03/19/2026 inspection of PETNET Solutions Inc.",
+    "title_issue": "Sterility test incubation periods not followed",
+    "summary": "FDA issued a Form 483 to PETNET Solutions Inc, a US PET drug manufacturer, after an inspection ending 03/19/2026. The one legible observation is that sterility test samples were read and recorded before the required incubation period ended, and an environmental monitoring plate from the ISO 5 hot cell area was removed before its required incubation was complete.",
     "key_facts": [
-     "Facility: PETNET Solutions Inc - FEI 3008769593",
-     "Facility type: Manufacturer",
-     "Inspection date: 03/19/2026"
+     "Facility: PETNET Solutions Inc, FEI 3008769593",
+     "Establishment type: Manufacturer",
+     "Observation legible: laboratory procedures not followed for sterility test and environmental monitoring incubation"
     ],
-    "implication": "This is a public record of an FDA inspection at a Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "Short-lived PET drugs are released before sterility results are in, so adherence to incubation periods in the follow-up sterility test may weigh more heavily as quality evidence. Recording results early was cited as a procedural failure, suggesting that reading times may be checked against incubation end times.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Sterility test reading times versus incubation end times",
+     "Recorded duration of each incubation stage for environmental monitoring plates"
     ]
    }
   },
   "fda483-195263": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Pharmalogic Salt Lake City, LLC 실사(02/24/2026)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "반복 분석 오류에 교육만 반복",
+   "summary": "FDA가 미국 PET 의약품 제조소 Pharmalogic Salt Lake City, LLC 실사(실사일 02/24/2026) 후 483을 발부했다. 판독된 관찰사항 1건은 블랭크 미주입 등 작업자 실수에 의한 크로마토그래피 시험 사건이 수개월간 반복됐는데, 매번 재시험과 인식 교육에 그쳐 재발을 막지 못한 점이다.",
    "key_facts": [
     "제조소/업체: Pharmalogic Salt Lake City, LLC · FEI 3029497444",
-    "시설 유형: Pet Drug Manufacturer",
-    "실사일: 02/24/2026"
+    "시설 · 유형: Pet Drug Manufacturer · 483",
+    "관찰사항: 1건 판독(부적합·품질 문제 재발 방지 조치 미흡)",
+    "사건: 약 4개월간 블랭크 미주입 최소 5건, 약 9개월간 주입 오류 최소 3건"
    ],
-   "implication": "Pet Drug Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "같은 유형의 작업자 실수가 반복되는데 시정조치가 재시험과 인식 교육에 머문 점이 지적됐다. 교육만으로 끝나는 CAPA는 재발이 이어지면 효과 없는 조치로 판단될 수 있어, 반복 사건에서는 시스템 차원의 원인 제거 조치가 있었는지가 검토 대상이 될 수 있음을 보여 준다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "반복 작업자 실수 사건의 추세 검토 여부",
+    "교육 외 시스템적 재발 방지 조치(점검 단계·시스템 제어) 유무"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 02/24/2026 inspection of Pharmalogic Salt Lake City, LLC.",
+    "title_issue": "Repeated analyst errors met only with retraining",
+    "summary": "FDA issued a Form 483 to Pharmalogic Salt Lake City, LLC, a US PET drug manufacturer, after an inspection ending 02/24/2026. The one legible observation is that chromatography testing incidents caused by operator error, such as no blank injected, recurred over several months, and each was closed with retesting and awareness training that did not prevent recurrence.",
     "key_facts": [
-     "Facility: Pharmalogic Salt Lake City, LLC - FEI 3029497444",
-     "Facility type: Pet Drug Manufacturer",
-     "Inspection date: 02/24/2026"
+     "Facility: Pharmalogic Salt Lake City, LLC, FEI 3029497444",
+     "Establishment type: Pet Drug Manufacturer",
+     "Observation legible: inadequate action to prevent recurrence of nonconformances and quality problems",
+     "Incidents: at least 5 missed blank injections in about 4 months, at least 3 injection errors in about 9 months"
     ],
-    "implication": "This is a public record of an FDA inspection at a Pet Drug Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "The same type of operator error kept recurring while corrective action stopped at retesting and awareness training. CAPAs that end with training can be judged ineffective when recurrence continues, suggesting that systemic actions to remove the cause may be expected for repeat events.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Trend review of repeated operator error incidents",
+     "Systemic preventive actions beyond training, such as added checks or system controls"
     ]
    }
   },
@@ -4318,30 +4324,30 @@
    }
   },
   "fda483-195640": {
-   "title_issue": "483 실사기록 공개",
-   "summary": "FDA OII FOIA 전자열람실에 Grand River Aseptic Manufacturing Inc 실사(09/19/2024)에 대한 Form 483 이 공개됐다.",
+   "title_issue": "충전 밸리데이션 공정 모사 미흡",
+   "summary": "FDA가 미국 무균 제조소 Grand River Aseptic Manufacturing Inc 실사(실사일 09/19/2024) 후 483을 발부했다. 판독된 관찰사항 1건은 주사기 충전라인 3에서 수행한 충전 밸리데이션 연구가 제조 공정 단계를 모두 모사하지 않았다는 것이다.",
    "key_facts": [
     "제조소/업체: Grand River Aseptic Manufacturing Inc · FEI 3008716173",
-    "시설 유형: Manufacturer",
-    "실사일: 09/19/2024"
+    "시설 · 유형: Manufacturer · 483",
+    "관찰사항: 1건 판독(충전 밸리데이션 공정 모사 범위)"
    ],
-   "implication": "Manufacturer 시설에 대한 FDA 실사 결과가 공개 기록으로 확인된 사례다. 해당 시설과 거래하는 국내 업체는 공개 원문 PDF 의 관찰 내용을 공급자 평가에 반영할 만하다.",
+   "implication": "무균 충전 밸리데이션이 실제 제조 공정 단계를 빠짐없이 모사해야 한다는 점이 지적된 사례다. 무균 충전 시설은 라인별 모의충전 설계가 실제 공정의 단계와 개입을 모두 포함하는지 확인해 볼 만하다.",
    "checks": [
-    "해당 시설의 자사 공급망 포함 여부",
-    "공개 483 원문 PDF 열람 및 관찰 내용 검토"
+    "모의충전 설계와 실제 공정 단계의 대조",
+    "라인별 모의충전의 개입 포함 범위"
    ],
    "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 09/19/2024 inspection of Grand River Aseptic Manufacturing Inc.",
+    "title_issue": "Fill validation did not simulate all process steps",
+    "summary": "FDA issued a Form 483 to Grand River Aseptic Manufacturing Inc, a US aseptic manufacturer, after an inspection ending 09/19/2024. The one legible observation is that the fill validation study performed on syringe filling line 3 did not simulate all manufacturing processing steps.",
     "key_facts": [
-     "Facility: Grand River Aseptic Manufacturing Inc - FEI 3008716173",
-     "Facility type: Manufacturer",
-     "Inspection date: 09/19/2024"
+     "Facility: Grand River Aseptic Manufacturing Inc, FEI 3008716173",
+     "Establishment type: Manufacturer",
+     "Observation legible: scope of process simulation in fill validation"
     ],
-    "implication": "This is a public record of an FDA inspection at a Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
+    "implication": "The case shows that aseptic fill validation is expected to simulate every actual manufacturing step. Aseptic fillers may want to check that each line's media fill design covers all real process steps and interventions.",
     "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
+     "Media fill design compared against actual process steps",
+     "Interventions covered in each line's media fill"
     ]
    }
   },

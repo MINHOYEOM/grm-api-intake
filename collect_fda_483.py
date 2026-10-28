@@ -120,6 +120,16 @@ FDA483_PDF_MAX_FETCHES = _env_int("FDA483_PDF_MAX_FETCHES", FDA483_EXCERPT_MAX_I
 # 실행 1회당 OCR 페이지 예산 — 실측 ≈2.2s/쪽. 200쪽 ≈ 7분으로 intake 전체 예산 안에 든다.
 # 소진 후 문서는 OCR 없이 진행(상태 `scan-ocr-budget`)해 **왜** 비었는지가 카드까지 전달된다.
 FDA483_OCR_PAGE_BUDGET = _env_int("FDA483_OCR_PAGE_BUDGET", 200)
+# [발행일 추가 예산 2026-10-27] 위 상한 밖 문서는 다음 날 grm-fda483-ocr-recovery 예약 실행
+# (23:37 UTC = 08:37 KST)이 회수한다. 그런데 **월요일 수집분만은** 그 회수가 07:30 KST
+# Routine 보다 늦다 — 월요일 실행이 상한에 걸리면 그 문서들은 그 주 브리프에 본문 없이 실린다
+# (10-20 실행: OCR 예산 소진 1건). 그래서 발행일 실행에만 상한을 넓히되, 넓힌 몫은 **마감
+# 시각(epoch 초)까지만** 쓴다 — 마감이 지나면 기본 상한으로 돌아가 handoff 생성이 Routine
+# 뒤로 밀리지 않게 한다. 마감 전에도 기본 상한은 항상 보장된다(늦게 시작한 실행이 손해 보지
+# 않는다). 셋 다 0(기본)이면 종전과 같다 — 워크플로가 발행일에만 env 로 켠다.
+FDA483_BURST_PDF_MAX_ITEMS = _env_int("FDA483_BURST_PDF_MAX_ITEMS", 0)
+FDA483_BURST_OCR_PAGE_BUDGET = _env_int("FDA483_BURST_OCR_PAGE_BUDGET", 0)
+FDA483_BURST_DEADLINE_EPOCH = _env_int("FDA483_BURST_DEADLINE_EPOCH", 0)
 FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
 FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
@@ -143,6 +153,11 @@ FDA483_OCR_DPI = min(max(_env_int("FDA483_OCR_DPI", 300), 72), 600)
 FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 은 10쪽 내외
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
+# [2026-10-27] 식품 실사(FD&C Act **805**조) 양식의 고지문은 "conditions" 가 아니라
+# "objectionable **practices**" 다(fda483-195259 C Czarnikow Sugar 실측). 이 변형을 못 알아봐
+# 1·2쪽이 이미지인 스캔본이 "고지문뿐인 텍스트층"으로 판정되지 않았고, OCR 이 한 번도 돌지
+# 않아 본문 없이 적재됐다.
+_FDA483_NOTICE_RE = re.compile(r"observations\s+of\s+objectionable\s+(?:conditions|practices)")
 
 # ── [텍스트층 위장 2026-08-02] "글자가 있다 ≠ 본문이 있다" ────────────────────────
 # 실측 32건: 본문은 100% 스캔 이미지인데 텍스트층에 **FOIA 리댁션 주석·페이지 라벨·
@@ -178,6 +193,40 @@ FDA483_SUBSTANTIVE_MIN_CHARS = 24
 FDA483_ARTIFACT_DOMINANCE = 0.25
 
 
+# [반복 머리말 2026-10-27] 본문이 이미지인 스캔본 중에는 텍스트층에 리댁션 마커와 함께
+# **쪽마다 똑같은 머리말**만 실린 것이 있다 — fda483-195245 Berkshire Sterile: 7쪽 모두
+# "Berkshire Sterile Manufacturing facility (FEI 3012144557) / October 14-21, 2024 /
+# Attachment 1 - Form FDA 483, N of 8" + `(b) (4)` 반복. 머리말이 24자를 넘겨 "본문 있음"으로
+# 판정됐고 OCR 이 한 번도 돌지 않았다. 여러 쪽에 반복되는 줄은 본문이 아니다(본문 산문은
+# 쪽마다 다르다) — 그런 줄을 걷어낸 뒤 판정한다. 쪽 번호만 정규화해 "1 of 8"·"2 of 8" 을
+# 같은 줄로 본다.
+FDA483_REPEATED_LINE_MIN = 3
+
+
+def _norm_boilerplate_line(line: str) -> str:
+    # 쪽 번호("1 of 8")만 정규화한다 — 숫자 전부를 지우면 숫자만 다른 **진짜 문장**
+    # ("line 1 was…" / "line 2 was…")까지 같은 줄로 묶여 본문이 아티팩트로 몰린다.
+    s = re.sub(r"\s+", " ", line).strip().lower()
+    return re.sub(r"\b\d+\s+of\s+\d+\b", "# of #", s)
+
+
+def _repeated_lines(chunks: list[str]) -> frozenset[str]:
+    """`chunks`(쪽 또는 줄 묶음) 가운데 서로 다른 덩어리 3곳 이상에 나오는 줄의 정규형."""
+    seen: dict[str, int] = {}
+    for chunk in chunks:
+        for norm in {_norm_boilerplate_line(l) for l in (chunk or "").splitlines()}:
+            if norm:
+                seen[norm] = seen.get(norm, 0) + 1
+    return frozenset(k for k, v in seen.items() if v >= FDA483_REPEATED_LINE_MIN)
+
+
+def _drop_lines(text: str, boilerplate: frozenset[str]) -> str:
+    if not boilerplate:
+        return text or ""
+    return "\n".join(l for l in (text or "").splitlines()
+                     if _norm_boilerplate_line(l) not in boilerplate)
+
+
 def _text_residue_after_artifacts(text: str) -> str:
     """리댁션 마커·페이지 라벨·접근성 고지를 걷어낸 뒤 남는 영숫자만 반환."""
     s = re.sub(r"\s+", " ", text or "")
@@ -186,7 +235,7 @@ def _text_residue_after_artifacts(text: str) -> str:
     return re.sub(r"[^A-Za-z0-9]+", "", s)
 
 
-def _is_substantive_text(text: str) -> bool:
+def _is_substantive_text(text: str, boilerplate: frozenset[str] = frozenset()) -> bool:
     """이 텍스트가 **읽을 본문**인가(마커·라벨 부스러기가 아니라).
 
     ★이 판정이 느슨하면 멀쩡한 텍스트 페이지를 OCR 결과로 덮어쓴다 — 가장 위험한 방향이다.
@@ -197,6 +246,7 @@ def _is_substantive_text(text: str) -> bool:
     글자를 덮어쓴다. 아티팩트뿐인 페이지는 잔여가 정확히 0 이라 두 조건을 늘 함께 만족한다
     (실측: `(b) (4)` 40회 반복 → 잔여 0 / 원문 영숫자 80).
     """
+    text = _drop_lines(text, boilerplate)
     residue = len(_text_residue_after_artifacts(text))
     if residue >= FDA483_SUBSTANTIVE_MIN_CHARS:
         return True
@@ -219,6 +269,21 @@ LAST_HEALTH: dict[str, Any] = {}
 # 실행 1회당 OCR 페이지 예산(모듈 전역 — collect_fda_483() 진입 시 리셋). 예산 밖 문서는
 # OCR 없이 진행하고 사유를 남긴다 — 조용히 빈 카드가 되지 않게.
 _OCR_BUDGET: dict[str, int] = {"remaining": FDA483_OCR_PAGE_BUDGET, "used": 0}
+
+
+def _burst_active(now: float | None = None) -> bool:
+    """발행일 추가 예산이 지금 유효한가 — 마감 epoch 가 설정됐고 아직 안 지났을 때만."""
+    if FDA483_BURST_DEADLINE_EPOCH <= 0:
+        return False
+    return (time.time() if now is None else now) < FDA483_BURST_DEADLINE_EPOCH
+
+
+def _pdf_caps(burst: bool) -> tuple[int, int]:
+    """(범위 안 문서 상한, 총 PDF 요청 상한). 추가 예산은 기본 상한을 **넓히기만** 한다."""
+    if burst and FDA483_BURST_PDF_MAX_ITEMS > FDA483_EXCERPT_MAX_ITEMS:
+        return FDA483_BURST_PDF_MAX_ITEMS, max(FDA483_PDF_MAX_FETCHES,
+                                               FDA483_BURST_PDF_MAX_ITEMS * 2)
+    return FDA483_EXCERPT_MAX_ITEMS, FDA483_PDF_MAX_FETCHES
 
 # [OCR 엔진 부재 표면화 2026-07-30] OCR 결과를 **상태코드별로 센다**.
 #
@@ -327,7 +392,11 @@ _OBS_MARKER_RECOVERY_RE = re.compile(
     r"|" + _PRONOUN + r"\s*/\s*WE\s+OBSERVED"                       # I/WE OBSERVED
     r"|\bWE\s+OBSERVED\b"                                            # WE OBSERVED
     r"|(?:^|[\s:])" + _PRONOUN + r"\s+OBSERVED\s*[:.]"              # I OBSERVED: · | OBSERVED:
-    r"|\bOBSERVED\s*:\s*(?=\S)",                                     # …OBSERVED: (최후 폴백)
+    r"|\bOBSERVED\s*:\s*(?=\S)"                                      # …OBSERVED: (최후 폴백)
+    # [2026-10-27] OCR 이 마커 자체를 깨뜨린 꼴 — fda483-195640 Grand River 실측
+    # "DURING AN INSPECTION OF YOUR FIR BSERVED:"(FIRM WE OBSERVED). 양식 앞부분
+    # "INSPECTION OF YOUR FIR…" 에 고정해 산문 오탐을 막고, 뒤는 "…SERVED:" 만 요구한다.
+    r"|INSPECTION\s+OF\s+YOUR\s+FIR\w*[^\n:]{0,15}?SERVED\s*:",
     re.I,
 )
 # 번호 목록 앵커 — 문장/줄 경계 뒤 "N. " + 대문자(따옴표 포함). WL 파서의
@@ -451,6 +520,13 @@ _FDA483_FOOTER_RE = re.compile(
     #   ③ OCR 이 Y 를 V 로 읽은 EMPLOYEE(S) — "EMPLOVEE(S" (위 EMP..OY 마커가 OY 를 못 찾는다).
     #      대문자 고정 — 산문의 "employees" 는 오탐하지 않는다.
     r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    #   ④ [2026-10-27] 연속 기재 양식(Continuation Sheet) 마지막 줄 "*DATES OF INSPECTION
+    #      1/21/2026(Wed), … <실사관 이름>" — 발행분 42관찰의 detail 끝에 실사일 나열과 서명자
+    #      이름이 그대로 실렸다. 대문자 고정이고 괄호 없는 "DATES" 만 잡는다 — 페이지 머리말 칸
+    #      이름 "DATE(S) OF INSPECTION" 은 관찰 중간 쪽 경계에도 찍히므로 여기서 자르면 다음
+    #      쪽으로 이어지는 본문이 잘린다. 산문 끝에 붙은 "Dates of inspection: June 12, …"
+    #      (fda483-193759 obs#8 실측)은 콜론을 요구해 산문의 "dates of inspection" 언급과 가른다.
+    r"|(?-i:[*\"]?\s*DATES\s+OF\s+INSPECTION)|Dates\s+of\s+inspection\s*:"
     r"|\bDATE\s+ISSUED\b"
     r"|\bPAGE\s+\d+\s+OF\s+\d+\b"
     r"|\bAdd\s+Continuation\s+Page\b",           # Observation 별 연속페이지 마커(2026-07-12 실측)
@@ -970,7 +1046,7 @@ def _is_notice_only(text: str) -> bool:
         return False
     if _OBS_RE.search(compact) or _WE_OBSERVED_RE.search(compact):
         return False
-    return _FDA483_NOTICE_ANCHOR in compact.lower()
+    return bool(_FDA483_NOTICE_RE.search(compact.lower()))
 
 
 def _needs_ocr(text: str) -> bool:
@@ -984,7 +1060,9 @@ def _needs_ocr(text: str) -> bool:
         return False
     if not (text or "").strip():
         return True
-    return _is_notice_only(text) or not _is_substantive_text(text)
+    # 쪽 경계가 없는 평탄화 텍스트라 "줄 하나 = 덩어리 하나"로 세어 3회 이상 반복된 줄을 뺀다.
+    boilerplate = _repeated_lines((text or "").splitlines())
+    return _is_notice_only(text) or not _is_substantive_text(text, boilerplate)
 
 
 def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
@@ -1024,9 +1102,10 @@ def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int) -> tuple[str, str]:
         with fitz.open(stream=data, filetype="pdf") as doc:
             if doc.needs_pass or doc.is_encrypted:
                 return "", "pdf-encrypted"
-            for page in doc:
-                native = page.get_text("text")
-                if _is_substantive_text(native):
+            natives = [page.get_text("text") for page in doc]
+            boilerplate = _repeated_lines(natives)     # 쪽마다 반복되는 머리말(위 주석)
+            for page, native in zip(doc, natives):
+                if _is_substantive_text(native, boilerplate):
                     parts.append(native)
                     continue
                 # ★여기가 32건을 실제로 막던 지점이다. 종전 조건은 `native.strip()` 이라
@@ -1249,6 +1328,20 @@ def _is_recovered_deficiency_publishable(deficiency: str) -> bool:
         return False
     symbols, fragment_ratio = _deficiency_garble(deficiency)
     return symbols == 0 and fragment_ratio <= FDA483_DEFICIENCY_GARBLE_MAX
+
+
+FDA483_GARBLED_LINE_RATIO = 0.3   # 이보다 제어/대체 문자가 많은 줄은 읽을 내용이 없다
+
+
+def _drop_garbled_lines(text: str) -> str:
+    """제어·대체 문자가 줄의 30% 이상인 줄을 뺀다(순수 함수)."""
+    keep = []
+    for line in (text or "").split("\n"):
+        bad = len(_BAD_CHAR_RE.findall(line))
+        if bad and bad >= len(line) * FDA483_GARBLED_LINE_RATIO:
+            continue
+        keep.append(line)
+    return "\n".join(keep)
 
 
 def _text_corruption_ratio(text: str) -> float:
@@ -1719,8 +1812,17 @@ def _extract_483_observations_from_text(
     라이브 오염(2026-07 VA San Diego 실측)을 방지한다. header_hints=None 은 힌트 없이도
     라벨/날짜/숫자런/주소는 그대로 제거된다(후방호환 — 기존 호출부는 그대로 동작).
     """
-    if not text or _text_corruption_ratio(text) > FDA483_TEXT_CORRUPTION_RATIO_MAX:
+    if not text:
         return []
+    if _text_corruption_ratio(text) > FDA483_TEXT_CORRUPTION_RATIO_MAX:
+        # [2026-10-27] 깨짐이 문서 전체가 아니라 **특정 줄**에 몰린 경우만 살린다 — 실측
+        # fda483-195262 PETNET·195263 Pharmalogic: 관찰이 든 앞 2쪽은 멀쩡한데 마지막 쪽
+        # 텍스트층이 제어문자 덩어리라 문서 깨짐률이 15%·12% 가 됐고, 관찰 전부가 버려졌다.
+        # 깨진 줄을 빼고도 임계를 넘으면 종전대로 버린다. 임계 안쪽 문서에는 닿지 않는
+        # 분기라 정상 문서 출력은 구조적으로 불변이다.
+        text = _drop_garbled_lines(text)
+        if _text_corruption_ratio(text) > FDA483_TEXT_CORRUPTION_RATIO_MAX:
+            return []
     hints = _header_hint_kwargs(header_hints)
     body = normalize_pdf_ligatures(text)   # [2026-07-20] 커밋된 낡은 source_text 도 여기서 복원
     m = _WE_OBSERVED_RE.search(body)
@@ -2164,7 +2266,11 @@ def collect_fda_483(
     """
     global LAST_HEALTH, _LAST_BACKBONE
     _LAST_BACKBONE = BACKBONE_DATATABLES     # 실행별 리셋(테스트 스텁 시 이전 값 누출 방지)
-    _OCR_BUDGET["remaining"] = FDA483_OCR_PAGE_BUDGET   # 실행별 리셋(위와 동일 이유)
+    # [발행일 추가 예산] 진입 시점에 마감 전이면 넓힌 예산으로 시작하고, 루프에서 마감이
+    # 지나는 순간 기본 예산으로 되돌린다(이미 쓴 만큼은 기본 예산에서 차감).
+    burst_granted = _burst_active()
+    _OCR_BUDGET["remaining"] = (max(FDA483_OCR_PAGE_BUDGET, FDA483_BURST_OCR_PAGE_BUDGET)
+                                if burst_granted else FDA483_OCR_PAGE_BUDGET)   # 실행별 리셋
     _OCR_BUDGET["used"] = 0
     reset_ocr_health()
     excerpt_health: dict[str, Any] = {
@@ -2179,6 +2285,8 @@ def collect_fda_483(
         "dropped_out_of_scope": 0,
         # 시설 유형(혈액·조직·임상·식품·기기)만으로 범위 밖이라 PDF 를 받지 않은 문서 수.
         "skipped_out_of_scope_type": 0,
+        # [발행일 추가 예산] 넓힌 예산을 받았는가 · 실행 도중 마감이 지나 기본 상한으로 돌아갔는가.
+        "burst_granted": burst_granted, "burst_deadline_hit": False,
     }
     observations_enabled = _observations_enabled()
     observations_health: dict[str, Any] = {
@@ -2271,8 +2379,17 @@ def collect_fda_483(
         if pdf_url:
             in_scope_attempted = (excerpt_health["attempted"]
                                   - excerpt_health["dropped_out_of_scope"])
-            if (in_scope_attempted >= FDA483_EXCERPT_MAX_ITEMS
-                    or excerpt_health["attempted"] >= FDA483_PDF_MAX_FETCHES):
+            burst = burst_granted and _burst_active()
+            if burst_granted and not burst and not excerpt_health["burst_deadline_hit"]:
+                excerpt_health["burst_deadline_hit"] = True
+                _OCR_BUDGET["remaining"] = min(
+                    _OCR_BUDGET["remaining"],
+                    max(0, FDA483_OCR_PAGE_BUDGET - _OCR_BUDGET["used"]))
+                log("INFO", "FDA 483 발행일 추가 예산 마감 — 이후 문서는 기본 상한"
+                            f"({FDA483_EXCERPT_MAX_ITEMS}건·OCR {FDA483_OCR_PAGE_BUDGET}쪽)으로")
+            max_items, max_fetches = _pdf_caps(burst)
+            if (in_scope_attempted >= max_items
+                    or excerpt_health["attempted"] >= max_fetches):
                 excerpt_health["capped"] = True
                 excerpt_health["skipped_no_attempt"] += 1
             else:
@@ -2388,6 +2505,8 @@ def collect_fda_483(
                 f"범위밖드롭={excerpt_health['dropped_out_of_scope']} "
                 f"범위밖유형={excerpt_health['skipped_out_of_scope_type']} "
                 f"· OCR {_OCR_BUDGET['used']}/{FDA483_OCR_PAGE_BUDGET}쪽 "
+                f"발행일추가예산={'on' if burst_granted else 'off'}"
+                f"{'(마감 도달)' if excerpt_health['burst_deadline_hit'] else ''} "
                 f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
                 f"예산초과={_OCR_HEALTH['budget_skipped']} "
                 f"· observations enabled={observations_enabled} "

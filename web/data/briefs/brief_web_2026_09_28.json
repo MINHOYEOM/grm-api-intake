@@ -414,7 +414,7 @@
      {
       "number": "7",
       "deficiency": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications and test procedures designed to assure that drug product containers conform to appropriate standards of identity, strength, quality and purity.",
-      "detail": "Specifically, A) Your finished product testing used to release finished drug products for commercial distribution and perform stability testing does not include an evaluation of impurities and degradants. B) You do not have a scientific rationale for not performing identity testing for glycerin and propylene glycol, which includes evaluating acceptable levels of diethylene glycol and ethylene glycol. These components used in part for the manufacture of sterile drug products. *DATES OF INSPECTION 4/20/2026 (Mon), 4/21/2026 (Tue), 4/22/2026 (Wed), 4/23/2026 (Thu), 4/24/2026 (Fri), 4/27/2026 (Mon), 4/28/2026 (Tue), 4/29/2026 (Wed), 4/30/2026 (Thu), 5/01/2026 (Fri), 6/01/2026 (Mon) Michael Z Weigman .. ... Si9\"ed\"By MICHAEL Z. WEIGMAN -S X Date Signed: 06-01·2026 16:08:06 _",
+      "detail": "Specifically, A) Your finished product testing used to release finished drug products for commercial distribution and perform stability testing does not include an evaluation of impurities and degradants. B) You do not have a scientific rationale for not performing identity testing for glycerin and propylene glycol, which includes evaluating acceptable levels of diethylene glycol and ethylene glycol. These components used in part for the manufacture of sterile drug products.",
       "deficiency_ko": "시험실 관리에 의약품 용기가 확인(identity)·함량(strength)·품질(quality)·순도(purity)의 적절한 기준에 적합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격과 시험절차의 수립이 포함되어 있지 않다.",
       "detail_ko": "구체적으로, A) 상업적 유통을 위한 완제의약품 출하와 안정성시험에 사용되는 귀사의 완제품 시험에는 불순물 및 분해생성물 평가가 포함되어 있지 않다. B) 귀사는 glycerin 과 propylene glycol 에 대해 확인시험을 수행하지 않는 것에 대한 과학적 근거를 갖고 있지 않으며, 여기에는 diethylene glycol 과 ethylene glycol 의 허용 수준 평가가 포함된다. 이들 성분은 무균 의약품 제조에 일부 사용된다."
      }
@@ -601,7 +601,7 @@
      {
       "number": "10",
       "deficiency": "Vermin or other animals or evidence of their presence was observed in the areas adjacent to production areas.",
-      "detail": "Specifically, on 08/05/2026, dead roaches were observed in the recycling room located at the back of the main warehouse, which is adjacent to areas with direct access to the compounding rooms. We observed each day of this inspection that bird feces were located on the ground outside your facility front door which could be tracked into your front office area and on to other areas within the facility. *DATES OF INSPECTION 8/05/2026 (Wed), 8/06/2026 (Thu), 8/07/2026 (Fri), 8/10/2026 (Mon), 8/11/2026 (Tue), 8/l 2/2026 (Wed), 8/13/2026 (Thu), 8/14/2026 (Fri), 8/18/2026 (Tue)",
+      "detail": "Specifically, on 08/05/2026, dead roaches were observed in the recycling room located at the back of the main warehouse, which is adjacent to areas with direct access to the compounding rooms. We observed each day of this inspection that bird feces were located on the ground outside your facility front door which could be tracked into your front office area and on to other areas within the facility.",
       "deficiency_ko": "생산 구역에 인접한 구역에서 해충 또는 기타 동물이나 그 흔적이 관찰되었다.",
       "detail_ko": "구체적으로, 2026-08-05 조제실로 직접 연결되는 구역과 인접한 주 창고 뒤편 재활용실에서 죽은 바퀴벌레가 관찰되었다. 실사 기간 매일, 귀사 시설 정문 밖 바닥에서 새의 배설물이 확인되었으며, 이는 정문 사무 구역과 시설 내 다른 구역으로 옮겨질 수 있다."
      }
@@ -1018,7 +1018,7 @@
      {
       "number": "4",
       "deficiency": "Aseptic processing areas are deficient regarding the system for monitoring environmental conditions.",
-      "detail": "Specifically, On August 5, 2026, video recordings of the production of Hydromorphone HCL 20mg/100mL CADDS lot #20260720HYD-l, EXP November 17, 2026, completed <Redacted B4> were reviewed. During this video review the following was observed: 1. Your production operators were observed placing the settle plates in the comers of the LAFHs before the start of the batch. Your SOP-0015 Environmental Monitoring (EM) Program: 503B Cleanroom, states placement should be\", <Redacted B4> from the back/HEPA filter.\" 2. Your firm does not document the time post production E M samples are taken. *DATES OF INSPECTION",
+      "detail": "Specifically, On August 5, 2026, video recordings of the production of Hydromorphone HCL 20mg/100mL CADDS lot #20260720HYD-l, EXP November 17, 2026, completed <Redacted B4> were reviewed. During this video review the following was observed: 1. Your production operators were observed placing the settle plates in the comers of the LAFHs before the start of the batch. Your SOP-0015 Environmental Monitoring (EM) Program: 503B Cleanroom, states placement should be\", <Redacted B4> from the back/HEPA filter.\" 2. Your firm does not document the time post production E M samples are taken.",
       "deficiency_ko": "무균조작 구역이 환경 조건 모니터링 체계 측면에서 미흡하다.",
       "detail_ko": "구체적으로, 2026년 8월 5일, <Redacted B4> 에 완료된 Hydromorphone HCL 20mg/100mL CADDS 로트 #20260720HYD-1(유효기한 2026년 11월 17일)의 생산 영상 기록을 검토했다. 이 영상 검토 중 다음 사항이 관찰되었다. 1. 생산 작업자가 배치 시작 전에 낙하균 평판을 LAFH 의 모서리에 놓는 것이 관찰되었다. 귀사의 SOP-0015 「Environmental Monitoring (EM) Program: 503B Cleanroom」은 배치 위치를 \"뒷면/HEPA 필터로부터 <Redacted B4>\"로 규정하고 있다. 2. 귀사는 생산 후 환경모니터링 시료를 채취하는 시각을 문서화하지 않는다."
      }

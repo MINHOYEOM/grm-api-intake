@@ -6555,7 +6555,9 @@ _FOOTER_GARBAGE_RE = re.compile(
     r"|(?-i:Digitally\s+signed\s+by)"     # 대문자 D 스탬프만 — 산문 "digitally signed by the …" 제외
     r"|observations\s+of\s+objectionable\s+conditions"
     r"|PURSUANT\s+TO\s+SECTION\s+704\s*\(b\)"
-    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])",
+    r"|(?-i:EMP[A-Z.]{0,3}O[VY]EE?\s*[({\[]?[S$5])"
+    # [2026-10-27] 연속 기재 양식 마지막 줄의 실사일·서명자 나열(수집기 ④와 같은 마커).
+    r"|(?-i:[*\"]?\s*DATES\s+OF\s+INSPECTION)|Dates\s+of\s+inspection\s*:",
     re.I,
 )
 

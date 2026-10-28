@@ -2378,6 +2378,14 @@ class Fda483SignatureStampFooterTest(unittest.TestCase):
         "Specifically, the cleaning records were incomplete for several lots. The observations of "
         "objectionable conditions and practices listed on the front of this form are reported":
             "Specifically, the cleaning records were incomplete for several lots.",
+        # 연속 기재 양식 마지막 줄의 실사일·서명자 나열 — 앞 별표까지 자른다(발행분 42관찰 실측).
+        "Specifically, the master batch record lacks theoretical yield specifications. "
+        "*DATES OF INSPECTION 1/28/2026(Wed), 1/30/2026(Fri) Laurel A Beer Investigator":
+            "Specifically, the master batch record lacks theoretical yield specifications.",
+        # 산문 끝에 붙은 소문자 변형(fda483-193759 obs#8 실측).
+        "Specifically, the reference material was not calibrated against the standard. "
+        "Dates of inspection: June 12, 2025 (Thursday), June 13, 2025 (Friday).":
+            "Specifically, the reference material was not calibrated against the standard.",
         # Y→V 오인식 EMPLOYEE(S)(fda483-195629 obs#2 실측).
         "Specifically, the batch was released to your client for further processing EMPLOVEE(S)":
             "Specifically, the batch was released to your client for further processing",
@@ -2396,6 +2404,8 @@ class Fda483SignatureStampFooterTest(unittest.TestCase):
 
     def test_prose_is_not_cut(self):
         for prose in ("Specifically, the record was digitally signed by the analyst after review.",
+                      "Specifically, the logbook lists the dates of inspection for each filter.",
+                      "DATE(S) OF INSPECTION 3/17/2026-3/19/2026 page header continues the text",
                       "Specifically, employees were not trained on the procedure."):
             with self.subTest(prose=prose):
                 self.assertIsNone(f._FDA483_FOOTER_RE.search(prose))
@@ -3150,3 +3160,72 @@ class Fda483OcrDpiKnobTest(unittest.TestCase):
         self.assertIn("ocr_dpi:", src)
         self.assertIn("FDA483_OCR_DPI: ${{ inputs.ocr_dpi || '300' }}", src)
         self.assertIn("default: '300'", src)
+
+
+class Fda483ZeroObservationRecoveryTest(unittest.TestCase):
+    """[2026-10-27] 본문은 있는데 관찰 0건이던 10-26 호 483 5건의 원인 4종(전부 실측).
+
+    ① 마지막 쪽 텍스트층이 제어문자 덩어리라 **문서 전체** 깨짐률이 임계(8%)를 넘어 관찰이
+       통째로 버려졌다 — 195262 PETNET(15%)·195263 Pharmalogic(12%).
+    ② 텍스트층이 쪽마다 같은 머리말 + `(b) (4)` 뿐인데 머리말이 24자를 넘어 "본문 있음" 판정,
+       OCR 이 한 번도 돌지 않았다 — 195245 Berkshire Sterile(7쪽).
+    ③ 식품 실사(805조) 양식 고지문 "objectionable **practices**" 를 고지문으로 못 알아봐 OCR 이
+       돌지 않았다 — 195259 C Czarnikow Sugar.
+    ④ OCR 이 양식 마커를 "YOUR FIR BSERVED:" 로 깨뜨려 번호 목록(1. 2.) 회수가 켜지지 않았다
+       — 195640 Grand River Aseptic."""
+
+    OBS = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED:\nOBSERVATION 1\n"
+           "Each laboratory used to conduct testing of finished PET drug products does not "
+           "follow written procedures for the conduct of each test.\nSpecifically,\n"
+           "Your firm failed to follow established incubation procedures for sterility testing.\n")
+
+    def test_garbled_trailing_page_does_not_discard_observations(self):
+        garbage = "\n".join(["\x01 \x02\x03 \x04 \x05 \x06\x07 \x08"] * 120)
+        self.assertGreater(f._text_corruption_ratio(self.OBS + garbage),
+                           f.FDA483_TEXT_CORRUPTION_RATIO_MAX)
+        rows = f._extract_483_observations_from_text(self.OBS + garbage)
+        self.assertEqual([r["number"] for r in rows], ["1"])
+
+    def test_corruption_spread_through_text_is_still_rejected(self):
+        """깨짐이 줄마다 고루 퍼진 문서는 종전대로 버린다 — 깨진 줄만 빼는 구제다."""
+        spread = "".join(ch + "\x01" for ch in self.OBS)
+        self.assertEqual(f._extract_483_observations_from_text(spread), [])
+
+    def test_repeated_page_header_is_not_a_body(self):
+        page = ("Berkshire Sterile Manufacturing facility (FEI 3012144557)\n"
+                "October 14-21, 2024\nAttachment 1 - Form FDA 483, {n} of 8\n"
+                + "(b) (4)\n" * 20)
+        doc = "\n".join(page.format(n=n) for n in range(1, 8))
+        with patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+            self.assertTrue(f._needs_ocr(doc))
+            # 반복 머리말을 뺀 쪽 단위 판정도 같아야 OCR 루프가 그 쪽을 건너뛰지 않는다.
+            boiler = f._repeated_lines([page.format(n=n) for n in range(1, 8)])
+            self.assertFalse(f._is_substantive_text(page.format(n=1), boiler))
+            # 반복 머리말이 있어도 산문이 있는 텍스트 PDF 는 OCR 하지 않는다.
+            prose = "\n".join(page.format(n=n) + f"OBSERVATION {n}\nThe cleaning record for "
+                              f"line {n} was not reviewed by the quality unit before release.\n"
+                              for n in range(1, 8))
+            self.assertFalse(f._needs_ocr(prose))
+
+    def test_food_inspection_notice_variant_is_notice_only(self):
+        notice = ("The observations of objectionable practices listed on the front of this form "
+                  "are reported:\n1. Pursuant to Section 805 of the Federal Food, Drug and "
+                  "Cosmetic Act, or\n2. To assist firms inspected in complying with the laws")
+        self.assertTrue(f._is_notice_only(notice))
+
+    def test_ocr_broken_marker_still_enables_numbered_recovery(self):
+        text = ("DURING AN INSPECTION OF YOUR FIR BSERVED:\n"
+                "1. The media fill validation study that was performed on the syringe filling "
+                "line did not simulate all manufacturing processing steps for the product.\n"
+                "2. Not all unplanned interventions were documented in the batch record in a "
+                "timely manner during the execution of the mock fill run.\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    def test_fsvp_inspection_is_out_of_scope(self):
+        import grm_taxonomy
+        body = ("You did not document that you approved a foreign supplier based on an "
+                "evaluation of the foreign supplier's performance.")
+        self.assertTrue(grm_taxonomy.is_out_of_scope_483("", body))
+        self.assertFalse(grm_taxonomy.is_out_of_scope_483(
+            "", body + " The API supplier qualification for drug substance was inadequate."))

@@ -153,7 +153,10 @@ jobs:
     runs-on: ubuntu-latest
     # [2026-07-27] 20 → 35. FDA 483 스캔본 OCR(실측 ≈2.2s/쪽·예산 200쪽 ≈ 7분)과 PDF 상한
     # 40 → 60 상향이 이 job 안에서 돌기 때문. 예산·상한 둘 다 env 로 닫혀 있어 상한선이 있다.
-    timeout-minutes: 35
+    # 35 → 55(2026-10-27): 월요일 483 추가 예산이 최대 20분을 더 쓴다(아래 Run collector 의
+    # 마감 계산). 실측 최장 실행 26분(10-20) + 20분 + 여유. 타임아웃으로 죽으면 handoff 가
+    # 통째로 안 나가므로 예산보다 넉넉해야 한다.
+    timeout-minutes: 55
     env:
       GRM_HEALTH_JSON: grm-health.json
       # §1-B 영구배선: job-level 로 둬 collector(산출)와 upload 스텝(조건/경로)이 동일 값을
@@ -366,6 +369,21 @@ jobs:
           fi
           if [ "$GRM_DRY_RUN" != "true" ]; then
             args+=(--emit-routine-handoff)
+          fi
+          # [483 발행일 추가 예산 2026-10-27] 상한 밖 483 은 다음 날 grm-fda483-ocr-recovery
+          # (23:37 UTC = 08:37 KST)가 회수하지만, **월요일 수집분만은** 그 회수가 07:30 KST
+          # Routine 보다 늦어 그 주 브리프에 본문 없이 실린다. 그래서 월요일(KST) 실행에만
+          # 483 상한을 넓힌다(PDF 60→150건 · OCR 200→600쪽 — 600 은 회수 예약과 같은 값).
+          # 넓힌 몫은 마감까지만 쓴다: min(06:45 KST, 지금+20분). 마감이 지나면 기본 상한으로
+          # 돌아가므로 handoff 가 Routine 뒤로 밀리지 않고, 잡 타임아웃(아래)도 넘지 않는다.
+          # 마감이 이미 지난 늦은 실행(크론 지각)은 종전과 똑같이 돈다.
+          if [ "$(TZ='Asia/Seoul' date '+%u')" = "1" ]; then
+            CUTOFF=$(TZ='Asia/Seoul' date -d "$(TZ='Asia/Seoul' date '+%Y-%m-%d') 06:45" '+%s')
+            SOFT=$(( $(date '+%s') + 20 * 60 ))
+            export FDA483_BURST_DEADLINE_EPOCH=$(( CUTOFF < SOFT ? CUTOFF : SOFT ))
+            export FDA483_BURST_PDF_MAX_ITEMS=150
+            export FDA483_BURST_OCR_PAGE_BUDGET=600
+            echo "483 발행일 추가 예산: PDF 150 · OCR 600쪽 · 마감 $(TZ='Asia/Seoul' date -d "@${FDA483_BURST_DEADLINE_EPOCH}" '+%H:%M') KST"
           fi
           python collect_intake.py "${args[@]}"
 

@@ -242,7 +242,9 @@ _FDA483_DEVICE_TEXT_RE = re.compile(
 # 기기와 같다.
 _FDA483_FOOD_TEXT_RE = re.compile(
     r"\bfood\s+(?:safety\s+plan|plant|contact\s+surfaces?)\b|preventive\s+controls?\b"
-    r"|\b117\.\d+|\bready[\s-]+to[\s-]+eat\b", re.I)
+    r"|\b117\.\d+|\bready[\s-]+to[\s-]+eat\b"
+    # 식품 수입업체 FSVP 실사(21 CFR 1.500~) — fda483-195259 C Czarnikow Sugar 실측.
+    r"|foreign\s+supplier\s+verification|\bfsvp\b|\bforeign\s+suppliers?\b", re.I)
 _FDA483_DRUG_TEXT_RE = re.compile(
     r"\bdrug\s+(?:products?|substances?)\b|\bapis?\b|active\s+pharmaceutical|\baseptic"
     r"|\bsterility\b|\bstability\b|out[\s-]+of[\s-]+specification|\boos\b|\b211\.\d+"

@@ -101,3 +101,42 @@ class CollectionCappedEngineMissingTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OutOfScopeMarkerTest(unittest.TestCase):
+    """[2026-10-28 첫 회수 실측] 다시 읽어 보니 범위 밖이면 상한 표식을 `out-of-scope` 로 바꾼다.
+
+    바꾸지 않으면 그 문서는 회수 후보로 남아 **매일 다시 받아 OCR** 된다(152건 중 71건이
+    범위 밖이었고, 상한 표식 38건이 그대로 남았다)."""
+
+    def _run(self, mode, **over):
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            rec._rebuild_item(_nrow(), "", "not-attempted"), collected_at="")["raw_signal_id"]
+        real_rebuild = rec._rebuild_item
+
+        def rebuild(nrow, text, status):
+            # 본문이 있으면 범위 밖 판정(None), 빈 본문 재구성은 정상 — 실제 게이트와 같은 모양
+            return None if text else real_rebuild(nrow, text, status)
+
+        over.setdefault("rows", [_row(rid, status="not-attempted")])
+        return _run(mode=mode, dry_run=False, rebuild_item=rebuild, **over)
+
+    def test_recoverable_marks_out_of_scope(self):
+        report, _code, upsert, _ = self._run(rec.MODE_RECOVERABLE)
+        self.assertEqual(report.gate_dropped, 1)
+        self.assertEqual(report.status_resolved, 1)
+        raw = rec._json_object(upsert.call_args[0][2]["raw_json"])
+        self.assertEqual(raw["fda483_text_status"], rec.OUT_OF_SCOPE_STATUS)
+        self.assertFalse(rec.is_recoverable_row(raw))          # 다음 실행 후보에서 빠진다
+        self.assertFalse(rec.is_collection_capped_row(raw))
+
+    def test_collection_capped_marks_too(self):
+        report, _code, upsert, _ = self._run(rec.MODE_COLLECTION_CAPPED)
+        self.assertEqual(report.status_resolved, 1)
+        upsert.assert_called_once()
+
+    def test_other_modes_do_not_write(self):
+        report, _code, upsert, _ = self._run(rec.MODE_MISSING_OBSERVATIONS)
+        self.assertEqual(report.gate_dropped, 1)
+        upsert.assert_not_called()

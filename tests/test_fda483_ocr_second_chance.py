@@ -16,6 +16,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 import unittest
 from unittest.mock import patch
 
@@ -202,10 +203,18 @@ class SecondChanceRealEngineTest(unittest.TestCase):
 
     def test_real_cli_recovers_observation(self):
         data = _read_pdf()
+        budget = dict(f._OCR_BUDGET)
         f._OCR_BUDGET.update({"remaining": 5, "used": 0})
-        with patch.object(f, "http_get_bytes", lambda *a, **k: data), \
-                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
-            text, status = f._fetch_fda483_pdf_text(URL)
+        started = time.monotonic()
+        try:
+            with patch.object(f, "http_get_bytes", lambda *a, **k: data), \
+                    patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+                text, status = f._fetch_fda483_pdf_text(URL)
+        finally:
+            f._OCR_BUDGET.update(budget)
+        # 러너 실측용 — CI 로그에 쪽당 시간이 남는다(성공 판정에는 쓰지 않는다).
+        print(f"\n[2차 판독 실엔진] 1쪽 {time.monotonic() - started:.2f}s · status={status}",
+              file=sys.stderr)
         self.assertEqual(status, "pdf-ok-ocr")
         observations = f._extract_483_observations_from_text(text)
         self.assertTrue(observations[0]["deficiency"].startswith(EXPECTED_HEADING))

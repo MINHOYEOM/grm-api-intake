@@ -165,7 +165,8 @@ jobs:
 
       # [#1209] 주간 브리프는 Notion 의 미소비(New) 행에서 만들어진다. 위 회수는 Supabase 만
       # 고치므로, 본문 없이 들어간 Notion 483 행의 raw 를 Supabase 의 본문 있는 raw 로 채운다
-      # (백필 페치가 먼저 받아 둔 문서 포함 — recovered=0 이어도 돌린다). 속성·Status 는 무접촉.
+      # (백필 페치가 먼저 받아 둔 문서 포함 — recovered=0 이어도 돌린다). 속성·Status 는 무접촉 —
+      # 단, Supabase 표식이 out-of-scope 인 행은 Status 만 Skipped 로 마감한다(묶음 카드 방지).
       - name: Sync empty Notion 483 rows from Supabase (weekly brief input)
         if: ${{ github.event_name == 'schedule' || inputs.apply }}
         env:

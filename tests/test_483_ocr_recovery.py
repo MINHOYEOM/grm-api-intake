@@ -457,3 +457,67 @@ class MissingObservationsModeTest(unittest.TestCase):
         )
         with self.assertRaises(SystemExit):
             parser.parse_args(["--mode", "nope"])
+
+
+# ── [2026-10-28] missing-observations 모드가 확정 사유를 표식으로 남긴다 ──────────────
+class MissingObservationsMarkerTest(unittest.TestCase):
+    """상태 키·발췌·관찰이 모두 없는 행 25건(2016~2026)이 이 모드로 읽히고도 아무것도 쓰이지
+    않아 매 감사마다 원인 미상으로 남았다. 다시 읽은 결과가 확정 사유(본문은 있으나 추출 0 ·
+    404 · 범위 밖)면 그 사유를 적어, 다음 감사에서 원인별로 갈리게 한다."""
+
+    _NO_ANCHOR = "We are enclosing a copy of the Establishment Inspection Report for your firm."
+
+    def _bare_row(self, rid, **extra):
+        import json
+        payload = _raw_payload("", "")
+        self.assertNotIn("fda483_text_status", payload)
+        payload.update(extra)
+        return {"raw_signal_id": rid, "document_id": "fda483-555001",
+                "collected_at": "2026-07-28T01:02:03Z",
+                "raw_json": json.dumps(payload, ensure_ascii=False, sort_keys=True)}
+
+    def _run_mode(self, fetch_text, **row_extra):
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            rec._rebuild_item(_nrow(), "", ""), collected_at="")["raw_signal_id"]
+        return _run(mode=rec.MODE_MISSING_OBSERVATIONS, dry_run=False,
+                    rows=[self._bare_row(rid, **row_extra)], fetch_text=fetch_text)
+
+    def test_text_without_extraction_records_pdf_status(self):
+        report, _code, upsert, rid = self._run_mode(lambda url: (self._NO_ANCHOR, "pdf-ok"))
+        self.assertEqual(report.text_without_extraction, 1)
+        self.assertEqual(report.status_resolved, 1)
+        record = upsert.call_args[0][2]
+        self.assertEqual(record["raw_signal_id"], rid)
+        self.assertEqual(rec._json_object(record["raw_json"])["fda483_text_status"], "pdf-ok")
+
+    def test_definitive_empty_records_reason_on_bare_row(self):
+        report, _code, upsert, _rid = self._run_mode(
+            lambda url: ("", "fetch-fail:HTTP GET final failure: (404 Client Error)"))
+        self.assertEqual(report.status_resolved, 1)
+        self.assertTrue(rec._json_object(upsert.call_args[0][2]["raw_json"])
+                        ["fda483_text_status"].startswith("fetch-fail"))
+
+    def test_row_with_excerpt_is_never_overwritten_by_empty_result(self):
+        """발췌가 있는 행에 빈 본문 재구성을 쓰면 발췌가 지워진다 — 쓰지 않는다."""
+        report, _code, upsert, _rid = self._run_mode(
+            lambda url: ("", "fetch-fail:HTTP GET final failure: (404 Client Error)"),
+            fda483_excerpt="OBSERVATION 1 The cleaning procedure was not followed.")
+        self.assertEqual(report.status_resolved, 0)
+        upsert.assert_not_called()
+
+    def test_gate_drop_records_out_of_scope(self):
+        real_rebuild = rec._rebuild_item
+
+        def rebuild(nrow, text, status):
+            return None if text else real_rebuild(nrow, text, status)
+        import findings_store
+        rid = findings_store.raw_signal_from_intake_item(
+            real_rebuild(_nrow(), "", ""), collected_at="")["raw_signal_id"]
+        report, _code, upsert, _ = _run(
+            mode=rec.MODE_MISSING_OBSERVATIONS, dry_run=False, rows=[self._bare_row(rid)],
+            rebuild_item=rebuild)
+        self.assertEqual(report.gate_dropped, 1)
+        self.assertEqual(report.status_resolved, 1)
+        self.assertEqual(rec._json_object(upsert.call_args[0][2]["raw_json"])
+                         ["fda483_text_status"], rec.OUT_OF_SCOPE_STATUS)

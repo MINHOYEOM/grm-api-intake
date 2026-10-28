@@ -379,6 +379,31 @@ def _is_definitive_empty(status: str) -> bool:
     return True
 
 
+def _is_unmarked_empty_row(raw: dict[str, Any]) -> bool:
+    """상태 키·발췌·관찰이 모두 없는 행 — 어떤 결손 사유도 기록되지 않은 행(순수 함수)."""
+    return not (raw.get("fda483_text_status") or raw.get("fda483_excerpt")
+                or raw.get(_OBSERVATIONS_KEY))
+
+
+def _marks_definitive_reason(
+    mode: str, raw: dict[str, Any], *, gate_dropped: bool = False,
+) -> bool:
+    """다시 읽은 결과 확정 사유(404·텍스트층 없음·범위 밖)가 나왔을 때 표식을 적는 모드인가.
+
+    상한·복구 가능 모드는 늘 적는다(안 적으면 예약 실행이 같은 문서를 매일 다시 받는다).
+    `missing-observations` 는 [2026-10-28] 부터 적는다 — 종전엔 이 모드가 범위 밖·본문 없음
+    문서를 읽고도 아무것도 쓰지 않아, 상태 키 없는 행 25건이 원인 미상으로 남았다.
+    단 본문 없음(404 등)은 **발췌도 없는 행에만** 적는다 — 재구성은 빈 본문으로 하므로 이미
+    있는 발췌를 지우게 된다. 범위 밖은 발췌가 있어도 적는다(범위 밖 문서의 발췌는 쓰이지
+    않고, 상한 모드와 같은 규칙이다).
+    """
+    if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE):
+        return True
+    if mode != MODE_MISSING_OBSERVATIONS:
+        return False
+    return gate_dropped or _is_unmarked_empty_row(raw)
+
+
 def _resolve_capped_status(
     report: OcrRecoveryReport,
     row: dict[str, Any],
@@ -532,8 +557,7 @@ def run(
             #   문서의 사실이 아니다. 실제로 읽어 본 결과가 상한이 아닌 사유(404·텍스트층 없음)면
             #   그 사유로 바꿔 적는다 — 잃는 본문은 없고(둘 다 빈손), 바꾸지 않으면 그 문서가
             #   매 예약 실행마다 후보로 남아 같은 PDF 를 영원히 다시 받는다.
-            if (mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE)
-                    and _is_definitive_empty(status)):
+            if _marks_definitive_reason(mode, raw) and _is_definitive_empty(status):
                 _resolve_capped_status(
                     report, r, raw, status, label=label, base=base, service_key=service_key,
                     dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
@@ -554,7 +578,7 @@ def run(
             # 도메인 게이트(수의/기기/식품) 드롭 — 애초에 적재되지 말았어야 할 행일 수 있으나
             # 이 스크립트는 삭제하지 않는다(범위 밖). 세어서 드러내기만 한다.
             report.gate_dropped += 1
-            if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE):
+            if _marks_definitive_reason(mode, raw, gate_dropped=True):
                 # ★[2026-10-28 실측] 본문을 받아 보니 범위 밖이면 상한 표식이 그대로 남아,
                 #   예약 회수가 **매일 같은 문서를 다시 받아 OCR 한다**(첫 회수 실행: 152건 중
                 #   71건이 범위 밖 — 상한 표식 38건이 그대로 남음). 예산 600쪽을 버릴 문서가
@@ -585,6 +609,14 @@ def run(
             report.still_empty += 1
             report.text_without_extraction += 1
             _bump(report, "no_excerpt_or_observations")
+            if mode == MODE_MISSING_OBSERVATIONS and _is_unmarked_empty_row(raw):
+                # 본문은 받았는데 결정론 층이 0건 — 그 사실(`pdf-ok` 등 PDF 상태)을 적는다.
+                # 상태 키도 발췌도 없는 행은 "왜 비었는지"가 어디에도 없어 감사 때마다 원인
+                # 미상으로 남았다(2026-10-28 실측 25건 — EIR 송부 공문·주 정부 실사 기록 등).
+                _resolve_capped_status(
+                    report, r, raw, status, label=label, base=base, service_key=service_key,
+                    dry_run=dry_run, rebuild_fn=rebuild_fn, upsert_fn=upsert_fn,
+                )
             continue
 
         if len(report.samples) < _MAX_SAMPLES:

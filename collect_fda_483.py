@@ -1265,6 +1265,23 @@ def _full_ocr_fallback(data: bytes, text: str, status: str, max_chars: int) -> t
     return text, status
 
 
+# tesseract CLI(fast)는 단어 끝 `l` 을 `!` 로 읽는 일이 잦다 — "quality contro! unit",
+# "Michae! R. Shanks", "settle plate near Stopper bow!". 관찰 파서의 `_first_sentence` 는 `!` 를
+# 문장 끝으로 보므로 표제가 거기서 잘린 채 공개 게이트를 통과했다(실측 191121 "…applicable to
+# the quality contro!", 161809 "…critical utility used for the!"). 483 산문에는 느낌표가 쓰이지
+# 않으므로, **글자 바로 뒤 `!` 다음에 소문자가 이어지는** 경우만(= 문장이 계속된다) 고친다:
+# 앞 단어가 기능어면 `!` 를 지우고("the! manufacturing"), 아니면 `l` 로 바꾼다. CLI 출력에만 건다.
+_CLI_BANG_RE = re.compile(r"([A-Za-z]+)!(?=\s*[a-z])")
+
+
+def _repair_cli_bang(text: str) -> str:
+    """CLI 판독 텍스트의 `l`→`!` 오독을 되돌린다(순수 함수)."""
+    def _fix(m: re.Match[str]) -> str:
+        word = m.group(1)
+        return word if word.lower() in _FUNCTION_WORDS else word + "l"
+    return _CLI_BANG_RE.sub(_fix, text or "")
+
+
 def _reocr_483_pdf_text(data: bytes, max_chars: int) -> tuple[str, str]:
     """모든 쪽을 렌더링해 tesseract CLI 로 판독한다(텍스트층 무시). (text, status).
 
@@ -1308,7 +1325,7 @@ def _reocr_483_pdf_text(data: bytes, max_chars: int) -> tuple[str, str]:
                 png = page.get_pixmap(dpi=FDA483_OCR_DPI, colorspace=fitz.csGRAY).tobytes("png")
                 proc = subprocess.run(args, input=png, capture_output=True, env=env,
                                       timeout=FDA483_REOCR_PAGE_TIMEOUT, check=False)
-                ocr_native = proc.stdout.decode("utf-8", "replace")
+                ocr_native = _repair_cli_bang(proc.stdout.decode("utf-8", "replace"))
                 parts.append(ocr_native if ocr_native.strip() else native)
     except Exception as e:  # noqa: BLE001 — 재판독 실패는 앞 단계 산출을 건드리지 않는다
         return "", f"pdf-parse-fail:{type(e).__name__}"

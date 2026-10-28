@@ -166,6 +166,49 @@ class CliFallbackTest(unittest.TestCase):
         self.assertEqual(text, f.normalize_pdf_ligatures(_read(BUILTIN_TEXT_PATH)))
 
 
+class CliBangRepairTest(unittest.TestCase):
+    """CLI 가 `l` 을 `!` 로 읽어 표제가 `!` 에서 잘린 채 공개 게이트를 통과하던 결함(실측 2건)."""
+
+    def test_truncated_headings_from_benchmark_are_restored(self):
+        # 191121 · 161809 CLI 판독 원문 그대로 — 수리 전에는 `!` 에서 잘린 표제가 게이트를 통과했다.
+        cases = [
+            ("OBSERVATION 2\nThe responsibilities and procedures applicable to the quality contro! "
+             "unit are not fully followed. Specifically, Your Quality Unit failed to establish.",
+             "The responsibilities and procedures applicable to the quality control unit are not "
+             "fully followed."),
+            ("OBSERVATION 10\nYour firm has not adequately qualified the critical utility used for the!\n"
+             "manufacturing processes in the Fill-Finish manufacturing facility. Specifically, none.",
+             "Your firm has not adequately qualified the critical utility used for the manufacturing "
+             "processes in the Fill-Finish manufacturing facility."),
+        ]
+        for raw, expected in cases:
+            broken = f._extract_483_observations_from_text(raw)[0]["deficiency"]
+            self.assertTrue(broken.endswith("!"), "전제: 수리 전 표제는 `!` 에서 잘린다")
+            self.assertTrue(f._is_publishable_deficiency(broken), "전제: 잘린 표제가 게이트를 통과한다")
+            repaired = f._extract_483_observations_from_text(f._repair_cli_bang(raw))
+            self.assertEqual(repaired[0]["deficiency"], expected)
+
+    def test_only_lowercase_continuation_is_touched(self):
+        """문장이 이어지는(뒤가 소문자) `!` 만 고친다 — 대문자·숫자가 이어지면 그대로 둔다."""
+        for text in ("Michae! R. Shanks", "Batch! O", "Stop! The firm", "no bang here"):
+            self.assertEqual(f._repair_cli_bang(text), text)
+        self.assertEqual(f._repair_cli_bang("quality contro! unit"), "quality control unit")
+        self.assertEqual(f._repair_cli_bang("used for the! manufacturing"),
+                         "used for the manufacturing")
+
+    def test_repair_is_applied_to_cli_output(self):
+        data = _read(PDF_PATH, "rb")
+        f._OCR_BUDGET.update({"remaining": 5, "used": 0})
+        try:
+            with patch.object(f.shutil, "which", lambda name: "/usr/bin/tesseract"), \
+                    patch.object(f.subprocess, "run",
+                                 _FakeTesseract("the quality contro! unit")):
+                text, _status = f._reocr_483_pdf_text(data, 1000)
+        finally:
+            f._OCR_BUDGET.update({"remaining": 200, "used": 0})
+        self.assertIn("quality control unit", text)
+
+
 @unittest.skipUnless(HAVE_FITZ, "PyMuPDF 필요")
 class CliFallbackScopeTest(unittest.TestCase):
     """관찰이 1건이라도 나오는 문서는 전면 재판독에 닿지 않는다 — 정상 문서 출력 바이트 불변."""

@@ -1405,8 +1405,8 @@
    "signal_label": "High",
    "type_tag": "CGMP",
    "headline_target": "Kellin Chemicals Co., Ltd. - Zhangjiagang",
-   "title_issue": "FDA 실사 지연·거부",
-   "summary": "FDA가 중국 Kellin Chemicals Co., Ltd. - Zhangjiagang에 경고서한을 발부했다. 소유자·운영자가 FDA 실사를 지연·거부·제한했다고 보고, 이 제조소에서 만든 의약품을 불량(adulterated)으로 판단했다.",
+   "title_issue": "사전 통보 FDA 실사 거부",
+   "summary": "FDA가 미국 시장용 완제의약품 제조사에 원료의약품을 공급하는 중국 Kellin Chemicals Co., Ltd. - Zhangjiagang에 경고서한을 발부했다. 2025년 7월 7~11일로 예정·통보된 실사를 회사가 거부해, FD&C Act 501(j)에 따라 이 제조소의 의약품을 불량(adulterated)으로 판단했다.",
    "facts": [
     {
      "label": "발행일",
@@ -1428,9 +1428,9 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "판단: 실사를 지연·거부·제한·거절한 제조소의 의약품은 불량(adulterated)에 해당",
-    "조치: 실사로 CGMP 준수가 확인될 때까지 해당 제조소를 기재한 신규 신청·변경 승인 보류 가능",
-    "조치: 미국 수입 시 801(a)(3)에 따른 억류·수입 거부 가능, 15영업일 내 서면 회신 요구",
+    "지적: 2025년 7월 7~11일 사전 통보된 실사를 거부(미국 대리인 Registrar Corp. 통해 통보)",
+    "판단: 실사를 지연·거부·제한·거절한 제조소의 의약품은 FD&C Act 501(j)에 따른 불량(adulterated)",
+    "조치: 실사로 CGMP 준수가 확인될 때까지 신규 신청·변경 승인 보류 가능, 801(a)(3)에 따른 억류·수입 거부 가능",
     "발행 부서/일자: Center for Drug Evaluation and Research (CDER) · 11/06/2025"
    ],
    "implication": "실사 지연·거부만으로 제조소 전체가 불량 판정을 받고 그 원료를 쓰는 완제 제조사까지 301(c) 위반 위험에 놓인다는 점이 드러난다. 해외 원료 공급처를 쓴다면 FDA 실사 수용 이력과 경고서한·수입경보 여부를 확인해 둘 필요가 있다.",
@@ -1452,13 +1452,13 @@
     }
    },
    "en": {
-    "title_issue": "FDA inspection delayed and refused",
-    "summary": "FDA issued a Warning Letter to Kellin Chemicals Co., Ltd. - Zhangjiagang in China, finding that the owner or operator delayed, denied, limited or refused an FDA inspection and that drugs from the site are therefore adulterated.",
+    "title_issue": "Preannounced FDA inspection refused",
+    "summary": "FDA issued a Warning Letter to Kellin Chemicals Co., Ltd. - Zhangjiagang in China, an API supplier to finished drug manufacturers serving the U.S. market. The firm refused an inspection preannounced for July 7 to July 11, 2025, so FDA deemed its drugs adulterated under section 501(j) of the FD&C Act.",
     "implication": "Delaying or refusing an inspection alone makes the whole site's output adulterated, and finished-dose manufacturers using its APIs face exposure under section 301(c). Firms using overseas API suppliers should check their FDA inspection history and whether they have a warning letter or import alert.",
     "key_facts": [
-     "Determination: drugs from a site that delayed, denied, limited or refused inspection are adulterated",
-     "Action: approval of new applications or supplements listing the site may be withheld until FDA inspects and confirms CGMP compliance",
-     "Action: shipments may be detained or refused admission under section 801(a)(3); written response required within 15 working days",
+     "Finding: the firm refused the inspection preannounced for July 7 to July 11, 2025 (notified through its U.S. Agent, Registrar Corp.)",
+     "Determination: drugs from a site that delayed, denied, limited or refused inspection are adulterated under section 501(j) of the FD&C Act",
+     "Action: approval of new applications or supplements may be withheld until FDA confirms CGMP compliance; shipments may be detained or refused admission under section 801(a)(3)",
      "Issuing office and date: Center for Drug Evaluation and Research (CDER), 11/06/2025"
     ],
     "checks": [

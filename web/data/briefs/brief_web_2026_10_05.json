@@ -25,11 +25,11 @@
    "식약처, 성일바이오엑스에 제조기록서 거짓 작성·공정 변경 미허가로 제조업무정지와 과징금 37,200,000원 처분"
   ],
   "coverage": {
-   "intake_total": 99,
-   "rendered": 47,
+   "intake_total": 102,
+   "rendered": 50,
    "evidence": {
     "A": 36,
-    "B": 11,
+    "B": 14,
     "C": 0
    },
    "resources": 8
@@ -1392,8 +1392,287 @@
    }
   },
   {
-   "id": "187807",
+   "id": "7e265b69a43e",
    "render_order": 8,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Kellin Chemicals Co., Ltd. - Zhangjiagang",
+   "title_issue": "FDA 실사 지연·거부",
+   "summary": "FDA가 중국 Kellin Chemicals Co., Ltd. - Zhangjiagang에 경고서한을 발부했다. 소유자·운영자가 FDA 실사를 지연·거부·제한했다고 보고, 이 제조소에서 만든 의약품을 불량(adulterated)으로 판단했다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-09-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "7e265b69a43e"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Kellin Chemicals Co., Ltd. - Zhangjiagang"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 11/06/2025"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "판단: 실사를 지연·거부·제한·거절한 제조소의 의약품은 불량(adulterated)에 해당",
+    "조치: 실사로 CGMP 준수가 확인될 때까지 해당 제조소를 기재한 신규 신청·변경 승인 보류 가능",
+    "조치: 미국 수입 시 801(a)(3)에 따른 억류·수입 거부 가능, 15영업일 내 서면 회신 요구",
+    "발행 부서/일자: Center for Drug Evaluation and Research (CDER) · 11/06/2025"
+   ],
+   "implication": "실사 지연·거부만으로 제조소 전체가 불량 판정을 받고 그 원료를 쓰는 완제 제조사까지 301(c) 위반 위험에 놓인다는 점이 드러난다. 해외 원료 공급처를 쓴다면 FDA 실사 수용 이력과 경고서한·수입경보 여부를 확인해 둘 필요가 있다.",
+   "checks": [
+    "해외 원료 공급처의 FDA 실사 수용 이력",
+    "공급처 경고서한·Import Alert 등재 모니터링",
+    "불량 판정 원료 사용 시 대체 공급처 확보 계획"
+   ],
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/kellin-chemicals-co-ltd-716228-zhangjiagang",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "FDA inspection delayed and refused",
+    "summary": "FDA issued a Warning Letter to Kellin Chemicals Co., Ltd. - Zhangjiagang in China, finding that the owner or operator delayed, denied, limited or refused an FDA inspection and that drugs from the site are therefore adulterated.",
+    "implication": "Delaying or refusing an inspection alone makes the whole site's output adulterated, and finished-dose manufacturers using its APIs face exposure under section 301(c). Firms using overseas API suppliers should check their FDA inspection history and whether they have a warning letter or import alert.",
+    "key_facts": [
+     "Determination: drugs from a site that delayed, denied, limited or refused inspection are adulterated",
+     "Action: approval of new applications or supplements listing the site may be withheld until FDA inspects and confirms CGMP compliance",
+     "Action: shipments may be detained or refused admission under section 801(a)(3); written response required within 15 working days",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 11/06/2025"
+    ],
+    "checks": [
+     "FDA inspection history of overseas API suppliers",
+     "Monitoring suppliers for warning letters and import alerts",
+     "Backup supplier plan if an API source is found adulterated"
+    ]
+   }
+  },
+  {
+   "id": "68fdf481ca5a",
+   "render_order": 9,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "VeganicSKN Limited",
+   "title_issue": "OOS 조사 지연·재시험 출하",
+   "summary": "FDA가 OTC 의약품 제조소 VeganicSKN Limited에 CGMP 위반으로 경고서한을 발부했다. OOS 결과를 받고도 2단계 조사를 3개월 넘게 미루고, 조사가 진행 중인 배치를 재시험 후 출하한 점이 첫 위반으로 지적됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-09-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "68fdf481ca5a"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "VeganicSKN Limited"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 02/09/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "위반 1: 2024년 8월 28일 OOS 보고 후 2024년 12월 4일에야 2단계 조사 착수, 조사 중 배치 출하(21 CFR 211.192)",
+    "위반 2: 오염 고위험 원료 확인시험 미실시 및 공급업체 COA 신뢰성 미검증(21 CFR 211.84(d)(1))",
+    "위반 3: 품질부서의 절차 수립·감독 책임 미이행(21 CFR 211.22)",
+    "수입경보: Import Alert 66-40 등재(2026년 1월 9일)"
+   ],
+   "implication": "근본원인 없이 재시험 합격으로 OOS 배치를 출하한 점과 고위험 원료의 COA 의존이 한 서한에 함께 지적됐다. OOS 조사 단계별 착수 기한과 조사 종결 전 출하를 막는 장치가 절차에 있는지 볼 만하다.",
+   "checks": [
+    "OOS 조사 단계별 착수·종결 기한",
+    "조사 종결 전 배치 출하 차단 절차",
+    "고위험 원료 로트별 확인시험 기록"
+   ],
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 3,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192",
+      "statement_ko": "귀사는 배치가 이미 유통되었는지와 관계없이, 설명되지 않은 불일치나 배치 또는 그 구성성분의 규격 부적합을 철저히 조사하지 않았다 (21 CFR 211.192)."
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)).",
+      "citation": "21 CFR 211.84(d)(1)",
+      "statement_ko": "귀사는 의약품의 각 구성성분에 대해 확인(identity)을 검증하는 시험을 최소 1개 이상 수행하지 않았다. 또한 귀사는 구성성분 공급업체의 시험 분석 결과를 적절한 주기로 밸리데이션하여 그 신뢰성을 확립하지 않았다 (21 CFR 211.84(d)(1) and 211.84(d)(2))."
+     },
+     {
+      "number": "3",
+      "statement": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22).",
+      "citation": "21 CFR 211.22",
+      "statement_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 관해 설정된 규격에 적합하도록 보장할 책임을 이행하지 않았다 (21 CFR 211.22)."
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/veganicskn-limited-719883-02092026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Delayed OOS investigation, release on retest",
+    "summary": "FDA issued a Warning Letter to OTC drug manufacturer VeganicSKN Limited for CGMP violations. The first violation is that a Phase II investigation began more than three months after an OOS result, and the batch under investigation was released after retesting.",
+    "implication": "Releasing an OOS batch on a passing retest without a root cause and relying on COAs for a high-risk component were cited together in one letter. It is worth checking that procedures set deadlines for each OOS investigation phase and block release before an investigation closes.",
+    "key_facts": [
+     "Violation 1: OOS reported on August 28, 2024, Phase II investigation not started until December 4, 2024, and the batch released during the investigation (21 CFR 211.192)",
+     "Violation 2: no identity testing of a high-risk component and supplier COA reliability not established (21 CFR 211.84(d)(1))",
+     "Violation 3: quality unit did not establish procedures or exercise oversight (21 CFR 211.22)",
+     "Import Alert 66-40 placement on January 9, 2026"
+    ],
+    "checks": [
+     "Start and closure deadlines for each OOS investigation phase",
+     "Procedure blocking batch release before an investigation closes",
+     "Lot-by-lot identity test records for high-risk components"
+    ]
+   }
+  },
+  {
+   "id": "f3d387dd5502",
+   "render_order": 10,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Fresenius Kabi USA LLC",
+   "title_issue": "주사제 엔도톡신·발열 반응 조사 미흡",
+   "summary": "FDA가 무균 주사제 제조소 Fresenius Kabi USA LLC에 CGMP 위반으로 경고서한을 발부했다. 파모티딘 주사 투여 후 발열 반응 보고와 엔도톡신 부적합 등 제품 이상에 대한 조사가 근본원인·영향 범위 확대 없이 이뤄진 점이 첫 위반으로 지적됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-09-29"
+    },
+    {
+     "label": "문서번호",
+     "value": "f3d387dd5502"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Fresenius Kabi USA LLC"
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 09/22/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "위반 1: 파모티딘 주사 발열 반응·엔도톡신 부적합 등 조사의 근본원인·영향 제품 확대 미흡(21 CFR 211.192)",
+    "위반 2: 배지충전이 최대 무균 개입 횟수를 반영하지 못함, 2024년 9·10월 배지충전 실패(21 CFR 211.113(b))",
+    "위반 3: 육안검사 프로그램 미흡과 무균 구역 관리 결함(21 CFR 211.110(a)·211.42(c)(10))",
+    "반복 위반: 시정되지 않은 반복 위반을 근거로 CGMP 컨설턴트 참여 권고"
+   ],
+   "implication": "대형 무균 주사제 제조소에서 환자 이상사례가 조사 부실 지적으로 이어진 사례다. 무균 제조소라면 생물부하 일탈을 엔도톡신 위험과 연결해 평가하는지, 배지충전이 실제 최대 개입을 반영하는지 볼 만하다.",
+   "checks": [
+    "생물부하 일탈 시 엔도톡신 추가 평가 기준",
+    "배지충전의 최대 개입 횟수 반영 여부",
+    "육안검사 검출 능력 평가와 시판 제품 영향 평가"
+   ],
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 3,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure of a batch or any of its components to meet any of its specifications, whether or not the batch has already been distributed (21 CFR 211.192).",
+      "citation": "21 CFR 211.192",
+      "statement_ko": "귀사는 배치가 이미 유통되었는지와 관계없이, 설명되지 않은 불일치나 배치 또는 그 구성성분의 규격 부적합을 철저히 조사하지 않았다 (21 CFR 211.192)."
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to establish and follow appropriate written procedures that are designed to prevent microbiological contamination of drug products purporting to be sterile, and that include validation of all aseptic and sterilization processes (21 CFR 211.113(b)).",
+      "citation": "21 CFR 211.113(b)",
+      "statement_ko": "귀사는 무균이라 표방하는 의약품의 미생물 오염을 방지하도록 설계되고 모든 무균 공정 및 멸균 공정의 밸리데이션을 포함하는 적절한 문서화된 절차를 수립·준수하지 않았다 (21 CFR 211.113(b))."
+     },
+     {
+      "number": "3",
+      "statement": "Your firm failed to establish adequate control procedures to monitor the output and to validate the performance of those manufacturing processes that may be responsible for causing variability in the characteristics of in-process material and the drug. Your firm failed to perform operations within specifically defined areas of adequate size and to have separate or defined areas or such other control systems necessary to prevent contamination or mix-ups in aseptic processing areas (21 CFR 211.110(a) and 21 CFR 211.42(c)(10)).",
+      "citation": "21 CFR 211.110(a) · 21 CFR 211.42(c)(10)",
+      "statement_ko": "귀사는 공정 중 물질과 의약품 특성의 변동을 일으킬 수 있는 제조 공정의 산출물을 모니터링하고 그 성능을 밸리데이션하는 적절한 관리 절차를 수립하지 않았다. 또한 귀사는 무균 공정 구역에서 적절한 크기의 특정 구역 안에서 작업하지 않았고, 오염이나 혼동을 방지하는 데 필요한 분리·구획된 구역 또는 그 밖의 관리 체계를 갖추지 않았다 (21 CFR 211.110(a) and 21 CFR 211.42(c)(10))."
+     }
+    ]
+   },
+   "source_body_captured": true,
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/fresenius-kabi-usa-llc-733107-09222026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "Injectable endotoxin and pyrogen probe gaps",
+    "summary": "FDA issued a Warning Letter to sterile injectable manufacturer Fresenius Kabi USA LLC for CGMP violations. The first violation is that investigations into product failures, including pyrogenic reactions after famotidine for injection and an endotoxin failure, lacked root causes and expansion to affected products.",
+    "implication": "This is a case where patient adverse events at a large sterile injectable site led to findings of inadequate investigations. Sterile sites may want to confirm that bioburden excursions are assessed for endotoxin risk and that media fills reflect the actual maximum interventions.",
+    "key_facts": [
+     "Violation 1: investigations, including pyrogenic reactions and an endotoxin failure for famotidine for injection, lacked root causes and expansion to affected products (21 CFR 211.192)",
+     "Violation 2: media fills did not represent maximum aseptic intervention counts; media fill failures in September and October 2024 (21 CFR 211.113(b))",
+     "Violation 3: inadequate visual inspection programme and aseptic area control (21 CFR 211.110(a) and 211.42(c)(10))",
+     "Repeat violations: FDA recommended a CGMP consultant because repeat violations were not corrected"
+    ],
+    "checks": [
+     "Criteria for added endotoxin assessment after bioburden excursions",
+     "Whether media fills reflect maximum intervention counts",
+     "Visual inspection detection capability and assessment of marketed product"
+    ]
+   }
+  },
+  {
+   "id": "187807",
+   "render_order": 11,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -1490,7 +1769,7 @@
   },
   {
    "id": "who-noc-cc401829c012",
-   "render_order": 9,
+   "render_order": 12,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -1564,7 +1843,7 @@
   },
   {
    "id": "who-whopir-5ca01e2642a0",
-   "render_order": 10,
+   "render_order": 13,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -1752,7 +2031,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxGX3",
-   "render_order": 11,
+   "render_order": 14,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -1862,7 +2141,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxL03",
-   "render_order": 12,
+   "render_order": 15,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2014,7 +2293,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxgUQ",
-   "render_order": 13,
+   "render_order": 16,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2126,7 +2405,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxIyg",
-   "render_order": 14,
+   "render_order": 17,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2206,7 +2485,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxQPY",
-   "render_order": 15,
+   "render_order": 18,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2286,7 +2565,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxWCT",
-   "render_order": 16,
+   "render_order": 19,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2366,7 +2645,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxiYQ",
-   "render_order": 17,
+   "render_order": 20,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2446,7 +2725,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxlWC",
-   "render_order": 18,
+   "render_order": 21,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2526,7 +2805,7 @@
   },
   {
    "id": "gmpinspect-1Q3s5BFxnaP",
-   "render_order": 19,
+   "render_order": 22,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2606,7 +2885,7 @@
   },
   {
    "id": "gmpinspect-1Q3cb-o8XTo",
-   "render_order": 20,
+   "render_order": 23,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2684,7 +2963,7 @@
   },
   {
    "id": "gmpinspect-1Q3cb-o8YRU",
-   "render_order": 21,
+   "render_order": 24,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2762,7 +3041,7 @@
   },
   {
    "id": "gmpinspect-1Q3cb-o8ZMK",
-   "render_order": 22,
+   "render_order": 25,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2840,7 +3119,7 @@
   },
   {
    "id": "gmpinspect-1Q3cb-o8att",
-   "render_order": 23,
+   "render_order": 26,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2918,7 +3197,7 @@
   },
   {
    "id": "gmpinspect-1Q3cg6KBa9T",
-   "render_order": 24,
+   "render_order": 27,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -2996,7 +3275,7 @@
   },
   {
    "id": "gmpinspect-1Q3cg6KBbdT",
-   "render_order": 25,
+   "render_order": 28,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -3074,7 +3353,7 @@
   },
   {
    "id": "admin-2026007197",
-   "render_order": 26,
+   "render_order": 29,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3180,7 +3459,7 @@
   },
   {
    "id": "admin-2026007196",
-   "render_order": 27,
+   "render_order": 30,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3285,7 +3564,7 @@
   },
   {
    "id": "admin-2026007215",
-   "render_order": 28,
+   "render_order": 31,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3390,7 +3669,7 @@
   },
   {
    "id": "admin-2026007035",
-   "render_order": 29,
+   "render_order": 32,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3505,7 +3784,7 @@
   },
   {
    "id": "admin-2026007015",
-   "render_order": 30,
+   "render_order": 33,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3612,7 +3891,7 @@
   },
   {
    "id": "admin-2026007096",
-   "render_order": 31,
+   "render_order": 34,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3716,7 +3995,7 @@
   },
   {
    "id": "data0010-15296",
-   "render_order": 32,
+   "render_order": 35,
    "group": "국내",
    "group_label": "지침·안내서",
    "agency": "MFDS",
@@ -3788,7 +4067,7 @@
   },
   {
    "id": "recall-02d69f958550",
-   "render_order": 33,
+   "render_order": 36,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -3872,7 +4151,7 @@
   },
   {
    "id": "recall-625c2681bb62",
-   "render_order": 34,
+   "render_order": 37,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -3963,7 +4242,7 @@
   },
   {
    "id": "D-0866-2026",
-   "render_order": 35,
+   "render_order": 38,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -4086,7 +4365,7 @@
   },
   {
    "id": "recall-c64de96c61e4",
-   "render_order": 36,
+   "render_order": 39,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4170,7 +4449,7 @@
   },
   {
    "id": "recall-fcba5694e1fc",
-   "render_order": 37,
+   "render_order": 40,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4254,7 +4533,7 @@
   },
   {
    "id": "D-0865-2026",
-   "render_order": 38,
+   "render_order": 41,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -4387,7 +4666,7 @@
   },
   {
    "id": "D-0869-2026",
-   "render_order": 39,
+   "render_order": 42,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -4514,7 +4793,7 @@
   },
   {
    "id": "c546a5ad5427",
-   "render_order": 40,
+   "render_order": 43,
    "group": "Recall",
    "group_label": null,
    "agency": "MHRA",
@@ -4598,7 +4877,7 @@
   },
   {
    "id": "hc-82684",
-   "render_order": 41,
+   "render_order": 44,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -4688,7 +4967,7 @@
   },
   {
    "id": "D-0841-2026",
-   "render_order": 42,
+   "render_order": 45,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -4805,7 +5084,7 @@
   },
   {
    "id": "D-0848-2026",
-   "render_order": 43,
+   "render_order": 46,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -4938,7 +5217,7 @@
   },
   {
    "id": "D-0852-2026",
-   "render_order": 44,
+   "render_order": 47,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5065,7 +5344,7 @@
   },
   {
    "id": "D-0853-2026",
-   "render_order": 45,
+   "render_order": 48,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5191,7 +5470,7 @@
   },
   {
    "id": "D-0864-2026",
-   "render_order": 46,
+   "render_order": 49,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

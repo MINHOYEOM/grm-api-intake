@@ -21,11 +21,11 @@
    "동화약품, 니트로소불순물(N-nitroso-meglumine) 초과로 리나디엠메트서방정 2개 함량 회수"
   ],
   "coverage": {
-   "intake_total": 89,
-   "rendered": 36,
+   "intake_total": 90,
+   "rendered": 37,
    "evidence": {
     "A": 29,
-    "B": 7,
+    "B": 8,
     "C": 0
    }
   },
@@ -615,8 +615,84 @@
    }
   },
   {
-   "id": "fda483-193419",
+   "id": "62f42a5dae53",
    "render_order": 4,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 2,
+   "signal_label": "Med",
+   "type_tag": "CGMP",
+   "headline_target": "Yangzhou Hongshengding Chemical Co., Ltd.",
+   "title_issue": "704(a)(4) 기록 요구 무응답",
+   "summary": "FDA가 OTC 의약품 제조소로 등록된 중국 Yangzhou Hongshengding Chemical Co., Ltd.에 경고서한을 발부했다. 704(a)(4)에 따른 기록·정보 요구에 응하지 않아 FD&C Act 301(e)의 금지행위에 해당한다고 봤다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-30"
+    },
+    {
+     "label": "문서번호",
+     "value": "62f42a5dae53"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Yangzhou Hongshengding Chemical Co., Ltd."
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/15/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "지적: 2026년 1월 20일 이후 이메일·서면 기록 요구에 무응답, 미국 대리인의 기한 연장 요청 뒤에도 미제출",
+    "판단: 기록 접근 거부는 FD&C Act 301(e) 금지행위, 품질보증 수준을 확인할 근거 없음",
+    "수입경보: Import Alert 66-79 등재(2026년 6월 3일)",
+    "발행 부서/일자: Center for Drug Evaluation and Research (CDER) · 06/15/2026"
+   ],
+   "implication": "FDA가 실사 없이 704(a)(4) 기록 요구 무응답만으로 해외 제조소의 전 제품을 수입경보에 올린 사례다. 해외 OTC·원료 공급처가 FDA 기록 요구에 응답할 체계를 갖췄는지, Import Alert 등재 여부를 확인해 둘 필요가 있다.",
+   "checks": [
+    "해외 공급처의 Import Alert 등재 여부 모니터링",
+    "FDA 기록 요구 접수·회신 담당과 연락처 최신화",
+    "미국 대리인과의 규제 서신 전달 경로"
+   ],
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/yangzhou-hongshengding-chemical-co-ltd-729710-06152026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   },
+   "en": {
+    "title_issue": "No response to 704(a)(4) records requests",
+    "summary": "FDA issued a Warning Letter to Yangzhou Hongshengding Chemical Co., Ltd. in China, registered as an OTC drug manufacturer, finding that its failure to respond to records requests under section 704(a)(4) is a prohibited act under section 301(e) of the FD&C Act.",
+    "implication": "FDA placed all products of an overseas site on an import alert solely because it did not answer 704(a)(4) records requests, without an inspection. It is worth confirming that overseas OTC and API suppliers can respond to FDA records requests and checking whether they are on an import alert.",
+    "key_facts": [
+     "Finding: no response to email and written records requests from January 20, 2026, and no records provided even after the U.S. Agent asked for an extension",
+     "Determination: refusing access to records is a prohibited act under section 301(e), leaving FDA no indication of the level of quality assurance",
+     "Import Alert 66-79 placement on June 3, 2026",
+     "Issuing office and date: Center for Drug Evaluation and Research (CDER), 06/15/2026"
+    ],
+    "checks": [
+     "Monitoring whether overseas suppliers are on an import alert",
+     "Up-to-date contact and owner for receiving and answering FDA records requests",
+     "Route for regulatory correspondence with the U.S. Agent"
+    ]
+   }
+  },
+  {
+   "id": "fda483-193419",
+   "render_order": 5,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -755,7 +831,7 @@
   },
   {
    "id": "93182856dcda",
-   "render_order": 5,
+   "render_order": 6,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -827,7 +903,7 @@
   },
   {
    "id": "admin-2026005294",
-   "render_order": 7,
+   "render_order": 8,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -939,7 +1015,7 @@
   },
   {
    "id": "admin-2026005254",
-   "render_order": 8,
+   "render_order": 9,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1041,7 +1117,7 @@
   },
   {
    "id": "admin-2026005214",
-   "render_order": 9,
+   "render_order": 10,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1143,7 +1219,7 @@
   },
   {
    "id": "admin-2026005134",
-   "render_order": 10,
+   "render_order": 11,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1245,7 +1321,7 @@
   },
   {
    "id": "gmpinspect-1PyJBfLEtwC",
-   "render_order": 11,
+   "render_order": 12,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1471,7 +1547,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asL5S",
-   "render_order": 12,
+   "render_order": 13,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1548,7 +1624,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asNCa",
-   "render_order": 13,
+   "render_order": 14,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1625,7 +1701,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asOMf",
-   "render_order": 14,
+   "render_order": 15,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1702,7 +1778,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asSGJ",
-   "render_order": 15,
+   "render_order": 16,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1779,7 +1855,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asUDD",
-   "render_order": 16,
+   "render_order": 17,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1856,7 +1932,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asWoD",
-   "render_order": 17,
+   "render_order": 18,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1937,7 +2013,7 @@
   },
   {
    "id": "gmpinspect-1PyLW-asYv7",
-   "render_order": 18,
+   "render_order": 19,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -2014,7 +2090,7 @@
   },
   {
    "id": "data0011-15874",
-   "render_order": 19,
+   "render_order": 20,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -2086,7 +2162,7 @@
   },
   {
    "id": "recall-a4ca19db4e52",
-   "render_order": 20,
+   "render_order": 21,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2173,7 +2249,7 @@
   },
   {
    "id": "recall-d3e479b8f155",
-   "render_order": 22,
+   "render_order": 23,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2256,7 +2332,7 @@
   },
   {
    "id": "recall-5cb847f79512",
-   "render_order": 23,
+   "render_order": 24,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2340,7 +2416,7 @@
   },
   {
    "id": "recall-74aef91e1df5",
-   "render_order": 24,
+   "render_order": 25,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2424,7 +2500,7 @@
   },
   {
    "id": "recall-b6baa101018b",
-   "render_order": 26,
+   "render_order": 27,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2507,7 +2583,7 @@
   },
   {
    "id": "recall-f6e0aa34a0c2",
-   "render_order": 27,
+   "render_order": 28,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2591,7 +2667,7 @@
   },
   {
    "id": "recall-32d883703cb1",
-   "render_order": 28,
+   "render_order": 29,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2675,7 +2751,7 @@
   },
   {
    "id": "recall-60a00ffadd4c",
-   "render_order": 29,
+   "render_order": 30,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -2758,7 +2834,7 @@
   },
   {
    "id": "hc-82272",
-   "render_order": 30,
+   "render_order": 31,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -2845,7 +2921,7 @@
   },
   {
    "id": "D-0588-2026",
-   "render_order": 31,
+   "render_order": 32,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -2966,7 +3042,7 @@
   },
   {
    "id": "D-0589-2026",
-   "render_order": 32,
+   "render_order": 33,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3078,7 +3154,7 @@
   },
   {
    "id": "D-0593-2026",
-   "render_order": 36,
+   "render_order": 37,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3186,7 +3262,7 @@
   },
   {
    "id": "D-0594-2026",
-   "render_order": 37,
+   "render_order": 38,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3312,7 +3388,7 @@
   },
   {
    "id": "D-0596-2026",
-   "render_order": 38,
+   "render_order": 39,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3438,7 +3514,7 @@
   },
   {
    "id": "D-0600-2026",
-   "render_order": 39,
+   "render_order": 40,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3572,7 +3648,7 @@
   },
   {
    "id": "D-0610-2026",
-   "render_order": 46,
+   "render_order": 47,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -3698,7 +3774,7 @@
   },
   {
    "id": "D-0629-2026",
-   "render_order": 47,
+   "render_order": 48,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

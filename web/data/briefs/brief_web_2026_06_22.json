@@ -23,11 +23,11 @@
   ],
   "tldr": [],
   "coverage": {
-   "intake_total": 36,
-   "rendered": 36,
+   "intake_total": 37,
+   "rendered": 37,
    "evidence": {
     "A": 15,
-    "B": 21,
+    "B": 22,
     "C": 0
    }
   },
@@ -251,8 +251,92 @@
    }
   },
   {
-   "id": "fda483-192439",
+   "id": "dce82d3cf578",
    "render_order": 4,
+   "group": "글로벌",
+   "group_label": "▫️ 기타",
+   "agency": "FDA",
+   "card_type": "Warning Letter",
+   "category": "Warning Letter",
+   "modality": null,
+   "evidence_level": "B",
+   "signal_tier": 3,
+   "signal_label": "High",
+   "type_tag": "CGMP",
+   "headline_target": "Sante Manufacturing Inc.",
+   "title_issue": "고위험 원료 확인시험 누락",
+   "summary": "FDA가 OTC 의약품 제조소 Sante Manufacturing Inc.에 CGMP 위반으로 경고서한을 발부했다. 오염 고위험 원료를 입고 로트마다 확인시험하지 않고 공급업체 COA에 의존한 점이 첫 위반으로 지적됐다.",
+   "facts": [
+    {
+     "label": "발행일",
+     "value": "2026-06-16"
+    },
+    {
+     "label": "문서번호",
+     "value": "dce82d3cf578"
+    },
+    {
+     "label": "업체/제조소",
+     "value": "Sante Manufacturing Inc."
+    },
+    {
+     "label": "발행 부서/일자",
+     "value": "Center for Drug Evaluation and Research (CDER) · 06/05/2026"
+    }
+   ],
+   "quotes": [],
+   "evidence_basis": "공식 인덱스 + 보조 출처",
+   "key_facts": [
+    "위반 1: 고위험 원료 확인시험 미실시 및 공급업체 COA 신뢰성 미검증(21 CFR 211.84(d)(1))",
+    "위반 2: 원료로 쓰는 (b)(4) 시스템의 적격성 평가·모니터링 미입증(21 CFR 211.100(a))",
+    "위반 3: 품질부서의 안정성 프로그램 등 감독 책임 미이행(21 CFR 211.22)",
+    "수입경보: Import Alert 66-40 등재(2026년 4월 27일)"
+   ],
+   "implication": "오염 고위험 원료를 COA만 믿고 받아들인 점이 다시 첫 위반으로 올라왔다. 이 시기 OTC 경고서한에서 같은 지적이 반복되는 만큼, 고위험 원료의 로트별 확인시험과 공급업체 성적서 검증 근거가 갖춰져 있는지 볼 만하다.",
+   "checks": [
+    "고위험 원료 입고 로트별 확인시험 기록",
+    "공급업체 COA 신뢰성 초기·주기 검증 근거",
+    "원료로 쓰는 용수 시스템의 적격성 평가·모니터링"
+   ],
+   "deterministic_detail": {
+    "type": "wl_violations",
+    "count": 3,
+    "violations": [
+     {
+      "number": "1",
+      "statement": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)).",
+      "citation": "21 CFR 211.84(d)(1)",
+      "statement_ko": "귀사는 의약품의 각 구성성분에 대해 확인(identity)을 검증하는 시험을 최소 1개 이상 수행하지 않았다. 또한 귀사는 구성성분 공급업체의 시험 분석 결과를 적절한 주기로 밸리데이션하여 그 신뢰성을 확립하지 않았다 (21 CFR 211.84(d)(1) and 211.84(d)(2))."
+     },
+     {
+      "number": "2",
+      "statement": "Your firm failed to establish adequate written procedures for production and process control designed to assure that the drug products you manufacture have the identity, strength, quality, and purity they purport or are represented to possess (21 CFR 211.100(a)).",
+      "citation": "21 CFR 211.100(a)",
+      "statement_ko": "귀사는 제조하는 의약품이 표시하거나 표방하는 확인(identity)·함량(strength)·품질(quality)·순도(purity)를 보증하도록 설계된 생산 및 공정관리에 관한 적절한 문서화된 절차를 수립하지 않았다 (21 CFR 211.100(a))."
+     },
+     {
+      "number": "3",
+      "statement": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22).",
+      "citation": "21 CFR 211.22",
+      "statement_ko": "귀사의 품질관리부서는 제조된 의약품이 CGMP를 준수하고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 관해 설정된 규격에 적합하도록 보장할 책임을 이행하지 않았다 (21 CFR 211.22)."
+     }
+    ]
+   },
+   "merged_count": 1,
+   "merged_items": [],
+   "sources": {
+    "info_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters",
+    "official_url": "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/sante-manufacturing-inc-724931-06052026",
+    "official_is_pdf": false,
+    "link_check": {
+     "info": "pending",
+     "official": "pending"
+    }
+   }
+  },
+  {
+   "id": "fda483-192439",
+   "render_order": 5,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -307,7 +391,7 @@
   },
   {
    "id": "fda483-192443",
-   "render_order": 5,
+   "render_order": 6,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -362,7 +446,7 @@
   },
   {
    "id": "4399b537ba30",
-   "render_order": 6,
+   "render_order": 7,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -413,7 +497,7 @@
   },
   {
    "id": "2026-12237",
-   "render_order": 7,
+   "render_order": 8,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -469,7 +553,7 @@
   },
   {
    "id": "2026-12238",
-   "render_order": 8,
+   "render_order": 9,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -525,7 +609,7 @@
   },
   {
    "id": "bfa2307d43e9",
-   "render_order": 9,
+   "render_order": 10,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -576,7 +660,7 @@
   },
   {
    "id": "fda483-192871",
-   "render_order": 10,
+   "render_order": 11,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -631,7 +715,7 @@
   },
   {
    "id": "fda483-192916",
-   "render_order": 11,
+   "render_order": 12,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -686,7 +770,7 @@
   },
   {
    "id": "2026-12367",
-   "render_order": 12,
+   "render_order": 13,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -742,7 +826,7 @@
   },
   {
    "id": "2026-12443",
-   "render_order": 13,
+   "render_order": 14,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -798,7 +882,7 @@
   },
   {
    "id": "2026-12444",
-   "render_order": 14,
+   "render_order": 15,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -854,7 +938,7 @@
   },
   {
    "id": "2026-12445",
-   "render_order": 15,
+   "render_order": 16,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -910,7 +994,7 @@
   },
   {
    "id": "a539f45fec9e",
-   "render_order": 16,
+   "render_order": 17,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -961,7 +1045,7 @@
   },
   {
    "id": "1c4f028e2881",
-   "render_order": 17,
+   "render_order": 18,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -1012,7 +1096,7 @@
   },
   {
    "id": "ce1e12b61e37",
-   "render_order": 18,
+   "render_order": 19,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -1063,7 +1147,7 @@
   },
   {
    "id": "2026-12235",
-   "render_order": 19,
+   "render_order": 20,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1119,7 +1203,7 @@
   },
   {
    "id": "2026-12236",
-   "render_order": 20,
+   "render_order": 21,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1175,7 +1259,7 @@
   },
   {
    "id": "2026-12239",
-   "render_order": 21,
+   "render_order": 22,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1231,7 +1315,7 @@
   },
   {
    "id": "2026-12245",
-   "render_order": 22,
+   "render_order": 23,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1287,7 +1371,7 @@
   },
   {
    "id": "92613444e102",
-   "render_order": 23,
+   "render_order": 24,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -1338,7 +1422,7 @@
   },
   {
    "id": "c1adef04914d",
-   "render_order": 24,
+   "render_order": 25,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -1389,7 +1473,7 @@
   },
   {
    "id": "e170a70f927c",
-   "render_order": 25,
+   "render_order": 26,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "ECA",
@@ -1440,7 +1524,7 @@
   },
   {
    "id": "2026-12165",
-   "render_order": 26,
+   "render_order": 27,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1496,7 +1580,7 @@
   },
   {
    "id": "2026-12166",
-   "render_order": 27,
+   "render_order": 28,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1552,7 +1636,7 @@
   },
   {
    "id": "2026-12167",
-   "render_order": 28,
+   "render_order": 29,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1608,7 +1692,7 @@
   },
   {
    "id": "1c12afdcf673",
-   "render_order": 29,
+   "render_order": 30,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1659,7 +1743,7 @@
   },
   {
    "id": "4a58d2e02eb1",
-   "render_order": 30,
+   "render_order": 31,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1710,7 +1794,7 @@
   },
   {
    "id": "de8dbe142778",
-   "render_order": 31,
+   "render_order": 32,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1761,7 +1845,7 @@
   },
   {
    "id": "f28938fbb3d2",
-   "render_order": 32,
+   "render_order": 33,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1812,7 +1896,7 @@
   },
   {
    "id": "1bae7194b5bc",
-   "render_order": 33,
+   "render_order": 34,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -1863,7 +1947,7 @@
   },
   {
    "id": "admin-2026004434",
-   "render_order": 34,
+   "render_order": 35,
    "group": "국내",
    "group_label": null,
    "agency": "MFDS",
@@ -1923,7 +2007,7 @@
   },
   {
    "id": "hc-82222",
-   "render_order": 35,
+   "render_order": 36,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",

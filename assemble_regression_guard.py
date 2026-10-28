@@ -94,6 +94,14 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
         succ = _successor(key)
         new_text = new.get(succ or key)
         if new_text is None:
+            old_items = _bundle_items(old_cards.get(key))
+            if old_items is not None:
+                # 묶음 항목이 전부 정식 카드로 풀렸거나 범위 밖으로 제외돼 묶음 자체가 없어졌다
+                # (10-26 호 남은 7건 = 기기·식품 483 전부 제외). 묶음은 시설 목록뿐인 결정론
+                # 산출이라 수기 보정분이 없다 — 항목이 빠지는 축소와 같은 이유로 소실로 세지 않는다.
+                unbundled.append({"id": key, "now": None, "before_items": len(old_items),
+                                  "after_items": 0})
+                continue
             missing.append(key)
             continue
         if succ is not None:
@@ -141,6 +149,10 @@ def render_markdown(result: dict[str, Any], out_path: str) -> str:
             f"본문 총 길이 {result['total_delta']:+,}자. 되돌려진 내용 없음."
         )
         for row in result.get("unbundled_cards") or []:
+            if row["now"] is None:
+                lines.append(f"- 묶음 해소 `{row['id']}`: {row['before_items']}건 → 0건 — "
+                             "항목이 전부 정식 카드로 풀렸거나 범위 밖 제외")
+                continue
             moved = f" (대표 → `{row['now']}`)" if row["now"] != row["id"] else ""
             lines.append(f"- 묶음 축소 `{row['id']}`: {row['before_items']}건 → "
                          f"{row['after_items']}건{moved} — 빠진 항목은 정식 카드로 풀렸거나 범위 밖 제외")

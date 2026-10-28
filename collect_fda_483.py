@@ -2208,14 +2208,6 @@ def _signal_tier(record_type: str, establishment_type: str, excerpt: str) -> str
     return base
 
 
-# 483 양식 머리말 고지문의 법령 문구(_to_item) — 법령 이름 "Federal Food, Drug, and Cosmetic
-# Act"(excerpt 1500자 끝에서 "Cosmetic A" 로 잘리기도 한다)와 704(b) 조문 인용 "any food, drug,
-# device, or cosmetic in such establishment".
-_FDCA_NAME_RE = re.compile(
-    r"\b(?:federal\s+)?food\s*,?\s*drug\s*,?\s*(?:and|&)\s*cosmetic(?:\s+a(?:ct)?)?\b"
-    r"|\bfood\s*,\s*drug\s*,\s*device\s*,?\s*or\s+cosmetic\b", re.I)
-
-
 def _site_country(country: str, state: str) -> str:
     """Site Country(소재국) 매핑(HOLD②). Country 우선(해외), 공란+State(미국) → 'United States'.
 
@@ -2265,14 +2257,6 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     if is_out_of_scope_483(establishment_type, f"{excerpt} {obs_text}"):
         return None
     relevance = compute_relevance(company, establishment_type, record_type, excerpt)
-    if relevance == "Unrelated":
-        # [2026-10-28] 483 양식 머리말 "pursuant to section 704(b) of the Federal Food, Drug and
-        # Cosmetic Act" 가 excerpt 에 실리면 법령 이름의 'cosmetic' 이 화장품 제외 어휘로 걸려
-        # 의약품 483 이 통째로 버려졌다(실측 7건 — API·완제·시험소 483). 법령 이름은 도메인
-        # 단서가 아니므로 지우고 한 번 더 본다. 원래 판정이 Unrelated 일 때만 다시 보므로
-        # 지금 남는 문서의 판정(Likely/Possible)은 바뀌지 않는다.
-        relevance = compute_relevance(company, establishment_type, record_type,
-                                      _FDCA_NAME_RE.sub("FD&C Act", excerpt))
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
         return None
     if relevance == "Pending":

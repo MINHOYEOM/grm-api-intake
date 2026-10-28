@@ -3244,8 +3244,7 @@ class Fda483FullPageOcrFallbackTest(unittest.TestCase):
        있다 — 글자가 충분해 OCR 이 돌지 않고 관찰 0건(106455·111291·161809 …).
        스캔본에 접근성 대체문구·깨진 내장 OCR 층만 있는 경우도 같은 길로 샌다(102220 …).
     ② 스캔 OCR 이 1번 표제를 `OBSERVATION |` 로 읽으면 2번부터만 저장된다(167686·170260).
-    ③ 483 양식 머리말의 법령 이름 "Food, Drug and Cosmetic Act" 가 화장품 제외 어휘에 걸려
-       의약품 483 이 통째로 버려진다(177580·193608 …)."""
+    (양식 머리말 법령 이름이 화장품 제외어에 걸리는 게이트 오판은 #1234 가 고친다.)"""
 
     NATIVE = ("TYPE ESTABLISHMENT INSPECTED\nA non-sterile germicidal detergent is used "
               "redacted (b)(4) in the cleaning of the ISO 5 PECs.\n(b) (4)\n")
@@ -3313,32 +3312,6 @@ class Fda483FullPageOcrFallbackTest(unittest.TestCase):
                 "performed under actual conditions of use.\n")
         rows = f._extract_483_observations_from_text(text)
         self.assertEqual([r["number"] for r in rows], ["1", "2"])
-
-    NROW = {"record_type": "483", "media_id": "177580", "company": "Alkem Laboratories Limited",
-            "fei": "3006370533", "state": "", "country": "India",
-            "establishment_type": "Finished Pharmaceutical Manufacturer",
-            "record_date": "03/27/2024", "publish_date": "04/09/2024"}
-    NOTICE = ("This document lists observations made by the FDA representative(s) during the "
-              "inspection of your facility. The observations of objectionable conditions and "
-              "practices listed on the front of this form are reported: 1. Pursuant to Section "
-              "704(b) of the Federal Food, Drug and Cosmetic Act, or 2. To assist firms "
-              "inspected in complying with the Acts and regulations enforced by the Food and Drug "
-              "Administration. Section 704(b) of the Federal Food, Drug, and Cosmetic Act "
-              "(21 USC 374(b)) provides that any food, drug, device, or cosmetic in such "
-              "establishment ")
-
-    def test_statute_name_in_form_notice_does_not_drop_drug_483(self):
-        item = f._to_item(self.NROW, self.NOTICE, [], "", "pdf-ok")
-        self.assertIsNotNone(item)
-        # excerpt 1500자 끝에서 법령 이름이 잘린 형태("…Drug and Cosmetic")도 같다.
-        cut = self.NOTICE.split("Act, or")[0].replace(" Act", "")
-        self.assertIsNotNone(f._to_item(self.NROW, cut, [], "", "pdf-ok"))
-
-    def test_real_cosmetic_wording_still_drops(self):
-        """법령 이름만 지운다 — 실제 화장품 제조 서술은 종전대로 범위 밖."""
-        nrow = dict(self.NROW, company="Glow Labs", establishment_type="Manufacturer")
-        excerpt = self.NOTICE + " You manufacture cosmetic products on shared equipment."
-        self.assertIsNone(f._to_item(nrow, excerpt, [], "", "pdf-ok"))
 
     def test_marker_with_garbled_observed_enables_numbered_recovery(self):
         """`OBSERVED` 쪽이 통째로 깨진 마커(195457 "OFYOUR FIRM ayeppaserven:")."""

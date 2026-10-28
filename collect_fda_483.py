@@ -399,6 +399,11 @@ _OBS_MARKER_RECOVERY_RE = re.compile(
     r"|INSPECTION\s+OF\s+YOUR\s+FIR\w*[^\n:]{0,15}?SERVED\s*:",
     re.I,
 )
+# [2026-10-28] 마커의 "OBSERVED" 쪽이 통째로 깨진 꼴 — 실측 195435 "OF YOURFIRM wnfee)ossenven",
+# 195457 "OFYOUR FIRM ayeppaserven:", 195561 "(xe) PoseRven:". 양식 앞부분은 멀쩡하므로 그 줄
+# 끝을 마커로 쓴다. 위 마커가 **하나도 없을 때만** 쓴다(_recover_483_observations) — 지금 회수되는
+# 문서의 스코프 시작점은 바뀌지 않는다.
+_FORM_MARKER_LINE_RE = re.compile(r"DURING\s+AN\s+INSPECTION\s+OF\s*YOUR\s*FIRM[^\n]{0,30}", re.I)
 # 번호 목록 앵커 — 문장/줄 경계 뒤 "N. " + 대문자(따옴표 포함). WL 파서의
 # `_WL_NUMBERED_ITEM_RE` 와 같은 경계 요구다(조항번호 소수점 뒷자리 오탐 방지).
 _NUMBERED_OBS_RE = re.compile(r"(?:^|(?<=[.)\:])\s|\n)\s*(\d{1,2})\.\s+(?=[A-Z\"“])")
@@ -985,6 +990,33 @@ def _extract_fda483_excerpt(text: str) -> str:
     return ""
 
 
+# [2026-10-28] 483 양식 상용구 — 관련성 게이트 입력에서만 지운다(저장 excerpt·관찰 파서 불변).
+# 뒷면 Section 704(b) 인용문("any food, drug, device, or cosmetic …")과 머리 체크박스 안내문
+# ("… required 483 statement on page 1 for medical device observations.")은 모든 483 에
+# 인쇄된다. OCR excerpt 에 섞이면 제외어 `cosmetic`·`medical device` 에 걸려 boost 2개 미만인
+# 의약품 483 이 Unrelated 로 버려지고(Corixa·Linde 실측), 회수는 그걸 out-of-scope 로 찍었다.
+# 뒷면 인용문은 ~1100자라 1500자 상한 안에서 끝("Secretary.")을 찾고, excerpt 절단으로 끝이
+# 없으면 문자열 끝까지 지운다. 둘 다 아니면(OCR 훼손) 아래 구절 단위 패턴이 남은 조각을 지운다.
+_FDA483_BOILERPLATE_RES = (
+    re.compile(r"the observations of objectionable conditions and practices listed on the "
+               r"front of this form.{0,1500}?(?:sent promptly to the secretary\.?\"?|$)", re.I),
+    re.compile(r"use this check\s?box to generate", re.I),
+    re.compile(r"(?:(?:the )?required 483 statement on page \S{1,3} )?"
+               r"for medical device observations\.?", re.I),
+    re.compile(r"(?:federal )?food,? drug,? (?:and|&) cosmetic act", re.I),
+    re.compile(r"\bfd ?& ?c act\b", re.I),
+    re.compile(r"food,? drug,? device,? (?:or|and) cosmetic", re.I),
+)
+
+
+def strip_483_form_boilerplate(text: str) -> str:
+    """483 텍스트 → 양식 상용구를 지운 평탄화 텍스트(관련성 게이트 입력 전용)."""
+    compact = re.sub(r"\s+", " ", text or "").strip()
+    for pat in _FDA483_BOILERPLATE_RES:
+        compact = pat.sub(" ", compact)
+    return re.sub(r"\s+", " ", compact).strip()
+
+
 def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tuple[str, str]:
     """483 PDF fetch → 평탄화 텍스트. fetch 는 grm_common.http_get_bytes(404 포함 retry/backoff).
 
@@ -1007,7 +1039,31 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
         )
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
-    text, status = _extract_pdf_text(data, max_chars=max_chars)
+    text, status = _read_fda483_pdf_text(data, max_chars, _extract_pdf_text)
+    if not text or _extract_483_observations_from_text(text) or not _ocr_enabled():
+        return text, status
+    # [전면 OCR 폴백 2026-10-28] 본문을 읽었는데 관찰이 0건이다. 실측(findings 0건 483 79건
+    # 재현)에서 두 갈래가 확인됐다:
+    #   · 표제(`OBSERVATION n`·지적 문장)는 **벡터 윤곽선**으로 찍혀 텍스트층에 없고, 리댁션
+    #     오버레이 글자만 남은 PDF(106455·111291·161809 …) — 글자가 충분해 OCR 이 안 돈다.
+    #   · 스캔본에 접근성 대체문구("redacted text"·"FDA Form page 2")나 깨진 내장 OCR 층만
+    #     있는 PDF(102220·102644·162340 …) — 역시 "본문 있음"으로 통과한다.
+    # 두 경우 모두 **쪽 전체를 렌더링해 OCR** 하면 관찰이 나온다. 그 결과로 관찰이 1건 이상
+    # 나올 때만 채택하고, 아니면 원래 텍스트를 그대로 돌려준다 — 지금 관찰이 나오는 문서는
+    # 이 분기에 오지 않으므로 출력이 바뀌지 않는다(제어 흐름의 성질).
+    full_text, full_status = _ocr_483_pdf_text_uncounted(data, max_chars, force_all=True)
+    full_text = normalize_pdf_ligatures(full_text)
+    if full_text and _extract_483_observations_from_text(full_text):
+        _record_ocr_outcome(full_status)
+        return full_text, full_status
+    return text, status
+
+
+def _read_fda483_pdf_text(
+    data: bytes, max_chars: int, extract_pdf_text: Callable[..., tuple[str, str]],
+) -> tuple[str, str]:
+    """PDF bytes → 평탄화 텍스트(텍스트층, 필요하면 빈 쪽만 OCR). `_fetch_fda483_pdf_text` 본체."""
+    text, status = extract_pdf_text(data, max_chars=max_chars)
     text = normalize_pdf_ligatures(text)           # [2026-07-20] 서브셋 폰트 합자 복원
     if not _needs_ocr(text):
         return text, status
@@ -1086,9 +1142,13 @@ def _ocr_483_pdf_text(data: bytes, max_chars: int = FDA483_TEXT_MAX_CHARS) -> tu
     return text, status
 
 
-def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int) -> tuple[str, str]:
+def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int,
+                                force_all: bool = False) -> tuple[str, str]:
     """실제 추출 본체. 반환 경로가 여섯 갈래라 **계수는 위 래퍼가 단독으로** 맡는다 —
-    반환마다 카운터를 손으로 올리면 나중에 추가되는 경로가 반드시 하나 빠진다."""
+    반환마다 카운터를 손으로 올리면 나중에 추가되는 경로가 반드시 하나 빠진다.
+
+    `force_all` — 텍스트층이 있는 쪽도 OCR 한다(전면 OCR 폴백 전용, `_fetch_fda483_pdf_text`).
+    벡터 윤곽선 표제는 이미지가 아니라서 이미지 유무로 거르지 않는다."""
     if _OCR_BUDGET["remaining"] <= 0:
         return "", "scan-ocr-budget"
     try:
@@ -1105,7 +1165,7 @@ def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int) -> tuple[str, str]:
             natives = [page.get_text("text") for page in doc]
             boilerplate = _repeated_lines(natives)     # 쪽마다 반복되는 머리말(위 주석)
             for page, native in zip(doc, natives):
-                if _is_substantive_text(native, boilerplate):
+                if not force_all and _is_substantive_text(native, boilerplate):
                     parts.append(native)
                     continue
                 # ★여기가 32건을 실제로 막던 지점이다. 종전 조건은 `native.strip()` 이라
@@ -1113,7 +1173,7 @@ def _ocr_483_pdf_text_uncounted(data: bytes, max_chars: int) -> tuple[str, str]:
                 #   15쪽 전부, 193692 는 4쪽 전부가 그렇게 통과했다. `_needs_ocr` 만 고치고
                 #   여기를 두면 OCR 은 켜지되 **모든 페이지를 건너뛴다.**
                 has_artifact_text = bool(native.strip())
-                if has_artifact_text and not page.get_images(full=True):
+                if not force_all and has_artifact_text and not page.get_images(full=True):
                     # 아티팩트뿐인데 이미지도 없다 = OCR 이 살릴 것이 없다. 예산을 쓰지
                     # 않고 원문을 그대로 둔다(종전 산출과 동일).
                     parts.append(native)
@@ -1745,6 +1805,15 @@ def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:
     }
 
 
+# 줄 머리 표제가 `Observation 1. There is…` 처럼 번호 뒤 마침표로 끝나는 꼴(실측 116184).
+# 상호참조("…refer to Observation 3.")는 줄 중간에 오므로 줄 머리일 때만 마침표를 걷는다.
+_LINE_HEAD_DOT_RE = re.compile(r"\.[ \t]+(?-i:[A-Z])")
+
+
+def _at_line_start(body: str, pos: int) -> bool:
+    return not body[max(0, body.rfind("\n", 0, pos) + 1):pos].strip()
+
+
 def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list[re.Match[str]]:
     """`OBSERVATION N` 매치 중 **진짜 항목 표제**만 남긴다(순수 함수).
 
@@ -1786,7 +1855,10 @@ def _select_observation_anchors(body: str, matches: list[re.Match[str]]) -> list
         if _XREF_PREFIX_RE.search(before) and not _XREF_FORMPRINT_RE.search(before):
             continue                                   # ① 문장 속 상호참조
         nxt = matches[i + 1].start() if i + 1 < len(matches) else len(body)
-        head, _ = _first_sentence(body[m.end():nxt].lstrip(" :\t\r\n"))
+        after = body[m.end():nxt]
+        if _LINE_HEAD_DOT_RE.match(after) and _at_line_start(body, m.start()):
+            after = after.lstrip(" .")             # 줄 머리 `Observation 1. There is…` 꼴
+        head, _ = _first_sentence(after.lstrip(" :\t\r\n"))
         if len(re.sub(r"[^A-Za-z]", "", head)) < _HEADING_MIN_ALPHA:
             continue                                   # ② 뒤따르는 실질 문장 없음
         first_alpha = next((c for c in head if c.isalpha()), "")
@@ -1829,7 +1901,8 @@ def _extract_483_observations_from_text(
     scoped = _scope_to_observation_list(body)
     primary = _observations_from_anchors(
         _cut_at_annotations(scoped),
-        lambda s: _select_observation_anchors(s, list(_OBS_RE.finditer(s))),
+        lambda s: _with_glyph_first_anchor(
+            s, _select_observation_anchors(s, list(_OBS_RE.finditer(s)))),
         hints,
         gate=_is_publishable_deficiency,
     )
@@ -1839,6 +1912,22 @@ def _extract_483_observations_from_text(
     # 오늘 관찰이 **0건인 문서에만** 도달한다(위에서 1건이라도 나오면 그대로 반환했다) —
     # 정상 문서 1,545개의 출력이 byte 단위로 불변임을 측정이 아니라 구조로 보장한다.
     return _recover_483_observations(body, m, hints)
+
+
+def _with_glyph_first_anchor(body: str, anchors: list[re.Match[str]]) -> list[re.Match[str]]:
+    """첫 숫자 표제가 `OBSERVATION 2` 이고 그 앞에 글리프 표제(`OBSERVATION |`)가 있으면 앞에 붙인다.
+
+    스캔 OCR 이 `1` 을 `I`·`l`·`|` 로 읽는 문제는 회수 경로(②b)가 이미 다루지만, 그 경로는
+    관찰이 **0건**인 문서에서만 돈다. 2번부터는 숫자로 읽힌 문서는 정상 경로로 가므로 1번만
+    소리 없이 빠졌다(실측 167686·170260 — 관찰 2·3 만 저장). 첫 숫자 표제가 2 일 때만, 그 앞
+    구간에서만 찾으므로 1번이 이미 있는 문서의 출력은 바뀌지 않는다.
+    """
+    if not anchors or anchors[0].group(1) != "2":
+        return anchors
+    glyph = _OBS_GLYPH_NUM_RE.search(body, 0, anchors[0].start())
+    if glyph is None:
+        return anchors
+    return [glyph, *anchors]
 
 
 def _scope_to_observation_list(body: str) -> str:
@@ -1892,7 +1981,10 @@ def _observations_from_anchors(
     for i, obs in enumerate(matches):
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
-        chunk = _clean_observation_chunk(_skip_pagebreak_block(body[start:end]))
+        seg = body[start:end]
+        if _LINE_HEAD_DOT_RE.match(seg) and _at_line_start(body, obs.start()):
+            seg = seg.lstrip(" .")                 # 줄 머리 `Observation 1. There is…` 꼴
+        chunk = _clean_observation_chunk(_skip_pagebreak_block(seg))
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
         # [표제 선행 잡음] **모든 경로**에 적용한다(회수 경로 전용 게이트와 달리) — OCR 로
@@ -1905,7 +1997,8 @@ def _observations_from_anchors(
         clean_detail = _clean_observation_detail(detail)
         clean_detail = gf.strip_fda483_page_header(clean_detail, **hints)
         row = {
-            "number": obs.group(1),
+            # 글리프 표제(`OBSERVATION |`)는 언제나 1번이다(_OBS_GLYPH_NUM_RE 주석).
+            "number": obs.group(1) if obs.group(1).isdigit() else "1",
             "deficiency": deficiency,
             "detail": clean_detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),
         }
@@ -1961,6 +2054,8 @@ def _recover_483_observations(
     #     0건일 때만 다른 마커로 한 번 더 돈다. 지금 무언가를 내고 있는 문서는 첫 패스에서
     #     그대로 반환되므로 **회귀가 구조적으로 불가능**하다(측정이 아니라 제어 흐름의 성질).
     recovery = _OBS_MARKER_RECOVERY_RE.search(body)
+    if we_observed is None and recovery is None:
+        recovery = _FORM_MARKER_LINE_RE.search(body)
     for marker in _marker_candidates(we_observed, recovery):
         found = _run_recovery_ladder(body, marker, hints, gate)
         if found:
@@ -2018,7 +2113,7 @@ def _run_recovery_ladder(
     found = _observations_from_anchors(
         scoped, lambda s: list(_NUMBERED_OBS_RE.finditer(s)), hints, gate=gate)
     if found:
-        return found
+        return _repair_ocr_leading_digit(found)
 
     # ④ 닫는 괄호 번호(`1)` · `1.)`). ③ 이 0건일 때만 — 한 문서가 두 양식을 섞어 쓰지
     # 않으므로 순서대로 시도하면 충분하고, 서로의 오탐을 만들지 않는다.
@@ -2031,6 +2126,25 @@ def _run_recovery_ladder(
     #   곧 지적문인데 ②③④ 는 전부 **번호를 전제**해 아무것도 못 잡는다(실측 36건).
     #   여기까지 왔다는 것은 정상 경로와 ①~④ 가 **모두 0건**이라는 뜻이다.
     return _single_unnumbered_observation(scoped, hints, gate)
+
+
+def _repair_ocr_leading_digit(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """번호 목록 회수(③)에서 OCR 이 앞에 군더더기 `1` 을 붙인 두 자리 번호를 바로잡는다.
+
+    실측 195561: `3.` 이 `13.` 으로 읽혀 관찰 번호가 13·4·6 이 됐다. 다음 번호보다 큰 두 자리
+    번호이고 끝자리가 이전·다음 번호 사이에 들어갈 때만 끝자리로 바꾼다 — 번호가 이미 오름차순인
+    문서는 손대지 않는다.
+    """
+    nums = [int(r["number"]) if r["number"].isdigit() else None for r in rows]
+    for i, n in enumerate(nums):
+        if n is None or n < 10 or i + 1 >= len(nums) or nums[i + 1] is None:
+            continue
+        nxt = nums[i + 1]
+        prev = next((p for p in reversed(nums[:i]) if p is not None), 0)
+        if n > nxt and prev < n % 10 < nxt:
+            rows[i] = {**rows[i], "number": str(n % 10)}
+            nums[i] = n % 10
+    return rows
 
 
 # [글리프 오인식 표제] 스캔 OCR 이 표제 번호 `1` 을 글자 `I`·`l`·`|` 로 읽는다. 단어 자체도
@@ -2160,16 +2274,19 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     record_date = nrow["record_date"]                    # 실사일(원문 MM/DD/YYYY 유지)
     publish_iso = _parse_mdy(nrow["publish_date"])
 
-    # 노이즈/관련성 게이트 — gate_blob 으로 도메인 판정.
-    gate_blob = " ".join([company, establishment_type, country, record_type, excerpt])
+    # 노이즈/관련성 게이트 — gate_blob 으로 도메인 판정. 입력에서 양식 상용구를 먼저 지운다
+    # (뒷면 704(b) 인용문의 cosmetic·체크박스의 medical device 가 의약품 483 을 버리던 결함).
+    gate_excerpt = strip_483_form_boilerplate(excerpt)
+    gate_blob = " ".join([company, establishment_type, country, record_type, gate_excerpt])
     if _kw_any(gate_blob.lower(), QA_HARD_EXCLUDE_TERMS):   # 수의/동물용 하드 드롭
         return None
     # [2026-10-26] 시설 유형·관찰 본문으로 범위 밖(혈액·조직·임상·식품·기기) 드롭.
     obs_text = " ".join(f"{o.get('deficiency', '')} {o.get('detail', '')}"
                         for o in (observations or []))
-    if is_out_of_scope_483(establishment_type, f"{excerpt} {obs_text}"):
+    if is_out_of_scope_483(establishment_type,
+                           f"{gate_excerpt} {strip_483_form_boilerplate(obs_text)}"):
         return None
-    relevance = compute_relevance(company, establishment_type, record_type, excerpt)
+    relevance = compute_relevance(company, establishment_type, record_type, gate_excerpt)
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
         return None
     if relevance == "Pending":

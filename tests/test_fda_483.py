@@ -1178,6 +1178,11 @@ _NOTICE_ONLY = (
 )
 
 
+# 관찰이 실제로 추출되는 텍스트층 483 (전면 OCR 폴백이 돌지 않는 조건).
+_REAL_483 = ("OBSERVATION 1\nWritten procedures for cleaning and maintenance of equipment "
+             "are not followed.")
+
+
 class ScannedPdfOcrFallbackTest(unittest.TestCase):
     """[스캔 483 OCR 2026-07-27] 뒷장 고지문만 있는 스캔본을 '정상 텍스트 PDF' 로 오분류하던
     구멍과 그 OCR 폴백. 이 오분류가 2026-07-27 디제스트 오발행("원문이 제공되지 않아")의
@@ -1245,12 +1250,13 @@ class ScannedPdfOcrFallbackTest(unittest.TestCase):
             raise AssertionError("OCR 이 호출되면 안 된다")
         with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 real"), \
                 patch.object(g, "_extract_pdf_text",
-                             lambda data, max_chars=None: ("OBSERVATION 1 real", "pdf-ok")), \
+                             lambda data, max_chars=None: (_REAL_483, "pdf-ok")), \
                 patch.object(f, "_ocr_483_pdf_text", _boom), \
+                patch.object(f, "_ocr_483_pdf_text_uncounted", _boom), \
                 patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
             text, status = f._fetch_fda483_pdf_text("https://x/media/1/download")
         self.assertEqual(status, "pdf-ok")
-        self.assertEqual(text, "OBSERVATION 1 real")
+        self.assertEqual(text, _REAL_483)
 
     def test_ocr_engine_missing_degrades_gracefully(self):
         """PyMuPDF/tesseract 부재는 수집을 멈추지 않는다 — 사유만 남는다."""
@@ -3229,3 +3235,114 @@ class Fda483ZeroObservationRecoveryTest(unittest.TestCase):
         self.assertTrue(grm_taxonomy.is_out_of_scope_483("", body))
         self.assertFalse(grm_taxonomy.is_out_of_scope_483(
             "", body + " The API supplier qualification for drug substance was inadequate."))
+
+
+class Fda483FullPageOcrFallbackTest(unittest.TestCase):
+    """[2026-10-28] findings 0건 483 79건 재현에서 나온 원인 셋(전부 실측).
+
+    ① 표제(`OBSERVATION n`·지적 문장)가 벡터 윤곽선이라 텍스트층엔 리댁션 오버레이 글자만
+       있다 — 글자가 충분해 OCR 이 돌지 않고 관찰 0건(106455·111291·161809 …).
+       스캔본에 접근성 대체문구·깨진 내장 OCR 층만 있는 경우도 같은 길로 샌다(102220 …).
+    ② 스캔 OCR 이 1번 표제를 `OBSERVATION |` 로 읽으면 2번부터만 저장된다(167686·170260).
+    (양식 머리말 법령 이름이 화장품 제외어에 걸리는 게이트 오판은 #1234 가 고친다.)"""
+
+    NATIVE = ("TYPE ESTABLISHMENT INSPECTED\nA non-sterile germicidal detergent is used "
+              "redacted (b)(4) in the cleaning of the ISO 5 PECs.\n(b) (4)\n")
+    OCR = ("DURING AN INSPECTION OF YOUR FIRM I OBSERVED:\nOBSERVATION 1\n"
+           "Disinfecting agents used in the ISO 5 area are not sterile. Specifically,\n"
+           "A non-sterile germicidal detergent is used in the cleaning of the ISO 5 PECs.\n")
+
+    def _fetch(self, native, forced):
+        calls = []
+
+        def _forced(data, max_chars, force_all=False):
+            calls.append(force_all)
+            return forced
+        with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 vector"), \
+                patch.object(g, "_extract_pdf_text",
+                             lambda data, max_chars=None: (native, "pdf-ok")), \
+                patch.object(f, "_ocr_483_pdf_text_uncounted", _forced), \
+                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "true"}):
+            text, status = f._fetch_fda483_pdf_text("https://x/media/1/download")
+        return text, status, calls
+
+    def test_text_without_observations_falls_back_to_full_page_ocr(self):
+        text, status, calls = self._fetch(self.NATIVE, (self.OCR, "pdf-ok-ocr"))
+        self.assertEqual(calls, [True])
+        self.assertEqual(status, "pdf-ok-ocr")
+        self.assertEqual([r["number"] for r in f._extract_483_observations_from_text(text)],
+                         ["1"])
+
+    def test_full_page_ocr_without_observations_keeps_native_text(self):
+        """OCR 로도 관찰이 안 나오면 원래 텍스트를 그대로 둔다(덮어쓰기 금지)."""
+        text, status, calls = self._fetch(self.NATIVE, ("unrelated words only", "pdf-ok-ocr"))
+        self.assertEqual(calls, [True])
+        self.assertEqual((text, status), (self.NATIVE, "pdf-ok"))
+
+    def test_text_with_observations_never_runs_full_page_ocr(self):
+        text, status, calls = self._fetch(self.OCR, (self.NATIVE, "pdf-ok-ocr"))
+        self.assertEqual(calls, [])
+        self.assertEqual((text, status), (self.OCR, "pdf-ok"))
+
+    def test_ocr_disabled_skips_full_page_ocr(self):
+        def _boom(*a, **k):
+            raise AssertionError("OCR 비활성인데 호출됐다")
+        with patch.object(f, "http_get_bytes", lambda *a, **k: b"%PDF-1.7 vector"), \
+                patch.object(g, "_extract_pdf_text",
+                             lambda data, max_chars=None: (self.NATIVE, "pdf-ok")), \
+                patch.object(f, "_ocr_483_pdf_text_uncounted", _boom), \
+                patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "false"}):
+            self.assertEqual(f._fetch_fda483_pdf_text("https://x/media/1/download"),
+                             (self.NATIVE, "pdf-ok"))
+
+    def test_glyph_first_heading_is_observation_one(self):
+        text = ("DURING AN INSPECTION OF YOUR FIRM (I) (WE) OBSERVED:\nOBSERVATION |\n"
+                "Aseptic processing areas for the filling line are deficient regarding air "
+                "flow.\nOBSERVATION 2\nYour firm's efficacy study for the disinfectant was not "
+                "performed under actual conditions of use.\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertTrue(rows[0]["deficiency"].startswith("Aseptic processing areas"))
+
+    def test_glyph_heading_ignored_when_observation_one_is_numeric(self):
+        """1번이 숫자로 읽힌 문서는 손대지 않는다 — 산문 속 `OBSERVATION I …` 오탐 방지."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED:\nOBSERVATION 1\n"
+                "Aseptic processing areas for the filling line are deficient regarding air "
+                "flow.\nOBSERVATION 2\nYour firm's efficacy study for the disinfectant was not "
+                "performed under actual conditions of use.\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    def test_marker_with_garbled_observed_enables_numbered_recovery(self):
+        """`OBSERVED` 쪽이 통째로 깨진 마커(195457 "OFYOUR FIRM ayeppaserven:")."""
+        text = ("DURING AN INSPECTION OFYOUR FIRM ayeppaserven:\n"
+                "1. Investigations are not closed in a timely manner as required by the "
+                "deviation management procedure.\n"
+                "2. Quality agreements are deficient in that they do not accurately specify the "
+                "services provided by the supplier.\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+
+    def test_ocr_leading_one_on_numbered_heading_is_repaired(self):
+        """`3.` 이 `13.` 으로 읽힌 번호(195561) — 끝자리가 앞뒤 사이에 들 때만 바로잡는다."""
+        rows = [{"number": n, "deficiency": "x", "detail": ""} for n in ("13", "4", "6")]
+        self.assertEqual([r["number"] for r in f._repair_ocr_leading_digit(rows)],
+                         ["3", "4", "6"])
+        ok = [{"number": n, "deficiency": "x", "detail": ""} for n in ("9", "10", "11")]
+        self.assertEqual([r["number"] for r in f._repair_ocr_leading_digit(ok)],
+                         ["9", "10", "11"])
+
+    def test_line_head_heading_with_trailing_dot(self):
+        """줄 머리 `Observation 1. There is…`(116184) — 번호 뒤 마침표를 상호참조로 오인하지 않는다."""
+        text = ("DURING AN INSPECTION OF YOUR FIRM WE OBSERVED:\n"
+                "Observation 1. There is an unacceptably high number of mold recoveries in the "
+                "classified rooms.\nObservation 2. Written procedures to prevent contamination of "
+                "drug substance are not followed.\n")
+        rows = f._extract_483_observations_from_text(text)
+        self.assertEqual([r["number"] for r in rows], ["1", "2"])
+        self.assertTrue(rows[0]["deficiency"].startswith("There is an unacceptably"))
+        # 줄 중간 상호참조 뒤 마침표는 종전대로 표제가 아니다.
+        xref = ("OBSERVATION 1\nThe cleaning procedure was not followed, as noted in "
+                "Observation 2. The quality unit did not review it.\n")
+        self.assertEqual([r["number"] for r in f._extract_483_observations_from_text(xref)],
+                         ["1"])

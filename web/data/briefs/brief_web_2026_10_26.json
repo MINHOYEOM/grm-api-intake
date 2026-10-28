@@ -24,10 +24,10 @@
   ],
   "coverage": {
    "intake_total": 276,
-   "rendered": 140,
+   "rendered": 139,
    "evidence": {
     "A": 41,
-    "B": 99,
+    "B": 98,
     "C": 0
    },
    "resources": 5
@@ -7584,93 +7584,8 @@
    }
   },
   {
-   "id": "fda483-195255",
-   "render_order": 51,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "BioSensics LLC",
-   "title_issue": "483 실사기록 다건 공개",
-   "summary": "FDA OII FOIA 전자열람실에 483 실사기록 7건이 공개됐다. 원문 PDF 는 공개돼 있으나 개별 관찰 본문을 자동으로 확보하지 못해 시설·실사일 목록만 정리했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-10-20"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-195255"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "BioSensics LLC · FEI 3010331770"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "02/09/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "공개 건수: 7건 (관찰 본문 자동 확보 실패 — 원문 PDF 는 공개돼 있음)",
-    "대표 시설: BioSensics LLC · FEI 3010331770 외 6곳",
-    "출처: FDA OII FOIA 전자열람실"
-   ],
-   "implication": "관찰 본문을 확보하지 못한 실사기록 공개는 그 자체로 조치 신호는 아니다. 국내 업체는 목록에 자사 공급망 시설이 있는지 확인하고, 있으면 원문(PDF)을 직접 열람할 필요가 있다.",
-   "checks": [
-    "목록에 자사 공급망·수급처 시설이 있는지 확인",
-    "해당 시 FDA FOIA 원문(PDF) 직접 열람"
-   ],
-   "merged_count": 7,
-   "merged_items": [
-    "BioSensics LLC · FEI 3010331770 · 실사 02/09/2026",
-    "Gobiquity, Inc. · FEI 3010539401 · 실사 02/12/2026",
-    "Viant San Antonio, Inc. · FEI 3003640911 · 실사 03/19/2026",
-    "Solomon Park Research Laboratories, Inc. · FEI 3023437 · 실사 01/08/2026",
-    "Hatch Product Development LLC · FEI 3030438338 · 실사 12/11/2025",
-    "Krispy Kreme Doughnut Corporation · FEI 1081922 · 실사 07/17/2024",
-    "SALUDA MEDICAL PTY. LTD. · FEI 3021836309 · 실사 05/16/2025"
-   ],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/195255/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Form 483 inspection record released",
-    "summary": "FDA's OII FOIA Electronic Reading Room released a Form 483 for the 02/09/2026 inspection of BioSensics LLC.",
-    "implication": "This is a public record of an FDA inspection at a Manufacturer facility. Korean firms sourcing from this site may want to factor the observations in the public PDF into supplier evaluation.",
-    "key_facts": [
-     "Facility: BioSensics LLC - FEI 3010331770",
-     "Facility type: Manufacturer",
-     "Inspection date: 02/09/2026"
-    ],
-    "checks": [
-     "Whether the site is part of your supply chain",
-     "Review of observations in the public Form 483 PDF"
-    ]
-   },
-   "merged_noun": "건"
-  },
-  {
    "id": "fda483-195258",
-   "render_order": 52,
+   "render_order": 51,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7808,7 +7723,7 @@
   },
   {
    "id": "fda483-195260",
-   "render_order": 53,
+   "render_order": 52,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7916,7 +7831,7 @@
   },
   {
    "id": "fda483-195262",
-   "render_order": 54,
+   "render_order": 53,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8006,7 +7921,7 @@
   },
   {
    "id": "fda483-195263",
-   "render_order": 55,
+   "render_order": 54,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8098,7 +8013,7 @@
   },
   {
    "id": "fda483-195264",
-   "render_order": 56,
+   "render_order": 55,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8198,7 +8113,7 @@
   },
   {
    "id": "fda483-195265",
-   "render_order": 57,
+   "render_order": 56,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8299,7 +8214,7 @@
   },
   {
    "id": "fda483-195277",
-   "render_order": 58,
+   "render_order": 57,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8476,7 +8391,7 @@
   },
   {
    "id": "fda483-195278",
-   "render_order": 59,
+   "render_order": 58,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8595,7 +8510,7 @@
   },
   {
    "id": "fda483-195279",
-   "render_order": 60,
+   "render_order": 59,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8685,7 +8600,7 @@
   },
   {
    "id": "fda483-195280",
-   "render_order": 61,
+   "render_order": 60,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8810,7 +8725,7 @@
   },
   {
    "id": "fda483-195281",
-   "render_order": 62,
+   "render_order": 61,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8930,7 +8845,7 @@
   },
   {
    "id": "fda483-195282",
-   "render_order": 63,
+   "render_order": 62,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9128,7 +9043,7 @@
   },
   {
    "id": "fda483-195284",
-   "render_order": 64,
+   "render_order": 63,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9266,7 +9181,7 @@
   },
   {
    "id": "fda483-195285",
-   "render_order": 65,
+   "render_order": 64,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9398,7 +9313,7 @@
   },
   {
    "id": "fda483-195286",
-   "render_order": 66,
+   "render_order": 65,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9518,7 +9433,7 @@
   },
   {
    "id": "fda483-195287",
-   "render_order": 67,
+   "render_order": 66,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9674,7 +9589,7 @@
   },
   {
    "id": "fda483-195289",
-   "render_order": 68,
+   "render_order": 67,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9799,7 +9714,7 @@
   },
   {
    "id": "fda483-195591",
-   "render_order": 69,
+   "render_order": 68,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9928,7 +9843,7 @@
   },
   {
    "id": "fda483-195592",
-   "render_order": 70,
+   "render_order": 69,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10036,7 +9951,7 @@
   },
   {
    "id": "fda483-195595",
-   "render_order": 71,
+   "render_order": 70,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10186,7 +10101,7 @@
   },
   {
    "id": "fda483-195601",
-   "render_order": 72,
+   "render_order": 71,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10292,7 +10207,7 @@
   },
   {
    "id": "fda483-195627",
-   "render_order": 73,
+   "render_order": 72,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10447,7 +10362,7 @@
   },
   {
    "id": "fda483-195673",
-   "render_order": 74,
+   "render_order": 73,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10625,7 +10540,7 @@
   },
   {
    "id": "2bfc7f4cc17f",
-   "render_order": 75,
+   "render_order": 74,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10747,7 +10662,7 @@
   },
   {
    "id": "7eb14a246e9e",
-   "render_order": 76,
+   "render_order": 75,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10862,7 +10777,7 @@
   },
   {
    "id": "8b9b6af44436",
-   "render_order": 77,
+   "render_order": 76,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11008,7 +10923,7 @@
   },
   {
    "id": "9995c30e33c0",
-   "render_order": 78,
+   "render_order": 77,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11154,7 +11069,7 @@
   },
   {
    "id": "e68818062d22",
-   "render_order": 79,
+   "render_order": 78,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11294,7 +11209,7 @@
   },
   {
    "id": "fda483-195241",
-   "render_order": 80,
+   "render_order": 79,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11454,7 +11369,7 @@
   },
   {
    "id": "fda483-195242",
-   "render_order": 81,
+   "render_order": 80,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11590,7 +11505,7 @@
   },
   {
    "id": "fda483-195243",
-   "render_order": 82,
+   "render_order": 81,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11746,7 +11661,7 @@
   },
   {
    "id": "fda483-195244",
-   "render_order": 83,
+   "render_order": 82,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11882,7 +11797,7 @@
   },
   {
    "id": "fda483-195245",
-   "render_order": 84,
+   "render_order": 83,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12017,7 +11932,7 @@
   },
   {
    "id": "fda483-195249",
-   "render_order": 85,
+   "render_order": 84,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12159,7 +12074,7 @@
   },
   {
    "id": "fda483-195251",
-   "render_order": 86,
+   "render_order": 85,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12301,7 +12216,7 @@
   },
   {
    "id": "fda483-195252",
-   "render_order": 87,
+   "render_order": 86,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12496,7 +12411,7 @@
   },
   {
    "id": "fda483-195253",
-   "render_order": 88,
+   "render_order": 87,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12609,7 +12524,7 @@
   },
   {
    "id": "fda483-195634",
-   "render_order": 89,
+   "render_order": 88,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12766,7 +12681,7 @@
   },
   {
    "id": "fda483-195638",
-   "render_order": 90,
+   "render_order": 89,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12917,7 +12832,7 @@
   },
   {
    "id": "fda483-195640",
-   "render_order": 91,
+   "render_order": 90,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13007,7 +12922,7 @@
   },
   {
    "id": "fda483-195646",
-   "render_order": 92,
+   "render_order": 91,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13097,7 +13012,7 @@
   },
   {
    "id": "fda483-195655",
-   "render_order": 93,
+   "render_order": 92,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13216,7 +13131,7 @@
   },
   {
    "id": "fda483-195665",
-   "render_order": 94,
+   "render_order": 93,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13400,7 +13315,7 @@
   },
   {
    "id": "fda483-195666",
-   "render_order": 95,
+   "render_order": 94,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13560,7 +13475,7 @@
   },
   {
    "id": "9e8a6f534dc5",
-   "render_order": 96,
+   "render_order": 95,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -13635,7 +13550,7 @@
   },
   {
    "id": "who-whopir-96b76d34d79b",
-   "render_order": 97,
+   "render_order": 96,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -13818,7 +13733,7 @@
   },
   {
    "id": "who-whopir-8bac486f0f4c",
-   "render_order": 98,
+   "render_order": 97,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -14008,7 +13923,7 @@
   },
   {
    "id": "who-whopir-af4a56516228",
-   "render_order": 99,
+   "render_order": 98,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -14198,7 +14113,7 @@
   },
   {
    "id": "gmpinspect-1Q5NxQxCVnP",
-   "render_order": 100,
+   "render_order": 99,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -14324,7 +14239,7 @@
   },
   {
    "id": "gmpinspect-1Q5Nv9G4oko",
-   "render_order": 101,
+   "render_order": 100,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -14404,7 +14319,7 @@
   },
   {
    "id": "admin-2026007579",
-   "render_order": 102,
+   "render_order": 101,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14506,7 +14421,7 @@
   },
   {
    "id": "admin-2026007497",
-   "render_order": 103,
+   "render_order": 102,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14610,7 +14525,7 @@
   },
   {
    "id": "admin-2026007515",
-   "render_order": 104,
+   "render_order": 103,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14718,7 +14633,7 @@
   },
   {
    "id": "admin-2026007516",
-   "render_order": 105,
+   "render_order": 104,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14822,7 +14737,7 @@
   },
   {
    "id": "admin-2026007495",
-   "render_order": 106,
+   "render_order": 105,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14928,7 +14843,7 @@
   },
   {
    "id": "admin-2026007595",
-   "render_order": 107,
+   "render_order": 106,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15037,7 +14952,7 @@
   },
   {
    "id": "admin-2026007596",
-   "render_order": 108,
+   "render_order": 107,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15146,7 +15061,7 @@
   },
   {
    "id": "admin-2026007597",
-   "render_order": 109,
+   "render_order": 108,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15255,7 +15170,7 @@
   },
   {
    "id": "admin-2026007598",
-   "render_order": 110,
+   "render_order": 109,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15362,7 +15277,7 @@
   },
   {
    "id": "admin-2026007599",
-   "render_order": 111,
+   "render_order": 110,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15467,7 +15382,7 @@
   },
   {
    "id": "admin-2026007600",
-   "render_order": 112,
+   "render_order": 111,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15568,7 +15483,7 @@
   },
   {
    "id": "admin-2026007601",
-   "render_order": 113,
+   "render_order": 112,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15677,7 +15592,7 @@
   },
   {
    "id": "admin-2026007602",
-   "render_order": 114,
+   "render_order": 113,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15785,7 +15700,7 @@
   },
   {
    "id": "admin-2026007615",
-   "render_order": 115,
+   "render_order": 114,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15891,7 +15806,7 @@
   },
   {
    "id": "admin-2026007603",
-   "render_order": 116,
+   "render_order": 115,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -16000,7 +15915,7 @@
   },
   {
    "id": "recall-00b44c39f0ef",
-   "render_order": 117,
+   "render_order": 116,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16086,7 +16001,7 @@
   },
   {
    "id": "recall-076361226898",
-   "render_order": 118,
+   "render_order": 117,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16171,7 +16086,7 @@
   },
   {
    "id": "recall-5b9a6ba180fb",
-   "render_order": 119,
+   "render_order": 118,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16259,7 +16174,7 @@
   },
   {
    "id": "recall-5d277daeab3d",
-   "render_order": 120,
+   "render_order": 119,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16345,7 +16260,7 @@
   },
   {
    "id": "recall-64e592fa696e",
-   "render_order": 121,
+   "render_order": 120,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16430,7 +16345,7 @@
   },
   {
    "id": "recall-6e6ea956ba8b",
-   "render_order": 122,
+   "render_order": 121,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16515,7 +16430,7 @@
   },
   {
    "id": "recall-86aedfb4b757",
-   "render_order": 123,
+   "render_order": 122,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16600,7 +16515,7 @@
   },
   {
    "id": "recall-9c61534d3fcd",
-   "render_order": 124,
+   "render_order": 123,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16685,7 +16600,7 @@
   },
   {
    "id": "recall-a3321198dd9f",
-   "render_order": 125,
+   "render_order": 124,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16770,7 +16685,7 @@
   },
   {
    "id": "recall-ac0329439ba5",
-   "render_order": 126,
+   "render_order": 125,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16855,7 +16770,7 @@
   },
   {
    "id": "recall-f03bf31e9833",
-   "render_order": 127,
+   "render_order": 126,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16942,7 +16857,7 @@
   },
   {
    "id": "recall-bb7341be805b",
-   "render_order": 128,
+   "render_order": 127,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -17029,7 +16944,7 @@
   },
   {
    "id": "hc-82808",
-   "render_order": 129,
+   "render_order": 128,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -17121,7 +17036,7 @@
   },
   {
    "id": "recall-4691559975d0",
-   "render_order": 130,
+   "render_order": 129,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -17206,7 +17121,7 @@
   },
   {
    "id": "recall-7ce217fb8ea2",
-   "render_order": 131,
+   "render_order": 130,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -17291,7 +17206,7 @@
   },
   {
    "id": "hc-82831",
-   "render_order": 132,
+   "render_order": 131,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -17381,7 +17296,7 @@
   },
   {
    "id": "D-0002-2027",
-   "render_order": 133,
+   "render_order": 132,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17525,7 +17440,7 @@
   },
   {
    "id": "D-0012-2027",
-   "render_order": 134,
+   "render_order": 133,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17638,7 +17553,7 @@
   },
   {
    "id": "D-0013-2027",
-   "render_order": 135,
+   "render_order": 134,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17748,7 +17663,7 @@
   },
   {
    "id": "D-0014-2027",
-   "render_order": 136,
+   "render_order": 135,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17878,7 +17793,7 @@
   },
   {
    "id": "D-0016-2027",
-   "render_order": 137,
+   "render_order": 136,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -18013,7 +17928,7 @@
   },
   {
    "id": "D-0017-2027",
-   "render_order": 138,
+   "render_order": 137,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -18143,7 +18058,7 @@
   },
   {
    "id": "D-0036-2027",
-   "render_order": 139,
+   "render_order": 138,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

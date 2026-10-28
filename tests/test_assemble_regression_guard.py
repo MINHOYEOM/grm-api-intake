@@ -138,6 +138,19 @@ class BundleShrinkTest(unittest.TestCase):
         self.assertTrue(r["ok"], r)
         self.assertEqual(r["unbundled_cards"][0]["now"], "b-2")
 
+    def test_bundle_fully_resolved_is_not_missing(self):
+        """[2026-10-28] 항목이 전부 빠져 묶음 자체가 없어진 경우(10-26 호 기기·식품 7건 전부
+        범위 밖 제외). 묶음 아닌 카드의 소실은 종전대로 막는다."""
+        other = self._bundle("r-1", ["Recall item A", "Recall item B"])   # 무관한 다른 묶음
+        pub = _doc([self._bundle("b-1", self.ITEMS[:7]), _card("keep", "k" * 300, 1), other])
+        asm = _doc([_card("keep", "k" * 300, 0), other])
+        r = g.compare(pub, asm)
+        self.assertTrue(r["ok"], r)
+        self.assertEqual((r["unbundled_cards"][0]["now"], r["unbundled_cards"][0]["after_items"]),
+                         (None, 0))
+        self.assertIn("묶음 해소", g.render_markdown(r, "x.json"))
+        self.assertEqual(g.compare(pub, _doc([]))["missing_cards"], ["keep"])
+
 
 class NoIdCardTest(unittest.TestCase):
     def test_cards_without_id_use_render_order(self):

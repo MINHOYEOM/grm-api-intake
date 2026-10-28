@@ -135,6 +135,19 @@ class OcrEngineWiringTest(unittest.TestCase):
                          "apt-get -qq 는 실패 사유까지 지운다 — 설치 실패가 조용해진다")
         self.assertIn("tesseract-ocr-eng", body, "eng 언어팩이 없으면 tessdata 탐색이 실패한다")
 
+    def test_action_verifies_cli_binary(self) -> None:
+        """[2차 판독 2026-10-28] `collect_fda_483._reocr_483_pdf_text` 는 tessdata 만이 아니라
+        `tesseract` **실행 파일**을 subprocess 로 부른다. 검증 스텝이 바이너리 존재를 계속
+        확인해야 "언어팩은 있는데 CLI 가 없다"가 조용히 지나가지 않는다."""
+        action = os.path.join(REPO, ".github", "actions", "setup-ocr", "action.yml")
+        with open(action, encoding="utf-8") as fh:
+            body = fh.read()
+        self.assertIn("command -v tesseract", body)
+        with open(os.path.join(REPO, "collect_fda_483.py"), encoding="utf-8") as fh:
+            src = fh.read()
+        self.assertIn('shutil.which("tesseract")', src,
+                      "2차 판독이 CLI 를 찾는 방식이 바뀌었다 — 이 액션의 검증도 함께 맞춰라")
+
 
 if __name__ == "__main__":
     unittest.main()

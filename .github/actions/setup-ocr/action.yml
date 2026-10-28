@@ -1,7 +1,12 @@
 name: 'Setup OCR engine (tesseract)'
 description: >
-  스캔 483 OCR(collect_fda_483._ocr_483_pdf_text → PyMuPDF get_textpage_ocr)이 요구하는
-  tesseract 바이너리를 러너에 설치하고, 설치 결과를 반드시 관측 가능하게 남긴다.
+  스캔 483 OCR 이 요구하는 tesseract(+eng 언어팩)를 러너에 설치하고, 설치 결과를 반드시
+  관측 가능하게 남긴다. 소비자 둘 — 1차 판독 `_ocr_483_pdf_text`(PyMuPDF get_textpage_ocr,
+  tessdata 사용)와 2차 판독 `_reocr_483_pdf_text`(관찰 0건 문서만, `tesseract` CLI 직접 실행).
+
+# 모델 = apt `tesseract-ocr-eng`(tessdata_fast 계열). 2026-10-28 벤치마크에서 tessdata_best 는
+#   쪽당 3.5s → 26.6s(7.5배)인데 판독 실패 44건 회수가 늘지 않아 채택하지 않았다
+#   (근거: docs/specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md). 모델을 바꿀 땐 여기서만 바꾼다.
 
 # 왜 복합 액션인가 (2026-07-30):
 #   483 PDF 텍스트 추출 경로(`collect_fda_483._fetch_fda483_pdf_text`)는 **두 워크플로**가

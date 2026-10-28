@@ -42,6 +42,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
+import subprocess
 import time
 from datetime import date
 from html import unescape as _html_unescape
@@ -151,6 +153,9 @@ FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
 # 만들어내지 못한다(업스케일은 정보를 늘리지 않는다).
 FDA483_OCR_DPI = min(max(_env_int("FDA483_OCR_DPI", 300), 72), 600)
 FDA483_OCR_MAX_PAGES = 30        # OCR 비용 상한(문서당) — 현실 483 은 10쪽 내외
+# [2차 판독 2026-10-28] 본문은 받았는데 관찰이 0건인 문서만 tesseract **CLI** 로 이미지
+# 페이지를 다시 읽는다(`_second_chance_ocr`). 쪽당 상한 — 멈춘 프로세스가 잡을 붙잡지 않게.
+FDA483_REOCR_PAGE_TIMEOUT = 120
 # 483 마지막 장 정형 고지문 — 이 문구만 남은 텍스트층은 "본문 없음"과 같다(스캔 판정 신호).
 _FDA483_NOTICE_ANCHOR = "observations of objectionable conditions"
 # [2026-10-27] 식품 실사(FD&C Act **805**조) 양식의 고지문은 "conditions" 가 아니라
@@ -295,7 +300,8 @@ def _pdf_caps(burst: bool) -> tuple[int, int]:
 #
 # `engine_reason` 은 첫 실패 사유만 보관한다 — 전건이 같은 원인이므로 목록은 잡음이다.
 _OCR_HEALTH: dict[str, Any] = {"ok": 0, "engine_unavailable": 0, "engine_reason": "",
-                               "budget_skipped": 0, "empty": 0}
+                               "budget_skipped": 0, "empty": 0,
+                               "reocr_tried": 0, "reocr_adopted": 0}
 
 # 엔진 부재를 뜻하는 status 접두사 — 이 판정을 문자열 비교로 흩뿌리지 않는다(백필 경로도 쓴다).
 _OCR_ENGINE_UNAVAILABLE_PREFIX = "scan-ocr-unavailable"
@@ -314,7 +320,8 @@ def is_ocr_engine_unavailable(status: str) -> bool:
 def reset_ocr_health() -> None:
     """OCR 관측 카운터를 실행 시작 상태로 되돌린다(collect_fda_483·백필 진입점이 호출)."""
     _OCR_HEALTH.update({"ok": 0, "engine_unavailable": 0, "engine_reason": "",
-                        "budget_skipped": 0, "empty": 0})
+                        "budget_skipped": 0, "empty": 0,
+                        "reocr_tried": 0, "reocr_adopted": 0})
 
 
 def ocr_health() -> dict[str, Any]:
@@ -328,6 +335,8 @@ def ocr_health() -> dict[str, Any]:
         "engine_reason": _OCR_HEALTH["engine_reason"],
         "budget_skipped": _OCR_HEALTH["budget_skipped"],
         "empty": _OCR_HEALTH["empty"],
+        "reocr_tried": _OCR_HEALTH["reocr_tried"],
+        "reocr_adopted": _OCR_HEALTH["reocr_adopted"],
     }
 
 
@@ -1010,12 +1019,13 @@ def _fetch_fda483_pdf_text(pdf_url: str, max_chars: int = FDA483_TEXT_MAX_CHARS)
     text, status = _extract_pdf_text(data, max_chars=max_chars)
     text = normalize_pdf_ligatures(text)           # [2026-07-20] 서브셋 폰트 합자 복원
     if not _needs_ocr(text):
-        return text, status
+        return _second_chance_ocr(data, text, status, max_chars)
     # [스캔 483 OCR 폴백 2026-07-27] 텍스트층이 아예 없거나 뒷장 정형 고지문뿐이다 —
     # 관찰은 이미지 안에 있다. 페이지 단위 OCR 로 되살린다. 실패해도 기존 산출은 보존.
     ocr_text, ocr_status = _ocr_483_pdf_text(data, max_chars=max_chars)
     if ocr_text:
-        return normalize_pdf_ligatures(ocr_text), ocr_status
+        return _second_chance_ocr(data, normalize_pdf_ligatures(ocr_text), ocr_status,
+                                  max_chars)
     # OCR 이 못 살렸다 — 원래 텍스트가 고지문뿐이거나 **아예 비었다면** 그건 "본문 없음"
     # 이므로 사유를 OCR 실패 코드로 바꿔 하류에 정확히 알린다.
     #
@@ -1170,6 +1180,100 @@ def _ensure_tessdata_prefix() -> None:
         found = _tessdata_dir()
         if found:
             os.environ["TESSDATA_PREFIX"] = found
+
+
+def _second_chance_ocr(data: bytes, text: str, status: str, max_chars: int) -> tuple[str, str]:
+    """본문은 있는데 관찰이 0건이면 이미지 페이지를 tesseract CLI 로 다시 읽는다.
+
+    [2026-10-28 벤치마크] findings 0건·본문 있음 47건을 원본 PDF 로 다시 돌려 보니 결손의
+    주원인은 우리 OCR 이 아니라 **FDA 가 넣은 텍스트층**이었다 — 28건이 Adobe "Paper
+    Capture" 로 OCR 된 스캔본인데 그 텍스트층이 "Sl'FEET AOOIIE$,S"·"OIIS€RVATIOll" 처럼
+    깨져 있다. 글자가 많으니 `_needs_ocr` 가 "본문 있음"으로 보고 OCR 을 한 번도 안 돌렸다.
+    나머지 16건은 우리가 OCR 했지만 관찰 마커("1." → "|.", "(WE) OBSERVED" → "wnfee)
+    ossenven")가 깨져 파서가 못 잡았다.
+
+    ★**관찰 0건 문서에만** 도달한다 — 1건이라도 나오는 문서는 입력 그대로 돌려준다. FDA
+      텍스트층을 일괄로 다시 읽으면 대조군 60건 중 8건이 오히려 관찰을 잃었다(Adobe 판독이
+      우리 판독보다 나은 문서가 있다). 정상 문서 출력이 바이트 단위로 불변임을 측정이 아니라
+      구조로 보장한다(`_extract_483_observations_from_text` 의 회수 경로와 같은 원칙).
+    ★다시 읽은 결과도 관찰이 0건이면 **원래 텍스트를 그대로** 돌려준다 — 2차 판독은 산출을
+      늘리기만 하고 줄이지 않는다(excerpt 는 원래 텍스트로 계속 만들어진다).
+    ★엔진은 PyMuPDF 내장 경로가 아니라 apt `tesseract` **CLI** 다. 같은 fast 모델·같은 DPI
+      로도 회수가 17 → 22문서로 많았고 쪽당 시간은 오히려 짧았다(내장 경로는 페이지 위에
+      얹은 텍스트층을 다시 만들어 붙이는 비용이 있다). 바이너리는 `setup-ocr` 액션이 이미
+      설치·검증한다.
+    """
+    if not (text or "").strip() or not _ocr_enabled():
+        return text, status
+    if _extract_483_observations_from_text(text):
+        return text, status
+    _OCR_HEALTH["reocr_tried"] += 1
+    re_text, _re_status = _reocr_483_pdf_text(data, max_chars)
+    if not re_text:
+        return text, status
+    re_text = normalize_pdf_ligatures(re_text)
+    if not _extract_483_observations_from_text(re_text):
+        return text, status
+    _OCR_HEALTH["reocr_adopted"] += 1
+    return re_text, "pdf-ok-ocr"
+
+
+def _reocr_483_pdf_text(data: bytes, max_chars: int) -> tuple[str, str]:
+    """이미지가 있는 페이지 **전부**를 tesseract CLI 로 판독한다(텍스트층 무시). (text, status).
+
+    `_ocr_483_pdf_text` 와 같은 OCR 페이지 예산(`_OCR_BUDGET`)·문서당 상한을 쓴다 — 벽시계를
+    지키는 장치는 하나여야 한다. 이미지가 없는 페이지는 원래 텍스트층을 그대로 쓴다.
+
+    status: `pdf-ok-ocr` | `reocr-no-image`(다시 읽을 이미지 없음) | `scan-ocr-budget` |
+            `scan-ocr-unavailable:tesseract-cli` | `pdf-encrypted` | `pdf-parse-fail:<Err>`
+    """
+    if _OCR_BUDGET["remaining"] <= 0:
+        return "", "scan-ocr-budget"
+    exe = shutil.which("tesseract")
+    if not exe:
+        return "", "scan-ocr-unavailable:tesseract-cli"
+    try:
+        import fitz  # type: ignore[import-not-found]
+    except ImportError:
+        return "", "scan-ocr-unavailable:pymupdf"
+    args = [exe, "stdin", "stdout", "-l", "eng", "--dpi", str(FDA483_OCR_DPI)]
+    tessdata = _tessdata_dir()
+    if tessdata:
+        args += ["--tessdata-dir", tessdata]
+    # apt tesseract 는 OpenMP 빌드다. 단일 스레드로 고정한다 — 다른 프로세스와 CPU 를 나눠
+    # 쓰는 러너에서 OpenMP 스레드가 경합하면 쪽당 수 초가 수 분으로 늘어난다(실측).
+    env = {**os.environ, "OMP_THREAD_LIMIT": os.environ.get("OMP_THREAD_LIMIT") or "1"}
+    try:
+        parts: list[str] = []
+        ocr_pages = 0
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            if doc.needs_pass or doc.is_encrypted:
+                return "", "pdf-encrypted"
+            for page in doc:
+                native = page.get_text("text")
+                if not page.get_images(full=True):
+                    parts.append(native)
+                    continue
+                if ocr_pages >= FDA483_OCR_MAX_PAGES or _OCR_BUDGET["remaining"] <= 0:
+                    parts.append(native)
+                    continue
+                ocr_pages += 1
+                _OCR_BUDGET["remaining"] -= 1
+                _OCR_BUDGET["used"] += 1
+                png = page.get_pixmap(dpi=FDA483_OCR_DPI, colorspace=fitz.csGRAY).tobytes("png")
+                proc = subprocess.run(args, input=png, capture_output=True, env=env,
+                                      timeout=FDA483_REOCR_PAGE_TIMEOUT, check=False)
+                ocr_native = proc.stdout.decode("utf-8", "replace")
+                parts.append(ocr_native if ocr_native.strip() else native)
+    except Exception as e:  # noqa: BLE001 — 2차 판독 실패는 1차 산출을 건드리지 않는다
+        return "", f"pdf-parse-fail:{type(e).__name__}"
+    if not ocr_pages:
+        return "", "reocr-no-image"
+    from collect_mfds_gmp_inspection import _normalize_extracted_text
+    text = _normalize_extracted_text("\n".join(parts))
+    if not text.strip():
+        return "", "scan-ocr-empty"
+    return text[:max_chars], "pdf-ok-ocr"
 
 
 def _fetch_fda483_excerpt(pdf_url: str) -> tuple[str, str]:
@@ -2509,6 +2613,7 @@ def collect_fda_483(
                 f"{'(마감 도달)' if excerpt_health['burst_deadline_hit'] else ''} "
                 f"ok={_OCR_HEALTH['ok']} 엔진불가={_OCR_HEALTH['engine_unavailable']} "
                 f"예산초과={_OCR_HEALTH['budget_skipped']} "
+                f"2차판독={_OCR_HEALTH['reocr_adopted']}/{_OCR_HEALTH['reocr_tried']} "
                 f"· observations enabled={observations_enabled} "
                 f"attempted={observations_health['attempted']} "
                 f"extracted={observations_health['extracted']} "

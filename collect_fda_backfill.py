@@ -47,14 +47,13 @@ already inserted or will insert later for the same document.
     unconditional (flag-independent) placement as the daily collector's own wiring. The
     only "new" code is the AJAX row source (offset-based instead of page-0-walk) and the
     document fetch/dedup wiring around it.
-  - FDA Warning Letter: there is no single reusable "build the IntakeItem" function in
-    collect_intake.py (the construction is inline in `collect_fda_warning_letters`), so
-    `_wl_item_from_row` below mirrors that inline construction field-for-field, but every
-    non-trivial piece of logic is still imported and called from collect_intake.py itself:
-    `_stable_doc_id`, `_fda_wl_office_gate`, `_is_low_value_fda_warning_letter`,
-    `compute_relevance`, `compute_signal_tier`, `_extract_wl_body_full`, `_parse_wl_date`,
-    `IntakeItem`, `SOURCE_FDA_WL`, `SRC_TYPE_OFFICIAL_PAGE`, `FDA_WL_URL`. See
-    tests/test_collect_fda_backfill.py for the identity assertions.
+  - FDA Warning Letter: `_wl_item_from_row` calls `collect_intake.build_wl_item` -- the
+    exact function `collect_fda_warning_letters` (and the daily recovery job) uses per row --
+    with the letter page run through the same excerpt/full extractors the daily collector
+    uses with ENABLE_WL_BODY and ENABLE_WL_BODY_FULL on (one GET, both extractors). So the
+    backfilled row carries the same excerpt, `wl_violations`, `wl_body_status` and body cGMP
+    tier floor as a live row for the same letter. See tests/test_collect_fda_backfill.py for
+    the byte-identity assertions.
 
 Both raw_signal record construction (`findings_store.raw_signal_from_intake_item`) and the
 Supabase POST transport (`findings_supabase_append._post_rows` /
@@ -557,53 +556,47 @@ def _wl_row_from_ajax(raw: Any) -> dict[str, str] | None:
     }
 
 
-def _wl_item_from_row(nrow: dict[str, str], body_full: str, office_gate_verdict: str) -> Any:
-    """Mirrors collect_intake.collect_fda_warning_letters' inline IntakeItem construction
-    field-for-field (see module docstring) -- every non-trivial rule is imported from
-    collect_intake, not reimplemented.
+def _wl_letter_fetch_status(exc: Exception) -> str:
+    """Letter GET failure -> the daily collector's fixed status vocabulary.
+
+    `http_get_html` wraps the final `requests` error in RuntimeError; the HTTP status lives on
+    `__cause__`. 403 maps to `fetch-403` (the recovery job's bot-block bucket); other HTTP codes
+    keep their number in the detail so `backfill_wl_body_recovery.is_definitive_status` can see 404.
     """
-    firm = nrow["firm"]
-    wl_href = nrow["wl_href"]
-    issuing_office = nrow["issuing_office"]
-    subject = nrow["subject"]
-    date_iso = nrow["date_iso"]
-    headline = subject or firm or "FDA Warning Letter"
+    cause = exc.__cause__ if exc.__cause__ is not None else exc
+    code = getattr(getattr(cause, "response", None), "status_code", None)
+    if code == 403:
+        return ci.WL_BODY_STATUS_403
+    if code:
+        return f"fetch-fail:HTTP {code}"
+    return f"fetch-fail:{type(cause).__name__}"
 
-    doc_id = ci._stable_doc_id(SOURCE_FDA_WL, firm, wl_href or ci.FDA_WL_URL, date_iso)
-    relevance = ci.compute_relevance(headline, subject, issuing_office)
-    tier = ci.compute_signal_tier(
-        SOURCE_FDA_WL, issuing_office or "Warning Letter", relevance, "N/A",
-        headline, subject, issuing_office,
-    )
 
-    wl_raw: dict[str, Any] = {
-        "firm": firm,
-        "posted_date": nrow.get("posted_date", ""),
-        "letter_date": nrow.get("letter_date", ""),
-        "issuing_office": issuing_office,
-        "subject": subject,
-        "url": wl_href,
-    }
-    if office_gate_verdict in ("review", "unknown"):
-        wl_raw["office_gate_verdict"] = office_gate_verdict
-    if body_full:
-        wl_raw["wl_body_full"] = body_full
+def _wl_body_results(letter_html: str, fetch_status: str
+                     ) -> tuple[tuple[str, str], tuple[str, str]]:
+    """One letter page -> the (excerpt, status) / (full, status) pair the daily collector gets
+    with ENABLE_WL_BODY and ENABLE_WL_BODY_FULL both on. Same extractors on the same HTML."""
+    if not letter_html:
+        return ("", fetch_status), ("", fetch_status)
+    excerpt = ci._extract_wl_body_excerpt(letter_html)
+    full = ci._extract_wl_body_full(letter_html)
+    return ((excerpt, ci.WL_BODY_STATUS_OK if excerpt else ci.WL_BODY_STATUS_NO_ANCHOR),
+            (full, ci.WL_BODY_STATUS_OK if full else ci.WL_BODY_STATUS_NO_ANCHOR))
 
-    return ci.IntakeItem(
-        source=SOURCE_FDA_WL,
-        document_id=doc_id,
-        date_iso=date_iso,
-        headline=headline,
-        official_url=wl_href or ci.FDA_WL_URL,
-        type_or_class=issuing_office or "Warning Letter",
-        firm=firm,
-        body=subject,
-        api_query=ci.FDA_WL_URL,
-        qa_relevance=relevance,
-        osd_relevance="N/A",
-        source_type=ci.SRC_TYPE_OFFICIAL_PAGE,
-        signal_tier=tier,
-        raw_payload=wl_raw,
+
+def _wl_item_from_row(nrow: dict[str, str], office_gate_verdict: str,
+                      excerpt: tuple[str, str] | None,
+                      full: tuple[str, str] | None) -> Any:
+    """Normalized AJAX row + letter fetch results -> IntakeItem via the daily collector's own
+    `collect_intake.build_wl_item` (excerpt, wl_violations, body cGMP tier floor included).
+    `excerpt`/`full` are None when no letter was fetched (no href) -- same as flag-off live.
+    """
+    return ci.build_wl_item(
+        firm=nrow["firm"], posted_raw=nrow.get("posted_date", ""),
+        letter_date_raw=nrow.get("letter_date", ""),
+        issuing_office=nrow["issuing_office"], subject=nrow["subject"],
+        wl_href=nrow["wl_href"], office_verdict=office_gate_verdict,
+        excerpt=excerpt, full=full,
     )
 
 
@@ -701,18 +694,22 @@ def run_wl(
             continue
 
         report.fetched += 1
-        body_full = ""
+        excerpt: tuple[str, str] | None = None
+        full: tuple[str, str] | None = None
         if wl_href:
+            letter_html, fetch_status = "", ci.WL_BODY_STATUS_OK
             try:
                 sleeper(delay)
                 letter_html = http_get_html(wl_href, timeout=20, retries=3, label="FDA WL backfill body")
-                body_full = ci._extract_wl_body_full(letter_html)
             except Exception as e:  # noqa: BLE001
                 # Graceful degrade (matches collect_intake's own WL body fetch failure
-                # handling) -- item still gets appended without wl_body_full.
+                # handling) -- item still gets appended, with wl_body_status so the daily
+                # recovery job (backfill_wl_body_recovery.py) knows why the body is missing.
+                fetch_status = _wl_letter_fetch_status(e)
                 report.errors.append(f"wl-document-fetch-failed({doc_id}):{type(e).__name__}")
+            excerpt, full = _wl_body_results(letter_html, fetch_status)
 
-        item = _wl_item_from_row(nrow, body_full, verdict)
+        item = _wl_item_from_row(nrow, verdict, excerpt, full)
         record = findings_store.raw_signal_from_intake_item(
             item, collected_at=datetime.now(timezone.utc).isoformat(),
         )

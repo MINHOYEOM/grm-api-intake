@@ -88,6 +88,38 @@ def _fetch_all_findings_evidence(base_url: str, service_key: str) -> list[dict[s
     return rows
 
 
+def _fetch_wl_permanent_403(base_url: str, service_key: str) -> list[dict[str, Any]]:
+    """회수를 포기한 FDA WL 행(`wl_body_status` = `fetch-403:permanent …`)의 document_id.
+
+    표식은 `backfill_wl_body_recovery.py` 의 영구 403 정책이 남긴다(주 한 줌 — 전량 1쪽)."""
+    url = f"{base_url}/rest/v1/raw_signals"
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    params = {
+        "select": "document_id",
+        "source": "eq.FDA Warning Letter",
+        "raw_json": "like.*fetch-403:permanent*",
+        "order": "document_id.asc",
+        "limit": str(_PAGE),
+    }
+    try:
+        resp = requests.get(url, params=params, headers=headers, timeout=_TIMEOUT)
+    except requests.exceptions.RequestException as exc:
+        raise RuntimeError(f"WL 영구 403 조회 실패: {type(exc).__name__}") from None
+    if resp.status_code >= 400:
+        raise RuntimeError(f"WL 영구 403 조회 HTTP {resp.status_code}")
+    return resp.json() or []
+
+
+def wl_permanent_403_line(rows: list[dict[str, Any]]) -> str:
+    """주간 요약 한 줄 — FDA 가 러너 IP 를 계속 막아 본문 회수를 포기한 WL 서한."""
+    ids = [str(r.get("document_id") or "") for r in rows if r.get("document_id")]
+    if not ids:
+        return "- FDA WL 본문 회수 포기(영구 403): 0건"
+    shown = ", ".join(ids[:10]) + (" …" if len(ids) > 10 else "")
+    return (f"- FDA WL 본문 회수 포기(영구 403): {len(ids)}건 — {shown} "
+            "(원문은 fda.gov 에서 직접 확인 · 재시도는 recover-wl 을 doc_ids 로 실행)")
+
+
 def _bucket_by_week(rows: list[dict[str, Any]], now: datetime
                     ) -> tuple[dict[str, int], dict[str, list[int]]]:
     """(current, history) 반환. current=최근 7일, history[source]=[직전주, 그전주, ...]."""
@@ -215,6 +247,17 @@ def main() -> int:
             _emit(f"::warning title=coverage-{a.severity}::{a.message}")
             _emit(f"  - [{a.severity}] {a.message}")
     # 비차단: 이상치가 있어도 exit 0. 경보는 위 ::warning:: 주석으로 Actions UI 에 노출.
+
+    _emit("\n## FDA WL 본문 회수 포기")
+    try:
+        given_up = _fetch_wl_permanent_403(base_url, service_key)
+    except RuntimeError as exc:
+        _emit(f"::warning title=wl-permanent-403::{exc}")
+    else:
+        line = wl_permanent_403_line(given_up)
+        _emit(line)
+        if given_up:
+            _emit(f"::warning title=wl-permanent-403::{line[2:]}")
 
     _emit("\n## evidence_url 오염 스캔")
     try:

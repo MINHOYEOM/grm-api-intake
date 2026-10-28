@@ -123,7 +123,9 @@ class WlExtractExcerptTest(unittest.TestCase):
             "(21 CFR 211.84(d)(1)).</p></body>"
         )
         ex = ci._extract_wl_body_excerpt(html)
-        self.assertTrue(ex.startswith("significant violations were observed including"))
+        # [본문 시작점 2026-10-28] 앵커가 든 문장의 첫머리부터(종전엔 문장 중간 소문자 시작).
+        self.assertTrue(ex.startswith("Following review of records, significant violations"))
+        self.assertNotIn("This warning letter", ex)
         self.assertIn("211.84(d)(1)", ex)
 
     def test_primary_anchor_telehealth_phrasing(self) -> None:
@@ -149,6 +151,86 @@ class WlExtractExcerptTest(unittest.TestCase):
         ex = ci._extract_wl_body_excerpt(html)
         self.assertTrue(ex.startswith("This warning letter"))
         self.assertGreater(len(ex), 0)
+
+
+class WlBodyStartTest(unittest.TestCase):
+    """[본문 시작점 2026-10-28] 본문은 문장 첫머리에서 시작한다 — 문장 중간 절단 회귀 방지.
+
+    실측: Supabase WL wl_body_full 1,372행 중 478행이 소문자로 시작("violation of section …",
+    "violations cited in …", "during the inspection …"). 1차 앵커가 없는 Kellin Chemicals
+    (실사 거부 서한)는 첫 단락을 통째로 잃었다."""
+
+    # Kellin Chemicals(2025-11-06, 320-26-15) 양식 축약 — 머리말 → 인사말 → 첫 단락에
+    # 위반 낱말 없음 → 셋째 문장에서야 폴백 앵커 `adulterated`.
+    _KELLIN = (
+        "<body><nav>Warning Letters About Warning and Close-Out Letters</nav>"
+        "<p>WARNING LETTER Kellin Chemicals Co., Ltd. - Zhangjiagang MARCS-CMS 716228</p>"
+        "<p>Issuing Office: Center for Drug Evaluation and Research (CDER) United States</p>"
+        "<p>Warning Letter 320-26-15 November 6, 2025</p><p>Dear Zhiyu Du:</p>"
+        "<p>Your firm is currently registered as a supplier of active pharmaceutical "
+        "ingredients (API) to manufacturers of finished drug products who have distributed "
+        "to the U.S. market. Your United States (U.S.) Agent, Registrar Corp., notified us "
+        "that your firm refused the preannounced inspection. Under section 501(j) of the "
+        "Federal Food, Drug, and Cosmetic Act (FD&amp;C Act), 21 U.S.C. 351(j), your drugs are "
+        "adulterated in that they have been manufactured, processed, packed, or held in an "
+        "establishment where the owner or operator has refused to permit inspection.</p></body>"
+    )
+
+    def test_kellin_form_starts_at_first_paragraph(self) -> None:
+        full = ci._extract_wl_body_full(self._KELLIN)
+        self.assertTrue(full.startswith("Your firm is currently registered as a supplier"), full[:80])
+        self.assertIn("refused the preannounced inspection", full)
+        self.assertNotIn("Dear Zhiyu Du", full)
+        self.assertNotIn("MARCS-CMS", full)
+
+    def test_mid_sentence_anchor_backs_up_to_sentence_start(self) -> None:
+        cases = {
+            # 폴백 앵커 + 인사말 없음(인사말이 있으면 위 Kellin 처럼 첫 단락부터).
+            "violation of section": (
+                "<p>WARNING LETTER</p><p>FDA reviewed your website. FDA has determined that "
+                "your product is an unapproved new drug introduced into interstate commerce "
+                "in violation of section 505(a) of the FD&amp;C Act, 21 U.S.C. 355(a).</p>",
+                "FDA has determined that your product"),
+            "during the inspection": (
+                "<p>Dear Ms. Roe:</p><p>The U.S. Food and Drug Administration inspected your "
+                "facility. Our investigator documented the following observations during the "
+                "inspection of your facility, and we reviewed your response.</p>",
+                "Our investigator documented"),
+            "specifically,": (
+                "<p>Dear Sir:</p><p>Your products are misbranded. These claims are not "
+                "supported; specifically, products listed on your website claim to cure "
+                "disease.</p>",
+                "These claims are not supported"),
+        }
+        for label, (html, head) in cases.items():
+            with self.subTest(label=label):
+                self.assertTrue(ci._extract_wl_body_full(html).startswith(head),
+                                ci._extract_wl_body_full(html)[:80])
+
+    def test_abbreviation_period_is_not_a_sentence_break(self) -> None:
+        html = ("<p>Dear Mr. Doe:</p><p>Your firm told us that Acme Labs Inc. Manufacturing "
+                "Division in the U.S. Midwest released lots in violation of section 501(a)(2)(B) "
+                "of the FD&amp;C Act.</p>")
+        full = ci._extract_wl_body_full(html)
+        self.assertTrue(full.startswith("Your firm told us that Acme Labs Inc."), full[:80])
+
+    def test_capital_anchor_at_sentence_start_is_unchanged(self) -> None:
+        self.assertTrue(ci._extract_wl_body_excerpt(_WL_BODY_HTML).startswith("During our inspection"))
+
+    def test_no_break_within_lookback_keeps_anchor(self) -> None:
+        # 마침표 없는 긴 서두(목록 nav 등) 뒤의 앵커 — 경계를 못 찾으면 오늘처럼 앵커에서 자른다.
+        filler = "word " * 200
+        html = f"<p>{filler}violation of section 505(a) of the Act, and more text follows here.</p>"
+        self.assertTrue(ci._extract_wl_body_full(html).startswith("violation of section 505(a)"))
+
+    def test_leadin_skip_still_wins_over_sentence_start(self) -> None:
+        html = (
+            "<p>Dear Mr. Doe:</p><p>During our inspection, our investigator observed specific "
+            "violations including, but not limited to, the following.</p><p>1. Your firm failed "
+            "to establish adequate written procedures for production and process control designed "
+            "to assure that the drug products have the identity, strength, quality, and purity "
+            "they purport or are represented to possess (21 CFR 211.100(a)).</p>")
+        self.assertTrue(ci._extract_wl_body_full(html).startswith("1. Your firm failed"))
 
 
 class WlFetchExcerptTest(unittest.TestCase):

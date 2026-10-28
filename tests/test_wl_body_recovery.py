@@ -77,6 +77,8 @@ class CandidateTest(unittest.TestCase):
             ({"wl_body_status": "fetch-fail:Read timed out"}, True),
             ({"wl_body_excerpt": "x"}, True),     # 전문 플래그 도입 전 적재분(사유 없음)
             ({}, True),                            # 백필 페치 예외 경로(사유 없음)
+            ({"wl_body_status": "fetch-403:since=2026-10-01"}, True),
+            ({"wl_body_status": "fetch-403:permanent since=2026-10-01"}, False),
         ]
         for raw, want in cases:
             with self.subTest(raw=raw):
@@ -127,7 +129,8 @@ class RecoveryGuardTest(unittest.TestCase):
                 "collected_at": "2026-06-10T21:00:00Z", "raw_json": failed["raw_json"]}
 
     def test_still_blocked_writes_nothing(self):
-        report, code, upsert = _run([self._failed_row()],
+        # 적재(06-10) 후 14일 안의 403 — 표식은 이미 맨 fetch-403(첫 관측 = 적재일)이라 쓸 것이 없다.
+        report, code, upsert = _run([self._failed_row()], today=date(2026, 6, 20),
                                     fetch_letter=lambda url: ("", "", "fetch-403"))
         self.assertEqual((report.still_empty, report.recovered), (1, 0))
         upsert.assert_not_called()
@@ -194,8 +197,146 @@ class RecoveryGuardTest(unittest.TestCase):
         for i in range(4):
             row = self._failed_row()
             rows.append({**row, "raw_signal_id": f"{row['raw_signal_id']}-{i}"})
-        report, code, _u = _run(rows, fetch_letter=lambda url: ("", "", "fetch-403"))
+        report, code, _u = _run(rows, today=date(2026, 6, 20),
+                                fetch_letter=lambda url: ("", "", "fetch-403"))
         self.assertEqual((report.attempted, report.still_empty, code), (4, 4, 1))
+
+
+class RebuildBodyStartTest(unittest.TestCase):
+    """--rebuild-body-start: 본문이 문장 중간에서 시작하는 행을 같은 build_wl_item 으로 다시 만든다."""
+
+    def _row(self, full_text):
+        good = _live_record(_Resp(_LETTER_HTML))
+        raw = json.loads(good["raw_json"])
+        raw["wl_body_full"] = full_text
+        return {"raw_signal_id": good["raw_signal_id"], "document_id": good["document_id"],
+                "collected_at": good["collected_at"], "raw_json": json.dumps(raw)}, good
+
+    def _run_rebuild(self, rows, fetch_letter, **kw):
+        calls = []
+
+        def fetch(base, key, **k):
+            calls.append(k)
+            return list(rows)
+        upsert = mock.MagicMock(return_value=(201, [], ""))
+        report, code = rec.run(base_url="https://x.supabase.co", service_key="k", dry_run=False,
+                               delay_seconds=0, fetch_raw_signals=fetch, fetch_letter=fetch_letter,
+                               upsert_raw_signal=upsert, sleeper=lambda _s: None,
+                               rebuild_body_start=True, **kw)
+        self.assertEqual(calls, [{"with_body": True}])
+        return report, code, upsert
+
+    def test_mid_sentence_row_is_rebuilt_to_live_bytes(self):
+        row, good = self._row("violations including, but not limited to, the following.")
+        report, code, upsert = self._run_rebuild([row], _letter_from_html(_LETTER_HTML))
+        self.assertEqual((report.candidates, report.recovered, code), (1, 1, 0))
+        written = upsert.call_args.args[2]
+        self.assertEqual(written["raw_json"], good["raw_json"])
+        self.assertEqual(written["raw_signal_id"], good["raw_signal_id"])
+        self.assertEqual(report.samples[0]["old_head"][:10], "violations")
+
+    def test_capitalised_row_is_not_a_candidate_unless_named(self):
+        row, _good = self._row("During our inspection, something.")
+        report, _c, upsert = self._run_rebuild([row], _letter_from_html(_LETTER_HTML))
+        self.assertEqual(report.candidates, 0)
+        report, _c, upsert = self._run_rebuild([row], _letter_from_html(_LETTER_HTML),
+                                               doc_ids=[row["document_id"]])
+        self.assertEqual((report.candidates, report.recovered), (1, 1))
+
+    def test_blocked_refetch_never_overwrites_existing_body(self):
+        row, _good = self._row("violation of section 505(a).")
+        report, _c, upsert = self._run_rebuild([row], lambda url: ("", "", "fetch-403"))
+        upsert.assert_not_called()
+        self.assertEqual((report.still_empty, report.blocked_403_marked), (1, 0))
+
+    def test_same_body_is_not_rewritten(self):
+        full = ci._extract_wl_body_full(_LETTER_HTML)
+        row, _good = self._row(full)
+        report, _c, upsert = self._run_rebuild([row], _letter_from_html(_LETTER_HTML),
+                                               doc_ids=[row["document_id"]])
+        upsert.assert_not_called()
+        self.assertEqual(report.body_start_unchanged, 1)
+
+
+class Permanent403Test(unittest.TestCase):
+    """영구 403 정책: 첫 403 관측일부터 14일 동안 본문을 못 받고 오늘도 403 이면 포기 표식."""
+
+    _BLOCKED = staticmethod(lambda url: ("", "", "fetch-403"))
+
+    def _row(self, status=None, collected_at="2026-10-01T21:00:00Z"):
+        failed = _live_record(_Resp("", 403))
+        raw = json.loads(failed["raw_json"])
+        if status is None:
+            raw.pop("wl_body_status")
+        else:
+            raw["wl_body_status"] = status
+        return {"raw_signal_id": failed["raw_signal_id"], "document_id": failed["document_id"],
+                "collected_at": collected_at, "raw_json": json.dumps(raw)}
+
+    def _written_status(self, upsert):
+        return json.loads(upsert.call_args.args[2]["raw_json"])["wl_body_status"]
+
+    def test_first_403_without_marker_records_since_once(self):
+        report, code, upsert = _run([self._row(None)], today=date(2026, 10, 28),
+                                    fetch_letter=self._BLOCKED)
+        self.assertEqual(self._written_status(upsert), "fetch-403:since=2026-10-28")
+        self.assertEqual((report.blocked_403_marked, report.permanent_403, report.still_empty),
+                         (1, 0, 1))
+        self.assertEqual(code, 0)
+        # 다음 날: 표식이 이미 같으니 쓰지 않는다.
+        written = upsert.call_args.args[2]
+        row = {"raw_signal_id": written["raw_signal_id"], "document_id": written["document_id"],
+               "collected_at": written["collected_at"], "raw_json": written["raw_json"]}
+        report2, _c, upsert2 = _run([row], today=date(2026, 10, 29), fetch_letter=self._BLOCKED)
+        upsert2.assert_not_called()
+        self.assertEqual(report2.still_empty, 1)
+
+    def test_other_failure_reason_is_replaced_by_since_on_first_403(self):
+        report, _code, upsert = _run([self._row("fetch-fail:503 Server Error")],
+                                     today=date(2026, 10, 28), fetch_letter=self._BLOCKED)
+        self.assertEqual(self._written_status(upsert), "fetch-403:since=2026-10-28")
+
+    def test_day_13_keeps_retrying_day_14_gives_up(self):
+        row = self._row("fetch-403:since=2026-10-01")
+        report, _c, upsert = _run([row], today=date(2026, 10, 14), fetch_letter=self._BLOCKED)
+        upsert.assert_not_called()
+        self.assertEqual(report.permanent_403, 0)
+        report, code, upsert = _run([row], today=date(2026, 10, 15), fetch_letter=self._BLOCKED)
+        self.assertEqual(self._written_status(upsert), "fetch-403:permanent since=2026-10-01")
+        self.assertEqual((report.permanent_403, report.permanent_403_docs),
+                         (1, [row["document_id"]]))
+        self.assertEqual(code, 0)
+
+    def test_bare_live_403_counts_from_collected_at(self):
+        row = self._row("fetch-403", collected_at="2026-10-01T21:00:00Z")
+        _r, _c, upsert = _run([row], today=date(2026, 10, 15), fetch_letter=self._BLOCKED)
+        self.assertEqual(self._written_status(upsert), "fetch-403:permanent since=2026-10-01")
+
+    def test_transient_failure_never_advances_to_permanent(self):
+        row = self._row("fetch-403:since=2026-09-01")
+        report, _c, upsert = _run([row], today=date(2026, 10, 28),
+                                  fetch_letter=lambda url: ("", "", "fetch-fail:503 Server Error"))
+        upsert.assert_not_called()
+        self.assertEqual((report.still_empty, report.permanent_403), (1, 0))
+
+    def test_permanent_row_is_skipped_daily_but_retried_by_doc_id(self):
+        row = self._row("fetch-403:permanent since=2026-09-01")
+        fetch = mock.MagicMock(return_value=("", "", "fetch-403"))
+        report, _c, _u = _run([row], today=date(2026, 10, 28), fetch_letter=fetch)
+        fetch.assert_not_called()
+        self.assertEqual(report.skipped_definitive, 1)
+        report, _c, upsert = _run([row], today=date(2026, 10, 28),
+                                  fetch_letter=_letter_from_html(_LETTER_HTML),
+                                  doc_ids=[row["document_id"]])
+        self.assertEqual(report.recovered, 1)
+        self.assertNotIn("wl_body_status", json.loads(upsert.call_args.args[2]["raw_json"]))
+
+    def test_marker_keeps_fetch_403_reason_label_downstream(self):
+        import card_scaffold
+        for status in ("fetch-403:since=2026-10-01", "fetch-403:permanent since=2026-10-01"):
+            with self.subTest(status=status):
+                self.assertEqual(card_scaffold._absent_reason({"wl_body_status": status}),
+                                 card_scaffold._ABSENT_REASON_LABELS["fetch-403"])
 
 
 if __name__ == "__main__":

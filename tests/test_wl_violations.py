@@ -106,6 +106,42 @@ class WlLeadinSkipTest(unittest.TestCase):
         start = text.index("During")
         self.assertEqual(ci._skip_wl_leadin(text, start), start)
 
+    # 2026-10-28: 앵커("identified during the inspection")가 회신 미수신 문장 안에 걸리고, 그 뒤
+    # 도입구 앞에 실질 문장이 끼는 서한 3종(06fdb805·568589dc·5563840b 원문 축약). 종전 코드는
+    # 앵커~도입구를 통째로 버렸다 — 도입구 문장만 빠지고 나머지는 남아야 한다.
+    _NO_RESPONSE = ("We have not received a response from your firm stating the corrective "
+                    "actions to address the observations identified during the inspection "
+                    "and cited on our Form FDA 483. ")
+    _OPENING = ("Dear Mr. Li: The United States Food and Drug Administration (FDA) "
+                "inspected your drug manufacturing facility from March 3 to 7, 2025. "
+                "This warning letter summarizes significant deviations from CGMP. ")
+
+    def _assert_keeps(self, middle: str):
+        ex = ci._extract_wl_body_full(self._html(self._OPENING + self._NO_RESPONSE + middle
+                                                 + _LEADIN + _BODY[len(_LEADIN):]))
+        self.assertTrue(ex.startswith("We have not received a response"), ex[:80])
+        if middle:
+            self.assertIn(middle.strip(), ex)
+        self.assertNotIn("but not limited to", ex)
+        self.assertIn("1. Your firm failed to thoroughly", ex)
+
+    def test_keeps_continue_to_ship_sentence(self):            # 06fdb805
+        self._assert_keeps("We note that you continue to ship drug products to the United States. ")
+
+    def test_keeps_discontinued_registration_sentence(self):   # 568589dc
+        self._assert_keeps(
+            "At the end of the inspection, your firm notified the Agency that you do not "
+            "intend to manufacture OTC drug products and have discontinued your FDA drug "
+            "registration. ")
+
+    def test_keeps_no_response_sentence(self):                 # 5563840b
+        self._assert_keeps("")
+
+    def test_leadin_as_anchor_sentence_still_starts_at_first_violation(self):
+        # 앵커가 도입구 문장 자체에 걸리면 남길 앞 문장이 없다 — 종전 동작 그대로.
+        ex = ci._extract_wl_body_full(self._html(self._OPENING + _BODY))
+        self.assertTrue(ex.startswith("1. Your firm failed to thoroughly"), ex[:80])
+
     def test_no_leadin_leaves_start_unchanged(self):
         text = "During our inspection, we found that your firm failed to do X. " * 20
         self.assertEqual(ci._skip_wl_leadin(text, 0), 0)

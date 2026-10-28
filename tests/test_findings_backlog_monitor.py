@@ -290,6 +290,30 @@ class ExtractionGapMigrationContractTest(unittest.TestCase):
         for forbidden in ("finding_text", "evidence_url", "raw_json'", "excerpt'"):
             self.assertNotIn(forbidden, sql.split("jsonb_build_object", 1)[1])
 
+    def test_anon_and_authenticated_execute_revoked(self):
+        """★096. `revoke ... from public` 만으로는 Supabase 가 anon·authenticated 에 직접 준
+        EXECUTE 가 남는다(046~095 가 그랬다 — 실측 routine_privileges 에 anon 이 있었다).
+        함수를 마지막으로 정의한 마이그레이션 **이후**(같은 파일 포함)에 anon·authenticated
+        회수가 있어야 한다 — 다음 `create or replace` 는 ACL 을 유지하니 이 순서면 충분하다."""
+        import os
+        import re as _re
+        d = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "web", "migrations")
+        define = _re.compile(
+            r"create\s+or\s+replace\s+function\s+public\.extraction_gap_by_source", _re.I)
+        revoke = _re.compile(
+            r"revoke\s+(?:all|execute)\s+on\s+function\s+public\.extraction_gap_by_source\(\)"
+            r"\s+from\s+anon\s*,\s*authenticated\s*;", _re.I)
+        files = []
+        for fn in sorted(os.listdir(d)):
+            if fn.endswith(".sql"):
+                with open(os.path.join(d, fn), encoding="utf-8") as fh:
+                    files.append((fn, fh.read()))
+        last_def = max(i for i, (_, body) in enumerate(files) if define.search(body))
+        self.assertTrue(any(revoke.search(body) for _, body in files[last_def:]),
+                        "extraction_gap_by_source 의 anon·authenticated EXECUTE 회수가 "
+                        f"{files[last_def][0]} 이후에 없다")
+
 
 class RunMonitorExtractionGapTest(unittest.TestCase):
     def _posts(self, stats_payload, gap_payload, unmapped_payload=None):

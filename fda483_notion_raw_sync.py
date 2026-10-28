@@ -28,6 +28,13 @@ Status=New 인 FDA 483 Notion 행마다:
 Notion 행이 소비(Status≠New)된 뒤에는 대상이 아니다 — 이미 발행된 주는 발행본 소급 수리
 (`grm-fda483-ocr-backfill.yml`) 경로다.
 
+## FDA Warning Letter (`--source wl`, 2026-10-28)
+
+WL 도 같은 구조다 — 편지 GET 이 실패하면 Notion 행과 Supabase 행이 함께 본문 없이 들어가고,
+예약 회수(`backfill_wl_body_recovery.py`)는 Supabase 만 고친다. WL 의 "본문" 판정은
+`wl_body_full`(심층분석 fan-out 의 유일한 입력)이다 — 발췌(`wl_body_excerpt`)만 있는 행은
+카드 신호(`_has_source_body`)로는 참이지만 fan-out 이 돌지 않으므로 동기화 대상이다.
+
 dry-run 이 기본이다. `--apply` 일 때만 Notion 을 쓴다.
 """
 
@@ -48,7 +55,7 @@ import findings_supabase_backfill as fsb
 from card_scaffold import _has_source_body
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_483, log
+from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL, log
 from grm_handoff import fetch_intake_raw_payload, notion_query_new_intake_rows
 from grm_notion import (
     NOTION_BLOCK_CHILDREN_URL_TPL,
@@ -57,7 +64,20 @@ from grm_notion import (
     notion_api_request,
 )
 
-SCHEMA_VERSION = "grm-483-notion-raw-sync/v1"
+SCHEMA_VERSION = "grm-483-notion-raw-sync/v2"
+
+
+def _has_wl_body_full(raw: dict[str, Any]) -> bool:
+    return bool(raw.get("wl_body_full"))
+
+
+# 소스별 계약 — Notion 소스명 · "본문 있음" 판정 · 리포트에 셀 항목 키.
+SOURCE_SPECS: dict[str, dict[str, Any]] = {
+    "fda483": {"source": SOURCE_FDA_483, "has_body": _has_source_body,
+               "items_key": "fda_483_observations"},
+    "wl": {"source": SOURCE_FDA_WL, "has_body": _has_wl_body_full,
+           "items_key": "wl_violations"},
+}
 DEFAULT_WINDOW_DAYS = 45
 _DOC_ID_BATCH = 50
 _NOTION_SLEEP_SECONDS = 0.34
@@ -71,15 +91,16 @@ KST = timezone(timedelta(hours=9))
 class NotionRawSyncReport:
     schema_version: str = SCHEMA_VERSION
     mode: str = ""                      # "dry_run" | "apply"
+    source: str = SOURCE_FDA_483
     window_days: int = DEFAULT_WINDOW_DAYS
-    new_rows: int = 0                   # Status=New 인 FDA 483 Notion 행
+    new_rows: int = 0                   # Status=New 인 해당 소스 Notion 행
     already_has_body: int = 0           # Notion raw 에 본문이 이미 있음 — 대상 아님
     notion_raw_unreadable: int = 0      # Notion raw 를 읽지 못함 — 손대지 않음
     candidates: int = 0                 # Notion raw 가 본문 없음
     supabase_missing: int = 0           # 같은 document_id 의 Supabase 행 없음
     supabase_also_empty: int = 0        # Supabase 도 본문 없음 — 회수 대기
     synced: int = 0                     # Notion children 교체(dry-run=교체 예정)
-    observations_synced: int = 0        # 교체로 생긴 관찰 항목 수(브리프 카드 규모)
+    observations_synced: int = 0        # 교체로 생긴 관찰(483)·위반 표제(WL) 수(브리프 카드 규모)
     failed: int = 0
     errors: list[str] = field(default_factory=list)
     samples: list[dict[str, Any]] = field(default_factory=list)
@@ -97,16 +118,16 @@ def _json_object(value: Any) -> dict[str, Any]:
     return parsed if isinstance(parsed, dict) else {}
 
 
-def _fetch_supabase_raw(base_url: str, service_key: str,
-                        doc_ids: list[str]) -> dict[str, dict[str, Any]]:
-    """document_id → raw_json(dict). FDA 483 행만."""
+def _fetch_supabase_raw(base_url: str, service_key: str, doc_ids: list[str],
+                        source: str = SOURCE_FDA_483) -> dict[str, dict[str, Any]]:
+    """document_id → raw_json(dict). 해당 소스 행만."""
     out: dict[str, dict[str, Any]] = {}
     for i in range(0, len(doc_ids), _DOC_ID_BATCH):
         batch = doc_ids[i:i + _DOC_ID_BATCH]
         rows = fsb._fetch_all_pages(
             base_url, service_key, "raw_signals",
             select="document_id,raw_json", page_size=1000, order="document_id.asc",
-            extra_params={"source": f"eq.{SOURCE_FDA_483}",
+            extra_params={"source": f"eq.{source}",
                           "document_id": "in.(" + ",".join(batch) + ")"},
         )
         for r in rows:
@@ -149,6 +170,7 @@ def run(
     dry_run: bool,
     run_date: date,
     window_days: int = DEFAULT_WINDOW_DAYS,
+    source_key: str = "fda483",
     query_rows: Callable[..., list[dict[str, Any]]] | None = None,
     fetch_notion_raw: Callable[[str, str], dict[str, Any] | None] | None = None,
     fetch_supabase_raw: Callable[..., dict[str, dict[str, Any]]] | None = None,
@@ -158,8 +180,12 @@ def run(
     notion_raw_fn = fetch_notion_raw or fetch_intake_raw_payload
     supa_fn = fetch_supabase_raw or _fetch_supabase_raw
     replace_fn = replace_page_raw or _replace_page_raw
+    spec = SOURCE_SPECS[source_key]
+    source = spec["source"]
+    has_body = spec["has_body"]
 
-    report = NotionRawSyncReport(mode="dry_run" if dry_run else "apply", window_days=window_days)
+    report = NotionRawSyncReport(mode="dry_run" if dry_run else "apply", source=source,
+                                 window_days=window_days)
     base = _normalize_base_url(base_url)
     if base is None:
         report.errors.append("SUPABASE_URL must start with https://")
@@ -167,7 +193,7 @@ def run(
 
     try:
         rows = query_fn(notion_token, notion_db, run_date, window_days=window_days,
-                        source_names={SOURCE_FDA_483})
+                        source_names={source})
     except (NotionHandoffError, RuntimeError) as exc:
         report.errors.append(f"notion_query_failed: {exc}")
         return report, 2
@@ -181,17 +207,17 @@ def run(
         if raw is None:
             report.notion_raw_unreadable += 1
             continue
-        if _has_source_body(raw):
+        if has_body(raw):
             report.already_has_body += 1
             continue
         targets.append((row, doc_id))
     report.candidates = len(targets)
     if not targets:
-        log("INFO", f"Notion 483 raw 동기화: New {report.new_rows}건 중 본문 없는 행 0건")
+        log("INFO", f"Notion {source} raw 동기화: New {report.new_rows}건 중 본문 없는 행 0건")
         return report, 0
 
     try:
-        supa = supa_fn(base, service_key, sorted({d for _r, d in targets}))
+        supa = supa_fn(base, service_key, sorted({d for _r, d in targets}), source)
     except RuntimeError as exc:
         report.errors.append(str(exc))
         return report, 2
@@ -202,10 +228,10 @@ def run(
         if raw is None:
             report.supabase_missing += 1
             continue
-        if not _has_source_body(raw):
+        if not has_body(raw):
             report.supabase_also_empty += 1
             continue
-        observations = raw.get("fda_483_observations") or []
+        observations = raw.get(spec["items_key"]) or []
         if len(report.samples) < 20:
             report.samples.append({"document_id": doc_id, "page_id": page_id,
                                    "observations": len(observations)})
@@ -221,7 +247,7 @@ def run(
         report.observations_synced += len(observations)
 
     head = "[DRY] 교체 예정" if dry_run else "교체 완료"
-    log("INFO", f"Notion 483 raw 동기화 {head} {report.synced}건(관찰 {report.observations_synced}건) "
+    log("INFO", f"Notion {source} raw 동기화 {head} {report.synced}건(관찰 {report.observations_synced}건) "
                 f"· 대상 {report.candidates}/New {report.new_rows} "
                 f"· Supabase 도 빈손 {report.supabase_also_empty} · Supabase 없음 "
                 f"{report.supabase_missing} · 실패 {report.failed}")
@@ -231,7 +257,9 @@ def run(
 
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        description="미소비(New) Notion FDA 483 행의 빈 raw 를 Supabase 의 본문 있는 raw 로 채운다.")
+        description="미소비(New) Notion FDA 483·WL 행의 빈 raw 를 Supabase 의 본문 있는 raw 로 채운다.")
+    p.add_argument("--source", choices=sorted(SOURCE_SPECS), default="fda483",
+                   help="대상 소스(기본 fda483). wl = FDA Warning Letter(본문 판정 = wl_body_full).")
     p.add_argument("--apply", action="store_true", default=False,
                    help="실제 Notion 쓰기. 기본은 dry-run(조회·판정만).")
     p.add_argument("--window-days", type=int, default=DEFAULT_WINDOW_DAYS,
@@ -259,6 +287,7 @@ def main(argv: list[str] | None = None) -> int:
         notion_token=notion_token, notion_db=notion_db,
         base_url=base_url, service_key=service_key,
         dry_run=not args.apply, run_date=datetime.now(KST).date(), window_days=args.window_days,
+        source_key=args.source,
     )
     payload = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)
     print(payload)

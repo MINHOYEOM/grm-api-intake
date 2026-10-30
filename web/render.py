@@ -130,6 +130,7 @@ from grm_i18n import (  # noqa: E402
     KO as _KO, SUPPORTED_LANGS, MissingTranslation, Translator, build_js_catalog,
     noop as N_,
 )
+from wl_anatomy import split_wl_finding  # noqa: E402
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -512,7 +513,8 @@ def _fact_value_for_lang(label: str, value: str, lang: str,
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG,
                doc_url_index: "dict[str, tuple[str, int]] | None" = None,
-               en_paths: "set[str] | None" = None) -> dict[str, Any]:
+               en_paths: "set[str] | None" = None,
+               anatomy_slugs: "set[str] | None" = None) -> dict[str, Any]:
     # [다국어 5단계] 서사 다섯은 언어에 따라 **다른 출력**을 쓴다(번역이 아니라 같은
     # 요약의 다른 언어판 — 설계 문서 §4). 영어 슬롯이 없으면 한국어 그대로다.
     card = _card_with_english_narrative(card, lang)
@@ -708,6 +710,10 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         # (firm_key 와 같은 관례: 매치 없으면 키가 있어도 항상 falsy).
         "doc_href": doc_href,
         "doc_findings": doc_findings,
+        # [WL 해부 2026-10-31] 그 문서 페이지가 경고서한을 회신·판단으로 나눠 그리면 링크
+        # 문구가 그 사실을 말한다(한국어 트리 전용 — 영어판 문서 페이지는 나누지 않는다).
+        "doc_anatomy": bool(doc_href and lang == DEFAULT_LANG and anatomy_slugs
+                            and doc_href[len("findings/doc/"):-1] in anatomy_slugs),
     }
 
 
@@ -3110,6 +3116,28 @@ def finding_body(f: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
     return (f.get("text_orig") or "").strip() or ko
 
 
+def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
+                        link) -> "dict[str, Any] | None":
+    """경고서한 지적 1건을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈 표시용 뷰.
+
+    한국어 트리의 FDA 경고서한만 나눈다(나누는 표지어가 국문 번역 문체다 — 영어판은
+    원문 한 문단 그대로). 나눌 근거가 없으면 None 이고 템플릿은 종전 문단을 낸다.
+    `link` 는 문장 조각에 용어 링크를 끼우는 함수(페이지 단위 `used` 를 공유) — 부분마다
+    따로 부르므로 같은 용어는 여전히 페이지에서 첫 곳 하나만 링크된다.
+    """
+    if lang != DEFAULT_LANG or doc.get("source") != "FDA Warning Letter":
+        return None
+    parts = split_wl_finding(finding_body(f, lang))
+    if parts is None:
+        return None
+    return {
+        "lead": link(parts["lead"]),
+        "issues": [{k: (link(v) if v else "") for k, v in it.items()} for it in parts["issues"]],
+        "request_head": link(parts["request_head"]) if parts["request_head"] else "",
+        "requests": [link(r) for r in parts["requests"]],
+    }
+
+
 def doc_is_english(doc: dict[str, Any]) -> bool:
     """이 문서를 **영어 트리에 낼 수 있는가** — 원문이 실제로 영어인가.
 
@@ -3163,6 +3191,21 @@ def build_doc_evidence_url_index(
             continue
         index[url] = (slug, len(doc.get("findings") or []))
     return index
+
+
+def build_doc_anatomy_slugs(docs_data: "dict[str, Any] | None") -> "set[str]":
+    """[WL 해부 2026-10-31] 지적 하나라도 회신·판단으로 나뉘는 경고서한 문서의 slug.
+
+    문서 페이지(`doc_finding_anatomy`)와 같은 판정(국문 본문 → split_wl_finding)이라
+    카드의 "회신·판단까지 보기" 문구가 실제 화면과 어긋나지 않는다.
+    """
+    out: set[str] = set()
+    for doc in (docs_data or {}).get("documents") or []:
+        if doc.get("source") != "FDA Warning Letter" or not doc.get("slug"):
+            continue
+        if any(split_wl_finding(finding_body(f)) for f in doc.get("findings") or []):
+            out.add(doc["slug"])
+    return out
 
 
 _FIRM_SLUG_KEEP = re.compile(r"[^a-z0-9]+")
@@ -5017,6 +5060,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [S-06 2026-09-23] 브리프 카드 → 문서 페이지 링크용 색인. 한 번만 짓고 브리프 루프의
     # 모든 카드(ko·en)가 재사용한다(build_doc_evidence_url_index 참조).
     doc_url_index = build_doc_evidence_url_index(docs_data)
+    anatomy_slugs = build_doc_anatomy_slugs(docs_data)
 
     # ── [다국어 4단계 2026-09-04] 영어 트리에 실사 문서 표면을 더한다 ─────────────
     # 3단계는 조회 화면(런타임 RPC)만 영어로 냈다. 정적 문서 페이지는 그때 `findings_docs.json`
@@ -6043,6 +6087,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                                   if f.get("category_label_ko") else ""}
                                  for f in (doc.get("findings") or [])],
                 }
+                # [WL 해부 2026-10-31] 지적마다 한 번에 처리한다 — 용어 링크는 페이지에서
+                # 첫 곳 하나라, 나눈 지적과 안 나눈 지적을 따로 돌리면 링크 위치가 바뀐다.
+                _link = (lambda t: link_terms_in_text(t, _sel, _pp.rel_root, _used, lang=_lg))
+                _views = []
+                for f in doc.get("findings") or []:
+                    _a = doc_finding_anatomy(doc, f, _lg, _link)
+                    _views.append(_a if _a is not None else {"body": _link(finding_body(f, _lg))})
+                _anat = _views if any("lead" in v for v in _views) else None
                 _emit("findings_doc.html", _pp,
                     page_title=_tr("{title} · GRM",
                                    title=doc_titles_by_lang[_lg][doc["slug"]]),
@@ -6070,11 +6122,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     related_categories=(related if _lg == DEFAULT_LANG else []),
                     same_firm=(same_firm if _lg == DEFAULT_LANG else
                                [s for s in same_firm if s["slug"] in en_doc_slugs]),
-                    finding_bodies=[
-                        link_terms_in_text(finding_body(f, _lg), _sel, _pp.rel_root, _used,
-                                           lang=_lg)
-                        for f in doc.get("findings") or []
-                    ],
+                    finding_bodies=(None if _anat else [v["body"] for v in _views]),
+                    # [WL 해부 2026-10-31] 경고서한은 회신·판단·요구로 나눠 그린다. 나눈
+                    # 지적이 하나도 없으면 None → 템플릿은 종전 문단만 낸다(바이트 불변).
+                    finding_anatomies=_anat,
                     # [B1] 이 업체의 정적 페이지가 있으면 그리로(색인 가능·팔로우),
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                     # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
@@ -6233,7 +6284,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         cards_sorted = sorted(renderable,
                               key=lambda c: (c.get("render_order") is None,
                                              c.get("render_order")))
-        card_views = [_card_view(c, tr, lang, doc_url_index, en_paths) for c in cards_sorted]
+        card_views = [_card_view(c, tr, lang, doc_url_index, en_paths, anatomy_slugs)
+                      for c in cards_sorted]
         _annotate_toc_distinguishers(card_views)        # P1-1: 동명 카드 목차 구분자
         sections = _build_sections(card_views, tr)
         ctx = _brief_context(b, issue_no, tr)

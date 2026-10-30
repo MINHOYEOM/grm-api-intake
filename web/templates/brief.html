@@ -303,7 +303,9 @@
 (function(){
   var cards=document.getElementById('cards'); if(!cards) return;
   var toggle=document.getElementById('briefView');
-  function setView(v){
+  var VIEW_KEY='grm-brief-view';
+  function setView(v, keep){
+    if(!keep){ try{ localStorage.setItem(VIEW_KEY, v); }catch(e){} }
     document.body.classList.toggle('brief-summary', v==='summary');
     if(toggle){
       toggle.classList.toggle('on-summary', v==='summary');
@@ -347,7 +349,7 @@
     var meta='<span class="mono">Vol.'+issueNo+' · '+date+'</span> · '+ct+' · Signal T'+tier+' · Evidence '+ev;
     a.innerHTML='<div>'+bhtml+'<h4>'+thtml+'</h4><div class="meta">'+meta+'</div></div><i class="ti ti-arrow-right go" aria-hidden="true"></i>';
     a.addEventListener('click', function(e){
-      e.preventDefault(); setView('full');
+      e.preventDefault(); setView('full', true);   /* 카드 하나 펼침 — 독자의 보기 선택으로 저장하지 않는다 */
       var t=document.getElementById(card.id);
       if(t){ t.scrollIntoView({block:'start'}); if(history.replaceState) history.replaceState(null,'','#'+card.id); }
     });
@@ -360,6 +362,17 @@
       var b=e.target.closest('button'); if(b) setView(b.getAttribute('data-view'));
     });
   }
+
+  /* [브리프 다이어트 2026-10-31] 처음 열면 요약보기 — 한 호가 카드 100장을 넘는데 전체보기는
+     한 장씩 읽어 내려가야 한다. 제목 목록을 훑고 고른 카드만 펼치게 한다(요약행 클릭 =
+     그 카드 전체보기). 카드로 바로 온 링크(#카드)와 독자가 고른 보기는 그대로 존중한다.
+     저장값은 이 브라우저 편의일 뿐이라 읽기 실패(사생활 모드 등)면 기본값으로 간다. */
+  var saved=''; try{ saved=localStorage.getItem(VIEW_KEY)||''; }catch(e){}
+  var hashCard=location.hash && document.getElementById(location.hash.slice(1));
+  var initial=(hashCard && hashCard.matches && hashCard.matches('article.card')) ? 'full'
+    : (saved==='full' || saved==='summary') ? saved : 'summary';
+  setView(initial, true);
+  if(initial==='full' && hashCard) hashCard.scrollIntoView({block:'start'});
 })();
 /* [브리프→업체 프로파일 브릿지] 카드 data-firm-key(render.py 빌드시 스탬프) → 013
    findings_firm_counts RPC 1회 호출(카드 수만큼 개별 호출 금지) → 지적 건수>0 인

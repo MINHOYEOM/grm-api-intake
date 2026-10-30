@@ -49,6 +49,18 @@
   .fd-no{font-family:var(--mono);font-size:12px;color:var(--muted)}
   .fd-cat{font-family:var(--sans);font-size:12.5px;color:var(--coral-2)}
   .fd-text{font-family:var(--sans);font-size:15.5px;line-height:1.8;color:var(--body);margin:0;word-break:keep-all}
+  /* [WL 해부 2026-10-31] 회신(회색)과 판단(산호색) 테두리로 대비만 준다. */
+  .fd-lead{font-weight:500;color:var(--ink)}
+  .fd-iss{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+  .fd-iss-h{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);margin:0;word-break:keep-all}
+  .fd-part{border-left:3px solid var(--line-2);padding:2px 0 2px 14px}
+  .fd-part p,.fd-part li{font-family:var(--sans);font-size:15px;line-height:1.8;color:var(--body);margin:0;word-break:keep-all}
+  .fd-part ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+  .fd-lab{display:block;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:4px}
+  .fd-resp{border-left-color:var(--muted)}
+  .fd-judg{border-left-color:var(--coral)}
+  .fd-judg .fd-lab{color:var(--coral-2)}
+  .fd-req{border-left-color:var(--ink)}
   .fd-term{color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)}
   .fd-term:hover{color:var(--coral);border-bottom-color:var(--coral)}
   .fd-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
@@ -129,7 +141,31 @@
           </div>
           {#- 용어 링크가 끼워진 본문(Markup). 텍스트는 무변형이고 <a> 만 삽입된다 —
               배선이 없으면(finding_bodies 미전달) 기존대로 원문을 그대로 낸다. #}
+          {%- set an = finding_anatomies[loop.index0] if finding_anatomies else none %}
+          {%- if an and an.lead %}
+          {#- [WL 해부 2026-10-31] 경고서한 한 조각을 FDA 문장 그대로 나눠 놓는다 — 고쳐 쓰거나
+              요약하지 않는다(web/wl_anatomy.py). 라벨만 우리가 붙인다. 초심자가 볼 것은
+              "무엇이 지적됐나"보다 "어떤 회신이 왜 통하지 않았나"라 그 대비를 나란히 둔다. -#}
+          <p class="fd-text fd-lead">{{ an.lead }}</p>
+          {%- for it in an.issues %}
+          <div class="fd-iss">
+            {%- if it.heading %}<h3 class="fd-iss-h">{{ it.heading }}</h3>{% endif %}
+            {%- if it.observed %}<div class="fd-part"><span class="fd-lab">{{ _('지적 내용') }}</span><p>{{ it.observed }}</p></div>{% endif %}
+            {%- if it.response %}<div class="fd-part fd-resp"><span class="fd-lab">{{ _('회사 회신') }}</span><p>{{ it.response }}</p></div>{% endif %}
+            {%- if it.judgment %}<div class="fd-part fd-judg"><span class="fd-lab">{{ _('FDA 판단') }}</span><p>{{ it.judgment }}</p></div>{% endif %}
+          </div>
+          {%- endfor %}
+          {%- if an.requests %}
+          <div class="fd-part fd-req"><span class="fd-lab">{{ _('FDA 요구사항') }}</span>
+            <p>{{ an.request_head }}</p>
+            <ul>{% for r in an.requests %}<li>{{ r }}</li>{% endfor %}</ul>
+          </div>
+          {%- endif %}
+          {%- elif an %}
+          <p class="fd-text">{{ an.body }}</p>
+          {%- else %}
           <p class="fd-text">{{ (finding_bodies[loop.index0] if finding_bodies else f.text_ko) }}</p>
+          {%- endif %}
         </article>
         {%- endfor %}
       </div>

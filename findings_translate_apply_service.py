@@ -58,7 +58,9 @@ surfaced, mirroring findings_supabase_append.py's convention.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -67,6 +69,20 @@ import requests
 
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
+
+
+# [WL 절단 복원 · 2026-10-31] outbox 항목 종류. `kind` 가 없으면 기존 번역 항목 — 동작 불변.
+# "restore" 는 finding_text(새 영문)·finding_text_ko·translation_method 를 **한 PATCH** 로 바꾼다.
+# 라이브 finding_text 의 md5 가 finding_text_old_md5 와 같을 때만 쓴다(재실행 = matched_zero).
+# 국문이 비는 순간은 없다: 공개 RLS 게이트(006)가 finding_text_ko='' 행을 즉시 숨기므로 영문만
+# 먼저 바꾸는 반쪽 상태를 만들지 않는다. category_code 등 분류 열은 건드리지 않는다.
+RESTORE_KIND = "restore"
+_MD5_RE = re.compile(r"[0-9a-f]{32}")
+
+
+def _md5_text(text: str) -> str:
+    """Postgres md5(finding_text) 와 같은 값(UTF-8 바이트의 md5 hex)."""
+    return hashlib.md5(str(text).encode("utf-8")).hexdigest()
 
 
 DEFAULT_OUTBOX_DIR = "translations/outbox"
@@ -200,6 +216,20 @@ def _apply_one_finding(
     """
     finding_id = str(item.get("finding_id") or "")
     finding_text = str(item.get("finding_text") or "")
+    finding_text_ko = str(item.get("finding_text_ko") or "")
+    kind = str(item.get("kind") or "")
+    old_md5 = str(item.get("finding_text_old_md5") or "")
+
+    # 0) restore 항목의 형식 가드 — 어긋나면 요청을 보내지 않는다(쓰기 0).
+    if kind == RESTORE_KIND:
+        if not _MD5_RE.fullmatch(old_md5):
+            return "errored", f"finding_id={finding_id} restore item has invalid finding_text_old_md5"
+        if not finding_text.strip() or not finding_text_ko.strip():
+            return "errored", f"finding_id={finding_id} restore item has empty finding_text/finding_text_ko"
+        if not str(item.get("translation_method") or ""):
+            return "errored", f"finding_id={finding_id} restore item has empty translation_method"
+    elif kind:
+        return "errored", f"finding_id={finding_id} unknown item kind"
 
     # 1) Fetch the live row by primary key (short URL). finding_id is the
     #    findings PK, so this returns 0 or 1 rows.
@@ -216,9 +246,15 @@ def _apply_one_finding(
     # Only a row whose live finding_text still byte-matches the outbox item is
     # eligible -- this reproduces the original finding_id+finding_text eq
     # filter as an in-process comparison instead of a URL predicate.
-    live_matches = [
-        r for r in (rows or []) if str(r.get("finding_text") or "") == finding_text
-    ]
+    # restore 는 옛(잘린) 본문 md5 로 대조한다 — 이미 복원된 행(라이브 = 새 본문)은 0건.
+    if kind == RESTORE_KIND:
+        live_matches = [
+            r for r in (rows or []) if _md5_text(str(r.get("finding_text") or "")) == old_md5
+        ]
+    else:
+        live_matches = [
+            r for r in (rows or []) if str(r.get("finding_text") or "") == finding_text
+        ]
     if not live_matches:
         # finding_id absent, or the source finding_text changed since the batch
         # was built -- a TOCTOU-safe no-op, counted as matched_zero exactly as
@@ -234,15 +270,18 @@ def _apply_one_finding(
 
     # 2) Write by primary key only (short URL). return=representation lets us
     #    confirm exactly one row was updated.
+    body = {
+        "finding_text_ko": finding_text_ko,
+        "translation_method": str(item.get("translation_method") or ""),
+    }
+    if kind == RESTORE_KIND:
+        body["finding_text"] = finding_text  # 영문·국문 동시 교체(한 PATCH = 한 UPDATE)
     _status, prows, perr = _send_findings_request(
         "patch",
         base_url,
         service_key,
         params={"finding_id": f"eq.{finding_id}"},
-        json_body={
-            "finding_text_ko": str(item.get("finding_text_ko") or ""),
-            "translation_method": str(item.get("translation_method") or ""),
-        },
+        json_body=body,
         timeout=timeout,
     )
     if perr:

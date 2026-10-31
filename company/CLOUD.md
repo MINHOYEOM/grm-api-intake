@@ -16,7 +16,7 @@ gh api "$R/pulls?state=open&per_page=100" --jq '.[]|[.number,.title,.head.ref]|@
 gh api "$R/pulls" -f title="…" -f head=claude/… -f base=main -F body=@/tmp/pr.md --jq .html_url  # PR 만들기
 gh api "$R/commits/<sha>/check-runs?per_page=100" --jq '.check_runs[]|[.name,.status,.conclusion]|@tsv'  # CI 결과
 gh api "$R/issues" -f title="…" -F body=@/tmp/issue.md -f 'labels[]=automation-warning'       # 이슈
-gh api "$R/issues?state=open&labels=automation-warning" --jq '.[]|[.number,.title]|@tsv'       # 경고 이슈
+gh api "$R/issues?state=open&labels=automation-warning" --jq '.[]|select(.pull_request==null)|[.number,.title]|@tsv'  # 경고 이슈(이 API 는 PR 도 섞어 준다 — 걸러라)
 ```
 다른 브랜치의 파일은 `git fetch origin <branch>` 후 `git show FETCH_HEAD:<path>` 로 읽는다.
 

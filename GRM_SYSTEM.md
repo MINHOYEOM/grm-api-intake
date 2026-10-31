@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.282` |
+| 문서 버전 | `v1.283` |
 | 최종 수정일 | 2026-10-31 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -169,7 +169,7 @@ GRM은 **기술적으로는 프로덕션 운영 단계**, 조직·제품 측면�
 flowchart TD
     A[GitHub Actions grm-intake<br/>매일 03:17 KST] --> B[Python 수집기 17종]
     B --> C[(Notion GRM API Intake<br/>raw 적재 + handoff v2 + 빈슬롯 스캐폴드)]
-    C --> D[클라우드 Claude Routine<br/>월 05:30~ 편집팀 데스크·기자·교열<br/>09:30 v16 백업]
+    C --> D[클라우드 Claude Routine<br/>월 05:30~ 브리프편집팀 데스크·기자·교열<br/>09:30 v16 백업]
     D --> E[6슬롯 산문 + 심층분석 생성<br/>→ Notion web-delta 행 예치·자기검증]
     E --> F[grm-delta-bridge 월 07:07~13:37 30분 간격<br/>델타 git 커밋 — deep은 근거 게이트 통과분만]
     F --> G[grm-web-publish 자동 조립<br/>발행 PR publish/brief-날짜]
@@ -186,7 +186,7 @@ flowchart TD
 | # | 단계 | 실행 장치 | 트리거 | 사람 |
 |---|---|---|---|---|
 | ① | 매일 수집 + handoff v2 + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST | 없음 |
-| ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 편집팀(company/editorial) · 백업 v16 Routine | 월 05:30·06:10·07:40 · 백업 09:30 KST | 없음 |
+| ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 브리프편집팀(company/editorial) · 백업 v16 Routine | 월 05:30·06:10·07:40 · 백업 09:30 KST | 없음 |
 | ③ | 델타를 git 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `grm-delta-bridge.yml` | cron 월 07:07~13:37 KST **30분 간격 14회**(PAT push) | 없음 |
 | ④ | 스캐폴드+델타 → 발행본 조립 → 캐노니컬 브랜치 `publish/brief-{date}` PR | `grm-web-publish.yml` | ③ 델타 커밋(PAT라 자동 트리거) | 없음 |
 | ⑤ | 발행본 렌더 → 미리보기 URL | `grm-web-deploy.yml` | ④ PR 생성 | 없음 |
@@ -196,7 +196,7 @@ flowchart TD
 | 보조 | **발행 전 FDA 본문 결손 점검** — ① 스캐폴드의 FDA 카드 본문 미확보 건수·비율(`fda_body_coverage.py`) → ② 483 이 임계 이상이고 07:00 KST 전이면 결손 문서만 자동 회수 + handoff OPEN 일 때 수집 재실행으로 **handoff·스캐폴드 재생성** → ③ 남으면 경고 이슈 | `grm-fda-coverage-gate.yml` | ① 월요일(KST) 정기 수집 완료(workflow_run) | 없음 |
 | 보조 | 발행 준비 검증+가속(클라우드 산출 확인·부재 시만 백필) | 로컬 태스크 `grm-monday-brief-publish` | 월 09:05 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | 주간 퀴즈 자동 출제(그 주 브리프 2 + 용어사전 개념 1~2 생성→quiz_lint→PR→CI 머지, 미라이브 시 스킵) | 로컬 태스크 `grm-monday-quiz-gen` | 월 13:00 KST(데스크톱 ON 전제) | 없음 |
-| 보조 | **주간 용어 추가**(최근 4호 브리프가 스스로 병기한 짝 중 사전에 없는 말 → `glossary_candidates.py` 후보 → 세션이 **공식 문서에 정의가 있는 것만** 0~5개 작성 + 사례 결정 → `glossary_lint`·용어 테스트·골든 재동결 → PR → CI 머지. 좋은 후보가 없는 주는 0개가 정상 — 사이트에 '매주 추가'를 약속하지 않는다. 다음 배포에서 용어집 PDF 도 새 판) | 로컬 태스크 `grm-glossary-weekly` · 규율 `docs/prompts/GRM_주간용어추가_프롬프트_v1.md` | 화 10:17 KST(데스크톱 ON 전제) | 없음 |
+| 보조 | **주간 용어 추가**(최근 4호 브리프가 스스로 병기한 짝 중 사전에 없는 말 → `glossary_candidates.py` 후보 → 세션이 **공식 문서에 정의가 있는 것만** 0~5개 작성 + 사례 결정 → `glossary_lint`·용어 테스트·골든 재동결 → PR → CI 머지. 좋은 후보가 없는 주는 0개가 정상 — 사이트에 '매주 추가'를 약속하지 않는다. 다음 배포에서 용어집 PDF 도 새 판) | 클라우드 예약작업(용어·교육팀 `company/education/glossary-weekly.md`, 화 08:00 KST·PR 만 열고 머지는 `grm-stranded-batch-pr.yml`) · 백업 로컬 태스크 `grm-glossary-weekly`(11-14 까지) · 규율 `docs/prompts/GRM_주간용어추가_프롬프트_v1.md` | 화 10:17 KST(데스크톱 ON 전제) | 없음 |
 | 보조 | **용어 그림 일일 배치**(그림 없는 용어·다시 볼 그림 → `glossary_figs.py queue` → 세션이 **정의 문장에 그릴 구조(눈금·경계·흐름·전후·부분/전체·인과)가 있을 때만** 그림 → `check`(두 언어 × Pretendard 실측) + 독립 검토자 1명 → 장부 `glossary_fig_review.json`(redo·skip) → PR → CI 머지. 성과는 그림 개수가 아니라 판정 — 그릴 구조가 없으면 skip 이 정상) | 로컬 태스크 `grm-glossary-fig-daily` · 규율 `docs/prompts/GRM_용어그림_일일배치_프롬프트_v1.md` | 매일 11:40 KST(지금 실행 가능·데스크톱 ON 전제) | 없음 |
 | 보조 | **주간 퀴즈 미생성 감시**(로컬 태스크의 침묵을 클라우드에서 본다 — 이번 주 세트 부재 시 `quiz-freshness` 이슈, 생기면 자동 종료) | `grm-quiz-freshness.yml` | cron 화 13:10 KST | 없음 |
 | 보조 | 뉴스레터 자동 실발송(멱등·새 호만) | `grm-newsletter-send.yml` | cron 월 14:00 KST | 없음 |
@@ -332,7 +332,7 @@ flowchart TD
 - **매일 적재(M4):** `collect_intake.py`가 Notion 적재 성공분을 Supabase `findings`에 직행 append(기본 off 플래그, 현재 활성).
 - **외부 백필(F2):** `collect_fda_backfill.py`(+ `grm-findings-backfill-fetch.yml`)가 FDA 483(총 2,002건)·Warning Letter(3,608건, 2021년~)의 과거분을 Notion을 우회해 Supabase에 직행 적재. robots.txt `Crawl-Delay: 30`초를 완전 준수하며, 매일 07:17 UTC cron이 `--auto` 모드로 1청크씩 소진합니다(483→WL 순, 완료되면 자가 종료 후 신규 문서 2차 안전망으로 전환). MFDS는 nedrug robots `Disallow: /` 정책 판단에 따라 백필 대상에서 제외(일일 수집만 유지). 진척(2026-07-15): 483 문서 1,886건 수집(WL 백필은 483 완주 후 착수 — 현재 WL 문서는 일일 수집분 위주).
 - **공개 게이트(M9):** `findings_public_read` RLS 정책이 `국문 번역 있음 또는 원문이 한국어`인 행만 anon(공개)에 노출. 미번역은 DB가 원천 차단.
-- **일일 번역(M8·M9):** **매일** 예약된 Claude Code 세션(`grm-findings-weekly-translate` 예약 태스크·구독 사용량·API 비용 0)이 미번역분을 추출(`findings_translation_queue` 009 RPC·최신순 ≤100건/일)→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영. 번역 큐는 공개 게이트와 정합(scope_status='ok' AND review_status≠'rejected' — 035): 공개될 findings 만 번역 슬롯을 쓴다. 대량 백필(수백~수천)은 100건/일 상한을 초과하므로 사람이 수동 일괄 처리한다(정상 일일 유입은 상한 이내라 무인 완결).
+- **일일 번역(M8·M9):** **매일** 클라우드 예약작업(글로벌번역팀 `company/translation/findings-daily.md`, 04:00 KST — PR 만 열고 머지는 `grm-stranded-batch-pr.yml`. 로컬 `grm-findings-weekly-translate` 는 11-14 까지 09:10 백업·구독 사용량·API 비용 0)이 미번역분을 추출(`findings_translation_queue` 009 RPC·최신순 ≤100건/일)→번역→검증→PR 자동 머지. 머지되면 `grm-findings-translate-apply.yml`(LLM 미관여 순수 스크립트)이 Supabase에 반영. 번역 큐는 공개 게이트와 정합(scope_status='ok' AND review_status≠'rejected' — 035): 공개될 findings 만 번역 슬롯을 쓴다. 대량 백필(수백~수천)은 100건/일 상한을 초과하므로 사람이 수동 일괄 처리한다(정상 일일 유입은 상한 이내라 무인 완결).
 - **검수 자동승격(P2, C-S2):** WL finding 은 태생 `review_status='needs_review'`(confidence 0.72)라 승격 경로가 없으면 영구 적체했다. `findings_review_promote_service.py`(`grm-findings-review-promote.yml` 매일 20:30 UTC 크론·LLM 0)가 `scope_status='ok' AND review_status='needs_review' AND source∈(WL,483)` 중 **고신뢰 신호**(저장 cfr_refs 조항 인용 AND finding_text 위반/조건 신호[`findings_extractors.wl_violation_signal_present`, A-S1 게이트와 동일 원천] AND 길이≥60)만 `accepted` 로 PATCH(가드 `review_status=eq.needs_review`·멱등). 라이브 3,144 accepted WL 대조에서 이 규칙 만족 rejected 0건(정밀도). 그 외는 needs_review 유지(애매하면 유지). 자동 반려는 opt-in(기본 off — A-S1 이 신규 오추출을 애초에 방출 안 함).
 - **오추출 차단·격리:** ①**A-S1 WL 파서 품질 게이트**(`findings_extractors._from_warning_letter`) — 방출 전 조항 인용 or 위반/조건 신호가 있는 블록만 채택, 화장품/OTC WL 이 인용한 제품 라벨 사용법("Use thick amount…")·파편은 드랍(문서 단위 유효 블록 0이면 통짜 폴백). ②**rejected 공개 숨김**(034) — 검수 반려 finding 을 공개 read RLS·`findings_stats` 집계에서 제외(삭제 아닌 숨김, 관리자는 RLS 우회로 조회). 라이브: anon rejected 15→0.
 - **백로그 모니터(P0):** `findings_backlog_monitor.py`(`grm-findings-backlog-monitor.yml` 매일 21:00 UTC 크론·읽기 전용)가 `findings_stats` 로 미번역 격차(findings−public_findings)·needs_review 백로그를 산출, 임계(기본 gap>300·needs_review>300) 초과 시 exit 1(red)+운영 이슈 생성/갱신(label `findings-backlog`), 정상 복귀 시 자동 종료. 대량 백필이 조용히 쌓이던 사각(RCA 원인 B-2/C-3)을 없앤다. 배너(`findings.js`)도 격차 소량이면 "다음 날 공개", 대량이면 "과거 자료 순차 공개 중"으로 정직 분기(B-S4).
@@ -603,7 +603,14 @@ grm-api-intake/
 │  ├─ js/mfds_inspector_ui.js       # 네트워크 없는 UI 계약 검증
 │  ├─ run_mfds_sql_mutations.py     # 정책 위반 주입 FAIL → 원복 PASS 검증
 │  └─ sql/mfds_attendees*.sql       # 격리 PostgreSQL 적재·조회·권한·멱등성 검증
-├─ company/                        # "Claude 가 운영하는 회사" 지시문 — CHARTER.md(공통 헌장) · editorial/(편집팀 데스크·기자·교열 — v16 절을 가리키기만 함 · RUN.md 실행 규칙 · 현행 v16 Routine 은 월 09:30 백업)
+├─ company/                        # "Claude 가 운영하는 회사(GRM Intelligence)" 지시문 — 클라우드 예약작업이 읽는다. 정본(docs/prompts/)은 가리키기만 한다(tests/test_company_pointers.py)
+│  ├─ CHARTER.md · CLOUD.md · ROUTINES.md   # 공통 헌장 · 클라우드 되는 것/막힌 것·gh api · 예약작업 목록(시각·모델·PC 백업 표식)
+│  ├─ editorial/                   # 브리프편집팀 데스크·기자·교열 — v16 절을 가리키기만 함 · RUN.md 실행 규칙 · v16 Routine 은 월 09:30 백업
+│  ├─ education/                   # 용어·교육팀 — 주간 용어 추가(화) · 주간 퀴즈(월)
+│  ├─ translation/                 # 글로벌번역팀 — 지적사항 일일 번역(매일 04:00)
+│  ├─ situation-room/              # 종합상황실 — 월 발행 준비 확인 · 월 운영 점검(확인만, 복구는 PC 백업)
+│  ├─ growth/ · outreach/          # 성장분석팀 주간 성장 보고 · 대외홍보팀 링크드인 초안 확인
+│  └─ run/                         # (claude/company-<날짜> 브랜치에만) 직무별 실행 결과
 ├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
 │  ├─ specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md     # 483 OCR 엔진·모델·전처리·psm·오픈소스 엔진 비교(판독 실패 44·대조군 60, 무료·로컬만)

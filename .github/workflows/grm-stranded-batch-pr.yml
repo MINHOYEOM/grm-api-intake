@@ -76,7 +76,13 @@ jobs:
               ? (context.payload.inputs.dry_run === 'true')
               : false;
 
-            const TITLE_PREFIX = 'chore(findings): 일일 번역 배치';
+            // 2026-10-31 클라우드 이전: 클라우드 작업(company/)은 PR 만 열고 머지하지 않는다
+            // (조직 규칙 "AI 는 머지하지 않는다"). 주간 용어·퀴즈 PR 도 같은 3시간 유예 뒤 여기서 머지한다.
+            const TITLE_PREFIXES = [
+              'chore(findings): 일일 번역 배치',
+              'glossary(weekly):',
+              'quiz(weekly):',
+            ];
             const ISSUE_TITLE = '일일 번역 배치 PR 방치 — 검사 실패 또는 충돌';
             const LABEL_FINDINGS = 'grm-findings';
             const LABEL_FAILURE = 'automation-failure';
@@ -95,7 +101,7 @@ jobs:
             const { data: openPrs } = await github.rest.pulls.list({
               owner, repo, state: 'open', base: 'main', per_page: 50,
             });
-            const batchPrs = openPrs.filter((pr) => pr.title.startsWith(TITLE_PREFIX));
+            const batchPrs = openPrs.filter((pr) => TITLE_PREFIXES.some((p) => pr.title.startsWith(p)));
 
             if (batchPrs.length === 0) {
               console.log('열린 배치 PR 없음 — 할 일 없음.');
@@ -163,7 +169,7 @@ jobs:
             await ensureLabel(LABEL_FINDINGS, '0e8a16', 'GRM findings pipeline');
             await ensureLabel(LABEL_FAILURE, 'b60205', 'GRM automation failure');
 
-            const lines = ['일일 번역 배치 PR 이 검사 실패 또는 충돌 상태로 방치돼 있다.', ''];
+            const lines = ['자동 배치 PR(번역·주간 용어·퀴즈)이 검사 실패 또는 충돌 상태로 방치돼 있다.', ''];
             for (const { pr: p, failedRuns, mergeableFalse } of stuck) {
               lines.push(`- #${p.number} ${p.html_url}`);
               for (const c of failedRuns) {

@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.281` |
+| 문서 버전 | `v1.282` |
 | 최종 수정일 | 2026-10-31 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -169,7 +169,7 @@ GRM은 **기술적으로는 프로덕션 운영 단계**, 조직·제품 측면�
 flowchart TD
     A[GitHub Actions grm-intake<br/>매일 03:17 KST] --> B[Python 수집기 17종]
     B --> C[(Notion GRM API Intake<br/>raw 적재 + handoff v2 + 빈슬롯 스캐폴드)]
-    C --> D[클라우드 Claude Routine<br/>매주 월 07:30 KST]
+    C --> D[클라우드 Claude Routine<br/>월 05:30~ 편집팀 데스크·기자·교열<br/>09:30 v16 백업]
     D --> E[6슬롯 산문 + 심층분석 생성<br/>→ Notion web-delta 행 예치·자기검증]
     E --> F[grm-delta-bridge 월 07:07~13:37 30분 간격<br/>델타 git 커밋 — deep은 근거 게이트 통과분만]
     F --> G[grm-web-publish 자동 조립<br/>발행 PR publish/brief-날짜]
@@ -186,7 +186,7 @@ flowchart TD
 | # | 단계 | 실행 장치 | 트리거 | 사람 |
 |---|---|---|---|---|
 | ① | 매일 수집 + handoff v2 + 빈슬롯 스캐폴드 artifact | `grm-intake.yml` | cron 매일 03:17 KST | 없음 |
-| ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 Routine | 매주 월 07:30 KST | 없음 |
+| ② | 월요일 카드 분석 → 슬롯 델타 + **심층분석 생성** → Notion 예치(자기검증) | 클라우드 편집팀(company/editorial) · 백업 v16 Routine | 월 05:30·06:10·07:40 · 백업 09:30 KST | 없음 |
 | ③ | 델타를 git 이관(deep는 `verify_deep_analysis` 게이트 통과분만) | `grm-delta-bridge.yml` | cron 월 07:07~13:37 KST **30분 간격 14회**(PAT push) | 없음 |
 | ④ | 스캐폴드+델타 → 발행본 조립 → 캐노니컬 브랜치 `publish/brief-{date}` PR | `grm-web-publish.yml` | ③ 델타 커밋(PAT라 자동 트리거) | 없음 |
 | ⑤ | 발행본 렌더 → 미리보기 URL | `grm-web-deploy.yml` | ④ PR 생성 | 없음 |
@@ -603,6 +603,7 @@ grm-api-intake/
 │  ├─ js/mfds_inspector_ui.js       # 네트워크 없는 UI 계약 검증
 │  ├─ run_mfds_sql_mutations.py     # 정책 위반 주입 FAIL → 원복 PASS 검증
 │  └─ sql/mfds_attendees*.sql       # 격리 PostgreSQL 적재·조회·권한·멱등성 검증
+├─ company/                        # "Claude 가 운영하는 회사" 지시문 — CHARTER.md(공통 헌장) · editorial/(편집팀 데스크·기자·교열 — v16 절을 가리키기만 함 · RUN.md 실행 규칙 · 현행 v16 Routine 은 월 09:30 백업)
 ├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
 │  ├─ specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md     # 483 OCR 엔진·모델·전처리·psm·오픈소스 엔진 비교(판독 실패 44·대조군 60, 무료·로컬만)

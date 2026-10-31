@@ -393,9 +393,10 @@
       과 정확히 일치할 때만(render.py `doc_url_index` 매치) 뜬다 — 없는 문서로 보내는
       링크는 무링크보다 나쁘다는 저장소 규율. 스타일은 이 카드가 실리는 페이지(brief.html)
       의 페이지 스코프 <style>(.arc-lib-go·.dt-xref-go 와 같은 결)에만 둔다 — grm.css
-      무접촉(§4 동결 규칙). -#}
+      무접촉(§4 동결 규칙). [WL 해부 2026-10-31] 문서 페이지가 경고서한을 회사 회신·
+      FDA 판단으로 나눠 그릴 때(card.doc_anatomy)만 링크 문구가 그 사실을 말한다. -#}
   {%- if card.doc_href %}
-  <a class="c-doclink" href="{{ rel_root }}{{ card.doc_href }}">{{ _("이 문서의 지적 {n}건 전체 보기", n=card.doc_findings) }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+  <a class="c-doclink" href="{{ rel_root }}{{ card.doc_href }}">{% if card.doc_anatomy %}{{ _("이 문서의 지적 {n}건 — 회사 회신과 FDA 판단 나눠 보기", n=card.doc_findings) }}{% else %}{{ _("이 문서의 지적 {n}건 전체 보기", n=card.doc_findings) }}{% endif %} <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
   {%- endif %}
   {#- [카드 반응 계층 S0 — 공유하기 2026-07-03] 순수 클라이언트(백엔드·계정 0). 정적 마크업(카드값
       미참조·불투명 anchor 만) → 콘텐츠 순수/결정론(#1·#2) 불침범. 기본 display:none, base.html 인라인

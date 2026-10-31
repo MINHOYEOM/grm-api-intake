@@ -11502,7 +11502,11 @@ class WebFindingsDocPageTest(unittest.TestCase):
             path = en_root / doc["slug"] / "index.html"
             self.assertTrue(path.is_file(), f"영어 문서 페이지 누락: {doc['slug']}")
             html = path.read_text(encoding="utf-8")
-            bodies = re.findall(r'<p class="fd-text">(.*?)</p>', html, re.S)
+            # [WL 해부 2026-10-31] 나뉜 경고서한은 본문이 요지(fd-lead)와 부분(fd-part)에 있다 —
+            # 그 문장들도 같은 원문이므로 함께 본다.
+            bodies = re.findall(r'<p class="fd-text[^"]*">(.*?)</p>', html, re.S)
+            bodies += re.findall(r'<div class="fd-part[^"]*"><span class="fd-lab">[^<]*</span><p>(.*?)</p>',
+                                 html, re.S)
             self.assertTrue(bodies, doc["slug"])
             for b in bodies:
                 self.assertNotRegex(b, "[가-힣]", f"{doc['slug']} 본문이 한국어다")

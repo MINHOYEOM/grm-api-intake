@@ -1,0 +1,74 @@
+name: GRM WL Truncation Restore Plan
+
+# [WL 절단 복원 · 2026-10-31] 옛 480자 상한(PR #653 전)으로 잘린 FDA Warning Letter findings 의
+# 복원 계획을 만든다. raw_signals(편지 전문)는 anon 으로 읽을 수 없어 service-role 키가 있는
+# 이곳에서 지금 추출기로 블록을 다시 만들고, 기존 finding_id 에 대응시킨 계획 JSON 을
+# **Actions 아티팩트**(wl-truncation-restore-plan, 90일)로 올린다.
+#
+# ★이 워크플로는 아무것도 쓰지 않는다 — DB 쓰기·git 쓰기 모두 없다(GET 만). 실제 교체는 일일
+# 번역 세션이 `gh run download` 로 계획을 받아 국문을 채운 restore 항목을 outbox 배치에 싣고,
+# grm-findings-translate-apply.yml 이 옛 본문 md5 대조 뒤 영문·국문을 한 PATCH 로 바꾼다.
+# 계획은 다시 돌려도 안전하다 — 이미 복원된 행은 "…" 로 끝나지 않아 후보에서 빠진다.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wl-truncation-restore-plan
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Build WL truncation restore plan (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build restore plan (GET only — no DB/git writes)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python backfill_wl_truncation_restore.py \
+            --output wl_truncation_restore_plan.json \
+            --report-path wl_truncation_restore_report.json
+
+      - name: Upload restore plan artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wl-truncation-restore-plan
+          path: |
+            wl_truncation_restore_plan.json
+            wl_truncation_restore_report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM WL Truncation Restore Plan"
+            echo ""
+            if [ -f wl_truncation_restore_report.json ]; then
+              echo '```json'
+              cat wl_truncation_restore_report.json
+              echo '```'
+            else
+              echo "리포트가 없습니다 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 또는 조회 실패를 확인하세요."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -48,6 +48,7 @@ resulting SQL is applied by a human via the Supabase SQL Editor) and rejects
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -76,6 +77,19 @@ TRANSLATION_APPLY_SCHEMA_VERSION = "grm-findings-translation-apply/v1"
 _ALLOWED_TRANSLATION_METHODS = tuple(m for m in gf.TRANSLATION_METHODS if m)
 
 _HANGUL_RE = re.compile(r"[가-힣]")
+
+# [WL 절단 복원 · 2026-10-31] plan/outbox 항목 종류. `kind` 키가 없으면 기존 번역 항목(동작 불변).
+# restore = 옛 480자 상한으로 잘린 WL 행의 영문을 새 본문으로 바꾸고 국문을 같은 PATCH 로 채우는
+# 항목. 계획은 backfill_wl_truncation_restore.py(Actions 아티팩트)가 만들고, --export-restore 가
+# 라이브에서 아직 옛 본문인 것만 고른다.
+RESTORE_KIND = "restore"
+RESTORE_PLAN_SCHEMA_VERSION = "grm-wl-truncation-restore-plan/v1"
+_MD5_RE = re.compile(r"[0-9a-f]{32}")
+
+
+def _md5_text(text: str) -> str:
+    """Postgres md5(finding_text) 와 같은 값(UTF-8 바이트의 md5 hex)."""
+    return hashlib.md5(str(text).encode("utf-8")).hexdigest()
 
 _EXPORT_COLUMNS = (
     "finding_id",
@@ -409,7 +423,22 @@ def _validate_item(item: dict[str, Any], db_rows: dict[str, dict[str, Any]]) -> 
 
     finding_text = str(item.get("finding_text") or "")
     db_finding_text = str(db_row.get("finding_text") or "")
-    if finding_text != db_finding_text:
+    kind = str(item.get("kind") or "")
+    if kind == RESTORE_KIND:
+        # [WL 절단 복원] finding_text 는 **새** 영문 본문이다 — 라이브 대조는 옛 본문 md5 로 한다.
+        old_md5 = str(item.get("finding_text_old_md5") or "")
+        if not _MD5_RE.fullmatch(old_md5):
+            errors.append(f"{finding_id}: restore item needs a 32-hex finding_text_old_md5")
+        elif _md5_text(db_finding_text) != old_md5:
+            errors.append(
+                f"{finding_id}: restore old md5 does not match the database "
+                "(already restored or source text changed)"
+            )
+        if not finding_text.strip() or finding_text == db_finding_text:
+            errors.append(f"{finding_id}: restore finding_text is empty or unchanged")
+    elif kind:
+        errors.append(f"{finding_id}: unknown item kind {kind!r}")
+    elif finding_text != db_finding_text:
         errors.append(
             f"{finding_id}: finding_text does not byte-match the database "
             "(source text was altered)"
@@ -444,6 +473,20 @@ def _build_sql_text(items: list[dict[str, Any]]) -> str:
         "-- the live database; this file makes no network connection on its own.",
     ]
     for item in items:
+        if str(item.get("kind") or "") == RESTORE_KIND:
+            # 영문·국문을 한 문장으로 교체 — 옛 본문 md5 가 맞을 때만(재실행 = 0행).
+            lines.append(
+                "update public.findings set finding_text = {text}, finding_text_ko = {ko}, "
+                "translation_method = {method} where finding_id = {fid} "
+                "and md5(finding_text) = {md5};".format(
+                    text=pg_quote_text(str(item["finding_text"])),
+                    ko=pg_quote_text(str(item["finding_text_ko"])),
+                    method=pg_quote_text(str(item["translation_method"])),
+                    fid=pg_quote_text(str(item["finding_id"])),
+                    md5=pg_quote_text(str(item["finding_text_old_md5"])),
+                )
+            )
+            continue
         lines.append(
             "update public.findings set finding_text_ko = {ko}, translation_method = {method} "
             "where finding_id = {fid} and finding_text = {text};".format(
@@ -481,8 +524,18 @@ def _write_sql_file(path: str | Path, items: list[dict[str, Any]]) -> None:
 _OUTBOX_ITEM_KEYS = ("finding_id", "finding_text", "finding_text_ko", "translation_method")
 
 
+# [WL 절단 복원] restore 항목만 두 키를 더 싣는다 — 일반 번역 항목의 모양은 그대로(키 4개).
+_OUTBOX_RESTORE_EXTRA_KEYS = ("kind", "finding_text_old_md5")
+
+
 def _build_outbox_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return [{key: str(item.get(key) or "") for key in _OUTBOX_ITEM_KEYS} for item in items]
+    out: list[dict[str, Any]] = []
+    for item in items:
+        keys = _OUTBOX_ITEM_KEYS
+        if str(item.get("kind") or "") == RESTORE_KIND:
+            keys = _OUTBOX_ITEM_KEYS + _OUTBOX_RESTORE_EXTRA_KEYS
+        out.append({key: str(item.get(key) or "") for key in keys})
+    return out
 
 
 def _write_outbox_file(path: str | Path, items: list[dict[str, Any]]) -> None:
@@ -560,6 +613,9 @@ def apply_translations(
             "schema_version mismatch: expected "
             f"{TRANSLATION_PLAN_SCHEMA_VERSION!r}, got {schema_version!r}"
         )
+
+    if any(isinstance(it, dict) and it.get("kind") for it in items):
+        errors.append("restore items are supported only with --source supabase")
 
     conn = views.open_findings_db_readonly(path)
     try:
@@ -801,7 +857,9 @@ def apply_translations_supabase(
         finding_id = str(item["finding_id"])
         db_row = db_rows.get(finding_id, {})
         already_translated = bool(str(db_row.get("finding_text_ko") or "").strip())
-        if already_translated and not overwrite:
+        # restore 항목은 잘린 본문의 국문을 새 본문의 국문으로 **바꾸는** 것이 목적이다.
+        is_restore = str(item.get("kind") or "") == RESTORE_KIND
+        if already_translated and not overwrite and not is_restore:
             skipped += 1
             continue
         to_update.append(item)
@@ -830,6 +888,68 @@ def apply_translations_supabase(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
+
+def build_restore_queue_supabase(
+    restore_plan: dict[str, Any], base_url: str, anon_key: str,
+) -> dict[str, Any]:
+    """[WL 절단 복원] 복원 계획(Actions 아티팩트) → 아직 남은 restore 항목만 담은 번역 plan.
+
+    라이브 finding_text 의 md5 가 계획의 옛 md5 와 같은 항목만 남긴다 — 이미 복원됐거나
+    (라이브 = 새 본문) 다른 경로로 본문이 바뀐 항목은 빠진다. 결과는 --export 와 같은 plan
+    모양(schema·items)이라 번역 세션이 국문만 채워 일반 항목과 한 filled.json 에 합친다.
+    정렬은 published_date 최신순(계획 순서와 같다). 읽기 전용(anon RPC 009).
+    """
+    base = _normalize_supabase_url(base_url)
+    if base is None:
+        raise ValueError("findings_translate: --supabase-url must start with https://")
+    if restore_plan.get("schema_version") != RESTORE_PLAN_SCHEMA_VERSION:
+        raise ValueError(
+            "restore plan schema_version mismatch: expected "
+            f"{RESTORE_PLAN_SCHEMA_VERSION!r}, got {restore_plan.get('schema_version')!r}"
+        )
+    plan_items = [it for it in (restore_plan.get("items") or []) if isinstance(it, dict)]
+    ids = sorted({str(it.get("finding_id") or "") for it in plan_items if it.get("finding_id")})
+    live, err = _fetch_live_rows_for_ids_supabase(base, anon_key, ids)
+    if err:
+        raise ValueError(f"findings_translate: restore live fetch failed: {err}")
+
+    pending: list[dict[str, Any]] = []
+    already_restored = drifted = missing = 0
+    for it in plan_items:
+        fid = str(it.get("finding_id") or "")
+        row = live.get(fid)
+        if row is None:
+            missing += 1
+            continue
+        live_text = str(row.get("finding_text") or "")
+        new_text = str(it.get("finding_text") or "")
+        if live_text == new_text:
+            already_restored += 1
+            continue
+        if _md5_text(live_text) != str(it.get("finding_text_old_md5") or ""):
+            drifted += 1
+            continue
+        pending.append({
+            "kind": RESTORE_KIND,
+            "finding_id": fid,
+            "published_date": str(it.get("published_date") or ""),
+            "finding_text_old_md5": str(it.get("finding_text_old_md5") or ""),
+            "finding_text": new_text,
+            "finding_text_ko": "",
+            "translation_method": "",
+        })
+    pending.sort(key=lambda x: (x["published_date"], x["finding_id"]), reverse=True)
+    return {
+        "schema_version": TRANSLATION_PLAN_SCHEMA_VERSION,
+        "kind": RESTORE_KIND,
+        "restore_plan_generated_at": str((restore_plan.get("report") or {}).get("generated_at") or ""),
+        "restore_pending": len(pending),
+        "restore_already_applied": already_restored,
+        "restore_drifted": drifted,
+        "restore_missing": missing,
+        "items": pending,
+    }
 
 
 def _resolve_supabase_credentials(args: argparse.Namespace) -> tuple[str, str] | None:
@@ -904,8 +1024,38 @@ def main(argv: list[str] | None = None) -> int:
         "apply service findings_translate_apply_service.py (--apply only; may be combined with "
         "--sql-output; --source sqlite and supabase both supported)",
     )
+    parser.add_argument(
+        "--export-restore",
+        metavar="RESTORE_PLAN_JSON",
+        help="[WL 절단 복원] 복원 계획(grm-wl-truncation-restore-plan.yml 아티팩트)에서 라이브가 "
+        "아직 옛 본문인 restore 항목만 plan JSON 으로 내보낸다(--source supabase, 읽기 전용)",
+    )
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output")
     args = parser.parse_args(argv)
+
+    if args.export_restore:
+        if args.export or args.apply or args.source != "supabase":
+            print(
+                "findings_translate: --export-restore is standalone and requires --source supabase",
+                file=sys.stderr,
+            )
+            return 2
+        creds = _resolve_supabase_credentials(args)
+        if creds is None:
+            print(
+                "findings_translate: --export-restore requires --supabase-url/--supabase-anon-key "
+                "or $SUPABASE_URL/$SUPABASE_ANON_KEY",
+                file=sys.stderr,
+            )
+            return 2
+        try:
+            restore_plan = _load_json(args.export_restore)
+            result = build_restore_queue_supabase(restore_plan, *creds)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"findings_translate: {exc}", file=sys.stderr)
+            return 2
+        _emit(result, output=args.output, pretty=args.pretty)
+        return 0
 
     if args.export and args.apply:
         print("findings_translate: use exactly one of --export or --apply", file=sys.stderr)
@@ -1022,6 +1172,7 @@ __all__ = [
     "apply_translations",
     "build_translation_plan_supabase",
     "apply_translations_supabase",
+    "build_restore_queue_supabase",
     "main",
 ]
 

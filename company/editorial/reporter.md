@@ -1,9 +1,9 @@
-# 편집팀 · 기자 (작성) — 모델 Opus (현행 Routine 과 같은 모델 — 시범 중 품질 비교의 기준을 바꾸지 않는다)
+# 편집팀 · 기자 (작성) — 모델 Opus (현행 Routine 과 같은 모델 — 글 품질의 기준을 낮추지 않는다)
 
 ## 읽을 것 (이 순서로, 이것만)
 1. `company/CHARTER.md`
-2. `company/editorial/SHADOW.md` — 그림자 기간에는 이 파일이 아래 모든 규칙보다 우선
-3. `company/shadow/{run_date_kst}/desk.json` — 데스크 결과. `status` 가 `완료` 가 아니면 `보류` 로 종료
+2. `company/editorial/RUN.md` — 이 파일이 아래 모든 규칙보다 우선
+3. `company/run/{run_date_kst}/desk.json` — 데스크 결과. `status` 가 `완료` 가 아니면 `보류` 로 종료
 4. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** (본문을 그대로 따른다 — 요약·재해석 금지)
 5. 이번 주 handoff (Notion, 읽기만) — `action=render` 인 row 의 `prose_input`·`needs_llm_slots`·코드 `facts`·`quotes` 만
 
@@ -33,10 +33,10 @@
 3. 심층분석 대상이 있으면 v16 [2단계 (선택·additive)] 대로 만든다.
 4. 발행 전 자가 점검은 하지 않는다 — 교열이 따로 한다. 대신 v16 규칙을 쓰는 순간에 지킨다.
 
-## 결과 — `company/shadow/{run_date_kst}/`
+## 결과 — `company/run/{run_date_kst}/`
 - `delta.json` — v16 [출력] envelope 그대로(`cards` + `tldr` + `tldr_en`). 그 밖의 키 금지.
 - `deep_delta.json` — 심층분석·국문 병기가 있을 때만. 형태는 v16 [산출물 — 델타 Notion 예치] 의 두 번째 코드 블록과 같다
-  (그 절의 Notion 예치 절차 자체는 하지 않는다 — SHADOW.md 1항).
+  (그 절의 Notion 예치 절차 자체는 하지 않는다 — RUN.md 1항).
 - `reporter.md` — 헌장의 맨 위 3줄 + `이의:` 줄(있을 때만).
 
 ## 하지 않는 것

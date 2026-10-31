@@ -13,7 +13,7 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 V16 = os.path.join(ROOT, "docs", "prompts", "GRM_Prompt_v16.md")
 EDITORIAL = os.path.join(ROOT, "company", "editorial")
-ROLE_FILES = ("desk.md", "reporter.md", "copyedit.md", "README.md")
+ROLE_FILES = ("desk.md", "reporter.md", "copyedit.md")
 
 _POINTER = re.compile(r"^- v16: (\[.+\])\s*$")
 _HEADING = re.compile(r"^\[[^\]]+\]\s*$")
@@ -56,12 +56,6 @@ class EditorialCoverageTest(unittest.TestCase):
                     for name, ps in role_pointers().items()}
         self.assertEqual({k: v for k, v in dangling.items() if v}, {},
                          "v16 에 없는 절을 가리킨다")
-
-    def test_live_only_sections_not_given_to_shadow_roles(self):
-        pointers = role_pointers()
-        live_only = set(pointers["README.md"])
-        for name in ("desk.md", "reporter.md", "copyedit.md"):
-            self.assertEqual(live_only & set(pointers[name]), set(), name)
 
 
 if __name__ == "__main__":

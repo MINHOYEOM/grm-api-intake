@@ -2,7 +2,7 @@
 
 ## 읽을 것 (이 순서로, 이것만)
 1. `company/CHARTER.md`
-2. `company/editorial/SHADOW.md` — 그림자 기간에는 이 파일이 아래 모든 규칙보다 우선
+2. `company/editorial/RUN.md` — 이 파일이 아래 모든 규칙보다 우선
 3. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** (본문을 그대로 따른다 — 요약·재해석 금지)
 4. 이번 주 handoff (Notion, 읽기만)
 
@@ -23,7 +23,7 @@
    Tier 3 는 전부 `render`. "카드 없이 처리"는 없다(v16 불건 해소 불변식).
 2. v16 [1단계] 대로 검색 보강을 한다(WebSearch 9 · WebFetch 5 한도). 찾은 사실은 출처 URL 과 함께 적는다.
 
-## 결과 — `company/shadow/{run_date_kst}/desk.json`
+## 결과 — `company/run/{run_date_kst}/desk.json`
 ```
 {
   "status": "완료|보류|실패",
@@ -39,4 +39,4 @@
 같은 폴더에 `desk.md` — 헌장의 맨 위 3줄만.
 
 ## 하지 않는 것
-산문 슬롯·tldr 작성, 자가 점검, Notion 쓰기(SHADOW.md 1항), 다른 직무 파일 수정.
+산문 슬롯·tldr 작성, 자가 점검, Notion 쓰기(RUN.md 1항), 다른 직무 파일 수정.

@@ -79,6 +79,49 @@ class SplitWlFindingTest(unittest.TestCase):
         self.assertEqual(self.parts["requests"], ["독립적 오염 위험평가.", "일정이 포함된 시정 계획."])
 
 
+# 같은 서한의 영어 원문 문형 — 소제목이 마침표 없이 다음 문장에 붙어 있고("…Deficiencies Our
+# inspection…"), 괄호 약어가 낀 소제목과 "e.g." 약어 마침표가 함정이다.
+SAMPLE_EN = (
+    "Your firm failed to establish appropriate written procedures. "
+    "Your firm also failed to maintain buildings in a good state of repair (21 CFR 211.113(b) and 21 CFR 211.58). "
+    "Airflow Visualization (AFV) Smoke Study Deficiencies Our inspection noted deficient smoke studies. "
+    "In your response, you state you will re-execute AFV studies. "
+    "Your response is inadequate because you do not explain how you will ensure satisfactory smoke studies. "
+    "Thorough smoke studies (e.g. under dynamic conditions) are essential. "
+    "Facility Maintenance Deficiencies Your firm did not properly maintain classified areas. "
+    "In your response, you commit to repair the facility. "
+    "Your response is inadequate because you do not explain the basis for your assertion. "
+    "In addition, your response does not adequately evaluate the cause of the peeling paint. "
+    "In response to this letter, provide: An independent risk assessment. A remediation plan with timelines."
+)
+
+
+class SplitWlFindingEnglishTest(unittest.TestCase):
+    """영어판 문서 페이지 — 규제기관 원문을 원문 표지어로 나눈다."""
+
+    def setUp(self):
+        self.parts = wl_anatomy.split_wl_finding(SAMPLE_EN, "en")
+        self.assertIsNotNone(self.parts)
+
+    def test_rejoin_is_lossless(self):
+        self.assertEqual(_norm(wl_anatomy.rejoin(self.parts)), _norm(SAMPLE_EN))
+
+    def test_run_in_headings_are_peeled(self):
+        heads = [it["heading"] for it in self.parts["issues"]]
+        self.assertEqual(heads, ["Airflow Visualization (AFV) Smoke Study Deficiencies",
+                                 "Facility Maintenance Deficiencies"])
+        self.assertTrue(self.parts["issues"][0]["observed"].startswith("Our inspection noted"))
+
+    def test_response_judgment_and_abbreviation(self):
+        a, b = self.parts["issues"]
+        self.assertTrue(a["response"].startswith("In your response, you state"))
+        self.assertIn("(e.g. under dynamic conditions)", a["judgment"])   # e.g. 에서 자르지 않는다
+        self.assertIn("does not adequately evaluate the cause", b["judgment"])
+
+    def test_requests(self):
+        self.assertTrue(self.parts["request_head"].startswith("In response to this letter, provide:"))
+
+
 class SplitWlFindingDeclinesTest(unittest.TestCase):
     """확신이 없으면 나누지 않는다 — 화면은 종전 한 문단을 낸다."""
 

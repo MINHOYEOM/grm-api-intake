@@ -60,8 +60,64 @@ _JUDGMENT_MORE = re.compile(
 )
 
 
-def _sentences(text: str) -> list[str]:
-    return [s for s in _SENT_SPLIT.split(text.strip()) if s]
+# ── 영어 원문 규칙(영어판 문서 페이지) ─────────────────────────────────────────────
+# 원문은 표지어가 번역보다 더 정형이다("In your response, …" / "Your response is
+# inadequate because …" / "In response to this letter, provide:"). 다만 소제목이 마침표
+# 없이 다음 문장에 붙어 있다("…Smoke Study Deficiencies Our inspection noted …") — 문장
+# 첫머리의 제목형 낱말 묶음을 떼어 소제목으로 본다.
+_EN_SENT_SPLIT = re.compile(r"(?<=[.?!])\s+(?=[A-Z(\"“])")
+_EN_ABBREV_END = re.compile(r"(?:\b(?:e\.g|i\.e|U\.S|No|Nos|Inc|Ltd|Co|Corp|Dr|Mr|Ms|vs|etc|approx|Fig|St)\.|\b[A-Z]\.)$")
+_EN_RESPONSE_HEAD = re.compile(
+    r"^.{0,80}?\b(?:[Ii]n|[Ww]ithin)\s+(?:your|its|the firm's|your firm's)\b[^.]{0,60}?\b(?:response|reply)\b"
+    r"|^(?:Your|The firm's|Its)\s+(?:\w+\s+){0,4}?(?:response|reply)\s+(?:states?|stated|indicates?|indicated|says|said|commits?|committed|notes?|noted|describes?|described|includes?|included|explains?|explained|provides?|provided|proposes?|proposed)\b"
+)
+_EN_INADEQUATE = re.compile(
+    r"\b(?:response|responses|reply)\b[^.]{0,300}?\b(?:inadequate|insufficient|not adequate|not sufficient)\b"
+    r"|\binadequate because\b"
+)
+_EN_REQUEST_HEAD = re.compile(r"\bIn response to this letter\b")
+_EN_JUDGMENT_MORE = re.compile(
+    r"^(?:Additionally|Also|Furthermore|Moreover|In addition)?,?\s*(?:your|the)\s+response\s+(?:also\s+)?(?:does|did|do|fails?|failed)\s+not\b",
+    re.I,
+)
+_EN_LIST_INTRO = re.compile(r"(?:the following|for example|for instance|such as)\s*[:.]?$|:$", re.I)
+_EN_HEAD_WORD = r"(?:[A-Z][\w()/&,'’-]*|\([A-Z][\w/&-]*\)|of|and|or|for|in|to|the|on|with|a|an|by|at)"
+_EN_SENT_START = r"(?:Our|Your|We|The|FDA|During|Investigators|In|On|For|Additionally|Specifically|Furthermore|However|Although|While|This|These|A|An)"
+_EN_HEADING_PEEL = re.compile(rf"^([A-Z][\w()/&,'’-]*(?:\s+{_EN_HEAD_WORD}){{1,9}}?)\s+(?={_EN_SENT_START}\s)")
+
+
+def _en_peel_heading(sentence: str) -> "tuple[str, str] | None":
+    m = _EN_HEADING_PEEL.match(sentence)
+    if not m:
+        return None
+    head = m.group(1)
+    words = head.split()
+    # 제목형: 끝 낱말이 대문자로 시작하고, 2낱말 이상. "In your response" 같은 문장 첫머리는
+    # 소문자 낱말이 끼어 여기 안 걸린다.
+    if len(words) < 2 or not words[-1][:1].isupper() or words[0] in ("In", "On", "For", "The", "A", "An"):
+        return None
+    return head, sentence[m.end():]
+
+
+def _sentences_en(text: str) -> "list[tuple[str, bool]]":
+    raw: list[str] = []
+    for piece in _EN_SENT_SPLIT.split(text.strip()):
+        if raw and _EN_ABBREV_END.search(raw[-1]):
+            raw[-1] = raw[-1] + " " + piece        # "e.g. The …"·"U.S. FDA" 에서 자르지 않는다
+        else:
+            raw.append(piece)
+    out: list[tuple[str, bool]] = []
+    for s in raw:
+        peeled = _en_peel_heading(s) if out else None   # 첫 문장(위반 요지)에서는 떼지 않는다
+        if peeled:
+            out += [(peeled[0], True), (peeled[1], False)]
+        elif s:
+            out.append((s, False))
+    return out
+
+
+def _sentences_ko(text: str) -> "list[tuple[str, bool]]":
+    return [(s, _is_heading(s)) for s in _SENT_SPLIT.split(text.strip()) if s]
 
 
 def _is_heading(sentence: str) -> bool:
@@ -69,32 +125,43 @@ def _is_heading(sentence: str) -> bool:
     return bool(_HEADING.match(s)) and not _PREDICATE_END.search(s) and "(21 CFR" not in s
 
 
-def split_wl_finding(text_ko: str) -> "dict[str, Any] | None":
-    """국문 경고서한 지적 한 건을 나눈다. 나눌 근거가 부족하면 None.
+_RULES = {
+    "ko": dict(sents=_sentences_ko, response=_RESPONSE_HEAD, inadequate=_INADEQUATE,
+               request=_REQUEST_HEAD, more=_JUDGMENT_MORE, list_intro=_LIST_INTRO),
+    "en": dict(sents=_sentences_en, response=_EN_RESPONSE_HEAD, inadequate=_EN_INADEQUATE,
+               request=_EN_REQUEST_HEAD, more=_EN_JUDGMENT_MORE, list_intro=_EN_LIST_INTRO),
+}
+
+
+def split_wl_finding(text: str, lang: str = "ko") -> "dict[str, Any] | None":
+    """경고서한 지적 한 건(국문 번역 또는 영어 원문)을 나눈다. 나눌 근거가 부족하면 None.
 
     반환: {"lead": 첫 문장(위반 요지·조항),
            "issues": [{"heading", "observed", "response", "judgment"}...],
            "requests": [요구 문장...], "request_head": 요구 머리 문장}
     각 값은 원문 문장을 공백 하나로 이은 문자열(빈 부분은 "").
     """
-    text = (text_ko or "").strip()
+    R = _RULES[lang]
+    text = (text or "").strip()
     if not text:
         return None
-    sents = _sentences(text)
+    sents = R["sents"](text)
     if len(sents) < 3:
         return None
 
-    req_at = next((i for i, s in enumerate(sents) if _REQUEST_HEAD.search(s)), None)
+    req_at = next((i for i, (s, _h) in enumerate(sents) if R["request"].search(s)), None)
     body = sents if req_at is None else sents[:req_at]
-    tail = [] if req_at is None else sents[req_at:]
+    tail = [] if req_at is None else [s for s, _h in sents[req_at:]]
 
-    if not any(_RESPONSE_HEAD.search(s) for s in body) or not any(_INADEQUATE.search(s) for s in body):
+    if (not any(R["response"].search(s) for s, _h in body)
+            or not any(R["inadequate"].search(s) for s, _h in body)):
         return None
 
     n_lead = 1
-    if not _CITATION.search(body[0]):
-        n_lead = next((i + 1 for i in range(1, min(3, len(body))) if _CITATION.search(body[i])), 1)
-    lead, rest = " ".join(body[:n_lead]), body[n_lead:]
+    if not _CITATION.search(body[0][0]):
+        n_lead = next((i + 1 for i in range(1, min(3, len(body)))
+                       if _CITATION.search(body[i][0]) and not body[i][1]), 1)
+    lead, rest = " ".join(s for s, _h in body[:n_lead]), body[n_lead:]
     issues: list[dict[str, list[str]]] = []
     cur: "dict[str, list[str]] | None" = None
     stage = "observed"
@@ -106,10 +173,9 @@ def split_wl_finding(text_ko: str) -> "dict[str, Any] | None":
         issues.append(item)
         return item
 
-    for s in rest:
-        short = _is_heading(s)
+    for s, short in rest:
         # "다음을 관찰하였다." 뒤의 짧은 명사구는 소제목이 아니라 목록 항목이다.
-        in_list = short and (in_list or bool(_LIST_INTRO.search(prev)))
+        in_list = short and (in_list or bool(R["list_intro"].search(prev)))
         prev = s
         if short and not in_list:
             if cur is not None and not any(cur[k] for k in ("observed", "response", "judgment")):
@@ -120,11 +186,11 @@ def split_wl_finding(text_ko: str) -> "dict[str, Any] | None":
         if cur is None:
             cur, stage = _new(), "observed"
         # '미흡' 판정을 먼저 본다 — "그러나 귀사의 답변은 미흡하다"는 회신 머리말 꼴이기도 하다.
-        if _INADEQUATE.search(s) and stage in ("response", "observed"):
+        if R["inadequate"].search(s) and stage in ("response", "observed"):
             stage = "judgment"
-        elif stage == "judgment" and _JUDGMENT_MORE.search(s):
+        elif stage == "judgment" and R["more"].search(s):
             pass
-        elif _RESPONSE_HEAD.search(s):
+        elif R["response"].search(s):
             if stage == "judgment":
                 # 소제목 없이 다음 회신 주기가 시작됐다 — 앞 주기의 판단과 다음 관찰을 가를
                 # 근거가 없으므로 새 항목은 회신부터 시작한다(관찰을 지어내지 않는다).

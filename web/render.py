@@ -3120,14 +3120,17 @@ def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
                         link) -> "dict[str, Any] | None":
     """경고서한 지적 1건을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈 표시용 뷰.
 
-    한국어 트리의 FDA 경고서한만 나눈다(나누는 표지어가 국문 번역 문체다 — 영어판은
-    원문 한 문단 그대로). 나눌 근거가 없으면 None 이고 템플릿은 종전 문단을 낸다.
+    FDA 경고서한만 나눈다 — 한국어 트리는 국문 번역을, 영어 트리는 규제기관 원문을 각자의
+    표지어로 나눈다(같은 기능이 두 언어에 다 있어야 한다는 문서 언어판 구조 가드). 실제로
+    읽는 본문의 문자로 규칙을 고른다(영어판이 원문 없이 국문으로 떨어지는 지적도 있다).
+    나눌 근거가 없으면 None 이고 템플릿은 종전 문단을 낸다.
     `link` 는 문장 조각에 용어 링크를 끼우는 함수(페이지 단위 `used` 를 공유) — 부분마다
     따로 부르므로 같은 용어는 여전히 페이지에서 첫 곳 하나만 링크된다.
     """
-    if lang != DEFAULT_LANG or doc.get("source") != "FDA Warning Letter":
+    if doc.get("source") != "FDA Warning Letter":
         return None
-    parts = split_wl_finding(finding_body(f, lang))
+    body = finding_body(f, lang)
+    parts = split_wl_finding(body, "ko" if _HANGUL_RE.search(body) else "en")
     if parts is None:
         return None
     return {

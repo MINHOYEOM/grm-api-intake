@@ -1797,6 +1797,22 @@
   }
 
   qsa("#grm-admin-tabs button").forEach(function (b) { b.addEventListener("click", function () { setTab(b.getAttribute("data-tab")); }); });
+  // 홈: 다른 화면이 이미 불러온 값을 복사해 보여준다(새 API 호출 없음).
+  var homeLinks = [
+    ["grm-home-live", function () { return txtOf("grm-admin-live"); }, ["grm-admin-live"]],
+    ["grm-home-approve", function () { return [txtOf("grm-web-approve-pr"), txtOf("grm-web-checks")].filter(Boolean).join(" · "); }, ["grm-web-approve-pr", "grm-web-checks"]],
+    ["grm-home-feedback", function () { return txtOf("grm-feedback-new"); }, ["grm-feedback-new"]]
+  ];
+  function txtOf(id) { var n = byId(id); return n ? n.textContent.trim() : ""; }
+  function syncHome() {
+    homeLinks.forEach(function (l) { var t = byId(l[0]); var v = l[1](); if (t && v) t.textContent = v; });
+  }
+  if (window.MutationObserver) {
+    var homeObs = new MutationObserver(syncHome);
+    homeLinks.forEach(function (l) { l[2].forEach(function (id) { var n = byId(id); if (n) homeObs.observe(n, { childList: true, characterData: true, subtree: true }); }); });
+  }
+  syncHome();
+  qsa("[data-goto]").forEach(function (b) { b.addEventListener("click", function () { setTab(b.getAttribute("data-goto")); }); });
   byId("grm-refresh-all").addEventListener("click", refreshAll);
   byId("grm-system-refresh").addEventListener("click", refreshAll);
   byId("grm-subscribers-refresh").addEventListener("click", loadSubscribers);

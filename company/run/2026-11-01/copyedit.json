@@ -1,0 +1,7 @@
+{
+  "status": "보류",
+  "published": false,
+  "code_gate": {"ran": false, "exit": null, "message": "delta.json 없음 (desk 보류)"},
+  "cards": [],
+  "counts": {"cards": 0, "pass": 0, "reject": 0, "fails_total": 0}
+}

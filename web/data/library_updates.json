@@ -2,6 +2,42 @@
   "schema_version": "grm-library-updates/v1",
   "entries": [
     {
+      "date": "2026-11-01",
+      "sources": {
+        "mfds": {
+          "new_ids": [
+            "data0010-15308",
+            "data0010-15310",
+            "data0010-15312",
+            "data0010-15313",
+            "data0011-15974",
+            "data0011-15977",
+            "data0011-15978",
+            "data0011-15979",
+            "data0011-15980",
+            "data0011-15981",
+            "data0011-15982",
+            "data0011-15985",
+            "data0011-15988",
+            "data0011-15989"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 131,
+          "truncated": false
+        },
+        "pics": {
+          "new_ids": [
+            "pics-pi-058-1"
+          ],
+          "changed_ids": [],
+          "removed_ids": [],
+          "total_count": 52,
+          "truncated": false
+        }
+      }
+    },
+    {
       "date": "2026-10-27",
       "sources": {
         "mfds": {

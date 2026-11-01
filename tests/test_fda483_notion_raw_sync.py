@@ -58,6 +58,44 @@ def _run(*, rows=None, notion_raw=None, supa=None, dry_run=False, replace=None,
     return report, code, replace, seen_query
 
 
+_EXCERPT_ONLY = {"media_id": "195591", "firm": "Axogen Corporation",
+                 "fda483_excerpt": "OBSERVATION 1 Procedures were not followed."}
+
+
+class ExcerptOnlyRowTest(unittest.TestCase):
+    """[2026-11-02 첫 실전 게이트] 발췌만 있는 Notion 행도 관찰이 없으면 대상이다.
+
+    스캐폴드의 상세 카드는 관찰에서만 만들어진다. 종전 판정(`_has_source_body`)은 발췌를
+    본문으로 봐 대상에서 뺐고, 11-02 호 483 결손 11건 중 7건이 Supabase 에는 관찰이 있었다."""
+
+    def test_excerpt_only_row_gets_supabase_observations(self):
+        report, _code, replace, _q = _run(notion_raw={"page-1": _EXCERPT_ONLY})
+        self.assertEqual(report.candidates, 1)
+        self.assertEqual(report.synced, 1)
+        self.assertEqual(report.observations_synced, 2)
+        replace.assert_called_once_with("t", "page-1", _FULL)
+
+    def test_excerpt_not_overwritten_by_excerpt(self):
+        report, _code, replace, _q = _run(notion_raw={"page-1": _EXCERPT_ONLY},
+                                          supa={"fda483-195591": dict(_EXCERPT_ONLY)})
+        self.assertEqual(report.supabase_also_empty, 1)
+        replace.assert_not_called()
+
+    def test_excerpt_row_is_not_closed_on_out_of_scope(self):
+        """범위 밖 마감은 종전처럼 본문 없는 행에만 — 발췌가 있는 행은 남긴다."""
+        report, _code, replace, _q = _run(notion_raw={"page-1": _EXCERPT_ONLY},
+                                          supa={"fda483-195591": _OUT_OF_SCOPE})
+        self.assertEqual(report.skipped_out_of_scope, 0)
+        _run.skip.assert_not_called()
+        replace.assert_not_called()
+
+    def test_empty_row_still_takes_excerpt_only_supabase(self):
+        """본문 없는 행은 종전처럼 발췌만 있는 Supabase raw 로도 채운다(퇴행 없음)."""
+        report, _code, replace, _q = _run(supa={"fda483-195591": _EXCERPT_ONLY})
+        self.assertEqual(report.synced, 1)
+        replace.assert_called_once_with("t", "page-1", _EXCERPT_ONLY)
+
+
 class NotionRawSyncTest(unittest.TestCase):
 
     def test_empty_notion_row_gets_supabase_body(self):

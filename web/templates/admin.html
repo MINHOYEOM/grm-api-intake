@@ -49,18 +49,37 @@
 .admin-kpi b{display:block;font-family:var(--serif);font-size:34px;font-weight:500;color:var(--ink);line-height:1.05;margin-top:6px;overflow:hidden;text-overflow:ellipsis}
 .admin-panel{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:24px}
 .admin-panel[hidden],.admin-hidden{display:none!important}
-.org-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
-.org-tier{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--ink);margin:20px 0 8px}
-.org-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.org-team{display:grid;gap:7px;align-content:start;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:13px}
-.org-team h4{display:flex;justify-content:space-between;gap:8px;margin:0;color:var(--ink);font-size:15px;font-weight:650}
-.org-team p{margin:0;color:var(--muted);font-size:12.5px}
-.org-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.org-dot{width:10px;height:10px;border-radius:50%;background:#C9C3B8;display:inline-block;flex:none}
-.org-roles{display:grid;gap:5px}
-.org-role{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--canvas);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12.5px}
-.org-role .btn{padding:4px 9px;font-size:12px}
-@media(max-width:900px){.org-grid{grid-template-columns:1fr}}
+.org-chart{--org-line:var(--line-2);padding:6px 0 4px}
+.org-root{display:flex;justify-content:center}
+.org-root b{background:var(--ink);color:var(--canvas);border-radius:var(--rad-s);padding:9px 34px;font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:.02em}
+.org-cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;position:relative;margin-top:30px}
+.org-cols:before{content:"";position:absolute;top:-15px;left:12.5%;right:12.5%;border-top:1px solid var(--org-line)}
+.org-root{position:relative}.org-root:after{content:"";position:absolute;left:50%;top:100%;height:15px;border-left:1px solid var(--org-line)}
+.org-col{position:relative}
+.org-col:before{content:"";position:absolute;top:-15px;left:50%;height:15px;border-left:1px solid var(--org-line)}
+.org-head{text-align:center;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:9px 8px;color:var(--ink);font-weight:650;font-size:14px}
+.org-head small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:1px}
+.org-col.direct .org-head{background:var(--coral-tint);border-color:rgba(194,96,63,.28);color:var(--coral-2)}
+.org-list{list-style:none;margin:0;padding:12px 0 0 14px;position:relative;display:grid;gap:8px}
+.org-list:before{content:"";position:absolute;left:0;top:0;bottom:22px;border-left:1px solid var(--org-line)}
+.org-node{position:relative;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:8px 11px;display:grid;gap:2px}
+.org-node:before{content:"";position:absolute;left:-14px;top:19px;width:14px;border-top:1px solid var(--org-line)}
+.org-node b{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--ink);font-size:13.5px;font-weight:650}
+.org-node span.d{color:var(--muted);font-size:12px;line-height:1.35}
+.org-node a{color:var(--coral-2);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
+.org-node a:hover{text-decoration:underline}
+.org-sub{display:flex;gap:12px;flex-wrap:wrap;margin-top:3px}
+.org-foot{margin-top:14px;color:var(--muted);font-size:12px}
+@media(max-width:1000px){.org-cols{grid-template-columns:1fr}.org-cols:before,.org-root:after,.org-col:before{display:none}}
+.home-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.home-stat{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:13px 15px;display:grid;gap:6px;align-content:start}
+.home-stat>span{color:var(--muted);font-size:12.5px;display:flex;align-items:center;gap:6px}
+.home-stat .ti{color:var(--coral-2);font-size:16px}
+.home-stat b{color:var(--ink);font-size:14.5px;font-weight:650;line-height:1.35}
+.home-stat button{justify-self:start;border:0;background:transparent;color:var(--coral-2);font-size:12.5px;font-weight:600;padding:0;cursor:pointer}
+.home-stat button:hover{text-decoration:underline}
+.home-sec{font-size:15px;color:var(--ink);margin:0 0 12px}
+@media(max-width:1000px){.home-status{grid-template-columns:1fr}}
 .admin-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
 .admin-panel h2{font-size:18px;font-weight:650;color:var(--ink)}
 .admin-panel .sub{color:var(--muted);font-size:13px;margin-top:3px}
@@ -238,10 +257,10 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <span><b>GRM Admin</b><span>Operations Console</span></span>
       </div>
       <nav class="admin-nav" id="grm-admin-tabs">
+        <span class="admin-nav-label">현황</span>
+        <button type="button" class="on" data-tab="home"><i class="ti ti-home-2"></i>홈</button>
         <span class="admin-nav-label">매주 월요일</span>
-        <button type="button" class="on" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>운영센터</button>
-        <span class="admin-nav-label">회사</span>
-        <button type="button" data-tab="org"><i class="ti ti-sitemap"></i>회사 조직도</button>
+        <button type="button" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>운영센터</button>
         <span class="admin-nav-label">매일 확인</span>
         <button type="button" data-tab="growth"><i class="ti ti-trending-up"></i>성장·유입</button>
         <span class="admin-nav-label">서비스 관리</span>
@@ -327,7 +346,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           <div class="admin-kpi"><span><i class="ti ti-send"></i>최근 발송</span><b id="grm-kpi-dispatch">-</b></div>
         </div>
 
-        <section class="admin-panel" data-panel="ops">
+        <section class="admin-panel" data-panel="ops" hidden>
           <div class="admin-panel-head">
             <div><h2>운영 상태 센터</h2><p class="sub">매주 월요일에는 맨 위 승인 카드 하나만 보면 됩니다. 아래 흐름도에서 시스템이 지금 어떻게 돌아가는지 한눈에 확인할 수 있습니다.</p></div>
             <span class="admin-pill" id="grm-github-state">GitHub 확인 중</span>
@@ -632,45 +651,47 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
         </section>
 
-        <section class="admin-panel" data-panel="org" hidden>
+        <section class="admin-panel" data-panel="home">
           <div class="admin-panel-head">
-            <div><h2>GRM Intelligence 조직도</h2><p class="sub">팀마다 하는 일, 지금 도는 곳, 상태를 한 화면에 모았습니다. 신호등은 종합상황실 보고 표가 연결되면 채워집니다. 예약작업 버튼은 claude.ai 의 해당 예약작업 페이지를 새 탭으로 엽니다(거기서 Run now).</p></div>
+            <div><h2>홈</h2><p class="sub">지금 상태와 회사 구성을 한 화면에서 봅니다. 자세한 것은 왼쪽 메뉴에서 여세요.</p></div>
           </div>
-          <div class="org-legend"><span class="admin-pill ok">정상</span><span class="admin-pill warn">특이사항</span><span class="admin-pill bad">문제</span><span class="admin-pill"><i class="org-dot"></i>연결 전</span></div>
-
-          <h3 class="org-tier">대표 직속 <span class="admin-pill">전체를 본다 · 대표에게 직접 보고</span></h3>
-          <div class="org-grid">
-            <div class="org-team"><h4>비서실 <i class="org-dot"></i></h4><p>대표 지시 창구. 일을 직접 하지 않고 맞는 팀에 맡긴다.</p><div class="org-row"><span class="admin-pill">PC · 대화 세션</span></div></div>
-            <div class="org-team"><h4>종합상황실 <i class="org-dot"></i></h4><p>제때 돌았나 감시 · 주간 보고 · 내부 도구 PR 처리</p><div class="org-row"><span class="admin-pill">GitHub 코드 + 주 1회</span></div></div>
-            <div class="org-team"><h4>검증실 <i class="org-dot"></i></h4><p>사이트 정보가 원본과 맞나, 개인정보·저작권 (월 1회)</p><div class="org-row"><span class="admin-pill">월간 · 호출</span></div></div>
+          <div class="home-status" id="grm-home-status">
+            <div class="home-stat"><span><i class="ti ti-activity"></i>운영 상태</span><b id="grm-home-live">확인 중</b><button type="button" data-goto="ops">운영센터 열기</button></div>
+            <div class="home-stat"><span><i class="ti ti-shield-check"></i>이번 주 발행 승인</span><b id="grm-home-approve">확인 중</b><button type="button" data-goto="ops">승인하러 가기</button></div>
+            <div class="home-stat"><span><i class="ti ti-message-report"></i>문의·제안</span><b id="grm-home-feedback">확인 중</b><button type="button" data-goto="feedback">문의 열기</button></div>
           </div>
-
-          <h3 class="org-tier">리서치 부문</h3>
-          <div class="org-grid">
-            <div class="org-team"><h4>브리프편집팀 <i class="org-dot"></i></h4><p>월요일 브리프를 만든다. 세션 3개가 이어서 일한다.</p>
-              <div class="org-roles">
-                <div class="org-role">데스크 <span class="org-row"><span class="admin-pill ok">클라우드</span><a class="btn" href="https://claude.ai/code/routines/trig_01UGGMtqtTdrak5FGWqAo37R" target="_blank" rel="noopener noreferrer"><i class="ti ti-external-link"></i>예약작업</a></span></div>
-                <div class="org-role">기자 <span class="org-row"><span class="admin-pill ok">클라우드</span><a class="btn" href="https://claude.ai/code/routines/trig_01F1KHL6ejWFgz9ec7tDn9Hr" target="_blank" rel="noopener noreferrer"><i class="ti ti-external-link"></i>예약작업</a></span></div>
-                <div class="org-role">교열 <span class="org-row"><span class="admin-pill ok">클라우드</span><a class="btn" href="https://claude.ai/code/routines/trig_01ScK5hprKgDe4syfZWkmbd5" target="_blank" rel="noopener noreferrer"><i class="ti ti-external-link"></i>예약작업</a></span></div>
-              </div></div>
-            <div class="org-team"><h4>글로벌번역팀 <i class="org-dot"></i></h4><p>지적사항 번역, 영문 화면 점검 (매일)</p><div class="org-row"><span class="admin-pill">확인 필요</span></div></div>
-            <div class="org-team"><h4>용어·교육팀 <i class="org-dot"></i></h4><p>용어 추가·그림, 주간 퀴즈</p><div class="org-row"><span class="admin-pill">확인 필요</span></div></div>
-          </div>
-
-          <h3 class="org-tier">플랫폼 부문</h3>
-          <div class="org-grid">
-            <div class="org-team"><h4>제품전략팀 (시범) <i class="org-dot"></i></h4><p>다음에 만들 것 3개 제안 (월 1회)</p><div class="org-row"><span class="admin-pill">월간 · 호출</span></div></div>
-            <div class="org-team"><h4>개발팀 <i class="org-dot"></i></h4><p>사이트·코드 수정, 버그 수리 (PR까지)</p><div class="org-row"><span class="admin-pill">호출형 · 일감 생길 때</span></div></div>
-            <div class="org-team"><h4>데이터품질팀 <i class="org-dot"></i></h4><p>수집·분류 표본 검사 (주 1회)</p><div class="org-row"><span class="admin-pill">확인 필요</span></div></div>
-            <div class="org-team"><h4>수집·인프라팀 <i class="org-dot"></i></h4><p>수집·배포 자동화 (AI 아님)</p><div class="org-row"><span class="admin-pill ok">GitHub 코드</span></div></div>
-          </div>
-
-          <h3 class="org-tier">고객 부문</h3>
-          <div class="org-grid">
-            <div class="org-team"><h4>대외홍보팀 <i class="org-dot"></i></h4><p>링크드인·뉴스레터 초안만. 게시·발송은 대표</p><div class="org-row"><span class="admin-pill">확인 필요</span></div></div>
-            <div class="org-team"><h4>성장분석팀 <i class="org-dot"></i></h4><p>방문·검색·구독 숫자 정리 (주 1회)</p><div class="org-row"><span class="admin-pill">확인 필요</span></div></div>
-          </div>
-          <p class="sub" style="margin-top:14px">독자지원은 팀이 아니라 종합상황실 겸임입니다.</p>
+          <h3 class="home-sec">회사 조직도</h3>
+<div class="org-chart">
+  <div class="org-root"><b>대표</b></div>
+  <div class="org-cols">
+    <div class="org-col direct"><div class="org-head">대표 직속<small>실</small></div>
+      <ul class="org-list">
+        <li class="org-node"><b>비서실</b><span class="d">대표 지시 창구</span></li>
+        <li class="org-node"><b>종합상황실</b><span class="d">제때 돌았나 감시·주간 보고</span></li>
+        <li class="org-node"><b>검증실</b><span class="d">원본과 맞나 월 1회 확인</span></li>
+      </ul></div>
+    <div class="org-col"><div class="org-head">리서치<small>부문</small></div>
+      <ul class="org-list">
+        <li class="org-node"><b>브리프편집팀</b><span class="d">월요일 브리프 제작</span>
+          <span class="org-sub"><a href="https://claude.ai/code/routines/trig_01UGGMtqtTdrak5FGWqAo37R" target="_blank" rel="noopener noreferrer">데스크 ↗</a><a href="https://claude.ai/code/routines/trig_01F1KHL6ejWFgz9ec7tDn9Hr" target="_blank" rel="noopener noreferrer">기자 ↗</a><a href="https://claude.ai/code/routines/trig_01ScK5hprKgDe4syfZWkmbd5" target="_blank" rel="noopener noreferrer">교열 ↗</a></span></li>
+        <li class="org-node"><b>글로벌번역팀</b><span class="d">지적사항 번역·영문판</span></li>
+        <li class="org-node"><b>용어·교육팀</b><span class="d">용어사전·퀴즈</span></li>
+      </ul></div>
+    <div class="org-col"><div class="org-head">플랫폼<small>부문</small></div>
+      <ul class="org-list">
+        <li class="org-node"><b>제품전략팀 (시범)</b><span class="d">다음에 만들 것 제안</span></li>
+        <li class="org-node"><b>개발팀</b><span class="d">사이트 수정·버그 수리</span></li>
+        <li class="org-node"><b>데이터품질팀</b><span class="d">수집·분류 표본 검사</span></li>
+        <li class="org-node"><b>수집·인프라팀</b><span class="d">수집·배포 자동화</span></li>
+      </ul></div>
+    <div class="org-col"><div class="org-head">고객<small>부문</small></div>
+      <ul class="org-list">
+        <li class="org-node"><b>대외홍보팀</b><span class="d">링크드인·뉴스레터 초안</span></li>
+        <li class="org-node"><b>성장분석팀</b><span class="d">방문·검색·구독 숫자</span></li>
+      </ul></div>
+  </div>
+  <p class="org-foot">↗ 는 claude.ai 의 예약작업 페이지(새 탭)입니다. 독자지원은 종합상황실이 겸임합니다.</p>
+</div>
         </section>
 
         <section class="admin-panel" data-panel="system" hidden>

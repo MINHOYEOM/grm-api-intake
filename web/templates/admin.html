@@ -193,6 +193,10 @@
 .admin-incident-empty{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:12px;color:var(--muted);font-size:13px}
 .admin-step-list{margin-top:8px;display:grid;gap:5px}
 .admin-step-list code{display:block;border:1px solid var(--line);border-radius:var(--rad-s);background:var(--canvas);padding:6px 8px;color:var(--body);font-size:11.5px;white-space:normal}
+.admin-fold{margin-top:14px;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:12px 13px}
+.admin-fold>summary{cursor:pointer;color:var(--ink);font-weight:700;font-size:14px}
+.admin-fold-sub{color:var(--muted);font-weight:400;font-size:12.5px;margin-left:6px}
+.admin-fold[open]>summary{margin-bottom:6px}
 .admin-recovery{margin-top:14px;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:12px 13px}
 .admin-recovery summary{cursor:pointer;color:var(--ink);font-weight:700;font-size:13.5px}
 .admin-recovery .admin-actions-grid{margin-top:12px}
@@ -447,7 +451,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
               </table>
             </div>
           </div>
-          <div class="admin-monitor-section" style="margin-top:16px">
+          <details class="admin-fold"><summary>검색·페이지 <span class="admin-fold-sub">어느 페이지·검색어·구역에서 들어오나</span></summary>
+<div class="admin-monitor-section" style="margin-top:16px">
             <h3>어느 페이지로 들어오나 — 최근 7일 합계</h3>
             <p class="admin-section-sub">방문자가 사이트에서 처음 연 페이지입니다. 어느 섹션이 실제로 사람을 데려오는지 보여줍니다(개인정보 보호를 위해 물음표 뒤 조회어는 저장하지 않습니다). Cloudflare가 표본추출을 걸면 값이 10단위로 반올림되고, 그러면 하루 5건 미만인 페이지가 0으로 사라져 목록에 없다고 방문이 없는 것은 아닙니다 — 그때는 바로 아래 줄이 '표본 추정'이라고 알려줍니다.</p>
             <p class="admin-section-sub" id="grm-rum-paths-precision">정밀도 확인 중</p>
@@ -480,7 +485,9 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
               </table>
             </div>
           </div>
-          <div class="admin-monitor-section" style="margin-top:16px">
+          </details>
+<details class="admin-fold"><summary>구독 전환 <span class="admin-fold-sub">구역·채널·전환·일별 깔때기</span></summary>
+<div class="admin-monitor-section" style="margin-top:16px">
             <h3>구독은 어느 구역에서 눌렀나</h3>
             <p class="admin-section-sub">구독 제출이 일어난 페이지의 최상위 구역입니다(누적). 밴드와 CTA는 모든 한국어 페이지에 있어서, 이 표가 없으면 "어디서 구독했나"에 답할 자료가 없습니다. 개인정보 보호를 위해 경로의 첫 조각만 남깁니다. 2026-09-05 이전 제출은 이 기록이 없어 집계에 빠져 있습니다.</p>
             <div class="admin-table-wrap">
@@ -531,7 +538,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
               </table>
             </div>
           </div>
-          <div class="admin-monitor-section" style="margin-top:16px">
+          </details>
+<div class="admin-monitor-section" style="margin-top:16px">
             <h3>외부 계기 바로가기</h3>
             <p class="admin-section-sub">방문·유입 경로의 정본은 Cloudflare Web Analytics(RUM·봇 제외)입니다. Cloudflare 존(Overview)의 방문자 수는 크롤러가 섞여 실사용 지표로 쓰지 않습니다.</p>
             <div class="admin-actions-grid">

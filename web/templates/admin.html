@@ -246,6 +246,12 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 @media(max-width:900px){.admin-workflow-compact,.admin-workflow-detail-grid,.admin-workflow-facts{grid-template-columns:1fr}.admin-workflow-action{justify-content:flex-start}.admin-workflow-quick span{white-space:normal}.admin-workflow-row summary{grid-template-columns:1fr}}
 @media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-nav-label{grid-column:1/-1}.admin-kpis,.admin-actions-grid,.admin-ops-summary,.admin-workflow-grid,.admin-publish-form{grid-template-columns:1fr}.admin-ops-brief{display:grid}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn,.admin-publish-form .btn{width:100%;justify-content:center}}
 
+.home-inbox{margin-bottom:22px}
+.home-inbox-row{display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(176,125,23,.3);background:var(--canvas);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.home-inbox-row.problem{border-color:rgba(189,75,54,.34)}
+.home-inbox-row b{color:var(--ink);font-size:13.5px}.home-inbox-row span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.org-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:6px;vertical-align:middle}
+.org-dot.notice{background:var(--med)}.org-dot.problem{background:var(--hi)}
 /* ── app skin ── */
 .nav,.grm-pet{display:none!important}
 .admin-main.wrap{width:100%;max-width:none;margin:0;padding:0}
@@ -730,34 +736,35 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <div class="home-stat"><span><i class="ti ti-shield-check"></i>이번 주 발행 승인</span><b id="grm-home-approve">확인 중</b><button type="button" data-goto="ops">승인하러 가기</button></div>
             <div class="home-stat"><span><i class="ti ti-message-report"></i>문의·제안</span><b id="grm-home-feedback">확인 중</b><button type="button" data-goto="feedback">문의 열기</button></div>
           </div>
+          <div class="home-inbox admin-hidden" id="grm-home-inbox"><h3 class="home-sec">결재함</h3><div class="home-inbox-list" id="grm-home-inbox-list"></div></div>
           <h3 class="home-sec">회사 조직도</h3>
 <div class="org-chart">
   <div class="org-root"><b>대표</b></div>
   <div class="org-cols">
     <div class="org-col direct"><div class="org-head">대표 직속<small>실</small></div>
       <ul class="org-list">
-        <li class="org-node"><b>비서실</b><span class="d">대표 지시 창구</span></li>
-        <li class="org-node"><b>종합상황실</b><span class="d">제때 돌았나 감시·주간 보고</span></li>
-        <li class="org-node"><b>검증실</b><span class="d">원본과 맞나 월 1회 확인</span></li>
+        <li class="org-node" data-dept="비서실"><b>비서실</b><span class="d">대표 지시 창구</span></li>
+        <li class="org-node" data-dept="종합상황실"><b>종합상황실</b><span class="d">제때 돌았나 감시·주간 보고</span></li>
+        <li class="org-node" data-dept="검증실"><b>검증실</b><span class="d">원본과 맞나 월 1회 확인</span></li>
       </ul></div>
     <div class="org-col"><div class="org-head">리서치<small>부문</small></div>
       <ul class="org-list">
-        <li class="org-node"><b>브리프편집팀</b><span class="d">월요일 브리프 제작</span>
+        <li class="org-node" data-dept="브리프편집팀"><b>브리프편집팀</b><span class="d">월요일 브리프 제작</span>
           <span class="org-sub"><a href="https://claude.ai/code/routines/trig_01UGGMtqtTdrak5FGWqAo37R" target="_blank" rel="noopener noreferrer">데스크 ↗</a><a href="https://claude.ai/code/routines/trig_01F1KHL6ejWFgz9ec7tDn9Hr" target="_blank" rel="noopener noreferrer">기자 ↗</a><a href="https://claude.ai/code/routines/trig_01ScK5hprKgDe4syfZWkmbd5" target="_blank" rel="noopener noreferrer">교열 ↗</a></span></li>
-        <li class="org-node"><b>글로벌번역팀</b><span class="d">지적사항 번역·영문판</span></li>
-        <li class="org-node"><b>용어·교육팀</b><span class="d">용어사전·퀴즈</span></li>
+        <li class="org-node" data-dept="글로벌번역팀"><b>글로벌번역팀</b><span class="d">지적사항 번역·영문판</span></li>
+        <li class="org-node" data-dept="용어·교육팀"><b>용어·교육팀</b><span class="d">용어사전·퀴즈</span></li>
       </ul></div>
     <div class="org-col"><div class="org-head">플랫폼<small>부문</small></div>
       <ul class="org-list">
-        <li class="org-node"><b>제품전략팀 (시범)</b><span class="d">다음에 만들 것 제안</span></li>
-        <li class="org-node"><b>개발팀</b><span class="d">사이트 수정·버그 수리</span></li>
-        <li class="org-node"><b>데이터품질팀</b><span class="d">수집·분류 표본 검사</span></li>
-        <li class="org-node"><b>수집·인프라팀</b><span class="d">수집·배포 자동화</span></li>
+        <li class="org-node" data-dept="제품전략팀 (시범)"><b>제품전략팀 (시범)</b><span class="d">다음에 만들 것 제안</span></li>
+        <li class="org-node" data-dept="개발팀"><b>개발팀</b><span class="d">사이트 수정·버그 수리</span></li>
+        <li class="org-node" data-dept="데이터품질팀"><b>데이터품질팀</b><span class="d">수집·분류 표본 검사</span></li>
+        <li class="org-node" data-dept="수집·인프라팀"><b>수집·인프라팀</b><span class="d">수집·배포 자동화</span></li>
       </ul></div>
     <div class="org-col"><div class="org-head">고객<small>부문</small></div>
       <ul class="org-list">
-        <li class="org-node"><b>대외홍보팀</b><span class="d">링크드인·뉴스레터 초안</span></li>
-        <li class="org-node"><b>성장분석팀</b><span class="d">방문·검색·구독 숫자</span></li>
+        <li class="org-node" data-dept="대외홍보팀"><b>대외홍보팀</b><span class="d">링크드인·뉴스레터 초안</span></li>
+        <li class="org-node" data-dept="성장분석팀"><b>성장분석팀</b><span class="d">방문·검색·구독 숫자</span></li>
       </ul></div>
   </div>
   <p class="org-foot">↗ 는 claude.ai 의 예약작업 페이지(새 탭)입니다. 독자지원은 종합상황실이 겸임합니다.</p>

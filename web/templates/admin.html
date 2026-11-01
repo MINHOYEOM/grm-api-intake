@@ -245,6 +245,70 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 @media(max-width:840px){.admin-shell{grid-template-columns:1fr}.admin-rail{position:static}.admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-nav-label{grid-column:1/-1}.admin-head{align-items:flex-start;flex-direction:column}.admin-head-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.admin-workflow-compact,.admin-workflow-detail-grid,.admin-workflow-facts{grid-template-columns:1fr}.admin-workflow-action{justify-content:flex-start}.admin-workflow-quick span{white-space:normal}.admin-workflow-row summary{grid-template-columns:1fr}}
 @media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-nav-label{grid-column:1/-1}.admin-kpis,.admin-actions-grid,.admin-ops-summary,.admin-workflow-grid,.admin-publish-form{grid-template-columns:1fr}.admin-ops-brief{display:grid}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn,.admin-publish-form .btn{width:100%;justify-content:center}}
+
+/* ── app skin ── */
+.nav,.grm-pet{display:none!important}
+.admin-main.wrap{width:100%;max-width:none;margin:0;padding:0}
+.admin-shell{grid-template-columns:244px minmax(0,1fr);gap:0;min-height:100vh;align-items:stretch}
+.admin-rail{position:sticky;top:0;height:100vh;overflow:auto;display:flex;flex-direction:column;border:0;border-right:1px solid var(--line);border-radius:0;background:var(--canvas);padding:20px 14px}
+.admin-brand{padding:0 6px 16px}
+.admin-nav{margin-top:6px;gap:2px}
+.admin-nav-label{font-size:10.5px;letter-spacing:.08em;padding:16px 10px 5px;color:var(--muted)}
+.admin-nav button{padding:8px 10px;font-size:13.5px;position:relative;color:var(--body)}
+.admin-nav button:hover{background:var(--soft)}
+.admin-nav button.on{background:var(--coral-tint);color:var(--coral-2);font-weight:650}
+.admin-nav button.on:before{content:"";position:absolute;left:-14px;top:7px;bottom:7px;width:3px;border-radius:0 3px 3px 0;background:var(--coral)}
+.admin-identity{margin-top:auto;padding-top:14px}
+.admin-shell>section{background:var(--soft);padding:0 40px 72px;min-width:0}
+.admin-head{position:sticky;top:0;z-index:5;margin:0 -40px 26px;padding:14px 40px;background:var(--canvas);border-bottom:1px solid var(--line);align-items:center}
+.admin-head h1{font-family:inherit;font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em}
+.admin-head .kick,.admin-head p{display:none}
+.admin-dashboard,.admin-login{max-width:1280px}
+.admin-login{margin:12vh auto 0;background:var(--canvas);border-radius:12px;padding:28px}
+.admin-panel{border:0;background:transparent;padding:0}
+.admin-panel-head{align-items:flex-end;margin-bottom:18px}
+.admin-panel-head h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.admin-panel-head>div:empty{display:none}
+.admin-panel h2{font-size:22px;font-weight:700;letter-spacing:-.015em}
+.admin-panel .sub{max-width:70ch;font-size:13px}
+.admin-kpi,.admin-metric,.home-stat,.admin-ops-brief,.admin-approve-hero,.admin-publish-console,.admin-op,.admin-issue,.admin-flow-node,.admin-fold,.admin-recovery,.admin-workflow-log,.org-node{background:var(--canvas);border-radius:10px}
+.admin-kpi,.admin-metric,.home-stat,.admin-fold,.admin-recovery{border-color:var(--line)}
+.admin-kpi{padding:16px 18px}
+.admin-kpi b{font-family:inherit;font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.admin-metric b{font-family:inherit;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.admin-approve-hero{border:1px solid rgba(194,96,63,.35);box-shadow:0 0 0 3px var(--coral-tint)}
+.admin-table-wrap{background:var(--canvas);border-radius:10px;max-height:560px}
+.admin-table{font-variant-numeric:tabular-nums}
+.admin-table th{position:sticky;top:0;z-index:1;font-size:11.5px;letter-spacing:.02em;padding:9px 12px}
+.admin-table td{padding:9px 12px}
+.admin-table tbody tr:hover td{background:var(--soft)}
+.admin-fold{padding:0}.admin-fold>summary{padding:13px 16px;list-style:none}
+.admin-fold>summary::-webkit-details-marker{display:none}
+.admin-fold>summary:before{content:"\25B8";display:inline-block;width:16px;color:var(--muted);transition:transform .15s}
+.admin-fold[open]>summary:before{transform:rotate(90deg)}
+.admin-fold>summary~*{margin-left:16px;margin-right:16px}.admin-fold>*:last-child{margin-bottom:16px}
+.admin-notes p{color:var(--muted);font-size:12.5px;line-height:1.55;margin-top:8px}
+.admin-monitor-section{margin-top:22px}
+.admin-monitor-section h3{font-size:14px}
+.admin-empty{text-align:center;padding:26px 16px}
+.home-sec{margin-top:8px}
+.org-head{border-radius:8px}
+@media(max-width:840px){
+.admin-shell{display:block}
+.admin-rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px 12px 8px}
+.admin-brand{padding-bottom:10px}
+.admin-nav{display:flex;overflow-x:auto;gap:4px;margin:0 -4px;padding:0 4px 6px;scrollbar-width:none}
+.admin-nav::-webkit-scrollbar{display:none}
+.admin-nav-label{display:none}
+.admin-nav button{width:auto;white-space:nowrap;flex:0 0 auto}
+.admin-nav button.on:before{display:none}
+.admin-identity{margin-top:6px;padding-top:8px}
+.admin-shell>section{padding:0 14px 56px}
+.admin-head{margin:0 -14px 18px;padding:12px 14px;flex-direction:row;align-items:center}
+.admin-panel-head{flex-direction:column;align-items:flex-start}
+.admin-table-wrap{max-height:none}
+.admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
 
 <main class="admin-main wrap" id="grm-admin">
@@ -285,11 +349,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 
     <section>
       <header class="admin-head">
-        <div>
-          <span class="kick">Admin</span>
-          <h1>GRM 컨트롤 타워</h1>
-          <p>회사 현황은 홈에서 봅니다. 월요일 승인은 발행 메뉴에서 합니다.</p>
-        </div>
+        <h1 id="grm-page-title">홈</h1>
         <div class="admin-head-actions">
           <span class="admin-pill warn" id="grm-admin-live"><i class="ti ti-activity"></i>상태 확인 중</span>
           <button class="btn" type="button" id="grm-refresh-all"><i class="ti ti-refresh"></i>새로고침</button>
@@ -354,12 +414,12 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 
         <section class="admin-panel" data-panel="ops" hidden>
           <div class="admin-panel-head">
-            <div><h2>운영 상태 센터</h2><p class="sub">매주 월요일에는 맨 위 승인 카드 하나만 보면 됩니다. 아래 흐름도에서 시스템이 지금 어떻게 돌아가는지 한눈에 확인할 수 있습니다.</p></div>
+            <div><h2>운영 상태 센터</h2><p class="sub">흐름도와 이슈로 시스템 상태를 한눈에 확인할 수 있습니다.</p></div>
             <span class="admin-pill" id="grm-github-state">GitHub 확인 중</span>
           </div>
           <section class="admin-approve-hero" aria-labelledby="grm-web-approve-title">
             <h3 id="grm-web-approve-title"><i class="ti ti-shield-check"></i>이번 주 발행 승인</h3>
-            <p>매주 월요일 할 일은 이것 하나입니다. 미리보기를 열어 이번 주 카드를 확인하고, 이상 없으면 승인을 누르세요. 승인하면 몇 분 안에 grm-solutions.com 이 새 브리프로 바뀝니다.</p>
+            <p>미리보기로 이번 주 카드를 확인하고, 이상 없으면 승인하세요. 몇 분 안에 사이트와 뉴스레터에 반영됩니다.</p>
             <div id="grm-web-approve">
               <div class="admin-web-approve-row">
                 <span class="admin-web-approve-pr" id="grm-web-approve-pr">발행 PR 확인 중</span>
@@ -442,8 +502,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section">
             <h3>방문 · 유입 경로</h3>
-            <p class="admin-section-sub">Cloudflare Web Analytics 실측(검색로봇 제외·자동화 브라우저 제외)을 매일 새벽 1시 30분에 가져옵니다. 날짜는 협정시(UTC) 기준이라 한국 시각으로는 그날 오전 9시부터 다음날 오전 9시까지를 담습니다 — 업무시간 방문은 같은 날짜에 들어갑니다.</p>
-            <p class="admin-section-sub" id="grm-rum-precision">정밀도 확인 중</p>
+                        <p class="admin-section-sub" id="grm-rum-precision">정밀도 확인 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>날짜</th><th>방문</th><th>페이지뷰</th><th>구글</th><th>네이버</th><th>AI 검색</th><th>직접 방문</th></tr></thead>
@@ -454,8 +513,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           <details class="admin-fold"><summary>검색·페이지 <span class="admin-fold-sub">어느 페이지·검색어·구역에서 들어오나</span></summary>
 <div class="admin-monitor-section" style="margin-top:16px">
             <h3>어느 페이지로 들어오나 — 최근 7일 합계</h3>
-            <p class="admin-section-sub">방문자가 사이트에서 처음 연 페이지입니다. 어느 섹션이 실제로 사람을 데려오는지 보여줍니다(개인정보 보호를 위해 물음표 뒤 조회어는 저장하지 않습니다). Cloudflare가 표본추출을 걸면 값이 10단위로 반올림되고, 그러면 하루 5건 미만인 페이지가 0으로 사라져 목록에 없다고 방문이 없는 것은 아닙니다 — 그때는 바로 아래 줄이 '표본 추정'이라고 알려줍니다.</p>
-            <p class="admin-section-sub" id="grm-rum-paths-precision">정밀도 확인 중</p>
+                        <p class="admin-section-sub" id="grm-rum-paths-precision">정밀도 확인 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>페이지</th><th>구역</th><th>방문</th></tr></thead>
@@ -465,8 +523,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
             <h3>무슨 말로 검색해 들어오나 &mdash; 최근 15일</h3>
-            <p class="admin-section-sub">구글 Search Console 실측입니다. <b>노출</b>은 검색결과에 우리 페이지가 보인 횟수, <b>클릭</b>은 실제로 눌린 횟수, <b>순위</b>는 평균 몇 번째에 떴는지입니다(1이 가장 위). 방문 기록은 &ldquo;구글에서 왔다&rdquo;까지만 알려주고, <b>무엇을 검색했는지는 이 표에만</b> 있습니다.</p>
-            <p class="admin-section-sub">구글이 확정 데이터를 2~3일 늦게 주므로 이 표의 최신 날짜는 위 방문 표보다 뒤처집니다(정상입니다). 또 검색한 사람이 적은 희귀 검색어는 구글이 개인 식별을 막으려고 아예 빼고 주기 때문에, <b>검색어 표의 합은 사이트 총합보다 작습니다</b> &mdash; 어긋난 것이 아닙니다.</p>
+                                    <p class="admin-section-sub">구글은 확정 데이터를 2~3일 늦게 줘 최신 날짜가 방문 표보다 뒤처지고(정상), 검색자가 적은 희귀 검색어는 익명화돼 빠집니다.</p>
             <p class="admin-section-sub" id="grm-gsc-summary">불러오는 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
@@ -477,8 +534,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
             <h3>어느 구역이 검색에 뜨나 &mdash; 최근 15일</h3>
-            <p class="admin-section-sub">검색결과에 노출된 페이지를 사이트 구역별로 묶었습니다. 위의 &ldquo;어느 페이지로 들어오나&rdquo;가 <b>실제로 들어온</b> 사람이라면, 이 표는 <b>보이기는 했는데 들어왔는지는 별개</b>인 숫자입니다. 노출이 많은데 클릭률이 낮은 구역은 순위가 아니라 검색결과에 뜨는 제목·설명이 문제일 수 있습니다.</p>
-            <div class="admin-table-wrap">
+                        <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>구역</th><th>노출</th><th>클릭</th><th>클릭률</th><th>평균 순위</th></tr></thead>
                 <tbody id="grm-gsc-zones"><tr><td colspan="5"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
@@ -489,8 +545,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 <details class="admin-fold"><summary>구독 전환 <span class="admin-fold-sub">구역·채널·전환·일별 깔때기</span></summary>
 <div class="admin-monitor-section" style="margin-top:16px">
             <h3>구독은 어느 구역에서 눌렀나</h3>
-            <p class="admin-section-sub">구독 제출이 일어난 페이지의 최상위 구역입니다(누적). 밴드와 CTA는 모든 한국어 페이지에 있어서, 이 표가 없으면 "어디서 구독했나"에 답할 자료가 없습니다. 개인정보 보호를 위해 경로의 첫 조각만 남깁니다. 2026-09-05 이전 제출은 이 기록이 없어 집계에 빠져 있습니다.</p>
-            <div class="admin-table-wrap">
+                        <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>구역</th><th>밴드 제출</th><th>CTA 제출</th><th>합계</th></tr></thead>
                 <tbody id="grm-funnel-zones"><tr><td colspan="4"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
@@ -499,8 +554,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
             <h3>구독은 어느 채널에서 왔나 — first touch (087)</h3>
-            <p class="admin-section-sub">구독 제출 때 함께 보낸 첫 방문 유입 정보(utm 값·리퍼러 호스트)를 채널로 묶었습니다. 세션이 아니라 이 브라우저에 7일 보관한 값이라, 링크드인 게시물을 보고 며칠 뒤 구독해도 잡힙니다. 노출(view)은 보내지 않습니다.</p>
-            <p class="admin-section-sub" id="grm-funnel-touch-note">불러오는 중</p>
+                        <p class="admin-section-sub" id="grm-funnel-touch-note">불러오는 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>채널</th><th>제출</th></tr></thead>
@@ -519,8 +573,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
             <h3>구역별 전환 — 방문 대비 제출 (2026-09-04 이후, 087)</h3>
-            <p class="admin-section-sub">RUM 착지 방문(봇 제외)을 분모로, 076 구역별 제출을 분자로 묶었습니다. 노출은 구역별로 보내지 않습니다 — 크롤러 오염이라 갈라도 못 읽습니다(2026-09-01 실측). 경로 표는 표본 실행에서 거칠어(10단위) 작은 구역의 방문이 0으로 보일 수 있습니다 — 전환율은 방향만 읽으세요.</p>
-            <p class="admin-section-sub" id="grm-funnel-zone-rate-note">불러오는 중</p>
+                        <p class="admin-section-sub" id="grm-funnel-zone-rate-note">불러오는 중</p>
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>구역</th><th>방문</th><th>제출</th><th>전환율</th><th>정밀도</th></tr></thead>
@@ -530,8 +583,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </div>
           <div class="admin-monitor-section" style="margin-top:16px">
             <h3>일별 깔때기 — 스냅샷 차분</h3>
-            <p class="admin-section-sub">매일 23:55(KST)에 누적 카운터를 동결해 전일 스냅샷과의 차이를 계산합니다. '오늘' 행은 마지막 스냅샷 이후의 진행분입니다.</p>
-            <div class="admin-table-wrap">
+                        <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead><tr><th>날짜</th><th>밴드 노출</th><th>밴드 제출</th><th>CTA 노출</th><th>CTA 제출</th><th>CTA 닫기</th><th>제출 합계</th></tr></thead>
                 <tbody id="grm-growth-daily"><tr><td colspan="7"><div class="admin-empty">불러오는 중</div></td></tr></tbody>
@@ -541,8 +593,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           </details>
 <div class="admin-monitor-section" style="margin-top:16px">
             <h3>외부 계기 바로가기</h3>
-            <p class="admin-section-sub">방문·유입 경로의 정본은 Cloudflare Web Analytics(RUM·봇 제외)입니다. Cloudflare 존(Overview)의 방문자 수는 크롤러가 섞여 실사용 지표로 쓰지 않습니다.</p>
-            <div class="admin-actions-grid">
+                        <div class="admin-actions-grid">
               <div class="admin-op">
                 <div><h3><i class="ti ti-chart-line"></i>Cloudflare RUM</h3><p>실방문·페이지뷰·유입 리퍼러·경로(봇 제외). 30일 창으로 열립니다.</p></div>
                 <a class="btn" target="_blank" rel="noopener" href="https://dash.cloudflare.com/f8a15e3902ceb00a390635c040a2f551/web-analytics/overview/visits?siteTag~in=aa495e04c95449028591a30d7e0f87b4&amp;excludeBots=Yes&amp;time-window=43200">열기</a>
@@ -562,7 +613,19 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </div>
           </div>
           <div class="admin-status" id="grm-growth-status" role="status" aria-live="polite"></div>
-        </section>
+        <details class="admin-fold admin-notes"><summary>표 읽는 법 <span class="admin-fold-sub">출처·지연·주의</span></summary>
+<p>Cloudflare Web Analytics 실측(검색로봇 제외·자동화 브라우저 제외)을 매일 새벽 1시 30분에 가져옵니다. 날짜는 협정시(UTC) 기준이라 한국 시각으로는 그날 오전 9시부터 다음날 오전 9시까지를 담습니다 — 업무시간 방문은 같은 날짜에 들어갑니다.</p>
+<p>방문자가 사이트에서 처음 연 페이지입니다. 어느 섹션이 실제로 사람을 데려오는지 보여줍니다(개인정보 보호를 위해 물음표 뒤 조회어는 저장하지 않습니다). Cloudflare가 표본추출을 걸면 값이 10단위로 반올림되고, 그러면 하루 5건 미만인 페이지가 0으로 사라져 목록에 없다고 방문이 없는 것은 아닙니다 — 그때는 바로 아래 줄이 '표본 추정'이라고 알려줍니다.</p>
+<p>구글 Search Console 실측입니다. <b>노출</b>은 검색결과에 우리 페이지가 보인 횟수, <b>클릭</b>은 실제로 눌린 횟수, <b>순위</b>는 평균 몇 번째에 떴는지입니다(1이 가장 위). 방문 기록은 &ldquo;구글에서 왔다&rdquo;까지만 알려주고, <b>무엇을 검색했는지는 이 표에만</b> 있습니다.</p>
+<p>구글이 확정 데이터를 2~3일 늦게 주므로 이 표의 최신 날짜는 위 방문 표보다 뒤처집니다(정상입니다). 또 검색한 사람이 적은 희귀 검색어는 구글이 개인 식별을 막으려고 아예 빼고 주기 때문에, <b>검색어 표의 합은 사이트 총합보다 작습니다</b> &mdash; 어긋난 것이 아닙니다.</p>
+<p>검색결과에 노출된 페이지를 사이트 구역별로 묶었습니다. 위의 &ldquo;어느 페이지로 들어오나&rdquo;가 <b>실제로 들어온</b> 사람이라면, 이 표는 <b>보이기는 했는데 들어왔는지는 별개</b>인 숫자입니다. 노출이 많은데 클릭률이 낮은 구역은 순위가 아니라 검색결과에 뜨는 제목·설명이 문제일 수 있습니다.</p>
+<p>구독 제출이 일어난 페이지의 최상위 구역입니다(누적). 밴드와 CTA는 모든 한국어 페이지에 있어서, 이 표가 없으면 "어디서 구독했나"에 답할 자료가 없습니다. 개인정보 보호를 위해 경로의 첫 조각만 남깁니다. 2026-09-05 이전 제출은 이 기록이 없어 집계에 빠져 있습니다.</p>
+<p>구독 제출 때 함께 보낸 첫 방문 유입 정보(utm 값·리퍼러 호스트)를 채널로 묶었습니다. 세션이 아니라 이 브라우저에 7일 보관한 값이라, 링크드인 게시물을 보고 며칠 뒤 구독해도 잡힙니다. 노출(view)은 보내지 않습니다.</p>
+<p>RUM 착지 방문(봇 제외)을 분모로, 076 구역별 제출을 분자로 묶었습니다. 노출은 구역별로 보내지 않습니다 — 크롤러 오염이라 갈라도 못 읽습니다(2026-09-01 실측). 경로 표는 표본 실행에서 거칠어(10단위) 작은 구역의 방문이 0으로 보일 수 있습니다 — 전환율은 방향만 읽으세요.</p>
+<p>매일 23:55(KST)에 누적 카운터를 동결해 전일 스냅샷과의 차이를 계산합니다. '오늘' 행은 마지막 스냅샷 이후의 진행분입니다.</p>
+<p>방문·유입 경로의 정본은 Cloudflare Web Analytics(RUM·봇 제외)입니다. Cloudflare 존(Overview)의 방문자 수는 크롤러가 섞여 실사용 지표로 쓰지 않습니다.</p>
+</details>
+</section>
 
         <section class="admin-panel" data-panel="newsletter" hidden>
           <div class="admin-panel-head">
@@ -662,11 +725,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         </section>
 
         <section class="admin-panel" data-panel="home">
-          <div class="admin-panel-head">
-            <div><h2>홈</h2><p class="sub">지금 상태와 회사 구성을 한 화면에서 봅니다. 자세한 것은 왼쪽 메뉴에서 여세요.</p></div>
-          </div>
           <div class="home-status" id="grm-home-status">
-            <div class="home-stat"><span><i class="ti ti-activity"></i>운영 상태</span><b id="grm-home-live">확인 중</b><button type="button" data-goto="ops">운영센터 열기</button></div>
+            <div class="home-stat"><span><i class="ti ti-activity"></i>운영 상태</span><b id="grm-home-live">확인 중</b><button type="button" data-goto="ops">발행·운영 열기</button></div>
             <div class="home-stat"><span><i class="ti ti-shield-check"></i>이번 주 발행 승인</span><b id="grm-home-approve">확인 중</b><button type="button" data-goto="ops">승인하러 가기</button></div>
             <div class="home-stat"><span><i class="ti ti-message-report"></i>문의·제안</span><b id="grm-home-feedback">확인 중</b><button type="button" data-goto="feedback">문의 열기</button></div>
           </div>

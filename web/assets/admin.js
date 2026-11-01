@@ -453,6 +453,9 @@
     qsa("#grm-admin-tabs button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === name); });
     qsa("[data-panel]").forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== name; });
     var kp = byId("grm-kpis"); if (kp) kp.hidden = name !== "home";
+    var cur = document.querySelector('#grm-admin-tabs button[data-tab="' + name + '"]'), tt = byId("grm-page-title");
+    if (cur && tt) tt.textContent = cur.textContent.trim();
+    window.scrollTo(0, 0);
   }
 
   function loadIndex() {

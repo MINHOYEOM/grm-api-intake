@@ -1,6 +1,6 @@
 # 클라우드 실행 공통 규칙 — claude.ai 예약작업(Routine)이 읽는다
 
-2026-10-31 실측(환경 `env_01ErF8qqKJtFSxMYM6UcCCz4`). 저장소 main 이 작업 폴더에 받아져 있다. `python3` 는 3.11.
+2026-10-31 실측(환경 `env_01ErF8qqKJtFSxMYM6UcCCz4`). 저장소 main 이 작업 폴더에 받아져 있다. `python3` 는 3.11(`python3.12` 도 있다 — 3.12 문법이 필요한 코드는 그 venv 로).
 
 ## 시작할 때
 - `pip install -q -r requirements.txt` (pypi 는 열려 있다). 테스트가 더 요구하는 모듈만 그때 설치한다.

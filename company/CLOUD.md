@@ -23,7 +23,7 @@ gh api "$R/issues?state=open&labels=automation-warning" --jq '.[]|select(.pull_r
 ## 브랜치·PR·머지
 - push 는 `claude/` 로 시작하는 브랜치에만. PR 제목은 지시문이 정한 형식 그대로 쓴다 — PC 백업의 중복 확인과 자동 머지가 그 제목을 찾는다.
 - 머지하지 않는다. `grm-stranded-batch-pr.yml` 이 6시간마다 돌며 CI 가 전부 성공하고 3시간 지난 PR 을 머지한다
-  (대상 제목: `chore(findings): 일일 번역 배치` · `glossary(weekly):` · `quiz(weekly):`).
+  (대상 제목: `chore(findings): 일일 번역 배치` · `glossary(weekly):` · `quiz(weekly):` · `glossary(fig):`).
 - 전체 테스트(약 2시간)는 돌리지 않는다. 지시문이 정한 표적 테스트만 돌리고 나머지는 CI 가 본다.
 
 ## 네트워크

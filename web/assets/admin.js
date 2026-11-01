@@ -452,6 +452,7 @@
   function setTab(name) {
     qsa("#grm-admin-tabs button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === name); });
     qsa("[data-panel]").forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== name; });
+    var kp = byId("grm-kpis"); if (kp) kp.hidden = name !== "home";
   }
 
   function loadIndex() {

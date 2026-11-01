@@ -19,8 +19,10 @@ Notion 행은 그대로라 브리프에서는 "관찰 본문 미확보" 묶음 �
 ## 무엇을 하는가
 
 Status=New 인 FDA 483 Notion 행마다:
-  1. Notion raw 를 읽어 본문이 **없을 때만** 대상으로 삼는다(`card_scaffold._has_source_body`
-     — 스캐폴드가 묶기 여부를 판정하는 바로 그 기준).
+  1. Notion raw 에 **관찰(`fda_483_observations`)이 없을 때** 대상으로 삼는다. 스캐폴드의 상세
+     카드는 관찰에서만 만들어지므로 발췌만 있는 행도 대상이다(2026-11-02 — 종전 기준
+     `card_scaffold._has_source_body` 는 발췌를 본문으로 봐 그런 행을 놓쳤다). 발췌가 있는 행은
+     Supabase 에 관찰이 있을 때만 교체한다(발췌를 발췌로 덮지 않는다).
   2. 같은 document_id 의 Supabase raw_signals.raw_json 을 읽어 본문이 **있을 때만** 교체한다.
      Supabase 쪽도 비었으면 손대지 않는다(빈손을 빈손으로 덮지 않는다).
   3. 페이지 children 을 Supabase raw 로 교체한다. Status·Handoff Ref 등 속성은 건드리지 않는다.
@@ -91,12 +93,20 @@ def _has_wl_body_full(raw: dict[str, Any]) -> bool:
     return bool(raw.get("wl_body_full"))
 
 
-# 소스별 계약 — Notion 소스명 · "본문 있음" 판정 · 리포트에 셀 항목 키.
+def _has_483_observations(raw: dict[str, Any]) -> bool:
+    return bool(raw.get("fda_483_observations"))
+
+
+# 소스별 계약 — Notion 소스명 · "본문 있음" 판정 · "완결" 판정 · 리포트에 셀 항목 키.
+# ★[2026-11-02 첫 실전 게이트] 483 의 완결은 **관찰**이다 — 스캐폴드의 상세 카드
+#   (`deterministic_detail`)는 관찰에서만 만들어진다. 발췌만 있는 Notion 행은 `_has_source_body`
+#   로는 참이라 대상에서 빠졌고, 회수가 Supabase 에 관찰을 채워도 Notion 에 닿지 않았다
+#   (11-02 호 483 결손 11건 중 7건이 Supabase 에는 관찰이 있었다). WL 의 `wl_body_full` 과 같은 구조.
 SOURCE_SPECS: dict[str, dict[str, Any]] = {
     "fda483": {"source": SOURCE_FDA_483, "has_body": _has_source_body,
-               "items_key": "fda_483_observations"},
+               "complete": _has_483_observations, "items_key": "fda_483_observations"},
     "wl": {"source": SOURCE_FDA_WL, "has_body": _has_wl_body_full,
-           "items_key": "wl_violations"},
+           "complete": _has_wl_body_full, "items_key": "wl_violations"},
 }
 DEFAULT_WINDOW_DAYS = 45
 _DOC_ID_BATCH = 50
@@ -214,6 +224,7 @@ def run(
     spec = SOURCE_SPECS[source_key]
     source = spec["source"]
     has_body = spec["has_body"]
+    complete = spec["complete"]
 
     report = NotionRawSyncReport(mode="dry_run" if dry_run else "apply", source=source,
                                  window_days=window_days)
@@ -230,7 +241,7 @@ def run(
         return report, 2
     report.new_rows = len(rows)
 
-    targets: list[tuple[dict[str, Any], str]] = []
+    targets: list[tuple[dict[str, Any], str, bool]] = []
     for row in rows:
         page_id = str(row.get("page_id") or "")
         doc_id = str(row.get("document_id") or "")
@@ -238,26 +249,31 @@ def run(
         if raw is None:
             report.notion_raw_unreadable += 1
             continue
-        if has_body(raw):
+        if complete(raw):
             report.already_has_body += 1
             continue
-        targets.append((row, doc_id))
+        targets.append((row, doc_id, has_body(raw)))
     report.candidates = len(targets)
     if not targets:
         log("INFO", f"Notion {source} raw 동기화: New {report.new_rows}건 중 본문 없는 행 0건")
         return report, 0
 
     try:
-        supa = supa_fn(base, service_key, sorted({d for _r, d in targets}), source)
+        supa = supa_fn(base, service_key, sorted({d for _r, d, _b in targets}), source)
     except RuntimeError as exc:
         report.errors.append(str(exc))
         return report, 2
 
-    for row, doc_id in targets:
+    for row, doc_id, notion_has_body in targets:
         page_id = str(row.get("page_id") or "")
         raw = supa.get(doc_id)
         if raw is None:
             report.supabase_missing += 1
+            continue
+        if notion_has_body and not complete(raw):
+            # Notion 에 발췌가 있고 Supabase 도 관찰이 없다 — 나을 것이 없으니 그대로 둔다
+            # (발췌를 다른 발췌로 덮지 않는다 · 범위 밖 마감도 종전처럼 본문 없는 행에만).
+            report.supabase_also_empty += 1
             continue
         if not has_body(raw):
             if (source != SOURCE_FDA_483

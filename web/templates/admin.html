@@ -42,6 +42,7 @@
 .admin-activation-grid{display:grid;gap:7px}
 .admin-activation a{color:var(--coral-2);text-decoration:underline}
 .admin-dashboard{display:grid;gap:20px}
+.admin-kpis[hidden]{display:none}
 .admin-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .admin-kpi{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:18px 20px;min-width:0}
 .admin-kpi span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px;white-space:nowrap}
@@ -259,17 +260,18 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
       <nav class="admin-nav" id="grm-admin-tabs">
         <span class="admin-nav-label">현황</span>
         <button type="button" class="on" data-tab="home"><i class="ti ti-home-2"></i>홈</button>
-        <span class="admin-nav-label">매주 월요일</span>
-        <button type="button" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>운영센터</button>
-        <span class="admin-nav-label">매일 확인</span>
-        <button type="button" data-tab="growth"><i class="ti ti-trending-up"></i>성장·유입</button>
-        <span class="admin-nav-label">서비스 관리</span>
+        <span class="admin-nav-label">발행 (매주 월요일)</span>
+        <button type="button" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>발행·운영</button>
+        <span class="admin-nav-label">독자</span>
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
         <button type="button" data-tab="users"><i class="ti ti-users"></i>회원</button>
         <button type="button" data-tab="feedback"><i class="ti ti-message-report"></i>문의·제안</button>
+        <span class="admin-nav-label">성장 (매일 확인)</span>
+        <button type="button" data-tab="growth"><i class="ti ti-trending-up"></i>성장·유입</button>
         <button type="button" data-tab="insights"><i class="ti ti-chart-bar"></i>인사이트</button>
-        <button type="button" data-tab="system"><i class="ti ti-shield-check"></i>시스템</button>
+        <span class="admin-nav-label">시스템</span>
+        <button type="button" data-tab="system"><i class="ti ti-shield-check"></i>점검·기록</button>
       </nav>
       <div class="admin-identity">
         <span class="admin-pill" id="grm-admin-email"><i class="ti ti-lock"></i>로그인 필요</span>
@@ -282,7 +284,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <div>
           <span class="kick">Admin</span>
           <h1>GRM 컨트롤 타워</h1>
-          <p>매주 월요일에는 맨 위 승인 카드 하나만 보면 됩니다. 나머지 메뉴는 문제가 있거나 궁금할 때만 여세요.</p>
+          <p>회사 현황은 홈에서 봅니다. 월요일 승인은 발행 메뉴에서 합니다.</p>
         </div>
         <div class="admin-head-actions">
           <span class="admin-pill warn" id="grm-admin-live"><i class="ti ti-activity"></i>상태 확인 중</span>
@@ -338,7 +340,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
       </section>
 
       <section class="admin-dashboard admin-hidden" id="grm-admin-dashboard" aria-live="polite">
-        <div class="admin-kpis">
+        <div class="admin-kpis" id="grm-kpis">
           <div class="admin-kpi"><span><i class="ti ti-users"></i>회원</span><b id="grm-kpi-users">-</b></div>
           <div class="admin-kpi"><span><i class="ti ti-address-book"></i>구독자</span><b id="grm-kpi-subscribers">-</b></div>
           <div class="admin-kpi"><span><i class="ti ti-heart"></i>하트</span><b id="grm-kpi-hearts">-</b></div>

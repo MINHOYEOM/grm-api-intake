@@ -17,11 +17,18 @@
 [역할] 중 데스크 몫은 "(2) WebSearch/WebFetch 로 Intake 밖 이벤트를 보강"까지다. 산문 슬롯은 쓰지 않는다.
 [0단계] 의 Tier 처리·불건 해소 불변식은 **조치 배정까지만** 한다. 실제 Status 갱신·PL-10 마감은 하지 않는다.
 
+## 시작할 때 (07:20 · 07:45 두 번 돈다)
+- `company/run/{run_date_kst}/desk.json` 이 이미 `status: 완료` 면 아무것도 하지 않고 종료한다(07:45 재시도가 07:20 결과를 덮어쓰지 않는다).
+- 이번 주 월요일 OPEN handoff 가 아직 없으면(Notion 에 생성 전 — 2026-11-02 시범에서 07:05 에 생겼다) `desk.json` 에
+  `"status": "보류", "reason": "handoff 없음"` 만 쓰고 끝낸다. 07:45 에 같은 확인을 한 번 더 한다. 그때도 없으면 그대로 두고 끝낸다(백업이 한다).
+
 ## 하는 일
 1. handoff 의 모든 row(병합 멤버 포함)에 조치를 하나씩 배정한다:
    `render`(카드) · `skip`(Tier 1·Unrelated) · `reflow`(지난주 처리분 재유입) · `error` · `defer`(용량 초과 보류).
    Tier 3 는 전부 `render`. "카드 없이 처리"는 없다(v16 불건 해소 불변식).
-2. v16 [1단계] 대로 검색 보강을 한다(WebSearch 9 · WebFetch 5 한도). 찾은 사실은 출처 URL 과 함께 적는다.
+2. **샤드 계획**을 `shards` 로 쓴다(RUN.md 6항): delta A·B 는 `render`·`merged_into` 없음 카드를 handoff 순서로 반씩,
+   deep A·B 는 `deep_analysis_ready=true` 또는 `ncr_translation_ready=true` 카드를 483 관찰 건수가 비슷하도록 둘로. 한 카드는 정확히 한 샤드에만 들어간다.
+3. v16 [1단계] 대로 검색 보강을 한다(WebSearch 9 · WebFetch 5 한도). 찾은 사실은 출처 URL 과 함께 적는다.
 
 ## 결과 — `company/run/{run_date_kst}/desk.json`
 ```
@@ -32,6 +39,7 @@
   "rows": [{"source": "...", "document_id": "...", "web_card_id": "...", "signal_tier": "...",
             "merged_into": null, "action": "render|skip|reflow|error|defer", "reason": "한 줄"}],
   "search_findings": [{"slot": 1, "fact": "한 문장", "url": "...", "related_web_card_id": null}],
+  "shards": {"delta": {"A": ["web_card_id"], "B": ["web_card_id"]}, "deep": {"A": ["web_card_id"], "B": ["web_card_id"]}},
   "counts": {"rows": 0, "render": 0, "skip": 0, "reflow": 0, "error": 0, "defer": 0,
              "websearch_used": 0, "webfetch_used": 0}
 }

@@ -5,7 +5,7 @@
 
 | 팀 | 일 | 지시문 | 모델 | 클라우드 | PC 백업 | 클라우드가 했다는 표식 |
 |---|---|---|---|---|---|---|
-| 브리프편집팀 | 월요일 브리프 | `editorial/` | Sonnet·Opus·Sonnet | 월 05:30·06:10·07:40 | v16 Routine 월 09:30 | handoff CONSUMED |
+| 브리프편집팀 | 월요일 브리프 | `editorial/` | Sonnet·(Opus·Sonnet)×2샤드·Sonnet | 월 07:20·07:45(재시도)·08:00·08:35(기자 4샤드)·09:05 | v16 Routine 월 09:30 | handoff CONSUMED |
 | 용어·교육팀 | 주간 용어 추가 | `education/glossary-weekly.md` | Sonnet | 화 08:00 | 화 10:17 | 브랜치 `claude/glossary-weekly-YYYYWW` 또는 `glossary(weekly): YYYYWW` PR |
 | 용어·교육팀 | 용어 그림 일일 배치 | `education/glossary-fig-daily.md` | Sonnet | 매일 21:00 | (PC 작업은 꺼짐) | 브랜치 `claude/glossary-fig-daily-YYYYMMDD-HHMM` PR |
 | 용어·교육팀 | 주간 퀴즈 | `education/quiz-weekly.md` | Sonnet | 월 12:30·16:30 | 월 15:00·19:00 | `quiz_bank.json` 의 이번 주 문항 · 브랜치 `claude/quiz-weekly-YYYYWW` |

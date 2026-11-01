@@ -4,7 +4,7 @@
 1. `company/CHARTER.md`
 2. `company/editorial/RUN.md` — 이 파일이 아래 모든 규칙보다 우선
 3. `company/run/{run_date_kst}/desk.json`, `delta.json`, (있으면) `deep_delta.json`
-   — `delta.json` 이 없으면 `보류` 로 종료
+   — 합친 `delta.json` 은 아래 "하는 일" 0번이 만든다
 4. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** = 기준표 (본문 그대로 — 기준을 더하거나 빼지 않는다)
 5. 이번 주 handoff (Notion, 읽기만) — 대조용 `prose_input`·코드 `facts`·`quotes` 만
 
@@ -20,6 +20,9 @@
 - v16: [Status 갱신 — 발행 후, 0단계 page_id 표 기준]
 
 ## 하는 일
+0. **샤드 합치기.** `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
+   `delta.json`·`deep_delta.json` 으로 합친다(LLM 이 옮겨 적지 않는다). exit≠0 이면 그 메시지를 `copyedit.json` 에 적고 `보류` — Notion 에 아무것도 쓰지 않는다.
+   기자 샤드가 08:35 시작분까지 끝났어야 한다. 아직 도는 중이면 09:15 까지 한 번 더 확인하고, 그래도 아니면 `보류`.
 1. **코드 검사 먼저.** 이번 주 intake 실행의 `_scaffold` 아티팩트(`grm-web-publish.yml` 이 쓰는 것과 같은 것)를 `gh api` 로 받아
    ```
    python assemble_publish_brief.py --scaffold <scaffold>/brief_web_{run_date_kst}.json \

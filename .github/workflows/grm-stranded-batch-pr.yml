@@ -82,6 +82,7 @@ jobs:
               'chore(findings): 일일 번역 배치',
               'glossary(weekly):',
               'quiz(weekly):',
+              'glossary(fig):',
             ];
             const ISSUE_TITLE = '일일 번역 배치 PR 방치 — 검사 실패 또는 충돌';
             const LABEL_FINDINGS = 'grm-findings';

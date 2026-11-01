@@ -23,13 +23,14 @@ gh api "$R/issues?state=open&labels=automation-warning" --jq '.[]|select(.pull_r
 ## 브랜치·PR·머지
 - push 는 `claude/` 로 시작하는 브랜치에만. PR 제목은 지시문이 정한 형식 그대로 쓴다 — PC 백업의 중복 확인과 자동 머지가 그 제목을 찾는다.
 - 머지하지 않는다. `grm-stranded-batch-pr.yml` 이 6시간마다 돌며 CI 가 전부 성공하고 3시간 지난 PR 을 머지한다
-  (대상 제목: `chore(findings): 일일 번역 배치` · `glossary(weekly):` · `quiz(weekly):`).
+  (대상 제목: `chore(findings): 일일 번역 배치` · `glossary(weekly):` · `quiz(weekly):` · `glossary(fig):`).
 - 전체 테스트(약 2시간)는 돌리지 않는다. 지시문이 정한 표적 테스트만 돌리고 나머지는 CI 가 본다.
 
 ## 네트워크
-허용된 곳만 열린다. 막힌 주소는 `ENOTFOUND`·`connect_rejected` 로 실패한다 — 다른 길로 우회하지 말고
-`보류: 네트워크 — <주소>` 로 끝낸다(대표가 환경 설정에서 허용해야 한다).
-- 필요한 주소: `grm-solutions.com` · `rfwixqqdljpmtjdlblct.supabase.co` · 공식 출처(용어 정의 확인용).
+2026-11-01 대표가 환경 네트워크를 전체 허용으로 바꿨다(fda.gov·grm-solutions.com·WebFetch 실측 통과).
+그래도 어떤 주소가 `ENOTFOUND`·`connect_rejected` 로 실패하면 다른 길로 우회하지 말고
+`보류: 네트워크 — <주소>` 로 끝낸다(환경 설정이 바뀐 것이다 — 대표가 확인).
+- 쓰는 주소: `grm-solutions.com` · `rfwixqqdljpmtjdlblct.supabase.co` · 공식 출처(용어 정의 확인용).
 - Supabase anon 키·URL(공개값)은 `curl -s https://grm-solutions.com/findings/ | grep -o 'data-url="[^"]*"\|data-key="[^"]*"'` 로 얻는다.
 - Supabase 커넥터는 `select` 만 쓴다. 쓰기·마이그레이션 금지.
 

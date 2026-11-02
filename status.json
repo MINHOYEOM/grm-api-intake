@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T01:58:44Z",
+ "generated_at": "2026-11-02T04:36:46Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 41389307185,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T04:35:19Z",
+    "updatedAt": "2026-11-02T04:36:38Z",
+    "headBranch": "main",
+    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락) (#1284)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389307185"
+   },
+   {
     "databaseId": 41375124348,
     "status": "completed",
     "conclusion": "success",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1213 from MINHOYEOM/claude/brief-2026-10-26-fda48…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40512875379"
-   },
-   {
-    "databaseId": 40269730976,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-10-26T04:34:01Z",
-    "updatedAt": "2026-10-26T04:35:26Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Publish (assemble)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40269730976"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41375222612,
+    "databaseId": 41389425725,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-02T01:58:35Z",
-    "updatedAt": "2026-11-02T01:58:39Z",
+    "createdAt": "2026-11-02T04:36:37Z",
+    "updatedAt": "2026-11-02T04:36:41Z",
     "headBranch": "publish/brief-2026-11-02",
     "displayTitle": "publish(web): 2026-11-02 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375222612"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389425725"
    },
    {
-    "databaseId": 41375218233,
+    "databaseId": 41389424006,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T01:58:32Z",
-    "updatedAt": "2026-11-02T01:58:36Z",
+    "createdAt": "2026-11-02T04:36:36Z",
+    "updatedAt": "2026-11-02T04:36:40Z",
     "headBranch": "publish/brief-2026-11-02",
     "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375218233"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389424006"
    },
    {
-    "databaseId": 41375124335,
+    "databaseId": 41389307374,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T01:57:19Z",
-    "updatedAt": "2026-11-02T01:57:23Z",
+    "createdAt": "2026-11-02T04:35:19Z",
+    "updatedAt": "2026-11-02T04:35:23Z",
     "headBranch": "main",
-    "displayTitle": "Merge pull request #1277 from MINHOYEOM/claude/dazzling-hopper-lygh07",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375124335"
+    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락) (#1284)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389307374"
    },
    {
-    "databaseId": 41375035021,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 41382146198,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T01:56:12Z",
-    "updatedAt": "2026-11-02T01:56:16Z",
-    "headBranch": "feat/brief-approval-mail",
-    "displayTitle": "feat(ops): 브리프 발행 PR 준비 시 대표 결재 요청 메일",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375035021"
+    "createdAt": "2026-11-02T03:16:04Z",
+    "updatedAt": "2026-11-02T03:20:46Z",
+    "headBranch": "data/brief-en-2026-11-02",
+    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41382146198"
    },
    {
-    "databaseId": 41375030255,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 41382135196,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T01:56:08Z",
-    "updatedAt": "2026-11-02T01:56:12Z",
-    "headBranch": "feat/brief-approval-mail",
-    "displayTitle": "fix(ops): 결재 메일 CLI stdout UTF-8 가드(CI 인코딩 가드 테스트)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375030255"
+    "createdAt": "2026-11-02T03:15:57Z",
+    "updatedAt": "2026-11-02T03:20:42Z",
+    "headBranch": "data/brief-en-2026-11-02",
+    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41382135196"
    }
   ],
   "grm-scaffold-mirror.yml": [

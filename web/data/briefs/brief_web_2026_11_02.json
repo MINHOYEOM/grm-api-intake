@@ -7984,8 +7984,8 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "위반 1: 배치별 출하 전 확인(identity)·함량(strength) 시험 미실시 (21 CFR 211.165(a))",
-    "위반 2: 원료 성분별 확인시험 미실시 및 공급업체 시험성적 신뢰성 미검증 (21 CFR 211.84(d)(1))",
+    "위반 1: 배치별 출하 전 확인(identity)·함량(strength) 시험 및 불쾌미생물 시험 미실시 (21 CFR 211.165(a)·(b))",
+    "위반 2: 원료 성분별 확인시험 미실시 및 공급업체 시험성적 신뢰성 미검증 (21 CFR 211.84(d)(1)·(d)(2))",
     "위반 3: 품질부서 책임 이행 미흡 (21 CFR 211.22)",
     "발행: CDER · 10/22/2026 · FEI 3023093622"
    ],
@@ -8069,8 +8069,8 @@
     "summary": "FDA CDER issued a Warning Letter to TSP Solutions Pte. Ltd. on 10/22/2026. The violations cited were no finished product testing before release, no identity testing of each component, and inadequate fulfillment of quality unit responsibilities.",
     "implication": "This is a case where FDA tied a setup that skipped release testing and component identity testing and relied on supplier certificates to a quality unit responsibility problem. Manufacturers using outsourced or imported materials should re-examine the basis for accepting certificates and the scope of their own identity testing.",
     "key_facts": [
-     "Violation 1: Identity and strength testing before release not performed for each batch (21 CFR 211.165(a))",
-     "Violation 2: Identity testing of each component not performed and reliability of supplier test reports not verified (21 CFR 211.84(d)(1))",
+     "Violation 1: Identity and strength testing before release, and testing for objectionable microorganisms, not performed for each batch (21 CFR 211.165(a), (b))",
+     "Violation 2: Identity testing of each component not performed and reliability of supplier test reports not validated (21 CFR 211.84(d)(1), (d)(2))",
      "Violation 3: Quality unit responsibilities not adequately fulfilled (21 CFR 211.22)",
      "Issued by: CDER, 10/22/2026, FEI 3023093622"
     ],
@@ -8095,8 +8095,8 @@
    "signal_label": "High",
    "type_tag": "CGMP",
    "headline_target": "Northland Nuclear Medicine, LLC",
-   "title_issue": "규격 부적합 배치 조사 미흡",
-   "summary": "FDA CDER가 10/22/2026 Northland Nuclear Medicine, LLC에 Warning Letter를 발행했다. May 26 to 29, 2026 실사에서 규격 부적합 배치에 대한 조사와 시정조치가 적절하지 않았다는 점이 지적됐다.",
+   "title_issue": "규격 부적합 조사·설비 절차 미흡",
+   "summary": "FDA CDER가 10/22/2026 Northland Nuclear Medicine, LLC에 Warning Letter를 발행했다. May 26 to 29, 2026 실사에서 규격 부적합 배치의 조사·시정조치 미흡(21 CFR 212.20(d))과 설비 청결·적합성 절차 미준수(21 CFR 212.30(b)) 2건이 지적됐다.",
    "facts": [
     {
      "label": "발행일",
@@ -8118,14 +8118,16 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "위반: 생산 배치·구성요소의 규격 부적합 시 적절한 조사 및 시정조치 미실시 (21 CFR 212.20(d))",
+    "위반 1: 생산 배치·구성요소의 규격 부적합 시 적절한 조사 및 시정조치 미실시 (21 CFR 212.20(d))",
+    "위반 2: 설비의 청결·적합성·유지관리 절차 미준수 (21 CFR 212.30(b))",
     "실사 기간: May 26 to 29, 2026",
     "발행: CDER · 10/22/2026 · FEI 3005334016"
    ],
    "implication": "PET 의약품 CGMP(21 CFR Part 212)에서도 규격 부적합 조사와 CAPA 연결이 집행의 핵심축이라는 점이 드러난다. 단기 반감기 제품처럼 출하 후 조사가 이뤄지는 공정일수록 부적합 조사의 범위와 종결 근거를 점검해 둘 필요가 있다.",
    "checks": [
     "규격 부적합 배치 조사 범위·종결 기준",
-    "부적합 조사와 CAPA 연계 기록"
+    "부적합 조사와 CAPA 연계 기록",
+    "설비 청결·적합성 절차 준수 기록"
    ],
    "deterministic_detail": {
     "type": "wl_violations",
@@ -8191,17 +8193,19 @@
     }
    },
    "en": {
-    "title_issue": "Inadequate investigation of failed batches",
-    "summary": "FDA CDER issued a Warning Letter to Northland Nuclear Medicine, LLC on 10/22/2026. It cited that investigation and corrective action for batches that failed specifications were inadequate in the inspection of May 26 to 29, 2026.",
+    "title_issue": "Failed-batch investigation and equipment gaps",
+    "summary": "FDA CDER issued a Warning Letter to Northland Nuclear Medicine, LLC on 10/22/2026. The inspection of May 26 to 29, 2026 cited two violations: inadequate investigation and corrective action for batches that failed specifications (21 CFR 212.20(d)) and procedures for equipment cleanliness and suitability not adequately followed (21 CFR 212.30(b)).",
     "implication": "It shows that even under PET drug CGMP (21 CFR Part 212), investigation of specification failures and the link to CAPA are a core axis of enforcement. For processes such as short half-life products, where investigation happens after release, the scope of failure investigations and the basis for closing them should be checked.",
     "key_facts": [
-     "Violation: No adequate investigation and corrective action when a production batch or component fails specifications (21 CFR 212.20(d))",
+     "Violation 1: No adequate investigation and corrective action when a production batch or component fails specifications (21 CFR 212.20(d))",
+     "Violation 2: Procedures for equipment cleanliness, suitability and maintenance not adequately followed (21 CFR 212.30(b))",
      "Inspection period: May 26 to 29, 2026",
      "Issued by: CDER, 10/22/2026, FEI 3005334016"
     ],
     "checks": [
      "Scope and closure criteria for investigations of batches that fail specifications",
-     "Records linking failure investigations to CAPA"
+     "Records linking failure investigations to CAPA",
+     "Records showing equipment cleanliness and suitability procedures are followed"
     ]
    }
   },
@@ -14138,7 +14142,7 @@
    "key_facts": [
     "발행기관: MFDS",
     "주제: 의약품등 품목별 사전 GMP 평가 운영지침",
-    "발행일: 2026-10-29"
+    "발행일: 2026-10-30"
    ],
    "implication": "품목 허가 단계의 사전 GMP 평가 운영 기준을 다루는 지침으로, 신규 품목 허가 일정과 실사 준비에 영향을 줄 수 있는 신호다. 변경 범위는 원문 확인이 필요하므로 허가 예정 품목이 있다면 평가 절차 변화를 점검해 둘 필요가 있다.",
    "checks": [
@@ -14163,7 +14167,7 @@
     "key_facts": [
      "Issuing agency: MFDS",
      "Subject: operating guideline on product-level pre-GMP evaluation of medicinal products",
-     "Issue date: 2026-10-29"
+     "Issue date: 2026-10-30"
     ],
     "checks": [
      "Whether upcoming approval products are subject to pre-GMP evaluation",

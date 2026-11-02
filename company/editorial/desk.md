@@ -26,8 +26,9 @@
 1. handoff 의 모든 row(병합 멤버 포함)에 조치를 하나씩 배정한다:
    `render`(카드) · `skip`(Tier 1·Unrelated) · `reflow`(지난주 처리분 재유입) · `error` · `defer`(용량 초과 보류).
    Tier 3 는 전부 `render`. "카드 없이 처리"는 없다(v16 불건 해소 불변식).
-2. **샤드 계획**을 `shards` 로 쓴다(RUN.md 6항): delta A·B 는 `render`·`merged_into` 없음 카드를 handoff 순서로 반씩,
-   deep A·B 는 `deep_analysis_ready=true` 또는 `ncr_translation_ready=true` 카드를 483 관찰 건수가 비슷하도록 둘로. 한 카드는 정확히 한 샤드에만 들어간다.
+2. **샤드 계획**을 `shards` 로 쓴다(RUN.md 6항) — **직접 나누지 않는다.** 입력 JSON `{"delta":[render·merged_into 없는 web_card_id, handoff 순서],
+   "deep":[{"id":deep_analysis_ready 또는 ncr_translation_ready 카드,"obs":483 관찰 건수}]}` 를 파일로 쓰고
+   `python company/editorial/plan_shards.py <입력.json>` 의 출력을 `desk.json` 의 `shards` 에 그대로 넣는다. 샤드 수는 분량이 정한다(2~8). **카드를 덜어내지 않는다** — 경고가 나도 전부 싣는다.
 3. v16 [1단계] 대로 검색 보강을 한다(WebSearch 9 · WebFetch 5 한도). 찾은 사실은 출처 URL 과 함께 적는다.
 
 ## 결과 — `company/run/{run_date_kst}/desk.json`
@@ -39,7 +40,7 @@
   "rows": [{"source": "...", "document_id": "...", "web_card_id": "...", "signal_tier": "...",
             "merged_into": null, "action": "render|skip|reflow|error|defer", "reason": "한 줄"}],
   "search_findings": [{"slot": 1, "fact": "한 문장", "url": "...", "related_web_card_id": null}],
-  "shards": {"delta": {"A": ["web_card_id"], "B": ["web_card_id"]}, "deep": {"A": ["web_card_id"], "B": ["web_card_id"]}},
+  "shards": {"delta": {"A": ["web_card_id"], "B": ["web_card_id"], "C": ["…"]}, "deep": {"A": ["web_card_id"], "B": ["web_card_id"]}, "tldr": "T"},
   "counts": {"rows": 0, "render": 0, "skip": 0, "reflow": 0, "error": 0, "defer": 0,
              "websearch_used": 0, "webfetch_used": 0}
 }

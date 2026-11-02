@@ -70,6 +70,7 @@ def _w(path, obj):
         json.dump(obj, f, ensure_ascii=False)
 
 
+EN = {"en": {"title_issue": "t", "summary": "s", "implication": "i", "key_facts": ["k"], "checks": ["c"]}}
 PLAN = {"delta": {"A": ["c1"], "B": ["c2"], "C": ["c3"]}, "deep": {"A": ["d1"], "B": []}, "tldr": "T"}
 
 
@@ -153,7 +154,7 @@ class MergeNTest(unittest.TestCase):
 
     def test_five_delta_shards_and_T(self):
         plan = {"delta": {s: [f"c{s}"] for s in "ABCDE"}, "deep": {"A": [], "B": []}, "tldr": "T"}
-        files = {f"delta.{s}.json": {"status": "완료", "cards": {f"c{s}": {}}} for s in "ABCDE"}
+        files = {f"delta.{s}.json": {"status": "완료", "cards": {f"c{s}": EN}} for s in "ABCDE"}
         files["delta.T.json"] = {"status": "완료", "tldr": ["a", "b", "c"], "tldr_en": ["a", "b", "c"]}
         delta, deep, problems = mp.merge(self._folder(plan, files))
         self.assertEqual(problems, [])
@@ -161,16 +162,24 @@ class MergeNTest(unittest.TestCase):
 
     def test_missing_T_blocks(self):
         plan = {"delta": {"A": ["c1"], "B": ["c2"]}, "deep": {"A": [], "B": []}, "tldr": "T"}
-        files = {"delta.A.json": {"status": "완료", "cards": {"c1": {}}},
-                 "delta.B.json": {"status": "완료", "cards": {"c2": {}}}}
+        files = {"delta.A.json": {"status": "완료", "cards": {"c1": EN}},
+                 "delta.B.json": {"status": "완료", "cards": {"c2": EN}}}
         self.assertTrue(any("tldr" in p for p in mp.merge(self._folder(plan, files))[2]))
 
     def test_unfinished_extra_shard_blocks(self):
         plan = {"delta": {"A": ["c1"], "B": ["c2"], "C": ["c3"]}, "deep": {"A": [], "B": []}, "tldr": "T"}
-        files = {"delta.A.json": {"status": "완료", "cards": {"c1": {}}},
-                 "delta.B.json": {"status": "완료", "cards": {"c2": {}}},
+        files = {"delta.A.json": {"status": "완료", "cards": {"c1": EN}},
+                 "delta.B.json": {"status": "완료", "cards": {"c2": EN}},
                  "delta.T.json": {"status": "완료", "tldr": ["x"], "tldr_en": ["x"]}}
         self.assertTrue(any("delta.C.json" in p for p in mp.merge(self._folder(plan, files))[2]))
+
+    def test_en_gap_still_blocks_with_n_shards(self):
+        plan = {"delta": {"A": ["c1"], "B": ["c2"], "C": ["c3"]}, "deep": {"A": [], "B": []}, "tldr": "T"}
+        files = {"delta.A.json": {"status": "완료", "cards": {"c1": EN}},
+                 "delta.B.json": {"status": "완료", "cards": {"c2": EN}},
+                 "delta.C.json": {"status": "완료", "cards": {"c3": {}}},
+                 "delta.T.json": {"status": "완료", "tldr": ["x"], "tldr_en": ["x"]}}
+        self.assertTrue(any("영문 슬롯" in p for p in mp.merge(self._folder(plan, files))[2]))
 
 
 if __name__ == "__main__":

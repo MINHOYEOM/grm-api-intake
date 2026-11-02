@@ -146,7 +146,7 @@ jobs:
           # (함수와 아무 상관 없는 이유로). 그래서 이 드리프트만 경고로 통과시키고,
           # 그 밖의 실패(SQL 오류·인증·네트워크)는 종전대로 배포를 막는다.
           set -uo pipefail
-          out="$(printf 'y\n' | supabase db push --password "$SUPABASE_DB_PASSWORD" 2>&1)" && rc=0 || rc=$?
+          out="$(printf 'y\n' | supabase db push --linked --password "$SUPABASE_DB_PASSWORD" 2>&1)" && rc=0 || rc=$?
           printf '%s\n' "$out"
           if [ "$rc" -eq 0 ]; then
             exit 0

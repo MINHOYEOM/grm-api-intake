@@ -217,11 +217,12 @@
   // 마찰 개선(12차): ① openLogin({mode:"signup"}) 가입 직행 ② 가입 진행 상태 sessionStorage
   // 복원 ③ 미확인 계정 로그인 실패 → 확인 코드 단계로 이어주기. 세 가지 모두 기존 로그인
   // 성공 경로·세션 저장소(grm-public-auth-v1)·하트/스크랩 로직은 건드리지 않는다.
-  var pop, resetEmail = "", pendingSignupEmail = "", pendingOptin = false, resendTimer = null;
+  var pop, resetEmail = "", pendingSignupEmail = "", pendingOptin = false, resendTimer = null, holdPop = false;
   var MODE_COPY = {
     login:   { title: _t("로그인"),          sub: _t("이메일과 비밀번호만 있으면 됩니다.") },
     signup:  { title: _t("회원가입"),        sub: _t("이메일과 비밀번호만 정하면 끝이에요. 확인 코드를 메일로 보내드립니다.") },
-    confirm: { title: _t("확인 코드 입력"),   sub: _t("메일로 받은 코드를 넣으면 가입이 끝나요.") },
+    confirm: { title: _t("이메일 확인"),      sub: _t("메일로 받은 코드를 넣으면 가입이 끝나요.") },
+    done:    { title: _t("가입이 완료되었습니다"), sub: _t("스크랩·관심 업체·구름이가 이 계정에 보관됩니다.") },
     reqcode: { title: _t("비밀번호 재설정"),   sub: _t("가입한 이메일로 재설정 코드를 보내드립니다.") },
     newpw:   { title: _t("새 비밀번호 설정"),  sub: _t("메일로 받은 코드와 새 비밀번호를 입력하세요.") }
   };
@@ -259,6 +260,12 @@
     try { sessionStorage.removeItem(SIGNUP_KEY); sessionStorage.removeItem(OPTIN_KEY); } catch (e) {}
   }
 
+  // 비밀번호 요건(가입·재설정). 로그인은 옛 6자 비밀번호 회원을 위해 요건을 검사하지 않는다.
+  var PW_MIN = 8;
+  function pwCheck(pw) { return { len: pw.length >= PW_MIN, letter: /[A-Za-z]/.test(pw), digit: /[0-9]/.test(pw) }; }
+  function pwOk(pw) { var c = pwCheck(pw); return c.len && c.letter && c.digit; }
+  var TERMS_VER = "terms-2026-11-03";   // 가입 시 동의한 약관·처리방침 시행일 — 문서를 바꾸면 올린다
+  function legalHref(p) { return "/" + p; }   // 법적 문서는 한국어 정본 한 벌 — 영문 화면에서도 같은 주소
   function pwField(ph, ac) {
     return '<span class="grm-pw-wrap"><input type="password" required minlength="6" autocomplete="' + ac +
       '" placeholder="' + ph + '" aria-label="' + ph + '" />' +
@@ -275,18 +282,37 @@
       '<h3 class="grm-login-title">' + _t("로그인") + '</h3>' +
       '<p class="grm-login-sub"></p>' +
       // 로그인·회원가입 공용 폼(이메일 + 비밀번호)
+      '<ol class="grm-steps" aria-label="' + _t("가입 단계") + '" hidden>' +
+      '<li data-s="1">' + _t("계정") + '</li><li data-s="2">' + _t("이메일 확인") + '</li><li data-s="3">' + _t("완료") + '</li></ol>' +
       '<form class="grm-login-form grm-login-auth" novalidate>' +
-      '<input type="email" required autocomplete="email" placeholder="you@company.com" aria-label="' + _t("이메일") + '" />' +
-      pwField(_t("비밀번호(6자 이상)"), "current-password") +
+      '<label class="grm-f"><span class="grm-f-l">' + _t("이메일") + '</span>' +
+      '<input type="email" required autocomplete="email" placeholder="you@company.com" aria-describedby="grm-e-email" /></label>' +
+      '<p class="grm-f-err" id="grm-e-email"></p>' +
+      '<label class="grm-f"><span class="grm-f-l">' + _t("비밀번호") + '</span>' +
+      pwField(_t("비밀번호"), "current-password") + '</label>' +
+      '<p class="grm-f-err" id="grm-e-pw"></p>' +
+      '<ul class="grm-pw-req" style="display:none" aria-live="polite">' +
+      '<li data-r="len">' + _t("8자 이상") + '</li><li data-r="letter">' + _t("영문 포함") + '</li><li data-r="digit">' + _t("숫자 포함") + '</li></ul>' +
+      '<div class="grm-consents" style="display:none">' +
+      '<label class="grm-login-optin grm-consent"><input type="checkbox" class="grm-c-age" />' +
+      '<span>' + _t("(필수) 만 14세 이상입니다") + '</span></label>' +
+      '<label class="grm-login-optin grm-consent"><input type="checkbox" class="grm-c-terms" />' +
+      '<span>' + _t("(필수) {terms}과 {privacy}에 동의합니다", { terms: '<a href="' + legalHref("terms/") + '" target="_blank" rel="noopener">' + _t("이용약관") + '</a>', privacy: '<a href="' + legalHref("privacy/") + '" target="_blank" rel="noopener">' + _t("개인정보처리방침") + '</a>' }) + '</span></label>' +
+      '<p class="grm-f-err" id="grm-e-consent"></p>' +
       (SUB_ACTION && !lsGet(SUB_OK_KEY)
-        ? '<label class="grm-login-optin" style="display:none"><input type="checkbox" class="grm-login-optin-cb" />' +
-          '<span>' + _t("(선택) 주간 뉴스레터 수신에 동의합니다") + '<small>' + _t("매주 월요일 규제 소식(브리프)과 사이트 새 기능 안내를 이메일로 받습니다. 가입 확인 코드를 입력하면 구독도 함께 완료되며, 모든 메일 하단의 수신거부 링크로 언제든 해지할 수 있어요.") + '</small></span></label>'
+        ? '<label class="grm-login-optin"><input type="checkbox" class="grm-login-optin-cb" />' +
+          '<span>' + _t("(선택) 주간 브리프·새 기능 안내 메일 받기") + '<small>' + _t("매주 월요일 규제 소식(브리프)과 사이트 새 기능 안내를 이메일로 받습니다. 가입 확인 코드를 입력하면 구독도 함께 완료되며, 모든 메일 하단의 수신거부 링크로 언제든 해지할 수 있어요.") + '</small></span></label>'
         : '') +
+      '</div>' +
       '<button type="submit" class="grm-login-primary">' + _t("로그인") + '</button></form>' +
       // 회원가입 이메일 확인: 코드
       '<form class="grm-login-form grm-login-confirm" style="display:none" novalidate>' +
-      '<input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="' + _t("메일로 받은 확인 코드") + '" aria-label="' + _t("확인 코드") + '" />' +
+      '<label class="grm-f"><span class="grm-f-l">' + _t("확인 코드") + '</span>' +
+      '<input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" autocomplete="one-time-code" placeholder="' + _t("메일로 받은 확인 코드") + '" class="grm-code" /></label>' +
       '<button type="submit" class="grm-login-primary">' + _t("가입 완료") + '</button></form>' +
+      '<div class="grm-login-done" style="display:none"><div class="grm-done-ic" aria-hidden="true">✓</div>' +
+      '<p class="grm-done-news" style="display:none"></p>' +
+      '<button type="button" class="grm-login-primary grm-done-go">' + _t("계속 둘러보기") + '</button></div>' +
       // 재설정 1단계: 이메일
       '<form class="grm-login-form grm-login-reqcode" style="display:none" novalidate>' +
       '<input type="email" required autocomplete="email" placeholder="' + _t("가입한 이메일") + '" aria-label="' + _t("이메일") + '" />' +
@@ -294,7 +320,7 @@
       // 재설정 2단계: 코드 + 새 비밀번호
       '<form class="grm-login-form grm-login-newpw" style="display:none" novalidate>' +
       '<input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="' + _t("메일로 받은 코드") + '" aria-label="' + _t("재설정 코드") + '" />' +
-      pwField(_t("새 비밀번호(6자 이상)"), "new-password") +
+      pwField(_t("새 비밀번호(8자 이상, 영문+숫자)"), "new-password") +
       '<button type="submit" class="grm-login-primary">' + _t("비밀번호 변경") + '</button></form>' +
       '<p class="grm-login-hint" role="alert"></p>' +
       '<p class="grm-login-msg" role="status" aria-live="polite"></p>' +
@@ -341,29 +367,55 @@
         tg.setAttribute("aria-label", show ? _t("비밀번호 숨김") : _t("비밀번호 표시"));
       });
     });
-    // 입력 시 힌트 해제
+    // 입력 시 힌트·필드 오류 해제 + 비밀번호 요건 실시간 표시
     Array.prototype.forEach.call(pop.querySelectorAll("input"), function (inp) {
-      inp.addEventListener("input", function () { hint.textContent = ""; });
+      inp.addEventListener("input", function () { hint.textContent = ""; clearFieldErr(inp); });
     });
+    var pwInput = authForm.querySelector(".grm-pw-wrap input");
+    var reqList = authForm.querySelector(".grm-pw-req");
+    pwInput.addEventListener("input", function () {
+      var c = pwCheck(pwInput.value);
+      Array.prototype.forEach.call(reqList.querySelectorAll("li"), function (li) { li.classList.toggle("ok", !!c[li.getAttribute("data-r")]); });
+    });
+    Array.prototype.forEach.call(authForm.querySelectorAll(".grm-consents input"), function (cb) {
+      cb.addEventListener("change", function () { setFieldErr(null, authForm.querySelector("#grm-e-consent"), ""); });
+    });
+    pop.querySelector(".grm-done-go").addEventListener("click", closeLogin);
 
     // 로그인/회원가입(이메일+비밀번호)
     authForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      var email = (authForm.querySelector('input[type="email"]').value || "").trim();
-      var pw = (authForm.querySelector(".grm-pw-wrap input").value || "");
-      if (!EMAIL_RE.test(email)) { hint.textContent = _t("올바른 이메일 형식을 입력해 주세요."); return; }
-      if (isAdminEmail(email)) { hint.textContent = _t("운영자 계정은 Admin 페이지에서 로그인하세요."); return; }
-      if (pw.length < 6) { hint.textContent = _t("비밀번호는 6자 이상이어야 합니다."); return; }
+      var emailIn = authForm.querySelector('input[type="email"]');
+      var email = (emailIn.value || "").trim();
+      var pw = (pwInput.value || "");
       var signup = pop.getAttribute("data-mode") === "signup";
+      var firstBad = null;
+      function bad(input, errEl, msg) { setFieldErr(input, errEl, msg); if (!firstBad) firstBad = input; }
+      if (!email) bad(emailIn, authForm.querySelector("#grm-e-email"), _t("이메일을 입력해 주세요."));
+      else if (!EMAIL_RE.test(email)) bad(emailIn, authForm.querySelector("#grm-e-email"), _t("올바른 이메일 형식을 입력해 주세요."));
+      else if (isAdminEmail(email)) bad(emailIn, authForm.querySelector("#grm-e-email"), _t("운영자 계정은 Admin 페이지에서 로그인하세요."));
+      if (!pw) bad(pwInput, authForm.querySelector("#grm-e-pw"), _t("비밀번호를 입력해 주세요."));
+      else if (signup && !pwOk(pw)) bad(pwInput, authForm.querySelector("#grm-e-pw"), _t("비밀번호는 8자 이상, 영문과 숫자를 함께 넣어 주세요."));
+      var ageCb = authForm.querySelector(".grm-c-age"), termsCb = authForm.querySelector(".grm-c-terms");
+      if (signup && !(ageCb.checked && termsCb.checked)) {
+        bad(!ageCb.checked ? ageCb : termsCb, authForm.querySelector("#grm-e-consent"),
+          !ageCb.checked ? _t("만 14세 이상만 가입할 수 있어요.") : _t("이용약관과 개인정보처리방침에 동의해 주세요."));
+      }
+      if (firstBad) { firstBad.focus(); return; }
       var optinCb = authForm.querySelector(".grm-login-optin-cb");
       var wantsNews = !!(signup && optinCb && optinCb.checked);
+      var meta = { newsletter_prompted: true, newsletter_optin: false };
+      if (wantsNews) meta = { newsletter_prompted: true, newsletter_optin: true, newsletter_consent_ver: SIGNUP_CONSENT_VER };
+      if (signup) { meta.age14_confirmed = true; meta.terms_ver = TERMS_VER; meta.terms_agreed_at = new Date().toISOString(); }
       setBusy(authForm, true); m.textContent = signup ? _t("가입 중…") : _t("로그인 중…");
+      if (signup) holdPop = true;
       var call = signup
-        ? sb.auth.signUp({ email: email, password: pw, options: { data: wantsNews ? { newsletter_prompted: true, newsletter_optin: true, newsletter_consent_ver: SIGNUP_CONSENT_VER } : { newsletter_prompted: true, newsletter_optin: false } } })
+        ? sb.auth.signUp({ email: email, password: pw, options: { data: meta } })
         : sb.auth.signInWithPassword({ email: email, password: pw });
       call.then(function (res) {
         setBusy(authForm, false);
         if (res && res.error) {
+          holdPop = false;
           m.textContent = "";
           // 미확인 계정 로그인 시도 → 막다른 오류 대신 코드 입력 단계로 이어준다.
           if (!signup && classifyAuthError(res.error) === "unconfirmed") {
@@ -377,10 +429,10 @@
         }
         if (signup) {
           pendingOptin = wantsNews;
-          if (res.data && res.data.session) { clearSignupProgress(); m.textContent = _t("가입되었습니다."); if (wantsNews) subscribeServer(res.data.session.access_token, "signup-optin", SIGNUP_CONSENT_VER); }
-          else { pendingSignupEmail = email; saveSignupProgress(email); saveOptinFlag(wantsNews); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); }
+          if (res.data && res.data.session) { clearSignupProgress(); setMode("done"); if (wantsNews) subscribeServer(res.data.session.access_token, "signup-optin", SIGNUP_CONSENT_VER); }
+          else { holdPop = false; pendingSignupEmail = email; saveSignupProgress(email); saveOptinFlag(wantsNews); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); startResendCooldown(); }
         } else { m.textContent = _t("로그인되었습니다."); }
-      }).catch(function () { setBusy(authForm, false); m.textContent = ""; hint.textContent = _t("요청에 실패했습니다. 잠시 후 다시 시도해 주세요."); });
+      }).catch(function () { holdPop = false; setBusy(authForm, false); m.textContent = ""; hint.textContent = _t("요청에 실패했습니다. 잠시 후 다시 시도해 주세요."); });
     });
 
     // 회원가입 이메일 확인: 코드 검증(type:"signup")
@@ -390,15 +442,16 @@
       if (!token) { hint.textContent = _t("메일로 받은 코드를 입력해 주세요."); return; }
       if (!pendingSignupEmail) { setMode("signup"); return; }
       setBusy(confirmForm, true); m.textContent = _t("확인 중…");
+      holdPop = true;
       sb.auth.verifyOtp({ email: pendingSignupEmail, token: token, type: "signup" }).then(function (res) {
         setBusy(confirmForm, false);
-        if (res && res.error) { m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
+        if (res && res.error) { holdPop = false; m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
         clearSignupProgress();
-        m.textContent = _t("가입이 완료되었습니다.");
+        setMode("done");
         // 이메일 확인이 끝난 지금에서야 구독을 서버에 요청한다(가입 화면에서 체크한 기록이 user_metadata 에 있을 때만 서버가 받는다).
         var vs = res && res.data, vmeta = vs && vs.user && vs.user.user_metadata;
         if (vs && vs.session && vmeta && vmeta.newsletter_optin === true) subscribeServer(vs.session.access_token, "signup-optin", vmeta.newsletter_consent_ver || SIGNUP_CONSENT_VER);
-      }).catch(function () { setBusy(confirmForm, false); m.textContent = ""; hint.textContent = _t("확인에 실패했습니다. 다시 시도해 주세요."); });
+      }).catch(function () { holdPop = false; setBusy(confirmForm, false); m.textContent = ""; hint.textContent = _t("확인에 실패했습니다. 다시 시도해 주세요."); });
     });
 
     // 재설정 1단계: 코드 발송
@@ -421,7 +474,7 @@
       var token = (newpwForm.querySelector('input[type="text"]').value || "").trim();
       var pw = (newpwForm.querySelector(".grm-pw-wrap input").value || "");
       if (!token) { hint.textContent = _t("메일로 받은 코드를 입력해 주세요."); return; }
-      if (pw.length < 6) { hint.textContent = _t("새 비밀번호는 6자 이상이어야 합니다."); return; }
+      if (!pwOk(pw)) { hint.textContent = _t("비밀번호는 8자 이상, 영문과 숫자를 함께 넣어 주세요."); return; }
       if (!resetEmail) { setMode("reqcode"); return; }
       setBusy(newpwForm, true); m.textContent = _t("확인 중…");
       sb.auth.verifyOtp({ email: resetEmail, token: token, type: "recovery" }).then(function (res) {
@@ -460,7 +513,7 @@
   function authErr(err, signup) {
     switch (classifyAuthError(err)) {
       case "exists":         return _t("이미 가입된 이메일이에요. 로그인하거나 비밀번호를 재설정해 주세요.");
-      case "weak_password":  return _t("비밀번호는 6자 이상으로 정해 주세요.");
+      case "weak_password":  return _t("비밀번호는 8자 이상, 영문과 숫자를 함께 넣어 주세요.");
       case "rate_limit":     return _t("메일을 너무 자주 보냈어요. 잠시 후 다시 시도해 주세요.");
       case "unconfirmed":    return _t("가입 확인이 아직이에요. 메일로 받은 확인 코드를 입력해 주세요.");
       default:               return signup ? _t("가입에 실패했습니다. 잠시 후 다시 시도해 주세요.")
@@ -475,7 +528,7 @@
   // 체크한 사람, 안내 카드의 '구독하기'를 누른 사람만. 사이트 구독 밴드 폼은 별개(Brevo 더블 옵트인).
   var SUB_OK_KEY = "grm-sub-ok";          // 구독 밴드와 같은 키(구독 요청한 브라우저 — 밴드·배너 숨김)
   var NUDGE_KEY = "grm-sub-nudge-v1";     // 로그인 후 안내를 이미 보인 브라우저
-  var SIGNUP_CONSENT_VER = "optin-v1";    // 가입 화면 동의 문구 버전 — 문구를 바꾸면 올린다
+  var SIGNUP_CONSENT_VER = "optin-v2";    // 가입 화면 동의 문구 버전 — 문구를 바꾸면 올린다
   var NUDGE_CONSENT_VER = "nudge-v1";     // 안내 카드 동의 문구 버전
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k) { try { localStorage.setItem(k, "1"); } catch (e) {} }
@@ -537,6 +590,18 @@
     });
   }
 
+  // 필드 오류: 입력칸에 aria-invalid, 메시지는 aria-describedby 로 연결된 <p> 에 둔다.
+  function setFieldErr(input, errEl, msg) {
+    if (errEl) errEl.textContent = msg || "";
+    if (input) { if (msg) input.setAttribute("aria-invalid", "true"); else input.removeAttribute("aria-invalid"); }
+  }
+  function clearFieldErr(input) {
+    if (!input || !input.removeAttribute) return;
+    input.removeAttribute("aria-invalid");
+    var d = input.getAttribute("aria-describedby"), el = d && document.getElementById(d);
+    if (el && el.classList.contains("grm-f-err")) el.textContent = "";
+    if (input.closest && input.closest(".grm-pw-wrap")) { var pe = document.getElementById("grm-e-pw"); if (pe) pe.textContent = ""; }
+  }
   function setBusy(form, busy) {
     var b = form.querySelector(".grm-login-primary");
     if (b) { b.disabled = !!busy; b.classList.toggle("is-busy", !!busy); }
@@ -571,6 +636,21 @@
     var reqcodeForm = pop.querySelector(".grm-login-reqcode");
     var newpwForm   = pop.querySelector(".grm-login-newpw");
     var isAuth = (mode === "login" || mode === "signup");
+    var doneBox = pop.querySelector(".grm-login-done");
+    doneBox.style.display = (mode === "done") ? "flex" : "none";
+    var steps = pop.querySelector(".grm-steps"), stepNo = { signup: 1, confirm: 2, done: 3 }[mode];
+    steps.hidden = !stepNo;
+    Array.prototype.forEach.call(steps.querySelectorAll("li"), function (li) {
+      var n = +li.getAttribute("data-s");
+      li.classList.toggle("on", n === stepNo); li.classList.toggle("past", n < stepNo);
+      if (n === stepNo) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+    });
+    if (mode === "done") {
+      pop.querySelector(".grm-login-msg").textContent = "";
+      var dn = pop.querySelector(".grm-done-news");
+      dn.style.display = (pendingOptin && SUB_ACTION) ? "block" : "none";
+      dn.textContent = _t("뉴스레터 구독도 함께 신청되었어요. 매주 월요일에 보내드려요.");
+    }
     authForm.style.display    = isAuth ? "flex" : "none";
     confirmForm.style.display = (mode === "confirm") ? "flex" : "none";
     reqcodeForm.style.display = (mode === "reqcode") ? "flex" : "none";
@@ -580,11 +660,13 @@
       var pwIn = authForm.querySelector(".grm-pw-wrap input");
       pwIn.setAttribute("autocomplete", mode === "signup" ? "new-password" : "current-password");
       authForm.querySelector(".grm-login-primary").textContent = (mode === "signup") ? _t("가입하기") : _t("로그인");
-      var optin = authForm.querySelector(".grm-login-optin");
-      if (optin) {
-        optin.style.display = (mode === "signup") ? "flex" : "none";
-        if (mode !== "signup") optin.querySelector("input").checked = false;   // 기본 해제 — 모드를 오가도 미리 체크되지 않는다
-      }
+      authForm.querySelector(".grm-pw-wrap input").placeholder = (mode === "signup") ? _t("8자 이상, 영문+숫자") : "";
+      authForm.querySelector(".grm-consents").style.display = (mode === "signup") ? "block" : "none";
+      authForm.querySelector(".grm-pw-req").style.display = (mode === "signup") ? "flex" : "none";
+      var optinCb0 = authForm.querySelector(".grm-login-optin-cb");
+      if (optinCb0 && mode !== "signup") optinCb0.checked = false;   // 기본 해제 — 모드를 오가도 미리 체크되지 않는다
+      Array.prototype.forEach.call(authForm.querySelectorAll("[aria-invalid]"), function (x) { x.removeAttribute("aria-invalid"); });
+      Array.prototype.forEach.call(authForm.querySelectorAll(".grm-f-err"), function (x) { x.textContent = ""; });
     }
 
     // 코드 재전송 링크(confirm/newpw) + 개인정보 안내(signup)
@@ -613,11 +695,12 @@
       addLink(_t("로그인으로 돌아가기"), "login");
       addLink(_t("다른 이메일로 가입"), "signup", function () { clearSignupProgress(); pendingSignupEmail = ""; });
     }
+    else if (mode === "done") { /* 마지막 단계 — 되돌아갈 곳 없음 */ }
     else { addLink(_t("로그인으로 돌아가기"), "login"); }
 
     var focusForm = isAuth ? authForm
-      : (mode === "confirm" ? confirmForm : (mode === "reqcode" ? reqcodeForm : newpwForm));
-    var first = focusForm.querySelector("input");
+      : (mode === "confirm" ? confirmForm : (mode === "reqcode" ? reqcodeForm : (mode === "done" ? doneBox : newpwForm)));
+    var first = focusForm.querySelector("input, button");
     if (first) setTimeout(function () { first.focus(); }, 30);
   }
 
@@ -628,8 +711,9 @@
   //     팝업을 닫았다 다시 열어도 코드 입력 단계로 돌아오고, 재전송 버튼(쿨다운 30초)이 그대로 있다.
   function openLogin(opts) {
     if (!pop) buildPop();
+    holdPop = false;
     var o = (typeof opts === "string") ? { msg: opts } : (opts || {});
-    Array.prototype.forEach.call(pop.querySelectorAll("input"), function (i) { i.value = ""; });
+    Array.prototype.forEach.call(pop.querySelectorAll("input"), function (i) { i.value = ""; if (i.type === "checkbox") i.checked = false; });
     Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-wrap input"), function (i) { i.type = "password"; });
     Array.prototype.forEach.call(pop.querySelectorAll(".grm-pw-toggle"), function (t) { t.innerHTML = EYE; t.setAttribute("aria-label", _t("비밀번호 표시")); });
     resetEmail = ""; pendingSignupEmail = "";
@@ -647,7 +731,7 @@
     pop.querySelector(".grm-login-msg").textContent = msg;
     pop.classList.add("show");
   }
-  function closeLogin() { if (pop) pop.classList.remove("show"); }
+  function closeLogin() { holdPop = false; if (pop) pop.classList.remove("show"); }
   // 다른 자산(growth-sync.js 펫 CTA 등)이 별도 로그인 UI 발명 없이 모드를 지정해 여는 공개 진입점.
   window.GRM_AUTH.open = openLogin;
 
@@ -1162,7 +1246,7 @@
   sb.auth.onAuthStateChange(function (_evt, s) {
     session = s; renderAuth(); if (rows.length) loadMine(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
     // 세션 성립 = 가입 흐름 종료. 로그인하려던 이유(누르려던 저장)를 여기서 갚는다.
-    if (s && s.user) { clearSignupProgress(); closeLogin(); applyPendingReact(); if (_evt === "SIGNED_IN") setTimeout(function () { maybeNudge(s.user); }, 1200); }
+    if (s && s.user) { clearSignupProgress(); if (!holdPop) closeLogin(); applyPendingReact(); if (_evt === "SIGNED_IN") setTimeout(function () { maybeNudge(s.user); }, 1200); }
   });
   if (rows.length) loadCounts();
 })();

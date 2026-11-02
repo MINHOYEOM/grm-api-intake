@@ -309,6 +309,7 @@
 .foot .b1 .foot-srclink{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:13px;color:var(--band-mut);border-bottom:1px solid var(--band-line);padding:0 0 3px;transition:color .16s var(--ease),border-color .16s var(--ease)}
 .foot .b1 .foot-srclink:hover{color:#fff;border-bottom-color:rgba(255,255,255,.35)}
 .foot .b1 .foot-srclink .ti{font-size:14px;line-height:1}
+.foot-copy .foot-policy a{margin-left:12px;color:inherit;text-decoration:underline}
 .foot-copy .foot-contact{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
 .foot-copy .foot-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;border:1px solid var(--band-line);color:var(--band-mut)}
 .foot-copy .foot-ico:hover{color:#fff;border-color:rgba(255,255,255,.3)}
@@ -387,7 +388,7 @@
   {# [푸터 정리 2026-09-06] 법적 줄 — 종전 영문 prov 문장("AI-generated from primary sources…")은 아래 한글 면책과 같은 말이라 걷어 냈다(AI 고지는 위 '서비스' 열 링크가 맡는다). 연락 아이콘(이메일)은 contact.json 에 값이 있을 때만(load_contact — 빈 값이면 아이콘도 span 도 없다). #}
   <div class="foot-legal">
     <div class="foot-copy">
-      <span>© 2026 Global Regulatory Monitor</span>{% if contact %}<span class="foot-contact">{% if contact.email %}<a class="foot-ico" href="mailto:{{ contact.email }}" aria-label="{{ _('이메일') }}" title="{{ _('이메일') }}"><i class="ti ti-mail" aria-hidden="true"></i></a>{% endif %}</span>{% endif %}</div>
+      <span>© 2026 Global Regulatory Monitor</span>{% if contact %}<span class="foot-contact">{% if contact.email %}<a class="foot-ico" href="mailto:{{ contact.email }}" aria-label="{{ _('이메일') }}" title="{{ _('이메일') }}"><i class="ti ti-mail" aria-hidden="true"></i></a>{% endif %}</span>{% endif %}<span class="foot-policy"><a href="/privacy/">{{ _("개인정보처리방침") }}</a><a href="/terms/">{{ _("이용약관") }}</a></span></div>
     <p class="foot-disclaimer">{{ _("본 서비스는 정보 제공 서비스이며, 제공 정보의 사용에 따른 최종 판단과 책임은 이용자에게 있습니다.") }}</p>
   </div>
 </div></footer>

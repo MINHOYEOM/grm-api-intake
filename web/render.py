@@ -65,10 +65,10 @@ GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
 # `# ` 한 줄 = 제목, 첫 `## ` 앞 문단 = 리드, `## ` 마다 한 블록(왼쪽 레이블 + 본문).
 # 영문 파일은 번역본이 아니라 또 하나의 정본이며 h2 순서가 같아야 한다(WebAboutTest 가 고정).
 ABOUT_FILE = WEB_DIR / "data" / "about_content.md"
-# [법무 초안] 개인정보처리방침·이용약관 초안. 기본 빌드는 출력하지 않는다 — 대표·법률 확인 전 공개 금지.
-# GRM_LEGAL_DRAFT_PAGES=1 일 때만 noindex 미리보기 2장을 낸다(푸터·sitemap·가입 문구 연결 없음).
-LEGAL_DRAFT_DIR = WEB_DIR / "data" / "legal"
-LEGAL_DRAFT_PAGES = os.environ.get("GRM_LEGAL_DRAFT_PAGES", "").strip() == "1"
+# [법무] 개인정보처리방침·이용약관(한국어 정본 한 벌, 2026-11-03 시행). 영어 트리에는 없다 —
+#   푸터 링크는 언어 무관하게 /privacy/·/terms/ 로 간다. 문안은 web/data/legal/*.md 가 정본.
+LEGAL_DIR = WEB_DIR / "data" / "legal"
+LEGAL_PAGES = (("privacy_ko", "privacy/"), ("terms_ko", "terms/"))
 ABOUT_EN_FILE = WEB_DIR / "data" / "about_content_en.md"
 # [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 이메일. 값이 비어 있으면
 # 그 링크는 **그리지 않는다**(죽은 링크 금지). 사이트에 그대로 실리므로 공개 주소만 넣는다.
@@ -4382,6 +4382,8 @@ def build_sitemap_xml(briefs: list[dict[str, Any]],
         f"  <url><loc>{base_url}/guide/</loc></url>",
         # [소개 2026-09-06] 정적 커밋 콘텐츠 — 이용안내와 같은 근거로 lastmod 생략.
         f"  <url><loc>{base_url}/about/</loc></url>",
+        f"  <url><loc>{base_url}/privacy/</loc></url>",
+        f"  <url><loc>{base_url}/terms/</loc></url>",
         f"  <url><loc>{base_url}/glossary/</loc></url>",
         # [용어사전 낱개] 색인 페이지 1건만 등록하면 226 어가 URL 하나에 묶여 검색 대상이
         # 되지 못한다("OOS 뜻"·"CAPA 란"). 용어당 URL 을 등록해 각 용어가 독립 색인 대상이
@@ -5451,15 +5453,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             about_sections=about_sections,
         )
 
-    # [법무 초안] 기본 꺼짐. 켜져도 sitemap·푸터에는 없다(출력만 한다).
-    if LEGAL_DRAFT_PAGES:
-        for _stem, _path in (("privacy_ko", "privacy-draft/"), ("terms_ko", "terms-draft/")):
-            _f = LEGAL_DRAFT_DIR / f"{_stem}.md"
-            if _f.exists():
-                _lt, _ll, _ls = render_about_html(_f.read_text(encoding="utf-8"))
-                emit("legal_draft.html", page(_path), page_title=_lt + " · GRM",
-                     nav_active="about", description="", about_title=_lt,
-                     about_lead=_ll, about_sections=_ls)
+    # [법무] 개인정보처리방침·이용약관 — 한국어 트리에만. 가입 화면·푸터에서 링크한다.
+    for _stem, _path in LEGAL_PAGES:
+        _f = LEGAL_DIR / f"{_stem}.md"
+        if _f.exists():
+            _lt, _ll, _ls = render_about_html(_f.read_text(encoding="utf-8"))
+            emit("legal.html", page(_path), page_title=_lt + " · GRM",
+                 nav_active="about", description="", about_title=_lt,
+                 about_lead=_ll, about_sections=_ls)
 
     # 용어사전(트랙 C 2차 웨이브) — glossary.json(정본)을 초성 색인 1페이지로 결정론 렌더.
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.

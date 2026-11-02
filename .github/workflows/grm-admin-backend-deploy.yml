@@ -161,7 +161,7 @@ jobs:
         if: steps.ref.outputs.ready == 'true'
         shell: bash
         run: |
-          supabase secrets set --project-ref "${{ steps.ref.outputs.project_ref }}" \
+          supabase secrets set --yes --project-ref "${{ steps.ref.outputs.project_ref }}" \
             SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY" \
             GITHUB_ACTIONS_TOKEN="$ADMIN_GITHUB_ACTIONS_TOKEN" \
             GITHUB_REPO="$GITHUB_REPOSITORY" \
@@ -170,7 +170,7 @@ jobs:
             GRM_NEWSLETTER_LIST_ID="$GRM_NEWSLETTER_LIST_ID"
           # 영문 리스트 ID 는 선택값 — 비어 있으면 건드리지 않는다(newsletter-optin 은 한국어 리스트로 폴백).
           if [ -n "${GRM_NEWSLETTER_LIST_ID_EN:-}" ]; then
-            supabase secrets set --project-ref "${{ steps.ref.outputs.project_ref }}" \
+            supabase secrets set --yes --project-ref "${{ steps.ref.outputs.project_ref }}" \
               GRM_NEWSLETTER_LIST_ID_EN="$GRM_NEWSLETTER_LIST_ID_EN"
           fi
 
@@ -178,8 +178,8 @@ jobs:
         if: steps.ref.outputs.ready == 'true'
         shell: bash
         run: |
-          supabase functions deploy admin-supabase --project-ref "${{ steps.ref.outputs.project_ref }}"
-          supabase functions deploy admin-github --project-ref "${{ steps.ref.outputs.project_ref }}"
-          supabase functions deploy admin-brevo --project-ref "${{ steps.ref.outputs.project_ref }}"
-          supabase functions deploy account-delete --project-ref "${{ steps.ref.outputs.project_ref }}"
-          supabase functions deploy newsletter-optin --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy admin-supabase --yes --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy admin-github --yes --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy admin-brevo --yes --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy account-delete --yes --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy newsletter-optin --yes --project-ref "${{ steps.ref.outputs.project_ref }}"

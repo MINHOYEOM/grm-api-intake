@@ -581,6 +581,8 @@ grm-api-intake/
 │  ├─ migrations/094_mfds_inspector_profiles.sql # MFDS 조회 RPC·FDA 응답 불변 가드
 │  ├─ migrations/095_extraction_gap_out_of_scope.sql # 추출 격차 감시에서 회수가 범위 밖으로 확정한 문서 제외
 │  ├─ migrations/096_extraction_gap_revoke_anon.sql # 추출 격차 RPC 실행 권한을 service_role 전용으로(anon·authenticated 회수)
+│  ├─ migrations/098_account_deletion_log.sql # 계정 삭제 결과 기록(개인정보 0)·관리자 읽기
+│  ├─ migrations/099_account_scrub_feedback.sql # 계정 삭제 시 문의 이메일만 비우는 RPC(service_role 전용)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)

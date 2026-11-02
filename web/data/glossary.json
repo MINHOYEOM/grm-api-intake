@@ -5004,5 +5004,25 @@
       "ATMPs"
     ],
     "easy_en": "A medicine for human use that is based on genes, cells or tissue engineering."
+  },
+  {
+    "id": "colony-forming-unit",
+    "term_ko": "집락형성단위 (CFU)",
+    "term_en": "Colony Forming Unit (CFU)",
+    "easy_ko": "하나 이상의 미생물에서 비롯된, 눈으로 확인되는 집락 하나를 가리키는 미생물학 용어입니다. 액체 시료는 mL당, 공기 시료는 m3당, 침강·접촉 평판 같은 고형 배지 시료는 시료당 CFU로 나타냅니다.",
+    "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Colony Forming Unit (CFU)",
+    "related": [
+      "environmental-monitoring",
+      "bioburden",
+      "cleanroom"
+    ],
+    "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",
+    "aliases": [
+      "colony forming unit",
+      "colony-forming unit",
+      "CFU",
+      "CFUs"
+    ],
+    "easy_en": "A microbiological term that describes a single detectable colony that originates from one or more microorganisms. Colony forming units are typically expressed as CFU per ml for liquid samples, CFU per m3 for air sample and CFU per sample for samples captured on solid medium such as settle or contact plates."
   }
 ]

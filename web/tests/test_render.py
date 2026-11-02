@@ -9878,7 +9878,8 @@ class WebGlossaryRenderTest(unittest.TestCase):
         # 242 → 243: 2026-09-29 주간 용어 추가 202640(summary-of-product-characteristics).
         # 243 → 245: 2026-10-06 주간 용어 추가 202641(adulterated-drug·package-leaflet).
         # 245 → 246: 2026-10-27 주간 용어 추가 202644(advanced-therapy-medicinal-product).
-        self.assertEqual(len(self.terms), 246)
+        # 246 → 247: 2026-11-02 주간 용어 추가 202645(colony-forming-unit).
+        self.assertEqual(len(self.terms), 247)
 
     def test_source_url_renders_source_as_link(self):
         # v2 source_url — 출처 표기를 공식 문서 새 탭 링크로(값 무변형·안전 URL 만).

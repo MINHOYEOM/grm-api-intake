@@ -1183,6 +1183,12 @@
       "q": "adulterated",
       "findings": 121,
       "documents": 119
+    },
+    {
+      "id": "colony-forming-unit",
+      "q": "CFU",
+      "findings": 28,
+      "documents": 28
     }
   ],
   "excluded": [

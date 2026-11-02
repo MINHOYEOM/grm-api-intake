@@ -15,6 +15,9 @@ _spec.loader.exec_module(mp)
 PLAN = {"delta": {"A": ["c1", "c2"], "B": ["c3"]}, "deep": {"A": ["fda483-1"], "B": []}}
 
 
+EN = {"en": {"title_issue": "t", "summary": "s", "implication": "i", "key_facts": ["k"], "checks": ["c"]}}
+
+
 def _write(folder, name, obj):
     with open(os.path.join(folder, name), "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False)
@@ -25,8 +28,8 @@ class MergePartsTest(unittest.TestCase):
         d = tempfile.mkdtemp()
         files = {
             "desk.json": {"status": "완료", "shards": PLAN},
-            "delta.A.json": {"status": "완료", "cards": {"c1": {}, "c2": {}}},
-            "delta.B.json": {"status": "완료", "cards": {"c3": {}}, "tldr": ["a"], "tldr_en": ["a"]},
+            "delta.A.json": {"status": "완료", "cards": {"c1": EN, "c2": EN}},
+            "delta.B.json": {"status": "완료", "cards": {"c3": EN}, "tldr": ["a"], "tldr_en": ["a"]},
             "deep.A.json": {"status": "완료", "items": {"fda483-1": {"deep_analysis": {}, "observations_ko": [{"number": "1"}]}}},
         }
         files.update(over)
@@ -42,7 +45,7 @@ class MergePartsTest(unittest.TestCase):
         self.assertEqual(list(deep), ["fda483-1"])
 
     def test_missing_card_blocks(self):
-        d = self._folder(**{"delta.A.json": {"status": "완료", "cards": {"c1": {}}}})
+        d = self._folder(**{"delta.A.json": {"status": "완료", "cards": {"c1": EN}}})
         self.assertTrue(mp.merge(d)[2])
 
     def test_unfinished_shard_blocks(self):
@@ -59,8 +62,23 @@ class MergePartsTest(unittest.TestCase):
         d = self._folder(**{"deep.A.json": {"status": "완료", "items": {"fda483-1": {"deep_analysis": {}}}}})
         self.assertTrue(any("observations_ko" in p for p in mp.merge(d)[2]))
 
+    def test_card_without_en_blocks(self):
+        d = self._folder(**{"delta.A.json": {"status": "완료", "cards": {"c1": EN, "c2": {}}}})
+        self.assertTrue(any("영문 슬롯" in p and "c2" in p for p in mp.merge(d)[2]))
+
+    def test_partial_en_blocks(self):
+        part = {"en": dict(EN["en"], checks=[])}
+        d = self._folder(**{"delta.A.json": {"status": "완료", "cards": {"c1": EN, "c2": part}}})
+        self.assertTrue(any("checks" in p for p in mp.merge(d)[2]))
+
+    def test_en_fields_match_renderer(self):
+        import sys
+        sys.path.insert(0, os.path.join(ROOT, "web"))
+        import render
+        self.assertEqual(tuple(mp.EN_FIELDS), tuple(render.CARD_NARRATIVE_FIELDS))
+
     def test_tldr_required(self):
-        d = self._folder(**{"delta.B.json": {"status": "완료", "cards": {"c3": {}}}})
+        d = self._folder(**{"delta.B.json": {"status": "완료", "cards": {"c3": EN}}})
         self.assertTrue(mp.merge(d)[2])
 
 

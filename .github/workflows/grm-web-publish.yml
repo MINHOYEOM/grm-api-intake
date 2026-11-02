@@ -33,6 +33,11 @@ on:
         description: '발행일 YYYY-MM-DD (web/data/deltas/delta_{date}.json 존재 필요)'
         required: true
         type: string
+      allow_no_en:
+        description: '영문 슬롯이 비어도 발행 PR 을 만든다(한국어만 내는 의도적 예외, 사람만). 기본 false'
+        required: false
+        default: 'false'
+        type: string
       intake_run_id:
         description: '스캐폴드 아티팩트를 가진 grm-intake run id (미지정 시 날짜로 최신 성공 run 탐색)'
         required: false
@@ -157,6 +162,20 @@ jobs:
             --delta    "${{ steps.r.outputs.delta }}" \
             --out      "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" \
             "${DEEP_ARGS[@]}"
+
+      - name: 영문 슬롯 게이트 — 빠졌으면 PR 을 만들기 전에 실패
+        # [2026-11-02] 영문 갈래가 빠진 채 PR 이 열려 CI test 3건이 뒤늦게 실패한 사고의 재발 방지.
+        # 델타(영문 포함)가 아직 안 온 호는 여기서 멈추고 원인·빠진 목록을 한 줄로 낸다.
+        # 의도적으로 한국어만 내야 하면 dispatch 입력 allow_no_en=true (사람만).
+        run: |
+          set -uo pipefail
+          OUT="web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json"
+          FLAG=""
+          if [ "${{ github.event.inputs.allow_no_en }}" = "true" ]; then FLAG="--warn-only"; fi
+          MSG=$(python check_en_slots.py "$OUT" $FLAG); RC=$?
+          echo "$MSG"
+          echo "### 영문 슬롯 게이트: $MSG" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$RC" -ne 0 ]; then echo "::error::$MSG"; exit "$RC"; fi
 
       - name: 골든 재동결(기본 env — prod 변수 미주입) + 렌더 스모크
         run: |

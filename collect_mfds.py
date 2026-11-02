@@ -27,11 +27,12 @@ ENABLE_MFDS=true 일 때 collect_intake.main() 에서 호출된다.
 
 from __future__ import annotations
 
+import email.utils
 import os
 import re
 import urllib.parse
 import xml.etree.ElementTree as ET
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from grm_common import http_get_xml, log
@@ -410,6 +411,27 @@ def _datago_item_to_intake(fields: dict[str, str],
     )
 
 
+_KST = timezone(timedelta(hours=9))
+
+
+def _kst_date_iso(raw: str, atom: bool) -> str:
+    """피드 타임스탬프 → **KST 달력 날짜**(YYYY-MM-DD). 식약처 게시일은 한국 날짜다.
+
+    RSS 가 GMT/UTC 로 내려주면(예: `Thu, 29 Oct 2026 15:30:00 GMT` = KST 10-30) 공용 파서의
+    `dt.date()` 는 UTC 날짜 10-29 를 돌려줘 카드 발행일이 하루 어긋났다(2026-11-03). 시간대가
+    있는 값만 KST 로 환산하고, 시간대가 없거나 파싱이 안 되면 공용 파서 결과를 그대로 쓴다."""
+    try:
+        if atom:
+            dt = datetime.fromisoformat(raw.strip().replace("Z", "+00:00"))
+        else:
+            dt = email.utils.parsedate_to_datetime(raw)
+        if dt.tzinfo is not None:
+            return dt.astimezone(_KST).date().isoformat()
+    except Exception:
+        pass
+    return _parse_atom_date(raw) if atom else _parse_rss2_date(raw)
+
+
 def _rss2_fields(el: Any) -> tuple[str, str, str, str]:
     """RSS 2.0 <item> → (title, link, date_iso, description)."""
     title = _rss_text(el.find("title"))
@@ -421,7 +443,7 @@ def _rss2_fields(el: Any) -> tuple[str, str, str, str]:
     pub_raw = _rss_text(el.find("pubDate")) or _rss_text(el.find("pubdate"))
     if not pub_raw:
         pub_raw = _rss_text(el.find(_DC_DATE_TAG))
-    date_iso = _parse_rss2_date(pub_raw) if pub_raw else ""
+    date_iso = _kst_date_iso(pub_raw, False) if pub_raw else ""
     desc = _rss_text(el.find("description"))
     return title, link, date_iso, desc
 
@@ -431,7 +453,7 @@ def _atom_fields(e: Any) -> tuple[str, str, str, str]:
     title = _atom_text(e, "title")
     link = _atom_link(e)
     pub_raw = _atom_text(e, "updated") or _atom_text(e, "published")
-    date_iso = _parse_atom_date(pub_raw) if pub_raw else ""
+    date_iso = _kst_date_iso(pub_raw, True) if pub_raw else ""
     desc = _atom_text(e, "summary") or _atom_text(e, "content")
     return title, link, date_iso, desc
 

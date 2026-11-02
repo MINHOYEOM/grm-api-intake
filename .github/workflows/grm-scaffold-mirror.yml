@@ -1,0 +1,95 @@
+name: GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)
+
+# 브리프편집팀 교열(클라우드)은 코드 검사에 그 주 스캐폴드(grm-web-brief 아티팩트)가 필요한데,
+# 클라우드 프록시가 `/actions/…` 를 403 으로 막아 아티팩트를 받을 수 없다(company/CLOUD.md).
+# 그래서 수집(GRM API Intake)이 성공할 때마다 스캐폴드 파일을 저장소 브랜치에도 복사해 둔다.
+# 교열은 `git fetch origin claude/scaffold-brief-web` 후 `git show FETCH_HEAD:brief_web_YYYY_MM_DD.json` 으로 읽는다.
+#
+# 안전 계약
+#   · 읽기 전용 사본 — 발행 경로(grm-web-publish 의 아티팩트 다운로드)는 그대로다. 이 브랜치는 어떤 PR·배포에도 쓰이지 않는다.
+#   · 브랜치는 매번 단일 커밋으로 덮어쓴다(기록이 쌓이지 않음) · 최신 날짜 4개 파일만 유지.
+#   · 같은 날짜 파일은 나중에 성공한 수집(재생성 포함)이 덮어쓴다 — 발행 워크플로가 "그 날짜 스캐폴드를 가진 최신 run" 을 고르는 것과 같다.
+#   · 비밀값 없음 · github.token 만 · 스캐폴드는 공개 사이트에 올라가는 규제 정보의 빈 슬롯 뼈대다.
+
+on:
+  workflow_run:
+    workflows: ["GRM API Intake (Daily)"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      intake_run_id:
+        description: '사본을 만들 grm-intake run id (그 run 의 grm-web-brief 아티팩트)'
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: grm-scaffold-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    name: grm-web-brief → claude/scaffold-brief-web
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MIRROR_BRANCH: claude/scaffold-brief-web
+      KEEP: '4'
+    steps:
+      - name: 스캐폴드 내려받기
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IN_RUN_ID: ${{ inputs.intake_run_id }}
+          WR_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          RID="${IN_RUN_ID:-$WR_ID}"
+          printf '%s' "$RID" | grep -qE '^[0-9]+$' || { echo "::error::run id 는 숫자"; exit 1; }
+          mkdir -p _in
+          if ! gh run download "$RID" -R "$GITHUB_REPOSITORY" -n grm-web-brief -D _in 2>/dev/null; then
+            echo "::notice::run $RID 에 grm-web-brief 아티팩트 없음 — 사본 생략(ENABLE_WEB_BRIEF_EMIT off 이거나 만료)"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          ls -l _in
+          ls _in/brief_web_*.json >/dev/null 2>&1 || { echo "::notice::brief_web_*.json 없음 — 사본 생략"; echo "SKIP=1" >> "$GITHUB_ENV"; }
+
+      - name: 브랜치 갱신 (단일 커밋 덮어쓰기)
+        if: ${{ env.SKIP != '1' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir _mirror && cd _mirror
+          git init -q
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$MIRROR_BRANCH" >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin "$MIRROR_BRANCH"
+            git checkout -q -b mirror FETCH_HEAD
+          else
+            git checkout -q --orphan mirror
+          fi
+          cp ../_in/brief_web_*.json .
+          # 최신 날짜(파일명 정렬) KEEP 개만 남긴다
+          ls brief_web_*.json | sort -r | tail -n +$((KEEP + 1)) | xargs -r rm -f
+          printf '교열(클라우드)용 스캐폴드 사본 — grm-scaffold-mirror.yml 이 쓴다. 손대지 않는다.\n' > README.txt
+          git add -A
+          if git diff --cached --quiet; then
+            echo "::notice::변경 없음"
+            exit 0
+          fi
+          git commit -q -m "scaffold mirror: $(ls brief_web_*.json | tr '\n' ' ')"
+          git push -q --force origin "mirror:refs/heads/${MIRROR_BRANCH}"
+          {
+            echo "### 스캐폴드 사본"
+            ls -l brief_web_*.json | awk '{print "- " $9 " (" $5 " bytes)"}'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -41,6 +41,23 @@ def _diff(name, got, planned, problems):
         problems.append(f"{name}: 계획에 없는 카드 {len(extra)}건 (예: {extra[:3]})")
 
 
+# 카드 영문 갈래 필수 다섯 — web/render.py CARD_NARRATIVE_FIELDS 와 같다(tests 가 일치를 확인한다).
+EN_FIELDS = ("title_issue", "summary", "implication", "key_facts", "checks")
+
+
+def _en_gaps(card):
+    """카드 영문 갈래에서 비었거나 빠진 필드 목록. 완결이면 []."""
+    en = card.get("en") if isinstance(card, dict) else None
+    en = en if isinstance(en, dict) else {}
+    gaps = []
+    for f in EN_FIELDS:
+        v = en.get(f)
+        ok = bool([x for x in v if str(x).strip()]) if isinstance(v, list) else bool(str(v or "").strip())
+        if not ok:
+            gaps.append(f)
+    return gaps
+
+
 def merge(folder):
     problems = []
     desk = _load(os.path.join(folder, "desk.json"))
@@ -63,6 +80,11 @@ def merge(folder):
             tldr, tldr_en = part["tldr"], part.get("tldr_en")
     if not tldr or not tldr_en:
         problems.append("tldr · tldr_en 이 없다 (delta.B.json 의 몫)")
+
+    en_bad = {cid: _en_gaps(c) for cid, c in cards.items() if _en_gaps(c)}
+    if en_bad:
+        ex = ", ".join(f"{cid}({'/'.join(g)})" for cid, g in list(en_bad.items())[:3])
+        problems.append(f"영문 슬롯 미완결 {len(en_bad)}/{len(cards)}장 — 이 호는 영어로 나가지 않는다 (예: {ex})")
 
     for s in DEEP_SHARDS:
         planned = plan["deep"].get(s, [])

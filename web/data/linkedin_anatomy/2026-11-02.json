@@ -1,0 +1,92 @@
+{
+  "schema": "grm-anatomy-slots/v1",
+  "pub": "2026-11-02",
+  "card_id": "8909d4bb39b5",
+  "firm_alias": "한 PET 의약품 제조소",
+  "status": "pilot",
+  "cover": {
+    "chip": "FDA WARNING LETTER · 환경모니터링·CAPA",
+    "headline": ["ISO 5 균 검출 100건 넘게,", "정식 동정 의뢰는 2건뿐"],
+    "sub": "PET 의약품 제조소 · 21 CFR 212.20(d), 212.30(b)",
+    "bars_head": "서한에 기재된 수치",
+    "bars": [
+      {"label": "ISO 5 미생물 검출 (2024년 3월~2026년 4월)", "value": 100, "unit": "건 이상",
+       "evidence": "2024년 3월부터 2026년 4월까지의 EM 데이터는 ISO 5 구역(예: (b)(4) 및 층류작업대(LAFW))에서 100건이 넘는 미생물 검출"},
+      {"label": "‘이전 집락과 유사’로만 기록", "value": 90, "unit": "건 이상",
+       "evidence": "90건이 넘는 ISO 5 분리균이 공식적인 미생물 동정 대신"},
+      {"label": "공식 동정 의뢰 (2024년 12월 이후 약 75건 중)", "value": 2, "unit": "건",
+       "evidence": "2024년 12월 이후 약 75건의 ISO 5 미생물 검출 중 공식 동정에 의뢰된 것은 단 2건이었다"}
+    ]
+  },
+  "s02": {
+    "heading": "ISO 5에서 균이 나왔는데 조사하지 못했다",
+    "cite": "21 CFR 212.20(d)",
+    "glosses": [
+      {"term": "ISO 5 구역", "text": "충전처럼 제품이 열려 있는 단계의 공기를 가장 엄격하게 관리하는 청정도 등급."},
+      {"term": "동정", "text": "검출된 균이 어떤 속·종인지 확인하는 시험."}
+    ],
+    "rows": [
+      {"label": "무엇이", "text": "ISO 5 구역에서 미생물이 100건 넘게 검출됐고, 서한은 이를 이상 경향이라고 적었다.",
+       "evidence": "ISO 5 구역(예: (b)(4) 및 층류작업대(LAFW))에서 100건이 넘는 미생물 검출이라는 이상 경향을 보였으며"},
+      {"label": "어떻게", "text": "90건 넘는 균은 동정하지 않고 ‘이전에 동정된 집락과 유사함’이라고만 기록했다. 무엇과 유사한지는 기록이 없다.",
+       "evidence": ["90건이 넘는 ISO 5 분리균이 공식적인 미생물 동정 대신", "해당 집락이 어떤 기동정 미생물과 유사하다는 것인지에 대한 기록은 없었다"]},
+      {"label": "결과", "text": "2024년 12월 이후 약 75건 중 공식 동정에 보낸 것은 2건이다. 2025년 9월 이후에는 ISO 5에서 나온 균의 속·종이 로그에 한 건도 없다.",
+       "evidence": ["2024년 12월 이후 약 75건의 ISO 5 미생물 검출 중 공식 동정에 의뢰된 것은 단 2건이었다", "2025년 9월 이후로는 ISO 5 구역에서 검출된 어떤 속(genus)이나 종(species)도 귀사의 EM 로그에 기록되지 않았다"]},
+      {"label": "다른 신호", "text": "판독 교육은 슬라이드 한 장이 전부였고, 제품 검토 문서에도 ‘과다 CFU가 지속적인 문제’라고 적혀 있었다.",
+       "evidence": ["프레젠테이션 슬라이드 한 장이 전부였으며, 미생물 동정에 관한 지침은 전혀 없었다", "클린룸의 과다 CFU가 지속적인 문제”임을 인정하고 있다"]}
+    ]
+  },
+  "s03": {
+    "heading": "원인을 찾기 전에 멈췄다",
+    "flow": ["ISO 5 균 검출 반복", "균 확인 없이 ‘유사’로 기록", "FDA: 조사할 수 없었다"],
+    "fda_quote": "이 검출균들은 공식적으로 동정되지 않았고, 이로 인해 귀사는 적절한 조사를 수행할 수 없었다.",
+    "proposal": "동정하지 못한 균에는 사유와 조사 번호를 남기고, 한도를 넘은 균은 속·종까지 확인한다.",
+    "not_stated": "서한은 동정을 하지 않은 사내 이유를 기재하지 않는다(교육 자료 한 장만 언급). 점검 항목은 제안이다."
+  },
+  "s04": {
+    "heading": "시정조치: FDA 요구사항",
+    "items": [
+      {"ref": 0, "title": "EM 프로그램 독립 검토", "text": "한도·채취 위치·빈도·경향 분석·일탈 조사를 외부가 검토하고, 결과로 CAPA 계획을 낸다."},
+      {"ref": 1, "title": "조사 시스템 평가", "text": "일탈·OOS·OOL·불만 조사 전반을 독립 평가하고, 품질부서에 권한과 자원을 준다."},
+      {"ref": 2, "title": "배지 취급 CAPA", "text": "검체 배지에 고유 라벨·서명·시각 기록·플레이트 사진을 남기는 관리 체계를 만든다."},
+      {"ref": 3, "title": "위험평가·스모크 스터디", "text": "오염 위험을 독립 평가하고, 개선 뒤 동적 조건에서 기류 시험을 다시 한다."}
+    ],
+    "footnote": "OOL = 경보·조치 기준을 넘은 결과. OOS = 시험 결과 규격 이탈."
+  },
+  "s05": {
+    "heading": "회사 회신 → FDA 판단",
+    "pairs": [
+      {"response": "ISO 5 검출균을 앞으로 동정·기록하겠다",
+       "judgment": "이미 나온 균의 소급 평가, 동정 없이 출하한 배치 평가, 포자형성균·진균 대응이 없다",
+       "evidence": ["ISO 5 검출균을 향후 동정·기록하겠다는 약속은 미동정 검출균의 소급 평가·이상 경향 평가, 동정 없이 이뤄진 과거 배치 출하 판정의 적절성 평가, ISO 등급 구역 내 포자형성균·진균 존재에 대한 대응이 없어 부적절하다"]},
+      {"response": "재교육과 사건보고서 양식 보완",
+       "judgment": "저수율의 근본 원인과 기준 하향의 적절성을 다루지 않았고, 교육만으로는 품질부서 감독 실패를 풀 수 없다",
+       "evidence": ["교육만으로는 품질부서 감독이 결함 있는 조사를 탐지하지 못한 시스템적 실패를 해결할 수 없다고 지적했다"]},
+      {"response": "EM 플레이트 분무 중단·절차 개정",
+       "judgment": "과거 EM 데이터의 신뢰성과 그에 근거한 출하 판정을 평가하지 않았다",
+       "evidence": ["EM 플레이트 분무 중단·절차 개정은 과거 EM 데이터의 신뢰성과 이에 근거한 출하 판정을 평가하지 않았고"]}
+    ],
+    "repeat": {"text": "2023년 12월 13일 규제 회의에서 같은 유형의 위반을 논의했는데도 반복돼, FDA는 경영진의 감독·통제가 부적절하다고 봤다.",
+               "evidence": "2023년 12월 13일 규제 회의에서 유사한 CGMP 위반을 논의했음에도 반복된 점을 들어 경영진의 감독·통제가 부적절하다고 평가했다"},
+    "not_stated": "서한은 새 조치의 유효성을 어떤 수치·기간으로 확인할지 기재하지 않는다. 지표 제안은 점검 항목이다.",
+    "proposal": "동정률(검출 건수 대비 동정 건수)과 같은 구역의 재검출 건수를 CAPA 유효성 지표로 둔다."
+  },
+  "s06": {
+    "heading": "우리 현장 체크리스트",
+    "checks": [
+      "‘유사 집락’처럼 동정을 대신하는 기록을 우리 절차가 허용하는가?",
+      "EM 플레이트를 소독제와 함께 보관·운반하는 일은 없는가?",
+      "스모크 스터디에 작업자 개입 같은 동적 조건이 들어 있는가?"
+    ],
+    "question": "우리 현장의 ISO 5 검출 건수와 동정 건수는 몇 대 몇인가?"
+  },
+  "caption": {
+    "lead": "FDA는 한 PET 의약품 제조소에 보낸 경고서한에서 ISO 5 구역(제품이 열려 있는 단계의 가장 엄격한 청정도 등급) 환경모니터링 검출을 조사하지 못했다며 21 CFR 212.20(d) 위반을 지적했습니다.",
+    "facts": "2024년 3월부터 2026년 4월까지 ISO 5 구역에서 미생물이 100건 넘게 검출됐습니다. 90건 넘는 균은 동정(균의 속·종 확인) 대신 ‘이전에 동정된 집락과 유사함’으로만 기록됐고, 2024년 12월 이후 약 75건 중 공식 동정에 보낸 것은 2건이었습니다.",
+    "contrast": "회사는 앞으로 ISO 5 검출균을 동정·기록하겠다고 회신했지만, FDA는 이미 나온 균의 소급 평가와 동정 없이 출하한 배치 평가, 포자형성균·진균 대응이 빠졌다며 부적절하다고 판단했습니다.",
+    "requests": "FDA는 EM 프로그램과 조사 시스템의 독립 평가, 미생물 배지 취급 CAPA, 오염 위험 독립 평가와 동적 조건 스모크 스터디 재실시를 요구했습니다.",
+    "question": "우리 현장의 ISO 5 검출 건수와 동정 건수는 몇 대 몇인가요?",
+    "tags": "#FDA #WarningLetter #CMC #GMP #EnvironmentalMonitoring #CAPA #PET #품질보증",
+    "en": "FDA cited a PET drug manufacturer under 21 CFR 212.20(d) for failing to investigate microbial recoveries in ISO 5 areas (the cleanest grade, where product is exposed). From March 2024 to April 2026, more than 100 recoveries were logged. More than 90 were recorded as 'resembles previously identified colonies' instead of being identified to genus and species, and since December 2024 only 2 of about 75 recoveries were sent for formal identification. The firm promised to identify and record ISO 5 isolates going forward; FDA found that inadequate because there was no retrospective evaluation of unidentified isolates, no assessment of batches released without identification, and no response to spore-forming bacteria and fungi in classified areas. FDA requested independent reviews of the EM program and investigation system, a media-handling CAPA, and an independent contamination risk assessment with repeat dynamic smoke studies. How do our ISO 5 recovery count and identification count compare?"
+  }
+}

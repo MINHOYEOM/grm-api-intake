@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T04:36:46Z",
+ "generated_at": "2026-11-02T05:38:24Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 41395061761,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T05:36:58Z",
+    "updatedAt": "2026-11-02T05:38:14Z",
+    "headBranch": "main",
+    "displayTitle": "brief(2026-11-02): 검증실 정정 3건 — Northland WL 위반 2건·MFDS 사전 GMP 지침 게시일·…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395061761"
+   },
+   {
     "databaseId": 41389307185,
     "status": "completed",
     "conclusion": "success",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "GRM Web Publish (assemble)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40513307937"
-   },
-   {
-    "databaseId": 40512875379,
-    "status": "completed",
-    "conclusion": "failure",
-    "event": "push",
-    "createdAt": "2026-10-27T13:32:12Z",
-    "updatedAt": "2026-10-27T13:33:27Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1213 from MINHOYEOM/claude/brief-2026-10-26-fda48…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40512875379"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41389425725,
+    "databaseId": 41395183091,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-02T04:36:37Z",
-    "updatedAt": "2026-11-02T04:36:41Z",
+    "createdAt": "2026-11-02T05:38:14Z",
+    "updatedAt": "2026-11-02T05:38:18Z",
     "headBranch": "publish/brief-2026-11-02",
     "displayTitle": "publish(web): 2026-11-02 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389425725"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395183091"
    },
    {
-    "databaseId": 41389424006,
+    "databaseId": 41395179389,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T04:36:36Z",
-    "updatedAt": "2026-11-02T04:36:40Z",
+    "createdAt": "2026-11-02T05:38:12Z",
+    "updatedAt": "2026-11-02T05:38:16Z",
     "headBranch": "publish/brief-2026-11-02",
     "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389424006"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395179389"
    },
    {
-    "databaseId": 41389307374,
+    "databaseId": 41395061694,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T04:35:19Z",
-    "updatedAt": "2026-11-02T04:35:23Z",
+    "createdAt": "2026-11-02T05:36:58Z",
+    "updatedAt": "2026-11-02T05:37:02Z",
     "headBranch": "main",
-    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락) (#1284)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389307374"
+    "displayTitle": "brief(2026-11-02): 검증실 정정 3건 — Northland WL 위반 2건·MFDS 사전 GMP 지침 게시일·…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395061694"
    },
    {
-    "databaseId": 41382146198,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 41394837702,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-02T03:16:04Z",
-    "updatedAt": "2026-11-02T03:20:46Z",
-    "headBranch": "data/brief-en-2026-11-02",
-    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41382146198"
+    "createdAt": "2026-11-02T05:34:44Z",
+    "updatedAt": "2026-11-02T05:34:49Z",
+    "headBranch": "docs/legal-drafts-1102",
+    "displayTitle": "docs(legal): 개인정보처리방침·이용약관 초안 (비공개, 머지 금지)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41394837702"
    },
    {
-    "databaseId": 41382135196,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 41394827382,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T03:15:57Z",
-    "updatedAt": "2026-11-02T03:20:42Z",
-    "headBranch": "data/brief-en-2026-11-02",
-    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41382135196"
+    "createdAt": "2026-11-02T05:34:38Z",
+    "updatedAt": "2026-11-02T05:34:42Z",
+    "headBranch": "docs/legal-drafts-1102",
+    "displayTitle": "docs(legal): 개인정보처리방침·이용약관 초안 + 수집항목표 (기본 빌드 비노출)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41394827382"
    }
   ],
   "grm-scaffold-mirror.yml": [

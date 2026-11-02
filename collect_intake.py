@@ -2728,6 +2728,14 @@ def _extract_wl_body_full(html_text: str) -> str:
 # 잘못된 표제를 카드에 싣는 것보다 안전). 번호가 역행/중복하면 버린다(각주 오인식 차단).
 _WL_VIOLATION_HEAD_RE = re.compile(
     r"(?<![\w.)])(\d{1,2})\.\s+(?=(?:Your firm|Your|You)\b[^.]{0,80}?\b(?:failed|did not)\b)")
+# [2026-11-03] "Your firm failed" 계열이 아닌 표제(PET 21 CFR 212 WL: "2. Procedures to ensure … are not
+# adequately followed. (21 CFR 212.30(b)).")는 직전 번호 바로 다음(n+1)이고, 조항 인용 앞에 부정·결함
+# 서술이 있고, 인용이 머리 가까이(`_WL_VIOLATION_PLAIN_CFR_WITHIN`) 있을 때만 인정한다(각주 오인식 차단).
+_WL_VIOLATION_PLAIN_HEAD_RE = re.compile(r"(?<![\w.)])(\d{1,2})\.\s+(?=[A-Z])")
+_WL_VIOLATION_PLAIN_DEFECT_RE = re.compile(
+    r"\b(?:not|no|fail\w*|inadequate\w*|without|lack\w*|unable|insufficient\w*)\b", re.I)
+_WL_VIOLATION_PLAIN_SKIP_RE = re.compile(r"(?:See|Refer|Id\b|Ibid|Source)", re.I)
+_WL_VIOLATION_PLAIN_CFR_WITHIN = 600
 _WL_VIOLATION_CFR_RE = re.compile(r"21 CFR\b")
 _WL_VIOLATION_END_RE = re.compile(r"\)\s*\.")
 _WL_VIOLATION_CITE_RE = re.compile(r"21 CFR \d+\.\d+(?:\([^()\s]{1,6}\))*")
@@ -2745,15 +2753,25 @@ def extract_wl_violations_from_text(text: str) -> list[dict[str, str]]:
         return []
     out: list[dict[str, str]] = []
     last_num = 0
+    heads: dict[int, tuple[int, int, bool]] = {}   # 시작 위치 → (머리 끝, 번호, 표준 머리 여부)
     for m in _WL_VIOLATION_HEAD_RE.finditer(text):
-        seg = text[m.end():m.end() + _WL_VIOLATION_LOOKAHEAD]
+        heads[m.start()] = (m.end(), int(m.group(1)), True)
+    for m in _WL_VIOLATION_PLAIN_HEAD_RE.finditer(text):
+        heads.setdefault(m.start(), (m.end(), int(m.group(1)), False))
+    for pos in sorted(heads):
+        h_end, num, standard = heads[pos]
+        seg = text[h_end:h_end + _WL_VIOLATION_LOOKAHEAD]
         cfr = _WL_VIOLATION_CFR_RE.search(seg)
         if not cfr:
             continue                       # ② 조항 인용 없음 → 표제 아님
+        if not standard and (
+                num != last_num + 1 or cfr.start() > _WL_VIOLATION_PLAIN_CFR_WITHIN
+                or _WL_VIOLATION_PLAIN_SKIP_RE.match(seg)
+                or not _WL_VIOLATION_PLAIN_DEFECT_RE.search(seg[:cfr.start()])):
+            continue
         end = _WL_VIOLATION_END_RE.search(seg, cfr.end())
         if not end:
             continue                       # ③ 표제문 종결 미확인 → 버린다
-        num = int(m.group(1))
         if num <= last_num:
             continue                       # 번호 역행/중복 → 각주 등 오인식
         last_num = num

@@ -1839,6 +1839,18 @@
   }
   syncHome();
   qsa("[data-goto]").forEach(function (b) { b.addEventListener("click", function () { setTab(b.getAttribute("data-goto")); }); });
+  // 회원 ∩ 구독자 — 서버(admin-brevo member_overlap)가 대조해 숫자만 준다. 눌렀을 때만 호출.
+  (function () {
+    var btn = byId("grm-overlap-run"), out = byId("grm-overlap-result");
+    if (!btn || !out) return;
+    btn.addEventListener("click", function () {
+      btn.disabled = true; out.textContent = "대조하는 중…";
+      api("admin-brevo?action=member_overlap").then(function (d) {
+        out.textContent = "회원 " + number(d.members) + "명 중 구독자 " + number(d.overlap) + "명 (회원만 " + number(d.member_only) +
+          "명) · 전체 구독자 " + number(d.subscribers) + "명" + (d.truncated ? " · 상한 초과로 일부만 집계" : "") + (d.cached ? " · 캐시" : "");
+      }).catch(function (error) { out.textContent = errText(error); }).then(function () { btn.disabled = false; });
+    });
+  })();
   byId("grm-refresh-all").addEventListener("click", refreshAll);
   byId("grm-system-refresh").addEventListener("click", refreshAll);
   byId("grm-subscribers-refresh").addEventListener("click", loadSubscribers);

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T07:55:20Z",
+ "generated_at": "2026-11-02T08:19:05Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 41409704695,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T07:58:12Z",
+    "updatedAt": "2026-11-02T08:04:17Z",
+    "headBranch": "main",
+    "displayTitle": "quiz(weekly): 202645 — 브리프 2 + 개념 2 (2026-11-02 브리프) (#1293)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41409704695"
+   },
+   {
+    "databaseId": 41409701064,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-02T07:58:10Z",
+    "updatedAt": "2026-11-02T07:58:13Z",
+    "headBranch": "main",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립) (#1290)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41409701064"
+   },
+   {
     "databaseId": 41399595021,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "feat/member-optin-onestep",
     "displayTitle": "회원 뉴스레터 구독 한 번에: 코드 확인 후 서버가 본인 이메일 등록(newsletter-optin)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41396561198"
-   },
-   {
-    "databaseId": 41396556291,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T05:52:45Z",
-    "updatedAt": "2026-11-02T05:58:32Z",
-    "headBranch": "feat/member-optin-onestep",
-    "displayTitle": "가입 진행 상태 저장 형태 원복 — 동의 체크 여부는 별도 sessionStorage 키로(기존 계약 유지)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41396556291"
-   },
-   {
-    "databaseId": 41395961772,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-02T05:46:27Z",
-    "updatedAt": "2026-11-02T05:52:19Z",
-    "headBranch": "feat/account-delete-ui",
-    "displayTitle": "feat(account): 계정 삭제 ② /me 화면 (#1291 선행)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395961772"
    }
   ],
   "grm-scaffold-mirror.yml": [

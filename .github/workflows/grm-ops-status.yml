@@ -1,0 +1,46 @@
+name: GRM Ops Status (Actions 요약 → 브랜치 사본)
+
+# 클라우드 세션은 `/actions/…` 가 403 이라 실행 조회·아티팩트 보유 여부를 못 본다(company/CLOUD.md).
+# 이 워크플로가 주요 워크플로의 최근 실행 요약을 `claude/ops-status` 브랜치 status.json 에 내려 준다.
+# 클라우드는 `git fetch origin claude/ops-status` 후 `git show FETCH_HEAD:status.json` 으로 읽는다.
+#
+# 안전 계약
+#   · 읽기 전용 요약 — 실행 번호·상태·시각·제목·URL 만. 로그 본문·수신자·비밀값 없음.
+#   · 이 브랜치는 어떤 PR·배포에도 쓰이지 않는다. 내용이 같으면(시각 제외) 커밋하지 않는다.
+#   · 발행·발송 경로에는 영향이 없다.
+
+on:
+  schedule:
+    - cron: '11,41 * * * *'
+  workflow_run:
+    workflows:
+      - "GRM API Intake (Daily)"
+      - "GRM Web Publish (assemble)"
+      - "GRM Watchlist Notify"
+      - "GRM Newsletter Send"
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: grm-ops-status
+  cancel-in-progress: false
+
+jobs:
+  status:
+    name: 실행 요약 → claude/ops-status
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: company/ops
+      - name: 요약 갱신
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash company/ops/ops_branch.sh "ops status" python3 "$GITHUB_WORKSPACE/company/ops/ops_status.py" status.json

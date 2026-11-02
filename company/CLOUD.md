@@ -8,7 +8,16 @@
 
 ## GitHub — `gh api` 만 쓴다
 `gh pr`·`gh run`·`gh workflow`·`gh variable` 은 쓰지 않는다. **`/actions/…` 경로(워크플로 실행 조회·재실행·아티팩트·변수)는 프록시가 막는다(403).**
-지시문이 이런 일을 시키면 하지 말고 결과에 `막힘: Actions — <하려던 일>` 한 줄을 남긴다(PC 백업이나 대표가 한다).
+지시문이 이런 일을 시키면 아래 두 다리를 먼저 쓰고, 그래도 안 되면 결과에 `막힘: Actions — <하려던 일>` 한 줄을 남긴다(PC 백업이나 대표가 한다).
+
+### Actions 다리 (2026-11-02) — 읽기는 status.json, 쓰기(깨우기)는 요청 마커
+- **읽기**: `git fetch origin claude/ops-status` 후 `git show FETCH_HEAD:status.json` — 주요 워크플로 최근 5회 실행(번호·상태·결론·시각·URL)과
+  최근 intake 성공 run 의 `grm-web-brief` 아티팩트 보유 여부(`intake_artifacts[].run_id`, 발행 재실행의 `intake_run_id` 로 쓴다). 30분마다 갱신되고 `generated_at` 이 있다.
+- **깨우기**: 브랜치 `claude/request-<날짜>-<이름>` 에 `company/requests/<id>.json` 한 파일을 커밋·push.
+  `id` = `YYYYMMDD-HHMM-<소문자·숫자·->` (파일명과 같아야 함). 형식 `{"id": "…", "action": "…", "args": {…}}`.
+  허용 동작은 `ping` · `ops-status-refresh` · `delta-bridge`(publish_date) · `web-publish`(publish_date, intake_run_id?) · `scaffold-mirror`(intake_run_id) · `wl-restore-plan`. 그 밖은 거부된다.
+  결과: `claude/ops-status` 의 `requests/<id>.json` (`outcome`: dispatched · rejected · pinged · dispatch-failed). 몇 분 뒤 status.json 에서 실제 실행 결과를 본다. 같은 id 는 한 번만, 시간당 10건.
+  깨운 것이 발행이어도 PR 머지·라이브 발행은 대표의 관리자 승인이다.
 
 ```
 R=repos/MINHOYEOM/grm-api-intake

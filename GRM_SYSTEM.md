@@ -605,6 +605,7 @@ grm-api-intake/
 │  └─ sql/mfds_attendees*.sql       # 격리 PostgreSQL 적재·조회·권한·멱등성 검증
 ├─ company/                        # "Claude 가 운영하는 회사(GRM Intelligence)" 지시문 — 클라우드 예약작업이 읽는다. 정본(docs/prompts/)은 가리키기만 한다(tests/test_company_pointers.py)
 │  ├─ CHARTER.md · CLOUD.md · ROUTINES.md   # 공통 헌장 · 클라우드 되는 것/막힌 것·gh api · 예약작업 목록(시각·모델·PC 백업 표식)
+│  ├─ ops/ · requests/             # 클라우드↔Actions 다리 — ops_status.py(실행 요약→claude/ops-status) · cloud_request.py(요청 마커 검증, 허용목록) · requests/ 는 마커 파일 자리
 │  ├─ editorial/                   # 브리프편집팀 데스크·기자·교열 — v16 절을 가리키기만 함 · RUN.md 실행 규칙 · v16 Routine 은 월 09:30 백업
 │  ├─ education/                   # 용어·교육팀 — 주간 용어 추가(화) · 용어 그림(매일) · 주간 퀴즈(월)
 │  ├─ translation/                 # 글로벌번역팀 — 지적사항 일일 번역(매일 04:00)

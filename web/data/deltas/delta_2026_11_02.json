@@ -14,7 +14,22 @@
    "checks": [
     "보관구역 온도 매핑 데이터 확보 여부",
     "모니터링 지점·주기 설정의 과학적 근거 문서화"
-   ]
+   ],
+   "en": {
+    "title_issue": "No scientific basis for temperature monitoring",
+    "summary": "FDA cited 1 observation at Sunrise Pharmaceutical, Inc. (Manufacturer): drugs were not stored under appropriate temperature conditions. The firm was recorded as having no data or scientific justification for its routine temperature monitoring decisions.",
+    "key_facts": [
+     "Number of observations: 1",
+     "Citation: Inadequate temperature storage conditions for drugs",
+     "Detail: No data or scientific justification for routine temperature monitoring decisions",
+     "Inspection date: 03/31/2026"
+    ],
+    "implication": "The key signal is that the problem cited was the lack of data behind the monitoring method and not the storage temperature itself. It is worth checking whether the link between warehouse temperature mapping results and the choice of monitoring points and intervals can be explained.",
+    "checks": [
+     "Whether temperature mapping data for storage areas is available",
+     "Documented scientific basis for monitoring points and intervals"
+    ]
+   }
   },
   "fda483-195360": {
    "title_issue": "투석 시험 중 시험물질 안정성 미입증",
@@ -29,7 +44,22 @@
    "checks": [
     "시험 기간 중 시료 안정성 입증 자료",
     "상온 장시간 실험 조건의 분석법 검증 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Test article stability during dialysis not shown",
+    "summary": "FDA cited, at Pliva Croatia Ltd. (Analytical facility), that the stability of the test article was not demonstrated in relation to particle size distribution (PSD) data reported in a study. Stability at room temperature during the dialysis experiment was recorded as not demonstrated by the analytical method.",
+    "key_facts": [
+     "Number of observations: 1",
+     "Data concerned: Particle size distribution (PSD) data reported in a study",
+     "Citation: Stability of test article at room temperature during dialysis experiment not demonstrated",
+     "Inspection date: 05/31/2018"
+    ],
+    "implication": "It signals that at an analytical facility, demonstrating sample stability during the test conditions was treated as a precondition for data reliability. It is worth checking that the temperature and time range to which samples are exposed in long experiments is supported by stability data.",
+    "checks": [
+     "Data demonstrating sample stability during the test period",
+     "Scope of analytical method validation for long room temperature experiments"
+    ]
+   }
   },
   "fda483-195361": {
    "title_issue": "공정 밸리데이션 관리절차 미수립",
@@ -45,7 +75,23 @@
     "변동 유발 공정의 성능 밸리데이션 관리절차",
     "배치 규모 대비 제조설비 용량 적합성",
     "실험기기 규격 충족 및 사용 제한 관리"
-   ]
+   ],
+   "en": {
+    "title_issue": "No process validation control procedures",
+    "summary": "FDA cited 3 observations at Qilu Pharmaceutical (Hainan) Co., Ltd. (Finished Drug Product Manufacturer). They included no control procedures for process performance validation, inadequate size of manufacturing equipment, and use of laboratory instruments that did not meet specifications.",
+    "key_facts": [
+     "Number of observations: 3",
+     "Observation 1: No control procedures for performance validation of processes that may cause variation in product characteristics",
+     "Observations 2 and 3: Inadequate size of manufacturing equipment, use of laboratory instruments not meeting specifications",
+     "Inspection date: 08/22/2025"
+    ],
+    "implication": "Citing process variability control together with equipment and instrument suitability at a finished drug product manufacturer signals that the foundation of overall manufacturing capability was addressed. Consistency between batch size and equipment capacity, and whether laboratory instruments in use meet specifications, should be checked together.",
+    "checks": [
+     "Control procedures for performance validation of processes that cause variation",
+     "Fit of manufacturing equipment capacity to batch size",
+     "Control of laboratory instrument specification compliance and use restrictions"
+    ]
+   }
   },
   "fda483-195362": {
    "title_issue": "무균 오염방지 절차·무균공정 검증 미흡",
@@ -61,7 +107,23 @@
     "무균공정 밸리데이션 적정성",
     "미생물 오염 방지 절차의 문서화·준수",
     "일탈 조사 결론·후속조치 기록 완결성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Weak sterile contamination control and validation",
+    "summary": "FDA cited 4 observations at Eugia Steriles Private Limited (Sterile Drug Product Manufacturer). The targets were procedures to prevent microbial contamination of sterile drugs, aseptic process validation, quality control unit procedures, and deviation investigation records.",
+    "key_facts": [
+     "Number of observations: 4",
+     "Observations 1 and 2: Procedures to prevent microbial contamination of sterile drugs not established or followed, aseptic process validation insufficient",
+     "Observation 3: Quality control unit responsibilities and procedures not documented or not followed",
+     "Observation 4: Records of investigations into unexplained discrepancies lack conclusions and follow-up"
+    ],
+    "implication": "Citing contamination prevention procedures and aseptic process validation together at a sterile manufacturer signals that the foundation of the sterility assurance system was addressed. It is worth checking that microbiology-related deviation investigations are closed with conclusions and follow-up, since this may be reviewed alongside aseptic process evaluation.",
+    "checks": [
+     "Adequacy of aseptic process validation",
+     "Documentation of and compliance with microbial contamination prevention procedures",
+     "Completeness of conclusions and follow-up records in deviation investigations"
+    ]
+   }
   },
   "fda483-195363": {
    "title_issue": "pH 미터 전자데이터 백업 미유지",
@@ -76,7 +138,22 @@
    "checks": [
     "단독형 실험기기 전자데이터 백업 대상 포함 여부",
     "수탁시험기관 원데이터 보존 방식 확인"
-   ]
+   ],
+   "en": {
+    "title_issue": "No backup of pH meter electronic data",
+    "summary": "FDA cited 1 observation at Fagron Analytical Services, LLC (Contract Laboratory): backup files of data entered into computerized systems were not maintained. Digital data and results generated by a Mettler Toledo pH meter in the chemistry laboratory were recorded as not backed up.",
+    "key_facts": [
+     "Number of observations: 1",
+     "Citation: Backup files of computerized system data not maintained",
+     "Instrument concerned: Mettler Toledo pH meter in the chemistry laboratory",
+     "Inspection date: 03/26/2026"
+    ],
+    "implication": "It signals that even a small stand-alone instrument such as a pH meter falls under backup requirements once it generates digital data. Firms that use contract testing laboratories should check that the scope of electronic data retention for each instrument also bears on the sponsor's data integrity.",
+    "checks": [
+     "Whether stand-alone laboratory instrument electronic data is included in backups",
+     "Confirmation of how the contract testing laboratory retains raw data"
+    ]
+   }
   },
   "fda483-195367": {
    "title_issue": "응급수혈 의사 서명 기록 미유지",
@@ -91,7 +168,22 @@
    "checks": [
     "예외·긴급 처리 시 승인자 서명 및 정당화 기록",
     "불일치 조사 결론·후속조치 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Emergency transfusion physician signature gaps",
+    "summary": "FDA cited two observations at Banner - University Medical Center Tuscon (Transufusion Service). Requesting-physician signatures and justification records for emergency transfusions were not maintained, and investigation and documentation of unexplained discrepancies were inadequate.",
+    "key_facts": [
+     "Observations: 2",
+     "Observation 1: Requesting-physician signature and emergency justification records not maintained for emergency transfusion",
+     "Observation 2: Inadequate thorough investigation of unexplained discrepancies and recording of conclusions and follow-up",
+     "Inspection date: 04/22/2026"
+    ],
+    "implication": "This signals the expectation that emergency exceptions at transfusion services be justified in documentation after the fact. It is worth checking whether exceptions that bypass normal procedure, such as urgent release, carry after-the-fact approval and a recorded rationale.",
+    "checks": [
+     "Approver signature and justification records for exception or emergency handling",
+     "Conclusion and follow-up records for discrepancy investigations"
+    ]
+   }
   },
   "fda483-195372": {
    "title_issue": "시험규격 근거 미흡·안정성 프로그램 부재",
@@ -106,7 +198,22 @@
    "checks": [
     "원료·완제품 규격 설정 근거 문서",
     "서면 안정성 시험 프로그램 및 유효기간 근거"
-   ]
+   ],
+   "en": {
+    "title_issue": "Weak specification basis, no stability program",
+    "summary": "FDA cited two observations at Laboratoires Anios (Drug Manufacturer). Scientifically sound specifications, sampling plans and test methods were not established for components, in-process materials and finished products, and there was no written testing program to assess drug stability characteristics.",
+    "key_facts": [
+     "Observations: 2",
+     "Observation 1: Specifications, sampling plans and test methods for components, in-process materials and finished products lacked scientific soundness",
+     "Observation 2: No written testing program to assess drug stability characteristics",
+     "Inspection date: 09/12/2024"
+    ],
+    "implication": "Citing specifications and the stability program together suggests that the basis for release decisions and for expiry dating was undermined at once. It is worth checking that expiry dating is supported by stability data and that the basis for specifications is documented.",
+    "checks": [
+     "Documented basis for component and finished-product specifications",
+     "Written stability testing program and basis for expiry dating"
+    ]
+   }
   },
   "fda483-195373": {
    "title_issue": "시험규격·안정성·미생물관리 등 7건 지적",
@@ -122,7 +229,23 @@
     "비무균 제품 유해 미생물 관리 절차 준수",
     "생산구역 공기 여과 시스템 적정성",
     "배치 기록의 실시간 작성 및 완결성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Seven observations across GMP areas",
+    "summary": "FDA cited seven observations at Tan-Alize Kozmetik ve Temizlik Urunleri Sanayi ve Ticaret A.S. (OTC Drug Manufacturer). They span laboratory specifications and methods, non-adherence to the stability program, microbial control for non-sterile products, air filtration and manufacturing records.",
+    "key_facts": [
+     "Observations: 7",
+     "Main findings: Inadequate laboratory specifications and test methods; written stability testing program not followed",
+     "Microbiological and environment: Procedures to prevent objectionable microorganisms in non-sterile drugs not followed; inadequate air filtration system in production areas",
+     "Records: Batch production and control records incomplete"
+    ],
+    "implication": "Findings spread evenly across testing, stability, microbiology, environment and records point to immaturity of the GMP system as a whole rather than one specific defect. When assessing contract manufacturers, check that even non-sterile products are controlled for objectionable microorganisms and production-area air handling.",
+    "checks": [
+     "Adherence to procedures against objectionable microorganisms in non-sterile products",
+     "Adequacy of the air filtration system in production areas",
+     "Contemporaneous entry and completeness of batch records"
+    ]
+   }
   },
   "fda483-195375": {
    "title_issue": "검증 불가 공정 밸리데이션 미흡",
@@ -138,7 +261,23 @@
     "사후 검증 불가 공정 식별 및 밸리데이션 현황",
     "공정중 제품 합격·관리 절차",
     "완제품 합격 판정 절차"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate validation of unverifiable processes",
+    "summary": "FDA cited four observations at DiAgam Societe Anonyme (S.A.) (Manufacturer). They include inadequate validation of a process whose results cannot be fully verified by subsequent inspection, manufacturing equipment not meeting requirements, and no established acceptance procedures for finished and in-process product.",
+    "key_facts": [
+     "Observations: 4",
+     "Observation 1: Inadequate validation of a process that cannot be fully verified by subsequent inspection",
+     "Observation 2: Findings on adequacy of manufacturing equipment design and installation and on meeting requirements",
+     "Observations 3 and 4: Inadequate finished-product acceptance procedures and in-process product acceptance and control procedures"
+    ],
+    "implication": "This shows that for processes whose results cannot be confirmed by later inspection, validation and stage-by-stage acceptance are the only basis for quality assurance. It is worth checking that in-process and finished-product acceptance criteria are linked to validation results.",
+    "checks": [
+     "Identification of processes that cannot be verified afterwards and their validation status",
+     "In-process product acceptance and control procedures",
+     "Finished-product acceptance procedures"
+    ]
+   }
   },
   "fda483-195376": {
    "title_issue": "공정 파라미터 모니터링 절차 미흡",
@@ -153,7 +292,22 @@
    "checks": [
     "밸리데이션 마스터플랜 개정 주기 및 현행화",
     "밸리데이션 후 공정 파라미터 지속 모니터링"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate process parameter monitoring procedures",
+    "summary": "FDA cited two observations at KCI POLYMEDICS BV (Manufacturer). Validation of a process whose results cannot be fully verified by subsequent inspection was inadequate, and procedures for monitoring and controlling parameters of validated processes were not sufficiently established.",
+    "key_facts": [
+     "Observations: 2",
+     "Observation 1: Inadequate validation of a process that cannot be fully verified by subsequent inspection",
+     "Observation 2: Inadequate procedures for monitoring and controlling parameters of validated processes",
+     "Related document: Validation Master Plan, PRO 38.E.00 Rev 1 (dated 04/16/2009)"
+    ],
+    "implication": "The mention of a validation master plan revised in 2009 signals that review may focus on whether old procedures have been updated to current expectations. It is worth checking that there is a system to keep monitoring process parameters after validation and so maintain the validated state.",
+    "checks": [
+     "Revision cycle and currency of the validation master plan",
+     "Continuous monitoring of process parameters after validation"
+    ]
+   }
   },
   "fda483-195381": {
    "title_issue": "품질관리부서 기록검토 권한 결여",
@@ -168,7 +322,22 @@
    "checks": [
     "품질관리부서 권한의 조직·직무 문서 명시",
     "생산기록 검토 및 오류 조사 실행 실적"
-   ]
+   ],
+   "en": {
+    "title_issue": "Quality unit lacks authority over record review",
+    "summary": "FDA cited 1 observation at Galaxy Medical Products LLC (Medical Gas Manufacturer): the quality control unit did not have the authority to review production records and investigate errors.",
+    "key_facts": [
+     "Number of observations: 1",
+     "Citation: Quality control unit lacks authority to review production records and investigate errors",
+     "Facility: Medical Gas Manufacturer",
+     "Inspection date: 04/28/2026"
+    ],
+    "implication": "It signals that the independent authority of the quality control unit is treated as a basic GMP requirement even in a small operation such as a medical gas manufacturer. It is worth checking that the organization explicitly gives the quality unit authority to review production records and open error investigations.",
+    "checks": [
+     "Written statement of quality control unit authority in organization and job documents",
+     "Record of production record reviews and error investigations actually carried out"
+    ]
+   }
   },
   "fda483-195382": {
    "title_issue": "QC 책임·절차 미문서화",
@@ -183,7 +352,22 @@
    "checks": [
     "수탁시험기관 품질관리부서 절차 확인",
     "위탁 시험법의 과학적 타당성 근거"
-   ]
+   ],
+   "en": {
+    "title_issue": "QC responsibilities and procedures undocumented",
+    "summary": "FDA cited 2 observations at Microchem Laboratory (Contract Laboratory). The quality control unit's responsibilities and procedures were not documented or followed, and scientifically sound test methods were not established.",
+    "key_facts": [
+     "Number of observations: 2",
+     "Observation 1: Quality control unit responsibilities and procedures not documented or followed",
+     "Observation 2: Scientifically sound test methods not established",
+     "Inspection date: 04/30/2026"
+    ],
+    "implication": "Citing the contract laboratory's own quality control role and test method soundness is a warning about relying on outside test results as the basis for release. It is worth checking whether the sponsor confirms the rationale for the suitability of outsourced test methods.",
+    "checks": [
+     "Confirmation of the contract laboratory's quality control unit procedures",
+     "Scientific rationale for outsourced test methods"
+    ]
+   }
   },
   "fda483-195384": {
    "title_issue": "공정관리 절차·설비 세척 등 6건 지적",
@@ -199,7 +383,23 @@
     "포장 공정 실제 수율 및 이론 수율 대비 백분율 기록",
     "포장 설비 세척·유지 주기",
     "포장품 온도·습도·광 보관조건"
-   ]
+   ],
+   "en": {
+    "title_issue": "Process control, equipment cleaning, 6 items",
+    "summary": "FDA cited 6 observations at Paxeuticals LLC (Contract Packager). The targets were written procedures for production and process control, equipment design and cleaning and maintenance, quality control unit procedures, yield records, and temperature, humidity, and light storage conditions.",
+    "key_facts": [
+     "Number of observations: 6",
+     "Process and equipment: Inadequate written process control procedures, inadequate equipment design, inadequate cleaning and maintenance intervals for equipment and utensils",
+     "Records: Batch record lacks actual yield and percentage of theoretical yield",
+     "Storage: Inadequate temperature, humidity, and light storage conditions"
+    ],
+    "implication": "Citing yield records and storage conditions at a contract packager signals that the packaging step is subject to the same level of GMP control as manufacturing. When outsourcing packaging, it is worth checking whether yield reconciliation and storage environment control are part of the sponsor's quality assessment.",
+    "checks": [
+     "Records of actual yield and percentage of theoretical yield in packaging",
+     "Cleaning and maintenance intervals for packaging equipment",
+     "Temperature, humidity, and light storage conditions for packaged goods"
+    ]
+   }
   },
   "fda483-195385": {
    "title_issue": "불만처리 기록 관리 미흡",
@@ -214,7 +414,22 @@
    "checks": [
     "불만 파일의 절차서 필수 항목 충족 여부",
     "오래된 불만처리 절차서의 현행 적합성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate complaint handling records",
+    "summary": "FDA cited one observation at NanoHive Medical LLC (Manufacturer): complaint handling records were not properly maintained. Complaint files were recorded as not sufficiently documented in accordance with the firm's complaint handling procedure SOP-032-Rev A.",
+    "key_facts": [
+     "Observations: 1",
+     "Finding: Complaint handling records not properly maintained",
+     "Related procedure: Complaint Handling procedure, SOP-032-Rev A (Effective Date: 7/21/2017)",
+     "Inspection date: 03/05/2026"
+    ],
+    "implication": "A procedure existed, but actual complaint files were not prepared as it required, so the gap between procedure and records is the focus. It is worth sampling complaint files against the required items in the procedure to check for omissions.",
+    "checks": [
+     "Whether complaint files meet the required items in the procedure",
+     "Current suitability of old complaint handling procedures"
+    ]
+   }
   },
   "fda483-195391": {
    "title_issue": "항원 공정 밸리데이션 대신 검증 적용",
@@ -229,7 +444,22 @@
    "checks": [
     "공정 밸리데이션 배제 시 근거 문서",
     "CPV 데이터의 제품군 전체 분석 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Verification used in place of validation",
+    "summary": "FDA found the rationale inadequate for applying verification instead of process validation to manufacture of the licensed antigen HCV c100-3 at Grifols Diagnostic Solutions Inc. (Licensed Antigen Component Manufacturer for IVDs). It also cited the absence of a CPV report analyzing process data across all antigen types to evaluate validation status.",
+    "key_facts": [
+     "Observations: 1",
+     "Subject: Manufacturing process of the licensed antigen HCV c100-3",
+     "Finding: Inadequate rationale for excluding process validation, and no analysis of process data for all antigens using a CPV report",
+     "Inspection date: 12/13/2024"
+    ],
+    "implication": "This shows that when verification is chosen over validation, the rationale for excluding validation is itself subject to inspection. It is worth checking whether continued process verification (CPV) data are analyzed across the whole product family to judge the validated state of the process.",
+    "checks": [
+     "Documented rationale when process validation is excluded",
+     "Whether CPV data are analyzed across the whole product family"
+    ]
+   }
   },
   "fda483-195392": {
    "title_issue": "PPQ 중 공정절차 미준수·데이터 무결성",
@@ -245,7 +475,23 @@
     "PPQ 배치 수행 시 절차 준수 및 일탈 처리",
     "PPQ 관련 전산 시스템 접근권한·감사추적",
     "생물의약품 미생물 오염 관리 절차"
-   ]
+   ],
+   "en": {
+    "title_issue": "PPQ process non-compliance and data integrity",
+    "summary": "FDA cited four observations at Kedrion BioPharma, Inc. (Biologic Manufacturer). They include not following process control procedures during RhoGAM PPQ batches, inadequate documentation of deviation investigations, no procedures to control microbial contamination, and inadequate data integrity controls for computerized data on PPQ lots.",
+    "key_facts": [
+     "Observations: 4",
+     "Observation 1: Written process control procedures not followed during RhoGAM PPQ",
+     "Observations 2 and 3: Inadequate documentation of deviation investigations; no procedures to control microbial contamination",
+     "Observation 4: Inadequate data integrity controls for computers used for PPQ lots"
+    ],
+    "implication": "Procedural non-compliance and data integrity problems cited in the PPQ batches themselves signal that the reliability of process validation results may be undermined. It is worth checking that PPQ execution records and computer audit trails support the validation conclusions.",
+    "checks": [
+     "Procedure compliance and deviation handling during PPQ batches",
+     "Access rights and audit trails of computer systems related to PPQ",
+     "Microbial contamination control procedures for biologics"
+    ]
+   }
   },
   "fda483-195398": {
    "title_issue": "경영진 품질시스템 책임 미이행",
@@ -261,7 +507,23 @@
     "경영진 검토의 품질 지표 반영",
     "육안검사 프로그램 검출 능력 검증",
     "복합제품 품질 감독 체계"
-   ]
+   ],
+   "en": {
+    "title_issue": "Management quality system responsibility unmet",
+    "summary": "FDA cited three observations at Neurotech Pharmaceuticals, Inc. (Drug Substance and Drug product Manufacturer): management responsibility for establishing the quality system, quality oversight of the NT-501 combination product, and the ability of the visual inspection program to detect turbidity, precipitate and particles.",
+    "key_facts": [
+     "Observations: 3",
+     "Observation 1: Management did not ensure an adequate and effective quality system was established",
+     "Observation 2: Inadequate quality oversight of the NT-501 combination product",
+     "Observation 3: Visual inspection program inadequate to identify turbidity, precipitate and particles"
+    ],
+    "implication": "Management responsibility was raised as the first observation, signaling that management involvement in quality is directly assessed beyond individual defects. It is worth checking that the visual inspection capability to identify turbidity, precipitate and particles is verified and that management review covers such quality indicators.",
+    "checks": [
+     "Reflection of quality indicators in management review",
+     "Verification of visual inspection program detection capability",
+     "Quality oversight system for combination products"
+    ]
+   }
   },
   "fda483-195400": {
    "title_issue": "표준품 시험·표준화 기록 불완전",
@@ -276,7 +538,22 @@
    "checks": [
     "표준품 적격성 평가 및 표준화 기록",
     "표준품 사용·재표준화 이력 추적성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Incomplete reference standard testing records",
+    "summary": "FDA cited one observation at 2seventy bio, Inc. (Viral Vector Testing Lab): records of testing and standardization of laboratory reference standards were not complete.",
+    "key_facts": [
+     "Observations: 1",
+     "Finding: Records of testing and standardization of laboratory reference standards incomplete",
+     "Facility: Viral Vector Testing Lab",
+     "Inspection date: 03/20/2025"
+    ],
+    "implication": "A stand-alone finding on reference standard records at a viral vector testing lab signals that traceability of the standards, the reference point for test results, is a key inspection item. It is worth checking that qualification and re-standardization history of reference standards are linked in the records.",
+    "checks": [
+     "Reference standard qualification and standardization records",
+     "Traceability of reference standard use and re-standardization history"
+    ]
+   }
   },
   "fda483-195404": {
    "title_issue": "V116 원료의약품 밸리데이션 미흡",
@@ -291,7 +568,21 @@
    "checks": [
     "1가 벌크 원료의약품별 밸리데이션 범위",
     "제조 운영 지원 시스템의 밸리데이션 현황"
-   ]
+   ],
+   "en": {
+    "title_issue": "Multiple 483 inspection records released",
+    "summary": "FDA OII FOIA Electronic Reading Room released 11 Form 483 inspection records. The original PDFs are public, but the individual observation text could not be obtained automatically, so only the list of facilities and inspection dates is summarized.",
+    "key_facts": [
+     "Records released: 11 (observation text not obtained automatically; original PDFs are public)",
+     "Representative facility: MSD International GmbH, FEI 3002808087, plus 10 others",
+     "Source: FDA OII FOIA Electronic Reading Room"
+    ],
+    "implication": "Release of inspection records without the observation text is not in itself a signal for action. Domestic firms should check whether any facility in their supply chain appears on the list and, if so, read the original PDF directly.",
+    "checks": [
+     "Whether any facility in your supply chain or sourcing appears on the list",
+     "If so, read the original FDA FOIA PDF directly"
+    ]
+   }
   },
   "fda483-195406": {
    "title_issue": "시험 데이터 기록·동시 기록 미흡",
@@ -307,7 +598,23 @@
     "시험 원데이터 전체 보존 여부",
     "실험실 기록의 수행 시점 동시 작성",
     "배치별 표시자재 견본·사본 보관"
-   ]
+   ],
+   "en": {
+    "title_issue": "Test data and contemporaneous recording gaps",
+    "summary": "FDA cited four observations at Omrix Biopharmaceuticals Ltd. (Manufacturer): scientific soundness of test methods, complete recording of test data, real-time recording of laboratory control activities, and labeling material records per batch.",
+    "key_facts": [
+     "Observations: 4",
+     "Observation 1: Scientifically sound test methods not established",
+     "Observations 2 and 3: Incomplete recording of test data; time of performing laboratory control activities not recorded",
+     "Observation 4: Batch records incomplete for labeling control, such as labeling specimens and copies"
+    ],
+    "implication": "Completeness of test data and contemporaneous recording were cited together, suggesting the assessment took a laboratory data integrity view. Because labeling material control in batch records was also included, check that record completeness holds in both the laboratory and production.",
+    "checks": [
+     "Retention of all raw test data",
+     "Contemporaneous entry of laboratory records when performed",
+     "Retention of labeling specimens and copies for each batch"
+    ]
+   }
   },
   "fda483-195408": {
    "title_issue": "API 설비·작업공간 유지관리 미흡",
@@ -323,7 +630,23 @@
     "인하우스 분석법 미지 결과 조사 절차",
     "바이오버든 관리 구역 시설 손상 점검·보수",
     "API 제조설비 예방정비"
-   ]
+   ],
+   "en": {
+    "title_issue": "API equipment and workspace maintenance gaps",
+    "summary": "FDA cited three observations at PCAS Finland Oy (API Manufacturer). Unknown results from an in-house analytical method were not investigated, and repair and maintenance of API manufacturing equipment and of the workspace for the bioburden-controlled process were inadequate.",
+    "key_facts": [
+     "Observations: 3",
+     "Observation 1: Unknown results from in-house analytical method not investigated",
+     "Observation 2: API manufacturing equipment not adequately maintained",
+     "Observation 3: Inadequate repair and maintenance of workspace and equipment for the bioburden-controlled process (two holes observed 05 JUN 2024)"
+    ],
+    "implication": "Physical damage in a bioburden-controlled area was observed directly during the inspection, linking facility maintenance to API quality. It is worth checking that unknown items in in-house method results feed into an investigation system and that facility damage and repair history are managed.",
+    "checks": [
+     "Investigation procedure for unknown results from in-house methods",
+     "Inspection and repair of facility damage in bioburden-controlled areas",
+     "Preventive maintenance of API manufacturing equipment"
+    ]
+   }
   },
   "fda483-195409": {
    "title_issue": "CIP 세척 밸리데이션·일탈 관리 미흡",
@@ -339,7 +662,23 @@
     "CIP 세척 밸리데이션 범위 및 제외 근거",
     "이상 이벤트의 일탈 개시 기준",
     "변경 시행 전 변경관리 종결 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "CIP cleaning validation and deviation control gaps",
+    "summary": "FDA cited CIP cleaning validation, delayed deviation initiation, an unclosed change control, and preventive maintenance at Plasma Industries Belgium SCRL (Biologics Manufacturer). This includes Change Control 92345 being still open as of March 15, 2018.",
+    "key_facts": [
+     "Key findings: Inadequate justification of container CIP cleaning validation; delayed or inadequate initiation of deviations (Events)",
+     "Change control: Change Control 92345 still open as of March 15, 2018",
+     "Particles: Procedure did not require opening a deviation when particles were detected",
+     "Other: Inadequate preventive maintenance in 2016 and 2017; discoloration observed (3-12-18)"
+    ],
+    "implication": "Deviations not being opened for CIP abnormalities and changes being implemented while change control remained open signal that the criteria for initiating quality events were themselves treated as an issue. It is worth checking that events that should immediately become deviations, such as particle detection or abnormal cleaning, are not deferred by the procedure.",
+    "checks": [
+     "Scope of CIP cleaning validation and rationale for exclusions",
+     "Criteria for initiating a deviation for abnormal events",
+     "Closure of change control before a change is implemented"
+    ]
+   }
   },
   "fda483-195411": {
    "title_issue": "규격 부적합 배치 조사 미흡",
@@ -354,7 +693,22 @@
    "checks": [
     "수탁시험기관 OOS 조사 절차 및 공유 방식",
     "출하 후 확인된 규격 부적합 검토"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate investigation of failing batches",
+    "summary": "FDA cited one observation at Reading Scientific Services Ltd (Control Testing Laboratory): specification failures of a batch or its components were not thoroughly reviewed, whether or not the batch had been distributed.",
+    "key_facts": [
+     "Observations: 1",
+     "Finding: Inadequate thorough review of specification failures of batches or components",
+     "Facility: Control Testing Laboratory",
+     "Inspection date: 06/16/2025"
+    ],
+    "implication": "A stand-alone finding on specification failure investigation at a testing laboratory signals that thorough handling of OOS results is a core axis of laboratory assessment. When outsourcing testing, check whether OOS investigation results and root cause conclusions are shared with the sponsor.",
+    "checks": [
+     "Contract laboratory OOS investigation procedure and how results are shared",
+     "Review of specification failures identified after release"
+    ]
+   }
   },
   "fda483-195415": {
    "title_issue": "무균공정 관리·소독제 효력시험 미흡",
@@ -370,7 +724,23 @@
     "무균공정 투입 배지·시약 사용 전 품질 관리",
     "소독제 효력 연구 범위",
     "일탈 조사 기한 및 위험평가 적정성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Aseptic process control and disinfectant efficacy",
+    "summary": "FDA cited, at Abeona Therapeutics Inc (Cell and Gene Therapy), insufficient aseptic process controls to assure sterility of the prademagene zamikeracel final product, among other items. Quality control of media and reagents, delayed deviation management, and inadequate disinfectant efficacy studies were also included.",
+    "key_facts": [
+     "Product: prademagene zamikeracel",
+     "Aseptic processing: Insufficient controls to assure sterility of the final product; inadequate quality control of media and reagents before use",
+     "Deviations: Ineffective QA deviation management led to delayed investigations and inadequate risk assessment",
+     "Disinfection: Inadequate disinfectant efficacy studies"
+    ],
+    "implication": "Media, reagents and disinfectant efficacy were all cited for a cell and gene therapy aseptic process, signaling that contamination control across all inputs to the aseptic process was assessed. Delayed deviation investigations were recorded as affecting the final decision, so it is worth checking whether investigation deadline management is linked to product disposition decisions.",
+    "checks": [
+     "Quality control of media and reagents before use in aseptic processing",
+     "Scope of disinfectant efficacy studies",
+     "Deviation investigation timelines and adequacy of risk assessment"
+    ]
+   }
   },
   "fda483-195419": {
    "title_issue": "이상사례 15일 내 보고 미이행",
@@ -385,7 +755,22 @@
    "checks": [
     "이상사례 최초 입수일 기록 및 기한 산정",
     "15일 보고 기한 준수 모니터링"
-   ]
+   ],
+   "en": {
+    "title_issue": "Adverse events not reported within 15 days",
+    "summary": "FDA cited one observation at Kite Pharma, Inc. (Finished Product Drug Manufacturer): not all adverse events were reported within 15 days of initial receipt of information.",
+    "key_facts": [
+     "Observations: 1",
+     "Finding: Adverse events not reported within 15 calendar day of initial receipt",
+     "Facility: Finished Product Drug Manufacturer",
+     "Inspection date: 11/01/2024"
+    ],
+    "implication": "A stand-alone finding on adverse event reporting timelines, rather than a manufacturing defect, signals that post-market safety reporting systems are also within inspection scope. It is worth checking that the date of initial receipt of information is recorded and the reporting deadline calculated consistently.",
+    "checks": [
+     "Recording of initial receipt date and deadline calculation for adverse events",
+     "Monitoring of compliance with the 15-day reporting deadline"
+    ]
+   }
   },
   "fda483-195420": {
    "title_issue": "원료 확인시험·불만조사 기록 미흡",
@@ -401,7 +786,23 @@
     "원료 성분별 확인시험 수행 여부",
     "불만 조사 결과·후속조치 기록",
     "규격 부적합 배치 검토 절차"
-   ]
+   ],
+   "en": {
+    "title_issue": "Raw material identity testing, complaint records",
+    "summary": "FDA cited four observations at Microvascular Tissue, Inc (Biological product manufacturer/distributor). The cited areas were complaint investigation records, written in-process control procedures, identity testing of each raw material component, and review of batches failing specifications.",
+    "key_facts": [
+     "Observations: 4",
+     "Observation 1: Complaint investigation records missing findings and follow-up actions",
+     "Observations 2 and 3: Inadequate written in-process control procedures; identity testing of each raw material component not performed",
+     "Observation 4: Inadequate thorough review of batches and components failing specifications"
+    ],
+    "implication": "Citing identity testing of incoming raw materials and complaint investigation records together shows a case where both the starting point and the end point of the quality history were weak. It is worth checking that at least one identity test is performed for each raw material component and that complaint investigation conclusions are closed out in records.",
+    "checks": [
+     "Whether identity testing is performed for each raw material component",
+     "Records of complaint investigation findings and follow-up actions",
+     "Review procedure for batches failing specifications"
+    ]
+   }
   },
   "fda483-195423": {
    "title_issue": "무균 충전구역 환경모니터링 미흡",
@@ -417,7 +818,23 @@
     "충전 구역 환경모니터링 지점 위험 기반 설정",
     "원인불명 불일치 조사 범위",
     "무균 의약품 미생물 오염 방지 절차"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate environmental monitoring in filling",
+    "summary": "FDA cited three observations at MSD Ireland (Carlow) (Biological Drug Manufacturer). During observation of the Gardasil 9 filling process, the environmental monitoring system for aseptic processing areas was found inadequate, and review of unexplained discrepancies and procedures to prevent microbial contamination were also cited.",
+    "key_facts": [
+     "Observations: 3",
+     "Observation 1: Inadequate system for monitoring environmental conditions in aseptic processing areas (during observation of the Gardasil 9 filling process)",
+     "Observation 2: Inadequate thorough review of unexplained discrepancies",
+     "Observation 3: No procedures to prevent microbial contamination of sterile drugs"
+    ],
+    "implication": "The environmental monitoring system was cited while the filling operation was directly observed, signaling that whether monitoring locations and methods reflect actual operational risk is now being assessed. It is worth checking whether monitoring points on the filling line are set based on interventions and risk assessment.",
+    "checks": [
+     "Risk-based setting of environmental monitoring points in the filling area",
+     "Scope of investigation of unexplained discrepancies",
+     "Procedures to prevent microbial contamination of sterile drugs"
+    ]
+   }
   },
   "fda483-195424": {
    "title_issue": "HCT/P 오염방지·공정관리 등 11건 지적",
@@ -433,7 +850,23 @@
     "수탁기관 업무 범위별 적용 규정 확인",
     "HCT/P 처리 환경 오염·교차오염 관리",
     "구성품 로트 상태 식별 체계"
-   ]
+   ],
+   "en": {
+    "title_issue": "Eleven observations: HCT/P contamination, controls",
+    "summary": "FDA cited 11 observations at Nelson Laboratories, LLC (Testing Laboratory) related to HCT/P processing. They include unmet in-process control requirements, prevention of contamination and cross-contamination, environmental control, personnel training, lot status identification and laboratory records.",
+    "key_facts": [
+     "Observations: 11",
+     "Process and contamination: In-process control requirements not met; inadequate prevention of contamination and cross-contamination during HCT/P processing; inadequate control of environmental conditions",
+     "Quality program: No monitoring system established; training of personnel for key GTP activities not ensured",
+     "Records and identification: Incomplete work history records; quarantine, approval and rejection status of component lots not identified"
+    ],
+    "implication": "A testing laboratory that also performs HCT/P processing drew 11 observations across GTP requirements, revealing the risk of contractors combining testing services and processing work. When a contractor's scope goes beyond testing, check that the regulations applying to that work are also evaluated.",
+    "checks": [
+     "Applicable regulations for each part of the contractor's scope of work",
+     "Control of contamination and cross-contamination in HCT/P processing environments",
+     "System for identifying component lot status"
+    ]
+   }
   },
   "fda483-195427": {
    "title_issue": "생산 일탈 기록·정당화 미흡",
@@ -449,7 +882,23 @@
     "생산 기록상 절차 이탈 건의 일탈 등록·정당화 누락 여부",
     "설비 정기 유지관리 주기와 실제 수행 이력 일치 여부",
     "배치별 공정 중 시료 시험 항목의 절차서 반영 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Production deviations not recorded or justified",
+    "summary": "FDA cited three observations at Octapharma AB (Plasma Derivatives Manufacturer) in an inspection on 09/19/2023. They are deviations from production and process control procedures not recorded or justified, inadequate equipment maintenance intervals, and no batch-specific in-process control procedures.",
+    "key_facts": [
+     "Inspection date: 09/19/2023",
+     "Facility type: Plasma Derivatives Manufacturer, 483",
+     "Observation 1: Deviations from procedures and their corrective actions not always documented and justified",
+     "Observation 3: Batch-specific in-process control procedures not established or followed"
+    ],
+    "implication": "Citing that deviations and corrective actions were not always recorded and justified signals that FDA checks traceability of procedural departures in plasma fractionation processes document by document. Since equipment maintenance intervals and in-process control procedures were cited together, it is worth checking that deviation records link to the process control basis.",
+    "checks": [
+     "Whether procedural departures in production records were registered as deviations and justified",
+     "Whether equipment maintenance intervals match the actual performance history",
+     "Whether batch-specific in-process test items are reflected in procedures"
+    ]
+   }
   },
   "fda483-195431": {
    "title_issue": "의약품 창고 보관 절차 미준수",
@@ -463,7 +912,21 @@
    "checks": [
     "창고 보관 절차서와 현장 운영 일치 여부",
     "보관 절차 이행 기록의 작성·검토 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Drug warehousing procedures not followed",
+    "summary": "FDA cited one observation at Patheon Italia S.p.A. (Biological Drug Manufacturer) in an inspection on 09/29/2023: the procedures governing drug warehousing were not followed.",
+    "key_facts": [
+     "Inspection date: 09/29/2023",
+     "Facility type: Biological Drug Manufacturer, 483",
+     "Observation 1: Warehousing procedures not followed"
+    ],
+    "implication": "Non-compliance with warehousing procedures, rather than manufacturing, standing as the sole observation signals that storage operations are treated as an independent inspection item even at biological drug manufacturers. It is worth confirming there is no gap between the operations described in storage procedures and actual practice on site.",
+    "checks": [
+     "Whether warehousing procedures match on-site operations",
+     "Whether records of storage procedure execution are made and reviewed"
+    ]
+   }
   },
   "fda483-195433": {
    "title_issue": "병원성 물질 취급 설비 분리 미흡",
@@ -479,7 +942,23 @@
     "병원성 물질 접촉 설비·소모품의 분리 관리 여부",
     "공급업체 시험성적서 신뢰성 주기적 검증 이력",
     "교정 프로그램 문서화 및 수행 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Pathogenic material equipment not segregated",
+    "summary": "FDA stated, in an inspection of SAFC Pharma Carlsbad (Biologics Manufacturer) on 06/22/2017, that equipment and consumables handling potentially pathogenic material were not separated from those used for manufacturing product, raising cross-contamination concerns. Aseptic contamination prevention procedures, procedure approval, container closures, calibration, and verification of supplier certificate reliability were also listed as observations.",
+    "key_facts": [
+     "Inspection date: 06/22/2017",
+     "Observation 1: Inadequate separation of equipment and consumables handling pathogenic material from manufacturing equipment (cross-contamination)",
+     "Observation 4: Container closure systems inadequately protected from external factors during storage and use",
+     "Observation 6: Inadequate periodic verification of the reliability of raw material supplier test certificates"
+    ],
+    "implication": "Separation of equipment handling pathogenic material was listed as the first observation, signaling that cross-contamination control at biologics sites is checked down to the level of equipment and consumables. Supplier certificates were also not periodically verified, so the basis for receiving raw materials on certificates is worth checking.",
+    "checks": [
+     "Segregated control of equipment and consumables contacting pathogenic material",
+     "History of periodic verification of supplier test certificate reliability",
+     "Documentation and execution of the calibration program"
+    ]
+   }
   },
   "fda483-195434": {
    "title_issue": "원심분리기 PQ 수행 부적절",
@@ -495,7 +974,23 @@
     "채취 장비(원심분리기) PQ 프로토콜·결과의 적정성",
     "기증분별 RTTI 검사 수행 기록",
     "혈장 공급처 평가 시 장비 적격성 확인 포함 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Centrifuge performance qualification inadequate",
+    "summary": "FDA stated at ABO Holdings, Inc. (Plasmapheresfa Center), inspected 11/21/2024, that performance qualification (PQ) of centrifuges in use was not performed correctly and that each donation was not tested for evidence of RTTI infection.",
+    "key_facts": [
+     "Inspection date: 11/21/2024",
+     "Facility and type: Plasmapheresfa Center, 483",
+     "Observation 1: Performance Qualification of Centrifuges in use not performed adequately",
+     "Observation 2: Each donation not tested for evidence of RTTI infection"
+    ],
+    "implication": "Citing centrifuge PQ and per-donation RTTI testing together signals that FDA looks at equipment qualification and infection safety of source plasma at once. If you receive plasma-derived material, check the collection facility's equipment qualification and infection testing history within supplier controls.",
+    "checks": [
+     "Adequacy of collection equipment (centrifuge) PQ protocol and results",
+     "Records of RTTI testing for each donation",
+     "Whether supplier evaluation of plasma sources covers equipment qualification"
+    ]
+   }
   },
   "fda483-195435": {
    "title_issue": "제조소 실사 483 관찰 공개",
@@ -525,7 +1020,23 @@
     "핵심 출발물질 수불 기록과 실물 재고 일치 여부",
     "품질 데이터 처리 컴퓨터 시스템 밸리데이션 현황",
     "CAPA 효과성 평가에 대한 품질부서 검토 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate control of critical starting material",
+    "summary": "FDA cited six observations at Protein Sciences Corporation (Licensed Biological Drug Substance Manufacturer) in an inspection on 03/17/2026. They include inadequate inventory control of critical starting materials for Flublok Monovalent Drug Substance, unvalidated computer systems for quality data, contamination prevention design, and inadequate quality unit oversight of CAPA.",
+    "key_facts": [
+     "Inspection date: 03/17/2026",
+     "Observation 1: Inadequate inventory control of critical starting materials for manufacturing Flublok Monovalent Drug Substance",
+     "Observation 2: Computer systems for collecting and analyzing quality data not validated",
+     "Observation 6: Quality Unit failed to provide oversight and ensure effective CAPA implementation"
+    ],
+    "implication": "Findings running from starting material inventory control to computer systems, contamination prevention design and quality unit oversight signal that the whole quality system of this recombinant vaccine drug substance site was seen as an issue. Unvalidated systems handling quality data in particular are worth checking from a data reliability standpoint.",
+    "checks": [
+     "Whether critical starting material transaction records match physical inventory",
+     "Validation status of computer systems that process quality data",
+     "Whether the quality unit reviews CAPA effectiveness evaluations"
+    ]
+   }
   },
   "fda483-195444": {
    "title_issue": "제품 전환 시 교차오염 절차 미준수",
@@ -541,7 +1052,23 @@
     "PCO 절차 단계별 수행 기록",
     "허가사항 변경의 보고 대상 분류 기준",
     "QC 시험실 출하시험 관리 절차 이행 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Cross-contamination procedures at changeover",
+    "summary": "FDA cited four observations at Samsung Biologics Co., Ltd. (Drug Substance Manufacturer) in an inspection on 05/27/2025. They include not following cross-contamination prevention procedures during product changeover (PCO), quality control unit responsibilities and procedures not followed, inadequate QC laboratory controls, and not following reporting procedures for changes to approved applications.",
+    "key_facts": [
+     "Inspection date: 05/27/2025",
+     "Observation 1: Drug substance cross-contamination prevention procedures not followed during product change over (PCO)",
+     "Observation 3: Inadequate procedures and controls in the QC Laboratory supporting drug substance release testing",
+     "Observation 4: Procedures for reporting and implementing changes to approved applications not followed"
+    ],
+    "implication": "PCO cross-contamination procedures and change reporting procedures cited together at a drug substance site signal that product changeover operations and change control are direct inspection targets. It is worth checking cleaning and verification records at changeover and the criteria for classifying license changes for reporting.",
+    "checks": [
+     "Step-by-step execution records of the PCO procedure",
+     "Criteria for classifying approved-application changes for reporting",
+     "Compliance with QC laboratory release testing control procedures"
+    ]
+   }
   },
   "fda483-195446": {
    "title_issue": "미해명 불일치 조사 미흡",
@@ -557,7 +1084,23 @@
     "출하 배치 포함 불일치 조사 범위 기준",
     "무균공정 구역 환경 모니터링 지점·빈도 설정 근거",
     "환경 모니터링 이탈과 배치 조사 연계 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Unexplained discrepancies not investigated",
+    "summary": "FDA stated, in an inspection of ADMA Biologics, Inc (Licensed Biological Drug Manufacturer) on 12/11/2024, that unexplained discrepancies were not thoroughly reviewed whether or not the batch had been distributed. The environmental monitoring system for aseptic processing areas and procedures to prevent microbial contamination of sterile drugs were also found inadequate.",
+    "key_facts": [
+     "Inspection date: 12/11/2024",
+     "Observation 1: Inadequate review of unexplained discrepancies regardless of whether the batch was distributed",
+     "Observation 2: Inadequate system for monitoring environmental conditions in aseptic processing areas",
+     "Observation 3: Procedures to prevent microbial contamination of drugs purporting to be sterile not established or followed"
+    ],
+    "implication": "Weak review of unexplained discrepancies alongside the aseptic environmental monitoring finding signals that FDA looks at how environmental abnormalities lead to batch investigations. It is worth checking whether there are criteria for widening the investigation scope to batches already distributed.",
+    "checks": [
+     "Criteria for investigation scope including distributed batches",
+     "Rationale for monitoring locations and frequency in aseptic processing areas",
+     "Link between environmental monitoring excursions and batch investigations"
+    ]
+   }
   },
   "fda483-195449": {
    "title_issue": "Shingrix 핵심 유틸리티 적격성 미흡",
@@ -573,7 +1116,23 @@
     "핵심 유틸리티 적격성 평가 및 정기 모니터링 계획",
     "공정제어시스템 전자 데이터 감사추적 검토 여부",
     "일탈의 원료의약품 영향 평가 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Shingrix critical utilities not qualified",
+    "summary": "FDA cited, at GSK Vaccines GmbH (Vaccine Bulk Product) in an inspection on 11/12/2024, inadequate maintenance of biological drug manufacturing facilities and equipment, along with inadequate qualification and monitoring of critical utilities for Shingrix manufacturing. Quality oversight and integrity of electronic data and inadequate deviation management were also cited.",
+    "key_facts": [
+     "Inspection date: 11/12/2024",
+     "Observation 2: Inadequate qualification and periodic monitoring of critical utilities for Shingrix manufacturing",
+     "Observation 3: Quality oversight and integrity of electronic data from manufacturing equipment, environmental monitoring and the Process Control System not established",
+     "Observation 4: Deviation management failed to identify, document and investigate impact on the drug substance"
+    ],
+    "implication": "Critical utility qualification and Process Control System electronic data integrity cited together signal that data left by automated systems in a vaccine bulk process is also subject to quality oversight. If utility monitoring data is stored in electronic systems, the reviewer and audit trail for that data are worth checking.",
+    "checks": [
+     "Critical utility qualification and periodic monitoring plan",
+     "Review of audit trails of process control system electronic data",
+     "Records of impact assessment of deviations on the drug substance"
+    ]
+   }
   },
   "fda483-195450": {
    "title_issue": "시험 원자료 보관소 이관 미흡",
@@ -587,7 +1146,21 @@
    "checks": [
     "시험 종료 시 원자료·검체 보관소 이관 확인 기록",
     "위탁 비임상시험의 자료 보관 책임 계약 반영 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Study data not transferred to archives",
+    "summary": "FDA cited one observation at Labcorp Early Development Laboratories, Inc. (GLP), inspected 05/07/2025: the study director did not ensure transfer of raw data, documentation, protocols, specimens and final reports to the archives during or at the close of the study.",
+    "key_facts": [
+     "Inspection date: 05/07/2025",
+     "Facility and type: GLP, 483",
+     "Observation 1: Study director did not ensure transfer of raw data, protocols, specimens and final reports to archives"
+    ],
+    "implication": "A stand-alone finding on the study director's duty to transfer data signals that completeness of nonclinical record retention bears directly on the reliability of submission data. When outsourcing nonclinical studies, check how transfer of raw data and specimens to archives is confirmed after the study ends.",
+    "checks": [
+     "Records confirming transfer of raw data and specimens to archives at study end",
+     "Whether outsourced nonclinical study contracts assign data archiving responsibility"
+    ]
+   }
   },
   "fda483-195453": {
    "title_issue": "생물학적 일탈보고(BPDR) 미제출",
@@ -603,7 +1176,23 @@
     "품질 불만·일탈의 BPDR 보고 대상 판정 기준",
     "불일치 조사 기록의 결론·후속조치 기재 여부",
     "배치 포장 기록의 주요 단계 수행 확인 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Biological deviation reports not submitted",
+    "summary": "FDA cited four observations at Octapharma Dessau GmbH (Packaging and Labeling), inspected 11/08/2024, including failure to submit biological deviation reports, investigation records without conclusions and follow-up, insufficient documentation of key steps in batch records, and a quality control unit lacking authority to approve procedures and specifications.",
+    "key_facts": [
+     "Inspection date: 11/08/2024",
+     "Observation 1: Failure to submit biological deviation reports (related SOP 0170-SOP-00084 \"Assessment and process for issuing BPDRs\")",
+     "Observation 2: Investigation records of unexplained discrepancies lacked conclusions and follow-up",
+     "Observation 4: Quality control unit lacked authority to approve or reject procedures and specifications"
+    ],
+    "implication": "Failure to submit BPDRs, cited as the first observation at a packaging and labeling site, signals that the procedure for deciding whether quality complaints and deviations are reportable to the authority is itself inspected. It is worth checking that the complaint handling procedure and the deviation reporting decision procedure are linked.",
+    "checks": [
+     "Criteria for deciding whether complaints and deviations require a BPDR",
+     "Whether discrepancy investigation records state conclusions and follow-up",
+     "Confirmation that key steps are performed in batch packaging records"
+    ]
+   }
   },
   "fda483-195454": {
    "title_issue": "일탈·OOS·CAPA 관리 부적절",
@@ -619,7 +1208,23 @@
     "수탁시험기관 OOS 조사·통보 절차",
     "수탁기관 시험장비 적격성 평가 현황",
     "수탁기관 CGMP 교육 주기"
-   ]
+   ],
+   "en": {
+    "title_issue": "Deviation, OOS and CAPA management inadequate",
+    "summary": "FDA cited five observations at Premier Laboratory, LLC (Contract testing facility), inspected 05/14/2025: inadequate management of deviations, OOS and CAPAs, weak quality oversight, lack of ongoing CGMP training, inadequate control of suppliers and service providers, and inadequate equipment qualification and monitoring.",
+    "key_facts": [
+     "Inspection date: 05/14/2025",
+     "Facility and type: Contract testing facility, 483",
+     "Observation 1: Inadequate management of deviations, OOS and CAPAs",
+     "Observation 5: Equipment not adequately qualified for intended use or monitored"
+    ],
+    "implication": "OOS and CAPA management and equipment qualification were cited together, signaling that the reliability of results a sponsor receives depends on the contract laboratory's own quality system. When outsourcing testing, check the laboratory's OOS handling and equipment qualification status in supplier evaluation.",
+    "checks": [
+     "Contract laboratory OOS investigation and notification procedure",
+     "Status of equipment qualification at the contract laboratory",
+     "CGMP training cycle at the contract laboratory"
+    ]
+   }
   },
   "fda483-195455": {
    "title_issue": "2022년 실사 483 관찰 공개",
@@ -663,7 +1268,23 @@
     "위험분석 결과의 밸리데이션 대상 선정 반영 여부",
     "부적합품 식별·격리·처리 기록",
     "문서관리 절차 개정·배포 이력"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate risk analysis",
+    "summary": "FDA cited five observations at Bio-Rad Medical Diagnostics GmbH (Manufacturer), inspected 06/14/2024: inadequate risk analysis, inadequate validation of a process that cannot be fully verified by subsequent inspection, inadequate control of nonconforming product, no CAPA procedure established, and document control procedures not maintained.",
+    "key_facts": [
+     "Inspection date: 06/14/2024",
+     "Observation 1: Risk analysis is inadequate",
+     "Observation 2: Inadequate validation of a process whose results cannot be fully verified by subsequent inspection or testing",
+     "Observation 3: Inadequate control of product not meeting specifications"
+    ],
+    "implication": "Citing weak validation of unverifiable processes together with inadequate risk analysis suggests risk assessment results may not have fed into deciding validation scope. It is worth checking that the risk analysis documents are linked to the list of processes subject to validation.",
+    "checks": [
+     "Whether risk analysis results are reflected in selecting processes for validation",
+     "Identification, segregation and disposition records for nonconforming product",
+     "Revision and distribution history of document control procedures"
+    ]
+   }
   },
   "fda483-195461": {
    "title_issue": "공정중 규격·WFI 조사 미흡",
@@ -679,7 +1300,23 @@
     "WFI 이상 검출 시 조사 범위와 제품 영향 평가",
     "공정 중 물질 규격 설정 근거",
     "비일상 운영에 대한 품질부서 사전 승인 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "In-process specifications and WFI investigation",
+    "summary": "FDA cited, at GlaxoSmithKline Biologicals SA (Vaccine Manufacturer) in an inspection on 06/24/2019, purity specifications for in-process materials not set on a scientific basis and findings in Water for Injection (WFI) in the aseptic bulk manufacturing area not thoroughly investigated, among other observations.",
+    "key_facts": [
+     "Inspection date: 06/24/2019",
+     "Observation 1: Scientific justification for in-process material purity specifications not established",
+     "Observation 2: Inadequate investigation of findings in Water for Injection (WFI)",
+     "Observation 5: No Quality Unit approval documents supporting operations outside the routine operating range"
+    ],
+    "implication": "Weak WFI investigation in the aseptic bulk area and an in-process specification problem cited together signal that water and intermediate quality criteria are assessed on the same line in vaccine manufacturing. Quality unit approval documents were also required for operations outside the routine range, so the approval path for abnormal operations is worth checking.",
+    "checks": [
+     "Scope of investigation and product impact assessment for abnormal WFI findings",
+     "Rationale for in-process material specifications",
+     "Prior quality unit approval records for non-routine operations"
+    ]
+   }
   },
   "fda483-195464": {
    "title_issue": "시험시설 인력 직무 이해 미흡",
@@ -695,7 +1332,23 @@
     "동물 케이지·랙 세척·소독 주기 기록",
     "QAU의 시험계획서·SOP 이탈 점검 기록",
     "시험 인력 직무 교육 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Staff understanding of duties not ensured",
+    "summary": "FDA stated at Noble Life Sciences, Inc (Nonclinical Laboratory), inspected 06/20/2025, that the testing facility management did not ensure personnel understood their duties, animal cages, racks and accessory equipment were not cleaned and sanitized at appropriate intervals, and the QAU did not verify unauthorized deviations from protocols and SOPs.",
+    "key_facts": [
+     "Inspection date: 06/20/2025",
+     "Facility and type: Nonclinical Laboratory, 483",
+     "Observation 2: Animal cages, racks and accessory equipment not cleaned and sanitized at appropriate intervals",
+     "Observation 3: QAU did not verify unauthorized deviations from approved protocols and SOPs"
+    ],
+    "implication": "Citing animal housing hygiene and the QAU's failure to verify deviations together signals that the condition of the test system is tied to judging the validity of study data. When outsourcing nonclinical studies, check how the QAU verifies and documents deviations from the protocol.",
+    "checks": [
+     "Records of cleaning and sanitizing intervals for animal cages and racks",
+     "QAU records of checks for deviations from protocols and SOPs",
+     "Records of job-duty training for study personnel"
+    ]
+   }
   },
   "fda483-195467": {
    "title_issue": "바이오버든 시료채취 설계 미흡",
@@ -724,7 +1377,21 @@
    "checks": [
     "무균공정 오염방지 절차서의 작업 포괄 범위",
     "무균 작업 현장 이행과 절차서 일치 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Sterile contamination procedures lacking",
+    "summary": "FDA cited one observation at SciVac LTD (Sterile Drug Manufacturer), inspected 03/27/2023: procedures to prevent microbiological contamination of drugs purporting to be sterile were not established, documented or followed.",
+    "key_facts": [
+     "Inspection date: 03/27/2023",
+     "Facility and type: Sterile Drug Manufacturer, 483",
+     "Observation 1: Procedures to prevent microbiological contamination of drugs purporting to be sterile not established, documented or followed"
+    ],
+    "implication": "Establishment, documentation and compliance were all questioned in a single observation, signaling shortfalls at every stage from existence of the procedure to its execution on the floor. It is worth checking step by step that aseptic process procedures cover the actual work completely and are followed as written.",
+    "checks": [
+     "Coverage of actual work by aseptic process contamination prevention procedures",
+     "Match between on-the-floor aseptic practice and the written procedure"
+    ]
+   }
   },
   "fda483-195469": {
    "title_issue": "품질부서 책임·절차 미문서화",
@@ -739,7 +1406,22 @@
     "일탈 등록·영향 평가 기한 기준",
     "품질관리부서 책임 범위의 문서화",
     "생산·공정관리 절차의 품질특성 보증 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Quality unit duties and procedures undocumented",
+    "summary": "FDA stated at Seqirus Inc (Manufacturing), inspected 06/05/2025, that quality control unit responsibilities and procedures were not documented, the deviation procedure did not ensure timely documentation and impact assessment of quality events, and written production and process control procedures were not adequately established.",
+    "key_facts": [
+     "Inspection date: 06/05/2025",
+     "Observation 1: Quality control unit responsibilities and procedures not documented (deviation procedure does not ensure timely documentation and impact assessment of quality events)",
+     "Observation 2: Inadequate establishment of written production and process control procedures"
+    ],
+    "implication": "The deviation procedure's failure to record and assess quality events in time was used as evidence that quality unit duties were undocumented, signaling that delays in deviation handling are read as a structural quality system problem. It is worth checking that procedures set time limits from occurrence of a deviation to registration and impact assessment.",
+    "checks": [
+     "Time limits for deviation registration and impact assessment",
+     "Documentation of the scope of quality control unit responsibilities",
+     "Whether production and process control procedures cover assurance of quality attributes"
+    ]
+   }
   },
   "fda483-195470": {
    "title_issue": "원료의약품 OOS 조사 미흡",
@@ -755,7 +1437,23 @@
     "원료의약품 OOS 조사의 근본원인 검토 범위",
     "생산 기록의 작업 동시 작성 여부",
     "장비·기구 세척·유지관리 주기"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate drug substance OOS investigation",
+    "summary": "FDA stated, in an inspection of Serum Institute of India Private Ltd. (Vaccine Manufacturer) on 01/30/2026, that OOS investigation of SARS-CoV-2rS drug substance batches was not thorough, production and process control records were not made at the time of the work, and cleaning and maintenance intervals for equipment and utensils were inadequate.",
+    "key_facts": [
+     "Inspection date: 01/30/2026",
+     "Observation 1: Inadequate Out of Specification investigation for Drug Substance",
+     "Observation 2: Production and process control records not documented at the time of performance",
+     "Observation 3: Inadequate cleaning and maintenance of equipment and utensils at appropriate intervals"
+    ],
+    "implication": "Weak OOS investigation together with records not made contemporaneously signals that the reliability of the production records underlying investigation conclusions is itself in doubt. It is worth checking whether, when reviewing production records in an OOS investigation, the timing of the entries is also confirmed.",
+    "checks": [
+     "Scope of root cause review in drug substance OOS investigations",
+     "Whether production records are made contemporaneously with the work",
+     "Cleaning and maintenance intervals for equipment and utensils"
+    ]
+   }
   },
   "fda483-195473": {
    "title_issue": "Yimmugo 품질감독 미흡",
@@ -771,7 +1469,23 @@
     "핵심 공정변수 운전 범위 대비 밸리데이션 포괄 여부",
     "수작업 육안검사 프로그램 검출 능력 평가",
     "표시자재 불출·사용·잔량 대조 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate quality oversight of Yimmugo",
+    "summary": "FDA cited multiple observations at Biotest AG (Drug Substance and Drug product Manufacturer), inspected 12/15/2023, including inadequate quality oversight of Yimmugo, deviation management, labeling material control, facilities to prevent contamination and mix-ups, scope of process validation, and the manual visual inspection program.",
+    "key_facts": [
+     "Inspection date: 12/15/2023",
+     "Observation 1: Inadequate quality oversight to assure identity, strength, quality and purity of Yimmugo drug product",
+     "Observation 7: Process validation did not cover the proposed range of critical process parameters",
+     "Observation 9: Manual visual inspection program inadequate to identify foreign matter and physical defects"
+    ],
+    "implication": "The finding that process validation did not cover the proposed range of critical process parameters signals that a gap between the applied operating range and the validated range is found at inspection. Because visual inspection and labeling material control were also cited, check final product stage controls as well.",
+    "checks": [
+     "Whether validation covers the operating range of critical process parameters",
+     "Evaluation of detection capability of the manual visual inspection program",
+     "Records reconciling issuance, use and remaining labeling materials"
+    ]
+   }
   },
   "fda483-195475": {
    "title_issue": "전용설비 세척 밸리데이션 미실시",
@@ -786,7 +1500,22 @@
     "전용설비 세척 밸리데이션 수행 여부",
     "구성성분 제조설비의 carry-over 허용기준 설정",
     "미해명 불일치 조사 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Dedicated equipment cleaning not validated",
+    "summary": "FDA stated, in an inspection of GSK Vaccines GmbH (Licensed Biological Drug Manufacturer) on 02/27/2026, that the cleaning procedure for dedicated equipment used to manufacture Aluminum Hydroxide adjuvant was not validated and that unexplained discrepancies were not thoroughly reviewed whether or not the batch was distributed.",
+    "key_facts": [
+     "Inspection date: 02/27/2026",
+     "Observation 1: Cleaning procedure for dedicated equipment used to make Aluminum Hydroxide adjuvant not validated (contamination and carry-over prevention)",
+     "Observation 2: Inadequate review of unexplained discrepancies regardless of distribution"
+    ],
+    "implication": "Requiring cleaning validation to prevent contamination and carry-over even for dedicated equipment signals that dedicated use is not a basis for skipping cleaning verification. The state of cleaning verification for equipment that makes components, such as adjuvants, is also worth checking.",
+    "checks": [
+     "Whether dedicated equipment cleaning validation has been performed",
+     "Carry-over acceptance criteria for equipment that makes components",
+     "Scope of investigation of unexplained discrepancies"
+    ]
+   }
   },
   "fda483-195478": {
    "title_issue": "설비·기구 유지관리 주기 미흡",
@@ -800,7 +1529,21 @@
    "checks": [
     "설비·기구 유지관리 주기 설정 근거",
     "유지관리 지연 발생 시 일탈 처리 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate equipment maintenance intervals",
+    "summary": "FDA cited one observation at Nova Laboratories Ltd (Biologics - Pharmaceuticals, Medical Devices) in an inspection on 08/23/2024: equipment and utensils were not maintained at appropriate intervals to prevent contamination that could alter the safety or quality of the drug.",
+    "key_facts": [
+     "Inspection date: 08/23/2024",
+     "Facility type: Biologics - Pharmaceuticals, Medical Devices, 483",
+     "Observation 1: Equipment and utensils not maintained at appropriate intervals to prevent contamination"
+    ],
+    "implication": "Maintenance intervals standing as the sole observation signals that delayed maintenance is treated as a matter that can lead through contamination to product safety and purity problems. It is worth checking that maintenance intervals are set based on contamination risk.",
+    "checks": [
+     "Rationale for setting equipment and utensil maintenance intervals",
+     "Whether a delayed maintenance event is handled as a deviation"
+    ]
+   }
   },
   "fda483-195479": {
    "title_issue": "배치 출하 프로토콜 미수립",
@@ -816,7 +1559,23 @@
     "원료의약품 출하 프로토콜의 yield·identity·bioburden 시험 포함 여부",
     "제조구역 환경 모니터링 체계",
     "세척 밸리데이션 프로그램 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Batch release protocol not established",
+    "summary": "FDA stated at Octapharma Produktionsgesellschaft Deutschland mbH. (Drug Substance Manufacturer), inspected 03/21/2023, that a batch release protocol including key product testing was not established, and also listed inadequate deviation and CAPA procedures, manufacturing area environmental monitoring and cleaning validation program.",
+    "key_facts": [
+     "Inspection date: 03/21/2023",
+     "Excerpted observation: Yield, identity and bioburden tests not performed to confirm quality of released batches",
+     "Observation 3: Inadequate system for monitoring environmental conditions in manufacturing areas",
+     "Observation 5: Cleaning validation program inadequate"
+    ],
+    "implication": "The absence of yield, identity and bioburden tests in the release protocol signals that the testing basis for drug substance release decisions was itself questioned. With cleaning validation and environmental monitoring also cited, check whether release testing items reflect the contamination risk of the process.",
+    "checks": [
+     "Whether the drug substance release protocol includes yield, identity and bioburden tests",
+     "Environmental monitoring system for manufacturing areas",
+     "Scope of the cleaning validation program"
+    ]
+   }
   },
   "fda483-195481": {
    "title_issue": "무균 작업자 가운 착용 부적절",
@@ -831,7 +1590,22 @@
     "무균 작업자 가운 착용 적격성 평가 이력",
     "작업 중 가운 착용 상태 확인 기록",
     "품질관리부서 책임 절차 이행 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate aseptic operator gowning",
+    "summary": "FDA stated at ROSLIN CELL THERAPIES LIMITED (Manufacturer), inspected 01/21/2025, that procedures to prevent microbiological contamination of drugs purporting to be sterile were not followed, citing inadequate aseptic operator gowning during production. Non-compliance with quality control unit responsibilities and procedures was also included.",
+    "key_facts": [
+     "Inspection date: 01/21/2025",
+     "Observation 1: Procedures to prevent microbiological contamination of drugs purporting to be sterile not followed (aseptic operator gown inadequate during production)",
+     "Observation 3: Quality control unit responsibilities and procedures partly not followed"
+    ],
+    "implication": "Gowning practice on the floor was presented as evidence of non-compliance with contamination prevention procedures, signaling that operator behavior is directly observed in aseptic production. It is worth checking that gowning qualification and in-process verification records reflect actual gowning.",
+    "checks": [
+     "History of aseptic operator gowning qualification",
+     "Records of in-process checks of gowning status",
+     "Execution of quality control unit responsibility procedures"
+    ]
+   }
   },
   "fda483-195482": {
    "title_issue": "무균 오염방지·혼동방지 구역 미흡",
@@ -847,7 +1621,23 @@
     "혼동 방지 구역 분리·표시 상태",
     "유통용 문서의 제품 식별 정보 정확성",
     "무균 오염방지 절차 이행 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Aseptic contamination control and mix-up areas",
+    "summary": "FDA cited four observations at GSK Vaccines GmbH (Licensed Biological Drug Manufacturer) in an inspection on 03/06/2024. They are procedures to prevent microbial contamination of sterile drugs not established or followed, inadequate review of unexplained discrepancies, inadequate areas to prevent mix-ups, and inadequate documents used for distribution.",
+    "key_facts": [
+     "Inspection date: 03/06/2024",
+     "Observation 1: Procedures to prevent microbial contamination of drugs purporting to be sterile not established or followed",
+     "Observation 3: Inadequate separate or defined areas to prevent mix-ups",
+     "Observation 4: Inadequate documents used for drug distribution"
+    ],
+    "implication": "Mix-up prevention areas and distribution documents cited alongside aseptic contamination control signal that post-manufacturing storage and distribution controls fall within the same inspection scope. It is worth checking that area separation and distribution documents reliably ensure product identification.",
+    "checks": [
+     "Separation and labeling state of mix-up prevention areas",
+     "Accuracy of product identification information in distribution documents",
+     "Records of execution of aseptic contamination prevention procedures"
+    ]
+   }
   },
   "fda483-195483": {
    "title_issue": "보관실 곰팡이 영향평가 미흡",
@@ -861,7 +1651,21 @@
    "checks": [
     "보관 구역 곰팡이 발견 시 조사·영향평가 절차",
     "안정성 시료 보관 환경 모니터링"
-   ]
+   ],
+   "en": {
+    "title_issue": "Mold in storage room not assessed",
+    "summary": "FDA cited one observation at Protherics UK Limited (Biological Drug Substance Manufacturer) in an inspection on 08/13/2024: various molds were found in a room storing manufacturing materials and stability samples, yet they were not adequately investigated or assessed for impact.",
+    "key_facts": [
+     "Inspection date: 08/13/2024",
+     "Facility type: Biological Drug Substance Manufacturer, 483",
+     "Observation 1: Inadequate investigation and impact assessment of various molds found in the room storing manufacturing materials and stability samples"
+    ],
+    "implication": "That the mold was found in the room holding manufacturing materials and stability samples signals that an abnormal storage environment can affect both material quality and the reliability of stability data. It is worth checking whether stability samples are included in the impact assessment when microbial abnormalities occur in storage areas.",
+    "checks": [
+     "Investigation and impact assessment procedure when mold is found in storage areas",
+     "Environmental monitoring of stability sample storage"
+    ]
+   }
   },
   "fda483-195485": {
    "title_issue": "제조기록 지시 불완전 등 5건 지적",
@@ -877,7 +1681,23 @@
     "중간체 조제 단계별 시간 기준의 마스터 제조기록 반영",
     "불만 연계 보관검체 검사 결과의 조사 반영",
     "의약품 보관조건 적정성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Incomplete batch record instructions, 5 items",
+    "summary": "FDA cited 5 observations at the Sanofi Pasteur vaccine manufacturing site (FEI 3002972083) in an inspection on 09/29/2023. The first observation is that time limits and instructions for Concentrated Tetanus Protein (CTP) bulk preparation in the Haemophilus b Conjugate Vaccine process were not defined in the master production and control record.",
+    "key_facts": [
+     "Inspection date: 09/29/2023",
+     "Facility type: Vaccine Manufacturer",
+     "Observation 1: Incomplete master production and control record instructions (time limits and instructions for CTP bulk preparation not defined)",
+     "Observation 2: Visual inspection of a retain sample linked to a broken-vial complaint found cellulose particles"
+    ],
+    "implication": "The case shows that when time limits and work instructions for intermediate preparation are not fixed in the master record, the basis for explaining batch-to-batch differences is weakened. Particles found in a retain sample during a complaint investigation signal a need to check whether complaint handling leads to detection of product quality signals.",
+    "checks": [
+     "Reflection of time limits for each intermediate preparation step in the master production record",
+     "Use of retain sample inspection results from complaints in investigations",
+     "Adequacy of drug product storage conditions"
+    ]
+   }
   },
   "fda483-195487": {
    "title_issue": "미해명 불일치 조사·경향 조치 미흡",
@@ -892,7 +1712,22 @@
    "checks": [
     "교정성적서 이상 시 영향 시험 결과 평가",
     "원액 시험 경향 분석과 시정조치 연계"
-   ]
+   ],
+   "en": {
+    "title_issue": "Unexplained discrepancy and trend actions lacking",
+    "summary": "FDA cited 2 observations at the Seqirus Vaccines Limited vaccine manufacturing site (FEI 3002806949) in an inspection on 05/26/2023. They were no investigation of an unexplained discrepancy found during review of calibration certificates for Fluad bulk formulated testing, and no corrective action for a testing trend in Monovalent Bulk Drug Substance.",
+    "key_facts": [
+     "Inspection date: 05/26/2023",
+     "Observation 1: No investigation of an unexplained discrepancy (related to calibration certificate review)",
+     "Observation 2: No corrective action for a testing trend in Monovalent Bulk Drug Substance",
+     "Facility type: Vaccine Manufacturer"
+    ],
+    "implication": "The finding that a discrepancy from calibration certificate review was not investigated signals that FDA looks at the link between instrument calibration results and the validity of test results. The lack of corrective action despite a trend in drug substance testing shows a need to check that trend analysis ends in action and not only in records.",
+    "checks": [
+     "Evaluation of affected test results when calibration certificates show anomalies",
+     "Link between drug substance test trend analysis and corrective action"
+    ]
+   }
   },
   "fda483-195490": {
    "title_issue": "OOS 조사 범위 불충분",
@@ -923,7 +1758,23 @@
     "불만기록 필수 항목 완결성",
     "예방정비 계획 대비 이행 실적",
     "샘플링 지점·방식의 대표성 근거"
-   ]
+   ],
+   "en": {
+    "title_issue": "Weak investigations and complaint records, 5",
+    "summary": "FDA cited 5 observations at the ID Biomedical Corporation of Quebec biological drug manufacturing site (FEI 3004835647) in an inspection on 05/20/2022. They included inadequate investigations, incomplete complaint records, inadequate procedures to prevent microbial contamination of drugs purporting to be sterile, uncompleted preventive maintenance, and non-representative sampling.",
+    "key_facts": [
+     "Inspection date: 05/20/2022",
+     "Facility type: Licensed Biological Drug Manufacturer",
+     "Observation 2: Complaint records incomplete or deficient",
+     "Observation 5: Sampling not representative of actual use"
+    ],
+    "implication": "Citing investigations and complaint records together signals that the whole flow of recording quality events and determining their cause was under inspection. Because uncompleted preventive maintenance and non-representative sampling were also raised, the basis for equipment condition and sampling design should be checked as well.",
+    "checks": [
+     "Completeness of required complaint record items",
+     "Preventive maintenance performance against plan",
+     "Rationale for representativeness of sampling points and methods"
+    ]
+   }
   },
   "fda483-195495": {
    "title_issue": "시험·검체채취 계획 이탈 근거 부재",
@@ -937,7 +1788,21 @@
    "checks": [
     "시험법·검체채취 계획 이탈 시 정당화 기록",
     "실험실 이탈의 일탈 처리 연계"
-   ]
+   ],
+   "en": {
+    "title_issue": "No justification for sampling and test deviations",
+    "summary": "FDA cited 1 observation at the Burgwedel Biotech GmbH biologics vaccine manufacturing site (FEI 3013514411) in an inspection on 08/29/2023. Deviations from the documented sampling plan, test procedures, and laboratory methods were not justified.",
+    "key_facts": [
+     "Inspection date: 08/29/2023",
+     "Facility type: Biologics Vaccine Manufacturer",
+     "Observation 1: No justification for deviations from sampling plan, test procedures, and laboratory methods"
+    ],
+    "implication": "In this case the target of the citation was less the departure from an approved sampling plan or test method than the absence of a recorded rationale for it. It signals a need to check whether laboratory deviations are assessed for justification within the deviation management system.",
+    "checks": [
+     "Justification records for deviations from test methods and sampling plans",
+     "Link between laboratory deviations and deviation handling"
+    ]
+   }
   },
   "fda483-195496": {
    "title_issue": "무균공정 SOP 미준수 작업 행동",
@@ -951,7 +1816,21 @@
    "checks": [
     "무균공정 SOP 규정 동작과 실제 작업 일치",
     "무균 작업자 행동 관찰·교정 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Operator behavior not following aseptic SOP",
+    "summary": "FDA cited 1 observation at the ENDO USA, Inc. biological drug manufacturing site (FEI 1818977) in an inspection on 06/05/2025. Procedures to prevent microbial contamination of drugs purporting to be sterile were not followed, and operator behavior did not match the instructions in the aseptic processing procedure (VV-SOP-00953).",
+    "key_facts": [
+     "Inspection date: 06/05/2025",
+     "Observation 1: Procedures to prevent microbial contamination of drugs purporting to be sterile not followed",
+     "Related procedure: Aseptic Processing procedure (VV-SOP-00953)"
+    ],
+    "implication": "The mismatch between the aseptic movements set in procedure VV-SOP-00953 and actual operator behavior signals that aseptic control is judged by on-the-floor conduct and not by having documents. It is worth checking, through observation, that the aseptic movements set in the procedure are followed consistently in real work.",
+    "checks": [
+     "Match between movements set in the aseptic processing SOP and actual work",
+     "Records of observation and correction of aseptic operator behavior"
+    ]
+   }
   },
   "fda483-195499": {
    "title_issue": "GDP·데이터 완전성 미흡 등 지적",
@@ -967,7 +1846,23 @@
     "반복 일탈의 분류 일관성",
     "HEPA 필터 교체 주기의 정비 절차 반영",
     "무균공정 구역 환경 모니터링 체계"
-   ]
+   ],
+   "en": {
+    "title_issue": "Weak GDP and data integrity practices",
+    "summary": "In the 483 from the 04/19/2022 inspection of the Serum Institute of India Pvt. Ltd. biological manufacturing site (FEI 3020223359), FDA cited inadequate GDP and data integrity practices as the first observation. The 5 extracted observations include inadequate deviation and investigation reporting, no HEPA filter replacement schedule, and an inadequate environmental monitoring system in aseptic processing areas.",
+    "key_facts": [
+     "Inspection date: 04/19/2022",
+     "Observation 1: Inadequate GDP and data integrity practices",
+     "Observation 6: Inadequate deviation and investigation reporting, including inconsistent classification of repeated deviations",
+     "Observation 7: Maintenance procedure has no schedule for replacing HEPA filters before failure"
+    ],
+    "implication": "Inconsistent classification of repeated deviations signals that deviation classification criteria drive trend detection and decisions on preventing recurrence. Read together with the missing pre-failure HEPA filter replacement schedule, it points to a need to check for a preventive, not reactive, maintenance system.",
+    "checks": [
+     "Consistency of classification of repeated deviations",
+     "Reflection of HEPA filter replacement intervals in maintenance procedures",
+     "Environmental monitoring system for aseptic processing areas"
+    ]
+   }
   },
   "fda483-195507": {
    "title_issue": "시험 완료 전 로트 출하 등 5건",
@@ -983,7 +1878,23 @@
     "출하 승인 전 필수 시험 완료 확인 장치",
     "시험법 실사용 조건 적합성 확인",
     "GMP 실험실 데이터 백업·감사 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Lot released before testing, 5 observations",
+    "summary": "FDA cited 5 observations at the IDT Biologika GmbH vaccine manufacturing site (FEI 3005001757) in an inspection on 09/08/2023. They were release of a licensed product lot before conformance testing was complete, an inadequate environmental monitoring system, test methods not verified under actual conditions of use, inadequate GMP training, and inadequate laboratory data backup and audit.",
+    "key_facts": [
+     "Inspection date: 09/08/2023",
+     "Observation 1: Licensed product lot released before conformance testing was complete",
+     "Observation 3: Suitability of test methods not verified under actual conditions of use",
+     "Observation 5: Backup data protection not assured, GMP laboratory data not audited"
+    ],
+    "implication": "The observation that a licensed product lot was released before conformance testing finished signals that FDA directly checks whether release approval requirements are enforced by the system. Citing inadequate laboratory data backup and audit alongside it shows that the reliability of the data behind release decisions is assessed on the same axis.",
+    "checks": [
+     "Controls confirming required testing is complete before release approval",
+     "Confirmation of test method suitability under actual conditions of use",
+     "Scope of GMP laboratory data backup and audit"
+    ]
+   }
   },
   "fda483-195509": {
    "title_issue": "원자료와 시험 결과 문서 불일치",
@@ -997,7 +1908,21 @@
    "checks": [
     "공정중·출하시험 원자료와 결과 문서 대조 검토",
     "핵심 자재 재고 기록과 실물 일치"
-   ]
+   ],
+   "en": {
+    "title_issue": "Raw data not matching reported test results",
+    "summary": "FDA cited 2 observations at the AGC Biologics, Inc. drug substance manufacturing site (FEI 3000209996) in an inspection on 04/18/2025. Review of in-process and release test data for drug substance was inadequate, so raw data did not match the final results documents, and inventory records for critical materials were inaccurate.",
+    "key_facts": [
+     "Inspection date: 04/18/2025",
+     "Observation 1: Inadequate review of in-process and release test laboratory data (raw data does not match results documents)",
+     "Observation 2: Inaccurate inventory records for critical materials"
+    ],
+    "implication": "The finding that raw data did not match the final results documents suggests that test result review stopped at the summary document and did not reach comparison with raw data. Together with the inaccurate critical material inventory records, it shows that record accuracy overall can be assessed from a data integrity viewpoint.",
+    "checks": [
+     "Review comparing in-process and release test raw data with results documents",
+     "Match between critical material inventory records and physical stock"
+    ]
+   }
   },
   "fda483-195517": {
    "title_issue": "바이러스 벡터 제조 관리 데이터 부족",
@@ -1012,7 +1937,22 @@
    "checks": [
     "하류공정 배치기록의 관리 데이터 기록 범위",
     "마스터 배치기록 개정본의 공정 반영 상태"
-   ]
+   ],
+   "en": {
+    "title_issue": "Insufficient viral vector control data",
+    "summary": "This is a 483 from the 11/22/2024 inspection by FDA of the Henogen SRL viral vector manufacturing site (FEI 3005932318). The excerpt indicates insufficient control data for viral vector manufacture and mentions control records such as the downstream process batch record (master record 000150367 v6.0); details of the observations need to be confirmed in the official source PDF.",
+    "key_facts": [
+     "Inspection date: 11/22/2024",
+     "Facility type: Viral Vector Manufacturer",
+     "Citation (excerpt): Insufficient viral vector control data",
+     "Related record: Downstream process master record 000150367 v6.0"
+    ],
+    "implication": "Naming the downstream process batch record as a subject of citation signals that FDA checks whether control data for each step of a multi-step viral vector process is captured in the batch record. The specific items cited should be confirmed in the official source PDF.",
+    "checks": [
+     "Scope of control data recorded in downstream process batch records",
+     "Reflection of master batch record revisions in the process"
+    ]
+   }
   },
   "fda483-195521": {
    "title_issue": "운송 핵심단계 SOP 부적절",
@@ -1026,7 +1966,21 @@
    "checks": [
     "운송 핵심 단계의 SOP 규정 범위",
     "설비 고장 빈도와 예방정비 주기 연계"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate SOP for critical transport steps",
+    "summary": "FDA cited 2 observations at the Boehringer lngelheim RCV GmbH & Co KG manufacturing site (FEI 3003433722) in an inspection on 12/05/2023. The SOP for critical transport steps was inadequate, and equipment preventive maintenance was not sufficient to prevent frequent breakdowns.",
+    "key_facts": [
+     "Inspection date: 12/05/2023",
+     "Observation 1: Inadequate SOP for critical transport steps",
+     "Observation 2: Equipment preventive maintenance does not prevent frequent breakdowns"
+    ],
+    "implication": "Citing the SOP for critical transport steps as inadequate signals that GMP control is viewed as extending past the manufacturing site to transport. The preventive maintenance citation for frequent equipment breakdowns shows a need to check whether breakdown history feeds back into resetting maintenance intervals.",
+    "checks": [
+     "Scope of SOP coverage for critical transport steps",
+     "Link between equipment breakdown frequency and preventive maintenance intervals"
+    ]
+   }
   },
   "fda483-195522": {
    "title_issue": "설비 설계·유지관리 부적절 등 7건",
@@ -1042,7 +1996,23 @@
     "제조 설비의 용도 적합 설계",
     "차압 제어 설비 구비",
     "연간 품질 검토용 기록 유지"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate equipment design and upkeep, 7 items",
+    "summary": "FDA cited 7 observations at the Fenwal International, Inc. manufacturing site (FEI 2627511) in an inspection on 09/18/2024. They were inadequate equipment design, inadequate equipment maintenance intervals, poor building repair, inadequate in-process material testing procedures, no differential pressure control equipment, no hot and cold water at washing and toilet facilities, and inadequate record keeping for annual review.",
+    "key_facts": [
+     "Inspection date: 09/18/2024",
+     "Observation 1: Manufacturing equipment not designed to suit its use",
+     "Observation 5: No differential pressure control equipment",
+     "Observation 7: Inadequate record keeping for annual quality review"
+    ],
+    "implication": "Equipment design, maintenance, building repair, and pressure control cited all at once reads as a case where hardware-based control was judged weak overall. With the record keeping citation for annual review added, it signals a need to check whether facility condition connects to the product quality evaluation system.",
+    "checks": [
+     "Fit-for-use design of manufacturing equipment",
+     "Provision of differential pressure control equipment",
+     "Record keeping for annual quality review"
+    ]
+   }
   },
   "fda483-195525": {
    "title_issue": "반복 알람 근본원인 미규명",
@@ -1057,7 +2027,22 @@
    "checks": [
     "반복 알람의 경향 분석·근본원인 조사",
     "알람 대응 절차 준수 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Root cause of repeat alarms not identified",
+    "summary": "FDA cited two observations at AGC Biologics S.p.A., a cell and gene therapy manufacturer (FEI 3020270660), in an inspection on 11/10/2023. Root cause and corrective action for repeat alarms were lacking and the alarm procedure was not followed, with procedural non-compliance cited separately.",
+    "key_facts": [
+     "Inspection date: 11/10/2023",
+     "Facility type: Cell and Gene Therapy Manufacturer",
+     "Observation 1: No root cause or corrective action for repeat alarms; alarm procedure not followed",
+     "Observation 2: Procedural non-compliance"
+    ],
+    "implication": "Citing repeated alarms with no root cause or corrective action signals that handling each alarm as an isolated event becomes an inspection issue. Since non-compliance with the alarm response procedure was also cited, it is worth checking that alarm handling records are kept as the procedure requires.",
+    "checks": [
+     "Trend analysis and root cause investigation of repeat alarms",
+     "Records of compliance with the alarm response procedure"
+    ]
+   }
   },
   "fda483-195529": {
    "title_issue": "제조 사용 요소 밸리데이션 미완료",
@@ -1071,7 +2056,21 @@
    "checks": [
     "제조 사용 요소별 밸리데이션 완료 상태",
     "핵심 유틸리티 밸리데이션·정기 모니터링"
-   ]
+   ],
+   "en": {
+    "title_issue": "Validation of manufacturing components incomplete",
+    "summary": "FDA cited 2 observations at the Autolus Limited (referred to as The Nucleus) drug substance and drug product manufacturing site (FEI 3015674982) in an inspection on 04/30/2024. Validation of components used in manufacturing the finished AUCATZYL (Obecabtagene autoleucel) product was not complete, and critical utilities were not adequately validated or routinely monitored.",
+    "key_facts": [
+     "Inspection date: 04/30/2024",
+     "Observation 1: Validation of components used to manufacture AUCATZYL (Obecabtagene autoleucel) not complete",
+     "Observation 2: Inadequate validation and routine monitoring of critical utilities"
+    ],
+    "implication": "The citation of incomplete validation for components used to make AUCATZYL signals that the completeness of validation for each process component is under inspection. Because insufficient validation and routine monitoring of critical utilities was also cited, the evidence for reproducible utility quality should be checked.",
+    "checks": [
+     "Validation completion status of each component used in manufacturing",
+     "Validation and routine monitoring of critical utilities"
+    ]
+   }
   },
   "fda483-195531": {
    "title_issue": "CAPA 문서화 미흡 등 11건",
@@ -1087,7 +2086,23 @@
     "설비 PQ 완료와 PPQ 착수 순서",
     "위탁시험 결과 무효 시 일탈 처리",
     "클린룸 세척 절차 적격성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate CAPA documentation and 10 more",
+    "summary": "FDA cited 11 observations at Duke University, a biologic manufacturer (FEI 3002663011), in an inspection on 08/02/2019. They start with inadequate CAPA documentation under CAPA SOP COMM-QA-076 and include environmental monitoring, qualification of clean room cleaning procedures, quality unit batch record review, and incomplete critical equipment PQ.",
+    "key_facts": [
+     "Inspection date: 08/02/2019",
+     "Observation 1: Inadequate CAPA documentation under CAPA SOP COMM-QA-076",
+     "Observation 2: Deviation (DEV-0723 019) related to an invalidated mycoplasma test result from a contract testing laboratory",
+     "Observation 11: PPQ (November 16, 2018 — January 17, 2019) performed before completion of critical equipment PQ"
+    ],
+    "implication": "Process performance qualification and aseptic process runs proceeding before critical equipment PQ was finished signals that a misordered qualification sequence can weaken the basis of all later validation results. Because the invalidated mycoplasma result from the contract laboratory and weak quality unit batch record review were cited together, quality unit review of external test results is also worth checking.",
+    "checks": [
+     "Order of equipment PQ completion and PPQ start",
+     "Deviation handling when a contract test result is invalidated",
+     "Qualification of clean room cleaning procedures"
+    ]
+   }
   },
   "fda483-195533": {
    "title_issue": "핵심 시약 사용 전 적격성 미확인",
@@ -1103,7 +2118,23 @@
     "핵심 시약 출고 전 적격성 평가",
     "엔도톡신 시험법의 검출 적합성",
     "품질 영향 일탈의 허가권자 통보"
-   ]
+   ],
+   "en": {
+    "title_issue": "Critical reagents not qualified before use",
+    "summary": "FDA cited four observations at Medlmmune UK Limited (AstraZeneca/Supply Biologics), a vaccine manufacturer (FEI 3004066112), in an inspection on 06/14/2022. Critical reagents were not always qualified before use in manufacturing US-licensed products (SOP-0069233 v13.0 not followed), along with an inadequate endotoxin test method, failure to notify the license holder of deviations, and insufficient validation supporting expiry dating.",
+    "key_facts": [
+     "Inspection date: 06/14/2022",
+     "Observation 1: Inadequate qualification of critical reagents before use (SOP-0069233 v13.0)",
+     "Observation 3: License holder not notified of deviations that could affect distributed product quality",
+     "Observation 4: Insufficient validation supporting the established expiry dating"
+    ],
+    "implication": "The finding that critical reagents could enter manufacturing without qualification signals a gap that arises when reagents are not controlled at the raw material level. The observation on not notifying the license holder shows that the channel for reporting quality-impacting deviations between the manufacturer and the license holder is an inspection issue.",
+    "checks": [
+     "Qualification of critical reagents before release",
+     "Suitability of the endotoxin test method for detection",
+     "Notification of the license holder about quality-impacting deviations"
+    ]
+   }
   },
   "fda483-195535": {
    "title_issue": "배치기록 주요 설비 식별 누락",
@@ -1118,7 +2149,22 @@
    "checks": [
     "배치기록의 주요 설비 식별번호 기재",
     "설비 이상 시 영향 배치 추적 가능성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Key equipment not identified in batch records",
+    "summary": "FDA cited one observation at Baxalta Belgium Manufacturing SA, a plasma derivative manufacturer (FEI 3002806503), in an inspection on 11/22/2024. Batch production and control records did not include identification of the major equipment used, with filling line cases for GAMMAGARD Liquid and Cuvitru cited.",
+    "key_facts": [
+     "Inspection date: 11/22/2024",
+     "Facility type: Plasma Derivative Manufacturer",
+     "Observation 1: Batch production and control records lack identification of major equipment",
+     "Related products: GAMMAGARD Liquid, Cuvitru"
+    ],
+    "implication": "Missing identification of the major equipment in batch records makes it hard to trace affected batches when equipment fails, so this reads as a traceability finding. As in the GAMMAGARD Liquid and Cuvitru filling line cases, it is worth checking that filling equipment identification is recorded in batch records.",
+    "checks": [
+     "Entry of major equipment ID numbers in batch records",
+     "Ability to trace affected batches when equipment fails"
+    ]
+   }
   },
   "fda483-195536": {
    "title_issue": "충전 작업 중 무균 절차 미준수",
@@ -1132,7 +2178,21 @@
    "checks": [
     "충전 작업 중 무균 절차 준수",
     "충전 구역 건물 보수 상태"
-   ]
+   ],
+   "en": {
+    "title_issue": "Aseptic procedures not followed during filling",
+    "summary": "FDA cited two observations at Catalent Maryland, Inc., a biological drug product manufacturer (FEI 3015558590), in an inspection on 04/09/2025. During observation of the APR-03-2025 ELEVIDYS (delandistrogene moxeparvovec-rokl) filling operation, procedures to prevent microbiological contamination of drugs purporting to be sterile were not followed, and the condition of the building repair was also cited.",
+    "key_facts": [
+     "Inspection date: 04/09/2025",
+     "Observation 1: Procedures to prevent microbiological contamination not followed (during observation of the ELEVIDYS filling operation)",
+     "Observation 2: Poor state of repair of the manufacturing building"
+    ],
+    "implication": "Aseptic procedure lapses found while observing the ELEVIDYS filling operation signal that the filling step is treated as a key weak point for sterility assurance. Since building repair was cited alongside, it is worth checking that facility maintenance of the filling area supports sterility assurance.",
+    "checks": [
+     "Compliance with aseptic procedures during filling",
+     "Building repair condition in the filling area"
+    ]
+   }
   },
   "fda483-195541": {
    "title_issue": "불일치 검토·보관검체 검사 미흡",
@@ -1148,7 +2208,23 @@
     "유통 배치 포함 불일치 영향 평가",
     "사용 직전 설비 청결 확인 기록",
     "보관검체 연 1회 육안검사 이행"
-   ]
+   ],
+   "en": {
+    "title_issue": "Discrepancy review and retain sample gaps",
+    "summary": "FDA cited three observations at GlaxoSmithKline Biologicals (FEI 3014752610) in an inspection on 03/12/2024. They are inadequate review of unexplained discrepancies regardless of whether the batch was distributed, an inadequate procedure to confirm equipment cleanliness immediately before use, and no visual inspection of retained samples at least annually.",
+    "key_facts": [
+     "Inspection date: 03/12/2024",
+     "Observation 1: Inadequate review of unexplained discrepancies regardless of distribution",
+     "Observation 2: Inadequate procedure to confirm equipment cleanliness immediately before use",
+     "Observation 3: Retained samples not visually inspected at least annually"
+    ],
+    "implication": "The citation requiring review of unexplained discrepancies even for batches already distributed signals that impact assessment of post-distribution batches is easily missed. Routine and periodic checks cited alongside, equipment cleanliness confirmation before use and annual visual inspection of retained samples, are also worth checking.",
+    "checks": [
+     "Impact assessment of discrepancies including distributed batches",
+     "Records of equipment cleanliness confirmation immediately before use",
+     "Annual visual inspection of retained samples"
+    ]
+   }
   },
   "fda483-195543": {
    "title_issue": "연속 조치기준 초과에 일탈 미발행",
@@ -1162,7 +2238,21 @@
    "checks": [
     "적격성 평가 중 조치기준 초과의 일탈 발행",
     "일탈 보고서 영향평가 충실도"
-   ]
+   ],
+   "en": {
+    "title_issue": "No deviation for repeated action limit excursions",
+    "summary": "FDA's first observation at Medimmune U.K. Limited, a biologic vaccine drug substance manufacturer (FEI 3004066112), in an inspection on 03/15/2024 was insufficient information and impact assessment in deviation QE-048460. In addition, no deviation was issued under SOP-0067565 for consecutive action limit excursions recorded in the qualification report for Jan 25 —Mar 8, 2023.",
+    "key_facts": [
+     "Inspection date: 03/15/2024",
+     "Observation 1: Insufficient information and impact assessment in deviation QE-048460",
+     "Observation 3: Inadequate investigation of consecutive action limit excursions; no deviation issued under SOP-0067565"
+    ],
+    "implication": "Consecutive action limit excursions recorded in a qualification report did not lead to a deviation, signaling that qualification data should be held to the same deviation criteria as routine monitoring. Together with the weak impact assessment in deviation QE-048460, the quality of deviation records was repeatedly an issue, so deviation reporting quality is worth checking.",
+    "checks": [
+     "Deviation issuance for action limit excursions during qualification",
+     "Thoroughness of impact assessment in deviation reports"
+    ]
+   }
   },
   "fda483-195545": {
    "title_issue": "독립 품질보증 조직 부재 등 6건",
@@ -1178,7 +2268,23 @@
     "시험기관 QA 조직 독립성",
     "핵심 실험실 업무 절차서 구비",
     "시험기관과의 품질협정 체결"
-   ]
+   ],
+   "en": {
+    "title_issue": "No independent quality unit, 6 observations",
+    "summary": "FDA cited 6 observations at the Clongen Laboratories, LLC release testing facility (FEI 3006579817) in an inspection on 06/17/2025. They included inadequate quality oversight, such as no independent QA unit and failure to follow the internal audit interval, along with no procedures for key laboratory operations, inadequate equipment qualification, inadequate training, and no quality agreement.",
+    "key_facts": [
+     "Inspection date: 06/17/2025",
+     "Facility type: Release testing facility",
+     "Observation 1: Inadequate quality oversight (no independent QA unit, internal audits at the Quality Manual interval not performed)",
+     "Observation 6: No quality agreement defining the roles and responsibilities of the parties involved"
+    ],
+    "implication": "Citing both the absence of an independent QA unit and the lack of a quality agreement at a release testing facility signals that the testing laboratory's quality system bears directly on the reliability of the sponsor's release decisions. Firms that outsource testing should check the testing laboratory's QA independence and whether a quality agreement is in place.",
+    "checks": [
+     "Independence of the testing laboratory's QA unit",
+     "Procedures in place for key laboratory operations",
+     "Quality agreement with the testing laboratory"
+    ]
+   }
   },
   "fda483-195549": {
    "title_issue": "품질 감독·오염관리 체계 미흡 6건",
@@ -1194,7 +2300,23 @@
     "소독제 효력시험의 오염·교차오염 대응 범위",
     "제조 구역 등급 분류와 적격성 평가",
     "OOS 조사 절차 적정성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Weak quality oversight and contamination control",
+    "summary": "FDA cited 6 observations at the Andelyn Biosciences, Inc. drug substance manufacturing site (FEI 3026042970) in an inspection on 05/30/2025. They were inadequate quality oversight, including inadequate review of manufacturing records by the quality unit, deficiencies in the environmental monitoring program, qualification of manufacturing areas, utility monitoring, disinfectant efficacy testing, and OOS procedures.",
+    "key_facts": [
+     "Inspection date: 05/30/2025",
+     "Observation 1: Inadequate quality oversight (inadequate review of manufacturing records by the quality unit)",
+     "Observation 5: Inadequate disinfectant efficacy testing for contamination and cross-contamination",
+     "Observation 6: Inadequate OOS procedure under Laboratory Investigation Management"
+    ],
+    "implication": "Citing environmental monitoring, area qualification, utility monitoring, and disinfectant efficacy testing all at once signals that the contamination control strategy was assessed as a system and not element by element. Because inadequate manufacturing record review by the quality unit came first, the effectiveness of quality oversight should also be checked.",
+    "checks": [
+     "Scope of disinfectant efficacy testing for contamination and cross-contamination",
+     "Classification and qualification assessment of manufacturing areas",
+     "Adequacy of OOS investigation procedures"
+    ]
+   }
   },
   "fda483-195550": {
    "title_issue": "세포치료 제조 인력 교육 부족",
@@ -1210,7 +2332,23 @@
     "세포치료 제조 작업자 직무별 교육 충족도",
     "무균공정 밸리데이션 적정성",
     "부자재·용기 재고기록의 배치 추적성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Insufficient training of cell therapy personnel",
+    "summary": "FDA cited five observations at Charles River Laboratories, a cell therapy manufacturer (FEI 3006500433), in an inspection on 02/07/2025. They are insufficient training of cell therapy manufacturing personnel, incomplete master production record instructions, inadequate aseptic process validation, poor building repair, and inadequate inventory records for components and containers.",
+    "key_facts": [
+     "Inspection date: 02/07/2025",
+     "Observation 1: Insufficient job training of cell therapy manufacturing personnel",
+     "Observation 3: Inadequate aseptic process validation",
+     "Observation 5: Inventory records for components and containers did not allow tracing of related batches"
+    ],
+    "implication": "Cell therapy processes generally depend heavily on operator skill, so citing insufficient training as the first observation signals that operator competence translates directly into process control. Since inventory records that cannot identify the related batches were also cited, material traceability is worth checking.",
+    "checks": [
+     "Training completion by job role for cell therapy manufacturing personnel",
+     "Adequacy of aseptic process validation",
+     "Batch traceability of component and container inventory records"
+    ]
+   }
   },
   "fda483-195551": {
    "title_issue": "계획된 일탈로 승인 공정 이탈 허용",
@@ -1226,7 +2364,23 @@
     "계획된 일탈과 변경관리 적용 경계",
     "제조 감독 자격 인력 확보 수준",
     "표시·포장 공정 PQ 완료 상태"
-   ]
+   ],
+   "en": {
+    "title_issue": "Planned deviations allow departure from process",
+    "summary": "At the Fin Vector Oy drug substance and drug product site (FEI 3010227150), inspected 09/27/2022, FDA cited as the first observation too few qualified personnel to perform and supervise manufacturing. Four extracted observations include inadequate equipment maintenance, a procedure allowing departures from the approved process as planned deviations, inadequate control of cleaning equipment, and incomplete labeling and packaging PQ.",
+    "key_facts": [
+     "Inspection date: 09/27/2022",
+     "Observation 1 (excerpt): Insufficient qualified personnel to perform and supervise manufacturing",
+     "Observation 3: SOP version 16 (effective September 7, 2022) step 5.1 allows departure from the approved process as a planned deviation",
+     "Observation 6: Labeling and packaging PQ validation and documentation incomplete"
+    ],
+    "implication": "Citing a procedure that lets departures from the approved process be documented as planned deviations raises concern that matters needing change control may be handled as deviations. With insufficient qualified staff and weak equipment maintenance also cited, check how staffing and equipment conditions relate to deviation occurrence.",
+    "checks": [
+     "Boundary between planned deviation and change control",
+     "Level of qualified manufacturing supervision staff",
+     "Completion status of PQ for labeling and packaging processes"
+    ]
+   }
   },
   "fda483-195554": {
    "title_issue": "시험법 과학적 타당성 부족 등 5건",
@@ -1242,7 +2396,23 @@
     "시험법의 과학적 타당성 근거",
     "컴퓨터 시스템 기록 변경 권한 통제",
     "검체 접수 정보의 실험실 기록 반영"
-   ]
+   ],
+   "en": {
+    "title_issue": "Test methods not scientifically sound, 5 items",
+    "summary": "FDA cited 5 observations at the Baxter Healthcare Corporation contract laboratory (FEI 1416980) in an inspection on 11/25/2025. They were no scientifically sound test procedures, quality control unit responsibilities and procedures not followed, inadequate control of access to change records in computer systems, inadequate training, and sample information missing from laboratory records.",
+    "key_facts": [
+     "Inspection date: 11/25/2025",
+     "Facility type: Contract Laboratory",
+     "Observation 3: Inadequate control of authority to change records in computer systems",
+     "Observation 5: Sample description, quantity, and receipt date missing from laboratory records"
+    ],
+    "implication": "Citing both scientific soundness of test methods and computer system access control at a contract laboratory signals that the accuracy of test results and data integrity are assessed together. The missing sample description, quantity, and receipt date show a need to check the basic elements of sample history tracing.",
+    "checks": [
+     "Scientific rationale for test methods",
+     "Control of authority to change records in computer systems",
+     "Reflection of sample receipt information in laboratory records"
+    ]
+   }
   },
   "fda483-195555": {
    "title_issue": "규격 부적합 로트 출하 등 11건",
@@ -1258,7 +2428,23 @@
     "출하 판정 전 배치기록 완결·규격 적합 확인",
     "세척 효과의 주기적 재검증",
     "공정용 가스 품질 모니터링·COA 확보"
-   ]
+   ],
+   "en": {
+    "title_issue": "Out-of-spec lot release and 10 more",
+    "summary": "FDA cited 11 observations at CellTrans Islet Isolation facility, a cell and gene therapy manufacturer (FEI 3019202665), in an inspection on 06/11/2021. They include release of final product lots with incomplete batch records or failing release specifications, unreported temperature excursion deviations, aseptic process and gowning defects, no periodic verification of cleaning, and no monitoring of carbon dioxide gas quality.",
+    "key_facts": [
+     "Inspection date: 06/11/2021",
+     "Observation 3: Final product lots released with incomplete batch records or failing release specifications",
+     "Observation 8: No periodic verification after the initial cleaning validation in 2018",
+     "Observation 12: Quality of carbon dioxide gas for incubators not monitored; no COA obtained"
+    ],
+    "implication": "Releasing final product with failing specifications or incomplete batch records shows that the quality unit's release decision function did not work. The lack of revalidation since the initial cleaning validation in 2018 and the gap in process gas quality control were also cited, so the maintained state after initial validation is worth checking.",
+    "checks": [
+     "Batch record completeness and specification conformance check before release decision",
+     "Periodic revalidation of cleaning effectiveness",
+     "Process gas quality monitoring and COA acquisition"
+    ]
+   }
   },
   "fda483-195558": {
    "title_issue": "주요 설비 적격성 검토·승인 미흡",
@@ -1274,7 +2460,23 @@
     "주요 설비 적격성 문서의 품질부서 검토 범위",
     "무균공정 밸리데이션 적정성",
     "설비 오염 방지 정비 주기"
-   ]
+   ],
+   "en": {
+    "title_issue": "Weak quality review of equipment qualification",
+    "summary": "FDA cited six observations at Merck Teknika LLC, a biological drug product manufacturer (FEI 1039284), in an inspection on 11/27/2024. They start with deficiencies in the quality control unit's review and approval of major equipment qualification and include inadequate aseptic process validation, missing or unfollowed contamination prevention procedures, review of unexplained discrepancies, and equipment design and maintenance problems.",
+    "key_facts": [
+     "Inspection date: 11/27/2024",
+     "Observation 1: Quality control unit responsibilities and procedures not followed (deficient review and approval of major equipment qualification)",
+     "Observation 2: Inadequate aseptic process validation",
+     "Observation 6: Inadequate maintenance intervals for equipment and utensils to prevent contamination"
+    ],
+    "implication": "Citing the quality control unit's review and approval of equipment qualification first signals that FDA looks at whether the quality unit actually verified the work, not just whether qualification documents exist. Aseptic process validation and contamination prevention procedures were cited next, so the link from equipment qualification gaps to sterility assurance is worth checking.",
+    "checks": [
+     "Scope of quality unit review of major equipment qualification documents",
+     "Adequacy of aseptic process validation",
+     "Maintenance intervals to prevent equipment contamination"
+    ]
+   }
   },
   "fda483-195561": {
    "title_issue": "입고 원료의약품 확인시험 미실시",
@@ -1305,7 +2507,23 @@
     "장비 제품접촉면 이물·잔류물 발견 시 특성 규명 및 품질영향 평가 기록",
     "세척밸리데이션 스왑 시험법의 미생물 회수율 시험 적정성",
     "품질부서 내 업무분장(segregation of duties) 절차 준수 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Unidentified material on equipment not assessed",
+    "summary": "FDA issued a 483 with 4 observations to GenTrac, Inc., a drug substance manufacturer. The citations included no characterization or quality impact assessment of material found on equipment product-contact surfaces and an inadequate microbial recovery test in the cleaning validation swab method.",
+    "key_facts": [
+     "Inspection date: 07/30/2025",
+     "Observation 1: No characterization of material identified on equipment product-contact surfaces and no assessment of impact on drug substance quality",
+     "Observation 2: Inadequate microbial recovery test for the cleaning validation swab method",
+     "Observations 3 and 4: Inadequate documentation of laboratory training and qualification, procedures for segregation of duties in the quality unit not followed"
+    ],
+    "implication": "Citing both the unexamined material on equipment surfaces and the weak basis for swab recovery signals that the scientific basis for cleaning control as a whole came under review. A drug substance manufacturer should check that characterization and quality impact assessment are actually recorded when residues are found after cleaning.",
+    "checks": [
+     "Records of characterization and quality impact assessment when foreign matter or residue is found on product-contact surfaces",
+     "Adequacy of the microbial recovery test in the cleaning validation swab method",
+     "Compliance with segregation of duties procedures within the quality unit"
+    ]
+   }
   },
   "fda483-195563": {
    "title_issue": "부적합 보고 조사 개시 지연",
@@ -1320,7 +2538,22 @@
    "checks": [
     "일탈 발견일 대비 부적합 보고·조사 개시 소요기간",
     "설비 이벤트의 일탈 등록 기준과 CAPA 연계"
-   ]
+   ],
+   "en": {
+    "title_issue": "Delayed start of nonconformance investigation",
+    "summary": "FDA issued a 483 to Janssen Biopharmaceuticals, Inc., a lentiviral vector manufacturer. It cited that the nonconformance report investigation was not started in a timely way after a deviation was found, as required by SOP-32984.",
+    "key_facts": [
+     "Inspection date: 11/01/2024",
+     "Facility type: Lentiviral vector manufacturer, 483",
+     "Observation 2: Nonconformance report investigation not started in a timely way after deviation discovery, per SOP-32984 (Nonconformance and CAPA Pharm Segment)",
+     "Observation 1 excerpt: Inadequate control and maintenance of manufacturing line systems"
+    ],
+    "implication": "The gap between discovering a deviation and starting the investigation being cited signals that FDA looks at the timeliness of the start, not just the conclusion. Because inadequate manufacturing line equipment control was also cited, it is worth checking that equipment events connect to the deviation and investigation system on time.",
+    "checks": [
+     "Time from deviation discovery to start of nonconformance report and investigation",
+     "Criteria for registering equipment events as deviations and the link to CAPA"
+    ]
+   }
   },
   "fda483-195565": {
    "title_issue": "포장·표시자재 적합성 확인 미실시",
@@ -1335,7 +2568,22 @@
    "checks": [
     "포장 작업 개시 전 표시·포장자재 적합성 확인 기록",
     "표시자재 수량 차이 발생 시 조사 서면기록 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Packaging and labeling materials not checked",
+    "summary": "FDA issued a Form 483 with three observations to Genzyme Corporation, a biological drug product labeling and packaging facility. Cited items include not following the procedure that assures correct labeling materials are used and not examining packaging and labeling materials for suitability before packaging.",
+    "key_facts": [
+     "Inspection date: 02/14/2025",
+     "Observation 1: Procedure to assure use of correct labeling materials not followed",
+     "Observation 2: Packaging and labeling materials not examined for suitability and accuracy before packaging",
+     "Observation 3: No written record of investigation of an unexplained discrepancy"
+    ],
+    "implication": "Citing the labeling material procedure and the missing pre-packaging line check at the same facility signals that safeguards against labeling errors were weakened twice over. Any site running packaging operations should check that pre-operation material checks and quantity discrepancy investigations are actually recorded.",
+    "checks": [
+     "Records of suitability checks of labeling and packaging materials before packaging starts",
+     "Written investigation records when labeling material quantity discrepancies occur"
+    ]
+   }
   },
   "fda483-195568": {
    "title_issue": "전산 입출력 정확성 점검 지적",
@@ -1365,7 +2613,23 @@
     "품질 불만 접수·조사 절차의 실제 운영 기록",
     "제조·공정관리 절차 일탈 시 정당화 근거 문서",
     "안정성 시험 프로그램 계획 대비 이행 현황"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate customer complaint handling",
+    "summary": "FDA issued a 483 with 5 observations to the Instituto Grifols, S.A. manufacturing site. The citations included inadequate procedures for handling written and oral complaints, inadequate review of unexplained discrepancies, and failure to follow the stability testing program.",
+    "key_facts": [
+     "Inspection date: 11/17/2023",
+     "Observation 1: Procedures for handling written and oral complaints not adequately written or followed (related to SOP IG_MSP-000532_ING version 20.0)",
+     "Observations 2 and 3: Inadequate review of unexplained discrepancies, no justification for deviations from manufacturing and process control procedures",
+     "Observation 5: Written stability testing program not followed"
+    ],
+    "implication": "The customer quality complaint SOP being cited first signals that the flow from complaint receipt to investigation is treated as central to post-release quality surveillance. With the missing deviation justification and stability program noncompliance also cited, it is worth checking the gap between written procedures and actual operations.",
+    "checks": [
+     "Operating records of the quality complaint receipt and investigation procedure",
+     "Documents giving the justification for deviations from manufacturing and process control procedures",
+     "Stability testing program performance against plan"
+    ]
+   }
   },
   "fda483-195572": {
    "title_issue": "배치기록 정기 평가 절차 부재",
@@ -1380,7 +2644,22 @@
    "checks": [
     "승인·불합격 배치를 포함한 정기 품질 평가 절차 수립 여부",
     "시험법·SOP 작성·검토·승인 조직단위 지정"
-   ]
+   ],
+   "en": {
+    "title_issue": "No procedure for periodic batch record evaluation",
+    "summary": "FDA issued a Form 483 with three observations to Barr Laboratories Inc., a vaccine manufacturer. Cited items are the lack of a procedure for periodic evaluation of representative batch records and test methods and procedure documents not prepared by an appropriate organizational unit.",
+    "key_facts": [
+     "Inspection date: 05/09/2025",
+     "Observation 1: No written procedure for periodic evaluation to review records of representative approved and rejected batches",
+     "Observation 2: Test methods and changes not prepared by an appropriate organizational unit",
+     "Observation 3: Written procedures not prepared, reviewed and approved by an appropriate organizational unit"
+    ],
+    "implication": "The absence of a periodic batch record evaluation procedure signals that there was no mechanism to revisit product quality trends on a regular basis. Since the preparing and approving units for test method and procedure documents were also cited, it is worth checking that responsible organizations for documents are designated as required.",
+    "checks": [
+     "Whether a periodic quality evaluation procedure covering approved and rejected batches exists",
+     "Designation of units that prepare, review and approve test methods and SOPs"
+    ]
+   }
   },
   "fda483-195573": {
    "title_issue": "비임상시험기관 483 발행",
@@ -1408,7 +2687,21 @@
    "checks": [
     "로트 단위 출하·유통처 기록 조회 가능성",
     "모의회수(mock recall) 실시 및 소요시간 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "No lot-level distribution tracing system",
+    "summary": "FDA issued a Form 483 with one observation to Ferring Microbiome Inc., a live biotherapeutics manufacturer. The finding is that no system was established to quickly identify where each lot was distributed, as needed for a recall.",
+    "key_facts": [
+     "Inspection date: 06/26/2025",
+     "Facility type: Live Biotherapeutics Manufacturer, 483",
+     "Observation 1: No system to quickly identify the distribution of each lot in case of a recall"
+    ],
+    "implication": "A single observation focused on lot-level distribution tracing signals that recall execution capability itself can be an independent inspection issue. It is worth checking whether shipping records can be retrieved immediately by lot and whether this is verified through a mock recall.",
+    "checks": [
+     "Ability to retrieve shipping and distribution records by lot",
+     "Mock recall performed and time taken recorded"
+    ]
+   }
   },
   "fda483-195576": {
    "title_issue": "CGTP 품질프로그램 미수립",
@@ -1424,7 +2717,23 @@
     "수행 단계별 CGTP 절차 정의 범위",
     "작업 기록 상세도 및 보존기간 준수",
     "기록관리 시스템 문서화"
-   ]
+   ],
+   "en": {
+    "title_issue": "No CGTP quality program established",
+    "summary": "FDA issued a 483 with 5 observations to MD Tox Laboratory, a testing laboratory. The citations included no quality program and procedures addressing the core CGTP requirements for HCT/P and inadequate record retention.",
+    "key_facts": [
+     "Inspection date: 01/28/2025",
+     "Observations 1 and 2: Quality program and step-by-step procedures addressing core CGTP requirements not defined or followed",
+     "Observations 3 and 4: Insufficient records of work performed, 10 years retention period after creation not met",
+     "Observation 5: CGTP recordkeeping system not maintained"
+    ],
+    "implication": "Citing the lack of a CGTP quality program for HCT/P at a testing laboratory signals that core requirements are expected to be applied according to the steps the laboratory performs. With record detail and the 10 years retention period also cited, it is worth checking the recordkeeping system.",
+    "checks": [
+     "Scope of CGTP procedures defined for each step performed",
+     "Detail of work records and compliance with the retention period",
+     "Documentation of the recordkeeping system"
+    ]
+   }
   },
   "fda483-195577": {
    "title_issue": "제조 절차 미준수 지적",
@@ -1454,7 +2763,23 @@
     "결함 범주별 개별 불량률 기준 설정",
     "AQL 불합격 시 재검사 기준과 범위",
     "제품접촉 호스 등 소모부품 교체주기 규정"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate process interruption investigation",
+    "summary": "FDA issued a 483 to the Cangene Corporation manufacturing site. The citations included an inadequate investigation of process interruptions for VIGIV bulk lots, no reject rate criteria by defect category, inadequate retesting of lots that failed AQL, and inadequate document and deviation control.",
+    "key_facts": [
+     "Inspection date: 06/21/2012",
+     "Excerpt Observation 1: Inadequate investigation of process interruptions for VIGIV bulk lots (substance causing fouling not identified)",
+     "Observations 2 and 3: No reject rate criteria by defect category, no retesting at tightened criteria for lots that failed AQL",
+     "Observations 9 and 10: Replacement interval not defined for product-contact flexible hoses, incubation time not specified for growth promotion testing of environmental monitoring media"
+    ],
+    "implication": "An interruption investigation that did not identify the substance causing fouling, together with an inspection criterion with only a cumulative reject rate, signals that investigations stay on the surface unless defect data is broken down by cause. The inspection date of 06/21/2012 makes this a past record, but it is worth checking the visual inspection reject rate criteria and the replacement intervals for consumable contact parts.",
+    "checks": [
+     "Setting separate reject rate criteria for each defect category",
+     "Criteria and scope for retesting after an AQL failure",
+     "Defined replacement intervals for consumable parts such as product-contact hoses"
+    ]
+   }
   },
   "fda483-195580": {
    "title_issue": "품질관리부서 부재 등 16건",
@@ -1470,7 +2795,23 @@
     "품질관리부서의 독립성과 출하 승인 권한",
     "무균공정 밸리데이션 및 환경모니터링 체계",
     "HCT/P 공여자 적격성 판정 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "No quality control unit and 15 more",
+    "summary": "FDA issued a Form 483 with 16 observations to Bello Bio LLC, a biological product manufacturer. Cited items include the absence of a quality control unit, aseptic process validation not covered, inadequate environmental monitoring, and inadequate documentation of HCT/P donor eligibility.",
+    "key_facts": [
+     "Inspection date: 12/16/2025",
+     "Observation 1: No quality control unit",
+     "Observations 2 and 5: Aseptic process validation not included; inadequate environmental monitoring system for aseptic processing areas",
+     "Observations 12, 15 and 16: Inadequate documentation and procedures for HCT/P donor eligibility determination"
+    ],
+    "implication": "With the missing quality control unit as the first observation, followed by 16 items spanning stability, complaints, cleaning and pre-release quarantine, the quality system foundation itself was assessed as not in place. Sites handling both sterile products and HCT/Ps should check aseptic process validation and donor eligibility records.",
+    "checks": [
+     "Independence of the quality control unit and its release approval authority",
+     "Aseptic process validation and environmental monitoring system",
+     "Records of HCT/P donor eligibility determinations"
+    ]
+   }
   },
   "fda483-195581": {
    "title_issue": "전자기록 audit trail 요건 미충족",
@@ -1484,7 +2825,21 @@
    "checks": [
     "시험 장비·시스템의 audit trail 활성화 및 검토 기록",
     "위탁 시험기관 감사 시 전자기록 관리 확인 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Electronic records fail audit trail requirements",
+    "summary": "FDA issued a Form 483 with two observations to Intertek USA Inc., a Control Laboratory. Electronic records did not meet audit trail requirements, and quality control unit responsibilities and procedures were not fully followed.",
+    "key_facts": [
+     "Inspection date: 03/07/2025",
+     "Observation 1: Audit trail requirements not met for electronic records in use",
+     "Observation 2: Quality control unit responsibilities and procedures not followed"
+    ],
+    "implication": "Audit trail non-compliance as the first observation at a contract laboratory signals that data integrity is a core axis of assessing testing contractors. If you outsource analysis to external laboratories, check that laboratory's audit trail configuration for electronic records and whether it is reviewed.",
+    "checks": [
+     "Audit trail activation and review records for test instruments and systems",
+     "Scope of electronic record controls checked in contract laboratory audits"
+    ]
+   }
   },
   "fda483-195584": {
    "title_issue": "시설·GMP 운영 SOP 미준수",
@@ -1498,7 +2853,21 @@
    "checks": [
     "시설·GMP 운영 SOP의 현장 적합성 정기 검토",
     "SOP 미준수 사례의 일탈 처리 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Facility and GMP operations SOPs not followed",
+    "summary": "FDA issued a Form 483 to the Charles River Laboratories Inc manufacturing site. Non-compliance with SOPs on facility and GMP operations and an inadequate SOP were cited.",
+    "key_facts": [
+     "Inspection date: 08/25/2023",
+     "Observation 1 (excerpt): SOPs on facility and GMP operations not followed",
+     "Observation 5: Inadequate SOP"
+    ],
+    "implication": "Citing both non-compliance with SOPs and inadequacy of the SOP itself signals that procedure content and on-the-floor execution are verified together. It is worth checking that facility operations SOPs are revised regularly to reflect actual work.",
+    "checks": [
+     "Periodic review of facility and GMP operations SOPs for suitability to the floor",
+     "Deviation handling records for SOP non-compliance"
+    ]
+   }
   },
   "fda483-195671": {
    "title_issue": "CAPA 활동 문서화 미흡",
@@ -1512,7 +2881,21 @@
    "checks": [
     "CAPA 실행 내역과 효과성 결과의 기록 완결성",
     "외부 서비스·컨설턴트별 관리 유형·범위 정의"
-   ]
+   ],
+   "en": {
+    "title_issue": "CAPA activities poorly documented",
+    "summary": "FDA issued a Form 483 with two observations to the August Reuchlen GmbH manufacturing site. Inadequate documentation of CAPA activities and results, and an undefined scope of control over external services and consultants, were cited.",
+    "key_facts": [
+     "Inspection date: 05/02/2025",
+     "Observation 1: Inadequate documentation of CAPA activities and results",
+     "Observation 2: Type and extent of control over external services and consultants not defined"
+    ],
+    "implication": "This shows that even when CAPA is carried out, it is cited if activities and results are not recorded. With the scope of control over external service providers also cited, check that the level of control over outsourced work is defined in documents.",
+    "checks": [
+     "Completeness of records of CAPA execution and effectiveness results",
+     "Definition of control type and extent for each external service and consultant"
+    ]
+   }
   },
   "fda483-195803": {
    "title_issue": "무균·비무균 조제시설 483 공개",
@@ -1542,7 +2925,23 @@
     "원료 입고 시 성분별 확인시험 실시 여부",
     "공급업체 시험성적서 신뢰성 검증 주기",
     "완제품 배치별 출하 전 규격시험 완결성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Release and ingredient identity testing missing",
+    "summary": "FDA CDER issued a Warning Letter to TSP Solutions Pte. Ltd. on 10/22/2026. The violations cited were no finished product testing before release, no identity testing of each component, and inadequate fulfillment of quality unit responsibilities.",
+    "key_facts": [
+     "Violation 1: Identity and strength testing before release not performed for each batch (21 CFR 211.165(a))",
+     "Violation 2: Identity testing of each component not performed and reliability of supplier test reports not verified (21 CFR 211.84(d)(1))",
+     "Violation 3: Quality unit responsibilities not adequately fulfilled (21 CFR 211.22)",
+     "Issued by: CDER, 10/22/2026, FEI 3023093622"
+    ],
+    "implication": "This is a case where FDA tied a setup that skipped release testing and component identity testing and relied on supplier certificates to a quality unit responsibility problem. Manufacturers using outsourced or imported materials should re-examine the basis for accepting certificates and the scope of their own identity testing.",
+    "checks": [
+     "Whether identity testing of each component is done on receipt of materials",
+     "Frequency of verifying the reliability of supplier test certificates",
+     "Completeness of pre-release specification testing for each finished product batch"
+    ]
+   }
   },
   "8909d4bb39b5": {
    "title_issue": "규격 부적합 배치 조사 미흡",
@@ -1556,7 +2955,21 @@
    "checks": [
     "규격 부적합 배치 조사 범위·종결 기준",
     "부적합 조사와 CAPA 연계 기록"
-   ]
+   ],
+   "en": {
+    "title_issue": "Inadequate investigation of failed batches",
+    "summary": "FDA CDER issued a Warning Letter to Northland Nuclear Medicine, LLC on 10/22/2026. It cited that investigation and corrective action for batches that failed specifications were inadequate in the inspection of May 26 to 29, 2026.",
+    "key_facts": [
+     "Violation: No adequate investigation and corrective action when a production batch or component fails specifications (21 CFR 212.20(d))",
+     "Inspection period: May 26 to 29, 2026",
+     "Issued by: CDER, 10/22/2026, FEI 3005334016"
+    ],
+    "implication": "It shows that even under PET drug CGMP (21 CFR Part 212), investigation of specification failures and the link to CAPA are a core axis of enforcement. For processes such as short half-life products, where investigation happens after release, the scope of failure investigations and the basis for closing them should be checked.",
+    "checks": [
+     "Scope and closure criteria for investigations of batches that fail specifications",
+     "Records linking failure investigations to CAPA"
+    ]
+   }
   },
   "c9f381687575": {
    "title_issue": "원료 확인시험·공정절차 부재",
@@ -1572,7 +2985,23 @@
     "공급업체 평가 시 공정관리 절차서 존재 확인",
     "원료 성분별 확인시험 실시 여부",
     "공급업체 품질관리부서 권한·체계"
-   ]
+   ],
+   "en": {
+    "title_issue": "No ingredient identity tests or process procedures",
+    "summary": "FDA CDER issued a Warning Letter to Sanrace Biotechnology Co., Ltd. on 10/22/2026. The violations cited were no identity testing of components, no written production and process control procedures, and an inadequate quality control unit.",
+    "key_facts": [
+     "Violation 1: Identity testing of each component not performed (21 CFR 211.84(d)(1))",
+     "Violation 2: No written production and process control procedures (21 CFR 211.100(a))",
+     "Violation 3: No adequate quality control unit established (21 CFR 211.22(a))",
+     "Issued by: CDER, 10/22/2026, FEI 3016897521"
+    ],
+    "implication": "This is a case where FDA judged a site with no procedures and no quality control unit to lack a basic CGMP system. Where such an overseas manufacturer is in the supply chain, supplier assessment should first confirm that identity testing and process control procedures exist.",
+    "checks": [
+     "Confirmation that process control procedures exist during supplier assessment",
+     "Whether identity testing of each component is performed",
+     "Authority and structure of the supplier's quality control unit"
+    ]
+   }
   },
   "data0011-15985": {
    "title_issue": "바이오 무균의약품 제조 규정 사례집",
@@ -1586,7 +3015,21 @@
    "checks": [
     "수록 사례와 자사 바이오 무균 공정 운영 방식 대조",
     "사례집 반영 필요 사항 파악"
-   ]
+   ],
+   "en": {
+    "title_issue": "Case book on biologic sterile manufacturing rules",
+    "summary": "MFDS issued a case book on applying biologic sterile medicinal product manufacturing rules on 2026-10-30. Review of the original text is needed.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: case book on applying biologic sterile medicinal product manufacturing rules",
+     "Issue date: 2026-10-30"
+    ],
+    "implication": "Issued as a case book rather than a rule commentary, it signals how MFDS interprets biologic sterile manufacturing rules in practice. Review of the original text is needed, and the included cases should be compared against the company's own aseptic process operation.",
+    "checks": [
+     "Comparison of the included cases with in-house biologic aseptic process operation",
+     "Identification of items that need to be reflected from the case book"
+    ]
+   }
   },
   "recall-014fb4381520": {
    "title_issue": "총호기성미생물수 부적합 회수",
@@ -1601,7 +3044,22 @@
    "checks": [
     "액제 제조용수 미생물 관리 기록",
     "동일 설비 공유 품목 간 미생물 한도 시험 추세"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for total aerobic microbial count",
+    "summary": "MFDS ordered a recall of two products from a domestic pharmaceutical company due to total aerobic microbial count. It is a combined recall of two products for the same reason.",
+    "key_facts": [
+     "Reason: total aerobic microbial count",
+     "Mandatory: Y",
+     "Recall order date: 20261027",
+     "Merged: combined recall of 2 products for the same reason"
+    ],
+    "implication": "Two polyhexamethylene biguanide-based liquid products from the same company being recalled together for total aerobic microbial count suggests looking at a common process or equipment problem rather than individual lots. Liquid microbial limit failures can generally relate to purified water and filling environment control, so check these items.",
+    "checks": [
+     "Microbial control records for liquid manufacturing water",
+     "Microbial limit test trends across products sharing the same equipment"
+    ]
+   }
   },
   "recall-2b4665f31873": {
    "title_issue": "중금속 품질 부적합 회수",
@@ -1616,7 +3074,22 @@
    "checks": [
     "원료 입고 시 중금속 시험 실시 여부",
     "원료 공급처별 중금속 시험 성적 추세"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for heavy metal nonconformity",
+    "summary": "MFDS ordered a recall of a Pueraria root herbal product from a domestic herbal pharmaceutical company due to quality nonconformity (heavy metals).",
+    "key_facts": [
+     "Reason: quality nonconformity (heavy metals)",
+     "Product: a Pueraria root herbal product",
+     "Mandatory: Y",
+     "Recall order date: 20261029"
+    ],
+    "implication": "Heavy metal nonconformity can generally relate to the growing and harvesting environment of the material, signaling that material-stage control is the issue. If other products use the same material, check heavy metal test results by supplier.",
+    "checks": [
+     "Whether heavy metal testing is performed on incoming material",
+     "Trend of heavy metal test results by material supplier"
+    ]
+   }
   },
   "recall-6011a2264ad4": {
    "title_issue": "총호기성미생물수 3품목 회수",
@@ -1631,7 +3104,22 @@
    "checks": [
     "공용 제조설비 세척 후 미생물 확인 기록",
     "품목 간 공용 용수 미생물 모니터링 결과"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall of 3 products for aerobic microbial count",
+    "summary": "MFDS ordered a recall of three products from a domestic company due to total aerobic microbial count. It is a combined recall of three products for the same reason.",
+    "key_facts": [
+     "Reason: total aerobic microbial count",
+     "Mandatory: Y",
+     "Recall order date: 20261027",
+     "Merged: combined recall of 3 products for the same reason"
+    ],
+    "implication": "Three products, including ones with different ingredients, being recalled on the same day for the same microbial reason suggests looking at common manufacturing environment factors rather than formulation. Such patterns can generally relate to shared equipment cleaning and water control, so check microbial control records on shared lines.",
+    "checks": [
+     "Microbial confirmation records after cleaning of shared manufacturing equipment",
+     "Microbial monitoring results for water shared across products"
+    ]
+   }
   },
   "recall-9e0edb7d81f3": {
    "title_issue": "뷰프로페진 잔류농약 부적합 회수",
@@ -1646,7 +3134,22 @@
    "checks": [
     "입고 원료 잔류농약 시험 항목 범위",
     "원료 공급처의 농약 사용 이력 확인"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for buprofezin pesticide residue",
+    "summary": "MFDS ordered a recall of a Lycium fruit herbal product from a domestic pharmaceutical company due to pesticide residue (buprofezin).",
+    "key_facts": [
+     "Reason: pesticide residue (buprofezin)",
+     "Product: a Lycium fruit herbal product",
+     "Mandatory: Y",
+     "Recall order date: 20261030"
+    ],
+    "implication": "Naming a specific pesticide, buprofezin, as the reason signals that pesticide use history at the raw material production stage bears directly on quality decisions. Those handling Lycium fruit material should check whether buprofezin is included in incoming residual pesticide testing.",
+    "checks": [
+     "Scope of residual pesticide test items for incoming materials",
+     "Verification of pesticide use history at raw material suppliers"
+    ]
+   }
   },
   "recall-a7bd40dfd288": {
    "title_issue": "총휘발성유기화합물 부적합 회수",
@@ -1661,7 +3164,22 @@
    "checks": [
     "충전 용기 내면 처리 및 세척 상태",
     "출하 전 총휘발성유기화합물 시험 실시 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for total volatile organic compounds",
+    "summary": "MFDS ordered a recall of a portable oxygen product from a domestic company due to quality nonconformity (total volatile organic compounds).",
+    "key_facts": [
+     "Reason: quality nonconformity (total volatile organic compounds)",
+     "Product: a portable oxygen product",
+     "Mandatory: Y",
+     "Recall order date: 20261029"
+    ],
+    "implication": "Total volatile organic compounds being the reason for an inhaled oxygen product signals that impurities from the container and filling system, not only the filling gas, are subject to control. Such nonconformities can generally relate to container and filling system control, so check these factors.",
+    "checks": [
+     "Inner surface treatment and washing state of filling containers",
+     "Whether total volatile organic compounds are tested before release"
+    ]
+   }
   },
   "recall-ad2ce8905966": {
    "title_issue": "휴대용산소 TVOC 부적합 회수",
@@ -1676,7 +3194,22 @@
    "checks": [
     "원료 가스 공급처 시험성적서의 휘발성 유기물 항목",
     "충전 공정 중 오염 유입 가능 지점 관리"
-   ]
+   ],
+   "en": {
+    "title_issue": "Portable oxygen TVOC nonconformity recall",
+    "summary": "MFDS ordered a recall of a portable oxygen product from a domestic company due to quality nonconformity (total volatile organic compounds).",
+    "key_facts": [
+     "Reason: quality nonconformity (total volatile organic compounds)",
+     "Product: a portable oxygen product",
+     "Mandatory: Y",
+     "Recall order date: 20261029"
+    ],
+    "implication": "A mandatory recall for total volatile organic compounds signals that the organic impurity limit is a key release item for inhaled oxygen products. A portable oxygen manufacturer should check the basis for controlling volatile organics in the source gas and filling process.",
+    "checks": [
+     "Volatile organic items on the source gas supplier's test certificate",
+     "Control of possible contamination entry points in the filling process"
+    ]
+   }
   },
   "recall-ad5fae1a1855": {
    "title_issue": "클로르피리포스 잔류농약 회수",
@@ -1691,7 +3224,22 @@
    "checks": [
     "택사 원료 로트별 클로르피리포스 시험 성적",
     "원료 공급처 변경 시 잔류농약 재평가 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for chlorpyrifos pesticide residue",
+    "summary": "MFDS ordered a recall of an Alisma rhizome herbal product from a domestic pharmaceutical company due to pesticide residue (chlorpyrifos).",
+    "key_facts": [
+     "Reason: pesticide residue (chlorpyrifos)",
+     "Product: an Alisma rhizome herbal product",
+     "Mandatory: Y",
+     "Recall order date: 20261030"
+    ],
+    "implication": "A residual pesticide recall naming chlorpyrifos signals that control variation at the growing origin and cultivation stage can lead to nonconforming finished products. Those handling Alisma rhizome material should check lot-by-lot residual pesticide test results and supplier control status.",
+    "checks": [
+     "Chlorpyrifos test results for each Alisma rhizome material lot",
+     "Re-evaluation of residual pesticides when the material supplier changes"
+    ]
+   }
   },
   "recall-af5348836ab4": {
    "title_issue": "순도시험 이물(씨) 부적합 회수",
@@ -1706,7 +3254,22 @@
    "checks": [
     "정선 공정 후 이물(씨) 혼입 확인 기록",
     "순도시험 이물 항목 시험 빈도"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for foreign matter (seeds) in purity test",
+    "summary": "MFDS ordered a recall of a Zanthoxylum fruit herbal product from a domestic pharmaceutical company due to foreign matter (seeds) in the purity test.",
+    "key_facts": [
+     "Reason: purity test, 1) foreign matter, a) seeds",
+     "Product: a Zanthoxylum fruit herbal product",
+     "Mandatory: Y",
+     "Recall order date: 20261030"
+    ],
+    "implication": "The seed limit under the foreign matter item of the purity test being the reason signals that physical control of sorting and cleaning, rather than chemical testing, is the issue. Such nonconformities can generally relate to sorting process control, so check foreign matter confirmation records after sorting.",
+    "checks": [
+     "Records confirming foreign matter (seeds) after the sorting process",
+     "Testing frequency for the foreign matter item of the purity test"
+    ]
+   }
   },
   "recall-bbeb5e7e244a": {
    "title_issue": "이산화황 사유 회수명령",
@@ -1721,7 +3284,22 @@
    "checks": [
     "원료 입고 시 이산화황 시험 실시 여부와 기준 적합성",
     "공급자 성적서와 자체 시험 결과의 일치 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall order for sulfur dioxide",
+    "summary": "MFDS issued a mandatory recall order (Mandatory: Y) for a galangal herbal product from a domestic pharmaceutical company, citing sulfur dioxide.",
+    "key_facts": [
+     "Product: a galangal herbal product",
+     "Reason: sulfur dioxide",
+     "Mandatory: Y",
+     "Recall order date: 20261030"
+    ],
+    "implication": "A mandatory recall over sulfur dioxide signals that residual sulfur dioxide control can be a direct release issue. Sulfur dioxide can generally relate to drying and preservation treatment history of the material, so check the reliability of material-stage test results.",
+    "checks": [
+     "Whether sulfur dioxide testing is performed on incoming material and the suitability of its criteria",
+     "Consistency between supplier certificates and in-house test results"
+    ]
+   }
   },
   "recall-c91f60aa3e8a": {
    "title_issue": "총휘발성유기화합물·포름알데히드 순도 부적합",
@@ -1736,7 +3314,22 @@
    "checks": [
     "순도 시험 항목에 총휘발성유기화합물·포름알데히드 포함 여부",
     "충전 용기·접촉 자재의 휘발성 물질 이행 평가"
-   ]
+   ],
+   "en": {
+    "title_issue": "Purity nonconformity: TVOC and formaldehyde",
+    "summary": "MFDS ordered a recall (Mandatory: Y) of a portable oxygen product from a domestic company due to quality nonconformity in purity (total volatile organic compounds and formaldehyde).",
+    "key_facts": [
+     "Product: a portable oxygen product",
+     "Reason: quality nonconformity (purity: total volatile organic compounds and formaldehyde)",
+     "Mandatory: Y",
+     "Recall order date: 20261029"
+    ],
+    "implication": "Total volatile organic compounds and formaldehyde being flagged under the purity item signals that control of impurity gases, beyond the main component content, can decide quality judgments. Such impurities can generally originate from filling containers or contact materials, so check these pathways.",
+    "checks": [
+     "Whether total volatile organic compounds and formaldehyde are included in purity test items",
+     "Migration assessment of volatile substances from filling containers and contact materials"
+    ]
+   }
   },
   "recall-f4a67b6bb40a": {
    "title_issue": "안정성시험 함량 기준일탈 회수",
@@ -1751,7 +3344,22 @@
    "checks": [
     "안정성 시험 함량 결과의 경시 추세 분석",
     "안정성 기준일탈 발생 시 시장 유통 로트 영향 평가 절차"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for assay out of specification in stability",
+    "summary": "A domestic pharmaceutical company is conducting a voluntary recall of a cream product due to an out-of-specification result in an item (assay) of the stability test.",
+    "key_facts": [
+     "Product: a cream product",
+     "Reason: voluntary recall by the marketing company due to out-of-specification result in a stability test item (assay)",
+     "Mandatory: N",
+     "Recall order date: 20261030"
+    ],
+    "implication": "An assay deviation found in post-release stability testing led to a voluntary recall, a sign that maintaining assay through shelf life is key to marketed product quality. Assay loss in creams can generally relate to storage conditions or active ingredient degradation, so check stability trend data.",
+    "checks": [
+     "Trend analysis of stability assay results over time",
+     "Procedure for assessing impact on distributed lots when a stability OOS occurs"
+    ]
+   }
   },
   "c0425b6520bc": {
    "title_issue": "미생물 오염 무균 용액 FDA WL",
@@ -1796,7 +3404,23 @@
     "서면·구두 불만 처리 절차와 불만 기록 파일 관리",
     "로트별 유통 기록을 통한 회수 추적 가능성",
     "HCT/P 기증자 적격성 판정 진술 동반 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "No complaint handling, QC unit, or lot tracking",
+    "summary": "FDA issued a 483 with 8 observations to Regen Suppliers LLC (Biological Product Distributor) after an inspection on 12/16/2025, covering complaint handling procedures, the quality control unit, and lot distribution tracking.",
+    "key_facts": [
+     "Number of observations: 8",
+     "Key citation: There is no quality control unit",
+     "Distribution control: No system established to identify distribution by lot and enable recall",
+     "Labeling: Expiration date not shown on the label in the required manner"
+    ],
+    "implication": "Citations spanning the lack of a quality control unit, complaint handling, labeling, and lot tracking signal that basic cGMP requirements apply in full to distribution-stage firms. The citation that HCT/P products were not accompanied by a donor eligibility determination statement shows a need to check accompanying documentation when distributing human-derived products.",
+    "checks": [
+     "Written and oral complaint handling procedures and complaint record file management",
+     "Recall traceability through lot-level distribution records",
+     "Whether HCT/P products are accompanied by a donor eligibility determination statement"
+    ]
+   }
   },
   "hc-82684": {
    "title_issue": "이물 입자 혼입 가능성 회수",
@@ -1814,7 +3438,22 @@
    ],
    "quotes_translation": [
     "오염"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for possible foreign particles",
+    "summary": "Health Canada announced a Type II recall under Contamination for the affected lot of PMS-FAMPRIDINE 10 mg Tablet from PHARMASCIENCE INC., which may contain foreign particles.",
+    "key_facts": [
+     "Product: PMS-FAMPRIDINE 10 mg Tablet",
+     "Reason: Contamination (possible foreign particles)",
+     "Class: Type II",
+     "Issue date: 2026-10-06"
+    ],
+    "implication": "A tablet product recalled for possible foreign particles shows that foreign matter control in solid dose processes is tied directly to recall risk. Foreign particles can generally relate to equipment wear or the raw material, so check the in-process foreign matter detection system.",
+    "checks": [
+     "Operating status of foreign matter detection and sorting devices in the tableting process",
+     "Root cause tracing and affected lot scope determination when foreign matter occurs"
+    ]
+   }
   },
   "hc-82891": {
    "title_issue": "금속 조각 혼입 가능성 회수",
@@ -1832,7 +3471,22 @@
    ],
    "quotes_translation": [
     "제품 품질"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for possible metal fragments",
+    "summary": "Health Canada announced a Type II recall under Product quality for Equate Ultra Strength Antacid Assorted Fruits (1000 mg chewable tablets) because it may contain metal fragments as foreign matter.",
+    "key_facts": [
+     "Product: Equate Ultra Strength Antacid Assorted Fruits",
+     "Category: Natural health products",
+     "Reason: Product quality (possible metal fragment foreign matter)",
+     "Class: Type II"
+    ],
+    "implication": "Possible metal fragments in a chewable tablet being the recall reason signals that dosage forms taken directly require stricter metal foreign matter control. Metal foreign matter can generally relate to damaged parts of tableting and milling equipment, so check equipment inspection intervals.",
+    "checks": [
+     "Metal detector sensitivity setting and periodic verification records",
+     "Inspection intervals for equipment parts such as tablet punches and screens"
+    ]
+   }
   },
   "be213c81b4cf": {
    "title_issue": "제약 운영의 시각적 인텔리전스",
@@ -1860,7 +3514,21 @@
    "checks": [
     "허가 예정 품목의 사전 GMP 평가 대상 여부",
     "사전 GMP 평가 제출 자료 준비 현황"
-   ]
+   ],
+   "en": {
+    "title_issue": "Product-level pre-GMP evaluation guideline",
+    "summary": "MFDS posted an operating guideline on product-level pre-GMP evaluation of medicinal products. Details require review of the original text.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: operating guideline on product-level pre-GMP evaluation of medicinal products",
+     "Issue date: 2026-10-29"
+    ],
+    "implication": "The guideline covers operating standards for pre-GMP evaluation at the marketing approval stage and may affect new product approval timelines and inspection preparation. The scope of changes needs review of the original text, so check changes in the evaluation procedure for products awaiting approval.",
+    "checks": [
+     "Whether upcoming approval products are subject to pre-GMP evaluation",
+     "Readiness of submission data for pre-GMP evaluation"
+    ]
+   }
   },
   "data0010-15313": {
    "title_issue": "의약품등 회수·폐기 처리 운영",
@@ -1874,7 +3542,21 @@
    "checks": [
     "회수 계획·보고 양식과 지침 요건의 정합성",
     "회수품 폐기 처리 기록 관리 방식"
-   ]
+   ],
+   "en": {
+    "title_issue": "Operating guideline for recall and disposal",
+    "summary": "MFDS posted an operating guideline on recall and disposal handling of medicinal products. Details require review of the original text.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: operating guideline on recall and disposal handling of medicinal products",
+     "Issue date: 2026-10-30"
+    ],
+    "implication": "The guideline covers administrative operating standards for recall and disposal and can serve as a reference point for company response procedures when a recall occurs. Whether it is a revision and its detailed requirements need review of the original text, so check alignment with the recall response system.",
+    "checks": [
+     "Alignment of recall plan and reporting forms with the guideline requirements",
+     "Record keeping for disposal of recalled products"
+    ]
+   }
   },
   "data0011-15978": {
    "title_issue": "박테리오파지 치료제 품질·비임상 평가",
@@ -1888,7 +3570,21 @@
    "checks": [
     "박테리오파지 치료제 개발 과제의 품질 평가 항목 대응",
     "임상시험 신청용 비임상 자료 구성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Bacteriophage therapy quality guideline",
+    "summary": "MFDS posted a guideline on quality and nonclinical evaluation of bacteriophage therapeutics in clinical trials. Details require review of the original text.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: guideline on quality and nonclinical evaluation of bacteriophage therapeutics in clinical trials",
+     "Issue date: 2026-10-29"
+    ],
+    "implication": "Clinical-stage quality and nonclinical evaluation standards for bacteriophage therapeutics, a new modality, signal that regulatory expectations for developers are becoming concrete. Detailed requirements need review of the original text, so companies with related pipelines should check how their quality data are composed.",
+    "checks": [
+     "Response of bacteriophage therapeutic projects to quality evaluation items",
+     "Composition of nonclinical data for clinical trial applications"
+    ]
+   }
   },
   "data0011-15981": {
    "title_issue": "일본뇌염 백신 품질평가",
@@ -1902,7 +3598,21 @@
    "checks": [
     "일본뇌염 백신 현행 기준 및 시험방법과 가이드라인 비교",
     "품질평가 항목별 시험법 밸리데이션 현황"
-   ]
+   ],
+   "en": {
+    "title_issue": "Japanese encephalitis vaccine quality guide",
+    "summary": "MFDS posted a quality evaluation guideline for Japanese encephalitis vaccines. Details require review of the original text.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: quality evaluation guideline for Japanese encephalitis vaccines",
+     "Issue date: 2026-10-30"
+    ],
+    "implication": "Quality evaluation standards for a specific vaccine category are now set out, which can be a reference point for test item setting by manufacturers and importers of such vaccines. Detailed evaluation items need review of the original text, so check differences from current specifications.",
+    "checks": [
+     "Comparison of current standards and test methods for the vaccine with the guideline",
+     "Test method validation status for each quality evaluation item"
+    ]
+   }
   },
   "data0011-15982": {
    "title_issue": "한약(생약)제제 GMP 질의응답",
@@ -1916,7 +3626,21 @@
    "checks": [
     "질의응답 문항과 현행 생약제제 GMP 운영 해석의 일치 여부",
     "생약 원료 관리 관련 문항의 사내 기준 반영 필요성"
-   ]
+   ],
+   "en": {
+    "title_issue": "GMP Q&A for herbal medicine preparations",
+    "summary": "MFDS posted a GMP question-and-answer booklet for herbal (crude drug) preparations, written as a guide for applicants. Details require review of the original text.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: GMP Q&A booklet for herbal (crude drug) preparations (applicant guide)",
+     "Issue date: 2026-10-30"
+    ],
+    "implication": "The applicant guide organizes GMP interpretation for herbal preparations in Q&A form and can serve as reference material for reducing interpretation gaps during inspections. The specific questions need review of the original text, so a herbal preparation manufacturer should compare them with its existing interpretation.",
+    "checks": [
+     "Consistency between the Q&A items and current herbal preparation GMP interpretation",
+     "Need to reflect raw herbal material control items in in-house standards"
+    ]
+   }
   },
   "data0011-15989": {
    "title_issue": "오가노이드 세포치료제 품질·비임상",
@@ -1930,7 +3654,21 @@
    "checks": [
     "오가노이드 세포치료제 개발 과제의 품질 특성분석 항목",
     "임상시험 신청용 비임상 평가 자료 구성"
-   ]
+   ],
+   "en": {
+    "title_issue": "Organoid therapy quality and nonclinical guide",
+    "summary": "MFDS posted a guideline on quality and nonclinical evaluation of organoid-based cell therapy products in clinical trials. Details require review of the original text.",
+    "key_facts": [
+     "Issuing agency: MFDS",
+     "Subject: guideline on quality and nonclinical evaluation of organoid-based cell therapy products in clinical trials",
+     "Issue date: 2026-10-30"
+    ],
+    "implication": "A separate clinical-stage evaluation standard for organoid-based cell therapies signals that regulatory expectations in advanced biologics are becoming more specific. Detailed requirements need review of the original text, so developers with related projects should check their characterization data plans.",
+    "checks": [
+     "Quality characterization items for organoid cell therapy development projects",
+     "Composition of nonclinical evaluation data for clinical trial applications"
+    ]
+   }
   },
   "07a33a63418b": {
    "title_issue": "예방적 조치 배치 회수",
@@ -1948,7 +3686,22 @@
    ],
    "quotes_translation": [
     "Advanz Pharma Limited는 Mynzepli 40 mg/mL 프리필드 시린지 주사용액의 특정 배치를 예방적 조치로 회수하고 있다."
-   ]
+   ],
+   "en": {
+    "title_issue": "Precautionary batch recall",
+    "summary": "Advanz Pharma Limited is recalling specified batches of Mynzepli 40 mg/mL solution for injection in pre-filled syringe as a precautionary measure, and MHRA announced it as Class 2.",
+    "key_facts": [
+     "Company: Advanz Pharma Limited",
+     "Product: Mynzepli 40 mg/mL solution for injection in pre-filled syringe",
+     "Class: Class 2",
+     "Nature of recall: precautionary measure"
+    ],
+    "implication": "Specified batches of a pre-filled syringe product being recalled as a precaution shows that recall decisions can be made before a defect is confirmed. The specific reason needs review of the original text, so check the criteria for precautionary recall decisions for similar dosage forms.",
+    "checks": [
+     "Criteria and decision records for precautionary recall decisions",
+     "Distribution record traceability to identify affected batches"
+    ]
+   }
   },
   "86de17d84fc1": {
    "title_issue": "표시량 미달 함량 회수",
@@ -1966,7 +3719,22 @@
    ],
    "quotes_translation": [
     "Xeal Pharma는 자사 Clopidogrel 경구 현탁액 및 경구 용액 전 함량 제품이 표시량보다 적은 clopidogrel을 함유하고 있다고 MHRA에 알렸다."
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for less than labelled amount",
+    "summary": "Xeal Pharma informed MHRA that all strengths of its Clopidogrel Oral Suspension and Clopidogrel Oral Solution products contain less than the labelled amount of clopidogrel, and MHRA announced a Class 2 recall.",
+    "key_facts": [
+     "Company: Xeal Pharma",
+     "Product: Clopidogrel Oral Suspension and Oral Solution (all strengths)",
+     "Reason: contain less clopidogrel than labelled amount",
+     "Class: Class 2"
+    ],
+    "implication": "All strengths, not specific batches, being recalled for less than the labelled amount shows that assay assurance in oral liquids can be a risk across the whole product line. Assay loss in liquids can generally relate to active ingredient degradation or homogeneity, so check the formulation and stability basis.",
+    "checks": [
+     "Assay stability trend of the oral liquid products",
+     "Suspension homogeneity and dose content uniformity evaluation"
+    ]
+   }
   },
   "e1b81b3ce05a": {
    "title_issue": "포장 혼입(함량 오류) 배치 회수",
@@ -1984,7 +3752,22 @@
    ],
    "quotes_translation": [
     "Accord-UK Ltd는 잘못된 함량이 관련된 포장 혼입으로 인해 Lercanidipine Hydrochloride 10mg 정제 1개 배치를 회수하고 있다."
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for packaging mix-up (wrong strength)",
+    "summary": "Accord-UK Ltd is recalling one batch of Lercanidipine Hydrochloride 10mg Tablets due to a packaging mix-up involving the incorrect strength, and MHRA announced it as Class 2.",
+    "key_facts": [
+     "Company: Accord-UK Ltd",
+     "Product: Lercanidipine Hydrochloride 10mg Film-Coated Tablets",
+     "Reason: packaging mix-up involving the incorrect strength",
+     "Class: Class 2"
+    ],
+    "implication": "A product of a different strength was mixed in at packaging, showing that mix-up risk is real on lines packing multiple strengths of the same ingredient. Packaging mix-ups can generally relate to line clearance and material identification control, so check these controls.",
+    "checks": [
+     "Line clearance records at changeover between strengths",
+     "System for verifying packaging material and tablet strength identity"
+    ]
+   }
   },
   "D-0038-2027": {
    "title_issue": "타 정제·캡슐 혼입 회수",
@@ -2002,7 +3785,22 @@
    ],
    "quotes_translation": [
     "이물 정제/캡슐 혼입"
-   ]
+   ],
+   "en": {
+    "title_issue": "Recall for foreign tablets or capsules",
+    "summary": "Teva Pharmaceuticals USA, Inc is conducting a Class II recall of bottled Metoclopramide Tablets, USP, 5 mg because other tablets or capsules were mixed in.",
+    "key_facts": [
+     "Company: Teva Pharmaceuticals USA, Inc",
+     "Product: Metoclopramide Tablets, USP, 5 mg (bottles of 100 or 500 tablets)",
+     "Reason: Presence of Foreign Tablets/Capsules",
+     "Class: Class II"
+    ],
+    "implication": "Other tablets or capsules being mixed into bottled tablets signals that mix-up prevention on multi-product bottle packaging lines is directly tied to recall risk. Mixing of foreign tablets can generally relate to handling of leftover product at changeover, so check line clearance procedures.",
+    "checks": [
+     "Confirmation of residual tablet removal at product changeover on bottle lines",
+     "Means of detecting foreign tablets in the filling process"
+    ]
+   }
   },
   "D-0039-2027": {
    "title_issue": "불순물/분해산물 규격 부적합",
@@ -2020,7 +3818,22 @@
    ],
    "quotes_translation": [
     "불순물/분해산물 규격 부적합."
-   ]
+   ],
+   "en": {
+    "title_issue": "Impurities/degradation specification failure",
+    "summary": "Zydus Pharmaceuticals (USA) Inc is recalling Hydrocortisone Sodium Succinate for Injection, USP 100 mg/vial as Class II for failed impurities/degradation specifications.",
+    "key_facts": [
+     "Company: Zydus Pharmaceuticals (USA) Inc",
+     "Product: Hydrocortisone Sodium Succinate for Injection, USP 100 mg/vial",
+     "Reason: Failed Impurities/Degradation Specifications",
+     "Class: Class II"
+    ],
+    "implication": "An injectable recalled for impurity and degradation specification failure shows that degradant growth during distribution can surface as a market quality issue. Degradant growth can generally relate to storage conditions or formulation stability, so check degradant trends in the stability data.",
+    "checks": [
+     "Degradant growth trend in stability testing and margin to specification",
+     "History of deviations from distribution and storage conditions"
+    ]
+   }
   },
   "D-0040-2027": {
    "title_issue": "무균성 보증 결여 일괄 회수",
@@ -2038,7 +3851,22 @@
    ],
    "quotes_translation": [
     "무균성 보증 결여."
-   ]
+   ],
+   "en": {
+    "title_issue": "Combined recall for lack of sterility assurance",
+    "summary": "Houston Rx LLC is recalling two injectable vial products as Class II for the same reason, lack of assurance of sterility.",
+    "key_facts": [
+     "Company: Houston Rx LLC",
+     "Reason: Lack of assurance of sterility",
+     "Class: Class II",
+     "Merged: combined recall of 2 products for the same reason"
+    ],
+    "implication": "Several injectable products being recalled together for the same reason, lack of sterility assurance, suggests the facility's aseptic process system itself may have been judged the problem rather than individual product defects. Such a lack can generally relate to aseptic process validation or environmental control, so check the assurance basis for the common process.",
+    "checks": [
+     "Status of process simulation (media fill) for the aseptic compounding process",
+     "Common risk assessment across injectable products made in the same facility"
+    ]
+   }
   },
   "D-0042-2027": {
    "title_issue": "포장 단위 타 정제 혼입 회수",
@@ -2056,7 +3884,22 @@
    ],
    "quotes_translation": [
     "이물 정제/캡슐 혼입"
-   ]
+   ],
+   "en": {
+    "title_issue": "Foreign tablets in packaged units recall",
+    "summary": "American Health Packaging is recalling Metoclopramide Tablets, USP, 5 mg, 100 Tablets (10 x 10) as Class II because other tablets or capsules were mixed in.",
+    "key_facts": [
+     "Company: American Health Packaging",
+     "Product: Metoclopramide Tablets, USP, 5 mg, 100 Tablets (10 x 10)",
+     "Reason: Presence of Foreign Tablets/Capsules",
+     "Class: Class II"
+    ],
+    "implication": "Foreign tablets or capsules were found in a unit dose packaged product, signaling that distributors and repackagers are also subject to mix-up risk control. Mix-ups in unit packaging can generally relate to item verification at the packaging input stage, so check controls at that step.",
+    "checks": [
+     "Product and lot reconciliation before unit dose packaging input",
+     "Foreign tablet inspection on the unit dose packaging line"
+    ]
+   }
   },
   "9047057e73ae": {
    "title_issue": "Annex 1 주요 변경 해석 PI 058-1",
@@ -2071,7 +3914,22 @@
    "checks": [
     "Annex 1(2022) 갭 분석 결과와 PI 058-1 해석의 차이",
     "오염관리전략(CCS) 문서의 해석 반영 필요성"
-   ]
+   ],
+   "en": {
+    "title_issue": "PIC/S PI 058-1 on Annex 1 key changes",
+    "summary": "PIC/S published Recommendation PI 058-1, an interpretation of the most important changes in Annex 1 (Manufacture of Sterile Products, 2022). Details require checking the original text.",
+    "key_facts": [
+     "Issuing body: PIC/S",
+     "Document: Recommendation PI 058-1",
+     "Subject: Annex 1 on the Manufacture of Sterile Products (2022)",
+     "Issue date: 2026-10-28"
+    ],
+    "implication": "An official PIC/S interpretation of the key Annex 1 (2022) changes signals alignment of member inspectorates' criteria for assessing sterile manufacturing. Because the interpretation itself requires checking the original text, sterile manufacturers should compare it with their existing Annex 1 gap analysis.",
+    "checks": [
+     "Differences between the Annex 1 (2022) gap analysis and the PI 058-1 interpretation",
+     "Need to reflect the interpretation in the contamination control strategy (CCS) document"
+    ]
+   }
   },
   "who-whopir-02bd4c5ce790": {
    "title_issue": "API 제조소 WHO 실사 보고",
@@ -2086,7 +3944,22 @@
    "checks": [
     "Quality Unit의 생산 부서로부터의 독립성",
     "중간체·API 출하 승인자 지정 및 권한 문서화"
-   ]
+   ],
+   "en": {
+    "title_issue": "WHO inspection report on an API manufacturer",
+    "summary": "WHO published a public inspection report (WHOPIR) for Styrax Life Science Pvt Ltd (Anakapalli), inspected 2026-06-01. Under quality management, a Quality Unit independent of production and designated release approvers for intermediates and API were confirmed.",
+    "key_facts": [
+     "Subject: Styrax Life Science Pvt Ltd (Anakapalli)",
+     "Inspection date: 2026-06-01",
+     "Quality management: Quality Unit independent of production established",
+     "Release approval: Release approvers for intermediates and API clearly designated"
+    ],
+    "implication": "That the WHOPIR quality management section first confirmed Quality Unit independence and definition of release approval authority signals that these two elements are basic checkpoints in API manufacturer assessment. A company sourcing API from this manufacturer should read the full report as supplier evaluation material.",
+    "checks": [
+     "Independence of the Quality Unit from the production department",
+     "Designation of release approvers for intermediates and API and documentation of their authority"
+    ]
+   }
   },
   "who-whopir-26b2f92e5e11": {
    "title_issue": "QA·QC 분리 품질시스템 실사",
@@ -2101,7 +3974,22 @@
    "checks": [
     "QA·QC 기능 분리와 생산 부서로부터의 독립성",
     "주요 품질 요소별 절차의 문서화 범위"
-   ]
+   ],
+   "en": {
+    "title_issue": "Quality system with separate QA and QC",
+    "summary": "WHO published a public inspection report (WHOPIR) for Hetero Labs (Unit 5 Polepally) from the 2026-04-21 inspection, noting a documented QA system and QA/QC units separate from production.",
+    "key_facts": [
+     "Subject: Hetero Labs (Unit 5 Polepally)",
+     "Inspection date: 2026-04-21",
+     "Quality system: documented QA system with procedures covering main quality elements",
+     "Organization: Quality Department split into QA and QC, separate from production"
+    ],
+    "implication": "The WHOPIR stating that the quality department is split into QA and QC and separated from production signals that organizational role separation is the starting point of PQS assessment. A company procuring from this site should check whether the report's follow-up items feed into supplier evaluation.",
+    "checks": [
+     "Separation of QA and QC functions and independence from production",
+     "Documentation coverage of procedures for the main quality elements"
+    ]
+   }
   },
   "who-whopir-450578ba3928": {
    "title_issue": "통합 QA 조직 운영 실사 보고",
@@ -2116,7 +4004,22 @@
    "checks": [
     "통합 QA 조직 내 QC 시험 검토와 출하 판정 간 견제 장치",
     "Quality Assurance Unit의 생산으로부터의 독립성"
-   ]
+   ],
+   "en": {
+    "title_issue": "WHO inspection of a combined QA/QC unit",
+    "summary": "WHO published a public inspection report (WHOPIR) for Styrax Pharma (Andhra Pradesh) from the 2026-05-26 inspection, noting that an independent Quality Assurance Unit performs both QA and QC functions.",
+    "key_facts": [
+     "Subject: Styrax Pharma (Andhra Pradesh)",
+     "Inspection date: 2026-05-26",
+     "Quality management: independent Quality Assurance Unit in operation",
+     "Function: one unit performs both QA and QC functions"
+    ],
+    "implication": "A single independent unit covering both QA and QC was accepted in the WHOPIR, a sign that independence matters more than organizational form in the assessment. Where QA and QC are combined, check how checks and balances are kept between test result review and batch release decisions.",
+    "checks": [
+     "Checks and balances between QC test review and release decisions in a combined QA unit",
+     "Independence of the Quality Assurance Unit from production"
+    ]
+   }
   },
   "who-whopir-80f937e4feb4": {
    "title_issue": "완제의약품(FPP) 시설 WHO 실사",
@@ -2131,12 +4034,32 @@
    "checks": [
     "완제품 위탁 제조소 WHOPIR 확보 및 검토 여부",
     "품질시스템 절차가 주요 품질 요소를 포괄하는지 여부"
-   ]
+   ],
+   "en": {
+    "title_issue": "WHO inspection of a finished product site",
+    "summary": "WHO published a public inspection report (WHOPIR) for Hetero Labs (Unit III Jeedimetla - FPP) from the 2026-04-27 inspection, noting a documented quality assurance system with procedures covering the main quality elements.",
+    "key_facts": [
+     "Subject: Hetero Labs (Unit III Jeedimetla - FPP)",
+     "Inspection date: 2026-04-27",
+     "Site type: FPP",
+     "Quality system: documented QA system with procedures covering main quality elements"
+    ],
+    "implication": "A finished pharmaceutical product (FPP) site WHOPIR opening with confirmation of a documented quality system signals that a complete procedural framework is a baseline expectation in WHO inspections. A company sourcing finished products from this site should check the rest of the report as part of contract manufacturer oversight.",
+    "checks": [
+     "Whether the WHOPIR for the contract finished-product site has been obtained and reviewed",
+     "Whether quality system procedures cover the main quality elements"
+    ]
+   }
   }
  },
  "tldr": [
   "FDA, TSP Solutions·Sanrace에 원료 확인시험 미실시 등 CGMP 위반 경고서한",
   "Houston Rx, 무균성 보증 결여(Lack of assurance of sterility)로 주사 바이알 2품목 Class II 회수",
   "광동제약 큐아크네플러스크림, 안정성시험 함량 기준일탈로 영업자 회수"
+ ],
+ "tldr_en": [
+  "FDA issued a Warning Letter to TSP Solutions and Sanrace over CGMP violations including no identity testing of raw materials.",
+  "Houston Rx recalled two injectable vial products (Class II) for lack of assurance of sterility.",
+  "A domestic marketer recalled an acne cream product after an out-of-specification assay in stability testing."
  ]
 }

@@ -1646,6 +1646,42 @@ def render_pdf(html_path: Path, pdf_path: Path, chrome: str, timeout: int = 120)
         raise RuntimeError(f"PDF 생성 실패: {pdf_path}")
 
 
+def render_png(html_path: Path, png_path: Path, chrome: str, timeout: int = 120) -> None:
+    """헤드리스 Chrome 스크린샷 — 슬라이드 1장짜리 html 을 1080x1350 PNG 로."""
+    profile = Path(tempfile.mkdtemp(prefix="grm-linkedin-chrome-"))
+    cmd = [chrome, "--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--no-first-run",
+           "--no-default-browser-check", f"--user-data-dir={profile}", "--window-size=1080,1350",
+           "--run-all-compositor-stages-before-draw", "--virtual-time-budget=15000",
+           f"--screenshot={png_path.resolve()}", html_path.resolve().as_uri()]
+    subprocess.run(cmd, check=False, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
+    shutil.rmtree(profile, ignore_errors=True)
+    if not png_path.exists() or png_path.stat().st_size < 2000:
+        raise RuntimeError(f"PNG 생성 실패: {png_path}")
+
+
+def render_pngs(deck: dict, stem: str, out_dir: Path, chrome: str) -> list[str]:
+    """슬라이드마다 PNG(`{stem}_01.png`…)를 낸다. 하나라도 실패하면 이미 쓴 PNG 를 지우고 빈 목록 —
+    반쪽짜리 세트가 나가면 작성창에 장이 빠진 채 올라간다."""
+    names: list[str] = []
+    try:
+        for i, slide in enumerate(deck["slides"], 1):
+            one = dict(deck, slides=[slide])
+            tmp = out_dir / f"{stem}_{i:02d}.tmp.html"
+            tmp.write_text(render_html(one), encoding="utf-8")
+            name = f"{stem}_{i:02d}.png"
+            try:
+                render_png(tmp, out_dir / name, chrome)
+            finally:
+                tmp.unlink(missing_ok=True)
+            names.append(name)
+    except Exception as exc:  # 비차단
+        print(f"::warning::{stem} PNG 렌더 실패({type(exc).__name__}) — PNG 건너뜀", file=sys.stderr)
+        for n in names + [f"{stem}_{len(names) + 1:02d}.png"]:
+            (out_dir / n).unlink(missing_ok=True)
+        return []
+    return names
+
+
 def latest_brief_path(data_dir: Path) -> Path | None:
     files = sorted(data_dir.glob("brief_web_*.json"))
     return files[-1] if files else None
@@ -1680,7 +1716,8 @@ def auto_months(briefs: list[dict]) -> list[str]:
     return [prev, cur]
 
 
-def _emit_deck(deck: dict, stem: str, out_dir: Path, chrome: str | None, keep_html: bool) -> None:
+def _emit_deck(deck: dict, stem: str, out_dir: Path, chrome: str | None, keep_html: bool,
+               png: bool = False) -> list[str]:
     """덱 하나를 txt(+html)로 쓰고, Chrome 이 있으면 pdf 도 낸다 — 매주 덱·월간 덱
     ([마케팅 2026-09-23 L-06]) 공용(산출 로직 한 벌). PDF 실패는 비차단(배포는 카드
     없이도 진행)."""
@@ -1696,8 +1733,10 @@ def _emit_deck(deck: dict, stem: str, out_dir: Path, chrome: str | None, keep_ht
         except Exception as exc:  # 비차단 — 배포는 카드 없이도 진행한다
             print(f"::warning::{stem}.pdf 렌더 실패({type(exc).__name__}) — html/txt 만 출력",
                   file=sys.stderr)
+    pngs = render_pngs(deck, stem, out_dir, chrome) if (chrome and png) else []
     if not keep_html:
         html_path.unlink(missing_ok=True)
+    return pngs
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1714,6 +1753,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--glossary", default=str(WEB_DIR / "data" / "glossary.json"))
     ap.add_argument("--out", required=True, help="출력 루트(dist) — briefs/{pub}/linkedin.{pdf,txt} 를 낸다")
     ap.add_argument("--anon", action="store_true", help="업체명을 가명(업체 A/B/C)으로")
+    ap.add_argument("--png", action="store_true",
+                    help="슬라이드별 PNG(linkedin_01.png…)와 linkedin_cards.json 매니페스트도 낸다(주간 덱만)")
     ap.add_argument("--html", action="store_true", help="linkedin.html 도 출력에 남긴다")
     ap.add_argument("--no-pdf", action="store_true", help="Chrome 렌더를 건너뛴다(html/txt 만)")
     ap.add_argument("--lang", default=",".join(LANGS),
@@ -1776,6 +1817,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     brief_doc = json.loads(brief_path.read_text(encoding="utf-8"))
 
+    manifest: dict[str, list[str]] = {}
+    pub_dir = ""
     for lang in langs:
         # 파일 이름: 한국어는 기존 그대로(linkedin.*), 영어는 접미(linkedin_en.*).
         # 기존 링크·운영 루틴을 건드리지 않으려고 가산만 한다.
@@ -1787,7 +1830,15 @@ def main(argv: list[str] | None = None) -> int:
             print(f"::warning::{stem} 건너뜀 — 실을 소식 장이 0(브리프 카드에 {lang} 본문 없음)",
                   file=sys.stderr)
             continue
-        _emit_deck(deck, stem, Path(args.out) / "briefs" / deck["pub"], chrome, args.html)
+        pub_dir = deck["pub"]
+        pngs = _emit_deck(deck, stem, Path(args.out) / "briefs" / deck["pub"], chrome, args.html, args.png)
+        if args.png:
+            manifest[lang] = pngs
+    if args.png and any(manifest.values()):
+        out = Path(args.out) / "briefs" / pub_dir
+        (out / "linkedin_cards.json").write_text(
+            json.dumps({k: manifest.get(k, []) for k in LANGS}, ensure_ascii=False, indent=1) + "\n",
+            encoding="utf-8")
     return 0
 
 

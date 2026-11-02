@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T01:27:01Z",
+ "generated_at": "2026-11-02T01:58:44Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,50 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 41374647610,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T01:51:34Z",
+    "updatedAt": "2026-11-02T01:51:53Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41374647610"
+   },
+   {
+    "databaseId": 41373833201,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T01:41:57Z",
+    "updatedAt": "2026-11-02T01:42:18Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41373833201"
+   },
+   {
+    "databaseId": 41372996394,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T01:32:19Z",
+    "updatedAt": "2026-11-02T01:32:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372996394"
+   },
+   {
+    "databaseId": 41372621661,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-02T01:27:56Z",
+    "updatedAt": "2026-11-02T01:28:18Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372621661"
+   },
+   {
     "databaseId": 41372174141,
     "status": "completed",
     "conclusion": "success",
@@ -69,53 +113,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372174141"
-   },
-   {
-    "databaseId": 41371296156,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T01:13:03Z",
-    "updatedAt": "2026-11-02T01:13:26Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41371296156"
-   },
-   {
-    "databaseId": 41370421015,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T01:03:25Z",
-    "updatedAt": "2026-11-02T01:03:45Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370421015"
-   },
-   {
-    "databaseId": 41369595687,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T00:53:47Z",
-    "updatedAt": "2026-11-02T00:54:09Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41369595687"
-   },
-   {
-    "databaseId": 41368735192,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T00:44:09Z",
-    "updatedAt": "2026-11-02T00:44:30Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41368735192"
    }
   ],
   "grm-web-publish.yml": [
+   {
+    "databaseId": 41375124348,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T01:57:19Z",
+    "updatedAt": "2026-11-02T01:58:36Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1277 from MINHOYEOM/claude/dazzling-hopper-lygh07",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375124348"
+   },
    {
     "databaseId": 40603680538,
     "status": "completed",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "GRM Web Publish (assemble)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40269730976"
-   },
-   {
-    "databaseId": 40248114058,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-10-26T00:11:09Z",
-    "updatedAt": "2026-10-26T00:12:35Z",
-    "headBranch": "main",
-    "displayTitle": "bridge(web): 2026-10-26 라우틴 델타 커밋 (자동)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40248114058"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41372514943,
+    "databaseId": 41375222612,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-02T01:58:35Z",
+    "updatedAt": "2026-11-02T01:58:39Z",
+    "headBranch": "publish/brief-2026-11-02",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375222612"
+   },
+   {
+    "databaseId": 41375218233,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T01:26:38Z",
-    "updatedAt": "2026-11-02T01:26:57Z",
-    "headBranch": "main",
-    "displayTitle": "admin: 회원 중 구독자 수(member_overlap, 숫자만) (#1273)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372514943"
+    "createdAt": "2026-11-02T01:58:32Z",
+    "updatedAt": "2026-11-02T01:58:36Z",
+    "headBranch": "publish/brief-2026-11-02",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375218233"
    },
    {
-    "databaseId": 41372458533,
-    "status": "completed",
-    "conclusion": "cancelled",
+    "databaseId": 41375124335,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T01:25:59Z",
-    "updatedAt": "2026-11-02T01:26:54Z",
+    "createdAt": "2026-11-02T01:57:19Z",
+    "updatedAt": "2026-11-02T01:57:23Z",
     "headBranch": "main",
-    "displayTitle": "feat(admin): 링크드인 탭 — 이번 주 국·영문 본문 복사와 카드 PDF 링크 (#1279)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372458533"
+    "displayTitle": "Merge pull request #1277 from MINHOYEOM/claude/dazzling-hopper-lygh07",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375124335"
    },
    {
-    "databaseId": 41370363979,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 41375035021,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-02T01:02:47Z",
-    "updatedAt": "2026-11-02T01:07:23Z",
+    "createdAt": "2026-11-02T01:56:12Z",
+    "updatedAt": "2026-11-02T01:56:16Z",
     "headBranch": "feat/brief-approval-mail",
     "displayTitle": "feat(ops): 브리프 발행 PR 준비 시 대표 결재 요청 메일",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370363979"
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375035021"
    },
    {
-    "databaseId": 41370355059,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 41375030255,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-02T01:02:41Z",
-    "updatedAt": "2026-11-02T01:07:02Z",
+    "createdAt": "2026-11-02T01:56:08Z",
+    "updatedAt": "2026-11-02T01:56:12Z",
     "headBranch": "feat/brief-approval-mail",
-    "displayTitle": "feat(ops): 브리프 발행 PR 준비 시 대표 결재 요청 메일 자동 발송(기본 dry-run)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370355059"
-   },
-   {
-    "databaseId": 41370310291,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-02T01:02:08Z",
-    "updatedAt": "2026-11-02T01:06:24Z",
-    "headBranch": "feat/admin-linkedin-card",
-    "displayTitle": "feat(admin): 링크드인 탭 — 국·영문 본문 복사와 카드 PDF 링크",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370310291"
+    "displayTitle": "fix(ops): 결재 메일 CLI stdout UTF-8 가드(CI 인코딩 가드 테스트)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375030255"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -540,7 +540,19 @@
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41203817317"
    }
   ],
-  "grm-cloud-request.yml": []
+  "grm-cloud-request.yml": [
+   {
+    "databaseId": 41372666537,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T01:28:29Z",
+    "updatedAt": "2026-11-02T01:28:44Z",
+    "headBranch": "claude/request-20261102-1028-ping",
+    "displayTitle": "chore(requests): ping 요청 마커 20261102-1028-ping",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372666537"
+   }
+  ]
  },
  "intake_artifacts": [
   {

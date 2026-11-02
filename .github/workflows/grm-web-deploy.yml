@@ -115,8 +115,8 @@ jobs:
       #   골든·결정론에 영향 0(Chrome 은 이 스텝만 쓴다). 월간 결산 덱은 바로 아래 별도 스텝.
       - name: LinkedIn cards (non-blocking)
         continue-on-error: true
-        timeout-minutes: 5
-        run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist
+        timeout-minutes: 12
+        run: python web/linkedin_cards.py --data web/data/briefs --glossary web/data/glossary.json --out web/dist --png
 
       # ── C2c: 링크드인 월간 결산 덱([마케팅 2026-09-23 L-06]) — 비차단. ──────────────────
       #   같은 스크립트를 `--months auto` 로 다시 불러 **최신 호가 속한 달 + 그 전 달** 두 편을

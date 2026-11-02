@@ -1171,5 +1171,59 @@ class MonthlyCliTest(unittest.TestCase):
             self.assertFalse((out / "monthly").exists())
 
 
+class PngTests(unittest.TestCase):
+    """PNG 세트 — Chrome 없이 render_png 를 가짜로 바꿔 파일명·매니페스트·롤백만 본다."""
+
+    def _deck(self):
+        return {"pub": "2026-09-07", "lang": "ko", "doc_title": "t",
+                "slides": [{"kind": "cover"}, {"kind": "cover"}, {"kind": "cover"}]}
+
+    def test_names_are_numbered_and_tmp_html_removed(self):
+        orig_png, orig_html = lc.render_png, lc.render_html
+        lc.render_html = lambda deck, **kw: "<html></html>"
+        lc.render_png = lambda h, p, c, timeout=120: p.write_bytes(b"x" * 3000)
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                out = pathlib.Path(tmp)
+                names = lc.render_pngs(self._deck(), "linkedin_en", out, "chrome")
+                self.assertEqual(names, ["linkedin_en_01.png", "linkedin_en_02.png", "linkedin_en_03.png"])
+                self.assertEqual(sorted(p.name for p in out.iterdir()), names)
+        finally:
+            lc.render_png, lc.render_html = orig_png, orig_html
+
+    def test_partial_failure_rolls_back_to_empty(self):
+        orig_png, orig_html = lc.render_png, lc.render_html
+        calls = []
+
+        def fake(h, p, c, timeout=120):
+            calls.append(p.name)
+            if len(calls) == 3:
+                raise RuntimeError("boom")
+            p.write_bytes(b"x" * 3000)
+        lc.render_html = lambda deck, **kw: "<html></html>"
+        lc.render_png = fake
+        try:
+            with tempfile.TemporaryDirectory() as tmp, redirect_stderr(io.StringIO()):
+                out = pathlib.Path(tmp)
+                self.assertEqual(lc.render_pngs(self._deck(), "linkedin", out, "chrome"), [])
+                self.assertEqual(list(out.iterdir()), [])
+        finally:
+            lc.render_png, lc.render_html = orig_png, orig_html
+
+    def test_png_flag_without_chrome_writes_no_manifest(self):
+        orig = lc.find_chrome
+        lc.find_chrome = lambda: None
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                out = pathlib.Path(tmp) / "dist"
+                with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                    rc = lc.main(["--data", str(BRIEF.parent), "--brief", str(BRIEF), "--glossary", str(GLOSSARY),
+                                  "--out", str(out), "--png"])
+                self.assertEqual(rc, 0)
+                self.assertFalse((out / "briefs" / "2026-09-07" / "linkedin_cards.json").exists())
+        finally:
+            lc.find_chrome = orig
+
+
 if __name__ == "__main__":
     unittest.main()

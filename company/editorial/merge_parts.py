@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""기자 샤드 4개의 결과를 delta.json · deep_delta.json 으로 합친다 (교열이 첫 단계로 돌린다).
+"""기자 샤드 N개(가변)의 결과를 delta.json · deep_delta.json 으로 합친다 (교열이 첫 단계로 돌린다).
 
 LLM 이 옮겨 적지 않는다 — 딕셔너리 합집합만 한다. 데스크의 `shards` 계획과 한 장도 어긋나면 exit 1.
 
@@ -9,8 +9,7 @@ import json
 import os
 import sys
 
-DELTA_SHARDS = ("A", "B")
-DEEP_SHARDS = ("A", "B")
+# 샤드 이름은 데스크 계획(desk.json shards)의 키 — A, B, C … (plan_shards.py). 고정이 아니다.
 
 
 def _load(path):
@@ -51,7 +50,9 @@ def merge(folder):
         return None, None, ["desk.json 에 shards 계획이 없다"]
 
     cards, tldr, tldr_en, deep = {}, None, None, {}
-    for s in DELTA_SHARDS:
+    delta_shards = sorted(plan.get("delta", {}))
+    deep_shards = sorted(plan.get("deep", {}))
+    for s in delta_shards:
         planned = plan["delta"].get(s, [])
         part = _part(folder, f"delta.{s}.json", planned, problems)
         if part is None:
@@ -61,10 +62,19 @@ def merge(folder):
         cards.update(got)
         if "tldr" in part:
             tldr, tldr_en = part["tldr"], part.get("tldr_en")
+    # tldr·tldr_en 은 가상 샤드 T(delta.T.json) 몫. 옛 형식(델타 샤드 안에 tldr)도 받는다.
+    t_name = plan.get("tldr") or "T"
+    t_path = os.path.join(folder, f"delta.{t_name}.json")
+    if os.path.exists(t_path):
+        t_part = _load(t_path)
+        if t_part.get("status") == "완료":
+            tldr, tldr_en = t_part.get("tldr"), t_part.get("tldr_en")
+        else:
+            problems.append(f"delta.{t_name}.json: status={t_part.get('status')!r} (완료 아님)")
     if not tldr or not tldr_en:
-        problems.append("tldr · tldr_en 이 없다 (delta.B.json 의 몫)")
+        problems.append("tldr · tldr_en 이 없다 (delta.T.json 의 몫)")
 
-    for s in DEEP_SHARDS:
+    for s in deep_shards:
         planned = plan["deep"].get(s, [])
         part = _part(folder, f"deep.{s}.json", planned, problems)
         if part is None:

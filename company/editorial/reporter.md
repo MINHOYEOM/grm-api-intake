@@ -1,4 +1,4 @@
-# 브리프편집팀 · 기자 (작성) — 샤드 4개: 델타-A·델타-B = Opus(글 품질 기준) · 심층-A·심층-B = Sonnet(번역·스키마 위주, 검증은 브릿지 게이트)
+# 브리프편집팀 · 기자 (작성) — 가변 샤드(워커 루프): 델타 = Opus(글 품질 기준) · 심층 = Sonnet(번역·스키마 위주, 검증은 브릿지 게이트)
 
 ## 읽을 것 (이 순서로, 이것만)
 1. `company/CHARTER.md`
@@ -26,12 +26,15 @@
 [역할] 중 기자 몫은 "(1) 카드별 산문 슬롯"과 "(3) LLM 슬롯 값 산출"이다. 검색은 데스크가 이미 했다 —
 `desk.json` 의 `search_findings` 만 보강 사실로 쓴다(새로 검색하지 않는다).
 
-## 어느 샤드인가 — 예약작업 프롬프트가 `샤드: 델타-A | 델타-B | 심층-A | 심층-B` 한 줄로 알려 준다
-RUN.md 6항 규칙을 따른다. 자기 결과 파일이 이미 `완료`면 종료. 자기 샤드 목록이 비어 있으면 빈 결과(`완료`)를 쓰고 종료.
+## 어느 샤드인가 — 예약작업 프롬프트가 `워커: 델타-1 | 델타-1+ | 심층-2 …` 한 줄로 알려 준다 (2026-11-02 가변 샤드)
+샤드는 데스크 계획(`desk.json` 의 `shards`)에 있는 만큼 — A, B, C… 와 가상 샤드 `T`(tldr). 어느 샤드를 할지는 **RUN.md 7항 루프**가 정한다
+(`shard_claim.py next` → `claim`). 자기 종류(델타=Opus·심층=Sonnet)가 아닌 샤드는 가져오지 않는다. 가져온 샤드의 결과 파일이 이미 `완료`면 건너뛴다.
+자기 샤드 목록이 비어 있으면 빈 결과(`완료`)를 쓰고 다음으로. 샤드를 끝낼 때마다 결과 파일을 커밋·push 하고(RUN.md 3항) 루프로 돌아간다.
 
 | 샤드 | 하는 일 | 결과 파일 |
 |---|---|---|
-| 델타-A·B | 아래 "하는 일" 1·2번 — 자기 목록 카드의 산문 슬롯(한·영). **B 는 추가로 `tldr`·`tldr_en`**(3개씩) — `delta.A.json` 이 `완료`가 아니면 `보류` | `delta.{A,B}.json` = `{"status","run_date_kst","shard","cards":{web_card_id:{슬롯…}}}` (B 만 `tldr`·`tldr_en` 추가) |
+| 델타-A·B·C… | 아래 "하는 일" 1·2번 — 자기 목록 카드의 산문 슬롯(한·영) |
+| 델타-T | **모든 델타 샤드가 `완료`가 된 뒤에만.** `tldr`·`tldr_en`(3개씩)을 쓴다 — 각 `delta.{S}.json` 의 `title_issue` 를 읽는다 → `delta.T.json` = `{"status","run_date_kst","tldr":[…],"tldr_en":[…]}` | `delta.{A,B}.json` = `{"status","run_date_kst","shard","cards":{web_card_id:{슬롯…}}}` (B 만 `tldr`·`tldr_en` 추가) |
 | 심층-A·B | 아래 "하는 일" 3번 — 자기 목록의 심층분석·`observations_ko`(★필수)·`violations_ko`·`ncr_ko` | `deep.{A,B}.json` = `{"status","run_date_kst","shard","items":{web_card_id:{deep_analysis,observations_ko?,violations_ko?,ncr_ko?}}}` |
 
 카드 키는 `web_card_id` 만(`card_id` 금지). 목록에 없는 카드는 쓰지 않고, 목록의 카드는 하나도 빠뜨리지 않는다 — `merge_parts.py` 가 계획과 대조한다.

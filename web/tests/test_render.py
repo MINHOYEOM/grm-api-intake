@@ -8940,6 +8940,18 @@ class WebCloudflareBeaconGateTest(unittest.TestCase):
         # 이중 안전벨트 — 게이트(/admin 분기)와 admin.js 양쪽이 같은 플래그를 세운다.
         self.assertIn('localStorage.setItem("grm-op", "1")', self.admin_js)
 
+    def test_admin_linkedin_panel_wired(self):
+        # 링크드인 탭 — 본문 복사·PDF 링크만. 게시 버튼·외부 호출은 없다(게시는 사람).
+        for needle in ('data-tab="linkedin"', 'data-panel="linkedin"', 'id="grm-li-caption-ko"',
+                       'id="grm-li-caption-en"', 'data-copy="grm-li-caption-ko"'):
+            self.assertIn(needle, (WEB_DIR / "templates" / "admin.html").read_text(encoding="utf-8"))
+        self.assertIn("renderLinkedin()", self.admin_js)
+        body = self.admin_js.split("function renderLinkedin", 1)[1].split("function loadOverview", 1)[0]
+        for banned in ("linkedin.com", "method:", "api("):
+            self.assertNotIn(banned, body)
+        # PNG 링크는 파일명 정규식을 통과한 것만(매니페스트가 오염돼도 임의 경로 링크 금지)
+        self.assertIn(".png$/", body)
+
 
 # ── 한글 안전 가드 (§4 — 강제: 한글에 mono/자간/대문자/이탤릭 금지) ─────────────
 class WebKoreanSafetyTest(unittest.TestCase):

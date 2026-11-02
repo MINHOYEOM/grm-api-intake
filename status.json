@@ -1,0 +1,572 @@
+{
+ "generated_at": "2026-11-02T01:27:01Z",
+ "workflows": {
+  "grm-intake.yml": [
+   {
+    "databaseId": 41355308842,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-01T22:05:18Z",
+    "updatedAt": "2026-11-01T22:18:35Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41355308842"
+   },
+   {
+    "databaseId": 41244592056,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-31T21:39:17Z",
+    "updatedAt": "2026-10-31T21:51:20Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41244592056"
+   },
+   {
+    "databaseId": 41137939924,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-30T22:24:41Z",
+    "updatedAt": "2026-10-30T22:40:13Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41137939924"
+   },
+   {
+    "databaseId": 40968546266,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-29T22:47:47Z",
+    "updatedAt": "2026-10-29T22:58:31Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40968546266"
+   },
+   {
+    "databaseId": 40781478508,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-28T22:38:10Z",
+    "updatedAt": "2026-10-28T22:50:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40781478508"
+   }
+  ],
+  "grm-delta-bridge.yml": [
+   {
+    "databaseId": 41372174141,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T01:22:40Z",
+    "updatedAt": "2026-11-02T01:22:59Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372174141"
+   },
+   {
+    "databaseId": 41371296156,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T01:13:03Z",
+    "updatedAt": "2026-11-02T01:13:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41371296156"
+   },
+   {
+    "databaseId": 41370421015,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T01:03:25Z",
+    "updatedAt": "2026-11-02T01:03:45Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370421015"
+   },
+   {
+    "databaseId": 41369595687,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T00:53:47Z",
+    "updatedAt": "2026-11-02T00:54:09Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41369595687"
+   },
+   {
+    "databaseId": 41368735192,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T00:44:09Z",
+    "updatedAt": "2026-11-02T00:44:30Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41368735192"
+   }
+  ],
+  "grm-web-publish.yml": [
+   {
+    "databaseId": 40603680538,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-10-27T23:40:05Z",
+    "updatedAt": "2026-10-27T23:41:12Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1219 from MINHOYEOM/claude/brief-2026-10-26-fda48…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40603680538"
+   },
+   {
+    "databaseId": 40513307937,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-10-27T13:35:10Z",
+    "updatedAt": "2026-10-27T13:36:29Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Publish (assemble)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40513307937"
+   },
+   {
+    "databaseId": 40512875379,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "push",
+    "createdAt": "2026-10-27T13:32:12Z",
+    "updatedAt": "2026-10-27T13:33:27Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1213 from MINHOYEOM/claude/brief-2026-10-26-fda48…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40512875379"
+   },
+   {
+    "databaseId": 40269730976,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-10-26T04:34:01Z",
+    "updatedAt": "2026-10-26T04:35:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Publish (assemble)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40269730976"
+   },
+   {
+    "databaseId": 40248114058,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-10-26T00:11:09Z",
+    "updatedAt": "2026-10-26T00:12:35Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-10-26 라우틴 델타 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40248114058"
+   }
+  ],
+  "grm-web-deploy.yml": [
+   {
+    "databaseId": 41372514943,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-02T01:26:38Z",
+    "updatedAt": "2026-11-02T01:26:57Z",
+    "headBranch": "main",
+    "displayTitle": "admin: 회원 중 구독자 수(member_overlap, 숫자만) (#1273)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372514943"
+   },
+   {
+    "databaseId": 41372458533,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-02T01:25:59Z",
+    "updatedAt": "2026-11-02T01:26:54Z",
+    "headBranch": "main",
+    "displayTitle": "feat(admin): 링크드인 탭 — 이번 주 국·영문 본문 복사와 카드 PDF 링크 (#1279)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372458533"
+   },
+   {
+    "databaseId": 41370363979,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-02T01:02:47Z",
+    "updatedAt": "2026-11-02T01:07:23Z",
+    "headBranch": "feat/brief-approval-mail",
+    "displayTitle": "feat(ops): 브리프 발행 PR 준비 시 대표 결재 요청 메일",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370363979"
+   },
+   {
+    "databaseId": 41370355059,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T01:02:41Z",
+    "updatedAt": "2026-11-02T01:07:02Z",
+    "headBranch": "feat/brief-approval-mail",
+    "displayTitle": "feat(ops): 브리프 발행 PR 준비 시 대표 결재 요청 메일 자동 발송(기본 dry-run)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370355059"
+   },
+   {
+    "databaseId": 41370310291,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-02T01:02:08Z",
+    "updatedAt": "2026-11-02T01:06:24Z",
+    "headBranch": "feat/admin-linkedin-card",
+    "displayTitle": "feat(admin): 링크드인 탭 — 국·영문 본문 복사와 카드 PDF 링크",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41370310291"
+   }
+  ],
+  "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 41367477879,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-02T00:30:05Z",
+    "updatedAt": "2026-11-02T00:30:17Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41367477879"
+   }
+  ],
+  "grm-watchlist-notify.yml": [
+   {
+    "databaseId": 40281075550,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-26T06:39:09Z",
+    "updatedAt": "2026-10-26T06:39:28Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40281075550"
+   },
+   {
+    "databaseId": 39210168705,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-19T06:29:02Z",
+    "updatedAt": "2026-10-19T06:29:24Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39210168705"
+   },
+   {
+    "databaseId": 38219073412,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-12T07:40:36Z",
+    "updatedAt": "2026-10-12T07:40:59Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/38219073412"
+   },
+   {
+    "databaseId": 37277397006,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-05T07:22:41Z",
+    "updatedAt": "2026-10-05T07:23:04Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/37277397006"
+   },
+   {
+    "databaseId": 36390639464,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-09-28T07:15:05Z",
+    "updatedAt": "2026-09-28T07:15:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/36390639464"
+   }
+  ],
+  "grm-newsletter-send.yml": [
+   {
+    "databaseId": 40313383130,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-26T11:12:57Z",
+    "updatedAt": "2026-10-26T11:13:51Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40313383130"
+   },
+   {
+    "databaseId": 40284508276,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-10-26T07:13:47Z",
+    "updatedAt": "2026-10-26T07:15:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40284508276"
+   },
+   {
+    "databaseId": 39240577089,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-19T10:52:38Z",
+    "updatedAt": "2026-10-19T10:53:05Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39240577089"
+   },
+   {
+    "databaseId": 39197470266,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-10-19T04:02:01Z",
+    "updatedAt": "2026-10-19T04:03:00Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39197470266"
+   },
+   {
+    "databaseId": 39197078779,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-10-19T03:56:59Z",
+    "updatedAt": "2026-10-19T03:57:54Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39197078779"
+   }
+  ],
+  "grm-findings-translate-apply.yml": [
+   {
+    "databaseId": 41368835352,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T00:45:16Z",
+    "updatedAt": "2026-11-02T00:45:37Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1272 from MINHOYEOM/chore/findings-restore-2026-1…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41368835352"
+   },
+   {
+    "databaseId": 41258403819,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-01T00:49:04Z",
+    "updatedAt": "2026-11-01T00:50:13Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1256 from MINHOYEOM/chore/findings-translate-2026…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41258403819"
+   },
+   {
+    "databaseId": 41150551488,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-10-31T00:30:37Z",
+    "updatedAt": "2026-10-31T00:31:57Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1248 from MINHOYEOM/chore/findings-translate-2026…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41150551488"
+   },
+   {
+    "databaseId": 40980403524,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-10-30T00:33:13Z",
+    "updatedAt": "2026-10-30T00:35:25Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1245 from MINHOYEOM/chore/findings-translate-2026…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40980403524"
+   },
+   {
+    "databaseId": 40829321243,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-10-29T06:27:29Z",
+    "updatedAt": "2026-10-29T06:28:47Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1242 from MINHOYEOM/chore/findings-translate-2026…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40829321243"
+   }
+  ],
+  "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 41312185831,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-01T13:37:47Z",
+    "updatedAt": "2026-11-01T16:50:30Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41312185831"
+   },
+   {
+    "databaseId": 41280168689,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-01T06:16:37Z",
+    "updatedAt": "2026-11-01T09:25:44Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41280168689"
+   },
+   {
+    "databaseId": 41202279040,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-31T12:42:13Z",
+    "updatedAt": "2026-10-31T15:56:56Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41202279040"
+   },
+   {
+    "databaseId": 41174305384,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-31T05:52:33Z",
+    "updatedAt": "2026-10-31T09:07:46Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41174305384"
+   },
+   {
+    "databaseId": 41060191012,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-30T13:04:17Z",
+    "updatedAt": "2026-10-30T16:16:56Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41060191012"
+   }
+  ],
+  "grm-wl-truncation-restore-plan.yml": [
+   {
+    "databaseId": 41148812528,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-10-31T00:11:41Z",
+    "updatedAt": "2026-10-31T00:12:28Z",
+    "headBranch": "main",
+    "displayTitle": "GRM WL Truncation Restore Plan",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41148812528"
+   }
+  ],
+  "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 41357044367,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-01T22:25:20Z",
+    "updatedAt": "2026-11-01T22:25:31Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41357044367"
+   },
+   {
+    "databaseId": 41334820444,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-01T18:05:57Z",
+    "updatedAt": "2026-11-01T18:06:11Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41334820444"
+   },
+   {
+    "databaseId": 41282438663,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-01T06:50:45Z",
+    "updatedAt": "2026-11-01T06:50:56Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41282438663"
+   },
+   {
+    "databaseId": 41245487267,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-31T21:50:59Z",
+    "updatedAt": "2026-10-31T21:51:08Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41245487267"
+   },
+   {
+    "databaseId": 41203817317,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-10-31T13:03:16Z",
+    "updatedAt": "2026-10-31T13:03:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41203817317"
+   }
+  ],
+  "grm-cloud-request.yml": []
+ },
+ "intake_artifacts": [
+  {
+   "run_id": 41355308842,
+   "created_at": "2026-11-01T22:05:18Z",
+   "has_web_brief": true
+  },
+  {
+   "run_id": 41244592056,
+   "created_at": "2026-10-31T21:39:17Z",
+   "has_web_brief": true
+  },
+  {
+   "run_id": 41137939924,
+   "created_at": "2026-10-30T22:24:41Z",
+   "has_web_brief": true
+  },
+  {
+   "run_id": 40968546266,
+   "created_at": "2026-10-29T22:47:47Z",
+   "has_web_brief": true
+  },
+  {
+   "run_id": 40781478508,
+   "created_at": "2026-10-28T22:38:10Z",
+   "has_web_brief": true
+  }
+ ]
+}

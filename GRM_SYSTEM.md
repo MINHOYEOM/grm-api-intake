@@ -588,6 +588,7 @@ grm-api-intake/
 │  ├─ wl_anatomy.py              # [WL 해부 2026-10-31] 경고서한 국문 지적을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈다(FDA 문장 무변형·이으면 원문·확신 없으면 None). 문서 페이지(findings_doc.html)와 브리프 카드 문서 링크 문구가 쓴다
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
+│  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본
 │  ├─ quiz_en_merge.py           # [다국어 2026-09-05] 주간 퀴즈 영문 문항 병합기 — 정본에 `question_en`·`choices_en`·`explanation_en` 을 **가산**한다(기존 키·들여쓰기 무변형·멱등). 게이트 3중 = 세 필드 전부거나 전부 없거나 · `choices_en` 길이 일치(`answer_index` 공유) · **EN_INVENTED_NUMBER**(`render.validate_quiz_en_facts` — 렌더와 같은 함수를 불러 사본 0)
 │  ├─ templates/  (landing·archive·brief·findings·**findings_browse**(둘러보기 면)·trends·**inspections**·**coverage**·**checklist**·firm·**inspector**·me·admin·base·library·library_catalog·guide·**about**(소개 /about/ — 2026-09-06)·glossary·**glossary_term**(하단 '사전 전체 규모' 블록)·**glossary_welcome**(구독 확인 도착 /welcome/ — noindex·목록 밖)·**findings_facet**·**findings_facet_index**·**findings_doc**·**findings_doc_list**·quiz·**landing_en**(영어판 홈 — 주간 브리프 히어로가 없는 별도 면))
@@ -628,6 +629,7 @@ grm-api-intake/
    ├─ grm-intake.yml, grm-ci.yml
    ├─ grm-rum-analytics.yml              # [성장·유입] RUM → Supabase 동기화 매일 16:30 UTC(01:30 KST) · 최근 8일 재적재 · 토큰 미설정은 클린 skip
    ├─ grm-growth-weekly.yml               # [성장·유입] 주간 성장 리포트 메일 — 수동 실행만(09-28 예약 해제: 매일 성장 일보·/admin 과 중복)
+   ├─ grm-approval-mail.yml               # [결재 메일] 발행 PR 준비 시 대표 메일 1통 — 기본 dry-run, GRM_APPROVAL_MAIL_ENABLED=true 일 때만 실발송
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
    ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-reconciliation.yml, grm-supabase-keepalive.yml

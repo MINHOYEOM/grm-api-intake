@@ -1,0 +1,73 @@
+name: GRM Approval Mail
+
+# 결재 요청 메일 — 발행 PR(`publish/brief-YYYY-MM-DD`)의 체크가 전부 success 가 되면
+# 대표 메일함으로 `[GRM 결재] W{주차} 브리프 발행 — 미리보기 확인` 1통(코드 발송·AI 없음).
+# 설계: web/approval_mail.py 머리말.
+#
+# ## 안전 장치
+#  - 기본은 dry-run. 저장소 변수 `GRM_APPROVAL_MAIL_ENABLED=true` 일 때만 실발송(대표 승인 후 켠다).
+#  - 수신자는 변수 `GRM_APPROVAL_MAIL_TO` 한 곳(주소 1개가 아니면 거부). 입력으로 바꿀 수 없다.
+#  - 중복 방지 = PR 숨김 표식 댓글(발송 성공 후 기록) + 브랜치별 concurrency 직렬화.
+#  - 실패(Brevo 오류·변수 누락)는 스텝 실패로 남는다.
+#  - 링크는 /admin/ 뿐 — 메일만으로는 승인되지 않는다.
+# 비용: GitHub Actions 무료분 + Brevo 무료 티어.
+
+on:
+  workflow_run:
+    workflows: ["GRM CI (compile + tests)", "GRM Web Deploy"]
+    types: [completed]
+    branches: ["publish/brief-*"]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '발행 PR 브랜치 (예: publish/brief-2026-11-09)'
+        required: true
+        type: string
+      dry_run:
+        description: 'true=판정·본문 출력만(발송 0). false=실발송(ENABLED 변수와 무관하게 발송)'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: grm-approval-mail-${{ github.event.workflow_run.head_branch || github.event.inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  approval-mail:
+    name: approval-mail
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: 결재 요청 메일
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.workflow_run.head_branch || github.event.inputs.branch }}
+          EVENT: ${{ github.event_name }}
+          DISPATCH_DRY: ${{ github.event.inputs.dry_run }}
+          ENABLED: ${{ vars.GRM_APPROVAL_MAIL_ENABLED }}
+          GRM_APPROVAL_MAIL_TO: ${{ vars.GRM_APPROVAL_MAIL_TO }}
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+          GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME }}
+          GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
+          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL }}
+        run: |
+          set -euo pipefail
+          DRY="--dry-run"
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            [ "$DISPATCH_DRY" = "false" ] && DRY=""
+          else
+            [ "$ENABLED" = "true" ] && DRY=""
+          fi
+          python web/approval_mail.py --branch "$BRANCH" $DRY

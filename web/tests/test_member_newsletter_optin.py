@@ -65,6 +65,25 @@ class ClientContract(unittest.TestCase):
         self.assertLess(vo.index("subscribeServer("), vo.index("재설정 1단계"))
         self.assertIn("newsletter_optin === true", JS)
 
+    def test_progress_record_unchanged_and_optin_in_separate_key(self):
+        # 가입 진행 상태(이메일+시각, 30분 TTL)는 기존 계약 그대로 — 체크 여부는 별도 키.
+        self.assertIn("JSON.stringify({ email: email, ts: Date.now() })", JS)
+        self.assertIn('var OPTIN_KEY = "grm-signup-optin-v1";', JS)
+        self.assertNotIn("o: !!", JS)
+        clear = JS[JS.index("function clearSignupProgress"):JS.index("function pwField")]
+        self.assertIn("removeItem(OPTIN_KEY)", clear)
+
+    def test_consent_survives_reload_at_code_step(self):
+        # 코드 입력 단계에서 새로고침해도 동의가 유지된다: 구독 여부는 sessionStorage 가 아니라
+        # 서버에 남긴 user_metadata.newsletter_optin 이 정한다(signUp 기록 → verifyOtp 응답의 메타데이터 →
+        # 서버 재확인). 클라이언트 키는 안내 문구만 좌우한다.
+        self.assertIn("newsletter_optin: true", JS)
+        confirm = JS[JS.index('type: "signup" }).then'):JS.index("재설정 1단계: 코드 발송")]
+        self.assertIn("vmeta.newsletter_optin === true", confirm)
+        self.assertNotIn("readOptinFlag", confirm)
+        self.assertNotIn("pendingOptin", confirm)
+        self.assertIn("meta.newsletter_optin !== true", FN)
+
     def test_nudge_once_never_bulk(self):
         fn = JS[JS.index("function maybeNudge"):JS.index("function setBusy")]
         for guard in ("newsletter_prompted", "SUB_OK_KEY", "NUDGE_KEY"):

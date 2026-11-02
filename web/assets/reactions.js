@@ -233,20 +233,30 @@
   // (사파리 프라이빗 등)는 조용히 삼켜 기존 동작으로 폴백한다.
   var SIGNUP_KEY = "grm-signup-progress-v1";
   var SIGNUP_TTL_MS = 30 * 60 * 1000;
-  function saveSignupProgress(email, optin) {
-    try { sessionStorage.setItem(SIGNUP_KEY, JSON.stringify({ email: email, ts: Date.now(), o: !!(optin === undefined ? pendingOptin : optin) })); } catch (e) {}
+  function saveSignupProgress(email) {
+    try { sessionStorage.setItem(SIGNUP_KEY, JSON.stringify({ email: email, ts: Date.now() })); } catch (e) {}
   }
   function loadSignupProgress() {
     try {
       var d = JSON.parse(sessionStorage.getItem(SIGNUP_KEY));
       if (!d || !EMAIL_RE.test(d.email || "")) return "";
       if (typeof d.ts !== "number" || (Date.now() - d.ts) > SIGNUP_TTL_MS) { clearSignupProgress(); return ""; }
-      pendingOptin = !!d.o;
+      pendingOptin = readOptinFlag();
       return d.email;
     } catch (e) { return ""; }
   }
+  // 뉴스레터 동의 체크 여부(코드 입력 단계 안내 문구용) — 진행 상태(이메일+시각)와 **별도 키**다.
+  // 이 값은 문구만 정한다: 실제 구독 여부는 가입 때 서버에 남긴 user_metadata.newsletter_optin 이
+  // 정하므로 새로고침·재로그인으로 이 키가 사라져도 동의는 유지된다(서버는 이 키를 보지 않는다).
+  var OPTIN_KEY = "grm-signup-optin-v1";
+  function saveOptinFlag(on) {
+    try { if (on) sessionStorage.setItem(OPTIN_KEY, "1"); else sessionStorage.removeItem(OPTIN_KEY); } catch (e) {}
+  }
+  function readOptinFlag() {
+    try { return sessionStorage.getItem(OPTIN_KEY) === "1"; } catch (e) { return false; }
+  }
   function clearSignupProgress() {
-    try { sessionStorage.removeItem(SIGNUP_KEY); } catch (e) {}
+    try { sessionStorage.removeItem(SIGNUP_KEY); sessionStorage.removeItem(OPTIN_KEY); } catch (e) {}
   }
 
   function pwField(ph, ac) {
@@ -368,7 +378,7 @@
         if (signup) {
           pendingOptin = wantsNews;
           if (res.data && res.data.session) { clearSignupProgress(); m.textContent = _t("가입되었습니다."); if (wantsNews) subscribeServer(res.data.session.access_token, "signup-optin", SIGNUP_CONSENT_VER); }
-          else { pendingSignupEmail = email; saveSignupProgress(email, wantsNews); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); }
+          else { pendingSignupEmail = email; saveSignupProgress(email); saveOptinFlag(wantsNews); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); }
         } else { m.textContent = _t("로그인되었습니다."); }
       }).catch(function () { setBusy(authForm, false); m.textContent = ""; hint.textContent = _t("요청에 실패했습니다. 잠시 후 다시 시도해 주세요."); });
     });

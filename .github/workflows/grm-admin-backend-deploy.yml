@@ -30,6 +30,7 @@ jobs:
       ADMIN_GITHUB_ACTIONS_TOKEN: ${{ secrets.ADMIN_GITHUB_ACTIONS_TOKEN }}
       NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
       GRM_NEWSLETTER_LIST_ID: ${{ vars.GRM_NEWSLETTER_LIST_ID }}
+      GRM_NEWSLETTER_LIST_ID_EN: ${{ vars.GRM_NEWSLETTER_LIST_ID_EN }}
       SUPABASE_URL_PUBLIC: ${{ vars.SUPABASE_URL }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -45,7 +46,8 @@ jobs:
           for file in \
             supabase/functions/admin-supabase/index.ts \
             supabase/functions/admin-github/index.ts \
-            supabase/functions/admin-brevo/index.ts
+            supabase/functions/admin-brevo/index.ts \
+            supabase/functions/newsletter-optin/index.ts
           do
             for attempt in 1 2 3; do
               if deno check "$file"; then
@@ -165,6 +167,11 @@ jobs:
             GITHUB_REF="main" \
             NEWSLETTER_API_KEY="$NEWSLETTER_API_KEY" \
             GRM_NEWSLETTER_LIST_ID="$GRM_NEWSLETTER_LIST_ID"
+          # 영문 리스트 ID 는 선택값 — 비어 있으면 건드리지 않는다(newsletter-optin 은 한국어 리스트로 폴백).
+          if [ -n "${GRM_NEWSLETTER_LIST_ID_EN:-}" ]; then
+            supabase secrets set --project-ref "${{ steps.ref.outputs.project_ref }}" \
+              GRM_NEWSLETTER_LIST_ID_EN="$GRM_NEWSLETTER_LIST_ID_EN"
+          fi
 
       - name: Deploy Admin Edge Functions
         if: steps.ref.outputs.ready == 'true'
@@ -173,3 +180,4 @@ jobs:
           supabase functions deploy admin-supabase --project-ref "${{ steps.ref.outputs.project_ref }}"
           supabase functions deploy admin-github --project-ref "${{ steps.ref.outputs.project_ref }}"
           supabase functions deploy admin-brevo --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy newsletter-optin --project-ref "${{ steps.ref.outputs.project_ref }}"

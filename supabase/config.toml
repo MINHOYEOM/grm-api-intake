@@ -6,3 +6,6 @@ verify_jwt = false
 
 [functions.admin-brevo]
 verify_jwt = false
+
+[functions.newsletter-optin]
+verify_jwt = false

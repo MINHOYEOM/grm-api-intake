@@ -22,7 +22,8 @@
 ## 하는 일
 0. **샤드 합치기.** `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
    `delta.json`·`deep_delta.json` 으로 합친다(LLM 이 옮겨 적지 않는다). exit≠0 이면 그 메시지를 `copyedit.json` 에 적고 `보류`(**영문 슬롯 미완결도 여기서 걸린다** — 카드마다 `en` 다섯 필드와 `tldr_en` 이 전부 있어야 합격. 빠졌으면 기자에게 되돌리고, 09:20 까지 못 메우면 `보류`) — Notion 에 아무것도 쓰지 않는다.
-   기자 샤드가 08:35 시작분까지 끝났어야 한다. 아직 도는 중이면 09:15 까지 한 번 더 확인하고, 그래도 아니면 `보류`.
+   기자 샤드(가변 N개 + `T`)가 08:40 보강 워커분까지 끝났어야 한다. 미완 샤드가 있으면(`python company/editorial/shard_claim.py status company/run/{run_date_kst}` 로 확인)
+   **09:20 까지 3분마다 다시 확인**하고, 그래도 아니면 `보류` — 09:30 백업이 마지막 안전망이다.
 1. **코드 검사 먼저.** 이번 주 스캐폴드를 받는다. 클라우드는 `/actions` 가 403 이라 아티팩트를 못 받으므로, 수집이 성공할 때마다 `grm-scaffold-mirror.yml` 이 복사해 둔 브랜치 사본을 쓴다:
    ```
    U=$(echo {run_date_kst} | tr - _); mkdir -p _scaffold

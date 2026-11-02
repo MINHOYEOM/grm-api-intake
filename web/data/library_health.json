@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-26T08:05:49+00:00",
+  "checked_at": "2026-11-02T09:55:55+00:00",
   "policy": {
     "bot_sensitive_hosts": [
       "fda.gov",
@@ -28,12 +28,12 @@
     "who.json"
   ],
   "summary": {
-    "blocked": 61,
+    "blocked": 63,
     "broken": 0,
-    "needs_review": 119,
-    "ok": 430,
-    "references": 732,
-    "unique_urls": 610
+    "needs_review": 130,
+    "ok": 433,
+    "references": 748,
+    "unique_urls": 626
   },
   "urls": {
     "https://assets.publishing.service.gov.uk/media/5a74ba91e5274a3f93b4854a/Good_manufacturing_practice_inspection_deficiencies_April_2010_to_March_2011.pdf": {
@@ -1507,6 +1507,21 @@
           "field": "official_url",
           "file": "pics.json",
           "item_id": "pics-pe-009-18-part-ii"
+        }
+      ],
+      "status": "ok"
+    },
+    "https://picscheme.org/docview/11495": {
+      "attempts": 1,
+      "final_url": "https://picscheme.org/docview/11495",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "pics.json",
+          "item_id": "pics-pi-058-1"
         }
       ],
       "status": "ok"
@@ -3219,9 +3234,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.188": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": null,
+      "http_status": 206,
       "method": "GET",
-      "reason": "network_or_tls:ReadTimeout",
+      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
       "references": [
         {
           "field": "official_url",
@@ -3229,7 +3244,7 @@
           "item_id": "cfr-211-188"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.192": {
       "attempts": 2,
@@ -3609,9 +3624,9 @@
     "https://www.ecfr.gov/current/title-21/part-211/section-211.82": {
       "attempts": 2,
       "final_url": "https://unblock.federalregister.gov",
-      "http_status": null,
+      "http_status": 206,
       "method": "GET",
-      "reason": "network_or_tls:ReadTimeout",
+      "reason": "suspected_bot_block:redirected_off_host:unblock.federalregister.gov",
       "references": [
         {
           "field": "official_url",
@@ -3619,7 +3634,7 @@
           "item_id": "cfr-211-82"
         }
       ],
-      "status": "needs_review"
+      "status": "blocked"
     },
     "https://www.ecfr.gov/current/title-21/part-211/section-211.84": {
       "attempts": 2,
@@ -6347,11 +6362,11 @@
       "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15251",
-      "http_status": 500,
-      "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -6359,7 +6374,7 @@
           "item_id": "data0010-15251"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15253": {
       "attempts": 2,
@@ -6612,6 +6627,66 @@
           "field": "official_url",
           "file": "mfds.json",
           "item_id": "data0010-15307"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15308": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15308",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15308"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15310": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15310",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15310"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15312": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15312",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15312"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15313": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15313",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0010-15313"
         }
       ],
       "status": "needs_review"
@@ -7832,11 +7907,11 @@
       "status": "needs_review"
     },
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15541",
-      "http_status": 500,
-      "method": "GET",
-      "reason": "transient_or_access_control:http_500",
+      "http_status": 200,
+      "method": "HEAD",
+      "reason": "reachable",
       "references": [
         {
           "field": "official_url",
@@ -7844,7 +7919,7 @@
           "item_id": "data0011-15541"
         }
       ],
-      "status": "needs_review"
+      "status": "ok"
     },
     "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15589": {
       "attempts": 2,
@@ -8461,6 +8536,171 @@
       ],
       "status": "needs_review"
     },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15973": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15973",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15973"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15974": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15974",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15974"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15977": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15977",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15977"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15978": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15978",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15978"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15979": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15979",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15979"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15980": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15980",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15980"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15981": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15981",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15981"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15982": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15982",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15982"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15985": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15985",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15985"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15988": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15988",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15988"
+        }
+      ],
+      "status": "needs_review"
+    },
+    "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15989": {
+      "attempts": 2,
+      "final_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15989",
+      "http_status": 500,
+      "method": "GET",
+      "reason": "transient_or_access_control:http_500",
+      "references": [
+        {
+          "field": "official_url",
+          "file": "mfds.json",
+          "item_id": "data0011-15989"
+        }
+      ],
+      "status": "needs_review"
+    },
     "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3": {
       "attempts": 1,
       "final_url": "https://www.mfds.go.kr/brd/m_209/down.do?brd_id=data0009&seq=44248&data_tp=A&file_seq=3",
@@ -8975,7 +9215,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000266954.pdf",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -8987,7 +9227,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000266955.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000266955.pdf",
       "http_status": 200,
       "method": "HEAD",
@@ -9002,10 +9242,10 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000267517.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000267517.pdf",
       "http_status": 200,
-      "method": "GET",
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -9017,10 +9257,10 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000273637.pdf": {
-      "attempts": 1,
+      "attempts": 2,
       "final_url": "https://www.pmda.go.jp/files/000273637.pdf",
       "http_status": 200,
-      "method": "GET",
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -9050,7 +9290,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280043.pdf",
       "http_status": 200,
-      "method": "HEAD",
+      "method": "GET",
       "reason": "reachable",
       "references": [
         {
@@ -9065,7 +9305,7 @@
       "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280045.pdf",
       "http_status": 200,
-      "method": "GET",
+      "method": "HEAD",
       "reason": "reachable",
       "references": [
         {
@@ -9077,7 +9317,7 @@
       "status": "ok"
     },
     "https://www.pmda.go.jp/files/000280046.pdf": {
-      "attempts": 2,
+      "attempts": 1,
       "final_url": "https://www.pmda.go.jp/files/000280046.pdf",
       "http_status": 200,
       "method": "HEAD",

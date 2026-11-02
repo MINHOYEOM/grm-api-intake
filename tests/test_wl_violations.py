@@ -82,6 +82,38 @@ class ExtractWlViolationsTest(unittest.TestCase):
                 "This warning letter concerns unapproved new drugs. "), [])
 
 
+class PlainHeadingViolationTest(unittest.TestCase):
+    """2026-11-03 Northland Nuclear Medicine(PET, 21 CFR 212) — 2번 표제가 "Your/You" 로 시작하지 않아
+    위반 표가 1건으로 파싱됐다."""
+
+    _NORTHLAND = (
+        "1. Your firm failed to conduct adequate investigations and take appropriate corrective "
+        "action when a failure of a production batch or any component of the batch failed to meet "
+        "any of its specifications (21 CFR 212.20(d)). Inadequate Investigation of Out-of-Limit "
+        "Environmental Monitoring Results Your firm failed to adequately investigate results. "
+        "2. Procedures to ensure that all equipment is clean, suitable for its intended purposes, "
+        "properly installed, maintained, and capable of repeatedly producing valid results, are "
+        "not adequately followed. (21 CFR 212.30(b)). Inadequate Control of Environmental "
+        "Monitoring Plates You failed to adequately control your EM contact plates. ")
+
+    def test_northland_two_violations(self):
+        got = ci.extract_wl_violations_from_text(_LEADIN + self._NORTHLAND)
+        self.assertEqual([v["number"] for v in got], ["1", "2"])
+        self.assertEqual(got[1]["citation"], "21 CFR 212.30(b)")
+        self.assertTrue(got[1]["statement"].startswith("Procedures to ensure"))
+        self.assertNotIn("Inadequate Control", got[1]["statement"])
+
+    def test_plain_heading_needs_sequential_number(self):
+        text = _LEADIN + _V1 + ("3. Procedures are not followed. (21 CFR 211.100(a)). ")
+        got = ci.extract_wl_violations_from_text(text)
+        self.assertEqual([v["number"] for v in got], ["1"])
+
+    def test_plain_footnote_with_citation_is_not_a_violation(self):
+        text = _BODY + "4. See 21 CFR 211.22 for the quality unit not described here (21 CFR 211.22). "
+        got = ci.extract_wl_violations_from_text(text)
+        self.assertEqual([v["number"] for v in got], ["1", "2", "3"])
+
+
 class WlLeadinSkipTest(unittest.TestCase):
     """①→② 수리: 내용 없는 도입구를 건너뛰어 하류 300자 절단이 실제 위반을 담게 한다."""
 

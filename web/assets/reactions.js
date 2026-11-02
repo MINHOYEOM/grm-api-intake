@@ -217,7 +217,7 @@
   // 마찰 개선(12차): ① openLogin({mode:"signup"}) 가입 직행 ② 가입 진행 상태 sessionStorage
   // 복원 ③ 미확인 계정 로그인 실패 → 확인 코드 단계로 이어주기. 세 가지 모두 기존 로그인
   // 성공 경로·세션 저장소(grm-public-auth-v1)·하트/스크랩 로직은 건드리지 않는다.
-  var pop, resetEmail = "", pendingSignupEmail = "", resendTimer = null;
+  var pop, resetEmail = "", pendingSignupEmail = "", pendingOptin = false, resendTimer = null;
   var MODE_COPY = {
     login:   { title: _t("로그인"),          sub: _t("이메일과 비밀번호만 있으면 됩니다.") },
     signup:  { title: _t("회원가입"),        sub: _t("이메일과 비밀번호만 정하면 끝이에요. 확인 코드를 메일로 보내드립니다.") },
@@ -241,11 +241,22 @@
       var d = JSON.parse(sessionStorage.getItem(SIGNUP_KEY));
       if (!d || !EMAIL_RE.test(d.email || "")) return "";
       if (typeof d.ts !== "number" || (Date.now() - d.ts) > SIGNUP_TTL_MS) { clearSignupProgress(); return ""; }
+      pendingOptin = readOptinFlag();
       return d.email;
     } catch (e) { return ""; }
   }
+  // 뉴스레터 동의 체크 여부(코드 입력 단계 안내 문구용) — 진행 상태(이메일+시각)와 **별도 키**다.
+  // 이 값은 문구만 정한다: 실제 구독 여부는 가입 때 서버에 남긴 user_metadata.newsletter_optin 이
+  // 정하므로 새로고침·재로그인으로 이 키가 사라져도 동의는 유지된다(서버는 이 키를 보지 않는다).
+  var OPTIN_KEY = "grm-signup-optin-v1";
+  function saveOptinFlag(on) {
+    try { if (on) sessionStorage.setItem(OPTIN_KEY, "1"); else sessionStorage.removeItem(OPTIN_KEY); } catch (e) {}
+  }
+  function readOptinFlag() {
+    try { return sessionStorage.getItem(OPTIN_KEY) === "1"; } catch (e) { return false; }
+  }
   function clearSignupProgress() {
-    try { sessionStorage.removeItem(SIGNUP_KEY); } catch (e) {}
+    try { sessionStorage.removeItem(SIGNUP_KEY); sessionStorage.removeItem(OPTIN_KEY); } catch (e) {}
   }
 
   function pwField(ph, ac) {
@@ -269,7 +280,7 @@
       pwField(_t("비밀번호(6자 이상)"), "current-password") +
       (SUB_ACTION && !lsGet(SUB_OK_KEY)
         ? '<label class="grm-login-optin" style="display:none"><input type="checkbox" class="grm-login-optin-cb" />' +
-          '<span>' + _t("주간 뉴스레터도 받기 (선택)") + '<small>' + _t("체크하면 구독 확인 메일이 별도로 가며, 그 메일의 버튼을 눌러야 구독됩니다.") + '</small></span></label>'
+          '<span>' + _t("(선택) 주간 뉴스레터 수신에 동의합니다") + '<small>' + _t("매주 월요일 규제 소식(브리프)과 사이트 새 기능 안내를 이메일로 받습니다. 가입 확인 코드를 입력하면 구독도 함께 완료되며, 모든 메일 하단의 수신거부 링크로 언제든 해지할 수 있어요.") + '</small></span></label>'
         : '') +
       '<button type="submit" class="grm-login-primary">' + _t("로그인") + '</button></form>' +
       // 회원가입 이메일 확인: 코드
@@ -348,7 +359,7 @@
       var wantsNews = !!(signup && optinCb && optinCb.checked);
       setBusy(authForm, true); m.textContent = signup ? _t("가입 중…") : _t("로그인 중…");
       var call = signup
-        ? sb.auth.signUp({ email: email, password: pw, options: { data: { newsletter_prompted: true, newsletter_optin: wantsNews } } })
+        ? sb.auth.signUp({ email: email, password: pw, options: { data: wantsNews ? { newsletter_prompted: true, newsletter_optin: true, newsletter_consent_ver: SIGNUP_CONSENT_VER } : { newsletter_prompted: true, newsletter_optin: false } } })
         : sb.auth.signInWithPassword({ email: email, password: pw });
       call.then(function (res) {
         setBusy(authForm, false);
@@ -365,9 +376,9 @@
           return;
         }
         if (signup) {
-          if (wantsNews) submitSubscribe(email);   // 체크한 사람만 — Brevo 가 확인 메일을 보낸다
-          if (res.data && res.data.session) { clearSignupProgress(); m.textContent = _t("가입되었습니다."); }
-          else { pendingSignupEmail = email; saveSignupProgress(email); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); }
+          pendingOptin = wantsNews;
+          if (res.data && res.data.session) { clearSignupProgress(); m.textContent = _t("가입되었습니다."); if (wantsNews) subscribeServer(res.data.session.access_token, "signup-optin", SIGNUP_CONSENT_VER); }
+          else { pendingSignupEmail = email; saveSignupProgress(email); saveOptinFlag(wantsNews); setMode("confirm"); m.textContent = _t("확인 코드를 {email} 로 보냈습니다.", { email: email }); }
         } else { m.textContent = _t("로그인되었습니다."); }
       }).catch(function () { setBusy(authForm, false); m.textContent = ""; hint.textContent = _t("요청에 실패했습니다. 잠시 후 다시 시도해 주세요."); });
     });
@@ -384,6 +395,9 @@
         if (res && res.error) { m.textContent = ""; hint.textContent = _t("코드가 맞지 않거나 시간이 지났어요. 다시 입력하거나 코드를 새로 받아 주세요."); return; }
         clearSignupProgress();
         m.textContent = _t("가입이 완료되었습니다.");
+        // 이메일 확인이 끝난 지금에서야 구독을 서버에 요청한다(가입 화면에서 체크한 기록이 user_metadata 에 있을 때만 서버가 받는다).
+        var vs = res && res.data, vmeta = vs && vs.user && vs.user.user_metadata;
+        if (vs && vs.session && vmeta && vmeta.newsletter_optin === true) subscribeServer(vs.session.access_token, "signup-optin", vmeta.newsletter_consent_ver || SIGNUP_CONSENT_VER);
       }).catch(function () { setBusy(confirmForm, false); m.textContent = ""; hint.textContent = _t("확인에 실패했습니다. 다시 시도해 주세요."); });
     });
 
@@ -455,21 +469,27 @@
   }
 
   // ── 뉴스레터 옵트인(회원 ↔ 구독자는 별개 명단) ────────────────────────────────
-  // 구독은 사이트 구독 밴드(base.html)와 **같은 경로**다: Brevo 호스팅 폼에 EMAIL 만 POST →
-  // Brevo 가 확인 메일을 보내고 그 버튼을 눌러야 구독(더블 옵트인). 여기서 직접 리스트에 넣는
-  // 일은 없다. 동의 없는 자동 구독 0 — 체크한 사람·'확인 메일 받기'를 누른 사람만.
+  // 구독 등록은 서버(Edge Function newsletter-optin)가 한다: 이메일 확인이 끝난 로그인 회원의
+  // **JWT 본인 이메일만** Brevo 리스트에 올리고, 동의 근거(출처·문구 버전·시각)를 남긴다.
+  // 브라우저는 이메일을 보내지 않는다(남의 주소 구독 불가). 동의 없는 자동 구독 0 — 가입 화면에서
+  // 체크한 사람, 안내 카드의 '구독하기'를 누른 사람만. 사이트 구독 밴드 폼은 별개(Brevo 더블 옵트인).
   var SUB_OK_KEY = "grm-sub-ok";          // 구독 밴드와 같은 키(구독 요청한 브라우저 — 밴드·배너 숨김)
   var NUDGE_KEY = "grm-sub-nudge-v1";     // 로그인 후 안내를 이미 보인 브라우저
+  var SIGNUP_CONSENT_VER = "optin-v1";    // 가입 화면 동의 문구 버전 — 문구를 바꾸면 올린다
+  var NUDGE_CONSENT_VER = "nudge-v1";     // 안내 카드 동의 문구 버전
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k) { try { localStorage.setItem(k, "1"); } catch (e) {} }
-  function submitSubscribe(email) {
-    if (!SUB_ACTION || !window.fetch || !EMAIL_RE.test(email || "")) return;
-    var body = new URLSearchParams();
-    body.append("EMAIL", email);
-    body.append("email_address_check", "");   // Brevo 허니팟(사람은 비움)
-    body.append("locale", "en");              // Brevo 폼 설정과 일치해야 하는 값(base.html 주석 참조)
-    try { fetch(SUB_ACTION, { method: "POST", mode: "no-cors", body: body }).catch(function () {}); } catch (e) {}
-    lsSet(SUB_OK_KEY);
+  function subscribeServer(token, source, ver) {
+    if (!SUB_ACTION || !window.fetch || !token) return Promise.resolve({});
+    var lang = ((document.documentElement && document.documentElement.lang) || "ko").slice(0, 2) === "en" ? "en" : "ko";
+    return fetch(SUPA_URL + "/functions/v1/newsletter-optin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token, "apikey": SUPA_KEY },
+      body: JSON.stringify({ source: source, consent_ver: ver, lang: lang })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
+      if (b && b.ok) lsSet(SUB_OK_KEY);
+      return b || {};
+    }).catch(function () { return {}; });
   }
 
   // 기존 회원 안내 — 로그인 후 한 번만, 일괄 등록 없이 묻는다. 이미 구독 요청한 브라우저·이미 보인
@@ -486,24 +506,35 @@
     nudgeEl.setAttribute("aria-label", _t("주간 뉴스레터, 받아보시겠어요?"));
     nudgeEl.innerHTML =
       '<b>' + _t("주간 뉴스레터, 받아보시겠어요?") + '</b>' +
-      '<p>' + _t("매주 월요일 한국어로 보내드려요. 구독 확인 메일의 버튼을 눌러야 구독됩니다.") + '</p>' +
-      '<div class="grm-nudge-row"><button type="button" class="grm-nudge-yes">' + _t("확인 메일 받기") + '</button>' +
+      '<p>' + _t("매주 월요일 규제 소식과 새 기능 안내를 보내드려요. 누르면 바로 구독되며, 메일 하단 수신거부 링크로 언제든 해지할 수 있어요.") + '</p>' +
+      '<div class="grm-nudge-row"><button type="button" class="grm-nudge-yes">' + _t("구독하기") + '</button>' +
       '<button type="button" class="grm-nudge-no">' + _t("괜찮아요") + '</button></div>';
     document.body.appendChild(nudgeEl);
-    function done() {
-      lsSet(NUDGE_KEY);
+    lsSet(NUDGE_KEY);   // 보인 것으로 기록 — 닫거나 새로고침해도 다시 묻지 않는다
+    function close() {
       if (nudgeEl && nudgeEl.parentNode) nudgeEl.parentNode.removeChild(nudgeEl);
+    }
+    nudgeEl.querySelector(".grm-nudge-no").addEventListener("click", function () {
+      close();
       // 다른 기기에서 또 묻지 않도록 회원 정보에 '물어봤다'만 남긴다(실패해도 무시 — localStorage 가 1차).
       try { sb.auth.updateUser({ data: { newsletter_prompted: true } }).catch(function () {}); } catch (e) {}
-    }
-    nudgeEl.querySelector(".grm-nudge-yes").addEventListener("click", function () {
-      submitSubscribe(user.email);
-      nudgeEl.innerHTML = '<p style="margin:0" role="status">' +
-        _t("확인 메일을 {email} 로 보냈습니다. 메일의 구독 확인 버튼을 눌러 주세요.", { email: esc(user.email) }) + '</p>';
-      setTimeout(done, 6000);
-      lsSet(NUDGE_KEY);
     });
-    nudgeEl.querySelector(".grm-nudge-no").addEventListener("click", done);
+    nudgeEl.querySelector(".grm-nudge-yes").addEventListener("click", function () {
+      var yes = nudgeEl.querySelector(".grm-nudge-yes");
+      yes.disabled = true;
+      var tok = session && session.access_token;
+      subscribeServer(tok, "login-nudge", NUDGE_CONSENT_VER).then(function (b) {
+        var msg = (b && b.ok)
+          ? (b.status === "blocked_unsubscribed"
+              ? _t("이전에 수신거부한 주소예요. 페이지 아래 구독 폼에서 다시 신청할 수 있어요.")
+              : _t("구독이 완료되었습니다. 매주 월요일에 보내드려요."))
+          : _t("구독을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.");
+        if (!(b && b.ok)) { yes.disabled = false; }
+        nudgeEl.innerHTML = '<p style="margin:0" role="status">' + msg + '</p>';
+        if (b && b.ok) setTimeout(close, 5000);
+        else setTimeout(close, 6000);
+      });
+    });
   }
 
   function setBusy(form, busy) {
@@ -532,7 +563,7 @@
     var dlg = pop.querySelector(".grm-login-card");
     if (dlg) dlg.setAttribute("aria-label", copy.title);
     pop.querySelector(".grm-login-title").textContent = copy.title;
-    pop.querySelector(".grm-login-sub").textContent = copy.sub;
+    pop.querySelector(".grm-login-sub").textContent = copy.sub + ((mode === "confirm" && pendingOptin && SUB_ACTION) ? " " + _t("뉴스레터 구독도 이 코드 입력으로 함께 완료됩니다.") : "");
     pop.querySelector(".grm-login-hint").textContent = "";
 
     var authForm    = pop.querySelector(".grm-login-auth");
@@ -691,6 +722,76 @@
     op.then(function (res) { if (res && res.error) rollback(); }).catch(rollback);
   }
 
+  // ── 계정 삭제 ─────────────────────────────────────────────────────────────
+  // 본인 JWT 로 Edge Function account-delete 를 부른다(서버가 관리자 거부·최근 인증 5분·
+  // Brevo/문의 정리·auth 삭제를 순서대로 한다). 재인증은 비밀번호 재입력(signInWithPassword)
+  // — 이메일 코드 방식은 Supabase Magic Link 템플릿이 코드({{ .Token }})를 담아야 해서 피했다.
+  // 되돌릴 수 없으므로 이메일 재입력 + 비밀번호 + 확인 체크 셋이 모두 있어야 버튼이 눌린다.
+  var delPop = null;
+  function closeDeleteAccount() { if (delPop) { delPop.parentNode.removeChild(delPop); delPop = null; } }
+  function openDeleteAccount() {
+    if (!session || !session.user || delPop) return;
+    var email = session.user.email || "";
+    delPop = document.createElement("div");
+    delPop.className = "grm-login-pop show";
+    delPop.innerHTML =
+      '<div class="grm-login-card" role="dialog" aria-modal="true" aria-label="' + _t("계정 삭제") + '">' +
+      '<button type="button" class="grm-login-x" aria-label="' + _t("닫기") + '">×</button>' +
+      '<h3 class="grm-login-title">' + _t("계정 삭제") + '</h3>' +
+      '<p class="grm-login-sub">' + _t("계정과 저장한 스크랩·용어·관심 업체·학습 기록이 모두 삭제되고 뉴스레터도 해지됩니다. 되돌릴 수 없습니다.") + '</p>' +
+      '<form class="grm-login-form" novalidate>' +
+      '<input type="email" class="grm-del-email" autocomplete="off" placeholder="' + _t("이메일을 다시 입력해 주세요") + '" aria-label="' + _t("이메일") + '" />' +
+      '<input type="password" class="grm-del-pw" autocomplete="current-password" placeholder="' + _t("비밀번호") + '" aria-label="' + _t("비밀번호") + '" />' +
+      '<label class="grm-login-optin"><input type="checkbox" class="grm-del-ok" />' +
+      '<span>' + _t("삭제하면 되돌릴 수 없다는 것을 확인했습니다.") + '</span></label>' +
+      '<button type="submit" class="grm-login-primary" disabled>' + _t("계정 삭제") + '</button></form>' +
+      '<p class="grm-login-hint" role="alert"></p>' +
+      '<p class="grm-login-msg" role="status" aria-live="polite"></p></div>';
+    document.body.appendChild(delPop);
+    var f = delPop.querySelector("form"), em = f.querySelector(".grm-del-email"),
+        pw = f.querySelector(".grm-del-pw"), ok = f.querySelector(".grm-del-ok"),
+        go = f.querySelector("button[type=submit]"),
+        hint = delPop.querySelector(".grm-login-hint"), msg = delPop.querySelector(".grm-login-msg");
+    function ready() {
+      go.disabled = !(em.value.trim().toLowerCase() === email.toLowerCase() && pw.value && ok.checked);
+    }
+    [em, pw, ok].forEach(function (el) { el.addEventListener("input", ready); el.addEventListener("change", ready); });
+    delPop.querySelector(".grm-login-x").addEventListener("click", closeDeleteAccount);
+    delPop.addEventListener("click", function (e) { if (e.target === delPop) closeDeleteAccount(); });
+    delPop.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDeleteAccount(); });
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (go.disabled) return;
+      hint.textContent = ""; msg.textContent = _t("삭제 중…"); go.disabled = true;
+      var fail = function (t) { msg.textContent = ""; hint.textContent = t; ready(); };
+      sb.auth.signInWithPassword({ email: email, password: pw.value }).then(function (res) {
+        if (res && res.error) { fail(_t("비밀번호가 맞지 않습니다.")); return null; }
+        var tok = res && res.data && res.data.session && res.data.session.access_token;
+        if (!tok) { fail(_t("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.")); return null; }
+        return fetch(SUPA_URL + "/functions/v1/account-delete", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + tok, "apikey": SUPA_KEY, "Content-Type": "application/json" },
+          body: "{}"
+        }).then(function (r) {
+          if (r.ok) {
+            try { sb.auth.signOut({ scope: "local" }); } catch (x) {}
+            delPop.querySelector(".grm-login-card").innerHTML =
+              '<h3 class="grm-login-title">' + _t("계정이 삭제되었습니다") + '</h3>' +
+              '<p class="grm-login-sub">' + _t("이용해 주셔서 감사합니다.") + '</p>' +
+              '<a class="grm-login-primary" style="display:block;text-align:center;text-decoration:none" href="' + esc(cfgRoot) + 'index.html">' + _t("홈으로") + '</a>';
+            return null;
+          }
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            fail(j && j.error === "admin_protected"
+              ? _t("운영자 계정은 여기서 삭제할 수 없습니다.")
+              : _t("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요."));
+          });
+        });
+      }).catch(function () { fail(_t("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.")); });
+    });
+    em.focus();
+  }
+
   // ── /me 마이페이지 ───────────────────────────────────────────────────────
   // [비로그인 불침번] 13차부터 /me 는 로그인 게이트가 아니라 개인 홈이다 — 게스트로 와도
   // 구름이 성장 현황(localStorage)은 그대로 보이고, 계정 카드는 빈칸이 아니라 "무엇이
@@ -726,9 +827,12 @@
       '<div class="grm-me-idbox"><div class="grm-me-label">' + _t("로그인 계정") + '</div>' +
       '<div class="grm-me-email">' + esc(email) + '</div>' +
       '<div class="grm-me-metaline">' + stat +
-      '<button type="button" class="grm-me-out">' + _t("로그아웃") + '</button></div></div></div>';
+      '<button type="button" class="grm-me-out">' + _t("로그아웃") + '</button>' +
+      '<button type="button" class="grm-me-out grm-me-del">' + _t("계정 삭제") + '</button></div></div></div>';
     var out = head.querySelector(".grm-me-out");
     if (out) out.addEventListener("click", function () { sb.auth.signOut(); });
+    var del = head.querySelector(".grm-me-del");
+    if (del) del.addEventListener("click", openDeleteAccount);
   }
   // Supabase 스크랩 card_id + search-index.json(card_id→제목·기관·링크)로 목록을 런타임 렌더.
   // provenance: 제목·링크는 우리 인덱스에서만, Supabase 엔 불투명 card_id 만.

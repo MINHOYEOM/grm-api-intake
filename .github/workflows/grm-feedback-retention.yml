@@ -1,0 +1,41 @@
+name: GRM Feedback Retention
+
+# 처리방침 약속 — "문의 내용: 처리 완료 후 1년이 지나면 지웁니다." (migration 100)
+# 주 1회 Supabase RPC feedback_purge_resolved(365) 를 호출해 처리 완료(done/dismissed) 후
+# 1년이 지난 문의 행을 삭제한다. 미처리 행은 지우지 않는다. 응답은 삭제 행 수(정수)뿐이라
+# 로그에 개인정보가 남지 않는다. SUPABASE_SERVICE_ROLE_KEY 는 기존 워크플로와 같은 secret.
+on:
+  schedule:
+    # 매주 일요일 19:00 UTC = 월요일 04:00 KST
+    - cron: '0 19 * * 0'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: feedback-retention
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    name: Purge resolved feedback older than 1 year
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call feedback_purge_resolved
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
+            echo "::error::SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 가 비어 있다"
+            exit 1
+          fi
+          deleted=$(curl -sS --fail-with-body -X POST \
+            "${SUPABASE_URL%/}/rest/v1/rpc/feedback_purge_resolved" \
+            -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"p_days":365}')
+          echo "deleted rows: ${deleted}"

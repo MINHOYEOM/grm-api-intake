@@ -65,6 +65,10 @@ GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
 # `# ` 한 줄 = 제목, 첫 `## ` 앞 문단 = 리드, `## ` 마다 한 블록(왼쪽 레이블 + 본문).
 # 영문 파일은 번역본이 아니라 또 하나의 정본이며 h2 순서가 같아야 한다(WebAboutTest 가 고정).
 ABOUT_FILE = WEB_DIR / "data" / "about_content.md"
+# [법무 초안] 개인정보처리방침·이용약관 초안. 기본 빌드는 출력하지 않는다 — 대표·법률 확인 전 공개 금지.
+# GRM_LEGAL_DRAFT_PAGES=1 일 때만 noindex 미리보기 2장을 낸다(푸터·sitemap·가입 문구 연결 없음).
+LEGAL_DRAFT_DIR = WEB_DIR / "data" / "legal"
+LEGAL_DRAFT_PAGES = os.environ.get("GRM_LEGAL_DRAFT_PAGES", "").strip() == "1"
 ABOUT_EN_FILE = WEB_DIR / "data" / "about_content_en.md"
 # [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 이메일. 값이 비어 있으면
 # 그 링크는 **그리지 않는다**(죽은 링크 금지). 사이트에 그대로 실리므로 공개 주소만 넣는다.
@@ -5446,6 +5450,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             about_lead=about_lead,
             about_sections=about_sections,
         )
+
+    # [법무 초안] 기본 꺼짐. 켜져도 sitemap·푸터에는 없다(출력만 한다).
+    if LEGAL_DRAFT_PAGES:
+        for _stem, _path in (("privacy_ko", "privacy-draft/"), ("terms_ko", "terms-draft/")):
+            _f = LEGAL_DRAFT_DIR / f"{_stem}.md"
+            if _f.exists():
+                _lt, _ll, _ls = render_about_html(_f.read_text(encoding="utf-8"))
+                emit("legal_draft.html", page(_path), page_title=_lt + " · GRM",
+                     nav_active="about", description="", about_title=_lt,
+                     about_lead=_ll, about_sections=_ls)
 
     # 용어사전(트랙 C 2차 웨이브) — glossary.json(정본)을 초성 색인 1페이지로 결정론 렌더.
     # 클라이언트 필터는 assets/glossary.js(신규·별도 asset). 파일 부재 시 조용히 생략.

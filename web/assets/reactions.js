@@ -691,6 +691,76 @@
     op.then(function (res) { if (res && res.error) rollback(); }).catch(rollback);
   }
 
+  // ── 계정 삭제 ─────────────────────────────────────────────────────────────
+  // 본인 JWT 로 Edge Function account-delete 를 부른다(서버가 관리자 거부·최근 인증 5분·
+  // Brevo/문의 정리·auth 삭제를 순서대로 한다). 재인증은 비밀번호 재입력(signInWithPassword)
+  // — 이메일 코드 방식은 Supabase Magic Link 템플릿이 코드({{ .Token }})를 담아야 해서 피했다.
+  // 되돌릴 수 없으므로 이메일 재입력 + 비밀번호 + 확인 체크 셋이 모두 있어야 버튼이 눌린다.
+  var delPop = null;
+  function closeDeleteAccount() { if (delPop) { delPop.parentNode.removeChild(delPop); delPop = null; } }
+  function openDeleteAccount() {
+    if (!session || !session.user || delPop) return;
+    var email = session.user.email || "";
+    delPop = document.createElement("div");
+    delPop.className = "grm-login-pop show";
+    delPop.innerHTML =
+      '<div class="grm-login-card" role="dialog" aria-modal="true" aria-label="' + _t("계정 삭제") + '">' +
+      '<button type="button" class="grm-login-x" aria-label="' + _t("닫기") + '">×</button>' +
+      '<h3 class="grm-login-title">' + _t("계정 삭제") + '</h3>' +
+      '<p class="grm-login-sub">' + _t("계정과 저장한 스크랩·용어·관심 업체·학습 기록이 모두 삭제되고 뉴스레터도 해지됩니다. 되돌릴 수 없습니다.") + '</p>' +
+      '<form class="grm-login-form" novalidate>' +
+      '<input type="email" class="grm-del-email" autocomplete="off" placeholder="' + _t("이메일을 다시 입력해 주세요") + '" aria-label="' + _t("이메일") + '" />' +
+      '<input type="password" class="grm-del-pw" autocomplete="current-password" placeholder="' + _t("비밀번호") + '" aria-label="' + _t("비밀번호") + '" />' +
+      '<label class="grm-login-optin"><input type="checkbox" class="grm-del-ok" />' +
+      '<span>' + _t("삭제하면 되돌릴 수 없다는 것을 확인했습니다.") + '</span></label>' +
+      '<button type="submit" class="grm-login-primary" disabled>' + _t("계정 삭제") + '</button></form>' +
+      '<p class="grm-login-hint" role="alert"></p>' +
+      '<p class="grm-login-msg" role="status" aria-live="polite"></p></div>';
+    document.body.appendChild(delPop);
+    var f = delPop.querySelector("form"), em = f.querySelector(".grm-del-email"),
+        pw = f.querySelector(".grm-del-pw"), ok = f.querySelector(".grm-del-ok"),
+        go = f.querySelector("button[type=submit]"),
+        hint = delPop.querySelector(".grm-login-hint"), msg = delPop.querySelector(".grm-login-msg");
+    function ready() {
+      go.disabled = !(em.value.trim().toLowerCase() === email.toLowerCase() && pw.value && ok.checked);
+    }
+    [em, pw, ok].forEach(function (el) { el.addEventListener("input", ready); el.addEventListener("change", ready); });
+    delPop.querySelector(".grm-login-x").addEventListener("click", closeDeleteAccount);
+    delPop.addEventListener("click", function (e) { if (e.target === delPop) closeDeleteAccount(); });
+    delPop.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDeleteAccount(); });
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (go.disabled) return;
+      hint.textContent = ""; msg.textContent = _t("삭제 중…"); go.disabled = true;
+      var fail = function (t) { msg.textContent = ""; hint.textContent = t; ready(); };
+      sb.auth.signInWithPassword({ email: email, password: pw.value }).then(function (res) {
+        if (res && res.error) { fail(_t("비밀번호가 맞지 않습니다.")); return null; }
+        var tok = res && res.data && res.data.session && res.data.session.access_token;
+        if (!tok) { fail(_t("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.")); return null; }
+        return fetch(SUPA_URL + "/functions/v1/account-delete", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + tok, "apikey": SUPA_KEY, "Content-Type": "application/json" },
+          body: "{}"
+        }).then(function (r) {
+          if (r.ok) {
+            try { sb.auth.signOut({ scope: "local" }); } catch (x) {}
+            delPop.querySelector(".grm-login-card").innerHTML =
+              '<h3 class="grm-login-title">' + _t("계정이 삭제되었습니다") + '</h3>' +
+              '<p class="grm-login-sub">' + _t("이용해 주셔서 감사합니다.") + '</p>' +
+              '<a class="grm-login-primary" style="display:block;text-align:center;text-decoration:none" href="' + esc(cfgRoot) + 'index.html">' + _t("홈으로") + '</a>';
+            return null;
+          }
+          return r.json().catch(function () { return {}; }).then(function (j) {
+            fail(j && j.error === "admin_protected"
+              ? _t("운영자 계정은 여기서 삭제할 수 없습니다.")
+              : _t("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요."));
+          });
+        });
+      }).catch(function () { fail(_t("삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.")); });
+    });
+    em.focus();
+  }
+
   // ── /me 마이페이지 ───────────────────────────────────────────────────────
   // [비로그인 불침번] 13차부터 /me 는 로그인 게이트가 아니라 개인 홈이다 — 게스트로 와도
   // 구름이 성장 현황(localStorage)은 그대로 보이고, 계정 카드는 빈칸이 아니라 "무엇이
@@ -726,9 +796,12 @@
       '<div class="grm-me-idbox"><div class="grm-me-label">' + _t("로그인 계정") + '</div>' +
       '<div class="grm-me-email">' + esc(email) + '</div>' +
       '<div class="grm-me-metaline">' + stat +
-      '<button type="button" class="grm-me-out">' + _t("로그아웃") + '</button></div></div></div>';
+      '<button type="button" class="grm-me-out">' + _t("로그아웃") + '</button>' +
+      '<button type="button" class="grm-me-out grm-me-del">' + _t("계정 삭제") + '</button></div></div></div>';
     var out = head.querySelector(".grm-me-out");
     if (out) out.addEventListener("click", function () { sb.auth.signOut(); });
+    var del = head.querySelector(".grm-me-del");
+    if (del) del.addEventListener("click", openDeleteAccount);
   }
   // Supabase 스크랩 card_id + search-index.json(card_id→제목·기관·링크)로 목록을 런타임 렌더.
   // provenance: 제목·링크는 우리 인덱스에서만, Supabase 엔 불투명 card_id 만.

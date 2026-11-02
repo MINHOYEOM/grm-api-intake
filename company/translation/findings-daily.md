@@ -35,8 +35,17 @@ PC 예약작업 `grm-findings-weekly-translate`(매일 09:10)를 옮긴 것이�
    - **사실 왜곡 금지**: 없는 내용 추가 금지, 수치·날짜·조항 번호 변경 금지. 긴 원문도 요약하지 말고 완역한다.
    - `finding_text_ko` 는 원문과 같은 문자열이면 안 되고 한글을 1자 이상 담아야 한다(위반 시 배치 전체 거부).
    - 원문이 한국어(MFDS 등)인 표 형태 지적사항은 문장형 평문으로 다듬되 사실·수치·조항 번호는 그대로.
-6-1. **WL 절단 복원(restore)은 클라우드에서 하지 않는다** — 계획이 Actions 아티팩트에만 있다(`/actions` 막힘).
-   결과에 `막힘: Actions — restore 계획 아티팩트` 한 줄만 남긴다. restore 는 PC 백업이 남은 용량으로 채운다.
+6-1. **WL 절단 복원(restore)** — 6단계 일반 항목이 100건 미만이면 남은 용량을 restore 항목으로 채운다. 계획은 Actions 아티팩트인데 `/actions` 가 막혀 있어,
+   `grm-wl-truncation-restore-plan.yml` 이 `claude/ops-status` 브랜치 `wl-restore/` 에 사본을 둔다:
+   `git fetch origin claude/ops-status && mkdir -p /tmp/restore && git show FETCH_HEAD:wl-restore/wl_truncation_restore_plan.json > /tmp/restore/wl_truncation_restore_plan.json`.
+   - 사본이 없으면(첫 실행 전) 요청 마커 `wl-restore-plan`(인자 없음, 브랜치 `claude/request-$D-wl-restore`, `company/CLOUD.md` "Actions 다리")을 한 번 올리고
+     결과에 `대기: restore 계획 생성 요청함` 한 줄을 남긴다 — 오늘은 일반 항목만 번역한다. 요청은 하루 한 번만.
+   - 있으면 `python3 findings_translate.py --export-restore /tmp/restore/wl_truncation_restore_plan.json --source supabase --output /tmp/tr/restore_queue.json --pretty` 로
+     남은 항목을 고르고(`items[]` 는 최신순·라이브가 아직 잘린 행만), 6단계 일반 항목과 겹치는 finding_id 는 뺀다.
+     각 항목의 `finding_text` 를 6단계와 같은 지침으로 완역해 `finding_text_ko` 를 채우고 `translation_method` 는 `"llm_assisted"`.
+     `kind`·`finding_text_old_md5`·`finding_text` 는 한 글자도 바꾸지 않는다. 같은 `filled.json` 의 `items` 에 함께 넣는다.
+     restore 원문은 평균 3천 자대로 길다 — 성실히 완역할 수 있는 만큼만(건수를 줄여도 정상).
+   - 사본이 한 달 넘게 묵었으면(브랜치 파일 날짜) 같은 마커로 새 계획을 요청한다.
 7. `python3 findings_translate.py --apply /tmp/tr/filled.json --source supabase --sql-output /tmp/tr/$D.sql --outbox-output translations/outbox/$D-batch.json --output /tmp/tr/apply_report.json --pretty`
    (`--sql-output` 은 필수다. SQL 은 저장소 밖에 쓴다).
 8. `apply_report.json` 의 `ready` 가 `false` 면 아무것도 커밋하지 말고, 어떤 항목이 왜 실패했는지 요약해 `실패` 로 끝낸다(우회 금지).

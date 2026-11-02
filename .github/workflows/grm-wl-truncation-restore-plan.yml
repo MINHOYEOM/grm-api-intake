@@ -13,7 +13,7 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: read
+  contents: write   # 계획 사본을 claude/ops-status 브랜치에 쓴다(아래 "사본" 스텝). 코드·main 은 건드리지 않는다.
 
 concurrency:
   group: wl-truncation-restore-plan
@@ -57,6 +57,14 @@ jobs:
             wl_truncation_restore_report.json
           retention-days: 90
           if-no-files-found: error
+
+      - name: 클라우드용 사본 (claude/ops-status 브랜치 wl-restore/)
+        # 클라우드 세션은 /actions 아티팩트를 못 받는다(company/CLOUD.md). 계획이 8MB 를 넘으면 리포트만 둔다.
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash company/ops/ops_branch.sh "wl restore plan" sh -c 'rm -rf wl-restore && mkdir wl-restore && cp ../wl_truncation_restore_report.json wl-restore/ && if [ "$(wc -c < ../wl_truncation_restore_plan.json)" -lt 8000000 ]; then cp ../wl_truncation_restore_plan.json wl-restore/; else echo "계획 8MB 초과 — 사본 생략" >&2; fi'
 
       - name: Write step summary
         if: always()

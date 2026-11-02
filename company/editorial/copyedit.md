@@ -23,14 +23,19 @@
 0. **샤드 합치기.** `python company/editorial/merge_parts.py company/run/{run_date_kst}` — `delta.A/B.json`·`deep.A/B.json` 을
    `delta.json`·`deep_delta.json` 으로 합친다(LLM 이 옮겨 적지 않는다). exit≠0 이면 그 메시지를 `copyedit.json` 에 적고 `보류` — Notion 에 아무것도 쓰지 않는다.
    기자 샤드가 08:35 시작분까지 끝났어야 한다. 아직 도는 중이면 09:15 까지 한 번 더 확인하고, 그래도 아니면 `보류`.
-1. **코드 검사 먼저.** 이번 주 intake 실행의 `_scaffold` 아티팩트(`grm-web-publish.yml` 이 쓰는 것과 같은 것)를 `gh api` 로 받아
+1. **코드 검사 먼저.** 이번 주 스캐폴드를 받는다. 클라우드는 `/actions` 가 403 이라 아티팩트를 못 받으므로, 수집이 성공할 때마다 `grm-scaffold-mirror.yml` 이 복사해 둔 브랜치 사본을 쓴다:
    ```
-   python assemble_publish_brief.py --scaffold <scaffold>/brief_web_{run_date_kst}.json \
+   U=$(echo {run_date_kst} | tr - _); mkdir -p _scaffold
+   git fetch origin claude/scaffold-brief-web && git show FETCH_HEAD:brief_web_$U.json > _scaffold/brief_web_$U.json
+   ```
+   파일이 없거나 비어 있으면 검사를 못 한 것이다. 그리고
+   ```
+   python assemble_publish_brief.py --scaffold _scaffold/brief_web_$U.json \
      --delta company/run/{run_date_kst}/delta.json \
      --out company/run/{run_date_kst}/brief_check.json [--deep company/run/{run_date_kst}/deep_delta.json]
    ```
    를 돌린다. 실패(exit≠0)면 그 메시지를 그대로 적는다 — 발행 경로에 넘겼다면 **발행이 멈췄을 것**이다.
-   아티팩트를 못 받아 검사를 못 하면 그것도 **통과가 아니다**.
+   사본을 못 받아 검사를 못 하면 그것도 **통과가 아니다**(결과에 `막힘: scaffold 사본 — <사유>` 한 줄).
 2. **의미 점검.** 카드마다 v16 [발행 전 산문 자가 점검] 1~10번과 [핵심 원칙] 2-1(원문 부재 주장 금지)을 O/X 로 판정한다.
    X 는 근거(슬롯 이름 + 코드 `facts`/`prose_input` 의 어느 값과 어긋나는지)를 적는다.
 3. **직접 고치지 않는다.** 판정만 한다. 기준표에 없는 취향 지적을 하지 않는다.

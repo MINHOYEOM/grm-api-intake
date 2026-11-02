@@ -1,7 +1,7 @@
 # 종합상황실 · 월요일 발행 준비 확인 — 모델 Haiku · 월 10:45 KST
 
-PC 예약작업 `grm-monday-brief-publish` 의 **확인 부분**을 옮긴 것이다. 클라우드는 GitHub Actions 를 부를 수 없고(`company/CLOUD.md`)
-심층분석을 새로 쓰는 일은 Haiku 의 몫이 아니므로, **확인·판정·기록만** 한다. 복구(브릿지 재실행·심층분석 백필)는 PC 백업(월 11:30)이 한다 —
+PC 예약작업 `grm-monday-brief-publish` 의 **확인 부분**을 옮긴 것이다. 클라우드는 GitHub Actions 를 직접 부를 수 없고(`company/CLOUD.md`)
+심층분석을 새로 쓰는 일은 Haiku 의 몫이 아니므로, **확인·판정·기록과 아래 "복구"의 워크플로 재실행 요청만** 한다. 심층분석 백필은 PC 백업(월 11:30)이 한다 —
 이 파일의 결과가 `상태: 완료` 가 아니면 PC 백업이 전체 절차를 돈다.
 
 ## 읽을 것
@@ -35,9 +35,17 @@ Notion Intake data source = `collection://d5b9634a-2bd7-4036-ba06-e4ad17ede288`.
   - `미작동·백업 발행`: 세 파일이 전부 없거나 데스크가 `완료` 가 아니고, 인계서가 `CONSUMED` 로 닫혀 있다(백업이 닫았다). 인계서가 아직 `OPEN` 이면 `미작동·백업 미발행`(대표 확인)로 쓴다.
   - 형식: `편집팀: <판정> — <원인 한 줄>` (원인은 멈춘 단계의 보류 사유, 파일 없음이면 `브랜치·파일 없음`).
 
+## 복구 — 워크플로 재실행 요청 (확인 2·3번에서 막혔을 때만, 한 번씩)
+`git fetch origin claude/ops-status` 후 `git show FETCH_HEAD:status.json` 으로 최근 실행을 먼저 본다(이미 돌고 있으면 요청하지 않는다).
+- 델타가 OPEN 인데 `delta_$UNDER.json` 이 main 에 없고 `grm-delta-bridge.yml` 최근 실행이 `in_progress` 가 아니다 → `delta-bridge` 요청(`publish_date=$D`).
+- 델타 파일은 있는데 발행 PR 이 없고 `grm-web-publish.yml` 최근 실행이 `in_progress` 가 아니다 → `web-publish` 요청(`publish_date=$D`, `intake_run_id` 는 비운다 — 날짜로 찾는다).
+- 요청 방법·형식은 `company/CLOUD.md` "Actions 다리". 브랜치는 `claude/request-$D-<delta-bridge|web-publish>`. 요청 id 는 `YYYYMMDD-HHMM-bridge` 처럼 만든다.
+- 요청 뒤 결과 파일(`claude/ops-status` 의 `requests/<id>.json`)을 5분쯤 뒤 한 번 확인한다. `rejected`·`dispatch-failed` 면 이유를 적고 `상태: 보류`. `dispatched` 여도 이번 실행의 판정은 바꾸지 않는다(`대기: 재실행 요청함` 으로 적는다).
+- 마커 파일이 안 생기거나 push 가 거절되면 `막힘: Actions — <하려던 일>` 로 남긴다(PC 백업이 한다).
+
 ## 기록
 `git fetch origin claude/company-$D` — 있으면 그 위에, 없으면 `origin/main` 에서 브랜치를 만든다. `company/run/$D/brief-prep.md` 하나만 쓰고 커밋·push.
 첫 3줄은 `CHARTER.md` 형식(`상태:` 로 시작) — PC 백업이 이 첫 줄을 읽고 건너뛸지 정한다. 3줄 바로 아래 4번째 줄에 `편집팀: …` 한 줄을 둔다(5번 판정). 다른 직무의 파일은 건드리지 않는다.
 
 ## 금지
-발행 PR 머지 · Notion 쓰기(오예치 이동도 PC 백업이 한다) · 심층분석 생성 · Supabase 쓰기.
+발행 PR 머지 · Notion 쓰기(오예치 이동도 PC 백업이 한다) · 심층분석 생성 · Supabase 쓰기 · 허용 동작 밖의 워크플로 요청.

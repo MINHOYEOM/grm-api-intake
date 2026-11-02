@@ -16,5 +16,6 @@
 | 대외홍보팀 | 링크드인 초안 확인 | `outreach/linkedin-draft.md` | Sonnet | 월 17:30 | 월 18:00 (작성창 세팅 — PC 만 가능) | — |
 
 ## 클라우드가 못 하는 것 (PC 백업이 맡고, 2주 뒤 대표가 정한다)
-- GitHub Actions 실행 조회·재실행·아티팩트(`/actions` 403): 발송 런 확인, 브릿지·web-publish 재실행, WL 절단 복원 계획 받기.
+- GitHub Actions 직접 조회·재실행·아티팩트(`/actions` 403)는 **다리로 대체했다**(2026-11-02, `company/CLOUD.md` "Actions 다리"): 실행 요약은 `claude/ops-status` 의 `status.json`,
+  재실행은 `claude/request-*` 요청 마커(허용목록 6개), WL 복원 계획은 같은 브랜치 `wl-restore/`. 첫 실측(ping) 전까지는 PC 백업이 그대로 맡는다.
 - 심층분석 백필(카드별 서브에이전트), 링크드인 작성창 세팅(크롬 로그인).

@@ -82,6 +82,14 @@
 .home-sec{font-size:15px;color:var(--ink);margin:0 0 12px}
 @media(max-width:1000px){.home-status{grid-template-columns:1fr}}
 .admin-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.admin-li-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.admin-li-card{border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:14px;display:grid;gap:10px;min-width:0}
+.admin-li-card h3{font-size:14px;margin:0}.admin-li-card h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+.admin-li-card textarea{width:100%;box-sizing:border-box;font:inherit;font-size:13px;line-height:1.55;border:1px solid var(--line-2);border-radius:var(--rad-s);padding:10px;background:#fff;color:var(--ink);resize:vertical}
+.admin-li-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.4px;color:var(--muted)}.admin-li-row code{color:var(--ink);word-break:break-all}
+.admin-li-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.admin-li-links{display:flex;gap:10px;flex-wrap:wrap;font-size:13px}
+.admin-li-steps{margin:16px 0 0;padding-left:20px;font-size:13px;line-height:1.7;color:var(--muted)}
+@media(max-width:760px){.admin-li-grid{grid-template-columns:1fr}}
 .admin-panel h2{font-size:18px;font-weight:650;color:var(--ink)}
 .admin-panel .sub{color:var(--muted);font-size:13px;margin-top:3px}
 .admin-actions-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -336,6 +344,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
         <button type="button" class="on" data-tab="home"><i class="ti ti-home-2"></i>홈</button>
         <span class="admin-nav-label">발행 (매주 월요일)</span>
         <button type="button" data-tab="ops"><i class="ti ti-activity-heartbeat"></i>발행·운영</button>
+        <button type="button" data-tab="linkedin"><i class="ti ti-brand-linkedin"></i>링크드인</button>
         <span class="admin-nav-label">독자</span>
         <button type="button" data-tab="newsletter"><i class="ti ti-mail-forward"></i>뉴스레터</button>
         <button type="button" data-tab="subscribers"><i class="ti ti-address-book"></i>구독자</button>
@@ -496,6 +505,34 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             </div>
           </details>
           <div class="admin-status" id="grm-ops-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="admin-panel" data-panel="linkedin" hidden>
+          <div class="admin-panel-head">
+            <div><h2>이번 주 링크드인</h2><p class="sub">본문을 복사해 붙이고 카드를 올린 뒤 게시만 누르면 됩니다. 게시는 대표님만 합니다.</p></div>
+            <span class="admin-pill warn" id="grm-li-state">확인 중</span>
+          </div>
+          <div class="admin-li-grid" id="grm-li-grid">
+            <article class="admin-li-card" data-lang="ko">
+              <h3>국문</h3>
+              <div class="admin-li-row"><span>제목(문서로 올릴 때)</span><code id="grm-li-title-ko">-</code><button class="btn" type="button" data-copy="grm-li-title-ko"><i class="ti ti-copy"></i>복사</button></div>
+              <textarea id="grm-li-caption-ko" readonly rows="12" aria-label="국문 게시 본문"></textarea>
+              <div class="admin-li-actions"><button class="btn coral" type="button" data-copy="grm-li-caption-ko"><i class="ti ti-copy"></i>본문 복사</button><span id="grm-li-links-ko" class="admin-li-links"></span></div>
+            </article>
+            <article class="admin-li-card" data-lang="en">
+              <h3>영문 <small>국문을 게시한 뒤 같은 날 두 번째 글로</small></h3>
+              <div class="admin-li-row"><span>제목(문서로 올릴 때)</span><code id="grm-li-title-en">-</code><button class="btn" type="button" data-copy="grm-li-title-en"><i class="ti ti-copy"></i>복사</button></div>
+              <textarea id="grm-li-caption-en" readonly rows="12" aria-label="영문 게시 본문"></textarea>
+              <div class="admin-li-actions"><button class="btn coral" type="button" data-copy="grm-li-caption-en"><i class="ti ti-copy"></i>본문 복사</button><span id="grm-li-links-en" class="admin-li-links"></span></div>
+            </article>
+          </div>
+          <div class="admin-status" id="grm-li-status" role="status" aria-live="polite"></div>
+          <ol class="admin-li-steps">
+            <li>링크드인 앱·사이트에서 글 올리기를 연다.</li>
+            <li>카드 이미지(PNG)를 모두 올린다. 이미지가 없으면 PDF를 내려받아 문서로 올릴 수 있는 곳(앱)에서 올린다.</li>
+            <li>본문 복사를 눌러 붙여넣는다. 맨 아래 AI 생성 고지 한 줄이 남아 있는지 본다.</li>
+            <li>게시를 누른다. 영문은 국문을 게시한 뒤에 같은 방식으로 한 번 더.</li>
+          </ol>
         </section>
 
         <section class="admin-panel" data-panel="growth" hidden>

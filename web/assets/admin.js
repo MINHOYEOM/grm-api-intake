@@ -477,6 +477,7 @@
       renderInsights();
       renderContentChecks();
       renderSystemChecks();
+      renderLinkedin();
       byId("grm-index-state").className = "admin-pill ok";
       txt("grm-index-state", "인덱스 정상");
     }).catch(function (error) {
@@ -485,6 +486,56 @@
       setStatus(byId("grm-newsletter-status"), errText(error), "err");
     });
   }
+
+  // 링크드인 탭 — 배포가 이미 만든 /briefs/{발행일}/linkedin(.txt|.pdf)(+_en)을 보여 주고 복사만 돕는다. 게시는 사람.
+  // 카드 PNG 목록은 linkedin_cards.json({"ko":[…],"en":[…]}, 파일명)이 있을 때만 링크로 낸다.
+  function copyFrom(id, btn) {
+    var n = byId(id);
+    if (!n) return;
+    var text = n.tagName === "TEXTAREA" ? n.value : n.textContent;
+    var done = function () { if (btn) { var old = btn.innerHTML; btn.textContent = "복사됨"; setTimeout(function () { btn.innerHTML = old; }, 1400); } };
+    var fallback = function () {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch (e) { setStatus(byId("grm-li-status"), "복사하지 못했습니다 — 본문을 직접 선택해 복사해 주세요.", "err"); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  }
+  function renderLinkedin() {
+    if (!byId("grm-li-grid") || !state.latest || !state.latest.date) return;
+    var pub = state.latest.date, base = "/briefs/" + pub + "/", failed = [];
+    var manifest = fetch(base + "linkedin_cards.json").then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    var jobs = [["ko", "linkedin"], ["en", "linkedin_en"]].map(function (pair) {
+      var lang = pair[0], stem = pair[1];
+      txt("grm-li-title-" + lang, (lang === "ko" ? "이번 주 규제 소식 · " : "This week in GMP regulation · ") + pub);
+      return fetch(base + stem + ".txt").then(function (r) {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.text();
+      }).then(function (body) {
+        byId("grm-li-caption-" + lang).value = body.replace(/\s+$/, "");
+        return manifest.then(function (m) {
+          var links = ['<a href="' + base + stem + '.pdf" target="_blank" rel="noopener">카드 PDF</a>'];
+          (m[lang] || []).forEach(function (f, i) {
+            if (/^[A-Za-z0-9_.-]+\.png$/.test(f)) links.push('<a href="' + base + f + '" download>카드 ' + (i + 1) + '</a>');
+          });
+          byId("grm-li-links-" + lang).innerHTML = links.join("");
+        });
+      }).catch(function () {
+        failed.push(lang === "ko" ? "국문" : "영문");
+        byId("grm-li-caption-" + lang).value = "";
+        byId("grm-li-links-" + lang).textContent = "";
+      });
+    });
+    Promise.all(jobs).then(function () {
+      var pill = byId("grm-li-state");
+      if (!failed.length) { pill.className = "admin-pill ok"; pill.textContent = pub + " 발행분"; setStatus(byId("grm-li-status"), ""); }
+      else { pill.className = "admin-pill warn"; pill.textContent = pub + " · " + failed.join("·") + " 없음"; setStatus(byId("grm-li-status"), failed.join("·") + " 본문을 불러오지 못했습니다. 배포의 LinkedIn cards 단계가 실패했거나 옛 브리프일 수 있습니다.", "err"); }
+    });
+  }
+  qsa("[data-copy]").forEach(function (b) { b.addEventListener("click", function () { copyFrom(b.getAttribute("data-copy"), b); }); });
 
   function loadOverview() {
     return api("admin-supabase?action=overview").then(function (data) {

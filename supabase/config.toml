@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.newsletter-optin]
 verify_jwt = false
+
+[functions.account-delete]
+verify_jwt = false

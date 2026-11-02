@@ -696,6 +696,10 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <div><h2>구독자 관리</h2><p class="sub">Brevo 리스트의 구독자를 조회하고 추가하거나 목록에서 제거합니다.</p></div>
             <button class="btn" type="button" id="grm-subscribers-refresh"><i class="ti ti-refresh"></i>새로고침</button>
           </div>
+          <div class="admin-toolbar" id="grm-overlap-bar">
+            <button class="btn" type="button" id="grm-overlap-run"><i class="ti ti-users-group"></i>회원 중 구독자 수 확인</button>
+            <span class="sub" id="grm-overlap-result" role="status" aria-live="polite">버튼을 누르면 회원·구독자 명단을 서버에서 대조해 숫자만 보여 줍니다(이메일은 화면·기록에 남지 않음, 10분 캐시).</span>
+          </div>
           <form class="admin-inline-form" id="grm-subscriber-form">
             <input type="email" name="email" placeholder="subscriber@example.com" required autocomplete="email" aria-label="구독자 이메일">
             <button class="btn coral" type="submit"><i class="ti ti-user-plus"></i>구독자 추가</button>

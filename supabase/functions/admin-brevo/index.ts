@@ -49,6 +49,63 @@ function cleanEmail(value: unknown): string {
   return String(value || "").trim().toLowerCase();
 }
 
+
+// ── 회원 ∩ 구독자 대조(숫자만) ─────────────────────────────────────────────
+// 두 명단(auth 회원·Brevo 리스트)을 서버에서만 대조하고 **개수만** 돌려준다 — 이메일은 응답·로그·감사
+// 기록 어디에도 남기지 않는다. 버튼을 눌렀을 때만 호출되고(자동 폴링 없음), 결과는 10분간 인스턴스
+// 메모리에 캐시해 Brevo API 호출을 아낀다. 상한(페이지 수)을 넘으면 truncated 로 알린다.
+const OVERLAP_TTL_MS = 10 * 60 * 1000;
+const OVERLAP_MAX_PAGES = 20; // Brevo 500건×20 = 1만 건, 회원 1000건×20 = 2만 명
+let overlapCache: { at: number; body: Record<string, unknown> } | null = null;
+
+async function memberOverlap(ctx: { supabase: any }) {
+  if (overlapCache && Date.now() - overlapCache.at < OVERLAP_TTL_MS) {
+    return { ...overlapCache.body, cached: true };
+  }
+  let truncated = false;
+  const subs = new Set<string>();
+  for (let page = 0; page < OVERLAP_MAX_PAGES; page++) {
+    const res = await brevo(`/contacts/lists/${encodeURIComponent(listId())}/contacts?limit=500&offset=${page * 500}`);
+    if (!res.ok) return { error: "brevo_request_failed", status: res.status };
+    const rows = ((res.payload as Record<string, unknown>).contacts || []) as Array<Record<string, unknown>>;
+    for (const r of rows) {
+      if (r.emailBlacklisted) continue; // 수신거부는 구독자로 세지 않는다
+      const e = cleanEmail(r.email);
+      if (e) subs.add(e);
+    }
+    if (rows.length < 500) break;
+    if (page === OVERLAP_MAX_PAGES - 1) truncated = true;
+  }
+  const { data: adminRows } = await ctx.supabase.from("admin_user").select("email").is("revoked_at", null);
+  const admins = new Set(((adminRows || []) as Array<Record<string, unknown>>).map((a) => cleanEmail(a.email)));
+  let members = 0;
+  let overlap = 0;
+  for (let page = 1; page <= OVERLAP_MAX_PAGES; page++) {
+    const { data, error } = await ctx.supabase.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) return { error: "auth_list_failed" };
+    const users = (data?.users || []) as Array<Record<string, unknown>>;
+    for (const u of users) {
+      const e = cleanEmail(u.email);
+      if (!e || admins.has(e)) continue;
+      members++;
+      if (subs.has(e)) overlap++;
+    }
+    if (users.length < 1000) break;
+    if (page === OVERLAP_MAX_PAGES) truncated = true;
+  }
+  const body = {
+    ok: true,
+    members,
+    subscribers: subs.size,
+    overlap,
+    member_only: members - overlap,
+    truncated,
+    computed_at: new Date().toISOString(),
+  };
+  overlapCache = { at: Date.now(), body };
+  return { ...body, cached: false };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return optionsResponse();
   const ctx = await requireAdmin(req);
@@ -95,6 +152,13 @@ Deno.serve(async (req: Request) => {
       const res = await brevo(`/contacts/lists/${encodeURIComponent(listId())}/contacts?limit=${limit}&offset=${offset}`);
       if (!res.ok) return jsonResponse({ error: "brevo_request_failed", status: res.status, details: res.payload }, 502);
       return jsonResponse(res.payload);
+    }
+    if (action === "member_overlap") {
+      if (!listId()) return jsonResponse({ error: "brevo_list_not_configured" }, 500);
+      const out = await memberOverlap(ctx);
+      if ("error" in out) return jsonResponse(out, 502);
+      await audit(ctx, "brevo.member_overlap", { cached: out.cached }); // 숫자 조회 사실만(이메일 없음)
+      return jsonResponse(out);
     }
     if (action === "campaigns") {
       const res = await brevo(`/emailCampaigns?type=classic&limit=${Math.min(limit, 100)}&offset=${offset}&sort=desc`);

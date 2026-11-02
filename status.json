@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T07:44:33Z",
+ "generated_at": "2026-11-02T07:55:20Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -244,6 +244,17 @@
   ],
   "grm-watchlist-notify.yml": [
    {
+    "databaseId": 41409324032,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-02T07:54:39Z",
+    "updatedAt": "2026-11-02T07:55:11Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41409324032"
+   },
+   {
     "databaseId": 41408157768,
     "status": "completed",
     "conclusion": "success",
@@ -286,17 +297,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Watchlist Notify",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/38219073412"
-   },
-   {
-    "databaseId": 37277397006,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-05T07:22:41Z",
-    "updatedAt": "2026-10-05T07:23:04Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Watchlist Notify",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/37277397006"
    }
   ],
   "grm-newsletter-send.yml": [

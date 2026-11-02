@@ -14654,7 +14654,7 @@ class WebLoginFrictionTest(unittest.TestCase):
         self.assertIn("var resume = loadSignupProgress();", self.js)
         self.assertIn('setMode("confirm");', self.js)
         # 성공(세션 성립)·명시적 이탈에서 진행 상태를 지운다 — 유령 복원 0.
-        self.assertIn("clearSignupProgress(); closeLogin();", self.js)
+        self.assertIn("clearSignupProgress(); if (!holdPop) closeLogin();", self.js)
         self.assertIn('addLink(_t("다른 이메일로 가입"), "signup"', self.js)
         # 저장 대상은 이메일+시각뿐(비밀번호·토큰·세션 미저장) + 30분 만료.
         self.assertIn("JSON.stringify({ email: email, ts: Date.now() })", self.js)

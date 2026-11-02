@@ -1225,5 +1225,35 @@ class PngTests(unittest.TestCase):
             lc.find_chrome = orig
 
 
+class FirmFieldRegressionTest(unittest.TestCase):
+    """2026-11-02 호 02 장 — '업체' 줄이 두 번 나오고 둘째가 공고 제목이 잘린 값이었다."""
+
+    @staticmethod
+    def _mhra_card() -> dict:
+        return _card(1, agency="MHRA", group="Recall", card_type="Recall(UK)",
+                     headline_target="Class 2 Medicines Recall: Xeal Pharma, Clopidogrel Oral Liqu…",
+                     title_issue="표시량 미달 함량 회수",
+                     facts=[{"label": "업체", "value": "Xeal Pharma"}],
+                     key_facts=["업체: Xeal Pharma", "제품: Clopidogrel Oral Suspension", "Class: Class 2"])
+
+    def test_firm_name_prefers_company_fact_over_truncated_title(self):
+        self.assertEqual(lc.firm_name(self._mhra_card()), "Xeal Pharma")
+
+    def test_firm_name_keeps_normal_targets(self):
+        self.assertEqual(lc.firm_name(_card(1)), "Firm 1 Inc.")
+
+    def test_headline_slide_has_one_company_row_without_truncated_title(self):
+        deck = lc.build_deck(_synthetic([self._mhra_card()], tldr=["Xeal Pharma"]), [])
+        rows = next(s for s in deck["slides"] if s["kind"] == "headline")["rows"]
+        company = [v for k, v in rows if k == "업체"]
+        self.assertEqual(company, ["Xeal Pharma"])
+        self.assertFalse(any("…" in v for _, v in rows))
+
+    def test_anon_still_maps_by_headline_target(self):
+        deck = lc.build_deck(_synthetic([self._mhra_card()], tldr=["Xeal Pharma"]), [], anon=True)
+        rows = next(s for s in deck["slides"] if s["kind"] == "headline")["rows"]
+        self.assertEqual([v for k, v in rows if k == "업체"], ["업체 A"])
+
+
 if __name__ == "__main__":
     unittest.main()

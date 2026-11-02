@@ -508,6 +508,28 @@ def has_en(card: dict) -> bool:
     return bool(str(en.get("title_issue") or "").strip() and str(en.get("summary") or "").strip())
 
 
+_RECALL_TITLE_TARGET = re.compile(r"^Class\s+\d\s+Medicines\s+Recall\s*:", re.I)
+
+
+def firm_name(card: dict) -> str:
+    """카드의 업체 표시명. MHRA 회수 카드는 `headline_target` 이 공고 제목을 40자로 자른 것
+    ('Class 2 Medicines Recall: Xeal Pharma, Clopidogrel Oral Liqu…')이라 그대로 쓰면 업체 줄에
+    제품 제목이 잘려 들어간다(2026-11-02 호 02 장). 그런 값이면 같은 카드의 업체 사실
+    (`facts` 의 업체 라벨 → `key_facts` 의 '업체:' 줄)에서 가져온다 — 없으면 원래 값."""
+    tgt = str(card.get("headline_target") or "")
+    if not (tgt.endswith(("…", "...")) or _RECALL_TITLE_TARGET.match(tgt)):
+        return tgt
+    for f in card.get("facts") or []:
+        if isinstance(f, dict) and str(f.get("label") or "").strip() in ("업체", "업체/제조소", "Company") \
+                and str(f.get("value") or "").strip():
+            return str(f["value"]).strip()
+    for line in _facts(card):
+        kv = parse_fact(line)
+        if kv and kv[0] in ("업체", "Company"):
+            return kv[1]
+    return tgt
+
+
 def _firm_for_lang(name: str, lang: str) -> str:
     """영문 덱에서 한글 업체명은 **빈 문자열**. 로마자로 옮기면 없는 회사를 만든다 —
     이름을 못 쓰면 그 줄을 빼고, 건수로만 남긴다."""
@@ -966,7 +988,7 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
 
     def firm(card: dict) -> str:
         tgt = str(card.get("headline_target") or "")
-        return _firm_for_lang(names.get(tgt, tgt), lang)
+        return _firm_for_lang(names.get(tgt) or firm_name(card), lang)
 
     # ── 01 표지: 통계 타일 4개(카드 수 + 0 이 아닌 축 셋)
     tiles = [(str(n_cards), t["tile_cards"])]
@@ -991,8 +1013,8 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
             if not kv:
                 continue
             label, value = kv
-            if label.startswith(("발행", "Published", "Posted")):
-                continue
+            if label.startswith(("발행", "Published", "Posted")) or label == t["row_company"]:
+                continue       # 업체 줄은 아래에서 한 번만 낸다(key_facts 의 '업체:' 와 겹쳐 두 번 나왔다)
             rows.append((label, value))
             if len(rows) >= 3:
                 break
@@ -1305,7 +1327,7 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
 
     def firm(card: dict) -> str:
         tgt = str(card.get("headline_target") or "")
-        return _firm_for_lang(names.get(tgt, tgt), lang)
+        return _firm_for_lang(names.get(tgt) or firm_name(card), lang)
 
     archive_url = _month_archive_url(briefs, base_url, lang)
     ai_note = t["ai_note"]
@@ -1328,8 +1350,8 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
             if not kv:
                 continue
             label, value = kv
-            if label.startswith(("발행", "Published", "Posted")):
-                continue
+            if label.startswith(("발행", "Published", "Posted")) or label == t["row_company"]:
+                continue       # 업체 줄은 아래에서 한 번만 낸다(key_facts 의 '업체:' 와 겹쳐 두 번 나왔다)
             rows.append((label, value))
             if len(rows) >= 3:
                 break

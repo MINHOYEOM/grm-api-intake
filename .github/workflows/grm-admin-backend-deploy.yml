@@ -45,7 +45,7 @@ jobs:
           for file in \
             supabase/functions/admin-supabase/index.ts \
             supabase/functions/admin-github/index.ts \
-            supabase/functions/admin-brevo/index.ts
+            supabase/functions/admin-brevo/index.ts \n            supabase/functions/account-delete/index.ts
           do
             for attempt in 1 2 3; do
               if deno check "$file"; then
@@ -173,3 +173,4 @@ jobs:
           supabase functions deploy admin-supabase --project-ref "${{ steps.ref.outputs.project_ref }}"
           supabase functions deploy admin-github --project-ref "${{ steps.ref.outputs.project_ref }}"
           supabase functions deploy admin-brevo --project-ref "${{ steps.ref.outputs.project_ref }}"
+          supabase functions deploy account-delete --project-ref "${{ steps.ref.outputs.project_ref }}"

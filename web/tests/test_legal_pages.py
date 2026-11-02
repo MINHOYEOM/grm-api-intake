@@ -46,8 +46,18 @@ class LegalPagesPublishedTest(unittest.TestCase):
         self.assertIn("/privacy/</loc>", sm)
         self.assertIn("/terms/</loc>", sm)
         index = (self.out / "index.html").read_text(encoding="utf-8")
-        self.assertIn('href="/privacy/"', index)
-        self.assertIn('href="/terms/"', index)
+        self.assertIn('href="privacy/index.html"', index)
+        self.assertIn('href="terms/index.html"', index)
+        en_index = (self.out / "en" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="privacy/index.html"', en_index)
+        self.assertIn("/en/privacy/</loc>", sm)
+        self.assertIn("/en/terms/</loc>", sm)
+
+    def test_english_pages_emitted(self):
+        for sub in ("privacy", "terms"):
+            html = (self.out / "en" / sub / "index.html").read_text(encoding="utf-8")
+            self.assertNotIn("noindex", html)
+            self.assertIn("November 3, 2026", html)
 
 
 class LegalContentTest(unittest.TestCase):
@@ -72,8 +82,23 @@ class LegalContentTest(unittest.TestCase):
 
     def test_signup_links_resolve_to_emitted_paths(self):
         js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
-        for _stem, path in render.LEGAL_PAGES:
+        for _stem, _stem_en, path in render.LEGAL_PAGES:
             self.assertIn(f'legalHref("{path}")', js)
+
+    def test_english_translation_mirrors_korean_structure(self):
+        for stem, stem_en, _path in render.LEGAL_PAGES:
+            _t, _l, ko = render.render_about_html((render.LEGAL_DIR / f"{stem}.md").read_text(encoding="utf-8"))
+            _t, _l, en = render.render_about_html((render.LEGAL_DIR / f"{stem_en}.md").read_text(encoding="utf-8"))
+            self.assertEqual(len(ko), len(en), stem)
+            md_en = (render.LEGAL_DIR / f"{stem_en}.md").read_text(encoding="utf-8")
+            self.assertIn("Korean version prevails", md_en)
+            self.assertIn("November 3, 2026", md_en)
+            real = json.loads((WEB_DIR / "data" / "contact.json").read_text(encoding="utf-8"))["email"]
+            self.assertIn(real, md_en)
+
+    def test_english_privacy_has_under_14_clause(self):
+        md = (render.LEGAL_DIR / "privacy_en.md").read_text(encoding="utf-8")
+        self.assertIn("Children under 14 cannot sign up", md)
 
 
 if __name__ == "__main__":

@@ -65,10 +65,10 @@ GUIDE_EN_FILE = WEB_DIR / "data" / "guide_content_en.md"
 # `# ` 한 줄 = 제목, 첫 `## ` 앞 문단 = 리드, `## ` 마다 한 블록(왼쪽 레이블 + 본문).
 # 영문 파일은 번역본이 아니라 또 하나의 정본이며 h2 순서가 같아야 한다(WebAboutTest 가 고정).
 ABOUT_FILE = WEB_DIR / "data" / "about_content.md"
-# [법무] 개인정보처리방침·이용약관(한국어 정본 한 벌, 2026-11-03 시행). 영어 트리에는 없다 —
-#   푸터 링크는 언어 무관하게 /privacy/·/terms/ 로 간다. 문안은 web/data/legal/*.md 가 정본.
+# [법무] 개인정보처리방침·이용약관(2026-11-03 시행). 한국어가 정본이고 영문(*_en.md)은 같은 절 순서의
+#   번역본이다(충돌 시 한국어 우선 — 영문 문안 첫머리에 명시). 문안은 web/data/legal/*.md.
 LEGAL_DIR = WEB_DIR / "data" / "legal"
-LEGAL_PAGES = (("privacy_ko", "privacy/"), ("terms_ko", "terms/"))
+LEGAL_PAGES = (("privacy_ko", "privacy_en", "privacy/"), ("terms_ko", "terms_en", "terms/"))
 ABOUT_EN_FILE = WEB_DIR / "data" / "about_content_en.md"
 # [소개 2026-09-06] 연락처 — 푸터 법적 줄과 소개 페이지의 이메일. 값이 비어 있으면
 # 그 링크는 **그리지 않는다**(죽은 링크 금지). 사이트에 그대로 실리므로 공개 주소만 넣는다.
@@ -3805,6 +3805,9 @@ EN_TREE_STATIC: tuple[str, ...] = (
     "me/",
     # [소개 2026-09-06] 소개 페이지 — 영문 정본(about_content_en.md)이 있을 때만.
     "about/",
+    # [법무 2026-11-03] 개인정보처리방침·이용약관 — 영문 번역본(web/data/legal/*_en.md)이 커밋돼 있다.
+    "privacy/",
+    "terms/",
 )
 
 
@@ -4297,6 +4300,8 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
     ("guide/", "Guide", "How to use the service, and frequently asked questions"),
     ("quiz/", "Weekly quiz", "Learning quiz based on that week's regulatory news"),
     ("about/", "About", "Why the service exists, how it is made, and how to get in touch"),
+    ("privacy/", "Privacy Policy", "What information we collect, why, and how long we keep it"),
+    ("terms/", "Terms of Service", "Terms for using the service"),
 )
 
 
@@ -5454,7 +5459,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         )
 
     # [법무] 개인정보처리방침·이용약관 — 한국어 트리에만. 가입 화면·푸터에서 링크한다.
-    for _stem, _path in LEGAL_PAGES:
+    for _stem, _stem_en, _path in LEGAL_PAGES:
         _f = LEGAL_DIR / f"{_stem}.md"
         if _f.exists():
             _lt, _ll, _ls = render_about_html(_f.read_text(encoding="utf-8"))
@@ -6498,6 +6503,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             about_lead=en_about_lead,
             about_sections=en_about_sections,
         )
+
+    # [법무] 영문 처리방침·약관 — 한국어 정본과 같은 절 순서의 번역본.
+    for _stem, _stem_en, _path in LEGAL_PAGES:
+        _fe = LEGAL_DIR / f"{_stem_en}.md"
+        if _fe.exists():
+            _et, _el, _es = render_about_html(_fe.read_text(encoding="utf-8"))
+            en_emit("legal.html", en_page(_path), page_title=_et + " · GRM",
+                    nav_active="about", description="", about_title=_et,
+                    about_lead=_el, about_sections=_es)
 
     # [다국어 2026-09-05] 주간 퀴즈 — 영문 세 필드가 다 있는 문항만(`quiz_has_english`).
     # 남은 문항이 0이면 페이지를 내지 않는다(빈 퀴즈 금지 = 빈 상자 금지 원칙).

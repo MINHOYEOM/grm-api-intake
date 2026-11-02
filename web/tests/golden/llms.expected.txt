@@ -50,3 +50,5 @@ Some pages exist only in Korean because the source document is Korean — MFDS i
 - [Guide](https://grm-solutions.com/en/guide/): How to use the service, and frequently asked questions
 - [Weekly quiz](https://grm-solutions.com/en/quiz/): Learning quiz based on that week's regulatory news
 - [About](https://grm-solutions.com/en/about/): Why the service exists, how it is made, and how to get in touch
+- [Privacy Policy](https://grm-solutions.com/en/privacy/): What information we collect, why, and how long we keep it
+- [Terms of Service](https://grm-solutions.com/en/terms/): Terms for using the service

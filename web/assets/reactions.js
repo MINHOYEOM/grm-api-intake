@@ -265,7 +265,7 @@
   function pwCheck(pw) { return { len: pw.length >= PW_MIN, letter: /[A-Za-z]/.test(pw), digit: /[0-9]/.test(pw) }; }
   function pwOk(pw) { var c = pwCheck(pw); return c.len && c.letter && c.digit; }
   var TERMS_VER = "terms-2026-11-03";   // 가입 시 동의한 약관·처리방침 시행일 — 문서를 바꾸면 올린다
-  function legalHref(p) { return "/" + p; }   // 법적 문서는 한국어 정본 한 벌 — 영문 화면에서도 같은 주소
+  function legalHref(p) { return esc(cfgRoot) + p + "index.html"; }   // 언어 트리마다 같은 상대 경로(한국어 /privacy/, 영문 /en/privacy/)
   function pwField(ph, ac) {
     return '<span class="grm-pw-wrap"><input type="password" required minlength="6" autocomplete="' + ac +
       '" placeholder="' + ph + '" aria-label="' + ph + '" />' +

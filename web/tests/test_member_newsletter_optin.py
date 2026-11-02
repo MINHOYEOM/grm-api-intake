@@ -18,7 +18,7 @@ CFG = (ROOT / "supabase/config.toml").read_text(encoding="utf-8")
 WF = (ROOT / ".github/workflows/grm-admin-backend-deploy.yml").read_text(encoding="utf-8")
 
 KEYS = [
-    "(선택) 주간 뉴스레터 수신에 동의합니다",
+    "(선택) 주간 브리프·새 기능 안내 메일 받기",
     "매주 월요일 규제 소식(브리프)과 사이트 새 기능 안내를 이메일로 받습니다. 가입 확인 코드를 입력하면 구독도 함께 완료되며, 모든 메일 하단의 수신거부 링크로 언제든 해지할 수 있어요.",
     "뉴스레터 구독도 이 코드 입력으로 함께 완료됩니다.",
     "주간 뉴스레터, 받아보시겠어요?",
@@ -98,8 +98,36 @@ class ClientContract(unittest.TestCase):
             self.assertIn(k, EN, k)
             self.assertTrue(EN[k].strip())
             self.assertIn(k, JS, k)
-        for gone in ("확인 메일 받기", "주간 뉴스레터도 받기 (선택)"):
+        for gone in ("확인 메일 받기", "주간 뉴스레터도 받기 (선택)", "(선택) 주간 뉴스레터 수신에 동의합니다"):
             self.assertNotIn(gone, EN)
+
+
+class SignupConsentContract(unittest.TestCase):
+    """가입 화면 필수 동의(만 14세·약관/처리방침) + 선택 구독 + 비밀번호 요건."""
+
+    def test_required_consents_block_submit(self):
+        for token in ("grm-c-age", "grm-c-terms", "만 14세 이상만 가입할 수 있어요.",
+                      "이용약관과 개인정보처리방침에 동의해 주세요."):
+            self.assertIn(token, JS)
+        # 필수 검사는 signUp 호출보다 앞선다.
+        self.assertLess(JS.index("!(ageCb.checked && termsCb.checked)"), JS.index("sb.auth.signUp("))
+
+    def test_consent_recorded_in_user_metadata(self):
+        for token in ("age14_confirmed = true", "meta.terms_ver = TERMS_VER", "meta.terms_agreed_at"):
+            self.assertIn(token, JS)
+
+    def test_legal_links_and_optional_newsletter(self):
+        self.assertIn('legalHref("terms/")', JS)
+        self.assertIn('legalHref("privacy/")', JS)
+        # 구독 체크는 선택 — 필수 검사식에 optinCb 가 끼지 않는다.
+        self.assertNotIn("optinCb.checked)) {", JS[JS.index("var ageCb"):JS.index("if (firstBad)")])
+
+    def test_password_rule_and_en_keys(self):
+        self.assertIn("var PW_MIN = 8;", JS)
+        for k in ("(필수) 만 14세 이상입니다", "(필수) {terms}과 {privacy}에 동의합니다",
+                  "비밀번호는 8자 이상, 영문과 숫자를 함께 넣어 주세요.", "계속 둘러보기"):
+            self.assertIn(k, EN, k)
+            self.assertIn(k, JS, k)
 
 
 class ServerContract(unittest.TestCase):

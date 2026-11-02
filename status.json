@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T13:38:13Z",
+ "generated_at": "2026-11-02T18:49:23Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41449227747,
+    "databaseId": 41498156454,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T13:00:05Z",
-    "updatedAt": "2026-11-02T13:05:42Z",
+    "createdAt": "2026-11-02T18:11:14Z",
+    "updatedAt": "2026-11-02T18:16:16Z",
     "headBranch": "main",
-    "displayTitle": "feat(account): 계정 삭제 ② /me 화면 — 확인 모달·영문 문구·영문 골든 재동결 (#1292)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41449227747"
+    "displayTitle": "feat(legal): 개인정보처리방침·이용약관 정식 공개 (② ①위에 쌓임) (#1299)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41498156454"
    },
    {
-    "databaseId": 41445172935,
+    "databaseId": 41493586876,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T12:29:52Z",
-    "updatedAt": "2026-11-02T12:35:56Z",
-    "headBranch": "feat/account-delete-ui",
-    "displayTitle": "feat(account): 계정 삭제 ② /me 화면 (#1291 선행)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41445172935"
+    "createdAt": "2026-11-02T17:41:49Z",
+    "updatedAt": "2026-11-02T17:46:55Z",
+    "headBranch": "feat/legal-pages-publish",
+    "displayTitle": "feat(legal): 개인정보처리방침·이용약관 정식 공개 (② ①위에 쌓임)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41493586876"
    },
    {
-    "databaseId": 41445166755,
+    "databaseId": 41493579534,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T12:29:49Z",
-    "updatedAt": "2026-11-02T12:36:12Z",
-    "headBranch": "feat/account-delete-ui",
-    "displayTitle": "merge main into account-delete-ui (영문 골든 해시 재동결)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41445166755"
+    "createdAt": "2026-11-02T17:41:46Z",
+    "updatedAt": "2026-11-02T17:47:22Z",
+    "headBranch": "feat/legal-pages-publish",
+    "displayTitle": "merge main into legal-pages-publish (#1298 반영, legalHref 는 언어 트리별 경로 유지)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41493579534"
    },
    {
-    "databaseId": 41444916739,
+    "databaseId": 41493255844,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T12:27:58Z",
-    "updatedAt": "2026-11-02T12:33:47Z",
+    "createdAt": "2026-11-02T17:39:42Z",
+    "updatedAt": "2026-11-02T17:45:05Z",
     "headBranch": "main",
-    "displayTitle": "feat(account): 계정 삭제 서버 — 098·099 마이그레이션 파일(미적용) + account-delete Edg…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41444916739"
+    "displayTitle": "feat(web): 회원가입 UX 개편 + 필수 동의(만 14세·약관) — ① 머지 순서 ①→②→③ (#1298)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41493255844"
    },
    {
-    "databaseId": 41440812039,
+    "databaseId": 41489948863,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T11:57:20Z",
-    "updatedAt": "2026-11-02T12:02:57Z",
-    "headBranch": "feat/account-delete-server",
-    "displayTitle": "feat(account): 계정 삭제 ① 서버 — 098·099(미적용) + account-delete",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41440812039"
+    "createdAt": "2026-11-02T17:18:43Z",
+    "updatedAt": "2026-11-02T17:25:04Z",
+    "headBranch": "feat/legal-pages-publish",
+    "displayTitle": "feat(legal): 개인정보처리방침·이용약관 정식 공개 (② ①위에 쌓임)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41489948863"
    }
   ],
   "grm-scaffold-mirror.yml": [

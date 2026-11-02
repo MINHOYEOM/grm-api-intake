@@ -120,6 +120,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--branch", required=True, help="발행 PR head 브랜치(publish/brief-YYYY-MM-DD)")
     ap.add_argument("--dry-run", action="store_true", help="조건 판정·메일 본문 출력만(발송·표식 0)")
     a = ap.parse_args(argv)
+    for _stream in (sys.stdout, sys.stderr):          # Windows cp949 콘솔서도 한글 출력(growth_weekly 와 동일 관용구)
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
 
     if not BRANCH_RE.match(a.branch):
         print(f"::notice::발행 PR 브랜치가 아니어서 건너뜀: {a.branch}")

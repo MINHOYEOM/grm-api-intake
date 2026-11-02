@@ -4,7 +4,7 @@
 set -uo pipefail
 MSG="$1"; shift
 BRANCH=claude/ops-status
-STDIN_FILE=$(mktemp); cat > "$STDIN_FILE" 2>/dev/null || true
+STDIN_FILE=$(mktemp); timeout 5 cat > "$STDIN_FILE" 2>/dev/null || true
 for attempt in 1 2 3 4; do
   rm -rf _ops && mkdir _ops && cd _ops
   git init -q

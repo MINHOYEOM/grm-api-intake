@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-02T08:44:38Z",
+ "generated_at": "2026-11-02T13:38:13Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41409704695,
+    "databaseId": 41449227747,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T07:58:12Z",
-    "updatedAt": "2026-11-02T08:04:17Z",
+    "createdAt": "2026-11-02T13:00:05Z",
+    "updatedAt": "2026-11-02T13:05:42Z",
     "headBranch": "main",
-    "displayTitle": "quiz(weekly): 202645 — 브리프 2 + 개념 2 (2026-11-02 브리프) (#1293)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41409704695"
+    "displayTitle": "feat(account): 계정 삭제 ② /me 화면 — 확인 모달·영문 문구·영문 골든 재동결 (#1292)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41449227747"
    },
    {
-    "databaseId": 41409701064,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-02T07:58:10Z",
-    "updatedAt": "2026-11-02T07:58:13Z",
-    "headBranch": "main",
-    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립) (#1290)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41409701064"
-   },
-   {
-    "databaseId": 41399595021,
+    "databaseId": 41445172935,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T06:23:25Z",
-    "updatedAt": "2026-11-02T06:28:27Z",
-    "headBranch": "quiz/weekly-20261102",
-    "displayTitle": "quiz(weekly): 202645 — 브리프 2 + 개념 2",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41399595021"
+    "createdAt": "2026-11-02T12:29:52Z",
+    "updatedAt": "2026-11-02T12:35:56Z",
+    "headBranch": "feat/account-delete-ui",
+    "displayTitle": "feat(account): 계정 삭제 ② /me 화면 (#1291 선행)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41445172935"
    },
    {
-    "databaseId": 41399582254,
+    "databaseId": 41445166755,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T06:23:18Z",
-    "updatedAt": "2026-11-02T06:28:55Z",
-    "headBranch": "quiz/weekly-20261102",
-    "displayTitle": "quiz(weekly): 202645 — 브리프 2 + 개념 2 (2026-11-02 브리프)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41399582254"
+    "createdAt": "2026-11-02T12:29:49Z",
+    "updatedAt": "2026-11-02T12:36:12Z",
+    "headBranch": "feat/account-delete-ui",
+    "displayTitle": "merge main into account-delete-ui (영문 골든 해시 재동결)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41445166755"
    },
    {
-    "databaseId": 41396561198,
+    "databaseId": 41444916739,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-02T12:27:58Z",
+    "updatedAt": "2026-11-02T12:33:47Z",
+    "headBranch": "main",
+    "displayTitle": "feat(account): 계정 삭제 서버 — 098·099 마이그레이션 파일(미적용) + account-delete Edg…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41444916739"
+   },
+   {
+    "databaseId": 41440812039,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T05:52:48Z",
-    "updatedAt": "2026-11-02T05:58:07Z",
-    "headBranch": "feat/member-optin-onestep",
-    "displayTitle": "회원 뉴스레터 구독 한 번에: 코드 확인 후 서버가 본인 이메일 등록(newsletter-optin)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41396561198"
+    "createdAt": "2026-11-02T11:57:20Z",
+    "updatedAt": "2026-11-02T12:02:57Z",
+    "headBranch": "feat/account-delete-server",
+    "displayTitle": "feat(account): 계정 삭제 ① 서버 — 098·099(미적용) + account-delete",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41440812039"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -301,6 +301,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 41454533632,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-02T13:37:05Z",
+    "updatedAt": "2026-11-02T13:38:03Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41454533632"
+   },
+   {
     "databaseId": 41415013713,
     "status": "completed",
     "conclusion": "success",
@@ -343,17 +354,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39240577089"
-   },
-   {
-    "databaseId": 39197470266,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-10-19T04:02:01Z",
-    "updatedAt": "2026-10-19T04:03:00Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39197470266"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -416,11 +416,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 41399070441,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-02T06:18:22Z",
-    "updatedAt": "2026-11-02T06:18:26Z",
+    "updatedAt": "2026-11-02T09:35:08Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41399070441"

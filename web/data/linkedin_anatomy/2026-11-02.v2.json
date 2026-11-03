@@ -1,0 +1,138 @@
+{
+  "schema": "grm-anatomy-slots/v2",
+  "pub": "2026-11-02",
+  "card_id": "8909d4bb39b5",
+  "firm_alias": "한 PET 의약품 제조소",
+  "status": "pilot",
+  "cover": {
+    "chip": "FDA 경고서한 · 환경모니터링",
+    "headline": [
+      "ISO 5 균 약 75건 중,",
+      "정식 동정은 2건뿐"
+    ],
+    "sub": "PET 의약품 제조소 · 21 CFR 212.20(d)",
+    "dots": {
+      "total": 75,
+      "marked": 2,
+      "evidence": [
+        "2024년 12월 이후 약 75건의 ISO 5 미생물 검출 중 공식 동정에 의뢰된 것은 단 2건이었다"
+      ],
+      "caption": "2024년 12월 이후 ISO 5 검출 약 75건 중 공식 동정 2건"
+    },
+    "line": "같은 서한: 100건 넘는 검출, 90건 넘는 ‘유사 집락’ 기록",
+    "line_evidence": [
+      "100건이 넘는 미생물 검출",
+      "90건이 넘는 ISO 5 분리균이 공식적인 미생물 동정 대신"
+    ]
+  },
+  "s02": {
+    "heading": "서한이 쓴 말 그대로, 세 문장",
+    "quotes": [
+      {
+        "en": "More than 90 ISO 5 isolates were documented as “resembles previously identified Bacillus colonies” or “resembles previously identified colonies” in lieu of formal microbial identification",
+        "ko": "90건이 넘는 ISO 5 분리균이 공식적인 미생물 동정 대신 “이전에 동정된 Bacillus 집락과 유사함” 또는 “이전에 동정된 집락과 유사함”으로 기록되었고",
+        "note": "‘유사’는 동정이 아니다. 무엇과 유사한지 기록도 없다."
+      },
+      {
+        "en": "Operator training for interpreting (b)(4) plate results consisted of a single presentation slide instructing personnel to “count CFUs and record results,” with no instruction regarding microbial identification.",
+        "ko": "(b)(4) 플레이트 결과 판독에 대한 작업자 교육은 “CFU를 계수하고 결과를 기록하라”고 지시하는 프레젠테이션 슬라이드 한 장이 전부였으며, 미생물 동정에 관한 지침은 전혀 없었다.",
+        "note": "교육은 슬라이드 한 장. 균을 가려내는 법은 없었다."
+      },
+      {
+        "en": "Exposure of EM plates to (b)(4) can kill or suppress the microorganisms these tests are designed to recover, rendering results unreliable and potentially generating false negatives.",
+        "ko": "EM 플레이트가 (b)(4)에 노출되면 이 시험이 회수하도록 설계된 미생물이 사멸하거나 억제될 수 있어, 결과를 신뢰할 수 없게 만들고 위음성을 초래할 가능성이 있다.",
+        "note": "플레이트가 약품에 닿으면 ‘균 없음’이 거짓일 수 있다."
+      }
+    ]
+  },
+  "s03": {
+    "heading": "우리 DB의 다른 서한과 견주면",
+    "lines": [
+      "경고서한 431건 중 ISO 5급 구역을 적은 서한은 60건이다.",
+      "PET 의약품 규정(21 CFR 212)을 인용한 다른 경고서한은 1건이다."
+    ],
+    "peer": {
+      "slug": "fda483-87719",
+      "label": "참고: 다른 사업장 483에 인용된 그 회사 자체 SOP (실사 2015년, 공개 2024년)",
+      "en": "All environmental isolates are sent out for identification, including alert and action level samples, routine bioburden samples, media fill samples and Class 100 samples, shall be identified to the species-level",
+      "ko": "경보·조치 수준 검체, 일상 생균수 검체, 미디어 필 검체 및 Class 100 검체를 포함한 모든 환경 분리균을 종 수준까지 동정하기 위해 외부로 보내야 한다고 요구합니다",
+      "note": "무균 업체의 자체 기준은 Class 100 분리균도 종 수준까지 동정한다."
+    }
+  },
+  "s04": {
+    "heading": "회사는 이렇게 답했고, FDA는 부적절하다고 했다",
+    "pairs": [
+      {
+        "response": "ISO 5 검출균을 앞으로 동정·기록하겠다",
+        "judgment": "이미 나온 균의 소급 평가, 동정 없이 출하한 배치 평가, 포자형성균·진균 대응이 없다",
+        "evidence": [
+          "ISO 5 검출균을 향후 동정·기록하겠다는 약속은 미동정 검출균의 소급 평가·이상 경향 평가, 동정 없이 이뤄진 과거 배치 출하 판정의 적절성 평가, ISO 등급 구역 내 포자형성균·진균 존재에 대한 대응이 없어 부적절하다"
+        ]
+      },
+      {
+        "response": "재교육과 사건보고서 양식 보완",
+        "judgment": "저수율의 근본 원인과 기준 하향의 적절성을 다루지 않았고, 교육만으로는 품질부서 감독 실패를 풀 수 없다",
+        "evidence": [
+          "교육만으로는 품질부서 감독이 결함 있는 조사를 탐지하지 못한 시스템적 실패를 해결할 수 없다고 지적했다"
+        ]
+      },
+      {
+        "response": "EM 플레이트 분무 중단·절차 개정",
+        "judgment": "과거 EM 데이터의 신뢰성과 그에 근거한 출하 판정을 평가하지 않았다",
+        "evidence": [
+          "EM 플레이트 분무 중단·절차 개정은 과거 EM 데이터의 신뢰성과 이에 근거한 출하 판정을 평가하지 않았고"
+        ]
+      }
+    ]
+  },
+  "s05": {
+    "heading": "FDA가 요구한 네 가지",
+    "items": [
+      {
+        "ref": 0,
+        "title": "EM 프로그램 독립 검토",
+        "text": "한도·채취 위치·빈도·경향 분석·일탈 조사를 외부가 검토하고, 결과로 CAPA 계획을 낸다."
+      },
+      {
+        "ref": 1,
+        "title": "조사 시스템 평가",
+        "text": "일탈·OOS·OOL·불만 조사 전반을 독립 평가하고, 품질부서에 권한과 자원을 준다."
+      },
+      {
+        "ref": 2,
+        "title": "배지 취급 CAPA",
+        "text": "검체 배지에 고유 라벨·서명·시각 기록·플레이트 사진을 남기는 관리 체계를 만든다."
+      },
+      {
+        "ref": 3,
+        "title": "위험평가·스모크 스터디",
+        "text": "오염 위험을 독립 평가하고, 개선 뒤 동적 조건에서 기류 시험을 다시 한다."
+      }
+    ]
+  },
+  "s06": {
+    "heading": "서한이 말하지 않은 것",
+    "not_stated": [
+      {
+        "text": "서한은 동정을 하지 않은 사내 이유를 적지 않았다.",
+        "basis": "카드 요약에는 교육 자료 한 장 언급뿐 [검증필요]"
+      },
+      {
+        "text": "서한은 동정 없이 출하한 배치가 몇 개인지 적지 않았다.",
+        "basis": "FDA 평가문은 해당 배치 평가가 없다고만 적음 [검증필요]"
+      }
+    ],
+    "question": "우리 ISO 5 검출 건수 대비 동정 건수는 몇 대 몇인가?",
+    "terms": [
+      "cleanroom-classification",
+      "viable-environmental-monitoring",
+      "airflow-visualization-study"
+    ]
+  },
+  "caption": {
+    "lead": "ISO 5 구역에서 균이 나올 때마다 이름을 확인하고 있습니까. 한 PET 의약품 제조소는 2024년 12월 이후 약 75건 중 2건만 정식 동정에 보냈고, FDA는 21 CFR 212.20(d) 위반으로 지적했습니다.",
+    "db": "지적사항 DB로 보면 경고서한 431건 중 환경모니터링 분류는 35건이고, PET 의약품 규정(21 CFR 212)을 인용한 다른 서한은 1건입니다. DB 기준일은 2026-10-31입니다.",
+    "contrast": "회사는 앞으로 동정·기록하겠다고 회신했지만, FDA는 이미 나온 균의 소급 평가와 동정 없이 출하한 배치 평가가 빠졌다며 부적절하다고 판단했습니다.",
+    "not_stated": "서한에 없는 것: 동정하지 않은 사내 이유와 해당 배치 수. 카드에 따로 표시했습니다."
+  }
+}

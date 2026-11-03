@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T08:33:56Z",
+ "generated_at": "2026-11-03T16:32:36Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41599812819,
+    "databaseId": 41667213901,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T07:57:53Z",
-    "updatedAt": "2026-11-03T08:04:24Z",
+    "createdAt": "2026-11-03T15:45:41Z",
+    "updatedAt": "2026-11-03T15:51:51Z",
     "headBranch": "main",
-    "displayTitle": "feat(linkedin): 주간 배포에 해부 7장 스텝 연결 (유사 사례 실조회·실패 시 05 카드만 제외) (#1306)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41599812819"
+    "displayTitle": "feat(brief): 독자 행동 익명 카운터 — 링크·스크롤·카드 펼침 (101, SQL 미적용) (#1312)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41667213901"
    },
    {
-    "databaseId": 41597558048,
+    "databaseId": 41666296623,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-03T07:37:32Z",
-    "updatedAt": "2026-11-03T07:44:38Z",
-    "headBranch": "feat/linkedin-weekly-7cards",
-    "displayTitle": "feat(linkedin): 주간 배포에 해부 7장 스텝 연결 (유사 사례 실조회·실패 시 05 카드만 제외)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41597558048"
+    "createdAt": "2026-11-03T15:40:20Z",
+    "updatedAt": "2026-11-03T15:45:55Z",
+    "headBranch": "fix/card-facts-hc-whopir-mhra",
+    "displayTitle": "fix(card): 캐나다 회수 업체·발행일 · WHO 실사 결론 첫 화면 · MHRA 사유 입력 (사실 불일치 3·5b·4)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41666296623"
    },
    {
-    "databaseId": 41597183653,
+    "databaseId": 41666290432,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T07:34:11Z",
-    "updatedAt": "2026-11-03T07:43:09Z",
-    "headBranch": "feat/linkedin-weekly-7cards",
-    "displayTitle": "feat(linkedin): 주간 배포에 해부 7장 스텝 연결 — --dist·최신 브리프, 실조회 재시도·지적별 실패 허용…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41597183653"
+    "createdAt": "2026-11-03T15:40:18Z",
+    "updatedAt": "2026-11-03T15:46:15Z",
+    "headBranch": "fix/card-facts-hc-whopir-mhra",
+    "displayTitle": "fix(web): 브랜드·정정일 라벨을 i18n 라벨 목록에 등록 · MONO_LABELS 어휘 고정 유지",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41666290432"
    },
    {
-    "databaseId": 41592343418,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-03T06:49:42Z",
-    "updatedAt": "2026-11-03T06:57:37Z",
-    "headBranch": "main",
-    "displayTitle": "feat(linkedin): 해부 카드 GRM 판 v2~v7 — 사이트 유사 사례 엔진·DB 연관 카드·문체 정리 (#1305)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41592343418"
-   },
-   {
-    "databaseId": 41589161413,
+    "databaseId": 41662202523,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-03T06:19:32Z",
-    "updatedAt": "2026-11-03T06:27:22Z",
-    "headBranch": "feat/linkedin-similar-cases-v5",
-    "displayTitle": "feat(linkedin): 해부 카드 GRM 판 v2~v7 — 사이트 유사 사례 엔진·DB 연관 카드·문체 정리",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41589161413"
+    "createdAt": "2026-11-03T15:16:42Z",
+    "updatedAt": "2026-11-03T15:21:59Z",
+    "headBranch": "feat/brief-reader-events",
+    "displayTitle": "feat(brief): 독자 행동 익명 카운터 — 링크·스크롤·카드 펼침 (101, SQL 미적용)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41662202523"
+   },
+   {
+    "databaseId": 41662191519,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-03T15:16:38Z",
+    "updatedAt": "2026-11-03T15:22:07Z",
+    "headBranch": "feat/brief-reader-events",
+    "displayTitle": "test(brief): 골든 재동결 (main 병합 후)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41662191519"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -427,11 +427,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 41592941559,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-03T06:55:28Z",
-    "updatedAt": "2026-11-03T06:55:32Z",
+    "updatedAt": "2026-11-03T10:05:56Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41592941559"

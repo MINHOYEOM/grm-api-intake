@@ -183,5 +183,34 @@ class SiteCasesTest(unittest.TestCase):
         self.assertEqual(lg.site_cases(None, FINDINGS), [])
 
 
+class FetchSimilarTest(unittest.TestCase):
+    def _rpc(self, calls):
+        def rpc(url, key, query, limit):
+            calls.append((query, limit))
+            return [dict(finding_id=f"f{limit}", score=0.1, source="FDA Warning Letter", firm_name="Acme", published_date="2026-01-01", text="t")]
+        return rpc
+
+    def test_calls_engine_per_finding_and_builds_capture(self):
+        calls = []
+        sim = lg.fetch_similar(_slots(), url="https://x", key="k", rpc=self._rpc(calls))
+        self.assertEqual(len(calls), 8)  # 지적 4개 × (상위 5 + 경고서한용 50)
+        self.assertEqual({it["q"] for it in sim["items"]}, {1, 2, 3, 4})
+        self.assertEqual(sim["rules"]["4"][0], "fact")
+
+    def test_failure_or_empty_gives_none(self):
+        def boom(*a):
+            raise OSError("down")
+        self.assertIsNone(lg.fetch_similar(_slots(), url="u", key="k", rpc=boom))
+        self.assertIsNone(lg.fetch_similar(_slots(), url="u", key="k", rpc=lambda *a: []))
+
+    def test_deck_without_similar_drops_only_that_card(self):
+        deck = lg.build_grm_deck(_doc(), _slots(), FINDINGS, similar={})
+        kinds = [s["kind"] for s in deck["slides"]]
+        self.assertNotIn("g_site", kinds)
+        self.assertEqual(kinds[0], "g_cover")
+        self.assertEqual(kinds[-1], "g_end")
+        self.assertNotRegex(deck["caption"], r"(?<!\d)0건")
+
+
 if __name__ == "__main__":
     unittest.main()

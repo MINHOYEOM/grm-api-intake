@@ -20,7 +20,9 @@ from __future__ import annotations
 
 import argparse
 import html
+import datetime as _dt
 import json
+import os
 import re
 import sys
 from collections import Counter, defaultdict
@@ -375,6 +377,17 @@ def _firm_history(findings: dict, slug: str) -> str:
     return line
 
 
+def _rule(sim: dict, q: int) -> tuple[str, re.Pattern]:
+    """지적 q 의 라벨 규칙: 슬롯(sim['rules'])이 있으면 그것, 없으면 이 서한용 기본값. 규칙이 없는 지적은 ‘주제만’."""
+    r = (sim.get("rules") or {}).get(str(q))
+    if r:
+        try:
+            return r[0], re.compile(r[1])
+        except re.error:
+            pass
+    return _SITE_RULES.get(q, ("topic", re.compile("$^")))
+
+
 def site_cases(sim: dict | None, findings: dict) -> list[dict]:
     """사이트 ‘유사 사례’ 엔진(findings_similar RPC)이 대상 서한의 지적마다 돌려준 결과를 그대로 쓴다 — 점수는 사이트 것이다.
     우리가 더하는 것은 닮은 정도 라벨(코드 규칙)·업체 익명 처리·그 업체의 DB 이력(센 값)이다.
@@ -389,7 +402,7 @@ def site_cases(sim: dict | None, findings: dict) -> list[dict]:
     for q in sorted({it["q"] for it in sim["items"]}):
         best = None
         for it in (x for x in sim["items"] if x["q"] == q and x["firm"] not in used):
-            lv, rx = _SITE_RULES.get(q, ("topic", re.compile("$^")))
+            lv, rx = _rule(sim, q)
             lv = lv if rx.search(it["text"]) else "topic"
             key = (rank[lv], "Warning" not in it["source"], -float(it["score"]))
             if best is None or key < best[0]:
@@ -406,6 +419,47 @@ def site_cases(sim: dict | None, findings: dict) -> list[dict]:
                          text=it["text"], fact=_pick_fact(full or it["text"]), slug=str(slug or ""),
                          history=_firm_history(findings, str(slug or ""))))
     return rows
+
+
+def _rpc(url: str, key: str, query: str, limit: int, timeout: int = 20) -> list[dict]:
+    import urllib.request
+    req = urllib.request.Request(f"{url.rstrip('/')}/rest/v1/rpc/findings_similar", method="POST",
+                                 data=json.dumps({"p_query": query[:500], "p_limit": limit}).encode(),
+                                 headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 — 공개 anon RPC
+        return (json.loads(r.read().decode("utf-8")) or {}).get("items") or []
+
+
+def fetch_similar(slots: dict, *, url: str, key: str, rpc=_rpc) -> dict | None:
+    """사이트 ‘유사 사례’ 엔진(findings_similar)을 서한의 지적 4개마다 호출한다(상위 5건 + 경고서한 상위 3건).
+    조회 실패·결과 0건이면 None — 호출한 쪽이 이 카드만 빼고 만든다(없다고 쓰거나 지어내지 않는다)."""
+    rows = (slots.get("s02") or {}).get("rows") or []
+    items: list[dict] = []
+    rules: dict[str, list[str]] = {}
+    targets: list[str] = []
+    try:
+        for q, r in enumerate(rows, 1):
+            query = str(r.get("sim_query") or " ".join(la._ev_list(r.get("evidence")))).strip()
+            targets.append(str(r.get("sim_short") or r.get("text") or "")[:24])
+            lv = "fact" if r.get("sim_fact") else "situation" if r.get("sim_situation") else ""
+            if lv:
+                rules[str(q)] = [lv, str(r.get("sim_fact") or r.get("sim_situation"))]
+            seen: set[str] = set()
+            top5 = rpc(url, key, query, 5)
+            wl = [x for x in rpc(url, key, query, 50) if "Warning" in str(x.get("source"))][:3]
+            for x in [*top5, *wl]:
+                if x.get("finding_id") in seen:
+                    continue
+                seen.add(x["finding_id"])
+                items.append(dict(q=q, finding_id=x["finding_id"], score=x.get("score") or 0, source=x.get("source") or "",
+                                  firm=x.get("firm_name") or "", date=str(x.get("published_date") or ""), text=x.get("text") or ""))
+    except Exception as exc:  # noqa: BLE001 — 네트워크·권한·JSON 어떤 실패든 카드만 뺀다
+        print(f"::warning::유사 사례 조회 실패({type(exc).__name__}) — 05 카드를 뺀다", file=sys.stderr)
+        return None
+    if not items:
+        return None
+    return dict(source="findings_similar RPC", captured_on=_dt.date.today().isoformat(), card_id=str(slots.get("card_id") or ""),
+                targets=targets, rules=rules, items=items)
 
 
 def site_lines(rows: list[dict]) -> list[str]:
@@ -644,8 +698,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     slots = json.loads(sp.read_text(encoding="utf-8"))
     findings = json.loads(FINDINGS.read_text(encoding="utf-8"))
+    url, key = os.environ.get("SUPABASE_URL", "").strip(), os.environ.get("SUPABASE_ANON_KEY", "").strip()
+    similar = None  # 키가 없으면(로컬·테스트) 저장된 <발행일>.similar.json 이 있을 때만 쓴다
+    if url and key:
+        similar = fetch_similar(slots, url=url, key=key) or {}
     try:
-        deck = build_grm_deck(doc, slots, findings)
+        deck = build_grm_deck(doc, slots, findings, similar=similar)
     except la.AnatomyError as exc:
         print("::warning::GRM 판 덱 검증 실패 — 만들지 않는다", file=sys.stderr)
         for pr in exc.problems:
@@ -654,6 +712,8 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "linkedin_grm.txt").write_text(deck["caption"], encoding="utf-8")
+    if similar:
+        (out / "similar.json").write_text(json.dumps(similar, ensure_ascii=False, indent=1), encoding="utf-8")
     (out / "linkedin_grm.html").write_text(render_html(deck), encoding="utf-8")
     chrome = None if args.no_pdf else lc.find_chrome()
     n = 0

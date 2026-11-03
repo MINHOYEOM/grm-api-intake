@@ -1376,6 +1376,45 @@ def normalize_firm_name(name: str) -> str:
     return text
 
 
+_FIRM_PAREN_RE = re.compile(r"\([^)]*\)")
+_FIRM_AND_RE = re.compile(r"\s+and\s+")
+_FIRM_AMP_RE = re.compile(r"\s*&\s*")
+_FIRM_EDGE_RE = re.compile(r"^\s+|[\s&-]+$")
+_FIRM_TRAIL_RE = re.compile(r"[\s&-]+$")
+_FIRM_THE_RE = re.compile(r"^the\s+")
+_FIRM_TAIL_SUFFIX1_RE = re.compile(r"\s+(incorporated|plc|ag|bv|nv|spa|sas|sarl|kg|bhd)$")
+_FIRM_TAIL_SUFFIX2_RE = re.compile(r"\s+(sdn|pte|pty)$")
+_HANGUL_RE = re.compile("[가-힣]")
+
+
+def normalize_firm_name_v2(name: str) -> str:
+    """업체명 정규화 v2 — 지식그래프용 보강안. 아직 firm_key 에 배선되지 않았다.
+
+    web/migrations/102_firm_name_normalize_v2.sql 의 public.grm_normalize_firm_name_v2 와 같은
+    결과를 내야 한다(규칙 순서 포함). v1 에 더하는 것: 괄호 구간 제거, and->&, 후미 법인접미사
+    (incorporated|plc|ag|bv|nv|spa|sas|sarl|kg|bhd|sdn|pte|pty), 선행 The. 한글이 있는 이름은
+    v1 결과를 그대로 쓴다.
+    """
+    text = _text(name)
+    if not text:
+        return ""
+    if _HANGUL_RE.search(text):
+        return normalize_firm_name(text)
+    text = text.replace("&amp;", "&").replace("&#039;", "'").replace("&#39;", "'")
+    text = text.lower()
+    text = _FIRM_PAREN_RE.sub(" ", text)
+    text = _FIRM_PUNCT_RE.sub("", text)
+    text = _FIRM_SUFFIX_RE.sub("", text)
+    text = _FIRM_AND_RE.sub(" & ", text)
+    text = _FIRM_AMP_RE.sub(" & ", text)
+    text = _FIRM_WHITESPACE_RE.sub(" ", text)
+    text = _FIRM_EDGE_RE.sub("", text)
+    text = _FIRM_THE_RE.sub("", text)
+    text = _FIRM_TAIL_SUFFIX1_RE.sub("", text)
+    text = _FIRM_TAIL_SUFFIX2_RE.sub("", text)
+    return _FIRM_TRAIL_RE.sub("", text)
+
+
 # ----------------------------------------------------------------------------
 # 국가 정규화(country_key) — web/migrations/055_findings_country_key.sql 의
 # public.grm_normalize_country 가 이 사전/함수의 SQL 복제본이다(순서는 무관하되 키

@@ -6,7 +6,7 @@ v1(`linkedin_anatomy.py`)은 벤치마크 6칸을 거의 그대로 옮겼다. �
 
 ## 고정 포맷 — 매 편 같은 순서 (`company/editorial/STYLE.md` §11)
 
-카드: 01 판정 · 02 지적 해부 · 03 회신 해부 · 04 시정 요구 · 05 유사 사례 · 06 서한에 없는 말
+카드: 01 판정 · 02 지적 내용 · 03 회신 평가 · 04 시정 요구 · 05 유사 사례 · 06 서한에 없는 것
 본문: ① 판정 한 줄 ② 지적(조항별) ③ 회신이 부적절한 이유 ④ 시정 요구 ⑤ 유사 사례(DB) ⑥ 서한에 없는 것 ⑦ 링크
 
 ## 사실의 출처 — 코드·DB 가 쥐고 LLM 은 슬롯만 (비용 0)
@@ -228,12 +228,14 @@ def _ns(x: Any) -> str:
 
 # ── 덱 ───────────────────────────────────────────────────────────────────────────────────────
 
-def db_lines(db: dict) -> list[str]:
-    """DB 값으로만 만드는 문장(템플릿) — LLM 이 쓰지 않는다."""
+def db_lines(db: dict, polite: bool = False) -> list[str]:
+    """DB 값으로만 만드는 문장(템플릿) — LLM 이 쓰지 않는다. polite=True 는 본문(합쇼체), 아니면 카드(짧은 평서)."""
     yrs = sorted(db["em_years"])
-    out = [f"같은 주제(환경모니터링)로 지적된 경고서한 {db['em_n']}건 ({yrs[0]}~{yrs[-1]}), 업체 {db['em_firms']}곳.",
-           f"이 중 {db['em_483_before']}곳은 서한 전에 483을 받았고, 서한을 두 번 이상 받은 곳은 {db['em_repeat']}곳이다."]
-    return out
+    if polite:
+        return [f"환경모니터링으로 지적된 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체입니다.",
+                f"이 중 {db['em_483_before']}곳은 서한 전에 483을 먼저 받았고, {db['em_repeat']}곳은 서한을 두 번 이상 받았습니다."]
+    return [f"환경모니터링으로 지적된 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체.",
+            f"이 중 {db['em_483_before']}곳은 서한 전에 483을 먼저 받았다. 서한을 두 번 이상 받은 곳은 {db['em_repeat']}곳."]
 
 
 def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[dict] | None = None,
@@ -256,14 +258,14 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     slides = [
         dict(kind="g_cover", chip=cv["chip"], h1=list(cv["headline"]), sub=cv["sub"], dots=dict(cv["dots"]),
              line=cv.get("line") or "", ft_right=src_note, ai=ai),
-        dict(kind="g_find", corner="지적 해부", heading=s2["heading"], rows=s2["rows"], ft_right=src_note, ai=ai),
-        dict(kind="g_reply", corner="회신 해부", heading=s3["heading"], sub=s3["sub"], pairs=s3["pairs"],
+        dict(kind="g_find", corner="지적 내용", heading=s2["heading"], rows=s2["rows"], ft_right=src_note, ai=ai),
+        dict(kind="g_reply", corner="회신 평가", heading=s3["heading"], sub=s3["sub"], pairs=s3["pairs"],
              repeat=s3["repeat"]["text"], ft_right=src_note, ai=ai),
         dict(kind="g_req", corner="시정 요구", heading=s4["heading"], sub=f"서한이 요구한 항목 {len(items)}건",
              items=[(it["title"], it["text"]) for it in s4["items"]], deadline=la._deadline(card), ft_right=src_note, ai=ai),
         dict(kind="g_sim", corner="유사 사례", heading=s5["heading"], db=db, lines=db_lines(db), comment=s5["comment"],
              ft_right=f"지적사항 DB {db['measured_on']} 기준 · 직접 센 숫자", ai=ai),
-        dict(kind="g_end", corner="서한에 없는 말", heading=s6["heading"], not_stated=s6["not_stated"],
+        dict(kind="g_end", corner="서한에 없는 것", heading=s6["heading"], not_stated=s6["not_stated"],
              question=s6["question"], ft_right="원문 링크는 브리프 페이지에서 확인", ai=ai),
     ]
     for i, s in enumerate(slides, 1):
@@ -271,11 +273,11 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     url = f"{base_url}/briefs/{pub}/"
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
-    sim = " ".join([la._norm(cap["similar"]), *db_lines(db)])
+    sim = " ".join([la._norm(cap["similar"]), *db_lines(db, polite=True)])
     ko = "\n\n".join([la._norm(cap["lead"]), la._norm(cap["claims"]), la._norm(cap["contrast"]),
                       la._norm(cap["requests"]), sim, la._norm(cap["not_stated"])])
     return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko + f"\n\n전체 해설: {caption_url}\n",
-            "doc_title": f"GRM {m}월 {wk}주 경고서한 해부(GRM 판)", "url": url, "caption_url": caption_url,
+            "doc_title": f"GRM {m}월 {wk}주 경고서한 분석(GRM 판)", "url": url, "caption_url": caption_url,
             "card_id": str(card.get("id")), "mode": "grm"}
 
 
@@ -317,7 +319,7 @@ CSS = """
 .g-ln{font-size:23px;line-height:1.45;margin:6px 0;word-break:keep-all;padding-left:14px;border-left:6px solid #C2603F}
 .g-map{margin:14px 0 4px;font-size:21px;border-top:2px solid #141413}
 .g-map div{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;padding:8px 2px;border-bottom:1px solid #D9CFC0}
-.g-map small{font-size:17px;color:#6C6A64}
+.g-map small{display:block;font-size:17px;color:#6C6A64}
 .g-cs3{margin-top:12px;display:flex;flex-direction:column;gap:8px}
 .g-cs3 div{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 14px;border:1.5px dashed #8A8478;border-radius:8px;font-size:19px;line-height:1.45;word-break:keep-all}
 .g-cs3 b{font-size:19px}.g-cs3 small{display:block;font-size:16px;color:#6C6A64}
@@ -374,7 +376,7 @@ def _slide_html(s: dict) -> str:
                 f'<div><b>{n}</b><i style="height:{max(6, int(100 * n / mx))}px"></i>{y}</div>' for y, n in db["em_years"].items()) + "</div>")
             p.extend(f'<div class="g-ln">{_e(x)}</div>' for x in s["lines"])
             p.append('<div class="g-map">' + "".join(
-                f'<div><span>{_e(r["label"])}<small> ↔ {_e(r["cfr"])}</small></span><span>서한 {r["n"]}건</span><span>2025년 이후 {r["recent"]}건</span></div>'
+                f'<div><span>{_e(r["label"])}<small>대응 조항 {_e(r["cfr"])}</small></span><span>서한 {r["n"]}건</span><span>2025년 이후 {r["recent"]}건</span></div>'
                 for r in db["cfr_rows"]) + '</div>')
             p.append(f'<div class="g-cs3">' + "".join(
                 f'<div><b>{_e(c["alias"])}<small>{_e(c["year"])} · {_e(c["cfr"] or c["agency"])}</small></b><span>{_e(c["text"])}</span></div>'
@@ -383,7 +385,7 @@ def _slide_html(s: dict) -> str:
         elif k == "g_end":
             for x in s["not_stated"]:
                 p.append(f'<div class="g-ns">{_e(x["text"])}<small>근거: {_e(x["basis"])}</small></div>')
-            p.append(f'<div class="g-qq"><small>우리 현장에 가져갈 질문 1개</small>{_e(s["question"])}</div>')
+            p.append(f'<div class="g-qq"><small>우리 현장에 던질 질문</small>{_e(s["question"])}</div>')
     ai = f'<div class="ai">{_e(s["ai"])}</div>' if s.get("ai") else ""
     cls = " g-cover g-page" if k == "g_cover" else " g-page"
     return (f'<section class="slide{cls}"><div class="hd"><div class="brand">{lc.OWL_SVG}<span class="w"><b>GRM</b>'

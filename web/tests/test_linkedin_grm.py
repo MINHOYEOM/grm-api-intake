@@ -101,7 +101,7 @@ class DeckTest(unittest.TestCase):
         self.assertEqual([s["kind"] for s in self.deck["slides"]],
                          ["g_cover", "g_find", "g_reply", "g_req", "g_sim", "g_end"])
         self.assertEqual([s.get("corner") for s in self.deck["slides"][1:]],
-                         ["지적 해부", "회신 해부", "시정 요구", "유사 사례", "서한에 없는 말"])
+                         ["지적 내용", "회신 평가", "시정 요구", "유사 사례", "서한에 없는 것"])
 
     def test_caption_paragraph_order_and_no_hashtag(self):
         paras = self.deck["caption"].strip().split("\n\n")

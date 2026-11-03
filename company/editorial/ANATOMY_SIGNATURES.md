@@ -1,6 +1,6 @@
 # 링크드인 해부 카드 — "따라한 느낌" 정리와 GRM 시그니처 (2026-11-03, 대표 피드백 반영)
 
-시범 코드: `web/linkedin_grm.py` (v2). v1(`linkedin_anatomy.py`)은 그대로 둔다. 슬롯: `web/data/linkedin_anatomy/2026-11-02.v2.json`.
+시범 코드: `web/linkedin_grm.py` (v7). v1(`linkedin_anatomy.py`)은 그대로 둔다. 슬롯: `web/data/linkedin_anatomy/2026-11-02.v3.json`.
 라이브 반영 없음(대표 승인 후).
 
 ## 1. 겉으로 복제처럼 보이는 요소 (v1 시범 기준)

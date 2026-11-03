@@ -337,7 +337,7 @@ body.js-search .bar{display:flex}
 .tldr .l{font-size:12px;font-weight:600;color:var(--coral-2)}  /* "이번 주 핵심" — 한글, 자간0·대문자 없음 (P2-3 대비) */
 .tldr ul{margin:14px 0 0;padding-left:0;list-style:none}
 .tldr li{margin:10px 0;font-size:17.5px;font-family:var(--serif);color:var(--ink);line-height:1.5;font-weight:400;letter-spacing:-.01em}
-.layout{display:grid;grid-template-columns:230px 1fr;gap:52px;padding:38px 0 90px;align-items:start}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:52px;padding:38px 0 90px;align-items:start}
 .toc{position:sticky;top:90px;max-height:calc(100vh - 110px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px;
   scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
 .toc::-webkit-scrollbar{width:7px}
@@ -579,7 +579,7 @@ footer.site{background:var(--band);color:var(--band-mut);padding:62px 0 40px;mar
   .hero .stats{grid-template-columns:repeat(2,1fr);gap:22px}
   .callout{padding:44px 28px}.callout h2{font-size:30px}
   .page-head h1{font-size:36px}.detail-head h1{font-size:34px}
-  .layout{grid-template-columns:1fr}
+  .layout{grid-template-columns:minmax(0,1fr)}
   /* P1-2: 데스크톱 사이드바 목차 → 모바일 바텀시트(+FAB). 화면 밖 대기, .open 시 슬라이드업. */
   .toc{display:block;position:fixed;left:0;right:0;bottom:0;top:auto;z-index:60;margin:0;max-height:74vh;overflow-y:auto;
     background:var(--canvas);border-top:1px solid var(--line-2);border-radius:16px 16px 0 0;box-shadow:0 -18px 44px -22px rgba(26,24,21,.42);

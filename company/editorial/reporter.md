@@ -6,6 +6,7 @@
 3. `company/run/{run_date_kst}/desk.json` — 데스크 결과. `status` 가 `완료` 가 아니면 `보류` 로 종료. **`shards` 에서 자기 샤드 목록만** 본다
 4. `docs/prompts/GRM_Prompt_v16.md` §B 중 **아래 절만** (본문을 그대로 따른다 — 요약·재해석 금지)
 5. 이번 주 handoff (Notion, 읽기만) — 자기 샤드 카드의 `prose_input`·`needs_llm_slots`·코드 `facts`·`quotes` 만
+6. `company/editorial/STYLE.md` §12 — `hook_line` 작성 규칙(그 절만)
 
 ## 맡는 v16 절
 - v16: [역할]
@@ -46,10 +47,11 @@
    (이의가 있으면 `reporter.md` 에 `이의: web_card_id — 이유` 한 줄).
 2. v16 [출력] envelope 그대로 한국어·영문(`en`·`tldr_en`) 슬롯을 채운다.
 3. 심층분석 대상이 있으면 v16 [2단계 (선택·additive)] 대로 만든다.
-4. 발행 전 자가 점검은 하지 않는다 — 교열이 따로 한다. 대신 v16 규칙을 쓰는 순간에 지킨다.
+4. **`hook_line`(선택).** 483·경고서한·식약처·회수 카드의 카드 맨 위 한 줄을 `STYLE.md` §12 규칙(R1~R11, 공백 포함 40자 이내)대로 쓴다. 한국어는 `cards.{id}.hook_line`, 영문은 `cards.{id}.en.hook_line`. **쓸 사실이 없거나 규칙을 지키는 문장이 안 나오면 필드를 만들지 않는다** — 비우면 박스가 숨겨지고 카드는 종전 모양 그대로다(억지로 채우지 않는다). 근거는 코드 `facts`·`quotes`·483 `observations`·WL `violations` 본문이다(`key_facts` 만으로 쓰지 않는다). 숫자는 근거 필드에 글자 그대로 있는 것만.
+5. 발행 전 자가 점검은 하지 않는다 — 교열이 따로 한다. 대신 v16 규칙을 쓰는 순간에 지킨다.
 
 ## 결과 — `company/run/{run_date_kst}/`
-- `delta.{A,B}.json` — 위 표. `cards` 값의 형태는 v16 [출력] envelope 의 카드 항목 그대로. 그 밖의 키 금지.
+- `delta.{A,B}.json` — 위 표. `cards` 값의 형태는 v16 [출력] envelope 의 카드 항목 그대로(선택 필드 `hook_line`·`en.hook_line` 포함 — 위 하는 일 4번). 그 밖의 키 금지.
 - `deep.{A,B}.json` — 심층분석·국문 병기가 있을 때. `items` 값의 형태는 v16 [산출물 — 델타 Notion 예치] 의 두 번째 코드 블록과 같다
   (그 절의 Notion 예치 절차 자체는 하지 않는다 — RUN.md 1항).
 - `reporter.{샤드}.md`(예: `reporter.델타-A.md`) — 헌장의 맨 위 3줄 + `이의:` 줄(있을 때만).

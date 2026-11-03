@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-03T21:59:58Z",
+ "generated_at": "2026-11-03T23:37:20Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 41739159032,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-03T23:26:28Z",
+    "updatedAt": "2026-11-03T23:37:10Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41739159032"
+   },
    {
     "databaseId": 41556874619,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41137939924"
-   },
-   {
-    "databaseId": 40968546266,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-29T22:47:47Z",
-    "updatedAt": "2026-10-29T22:58:31Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40968546266"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -174,62 +174,73 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41695353449,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-03T18:36:00Z",
-    "updatedAt": "2026-11-03T18:43:23Z",
-    "headBranch": "main",
-    "displayTitle": "feat(utm): 내보내는 모든 링크에 채널 표식 사전 적용 + 방문 도착 채널 정수 카운터(104) (#1317)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41695353449"
+    "databaseId": 41740017604,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-03T23:32:57Z",
+    "updatedAt": "2026-11-03T23:33:01Z",
+    "headBranch": "automation/findings-facets-auto-41739468729",
+    "displayTitle": "chore: refresh findings facet pages",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41740017604"
    },
    {
-    "databaseId": 41686736970,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-03T17:41:54Z",
-    "updatedAt": "2026-11-03T17:47:50Z",
-    "headBranch": "main",
-    "displayTitle": "feat(web): 가입 화면 약관·처리방침을 모달로 열기 + 법적 페이지 글자 위계 조정 (#1311)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41686736970"
-   },
-   {
-    "databaseId": 41686056768,
+    "databaseId": 41737767822,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-03T17:37:32Z",
-    "updatedAt": "2026-11-03T17:43:58Z",
-    "headBranch": "feat/utm-channel-dictionary-1104",
-    "displayTitle": "feat(utm): 내보내는 모든 링크 표식 통일 + 방문 도착 채널 카운터(104)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41686056768"
+    "createdAt": "2026-11-03T23:16:03Z",
+    "updatedAt": "2026-11-03T23:21:28Z",
+    "headBranch": "feat/card-hookline",
+    "displayTitle": "feat(card): 훅1 — hook_line 한 줄 헤드라인 박스(가산·검증·폴백)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41737767822"
    },
    {
-    "databaseId": 41685987580,
+    "databaseId": 41737666697,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T17:37:05Z",
-    "updatedAt": "2026-11-03T17:43:24Z",
-    "headBranch": "feat/utm-channel-dictionary-1104",
-    "displayTitle": "feat(utm): 내보내는 모든 링크에 채널 표식 사전 적용 + 방문 도착 채널 정수 카운터(104)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41685987580"
+    "createdAt": "2026-11-03T23:15:13Z",
+    "updatedAt": "2026-11-03T23:21:05Z",
+    "headBranch": "feat/card-hookline",
+    "displayTitle": "feat(card): hook_line 한 줄 헤드라인 박스 (훅1) — 가산 필드·렌더 시 검증·폴백 숨김",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41737666697"
    },
    {
-    "databaseId": 41682967976,
+    "databaseId": 41737433839,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-03T17:18:33Z",
-    "updatedAt": "2026-11-03T17:25:17Z",
-    "headBranch": "feat/legal-modal",
-    "displayTitle": "feat(web): 가입 약관·처리방침 모달 + 법적 페이지 글자 위계",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41682967976"
+    "createdAt": "2026-11-03T23:13:30Z",
+    "updatedAt": "2026-11-03T23:19:18Z",
+    "headBranch": "kg/firm-alias",
+    "displayTitle": "kg: 업체 별칭 26그룹(105) — 프로필·실사 이력 합산, firm_key 불변",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41737433839"
+   },
+   {
+    "databaseId": 41737352700,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-03T23:12:55Z",
+    "updatedAt": "2026-11-03T23:19:02Z",
+    "headBranch": "kg/firm-alias",
+    "displayTitle": "kg: 업체 별칭 26그룹 — firm_alias(105)로 프로필·실사 이력 합산, 정적 업체 페이지 정본 키 병합",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41737352700"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 41740583782,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_run",
+    "createdAt": "2026-11-03T23:37:13Z",
+    "updatedAt": "2026-11-03T23:37:17Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41740583782"
+   },
    {
     "databaseId": 41558057285,
     "status": "completed",
@@ -589,6 +600,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 41739159032,
+   "created_at": "2026-11-03T23:26:28Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 41556874619,
    "created_at": "2026-11-03T01:00:57Z",
    "has_web_brief": true
@@ -606,11 +622,6 @@
   {
    "run_id": 41137939924,
    "created_at": "2026-10-30T22:24:41Z",
-   "has_web_brief": true
-  },
-  {
-   "run_id": 40968546266,
-   "created_at": "2026-10-29T22:47:47Z",
    "has_web_brief": true
   }
  ]

@@ -514,6 +514,52 @@ def _fact_value_for_lang(label: str, value: str, lang: str,
     return value, bool(_HANGUL_RE.search(value))
 
 
+_TIDY_483_LABELS = ("발행일", "제조소/업체", "시설 · 유형", "실사일")
+# 핵심 사실 항목 머리말 중 사실표(메타 줄)와 같은 정보를 되풀이하는 것 — 값 표기가 달라도
+# (표 04/08/2026 · 항목 2026-04-08) 같은 사실이다. 데이터(편집 산출물) 어휘라 tr() 대상 아님.
+_TIDY_483_DUP_HEADS = frozenset({"실사일", "시설 유형", "시설 · 유형", "제조소/업체",
+                                 "Inspection date", "Facility type", "Facility / manufacturer"})
+
+
+def _tidy_483(card: dict[str, Any], facts: list[dict[str, Any]],
+              tr: Translator) -> "tuple[str, list[str]]":
+    """[카드 정돈 2026-11-03 · PR1] FDA 483 단독 카드의 4칸 표 + "핵심 사실" 중복을 메타 한 줄로.
+
+    반환 (메타 한 줄, 표시할 핵심 사실). 483 단독 카드가 아니거나 사실표 모양이 예상과 다르면
+    `("", 원본 key_facts)` — 템플릿이 기존 표·목록을 그대로 그린다(다른 유형 바이트 불변).
+    메타 한 줄 = 발행일·실사일·시설유형·제조소(FEI) 값. 문서번호(해시)는 싣지 않는다.
+    핵심 사실에서는 **표 값을 그대로 되풀이하는 항목**("실사일: 11/10/2023" 등)만 뺀다 —
+    관찰 항목은 한 글자도 건드리지 않는다. 값 비교라 영어 트리도 같은 규칙으로 걸러진다.
+    """
+    raw_kf = card.get("key_facts") or []
+    if card.get("type_tag") != "483" or (card.get("merged_count") or 1) > 1:
+        return "", raw_kf
+    raw = {f.get("label"): f.get("value", "") for f in (card.get("facts") or [])}
+    if any(not raw.get(k) for k in _TIDY_483_LABELS):
+        return "", raw_kf
+    by_label = {f["label"]: f["value"] for f in facts}   # 표시 언어 값(영어 트리는 번역·고지 규칙 통과)
+    firm = by_label.get(tr("제조소/업체"), "")
+    fei = firm.split(" · ", 1)[1] if " · " in firm else ""
+    fac = by_label.get(tr("시설 · 유형"), "")
+    if fac.endswith(" · 483"):
+        fac = fac[: -len(" · 483")]
+    parts = [f"{tr('발행일')} {by_label.get(tr('발행일'), '')}",
+             f"{tr('실사일')} {by_label.get(tr('실사일'), '')}", fac, fei]
+    meta = " · ".join(p for p in parts if p and p.strip())
+    shown_values = set()
+    for v in by_label.values():
+        shown_values.add(v.strip())
+        shown_values.update(x.strip() for x in v.split(" · "))
+    kf = []
+    for k in raw_kf:
+        head, sep, val = str(k).partition(":")
+        if sep and val.strip() and (head.strip() in _TIDY_483_DUP_HEADS
+                                    or val.strip() in shown_values):
+            continue
+        kf.append(k)
+    return meta, kf
+
+
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG,
                doc_url_index: "dict[str, tuple[str, int]] | None" = None,
@@ -622,6 +668,8 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
             "mono": raw_label in MONO_LABELS,
         })
 
+    tidy_meta, key_facts = _tidy_483(card, facts, tr)
+
     return {
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
@@ -667,7 +715,9 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
                         else tr("품목")),
         "quotes": quotes,
         "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
-        "key_facts": card.get("key_facts") or [],
+        "key_facts": key_facts,
+        # [카드 정돈 2026-11-03] 483 단독 카드만 값이 있다 — 4칸 표 대신 메타 한 줄(템플릿이 분기).
+        "tidy_meta": tidy_meta,
         # ★근거 라벨도 데이터로 오는 표시 문구다(불변식 #13) — 여기서 한 번 번역해
         #   넘기지 않으면 영어 카드의 "핵심 사실" 줄에 한국어가 그대로 실린다.
         # [D2 2026-09-11] tr() 에 넘기기 전에 내부 계약 토큰을 방문자 문구로 먼저

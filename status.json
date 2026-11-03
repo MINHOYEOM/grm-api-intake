@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T01:32:50Z",
+ "generated_at": "2026-11-03T08:33:56Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41557675936,
+    "databaseId": 41599812819,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-03T07:57:53Z",
+    "updatedAt": "2026-11-03T08:04:24Z",
+    "headBranch": "main",
+    "displayTitle": "feat(linkedin): 주간 배포에 해부 7장 스텝 연결 (유사 사례 실조회·실패 시 05 카드만 제외) (#1306)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41599812819"
+   },
+   {
+    "databaseId": 41597558048,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-03T01:07:55Z",
-    "updatedAt": "2026-11-03T01:13:07Z",
-    "headBranch": "automation/library-auto-41557260371",
-    "displayTitle": "chore: refresh live regulatory library",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41557675936"
+    "createdAt": "2026-11-03T07:37:32Z",
+    "updatedAt": "2026-11-03T07:44:38Z",
+    "headBranch": "feat/linkedin-weekly-7cards",
+    "displayTitle": "feat(linkedin): 주간 배포에 해부 7장 스텝 연결 (유사 사례 실조회·실패 시 05 카드만 제외)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41597558048"
    },
    {
-    "databaseId": 41555919700,
+    "databaseId": 41597183653,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T00:52:22Z",
-    "updatedAt": "2026-11-03T00:58:39Z",
-    "headBranch": "feat/content-style-anatomy-cards",
-    "displayTitle": "feat(linkedin): 해부 카드 GRM 판 v3 — 조항별 해부·고정 포맷·DB 유사 사례",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41555919700"
+    "createdAt": "2026-11-03T07:34:11Z",
+    "updatedAt": "2026-11-03T07:43:09Z",
+    "headBranch": "feat/linkedin-weekly-7cards",
+    "displayTitle": "feat(linkedin): 주간 배포에 해부 7장 스텝 연결 — --dist·최신 브리프, 실조회 재시도·지적별 실패 허용…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41597183653"
    },
    {
-    "databaseId": 41553947963,
+    "databaseId": 41592343418,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T00:35:29Z",
-    "updatedAt": "2026-11-03T00:41:34Z",
-    "headBranch": "feat/content-style-anatomy-cards",
-    "displayTitle": "feat(linkedin): 해부 카드 GRM 판(v2 시범) — 세 겹 표시·원문 대조·DB로 본 자리·점 그림",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41553947963"
+    "createdAt": "2026-11-03T06:49:42Z",
+    "updatedAt": "2026-11-03T06:57:37Z",
+    "headBranch": "main",
+    "displayTitle": "feat(linkedin): 해부 카드 GRM 판 v2~v7 — 사이트 유사 사례 엔진·DB 연관 카드·문체 정리 (#1305)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41592343418"
    },
    {
-    "databaseId": 41546762241,
+    "databaseId": 41589161413,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T23:36:42Z",
-    "updatedAt": "2026-11-02T23:41:53Z",
-    "headBranch": "claude/glossary-weekly-202645",
-    "displayTitle": "glossary(weekly): 202645 용어 1개 — 집락형성단위 (CFU)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41546762241"
-   },
-   {
-    "databaseId": 41546754516,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T23:36:39Z",
-    "updatedAt": "2026-11-02T23:41:26Z",
-    "headBranch": "claude/glossary-weekly-202645",
-    "displayTitle": "glossary(weekly): CFU 영문 정의를 카드 5줄 예산에 맞게 축약",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41546754516"
+    "createdAt": "2026-11-03T06:19:32Z",
+    "updatedAt": "2026-11-03T06:27:22Z",
+    "headBranch": "feat/linkedin-similar-cases-v5",
+    "displayTitle": "feat(linkedin): 해부 카드 GRM 판 v2~v7 — 사이트 유사 사례 엔진·DB 연관 카드·문체 정리",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41589161413"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -426,6 +426,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 41592941559,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-03T06:55:28Z",
+    "updatedAt": "2026-11-03T06:55:32Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41592941559"
+   },
+   {
     "databaseId": 41531111671,
     "status": "completed",
     "conclusion": "success",
@@ -468,17 +479,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41280168689"
-   },
-   {
-    "databaseId": 41202279040,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-31T12:42:13Z",
-    "updatedAt": "2026-10-31T15:56:56Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41202279040"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -495,6 +495,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 41594947184,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-03T07:13:59Z",
+    "updatedAt": "2026-11-03T07:14:09Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41594947184"
+   },
    {
     "databaseId": 41532732609,
     "status": "completed",
@@ -538,17 +549,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41334820444"
-   },
-   {
-    "databaseId": 41282438663,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-01T06:50:45Z",
-    "updatedAt": "2026-11-01T06:50:56Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41282438663"
    }
   ],
   "grm-cloud-request.yml": [

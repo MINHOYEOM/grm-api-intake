@@ -123,6 +123,9 @@ from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E4
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
 # (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
 from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
+# [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
+# 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
+from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -667,6 +670,19 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
             "value": value,
             "mono": raw_label in MONO_LABELS,
         })
+
+    # [WHOPIR 결론 한 줄 2026-11-03] 접힘 밖 사실표에 "결론" 행을 결정론으로 낸다(생성 0).
+    # 정형 어구를 못 읽으면 행을 만들지 않는다. 실사일 행 바로 아래에 둔다.
+    if isinstance(detail, dict) and detail.get("type") == "whopir_report":
+        _parts = _whopir_outcome_parts(detail)
+        if _parts:
+            _bits = [tr("수용 가능") if _parts["verdict"] == "acceptable" else tr("수용 불가")]
+            if _parts["years"]:
+                _bits.append(tr("{n}년 유효", n=_parts["years"]))
+            if _parts["desk"]:
+                _bits.append(tr("서면 평가"))
+            facts.insert(min(1, len(facts)),
+                         {"label": tr("결론"), "value": " · ".join(_bits), "mono": False})
 
     tidy_meta, key_facts = _tidy_483(card, facts, tr)
 
@@ -3107,7 +3123,7 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     # facts[].label — 표 라벨
     N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
     N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
-    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"),
+    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"), N_("브랜드"), N_("정정일"),
     # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다. Evidence A 원본 토큰
     # "Intake raw" 는 EVIDENCE_BASIS_LABELS 가 여기 도달하기 전에 방문자 문구로 바꾸므로
     # 그 문구를 등록한다(D2 2026-09-11) — 등록은 위 dict 정의에서도 이뤄지지만 이 표가

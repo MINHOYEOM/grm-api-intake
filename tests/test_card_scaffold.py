@@ -2361,5 +2361,89 @@ class SourceBodySignalInvariantTest(unittest.TestCase):
                          "본문이 아닌 메타 키가 신호를 켜면 안 된다")
 
 
+class CardFactsFixTest(unittest.TestCase):
+    """[2026-11-03] 카드 사실 불일치 수리 — HC 업체·브랜드·정정일 행, WHOPIR 결론, MHRA 사유."""
+
+    _OUTCOME = ("Site X, located at Y, was considered to be operating at an acceptable level of "
+                "compliance with WHO GMP. This WHOPIR will remain valid for three years, provided "
+                "that the outcome of any inspection conducted during this period is positive.")
+
+    # ── HC W2 행 ──
+    def _hc_rows(self, **raw):
+        return dict(cs._w2_rows("hc-recall", {"date": "2026-10-30", "firm": ""}, raw))
+
+    def test_hc_brand_is_its_own_row_not_the_company(self) -> None:
+        rows = self._hc_rows(company="Guardian Drug Company Inc.", brand="Equate",
+                             Product="Equate Antacid", **{"Recall class": "Type II"})
+        self.assertEqual(rows["업체"], "Guardian Drug Company Inc.")
+        self.assertEqual(rows["브랜드"], "Equate")
+
+    def test_hc_brand_row_omitted_when_same_as_company_or_absent(self) -> None:
+        self.assertNotIn("브랜드", self._hc_rows(company="Apotex Inc.", brand="apotex inc."))
+        self.assertNotIn("브랜드", self._hc_rows(company="Apotex Inc."))
+
+    def test_hc_company_missing_is_unknown_not_brand(self) -> None:
+        self.assertEqual(self._hc_rows(brand="Aleve")["업체"], cs.VALUE_UNKNOWN)
+
+    def test_hc_correction_date_row_only_when_present(self) -> None:
+        rows = self._hc_rows(company="X Inc.", correction_date="2026-11-01",
+                             Product="P", **{"Recall class": "Type II"})
+        self.assertEqual(rows["정정일"], "2026-11-01")
+        self.assertNotIn("정정일", self._hc_rows(company="X Inc."))
+
+    def test_w2_cap_stays_five_for_other_kinds_and_plain_hc(self) -> None:
+        plain = cs._w2_rows("hc-recall", {"date": "d"}, {"company": "X", "Product": "P",
+                                                          "Recall class": "Type II"})
+        self.assertEqual(len(plain), 5)
+
+    # ── WHOPIR 결론 ──
+    def test_whopir_outcome_line(self) -> None:
+        self.assertEqual(cs.whopir_outcome_line({"outcome": self._OUTCOME}),
+                         "결론: 수용 가능 · 3년 유효")
+
+    def test_whopir_outcome_negated_and_unreadable(self) -> None:
+        neg = {"outcome": "Site was not considered to be operating at an acceptable level of compliance."}
+        self.assertEqual(cs.whopir_outcome_line(neg), "결론: 수용 불가")
+        # 정형 어구가 아니면 지어내지 않는다.
+        self.assertEqual(cs.whopir_outcome_line({"outcome": "Inspection was conducted."}), "")
+        self.assertEqual(cs.whopir_outcome_line(None), "")
+        self.assertEqual(cs.whopir_outcome_line({"outcome": ""}), "")
+
+    def test_whopir_non_compliances_word_is_not_a_negation(self) -> None:
+        o = {"outcome": self._OUTCOME + " All the non-compliances were addressed."}
+        self.assertEqual(cs.whopir_outcome_parts(o)["verdict"], "acceptable")
+
+    def test_whopir_reliance_is_marked_desk_assessment(self) -> None:
+        o = {"report_kind": "reliance", "outcome": self._OUTCOME}
+        self.assertEqual(cs.whopir_outcome_line(o), "결론: 수용 가능 · 3년 유효 · 서면 평가")
+
+    def test_whopir_outcome_reaches_prose_input(self) -> None:
+        raw = {"whopir_report": {"report_kind": "findings", "outcome": self._OUTCOME,
+                                 "sections": []}}
+        pi = cs._prose_input("who-inspection", {"source": "WHO", "headline": "h"}, raw,
+                             "B", "", "EN")
+        self.assertIn("결론: 수용 가능 · 3년 유효", pi["issue_or_reason"])
+        self.assertIn("결론: 수용 가능 · 3년 유효", pi["body_excerpt"])
+
+    # ── MHRA 회수 배경 ──
+    _MHRA_BODY = ("MHRA alert header line.\n\nThe MAH is recalling the batch because a defect was "
+                  "identified in the packaging.\n\nPL 12345/0001")
+
+    def test_mhra_background_paragraph_reaches_prose_input(self) -> None:
+        raw = {"mhra_alert_body": self._MHRA_BODY, "description": "Precautionary action"}
+        pi = cs._prose_input("mhra-recall", {"source": "MHRA", "headline": "h"}, raw,
+                             "A", "", "EN")
+        self.assertIn("because a defect was identified", pi["issue_or_reason"])
+        self.assertNotIn("Precautionary", pi["issue_or_reason"])
+
+    def test_mhra_background_falls_back_to_first_paragraph_and_to_feed(self) -> None:
+        self.assertEqual(cs._mhra_background({"mhra_alert_body": "Only a plain sentence."}),
+                         "Only a plain sentence.")
+        self.assertEqual(cs._mhra_background({}), "")
+        pi = cs._prose_input("mhra-recall", {"source": "MHRA", "headline": "h"},
+                             {"description": "Feed summary"}, "A", "", "EN")
+        self.assertEqual(pi["issue_or_reason"], "Feed summary")
+
+
 if __name__ == "__main__":
     unittest.main()

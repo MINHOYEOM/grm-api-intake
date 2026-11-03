@@ -1484,11 +1484,18 @@ def _w2_extra_hc_recall(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[
     # Organization 은 HC 부서명("Drugs and health products")이라 회사가 아님 → 사용 금지.
     # 실제 회사는 collect_hc 가 상세 페이지에서 끌어와 firm/company 에 채운다(P8).
     rows = [("업체", _first(raw.get("company"), row.get("firm")) or VALUE_UNKNOWN)]
+    # [2026-11-03] 브랜드는 업체가 아니라 별도 행 — 업체와 같은 글자면 중복이라 생략한다.
+    brand = str(raw.get("brand") or "").strip()
+    if brand and brand.lower() != str(rows[0][1]).strip().lower():
+        rows.append(("브랜드", brand))
     product = _first(raw.get("Product"), raw.get("product_description"))
     if product:
         rows.append(("제품", _truncate_at_sentence(str(product), 80)))
     if raw.get("Recall class"):
         rows.append(("Class", str(raw["Recall class"])))
+    # 발행일은 페이지의 최초 게시일이고, 정정일은 다를 때만 따로 싣는다(수집기가 raw 에 둔다).
+    if raw.get("correction_date"):
+        rows.append(("정정일", str(raw["correction_date"])))
     return rows
 
 
@@ -1596,7 +1603,8 @@ def _w2_rows(kind: str, row: dict[str, Any], raw: dict[str, Any] | None) -> list
         ("문서번호", _doc_number(kind, row)),
     ]
     rows += (spec.extra_rows or _w2_extra_default)(row, raw)
-    return rows[:5]
+    # HC 회수만 브랜드·정정일이 붙을 수 있어 상한을 7행으로 둔다(없는 카드는 종전 5행 그대로).
+    return rows[:7 if kind == "hc-recall" else 5]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1892,6 +1900,88 @@ def _footer_block(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
     return _callout(["**출처**  " + "   ·   ".join(parts)], icon="🔖", color=cfg.color_footer)
 
 
+# ── WHOPIR 결론 한 줄(결정론 — 생성 0) ───────────────────────────────────────────
+# `whopir_report.outcome` 은 수집돼 접힌 상세에만 있었고 카드 입력·첫 화면엔 없었다(32장 전부
+# 수집, 요약·핵심 사실에 결론 취지가 없는 장이 23장). 결론 문장은 WHO 의 정형 어구라
+# 판정은 어구 매칭으로 하고, 못 읽으면 **아무것도 지어내지 않는다**(None → 한 줄 생략).
+_WHOPIR_YEARS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6}
+_WHOPIR_ACCEPTABLE_RE = re.compile(r"acceptable\s+level\s+of\s+compliance", re.I)
+_WHOPIR_NEGATED_RE = re.compile(r"\bnot\b[^.]{0,80}acceptable|\bunacceptable\b", re.I)
+_WHOPIR_VALID_RE = re.compile(r"valid\s+for\s+(\d+|one|two|three|four|five|six)\s+years?", re.I)
+_WHOPIR_DESK_RE = re.compile(r"desk\s+assessment|in\s+lieu\s+of\s+a\s+WHO\s+inspection", re.I)
+
+
+def whopir_outcome_parts(report: Any) -> dict[str, Any] | None:
+    """`whopir_report` → {"verdict": "acceptable"|"unacceptable", "years": int|None,
+    "desk": bool}. 결론 문장이 정형 어구가 아니면 None."""
+    if not isinstance(report, dict):
+        return None
+    outcome = str(report.get("outcome") or "")
+    if not outcome:
+        return None
+    if _WHOPIR_NEGATED_RE.search(outcome):
+        verdict = "unacceptable"
+    elif _WHOPIR_ACCEPTABLE_RE.search(outcome):
+        verdict = "acceptable"
+    else:
+        return None
+    years = None
+    m = _WHOPIR_VALID_RE.search(outcome)
+    if m:
+        tok = m.group(1).lower()
+        years = int(tok) if tok.isdigit() else _WHOPIR_YEARS.get(tok)
+    desk = (str(report.get("report_kind")) == "reliance"
+            or bool(_WHOPIR_DESK_RE.search(outcome)))
+    return {"verdict": verdict, "years": years, "desk": desk}
+
+
+def whopir_outcome_line(report: Any) -> str:
+    """국문 한 줄 — 예: "결론: 수용 가능 · 3년 유효". 읽지 못하면 ""."""
+    parts = whopir_outcome_parts(report)
+    if not parts:
+        return ""
+    bits = ["수용 가능" if parts["verdict"] == "acceptable" else "수용 불가"]
+    if parts["years"]:
+        bits.append(f"{parts['years']}년 유효")
+    if parts["desk"]:
+        bits.append("서면 평가")
+    return "결론: " + " · ".join(bits)
+
+
+def _whopir_outcome_for_prose(raw: dict[str, Any]) -> str:
+    """카드 작성기 입력용 — 결정론 한 줄 + 결론 원문(대상 제조소 주소절은 떼고 판정 문장부터)."""
+    report = raw.get("whopir_report")
+    if not isinstance(report, dict):
+        return ""
+    outcome = re.sub(r"\s+", " ", str(report.get("outcome") or "")).strip()
+    if not outcome:
+        return ""
+    m = re.search(r"\b(?:is|was|are|were)\s+considered\b.*", outcome)
+    body = m.group(0) if m else outcome
+    line = whopir_outcome_line(report)
+    return f"WHOPIR {line}. {body}" if line else body
+
+
+# MHRA 알림 본문 → 회수 배경 문단. 사유는 "because/due to/reason" 문장에 있는 경우가 많다.
+_MHRA_REASON_RE = re.compile(
+    r"\b(?:because|due to|as a result of|reason|following|identified|detected|found that)\b", re.I)
+
+
+def _mhra_background(raw: dict[str, Any]) -> str:
+    """`mhra_alert_body` 에서 회수 배경 문단을 뽑는다(없으면 ""). 사유 어구가 든 첫 문단을
+    쓰고, 어구가 없으면 본문 첫 문단 — 카드 작성기가 피드 요약 한 문장만 보고 "원문 확인 필요"로
+    쓰는 일을 막는다(Advanz Mynzepli)."""
+    body = str(raw.get("mhra_alert_body") or "").strip()
+    if not body:
+        return ""
+    paras = [re.sub(r"\s+", " ", p).strip() for p in re.split(r"\n\s*\n|\n", body)]
+    paras = [p for p in paras if p]
+    for p in paras:
+        if _MHRA_REASON_RE.search(p):
+            return p
+    return paras[0] if paras else ""
+
+
 def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
                  evidence: str, modality: str, language: str) -> dict[str, Any]:
     """§9 — 카드 1장치 최소 컨텍스트(raw 전체 아님). LLM 산문 슬롯 입력.
@@ -1911,6 +2001,9 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         # (있으면 우선). 구조화 사유(위) 뒤 · 링크텍스트/표지(subject·anchor_text 등) 앞 —
         # "왜"를 살린다. 세 키는 WHO-inspection/WL/FDA-483 외엔 부재 → 기존 golden _first 불변.
         raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"), raw.get("fda483_excerpt"),
+        # [2026-11-03] WHOPIR 결론(구조화 보고서)·MHRA 알림 본문의 회수 배경 — 접힌 상세에만
+        # 있고 작성기 입력엔 없어 결론·사유가 요약에서 빠졌다. 옛 키들 뒤·링크 문구 앞.
+        _whopir_outcome_for_prose(raw), _mhra_background(raw),
         # [전문지 브리핑 v2 2026-07-13] ECA 기사 본문 excerpt(ENABLE_ECA_ARTICLE_EXCERPT
         # on 시만 부재 → 기존 golden 불변). rss-news 카드의 RSS 요약(description)보다 우선해
         # Routine summary 가 실기사 본문을 근거로 쓰도록 한다.
@@ -1943,7 +2036,9 @@ def _prose_input(kind: str, row: dict[str, Any], raw: dict[str, Any] | None,
         "w2_facts": {label: value for label, value in _w2_rows(kind, row, raw)},
         "body_excerpt": _truncate_at_sentence(
             _first(raw.get("whopir_excerpt"), raw.get("wl_body_excerpt"),
-                   raw.get("fda483_excerpt"), raw.get("eca_article_excerpt"),
+                   raw.get("fda483_excerpt"),
+                   _whopir_outcome_for_prose(raw), _mhra_background(raw),
+                   raw.get("eca_article_excerpt"),
                    # [전문지 브리핑 소스확장 2026-07-13] article_excerpt=비ECA 전문지(ISPE 등) 제네릭 키
                    raw.get("article_excerpt"),
                    raw.get("description"), raw.get("summary"), row.get("body")), 300),

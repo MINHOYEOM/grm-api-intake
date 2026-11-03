@@ -36,11 +36,14 @@
 {%- endmacro -%}
 <article class="card{% if card.is_evA %} evA{% endif %}" id="{{ card.anchor }}" data-card-type="{{ card.card_type }}" data-signal-tier="{{ card.signal_tier }}" data-evidence="{{ card.evidence_level }}"{% if card.firm_key %} data-firm-key="{{ card.firm_key }}"{% endif %}>
   <div class="c-title"><span class="pre">[{{ card.card_type }} · {{ card.agency }}]</span>{{ card.headline_target }}{% if card.title_issue %} — <b>{{ card.title_issue }}</b>{% endif %}</div>
-  <div class="badges"><span class="b code {% if card.is_evA %}ev{% else %}evB{% endif %}">Evidence {{ card.evidence_level }}</span><span class="b ag">{{ card.agency }}</span><span class="b sig code"><span class="d" style="background:{{ card.sig_color }}"></span>Signal {{ card.signal_label }} · T{{ card.signal_tier }}</span>{% if card.modality %}<span class="b mod">{{ card.modality }}</span>{% endif %}{% if card.type_tag %}<span class="b typ">{{ card.type_tag }}</span>{% endif %}</div>
+  <div class="badges">{% if not card.tidy_meta %}<span class="b code {% if card.is_evA %}ev{% else %}evB{% endif %}">Evidence {{ card.evidence_level }}</span>{% endif %}<span class="b ag">{{ card.agency }}</span>{% if not card.tidy_meta %}<span class="b sig code"><span class="d" style="background:{{ card.sig_color }}"></span>Signal {{ card.signal_label }} · T{{ card.signal_tier }}</span>{% endif %}{% if card.modality %}<span class="b mod">{{ card.modality }}</span>{% endif %}{% if card.type_tag %}<span class="b typ">{{ card.type_tag }}</span>{% endif %}</div>
   {%- if card.summary %}
   <p class="summary">{{ card.summary }}</p>
   {%- endif %}
-  {%- if card.deep_analysis %}
+  {%- if card.tidy_meta %}
+  {#- [카드 정돈 2026-11-03] 483 단독 카드: 4칸 표 → 메타 한 줄(grm.css 프리즈 — 인라인 스타일). -#}
+  <p class="facts-meta" style="margin:12px 0 0;font-size:13px;line-height:1.5;color:var(--muted)">{{ card.tidy_meta }}</p>
+  {%- elif card.deep_analysis %}
   {#- [WL 심층분석 §2.5] deep 카드는 facts 를 2×2 그리드(라벨 muted + 값 굵게 — 스캔성)로.
       deep 아님(대다수 카드)은 기존 세로 표 그대로 → 기존 golden 바이트 불변(additive). -#}
   <div class="facts-grid">

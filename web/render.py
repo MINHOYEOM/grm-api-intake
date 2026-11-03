@@ -123,6 +123,9 @@ from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E4
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
 # (재수집 없음), 렌더 단에도 같은 분류기로 최후 방어선을 둔다(단일 진실원 재사용).
 from grm_findings import evidence_url_quality_error as _evidence_url_quality_error  # noqa: E402
+# [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
+# 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
+from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -514,6 +517,52 @@ def _fact_value_for_lang(label: str, value: str, lang: str,
     return value, bool(_HANGUL_RE.search(value))
 
 
+_TIDY_483_LABELS = ("발행일", "제조소/업체", "시설 · 유형", "실사일")
+# 핵심 사실 항목 머리말 중 사실표(메타 줄)와 같은 정보를 되풀이하는 것 — 값 표기가 달라도
+# (표 04/08/2026 · 항목 2026-04-08) 같은 사실이다. 데이터(편집 산출물) 어휘라 tr() 대상 아님.
+_TIDY_483_DUP_HEADS = frozenset({"실사일", "시설 유형", "시설 · 유형", "제조소/업체",
+                                 "Inspection date", "Facility type", "Facility / manufacturer"})
+
+
+def _tidy_483(card: dict[str, Any], facts: list[dict[str, Any]],
+              tr: Translator) -> "tuple[str, list[str]]":
+    """[카드 정돈 2026-11-03 · PR1] FDA 483 단독 카드의 4칸 표 + "핵심 사실" 중복을 메타 한 줄로.
+
+    반환 (메타 한 줄, 표시할 핵심 사실). 483 단독 카드가 아니거나 사실표 모양이 예상과 다르면
+    `("", 원본 key_facts)` — 템플릿이 기존 표·목록을 그대로 그린다(다른 유형 바이트 불변).
+    메타 한 줄 = 발행일·실사일·시설유형·제조소(FEI) 값. 문서번호(해시)는 싣지 않는다.
+    핵심 사실에서는 **표 값을 그대로 되풀이하는 항목**("실사일: 11/10/2023" 등)만 뺀다 —
+    관찰 항목은 한 글자도 건드리지 않는다. 값 비교라 영어 트리도 같은 규칙으로 걸러진다.
+    """
+    raw_kf = card.get("key_facts") or []
+    if card.get("type_tag") != "483" or (card.get("merged_count") or 1) > 1:
+        return "", raw_kf
+    raw = {f.get("label"): f.get("value", "") for f in (card.get("facts") or [])}
+    if any(not raw.get(k) for k in _TIDY_483_LABELS):
+        return "", raw_kf
+    by_label = {f["label"]: f["value"] for f in facts}   # 표시 언어 값(영어 트리는 번역·고지 규칙 통과)
+    firm = by_label.get(tr("제조소/업체"), "")
+    fei = firm.split(" · ", 1)[1] if " · " in firm else ""
+    fac = by_label.get(tr("시설 · 유형"), "")
+    if fac.endswith(" · 483"):
+        fac = fac[: -len(" · 483")]
+    parts = [f"{tr('발행일')} {by_label.get(tr('발행일'), '')}",
+             f"{tr('실사일')} {by_label.get(tr('실사일'), '')}", fac, fei]
+    meta = " · ".join(p for p in parts if p and p.strip())
+    shown_values = set()
+    for v in by_label.values():
+        shown_values.add(v.strip())
+        shown_values.update(x.strip() for x in v.split(" · "))
+    kf = []
+    for k in raw_kf:
+        head, sep, val = str(k).partition(":")
+        if sep and val.strip() and (head.strip() in _TIDY_483_DUP_HEADS
+                                    or val.strip() in shown_values):
+            continue
+        kf.append(k)
+    return meta, kf
+
+
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG,
                doc_url_index: "dict[str, tuple[str, int]] | None" = None,
@@ -622,6 +671,21 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
             "mono": raw_label in MONO_LABELS,
         })
 
+    # [WHOPIR 결론 한 줄 2026-11-03] 접힘 밖 사실표에 "결론" 행을 결정론으로 낸다(생성 0).
+    # 정형 어구를 못 읽으면 행을 만들지 않는다. 실사일 행 바로 아래에 둔다.
+    if isinstance(detail, dict) and detail.get("type") == "whopir_report":
+        _parts = _whopir_outcome_parts(detail)
+        if _parts:
+            _bits = [tr("수용 가능") if _parts["verdict"] == "acceptable" else tr("수용 불가")]
+            if _parts["years"]:
+                _bits.append(tr("{n}년 유효", n=_parts["years"]))
+            if _parts["desk"]:
+                _bits.append(tr("서면 평가"))
+            facts.insert(min(1, len(facts)),
+                         {"label": tr("결론"), "value": " · ".join(_bits), "mono": False})
+
+    tidy_meta, key_facts = _tidy_483(card, facts, tr)
+
     return {
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
@@ -667,7 +731,9 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
                         else tr("품목")),
         "quotes": quotes,
         "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
-        "key_facts": card.get("key_facts") or [],
+        "key_facts": key_facts,
+        # [카드 정돈 2026-11-03] 483 단독 카드만 값이 있다 — 4칸 표 대신 메타 한 줄(템플릿이 분기).
+        "tidy_meta": tidy_meta,
         # ★근거 라벨도 데이터로 오는 표시 문구다(불변식 #13) — 여기서 한 번 번역해
         #   넘기지 않으면 영어 카드의 "핵심 사실" 줄에 한국어가 그대로 실린다.
         # [D2 2026-09-11] tr() 에 넘기기 전에 내부 계약 토큰을 방문자 문구로 먼저
@@ -3057,7 +3123,7 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     # facts[].label — 표 라벨
     N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
     N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
-    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"),
+    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"), N_("브랜드"), N_("정정일"),
     # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다. Evidence A 원본 토큰
     # "Intake raw" 는 EVIDENCE_BASIS_LABELS 가 여기 도달하기 전에 방문자 문구로 바꾸므로
     # 그 문구를 등록한다(D2 2026-09-11) — 등록은 위 dict 정의에서도 이뤄지지만 이 표가

@@ -23,6 +23,7 @@ ENABLE_HC=true 또는 --sources hc 일 때 collect_intake.main() 에서 호출�
 
 from __future__ import annotations
 
+import html as html_lib
 import re
 import time
 from datetime import date
@@ -60,11 +61,22 @@ _DETAIL_TAG_RE = re.compile(r"<[^>]+>")
 _COMPANY_LABELS = ("company", "recalling firm", "manufacturer", "distributor",
                    "marketed by", "importer")
 
-# [폴백 2026-07-20] HC 상세표의 Brand(s) 는 실무상 시판허가권자(회사)가 들어가는 칸이다 —
-# 실측 6건 전부 회사명이었다(Apotex Inc.·Servier Canada Inc.·Kao Canada Inc. 등).
-# 그래도 브랜드가 곧 회사는 아니므로 _COMPANY_LABELS 에 합치지 않고 **최후 폴백**으로만 쓴다.
-# 이 폴백이 없던 동안 카드가 "업체: 원문 미기재" 라고 거짓을 발행했다(원문에는 있었다).
-_COMPANY_FALLBACK_LABELS = ("brand", "brand(s)", "brands")
+# [2026-11-03] 업체란은 상세 페이지의 별도 "Companies"(회수 업체) 칸이 1순위다. 상세표의
+# Brand(s) 는 소비자 브랜드(Equate·Aleve·Claritin…)가 든 페이지가 있어 회사가 아니다 —
+# 07-20 에 "원문 미기재" 거짓을 막으려고 Brand(s) 를 최후 폴백으로 썼더니 6장이 브랜드를
+# 업체로 발행했다(캐나다 43장 대조). 브랜드는 업체 폴백이 아니라 **별도 값**(`brand`)이다.
+_BRAND_LABELS = ("brand", "brand(s)", "brands")
+_COMPANIES_KEY = "_companies"            # `_parse_detail_html` 가 data-label 키와 겹치지 않게 접두 `_`
+_COMPANIES_BLOCK_RE = re.compile(
+    r'field--name-companies"(.*?)(?:field--name-node-id|Published by)', re.S | re.I)
+_PARA_RE = re.compile(r"<p[^>]*>(.*?)</p>", re.S | re.I)
+_BR_RE = re.compile(r"<br\s*/?>", re.I)
+_COMPANY_PREFIX_RE = re.compile(
+    r"^(?:recalling\s+firms?|companies|company)\s*:?\s*", re.I)
+# 정정이 나도 바뀌지 않는 최초 게시일 — 피드의 "Last updated" 는 정정일로 바뀐다.
+_ORIGINAL_PUBLISHED_RE = re.compile(
+    r"Original published date:?\s*</strong>\s*<time[^>]*>\s*(\d{4}-\d{2}-\d{2})", re.S | re.I)
+_FIRST_PUBLISHED_KEY = "_first_published"
 
 TARGET_ORG = "drugs and health products"     # Organization 필터 (소문자 비교)
 # [2026-09-14] Organization 필터를 단일 값에서 집합으로. HC 는 의약품 회수·경보를 **세
@@ -182,17 +194,56 @@ def _parse_detail_html(html: str) -> dict[str, str]:
         key = label.strip().lower()
         if val and key not in out:        # 첫 값 우선(동일 라벨 다중 행 방지)
             out[key] = val
+    companies = _parse_companies(html)
+    if companies:
+        out[_COMPANIES_KEY] = companies
+    m = _ORIGINAL_PUBLISHED_RE.search(html or "")
+    if m and _parse_date(m.group(1)):
+        out[_FIRST_PUBLISHED_KEY] = m.group(1)
     return out
 
 
+def _parse_companies(html: str) -> str:
+    """상세 페이지 "Companies"(회수 업체) 칸의 **첫 회사명**(순수 함수). 없으면 "".
+
+    칸 안은 `<p>` 줄 묶음이다(첫 줄=상호, 이어서 주소). 엑셀에서 붙여 넣은 표 잔해가 섞여 있어
+    태그를 걷어 낸 뒤 줄 단위로 읽는다. "Recalling Firm:" 같은 머리말은 떼고, 머리말만 있는
+    줄은 건너뛴다."""
+    m = _COMPANIES_BLOCK_RE.search(html or "")
+    if not m:
+        return ""
+    block = re.sub(r"<(style|script)[^>]*>.*?</\1>", " ", m.group(1), flags=re.S | re.I)
+    block = block.split('field--label">Companies</div>', 1)[-1]
+    block = re.sub(r"<[^>]*$", "", block)          # 끝 표지(node-id) 앞에서 잘린 열린 태그
+    paras = _PARA_RE.findall(block) or _BR_RE.split(block)
+    for para in paras:
+        line = _DETAIL_TAG_RE.sub(" ", para)
+        line = html_lib.unescape(line).replace("\xa0", " ")
+        line = re.sub(r"\s+", " ", line).strip()
+        line = _COMPANY_PREFIX_RE.sub("", line).strip(" ,;")
+        # 상호와 주소가 한 줄로 붙어 오는 페이지가 많다("Apotex Inc. 150 Signet Drive …") —
+        # 첫 "공백+숫자" 앞까지가 상호다(상호 자체가 숫자로 시작하는 경우는 선행 숫자라 걸리지 않는다).
+        line = re.split(r"(?<=\S)\s+\d", line, maxsplit=1)[0].strip(" ,;")
+        if line and re.search(r"[A-Za-z]", line):
+            return line
+    return ""
+
+
 def _detail_company(detail: dict[str, str]) -> str:
-    """상세 셀에서 회사명을 뽑는다. 우선 '실제 회사/제조사' 라벨(_COMPANY_LABELS), 없으면
-    최후 폴백으로 Brand(s)(_COMPANY_FALLBACK_LABELS — 실무상 회사명이 들어가는 칸, 위 상수
-    주석 참조). 둘 다 없으면 ""(→ 카드에서 값 부재로 표기)."""
+    """상세에서 회수 업체를 뽑는다. 1순위 "Companies" 칸, 다음 '실제 회사/제조사' 라벨
+    (_COMPANY_LABELS). **Brand(s) 는 쓰지 않는다**(브랜드는 회사가 아니다 — 위 상수 주석).
+    없으면 ""(→ 카드에서 값 부재로 표기)."""
+    if detail.get(_COMPANIES_KEY):
+        return detail[_COMPANIES_KEY]
     for key in _COMPANY_LABELS:
         if detail.get(key):
             return detail[key]
-    for key in _COMPANY_FALLBACK_LABELS:
+    return ""
+
+
+def _detail_brand(detail: dict[str, str]) -> str:
+    """상세표의 Brand(s) — 업체가 아니라 별도 값."""
+    for key in _BRAND_LABELS:
         if detail.get(key):
             return detail[key]
     return ""
@@ -239,8 +290,10 @@ def _to_item(
     title = _text(rec, "Title")
     if not nid or not title:
         return None
-    date_iso = _parse_date(_text(rec, "Last updated", "Date published"))
-    if not _within_window(date_iso, start, end):
+    # 윈도우 판정은 피드의 "Last updated"(정정 포함 최신일)로 한다 — 정정도 일단 눈에 띄게.
+    # 카드에 찍는 발행일은 상세 페이지의 "Original published date" 가 있으면 그것이다(아래).
+    feed_date = _parse_date(_text(rec, "Last updated", "Date published"))
+    if not _within_window(feed_date, start, end):
         return None
 
     category = _text(rec, "Category")
@@ -255,7 +308,17 @@ def _to_item(
     detail = detail_fetcher(url) if detail_fetcher else {}
     ingredient = detail.get("strength", "")        # 유효성분·함량(생물 원료 단서)
     dosage_form = detail.get("dosage form", "")   # 파서 키 = label.lower() — 공백 유지
-    firm = _detail_company(detail)                 # 실제 회사 라벨 우선, 없으면 Brand(s) 최후 폴백; Organization 은 회사 아님
+    firm = _detail_company(detail)                 # "Companies" 칸 우선 → 회사 라벨; Brand(s)·Organization 은 회사 아님
+    brand = _detail_brand(detail)
+    first_published = detail.get(_FIRST_PUBLISHED_KEY, "")
+    if first_published and feed_date and first_published < start.isoformat():
+        # 같은 NID 의 **정정**이다 — 최초 게시는 이전 윈도우에서 이미 카드가 됐다. 새 카드를 또
+        # 만들면 같은 회수가 다음 호에 두 번 나간다(PMS-Fampridine 10-05호·11-02호). 조용히 버리지
+        # 않고 로그로 남긴다(기존 카드 쪽 갱신은 별도 작업).
+        log("WARN", f"HC 정정 건너뜀(최초 게시 {first_published} < 윈도우 시작 {start}, 정정 {feed_date}) "
+                    f"nid={nid} — 기존 카드가 있다")
+        return None
+    date_iso = first_published or feed_date
 
     blob = f"{title} {product} {issue} {ingredient}".lower()
     tier = _signal_tier(recall_class, blob)
@@ -287,6 +350,12 @@ def _to_item(
         raw_payload["dosage_form_detail"] = dosage_form
     if firm:
         raw_payload["company"] = firm
+    if brand:
+        raw_payload["brand"] = brand           # 업체 폴백이 아니라 별도 행(card_scaffold 가 표기)
+    if first_published:
+        raw_payload["first_published"] = first_published
+        if feed_date and feed_date > first_published:
+            raw_payload["correction_date"] = feed_date    # 정정일 — 발행일과 다를 때만
 
     return IntakeItem(
         source=SOURCE_HC,
@@ -295,7 +364,7 @@ def _to_item(
         headline=f"[HC] {title}"[:240],
         official_url=url,                       # 항목별 공식 URL(절대)
         type_or_class=TYPE_HC_RECALL,
-        firm=firm,                              # 회사(라벨 우선·Brand(s) 폴백); 둘 다 없으면 "" → 카드에서 값 부재로 표기
+        firm=firm,                              # 회수 업체("Companies" 칸 우선); 없으면 "" → 카드에서 값 부재로 표기
         body="\n".join(p for p in body_parts if p),
         api_query=HC_OPENDATA_URL,
         qa_relevance=relevance,

@@ -135,14 +135,58 @@ class TestP8FirmMapping(unittest.TestCase):
         item = hc._to_item(_rec(), START, END, detail_fetcher=det)
         self.assertEqual(item.firm, "CSL Behring Canada Inc.")
 
-    def test_brand_only_used_as_last_resort_fallback(self):
-        # [폴백 2026-07-20] 실제 회사 라벨이 전혀 없을 때만 Brand(s) 를 최후 폴백으로 쓴다 —
-        # 실측 HC 회수 7건 중 6건이 Brand(s) 칸에 회사명(Apotex Inc. 등)을 담고 있었다.
-        # 폴백이 없으면 카드가 "업체: 원문 미기재"라는 거짓을 발행한다(원문에는 있었다).
-        det = lambda u: {"brand": "Apotex Inc.", "product name": "Hizentra",
-                         "strength": "IMMUNOGLOBULIN (HUMAN) 200 mg/mL"}
+    def test_brand_is_not_a_company_fallback(self):
+        # [2026-11-03] Brand(s) 칸에 소비자 브랜드(Equate·Aleve·Claritin…)가 든 페이지가 있다 —
+        # 07-20 폴백이 그 6장을 업체로 발행했다. 회사 칸이 없으면 업체는 비고(→ 카드 "미확인"),
+        # 브랜드는 업체가 아니라 별도 값(raw_payload["brand"])으로 남는다.
+        det = lambda u: {"brand": "Equate", "product name": "Equate Antacid"}
         item = hc._to_item(_rec(), START, END, detail_fetcher=det)
-        self.assertEqual(item.firm, "Apotex Inc.")
+        self.assertEqual(item.firm, "")
+        self.assertNotIn("company", item.raw_payload)
+        self.assertEqual(item.raw_payload["brand"], "Equate")
+
+    def test_companies_block_beats_brand(self):
+        det = lambda u: {"brand": "Equate", "_companies": "Guardian Drug Company Inc."}
+        item = hc._to_item(_rec(), START, END, detail_fetcher=det)
+        self.assertEqual(item.firm, "Guardian Drug Company Inc.")
+        self.assertEqual(item.raw_payload["company"], "Guardian Drug Company Inc.")
+        self.assertEqual(item.raw_payload["brand"], "Equate")
+
+
+class TestPublishedDate(unittest.TestCase):
+    """발행일 = 페이지의 "Original published date". 정정일은 별도 값, 정정만 뜬 옛 회수는 건너뛴다."""
+
+    def test_first_published_is_the_card_date(self):
+        det = lambda u: {"_first_published": "2026-06-01"}
+        item = hc._to_item(_rec(**{"Last updated": "2026-06-03"}), START, END, detail_fetcher=det)
+        self.assertEqual(item.date_iso, "2026-06-01")
+        self.assertEqual(item.raw_payload["first_published"], "2026-06-01")
+        self.assertEqual(item.raw_payload["correction_date"], "2026-06-03")
+
+    def test_no_correction_date_when_same_day(self):
+        det = lambda u: {"_first_published": "2026-06-03"}
+        item = hc._to_item(_rec(**{"Last updated": "2026-06-03"}), START, END, detail_fetcher=det)
+        self.assertEqual(item.date_iso, "2026-06-03")
+        self.assertNotIn("correction_date", item.raw_payload)
+
+    def test_feed_date_when_page_has_no_original_date(self):
+        item = hc._to_item(_rec(), START, END, detail_fetcher=lambda u: {})
+        self.assertEqual(item.date_iso, "2026-06-03")
+        self.assertNotIn("first_published", item.raw_payload)
+
+    def test_correction_of_a_recall_older_than_window_is_skipped(self):
+        # 같은 NID 정정 — 최초 게시는 이전 윈도우에서 이미 카드가 됐다(PMS-Fampridine 중복 사례).
+        det = lambda u: {"_first_published": "2025-12-20"}
+        item = hc._to_item(_rec(**{"Last updated": "2026-06-03"}), START, END, detail_fetcher=det)
+        self.assertIsNone(item)
+
+    def test_window_still_judged_on_last_updated(self):
+        # 피드 날짜가 윈도우 밖이면 상세를 열기 전에 탈락(네트워크 절약 유지).
+        calls = []
+        det = lambda u: calls.append(u) or {}
+        item = hc._to_item(_rec(**{"Last updated": "2027-02-01"}), START, END, detail_fetcher=det)
+        self.assertIsNone(item)
+        self.assertEqual(calls, [])
 
 
 class TestDetailParser(unittest.TestCase):
@@ -166,17 +210,67 @@ class TestDetailParser(unittest.TestCase):
     def test_empty_html_returns_empty(self):
         self.assertEqual(hc._parse_detail_html(""), {})
 
-    # ── [폴백 2026-07-20] _detail_company 3갈래: 라벨 우선 · brand 최후 폴백 · 둘 다 없음 ──
-    def test_brand_fallback_used_when_no_company_label(self):
-        self.assertEqual(hc._detail_company({"brand": "Apotex Inc."}), "Apotex Inc.")
+    # ── [2026-11-03] _detail_company: Companies 칸 > 회사 라벨 > 빈 값(Brand 는 업체가 아니다) ──
+    def test_brand_is_never_the_company(self):
+        self.assertEqual(hc._detail_company({"brand": "Apotex Inc."}), "")
+        self.assertEqual(hc._detail_brand({"brand": "Aleve"}), "Aleve")
 
-    def test_company_label_wins_over_brand_fallback(self):
+    def test_company_label_still_works_without_brand(self):
         self.assertEqual(
             hc._detail_company({"brand": "Retail Brand", "manufacturer": "Acme Pharma"}),
             "Acme Pharma")
 
+    def test_companies_block_wins_over_label(self):
+        self.assertEqual(
+            hc._detail_company({"_companies": "Bayer Inc.", "manufacturer": "Acme Pharma"}),
+            "Bayer Inc.")
+
     def test_neither_company_nor_brand_label_returns_empty(self):
         self.assertEqual(hc._detail_company({"product name": "X"}), "")
+
+    # ── "Companies" 칸·"Original published date" 파싱(실제 페이지 모양) ──
+    @staticmethod
+    def _page(companies_inner, original="2026-10-30"):
+        return (
+            '<div class="view-content"><div><strong class="views-label">Original published date: </strong>'
+            f'<time datetime="{original}T15:57:44-04:00">{original}</time></div></div>'
+            '<div class="field field--name-companies"><div class="field--label">Companies</div>'
+            f'<div class="field field--name-field-companies field--item">{companies_inner}</div></div>'
+            '<div class="field field--name-node-id"><div class="field--label">Published by</div>')
+
+    def test_companies_name_and_address_in_one_paragraph(self):
+        html = self._page('<table><tbody><tr><td><p>Apotex Inc. 150 Signet Drive Toronto ON, M9L 1T9</p></td></tr></tbody></table>')
+        d = hc._parse_detail_html(html)
+        self.assertEqual(d["_companies"], "Apotex Inc.")
+        self.assertEqual(d["_first_published"], "2026-10-30")
+
+    def test_companies_first_paragraph_is_the_name(self):
+        html = self._page('<meta name="Generator" content="Microsoft Excel 15"><style></style><table><tr><td>'
+                          '<p>Guardian Drug Company Inc.    </p><p>2 Charles Court, </p>'
+                          '<p>Dayton, New Jersey </p></td></tr></table>')
+        self.assertEqual(hc._parse_detail_html(html)["_companies"], "Guardian Drug Company Inc.")
+
+    def test_recalling_firm_prefix_is_stripped_and_bare_prefix_skipped(self):
+        a = self._page("<p>Recalling Firm Dr. Reddy's Laboratories Canada Inc. 5580 Explorer Dr</p>")
+        self.assertEqual(hc._parse_detail_html(a)["_companies"], "Dr. Reddy's Laboratories Canada Inc.")
+        b = self._page("<p>Recalling Firm:</p><p>ATTITUDE</p>")
+        self.assertEqual(hc._parse_detail_html(b)["_companies"], "ATTITUDE")
+
+    def test_company_name_that_starts_with_digits_is_kept(self):
+        html = self._page("<p>9055-7588 Quebec Inc. (Attitude) 900 5605 De Gaspe</p>")
+        self.assertEqual(hc._parse_detail_html(html)["_companies"], "9055-7588 Quebec Inc. (Attitude)")
+
+    def test_empty_companies_block_yields_no_company(self):
+        html = self._page("")
+        d = hc._parse_detail_html(html)
+        self.assertNotIn("_companies", d)
+        self.assertEqual(hc._detail_company(d), "")
+
+    def test_page_without_companies_block_has_no_company_key(self):
+        d = hc._parse_detail_html('<td data-label="Brand">Servier Canada Inc.</td>')
+        self.assertNotIn("_companies", d)
+        self.assertEqual(hc._detail_company(d), "")
+        self.assertEqual(hc._detail_brand(d), "Servier Canada Inc.")
 
 
 class TestDetailFetchStats(unittest.TestCase):

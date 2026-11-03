@@ -2,7 +2,7 @@
  "source": "supabase public.findings_similar(query,5) — 사이트 '유사 사례' 와 같은 엔진(렉시컬 FTS+similarity)",
  "captured_on": "2026-11-03",
  "card_id": "8909d4bb39b5",
- "note": "질의는 대상 서한 4개 지적의 한국어 근거를 줄인 것. 항목은 질의별 점수 상위(사이트 순서 그대로, 일부 생략: 질의 3 의 보류 로트 항목 3건)",
+ "note": "질의별 사이트 점수 상위 5건 + 같은 질의의 경고서한 상위 3건(limit 50 중). 일부 본문은 앞부분만. 질의 3의 보류 로트 항목 3건 생략",
  "queries": [
   "90건이 넘는 ISO 5 분리균이 공식적인 미생물 동정 대신 이전에 동정된 집락과 유사함으로 기록되었고 ISO 5 구역에서 100건이 넘는 미생물 검출",
   "근본 원인을 규명하고 시정하는 대신 수율 한도를 낮추었다 여러 CAPA가 효과성 점검 없이 종결되었다",
@@ -144,6 +144,69 @@
    "firm": "SCA Pharmaceuticals, LLC",
    "date": "2026-10-13",
    "text": "귀사 시설은 동적 조건에서 수행하는 기류 시각화 연구를 포함하여 ISO 5 구역에 대한 일상적이고 엄격한 인증을 실시하지 않았다."
+  },
+  {
+   "q": 1,
+   "finding_id": "finding-b47e2ce4fc509e61d35db8f4",
+   "score": 0.0879,
+   "source": "FDA Warning Letter",
+   "firm": "Med Shop Total Care, Inc.",
+   "date": "2022-04-12",
+   "text": "귀사는 ISO 5 무균 공정 구역 내에서 미생물 오염이 검출된 이후 적절한 제품 평가를 실시하고 적절한 시정조치를 취하지 못하였습니다."
+  },
+  {
+   "q": 1,
+   "finding_id": "finding-9368332ec2fa4b34ef0517fa",
+   "score": 0.0836,
+   "source": "FDA Warning Letter",
+   "firm": "Fagron Compounding Services, LLC dba Fagron Sterile Service",
+   "date": "2025-02-04",
+   "text": "귀사는 ISO 5 무균 공정 구역 내에서 미생물 오염이 검출된 후 적절한 제품 평가를 수행하고 적절한 시정조치를 취하지 않았습니다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-38652d5d3567b38301597b31",
+   "score": 0.058,
+   "source": "FDA Warning Letter",
+   "firm": "Indoco Remedies Limited",
+   "date": "2025-01-07",
+   "text": "귀사의 조사에서 인용한 두 과학 간행물 출처 모두 귀사가 규명한 근본 원인을 뒷받침하지 않습니다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-c5bd54912fa1e219420307b3",
+   "score": 0.0483,
+   "source": "FDA Warning Letter",
+   "firm": "Pinnacle Transplant Technologies, LLC",
+   "date": "2024-10-22",
+   "text": "배치 또는 그 구성요소가 규격을 충족하지 못한 원인을 알 수 없는 불일치 또는 실패를 배치의 유통 여부와 관계없이 철저히 조사하지 못하였습니다 [21 CFR 211.192]. 구체적으로, 2020년 7월부터 2022년 2월 사이 귀사는 8건의 무균시험 실패를 조사하지 못하였습니다. 오염 미생물을 확인하기는 하였으나, 실패의 근본 원인을 규명하기 위한 조사를 수행하지 않았고 시정 및 예방조치도 시행하지 않았습니다."
+  },
+  {
+   "q": 3,
+   "finding_id": "finding-410cbbdfd533dd7f645ee010",
+   "score": 0.064,
+   "source": "FDA Warning Letter",
+   "firm": "RenatiLabs Inc.",
+   "date": "2023-08-01",
+   "text": "FDA-483 지적사항 3에 대한 답변에서 귀사는 무균시험 검체를 냉동 보관해도 미생물 오염 검출에 영향을 미치지 않는다고 진술했습니다. FDA는 이에 동의하지 않습니다."
+  },
+  {
+   "q": 4,
+   "finding_id": "finding-9e43679d4bef4c6774308dab",
+   "score": 0.1006,
+   "source": "FDA Warning Letter",
+   "firm": "Empower Clinic Services, LLC dba Empower Pharmacy",
+   "date": "2026-09-22",
+   "text": "귀사는 ISO 5 구역 내 일방향 기류(unidirectional airflow)를 입증하기 위한 동적 조건(dynamic conditions)에서의 적절한 스모크 스터디(smoke study)를 수행하지 않았다."
+  },
+  {
+   "q": 4,
+   "finding_id": "finding-fab0cdfde1844c9314e36156",
+   "score": 0.0832,
+   "source": "FDA Warning Letter",
+   "firm": "Apothecary Pharma, LLC",
+   "date": "2026-03-17",
+   "text": "귀사는 ISO 5 구역 내에서 단일방향 기류(unidirectional airflow)를 입증하기 위한 동적 조건(dynamic conditions) 하에서의 적절한 스모크 스터디(smoke study)를 수행하지 못하였습니다."
   }
  ],
  "targets": [

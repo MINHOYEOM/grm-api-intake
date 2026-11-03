@@ -353,37 +353,63 @@ _SITE_RULES = {1: ("situation", re.compile(r"ISO ?5.*(?:오염|검출)|동정"))
                4: ("fact", re.compile(r"(?=.*(?:스모크|기류 시각화))(?=.*동적)"))}
 
 
+def _pick_fact(text: str) -> str:
+    """원문 지적에서 수치·기간이 든 문장을 먼저, 없으면 첫 문장을 그대로 쓴다(직접 쓰지 않는다). 너무 길면 자른다."""
+    sents = [x for x in re.split(r"(?<=[.!?다])\s+(?=[가-힣A-Z0-9(])", re.sub(r"\s+", " ", text or "").strip()) if x]
+    sents = [re.sub(r"\s*\[[^\]]*CFR[^\]]*\]", "", x) for x in sents]
+    pick = next((x for x in sents if re.search(r"\d+\s*건|\d{4}년|\d+\s*%|\d+개월", x)), sents[0] if sents else "")
+    pick = re.sub(r"^구체적으로,\s*", "", pick)
+    pick = re.sub(r"^귀사는\s*", "", pick)
+    return pick if len(pick) <= 104 else pick[:100].rstrip() + "…"
+
+
+def _firm_history(findings: dict, slug: str) -> str:
+    docs = findings.get("documents") or []
+    key = next((d.get("firm_key") for d in docs if d.get("slug") == slug), None)
+    mine = [d for d in docs if key and d.get("firm_key") == key]
+    wl = sorted(str(d["published_date"]) for d in mine if _is_wl(d))
+    b483 = sorted(str(d["published_date"]) for d in mine if d.get("source") == "FDA 483")
+    line = f"이 업체 DB 이력: 483 {len(b483)}건 · 경고서한 {len(wl)}건"
+    if wl and b483 and b483[0] < wl[0]:
+        line += " (483이 서한보다 먼저 게시)"
+    return line
+
+
 def site_cases(sim: dict | None, findings: dict) -> list[dict]:
-    """사이트 ‘유사 사례’ 엔진(findings_similar RPC)이 대상 서한의 지적마다 돌려준 결과를 그대로 쓴다 — 순서·점수는 사이트 것이다.
-    우리가 더하는 것은 닮은 정도 라벨(코드 규칙)과 업체 익명 처리뿐. 지적마다 (라벨, 점수) 순으로 한 건을 고른다."""
+    """사이트 ‘유사 사례’ 엔진(findings_similar RPC)이 대상 서한의 지적마다 돌려준 결과를 그대로 쓴다 — 점수는 사이트 것이다.
+    우리가 더하는 것은 닮은 정도 라벨(코드 규칙)·업체 익명 처리·그 업체의 DB 이력(센 값)이다.
+    지적마다 (라벨, 같은 라벨이면 경고서한 먼저, 점수) 순으로 한 건을 고르고, 같은 업체는 한 번만 쓴다."""
     if not sim or not sim.get("items"):
         return []
-    slug_of = {f.get("finding_id"): d.get("slug") for d in findings.get("documents") or [] for f in d.get("findings") or []}
+    docs = findings.get("documents") or []
+    by_fid = {f.get("finding_id"): (d.get("slug"), f.get("text_ko")) for d in docs for f in d.get("findings") or []}
     rank = {"fact": 0, "situation": 1, "topic": 2}
-    aliases: dict[str, str] = {}
-    rows: list[dict] = []
-    targets = sim.get("targets") or []
+    used: set[str] = set()
+    picked: list[tuple[int, str, dict]] = []
     for q in sorted({it["q"] for it in sim["items"]}):
         best = None
-        for it in (x for x in sim["items"] if x["q"] == q):
+        for it in (x for x in sim["items"] if x["q"] == q and x["firm"] not in used):
             lv, rx = _SITE_RULES.get(q, ("topic", re.compile("$^")))
             lv = lv if rx.search(it["text"]) else "topic"
-            key = (rank[lv], -float(it["score"]))
+            key = (rank[lv], "Warning" not in it["source"], -float(it["score"]))
             if best is None or key < best[0]:
                 best = (key, lv, it)
-        if best is None:
-            continue
-        _, lv, it = best
-        if it["firm"] not in aliases:
-            aliases[it["firm"]] = f"업체 {'ABCDEFG'[len(aliases)]}"
-        rows.append(dict(q=q, target=targets[q - 1] if q <= len(targets) else "", alias=aliases[it["firm"]], level=lv, label=SITE_LEVELS[lv],
-                         year=str(it["date"])[:4], agency="FDA 경고서한" if "Warning" in it["source"] else "FDA 483", score=float(it["score"]),
-                         text=it["text"], slug=str(slug_of.get(it["finding_id"]) or "")))
+        if best:
+            used.add(best[2]["firm"])
+            picked.append((q, best[1], best[2]))
+    targets = sim.get("targets") or []
+    rows = []
+    for n, (q, lv, it) in enumerate(picked):
+        slug, full = by_fid.get(it["finding_id"], ("", ""))
+        rows.append(dict(q=q, target=targets[q - 1] if q <= len(targets) else "", alias=f"업체 {'ABCDEFG'[n]}", level=lv, label=SITE_LEVELS[lv],
+                         year=str(it["date"])[:4], agency="경고서한" if "Warning" in it["source"] else "483", score=float(it["score"]),
+                         text=it["text"], fact=_pick_fact(full or it["text"]), slug=str(slug or ""),
+                         history=_firm_history(findings, str(slug or ""))))
     return rows
 
 
 def site_lines(rows: list[dict]) -> list[str]:
-    return [f"{r['alias']}({r['year']}년 {r['agency']}, {r['label']}) ‘{r['target']}’ ← {r['text']} grm-solutions.com/findings/doc/{r['slug']}/"
+    return [f"{r['alias']}({r['year']}년 {r['agency']}, {r['label']}) ‘{r['target']}’ ← {r['fact']} grm-solutions.com/findings/doc/{r['slug']}/"
             for r in rows if r["slug"]]
 
 
@@ -492,12 +518,12 @@ CSS = """
 .g-ln{font-size:23px;line-height:1.45;margin:6px 0;word-break:keep-all;padding-left:14px;border-left:6px solid #C2603F}
 .g-map{margin:14px 0 4px;font-size:21px;border-top:2px solid #141413}
 .g-map div{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;padding:3px 2px;border-bottom:1px solid #D9CFC0}
-.g-map small{display:block;font-size:17px;color:#6C6A64}
+.g-map.big{font-size:27px;margin-top:26px}.g-map.big div{padding:12px 2px}.g-map.big small{font-size:20px}.g-map small{display:block;font-size:17px;color:#6C6A64}
 .g-cs3{margin-top:12px;display:flex;flex-direction:column;gap:8px}
 .g-st{margin:2px 0 8px;font-size:22px;font-weight:800;color:#6C6A64}
 .g-map .mh{font-size:17px;font-weight:800;color:#6C6A64;border-bottom:2px solid #141413}
 .g-cs3 em.lv{display:inline-block;font-style:normal;font-size:16px;font-weight:800;border-radius:5px;padding:1px 9px;margin:0 8px 3px 0;color:#fff;background:#6C6A64}
-.g-cs3 em.both{background:#C2603F}.g-cs3 em.pattern{background:#1A1815}.g-cs3 em.fact{background:#C2603F}.g-cs3 em.situation{background:#1A1815}.g-cs3 small.t{color:#A14B30;font-weight:700;margin-bottom:2px}.g-site div{padding:14px 16px;font-size:22px}
+.g-cs3 em.both{background:#C2603F}.g-cs3 em.pattern{background:#1A1815}.g-cs3 em.fact{background:#C2603F}.g-cs3 em.situation{background:#1A1815}.g-cs3 small.t{color:#A14B30;font-weight:700;margin-bottom:2px}.g-site div{padding:16px 18px;font-size:25px;line-height:1.5}.g-site small.h{color:#3D3D3A;font-size:18px;margin-top:4px}.g-site{gap:12px}
 .g-chips{margin:8px 0 2px;display:flex;flex-wrap:wrap;gap:8px;font-size:17px}
 .g-chips i{font-style:normal;border:1.5px solid #8A8478;border-radius:99px;padding:2px 12px;color:#3D3D3A}
 .g-chips u{text-decoration:none;background:#EFE9DE;border-radius:99px;padding:2px 12px;font-weight:700}
@@ -516,7 +542,12 @@ def _e(s: Any) -> str:
     return html.escape(str(s), quote=True)
 
 
-_KEY = '<div class="g-key"><span class="o">서한 원문</span><span class="h">GRM 해설</span><span class="n">서한에 없음</span></div>'
+_KEY_SPAN = {"o": "서한 원문", "h": "GRM 해설", "n": "서한에 없음"}
+_KEY_OF = {"g_find": "oh", "g_reply": "oh", "g_req": "oh", "g_site": "h", "g_sim": "h", "g_end": "nh"}  # 그 카드에 실제로 있는 종류만 표시
+
+
+def _key(kind: str) -> str:
+    return '<div class="g-key">' + "".join(f'<span class="{c}">{_KEY_SPAN[c]}</span>' for c in _KEY_OF.get(kind, "oh")) + "</div>"
 
 
 def _slide_html(s: dict) -> str:
@@ -531,7 +562,7 @@ def _slide_html(s: dict) -> str:
         p.append(f'<div class="g-dots"><div class="g-grid">{grid}</div><div class="g-dcap">{_e(d["caption"])}</div>'
                  + (f'<div class="g-line">{_e(s["line"])}</div>' if s.get("line") else "") + '</div>')
     else:
-        p.append(_KEY)
+        p.append(_key(k))
         p.append(f'<span class="g-corner">{_e(s["corner"])}</span>')
         p.append(f'<h2 class="g-h">{_e(s["heading"])}</h2>')
         if k == "g_find":
@@ -552,8 +583,9 @@ def _slide_html(s: dict) -> str:
                 p.append(f'<div class="g-dl">회신 기한: {_e(s["deadline"])}</div>')
         elif k == "g_site":
             p.append('<div class="g-cs3 g-site">' + "".join(
-                f'<div><b>{_e(r["alias"])}<small>{_e(r["year"])} · {_e(r["agency"])}</small></b>'
-                f'<span><small class="t">이번 서한: {_e(r["target"])}</small><em class="lv {r["level"]}">{_e(r["label"])}</em>{_e(r["text"])}'
+                f'<div><b>{_e(r["alias"])}<small>{_e(r["year"])} · FDA {_e(r["agency"])}</small></b>'
+                f'<span><small class="t">이번 서한의 지적: {_e(r["target"])}</small><em class="lv {r["level"]}">{_e(r["label"])}</em>{_e(r["fact"])}'
+                f'<small class="h">{_e(r["history"])}</small>'
                 f'<small class="u">grm-solutions.com/findings/doc/{_e(r["slug"])}/</small></span></div>' for r in s["rows"]) + "</div>")
         elif k == "g_sim":
             db = s["db"]
@@ -563,10 +595,12 @@ def _slide_html(s: dict) -> str:
                 f'<span><em class="lv {c["level"]}">{_e(c["label"])}</em>{_e(_case_facets(c))}'
                 f'<small class="u">grm-solutions.com/findings/doc/{_e(c["slug"])}/</small></span></div>'
                 for c in db["cases"]) + "</div>")
-            p.extend(f'<div class="g-ln">{_e(x)}</div>' for x in s["lines"])
+            big = bool(db.get("site"))  # DB 연관 카드는 내용이 적어 글을 키운다(억지로 채우지 않고 읽기 편하게)
+            ln_style = ' style="font-size:29px;margin:14px 0"' if big else ""
+            p.extend(f'<div class="g-ln"{ln_style}>{_e(x)}</div>' for x in s["lines"])
             p.append('<div class="g-chips">' + "".join(f'<i>{_e(k_)}</i>' for k_ in KEYWORDS)
                      + "".join(f'<u>{_e(n)}</u>' for n, _ in s.get("terms") or []) + '</div>')
-            p.append('<div class="g-map"><div class="mh"><span>대응 조항 기준 (212 → 211)</span><span>경고서한</span><span>2025년 이후</span></div>' + "".join(
+            p.append(f'<div class="g-map{" big" if big else ""}"><div class="mh"><span>대응 조항 기준 (212 → 211)</span><span>경고서한</span><span>2025년 이후</span></div>' + "".join(
                 f'<div><span>{_e(r["label"])}<small>{_e(r["cfr"])}</small></span><span>{r["n"]}건</span><span>{r["recent"]}건</span></div>'
                 for r in db["cfr_rows"]) + '</div>')
             p.append(f'<div class="g-cm">{_e(s["comment"])}</div>')

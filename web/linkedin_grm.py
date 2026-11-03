@@ -83,31 +83,89 @@ def db_similar(findings: dict, card: dict, *, n_cases: int = 3) -> dict[str, Any
         cfr_rows.append(dict(label=label, cfr=prefix, n=len(hit), recent=sum(1 for d in hit if str(d["published_date"]) >= "2025-01-01")))
     pet = [d for d in wls if any("21 CFR 212" in r for f in d.get("findings") or [] for r in f.get("cfr_refs") or [])
            and not (tgt and tgt in str(d.get("firm_name")).lower())]
-    cases = []
-    for d in sorted(em, key=lambda x: str(x["published_date"]), reverse=True):
-        if len(cases) >= n_cases:
-            break
-        f = next((x for x in d.get("findings") or [] if x.get("category_label_ko") == "환경모니터링"
-                  and _EM_TOPIC.search(x.get("text_orig") or "")), None)
-        if f is None:
-            continue
-        txt = re.sub(r"\s+", " ", str((f or {}).get("text_ko") or "")).strip()
-        if len(txt) < 20 or any(t.lower() in (txt + " " + " ".join(x.get("text_ko") or "" for x in d["findings"])).lower()
-                                for t in _firm_tokens(d.get("firm_name"))):
-            continue
-        cfr = next((r for r in (f.get("cfr_refs") or []) if r.startswith("21 CFR 21")), "")
-        cases.append(dict(year=str(d["published_date"])[:4], agency="FDA 경고서한", cfr=cfr,
-                          text=txt[:60].rstrip() + ("…" if len(txt) > 60 else ""), slug=d.get("slug")))
-    for i, c in enumerate(cases):
-        c["alias"] = f"업체 {'ABC'[i]}"
+    cases, tiers, id_n = similar_cases(wls, tgt, n_cases)
     return dict(measured_on=findings.get("measured_on") or "", wl_total=len(wls), em_n=len(em), em_years=dict(sorted(years.items())),
                 em_firms=len(firms), em_483_before=b483_before, em_repeat=repeat, cfr_rows=cfr_rows, pet_other=len(pet),
-                cases=cases)
+                cases=cases, tiers=tiers, pool=tiers["both"] + tiers["pattern"], id_n=id_n)
+
+
+# 개별 유사 사례 — 태그 집계가 아니라 서한 문장에서 사실이 겹치는 것만. 겹침 판정은 정규식(코드)이다.
+_ISO5 = re.compile(r"ISO ?\(?5|Grade A|Class ?100", re.I)
+_ID_NEG = re.compile(r"(?:not|fail\w*|without|did not|never|no)\b[^.]{0,80}(?:identif|speciat)|(?:identif|speciat)\w*[^.]{0,80}(?:not|fail|without|inadequate)", re.I)
+FACETS = {
+    "iso5_recovery": ("ISO 5에서 균이 나온 뒤 조사·평가가 부족하다는 지적",
+                      lambda s: bool(_ISO5.search(s) and re.search(r"recover|isolate|excursion|mold|growth", s, re.I)
+                                     and re.search(r"investigat|product evaluation|corrective action|impact|remediat|evaluat", s, re.I))),
+    "smoke_dynamic": ("스모크 스터디에 동적 조건이 빠졌다는 지적",
+                      lambda s: bool(re.search(r"smoke|airflow visuali", s, re.I) and re.search(r"dynamic", s, re.I)
+                                     and re.search(r"fail|inadequate|did not|not (?:include|perform|conduct)|lack|ensure", s, re.I))),
+    "capa_effect": ("CAPA 효과성 확인이 부족하다는 지적",
+                    lambda s: bool(re.search(r"CAPA|corrective", s, re.I) and re.search(r"effectiveness", s, re.I)
+                                   and re.search(r"fail|without|lack|did not|no defined", s, re.I)
+                                   and not re.search(r"should include|should be|ensure", s, re.I))),
+}
+
+
+def _sentences(text: Any) -> list[str]:
+    return re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", str(text or "")))
+
+
+LEVELS = {"both": "조항·사실 일치", "pattern": "사실 패턴 일치", "clause": "조항만 일치"}
+_CLAUSES = tuple(prefix for _, prefix in CFR_MAP)
+
+
+def similar_cases(wls: list[dict], tgt: str, n_cases: int = 3) -> tuple[list[dict], dict, int]:
+    """과거 경고서한을 닮은 정도 순으로 고른다 — 정확히 일치가 모자라면 단계적으로 넓힌다.
+      조항·사실 일치: 겹치는 문장이 대응 조항(211.192·211.67·211.113(b))으로 인용된 서한
+      사실 패턴 일치: 조항은 달라도 겹치는 지적(ISO 5 검출 대응 부족·스모크 동적·CAPA 효과성)이 2가지 이상
+      조항만 일치:    위 둘로 3건이 안 차면, 환경모니터링 지적에 대응 조항이 인용된 최근 서한
+    정렬: 단계 → 겹침 수 ↓ → 최신 ↓ → slug. 반환: (상위 n건, 단계별 후보 수, ISO 5 동정 미흡 서한 수)."""
+    found: dict[str, list[dict]] = {"both": [], "pattern": [], "clause": []}
+    id_n = 0
+    for d in wls:
+        if tgt and tgt in str(d.get("firm_name")).lower():
+            continue
+        hit: dict[str, dict] = {}
+        idneg = False
+        for f in d.get("findings") or []:
+            for s in _sentences(f.get("text_orig")):
+                if _ISO5.search(s) and _ID_NEG.search(s):
+                    idneg = True
+                for key, (_, fn) in FACETS.items():
+                    if key not in hit and fn(s):
+                        hit[key] = f
+        id_n += idneg
+        refs_of = lambda fs: [r for f in fs for r in (f.get("cfr_refs") or []) if r.startswith(_CLAUSES)]  # noqa: E731
+        base = dict(year=str(d["published_date"])[:4], date=str(d["published_date"]), agency="FDA 경고서한",
+                    slug=str(d.get("slug") or ""), facets=[FACETS[k][0] for k in FACETS if k in hit])
+        if hit and refs_of(hit.values()):
+            found["both"].append(dict(base, level="both", cfr=refs_of(hit.values())[0]))
+        elif len(hit) >= 2:
+            cfr = next((r for f in hit.values() for r in (f.get("cfr_refs") or []) if r.startswith("21 CFR 21")), "")
+            found["pattern"].append(dict(base, level="pattern", cfr=cfr or "조항 표시 없음"))
+        else:
+            em = [f for f in d.get("findings") or [] if f.get("category_label_ko") == "환경모니터링" and refs_of([f])]
+            if em:
+                found["clause"].append(dict(base, level="clause", cfr=refs_of(em)[0], facets=[]))
+    for lv in found:
+        found[lv].sort(key=lambda c: (-len(c["facets"]), [-ord(ch) for ch in c["date"]], c["slug"]))
+    # 독자에게 닮은 정도의 폭을 보이려고 단계마다 먼저 한 건씩(조항·사실 → 패턴 → 조항만), 남는 자리는 가까운 단계부터 채운다.
+    cases = [found[lv][0] for lv in ("both", "pattern", "clause") if found[lv]][:n_cases]
+    for lv in ("both", "pattern", "clause"):
+        for c in found[lv][1:]:
+            if len(cases) < n_cases:
+                cases.append(c)
+    cases.sort(key=lambda c: list(LEVELS).index(c["level"]))
+    for i, c in enumerate(cases):
+        c["alias"] = f"업체 {'ABC'[i]}"
+        c["label"] = LEVELS[c["level"]]
+    return cases, {k: len(v) for k, v in found.items()}, id_n
 
 
 def db_numbers(db: dict) -> set[str]:
     blob = " ".join(str(v) for v in (db["measured_on"], db["wl_total"], db["em_n"], db["em_firms"], db["em_483_before"],
-                                     db["em_repeat"], db["pet_other"], *db["em_years"].keys(), *db["em_years"].values()))
+                                     db["em_repeat"], db["pet_other"], db["pool"], db["id_n"], *db["tiers"].values(),
+                                     *db["em_years"].keys(), *db["em_years"].values(), *(c["year"] for c in db["cases"])))
     for r in db["cfr_rows"]:
         blob += f" {r['n']} {r['recent']} {r['cfr']}"
     return la._nums(blob)
@@ -232,10 +290,46 @@ def db_lines(db: dict, polite: bool = False) -> list[str]:
     """DB 값으로만 만드는 문장(템플릿) — LLM 이 쓰지 않는다. polite=True 는 본문(합쇼체), 아니면 카드(짧은 평서)."""
     yrs = sorted(db["em_years"])
     if polite:
-        return [f"환경모니터링으로 지적된 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체입니다.",
-                f"이 중 {db['em_483_before']}곳은 서한 전에 483을 먼저 받았고, {db['em_repeat']}곳은 서한을 두 번 이상 받았습니다."]
-    return [f"환경모니터링으로 지적된 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체.",
-            f"이 중 {db['em_483_before']}곳은 서한 전에 483을 먼저 받았다. 서한을 두 번 이상 받은 곳은 {db['em_repeat']}곳."]
+        return [f"참고로 ‘환경모니터링’ 태그로 묶인 경고서한은 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체입니다.",
+                f"이 중 {db['em_483_before']}곳은 서한 전에 483이 먼저 게시됐고, {db['em_repeat']}곳은 서한을 두 번 이상 받았습니다(업체명 일치 기준이라 최소값입니다)."]
+    return [f"태그 기준 집계: ‘환경모니터링’ 경고서한 {db['em_n']}건({yrs[0]}~{yrs[-1]}년), {db['em_firms']}개 업체.",
+            f"이 중 {db['em_483_before']}곳은 서한 전에 483이 먼저 게시됐고, {db['em_repeat']}곳은 서한 2건 이상. 업체명 일치 기준이라 최소값."]
+
+
+MAP_NOTE = "대응 조항 기준: PET 의약품 규정(21 CFR 212)을 같은 취지의 일반 cGMP(21 CFR 211) 조항으로 바꿔 센 값입니다."
+
+
+METHOD = "찾은 방법: 경고서한 영문 문장을 코드로 검색(ISO 5·Grade A 검출 + 조사·평가 부족 / smoke study + dynamic / CAPA + effectiveness 부재)하고, 대응 조항 인용 여부로 닮은 정도를 나눴습니다."
+KEYWORDS = ["ISO 5 · Grade A", "smoke study · dynamic", "CAPA effectiveness"]
+TERM_IDS = ["cleanroom-classification", "viable-environmental-monitoring", "airflow-visualization-study", "capa"]
+_NO_ID = "‘검출균 동정 미흡’ 그대로 지적한 서한은 DB에서 아직 찾지 못했다. 그래서 상황·조항이 겹치는 서한까지 넓혀 닮은 정도를 표시한다."
+
+
+def _case_facets(c: dict) -> str:
+    return ", ".join(c["facets"]) if c["facets"] else "환경모니터링 지적에 같은 조항이 인용됨(세부 사실은 다름)"
+
+
+def case_lines(db: dict, polite: bool = False) -> list[str]:
+    """개별 유사 사례 문장(템플릿) — 코드가 센 값·판정만 쓴다. 정확히 일치가 모자라면 단계적으로 넓히고 정도 라벨을 붙인다."""
+    out = []
+    if polite:
+        for c in db["cases"]:
+            out.append(f"{c['alias']}({c['year']}년, {c['cfr']}, {c['label']}): {_case_facets(c)} — grm-solutions.com/findings/doc/{c['slug']}/")
+    if db["id_n"] == 0:
+        out.append(_NO_ID.replace("찾지 못했다. 그래서", "찾지 못했습니다. 그래서").replace("표시한다.", "표시했습니다.") if polite else _NO_ID)
+    return out
+
+
+def _load_glossary() -> list[dict]:
+    try:
+        return json.loads((WEB_DIR / "data" / "glossary.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+
+
+def glossary_terms(glossary: list[dict] | None) -> list[tuple[str, str]]:
+    by = {g.get("id"): g.get("term_ko") for g in glossary or []}
+    return [(by[i], i) for i in TERM_IDS if by.get(i)]
 
 
 def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[dict] | None = None,
@@ -255,6 +349,7 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     items = (card["deep_analysis"].get("required_remediation") or {}).get("items") or []
     src_note = f"원문: FDA 경고서한{f' ({issued})' if issued else ''} · 업체명 비공개"
     ai = lc.AI_NOTE
+    terms = glossary_terms(glossary if glossary is not None else _load_glossary())
     slides = [
         dict(kind="g_cover", chip=cv["chip"], h1=list(cv["headline"]), sub=cv["sub"], dots=dict(cv["dots"]),
              line=cv.get("line") or "", ft_right=src_note, ai=ai),
@@ -263,7 +358,7 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
              repeat=s3["repeat"]["text"], ft_right=src_note, ai=ai),
         dict(kind="g_req", corner="시정 요구", heading=s4["heading"], sub=f"서한이 요구한 항목 {len(items)}건",
              items=[(it["title"], it["text"]) for it in s4["items"]], deadline=la._deadline(card), ft_right=src_note, ai=ai),
-        dict(kind="g_sim", corner="유사 사례", heading=s5["heading"], db=db, lines=db_lines(db), comment=s5["comment"],
+        dict(kind="g_sim", corner="유사 사례", heading=s5["heading"], db=db, lines=case_lines(db) + db_lines(db), comment=s5["comment"], terms=terms,
              ft_right=f"지적사항 DB {db['measured_on']} 기준 · 직접 센 숫자", ai=ai),
         dict(kind="g_end", corner="서한에 없는 것", heading=s6["heading"], not_stated=s6["not_stated"],
              question=s6["question"], ft_right="원문 링크는 브리프 페이지에서 확인", ai=ai),
@@ -273,7 +368,9 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     url = f"{base_url}/briefs/{pub}/"
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
-    sim = " ".join([la._norm(cap["similar"]), *db_lines(db, polite=True)])
+    term_line = ("관련 용어: " + " · ".join(n for n, _ in terms) + " (grm-solutions.com/glossary/)") if terms else ""
+    sim = "\n".join(x for x in [la._norm(cap["similar"]), *case_lines(db, polite=True), METHOD, *db_lines(db, polite=True),
+                               MAP_NOTE, term_line] if x)
     ko = "\n\n".join([la._norm(cap["lead"]), la._norm(cap["claims"]), la._norm(cap["contrast"]),
                       la._norm(cap["requests"]), sim, la._norm(cap["not_stated"])])
     return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko + f"\n\n전체 해설: {caption_url}\n",
@@ -318,10 +415,18 @@ CSS = """
 .g-yr div{flex:1;text-align:center;font-size:20px;color:#6C6A64}.g-yr i{display:block;background:#C2603F;border-radius:5px 5px 0 0;margin-bottom:6px}.g-yr b{display:block;font-size:22px;color:#141413}
 .g-ln{font-size:23px;line-height:1.45;margin:6px 0;word-break:keep-all;padding-left:14px;border-left:6px solid #C2603F}
 .g-map{margin:14px 0 4px;font-size:21px;border-top:2px solid #141413}
-.g-map div{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;padding:8px 2px;border-bottom:1px solid #D9CFC0}
+.g-map div{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:10px;padding:3px 2px;border-bottom:1px solid #D9CFC0}
 .g-map small{display:block;font-size:17px;color:#6C6A64}
 .g-cs3{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.g-cs3 div{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 14px;border:1.5px dashed #8A8478;border-radius:8px;font-size:19px;line-height:1.45;word-break:keep-all}
+.g-st{margin:2px 0 8px;font-size:22px;font-weight:800;color:#6C6A64}
+.g-map .mh{font-size:17px;font-weight:800;color:#6C6A64;border-bottom:2px solid #141413}
+.g-cs3 em.lv{display:inline-block;font-style:normal;font-size:16px;font-weight:800;border-radius:5px;padding:1px 9px;margin:0 8px 3px 0;color:#fff;background:#6C6A64}
+.g-cs3 em.both{background:#C2603F}.g-cs3 em.pattern{background:#1A1815}
+.g-chips{margin:8px 0 2px;display:flex;flex-wrap:wrap;gap:8px;font-size:17px}
+.g-chips i{font-style:normal;border:1.5px solid #8A8478;border-radius:99px;padding:2px 12px;color:#3D3D3A}
+.g-chips u{text-decoration:none;background:#EFE9DE;border-radius:99px;padding:2px 12px;font-weight:700}
+.g-cs3 small.u{font-size:15px;color:#8A8478;margin-top:2px}
+.g-cs3 div{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px 14px;border:1.5px dashed #8A8478;border-radius:8px;font-size:19px;line-height:1.45;word-break:keep-all}
 .g-cs3 b{font-size:19px}.g-cs3 small{display:block;font-size:16px;color:#6C6A64}
 .g-cm{margin-top:10px;font-size:22px;font-weight:700;color:#A14B30;word-break:keep-all}
 .g-ns{background:#FBF1DD;border:2px solid #E9C98C;border-radius:12px;padding:28px 30px;margin-bottom:22px;font-size:31px;line-height:1.5;word-break:keep-all;color:#3F2F0B}
@@ -371,16 +476,17 @@ def _slide_html(s: dict) -> str:
                 p.append(f'<div class="g-dl">회신 기한: {_e(s["deadline"])}</div>')
         elif k == "g_sim":
             db = s["db"]
-            mx = max(db["em_years"].values()) or 1
-            p.append('<div class="g-yr">' + "".join(
-                f'<div><b>{n}</b><i style="height:{max(6, int(100 * n / mx))}px"></i>{y}</div>' for y, n in db["em_years"].items()) + "</div>")
-            p.extend(f'<div class="g-ln">{_e(x)}</div>' for x in s["lines"])
-            p.append('<div class="g-map">' + "".join(
-                f'<div><span>{_e(r["label"])}<small>대응 조항 {_e(r["cfr"])}</small></span><span>서한 {r["n"]}건</span><span>2025년 이후 {r["recent"]}건</span></div>'
-                for r in db["cfr_rows"]) + '</div>')
-            p.append(f'<div class="g-cs3">' + "".join(
-                f'<div><b>{_e(c["alias"])}<small>{_e(c["year"])} · {_e(c["cfr"] or c["agency"])}</small></b><span>{_e(c["text"])}</span></div>'
+            p.append('<div class="g-cs3">' + "".join(
+                f'<div><b>{_e(c["alias"])}<small>{_e(c["year"])} · {_e(c["agency"])}<br>{_e(c["cfr"])}</small></b>'
+                f'<span><em class="lv {c["level"]}">{_e(c["label"])}</em>{_e(_case_facets(c))}'
+                f'<small class="u">grm-solutions.com/findings/doc/{_e(c["slug"])}/</small></span></div>'
                 for c in db["cases"]) + "</div>")
+            p.extend(f'<div class="g-ln">{_e(x)}</div>' for x in s["lines"])
+            p.append('<div class="g-chips">' + "".join(f'<i>{_e(k_)}</i>' for k_ in KEYWORDS)
+                     + "".join(f'<u>{_e(n)}</u>' for n, _ in s.get("terms") or []) + '</div>')
+            p.append('<div class="g-map"><div class="mh"><span>대응 조항 기준 (212 → 211)</span><span>경고서한</span><span>2025년 이후</span></div>' + "".join(
+                f'<div><span>{_e(r["label"])}<small>{_e(r["cfr"])}</small></span><span>{r["n"]}건</span><span>{r["recent"]}건</span></div>'
+                for r in db["cfr_rows"]) + '</div>')
             p.append(f'<div class="g-cm">{_e(s["comment"])}</div>')
         elif k == "g_end":
             for x in s["not_stated"]:

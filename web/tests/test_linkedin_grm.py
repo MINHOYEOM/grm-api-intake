@@ -84,13 +84,43 @@ class DbSimilarTest(unittest.TestCase):
         self.assertEqual(sum(self.db["em_years"].values()), len(em))
         self.assertLessEqual(self.db["em_483_before"], self.db["em_firms"])
 
-    def test_cases_are_anonymous_and_deterministic(self):
+    def test_cases_labeled_by_level_and_verified_against_text(self):
+        labels = {v[0]: k for k, v in lg.FACETS.items()}
+        self.assertEqual(len(self.db["cases"]), 3)
+        self.assertEqual([c["level"] for c in self.db["cases"]], sorted((c["level"] for c in self.db["cases"]), key=list(lg.LEVELS).index))
+        for c in self.db["cases"]:
+            doc = next(d for d in FINDINGS["documents"] if d["slug"] == c["slug"])
+            self.assertEqual(doc["source"], "FDA Warning Letter")
+            self.assertEqual(c["label"], lg.LEVELS[c["level"]])
+            sents = [s for f in doc["findings"] for s in lg._sentences(f.get("text_orig"))]
+            for lab in c["facets"]:
+                self.assertTrue(any(lg.FACETS[labels[lab]][1](s) for s in sents), (c["slug"], lab))
+            if c["level"] == "pattern":
+                self.assertGreaterEqual(len(c["facets"]), 2)
+            if c["level"] in ("both", "clause"):
+                refs = [r for f in doc["findings"] for r in (f.get("cfr_refs") or [])]
+                self.assertTrue(c["cfr"] in refs, c)
+        again = lg.db_similar(FINDINGS, la.pick_anatomy_card(_doc()))
+        self.assertEqual(self.db["cases"], again["cases"])
+
+    def test_cases_do_not_name_firms(self):
+        out = " ".join(lg.case_lines(self.db, polite=True))
         for c in self.db["cases"]:
             doc = next(d for d in FINDINGS["documents"] if d["slug"] == c["slug"])
             for t in lg._firm_tokens(doc["firm_name"]):
-                self.assertNotIn(t.lower(), c["text"].lower())
-        again = lg.db_similar(FINDINGS, la.pick_anatomy_card(_doc()))
-        self.assertEqual(self.db["cases"], again["cases"])
+                self.assertNotIn(t.lower(), out.lower())
+
+    def test_never_writes_zero_or_shortage(self):
+        out = " ".join(lg.case_lines(self.db, polite=True) + lg.case_lines(self.db))
+        self.assertNotIn("0건", out)
+        self.assertNotIn("유사 사례 부족", out)
+        self.assertEqual(self.db["id_n"], 0)
+        self.assertIn("넓혀", out)
+
+    def test_widening_fills_when_exact_matches_missing(self):
+        tiers = dict(both=0, pattern=0, clause=0)
+        cases, got, _ = lg.similar_cases([], "", 3)
+        self.assertEqual((cases, got), ([], tiers))
 
 
 class DeckTest(unittest.TestCase):

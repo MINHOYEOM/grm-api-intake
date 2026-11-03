@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-02T18:49:23Z",
+ "generated_at": "2026-11-03T01:11:26Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 41556874619,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-03T01:00:57Z",
+    "updatedAt": "2026-11-03T01:11:15Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41556874619"
+   },
    {
     "databaseId": 41355308842,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40968546266"
-   },
-   {
-    "databaseId": 40781478508,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-28T22:38:10Z",
-    "updatedAt": "2026-10-28T22:50:26Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40781478508"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -174,62 +174,73 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41498156454,
+    "databaseId": 41557675936,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-03T01:07:55Z",
+    "updatedAt": "2026-11-03T01:07:59Z",
+    "headBranch": "automation/library-auto-41557260371",
+    "displayTitle": "chore: refresh live regulatory library",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41557675936"
+   },
+   {
+    "databaseId": 41555919700,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T18:11:14Z",
-    "updatedAt": "2026-11-02T18:16:16Z",
-    "headBranch": "main",
-    "displayTitle": "feat(legal): 개인정보처리방침·이용약관 정식 공개 (② ①위에 쌓임) (#1299)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41498156454"
+    "createdAt": "2026-11-03T00:52:22Z",
+    "updatedAt": "2026-11-03T00:58:39Z",
+    "headBranch": "feat/content-style-anatomy-cards",
+    "displayTitle": "feat(linkedin): 해부 카드 GRM 판 v3 — 조항별 해부·고정 포맷·DB 유사 사례",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41555919700"
    },
    {
-    "databaseId": 41493586876,
+    "databaseId": 41553947963,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-03T00:35:29Z",
+    "updatedAt": "2026-11-03T00:41:34Z",
+    "headBranch": "feat/content-style-anatomy-cards",
+    "displayTitle": "feat(linkedin): 해부 카드 GRM 판(v2 시범) — 세 겹 표시·원문 대조·DB로 본 자리·점 그림",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41553947963"
+   },
+   {
+    "databaseId": 41546762241,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-02T17:41:49Z",
-    "updatedAt": "2026-11-02T17:46:55Z",
-    "headBranch": "feat/legal-pages-publish",
-    "displayTitle": "feat(legal): 개인정보처리방침·이용약관 정식 공개 (② ①위에 쌓임)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41493586876"
+    "createdAt": "2026-11-02T23:36:42Z",
+    "updatedAt": "2026-11-02T23:41:53Z",
+    "headBranch": "claude/glossary-weekly-202645",
+    "displayTitle": "glossary(weekly): 202645 용어 1개 — 집락형성단위 (CFU)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41546762241"
    },
    {
-    "databaseId": 41493579534,
+    "databaseId": 41546754516,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-02T17:41:46Z",
-    "updatedAt": "2026-11-02T17:47:22Z",
-    "headBranch": "feat/legal-pages-publish",
-    "displayTitle": "merge main into legal-pages-publish (#1298 반영, legalHref 는 언어 트리별 경로 유지)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41493579534"
-   },
-   {
-    "databaseId": 41493255844,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T17:39:42Z",
-    "updatedAt": "2026-11-02T17:45:05Z",
-    "headBranch": "main",
-    "displayTitle": "feat(web): 회원가입 UX 개편 + 필수 동의(만 14세·약관) — ① 머지 순서 ①→②→③ (#1298)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41493255844"
-   },
-   {
-    "databaseId": 41489948863,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-02T17:18:43Z",
-    "updatedAt": "2026-11-02T17:25:04Z",
-    "headBranch": "feat/legal-pages-publish",
-    "displayTitle": "feat(legal): 개인정보처리방침·이용약관 정식 공개 (② ①위에 쌓임)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41489948863"
+    "createdAt": "2026-11-02T23:36:39Z",
+    "updatedAt": "2026-11-02T23:41:26Z",
+    "headBranch": "claude/glossary-weekly-202645",
+    "displayTitle": "glossary(weekly): CFU 영문 정의를 카드 5줄 예산에 맞게 축약",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41546754516"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 41558057285,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-03T01:11:18Z",
+    "updatedAt": "2026-11-03T01:11:26Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41558057285"
+   },
    {
     "databaseId": 41367477879,
     "status": "completed",
@@ -358,6 +369,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 41555324787,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-03T00:47:20Z",
+    "updatedAt": "2026-11-03T00:47:46Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1303 from MINHOYEOM/chore/findings-restore-2026-1…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41555324787"
+   },
+   {
     "databaseId": 41368835352,
     "status": "completed",
     "conclusion": "success",
@@ -400,20 +422,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1245 from MINHOYEOM/chore/findings-translate-2026…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40980403524"
-   },
-   {
-    "databaseId": 40829321243,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-10-29T06:27:29Z",
-    "updatedAt": "2026-10-29T06:28:47Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1242 from MINHOYEOM/chore/findings-translate-2026…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40829321243"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 41531111671,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-02T21:44:36Z",
+    "updatedAt": "2026-11-03T00:59:06Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41531111671"
+   },
    {
     "databaseId": 41399070441,
     "status": "completed",
@@ -457,17 +479,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41202279040"
-   },
-   {
-    "databaseId": 41174305384,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-31T05:52:33Z",
-    "updatedAt": "2026-10-31T09:07:46Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41174305384"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -484,6 +495,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 41532732609,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-02T21:55:32Z",
+    "updatedAt": "2026-11-02T21:55:48Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41532732609"
+   },
    {
     "databaseId": 41402295234,
     "status": "completed",
@@ -527,17 +549,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41282438663"
-   },
-   {
-    "databaseId": 41245487267,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-31T21:50:59Z",
-    "updatedAt": "2026-10-31T21:51:08Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41245487267"
    }
   ],
   "grm-cloud-request.yml": [
@@ -556,6 +567,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 41556874619,
+   "created_at": "2026-11-03T01:00:57Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 41355308842,
    "created_at": "2026-11-01T22:05:18Z",
    "has_web_brief": true
@@ -573,11 +589,6 @@
   {
    "run_id": 40968546266,
    "created_at": "2026-10-29T22:47:47Z",
-   "has_web_brief": true
-  },
-  {
-   "run_id": 40781478508,
-   "created_at": "2026-10-28T22:38:10Z",
    "has_web_brief": true
   }
  ]

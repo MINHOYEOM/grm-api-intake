@@ -58,7 +58,7 @@ SITE_BASE_URL = "https://grm-solutions.com"
 # 같은 방어적 삽입을 둬 다른 실행 컨텍스트(테스트 등)에서도 같은 디렉터리의 utm.py 를 찾는다.
 if str(WEB_DIR) not in sys.path:
     sys.path.insert(0, str(WEB_DIR))
-from utm import LINKEDIN_WEEKLY, linkedin_weekly_campaign, with_utm  # noqa: E402
+from utm import LINKEDIN_WEEKLY, channel_url, linkedin_weekly_campaign, with_utm  # noqa: E402
 # [마케팅 2026-09-23 L-06] 월간 결산 덱의 마무리 장은 아카이브 페이지로 링크한다. 영문
 # 아카이브(`/en/archive/`)는 **영문으로 낼 수 있는 호가 하나라도 있을 때만** 존재한다
 # (`render.py` `brief_has_english()` + `en_paths.add("archive/")`, 4880줄 부근) — 그 계약을
@@ -1113,7 +1113,7 @@ def build_deck(brief_doc: dict, glossary: list[dict], *, anon: bool = False,
     # ── 본문 URL — [마케팅 2026-09-23] 슬라이드 URL(위 `url`)은 깨끗하게 두고, 캡션에만 UTM 을
     # 붙인다(`web/utm.py`). RUM 은 쿼리를 안 읽으므로 이 태그의 소비자는 사이트 first-touch
     # 계측뿐 — 슬라이드 안 표시용 URL 을 더럽히지 않는다.
-    caption_url = with_utm(url, *LINKEDIN_WEEKLY, linkedin_weekly_campaign(pub))
+    caption_url = channel_url(url, "linkedin_weekly", date=pub)
 
     # ── 본문 A: 요약형(종전 기본, `--caption summary`) — 한 줄에 한 뜻·모바일 폭 안쪽
     lines = [nfmt(t["cap_head"], len(slides)), ""]
@@ -1394,7 +1394,7 @@ def build_month_deck(briefs: list[dict], glossary: list[dict], month: str, *, an
     for i, s in enumerate(slides, 1):
         s["idx"], s["total"] = i, len(slides)
 
-    caption_url = with_utm(archive_url, "linkedin", "social", f"monthly_{month}")
+    caption_url = channel_url(archive_url, "linkedin_monthly", month=month)
 
     # ── 게시 본문 — '이번 주 한 건'과 같은 결(항목마다 한 줄+들여쓰기 이어짐), 항목이 여럿이라
     # 카드 하나 전체가 아니라 제목 한 줄(첫 문장)만 싣는다.

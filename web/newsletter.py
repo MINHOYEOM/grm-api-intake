@@ -79,7 +79,7 @@ def section_groups(brief_obj: dict[str, Any]) -> list[str]:
 
 def brief_anchor_href(base_url: str, publish_date: str, group: str | None = None) -> str:
     """우리 상세 페이지(+섹션 앵커) 절대 URL. 한글 그룹은 percent-encode(이메일 안전).
-    추적 파라미터 0(쿼리스트링 없음) — provenance/무변형 보존."""
+    표식은 여기서 붙이지 않는다(호출부 `tag()` 가 `utm.channel_url` 로 붙인다) — 앵커·경로만 만든다."""
     base = base_url.rstrip("/")
     url = f"{base}/briefs/{publish_date}/"
     if group:
@@ -128,13 +128,15 @@ def library_update_for_issue(
         entries[0], catalogs if catalogs is not None else render.load_library(), cap=cap)
 
 
-def render_library_block(update: dict[str, Any], *, site_base_url: str) -> str:
+def render_library_block(update: dict[str, Any], *, site_base_url: str, pub: str = "") -> str:
     """자료실 변경 뷰 → 주간 티저에 얹는 "자료실 업데이트" HTML 조각.
 
     호출부는 update 가 None 이면 빈 문자열을 넘기므로 여기선 내용이 있다고 본다. 문서 제목은
     **텍스트**(외부 원문 링크 금지 — gate_provenance), 링크는 우리 카탈로그·허브 페이지뿐."""
     e = _html.escape
     base = site_base_url.rstrip("/")
+    # 표식 — 주간 메일 본문과 같은 채널(`brief_{date}`). pub 가 비면(단독 호출) 표식 없이 둔다.
+    tag = (lambda u: utm.channel_url(u, "newsletter_body", date=pub)) if pub else (lambda u: u)
     parts = [
         '<div style="border:1px solid #E6DFD8;border-radius:10px;padding:16px 18px;'
         'margin:0 0 26px;background:#FFFFFF">',
@@ -150,7 +152,7 @@ def render_library_block(update: dict[str, Any], *, site_base_url: str) -> str:
                              ("내림", s["removed_count"])) if n)
         parts.append(
             '<div style="font-size:14px;line-height:1.6;color:#3D3D3A;margin:8px 0 0">'
-            f'<a href="{e(href)}" style="color:#A14B30;text-decoration:none;font-weight:600">'
+            f'<a href="{tag(href)}" style="color:#A14B30;text-decoration:none;font-weight:600">'
             f'{e(s["short"])}</a> <span style="color:#6C6A64;font-size:13px">{e(counts)}</span></div>')
         for it in s["items"]:
             parts.append(
@@ -161,7 +163,7 @@ def render_library_block(update: dict[str, Any], *, site_base_url: str) -> str:
                 '<div style="font-size:13px;line-height:1.55;color:#8E8B82;'
                 f'margin:3px 0 0;padding-left:10px">· 외 {s["hidden_count"]}건</div>')
     parts.append(
-        f'<div style="margin:14px 0 0"><a href="{e(base)}/library/" '
+        f'<div style="margin:14px 0 0"><a href="{tag(base + "/library/")}" '
         'style="color:#A14B30;text-decoration:none;font-size:14px;font-weight:600">'
         '자료실에서 원문 보기 →</a></div>')
     parts.append("</div>")
@@ -222,6 +224,11 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
     brief_url = brief_anchor_href(base, pub)
     subject = teaser_subject(bm)
 
+    def tag(u: str) -> str:
+        # 본문 링크 전부에 같은 표식(utm 사전 `newsletter_body`). `&` 를 e() 로 바꾸면
+        # gate_provenance(naive href 파서)와 어긋나므로 이스케이프하지 않는다 — 값은 utm._TAG_RE 로 이미 안전.
+        return utm.channel_url(u, "newsletter_body", date=pub)
+
     e = _html.escape
     parts: list[str] = [
         "<!DOCTYPE html>",
@@ -249,12 +256,12 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
                 '<div style="border-top:1px solid #E6DFD8;padding:14px 0">'
                 f'<div style="font-size:15px;line-height:1.65;color:#141413;'
                 f'margin-bottom:8px">{e(t)}</div>'
-                f'<a href="{e(brief_url)}" style="color:#A14B30;text-decoration:none;'
+                f'<a href="{tag(brief_url)}" style="color:#A14B30;text-decoration:none;'
                 'font-size:14px;font-weight:600">자세히 보기 →</a></div>')
         parts.append('<div style="margin:0 0 10px"></div>')
     # 1차 CTA — 이번 호 전체(웹 브리프).
     parts.append(
-        f'<div style="margin:0 0 24px"><a href="{e(brief_url)}" '
+        f'<div style="margin:0 0 24px"><a href="{tag(brief_url)}" '
         'style="display:inline-block;background:#C2603F;color:#FAF9F5;text-decoration:none;'
         'font-weight:600;font-size:15px;padding:13px 24px;border-radius:8px">'
         '이번 주 소식 전체 보기 →</a></div>')
@@ -267,7 +274,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         for g in groups:
             href = brief_anchor_href(base, pub, g)
             parts.append(
-                f'<a href="{e(href)}" style="display:inline-block;color:#A14B30;'
+                f'<a href="{tag(href)}" style="display:inline-block;color:#A14B30;'
                 'text-decoration:none;font-size:14px;font-weight:500;border:1px solid #DCD3C7;'
                 f'border-radius:9999px;padding:7px 15px;margin:0 8px 8px 0">{e(g)} →</a>')
         parts.append("</div>")
@@ -285,13 +292,13 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         'margin-bottom:6px">이번 주 퀴즈</div>'
         '<div style="font-size:14px;line-height:1.7;color:#3D3D3A">'
         '이번 주 소식과 규제·품질 용어로 만든 짧은 퀴즈예요. 3분이면 충분합니다.</div>'
-        f'<a href="{e(base)}/quiz/" style="display:inline-block;margin-top:10px;color:#A14B30;'
+        f'<a href="{tag(base + "/quiz/")}" style="display:inline-block;margin-top:10px;color:#A14B30;'
         'text-decoration:none;font-size:14px;font-weight:500;border:1px solid #DCD3C7;'
         'border-radius:9999px;padding:7px 15px">퀴즈 풀어보기 →</a></div>')
     # 구독→회원 사다리(성장 3차) — 매주 구독자 전원에게 닿는 채널은 이 메일뿐인데,
     # 회원 간판 기능(관심 업체 주간 알림)의 진입점이 없었다(랜딩 배너는 사이트에 이미
     # 들어온 사람만 본다). 정적 카피·데이터 바인딩 0. 링크는 랜딩 배너 앵커(#watchlist)
-    # 하나뿐 — 추적 파라미터 0 정책 준수. 배너는 reactions 게이트라 env-off 배포에선
+    # 하나뿐(표식 utm 은 `tag()` 가 붙인다). 배너는 reactions 게이트라 env-off 배포에선
     # 앵커가 없지만 랜딩 상단으로 자연 폴백(무해). 퀴즈 카드와 동일 골격, 한글에 자간 없음.
     parts.append(
         '<div style="border:1px solid #DCD3C7;border-radius:12px;padding:16px 18px;'
@@ -301,7 +308,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
         '<div style="font-size:14px;line-height:1.7;color:#3D3D3A">'
         '협력사·경쟁사를 관심 업체로 등록해 두면, 새 지적 기록이 공개될 때 메일로 모아 '
         '알려드려요. 무료 회원이면 바로 쓸 수 있습니다.</div>'
-        f'<a href="{e(base)}/#watchlist" style="display:inline-block;margin-top:10px;'
+        f'<a href="{tag(base + "/#watchlist")}" style="display:inline-block;margin-top:10px;'
         'color:#A14B30;text-decoration:none;font-size:14px;font-weight:500;'
         'border:1px solid #DCD3C7;border-radius:9999px;padding:7px 15px">'
         '관심 업체 등록하기 →</a></div>')
@@ -315,7 +322,7 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
     # `gate_provenance`(naive `href="..."` 정규식 파서)와 여기 값 자체가 어긋난다. base_url
     # 은 SITE_BASE_URL(고정)이고 태그 값은 utm._TAG_RE(`^[a-z0-9._-]{1,60}$`)로 이미
     # 검증돼 attribute 를 깨뜨릴 문자(따옴표·꺾쇠)가 애초에 나올 수 없다.
-    share_href = utm.with_utm(brief_url, "newsletter", "forward", f"brief_{pub}")
+    share_href = utm.channel_url(brief_url, "newsletter_forward", date=pub)
     parts.append(
         '<div style="border:1px solid #DCD3C7;border-radius:12px;padding:16px 18px;'
         'margin:0 0 24px;background:#FBF8F4">'
@@ -338,8 +345,8 @@ def build_teaser(brief_obj: dict[str, Any], *, site_base_url: str, issue_no: int
     # 남지 않는다(집계뿐). 카드가 아니라 박스 없는 가운데 정렬 한 줄 — 퀴즈·워치리스트·
     # 전달 카드처럼 매번 세 개를 늘어놓으면 메일이 길어져서다. 같은 폰트·색상 재사용,
     # 한글에 자간 없음.
-    fb_up_href = e(f"{brief_url}#fb-up")
-    fb_down_href = e(f"{brief_url}#fb-down")
+    fb_up_href = tag(f"{brief_url}#fb-up")
+    fb_down_href = tag(f"{brief_url}#fb-down")
     parts.append(
         '<div style="text-align:center;margin:0 0 24px;font-size:13px;color:#6C6A64">'
         '이번 호, 유용했나요? '
@@ -526,7 +533,7 @@ def run_gates(brief_obj: dict[str, Any], *, expected_date: str, site_base_url: s
     struct_fails = gate_publishable(brief_obj, expected_date)
     reasons.append(f"구조 검증: {'OK' if not struct_fails else 'FAIL'}")
     prov_fails = gate_provenance(teaser, site_base_url)
-    reasons.append(f"provenance(우리 페이지·전달 링크 외 추적 파라미터 0): {'OK' if not prov_fails else 'FAIL'}")
+    reasons.append(f"provenance(우리 페이지·utm 세 키 외 쿼리 0): {'OK' if not prov_fails else 'FAIL'}")
     fails = struct_fails + prov_fails
     if run_linkcheck:
         lc_fails, tally = gate_linkcheck(brief_obj, checker=checker)
@@ -868,7 +875,7 @@ def main(argv: "list[str] | None" = None) -> int:
     lib_update = library_update_for_issue(args.publish_date)
     library_html = ""
     if lib_update is not None:
-        library_html = render_library_block(lib_update, site_base_url=site_base_url)
+        library_html = render_library_block(lib_update, site_base_url=site_base_url, pub=args.publish_date)
         print(f"자료실 업데이트 블록 삽입: {lib_update['date']} "
               f"({lib_update['change_count']}건 / 카탈로그 {lib_update['catalog_count']}종)")
 

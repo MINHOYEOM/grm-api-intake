@@ -128,6 +128,8 @@ class EmailAndGateTest(unittest.TestCase):
         hrefs = re.findall(r'href="([^"]*)"', mail["html"])
         self.assertTrue(hrefs)
         self.assertTrue(all(h.startswith(f"{BASE}/en/") for h in hrefs), hrefs)
+        # 2026-11-04 — 영문 본문 링크도 utm 사전 `newsletter_en_body` 표식(newsletter_en/email).
+        self.assertTrue(all("utm_source=newsletter_en&utm_medium=email&utm_campaign=brief_" in h for h in hrefs), hrefs)
         self.assertIn('<html lang="en">', mail["html"])
 
     def test_no_source_text_or_source_url_in_mail(self):

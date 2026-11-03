@@ -105,9 +105,9 @@ class NewsletterTeaserTest(unittest.TestCase):
             self.assertIn(t, self.html)                                    # 요약 verbatim
 
     def test_brief_cta_and_section_anchors(self):
-        self.assertIn(f'href="{BASE}/briefs/2026-06-26/"', self.html)      # 전체 보기
+        self.assertIn(f'href="{BASE}/briefs/2026-06-26/?utm_source=newsletter&utm_medium=email&utm_campaign=brief_2026-06-26"', self.html)      # 전체 보기(본문 표식)
         # 섹션 앵커(관심 주제 클릭 신호) — 06-26 = 글로벌/국내/Recall, #sec-{그룹}(percent-encode).
-        self.assertIn(f'{BASE}/briefs/2026-06-26/#sec-Recall', self.html)
+        self.assertIn(f'{BASE}/briefs/2026-06-26/?utm_source=newsletter&utm_medium=email&utm_campaign=brief_2026-06-26#sec-Recall', self.html)
         from urllib.parse import quote
         for g in ("글로벌", "국내"):
             self.assertIn(f'#sec-{quote(g, safe="")}', self.html)
@@ -121,7 +121,7 @@ class NewsletterTeaserTest(unittest.TestCase):
         landing.html 쪽에서 고정한다(파일 간 계약의 양끝을 각자 잠근다)."""
         self.assertIn("관심 업체 알림", self.html)
         self.assertIn("관심 업체 등록하기 →", self.html)
-        self.assertIn(f'href="{BASE}/#watchlist"', self.html)
+        self.assertIn(f'href="{BASE}/?utm_source=newsletter&utm_medium=email&utm_campaign=brief_2026-06-26#watchlist"', self.html)
 
     def test_no_card_source_urls_in_mail(self):
         # 무변형/provenance — 카드 출처 URL(보호 대상)은 메일에 들어가지 않는다(우리 페이지만).
@@ -132,14 +132,16 @@ class NewsletterTeaserTest(unittest.TestCase):
                     self.assertNotIn(u, self.html, f"카드 출처 URL 누출: {u}")
 
     def test_no_tracking_query_on_our_links(self):
-        """[N-03 2026-09-23 이후] 전달 링크(팀 동료에게 전달 카드) 하나만 예외 — 나머지
-        모든 링크는 여전히 쿼리 0(무변형 불변식 그대로)."""
+        """[2026-11-04 개정] 모든 링크는 utm 세 키(사전 `utm.CHANNELS`)만 쿼리로 갖는다 — 전달 링크는
+        newsletter/forward, 나머지 본문 링크는 newsletter/email. 그 밖의 파라미터는 0(무변형 불변식)."""
         pub = self.brief["brief"]["publish_date"]
-        expected_share_href = utm.with_utm(self.t["brief_url"], "newsletter", "forward", f"brief_{pub}")
+        from urllib.parse import parse_qsl, urlsplit
         for h in re.findall(r'href="([^"]*)"', self.html):
-            if h == expected_share_href:
-                continue
-            self.assertNotIn("?", h, f"추적/쿼리 파라미터 부착: {h}")
+            q = dict(parse_qsl(urlsplit(h).query))
+            self.assertEqual({"utm_source", "utm_medium", "utm_campaign"}, set(q), f"표식 누락/잉여: {h}")
+            self.assertEqual("newsletter", q["utm_source"])
+            self.assertEqual(f"brief_{pub}", q["utm_campaign"])
+            self.assertEqual("forward" if h.startswith(utm.channel_url(self.t["brief_url"], "newsletter_forward", date=pub)) else "email", q["utm_medium"])
 
     # ── 팀 동료에게 전달(N-03 2026-09-23) ─────────────────────────────────────
     def test_share_block_copy_present(self):
@@ -201,16 +203,18 @@ class NewsletterTeaserTest(unittest.TestCase):
         self.assertLess(i_feedback, i_disclosure, "피드백 줄이 면책 문구보다 뒤에 있음")
 
     def test_feedback_hrefs_are_brief_url_anchors_only(self):
-        self.assertIn(f'href="{self.t["brief_url"]}#fb-up"', self.html)
-        self.assertIn(f'href="{self.t["brief_url"]}#fb-down"', self.html)
+        q = "?utm_source=newsletter&utm_medium=email&utm_campaign=brief_2026-06-26"
+        self.assertIn(f'href="{self.t["brief_url"]}{q}#fb-up"', self.html)
+        self.assertIn(f'href="{self.t["brief_url"]}{q}#fb-down"', self.html)
         self.assertIn("👍 유용했어요", self.html)
         self.assertIn("👎 아쉬웠어요", self.html)
 
-    def test_feedback_links_carry_no_query_string(self):
-        # 앵커뿐(쿼리 파라미터 0) — gate_provenance 가 쿼리 문자열만 보므로 이 링크는
-        # 애초에 검사 대상에 안 걸린다(N-05 는 Brevo linksStats 의 앵커로 두 수를 가른다).
-        for h in (f'{self.t["brief_url"]}#fb-up', f'{self.t["brief_url"]}#fb-down'):
-            self.assertNotIn("?", h)
+    def test_feedback_links_keep_anchor_after_utm(self):
+        # 2026-11-04: 표식이 붙어도 앵커(#fb-up/#fb-down)는 쿼리 **뒤**에 남는다 — N-05 수집기가
+        # Brevo linksStats 의 URL 끝 앵커로 두 수를 가르므로 이 순서가 계약이다.
+        hs = re.findall(r'href="([^"]*)"', self.html)
+        self.assertEqual(1, sum(h.endswith("#fb-up") for h in hs))
+        self.assertEqual(1, sum(h.endswith("#fb-down") for h in hs))
 
     def test_feedback_links_pass_provenance_gate(self):
         self.assertEqual(newsletter.gate_provenance(self.t, BASE), [])

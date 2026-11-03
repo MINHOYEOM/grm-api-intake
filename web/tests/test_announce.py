@@ -109,7 +109,7 @@ class AnnounceMailTest(unittest.TestCase):
 
     def test_items_and_cta_rendered_as_absolute_urls(self):
         for path in ("/library/", "/quiz/", "/guide/"):
-            self.assertIn(f'href="{BASE}{path}"', self.html)
+            self.assertIn(f'href="{BASE}{path}?utm_source=announce&utm_medium=email&utm_campaign=service_update"', self.html)
         self.assertIn("설명 A", self.html)
         self.assertIn("둘러보기", self.html)
 
@@ -157,8 +157,9 @@ class AnnounceMailTest(unittest.TestCase):
         self.assertEqual(newsletter.gate_provenance(self.mail, BASE), [])
 
     def test_no_tracking_query_on_any_link(self):
+        # 2026-11-04 개정 — utm 세 키(announce/email/service_update)만 허용.
         for href in re.findall(r'href="([^"]*)"', self.html):
-            self.assertNotIn("?", href)
+            self.assertTrue(href.endswith("?utm_source=announce&utm_medium=email&utm_campaign=service_update"), href)
 
 
 # ── 링크 실존 게이트 ──────────────────────────────────────────────────────────
@@ -319,7 +320,7 @@ class WeeklyUpdatesBlockTest(unittest.TestCase):
         block = announce.render_weekly_block(self.ann, site_base_url=BASE)
         html = self._teaser(updates_html=block)
         self.assertIn("서비스 소식", html)
-        self.assertIn(f'href="{BASE}/library/"', html)
+        self.assertIn(f'href="{BASE}/library/?utm_source=newsletter&utm_medium=email&utm_campaign=service_update"', html)
         self.assertIn("설명 B", html)
 
     def test_block_sits_before_disclaimer(self):

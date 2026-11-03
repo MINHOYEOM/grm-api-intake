@@ -18,12 +18,22 @@
   | 뉴스레터 전달     | newsletter   | forward   | `brief_{date}`                 |
   | 카카오톡          | kakao        | share     | `{경로}`                       |
   | 커뮤니티          | community    | post      | `monthly_{YYYY-MM}`            |
+  | 주간 메일 본문    | newsletter   | email     | `brief_{date}`                 |
+  | 영문 메일 본문    | newsletter_en| email     | `brief_{date}`                 |
+  | 서비스 안내 메일  | announce     | email     | `service_update`               |
+  | 주간 메일 속 소식 | newsletter   | email     | `service_update`               |
+  | 용어집 PDF        | glossary_pdf | pdf       | `glossary_pdf`                 |
+  | 구독 확인 메일    | welcome      | email     | `confirm`                      |
 
-★주간 메일 자체의 본문 링크(섹션 앵커·전체보기 CTA 등)는 여전히 깨끗하게 둔다 — 유일한
-예외가 **전달/구독 링크**(`newsletter/forward/brief_{date}`)다. 이 링크는 `gate_provenance`
-가 명시적으로 허용한다(2026-09-23 Task N-03) — 우리 호스트고 `utm_*` 세 키뿐이라 카드
-출처 URL·외부 링크 차단(무변형 불변식)과 충돌하지 않는다. 나머지 채널(링크드인 등)은
-종전대로 본문이 곧 채널인 경우에만 쓴다.
+★2026-11-04 개정 — 우리가 **내보내는 모든 링크**에 표식을 붙인다(성장분석팀 11-04 조사: 가입
+경로 '직접' 6/23건의 정체를 못 쪼갠 원인이 메일 본문 링크에 표식이 없던 것). 메일 본문(주간·
+서비스 안내·영문)·용어집 PDF·링크드인 캡션 본문 속 주소가 모두 아래 사전 한 곳(`CHANNELS`)
+에서 나온다. `gate_provenance` 는 우리 호스트의 `utm_*` 세 키만 허용하므로(2026-09-23 N-03)
+카드 출처 URL·외부 링크 차단(무변형 불변식)과 충돌하지 않는다.
+
+Brevo 화면에서 직접 쓰는 두 곳(코드 밖)도 같은 사전을 따른다:
+  · 구독 확인 메일 본문의 우리 사이트 링크 → `welcome`/`email`/`confirm`
+  · '확인 후 이동' 주소 → `https://grm-solutions.com/welcome/?utm_source=welcome&utm_medium=email&utm_campaign=confirm`
 """
 from __future__ import annotations
 
@@ -36,6 +46,20 @@ _TAG_RE = re.compile(r"^[a-z0-9._-]{1,60}$")
 # 링크드인 주간 게시물의 (source, medium) 고정쌍 — campaign 은 발행일마다 갈리므로
 # `linkedin_weekly_campaign()` 이 따로 만든다.
 LINKEDIN_WEEKLY = ("linkedin", "social")
+
+# 채널 사전 — 이름 → (source, medium, campaign 서식). 새 채널은 여기에 한 줄 더하고 위 표도
+# 갱신한다. campaign 서식의 `{date}` 등은 `channel_url()` 인자로 채운다.
+CHANNELS: dict[str, tuple[str, str, str]] = {
+    "newsletter_body": ("newsletter", "email", "brief_{date}"),
+    "newsletter_forward": ("newsletter", "forward", "brief_{date}"),
+    "newsletter_en_body": ("newsletter_en", "email", "brief_{date}"),
+    "service_update_mail": ("announce", "email", "service_update"),
+    "service_update_in_weekly": ("newsletter", "email", "service_update"),
+    "glossary_pdf": ("glossary_pdf", "pdf", "glossary_pdf"),
+    "linkedin_weekly": ("linkedin", "social", "{date}_weekly"),
+    "linkedin_monthly": ("linkedin", "social", "monthly_{month}"),
+    "welcome_confirm": ("welcome", "email", "confirm"),
+}
 
 
 def _clean(value: str, label: str) -> str:
@@ -66,3 +90,21 @@ def with_utm(url: str, source: str, medium: str, campaign: str) -> str:
 def linkedin_weekly_campaign(pub: str) -> str:
     """발행일(`YYYY-MM-DD`) → 링크드인 주간 게시물의 campaign 태그."""
     return f"{pub}_weekly"
+
+
+def channel_url(url: str, channel: str, **fmt: str) -> str:
+    """사전(`CHANNELS`)의 채널 표식을 `url` 에 붙인다. 모르는 채널은 예외(조용히 흘리지 않는다)."""
+    source, medium, campaign = CHANNELS[channel]
+    return with_utm(url, source, medium, campaign.format(**fmt))
+
+
+_BARE_SITE_RE = re.compile(r"(?<![/\w.])grm-solutions\.com(/[^\s)\]]*)?")
+
+
+def tag_bare_site_urls(text: str, channel: str, **fmt: str) -> str:
+    """글자만 적힌 `grm-solutions.com/경로` 를 스킴 포함 표식 URL 로 바꾼다(링크드인 캡션 본문 —
+    스킴이 없어도 링크드인이 링크로 걸어 주지만 표식이 없어 직접 유입으로 섞였다). 이미 `https://`
+    가 앞에 붙은 주소(`caption_url` 등)는 건드리지 않는다."""
+    def _sub(m: "re.Match[str]") -> str:
+        return channel_url("https://grm-solutions.com" + (m.group(1) or "/"), channel, **fmt)
+    return _BARE_SITE_RE.sub(_sub, text)

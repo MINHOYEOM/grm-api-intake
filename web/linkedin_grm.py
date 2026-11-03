@@ -33,6 +33,7 @@ WEB_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(WEB_DIR))
 import linkedin_anatomy as la  # noqa: E402
 import linkedin_cards as lc  # noqa: E402
+import utm  # noqa: E402
 
 SCHEMA = "grm-anatomy-slots/v3"
 SLOTS_DIR = la.SLOTS_DIR
@@ -542,6 +543,8 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
                                MAP_NOTE, term_line] if x)
     ko = "\n\n".join([la._norm(cap["lead"]), la._norm(cap["claims"]), la._norm(cap["contrast"]),
                       la._norm(cap["requests"]), sim, la._norm(cap["not_stated"])])
+    # 캡션 본문 속 글자 주소(`grm-solutions.com/...`)에도 같은 표식 — 링크드인이 링크로 걸어 주지만 표식이 없어 '직접'에 섞였다.
+    ko = utm.tag_bare_site_urls(ko, "linkedin_weekly", date=pub)
     return {"pub": pub, "lang": "ko", "slides": slides, "caption": ko + f"\n\n전체 해설: {caption_url}\n",
             "doc_title": f"GRM {m}월 {wk}주 경고서한 분석(GRM 판)", "url": url, "caption_url": caption_url,
             "card_id": str(card.get("id")), "mode": "grm"}

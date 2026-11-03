@@ -911,20 +911,34 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   function touchCapture(){
     try{
       var raw=localStorage.getItem(TOUCH);
-      if(raw){var old=JSON.parse(raw);if(old&&old.exp>Date.now())return;}   // first touch 유지
+      if(raw){var old=JSON.parse(raw);if(old&&old.exp>Date.now())return null;}   // first touch 유지
       var q=new URLSearchParams(location.search);
       var rh='';
       try{rh=document.referrer?String(new URL(document.referrer).hostname||'').toLowerCase():'';}catch(_){rh='';}
       if(!rh)rh='direct';
       else if(rh===hn||rh==='www.'+hn)rh='internal';
       var seg=String(location.pathname||'/').split('/')[1]||'home';
-      localStorage.setItem(TOUCH,JSON.stringify({
+      var t={
         s:fold(q.get('utm_source'),RE_TAG,'none'),
         m:fold(q.get('utm_medium'),RE_TAG,'none'),
         c:fold(q.get('utm_campaign'),RE_CAMP,'none'),
         r:fold(rh,RE_HOST,'direct'),
         z:fold(seg,RE_ZONE,'home'),
-        exp:Date.now()+TOUCH_TTL}));
+        exp:Date.now()+TOUCH_TTL};
+      localStorage.setItem(TOUCH,JSON.stringify(t));
+      return t;
+    }catch(_){return null;}
+  }
+  // [104] 도착 채널 — 새 first touch 가 저장된 **그 순간 1회**만(7일에 한 번) 채널 정수 카운터를 올린다.
+  // 보내는 값은 utm_source·utm_medium·리퍼러 호스트뿐(campaign·경로·쿼리 원문·식별자 없음).
+  // 저장소 예외·운영자 플래그(grm-op)·이미 first touch 가 있는 재방문은 보내지 않는다.
+  function arrivalBump(t){
+    try{
+      if(!t)return;
+      try{if(localStorage.getItem('grm-op')==='1')return;}catch(_){}
+      fetch(u+'/rest/v1/rpc/arrival_bump',{method:'POST',keepalive:true,
+        headers:{'Content-Type':'application/json',apikey:k,Authorization:'Bearer '+k},
+        body:JSON.stringify({p_source:t.s,p_medium:t.m,p_ref_host:t.r})}).catch(function(){});
     }catch(_){}
   }
   function touchRead(){
@@ -932,7 +946,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       if(t&&t.exp>Date.now()&&t.s&&t.r)return t;}catch(_){}
     return {s:'none',m:'none',c:'none',r:'none',z:'none'};
   }
-  touchCapture();
+  arrivalBump(touchCapture());
   // 구역 = 경로의 **첫 조각**뿐(076). 손으로 적은 구역 목록을 두지 않는다 — 목록은
   // 라우트가 늘면 조용히 낡는다. 쿼리스트링·경로 뒷부분은 통째로 버리므로
   // `/findings/inspector/?key=실명` 이 와도 남는 값은 'findings' 뿐이다(무PII).

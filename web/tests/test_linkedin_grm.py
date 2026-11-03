@@ -143,6 +143,15 @@ class DeckTest(unittest.TestCase):
         self.assertTrue(paras[6].startswith("전체 해설"))
         self.assertNotIn("#", "\n".join(paras[:6]))
 
+    def test_every_site_url_in_caption_carries_utm(self):
+        # 2026-11-04 — 글자만 적힌 주소도 스킴+표식(linkedin/social/{pub}_weekly) 이 붙는다.
+        import re
+        urls = re.findall(r"\S*grm-solutions\.com\S*", self.deck["caption"])
+        self.assertTrue(urls)
+        for u in urls:
+            self.assertIn("https://grm-solutions.com", u)
+            self.assertIn("utm_source=linkedin&utm_medium=social&utm_campaign=", u)
+
     def test_no_firm_name_and_ai_notice_kept(self):
         out = lg.render_html(self.deck, font_links=False) + self.deck["caption"]
         self.assertNotIn("Northland", out)

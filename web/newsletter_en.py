@@ -42,6 +42,7 @@ sys.path.insert(0, str(WEB_DIR))
 import newsletter  # noqa: E402  (게이트·발송 어댑터·브리프 로더 재사용)
 import render      # noqa: E402  (SITE_BASE_URL·영문 브리프 판정·title 파생)
 from grm_i18n import MissingTranslation, Translator  # noqa: E402
+import utm  # noqa: E402
 
 KST = _timezone(_timedelta(hours=9))
 SNAPSHOT_SCHEMA = "grm-newsletter-en-findings/v1"
@@ -280,7 +281,8 @@ def build_email(sections: list[Section], *, publish_date: str, site_base_url: st
                 unsubscribe_html: str = "") -> dict[str, Any]:
     e = _html.escape
     base = site_base_url.rstrip("/")
-    findings_url = f"{base}/en/findings/"
+    # 표식(utm 사전 `newsletter_en_body`) — `&` 를 e() 로 바꾸면 gate_provenance 와 어긋나 이스케이프하지 않는다.
+    findings_url = utm.channel_url(f"{base}/en/findings/", "newsletter_en_body", date=publish_date)
     total = sum(s.total for s in sections)
     subject = subject_for(total, publish_date)
     parts: list[str] = [
@@ -322,19 +324,20 @@ def build_email(sections: list[Section], *, publish_date: str, site_base_url: st
                          f'and {s.hidden} more</div>')
         parts.append("</div>")
     parts.append(
-        f'<div style="margin:18px 0 28px"><a href="{e(findings_url)}" '
+        f'<div style="margin:18px 0 28px"><a href="{findings_url}" '
         'style="display:inline-block;background:#C2603F;color:#FAF9F5;text-decoration:none;'
         'font-weight:600;font-size:15px;padding:13px 24px;border-radius:8px">'
         'Browse the latest findings →</a></div>')
     if brief:
-        brief_url = f"{base}/en/briefs/{brief['publish_date']}/"
+        brief_url = utm.channel_url(f"{base}/en/briefs/{brief['publish_date']}/",
+                                    "newsletter_en_body", date=publish_date)
         parts.append('<div style="border:1px solid #DCD3C7;border-radius:12px;padding:16px 18px;'
                      'margin:0 0 24px;background:#FBF8F4">'
                      '<div style="font-size:13px;font-weight:600;color:#A14B30;margin-bottom:6px">'
                      "This week's regulatory brief</div>")
         for t in brief["tldr"]:
             parts.append(f'<div style="font-size:14px;line-height:1.65;color:#3D3D3A;margin:4px 0 0">· {e(t)}</div>')
-        parts.append(f'<a href="{e(brief_url)}" style="display:inline-block;margin-top:10px;color:#A14B30;'
+        parts.append(f'<a href="{brief_url}" style="display:inline-block;margin-top:10px;color:#A14B30;'
                      'text-decoration:none;font-size:14px;font-weight:600">Read the brief →</a></div>')
     parts.append('<div style="border-top:1px solid #E6DFD8;margin-top:8px;padding-top:18px;'
                  'font-size:12px;line-height:1.7;color:#6C6A64">')

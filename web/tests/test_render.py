@@ -13509,9 +13509,9 @@ class WebBriefFirmLinkTest(unittest.TestCase):
         # fetch() 가 브리프 상세 페이지 전체에서 정확히 1번만 호출된다 — 카드마다
         # 개별 호출하지 않고 for-each 밖에서 1회만 여는 계약(신규 구독폼 fetch 등
         # 다른 fetch 가 없는 이 고정 fixture 빌드 기준).
-        # [101] 독자 행동 계측 블록(brief_event_bump 전용 fetch)은 별도 계약(WebBriefReaderEventsTest)
+        # [103] 독자 행동 계측 블록(brief_event_bump 전용 fetch)은 별도 계약(WebBriefReaderEventsTest)
         # 이라 이 카운트에서 뺀다 — 업체 브릿지 쪽 fetch 가 1번이라는 계약은 그대로.
-        bridge = self.detail.split("[101] 독자 행동 계측", 1)[0]
+        bridge = self.detail.split("[103] 독자 행동 계측", 1)[0]
         self.assertEqual(bridge.count("fetch("), 1)
         self.assertEqual(self.detail.count("p_firm_keys"), 1)
         # RPC POST body 는 카드에서 모은 고유 firm_key 배열 하나(keys 변수).
@@ -16235,13 +16235,13 @@ class WebProfileInterpretationTest(unittest.TestCase):
 MIG_TOUCH = "087_funnel_touch_counts.sql"
 
 
-MIG_BRIEF_EVENTS = "101_brief_reader_events.sql"
+MIG_BRIEF_EVENTS = "103_brief_reader_events.sql"
 
 
 class WebBriefReaderEventsTest(unittest.TestCase):
-    """브리프 독자 행동 계측(101) 계약 — 무PII · 닫힌 어휘 3자 동기 · 가산만 · 전송 게이트.
+    """브리프 독자 행동 계측(103) 계약 — 무PII · 닫힌 어휘 3자 동기 · 가산만 · 전송 게이트.
 
-    ① 어휘 — brief.html kind()/card_open/depth 값 = 101 CHECK = RPC 접힘 목록. 한쪽만 늘리면
+    ① 어휘 — brief.html kind()/card_open/depth 값 = 103 CHECK = RPC 접힘 목록. 한쪽만 늘리면
        'other' 로 조용히 접히거나(링크) 예외로 버려진다(깊이).
     ② 무PII — 계측 스크립트는 href·경로·쿼리·리퍼러를 payload 에 싣지 않는다. payload 키는 4개 고정.
     ③ 게이트 — 호스트·자동화·운영자 검사가 첫 fetch 보다 앞선다(프리뷰가 프로덕션 카운터를 올린 전례).
@@ -16252,7 +16252,7 @@ class WebBriefReaderEventsTest(unittest.TestCase):
     def setUpClass(cls):
         cls.mig = (WEB_DIR / "migrations" / MIG_BRIEF_EVENTS).read_text(encoding="utf-8")
         tpl = (WEB_DIR / "templates" / "brief.html").read_text(encoding="utf-8")
-        i = tpl.index("[101] 독자 행동 계측")
+        i = tpl.index("[103] 독자 행동 계측")
         cls.js = tpl[i:tpl.rindex("</script>")]
 
     def test_vocabulary_synced_three_ways(self):

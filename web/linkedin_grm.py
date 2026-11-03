@@ -395,13 +395,14 @@ def site_cases(sim: dict | None, findings: dict) -> list[dict]:
     if not sim or not sim.get("items"):
         return []
     docs = findings.get("documents") or []
+    # 지적사항 DB 사본에 없는 지적은 링크·업체 이력을 댈 수 없어 고르지 않는다(빈 링크·거짓 ‘0건’ 방지)
     by_fid = {f.get("finding_id"): (d.get("slug"), f.get("text_ko")) for d in docs for f in d.get("findings") or []}
     rank = {"fact": 0, "situation": 1, "topic": 2}
     used: set[str] = set()
     picked: list[tuple[int, str, dict]] = []
     for q in sorted({it["q"] for it in sim["items"]}):
         best = None
-        for it in (x for x in sim["items"] if x["q"] == q and x["firm"] not in used):
+        for it in (x for x in sim["items"] if x["q"] == q and x["firm"] not in used and by_fid.get(x["finding_id"], ("",))[0]):
             lv, rx = _rule(sim, q)
             lv = lv if rx.search(it["text"]) else "topic"
             key = (rank[lv], "Warning" not in it["source"], -float(it["score"]))
@@ -421,45 +422,57 @@ def site_cases(sim: dict | None, findings: dict) -> list[dict]:
     return rows
 
 
-def _rpc(url: str, key: str, query: str, limit: int, timeout: int = 20) -> list[dict]:
+def _rpc(url: str, key: str, query: str, limit: int, timeout: int = 20, tries: int = 3) -> list[dict]:
+    """공개 anon RPC 한 번. anon 의 statement_timeout(3초)에 간헐로 걸리므로(500·57014) 몇 번 다시 시도한다."""
+    import time
     import urllib.request
-    req = urllib.request.Request(f"{url.rstrip('/')}/rest/v1/rpc/findings_similar", method="POST",
-                                 data=json.dumps({"p_query": query[:500], "p_limit": limit}).encode(),
-                                 headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 — 공개 anon RPC
-        return (json.loads(r.read().decode("utf-8")) or {}).get("items") or []
+    last: Exception | None = None
+    for n in range(tries):
+        req = urllib.request.Request(f"{url.rstrip('/')}/rest/v1/rpc/findings_similar", method="POST",
+                                     data=json.dumps({"p_query": query[:500], "p_limit": limit}).encode(),
+                                     headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 — 공개 anon RPC
+                return (json.loads(r.read().decode("utf-8")) or {}).get("items") or []
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            if n + 1 < tries:
+                time.sleep(1.5)
+    raise last  # type: ignore[misc]
 
 
 def fetch_similar(slots: dict, *, url: str, key: str, rpc=_rpc) -> dict | None:
-    """사이트 ‘유사 사례’ 엔진(findings_similar)을 서한의 지적 4개마다 호출한다(상위 5건 + 경고서한 상위 3건).
-    조회 실패·결과 0건이면 None — 호출한 쪽이 이 카드만 빼고 만든다(없다고 쓰거나 지어내지 않는다)."""
+    """사이트 ‘유사 사례’ 엔진(findings_similar)을 서한의 지적마다 한 번 호출한다(limit 50 → 상위 5건 + 그중 경고서한 상위 3건).
+    지적 하나가 끝내 실패해도 나머지로 간다. 전부 실패·결과 0건이면 None — 호출한 쪽이 이 카드만 빼고 만든다(없다고 쓰거나 지어내지 않는다)."""
     rows = (slots.get("s02") or {}).get("rows") or []
     items: list[dict] = []
     rules: dict[str, list[str]] = {}
     targets: list[str] = []
-    try:
-        for q, r in enumerate(rows, 1):
-            query = str(r.get("sim_query") or " ".join(la._ev_list(r.get("evidence")))).strip()
-            targets.append(str(r.get("sim_short") or r.get("text") or "")[:24])
-            lv = "fact" if r.get("sim_fact") else "situation" if r.get("sim_situation") else ""
-            if lv:
-                rules[str(q)] = [lv, str(r.get("sim_fact") or r.get("sim_situation"))]
-            seen: set[str] = set()
-            top5 = rpc(url, key, query, 5)
-            wl = [x for x in rpc(url, key, query, 50) if "Warning" in str(x.get("source"))][:3]
-            for x in [*top5, *wl]:
-                if x.get("finding_id") in seen:
-                    continue
-                seen.add(x["finding_id"])
-                items.append(dict(q=q, finding_id=x["finding_id"], score=x.get("score") or 0, source=x.get("source") or "",
-                                  firm=x.get("firm_name") or "", date=str(x.get("published_date") or ""), text=x.get("text") or ""))
-    except Exception as exc:  # noqa: BLE001 — 네트워크·권한·JSON 어떤 실패든 카드만 뺀다
-        print(f"::warning::유사 사례 조회 실패({type(exc).__name__}) — 05 카드를 뺀다", file=sys.stderr)
-        return None
+    failed = 0
+    for q, r in enumerate(rows, 1):
+        query = str(r.get("sim_query") or " ".join(la._ev_list(r.get("evidence")))).strip()
+        targets.append(str(r.get("sim_short") or r.get("text") or "")[:24])
+        lv = "fact" if r.get("sim_fact") else "situation" if r.get("sim_situation") else ""
+        if lv:
+            rules[str(q)] = [lv, str(r.get("sim_fact") or r.get("sim_situation"))]
+        try:
+            got = rpc(url, key, query, 50)
+        except Exception as exc:  # noqa: BLE001 — 네트워크·권한·JSON 어떤 실패든 그 지적만 건너뛴다
+            failed += 1
+            print(f"::warning::유사 사례 조회 실패(지적 {q}, {type(exc).__name__})", file=sys.stderr)
+            continue
+        seen: set[str] = set()
+        for x in [*got[:5], *[x for x in got if "Warning" in str(x.get("source"))][:3]]:
+            if x.get("finding_id") in seen:
+                continue
+            seen.add(x["finding_id"])
+            items.append(dict(q=q, finding_id=x["finding_id"], score=x.get("score") or 0, source=x.get("source") or "",
+                              firm=x.get("firm_name") or "", date=str(x.get("published_date") or ""), text=x.get("text") or ""))
     if not items:
+        print("::warning::유사 사례 결과 없음 — 05 카드를 뺀다", file=sys.stderr)
         return None
     return dict(source="findings_similar RPC", captured_on=_dt.date.today().isoformat(), card_id=str(slots.get("card_id") or ""),
-                targets=targets, rules=rules, items=items)
+                targets=targets, rules=rules, items=items, failed_findings=failed)
 
 
 def site_lines(rows: list[dict]) -> list[str]:
@@ -685,12 +698,20 @@ def main(argv: list[str] | None = None) -> int:
         except (AttributeError, ValueError):
             pass
     ap = argparse.ArgumentParser(description="링크드인 사건 해부 GRM 판(시범 v3)")
-    ap.add_argument("--brief", required=True)
+    ap.add_argument("--brief", help="브리프 JSON(미지정 시 --data 의 최신)")
+    ap.add_argument("--data", default=str(WEB_DIR / "data" / "briefs"), help="--brief 가 없을 때 최신 브리프를 찾을 디렉터리")
     ap.add_argument("--slots", help="v3 슬롯 JSON(기본: web/data/linkedin_anatomy/<발행일>.v3.json)")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", help="출력 폴더")
+    ap.add_argument("--dist", help="배포 루트 — briefs/<발행일>/ 아래에 낸다(linkedin.* 옆, 사이트맵 비등록)")
     ap.add_argument("--no-pdf", action="store_true")
     args = ap.parse_args(argv)
-    doc = json.loads(Path(args.brief).read_text(encoding="utf-8"))
+    if not (args.out or args.dist):
+        ap.error("--out 또는 --dist 가 필요하다")
+    bp = Path(args.brief) if args.brief else lc.latest_brief_path(Path(args.data))
+    if bp is None:
+        print("::warning::브리프 JSON 없음 — 만들지 않는다", file=sys.stderr)
+        return 0
+    doc = json.loads(bp.read_text(encoding="utf-8"))
     pub = str((doc.get("brief") or {}).get("publish_date") or "")
     sp = Path(args.slots) if args.slots else SLOTS_DIR / f"{pub}.v3.json"
     if not sp.exists():
@@ -709,7 +730,7 @@ def main(argv: list[str] | None = None) -> int:
         for pr in exc.problems:
             print(f"  - {pr}", file=sys.stderr)
         return 1
-    out = Path(args.out)
+    out = Path(args.out) if args.out else Path(args.dist) / "briefs" / pub
     out.mkdir(parents=True, exist_ok=True)
     (out / "linkedin_grm.txt").write_text(deck["caption"], encoding="utf-8")
     if similar:

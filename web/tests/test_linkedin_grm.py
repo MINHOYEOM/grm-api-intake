@@ -6,6 +6,7 @@ CI 는 `tests/test_web_linkedin_grm.py` shim 으로 순회. 직접: python web/t
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import pathlib
 import sys
 import unittest
@@ -179,6 +180,10 @@ class SiteCasesTest(unittest.TestCase):
         r4 = next(r for r in self.rows if r["q"] == 4)
         self.assertEqual(r4["level"], "fact")
 
+    def test_items_missing_from_db_copy_are_not_picked(self):
+        sim = dict(self.sim, items=[dict(i, finding_id="finding-not-in-db") for i in self.sim["items"]])
+        self.assertEqual(lg.site_cases(sim, FINDINGS), [])
+
     def test_missing_capture_falls_back(self):
         self.assertEqual(lg.site_cases(None, FINDINGS), [])
 
@@ -193,7 +198,7 @@ class FetchSimilarTest(unittest.TestCase):
     def test_calls_engine_per_finding_and_builds_capture(self):
         calls = []
         sim = lg.fetch_similar(_slots(), url="https://x", key="k", rpc=self._rpc(calls))
-        self.assertEqual(len(calls), 8)  # 지적 4개 × (상위 5 + 경고서한용 50)
+        self.assertEqual(len(calls), 4)  # 지적마다 limit 50 한 번(상위 5 + 경고서한 3 을 거기서 고른다)
         self.assertEqual({it["q"] for it in sim["items"]}, {1, 2, 3, 4})
         self.assertEqual(sim["rules"]["4"][0], "fact")
 
@@ -203,6 +208,15 @@ class FetchSimilarTest(unittest.TestCase):
         self.assertIsNone(lg.fetch_similar(_slots(), url="u", key="k", rpc=boom))
         self.assertIsNone(lg.fetch_similar(_slots(), url="u", key="k", rpc=lambda *a: []))
 
+    def test_one_finding_failing_keeps_the_rest(self):
+        def flaky(url, key, query, limit):
+            if "스모크" in query:
+                raise OSError("timeout")
+            return [dict(finding_id="f", score=0.1, source="FDA 483", firm_name="A", published_date="2026-01-01", text="t")]
+        sim = lg.fetch_similar(_slots(), url="u", key="k", rpc=flaky)
+        self.assertEqual({it["q"] for it in sim["items"]}, {1, 2, 3})
+        self.assertEqual(sim["failed_findings"], 1)
+
     def test_deck_without_similar_drops_only_that_card(self):
         deck = lg.build_grm_deck(_doc(), _slots(), FINDINGS, similar={})
         kinds = [s["kind"] for s in deck["slides"]]
@@ -210,6 +224,26 @@ class FetchSimilarTest(unittest.TestCase):
         self.assertEqual(kinds[0], "g_cover")
         self.assertEqual(kinds[-1], "g_end")
         self.assertNotRegex(deck["caption"], r"(?<!\d)0건")
+
+
+class DistTest(unittest.TestCase):
+    def test_dist_writes_under_briefs_pub(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            rc = lg.main(["--brief", str(BRIEF), "--dist", td, "--no-pdf"])
+            self.assertEqual(rc, 0)
+            self.assertTrue((Path(td) / "briefs" / "2026-11-02" / "linkedin_grm.txt").exists())
+
+    def test_missing_slots_writes_nothing(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            rc = lg.main(["--brief", str(BRIEF), "--slots", str(Path(td) / "none.json"), "--dist", td, "--no-pdf"])
+            self.assertEqual(rc, 0)
+            self.assertFalse((Path(td) / "briefs").exists())
+
+    def test_requires_out_or_dist(self):
+        with self.assertRaises(SystemExit):
+            lg.main(["--brief", str(BRIEF)])
 
 
 if __name__ == "__main__":

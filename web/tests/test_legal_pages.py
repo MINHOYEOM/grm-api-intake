@@ -39,6 +39,8 @@ class LegalPagesPublishedTest(unittest.TestCase):
             self.assertNotIn("확인 필요", html)
             self.assertNotIn("초안", html)
             self.assertIn("2026년 11월 3일", html)
+            self.assertIn("data-legal-doc", html)
+            self.assertIn(".legal-doc", html)
         self.assertFalse((self.out / "privacy-draft").exists())
 
     def test_sitemap_and_footer_link(self):
@@ -84,6 +86,16 @@ class LegalContentTest(unittest.TestCase):
         js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
         for _stem, _stem_en, path in render.LEGAL_PAGES:
             self.assertIn(f'legalHref("{path}")', js)
+
+    def test_modal_contract(self):
+        js = (WEB_DIR / "assets" / "reactions.js").read_text(encoding="utf-8")
+        for token in ("data-legal>", "function openLegal", 'querySelector("[data-legal-doc]")',
+                      'role="dialog" aria-modal="true"', "e.metaKey || e.ctrlKey", "window.open(url"):
+            self.assertIn(token, js, token)
+        # 본문 마크업은 legal.html 한 곳 — 모달이 가져가는 표지가 페이지에 있다.
+        self.assertIn("data-legal-doc", (WEB_DIR / "templates" / "legal.html").read_text(encoding="utf-8"))
+        # ESC 가 아래 가입 팝업까지 닫지 않게 전파를 막는다.
+        self.assertIn("e.stopPropagation(); closeLegal()", js)
 
     def test_english_translation_mirrors_korean_structure(self):
         for stem, stem_en, _path in render.LEGAL_PAGES:

@@ -13509,7 +13509,10 @@ class WebBriefFirmLinkTest(unittest.TestCase):
         # fetch() 가 브리프 상세 페이지 전체에서 정확히 1번만 호출된다 — 카드마다
         # 개별 호출하지 않고 for-each 밖에서 1회만 여는 계약(신규 구독폼 fetch 등
         # 다른 fetch 가 없는 이 고정 fixture 빌드 기준).
-        self.assertEqual(self.detail.count("fetch("), 1)
+        # [103] 독자 행동 계측 블록(brief_event_bump 전용 fetch)은 별도 계약(WebBriefReaderEventsTest)
+        # 이라 이 카운트에서 뺀다 — 업체 브릿지 쪽 fetch 가 1번이라는 계약은 그대로.
+        bridge = self.detail.split("[103] 독자 행동 계측", 1)[0]
+        self.assertEqual(bridge.count("fetch("), 1)
         self.assertEqual(self.detail.count("p_firm_keys"), 1)
         # RPC POST body 는 카드에서 모은 고유 firm_key 배열 하나(keys 변수).
         self.assertIn("JSON.stringify({ p_firm_keys:keys })", self.detail)
@@ -16230,6 +16233,81 @@ class WebProfileInterpretationTest(unittest.TestCase):
 # 테스트 메서드명·변수명에 번호를 그대로 박으면 이런 충돌마다 이름까지 함께 갈아야 하므로,
 # 파일명은 이 상수 하나에서만 참조한다(관례: 이후 신설 마이그도 이 꼴을 따른다).
 MIG_TOUCH = "087_funnel_touch_counts.sql"
+
+
+MIG_BRIEF_EVENTS = "103_brief_reader_events.sql"
+
+
+class WebBriefReaderEventsTest(unittest.TestCase):
+    """브리프 독자 행동 계측(103) 계약 — 무PII · 닫힌 어휘 3자 동기 · 가산만 · 전송 게이트.
+
+    ① 어휘 — brief.html kind()/card_open/depth 값 = 103 CHECK = RPC 접힘 목록. 한쪽만 늘리면
+       'other' 로 조용히 접히거나(링크) 예외로 버려진다(깊이).
+    ② 무PII — 계측 스크립트는 href·경로·쿼리·리퍼러를 payload 에 싣지 않는다. payload 키는 4개 고정.
+    ③ 게이트 — 호스트·자동화·운영자 검사가 첫 fetch 보다 앞선다(프리뷰가 프로덕션 카운터를 올린 전례).
+    ④ 가산만 — 기존 funnel_*/rum_* 함수를 재정의하지 않는다(반환 shape 변경 금지).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mig = (WEB_DIR / "migrations" / MIG_BRIEF_EVENTS).read_text(encoding="utf-8")
+        tpl = (WEB_DIR / "templates" / "brief.html").read_text(encoding="utf-8")
+        i = tpl.index("[103] 독자 행동 계측")
+        cls.js = tpl[i:tpl.rindex("</script>")]
+
+    def test_vocabulary_synced_three_ways(self):
+        kinds = set(re.findall(r"return '([a-z]+)';", self.js.split("function kind", 1)[1]
+                               .split("document.addEventListener", 1)[0]))
+        self.assertEqual(kinds, {"toc", "firm", "term", "doc", "src", "other"})
+        m = re.search(r"key = 'link_click' and sub in \(([^)]*)\)", self.mig)
+        self.assertEqual(set(re.findall(r"'([a-z]+)'", m.group(1))), kinds)
+        # RPC 접힘 목록도 같은 어휘
+        self.assertIn("if s not in ('src','firm','term','doc','toc','other') then s := 'other'", self.mig)
+        opens = {"deep", "merged", "detail"}
+        for v in opens:
+            self.assertIn(f"'{v}'", self.js)
+            self.assertIn(f"'{v}'", self.mig)
+        self.assertIn("[25,50,75,100]", self.js)
+        self.assertIn("sub in ('25','50','75','100')", self.mig)
+        self.assertIn("key in ('link_click','depth','card_open')", self.mig)
+        self.assertIn("raise exception 'brief_event_bump: unknown key", self.mig)
+
+    def test_no_pii_in_payload(self):
+        self.assertEqual(re.findall(r"p_[a-z_]+(?=:)", self.js),
+                         ["p_key", "p_sub", "p_card_type", "p_device"])
+        for banned in ("location.href", "location.search", "location.pathname", "document.referrer",
+                       "getAttribute('href')+", "setItem", "cookie", "email"):
+            self.assertNotIn(banned, self.js, banned)
+        # href 는 분류에만 읽고 payload 로 흘리지 않는다.
+        self.assertEqual(len(re.findall(r"JSON\.stringify", self.js)), 1)
+        for col in ("ip", "email", "user_id", "session"):
+            self.assertNotRegex(self.mig.split("create table", 1)[1].split(");", 1)[0],
+                                rf"\b{col}\b text")
+
+    def test_gates_precede_first_fetch(self):
+        first_fetch = self.js.index("fetch(u+")
+        for gate in ("hn!=='{{ site_host }}'", "navigator.webdriver===true",
+                     "getItem('grm-op')==='1'"):
+            self.assertIn(gate, self.js)
+            self.assertLess(self.js.index(gate), first_fetch, gate)
+        self.assertIn("{passive:true}", self.js)
+        self.assertIn("requestAnimationFrame", self.js)
+
+    def test_grants_and_additive_only(self):
+        self.assertIn("revoke all on public.brief_event_counts from public, anon, authenticated", self.mig)
+        self.assertIn("grant select on public.brief_event_counts to authenticated", self.mig)
+        self.assertIn("grant execute on function public.brief_event_bump(text, text, text, text) "
+                      "to anon, authenticated", self.mig)
+        self.assertIn("grant execute on function public.brief_event_report() to authenticated", self.mig)
+        self.assertNotIn("to anon;", self.mig.replace("to anon, authenticated;", ""))
+        self.assertIn("cap constant integer := 3000;", self.mig)
+        defined = re.findall(r"create or replace function public\.(\w+)", self.mig)
+        self.assertEqual(sorted(defined), ["brief_event_bump", "brief_event_report"])
+        for forbidden in ("drop table", "drop function"):
+            self.assertNotIn(forbidden, self.mig.lower())
+        # 기존 표는 건드리지 않는다 — alter 는 이 파일이 만든 표(RLS 켜기)뿐.
+        self.assertEqual(re.findall(r"alter table ([a-z_.]+)", self.mig.lower()),
+                         ["public.brief_event_counts"])
 
 
 class WebAdminGrowthPanelTest(unittest.TestCase):

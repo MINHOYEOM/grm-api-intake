@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 개인정보처리방침·이용약관(한국어 정본). 문안은 web/data/legal/*.md, 푸터와 가입 화면에서 링크. -#}
+<main>
+  <div class="wrap page-head about-head">
+    <h1>{{ about_title }}</h1>
+    <div class="about-lead">{{ about_lead }}</div>
+  </div>
+  <div class="wrap about-body">
+    {% for s in about_sections %}
+    <section class="about-sec" id="{{ s.id }}">
+      <h2>{{ s.title }}</h2>
+      <div class="about-prose">{{ s.body }}</div>
+    </section>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

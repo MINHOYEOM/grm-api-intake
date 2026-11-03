@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-{#- 개인정보처리방침·이용약관(한국어 정본). 문안은 web/data/legal/*.md, 푸터와 가입 화면에서 링크. -#}
+{#- 개인정보처리방침·이용약관. 문안은 web/data/legal/*.md(정본), 푸터와 가입 화면에서 링크한다.
+    가입 화면(reactions.js)은 이 페이지를 fetch 해 [data-legal-doc] 안쪽만 모달에 싣는다 —
+    본문 마크업은 여기 한 곳뿐이다. 스타일은 legal_doc_css.html(모달과 공용). -#}
 <main>
-  <div class="wrap page-head about-head">
+  <article class="wrap legal-doc" data-legal-doc>
     <h1>{{ about_title }}</h1>
-    <div class="about-lead">{{ about_lead }}</div>
-  </div>
-  <div class="wrap about-body">
+    <div class="legal-lead">{{ about_lead }}</div>
     {% for s in about_sections %}
-    <section class="about-sec" id="{{ s.id }}">
+    <section class="legal-sec" id="{{ s.id }}">
       <h2>{{ s.title }}</h2>
-      <div class="about-prose">{{ s.body }}</div>
+      <div class="legal-prose">{{ s.body }}</div>
     </section>
     {% endfor %}
-  </div>
+  </article>
 </main>
+{% if not reactions_enabled %}{% include "legal_doc_css.html" %}{% endif %}
 {% endblock %}

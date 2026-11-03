@@ -297,7 +297,7 @@
       '<label class="grm-login-optin grm-consent"><input type="checkbox" class="grm-c-age" />' +
       '<span>' + _t("(필수) 만 14세 이상입니다") + '</span></label>' +
       '<label class="grm-login-optin grm-consent"><input type="checkbox" class="grm-c-terms" />' +
-      '<span>' + _t("(필수) {terms}과 {privacy}에 동의합니다", { terms: '<a href="' + legalHref("terms/") + '" target="_blank" rel="noopener">' + _t("이용약관") + '</a>', privacy: '<a href="' + legalHref("privacy/") + '" target="_blank" rel="noopener">' + _t("개인정보처리방침") + '</a>' }) + '</span></label>' +
+      '<span>' + _t("(필수) {terms}과 {privacy}에 동의합니다", { terms: '<a href="' + legalHref("terms/") + '" target="_blank" rel="noopener" data-legal>' + _t("이용약관") + '</a>', privacy: '<a href="' + legalHref("privacy/") + '" target="_blank" rel="noopener" data-legal>' + _t("개인정보처리방침") + '</a>' }) + '</span></label>' +
       '<p class="grm-f-err" id="grm-e-consent"></p>' +
       (SUB_ACTION && !lsGet(SUB_OK_KEY)
         ? '<label class="grm-login-optin"><input type="checkbox" class="grm-login-optin-cb" />' +
@@ -337,6 +337,14 @@
     var hint        = pop.querySelector(".grm-login-hint");
     var m           = pop.querySelector(".grm-login-msg");
 
+    // 약관·처리방침 링크: 페이지를 떠나지 않고 모달로 읽는다(가입 폼 입력값 유지). 수정키·가운데 클릭은
+    // 브라우저 기본(새 탭)에 맡기고, 불러오기에 실패해도 새 탭으로 폴백한다.
+    pop.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest("a[data-legal]");
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      openLegal(a);
+    });
     pop.querySelector(".grm-login-x").addEventListener("click", closeLogin);
     pop.addEventListener("click", function (e) { if (e.target === pop) closeLogin(); });
 
@@ -730,6 +738,66 @@
     }
     pop.querySelector(".grm-login-msg").textContent = msg;
     pop.classList.add("show");
+  }
+  // ── 약관·처리방침 모달 ─────────────────────────────────────────────────────
+  // 본문은 /privacy/·/terms/ 페이지의 [data-legal-doc] 를 fetch 해서 그대로 쓴다(문안 이중 관리 0).
+  var legalPop = null, legalTrigger = null, legalCache = {};
+  function ensureLegalPop() {
+    if (legalPop) return legalPop;
+    legalPop = document.createElement("div");
+    legalPop.className = "grm-legal-pop";
+    legalPop.innerHTML =
+      '<div class="grm-legal-card" role="dialog" aria-modal="true">' +
+      '<button type="button" class="grm-legal-x" aria-label="' + _t("닫기") + '">×</button>' +
+      '<div class="grm-legal-body" tabindex="-1"></div>' +
+      '<div class="grm-legal-foot"><button type="button" class="grm-legal-close">' + _t("닫기") + '</button></div></div>';
+    document.body.appendChild(legalPop);
+    legalPop.addEventListener("click", function (e) { if (e.target === legalPop) closeLegal(); });
+    legalPop.querySelector(".grm-legal-x").addEventListener("click", closeLegal);
+    legalPop.querySelector(".grm-legal-close").addEventListener("click", closeLegal);
+    legalPop.addEventListener("keydown", function (e) {
+      if (!legalPop.classList.contains("show")) return;
+      if (e.key === "Escape" || e.key === "Esc") { e.stopPropagation(); closeLegal(); return; }
+      if (e.key !== "Tab") return;
+      var f = legalPop.querySelectorAll("button, a[href], [tabindex='-1']"), vis = [];
+      for (var i = 0; i < f.length; i++) { if (f[i].offsetParent !== null && !f[i].disabled) vis.push(f[i]); }
+      if (!vis.length) return;
+      var first = vis[0], last = vis[vis.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    return legalPop;
+  }
+  function closeLegal() {
+    if (!legalPop) return;
+    legalPop.classList.remove("show");
+    if (legalTrigger && legalTrigger.focus) legalTrigger.focus();
+    legalTrigger = null;
+  }
+  function showLegal(html, trigger) {
+    var p = ensureLegalPop(), body = p.querySelector(".grm-legal-body");
+    body.innerHTML = html;
+    var h = body.querySelector("h1"), card = p.querySelector(".grm-legal-card");
+    if (h) card.setAttribute("aria-label", h.textContent);
+    body.scrollTop = 0;
+    legalTrigger = trigger;
+    p.classList.add("show");
+    body.focus();
+  }
+  function openLegal(a) {
+    var url = a.getAttribute("href");
+    function fallback() { window.open(url, "_blank", "noopener"); }
+    if (legalCache[url]) { showLegal(legalCache[url], a); return; }
+    if (!window.fetch || !window.DOMParser) { fallback(); return; }
+    fetch(url, { credentials: "same-origin" })
+      .then(function (r) { if (!r.ok) throw new Error("http"); return r.text(); })
+      .then(function (txt) {
+        var src = new DOMParser().parseFromString(txt, "text/html").querySelector("[data-legal-doc]");
+        if (!src) throw new Error("nodoc");
+        legalCache[url] = src.innerHTML;
+        showLegal(legalCache[url], a);
+      })
+      .catch(fallback);
   }
   function closeLogin() { holdPop = false; if (pop) pop.classList.remove("show"); }
   // 다른 자산(growth-sync.js 펫 CTA 등)이 별도 로그인 UI 발명 없이 모드를 지정해 여는 공개 진입점.

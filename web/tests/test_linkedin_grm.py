@@ -129,9 +129,9 @@ class DeckTest(unittest.TestCase):
 
     def test_fixed_format_order(self):
         self.assertEqual([s["kind"] for s in self.deck["slides"]],
-                         ["g_cover", "g_find", "g_reply", "g_req", "g_sim", "g_end"])
+                         ["g_cover", "g_find", "g_reply", "g_req", "g_site", "g_sim", "g_end"])
         self.assertEqual([s.get("corner") for s in self.deck["slides"][1:]],
-                         ["지적 내용", "회신 평가", "시정 요구", "유사 사례", "서한에 없는 것"])
+                         ["지적 내용", "회신 평가", "시정 요구", "유사 사례", "DB 연관", "서한에 없는 것"])
 
     def test_caption_paragraph_order_and_no_hashtag(self):
         paras = self.deck["caption"].strip().split("\n\n")
@@ -157,6 +157,30 @@ class DeckTest(unittest.TestCase):
     def test_no_paid_api_and_live_module_untouched(self):
         self.assertNotIn("import anthropic", (WEB_DIR / "linkedin_grm.py").read_text(encoding="utf-8"))
         self.assertNotIn("linkedin_grm", (WEB_DIR / "linkedin_cards.py").read_text(encoding="utf-8"))
+
+
+
+class SiteCasesTest(unittest.TestCase):
+    def setUp(self):
+        self.sim = json.loads((WEB_DIR / "data" / "linkedin_anatomy" / "2026-11-02.similar.json").read_text(encoding="utf-8"))
+        self.rows = lg.site_cases(self.sim, FINDINGS)
+
+    def test_one_row_per_finding_with_label_and_doc_link(self):
+        self.assertEqual([r["q"] for r in self.rows], [1, 2, 3, 4])
+        for r in self.rows:
+            self.assertIn(r["label"], lg.SITE_LEVELS.values())
+            self.assertTrue(r["slug"])
+
+    def test_rows_come_from_the_site_engine_capture(self):
+        texts = {i["text"] for i in self.sim["items"]}
+        self.assertTrue(all(r["text"] in texts for r in self.rows))
+
+    def test_smoke_row_is_fact_match(self):
+        r4 = next(r for r in self.rows if r["q"] == 4)
+        self.assertEqual(r4["level"], "fact")
+
+    def test_missing_capture_falls_back(self):
+        self.assertEqual(lg.site_cases(None, FINDINGS), [])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,155 @@
+{
+ "source": "supabase public.findings_similar(query,5) — 사이트 '유사 사례' 와 같은 엔진(렉시컬 FTS+similarity)",
+ "captured_on": "2026-11-03",
+ "card_id": "8909d4bb39b5",
+ "note": "질의는 대상 서한 4개 지적의 한국어 근거를 줄인 것. 항목은 질의별 점수 상위(사이트 순서 그대로, 일부 생략: 질의 3 의 보류 로트 항목 3건)",
+ "queries": [
+  "90건이 넘는 ISO 5 분리균이 공식적인 미생물 동정 대신 이전에 동정된 집락과 유사함으로 기록되었고 ISO 5 구역에서 100건이 넘는 미생물 검출",
+  "근본 원인을 규명하고 시정하는 대신 수율 한도를 낮추었다 여러 CAPA가 효과성 점검 없이 종결되었다",
+  "EM 플레이트는 검체 채취 전후로 용액이 들어 있는 용기 안에 보관되었다 미생물 회수에 미치는 영향을 평가하지 않았다",
+  "기류 시각화 연구 스모크 스터디는 작업에 대한 동적 dynamic 평가를 포함하지 않았다"
+ ],
+ "items": [
+  {
+   "q": 1,
+   "finding_id": "finding-80885170a88f08146b0bc030",
+   "score": 0.108,
+   "source": "FDA 483",
+   "firm": "Greenwich Rx",
+   "date": "2026-10-21",
+   "text": "ISO 5 구역 및 생산 구역에 인접한 구역에서 미생물 오염이 존재했다."
+  },
+  {
+   "q": 1,
+   "finding_id": "finding-d40d7fc06b6e9e13745cc701",
+   "score": 0.1043,
+   "source": "FDA 483",
+   "firm": "Houston Rx LLC",
+   "date": "2026-10-01",
+   "text": "ISO 5 구역에 미생물 오염이 존재했다."
+  },
+  {
+   "q": 1,
+   "finding_id": "finding-055e6cb8461f80e6fbde3ae9",
+   "score": 0.0939,
+   "source": "FDA 483",
+   "firm": "Revive Rx LLC",
+   "date": "2025-03-28",
+   "text": "ISO 5 구역과 생산 구역 인근 구역에 미생물 오염이 존재했다."
+  },
+  {
+   "q": 1,
+   "finding_id": "finding-157a35131aaa82f5e7fa5121",
+   "score": 0.0929,
+   "source": "FDA 483",
+   "firm": "Revive Rx LLC",
+   "date": "2026-04-22",
+   "text": "ISO 5 구역 및 생산 구역 인접 구역에 미생물 오염이 존재하였다."
+  },
+  {
+   "q": 1,
+   "finding_id": "finding-8f56c6a75047a490af9ab63c",
+   "score": 0.0924,
+   "source": "FDA Warning Letter",
+   "firm": "Pharmacy Plus, Inc., dba Vital Care Compounder",
+   "date": "2023-06-13",
+   "text": "귀사는 ISO 5 무균 공정 구역 내에서 미생물 오염이 검출된 후 적절한 시정조치를 취하지 않았습니다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-a2cfddb749003fcf213a3c4b",
+   "score": 0.0878,
+   "source": "FDA 483",
+   "firm": "AGC Biologics S.p.A.",
+   "date": "2026-10-30",
+   "text": "경보(alarm)의 반복 발생에 대해 근본 원인을 규명하고 시정조치를 시행하지 않았으며, 경보 관련 절차도 준수하지 않았다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-ee5476c18b7df151216e6cd2",
+   "score": 0.0805,
+   "source": "FDA 483",
+   "firm": "American Red Cross Blood Services",
+   "date": "2024-01-17",
+   "text": "귀사는 생물학적 제품 일탈(BPD)을 철저하고 충분히 조사하고, 근본 원인을 규명하며, 시정하고, 재발 방지 조치를 취하지 못했다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-51b57251768e87014592d555",
+   "score": 0.0778,
+   "source": "FDA 483",
+   "firm": "Fujifilm Diosynth Biotechnologies USA",
+   "date": "2021-08-26",
+   "text": "근본 원인을 확인하기 위한 불일치 조사가 완전하게 수행되지 않으며 재발 방지를 위한 시정 및 예방조치(CAPA)가 적절히 이행되지 않는다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-eaa6d63789af9203531996b4",
+   "score": 0.0722,
+   "source": "FDA 483",
+   "firm": "Samsung Biologics",
+   "date": "2024-07-15",
+   "text": "불일치의 근본 원인을 확인하고 적절한 시정조치를 시행하기 위한 조사가 항상 수행되지는 않는다."
+  },
+  {
+   "q": 2,
+   "finding_id": "finding-01c2717666fb8623572ff5e6",
+   "score": 0.0696,
+   "source": "FDA 483",
+   "firm": "Lupin Limited Unit 1",
+   "date": "2022-12-08",
+   "text": "배치가 이미 출하되었는지 여부와 관계없이, 중간체 또는 API 배치의 규격 부적합에 대한 근본 원인을 규명하기 위한 조사가 부적절하다."
+  },
+  {
+   "q": 3,
+   "finding_id": "finding-9bccb519374d34b0f9a24a38",
+   "score": 0.1134,
+   "source": "FDA 483",
+   "firm": "CFP Acquisitions, Inc",
+   "date": "2024-01-17",
+   "text": "미생물 회수를 보장하기 위한 환경 모니터링 검체 채취가 수행되지 않았다."
+  },
+  {
+   "q": 3,
+   "finding_id": "finding-b3a78057a5fd93eae5c98d4b",
+   "score": 0.0887,
+   "source": "FDA 483",
+   "firm": "Protherics UK Limited",
+   "date": "2026-10-26",
+   "text": "제조 자재와 안정성 검체가 보관되는 실에서 여러 종류의 곰팡이가 발견된 것에 대해 충분히 조사하거나 그 영향을 평가하지 않았다."
+  },
+  {
+   "q": 4,
+   "finding_id": "finding-00a400c157840afa54f39237",
+   "score": 0.1725,
+   "source": "FDA 483",
+   "firm": "Greenwich Rx",
+   "date": "2026-10-21",
+   "text": "기류 시각화 시험(smoke study)을 동적 조건(dynamic conditions)에서 실시하지 않았다."
+  },
+  {
+   "q": 4,
+   "finding_id": "finding-ad0f37a0205a6a7d83af3ccd",
+   "score": 0.1563,
+   "source": "FDA 483",
+   "firm": "Richmond VA Medical Center",
+   "date": "2026-07-06",
+   "text": "동적 조건(dynamic conditions)에서 스모크 스터디(smoke study)가 수행되지 않았다."
+  },
+  {
+   "q": 4,
+   "finding_id": "finding-d85a460f333fab81e5c8d015",
+   "score": 0.1524,
+   "source": "FDA Warning Letter",
+   "firm": "SCA Pharmaceuticals, LLC",
+   "date": "2026-10-13",
+   "text": "귀사 시설은 동적 조건에서 수행하는 기류 시각화 연구를 포함하여 ISO 5 구역에 대한 일상적이고 엄격한 인증을 실시하지 않았다."
+  }
+ ],
+ "targets": [
+  "ISO 5 검출균 동정",
+  "수율 한도·CAPA 종결",
+  "EM 플레이트 보관",
+  "스모크 스터디 동적 평가"
+ ]
+}

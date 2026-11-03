@@ -110,13 +110,33 @@ def _sentences(text: Any) -> list[str]:
     return re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", str(text or "")))
 
 
+_KO_KEY = re.compile(r"ISO ?\(?5|Grade A|스모크|기류|CAPA|효과성|곰팡이|집락")
+
+
+def _fact(fs: list[dict]) -> str:
+    """서한 한국어 번역(text_ko)에서 코드로 뽑은 서한별 고유 사실 한 줄 — 직접 쓰지 않고, 핵심어가 든 원문 문장의 그 부근을 자른다."""
+    for f in fs:
+        for sent in re.split(r"(?<=\.)\s+", re.sub(r"\s+", " ", str(f.get("text_ko") or ""))):
+            m = _KO_KEY.search(sent)
+            if not m or len(sent) < 34:
+                continue
+            sent = re.sub(r"^(?:또한\s*)?귀사는\s*", "", sent.strip()).rstrip(".")
+            m = _KO_KEY.search(sent)
+            st = sent.rfind(" ", 0, max(m.start() - 14, 0)) + 1 if m.start() > 14 else 0
+            out = sent[st:st + 50]
+            if st + 50 < len(sent):
+                out = out[:max(out.rfind(" "), 30)] + "…"
+            return ("…" if st else "") + out
+    return ""
+
+
 LEVELS = {"both": "조항·사실 일치", "pattern": "사실 패턴 일치", "clause": "조항만 일치"}
 _CLAUSES = tuple(prefix for _, prefix in CFR_MAP)
 
 
 def similar_cases(wls: list[dict], tgt: str, n_cases: int = 3) -> tuple[list[dict], dict, int]:
     """과거 경고서한을 닮은 정도 순으로 고른다 — 정확히 일치가 모자라면 단계적으로 넓힌다.
-      조항·사실 일치: 겹치는 문장이 대응 조항(211.192·211.67·211.113(b))으로 인용된 서한
+      조항·사실 일치: 겹치는 지적이 있고 서한이 대응 조항(211.192·211.67·211.113(b))을 인용한 서한
       사실 패턴 일치: 조항은 달라도 겹치는 지적(ISO 5 검출 대응 부족·스모크 동적·CAPA 효과성)이 2가지 이상
       조항만 일치:    위 둘로 3건이 안 차면, 환경모니터링 지적에 대응 조항이 인용된 최근 서한
     정렬: 단계 → 겹침 수 ↓ → 최신 ↓ → slug. 반환: (상위 n건, 단계별 후보 수, ISO 5 동정 미흡 서한 수)."""
@@ -136,19 +156,23 @@ def similar_cases(wls: list[dict], tgt: str, n_cases: int = 3) -> tuple[list[dic
                         hit[key] = f
         id_n += idneg
         refs_of = lambda fs: [r for f in fs for r in (f.get("cfr_refs") or []) if r.startswith(_CLAUSES)]  # noqa: E731
+        # 조항은 겹치는 문장이 든 지적과 같은 주제 분류의 지적 어디에서든 인용되면 인정한다(문장 지적에만 조항이 달리지 않는 서한이 있다)
+        cats = {f.get("category_label_ko") for f in hit.values()}
+        doc_refs = refs_of([f for f in d.get("findings") or [] if f.get("category_label_ko") in cats])
         base = dict(year=str(d["published_date"])[:4], date=str(d["published_date"]), agency="FDA 경고서한",
                     slug=str(d.get("slug") or ""), facets=[FACETS[k][0] for k in FACETS if k in hit])
-        if hit and refs_of(hit.values()):
-            found["both"].append(dict(base, level="both", cfr=refs_of(hit.values())[0]))
+        if hit and doc_refs:
+            found["both"].append(dict(base, level="both", cfr=(refs_of(hit.values()) or doc_refs)[0], fact=_fact(list(hit.values())),
+                                      strict=bool(refs_of(hit.values()))))
         elif len(hit) >= 2:
-            cfr = next((r for f in hit.values() for r in (f.get("cfr_refs") or []) if r.startswith("21 CFR 21")), "")
-            found["pattern"].append(dict(base, level="pattern", cfr=cfr or "조항 표시 없음"))
+            cfr = next((r for f in d.get("findings") or [] for r in (f.get("cfr_refs") or []) if r.startswith("21 CFR 21")), "")
+            found["pattern"].append(dict(base, level="pattern", cfr=cfr or "211·212 인용 없음", fact=_fact(list(hit.values()))))
         else:
             em = [f for f in d.get("findings") or [] if f.get("category_label_ko") == "환경모니터링" and refs_of([f])]
             if em:
-                found["clause"].append(dict(base, level="clause", cfr=refs_of(em)[0], facets=[]))
+                found["clause"].append(dict(base, level="clause", cfr=refs_of(em)[0], facets=[], fact=_fact(em)))
     for lv in found:
-        found[lv].sort(key=lambda c: (-len(c["facets"]), [-ord(ch) for ch in c["date"]], c["slug"]))
+        found[lv].sort(key=lambda c: (not c.get("strict"), -len(c["facets"]), [-ord(ch) for ch in c["date"]], c["slug"]))
     # 독자에게 닮은 정도의 폭을 보이려고 단계마다 먼저 한 건씩(조항·사실 → 패턴 → 조항만), 남는 자리는 가까운 단계부터 채운다.
     cases = [found[lv][0] for lv in ("both", "pattern", "clause") if found[lv]][:n_cases]
     for lv in ("both", "pattern", "clause"):
@@ -306,6 +330,8 @@ _NO_ID = "‘검출균 동정 미흡’ 그대로 지적한 서한은 DB에서 �
 
 
 def _case_facets(c: dict) -> str:
+    if c.get("fact"):
+        return c["fact"]
     return ", ".join(c["facets"]) if c["facets"] else "환경모니터링 지적에 같은 조항이 인용됨(세부 사실은 다름)"
 
 
@@ -318,6 +344,47 @@ def case_lines(db: dict, polite: bool = False) -> list[str]:
     if db["id_n"] == 0:
         out.append(_NO_ID.replace("찾지 못했다. 그래서", "찾지 못했습니다. 그래서").replace("표시한다.", "표시했습니다.") if polite else _NO_ID)
     return out
+
+
+SITE_LEVELS = {"fact": "사실 일치", "situation": "상황 일치", "topic": "주제만 겹침"}
+_SITE_RULES = {1: ("situation", re.compile(r"ISO ?5.*(?:오염|검출)|동정")),
+               2: ("situation", re.compile(r"CAPA|시정 및 예방")),
+               3: ("situation", re.compile(r"환경 ?모니터링|플레이트|곰팡이")),
+               4: ("fact", re.compile(r"(?=.*(?:스모크|기류 시각화))(?=.*동적)"))}
+
+
+def site_cases(sim: dict | None, findings: dict) -> list[dict]:
+    """사이트 ‘유사 사례’ 엔진(findings_similar RPC)이 대상 서한의 지적마다 돌려준 결과를 그대로 쓴다 — 순서·점수는 사이트 것이다.
+    우리가 더하는 것은 닮은 정도 라벨(코드 규칙)과 업체 익명 처리뿐. 지적마다 (라벨, 점수) 순으로 한 건을 고른다."""
+    if not sim or not sim.get("items"):
+        return []
+    slug_of = {f.get("finding_id"): d.get("slug") for d in findings.get("documents") or [] for f in d.get("findings") or []}
+    rank = {"fact": 0, "situation": 1, "topic": 2}
+    aliases: dict[str, str] = {}
+    rows: list[dict] = []
+    targets = sim.get("targets") or []
+    for q in sorted({it["q"] for it in sim["items"]}):
+        best = None
+        for it in (x for x in sim["items"] if x["q"] == q):
+            lv, rx = _SITE_RULES.get(q, ("topic", re.compile("$^")))
+            lv = lv if rx.search(it["text"]) else "topic"
+            key = (rank[lv], -float(it["score"]))
+            if best is None or key < best[0]:
+                best = (key, lv, it)
+        if best is None:
+            continue
+        _, lv, it = best
+        if it["firm"] not in aliases:
+            aliases[it["firm"]] = f"업체 {'ABCDEFG'[len(aliases)]}"
+        rows.append(dict(q=q, target=targets[q - 1] if q <= len(targets) else "", alias=aliases[it["firm"]], level=lv, label=SITE_LEVELS[lv],
+                         year=str(it["date"])[:4], agency="FDA 경고서한" if "Warning" in it["source"] else "FDA 483", score=float(it["score"]),
+                         text=it["text"], slug=str(slug_of.get(it["finding_id"]) or "")))
+    return rows
+
+
+def site_lines(rows: list[dict]) -> list[str]:
+    return [f"{r['alias']}({r['year']}년 {r['agency']}, {r['label']}) ‘{r['target']}’ ← {r['text']} grm-solutions.com/findings/doc/{r['slug']}/"
+            for r in rows if r["slug"]]
 
 
 def _load_glossary() -> list[dict]:
@@ -333,7 +400,7 @@ def glossary_terms(glossary: list[dict] | None) -> list[tuple[str, str]]:
 
 
 def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[dict] | None = None,
-                   *, base_url: str = lc.SITE_BASE_URL) -> dict[str, Any]:
+                   *, base_url: str = lc.SITE_BASE_URL, similar: dict | None = None) -> dict[str, Any]:
     card = la.pick_anatomy_card(brief_doc, str(slots.get("card_id") or ""))
     if card is None:
         raise la.AnatomyError(["card_id 에 맞는 해부 가능한 경고서한이 브리프에 없다"])
@@ -344,6 +411,13 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     brief = brief_doc.get("brief") or {}
     pub = str(brief.get("publish_date") or slots.get("pub") or "")
     y, m, wk = lc.title_dateform(pub)
+    if similar is None:
+        try:
+            similar = json.loads((SLOTS_DIR / f"{pub}.similar.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            similar = None
+    site = site_cases(similar, findings)
+    db["site"] = site
     issued = la._issue_date(card)
     cv, s2, s3, s4, s5, s6 = (slots[k] for k in ("cover", "s02", "s03", "s04", "s05", "s06"))
     items = (card["deep_analysis"].get("required_remediation") or {}).get("items") or []
@@ -358,7 +432,9 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
              repeat=s3["repeat"]["text"], ft_right=src_note, ai=ai),
         dict(kind="g_req", corner="시정 요구", heading=s4["heading"], sub=f"서한이 요구한 항목 {len(items)}건",
              items=[(it["title"], it["text"]) for it in s4["items"]], deadline=la._deadline(card), ft_right=src_note, ai=ai),
-        dict(kind="g_sim", corner="유사 사례", heading=s5["heading"], db=db, lines=case_lines(db) + db_lines(db), comment=s5["comment"], terms=terms,
+        *([dict(kind="g_site", corner="유사 사례", heading=s5["heading"], rows=site, ft_right="사이트 유사 사례 검색 결과 · 정도 라벨은 코드 규칙", ai=ai)] if site else []),
+        dict(kind="g_sim", corner="DB 연관" if site else "유사 사례", heading="DB로 본 반복과 선행" if site else s5["heading"], db=db,
+             lines=(db_lines(db) if site else case_lines(db) + db_lines(db)), comment=s5["comment"], terms=terms,
              ft_right=f"지적사항 DB {db['measured_on']} 기준 · 직접 센 숫자", ai=ai),
         dict(kind="g_end", corner="서한에 없는 것", heading=s6["heading"], not_stated=s6["not_stated"],
              question=s6["question"], ft_right="원문 링크는 브리프 페이지에서 확인", ai=ai),
@@ -369,7 +445,7 @@ def build_grm_deck(brief_doc: dict, slots: dict, findings: dict, glossary: list[
     cap = slots["caption"]
     caption_url = lc.with_utm(url, *lc.LINKEDIN_WEEKLY, lc.linkedin_weekly_campaign(pub))
     term_line = ("관련 용어: " + " · ".join(n for n, _ in terms) + " (grm-solutions.com/glossary/)") if terms else ""
-    sim = "\n".join(x for x in [la._norm(cap["similar"]), *case_lines(db, polite=True), METHOD, *db_lines(db, polite=True),
+    sim = "\n".join(x for x in [la._norm(cap["similar"]), *(site_lines(site) if site else case_lines(db, polite=True)), METHOD, *db_lines(db, polite=True),
                                MAP_NOTE, term_line] if x)
     ko = "\n\n".join([la._norm(cap["lead"]), la._norm(cap["claims"]), la._norm(cap["contrast"]),
                       la._norm(cap["requests"]), sim, la._norm(cap["not_stated"])])
@@ -421,7 +497,7 @@ CSS = """
 .g-st{margin:2px 0 8px;font-size:22px;font-weight:800;color:#6C6A64}
 .g-map .mh{font-size:17px;font-weight:800;color:#6C6A64;border-bottom:2px solid #141413}
 .g-cs3 em.lv{display:inline-block;font-style:normal;font-size:16px;font-weight:800;border-radius:5px;padding:1px 9px;margin:0 8px 3px 0;color:#fff;background:#6C6A64}
-.g-cs3 em.both{background:#C2603F}.g-cs3 em.pattern{background:#1A1815}
+.g-cs3 em.both{background:#C2603F}.g-cs3 em.pattern{background:#1A1815}.g-cs3 em.fact{background:#C2603F}.g-cs3 em.situation{background:#1A1815}.g-cs3 small.t{color:#A14B30;font-weight:700;margin-bottom:2px}.g-site div{padding:14px 16px;font-size:22px}
 .g-chips{margin:8px 0 2px;display:flex;flex-wrap:wrap;gap:8px;font-size:17px}
 .g-chips i{font-style:normal;border:1.5px solid #8A8478;border-radius:99px;padding:2px 12px;color:#3D3D3A}
 .g-chips u{text-decoration:none;background:#EFE9DE;border-radius:99px;padding:2px 12px;font-weight:700}
@@ -474,9 +550,15 @@ def _slide_html(s: dict) -> str:
                 for n, (t, x) in enumerate(s["items"], 1)) + "</div>")
             if s.get("deadline"):
                 p.append(f'<div class="g-dl">회신 기한: {_e(s["deadline"])}</div>')
+        elif k == "g_site":
+            p.append('<div class="g-cs3 g-site">' + "".join(
+                f'<div><b>{_e(r["alias"])}<small>{_e(r["year"])} · {_e(r["agency"])}</small></b>'
+                f'<span><small class="t">이번 서한: {_e(r["target"])}</small><em class="lv {r["level"]}">{_e(r["label"])}</em>{_e(r["text"])}'
+                f'<small class="u">grm-solutions.com/findings/doc/{_e(r["slug"])}/</small></span></div>' for r in s["rows"]) + "</div>")
         elif k == "g_sim":
             db = s["db"]
-            p.append('<div class="g-cs3">' + "".join(
+            if not db.get("site"):
+                p.append('<div class="g-cs3">' + "".join(
                 f'<div><b>{_e(c["alias"])}<small>{_e(c["year"])} · {_e(c["agency"])}<br>{_e(c["cfr"])}</small></b>'
                 f'<span><em class="lv {c["level"]}">{_e(c["label"])}</em>{_e(_case_facets(c))}'
                 f'<small class="u">grm-solutions.com/findings/doc/{_e(c["slug"])}/</small></span></div>'

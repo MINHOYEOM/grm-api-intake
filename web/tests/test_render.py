@@ -756,6 +756,33 @@ class WebLiveBriefsRenderSmokeTest(unittest.TestCase):
             {"id": "c1", "render_order": 1, "deterministic_detail": ko_detail},
         )["detail_omitted_ko"])
 
+    def test_whopir_outcome_row_is_rendered_deterministically_above_the_fold(self):
+        """[2026-11-03] WHOPIR 결론은 접힌 상세에만 있었다 — 첫 화면 사실표에 "결론" 행을 낸다.
+
+        재수집 없이 **과거 호도** 같은 JSON 으로 바로 반영된다(렌더 단 파생). 정형 어구가 아니면
+        행을 만들지 않는다(지어내지 않는다).
+        """
+        outcome = ("Site X was considered to be operating at an acceptable level of compliance "
+                   "with WHO GMP. This WHOPIR will remain valid for three years.")
+        base = {"id": "w1", "render_order": 1,
+                "facts": [{"label": "실사일", "value": "2026-06-01"},
+                          {"label": "문서번호", "value": "who-whopir-1"}]}
+
+        def rows(lang, detail):
+            tr = grm_i18n.Translator(lang) if lang != "ko" else render._KO
+            view = render._card_view({**base, "deterministic_detail": detail}, tr, lang)
+            return [(f["label"], f["value"]) for f in view["facts"]]
+
+        d = {"type": "whopir_report", "report_kind": "findings", "outcome": outcome, "sections": []}
+        ko = rows("ko", d)
+        self.assertEqual(ko[0][0], "실사일")
+        self.assertEqual(ko[1], ("결론", "수용 가능 · 3년 유효"))
+        en = rows("en", d)
+        self.assertEqual(en[1], ("Outcome", "Acceptable · Valid for 3 years"))
+        # 읽지 못하면 행이 없다 · 다른 유형엔 영향 없다.
+        self.assertEqual(len(rows("ko", {**d, "outcome": "Inspection was conducted."})), 2)
+        self.assertEqual(len(rows("ko", {"type": "hc_recall_detail"})), 2)
+
     def test_english_briefs_disclose_why_korean_names_remain(self):
         """★영문 브리프에 남는 한글은 **한국 규제기관 문서의 업체·기관 실명**뿐이다
         (동아제약(주)·화순전남대학병원). 옮기면 존재하지 않는 이름을 가리키게 되므로

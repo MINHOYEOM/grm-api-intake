@@ -25,6 +25,17 @@ name: GRM CI (compile + tests)
 #   앞선 런만 취소한다 — main 브랜치로 향하는 런(머지 커밋)은 `cancel-in-progress` 가
 #   `false` 로 고정돼 있어 취소되지 않는다(모든 머지가 자기 자신의 CI 결과를 남긴다).
 #   서로 다른 PR 브랜치끼리는 group 이 달라 애초에 서로를 취소하지 않는다.
+#
+# 2026-11-04: 상한 30분 → 45분. 11-03 오후 PR 런이 6,938건에 1,585~1,782초(26~30분)로
+#   30분 한도에 걸려 취소됐다(#1311 취소, #1314 는 로그 OK 직후 취소). 먼저 쟀다:
+#   · 동시 런 수와 무관 — 같은 날 아침 한산한 main 런도 6,929건 1,656s 였다.
+#   · 같은 테스트 수에서 러너마다 ±50% 흔들린다(6,380건: 865s ↔ 6,387건: 1,438s, 10월).
+#   · 스위트 자체는 완만히 자랐다(9월초 5,540건 747s → 11-03 6,938건 ~1,600s).
+#   · 시간의 약 82%(1,326s/1,615s)가 web/tests/test_render.py 의 사이트 전체 빌드
+#     (setUpClass 가 render_site 를 클래스마다 돈다 — 상위: WebRenderHardeningTest 233s).
+#   급증한 단일 테스트(10→23초 같은)는 없어서 코드 최적화로 풀 문제가 아니다 — 평균이
+#   이미 한도 근처라 러너가 느린 날 잘리는 것이다. 45분으로 여유를 두고, 근본 단축은
+#   render_site 결과 공유(클래스 간 빌드 재사용)를 따로 검토한다.
 on:
   push:
     branches: [main]
@@ -41,7 +52,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0

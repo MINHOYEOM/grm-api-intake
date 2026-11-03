@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T16:32:36Z",
+ "generated_at": "2026-11-03T21:59:58Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41667213901,
+    "databaseId": 41695353449,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T15:45:41Z",
-    "updatedAt": "2026-11-03T15:51:51Z",
+    "createdAt": "2026-11-03T18:36:00Z",
+    "updatedAt": "2026-11-03T18:43:23Z",
     "headBranch": "main",
-    "displayTitle": "feat(brief): 독자 행동 익명 카운터 — 링크·스크롤·카드 펼침 (101, SQL 미적용) (#1312)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41667213901"
+    "displayTitle": "feat(utm): 내보내는 모든 링크에 채널 표식 사전 적용 + 방문 도착 채널 정수 카운터(104) (#1317)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41695353449"
    },
    {
-    "databaseId": 41666296623,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-03T15:40:20Z",
-    "updatedAt": "2026-11-03T15:45:55Z",
-    "headBranch": "fix/card-facts-hc-whopir-mhra",
-    "displayTitle": "fix(card): 캐나다 회수 업체·발행일 · WHO 실사 결론 첫 화면 · MHRA 사유 입력 (사실 불일치 3·5b·4)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41666296623"
-   },
-   {
-    "databaseId": 41666290432,
+    "databaseId": 41686736970,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T15:40:18Z",
-    "updatedAt": "2026-11-03T15:46:15Z",
-    "headBranch": "fix/card-facts-hc-whopir-mhra",
-    "displayTitle": "fix(web): 브랜드·정정일 라벨을 i18n 라벨 목록에 등록 · MONO_LABELS 어휘 고정 유지",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41666290432"
+    "createdAt": "2026-11-03T17:41:54Z",
+    "updatedAt": "2026-11-03T17:47:50Z",
+    "headBranch": "main",
+    "displayTitle": "feat(web): 가입 화면 약관·처리방침을 모달로 열기 + 법적 페이지 글자 위계 조정 (#1311)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41686736970"
    },
    {
-    "databaseId": 41662202523,
+    "databaseId": 41686056768,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-03T15:16:42Z",
-    "updatedAt": "2026-11-03T15:21:59Z",
-    "headBranch": "feat/brief-reader-events",
-    "displayTitle": "feat(brief): 독자 행동 익명 카운터 — 링크·스크롤·카드 펼침 (101, SQL 미적용)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41662202523"
+    "createdAt": "2026-11-03T17:37:32Z",
+    "updatedAt": "2026-11-03T17:43:58Z",
+    "headBranch": "feat/utm-channel-dictionary-1104",
+    "displayTitle": "feat(utm): 내보내는 모든 링크 표식 통일 + 방문 도착 채널 카운터(104)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41686056768"
    },
    {
-    "databaseId": 41662191519,
+    "databaseId": 41685987580,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-03T15:16:38Z",
-    "updatedAt": "2026-11-03T15:22:07Z",
-    "headBranch": "feat/brief-reader-events",
-    "displayTitle": "test(brief): 골든 재동결 (main 병합 후)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41662191519"
+    "createdAt": "2026-11-03T17:37:05Z",
+    "updatedAt": "2026-11-03T17:43:24Z",
+    "headBranch": "feat/utm-channel-dictionary-1104",
+    "displayTitle": "feat(utm): 내보내는 모든 링크에 채널 표식 사전 적용 + 방문 도착 채널 정수 카운터(104)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41685987580"
+   },
+   {
+    "databaseId": 41682967976,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-03T17:18:33Z",
+    "updatedAt": "2026-11-03T17:25:17Z",
+    "headBranch": "feat/legal-modal",
+    "displayTitle": "feat(web): 가입 약관·처리방침 모달 + 법적 페이지 글자 위계",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41682967976"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -426,6 +426,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 41704093864,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-03T19:31:48Z",
+    "updatedAt": "2026-11-03T21:26:15Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41704093864"
+   },
+   {
     "databaseId": 41592941559,
     "status": "completed",
     "conclusion": "success",
@@ -468,20 +479,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41312185831"
-   },
-   {
-    "databaseId": 41280168689,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-01T06:16:37Z",
-    "updatedAt": "2026-11-01T09:25:44Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41280168689"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
+   {
+    "databaseId": 41700675594,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-03T19:09:51Z",
+    "updatedAt": "2026-11-03T19:11:23Z",
+    "headBranch": "main",
+    "displayTitle": "GRM WL Truncation Restore Plan",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41700675594"
+   },
    {
     "databaseId": 41148812528,
     "status": "completed",
@@ -495,6 +506,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 41706622917,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-03T19:48:02Z",
+    "updatedAt": "2026-11-03T19:48:16Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41706622917"
+   },
    {
     "databaseId": 41594947184,
     "status": "completed",
@@ -538,20 +560,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41357044367"
-   },
-   {
-    "databaseId": 41334820444,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-01T18:05:57Z",
-    "updatedAt": "2026-11-01T18:06:11Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41334820444"
    }
   ],
   "grm-cloud-request.yml": [
+   {
+    "databaseId": 41700491563,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-03T19:08:42Z",
+    "updatedAt": "2026-11-03T19:10:31Z",
+    "headBranch": "claude/request-2026-11-04-wl-restore",
+    "displayTitle": "request: wl-restore-plan",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41700491563"
+   },
    {
     "databaseId": 41372666537,
     "status": "completed",

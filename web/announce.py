@@ -43,6 +43,7 @@ DATA_DIR = WEB_DIR / "data" / "announcements"
 # 같은 디렉터리 — 발송 배관(BrevoSender·게이트·GateReport)·메일 톤 단일 파생원.
 import newsletter  # noqa: E402
 import render      # noqa: E402
+import utm         # noqa: E402
 
 SCHEMA_VERSION = "grm-announce/v1"
 
@@ -97,7 +98,7 @@ def find_for_weekly(data_dir: Path, publish_date: str) -> "dict[str, Any] | None
 
 # ── URL 조립 ──────────────────────────────────────────────────────────────────
 def announce_href(site_base_url: str, path: str) -> str:
-    """사이트 상대경로 → 절대 URL. 추적 파라미터 0(무변형·provenance 보존)."""
+    """사이트 상대경로 → 절대 URL(표식 없음 — 링크 실존 검사용). 메일 렌더가 `utm.channel_url` 로 표식을 붙인다."""
     return f"{site_base_url.rstrip('/')}{path}"
 
 
@@ -194,10 +195,11 @@ def render_weekly_block(ann: dict[str, Any], *, site_base_url: str) -> str:
         f'{e(ann.get("title") or "")}</div>',
     ]
     for it in (ann.get("items") or []):
-        href = announce_href(base, it["path"])
+        # 표식(utm 사전 `service_update_in_weekly`) — `&` 를 e() 로 바꾸면 gate_provenance 와 어긋나 이스케이프하지 않는다.
+        href = utm.channel_url(announce_href(base, it["path"]), "service_update_in_weekly")
         parts.append(
             '<div style="font-size:14px;line-height:1.6;color:#3D3D3A;margin:6px 0">'
-            f'<a href="{e(href)}" style="color:#A14B30;text-decoration:none;font-weight:600">'
+            f'<a href="{href}" style="color:#A14B30;text-decoration:none;font-weight:600">'
             f'{e(it["label"])}</a> — {e(it["text"])}</div>')
     parts.append("</div>")
     return "".join(parts)
@@ -278,20 +280,20 @@ def build_announcement(ann: dict[str, Any], *, site_base_url: str,
         parts.append(f'<p style="margin:0 0 24px;color:#141413">{e(lede)}</p>')
     parts.append(build_visual_html(ann.get("visual")))
     for it in (ann.get("items") or []):
-        href = announce_href(base, it["path"])
+        href = utm.channel_url(announce_href(base, it["path"]), "service_update_mail")
         parts.append(
             '<div style="border-top:1px solid #E6DFD8;padding:16px 0">'
             f'<div style="font-size:16px;font-weight:600;color:#141413;margin-bottom:5px">'
             f'{e(it["label"])}</div>'
             f'<div style="font-size:15px;line-height:1.65;color:#3D3D3A;margin-bottom:9px">'
             f'{e(it["text"])}</div>'
-            f'<a href="{e(href)}" style="color:#A14B30;text-decoration:none;font-size:14px;'
+            f'<a href="{href}" style="color:#A14B30;text-decoration:none;font-size:14px;'
             f'font-weight:600">바로 가기 →</a></div>')
     cta = ann.get("cta")
     if cta:
-        href = announce_href(base, cta["path"])
+        href = utm.channel_url(announce_href(base, cta["path"]), "service_update_mail")
         parts.append(
-            f'<div style="margin:26px 0 24px"><a href="{e(href)}" '
+            f'<div style="margin:26px 0 24px"><a href="{href}" '
             'style="display:inline-block;background:#C2603F;color:#FAF9F5;text-decoration:none;'
             'font-weight:600;font-size:15px;padding:13px 24px;border-radius:8px">'
             f'{e(cta["text"])} →</a></div>')

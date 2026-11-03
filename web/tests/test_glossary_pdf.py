@@ -38,7 +38,7 @@ class GlossaryPdfHtmlTest(unittest.TestCase):
     def test_one_online_link_per_term(self):
         self.assertEqual(self.html.count(glossary_pdf.ONLINE), len(self.terms))
         for t in self.terms:
-            self.assertIn(f'href="https://grm-solutions.com/glossary/{t["id"]}/"', self.html, t["id"])
+            self.assertIn(f'href="https://grm-solutions.com/glossary/{t["id"]}/?utm_source=glossary_pdf&amp;utm_medium=pdf&amp;utm_campaign=glossary_pdf"', self.html, t["id"])
 
     def test_values_are_verbatim(self):
         # 풀이·출처를 고쳐 쓰지 않는다 — 이스케이프만.
@@ -85,9 +85,10 @@ class GlossaryPdfHelpersTest(unittest.TestCase):
         self.assertEqual(glossary_pdf.promo_slots(0), {})
 
     def test_href_from_shown_address(self):
-        self.assertEqual(glossary_pdf._href("grm-solutions.com"), "https://grm-solutions.com/")
+        q = "?utm_source=glossary_pdf&utm_medium=pdf&utm_campaign=glossary_pdf"
+        self.assertEqual(glossary_pdf._href("grm-solutions.com"), "https://grm-solutions.com/" + q)
         self.assertEqual(glossary_pdf._href("grm-solutions.com/findings/trends"),
-                         "https://grm-solutions.com/findings/trends/")
+                         "https://grm-solutions.com/findings/trends/" + q)
 
     def test_qr_svg_is_inline_svg(self):
         svg = glossary_pdf.qr_svg("https://grm-solutions.com/")

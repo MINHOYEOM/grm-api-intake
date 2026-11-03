@@ -29,15 +29,14 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import linkedin_cards as lc  # noqa: E402
 import render  # noqa: E402
-from utm import with_utm  # noqa: E402
+from utm import channel_url  # noqa: E402
 
 # 배포되는 PDF 는 프리뷰 배포에서 만들어져도 운영 주소만 가리켜야 한다 — env 로 바뀌는
 # render.SITE_BASE_URL 대신 고정한다(표시 문자열도 전부 grm-solutions.com 이다).
 SITE = "https://grm-solutions.com"
 KST = timezone(timedelta(hours=9))
-UTM = ("glossary_pdf", "pdf", "glossary_pdf")
-QR_GLOSSARY = with_utm(SITE + "/glossary/", *UTM)
-QR_HOME = with_utm(SITE + "/", *UTM)
+QR_GLOSSARY = channel_url(SITE + "/glossary/", "glossary_pdf")
+QR_HOME = channel_url(SITE + "/", "glossary_pdf")
 ONLINE = "온라인에서 보기 →"
 
 # 본문 사이 GRM 안내 — (제목, 설명, 표시 주소). 네 칸을 초성 묶음 사이에 고르게 끼운다.
@@ -62,7 +61,7 @@ def _e(s: Any) -> str:
 def _href(shown: str) -> str:
     """표시 주소(grm-solutions.com/…) → 실제 링크(https://…/). 표시와 링크가 한 값에서 나온다."""
     path = shown[len("grm-solutions.com"):].strip("/")
-    return f"{SITE}/{path}/" if path else f"{SITE}/"
+    return channel_url(f"{SITE}/{path}/" if path else f"{SITE}/", "glossary_pdf")
 
 
 def qr_svg(url: str, dark: str = "#141413") -> str:
@@ -221,7 +220,7 @@ def entry(t: dict[str, Any]) -> str:
     online = f"실사 지적 사례 {n}건 · {ONLINE}" if n else ONLINE
     return (f'<article class="t" id="{_e(t["id"])}">{fig}<h4>{_e(t["term"])}{en}</h4>'
             f'<p class="easy">{_e(t["easy"])}</p>{detail}<p class="meta">{meta}</p>'
-            f'<a class="online" href="{SITE}/glossary/{_e(t["id"])}/">{_e(online)}</a></article>')
+            f'<a class="online" href="{_e(channel_url(f"{SITE}/glossary/{t['id']}/", "glossary_pdf"))}">{_e(online)}</a></article>')
 
 
 def promo(i: int) -> str:

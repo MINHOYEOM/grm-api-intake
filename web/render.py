@@ -151,7 +151,7 @@ LANG_OG_LOCALE: dict[str, str] = {"ko": "ko_KR", "en": "en_US"}
 
 # ── v4 디자인 계약에서 가져온 결정론 매핑 ──────────────────────────────────────
 # 사실표에서 mono(ASCII 데이터)로 표기하는 라벨(v4 dataLabels 동결). 한글에 mono 금지.
-MONO_LABELS = {"발행일", "문서번호", "실사일", "Class", "회수 등급", "정정일"}
+MONO_LABELS = {"발행일", "문서번호", "실사일", "Class", "회수 등급"}
 SIG_COLOR = {"High": "var(--hi)", "Med": "var(--med)", "Low": "var(--lo)"}
 SECTION_ICON = {"글로벌": "ti-world", "국내": "ti-map-pin", "Recall": "ti-alert-triangle"}
 # [D2 2026-09-11] "Intake raw" 는 card_scaffold §13 Evidence 판정의 내부 계약 토큰
@@ -3073,7 +3073,7 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     # facts[].label — 표 라벨
     N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
     N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
-    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"),
+    N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"), N_("브랜드"), N_("정정일"),
     # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다. Evidence A 원본 토큰
     # "Intake raw" 는 EVIDENCE_BASIS_LABELS 가 여기 도달하기 전에 방문자 문구로 바꾸므로
     # 그 문구를 등록한다(D2 2026-09-11) — 등록은 위 dict 정의에서도 이뤄지지만 이 표가

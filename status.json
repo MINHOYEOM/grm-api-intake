@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T01:11:26Z",
+ "generated_at": "2026-11-03T01:32:50Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -175,11 +175,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 41557675936,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-03T01:07:55Z",
-    "updatedAt": "2026-11-03T01:07:59Z",
+    "updatedAt": "2026-11-03T01:13:07Z",
     "headBranch": "automation/library-auto-41557260371",
     "displayTitle": "chore: refresh live regulatory library",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41557675936"

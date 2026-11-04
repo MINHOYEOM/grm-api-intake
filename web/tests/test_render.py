@@ -1137,9 +1137,27 @@ class WebRenderStructureTest(unittest.TestCase):
 
     def test_mono_only_for_data_labels(self):
         # 발행일/문서번호/실사일/Class 는 mono, 한글 라벨값(업체 등)은 mono 아님.
-        self.assertIn('<td class="k">발행일</td><td class="v"><span class="mono">2026-06-17</span></td>', self.detail)
-        self.assertIn('<td class="k">Class</td><td class="v"><span class="mono">Type III</span></td>', self.detail)
-        self.assertIn('<td class="k">업체</td><td class="v">경방신약(주)</td>', self.detail)
+        # [카드 정돈 2026-11-04] 사실표가 메타 한 줄(`발행일 <mono 날짜> · …`)이 된 카드와
+        # 아직 표로 그리는 카드(다건 등) 양쪽에서 같은 약속을 확인한다 — 값은 mono, 라벨 접두·
+        # 한글 값은 mono 가 아니다.
+        d = self.detail
+        self.assertTrue(
+            '<td class="k">발행일</td><td class="v"><span class="mono">2026-06-17</span></td>' in d
+            or '발행일 <span class="mono">2026-06-17</span>' in d)
+        self.assertTrue(
+            '<td class="k">Class</td><td class="v"><span class="mono">Type III</span></td>' in d
+            or '<span class="mono">Type III</span>' in d)
+        self.assertTrue(
+            '<td class="k">업체</td><td class="v">경방신약(주)</td>' in d
+            or '<span class="mono">경방신약(주)</span>' not in d)
+        self.assertNotIn('<span class="mono">경방신약(주)</span>', d)
+        self.assertNotIn('<span class="mono">발행일', d)               # 라벨 접두는 mono 아님
+        # 메타 줄 조각: 날짜는 mono, 한글 값(처분 문구 등)은 mono 아님.
+        meta = re.findall(r'<p class="facts-meta"[^>]*>(.*?)</p>', d)
+        self.assertTrue(meta, "정돈된 카드가 하나도 없다")
+        for line in meta:
+            for m in re.findall(r'<span class="mono">(.*?)</span>', line):
+                self.assertTrue(m.isascii(), f"한글 값이 mono: {m!r}")
 
     def test_dual_links_pdf_vs_page(self):
         # official_is_pdf 분기.
@@ -1323,21 +1341,22 @@ class WebRenderFidelityTest(unittest.TestCase):
 
     def test_fact_values_verbatim(self):
         for c in self.cards:
-            # [카드 정돈 2026-11-03] 483 단독 카드는 4칸 표 대신 메타 한 줄(발행일·실사일·시설유형·
-            # FEI)로 그린다 — 문서번호(해시)는 싣지 않고, 값은 " · " 조각 단위로 **그대로** 실린다
-            # (유형 토큰 "483" 은 유형 칩이 대신). 조각이 하나라도 변형·누락되면 실패한다.
-            tidy = bool(render._tidy_483(c, c["facts"], render._KO)[0])
+            # [카드 정돈 2026-11-03·11-04] 정돈 카드(사실표→메타 한 줄)는 내부 ID 문서번호만 싣지
+            # 않는다. 483 은 값이 " · " 조각 단위로(유형 토큰 "483" 은 유형 칩이 대신), 그 밖의
+            # 유형은 값 전체가 그대로 실려야 한다 — 변형·누락이 있으면 실패한다.
+            tidy = bool(render._tidy_card(c, c["facts"], render._KO)[0])
             for f in c["facts"]:
                 with self.subTest(card=c["id"], label=f["label"]):
                     if tidy:
-                        if f["label"] == "문서번호":
+                        if f["label"] == "문서번호" and render._INTERNAL_DOCNO_RE.match(f["value"]):
                             continue
-                        for piece in f["value"].split(" · "):
-                            if piece == "483":
-                                continue
-                            self.assertTrue(self._present(piece),
-                                            f"사실값 조각 누락/변형: {c['id']} {f['label']}={piece!r}")
-                        continue
+                        if c.get("type_tag") == "483":
+                            for piece in f["value"].split(" · "):
+                                if piece == "483":
+                                    continue
+                                self.assertTrue(self._present(piece),
+                                                f"사실값 조각 누락/변형: {c['id']} {f['label']}={piece!r}")
+                            continue
                     self.assertTrue(self._present(f["value"]),
                                     f"사실값 누락/변형: {c['id']} {f['label']}={f['value']!r}")
 

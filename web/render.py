@@ -277,6 +277,59 @@ def _card_anchor(card: dict[str, Any]) -> str:
     return cid if cid else f"c{card.get('render_order')}"
 
 
+# ── [백링크 패널 2026-11-04] 지식 그래프 역방향 간선 — 카드 id → 실린 호 ─────────────
+# 카드 id 는 문서 id(document_id)와 같은 형식이라 브리프 JSON 만으로 "이 문서가 실린
+# 호"를 빌드 때 역으로 셀 수 있다. 앵커는 `_card_anchor`(= 상세 article id)가 낳는 값이라
+# 호 페이지에 실제로 존재한다 — 같은 함수에서 파생하므로 별도 크롤 없이 보장되고,
+# 테스트가 빌드 산출물에서 한 번 더 대조한다. 공백·슬래시가 든 id(MHRA)는 URL 조각으로
+# 안전하지 않아 앵커를 버리고 호 링크만 낸다.
+_BACKLINK_SAFE_ANCHOR = re.compile(r"^[A-Za-z0-9_.:\-]+$")
+
+
+def build_card_issue_index(briefs: "list[dict[str, Any]]") -> "dict[str, list[dict[str, str]]]":
+    """카드 id → [{date, anchor}] (날짜 내림차순). 렌더되는 카드만 센다."""
+    out: dict[str, list[dict[str, str]]] = {}
+    for b in briefs:
+        pub = (b.get("brief") or {}).get("publish_date", "")
+        if not pub:
+            continue
+        for c in b.get("cards") or []:
+            cid = str(c.get("id") or "").strip()
+            if not cid or not _is_renderable(c):
+                continue
+            anchor = _card_anchor(c)
+            ent = {"date": pub,
+                   "anchor": anchor if _BACKLINK_SAFE_ANCHOR.match(anchor) else ""}
+            if all(e["date"] != pub for e in out.setdefault(cid, [])):
+                out[cid].append(ent)
+    for lst in out.values():
+        lst.sort(key=lambda e: e["date"], reverse=True)
+    return out
+
+
+def build_backlink_panel(kind: str, node_id: str, *, index: "dict[str, list[dict[str, str]]]",
+                         lang: str, issue_slugs: "set[str]", rel_root: str, tr) -> "dict[str, Any]":
+    """백링크 패널 뷰모델 — 칸 구조는 노드 유형(doc·firm·term)이 달라도 같다.
+
+    이번에는 kind="doc" 의 첫 칸(실린 브리프 호)만 채운다. 칸마다 chips 가 비면 `empty`
+    사유를 회색으로 보인다(숨기지 않는다). 링크는 **그 언어 트리에 실제로 있는 호**로만 건다.
+    """
+    cells: list[dict[str, Any]] = []
+    if kind == "doc":
+        hits = [e for e in index.get(node_id, []) if e["date"] in issue_slugs]
+        chips = [{"href": f"{rel_root}briefs/{e['date']}/" + (f"#{e['anchor']}" if e["anchor"] else ""),
+                  "label": tr("{date} 호", date=e["date"])} for e in hits]
+        if chips:
+            empty = ""
+        elif index.get(node_id):
+            empty = tr("한국어 브리프에만 실렸고 영문 호는 아직 없습니다.")
+        else:
+            empty = tr("아직 주간 브리프 카드로 다루지 않은 문서입니다.")
+        cells.append({"key": "briefs", "label": tr("이 문서가 실린 브리프 호"),
+                      "chips": chips, "empty": empty})
+    return {"title": tr("연결된 글 (백링크)"), "cells": cells}
+
+
 # ── [소스확장 2026-07-02] 상세보기 접힘 미리보기 태그(결정론 파생 — 사실 재작성 0) ──────
 def detail_is_korean(detail: "dict[str, Any] | None") -> bool:
     """이 결정론 상세가 **한국어 기록인가** — 값으로 판정한다.
@@ -5293,6 +5346,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 3단계는 조회 화면(런타임 RPC)만 영어로 냈다. 정적 문서 페이지는 그때 `findings_docs.json`
     # 에 원문이 없어 "영어 껍데기에 한국어 본문"이 될 수밖에 없었는데, 이제 `text_orig` 가
     # 들어와 그 조건이 풀렸다. **원문이 실제로 영어인 문서만** 낸다(doc_is_english).
+    card_issue_index = build_card_issue_index(briefs)
+    all_issue_slugs = {b["brief"].get("publish_date", "") for b in briefs} - {""}
     en_docs = [d for d in (docs_data or {}).get("documents", []) if doc_is_english(d)]
     en_doc_slugs = {d["slug"] for d in en_docs}
 
@@ -6367,6 +6422,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                     # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
                     firm_page_slug=_firm_slug_for(doc, _lg),
+                    backlinks=build_backlink_panel(
+                        "doc", doc.get("document_id", ""), index=card_issue_index,
+                        lang=_lg,
+                        issue_slugs=(all_issue_slugs if _lg == DEFAULT_LANG else en_brief_slugs),
+                        rel_root=_pp.rel_root, tr=_tr),
                 )
 
         # [B1] 업체 페이지. sitemap 은 **데이터에서** 파생하고(렌더 스위치와 무관),

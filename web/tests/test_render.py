@@ -12968,6 +12968,47 @@ def freeze() -> None:
     print(f"골든 동결 완료 → {GOLDEN_DIR}")
 
 
+# ── [백링크 패널 2026-11-04] 문서 페이지 → 실린 브리프 호 역색인 ──────────────────────
+class WebBacklinkPanelTest(unittest.TestCase):
+    """카드 id → 호 역색인과 패널 칸. 없는 페이지·없는 앵커로 보내지 않는다."""
+
+    @staticmethod
+    def _brief(pub, cards):
+        return {"brief": {"publish_date": pub}, "cards": cards}
+
+    def _card(self, cid, **kw):
+        return {"id": cid, "render_order": "0", "agency": "FDA", "card_type": "FDA 483 실사 관찰",
+                "headline_target": "X", "title_issue": "Y", "summary": "Z", **kw}
+
+    def test_index_and_panel(self):
+        briefs = [self._brief("2026-10-26", [self._card("fda483-1")]),
+                  self._brief("2026-11-02", [self._card("fda483-1"), self._card("Insp GMP 1/2")])]
+        idx = render.build_card_issue_index(briefs)
+        self.assertEqual([e["date"] for e in idx["fda483-1"]], ["2026-11-02", "2026-10-26"])
+        self.assertEqual(idx["Insp GMP 1/2"][0]["anchor"], "")      # 안전하지 않은 앵커는 호 링크만
+        tr = lambda k, **kw: k.format(**kw)
+        p = render.build_backlink_panel("doc", "fda483-1", index=idx, lang="ko",
+                                        issue_slugs={"2026-11-02", "2026-10-26"},
+                                        rel_root="../../../", tr=tr)
+        hrefs = [c["href"] for c in p["cells"][0]["chips"]]
+        self.assertEqual(hrefs[0], "../../../briefs/2026-11-02/#fda483-1")
+        # 영문 트리에 없는 호는 링크하지 않는다 → 회색 사유
+        p = render.build_backlink_panel("doc", "fda483-1", index=idx, lang="en",
+                                        issue_slugs=set(), rel_root="../../../en/", tr=tr)
+        self.assertEqual(p["cells"][0]["chips"], [])
+        self.assertTrue(p["cells"][0]["empty"])
+        p = render.build_backlink_panel("doc", "nope", index=idx, lang="ko",
+                                        issue_slugs={"2026-11-02"}, rel_root="", tr=tr)
+        self.assertEqual(p["cells"][0]["chips"], [])
+        self.assertNotEqual(p["cells"][0]["empty"], "")
+
+    def test_unrendered_card_not_counted(self):
+        idx = render.build_card_issue_index(
+            [self._brief("2026-11-02", [self._card("fda483-9", agency="")])])
+        # _is_renderable 가 거르는 카드는 앵커가 없으므로 역색인에도 없다
+        self.assertEqual("fda483-9" in idx, render._is_renderable(self._card("fda483-9", agency="")))
+
+
 # ── [상세보기 결정론 승격 2026-07-02 · spec §16] 결정론 상세 블록 렌더 스모크 ──────────
 class WebDeterministicDetailTest(unittest.TestCase):
     """gmp deterministic_detail 카드를 합성 브리프(06-08 봉투 재사용)에 주입해 실제

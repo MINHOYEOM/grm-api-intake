@@ -69,6 +69,18 @@
   .fd-rel{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-wrap:wrap;gap:8px}
   .fd-rel a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
   .fd-rel a:hover{border-color:var(--coral);color:var(--coral)}
+  /* [백링크 패널 2026-11-04] 맨 아래 접힘 1개 — 칸 구조는 업체·용어 페이지와 공유한다. */
+  .fd-bl{border-top:1px solid var(--line);padding-top:18px}
+  .fd-bl summary{cursor:pointer;font-family:var(--sans);font-size:14px;color:var(--muted);list-style:none}
+  .fd-bl summary::-webkit-details-marker{display:none}
+  .fd-bl summary::before{content:"+ ";font-family:var(--mono)}
+  .fd-bl[open] summary::before{content:"- "}
+  .fd-bl-cell{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .fd-bl-lab{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted)}
+  .fd-bl-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .fd-bl-chips a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
+  .fd-bl-chips a:hover{border-color:var(--coral);color:var(--coral)}
+  .fd-bl-none{font-family:var(--sans);font-size:13px;color:var(--muted);margin:0;word-break:keep-all}
 </style>
 <main>
   <div class="wrap">
@@ -208,6 +220,24 @@
       {%- for c in related_categories %}<a href="{{ rel_root }}findings/c/{{ c.slug }}/">{{ _("{cat} 지적사항", cat=c.label_ko) }}</a>{% endfor %}
       <a href="{{ rel_root }}findings/">{{ _("지적사항 검색으로") }}</a>
     </section>
+
+    {%- if backlinks and backlinks.cells %}
+    <details class="fd-bl">
+      <summary>{{ backlinks.title }}</summary>
+      {#- 칸은 유형(문서·업체·용어)이 달라도 같은 이름·같은 순서. 재료가 없는 칸은 숨기지
+          않고 이유와 함께 회색으로 보인다. 링크는 전부 실제로 있는 호 페이지로만 건다. -#}
+      {%- for cell in backlinks.cells %}
+      <div class="fd-bl-cell">
+        <span class="fd-bl-lab">{{ cell.label }}</span>
+        {%- if cell.chips %}
+        <div class="fd-bl-chips">{% for c in cell.chips %}<a href="{{ c.href }}">{{ c.label }}</a>{% endfor %}</div>
+        {%- else %}
+        <p class="fd-bl-none">{{ _('연결 없음') }} ({{ cell.empty }})</p>
+        {%- endif %}
+      </div>
+      {%- endfor %}
+    </details>
+    {%- endif %}
   </div>
 </main>
 {% endblock %}

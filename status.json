@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04T09:50:59Z",
+ "generated_at": "2026-11-04T17:58:38Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41755704522,
+    "databaseId": 41879555751,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-04T17:41:26Z",
+    "updatedAt": "2026-11-04T17:52:17Z",
+    "headBranch": "main",
+    "displayTitle": "kg: 신규 지적 일일 자동 연결(108)·연결 품질 감시·새 유형 체크리스트 (#1330)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41879555751"
+   },
+   {
+    "databaseId": 41874121143,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-04T01:40:52Z",
-    "updatedAt": "2026-11-04T01:46:30Z",
-    "headBranch": "kg/firm-alias",
-    "displayTitle": "kg: 업체 별칭 26그룹(105) — 프로필·실사 이력 합산, firm_key 불변",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41755704522"
+    "createdAt": "2026-11-04T17:05:37Z",
+    "updatedAt": "2026-11-04T17:11:23Z",
+    "headBranch": "kg/link-new-findings",
+    "displayTitle": "kg: 신규 지적 일일 자동 연결(108)·연결 품질 감시·새 유형 체크리스트",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41874121143"
    },
    {
-    "databaseId": 41755698758,
+    "databaseId": 41874115312,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-04T01:40:49Z",
-    "updatedAt": "2026-11-04T01:46:30Z",
-    "headBranch": "kg/firm-alias",
-    "displayTitle": "test: 업체 페이지 기대값을 정본 키 기준으로 (별칭 병합 반영)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41755698758"
+    "createdAt": "2026-11-04T17:05:35Z",
+    "updatedAt": "2026-11-04T17:11:56Z",
+    "headBranch": "kg/link-new-findings",
+    "displayTitle": "kg-link: workflow_dispatch days 입력(기본 7, 비정수는 7) — 최초 백필용",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41874115312"
    },
    {
-    "databaseId": 41753996155,
+    "databaseId": 41873715597,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-04T01:25:49Z",
-    "updatedAt": "2026-11-04T01:32:57Z",
+    "createdAt": "2026-11-04T17:03:19Z",
+    "updatedAt": "2026-11-04T17:09:29Z",
     "headBranch": "main",
-    "displayTitle": "feat(card): hook_line 한 줄 헤드라인 박스 (훅1) — 가산 필드·렌더 시 검증·폴백 숨김 (#1321)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41753996155"
+    "displayTitle": "feat(findings): 유사 사례 표시 정제 — 하한·확실도·변형 묶기·흔한 문구·같은 업체 라벨 (#1331)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41873715597"
    },
    {
-    "databaseId": 41753984324,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-04T01:25:43Z",
-    "updatedAt": "2026-11-04T01:27:18Z",
-    "headBranch": "main",
-    "displayTitle": "docs(privacy): 자체 익명 집계 카운터 한 줄 추가(ko/en) (#1319)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41753984324"
-   },
-   {
-    "databaseId": 41744078153,
+    "databaseId": 41871051662,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-04T00:04:43Z",
-    "updatedAt": "2026-11-04T00:10:47Z",
+    "createdAt": "2026-11-04T16:47:43Z",
+    "updatedAt": "2026-11-04T16:53:34Z",
     "headBranch": "main",
-    "displayTitle": "chore: refresh findings facet pages (#1323)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41744078153"
+    "displayTitle": "kg: 조항 정규화 finding_clause(106)·지적↔용어 finding_term(107) (#1329)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41871051662"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -380,6 +380,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 41832219219,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-04T12:46:48Z",
+    "updatedAt": "2026-11-04T12:47:12Z",
+    "headBranch": "main",
+    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-04 - 2건 (#1318)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41832219219"
+   },
+   {
     "databaseId": 41555324787,
     "status": "completed",
     "conclusion": "success",
@@ -422,17 +433,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1248 from MINHOYEOM/chore/findings-translate-2026…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41150551488"
-   },
-   {
-    "databaseId": 40980403524,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-10-30T00:33:13Z",
-    "updatedAt": "2026-10-30T00:35:25Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1245 from MINHOYEOM/chore/findings-translate-2026…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40980403524"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

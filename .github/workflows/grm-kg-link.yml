@@ -19,6 +19,11 @@ on:
         options:
           - "true"
           - "false"
+      days:
+        description: "연결할 창(일). 기본 7 — finding_term 최초 백필처럼 과거분을 채울 때만 키운다(예: 5000). schedule 은 항상 7."
+        required: false
+        default: "7"
+        type: string
 
 permissions:
   contents: read
@@ -53,7 +58,9 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          ARGS="--days 7"
+          DAYS="${{ inputs.days }}"
+          case "$DAYS" in ''|*[!0-9]*) DAYS=7 ;; esac   # schedule(빈 값)·비정수는 7
+          ARGS="--days $DAYS"
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi

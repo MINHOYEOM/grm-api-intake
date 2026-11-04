@@ -190,6 +190,13 @@ class WorkflowAndDocs(unittest.TestCase):
         self.assertNotRegex(_WF, r"git (push|commit)")
         self.assertNotIn("continue-on-error", _WF)
 
+    def test_dispatch_days_input_defaults_to_7_and_is_sanitized(self):
+        self.assertRegex(_WF, r'days:\s*\n\s*description:.*\n\s*required: false\n\s*default: "7"')
+        self.assertIn('DAYS="${{ inputs.days }}"', _WF)
+        self.assertIn("*[!0-9]*) DAYS=7", _WF)       # schedule/비정수 -> 7
+        self.assertIn('ARGS="--days $DAYS"', _WF)
+        self.assertIn('default: "true"', _WF)         # dry_run 기본 true 유지
+
     def test_checklist_covers_required_keys(self):
         doc = (_ROOT / "docs" / "kg_new_source_checklist.md").read_text(encoding="utf-8")
         for key in ("firm_key", "fei", "country_key", "category_code", "cfr_refs", "mfds_refs",

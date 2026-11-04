@@ -591,6 +591,7 @@ grm-api-intake/
 │  ├─ utm.py                     # [성장 2026-09-23] UTM 부착 헬퍼 + 채널 사전 `CHANNELS`(링크드인·주간/영문/서비스 안내 메일 본문·전달·용어집 PDF·구독 확인 메일 — 내보내는 모든 링크의 단일 정본, 2026-11-04). RUM(Cloudflare)은 쿼리를 안 읽으므로 소비자는 base.html 의 first-touch 계측(087 가입 시·104 도착 시 정수 카운트)뿐
 │  ├─ wl_anatomy.py              # [WL 해부 2026-10-31] 경고서한 국문 지적을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈다(FDA 문장 무변형·이으면 원문·확신 없으면 None). 문서 페이지(findings_doc.html)와 브리프 카드 문서 링크 문구가 쓴다
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
+│  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본

@@ -119,6 +119,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
+import graph_export  # noqa: E402
 # [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
 # 걸러도, 게이트 이전에 발행된 브리프 JSON(`web/data/briefs/*.json`)은 여전히 파일에
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
@@ -6470,6 +6471,31 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
                          measured_on=docs_data.get("measured_on", ""),
                          min_findings=docs_data.get("min_findings"))
+
+        # [지식 그래프 내보내기 2026-11-04] `graph/` 공개 정적 파일(노드·엣지 jsonl + manifest).
+        # 문서 페이지와 같은 입력(역색인·용어 선정·업체 정본 키)을 재사용한다. 테스트 속도
+        # 스위치(render_doc_pages=False)에서는 문서 입력이 없는 것과 같아 만들지 않는다.
+        if render_doc_pages:
+            _g_index = term_link_index_by_lang.get(DEFAULT_LANG, [])
+            _g_freq = term_doc_freq_by_lang.get(DEFAULT_LANG, {})
+            _g_rows = graph_export.build_graph(
+                documents=documents,
+                brief_slugs=all_issue_slugs, en_brief_slugs=en_brief_slugs,
+                card_issue_index=card_issue_index, en_doc_slugs=en_doc_slugs,
+                glossary_terms=glossary_terms or [], term_ids_with_pages=glossary_term_ids,
+                doc_term_ids=lambda d: [tid for _s, tid in (
+                    select_doc_term_links(d, _g_index, _g_freq, lang=DEFAULT_LANG)
+                    if _g_index else [])],
+                firm_page_slug_by_key=firm_page_slug_by_key,
+                canonical_firm_key=_canonical_firm_key,
+                cfr_section_of=_cfr_section_of,
+                clause_slugs=clause_slugs, clause_slug_of=clause_slug)
+            _g_errs = graph_export.validate_graph(_g_rows)
+            if _g_errs:
+                raise RuntimeError("graph/ 가드 위반 %d건: %s" % (len(_g_errs), _g_errs[:5]))
+            _g_built = max([docs_data.get("measured_on") or ""] + sorted(all_issue_slugs)[-1:])
+            written.extend(graph_export.write_graph(
+                out_dir, graph_export.graph_files(_g_rows, built_at=_g_built)))
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

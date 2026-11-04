@@ -118,6 +118,7 @@ DIST_DIR = WEB_DIR / "dist"
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
+from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 # [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
 # 걸러도, 게이트 이전에 발행된 브리프 JSON(`web/data/briefs/*.json`)은 여전히 파일에
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
@@ -5990,7 +5991,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         #   ③ 모음 페이지의 사례 → 그 문서 페이지(build_facet_item_view 가 doc_slug 를 채움)
         by_firm: dict[str, list[dict[str, Any]]] = {}
         for d in documents:
-            key = d.get("firm_key") or ""
+            # 표기 변종 별칭은 정본 키 한 곳으로 모은다(grm_findings.FIRM_KEY_ALIASES).
+            key = _canonical_firm_key(d.get("firm_key") or "")
             if key:
                 by_firm.setdefault(key, []).append(d)
 
@@ -6041,7 +6043,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             영어 문서가 2건 미만인 업체는 영어판 페이지가 없다 — 없는 페이지로 보내는
             링크는 무링크보다 나쁘다.
             """
-            slug = firm_page_slug_by_key.get(doc.get("firm_key") or "")
+            slug = firm_page_slug_by_key.get(_canonical_firm_key(doc.get("firm_key") or ""))
             if not slug:
                 return None
             return slug if (lg == DEFAULT_LANG or slug in en_firm_slugs) else None

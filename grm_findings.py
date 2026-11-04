@@ -1415,6 +1415,45 @@ def normalize_firm_name_v2(name: str) -> str:
     return _FIRM_TRAIL_RE.sub("", text)
 
 
+# 같은 회사의 표기 변종 26그룹(별칭 -> 정본 firm_key). firm_key 자체는 바꾸지 않는다 —
+# 업체 URL·firm_watchlist 가 그대로 유효하고, 합쳐 보이는 일은 조회 쪽이 맡는다:
+# DB 는 web/migrations/105_firm_alias_groups.sql 의 firm_alias 시드, 정적 업체 페이지는
+# 이 사전(web/render.py). 두 시드는 tests/test_firm_alias_groups.py 가 일치를 고정한다.
+FIRM_KEY_ALIASES: dict[str, str] = {
+    "agc biologics spa": "agc biologics",
+    "akorn ag": "akorn",
+    "the american national red cross": "american national red cross",
+    "aurobindo pharma (unit vii)": "aurobindo pharma",
+    "bausch and lomb incorporated": "bausch & lomb",
+    "biocon sdn bhd": "biocon",
+    "central admixture pharmacy services (caps)": "central admixture pharmacy services",
+    "college pharmacy incorporated": "college pharmacy",
+    "divi's laboratories (unit ii)": "divi's laboratories",
+    "downing labs (formerly nuvision pharmacy )": "downing labs",
+    "fresenius kabi ag": "fresenius kabi",
+    "hartley medical center pharmacy incorporated": "hartley medical center pharmacy",
+    "imprimis njof -": "imprimis njof",
+    "infusion partners (subsidiary of bioscrip)": "infusion partners",
+    "jd and sn": "jd & sn",
+    "johnson and johnson (mcneil)": "johnson & johnson",
+    "logistic support unit (now operating under del 3-002794-a)": "logistic support unit",
+    "medi-fare drug and home health center": "medi-fare drug & home health center",
+    "natco pharma (canada)": "natco pharma",
+    "peanut of america (pca)": "peanut of america",
+    "pharmacia and upjohn": "pharmacia & upjohn",
+    "region care (northwell health)": "region care",
+    "sanofi spa": "sanofi",
+    "south coast specialty compounding (park pharmacy and compounding)": "south coast specialty compounding",
+    "sun pharmaceutical medicare (spml)": "sun pharmaceutical medicare",
+    "the wellness pharmacy": "wellness pharmacy",
+}
+
+
+def canonical_firm_key(firm_key: str) -> str:
+    """별칭이면 정본 firm_key, 아니면 입력 그대로."""
+    return FIRM_KEY_ALIASES.get(firm_key, firm_key)
+
+
 # ----------------------------------------------------------------------------
 # 국가 정규화(country_key) — web/migrations/055_findings_country_key.sql 의
 # public.grm_normalize_country 가 이 사전/함수의 SQL 복제본이다(순서는 무관하되 키

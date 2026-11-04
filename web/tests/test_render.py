@@ -21251,6 +21251,89 @@ class WebSitePopupTest(unittest.TestCase):
             self.assertNotIn(banned, self.js)
 
 
+class HookLineTest(unittest.TestCase):
+    """[카드 훅1 2026-11-03] `hook_line` — 가산 필드·검증 실패 시 박스 숨김(폴백)·영문 격리.
+
+    샘플은 편집팀 규칙 문서의 483 10건(10-26호 실카드)이다. 렌더 시 검사: 40자 상한·금칙어·
+    숫자 토큰이 `deterministic_detail`/`facts` 에 글자 그대로 있어야 한다."""
+
+    SAMPLES = {
+        "fda483-195318": "공정용 백 누출이 반복돼 2025년 결함률이 0.45~5.88%",
+        "fda483-195269": "불만 경향분석 절차가 없고 경고한계 이탈 평가도 기록에 없음",
+        "fda483-195262": "배양 기간이 끝나기 전에 무균시험 검체를 판독하고 결과를 기록",
+        "fda483-195317": "시험 무효율이 53%인 시험법에도 조사가 이뤄지지 않음",
+        "fda483-195314": "배치기록을 작업자가 아닌 감독자가 작업 종료 후 작성",
+        "fda483-195348": "모든 결함 범주에서 육안검사 결함률이 조치기준 초과인 로트 출하",
+        "fda483-195673": "엔도톡신 규격이탈·경향이탈 결과 14건 반복, 원인 규명 못 함",
+        "fda483-195289": "일탈이 반복됐으나 재발 방지용 경향 분석을 항상 하지는 않음",
+        "fda483-195282": "시험 후 원자료와 워크시트를 폐기했다고 공장장이 진술",
+        "fda483-195301": "사용한 설비 팰릿이 약 1.5~2년간 아목시실린 보관실에 있었다고 진술",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        d = json.loads((WEB_DIR / "data/briefs/brief_web_2026_10_26.json").read_text(encoding="utf-8"))
+        cls.cards = {c["id"]: c for c in d["cards"]}
+
+    def _view(self, cid, hook=None, lang="ko", en_hook=None):
+        card = dict(self.cards[cid])
+        if hook is not None:
+            card["hook_line"] = hook
+        if en_hook is not None:
+            card["en"] = {**card.get("en", {}), "hook_line": en_hook}
+        tr = grm_i18n.Translator(lang) if lang != "ko" else render._KO
+        return render._card_view(card, tr, lang)
+
+    def test_editorial_samples_all_pass(self):
+        for cid, text in self.SAMPLES.items():
+            with self.subTest(card=cid):
+                self.assertLessEqual(len(text), 40)
+                self.assertEqual(self._view(cid, text)["hook_line"], text)
+
+    def test_absent_field_is_todays_markup(self):
+        cid = "fda483-195317"
+        env = render._make_env()
+        html = env.get_template("partials/card.html").render(card=self._view(cid))
+        self.assertNotIn("hook-line", html)
+        self.assertEqual(self._view(cid)["hook_line"], "")
+
+    def test_renders_box_above_summary(self):
+        cid = "fda483-195317"
+        env = render._make_env()
+        html = env.get_template("partials/card.html").render(card=self._view(cid, self.SAMPLES[cid]))
+        self.assertIn(self.SAMPLES[cid], html)
+        self.assertLess(html.index('class="hook-line"'), html.index('class="summary"'))
+
+    def test_failed_checks_hide_the_box(self):
+        cid = "fda483-195317"
+        for bad in (
+            "시험 무효율이 54%인 시험법에도 조사가 이뤄지지 않음",     # 원문에 없는 숫자
+            "시험 무효율이 53%인 시험법에도 조사가 되지 않은 것은 가능성을 시사",  # 금칙어
+            "시험 무효율이 53%인 시험법에도 조사가 이뤄지지 않았다는 사실이 확인됨을 알림 가나다라마바사",  # 40자 초과
+            "무려 53%!",                                                  # 느낌표
+            "",
+            "   ",
+        ):
+            with self.subTest(text=bad):
+                self.assertEqual(self._view(cid, bad)["hook_line"], "")
+        self.assertEqual(self._view(cid, 53)["hook_line"], "")           # 문자열 아님
+
+    def test_number_must_be_whole_token(self):
+        # "5" 는 "53%" 안에 들어 있어도 같은 숫자가 아니다.
+        card = {"hook_line": "무효율 5%인 시험법", "deterministic_detail": {"x": "무효 시험률 53%"}}
+        self.assertEqual(render._valid_hook_line(card, "ko"), "")
+        card["hook_line"] = "무효율 53%인 시험법"
+        self.assertEqual(render._valid_hook_line(card, "ko"), "무효율 53%인 시험법")
+
+    def test_english_shows_only_en_hook(self):
+        cid = "fda483-195317"
+        self.assertEqual(self._view(cid, self.SAMPLES[cid], "en")["hook_line"], "")   # ko 만 있음 → 숨김
+        en = "Test invalidation rate of 53% was not investigated"
+        self.assertEqual(self._view(cid, self.SAMPLES[cid], "en", en_hook=en)["hook_line"], en)
+        self.assertEqual(self._view(cid, None, "en", en_hook="무효율 53%")["hook_line"], "")  # 한글 노출 금지
+        self.assertEqual(self._view(cid, None, "en", en_hook="Rate of 61% was not investigated")["hook_line"], "")
+
+
 if __name__ == "__main__":
     if "--freeze" in sys.argv:
         freeze()

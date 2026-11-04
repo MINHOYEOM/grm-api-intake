@@ -3648,7 +3648,7 @@ class WebFindingsRenderTest(unittest.TestCase):
         state_fn = js_src[js_src.index("function renderSimilarToState(block, items) {"):]
         state_fn = state_fn[:state_fn.index("\n  }\n") + 4]
         self.assertIn('"불러오는 중…"', state_fn)
-        self.assertIn('"유사 사례를 찾지 못했습니다"', state_fn)
+        self.assertIn('"유사한 사례를 찾지 못했습니다"', state_fn)
 
         # 오류 렌더러는 사실을 단언하지 않고(0건 문구 금지) 재시도 수단을 준다.
         err_fn = js_src[js_src.index("function renderSimilarToError(block, onRetry) {"):]

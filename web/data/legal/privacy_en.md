@@ -13,6 +13,7 @@ Required and optional items are listed separately.
 - Inquiries and suggestions (optional): the message, the page path you were viewing, browser information (User-Agent) and screen size. If you want a reply, we receive your email address and store it only if you agree.
 - Newsletter (optional): email address, how you subscribed, time of consent, and version of the consent wording. The purpose is to send the weekly brief and announcements of new features.
 - Visit statistics: Cloudflare Web Analytics counts pages, referrers, countries and device types. It sets no cookies and stores no information that identifies an individual; Cloudflare may process IP addresses and similar data temporarily while it produces the statistics.
+- Our own anonymous counts: we count, only as daily totals, which kind of visit a subscription prompt started from (a source marker kept in your browser for 7 days), clicks, scrolls and card expansions inside the brief, and the channel a visit arrived from (UTM and referrer host). We do not store email addresses, IP addresses, identifiers or URLs for this.
 
 ## Browser storage
 

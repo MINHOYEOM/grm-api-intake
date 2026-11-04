@@ -517,6 +517,67 @@ def _fact_value_for_lang(label: str, value: str, lang: str,
     return value, bool(_HANGUL_RE.search(value))
 
 
+# [카드 훅1 2026-11-03 · 편집팀 규칙 R2·R4·R5·R11] `hook_line` — 제목 아래 핵심 한 줄.
+# 필드는 **가산**이고, 아래 검사에 하나라도 걸리면 박스를 숨긴다(고치지 않고 감춘다 —
+# 억지 문장보다 빈 칸이 낫다는 R11). 영문판은 `en.hook_line` 이 있을 때만 싣는다
+# (한국어 문장을 영어 화면에 노출하지 않는다).
+HOOK_LINE_MAX_CHARS = {"ko": 40, "en": 90}
+_HOOK_BANNED = {
+    "ko": ("신호", "볼 만", "볼만", "필요가", "가능성", "시사", "우려", "!", "?", "！", "？"),
+    "en": ("signal", "worth ", "may indicate", "suggests", "possib", "concern", "!", "?"),
+}
+_HOOK_NUM_RE = re.compile(r"\d+(?:[.,]\d+)*")
+
+
+def _hook_haystack(card: dict[str, Any]) -> str:
+    """헤드라인 숫자 대조 대상 — `deterministic_detail` 의 모든 문자열 + `facts` 값."""
+    out: list[str] = []
+
+    def walk(x: Any) -> None:
+        if isinstance(x, str):
+            out.append(x)
+        elif isinstance(x, dict):
+            for v in x.values():
+                walk(v)
+        elif isinstance(x, (list, tuple)):
+            for v in x:
+                walk(v)
+        elif isinstance(x, (int, float)) and not isinstance(x, bool):
+            out.append(str(x))
+
+    walk(card.get("deterministic_detail"))
+    for f in card.get("facts") or []:
+        walk(f.get("value"))
+    return "\n".join(out)
+
+
+def _valid_hook_line(card: dict[str, Any], lang: str) -> str:
+    """검사를 통과한 헤드라인, 아니면 "" (박스 숨김).
+
+    ① 문자열이고 비어 있지 않다 ② 글자 수 상한(한국어 40) ③ 금칙어·느낌표·물음표 없음
+    ④ 숫자 토큰이 모두 같은 카드의 `deterministic_detail`·`facts` 에 그대로 있다(R2 —
+    세거나 반올림한 숫자는 걸러진다). 영문판은 `en.hook_line` 만 본다.
+    """
+    is_ko = lang == DEFAULT_LANG
+    raw = card.get("hook_line") if is_ko else (card.get("en") or {}).get("hook_line")
+    if not isinstance(raw, str):
+        return ""
+    text = " ".join(raw.split())
+    key = "ko" if is_ko else "en"
+    if not text or len(text) > HOOK_LINE_MAX_CHARS[key]:
+        return ""
+    low = text.lower()
+    if any(b in low for b in _HOOK_BANNED[key]):
+        return ""
+    if not is_ko and _HANGUL_RE.search(text):
+        return ""
+    hay = _hook_haystack(card)
+    for tok in _HOOK_NUM_RE.findall(text):
+        if not re.search(r"(?<![\d.,])" + re.escape(tok) + r"(?![\d])", hay):
+            return ""
+    return text
+
+
 _TIDY_483_LABELS = ("발행일", "제조소/업체", "시설 · 유형", "실사일")
 # 핵심 사실 항목 머리말 중 사실표(메타 줄)와 같은 정보를 되풀이하는 것 — 값 표기가 달라도
 # (표 04/08/2026 · 항목 2026-04-08) 같은 사실이다. 데이터(편집 산출물) 어휘라 tr() 대상 아님.
@@ -570,6 +631,7 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
                anatomy_slugs: "set[str] | None" = None) -> dict[str, Any]:
     # [다국어 5단계] 서사 다섯은 언어에 따라 **다른 출력**을 쓴다(번역이 아니라 같은
     # 요약의 다른 언어판 — 설계 문서 §4). 영어 슬롯이 없으면 한국어 그대로다.
+    hook_line = _valid_hook_line(card, lang)
     card = _card_with_english_narrative(card, lang)
     quotes_in = card.get("quotes") or []
     multi = len(quotes_in) > 1
@@ -708,6 +770,9 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "modality": tr(card["modality"]) if card.get("modality") else card.get("modality"),
         "type_tag": tr(card["type_tag"]) if card.get("type_tag") else card.get("type_tag"),
         "summary": card.get("summary", ""),
+        # [카드 훅1 2026-11-03] 검증을 통과한 한 줄 헤드라인 — 없거나 검사에 걸리면 빈 문자열
+        # (card.html 이 박스를 아예 그리지 않아 오늘과 같은 모양).
+        "hook_line": hook_line,
         "facts": facts,
         # 영어 트리에서 한국어 원문 그대로 남은 사실값 개수(고유명사 라벨 제외) —
         # card.html 이 0이면 고지를 생략하고, 그 외엔 "이 표의 {n}개 값은 한국어

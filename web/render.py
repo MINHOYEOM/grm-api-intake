@@ -580,10 +580,18 @@ def _valid_hook_line(card: dict[str, Any], lang: str) -> str:
 
 
 _TIDY_483_LABELS = ("발행일", "제조소/업체", "시설 · 유형", "실사일")
-# 핵심 사실 항목 머리말 중 사실표(메타 줄)와 같은 정보를 되풀이하는 것 — 값 표기가 달라도
-# (표 04/08/2026 · 항목 2026-04-08) 같은 사실이다. 데이터(편집 산출물) 어휘라 tr() 대상 아님.
-_TIDY_483_DUP_HEADS = frozenset({"실사일", "시설 유형", "시설 · 유형", "제조소/업체",
-                                 "Inspection date", "Facility type", "Facility / manufacturer"})
+
+
+_TIDY_DATE_RE = re.compile(r"(\d{2})/(\d{2})/(\d{4})")
+
+
+def _norm_tidy_value(v: str) -> str:
+    """사실표 값 ↔ 핵심 사실 값 비교용 정규화 — 날짜 mm/dd/yyyy→yyyy-mm-dd, 꼬리 "· 483"·", 483"·
+    "(FEI n)" 제거, 공백 접기. 이 밖의 글자는 한 자도 건드리지 않는다(덧붙은 말이 있으면 다른 값)."""
+    t = _TIDY_DATE_RE.sub(lambda m: f"{m.group(3)}-{m.group(1)}-{m.group(2)}", str(v))
+    t = re.sub(r"\s*\(FEI \d+\)", "", t)
+    t = re.sub(r"\s*[·,]\s*483\s*$", "", t)
+    return " ".join(t.split())
 
 
 def _tidy_483(card: dict[str, Any], facts: list[dict[str, Any]],
@@ -608,21 +616,86 @@ def _tidy_483(card: dict[str, Any], facts: list[dict[str, Any]],
     fac = by_label.get(tr("시설 · 유형"), "")
     if fac.endswith(" · 483"):
         fac = fac[: -len(" · 483")]
-    parts = [f"{tr('발행일')} {by_label.get(tr('발행일'), '')}",
-             f"{tr('실사일')} {by_label.get(tr('실사일'), '')}", fac, fei]
+    # 제목의 업체명이 사실표의 업체명과 글자 단위로 다르면(", Inc." 같은 꼬리가 잘린 제목) 표 쪽
+    # 이름을 메타 줄에 남긴다 — 표를 없애면서 이름 표기 하나가 사라지지 않게.
+    name = firm.split(" · ", 1)[0].strip()
+    lead = [name] if name and name != (card.get("headline_target") or "").strip() else []
+    parts = lead + [f"{tr('발행일')} {by_label.get(tr('발행일'), '')}",
+                    f"{tr('실사일')} {by_label.get(tr('실사일'), '')}", fac, fei]
     meta = " · ".join(p for p in parts if p and p.strip())
     shown_values = set()
     for v in by_label.values():
-        shown_values.add(v.strip())
-        shown_values.update(x.strip() for x in v.split(" · "))
+        for x in [v] + v.split(" · "):
+            shown_values.add(_norm_tidy_value(x))
+    shown_values.add(_norm_tidy_value(card.get("headline_target") or ""))
     kf = []
     for k in raw_kf:
         head, sep, val = str(k).partition(":")
-        if sep and val.strip() and (head.strip() in _TIDY_483_DUP_HEADS
-                                    or val.strip() in shown_values):
+        # 값이 표와 **같을 때만** 뺀다(표기 차이 — 날짜 순서·꼬리 "· 483"·"(FEI n)" — 는 같은 값으로 본다).
+        # 값에 덧붙은 말("— 이번에 공개된 과거 실사기록", "(API Manufacture)")이 있으면 남긴다.
+        if sep and val.strip() and _norm_tidy_value(val) in shown_values:
             continue
         kf.append(k)
     return meta, kf
+
+
+# [카드 정돈 2026-11-04 · PR3] 483 외 유형 — 같은 원칙(정보 삭제 없이 중복만 합침).
+# 사실표 값은 메타 한 줄에 **그대로** 남는다. 빠지는 것은 ① 내부 ID 문서번호(해시·접두+ID)
+# ② 제목(headline_target)과 같은 값(제목에 이미 있다) ③ 핵심 사실에서 표 값을 되풀이하는 항목뿐.
+# 공식 식별자(FDA 회수번호 D-0876-2026·MHRA Insp GMP …·EU 부적합 번호·MFDS 지침 번호 등)는
+# 사실이므로 "문서번호 …" 로 메타 줄에 남긴다.
+_INTERNAL_DOCNO_RE = re.compile(
+    r"^(?:fda483-\d+|[0-9a-f]{12}|recall-[0-9a-f]+|admin-\d+|gmpinspect-\S+"
+    r"|who-whopir-[0-9a-f]+|data\d+-\d+)$")
+# 값만으로 뜻이 서는 라벨(값 앞에 라벨을 붙이지 않는다).
+_TIDY_PLAIN_LABELS = frozenset({"업체", "제조소", "제조소/업체", "업체/제조소", "Class", "시설 · 유형"})
+_DATE_VALUE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _tidy_generic(card: dict[str, Any], facts: list[dict[str, Any]],
+                  tr: Translator) -> "tuple[str, list[str]]":
+    raw_kf = card.get("key_facts") or []
+    raw_facts = card.get("facts") or []
+    if ((card.get("merged_count") or 1) > 1 or len(raw_facts) < 2
+            or not {f.get("label") for f in raw_facts} & {"발행일", "실사일"}):
+        return "", raw_kf
+    # 뷰는 데이터에 없는 행을 끼워 넣을 수 있다(WHOPIR "결론" 행) — 원본 라벨은 번역 라벨로 되짚는다.
+    raw_by_view = {tr(f.get("label", "")): f.get("label", "") for f in raw_facts if f.get("label")}
+    target = (card.get("headline_target") or "").strip()
+    parts: list[str] = []
+    for view in facts:
+        label, value = raw_by_view.get(view["label"], ""), view["value"]
+        if not str(value).strip():
+            continue
+        if label == "문서번호" and _INTERNAL_DOCNO_RE.match(str(value)):
+            continue
+        if str(value).strip() == target:
+            continue
+        parts.append(str(value) if label in _TIDY_PLAIN_LABELS else f"{view['label']} {value}")
+    if not parts:
+        return "", raw_kf
+    shown = set()
+    for f in facts:
+        v = str(f["value"]).strip()
+        shown.add(v)
+        shown.update(x.strip() for x in v.split(" · "))
+    shown.add(target)
+    kf = []
+    for k in raw_kf:
+        head, sep, val = str(k).partition(":")
+        v = val.strip()
+        if sep and v and v in shown and not _DATE_VALUE_RE.match(v):
+            continue
+        kf.append(k)
+    return " · ".join(parts), kf
+
+
+def _tidy_card(card: dict[str, Any], facts: list[dict[str, Any]],
+               tr: Translator) -> "tuple[str, list[str]]":
+    """사실표 → 메타 한 줄 정돈의 단일 입구. 483 은 PR1 규칙, 그 밖의 유형은 `_tidy_generic`."""
+    if card.get("type_tag") == "483":
+        return _tidy_483(card, facts, tr)
+    return _tidy_generic(card, facts, tr)
 
 
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
@@ -747,7 +820,7 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
             facts.insert(min(1, len(facts)),
                          {"label": tr("결론"), "value": " · ".join(_bits), "mono": False})
 
-    tidy_meta, key_facts = _tidy_483(card, facts, tr)
+    tidy_meta, key_facts = _tidy_card(card, facts, tr)
 
     return {
         "render_order": card.get("render_order"),
@@ -798,7 +871,7 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "quotes": quotes,
         "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
         "key_facts": key_facts,
-        # [카드 정돈 2026-11-03] 483 단독 카드만 값이 있다 — 4칸 표 대신 메타 한 줄(템플릿이 분기).
+        # [카드 정돈 2026-11-03·11-04] 정돈 대상 카드만 값이 있다 — 4칸 표 대신 메타 한 줄(템플릿이 분기).
         "tidy_meta": tidy_meta,
         # ★근거 라벨도 데이터로 오는 표시 문구다(불변식 #13) — 여기서 한 번 번역해
         #   넘기지 않으면 영어 카드의 "핵심 사실" 줄에 한국어가 그대로 실린다.

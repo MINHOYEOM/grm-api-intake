@@ -1323,21 +1323,22 @@ class WebRenderFidelityTest(unittest.TestCase):
 
     def test_fact_values_verbatim(self):
         for c in self.cards:
-            # [카드 정돈 2026-11-03] 483 단독 카드는 4칸 표 대신 메타 한 줄(발행일·실사일·시설유형·
-            # FEI)로 그린다 — 문서번호(해시)는 싣지 않고, 값은 " · " 조각 단위로 **그대로** 실린다
-            # (유형 토큰 "483" 은 유형 칩이 대신). 조각이 하나라도 변형·누락되면 실패한다.
-            tidy = bool(render._tidy_483(c, c["facts"], render._KO)[0])
+            # [카드 정돈 2026-11-03·11-04] 정돈 카드(사실표→메타 한 줄)는 내부 ID 문서번호만 싣지
+            # 않는다. 483 은 값이 " · " 조각 단위로(유형 토큰 "483" 은 유형 칩이 대신), 그 밖의
+            # 유형은 값 전체가 그대로 실려야 한다 — 변형·누락이 있으면 실패한다.
+            tidy = bool(render._tidy_card(c, c["facts"], render._KO)[0])
             for f in c["facts"]:
                 with self.subTest(card=c["id"], label=f["label"]):
                     if tidy:
-                        if f["label"] == "문서번호":
+                        if f["label"] == "문서번호" and render._INTERNAL_DOCNO_RE.match(f["value"]):
                             continue
-                        for piece in f["value"].split(" · "):
-                            if piece == "483":
-                                continue
-                            self.assertTrue(self._present(piece),
-                                            f"사실값 조각 누락/변형: {c['id']} {f['label']}={piece!r}")
-                        continue
+                        if c.get("type_tag") == "483":
+                            for piece in f["value"].split(" · "):
+                                if piece == "483":
+                                    continue
+                                self.assertTrue(self._present(piece),
+                                                f"사실값 조각 누락/변형: {c['id']} {f['label']}={piece!r}")
+                            continue
                     self.assertTrue(self._present(f["value"]),
                                     f"사실값 누락/변형: {c['id']} {f['label']}={f['value']!r}")
 

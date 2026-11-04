@@ -6699,7 +6699,7 @@ class WebFirmRenderTest(unittest.TestCase):
             self.skipTest("findings_docs.json 미존재")
         by_firm: dict[str, int] = {}
         for d in docs["documents"]:
-            k = d.get("firm_key") or ""
+            k = render._canonical_firm_key(d.get("firm_key") or "")
             if k:
                 by_firm[k] = by_firm.get(k, 0) + 1
         expected = sum(1 for n in by_firm.values() if n >= 2)
@@ -11190,7 +11190,7 @@ class WebFirmPageTest(unittest.TestCase):
         cls.root = cls.out / "findings" / "firm"
         cls.by_firm = {}
         for d in cls.data["documents"]:
-            k = d.get("firm_key") or ""
+            k = render._canonical_firm_key(d.get("firm_key") or "")
             if k:
                 cls.by_firm.setdefault(k, []).append(d)
         cls.expected = {k: v for k, v in cls.by_firm.items() if len(v) >= 2}
@@ -11905,9 +11905,9 @@ class WebFindingsDocPageTest(unittest.TestCase):
         by_key: dict[str, list[str]] = {}
         for d in self.data["documents"]:
             if d.get("firm_key"):
-                by_key.setdefault(d["firm_key"], []).append(d["slug"])
+                by_key.setdefault(render._canonical_firm_key(d["firm_key"]), []).append(d["slug"])
         multi = [d for d in self.data["documents"]
-                 if len(by_key.get(d.get("firm_key") or "", [])) > 1][:15]
+                 if len(by_key.get(render._canonical_firm_key(d.get("firm_key") or ""), [])) > 1][:15]
         self.assertTrue(multi, "문서 2건 이상 업체가 없다(배선 확인)")
         for doc in multi:
             html = self._page(doc["slug"])

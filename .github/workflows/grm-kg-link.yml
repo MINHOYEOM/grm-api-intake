@@ -1,0 +1,78 @@
+name: GRM KG Link
+
+# 지식그래프 일일 연결 — 새로 들어온 지적의 fei·조항(DB 함수)·용어(파이썬 엔진) 엣지를 채우고,
+# 연결이 비는 비율을 한 줄로 점검한다(kg_link_health.py). 수집 경로는 건드리지 않는다.
+# 108(RPC)·107(finding_term)이 적용되기 전에는 해당 단계가 SKIP 으로 끝난다(0 종료).
+# 점검 한 줄(KG-LINK OK|WARN ...)은 step summary 에 남고, 임계 위반이면 잡이 red 가 된다.
+# git 쓰기 전무. SUPABASE_URL(Variables) / SUPABASE_SERVICE_ROLE_KEY(Secrets) 재사용.
+on:
+  schedule:
+    # 매일 21:30 UTC = 06:30 KST — 야간 번역·적재가 한 바퀴 돈 뒤.
+    - cron: '30 21 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true=네트워크 없이 종료, false=실제 연결. schedule 은 항상 apply."
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kg-link
+  cancel-in-progress: false
+
+jobs:
+  link:
+    name: Link new findings into the knowledge graph
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # schedule 이벤트는 inputs 가 비어 apply 로 실행된다. dispatch 는 dry_run 기본 true.
+      - name: Link new findings (fei·clause via RPC, terms via engine)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          ARGS="--days 7"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python kg_link_new.py $ARGS
+
+      - name: Link quality check (one line)
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set +e
+          python kg_link_health.py --days 7 | tee kg_link_health.txt
+          rc=${PIPESTATUS[0]}
+          {
+            echo "### GRM KG Link"
+            echo ""
+            echo '```'
+            cat kg_link_health.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc

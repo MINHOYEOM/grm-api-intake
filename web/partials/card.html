@@ -46,7 +46,7 @@
   {%- endif %}
   {%- if card.tidy_meta %}
   {#- [카드 정돈 2026-11-03] 483 단독 카드: 4칸 표 → 메타 한 줄(grm.css 프리즈 — 인라인 스타일). -#}
-  <p class="facts-meta" style="margin:12px 0 0;font-size:13px;line-height:1.5;color:var(--muted)">{{ card.tidy_meta }}</p>
+  <p class="facts-meta" style="margin:12px 0 0;font-size:13px;line-height:1.5;color:var(--muted)">{% for g in card.tidy_parts %}{% if not loop.first %} · {% endif %}{{ g.prefix }}{% if g.mono %}<span class="mono">{{ g.value }}</span>{% else %}{{ g.value }}{% endif %}{% endfor %}</p>
   {%- elif card.deep_analysis %}
   {#- [WL 심층분석 §2.5] deep 카드는 facts 를 2×2 그리드(라벨 muted + 값 굵게 — 스캔성)로.
       deep 아님(대다수 카드)은 기존 세로 표 그대로 → 기존 golden 바이트 불변(additive). -#}

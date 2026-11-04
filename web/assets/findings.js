@@ -1139,6 +1139,88 @@
     });
   }
 
+  // ── [유사 사례 품질 2026-11-05 · GRM_유사사례_정확도점검] 표시 층 정제 ──────────────────────
+  // ★임계값(0.35·0.50)은 **표본 65건(195쌍) 눈 판정 기반**이다 — 더 큰 표본으로 재확정이 필요하다.
+  //   483 실측: 점수 ≥0.50 정밀도 98% · 0.35~0.50 85% · 0.35 미만 24%(0.20 미만 0%).
+  //   점수 눈금은 출처마다 다르다(경고서한·식약처는 본문이 길어 적합인데도 0.1대) — 그래서 하한과
+  //   확실도 문구는 **점수 눈금이 검증된 483·HC 에만** 건다. 다른 출처는 종전대로 보이되 확실도 문구는 없다.
+  // RPC 반환·순서는 그대로고(서버 가산 없음, 사전계산 캐시와 어긋날 일 없음), 이 함수는 받은 items 로
+  // 새 배열을 만들 뿐 원본을 바꾸지 않는다. renderSimilarToState 는 여전히 재정렬·재필터를 하지 않는다.
+  var SIMILAR_GATED_SOURCES = { "FDA 483": true, "Health Canada Inspection": true };
+  var SIMILAR_MIN_SCORE = 0.35;      // 미만 = 숨김("유사한 사례를 찾지 못했습니다")
+  var SIMILAR_STRONG_SCORE = 0.5;    // 이상 = "같은 요건 문구", 미만 = "비슷한 요건"
+  var SIMILAR_COMMON_DOCS = 10;      // dup_documents 가 이 이상이면 사례가 아니라 "자주 나오는 지적"
+  var SIMILAR_VARIANT_DICE = 0.8;    // 결과끼리 글자 유사도가 이 이상이면 번역 변형으로 보고 한 칸으로 묶는다
+
+  function similarBigrams(s) {
+    var t = String(s || "").replace(/[\s.,;:()\[\]'"“”‘’·\-]+/g, "");
+    var m = {}, n = 0;
+    for (var i = 0; i < t.length - 1; i++) {
+      var g = t.substr(i, 2);
+      m[g] = (m[g] || 0) + 1;
+      n++;
+    }
+    return { m: m, n: n };
+  }
+
+  // 글자 2-gram Dice 계수(0~1). 둘 중 하나가 너무 짧으면 0(묶지 않는다 — 틀리게 묶느니 안 묶는다).
+  function similarDice(a, b) {
+    var A = similarBigrams(a), B = similarBigrams(b);
+    if (A.n < 4 || B.n < 4) return 0;
+    var inter = 0;
+    for (var g in A.m) {
+      if (Object.prototype.hasOwnProperty.call(A.m, g) && Object.prototype.hasOwnProperty.call(B.m, g)) {
+        inter += Math.min(A.m[g], B.m[g]);
+      }
+    }
+    return (2 * inter) / (A.n + B.n);
+  }
+
+  function similarFirmKey(name) {
+    return String(name || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+
+  // items: 서버 응답 순서. base: 기준 지적 행(firm_name). 반환: 장식된 새 배열
+  //   _level ("strong"|"similar"|"") · _variants(묶인 변형 수) · _repeat(같은 업체) · _common(자주 나오는 지적)
+  // 순서: 다른 업체 먼저, 같은 업체 반복은 뒤로(각 묶음 안은 서버 순서 유지).
+  function refineSimilarItems(items, base) {
+    var baseFirm = similarFirmKey(base && base.firm_name);
+    var kept = [];
+    (items || []).forEach(function (src) {
+      var score = Number(src.score);
+      if (SIMILAR_GATED_SOURCES[src.source] && !(score >= SIMILAR_MIN_SCORE)) return; // 하한 미달 숨김
+      var it = {};
+      for (var k in src) if (Object.prototype.hasOwnProperty.call(src, k)) it[k] = src[k];
+      it._repeat = !!baseFirm && similarFirmKey(src.firm_name) === baseFirm;
+      it._common = Number(src.dup_documents) >= SIMILAR_COMMON_DOCS;
+      it._variants = 0;
+      it._level = "";
+      if (SIMILAR_GATED_SOURCES[src.source] && !it._common) {
+        it._level = score >= SIMILAR_STRONG_SCORE ? "strong" : "similar";
+      }
+      for (var j = 0; j < kept.length; j++) {
+        if (kept[j]._repeat === it._repeat && similarDice(kept[j].text, it.text) >= SIMILAR_VARIANT_DICE) {
+          kept[j]._variants += 1; // 표현만 다른 변형 — 먼저 온(점수 높은) 항목에 접는다
+          return;
+        }
+      }
+      kept.push(it);
+    });
+    var others = [], repeats = [];
+    kept.forEach(function (it) { (it._repeat ? repeats : others).push(it); });
+    return others.concat(repeats);
+  }
+
+  function similarPill(text, tint) {
+    var p = el("span", null, text);
+    p.style.cssText =
+      "display:inline-flex;align-items:center;height:20px;font-size:11px;font-weight:600;" +
+      "line-height:1;border-radius:var(--rad-s);padding:0 7px;border:1px solid " +
+      (tint ? "rgba(194,96,63,.22);background:var(--coral-tint);color:var(--coral-2)"
+            : "var(--line);background:transparent;color:var(--muted)");
+    return p;
+  }
+
   // 항목 1개 — 업체명·발행일·본문(2줄 클램프)·중복 배지("동일 문구 N개 문서", N=
   // dup_documents, dup_findings>1 인 경우만)·해당 문서 보기(PR-0 딥링크, S1 이 이미 만든
   // similarItemDeepLinkUrl() 재사용 — 신규 URL 스킴 없음). 신뢰도 배지(Evidence 등급)는
@@ -1165,7 +1247,14 @@
       date.style.cssText = "font-family:var(--mono);font-size:11.5px;color:var(--muted)";
       head.appendChild(date);
     }
-    if (Number(item.dup_findings) > 1) {
+    if (item._level) {
+      head.appendChild(similarPill((item._level === "strong" ? _t("같은 요건 문구") : _t("비슷한 요건")), item._level === "strong"));
+    }
+    if (item._repeat) head.appendChild(similarPill(_t("같은 업체 반복"), false));
+    if (item._common) {
+      // 문서 10개 이상에 똑같이 나오는 문구 — 특정 사례가 아니라 흔한 지적이다(사례처럼 보이지 않게 회색).
+      head.appendChild(similarPill(_t("자주 나오는 지적 · {n}개 문서", { n: item.dup_documents || 0 }), false));
+    } else if (Number(item.dup_findings) > 1) {
       var badge = el("span", null, _t("동일 문구 {n}개 문서", { n: item.dup_documents || 0 }));
       badge.style.cssText =
         "display:inline-flex;align-items:center;height:20px;font-size:11px;font-weight:600;" +
@@ -1173,6 +1262,7 @@
         "background:var(--coral-tint);color:var(--coral-2)";
       head.appendChild(badge);
     }
+    if (item._variants > 0) head.appendChild(similarPill(_t("표현만 다른 {n}건", { n: item._variants }), false));
     row.appendChild(head);
     var text = el("p", null, item.text || "");
     text.style.cssText =
@@ -1201,7 +1291,7 @@
       return;
     }
     if (!items.length) {
-      var empty = el("p", null, _t("유사 사례를 찾지 못했습니다"));
+      var empty = el("p", null, _t("유사한 사례를 찾지 못했습니다"));
       empty.style.cssText = "font-size:12.5px;color:var(--muted);margin:0";
       block.appendChild(empty);
       return;
@@ -1260,7 +1350,7 @@
           inFlight = false;
           fetched = true;
           var items = (data && Array.isArray(data.items)) ? data.items : [];
-          renderSimilarToState(block, items);
+          renderSimilarToState(block, refineSimilarItems(items, row));
         })
         .catch(function () {
           inFlight = false;

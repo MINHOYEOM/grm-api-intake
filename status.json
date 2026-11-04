@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04T02:18:01Z",
+ "generated_at": "2026-11-04T09:50:59Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -437,6 +437,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 41786550688,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-04T06:35:35Z",
+    "updatedAt": "2026-11-04T09:47:57Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41786550688"
+   },
+   {
     "databaseId": 41704093864,
     "status": "completed",
     "conclusion": "success",
@@ -479,17 +490,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41399070441"
-   },
-   {
-    "databaseId": 41312185831,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-01T13:37:47Z",
-    "updatedAt": "2026-11-01T16:50:30Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41312185831"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -517,6 +517,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 41789000959,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-04T06:58:01Z",
+    "updatedAt": "2026-11-04T06:58:10Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41789000959"
+   },
    {
     "databaseId": 41706622917,
     "status": "completed",
@@ -560,17 +571,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41402295234"
-   },
-   {
-    "databaseId": 41357044367,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-01T22:25:20Z",
-    "updatedAt": "2026-11-01T22:25:31Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41357044367"
    }
   ],
   "grm-cloud-request.yml": [

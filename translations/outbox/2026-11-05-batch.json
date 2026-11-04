@@ -1,0 +1,122 @@
+[
+  {
+    "finding_id": "finding-001c1f3945059521cd9672ee",
+    "finding_text": "Your firm failed to have, for each batch of medical gas, appropriate laboratory determination of satisfactory conformance to final specifications for the medical gas, including the identity and strength of each active ingredient, prior to release (21 CFR 213.165(a)). 1 Your firm is a manufacturer of Oxygen, USP for administration by inhalation, including for use in hospital settings. Your firm failed to adequately test finished batches of your medical gases for the identity and strength of your active ingredients (Oxygen, USP) before release and distribution, which includes using properly calibrated instruments. For example, while reviewing an investigation into a customer complaint for a medical gas mix-up, our investigator identified that your filling technician reported passing testing results for batches of Oxygen, USP prior to their release without actually performing the required tests. The customer complaint revealed that third-party testing of the Oxygen, USP batches showed the presence of (b)(4) as high as 99% within the containers. A container labeled as medical oxygen administered to a patient despite having a level of 99% (b)(4) (and less than 1% oxygen) represents a catastrophic, immediately life-threatening event from complete oxygen deprivation. Appropriate release testing, which includes strength and identity testing of the active ingredient, must be performed before drug product batch release and distribution. Without adequate testing, you do not have adequate scientific evidence to assure that your medical gases conform to appropriate specifications before release. Further, a second person verification (witness) of all critical testing and adequate review of the testing results by the quality unit prior to release of the drug products should be documented to ensure accuracy and accountability. In your response, you state that you are in the process of developing and implementing comprehensive standard operating procedures (SOPs) with the relocation to your new facility, including procedures for testing and release for distribution. Additionally, you state that you are updating your fill logs to include a second-person verification and plan to record all testing results to enhance the accountability of the testing. Your response is inadequate because you failed to provide your finished product specifications for Oxygen, USP, procedures for medical gas testing and release, evidence of proper calibration of your testing instruments, or testing results to demonstrate that your firm can manufacture medical gases that meet all quality attributes. In response to this letter, provide: A list of all test methods and specifications used to analyze each batch of your drug product before making a batch disposition decision, and the associated written procedures. A comprehensive, independent assessment of your laboratory practices, procedures, methods, equipment, documentation, and analyst competencies. Based on this review, provide a detailed plan to remediate and evaluate the effectiveness of your laboratory system.",
+    "finding_text_ko": "귀사는 의료용 가스의 각 배치에 대해, 출고 전에 각 유효성분의 확인시험(identity)과 함량(strength)을 포함하여 최종 규격에 대한 적합 여부를 판정하는 적절한 시험실 시험을 실시하지 않았다(21 CFR 213.165(a)). 1 귀사는 병원 등에서 흡입 투여용으로 사용되는 Oxygen, USP의 제조업체이다. 귀사는 적절히 교정된 기기를 사용하는 것을 포함하여, 완제 의료용 가스 배치를 출고·유통하기 전에 유효성분(Oxygen, USP)의 확인시험과 함량시험을 적절히 실시하지 않았다. 예를 들어, 의료용 가스 혼입(mix-up)에 관한 고객 불만 조사를 검토하던 중, 당국 실사관은 귀사의 충전 담당자가 필요한 시험을 실제로 수행하지 않은 채 Oxygen, USP 배치의 시험 결과를 적합으로 보고하고 출고했음을 확인했다. 고객 불만 건에서 제3자 시험은 용기 내에 (b)(4)가 최대 99%까지 존재함을 보여주었다. 의료용 산소로 표시된 용기에 (b)(4)가 99%이고 산소가 1% 미만인 상태에서 환자에게 투여된 것은 완전한 산소 결핍을 초래하는 치명적이고 생명을 즉각 위협하는 사건이다. 의약품 배치를 출고·유통하기 전에는 유효성분의 함량 및 확인시험을 포함한 적절한 출고 시험을 반드시 실시해야 한다. 적절한 시험이 없으면 귀사의 의료용 가스가 출고 전에 적절한 규격에 적합하다는 과학적 근거가 없다. 또한 정확성과 책임성을 보장하기 위해, 모든 중요 시험에 대해 제2자 확인(witness)을 하고 품질부서가 제품 출고 전에 시험 결과를 적절히 검토한 것을 문서화해야 한다. 귀사는 회신에서 새 시설로 이전하면서 시험 및 출고 절차를 포함한 포괄적인 표준작업절차(SOP)를 개발·시행하는 중이라고 밝혔다. 또한 충전 기록(fill log)에 제2자 확인을 추가하고 시험 결과를 모두 기록하여 시험의 책임성을 높일 계획이라고 밝혔다. 그러나 귀사는 Oxygen, USP의 완제품 규격, 의료용 가스 시험 및 출고 절차, 시험 기기의 적절한 교정 증빙, 또는 귀사가 모든 품질 특성을 충족하는 의료용 가스를 제조할 수 있음을 보여주는 시험 결과를 제출하지 않았으므로 회신은 부적절하다. 본 서한에 대한 회신에서 다음을 제출하라: 배치 처분 결정을 내리기 전에 각 의약품 배치를 분석하는 데 사용하는 모든 시험방법 및 규격의 목록과 관련 문서화된 절차. 귀사의 시험실 운영, 절차, 시험방법, 설비, 문서, 시험자 역량에 대한 포괄적이고 독립적인 평가. 이 검토를 토대로 시험실 시스템을 개선하고 그 효과를 평가하기 위한 상세 계획.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-02d18f464c5992077fbd8fde",
+    "finding_text": "기타 [별표 1] 제7.1호 다목 출발물질 시험에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타. [별표 1] 제7.1호 다목 출발물질 시험에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-036bc6842c994f256ab73187",
+    "finding_text": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Your firm also failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms (21 CFR 211.165(a) and 211.165(b)). Based on the records and information you provided, you did not demonstrate that you adequately test your OTC finished drug products prior to release for distribution to the United States. Specifically, the certificate of analyses (COA) that you provided did not include identity, assay, or impurity test results. In addition, the COAs provided also reveal that you lacked appropriate testing for objectionable microorganisms for each batch. Testing is an essential part of CGMP to ensure that the drug products you manufacture conform to all pre-determined quality attributes appropriate for their intended use. Drug products must be tested for identity and strength of the active ingredient prior to release and distribution. Without adequate testing, you do not have scientific evidence to assure that your drug products conform to appropriate specifications before release.",
+    "finding_text_ko": "귀사는 의약품의 각 배치에 대해, 출고 전에 각 유효성분의 확인시험(identity)과 함량(strength)을 포함하여 최종 규격에 대한 적합 여부를 판정하는 적절한 시험실 시험을 실시하지 않았다. 또한 objectionable microorganisms 가 없어야 하는 각 의약품 배치에 대해 필요한 적절한 시험실 시험을 실시하지 않았다(21 CFR 211.165(a) 및 211.165(b)). 귀사가 제공한 기록과 정보에 따르면, 귀사는 미국으로 유통하는 OTC 완제의약품을 출고 전에 적절히 시험한다는 것을 입증하지 못했다. 구체적으로, 귀사가 제출한 시험성적서(COA)에는 확인시험, 함량(assay) 또는 불순물 시험 결과가 포함되어 있지 않았다. 아울러 제출된 COA를 보면 각 배치에 대한 objectionable microorganisms 시험도 적절히 실시되지 않았다. 시험은 CGMP의 필수 요소로서, 제조하는 의약품이 의도한 용도에 적합한 모든 사전 설정 품질 특성에 부합하도록 보장한다. 의약품은 출고·유통 전에 유효성분의 확인시험과 함량시험을 실시해야 한다. 적절한 시험이 없으면 귀사의 의약품이 출고 전에 적절한 규격에 적합하다는 과학적 근거가 없다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-0e5994c561fe99bec9557ee4",
+    "finding_text": "시험실 기타 [별표 1] 제6.3호 시험방법 밸리데이션에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "시험실, 기타. [별표 1] 제6.3호 시험방법 밸리데이션에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1a6ff45d206ffe241fc020fb",
+    "finding_text": "[별표 1] 제6.6호 계산 시 사용하는 스프레드시트의 검증에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "[별표 1] 제6.6호 계산에 사용하는 스프레드시트의 검증에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-313a92306180db0bbfc2222c",
+    "finding_text": "시설장비 기타 [별표 1] 제2.1호 다목 정제수 시스템의 미사용 배관에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "시설·장비, 기타. [별표 1] 제2.1호 다목 정제수 시스템의 미사용 배관에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4cbe60e4fa8f789854a296cb",
+    "finding_text": "품질 경영 기타 [별표 1] 제3.2호 품질(보증)부서 책임자의 이행 결과(백업 절차 등)의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "품질경영, 기타. [별표 1] 제3.2호 품질(보증)부서 책임자의 이행 결과(백업 절차 등)에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6eed56decff4b1dfb4bd40b4",
+    "finding_text": "기타 [별표 1] 제7.1호 라목 시험 행위의 재구성에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "기타. [별표 1] 제7.1호 라목 시험 행위의 재구성에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-874047a0e71f9b09877c099d",
+    "finding_text": "기타 [별표 1] 제7.1호 잔류 유기용매 시험에 대한 추가 설명자료를 제출할 것",
+    "finding_text_ko": "기타. [별표 1] 제7.1호 잔류 유기용매 시험에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a74605183bdcb16183234054",
+    "finding_text": "The previously referenced video on the “X” social media platform posted by @Ronan_Rx represented that your products are “American made” and “farm-to-table drugs,” and ends with a background visual of confetti bursting around an unfurled American flag, with two individuals in sterile garments dancing in front of it. FDA’s records contain no drug listings for semaglutide or tirzepatide active pharmaceutical ingredients, intended for use in compounding, that identify a United States establishment registered with the FDA as the drug substance manufacturer. Describing the finished product as “American made” and “farm-to-table drugs” creates a misleading impression regarding the product’s true origin because, based on FDA’s records, the active pharmaceutical ingredient in the product was not made in the U.S. By falsely describing your compounded drug products as “American made” and “farm-to-table drugs,” and reinforcing these claims with celebratory imagery featuring the American flag, you conceal the true origin of your products and create the misleading impression that your products have a domestic origin indicative of superior quality. Accordingly, these representations cause the compounded drug products you offer for sale to be misbranded under sections 502(a) and 502(bb) of the FD&C Act [21 U.S.C. §§ 352(a) and 352(bb)]. The introduction or delivery for introduction into interstate commerce of these misbranded drug products is a prohibited act under section 301(a) of the FD&C Act [21 U.S.C. § 331(a)]. The violations described in this letter put you on notice of our concerns but may not represent an exhaustive list of violations. Please be advised, the receipt in interstate commerce of misbranded drug products, and the delivery or proffered delivery thereof, is also a violation of section 301(c) of the FD&C Act [21 U.S.C. § 331(c)]. You are responsible for investigating and determining the root causes of any violations and implementing corrective and preventative measures to ensure future and sustained compliance so that these violations and any others do not occur. It is your responsibility to ensure that your operations comply with all requirements of federal law, including FDA regulations. For example, compounded drug products must meet the conditions in sections 503A or 503B of the FD&C Act [21 U.S.C. §§ 353a or 353b] in order to be exempt from certain requirements under the FD&C Act, including the new drug approval requirements.",
+    "finding_text_ko": "앞서 언급한 @Ronan_Rx 의 “X” 소셜미디어 게시 영상은 귀사의 제품이 “미국산(American made)”이고 “농장에서 식탁까지(farm-to-table) 의약품”이라고 표방하며, 영상 말미에는 펼쳐진 성조기 주위로 색종이가 터지는 배경 앞에서 무균복을 입은 두 사람이 춤추는 장면이 나온다. FDA 기록에는 조제용으로 사용되는 semaglutide 또는 tirzepatide 원료의약품에 대해, FDA에 등록된 미국 내 시설을 원료의약품 제조업체로 기재한 의약품 등록(drug listing)이 없다. 완제품을 “미국산”, “농장에서 식탁까지 의약품”이라고 표현하는 것은, FDA 기록상 해당 제품의 원료의약품이 미국에서 제조되지 않았으므로 제품의 실제 원산지에 대해 오해를 일으킨다. 귀사는 조제 의약품을 “미국산”, “농장에서 식탁까지 의약품”이라고 허위로 표시하고 성조기가 나오는 축하 영상으로 이를 강화함으로써 제품의 실제 원산지를 숨기고, 우수한 품질을 시사하는 국내산이라는 오해를 일으킨다. 따라서 이러한 표시로 인해 귀사가 판매하는 조제 의약품은 FD&C Act 502(a) 및 502(bb)항 [21 U.S.C. §§ 352(a) 및 352(bb)]에 따라 허위표시(misbranded)된 것이 된다. 이러한 허위표시 의약품을 주간(州間) 통상에 도입하거나 도입을 위해 인도하는 행위는 FD&C Act 301(a)항 [21 U.S.C. § 331(a)]에 따른 금지행위이다. 본 서한에 기술된 위반 사항은 귀사에 우려를 통지하기 위한 것이며 위반 사항의 전부가 아닐 수 있다. 허위표시 의약품을 주간 통상에서 수령하거나 이를 인도 또는 인도하겠다고 제의하는 행위 역시 FD&C Act 301(c)항 [21 U.S.C. § 331(c)] 위반임을 유의하라. 귀사는 모든 위반의 근본 원인을 조사·규명하고, 이러한 위반 및 그 밖의 위반이 재발하지 않도록 시정·예방 조치를 이행하여 지속적인 준수를 보장할 책임이 있다. 귀사의 운영이 FDA 규정을 포함한 모든 연방법 요건을 준수하도록 보장하는 것도 귀사의 책임이다. 예를 들어 조제 의약품이 신약 승인 요건 등 FD&C Act의 일부 요건에서 면제되려면 FD&C Act 503A 또는 503B항 [21 U.S.C. §§ 353a 또는 353b]의 조건을 충족해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-b39241bcbd84d723e59e7118",
+    "finding_text": "기타 [별표 1] 제9.2호 작업소의 위생관리(칭량도구 세척기록 등) 의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "기타. [별표 1] 제9.2호 작업소의 위생관리(칭량도구 세척기록 등)에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-baac8234ee8db27bef4a8559",
+    "finding_text": "제조 기타 [별표 1] 제6.4호 세척밸리데이션(캠페인 생산 등)의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "제조, 기타. [별표 1] 제6.4호 세척 밸리데이션(캠페인 생산 등)에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c1c631b702eb611fb08372c9",
+    "finding_text": "시험실 기타 [별표 1] 제7.1호 미생물한도 시험에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "시험실, 기타. [별표 1] 제7.1호 미생물한도 시험에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c2bc91ce5ac0a0cb697589cd",
+    "finding_text": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality (21 CFR 211.84(d)(1) and 211.84(d)(2)). Your firm manufactures OTC drug products including (b)(4) . Based on the records and information you provided, you did not demonstrate that you adequately tested the identity, purity, or strength of components used in the manufacture of your drug products. You also relied on your suppliers' certificates of analysis (COA) for (b)(4) without demonstrating the reliability of your suppliers' test analyses at appropriate intervals. (b)(4) Your incoming inspection records for your (b)(4) active ingredient failed to include appropriate compendial identity testing, assay, or impurity testing. You manufacture drugs that contain (b)(4) . The use of (b)(4) contaminated with (b)(4) has resulted in various lethal poisoning incidents in humans worldwide. See FDA’s guidance document (b)(4). (b)(4) Your incoming inspection records for your (b)(4) component similarly failed to include compendial identity testing and lacked appropriate (b)(4) limit testing. Identity testing for (b)(4) and certain other high-risk drug components includes a limit test in the United States Pharmacopeia (USP) to ensure that the component meets the relevant safety limits for levels of (b)(4) . The use of ingredients contaminated with (b)(4) has resulted in various lethal poisoning incidents in humans worldwide. See FDA’s guidance document (b)(4) (b)(4) Based on the records you provided, you did not perform appropriate (b)(4) testing, including (b)(4) testing, on the (b)(4) used to manufacture your drug products. Your (b)(4) specifications reference the Chinese Pharmacopeia rather than USP for (b)(4) . Without adequate (b)(4) testing, you do not have scientific evidence that the (b)(4) used as a component in your drug product manufacturing conforms to appropriate specifications. Component testing is fundamental to quality. Without adequate testing, you do not have scientific evidence that your components conform to appropriate specifications prior to use in the manufacture of your drug products. As a manufacturer, you have a responsibility to sample, test, and examine drug components before use in production to assure adequate quality.",
+    "finding_text_ko": "귀사는 각 원료(component)의 시료에 대해 순도, 함량, 품질에 관한 모든 적절한 문서화된 규격에 따른 확인시험 및 적합성 시험을 실시하지 않았다(21 CFR 211.84(d)(1) 및 211.84(d)(2)). 귀사는 (b)(4) 를 포함한 OTC 의약품을 제조한다. 귀사가 제공한 기록과 정보에 따르면, 귀사는 의약품 제조에 사용하는 원료의 확인, 순도 또는 함량을 적절히 시험했음을 입증하지 못했다. 또한 귀사는 공급업체 시험 분석의 신뢰성을 적절한 주기로 입증하지 않은 채 (b)(4) 에 대한 공급업체 시험성적서(COA)에 의존했다. (b)(4) 귀사의 (b)(4) 유효성분 입고 검사 기록에는 적절한 공정서(compendial) 확인시험, 함량(assay) 또는 불순물 시험이 포함되어 있지 않았다. 귀사는 (b)(4) 를 함유한 의약품을 제조한다. (b)(4) 로 오염된 (b)(4) 의 사용은 전 세계에서 여러 건의 치명적인 사람 중독 사고를 초래했다. FDA 지침 문서 (b)(4) 를 참조하라. (b)(4) 귀사의 (b)(4) 원료 입고 검사 기록 역시 공정서 확인시험이 없었고 적절한 (b)(4) 한도시험이 누락되어 있었다. (b)(4) 및 기타 일부 고위험 의약품 원료에 대한 확인시험에는 (b)(4) 수준이 관련 안전 한도에 부합하는지 확인하기 위한 미국약전(USP)의 한도시험이 포함된다. (b)(4) 로 오염된 원료의 사용은 전 세계에서 여러 건의 치명적인 사람 중독 사고를 초래했다. FDA 지침 문서 (b)(4) 를 참조하라. (b)(4) 제공된 기록에 따르면, 귀사는 의약품 제조에 사용한 (b)(4) 에 대해 (b)(4) 시험을 포함한 적절한 (b)(4) 시험을 실시하지 않았다. 귀사의 (b)(4) 규격은 (b)(4) 에 대해 USP가 아닌 중국약전(Chinese Pharmacopeia)을 인용하고 있다. 적절한 (b)(4) 시험이 없으면, 의약품 제조에 원료로 사용한 (b)(4) 가 적절한 규격에 적합하다는 과학적 근거가 없다. 원료 시험은 품질의 기본이다. 적절한 시험이 없으면 귀사의 원료가 의약품 제조에 사용되기 전에 적절한 규격에 적합하다는 과학적 근거가 없다. 제조업체로서 귀사는 품질을 보장하기 위해 생산에 사용하기 전에 의약품 원료를 샘플링하고 시험·검사할 책임이 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c8d319be42a750a176661cb8",
+    "finding_text": "기타 [별표 1] 제8.1호 가목 제조지시 및 기록서 작성 방법의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "기타. [별표 1] 제8.1호 가목 제조지시 및 기록서 작성 방법에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cb9f640f20d8885a19fa68f7",
+    "finding_text": "시설 장비 기타 [별표 1] 제2.1호 아목 제조라인 정지 및 재가동 시 공기 흐름 평가의 추가 설명자료를 제출할 것",
+    "finding_text_ko": "시설·장비, 기타. [별표 1] 제2.1호 아목 제조라인 정지 및 재가동 시 공기 흐름 평가에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-cc2ac797653cfd48250564bd",
+    "finding_text": "Your firm’s quality unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22). The records and information you provided demonstrate that your quality unit (QU) did not effectively exercise its responsibilities to oversee the quality of your drug manufacturing operations. For example, your QU failed to ensure: The establishment of an adequate, ongoing stability program (21 CFR 211.166(a)). Adequate procedures ensuring appropriate production and process controls, including appropriate qualification of the (b)(4) system (21 CFR 211.100(a)). Your firm’s quality systems are inadequate. For help implementing quality systems and risk management approaches to meet the requirements of CGMP regulations 21 CFR, parts 210 and 211, see FDA’s guidance documents Quality Systems Approach to Pharmaceutical CGMP Regulations at https://www.fda.gov/media/71023/download. CGMP Consultant Recommended Based upon the nature of the violations we identified in your response, you should engage a consultant qualified as set forth in 21 CFR 211.34, to evaluate your operations and to assist your firm in meeting CGMP requirements. The qualified consultant should also perform a comprehensive six-system audit of your entire operation for CGMP compliance and evaluate the completion and efficacy of your corrective actions and preventive actions before you pursue resolution of your firm’s compliance status with FDA. Your use of a consultant does not relieve your firm’s obligation to comply with CGMP. Your firm’s executive management remains responsible for resolving all deficiencies and systemic flaws to ensure ongoing CGMP compliance.",
+    "finding_text_ko": "귀사의 품질부서는 제조되는 의약품이 CGMP를 준수하고 확인, 함량, 품질, 순도에 대해 설정된 규격에 적합하도록 보장할 책임을 이행하지 않았다(21 CFR 211.22). 귀사가 제공한 기록과 정보에 따르면, 귀사의 품질부서(QU)는 의약품 제조 운영의 품질을 감독할 책임을 효과적으로 이행하지 않았다. 예를 들어 품질부서는 다음을 보장하지 못했다: 적절하고 지속적인 안정성 프로그램의 수립(21 CFR 211.166(a)). (b)(4) 시스템의 적절한 적격성평가(qualification)를 포함하여 적절한 생산 및 공정 관리를 보장하는 적절한 절차(21 CFR 211.100(a)). 귀사의 품질시스템은 부적절하다. CGMP 규정 21 CFR 210, 211 부의 요건을 충족하기 위한 품질시스템 및 위험관리 접근법의 구현에 도움이 되는 FDA 지침 문서 Quality Systems Approach to Pharmaceutical CGMP Regulations (https://www.fda.gov/media/71023/download)를 참조하라. CGMP 컨설턴트 권고: 귀사의 회신에서 확인된 위반의 성격을 고려할 때, 귀사는 21 CFR 211.34에 규정된 자격을 갖춘 컨설턴트를 선임하여 운영을 평가하고 CGMP 요건 충족을 지원받아야 한다. 해당 컨설턴트는 또한 귀사의 규제 준수 상태에 대한 해결을 추진하기 전에, 전체 운영에 대해 CGMP 준수를 위한 포괄적인 6개 시스템 감사(six-system audit)를 수행하고 시정조치·예방조치(CAPA)의 완료 여부와 효과를 평가해야 한다. 컨설턴트를 활용하더라도 귀사의 CGMP 준수 의무는 면제되지 않는다. 모든 결함과 시스템적 결함을 해결하여 지속적인 CGMP 준수를 보장할 책임은 여전히 귀사의 경영진에게 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-da6132c2c1e3149ea9830ffa",
+    "finding_text": "The following claims concerning compounded semaglutide and tirzepatide products appear on your website: “Well-Studied Compounded Medications,” accompanied by the description, “Compounded medications with substantial human clinical evidence—randomized trials, mechanistic studies, and decades of use—though the specific compounded preparation may not itself be FDA-approved.” “FDA-Approved Compounded Medications,” accompanied by the description, “Compounded medications whose active ingredient has at least one FDA-approved branded form for the indication described.” The following claims appear on the “X” social media platform, posted by @Ronan_Rx: Your “Bio” header states, “Explore GLP-1s like Ozempic” A video reposted and pinned at the top of your feed states, “Yea, seventy-eight dollars a month, for drugs like Ozempic. But are our drugs even legit? No. Our drugs are super [bleep] legit.” Compounded drug products are not FDA-approved. Your claims represent that the compounded drug products you offer have been FDA-approved or otherwise evaluated for safety and effectiveness when they have not. Website and video disclaimers that the specific compounded preparation “may not itself be FDA-approved” or that “[c]ompounded medications are not FDA-approved” do not cure the misleading overall impression created by these claims.",
+    "finding_text_ko": "귀사의 웹사이트에는 조제(compounded) semaglutide 및 tirzepatide 제품에 관한 다음 주장이 게시되어 있다: “Well-Studied Compounded Medications”, 설명은 “상당한 인체 임상 근거—무작위 시험, 기전 연구, 수십 년의 사용 경험—를 갖춘 조제 의약품이나, 해당 조제 제제 자체는 FDA 승인을 받지 않았을 수 있다”(Compounded medications with substantial human clinical evidence—randomized trials, mechanistic studies, and decades of use—though the specific compounded preparation may not itself be FDA-approved). “FDA-Approved Compounded Medications”, 설명은 “유효성분이 해당 적응증에 대해 FDA 승인을 받은 브랜드 제품을 하나 이상 가진 조제 의약품”(Compounded medications whose active ingredient has at least one FDA-approved branded form for the indication described). “X” 소셜미디어 플랫폼의 @Ronan_Rx 게시물에는 다음 주장이 있다: “Bio” 헤더에 “Explore GLP-1s like Ozempic”. 피드 상단에 고정된 재게시 영상에는 “Yea, seventy-eight dollars a month, for drugs like Ozempic. But are our drugs even legit? No. Our drugs are super [bleep] legit.” 라고 되어 있다. 조제 의약품은 FDA 승인 대상이 아니다. 귀사의 주장은 귀사가 제공하는 조제 의약품이 FDA 승인을 받았거나 안전성과 유효성에 대해 달리 평가를 받은 것처럼 나타내고 있으나, 실제로는 그렇지 않다. 해당 조제 제제가 “그 자체로 FDA 승인을 받지 않았을 수 있다”거나 “조제 의약품은 FDA 승인을 받지 않는다”는 웹사이트 및 영상의 면책 문구는 이러한 주장이 만들어내는 전체적인 오해 소지를 해소하지 못한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e510243adb948ba470f73a4f",
+    "finding_text": "품질경영 기타 [별표 1] 제5.2호 나목 백업에 대한 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "품질경영, 기타. [별표 1] 제5.2호 나목 백업에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-ebccfabca573d3b1525ec7b0",
+    "finding_text": "시험실 기타 [별표 1] 제6.3호 미생물한도시험 적합성 평가의 추가 설명 자료를 제출할 것",
+    "finding_text_ko": "시험실, 기타. [별표 1] 제6.3호 미생물한도 시험 적합성 평가에 대한 추가 설명 자료를 제출해야 한다.",
+    "translation_method": "llm_assisted"
+  }
+]

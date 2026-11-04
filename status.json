@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-04T23:38:22Z",
+ "generated_at": "2026-11-04T23:54:08Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 41935865641,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-04T23:42:45Z",
+    "updatedAt": "2026-11-04T23:53:49Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41935865641"
+   },
    {
     "databaseId": 41739159032,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41244592056"
-   },
-   {
-    "databaseId": 41137939924,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-30T22:24:41Z",
-    "updatedAt": "2026-10-30T22:40:13Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41137939924"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -230,6 +230,17 @@
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 41937259973,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_run",
+    "createdAt": "2026-11-04T23:53:51Z",
+    "updatedAt": "2026-11-04T23:54:00Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41937259973"
+   },
    {
     "databaseId": 41740583782,
     "status": "completed",
@@ -600,6 +611,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 41935865641,
+   "created_at": "2026-11-04T23:42:45Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 41739159032,
    "created_at": "2026-11-03T23:26:28Z",
    "has_web_brief": true
@@ -617,11 +633,6 @@
   {
    "run_id": 41244592056,
    "created_at": "2026-10-31T21:39:17Z",
-   "has_web_brief": true
-  },
-  {
-   "run_id": 41137939924,
-   "created_at": "2026-10-30T22:24:41Z",
    "has_web_brief": true
   }
  ]

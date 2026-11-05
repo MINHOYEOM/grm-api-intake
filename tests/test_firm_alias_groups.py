@@ -13,6 +13,7 @@ import grm_findings
 _MIG = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _SQL = (_MIG / "105_firm_alias_groups.sql").read_text(encoding="utf-8")
 _SQL115 = (_MIG / "115_firm_alias_more.sql").read_text(encoding="utf-8")
+_SQL118 = (_MIG / "118_firm_alias_b.sql").read_text(encoding="utf-8")
 _P65 = (_MIG / "065_profile_categories_and_repeats.sql").read_text(encoding="utf-8")
 _P63 = (_MIG / "063_fda_inspection_firm.sql").read_text(encoding="utf-8")
 _RENDER = (Path(__file__).resolve().parent.parent / "web" / "render.py").read_text(encoding="utf-8")
@@ -27,6 +28,7 @@ def _seed_of(src: str) -> dict[str, str]:
 def _seed() -> dict[str, str]:
     d = _seed_of(_SQL)
     d.update(_seed_of(_SQL115))
+    d.update(_seed_of(_SQL118))
     return d
 
 
@@ -42,11 +44,13 @@ class AliasSeed(unittest.TestCase):
     def test_105_seed_unchanged_26(self):
         self.assertEqual(len(_seed_of(_SQL)), 26)
         self.assertEqual(len(_seed_of(_SQL115)), 23)
+        self.assertEqual(len(_seed_of(_SQL118)), 35)
+        self.assertFalse(set(_seed_of(_SQL115)) & set(_seed_of(_SQL118)))
         self.assertFalse(set(_seed_of(_SQL)) & set(_seed_of(_SQL115)))
 
     def test_no_chains_no_self(self):
         d = grm_findings.FIRM_KEY_ALIASES
-        self.assertEqual(len(d), 49)
+        self.assertEqual(len(d), 84)
         for a, c in d.items():
             self.assertNotEqual(a, c)
             self.assertNotIn(c, d, f"체인 금지: {a} -> {c}")

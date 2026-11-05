@@ -24,6 +24,14 @@ on:
         required: false
         default: "7"
         type: string
+      only_product:
+        description: "true=제품군(111) 엣지만(RPC·용어 건너뜀). 긴 창 백필용. schedule 은 항상 false."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 permissions:
   contents: read
@@ -63,6 +71,9 @@ jobs:
           ARGS="--days $DAYS"
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ inputs.only_product }}" = "true" ]; then
+            ARGS="$ARGS --only-product"
           fi
           python kg_link_new.py $ARGS
 

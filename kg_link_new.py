@@ -7,6 +7,7 @@
    엔진, 백필과 같은 코드)로 계산하고 `finding_term` 에 `ignore-duplicates` 로 넣는다. 번역 지연으로
    본문이 나중에 생기는 지적도 창(기본 7일) 안에서 다시 잡힌다.
 
+`--only-product` 는 제품군 단계만 돈다(RPC 가 긴 창에서 타임아웃 나는 과거분 백필용).
 RPC/표가 아직 없으면(108·107 적용 전) 그 단계만 건너뛰고 0 으로 끝난다. 수집 경로는 건드리지 않는다.
 서비스 키는 로그·예외 메시지에 넣지 않는다(예외 타입명·HTTP status 만).
 """
@@ -105,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--supabase-url", default=None)
     ap.add_argument("--service-role-key", default=None)
     ap.add_argument("--dry-run", action="store_true", help="네트워크 0")
+    ap.add_argument("--only-product", action="store_true",
+                    help="RPC(fei·조항)·용어 단계를 건너뛰고 제품군(111) 엣지만 채운다 — 긴 창 백필용")
     ap.add_argument("--glossary", default=str(ROOT / "web" / "data" / "glossary.json"))
     a = ap.parse_args(argv)
     if a.dry_run:
@@ -121,6 +124,11 @@ def main(argv: list[str] | None = None) -> int:
     key = creds[1]
     since = (datetime.now(timezone.utc) - timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
+        if a.only_product:
+            n_prod, sent_prod = kg_product.link_recent(base, key, since)
+            print(f"[kg-link] 제품군(only): 엣지 {n_prod:,} · "
+                  + (f"전송 {sent_prod:,}" if sent_prod is not None else "SKIP(111 미적용)"))
+            return 0
         db = link_db(base, key, a.days)
         print("[kg-link] fei·조항: " + (json.dumps(db, ensure_ascii=False) if db is not None else "SKIP(108 미적용)"))
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))

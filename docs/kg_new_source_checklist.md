@@ -22,6 +22,9 @@
 
 - DB 엣지 테이블: `finding_clause(finding_id, citation_key, citation_paragraph, confidence, basis, raw_ref)` (106),
   `finding_term(finding_id, term_id, surface, confidence >= 0.8)` (107). 둘 다 `ignore duplicates` 멱등.
+- 식약처 별표 ref 에 규칙명이 없으면 106 파서는 `[규칙 미상]`(0.7)로만 저장한다. 109 가 **출처 문서**(`raw_signals.raw_json.attachment_text`)의
+  "｢규칙｣ … [별표 N]" 문장으로 규칙이 하나로 정해질 때만 `basis='mfds_byeolpyo_doc'`(0.9)로 보강한다(`kg_edges.parse_citation_with_doc` 가 기준 구현).
+  새 식약처 문서 유형이 이 문장을 쓰지 않으면 보강되지 않는다 — 규칙명을 추측으로 채우지 않는다.
 - 내보내기(`web/graph_export.py`) 노드: `doc` · `firm` · `clause` · `term` · `brief`, 엣지: `cited_in_brief` · `issued_to` · `cites_clause` · `uses_term`.
   새 유형은 보통 새 노드 유형이 아니라 **기존 `doc` 노드의 새 `agency`/`source` 값**이다. 새 노드·엣지 유형이 정말 필요하면 `NODE_TYPES`/`NODE_FIELDS` 허용목록과 `validate_graph` 가드를 먼저 확장한다.
 

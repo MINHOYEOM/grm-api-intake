@@ -74,6 +74,39 @@ def parse_citation(raw: str) -> list[Citation]:
     return out
 
 
+# ── 식약처 규칙명 없는 별표 — 출처 문서 근거 보강(109 SQL 의 파이썬 기준 구현) ─────────────────
+# 문서(attachment_text)의 "｢규칙명｣ … [별표 N]" 문장에서 (규칙, 별표) 쌍을 읽고, 한 문서에서 그 별표에 규칙이
+# 정확히 하나만 묶일 때만 규칙명을 붙인다. ref 가 strict 형태(한 별표 + 호/목 나열)일 때만. conf 0.9.
+_DOC_RULE = re.compile(r"[｢「]([^｣」]{2,40})[｣」][^｢｣「」\[]{0,60}?\[별표\s*(\d+(?:의\d+)?)\]")
+_STRICT_REF = re.compile(
+    r"^\s*\[별표\s*\d+(?:의\d+)?\]\s*(?:제\s*)?\d+(?:[.의]\d+)*\s*호?(?:\s*[가-하]목)?"
+    r"(?:\s*(?:,|및)\s*제\s*\d+(?:[.의]\d+)*\s*호(?:\s*[가-하]목)?)*\s*$")
+_REF_TBL = re.compile(r"^\s*\[별표\s*(\d+(?:의\d+)?)\]")
+DOC_RULE_CONFIDENCE = 0.9
+DOC_RULE_BASIS = "mfds_byeolpyo_doc"
+
+
+def doc_rule(doc_text: str | None, tbl: str) -> str | None:
+    laws = set()
+    for law, t in _DOC_RULE.findall(doc_text or ""):
+        law = re.sub(r"\s+", " ", law.strip())
+        if re.sub(r"\s+", "", t) == tbl and re.search(r"(규칙|규정)$", law):
+            laws.add(law)
+    return next(iter(laws)) if len(laws) == 1 else None
+
+
+def parse_citation_with_doc(raw: str, doc_text: str | None) -> list[Citation]:
+    """규칙명 없는 strict 별표 ref 를 문서 근거로 보강한 조항 키(conf 0.9). 근거가 없으면 빈 목록."""
+    m = _REF_TBL.match(raw or "")
+    if not m or not _STRICT_REF.match(raw):
+        return []
+    law = doc_rule(doc_text, m[1])
+    if not law:
+        return []
+    return [(k, p, DOC_RULE_CONFIDENCE, DOC_RULE_BASIS)
+            for k, p, _c, b in parse_citation(f"{law} {raw}") if b == "mfds_byeolpyo"]
+
+
 # ── 지적 ↔ 용어 ────────────────────────────────────────────────────────────────
 
 def _load_render():

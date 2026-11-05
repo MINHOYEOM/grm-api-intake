@@ -140,3 +140,54 @@ class TermEdges(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+_S109 = (_MIG / "109_mfds_clause_rule_from_document.sql").read_text(encoding="utf-8")
+_RULE = "의약품 등의 안전에 관한 규칙"
+_DOC = "실사 목적: ｢약사법｣제38조의3 및 제69조, ｢의약품 등의 안전에 관한 규칙｣\n(총리령) 제48조의4 및 [별표 1]의 제조 및 품질관리기준에 따라"
+
+
+class MfdsRuleFromDocument(unittest.TestCase):
+    def test_enriches_only_with_document_evidence(self):
+        got = kg_edges.parse_citation_with_doc("[별표 1] 7.1", _DOC)
+        self.assertEqual(got, [(f"{_RULE} 별표1 제7.1호", "", 0.9, "mfds_byeolpyo_doc")])
+        # 명시 규칙명 표기와 같은 키 — 한 조항으로 합쳐진다.
+        self.assertEqual(got[0][0], kg_edges.parse_citation(f"{_RULE} [별표 1] 제7.1호")[0][0])
+
+    def test_no_evidence_no_edge(self):
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] 제7.1호", ""), [])
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] 제7.1호", None), [])
+        # 문서가 다른 별표만 묶으면(별표 8 은 문장이 없다) 추측하지 않는다.
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 8] 행정처분의", _DOC), [])
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 2] 제1호", _DOC), [])
+
+    def test_two_rules_for_one_table_is_ambiguous(self):
+        doc = _DOC + " ｢의약품 제조 및 품질관리에 관한 규정｣ 제3조 및 [별표 1]에 따라"
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] 제7.1호", doc), [])
+
+    def test_multi_table_and_truncated_refs_excluded(self):
+        # 106 파서가 뒤쪽 호를 앞 별표에 붙이는 표기 — 오결합 방지로 제외.
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] 제5.2호 [별표 1의2] 제6.1호", _DOC), [])
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] ○「약사법」제76조", _DOC), [])
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] 제7", _DOC), [])
+
+    def test_list_and_mok(self):
+        got = kg_edges.parse_citation_with_doc("[별표 1] 제2.1호, 제8.1호", _DOC)
+        self.assertEqual([g[0].split(" 별표")[1] for g in got], ["1 제2.1호", "1 제8.1호"])
+        self.assertEqual(kg_edges.parse_citation_with_doc("[별표 1] 제3.3호 하목", _DOC)[0][1], "하목")
+
+    def test_sql_contract(self):
+        code = _code(_S109)
+        low = code.lower()
+        self.assertIn("0.90::numeric, 'mfds_byeolpyo_doc'", code)
+        self.assertIn("on conflict do nothing", low)
+        self.assertNotRegex(low, r"drop\s+(table|column|function)|alter table|delete from|update public")
+        for sig in ("grm_mfds_doc_rule(text, text)", "grm_backfill_finding_clause_mfds_rule_since(timestamptz)",
+                    "grm_backfill_finding_clause_mfds_rule()", "grm_link_new_findings(integer)"):
+            self.assertIn(f"revoke all on function public.{sig} from public, anon, authenticated", low)
+        # 파이썬 기준 구현과 같은 패턴을 쓴다.
+        self.assertIn(kg_edges._DOC_RULE.pattern, code)
+        self.assertIn(kg_edges._STRICT_REF.pattern, code)
+        # 108 의 기존 결과 키는 그대로, 새 키만 추가.
+        for k in ("'since'", "'fei_filled'", "'clause_edges'", "'clause_mfds_rule'"):
+            self.assertIn(k, code)

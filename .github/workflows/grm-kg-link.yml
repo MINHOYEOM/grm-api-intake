@@ -40,6 +40,14 @@ on:
         options:
           - "false"
           - "true"
+      only_similar:
+        description: "true=유사 지적 엣지(114)만(백필: days=5000 과 함께). schedule 은 항상 false."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 permissions:
   contents: read
@@ -82,6 +90,9 @@ jobs:
           fi
           if [ "${{ inputs.only_product }}" = "true" ]; then
             ARGS="$ARGS --only-product"
+          fi
+          if [ "${{ inputs.only_similar }}" = "true" ]; then
+            ARGS="$ARGS --only-similar --similar-budget 600"
           fi
           if [ "${{ inputs.skip_rpc }}" = "true" ]; then
             ARGS="$ARGS --skip-rpc"

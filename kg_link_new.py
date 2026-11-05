@@ -23,6 +23,7 @@ from typing import Any
 import requests
 
 import kg_edges
+import kg_product
 from grm_cli import normalize_supabase_url, resolve_supabase_service_credentials
 
 ROOT = Path(__file__).resolve().parent
@@ -128,6 +129,9 @@ def main(argv: list[str] | None = None) -> int:
         sent = write_term_edges(base, key, edges)
         print(f"[kg-link] 용어: 지적 {len(rows):,}건 스캔 · 엣지 {len(edges):,} · "
               + (f"전송 {sent:,}" if sent is not None else "SKIP(107 미적용)"))
+        n_prod, sent_prod = kg_product.link_recent(base, key, since)
+        print(f"[kg-link] 제품군: 엣지 {n_prod:,} · "
+              + (f"전송 {sent_prod:,}" if sent_prod is not None else "SKIP(111 미적용)"))
     except (RuntimeError, OSError, ValueError) as exc:
         print(f"[kg-link] 실패: {exc}", file=sys.stderr)
         return 1

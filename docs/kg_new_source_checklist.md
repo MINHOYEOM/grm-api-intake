@@ -22,6 +22,7 @@
 
 - DB 엣지 테이블: `finding_clause(finding_id, citation_key, citation_paragraph, confidence, basis, raw_ref)` (106),
   `finding_term(finding_id, term_id, surface, confidence >= 0.8)` (107). 둘 다 `ignore duplicates` 멱등.
+  `finding_product(finding_id, axis, value, confidence >= 0.8, basis, evidence)` (111, 제품군 — MFDS 제품명·FDA 483 본문에 명시된 경우만; 규칙은 `kg_product.py`).
 - 내보내기(`web/graph_export.py`) 노드: `doc` · `firm` · `clause` · `term` · `brief`, 엣지: `cited_in_brief` · `issued_to` · `cites_clause` · `uses_term`.
   새 유형은 보통 새 노드 유형이 아니라 **기존 `doc` 노드의 새 `agency`/`source` 값**이다. 새 노드·엣지 유형이 정말 필요하면 `NODE_TYPES`/`NODE_FIELDS` 허용목록과 `validate_graph` 가드를 먼저 확장한다.
 

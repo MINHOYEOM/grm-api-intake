@@ -138,6 +138,53 @@ class TermEdges(unittest.TestCase):
         self.assertIn("join public.findings f on f.finding_id = v.finding_id", sql)
 
 
+class ExtendedSurfaces(unittest.TestCase):
+    """영문 원문·한글 별칭 확장(가산). 일반어·모호 표면형은 계속 연결하지 않는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.terms = json.loads((_ROOT / "web/data/glossary.json").read_text(encoding="utf-8"))
+
+    def _edges(self, ko, orig="", extended=True):
+        docs = [{"findings": [{"finding_id": "f1", "text_ko": ko, "text_orig": orig}]}]
+        edges, _ = kg_edges.build_term_edges(docs, self.terms, extended=extended)
+        return {e["term_id"]: e for e in edges}
+
+    def test_english_original_links_with_confidence_below_exact(self):
+        e = self._edges("서면 절차가 없었다.", "Written procedures are not established.")
+        self.assertEqual(e["written-procedure"]["confidence"], kg_edges.EN_CONFIDENCE)
+        self.assertEqual(e["written-procedure"]["basis"], "en")
+        self.assertNotIn("written-procedure", self._edges("서면 절차가 없었다.", "Written procedures are not established.", extended=False))
+
+    def test_plural_hyphen_case_variants(self):
+        self.assertIn("computerised-system", self._edges("x", "The Computerized Systems were not validated."))
+        self.assertIn("cross-contamination", self._edges("x", "risk of cross contamination between lines"))
+
+    def test_latin_word_boundary(self):
+        # 'sop' 가 다른 낱말 안에 걸리면 안 된다
+        self.assertNotIn("sop", self._edges("x", "The sophisticated assay was not documented."))
+
+    def test_generic_and_denied_english_not_linked(self):
+        e = self._edges("x", "The quality of the batch record and production procedure, accurate and legible; "
+                             "non-viable cells; quality audit; logbook.")
+        self.assertEqual(e, {})
+
+    def test_korean_alias_and_acronym_paren_base(self):
+        self.assertIn("pharmaceutical-quality-system", self._edges("품질경영시스템의 유효성이 미흡했다."))
+        self.assertEqual(self._edges("품질관리부서가 업무를 수행하지 않았다.")["quality-control-unit"]["basis"], "ko_alias")
+        # 괄호가 한정어(FDA 모델)면 본체를 표면형으로 쓰지 않는다
+        self.assertNotIn("quality-system", self._edges("품질시스템 이행이 미흡했다."))
+
+    def test_ambiguous_surface_owned_by_two_terms_is_dropped(self):
+        terms = [{"id": "a", "term_ko": "가나다라", "term_en": "Foo Barrier", "aliases": []},
+                 {"id": "b", "term_ko": "마바사아", "term_en": "Other", "aliases": ["foo barrier"]}]
+        self.assertEqual([s for s, _t, _r in kg_edges.build_en_index(terms)], ["Other"])
+
+    def test_no_extra_edge_when_ko_edge_exists(self):
+        e = self._edges("표준작업지침서(SOP)가 없다.", "Standard operating procedure is missing (SOP).")
+        self.assertEqual(e["sop"]["basis"], "ko")
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -8,9 +8,7 @@ from __future__ import annotations
 
 import json
 import pathlib
-import shutil
 import sys
-import tempfile
 import unittest
 
 WEB_DIR = pathlib.Path(__file__).resolve().parent.parent
@@ -109,29 +107,30 @@ class FirmAliasRedirectTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             render.build_redirects_txt([(f"/a{i}/", "/b/") for i in range(2001)])
 
-    def test_live_data_rules_and_sitemap(self):
-        """실데이터 렌더: _redirects 규칙의 새 주소는 전부 실제로 내보낸 페이지이고,
-        옛 주소는 페이지·sitemap 어디에도 없다."""
+    def test_live_data_rules(self):
+        """실데이터(render 와 같은 묶음 규칙: 정본 키별 문서 2건 이상 = 페이지)에서
+        확인된 404 4건이 규칙에 있고, 새 주소는 전부 페이지가 있는 정본이며,
+        옛 주소는 어떤 정본 페이지 주소와도 겹치지 않는다(= sitemap 에 오르지 않는다).
+        (전체 렌더는 25분 걸려 CI 에서 돌리지 않는다.)"""
         if not DOCS_FILE.exists():
             self.skipTest("findings_docs.json 없음")
-        tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_redir_"))
-        try:
-            out = tmp / "out"
-            render.render_site(WEB_DIR / "data", out, render_doc_pages=True)
-            txt = (out / "_redirects").read_text(encoding="utf-8")
-            rules = [ln.split(" ") for ln in txt.splitlines() if ln and not ln.startswith("#")]
-            self.assertTrue(rules, "실데이터에서 리다이렉트 규칙이 0건")
-            sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
-            for old, new, code in rules:
-                self.assertEqual(code, "301")
-                self.assertTrue((out / new.strip("/") / "index.html").exists(),
-                                f"404 로 가는 리다이렉트: {old} -> {new}")
-                self.assertFalse((out / old.strip("/") / "index.html").exists(),
-                                 f"옛 주소에 실제 페이지가 있다: {old}")
-                self.assertNotIn(old, sitemap, f"sitemap 에 옛 주소: {old}")
-            self.assertEqual(len({r[0] for r in rules}), len(rules))
-        finally:
-            shutil.rmtree(tmp, ignore_errors=True)
+        docs = json.loads(DOCS_FILE.read_text(encoding="utf-8"))["documents"]
+        count: dict[str, int] = {}
+        for d in docs:
+            k = canonical_firm_key(d.get("firm_key") or "")
+            if k:
+                count[k] = count.get(k, 0) + 1
+        slugs = {k: render._firm_slug(k) for k, n in count.items() if n >= 2}
+        rules = render.build_firm_alias_redirects(FIRM_KEY_ALIASES, slugs, set(slugs.values()))
+        by_old = dict(rules)
+        for old in CONFIRMED_OLD:
+            self.assertIn(old, by_old)
+        live_paths = {f"/findings/firm/{s}/" for s in slugs.values()} |             {f"/en/findings/firm/{s}/" for s in slugs.values()}
+        self.assertTrue(rules)
+        self.assertEqual(len(by_old), len(rules))
+        for old, new in rules:
+            self.assertIn(new, live_paths, f"404 로 가는 리다이렉트: {old} -> {new}")
+            self.assertNotIn(old, live_paths)
 
 
 if __name__ == "__main__":

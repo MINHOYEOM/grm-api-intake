@@ -102,5 +102,30 @@ class MigrationContract(unittest.TestCase):
         self.assertEqual(order, sorted(order))
 
 
+_S112 = (_MIG / "112_wl_fei_backfill_narrow.sql").read_text(encoding="utf-8")
+
+
+class NarrowedBackfill(unittest.TestCase):
+    """112 는 110 과 같은 규칙에서 findings 를 먼저 좁히기만 한다."""
+
+    def test_signature_and_lockdown(self):
+        code = _code(_S112)
+        self.assertEqual(re.findall(r"create or replace function public\.(\w+)\(([^)]*)\)", code),
+                         [("grm_backfill_wl_fei_since", "p_since timestamptz")])
+        self.assertIn("returns integer", code)
+        self.assertIn("revoke all on function public.grm_backfill_wl_fei_since(timestamptz) from public, anon, authenticated", code)
+
+    def test_findings_narrowed_before_raw_signals(self):
+        code = re.sub(r"\s+", " ", _code(_S112))
+        self.assertIn("with t as materialized ( select distinct f0.raw_signal_id from public.findings f0 "
+                      "where f0.source = 'FDA Warning Letter' and f0.fei is null and f0.ingested_at >= p_since )", code)
+        self.assertIn("from t join public.raw_signals r on r.raw_signal_id = t.raw_signal_id", code)
+
+    def test_same_write_rule_as_110(self):
+        norm = lambda s: re.sub(r"\s+", " ", s[s.index("update public.findings f"):s.index("get diagnostics")])
+        tail = lambda s: norm(s)[norm(s).index("where f.raw_signal_id"):]
+        self.assertEqual(tail(_code(_S112)), tail(_code(_S110)))
+
+
 if __name__ == "__main__":
     unittest.main()

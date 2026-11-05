@@ -79,6 +79,36 @@ class MigrationContract(unittest.TestCase):
         self.assertEqual(nums.count(114), 1)
 
 
+_S116 = (_ROOT / "web" / "migrations" / "116_finding_similar_speed.sql").read_text(encoding="utf-8")
+
+
+class SpeedMigration(unittest.TestCase):
+    def test_same_signatures_and_locked_down(self):
+        code = _code(_S116)
+        for sig in ("grm_finding_similar_compute(text[], numeric, integer)",
+                    "grm_link_finding_similar(timestamptz, integer, integer)",
+                    "grm_finding_similar_sync_texts()"):
+            self.assertIn(f"revoke all on function public.{sig} from public, anon, authenticated", code)
+        self.assertIn("revoke all on table public.finding_similar_text from public, anon, authenticated", code)
+        self.assertNotRegex(code.lower(), r"drop\s+(table|column|function|index)")
+
+    def test_threshold_derived_from_min_score_with_margin(self):
+        code = " ".join(_code(_S116).split())
+        self.assertIn("(coalesce(p_min_score, 0.40) - 0.064) / 0.6", code)  # fts 상한 0.16(실측 0.076)의 2배 마진
+
+    def test_score_exclusions_and_basis_unchanged_from_114(self):
+        a, b = " ".join(_code(_SQL).split()), " ".join(_code(_S116).split())
+        for frag in ("0.6 * s.sim + 0.4 * s.fr", "'lexical_v1' || case when r.same_text then ';same_text' else '' end",
+                     "';sim=' || to_char(r.sim::numeric, 'FM0.00') || ';fts=' || to_char(r.fr::numeric, 'FM0.00')",
+                     "g.crid is distinct from b.rid and g.cid <> b.fid"):
+            self.assertIn(frag, b)
+        self.assertIn("'lexical_v1'", a)
+
+    def test_sync_runs_first_in_link_function(self):
+        body = " ".join(_code(_S116).split()).split("create or replace function public.grm_link_finding_similar", 1)[1]
+        self.assertLess(body.index("grm_finding_similar_sync_texts()"), body.index("select array_agg(q.finding_id)"))
+
+
 class LinkSimilar(unittest.TestCase):
     def test_loops_until_pending_zero(self):
         seq = [Resp(200, {"processed": 40, "edges": 90, "pending": 30}),
@@ -88,7 +118,7 @@ class LinkSimilar(unittest.TestCase):
         self.assertEqual(r, {"calls": 2, "processed": 70, "edges": 140, "pending": 0})
         self.assertEqual(post.call_count, 2)
         sent = post.call_args.kwargs["json"]
-        self.assertEqual(sent["p_limit"], 40)
+        self.assertEqual(sent["p_limit"], 100)
         self.assertEqual(sent["p_stale_days"], 30)
         self.assertIn("p_since", sent)
 

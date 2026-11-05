@@ -53,6 +53,18 @@ def link_db(base: str, key: str, days: int, timeout: float = 120.0) -> dict[str,
     return resp.json()
 
 
+def link_text_clauses(base: str, key: str, days: int, timeout: float = 120.0) -> int | None:
+    """본문 직접 인용 조항(113, kg_clause_text.py 와 같은 규칙). 113 미적용이면 None."""
+    since = (datetime.now(timezone.utc) - timedelta(days=max(days, 1))).strftime("%Y-%m-%dT%H:%M:%SZ")
+    resp = _call(lambda: requests.post(f"{base}/rest/v1/rpc/grm_backfill_finding_clause_text_since",
+                                       headers=_headers(key), json={"p_since": since}, timeout=timeout))
+    if resp.status_code == 404:
+        return None
+    if resp.status_code != 200:
+        raise RuntimeError(f"grm_backfill_finding_clause_text_since HTTP {resp.status_code}")
+    return int(resp.json())
+
+
 def fetch_recent_texts(base: str, key: str, since_iso: str, timeout: float = 120.0) -> list[dict[str, str]]:
     """창 안에 들어온, 한국어 본문이 있는 지적 [{finding_id, text_ko}]."""
     rows: list[dict[str, str]] = []
@@ -123,6 +135,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         db = link_db(base, key, a.days)
         print("[kg-link] fei·조항: " + (json.dumps(db, ensure_ascii=False) if db is not None else "SKIP(108 미적용)"))
+        n_text = link_text_clauses(base, key, a.days)
+        print("[kg-link] 본문 조항: " + (f"신규 {n_text:,}" if n_text is not None else "SKIP(113 미적용)"))
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))
         rows = fetch_recent_texts(base, key, since)
         edges, _stats = compute_edges(rows, terms)

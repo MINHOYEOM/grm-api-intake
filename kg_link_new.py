@@ -106,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--supabase-url", default=None)
     ap.add_argument("--service-role-key", default=None)
     ap.add_argument("--dry-run", action="store_true", help="네트워크 0")
+    ap.add_argument("--skip-rpc", action="store_true",
+                    help="RPC(fei·조항) 단계만 건너뛰고 용어+제품군은 돈다 — RPC 가 타임아웃 나는 긴 창 백필용")
     ap.add_argument("--only-product", action="store_true",
                     help="RPC(fei·조항)·용어 단계를 건너뛰고 제품군(111) 엣지만 채운다 — 긴 창 백필용")
     ap.add_argument("--glossary", default=str(ROOT / "web" / "data" / "glossary.json"))
@@ -129,8 +131,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[kg-link] 제품군(only): 엣지 {n_prod:,} · "
                   + (f"전송 {sent_prod:,}" if sent_prod is not None else "SKIP(111 미적용)"))
             return 0
-        db = link_db(base, key, a.days)
-        print("[kg-link] fei·조항: " + (json.dumps(db, ensure_ascii=False) if db is not None else "SKIP(108 미적용)"))
+        if a.skip_rpc:
+            print("[kg-link] fei·조항: SKIP(--skip-rpc)")
+        else:
+            db = link_db(base, key, a.days)
+            print("[kg-link] fei·조항: " + (json.dumps(db, ensure_ascii=False) if db is not None else "SKIP(108 미적용)"))
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))
         rows = fetch_recent_texts(base, key, since)
         edges, _stats = compute_edges(rows, terms)

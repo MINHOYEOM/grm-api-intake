@@ -119,6 +119,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E402
 from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
+from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
 import graph_export  # noqa: E402
 # [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
 # 걸러도, 게이트 이전에 발행된 브리프 JSON(`web/data/briefs/*.json`)은 여전히 파일에
@@ -4423,6 +4424,47 @@ def build_robots_txt(base_url: str = SITE_BASE_URL, *, disallow_admin: bool = Fa
     return "\n".join(lines) + "\n"
 
 
+# Cloudflare Pages `_redirects` 정적 규칙 상한(초과분은 배포가 무시한다).
+REDIRECTS_STATIC_MAX = 2000
+
+
+def build_firm_alias_redirects(
+        aliases: "dict[str, str]",
+        slug_by_key: "dict[str, str]",
+        en_slugs: "set[str]",
+        *, slug_fn: "Any" = None) -> "list[tuple[str, str]]":
+    """업체 별칭(옛 키)의 정적 페이지 주소 → 정본 업체 페이지 주소 301 규칙 (옛, 새).
+
+    별칭 병합(105·115) 뒤 정적 업체 페이지는 정본 키로만 만들어져, 별칭 키로 만들어졌던
+    옛 슬러그가 404 가 된다. 옛 슬러그는 `_firm_slug(별칭키)` — 그 키가 페이지를 가졌다면
+    나왔을 주소다(실제로 있었는지 가릴 필요 없이 정본 페이지가 있는 별칭 전부).
+    ★정본 페이지가 없는 별칭엔 규칙을 만들지 않는다(404 로 가는 리다이렉트 금지).
+    영어판은 정본의 영어 페이지가 있을 때만(`en_slugs`). 옛=새·살아 있는 페이지와 같은
+    주소(덮어쓰기 위험)는 건너뛴다.
+    """
+    slug_fn = slug_fn or _firm_slug
+    live = set(slug_by_key.values())
+    rules: list[tuple[str, str]] = []
+    for alias in sorted(aliases):
+        new = slug_by_key.get(aliases[alias])
+        old = slug_fn(alias)
+        if not new or not old or old == new or old in live:
+            continue
+        rules.append((f"/findings/firm/{old}/", f"/findings/firm/{new}/"))
+        if new in en_slugs:
+            rules.append((f"/en/findings/firm/{old}/", f"/en/findings/firm/{new}/"))
+    return rules
+
+
+def build_redirects_txt(rules: "list[tuple[str, str]]") -> str:
+    """_redirects — `옛 새 301` 한 줄씩(정렬·중복 제거로 결정론). 규칙이 없어도 머리말은 낸다."""
+    uniq = sorted(set(rules))
+    if len(uniq) > REDIRECTS_STATIC_MAX:
+        raise RuntimeError(f"_redirects 정적 규칙 {len(uniq)}개 > 상한 {REDIRECTS_STATIC_MAX}")
+    head = "# 업체 별칭 병합으로 사라진 옛 업체 페이지 주소 → 정본 주소 (Cloudflare Pages _redirects)\n"
+    return head + "".join(f"{a} {b} 301\n" for a, b in uniq)
+
+
 def build_headers_txt() -> str:
     """_headers — Cloudflare Pages 응답 헤더 규칙(공급망·보안 위생, 2026-09-10).
 
@@ -6054,6 +6096,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   ★분류 라벨 → 모음 페이지 슬러그는 **facets 데이터에서 파생**한다(사본 금지). facets
     #     가 없거나 그 분류가 표본 미달로 페이지가 없으면 링크를 만들지 않는다 — 없는 페이지로
     #     보내는 링크가 무링크보다 나쁘다(자료실 조항 링크와 같은 판단).
+    firm_alias_redirects: list[tuple[str, str]] = []
     if docs_data:
         doc_agency_labels = docs_data.get("agency_labels") or (
             facets.get("agency_labels") if facets else {}) or {}
@@ -6173,6 +6216,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         en_firm_slugs = {fp["slug"] for fp in en_firm_pages}
         if en_firm_slugs:
             en_paths |= {f"findings/firm/{sl}/" for sl in en_firm_slugs}
+        firm_alias_redirects = build_firm_alias_redirects(
+            FIRM_KEY_ALIASES, firm_page_slug_by_key, en_firm_slugs)
 
         def _firm_slug_for(doc: dict[str, Any], lg: str) -> "str | None":
             """그 언어 트리에 **실제로 있는** 업체 페이지의 슬러그(없으면 None).
@@ -6890,6 +6935,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # robots.txt 와 나란히 둔다(Pages 관례).
     _write(out_dir / "_headers", build_headers_txt())
     written.append("_headers")
+    # _redirects — 별칭 병합으로 잃은 옛 업체 페이지 주소의 301(정본이 있는 것만).
+    _write(out_dir / "_redirects", build_redirects_txt(firm_alias_redirects))
+    written.append("_redirects")
     # llms.txt — AI 어시스턴트용 안내. sitemap 과 같은 입력에서 파생(결정론).
     _write(out_dir / "llms.txt",
            build_llms_txt(briefs, glossary_term_ids=glossary_term_ids, en_paths=en_paths,

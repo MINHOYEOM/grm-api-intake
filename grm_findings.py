@@ -1415,37 +1415,60 @@ def normalize_firm_name_v2(name: str) -> str:
     return _FIRM_TRAIL_RE.sub("", text)
 
 
-# 같은 회사의 표기 변종 26그룹(별칭 -> 정본 firm_key). firm_key 자체는 바꾸지 않는다 —
+# 같은 회사의 표기 변종 49개 별칭(26그룹 + 115 의 23)(별칭 -> 정본 firm_key). firm_key 자체는 바꾸지 않는다 —
 # 업체 URL·firm_watchlist 가 그대로 유효하고, 합쳐 보이는 일은 조회 쪽이 맡는다:
 # DB 는 web/migrations/105_firm_alias_groups.sql 의 firm_alias 시드, 정적 업체 페이지는
 # 이 사전(web/render.py). 두 시드는 tests/test_firm_alias_groups.py 가 일치를 고정한다.
 FIRM_KEY_ALIASES: dict[str, str] = {
     "agc biologics spa": "agc biologics",
     "akorn ag": "akorn",
-    "the american national red cross": "american national red cross",
+    "american red cross donor and client support center": "american red cross - donor and client support center",
     "aurobindo pharma (unit vii)": "aurobindo pharma",
+    "aurobindo pharma - unit 4": "aurobindo pharma unit 4",
     "bausch and lomb incorporated": "bausch & lomb",
     "biocon sdn bhd": "biocon",
+    "brookfield medical / surgical supply": "brookfield medical/surgical supply",
+    "brookfield medical /surgical supply": "brookfield medical/surgical supply",
     "central admixture pharmacy services (caps)": "central admixture pharmacy services",
     "college pharmacy incorporated": "college pharmacy",
+    "crosby’s drugs": "crosbys drugs",
+    "curexa - east curexa": "curexa – east curexa",
+    "denver solutions leiter's health": "denver solutions leiters health",
+    "denver solutions leiter’s health": "denver solutions leiters health",
+    "dignity health- northridge hospital medical center": "dignity health-northridge hospital medical center",
     "divi's laboratories (unit ii)": "divi's laboratories",
+    "dougherty’s pharmacy": "dougherty's pharmacy",
     "downing labs (formerly nuvision pharmacy )": "downing labs",
+    "dr reddy’s laboratories": "dr reddy's laboratories",
+    "dr reddy’s laboratories biologics": "dr reddy's laboratories biologics",
+    "dyna labs": "dynalabs",
+    "fin vector oy": "finvector oy",
     "fresenius kabi ag": "fresenius kabi",
+    "grandpa’s compounding pharmacy": "grandpa's compounding pharmacy",
     "hartley medical center pharmacy incorporated": "hartley medical center pharmacy",
     "imprimis njof -": "imprimis njof",
     "infusion partners (subsidiary of bioscrip)": "infusion partners",
+    "intratheca l compounding specialists": "intrathecal compounding specialists",
     "jd and sn": "jd & sn",
     "johnson and johnson (mcneil)": "johnson & johnson",
     "logistic support unit (now operating under del 3-002794-a)": "logistic support unit",
+    "mandell’s clinical pharmacy": "mandell's clinical pharmacy",
+    "maplerose enterprises pencol pharmacy": "maple rose enterprises pencol pharmacy",
+    "master pharm": "masterpharm",
     "medi-fare drug and home health center": "medi-fare drug & home health center",
     "natco pharma (canada)": "natco pharma",
     "peanut of america (pca)": "peanut of america",
+    "people’s custom rx and clinical care": "people's custom rx and clinical care",
     "pharmacia and upjohn": "pharmacia & upjohn",
     "region care (northwell health)": "region care",
+    "right value drug stores carie boyd’s prescription shop": "right value drug stores carie boyd's prescription shop",
+    "rx south rx3 pharmacy": "rxsouth ( rx3 pharmacy)",
     "sanofi spa": "sanofi",
     "south coast specialty compounding (park pharmacy and compounding)": "south coast specialty compounding",
     "sun pharmaceutical medicare (spml)": "sun pharmaceutical medicare",
+    "the american national red cross": "american national red cross",
     "the wellness pharmacy": "wellness pharmacy",
+    "veganicskn": "veganic skn",
 }
 
 

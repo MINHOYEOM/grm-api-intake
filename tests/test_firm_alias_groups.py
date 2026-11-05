@@ -12,15 +12,22 @@ import grm_findings
 
 _MIG = Path(__file__).resolve().parent.parent / "web" / "migrations"
 _SQL = (_MIG / "105_firm_alias_groups.sql").read_text(encoding="utf-8")
+_SQL115 = (_MIG / "115_firm_alias_more.sql").read_text(encoding="utf-8")
 _P65 = (_MIG / "065_profile_categories_and_repeats.sql").read_text(encoding="utf-8")
 _P63 = (_MIG / "063_fda_inspection_firm.sql").read_text(encoding="utf-8")
 _RENDER = (Path(__file__).resolve().parent.parent / "web" / "render.py").read_text(encoding="utf-8")
 
 
-def _seed() -> dict[str, str]:
-    block = _SQL.split("insert into public.firm_alias (alias_key, canonical_key) values", 1)[1].split("on conflict", 1)[0]
+def _seed_of(src: str) -> dict[str, str]:
+    block = src.split("insert into public.firm_alias (alias_key, canonical_key) values", 1)[1].split("on conflict", 1)[0]
     return {a.replace("''", "'"): c.replace("''", "'")
             for a, c in re.findall(r"\('((?:[^']|'')*)', '((?:[^']|'')*)'\)", block)}
+
+
+def _seed() -> dict[str, str]:
+    d = _seed_of(_SQL)
+    d.update(_seed_of(_SQL115))
+    return d
 
 
 def _fn(src: str, head: str) -> str:
@@ -32,9 +39,14 @@ class AliasSeed(unittest.TestCase):
     def test_sql_seed_equals_python_dict(self):
         self.assertEqual(_seed(), grm_findings.FIRM_KEY_ALIASES)
 
-    def test_26_groups_no_chains_no_self(self):
+    def test_105_seed_unchanged_26(self):
+        self.assertEqual(len(_seed_of(_SQL)), 26)
+        self.assertEqual(len(_seed_of(_SQL115)), 23)
+        self.assertFalse(set(_seed_of(_SQL)) & set(_seed_of(_SQL115)))
+
+    def test_no_chains_no_self(self):
         d = grm_findings.FIRM_KEY_ALIASES
-        self.assertEqual(len(d), 26)
+        self.assertEqual(len(d), 49)
         for a, c in d.items():
             self.assertNotEqual(a, c)
             self.assertNotIn(c, d, f"체인 금지: {a} -> {c}")

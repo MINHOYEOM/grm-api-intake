@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-04T23:54:08Z",
+ "generated_at": "2026-11-05T12:16:08Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 41879555751,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-04T17:41:26Z",
-    "updatedAt": "2026-11-04T17:52:17Z",
-    "headBranch": "main",
-    "displayTitle": "kg: 신규 지적 일일 자동 연결(108)·연결 품질 감시·새 유형 체크리스트 (#1330)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41879555751"
+    "databaseId": 42025108090,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-05T12:11:58Z",
+    "updatedAt": "2026-11-05T12:12:02Z",
+    "headBranch": "claude/glossary-fig-daily-20261105-2110",
+    "displayTitle": "glossary(fig): 2026-11-05 새 그림 0 · 다시 그림 0 · 보류 5 — assay·training·risk-evaluation·ATMP·risk-identification",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42025108090"
    },
    {
-    "databaseId": 41874121143,
+    "databaseId": 42025102126,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-05T12:11:56Z",
+    "updatedAt": "2026-11-05T12:12:00Z",
+    "headBranch": "claude/glossary-fig-daily-20261105-2110",
+    "displayTitle": "glossary(fig): 2026-11-05 새 그림 0 · 다시 그림 0 · 보류 5 — assay·training·ri…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42025102126"
+   },
+   {
+    "databaseId": 42024861153,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-04T17:05:37Z",
-    "updatedAt": "2026-11-04T17:11:23Z",
-    "headBranch": "kg/link-new-findings",
-    "displayTitle": "kg: 신규 지적 일일 자동 연결(108)·연결 품질 감시·새 유형 체크리스트",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41874121143"
+    "createdAt": "2026-11-05T12:10:12Z",
+    "updatedAt": "2026-11-05T12:15:52Z",
+    "headBranch": "kg-similar-speed",
+    "displayTitle": "kg: 유사 지적 계산 속도 수리 (migration 116)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42024861153"
    },
    {
-    "databaseId": 41874115312,
+    "databaseId": 42024843001,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-04T17:05:35Z",
-    "updatedAt": "2026-11-04T17:11:56Z",
-    "headBranch": "kg/link-new-findings",
-    "displayTitle": "kg-link: workflow_dispatch days 입력(기본 7, 비정수는 7) — 최초 백필용",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41874115312"
+    "createdAt": "2026-11-05T12:10:05Z",
+    "updatedAt": "2026-11-05T12:15:50Z",
+    "headBranch": "kg-similar-speed",
+    "displayTitle": "kg: 유사 지적 계산 속도 수리 (116) — 임계 0.56 + 고유 문장 표",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42024843001"
    },
    {
-    "databaseId": 41873715597,
+    "databaseId": 42023669010,
     "status": "completed",
     "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-04T17:03:19Z",
-    "updatedAt": "2026-11-04T17:09:29Z",
-    "headBranch": "main",
-    "displayTitle": "feat(findings): 유사 사례 표시 정제 — 하한·확실도·변형 묶기·흔한 문구·같은 업체 라벨 (#1331)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41873715597"
-   },
-   {
-    "databaseId": 41871051662,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-04T16:47:43Z",
-    "updatedAt": "2026-11-04T16:53:34Z",
-    "headBranch": "main",
-    "displayTitle": "kg: 조항 정규화 finding_clause(106)·지적↔용어 finding_term(107) (#1329)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41871051662"
+    "event": "pull_request",
+    "createdAt": "2026-11-05T12:01:33Z",
+    "updatedAt": "2026-11-05T12:07:54Z",
+    "headBranch": "kg-firm-alias-more",
+    "displayTitle": "kg-firm: 업체 별칭 23개 가산 (migration 115)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42023669010"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -391,6 +391,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 41986364232,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-05T07:18:58Z",
+    "updatedAt": "2026-11-05T07:19:35Z",
+    "headBranch": "main",
+    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-05 - 20건 (#1332)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41986364232"
+   },
+   {
     "databaseId": 41832219219,
     "status": "completed",
     "conclusion": "success",
@@ -433,20 +444,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1256 from MINHOYEOM/chore/findings-translate-2026…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41258403819"
-   },
-   {
-    "databaseId": 41150551488,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-10-31T00:30:37Z",
-    "updatedAt": "2026-10-31T00:31:57Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1248 from MINHOYEOM/chore/findings-translate-2026…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41150551488"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 41983721091,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-05T06:56:03Z",
+    "updatedAt": "2026-11-05T10:04:09Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41983721091"
+   },
    {
     "databaseId": 41900777616,
     "status": "completed",
@@ -490,17 +501,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41592941559"
-   },
-   {
-    "databaseId": 41531111671,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-02T21:44:36Z",
-    "updatedAt": "2026-11-03T00:59:06Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41531111671"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -528,6 +528,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 41986887272,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-05T07:23:25Z",
+    "updatedAt": "2026-11-05T07:23:36Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41986887272"
+   },
    {
     "databaseId": 41902593105,
     "status": "completed",
@@ -571,17 +582,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41594947184"
-   },
-   {
-    "databaseId": 41532732609,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-02T21:55:32Z",
-    "updatedAt": "2026-11-02T21:55:48Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41532732609"
    }
   ],
   "grm-cloud-request.yml": [

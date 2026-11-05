@@ -13,7 +13,7 @@
 --  3) 7~10자리 숫자만(101 의 CHECK 와 동일). 앞자리 0 채움 없음. 이름 유사도는 쓰지 않는다.
 --  4) fei is null 인 행만 채운다 → 멱등. 이미 채운 행·483 은 건드리지 않는다.
 --
--- 적용 순서: 101·108 이 먼저 적용돼 있어야 한다. 적용 후 `select public.grm_backfill_wl_fei();` 1회.
+-- 적용 순서: 101·108·109 이 먼저 적용돼 있어야 한다. 적용 후 `select public.grm_backfill_wl_fei();` 1회.
 -- 이후 신규 WL 은 grm_link_new_findings(108) 가 같은 *_since 함수를 불러 일일로 채운다(아래 (D)).
 
 -- (A) 순수 파서 — 편지 본문에서 수신 업체 FEI 한 개를 돌려준다(없거나 모호하면 NULL).
@@ -79,7 +79,7 @@ set search_path = public
 as $$ select public.grm_backfill_wl_fei_since('-infinity'::timestamptz); $$;
 revoke all on function public.grm_backfill_wl_fei() from public, anon, authenticated;
 
--- (D) 일일 연결 진입점 — 108 본문 그대로 + WL fei 한 줄. 반환 jsonb 는 키만 추가(기존 키 불변).
+-- (D) 일일 연결 진입점 — 109 본문(fei→clause→mfds_rule) 위에 WL fei 한 줄만 가산(109 선적용 전제). 반환 jsonb 는 키만 추가(기존 키 불변).
 create or replace function public.grm_link_new_findings(p_days integer default 3)
 returns jsonb
 language plpgsql
@@ -91,11 +91,14 @@ declare
   v_fei    integer;
   v_wl_fei integer;
   v_clause integer;
+  v_rule   integer;
 begin
   v_fei := public.grm_backfill_findings_fei_since(v_since);
   v_wl_fei := public.grm_backfill_wl_fei_since(v_since);
   v_clause := public.grm_backfill_finding_clause_since(v_since);
-  return jsonb_build_object('since', v_since, 'fei_filled', v_fei, 'wl_fei_filled', v_wl_fei, 'clause_edges', v_clause);
+  v_rule := public.grm_backfill_finding_clause_mfds_rule_since(v_since);
+  return jsonb_build_object('since', v_since, 'fei_filled', v_fei, 'wl_fei_filled', v_wl_fei,
+                            'clause_edges', v_clause, 'clause_mfds_rule', v_rule);
 end;
 $$;
 revoke all on function public.grm_link_new_findings(integer) from public, anon, authenticated;

@@ -91,9 +91,15 @@ class MigrationContract(unittest.TestCase):
 
     def test_daily_entry_keeps_existing_keys(self):
         code = re.sub(r"\s+", " ", _code(_S110))
-        for key in ("'since'", "'fei_filled'", "'clause_edges'"):
+        for key in ("'since'", "'fei_filled'", "'clause_edges'", "'clause_mfds_rule'"):
             self.assertIn(key, code)
         self.assertIn("grm_backfill_wl_fei_since(v_since)", code)
+        self.assertIn("grm_backfill_finding_clause_mfds_rule_since(v_since)", code)
+        # 순서: fei(483) -> WL fei -> clause -> mfds_rule
+        order = [code.index(k) for k in ("grm_backfill_findings_fei_since(v_since)", "grm_backfill_wl_fei_since(v_since)",
+                                         "grm_backfill_finding_clause_since(v_since)",
+                                         "grm_backfill_finding_clause_mfds_rule_since(v_since)")]
+        self.assertEqual(order, sorted(order))
 
 
 if __name__ == "__main__":

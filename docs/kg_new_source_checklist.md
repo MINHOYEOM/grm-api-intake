@@ -22,6 +22,7 @@
 
 - DB 엣지 테이블: `finding_clause(finding_id, citation_key, citation_paragraph, confidence, basis, raw_ref)` (106),
   `finding_term(finding_id, term_id, surface, confidence >= 0.8)` (107). 둘 다 `ignore duplicates` 멱등.
+  `finding_product(finding_id, axis, value, confidence >= 0.8, basis, evidence)` (111, 제품군 — MFDS 제품명·FDA 483 본문에 명시된 경우만; 규칙은 `kg_product.py`).
 - 식약처 별표 ref 에 규칙명이 없으면 106 파서는 `[규칙 미상]`(0.7)로만 저장한다. 109 가 **출처 문서**(`raw_signals.raw_json.attachment_text`)의
   "｢규칙｣ … [별표 N]" 문장으로 규칙이 하나로 정해질 때만 `basis='mfds_byeolpyo_doc'`(0.9)로 보강한다(`kg_edges.parse_citation_with_doc` 가 기준 구현).
   새 식약처 문서 유형이 이 문장을 쓰지 않으면 보강되지 않는다 — 규칙명을 추측으로 채우지 않는다.

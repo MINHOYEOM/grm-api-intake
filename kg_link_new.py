@@ -54,19 +54,32 @@ def link_db(base: str, key: str, days: int, timeout: float = 120.0) -> dict[str,
     return resp.json()
 
 
+def link_text_clauses(base: str, key: str, days: int, timeout: float = 120.0) -> int | None:
+    """본문 직접 인용 조항(113, kg_clause_text.py 와 같은 규칙). 113 미적용이면 None."""
+    since = (datetime.now(timezone.utc) - timedelta(days=max(days, 1))).strftime("%Y-%m-%dT%H:%M:%SZ")
+    resp = _call(lambda: requests.post(f"{base}/rest/v1/rpc/grm_backfill_finding_clause_text_since",
+                                       headers=_headers(key), json={"p_since": since}, timeout=timeout))
+    if resp.status_code == 404:
+        return None
+    if resp.status_code != 200:
+        raise RuntimeError(f"grm_backfill_finding_clause_text_since HTTP {resp.status_code}")
+    return int(resp.json())
+
+
 def fetch_recent_texts(base: str, key: str, since_iso: str, timeout: float = 120.0) -> list[dict[str, str]]:
-    """창 안에 들어온, 한국어 본문이 있는 지적 [{finding_id, text_ko}]."""
+    """창 안에 들어온, 한국어 본문이 있는 지적 [{finding_id, text_ko, text_orig(영문 원문)}]."""
     rows: list[dict[str, str]] = []
     offset = 0
     while True:
         resp = _call(lambda: requests.get(
             f"{base}/rest/v1/findings", headers=_headers(key, Range=f"{offset}-{offset + PAGE - 1}"), timeout=timeout,
-            params={"select": "finding_id,finding_text_ko", "ingested_at": f"gte.{since_iso}",
+            params={"select": "finding_id,finding_text_ko,finding_text", "ingested_at": f"gte.{since_iso}",
                     "finding_text_ko": "neq.", "order": "finding_id.asc"}))
         if resp.status_code not in (200, 206):
             raise RuntimeError(f"findings HTTP {resp.status_code}")
         page = resp.json()
-        rows.extend({"finding_id": r["finding_id"], "text_ko": r["finding_text_ko"]} for r in page)
+        rows.extend({"finding_id": r["finding_id"], "text_ko": r["finding_text_ko"],
+                     "text_orig": r.get("finding_text") or ""} for r in page)
         if len(page) < PAGE:
             return rows
         offset += PAGE
@@ -107,9 +120,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--service-role-key", default=None)
     ap.add_argument("--dry-run", action="store_true", help="네트워크 0")
     ap.add_argument("--skip-rpc", action="store_true",
-                    help="RPC(fei·조항) 단계만 건너뛰고 용어+제품군은 돈다 — RPC 가 타임아웃 나는 긴 창 백필용")
+                    help="DB RPC 단계(fei·조항·본문 조항)만 건너뛰고 용어+제품군은 돈다 — RPC 가 타임아웃 나는 긴 창 백필용")
     ap.add_argument("--only-product", action="store_true",
-                    help="RPC(fei·조항)·용어 단계를 건너뛰고 제품군(111) 엣지만 채운다 — 긴 창 백필용")
+                    help="RPC(fei·조항·본문 조항)·용어 단계를 건너뛰고 제품군(111) 엣지만 채운다 — 긴 창 백필용")
     ap.add_argument("--glossary", default=str(ROOT / "web" / "data" / "glossary.json"))
     a = ap.parse_args(argv)
     if a.dry_run:
@@ -132,10 +145,14 @@ def main(argv: list[str] | None = None) -> int:
                   + (f"전송 {sent_prod:,}" if sent_prod is not None else "SKIP(111 미적용)"))
             return 0
         if a.skip_rpc:
+            # DB 안에서 도는 RPC 두 단계(fei·조항, 본문 조항)를 모두 건너뛴다. 용어·제품군은 파이썬 쪽이라 돈다.
             print("[kg-link] fei·조항: SKIP(--skip-rpc)")
+            print("[kg-link] 본문 조항: SKIP(--skip-rpc)")
         else:
             db = link_db(base, key, a.days)
             print("[kg-link] fei·조항: " + (json.dumps(db, ensure_ascii=False) if db is not None else "SKIP(108 미적용)"))
+            n_text = link_text_clauses(base, key, a.days)
+            print("[kg-link] 본문 조항: " + (f"신규 {n_text:,}" if n_text is not None else "SKIP(113 미적용)"))
         terms = json.loads(Path(a.glossary).read_text(encoding="utf-8"))
         rows = fetch_recent_texts(base, key, since)
         edges, _stats = compute_edges(rows, terms)

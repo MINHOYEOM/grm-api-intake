@@ -134,10 +134,123 @@ def _surface_confidence(surface: str, hangul_re: "re.Pattern[str]") -> float:
     return 1.0 if len(surface) >= 3 else 0.5
 
 
-def build_term_edges(docs: Iterable[dict], terms: list[dict], render=None) -> tuple[list[dict], dict]:
-    """[{finding_id, term_id, surface, confidence}] 와 통계. 입력은 findings_docs.json 의 documents."""
+# ── 확장 표면형(용어 사전의 근거 있는 변형만) ─────────────────────────────────────
+# 기본 색인(render.build_doc_term_link_index)은 한글 표제어(·로 분리)와 term_en 괄호 속 영문 약어만
+# 쓴다. 아래는 같은 사전이 이미 들고 있는 변형을 **가산**으로 더 읽는다 — 새 사전 편집 없음.
+#   K-alias : 한글 aliases(품질경영시스템·표준작업지침서 등)
+#   K-paren : 괄호가 붙은 한글 표제어의 본체(`품질관리부서(QCU)` → `품질관리부서`)
+#   E-orig  : 영문 표제어·약어·영문 aliases 를 **영문 원문(text_orig)** 과 한국어 번역문에서 낱말 경계로
+#             찾는다(복수형 -s/-es, 하이픈↔공백, 대소문자 무시; 약어는 대소문자 일치)
+# 정밀도 규칙: 한글은 기존 `_surface_confidence`·낱말 시작 규칙을 그대로 쓴다. 영문은 (1) 일반어
+# (EN_GENERIC) 제외, (2) 한 낱말 영문은 약어(대문자 3자 이상)이거나 4자 이상, (3) 신뢰도 0.9.
+EN_CONFIDENCE = 0.9
+EN_BASIS_MIN_LEN = 4
+# 영문 단일어/구 중 "거의 모든 지적에 나오는 일반어" — 한국어 쪽에서 품질·제조·기록·배치를 저장하지
+# 않는 것과 같은 정책(정보량이 없어 AI/RAG 가 읽을 때 잡음). 소문자·단수형 기준.
+EN_GENERIC = frozenset({
+    "quality", "manufacture", "production", "packaging", "record", "procedure", "batch", "lot",
+    "specification", "contamination", "deviation", "risk", "calibration", "sterilization",
+    "content", "drug product", "medicinal product", "raw material", "range", "harm", "backup",
+    "yield", "disinfection", "validation", "documentation", "intermediate", "accuracy",
+    "hazard", "severity", "manufacturer", "starting material", "finished product",
+})
+
+# 표면형이 사전 별칭에 있어도 **용어를 특정하지 못하는** 말(실측 100건 대조에서 오탐/모호로 판정):
+# 부분 별칭(`Non-viable` 은 세포·조직의 "생존 불가"에도 쓰인다), ALCOA 형용사, 일반 동사·명사,
+# 다른 개념과 겹치는 말(`quality audit` 은 자체점검이 아니라 공급자 감사에도 쓴다). 소문자.
+EN_DENY = frozenset({
+    "non-viable", "accurate", "legible", "attributable", "contemporaneous", "precision", "robustness",
+    "archive", "archival", "returns", "time limit", "sanitary", "pest", "adulterated", "potency",
+    "quality audit", "internal audit", "duties and responsibilities", "positive pressure",
+    "equipment log", "usage log", "logbook", "quality system", "selectivity",
+})
+KO_ALIAS_DENY = frozenset({"로그북", "사용기록"})
+
+_HANGUL = re.compile("[가-힣]")
+
+
+def _split_ko(term_ko: str) -> list[str]:
+    return [p.strip() for p in (term_ko or "").split("·") if p.strip()]
+
+
+def extra_ko_surfaces(terms: list[dict]) -> list[tuple[str, str]]:
+    """[(표면형, term_id)] — 한글 aliases 와 괄호 본체. 기본 색인에 없는 것만."""
+    out: dict[str, str] = {}
+    for t in terms:
+        cands: list[str] = []
+        for p in _split_ko(t.get("term_ko") or ""):
+            # 괄호 속이 약어(QCU·GDocP)일 때만 본체를 쓴다 — `품질시스템(FDA 모델)` 같은 한정어는 제외
+            m = re.match(r"^(.*?)\s*\(([A-Za-z][A-Za-z0-9/-]{1,9})\)\s*$", p)
+            if m and _HANGUL.search(m.group(1)):
+                cands.append(m.group(1).strip())
+        cands.extend(str(a).strip() for a in (t.get("aliases") or [])
+                     if _HANGUL.search(str(a)) and str(a).strip() not in KO_ALIAS_DENY)
+        for c in cands:
+            if len(c) >= 2 and c not in out:
+                out[c] = t["id"]
+    return sorted(out.items(), key=lambda kv: (-len(kv[0]), kv[0]))
+
+
+def _en_candidates(t: dict) -> list[str]:
+    out: list[str] = []
+    for part in re.split(r"\s*/\s*", t.get("term_en") or ""):
+        base = re.sub(r"\s*\([^)]*\)", "", part).strip()
+        if base:
+            out.append(base)
+        for m in re.finditer(r"\(([^)]*)\)", part):
+            for q in re.split(r",| or ", m.group(1)):
+                q = re.sub(r"^or\s+", "", q.strip()).strip()
+                if q:
+                    out.append(q)
+    out.extend(str(a).strip() for a in (t.get("aliases") or []))
+    return out
+
+
+def _en_ok(s: str) -> bool:
+    if _HANGUL.search(s) or not re.search(r"[A-Za-z]", s):
+        return False
+    low = s.lower()
+    if low in EN_DENY or low in EN_GENERIC or low.rstrip("s") in EN_GENERIC:
+        return False
+    acronym = bool(re.fullmatch(r"[A-Z][A-Z0-9/-]{2,}", s))
+    return acronym or len(s) >= EN_BASIS_MIN_LEN
+
+
+def build_en_index(terms: list[dict]) -> list[tuple[str, str, "re.Pattern[str]"]]:
+    """[(표면형, term_id, 정규식)] — 긴 것부터. 같은 표면형이 두 용어에 걸리면 연결하지 않는다(모호)."""
+    owner: dict[str, set[str]] = {}
+    for t in terms:
+        for c in _en_candidates(t):
+            if _en_ok(c):
+                owner.setdefault(c.lower(), set()).add(t["id"])
+    seen: set[str] = set()
+    out: list[tuple[str, str, re.Pattern[str]]] = []
+    for t in terms:
+        for c in _en_candidates(t):
+            key = c.lower()
+            if key in seen or not _en_ok(c) or len(owner.get(key, ())) != 1:
+                continue
+            seen.add(key)
+            esc = re.escape(c)
+            if re.fullmatch(r"[A-Z][A-Z0-9/-]{2,}", c):
+                rx = re.compile(r"(?<![A-Za-z0-9])" + esc + r"(?![A-Za-z0-9])")
+            else:
+                esc = esc.replace(r"\ ", r"[\s-]+").replace(r"\-", r"[\s-]?")
+                rx = re.compile(r"(?<![A-Za-z0-9])" + esc + r"(?:s|es)?(?![A-Za-z0-9])", re.I)
+            out.append((c, t["id"], rx))
+    return sorted(out, key=lambda x: (-len(x[0]), x[0]))
+
+
+def build_term_edges(docs: Iterable[dict], terms: list[dict], render=None,
+                     extended: bool = True) -> tuple[list[dict], dict]:
+    """[{finding_id, term_id, surface, confidence, basis}] 와 통계. 입력은 findings_docs.json 의 documents.
+
+    findings 는 `text_ko`(필수)와 선택 `text_orig`(영문 원문)를 읽는다. `extended=False` 는 확장 이전 규칙.
+    """
     render = render or _load_render()
     index = render.build_doc_term_link_index(terms)
+    extra_ko = extra_ko_surfaces(terms) if extended else []
+    en_index = build_en_index(terms) if extended else []
     hangul = render._HANGUL_RE
     edges: list[dict] = []
     dropped_low = 0
@@ -159,7 +272,27 @@ def build_term_edges(docs: Iterable[dict], terms: list[dict], render=None) -> tu
                         dropped_low += 1
                         continue
                     edges.append({"finding_id": f["finding_id"], "term_id": tid,
-                                  "surface": surface, "confidence": conf})
+                                  "surface": surface, "confidence": conf, "basis": "ko"})
+            for surface, tid in extra_ko:
+                if tid in seen or render._doc_term_find(text, surface) < 0:
+                    continue
+                conf = _surface_confidence(surface, hangul)
+                if conf < MIN_CONFIDENCE:
+                    dropped_low += 1
+                    continue
+                seen.add(tid)
+                edges.append({"finding_id": f["finding_id"], "term_id": tid,
+                              "surface": surface, "confidence": conf, "basis": "ko_alias"})
+            if en_index:
+                orig = f.get("text_orig") or ""
+                low = (orig + "\n" + text).lower().replace("-", " ")
+                for surface, tid, rx in en_index:
+                    if tid in seen or surface.lower().replace("-", " ") not in low:
+                        continue
+                    if rx.search(orig) or rx.search(text):
+                        seen.add(tid)
+                        edges.append({"finding_id": f["finding_id"], "term_id": tid,
+                                      "surface": surface, "confidence": EN_CONFIDENCE, "basis": "en"})
     stats = {"findings_scanned": n_findings, "edges": len(edges), "dropped_low_confidence": dropped_low,
              "findings_with_edge": len({e["finding_id"] for e in edges}),
              "terms_used": len({e["term_id"] for e in edges})}

@@ -54,18 +54,19 @@ def link_db(base: str, key: str, days: int, timeout: float = 120.0) -> dict[str,
 
 
 def fetch_recent_texts(base: str, key: str, since_iso: str, timeout: float = 120.0) -> list[dict[str, str]]:
-    """창 안에 들어온, 한국어 본문이 있는 지적 [{finding_id, text_ko}]."""
+    """창 안에 들어온, 한국어 본문이 있는 지적 [{finding_id, text_ko, text_orig(영문 원문)}]."""
     rows: list[dict[str, str]] = []
     offset = 0
     while True:
         resp = _call(lambda: requests.get(
             f"{base}/rest/v1/findings", headers=_headers(key, Range=f"{offset}-{offset + PAGE - 1}"), timeout=timeout,
-            params={"select": "finding_id,finding_text_ko", "ingested_at": f"gte.{since_iso}",
+            params={"select": "finding_id,finding_text_ko,finding_text", "ingested_at": f"gte.{since_iso}",
                     "finding_text_ko": "neq.", "order": "finding_id.asc"}))
         if resp.status_code not in (200, 206):
             raise RuntimeError(f"findings HTTP {resp.status_code}")
         page = resp.json()
-        rows.extend({"finding_id": r["finding_id"], "text_ko": r["finding_text_ko"]} for r in page)
+        rows.extend({"finding_id": r["finding_id"], "text_ko": r["finding_text_ko"],
+                     "text_orig": r.get("finding_text") or ""} for r in page)
         if len(page) < PAGE:
             return rows
         offset += PAGE

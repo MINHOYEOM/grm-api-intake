@@ -70,7 +70,7 @@ def link_text_clauses(base: str, key: str, days: int, timeout: float = 120.0) ->
     return int(resp.json())
 
 
-def link_similar(base: str, key: str, days: int, *, limit: int = 100, budget_s: float = 240.0,
+def link_similar(base: str, key: str, days: int, *, limit: int = 20, budget_s: float = 240.0,
                  stale_days: int | None = 30, timeout: float = 60.0) -> dict[str, Any] | None:
     """유사 지적 엣지(114). 대기열이 빌 때까지 또는 budget_s 초까지 반복. 114 미적용이면 None.
 

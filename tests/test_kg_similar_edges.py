@@ -109,6 +109,38 @@ class SpeedMigration(unittest.TestCase):
         self.assertLess(body.index("grm_finding_similar_sync_texts()"), body.index("select array_agg(q.finding_id)"))
 
 
+_S117 = (_ROOT / "web" / "migrations" / "117_finding_similar_member.sql").read_text(encoding="utf-8")
+
+
+class MemberMigration(unittest.TestCase):
+    def test_locked_down_and_additive(self):
+        code = _code(_S117)
+        self.assertIn("revoke all on table public.finding_similar_member from public, anon, authenticated", code)
+        self.assertIn("alter table public.finding_similar_member enable row level security", code)
+        for sig in ("grm_finding_similar_sync_members(interval)", "grm_finding_similar_sync_texts()",
+                    "grm_finding_similar_compute(text[], numeric, integer)",
+                    "grm_link_finding_similar(timestamptz, integer, integer)"):
+            self.assertIn(f"revoke all on function public.{sig} from public, anon, authenticated", code)
+        self.assertNotRegex(code.lower(), r"drop\s+(table|column|function|index)")
+
+    def test_no_full_findings_scan_in_hot_path(self):
+        code = " ".join(_code(_S117).split())
+        compute = code.split("create or replace function public.grm_finding_similar_compute", 1)[1].split("create or replace function public.grm_link", 1)[0]
+        self.assertIn("join public.finding_similar_member m on m.grp = c.cgrp and m.ftype = c.bftype", compute)
+        self.assertNotIn("select count(*) from gm x", compute)  # 쌍마다 gm 재스캔 제거
+        link = code.split("create or replace function public.grm_link_finding_similar", 1)[1]
+        self.assertNotIn("md5(coalesce(nullif(e.finding_text_ko", link)
+        self.assertLess(link.index("sync_members()"), link.index("sync_texts()"))
+
+    def test_scoring_unchanged_from_116(self):
+        a, b = " ".join(_code(_S116).split()), " ".join(_code(_S117).split())
+        for frag in ("0.6 * s.sim + 0.4 * s.fr", "(coalesce(p_min_score, 0.40) - 0.064) / 0.6",
+                     "'lexical_v1' || case when r.same_text then ';same_text' else '' end",
+                     "g.crid is distinct from b.rid and g.cid <> b.fid and g.rk <= 2"):
+            self.assertIn(frag, a)
+            self.assertIn(frag, b)
+
+
 class LinkSimilar(unittest.TestCase):
     def test_loops_until_pending_zero(self):
         seq = [Resp(200, {"processed": 40, "edges": 90, "pending": 30}),
@@ -118,7 +150,7 @@ class LinkSimilar(unittest.TestCase):
         self.assertEqual(r, {"calls": 2, "processed": 70, "edges": 140, "pending": 0})
         self.assertEqual(post.call_count, 2)
         sent = post.call_args.kwargs["json"]
-        self.assertEqual(sent["p_limit"], 100)
+        self.assertEqual(sent["p_limit"], 20)
         self.assertEqual(sent["p_stale_days"], 30)
         self.assertIn("p_since", sent)
 

@@ -163,6 +163,50 @@ class Runner(unittest.TestCase):
         self.assertIn("ignore-duplicates", kw["headers"]["Prefer"])
         self.assertEqual(kw["params"], {"on_conflict": "finding_id,term_id"})
 
+    def test_only_product_skips_rpc_and_terms(self):
+        env = {"SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"}
+        with mock.patch.dict("os.environ", env, clear=True),                 mock.patch("kg_link_new.link_db") as db,                 mock.patch("kg_link_new.link_text_clauses") as lt,                 mock.patch("kg_link_new.fetch_recent_texts") as ft,                 mock.patch("kg_link_new.kg_product.link_recent", return_value=(3, 3)) as lr:
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                self.assertEqual(kg_link_new.main(["--only-product", "--days", "5000"]), 0)
+        db.assert_not_called()
+        lt.assert_not_called()
+        ft.assert_not_called()
+        lr.assert_called_once()
+        self.assertIn("제품군(only)", buf.getvalue())
+
+    def test_default_path_still_runs_all_steps(self):
+        env = {"SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"}
+        with mock.patch.dict("os.environ", env, clear=True),                 mock.patch("kg_link_new.link_db", return_value={}) as db,                 mock.patch("kg_link_new.link_text_clauses", return_value=0) as lt,                 mock.patch("kg_link_new.fetch_recent_texts", return_value=[]) as ft,                 mock.patch("kg_link_new.write_term_edges", return_value=0),                 mock.patch("kg_link_new.kg_product.link_recent", return_value=(0, 0)) as lr:
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(kg_link_new.main([]), 0)
+        db.assert_called_once()
+        lt.assert_called_once()
+        ft.assert_called_once()
+        lr.assert_called_once()
+
+    def test_workflow_exposes_only_product_input(self):
+        wf = (_ROOT / ".github/workflows/grm-kg-link.yml").read_text(encoding="utf-8")
+        self.assertIn("only_product:", wf)
+        self.assertIn("--only-product", wf)
+
+    def test_skip_rpc_runs_terms_and_product_only(self):
+        env = {"SUPABASE_URL": "https://x.supabase.co", "SUPABASE_SERVICE_ROLE_KEY": "k"}
+        with mock.patch.dict("os.environ", env, clear=True),                 mock.patch("kg_link_new.link_db") as db,                 mock.patch("kg_link_new.link_text_clauses") as lt,                 mock.patch("kg_link_new.fetch_recent_texts", return_value=[]) as ft,                 mock.patch("kg_link_new.write_term_edges", return_value=0),                 mock.patch("kg_link_new.kg_product.link_recent", return_value=(0, 0)) as lr:
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                self.assertEqual(kg_link_new.main(["--skip-rpc", "--days", "5000"]), 0)
+        db.assert_not_called()
+        lt.assert_not_called()
+        ft.assert_called_once()
+        lr.assert_called_once()
+        self.assertIn("SKIP(--skip-rpc)", buf.getvalue())
+
+    def test_workflow_exposes_skip_rpc_input(self):
+        wf = (_ROOT / ".github/workflows/grm-kg-link.yml").read_text(encoding="utf-8")
+        self.assertIn("skip_rpc:", wf)
+        self.assertIn("--skip-rpc", wf)
+
     def test_same_engine_as_backfill(self):
         import json as _j
         terms = _j.loads((_ROOT / "web/data/glossary.json").read_text(encoding="utf-8"))

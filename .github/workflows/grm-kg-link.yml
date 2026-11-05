@@ -24,6 +24,22 @@ on:
         required: false
         default: "7"
         type: string
+      skip_rpc:
+        description: "true=RPC(fei·조항) 단계만 건너뛰고 용어+제품군은 실행. 긴 창 백필용. schedule 은 항상 false."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      only_product:
+        description: "true=제품군(111) 엣지만(RPC·용어 건너뜀). 긴 창 백필용. schedule 은 항상 false."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 permissions:
   contents: read
@@ -63,6 +79,12 @@ jobs:
           ARGS="--days $DAYS"
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ inputs.only_product }}" = "true" ]; then
+            ARGS="$ARGS --only-product"
+          fi
+          if [ "${{ inputs.skip_rpc }}" = "true" ]; then
+            ARGS="$ARGS --skip-rpc"
           fi
           python kg_link_new.py $ARGS
 

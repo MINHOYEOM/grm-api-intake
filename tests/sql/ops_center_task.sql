@@ -61,7 +61,7 @@ insert into public.ops_member (team_id, slug, name, kind, state)
 -- ── 1. 권한 ─────────────────────────────────────────────────────────────────
 select pg_temp.assert_true(not has_function_privilege('anon', 'public.ops_task_create(text,text,text,date,text)', 'EXECUTE'), 'anon cannot call ops_task_create');
 select pg_temp.assert_true(has_function_privilege('authenticated', 'public.ops_task_create(text,text,text,date,text)', 'EXECUTE'), 'authenticated may call ops_task_create');
-select pg_temp.assert_true(not has_function_privilege('service_role', 'public.ops_task_create(text,text,text,date,text)', 'EXECUTE'), 'service_role not granted (screen-only function)');
+-- service_role 은 Supabase 기본 권한으로 EXECUTE 가 남는다(125 ops_decide 와 같음) — 불러도 관리자 검사에서 42501.
 select pg_temp.assert_true((select prosecdef from pg_proc where oid = 'public.ops_task_create(text,text,text,date,text)'::regprocedure), 'ops_task_create is security definer');
 select pg_temp.assert_true((select proconfig::text like '%search_path=public%' from pg_proc where oid = 'public.ops_task_create(text,text,text,date,text)'::regprocedure), 'ops_task_create fixes search_path');
 select pg_temp.assert_true((select proconfig::text like '%search_path=public%' from pg_proc where oid = 'private.ops_task_create_at(text,text,text,date,text,uuid,timestamptz)'::regprocedure), 'body fixes search_path');

@@ -1,5 +1,5 @@
 name: Ops center SQL checks
-# 운영 센터 122·123(+124·127 시드)·125(결정 쓰기)·126(업무 지시)을 격리 PostgreSQL 에서 실제로 실행해 경계표·권한·42501·롤업을 확인하고,
+# 운영 센터 122·123(+124·127 시드)·125(결정 쓰기)·126(업무 지시)·128(자동 측정)을 격리 PostgreSQL 에서 실제로 실행해 경계표·권한·42501·롤업을 확인하고,
 # 뮤테이션(관리자 검사 우회·1.5배·worst 순서·분모 0·선 순서 제약 등)이 전부 빨개지는지 본다.
 # 실서비스 DB 에는 닿지 않는다(비밀값 없음). 적용은 비서실이 SQL 검토 후 한다.
 on:
@@ -9,11 +9,13 @@ on:
       - 'web/migrations/*ops_home*'
       - 'web/migrations/*ops_decision*'
       - 'web/migrations/*ops_task*'
+      - 'web/migrations/*ops_measure*'
       - 'tests/sql/ops_center.sql'
       - 'tests/sql/ops_center_seed.sql'
       - 'tests/sql/ops_center_decide.sql'
       - 'tests/sql/ops_center_task.sql'
       - 'tests/sql/ops_center_seed_planning.sql'
+      - 'tests/sql/ops_center_measure.sql'
       - 'tests/run_ops_center_sql_mutations.py'
       - '.github/workflows/grm-ops-center-sql-check.yml'
   workflow_dispatch:
@@ -46,5 +48,9 @@ jobs:
         run: |
           sudo -u postgres createdb ops_center_plan_test
           sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d ops_center_plan_test -f tests/sql/ops_center_seed_planning.sql
+      - name: Run the 128 measure checks (hold on zero denominator · failure/timeout keeps value · ref guard · seed idempotent)
+        run: |
+          sudo -u postgres createdb ops_center_measure_test
+          sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d ops_center_measure_test -f tests/sql/ops_center_measure.sql
       - name: Prove guards fail on mutations and pass after restoration
         run: python3 tests/run_ops_center_sql_mutations.py

@@ -165,7 +165,8 @@ class AdditiveOnlyTest(unittest.TestCase):
         # 125 는 이 표에 쓰는 함수 파일(계약은 test_ops_center_decide 가 본다)
         # 126(업무 지시)·127(시드 추가) 계약은 test_ops_center_task 가 본다
         mine = {_P122.name, _P123.name, "124_ops_center_seed.sql", "125_ops_decision_write.sql",
-                "126_ops_task_create.sql", "127_ops_center_seed_planning.sql"}
+                "126_ops_task_create.sql", "127_ops_center_seed_planning.sql",
+                "128_ops_measure.sql"}  # 128(자동 측정) 계약은 test_ops_center_measure 가 본다
         for p in sorted(_MIG.glob("*.sql")):
             if p.name in mine:
                 continue

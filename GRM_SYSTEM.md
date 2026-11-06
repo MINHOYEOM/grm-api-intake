@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.291` |
-| 최종 수정일 | 2026-11-06 |
+| 문서 버전 | `v1.292` |
+| 최종 수정일 | 2026-11-07 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -590,6 +590,7 @@ grm-api-intake/
 │  ├─ migrations/126_ops_task_create.sql # 운영 센터 업무 지시 쓰기 — ops_task_create(팀 필수·실/팀만·제목 1~120·내용 ≤2000·마감 KST 오늘 이후·직원은 그 팀 소속, 함수 안 관리자 검사 42501, 같은 제목 10초 안 거부, 지시함 lane=inbox·reason=directive·created_kind=ceo, 감사 기록). 거부는 {ok:false, code, message}
 │  ├─ migrations/127_ops_center_seed_planning.sql # 운영 센터 시드 추가 — 경영기획실(planning, 실)·독자지원팀(support, 고객 부문)·팀원 3·목표 3, 제품전략팀 정식(이름·is_pilot=false)·strat-adopted 이름. 124 와 같은 멱등 규칙, 124 를 다시 돌리면 127 도 다시
 │  ├─ migrations/125_ops_decision_write.sql # 운영 센터 결정 쓰기 — ops_decide(승인·보류, 함수 안 관리자 검사 42501, pending·snoozed 만, 보류=KST 08:00, 감사 기록) + service_role 전용 ops_decision_open·ops_secretary_inbox·ops_member_touch·ops_goal_set·ops_task_move
+│  ├─ migrations/128_ops_measure.sql # 운영 센터 자동 측정(SQL 갈래) — private.ops_m_*(조항 연결률 경고서한·식약처·용어 최저 유형·적재 경과·3일 넘은 미번역·DB MB·구독 1위 경로·하루 구독 증감, note 에 분자·분모) + service_role 전용 ops_measure_all()(목표마다 예외 격리·분모 0=측정 보류·실패/시간 초과=값 유지+메모만→낡음 강등·measure_ref 형식 검사) + private.ops_measure_log + 인덱스 3 + 새 목표 3(infra-db-size·growth-sub-top·pr-subs-day). pg_cron 03:30 KST 등록 SQL 은 머리 주석에만(비서실 적용)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -602,6 +603,7 @@ grm-api-intake/
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)
 │  ├─ ops_decision_mail.py        # [결정 알림] 운영 센터 대기 결정(pending·mail_sent_at null) → 대표 메일 1건 1통·하루 3통·넘치면 다음 날 아침 묶음·KST 22~08 조용한 시간. 발송·수신자 검사는 approval_mail 재사용
+│  ├─ ops_measure_github.py       # [자동 측정] 운영 센터 GitHub 갈래 — gh api 로 CI test 잡 중앙값·3일 넘은 PR·일일 연결 연속 성공일·24시간 배포 실패·정기 작업 정시율(7일·예정+60분·하루 4회 이하 예약)·이번 주 용어 사전 증가 → ops_goal_set, 코드 팀원(dq-kg-link·infra-intake) 마지막 성공 → ops_member_touch(더 새로울 때만). 기본 dry-run, 실패는 단계 요약에만
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본
 │  ├─ quiz_en_merge.py           # [다국어 2026-09-05] 주간 퀴즈 영문 문항 병합기 — 정본에 `question_en`·`choices_en`·`explanation_en` 을 **가산**한다(기존 키·들여쓰기 무변형·멱등). 게이트 3중 = 세 필드 전부거나 전부 없거나 · `choices_en` 길이 일치(`answer_index` 공유) · **EN_INVENTED_NUMBER**(`render.validate_quiz_en_facts` — 렌더와 같은 함수를 불러 사본 0)
 │  ├─ templates/  (landing·archive·brief·findings·**findings_browse**(둘러보기 면)·trends·**inspections**·**coverage**·**checklist**·firm·**inspector**·me·admin·base·library·library_catalog·guide·**about**(소개 /about/ — 2026-09-06)·glossary·**glossary_term**(하단 '사전 전체 규모' 블록)·**glossary_welcome**(구독 확인 도착 /welcome/ — noindex·목록 밖)·**findings_facet**·**findings_facet_index**·**findings_doc**·**findings_doc_list**·quiz·**landing_en**(영어판 홈 — 주간 브리프 히어로가 없는 별도 면))
@@ -618,9 +620,10 @@ grm-api-intake/
 │  ├─ js/ops_home_render.js · fixtures/ops_home_sample.json · test_ops_center_home_ui.py # 운영 센터 홈 렌더러 Node 시험(직원 태그=DB 필드만·4상태 글자·결재 버튼 상태(처리 중·처리됨·오류)·금지 디자인·금지 문구) + admin 배선 계약(중복 id·숫자 옮겨 오기·테마 토큰·ops_decide 잠금)
 │  ├─ test_ops_center_task.py       # 126 텍스트 계약(검사 순서·42501·권한·10초 중복) + 127 시드 오프라인 검사(행·선 순서·멱등·124 불변) + 업무 지시 시트·이번 주 일 Node 시험·admin 배선(잠금·새로고침)
 │  ├─ test_ops_center_decide.py     # 125 텍스트 계약(42501·상태 조건·KST 08:00·서비스 권한) + 결정 알림 메일 계획(3통 상한·아침 묶음·조용한 시간·3줄+버튼 1개)·워크플로(dry-run 기본·마스킹·기존 비밀값만)
+│  ├─ test_ops_center_measure.py    # 128 텍스트 계약(cron 은 주석만·권한·definer 는 진입점만·ref 검사·수동 목표 불변) + GitHub 측정 순수 함수(중앙값·연속 성공일·cron 예정·정시율·용어 증가)·워크플로(dry-run 기본·ENABLED 변수·기존 비밀값만·마스킹·읽기 권한)
 │  ├─ run_mfds_sql_mutations.py     # 정책 위반 주입 FAIL → 원복 PASS 검증
-│  ├─ run_ops_center_sql_mutations.py # 운영 센터 122·123·125·126·127 뮤테이션(관리자 검사·1.5배·worst 순서·빈 집합·선 순서 / 결정 상태 조건·KST 08:00·감사·서비스 권한 / 지시 팀 필수·길이·소속·10초·감사 / 시드 이름·순서·새 값 보존) FAIL → 원복 PASS
-│  └─ sql/mfds_attendees*.sql · sql/ops_center*.sql # 격리 PostgreSQL 행동 검증(적재·권한·멱등성 / 운영 센터 경계표·롤업·42501 · 124 시드 2회 적용·부록 C 상태 대조 · 125 결정 쓰기 ops_center_decide.sql · 126 업무 지시 ops_center_task.sql · 124→127 시드 ops_center_seed_planning.sql)
+│  ├─ run_ops_center_sql_mutations.py # 운영 센터 122·123·125·126·127·128 뮤테이션(관리자 검사·1.5배·worst 순서·빈 집합·선 순서 / 결정 상태 조건·KST 08:00·감사·서비스 권한 / 지시 팀 필수·길이·소속·10초·감사 / 시드 이름·순서·새 값 보존 / 측정 보류·실패 값 유지·시간 초과·ref 검사·distinct) FAIL → 원복 PASS
+│  └─ sql/mfds_attendees*.sql · sql/ops_center*.sql # 격리 PostgreSQL 행동 검증(적재·권한·멱등성 / 운영 센터 경계표·롤업·42501 · 124 시드 2회 적용·부록 C 상태 대조 · 125 결정 쓰기 ops_center_decide.sql · 126 업무 지시 ops_center_task.sql · 124→127 시드 ops_center_seed_planning.sql · 128 자동 측정 ops_center_measure.sql)
 ├─ company/                        # "Claude 가 운영하는 회사(GRM Intelligence)" 지시문 — 클라우드 예약작업이 읽는다. 정본(docs/prompts/)은 가리키기만 한다(tests/test_company_pointers.py)
 │  ├─ CHARTER.md · CLOUD.md · ROUTINES.md   # 공통 헌장 · 클라우드 되는 것/막힌 것·gh api · 예약작업 목록(시각·모델·PC 백업 표식)
 │  ├─ ops/ · requests/             # 클라우드↔Actions 다리 — ops_status.py(실행 요약→claude/ops-status) · cloud_request.py(요청 마커 검증, 허용목록) · requests/ 는 마커 파일 자리
@@ -648,7 +651,8 @@ grm-api-intake/
    ├─ grm-growth-weekly.yml               # [성장·유입] 주간 성장 리포트 메일 — 수동 실행만(09-28 예약 해제: 매일 성장 일보·/admin 과 중복)
    ├─ grm-approval-mail.yml               # [결재 메일] 발행 PR 준비 시 대표 메일 1통 — 기본 dry-run, GRM_APPROVAL_MAIL_ENABLED=true 일 때만 실발송
    ├─ grm-ops-decision-mail.yml          # [결정 알림] 30분마다 web/ops_decision_mail.py — 기본 dry-run, GRM_OPS_DECISION_MAIL_ENABLED=true 일 때만 실발송(수신자 GRM_APPROVAL_MAIL_TO)
-   ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123·124·127(시드)·125(결정 쓰기)·126(업무 지시) 를 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음
+   ├─ grm-ops-measure.yml                # [자동 측정] 매일 07:23 KST web/ops_measure_github.py — 기본 dry-run, GRM_OPS_MEASURE_ENABLED=true 일 때만 ops_goal_set·ops_member_touch 쓰기(SUPABASE_SERVICE_ROLE_KEY 재사용·마스킹·읽기 권한만)
+   ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123·124·127(시드)·125(결정 쓰기)·126(업무 지시)·128(자동 측정) 를 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
    ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-reconciliation.yml, grm-supabase-keepalive.yml

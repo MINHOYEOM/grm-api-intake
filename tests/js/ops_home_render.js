@@ -30,6 +30,25 @@ const empty = clone(); empty.tree = [];
 out.emptyTree = parts(empty, {});
 out.nullData = ops.render(null, {});
 
+// 결재 버튼 상태: 처리 중(잠금) · 처리됨(버튼 사라짐) · 오류(문구)
+out.decide = {
+  busy: ops.renderDocs(clone(), { decide: { busy: { 2: true }, done: {}, errors: {} } }),
+  done: ops.renderDocs(clone(), { decide: { busy: {}, done: { 2: "승인됨 · 비서실이 이어서 진행합니다" }, errors: {} } }),
+  error: ops.renderDocs(clone(), { decide: { busy: {}, done: {}, errors: { 1: "처리하지 못했습니다. 잠시 뒤 다시 눌러 주세요." } } }),
+  labels: [ops.approveLabel({ reason: "approve", recommendation: "진행" }), ops.approveLabel({ reason: "ask", recommendation: "유지" }),
+           ops.approveLabel({ reason: "ask", recommendation: "11-09~13 클라우드 정상 확인 후 끔" }), ops.approveLabel({ reason: "ask" })]
+};
+// bind: 버튼을 누르면 onDecide(id, action, snooze) 가 불린다(가짜 DOM)
+const calls = [];
+const btn = (attrs) => ({ disabled: !!attrs.disabled, getAttribute: k => attrs[k] == null ? null : String(attrs[k]),
+                          closest: sel => (sel === "[data-oc-decide]" ? btn(attrs) : null) });
+const host = { addEventListener: (_, fn) => { host.fn = fn; } };
+ops.bind(host, () => calls.push(["goto"]), (id, action, snooze) => calls.push([id, action, snooze]));
+host.fn({ target: btn({ "data-oc-decide": "approve", "data-oc-id": 2 }) });
+host.fn({ target: btn({ "data-oc-decide": "snooze", "data-oc-id": 1, "data-oc-snooze": "3d" }) });
+host.fn({ target: btn({ "data-oc-decide": "approve", "data-oc-id": 3, disabled: true }) });
+out.bindCalls = calls;
+
 // 직원 판정은 DB 필드만 본다 — 일수로 다시 판정하지 않는다
 const m = (over) => Object.assign({ name: "담당", state: "active", open_tasks: 0, idle: false, no_record: false, last_active_days: 2, last_active_note: null }, over);
 const st = (mm, tasks) => { const s = ops.memberStatus(mm, tasks || []); return [s.tag, s.text, !!s.idle]; };

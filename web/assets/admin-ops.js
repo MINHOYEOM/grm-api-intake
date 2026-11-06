@@ -8,7 +8,9 @@
  * 순수 함수: renderSummary / renderDocs / renderTeams(data, ctx) → HTML 문자열, render = 셋을 이은 것.
  * DOM·네트워크를 만지지 않아 Node 로 시험한다(tests/js/ops_home_render.js).
  * 직원 한 줄 = 직무 이름 + 지금 맡은 일 한 줄 + 글자 태그(진행 중 / 확인 대기 / 지연 / 배정 없음).
- * 평면도·원형 아바타·점 아이콘은 쓰지 않는다. 읽기 전용: 승인·보류 버튼은 PR4.
+ * 평면도·원형 아바타·점 아이콘은 쓰지 않는다.
+ * 결재(PR4): 서류마다 [승인(질문형은 권장 라벨)] [보류(내일 아침)] [3일 뒤] — 누르면 admin.js 가 rpc('ops_decide')
+ * 를 부르고, 결과는 ctx.decide 로 다시 넘어와 그려진다(처리 중·처리됨·오류). 반려 버튼은 없다(D5).
  * 운영자 전용 한국어 화면 — grm_i18n.EXCLUDED_ASSETS 대상(영문판에 실리지 않는다).
  */
 (function (root) {
@@ -197,19 +199,40 @@
   }
 
   // ── 대표실 · 결재 서류 ───────────────────────────────────────────────────────
-  function decisionDoc(d, teams, generatedAt) {
+  // 승인 버튼 글자: 승인 요청은 '승인', 질문은 권장 답이 짧으면 그 답(예: '유지'), 길면 '권장대로'.
+  function approveLabel(d) {
+    if (d.reason !== "ask") return "승인";
+    var r = String(d.recommendation || "").trim();
+    return r && r.length <= 8 ? r : "권장대로";
+  }
+  function decideButtons(d, st) {
+    var busy = !!(st.busy && st.busy[d.id]), id = esc(d.id), t = esc(d.title);
+    var dis = busy ? " disabled" : "";
+    return '<div class="oc-btns">' +
+      '<button type="button" class="oc-pri" data-oc-decide="approve" data-oc-id="' + id + '" aria-label="' + t + " — " + esc(approveLabel(d)) + '"' + dis + ">" +
+        (busy ? "처리 중" : esc(approveLabel(d))) + "</button>" +
+      '<button type="button" data-oc-decide="snooze" data-oc-snooze="tomorrow" data-oc-id="' + id + '" aria-label="' + t + ' — 내일 아침까지 보류"' + dis + ">보류</button>" +
+      '<button type="button" class="oc-link" data-oc-decide="snooze" data-oc-snooze="3d" data-oc-id="' + id + '" aria-label="' + t + ' — 3일 뒤까지 보류"' + dis + ">3일 뒤</button>" +
+      "</div>";
+  }
+  function decisionDoc(d, teams, generatedAt, st) {
+    st = st || {};
     var team = teams[d.team] || {}, u = safeUrl(d.ref_url), left = daysLeft(d.due_at, generatedAt);
+    var done = st.done && st.done[d.id], err = st.errors && st.errors[d.id];
     var due = !d.due_at ? "기한 없음"
       : d.overdue ? '<span class="oc-flag-warn">기한 지남 ' + esc(dayLabel(d.due_at)) + "</span>"
       : "기한 " + esc(dayLabel(d.due_at)) + (left != null && left >= 0 ? " (" + (left === 0 ? "오늘" : left + "일 남음") + ")" : "");
-    return '<div class="oc-doc' + (d.overdue ? " is-overdue" : "") + '"><div class="oc-doc-body">' +
+    return '<div class="oc-doc' + (d.overdue ? " is-overdue" : "") + (done ? " is-done" : "") + '" data-oc-doc="' + esc(d.id) + '"><div class="oc-doc-body">' +
       '<span class="oc-kind">' + (d.reason === "ask" ? "질문" : "승인 요청") + "</span>" +
       '<span class="oc-t">' + esc(d.title) + "</span>" +
       '<div class="oc-m">' + esc(team.name || d.team || "") + " · " + due +
       (u ? ' · <a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">근거</a>' : "") + "</div>" +
-      // 시안: 서류 = 종류·제목 / 팀·기한 / 권장 한 줄(권장 + 이유). '승인하면'은 버튼이 붙는 PR4 에서.
+      // 시안: 서류 = 종류·제목 / 팀·기한 / 권장 한 줄(권장 + 이유) / 승인하면 일어나는 일.
       (d.recommendation || d.why ? '<div class="oc-rec"><b>권장</b> ' + esc([d.recommendation, d.why].filter(Boolean).join(". ")) + "</div>" : "") +
-      "</div></div>";
+      (d.if_approved && !done ? '<div class="oc-m">승인하면 ' + esc(d.if_approved) + "</div>" : "") +
+      (done ? '<div class="oc-done" role="status">' + esc(done) + "</div>" : "") +
+      (err && !done ? '<div class="oc-err" role="status">' + esc(err) + "</div>" : "") +
+      "</div>" + (done ? "" : decideButtons(d, st)) + "</div>";
   }
   function renderDocs(data, ctx) {
     ctx = ctx || {};
@@ -222,7 +245,7 @@
         '<div class="oc-m">' + esc(ctx.publish.meta || "") + "</div></div>" +
         '<button type="button" class="oc-link" data-oc-goto="ops">발행·운영 열기</button></div>';
     }
-    html += decisions.map(function (d) { return decisionDoc(d, teams, data.generated_at); }).join("");
+    html += decisions.map(function (d) { return decisionDoc(d, teams, data.generated_at, ctx.decide); }).join("");
     if (!html) html = '<p class="oc-empty">결재할 서류가 없습니다.</p>';
     return html + (more ? '<div class="oc-more">그 밖에 ' + more + "건이 더 기다립니다</div>" : "");
   }
@@ -244,18 +267,21 @@
       '<section class="oc-card oc-docs">' + renderDocs(data, ctx) + "</section>" + renderTeams(data);
   }
 
-  // 화면 동작은 '발행·운영 열기' 이동 하나뿐(펼침은 <details> 가 한다).
-  function bind(host, onGoto) {
+  // 화면 동작: '발행·운영 열기' 이동과 결재 버튼(펼침은 <details> 가 한다). 처리 자체는 admin.js 의 onDecide.
+  function bind(host, onGoto, onDecide) {
     if (!host || host.__ocBound) return;
     host.__ocBound = true;
     host.addEventListener("click", function (e) {
       var go = e.target.closest ? e.target.closest("[data-oc-goto]") : null;
-      if (go && onGoto) onGoto(go.getAttribute("data-oc-goto"));
+      if (go) { if (onGoto) onGoto(go.getAttribute("data-oc-goto")); return; }
+      var b = e.target.closest ? e.target.closest("[data-oc-decide]") : null;
+      if (!b || b.disabled || !onDecide) return;
+      onDecide(Number(b.getAttribute("data-oc-id")), b.getAttribute("data-oc-decide"), b.getAttribute("data-oc-snooze") || null);
     });
   }
 
   var api = { render: render, renderSummary: renderSummary, renderDocs: renderDocs, renderTeams: renderTeams,
-              bind: bind, memberStatus: memberStatus, dayLabel: dayLabel, daysLeft: daysLeft, clock: clock, STATE_WORD: STATE_WORD };
+              bind: bind, approveLabel: approveLabel, memberStatus: memberStatus, dayLabel: dayLabel, daysLeft: daysLeft, clock: clock, STATE_WORD: STATE_WORD };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.GRMOps = api;
 })(typeof window !== "undefined" ? window : this);

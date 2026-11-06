@@ -1,5 +1,5 @@
-"""CI 전용: 격리 PostgreSQL 에서 운영 센터 122·123·125·126·127 을 일부러 깨 보고 tests/sql/ops_center.sql·
-ops_center_decide.sql·ops_center_task.sql·ops_center_seed_planning.sql 이 빨개지는지(FAIL) 확인한 뒤,
+"""CI 전용: 격리 PostgreSQL 에서 운영 센터 122·123·125·126·127·128 을 일부러 깨 보고 tests/sql/ops_center.sql·
+ops_center_decide.sql·ops_center_task.sql·ops_center_seed_planning.sql·ops_center_measure.sql 이 빨개지는지(FAIL) 확인한 뒤,
 원복해서 초록(PASS)인지 확인한다.
 가드는 뮤테이션으로 검증한다.
 
@@ -16,11 +16,13 @@ M123 = ROOT / "web/migrations/123_ops_home.sql"
 M125 = ROOT / "web/migrations/125_ops_decision_write.sql"
 M126 = ROOT / "web/migrations/126_ops_task_create.sql"
 M127 = ROOT / "web/migrations/127_ops_center_seed_planning.sql"
+M128 = ROOT / "web/migrations/128_ops_measure.sql"
 DB = "ops_center_test"
 SQL_HOME = "tests/sql/ops_center.sql"
 SQL_DECIDE = "tests/sql/ops_center_decide.sql"
 SQL_TASK = "tests/sql/ops_center_task.sql"
 SQL_PLAN = "tests/sql/ops_center_seed_planning.sql"
+SQL_MEASURE = "tests/sql/ops_center_measure.sql"
 
 # (이름, 파일, 찾을 문자열, 바꿀 문자열) — 찾을 문자열이 없으면 뮤테이션 자체가 낡은 것이므로 실패시킨다.
 MUTATIONS = [
@@ -213,6 +215,59 @@ MUTATIONS_PLAN = [
 ]
 
 
+# 128 자동 측정 — tests/sql/ops_center_measure.sql 이 잡아야 한다.
+MUTATIONS_MEASURE = [
+    ("zero denominator writes 0", M128,
+     "jsonb_build_object('value', null, 'note', '분모 0 · ' || p_basis)",
+     "jsonb_build_object('value', 0, 'note', '분모 0 · ' || p_basis)"),
+    ("timeout not caught", M128,
+     "      when query_canceled then\n        v_status := 'timeout';\n        v_err := '시간 초과';\n", ""),
+    ("failure stops the loop", M128,
+     "        v_status := 'error';\n        v_err := sqlstate || ' ' || left(sqlerrm, 60);",
+     "        raise;"),
+    ("hold refreshes measured_at", M128,
+     "update public.ops_goal set note = left('측정 보류 ' || v_day || ': ' || v_note, 120) where slug = g.slug;",
+     "update public.ops_goal set note = left('측정 보류 ' || v_day || ': ' || v_note, 120), measured_at = p_now where slug = g.slug;"),
+    ("failure refreshes measured_at", M128,
+     "update public.ops_goal set note = left('측정 실패 ' || v_day || ': ' || v_err, 120) where slug = g.slug;",
+     "update public.ops_goal set note = left('측정 실패 ' || v_day || ': ' || v_err, 120), measured_at = p_now where slug = g.slug;"),
+    ("ref guard removed", M128,
+     "if g.measure_ref !~ '^private\\.ops_m_[a-z0-9_]{1,40}$'\n         or to_regprocedure",
+     "if false\n         and to_regprocedure"),
+    ("anon may run ops_measure_all", M128,
+     "grant execute on function public.ops_measure_all() to service_role;",
+     "grant execute on function public.ops_measure_all() to service_role, anon;"),
+    ("measure revoke dropped", M128,
+     "revoke all on function public.ops_measure_all() from public, anon, authenticated;",
+     "revoke all on function public.ops_measure_all() from public;"),
+    ("measure not definer", M128,
+     "volatile\nsecurity definer\nset search_path = public\nas $$\nbegin\n  return private.ops_measure_all_at(now());",
+     "volatile\nset search_path = public\nas $$\nbegin\n  return private.ops_measure_all_at(now());"),
+    ("clause count not distinct", M128,
+     "count(*) filter (where exists (select 1 from public.finding_clause fc\n"
+     "                                                 where fc.finding_id = f.finding_id)) as num\n"
+     "            from public.findings f\n"
+     "           where f.source = 'FDA Warning Letter') c",
+     "(select count(*) from public.finding_clause fc join public.findings f2 on f2.finding_id = fc.finding_id\n"
+     "                  where f2.source = 'FDA Warning Letter') as num\n"
+     "            from public.findings f\n"
+     "           where f.source = 'FDA Warning Letter') c"),
+    ("tiny types counted", M128, "where t.den >= 20", "where t.den >= 1"),
+    ("backlog window 0 days", M128, "f.ingested_at < p_now - interval '3 days'", "f.ingested_at < p_now - interval '0 days'"),
+    ("backlog counts rejected", M128, "f.review_status <> 'rejected') c", "true) c"),
+    ("stale snapshot not held", M128,
+     "if a.snap_date < (p_now at time zone 'Asia/Seoul')::date - 2 then", "if false then"),
+    ("seed note overwritten", M128,
+     "note = case when ops_goal.measured_at is null then excluded.note else ops_goal.note end;",
+     "note = excluded.note;"),
+    ("db warn line 420", M128,
+     "'lte', 400::numeric, 400::numeric, 450::numeric", "'lte', 400::numeric, 420::numeric, 450::numeric"),
+    ("manual goal measured", M128,
+     "    ('tr-backlog',        'sql',    'private.ops_m_tr_backlog'),\n",
+     "    ('tr-backlog',        'sql',    'private.ops_m_tr_backlog'),\n    ('sr-report',         'sql',    'private.ops_m_ingest_age'),\n"),
+]
+
+
 def run(sql: str) -> subprocess.CompletedProcess:
     subprocess.run(["sudo", "-u", "postgres", "dropdb", "--if-exists", DB], cwd=ROOT, check=True)
     subprocess.run(["sudo", "-u", "postgres", "createdb", DB], cwd=ROOT, check=True)
@@ -222,7 +277,9 @@ def run(sql: str) -> subprocess.CompletedProcess:
 
 def main() -> None:
     originals = {p: p.read_text(encoding="utf-8") for p in (M122, M123, M125, M126, M127)}
-    plan = [(SQL_HOME, MUTATIONS), (SQL_DECIDE, MUTATIONS_DECIDE), (SQL_TASK, MUTATIONS_TASK), (SQL_PLAN, MUTATIONS_PLAN)]
+    originals[M128] = M128.read_text(encoding="utf-8")
+    plan = [(SQL_HOME, MUTATIONS), (SQL_DECIDE, MUTATIONS_DECIDE), (SQL_TASK, MUTATIONS_TASK), (SQL_PLAN, MUTATIONS_PLAN),
+            (SQL_MEASURE, MUTATIONS_MEASURE)]
     try:
         for sql, _ in plan:
             baseline = run(sql)

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T23:51:26Z",
+ "generated_at": "2026-11-06T01:07:32Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 42134308944,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-06T00:05:56Z",
+    "updatedAt": "2026-11-06T00:11:29Z",
+    "headBranch": "fei-since-narrow",
+    "displayTitle": "kg: 483 FEI 채우기 함수 호출당 비용 축소 (migration 119)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42134308944"
+   },
+   {
+    "databaseId": 42134300665,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-06T00:05:52Z",
+    "updatedAt": "2026-11-06T00:11:39Z",
+    "headBranch": "fei-since-narrow",
+    "displayTitle": "kg: 483 FEI 채우기 함수가 창 안 지적의 원문만 파싱하도록 좁힘 (migration 119)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42134300665"
+   },
+   {
     "databaseId": 42063421554,
     "status": "completed",
     "conclusion": "success",
@@ -205,38 +227,16 @@
     "headBranch": "main",
     "displayTitle": "web: 업체 별칭 옛 주소 301 리다이렉트 (_redirects) (#1346)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42059579086"
-   },
-   {
-    "databaseId": 42058335930,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-05T15:46:14Z",
-    "updatedAt": "2026-11-05T15:52:16Z",
-    "headBranch": "main",
-    "displayTitle": "glossary(fig): 2026-11-05 새 그림 0 · 다시 그림 0 · 보류 5 — assay·training·ri…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42058335930"
-   },
-   {
-    "databaseId": 42055738417,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-05T15:30:54Z",
-    "updatedAt": "2026-11-05T15:37:16Z",
-    "headBranch": "main",
-    "displayTitle": "kg-firm: 업체 별칭 35개 가산 (migration 118, 후보 B) (#1347)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42055738417"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 42132537701,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-05T23:51:19Z",
-    "updatedAt": "2026-11-05T23:51:23Z",
+    "updatedAt": "2026-11-05T23:51:30Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42132537701"

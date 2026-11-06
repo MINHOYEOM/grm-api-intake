@@ -45,7 +45,7 @@ class OpsHomeRenderTest(unittest.TestCase):
         self.assertEqual(h.count('class="oc-avatar"'), 15)
         # 결재 서류 = 발행 승인 1 + 결정 3, 넷째부터는 '그 밖에'
         self.assertEqual(len(re.findall(r'<li class="oc-paper[ "]', h)), 4)
-        self.assertIn("그 밖에 1건이 더 기다리고 있습니다", h)
+        self.assertIn('<p class="oc-more">그 밖에 1건</p>', h)
         self.assertIn("결재할 서류가 5건", h)
         self.assertIn("발행·운영 열기", h)
 
@@ -57,13 +57,13 @@ class OpsHomeRenderTest(unittest.TestCase):
 
     def test_seat_states_follow_db_fields(self):
         h = self.out["sample"]
-        for word in ("일하는 중", "막힘", "놀고 있음", "검사 대기", "활동 기록 없음", "쉬는 중", "일 없음"):
+        for word in ("일하는 중", "막힘", "놀고 있음", "검사 대기", "기록 없음", "쉬는 중", "일 없음"):
             self.assertIn('<span class="oc-seat-word">' + word + "</span>", h, word)
         s = self.out["seats"]
         self.assertEqual(s["oldButNotIdle"], "일 없음", "30일 전이어도 DB 가 idle=false 면 놀고 있음이 아니다")
         self.assertEqual(s["idleRecent"], "놀고 있음", "DB 가 idle=true 면 그대로 따른다")
-        self.assertEqual(s["noRecordFlag"], "활동 기록 없음")
-        self.assertEqual(s["nullDays"], "활동 기록 없음", "기록이 없으면 일수를 지어내지 않는다")
+        self.assertEqual(s["noRecordFlag"], "기록 없음")
+        self.assertEqual(s["nullDays"], "기록 없음", "기록이 없으면 일수를 지어내지 않는다")
         self.assertEqual(s["working"], "일하는 중")
         self.assertEqual(s["blocked"], "막힘")
         self.assertEqual(s["review"], "검사 대기")
@@ -78,7 +78,7 @@ class OpsHomeRenderTest(unittest.TestCase):
         self.assertIn("측정 필요 · 목표 미정", h)
         self.assertIn('<span class="oc-memo-tag">낡음</span>', h)
         self.assertIn('<span class="oc-memo-tag">놀고 있음</span>', h)
-        self.assertIn('<span class="oc-memo-tag">활동 기록 없음</span>', h)
+        self.assertIn('<span class="oc-memo-tag">기록 없음</span>', h)
 
     def test_goal_bar_has_target_line(self):
         h = self.out["sample"]
@@ -119,6 +119,59 @@ class OpsHomeRenderTest(unittest.TestCase):
         self.assertNotIn('class="oc-sum is-bad"', h)
         # 정상 부문은 접어 둘 수 있다(foldOk)
         self.assertRegex(h, r'<details class="oc-room oc-wing oc-t-ok" data-team="research">')
+
+    def test_density_ok_teams_fold_alert_teams_open(self):
+        """대표 피드백(11-06 "빽빽하다"): 정상 팀은 한 줄로 접고, 알림이 있는 팀만 펼친다."""
+        h = self.out["sample"]
+        for slug in ("brief", "strategy", "verification"):
+            self.assertRegex(h, r'<details class="oc-team oc-t-ok[^"]*" data-team="%s">' % slug, slug)
+        for slug in ("translation", "dev", "quality", "education", "situation-room"):
+            self.assertRegex(h, r'<details class="oc-team oc-t-(warn|bad|unknown)[^"]*" open data-team="%s">' % slug, slug)
+        # 정상 팀의 접힌 한 줄 = 이름 + 상태 + (결재 칩) + 인원 — 이유·목표선 없음
+        brief = h[h.index('data-team="brief"'):]
+        brief = brief[:brief.index("</summary>")]
+        self.assertNotIn("oc-worst", brief)
+
+    def test_density_goals_hidden_except_worst_line(self):
+        h = self.out["sample"]
+        # 팀 머리엔 가장 나쁜 목표 하나만 가는 선으로, 목표 전부는 접힘 안
+        quality = h[h.index('data-team="quality"'):]
+        quality = quality[:quality.index('data-team="infra"')]
+        self.assertEqual(quality.count('class="oc-worst"'), 1)
+        self.assertIn('oc-bar oc-b-warn is-thin', quality)
+        self.assertIn("용어 연결률(가장 낮은 유형 483) 50.2% · 목표 70%", quality)
+        self.assertIn('<details class="oc-goals-fold"><summary>목표 4개</summary>', quality)
+        # 목표 목록은 '목표 N개' 접힘이나 자리 펼침(팀 목표) 안에만 있다 — 밖에 늘 펼쳐진 목록이 없다
+        total = h.count('<ul class="oc-goals"')
+        folded = len(re.findall(r'목표 \d+개</summary><ul class="oc-goals"', h))
+        in_seat = h.count('<h5>팀 목표</h5><ul class="oc-goals"')
+        self.assertGreater(folded, 0)
+        self.assertEqual(total, folded + in_seat)
+
+    def test_density_seat_is_name_and_one_word(self):
+        h = self.out["sample"]
+        for btn in re.findall(r'<button type="button" class="oc-seat-btn".*?</button>', h, flags=re.S):
+            text = re.sub(r"<[^>]+>", "|", btn)
+            parts = [p for p in text.split("|") if p.strip()]
+            self.assertEqual(len(parts), 3, f"자리 = 이니셜·이름·한 마디만: {parts}")
+            self.assertIn(parts[2], ("일하는 중", "막힘", "놀고 있음", "검사 대기", "기록 없음", "쉬는 중", "일 없음"))
+        # 할 일 제목은 자리에 안 보이고 펼침에서만
+        seat_html = "".join(re.findall(r'<button type="button" class="oc-seat-btn".*?</button>', h, flags=re.S))
+        self.assertNotIn("11-09 호 카드 고르기", seat_html)
+        self.assertIn("11-09 호 카드 고르기", h)
+
+    def test_density_ceo_office(self):
+        h = self.out["sample"]
+        ceo = h[:h.index('class="oc-floor"')]
+        main = ceo[ceo.index('class="oc-sumline"'):ceo.index('class="oc-sum-more"')]
+        self.assertEqual(re.findall(r'<span class="oc-sum[^"]*">([^<]+) <b>', main), ["문제", "주의", "결재"])
+        self.assertIn("<summary>숫자 더 보기</summary>", ceo)
+        memo = ceo[ceo.index("<h3>눈여겨볼 것</h3>"):]
+        visible = memo[:memo.index('class="oc-memo-more"')]
+        self.assertEqual(visible.count("<li class="), 5, "눈여겨볼 것은 5개까지")
+        self.assertIn("<summary>더 보기 1</summary>", memo)
+        self.assertNotIn("다가오는 날짜", ceo, "날짜는 이번 주 일 접힘으로")
+        self.assertIn("<h4>다가오는 날짜</h4>", h)
 
     def test_empty_inputs(self):
         self.assertEqual(self.out["nullData"], "")
@@ -168,6 +221,12 @@ class OpsHomeWiringTest(unittest.TestCase):
         self.assertIn('"42501"', self.js)
         self.assertIn("다시 시도", self.js)
         self.assertIn("분 전입니다", self.js)
+
+    def test_no_control_characters(self):
+        # 패치 스크립트가 "\25B8" 같은 CSS 이스케이프를 파이썬 8진 이스케이프로 먹으면 제어 문자가 박힌다
+        for name, src in (("admin.html", self.html), ("admin-ops.js", self.ops)):
+            bad = [hex(ord(c)) for c in src if ord(c) < 32 and c not in "\n\r\t"]
+            self.assertEqual(bad, [], f"{name}: 제어 문자")
 
     def test_renderer_does_not_recompute_state(self):
         # 판정 경계(3일·1.5배·주의선 비교)를 JS 에 두지 않는다 — DB(123) 단일 원천

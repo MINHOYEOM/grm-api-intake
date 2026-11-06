@@ -227,6 +227,11 @@ def write_sidecar(out_dir: Path, sidecar: dict[str, Any]) -> Path:
 def main(argv: list[str] | None = None,
          post: Callable[[dict[str, Any]], Any] | None = None,
          firm_key_fn: Callable[[dict[str, Any]], str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):  # cp949 콘솔에서 한글·기호 출력이 죽지 않게
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--brief", required=True, help="발행본 brief_web_*.json 경로")
     ap.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))

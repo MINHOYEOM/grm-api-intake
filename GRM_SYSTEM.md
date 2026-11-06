@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.286` |
+| 문서 버전 | `v1.287` |
 | 최종 수정일 | 2026-11-06 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -586,6 +586,7 @@ grm-api-intake/
 │  ├─ migrations/099_account_scrub_feedback.sql # 계정 삭제 시 문의 이메일만 비우는 RPC(service_role 전용)
 │  ├─ migrations/122_ops_center_tables.sql # 운영 센터 표 5개(ops_team·ops_member·ops_goal·ops_task·ops_decision) — 관리자 읽기만·쓰기 service_role·선 순서 제약
 │  ├─ migrations/123_ops_home.sql # 운영 센터 상태 계산(private.ops_goal_state 순수 함수·worst-of 롤업·주기×1.5 강등·놀고 있음) + 홈 읽기 RPC ops_home()(함수 안 관리자 검사, 아니면 42501)
+│  ├─ migrations/124_ops_center_seed.sql # 운영 센터 시드 — 조직도 14칸(실 2·부문 3·팀 9)·팀원 15(직무 이름)·목표 23. on conflict (slug) 멱등, 값은 실제 측정일만(안 잰 것 null)·새로 잰 값은 재실행이 안 덮음
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -612,7 +613,7 @@ grm-api-intake/
 │  ├─ js/mfds_inspector_ui.js       # 네트워크 없는 UI 계약 검증
 │  ├─ run_mfds_sql_mutations.py     # 정책 위반 주입 FAIL → 원복 PASS 검증
 │  ├─ run_ops_center_sql_mutations.py # 운영 센터 122·123 뮤테이션(관리자 검사·1.5배·worst 순서·빈 집합·선 순서) FAIL → 원복 PASS
-│  └─ sql/mfds_attendees*.sql · sql/ops_center.sql # 격리 PostgreSQL 행동 검증(적재·권한·멱등성 / 운영 센터 경계표·롤업·42501)
+│  └─ sql/mfds_attendees*.sql · sql/ops_center*.sql # 격리 PostgreSQL 행동 검증(적재·권한·멱등성 / 운영 센터 경계표·롤업·42501 · 124 시드 2회 적용·부록 C 상태 대조)
 ├─ company/                        # "Claude 가 운영하는 회사(GRM Intelligence)" 지시문 — 클라우드 예약작업이 읽는다. 정본(docs/prompts/)은 가리키기만 한다(tests/test_company_pointers.py)
 │  ├─ CHARTER.md · CLOUD.md · ROUTINES.md   # 공통 헌장 · 클라우드 되는 것/막힌 것·gh api · 예약작업 목록(시각·모델·PC 백업 표식)
 │  ├─ ops/ · requests/             # 클라우드↔Actions 다리 — ops_status.py(실행 요약→claude/ops-status) · cloud_request.py(요청 마커 검증, 허용목록) · requests/ 는 마커 파일 자리
@@ -639,7 +640,7 @@ grm-api-intake/
    ├─ grm-rum-analytics.yml              # [성장·유입] RUM → Supabase 동기화 매일 16:30 UTC(01:30 KST) · 최근 8일 재적재 · 토큰 미설정은 클린 skip
    ├─ grm-growth-weekly.yml               # [성장·유입] 주간 성장 리포트 메일 — 수동 실행만(09-28 예약 해제: 매일 성장 일보·/admin 과 중복)
    ├─ grm-approval-mail.yml               # [결재 메일] 발행 PR 준비 시 대표 메일 1통 — 기본 dry-run, GRM_APPROVAL_MAIL_ENABLED=true 일 때만 실발송
-   ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123 을 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음
+   ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123·124(시드) 를 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
    ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml
    ├─ grm-brief-audit.yml, grm-reconciliation.yml, grm-supabase-keepalive.yml

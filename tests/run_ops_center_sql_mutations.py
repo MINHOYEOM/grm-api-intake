@@ -1,5 +1,6 @@
-"""CI 전용: 격리 PostgreSQL 에서 운영 센터 122·123·125 를 일부러 깨 보고 tests/sql/ops_center.sql·
-tests/sql/ops_center_decide.sql 이 빨개지는지(FAIL) 확인한 뒤, 원복해서 초록(PASS)인지 확인한다.
+"""CI 전용: 격리 PostgreSQL 에서 운영 센터 122·123·125·126·127 을 일부러 깨 보고 tests/sql/ops_center.sql·
+ops_center_decide.sql·ops_center_task.sql·ops_center_seed_planning.sql 이 빨개지는지(FAIL) 확인한 뒤,
+원복해서 초록(PASS)인지 확인한다.
 가드는 뮤테이션으로 검증한다.
 
 로컬에서 돌리지 않는다(sudo postgres 필요). 워크플로: .github/workflows/grm-ops-center-sql-check.yml
@@ -13,9 +14,13 @@ ROOT = Path(__file__).resolve().parents[1]
 M122 = ROOT / "web/migrations/122_ops_center_tables.sql"
 M123 = ROOT / "web/migrations/123_ops_home.sql"
 M125 = ROOT / "web/migrations/125_ops_decision_write.sql"
+M126 = ROOT / "web/migrations/126_ops_task_create.sql"
+M127 = ROOT / "web/migrations/127_ops_center_seed_planning.sql"
 DB = "ops_center_test"
 SQL_HOME = "tests/sql/ops_center.sql"
 SQL_DECIDE = "tests/sql/ops_center_decide.sql"
+SQL_TASK = "tests/sql/ops_center_task.sql"
+SQL_PLAN = "tests/sql/ops_center_seed_planning.sql"
 
 # (이름, 파일, 찾을 문자열, 바꿀 문자열) — 찾을 문자열이 없으면 뮤테이션 자체가 낡은 것이므로 실패시킨다.
 MUTATIONS = [
@@ -138,6 +143,76 @@ MUTATIONS_DECIDE = [
 ]
 
 
+# 126 업무 지시 — tests/sql/ops_center_task.sql 이 잡아야 한다.
+MUTATIONS_TASK = [
+    ("task admin check removed", M126,
+     "if not coalesce(private.is_admin(), false) then\n    raise exception 'ops_task_create: admin only'",
+     "if false then\n    raise exception 'ops_task_create: admin only'"),
+    ("task admin null guard removed", M126,
+     "if not coalesce(private.is_admin(), false) then\n    raise exception 'ops_task_create: admin only'",
+     "if not private.is_admin() then\n    raise exception 'ops_task_create: admin only'"),
+    ("anon may call ops_task_create", M126,
+     "grant execute on function public.ops_task_create(text, text, text, date, text) to authenticated;",
+     "grant execute on function public.ops_task_create(text, text, text, date, text) to anon, authenticated;"),
+    ("task body callable by members", M126,
+     "revoke all on function private.ops_task_create_at(text, text, text, date, text, uuid, timestamptz) from public, anon, authenticated;",
+     "revoke all on function private.ops_task_create_at(text, text, text, date, text, uuid, timestamptz) from anon;"),
+    ("task not definer", M126,
+     "volatile\nsecurity definer\nset search_path = public\nas $$\nbegin\n  -- 회원 가입이",
+     "volatile\nset search_path = public\nas $$\nbegin\n  -- 회원 가입이"),
+    ("blank team accepted", M126, "if nullif(btrim(coalesce(p_team, '')), '') is null then", "if p_team is null then"),
+    ("team required check dropped", M126, "if nullif(btrim(coalesce(p_team, '')), '') is null then", "if false then"),
+    ("inactive team accepted", M126, "if not found or not v_team.active then", "if not found then"),
+    ("division accepted", M126, "if v_team.kind = 'division' then", "if false then"),
+    ("title 121 accepted", M126, "char_length(v_title) > 120", "char_length(v_title) > 121"),
+    ("blank title accepted", M126, "if char_length(v_title) < 1 or", "if char_length(v_title) < 0 or"),
+    ("title not trimmed", M126, "v_title text := btrim(coalesce(p_title, ''));", "v_title text := coalesce(p_title, '');"),
+    ("detail length unchecked", M126, "if v_detail is not null and char_length(v_detail) > 2000 then", "if false then"),
+    ("past due accepted", M126, "if p_due is not null and p_due < (p_now at time zone 'Asia/Seoul')::date then", "if false then"),
+    ("due uses UTC date", M126, "p_due < (p_now at time zone 'Asia/Seoul')::date", "p_due < (p_now at time zone 'UTC')::date"),
+    ("member team unchecked", M126, "where slug = v_member_slug and team_id = v_team.id and state <> 'retired';",
+     "where slug = v_member_slug and state <> 'retired';"),
+    ("retired member accepted", M126, "where slug = v_member_slug and team_id = v_team.id and state <> 'retired';",
+     "where slug = v_member_slug and team_id = v_team.id;"),
+    ("duplicate window 5s", M126, "created_at > p_now - interval '10 seconds'", "created_at > p_now - interval '5 seconds'"),
+    ("duplicate check dropped", M126, "if exists (select 1 from public.ops_task", "if false and exists (select 1 from public.ops_task"),
+    ("lane not inbox", M126, "values (v_team.id, v_member, v_title, v_detail, 'inbox', 'directive',",
+     "values (v_team.id, v_member, v_title, v_detail, 'doing', 'directive',"),
+    ("reason not directive", M126, "v_detail, 'inbox', 'directive', p_actor, 'ceo',", "v_detail, 'inbox', 'routine', p_actor, 'ceo',"),
+    ("created_by not recorded", M126, "'directive', p_actor, 'ceo',", "'directive', null, 'ceo',"),
+    ("created_kind secretary", M126, "'directive', p_actor, 'ceo',", "'directive', p_actor, 'secretary',"),
+    ("task audit row dropped", M126,
+     "  insert into public.admin_audit_log (actor_user_id, action, target_type, target_id, details)\n"
+     "  values (p_actor, 'ops_task_create', 'ops_task', v_id::text,\n"
+     "          jsonb_build_object('team', v_team.slug, 'member', v_member_slug, 'title', v_title, 'due_on', p_due));",
+     "  null;"),
+]
+
+# 127 시드 추가 — tests/sql/ops_center_seed_planning.sql 이 잡아야 한다.
+MUTATIONS_PLAN = [
+    ("strategy row dropped", M127,
+     "  ('strategy',    '제품전략팀',       'platform', 1, false, '새 기능을 시험해 보고 쓸지 정합니다'),\n", ""),
+    ("strategy still pilot", M127,
+     "('strategy',    '제품전략팀',       'platform', 1, false,", "('strategy',    '제품전략팀',       'platform', 1, true,"),
+    ("support under research", M127, "('support',     '독자지원팀',       'customer', 3,",
+     "('support',     '독자지원팀',       'research', 3,"),
+    ("planning sorted last", M127, "('planning', '경영기획실', 'office', 0,", "('planning', '경영기획실', 'office', 9,"),
+    ("strat-adopted label not applied", M127, "  ('strategy', 'strat-adopted',", "  ('strategy', 'strat-adopted-2',"),
+    ("plan value overwritten", M127,
+     "  current_value = case when ops_goal.measured_at is null\n"
+     "                         or (excluded.measured_at is not null and ops_goal.measured_at <= excluded.measured_at)\n"
+     "                       then excluded.current_value else ops_goal.current_value end,",
+     "  current_value = excluded.current_value,"),
+    ("activity overwritten", M127,
+     "  last_active_note = case when excluded.last_active_at is not null\n"
+     "                           and (ops_member.last_active_at is null or ops_member.last_active_at <= excluded.last_active_at)\n"
+     "                          then excluded.last_active_note else ops_member.last_active_note end,",
+     "  last_active_note = excluded.last_active_note,"),
+    ("risk bad line 2", M127, "'plan-risks-open', '대응 안 된 높은 위험',      '건',   'lte', 0,  null, 1, ",
+     "'plan-risks-open', '대응 안 된 높은 위험',      '건',   'lte', 0,  null, 2, "),
+]
+
+
 def run(sql: str) -> subprocess.CompletedProcess:
     subprocess.run(["sudo", "-u", "postgres", "dropdb", "--if-exists", DB], cwd=ROOT, check=True)
     subprocess.run(["sudo", "-u", "postgres", "createdb", DB], cwd=ROOT, check=True)
@@ -146,8 +221,8 @@ def run(sql: str) -> subprocess.CompletedProcess:
 
 
 def main() -> None:
-    originals = {p: p.read_text(encoding="utf-8") for p in (M122, M123, M125)}
-    plan = [(SQL_HOME, MUTATIONS), (SQL_DECIDE, MUTATIONS_DECIDE)]
+    originals = {p: p.read_text(encoding="utf-8") for p in (M122, M123, M125, M126, M127)}
+    plan = [(SQL_HOME, MUTATIONS), (SQL_DECIDE, MUTATIONS_DECIDE), (SQL_TASK, MUTATIONS_TASK), (SQL_PLAN, MUTATIONS_PLAN)]
     try:
         for sql, _ in plan:
             baseline = run(sql)
@@ -173,7 +248,7 @@ def main() -> None:
     finally:
         for p, text in originals.items():
             p.write_text(text, encoding="utf-8")
-    total = len(MUTATIONS) + len(MUTATIONS_DECIDE)
+    total = sum(len(m) for _, m in plan)
     print(f"PASS: {total} mutations killed, restored SQL passes")
 
 

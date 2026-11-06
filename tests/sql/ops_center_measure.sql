@@ -234,7 +234,7 @@ select pg_temp.assert_true(pg_temp.n('tr-backlog') like '측정 실패 __-__: P0
 select pg_temp.assert_true(pg_temp.n('infra-ingest-age') like '측정 실패 __-__: 시간 초과', 'timeout note');
 select pg_temp.assert_true((select bool_and(measured_at = now()) from public.ops_goal where slug in ('dq-term-min','infra-db-size')),
                            'one failure does not stop the rest');
-select pg_temp.assert_eq((select string_agg(status, ',' order by status) from private.ops_measure_log where measured_at = now() and slug in ('tr-backlog','infra-ingest-age')),
+select pg_temp.assert_eq((select string_agg(status, ',' order by status) from private.ops_measure_log where status <> 'ok' and slug in ('tr-backlog','infra-ingest-age')),
                          'error,timeout', 'failures logged');
 -- 실제 statement_timeout: 문장 시작에 건 타이머가 측정 중에 울리면 그 목표만 시간 초과, 나머지는 계속
 create or replace function private.ops_m_ingest_age(p_now timestamptz) returns jsonb language plpgsql

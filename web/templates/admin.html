@@ -429,7 +429,40 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 .oc-b-unknown i{background:var(--oc-muted)}
 .oc-legacy{margin-top:30px}
 .oc-legacy>summary{font-size:13px;color:var(--muted)}
+.oc-sec .oc-task-open{min-height:34px}
+.oc-week{margin:0 0 12px}
+.oc-week>summary{padding:12px 16px;font-size:13px;font-weight:500;color:var(--oc-ink)}
+.oc-week>summary:before{content:"\25B8";display:inline-block;width:14px;font-size:10px;color:var(--oc-muted);transition:transform .15s}
+.oc-week[open]>summary:before{transform:rotate(90deg)}
+.oc-wk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--oc-line)}
+.oc-wk-col{padding:12px 16px;min-width:0}
+.oc-wk-col+.oc-wk-col{border-left:1px solid var(--oc-line)}
+.oc-wk-col h5{font-size:11.5px;color:var(--oc-muted);font-weight:500;margin-bottom:4px}
+.oc-wk-i{display:grid;gap:1px;padding:7px 0;border-top:1px solid var(--oc-line);font-size:13px;min-width:0}
+.oc-wk-i:first-child{border-top:0}
+.oc-wk-t{font-weight:500;overflow-wrap:anywhere}
+.oc-wk-m,.oc-wk-s{font-size:12px;color:var(--oc-muted);overflow-wrap:anywhere}
+.oc-wk-i.is-overdue .oc-wk-t{color:var(--oc-bad)}
+.oc-sheet-back{position:fixed;inset:0;background:rgba(12,14,17,.45);z-index:60}
+.oc-sheet{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);z-index:61;overflow-y:auto;background:var(--oc-surface);color:var(--oc-ink);border-left:1px solid var(--oc-line);padding:18px 20px 24px;font-size:14px;line-height:1.55}
+.oc-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.oc-sheet-head h3{font-size:16px;font-weight:600}
+.oc-form{display:grid;gap:6px}
+.oc-form>.oc-muted{margin-top:2px}
+.oc-form label{display:block;font-size:12.5px;font-weight:500;color:var(--oc-muted);margin-top:8px}
+.oc-form label b{font-weight:500;font-size:11.5px;color:var(--oc-accent);margin-left:4px}
+.oc-form label small{font-size:11.5px;color:var(--oc-faint);margin-left:4px}
+.oc-form select,.oc-form input,.oc-form textarea{font:inherit;font-size:14px;width:100%;min-height:40px;padding:8px 10px;border-radius:7px;border:1px solid var(--oc-line);background:var(--oc-bg);color:var(--oc-ink)}
+.oc-form textarea{min-height:96px;resize:vertical}
+.oc-form select:focus-visible,.oc-form input:focus-visible,.oc-form textarea:focus-visible{outline:2px solid var(--oc-accent);outline-offset:1px}
+.oc-form select:disabled{opacity:.55}
+.oc-why{margin:8px 0 0;font-size:12.5px;color:var(--oc-warn)}
+.oc-why[hidden],#grm-oc-sheet[hidden]{display:none}
+.oc-form .oc-err:empty,.oc-form .oc-done:empty{display:none}
+.oc-sheet-btns{margin-top:12px}
+.oc-sheet-btns button{min-height:40px;padding:8px 18px}
 @media(max-width:860px){.oc-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:560px){.oc-wk{grid-template-columns:minmax(0,1fr)}.oc-wk-col+.oc-wk-col{border-left:0;border-top:1px solid var(--oc-line)}.oc-sec .oc-task-open{width:100%}.oc-sheet{top:auto;left:0;width:100%;max-height:92vh;border-left:0;border-top:1px solid var(--oc-line);border-radius:12px 12px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}.oc-form select,.oc-form input,.oc-form textarea{font-size:16px}}
 @media(max-width:560px){.oc-wrap{padding:14px 12px 20px}.oc-summary{font-size:19px}.oc-legend{margin-left:0}.oc-n{min-width:0;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 </style>
 
@@ -896,6 +929,8 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
               </section>
             </div>
             <div id="grm-oc"></div>
+            {# 업무 지시 시트(PR5) — '팀과 직원' 머리의 [업무 지시] 가 열고, admin-ops.js renderTaskSheet 가 채운다. #}
+            <div id="grm-oc-sheet" hidden></div>
           </div>
           <details class="admin-fold oc-legacy" id="grm-home-legacy">
           <summary>이전 홈 화면 (숫자·옛 조직도)</summary>

@@ -234,7 +234,7 @@ class OpsHomeWiringTest(unittest.TestCase):
         self.assertIn('r.code === "already_decided"', body)
         self.assertIn('"42501"', body)
         self.assertIn("window.setTimeout(loadOpsHome", body, "처리 후 홈 새로고침")
-        self.assertIn(", opsDecide);", self.js, "bind 에 처리 함수가 이어져 있다")
+        self.assertIn(", opsDecide, opsTaskOpen);", self.js, "bind 에 결재·업무 지시 처리 함수가 이어져 있다")
 
     def test_admin_js_calls_ops_home_once_via_supabase_rpc(self):
         self.assertIn('state.client.rpc("ops_home")', self.js)

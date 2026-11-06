@@ -9,6 +9,8 @@
  * DOM·네트워크를 만지지 않아 Node 로 시험한다(tests/js/ops_home_render.js).
  * 직원 한 줄 = 직무 이름 + 지금 맡은 일 한 줄 + 글자 태그(진행 중 / 확인 대기 / 지연 / 배정 없음).
  * 평면도·원형 아바타·점 아이콘은 쓰지 않는다.
+ * 업무 지시(PR5): '팀과 직원' 머리의 [업무 지시] → renderTaskSheet(팀 필수·직원 선택·제목·내용·마감일) →
+ * admin.js 가 validateTask 로 먼저 막고 rpc('ops_task_create') 를 부른다. 보낸 지시는 '이번 주 일' 접힘(flow)의 지시함에 보인다.
  * 결재(PR4): 서류마다 [승인(질문형은 권장 라벨)] [보류(내일 아침)] [3일 뒤] — 누르면 admin.js 가 rpc('ops_decide')
  * 를 부르고, 결과는 ctx.decide 로 다시 넘어와 그려진다(처리 중·처리됨·오류). 반려 버튼은 없다(D5).
  * 운영자 전용 한국어 화면 — grm_i18n.EXCLUDED_ASSETS 대상(영문판에 실리지 않는다).
@@ -250,30 +252,156 @@
     return html + (more ? '<div class="oc-more">그 밖에 ' + more + "건이 더 기다립니다</div>" : "");
   }
 
+  // ── 이번 주 일(접힘) — ops_home.flow 그대로: 지시함 · 진행(확인 대기 포함) · 이번 주 완료 ─────────
+  // 대표가 막 보낸 지시는 담당이 비어 있을 수 있어 직원 줄에는 안 보인다 → 여기서 '접수됨'으로 보인다(두 번 안 보내게).
+  function memberName(teams, t) {
+    var ms = arr((teams[t.team] || {}).members);
+    for (var i = 0; i < ms.length; i++) if (ms[i].slug === t.member) return ms[i].name || t.member;
+    return t.member || "";
+  }
+  function weekItem(t, teams) {
+    var team = (teams[t.team] || {}).name || t.team || "";
+    var who = t.member ? memberName(teams, t) : "담당 미정";
+    var tag = t.lane === "done" ? "완료"
+      : t.lane === "review" ? "확인 대기"
+      : t.lane === "doing" ? "진행 중"
+      : t.secretary_seen ? "비서실 확인함" : "접수됨";
+    var u = safeUrl(t.result_url);
+    return '<li class="oc-wk-i' + (t.overdue ? " is-overdue" : "") + '"><span class="oc-wk-t">' + esc(t.title) + "</span>" +
+      '<span class="oc-wk-m">' + esc(team) + " · " + esc(who) +
+      (t.due_on ? " · " + esc(dayLabel(t.due_on)) + "까지" : "") +
+      (t.created_kind === "ceo" ? " · 대표 지시" : "") + "</span>" +
+      '<span class="oc-wk-s">' + esc(tag) + (t.overdue ? ' <span class="oc-flag-bad">마감 지남</span>' : "") +
+      (u ? ' · <a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">결과</a>' : "") + "</span></li>";
+  }
+  function renderWeek(data, ctx) {
+    if (!data || typeof data !== "object") return "";
+    var flow = data.flow || {}, teams = data.teams || {};
+    var todo = arr(flow.todo), doing = arr(flow.doing), done = arr(flow.done);
+    var col = function (title, list, empty) {
+      return '<div class="oc-wk-col"><h5>' + title + " " + list.length + "</h5>" +
+        (list.length ? "<ul>" + list.map(function (t) { return weekItem(t, teams); }).join("") + "</ul>"
+          : '<p class="oc-muted">' + empty + "</p>") + "</div>";
+    };
+    return '<details class="oc-card oc-week" data-oc-week="1"' + (ctx && ctx.weekOpen ? " open" : "") + ">" +
+      "<summary>이번 주 일 · 지시함 " + todo.length + " · 진행 " + doing.length + " · 완료 " + done.length + "</summary>" +
+      '<div class="oc-wk">' + col("지시함", todo, "새 지시 없음") + col("진행", doing, "진행 중인 일이 없습니다") +
+      col("이번 주 완료", done, "아직 없음") + "</div></details>";
+  }
+
   // ── 팀과 직원 ────────────────────────────────────────────────────────────────
-  function renderTeams(data) {
+  function renderTeams(data, ctx) {
     if (!data || typeof data !== "object") return "";
     var teams = data.teams || {}, tree = arr(data.tree), c = { tasks: tasksByMember(data.flow || {}) };
     var head = '<div class="oc-sec"><h2>팀과 직원</h2><span>누가 지금 무슨 일을 맡고 있는지</span>' +
       '<div class="oc-legend"><span class="oc-pill oc-p-work">진행 중</span><span class="oc-pill oc-p-wait">확인 대기</span>' +
-      '<span class="oc-pill oc-p-bad">지연</span><span class="oc-pill oc-p-none">배정 없음</span></div></div>';
+      '<span class="oc-pill oc-p-bad">지연</span><span class="oc-pill oc-p-none">배정 없음</span></div>' +
+      (tree.length ? '<button type="button" class="oc-pri oc-task-open" data-oc-task-open="1">업무 지시</button>' : "") + "</div>";
     if (!tree.length) return head + '<p class="oc-empty">아직 조직 자료가 없습니다.</p>';
-    return head + '<div class="oc-rooms">' + tree.map(function (n) { return room(n, teams, c); }).join("") + "</div>";
+    return head + renderWeek(data, ctx) +
+      '<div class="oc-rooms">' + tree.map(function (n) { return room(n, teams, c); }).join("") + "</div>";
+  }
+
+  // ── 업무 지시 시트 ─────────────────────────────────────────────────────────────
+  // 팀 필수(대상 없는 지시 금지) · 직원은 고르지 않으면 비서실이 정한다 · 제목 1~120자 · 내용 2000자 · 마감 선택.
+  // 검사 규칙은 126 ops_task_create 와 같은 선(서버가 최종 판정 — 화면은 먼저 막아 헛걸음을 줄인다).
+  var TASK_LIMIT = { title: 120, detail: 2000 };
+  var TASK_MSG = {
+    no_team: "팀을 골라 주세요. 맡을 팀이 없으면 보낼 수 없습니다",
+    title_length: "제목은 1~120자로 적어 주세요",
+    detail_length: "내용은 2000자까지 적을 수 있습니다",
+    due_past: "마감일이 이미 지났습니다. 오늘 이후로 골라 주세요",
+    due_format: "마감일을 달력에서 골라 주세요",
+    member_team: "고른 직원이 그 팀에 없습니다"
+  };
+  // 지시를 받을 수 있는 칸 = 실과 팀(부문은 묶음이라 고르지 않는다). 순서는 조직도 순서.
+  function taskTeams(data) {
+    var out = [];
+    arr(data && data.tree).forEach(function (n) {
+      if (n.kind === "office") out.push({ slug: n.slug, name: n.name, group: "실" });
+      else arr(n.children).forEach(function (k) { out.push({ slug: k.slug, name: k.name, group: n.name }); });
+    });
+    return out;
+  }
+  function teamOptions(data, selected) {
+    var html = '<option value="">팀을 고르세요</option>', group = null;
+    taskTeams(data).forEach(function (t) {
+      if (t.group !== group) { html += (group === null ? "" : "</optgroup>") + '<optgroup label="' + esc(t.group) + '">'; group = t.group; }
+      html += '<option value="' + esc(t.slug) + '"' + (t.slug === selected ? " selected" : "") + ">" + esc(t.name) + "</option>";
+    });
+    return html + (group === null ? "" : "</optgroup>");
+  }
+  function memberOptions(data, team, selected) {
+    var ms = arr(((data && data.teams) || {})[team] && data.teams[team].members).filter(function (m) { return m.state !== "retired"; });
+    return '<option value="">' + (team ? "비서실이 정함" : "팀을 먼저 고르세요") + "</option>" + ms.map(function (m) {
+      return '<option value="' + esc(m.slug) + '"' + (m.slug === selected ? " selected" : "") + ">" + esc(m.name || m.slug) + "</option>";
+    }).join("");
+  }
+  function kstToday(data) {
+    var p = kstParts(data && data.generated_at);
+    if (!p) return "";
+    return p[0] + "-" + (p[1] < 10 ? "0" : "") + p[1] + "-" + (p[2] < 10 ? "0" : "") + p[2];
+  }
+  // 입력 → { ok, code, field, message, payload }. payload 는 rpc('ops_task_create') 인자 그대로.
+  function validateTask(v, data) {
+    v = v || {};
+    var team = String(v.team || "").trim(), member = String(v.member || "").trim();
+    var title = String(v.title || "").trim(), detail = String(v.detail || "").trim(), due = String(v.due || "").trim();
+    var fail = function (code, field) { return { ok: false, code: code, field: field, message: TASK_MSG[code] }; };
+    if (!team) return fail("no_team", "team");
+    if (data && !taskTeams(data).some(function (t) { return t.slug === team; })) return fail("no_team", "team");
+    if (title.length < 1 || title.length > TASK_LIMIT.title) return fail("title_length", "title");
+    if (detail.length > TASK_LIMIT.detail) return fail("detail_length", "detail");
+    if (due && !/^\d{4}-\d{2}-\d{2}$/.test(due)) return fail("due_format", "due");
+    var today = kstToday(data);
+    if (due && today && due < today) return fail("due_past", "due");
+    if (member && data && !arr(((data.teams || {})[team] || {}).members).some(function (m) { return m.slug === member; })) {
+      return fail("member_team", "member");
+    }
+    return { ok: true, payload: { p_team: team, p_title: title, p_detail: detail || null, p_due: due || null, p_member: member || null } };
+  }
+  function renderTaskSheet(data, f) {
+    f = f || {};
+    var team = f.team || "", ready = !!team, today = kstToday(data);
+    return '<div class="oc-sheet-back" data-oc-task-close="1"></div>' +
+      '<div class="oc-sheet" role="dialog" aria-modal="true" aria-labelledby="grm-oc-task-title">' +
+      '<form class="oc-form" id="grm-oc-task-form" novalidate>' +
+      '<div class="oc-sheet-head"><h3 id="grm-oc-task-title">업무 지시</h3>' +
+      '<button type="button" class="oc-link" data-oc-task-close="1">닫기</button></div>' +
+      '<p class="oc-muted">팀을 고르고 할 일을 적어 보내면 지시함에 들어갑니다. 직원을 고르지 않으면 비서실이 정합니다.</p>' +
+      '<label for="grm-oc-task-team">팀 <b>필수</b></label>' +
+      '<select id="grm-oc-task-team" name="team" required>' + teamOptions(data, team) + "</select>" +
+      '<label for="grm-oc-task-member">직원 <small>선택</small></label>' +
+      '<select id="grm-oc-task-member" name="member"' + (ready ? "" : " disabled") + ">" + memberOptions(data, team, f.member) + "</select>" +
+      '<label for="grm-oc-task-name">제목</label>' +
+      '<input id="grm-oc-task-name" name="title" type="text" maxlength="' + TASK_LIMIT.title + '" required autocomplete="off" value="' + esc(f.title || "") + '">' +
+      '<label for="grm-oc-task-detail">내용 <small>선택 · 2000자까지</small></label>' +
+      '<textarea id="grm-oc-task-detail" name="detail" rows="4" maxlength="' + TASK_LIMIT.detail + '">' + esc(f.detail || "") + "</textarea>" +
+      '<label for="grm-oc-task-due">마감일 <small>선택</small></label>' +
+      '<input id="grm-oc-task-due" name="due" type="date"' + (today ? ' min="' + today + '"' : "") + ' value="' + esc(f.due || "") + '">' +
+      '<p class="oc-why" id="grm-oc-task-why"' + (ready ? " hidden" : "") + ">팀을 골라야 보낼 수 있습니다.</p>" +
+      '<p class="oc-err" id="grm-oc-task-err" role="status">' + esc(f.error || "") + "</p>" +
+      '<div class="oc-btns oc-sheet-btns"><button type="submit" class="oc-pri" id="grm-oc-task-send"' + (ready ? "" : " disabled") + ">보내기</button>" +
+      '<button type="button" data-oc-task-close="1">취소</button></div>' +
+      "</form></div>";
   }
 
   function render(data, ctx) {
     if (!data || typeof data !== "object") return "";
     return '<p class="oc-summary">' + renderSummary(data, ctx) + "</p>" +
-      '<section class="oc-card oc-docs">' + renderDocs(data, ctx) + "</section>" + renderTeams(data);
+      '<section class="oc-card oc-docs">' + renderDocs(data, ctx) + "</section>" + renderTeams(data, ctx);
   }
 
-  // 화면 동작: '발행·운영 열기' 이동과 결재 버튼(펼침은 <details> 가 한다). 처리 자체는 admin.js 의 onDecide.
-  function bind(host, onGoto, onDecide) {
+  // 화면 동작: '발행·운영 열기' 이동, 결재 버튼, '업무 지시' 시트 열기(펼침은 <details> 가 한다).
+  // 처리 자체는 admin.js 의 onDecide·onTask.
+  function bind(host, onGoto, onDecide, onTask) {
     if (!host || host.__ocBound) return;
     host.__ocBound = true;
     host.addEventListener("click", function (e) {
       var go = e.target.closest ? e.target.closest("[data-oc-goto]") : null;
       if (go) { if (onGoto) onGoto(go.getAttribute("data-oc-goto")); return; }
+      var open = e.target.closest ? e.target.closest("[data-oc-task-open]") : null;
+      if (open) { if (!open.disabled && onTask) onTask(); return; }
       var b = e.target.closest ? e.target.closest("[data-oc-decide]") : null;
       if (!b || b.disabled || !onDecide) return;
       onDecide(Number(b.getAttribute("data-oc-id")), b.getAttribute("data-oc-decide"), b.getAttribute("data-oc-snooze") || null);
@@ -281,6 +409,8 @@
   }
 
   var api = { render: render, renderSummary: renderSummary, renderDocs: renderDocs, renderTeams: renderTeams,
+              renderWeek: renderWeek, renderTaskSheet: renderTaskSheet, teamOptions: teamOptions, memberOptions: memberOptions,
+              validateTask: validateTask, taskTeams: taskTeams, TASK_MSG: TASK_MSG,
               bind: bind, approveLabel: approveLabel, memberStatus: memberStatus, dayLabel: dayLabel, daysLeft: daysLeft, clock: clock, STATE_WORD: STATE_WORD };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.GRMOps = api;

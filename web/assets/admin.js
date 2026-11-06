@@ -1274,11 +1274,115 @@
   }
   function renderOpsHome() {
     if (!window.GRMOps || !state.opsHome) return;
-    var ctx = { publish: opsPublishCtx(), decide: state.opsDecide }, G = window.GRMOps;
-    opsFill(G.renderSummary(state.opsHome, ctx), G.renderDocs(state.opsHome, ctx), G.renderTeams(state.opsHome));
-    G.bind(byId("grm-oc-wrap"), function (tab) { setTab(tab); }, opsDecide);
+    var ctx = { publish: opsPublishCtx(), decide: state.opsDecide, weekOpen: !!state.opsWeekOpen }, G = window.GRMOps;
+    opsFill(G.renderSummary(state.opsHome, ctx), G.renderDocs(state.opsHome, ctx), G.renderTeams(state.opsHome, ctx));
+    G.bind(byId("grm-oc-wrap"), function (tab) { setTab(tab); }, opsDecide, opsTaskOpen);
     opsAge();
   }
+  // ── 업무 지시(126 ops_task_create, 함수 안 관리자 검사) ─────────────────────────
+  // 시트는 열 때 한 번 그리고(입력이 지워지지 않게), 팀을 바꾸면 직원 목록과 보내기 잠금만 고친다.
+  // 더블 탭: 보내는 동안 버튼 잠금 + 같은 제목 10초 안 재전송은 화면에서도 막는다(서버도 10초 안 같은 제목 거부).
+  state.opsTask = { busy: false, last: null, timer: 0 };
+  var OPS_TASK_DUP_MS = 10000;
+  function opsTaskEl(id) { return byId(id); }
+  function opsTaskNote(text, ok) {
+    var n = opsTaskEl("grm-oc-task-err");
+    if (!n) return;
+    n.textContent = text || "";
+    n.className = ok ? "oc-done" : "oc-err";
+  }
+  function opsTaskSync() {
+    var team = opsTaskEl("grm-oc-task-team"), member = opsTaskEl("grm-oc-task-member");
+    var send = opsTaskEl("grm-oc-task-send"), why = opsTaskEl("grm-oc-task-why");
+    if (!team) return;
+    var ready = !!team.value;
+    if (member) {
+      var keep = member.value;
+      member.innerHTML = window.GRMOps.memberOptions(state.opsHome, team.value, keep);
+      member.disabled = !ready || state.opsTask.busy;
+    }
+    if (send) send.disabled = !ready || state.opsTask.busy;
+    if (why) why.hidden = ready;
+  }
+  function opsTaskClose() {
+    var host = byId("grm-oc-sheet");
+    if (!host || state.opsTask.busy) return;
+    window.clearTimeout(state.opsTask.timer);
+    host.innerHTML = "";
+    host.hidden = true;
+    var open = document.querySelector("[data-oc-task-open]");
+    if (open) open.focus();
+  }
+  function opsTaskOpen() {
+    var host = byId("grm-oc-sheet");
+    if (!host || !window.GRMOps || !state.opsHome) return;
+    host.innerHTML = window.GRMOps.renderTaskSheet(state.opsHome, {});
+    host.hidden = false;
+    var team = opsTaskEl("grm-oc-task-team");
+    if (team) team.focus();
+  }
+  function opsTaskSend() {
+    var st = state.opsTask, form = byId("grm-oc-task-form");
+    if (!form || st.busy) return Promise.resolve();
+    // form.title 은 폼 자신의 title 속성과 겹칠 수 있어 이름으로 꺼낸다
+    var field = function (name) { return form.elements.namedItem(name); };
+    var val = function (name) { var el = field(name); return el ? el.value : ""; };
+    var v = { team: val("team"), member: val("member"), title: val("title"), detail: val("detail"), due: val("due") };
+    var check = window.GRMOps.validateTask(v, state.opsHome);
+    if (!check.ok) {
+      opsTaskNote(check.message, false);
+      var bad = field(check.field);
+      if (bad && bad.focus) bad.focus();
+      return Promise.resolve();
+    }
+    var p = check.payload;
+    if (st.last && st.last.title === p.p_title && Date.now() - st.last.at < OPS_TASK_DUP_MS) {
+      opsTaskNote("방금 같은 지시를 보냈습니다. 지시함을 확인해 주세요", false);
+      return Promise.resolve();
+    }
+    st.busy = true;
+    var send = byId("grm-oc-task-send");
+    if (send) { send.disabled = true; send.textContent = "보내는 중"; }
+    opsTaskNote("", false);
+    return state.client.rpc("ops_task_create", p)
+      .then(function (res) {
+        if (res.error) throw res.error;
+        var r = res.data || {};
+        if (!r.ok) { opsTaskNote(r.message || "보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.", false); return false; }
+        st.last = { title: p.p_title, at: Date.now() };
+        opsTaskNote(r.message || "지시했습니다 · 비서실이 읽고 담당을 정합니다", true);
+        return true;
+      })
+      .catch(function (error) {
+        var code = error && (error.code || (error.data && error.data.code));
+        opsTaskNote(code === "42501" ? "관리자 권한이 확인되지 않아 보내지 못했습니다."
+          : "보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.", false);
+        return false;
+      })
+      .then(function (ok) {
+        st.busy = false;
+        if (send) send.textContent = "보내기";
+        if (!ok) { opsTaskSync(); return; }
+        // 보낸 내용은 그대로 두고 잠근 채 문구를 보인 뒤 닫고 홈을 다시 읽는다 → '이번 주 일' 지시함에 나타난다.
+        Array.prototype.forEach.call(form.elements, function (el) { if (!el.hasAttribute("data-oc-task-close")) el.disabled = true; });
+        state.opsWeekOpen = true;
+        st.timer = window.setTimeout(function () { opsTaskClose(); loadOpsHome(); }, 1500);
+      });
+  }
+  (function () {
+    var host = byId("grm-oc-sheet");
+    if (!host) return;
+    host.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("[data-oc-task-close]")) opsTaskClose();
+    });
+    host.addEventListener("change", function (e) {
+      if (e.target && e.target.id === "grm-oc-task-team") { opsTaskNote("", false); opsTaskSync(); }
+    });
+    host.addEventListener("submit", function (e) { e.preventDefault(); opsTaskSend(); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !host.hidden) opsTaskClose();
+    });
+  })();
   // 승인·보류 — 125 ops_decide(함수 안 관리자 검사). 같은 서류는 응답 전까지 다시 못 누른다.
   // 서버도 state in ('pending','snoozed') 인 행만 바꾸므로 폰·PC 두 곳에서 눌러도 한 번만 반영된다.
   function opsDecide(id, action, snooze) {

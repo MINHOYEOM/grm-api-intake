@@ -256,7 +256,7 @@ update public.ops_goal set measure_ref = 'private.ops_m_nope' where slug = 'dq-t
 create temp table r5 as select private.ops_measure_all_at(now()) as r;
 select pg_temp.assert_true(to_regclass('public.t_canary') is not null, 'injected SQL not executed');
 select pg_temp.assert_eq((select string_agg(e ->> 'slug', ',' order by e ->> 'slug') from r5, jsonb_array_elements(r -> 'failed') e
-                          where e ->> 'error' like '22023%'), 'dq-term-min,infra-db-size', 'bad refs fail safely');
+                          where e ->> 'error' like '22023 measure_ref%'), 'dq-term-min,infra-db-size', 'bad refs fail safely');
 -- github·manual 목표는 SQL 갈래가 건드리지 않는다
 select pg_temp.assert_true(not exists (select 1 from private.ops_measure_log l join public.ops_goal g using (slug)
                                         where g.measure_kind <> 'sql'), 'only sql goals measured');

@@ -1233,8 +1233,77 @@
         box.classList.toggle("admin-hidden", !ask.length);
       }).catch(function () { var box = byId("grm-home-inbox"); if (box) box.classList.add("admin-hidden"); });
   }
+  // ── 운영 센터(123 ops_home) — 홈 전체를 함수 한 번으로 읽는다. 상태 판정은 DB, 그리기는 admin-ops.js ──
+  // 실패해도 조용히 한 줄 + 다시 시도. 옛 홈(접힘)을 펼쳐 발행 승인 길은 막히지 않게 한다.
+  var OPS_STALE_MIN = 5;
+  function opsPublishCtx() {
+    var d = state.publishPr;
+    if (!d || !d.pr) return null;
+    var checks = { green: "CI 통과", red: "CI 실패", pending: "CI 대기 중" }[(d.checks && d.checks.state) || ""] || "CI 확인 불가";
+    return { title: "#" + (d.pr.number || "-") + " " + (d.pr.title || "이번 주 브리프 발행"), meta: checks + " · 승인은 발행·운영 화면에서" };
+  }
+  function opsMsg(text, kind, retry) {
+    var box = byId("grm-oc-msg");
+    if (!box) return;
+    box.className = "oc-msg" + (kind === "err" ? " is-err" : "") + (text ? "" : " is-hidden");
+    box.innerHTML = esc(text || "") + (retry ? ' <button type="button" data-oc-retry="1">다시 시도</button>' : "");
+  }
+  function opsAge() {
+    var n = byId("grm-oc-age");
+    if (!n) return;
+    if (!state.opsHome) { n.textContent = "운영 센터"; n.className = "oc-age"; return; }
+    var hm = window.GRMOps ? window.GRMOps.clock(state.opsHome.generated_at) : "";
+    var min = Math.floor((Date.now() - (state.opsHomeAt || Date.now())) / 60000);
+    n.className = "oc-age" + (min >= OPS_STALE_MIN ? " is-old" : "");
+    n.textContent = "갱신 " + (hm || "-") + (min >= OPS_STALE_MIN ? " · 자료가 " + min + "분 전입니다. 다시 불러오세요." : "");
+  }
+  function renderOpsHome() {
+    var host = byId("grm-oc");
+    if (!host || !window.GRMOps || !state.opsHome) return;
+    host.innerHTML = window.GRMOps.render(state.opsHome, { publish: opsPublishCtx() });
+    window.GRMOps.bind(host, function (tab) { setTab(tab); });
+    opsAge();
+  }
+  function loadOpsHome() {
+    if (!window.GRMOps) { opsMsg("운영 센터 화면 파일을 읽지 못했습니다. 새로고침해 주세요.", "err", false); return Promise.resolve(); }
+    if (!state.opsHome) opsMsg("운영 센터를 불러오는 중입니다.", "", false);
+    return state.client.rpc("ops_home").then(function (res) {
+      if (res.error) throw res.error;
+      var data = res.data;
+      if (!data || typeof data !== "object" || !Array.isArray(data.tree) || !data.tree.length) {
+        state.opsHome = null;
+        var host = byId("grm-oc"); if (host) host.innerHTML = "";
+        opsMsg("아직 조직 자료가 없습니다. 비서실이 자료를 넣으면 여기에 보입니다.", "", true);
+        opsAge();
+        return;
+      }
+      state.opsHome = data;
+      state.opsHomeAt = Date.now();
+      opsMsg("", "", false);
+      renderOpsHome();
+    }).catch(function (error) {
+      var code = error && (error.code || (error.data && error.data.code));
+      opsMsg(code === "42501" ? "관리자 권한이 확인되지 않아 운영 센터를 열 수 없습니다."
+        : "운영 센터를 불러오지 못했습니다." + (state.opsHome ? " 아래는 이전에 읽은 자료입니다." : ""), "err", true);
+      var legacy = byId("grm-home-legacy");
+      if (legacy && !state.opsHome) legacy.open = true;
+    });
+  }
+  (function () {
+    var reload = byId("grm-oc-reload"), msg = byId("grm-oc-msg");
+    if (reload) reload.addEventListener("click", function () { loadOpsHome(); });
+    if (msg) msg.addEventListener("click", function (e) { if (e.target.closest("[data-oc-retry]")) loadOpsHome(); });
+    // 폴링 없음: 1분마다 '자료가 N분 전' 글자만 고치고, 탭이 다시 보일 때 5분 지났으면 한 번 읽는다.
+    window.setInterval(opsAge, 60000);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState !== "visible" || !state.session || !state.opsHomeAt) return;
+      if (Date.now() - state.opsHomeAt >= OPS_STALE_MIN * 60000) loadOpsHome();
+    });
+  })();
   function refreshAll() {
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadSearchConsole(), loadRuns(), loadHealth(), loadPublishPr(), loadOpsReports()]).then(function () {
+    // 운영 센터는 따로 읽고, 발행 PR 결과가 오면 대표실 '발행 승인' 한 줄을 위해 다시 그린다(DB 복사 없음).
+    var publish = loadPublishPr().then(renderOpsHome);
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadSearchConsole(), loadRuns(), loadHealth(), publish, loadOpsHome(), loadOpsReports()]).then(function () {
       renderSystemChecks();
     });
   }

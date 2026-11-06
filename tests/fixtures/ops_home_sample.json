@@ -1,0 +1,129 @@
+{
+  "generated_at": "2026-11-06T09:10:00+09:00",
+  "summary": {"bad": 0, "warn": 3, "unknown_teams": 5, "ok_teams": 3, "decisions": 4, "idle": 1, "no_record": 1, "deadlines": 3, "overdue": 1},
+  "decisions": [
+    {"id": 2, "team": "situation-room", "reason": "ask", "title": "처리방침 시행일을 11-03 그대로 둘까요", "why": "공개 전 마지막 확인입니다.", "if_approved": "현행 유지(변경 시 공지 필요)", "recommendation": "유지", "due_at": "2026-11-09T00:00:00+00:00", "overdue": false, "state": "pending", "snooze_count": 0, "ref_url": null},
+    {"id": 1, "team": "outreach", "reason": "approve", "title": "Brevo 확인 메일 링크에 유입 표식 붙이기", "why": "구독이 어느 채널에서 왔는지 지금은 나눌 수 없습니다.", "if_approved": "템플릿 2개를 화면을 보며 수정(데스크톱 앱 필요), 이후 구독 유입 경로가 채널별로 구분됨", "recommendation": "진행", "due_at": "2026-11-13T00:00:00+00:00", "overdue": false, "state": "pending", "snooze_count": 1, "ref_url": "https://github.com/MINHOYEOM/grm-api-intake/pull/1"},
+    {"id": 3, "team": "situation-room", "reason": "approve", "title": "PC 예약작업 백업을 11-14 에 끌까요", "why": "클라우드 루틴이 2주째 정상입니다.", "if_approved": "클라우드만으로 운영, 월요일 작업 2개 경로 정리", "recommendation": "11-09~13 클라우드 정상 확인 후 끔", "due_at": "2026-11-05T00:00:00+00:00", "overdue": true, "state": "pending", "snooze_count": 0, "ref_url": "javascript:alert(1)"}
+  ],
+  "decisions_more": 1,
+  "publish_approval": null,
+  "anomalies": [
+    {"kind": "goal", "team": "translation", "goal": "tr-same-day", "state": "warn", "text": "브리프 영문판 같은 날 발행 0 · 목표 1", "note": "11-02 호는 한글만 먼저"},
+    {"kind": "goal", "team": "dev", "goal": "dev-link-streak", "state": "warn", "text": "일일 연결 연속 성공 0일 · 목표 30일", "note": null},
+    {"kind": "goal", "team": "quality", "goal": "dq-term-min", "state": "warn", "text": "용어 연결률(가장 낮은 유형 483) 50.2% · 목표 70%", "note": null},
+    {"kind": "stale", "team": "education", "goal": "edu-quiz", "state": "unknown", "text": "주간 퀴즈 정시 발행 · 12일 전 측정", "note": null, "measured_days": 12},
+    {"kind": "idle", "team": "quality", "member": "dq-kg-link", "name": "연결 담당", "days": 4},
+    {"kind": "no_record", "team": "translation", "member": "tr-daily", "name": "번역 담당"}
+  ],
+  "tree": [
+    {"slug": "situation-room", "name": "종합상황실", "kind": "office", "state": "unknown", "reason_code": "no_value", "reason": "정기 작업이 제때 돈 비율 · 값 없음", "worst_goal": "sr-ontime", "is_pilot": false, "decisions": 2},
+    {"slug": "verification", "name": "검증실", "kind": "office", "state": "ok", "reason_code": "", "reason": "", "worst_goal": null, "is_pilot": false, "decisions": 0},
+    {"slug": "research", "name": "리서치", "kind": "division", "state": "warn", "reason_code": "child_warn", "reason": "글로벌번역팀 · 브리프 영문판 같은 날 발행 0 · 목표 1", "worst_team": "translation", "decisions": 0, "children": [
+      {"slug": "brief", "name": "브리프편집팀", "kind": "team", "state": "ok", "reason_code": "", "reason": "", "worst_goal": null, "is_pilot": false, "decisions": 0},
+      {"slug": "translation", "name": "글로벌번역팀", "kind": "team", "state": "warn", "reason_code": "goal_warn", "reason": "브리프 영문판 같은 날 발행 0 · 목표 1", "worst_goal": "tr-same-day", "is_pilot": false, "decisions": 0},
+      {"slug": "education", "name": "용어·교육팀", "kind": "team", "state": "unknown", "reason_code": "stale", "reason": "주간 퀴즈 정시 발행 · 12일 전 측정", "worst_goal": "edu-quiz", "is_pilot": false, "decisions": 0}]},
+    {"slug": "platform", "name": "플랫폼", "kind": "division", "state": "warn", "reason_code": "child_warn", "reason": "개발팀 · 일일 연결 연속 성공 0일 · 목표 30일", "worst_team": "dev", "decisions": 0, "children": [
+      {"slug": "strategy", "name": "제품전략팀(시범)", "kind": "team", "state": "ok", "reason_code": "", "reason": "", "worst_goal": null, "is_pilot": true, "decisions": 0},
+      {"slug": "dev", "name": "개발팀", "kind": "team", "state": "warn", "reason_code": "goal_warn", "reason": "일일 연결 연속 성공 0일 · 목표 30일", "worst_goal": "dev-link-streak", "is_pilot": false, "decisions": 0},
+      {"slug": "quality", "name": "데이터품질팀", "kind": "team", "state": "warn", "reason_code": "goal_warn", "reason": "용어 연결률(가장 낮은 유형 483) 50.2% · 목표 70%", "worst_goal": "dq-term-min", "is_pilot": false, "decisions": 0},
+      {"slug": "infra", "name": "수집·인프라팀", "kind": "team", "state": "unknown", "reason_code": "no_value", "reason": "마지막 수집 적재 후 경과 · 값 없음", "worst_goal": "infra-ingest-age", "is_pilot": false, "decisions": 0}]},
+    {"slug": "customer", "name": "고객", "kind": "division", "state": "unknown", "reason_code": "child_unknown", "reason": "대외홍보팀 · 링크드인 주간 카드 게시 · 값 없음", "worst_team": "outreach", "decisions": 1, "children": [
+      {"slug": "outreach", "name": "대외홍보팀", "kind": "team", "state": "unknown", "reason_code": "no_value", "reason": "링크드인 주간 카드 게시 · 값 없음", "worst_goal": "pr-linkedin", "is_pilot": false, "decisions": 1},
+      {"slug": "growth", "name": "성장분석팀", "kind": "team", "state": "unknown", "reason_code": "no_target", "reason": "유입 경로를 구분할 수 있는 방문 비율 · 목표 미정", "worst_goal": "growth-channel", "is_pilot": false, "decisions": 0}]}
+  ],
+  "teams": {
+    "situation-room": {"name": "종합상황실", "kind": "office", "state": "unknown", "reason_code": "no_value", "reason": "정기 작업이 제때 돈 비율 · 값 없음", "worst_goal": "sr-ontime", "blurb": "정기 작업이 제때 도는지 보고 문제를 알립니다",
+      "members": [
+        {"slug": "sr-brief-prep", "name": "발행 준비 담당", "kind": "routine", "model": "haiku", "state": "active", "idle_exempt": false, "last_active_at": null, "last_active_days": null, "last_active_note": null, "open_tasks": 1, "idle": false, "no_record": false},
+        {"slug": "sr-ops-weekly", "name": "운영 점검 담당", "kind": "routine", "model": "haiku", "state": "active", "idle_exempt": false, "last_active_at": null, "last_active_days": null, "last_active_note": null, "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "sr-ontime", "label": "정기 작업이 제때 돈 비율", "unit": "%", "direction": "gte", "current": null, "target": 95, "warn_at": 80, "bad_at": 50, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "github", "note": "값 없음. 자동 측정은 PR6"},
+        {"slug": "sr-report", "label": "문제 발생 후 대표 보고까지", "unit": "분", "direction": "lte", "current": null, "target": 60, "warn_at": 180, "bad_at": null, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "manual", "note": "잴 수단이 아직 없음"}]},
+    "verification": {"name": "검증실", "kind": "office", "state": "ok", "reason_code": "", "reason": "", "worst_goal": null, "blurb": "한 달에 한 번 사이트와 데이터를 점검합니다",
+      "members": [
+        {"slug": "ver-monthly", "name": "점검 담당", "kind": "routine", "model": "sonnet", "state": "active", "idle_exempt": false, "last_active_at": "2026-11-03T00:00:00+09:00", "last_active_days": 3, "last_active_note": "11-03 첫 월간 점검", "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "ver-gap", "label": "마지막 점검 후 경과", "unit": "일", "direction": "lte", "current": 3, "target": 31, "warn_at": 38, "bad_at": 60, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "manual", "note": null}]},
+    "brief": {"name": "브리프편집팀", "kind": "team", "state": "ok", "reason_code": "", "reason": "", "worst_goal": null, "blurb": "매주 월요일 규제 소식 브리프를 냅니다",
+      "members": [
+        {"slug": "brief-desk", "name": "편집팀장", "kind": "routine", "model": "sonnet", "state": "active", "idle_exempt": false, "last_active_at": "2026-11-02T00:00:00+09:00", "last_active_days": 4, "last_active_note": "11-02 호 발행", "open_tasks": 1, "idle": false, "no_record": false},
+        {"slug": "brief-reporter", "name": "기자", "kind": "routine", "model": "opus", "state": "active", "idle_exempt": false, "last_active_at": "2026-11-02T00:00:00+09:00", "last_active_days": 4, "last_active_note": "11-02 호 발행", "open_tasks": 1, "idle": false, "no_record": false},
+        {"slug": "brief-copyedit", "name": "교열 담당", "kind": "routine", "model": "sonnet", "state": "active", "idle_exempt": false, "last_active_at": "2026-11-02T00:00:00+09:00", "last_active_days": 4, "last_active_note": "11-02 호 발행", "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "brief-ontime", "label": "월요일 정시 발행", "unit": "", "direction": "gte", "current": 1, "target": 1, "warn_at": null, "bad_at": null, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-02T00:00:00+09:00", "measured_days": 4, "stale": false, "measure_kind": "manual", "note": "11-02 발행"},
+        {"slug": "brief-errors", "label": "카드 사실 오류", "unit": "건", "direction": "lte", "current": 0, "target": 0, "warn_at": 1, "bad_at": 3, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-03T00:00:00+09:00", "measured_days": 3, "stale": false, "measure_kind": "manual", "note": null}]},
+    "translation": {"name": "글로벌번역팀", "kind": "team", "state": "warn", "reason_code": "goal_warn", "reason": "브리프 영문판 같은 날 발행 0 · 목표 1", "worst_goal": "tr-same-day", "blurb": "지적사항과 브리프를 두 언어로 옮깁니다",
+      "members": [
+        {"slug": "tr-daily", "name": "번역 담당", "kind": "routine", "model": "sonnet", "state": "active", "idle_exempt": false, "last_active_at": null, "last_active_days": null, "last_active_note": null, "open_tasks": 0, "idle": false, "no_record": true}],
+      "goals": [
+        {"slug": "tr-backlog", "label": "3일 넘은 미번역 잔량", "unit": "건", "direction": "lte", "current": null, "target": 0, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "sql", "note": "무엇을 셀지 정하기 전"},
+        {"slug": "tr-same-day", "label": "브리프 영문판 같은 날 발행", "unit": "", "direction": "gte", "current": 0, "target": 1, "warn_at": null, "bad_at": null, "state": "warn", "unknown_reason": null, "measured_at": "2026-11-02T00:00:00+09:00", "measured_days": 4, "stale": false, "measure_kind": "manual", "note": "당일 기준이면 0 — 기준 확인 필요"}]},
+    "education": {"name": "용어·교육팀", "kind": "team", "state": "unknown", "reason_code": "stale", "reason": "주간 퀴즈 정시 발행 · 12일 전 측정", "worst_goal": "edu-quiz", "blurb": "용어 사전과 주간 퀴즈를 만듭니다",
+      "members": [
+        {"slug": "edu-terms", "name": "용어 담당", "kind": "routine", "model": "sonnet", "state": "active", "idle_exempt": false, "last_active_at": "2026-11-05T00:00:00+09:00", "last_active_days": 1, "last_active_note": "11-05 용어 그림·사례 수 PR", "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "edu-terms-week", "label": "이번 주 용어 추가 수", "unit": "개", "direction": "gte", "current": null, "target": 1, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "sql", "note": null},
+        {"slug": "edu-quiz", "label": "주간 퀴즈 정시 발행", "unit": "", "direction": "gte", "current": 1, "target": 1, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "stale", "measured_at": "2026-10-25T00:00:00+09:00", "measured_days": 12, "stale": true, "measure_kind": "manual", "note": "10-25 발행"}]},
+    "strategy": {"name": "제품전략팀(시범)", "kind": "team", "state": "ok", "reason_code": "", "reason": "", "worst_goal": null, "blurb": "새 기능을 시험해 보고 쓸지 정합니다",
+      "members": [
+        {"slug": "strat-card-history", "name": "시범 기획 담당", "kind": "session", "model": null, "state": "active", "idle_exempt": true, "last_active_at": "2026-11-06T00:00:00+09:00", "last_active_days": 0, "last_active_note": "11-06 카드 업체 이력 시범 승인", "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "strat-adopted", "label": "시범 채택 건수", "unit": "건", "direction": "gte", "current": 1, "target": 1, "warn_at": null, "bad_at": null, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "manual", "note": null}]},
+    "dev": {"name": "개발팀", "kind": "team", "state": "warn", "reason_code": "goal_warn", "reason": "일일 연결 연속 성공 0일 · 목표 30일", "worst_goal": "dev-link-streak", "blurb": "사이트와 자동 작업의 코드를 고칩니다",
+      "members": [
+        {"slug": "dev-session", "name": "개발 담당", "kind": "session", "model": null, "state": "active", "idle_exempt": true, "last_active_at": "2026-11-06T00:00:00+09:00", "last_active_days": 0, "last_active_note": "11-06 운영 센터 표 PR", "open_tasks": 1, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "dev-ci", "label": "전체 테스트 시간", "unit": "분", "direction": "lte", "current": 28, "target": 30, "warn_at": 40, "bad_at": 45, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "github", "note": "한도 45분"},
+        {"slug": "dev-link-streak", "label": "일일 연결 연속 성공", "unit": "일", "direction": "gte", "current": 0, "target": 30, "warn_at": 7, "bad_at": null, "state": "warn", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "github", "note": "11-06 수동 실행 1회 실패"},
+        {"slug": "dev-pr-old", "label": "3일 넘은 열린 PR", "unit": "건", "direction": "lte", "current": 0, "target": 0, "warn_at": 0, "bad_at": 3, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "github", "note": null}]},
+    "quality": {"name": "데이터품질팀", "kind": "team", "state": "warn", "reason_code": "goal_warn", "reason": "용어 연결률(가장 낮은 유형 483) 50.2% · 목표 70%", "worst_goal": "dq-term-min", "blurb": "지적사항을 조항·용어와 잇고 정확도를 지킵니다",
+      "members": [
+        {"slug": "dq-kg-link", "name": "연결 담당", "kind": "code", "model": null, "state": "active", "idle_exempt": false, "last_active_at": "2026-11-02T00:00:00+09:00", "last_active_days": 4, "last_active_note": "11-02 일일 연결 실행", "open_tasks": 0, "idle": true, "no_record": false}],
+      "goals": [
+        {"slug": "dq-clause-wl", "label": "경고서한 조항 연결률", "unit": "%", "direction": "gte", "current": 77, "target": 80, "warn_at": 64, "bad_at": 40, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "sql", "note": null},
+        {"slug": "dq-clause-mfds", "label": "식약처 조항 연결률", "unit": "%", "direction": "gte", "current": 50.2, "target": 60, "warn_at": 48, "bad_at": 30, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "sql", "note": "식약처 전체 2,360건 중 1,185건"},
+        {"slug": "dq-term-min", "label": "용어 연결률(가장 낮은 유형 483)", "unit": "%", "direction": "gte", "current": 50.2, "target": 70, "warn_at": 56, "bad_at": 35, "state": "warn", "unknown_reason": null, "measured_at": "2026-11-06T00:00:00+09:00", "measured_days": 0, "stale": false, "measure_kind": "sql", "note": "483 12,676건 기준"},
+        {"slug": "dq-precision", "label": "새 연결 표본 정밀도", "unit": "%", "direction": "gte", "current": 99, "target": 98, "warn_at": 96, "bad_at": 90, "state": "ok", "unknown_reason": null, "measured_at": "2026-11-05T00:00:00+09:00", "measured_days": 1, "stale": false, "measure_kind": "manual", "note": null}]},
+    "infra": {"name": "수집·인프라팀", "kind": "team", "state": "unknown", "reason_code": "no_value", "reason": "마지막 수집 적재 후 경과 · 값 없음", "worst_goal": "infra-ingest-age", "blurb": "각국 규제 자료를 매일 모아 저장합니다",
+      "members": [
+        {"slug": "infra-intake", "name": "수집 담당", "kind": "code", "model": null, "state": "active", "idle_exempt": false, "last_active_at": "2026-11-06T08:50:00+09:00", "last_active_days": 0, "last_active_note": "11-06 08:50 적재", "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "infra-ingest-age", "label": "마지막 수집 적재 후 경과", "unit": "시간", "direction": "lte", "current": null, "target": 36, "warn_at": 36, "bad_at": 72, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "sql", "note": null},
+        {"slug": "infra-deploy-fail", "label": "배포 실패", "unit": "건", "direction": "lte", "current": null, "target": 0, "warn_at": 0, "bad_at": 2, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "github", "note": null}]},
+    "outreach": {"name": "대외홍보팀", "kind": "team", "state": "unknown", "reason_code": "no_value", "reason": "링크드인 주간 카드 게시 · 값 없음", "worst_goal": "pr-linkedin", "blurb": "링크드인 게시와 구독 안내를 맡습니다",
+      "members": [
+        {"slug": "pr-linkedin-cards", "name": "링크드인 담당", "kind": "session", "model": null, "state": "active", "idle_exempt": false, "last_active_at": null, "last_active_days": null, "last_active_note": null, "open_tasks": 0, "idle": false, "no_record": false},
+        {"slug": "pr-subscribe-nudge", "name": "구독 안내 담당", "kind": "session", "model": null, "state": "paused", "idle_exempt": false, "last_active_at": null, "last_active_days": null, "last_active_note": null, "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "pr-linkedin", "label": "링크드인 주간 카드 게시", "unit": "회", "direction": "gte", "current": null, "target": 1, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "manual", "note": "게시는 대표가 한다"},
+        {"slug": "pr-subs", "label": "주간 구독자 증가", "unit": "명", "direction": "gte", "current": null, "target": null, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "no_target", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "manual", "note": "목표 미정 — 대표 결정(D3)"}]},
+    "growth": {"name": "성장분석팀", "kind": "team", "state": "unknown", "reason_code": "no_target", "reason": "유입 경로를 구분할 수 있는 방문 비율 · 목표 미정", "worst_goal": "growth-channel", "blurb": "방문자가 어디서 와서 무엇을 보는지 셉니다",
+      "members": [
+        {"slug": "growth-analysis", "name": "분석 담당", "kind": "session", "model": null, "state": "active", "idle_exempt": false, "last_active_at": "2026-11-04T00:00:00+09:00", "last_active_days": 2, "last_active_note": "11-04 유입 경로 분석 문서", "open_tasks": 0, "idle": false, "no_record": false}],
+      "goals": [
+        {"slug": "growth-channel", "label": "유입 경로를 구분할 수 있는 방문 비율", "unit": "%", "direction": "gte", "current": null, "target": null, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "no_target", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "manual", "note": "카운터 11-04 설치"},
+        {"slug": "growth-brief-click", "label": "브리프 안 클릭 주간 보고", "unit": "회", "direction": "gte", "current": null, "target": 1, "warn_at": null, "bad_at": null, "state": "unknown", "unknown_reason": "no_value", "measured_at": null, "measured_days": null, "stale": false, "measure_kind": "manual", "note": null}]}
+  },
+  "flow": {
+    "todo": [
+      {"id": 11, "team": "brief", "member": "brief-reporter", "title": "캐나다 회수 카드 원문 다시 확인", "lane": "inbox", "due_on": "2026-11-05", "overdue": true, "created_kind": "ceo", "secretary_seen": true},
+      {"id": 12, "team": "situation-room", "member": "sr-brief-prep", "title": "첫 발행 확인(링크드인 7장·헤드라인·캐나다 카드)", "lane": "inbox", "due_on": "2026-11-09", "overdue": false, "created_kind": "secretary", "secretary_seen": true},
+      {"id": 13, "team": "outreach", "member": null, "title": "구독 독려 메일 명단 정리", "lane": "inbox", "due_on": null, "overdue": false, "created_kind": "ceo", "secretary_seen": false}
+    ],
+    "doing": [
+      {"id": 21, "team": "brief", "member": "brief-desk", "title": "11-09 호 카드 고르기", "lane": "doing", "due_on": "2026-11-09", "overdue": false, "created_kind": "secretary", "secretary_seen": true},
+      {"id": 22, "team": "dev", "member": "dev-session", "title": "운영 센터 화면(PR3)", "lane": "doing", "due_on": null, "overdue": false, "created_kind": "secretary", "secretary_seen": true},
+      {"id": 23, "team": "growth", "member": "growth-analysis", "title": "11월 첫 주 유입 보고", "lane": "review", "due_on": "2026-11-11", "overdue": false, "created_kind": "secretary", "secretary_seen": true}
+    ],
+    "done": [
+      {"id": 31, "team": "dev", "member": "dev-session", "title": "운영 센터 시드(PR2)", "lane": "done", "done_at": "2026-11-06T08:00:00+09:00", "result_url": "https://github.com/MINHOYEOM/grm-api-intake/pull/1354"}
+    ]
+  },
+  "upcoming": [
+    {"on": "2026-11-09", "kind": "decision", "text": "처리방침 시행일을 11-03 그대로 둘까요", "team": "situation-room"},
+    {"on": "2026-11-09", "kind": "task", "text": "첫 발행 확인(링크드인 7장·헤드라인·캐나다 카드)", "team": "situation-room"},
+    {"on": "2026-11-11", "kind": "task", "text": "11월 첫 주 유입 보고", "team": "growth"},
+    {"on": "2026-11-13", "kind": "decision", "text": "Brevo 확인 메일 링크에 유입 표식 붙이기", "team": "outreach"}
+  ]
+}

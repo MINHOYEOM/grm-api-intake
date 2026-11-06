@@ -5199,6 +5199,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     env.globals["growthsyncjs_ver"] = _asset_ver("growth-sync.js")
     env.globals["feedbackjs_ver"] = _asset_ver("feedback.js")
     env.globals["adminjs_ver"] = _asset_ver("admin.js")
+    env.globals["adminopsjs_ver"] = _asset_ver("admin-ops.js")
     briefs = load_briefs(data_dir)
     if not briefs:
         raise SystemExit(f"입력 브리프 없음: {data_dir}")

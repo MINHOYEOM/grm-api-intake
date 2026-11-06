@@ -161,7 +161,8 @@ class AdditiveOnlyTest(unittest.TestCase):
             self.assertNotIn(bad, code, bad)
 
     def test_names_not_already_defined_elsewhere(self):
-        mine = {_P122.name, _P123.name}
+        # 124 시드는 이 표에 행을 넣는 파일이라 이름이 나오는 게 정상(DDL·함수 정의 없음은 test_ops_center_seed 가 본다)
+        mine = {_P122.name, _P123.name, "124_ops_center_seed.sql"}
         for p in sorted(_MIG.glob("*.sql")):
             if p.name in mine:
                 continue

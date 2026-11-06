@@ -571,6 +571,7 @@ grm-api-intake/
 ├─ glossary_cases_refresh.py       # [트랙 C] 용어사전 사례연결 건수 주간 재측정(findings_search RPC · q/excluded 무변형 · 0건은 종전 값 유지 · 20% 실패 시 중단)
 ├─ findings_facets_refresh.py      # [검색 유입] 분류·국가·기관 모음 페이지 정본 재측정(findings_search RPC · anon=공개 RLS · 표본 미달 제외·모르는 기관 코드는 실패)
 ├─ findings_docs_refresh.py        # [검색 유입] 문서 단위 페이지 정본 재측정(지적 3건 이상 · 발행일/원문링크 필수 · 본문 무절단 · 문서 id 정렬로 작은 diff)
+├─ firm_history_stamp.py           # 브리프 카드 '이 업체 앞선 지적 기록' 사이드카(web/data/firm_history/<발행일>.json) 생성 — RPC findings_card_history(120) 조회 → 확실/참고용/숨김 판정(시범: 483 FEI 일치 + 식약처 3종)
 ├─ collect_rum_analytics.py        # [성장·유입] Cloudflare Web Analytics(RUM) → Supabase 일별 적재(072/073/075/077 · 그룹마다 별도 GraphQL 요청 · avg{sampleInterval} 동반 저장 · 정확값을 추정값으로 덮지 않음(계층 래칫 PRECISION_BAND=3.0) · 창은 upsert 아닌 삭제 후 삽입 · **질의를 CHUNK_DAYS=3 조각으로 자른다** — ★Cloudflare 의 전수(비표본) 데이터셋 보존이 약 7일이고 그 밖을 조금이라도 건드리는 질의는 통째로 표본으로 떨어진다(2026-09-05 통제 실측: 한 실행·같은 1일 창에서 8/28=간격 12.5 표본, 8/29=간격 1.07 전수). 놓친 날은 영구히 회수 불가라 어릴 때 짧은 창으로 받아 둔다 — 8/10~8/28 이 8일 창 단일 질의로만 물어와 그렇게 굳었다. 조각은 겹치지 않게 자른다(datetime_leq 라 자정에서 맞대면 앞 조각이 다음 날 한 순간을 삼켜 멀쩡한 하루를 ~0 으로 덮는다))
 ├─ collect_newsletter_subscribers.py  # [성장·유입] Brevo 리스트 구독자 수 일별 스냅샷(077 `newsletter_subscribers_daily`). uniqueSubscribers → totalSubscribers → contacts.count 순으로 읽고, 지원 중단 필드가 0 을 줘도 "전원 이탈"로 저장하지 않는다
 ├─ collect_newsletter_campaigns.py  # [성장·유입 2026-09-23] Brevo 캠페인 지표(발송·클릭·해지·링크별 클릭) 일별 적재(090 `newsletter_campaign_stats`). 1클릭 피드백은 #fb-up/#fb-down 링크 클릭 수로 판독(새 수집 경로 없음)

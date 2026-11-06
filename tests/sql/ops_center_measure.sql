@@ -225,7 +225,7 @@ create temp table r3 as select private.ops_measure_all_at(now()) as r;
 select pg_temp.assert_eq((select string_agg(e ->> 'slug' || ':' || (e ->> 'status'), ',' order by e ->> 'slug')
                           from r3, jsonb_array_elements(r -> 'failed') e),
                          'dq-clause-mfds:error,infra-ingest-age:timeout,tr-backlog:error', 'failures listed');
-select pg_temp.assert_eq(pg_temp.v('tr-backlog'), '3', 'failed goal keeps value');
+select pg_temp.assert_eq(pg_temp.v('tr-backlog'), '1', 'failed goal keeps value (1 after WL rows were deleted in 5)');
 select pg_temp.assert_eq(pg_temp.v('infra-ingest-age'), '10', 'timed-out goal keeps value');
 select pg_temp.assert_eq(pg_temp.v('dq-clause-mfds'), '50', 'out-of-range percent rejected, value kept');
 select pg_temp.assert_true((select bool_and(measured_at = now() - interval '1 hour') from public.ops_goal

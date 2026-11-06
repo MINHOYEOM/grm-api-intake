@@ -1,5 +1,6 @@
-"""CI 전용: 격리 PostgreSQL 에서 운영 센터 122·123 을 일부러 깨 보고 tests/sql/ops_center.sql 이
-빨개지는지(FAIL) 확인한 뒤, 원복해서 초록(PASS)인지 확인한다. 가드는 뮤테이션으로 검증한다.
+"""CI 전용: 격리 PostgreSQL 에서 운영 센터 122·123·125 를 일부러 깨 보고 tests/sql/ops_center.sql·
+tests/sql/ops_center_decide.sql 이 빨개지는지(FAIL) 확인한 뒤, 원복해서 초록(PASS)인지 확인한다.
+가드는 뮤테이션으로 검증한다.
 
 로컬에서 돌리지 않는다(sudo postgres 필요). 워크플로: .github/workflows/grm-ops-center-sql-check.yml
 """
@@ -11,9 +12,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 M122 = ROOT / "web/migrations/122_ops_center_tables.sql"
 M123 = ROOT / "web/migrations/123_ops_home.sql"
+M125 = ROOT / "web/migrations/125_ops_decision_write.sql"
 DB = "ops_center_test"
-COMMAND = ["sudo", "-u", "postgres", "psql", "-X", "-v", "ON_ERROR_STOP=1",
-           "-d", DB, "-f", "tests/sql/ops_center.sql"]
+SQL_HOME = "tests/sql/ops_center.sql"
+SQL_DECIDE = "tests/sql/ops_center_decide.sql"
 
 # (이름, 파일, 찾을 문자열, 바꿀 문자열) — 찾을 문자열이 없으면 뮤테이션 자체가 낡은 것이므로 실패시킨다.
 MUTATIONS = [
@@ -91,38 +93,88 @@ MUTATIONS = [
     ("inbox cap 4", M123, "where x.rn <= 3", "where x.rn <= 4"),
 ]
 
+# 125 결정 쓰기 — tests/sql/ops_center_decide.sql 이 잡아야 한다.
+MUTATIONS_DECIDE = [
+    ("decide admin check removed", M125,
+     "if not coalesce(private.is_admin(), false) then\n    raise exception 'ops_decide: admin only'",
+     "if false then\n    raise exception 'ops_decide: admin only'"),
+    ("decide admin null guard removed", M125,
+     "if not coalesce(private.is_admin(), false) then\n    raise exception 'ops_decide: admin only'",
+     "if not private.is_admin() then\n    raise exception 'ops_decide: admin only'"),
+    ("anon may call ops_decide", M125,
+     "grant execute on function public.ops_decide(bigint, text, text) to authenticated;",
+     "grant execute on function public.ops_decide(bigint, text, text) to anon, authenticated;"),
+    ("approve ignores state", M125,
+     "snooze_until = null, secretary_seen_at = null\n     where id = p_id and state in ('pending','snoozed')",
+     "snooze_until = null, secretary_seen_at = null\n     where id = p_id"),
+    ("snooze ignores state", M125,
+     "secretary_seen_at = null\n     where id = p_id and state in ('pending','snoozed')\n     returning * into v_row;\n  end if;",
+     "secretary_seen_at = null\n     where id = p_id\n     returning * into v_row;\n  end if;"),
+    ("decided_by not recorded", M125, "decided_at = p_now, decided_by = p_actor,", "decided_at = p_now,"),
+    ("audit row dropped", M125,
+     "  insert into public.admin_audit_log (actor_user_id, action, target_type, target_id, details)\n"
+     "  values (p_actor, 'ops_decide', 'ops_decision', p_id::text,\n"
+     "          jsonb_build_object('action', p_action, 'snooze', p_snooze, 'snooze_until', v_until, 'title', v_row.title));",
+     "  null;"),
+    ("snooze uses UTC date", M125,
+     "when 'tomorrow' then (((p_now at time zone 'Asia/Seoul')::date + 1)",
+     "when 'tomorrow' then (((p_now at time zone 'UTC')::date + 1)"),
+    ("snooze at 09:00", M125, "+ 1) + time '08:00'", "+ 1) + time '09:00'"),
+    ("3d is 2d", M125, "+ 3) + time '08:00'", "+ 2) + time '08:00'"),
+    ("service fn open to members", M125,
+     "grant execute on function public.ops_secretary_inbox() to service_role;",
+     "grant execute on function public.ops_secretary_inbox() to service_role, authenticated;"),
+    ("service revoke dropped", M125,
+     "revoke all on function public.ops_goal_set(text, numeric, text, timestamptz) from public, anon, authenticated;",
+     "revoke all on function public.ops_goal_set(text, numeric, text, timestamptz) from public;"),
+    ("publish PR guard removed", M125, "if coalesce(p_ref_url, '') ~ 'publish/brief-' then", "if false then"),
+    ("own decision unseen", M125, "          now())   -- 비서실이 올린 행은", "          null)   -- 비서실이 올린 행은"),
+    ("inbox shows unprocessed", M125, "x.secretary_seen_at is null and x.state in ('approved','snoozed')",
+     "x.secretary_seen_at is null"),
+    ("percent range unchecked", M125, "if v_unit = '%' and (p_value < 0 or p_value > 100) then", "if false then"),
+    ("done without link", M125,
+     "if p_lane = 'done' and coalesce(p_result_url, v_task.result_url) is null then", "if false then"),
+    ("done reopened", M125, "if v_task.lane = 'done' then", "if false then"),
+]
 
-def run() -> subprocess.CompletedProcess:
+
+def run(sql: str) -> subprocess.CompletedProcess:
     subprocess.run(["sudo", "-u", "postgres", "dropdb", "--if-exists", DB], cwd=ROOT, check=True)
     subprocess.run(["sudo", "-u", "postgres", "createdb", DB], cwd=ROOT, check=True)
-    return subprocess.run(COMMAND, cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+    return subprocess.run(["sudo", "-u", "postgres", "psql", "-X", "-v", "ON_ERROR_STOP=1", "-d", DB, "-f", sql],
+                          cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
 
 
 def main() -> None:
-    originals = {p: p.read_text(encoding="utf-8") for p in (M122, M123)}
+    originals = {p: p.read_text(encoding="utf-8") for p in (M122, M123, M125)}
+    plan = [(SQL_HOME, MUTATIONS), (SQL_DECIDE, MUTATIONS_DECIDE)]
     try:
-        baseline = run()
-        if baseline.returncode:
-            raise RuntimeError("Unmodified SQL failed:\n" + baseline.stdout + baseline.stderr)
-        for name, path, old, new in MUTATIONS:
-            text = originals[path]
-            if old not in text:
-                raise RuntimeError(f"mutation target missing (stale mutation?): {name}")
-            path.write_text(text.replace(old, new), encoding="utf-8")
-            try:
-                result = run()
-            finally:
-                path.write_text(text, encoding="utf-8")
-            if result.returncode == 0:
-                raise RuntimeError(f"mutation survived (guard is blind): {name}")
-            print(f"killed: {name}")
-        restored = run()
-        if restored.returncode:
-            raise RuntimeError("Restored SQL failed:\n" + restored.stdout + restored.stderr)
+        for sql, _ in plan:
+            baseline = run(sql)
+            if baseline.returncode:
+                raise RuntimeError(f"Unmodified SQL failed ({sql}):\n" + baseline.stdout + baseline.stderr)
+        for sql, mutations in plan:
+            for name, path, old, new in mutations:
+                text = originals[path]
+                if old not in text:
+                    raise RuntimeError(f"mutation target missing (stale mutation?): {name}")
+                path.write_text(text.replace(old, new), encoding="utf-8")
+                try:
+                    result = run(sql)
+                finally:
+                    path.write_text(text, encoding="utf-8")
+                if result.returncode == 0:
+                    raise RuntimeError(f"mutation survived (guard is blind): {name}")
+                print(f"killed: {name}")
+        for sql, _ in plan:
+            restored = run(sql)
+            if restored.returncode:
+                raise RuntimeError(f"Restored SQL failed ({sql}):\n" + restored.stdout + restored.stderr)
     finally:
         for p, text in originals.items():
             p.write_text(text, encoding="utf-8")
-    print(f"PASS: {len(MUTATIONS)} mutations killed, restored SQL passes")
+    total = len(MUTATIONS) + len(MUTATIONS_DECIDE)
+    print(f"PASS: {total} mutations killed, restored SQL passes")
 
 
 if __name__ == "__main__":

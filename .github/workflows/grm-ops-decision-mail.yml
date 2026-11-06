@@ -1,0 +1,69 @@
+name: GRM Ops Decision Mail
+
+# 결정 대기 알림 — 운영 센터(ops_decision)에 새 결정이 올라오면 대표 메일함으로 `[GRM 결재] …` 1통.
+# 설계: web/ops_decision_mail.py 머리말 · 설계서 2026-11-06 §4-4(D2 승인).
+#
+# ## 안전 장치
+#  - 기본은 dry-run(건수·id 만 출력). 저장소 변수 `GRM_OPS_DECISION_MAIL_ENABLED=true` 일 때만 실발송
+#    — 대표 확인 뒤 비서실이 켠다. 수동 실행도 dry_run=false **그리고** 변수가 켜져 있어야 보낸다.
+#  - 수신자는 월요일 결재 메일과 같은 변수 `GRM_APPROVAL_MAIL_TO` 한 곳(주소 1개가 아니면 거부).
+#  - 하루(KST) 3통 상한, 넘치면 다음 날 아침 묶음 1통, KST 22:00~08:00 조용한 시간. 재알림 없음.
+#  - 링크는 /admin/ 뿐 — 메일만으로는 승인되지 않는다.
+#  - 키·수신자는 로그에서 가린다(::add-mask::). 로그에는 건수·id 만 남는다.
+# 비용: GitHub Actions 무료분 + Brevo 무료 티어. 비밀값은 기존 워크플로가 쓰는 것을 그대로 쓴다(신규 없음).
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'     # 30분마다(정각을 피한다 — 정각 크론은 밀린다)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true=보낼 건수·id 만 출력(발송 0). false=실발송(GRM_OPS_DECISION_MAIL_ENABLED 도 켜져 있어야 함)'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grm-ops-decision-mail
+  cancel-in-progress: false
+
+jobs:
+  decision-mail:
+    name: decision-mail
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: 결정 대기 알림 메일
+        env:
+          EVENT: ${{ github.event_name }}
+          DISPATCH_DRY: ${{ github.event.inputs.dry_run }}
+          ENABLED: ${{ vars.GRM_OPS_DECISION_MAIL_ENABLED }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GRM_APPROVAL_MAIL_TO: ${{ vars.GRM_APPROVAL_MAIL_TO }}
+          NEWSLETTER_API_KEY: ${{ secrets.NEWSLETTER_API_KEY }}
+          GRM_NEWSLETTER_SENDER_NAME: ${{ vars.GRM_NEWSLETTER_SENDER_NAME }}
+          GRM_NEWSLETTER_SENDER_EMAIL: ${{ vars.GRM_NEWSLETTER_SENDER_EMAIL }}
+          GRM_SITE_BASE_URL: ${{ vars.GRM_SITE_BASE_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "$SUPABASE_SERVICE_ROLE_KEY" ] && echo "::add-mask::$SUPABASE_SERVICE_ROLE_KEY"
+          [ -n "$NEWSLETTER_API_KEY" ] && echo "::add-mask::$NEWSLETTER_API_KEY"
+          [ -n "$GRM_APPROVAL_MAIL_TO" ] && echo "::add-mask::$GRM_APPROVAL_MAIL_TO"
+          DRY="--dry-run"
+          if [ "$ENABLED" = "true" ]; then
+            if [ "$EVENT" = "workflow_dispatch" ]; then
+              [ "$DISPATCH_DRY" = "false" ] && DRY=""
+            else
+              DRY=""
+            fi
+          fi
+          python web/ops_decision_mail.py $DRY

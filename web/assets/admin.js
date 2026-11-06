@@ -1265,12 +1265,47 @@
     if (b) b.innerHTML = docs;
     if (c) c.innerHTML = teams;
   }
+  // 결재 처리 상태(화면만): busy = 누른 뒤 응답 전(버튼 잠금·더블 탭 방지), done = 처리 문구, errors = 조용한 오류.
+  state.opsDecide = { busy: {}, done: {}, errors: {} };
+  function renderOpsDocs() {
+    if (!window.GRMOps || !state.opsHome) return;
+    var box = byId("grm-oc-docs");
+    if (box) box.innerHTML = window.GRMOps.renderDocs(state.opsHome, { publish: opsPublishCtx(), decide: state.opsDecide });
+  }
   function renderOpsHome() {
     if (!window.GRMOps || !state.opsHome) return;
-    var ctx = { publish: opsPublishCtx() }, G = window.GRMOps;
+    var ctx = { publish: opsPublishCtx(), decide: state.opsDecide }, G = window.GRMOps;
     opsFill(G.renderSummary(state.opsHome, ctx), G.renderDocs(state.opsHome, ctx), G.renderTeams(state.opsHome));
-    G.bind(byId("grm-oc-wrap"), function (tab) { setTab(tab); });
+    G.bind(byId("grm-oc-wrap"), function (tab) { setTab(tab); }, opsDecide);
     opsAge();
+  }
+  // 승인·보류 — 125 ops_decide(함수 안 관리자 검사). 같은 서류는 응답 전까지 다시 못 누른다.
+  // 서버도 state in ('pending','snoozed') 인 행만 바꾸므로 폰·PC 두 곳에서 눌러도 한 번만 반영된다.
+  function opsDecide(id, action, snooze) {
+    var st = state.opsDecide;
+    if (!id || st.busy[id] || st.done[id]) return Promise.resolve();
+    st.busy[id] = true;
+    delete st.errors[id];
+    renderOpsDocs();
+    return state.client.rpc("ops_decide", { p_id: id, p_action: action, p_snooze: action === "snooze" ? (snooze || "tomorrow") : null })
+      .then(function (res) {
+        if (res.error) throw res.error;
+        var r = res.data || {};
+        if (r.ok) st.done[id] = r.message || "처리됐습니다";
+        else if (r.code === "already_decided") st.done[id] = "이미 처리된 결정입니다";
+        else st.errors[id] = r.message || "처리하지 못했습니다. 잠시 뒤 다시 눌러 주세요.";
+      })
+      .catch(function (error) {
+        var code = error && (error.code || (error.data && error.data.code));
+        st.errors[id] = code === "42501" ? "관리자 권한이 확인되지 않아 처리하지 못했습니다."
+          : "처리하지 못했습니다. 잠시 뒤 다시 눌러 주세요.";
+      })
+      .then(function () {
+        delete st.busy[id];
+        renderOpsDocs();
+        // 처리됐으면 잠깐 문구를 보여 준 뒤 홈을 다시 읽는다(서류가 빠지고 요약 숫자가 바뀐다).
+        if (st.done[id]) window.setTimeout(loadOpsHome, 1500);
+      });
   }
   function loadOpsHome() {
     if (!window.GRMOps) { opsMsg("운영 센터 화면 파일을 읽지 못했습니다. 새로고침해 주세요.", "err", false); return Promise.resolve(); }
@@ -1287,6 +1322,7 @@
       }
       state.opsHome = data;
       state.opsHomeAt = Date.now();
+      state.opsDecide.done = {};   // 새로 읽은 목록에는 처리된 서류가 없다(처리 문구는 한 번만 보인다)
       opsMsg("", "", false);
       renderOpsHome();
     }).catch(function (error) {

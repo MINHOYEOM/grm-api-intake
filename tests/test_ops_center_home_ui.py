@@ -51,20 +51,49 @@ class OpsHomeRenderTest(unittest.TestCase):
         self.assertEqual(calm, "결재할 서류는 없고, 주의가 필요한 팀은 없습니다. 배정된 업무가 없는 직원은 없습니다.")
         self.assertIn("그중 1곳은 문제입니다.", self.out["bad"]["summary"])
 
-    def test_docs_up_to_three_plus_more_no_buttons(self):
+    def test_docs_up_to_three_plus_more(self):
         d = self.out["sample"]["docs"]
         self.assertEqual(len(re.findall(r'<div class="oc-doc[ "]', d)), 4, "발행 승인 1 + 결정 3")
         self.assertIn('<div class="oc-more">그 밖에 1건이 더 기다립니다</div>', d)
         self.assertIn('<div class="oc-rec"><b>권장</b> 유지. 공개 전 마지막 확인입니다.</div>', d)
+        self.assertIn("<div class=\"oc-m\">승인하면 현행 유지(변경 시 공지 필요)</div>", d)
         self.assertIn("기한 11-09(월) (3일 남음)", d)
         self.assertIn("기한 지남 11-05(목)", d)
+        self.assertIn("결재할 서류가 없습니다", self.out["calm"]["docs"])
+
+    def test_decision_buttons(self):
+        d = self.out["sample"]["docs"]
+        # 결정 3건에만 버튼 3개씩(승인·보류·3일 뒤). 발행 승인 줄은 이동 링크뿐(승인은 발행·운영 화면에서).
+        self.assertEqual(d.count('data-oc-decide="approve"'), 3)
+        self.assertEqual(d.count('data-oc-decide="snooze" data-oc-snooze="tomorrow"'), 3)
+        self.assertEqual(d.count('data-oc-decide="snooze" data-oc-snooze="3d"'), 3)
+        publish = d[:d.index('data-oc-doc=')]
+        self.assertNotIn("data-oc-decide", publish)
+        self.assertIn('class="oc-pri" data-oc-decide="approve" data-oc-id="2"', d)
+        labels = re.findall(r'data-oc-decide="approve"[^>]*>([^<]+)</button>', d)
+        self.assertEqual(labels, ["유지", "승인", "승인"], "질문형은 권장 답(유지), 승인 요청은 '승인'")
+        self.assertEqual(self.out["decide"]["labels"], ["승인", "유지", "권장대로", "권장대로"])
         for name in ("sample", "calm", "bad"):
             for label in re.findall(r"<button[^>]*>([^<]*)</button>", self.out[name]["all"]):
-                self.assertNotIn("승인", label, f"{name}: 승인 버튼은 PR4 — {label}")
-                self.assertNotIn("보류", label, f"{name}: 보류 버튼은 PR4 — {label}")
-                self.assertNotIn("유지", label)
-            self.assertNotIn("disabled", self.out[name]["all"])
-        self.assertIn("결재할 서류가 없습니다", self.out["calm"]["docs"])
+                self.assertNotIn("반려", label, "반려 없음(D5)")
+                self.assertNotIn("거절", label)
+            self.assertNotIn("disabled", self.out[name]["all"], "평소엔 잠그지 않는다")
+
+    def test_decision_states(self):
+        busy = self.out["decide"]["busy"]
+        doc2 = busy[busy.index('data-oc-doc="2"'):]
+        doc2 = doc2[:doc2.index('data-oc-doc="1"')]
+        self.assertEqual(doc2.count(" disabled>"), 3, "처리 중엔 그 서류 버튼 3개 모두 잠김(더블 탭 방지)")
+        self.assertIn(">처리 중</button>", doc2)
+        self.assertEqual(busy.count(" disabled>"), 3, "다른 서류는 잠기지 않는다")
+        done = self.out["decide"]["done"]
+        self.assertIn('<div class="oc-doc is-done" data-oc-doc="2">', done)
+        self.assertIn('<div class="oc-done" role="status">승인됨 · 비서실이 이어서 진행합니다</div>', done)
+        self.assertEqual(done.count('data-oc-decide="approve"'), 2, "처리된 서류는 버튼이 사라진다")
+        err = self.out["decide"]["error"]
+        self.assertIn('<div class="oc-err" role="status">처리하지 못했습니다. 잠시 뒤 다시 눌러 주세요.</div>', err)
+        self.assertEqual(err.count('data-oc-decide="approve"'), 3, "오류면 다시 누를 수 있다")
+        self.assertEqual(self.out["bindCalls"], [[2, "approve", None], [1, "snooze", "3d"]], "잠긴 버튼은 무시")
 
     def test_rooms_and_member_lines(self):
         t = self.out["sample"]["teams"]
@@ -194,6 +223,18 @@ class OpsHomeWiringTest(unittest.TestCase):
         import grm_i18n
         self.assertIn("admin-ops.js", grm_i18n.EXCLUDED_ASSETS)
         self.assertNotIn("admin-ops.js", [p.name for p in grm_i18n.asset_files()])
+
+    def test_admin_js_decides_via_rpc_with_guards(self):
+        body = self.js[self.js.index("function opsDecide("):]
+        body = body[:body.index("\n  }\n") + 4]
+        self.assertIn('state.client.rpc("ops_decide", { p_id: id, p_action: action, p_snooze:', body)
+        self.assertEqual(self.js.count('rpc("ops_decide"'), 1)
+        self.assertIn("if (!id || st.busy[id] || st.done[id]) return Promise.resolve();", body, "더블 탭·이중 처리 방지")
+        self.assertLess(body.index("st.busy[id] = true;"), body.index('rpc("ops_decide"'), "호출 전에 잠근다")
+        self.assertIn('r.code === "already_decided"', body)
+        self.assertIn('"42501"', body)
+        self.assertIn("window.setTimeout(loadOpsHome", body, "처리 후 홈 새로고침")
+        self.assertIn(", opsDecide);", self.js, "bind 에 처리 함수가 이어져 있다")
 
     def test_admin_js_calls_ops_home_once_via_supabase_rpc(self):
         self.assertIn('state.client.rpc("ops_home")', self.js)

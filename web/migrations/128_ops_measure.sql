@@ -127,7 +127,7 @@ stable
 set search_path = public
 as $$
   select case when p is null then '?'
-              when p = trunc(p) then to_char(p, 'FM999,999,999,990')
+              when scale(p) = 0 then to_char(p, 'FM999,999,999,990')
               else to_char(round(p, 1), 'FM999,999,999,990.0') end
 $$;
 

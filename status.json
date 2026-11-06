@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-06T07:55:06Z",
+ "generated_at": "2026-11-06T15:53:58Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42180353192,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-06T07:21:38Z",
-    "updatedAt": "2026-11-06T07:26:45Z",
-    "headBranch": "feat/ops-center-home-polish",
-    "displayTitle": "feat(ops-center): 운영 센터 홈 다듬기 — 덜 빽빽하게",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42180353192"
-   },
-   {
-    "databaseId": 42180317710,
+    "databaseId": 42245019283,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-06T07:21:19Z",
-    "updatedAt": "2026-11-06T07:28:14Z",
-    "headBranch": "feat/ops-center-home-polish",
-    "displayTitle": "feat(ops-center): 운영 센터 홈 다듬기 — 덜 빽빽하게(대표 피드백)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42180317710"
-   },
-   {
-    "databaseId": 42179638632,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-06T07:15:07Z",
-    "updatedAt": "2026-11-06T07:20:27Z",
+    "createdAt": "2026-11-06T15:39:06Z",
+    "updatedAt": "2026-11-06T15:44:22Z",
     "headBranch": "main",
-    "displayTitle": "feat(ops-center): 운영 센터 PR3 — 홈을 사무실 배치도로(읽기 전용) (#1355)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42179638632"
+    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래) (#1361)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42245019283"
    },
    {
-    "databaseId": 42176282837,
+    "databaseId": 42240915570,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-06T06:43:47Z",
-    "updatedAt": "2026-11-06T06:48:29Z",
-    "headBranch": "feat/ops-center-pr3-home",
-    "displayTitle": "feat(ops-center): 운영 센터 PR3 — 홈을 사무실 배치도로(읽기 전용)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42176282837"
+    "createdAt": "2026-11-06T15:12:47Z",
+    "updatedAt": "2026-11-06T15:19:30Z",
+    "headBranch": "feat/ops-center-pr6-measure",
+    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240915570"
    },
    {
-    "databaseId": 42176239437,
+    "databaseId": 42240701751,
     "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-06T06:43:23Z",
-    "updatedAt": "2026-11-06T06:48:37Z",
-    "headBranch": "feat/ops-center-pr3-home",
-    "displayTitle": "feat(ops-center): 운영 센터 PR3 — 홈을 사무실 배치도로(읽기 전용)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42176239437"
+    "conclusion": "cancelled",
+    "event": "pull_request",
+    "createdAt": "2026-11-06T15:11:25Z",
+    "updatedAt": "2026-11-06T15:13:38Z",
+    "headBranch": "feat/ops-center-pr6-measure",
+    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240701751"
+   },
+   {
+    "databaseId": 42240480815,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "pull_request",
+    "createdAt": "2026-11-06T15:09:59Z",
+    "updatedAt": "2026-11-06T15:12:05Z",
+    "headBranch": "feat/ops-center-pr6-measure",
+    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240480815"
+   },
+   {
+    "databaseId": 42240250822,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "pull_request",
+    "createdAt": "2026-11-06T15:08:30Z",
+    "updatedAt": "2026-11-06T15:10:30Z",
+    "headBranch": "feat/ops-center-pr6-measure",
+    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240250822"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -460,11 +460,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 42177558169,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-06T06:55:54Z",
-    "updatedAt": "2026-11-06T06:55:58Z",
+    "updatedAt": "2026-11-06T10:08:05Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42177558169"

@@ -743,6 +743,7 @@
         paths: rumPrecision((res[2].data || []).filter(function (r) { return window7[r.snap_date]; }))
       };
       state.rum = { byDate: byDate, refs: refs, paths: paths, precision: precision };
+      txt("grm-oc-kpi-visits", number(recent.reduce(function (sum, d) { return sum + ((byDate[d] || {}).visits || 0); }, 0)));
       renderRum();
       renderRumPaths();
     }).catch(function (error) {
@@ -1257,11 +1258,18 @@
     n.className = "oc-age" + (min >= OPS_STALE_MIN ? " is-old" : "");
     n.textContent = "갱신 " + (hm || "-") + (min >= OPS_STALE_MIN ? " · 자료가 " + min + "분 전입니다. 다시 불러오세요." : "");
   }
+  // 세 칸(한 줄 요약·결재 서류·팀과 직원)을 각자 자리에 그린다. '우리 회사 숫자'는 정적 칸이라 여기서 안 건드린다.
+  function opsFill(summary, docs, teams) {
+    var a = byId("grm-oc-summary"), b = byId("grm-oc-docs"), c = byId("grm-oc");
+    if (a) a.innerHTML = summary;
+    if (b) b.innerHTML = docs;
+    if (c) c.innerHTML = teams;
+  }
   function renderOpsHome() {
-    var host = byId("grm-oc");
-    if (!host || !window.GRMOps || !state.opsHome) return;
-    host.innerHTML = window.GRMOps.render(state.opsHome, { publish: opsPublishCtx() });
-    window.GRMOps.bind(host, function (tab) { setTab(tab); });
+    if (!window.GRMOps || !state.opsHome) return;
+    var ctx = { publish: opsPublishCtx() }, G = window.GRMOps;
+    opsFill(G.renderSummary(state.opsHome, ctx), G.renderDocs(state.opsHome, ctx), G.renderTeams(state.opsHome));
+    G.bind(byId("grm-oc-wrap"), function (tab) { setTab(tab); });
     opsAge();
   }
   function loadOpsHome() {
@@ -1272,7 +1280,7 @@
       var data = res.data;
       if (!data || typeof data !== "object" || !Array.isArray(data.tree) || !data.tree.length) {
         state.opsHome = null;
-        var host = byId("grm-oc"); if (host) host.innerHTML = "";
+        opsFill("", '<p class="oc-empty">아직 결재 서류가 없습니다.</p>', "");
         opsMsg("아직 조직 자료가 없습니다. 비서실이 자료를 넣으면 여기에 보입니다.", "", true);
         opsAge();
         return;
@@ -1286,6 +1294,7 @@
       opsMsg(code === "42501" ? "관리자 권한이 확인되지 않아 운영 센터를 열 수 없습니다."
         : "운영 센터를 불러오지 못했습니다." + (state.opsHome ? " 아래는 이전에 읽은 자료입니다." : ""), "err", true);
       var legacy = byId("grm-home-legacy");
+      if (!state.opsHome) opsFill("", '<p class="oc-empty">불러오지 못했습니다.</p>', "");
       if (legacy && !state.opsHome) legacy.open = true;
     });
   }
@@ -1947,7 +1956,14 @@
   var homeLinks = [
     ["grm-home-live", function () { return txtOf("grm-admin-live"); }, ["grm-admin-live"]],
     ["grm-home-approve", function () { return [txtOf("grm-web-approve-pr"), txtOf("grm-web-checks")].filter(Boolean).join(" · "); }, ["grm-web-approve-pr", "grm-web-checks"]],
-    ["grm-home-feedback", function () { return txtOf("grm-feedback-new"); }, ["grm-feedback-new"]]
+    ["grm-home-feedback", function () { return txtOf("grm-feedback-new"); }, ["grm-feedback-new"]],
+    // 운영 센터 '우리 회사 숫자' — 옛 홈 칸을 채우는 로더 결과를 그대로 옮긴다(같은 값, 다른 id).
+    ["grm-oc-kpi-users", function () { return txtOf("grm-kpi-users"); }, ["grm-kpi-users"]],
+    ["grm-oc-kpi-subscribers", function () { return txtOf("grm-kpi-subscribers"); }, ["grm-kpi-subscribers"]],
+    ["grm-oc-kpi-dispatch", function () {
+      var v = txtOf("grm-kpi-dispatch");
+      return /^\d{4}-\d{2}-\d{2}$/.test(v) && window.GRMOps ? window.GRMOps.dayLabel(v) : v;
+    }, ["grm-kpi-dispatch"]]
   ];
   function txtOf(id) { var n = byId(id); return n ? n.textContent.trim() : ""; }
   function syncHome() {

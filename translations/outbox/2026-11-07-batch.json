@@ -1,0 +1,260 @@
+[
+  {
+    "finding_id": "finding-050b9723ad7717fc79d76b8a",
+    "finding_text": "Your validation protocols for the execution ofrevalidation studies do not specify critical process steps.",
+    "finding_text_ko": "귀사의 재밸리데이션 시험 실시를 위한 밸리데이션 프로토콜에 핵심 공정 단계(critical process steps)가 명시되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1db2abaeead90e3b9cbdd9cf",
+    "finding_text": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+    "finding_text_ko": "장비와 기구를 의약품의 안전성, 확인(identity), 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하기에 적절한 주기로 세척·유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-2b5646ddff0e35a59632d66c",
+    "finding_text": "기타 공정검사의 시험과정을 기록하고 데이터완전성 절차에 따라 검토할 것",
+    "finding_text_ko": "기타 공정검사의 시험 과정을 기록하고 데이터 완전성 절차에 따라 검토할 것",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-37799e47c15ee54c13b18a79",
+    "finding_text": "기타 시험 행위의 재구성을 위한 모든 메타데이터를 보관할 것",
+    "finding_text_ko": "기타 시험 행위를 재구성할 수 있도록 모든 메타데이터를 보관해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4353df773b1e4175f04f74f0",
+    "finding_text": "Procedures designed to prevent objectionable microorganisms in drug substance not required to be sterile are not effective.",
+    "finding_text_ko": "멸균이 요구되지 않는 원료의약품(drug substance)에서 바람직하지 않은 미생물을 방지하기 위해 마련된 절차가 효과적이지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4a419a2bfe0f77a2ada78931",
+    "finding_text": "Reports of analysis from component suppliers are accepted without establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at appropriate intervals.",
+    "finding_text_ko": "구성성분 공급업체의 시험성적서(Reports of analysis)를 수용하면서, 적절한 주기로 공급업체 시험결과의 적절한 검증을 통해 공급업체 분석의 신뢰성을 확립하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-4cd4d436e1ccd1fae81b52e2",
+    "finding_text": "기타 [별표 1] 6.4 [별표 1의2] 12.4 세척밸리데이션 수행방법을 적절하게 설정할 것",
+    "finding_text_ko": "기타 [별표 1] 6.4 [별표 1의2] 12.4 세척밸리데이션 수행방법을 적절하게 설정해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-51009ba8355729361733762c",
+    "finding_text": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed.",
+    "finding_text_ko": "멸균 표방 의약품의 미생물 오염을 방지하기 위한 절차를 수립하여 문서화하고 이행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-520c0849e478c6ac4cbffd28",
+    "finding_text": "Cleaning Validation Program is deficient, Specifically The firm manufactured and shipped 8 ari products for the US market in the past three years each with a different particle size as listed below: Product Name Product Type | == NDC The firm performed three cleaning validations to establish successful product change over cleaning as detailed below for and product changeovers: i a completion A washing amount of or more is required.",
+    "finding_text_ko": "세척밸리데이션 프로그램이 미흡하다. 구체적으로, 업체는 지난 3년간 미국 시판용으로 8종의 ari 제품을 제조·출하했으며 각 제품의 입자 크기가 서로 다르다(아래 표 참조). 제품명 제품유형 | == NDC 업체는 제품 교체(changeover) 세척이 성공적임을 입증하기 위해 아래와 같이 제품 교체에 대한 세척밸리데이션을 3회 수행했다: i a 완료 세척량 이상이 요구된다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-55f3d85ab8560186aec9c49e",
+    "finding_text": "Out of Specification investigation (OOS) is deficient and further no CAPA is initiated to prevent recurrence.",
+    "finding_text_ko": "기준일탈(OOS) 조사가 미흡하며, 재발 방지를 위한 CAPA도 개시되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-5d99e59c6188d83c75b6de16",
+    "finding_text": "The accuracy, sensitivity, specificity, reproducibility of test methods have not been established and documented.",
+    "finding_text_ko": "시험방법의 정확성, 민감도, 특이성, 재현성이 확립되어 문서화되지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-62b5ef108efec9d5972787f6",
+    "finding_text": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+    "finding_text_ko": "품질관리 부서(quality control unit)의 책임과 절차가 문서화되어 있지 않으며 완전히 이행되지 않고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6582c692bcf185b421ac7f5b",
+    "finding_text": "Your process validations are inadequate.",
+    "finding_text_ko": "귀사의 공정밸리데이션이 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-66f43ce1f7cee4d14cf9dc24",
+    "finding_text": "The firm’s stability program was inadequate in that the firm’s QC Laboratory failed to utilize a stability indicating method for assay testing of(b) (4) The QC Laboratory utilizes a titration method for assay testing of (b) (4) for all stability testing that the firm has conducted on their(B) (4) API products including the following US marketed API:(B) (4) For example, the firm utilized the titration assay method for the accelerated stability studies of(D) (4) API (lot#s(b) (4) The data from the accelerated stability studies was later utilized to determine the shelf life of the product.",
+    "finding_text_ko": "업체의 안정성 프로그램이 미흡했다. 업체의 QC 시험실은 (b) (4)의 함량시험에 안정성 지표 시험법(stability indicating method)을 사용하지 않았다. QC 시험실은 업체가 수행한 (B) (4) 원료의약품(API) 제품 전체의 모든 안정성 시험에서 (b) (4)의 함량시험에 적정법을 사용했으며, 여기에는 미국 시판 API (B) (4)가 포함된다. 예를 들어 업체는 (D) (4) API(로트번호 (b) (4))의 가속 안정성 시험에 적정 함량시험법을 사용했다. 이 가속 안정성 시험 데이터는 이후 제품의 유통기한(shelf life)을 결정하는 데 사용되었다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-67e6c4c44f7ff0b5ea8e8924",
+    "finding_text": "The firm's Production Unit utilizes critical raw materials within the manufacturing process prior to the completion of identification testing and release of the raw materials by the firm's Quality Control Unit.",
+    "finding_text_ko": "업체의 생산 부서가 핵심 원자재에 대한 확인시험 완료 및 품질관리 부서의 원자재 출하승인 이전에 해당 원자재를 제조 공정에 사용했다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-6e8600ad4a64a79244a5f347",
+    "finding_text": "Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity, strength, quality and purity at the time of use.",
+    "finding_text_ko": "의약품에 사용 시점에 확인(identity), 함량, 품질 및 순도의 적용 기준을 충족함을 보증하는 적절한 안정성 데이터로 결정된 사용기한이 표시되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-7c8e9a74b2225c9cea681659",
+    "finding_text": "제조 기타 [별표 1] 8.1 [별표 1의2] 8.1 원료 투입량을 확인할 수 있는 근거자료를 첨부할 것",
+    "finding_text_ko": "제조 기타 [별표 1] 8.1 [별표 1의2] 8.1 원료 투입량을 확인할 수 있는 근거자료를 첨부해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8040d9b2bee08846f7768976",
+    "finding_text": "Your firm failed to establish adequate written procedures for cleaning and maintenance of equipment used in the manufacture, processing, or holding of drug substances, and failed to validate cleaning procedures to ensure that equipment is routinely cleaned to prevent contamination.",
+    "finding_text_ko": "귀사는 원료의약품의 제조, 가공 또는 보관에 사용되는 장비의 세척 및 유지관리에 대한 적절한 문서화된 절차를 수립하지 않았으며, 장비가 오염을 방지하도록 정기적으로 세척됨을 보증하기 위한 세척 절차를 밸리데이션하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8093101aaefeb97e7a6bc66b",
+    "finding_text": "Your receiving procedures for raw materials are inadequate.",
+    "finding_text_ko": "귀사의 원자재 입고 절차가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8618e2bd2505008b2e7bddb9",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리(laboratory controls)에 의약품이 확인(identity), 함량, 품질 및 순도의 적절한 기준에 부합함을 보증하도록 설계된, 과학적으로 타당하고 적절한 규격의 설정이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-86d293110d13f0b381307b30",
+    "finding_text": "Your supplier qualifications are deficient.",
+    "finding_text_ko": "귀사의 공급업체 적격성 평가가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-89513d64398ec09bb5ea3189",
+    "finding_text": "Laboratory Controls are inadequate.",
+    "finding_text_ko": "시험실 관리(Laboratory Controls)가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-952dd400ace23a95db816e81",
+    "finding_text": "기타 반제품 보관기간을 설정하여 관리할 것",
+    "finding_text_ko": "기타 반제품 보관기간을 설정하여 관리해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-965e77c17cf1cc48eeeae6cd",
+    "finding_text": "Equipment and utensils utilized in the production of API for the US Market are not cleaned or maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, purity and quality of the drug substance.",
+    "finding_text_ko": "미국 시판용 API 생산에 사용되는 장비와 기구를 원료의약품의 안전성, 확인(identity), 함량, 순도 및 품질을 변화시킬 수 있는 오염을 방지하기에 적절한 주기로 세척 또는 유지관리하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9aa0855fef7459bdc525789e",
+    "finding_text": "시험실 기타 [별표 1] 7.1 [별표 1의2] 11.1 모든 시험기록은 원본 데이터를 포함하여 Audit trail을 실시할 것",
+    "finding_text_ko": "시험실 기타 [별표 1] 7.1 [별표 1의2] 11.1 모든 시험기록은 원본 데이터를 포함하여 Audit trail을 실시해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-9c8b1f66c94b4a3b9a6e03e3",
+    "finding_text": "Samples of representative units were not visually examined for correct labeling at the completion of finishing operations.",
+    "finding_text_ko": "포장·표시 완료 시점에 대표 단위 시료의 표시(labeling)가 올바른지 육안으로 확인하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a16fb6f1e109e8f44246c8a4",
+    "finding_text": "Stability studies do not support the labeled retest date.",
+    "finding_text_ko": "안정성 시험 결과가 표시된 재시험일(retest date)을 뒷받침하지 않는다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-a74b507d3e83953770df1142",
+    "finding_text": "Changes that could affect the production and control of the intermediate or API are not always handled using the formal change control system.",
+    "finding_text_ko": "중간제품 또는 API의 생산 및 관리에 영향을 줄 수 있는 변경이 항상 공식 변경관리 시스템으로 처리되지는 않는다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-c0d123e3770231a449b60d90",
+    "finding_text": "시설장비 기타 [별표 1] 2.1 기기 적격성평가 항목을 적절히 설정하고, 데이터를 보관할 것",
+    "finding_text_ko": "시설장비 기타 [별표 1] 2.1 기기 적격성평가 항목을 적절히 설정하고 데이터를 보관해야 한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d2f06e50cfc32f88e32014fd",
+    "finding_text": "Review of audit trail for analytical data generated by your firm is inadequate.",
+    "finding_text_ko": "귀사에서 생성된 분석 데이터의 audit trail 검토가 미흡하다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-d9d41021e2d4d1b7bca68b6d",
+    "finding_text": "Verification testing of the raw material supplier COA is inadequate as the firm has failed to conduct all of the analyses listed on the respective supplier COA.",
+    "finding_text_ko": "원자재 공급업체 COA의 확인시험이 미흡하다. 업체는 해당 공급업체 COA에 기재된 모든 분석을 수행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-dcb6ac779845efa8066c993b",
+    "finding_text": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+    "finding_text_ko": "설명되지 않은 불일치, 그리고 배치 또는 그 구성성분이 규격을 충족하지 못한 경우를, 해당 배치가 이미 유통되었는지와 관계없이 철저히 검토하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-de0a4c8511c25703ce22da1c",
+    "finding_text": "현진정향: 성상 부적합",
+    "finding_text_ko": "현진정향의 성상 부적합",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e3d0b0577d84e30e72897b8b",
+    "finding_text": "Your cleaning procedures are not validated.",
+    "finding_text_ko": "귀사의 세척 절차가 밸리데이션되어 있지 않다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-e52f1239e6f9d6acc84adaf6",
+    "finding_text": "The persons double-checking the cleaning and maintenance are not dating, signing or initialing the equipment cleaning and use log.",
+    "finding_text_ko": "세척 및 유지관리를 이중 확인하는 담당자가 장비 세척 및 사용 기록에 일자 기재, 서명 또는 이니셜 기재를 하지 않고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-eef8579a4cb084e812ceb76c",
+    "finding_text": "The roles and responsibilities ofthe quality unit is not fully followed.",
+    "finding_text_ko": "품질 부서(quality unit)의 역할과 책임이 완전히 이행되지 않고 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f0096e9fcb43b2b8d2b5e690",
+    "finding_text": "Written procedures are not established or followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+    "finding_text_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 장비의 세척 및 유지관리에 대한 문서화된 절차를 수립하지 않았거나 이행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-f6c7fd4aac8f3fae574bbc63",
+    "finding_text": "Your firm failed to establish and follow appropriate written procedures for equipment qualification.",
+    "finding_text_ko": "귀사는 장비 적격성평가(equipment qualification)에 대한 적절한 문서화된 절차를 수립하고 이행하지 않았다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-fb0d8be03345a41cd6b7adae",
+    "finding_text": "Specifications of Water used in the manufacture of APIs do not demonstrate the water is suitable for its intended use.",
+    "finding_text_ko": "API 제조에 사용되는 용수(Water)의 규격이 해당 용수가 의도된 용도에 적합함을 입증하지 못한다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-1af97749ec182f73180f505d",
+    "finding_text": "'큐레이드(벤잘코늄염화물반창고(1회용))‘ 등 제품의 수거·검사 결과 ’형상(폭)‘, ’인장강도‘ 시험항목 부적합",
+    "finding_text_ko": "'큐레이드(벤잘코늄염화물반창고(1회용))' 등 제품의 수거·검사 결과 '형상(폭)', '인장강도' 시험항목 부적합",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-8b2518ea6adacbf55328b9ab",
+    "finding_text": "계림반하생강백반제: 성상 부적합",
+    "finding_text_ko": "계림반하생강백반제의 성상 부적합",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-bc798ad2ea9ee0b12fa946c3",
+    "finding_text": "○ 수탁자 준수사항 위반(기준서 미준수) 자사 기준서에서 ‘작업자는 제조공정과 동시에 해당 내용을 기록한다.’, '‘제조(포장)지시 및 기록서’ 제조(포장)기록의 세부항목은 제조(포장)작업과 동시에 기록되어야 한다.’라고 규정하고 있음에도 불구하고, 수탁 제조하는 품목에 대하여 해당 제품 포장지시 및 기록서에 1차 포장, 2차 포장 작업에 대한 일부 기록을 수행하지 않은 것이 확인되는 등 자사 기준서를 미준수한 사실이 있음",
+    "finding_text_ko": "○ 수탁자 준수사항 위반(기준서 미준수): 자사 기준서에서 '작업자는 제조공정과 동시에 해당 내용을 기록한다.', '제조(포장)지시 및 기록서의 제조(포장)기록 세부항목은 제조(포장)작업과 동시에 기록되어야 한다.'라고 규정하고 있음에도, 수탁 제조하는 품목의 포장지시 및 기록서에 1차 포장, 2차 포장 작업에 대한 일부 기록을 수행하지 않은 것이 확인되는 등 자사 기준서를 준수하지 않은 사실이 있다.",
+    "translation_method": "llm_assisted"
+  },
+  {
+    "finding_id": "finding-025db957589968cb0c227625",
+    "finding_text": "○ 의약품(한약재) 제조 등의 금지 - 의약품 제조업자는「약사법」제62조제3호에 따라, 기준이 정하여진 의약품(한약재)으로서 정한 기준에 맞지 아니한 의약품을 판매할 목적으로 제조하여서는 아니 되나, - ‘다온목단피(제조번호: DO-38-2508)’의 품질검사 결과, 이산화항의 기준이 초과한 제품을 제조하여 판매한 사실이 있음 * (기준) 30ppm이하 / (결과) 540ppm",
+    "finding_text_ko": "○ 의약품(한약재) 제조 등의 금지: 의약품 제조업자는 「약사법」 제62조제3호에 따라 기준이 정해진 의약품(한약재)으로서 정해진 기준에 맞지 않는 의약품을 판매할 목적으로 제조해서는 안 되나, '다온목단피(제조번호: DO-38-2508)'의 품질검사 결과 이산화항 기준을 초과한 제품을 제조하여 판매한 사실이 있다. * (기준) 30ppm 이하 / (결과) 540ppm",
+    "translation_method": "llm_assisted"
+  }
+]

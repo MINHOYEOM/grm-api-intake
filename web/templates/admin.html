@@ -50,28 +50,6 @@
 .admin-kpi b{display:block;font-family:var(--serif);font-size:34px;font-weight:500;color:var(--ink);line-height:1.05;margin-top:6px;overflow:hidden;text-overflow:ellipsis}
 .admin-panel{border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:24px}
 .admin-panel[hidden],.admin-hidden{display:none!important}
-.org-chart{--org-line:var(--line-2);padding:6px 0 4px}
-.org-root{display:flex;justify-content:center}
-.org-root b{background:var(--ink);color:var(--canvas);border-radius:var(--rad-s);padding:9px 34px;font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:.02em}
-.org-cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;position:relative;margin-top:30px}
-.org-cols:before{content:"";position:absolute;top:-15px;left:12.5%;right:12.5%;border-top:1px solid var(--org-line)}
-.org-root{position:relative}.org-root:after{content:"";position:absolute;left:50%;top:100%;height:15px;border-left:1px solid var(--org-line)}
-.org-col{position:relative}
-.org-col:before{content:"";position:absolute;top:-15px;left:50%;height:15px;border-left:1px solid var(--org-line)}
-.org-head{text-align:center;border:1px solid var(--line-2);background:var(--soft);border-radius:var(--rad-s);padding:9px 8px;color:var(--ink);font-weight:650;font-size:14px}
-.org-head small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:1px}
-.org-col.direct .org-head{background:var(--coral-tint);border-color:rgba(194,96,63,.28);color:var(--coral-2)}
-.org-list{list-style:none;margin:0;padding:12px 0 0 14px;position:relative;display:grid;gap:8px}
-.org-list:before{content:"";position:absolute;left:0;top:0;bottom:22px;border-left:1px solid var(--org-line)}
-.org-node{position:relative;border:1px solid var(--line);background:var(--canvas);border-radius:var(--rad-s);padding:8px 11px;display:grid;gap:2px}
-.org-node:before{content:"";position:absolute;left:-14px;top:19px;width:14px;border-top:1px solid var(--org-line)}
-.org-node b{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--ink);font-size:13.5px;font-weight:650}
-.org-node span.d{color:var(--muted);font-size:12px;line-height:1.35}
-.org-node a{color:var(--coral-2);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
-.org-node a:hover{text-decoration:underline}
-.org-sub{display:flex;gap:12px;flex-wrap:wrap;margin-top:3px}
-.org-foot{margin-top:14px;color:var(--muted);font-size:12px}
-@media(max-width:1000px){.org-cols{grid-template-columns:1fr}.org-cols:before,.org-root:after,.org-col:before{display:none}}
 .home-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px}
 .home-stat{border:1px solid var(--line);background:var(--soft);border-radius:var(--rad-s);padding:13px 15px;display:grid;gap:6px;align-content:start}
 .home-stat>span{color:var(--muted);font-size:12.5px;display:flex;align-items:center;gap:6px}
@@ -79,7 +57,6 @@
 .home-stat b{color:var(--ink);font-size:14.5px;font-weight:650;line-height:1.35}
 .home-stat button{justify-self:start;border:0;background:transparent;color:var(--coral-2);font-size:12.5px;font-weight:600;padding:0;cursor:pointer}
 .home-stat button:hover{text-decoration:underline}
-.home-sec{font-size:15px;color:var(--ink);margin:0 0 12px}
 @media(max-width:1000px){.home-status{grid-template-columns:1fr}}
 .admin-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
 .admin-li-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -254,12 +231,6 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 @media(max-width:900px){.admin-workflow-compact,.admin-workflow-detail-grid,.admin-workflow-facts{grid-template-columns:1fr}.admin-workflow-action{justify-content:flex-start}.admin-workflow-quick span{white-space:normal}.admin-workflow-row summary{grid-template-columns:1fr}}
 @media(max-width:560px){.admin-main{padding-top:24px}.admin-head h1{font-size:32px}.admin-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-nav-label{grid-column:1/-1}.admin-kpis,.admin-actions-grid,.admin-ops-summary,.admin-workflow-grid,.admin-publish-form{grid-template-columns:1fr}.admin-ops-brief{display:grid}.admin-inline-form input{min-width:0;width:100%}.admin-inline-form .btn,.admin-publish-form .btn{width:100%;justify-content:center}}
 
-.home-inbox{margin-bottom:22px}
-.home-inbox-row{display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(176,125,23,.3);background:var(--canvas);border-radius:10px;padding:12px 14px;margin-bottom:8px}
-.home-inbox-row.problem{border-color:rgba(189,75,54,.34)}
-.home-inbox-row b{color:var(--ink);font-size:13.5px}.home-inbox-row span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
-.org-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:6px;vertical-align:middle}
-.org-dot.notice{background:var(--med)}.org-dot.problem{background:var(--hi)}
 /* ── app skin ── */
 .nav,.grm-pet{display:none!important}
 .admin-main.wrap{width:100%;max-width:none;margin:0;padding:0}
@@ -285,7 +256,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 .admin-panel-head>div:empty{display:none}
 .admin-panel h2{font-size:22px;font-weight:700;letter-spacing:-.015em}
 .admin-panel .sub{max-width:70ch;font-size:13px}
-.admin-kpi,.admin-metric,.home-stat,.admin-ops-brief,.admin-approve-hero,.admin-publish-console,.admin-op,.admin-issue,.admin-flow-node,.admin-fold,.admin-recovery,.admin-workflow-log,.org-node{background:var(--canvas);border-radius:10px}
+.admin-kpi,.admin-metric,.home-stat,.admin-ops-brief,.admin-approve-hero,.admin-publish-console,.admin-op,.admin-issue,.admin-flow-node,.admin-fold,.admin-recovery,.admin-workflow-log{background:var(--canvas);border-radius:10px}
 .admin-kpi,.admin-metric,.home-stat,.admin-fold,.admin-recovery{border-color:var(--line)}
 .admin-kpi{padding:16px 18px}
 .admin-kpi b{font-family:inherit;font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -305,8 +276,6 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 .admin-monitor-section{margin-top:22px}
 .admin-monitor-section h3{font-size:14px}
 .admin-empty{text-align:center;padding:26px 16px}
-.home-sec{margin-top:8px}
-.org-head{border-radius:8px}
 @media(max-width:840px){
 .admin-shell{display:block}
 .admin-rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px 12px 8px}
@@ -907,7 +876,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 
         <section class="admin-panel" data-panel="home">
           {# 운영 센터(PR3, 설계서 2026-11-06 §3) — 새 기본 홈(D1). 읽기 전용: ops_home() 한 번 호출,
-             그리기는 /assets/admin-ops.js. 옛 숫자·조직도·결재함은 아래 접힘(삭제는 PR7). #}
+             그리기는 /assets/admin-ops.js. 옛 숫자 칸은 아래 접힘(운영 센터 '우리 회사 숫자'의 원천). #}
           <div class="oc-wrap" id="grm-oc-wrap">
             <div class="oc-status"><span id="grm-oc-age">운영 센터</span><button type="button" id="grm-oc-reload">다시 불러오기</button></div>
             <div class="oc-msg" id="grm-oc-msg" role="status" aria-live="polite">운영 센터를 불러오는 중입니다.</div>
@@ -933,7 +902,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <div id="grm-oc-sheet" hidden></div>
           </div>
           <details class="admin-fold oc-legacy" id="grm-home-legacy">
-          <summary>이전 홈 화면 (숫자·옛 조직도)</summary>
+          <summary>이전 홈 화면 (숫자)</summary>
           <div class="admin-kpis" id="grm-kpis">
             <div class="admin-kpi"><span><i class="ti ti-users"></i>회원</span><b id="grm-kpi-users">-</b></div>
             <div class="admin-kpi"><span><i class="ti ti-address-book"></i>구독자</span><b id="grm-kpi-subscribers">-</b></div>
@@ -947,39 +916,6 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
             <div class="home-stat"><span><i class="ti ti-shield-check"></i>이번 주 발행 승인</span><b id="grm-home-approve">확인 중</b><button type="button" data-goto="ops">승인하러 가기</button></div>
             <div class="home-stat"><span><i class="ti ti-message-report"></i>문의·제안</span><b id="grm-home-feedback">확인 중</b><button type="button" data-goto="feedback">문의 열기</button></div>
           </div>
-          <div class="home-inbox admin-hidden" id="grm-home-inbox"><h3 class="home-sec">결재함</h3><div class="home-inbox-list" id="grm-home-inbox-list"></div></div>
-          <h3 class="home-sec">회사 조직도</h3>
-<div class="org-chart">
-  <div class="org-root"><b>대표</b></div>
-  <div class="org-cols">
-    <div class="org-col direct"><div class="org-head">대표 직속<small>실</small></div>
-      <ul class="org-list">
-        <li class="org-node" data-dept="비서실"><b>비서실</b><span class="d">대표 지시 창구</span></li>
-        <li class="org-node" data-dept="종합상황실"><b>종합상황실</b><span class="d">제때 돌았나 감시·주간 보고</span></li>
-        <li class="org-node" data-dept="검증실"><b>검증실</b><span class="d">원본과 맞나 월 1회 확인</span></li>
-      </ul></div>
-    <div class="org-col"><div class="org-head">리서치<small>부문</small></div>
-      <ul class="org-list">
-        <li class="org-node" data-dept="브리프편집팀"><b>브리프편집팀</b><span class="d">월요일 브리프 제작</span>
-          <span class="org-sub"><a href="https://claude.ai/code/routines/trig_01UGGMtqtTdrak5FGWqAo37R" target="_blank" rel="noopener noreferrer">데스크 ↗</a><a href="https://claude.ai/code/routines/trig_01F1KHL6ejWFgz9ec7tDn9Hr" target="_blank" rel="noopener noreferrer">기자 ↗</a><a href="https://claude.ai/code/routines/trig_01ScK5hprKgDe4syfZWkmbd5" target="_blank" rel="noopener noreferrer">교열 ↗</a></span></li>
-        <li class="org-node" data-dept="글로벌번역팀"><b>글로벌번역팀</b><span class="d">지적사항 번역·영문판</span></li>
-        <li class="org-node" data-dept="용어·교육팀"><b>용어·교육팀</b><span class="d">용어사전·퀴즈</span></li>
-      </ul></div>
-    <div class="org-col"><div class="org-head">플랫폼<small>부문</small></div>
-      <ul class="org-list">
-        <li class="org-node" data-dept="제품전략팀 (시범)"><b>제품전략팀 (시범)</b><span class="d">다음에 만들 것 제안</span></li>
-        <li class="org-node" data-dept="개발팀"><b>개발팀</b><span class="d">사이트 수정·버그 수리</span></li>
-        <li class="org-node" data-dept="데이터품질팀"><b>데이터품질팀</b><span class="d">수집·분류 표본 검사</span></li>
-        <li class="org-node" data-dept="수집·인프라팀"><b>수집·인프라팀</b><span class="d">수집·배포 자동화</span></li>
-      </ul></div>
-    <div class="org-col"><div class="org-head">고객<small>부문</small></div>
-      <ul class="org-list">
-        <li class="org-node" data-dept="대외홍보팀"><b>대외홍보팀</b><span class="d">링크드인·뉴스레터 초안</span></li>
-        <li class="org-node" data-dept="성장분석팀"><b>성장분석팀</b><span class="d">방문·검색·구독 숫자</span></li>
-      </ul></div>
-  </div>
-  <p class="org-foot">↗ 는 claude.ai 의 예약작업 페이지(새 탭)입니다. 독자지원은 종합상황실이 겸임합니다.</p>
-</div>
           </details>
         </section>
 

@@ -199,10 +199,21 @@ class OpsHomeWiringTest(unittest.TestCase):
         ids = re.findall(r'\bid="([^"{]+)"', self.html)
         dup = sorted({i for i in ids if ids.count(i) > 1})
         self.assertEqual(dup, [], f"중복 id: {dup}")
-        # 옛 홈 숫자 칸은 접힘 안에 그대로(삭제는 PR7)
+        # 옛 홈 숫자 칸은 접힘 안에 그대로('우리 회사 숫자'의 원천). 옛 조직도·결재함은 PR7 에서 걷었다.
         legacy = home[home.index('id="grm-home-legacy"'):]
-        for marker in ('id="grm-kpis"', 'id="grm-kpi-users"', 'id="grm-home-status"', 'class="org-chart"'):
+        for marker in ('id="grm-kpis"', 'id="grm-kpi-users"', 'id="grm-home-status"'):
             self.assertIn(marker, legacy)
+
+    def test_old_org_chart_and_inbox_removed(self):
+        # PR7: 옛 조직도 마크업·org-* CSS·결재함 칸·loadOpsReports(097 ops_reports 읽기)는 남기지 않는다.
+        # ops_reports 표·DB 는 그대로 — 화면에서 읽지 않을 뿐이다.
+        self.assertNotRegex(self.html, r'\borg-(chart|root|cols|col|head|list|node|sub|foot|dot)\b')
+        self.assertNotIn("--org-line", self.html)
+        for gone in ('id="grm-home-inbox"', 'id="grm-home-inbox-list"', "home-inbox", "home-sec", "회사 조직도"):
+            self.assertNotIn(gone, self.html)
+        for gone in ("loadOpsReports", "ops_reports", "org-dot", "org-node", "grm-home-inbox"):
+            self.assertNotIn(gone, self.js)
+        self.assertNotIn("org-", self.ops, "새 운영 센터 렌더러는 옛 org-* 클래스를 쓰지 않는다")
 
     def test_company_numbers_reuse_existing_loaders(self):
         for new, old in (("grm-oc-kpi-users", "grm-kpi-users"), ("grm-oc-kpi-subscribers", "grm-kpi-subscribers"),

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-07T01:12:29Z",
+ "generated_at": "2026-11-07T07:46:03Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,17 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 42324836472,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-07T01:35:01Z",
+    "updatedAt": "2026-11-07T01:40:37Z",
+    "headBranch": "main",
+    "displayTitle": "feat(ops-center): 운영 센터 PR7 — Admin 홈에서 옛 조직도·결재함 걷기 (#1364)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42324836472"
+   },
+   {
     "databaseId": 42321712253,
     "status": "completed",
     "conclusion": "success",
@@ -216,17 +227,6 @@
     "headBranch": "feat/ops-center-pr6-measure",
     "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240915570"
-   },
-   {
-    "databaseId": 42240701751,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "pull_request",
-    "createdAt": "2026-11-06T15:11:25Z",
-    "updatedAt": "2026-11-06T15:13:38Z",
-    "headBranch": "feat/ops-center-pr6-measure",
-    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240701751"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 42345581097,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-07T06:07:15Z",
+    "updatedAt": "2026-11-07T06:07:19Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42345581097"
+   },
+   {
     "databaseId": 42279948581,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41983721091"
-   },
-   {
-    "databaseId": 41900777616,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-04T19:50:11Z",
-    "updatedAt": "2026-11-04T23:02:31Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41900777616"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -539,6 +539,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 42347686431,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-07T06:35:23Z",
+    "updatedAt": "2026-11-07T06:35:34Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42347686431"
+   },
    {
     "databaseId": 42281752284,
     "status": "completed",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41986887272"
-   },
-   {
-    "databaseId": 41902593105,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-04T20:01:34Z",
-    "updatedAt": "2026-11-04T20:01:44Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41902593105"
    }
   ],
   "grm-cloud-request.yml": [

@@ -1212,28 +1212,6 @@
     }).join("");
   }
 
-  // ── 종합상황실 보고(097 ops_reports) — 값이 들어오기 전엔 결재함·상태 점 모두 숨김 ───────────
-  function loadOpsReports() {
-    return state.client.from("ops_reports").select("day,dept,status,summary,needs_decision")
-      .order("day", { ascending: false }).limit(60).then(function (res) {
-        if (res.error) throw res.error;
-        var rows = res.data || [], latest = rows.length ? rows[0].day : "";
-        var today = rows.filter(function (r) { return r.day === latest; });
-        qsa(".org-node .org-dot").forEach(function (d) { d.remove(); });
-        today.forEach(function (r) {
-          if (r.status === "normal") return;
-          var node = document.querySelector('.org-node[data-dept="' + r.dept.replace(/"/g, "") + '"] b');
-          if (node) { var dot = document.createElement("i"); dot.className = "org-dot " + r.status; dot.title = r.summary || ""; node.insertBefore(dot, node.firstChild.nextSibling); }
-        });
-        var ask = today.filter(function (r) { return r.needs_decision; });
-        var box = byId("grm-home-inbox"), list = byId("grm-home-inbox-list");
-        if (!box || !list) return;
-        list.innerHTML = ask.map(function (r) {
-          return '<div class="home-inbox-row ' + esc(r.status) + '"><div><b>' + esc(r.dept) + '</b><span>' + esc(r.summary || "") + '</span></div></div>';
-        }).join("");
-        box.classList.toggle("admin-hidden", !ask.length);
-      }).catch(function () { var box = byId("grm-home-inbox"); if (box) box.classList.add("admin-hidden"); });
-  }
   // ── 운영 센터(123 ops_home) — 홈 전체를 함수 한 번으로 읽는다. 상태 판정은 DB, 그리기는 admin-ops.js ──
   // 실패해도 조용히 한 줄 + 다시 시도. 옛 홈(접힘)을 펼쳐 발행 승인 길은 막히지 않게 한다.
   var OPS_STALE_MIN = 5;
@@ -1452,7 +1430,7 @@
   function refreshAll() {
     // 운영 센터는 따로 읽고, 발행 PR 결과가 오면 대표실 '발행 승인' 한 줄을 위해 다시 그린다(DB 복사 없음).
     var publish = loadPublishPr().then(renderOpsHome);
-    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadSearchConsole(), loadRuns(), loadHealth(), publish, loadOpsHome(), loadOpsReports()]).then(function () {
+    return Promise.allSettled([loadIndex(), loadOverview(), loadSubscribers(), loadGrowth(), loadRum(), loadSearchConsole(), loadRuns(), loadHealth(), publish, loadOpsHome()]).then(function () {
       renderSystemChecks();
     });
   }

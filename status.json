@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-06T23:26:40Z",
+ "generated_at": "2026-11-07T01:12:29Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 42321712253,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-07T01:01:30Z",
+    "updatedAt": "2026-11-07T01:07:16Z",
+    "headBranch": "ops-center-pr7-remove-old-org",
+    "displayTitle": "feat(ops-center): 운영 센터 PR7 — Admin 홈에서 옛 조직도·결재함 걷기",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42321712253"
+   },
+   {
+    "databaseId": 42321671007,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-07T01:01:07Z",
+    "updatedAt": "2026-11-07T01:06:52Z",
+    "headBranch": "ops-center-pr7-remove-old-org",
+    "displayTitle": "feat(ops-center): 운영 센터 PR7 — Admin 홈에서 옛 조직도·결재함 걷기",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42321671007"
+   },
+   {
     "databaseId": 42245019283,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "feat/ops-center-pr6-measure",
     "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240701751"
-   },
-   {
-    "databaseId": 42240480815,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "pull_request",
-    "createdAt": "2026-11-06T15:09:59Z",
-    "updatedAt": "2026-11-06T15:12:05Z",
-    "headBranch": "feat/ops-center-pr6-measure",
-    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240480815"
-   },
-   {
-    "databaseId": 42240250822,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "pull_request",
-    "createdAt": "2026-11-06T15:08:30Z",
-    "updatedAt": "2026-11-06T15:10:30Z",
-    "headBranch": "feat/ops-center-pr6-measure",
-    "displayTitle": "feat(ops-center): 운영 센터 PR6 — 자동 측정(128 SQL 갈래 + GitHub 갈래)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42240250822"
    }
   ],
   "grm-scaffold-mirror.yml": [

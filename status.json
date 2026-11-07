@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-07T22:07:30Z",
+ "generated_at": "2026-11-07T22:59:55Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -175,11 +175,11 @@
   "grm-web-deploy.yml": [
    {
     "databaseId": 42418906442,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-07T22:05:03Z",
-    "updatedAt": "2026-11-07T22:05:07Z",
+    "updatedAt": "2026-11-07T22:11:19Z",
     "headBranch": "automation/findings-docs-auto-42418575787",
     "displayTitle": "chore: refresh findings document pages",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42418906442"
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 42419915489,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-07T22:17:33Z",
+    "updatedAt": "2026-11-07T22:19:13Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1369 from MINHOYEOM/claude/findings-translate-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42419915489"
+   },
+   {
     "databaseId": 41986364232,
     "status": "completed",
     "conclusion": "success",
@@ -444,17 +455,6 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1272 from MINHOYEOM/chore/findings-restore-2026-1…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41368835352"
-   },
-   {
-    "databaseId": 41258403819,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-01T00:49:04Z",
-    "updatedAt": "2026-11-01T00:50:13Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1256 from MINHOYEOM/chore/findings-translate-2026…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41258403819"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
@@ -540,6 +540,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 42419901545,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-07T22:17:23Z",
+    "updatedAt": "2026-11-07T22:17:37Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42419901545"
+   },
+   {
     "databaseId": 42377433312,
     "status": "completed",
     "conclusion": "success",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42180600788"
-   },
-   {
-    "databaseId": 42101715688,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-05T20:15:39Z",
-    "updatedAt": "2026-11-05T20:15:49Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42101715688"
    }
   ],
   "grm-cloud-request.yml": [

@@ -47,6 +47,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+import intake_exclusion as _xl
 from grm_common import (
     HTTPClientError,
     KR_EGRESS_PROXY_REACHABLE,
@@ -767,6 +768,10 @@ class CollectionStats:
     mhra_gmp_ncr_insert_failed: int = 0
     mhra_gmp_ncr_error: bool = False
     mhra_gmp_ncr_error_msg: str = ""
+
+    # ── 제외 장부(intake_exclusion) 실행 요약 — 가산 필드 ──────────────────────
+    # LEDGER.summary(): 소스별 excluded·skipped_known·이유별 건수 + 읽기/저장 실패 카운터.
+    exclusion_ledger: dict[str, Any] = field(default_factory=dict)
 
     def total_insert_failures(self) -> int:
         return (
@@ -3108,6 +3113,26 @@ def build_wl_item(
     )
 
 
+_WL_RULE_VERSION_CACHE: list[str] = []
+
+
+def _wl_exclusion_rule_version() -> str:
+    """WL 제외 규칙(부서 게이트·저가치 키워드)의 AST 지문 — 키워드가 바뀌면 달라진다."""
+    if not _WL_RULE_VERSION_CACHE:
+        _WL_RULE_VERSION_CACHE.append(_xl.rule_fingerprint(
+            ("_fda_wl_office_gate", "_is_low_value_fda_warning_letter"), ("grm_taxonomy",)))
+    return _WL_RULE_VERSION_CACHE[0]
+
+
+def _record_wl_exclusion(firm: str, wl_href: str, date_iso: str, headline: str, reason: str) -> None:
+    """제외 장부에 WL 한 건. document_id 는 build_wl_item 과 같은 식(수집됐다면 같은 키)."""
+    _xl.record(source=SOURCE_FDA_WL,
+               document_id=_stable_doc_id(SOURCE_FDA_WL, firm, wl_href or FDA_WL_URL, date_iso),
+               official_url=wl_href or FDA_WL_URL, title=f"{firm} - {headline}" if firm else headline,
+               published_date=date_iso, reason_code=reason,
+               rule_version=_wl_exclusion_rule_version(), basis=_xl.BASIS_METADATA)
+
+
 def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
     """FDA Warning Letters 페이지 HTML 테이블 파싱 수집.
 
@@ -3218,11 +3243,13 @@ def collect_fda_warning_letters(start: date, end: date) -> tuple[list[IntakeItem
         if office_verdict == "exclude":
             log("INFO", f"FDA WL 부서 게이트 제외({truncate(issuing_office, 40)}): "
                         f"{truncate(firm or headline, 60)}")
+            _record_wl_exclusion(firm, wl_href, date_iso, headline, "office_gate_exclude")
             continue
         if office_verdict == "unknown" and _is_low_value_fda_warning_letter(
             headline, subject, issuing_office, firm
         ):
             log("INFO", f"FDA WL 저가치 식품/보충제 항목 제외: {truncate(firm or headline, 80)}")
+            _record_wl_exclusion(firm, wl_href, date_iso, headline, "low_value_food_supplement")
             continue
         # keep / review / unknown(본문 폴백 통과) → 유지. review(OII 맥락 모호)는
         # 보수적 비-드롭(약품 WL 오삭제 방지). 전용 Status 마킹은 인프라 부재로 K4 이월.
@@ -3334,7 +3361,18 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
     for item in items:
         if not item.document_id:
             log("WARN", f"document_id 없음 — skip (source={item.source})")
+            # 제외 장부: 회수 번호 빈값 등 — 키가 없어 내용 해시로 합성한다(`noid-...`). 규칙이 아니라
+            # 원천 결함이라 규칙 버전은 고정값. 수집기가 고쳐지면 같은 문서가 다른 키로 들어온다.
+            _xl.record(
+                source=item.source,
+                document_id="noid-" + hashlib.sha1(
+                    f"{item.official_url}|{item.headline}|{item.date_iso}".encode("utf-8")
+                ).hexdigest()[:16],
+                official_url=item.official_url, title=item.headline,
+                published_date=item.date_iso, reason_code="missing_document_id",
+                rule_version="static-1", basis=_xl.BASIS_METADATA)
             continue
+        _xl.LEDGER.note_included(item.source, item.document_id)   # 규칙 변경으로 다시 들어온 문서 해제
         # dedupe key = "source::document_id" (source 포함으로 FR/Recall ID 충돌 방지)
         dedup_key = f"{item.source}::{item.document_id}"
         if dedup_key in existing_ids:
@@ -3495,6 +3533,8 @@ def _health_payload(
         "flags": flags,
         "health": health.to_dict(),
         "sources": _source_health_rows(stats),
+        # 제외 장부 - 소스별 excluded 가 원천 대조(원천=수집+제외+미뤄짐)의 '제외' 항이다(가산 키).
+        "exclusion_ledger": dict(stats.exclusion_ledger),
         "handoff": {
             "emitted": handoff_emitted,
             "failed": handoff_failed,
@@ -3593,6 +3633,50 @@ def _fda483_known_document_ids(
         return None
     log("INFO", f"FDA 483 기보유 {len(known)}건(최근 {window}일) — PDF·OCR 건너뛰기 대상")
     return known
+
+
+# 제외 장부를 읽어 둘 소스 - 장부에 쓰는 소스(연결된 버림 지점이 있는 소스)와 일치시킨다.
+_EXCLUSION_LEDGER_SOURCES = (SOURCE_FDA_483, SOURCE_FDA_WL, SOURCE_MFDS)
+
+
+def _configure_exclusion_ledger(dry_run: bool, active: set[str], cfg: RunConfig,
+                                run_date: date) -> bool:
+    """제외 장부 활성화 - `ENABLE_INTAKE_EXCLUSION_LEDGER`(기본 off) + SUPABASE_URL/SERVICE_ROLE_KEY.
+
+    dry-run 에서는 쓰지 않는다. 읽기 실패는 수집을 막지 않는다(전량 재판정 = 오늘과 동일 동작).
+    """
+    _xl.LEDGER.reset()
+    if not env_flag("ENABLE_INTAKE_EXCLUSION_LEDGER"):
+        return False
+    if dry_run:
+        log("INFO", "ENABLE_INTAKE_EXCLUSION_LEDGER=true 이지만 dry-run 이므로 제외 장부 생략")
+        return False
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    if not _xl.LEDGER.configure(cfg.findings_supabase_url, key, run_date):
+        log("WARN", "ENABLE_INTAKE_EXCLUSION_LEDGER=true 이지만 SUPABASE_URL(https)/"
+                    "SUPABASE_SERVICE_ROLE_KEY 미설정 - 제외 장부 비활성")
+        return False
+    try:
+        n = _xl.LEDGER.load_known(_EXCLUSION_LEDGER_SOURCES)
+    except Exception as e:  # noqa: BLE001
+        _xl.LEDGER.load_failed = True
+        n = 0
+        log("WARN", f"제외 장부 읽기 중 예외(무시): {type(e).__name__}")
+    if _xl.LEDGER.load_failed:
+        log("WARN", f"제외 장부 읽기 실패({_xl.LEDGER.last_error}) - 전량 재판정으로 진행(비용만 증가)")
+    else:
+        log("INFO", f"제외 장부 {n}건 로드(소스 {len(_EXCLUSION_LEDGER_SOURCES)}종)")
+    return True
+
+
+def _log_exclusion_summary(summary: dict[str, Any]) -> None:
+    if not summary.get("enabled"):
+        return
+    per = ", ".join(f"{s}: 제외 {v['excluded']}·건너뜀 {v['skipped_known']}"
+                    for s, v in sorted(summary.get("by_source", {}).items())) or "없음"
+    log("INFO", f"제외 장부: {per} · 저장 {summary['flushed']}(실패 {summary['flush_failed']}) · "
+                f"해제 {summary['released']}(실패 {summary['release_failed']}) · "
+                f"읽기실패={summary['load_failed']}")
 
 
 def _run_collection(cfg: RunConfig, active: set[str], run_date: date,
@@ -4198,6 +4282,15 @@ def _write_step_summary(cfg: RunConfig, args: argparse.Namespace,
                                 f"`{handoff_error_msg[:160]}`\n")
                     else:
                         f.write("- Routine handoff: not emitted (dry-run)\n")
+                _xl_sum = stats.exclusion_ledger or {}
+                if _xl_sum.get("enabled"):
+                    _warn = "⚠️ " if (_xl_sum.get("load_failed") or _xl_sum.get("flush_failed")
+                                      or _xl_sum.get("release_failed")) else ""
+                    _per = " · ".join(f"{s} excluded {v['excluded']} (skip {v['skipped_known']})"
+                                      for s, v in sorted(_xl_sum.get("by_source", {}).items())) or "none"
+                    f.write(f"- {_warn}Exclusion ledger: {_per} · saved {_xl_sum['flushed']} "
+                            f"(failed {_xl_sum['flush_failed']}) · released {_xl_sum['released']} · "
+                            f"read-failed `{_xl_sum['load_failed']}`\n")
                 f.write(f"- Dry run: `{args.dry_run}`\n")
                 # [tier 관측 2026-08-03] Actions 화면에도 남긴다 — 로그 깊숙이 있으면 안 본다.
                 # 근접미스는 "한 글자 차이로 놓쳤을 수 있는 것" 목록이라 사람이 훑어야 값이 있다.
@@ -4384,6 +4477,8 @@ def main() -> int:
     log("INFO", f"MFDS enforcement window={enf_start}~{end} "
                 f"({mfds_enforcement_window_days}일, 회수·행정처분 지연공개 대응)")
 
+    _configure_exclusion_ledger(args.dry_run, active, cfg, run_date)
+
     (stats, fr_items, recall_items, ema_items, mhra_items, mhra_alert_items,
      pics_items, eca_items,
      wl_items, mfds_items, mfds_law_items, mfds_recall_items, mfds_admin_items,
@@ -4539,6 +4634,14 @@ def main() -> int:
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
+
+    # 제외 장부 저장(실패해도 수집 결과·종료 코드에 영향 없음 - 카운터로만 남는다).
+    try:
+        _xl.LEDGER.flush()
+    except Exception as e:  # noqa: BLE001 - 장부는 부가 장치
+        log("WARN", f"제외 장부 저장 중 예외(무시): {type(e).__name__}")
+    stats.exclusion_ledger = _xl.LEDGER.summary()
+    _log_exclusion_summary(stats.exclusion_ledger)
 
     # ── Phase 2a: Brave Search (ENABLE_SEARCH=true 시 실행) ──────────────────
     # enable_search는 위 dedupe 윈도우 계산 시 이미 정의됨 (재정의 불필요)

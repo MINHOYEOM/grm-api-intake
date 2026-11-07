@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import urllib.parse
 
+import intake_exclusion as _xl
 from grm_mfds_item_class import enrich_raw_payload
 from datetime import date
 from typing import Any
@@ -115,6 +116,12 @@ def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
     reason = _text(raw, "RTRVL_RESN")
     date_iso = _item_date(raw)
     if not product or not date_iso:
+        # 제외 장부: 규칙이 아니라 원천 행의 필수 필드 결측(품명·일자). 수정되면 다음 실행에 같은 키가
+        # 정상 수집되고 note_included 가 장부에서 푼다. 규칙 버전은 고정값.
+        _xl.record(source=SOURCE_MFDS, document_id=_document_id(raw), official_url=DATASET_URL,
+                   title=product or firm, published_date=date_iso,
+                   reason_code="missing_required_field", rule_version="static-1",
+                   basis=_xl.BASIS_METADATA)
         return None
 
     headline = f"[회수·판매중지] {product}"

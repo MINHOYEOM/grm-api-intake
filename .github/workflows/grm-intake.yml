@@ -312,6 +312,9 @@ jobs:
           # 후 자동 비활성(hard fail 없음). FINDINGS_APPEND 는 APPEND 도 true 여야 findings 까지 포함.
           ENABLE_FINDINGS_SUPABASE_APPEND: ${{ vars.ENABLE_FINDINGS_SUPABASE_APPEND || 'false' }}
           ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND: ${{ vars.ENABLE_FINDINGS_SUPABASE_FINDINGS_APPEND || 'false' }}
+          # 수집기 제외 장부(migration 130). 기본 off - 130 적용 전에는 켜지 않는다. 켜도 장부 읽기·저장
+          # 실패는 수집을 멈추지 않는다(실행 요약 카운터). SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 재사용.
+          ENABLE_INTAKE_EXCLUSION_LEDGER: ${{ vars.ENABLE_INTAKE_EXCLUSION_LEDGER || 'false' }}
           # §1-B(ENABLE_WEB_BRIEF_EMIT·GRM_WEB_BRIEF_DIR)는 job-level env 에 정의(upload 스텝과 공유).
         run: |
           # bash array 방식 — 인자를 문자열 연결하지 않아 quoting/injection 문제 없음

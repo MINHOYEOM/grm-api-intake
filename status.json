@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-07T14:53:34Z",
+ "generated_at": "2026-11-07T19:24:22Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42370542267,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-07T12:00:18Z",
-    "updatedAt": "2026-11-07T12:05:58Z",
-    "headBranch": "main",
-    "displayTitle": "feat(ops-center): 비서실 방 + 비서 2명(티로·해밀턴) 시드 (migration 129) (#1366)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42370542267"
-   },
-   {
-    "databaseId": 42368904264,
+    "databaseId": 42393097404,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-07T11:36:36Z",
-    "updatedAt": "2026-11-07T11:42:13Z",
-    "headBranch": "feat/ops-center-secretaries",
-    "displayTitle": "feat(ops-center): 비서실 방 + 비서 2명(티로·해밀턴) 시드 (migration 129)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42368904264"
+    "createdAt": "2026-11-07T16:47:59Z",
+    "updatedAt": "2026-11-07T16:53:39Z",
+    "headBranch": "claude/issue-1209-analysis-p08pkx",
+    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42393097404"
    },
    {
-    "databaseId": 42368900201,
+    "databaseId": 42393071460,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-07T11:36:32Z",
-    "updatedAt": "2026-11-07T11:41:47Z",
-    "headBranch": "feat/ops-center-secretaries",
-    "displayTitle": "feat(ops-center): 비서실 방 + 비서 2명(티로·해밀턴) 시드 (migration 129)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42368900201"
+    "createdAt": "2026-11-07T16:47:39Z",
+    "updatedAt": "2026-11-07T16:53:39Z",
+    "headBranch": "claude/issue-1209-analysis-p08pkx",
+    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42393071460"
    },
    {
-    "databaseId": 42324836472,
+    "databaseId": 42391308950,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-07T01:35:01Z",
-    "updatedAt": "2026-11-07T01:40:37Z",
+    "createdAt": "2026-11-07T16:26:33Z",
+    "updatedAt": "2026-11-07T16:32:13Z",
     "headBranch": "main",
-    "displayTitle": "feat(ops-center): 운영 센터 PR7 — Admin 홈에서 옛 조직도·결재함 걷기 (#1364)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42324836472"
+    "displayTitle": "feat(intake): 수집기 제외 장부 — 버린 문서의 기록 + 규칙 버전 재판정 (migration 130) (#1367)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42391308950"
    },
    {
-    "databaseId": 42321712253,
+    "databaseId": 42388777297,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-07T01:01:30Z",
-    "updatedAt": "2026-11-07T01:07:16Z",
-    "headBranch": "ops-center-pr7-remove-old-org",
-    "displayTitle": "feat(ops-center): 운영 센터 PR7 — Admin 홈에서 옛 조직도·결재함 걷기",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42321712253"
+    "createdAt": "2026-11-07T15:56:20Z",
+    "updatedAt": "2026-11-07T16:01:46Z",
+    "headBranch": "feat/intake-exclusion-ledger",
+    "displayTitle": "feat(intake): 수집기 제외 장부 + 규칙 버전 재판정 (migration 130)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42388777297"
+   },
+   {
+    "databaseId": 42388713551,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-07T15:55:30Z",
+    "updatedAt": "2026-11-07T16:01:24Z",
+    "headBranch": "feat/intake-exclusion-ledger",
+    "displayTitle": "feat(intake): 수집기 제외 장부 — 버린 문서의 기록 + 규칙 버전 재판정 (migration 130)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42388713551"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -460,11 +460,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 42375898094,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-07T13:12:27Z",
-    "updatedAt": "2026-11-07T13:12:31Z",
+    "updatedAt": "2026-11-07T16:33:36Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42375898094"

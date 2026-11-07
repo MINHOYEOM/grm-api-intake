@@ -35,6 +35,7 @@ import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
+import intake_exclusion as _xl
 from grm_common import http_get_xml, log
 
 # collect_intake 의 공유 자산 재사용 (private 헬퍼 포함 — 동일 코드베이스 내부용)
@@ -186,6 +187,17 @@ def _mfds_signal_counts(title: str, body: str) -> tuple[int, int, int, int, int,
     rescue_hits = sum(1 for kw in MFDS_KO_RESCUE_TERMS if kw.lower() in blob.lower())
     eng = compute_relevance(title, body)  # 영어 단어경계 매칭
     return gmp_hits, pharma_hits, ko_boost, exclude_hits, rescue_hits, eng
+
+
+_RULE_VERSION_CACHE: list[str] = []
+
+
+def _exclusion_rule_version() -> str:
+    """MFDS 관련성 게이트(_mfds_relevance)의 AST 지문 - 어휘·함수가 바뀌면 달라진다."""
+    if not _RULE_VERSION_CACHE:
+        _RULE_VERSION_CACHE.append(_xl.rule_fingerprint(
+            ("_mfds_relevance",), ("collect_mfds", "grm_taxonomy")))
+    return _RULE_VERSION_CACHE[0]
 
 
 def _mfds_relevance(title: str, body: str) -> str:
@@ -379,13 +391,15 @@ def _datago_item_to_intake(fields: dict[str, str],
         f"첨부: {fields.get('FileName', '').strip()}" if fields.get("FileName") else "",
     ]
     body = "\n".join(part for part in body_parts if part)
-    relevance = _mfds_relevance(title, body)
-    if relevance == "Pending":
-        return None
-
     seq = fields.get("ogLmPpSeq", "").strip()
     official_url = _datago_detail_url(fields)
     document_id = f"ogLmPp-{seq}" if seq else _stable_doc_id(SOURCE_MFDS, title, official_url, date_iso)
+    relevance = _mfds_relevance(title, body)
+    if relevance == "Pending":
+        _xl.record(source=SOURCE_MFDS, document_id=document_id, official_url=official_url,
+                   title=title, published_date=date_iso, reason_code="relevance_pending",
+                   rule_version=_exclusion_rule_version(), basis=_xl.BASIS_METADATA)
+        return None
     tier = _mfds_tier(TYPE_LEGISLATIVE_NOTICE, relevance, title, body)
     return IntakeItem(
         source=SOURCE_MFDS,
@@ -486,6 +500,10 @@ def _collect_rss_feed(type_or_class: str, brd_id: str,
         # P0 개선: 안전성 서한 보드는 Pending이어도 드롭하지 않는다(_build_item에서 floor 처리).
         if relevance == "Pending" and type_or_class != TYPE_SAFETY_LETTER:
             skipped_out_of_scope += 1
+            _xl.record(source=SOURCE_MFDS, document_id=_doc_id(brd_id, link, title, date_iso),
+                       official_url=link, title=title, published_date=date_iso,
+                       reason_code="relevance_pending",
+                       rule_version=_exclusion_rule_version(), basis=_xl.BASIS_METADATA)
             continue
         items.append(_build_item(
             brd_id=brd_id, type_or_class=type_or_class, feed_url=feed_url,

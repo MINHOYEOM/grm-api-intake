@@ -52,6 +52,7 @@ from typing import Any
 from urllib.parse import urlencode, urljoin
 
 import grm_findings as gf
+import intake_exclusion as _xl
 from grm_taxonomy import is_out_of_scope_483, is_out_of_scope_483_establishment
 from grm_common import _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
@@ -708,6 +709,34 @@ def _norm_record_type(text: str) -> str:
 
 def _pdf_url(media_id: str) -> str:
     return f"{FDA_MEDIA_BASE}/media/{media_id}/download" if media_id else ""
+
+
+# ── 제외 장부(intake_exclusion) 연결 ─────────────────────────────────────────────
+# 483 을 버리는 지점 4곳(시설유형·수의·범위밖 시설/본문·Unrelated 도메인)이 흔적을 남긴다.
+# 규칙 버전 = 위 판정 함수들이 읽는 키워드·정규식·함수의 AST 지문 — 규칙이 바뀌면 달라져
+# 장부에 있던 문서도 다시 받아 다시 판정한다. `_GATE_ORDER_REV` 는 AST 로 안 잡히는 게이트
+# 순서(_to_item 의 분기 구조)를 바꿀 때 사람이 올린다.
+_GATE_ORDER_REV = "1"
+_RULE_VERSION_CACHE: list[str] = []
+
+
+def exclusion_rule_version() -> str:
+    if not _RULE_VERSION_CACHE:
+        _RULE_VERSION_CACHE.append(_xl.rule_fingerprint(
+            ("is_out_of_scope_483", "is_out_of_scope_483_establishment", "compute_relevance",
+             "strip_483_form_boilerplate", "_kw_any", "QA_HARD_EXCLUDE_TERMS"),
+            ("collect_fda_483", "grm_taxonomy"), salt=_GATE_ORDER_REV))
+    return _RULE_VERSION_CACHE[0]
+
+
+def _record_483_exclusion(nrow: dict[str, str], reason: str, basis: str) -> None:
+    media_id = nrow.get("media_id", "")
+    if not media_id:
+        return
+    _xl.record(source=SOURCE_FDA_483, document_id=f"fda483-{media_id}",
+               official_url=_pdf_url(media_id), title=nrow.get("company", ""),
+               published_date=_parse_mdy(nrow.get("publish_date", "")),
+               reason_code=reason, rule_version=exclusion_rule_version(), basis=basis)
 
 
 def _media_id_from(cell_html: str) -> str:
@@ -2391,16 +2420,21 @@ def _to_item(nrow: dict[str, str], excerpt: str,
     # (뒷면 704(b) 인용문의 cosmetic·체크박스의 medical device 가 의약품 483 을 버리던 결함).
     gate_excerpt = strip_483_form_boilerplate(excerpt)
     gate_blob = " ".join([company, establishment_type, country, record_type, gate_excerpt])
+    # 장부 basis: 본문을 읽었으면 text, 못 읽은 채 메타만으로 판정하면 text_missing(다음에 다시 본다).
+    ledger_basis = _xl.BASIS_TEXT if text_status == "ok" else _xl.BASIS_TEXT_MISSING
     if _kw_any(gate_blob.lower(), QA_HARD_EXCLUDE_TERMS):   # 수의/동물용 하드 드롭
+        _record_483_exclusion(nrow, "veterinary_hard_exclude", ledger_basis)
         return None
     # [2026-10-26] 시설 유형·관찰 본문으로 범위 밖(혈액·조직·임상·식품·기기) 드롭.
     obs_text = " ".join(f"{o.get('deficiency', '')} {o.get('detail', '')}"
                         for o in (observations or []))
     if is_out_of_scope_483(establishment_type,
                            f"{gate_excerpt} {strip_483_form_boilerplate(obs_text)}"):
+        _record_483_exclusion(nrow, "out_of_scope_facility", ledger_basis)
         return None
     relevance = compute_relevance(company, establishment_type, record_type, gate_excerpt)
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
+        _record_483_exclusion(nrow, "unrelated_domain", ledger_basis)
         return None
     if relevance == "Pending":
         relevance = "Possible"             # 483 은 제조 실사 맥락 → 보수적 보존
@@ -2565,6 +2599,7 @@ def collect_fda_483(
     seen: set[str] = set()
     known = skip_document_ids or set()
     skipped_known = 0
+    skipped_excluded = 0
     for nrow in in_window:
         media_id = nrow["media_id"]
         if not media_id or media_id in seen:
@@ -2578,6 +2613,15 @@ def collect_fda_483(
         # 판정을 뒤집지 않는다). 본문이 필요한 기기 판정은 _to_item 에서 한다.
         if is_out_of_scope_483_establishment(nrow.get("establishment_type", "")):
             excerpt_health["skipped_out_of_scope_type"] += 1
+            _record_483_exclusion(nrow, "out_of_scope_type", _xl.BASIS_METADATA)
+            continue
+        # ★제외 장부: **같은 규칙 버전으로 이미 버린** 문서는 PDF 를 다시 받지 않는다(하루 한도 낭비 방지).
+        #   규칙 버전이 바뀌었으면 current_entry 가 None → 아래로 내려가 다시 판정한다.
+        _prior = _xl.LEDGER.current_entry(
+            SOURCE_FDA_483, f"fda483-{media_id}", exclusion_rule_version())
+        if _prior is not None:
+            skipped_excluded += 1
+            _record_483_exclusion(nrow, _prior.reason_code, _prior.basis)   # 마지막 본 날 갱신
             continue
 
         # 483 PDF 결함 excerpt + Observation 상세 + (deep on) 전문 보존(cap 내 시도).
@@ -2709,6 +2753,7 @@ def collect_fda_483(
         # 후보 수에 근접하는 것이 정상이고(신규는 하루 한두 건), 갑자기 0 이 되면 dedup
         # 조회가 죽어 폴백했다는 뜻이다.
         "fda483_skipped_known": skipped_known,
+        "fda483_skipped_excluded": skipped_excluded,   # 제외 장부(같은 규칙 버전)로 건너뛴 수
     }
     # [침묵 금지 2026-07-30] 엔진 부재는 문서 사정이 아니라 **환경 사정**이다 — 고치면
     # 되찾을 수 있는 결손이므로 건수와 사유를 로그에 올리고, health 경보로도 승격시킨다
@@ -2726,7 +2771,7 @@ def collect_fda_483(
         log("WARN", f"FDA 483 OCR 페이지 예산({FDA483_OCR_PAGE_BUDGET}쪽) 소진 — "
                     "이후 스캔본은 OCR 없이 진행(FDA483_OCR_PAGE_BUDGET 로 상향 가능)")
     log("INFO", f"FDA 483 완료: {len(items)}건 (윈도우내 후보 {len(in_window)}, "
-                f"기보유 건너뜀 {skipped_known}, "
+                f"기보유 건너뜀 {skipped_known}, 제외장부 건너뜀 {skipped_excluded}, "
                 f"483 행 {len(keep_rows)}/{html_data_count}, "
                 f"source={_LAST_BACKBONE}{'·부분/동결의심' if source_degraded else ''}) "
                 f"· excerpt attempted={excerpt_health['attempted']} ok={excerpt_health['ok']} "

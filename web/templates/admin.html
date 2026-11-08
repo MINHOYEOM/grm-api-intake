@@ -320,6 +320,9 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
 .oc-msg.is-hidden{display:none}
 .oc-summary{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:14px 0 20px;line-height:1.35;text-wrap:balance;color:var(--oc-ink)}
 .oc-summary:empty{display:none}
+.oc-alarm{margin:14px 0 0;border:1px solid var(--oc-bad);background:var(--oc-bad-soft);color:var(--oc-ink);border-radius:10px;padding:12px 16px;font-size:14px}
+.oc-alarm b{color:var(--oc-bad)}
+.oc-alarm-list{margin:6px 0 0;padding-left:18px}
 .oc-summary em{font-style:normal;color:var(--oc-warn)}
 .oc-summary b{font-weight:600;color:var(--oc-accent)}
 .oc-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
@@ -880,6 +883,7 @@ html:not(.grm-icons-ready) .navtoggle .ti-menu-2::before{content:"\2630";font-fa
           <div class="oc-wrap" id="grm-oc-wrap">
             <div class="oc-status"><span id="grm-oc-age">운영 센터</span><button type="button" id="grm-oc-reload">다시 불러오기</button></div>
             <div class="oc-msg" id="grm-oc-msg" role="status" aria-live="polite">운영 센터를 불러오는 중입니다.</div>
+            <div id="grm-oc-alarms"></div>
             <p class="oc-summary" id="grm-oc-summary"></p>
             <div class="oc-grid">
               <section class="oc-card oc-docs" aria-labelledby="grm-oc-docs-title">

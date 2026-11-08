@@ -1,0 +1,74 @@
+name: GRM Site Error Watch (Cloudflare 실측, daily)
+
+# [2026-11-08] 방문자가 실제로 받은 응답(Cloudflare 존 분석)에서 오류 징후를 매일 본다.
+# 판정·기준·이유는 site_error_watch.py 도크스트링 참조(30일 실측으로 정함).
+#
+# 역할 분담: grm-site-probe.yml(경보 "사이트 합성 점검 실패")은 정해 둔 페이지를 직접 여는
+# 능동 점검이고, 이 워크플로는 어제 하루 실제 요청의 5xx·사이트 경로 404 급증 + 마지막 배포
+# 실패를 보는 수동 관측이다. 경보 이슈는 제목 "사이트 오류 징후 감지 (Cloudflare 실측)",
+# 라벨 `site-errors` -> 운영 센터 개발팀(web/ops_alarm_sync.py LABEL_TEAM).
+#
+# 켜기: repo 변수 ENABLE_SITE_ERROR_WATCH=true 일 때만 이슈를 쓴다(기본 꺼짐 — 조회·판정만).
+# 토큰: CLOUDFLARE_ZONE_ANALYTICS_TOKEN(있으면 우선) 또는 CLOUDFLARE_ANALYTICS_TOKEN.
+#       이 존(grm-solutions.com)의 Zone > Analytics > Read 권한이 필요하다. 없으면 조회 실패
+#       이슈("사이트 오류 감시 실행 실패", automation-failure)로 드러난다.
+# 부수효과: git 쓰기 없음. Cloudflare 는 읽기 전용 GraphQL 조회 1회. 비용 0.
+on:
+  schedule:
+    # 00:41 UTC = 09:41 KST. 전날(UTC) 하루가 닫힌 뒤. 정각·기존 크론(:13·:17·:23·:30)을 피한다.
+    - cron: '41 0 * * *'
+  workflow_dispatch:
+    inputs:
+      day:
+        description: '판정할 UTC 날짜(YYYY-MM-DD). 비우면 어제.'
+        required: false
+        default: ''
+      apply:
+        description: 'true 면 이슈를 쓴다(ENABLE_SITE_ERROR_WATCH=true 도 필요). 기본은 판정만.'
+        required: false
+        type: choice
+        options: ['false', 'true']
+        default: 'false'
+
+permissions:
+  contents: read
+  issues: write
+  actions: read    # grm-web-deploy.yml 마지막 실행 결과 읽기
+
+concurrency:
+  group: grm-site-error-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    name: 어제 방문자 요청의 오류 징후를 판정한다
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
+      # 표준 라이브러리만 쓴다(설치 없음). 입력은 env 로 넘긴다 — run 본문에 직접 펼치지 않는다.
+      - name: Judge and manage alarm issue
+        env:
+          ENABLE_SITE_ERROR_WATCH: ${{ vars.ENABLE_SITE_ERROR_WATCH || 'false' }}
+          CLOUDFLARE_ZONE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ZONE_ANALYTICS_TOKEN }}
+          CLOUDFLARE_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
+          CLOUDFLARE_ZONE_TAG: ${{ vars.CLOUDFLARE_ZONE_TAG }}
+          GH_TOKEN: ${{ github.token }}
+          IN_DAY: ${{ inputs.day }}
+          IN_APPLY: ${{ github.event_name == 'schedule' && 'true' || inputs.apply }}
+        run: |
+          set -euo pipefail
+          ARGS=(--report site_error_report.json)
+          if [ -n "${IN_DAY:-}" ]; then
+            case "$IN_DAY" in
+              [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ARGS+=(--day "$IN_DAY") ;;
+              *) echo "day 는 YYYY-MM-DD 꼴이어야 한다: '$IN_DAY'" >&2; exit 1 ;;
+            esac
+          fi
+          if [ "${IN_APPLY:-false}" = "true" ]; then ARGS+=(--apply); fi
+          python site_error_watch.py "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY"

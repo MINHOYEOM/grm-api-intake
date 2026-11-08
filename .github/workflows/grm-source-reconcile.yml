@@ -1,0 +1,208 @@
+name: GRM Source Reconcile (daily, after intake)
+
+# 원천 대조 감시 — "원천이 올린 문서 = 수집 + 의도적 제외(제외 장부) + 미뤄짐" 등식을 매일 센다.
+# 기존 감시(grm_health·source_silence·reconciliation·fda_body_coverage)는 우리 과거값·마지막 수집일과만
+# 비교해, FDA 가 대량 게시한 일부가 누락돼도 못 잡았다. 이 잡은 원천 목록 자체를 다시 받아 문서 하나하나를
+# 대조한다(source_reconcile.py 도크스트링 참조).
+#
+# 실행 시점: 매일 수집(GRM API Intake (Daily))이 **끝난 뒤**. 수집 크론(03:17 KST)은 실제로 3~5시간 지연되므로
+# 고정 시각 크론이 아니라 workflow_run 으로 건다(grm-fda-coverage-gate 와 같은 관례). 수집이 실패한 날은
+# 건너뛴다(수집 실패는 수집 쪽 이슈가 알리고, 이 잡이 돌면 전부 놓침으로 오독된다).
+# 수동 실행: workflow_dispatch(창 일수 입력).
+#
+# 비차단: 읽기 전용(Notion 조회·제외 장부 조회·원천 GET). 이상이 있어도 파이프라인을 막지 않고 이슈로만 알린다.
+# 끄기: repo 변수 ENABLE_SOURCE_RECONCILE=false (워크플로 job 조건만 읽는다 — 코드는 읽지 않아 .env.example 에 싣지 않는다).
+
+on:
+  workflow_run:
+    workflows: ["GRM API Intake (Daily)"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      window_days:
+        description: '기본 창 일수 1~90 (기본 7). 지연공개 소스(483·회수)는 max(N, 30)'
+        type: string
+        default: '7'
+      sources:
+        description: '소스 제한(공백/쉼표). 키는 source_reconcile.py SPECS 참조(예: fda483 wl ema hc_recall). 비우면 전체'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  issues: write        # 놓침 알림 이슈 생성/갱신/종료
+
+concurrency:
+  group: grm-source-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    if: >-
+      vars.ENABLE_SOURCE_RECONCILE != 'false' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.event == 'schedule'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run source reconcile (non-blocking)
+        id: reconcile
+        continue-on-error: true
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+          MFDS_HTTP_PROXY: ${{ secrets.MFDS_HTTP_PROXY }}
+          # 식약처 회수·행정처분(data.go.kr) — 수집기와 같은 시크릿. 읽기(GET)만 한다.
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          MFDS_RSS_BOARD_MODE: ${{ vars.MFDS_RSS_BOARD_MODE || 'all' }}
+          MFDS_RSS_BOARD_IDS: ${{ vars.MFDS_RSS_BOARD_IDS || '' }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # 수집기가 꺼 둔 소스는 대조에서 뺀다(수집기와 같은 변수·같은 기본값).
+          ENABLE_MFDS: ${{ vars.ENABLE_MFDS || 'true' }}
+          ENABLE_FDA_483: ${{ vars.ENABLE_FDA_483 || 'true' }}
+          ENABLE_MFDS_RECALL: ${{ vars.ENABLE_MFDS_RECALL || 'true' }}
+          ENABLE_MFDS_ADMIN: ${{ vars.ENABLE_MFDS_ADMIN || 'true' }}
+          ENABLE_ICH: ${{ vars.ENABLE_ICH || 'false' }}
+          ENABLE_WHO: ${{ vars.ENABLE_WHO || 'false' }}
+          ENABLE_HC: ${{ vars.ENABLE_HC || 'false' }}
+          ENABLE_ISPE: ${{ vars.ENABLE_ISPE || 'false' }}
+          ENABLE_EU_GMP_NCR: ${{ vars.ENABLE_EU_GMP_NCR || 'false' }}
+          ENABLE_MHRA_GMP_NCR: ${{ vars.ENABLE_MHRA_GMP_NCR || 'false' }}
+          # dispatch 입력은 env 로만 받아 shell 본문에 직접 삽입하지 않는다.
+          GRM_WINDOW_DAYS_INPUT: ${{ inputs.window_days }}
+          GRM_SOURCES_INPUT: ${{ inputs.sources }}
+          GRM_EVENT_NAME: ${{ github.event_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          args=(--json source-reconcile.json --report source-reconcile.md --run-url "$RUN_URL")
+          if [ "$GRM_EVENT_NAME" = "workflow_dispatch" ]; then
+            if printf '%s' "$GRM_WINDOW_DAYS_INPUT" | grep -qE '^[0-9]+$' \
+               && [ "$GRM_WINDOW_DAYS_INPUT" -ge 1 ] && [ "$GRM_WINDOW_DAYS_INPUT" -le 90 ]; then
+              args+=(--window-days "$GRM_WINDOW_DAYS_INPUT")
+            else
+              echo "::warning ::window_days 가 1~90 정수가 아니어서 기본값을 쓴다"
+            fi
+            if [ -n "$GRM_SOURCES_INPUT" ]; then
+              read -r -a TOKENS <<< "$(printf '%s' "$GRM_SOURCES_INPUT" | tr ',' ' ')"
+              src_args=()
+              for t in "${TOKENS[@]}"; do
+                case "$t" in
+                  fda483|wl|recall|mfds_rss|fr|ema|mhra_blog|mhra_alert|mhra_ncr|eu_ncr|pics|eca|ispe|ich|who_rss|who_insp|hc_recall|mfds_recall|mfds_admin) src_args+=("$t") ;;
+                  *) echo "::error ::invalid source token"; exit 1 ;;
+                esac
+              done
+              if [ "${#src_args[@]}" -gt 0 ]; then args+=(--sources "${src_args[@]}"); fi
+            fi
+          fi
+          python source_reconcile.py "${args[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: source-reconcile
+          path: |
+            source-reconcile.json
+            source-reconcile.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      # 소스별 이슈: 놓침 ≥1 → 고정 제목의 열린 이슈 갱신/생성, 정상 복귀 → 해소 댓글 후 닫기.
+      # 원천 접속 불가·저장소 대조 불가는 판정을 못 한 것이므로 열지도 닫지도 않는다(plan 의 keep).
+      # 판정·계획은 source_reconcile.plan_issues(시험 대상)가 JSON 에 싣고, 여기서는 실행만 한다.
+      - name: Open / update / close per-source issues
+        if: steps.reconcile.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const report = JSON.parse(fs.readFileSync('source-reconcile.json', 'utf8'));
+            async function ensureLabel(name) {
+              try { await github.rest.issues.getLabel({ owner, repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, name, color: 'd93f0b',
+                  description: '원천 대조 감시(source_reconcile.py)' });
+              }
+            }
+            for (const plan of report.issues) {
+              if (plan.action === 'keep') { core.notice(`${plan.source}: ${plan.reason} — 이슈 유지`); continue; }
+              const sourceLabel = plan.labels[plan.labels.length - 1];
+              const { data: open } = await github.rest.issues.listForRepo({
+                owner, repo, state: 'open', labels: sourceLabel, per_page: 20 });
+              const existing = open.find(i => i.title === plan.title);
+              if (plan.action === 'open') {
+                for (const l of plan.labels) await ensureLabel(l);
+                if (existing) {
+                  const changed = !(existing.body || '').includes(plan.fingerprint);
+                  await github.rest.issues.update({ owner, repo, issue_number: existing.number, body: plan.body });
+                  if (changed) {
+                    await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                      body: `${plan.comment} — 실행 ${context.runId}` });
+                  }
+                  core.notice(`기존 이슈 #${existing.number} 갱신`);
+                } else {
+                  const { data: created } = await github.rest.issues.create({
+                    owner, repo, title: plan.title, body: plan.body, labels: plan.labels, assignees: [owner] });
+                  core.notice(`이슈 #${created.number} 생성`);
+                }
+              } else if (plan.action === 'close' && existing) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number,
+                  body: `${plan.comment} (실행 ${context.runId})` });
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+                core.notice(`이슈 #${existing.number} 자동 종료`);
+              }
+            }
+
+      # 감시 자체가 죽은 경우(미처리 예외)는 별도 이슈로 알린다. 정상 실행이면 닫는다.
+      - name: Monitor crash issue
+        if: always()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          OUTCOME: ${{ steps.reconcile.outcome }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = '[source-reconcile] 원천 대조 감시 자체가 실패했습니다';
+            const label = 'reconcile-monitor';
+            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            const outcome = process.env.OUTCOME;
+            if (outcome !== 'failure' && outcome !== 'success') return;
+            try { await github.rest.issues.getLabel({ owner, repo, name: label }); }
+            catch (e) { if (e.status !== 404) throw e;
+              await github.rest.issues.createLabel({ owner, repo, name: label, color: 'd93f0b', description: '원천 대조 감시' }); }
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: label, per_page: 20 });
+            const existing = open.find(i => i.title === title);
+            if (outcome === 'failure') {
+              const body = `source_reconcile.py 실행이 실패했습니다(미처리 예외 등). 원래 비차단 감시라 이 자체가 이상 신호입니다.\n\n실행: ${runUrl}`;
+              if (existing) {
+                await github.rest.issues.update({ owner, repo, issue_number: existing.number, body });
+                await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `다시 실패 — 실행 ${context.runId}` });
+              } else {
+                await github.rest.issues.create({ owner, repo, title, body, labels: ['reconciliation', label], assignees: [owner] });
+              }
+            } else if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `정상 실행으로 복귀해 닫습니다 (실행 ${context.runId}).` });
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+            }

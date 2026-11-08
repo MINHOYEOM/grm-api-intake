@@ -61,7 +61,10 @@ class MigrationContractTest(unittest.TestCase):
     def test_is_number_130_and_follows_129(self):
         names = sorted(p.name for p in (ROOT / "web" / "migrations").glob("*.sql"))
         self.assertIn("130_intake_exclusion_ledger.sql", names)
-        self.assertEqual(max(n for n in names if re.match(r"\d+_", n))[:3], "130")
+        # 130 은 129 바로 다음이어야 한다(뒤에 131 이후가 붙는 것은 정상 — 최댓값을 못 박지 않는다).
+        numbered = sorted(n[:3] for n in names if re.match(r"\d{3}_", n))
+        self.assertIn("129", numbered)
+        self.assertEqual(numbered[numbered.index("129") + 1], "130")
 
     def test_table_key_and_columns(self):
         n = _norm(SQL)
@@ -315,9 +318,10 @@ class Fda483LedgerIntegrationTest(unittest.TestCase):
         return items, err, fetched
 
     FIRMS = [("Acme Pharma", "Drug Manufacturer"),
-             ("Hankook Cosmetics", "Drug Manufacturer"),       # 업체명 때문에 Unrelated(알려진 오판정)
+             ("Hankook Cosmetics", "Drug Manufacturer"),       # 의약품 시설 → 업체명 무시하고 수집(11-08 수리)
              ("Best Bakery Inc", "Bakery"),                    # 시설 유형만으로 범위 밖(PDF 안 받음)
-             ("Vet Pharm", "Veterinary Drug Manufacturer")]
+             ("Vet Pharm", "Veterinary Drug Manufacturer"),
+             ("Glow Cosmetics", "Manufacturer")]               # 유형이 의약품 아님 → 업체명으로 Unrelated
 
     def _fresh(self):
         led = _ledger()
@@ -331,16 +335,17 @@ class Fda483LedgerIntegrationTest(unittest.TestCase):
         items, err, fetched = self._run(self._rows(self.FIRMS), None)
         self.assertIsNone(err)
         got = {d: r for (_s, d), r in led._pending.items()}
-        self.assertEqual({i.document_id for i in items}, {"fda483-9200"})
-        self.assertEqual(got["fda483-9201"]["reason_code"], "unrelated_domain")
-        self.assertEqual(got["fda483-9201"]["basis"], "text")
+        self.assertEqual({i.document_id for i in items}, {"fda483-9200", "fda483-9201"})
+        self.assertEqual(got["fda483-9204"]["reason_code"], "unrelated_domain")
+        self.assertEqual(got["fda483-9204"]["basis"], "text")
         self.assertEqual(got["fda483-9202"]["reason_code"], "out_of_scope_type")
         self.assertEqual(got["fda483-9202"]["basis"], "metadata")
         self.assertEqual(got["fda483-9203"]["reason_code"], "veterinary_hard_exclude")
         for r in got.values():
             self.assertEqual(r["rule_version"], f.exclusion_rule_version())
-        self.assertEqual(len(fetched), 3, "시설유형 제외(9202)는 PDF 를 받지 않는다")
+        self.assertEqual(len(fetched), 4, "시설유형 제외(9202)는 PDF 를 받지 않는다")
         self.assertNotIn("fda483-9200", got, "수집된 문서는 장부에 없다")
+        self.assertNotIn("fda483-9201", got, "의약품 시설 Hankook 은 업체명으로 버리지 않는다")
 
     def test_next_day_same_rule_version_does_not_refetch_excluded_pdf(self):
         led = self._fresh()
@@ -352,8 +357,8 @@ class Fda483LedgerIntegrationTest(unittest.TestCase):
                         for (_s, d), r in led._pending.items()})
         with patch.object(xl, "LEDGER", led2):
             items, _err, fetched = self._run(rows, None)
-        self.assertEqual(len(fetched), 1, "수집된 Acme 만 PDF 를 받는다(제외 2건은 건너뜀)")
-        self.assertEqual({i.document_id for i in items}, {"fda483-9200"})
+        self.assertEqual(len(fetched), 2, "수집된 Acme·Hankook 만 PDF 를 받는다(제외 2건은 건너뜀)")
+        self.assertEqual({i.document_id for i in items}, {"fda483-9200", "fda483-9201"})
         self.assertEqual(f.LAST_HEALTH["fda483_skipped_excluded"], 2)
         # 마지막 본 날 갱신을 위해 다시 기록은 된다
         self.assertEqual(led2.summary()["by_source"]["FDA 483"]["excluded"], 3)
@@ -367,9 +372,8 @@ class Fda483LedgerIntegrationTest(unittest.TestCase):
             # 지금 규칙 버전은 old_ver 와 다르다 → 건너뛰지 않고 PDF 를 받아 다시 판정
             _i, _e, fetched = self._run(rows, None)
             self.assertEqual(len(fetched), 1)
-            # 규칙이 고쳐져 이번엔 통과한다고 가정(관련성 판정 패치)
-            with patch.object(f, "compute_relevance", return_value="Likely"):
-                items, _e, fetched = self._run(rows, None)
+            # 11-08 수리로 실제 규칙이 고쳐져 패치 없이 통과한다
+            items, _e, fetched = self._run(rows, None)
             self.assertEqual([i.document_id for i in items], ["fda483-9200"])
             # 적재 단계가 note_included 를 부르면 예전 제외 행은 해제 대상이 된다
             led._pending.clear()
@@ -383,7 +387,7 @@ class Fda483LedgerIntegrationTest(unittest.TestCase):
 
     def test_excluded_without_text_is_recorded_as_text_missing_and_refetched(self):
         led = self._fresh()
-        rows = self._rows([("Hankook Cosmetics", "Drug Manufacturer")])
+        rows = self._rows([("Glow Cosmetics", "Manufacturer")])
         with patch.object(f, "_fetch_fda483_pdf_text", lambda url: ("", "ocr-budget")), \
                 patch.dict(os.environ, {"ENABLE_FDA_483_OCR": "false"}), \
                 patch.object(f, "FDA483_EXCERPT_DELAY_SECONDS", 0), \

@@ -64,10 +64,12 @@ from findings_store import (
     DEFAULT_FINDINGS_SQLITE_PATH,
     append_intake_item_to_sqlite,
     append_intake_item_with_findings_to_sqlite,
+    raw_signal_from_intake_item,
 )
 from findings_supabase_append import (
     append_intake_item_to_supabase,
     append_intake_item_with_findings_to_supabase,
+    existing_raw_signal_ids,
 )
 # K2: 결정론 카드 골격 조립기 (같은 폴더 평면 모듈)
 from card_scaffold import (
@@ -1738,8 +1740,35 @@ def _mask_api_key(url: str) -> str:
     return re.sub(r"(api_key=)[^&]+", r"\1***REDACTED***", url)
 
 
-def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
+# OpenFDA 가 회수 번호 자리에 넣는 "값 없음" 표기. 이런 번호를 그대로 document_id 로 쓰면
+# 서로 다른 회수가 `OpenFDA Recall::N/A` 하나로 합쳐지고, 빈 번호는 insert_items 에서 통째로
+# 건너뛴다(2026-11-07 수집 완전성 진단).
+_RECALL_NUMBER_PLACEHOLDERS = frozenset({"", "n/a", "na", "none", "null", "unknown", "-", "--"})
+# 대체 키를 이루는 원천 필드 — 한 사건(event_id) 안에서도 제품·lot(code_info)별 레코드가
+# 따로 오므로 둘 다 넣는다. 순서·구성을 바꾸면 이미 적재된 대체 키 행이 다시 들어온다(중복).
+_RECALL_FALLBACK_KEY_FIELDS = ("event_id", "product_description", "code_info",
+                               "recalling_firm", "report_date", "recall_initiation_date")
+
+
+def recall_document_id(r: dict[str, Any]) -> str:
+    """OpenFDA 회수 레코드의 document_id. 정상 회수 번호는 그대로(기존 행과 같은 키).
+
+    번호가 비었거나 "N/A" 류면 원천 필드 해시로 `recall-fb-<16hex>` 를 만든다. 접두사는
+    FDA 회수 번호 형식(`D-0123-2026`)과 겹칠 수 없어 기존 Notion 행과 충돌하지 않는다.
+    원천 필드가 전부 비었으면 빈 문자열(→ 종전처럼 장부에 missing_document_id 로 남는다)."""
     recall_number = str(r.get("recall_number") or "").strip()
+    if recall_number.lower() not in _RECALL_NUMBER_PLACEHOLDERS:
+        return recall_number
+    parts = [re.sub(r"\s+", " ", str(r.get(k) or "")).strip().lower()
+             for k in _RECALL_FALLBACK_KEY_FIELDS]
+    if not any(parts):
+        return ""
+    digest = hashlib.sha1("|".join(parts).encode("utf-8")).hexdigest()[:16]
+    return f"recall-fb-{digest}"
+
+
+def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
+    recall_number = recall_document_id(r)
     classification = (r.get("classification") or "").strip()
     product = (r.get("product_description") or "").strip()
     reason = (r.get("reason_for_recall") or "").strip()
@@ -1815,6 +1844,9 @@ class RssFeedSpec:
     # FSN 을 버리고 의약품 회수/결함만 채택). None(기본)이면 전건 채택 — 기존 4종 스펙은
     # 이 필드 미지정이라 산출 IntakeItem 이 byte 동일하게 유지된다.
     keep_item: Callable[["_RssItemFields"], bool] | None = None
+    # keep_item 이 버린 항목을 제외 장부에 남길 때의 사유 코드(원천 대조 감시가 '의도적 제외'로 센다).
+    # 규칙 버전은 keep_item 함수의 AST 지문 — 키워드가 바뀌면 그 항목은 다시 판정된다.
+    exclude_reason: str = "keep_item_rejected"
 
 
 # ── [기사 permalink 2차 dedup 2026-08-24] ────────────────────────────────────
@@ -1833,6 +1865,28 @@ class RssFeedSpec:
 #                                              구조라 예방적으로 포함(동작 변화 없음)
 # 나머지(FDA WL·483·HC·PIC/S·MHRA·EU NCR)는 실측 중복 0 이라 손대지 않는다.
 _CANONICAL_URL_DEDUP_SOURCES = frozenset({SOURCE_ECA, SOURCE_ISPE})
+
+
+_RSS_RULE_VERSION_CACHE: dict[str, str] = {}
+
+
+def _rss_exclusion_rule_version(keep_item: Callable[..., bool]) -> str:
+    """keep_item 판정 함수(+ 그 함수가 읽는 키워드·정규식)의 AST 지문."""
+    name = getattr(keep_item, "__name__", "")
+    if name not in _RSS_RULE_VERSION_CACHE:
+        _RSS_RULE_VERSION_CACHE[name] = _xl.rule_fingerprint(
+            (name,), ("collect_intake", "grm_taxonomy"))
+    return _RSS_RULE_VERSION_CACHE[name]
+
+
+def _record_rss_exclusion(spec: "RssFeedSpec", doc_id: str, f: "_RssItemFields") -> None:
+    """keep_item 이 버린 RSS 항목 한 건을 제외 장부에. document_id 는 수집됐다면 쓸 키와 같다."""
+    if spec.keep_item is None:
+        return
+    _xl.record(source=spec.source, document_id=doc_id, official_url=f.link, title=f.title,
+               published_date=f.date_iso, reason_code=spec.exclude_reason,
+               rule_version=_rss_exclusion_rule_version(spec.keep_item),
+               basis=_xl.BASIS_METADATA)
 
 
 def collect_rss_feed(spec: RssFeedSpec, start: date,
@@ -1868,9 +1922,10 @@ def collect_rss_feed(spec: RssFeedSpec, start: date,
             f = spec.extract(el, feed_name, feed_url)
             if not _within_window(f.date_iso, start, end):
                 continue
-            if spec.keep_item is not None and not spec.keep_item(f):
-                continue
             doc_id = _stable_doc_id(spec.source, f.title, f.link, f.date_iso)
+            if spec.keep_item is not None and not spec.keep_item(f):
+                _record_rss_exclusion(spec, doc_id, f)
+                continue
             if spec.uses_category:
                 relevance = compute_relevance(f.title, f.description, f.category)
                 tier = compute_signal_tier(spec.source, f.type_or_class, relevance,
@@ -2189,6 +2244,7 @@ _MHRA_ALERT_FEED_SPEC = RssFeedSpec(
     feeds=(("mhra_alert", MHRA_ALERT_RSS_URL),),
     iter_items=_atom_entries_from_root, extract=_extract_mhra_alert,
     uses_category=True, keep_item=_is_mhra_medicines_alert,
+    exclude_reason="not_medicines_alert",
 )
 _MHRA_FEED_SPEC = RssFeedSpec(
     source=SOURCE_MHRA, source_type=SRC_TYPE_OFFICIAL_BLOG, label="MHRA RSS",
@@ -2214,6 +2270,7 @@ _ISPE_FEED_SPEC = RssFeedSpec(
     feeds=(("ispe", ISPE_RSS_URL),),
     iter_items=_rss2_or_atom_items, extract=_extract_ispe,
     http_silent=True, keep_item=_is_ispe_gmp_relevant,
+    exclude_reason="not_gmp_relevant",
 )
 
 
@@ -3345,8 +3402,13 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
                  findings_sqlite_path: str | None = None,
                  findings_sqlite_include_findings: bool = False,
                  findings_supabase: tuple[str, str] | None = None,
-                 findings_supabase_include_findings: bool = False) -> tuple[int, int, int]:
+                 findings_supabase_include_findings: bool = False,
+                 heal_candidates: list[IntakeItem] | None = None) -> tuple[int, int, int]:
     """삽입 실행. 반환: (inserted, skipped, failed)
+
+    [수집 완전성 2026-11-08] heal_candidates(리스트)를 주면 Notion 에 이미 있어 건너뛴 항목을
+    거기에 모은다 — 호출부가 `heal_supabase_copies` 로 Supabase 사본에 없는 것만 채운다.
+    미지정(None)이면 종전과 완전히 같다.
 
     [배치6 Phase2] modality_enabled: main 이 preflight 로 결정한 effective 값을 전달하면
     row 당 env 재독해 없이 그대로 build_notion_properties 로 흐른다(미지정 시 env 폴백).
@@ -3377,6 +3439,8 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
         dedup_key = f"{item.source}::{item.document_id}"
         if dedup_key in existing_ids:
             skipped += 1
+            if heal_candidates is not None:
+                heal_candidates.append(item)
             continue
         # 2차: 같은 기사가 날짜만 바꿔 다시 온 경우(doc_id 가 달라져 위 검사를 빠져나간다).
         # 누적(insert 후 add)이라 **배치 안 중복**과 **실행 간 중복**을 한자리에서 함께 막는다.
@@ -3474,6 +3538,74 @@ def insert_items(token: str, db_id: str, items: Iterable[IntakeItem],
             failed += 1
             log("WARN", f"insert 최종 실패 — 다음 항목으로 진행 doc={item.document_id}")
     return inserted, skipped, failed
+
+
+# [수집 완전성 2026-11-08] Supabase raw_signals 는 "이번 실행에 Notion 에 새로 넣은 행"만 받았다.
+# 그래서 사본 append 를 켜기 전(07-08 이전)에 들어온 행, 그날 POST 가 실패한 행은 원천에 매일
+# 다시 나와도 Notion 중복으로 건너뛰어 영영 사본에 없다(ICH 0행·WHO 171건 중 20행). 건너뛴
+# 항목을 모아 사본에 없는 것만 같은 append 함수로 채운다. 조회가 실패하면 아무것도 쓰지 않는다
+# (모르는 채로 전부 POST 하지 않는다 — ignore-duplicates 라 무해하지만 호출 수가 수백 배다).
+# 원천에 다시 나오지 않는 옛 행은 이 경로로 못 채운다 → backfill_raw_signals_from_notion.py.
+RAW_SIGNALS_HEAL_MAX_DEFAULT = 300
+
+
+def heal_supabase_copies(supabase_url: str, service_key: str, items: list[IntakeItem],
+                         collected_at: datetime, *, include_findings: bool = False,
+                         max_heal: int = RAW_SIGNALS_HEAL_MAX_DEFAULT) -> dict[str, int]:
+    """Notion 에는 있고 Supabase 사본엔 없는 항목을 채운다. 반환: 집계 dict(로그용)."""
+    summary = {"candidates": 0, "present": 0, "missing": 0, "healed": 0,
+               "failed": 0, "deferred": 0, "lookup_failed": 0, "skipped_bare": 0}
+    # WHOPIR 재수집분은 PDF 보강 전 bare raw 다(보강은 신규 항목에만 돈다). 이걸 넣으면 Notion 의
+    # 보강본보다 못한 행이 append-only 사본에 영구히 박힌다 → 건너뛰고 백필 스크립트(Notion 본)가 맡는다.
+    try:
+        from collect_who import whopir_raw_is_bare as _bare
+    except ImportError:
+        def _bare(_raw: Any) -> bool:
+            return False
+    by_id: dict[str, IntakeItem] = {}
+    for item in items:
+        if item.source == SOURCE_WHO and _bare(item.raw_payload):
+            summary["skipped_bare"] += 1
+            continue
+        record = raw_signal_from_intake_item(item, collected_at=collected_at)
+        rid = str(record.get("raw_signal_id") or "")
+        if rid:
+            by_id.setdefault(rid, item)
+    summary["candidates"] = len(by_id)
+    if not by_id:
+        return summary
+    present = existing_raw_signal_ids(supabase_url, service_key, list(by_id))
+    if present is None:
+        summary["lookup_failed"] = 1
+        log("WARN", f"Supabase 사본 보충: raw_signals 조회 실패 — 이번 실행은 보충 생략 "
+                    f"(후보 {len(by_id)}건)")
+        return summary
+    missing = [rid for rid in sorted(by_id) if rid not in present]
+    summary["present"] = len(by_id) - len(missing)
+    summary["missing"] = len(missing)
+    if len(missing) > max_heal:
+        summary["deferred"] = len(missing) - max_heal
+        missing = missing[:max_heal]
+    append = (append_intake_item_with_findings_to_supabase if include_findings
+              else append_intake_item_to_supabase)
+    for rid in missing:
+        item = by_id[rid]
+        try:
+            result = append(supabase_url, service_key, item, collected_at=collected_at)
+        except Exception as e:  # noqa: BLE001 — 부가 경로가 수집을 깨지 않게
+            summary["failed"] += 1
+            log("WARN", f"Supabase 사본 보충 예외 doc={item.document_id}: {type(e).__name__}")
+            continue
+        if result.status in {"inserted", "raw_signal_inserted", "duplicate", "partial"}:
+            summary["healed"] += 1
+        else:
+            summary["failed"] += 1
+            log("WARN", f"Supabase 사본 보충 실패 source={item.source} doc={item.document_id} "
+                        f"status={result.status} errors={list(result.errors)[:2]}")
+    log("INFO", f"Supabase 사본 보충: 후보 {summary['candidates']} · 이미 있음 {summary['present']} · "
+                f"없음 {summary['missing']} · 채움 {summary['healed']} · 실패 {summary['failed']} · "
+                f"다음 실행으로 미룸 {summary['deferred']} · WHO 보강 전 건너뜀 {summary['skipped_bare']}")
+    return summary
 
 
 _ALL_SOURCES = ["fr", "recall", "ema", "mhra", "pics", "eca", "wl"]
@@ -3636,7 +3768,10 @@ def _fda483_known_document_ids(
 
 
 # 제외 장부를 읽어 둘 소스 - 장부에 쓰는 소스(연결된 버림 지점이 있는 소스)와 일치시킨다.
-_EXCLUSION_LEDGER_SOURCES = (SOURCE_FDA_483, SOURCE_FDA_WL, SOURCE_MFDS)
+_EXCLUSION_LEDGER_SOURCES = (SOURCE_FDA_483, SOURCE_FDA_WL, SOURCE_MFDS,
+                             # 2026-11 원천 대조 확장에서 연결: MHRA 경보(의료기기 FSN)·ISPE(홍보성)·
+                             # HC 회수(범위 밖 기관·Category·정정)·WHO RSS(범위 밖 프로그램)
+                             SOURCE_MHRA, SOURCE_ISPE, SOURCE_HC, SOURCE_WHO)
 
 
 def _configure_exclusion_ledger(dry_run: bool, active: set[str], cfg: RunConfig,
@@ -4619,6 +4754,10 @@ def main() -> int:
         "eu_gmp_ncr": eu_gmp_ncr_items,
         "mhra_gmp_ncr": mhra_gmp_ncr_items,
     }
+    # [수집 완전성 2026-11-08] Notion 중복으로 건너뛴 항목 → Supabase 사본 보충 후보.
+    # 사본 append 가 켜져 있을 때 기본으로 돈다. 끄려면 RAW_SIGNALS_HEAL=false.
+    heal_candidates: list[IntakeItem] | None = (
+        [] if findings_supabase and env_flag("RAW_SIGNALS_HEAL", True) else None)
     for spec in INTAKE_SOURCE_SPECS:
         if spec.prefix == "search":
             continue  # search 는 아래 결합 블록에서 처리
@@ -4630,10 +4769,20 @@ def main() -> int:
             findings_sqlite_path=findings_sqlite_path,
             findings_sqlite_include_findings=findings_sqlite_include_findings,
             findings_supabase=findings_supabase,
-            findings_supabase_include_findings=findings_supabase_include_findings)
+            findings_supabase_include_findings=findings_supabase_include_findings,
+            heal_candidates=heal_candidates)
         setattr(stats, f"{spec.prefix}_inserted", ins)
         setattr(stats, f"{spec.prefix}_skipped_dup", sk)
         setattr(stats, f"{spec.prefix}_insert_failed", fail)
+
+    if findings_supabase and heal_candidates:
+        try:
+            heal_supabase_copies(
+                findings_supabase[0], findings_supabase[1], heal_candidates, collected_at,
+                include_findings=findings_supabase_include_findings,
+                max_heal=_env_int("RAW_SIGNALS_HEAL_MAX", RAW_SIGNALS_HEAL_MAX_DEFAULT))
+        except Exception as e:  # noqa: BLE001 — 사본 보충은 부가 장치
+            log("WARN", f"Supabase 사본 보충 중 예외(무시): {type(e).__name__}")
 
     # 제외 장부 저장(실패해도 수집 결과·종료 코드에 영향 없음 - 카운터로만 남는다).
     try:

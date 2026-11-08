@@ -53,7 +53,11 @@ from urllib.parse import urlencode, urljoin
 
 import grm_findings as gf
 import intake_exclusion as _xl
-from grm_taxonomy import is_out_of_scope_483, is_out_of_scope_483_establishment
+from grm_taxonomy import (
+    is_out_of_scope_483,
+    is_out_of_scope_483_establishment,
+    is_pharma_establishment_483,
+)
 from grm_common import _env_int, env_flag, http_get_bytes, http_get_html, http_get_json, log
 from collect_intake import (
     IntakeItem,
@@ -716,7 +720,8 @@ def _pdf_url(media_id: str) -> str:
 # 규칙 버전 = 위 판정 함수들이 읽는 키워드·정규식·함수의 AST 지문 — 규칙이 바뀌면 달라져
 # 장부에 있던 문서도 다시 받아 다시 판정한다. `_GATE_ORDER_REV` 는 AST 로 안 잡히는 게이트
 # 순서(_to_item 의 분기 구조)를 바꿀 때 사람이 올린다.
-_GATE_ORDER_REV = "1"
+# rev 2 (2026-11-08): 시설 유형이 의약품이면 관련성 판정에서 업체명을 뺀다(Hankook Cosmetics).
+_GATE_ORDER_REV = "2"
 _RULE_VERSION_CACHE: list[str] = []
 
 
@@ -724,7 +729,7 @@ def exclusion_rule_version() -> str:
     if not _RULE_VERSION_CACHE:
         _RULE_VERSION_CACHE.append(_xl.rule_fingerprint(
             ("is_out_of_scope_483", "is_out_of_scope_483_establishment", "compute_relevance",
-             "strip_483_form_boilerplate", "_kw_any", "QA_HARD_EXCLUDE_TERMS"),
+             "is_pharma_establishment_483", "strip_483_form_boilerplate", "_kw_any", "QA_HARD_EXCLUDE_TERMS"),
             ("collect_fda_483", "grm_taxonomy"), salt=_GATE_ORDER_REV))
     return _RULE_VERSION_CACHE[0]
 
@@ -2432,7 +2437,15 @@ def _to_item(nrow: dict[str, str], excerpt: str,
                            f"{gate_excerpt} {strip_483_form_boilerplate(obs_text)}"):
         _record_483_exclusion(nrow, "out_of_scope_facility", ledger_basis)
         return None
-    relevance = compute_relevance(company, establishment_type, record_type, gate_excerpt)
+    # [2026-11-08] 시설 유형이 의약품·생물의약품이면 업체명은 관련성 판정에 넣지 않는다 —
+    # FDA 가 직접 적은 시설 분류가 업체 이름의 낱말보다 강한 증거다. OTC 의약품 제조소
+    # Hankook Cosmetics 가 이름의 "Cosmetics" 때문에 Unrelated 로 버려졌다. 수의 하드 드롭은
+    # 위에서 업체명까지 이미 봤으므로 그대로다. compute_relevance 자체는 손대지 않는다(FR·회수·
+    # MFDS 도 같은 함수를 쓴다).
+    relevance_parts = ((establishment_type, record_type, gate_excerpt)
+                       if is_pharma_establishment_483(establishment_type)
+                       else (company, establishment_type, record_type, gate_excerpt))
+    relevance = compute_relevance(*relevance_parts)
     if relevance == "Unrelated":           # 기기/식품/화장품 도메인 → 드롭(QA 범위 밖)
         _record_483_exclusion(nrow, "unrelated_domain", ledger_basis)
         return None

@@ -12,7 +12,8 @@
 | 글로벌번역팀 | 지적사항 일일 번역 | `translation/findings-daily.md` | Sonnet | 매일 04:00 | 매일 09:10 | 브랜치 `claude/findings-translate-YYYY-MM-DD` |
 | 종합상황실 | 월 발행 준비 확인 | `situation-room/brief-prep.md` | Haiku | 월 10:45 | 월 11:30 (복구 담당) | `company/run/<날짜>/brief-prep.md` 첫 줄 `상태: 완료` |
 | 종합상황실 | 월 운영 점검 | `situation-room/ops-weekly.md` | Haiku | 월 14:00 | 월 15:30 (`막힘:` 항목만) | `company/run/<날짜>/ops.md` |
-| 성장분석팀 | 주간 성장 보고 | `growth/weekly-report.md` | Haiku | 화 07:30 | (PC 매일 일보는 꺼짐) | — |
+| 성장분석팀 | 매일 성장 일보 v2 (방문→검색→구독→메일 클릭) | `growth/daily-report.md` | Haiku | 매일 08:10 | (없음) | — |
+| 성장분석팀 | 주간 검색 개선 리포트 | `growth/weekly-report.md` | Haiku | 화 07:30 | (없음) | — |
 | 대외홍보팀 | 링크드인 초안 확인 | `outreach/linkedin-draft.md` | Sonnet | 월 17:30 | 월 18:00 (작성창 세팅 — PC 만 가능) | — |
 | 검증실 | 월간 검증(사실 일치·개인정보·저작권) | `verification/monthly.md` | Sonnet | 월 13:30 (매주 걸고 달 1회만 실행) | (없음) | `company/run/<날짜>/verification.md` 첫 줄 `상태: 완료` (같은 달) |
 

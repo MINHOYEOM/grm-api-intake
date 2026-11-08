@@ -241,5 +241,113 @@ class FetchFilterParamsTest(unittest.TestCase):
         self.assertEqual(params["select"], svc._SELECT_COLUMNS)
 
 
+
+# ---------------------------------------------------------------------------
+# P-D (2026-11-08) — 조항이 상위 항목에만 있는 WL 하위 관찰 항목의 형제 상속 승격
+# 실측 문구는 11-08 needs_review 18건·과거 rejected 19건에서 가져왔다.
+# ---------------------------------------------------------------------------
+
+_PD_DEFICIENT = [
+    "Your firm did not disinfect materials during transfer from the ISO 7 cleanroom into the ISO 5 hood.",
+    "Your facility lacked routine and rigorous certification of the ISO 5 areas, including airflow visualization studies performed under dynamic conditions.",
+    "Your component control is not adequately designed or maintained to prevent contamination of product contact surfaces.",
+    "Your compounding technicians and aseptic assistants employ poor practices which introduce risk of microbial contamination.",
+    "The final study report did not include all the abnormal cageside clinical observations for all 48 animals.",
+]
+# 회사의 시정 조치 서술·회신 인정 문단(과거 전부 rejected) — 일반 위반 신호는 맞지만 결함 문형은 아니다.
+_PD_NOT_DEFICIENT = [
+    "Your firm revised your SOP to reflect the new process for sterilization and marking of goggles used in sterile production.",
+    "Your firm performed smoke studies of its ISO 5 areas under appropriate dynamic conditions.",
+    "Your firm has performed media fills that reflect the largest batch size produced by your firm.",
+    "Regarding your disinfectant efficacy studies, your response indicated a study; the study did not include all isolates.",
+    "In response to Form FDA 483 Observation 1A, we acknowledge that you have initiated CAPA-2 but did not finish it.",
+]
+
+
+def _pd_row(fid: str, text: str, doc: str = "doc-1", cfr=None) -> dict:
+    r = _row(fid, text, [] if cfr is None else cfr)
+    r["document_id"] = doc
+    return r
+
+
+class DeficiencySignalTest(unittest.TestCase):
+    def test_deficient_wordings_match(self):
+        for text in _PD_DEFICIENT:
+            self.assertTrue(svc.fx.wl_deficiency_signal_present(text), text)
+
+    def test_corrective_action_and_ack_paragraphs_do_not_match(self):
+        for text in _PD_NOT_DEFICIENT:
+            self.assertFalse(svc.fx.wl_deficiency_signal_present(text), text)
+            # 일반 위반 신호는 이 문장들에도 맞는다 — 그래서 P-D 에 일반 신호를 못 쓴다.
+        self.assertTrue(svc.fx.wl_violation_signal_present(_PD_NOT_DEFICIENT[0]))
+
+
+class SiblingRuleVerdictTest(unittest.TestCase):
+    def test_promotes_when_document_has_cited_accepted_sibling(self):
+        for text in _PD_DEFICIENT:
+            row = _pd_row("f-pd", text)
+            self.assertEqual(
+                svc.review_verdict(row, enable_reject=False, cited_sibling_docs={"doc-1"}),
+                "accepted", text,
+            )
+
+    def test_kept_without_cited_sibling(self):
+        row = _pd_row("f-pd", _PD_DEFICIENT[0])
+        self.assertIsNone(svc.review_verdict(row, enable_reject=False))
+        self.assertIsNone(svc.review_verdict(row, enable_reject=False, cited_sibling_docs={"other"}))
+
+    def test_corrective_action_kept_even_with_sibling(self):
+        for text in _PD_NOT_DEFICIENT:
+            row = _pd_row("f-pd", text)
+            self.assertIsNone(
+                svc.review_verdict(row, enable_reject=False, cited_sibling_docs={"doc-1"}), text,
+            )
+
+    def test_only_wl_source_uses_sibling_rule(self):
+        row = _pd_row("f-pd", _PD_DEFICIENT[0])
+        row["source"] = "FDA 483"
+        self.assertIsNone(svc.review_verdict(row, enable_reject=False, cited_sibling_docs={"doc-1"}))
+
+    def test_short_fragment_kept(self):
+        row = _pd_row("f-pd", "Your firm did not clean.")
+        self.assertIsNone(svc.review_verdict(row, enable_reject=False, cited_sibling_docs={"doc-1"}))
+
+
+class SiblingRuleRunTest(unittest.TestCase):
+    def test_run_promote_looks_up_siblings_and_promotes(self):
+        queue = [_pd_row("f-pd", _PD_DEFICIENT[0], doc="doc-1"),
+                 _pd_row("f-keep", _PD_NOT_DEFICIENT[0], doc="doc-1")]
+        siblings = [{"document_id": "doc-1", "cfr_refs": ["21 CFR 211.113(b)"], "review_status": "accepted"}]
+
+        def fake_get(url, params=None, headers=None, timeout=None):
+            payload = siblings if params.get("review_status") == "eq.accepted" else queue
+            return _FakeGetResponse(200, payload, headers={"Content-Range": f"0-{len(payload) - 1}/{len(payload)}"})
+
+        with mock.patch("findings_supabase_backfill.requests.get", side_effect=fake_get) as g, \
+             mock.patch.object(svc.requests, "patch") as patched:
+            report = svc.run_promote(_BASE_URL, _SERVICE_KEY, dry_run=True)
+        patched.assert_not_called()
+        self.assertEqual(report["promotions_planned"], 1)
+        self.assertEqual(report["sibling_rule_promotions"], 1)
+        self.assertEqual(report["kept_needs_review"], 1)
+        sib_params = g.call_args_list[-1].kwargs["params"]
+        self.assertEqual(sib_params["review_status"], "eq.accepted")
+        self.assertEqual(sib_params["document_id"], 'in.("doc-1")')
+        self.assertNotIn("finding_text", sib_params["select"])
+
+    def test_needs_review_or_uncited_sibling_rows_do_not_count(self):
+        with _mock_get_all([
+            {"document_id": "doc-1", "cfr_refs": ["21 CFR 211"], "review_status": "needs_review"},
+            {"document_id": "doc-1", "cfr_refs": [], "review_status": "accepted"},
+        ]):
+            self.assertEqual(svc.fetch_cited_sibling_docs(_BASE_URL, _SERVICE_KEY, ["doc-1"]), set())
+
+    def test_no_candidates_means_no_sibling_query(self):
+        rows = [_row("f-1", _PROMOTABLE_TEXT, ["21 CFR 211.67"])]
+        with _mock_get_all(rows) as g, mock.patch.object(svc.requests, "patch"):
+            svc.run_promote(_BASE_URL, _SERVICE_KEY, dry_run=True)
+        self.assertEqual(g.call_count, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

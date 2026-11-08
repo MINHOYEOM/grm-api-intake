@@ -21,9 +21,11 @@
   ④ 첫 실행 → 이력 시작점('seed')으로만 표시한다. 'listed'(신규 등재)를 수천 건 쏟지 않는다.
   ⑤ 갱신 주기 미검증 → 매 실행 Last-Modified·문서 Published Date 를 스냅샷 행에 남긴다(주기 실측용).
 
-접속: www.accessdata.fda.gov 는 www.fda.gov 와 달리 Akamai 봇차단에 걸리지 않는다. 2026-11-08
-  `requests` + 저장소 기본 UA(grm_common.DEFAULT_USER_AGENT)로 두 페이지 모두 HTTP 200 실측
-  (curl 아님 — 수집기가 실제로 쓰는 클라이언트로 쟀다). 막히면 우회하지 말고 실패로 보고한다.
+접속: 한국 PC(가정·사무실 회선)에서는 `requests` + 저장소 기본 UA(grm_common.DEFAULT_USER_AGENT)로
+  두 페이지 모두 HTTP 200(2026-11-08 실측). ★GitHub 러너(Azure IP)에서는 www.accessdata.fda.gov
+  호스트 전체가 Akamai abuse-detection 으로 HTTP 404("FDA Apology")다(같은 날 진단 실행 —
+  cms_ia·Drugs@FDA·루트 전부, UA 무관). 그래서 워크플로 schedule 은 꺼 두었다. 막히면 우회하지
+  말고 실패(failure_kind=fetch)로 보고한다.
 
 쓰기 게이트(둘 다 참일 때만 Supabase 에 쓴다):
   - CLI `--apply`

@@ -12,10 +12,17 @@ name: GRM FDA Import Alert Snapshot (66-40 / 66-41)
 # ★첫 실제 쓰기 = 이력 시작점(seed). 신규 등재(listed) 폭주 없음.
 # ★원문 HTML.gz + 리포트를 90일 아티팩트로 남긴다 — 원천에 해제일이 없어 스냅샷이 유일한 이력이다.
 # ★구조 검증 실패·수집 실패·DB 실패 → exit 2 → schedule 이면 이슈(제목 고정·20시간 스로틀).
+#
+# ★★2026-11-08 schedule 해제 — GitHub 러너(Azure IP)에서는 www.accessdata.fda.gov 전체가
+#   Akamai abuse-detection 으로 HTTP 404("FDA Apology")다. cms_ia 뿐 아니라 Drugs@FDA·루트까지
+#   전부 막히고, 같은 요청이 한국 PC 에서는 200 이다(www.fda.gov·DDAPI·openFDA 는 러너에서 200).
+#   우회(TLS 위장·헤드리스·프록시)는 만들지 않는다. 실행 위치가 정해질 때까지 매일 실패 이슈만
+#   만들지 않도록 cron 을 뺐다. 실행 위치가 생기면 아래 주석을 되살리거나 그 위치에서
+#   `python collect_fda_import_alert.py --apply`(+ENABLE_FDA_IMPORT_ALERT=true)를 돌린다.
+#   dispatch 는 남긴다 — 러너 접속이 풀렸는지 확인하는 용도(dry_run 기본).
+#   schedule:
+#     - cron: '41 21 * * *'   # 매일 21:41 UTC = 06:41 KST
 on:
-  schedule:
-    # 매일 21:41 UTC = 06:41 KST. grm-intake(18:17 UTC)·findings 백필(00/06/12:17 UTC)과 겹치지 않는다.
-    - cron: '41 21 * * *'
   workflow_dispatch:
     inputs:
       dry_run:

@@ -423,12 +423,18 @@ class Store:
         return h
 
     def has_snapshot(self, alert_no: str) -> bool:
+        return self.latest_snapshot(alert_no) is not None
+
+    def latest_snapshot(self, alert_no: str) -> dict[str, Any] | None:
+        """가장 최근 스냅샷 1행({run_date, sha256}) 또는 None. 멱등·역행 가드가 쓴다."""
         r = self.http.get(f"{self.base}/rest/v1/import_alert_snapshot",
-                          params={"alert_no": f"eq.{alert_no}", "select": "id", "limit": "1"},
+                          params={"alert_no": f"eq.{alert_no}", "select": "run_date,sha256",
+                                  "order": "run_date.desc", "limit": "1"},
                           headers=self._h(), timeout=60)
         if r.status_code != 200:
             raise SupabaseError(f"snapshot read HTTP {r.status_code}: {r.text[:200]}")
-        return bool(r.json())
+        rows = r.json()
+        return rows[0] if rows else None
 
     def load_listing(self, alert_no: str) -> dict[str, dict[str, Any]]:
         out: dict[str, dict[str, Any]] = {}
@@ -489,6 +495,69 @@ def fetch_page(alert_no: str) -> tuple[bytes, dict[str, str]]:
     raise RuntimeError(f"fetch failed: {url} ({last})")
 
 
+# ── 중계(relay) 입력 — PC 가 받은 원문을 러너가 파싱·적용한다 ─────────────────────────
+# 러너(데이터센터 IP)는 accessdata 가 막혀 있어서(모듈 독스트링 '접속'), 한국 PC 가 원문만 받아
+# 비공개 저장소 grm-ops 에 올리고 러너가 그것을 내려받아 이 수집기로 적용한다
+# (fda_import_alert_relay.py · grm-fda-import-alert.yml source=ops).
+# manifest.json 이 계약이다 — sha256·bytes 는 **압축 전 원문 HTML** 기준(스냅샷 sha256 과 같은 값).
+RELAY_SCHEMA = "grm-fda-import-alert-relay/v1"
+RELAY_MANIFEST = "manifest.json"
+
+
+def relay_file_name(alert_no: str) -> str:
+    return f"{alert_no}.html.gz"
+
+
+class RelayError(RuntimeError):
+    pass
+
+
+def load_relay_dir(html_dir: Path) -> tuple[dict[str, Any], Callable[[str], tuple[bytes, dict[str, str]]]]:
+    """manifest 를 읽고, 경보별 원문을 sha256·크기 검증 후 돌려주는 fetch 함수를 만든다.
+
+    검증 실패는 그 경보의 fetch 실패(failure_kind=fetch)가 된다 — 깨진·잘린 파일로 쓰지 않는다.
+    """
+    mpath = html_dir / RELAY_MANIFEST
+    try:
+        manifest = json.loads(mpath.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise RelayError(f"manifest 읽기 실패: {mpath} ({exc})") from exc
+    if manifest.get("schema") != RELAY_SCHEMA:
+        raise RelayError(f"manifest schema 불일치: {manifest.get('schema')!r}")
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(manifest.get("run_date") or "")):
+        raise RelayError(f"manifest run_date 형식 오류: {manifest.get('run_date')!r}")
+
+    def fetch(alert_no: str) -> tuple[bytes, dict[str, str]]:
+        entry = (manifest.get("files") or {}).get(alert_no)
+        if not entry:
+            raise RelayError(f"manifest 에 {alert_no} 없음")
+        path = html_dir / relay_file_name(alert_no)
+        try:
+            data = gzip.decompress(path.read_bytes())
+        except (OSError, EOFError, gzip.BadGzipFile) as exc:
+            raise RelayError(f"{path.name} 읽기 실패: {exc}") from exc
+        if len(data) != int(entry.get("bytes") or -1):
+            raise RelayError(f"{path.name} 크기 불일치 {len(data)} != {entry.get('bytes')}")
+        if hashlib.sha256(data).hexdigest() != entry.get("sha256"):
+            raise RelayError(f"{path.name} sha256 불일치")
+        return data, {"last_modified": entry.get("last_modified") or "",
+                      "url": entry.get("url") or URL_TMPL.format(page_id=ALERTS[alert_no]["page_id"])}
+
+    return manifest, fetch
+
+
+def build_relay_manifest(run_date: str, fetched_at: str,
+                         pages: dict[str, tuple[bytes, dict[str, str]]]) -> dict[str, Any]:
+    """PC 중계 스크립트가 올리는 manifest. load_relay_dir 와 같은 모듈에 두어 계약이 갈라지지 않게 한다."""
+    return {
+        "schema": RELAY_SCHEMA, "run_date": run_date, "fetched_at": fetched_at,
+        "files": {a: {"file": relay_file_name(a), "sha256": hashlib.sha256(d).hexdigest(),
+                      "bytes": len(d), "last_modified": m.get("last_modified", ""),
+                      "url": m.get("url", "")}
+                  for a, (d, m) in pages.items()},
+    }
+
+
 def run_alert(alert_no: str, *, run_date: str, fetch: Callable[[str], tuple[bytes, dict[str, str]]],
               store: Store | None, write: bool, raw_dir: Path | None) -> dict[str, Any]:
     rep: dict[str, Any] = {"alert_no": alert_no, "failures": [], "warnings": []}
@@ -507,9 +576,11 @@ def run_alert(alert_no: str, *, run_date: str, fetch: Callable[[str], tuple[byte
 
     previous: dict[str, dict[str, Any]] = {}
     seeded = False
+    latest: dict[str, Any] | None = None
     if store is not None:
         try:
-            seeded = store.has_snapshot(alert_no)
+            latest = store.latest_snapshot(alert_no)
+            seeded = latest is not None
             previous = store.load_listing(alert_no) if seeded else {}
         except Exception as exc:  # noqa: BLE001
             rep["failures"].append(f"db_read:{exc}")
@@ -542,6 +613,17 @@ def run_alert(alert_no: str, *, run_date: str, fetch: Callable[[str], tuple[byte
     rep["failures"].extend(f"structure:{f}" for f in fails)
     if fails:
         return rep
+    # ★멱등·역행 가드 — 두 PC 가 같은 날 각각 원문을 넘겨도, 같은 날을 두 번 돌려도 결과가 같다.
+    #   · 같은 날 + 같은 sha256 이 이미 적용됨 → 쓰지 않는다(스냅샷 events 요약을 0 으로 덮지 않게).
+    #   · 최신 스냅샷보다 과거 날짜 → 쓰지 않는다(늦게 도착한 옛 원문이 해제 판정을 되돌리지 않게).
+    #   둘 다 실패가 아니라 skip 이다(exit 0).
+    last_date = str((latest or {}).get("run_date") or "")
+    if last_date and last_date > run_date:
+        rep["skipped"] = f"older_than_latest:{last_date}"
+        return rep
+    if last_date == run_date and (latest or {}).get("sha256") == sha:
+        rep["skipped"] = "already_applied"
+        return rep
     if write and store is not None:
         snapshot = {"sha256": sha, "last_modified": meta.get("last_modified") or None,
                     "page_published": parsed.page_published, "raw_blocks": parsed.raw_block_count,
@@ -573,8 +655,30 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-db", action="store_true", help="DB 읽기도 하지 않는다(빈 상태 기준 diff)")
     ap.add_argument("--run-date", default="", help="기준일 ISO(기본 오늘 UTC)")
     ap.add_argument("--raw-dir", default="", help="원문 HTML.gz 보관 폴더(워크플로 아티팩트용)")
+    ap.add_argument("--html-dir", default="",
+                    help="원천 대신 PC 중계 폴더(manifest.json + <경보>.html.gz)를 읽는다. "
+                         "기준일은 manifest run_date(--run-date 와 다르면 거부)")
     ap.add_argument("--output", default="import_alert_report.json")
     args = ap.parse_args(argv)
+
+    fetch: Callable[[str], tuple[bytes, dict[str, str]]] = fetch_page
+    source = "fetch"
+    if args.html_dir:
+        try:
+            manifest, fetch = load_relay_dir(Path(args.html_dir))
+        except RelayError as exc:
+            print(f"중계 입력 오류: {exc}", file=sys.stderr)
+            Path(args.output).write_text(json.dumps(
+                {"schema_version": SCHEMA_VERSION, "mode": "dry-run", "source": "relay",
+                 "alerts": [], "failures": [f"relay:{exc}"], "failure_kind": "fetch"},
+                ensure_ascii=False, indent=2), encoding="utf-8")
+            return 2
+        if args.run_date and args.run_date != manifest["run_date"]:
+            print(f"--run-date {args.run_date} 와 manifest run_date {manifest['run_date']} 가 다르다",
+                  file=sys.stderr)
+            return 2
+        args.run_date = manifest["run_date"]
+        source = "relay"
 
     run_date = args.run_date or dt.datetime.now(dt.timezone.utc).date().isoformat()
     alerts = [a.strip() for a in args.alerts.split(",") if a.strip()]
@@ -597,11 +701,11 @@ def main(argv: list[str] | None = None) -> int:
     report: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION, "run_date": run_date,
         "mode": "apply" if write else "dry-run", "enabled_flag": enabled,
-        "apply_requested": args.apply, "db_read": store is not None, "alerts": [],
+        "apply_requested": args.apply, "db_read": store is not None, "source": source, "alerts": [],
     }
     raw_dir = Path(args.raw_dir) if args.raw_dir else None
     for a in alerts:
-        report["alerts"].append(run_alert(a, run_date=run_date, fetch=fetch_page, store=store,
+        report["alerts"].append(run_alert(a, run_date=run_date, fetch=fetch, store=store,
                                           write=write, raw_dir=raw_dir))
     failures = [f"{r['alert_no']}:{f}" for r in report["alerts"] for f in r["failures"]]
     report["failures"] = failures
@@ -615,7 +719,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[{r['alert_no']}] 업체 {r.get('firms_unique', '-')}곳(블록 {r.get('raw_blocks', '-')}, "
               f"문서 안 중복 합침 {r.get('merged_duplicate_blocks', '-')}) · 한국 {r.get('korea_firms', '-')}곳 · "
               f"최근 {RECENT_DAYS}일 등재 {r.get('recent', {}).get('firms_listed', '-')}곳 · "
-              f"이벤트 {r.get('events', {})} · 실패 {r['failures'] or '없음'}")
+              f"이벤트 {r.get('events', {})} · 실패 {r['failures'] or '없음'}"
+              + (f" · skip {r['skipped']}" if r.get("skipped") else ""))
     print(f"mode={report['mode']} failures={len(failures)}")
     return 2 if failures else 0
 

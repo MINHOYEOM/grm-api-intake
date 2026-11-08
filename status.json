@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T16:20:00Z",
+ "generated_at": "2026-11-08T20:45:41Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,39 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 42511740726,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-08T18:47:28Z",
+    "updatedAt": "2026-11-08T18:52:54Z",
+    "headBranch": "automation/findings-docs-auto-42418575787",
+    "displayTitle": "chore: refresh findings document pages",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42511740726"
+   },
+   {
+    "databaseId": 42511735502,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-08T18:47:24Z",
+    "updatedAt": "2026-11-08T18:52:47Z",
+    "headBranch": "automation/findings-docs-auto-42418575787",
+    "displayTitle": "Merge branch 'main' into automation/findings-docs-auto-42418575787",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42511735502"
+   },
+   {
+    "databaseId": 42508136055,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-08T18:04:40Z",
+    "updatedAt": "2026-11-08T18:11:57Z",
+    "headBranch": "main",
+    "displayTitle": "Merge pull request #1358 from MINHOYEOM/claude/glossary-fig-daily-202…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42508136055"
+   },
+   {
     "databaseId": 42473404445,
     "status": "completed",
     "conclusion": "success",
@@ -194,39 +227,6 @@
     "headBranch": "main",
     "displayTitle": "feat(ops): 사이트 오류 징후 일일 감시 — Cloudflare 실측 5xx·사이트 경로 404 급증·배포 실패 ->…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42473398676"
-   },
-   {
-    "databaseId": 42472767045,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-08T10:45:29Z",
-    "updatedAt": "2026-11-08T10:50:59Z",
-    "headBranch": "feat/growth-daily-v2",
-    "displayTitle": "feat(growth): 성장 일보 v2 + 주간 검색 개선 리포트 (135)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42472767045"
-   },
-   {
-    "databaseId": 42472697465,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-08T10:44:32Z",
-    "updatedAt": "2026-11-08T10:50:28Z",
-    "headBranch": "feat/growth-daily-v2",
-    "displayTitle": "feat(growth): 성장 일보 v2 — 방문→검색→구독→메일 클릭 한 장 + 주간 검색 개선 리포트 (135)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42472697465"
-   },
-   {
-    "databaseId": 42472482577,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-08T10:41:26Z",
-    "updatedAt": "2026-11-08T10:46:42Z",
-    "headBranch": "feat/site-error-watch",
-    "displayTitle": "feat(ops): 사이트 오류 징후 일일 감시 — Cloudflare 실측 5xx·404 급증·배포 실패 → 개발팀 경보",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42472482577"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -460,11 +460,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 42485603695,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-08T13:34:25Z",
-    "updatedAt": "2026-11-08T13:34:28Z",
+    "updatedAt": "2026-11-08T16:54:10Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42485603695"
@@ -540,6 +540,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 42508120898,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-08T18:04:28Z",
+    "updatedAt": "2026-11-08T18:04:43Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42508120898"
+   },
+   {
     "databaseId": 42455808023,
     "status": "completed",
     "conclusion": "success",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42347686431"
-   },
-   {
-    "databaseId": 42281752284,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-06T19:40:53Z",
-    "updatedAt": "2026-11-06T19:41:06Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42281752284"
    }
   ],
   "grm-cloud-request.yml": [

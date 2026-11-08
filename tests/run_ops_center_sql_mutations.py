@@ -17,12 +17,14 @@ M125 = ROOT / "web/migrations/125_ops_decision_write.sql"
 M126 = ROOT / "web/migrations/126_ops_task_create.sql"
 M127 = ROOT / "web/migrations/127_ops_center_seed_planning.sql"
 M128 = ROOT / "web/migrations/128_ops_measure.sql"
+M131 = ROOT / "web/migrations/131_ops_alarm_tasks.sql"
 DB = "ops_center_test"
 SQL_HOME = "tests/sql/ops_center.sql"
 SQL_DECIDE = "tests/sql/ops_center_decide.sql"
 SQL_TASK = "tests/sql/ops_center_task.sql"
 SQL_PLAN = "tests/sql/ops_center_seed_planning.sql"
 SQL_MEASURE = "tests/sql/ops_center_measure.sql"
+SQL_ALARM = "tests/sql/ops_center_alarm.sql"
 
 # (이름, 파일, 찾을 문자열, 바꿀 문자열) — 찾을 문자열이 없으면 뮤테이션 자체가 낡은 것이므로 실패시킨다.
 MUTATIONS = [
@@ -268,6 +270,42 @@ MUTATIONS_MEASURE = [
 ]
 
 
+# 131 경보 업무 — tests/sql/ops_center_alarm.sql 이 잡아야 한다.
+MUTATIONS_ALARM = [
+    ("neglect boundary inclusive", M131,
+     "and p_now - t.updated_at > interval '3 days'", "and p_now - t.updated_at >= interval '3 days'"),
+    ("neglect 2 days", M131,
+     "and p_now - t.updated_at > interval '3 days'", "and p_now - t.updated_at > interval '2 days'"),
+    ("neglect ignores lane", M131, "     and t.lane = 'inbox'\n", ""),
+    ("neglect flagged twice", M131,
+     "for r in select * from public.ops_alarm_neglected(p_now) n where not n.flagged order by n.issue_number loop",
+     "for r in select * from public.ops_alarm_neglected(p_now) n order by n.issue_number loop"),
+    ("closed issue not completed", M131,
+     "set lane = 'done', done_at = coalesce(done_at, p_now), updated_at = p_now\n     where id = v_task.id and lane <> 'done';",
+     "set updated_at = p_now\n     where id = v_task.id and lane <> 'done';"),
+    ("reopen keeps done", M131, "set lane = 'inbox', done_at = null, started_at = null, secretary_seen_at = null,",
+     "set lane = lane, done_at = done_at, started_at = null, secretary_seen_at = null,"),
+    ("sync resets clock", M131, "    update public.ops_task set title = v_title where id = v_task.id;",
+     "    update public.ops_task set title = v_title, updated_at = p_now where id = v_task.id;"),
+    ("closed unknown issue created", M131,
+     "    if p_state = 'closed' then\n      return jsonb_build_object('ok', true, 'action', 'skipped_closed'",
+     "    if false then\n      return jsonb_build_object('ok', true, 'action', 'skipped_closed'"),
+    ("anon may upsert", M131,
+     "grant execute on function public.ops_alarm_upsert(integer, text, text, text, text[], text, timestamptz) to service_role;",
+     "grant execute on function public.ops_alarm_upsert(integer, text, text, text, text[], text, timestamptz) to service_role, anon;"),
+    ("members read table", M131, "revoke all on public.ops_alarm from public, anon, authenticated;",
+     "revoke all on public.ops_alarm from public;"),
+    ("ops_home admin check removed", M131,
+     "if not coalesce(private.is_admin(), false) then\n    raise exception 'ops_home: admin only'",
+     "if false then\n    raise exception 'ops_home: admin only'"),
+    ("ops_home drops alarms", M131,
+     "return private.ops_home_at(now()) || jsonb_build_object('alarms', private.ops_alarm_summary(now()));",
+     "return private.ops_home_at(now());"),
+    ("url guard removed", M131, "if coalesce(p_url, '') !~ '^https://github\\.com/[^ ]+$' or char_length(p_url) > 300 then",
+     "if false then"),
+]
+
+
 def run(sql: str) -> subprocess.CompletedProcess:
     subprocess.run(["sudo", "-u", "postgres", "dropdb", "--if-exists", DB], cwd=ROOT, check=True)
     subprocess.run(["sudo", "-u", "postgres", "createdb", DB], cwd=ROOT, check=True)
@@ -278,8 +316,9 @@ def run(sql: str) -> subprocess.CompletedProcess:
 def main() -> None:
     originals = {p: p.read_text(encoding="utf-8") for p in (M122, M123, M125, M126, M127)}
     originals[M128] = M128.read_text(encoding="utf-8")
+    originals[M131] = M131.read_text(encoding="utf-8")
     plan = [(SQL_HOME, MUTATIONS), (SQL_DECIDE, MUTATIONS_DECIDE), (SQL_TASK, MUTATIONS_TASK), (SQL_PLAN, MUTATIONS_PLAN),
-            (SQL_MEASURE, MUTATIONS_MEASURE)]
+            (SQL_MEASURE, MUTATIONS_MEASURE), (SQL_ALARM, MUTATIONS_ALARM)]
     try:
         for sql, _ in plan:
             baseline = run(sql)

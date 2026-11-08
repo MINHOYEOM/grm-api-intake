@@ -60,7 +60,7 @@ on:
 
 permissions:
   contents: read
-  issues: write   # 마지막 스텝(주간 스케줄 실패 표면화 이슈) 전용 — 나머지 스텝은 GitHub 에 쓰지 않는다.
+  issues: write   # 마지막 두 스텝(주간 스케줄 실패 이슈 · GMP 새 도메인 감지 이슈) 전용 — 나머지 스텝은 GitHub 에 쓰지 않는다.
 
 concurrency:
   # 자기 자신과만 직렬화한다(일일 크론에 HC 실사 채널이 없으므로 경합 대상이 없다).
@@ -141,11 +141,33 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           python collect_hc_inspection_backfill.py "${ARGS[@]}"
 
+      # [2026-11-08] 원천 이전 감시 — 옛 서버(www.drug-inspections.canada.ca)가 10-31 부터
+      # 모두에게 연결을 끊고, Health Canada 는 새 도메인(drug-inspection-results.canada.ca)으로
+      # DSO·GCP·CTO 만 먼저 옮겼다(GMP 미이전). 재수집 성패와 무관하게 매번 돌려, 실패 경보에
+      # "원천 이전 중"을 적고 GMP 가 새 도메인에 생기면 따로 이슈로 알린다. 읽기 전용·secret 미사용.
+      - name: Check HC GMP migration to the new domain
+        id: migration
+        if: always()
+        run: |
+          python hc_inspection_migration_check.py --output migration_check.json > /dev/null
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          r = json.load(open("migration_check.json", encoding="utf-8"))
+          print(f"verdict={r.get('verdict', 'unknown')}")
+          PY
+
       - name: Write step summary
         if: always()
         run: |
           {
             echo "### GRM Health Canada Inspection Deep Backfill"
+            echo ""
+            echo "원천 이전 판정: \`${{ steps.migration.outputs.verdict }}\` (old_host_ok=옛 서버 정상 · migrating=이전 중·GMP 미이전 · gmp_migrated=새 도메인에 GMP 생김 · unknown=측정 불가)"
+            if [ -f migration_check.json ]; then
+              echo '```json'
+              cat migration_check.json
+              echo '```'
+            fi
             echo ""
             echo "event: \`${{ github.event_name }}\`"
             echo ""
@@ -184,12 +206,35 @@ jobs:
               owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
             });
             const existing = open.find((i) => i.title === title);
+            // [2026-11-08] 원인을 먼저 가른다 — 예전 문구는 무조건 "시크릿 확인"부터 시켜 오진을
+            // 유도했다(10-31 실패의 실제 원인은 원천 서버가 모두에게 연결을 끊는 것이었다).
+            const fs = require('fs');
+            let kind = '';
+            try { kind = JSON.parse(fs.readFileSync('backfill_report.json', 'utf8')).list_failure_kind || ''; } catch (e) { kind = ''; }
+            const verdict = '${{ steps.migration.outputs.verdict }}';
+            let cause;
+            if (kind === 'unreachable' && verdict === 'migrating') {
+              cause = '원인: **원천 이전 중(GMP 미이전)** — 옛 서버가 연결을 끊고, 새 도메인(drug-inspection-results.canada.ca)에는 아직 GMP 가 없다. 코드·시크릿 문제가 아니다. 재실행해도 실패한다 — GMP 가 새 도메인에 생기면 별도 이슈("HC 실사 GMP 새 도메인 감지")가 열린다.';
+            } else if (verdict === 'gmp_migrated') {
+              cause = '원인: **새 도메인으로 이전됨** — 새 도메인에 GMP 흔적이 있다. 수집기를 새 경로로 옮겨야 한다("HC 실사 GMP 새 도메인 감지" 이슈 참조).';
+            } else if (kind === 'unreachable') {
+              cause = '원인: **원천 접속 불가** — 옛 서버 연결이 끊겼다(이전 판정: ' + (verdict || '없음') + '). 일시 장애일 수 있어 다음 스케줄을 본다.';
+            } else if (kind === 'shape_changed') {
+              cause = '원인: **원천 응답 구조 변경** — 목록 응답이 계약(data 배열)과 다르다. 코드 주석의 원천 경로를 확인한다.';
+            } else if (kind === 'http_error') {
+              cause = '원인: **원천 HTTP 오류** — 서버는 응답했지만 4xx/5xx 다. Job Summary 의 errors 를 본다.';
+            } else {
+              cause = '원인: 목록 단계 실패가 아니다(건별 실패·적재 실패·인증). 확인 순서: ① SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 시크릿 ② Job Summary 의 backfill_report.json(errors/failed_ins_numbers).';
+            }
             const body = [
               '주 1회 Health Canada 실사 재수집(grm-hc-inspection-backfill.yml, schedule)이 실패했습니다.',
               '',
               `- 실행: ${runUrl}`,
+              `- 목록 실패 종류: \`${kind || '해당 없음'}\` · 원천 이전 판정: \`${verdict || '없음'}\``,
               '',
-              '확인 순서: ① SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 시크릿 ② HC 목록/상세 API 구조 변경(코드 주석의 원천 경로) ③ Job Summary 의 backfill_report.json(errors/failed_ins_numbers). 재실행은 멱등이라 그대로 dispatch(dry_run=false)로 다시 돌려도 안전하다. 복구되면 다음 스케줄 성공 때 사람이 닫는다.',
+              cause,
+              '',
+              '재실행은 멱등이라 그대로 dispatch(dry_run=false)로 다시 돌려도 안전하다. 복구되면 다음 스케줄 성공 때 사람이 닫는다.',
             ].join('\n');
             if (!existing) {
               await github.rest.issues.create({
@@ -203,6 +248,39 @@ jobs:
             const recent = comments.some((c) => Date.now() - new Date(c.created_at).getTime() < 20 * 3600 * 1000);
             if (!recent) {
               await github.rest.issues.createComment({
-                owner, repo, issue_number: existing.number, body: `여전히 실패 중입니다 (${runUrl}).`,
+                owner, repo, issue_number: existing.number,
+                body: `여전히 실패 중입니다 (${runUrl}). 목록 실패 종류 \`${kind || '해당 없음'}\` · 원천 이전 판정 \`${verdict || '없음'}\`.\n\n${cause}`,
               });
             }
+
+      # [2026-11-08] GMP 가 새 도메인에 생기면 알린다 — 재수집 성패와 무관하다(옛 서버가 살아
+      # 있어도 곧 꺼질 것이므로 이전을 먼저 알아채는 쪽이 싸다). 제목 고정·열린 이슈가 있으면 침묵.
+      - name: Surface GMP appearing on the new domain
+        if: always() && steps.migration.outputs.verdict == 'gmp_migrated'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'HC 실사 GMP 새 도메인 감지';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            if (open.some((i) => i.title === title)) {
+              return;
+            }
+            const fs = require('fs');
+            let evidence = [];
+            try { evidence = JSON.parse(fs.readFileSync('migration_check.json', 'utf8')).gmp_evidence || []; } catch (e) { evidence = []; }
+            const body = [
+              'Health Canada 의약품 GMP 실사 DB 가 새 도메인(drug-inspection-results.canada.ca)에 보인다.',
+              '',
+              `- 실행: ${runUrl}`,
+              ...evidence.map((e) => `- 근거: \`${e}\``),
+              '',
+              '할 일: collect_hc_inspection_backfill.py 의 원천을 새 경로로 옮긴다. 새 앱은 JSON API 가 아니라 서버가 그린 HTML 이고, **중간 인증서를 보내지 않으므로** requests 기본 검증으로는 죽는다(hc_inspection_migration_check.build_ca_bundle 참조). 옛 서버 기준 코드의 이중 슬래시·필드 오타 주석은 새 원천에서 다시 실측한다.',
+            ].join('\n');
+            await github.rest.issues.create({
+              owner, repo, title, body, labels: ['automation-failure'], assignees: [owner],
+            });

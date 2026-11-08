@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-07T22:59:55Z",
+ "generated_at": "2026-11-08T09:28:10Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42418906442,
+    "databaseId": 42467142267,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-08T09:25:43Z",
+    "updatedAt": "2026-11-08T09:25:47Z",
+    "headBranch": "feat/import-alert-pc-relay",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/import-alert-pc-…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42467142267"
+   },
+   {
+    "databaseId": 42467118369,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-08T09:25:23Z",
+    "updatedAt": "2026-11-08T09:25:27Z",
+    "headBranch": "feat/inspection-result-card",
+    "displayTitle": "feat(brief): 실사 결과 카드 공통 틀 — 지적 목록·등급·조치를 앞면으로 (11-16호부터)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42467118369"
+   },
+   {
+    "databaseId": 42466801374,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-07T22:05:03Z",
-    "updatedAt": "2026-11-07T22:11:19Z",
-    "headBranch": "automation/findings-docs-auto-42418575787",
-    "displayTitle": "chore: refresh findings document pages",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42418906442"
+    "createdAt": "2026-11-08T09:20:56Z",
+    "updatedAt": "2026-11-08T09:26:21Z",
+    "headBranch": "feat/deficiency-examples",
+    "displayTitle": "feat(intake): PMDA·MHRA 실사 지적 사례 모음 수집기 + 134 표 — dry-run 기본",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42466801374"
    },
    {
-    "databaseId": 42393097404,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-07T16:47:59Z",
-    "updatedAt": "2026-11-07T16:53:39Z",
-    "headBranch": "claude/issue-1209-analysis-p08pkx",
-    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42393097404"
-   },
-   {
-    "databaseId": 42393071460,
+    "databaseId": 42466797306,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-07T16:47:39Z",
-    "updatedAt": "2026-11-07T16:53:39Z",
-    "headBranch": "claude/issue-1209-analysis-p08pkx",
-    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42393071460"
+    "createdAt": "2026-11-08T09:20:53Z",
+    "updatedAt": "2026-11-08T09:26:22Z",
+    "headBranch": "feat/deficiency-examples",
+    "displayTitle": "Merge branch 'main' into feat/deficiency-examples",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42466797306"
    },
    {
-    "databaseId": 42391308950,
+    "databaseId": 42466792279,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-07T16:26:33Z",
-    "updatedAt": "2026-11-07T16:32:13Z",
+    "createdAt": "2026-11-08T09:20:48Z",
+    "updatedAt": "2026-11-08T09:25:56Z",
     "headBranch": "main",
-    "displayTitle": "feat(intake): 수집기 제외 장부 — 버린 문서의 기록 + 규칙 버전 재판정 (migration 130) (#1367)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42391308950"
-   },
-   {
-    "databaseId": 42388777297,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-07T15:56:20Z",
-    "updatedAt": "2026-11-07T16:01:46Z",
-    "headBranch": "feat/intake-exclusion-ledger",
-    "displayTitle": "feat(intake): 수집기 제외 장부 + 규칙 버전 재판정 (migration 130)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42388777297"
+    "displayTitle": "feat(fda): FDA 실사 지적 조항(citations) 수집기 + 133 표 (dry-run 기본) (#1379)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42466792279"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 42462860881,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-08T08:25:13Z",
+    "updatedAt": "2026-11-08T08:26:13Z",
+    "headBranch": "main",
+    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-06 - 4건 (#1349)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42462860881"
+   },
+   {
     "databaseId": 42419915489,
     "status": "completed",
     "conclusion": "success",
@@ -444,20 +455,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1303 from MINHOYEOM/chore/findings-restore-2026-1…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41555324787"
-   },
-   {
-    "databaseId": 41368835352,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T00:45:16Z",
-    "updatedAt": "2026-11-02T00:45:37Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1272 from MINHOYEOM/chore/findings-restore-2026-1…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41368835352"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 42453763074,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-08T06:12:08Z",
+    "updatedAt": "2026-11-08T06:12:11Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42453763074"
+   },
    {
     "databaseId": 42375898094,
     "status": "completed",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42177558169"
-   },
-   {
-    "databaseId": 42099464221,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-05T20:01:38Z",
-    "updatedAt": "2026-11-05T23:24:05Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42099464221"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -539,6 +539,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 42455808023,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-08T06:41:56Z",
+    "updatedAt": "2026-11-08T06:42:05Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42455808023"
+   },
    {
     "databaseId": 42419901545,
     "status": "completed",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42281752284"
-   },
-   {
-    "databaseId": 42180600788,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-06T07:23:53Z",
-    "updatedAt": "2026-11-06T07:24:03Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42180600788"
    }
   ],
   "grm-cloud-request.yml": [

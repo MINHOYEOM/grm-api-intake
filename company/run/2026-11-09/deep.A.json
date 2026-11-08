@@ -1,0 +1,402 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-09",
+ "shard": "A",
+ "items": {
+  "fda483-196144": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "ISO 5 구역 조제 시스템 설비에 녹과 도장 벗겨짐이 있었고 재도장 후 씰이 페인트로 덮인 것이 관찰되었는데, 같은 날 Oxytocin 30U 500mL 제조가 진행 중이었다.",
+      "citation": "21 CFR 211.67(a)",
+      "risk": "ISO 5 구역의 부식·도장 박리는 입자 오염원이 되어 무균 주사제의 무균성에 직접 영향을 줄 수 있다."
+     },
+     {
+      "observation": "환경 모니터링의 경고·조치 한도가 ISO 5 에 적절하지 않아 핵심 구역에서 미생물이 회수되어도 공식 조사가 요구되지 않는다. 위해성 평가와 문제 미생물 식별도 없었고, QU 는 Serratia marcescens 회수를 최소 위험으로 평가하고 추가 시정조치 없이 종결했다.",
+      "citation": "21 CFR 211.113(b)",
+      "risk": "ISO 5 에서 미생물을 오염으로 취급하지 않으면 무균 보증 체계가 사실상 작동하지 않는다."
+     },
+     {
+      "observation": "Dexmedetomidine 재포장 제품의 사용기한을 제조업체 규격을 벗어난 함량 결과에 근거해 설정했다. 기술 연구 로트 여러 개의 함량이 88.4~93.4% 로 보고되었고 유통 로트도 규격을 벗어났다.",
+      "citation": "21 CFR 211.137",
+      "risk": "데이터가 뒷받침하지 않는 사용기한은 사용 시점에 효능이 낮은 제품이 투여될 수 있음을 의미한다."
+     },
+     {
+      "observation": "함량 시험법이 밸리데이션되지 않았고, 위탁 기관의 ATP 생물발광 무균시험법이 USP <73> 과 동등하다는 증거가 없다.",
+      "citation": "21 CFR 211.165(e)",
+      "risk": "밸리데이션되지 않은 시험법의 결과로는 출고 판정을 신뢰할 수 없다."
+     }
+    ],
+    "inspectional_significance": "9건이 설비 유지관리, 환경 모니터링 체계, QU 감독, 안정성·BUD, 규격 설정, 시험법 밸리데이션, 세척 절차, 기록 검증, 라벨 확인에 걸쳐 있어 체계적 483 이다. 무균 조제 시설에서 ISO 5 구역 설비 부식, 포자 형성균 회수, Serratia marcescens 미조치가 함께 확인되었고, QU 의 감독 실패와 확인자의 사후 서명도 포함된다. 무균성 보증 우려가 크므로 Warning Letter 로 승격될 가능성이 있다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "ISO 5 구역 설비의 녹·도장 박리 상태를 조사하고 해당 기간 제조 로트의 영향을 평가한 뒤 설비를 교체·보수한다.",
+      "환경 모니터링 한도·위해성 평가·문제 미생물 목록을 재정립하고 UDR 2025-10 을 포함한 과거 회수 건을 재조사한다.",
+      "BUD 를 입증된 안정성 데이터로 재설정하고 규격을 벗어난 로트의 영향을 평가하며 시험법을 밸리데이션한다.",
+      "ISO 5 전실에 살포자제 사용을 포함하도록 세척 절차를 개정하고 QA 확인자의 동시 서명과 최종 라벨 검사를 절차에 반영한다."
+     ]
+    },
+    "administrative_risks": "무균 조제 시설의 체계적 지적이 시정되지 않으면 Warning Letter, 제조 중단 요구, 추가 실사와 제품 회수 요구로 이어질 가능성이 있다."
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "설비와 기구가 의약품의 안전성, 확인, 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하기에 적절한 주기로 세척·유지관리되지 않는다.",
+     "detail_ko": "구체적으로, 귀사는 <Redacted B4> 조제 시스템의 ISO 5 등급 구역 내부 설비를 적절히 유지관리하지 못했다. <Redacted B4> 시스템(<Redacted B4> 룸 스위트, 룸 번호 <Redacted B4>) 점검 중 다음 상태가 관찰되었다. 1. 2026년 9월 9일, ISO 5 등급 구역 내 <Redacted B4>의 고정 베이스와, 고정 베이스와 회전부 사이 접합부에서 녹과 도장 벗겨짐으로 보이는 것이 관찰되었다. 또한 2026년 9월 10일에는 베이스가 재도장된 뒤 <Redacted B4> 베이스의 붉은색 씰이 페인트로 덮인 것으로 보였다. 2. 2026년 9월 9일, ISO 5 등급 구역 내 <Redacted B4>의 고정 베이스에서 광범위한 녹과 도장 벗겨짐으로 보이는 것이 관찰되었으며, 접합부의 심한 열화와 부식이 포함되었다. 또한 2026년 9월 10일에는 베이스가 재도장된 뒤 붉은색 씰이 페인트로 덮인 것으로 보였다. 2026년 9월 9일 귀사는 Oxytocin 30U를 500mL"
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "무균을 표방하는 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화되지 않았고 준수되지도 않는다.",
+     "detail_ko": "구체적으로, 귀사의 환경 모니터링(EM) 프로그램은 시설에서 회수된 미생물의 식별, 평가 및 취해야 할 시정조치를 적절히 다루지 않는다. 예를 들어, A. SOP 6.22 rev 04 환경 모니터링 프로그램에 따라 귀사는 분류된 구역의 공기 및 표면 시료 채취와 작업자 모니터링에 대해 미생물 오염 경고 및 조치 한도를 설정했으나, 이는 ISO 5 등급 구역에 적절하지 않다. 표면 시료 경고(<Redacted B4> CFU) 및 조치(<Redacted B4> CFU) 수준은 <Redacted B4> 격리 셀(containment cell)과 전실(vestibule)을 포함한 핵심 ISO 5 구역에서 미생물이 회수되어도 공식 조사, 시정조치 또는 예방조치가 요구되지 않도록 허용한다. ISO 5 환경의 시료에서는 미생물 오염물이 검출되지 않아야 하며, 이러한 핵심 구역에서의 모든 회수는 공식 조사와 시정조치로 이어져야 한다. B. 귀사는 환경 모니터링 시료 채취 위치를 정당화하기 위한 시설 위해성 평가를 수행하지 않았고, 문제가 될 수 있는 미생물(objectionable microorganism)도 식별하지 않았다. C. 귀사는 적절히 하지 못했다"
+    },
+    {
+     "number": "3",
+     "deficiency_ko": "품질관리부서의 책임과 절차가 문서화되어 있지 않고 충분히 준수되지도 않는다.",
+     "detail_ko": "구체적으로, A. 귀사의 품질부서(QU)는 <Redacted B4> ISO 5 격리 셀에서 회수된 미생물 오염에 대해 적절한 감독을 하지 못했고 적절한 시정·예방조치(CAPA)를 이행하지 않았다. 2025년 10월 25일, <Redacted B4>의 표면 시료 <Redacted B4>에서 임상적 의미가 알려진 그람음성 기회감염균 Serratia marcescens가 1 CFU 검출되었다. 이는 일탈 UDR 2025-10으로 문서화되었고, 설정된 EM 경고·조치 한도 이내의 경향이탈(OOT) 통계적 이상치로 분류되었다. QU는 이 사건을 중대(major)로 분류하면서도 위험도는 최소로 평가했다. QU는 조사에서 해당 물질이 '일탈 감지 전에 폐기되어 시험할 수 없었다'고 명시했음에도, 추정 근본 원인이 '조제 중 유입된 오염 물질'이라는 조사 결론을 승인했다. QU는 이 사건이 '산발적 환경 오염'이며 '현 시점에서 추가 시정조치는 필요하지 않다'는 결론을 승인했다. QU는 재발 방지를 위한 체계적 조치가 이행되도록 보장하지 못했으며, 유일한 조치는"
+    },
+    {
+     "number": "4",
+     "deficiency_ko": "의약품에 의도한 사용 시점에 확인, 함량, 품질 및 순도의 해당 기준에 부합함을 보장하는 적절한 안정성 데이터로 정해진 유효기한이 표시되어 있지 않다.",
+     "detail_ko": "구체적으로, 귀사는 완제의약품 Dexmedetomidine HCl 20 mcg/5 mL을 10mL 주사기로 재포장한 제품의 사용기한(BUD)을 제조업체가 정한 규격을 벗어난 함량(assay) 규격에 근거해 설정했다. 귀사는 이 재포장 제품에 상온(CRT)에서 <Redacted B4>일, 냉장 조건에서 일의 BUD를 부여했으나 이 기간을 뒷받침하는 데이터가 없다. 예를 들어, 다음 기술 연구 로트는 제조업체 규격에 따른 역가 시험에서 불합격했다. • 상온 로트 <Redacted B4>(2026년 2월 8일 조제): <Redacted B4>일차 함량 결과 89.7% • 상온 로트 <Redacted B4>(2026년 2월 9일 조제): <Redacted B4>일차 함량 결과 92.6% • 냉장 로트 <Redacted B4>(2026년 4월 15일 조제): <Redacted B4>일차 함량 결과 93.4% • 냉장 로트 <Redacted B4>(2026년 4월 16일 조제): <Redacted B4>일차 함량 결과 88.4%. 더 나아가, 상업적으로 유통된 로트 DEXM2020260204(2026년 2월 4일 조제)는 <Redacted B4>일차 함량 결과 93.4%로 보고되어 제조업체가 정한 규격을 벗어났다."
+    },
+    {
+     "number": "5",
+     "deficiency_ko": "시험실 관리에 의약품이 확인, 함량, 품질 및 순도의 적절한 기준에 부합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격의 설정이 포함되어 있지 않다.",
+     "detail_ko": "구체적으로, A. 귀사는 완제 조제의약품 Azithromycin 500mg in 250mL Dextrose 5% IV Bag에 대해 2022년 8월 19일자로 pH 규격을 <Redacted B4>로 설정했으나, 2025년 12월 3일 적절한 과학적 근거나 뒷받침 데이터 없이 규격을 <Redacted B4>로 확대했다."
+    },
+    {
+     "number": "6",
+     "deficiency_ko": "시험법의 정확성, 감도, 특이성 및 재현성이 확립·문서화되지 않았다.",
+     "detail_ko": "구체적으로, A. 재포장 완제의약품 Dexmedetomidine HCl 20 mcg/5 mL 시험에 사용된 함량 시험법은 밸리데이션되지 않았다. 위탁 시험기관에서 받은 2026년 8월 7일자 시험성적서 QUF-414-VJ는 역가 시험법이 비 cGMP 분석 프로토콜 하에서 시스템 적합성 요건을 충족했으며, 해당 시료에 대해 제품별 시험법 밸리데이션은 수행되지 않았음을 나타낸다. 위탁 시험기관은 또한 보고된 규격이 참고용으로만 제공되었으며, 규격과 분석·보고된 결과가 시험 대상 제품에 적절한지 확인할 책임은 귀사에 있다고 밝혔다. 귀사는 이 제품 시험에 사용된 방법이 적절히 밸리데이션되었음을 보여주는 어떤 증거도 제시하지 못했다. B. 귀사는 완제의약품 무균시험을 ATP 생물발광법을 사용하는 제3의 시험기관에 위탁한다. 2025년 8월 이후 USP <73>이라는 확립된 방법이 시행되었으나, 귀사는 해당 시험기관의 ATP 생물발광법이 USP <73>과 동등함을 입증하는 증거를 보유하고 있지 않다."
+    },
+    {
+     "number": "7",
+     "deficiency_ko": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 설비와 기구의 세척 및 유지관리에 대한 문서화된 절차가 수립되지 않았거나 준수되지 않는다.",
+     "detail_ko": "구체적으로, A. 귀사의 <Redacted B4> 세척 절차는 <Redacted B4> 조제 시스템의 ISO 5 전실 구역을 세척·소독할 때 살포자제(sporicidal) 제제의 사용을 정하지 않아 미흡하다. 작업자는 이 전실에서 구성품, 용기 및 마개를 각 시스템에 장입하기 전에 세척한다. 귀사의 세척 절차에는 전실을 <Redacted B4>로 세척했다고 기록하는 세척 기록지만 있다. 절차는 작업자가 ISO 5 전실의 세척 과정에서 살포자제 세척제를 사용하도록 요구하지 않는다. 2026년 5월 15일 환경 모니터링 중 귀사는 ISO 5 <Redacted B4> 전실 두 곳에서 내생포자 형성 미생물인 Bacillus spp.를 회수했다. 귀사의 절차는 ISO 5 전실에 내생포자 형성 미생물이 없도록 살포자제 사용을 요구하지 않는다. B. 귀사의 <Redacted B4> 세척 절차는 <Redacted B4> 조제 시스템의 ISO 5 전실 구역을 세척·소독할 때 작업자가 따라야 할 과정을 정하지 않아 미흡하다."
+    },
+    {
+     "number": "8",
+     "deficiency_ko": "세척 및 유지관리를 이중 확인하는 사람이 설비 세척·사용 기록에 날짜를 기입하거나 서명 또는 이니셜을 하지 않고 있다.",
+     "detail_ko": "구체적으로, 귀사는 <Redacted B4> 및 <Redacted B4> 청정실의 세척 작업이 수행된 시점에 그 세척이 이루어졌음을 확인하지 못했다. 귀사의 문서화 우수 관리 기준(GDP) 절차는 중요 단계나 작업을 제2의 확인자가 검증하도록 요구하며, 제2의 확인자는 해당 단계 전체를 지켜보았음을 나타내도록 작업 수행 시점에 서명/이니셜과 날짜를 기입해야 한다. 귀사의 <Redacted B4> 세척 기록 및 <Redacted B4> 룸 세척 기록은 세척 작업을 수행한 작업자가 각 양식을 작성하고 서명/이니셜 및 날짜를 기입하도록 요구한다. 양식은 또한 QA가 각 세척 작업이 수행되었음을 확인하고 서명/이니셜 및 날짜를 기입하도록 요구한다. 세척 기록에서 QA 확인자가 세척 작업 수행 며칠 후에 이니셜과 날짜를 기입한 사례가 여러 건 관찰되었다. QA 확인자는 세척 작업이 수행된 시점에 양식에 이니셜과 날짜를 기입하지 않았다. 예를 들어, • 2026년 8월 25일 작업자들이 <Redacted B4> 및 <Redacted B4>와 <Redacted B4> 룸 <Redacted B4> 및 <Redacted B4> 룸 <Redacted B4>을 세척했다."
+    },
+    {
+     "number": "9",
+     "deficiency_ko": "포장 완료 단계에서 대표 단위 시료에 대한 올바른 표시(라벨링)의 육안 검사가 수행되지 않았다.",
+     "detail_ko": "구체적으로, 귀사는 완제의약품의 올바른 라벨링을 확인하기 위한 대표 시료의 육안 검사를 하지 않았다. 귀사의 육안 검사 프로그램은 주사기 및 IV 백 제품에 대해 누출, 입자, 금속, 섬유, 모발 등의 결함을 100% 육안 검사하도록 요구한다. 검사자는 각 제품의 배치 제조 기록에 포함된 육안 검사 작업지시서에 검사 결과를 기록한다. 귀사의 절차는 검사자가 완제의약품의 올바른 라벨링을 육안으로 검사하도록 요구하지 않는다. 귀사의 육안 검사 작업지시서에도 완제품 라벨링을 육안으로 검사한 내용이 나타나 있지 않으며, 여기에는 Heparin Sodium 500U into 500mL 0.9% NaCl IV Bags(로트 HEPA500020260824) 및 Phenylephrine HCl 40mg into 250mL 0.9% NaCl IV Bags(로트 PHEN4020260824, PHEN4020260825, PHEN4020260826)의 작업지시서가 포함된다."
+    }
+   ]
+  },
+  "fda483-196224": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "시험실 관리가 부적절하다. 출고시험용 표준품에 일부 휘발성 유사체 피크가 없었고, 시험 전후 시료 접근 통제가 없었으며, 환경 모니터링 배지의 성장촉진시험을 하지 않았고, 'extra' 표시의 방치된 GC 바이알의 출처 확인 요청이 있었다.",
+      "citation": "21 CFR 211.160(b)",
+      "risk": "표준품과 시료 관리가 통제되지 않으면 출고 시험 결과의 신뢰성과 데이터 무결성을 보장할 수 없다."
+     },
+     {
+      "observation": "세척 절차가 밸리데이션되지 않았다. API 충전 설비의 세척 밸리데이션이 없고, 캠페인 배치 수가 일정하지 않으며, 2015~2020년 사용한 시험법의 LOQ 가 잔류물 규격에 적합하지 않았다.",
+      "citation": "21 CFR 211.67(a)",
+      "risk": "입증되지 않은 세척은 이전 제품 잔류물에 의한 교차오염을 놓칠 수 있다."
+     },
+     {
+      "observation": "변경관리 시스템을 거치지 않은 변경이 있었다. 공조 시스템 교체와 세척 밸리데이션 시험법·잔류 한도 변경에 대해 변경관리를 하지 않은 근거가 없었고, 배지 보관 조건 변경의 영향 확인 절차도 없었다.",
+      "citation": "21 CFR 211.100(a)",
+      "risk": "통제 없는 변경은 제품 품질에 미치는 영향을 평가하지 않은 채 공정·시험 조건을 바꾸는 결과를 낳는다."
+     }
+    ],
+    "inspectional_significance": "6건에 걸쳐 시험실 관리, 용수 규격, 세척 밸리데이션, 변경관리, 공정 밸리데이션, 원료 입고 절차가 지적되어 품질 시스템 전반이 문제 되는 체계적 483 에 가깝다. 세척 밸리데이션 시험법이 5년간 적합하지 않았다는 지적과 방치된 시료·바이알 관련 관찰은 데이터 무결성 우려로 이어질 가능성이 있다. API 제조소이므로 시정 미흡 시 Warning Letter 나 Import Alert 로 승격될 가능성이 있다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "시험실 표준품 적격성 평가와 시료 접근 통제를 정비하고 방치된 시료·바이알의 출처와 처리를 조사한다.",
+      "세척 밸리데이션을 재수행하고 LOQ 가 잔류물 규격을 충족하는 시험법으로 과거 결과를 소급 평가한다.",
+      "변경관리 대상 범위를 재정의하고 변경관리를 거치지 않은 변경을 소급하여 평가한다.",
+      "용수 규격에 B. cepacia 시험을 포함할지 위해성 평가로 판단하고 공정 밸리데이션 프로토콜에 핵심 공정 파라미터를 명시한다."
+     ]
+    },
+    "administrative_risks": "체계적 지적이 시정되지 않으면 Warning Letter, Import Alert 등재, OAI 분류 및 재실사로 이어질 가능성이 있다."
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "시험실 관리(Laboratory Controls)가 부적절하다.",
+     "detail_ko": "구체적으로, a) 함량 및 휘발성 유사체 출고시험에 사용되는 표준품(working standard)이 해당 휘발성 유사체의 피크를 항상 포함하지는 않는다. 표준품 적격성 평가 시 요건 중 하나는 모든 피크의 존재를 확인하는 것이나, XANGAPT 상업 로트 분석 중 주입한 표준품에는 각 휘발성 유사체의 해당 머무름 시간에 모든 피크가 나타나지 않는다. b) 시험 대상으로 지정되지 않은 시료와 시험이 완료된 시료에 대한 접근 통제가 제한되어 있지 않다. 또한 2023년 9월 11일 QC 시험실 바닥에서 출고된 배치의 시험 완료 시료가 시험 진행 중인 시료 옆에 보관된 것이 관찰되었다. 업체는 시험 완료 시료를 분석자 적격성 평가에 사용할 예정이므로 폐기하지 않았다고 구두로 밝혔으나, 이를 뒷받침하는 문서는 없었다. c) 해당 사업장은 API 충전실의 환경 모니터링에 사용하는 배지에 대해 성장촉진시험(growth promotion)을 수행하지 않는다. d) 2023년 9월 11일, GC 23 독립 장비 근처 시험실에 'extra'라고 표시된 충전된 GC 바이알이 방치되어 있는 것을 관찰했으며, 해당 바이알의 출처를 요청했을 때"
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "API 제조에 사용되는 물의 규격이 그 물이 의도한 용도에 적합함을 입증하지 못한다.",
+     "detail_ko": "구체적으로, 세척 및 후속 공정에 사용되는 물의 규격에는 물 시스템에서 B. cepacia가 없음을 확인하는 시험이 포함되어 있지 않다."
+    },
+    {
+     "number": "3",
+     "deficiency_ko": "세척 절차가 밸리데이션되지 않았다.",
+     "detail_ko": "구체적으로, a) 업체는 API를 용기에 충전하는 데 사용되는 설비의 세척 절차에 대한 밸리데이션을 수행하지 않았다. b) 절차 MSE18-33은 제조 설비의 세척을 요구하나, 설비에서 제조되는 연속 배치 수는 일정하지 않다. 예를 들어, 2020년 10월 15일 세척 재밸리데이션 연구를 평가하기 위해 수행된 캠페인은 일정 수의 배치로 구성되었으나, 직전 제조 캠페인은 그와 다른 수의 로트로 구성되었다. c) 세척 유지시간(clean hold time)을 포함한 벌크 용기의 세척 밸리데이션 연구에는 적절한 미생물 수준을 판단하기 위한 시료가 포함되어 있지 않다. d) 사용된 (물질)의 제거 여부를 이 방법으로 확인한 결과는 해당 물질이 제거된 수준으로 감소했음을 나타낼 만큼 민감하지 않다. e) 2015년부터 2020년까지 세척 밸리데이션 시료 평가에 사용한 시험법의 LOQ가 잔류물 규격보다 높았다. 따라서 이 시험법은 해당 기간 동안 세척 밸리데이션 시료의 평가에 적합하지 않았다."
+    },
+    {
+     "number": "4",
+     "deficiency_ko": "중간체 또는 API의 생산 및 관리에 영향을 줄 수 있는 변경이 항상 공식 변경관리 시스템으로 처리되지는 않는다.",
+     "detail_ko": "구체적으로, a) 다음 변경은 변경관리 시스템으로 처리되지 않았다(목록은 전수가 아님): 피팅룸의 공조(AC) 시스템 변경 — 업체는 동일 규격의 장치로 교체하는 것이어서 변경관리를 실행하지 않았다고 밝혔으나, 변경 시점에 기존 장치와 신규 장치의 비교가 문서화되지 않아 변경관리를 하지 않은 근거가 없었다. 2023년 8월 6일에는 세척 밸리데이션 린스 시료 평가에 사용하는 UQSE20-19 시험법이 더 낮은 LOD와 LOQ를 얻도록 변경되었고 설비 잔류물 한도도 변경되었으나, 이 변경을 변경관리 프로그램으로 수행하지 않은 이유가 문서화되지 않았다. b) QC가 사용하는 배지의 보관 조건을 냉장에서 실온으로 바꾸기 위한 변경관리 CCQ22-17은 보관 조건 변경이 시험에 미치는 영향을 업체가 확인할 것이라고 기재하고 있다. 그러나 이 확인을 어떻게 수행할지에 대한 단계, 프로토콜 또는 지침이 없었다. 또한 2023년 9월 15일, 배지가 보관되는 방의 온도를 모니터링할 교정된 장치가 없는 것이 관찰되었다."
+    },
+    {
+     "number": "5",
+     "deficiency_ko": "재밸리데이션 연구 수행을 위한 밸리데이션 프로토콜이 핵심 공정 단계를 명시하지 않는다.",
+     "detail_ko": "공정 밸리데이션 연구에 평가 대상이 될 핵심 공정 파라미터가 나타나 있지 않으며, 배치 기록 검토 결과 밸리데이션 연구에 설정된 범위 내 파라미터 변동이 포함되지 않았다. 또한 흐름 제어에 사용되는 타이머 등의 파라미터가 핵심 공정 파라미터로 정의되어 있지 않다."
+    },
+    {
+     "number": "6",
+     "deficiency_ko": "원료 입고 절차가 부적절하다."
+    }
+   ]
+  },
+  "fda483-196225": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "품질관리부서의 확인시험 완료 및 출고 승인 전에 핵심 원료를 API 제조에 사용했다. 원문에 든 세 사례 모두 출고 승인 이전에 원료가 API 로트 제조에 투입되었다.",
+      "citation": "21 CFR 211.84(a)",
+      "risk": "출고 승인 전 원료를 쓰면 확인되지 않은 원료가 API 에 들어갈 수 있어 품질 보증의 기본 관문이 무력해진다."
+     },
+     {
+      "observation": "안정성 시험에 안정성 지시 방법이 아닌 적정 함량 시험법을 사용했고, 이 가속 안정성 데이터를 유효기간 설정에 썼다. 이 방법이 불순물·분해산물을 검출한다는 데이터도 없었다.",
+      "citation": "21 CFR 211.166(a)",
+      "risk": "분해산물을 검출하지 못하는 방법으로 정한 유효기간은 저장 중 품질 저하를 놓칠 수 있다."
+     },
+     {
+      "observation": "공급업체 COA 에 기재된 시험 항목을 모두 수행하지 않았다. 외관·비중·순도·강열잔분·수분·이물 등이 기재된 COA 에 대해 일부 항목만 검증했다.",
+      "citation": "21 CFR 211.84(d)(2)",
+      "risk": "COA 신뢰성을 완전히 확인하지 않으면 공급업체 시험 결과를 근거로 한 원료 승인이 위험해진다."
+     },
+     {
+      "observation": "API 생산 설비와 기구의 세척·유지관리가 부적절했다. 물 호스 내부의 적갈색 변색, 시료채취실 저울 외부의 흰색 분말 잔류물이 관찰되었고 시료채취실 세척 활동은 문서화되지 않았다.",
+      "citation": "21 CFR 211.67(a)",
+      "risk": "청결하지 못한 설비 표면은 API 오염과 교차오염의 경로가 될 수 있다."
+     }
+    ],
+    "inspectional_significance": "4건이 원료 출고 전 사용, 안정성 시험법 부적합, COA 검증 미흡, 설비 청결이라는 서로 다른 시스템에 걸쳐 있다. 특히 출고 승인 전 사용이 여러 로트에서 반복되었다는 점과 안정성 시험법이 모든 안정성 시험에 쓰였다는 점은 개별 실수가 아니라 품질 시스템 전반의 문제로 해석될 가능성이 있다. 이로 인해 해당 제조소는 Warning Letter 나 Import Alert 로 승격될 가능성이 있으나, 원문에 승격을 직접 언급하는 문장은 없다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "품질관리부서의 출고 승인 전 원료 사용이 가능한 구조적 원인을 조사하고, 원료 상태를 시스템에서 통제하는 방법을 도입한다.",
+      "모든 안정성 시험을 대상으로 안정성 지시 방법으로 재평가하고, 이미 설정된 유효기간을 재검토한다.",
+      "공급업체 COA 검증 프로그램을 재설계하여 기재된 시험 항목 전체를 검증하거나 축소 근거를 문서화한다.",
+      "설비·시료채취 도구의 세척 주기와 기록을 정비하고 호스 등 변색 부위의 오염 가능성을 평가한다."
+     ]
+    },
+    "administrative_risks": "해외 API 제조소로서 시정이 확인되지 않으면 Warning Letter, Import Alert 등재, OAI 분류와 후속 재실사 가능성이 있다. 이미 미국 시판 API 로 출하된 로트에 대한 영향 평가를 요구받을 수 있다."
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "업체의 생산부서가 품질관리부서의 확인시험(identification testing) 완료 및 원료 출고 승인 이전에 핵심 원료를 제조 공정에 사용했다.",
+     "detail_ko": "예를 들어, (b)(4) 로트는 2023년 7월 12일 입고·채취되었고 확인시험은 2023년 8월 3일부터 8월 8일까지 수행되어 2023년 8월 9일 품질관리부서가 출고 승인했으나, 해당 원료는 2023년 7월 31일 (b)(4) API 로트의 제조에 사용되었다. 다른 (b)(4) 로트는 2023년 7월 28일 입고·채취되었고 확인시험은 2023년 8월 3일 수행되었으나, 해당 원료는 마찬가지로 2023년 7월 31일 (b)(4) API 로트의 제조에 사용되었다. 또 다른 (b)(4) 로트는 2022년 6월 13일 입고·채취되었고 확인시험은 2022년 6월 18일 수행되었으나, 해당 원료는 2022년 6월 19일 (b)(4) API 로트의 제조에 사용되었다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "업체의 안정성 프로그램이 부적절했다. QC 시험실이 (b)(4)의 함량(assay) 시험에 안정성 지시(stability-indicating) 방법을 사용하지 않았다. QC 시험실은 업체가 수행한 (b)(4) API 제품 전체의 모든 안정성 시험에 적정(titration) 방법을 함량 시험으로 사용하며, 여기에는 미국 시판 API가 포함된다. 예를 들어, 업체는 (b)(4) API 가속 안정성 시험에 적정 함량 시험법을 사용했고, 이 가속 안정성 시험 데이터는 이후 제품의 유효기간 설정에 이용되었다.",
+     "detail_ko": "업체는 적정 함량 시험법이 안정성 지시 방법이라는 점, 또는 API의 유효기간 동안 불순물이나 분해산물을 검출할 능력이 있다는 점을 뒷받침하는 데이터를 보유하고 있지 않다."
+    },
+    {
+     "number": "3",
+     "deficiency_ko": "원료 공급업체 시험성적서(COA)에 대한 검증 시험이 부적절하다. 업체가 해당 공급업체 COA에 기재된 모든 시험 항목을 수행하지 않았다.",
+     "detail_ko": "예를 들어, 공급업체의 (b)(4) 로트 COA에는 외관, 비중 등의 시험이 기재되어 있으나, 업체의 해당 공급업체 COA 검증 시험에는 비중 등 일부만 포함되었다. 다른 공급업체의 (b)(4) 로트 COA에는 순도, 강열잔분, 수분, 이물 등의 시험이 기재되어 있으나, 업체의 해당 COA 검증 시험에는 순도와 강열잔분만 포함되었다."
+    },
+    {
+     "number": "4",
+     "deficiency_ko": "미국 시장용 API 생산에 사용되는 설비와 기구가 원료의약품의 안전성, 확인, 함량, 순도 및 품질을 변화시킬 수 있는 오염을 방지하기에 적절한 주기로 세척·유지관리되지 않았다.",
+     "detail_ko": "예를 들어, 보관 용기(RT-8)로 물을 보내는 물 호스 내부에서 적갈색 변색이 관찰되었다. 이 호스는 (b)(4)가 빠져나가지 않도록 용기 천장으로 물을 펌핑하는 데 사용되며, 해당 보관 용기는 (b)(4) API 제조에 사용된다. 또한 (GM-5)로 가는 물 호스 내부에서도 적갈색 변색이 관찰되었다. 이 호스들은 용기 내부를 냉각하기 위해 물을 펌핑하는 데 사용되며, 해당 용기는 (b)(4) API 제조에 사용된다. 시료채취실 내 Kubota 저울 외부에서는 흰색 분말 잔류물이 관찰되었다. 이 저울은 (b)(4) API 제조에 쓰이는 핵심 원료의 칭량에 사용된다. 경영진 설명에 따르면 저울은 세척된 것으로 보고되었으나, 업체는 시료채취실 내 세척 활동을 전혀 문서화하지 않고 있다. 업체는 제조 공정 중 시료채취 도구를 사용하며, 이 도구는 초기 공정의 여러 지점에서 사용된다. 경영진 설명에 따르면, 시료채취"
+    }
+   ]
+  },
+  "fda483-196246": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "중대·예상치 못한 이상사례의 15일 신속보고를 하지 않았다. 입원에 이른 소비자 보고를 업체 스스로 중대·신속보고 대상으로 분류하고도 환자 식별정보가 없다며 비유효로 재분류했으나, 사례 서술서에는 12일간의 임상 경과가 담겨 식별 가능한 환자 기준을 충족했다. 같은 소셜미디어 출처의 3건에도 건별 의학적 검토 없이 같은 분류를 적용했다.",
+      "risk": "중대한 이상사례의 FDA 보고 지연·누락은 안전성 신호 탐지를 늦추고 환자 안전에 직접 영향을 줄 수 있다."
+     },
+     {
+      "observation": "소셜미디어 모니터링으로 확인되는 시판 후 이상사례의 감시·접수·평가·FDA 보고에 관한 문서화된 절차가 SKYTROFA 와 YORVIPATH 에 대해 없다.",
+      "risk": "절차가 없으면 보고 대상 판단이 담당자 재량에 맡겨져, 이번과 같은 비유효 일괄 분류가 반복될 수 있다."
+     }
+    ],
+    "inspectional_significance": "약물감시(시판 후 이상사례 보고) 지적이며 제조 품질 관찰이 아니다. 업체 자체 분류와 서술서가 보고 대상임을 보여 주는데도 비유효로 재분류했고, 같은 분류를 3건에 일괄 적용했으며 관련 절차도 없다는 점에서 단발 누락이 아니라 체계적 문제로 평가될 가능성이 있다. 소셜미디어 출처의 개별 환자 사례가 비유효로 걸러졌다면 같은 방식으로 처리된 다른 사례가 더 있을 수 있어 범위 확대 가능성이 있다. 원문에 Warning Letter 승격 여부를 적은 문장은 없다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "소셜미디어 출처에서 비유효로 분류한 모든 사례를 건별 의학적 검토로 다시 평가하고 보고 대상은 지연 사유와 함께 FDA 에 제출한다.",
+      "환자 식별 가능성 판단 기준을 포함해 시판 후 이상사례 감시·접수·평가·보고 절차를 신설하고 SKYTROFA·YORVIPATH 에 적용한다.",
+      "소셜미디어 모니터링으로 들어오는 건의 분류·검토 책임자와 재분류 승인 체계를 정한다.",
+      "지연 보고 사례에 대한 소급 검토와 CAPA 를 문서화한다."
+     ]
+    },
+    "administrative_risks": "신속보고 누락과 절차 부재가 시정되지 않으면 약물감시 관련 Warning Letter 와 후속 실사로 이어질 가능성이 있다. 소급 검토에서 추가 미보고 사례가 확인되면 추가 지적과 시정 요구가 따를 수 있다."
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "중대하면서 예상치 못한(serious and unexpected) 이상사례가 모두 최초 정보 접수 후 15일(역일) 이내에 FDA에 보고되지는 않았다.",
+     "detail_ko": "구체적으로, 2025년 6월 13일 업체는 Yorvipath 사용 후 입원에 이른 사례를 기술한 소비자의 자발적 보고를 접수했다. 업체 자체 분류(2025년 6월 16일 완료)는 이 사례를 중대(입원)·예상치 못함·신속보고 대상으로 판단했다. 그러나 업체는 이후 환자 식별정보가 없다는 이유로 이 사례를 비유효(non-valid)로 재분류했다. 업체 자체의 사례 서술서에는 검사 수치, 병원 응급처치, 입원 치료를 포함한 단일 환자의 12일간 연속 임상 경과가 기록되어 있어 식별 가능한 환자의 기준을 충족했다. 이 사례에 대해 15일 신속보고는 FDA에 제출되지 않았다. 더 나아가, 2025년 6월 18일자 업체 내부 서신은 동일한 소셜미디어 출처의 다른 이상사례 보고 3건에 대해서도 비유효 분류를 일괄 적용했음을 확인해 준다. 이들 3건은 업체 운영팀이 이미 개별 환자 이상사례 보고로 식별했던 것이며, 보고자 이메일 주소와 환자 정보가 없다는 이유로 건별 의학적 검토 없이 분류되었다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "시판 후 이상사례의 감시, 접수, 평가 및 FDA 보고에 관한 문서화된 절차가 없다.",
+     "detail_ko": "구체적으로, SKYTROFA 및 YORVIPATH에 대해 소셜미디어 모니터링으로 확인된 시판 후 이상사례를 체계적으로 감시·접수하고 FDA에 보고하도록 보장하는 문서화된 절차가 없다."
+    }
+   ]
+  },
+  "fda483-196250": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "observation": "방법 밸리데이션 시험의 일부가 원시 기록에 문서화되지 않았다. 전혈 내 안정성 평가에서 1·2·4시간 실온 배양 시점을 뒷받침하는 시간 기록이 없었고, 운송·단기 안정성 시험에서도 유사한 결함이 확인되었다.",
+      "citation": "21 CFR 211.194(a)",
+      "risk": "시험 조건(배양 시간)을 입증할 원시 기록이 없으면 밸리데이션 결과의 신뢰성과 ALCOA+ 준수를 증명할 수 없다."
+     },
+     {
+      "observation": "SOP Q053698 을 지키지 않았다. 확인 시험 8회차에 불합격 안정성 QC 만이 아니라 새 QC 전체 세트를 넣었고, P&A 9회차는 SOP 가 정한 평균 %RE 계산 없이 육안 평가로 불합격 처리했다. 조사관 요청으로 계산하자 9회차는 기준 이내였다.",
+      "citation": "21 CFR 211.100(b)",
+      "risk": "합격·불합격 판정 기준을 임의로 적용하면 유효한 시험 회차가 폐기되거나 부적절한 회차가 채택되어 밸리데이션 결론이 왜곡된다."
+     }
+    ],
+    "inspectional_significance": "관찰은 2건으로 적고, 생물분석 방법 밸리데이션(시험 기록의 시간 근거 부재, SOP 미준수)에 한정된다. 다만 판정 기준이 SOP 와 다르게 적용되고 기록이 시험 조건을 뒷받침하지 못한다는 점에서 단발 실수를 넘어 시험 데이터 관리 체계의 문제로 읽힐 가능성이 있다. 이 483 은 제조 공정이 아니라 밸리데이션 시험 데이터 신뢰성에 관한 지적이므로, 해당 방법으로 생산된 분석 결과의 활용 범위에 따라 중대도가 달라질 수 있다. 원문에는 Warning Letter 승격을 시사하는 표현이 없고, 회신 내용에 따라 후속 조치가 결정될 가능성이 있다.",
+    "required_remediation": {
+     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
+     "items": [
+      "시간 기록이 없는 안정성(전혈·운송·단기) 시험 전체를 식별하고 해당 시험의 유효성을 재평가한다.",
+      "SOP Q053698 9.8.2항·5.1항 위반 회차(확인 시험 8회차, P&A 9회차)에 대해 일탈 조사를 열고 판정을 재검토한다.",
+      "원시 기록에 시험 시점·시간을 남기는 절차를 보완하고, 같은 유형의 다른 밸리데이션 연구까지 소급 검토한다.",
+      "합격 기준 계산을 분석자 판단이 아닌 계산값으로 적용하도록 SOP 와 교육을 정비하고 CAPA 로 문서화한다."
+     ]
+    },
+    "administrative_risks": "회신이 미흡하거나 같은 유형이 다른 연구에서도 확인되면 후속 실사와 추가 자료 요청이 이어질 수 있고, 지적이 시정되지 않으면 Warning Letter 로 이어질 가능성이 있다. 해외 시설이므로 시정이 확인되지 않을 경우 해당 시설과 연관된 제출 자료의 신뢰성 평가에 영향을 줄 수 있다."
+   },
+   "observations_ko": [
+    {
+     "number": "1",
+     "deficiency_ko": "모든 방법 밸리데이션 활동이 시험 원시 기록(source records)에 문서화되지는 않았다.",
+     "detail_ko": "예를 들어, 전혈 내 분석물질의 안정성을 실온에서 1시간, 2시간, 4시간 배양한 뒤 평가했으나, 원시 기록에는 해당 배양 시점을 뒷받침하는 시간 기록(time stamp)이 없었다. 운송(shipping) 및 단기 안정성 시험에서도 유사한 지적 사항이 관찰되었다."
+    },
+    {
+     "number": "2",
+     "deficiency_ko": "방법 밸리데이션 시험을 수행하는 동안 기존 표준작업절차서(SOP)가 항상 준수되지는 않았다.",
+     "detail_ko": "예를 들어, 2a. SOP Q053698 9.8.2항은 이후의 확인(confirmatory) 시험에는 불합격한 안정성 QC만 포함해야 한다고 규정하나, 확인 시험 8회차에는 7회차의 불합격 안정성 QC만 넣는 대신 새로운 안정성 QC 전체 세트가 포함되었다. 2b. SOP Q053698 5.1항은 농도(QC) 수준별로 평균 상대오차 백분율(%RE)을 산출하여 정밀도·정확도(P&A) 시험 회차의 합격·불합격 판정에 사용해야 하며, 평균 %RE 값이 LLOQ와 ULOQ 수준에서 25%, 그 밖의 모든 QC 수준에서 20%를 초과하면 해당 P&A 회차를 불합격 처리해야 한다고 규정한다. 그러나 P&A 9회차는 계산된 평균 %RE 값이 아니라 육안 평가에 근거해 불합격 처리되었다. 조사관의 요청으로 실사 중 평균 %RE 값을 산출한 결과, 9회차는 평균 %RE 값이 모든 QC 수준에서 기준 이내였음에도 잘못 불합격 처리되었음이 확인되었다."
+    }
+   ]
+  },
+  "142f18a0ab47": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "21 CFR 81.30(d)",
+      "original": "Based on our review of batch records and product labels, your “Brush Buddies Cookies ‘n Cream Ice Cream Flavored Toothpaste” contains the color additive “CI 14720” (also known as Ext. D&C Red No. 10 or Acid Red No. 14 or Food Red 3 or Carmoisine or Azorubine (E122)). In 1966, FDA cancelled the certification and delisted Ext. D&C Red No. 10 due to lack of safety data from any manufacturer. Under 21 CFR 81.30(d), using Ext. D&C Red No.10 after October 4, 1966, results in the drug being adulterated. Any color additive not explicitly listed as safe for its intended use is deemed unsafe within the meaning of section 721(a) of the FD&C Act. The inclusion of a delisted color additive in your drug product formulation indicates that your quality unit’s review (as required under 21 CFR 211.22) of your raw material qualification process and formulation review procedures are inadequate to ensure that only acceptable ingredients are used in the manufacture of drug products, especially those marketed to children.",
+      "description": "배치 기록과 제품 라벨을 검토한 결과, 어린이와 성인이 모두 쓰는 'Brush Buddies Cookies ‘n Cream Ice Cream Flavored Toothpaste' 에 색소 'CI 14720'(Ext. D&C Red No. 10 등으로도 불림)이 들어 있었다. FDA 는 1966년 안전성 자료 부족으로 Ext. D&C Red No. 10 의 인증을 취소하고 목록에서 삭제했으며, 21 CFR 81.30(d) 에 따라 1966년 10월 4일 이후 이를 사용하면 의약품은 불량(adulterated)이 된다. 안전한 용도로 명시적으로 목록에 오르지 않은 색소는 FD&C Act 721(a) 상 안전하지 않은 것으로 간주된다. 삭제된 색소가 제형에 포함된 것은 21 CFR 211.22 가 요구하는 품질부서의 원료 적격성 평가와 처방 검토 절차가, 특히 어린이용 제품에서 허용 가능한 성분만 쓰도록 보장하기에 미흡함을 보여 준다.",
+      "risk": "어린이가 쓰는 치약에 삭제된 색소가 들어갔다면 안전성이 입증되지 않은 성분에 대한 노출이 발생하며 제품 전체의 회수와 수입 거부로 이어질 수 있다."
+     },
+     {
+      "citation": "21 CFR 211.194(a)",
+      "original": "During the inspection, we observed multiple media plates with (b)(4) for (b)(4) samples in your incubator with visible microbiological growth. However, on the next day, during plate reading and result recording, there was no visible microbiological growth on plates labeled as the same samples observed the day before. Additionally, we identified multiple discrepancies between the labeling of the sample identification information handwritten on the exterior of the plates from one day to the subsequent day. Microbiological monitoring and testing are essential quality control steps that are integral to ensure raw materials are adequate for use. Such programs provide critical information on the state of control of the manufacturing operation. Substitution of unreliable or false results fundamentally compromises a facility’s ability to identify risks to the drug product. In your response, you indicate that an investigation into the falsified results concluded that the “… transposition of plates …” was a deliberate but isolated act by the microbiologist to circumvent your procedure. You state that you retrained the microbiologists to recognize when a plate should be considered Too Numerous To Count (TNTC), introduced a tamper evident seal for the plate, implemented color coding to differentiate the negative control plate from the product or component sample, and mandated that all microbiological plate reading must be performed by two analysts concurrently prior to data entry. Your response is inadequate since you fail to address the severity of the observed data integrity violation for the falsification and alteration of the microbiological test results. Your proposed corrective actions address the data integrity breaches as isolated procedural gaps rather than as evidence of a systemic breakdown in quality unit (QU) oversight and a deficient quality culture.",
+      "description": "실사 중 배양기 안의 여러 배지 평판에서 미생물 성장이 눈에 보였으나, 이튿날 판독·결과 기록 시에는 전날 같은 시료로 표시된 평판에서 성장이 보이지 않았다. 평판 외부에 손으로 쓴 시료 식별 정보도 전날과 다음 날 사이에 여러 곳이 달랐다. 미생물 모니터링과 시험은 원료가 사용에 적합한지 보증하는 필수 품질관리 단계이며 제조 공정의 관리 상태에 관한 핵심 정보를 제공한다. 신뢰할 수 없거나 허위인 결과로 대체하면 시설이 의약품에 대한 위험을 식별하는 능력이 근본적으로 훼손된다. 업체는 회신에서 허위 결과에 대한 조사가 '평판의 바꿔치기'를 미생물 담당자가 절차를 우회하려 한 의도적이나 고립된 행위로 결론지었다고 밝히고, 미생물 담당자 재교육, 평판에 대한 개봉 방지 씰 도입, 음성 대조 평판과 제품·원료 시료 평판을 구분하는 색상 코딩, 데이터 입력 전 분석자 2명이 동시에 모든 평판을 판독하도록 하는 조치를 제시했다. FDA 는 이 회신이 미생물 시험 결과의 위조·변조라는 관찰된 데이터 무결성 위반의 심각성을 다루지 않아 미흡하다고 평가했다. 제안된 시정조치는 데이터 무결성 위반을 품질부서(QU) 감독의 체계적 붕괴와 미흡한 품질 문화의 증거가 아니라 고립된 절차상 공백으로 다룬다는 것이다.",
+      "risk": "미생물 시험 결과가 위조·변조되었다면 원료와 제품의 미생물 품질에 대한 모든 판정이 의심되며, 이미 유통된 제품의 안전성 평가가 불가능해진다."
+     },
+     {
+      "citation": "21 CFR 211.84(d)(1)",
+      "original": "You failed to perform adequate identity testing for each component lot used in the production of your OTC drug products. You relied on the certificates of analysis (COAs) from your suppliers and failed to establish the reliability of each of your suppliers’ COA for component specifications and characteristics. Products Contain Ingredients at Risk for Diethylene Glycol or Ethylene Glycol (DEG or EG) Contamination You manufacture multiple toothpaste drug products (intended for adults and children) that contain sorbitol solution. You failed to adequately test your incoming components at high risk of DEG and EG contamination for identity before using them to manufacture your drug products. For example, during the inspection, you provided our investigators with one COA with independent identity testing results, including DEG and EG, out of approximately (b)(4) shipments of sorbitol solution. Identity testing, including DEG and EG, is required for each lot that you receive. The use of ingredients contaminated with DEG or EG has resulted in various lethal poisoning incidents in humans worldwide.",
+      "description": "OTC 의약품 제조에 쓴 각 원료 로트에 대해 적절한 확인시험을 하지 않았고, 공급업체 시험성적서(COA)에 의존하면서 각 공급업체 COA 의 규격·특성 항목에 대한 신뢰성을 확립하지 않았다. 성인과 어린이용 치약 여러 종에 들어가는 소르비톨 용액처럼 디에틸렌글리콜(DEG)·에틸렌글리콜(EG) 오염 위험이 큰 원료를 제조에 쓰기 전에 확인시험으로 적절히 검사하지 않았다. 실사 중 소르비톨 용액 입고 건 가운데 DEG·EG 를 포함한 독립 확인시험 결과가 있는 COA 는 하나만 제시되었다. DEG·EG 를 포함한 확인시험은 입고되는 모든 로트에 필요하다. DEG 나 EG 로 오염된 성분의 사용은 전 세계에서 여러 차례 치명적인 중독 사고를 일으켰다.",
+      "risk": "DEG·EG 에 오염된 소르비톨이 어린이용 치약에 쓰였을 가능성을 배제할 수 없어 사용자 안전에 직결되는 위험이다."
+     },
+     {
+      "citation": "21 CFR 211.22",
+      "original": "Your QU failed to exercise its authority and responsibilities over your drug manufacturing operations, including ensuring the data integrity of your records. For example, the QU failed to ensure: (b)(4) was suitable for its intended use (21 CFR 211.100). An adequate training program for your microbiology laboratory employees that objectively evaluated competency and proficiency results to assess training effectiveness (21 CFR 211.25(c)). Adequate laboratory controls that include scientifically sound and appropriate specifications, standards, sampling plans, and test procedures (21 CFR 211.160(b)).",
+      "description": "품질부서(QU)는 기록의 데이터 무결성 확보를 포함해 의약품 제조 운영에 대한 권한과 책임을 행사하지 못했다. 예를 들어 QU 는 (b)(4) 이 의도한 용도에 적합함을 보장하지 못했고(21 CFR 211.100), 미생물 시험실 직원이 역량과 숙련도를 객관적으로 평가해 교육 효과를 판단하는 적절한 교육 프로그램을 보장하지 못했으며(21 CFR 211.25(c)), 과학적으로 타당하고 적절한 규격·기준·시료 채취 계획·시험 절차를 포함한 적절한 시험실 관리를 보장하지 못했다(21 CFR 211.160(b)).",
+      "risk": "QU 가 기능하지 않으면 데이터 무결성, 교육, 시험실 관리 전반에서 같은 유형의 결함이 재발하고 출하 판정의 신뢰성이 사라진다."
+     }
+    ],
+    "fda_evaluation": "FDA 는 업체의 2026년 5월 11일자 기록 요청 회신과 2026년 6월 25일자 483 회신을 상세히 검토하고도 두 가지 점에서 회신이 미흡하다고 평가했다. 첫째, 미생물 평판 위조에 대해 개별 절차상 공백으로만 접근해 QU 감독 붕괴와 품질 문화 문제로 다루지 않았고 이미 미국에 유통된 제품 품질에 대한 영향 평가도 부족했다. 둘째, 소르비톨 용액에 대한 확인시험 개선안은 이전 확인시험 근거를 새로 제시하지 못했고 글리세린·폴리에틸렌글리콜 등 다른 고위험 성분은 다루지 않았다. FDA 는 CGMP 컨설턴트 선임과 6개 시스템 감사를 권고했고, 이 업체의 모든 의약품은 2026년 9월 3일 수입경보 66-40 에 올랐으며 업체는 2026년 9월 10일 유효기간 내 치약 전 제품을 자발적으로 회수했다.",
+    "required_remediation": {
+     "deadline": "서신 수령 후 15영업일 이내 서면 회신(FEI 3020826443 표기)",
+     "items": [
+      "시험실 관행·절차·방법·설비·문서·감독·분석자 역량에 대한 포괄적이고 독립적인 평가와 시험실 시스템 개선·효과성 평가 계획을 제출한다.",
+      "미생물 시료의 고유 라벨, 취급자 서명, 보관 연속성, 판독 시점 디지털 시간기록 사진 등을 포함한 시료 인수 및 추적 CAPA 를 수립한다.",
+      "소르비톨 용액을 포함한 고위험 성분 보관분의 DEG·EG 시험 결과를 서신일로부터 30일 이내 제출하고, 유효기간 내 관련 제품 위해성 평가와 필요 시 고객 통보·회수를 실시한다.",
+      "각 성분 로트의 확인시험(최소 1개 특이 시험)과 공급업체 COA 의 초기 및 주기적 재검증 체계를 수립한다.",
+      "QU 에 권한과 자원이 부여되도록 평가·개선 계획을 세우고, 데이터 무결성 전반에 대한 독립 조사와 전체 CAPA 전략(연 1회 이상 외부 감사 2년 이상 포함)을 제시한다.",
+      "모든 제형에 대해 색소 사용의 적절성(대체 명칭 포함)을 점검하는 위해성 평가를 제출한다."
+     ]
+    },
+    "administrative_risks": "FDA 는 이미 이 업체의 모든 의약품을 수입경보 66-40 에 올렸고, 위반이 완전히 해결되어 CGMP 준수가 확인될 때까지 신규 신청서·보충서류 승인을 보류할 수 있다. 위반이 시정되지 않으면 FD&C Act 801(a)(3) 에 따라 해당 제조소 제품의 미국 반입이 계속 거부될 수 있고 재실사가 이어질 수 있다."
+   },
+   "violations_ko": [
+    {
+     "number": "1",
+     "statement_ko": "업체는 시험 규격과 기준을 준수하는지 확인하는 데 필요한 모든 시험에서 도출된 완전한 데이터가 시험실 기록에 포함되도록 보장하지 못했다 (21 CFR 211.194(a))."
+    },
+    {
+     "number": "2",
+     "statement_ko": "업체는 의약품 성분의 확인(identity)을 검증하기 위한 시험을 최소 1개도 수행하지 않았다. 또한 성분 공급업체의 시험 분석 결과의 신뢰성을 적절한 주기로 검증하고 확립하지 못했다 (21 CFR 211.84(d)(1) 및 211.84(d)(2))."
+    },
+    {
+     "number": "3",
+     "statement_ko": "업체의 품질관리부서는 제조된 의약품이 CGMP 를 준수하고 확인(identity), 함량(strength), 품질(quality), 순도(purity)에 대해 확립된 규격을 충족하도록 보장할 책임을 이행하지 못했다 (21 CFR 211.22)."
+    }
+   ]
+  },
+  "admin-2026007737": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "「약사법」제38조제1항",
+      "description": "의약품 제조업자는 제조 시 의약품 제조 및 품질관리기준을 지켜야 하고, 자사 기준서 '불만처리 규정(문서번호: KBP-G021)' 에 따라 품질보증부서는 불만 접수 시 작성한 불만조사보고서 또는 불만 보고서를 제조부서 및 품질부서(보증)책임자, 고객불만처리위원회 위원장이 검토하도록 해야 하나 그러지 않았다.",
+      "risk": "자사 기준서가 정한 불만 검토 절차를 지키지 않으면 불만에서 드러난 품질 문제가 정상 경로로 평가되지 못한다.",
+      "original": "의약품 제조업자는 의약품 제조 시 의약품 제조 및 품질관리기준  준수하여 자사 기준서 ‘불만처리 규정(문서번호: KBP-G021)’에 따라, 품질보증부서는 불만 접수 시 작성된 불만조사보고서 또는 불만 보고서를 제조부서 및 품질부서(보증)책임자, 고객불만처리위원회 위원장의 검토를 받아야함에도 불구하고,"
+     },
+     {
+      "citation": "「의약품 등의 안전에 관한 규칙」제48조제9호가목[별표1]",
+      "description": "글로스타정10밀리그램(아토르바스타틴칼슘수화물)(제조번호: AR003) 에 대해 접수된 불만을 처리하면서 품질부서책임자가 주관하지 않고 처리한 사실이 있다.",
+      "risk": "불만 처리를 품질부서책임자가 주관하지 않으면 특정 로트의 불만이 독립적인 품질 판단 없이 종결될 수 있다.",
+      "original": "동 업체는 ‘글로스타정10밀리그램(아토르바스타틴칼슘수화물)(제조번호: AR003)’에 대하여 접수된 불만을 처리하면서 품질부서책임자가 주관하지 않고 처리한 사실이 있음"
+     }
+    ],
+    "disposition_basis": "해당 품목(글로스타정10밀리그램, 허가번호 제70호) 제조업무정지 1개월(2026. 11. 12. ~ 2026. 12. 11.) 처분이다. 처분 사유는 의약품 제조업자의 준수사항 등 규정 위반이며, 적용법령은 「약사법」제38조제1항 및 「의약품 등의 안전에 관한 규칙」제48조제9호가목[별표1] 의약품 제조 및 품질관리기준, 그리고 「약사법」제76조 및 같은 규칙 제95조 관련 [별표8]Ⅱ.개별기준 제25호다목3) 이다. 최종처분일자는 20261029 로 원문에 표시되어 있다.",
+    "required_remediation": {
+     "deadline": "제조업무정지 기간: 2026. 11. 12. ~ 2026. 12. 11.",
+     "items": [
+      "정지 기간 동안 해당 품목(글로스타정10밀리그램)의 제조업무를 중단한다.",
+      "불만처리 규정(KBP-G021)에 따른 불만 검토 절차에서 품질부서책임자 주관과 검토 서명이 누락되지 않도록 절차를 점검한다.",
+      "제조번호 AR003 불만 건을 포함해 최근 접수한 불만의 처리 기록을 소급 검토한다."
+     ]
+    },
+    "administrative_risks": "원문에 따르면 이번 처분은 약사법 제76조 및 규칙 [별표8] 개별기준에 따른 것이므로, 같은 유형의 위반이 반복되면 같은 기준표에 따라 가중된 처분을 받을 가능성이 있다. 원문에는 공개종료일자 20270310 이 표시되어 있다."
+   }
+  },
+  "admin-2026007895": {
+   "deep_analysis": {
+    "key_violations": [
+     {
+      "citation": "약사법」 제62조 제11호",
+      "description": "'큐레이드(벤잘코늄염화물반창고(1회용))' 등 제품을 수거하여 검사한 결과 '형상(폭)' 과 '인장강도' 시험항목이 부적합했다.",
+      "risk": "기준에 부적합한 형상과 인장강도로 출하된 제품은 품질 기준을 충족하지 못한 제품이 유통되었음을 뜻한다.",
+      "original": "'큐레이드(벤잘코늄염화물반창고(1회용))‘ 등 제품의 수거·검사 결과 ’형상(폭)‘, ’인장강도‘ 시험항목 부적합"
+     },
+     {
+      "citation": "「약사법」 제76조 제1항 제4호",
+      "description": "처분은 「약사법」 제76조 제1항 제4호 및 「의약품 등의 안전에 관한 규칙」 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제39호 가목 11) 규정에 의한 것이다.",
+      "risk": "개별기준에 따라 정해진 처분이므로 같은 항목이 반복 부적합이면 같은 기준표로 가중될 수 있다.",
+      "original": "-「약사법」 제76조 제1항 제4호 및 「의약품 등의 안전에 관한 규칙」 제95조 [별표8] 행정처분의 기준 Ⅱ. 개별기준 제39호 가목 11) 규정에 의한 처분"
+     }
+    ],
+    "disposition_basis": "해당 품목(큐레이드(벤잘코늄염화물반창고(1회용)), 아쿠아밴드멸균형) 제조업무정지 15일(2026.11.18.~2026.12.2.) 이다. 사유는 수거·검사 결과 '형상(폭)', '인장강도' 시험항목 부적합이며, 적용법령은 「약사법」 제62조 제11호 및 같은 법 제66조, 제76조 제1항 제4호와 「의약품 등의 안전에 관한 규칙」 제95조 [별표8] Ⅱ. 개별기준 제39호 가목 11) 이다. 최종처분일자는 20261104 로 표시되어 있다.",
+    "required_remediation": {
+     "deadline": "제조업무정지 기간: 2026.11.18. ~ 2026.12.2.",
+     "items": [
+      "정지 기간 동안 해당 2개 품목의 제조업무를 중단한다.",
+      "'형상(폭)' 과 '인장강도' 시험항목이 부적합한 원인을 조사하고 규격·시험 방법의 적합성을 점검한다.",
+      "정지 해제 전에 해당 품목의 시험 결과가 기준에 적합함을 확인한다."
+     ]
+    },
+    "administrative_risks": "같은 시험항목 부적합이 반복되면 [별표8] 개별기준에 따라 가중된 처분을 받을 가능성이 있다. 처분 공개종료일자는 20270302 로 표시되어 있다."
+   }
+  }
+ }
+}

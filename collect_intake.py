@@ -1738,8 +1738,35 @@ def _mask_api_key(url: str) -> str:
     return re.sub(r"(api_key=)[^&]+", r"\1***REDACTED***", url)
 
 
-def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
+# OpenFDA 가 회수 번호 자리에 넣는 "값 없음" 표기. 이런 번호를 그대로 document_id 로 쓰면
+# 서로 다른 회수가 `OpenFDA Recall::N/A` 하나로 합쳐지고, 빈 번호는 insert_items 에서 통째로
+# 건너뛴다(2026-11-07 수집 완전성 진단).
+_RECALL_NUMBER_PLACEHOLDERS = frozenset({"", "n/a", "na", "none", "null", "unknown", "-", "--"})
+# 대체 키를 이루는 원천 필드 — 한 사건(event_id) 안에서도 제품·lot(code_info)별 레코드가
+# 따로 오므로 둘 다 넣는다. 순서·구성을 바꾸면 이미 적재된 대체 키 행이 다시 들어온다(중복).
+_RECALL_FALLBACK_KEY_FIELDS = ("event_id", "product_description", "code_info",
+                               "recalling_firm", "report_date", "recall_initiation_date")
+
+
+def recall_document_id(r: dict[str, Any]) -> str:
+    """OpenFDA 회수 레코드의 document_id. 정상 회수 번호는 그대로(기존 행과 같은 키).
+
+    번호가 비었거나 "N/A" 류면 원천 필드 해시로 `recall-fb-<16hex>` 를 만든다. 접두사는
+    FDA 회수 번호 형식(`D-0123-2026`)과 겹칠 수 없어 기존 Notion 행과 충돌하지 않는다.
+    원천 필드가 전부 비었으면 빈 문자열(→ 종전처럼 장부에 missing_document_id 로 남는다)."""
     recall_number = str(r.get("recall_number") or "").strip()
+    if recall_number.lower() not in _RECALL_NUMBER_PLACEHOLDERS:
+        return recall_number
+    parts = [re.sub(r"\s+", " ", str(r.get(k) or "")).strip().lower()
+             for k in _RECALL_FALLBACK_KEY_FIELDS]
+    if not any(parts):
+        return ""
+    digest = hashlib.sha1("|".join(parts).encode("utf-8")).hexdigest()[:16]
+    return f"recall-fb-{digest}"
+
+
+def _recall_to_item(r: dict[str, Any], api_query_url: str) -> IntakeItem:
+    recall_number = recall_document_id(r)
     classification = (r.get("classification") or "").strip()
     product = (r.get("product_description") or "").strip()
     reason = (r.get("reason_for_recall") or "").strip()

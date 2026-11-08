@@ -1,0 +1,72 @@
+@@page 9
+9
+Chapter 1 - Deficiency examples
+The deviation procedure lacked sufficient detail to ensure that 
+investigations were appropriately thorough:
+• There was no requirement to identify the impact of the deviation on the 
+batch.
+• There was no process to escalate deviations in a timely manner in the 
+event of an issue having the potential to present a patient safety impact. 
+• There was no procedural requirement to consider if the deviation had 
+occurred previously.  
+• There was no requirement to ensure that process, procedural or systems 
+based errors had not been overlooked prior to identifying ‘Personnel 
+Error’ as a root cause.
+• There was no timeline for completion of the deviations in the procedure 
+(other than ‘in a timely manner’).   
+• The root causes recorded were not always those identified in the 
+procedure.
+@@page 10
+10
+Chapter 1 - Deficiency examples
+• At least 8 overdue CAPA (ranging from 59 days to 242 days overdue) 
+were observed to have been closed the day before the inspection. 
+• Two overdue CAPA were open at the time of the inspection (186 days 
+and 60 days overdue).  
+• Where134 deviations were raised between November 2015 and 
+February 2016, no CAPA were raised.
+• Effective monitoring of CAPA was not in place as numerous CAPA with 
+different due dates could be recorded on a single form but only the latest 
+date was tracked.  
+• The review of effectiveness of CAPAs was identified as being part of 
+Management Review, however there was insufficient detail describing 
+this process and the process was not risk based as the Management 
+Review was only carried out once a year.
+@@page 18
+18
+Chapter 1 - Deficiency examples
+Deficiency related to the return of products:
+The returns procedure did not require verification that the 
+returned goods had been stored under appropriate temperature 
+conditions by the customer prior to the return.
+@@page 99
+99
+0
+0.2
+0.4
+0.6
+0.8
+1
+1.2
+Principle
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+Number of findings 
+Findings Annex 19 per Section
+Total Critical:
+Total Major:
+Total Other:
+@@page 100
+100
+Annex 19 - Deficiency examples
+Deficiency related to procedures and control:
+The arrangements associated with retention samples had not 
+been fully defined.

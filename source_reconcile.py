@@ -57,11 +57,16 @@ KST = ZoneInfo("Asia/Seoul")
 # 없을 수 있다(장부는 그날부터 쌓인다). 그래서 "어디에도 없음"을 곧바로 놓침으로 단정하지 않고 첫 2주는
 # `pre_ledger` 칸으로 따로 센다. 수집기는 창 안 문서를 매일 다시 판정하므로 보통 첫 며칠 안에 장부로 흡수된다.
 LEDGER_ACTIVE_FROM = date(2026, 11, 8)
+# 2026-11 확장에서 **새로 장부를 연결한** 소스(MHRA 경보·ISPE·HC 회수·WHO RSS·식약처 행정처분)의 시작일.
+# 연결 PR 이 머지돼 다음 수집이 돈 날부터 장부가 쌓이므로 그 이전 게시분은 위와 같은 유예를 받는다.
+# 머지가 늦어지면 이 날짜를 머지 다음 날(KST)로 맞춘다 — 시험은 '기존 날짜 이후'만 잠근다.
+LEDGER_EXPANSION_FROM = date(2026, 11, 10)
 PRE_LEDGER_GRACE_DAYS = 14           # 이 기간이 지나면 pre_ledger 칸은 쓰지 않는다(모두 놓침으로 센다)
 DEFERRED_MAX_DAYS = 3                # 미뤄짐이 이 일수를 넘어 같은 문서에 남으면 놓침으로 승격
 DEFAULT_WINDOW_DAYS = 7              # collect_intake --window-days 기본값
 DEFAULT_ENF_WINDOW_DAYS = 30         # MFDS_ENFORCEMENT_WINDOW_DAYS 기본값(지연공개 소스의 창)
 NOTION_DEDUP_MARGIN_DAYS = 3         # Notion Run Date 조회 창 여유(창 시작 이전 수집분 흡수)
+SNAPSHOT_DEDUP_DAYS = 1095           # collect_intake `_SNAPSHOT_DEDUP_WINDOW_DAYS`(ICH·WHO 3년 dedup)와 같은 값
 MAX_LISTED_IN_ISSUE = 40
 HTTP_TIMEOUT = 30
 _UA = "GRM-Intake/1.1 (+github-actions)"   # collect_intake 의 WL·FR 요청과 같은 값
@@ -81,6 +86,7 @@ _CLOSEABLE = frozenset({V_OK, V_QUIET, V_DEFERRED_ONLY, V_DISABLED})   # 이 판
 
 WINDOW_BASE = "base"   # 수집기 기본 창(--window-days, 7)
 WINDOW_ENF = "enf"     # 지연공개 창(MFDS_ENFORCEMENT_WINDOW_DAYS, 30)
+WINDOW_SNAPSHOT = "snapshot"   # 게시일 창이 아니라 "원천 현재 전체 목록 vs 우리 전체(3년)" (ICH·WHO 실사)
 
 ISSUE_LABEL_FAMILY = "reconciliation"   # 기존 주간 reconciliation 과 같은 라벨 계열
 ISSUE_LABEL_PREFIX = "reconcile-"       # + 소스 슬러그 → 라벨에 소스명이 드러난다(담당 팀 자동 배정용)
@@ -97,6 +103,13 @@ class SourceSpec:
     window_kind: str
     flag: str = ""      # 이 ENABLE_* 가 꺼지면 수집기가 안 도는 소스 → disabled
     flag_default: bool = True
+    issue_name: str = ""          # 이슈 제목의 소스 이름 — 같은 Notion source 를 나눠 쓰는 소스(MHRA·MFDS·WHO)만
+    url_dedup: bool = False       # 수집기가 정규화 URL 로도 중복을 막는 소스(ECA·ISPE) — URL 키 일치도 수집됨
+    ledger_from: date | None = None   # 제외 장부가 이 소스에 연결된 날(없으면 LEDGER_ACTIVE_FROM)
+
+    @property
+    def issue_source(self) -> str:
+        return self.issue_name or self.source
 
 
 SPECS: tuple[SourceSpec, ...] = (
@@ -106,6 +119,35 @@ SPECS: tuple[SourceSpec, ...] = (
     SourceSpec("recall", "OpenFDA Recall", "OpenFDA 의약품 회수", "openfda-recall", WINDOW_ENF),
     SourceSpec("mfds_rss", "MFDS", "식약처 RSS 보드", "mfds-rss", WINDOW_BASE, flag="ENABLE_MFDS"),
     SourceSpec("fr", "Federal Register", "Federal Register (FDA)", "federal-register", WINDOW_BASE),
+    # ── 2026-11 확장: 유럽·국제 ───────────────────────────────────────────────────
+    # 수집기 창·플래그·기본값은 grm-intake.yml / collect_intake.main 과 같게 둔다.
+    SourceSpec("ema", "EMA", "EMA RSS(4개 피드)", "ema", WINDOW_BASE),
+    SourceSpec("mhra_blog", "MHRA Inspectorate", "MHRA 실사관 블로그", "mhra-blog", WINDOW_BASE,
+               issue_name="MHRA Inspectorate 블로그"),
+    SourceSpec("mhra_alert", "MHRA Inspectorate", "MHRA 의약품 경보·회수", "mhra-alert", WINDOW_BASE,
+               issue_name="MHRA 의약품 경보·회수", ledger_from=LEDGER_EXPANSION_FROM),
+    SourceSpec("mhra_ncr", "MHRA GMP NCR", "MHRA GMP 부적합(GMDP)", "mhra-gmp-ncr", WINDOW_ENF,
+               flag="ENABLE_MHRA_GMP_NCR", flag_default=False),
+    SourceSpec("eu_ncr", "EU GMP NCR (EudraGMDP)", "EU GMP 부적합(EudraGMDP)", "eu-gmp-ncr", WINDOW_ENF,
+               flag="ENABLE_EU_GMP_NCR", flag_default=False),
+    SourceSpec("pics", "PIC/S", "PIC/S RSS", "pics", WINDOW_BASE),
+    SourceSpec("eca", "ECA Academy", "ECA Academy RSS", "eca", WINDOW_BASE, url_dedup=True),
+    SourceSpec("ispe", "ISPE", "ISPE iSpeak RSS", "ispe", WINDOW_ENF, flag="ENABLE_ISPE",
+               flag_default=False, url_dedup=True, ledger_from=LEDGER_EXPANSION_FROM),
+    SourceSpec("ich", "ICH", "ICH 가이드라인·의견수렴(스냅샷)", "ich", WINDOW_SNAPSHOT,
+               flag="ENABLE_ICH", flag_default=False),
+    SourceSpec("who_rss", "WHO", "WHO PQ RSS", "who-rss", WINDOW_BASE, flag="ENABLE_WHO",
+               flag_default=False, issue_name="WHO PQ RSS", ledger_from=LEDGER_EXPANSION_FROM),
+    SourceSpec("who_insp", "WHO", "WHO 실사 보고서·우려 공지(스냅샷)", "who-inspection", WINDOW_SNAPSHOT,
+               flag="ENABLE_WHO", flag_default=False, issue_name="WHO WHOPIR·NOC"),
+    # ── 2026-11 확장: 식약처 API·HC 회수 ─────────────────────────────────────────
+    # HC 실사(Health Canada Inspection)는 넣지 않았다 — fetch_hc_recall 도크스트링 참조(원천 이전 중).
+    SourceSpec("hc_recall", "Health Canada", "Health Canada 회수·경고", "hc-recall", WINDOW_ENF,
+               flag="ENABLE_HC", flag_default=False, ledger_from=LEDGER_EXPANSION_FROM),
+    SourceSpec("mfds_recall", "MFDS", "식약처 회수·판매중지(API)", "mfds-recall", WINDOW_ENF,
+               flag="ENABLE_MFDS_RECALL", issue_name="MFDS 회수·판매중지"),
+    SourceSpec("mfds_admin", "MFDS", "식약처 행정처분(API)", "mfds-admin", WINDOW_ENF,
+               flag="ENABLE_MFDS_ADMIN", issue_name="MFDS 행정처분", ledger_from=LEDGER_EXPANSION_FROM),
 )
 SPEC_BY_KEY = {s.key: s for s in SPECS}
 
@@ -189,7 +231,11 @@ def noid_document_id(official_url: str, title: str, date_iso: str) -> str:
 
 
 def window_bounds(spec: SourceSpec, run_date: date, base_days: int, enf_days: int) -> tuple[date, date]:
-    """수집기와 같은 창: start = run_date - N일, end = run_date(`date_window`·`enf_start` 와 동일)."""
+    """수집기와 같은 창: start = run_date - N일, end = run_date(`date_window`·`enf_start` 와 동일).
+
+    스냅샷 소스는 게시일 창이 없다 — 우리 쪽 조회 범위(수집기 스냅샷 dedup 3년)를 창으로 표시한다."""
+    if spec.window_kind == WINDOW_SNAPSHOT:
+        return run_date - timedelta(days=SNAPSHOT_DEDUP_DAYS), run_date
     days = enf_days if spec.window_kind == WINDOW_ENF else base_days
     return run_date - timedelta(days=days), run_date
 
@@ -210,12 +256,12 @@ def _days_between(later: date, earlier_iso: str) -> int | None:
         return None
 
 
-def _is_pre_ledger(published: str, run_date: date) -> bool:
-    """장부 연결 전 게시분이고 아직 유예 기간(첫 2주) 안인가."""
-    if run_date >= LEDGER_ACTIVE_FROM + timedelta(days=PRE_LEDGER_GRACE_DAYS):
+def _is_pre_ledger(published: str, run_date: date, active_from: date = LEDGER_ACTIVE_FROM) -> bool:
+    """장부 연결 전 게시분이고 아직 유예 기간(첫 2주) 안인가. `active_from` 은 소스별 장부 연결일."""
+    if run_date >= active_from + timedelta(days=PRE_LEDGER_GRACE_DAYS):
         return False
     try:
-        return date.fromisoformat(published) < LEDGER_ACTIVE_FROM
+        return date.fromisoformat(published) < active_from
     except ValueError:
         return False       # 게시일을 모르면 유예하지 않는다(놓침으로 센다)
 
@@ -231,6 +277,7 @@ def reconcile_source(
     window: tuple[date, date],
     collected: set[str] | None, store_error: str = "",
     ledger: dict[str, LedgerRow] | None = None, ledger_error: str = "",
+    collected_urls: set[str] | None = None,
 ) -> SourceResult:
     """소스 하나의 등식 계산과 판정. `collected` 는 `source::document_id` 집합, `ledger` 는 document_id → 행.
 
@@ -265,6 +312,13 @@ def reconcile_source(
         if f"{spec.source}::{doc.document_id}" in collected:
             counts["collected"] += 1
             continue
+        if spec.url_dedup and collected_urls and doc.url:
+            # 같은 기사가 날짜만 바꿔 재게시되면 키가 달라진다 — 수집기는 정규화 URL 로 중복을 막는다
+            # (`collect_intake._CANONICAL_URL_DEDUP_SOURCES`). 같은 기준으로 '이미 있음'을 센다.
+            from grm_notion import canonical_url_key
+            if canonical_url_key(spec.source, doc.url) in collected_urls:
+                counts["collected"] += 1
+                continue
         row = ledger.get(doc.document_id)
         if row is not None:
             if row.basis == "text_missing":
@@ -291,7 +345,7 @@ def reconcile_source(
             counts["deferred_recent"] += 1
             res.deferred.append(_brief(doc, reason="recent_not_yet_attempted", since=doc.published))
             continue
-        if _is_pre_ledger(doc.published, run_date):
+        if _is_pre_ledger(doc.published, run_date, spec.ledger_from or LEDGER_ACTIVE_FROM):
             counts["pre_ledger"] += 1
             res.pre_ledger.append(_brief(doc))
             continue
@@ -364,7 +418,8 @@ def plan_issues(results: Iterable[SourceResult], *, run_url: str = "") -> list[d
             (크래시를 정상으로 오독해 알람을 스스로 끄는 사고를 막는 기존 관례)."""
     plan: list[dict[str, Any]] = []
     for r in results:
-        base = {"key": r.key, "source": r.source, "title": issue_title(r.source),
+        name = SPEC_BY_KEY[r.key].issue_source if r.key in SPEC_BY_KEY else r.source
+        base = {"key": r.key, "source": r.source, "title": issue_title(name),
                 "labels": [ISSUE_LABEL_FAMILY, ISSUE_LABEL_PREFIX + r.slug], "verdict": r.verdict}
         if r.verdict == V_MISSED:
             plan.append({**base, "action": "open", "body": issue_body(r, run_url),
@@ -587,9 +642,321 @@ def fetch_mfds_rss(start: date, end: date) -> FetchOutcome:
     return FetchOutcome(docs=_dedupe(docs), partial=partial, notes=notes, undated=undated)
 
 
+def rss_docs_from_root(feed_spec: Any, root: Any, feed_name: str, feed_url: str,
+                       start: date, end: date) -> tuple[list[SourceDoc], int]:
+    """RSS/Atom 루트 → 창 안 문서. 반복자·필드 추출·문서 키는 `collect_rss_feed` 와 같은 함수.
+
+    수집기의 `keep_item`(MHRA 의료기기 경보·ISPE 홍보성 글 거르기)은 **적용하지 않는다** — 그 필터가
+    버린 항목은 제외 장부(`not_medicines_alert`·`not_gmp_relevant`)가 설명한다."""
+    import collect_intake as ci
+    docs: list[SourceDoc] = []
+    undated = 0
+    for el in feed_spec.iter_items(root):
+        f = feed_spec.extract(el, feed_name, feed_url)
+        if not f.date_iso:
+            undated += 1
+            continue
+        if not ci._within_window(f.date_iso, start, end):
+            continue
+        docs.append(SourceDoc(document_id=ci._stable_doc_id(feed_spec.source, f.title, f.link, f.date_iso),
+                              url=f.link, title=f.title, published=f.date_iso))
+    return docs, undated
+
+
+def fetch_rss_spec(feed_spec: Any, start: date, end: date) -> FetchOutcome:
+    """`RssFeedSpec` 하나(EMA·MHRA·PIC/S·ECA·ISPE)의 피드 전부. 피드 일부 실패는 partial, 전부 실패는 접속 불가.
+
+    ECA·ISPE 수집기는 HTTP 4xx 를 조용히 건너뛰지만(Expert Secondary 정책) 대조에서는 접속 불가로 드러낸다."""
+    import collect_intake as ci
+    docs: list[SourceDoc] = []
+    notes: list[str] = []
+    failed: list[str] = []
+    undated = 0
+    for feed_name, feed_url in feed_spec.feeds:
+        try:
+            root = ci.http_get_xml(feed_url)
+        except Exception as exc:  # noqa: BLE001
+            failed.append(feed_name)
+            notes.append(f"{feed_name}: {safe_error(exc)}")
+            continue
+        got, n_undated = rss_docs_from_root(feed_spec, root, feed_name, feed_url, start, end)
+        docs.extend(got)
+        undated += n_undated
+    if len(failed) == len(feed_spec.feeds):
+        raise SourceFetchError("; ".join(notes)[:300] or f"{feed_spec.label} 전 피드 실패")
+    partial = bool(failed)
+    if partial:
+        notes.insert(0, f"피드 {len(failed)}/{len(feed_spec.feeds)} 실패({', '.join(failed)}) — 목록이 전수가 아닐 수 있다")
+    return FetchOutcome(docs=_dedupe(docs), partial=partial, notes=notes, undated=undated)
+
+
+def _rss_fetcher(attr: str) -> Callable[[date, date], FetchOutcome]:
+    def _fetch(start: date, end: date) -> FetchOutcome:
+        import collect_intake as ci
+        return fetch_rss_spec(getattr(ci, attr), start, end)
+    _fetch.__name__ = f"fetch_rss_{attr.strip('_').lower()}"
+    return _fetch
+
+
+def fetch_mhra_gmp_ncr(start: date, end: date) -> FetchOutcome:
+    """MHRA GMDP 비준수 성명서 전체 목록 → 상세(발행일) → 창. 클라이언트·키 식(`report_no or slug`)은 수집기 것.
+
+    수집기에는 관련성 필터가 없다(비준수 성명서는 전건 수집). 상세 실패는 수집기가 조용히 건너뛰는 지점이라
+    여기서는 점검일로 창을 판정해 목록에 남긴다 — 수집되지 않았으면 놓침으로 드러난다."""
+    from mhra_gmdp_client import MHRAGmpError, MHRAGmpNCRClient
+    client = MHRAGmpNCRClient()
+    try:
+        records = client.list_noncompliant()
+    except MHRAGmpError as exc:
+        raise SourceFetchError(safe_error(exc)) from None
+    docs: list[SourceDoc] = []
+    notes: list[str] = []
+    detail_failed = 0
+    for rec in records:
+        key = rec.report_no or rec.slug
+        if not key:
+            continue
+        try:
+            client.fetch_detail(rec)
+        except Exception:  # noqa: BLE001 — 상세 실패는 점검일로 창 판정
+            detail_failed += 1
+        date_iso = rec.issue_date or rec.inspection_date or ""
+        if not in_window(date_iso, start, end):
+            continue
+        docs.append(SourceDoc(document_id=key, url=rec.detail_url,
+                              title=getattr(rec, "manufacturer", "") or key, published=date_iso))
+    notes.append(f"비준수 목록 전체 {len(records)}건")
+    if detail_failed:
+        notes.append(f"상세 실패 {detail_failed}건은 점검일로 창 판정")
+    return FetchOutcome(docs=_dedupe(docs), notes=notes)
+
+
+def fetch_eu_gmp_ncr(start: date, end: date) -> FetchOutcome:
+    """EudraGMDP 비준수 보고서 — 서버 측 발행일 창 검색(`list_window`) 결과 전부. 키 = doc_ref(수집기와 같다)."""
+    from eudragmdp_client import EudraGMDPClient, EudraGMDPError
+    try:
+        records = EudraGMDPClient().list_window(start.isoformat(), end.isoformat())
+    except EudraGMDPError as exc:
+        raise SourceFetchError(safe_error(exc)) from None
+    docs = [SourceDoc(document_id=r.doc_ref, url="", title=r.site_name or r.report_no,
+                      published=r.issue_date or "")
+            for r in records if r.doc_ref]
+    return FetchOutcome(docs=_dedupe(docs))
+
+
+def hc_docs_from_records(records: Iterable[Any], start: date, end: date) -> tuple[list[SourceDoc], int]:
+    """HC 회수 오픈데이터 레코드 → 창 안 문서(피드 'Last updated' 기준 — 수집기 창과 같다).
+
+    수집기의 기관·Category 범위 규칙과 정정 건너뛰기는 **적용하지 않는다**(제외 장부가 설명한다).
+    NID 가 없는 레코드는 키가 없어 세지 않는다(수집기도 장부에 못 남긴다) — 개수만 돌려준다."""
+    import collect_hc as hc
+    docs: list[SourceDoc] = []
+    no_nid = 0
+    for rec in records:
+        if not isinstance(rec, dict):
+            continue
+        feed_date = hc._feed_date(rec)
+        if not in_window(feed_date, start, end):
+            continue
+        nid = hc._text(rec, "NID")
+        if not nid:
+            no_nid += 1
+            continue
+        rel = hc._text(rec, "URL")
+        url = urllib.parse.urljoin(hc.HC_BASE, rel) if rel else hc.HC_BASE
+        docs.append(SourceDoc(document_id=f"hc-{nid}", url=url, title=hc._text(rec, "Title"),
+                              published=feed_date))
+    return _dedupe(docs), no_nid
+
+
+def fetch_hc_recall(start: date, end: date) -> FetchOutcome:
+    """Health Canada 회수·안전 경고 오픈데이터(JSON 배열 한 벌) 전체 → 창.
+
+    ★HC **실사**(drug-inspections.canada.ca, `Health Canada Inspection`)는 대상이 아니다 — 옛 서버가
+    2026-10-31 부터 누구에게도 응답하지 않고 새 도메인으로 이전 중이다(GMP 경로 미개설, PR #1373 이 이전
+    감지 경보를 붙였다). 원천 목록 자체를 못 받는 동안은 대조할 수 없어 넣지 않았다. 새 경로가 열리면 추가한다."""
+    import collect_hc as hc
+    from grm_common import http_get_json
+    try:
+        data = http_get_json(hc.HC_OPENDATA_URL, timeout=60, retries=2)
+    except Exception as exc:  # noqa: BLE001
+        raise SourceFetchError(safe_error(exc)) from None
+    if not isinstance(data, list) or not data:
+        raise SourceFetchError("HC 오픈데이터 형식 이상(배열 아님/0레코드)")
+    docs, no_nid = hc_docs_from_records(data, start, end)
+    notes = [f"피드 전체 {len(data)}레코드"]
+    if no_nid:
+        notes.append(f"NID 없는 창 안 레코드 {no_nid}건은 키가 없어 세지 않았다")
+    return FetchOutcome(docs=docs, notes=notes)
+
+
+def fetch_ich(start: date, end: date) -> FetchOutcome:
+    """ICH 가이드라인·의견수렴 페이지 3개의 **현재 전체 목록**(스냅샷). 창은 쓰지 않는다.
+
+    ICH 는 게시일이 없는 정적 카탈로그라 '창 안 문서'가 없다. 수집기의 섹션 제목 추출
+    (`_candidate_titles`)은 관련성 필터가 아니라 목록 파서 자체라 그대로 쓴다(파서를 따로 만들면 키가
+    갈라진다). 우리 쪽은 수집기의 스냅샷 dedup 과 같은 3년 창으로 읽는다."""
+    import collect_ich as ich
+    docs: list[SourceDoc] = []
+    notes: list[str] = []
+    failed_required: list[str] = []
+    for slug, type_or_class, required in ich.ICH_PAGES:
+        try:
+            html_text = ich._get_html(ich.ADMIN_BASE + slug)
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"{slug}: {safe_error(exc)}")
+            if required:
+                failed_required.append(slug)
+            continue
+        titles = ich._candidate_titles(ich._text_blocks(html_text))
+        if required and not titles:
+            failed_required.append(slug)
+            notes.append(f"{slug}: 섹션 0건 — 구조 변경 의심")
+        for title in titles:
+            headline = title if type_or_class == ich.TYPE_ICH_GUIDELINE else f"[Public Consultation] {title}"
+            docs.append(SourceDoc(document_id=ich._document_id(slug, title), url=ich.PUBLIC_BASE + slug,
+                                  title=headline[:ich.MAX_TITLE_CHARS], published=""))
+    if len(failed_required) == sum(1 for _s, _t, r in ich.ICH_PAGES if r):
+        raise SourceFetchError("; ".join(notes)[:300] or "ICH 핵심 페이지 전부 실패")
+    return FetchOutcome(docs=_dedupe(docs), partial=bool(failed_required), notes=notes)
+
+
+def who_rss_docs_from_root(root: Any, start: date, end: date) -> tuple[list[SourceDoc], int]:
+    """WHO PQ RSS 루트 → 창 안 문서. 필드 해석·키(`_stable_doc_id(WHO, 제목, 링크, 날짜)`)는 `_collect_rss` 와 같다.
+
+    수집기의 범위 밖 프로그램 제외(`_excluded`)는 적용하지 않는다 — 제외 장부(`out_of_scope_program`)가 설명한다."""
+    import collect_intake as ci
+    import collect_who as who
+    rss_items = ci._rss2_items_from_root(root)
+    use_atom = not rss_items
+    nodes = ci._atom_entries_from_root(root) if use_atom else rss_items
+    docs: list[SourceDoc] = []
+    undated = 0
+    for node in nodes:
+        if use_atom:
+            title = ci._atom_text(node, "title")
+            link = ci._atom_link(node)
+            pub = ci._atom_text(node, "updated") or ci._atom_text(node, "published")
+            date_iso = ci._parse_atom_date(pub) if pub else ""
+        else:
+            title = ci._rss_text(node.find("title"))
+            link = ci._rss_text(node.find("link"))
+            pub = ci._rss_text(node.find("pubDate")) or ci._rss_text(node.find("pubdate"))
+            date_iso = ci._parse_rss2_date(pub) if pub else ""
+        title = who._clean(title)
+        if not title:
+            continue
+        if not date_iso:
+            undated += 1
+            continue
+        if not in_window(date_iso, start, end):
+            continue
+        docs.append(SourceDoc(document_id=ci._stable_doc_id(ci.SOURCE_WHO, title, link, date_iso),
+                              url=link, title=title, published=date_iso))
+    return _dedupe(docs), undated
+
+
+def fetch_who_rss(start: date, end: date) -> FetchOutcome:
+    """WHO 사전적격심사(PQ) RSS — 창 안 전부."""
+    import collect_who as who
+    from grm_common import http_get_xml
+    try:
+        root = http_get_xml(who.WHO_RSS_URL)
+    except Exception as exc:  # noqa: BLE001
+        raise SourceFetchError(safe_error(exc)) from None
+    docs, undated = who_rss_docs_from_root(root, start, end)
+    return FetchOutcome(docs=docs, undated=undated)
+
+
+def fetch_who_inspections(start: date, end: date) -> FetchOutcome:
+    """WHO 공개 실사 보고서(WHOPIR)·우려 공지(NOC)의 **현재 전체 목록**(스냅샷) — 창은 쓰지 않는다.
+
+    두 채널은 수집기에도 창·관련성 필터가 없다(매 실행 전체 목록을 받아 3년 dedup 으로 거른다). 그래서
+    수집기의 목록 함수(`_collect_whopir`·`_collect_noc`)를 그대로 부른다 — 키 식이 갈라질 여지가 없다.
+    WHOPIR PDF 본문(ENABLE_WHOPIR_EXCERPT)은 이 잡에서 켜지 않으므로 목록 페이지만 받는다."""
+    import collect_who as who
+    docs: list[SourceDoc] = []
+    notes: list[str] = []
+    errors: list[str] = []
+    for label, fn in (("WHOPIR", who._collect_whopir), ("NOC", who._collect_noc)):
+        try:
+            items, err = fn(end)
+        except Exception as exc:  # noqa: BLE001
+            items, err = [], safe_error(exc)
+        if err:
+            errors.append(label)
+            notes.append(f"{label}: {str(err)[:150]}")
+        for it in items:
+            docs.append(SourceDoc(document_id=it.document_id, url=it.official_url,
+                                  title=it.headline, published=it.date_iso or ""))
+        notes.append(f"{label} 목록 {len(items)}건")
+    if len(errors) == 2:
+        raise SourceFetchError("; ".join(notes)[:300])
+    return FetchOutcome(docs=_dedupe(docs), partial=bool(errors), notes=notes)
+
+
+def _datago_docs(module: Any, endpoint: str, start: date, end: date, *,
+                 extra_params: dict[str, str] | None, title_fields: tuple[str, ...]) -> FetchOutcome:
+    """data.go.kr 페이지 API(식약처 회수·행정처분) 전 페이지 → 창. 페이지 반복기·키·날짜 식은 수집기 모듈 것."""
+    from grm_common import DatagoPageError, datago_paginate, http_get_json
+    key = os.environ.get("DATA_GO_KR_SERVICE_KEY", "").strip()
+    if not key:
+        raise SourceFetchError("DATA_GO_KR_SERVICE_KEY 미설정")
+    paginator = datago_paginate(endpoint, service_key=key, extract=module._extract_items,
+                                http_get=http_get_json, max_pages=module.MAX_PAGES,
+                                page_size=module.PAGE_SIZE, extra_params=extra_params)
+    docs: list[SourceDoc] = []
+    notes: list[str] = []
+    partial = False
+    undated = 0
+    try:
+        for raw_items, _masked in paginator:
+            for raw in raw_items:
+                date_iso = module._item_date(raw)
+                if not date_iso:
+                    undated += 1
+                    continue
+                if not in_window(date_iso, start, end):
+                    continue
+                title = next((module._text(raw, f) for f in title_fields if module._text(raw, f)), "")
+                docs.append(SourceDoc(document_id=module._document_id(raw), url=module.DATASET_URL,
+                                      title=title, published=date_iso))
+    except DatagoPageError as exc:
+        if not docs:
+            raise SourceFetchError(safe_error(exc)) from None
+        partial = True
+        notes.append(f"페이지 {getattr(exc, 'page_no', '?')} 실패 — 목록이 전수가 아니다")
+    except Exception as exc:  # noqa: BLE001
+        raise SourceFetchError(safe_error(exc)) from None
+    if getattr(paginator, "truncated", False):
+        partial = True
+        notes.append(f"페이지 상한({module.MAX_PAGES}) 도달 — 전체 {getattr(paginator, 'total_count', '?')}건 중 일부만 봤다")
+    return FetchOutcome(docs=_dedupe(docs), partial=partial, notes=notes, undated=undated)
+
+
+def fetch_mfds_recall(start: date, end: date) -> FetchOutcome:
+    """식약처 의약품 회수·판매중지(data.go.kr). 수집기에는 관련성 필터가 없다(품명 결측만 장부에 남긴다)."""
+    import collect_mfds_recall as m
+    return _datago_docs(m, m.RECALL_API_ENDPOINT, start, end, extra_params=None,
+                        title_fields=("PRDUCT", "ENTRPS"))
+
+
+def fetch_mfds_admin(start: date, end: date) -> FetchOutcome:
+    """식약처 행정처분(data.go.kr, order=Y 는 수집기와 같다). `_is_collectable` 거부분은 제외 장부가 설명한다."""
+    import collect_mfds_admin_action as m
+    return _datago_docs(m, m.ADMIN_API_ENDPOINT, start, end, extra_params={"order": "Y"},
+                        title_fields=("ITEM_NAME", "ADM_DISPS_NAME", "ENTP_NAME"))
+
+
 FETCHERS: dict[str, Callable[[date, date], FetchOutcome]] = {
     "fda483": fetch_fda483, "wl": fetch_wl, "recall": fetch_recall,
     "mfds_rss": fetch_mfds_rss, "fr": fetch_fr,
+    "ema": _rss_fetcher("_EMA_FEED_SPEC"), "mhra_blog": _rss_fetcher("_MHRA_FEED_SPEC"),
+    "mhra_alert": _rss_fetcher("_MHRA_ALERT_FEED_SPEC"), "pics": _rss_fetcher("_PICS_FEED_SPEC"),
+    "eca": _rss_fetcher("_ECA_FEED_SPEC"), "ispe": _rss_fetcher("_ISPE_FEED_SPEC"),
+    "mhra_ncr": fetch_mhra_gmp_ncr, "eu_ncr": fetch_eu_gmp_ncr,
+    "ich": fetch_ich, "who_rss": fetch_who_rss, "who_insp": fetch_who_inspections,
+    "hc_recall": fetch_hc_recall, "mfds_recall": fetch_mfds_recall, "mfds_admin": fetch_mfds_admin,
 }
 
 
@@ -622,11 +989,12 @@ def _flag(env: Any, name: str, default: bool) -> bool:
 # ─────────────────────────────────────────────────────────────────────────────
 # 저장소 읽기 — 수집됨(Notion, 수집기 dedup 과 같은 조회) · 제외 장부(Supabase, 읽기 전용)
 # ─────────────────────────────────────────────────────────────────────────────
-def load_collected(run_date: date, window_days: int, sources: set[str],
-                   token: str, db_id: str) -> set[str]:
-    """수집기 dedup 과 **같은 함수**로 `source::document_id` 집합을 만든다. 실패하면 StoreReadError.
+def load_collected_keys(run_date: date, window_days: int, sources: set[str],
+                        token: str, db_id: str) -> tuple[set[str], set[str]]:
+    """수집기 dedup 과 **같은 함수**로 (`source::document_id` 집합, `source::정규화URL` 집합)을 만든다.
 
-    Run Date(수집일) 기준 창이다. 수집일은 게시일 이후이므로 게시 창을 덮는 창이면 충분하다."""
+    Run Date(수집일) 기준 창이다. 수집일은 게시일 이후이므로 게시 창을 덮는 창이면 충분하다.
+    실패하면 StoreReadError."""
     from grm_notion import NotionDedupeQueryError, notion_query_existing_keys
     try:
         keys = notion_query_existing_keys(token, db_id, run_date, window_days=window_days,
@@ -635,7 +1003,13 @@ def load_collected(run_date: date, window_days: int, sources: set[str],
         raise StoreReadError(f"Notion 중복 조회 실패: {safe_error(exc)}") from None
     except Exception as exc:  # noqa: BLE001
         raise StoreReadError(f"Notion 조회 실패: {type(exc).__name__}") from None
-    return keys.doc_ids
+    return keys.doc_ids, keys.url_keys
+
+
+def load_collected(run_date: date, window_days: int, sources: set[str],
+                   token: str, db_id: str) -> set[str]:
+    """`load_collected_keys` 의 문서 키 쪽(기존 호출부 호환)."""
+    return load_collected_keys(run_date, window_days, sources, token, db_id)[0]
 
 
 def load_ledger(base_url: str, service_key: str, sources: Iterable[str],
@@ -685,7 +1059,7 @@ def build_report(
     *, run_date: date, specs: Iterable[SourceSpec], outcomes: dict[str, FetchOutcome],
     windows: dict[str, tuple[date, date]], collected: set[str] | None, store_error: str,
     ledger: dict[str, dict[str, LedgerRow]] | None, ledger_error: str,
-    run_url: str = "",
+    run_url: str = "", collected_urls: set[str] | None = None,
 ) -> dict[str, Any]:
     results: list[SourceResult] = []
     for spec in specs:
@@ -693,7 +1067,7 @@ def build_report(
             spec, outcomes[spec.key], run_date=run_date, window=windows[spec.key],
             collected=collected, store_error=store_error,
             ledger=None if ledger is None else ledger.get(spec.source, {}),
-            ledger_error=ledger_error))
+            ledger_error=ledger_error, collected_urls=collected_urls))
     return {
         "schema": "grm-source-reconcile/v1",
         "run_date": run_date.isoformat(),
@@ -777,6 +1151,7 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
     outcomes = fetch_all(specs, windows, fetchers, env)
 
     collected: set[str] | None = None
+    collected_urls: set[str] | None = None
     ledger: dict[str, dict[str, LedgerRow]] | None = None
     store_error = ledger_error = ""
     token = str(env.get("NOTION_TOKEN") or "").strip()
@@ -790,10 +1165,24 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
         if not token or not db_id:
             store_error = "NOTION_TOKEN/NOTION_DATABASE_ID 미설정"
         else:
-            widest = max((end - start).days for start, end in windows.values())
+            # 창 소스는 가장 넓은 게시 창 + 여유로 한 번, 스냅샷 소스(ICH·WHO)는 수집기 스냅샷 dedup 과
+            # 같은 3년 창을 그 소스로만 한정해 한 번 더(전체를 3년으로 넓히면 Notion 페이지 상한에 걸린다).
+            windowed = [s for s in specs if s.window_kind != WINDOW_SNAPSHOT]
+            snap_names = {s.source for s in specs if s.window_kind == WINDOW_SNAPSHOT}
             try:
-                collected = load_collected(run_date, widest + NOTION_DEDUP_MARGIN_DAYS, names, token, db_id)
+                collected, collected_urls = set(), set()
+                if windowed:
+                    widest = max((windows[s.key][1] - windows[s.key][0]).days for s in windowed)
+                    ids, urls = load_collected_keys(run_date, widest + NOTION_DEDUP_MARGIN_DAYS,
+                                                    {s.source for s in windowed}, token, db_id)
+                    collected |= ids
+                    collected_urls |= urls
+                if snap_names:
+                    ids, urls = load_collected_keys(run_date, SNAPSHOT_DEDUP_DAYS, snap_names, token, db_id)
+                    collected |= ids
+                    collected_urls |= urls
             except StoreReadError as exc:
+                collected = collected_urls = None
                 store_error = str(exc)
         if not sb_url.lower().startswith("https://") or not sb_key:
             ledger_error = "SUPABASE_URL(https)/SUPABASE_SERVICE_ROLE_KEY 미설정"
@@ -804,7 +1193,7 @@ def run(*, run_date: date, base_days: int, enf_days: int, specs: Iterable[Source
                 ledger_error = str(exc)
     return build_report(run_date=run_date, specs=specs, outcomes=outcomes, windows=windows,
                         collected=collected, store_error=store_error, ledger=ledger,
-                        ledger_error=ledger_error, run_url=run_url)
+                        ledger_error=ledger_error, run_url=run_url, collected_urls=collected_urls)
 
 
 def _emit(line: str) -> None:

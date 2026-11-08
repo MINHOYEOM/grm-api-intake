@@ -32,6 +32,7 @@ from urllib.parse import urljoin
 
 import requests
 
+import intake_exclusion as _xl
 from grm_common import DEFAULT_USER_AGENT, http_get_json, log
 from collect_intake import (
     IntakeItem,
@@ -280,6 +281,35 @@ def _fetch_recall_detail(url: str, stats: dict[str, int] | None = None) -> dict[
     return {}
 
 
+# ── 제외 장부(intake_exclusion) 연결 ─────────────────────────────────────────────
+# 창 안에서 범위 규칙으로 버린 레코드만 남긴다(피드는 전체 회수 DB 라 창 밖까지 쓰면 매일 수천 행).
+# 원천 대조 감시(source_reconcile.py)는 창 안 레코드 = 수집 + 이 장부 + 미뤄짐 으로 센다.
+_RULE_VERSION_CACHE: list[str] = []
+
+
+def exclusion_rule_version() -> str:
+    """HC 범위 규칙(기관·Category·정정 판정)의 AST 지문."""
+    if not _RULE_VERSION_CACHE:
+        _RULE_VERSION_CACHE.append(_xl.rule_fingerprint(
+            ("_record_in_scope", "_EXCLUDED_CATEGORIES", "_FIRST_PUBLISHED_KEY"), ("collect_hc",)))
+    return _RULE_VERSION_CACHE[0]
+
+
+def _feed_date(rec: dict[str, Any]) -> str:
+    return _parse_date(_text(rec, "Last updated", "Date published"))
+
+
+def _record_exclusion(rec: dict[str, Any], reason: str, *, rule_version: str = "",
+                      basis: str = _xl.BASIS_METADATA) -> None:
+    nid = _text(rec, "NID")
+    if not nid:
+        return      # 키가 없으면 대조 감시도 세지 않는다(같은 기준)
+    url = urljoin(HC_BASE, _text(rec, "URL")) if _text(rec, "URL") else HC_BASE
+    _xl.record(source=SOURCE_HC, document_id=f"hc-{nid}", official_url=url,
+               title=_text(rec, "Title"), published_date=_feed_date(rec), reason_code=reason,
+               rule_version=rule_version or exclusion_rule_version(), basis=basis)
+
+
 def _to_item(
     rec: dict[str, Any],
     start: date,
@@ -288,16 +318,19 @@ def _to_item(
 ) -> IntakeItem | None:
     nid = _text(rec, "NID")
     title = _text(rec, "Title")
-    if not nid or not title:
-        return None
     # 윈도우 판정은 피드의 "Last updated"(정정 포함 최신일)로 한다 — 정정도 일단 눈에 띄게.
     # 카드에 찍는 발행일은 상세 페이지의 "Original published date" 가 있으면 그것이다(아래).
-    feed_date = _parse_date(_text(rec, "Last updated", "Date published"))
+    feed_date = _feed_date(rec)
+    if not nid or not title:
+        if _within_window(feed_date, start, end):
+            _record_exclusion(rec, "missing_required_field", rule_version="static-1")
+        return None
     if not _within_window(feed_date, start, end):
         return None
 
     category = _text(rec, "Category")
     if category.lower() in _EXCLUDED_CATEGORIES:   # 수의약품/의료기기 배제
+        _record_exclusion(rec, "excluded_category")
         return None
     product = _text(rec, "Product")
     issue = _text(rec, "Issue")
@@ -317,6 +350,7 @@ def _to_item(
         # 않고 로그로 남긴다(기존 카드 쪽 갱신은 별도 작업).
         log("WARN", f"HC 정정 건너뜀(최초 게시 {first_published} < 윈도우 시작 {start}, 정정 {feed_date}) "
                     f"nid={nid} — 기존 카드가 있다")
+        _record_exclusion(rec, "correction_of_earlier_notice", basis=_xl.BASIS_TEXT)
         return None
     date_iso = first_published or feed_date
 
@@ -406,6 +440,8 @@ def collect_hc(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
         if not isinstance(rec, dict):
             continue
         if not _record_in_scope(rec):
+            if _within_window(_feed_date(rec), start, end):
+                _record_exclusion(rec, "out_of_scope_org")
             continue
         org_total += 1
         item = _to_item(rec, start, end, detail_fetcher=_fetcher)

@@ -1238,7 +1238,8 @@
   }
   // 세 칸(한 줄 요약·결재 서류·팀과 직원)을 각자 자리에 그린다. '우리 회사 숫자'는 정적 칸이라 여기서 안 건드린다.
   function opsFill(summary, docs, teams) {
-    var a = byId("grm-oc-summary"), b = byId("grm-oc-docs"), c = byId("grm-oc");
+    var a = byId("grm-oc-summary"), b = byId("grm-oc-docs"), c = byId("grm-oc"), al = byId("grm-oc-alarms");
+    if (al) al.innerHTML = window.GRMOps && state.opsHome ? window.GRMOps.renderAlarms(state.opsHome) : "";
     if (a) a.innerHTML = summary;
     if (b) b.innerHTML = docs;
     if (c) c.innerHTML = teams;

@@ -1,0 +1,81 @@
+name: GRM Ops Alarm Owner
+
+# 경보 이슈 -> 운영 센터 업무 (131 · web/ops_alarm_sync.py).
+# 자동 감시가 GitHub 이슈로 경보를 열어도 아무도 처리하지 않았다. 경보 라벨이 붙은 이슈 1건 = 담당 팀 업무 1건(지시함),
+# 이슈가 닫히면 완료, 다시 열리면 되살림, 지시함에서 3일 넘게 안 움직이면 종합상황실에 '방치 경보' 업무 + 이슈 댓글.
+#
+# ## 실행 경로
+#  - issues 이벤트(opened·reopened·closed·labeled·unlabeled): 한 건 즉시 반영.
+#    ★GITHUB_TOKEN 으로 열린 이슈(자동 감시 대부분)는 워크플로 이벤트를 일으키지 않는다 -> 보장은 아래 매일 동기화가 한다.
+#  - 매일 07:41 KST(22:41 UTC): 열린 경보 이슈 전부 동기화 + 닫힌 이슈 완료 처리 + 방치 감시.
+#  - 수동(workflow_dispatch): 같은 동기화. 처음 켤 때 이미 열려 있는 경보(#1274·#1267·#1255·#1214 …)를 일괄 등록하는 경로.
+#
+# ## 안전 장치
+#  - 기본은 dry-run(GitHub 읽기·계획 출력만, 쓰기 0). 저장소 변수 `GRM_OPS_ALARM_ENABLED=true` 일 때만 실제 쓰기
+#    — 비서실이 131 적용 뒤 dry-run 출력을 보고 켠다. 수동 실행도 dry_run=false **그리고** 변수가 켜져 있어야 쓴다.
+#  - 메일·외부 발송 없음(결재 메일 GRM_OPS_DECISION_MAIL_ENABLED 와 무관). 이슈 댓글은 방치 표시 한 가지뿐.
+#  - 키는 기존 워크플로가 쓰는 SUPABASE_SERVICE_ROLE_KEY 그대로(새 비밀값 없음), 로그에서 가린다(::add-mask::).
+#  - 이슈 제목 같은 외부 입력은 쉘에 끼워 넣지 않는다(스크립트가 이벤트 파일을 직접 읽는다). 체크아웃은 main 의 스크립트만.
+#  - AI 호출 0 · 비용 = Actions 무료분.
+
+on:
+  issues:
+    types: [opened, reopened, closed, labeled, unlabeled]
+  schedule:
+    - cron: '41 22 * * *'     # 07:41 KST 매일(정각을 피한다 — 정각 크론은 밀린다)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true=계획 출력만(쓰기 0). false=실제 쓰기(GRM_OPS_ALARM_ENABLED 도 켜져 있어야 함) — 열린 경보 일괄 등록 포함'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: grm-ops-alarm
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: |
+            .github/workflows
+            web/ops_alarm_sync.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: 경보 -> 업무
+        env:
+          EVENT: ${{ github.event_name }}
+          DISPATCH_DRY: ${{ github.event.inputs.dry_run }}
+          ENABLED: ${{ vars.GRM_OPS_ALARM_ENABLED }}
+          GH_TOKEN: ${{ github.token }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          [ -n "$SUPABASE_SERVICE_ROLE_KEY" ] && echo "::add-mask::$SUPABASE_SERVICE_ROLE_KEY"
+          DRY="--dry-run"
+          if [ "$ENABLED" = "true" ]; then
+            if [ "$EVENT" = "workflow_dispatch" ]; then
+              [ "$DISPATCH_DRY" = "false" ] && DRY=""
+            else
+              DRY=""
+            fi
+          fi
+          MODE=sync
+          [ "$EVENT" = "issues" ] && MODE=event
+          python web/ops_alarm_sync.py --mode "$MODE" $DRY

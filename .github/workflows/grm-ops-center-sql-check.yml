@@ -10,12 +10,14 @@ on:
       - 'web/migrations/*ops_decision*'
       - 'web/migrations/*ops_task*'
       - 'web/migrations/*ops_measure*'
+      - 'web/migrations/*ops_alarm*'
       - 'tests/sql/ops_center.sql'
       - 'tests/sql/ops_center_seed.sql'
       - 'tests/sql/ops_center_decide.sql'
       - 'tests/sql/ops_center_task.sql'
       - 'tests/sql/ops_center_seed_planning.sql'
       - 'tests/sql/ops_center_measure.sql'
+      - 'tests/sql/ops_center_alarm.sql'
       - 'tests/run_ops_center_sql_mutations.py'
       - '.github/workflows/grm-ops-center-sql-check.yml'
   workflow_dispatch:
@@ -52,5 +54,9 @@ jobs:
         run: |
           sudo -u postgres createdb ops_center_measure_test
           sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d ops_center_measure_test -f tests/sql/ops_center_measure.sql
+      - name: Run the 131 alarm checks (one task per issue · close/reopen · 3-day neglect once · ops_home additive · service-only)
+        run: |
+          sudo -u postgres createdb ops_center_alarm_test
+          sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d ops_center_alarm_test -f tests/sql/ops_center_alarm.sql
       - name: Prove guards fail on mutations and pass after restoration
         run: python3 tests/run_ops_center_sql_mutations.py

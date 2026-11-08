@@ -13,6 +13,9 @@ findings_reclassify_service 와 동일 보안 모델을 따른다:
       AND 길이 ≥ _PROMOTE_MIN_LEN. FDA Warning Letter에는 조항 없이도 문두의 강한 위반
       표제(P-B)를 만족하면 승격한다. MFDS는 mfds_refs AND 한국어 지적 문형(P-C) AND 길이
       ≥ _PROMOTE_MIN_LEN을 별도 적용한다. 애매하면 needs_review로 유지한다.
+      FDA WL P-D(2026-11-08): 조항이 상위 항목에만 있는 하위 관찰 항목(503B·GLP WL)은
+      **같은 서한에 조항 인용 accepted 형제가 있고** 결함 문형(wl_deficiency_signal_present)
+      AND 길이 ≥ _PROMOTE_MIN_LEN 이면 승격한다(회신 인정 문단 제외).
       그 외는 needs_review 그대로 둔다(사람/LLM 검수 몫 — 과잉 승격 금지).
   - service-role 키로 PostgREST 읽기(RLS 우회, M4 야간 적재·M12 백필과 동일 안전 메커니즘),
     Range 헤더 페이지네이션. 서버측 필터로 needs_review WL/483/MFDS 만 가져온다.
@@ -50,7 +53,10 @@ _TARGET_SOURCES = ("FDA Warning Letter", "FDA 483", "MFDS")
 _PROMOTE_MIN_LEN = 60   # 조항+신호가 있어도 초단문은 승격하지 않는다(파편 방어)
 _REJECT_MAX_LEN = 60    # opt-in 반려는 초단문에만(조항·신호 전무 + 이 길이 미만)
 
-_SELECT_COLUMNS = "finding_id,finding_text,cfr_refs,mfds_refs,source,review_status"
+_SELECT_COLUMNS = "finding_id,finding_text,cfr_refs,mfds_refs,source,review_status,document_id"
+# P-D 형제 조회 — 본문은 읽지 않는다(조항 유무만 본다).
+_SIBLING_SELECT_COLUMNS = "document_id,cfr_refs,review_status"
+_SIBLING_DOC_CHUNK = 50  # in.(…) 목록이 URL 길이 상한을 넘지 않게 나눠 묻는다
 
 
 def _normalize_base_url(base_url: str) -> str | None:
@@ -101,12 +107,62 @@ def _has_legal_ref(row: dict[str, Any], column: str) -> bool:
     return isinstance(refs, list) and len(refs) > 0
 
 
-def review_verdict(row: dict[str, Any], *, enable_reject: bool) -> str | None:
+def _pd_candidate(row: dict[str, Any]) -> bool:
+    """P-D 후보 — 형제 조회가 필요한 WL 행(조항 없음 + 결함 문형 + 길이 + document_id)."""
+    return (
+        str(row.get("source") or "") == "FDA Warning Letter"
+        and bool(str(row.get("document_id") or ""))
+        and not _has_legal_ref(row, "cfr_refs")
+        and len(str(row.get("finding_text") or "")) >= _PROMOTE_MIN_LEN
+        and fx.wl_deficiency_signal_present(str(row.get("finding_text") or ""))
+    )
+
+
+def fetch_cited_sibling_docs(
+    base_url: str,
+    service_key: str,
+    document_ids: list[str],
+) -> set[str]:
+    """document_ids 중 '조항 인용이 있는 accepted WL 행'을 하나 이상 가진 문서 id 집합.
+
+    PostgREST 필터는 review_status·source·document_id 로 좁히고, 조항 유무와 상태는 파이썬에서
+    다시 확인한다(목 응답·필터 오작동에도 needs_review 행이 형제로 세지지 않게)."""
+    base = _normalize_base_url(base_url)
+    if base is None or not document_ids:
+        return set()
+    found: set[str] = set()
+    ids = sorted(set(document_ids))
+    for i in range(0, len(ids), _SIBLING_DOC_CHUNK):
+        chunk = ids[i:i + _SIBLING_DOC_CHUNK]
+        quoted = ",".join(f'"{d}"' for d in chunk)
+        rows = fsb._fetch_all_pages(
+            base, service_key, "findings",
+            select=_SIBLING_SELECT_COLUMNS, page_size=_DEFAULT_PAGE_SIZE, order="document_id.asc",
+            extra_params={
+                "review_status": "eq.accepted",
+                "source": 'eq.FDA Warning Letter',
+                "document_id": f"in.({quoted})",
+            },
+        )
+        for r in rows:
+            doc = str(r.get("document_id") or "")
+            if doc in chunk and r.get("review_status") == "accepted" and _has_legal_ref(r, "cfr_refs"):
+                found.add(doc)
+    return found
+
+
+def review_verdict(
+    row: dict[str, Any],
+    *,
+    enable_reject: bool,
+    cited_sibling_docs: set[str] | frozenset[str] = frozenset(),
+) -> str | None:
     """행 하나 → 'accepted'(승격)/'rejected'(opt-in 반려)/None(유지). 결정론·순수.
 
     FDA WL/483 승격: cfr_refs AND 영문 위반/조건 신호 AND 길이≥_PROMOTE_MIN_LEN.
     FDA WL P-B: cfr_refs 없이도 문두 강한 위반 표제 AND 길이≥_PROMOTE_MIN_LEN.
     MFDS P-C: mfds_refs AND 한국어 지적 문형 AND 길이≥_PROMOTE_MIN_LEN.
+    FDA WL P-D: document_id ∈ cited_sibling_docs AND 결함 문형 AND 길이≥_PROMOTE_MIN_LEN.
     반려(opt-in): 조항·신호 전무 AND 길이<_REJECT_MAX_LEN (명백한 파편/라벨 인용).
     그 외: None(needs_review 유지 — 애매하면 유지).
     """
@@ -131,6 +187,12 @@ def review_verdict(row: dict[str, Any], *, enable_reject: bool) -> str | None:
         or fx.wl_strong_violation_heading_present(text)
     ) and len(text) >= _PROMOTE_MIN_LEN:
         return "accepted"
+    if (
+        source == "FDA Warning Letter"
+        and str(row.get("document_id") or "") in cited_sibling_docs
+        and _pd_candidate(row)
+    ):
+        return "accepted"
     if source == "FDA 483" and has_cfr_ref and has_wl_signal and len(text) >= _PROMOTE_MIN_LEN:
         return "accepted"
     if enable_reject and not has_cfr_ref and not has_wl_signal and len(text) < _REJECT_MAX_LEN:
@@ -142,6 +204,7 @@ def plan_review(
     rows: list[dict[str, Any]],
     *,
     enable_reject: bool,
+    cited_sibling_docs: set[str] | frozenset[str] = frozenset(),
 ) -> list[dict[str, Any]]:
     """승격/반려 대상만 (finding_id, new_status) 로 계획한다. 유지(None)는 제외 —
     대기 중 아무것도 없으면 0건 PATCH(구성상 멱등)."""
@@ -150,7 +213,9 @@ def plan_review(
         finding_id = str(row.get("finding_id") or "")
         if not finding_id:
             continue
-        new_status = review_verdict(row, enable_reject=enable_reject)
+        new_status = review_verdict(
+            row, enable_reject=enable_reject, cited_sibling_docs=cited_sibling_docs,
+        )
         if new_status is None:
             continue
         plan.append({"finding_id": finding_id, "new_status": new_status})
@@ -230,6 +295,7 @@ def run_promote(
         "kept_needs_review": 0,
         "patched": 0,
         "matched_zero": 0,
+        "sibling_rule_promotions": 0,
         "errors": [],
     }
     if base is None:
@@ -243,13 +309,25 @@ def run_promote(
         return report
 
     report["rows_scanned"] = len(rows)
-    plan = plan_review(rows, enable_reject=enable_reject)
+    candidates = [str(r.get("document_id")) for r in rows if _pd_candidate(r)]
+    try:
+        cited = fetch_cited_sibling_docs(base, service_key, candidates) if candidates else set()
+    except (RuntimeError, ValueError) as exc:
+        report["errors"].append(str(exc))
+        cited = set()
+    plan = plan_review(rows, enable_reject=enable_reject, cited_sibling_docs=cited)
     if limit is not None and limit >= 0:
         plan = plan[:limit]
 
     report["promotions_planned"] = sum(1 for item in plan if item["new_status"] == "accepted")
     report["rejections_planned"] = sum(1 for item in plan if item["new_status"] == "rejected")
     report["kept_needs_review"] = len(rows) - len(plan)
+    by_id = {str(r.get("finding_id") or ""): r for r in rows}
+    report["sibling_rule_promotions"] = sum(
+        1 for item in plan
+        if item["new_status"] == "accepted"
+        and review_verdict(by_id[item["finding_id"]], enable_reject=False) is None
+    )
 
     if dry_run:
         return report
@@ -347,6 +425,7 @@ def main(argv: list[str] | None = None) -> int:
 
 __all__ = [
     "fetch_needs_review",
+    "fetch_cited_sibling_docs",
     "review_verdict",
     "plan_review",
     "run_promote",

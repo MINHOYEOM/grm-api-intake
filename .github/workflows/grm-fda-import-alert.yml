@@ -1,0 +1,165 @@
+name: GRM FDA Import Alert Snapshot (66-40 / 66-41)
+
+# FDA 수입경보 66-40(Drug GMP 미충족)·66-41(미승인 신약) Red List 를 매일 한 번 스냅샷한다.
+# 수집기: collect_fda_import_alert.py · 표: web/migrations/132_fda_import_alert.sql
+# 타당성: docs/신규소스_수입경보_FDA대시보드_EDQM_타당성_2026-08-11.md §2(조건부 채택)
+#
+# ★독립 경로 — 일일 intake(grm-intake.yml)·Notion·주간 브리프와 무관하다. 브리프·검색 연결은 다음 단계.
+# ★쓰기 게이트 두 겹: repo 변수 ENABLE_FDA_IMPORT_ALERT=true(기본 off) **그리고** --apply.
+#   - schedule: --apply 를 넘긴다 → 변수가 off 면 수집기가 dry-run 으로 돈다(구조 검증·diff 만).
+#   - dispatch: dry_run=true(기본)면 --apply 를 안 넘긴다.
+#   변수를 켜기 전에도 매일 돌며 구조 검증을 하므로, 원천 형식이 바뀌면 켜기 전에 먼저 알 수 있다.
+# ★첫 실제 쓰기 = 이력 시작점(seed). 신규 등재(listed) 폭주 없음.
+# ★원문 HTML.gz + 리포트를 90일 아티팩트로 남긴다 — 원천에 해제일이 없어 스냅샷이 유일한 이력이다.
+# ★구조 검증 실패·수집 실패·DB 실패 → exit 2 → schedule 이면 이슈(제목 고정·20시간 스로틀).
+on:
+  schedule:
+    # 매일 21:41 UTC = 06:41 KST. grm-intake(18:17 UTC)·findings 백필(00/06/12:17 UTC)과 겹치지 않는다.
+    - cron: '41 21 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true = 쓰지 않는다(기본). false 여도 repo 변수 ENABLE_FDA_IMPORT_ALERT=true 일 때만 쓴다.'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write   # 마지막 스텝(schedule 실패 이슈) 전용
+
+concurrency:
+  group: fda-import-alert
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    name: Snapshot FDA Import Alert Red Lists (no git writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # SUPABASE_* 는 grm-intake.yml 과 같은 secret/var 재사용 — 신규 등록 불필요.
+      - name: Run import alert snapshot
+        id: run
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ENABLE_FDA_IMPORT_ALERT: ${{ vars.ENABLE_FDA_IMPORT_ALERT || 'false' }}
+        run: |
+          ARGS=(--output import_alert_report.json --raw-dir import_alert_raw)
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS+=(--apply)
+          elif [ "${{ inputs.dry_run }}" = "false" ]; then
+            ARGS+=(--apply)
+          fi
+          python collect_fda_import_alert.py "${ARGS[@]}"
+
+      - name: Upload raw snapshot + report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fda-import-alert-${{ github.run_id }}
+          path: |
+            import_alert_report.json
+            import_alert_raw/
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM FDA Import Alert Snapshot"
+            echo ""
+            echo "event: \`${{ github.event_name }}\` · ENABLE_FDA_IMPORT_ALERT: \`${{ vars.ENABLE_FDA_IMPORT_ALERT || 'false' }}\`"
+            echo ""
+            if [ -f import_alert_report.json ]; then
+              python - <<'PY'
+          import json
+          r = json.load(open("import_alert_report.json", encoding="utf-8"))
+          print(f"mode: **{r['mode']}** · failures: {len(r['failures'])}")
+          print("")
+          print("| 경보 | 업체 | 한국 | 최근 30일 등재 | 문서 안 중복 합침 | 이벤트 | 실패 |")
+          print("|---|---:|---:|---:|---:|---|---|")
+          for a in r["alerts"]:
+              rc = a.get("recent") or {}
+              print(f"| {a['alert_no']} | {a.get('firms_unique', '-')} | {a.get('korea_firms', '-')} | "
+                    f"{rc.get('firms_listed', '-')} | {a.get('merged_duplicate_blocks', '-')} | "
+                    f"{a.get('events', {})} | {', '.join(a['failures']) or '-'} |")
+          PY
+            else
+              echo "import_alert_report.json 미생성 — 인자/자격증명 단계에서 조기 종료"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Surface scheduled failure
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = 'FDA 수입경보 스냅샷 실패';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const fs = require('fs');
+            let kind = '';
+            let failures = [];
+            try {
+              const r = JSON.parse(fs.readFileSync('import_alert_report.json', 'utf8'));
+              kind = r.failure_kind || '';
+              failures = r.failures || [];
+            } catch (e) { kind = ''; }
+            let cause;
+            if (kind === 'structure') {
+              cause = '원인: **원천 형식 변경 의심(구조 검증 실패)** — 업체 블록 수·필드 채움률·하한·급감 가드 중 하나가 걸렸다. 이번 실행은 DB 에 아무것도 쓰지 않았다(가짜 대량 해제 방지). 아티팩트의 원문 HTML 로 collect_fda_import_alert.parse_alert_page 를 다시 맞춘다.';
+            } else if (kind === 'fetch') {
+              cause = '원인: **원천 접속 실패** — accessdata.fda.gov 가 응답하지 않거나 200 이 아니다. 봇 차단이면 우회하지 말고 판정을 다시 한다.';
+            } else if (kind === 'db') {
+              cause = '원인: **DB 읽기/쓰기 실패** — migration 132 적용 여부, SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 를 확인한다.';
+            } else {
+              cause = '원인: 리포트가 없다 — 인자·자격증명 단계에서 멈췄다. 로그를 본다.';
+            }
+            const body = [
+              '매일 FDA 수입경보 스냅샷(grm-fda-import-alert.yml, schedule)이 실패했습니다.',
+              '',
+              `- 실행: ${runUrl}`,
+              `- 실패 종류: \`${kind || '알 수 없음'}\``,
+              ...failures.slice(0, 10).map((f) => `- \`${f}\``),
+              '',
+              cause,
+              '',
+              '해제일이 원천에 없어 실패한 날의 등재·해제 변화는 다음 성공 실행의 diff 에 합쳐진다(날짜는 그날로 찍힌다). 복구되면 사람이 닫는다.',
+            ].join('\n');
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'automation-failure', per_page: 50,
+            });
+            const existing = open.find((i) => i.title === title);
+            if (!existing) {
+              await github.rest.issues.create({
+                owner, repo, title, body, labels: ['automation-failure'], assignees: [owner],
+              });
+              return;
+            }
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: existing.number, per_page: 100,
+            });
+            const recent = comments.some((c) => Date.now() - new Date(c.created_at).getTime() < 20 * 3600 * 1000);
+            if (!recent) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: existing.number,
+                body: `여전히 실패 중입니다 (${runUrl}). 실패 종류 \`${kind || '알 수 없음'}\`.\n\n${cause}`,
+              });
+            }

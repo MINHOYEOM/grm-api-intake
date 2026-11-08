@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.295` |
+| 문서 버전 | `v1.296` |
 | 최종 수정일 | 2026-11-08 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -547,6 +547,10 @@ grm-api-intake/
 ├─ hc_inspection_migration_check.py # HC 의약품 GMP 실사 DB의 새 도메인 이전 감지
 ├─ findings_review_queue.py        # needs_review 큐 나이 측정 + 사람 판정 적용(grm-findings-review-queue)
 ├─ collect_fda_import_alert.py     # FDA 수입경보 66-40·66-41 Red List 스냅샷 수집기(독립 경로, 수집 꺼짐·재설계 중, 132)
+├─ fda_import_alert_relay.py       # 수입경보 PC 중계 — 러너에서 FDA accessdata가 막혀(404) 한국 PC에서 받아 올린다(워크플로 cron 꺼짐)
+├─ collect_fda_citations.py        # FDA Data Dashboard 실사 지적 조항 수집 → fda_inspection_citations(133), Supabase 직행·Notion 무접촉
+├─ collect_deficiency_examples.py  # 실사 지적 사례(업체명 없음) 수집 — 일본 PMDA 연차보고서 별첨·영국 MHRA GMP 지적 원자료(134)
+├─ site_error_watch.py             # 사이트 오류 징후 일일 감시 — Cloudflare 5xx·404 급증·배포 실패 → 경보 이슈(grm-site-error-watch, 기본 꺼짐)
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
 ├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
@@ -602,6 +606,9 @@ grm-api-intake/
 │  ├─ migrations/130_intake_exclusion_ledger.sql # 수집 제외 장부 표
 │  ├─ migrations/131_ops_alarm_tasks.sql # 경보 이슈 → 운영 센터 업무 배정(가산)
 │  ├─ migrations/132_fda_import_alert.sql # FDA 수입경보 스냅샷·등재 이력 표 3개
+│  ├─ migrations/133_fda_inspection_citations.sql # FDA 실사 지적 조항 표
+│  ├─ migrations/134_deficiency_examples.sql # PMDA·MHRA 지적 사례 표
+│  ├─ migrations/135_growth_daily_v2.sql # 성장 일보 v2 집계(파일 있음·운영 DB 적용 대기)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -616,6 +623,7 @@ grm-api-intake/
 │  ├─ ops_decision_mail.py        # [결정 알림] 운영 센터 대기 결정(pending·mail_sent_at null) → 대표 메일 1건 1통·하루 3통·넘치면 다음 날 아침 묶음·KST 22~08 조용한 시간. 발송·수신자 검사는 approval_mail 재사용
 │  ├─ ops_measure_github.py       # [자동 측정] 운영 센터 GitHub 갈래 — gh api 로 CI test 잡 중앙값·3일 넘은 PR·일일 연결 연속 성공일·24시간 배포 실패·정기 작업 정시율(7일·예정+60분·하루 4회 이하 예약)·이번 주 용어 사전 증가 → ops_goal_set, 코드 팀원(dq-kg-link·infra-intake) 마지막 성공 → ops_member_touch(더 새로울 때만). 기본 dry-run, 실패는 단계 요약에만
 │  ├─ ops_alarm_sync.py           # [경보 담당] 경보 이슈 1건 = 담당 팀 업무 1건, 닫히면 완료·3일 방치 시 종합상황실 경보(131)
+│  ├─ growth_daily.py             # [성장 일보 v2] 방문→검색→구독→메일 클릭 판독 JSON → 한국어 마크다운, 주간 검색 개선 리포트(135)
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본
 │  ├─ quiz_en_merge.py           # [다국어 2026-09-05] 주간 퀴즈 영문 문항 병합기 — 정본에 `question_en`·`choices_en`·`explanation_en` 을 **가산**한다(기존 키·들여쓰기 무변형·멱등). 게이트 3중 = 세 필드 전부거나 전부 없거나 · `choices_en` 길이 일치(`answer_index` 공유) · **EN_INVENTED_NUMBER**(`render.validate_quiz_en_facts` — 렌더와 같은 함수를 불러 사본 0)
 │  ├─ templates/  (landing·archive·brief·findings·**findings_browse**(둘러보기 면)·trends·**inspections**·**coverage**·**checklist**·firm·**inspector**·me·admin·base·library·library_catalog·guide·**about**(소개 /about/ — 2026-09-06)·glossary·**glossary_term**(하단 '사전 전체 규모' 블록)·**glossary_welcome**(구독 확인 도착 /welcome/ — noindex·목록 밖)·**findings_facet**·**findings_facet_index**·**findings_doc**·**findings_doc_list**·quiz·**landing_en**(영어판 홈 — 주간 브리프 히어로가 없는 별도 면))
@@ -668,6 +676,9 @@ grm-api-intake/
    ├─ grm-ops-alarm.yml                  # [경보 담당] 경보 라벨 이슈 → 운영 센터 업무(web/ops_alarm_sync.py), 매일 07:41 KST 점검
    ├─ grm-findings-review-queue.yml      # [검토 대기] needs_review 큐 나이 감시 — 데이터품질팀 업무
    ├─ grm-fda-import-alert.yml           # [수입경보] 66-40·66-41 스냅샷(현재 수집 꺼짐)
+   ├─ grm-fda-citations.yml              # [FDA 지적 조항] collect_fda_citations.py 실행(ENABLE_FDA_CITATIONS)
+   ├─ grm-deficiency-examples.yml        # [지적 사례] collect_deficiency_examples.py 실행(ENABLE_DEFICIENCY_EXAMPLES)
+   ├─ grm-site-error-watch.yml           # [사이트 오류] site_error_watch.py 일일 점검, 기본 꺼짐
    ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123·124·127(시드)·125(결정 쓰기)·126(업무 지시)·128(자동 측정) 를 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음
    ├─ grm-web-deploy.yml, grm-web-publish.yml, grm-delta-bridge.yml, grm-publish-watchdog.yml
    ├─ grm-newsletter-send.yml, grm-watchlist-notify.yml, grm-admin-backend-deploy.yml

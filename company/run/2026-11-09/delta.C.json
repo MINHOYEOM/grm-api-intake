@@ -1,0 +1,480 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-09",
+ "shard": "C",
+ "cards": {
+  "recall-af6b42c8c4df": {
+   "title_issue": "성상 부적합 회수",
+   "summary": "식약처가 (주)현진제약의 현진정향 등 2개 품목에 대해 성상 부적합을 사유로 회수를 명령했다.",
+   "key_facts": [
+    "사유: 성상 부적합(동일 사유 2품목 일괄 회수)",
+    "구분: 강제 회수(강제여부 Y), 회수명령일자 2026-11-05",
+    "업체: (주)현진제약"
+   ],
+   "implication": "식약처는 외관·성상이 기준에 맞지 않는 제품을 업체 자율이 아닌 강제 회수로 처리했다. 성상 시험은 일반적으로 원료 품질·보관 조건과 연관될 수 있으므로 우리 출하시험의 성상 판정 기준이 구체적으로 기술돼 있는지 확인해야 한다.",
+   "checks": [
+    "출하시험 성상 항목의 판정 기준이 색·형태 등으로 구체적으로 기술돼 있는가?",
+    "성상 부적합 발생 시 같은 원료를 쓴 다른 품목까지 영향 평가를 하는가?"
+   ],
+   "hook_line": "현진정향·현진곡기생 성상 부적합, 강제 회수",
+   "en": {
+    "title_issue": "Recall for failed appearance test",
+    "summary": "MFDS ordered a recall of two products from one domestic manufacturer because they failed the appearance (description) specification.",
+    "key_facts": [
+     "Reason: failed appearance (description) test; same reason for 2 products recalled together",
+     "Type: mandatory recall; recall order date 2026-11-05",
+     "Manufacturer: see the Korean-language name in the headline"
+    ],
+    "implication": "MFDS handled a product that failed its appearance specification as a mandatory recall rather than a voluntary one. Appearance failures can generally relate to raw material quality or storage conditions, so check that our release test defines appearance acceptance criteria in concrete terms.",
+    "checks": [
+     "Do our release appearance criteria specify color and form concretely?",
+     "When an appearance failure occurs, do we assess other products made from the same raw material?"
+    ],
+    "hook_line": "Two products recalled under a mandatory order for failed appearance test"
+   }
+  },
+  "recall-b250b08c23d5": {
+   "title_issue": "시판 후 안정성 함량 부적합 회수",
+   "summary": "(주)테라젠이텍스가 넥스온정40mg(에스오메프라졸마그네슘삼수화물)의 시판 후 안정성 함량시험 부적합으로 영업자 회수를 진행한다.",
+   "key_facts": [
+    "사유: 시판 후 안정성 함량시험 결과 부적합",
+    "구분: 영업자 회수(강제여부 N), 회수명령일자 2026-11-06",
+    "제품: 넥스온정40mg (에스오메프라졸마그네슘삼수화물)"
+   ],
+   "implication": "출하 때 적합했던 제품이 시판 후 안정성시험에서 함량 기준을 벗어나 회수로 이어졌다. 우리 시판 후 안정성 프로그램에서 함량 감소 경향을 규격이탈 전에 잡아내는 경향 분석이 운영되는지 확인할 차례다.",
+   "checks": [
+    "시판 후 안정성 함량 결과에 경향 분석 기준이 설정돼 있는가?",
+    "안정성 함량 규격이탈 시 시중 유통 로트의 회수 판단 절차가 정해져 있는가?"
+   ],
+   "hook_line": "출하 후 안정성 시험에서 함량 부적합, 영업자 회수",
+   "en": {
+    "title_issue": "Recall for post-market stability assay failure",
+    "summary": "A domestic manufacturer is recalling an esomeprazole magnesium trihydrate 40 mg tablet product after a post-marketing stability assay test failed.",
+    "key_facts": [
+     "Reason: post-marketing stability assay result out of specification",
+     "Type: voluntary recall by the company; recall date 2026-11-06",
+     "Product: esomeprazole magnesium trihydrate 40 mg tablets (Korean product name in headline)"
+    ],
+    "implication": "A product that passed at release fell outside its assay limit during post-marketing stability testing, leading to a recall. Check that our ongoing stability program uses trend analysis to catch assay decline before a result goes out of specification.",
+    "checks": [
+     "Are trend criteria set for post-marketing stability assay results?",
+     "Is there a defined procedure for recall decisions on marketed lots after a stability OOS?"
+    ],
+    "hook_line": "Assay failure in post-marketing stability testing, voluntary recall"
+   }
+  },
+  "recall-f9cb26370283": {
+   "title_issue": "첨부문서 주의사항 누락 회수",
+   "summary": "파마사이언스코리아(주)가 피엠에스플루옥세틴캡슐20밀리그램(플루옥세틴염산염)의 첨부문서에서 사용상의 주의사항 일부가 누락돼 영업자 회수를 진행한다.",
+   "key_facts": [
+    "사유: 첨부 문서 기재 사항(사용상의 주의사항 일부) 누락",
+    "구분: 영업자 회수(강제여부 N), 회수명령일자 2026-11-06",
+    "제품: 피엠에스플루옥세틴캡슐20밀리그램(플루옥세틴염산염)"
+   ],
+   "implication": "품질 시험이 아니라 첨부문서 기재 누락만으로도 회수가 이뤄졌다. 우리 허가사항 변경이 첨부문서 개정과 실제 포장 반영까지 이어지는지 문서통제 기록으로 확인해야 한다.",
+   "checks": [
+    "허가사항(사용상의 주의사항) 변경 시 첨부문서 개정 일정이 관리되는가?",
+    "출하 전 첨부문서 판번호를 최신 허가사항과 대조하는가?"
+   ],
+   "hook_line": "첨부문서의 사용상의 주의사항 일부 누락으로 영업자 회수",
+   "en": {
+    "title_issue": "Recall for missing label precautions",
+    "summary": "A domestic company is recalling a fluoxetine hydrochloride 20 mg capsule product because part of the precautions for use was missing from the package insert.",
+    "key_facts": [
+     "Reason: part of the precautions for use omitted from the package insert",
+     "Type: voluntary recall by the company; recall date 2026-11-06",
+     "Product: fluoxetine hydrochloride 20 mg capsules (Korean product name in headline)"
+    ],
+    "implication": "A recall followed from a package insert omission alone, not from a failed quality test. Check through document control records that approved label changes flow into revised inserts and the actual packaging.",
+    "checks": [
+     "Is the insert revision schedule managed when approved precautions change?",
+     "Is the insert version checked against current approved labeling before release?"
+    ],
+    "hook_line": "Part of the precautions for use missing from the insert, voluntary recall"
+   }
+  },
+  "D-0070-2027": {
+   "title_issue": "무균 보증 결여 회수",
+   "summary": "Right Value Drug Stores LLC 가 근육주사용 조제약 Testosterone Cypionate 200 mg/mL 바이알을 무균 보증 결여로 회수한다.",
+   "key_facts": [
+    "사유: 무균 보증 결여(Lack of sterility assurance)",
+    "회수 등급: Class II",
+    "제품: Testosterone Cypionate, 200 mg/mL 조제약(근육주사용), 5 mL 바이알 등"
+   ],
+   "implication": "FDA 회수 사유는 오염 검출이 아니라 무균을 보증할 근거가 부족하다는 것이다. 우리 무균 주사제 출하 판단에서 무균시험 결과 외에 공정 무균 보증 근거(배지충진·환경 모니터링)가 함께 검토되는지 확인해야 한다.",
+   "checks": [
+    "무균 주사제 출하 시 무균시험 외 공정 무균 보증 자료를 함께 검토하는가?",
+    "조제·소량 생산 주사제에도 배지충진 등 무균 공정 검증이 적용되는가?"
+   ],
+   "quotes_translation": [
+    "무균 보증 결여."
+   ],
+   "hook_line": "조제 테스토스테론 주사 바이알 무균 보증 결여, Class II",
+   "en": {
+    "title_issue": "Lack of sterility assurance recall",
+    "summary": "Right Value Drug Stores LLC is recalling compounded Testosterone Cypionate 200 mg/mL vials for intramuscular use due to lack of sterility assurance.",
+    "key_facts": [
+     "Reason: lack of sterility assurance",
+     "Recall class: Class II",
+     "Product: compounded Testosterone Cypionate, 200 mg/mL, intramuscular, in 5 mL and other vials"
+    ],
+    "implication": "The recall reason is not detected contamination but insufficient basis to assure sterility. Check that our sterile injectable release reviews process sterility assurance data such as media fills and environmental monitoring, not just the sterility test.",
+    "checks": [
+     "Do we review process sterility assurance data alongside the sterility test at release?",
+     "Do compounded or small-batch injectables also have aseptic process verification such as media fills?"
+    ],
+    "hook_line": "Compounded testosterone vials recalled for lack of sterility assurance, Class II"
+   }
+  },
+  "D-0082-2027": {
+   "title_issue": "주사제 이물 Class I 회수",
+   "summary": "Par Health USA, LLC 가 Argatroban Injection 250 mg/2.5mL 단회용 바이알을 용액 중 이물 발견으로 회수하며, 동일 사유 2품목을 일괄 회수한다.",
+   "key_facts": [
+    "사유: 제품 용액에서 셀룰로스·폴리스티렌·폴리에틸렌테레프탈레이트·스테인리스강·마개 재질로 확인된 이물",
+    "회수 등급: Class I",
+    "제품: Argatroban Injection, USP, 250 mg/2.5mL (100 mg/mL) 단회용 바이알(동일 사유 2품목)"
+   ],
+   "implication": "이물이 셀룰로스·폴리스티렌·스테인리스강·마개 재질 등 여러 재질로 확인돼 단일 공정 지점이 아닌 여러 접촉 경로가 일반적으로 연관될 수 있다. 우리 주사제 육안검사 불합격품의 이물을 재질별로 동정해 기원 추적에 쓰는지 확인할 차례다.",
+   "checks": [
+    "주사제 육안검사에서 나온 이물을 재질별로 동정하는가?",
+    "마개·용기 공급사 이물 기준과 입고검사가 이물 경향과 연결되는가?",
+    "스테인리스강 이물 발생 시 설비 마모 점검을 조사 범위에 넣는가?"
+   ],
+   "quotes_translation": [
+    "이물: 제품 용액에서 셀룰로스, 폴리스티렌, 폴리에틸렌테레프탈레이트, 스테인리스강 또는 마개 재질로 확인된 이물이 발견됨."
+   ],
+   "hook_line": "아르가트로반 주사액에 셀룰로스·스테인리스강 등 이물, Class I",
+   "en": {
+    "title_issue": "Particulate matter Class I recall",
+    "summary": "Par Health USA, LLC is recalling Argatroban Injection 250 mg/2.5mL single-dose vials for particulate matter in the solution; 2 products are recalled together for the same reason.",
+    "key_facts": [
+     "Reason: particulate matter identified as cellulose, polystyrene, polyethylene terephthalate, stainless steel or stopper material in the solution",
+     "Recall class: Class I",
+     "Product: Argatroban Injection, USP, 250 mg/2.5mL (100 mg/mL) single-dose vials (2 products, same reason)"
+    ],
+    "implication": "The particles were identified as several materials, including cellulose, polystyrene, stainless steel and stopper material, which can generally point to multiple contact paths rather than one process step. Check that our injectable visual inspection rejects are identified by material and used to trace their source.",
+    "checks": [
+     "Do we identify particles from visual inspection rejects by material?",
+     "Are stopper and container supplier particle limits linked to incoming inspection trends?",
+     "Does a stainless steel particle trigger an equipment wear check?"
+    ],
+    "hook_line": "Cellulose, stainless steel and other particles in argatroban solution, Class I"
+   }
+  },
+  "D-0084-2027": {
+   "title_issue": "무균제품 미생물 오염 회수",
+   "summary": "Greenwich Rx 가 Glutathione Injection 200 mg/mL 10 mL 다회용 바이알을 무균제품 미생물 오염으로 Class I 회수한다.",
+   "key_facts": [
+    "사유: 무균제품의 미생물 오염(Microbial Contamination of Sterile Products)",
+    "회수 등급: Class I",
+    "제품: Glutathione Injection 200 mg/mL, 10 mL multi-dose vial, 피하주사 전용"
+   ],
+   "implication": "무균 주사제에서 미생물 오염이 확인돼 최고 위험 등급인 Class I 회수가 이뤄졌다. 우리 다회용 주사 바이알의 보존제 효력시험과 사용 중 무균성 근거가 갖춰져 있는지 확인해야 한다.",
+   "checks": [
+    "다회용 주사 바이알의 보존제 효력 자료가 있는가?",
+    "무균 제품 미생물 오염 발생 시 같은 공정 로트 전체로 조사를 확대하는가?"
+   ],
+   "quotes_translation": [
+    "무균제품의 미생물 오염"
+   ],
+   "hook_line": "글루타치온 다회용 주사 바이알, 무균제품 미생물 오염으로 Class I",
+   "en": {
+    "title_issue": "Microbial contamination Class I recall",
+    "summary": "Greenwich Rx is recalling Glutathione Injection 200 mg/mL 10 mL multi-dose vials for microbial contamination of sterile products under Class I.",
+    "key_facts": [
+     "Reason: microbial contamination of sterile products",
+     "Recall class: Class I",
+     "Product: Glutathione Injection 200 mg/mL, 10 mL multi-dose vial, subcutaneous only"
+    ],
+    "implication": "Microbial contamination in a sterile injectable led to a Class I recall, the highest-risk class. Check that our multi-dose injectable vials have preservative efficacy and in-use sterility data in place.",
+    "checks": [
+     "Do our multi-dose vials have preservative efficacy data?",
+     "Does a sterile product contamination investigation extend to all lots from the same process?"
+    ],
+    "hook_line": "Glutathione multi-dose vials recalled Class I for microbial contamination"
+   }
+  },
+  "5c65b6ffb871": {
+   "title_issue": "PIC/S Annex 1 Q&A 발간",
+   "summary": "ECA Academy 는 PIC/S 가 Annex 1 적용을 돕는 Q&A 문서를 발간했다고 전했다.",
+   "key_facts": [
+    "주제: PIC/S, Annex 1 지원 Q&A 문서 발간",
+    "발행기관: ECA · 발행일 2026-11-02",
+    "세부 Q&A 항목: 원문 확인 필요"
+   ],
+   "implication": "Annex 1 해석을 두고 PIC/S 차원의 질의응답이 따로 나왔다는 점에서 무균 제조 실사에서 참고될 해석 기준이 늘었다. 세부 문항은 원문으로 확인한 뒤 우리 오염관리전략 문서와 대조해야 한다.",
+   "checks": [
+    "PIC/S Annex 1 Q&A 원문을 확보해 오염관리전략과 대조했는가?",
+    "Annex 1 이행 격차 목록에 Q&A 해석을 반영할 담당이 정해져 있는가?"
+   ],
+   "en": {
+    "title_issue": "PIC/S Annex 1 Q&A published",
+    "summary": "ECA Academy reports that PIC/S has published a Q&A document to assist with Annex 1.",
+    "key_facts": [
+     "Topic: PIC/S publishes a Q&A document to assist with Annex 1",
+     "Publisher: ECA; published 2026-11-02",
+     "Specific Q&A items: check the original"
+    ],
+    "implication": "A separate PIC/S-level Q&A on interpreting Annex 1 adds to the interpretive reference points inspectors may use for sterile manufacturing. Read the original questions and compare them against our contamination control strategy.",
+    "checks": [
+     "Have we obtained the PIC/S Annex 1 Q&A and compared it to our contamination control strategy?",
+     "Is someone assigned to reflect the Q&A in our Annex 1 gap list?"
+    ]
+   }
+  },
+  "a37196272835": {
+   "title_issue": "허용 결과까지 재시험한 경고서한",
+   "summary": "ECA Academy 는 시험 절차가 허용 가능한 결과가 나올 때까지 재시험을 허용한 사례를 다룬 FDA 경고서한을 소개했다.",
+   "key_facts": [
+    "주제: 허용 결과가 나올 때까지 재시험을 허용한 시험 절차에 대한 FDA Warning Letter",
+    "발행기관: ECA · 발행일 2026-11-02",
+    "관련 서한 일자: 2026년 10월 20일(원문 발췌 기준), 세부 내용은 원문 확인 필요"
+   ],
+   "implication": "시험 절차 자체가 반복 재시험을 허용한 구조를 FDA 가 문제 삼았다는 점이 핵심이다. 우리 시험법·규격이탈 절차가 근본원인 없이 재시험 결과로 최초 결과를 대체하는 길을 열어 두고 있지 않은지 확인할 차례다.",
+   "checks": [
+    "시험 절차가 근본원인 조사 없이 재시험을 허용하지 않는가?",
+    "재시험 횟수와 결과 채택 기준이 절차서에 정해져 있는가?"
+   ],
+   "en": {
+    "title_issue": "Retesting until acceptable result",
+    "summary": "ECA Academy covers an FDA Warning Letter on test procedures that allowed retesting until an acceptable result was obtained.",
+    "key_facts": [
+     "Topic: FDA Warning Letter on test procedures allowing retesting until an acceptable result",
+     "Publisher: ECA; published 2026-11-02",
+     "Related letter date: 20 October 2026 (per excerpt); details require the original"
+    ],
+    "implication": "The core issue is that the test procedure itself permitted repeated retesting. Check that our test methods and OOS procedure do not allow a retest to replace an original result without a root cause.",
+    "checks": [
+     "Do our procedures forbid retesting without a root-cause investigation?",
+     "Are retest limits and result-acceptance rules defined in the procedure?"
+    ]
+   }
+  },
+  "c945d37aa20e": {
+   "title_issue": "경고서한 속 GMP 교육 결함",
+   "summary": "ECA Academy 는 2026년 FDA 경고서한에서 반복된 GMP 교육 미흡 사례를 정리했다.",
+   "key_facts": [
+    "주제: FDA Warning Letter 에 나타난 GMP 교육 결함(2026년)",
+    "발행기관: ECA · 발행일 2026-11-02",
+    "세부 사례: 원문 확인 필요"
+   ],
+   "implication": "교육 미흡이 독립 지적 항목으로 경고서한에 거듭 오르고 있다는 점이 정리됐다. 우리 교육 기록이 이수 여부를 넘어 직무별 유효성 평가까지 남기는지 확인해야 한다.",
+   "checks": [
+    "직무별 GMP 교육에 유효성 평가 기록이 있는가?",
+    "일탈 조사 결과가 교육 계획 개정으로 이어지는가?"
+   ],
+   "en": {
+    "title_issue": "GMP training gaps in Warning Letters",
+    "summary": "ECA Academy reviews further GMP training deficiencies cited in FDA Warning Letters in 2026.",
+    "key_facts": [
+     "Topic: GMP training deficiencies in FDA Warning Letters (2026)",
+     "Publisher: ECA; published 2026-11-02",
+     "Specific cases: check the original"
+    ],
+    "implication": "The piece notes that training gaps keep appearing as standalone citations in Warning Letters. Check that our training records capture role-specific effectiveness checks, not just completion.",
+    "checks": [
+     "Do role-specific GMP trainings have recorded effectiveness checks?",
+     "Do deviation findings lead to revised training plans?"
+    ]
+   }
+  },
+  "91bceac3ffe8": {
+   "title_issue": "기록 제출 거부·수입경보",
+   "summary": "FDA 가 OTC 의약품(자외선차단제 포함) 제조소인 Guangdong Bisutang Biotechnology Co., Ltd. 에 기록 열람·복사 거부와 삭제된 색소 사용으로 경고서한을 발부했다.",
+   "key_facts": [
+    "위반 1: 704(a)(4) 기록 요청과 후속 연락에 응답하지 않음(기록 열람·복사 거부, 301(e) 금지행위)",
+    "결과: 2026년 7월 31일 해당 업체 의약품 전체 Import Alert 66-79 등재",
+    "위반 2: 자외선차단제 'XUEYI SKIN CARE' 에 인증 취소된 색소 Ext. D&C Yellow No. 5(CI 11680) 사용 — 501(a)(4)(A) 불량의약품"
+   ],
+   "implication": "FDA 는 기록 요청에 응답하지 않은 것만으로 품질보증 수준을 알 수 없다며 업체 의약품 전체를 수입경보에 올렸다. 우리 해외 제조소·수탁처가 FDA 기록 요청 연락처와 대응 절차를 최신으로 유지하는지 확인할 차례다.",
+   "checks": [
+    "등록 연락처와 미국 대리인으로 온 FDA 기록 요청을 놓치지 않는 절차가 있는가?",
+    "제품 처방의 색소가 현행 허용 목록에 있는지 정기 확인하는가?"
+   ],
+   "hook_line": "기록 제출 요청에 응하지 않아 수입경보 66-79 등재",
+   "en": {
+    "title_issue": "Records refusal and import alert",
+    "summary": "FDA issued a Warning Letter to Guangdong Bisutang Biotechnology Co., Ltd., an OTC drug manufacturer including sunscreen, for refusing access to and copying of records and for using a cancelled color additive.",
+    "key_facts": [
+     "Violation 1: no response to 704(a)(4) records requests and follow-up contacts (refusal of records access, a prohibited act under 301(e))",
+     "Consequence: all drugs from the firm placed on Import Alert 66-79 on July 31, 2026",
+     "Violation 2: 'XUEYI SKIN CARE' sunscreen contains the cancelled color additive Ext. D&C Yellow No. 5 (CI 11680), adulterated under 501(a)(4)(A)"
+    ],
+    "implication": "FDA placed all of the firm's drugs on import alert because the unanswered records request left it with no indication of quality assurance. Check that our overseas sites and contract manufacturers keep FDA records-request contacts and response procedures current.",
+    "checks": [
+     "Do we have a procedure so FDA records requests to our registered contact or U.S. agent are not missed?",
+     "Do we periodically confirm that colorants in our formulas are on current permitted lists?"
+    ],
+    "hook_line": "No response to records requests, placed on Import Alert 66-79"
+   }
+  },
+  "5d04db86a831": {
+   "title_issue": "ISPE 네덜란드 품질 CoP 출범",
+   "summary": "ISPE 는 2025년 설립된 ISPE Netherlands Quality Community of Practice 가 2026년 6월 9일 네덜란드 레이던에서 공식 출범 행사를 열었다고 소개했다.",
+   "key_facts": [
+    "주제: 컴플라이언스를 넘어선 품질 공동체의 역할",
+    "행사: 2026년 6월 9일 레이던 Bio Science Park, 제약 전문가 50명 이상 참석",
+    "논의: Quality 5.0·지식관리·품질위험관리·조직 학습"
+   ],
+   "implication": "업계 품질 담당자들이 품질을 규정 준수 기능에서 조직 전반을 잇는 역할로 넓히자는 논의를 공유했다. 우리 품질위험관리·지식관리 활동이 부서 간 공유 체계로 운영되는지 점검할 차례다.",
+   "checks": [
+    "품질위험관리 결과가 생산·개발 부서와 정기적으로 공유되는가?",
+    "일탈·CAPA 에서 얻은 교훈을 축적하는 지식관리 체계가 있는가?"
+   ],
+   "en": {
+    "title_issue": "ISPE NL Quality CoP launch",
+    "summary": "ISPE describes the official launch event of the ISPE Netherlands Quality Community of Practice, established in 2025, held on 9 June 2026 in Leiden, the Netherlands.",
+    "key_facts": [
+     "Theme: the role of quality communities beyond compliance",
+     "Event: 9 June 2026 at Leiden Bio Science Park, with more than 50 pharmaceutical professionals",
+     "Topics: Quality 5.0, knowledge management, quality risk management and organizational learning"
+    ],
+    "implication": "Industry quality professionals shared a push to widen quality from a compliance function to a role connecting the whole organization. Check whether our quality risk management and knowledge management run as cross-department sharing systems.",
+    "checks": [
+     "Are quality risk management outputs shared regularly with production and development?",
+     "Do we have a knowledge management system that captures lessons from deviations and CAPA?"
+    ]
+   }
+  },
+  "6a995fafd1c0": {
+   "title_issue": "GxP 검증의 머신 인 더 루프",
+   "summary": "ISPE 는 AI 를 쓰는 GxP 환경에서 사람 검토자(Human-in-the-Loop)가 실제 통제를 보장하는지 묻고, 머신 인 더 루프로 검증 범위 누락을 다룰 수 있는지 논의했다.",
+   "key_facts": [
+    "주제: Machine-in-the-Loop 로 GxP 밸리데이션의 커버리지 누락을 다룰 수 있는가",
+    "배경: iSpeak 블로그 'Human-in-the-Loop as an Illusion of Control?' 의 문제 제기",
+    "세부 제안 내용: 원문 확인 필요"
+   ],
+   "implication": "AI 산출물을 사람이 검토한다는 것만으로 통제가 충분하다고 보기 어렵다는 문제 제기가 업계에서 이어지고 있다. 우리 AI 활용 GxP 업무에서 사람 검토가 실제로 어떤 오류 범위를 잡아내는지 근거를 두고 있는지 확인할 차례다.",
+   "checks": [
+    "AI 산출물에 대한 사람 검토의 오류 검출 범위를 정의했는가?",
+    "AI 도구 밸리데이션에서 커버리지 누락을 평가하는 방법이 있는가?"
+   ],
+   "en": {
+    "title_issue": "Machine-in-the-loop for GxP validation",
+    "summary": "ISPE asks whether human reviewers truly provide control over AI in GxP environments, and whether machine-in-the-loop can address coverage failure in validation.",
+    "key_facts": [
+     "Topic: can machine-in-the-loop address coverage failure in GxP validation",
+     "Background: the iSpeak blog post 'Human-in-the-Loop as an Illusion of Control?'",
+     "Specific proposals: check the original"
+    ],
+    "implication": "Industry is questioning whether having a human review AI output is by itself sufficient control. Check that our AI-assisted GxP work has evidence of which errors human review actually catches.",
+    "checks": [
+     "Have we defined what errors human review of AI output is expected to catch?",
+     "Do our AI tool validations assess coverage gaps?"
+    ]
+   }
+  },
+  "dd952ef843b4": {
+   "title_issue": "AI·자동화 무균 제조 사례",
+   "summary": "ISPE 팟캐스트는 FOYA 수상 Hepalink Pingshan 시설이 AI·5G·자동화를 활용해 무균 제조를 개선한 사례를 다뤘다.",
+   "key_facts": [
+    "주제: AI·5G·자동화를 활용한 무균 제조 개선(Hepalink Pingshan 시설, FOYA 수상)",
+    "질문: 공간 제약 속에서 생산능력·무균 보증·공급 안정성을 어떻게 높이는가",
+    "세부 내용: 원문 확인 필요"
+   ],
+   "implication": "공간이 제한된 시설에서 자동화로 무균 보증과 생산능력을 함께 끌어올린 사례가 공유됐다. 우리 무균 공정 자동화 검토 시 사람 개입 감소가 오염관리전략에 어떻게 반영되는지 확인해야 한다.",
+   "checks": [
+    "무균 공정 자동화 검토에 사람 개입 감소 효과를 오염관리전략에 반영하는가?",
+    "자동화 설비 도입 시 데이터 무결성 요건을 함께 검토하는가?"
+   ],
+   "en": {
+    "title_issue": "AI and automation in sterile manufacturing",
+    "summary": "An ISPE podcast covers how Hepalink's FOYA-winning Pingshan facility uses AI, 5G and automation to improve sterile manufacturing.",
+    "key_facts": [
+     "Topic: AI, 5G and automation to improve sterile manufacturing (Hepalink Pingshan facility, FOYA winner)",
+     "Question: how to raise capacity, sterility assurance and supply reliability with limited space",
+     "Details: check the original"
+    ],
+    "implication": "A case was shared of a space-constrained site using automation to raise both sterility assurance and capacity. When we assess aseptic automation, check how reduced human intervention is reflected in our contamination control strategy.",
+    "checks": [
+     "Does our aseptic automation review reflect reduced intervention in the contamination control strategy?",
+     "Are data integrity requirements reviewed when automation equipment is introduced?"
+    ]
+   }
+  },
+  "data0008-15200": {
+   "title_issue": "의약외품 허가·심사 규정 개정",
+   "summary": "식약처가 '의약외품 품목허가·신고·심사 규정' 일부개정고시를 냈다.",
+   "key_facts": [
+    "주제: '의약외품 품목허가·신고·심사 규정' 일부개정고시",
+    "발행기관: MFDS · 발행일 2026-10-29",
+    "개정 내용·시행일: 원문 확인이 필요하다"
+   ],
+   "implication": "의약외품 품목허가·신고·심사 기준이 바뀌어 허가 서류 요건에 영향을 줄 수 있다. 개정 조항과 시행일은 원문으로 확인한 뒤 진행 중인 의약외품 허가·변경 건에 대입해야 한다.",
+   "checks": [
+    "개정 고시 원문을 확보해 바뀐 조항을 확인했는가?",
+    "진행 중인 의약외품 허가·신고 건에 개정 조항 적용 여부를 검토했는가?"
+   ],
+   "en": {
+    "title_issue": "Quasi-drug approval rules amended",
+    "summary": "MFDS issued a partial amendment to its regulation on approval, notification and review of quasi-drug products.",
+    "key_facts": [
+     "Topic: partial amendment of the quasi-drug product approval, notification and review regulation",
+     "Publisher: MFDS; published 2026-10-29",
+     "Changes and effective date: original needs to be checked"
+    ],
+    "implication": "The approval, notification and review criteria for quasi-drugs have changed, which may affect dossier requirements. Confirm the amended articles and effective date from the original and apply them to open quasi-drug filings.",
+    "checks": [
+     "Have we obtained the amendment and identified the changed articles?",
+     "Have we checked whether the changes apply to our pending quasi-drug filings?"
+    ]
+   }
+  },
+  "data0008-15202": {
+   "title_issue": "한약(생약)제제 허가 규정 개정",
+   "summary": "식약처가 「한약(생약)제제 등의 품목허가·신고에 관한 규정」 일부개정고시(식품의약품안전처 고시 제2026-73호)를 냈다.",
+   "key_facts": [
+    "주제: 「한약(생약)제제 등의 품목허가·신고에 관한 규정」 일부개정",
+    "고시 번호: 식품의약품안전처 고시 제2026-73호 · 발행일 2026-10-30",
+    "개정 내용·시행일: 원문 확인이 필요하다"
+   ],
+   "implication": "한약(생약)제제 품목허가·신고 기준이 개정돼 해당 제품 허가 자료 요건이 달라질 수 있다. 개정 조항과 시행일을 원문으로 확인해 진행 중인 한약(생약)제제 허가·변경 건에 반영해야 한다.",
+   "checks": [
+    "고시 제2026-73호 원문으로 바뀐 조항을 확인했는가?",
+    "진행 중인 한약(생약)제제 허가·신고 건에 개정 조항 적용 여부를 검토했는가?"
+   ],
+   "en": {
+    "title_issue": "Herbal product approval rules amended",
+    "summary": "MFDS issued a partial amendment to its regulation on approval and notification of herbal (crude drug) preparations (MFDS Notice No. 2026-73).",
+    "key_facts": [
+     "Topic: partial amendment of the herbal (crude drug) preparation approval and notification regulation",
+     "Notice: MFDS Notice No. 2026-73; published 2026-10-30",
+     "Changes and effective date: original needs to be checked"
+    ],
+    "implication": "Approval and notification criteria for herbal preparations have been amended, which may change dossier requirements for these products. Confirm the amended articles and effective date from the original and apply them to pending herbal product filings.",
+    "checks": [
+     "Have we identified the changed articles from Notice No. 2026-73?",
+     "Have we checked whether they apply to our pending herbal product filings?"
+    ]
+   }
+  },
+  "data0008-15203": {
+   "title_issue": "의약품 허가·심사 규정 개정",
+   "summary": "식약처가 「의약품의 품목허가·신고·심사 규정」 일부개정 고시를 알렸다.",
+   "key_facts": [
+    "주제: 「의약품의 품목허가·신고·심사 규정」 일부개정 고시",
+    "발행기관: MFDS · 발행일 2026-10-30",
+    "개정 내용·시행일: 원문 확인이 필요하다"
+   ],
+   "implication": "의약품 품목허가·신고·심사의 기본 규정이 개정돼 허가 자료와 변경 관리 전반에 영향이 미칠 수 있다. 개정 조항과 시행일을 원문으로 확인하고 진행 중인 허가·변경 신청과 대조해야 한다.",
+   "checks": [
+    "개정 고시 원문으로 바뀐 조항과 시행일을 확인했는가?",
+    "진행 중인 의약품 허가·변경 신청에 개정 조항 영향 평가를 했는가?"
+   ],
+   "en": {
+    "title_issue": "Drug approval rules amended",
+    "summary": "MFDS announced a partial amendment to its regulation on approval, notification and review of drug products.",
+    "key_facts": [
+     "Topic: partial amendment of the drug product approval, notification and review regulation",
+     "Publisher: MFDS; published 2026-10-30",
+     "Changes and effective date: original needs to be checked"
+    ],
+    "implication": "The core regulation for drug approval, notification and review has been amended, which may affect dossiers and change management broadly. Confirm the amended articles and effective date from the original and compare them with pending applications.",
+    "checks": [
+     "Have we identified the changed articles and effective date from the original?",
+     "Have we assessed the impact on pending approval and variation applications?"
+    ]
+   }
+  }
+ }
+}

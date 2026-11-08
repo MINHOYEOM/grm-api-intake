@@ -760,6 +760,78 @@ def _tidy_card(card: dict[str, Any], facts: list[dict[str, Any]],
     return _tidy_generic(card, facts, tr)
 
 
+# ── [실사 결과 카드 2026-11-08] 앞면 블록 뷰 ────────────────────────────────────
+# 데이터(`card["inspection"]`)는 `inspection_card.py` 가 조립 단계에서 결정론으로 만든다.
+# 여기서는 표시 언어를 고르고 라벨을 번역할 뿐이다(템플릿은 언어를 고르지 않는다).
+# ★블록이 없는 카드(이미 발행된 호 전부)는 None → card.html 이 종전 모양 그대로 그린다.
+INSPECTION_FRONT_ITEMS = 5
+_INSPECTION_SEV_LABEL = {"critical": N_("치명"), "major": N_("주요"), "other": N_("기타")}
+_INSPECTION_SEV_LABEL_MFDS = {"critical": N_("치명"), "major": N_("중요"), "other": N_("기타")}
+_INSPECTION_ACTION_LABEL = {
+    "prohibition_of_supply": N_("공급 금지"),
+    "recall": N_("출하 배치 회수"),
+    "ma_suspension": N_("판매허가 정지"),
+    "ma_revocation": N_("판매허가 취소"),
+    "cep_suspension": N_("CEP 정지·무효화"),
+    "certificate_withdrawal": N_("GMP 인증서 철회"),
+    "clinical_trial_suspension": N_("임상시험 중지"),
+}
+
+
+def _inspection_view(card: dict[str, Any], tr: Translator, lang: str) -> "dict[str, Any] | None":
+    blk = card.get("inspection")
+    if not isinstance(blk, dict):
+        return None
+    dd = card.get("deterministic_detail") or {}
+    mfds = dd.get("type") == "gmp_deficiencies"
+    sev_label = _INSPECTION_SEV_LABEL_MFDS if mfds else _INSPECTION_SEV_LABEL
+    chips: list[dict[str, Any]] = []
+    for c in blk.get("counts") or []:
+        sev, n = c.get("sev"), c.get("n")
+        if not isinstance(n, int) or n <= 0:
+            continue
+        if sev == "observation":
+            chips.append({"text": tr("Observation {n}건", n=n), "cls": "obs"})
+        elif sev == "violation":
+            chips.append({"text": tr("위반 {n}건", n=n), "cls": "obs"})
+        elif sev in sev_label:
+            chips.append({"text": f"{tr(sev_label[sev])} {n}", "cls": sev})
+    items: list[dict[str, Any]] = []
+    for it in blk.get("items") or []:
+        # 한국어 트리 = 국문 한 줄(없으면 원문). 영어 트리 = 원문(영문)만 — 원문이 한국어뿐인
+        # 식약처 항목은 영어 트리에 싣지 않는다(지어 옮기지 않는다 · 개수 칩은 남는다).
+        if lang == DEFAULT_LANG:
+            text, more = it.get("text") or it.get("orig") or "", it.get("more") if it.get("text") else it.get("orig_more")
+        else:
+            text, more = it.get("orig") or "", it.get("orig_more")
+        if not text:
+            continue
+        sev = it.get("sev")
+        items.append({
+            "no": it.get("no", ""),
+            "sev": tr(sev_label[sev]) if sev in sev_label else "",
+            "sev_cls": sev if sev in sev_label else "",
+            "text": text, "more": more or "",
+            "area": (it.get("area") or "") if lang == DEFAULT_LANG else "",
+            "clause": it.get("clause") or "",
+            "note": (it.get("note") or "") if lang == DEFAULT_LANG else "",
+        })
+    actions = [tr(_INSPECTION_ACTION_LABEL[a]) for a in (blk.get("actions") or [])
+               if a in _INSPECTION_ACTION_LABEL]
+    country = ((blk.get("authority") or {}).get("country") or "").strip()
+    stmts = blk.get("statements") or []
+    if not (chips or items or actions):
+        return None
+    return {
+        "chips": chips,
+        "items_head": items[:INSPECTION_FRONT_ITEMS],
+        "items_rest": items[INSPECTION_FRONT_ITEMS:],
+        "actions": actions,
+        "authority": tr("{country} 규제당국", country=country) if country else "",
+        "statements": tr("판정서 {n}건", n=len(stmts)) if len(stmts) > 1 else "",
+    }
+
+
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG,
                doc_url_index: "dict[str, tuple[str, int]] | None" = None,
@@ -884,6 +956,12 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
 
     tidy_meta, key_facts, tidy_parts = _tidy_card(card, facts, tr)
 
+    # [실사 결과 카드 2026-11-08] 앞면 블록이 있고 지적 목록이 실리면, 목록이 대신하는 서술층
+    # (요약 문단·원문 앞 250자 인용·핵심 사실·시사점)을 앞면에서 뺀다. 데이터는 그대로 둔다
+    # (링크드인 카드뉴스가 같은 칸을 쓴다). 목록이 없으면(원문 구조·번역 없음) 종전 층을 둔다.
+    insp = _inspection_view(card, tr, lang)
+    insp_list = bool(insp and (insp["items_head"] or insp["items_rest"]))
+
     return {
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
@@ -896,6 +974,9 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "is_evA": card.get("evidence_level") == "A",
         "card_type": tr(card["card_type"]) if card.get("card_type") else "",
         "agency": card.get("agency", ""),
+        # 화면 표기 기관 — EU 비준수는 실제 판정한 회원국 당국(예: "Malta 규제당국").
+        "agency_label": (insp["authority"] if insp and insp["authority"] else card.get("agency", "")),
+        "inspection": insp,
         "headline_target": card.get("headline_target", ""),
         "title_issue": card.get("title_issue", ""),
         "toc_distinguisher": "",            # P1-1: 동명 카드 목차 구분자(annotate 단계서 채움)
@@ -905,7 +986,7 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         "sig_color": SIG_COLOR.get(card.get("signal_label"), "var(--lo)"),
         "modality": tr(card["modality"]) if card.get("modality") else card.get("modality"),
         "type_tag": tr(card["type_tag"]) if card.get("type_tag") else card.get("type_tag"),
-        "summary": card.get("summary", ""),
+        "summary": "" if insp_list else card.get("summary", ""),
         # [카드 훅1 2026-11-03] 검증을 통과한 한 줄 헤드라인 — 없거나 검사에 걸리면 빈 문자열
         # (card.html 이 박스를 아예 그리지 않아 오늘과 같은 모양).
         "hook_line": hook_line,
@@ -930,9 +1011,10 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         #   i18n 스캐너가 리터럴을 못 보고 `품목` 이 사전 고아로 잡힌다(실측 1회 실패).
         "merged_noun": (tr(card["merged_noun"]) if card.get("merged_noun")
                         else tr("품목")),
-        "quotes": quotes,
-        "quote_label": ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None),
-        "key_facts": key_facts,
+        "quotes": [] if insp_list else quotes,
+        "quote_label": (None if insp_list else
+                        ((tr("원문 및 번역") if any_trans else tr("원문")) if quotes_in else None)),
+        "key_facts": [] if insp_list else key_facts,
         # [카드 정돈 2026-11-03·11-04] 정돈 대상 카드만 값이 있다 — 4칸 표 대신 메타 한 줄(템플릿이 분기).
         "tidy_meta": tidy_meta,
         "tidy_parts": tidy_parts,
@@ -943,7 +1025,7 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         #   손대지 않는다.
         "evidence_basis": (tr(EVIDENCE_BASIS_LABELS.get(card["evidence_basis"], card["evidence_basis"]))
                            if card.get("evidence_basis") else card.get("evidence_basis", "")),
-        "implication": card.get("implication", ""),
+        "implication": "" if insp_list else card.get("implication", ""),
         "checks": card.get("checks") or [],
         # [WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 그대로 통과(사실/URL 무변형 원칙과
         # 동형 — 표시 플래그 미가공, 값 자체는 raw). 대다수 카드는 키 부재/None → card.html

@@ -155,6 +155,11 @@ def run(sources: list[str], *, notion_token: str, notion_db: str, supabase_url: 
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     ap.add_argument("--source", action="append", required=True,
                     help="Notion Source 값(예: ICH, WHO). 여러 번 줄 수 있다")

@@ -1,1 +1,1164 @@
-{"status":"보류","run_date_kst":"2026-11-09","reason":"handoff 없음"}
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-09",
+ "handoff_title": "OPEN GRM Routine Handoff 2026-11-09",
+ "rows": [
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-195283",
+   "web_card_id": "fda483-195283",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196144",
+   "web_card_id": "fda483-196144",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196220",
+   "web_card_id": "fda483-196220",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196221",
+   "web_card_id": "fda483-196221",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196222",
+   "web_card_id": "fda483-196222",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196223",
+   "web_card_id": "fda483-196223",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196224",
+   "web_card_id": "fda483-196224",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196225",
+   "web_card_id": "fda483-196225",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196231",
+   "web_card_id": "fda483-196231",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196239",
+   "web_card_id": "fda483-196239",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196241",
+   "web_card_id": "fda483-196241",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196242",
+   "web_card_id": "fda483-196242",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196243",
+   "web_card_id": "fda483-196243",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196246",
+   "web_card_id": "fda483-196246",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196247",
+   "web_card_id": "fda483-196247",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196248",
+   "web_card_id": "fda483-196248",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA 483",
+   "document_id": "fda483-196250",
+   "web_card_id": "fda483-196250",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "13ca327def9d",
+   "web_card_id": "13ca327def9d",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "142f18a0ab47",
+   "web_card_id": "142f18a0ab47",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "630b3e9f64ec",
+   "web_card_id": "630b3e9f64ec",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "8632153aa053",
+   "web_card_id": "8632153aa053",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "Health Canada",
+   "document_id": "hc-82896",
+   "web_card_id": "hc-82896",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026007737",
+   "web_card_id": "admin-2026007737",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026007815",
+   "web_card_id": "admin-2026007815",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026007836",
+   "web_card_id": "admin-2026007836",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "admin-2026007895",
+   "web_card_id": "admin-2026007895",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-01f0f654c3cd",
+   "web_card_id": "recall-01f0f654c3cd",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-168496d79d9a",
+   "web_card_id": "recall-168496d79d9a",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-393b7e02ee72",
+   "web_card_id": "recall-393b7e02ee72",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-48c360d4b6d1",
+   "web_card_id": "recall-48c360d4b6d1",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-5a12ea50b80b",
+   "web_card_id": "recall-5a12ea50b80b",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-7621d6b9981d",
+   "web_card_id": "recall-7621d6b9981d",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-8978cba1d6d6",
+   "web_card_id": null,
+   "signal_tier": "Tier 3",
+   "merged_into": "MFDS::recall-48c360d4b6d1",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-af6b42c8c4df",
+   "web_card_id": "recall-af6b42c8c4df",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-b250b08c23d5",
+   "web_card_id": "recall-b250b08c23d5",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-c09b3c49bbe8",
+   "web_card_id": null,
+   "signal_tier": "Tier 3",
+   "merged_into": "MFDS::recall-af6b42c8c4df",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "recall-f9cb26370283",
+   "web_card_id": "recall-f9cb26370283",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0070-2027",
+   "web_card_id": "D-0070-2027",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0082-2027",
+   "web_card_id": "D-0082-2027",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0083-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 3",
+   "merged_into": "OpenFDA Recall::D-0082-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0084-2027",
+   "web_card_id": "D-0084-2027",
+   "signal_tier": "Tier 3",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 3 카드"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "5c65b6ffb871",
+   "web_card_id": "5c65b6ffb871",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "a37196272835",
+   "web_card_id": "a37196272835",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "c945d37aa20e",
+   "web_card_id": "c945d37aa20e",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "91bceac3ffe8",
+   "web_card_id": "91bceac3ffe8",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "ISPE",
+   "document_id": "5d04db86a831",
+   "web_card_id": "5d04db86a831",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "ISPE",
+   "document_id": "6a995fafd1c0",
+   "web_card_id": "6a995fafd1c0",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "ISPE",
+   "document_id": "dd952ef843b4",
+   "web_card_id": "dd952ef843b4",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0008-15200",
+   "web_card_id": "data0008-15200",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0008-15202",
+   "web_card_id": "data0008-15202",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0008-15203",
+   "web_card_id": "data0008-15203",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44301",
+   "web_card_id": "data0009-44301",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q6VfHVal_H",
+   "web_card_id": "gmpinspect-1Q6VfHVal_H",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q6VfHVao4W",
+   "web_card_id": "gmpinspect-1Q6VfHVao4W",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q6VfHVap_U",
+   "web_card_id": "gmpinspect-1Q6VfHVap_U",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "gmpinspect-1Q6fJiSER3Z",
+   "web_card_id": "gmpinspect-1Q6fJiSER3Z",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "document_id": "8b6bc62e550c",
+   "web_card_id": "8b6bc62e550c",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "document_id": "91ccd273fe30",
+   "web_card_id": "91ccd273fe30",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0045-2027",
+   "web_card_id": "D-0045-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0050-2027",
+   "web_card_id": "D-0050-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0051-2027",
+   "web_card_id": "D-0051-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0052-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0051-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0053-2027",
+   "web_card_id": "D-0053-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0054-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0055-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0056-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0057-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0058-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0059-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0060-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0061-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0062-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0063-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0064-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0065-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0066-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0067-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0068-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0069-2027",
+   "web_card_id": null,
+   "signal_tier": "Tier 2",
+   "merged_into": "OpenFDA Recall::D-0053-2027",
+   "action": "render",
+   "reason": "병합 멤버 — 대표 카드에 포함"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0076-2027",
+   "web_card_id": "D-0076-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0079-2027",
+   "web_card_id": "D-0079-2027",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "recall-fb-ad0646134a334095",
+   "web_card_id": "recall-fb-ad0646134a334095",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "recall-fb-d2089da0cb841a55",
+   "web_card_id": "recall-fb-d2089da0cb841a55",
+   "signal_tier": "Tier 2",
+   "merged_into": null,
+   "action": "render",
+   "reason": "Tier 2 카드"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "10bd10f0bd2a",
+   "web_card_id": "10bd10f0bd2a",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "415747001653",
+   "web_card_id": "415747001653",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "adb9743fda43",
+   "web_card_id": "adb9743fda43",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "d0117b1b66bf",
+   "web_card_id": "d0117b1b66bf",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "d6e276f2d4ee",
+   "web_card_id": "d6e276f2d4ee",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "ECA Academy",
+   "document_id": "dfb08de600a1",
+   "web_card_id": "dfb08de600a1",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "EMA",
+   "document_id": "183301e04d79",
+   "web_card_id": "183301e04d79",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "EMA",
+   "document_id": "fc86f4092980",
+   "web_card_id": "fc86f4092980",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "6b09f4eb7150",
+   "web_card_id": "6b09f4eb7150",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "92844d82511d",
+   "web_card_id": "92844d82511d",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "989c048a81f9",
+   "web_card_id": "989c048a81f9",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "9f853b0637c4",
+   "web_card_id": "9f853b0637c4",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "a646a46b5673",
+   "web_card_id": "a646a46b5673",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "dd54dbe4a427",
+   "web_card_id": "dd54dbe4a427",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "FDA Warning Letter",
+   "document_id": "f2339da0101d",
+   "web_card_id": "f2339da0101d",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22369",
+   "web_card_id": "2026-22369",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22427",
+   "web_card_id": "2026-22427",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22589",
+   "web_card_id": "2026-22589",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22590",
+   "web_card_id": "2026-22590",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22593",
+   "web_card_id": "2026-22593",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22657",
+   "web_card_id": "2026-22657",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Federal Register",
+   "document_id": "2026-22663",
+   "web_card_id": "2026-22663",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "Health Canada",
+   "document_id": "hc-82902",
+   "web_card_id": "hc-82902",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44302",
+   "web_card_id": "data0009-44302",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44307",
+   "web_card_id": "data0009-44307",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44313",
+   "web_card_id": "data0009-44313",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44314",
+   "web_card_id": "data0009-44314",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0009-44316",
+   "web_card_id": "data0009-44316",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0011-15992",
+   "web_card_id": "data0011-15992",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0011-15993",
+   "web_card_id": "data0011-15993",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "MFDS",
+   "document_id": "data0011-15994",
+   "web_card_id": "data0011-15994",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "document_id": "D-0049-2027",
+   "web_card_id": "D-0049-2027",
+   "signal_tier": "Tier 1",
+   "merged_into": null,
+   "action": "skip",
+   "reason": "Tier 1 — 카드 생략(Skipped)"
+  }
+ ],
+ "search_findings": [],
+ "shards": {
+  "delta": {
+   "A": [
+    "fda483-195283",
+    "fda483-196144",
+    "fda483-196220",
+    "fda483-196221",
+    "fda483-196222",
+    "fda483-196223",
+    "fda483-196224",
+    "fda483-196225",
+    "fda483-196231",
+    "fda483-196239",
+    "fda483-196241",
+    "fda483-196242",
+    "fda483-196243",
+    "fda483-196246",
+    "fda483-196247",
+    "fda483-196248"
+   ],
+   "B": [
+    "fda483-196250",
+    "13ca327def9d",
+    "142f18a0ab47",
+    "630b3e9f64ec",
+    "8632153aa053",
+    "hc-82896",
+    "admin-2026007737",
+    "admin-2026007815",
+    "admin-2026007836",
+    "admin-2026007895",
+    "recall-01f0f654c3cd",
+    "recall-168496d79d9a",
+    "recall-393b7e02ee72",
+    "recall-48c360d4b6d1",
+    "recall-5a12ea50b80b",
+    "recall-7621d6b9981d"
+   ],
+   "C": [
+    "recall-af6b42c8c4df",
+    "recall-b250b08c23d5",
+    "recall-f9cb26370283",
+    "D-0070-2027",
+    "D-0082-2027",
+    "D-0084-2027",
+    "5c65b6ffb871",
+    "a37196272835",
+    "c945d37aa20e",
+    "91bceac3ffe8",
+    "5d04db86a831",
+    "6a995fafd1c0",
+    "dd952ef843b4",
+    "data0008-15200",
+    "data0008-15202",
+    "data0008-15203"
+   ],
+   "D": [
+    "data0009-44301",
+    "gmpinspect-1Q6VfHVal_H",
+    "gmpinspect-1Q6VfHVao4W",
+    "gmpinspect-1Q6VfHVap_U",
+    "gmpinspect-1Q6fJiSER3Z",
+    "8b6bc62e550c",
+    "91ccd273fe30",
+    "D-0045-2027",
+    "D-0050-2027",
+    "D-0051-2027",
+    "D-0053-2027",
+    "D-0076-2027",
+    "D-0079-2027",
+    "recall-fb-ad0646134a334095",
+    "recall-fb-d2089da0cb841a55"
+   ]
+  },
+  "deep": {
+   "A": [
+    "fda483-196144",
+    "fda483-196224",
+    "fda483-196225",
+    "fda483-196246",
+    "fda483-196250",
+    "142f18a0ab47",
+    "admin-2026007737",
+    "admin-2026007895"
+   ],
+   "B": [
+    "fda483-195283",
+    "fda483-196221",
+    "fda483-196231",
+    "fda483-196239",
+    "fda483-196242",
+    "fda483-196248",
+    "630b3e9f64ec",
+    "admin-2026007815",
+    "91bceac3ffe8"
+   ],
+   "C": [
+    "fda483-196220",
+    "fda483-196222",
+    "fda483-196223",
+    "fda483-196241",
+    "fda483-196243",
+    "fda483-196247",
+    "13ca327def9d",
+    "8632153aa053",
+    "admin-2026007836"
+   ]
+  },
+  "tldr": "T"
+ },
+ "counts": {
+  "rows": 115,
+  "render": 83,
+  "skip": 32,
+  "reflow": 0,
+  "error": 0,
+  "defer": 0,
+  "websearch_used": 3,
+  "webfetch_used": 0
+ },
+ "notes": "검색 슬롯 2(FDA Guidance)·7(ICH 변동 없음, 확인함 — 6월 총회 이후 11/2~9 신규 공식 보도 미발견)·8(TGA) 모두 7일 내 신규 0건. 11/2 CONSUMED handoff 와 대조해 재유입 0건(DEFERRED 블록 없음). 심층 대상 26장(483 관찰 54건)."
+}

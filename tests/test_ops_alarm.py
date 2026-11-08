@@ -46,6 +46,8 @@ class MappingTest(unittest.TestCase):
         (["reconcile-fda"], "infra"),                           # reconcile-<소스> 접두
         (["reconciliation", "reconcile-monitor"], "dev"),       # 감시 자체 실패는 개발팀(접두 규칙보다 위)
         (["reconcile-monitor"], "dev"),
+        (["site-errors"], "dev"),                               # 사이트 오류 징후 -> 개발팀
+        (["site-errors", "automation-warning"], "dev"),
         (["automation-failure"], "infra"),
         (["automation-warning"], "infra"),
         (["grm-intake", "automation-failure"], "infra"),

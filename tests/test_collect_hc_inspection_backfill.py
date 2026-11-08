@@ -473,6 +473,37 @@ class TestRunFailures(unittest.TestCase):
         report, code = _run(lambda url, **kw: {"rows": []})
         self.assertEqual(code, 2)
         self.assertTrue(any("data 배열" in e for e in report.errors))
+        self.assertEqual(report.list_failure_kind, mod.LIST_FAILURE_SHAPE)
+
+    def test_tls_eof_is_classified_unreachable(self):
+        # 2026-10-31~ 실측 문구 그대로(http_get_json 이 requests 예외를 감싼 형태).
+        msg = ("HTTP GET final failure: https://www.drug-inspections.canada.ca/gmp//controller/"
+               "searchResult.ashx (HTTPSConnectionPool(host='www.drug-inspections.canada.ca', "
+               "port=443): Max retries exceeded with url: /gmp//controller/searchResult.ashx "
+               "(Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF "
+               "occurred in violation of protocol (_ssl.c:1011)'))))")
+
+        def boom(url, **kw):
+            raise RuntimeError(msg)
+        report, code = _run(boom)
+        self.assertEqual(code, 2)
+        self.assertEqual(report.list_failure_kind, mod.LIST_FAILURE_UNREACHABLE)
+        self.assertFalse(report.source_quiet)
+
+    def test_http_status_is_not_confused_with_unreachable(self):
+        self.assertEqual(mod.classify_list_failure(
+            "목록 수집 실패: HTTPClientError: HTTP 404 for https://x"), mod.LIST_FAILURE_HTTP)
+        self.assertEqual(mod.classify_list_failure(
+            "목록 수집 실패: RuntimeError: HTTP GET final failure: https://x "
+            "(503 Server Error: Service Unavailable for url: https://x)"), mod.LIST_FAILURE_HTTP)
+        self.assertEqual(mod.classify_list_failure("목록 수집 실패: ValueError: ?"),
+                         mod.LIST_FAILURE_OTHER)
+
+    def test_empty_list_is_quiet_source_not_failure(self):
+        report, code = _run(lambda url, **kw: {"data": []})
+        self.assertEqual(code, 0)
+        self.assertTrue(report.source_quiet)
+        self.assertEqual(report.list_failure_kind, "")
 
     def test_card_failure_is_per_document_and_recorded_for_rerun(self):
         http = _FakeHttp([_list_row(insepctionNumber=n) for n in (1, 2, 3)],

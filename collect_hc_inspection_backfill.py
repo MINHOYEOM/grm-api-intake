@@ -392,6 +392,39 @@ class BackfillReport:
     failed_ins_numbers: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     would_append: list[str] = field(default_factory=list)  # dry-run: 앞 20건 document_id
+    # 목록 실패의 **종류**(classify_list_failure). 경보가 "시크릿 확인"부터 시키면 오진한다 —
+    # 2026-10-31~ 실패는 시크릿이 아니라 원천 서버가 모두에게 연결을 끊는 것이었다.
+    list_failure_kind: str = ""
+    # 목록은 받았는데 창 안에 0행 = 원천이 조용하다(장애 아님). 접속 불가와 갈라 본다.
+    source_quiet: bool = False
+
+
+LIST_FAILURE_UNREACHABLE = "unreachable"     # 연결·TLS 단계에서 끊김(원천 서버 문제)
+LIST_FAILURE_HTTP = "http_error"              # 서버는 응답했지만 4xx/5xx
+LIST_FAILURE_SHAPE = "shape_changed"          # 응답은 왔지만 계약 구조가 아니다
+LIST_FAILURE_OTHER = "other"
+
+# requests 예외 문자열에 실리는 연결 단계 표지. http_get_json 은 최종 실패를
+# RuntimeError("HTTP GET final failure: ... (<requests 예외 문자열>)") 로 감싸므로
+# 타입이 아니라 문자열로 가른다.
+_UNREACHABLE_MARKERS = (
+    "SSLError", "SSLEOFError", "UNEXPECTED_EOF", "ConnectionError", "ConnectTimeout",
+    "ReadTimeout", "timed out", "Connection reset", "Connection aborted",
+    "RemoteDisconnected", "NameResolutionError", "Failed to resolve", "Max retries exceeded",
+)
+
+
+def classify_list_failure(err: str) -> str:
+    """목록 실패 문구 → 종류. 경보 문구가 이 값으로 갈린다(워크플로 Surface 스텝)."""
+    text = err or ""
+    if "구조 변경" in text or "객체가 아님" in text:
+        return LIST_FAILURE_SHAPE
+    if "HTTPClientError" in text or re.search(r"\b[45]\d\d\b (Client|Server) Error", text) \
+            or re.search(r"HTTP [45]\d\d for", text):
+        return LIST_FAILURE_HTTP
+    if any(marker in text for marker in _UNREACHABLE_MARKERS):
+        return LIST_FAILURE_UNREACHABLE
+    return LIST_FAILURE_OTHER
 
 
 def _fetch_list(
@@ -453,10 +486,16 @@ def run(
     rows, err = _fetch_list(start, end, http_get=http_get, retries=retries)
     if err:
         report.errors.append(f"collect_failed:{err}")
-        log("ERROR", f"HC 실사 백필 목록 수집 실패: {err}")
+        report.list_failure_kind = classify_list_failure(err)
+        log("ERROR", f"HC 실사 백필 목록 수집 실패({report.list_failure_kind}): {err}")
         return report, 2
     report.listed = len(rows)
     log("INFO", f"HC 실사 백필 목록 {len(rows)}행 (창 {start}~{end})")
+    if not rows:
+        # 장애가 아니다(목록 응답 자체는 정상). 다만 0건이 몇 주 이어지면 사람이 봐야 하므로
+        # 리포트에 따로 표시한다 — 접속 불가(exit 2)와 같은 칸에 섞이지 않게.
+        report.source_quiet = True
+        log("WARN", f"HC 실사 목록 0행 — 원천이 조용하다(창 {start}~{end}, 접속은 정상)")
 
     # ── 1단계: 네트워크 이전에 끝낼 수 있는 선별을 전부 끝낸다 ────────────────────
     # 상세는 문서당 1콜이라 여기서 거른 만큼 그대로 비용이다. 순서도 의미가 있다 —
@@ -669,6 +708,7 @@ def main(argv: list[str] | None = None) -> int:
 __all__ = [
     "BackfillReport",
     "build_item",
+    "classify_list_failure",
     "is_target_row",
     "list_params",
     "non_human_category",

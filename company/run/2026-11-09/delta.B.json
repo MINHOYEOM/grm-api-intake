@@ -1,0 +1,524 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-09",
+ "shard": "B",
+ "cards": {
+  "fda483-196250": {
+   "title_issue": "시험법 밸리데이션 기록·절차 미준수",
+   "hook_line": "육안 판단으로 기각한 분석 회차가 계산해 보니 잘못 기각됨",
+   "summary": "FDA 가 Novo Nordisk 바이오의약품 시설 실사(실사일 04/17/2026)에서 의약품을 뒷받침하는 시험법 밸리데이션 활동과 관련한 부적합 사항을 Form 483 으로 지적했다.",
+   "key_facts": [
+    "지적 대상: 의약품을 뒷받침하는 시험법 밸리데이션 활동",
+    "관찰 1: 일부 밸리데이션 활동이 원 기록에 문서화되지 않음(전혈 내 안정성 배양 시점에 시간 기록 없음)",
+    "관찰 2: 시험법 밸리데이션 실험 중 기존 SOP 를 항상 따르지는 않음(평균 %RE 계산 대신 육안 판단으로 P&A 회차 기각)",
+    "시설: Biopharmaceutical Manufacturer · FEI 3003037054"
+   ],
+   "implication": "FDA 는 1·2·4시간 배양 시점을 주장하면서도 원 기록에 시간 기록이 없는 안정성 실험, 그리고 SOP 가 정한 평균 %RE 계산 없이 육안으로 기각한 분석 회차를 받아들이지 않았다. 우리 시험법 밸리데이션에서도 시점·판정 근거가 원 기록에 남고 기각 판정이 SOP 의 계산 기준을 따르는지 확인할 차례다.",
+   "checks": [
+    "시험법 밸리데이션의 배양·보관 시점이 원 기록에 시각으로 남아 있는가?",
+    "분석 회차 채택·기각을 SOP 에 정한 계산값(평균 %RE 등)으로 판정하는가?",
+    "확인 재시험에 SOP 가 정한 대상 QC 만 포함되는지 검토하는가?"
+   ],
+   "en": {
+    "title_issue": "Method validation records and SOP gaps",
+    "hook_line": "An assay run rejected by visual assessment was found incorrectly rejected once calculated",
+    "summary": "FDA issued a Form 483 to Novo Nordisk's biopharmaceutical facility (inspection date 04/17/2026) citing objectionable conditions in method validation activities conducted in support of a drug.",
+    "key_facts": [
+     "Scope: method validation activities conducted in support of a drug",
+     "Observation 1: not all method validation activities were documented in source records (no time stamps for whole-blood stability incubation time points)",
+     "Observation 2: existing SOPs were not always followed (a P&A run was rejected by visual assessment instead of a calculated average %RE)",
+     "Facility: Biopharmaceutical Manufacturer · FEI 3003037054"
+    ],
+    "implication": "FDA did not accept stability experiments claiming 1-, 2- and 4-hour incubation points without time stamps in source records, nor an assay run rejected visually instead of by the average %RE calculation the SOP required. Validation labs should confirm that time points and acceptance decisions are traceable in source records and that run rejection follows the SOP's calculated criteria.",
+    "checks": [
+     "Are incubation and storage time points in method validation recorded with times in source records?",
+     "Are run acceptance and rejection decided by the calculated values the SOP specifies (such as average %RE)?",
+     "Do confirmatory runs include only the QCs the SOP allows?"
+    ]
+   }
+  },
+  "13ca327def9d": {
+   "title_issue": "원료 확인시험 미실시·성적서 의존",
+   "hook_line": "원료 확인시험 없이 공급사 성적서에 의존, 수입경보 66-40 등재",
+   "summary": "FDA 가 Guangdong Bangze Medicine Co., Ltd. 의 의약품 제조시설 기록 검토에서 완제의약품 CGMP 위반을 확인하고 해당 제품을 불량(adulterated)으로 보는 경고서한을 발부했다.",
+   "key_facts": [
+    "위반 1: 각 원료의 확인·순도·함량 시험 미실시, 공급사 성적서(COA)를 신뢰성 검증 없이 사용(21 CFR 211.84(d)(1)·(d)(2))",
+    "위반 2: 출하 전 완제품 배치별 확인·함량 시험과 유해 미생물 시험 미흡(21 CFR 211.165(a)·(b))",
+    "위반 3: 품질부서가 CGMP 준수 책임을 다하지 않음(21 CFR 211.22)",
+    "조치: 2026년 8월 7일 수입경보 Import Alert 66-40 등재"
+   ],
+   "implication": "FDA 는 고위험 원료의 약전 확인시험·한도시험 없이 공급사 성적서만으로 입고한 기록을 원료 적합성 입증으로 받아들이지 않았고, 이미 수입경보까지 걸었다. 우리 입고 시험이 고위험 원료마다 약전 확인시험과 한도시험을 직접 수행하는지, 성적서 신뢰성 검증 주기가 정해져 있는지 확인할 차례다.",
+   "checks": [
+    "고위험 원료 입고 시 약전 확인시험과 한도시험을 자체 수행하는가?",
+    "공급사 성적서의 신뢰성을 정해진 주기로 검증한 기록이 있는가?",
+    "완제품 출하 전 배치마다 확인·함량·미생물 시험 결과를 확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Component identity testing skipped, COA reliance",
+    "hook_line": "Relied on supplier COAs without component identity testing; on Import Alert 66-40",
+    "summary": "FDA issued a warning letter to Guangdong Bangze Medicine Co., Ltd. after a records review of its drug manufacturing facility found CGMP violations for finished pharmaceuticals, rendering its drugs adulterated.",
+    "key_facts": [
+     "Violation 1: components not tested for identity, purity and strength; supplier COAs relied on without establishing their reliability (21 CFR 211.84(d)(1), (d)(2))",
+     "Violation 2: inadequate pre-release identity, strength and objectionable-microorganism testing of finished batches (21 CFR 211.165(a), (b))",
+     "Violation 3: quality unit failed to exercise its CGMP responsibilities (21 CFR 211.22)",
+     "Action: placed on Import Alert 66-40 on August 7, 2026"
+    ],
+    "implication": "FDA did not accept incoming records that relied on supplier COAs without compendial identity and limit testing of high-risk components as proof of component suitability, and had already placed the firm on import alert. Incoming QC teams should confirm that each high-risk component receives in-house compendial identity and limit testing and that COA reliability is verified on a defined schedule.",
+    "checks": [
+     "Are compendial identity and limit tests run in-house for each high-risk component lot?",
+     "Is supplier COA reliability verified at defined intervals with records?",
+     "Are identity, assay and microbial results confirmed for every finished batch before release?"
+    ]
+   }
+  },
+  "142f18a0ab47": {
+   "title_issue": "미생물 시험 기록 불일치·확인시험 미흡",
+   "hook_line": "전날 미생물 생육이 보인 배지가 다음 날 판독 기록엔 생육 없음",
+   "summary": "FDA 가 Pritam International Private Limited 의 의약품 제조시설에 대한 CGMP 위반으로 경고서한을 발부하고 해당 완제의약품을 불량(adulterated)으로 판단했다.",
+   "key_facts": [
+    "위반 1: 실험실 기록에 모든 시험의 완전한 원 데이터가 없음 — 전날 미생물 생육이 보인 배지가 다음 날 판독에선 생육 없음으로 기록(21 CFR 211.194(a))",
+    "위반 2: 원료별 확인시험 미흡, 공급사 시험 신뢰성 미검증(21 CFR 211.84(d)(1)·(d)(2))",
+    "위반 3: 품질관리부서가 CGMP 준수 책임을 다하지 않음(21 CFR 211.22)",
+    "조치: 2026년 9월 3일 수입경보 Import Alert 66-40 등재"
+   ],
+   "implication": "FDA 는 배양기에서 생육이 보인 배지가 다음 날 생육 없음으로 기록되고 배지 표기까지 바뀐 미생물 시험 기록을 신뢰할 수 없는 데이터로 보고 데이터 완전성 시정을 요구했다. 우리 미생물 시험실에서 배지 판독 결과가 관찰 시점에 바로 기록되고 시료 표기가 바뀌지 않게 관리되는지 확인할 차례다.",
+   "checks": [
+    "배지 판독 결과를 관찰 즉시 기록하고 2인 확인을 거치는가?",
+    "배지 외부의 시료 식별 표기가 배양 중 변경되지 않도록 관리하는가?",
+    "주요 원료 입고 시 원료별 확인시험을 직접 수행하는가?"
+   ],
+   "en": {
+    "title_issue": "Micro test record discrepancies, ID testing",
+    "hook_line": "Plates with visible growth one day were recorded as no growth the next day",
+    "summary": "FDA issued a warning letter to Pritam International Private Limited for CGMP violations at its drug manufacturing facility, finding its finished pharmaceuticals adulterated.",
+    "key_facts": [
+     "Violation 1: laboratory records lacked complete original data; plates with visible microbial growth one day showed no growth when read and recorded the next day (21 CFR 211.194(a))",
+     "Violation 2: inadequate identity testing of each component and no validation of supplier test reliability (21 CFR 211.84(d)(1), (d)(2))",
+     "Violation 3: quality control unit failed to exercise its CGMP responsibilities (21 CFR 211.22)",
+     "Action: placed on Import Alert 66-40 on September 3, 2026"
+    ],
+    "implication": "FDA treated microbiology records in which plates showing growth in the incubator were recorded as no growth the next day, with changed sample labeling, as unreliable data and required data integrity remediation. Microbiology labs should confirm that plate readings are recorded at the time of observation and that sample labeling on plates cannot change during incubation.",
+    "checks": [
+     "Are plate readings recorded at the time of observation with second-person verification?",
+     "Is sample identification on plates controlled so it cannot change during incubation?",
+     "Is identity testing performed in-house for each major component lot?"
+    ]
+   }
+  },
+  "630b3e9f64ec": {
+   "title_issue": "사용 취소 색소 사용·품질부서 감독 부실",
+   "hook_line": "제품 표시에 1976년 사용 취소된 적색 2호 색소를 기재함",
+   "summary": "FDA 가 Guangzhou Jiugong Research And Development Biotechnology Co., Ltd. 의 의약품 제조시설 기록 검토에서 완제의약품 CGMP 위반을 확인하고 경고서한을 발부했다.",
+   "key_facts": [
+    "위반: 제품 표시에 1976년 인증 취소된 색소 FD&C Red No. 2(CI 16185) 기재 — 21 CFR 81.30(j)(1)에 따라 불량 의약품",
+    "품질부서: 표시·배치 처방·성적서의 색소가 서로 달라 원료 적격성·처방 검토 부실(21 CFR 211.22)",
+    "자료 요청: 2026년 7월 28일·8월 5일 추가 자료 요청에 응답 없음",
+    "책임: 위탁 제조시설로서 계약과 무관하게 제조 의약품 품질에 책임"
+   ],
+   "implication": "FDA 는 표시·처방·성적서에 서로 다른 색소가 적힌 자료를 품질부서가 원료 적격성을 검토하지 않았다는 증거로 보았고, 추가 자료 요청 무응답도 지적했다. 우리 처방 검토에서 표시사항·배치 처방·공급사 성적서의 첨가제 정보가 일치하는지, 사용 허용 목록과 대조하는지 확인할 차례다.",
+   "checks": [
+    "표시사항·배치 처방·성적서의 색소 등 첨가제 정보가 서로 일치하는가?",
+    "신규 첨가제를 사용 허용 목록과 대조한 뒤 처방에 반영하는가?",
+    "위탁 제조 품목도 수탁사 품질부서가 원료 적격성을 직접 검토하는가?"
+   ],
+   "en": {
+    "title_issue": "Delisted color additive, weak QU oversight",
+    "hook_line": "Product label listed FD&C Red No. 2, a color additive delisted in 1976",
+    "summary": "FDA issued a warning letter to Guangzhou Jiugong Research And Development Biotechnology Co., Ltd. after a records review of its drug manufacturing facility found CGMP violations for finished pharmaceuticals.",
+    "key_facts": [
+     "Violation: product label lists FD&C Red No. 2 (CI 16185), delisted in 1976; the drug is adulterated under 21 CFR 81.30(j)(1)",
+     "Quality unit: label, batch formulation and COA each named a different color additive, showing inadequate raw material and formulation review (21 CFR 211.22)",
+     "Information requests: FDA requests of July 28, 2026 and August 5, 2026 went unanswered",
+     "Responsibility: as a contract facility, the firm is responsible for drug quality regardless of agreements"
+    ],
+    "implication": "FDA read the mismatch between the color additive on the label, the batch formulation and the COA as evidence that the quality unit had not reviewed raw material qualification, and also cited the unanswered information requests. Formulation reviewers should confirm that excipient information matches across labeling, batch formulation and supplier COAs and is checked against permitted-use lists.",
+    "checks": [
+     "Does excipient information such as color additives match across labeling, batch formulation and COA?",
+     "Are new excipients checked against permitted-use lists before entering a formulation?",
+     "Does the contract site's quality unit itself review raw material qualification for client products?"
+    ]
+   }
+  },
+  "8632153aa053": {
+   "title_issue": "의료용 산소 출하시험 미실시",
+   "hook_line": "출하 전 시험을 하지 않고 의료용 산소 배치를 적합으로 기록",
+   "summary": "FDA 가 Conroe Welding Supply, Inc. 의 의료용 가스 제조시설 실사(2026년 3월 30일~4월 3일)에서 CGMP 위반을 확인하고 경고서한을 발부했다.",
+   "key_facts": [
+    "위반 1: 출하 전 의료용 가스 배치별 확인·함량 시험 미흡 — 충전 기사가 실제 시험 없이 Oxygen, USP 배치 적합 결과를 기록(21 CFR 213.165(a))",
+    "고객 불만: 제3자 시험에서 용기 내 (b)(4) 최대 99% 확인(산소 1% 미만)",
+    "위반 2~4: 입고 의료용 가스 시험·공급사 시험 신뢰성 미검증, 불만처리 절차 미흡, 품질부서 책임 미이행(21 CFR 213.22)",
+    "회신 평가: 2026년 4월 15일 회신은 완제품 규격·시험 절차·교정 증거·시험 결과가 없어 부적절"
+   ],
+   "implication": "FDA 는 충전 기록에 2인 확인을 추가하겠다는 회신을 받아들이지 않았다 — 완제품 규격·시험 절차·기기 교정 증거·시험 결과가 없었기 때문이다. 우리 출하 판정에서 시험 결과가 실제 시험 기록·교정된 기기와 연결돼 검증되는지 확인할 차례다.",
+   "checks": [
+    "출하 적합 판정이 실제 시험 원 데이터와 연결돼 검증되는가?",
+    "출하 시험에 쓰는 분석 기기의 교정 기록이 최신인가?",
+    "제품 혼동 관련 고객 불만을 품질부서가 검토해 해당 배치를 조사하는가?"
+   ],
+   "en": {
+    "title_issue": "Medical oxygen released without testing",
+    "hook_line": "Medical oxygen batches recorded as passing without the required tests performed",
+    "summary": "FDA issued a warning letter to Conroe Welding Supply, Inc. after an inspection of its medical gas manufacturing facility (March 30 to April 3, 2026) found CGMP violations.",
+    "key_facts": [
+     "Violation 1: inadequate pre-release identity and strength testing of medical gas batches; a filling technician reported passing results for Oxygen, USP batches without performing the tests (21 CFR 213.165(a))",
+     "Customer complaint: third-party testing found (b)(4) as high as 99% in containers (less than 1% oxygen)",
+     "Violations 2-4: no testing of incoming designated medical gases or validation of supplier analyses, inadequate complaint procedures, quality unit failures (21 CFR 213.22)",
+     "Response: the April 15, 2026 response was inadequate, lacking finished product specifications, test procedures, calibration evidence and test results"
+    ],
+    "implication": "FDA did not accept a response promising second-person verification of fill logs because it lacked finished product specifications, test procedures, instrument calibration evidence and test results. Release teams should confirm that every passing release result is tied to actual test records from calibrated instruments.",
+    "checks": [
+     "Is each release decision verified against the raw test data behind it?",
+     "Are calibration records current for the instruments used in release testing?",
+     "Does the quality unit review product mix-up complaints and investigate the affected batches?"
+    ]
+   }
+  },
+  "hc-82896": {
+   "title_issue": "주사제 미립자 혼입 회수",
+   "hook_line": "주사용 분말 1000 mg/vial 미립자 혼입, Type I 회수",
+   "summary": "Health Canada 가 Marcan Pharmaceuticals Inc 의 Cyclophosphamide for Injection USP 에 대해 미립자(particulate matter) 혼입을 이유로 Type I 회수를 공지했다.",
+   "key_facts": [
+    "제품: Cyclophosphamide for Injection USP(1000 mg/vial · Powder for Solution)",
+    "사유: Product quality — 미립자(particulate matter) 혼입",
+    "회수 등급: Type I",
+    "조치: 건강 우려 시 의료인 상담, 회수 관련 문의는 회수 업체로 안내"
+   ],
+   "implication": "Health Canada 는 주사용 분말 제품의 미립자 혼입을 가장 높은 위험 등급인 Type I 로 분류했다. 우리 주사제 라인에서 재구성 후 불용성 미립자 검사와 출하 전 육안 이물 검사 기준이 제품 위험도에 맞게 정해져 있는지 확인할 차례다.",
+   "checks": [
+    "주사용 분말 제품의 재구성 후 불용성 미립자 시험이 출하 기준에 포함돼 있는가?",
+    "미립자 관련 불만 접수 시 동일 원료·바이알 로트로 조사를 확대하는가?"
+   ],
+   "quotes_translation": [
+    "제품 품질"
+   ],
+   "en": {
+    "title_issue": "Particulate matter recall, injectable",
+    "hook_line": "Particulate matter in a 1000 mg/vial powder for injection, Type I recall",
+    "summary": "Health Canada posted a Type I recall of Marcan Pharmaceuticals Inc's Cyclophosphamide for Injection USP due to the presence of particulate matter.",
+    "key_facts": [
+     "Product: Cyclophosphamide for Injection USP (1000 mg/vial, Powder for Solution)",
+     "Reason: Product quality, presence of particulate matter",
+     "Recall class: Type I",
+     "Action: consult a healthcare provider for health concerns; contact the recalling firm with questions"
+    ],
+    "implication": "Health Canada classified particulate matter in a powder for injection as Type I, its highest risk class. Sterile product teams should confirm that sub-visible particulate testing after reconstitution and pre-release visual inspection criteria match the product's risk.",
+    "checks": [
+     "Is sub-visible particulate testing after reconstitution part of release criteria for powders for injection?",
+     "Are particulate complaints investigated across the same component and vial lots?"
+    ]
+   }
+  },
+  "admin-2026007737": {
+   "title_issue": "불만처리 절차 미준수 제조업무정지",
+   "hook_line": "품질부서책임자 주관 없이 불만을 처리, 품목 제조업무정지 1개월",
+   "summary": "식약처가 (주)킵스바이오파마에 대해 접수된 불만을 자사 불만처리 규정과 달리 품질부서책임자 주관 없이 처리한 사실로 해당 품목 제조업무정지 1개월(2026. 11. 12. ~ 2026. 12. 11.)을 처분했다.",
+   "key_facts": [
+    "위반: 의약품 제조업자의 준수사항 등의 규정 위반 — 자사 기준서 ‘불만처리 규정(문서번호: KBP-G021)’ 미준수",
+    "행위: 글로스타정10밀리그램(아토르바스타틴칼슘수화물)(제조번호: AR003) 불만을 품질부서책임자가 주관하지 않고 처리",
+    "기준서 요건: 불만조사보고서를 제조부서·품질부서(보증)책임자·고객불만처리위원회 위원장이 검토",
+    "처분: 해당 품목 제조업무정지 1개월(2026. 11. 12. ~ 2026. 12. 11.)"
+   ],
+   "implication": "식약처는 불만을 처리한 사실만으로는 부족하고, 자사 기준서가 정한 품질부서책임자의 주관·검토 단계를 거치지 않은 처리를 위반으로 보았다. 우리 불만처리 기록에서 기준서가 정한 검토자 서명이 모든 건에 빠짐없이 남아 있는지 확인할 차례다.",
+   "checks": [
+    "모든 불만조사보고서에 기준서가 정한 검토자(품질부서책임자 등) 서명이 있는가?",
+    "불만처리 종결 전에 품질부서책임자가 주관했는지 확인하는 단계가 있는가?"
+   ],
+   "en": {
+    "title_issue": "Complaint handling SOP breach suspension",
+    "hook_line": "Complaint handled without the head of quality leading it; one-month product suspension",
+    "summary": "MFDS suspended manufacturing of one product for one month (2026. 11. 12. ~ 2026. 12. 11.) after a manufacturer handled a complaint without the head of quality leading the process, contrary to its own complaint-handling procedure.",
+    "key_facts": [
+     "Violation: breach of manufacturer obligations, non-compliance with the firm's own complaint-handling procedure (KBP-G021)",
+     "Conduct: a complaint about an atorvastatin calcium hydrate tablet product (batch AR003) was handled without the head of quality leading it",
+     "Procedure requirement: complaint investigation reports must be reviewed by production, the head of quality (assurance) and the chair of the customer complaint committee",
+     "Action: manufacturing suspension of the product for one month (2026. 11. 12. ~ 2026. 12. 11.)"
+    ],
+    "implication": "MFDS treated a complaint closed without the head-of-quality leadership and review its own procedure required as a violation, regardless of the complaint having been handled. Complaint owners should confirm that every complaint record carries the reviewer sign-offs their procedure specifies.",
+    "checks": [
+     "Does every complaint investigation report carry the sign-offs the procedure requires, including the head of quality?",
+     "Is there a step confirming quality leadership before a complaint is closed?"
+    ]
+   }
+  },
+  "admin-2026007815": {
+   "title_issue": "포장 기록 동시 기록 미준수",
+   "hook_line": "1차·2차 포장 작업 일부를 기록하지 않음, 첩부제 제조업무정지 15일",
+   "summary": "식약처가 아이큐어(주)에 대해 수탁 제조 품목의 포장지시 및 기록서에 1차·2차 포장 작업 일부 기록을 하지 않는 등 자사 기준서를 지키지 않은 사실로 첩부제 제형 제조업무정지 15일(2026. 11. 18. ~ 2026. 12. 2.)을 처분했다.",
+   "key_facts": [
+    "위반: 수탁자 준수사항 위반(기준서 미준수)",
+    "기준서 요건: ‘작업자는 제조공정과 동시에 해당 내용을 기록한다’ — 제조(포장)기록 세부항목은 작업과 동시에 기록",
+    "행위: 수탁 제조 품목 포장지시 및 기록서에 1차 포장, 2차 포장 작업 일부 기록 미수행",
+    "처분: 해당 제형(첩부제) 제조업무정지 15일(2026. 11. 18. ~ 2026. 12. 2.)"
+   ],
+   "implication": "식약처는 수탁 제조라도 포장 작업과 동시에 기록하도록 한 자사 기준서를 지키지 않은 것을 처분 사유로 삼았고, 처분 범위는 품목이 아니라 첩부제 제형 전체였다. 우리 포장 라인에서 1차·2차 포장 기록이 작업과 동시에 작성되는지, 사후 일괄 기재가 없는지 확인할 차례다.",
+   "checks": [
+    "1차·2차 포장 기록이 작업 시점에 바로 작성되는가?",
+    "포장 기록서의 빈 항목을 공정 종료 전에 확인하는 단계가 있는가?",
+    "수탁 품목의 포장 기록도 자사 기준서 동시 기록 요건으로 점검하는가?"
+   ],
+   "en": {
+    "title_issue": "Packaging records not contemporaneous",
+    "hook_line": "Parts of primary and secondary packaging went unrecorded; 15-day patch suspension",
+    "summary": "MFDS suspended a contract manufacturer's manufacturing of patch dosage forms for 15 days (2026. 11. 18. ~ 2026. 12. 2.) after it failed to record parts of primary and secondary packaging in packaging batch records, contrary to its own procedures.",
+    "key_facts": [
+     "Violation: breach of contract manufacturer obligations (non-compliance with own procedures)",
+     "Procedure requirement: operators record details at the same time as each manufacturing or packaging step",
+     "Conduct: parts of primary and secondary packaging were not recorded in packaging instruction and batch records for contract-manufactured products",
+     "Action: 15-day manufacturing suspension for the patch dosage form (2026. 11. 18. ~ 2026. 12. 2.)"
+    ],
+    "implication": "MFDS sanctioned a contract manufacturer for not following its own rule to record packaging contemporaneously, and the suspension covered the whole patch dosage form rather than one product. Packaging teams should confirm that primary and secondary packaging entries are made at the time of the work, not filled in afterwards.",
+    "checks": [
+     "Are primary and secondary packaging entries made at the time of the work?",
+     "Is there a check for blank fields in packaging records before the step closes?",
+     "Are contract products held to the same contemporaneous recording rule?"
+    ]
+   }
+  },
+  "admin-2026007836": {
+   "title_issue": "이산화황 기준 초과 제조·판매",
+   "hook_line": "이산화황 540ppm(기준 30ppm이하) 판매, 제조업무정지 3개월",
+   "summary": "식약처가 농업회사법인다온허브주식회사에 대해 이산화황 기준을 초과한 다온목단피를 제조·판매한 사실로 해당 품목 제조업무정지 3개월(2026. 11. 17. ~ 2027. 2. 16.)을 처분했다.",
+   "key_facts": [
+    "위반: 의약품(한약재) 제조 등의 금지 — 「약사법」 제62조제3호",
+    "행위: 다온목단피(제조번호: DO-38-2508) 품질검사 결과 이산화황 기준 초과 제품을 제조·판매",
+    "수치: (기준) 30ppm이하 / (결과) 540ppm",
+    "처분: 해당 품목 제조업무정지 3개월(2026. 11. 17. ~ 2027. 2. 16.)"
+   ],
+   "implication": "식약처는 기준이 정해진 한약재를 기준에 맞지 않는 상태로 판매 목적 제조한 것 자체를 「약사법」 제62조 위반으로 보았고, 결과는 540ppm 으로 기준(30ppm이하)을 넘었다. 우리 한약재 입고·출하 시험에서 이산화황 항목이 배치마다 수행되고 부적합 시 출하가 막히는지 확인할 차례다.",
+   "checks": [
+    "한약재 배치마다 이산화황 시험을 출하 전에 수행하는가?",
+    "이산화황 부적합 결과가 나오면 출하 보류가 자동으로 걸리는가?"
+   ],
+   "en": {
+    "title_issue": "Sulfur dioxide over limit, sold",
+    "hook_line": "Sold product with sulfur dioxide at 540ppm against a 30ppm limit; 3-month suspension",
+    "summary": "MFDS suspended manufacturing of an herbal medicinal material product for 3 months (2026. 11. 17. ~ 2027. 2. 16.) after a manufacturer made and sold a batch exceeding the sulfur dioxide limit.",
+    "key_facts": [
+     "Violation: prohibition on manufacturing non-conforming medicines (herbal medicinal materials), Pharmaceutical Affairs Act Article 62(3)",
+     "Conduct: a batch (DO-38-2508) of a moutan root bark product was made and sold despite exceeding the sulfur dioxide limit in quality testing",
+     "Values: limit 30ppm or less, result 540ppm",
+     "Action: manufacturing suspension of the product for 3 months (2026. 11. 17. ~ 2027. 2. 16.)"
+    ],
+    "implication": "MFDS treated manufacturing for sale of an herbal medicinal material that failed its set standard as a violation in itself, with a result of 540ppm against a 30ppm limit. Herbal material suppliers should confirm that sulfur dioxide is tested for every batch before release and that a failing result blocks shipment.",
+    "checks": [
+     "Is sulfur dioxide tested on every herbal material batch before release?",
+     "Does a failing sulfur dioxide result automatically place the batch on hold?"
+    ]
+   }
+  },
+  "admin-2026007895": {
+   "title_issue": "형상·인장강도 부적합 제조업무정지",
+   "hook_line": "수거검사에서 폭·인장강도 부적합, 품목 제조업무정지 15일",
+   "summary": "식약처가 에버레이드주식회사의 큐레이드(벤잘코늄염화물반창고(1회용)) 등 제품 수거·검사에서 ‘형상(폭)’·‘인장강도’ 시험항목이 부적합해 해당 품목 제조업무정지 15일(2026.11.18.~2026.12.2.)을 처분했다.",
+   "key_facts": [
+    "사유: 수거·검사 결과 ‘형상(폭)’, ‘인장강도’ 시험항목 부적합",
+    "대상 품목: 큐레이드(벤잘코늄염화물반창고(1회용)), 아쿠아밴드멸균형",
+    "적용법령: 「약사법」 제62조 제11호·제66조 위반, 같은 법 제76조 제1항 제4호",
+    "처분: 해당 품목 제조업무정지 15일(2026.11.18.~2026.12.2.)"
+   ],
+   "implication": "식약처는 시중 유통품 수거·검사에서 반창고의 물리적 규격(폭·인장강도)이 맞지 않은 것을 제조업무정지 사유로 삼았다. 우리 외용 제품 출하 시험에서 치수·인장강도 같은 물리 규격 항목이 배치마다 수행되는지 확인할 차례다.",
+   "checks": [
+    "반창고 등 외용 제품의 폭·인장강도를 배치마다 출하 전에 시험하는가?",
+    "재단·코팅 설비 변경 후 치수 규격을 재확인하는가?"
+   ],
+   "en": {
+    "title_issue": "Width and tensile strength failures",
+    "hook_line": "Post-market testing failed width and tensile strength; 15-day product suspension",
+    "summary": "MFDS suspended manufacturing of two adhesive bandage products for 15 days (2026.11.18.~2026.12.2.) after post-market sampling found them non-conforming for width and tensile strength.",
+    "key_facts": [
+     "Reason: post-market sampling and testing failed the width (shape) and tensile strength test items",
+     "Products: a benzalkonium chloride single-use adhesive bandage product and a sterile bandage product",
+     "Legal basis: Pharmaceutical Affairs Act Articles 62(11), 66 and 76(1)4",
+     "Action: 15-day manufacturing suspension for the products (2026.11.18.~2026.12.2.)"
+    ],
+    "implication": "MFDS used physical specification failures (width and tensile strength) found in marketed bandages as grounds for a manufacturing suspension. Manufacturers of topical products should confirm that dimensional and tensile specifications are tested for every batch before release.",
+    "checks": [
+     "Are width and tensile strength tested on every bandage batch before release?",
+     "Are dimensional specifications rechecked after changes to cutting or coating equipment?"
+    ]
+   }
+  },
+  "recall-01f0f654c3cd": {
+   "title_issue": "순도시험(이물) 부적합 회수",
+   "hook_line": "순도시험에서 이물(줄기·잎) 부적합, 강제 회수",
+   "summary": "식약처가 씨케이(주)의 씨케이시호에 대해 순도시험(이물-줄기,잎) 품질부적합으로 회수를 명령했다(회수명령일자 2026-10-29).",
+   "key_facts": [
+    "사유: 품질부적합[순도시험(이물-줄기,잎)]",
+    "구분: 강제 회수(강제여부: Y)",
+    "회수명령일자: 2026-10-29",
+    "회수 등급: 미확인"
+   ],
+   "implication": "이번 부적합은 순도시험의 이물 항목으로, 약용 부위 외의 줄기·잎 혼입이 부적합 판정을 받아 강제 회수로 이어졌다. 우리 입고 원료 선별 공정에서 비약용 부위 혼입을 배치마다 확인하는 이물 시험 기준과 선별 기록이 있는지 확인할 차례다.",
+   "checks": [
+    "입고 원료마다 순도시험(이물) 항목을 출하 전에 수행하는가?",
+    "비약용 부위 선별 공정의 작업 기록과 선별 후 확인 결과가 남아 있는가?"
+   ],
+   "en": {
+    "title_issue": "Purity test (foreign matter) failure recall",
+    "hook_line": "Purity test failure for foreign matter (stems, leaves), mandatory recall",
+    "summary": "MFDS ordered a recall of an herbal product for a quality failure in the purity test for foreign matter (stems and leaves), with the recall order dated 2026-10-29.",
+    "key_facts": [
+     "Reason: quality failure in the purity test (foreign matter: stems, leaves)",
+     "Type: mandatory recall (order: Y)",
+     "Recall order date: 2026-10-29",
+     "Recall class: not confirmed"
+    ],
+    "implication": "The failure was in the foreign matter item of the purity test, where stems and leaves outside the medicinal part led to a mandatory recall. Herbal material handlers should confirm that each batch is checked for non-medicinal plant parts against a foreign matter limit with sorting records.",
+    "checks": [
+     "Is the purity test for foreign matter performed on each batch before release?",
+     "Are sorting records and post-sorting checks kept for removing non-medicinal plant parts?"
+    ]
+   }
+  },
+  "recall-168496d79d9a": {
+   "title_issue": "성상 부적합 회수",
+   "summary": "식약처가 계림제약의 계림반하생강백반제에 대해 성상 부적합으로 회수를 명령했다(회수명령일자 2026-11-04).",
+   "key_facts": [
+    "사유: 성상 부적합",
+    "구분: 강제 회수(강제여부: Y)",
+    "회수명령일자: 2026-11-04",
+    "회수 등급: 미확인"
+   ],
+   "implication": "성상은 외관·색·냄새로 판정하는 기본 항목인데, 그 항목 하나의 부적합으로 강제 회수가 됐고 원인은 공개 정보로 확인되지 않는다. 우리 품목의 성상 판정 기준이 외관·색·냄새별로 구체적으로 적혀 있어 기준 견본과 대조할 수 있는지 확인할 차례다.",
+   "checks": [
+    "품목별 성상 기준이 외관·색·냄새별로 구체적으로 정해져 있는가?",
+    "성상 판정 시 비교용 표준품이나 기준 견본을 쓰는가?"
+   ],
+   "en": {
+    "title_issue": "Appearance (description) failure recall",
+    "summary": "MFDS ordered a recall of an herbal product for failing the description (appearance) test, with the recall order dated 2026-11-04.",
+    "key_facts": [
+     "Reason: description (appearance) non-conformance",
+     "Type: mandatory recall (order: Y)",
+     "Recall order date: 2026-11-04",
+     "Recall class: not confirmed"
+    ],
+    "implication": "Description is a basic item judged by appearance, color and odor, and a failure on that single item led to a mandatory recall whose cause is not confirmed in public data. Firms should confirm that description criteria are written specifically for appearance, color and odor so results can be compared with a reference sample.",
+    "checks": [
+     "Are description criteria defined specifically for appearance, color and odor for each product?",
+     "Is a reference sample used when judging description?"
+    ]
+   }
+  },
+  "recall-393b7e02ee72": {
+   "title_issue": "관능(성상) 부적합 회수",
+   "summary": "식약처가 한솔제약(주)의 한솔두충염자에 대해 관능(성상) 부적합으로 회수를 명령했다(회수명령일자 2026-11-06).",
+   "key_facts": [
+    "사유: 관능(성상)",
+    "구분: 강제 회수(강제여부: Y)",
+    "회수명령일자: 2026-11-06",
+    "회수 등급: 미확인"
+   ],
+   "implication": "사유가 관능검사로 판정하는 성상 항목이라, 시험자 판단에 기대는 항목이 강제 회수 근거가 됐다. 우리 관능 성상 시험이 판정 기준 문구와 시험자 교육 기록으로 뒷받침돼 시험자마다 같은 결론을 내는지 확인할 차례다.",
+   "checks": [
+    "관능 성상 시험의 판정 기준이 시험자가 달라도 같은 결론이 나게 적혀 있는가?",
+    "관능 시험자 교육·적격성 기록이 있는가?"
+   ],
+   "en": {
+    "title_issue": "Organoleptic (description) failure recall",
+    "summary": "MFDS ordered a recall of an herbal product for failing the organoleptic (description) test, with the recall order dated 2026-11-06.",
+    "key_facts": [
+     "Reason: organoleptic (description) non-conformance",
+     "Type: mandatory recall (order: Y)",
+     "Recall order date: 2026-11-06",
+     "Recall class: not confirmed"
+    ],
+    "implication": "The reason was an organoleptic description item, so a test that relies on analyst judgment became the basis for a mandatory recall. QC labs should confirm that organoleptic criteria and analyst training records let different analysts reach the same result.",
+    "checks": [
+     "Are organoleptic criteria written so that different analysts reach the same conclusion?",
+     "Are training and qualification records kept for organoleptic analysts?"
+    ]
+   }
+  },
+  "recall-48c360d4b6d1": {
+   "title_issue": "성상 부적합 2품목 회수",
+   "summary": "식약처가 (주)이풀잎제약의 이풀잎유백피 등 동일 사유(성상 부적합) 2품목에 대해 일괄 회수를 명령했다(회수명령일자 2026-11-06).",
+   "key_facts": [
+    "사유: 성상 부적합(동일 사유 2품목 일괄 회수)",
+    "구분: 강제 회수(강제여부: Y)",
+    "회수명령일자: 2026-11-06",
+    "회수 등급: 미확인"
+   ],
+   "implication": "같은 날 한 업체의 서로 다른 2품목이 같은 성상 부적합으로 회수됐다. 부적합 원인은 공개 정보로 확인되지 않으므로, 우리도 한 품목에서 성상 부적합이 나오면 같은 공급원·보관 조건을 쓰는 다른 품목까지 조사를 넓히는지 확인할 차례다.",
+   "checks": [
+    "한 품목의 성상 부적합 시 같은 공급원·보관 조건의 다른 품목도 조사하는가?",
+    "품목별 성상 기준이 서로 다른 약용 부위 특성에 맞게 정해져 있는가?"
+   ],
+   "en": {
+    "title_issue": "Description failure, 2 products recalled",
+    "summary": "MFDS ordered a combined recall of 2 products from one manufacturer for the same reason, description (appearance) non-conformance, with the recall order dated 2026-11-06.",
+    "key_facts": [
+     "Reason: description non-conformance (2 products recalled together for the same reason)",
+     "Type: mandatory recall (order: Y)",
+     "Recall order date: 2026-11-06",
+     "Recall class: not confirmed"
+    ],
+    "implication": "Two different products from one firm were recalled on the same day for the same description failure. The cause is not confirmed in public data, so firms should confirm that a description failure in one product triggers investigation of other products sharing the same source or storage conditions.",
+    "checks": [
+     "Does a description failure in one product extend the investigation to products with the same source or storage?",
+     "Are description criteria set for the characteristics of each medicinal part?"
+    ]
+   }
+  },
+  "recall-5a12ea50b80b": {
+   "title_issue": "이산화황 부적합 회수",
+   "summary": "식약처가 주식회사올본의 올본산약에 대해 이산화황 부적합으로 회수를 명령했다(회수명령일자 2026-11-06).",
+   "key_facts": [
+    "사유: 이산화황 부적합",
+    "구분: 강제 회수(강제여부: Y)",
+    "회수명령일자: 2026-11-06",
+    "회수 등급: 미확인"
+   ],
+   "implication": "사유는 잔류 이산화황 기준 부적합으로, 이산화황은 일반적으로 건조·보관 과정의 처리와 연관될 수 있으나 이번 원인은 공개 정보로 확인되지 않는다. 우리 공급사 관리에서 건조·보관 공정의 이산화황 사용 여부를 확인하고 입고 배치마다 이산화황을 시험하는지 확인할 차례다.",
+   "checks": [
+    "공급사의 건조·보관 공정에서 이산화황 처리 여부를 확인했는가?",
+    "입고 배치마다 잔류 이산화황 시험을 수행하는가?"
+   ],
+   "en": {
+    "title_issue": "Sulfur dioxide failure recall",
+    "summary": "MFDS ordered a recall of an herbal product for sulfur dioxide non-conformance, with the recall order dated 2026-11-06.",
+    "key_facts": [
+     "Reason: sulfur dioxide non-conformance",
+     "Type: mandatory recall (order: Y)",
+     "Recall order date: 2026-11-06",
+     "Recall class: not confirmed"
+    ],
+    "implication": "The reason was a residual sulfur dioxide failure; sulfur dioxide can generally be associated with drying or storage treatment, but the cause here is not confirmed in public data. Firms should confirm with suppliers whether sulfur dioxide is used in drying or storage and test each incoming batch for it.",
+    "checks": [
+     "Has the supplier's use of sulfur dioxide in drying or storage been confirmed?",
+     "Is residual sulfur dioxide tested on each incoming batch?"
+    ]
+   }
+  },
+  "recall-7621d6b9981d": {
+   "title_issue": "성상 부적합 회수",
+   "summary": "식약처가 (주)나음제약의 나음독활에 대해 성상 부적합으로 회수를 명령했다(회수명령일자 2026-11-06).",
+   "key_facts": [
+    "사유: 성상 부적합",
+    "구분: 강제 회수(강제여부: Y)",
+    "회수명령일자: 2026-11-06",
+    "회수 등급: 미확인"
+   ],
+   "implication": "단일 품목이 성상 부적합으로 강제 회수됐고, 부적합 원인은 공개 정보로 확인되지 않는다. 우리 출하 시험에서 성상 결과가 입고 시점과 출하 시점 모두 확인돼 보관 중 변화가 걸러지는지 확인할 차례다.",
+   "checks": [
+    "성상을 입고 시점뿐 아니라 출하 직전에도 다시 확인하는가?",
+    "보관 중 성상 변화가 의심되는 배치를 재시험 대상으로 지정하는가?"
+   ],
+   "en": {
+    "title_issue": "Description failure recall",
+    "summary": "MFDS ordered a recall of an herbal product for description (appearance) non-conformance, with the recall order dated 2026-11-06.",
+    "key_facts": [
+     "Reason: description non-conformance",
+     "Type: mandatory recall (order: Y)",
+     "Recall order date: 2026-11-06",
+     "Recall class: not confirmed"
+    ],
+    "implication": "A single product was subject to a mandatory recall for a description failure, and the cause is not confirmed in public data. Firms should confirm that description is checked both at receipt and just before release so changes during storage are caught.",
+    "checks": [
+     "Is description rechecked just before release as well as at receipt?",
+     "Are batches suspected of change during storage flagged for retesting?"
+    ]
+   }
+  }
+ }
+}

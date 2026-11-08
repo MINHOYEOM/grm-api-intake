@@ -1,0 +1,202 @@
+name: GRM FDA Inspection Citations
+
+# FDA Data Dashboard API(inspections_citations) 실사 지적 조항 적재 —
+# **수동 dispatch(기본 dry-run) + 월 1회 자동 갱신(repo 변수로 켤 때만)**.
+# public.fda_inspection_citations(133) 에 직행 upsert 한다. 133 적용 전에는 --apply 금지.
+#
+# ★핵심 제약(grm-fda-inspections-backfill.yml 과 같다):
+#   - git 쓰기 없음. Notion 무접촉. findings 표와 무관한 별도 평평한 표.
+#   - 멱등: upsert(on_conflict=inspection_id,citation_id, merge-duplicates) — 월간 실행은
+#     회계연도 창(최근 7년) 전량을 매번 다시 싣는다.
+#   - dry-run 도 DDAPI 는 실제로 호출한다(FDA_API_USER/FDA_DDAPI_KEY 필요). dry-run 리포트의
+#     summary 에 ProgramArea 별 전체·회계연도별·한국 건수·상위 20 CFR 조항과
+#     fda_inspections 연결분(_linked_to_classifications)이 실린다.
+#
+# ★자동 갱신 스위치: repo 변수 `ENABLE_FDA_CITATIONS` = 'true' 일 때만 스케줄이 돈다.
+#   133 적용 + 첫 --apply 성공 전에는 꺼 둔다(켜기 전 스케줄은 판정 잡 하나만 돌고 끝난다).
+#
+# ★시각: 매월 1일 16:17 UTC(= 2일 01:17 KST). 실사 등급 월간 갱신(15:47 UTC) 30분 뒤라
+#   연결 통계가 같은 달 등급 표를 본다. 정각·혼잡 구간(18~21 UTC)을 피한다.
+on:
+  schedule:
+    - cron: '17 16 1 * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true = DDAPI 수집만(Supabase 적재 없음). 먼저 이걸로 검증. ※수동 실행에만 적용 — 스케줄은 항상 실제 적재.'
+        type: boolean
+        default: true
+      max_pages:
+        description: '안전판 페이지 상한(5000행/페이지). 꽉 찬 페이지로 소진하면 실패한다. 비우면 수집기 기본값.'
+        type: string
+        default: ''
+      program_areas:
+        description: '쉼표로 구분한 ProgramArea. 비우면 수집기 기본값(Drugs,Biologics).'
+        type: string
+        default: ''
+
+env:
+  FAILURE_ISSUE_TITLE: 'GRM FDA 지적 조항 월간 갱신 실패'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: fda-citations
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    name: Decide whether this run proceeds
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - name: Decide
+        id: check
+        env:
+          GRM_EVENT_NAME: ${{ github.event_name }}
+          GRM_SCHEDULE_ON: ${{ vars.ENABLE_FDA_CITATIONS || 'false' }}
+        run: |
+          set -euo pipefail
+          if [ "$GRM_EVENT_NAME" != "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "판정: 수동 실행" >> "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          if [ "$GRM_SCHEDULE_ON" = "true" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "판정: 월간 정기" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "판정: 건너뜀 — repo 변수 ENABLE_FDA_CITATIONS 가 'true' 가 아니다(133 적용·첫 적재 후 켠다)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  collect:
+    name: Collect FDA inspection citations (no git writes)
+    needs: decide
+    if: needs.decide.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run FDA inspection citations collector
+        id: collect
+        env:
+          FDA_API_USER: ${{ secrets.FDA_API_USER }}
+          FDA_DDAPI_KEY: ${{ secrets.FDA_DDAPI_KEY }}
+          # dry-run 에도 넘긴다 — fda_inspections 연결 통계를 읽기 위해서다(적재는 안 한다).
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GRM_EVENT_NAME: ${{ github.event_name }}
+          IN_DRY_RUN: ${{ inputs.dry_run }}
+          IN_MAX_PAGES: ${{ inputs.max_pages }}
+          IN_PROGRAM_AREAS: ${{ inputs.program_areas }}
+        run: |
+          set -euo pipefail
+          ARGS=(--output citations_report.json)
+          # ★스케줄 이벤트에는 dispatch 입력이 빈 문자열이다 — 빈 값이 else 로 떨어져
+          #   우연히 --apply 가 되지 않게, 스케줄 분기를 코드가 명시한다.
+          if [ "$GRM_EVENT_NAME" = "schedule" ]; then
+            MODE="apply"; ARGS+=(--apply)
+          else
+            if [ "$IN_DRY_RUN" = "true" ]; then MODE="dry-run"; ARGS+=(--dry-run); else MODE="apply"; ARGS+=(--apply); fi
+            if [ -n "$IN_MAX_PAGES" ]; then ARGS+=(--max-pages "$IN_MAX_PAGES"); fi
+            if [ -n "$IN_PROGRAM_AREAS" ]; then ARGS+=(--program-areas "$IN_PROGRAM_AREAS"); fi
+          fi
+          printf 'mode=%s\n' "$MODE" >> "$GITHUB_OUTPUT"
+          echo "event=$GRM_EVENT_NAME mode=$MODE args=${ARGS[*]}"
+          python collect_fda_citations.py "${ARGS[@]}"
+
+      - name: Write step summary
+        if: always()
+        env:
+          RUN_MODE: ${{ steps.collect.outputs.mode }}
+        run: |
+          {
+            echo "### GRM FDA Inspection Citations"
+            echo ""
+            echo "mode: \`${RUN_MODE:-미판정}\`"
+            echo ""
+            if [ -f citations_report.json ]; then
+              echo '```json'
+              cat citations_report.json
+              echo '```'
+            else
+              echo "citations_report.json 미생성 — 인자/자격증명/수집 실패로 조기 종료 가능."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fda-citations-report
+          path: citations_report.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Open or update the monthly refresh failure issue
+        if: (failure() || cancelled()) && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = process.env.FAILURE_ISSUE_TITLE;
+            const label = 'automation-failure';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+                         + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            try {
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: 'd93f0b', description: 'GRM 자동화 스케줄 실행 실패' });
+            }
+            const body = [
+              'FDA 지적 조항(**public.fda_inspection_citations**) 월간 자동 갱신이 실패했습니다.',
+              '',
+              `- 실행: ${runUrl}`,
+              '- 적재 건수·오류는 실행 페이지 잡 요약의 리포트 숫자를 먼저 보십시오(부분 적재로 끝났을 수 있습니다).',
+              '- 표는 이 워크플로가 삭제하지 않습니다(upsert 전용). 이전 적재분은 그대로 남아 있습니다.',
+              '- 다음 달 1일 정기 실행 또는 수동 dispatch(dry_run=false)로 재시도합니다. 성공하면 이 이슈는 자동으로 닫힙니다.',
+            ].join('\n');
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 100 });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `여전히 실패 중입니다 (${runUrl}).` });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner] });
+            }
+
+      - name: Close the failure issue on a successful apply
+        if: success() && steps.collect.outputs.mode == 'apply'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = process.env.FAILURE_ISSUE_TITLE;
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+                         + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open',
+              labels: 'automation-failure', per_page: 100 });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `✅ 복구 확인 — 적재가 성공해 자동으로 닫습니다. (${runUrl})` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed' });
+            }

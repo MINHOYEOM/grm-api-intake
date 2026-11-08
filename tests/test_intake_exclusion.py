@@ -61,7 +61,10 @@ class MigrationContractTest(unittest.TestCase):
     def test_is_number_130_and_follows_129(self):
         names = sorted(p.name for p in (ROOT / "web" / "migrations").glob("*.sql"))
         self.assertIn("130_intake_exclusion_ledger.sql", names)
-        self.assertEqual(max(n for n in names if re.match(r"\d+_", n))[:3], "130")
+        # 130 은 129 바로 다음이어야 한다(뒤에 131 이후가 붙는 것은 정상 — 최댓값을 못 박지 않는다).
+        numbered = sorted(n[:3] for n in names if re.match(r"\d{3}_", n))
+        self.assertIn("129", numbered)
+        self.assertEqual(numbered[numbered.index("129") + 1], "130")
 
     def test_table_key_and_columns(self):
         n = _norm(SQL)

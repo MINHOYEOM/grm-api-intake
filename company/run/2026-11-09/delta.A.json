@@ -1,0 +1,495 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-09",
+ "shard": "A",
+ "cards": {
+  "fda483-195283": {
+   "title_issue": "안정성 자료 없는 사용기한 설정",
+   "summary": "FDA 가 OTC 의약품 제조소 실사에서 안정성시험 결과가 사용기한 설정에 쓰이지 않는다고 지적했다.",
+   "key_facts": [
+    "지적 1: 안정성시험 결과를 사용기한 결정에 사용하지 않음",
+    "근거 절차: QP-20-17 'Stability Test' 는 OTC 의약품 사용기한 설정·확인을 위한 장기 안정성시험을 요구",
+    "시설 유형: OTC Drug Manufacturer · 실사일 11/21/2024"
+   ],
+   "implication": "FDA 는 절차서에 장기 안정성시험을 규정해 두고도 그 결과로 사용기한을 뒷받침하지 않은 운영을 받아들이지 않았다. 우리 제품의 표시 사용기한마다 완료된 안정성 자료가 실제로 연결돼 있는지 확인할 차례다.",
+   "checks": [
+    "표시 사용기한마다 완료된 장기 안정성시험 자료가 연결돼 있는가?",
+    "안정성시험을 중도 취소할 때 사용기한 근거에 미치는 영향을 평가·승인하는가?"
+   ],
+   "hook_line": "착수한 44개 로트 안정성시험이 모두 약 3개월 뒤 취소됨",
+   "en": {
+    "title_issue": "Expiry dating without stability data",
+    "summary": "During an inspection of an OTC drug manufacturer, FDA observed that stability testing results are not used in determining expiration dates.",
+    "key_facts": [
+     "Observation 1: results of stability testing are not used in determining expiration dates",
+     "Procedure QP-20-17 'Stability Test' requires long-term stability studies to establish and confirm expiration dates for OTC drug products",
+     "Facility type: OTC Drug Manufacturer; inspection date 11/21/2024"
+    ],
+    "implication": "FDA did not accept a site whose own procedure calls for long-term stability studies while its expiration dates are not supported by those results. Check that every labeled expiry date at our site is backed by completed stability data.",
+    "checks": [
+     "Is every labeled expiration date linked to completed long-term stability data?",
+     "When a stability study is cancelled, is the impact on the expiry justification assessed and approved?"
+    ],
+    "hook_line": "Stability studies on 44 lots were all cancelled about 3 months after initiation"
+   }
+  },
+  "fda483-196144": {
+   "title_issue": "무균 구역 장비 유지관리 미흡",
+   "summary": "FDA 가 503B 아웃소싱 시설 실사에서 장비·기구가 오염을 막을 수 있는 주기로 세척·유지되지 않는다고 지적했다.",
+   "key_facts": [
+    "지적 1: 장비·기구를 적절한 주기로 세척·유지하지 않음",
+    "대상: 조제 시스템의 ISO 5 등급 구역 내부 장비",
+    "시설 유형: Outsourcing Facility · 실사일 09/23/2026"
+   ],
+   "implication": "FDA 는 ISO 5 등급 구역 안 장비의 표면 상태 관리가 오염 방지 요건을 충족하지 못한다고 봤다. 우리 무균 구역 장비의 도장·실링·녹 같은 표면 결함을 정기 점검 항목으로 보고 있는지 확인해야 한다.",
+   "checks": [
+    "ISO 5 구역 장비의 도장·실링 손상을 정기 점검에서 확인하는가?",
+    "무균 구역 장비 보수(재도장 등) 후 적합성 평가를 거쳐 사용을 재개하는가?"
+   ],
+   "hook_line": "ISO 5 구역 장비 기초부에서 녹으로 보이는 흔적·벗겨진 도장 관찰",
+   "en": {
+    "title_issue": "Poor equipment upkeep in ISO 5 area",
+    "summary": "During an inspection of a 503B outsourcing facility, FDA observed that equipment and utensils are not cleaned and maintained at intervals appropriate to prevent contamination.",
+    "key_facts": [
+     "Observation 1: equipment and utensils are not cleaned and maintained at appropriate intervals",
+     "Scope: equipment inside the ISO 5 classified areas of the compounding systems",
+     "Facility type: Outsourcing Facility; inspection date 09/23/2026"
+    ],
+    "implication": "FDA found that the surface condition of equipment inside ISO 5 areas did not meet contamination-prevention expectations. Confirm that paint, seal and corrosion defects on our aseptic-area equipment are part of routine inspections.",
+    "checks": [
+     "Do routine checks cover damaged paint and seals on ISO 5 equipment?",
+     "After repairs such as repainting, is aseptic-area equipment assessed before it returns to use?"
+    ],
+    "hook_line": "What appeared to be rust and chipping paint seen at an ISO 5 equipment base"
+   }
+  },
+  "fda483-196220": {
+   "title_issue": "안정성시험 미생물 시험 누락",
+   "summary": "FDA 가 원료의약품 제조소 실사에서 안정성시험이 표시된 재시험일을 뒷받침하지 못한다고 지적했다.",
+   "key_facts": [
+    "지적: 안정성시험이 표시 재시험일을 뒷받침하지 않음",
+    "내용: 안정성시험 중 미생물 시험을 하지 않아 사용기한·재시험일 동안의 미생물 오염 위험을 확인하지 않음",
+    "시설 유형: Manufacturer · 실사일 11/21/2025"
+   ],
+   "implication": "FDA 는 미생물 항목 없이 설정한 원료의약품 재시험일을 근거가 부족하다고 판단했다. 우리 원료 안정성 프로토콜에 미생물 항목이 빠져 있다면 그 사유가 위험평가로 문서화돼 있는지 확인해야 한다.",
+   "checks": [
+    "원료의약품 안정성 프로토콜에 미생물 시험 항목이 포함돼 있는가?",
+    "미생물 항목을 제외했다면 그 근거가 위험평가로 문서화돼 있는가?"
+   ],
+   "hook_line": "안정성시험 중 미생물 시험을 하지 않아 재시험일 근거가 부족함",
+   "en": {
+    "title_issue": "No microbial testing in stability",
+    "summary": "During an inspection of an API manufacturer, FDA observed that stability studies do not support the labeled retest date.",
+    "key_facts": [
+     "Observation: stability studies do not support the labeled retest date",
+     "Detail: no microbial testing is performed during stability studies to establish the risk of microbial contamination through the shelf life or retest date",
+     "Facility type: Manufacturer; inspection date 11/21/2025"
+    ],
+    "implication": "FDA judged an API retest date set without microbial attributes to be insufficiently supported. If our API stability protocols omit microbial testing, check that the rationale is documented in a risk assessment.",
+    "checks": [
+     "Do our API stability protocols include microbial testing?",
+     "If microbial testing is excluded, is the rationale documented in a risk assessment?"
+    ],
+    "hook_line": "No microbial testing during stability, so the retest date is not supported"
+   }
+  },
+  "fda483-196221": {
+   "title_issue": "세척 밸리데이션 미실시",
+   "summary": "FDA 가 원료의약품 제조소 실사에서 주요 제조설비의 세척·유지 절차가 부적절하고 세척 절차가 밸리데이션되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 원료의약품 제조설비 세척·유지 서면 절차 부적절, 세척 절차 밸리데이션 미실시",
+    "대상: 원료의약품(API)·중간체 생산에 쓰는 주요 제조·공정 설비",
+    "지적 2: 설비 적격성평가 서면 절차를 수립·준수하지 않음"
+   ],
+   "implication": "FDA 는 다품목 원료의약품 설비를 세척 밸리데이션 없이 운용한 것을 교차오염 방지 근거가 없다고 봤다. 우리 공용 설비마다 세척 절차의 밸리데이션 근거가 연결돼 있는지 설비 목록 단위로 확인해야 한다.",
+   "checks": [
+    "주요 공용 설비마다 밸리데이션된 세척 절차가 연결돼 있는가?",
+    "중간체 생산 설비도 세척 밸리데이션 범위에 포함돼 있는가?",
+    "설비 적격성평가 절차가 서면으로 수립돼 실제로 지켜지는가?"
+   ],
+   "hook_line": "원료의약품 주요 제조설비의 세척 절차를 밸리데이션하지 않음",
+   "en": {
+    "title_issue": "Cleaning procedures not validated",
+    "summary": "During an inspection of an API manufacturer, FDA observed inadequate written procedures for equipment cleaning and maintenance and no validation of cleaning procedures.",
+    "key_facts": [
+     "Observation 1: inadequate written cleaning and maintenance procedures and no cleaning validation for drug substance equipment",
+     "Scope: major manufacturing and processing equipment used for API and API intermediates",
+     "Observation 2: written procedures for equipment qualification were not established and followed"
+    ],
+    "implication": "FDA treated running multi-product API equipment without cleaning validation as lacking any basis for preventing cross-contamination. Check, equipment by equipment, that each shared item has a validated cleaning procedure behind it.",
+    "checks": [
+     "Does each major shared piece of equipment have a validated cleaning procedure?",
+     "Is intermediate-production equipment within the cleaning validation scope?",
+     "Are equipment qualification procedures written and actually followed?"
+    ],
+    "hook_line": "Cleaning procedures for major API equipment were not validated"
+   }
+  },
+  "fda483-196222": {
+   "title_issue": "불만 조사 범위·기한 미흡",
+   "summary": "FDA 가 원료의약품 제조소 실사에서 원인 미상 불일치와 규격 부적합을 철저히 검토하지 않았으며 불만 조사가 부실했다고 지적했다.",
+   "key_facts": [
+    "지적 1: 원인 미상 불일치·규격 부적합 배치를 출하 여부와 관계없이 철저히 검토하지 않음",
+    "내용: 고객 사용 후 아나필락시스 반응·사망 관련 불만 조사(2024-39)가 원료·용수의 엔도톡신 오염 가능성까지 확장되지 않음, 보관검체 시험 미실시",
+    "내용: 불만 조사가 절차서상 허용 기간을 넘겨 열려 있음"
+   ],
+   "implication": "FDA 는 중대 이상반응 불만을 받고도 원료·용수와 보관검체까지 조사를 넓히지 않은 회사 대응을 받아들이지 않았다. 우리 불만 조사 절차가 중대 사례에서 보관검체 시험과 원료 추적을 기본 범위로 요구하는지 확인할 차례다.",
+   "checks": [
+    "중대 이상반응 불만에서 보관검체 시험을 기본으로 하는가?",
+    "불만 조사 범위에 원료·공정용수 오염 가능성이 포함되는가?",
+    "절차서상 조사 기한을 넘긴 불만을 추적·관리하는가?"
+   ],
+   "hook_line": "사망 관련 불만 조사에서 보관검체를 시험하지 않음",
+   "en": {
+    "title_issue": "Inadequate complaint investigations",
+    "summary": "During an inspection of an API manufacturer, FDA observed a failure to thoroughly review unexplained discrepancies and specification failures, including deficient complaint investigations.",
+    "key_facts": [
+     "Observation 1: unexplained discrepancies and specification failures not thoroughly reviewed, whether or not the batch was distributed",
+     "Detail: complaint 2024-39, involving an anaphylactic reaction followed by death after drug use, did not extend to raw materials or water for potential endotoxin; no retain samples were tested",
+     "Detail: complaint investigations remained open beyond the time allowed by the written procedure"
+    ],
+    "implication": "FDA did not accept a response to a serious adverse-reaction complaint that never extended to raw materials, water or retain samples. Check that our complaint procedure makes retain-sample testing and raw-material tracing the default scope for serious cases.",
+    "checks": [
+     "Is retain-sample testing standard for serious adverse-reaction complaints?",
+     "Does the complaint investigation scope include raw materials and process water?",
+     "Are complaints open past the procedural deadline tracked?"
+    ],
+    "hook_line": "No retain samples tested in a complaint investigation involving a death"
+   }
+  },
+  "fda483-196223": {
+   "title_issue": "세척 밸리데이션 프로그램 결함",
+   "summary": "FDA 가 원료의약품 제조소 실사에서 제품 전환 세척 밸리데이션 프로그램이 부실하다고 지적했다.",
+   "key_facts": [
+    "지적 1: 세척 밸리데이션 프로그램 부적절",
+    "내용: 입자 크기가 다른 제품을 같은 설비에서 전환 생산하며 세척 밸리데이션 3회를 근거로 삼았으나 이후 세척 후 비표면적(BET) 규격이탈 조사가 이어짐",
+    "시설 유형: API Manufacturer · 실사일 10/27/2023"
+   ],
+   "implication": "FDA 는 세척 밸리데이션을 마친 뒤에도 세척 후 규격이탈이 반복된 상황을 밸리데이션 성공의 보증이 없다고 판단했다. 우리 세척 밸리데이션 이후 발생한 세척 관련 규격이탈을 재밸리데이션 판단에 연결하는지 확인해야 한다.",
+   "checks": [
+    "세척 밸리데이션 이후 세척 관련 규격이탈을 재밸리데이션 검토로 연결하는가?",
+    "세척 실패 시 폐기량을 늘리는 식의 절차 변경을 일탈·규격이탈로 기록하는가?"
+   ],
+   "hook_line": "세척 밸리데이션 후 비표면적 규격이탈 결과 조사 약 9건 발생",
+   "en": {
+    "title_issue": "Deficient cleaning validation program",
+    "summary": "During an inspection of an API manufacturer, FDA observed that the product changeover cleaning validation program is deficient.",
+    "key_facts": [
+     "Observation 1: the cleaning validation program is deficient",
+     "Detail: three cleaning validations supported changeovers between products of different particle size, yet out-of-specification investigations for specific surface area (BET) after cleaning followed",
+     "Facility type: API Manufacturer; inspection date 10/27/2023"
+    ],
+    "implication": "FDA held that repeated post-cleaning out-of-specification results after a completed validation gave no assurance the validation had succeeded. Check that cleaning-related failures after our validations feed into revalidation decisions.",
+    "checks": [
+     "Do cleaning-related OOS results after validation trigger a revalidation review?",
+     "Are procedure changes such as discarding more product after a failed cleaning recorded as deviations or OOS?"
+    ],
+    "hook_line": "About nine OOS investigations for surface area followed cleaning validation"
+   }
+  },
+  "fda483-196224": {
+   "title_issue": "시험실 관리 부적절",
+   "summary": "FDA 가 원료의약품 제조소 실사에서 시험실 관리가 부적절하다고 지적했다.",
+   "key_facts": [
+    "지적: 시험실 관리 부적절",
+    "내용: 출하시험용 작업표준품 주입에서 휘발성 유연물질 피크가 모두 나타나지 않음",
+    "내용: 충전실 환경 모니터링용 배지의 성장촉진시험 미실시, 내용물을 확인할 수 없는 GC 바이알 방치"
+   ],
+   "implication": "FDA 는 표준품 피크 확인, 검체 접근 통제, 배지 성장촉진 같은 기본 시험실 관리를 문서 근거 없이 운영한 것을 받아들이지 않았다. 우리 시험실에서 표준품 적격성 요건과 실제 분석 결과가 일치하는지 확인할 차례다.",
+   "checks": [
+    "작업표준품 주입 결과에 적격성 평가에서 요구한 피크가 모두 나타나는가?",
+    "환경 모니터링용 배지마다 성장촉진시험을 하는가?",
+    "시험 완료 검체와 진행 중 검체의 보관·접근이 분리·통제되는가?"
+   ],
+   "hook_line": "환경 모니터링용 배지의 성장촉진시험을 하지 않음",
+   "en": {
+    "title_issue": "Inadequate laboratory controls",
+    "summary": "During an inspection of an API manufacturer, FDA observed that laboratory controls are inadequate.",
+    "key_facts": [
+     "Observation: laboratory controls are inadequate",
+     "Detail: working standard injections used in release testing did not show peaks for all volatile analogues",
+     "Detail: no growth promotion of environmental monitoring media for the filling room; an unattended GC vial with unknown contents"
+    ],
+    "implication": "FDA did not accept basic lab controls such as standard peak checks, sample access and media growth promotion run without documented support. Check that our working standard qualification criteria match what actual analyses show.",
+    "checks": [
+     "Do working standard injections show every peak required at qualification?",
+     "Is growth promotion performed on each lot of environmental monitoring media?",
+     "Are completed and in-process samples stored and accessed separately?"
+    ],
+    "hook_line": "No growth promotion on environmental monitoring media"
+   }
+  },
+  "fda483-196225": {
+   "title_issue": "원료 출하 승인 전 사용",
+   "summary": "FDA 가 원료의약품 제조소 실사에서 생산부서가 핵심 원료를 확인시험과 품질부서 출하 승인 전에 제조에 사용했다고 지적했다.",
+   "key_facts": [
+    "지적: 핵심 원료를 확인시험 완료·품질관리 부서 출하 승인 전에 제조에 사용",
+    "예: 07/12/2023 입고·검체채취, 08/09/2023 출하 승인된 원료 로트를 07/31/2023 제조에 사용",
+    "시설 유형: API Manufacturer · 실사일 12/08/2023"
+   ],
+   "implication": "FDA 는 확인시험이 끝나기 전에 원료를 투입한 생산 운영을 품질부서 승인 절차를 건너뛴 것으로 봤다. 우리 시스템에서 출하 승인 전 원료가 칭량·투입 단계로 넘어가지 못하도록 막혀 있는지 확인해야 한다.",
+   "checks": [
+    "원료 출하 승인 전에는 칭량·투입이 시스템으로 차단되는가?",
+    "원료 사용일과 출하 승인일을 배치 기록 검토에서 대조하는가?"
+   ],
+   "hook_line": "원료를 확인시험·품질부서 출하 승인 전에 제조에 사용함",
+   "en": {
+    "title_issue": "Raw materials used before release",
+    "summary": "During an inspection of an API manufacturer, FDA observed that production used critical raw materials before identification testing and Quality Control release were complete.",
+    "key_facts": [
+     "Observation: critical raw materials used in manufacturing before identification testing and QC release",
+     "Example: a lot received and sampled 07/12/2023 and released 08/09/2023 was used in manufacturing on 07/31/2023",
+     "Facility type: API Manufacturer; inspection date 12/08/2023"
+    ],
+    "implication": "FDA treated feeding raw materials into production before identity testing as bypassing the quality unit's release. Check that our systems block unreleased materials from dispensing and charging.",
+    "checks": [
+     "Is dispensing of unreleased raw materials blocked by the system?",
+     "Does batch record review compare material use dates with release dates?"
+    ],
+    "hook_line": "Raw materials used before identity testing and quality release"
+   }
+  },
+  "fda483-196231": {
+   "title_issue": "CAPA 절차 미준수",
+   "summary": "FDA 가 제조소 실사에서 시정 및 예방조치 절차가 적절히 수립되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 시정 및 예방조치(CAPA) 절차 수립 미흡",
+    "내용: 소프트웨어 재시작 관련 불만(0016·0017·0018)에 근본원인 공식 조사를 하지 않아 자사 절차(QOP-85-03)를 따르지 않음",
+    "시설 유형: Manufacturer · 실사일 12/15/2025"
+   ],
+   "implication": "FDA 는 소프트웨어 재시작 불만에 대해 자사 CAPA 절차가 요구한 원인 조사를 생략한 것을 받아들이지 않았다. 우리 불만 처리에서 별도 연구로 원인을 확인한 경우에도 개별 불만의 조사 기록이 남는지 확인해야 한다.",
+   "checks": [
+    "반복 불만마다 근본원인 조사가 개별 기록으로 남는가?",
+    "별도 연구로 확인한 원인이 해당 불만 기록과 연결되는가?"
+   ],
+   "hook_line": "소프트웨어 재시작 불만에 근본원인 공식 조사를 하지 않음",
+   "en": {
+    "title_issue": "CAPA procedure not followed",
+    "summary": "During an inspection of a manufacturer, FDA observed that corrective and preventive action procedures were not adequately established.",
+    "key_facts": [
+     "Observation 1: CAPA procedures not adequately established",
+     "Detail: complaints 0016, 0017 and 0018 on a software reset had no formal root-cause investigation, contrary to the firm's procedure QOP-85-03",
+     "Facility type: Manufacturer; inspection date 12/15/2025"
+    ],
+    "implication": "FDA did not accept skipping the root-cause investigation that the firm's own CAPA procedure required for software reset complaints. Check that each complaint keeps its own investigation record even when a separate study identified the cause.",
+    "checks": [
+     "Does each recurring complaint have its own root-cause investigation record?",
+     "Is a cause found in a separate study linked back to the complaint records?"
+    ],
+    "hook_line": "No formal root-cause investigation of software reset complaints"
+   }
+  },
+  "fda483-196239": {
+   "title_issue": "공정 밸리데이션 문서 미흡",
+   "summary": "FDA 가 의료기기 제조소 실사에서 후속 검사로 확인할 수 없는 공정이 적절히 밸리데이션되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 출력물을 후속 모니터링·측정으로 확인할 수 없는 공정의 밸리데이션 미흡",
+    "내용: 자동 폼 절단 공정의 초기 밸리데이션 미실시",
+    "지적 2: 공정 밸리데이션 절차에 표본 크기 근거·통계 기법이 문서화되지 않음"
+   ],
+   "implication": "FDA 는 후속 검사로 품질을 확인할 수 없는 자동 절단 공정을 초기 밸리데이션 없이 운영한 것을 받아들이지 않았다. 우리 공정 중 결과를 전수 검증하지 않는 공정이 밸리데이션 대상 목록에 모두 올라 있는지 확인할 차례다.",
+   "checks": [
+    "결과를 전수 검증할 수 없는 공정이 모두 밸리데이션돼 있는가?",
+    "공정 중 검사의 표본 크기 근거가 문서화돼 있는가?"
+   ],
+   "hook_line": "자동 폼 절단 공정의 초기 밸리데이션을 하지 않음",
+   "en": {
+    "title_issue": "Process validation not documented",
+    "summary": "During an inspection of a manufacturer, FDA observed that processes whose output cannot be verified by subsequent monitoring or measurement were not adequately validated.",
+    "key_facts": [
+     "Observation 1: processes whose output cannot be verified afterwards were not adequately validated",
+     "Detail: no initial validation of the automated foam cutting process",
+     "Observation 2: validation procedures lacked statistical techniques and documented rationale for sample sizes"
+    ],
+    "implication": "FDA did not accept an automated cutting process run without initial validation when its output is not verified downstream. Check that every process whose output we do not fully verify is on our validation list.",
+    "checks": [
+     "Are all processes whose output cannot be fully verified validated?",
+     "Is the rationale for in-process inspection sample sizes documented?"
+    ],
+    "hook_line": "No initial validation of the automated foam cutting process"
+   }
+  },
+  "fda483-196241": {
+   "title_issue": "위험관리 기록 유지 미흡",
+   "summary": "FDA 가 체외진단 제품 제조소 실사에서 제품 실현 과정의 위험관리 기록이 적절히 유지되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 제품 실현 단계 위험관리 활동 기록 유지 미흡(SOP-00038 기준)",
+    "내용: Class II Coccidioides Ab Enzyme Immunoassay 위험관리 파일이 시판 후 감시에서 나온 위해(동결·해동 영향, 민감도·특이도·안정성 저하)를 다루지 않음",
+    "지적 2: 설계·개발 변경을 시행 전 검토·검증·승인하지 않음"
+   ],
+   "implication": "FDA 는 시판 후 감시에서 드러난 위해를 위험관리 파일에 반영하지 않은 것을 자사 절차 위반으로 봤다. 우리 위험관리 파일이 불만·시판 후 정보를 주기적으로 반영하는지 확인해야 한다.",
+   "checks": [
+    "시판 후 감시에서 나온 위해가 위험관리 파일에 반영되는가?",
+    "설계 변경을 시행 전에 검토·검증·승인하는가?"
+   ],
+   "hook_line": "시판 후 감시에서 나온 동결·해동 영향을 위험관리 파일에 미반영",
+   "en": {
+    "title_issue": "Risk management records not kept",
+    "summary": "During an inspection of a diagnostics manufacturer, FDA observed that records of risk management activities in product realization were not adequately maintained.",
+    "key_facts": [
+     "Observation 1: risk management records in product realization not adequately maintained (per SOP-00038)",
+     "Detail: the risk management file for the Class II Coccidioides Ab Enzyme Immunoassay did not address post-market hazards such as freeze/thaw effects and reduced sensitivity, specificity and stability",
+     "Observation 2: design and development changes were not reviewed, verified, validated and approved before implementation"
+    ],
+    "implication": "FDA treated hazards surfaced by post-market surveillance but missing from the risk management file as a breach of the firm's own procedure. Check that our risk files are updated with complaint and post-market data on a set cycle.",
+    "checks": [
+     "Are hazards from post-market surveillance added to the risk management file?",
+     "Are design changes reviewed, verified and approved before implementation?"
+    ],
+    "hook_line": "Post-market freeze/thaw hazards missing from the risk management file"
+   }
+  },
+  "fda483-196242": {
+   "title_issue": "위험관리 프로세스 부재",
+   "summary": "FDA 가 의료기기 제조소 실사에서 제품 실현 과정의 위험관리 프로세스가 수립·문서화되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 제품 실현 단계 위험관리 프로세스를 수립·이행·유지하지 않음",
+    "내용: 텅스텐 눈 차폐물 제품에 위험평가 등 위험관리 기록이 없음",
+    "내용: 확정된 절차서 어디에도 위험평가 방법이 없음, 회사는 시정을 약속"
+   ],
+   "implication": "FDA 는 위험평가 방법을 정한 절차 자체가 없는 상태를 제품 실현 요건 미충족으로 판단했다. 우리 제품군마다 위험평가 기록과 그 방법을 정한 절차서가 모두 있는지 확인할 차례다.",
+   "checks": [
+    "제품군마다 위험평가 기록이 존재하는가?",
+    "위험 평가 방법을 정한 확정 절차서가 있는가?"
+   ],
+   "hook_line": "텅스텐 눈 차폐물 제품에 위험평가 기록이 없음",
+   "en": {
+    "title_issue": "No risk management process",
+    "summary": "During an inspection of a device manufacturer, FDA observed that no risk management process for product realization had been established or documented.",
+    "key_facts": [
+     "Observation 1: no risk management process for product realization established, implemented or maintained",
+     "Detail: no risk assessment or other risk record for the tungsten eye shield products",
+     "Detail: no finalized procedure establishes how to assess risk; the firm promised to correct"
+    ],
+    "implication": "FDA judged the absence of any procedure defining how to assess risk as failing product realization requirements. Check that each of our product families has a risk assessment record and a procedure that defines the method.",
+    "checks": [
+     "Does each product family have a risk assessment record?",
+     "Is there a finalized procedure defining how risk is assessed?"
+    ],
+    "hook_line": "No risk assessment record for tungsten eye shield products"
+   }
+  },
+  "fda483-196243": {
+   "title_issue": "부적합품 관리 절차 미흡",
+   "summary": "FDA 가 위탁 멸균업체 실사에서 규정 요건에 맞지 않는 제품을 관리하는 절차가 적절히 수립되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 부적합품 관리 절차 미흡(CP-04 기준)",
+    "내용: 가스 주입 후 백 밀봉 문제와 통기 챔버 온도의 규격 범위 이탈에 부적합품 보고서(NCPR)를 작성하지 않음",
+    "시설 유형: Contract Sterilizer · 실사일 05/24/2018"
+   ],
+   "implication": "FDA 는 자사 절차가 보고를 요구한 멸균 공정 이탈을 부적합품 보고 없이 넘긴 것을 받아들이지 않았다. 우리 멸균 공정의 온도 기록 이탈과 포장 밀봉 이상이 실제로 부적합 보고로 이어지는지 확인해야 한다.",
+   "checks": [
+    "멸균 후 포장 밀봉 이상이 부적합 보고로 기록되는가?",
+    "멸균·통기 온도 기록의 규격 이탈을 부적합 보고로 연결하는가?"
+   ],
+   "hook_line": "가스 주입 후 백 밀봉 문제·통기 온도 이탈에 부적합 보고 없음",
+   "en": {
+    "title_issue": "Nonconforming product control lacking",
+    "summary": "During an inspection of a contract sterilizer, FDA observed that procedures to control nonconforming product were not adequately established.",
+    "key_facts": [
+     "Observation 1: inadequate nonconforming product control (per CP-04)",
+     "Detail: no Non-Conforming Product Reports for bag sealing issues after gas injection or aeration chamber temperature excursions outside specification",
+     "Facility type: Contract Sterilizer; inspection date 05/24/2018"
+    ],
+    "implication": "FDA did not accept sterilization process excursions that the firm's own procedure required to be reported passing without nonconformance reports. Check that temperature excursions and seal failures in our sterilization processes actually generate nonconformance reports.",
+    "checks": [
+     "Are seal failures after sterilization recorded as nonconformances?",
+     "Are out-of-range sterilization or aeration temperatures linked to nonconformance reports?"
+    ],
+    "hook_line": "No nonconformance reports for bag seal issues or aeration temperature excursions"
+   }
+  },
+  "fda483-196246": {
+   "title_issue": "중대 이상사례 15일 보고 누락",
+   "summary": "FDA 가 시판 후 이상사례 보고(PADE) 실사에서 중대하고 예상하지 못한 이상사례가 15일 이내에 보고되지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 중대·예상하지 못한 이상사례를 최초 접수 후 15일 이내에 FDA 에 보고하지 않음",
+    "내용: 입원 관련 자발 보고를 자사 분류에서 중대·예상 외·신속보고 대상으로 판정하고도 환자 식별정보가 없다며 무효 처리",
+    "지적 2: 시판 후 이상사례 감시·접수·평가·보고 서면 절차 없음"
+   ],
+   "implication": "FDA 는 자사 사례 서술에 단일 환자의 경과가 담겨 있는데도 환자 식별정보 부재를 이유로 무효 처리한 판단을 받아들이지 않았다. 우리 약물감시 절차에서 무효 사례 판정에 개별 의학적 검토가 들어가는지 확인할 차례다.",
+   "checks": [
+    "이상사례를 무효로 분류할 때 개별 의학적 검토를 거치는가?",
+    "소셜미디어 출처 이상사례를 일괄 분류하지 않고 건별 평가하는가?",
+    "시판 후 이상사례 보고 서면 절차가 있는가?"
+   ],
+   "hook_line": "입원 사례를 환자 식별정보 부재로 무효 처리, 15일 보고 안 함",
+   "en": {
+    "title_issue": "Missed 15-day serious ADE reports",
+    "summary": "During a postmarketing adverse drug experience (PADE) inspection, FDA observed that serious and unexpected adverse drug experiences were not all reported within 15 calendar days.",
+    "key_facts": [
+     "Observation 1: serious and unexpected adverse drug experiences not reported to FDA within 15 calendar days of initial receipt",
+     "Detail: a hospitalization report triaged by the firm as serious, unexpected and expedited was later classified non-valid for lacking a patient identifier",
+     "Observation 2: no written procedures for surveillance, receipt, evaluation and reporting of postmarketing adverse experiences"
+    ],
+    "implication": "FDA did not accept a non-valid classification based on a missing patient identifier when the firm's own narrative described a single patient's course. Check that our pharmacovigilance procedure requires individual medical review before any case is classed non-valid.",
+    "checks": [
+     "Does every non-valid case classification get individual medical review?",
+     "Are social-media adverse event reports assessed case by case rather than in bulk?",
+     "Is there a written procedure for postmarketing adverse experience reporting?"
+    ],
+    "hook_line": "Hospitalization case classed non-valid for no patient identifier, no 15-day report"
+   }
+  },
+  "fda483-196247": {
+   "title_issue": "시험 자료·검체 보관 누락",
+   "summary": "FDA 가 비임상시험기관 실사에서 시험책임자가 원자료·검체·최종보고서 등을 시험 종료 시 보관소로 이관하도록 하지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 시험책임자가 모든 원자료·문서·계획서·검체·최종보고서의 보관소 이관을 보장하지 않음",
+    "내용: 시험 종료 시 Group 1 검체 일부가 보관소에 보존되지 않음",
+    "내용: 최종보고서 준수 진술서에 규정 예외 사항을 기재하지 않음"
+   ],
+   "implication": "FDA 는 검체 일부를 보관하지 못하고도 최종보고서 준수 진술서에 그 예외를 적지 않은 것을 받아들이지 않았다. 우리 비임상 시험 종료 시 검체 이관 목록과 준수 진술서의 예외 기재를 대조하는지 확인해야 한다.",
+   "checks": [
+    "시험 종료 시 검체 이관 목록을 계획서와 대조하는가?",
+    "규정 예외 사항이 최종보고서 준수 진술서에 기재되는가?"
+   ],
+   "hook_line": "시험 종료 시 Group 1 검체 일부가 보관소에 보존되지 않음",
+   "en": {
+    "title_issue": "Study specimens not archived",
+    "summary": "During an inspection of a nonclinical laboratory, FDA observed that the study director failed to assure transfer of all raw data, documentation, protocols, specimens and final reports to the archives.",
+    "key_facts": [
+     "Observation 1: the study director did not assure all raw data, documentation, protocols, specimens and final reports were archived",
+     "Detail: not all Group 1 specimens were retained in the archives at the close of the study",
+     "Detail: the exception from the regulations was not documented in the final report's compliance statement"
+    ],
+    "implication": "FDA did not accept losing part of the specimens without disclosing the exception in the final report's compliance statement. Check that our nonclinical study close-out reconciles specimen transfer lists with compliance statement exceptions.",
+    "checks": [
+     "Is the specimen transfer list reconciled against the protocol at study close?",
+     "Are regulatory exceptions stated in the final report's compliance statement?"
+    ],
+    "hook_line": "Not all Group 1 specimens retained in the archives at study close"
+   }
+  },
+  "fda483-196248": {
+   "title_issue": "예기치 못한 상황 시정조치 미기록",
+   "summary": "FDA 가 GLP 비임상시험기관 실사에서 시험책임자가 시험 품질에 영향을 줄 수 있는 예기치 못한 상황을 기록하고 시정조치를 문서화하도록 하지 않았다고 지적했다.",
+   "key_facts": [
+    "지적 1: 시험책임자가 예기치 못한 상황의 기록·시정조치 문서화를 보장하지 않음",
+    "내용: 부형제 대조군 시료에서 시험물질 오염이 검출됐으나 시정조치 기록 없음",
+    "내용: 품질보증 책임자가 시정조치 미기록 상태에서 품질보증 진술서에 서명"
+   ],
+   "implication": "FDA 는 대조군 오염과 반복된 동결·해동 오류에 시정조치 기록이 없는데도 품질보증 진술서가 서명된 것을 받아들이지 않았다. 우리 비임상 시험에서 품질보증 서명 전에 미결 일탈·시정조치 기록을 확인하는지 점검할 차례다.",
+   "checks": [
+    "대조군 시료 오염 발생 시 시정조치를 문서화하는가?",
+    "품질보증 진술서 서명 전 미결 일탈·시정조치를 확인하는가?"
+   ],
+   "hook_line": "부형제 대조군 16마리 시료에서 시험물질 오염 검출, 시정조치 기록 없음",
+   "en": {
+    "title_issue": "Unforeseen events not corrected",
+    "summary": "During an inspection of a GLP nonclinical laboratory, FDA observed that the study director failed to assure unforeseen circumstances affecting study quality were noted and corrective action documented.",
+    "key_facts": [
+     "Observation 1: the study director did not assure unforeseen circumstances were noted and corrective action documented",
+     "Detail: test article contamination was detected in vehicle control samples, with no corrective action documented",
+     "Detail: the Quality Assurance Manager signed QA statements although corrective actions were not documented"
+    ],
+    "implication": "FDA did not accept QA statements signed for studies with control-group contamination and repeated freeze-thaw errors that had no documented corrective action. Check that our QA confirms open deviations and corrective actions before signing nonclinical study statements.",
+    "checks": [
+     "Is corrective action documented when control samples show contamination?",
+     "Does QA verify open deviations and corrective actions before signing study statements?"
+    ],
+    "hook_line": "Test article found in vehicle control samples from 16 animals, no corrective action"
+   }
+  }
+ }
+}

@@ -14,6 +14,8 @@
   * 미뤄짐   = 제외 장부에 basis=`text_missing` 행이 있다 — 본문을 못 얻은 채 메타만으로 판정해 수집기가
                "판정 끝"으로 보지 않고 다음 실행에 다시 보는 문서(하루 한도·OCR 예산 등). 같은 문서가
                `DEFERRED_MAX_DAYS` 일을 넘게 남아 있으면(first_seen 기준) 놓침으로 **승격**한다.
+  * 최근 미시도 = 게시일이 오늘(KST) 기준 `DEFERRED_MAX_DAYS` 일 이내이고 수집·제외 어디에도 없는 문서(이유
+               `recent_not_yet_attempted`) — 대량 게시일 하루 한도로 아직 시도 전인 것. 기한을 넘기면 놓침.
   * 장부 이전(pre_ledger) = 장부 연결 전에 게시돼 장부에 없을 수 있는 문서 — 첫 2주만 별도 칸.
 
 ★원천 목록은 수집기의 관련성 필터를 **거치지 않는다**(필터 자체가 틀렸을 때도 잡으려고). 단 HTTP·파싱
@@ -235,7 +237,7 @@ def reconcile_source(
     collected 가 None(저장소 못 읽음)이거나 ledger 가 None(장부 못 읽음)이면 대조 불가 — 놓침 0, 판정은
     store_unreachable. 원천 접속 실패도 놓침 0(source_unreachable)."""
     counts = {"listed": 0, "collected": 0, "excluded": 0, "deferred": 0,
-              "deferred_overdue": 0, "pre_ledger": 0, "missed": 0}
+              "deferred_recent": 0, "deferred_overdue": 0, "pre_ledger": 0, "missed": 0}
     res = SourceResult(
         key=spec.key, source=spec.source, label=spec.label, slug=spec.slug, verdict=V_OK,
         window_start=window[0].isoformat(), window_end=window[1].isoformat(), counts=counts,
@@ -279,6 +281,16 @@ def reconcile_source(
             else:
                 counts["excluded"] += 1
             continue
+        # 게시일이 DEFERRED_MAX_DAYS 이내인 문서가 수집·제외 어디에도 없으면 "아직 시도 전"이다 —
+        # 대량 게시일에 하루 한도(excerpt cap)에 걸려 한 번도 시도되지 않은 문서(skipped_no_attempt)는
+        # 장부에도 Notion 에도 없어 첫날부터 놓침으로 보이는데, 다음 실행들이 따라잡으면 정상이다.
+        # 상한을 넘기면 아래 놓침으로 승격된다. 게시일을 모르면 보수적으로 놓침.
+        pub_age = _days_between(run_date, doc.published) if doc.published else None
+        if pub_age is not None and pub_age <= DEFERRED_MAX_DAYS:
+            counts["deferred"] += 1
+            counts["deferred_recent"] += 1
+            res.deferred.append(_brief(doc, reason="recent_not_yet_attempted", since=doc.published))
+            continue
         if _is_pre_ledger(doc.published, run_date):
             counts["pre_ledger"] += 1
             res.pre_ledger.append(_brief(doc))
@@ -318,6 +330,7 @@ def issue_body(res: SourceResult, run_url: str = "") -> str:
         f"- 창: {res.window_start} ~ {res.window_end}",
         f"- 원천 {c['listed']}건 = 수집 {c['collected']} + 제외 {c['excluded']} + 미뤄짐 {c['deferred']}"
         f" + 장부 이전 {c['pre_ledger']} + **놓침 {c['missed']}**"
+        + (f" (미뤄짐 중 게시 {DEFERRED_MAX_DAYS}일 이내 미시도 {c['deferred_recent']})" if c["deferred_recent"] else "")
         + (f" (그중 미뤄짐 {DEFERRED_MAX_DAYS}일 초과 승격 {c['deferred_overdue']})" if c["deferred_overdue"] else ""),
     ]
     if res.partial:
@@ -719,6 +732,9 @@ def render_markdown(report: dict[str, Any]) -> str:
         if s["error"]:
             extra.append(f"사유: {s['error']}")
         extra += s["notes"]
+        if s["counts"]["deferred_recent"]:
+            extra.append(f"미뤄짐 {s['counts']['deferred']}건 중 {s['counts']['deferred_recent']}건은 게시 {report['deferred_max_days']}일 이내 "
+                         "미시도(recent_not_yet_attempted) — 기한을 넘기면 놓침으로 승격")
         if s["pre_ledger"]:
             extra.append(f"장부 이전 게시분 {len(s['pre_ledger'])}건은 {report['pre_ledger_until']} 까지 놓침으로 세지 않는다")
         if extra:

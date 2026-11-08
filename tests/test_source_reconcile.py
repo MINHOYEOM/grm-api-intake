@@ -77,7 +77,7 @@ class PreLedgerTest(unittest.TestCase):
         self.assertEqual((r.counts["pre_ledger"], r.counts["missed"], r.verdict), (1, 0, sr.V_OK))
 
     def test_after_activation_is_not_pre_ledger(self):
-        r = recon([doc("new", "2026-11-09")], run=EARLY)
+        r = recon([doc("new", "2026-11-09")], run=date(2026, 11, 20))   # 11일 전 게시 — 유예 안 + 장부 이후
         self.assertEqual((r.counts["pre_ledger"], r.counts["missed"]), (0, 1))
 
     def test_grace_expires_after_two_weeks(self):
@@ -126,6 +126,36 @@ class VerdictTest(unittest.TestCase):
         r = sr.reconcile_source(SPEC, out, run_date=RUN, window=WIN, collected=set(),
                                 ledger=None, ledger_error="제외 장부 조회 HTTP 500")
         self.assertEqual((r.verdict, r.counts["missed"]), (sr.V_STORE_UNREACHABLE, 0))
+
+
+class RecentNotYetAttemptedTest(unittest.TestCase):
+    def test_within_three_days_is_deferred_not_missed(self):
+        for pub in ("2026-12-01", "2026-11-30", "2026-11-28"):     # 0·1·3일 전
+            r = recon([doc("a", pub)])
+            self.assertEqual((r.counts["deferred"], r.counts["deferred_recent"], r.counts["missed"]), (1, 1, 0), pub)
+            self.assertEqual(r.deferred[0]["reason"], "recent_not_yet_attempted")
+            self.assertEqual(r.verdict, sr.V_DEFERRED_ONLY)
+
+    def test_over_three_days_is_missed(self):
+        r = recon([doc("a", "2026-11-27")])      # 4일 전
+        self.assertEqual((r.counts["deferred"], r.counts["missed"], r.verdict), (0, 1, sr.V_MISSED))
+
+    def test_no_published_date_is_missed(self):
+        r = recon([doc("a", "")])
+        self.assertEqual((r.counts["deferred"], r.counts["missed"]), (0, 1))
+
+    def test_collected_or_excluded_recent_doc_is_not_deferred(self):
+        r = recon([doc("a", "2026-12-01"), doc("b", "2026-12-01")], collected=["a"], ledger={"b": row()})
+        self.assertEqual((r.counts["deferred_recent"], r.counts["collected"], r.counts["excluded"]), (0, 1, 1))
+
+    def test_visible_in_json_and_markdown_and_no_issue_opened(self):
+        r = recon([doc("a", "2026-12-01"), doc("b", "2026-12-01")], collected=["b"])
+        rep = sr.build_report(run_date=RUN, specs=[SPEC], outcomes={"fda483": sr.FetchOutcome(docs=[doc("a", "2026-12-01")])},
+                              windows={"fda483": WIN}, collected=set(), store_error="",
+                              ledger={"FDA 483": {}}, ledger_error="")
+        self.assertEqual(rep["sources"][0]["counts"]["deferred_recent"], 1)
+        self.assertIn("recent_not_yet_attempted", sr.render_markdown(rep))
+        self.assertEqual(sr.plan_issues([r])[0]["action"], "close")
 
 
 class DeferredPromotionTest(unittest.TestCase):

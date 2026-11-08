@@ -336,3 +336,57 @@ def append_intake_item_with_findings_to_supabase(
     record = findings_store.raw_signal_from_intake_item(item, collected_at=collected_at)
     findings = findings_extractors.findings_from_raw_signal(record)
     return _append_raw_signal_with_findings(base, service_key, record, findings)
+
+
+_EXISTING_IDS_CHUNK = 80  # in.(...) 필터 URL 길이 상한(raw_signal_id 31자 x 80 ≈ 2.6KB)
+
+
+def existing_raw_signal_ids(
+    base_url: str,
+    service_key: str,
+    raw_signal_ids: list[str],
+    *,
+    timeout: int = DEFAULT_TIMEOUT_SECONDS,
+) -> set[str] | None:
+    """Return which of ``raw_signal_ids`` already exist in Supabase raw_signals.
+
+    Returns None if any lookup fails (after one retry for 5xx/timeout), so the
+    caller can skip work instead of guessing -- never a partial set. Like
+    _post_rows, failures never surface exception text (service-role key safety).
+    """
+    base = _normalize_base_url(base_url)
+    if base is None:
+        return None
+    ids = sorted({i for i in raw_signal_ids if i})
+    headers = {"apikey": service_key, "Authorization": f"Bearer {service_key}"}
+    found: set[str] = set()
+    for start in range(0, len(ids), _EXISTING_IDS_CHUNK):
+        chunk = ids[start:start + _EXISTING_IDS_CHUNK]
+        params = {"select": "raw_signal_id",
+                  "raw_signal_id": "in.(" + ",".join(chunk) + ")"}
+        rows = None
+        for attempt in range(1, _MAX_ATTEMPTS + 1):
+            try:
+                resp = requests.get(f"{base}/rest/v1/raw_signals", params=params,
+                                    headers=headers, timeout=timeout)
+            except requests.exceptions.Timeout:
+                if attempt < _MAX_ATTEMPTS:
+                    continue
+                return None
+            except requests.exceptions.RequestException:
+                return None
+            if resp.status_code >= 500 and attempt < _MAX_ATTEMPTS:
+                continue
+            if resp.status_code >= 400:
+                return None
+            try:
+                data = resp.json()
+            except ValueError:
+                return None
+            rows = data if isinstance(data, list) else None
+            break
+        if rows is None:
+            return None
+        found.update(str(r.get("raw_signal_id") or "") for r in rows if isinstance(r, dict))
+    found.discard("")
+    return found

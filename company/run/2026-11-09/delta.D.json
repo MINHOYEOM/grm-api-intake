@@ -1,0 +1,496 @@
+{
+ "status": "완료",
+ "run_date_kst": "2026-11-09",
+ "shard": "D",
+ "cards": {
+  "data0009-44301": {
+   "title_issue": "GMP 규정 일부개정 행정예고",
+   "summary": "식약처가 「의약품 제조 및 품질관리에 관한 규정」 일부개정고시(안)을 행정예고했다(식품의약품안전처 공고 제2026-500호).",
+   "key_facts": [
+    "대상: 「의약품 제조 및 품질관리에 관한 규정」 일부개정고시(안)",
+    "공고: 식품의약품안전처 공고 제2026-500호 · 발행일 2026-10-16",
+    "개정 조항·의견제출 기한: 본문을 받지 못해 원문 확인이 필요하다"
+   ],
+   "implication": "식약처가 GMP 고시 자체를 고치는 행정예고를 냈으나, 이번 수집에서는 개정 조항과 의견제출 기한을 받지 못했다. 공고 원문에서 개정 대상 조항이 우리 제조·품질관리 절차의 어느 부분에 걸리는지 먼저 확인할 차례다.",
+   "checks": [
+    "공고 제2026-500호 원문에서 개정 대상 조항을 확인했는가?",
+    "의견제출 기한 안에 사내 검토 의견을 모을 담당자가 정해져 있는가?"
+   ],
+   "en": {
+    "title_issue": "MFDS GMP regulation amendment notice",
+    "summary": "MFDS issued an administrative pre-announcement of a partial amendment to its Regulation on Good Manufacturing and Quality Control of Drugs (MFDS Notice No. 2026-500).",
+    "key_facts": [
+     "Subject: draft partial amendment to the Regulation on Good Manufacturing and Quality Control of Drugs",
+     "Notice: MFDS Notice No. 2026-500; published 2026-10-16",
+     "Amended provisions and comment deadline: we did not receive the notice body, so the original needs to be checked"
+    ],
+    "implication": "MFDS has proposed changes to the GMP regulation itself, but this collection did not capture the amended provisions or the comment deadline. Check the original notice to see which of our manufacturing and quality control procedures the amended provisions touch.",
+    "checks": [
+     "Have the amended provisions in Notice No. 2026-500 been confirmed from the original text?",
+     "Is someone assigned to gather internal comments before the comment deadline?"
+    ]
+   }
+  },
+  "gmpinspect-1Q6VfHVal_H": {
+   "title_issue": "사후 GMP 실사 지적사항 없음",
+   "summary": "식약처 GMP 사후 실사에서 대성가스텍(주) 완제(단일) 제조소에 대한 평가 결과 지적(보완)사항이 없었다.",
+   "key_facts": [
+    "결론: 평가 결과 지적(보완)사항(Deficiencies) 없음",
+    "구분: 사후 / 완제(단일)",
+    "실사일자: 2026-08-20 · 등록일 2026-11-03"
+   ],
+   "implication": "식약처는 이번 사후 실사에서 시정·보완을 요구할 지적사항을 남기지 않았고, 지적 없음 결과도 실사 결과로 공개했다. 우리 제조소도 직전 실사 이후 바뀐 시설·절차의 근거 자료가 사후 실사에 바로 제시할 수 있게 정리돼 있는지 확인할 차례다.",
+   "checks": [
+    "직전 GMP 실사 이후 변경된 시설·절차의 근거 자료가 실사 대비 목록에 반영돼 있는가?",
+    "지적 없이 끝난 실사도 실사 범위와 확인 항목을 내부 기록으로 남기는가?"
+   ],
+   "en": {
+    "title_issue": "No deficiencies in follow-up GMP inspection",
+    "summary": "In an MFDS follow-up GMP inspection of a finished-product manufacturing site, the evaluation found no deficiencies.",
+    "key_facts": [
+     "Conclusion: no deficiencies identified in the evaluation",
+     "Category: follow-up inspection, finished product (single)",
+     "Inspection date: 2026-08-20; posted 2026-11-03"
+    ],
+    "implication": "MFDS left no deficiencies requiring correction in this follow-up inspection and published the no-deficiency outcome as an inspection result. Check that the evidence for facility and procedure changes since our last inspection is organized so it can be presented immediately in a follow-up inspection.",
+    "checks": [
+     "Are facility and procedure changes since the last GMP inspection reflected in the inspection readiness list?",
+     "When an inspection ends with no deficiencies, do we still record its scope and the items checked?"
+    ]
+   }
+  },
+  "gmpinspect-1Q6VfHVao4W": {
+   "title_issue": "공기 흐름 평가·세척 밸리데이션 보완",
+   "summary": "식약처 정기실사에서 대원제약(주) 제조소에 품질경영·시설장비·제조 분야의 '기타' 지적(보완)사항이 내려졌다. 제조라인 정지 및 재가동 시 공기 흐름 평가 건은 보완 완료, 나머지는 이행계획서 타당성이 인정됐다.",
+   "key_facts": [
+    "시설장비: 제조라인 정지 및 재가동 시 공기 흐름 평가의 추가 설명자료 제출([별표 1] 제2.1호 아목) — 보완 완료",
+    "제조: 세척밸리데이션(캠페인 생산 등)·제조지시 및 기록서 작성 방법의 추가 설명자료 제출 — 이행계획서 타당성 인정",
+    "품질경영·위생: 품질(보증)부서 책임자의 이행 결과(백업 절차 등)·작업소의 위생관리(칭량도구 세척기록 등) 추가 설명자료 제출",
+    "실사: 2026-07-06~2026-07-10 현장실사, 대상 제형에 내용고형제·내용액제·주사제 포함"
+   ],
+   "implication": "식약처는 캠페인 생산의 세척밸리데이션과 제조라인 정지·재가동 시 공기 흐름 평가를 근거 설명 없이 넘기지 않고 추가 설명자료를 요구했다. 우리 캠페인 생산 품목의 세척 밸리데이션이 실제 캠페인 생산 조건을 근거로 설정돼 있는지 확인할 차례다.",
+   "checks": [
+    "캠페인 생산 품목의 세척 밸리데이션이 실제 캠페인 생산 조건을 반영해 설정돼 있는가?",
+    "제조라인을 정지했다 재가동할 때 공기 흐름 평가 결과가 기록으로 남는가?",
+    "칭량도구 세척기록이 사용 이력과 연결돼 관리되는가?"
+   ],
+   "hook_line": "라인 정지·재가동 시 공기 흐름 평가 보완 완료, 나머지는 이행계획 인정",
+   "en": {
+    "title_issue": "Airflow evaluation and cleaning validation",
+    "summary": "An MFDS routine GMP inspection of a domestic manufacturer raised 'other'-category deficiencies in quality management, facilities and equipment, and production. The airflow evaluation for line shutdown and restart was closed; the remaining items had their action plans accepted.",
+    "key_facts": [
+     "Facilities and equipment: submit additional explanation on airflow evaluation during line shutdown and restart — completed",
+     "Production: submit additional explanation on cleaning validation (campaign production, etc.) and on how batch manufacturing instructions and records are completed — action plan accepted",
+     "Quality management and hygiene: additional explanation on the QA head's implementation results (backup procedures, etc.) and work-area hygiene (cleaning records for weighing tools, etc.)",
+     "Inspection: on-site, 2026-07-06 to 2026-07-10; dosage forms included oral solids, oral liquids and injections"
+    ],
+    "implication": "MFDS did not accept cleaning validation for campaign production or airflow evaluation at line shutdown and restart without a justification, and asked for additional explanation. Check that cleaning validation for our campaign-produced products is set on the basis of actual campaign production conditions.",
+    "checks": [
+     "Does cleaning validation for campaign-produced products reflect actual campaign production conditions?",
+     "Is an airflow evaluation recorded when a production line is shut down and restarted?",
+     "Are weighing-tool cleaning records linked to their usage history?"
+    ],
+    "hook_line": "Airflow evaluation at line shutdown and restart completed; other items under accepted action plans"
+   }
+  },
+  "gmpinspect-1Q6VfHVap_U": {
+   "title_issue": "정제수 배관·스프레드시트 검증 보완",
+   "summary": "식약처 정기실사에서 시믹씨엠오코리아주식회사의 연고제·크림제·겔제 완제 제조소에 품질경영·시설장비·시험실 분야 '기타' 지적(보완)사항이 내려졌고, 모두 이행계획서 타당성이 인정됐다.",
+   "key_facts": [
+    "시설장비: 정제수 시스템의 미사용 배관에 대한 추가 설명 자료 제출([별표 1] 제2.1호 다목)",
+    "시설장비: 계산 시 사용하는 스프레드시트의 검증에 대한 추가 설명 자료 제출([별표 1] 제6.6호)",
+    "시험실·품질경영: 시험방법 밸리데이션·출발물질 시험·백업에 대한 추가 설명 자료 제출",
+    "후속: 모든 지적에 이행계획서 타당성 인정 · 실사 2026-06-23~2026-06-25"
+   ],
+   "implication": "식약처는 정제수 시스템에 남은 미사용 배관과 계산용 스프레드시트의 검증 상태를 설명 없이 인정하지 않고 추가 자료를 요구했다. 우리 정제수 계통도에 사용하지 않는 배관이 남아 있는지, 품질 계산에 쓰는 스프레드시트가 검증 목록에 올라 있는지 확인할 차례다.",
+   "checks": [
+    "정제수 계통도에 사용하지 않는 배관 구간이 표시되고 제거·관리 근거가 있는가?",
+    "시험·품질 계산에 쓰는 스프레드시트가 검증 대상 목록에 올라 있는가?",
+    "출발물질 시험 항목이 규격과 공급업체 자료에 맞춰 설정돼 있는가?"
+   ],
+   "hook_line": "정제수 시스템 미사용 배관에 추가 설명 요구, 이행계획 인정",
+   "en": {
+    "title_issue": "Purified water piping and spreadsheet validation",
+    "summary": "An MFDS routine GMP inspection of a domestic finished-product site for ointments, creams and gels raised 'other'-category deficiencies in quality management, facilities and equipment, and the laboratory; all action plans were accepted.",
+    "key_facts": [
+     "Facilities and equipment: submit additional explanation on unused piping in the purified water system",
+     "Facilities and equipment: submit additional explanation on validation of spreadsheets used for calculations",
+     "Laboratory and quality management: additional explanation on analytical method validation, starting material testing and backup",
+     "Follow-up: action plans accepted for all items; inspection 2026-06-23 to 2026-06-25"
+    ],
+    "implication": "MFDS did not accept unused piping left in the purified water system or the validation status of calculation spreadsheets without explanation, and asked for more information. Check whether unused pipe sections remain on our purified water system drawings and whether spreadsheets used for quality calculations are on the validation inventory.",
+    "checks": [
+     "Are unused pipe sections marked on the purified water system drawing with a basis for removal or control?",
+     "Are spreadsheets used for testing and quality calculations on the validation inventory?",
+     "Are starting material tests set in line with specifications and supplier data?"
+    ],
+    "hook_line": "Additional explanation requested on unused purified water piping; action plan accepted"
+   }
+  },
+  "gmpinspect-1Q6fJiSER3Z": {
+   "title_issue": "감사 추적·데이터 완전성 보완",
+   "summary": "식약처 정기실사에서 (주)삼양바이오팜의 완제(세포독성항암제 주사제)·원료 겸업 제조소에 시설장비·시험실·제조 분야 '기타' 지적(보완)사항이 내려졌고, 모두 이행계획서 타당성이 인정됐다.",
+   "key_facts": [
+    "시험실: 모든 시험기록은 원본 데이터를 포함하여 Audit trail 을 실시하고, 시험 행위 재구성을 위한 모든 메타데이터를 보관할 것",
+    "제조: 원료 투입량 근거자료 첨부, 공정검사 시험과정 기록 및 데이터완전성 절차에 따른 검토, 반제품 보관기간 설정",
+    "시설장비·세척: 기기 적격성평가 항목 설정과 데이터 보관, 세척밸리데이션 수행방법 설정",
+    "실사: 2026-08-10~2026-08-13 현장실사, 대상에 무균 세포독성항암제 주사제 완제 포함"
+   ],
+   "implication": "식약처는 시험실뿐 아니라 공정검사 기록까지 원본 데이터·메타데이터와 감사 추적이 남지 않는 상태를 받아들이지 않고 데이터완전성 절차에 따른 검토를 요구했다. 우리 공정검사 결과가 원본 데이터와 함께 기록되고 데이터 완전성 검토 대상에 들어 있는지 확인할 차례다.",
+   "checks": [
+    "공정검사 시험과정이 원본 데이터와 함께 기록되고 데이터 완전성 검토를 거치는가?",
+    "시험기록의 감사 추적이 원본 데이터까지 포함해 검토되는가?",
+    "반제품마다 보관기간이 설정돼 있고 초과 시 처리 기준이 있는가?"
+   ],
+   "hook_line": "모든 시험기록에 원본 데이터 포함 감사 추적 실시 요구, 이행계획 인정",
+   "en": {
+    "title_issue": "Audit trail and data integrity",
+    "summary": "An MFDS routine GMP inspection of a domestic site making finished cytotoxic injections and APIs raised 'other'-category deficiencies in facilities and equipment, the laboratory and production; all action plans were accepted.",
+    "key_facts": [
+     "Laboratory: perform audit trail review on all test records including original data, and retain all metadata needed to reconstruct testing activities",
+     "Production: attach evidence confirming raw material charge quantities, record in-process testing and review it under data integrity procedures, set hold times for intermediates",
+     "Facilities and cleaning: set equipment qualification items and retain the data; set an appropriate cleaning validation method",
+     "Inspection: on-site, 2026-08-10 to 2026-08-13; scope included sterile cytotoxic injections"
+    ],
+    "implication": "MFDS did not accept in-process testing records, not only laboratory records, that lacked original data, metadata and audit trails, and required review under data integrity procedures. Check that our in-process test results are recorded with original data and fall within the scope of data integrity review.",
+    "checks": [
+     "Are in-process tests recorded with original data and reviewed for data integrity?",
+     "Does audit trail review of test records extend to the original data?",
+     "Is a hold time set for every intermediate, with criteria for when it is exceeded?"
+    ],
+    "hook_line": "Audit trail including original data required for all test records; action plan accepted"
+   }
+  },
+  "8b6bc62e550c": {
+   "title_issue": "SmPC 용량표 오류 결함 통지",
+   "summary": "Sandoz Limited 가 Co-amoxiclav 250/62.5 mg/5 ml 경구현탁용 산제의 제품특성요약(SmPC) 용량표 오류를 MHRA 에 알렸고, MHRA 가 Class 4 의약품 결함 통지를 냈다.",
+   "key_facts": [
+    "결함: SmPC 용량표(dosing table) 오류",
+    "구분: Class 4 Medicines Defect Notification",
+    "정정: 2026-11-05 게시 후 주석으로 의약품 정보 표의 강도 오기를 250/62.5 mg/5ml 로 바로잡음"
+   ],
+   "implication": "MHRA 는 SmPC 용량표 오류를 Class 4 결함 통지로 공개했고, 통지문 표에 처음 잘못 적힌 제품 강도도 게시 후 주석으로 바로잡았다. 우리 제품의 제품특성요약·첨부문서 용량표가 승인된 강도·용법과 일치하는지 개정 때마다 대조하는지 확인할 차례다.",
+   "checks": [
+    "제품특성요약·첨부문서 개정 시 용량표를 승인된 강도·용법과 대조 검토하는가?",
+    "표시자료 오류를 발견했을 때 규제기관 보고 여부를 판단하는 기준이 있는가?"
+   ],
+   "quotes_translation": [
+    "Sandoz Limited 가 Co-amoxiclav 250/62.5 mg/5 ml 경구현탁용 산제의 제품특성요약(SmPC) 용량표 오류를 MHRA 에 알렸습니다."
+   ],
+   "hook_line": "코아목시클라브 현탁용 산제 제품특성요약 용량표 오류, Class 4 통지",
+   "en": {
+    "title_issue": "SmPC dosing table error notified",
+    "summary": "Sandoz Limited informed the MHRA of errors in the dosing table of the SmPC for Co-amoxiclav 250/62.5 mg/5 ml Powder for Oral Suspension, and the MHRA issued a Class 4 Medicines Defect Notification.",
+    "key_facts": [
+     "Defect: errors in the SmPC dosing table",
+     "Category: Class 4 Medicines Defect Notification",
+     "Correction: a post-publication note dated 2026-11-05 corrected the strength in the Medicine Details table to 250/62.5 mg/5ml"
+    ],
+    "implication": "The MHRA published an SmPC dosing table error as a Class 4 defect notification and also corrected, by post-publication note, a product strength first stated incorrectly in its own table. Check that each revision of our SmPC and patient information is cross-checked against the approved strength and posology.",
+    "checks": [
+     "Is the dosing table checked against the approved strength and posology whenever the SmPC or leaflet is revised?",
+     "Are there criteria for deciding whether a labelling error must be reported to the regulator?"
+    ],
+    "hook_line": "SmPC dosing table errors for co-amoxiclav oral suspension, Class 4 notification"
+   }
+  },
+  "91ccd273fe30": {
+   "title_issue": "사용기한 오표시 Class 3 회수",
+   "summary": "Aspire Pharma Ltd 가 Tropicamide 1% 점안액(1회용 용기 0.5ml x 20) 특정 배치에 잘못된 사용기한이 표시돼 회수하며, MHRA 가 Class 3 Medicines Recall 을 냈다.",
+   "key_facts": [
+    "사유: 특정 배치에 잘못된 사용기한(incorrect expiry date) 표시",
+    "구분: Class 3 Medicines Recall · DMRC-41341621",
+    "제품: Tropicamide 1% Eye Drops, solution in single dose containers 20 x 0.5ml (PL: 35533/0198)"
+   ],
+   "implication": "MHRA 는 표시 사용기한 오류를 사유로 해당 배치를 Class 3 회수 대상으로 공개했다. 우리 포장 공정에서 배치별 사용기한 인쇄값이 배치기록의 기한과 대조·확인되는지 확인할 차례다.",
+   "checks": [
+    "포장 시 인쇄된 사용기한을 배치기록상 기한과 대조하는 확인 단계가 있는가?",
+    "1회용 용기와 외포장의 사용기한 표시가 서로 일치하는지 출하 전에 보는가?"
+   ],
+   "quotes_translation": [
+    "Aspire Pharma Ltd 가 Tropicamide 1% 점안액(1회용 용기 0.5ml x 20) 특정 배치를 잘못된 사용기한이 표시됐다는 이유로 회수하고 있습니다.",
+    "이 배치들의 올바른 사용기한은…"
+   ],
+   "hook_line": "트로피카마이드 1% 점안액 배치 사용기한 오표시, Class 3 회수",
+   "en": {
+    "title_issue": "Class 3 recall for wrong expiry date",
+    "summary": "Aspire Pharma Ltd is recalling specific batches of Tropicamide 1% Eye Drops in single dose containers (0.5ml x 20) because they were labelled with an incorrect expiry date; the MHRA issued a Class 3 Medicines Recall.",
+    "key_facts": [
+     "Reason: specific batches labelled with an incorrect expiry date",
+     "Category: Class 3 Medicines Recall; DMRC-41341621",
+     "Product: Tropicamide 1% Eye Drops, solution in single dose containers 20 x 0.5ml (PL: 35533/0198)"
+    ],
+    "implication": "The MHRA published a Class 3 recall of the affected batches on the ground of an expiry date labelling error. Check that the expiry date printed for each batch in our packaging process is verified against the batch record.",
+    "checks": [
+     "Is there a step during packaging that checks the printed expiry date against the batch record?",
+     "Is consistency of the expiry date between single-dose containers and outer cartons checked before release?"
+    ],
+    "hook_line": "Specific batches of tropicamide 1% eye drops labelled with wrong expiry date, Class 3 recall"
+   }
+  },
+  "D-0045-2027": {
+   "title_issue": "복합정 용출 규격이탈 회수",
+   "summary": "Ascend Laboratories, LLC 가 유통한 Amlodipine and Olmesartan Medoxomil Tablets 10mg/40mg 이 용출 규격이탈(Out of specification due to dissolution)로 Class II 회수됐다.",
+   "key_facts": [
+    "사유: Out of specification due to dissolution(용출 규격이탈)",
+    "회수 등급: Class II",
+    "제품: Amlodipine and Olmesartan Medoxomil Tablets, 10mg/40mg, 30 Tablets · 제조 Alkem Laboratories Ltd.(INDIA)"
+   ],
+   "implication": "FDA 회수 기록은 두 성분 복합정의 용출 결과가 규격을 벗어난 제품을 시중에 둘 수 없다고 보고 Class II 로 분류했다. 복합제는 일반적으로 성분별로 용출 기준을 따로 두므로, 우리 복합제의 용출 경향이 성분마다 따로 관리되는지 확인할 차례다.",
+   "checks": [
+    "복합제의 용출 결과를 성분별로 나눠 경향을 관리하는가?",
+    "해외 수탁 제조소의 용출 규격이탈 결과가 유통사에 통보되는 기한이 품질협약에 정해져 있는가?"
+   ],
+   "quotes_translation": [
+    "용출 규격이탈."
+   ],
+   "hook_line": "암로디핀·올메사르탄 복합정 용출 규격이탈, Class II 회수",
+   "en": {
+    "title_issue": "Combination tablet dissolution OOS",
+    "summary": "Amlodipine and Olmesartan Medoxomil Tablets 10mg/40mg distributed by Ascend Laboratories, LLC were recalled (Class II) as out of specification due to dissolution.",
+    "key_facts": [
+     "Reason: out of specification due to dissolution",
+     "Recall class: Class II",
+     "Product: Amlodipine and Olmesartan Medoxomil Tablets, 10mg/40mg, 30 Tablets; manufactured by Alkem Laboratories Ltd., India"
+    ],
+    "implication": "The FDA recall record classified a two-component combination tablet with out-of-specification dissolution as Class II. Because combination products generally carry separate dissolution criteria for each component, check that dissolution trends for our combination products are tracked component by component.",
+    "checks": [
+     "Are dissolution results for combination products trended separately for each component?",
+     "Does the quality agreement set a deadline for a contract site to notify the distributor of dissolution OOS results?"
+    ],
+    "hook_line": "Amlodipine/olmesartan combination tablets, dissolution OOS, Class II recall"
+   }
+  },
+  "D-0050-2027": {
+   "title_issue": "무균보증 결여 헤파린 주사 회수",
+   "summary": "Shenzhen Techdow Pharmaceutical Co., Ltd. 의 Heparin Sodium Injection, USP 5,000 USP Units/mL 다회용 바이알이 무균보증 결여(Lack of Assurance of Sterility)로 Class II 회수됐다.",
+   "key_facts": [
+    "사유: Lack of Assurance of Sterility(무균보증 결여)",
+    "회수 등급: Class II",
+    "제품: Heparin Sodium Injection, USP, 5,000 USP Units/mL, 1mL Multi dose vial x 25 vials per carton · 유통 Hepalink USA Inc."
+   ],
+   "implication": "FDA 회수 기록은 무균보증 결여를 사유로 이 주사제를 Class II 회수 대상으로 분류했다. 우리 무균 주사제의 출하 판단이 무균시험 적합만이 아니라 공정 밸리데이션·환경 모니터링 결과까지 함께 검토하는지 확인할 차례다.",
+   "checks": [
+    "무균 주사제 출하 판정 시 환경 모니터링·공정 일탈 기록을 무균시험 결과와 함께 검토하는가?",
+    "다회용 바이알 제품의 용기 완전성 자료가 무균보증 근거에 포함돼 있는가?"
+   ],
+   "quotes_translation": [
+    "무균보증 결여"
+   ],
+   "hook_line": "헤파린나트륨 주사 다회용 바이알 무균보증 결여, Class II 회수",
+   "en": {
+    "title_issue": "Heparin injection sterility assurance",
+    "summary": "Heparin Sodium Injection, USP, 5,000 USP Units/mL multi-dose vials from Shenzhen Techdow Pharmaceutical Co., Ltd. were recalled (Class II) for lack of assurance of sterility.",
+    "key_facts": [
+     "Reason: lack of assurance of sterility",
+     "Recall class: Class II",
+     "Product: Heparin Sodium Injection, USP, 5,000 USP Units/mL, 1mL multi-dose vial x 25 vials per carton; distributed by Hepalink USA Inc."
+    ],
+    "implication": "The FDA recall record classified this injectable as a Class II recall on the ground of lack of assurance of sterility. Check that release decisions for our sterile injectables review process validation and environmental monitoring results alongside the sterility test.",
+    "checks": [
+     "Are environmental monitoring and process deviation records reviewed together with the sterility test at release of sterile injectables?",
+     "Is container closure integrity data for multi-dose vials part of the sterility assurance justification?"
+    ],
+    "hook_line": "Heparin sodium multi-dose vials, lack of assurance of sterility, Class II recall"
+   }
+  },
+  "D-0051-2027": {
+   "title_issue": "안정성시험 함량 미달 회수",
+   "summary": "Pfizer 가 유통한 Levoxyl(levothyroxine sodium tablets, USP) 175 mcg 이 안정성시험 중 확인된 함량 규격이탈로 동일 사유 2품목 일괄 Class II 회수됐다.",
+   "key_facts": [
+    "사유: Subpotent Drug — 안정성시험 중 확인된 함량(assay) 규격이탈",
+    "회수 범위: 동일 사유 2품목(병 포장 단위 차이) 일괄 회수",
+    "회수 등급: Class II · Made in Austria"
+   ],
+   "implication": "FDA 회수 기록에서 안정성시험 중 확인된 함량 규격이탈은 시판 제품 회수로 이어졌다. 우리 안정성시험에서 함량 규격이탈이 확정되면 같은 기간 시판 배치에 대한 영향평가와 회수 판단이 즉시 열리는지 확인할 차례다.",
+   "checks": [
+    "안정성시험 함량 규격이탈이 확정되면 시판 배치 영향평가가 바로 시작되는가?",
+    "같은 제품의 포장 단위가 다를 때 회수 범위를 포장 단위별로 검토하는가?"
+   ],
+   "quotes_translation": [
+    "함량 미달 의약품: 안정성시험 중 함량(assay) 규격이탈 확인."
+   ],
+   "hook_line": "레보티록신 175 mcg 안정성시험 함량 규격이탈, Class II 회수",
+   "en": {
+    "title_issue": "Subpotency found in stability testing",
+    "summary": "Levoxyl (levothyroxine sodium tablets, USP) 175 mcg distributed by Pfizer was recalled (Class II) in 2 presentations for the same reason: a confirmed out-of-specification assay during stability testing.",
+    "key_facts": [
+     "Reason: subpotent drug, confirmed OOS assay during stability testing",
+     "Scope: 2 presentations (different bottle counts) recalled for the same reason",
+     "Recall class: Class II; made in Austria"
+    ],
+    "implication": "In the FDA recall record, an assay OOS confirmed during stability testing led to recall of marketed product. Check that when a stability assay OOS is confirmed at our site, an impact assessment and recall decision for marketed batches opens immediately.",
+    "checks": [
+     "Does a confirmed stability assay OOS immediately trigger an impact assessment of marketed batches?",
+     "When a product has several pack sizes, is recall scope reviewed for each pack size?"
+    ],
+    "hook_line": "Levothyroxine 175 mcg tablets, assay OOS in stability testing, Class II recall"
+   }
+  },
+  "D-0053-2027": {
+   "title_issue": "CGMP 일탈 치약 17품목 회수",
+   "summary": "PRITAM INTERNATIONAL PRIVATE LIMITED 가 제조한 불소 치약 제품이 CGMP 일탈(CGMP Deviations)을 사유로 동일 사유 17품목 일괄 Class II 회수됐다.",
+   "key_facts": [
+    "사유: CGMP Deviations(CGMP 일탈)",
+    "회수 범위: 동일 사유 17품목 일괄 회수 · 유통 Ashtel Studios Inc.",
+    "회수 등급: Class II · 구체적 일탈 내용: 확인 불가(원문 확인이 필요하다)"
+   ],
+   "implication": "FDA 회수 기록은 CGMP 일탈을 사유로 한 제조사의 여러 브랜드 치약을 한꺼번에 회수 대상으로 묶었다. 우리 위탁 제조 품목에서 제조소의 GMP 문제가 확인될 때 그 제조소 전 품목으로 영향 범위를 넓혀 보는지 확인할 차례다.",
+   "checks": [
+    "위탁 제조소의 GMP 일탈이 확인되면 그 제조소에서 만든 전 품목을 영향평가 대상으로 묶는가?",
+    "위탁 품목의 수탁 제조소 실사·평가 주기가 정해져 있는가?"
+   ],
+   "quotes_translation": [
+    "CGMP 일탈"
+   ],
+   "hook_line": "불소 치약 17품목 CGMP 일탈로 Class II 일괄 회수",
+   "en": {
+    "title_issue": "Toothpastes recalled for CGMP deviations",
+    "summary": "Fluoride toothpaste products made by PRITAM INTERNATIONAL PRIVATE LIMITED were recalled (Class II) for CGMP deviations, 17 products in one recall for the same reason.",
+    "key_facts": [
+     "Reason: CGMP deviations",
+     "Scope: 17 products recalled together for the same reason; distributed by Ashtel Studios Inc.",
+     "Recall class: Class II; specific deviations: could not be confirmed (the original needs to be checked)"
+    ],
+    "implication": "The FDA recall record grouped several toothpaste brands from one manufacturer into a single recall based on CGMP deviations. Check that when a GMP problem is found at a contract site making our products, the impact assessment is widened to every product from that site.",
+    "checks": [
+     "When a GMP deviation is confirmed at a contract site, are all products from that site included in the impact assessment?",
+     "Is there a defined audit and evaluation interval for contract manufacturers?"
+    ],
+    "hook_line": "17 fluoride toothpaste products recalled together for CGMP deviations, Class II"
+   }
+  },
+  "D-0076-2027": {
+   "title_issue": "정제 질량 균일성 부적합 회수",
+   "summary": "Hikma Pharmaceuticals USA INC. 의 Abirtega(abiraterone acetate) USP 250 mg 정제가 질량 균일성(weight uniformity) 규격 부적합으로 Class II 회수됐다.",
+   "key_facts": [
+    "사유: Failed Tablet/Capsule Specifications — weight uniformity 규격 부적합",
+    "회수 등급: Class II",
+    "제품: Abirtega (abiraterone acetate) USP, 250 mg, 120-count bottles · 제조 Arab Pharmaceuticals Manufacturing PSC(Jordan)"
+   ],
+   "implication": "FDA 회수 기록은 정제의 질량 균일성 규격 부적합을 시판 제품 회수 사유로 분류했다. 질량 균일성은 일반적으로 타정 중 공정검사로 먼저 걸러지는 항목이므로, 우리 타정 공정검사의 질량 측정 빈도와 이탈 시 조치 기준이 완제품 규격과 맞물려 있는지 확인할 차례다.",
+   "checks": [
+    "타정 공정검사의 질량 측정 기준이 완제품 질량 균일성 규격과 일치하는가?",
+    "타정 중 질량 이탈이 나면 해당 구간 정제를 격리·평가하는 절차가 있는가?"
+   ],
+   "quotes_translation": [
+    "정제/캡슐 규격 부적합: 정제 질량 균일성 규격 부적합."
+   ],
+   "hook_line": "아비라테론 250 mg 정제 질량 균일성 부적합, Class II 회수",
+   "en": {
+    "title_issue": "Tablet weight uniformity failure",
+    "summary": "Abirtega (abiraterone acetate) USP 250 mg tablets from Hikma Pharmaceuticals USA INC. were recalled (Class II) for failing tablet specifications for weight uniformity.",
+    "key_facts": [
+     "Reason: failed tablet/capsule specifications, weight uniformity",
+     "Recall class: Class II",
+     "Product: Abirtega (abiraterone acetate) USP, 250 mg, 120-count bottles; made by Arab Pharmaceuticals Manufacturing PSC, Jordan"
+    ],
+    "implication": "The FDA recall record treated a tablet weight uniformity failure as a reason to recall marketed product. Since weight uniformity is generally caught first by in-process checks during compression, check that our in-process weight check frequency and action limits are aligned with the finished-product specification.",
+    "checks": [
+     "Do in-process tablet weight limits match the finished-product weight uniformity specification?",
+     "Is there a procedure to segregate and assess tablets from the affected period when weight drifts during compression?"
+    ],
+    "hook_line": "Abiraterone acetate 250 mg tablets failed weight uniformity, Class II recall"
+   }
+  },
+  "D-0079-2027": {
+   "title_issue": "시나칼세트 정 용출 부적합 회수",
+   "summary": "STRIDES PHARMA INC 가 유통한 Cinacalcet Tablets 30 mg 이 용출 규격 부적합(Failed dissolution specifications)으로 Class II 회수됐다.",
+   "key_facts": [
+    "사유: Failed dissolution specifications(용출 규격 부적합)",
+    "회수 등급: Class II",
+    "제품: Cinacalcet Tablets, 30 mg, 30-count bottle · 제조 Strides Pharma Science Ltd.(India)"
+   ],
+   "implication": "FDA 회수 기록은 이 정제의 용출 규격 부적합을 Class II 로 분류했고, 어느 시험 단계의 결과인지는 우리가 확인하지 못했다. 우리 용출 시험법이 배치 간 차이를 구별할 만큼 판별력이 있는지, 시점별 용출 경향을 보는지 확인할 차례다.",
+   "checks": [
+    "용출 시험법의 판별력이 밸리데이션 자료로 입증돼 있는가?",
+    "안정성 시점별 용출 결과를 경향으로 검토해 규격 접근을 미리 잡는가?"
+   ],
+   "quotes_translation": [
+    "용출 규격 부적합"
+   ],
+   "hook_line": "시나칼세트 30 mg 정제 용출 규격 부적합, Class II 회수",
+   "en": {
+    "title_issue": "Cinacalcet tablet dissolution failure",
+    "summary": "Cinacalcet Tablets 30 mg distributed by STRIDES PHARMA INC were recalled (Class II) for failed dissolution specifications.",
+    "key_facts": [
+     "Reason: failed dissolution specifications",
+     "Recall class: Class II",
+     "Product: Cinacalcet Tablets, 30 mg, 30-count bottle; manufactured by Strides Pharma Science Ltd., India"
+    ],
+    "implication": "The FDA recall record classified this tablet's dissolution failure as Class II, and we could not confirm at which testing stage the failure arose. Check that our dissolution method is discriminating enough to detect batch differences and that dissolution is trended across timepoints.",
+    "checks": [
+     "Is the discriminating power of the dissolution method demonstrated in validation data?",
+     "Are dissolution results trended across stability timepoints to catch drift toward the limit?"
+    ],
+    "hook_line": "Cinacalcet 30 mg tablets failed dissolution specifications, Class II recall"
+   }
+  },
+  "recall-fb-ad0646134a334095": {
+   "title_issue": "단위용량 포장 정제 용출 부적합",
+   "summary": "AvKARE 를 위해 제조된 Amitriptyline Hydrochloride Tablets USP 10 mg 단위용량 카드 포장 제품이 용출 규격 부적합으로 Class II 회수됐다.",
+   "key_facts": [
+    "사유: Failed dissolution specifications(용출 규격 부적합)",
+    "회수 등급: Class II",
+    "제품: Amitriptyline Hydrochloride, Tablets, USP, 10 mg, 5 x 10 Unit dose cards in paper cartons"
+   ],
+   "implication": "FDA 회수 기록은 단위용량 카드 포장 정제의 용출 규격 부적합을 Class II 로 분류했다. 포장 형태가 바뀌면 일반적으로 용출 같은 품질 특성에 영향이 있을 수 있으므로, 우리 단위용량·재포장 품목이 그 포장 형태로 수행한 안정성 자료를 근거로 하는지 확인할 차례다.",
+   "checks": [
+    "단위용량 카드 등 다른 포장 형태 품목에 그 포장으로 수행한 안정성 자료가 있는가?",
+    "재포장 품목의 용출 결과를 원 포장 제품 결과와 비교 검토하는가?"
+   ],
+   "quotes_translation": [
+    "용출 규격 부적합."
+   ],
+   "hook_line": "아미트리프틸린 10 mg 단위용량 정제 용출 부적합, Class II",
+   "en": {
+    "title_issue": "Unit-dose tablets fail dissolution",
+    "summary": "Amitriptyline Hydrochloride Tablets USP 10 mg in unit dose cards, manufactured for AvKARE, were recalled (Class II) for failed dissolution specifications.",
+    "key_facts": [
+     "Reason: failed dissolution specifications",
+     "Recall class: Class II",
+     "Product: Amitriptyline Hydrochloride Tablets, USP, 10 mg, 5 x 10 unit dose cards in paper cartons"
+    ],
+    "implication": "The FDA recall record classified a dissolution failure in unit-dose card packaged tablets as Class II. Because a change in packaging format can generally affect quality attributes such as dissolution, check that our unit-dose and repackaged products are supported by stability data generated in that packaging.",
+    "checks": [
+     "Do products in other pack formats such as unit-dose cards have stability data generated in that pack?",
+     "Are dissolution results for repackaged products compared with those of the original pack?"
+    ],
+    "hook_line": "Amitriptyline 10 mg unit-dose tablets failed dissolution, Class II recall"
+   }
+  },
+  "recall-fb-d2089da0cb841a55": {
+   "title_issue": "엔도톡신 규격이탈 조제 주사제 회수",
+   "summary": "Centric Compounding LLC 의 Tri-Immune Boost 30 mL 바이알이 세균 엔도톡신 규격이탈 결과에 따른 무균제품 미생물 오염 사유로 회수됐다(등급 Not Yet Classified).",
+   "key_facts": [
+    "사유: Microbial Contamination of Sterile Products — 세균 엔도톡신 규격이탈 결과",
+    "회수 등급: Not Yet Classified(미분류)",
+    "제품: Tri-Immune Boost (Glutathione: 200 mg, Ascorbic Acid: 200 mg, Zinc: 2.5 mg), 30 mL vial"
+   ],
+   "implication": "FDA 회수 기록은 조제(compounding) 무균제품의 엔도톡신 규격이탈 결과를 무균제품 미생물 오염 회수 사유로 기재했다. 우리 무균제품의 엔도톡신 규격이탈 결과가 원료·용수·용기의 오염원 조사로 이어지는지 확인할 차례다.",
+   "checks": [
+    "엔도톡신 규격이탈 결과가 나오면 원료·용수·용기별 오염원 조사를 여는가?",
+    "다회 사용 바이알 제품의 엔도톡신 시험 검체가 배치 전체를 대표하도록 채취되는가?"
+   ],
+   "quotes_translation": [
+    "무균제품의 미생물 오염 - 세균 엔도톡신에 대해 규격이탈 결과가 얻어졌습니다."
+   ],
+   "hook_line": "조제 주사용 바이알 엔도톡신 규격이탈 결과로 회수, 등급 미분류",
+   "en": {
+    "title_issue": "Compounded vial endotoxin OOS",
+    "summary": "Tri-Immune Boost 30 mL vials from Centric Compounding LLC were recalled for microbial contamination of sterile products after out-of-specification bacterial endotoxin results (class: Not Yet Classified).",
+    "key_facts": [
+     "Reason: microbial contamination of sterile products, out-of-specification results for bacterial endotoxin",
+     "Recall class: Not Yet Classified",
+     "Product: Tri-Immune Boost (Glutathione: 200 mg, Ascorbic Acid: 200 mg, Zinc: 2.5 mg), 30 mL vial"
+    ],
+    "implication": "The FDA recall record listed out-of-specification endotoxin results in a compounded sterile product as a microbial contamination recall reason. Check that endotoxin OOS results for our sterile products lead to a contamination source investigation covering raw materials, water and containers.",
+    "checks": [
+     "Does an endotoxin OOS result open a source investigation across raw materials, water and containers?",
+     "Are endotoxin test samples for vial products taken so they represent the whole batch?"
+    ],
+    "hook_line": "Compounded vial recalled after endotoxin OOS results, not yet classified"
+   }
+  }
+ }
+}

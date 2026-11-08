@@ -1844,6 +1844,9 @@ class RssFeedSpec:
     # FSN 을 버리고 의약품 회수/결함만 채택). None(기본)이면 전건 채택 — 기존 4종 스펙은
     # 이 필드 미지정이라 산출 IntakeItem 이 byte 동일하게 유지된다.
     keep_item: Callable[["_RssItemFields"], bool] | None = None
+    # keep_item 이 버린 항목을 제외 장부에 남길 때의 사유 코드(원천 대조 감시가 '의도적 제외'로 센다).
+    # 규칙 버전은 keep_item 함수의 AST 지문 — 키워드가 바뀌면 그 항목은 다시 판정된다.
+    exclude_reason: str = "keep_item_rejected"
 
 
 # ── [기사 permalink 2차 dedup 2026-08-24] ────────────────────────────────────
@@ -1862,6 +1865,28 @@ class RssFeedSpec:
 #                                              구조라 예방적으로 포함(동작 변화 없음)
 # 나머지(FDA WL·483·HC·PIC/S·MHRA·EU NCR)는 실측 중복 0 이라 손대지 않는다.
 _CANONICAL_URL_DEDUP_SOURCES = frozenset({SOURCE_ECA, SOURCE_ISPE})
+
+
+_RSS_RULE_VERSION_CACHE: dict[str, str] = {}
+
+
+def _rss_exclusion_rule_version(keep_item: Callable[..., bool]) -> str:
+    """keep_item 판정 함수(+ 그 함수가 읽는 키워드·정규식)의 AST 지문."""
+    name = getattr(keep_item, "__name__", "")
+    if name not in _RSS_RULE_VERSION_CACHE:
+        _RSS_RULE_VERSION_CACHE[name] = _xl.rule_fingerprint(
+            (name,), ("collect_intake", "grm_taxonomy"))
+    return _RSS_RULE_VERSION_CACHE[name]
+
+
+def _record_rss_exclusion(spec: "RssFeedSpec", doc_id: str, f: "_RssItemFields") -> None:
+    """keep_item 이 버린 RSS 항목 한 건을 제외 장부에. document_id 는 수집됐다면 쓸 키와 같다."""
+    if spec.keep_item is None:
+        return
+    _xl.record(source=spec.source, document_id=doc_id, official_url=f.link, title=f.title,
+               published_date=f.date_iso, reason_code=spec.exclude_reason,
+               rule_version=_rss_exclusion_rule_version(spec.keep_item),
+               basis=_xl.BASIS_METADATA)
 
 
 def collect_rss_feed(spec: RssFeedSpec, start: date,
@@ -1897,9 +1922,10 @@ def collect_rss_feed(spec: RssFeedSpec, start: date,
             f = spec.extract(el, feed_name, feed_url)
             if not _within_window(f.date_iso, start, end):
                 continue
-            if spec.keep_item is not None and not spec.keep_item(f):
-                continue
             doc_id = _stable_doc_id(spec.source, f.title, f.link, f.date_iso)
+            if spec.keep_item is not None and not spec.keep_item(f):
+                _record_rss_exclusion(spec, doc_id, f)
+                continue
             if spec.uses_category:
                 relevance = compute_relevance(f.title, f.description, f.category)
                 tier = compute_signal_tier(spec.source, f.type_or_class, relevance,
@@ -2218,6 +2244,7 @@ _MHRA_ALERT_FEED_SPEC = RssFeedSpec(
     feeds=(("mhra_alert", MHRA_ALERT_RSS_URL),),
     iter_items=_atom_entries_from_root, extract=_extract_mhra_alert,
     uses_category=True, keep_item=_is_mhra_medicines_alert,
+    exclude_reason="not_medicines_alert",
 )
 _MHRA_FEED_SPEC = RssFeedSpec(
     source=SOURCE_MHRA, source_type=SRC_TYPE_OFFICIAL_BLOG, label="MHRA RSS",
@@ -2243,6 +2270,7 @@ _ISPE_FEED_SPEC = RssFeedSpec(
     feeds=(("ispe", ISPE_RSS_URL),),
     iter_items=_rss2_or_atom_items, extract=_extract_ispe,
     http_silent=True, keep_item=_is_ispe_gmp_relevant,
+    exclude_reason="not_gmp_relevant",
 )
 
 
@@ -3740,7 +3768,10 @@ def _fda483_known_document_ids(
 
 
 # 제외 장부를 읽어 둘 소스 - 장부에 쓰는 소스(연결된 버림 지점이 있는 소스)와 일치시킨다.
-_EXCLUSION_LEDGER_SOURCES = (SOURCE_FDA_483, SOURCE_FDA_WL, SOURCE_MFDS)
+_EXCLUSION_LEDGER_SOURCES = (SOURCE_FDA_483, SOURCE_FDA_WL, SOURCE_MFDS,
+                             # 2026-11 원천 대조 확장에서 연결: MHRA 경보(의료기기 FSN)·ISPE(홍보성)·
+                             # HC 회수(범위 밖 기관·Category·정정)·WHO RSS(범위 밖 프로그램)
+                             SOURCE_MHRA, SOURCE_ISPE, SOURCE_HC, SOURCE_WHO)
 
 
 def _configure_exclusion_ledger(dry_run: bool, active: set[str], cfg: RunConfig,

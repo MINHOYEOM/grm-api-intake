@@ -370,7 +370,8 @@ class KeyPinTest(unittest.TestCase):
         import grm_common as g
         want = {"fda483": g.SOURCE_FDA_483, "wl": g.SOURCE_FDA_WL, "recall": g.SOURCE_RECALL,
                 "mfds_rss": g.SOURCE_MFDS, "fr": g.SOURCE_FR}
-        self.assertEqual({s.key: s.source for s in sr.SPECS}, want)
+        # 첫 5개 소스(PR #1371). 확장분은 test_source_reconcile_expand 가 잠근다.
+        self.assertEqual({k: sr.SPEC_BY_KEY[k].source for k in want}, want)
 
 
 class WorkflowContractTest(unittest.TestCase):

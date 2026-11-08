@@ -771,6 +771,42 @@ def wl_strong_violation_heading_present(text: str) -> bool:
     return bool(_WL_STRONG_VIOLATION_HEADING_RE.search(text or ""))
 
 
+# [FIND-1 P-D · 2026-11-08] 조항 없는 WL 하위 항목의 "결함 서술" 신호.
+# 503B 외주조제·GLP·홍보물 WL 은 조항 인용이 상위 항목(또는 절 머리)에만 있고 그 밑의 관찰
+# 항목("Your firm did not disinfect …" · "Your facility lacked …")에는 없다. 파서는 이 항목을
+# 따로 떼어 내지만 cfr_refs 가 비어 P-A(조항+신호) 로도, 문두 표제가 "Failure to" 가 아니라
+# P-B 로도 승격되지 못해 needs_review 에 영구 적체했다(11-08 실측 18건, 최고 33일).
+#
+# 일반 위반 신호(_WL_VIOLATION_SIGNAL_RE)는 여기 못 쓴다 — "your firm"·"aseptic"·"ISO 5" 같은
+# 주제어만으로도 맞아서, 회사의 **시정 조치 서술**("Your firm revised your SOP …" · "Your firm
+# performed smoke studies …")까지 끌어올린다. 그래서 이 신호는 **부정·결함 문형만** 본다.
+# 라이브 대조(11-08): 같은 서한에 조항 인용 승격 형제가 있는 조항 없는 WL 행에서
+#   rejected 19건 중 0건 일치 · needs_review 18건 중 18건 일치 · accepted 562건 중 291건 일치.
+_WL_DEFICIENCY_SIGNAL_RE = re.compile(
+    r"\bfail(?:ed|s|ure)?\b"
+    r"|\b(?:did|does|do|was|were|is|are|has|have|had)\s+not\b"
+    r"|\bnot\s+adequate(?:ly)?\b|\binadequate"
+    r"|\black(?:ed|ing|s)?\b|\bpoor\s+practices?\b|\bdeficien|\binsufficient",
+    re.I,
+)
+
+# FDA 가 회사 회신을 **인정·요약**하며 여는 문단("Regarding …, your response indicated …" ·
+# "In response to Form FDA 483 Observation 1A, we acknowledge …")은 지적이 아니라 경과 서술이다.
+# 과거 검수에서 전부 rejected 였다. 결함 문형이 섞여 있어도 P-D 로는 승격하지 않는다.
+_WL_ACK_LEAD_RE = re.compile(
+    r"^\s*(?:regarding\b|in\s+response\b|in\s+your\s+response\b|we\s+acknowledge\b)",
+    re.I,
+)
+
+
+def wl_deficiency_signal_present(text: str) -> bool:
+    """WL 하위 항목이 결함을 서술하는지(P-D). 회신 인정 문단으로 시작하면 False."""
+    text = text or ""
+    if _WL_ACK_LEAD_RE.search(text):
+        return False
+    return bool(_WL_DEFICIENCY_SIGNAL_RE.search(text))
+
+
 def mfds_finding_signal_present(text: str) -> bool:
     """MFDS 평가 결과의 한국어 지적/보완 문형(P-C)이 있는지 판정한다.
 

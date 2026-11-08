@@ -35,6 +35,7 @@ LABEL_TEAM: tuple[tuple[str, str], ...] = (
     ("quiz-freshness", "education"),
     ("growth-weekly", "growth"),
     ("findings-backlog", "translation"),
+    ("findings-review-queue", "quality"),
     ("taxonomy-drift", "quality"),
     ("classification-audit", "quality"),
     ("findings-facets", "quality"),

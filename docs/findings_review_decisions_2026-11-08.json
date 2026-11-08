@@ -1,0 +1,19 @@
+{
+  "_note": "2026-11-08 데이터품질팀 제안. scope_status=non_pharma 7행 — 자동승격은 scope ok 만 보므로 이 행들은 규칙으로 풀리지 않는다. 검색 화면에는 원래 안 보이는 행(범위 밖)이라 판정은 장부 정리다. 적용: python findings_review_queue.py decide --decisions docs/findings_review_decisions_2026-11-08.json (dry-run) → 확인 후 --apply.",
+  "decisions": [
+    {"finding_id": "finding-daf86788226ae7fd82c41624", "decision": "accepted",
+     "reason": "Baylab USA 마스크 WL. 라벨 효능 주장 위반 서술, 조항 9개 인용. 같은 서한 7행 중 5행 accepted 와 같은 성격."},
+    {"finding_id": "finding-00f6150cfc811161c4ddf75d", "decision": "accepted",
+     "reason": "Baylab USA 마스크 WL. 510(k) 허가 범위 밖 판매 위반 서술, 조항 2개 인용. 형제 5행 accepted 와 같은 성격."},
+    {"finding_id": "finding-695774c5f96accbb3c908224", "decision": "rejected",
+     "reason": "DeChoker WL. FDA 가 회신에 담으라고 요청한 항목 목록(ECR 검토 현황·회신 주소)이지 지적이 아니다."},
+    {"finding_id": "finding-a98e3c7aa0baae670aaf2a60", "decision": "rejected",
+     "reason": "DeChoker WL. 회신 요청 항목('How your firm assesses risk differences…'). 지적 서술 아님."},
+    {"finding_id": "finding-134994d46285f4537d137149", "decision": "rejected",
+     "reason": "DeChoker WL. 회신 요청 항목('Specific corrective actions … to address …'). 지적 서술 아님."},
+    {"finding_id": "finding-b8c3c3a8b4e83cc557e09008", "decision": "rejected",
+     "reason": "Tides Medical WL(의료기기 무허가). 위반 블록 분해 실패로 편지 본문 통째 1행(3,457자) — 개별 지적이 아니고 범위 밖. 재추출해도 같은 통짜가 나온다."},
+    {"finding_id": "finding-7c1152edfee61adf684c8858", "decision": "rejected",
+     "reason": "Amgen Vectibix 홍보물(OPDP) 서한. 본문 통째 1행(5,370자), 앞부분이 허가사항 배경 설명. 제조·품질 지적이 아니고 범위 밖."}
+  ]
+}

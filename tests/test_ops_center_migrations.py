@@ -167,7 +167,8 @@ class AdditiveOnlyTest(unittest.TestCase):
         mine = {_P122.name, _P123.name, "124_ops_center_seed.sql", "125_ops_decision_write.sql",
                 "126_ops_task_create.sql", "127_ops_center_seed_planning.sql",
                 "128_ops_measure.sql",  # 128(자동 측정) 계약은 test_ops_center_measure 가 본다
-                "129_ops_center_secretaries.sql"}  # 129(비서실·비서 2명 시드)는 124·127 과 같은 행 넣기 파일
+                "129_ops_center_secretaries.sql",  # 129(비서실·비서 2명 시드)는 124·127 과 같은 행 넣기 파일
+                "131_ops_alarm_tasks.sql"}  # 131(경보 업무)은 이 표에 쓰고 ops_home 을 가산 재정의 — 계약은 test_ops_alarm 이 본다
         for p in sorted(_MIG.glob("*.sql")):
             if p.name in mine:
                 continue

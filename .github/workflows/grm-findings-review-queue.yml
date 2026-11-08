@@ -1,0 +1,183 @@
+name: GRM Findings Review Queue
+
+# [2026-11-08] 검토 대기(needs_review) 큐의 **나이** 감시 — 데이터품질팀(quality) 업무.
+# findings_review_queue.py measure 가 needs_review 전 행(모든 소스·scope)의 건수와 가장 오래된
+# 행의 나이(ingested_at 기준)를 잰다. N일(기본 3) 넘게 남은 행이 하나라도 있으면 exit 1 →
+# 이 워크플로가 이슈(label: findings-review-queue)를 열거나 같은 이슈를 갱신한다. 초과 행이
+# 0건이 되면 해소 댓글을 달고 닫는다.
+#
+# 왜 건수가 아니라 나이인가: 자동승격(grm-findings-review-promote, 05:30 KST)이 매일 돌므로
+# 규칙으로 풀릴 행은 하루 안에 빠진다. 사흘 넘게 남은 행은 규칙이 판정하지 못한 행이다.
+# 기존 grm-findings-backlog-monitor 는 건수 300 초과만 봐서 18건이 몇 주 남아도 초록이었다.
+#
+# ★읽기 전용: findings 를 write 하지 않는다(사람 판정 적용은 같은 스크립트의 decide 를 로컬에서
+# 비서가 실행). finding_text 는 읽지 않는다. 기존 SUPABASE_SERVICE_ROLE_KEY secret 재사용.
+on:
+  schedule:
+    # 매일 21:40 UTC = 06:40 KST. 자동승격(20:30 UTC)·백로그 감시(21:00 UTC) 뒤라 그날 승격
+    # 결과가 반영된 뒤의 큐를 본다.
+    - cron: '40 21 * * *'
+  workflow_dispatch:
+    inputs:
+      max_age_days:
+        description: '이 일수를 넘긴 검토 대기 행이 있으면 경보. 비우면 기본 3.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write        # 경보 이슈 생성/갱신/종료
+
+concurrency:
+  group: findings-review-queue
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    name: Measure needs_review queue age
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 초과(exit 1)는 하드 실패가 아니라 이슈로 처리한다 — outcome 을 뒤에서 분기.
+      - name: Measure queue (read-only)
+        id: measure
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          MAX_AGE_DAYS: ${{ inputs.max_age_days }}
+        run: |
+          ARGS="measure --output review_queue_report.json"
+          if [ -n "$MAX_AGE_DAYS" ]; then
+            ARGS="$ARGS --max-age-days $MAX_AGE_DAYS"
+          fi
+          python findings_review_queue.py $ARGS
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Review Queue"
+            echo ""
+            if [ -f review_queue_report.json ]; then
+              echo '```json'
+              cat review_queue_report.json
+              echo '```'
+            else
+              echo "review_queue_report.json 이 생성되지 않았습니다 (exit 2 조기 종료 — SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY 확인)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 리포트가 없으면(자격증명 누락 등) 이슈를 열고 run 을 red 로 남긴다 — 도구 사망을 초록으로
+      # 숨기지 않는다(continue-on-error 가 감사기 사망을 가린 09-23 전례).
+      - name: Open or update queue issue
+        if: steps.measure.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            let r = {};
+            try { r = JSON.parse(fs.readFileSync('review_queue_report.json', 'utf8')); }
+            catch (e) { r = { status: 'error', errors: ['review_queue_report.json 없음/파싱 실패 — 측정 도구가 돌지 못했습니다'] }; }
+
+            const title = '[findings-review-queue] 검토 대기 지적사항이 기한을 넘겼습니다';
+            const label = 'findings-review-queue';
+            const lines = [];
+            if ((r.errors || []).length) {
+              lines.push('**측정 오류** — 이번 실행은 큐를 읽지 못했습니다:');
+              for (const e of r.errors) lines.push(`- ${e}`);
+            } else {
+              lines.push(`- 검토 대기 전체: **${r.needs_review}**건 (검색 화면에 보이는 scope ok: ${r.needs_review_visible}건)`);
+              lines.push(`- 가장 오래된 건: **${r.oldest_age_days}일** · 기한 ${r.max_age_days}일 초과: **${r.overdue}**건`);
+              lines.push(`- 소스별: ${Object.entries(r.by_source || {}).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
+              lines.push(`- 범위별: ${Object.entries(r.by_scope || {}).map(([k, v]) => `${k} ${v}`).join(' · ')}`);
+              lines.push('');
+              lines.push('| finding_id | 소스 | 범위 | 업체 | 대기(일) |');
+              lines.push('|---|---|---|---|---|');
+              for (const x of (r.overdue_rows || [])) {
+                lines.push(`| \`${x.finding_id}\` | ${x.source} | ${x.scope_status} | ${(x.firm_name || '').replace(/\|/g, '/')} | ${x.age_days ?? '?'} |`);
+              }
+              if (r.overdue_rows_truncated) lines.push(`\n(표에서 ${r.overdue_rows_truncated}건 생략 — 실행 요약의 JSON 참조)`);
+              lines.push('');
+              lines.push('**처리 방법** — 자동승격 규칙이 판정하지 못한 행입니다. 행마다 accepted/rejected 와 근거를 판정 파일(JSON)에 적고:');
+              lines.push('```');
+              lines.push('python findings_review_queue.py decide --decisions <파일>          # dry-run');
+              lines.push('python findings_review_queue.py decide --decisions <파일> --apply  # 적용');
+              lines.push('```');
+              lines.push('같은 유형이 반복되면 판정 대신 `findings_review_promote_service.py` 규칙을 고칩니다. 예시 파일: `docs/findings_review_decisions_2026-11-08.json`.');
+            }
+            const body = lines.join('\n')
+              + `\n\n검사시각(UTC): ${r.checked_at_utc || '?'} · 실행: ${context.runId}`
+              + `\n워크플로 \`grm-findings-review-queue.yml\` · 기한 초과 행이 0건이 되면 자동으로 닫힙니다.`;
+
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'fbca04', 'findings 검토 대기(needs_review) 기한 초과 — 데이터품질팀');
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+              core.notice(`기존 이슈 #${existing.number} 갱신`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+              core.notice(`이슈 #${created.number} 생성`);
+            }
+
+      - name: Close queue issue on recovery
+        if: steps.measure.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-review-queue] 검토 대기 지적사항이 기한을 넘겼습니다';
+            const label = 'findings-review-queue';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `기한을 넘긴 검토 대기 행이 0건이 되어 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.notice(`이슈 #${issue.number} 자동 종료`);
+            }
+
+      - name: Propagate red on overdue or error
+        if: steps.measure.outcome == 'failure'
+        run: |
+          echo "검토 대기 기한 초과 또는 측정 오류 — 상세는 위 이슈/step summary 참조."
+          exit 1

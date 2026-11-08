@@ -386,9 +386,26 @@
       "</form></div>";
   }
 
+  // ── 방치 경보(131) ───────────────────────────────────────────────────────────
+  // data.alarms 는 가산 키다(없거나 방치 0건이면 빈 문자열 -> 화면에 아무것도 안 그린다). 빨간 띠 + 이슈 링크 최대 5건.
+  function renderAlarms(data) {
+    var al = data && typeof data === "object" ? data.alarms : null;
+    var n = al ? num(al.neglected) : 0;
+    if (!al || !n || n < 1) return "";
+    var days = num(al.neglect_days) || 3;
+    var rows = arr(al.items).map(function (it) {
+      var u = safeUrl(it.url), t = "#" + esc(it.issue) + " " + esc(it.title);
+      return "<li>" + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + t + "</a>" : t) +
+        ' <span class="oc-m">' + esc(it.days) + "일째 · " + esc(it.team) + "</span></li>";
+    }).join("");
+    var more = n > arr(al.items).length ? '<li class="oc-m">그 밖에 ' + (n - arr(al.items).length) + "건</li>" : "";
+    return '<div class="oc-alarm" role="alert"><b>방치된 경보 ' + n + "건</b> — 지시함에서 " + days + "일 넘게 움직이지 않았습니다." +
+      '<ul class="oc-alarm-list">' + rows + more + "</ul></div>";
+  }
+
   function render(data, ctx) {
     if (!data || typeof data !== "object") return "";
-    return '<p class="oc-summary">' + renderSummary(data, ctx) + "</p>" +
+    return renderAlarms(data) + '<p class="oc-summary">' + renderSummary(data, ctx) + "</p>" +
       '<section class="oc-card oc-docs">' + renderDocs(data, ctx) + "</section>" + renderTeams(data, ctx);
   }
 
@@ -408,7 +425,7 @@
     });
   }
 
-  var api = { render: render, renderSummary: renderSummary, renderDocs: renderDocs, renderTeams: renderTeams,
+  var api = { render: render, renderAlarms: renderAlarms, renderSummary: renderSummary, renderDocs: renderDocs, renderTeams: renderTeams,
               renderWeek: renderWeek, renderTaskSheet: renderTaskSheet, teamOptions: teamOptions, memberOptions: memberOptions,
               validateTask: validateTask, taskTeams: taskTeams, TASK_MSG: TASK_MSG,
               bind: bind, approveLabel: approveLabel, memberStatus: memberStatus, dayLabel: dayLabel, daysLeft: daysLeft, clock: clock, STATE_WORD: STATE_WORD };

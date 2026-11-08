@@ -393,5 +393,61 @@ class WorkflowWiringTest(unittest.TestCase):
         self.assertIn("090", self.text.split("on:")[0], "머리글 주석에 [090] 설명 없음")
 
 
+class ListStatsTest(unittest.TestCase):
+    """[135] 목록 기준 클릭 — 2026-11-08 Brevo 실측 모양(11-02 호) 그대로."""
+
+    LIST_ITEM = {"id": 38, "statistics": {
+        "globalStats": {"uniqueClicks": 72, "clickers": 74, "delivered": 29},
+        "campaignStats": [{"listId": 3, "uniqueClicks": 6, "clickers": 8, "delivered": 29,
+                           "uniqueViews": 19}]}}
+
+    def test_reads_campaign_stats_not_global(self):
+        s = cnc.extract_list_stats(self.LIST_ITEM)
+        self.assertEqual(s, {"list_delivered": 29, "list_unique_views": 19,
+                             "list_unique_clicks": 6, "list_clickers": 8})
+
+    def test_sums_over_lists_and_accepts_nested_stats(self):
+        s = cnc.extract_list_stats({"campaignStats": [{"stats": {"uniqueClicks": 2}},
+                                                      {"stats": {"uniqueClicks": 3}}]})
+        self.assertEqual(s["list_unique_clicks"], 5)
+        self.assertIsNone(s["list_delivered"])
+
+    def test_absent_is_none_not_zero(self):
+        self.assertEqual(set(cnc.extract_list_stats({"statistics": {}}).values()), {None})
+
+
+class UpsertFallbackTest(unittest.TestCase):
+    ROWS = [{"campaign_id": 1, "list_unique_clicks": 6, "list_clickers": 8,
+             "list_delivered": 29, "list_unique_views": 19, "unique_clicks": 72}]
+
+    def test_missing_column_retries_without_list_fields(self):
+        calls = []
+
+        def fake(url, key, rows):
+            calls.append(rows)
+            if len(calls) == 1:
+                raise cnc.UpsertError(400, missing_column=True)
+
+        with contextlib.redirect_stderr(io.StringIO()):
+            ok = cnc.upsert_with_fallback("u", "k", self.ROWS, upsert=fake)
+        self.assertFalse(ok)
+        self.assertEqual(len(calls), 2)
+        self.assertNotIn("list_unique_clicks", calls[1][0])
+        self.assertEqual(calls[1][0]["unique_clicks"], 72)
+
+    def test_other_errors_propagate(self):
+        def fake(url, key, rows):
+            raise cnc.UpsertError(500)
+
+        with self.assertRaises(SystemExit):
+            cnc.upsert_with_fallback("u", "k", self.ROWS, upsert=fake)
+
+    def test_success_keeps_list_fields(self):
+        seen = []
+        self.assertTrue(cnc.upsert_with_fallback("u", "k", self.ROWS,
+                                                 upsert=lambda u, k, r: seen.append(r)))
+        self.assertIn("list_unique_clicks", seen[0][0])
+
+
 if __name__ == "__main__":
     unittest.main()

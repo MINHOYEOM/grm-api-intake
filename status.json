@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T00:50:22Z",
+ "generated_at": "2026-11-09T01:41:30Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 42546730258,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T01:39:39Z",
+    "updatedAt": "2026-11-09T01:40:05Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42546730258"
+   },
+   {
     "databaseId": 41396089686,
     "status": "completed",
     "conclusion": "success",
@@ -102,20 +113,20 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372996394"
-   },
-   {
-    "databaseId": 41372621661,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-02T01:27:56Z",
-    "updatedAt": "2026-11-02T01:28:18Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372621661"
    }
   ],
   "grm-web-publish.yml": [
+   {
+    "databaseId": 42546767176,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "push",
+    "createdAt": "2026-11-09T01:40:04Z",
+    "updatedAt": "2026-11-09T01:41:21Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-11-09 라우틴 델타 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42546767176"
+   },
    {
     "databaseId": 41395061761,
     "status": "completed",
@@ -159,20 +170,20 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1219 from MINHOYEOM/claude/brief-2026-10-26-fda48…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40603680538"
-   },
-   {
-    "databaseId": 40513307937,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-10-27T13:35:10Z",
-    "updatedAt": "2026-10-27T13:36:29Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Publish (assemble)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40513307937"
    }
   ],
   "grm-web-deploy.yml": [
+   {
+    "databaseId": 42546767053,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-09T01:40:04Z",
+    "updatedAt": "2026-11-09T01:40:08Z",
+    "headBranch": "main",
+    "displayTitle": "bridge(web): 2026-11-09 라우틴 델타 커밋 (자동)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42546767053"
+   },
    {
     "databaseId": 42530328725,
     "status": "completed",
@@ -216,17 +227,6 @@
     "headBranch": "automation/findings-docs-auto-42418575787",
     "displayTitle": "Merge branch 'main' into automation/findings-docs-auto-42418575787",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42511735502"
-   },
-   {
-    "databaseId": 42508136055,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-08T18:04:40Z",
-    "updatedAt": "2026-11-08T18:11:57Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1358 from MINHOYEOM/claude/glossary-fig-daily-202…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42508136055"
    }
   ],
   "grm-scaffold-mirror.yml": [

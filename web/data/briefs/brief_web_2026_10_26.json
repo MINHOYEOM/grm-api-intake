@@ -24,10 +24,10 @@
   ],
   "coverage": {
    "intake_total": 276,
-   "rendered": 139,
+   "rendered": 136,
    "evidence": {
     "A": 41,
-    "B": 98,
+    "B": 95,
     "C": 0
    },
    "resources": 5
@@ -1047,8 +1047,15 @@
    ],
    "deterministic_detail": {
     "type": "fda_483_observations",
-    "count": 5,
+    "count": 6,
     "observations": [
+     {
+      "number": "1",
+      "deficiency": "Your firm failed to establish written procedures for production and process controls designed to assure that the drug products have the identity, strength, purity, and quality that they are purported or represented to possess.",
+      "detail": "Specifically, A. Your multiple materials such as 0541 PIP Me% For example, the Ib/141 'process is not required to run continuously and is allowed to be completed over 51(41 until the OM 18)141 15141 . The are held process is finished. (0141 and other or for 51+0 (WI before resuming was paused on Ibif41 , the materials were placed on hold from on (.1(.) 81141 at batch were held on . Due to a power outage, the with other - Your process for batch resumed on , and was completed on, batch lwas released to your - Ifor further! OM) . Palforzi a _Ito the U.S market. Your firm has not established an appropriate hold time or validated the non -continuous",
+      "deficiency_ko": "귀사는 의약품이 갖추어야 한다고 표방하거나 표시한 확인·함량·순도·품질을 보장하도록 설계된 생산 및 공정관리 서면 절차를 수립하지 않았다.",
+      "detail_ko": "구체적으로, A. 귀사의 여러 물질(판독 불가) 가운데, 예를 들어 (판독 불가) 공정은 연속으로 진행할 필요가 없어 (판독 불가) 때까지 나누어 완료하도록 허용된다. 공정이 끝날 때까지 (판독 불가)은 보류된다. (판독 불가) 재개 전에 (판독 불가) 공정이 중단되었고 물질은 (비공개)부터 보류되었다. 정전으로 인해 (판독 불가) 배치의 공정은 (비공개)에 재개되어 (비공개)에 완료되었으며, 해당 배치는 귀사 (판독 불가)에 (판독 불가) 추가 (판독 불가)를 위해, 미국 시장용 Palforzia로 출하되었다. 귀사는 적절한 보류시간을 설정하지 않았고 비연속(non-continuous) (이하 판독 불가; 원문 추출이 여기서 끝남)"
+     },
      {
       "number": "2",
       "deficiency": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
@@ -3155,125 +3162,8 @@
    }
   },
   {
-   "id": "fda483-195338",
-   "render_order": 21,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "IPAX, Incorporated",
-   "title_issue": "공정 리스크관리(pFMEA) 문서화 미흡",
-   "summary": "FDA가 02/05/2026 IPAX, Incorporated(Contract Manufacturer) 실사에서 자가이식용 지방 채취 시스템 생산의 리스크관리 프로세스가 적절히 문서화되지 않았다는 관찰 1건을 지적했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-10-23"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-195338"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "IPAX, Incorporated · FEI 1720734"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Contract Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "02/05/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "제조소/업체: IPAX, Incorporated · FEI 1720734",
-    "실사일: 02/05/2026",
-    "관찰 요지: 작업지침서 QSWI 3.007 Section 12.8.1의 기능시험에 대응하는 리스크가 pFMEA 001 등 리스크 문서에서 확인되지 않음",
-    "추가 지적: pFMEA의 \"vacuum loss\" 위해 심각도가 Possible Hazards 표와 달라 추적성이 불명확"
-   ],
-   "implication": "생산 공정에 필수 기능 시험이 있는데도 그에 대응하는 리스크가 pFMEA에 없었다는 점은 작업지침서와 공정 리스크 분석이 서로 연결되지 않은 상태라는 신호다. 같은 위해(진공 손실)에 대해 위해 표와 pFMEA 행의 심각도가 다르게 매겨진 것도 리스크 문서 간 추적성 관리가 약했음을 보여주는 사례로 볼 만하다.",
-   "checks": [
-    "작업지침서 공정 시험 항목과 pFMEA 리스크 항목의 대응 관계",
-    "위해 표와 pFMEA 행 간 심각도 등급 일관성"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 1,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "One or more processes for risk management in product realization have not been adequately documented.",
-      "detail": "Specifically, a) Your company’s “Work Instructions for LifeCell Revolve Assemblies”, Doc: QSWI 3.007, Dated: 12/2/2024, Rev 010 describes the production process your company performs to manufacture an adipose collection system for autologous grafting. The document also includes a device ‘ ” in Section 12.8.1, which involves a functional test of thewm assembly. Note that your company’s Director of Operations stated that the assembly serves as an essential function of the device to strain out the patient’s serum from the adipose tissue collected for subsequent autologous implantation. I then asked your company’s CEO and Director of ations to identify where your company documented the risk associated with the handle functional test in production. However, your company’s CEO and Director of Operations responded that they could not locate a corresponding risk following their review of the “LifeCell (pFMEA 001)”, Doc: pFMEA 001, Dated: 07/06/2020, Rev.: 002, nor any other risk documentation. b) During my review of your company’s “LifeCell (pFMEA 001)”, Doc: pFMEA 001, Dated",
-      "deficiency_ko": "제품 실현에서 리스크관리를 위한 하나 이상의 프로세스가 적절히 문서화되지 않았다.",
-      "detail_ko": "구체적으로, a) 귀사의 \"Work Instructions for LifeCell Revolve Assemblies\"(문서: QSWI 3.007, 일자: 12/2/2024, Rev 010)는 귀사가 자가이식용 지방 채취 시스템을 제조하기 위해 수행하는 생산 공정을 기술한다. 이 문서에는 Section 12.8.1에 (비공개) 조립품의 기능시험을 포함하는 기기 관련 항목도 들어 있다. 귀사의 운영 책임자(Director of Operations)는 해당 조립품이 이후 자가 이식을 위해 채취한 지방조직에서 환자의 혈청을 걸러내는 기기의 필수 기능을 한다고 진술했다. 이에 본 조사관은 귀사의 CEO와 운영 책임자에게 생산 중 핸들 기능시험과 관련된 리스크를 귀사가 어디에 문서화했는지 확인해 달라고 요청했다. 그러나 귀사의 CEO와 운영 책임자는 \"LifeCell (pFMEA 001)\"(문서: pFMEA 001, 일자: 07/06/2020, Rev.: 002) 및 기타 어떤 리스크 문서를 검토한 후에도 대응하는 리스크를 찾지 못했다고 답했다. b) 귀사의 \"LifeCell (pFMEA 001)\"(문서: pFMEA 001, 일자"
-     }
-    ],
-    "inspectors": [
-     "Matthew M Vernon"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "작업지침서 QSWI 3.007(Rev 010) Section 12.8.1에 생산 중 조립품 기능시험이 포함되어 있고 운영 책임자는 해당 조립품이 채취한 지방조직에서 환자 혈청을 걸러내는 필수 기능을 한다고 설명했으나, CEO와 운영 책임자는 pFMEA 001(Rev 002)이나 다른 리스크 문서에서 이 기능시험에 대응하는 리스크를 찾지 못했다.",
-      "risk": "필수 기능과 관련된 공정 리스크가 분석·통제되지 않아, 해당 기능시험의 근거와 실패 시 영향이 평가되지 않은 채 자가이식용 기기가 생산될 수 있다."
-     },
-     {
-      "observation": "pFMEA 001의 Possible Hazards 표는 \"loss of vacuum\"을 \"serious\" 심각도로 기재했으나, 같은 \"vacuum loss\" 위해를 다루는 BFE-016, BFE-019, BFE-031 행은 \"minor\" 심각도로 매겨져 있었고, CEO는 위해 표와 pFMEA 행 간 추적성이 불명확함을 인정했다.",
-      "risk": "위해 심각도가 과소평가되면 리스크 우선순위와 관리 조치가 부적절하게 정해져 진공 손실 관련 위해가 충분히 통제되지 않을 수 있다."
-     }
-    ],
-    "inspectional_significance": "이 483은 관찰 1건이지만, 공정 리스크관리 문서(pFMEA)가 실제 생산 공정의 필수 기능시험을 반영하지 못하고 위해 심각도 체계 간 일관성도 결여됐다는 두 측면을 함께 지적해, 리스크관리 문서 체계 전반의 문제일 가능성이 있다. 데이터 무결성 관련 지적은 없으며 업체는 시정을 약속(Promised to correct)했다. 결함이 문서화 영역에 머물러 있어 충실한 응답이 이루어지면 Warning Letter로 승격될 가능성은 높지 않으나, 리스크 재평가 결과 미평가 위해가 드러나면 중대도가 커질 수 있다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA에 서면 회신",
-     "items": [
-      "QSWI 3.007의 생산 공정 단계·시험(Section 12.8.1 기능시험 포함)을 pFMEA 001과 대조해 누락된 리스크를 식별하고 pFMEA를 개정한다.",
-      "Possible Hazards 표와 pFMEA 각 행(BFE-016, BFE-019, BFE-031 등)의 위해·심각도 등급을 재검토해 추적성과 일관성을 확보한다.",
-      "작업지침서 변경 시 리스크 문서가 함께 검토·갱신되도록 하는 CAPA를 수립·문서화한다."
-     ]
-    },
-    "administrative_risks": "응답이 불충분하거나 후속 실사에서 리스크관리 문서화 결함이 지속되면 Warning Letter 발부와 OAI 분류로 이어질 수 있다. 시정 약속의 이행 여부는 후속 재실사에서 확인될 가능성이 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/195338/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Process risk management (pFMEA) not documented",
-    "summary": "During a 02/05/2026 inspection of contract manufacturer IPAX, Incorporated, FDA issued one observation that risk management processes for producing an adipose collection system for autologous grafting were not adequately documented.",
-    "implication": "A production functional test with no matching risk in the pFMEA suggests the work instructions and the process risk analysis were not linked. Different severity rankings for the same vacuum-loss hazard across the hazards table and pFMEA rows also point to weak traceability between risk documents.",
-    "key_facts": [
-     "Firm: IPAX, Incorporated · FEI 1720734",
-     "Inspection date: 02/05/2026",
-     "Observation: no risk in pFMEA 001 or other risk documents corresponded to the functional test in Section 12.8.1 of work instruction QSWI 3.007",
-     "Also noted: pFMEA severity for \"vacuum loss\" differed from the Possible Hazards table, with unclear traceability"
-    ],
-    "checks": [
-     "Mapping between production test steps and pFMEA risk entries",
-     "Consistency of severity rankings between the hazards table and pFMEA rows"
-    ]
-   }
-  },
-  {
    "id": "fda483-195342",
-   "render_order": 22,
+   "render_order": 21,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3410,7 +3300,7 @@
   },
   {
    "id": "fda483-195344",
-   "render_order": 23,
+   "render_order": 22,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3533,7 +3423,7 @@
   },
   {
    "id": "fda483-195345",
-   "render_order": 24,
+   "render_order": 23,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3681,7 +3571,7 @@
   },
   {
    "id": "fda483-195346",
-   "render_order": 25,
+   "render_order": 24,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3838,7 +3728,7 @@
   },
   {
    "id": "fda483-195347",
-   "render_order": 26,
+   "render_order": 25,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3975,7 +3865,7 @@
   },
   {
    "id": "fda483-195348",
-   "render_order": 27,
+   "render_order": 26,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4145,7 +4035,7 @@
   },
   {
    "id": "fda483-195349",
-   "render_order": 28,
+   "render_order": 27,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4322,7 +4212,7 @@
   },
   {
    "id": "fda483-195352",
-   "render_order": 29,
+   "render_order": 28,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4471,7 +4361,7 @@
   },
   {
    "id": "fda483-195354",
-   "render_order": 30,
+   "render_order": 29,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4632,7 +4522,7 @@
   },
   {
    "id": "fda483-195356",
-   "render_order": 31,
+   "render_order": 30,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4759,7 +4649,7 @@
   },
   {
    "id": "2026-21669",
-   "render_order": 32,
+   "render_order": 31,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4838,7 +4728,7 @@
   },
   {
    "id": "fda483-195295",
-   "render_order": 33,
+   "render_order": 32,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -4994,7 +4884,7 @@
   },
   {
    "id": "fda483-195297",
-   "render_order": 34,
+   "render_order": 33,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5114,7 +5004,7 @@
   },
   {
    "id": "fda483-195298",
-   "render_order": 35,
+   "render_order": 34,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5263,7 +5153,7 @@
   },
   {
    "id": "fda483-195299",
-   "render_order": 36,
+   "render_order": 35,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5385,7 +5275,7 @@
   },
   {
    "id": "fda483-195300",
-   "render_order": 37,
+   "render_order": 36,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5527,7 +5417,7 @@
   },
   {
    "id": "fda483-195301",
-   "render_order": 38,
+   "render_order": 37,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5670,7 +5560,7 @@
   },
   {
    "id": "fda483-195303",
-   "render_order": 39,
+   "render_order": 38,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5822,7 +5712,7 @@
   },
   {
    "id": "fda483-195304",
-   "render_order": 40,
+   "render_order": 39,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -5874,8 +5764,15 @@
    ],
    "deterministic_detail": {
     "type": "fda_483_observations",
-    "count": 6,
+    "count": 7,
     "observations": [
+     {
+      "number": "1",
+      "deficiency": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile did not include adequate validation of the sterilization process.",
+      "detail": "Specifically, A. Scientific evidence could not be provided demonstrating the source of the smoke used during your air flow visualization studies is neutrally buoyant. During your review of smoke study videos in your aseptic filling lines in workshops@gy as well as thefy line, the following discrepancies were noted: 1. The positioning of the ga ducts of the (4 RABS in relation to the grade B area has the potential to short circuit the grade B air flow, causing an upward movement ofair in the cleanroom. Smoke studies have not been performed in this area to demonstrate adequate airflow in aseptic filling lines workshops §y 2. Air flow videos are recorded with the smoke pointing directly upwards, not providing a uniform curtain of smoke in which to evaluate air currents.",
+      "deficiency_ko": "무균 의약품으로 표방되는 제품의 미생물 오염을 방지하기 위해 설계된 절차에 멸균 공정의 적절한 밸리데이션이 포함되어 있지 않았다.",
+      "detail_ko": "구체적으로, A. 기류 시각화(airflow visualization) 연구에 사용한 연기의 발생원이 중성 부력(neutrally buoyant)임을 보여주는 과학적 근거를 제시하지 못했다. 작업장 (비공개) 및 (비공개) 라인의 무균 충전 라인에 대한 연기 연구 영상을 검토하는 중 다음 불일치가 확인되었다. 1. (비공개) RABS의 (판독 불가) 덕트가 grade B 구역에 대해 놓인 위치는 grade B 기류를 단락(short circuit)시켜 클린룸에서 공기가 위로 이동하게 할 가능성이 있다. 이 구역에서는 작업장 (비공개) 무균 충전 라인의 적절한 기류를 입증하는 연기 연구가 수행되지 않았다. 2. 기류 영상은 연기를 바로 위로 향하게 하여 기록되어 있어, 기류를 평가할 수 있는 균일한 연기 막(curtain)을 제공하지 못한다."
+     },
      {
       "number": "2",
       "deficiency": "Your firm failed to thoroughly investigate any unexplained discrepancy or failure ofa batch or any of its components to meet any of its specifications whether or not the batch has already been distributed.",
@@ -5984,143 +5881,8 @@
    }
   },
   {
-   "id": "fda483-195309",
-   "render_order": 41,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "Ventana Medical Systems, Inc.",
-   "title_issue": "불만 시정조치 기록·공정 밸리데이션 미흡",
-   "summary": "FDA가 02/10/2026 종료된 Ventana Medical Systems, Inc. 실사에서 불만처리 시정조치 문서화 미흡과 공정 밸리데이션 부적절 등 관찰사항 2건을 담은 483을 발부했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-10-22"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-195309"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "Ventana Medical Systems, Inc. · FEI 1000125183"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "02/10/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "업체: Ventana Medical Systems, Inc. · FEI 1000125183",
-    "실사일: 02/10/2026",
-    "관찰 1: 불만 파일 5건 중 2건에서 실시한 시정조치 미기록, 1건은 불만을 문의(Inquiry)로 잘못 분류",
-    "관찰 2: VENTANA PTEN (SP218) RxDx Assay 공정 밸리데이션에서 최대 혼합시간 배치 미생산·표본 크기 통계적 근거 부재"
-   ],
-   "implication": "불만을 문의로 분류해 원인과 시정조치가 기록되지 않은 사례는 불만 분류 기준이 CAPA 연결 여부를 좌우한다는 점을 보여주는 신호다. 밸리데이션 보고서가 스스로 요구한 최대 혼합시간 조건을 실제 배치가 충족하지 않은 점은 프로토콜 요구사항과 실행 결과의 대조 검토가 지적 대상이 될 수 있음을 시사한다.",
-   "checks": [
-    "불만 대 문의 분류 기준과 재분류 검토 기록",
-    "불만 종결 시 시정조치·근본원인 문서화 여부",
-    "공정 밸리데이션 최악조건 실행 여부와 표본 크기 통계적 근거"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 2,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "Correction or corrective action resulting from the complaint handling process was not adequately documented.",
-      "detail": "Specifically, both complaint handling procedures applicable to the complaints reviewed during this inspection, Customer Support Procedure MQMS-PM-GSP-03 (Ver 05, dated 30 July 2023) and Global Complaint Handling MQMS-PM-GSP-04 (Ver 06, dated 8 March 2024) require in the Case Closure section that all relevant information, including, but not limited to, the outcome and conclusion, are documented. In 2 of 5 complaint files reviewed (CAS-0020178849 and CAS-0022879637), however, the specific corrective actions implemented were not documented. Additionally, one complaint involving a protocol containing inaccurate information was incorrectly classified as an Inquiry (CAS-0019737772) instead of a Complaint, and neither the corrective action nor root cause was documented.",
-      "deficiency_ko": "불만처리 과정에서 발생한 시정 또는 시정조치가 적절히 문서화되지 않았다.",
-      "detail_ko": "구체적으로, 이번 실사에서 검토한 불만에 적용되는 두 불만처리 절차인 Customer Support Procedure MQMS-PM-GSP-03(Ver 05, 2023년 7월 30일자)과 Global Complaint Handling MQMS-PM-GSP-04(Ver 06, 2024년 3월 8일자)는 사례 종결(Case Closure) 섹션에서 결과와 결론을 포함하되 이에 국한되지 않는 모든 관련 정보를 문서화하도록 요구한다. 그러나 검토한 불만 파일 5건 중 2건(CAS-0020178849 및 CAS-0022879637)에서 실제 시행된 구체적 시정조치가 문서화되지 않았다. 또한 부정확한 정보가 담긴 프로토콜과 관련된 불만 1건이 불만(Complaint)이 아닌 문의(Inquiry)로 잘못 분류되었고(CAS-0019737772), 시정조치와 근본원인 모두 문서화되지 않았다."
-     },
-     {
-      "number": "2",
-      "deficiency": "Validation of processes for production and service provision did not adequately demonstrate the ability of the processes to achieve planned results consistently.",
-      "detail": "Specifically, the process validation report for your firm's Ventana PTEN Assay, Report for PQ (pOQ & pPQ) Protocols for VENTANA PTEN (SP218) RxDx Assay, PN 740-7043 (completion date 12 Aug 2020), states in Section 1 that a small batch of product was required to be produced using the maximum mixing time @®min), however, the Batch Formulation Results table indicates that none of the (6))@)batches were mixed for the maximum indicated time of™™minutes. Additionally, neither the report nor the associated protocols document a statistical rationale to support a sample size of(GO) 4) pOQ and (P#)pPQ).",
-      "deficiency_ko": "생산 및 서비스 제공 공정의 밸리데이션이 공정이 계획된 결과를 일관되게 달성할 수 있음을 적절히 입증하지 못했다.",
-      "detail_ko": "구체적으로, 귀사 Ventana PTEN Assay의 공정 밸리데이션 보고서인 Report for PQ (pOQ & pPQ) Protocols for VENTANA PTEN (SP218) RxDx Assay, PN 740-7043(완료일 2020년 8월 12일)은 섹션 1에서 최대 혼합시간((비공개)분)을 적용해 소규모 배치 제품을 생산해야 한다고 기술하고 있으나, 배치 조제 결과(Batch Formulation Results) 표에 따르면 (비공개)개 배치 중 어느 것도 명시된 최대 시간인 (비공개)분 동안 혼합되지 않았다. 또한 보고서와 관련 프로토콜 모두 (비공개) pOQ 및 (비공개) pPQ의 표본 크기를 뒷받침하는 통계적 근거를 문서화하지 않았다."
-     }
-    ],
-    "inspectors": [
-     "Scott D Stevens"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "불만처리 절차(MQMS-PM-GSP-03, MQMS-PM-GSP-04)가 사례 종결 시 결과와 결론 등 관련 정보 기록을 요구함에도, 검토한 불만 파일 5건 중 2건에서 실제 시행한 시정조치가 기록되지 않았다.",
-      "risk": "시정조치의 실효성과 재발 여부를 추적할 수 없어 동일 결함이 반복될 수 있다."
-     },
-     {
-      "observation": "부정확한 정보가 담긴 프로토콜 관련 불만 1건(CAS-0019737772)을 불만이 아닌 문의(Inquiry)로 잘못 분류했고, 시정조치와 근본원인 모두 기록되지 않았다.",
-      "risk": "불만 분류 오류로 조사·CAPA 체계를 우회해 제품 관련 문제가 평가되지 않은 채 남을 수 있다."
-     },
-     {
-      "observation": "VENTANA PTEN (SP218) RxDx Assay 공정 밸리데이션 보고서는 최대 혼합시간으로 소규모 배치를 생산해야 한다고 명시했으나, 배치 조제 결과표상 어느 배치도 최대 혼합시간으로 혼합되지 않았다.",
-      "risk": "공정 범위의 상한 조건이 검증되지 않아 해당 조건에서의 제품 성능이 입증되지 않은 상태로 생산될 수 있다."
-     },
-     {
-      "observation": "보고서와 관련 프로토콜 모두 pOQ·pPQ 표본 크기를 뒷받침하는 통계적 근거를 문서화하지 않았다.",
-      "risk": "밸리데이션 결론의 통계적 신뢰도를 입증할 수 없어 공정이 일관되게 의도한 결과를 달성한다는 주장이 약화된다."
-     }
-    ],
-    "inspectional_significance": "관찰사항은 불만처리 기록과 공정 밸리데이션 두 영역 2건으로, 무균이나 데이터 위조 같은 데이터 무결성 문제는 포함되지 않았다. 다만 불만 파일 5건 중 3건에서 기록 또는 분류 결함이 확인돼 불만처리 체계 운영 전반의 문제로 해석될 가능성이 있고, 밸리데이션 결함은 2020년 완료 보고서에 관한 것이어서 기존 밸리데이션 검토 체계의 공백을 시사한다. 원문 주석상 업체가 두 관찰 모두 시정을 약속했으므로, 회신이 충분하면 Warning Letter로 승격될 가능성은 상대적으로 제한적일 수 있으나 불충분하면 승격 가능성이 있다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "지적된 불만 파일(CAS-0020178849, CAS-0022879637)의 시행 시정조치를 보완 기록하고 다른 종결 불만 파일도 소급 검토한다.",
-      "CAS-0019737772를 불만으로 재분류해 근본원인 조사와 시정조치를 수행·기록하고, 불만과 문의의 분류 기준을 명확히 한다.",
-      "PTEN Assay 공정에 대해 최대 혼합시간 조건을 포함한 밸리데이션을 재평가하거나 보완 수행한다.",
-      "pOQ·pPQ 표본 크기의 통계적 근거를 문서화하고 밸리데이션 프로토콜 작성 기준에 반영한다."
-     ]
-    },
-    "administrative_risks": "회신이 불충분하거나 시정이 이행되지 않으면 Warning Letter 발부와 OAI 분류로 이어질 수 있으며, 시정 확인을 위한 후속 재실사 대상이 될 수 있다. 불만처리와 밸리데이션 결함이 반복 확인되면 추가 행정조치 가능성이 커진다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/195309/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Complaint CAPA records and process validation gaps",
-    "summary": "FDA issued a Form 483 with two observations to Ventana Medical Systems, Inc. after an inspection ending 02/10/2026, citing inadequate documentation of complaint corrective actions and deficient process validation.",
-    "implication": "A complaint logged as an inquiry, with no root cause or corrective action recorded, signals that complaint classification criteria determine whether issues ever reach CAPA. A validation report whose own worst-case mixing condition was not met by any batch suggests investigators compare protocol requirements against actual execution.",
-    "key_facts": [
-     "Firm: Ventana Medical Systems, Inc. · FEI 1000125183",
-     "Inspection date: 02/10/2026",
-     "Observation 1: corrective actions not documented in 2 of 5 complaint files; one complaint misclassified as an Inquiry",
-     "Observation 2: PTEN assay validation did not run batches at the maximum mixing time and lacked a statistical rationale for sample size"
-    ],
-    "checks": [
-     "Criteria for classifying complaints versus inquiries and review of reclassification",
-     "Documentation of corrective action and root cause at complaint closure",
-     "Execution of worst-case conditions and statistical sample size rationale in process validation"
-    ]
-   }
-  },
-  {
    "id": "fda483-195312",
-   "render_order": 42,
+   "render_order": 40,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6251,7 +6013,7 @@
   },
   {
    "id": "fda483-195314",
-   "render_order": 43,
+   "render_order": 41,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6421,7 +6183,7 @@
   },
   {
    "id": "fda483-195315",
-   "render_order": 44,
+   "render_order": 42,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6537,7 +6299,7 @@
   },
   {
    "id": "fda483-195316",
-   "render_order": 45,
+   "render_order": 43,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6720,7 +6482,7 @@
   },
   {
    "id": "fda483-195317",
-   "render_order": 46,
+   "render_order": 44,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -6913,7 +6675,7 @@
   },
   {
    "id": "fda483-195320",
-   "render_order": 47,
+   "render_order": 45,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7056,7 +6818,7 @@
   },
   {
    "id": "fda483-195321",
-   "render_order": 48,
+   "render_order": 46,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7218,7 +6980,7 @@
   },
   {
    "id": "fda483-195513",
-   "render_order": 49,
+   "render_order": 47,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7366,7 +7128,7 @@
   },
   {
    "id": "fda483-195802",
-   "render_order": 50,
+   "render_order": 48,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7584,146 +7346,8 @@
    }
   },
   {
-   "id": "fda483-195258",
-   "render_order": 51,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "Snap Diagnostics, LLC.",
-   "title_issue": "호흡노력 센서 고장 CAPA 미흡",
-   "summary": "FDA가 02/13/2026 실사 후 Snap Diagnostics, LLC.에 3건의 관찰사항을 담은 483을 발부했다. 수면무호흡 기록기 SAM Model 9-10000의 호흡노력 센서 고장에 대한 시정조치·위험관리·부적합품 관리가 미흡하다고 지적했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-10-20"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-195258"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "Snap Diagnostics, LLC. · FEI 3000215335"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "02/13/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "제조소/업체: Snap Diagnostics, LLC. · FEI 3000215335",
-    "실사일: 02/13/2026",
-    "CAPA 0072: 호흡노력 센서 고장 4,079대 확인, February 2025부터 미종결 상태로 해당 기기 계속 유통",
-    "부적합 보고서: 02/07/2026에야 개설(문제 확인 후 20개월 이상 경과)"
-   ],
-   "implication": "업체가 스스로 높은 고장률을 확인하고도 부품 변경만 거듭하며 출하를 이어간 점은 CAPA 효과성 검증과 위험 등급 평가가 서로 연결되지 않았다는 신호다. 위해 확률을 제품 수명주기 데이터가 아닌 낮은 수준으로 평가한 사례여서, 고장 이력이 쌓인 부품의 위험 평가를 실제 고장 데이터로 갱신하는지 볼 만하다.",
-   "checks": [
-    "장기 미종결 CAPA의 원인 제거 효과성 검증 여부",
-    "자체 고장률 데이터 기반 위해 확률·위험 등급 재평가",
-    "부적합 의심 제품의 유통 차단 통제 절차"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 3,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "Corrective action was not adequately taken to eliminate the cause of nonconformities in order to prevent recurrence.",
-      "detail": "Specifically, your firm openeda corrective action (CAPA 0072) to address a failure with the effort sensor of the Class II SAM Model 9-10000 Sleep Apnea Recorder (K240100, MNR) and did not adequately implement an action to eliminate the cause of the effort sensor failure. The SAM Model 9- 10000 Sleep Apnea Recorder is intended to be used as an aid that records airflow, breathing effort, and body position for diagnostic evaluation of patients using quantitative and qualitative analysis. Your firm identified 4,079 units out of(6)(4)\" units since (6) (4) that had an effort sensor failure due to the durability issues of the effort sensor material, which caused the failure to record data. Your firm implemented (©) 4)component changes from (6) (4) without adequately eliminating the cause of the effort sensor failure. The corrective action record has been open since February 2025. Your firm continues to distribute the SAM Model 9-10000 Sleep Apnea Recorders with effort sensor components, despite the self-identified high failure rate and the component changes that were implemented to improve performance of the device. Currently, there are (6)(4) units with the original (b) (4) 2ffort sensor",
-      "deficiency_ko": "재발 방지를 위해 부적합의 원인을 제거하는 시정조치가 적절히 취해지지 않았다.",
-      "detail_ko": "구체적으로, 귀사는 Class II SAM Model 9-10000 수면무호흡 기록기(K240100, MNR)의 호흡노력(effort) 센서 고장을 다루기 위해 시정조치(CAPA 0072)를 개설했으나, 호흡노력 센서 고장의 원인을 제거하는 조치를 적절히 이행하지 않았다. SAM Model 9-10000 수면무호흡 기록기는 정량·정성 분석을 이용한 환자 진단 평가를 위해 기류, 호흡노력, 체위를 기록하는 보조기기로 사용하도록 의도되어 있다. 귀사는 (비공개) 이후 (비공개)대 중 4,079대에서 호흡노력 센서 소재의 내구성 문제로 인한 센서 고장이 있었고, 이로 인해 데이터가 기록되지 않았음을 확인했다. 귀사는 (비공개)부터 (비공개) 부품 변경을 시행했으나 호흡노력 센서 고장의 원인을 적절히 제거하지 못했다. 해당 시정조치 기록은 February 2025부터 열려 있는 상태다. 귀사는 스스로 확인한 높은 고장률과 기기 성능 개선을 위해 시행한 부품 변경에도 불구하고 호흡노력 센서 부품이 장착된 SAM Model 9-10000 수면무호흡 기록기를 계속 유통하고 있다. 현재 원래의 (비공개) 호흡노력 센서를 장착한 기기가 (비공개)대 있다."
-     },
-     {
-      "number": "2",
-      "deficiency": "One or more processes for risk management in product realization have not been adequately documented.",
-      "detail": "Specifically, your firm failed to adequately identify the risk and risk control measures to manage the risk of an effort sensor failure of the Class II SAM Model 9-10000 Sleep Apnea Recorder (K240100, MNR). The SAM Model 9-10000 Sleep Apnea Recorder is intended to be used as an aid that records airflow, breathing effort, and body position for diagnostic evaluation of patients using quantitative and qualitative analysis. Your firm identifies the harm of device sensor malfunction to be a delayed diagnosis with a severity level of minor, a probability of harm to be remote, and a low risk level. Your firm did not accurately identify the probability of harm based on the product life cycle, therefore inaccurately identifying a risk level. Based on your firm's current Risk Management Plan, the probability of harm based on the product life cycle should have been identified as probable with a severity level of at minimum, minor; therefore, increasing the risk level to medium. Additionally, the risk control measures identified to address the issue are not adequately identified to prevent the harm of a delay in treatment to the patient. For example, the LED indicates a device error, which doe",
-      "deficiency_ko": "제품 실현 과정의 위험관리 프로세스 중 하나 이상이 적절히 문서화되지 않았다.",
-      "detail_ko": "구체적으로, 귀사는 Class II SAM Model 9-10000 수면무호흡 기록기(K240100, MNR)의 호흡노력 센서 고장 위험을 관리하기 위한 위험과 위험통제 수단을 적절히 파악하지 못했다. SAM Model 9-10000 수면무호흡 기록기는 정량·정성 분석을 이용한 환자 진단 평가를 위해 기류, 호흡노력, 체위를 기록하는 보조기기로 사용하도록 의도되어 있다. 귀사는 기기 센서 오작동의 위해를 진단 지연으로, 심각도를 경미(minor)로, 위해 발생 확률을 희박(remote)으로, 위험 수준을 낮음(low)으로 파악하고 있다. 귀사는 제품 수명주기에 근거한 위해 발생 확률을 정확히 파악하지 않아 위험 수준을 부정확하게 파악했다. 귀사의 현행 위험관리 계획(Risk Management Plan)에 따르면, 제품 수명주기에 근거한 위해 발생 확률은 가능성 높음(probable)으로, 심각도는 최소 경미(minor)로 파악되었어야 하며, 따라서 위험 수준은 중간(medium)으로 상향되었어야 한다. 또한 이 문제를 다루기 위해 파악된 위험통제 수단은 환자의 치료 지연이라는 위해를 방지하기에 적절히 파악되어 있지 않다. 예를 들어, LED는 기기 오류를 표시하는데, 이는"
-     },
-     {
-      "number": "3",
-      "deficiency": "Procedures to define the controls and related responsibilities and authorities for the identification, documentation, segregation, evaluation, and disposition of nonconforming product were not adequately documented.",
-      "detail": "Specifically, your firm failed to adequately define the controls to document and evaluate nonconforming product. Your procedure, \"Control ofNonconforming Product/Processes Procedure\" (QP-009, Rev. L 03/03/2025 and Rev. J, 02/25/2022), requires that all product discovered (b) (4) s nonconforming will be documented in a nonconformance log and either on a paper record ((6)(4)™) or electronically through a (b) (4) . Your firm manufactures the SAM Model 9-10000 Sleep Apnea Recorder (K240100, MNR), which is intended to be used as an aid that records airflow, breathing effort, and body position for diagnostic evaluation ofpatients using quantitative and qualitative analysis. Your firm identified",
-      "deficiency_ko": "부적합품의 식별, 문서화, 격리, 평가 및 처리에 대한 통제와 관련 책임·권한을 규정하는 절차가 적절히 문서화되지 않았다.",
-      "detail_ko": "구체적으로, 귀사는 부적합품을 문서화하고 평가하기 위한 통제를 적절히 규정하지 않았다. 귀사의 절차 \"Control of Nonconforming Product/Processes Procedure\"(QP-009, Rev. L 03/03/2025 및 Rev. J, 02/25/2022)는 (비공개) 부적합으로 발견된 모든 제품을 부적합 로그에 기록하고, 종이 기록((비공개)) 또는 (비공개)를 통해 전자적으로 문서화하도록 요구한다. 귀사는 정량·정성 분석을 이용한 환자 진단 평가를 위해 기류, 호흡노력, 체위를 기록하는 보조기기로 사용하도록 의도된 SAM Model 9-10000 수면무호흡 기록기(K240100, MNR)를 제조한다. 귀사는 확인했다"
-     }
-    ],
-    "inspectors": [
-     "Shuana H Xiong"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "수면무호흡 기록기 SAM Model 9-10000의 호흡노력 센서 고장에 대해 CAPA 0072를 개설했으나 원인(센서 소재 내구성 문제)을 제거하는 조치를 적절히 이행하지 않았다. 4,079대의 센서 고장을 확인하고 부품 변경을 했음에도 원인이 제거되지 않았고, CAPA는 February 2025부터 열린 채로 해당 기기 유통이 계속됐다.",
-      "risk": "데이터 기록 실패가 반복되는 기기가 계속 유통되어 진단 평가에 필요한 데이터 손실이 지속될 수 있다."
-     },
-     {
-      "observation": "센서 고장 위해를 '진단 지연·경미·발생 가능성 희박·저위험'으로 평가해, 제품 수명주기 기준으로는 '가능성 높음(probable)'·중위험이어야 할 위험 수준을 과소평가했다. 위험통제 수단도 LED 오류 표시에 그쳐 데이터 손실과 그에 따른 치료 지연 위해를 막지 못한다.",
-      "risk": "위험 과소평가로 실효성 없는 위험통제가 유지되어 진단·치료 지연이라는 환자 위해가 관리되지 않을 수 있다."
-     },
-     {
-      "observation": "부적합품 관리 절차(QP-009)가 부적합품 기록·평가 통제를 적절히 규정하지 않아, 센서 고장 기기를 부적합 로그에만 기록하고 추가 평가를 문서화하지 않았다. 부적합 가능성이 있는 제품의 유통을 막는 통제도 없었고, 부적합 보고서는 문제 확인 후 20개월 이상 지난 02/07/2026에야 개설됐다.",
-      "risk": "부적합 가능 제품이 평가·격리 없이 출하되어 시장 내 결함 기기 노출이 확대될 수 있다."
-     }
-    ],
-    "inspectional_significance": "세 관찰이 모두 같은 호흡노력 센서 고장 문제에서 비롯되며, CAPA·위험관리·부적합품 관리가 동시에 작동하지 않았다는 점에서 단발성보다는 품질시스템 전반의 체계적(systemic) 결함으로 볼 수 있다. 업체가 스스로 높은 고장률을 확인하고도 장기간 유통을 계속하고 위험 등급을 낮게 유지한 점은 중대도를 높이는 요소다. 데이터 무결성 문제는 관찰에 포함되지 않았다. 세 관찰 모두 '시정 약속(Promised to correct)'으로 기재되어 있으나, 시정이 불충분하면 Warning Letter로 승격될 가능성이 있다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "호흡노력 센서 고장의 근본원인(센서 소재 내구성)을 조사하고 원인을 제거하는 시정조치를 이행한 뒤 CAPA 0072의 효과성을 검증한다.",
-      "제품 수명주기 고장 데이터를 반영해 센서 고장의 위해 확률과 위험 수준을 재평가하고, 데이터 손실을 실제로 방지할 수 있는 위험통제 수단을 수립한다.",
-      "부적합품 관리 절차(QP-009)를 개정해 부적합품의 기록·평가·격리·처리와 부적합 가능 제품의 유통 차단 통제를 규정한다.",
-      "이미 유통 중이거나 출하 대기 중인 기존 센서 부품 장착 기기를 소급 평가하고 처리 방안을 문서화한다."
-     ]
-    },
-    "administrative_risks": "응답이 불충분하거나 후속 실사에서 같은 문제가 반복되면 OAI 분류와 Warning Letter 발부로 이어질 가능성이 있다. 결함이 확인된 기기가 계속 유통된 점에 비추어 후속 재실사가 이뤄질 수 있고, 시정이 장기간 이뤄지지 않으면 consent decree 등 더 강한 조치로 이어질 가능성도 배제하기 어렵다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/195258/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Inadequate CAPA for effort sensor failures",
-    "summary": "FDA issued a Form 483 with three observations to Snap Diagnostics, LLC. after an inspection ending 02/13/2026. The observations concern corrective action, risk management and nonconforming product control for effort sensor failures in the SAM Model 9-10000 Sleep Apnea Recorder.",
-    "implication": "Continuing distribution through repeated component changes despite a self-identified high failure rate signals that CAPA effectiveness checks were not tied to the risk rating. Because the probability of harm was rated remote rather than based on product life cycle data, it is worth checking whether risk assessments for failure-prone components are updated with actual failure data.",
-    "key_facts": [
-     "Firm: Snap Diagnostics, LLC. · FEI 3000215335",
-     "Inspection date: 02/13/2026",
-     "CAPA 0072: 4,079 units with effort sensor failures identified; record open since February 2025 while the device kept being distributed",
-     "Nonconformance report: not opened until 02/07/2026, over 20 months after the issue was identified"
-    ],
-    "checks": [
-     "Effectiveness verification for long-open CAPAs",
-     "Re-rating probability of harm and risk level from in-house failure data",
-     "Controls that block distribution of potentially nonconforming product"
-    ]
-   }
-  },
-  {
    "id": "fda483-195260",
-   "render_order": 52,
+   "render_order": 49,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7831,7 +7455,7 @@
   },
   {
    "id": "fda483-195262",
-   "render_order": 53,
+   "render_order": 50,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -7921,7 +7545,7 @@
   },
   {
    "id": "fda483-195263",
-   "render_order": 54,
+   "render_order": 51,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8013,7 +7637,7 @@
   },
   {
    "id": "fda483-195264",
-   "render_order": 55,
+   "render_order": 52,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8113,7 +7737,7 @@
   },
   {
    "id": "fda483-195265",
-   "render_order": 56,
+   "render_order": 53,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8214,7 +7838,7 @@
   },
   {
    "id": "fda483-195277",
-   "render_order": 57,
+   "render_order": 54,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8391,7 +8015,7 @@
   },
   {
    "id": "fda483-195278",
-   "render_order": 58,
+   "render_order": 55,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8510,7 +8134,7 @@
   },
   {
    "id": "fda483-195279",
-   "render_order": 59,
+   "render_order": 56,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8600,7 +8224,7 @@
   },
   {
    "id": "fda483-195280",
-   "render_order": 60,
+   "render_order": 57,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8725,7 +8349,7 @@
   },
   {
    "id": "fda483-195281",
-   "render_order": 61,
+   "render_order": 58,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -8845,7 +8469,7 @@
   },
   {
    "id": "fda483-195282",
-   "render_order": 62,
+   "render_order": 59,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9043,7 +8667,7 @@
   },
   {
    "id": "fda483-195284",
-   "render_order": 63,
+   "render_order": 60,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9181,7 +8805,7 @@
   },
   {
    "id": "fda483-195285",
-   "render_order": 64,
+   "render_order": 61,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9313,7 +8937,7 @@
   },
   {
    "id": "fda483-195286",
-   "render_order": 65,
+   "render_order": 62,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9433,7 +9057,7 @@
   },
   {
    "id": "fda483-195287",
-   "render_order": 66,
+   "render_order": 63,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9589,7 +9213,7 @@
   },
   {
    "id": "fda483-195289",
-   "render_order": 67,
+   "render_order": 64,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9714,7 +9338,7 @@
   },
   {
    "id": "fda483-195591",
-   "render_order": 68,
+   "render_order": 65,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9843,7 +9467,7 @@
   },
   {
    "id": "fda483-195592",
-   "render_order": 69,
+   "render_order": 66,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -9951,7 +9575,7 @@
   },
   {
    "id": "fda483-195595",
-   "render_order": 70,
+   "render_order": 67,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10101,7 +9725,7 @@
   },
   {
    "id": "fda483-195601",
-   "render_order": 71,
+   "render_order": 68,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10113,8 +9737,8 @@
    "signal_label": "High",
    "type_tag": "483",
    "headline_target": "Genlbet Biopbarmaceuticals SA",
-   "title_issue": "세척 밸리데이션·제염 근거 미흡",
-   "summary": "FDA가 포르투갈 원료·완제의약품 제조소 Genlbet Biopbarmaceuticals SA 실사(실사일 01/31/2023) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 세척 밸리데이션이 세척 난해 부위·최대 로트 크기·보관시간을 대표하지 못한 점, 제염 유효성 연구 부재, 세척 후 노출 시간을 정하지 않은 절차서다.",
+   "title_issue": "공정관리·세척·제염 밸리데이션 근거 미흡",
+   "summary": "FDA가 포르투갈 원료·완제의약품 제조소 Genlbet Biopbarmaceuticals SA 실사(실사일 01/31/2023) 후 483을 발부했다. 판독된 관찰사항 4건은 최대 목표 배치 크기·보류시간·운전 범위를 뒷받침하는 공정관리 데이터 부족, 세척 밸리데이션이 세척 난해 부위·최대 로트 크기·보관시간을 대표하지 못한 점, 제염 유효성 연구 부재, 세척 후 노출 시간을 정하지 않은 절차서다.",
    "facts": [
     {
      "label": "발행일",
@@ -10142,12 +9766,12 @@
    "key_facts": [
     "제조소/업체: Genlbet Biopbarmaceuticals SA · FEI 3011160795",
     "시설 · 유형: Drug Substance/Drug Product Manufacturer · 483",
-    "관찰사항: 3건 판독(2번 설비 세척, 3번 제염, 4번 세척·유지관리 절차서)"
+    "관찰사항: 4건 판독(1번 공정관리, 2번 설비 세척, 3번 제염, 4번 세척·유지관리 절차서)"
    ],
-   "implication": "세척 밸리데이션이 실제 공정의 세척 후 보관시간과 최대 로트 크기를 반영하지 못했다는 지적은 다품목 공용 설비에서 교차오염 방지 근거를 묻는 전형적인 형태다. 자사 세척 밸리데이션이 세척 난해 부위, 최악 로트 크기, 실제 보관시간을 포함하는지 확인해 볼 만하다.",
+   "implication": "공정 성능 적격성평가 배치가 승인된 최대 목표 배치 크기를 대표하지 못한다는 지적과, 세척 밸리데이션이 실제 공정의 세척 후 보관시간과 최대 로트 크기를 반영하지 못했다는 지적은 다품목 공용 설비에서 공정·교차오염 관리의 근거를 묻는 전형적인 형태다. 자사 밸리데이션 배치가 최악 조건(최대 배치, 세척 난해 부위, 실제 보관시간)을 포함하는지 확인해 볼 만하다.",
    "checks": [
-    "세척 밸리데이션의 세척 난해 부위·최대 로트 크기 포함 여부",
-    "세척 후 보관시간(clean hold time) 설정 근거",
+    "공정 성능 적격성평가 배치 크기가 최대 목표 배치 크기를 대표하는지 여부",
+    "세척 밸리데이션의 세척 난해 부위·최대 로트 크기·보관시간 포함 여부",
     "제염제 유효성 연구 수행 여부"
    ],
    "merged_count": 1,
@@ -10162,24 +9786,31 @@
     }
    },
    "en": {
-    "title_issue": "Weak cleaning validation and decontamination",
-    "summary": "FDA issued a Form 483 to Genlbet Biopbarmaceuticals SA, a drug substance and drug product manufacturer in Portugal, after an inspection ending 01/31/2023. Three legible observations (2 to 4) cover cleaning validation that did not represent hard-to-clean areas, maximum lot size or hold times, no decontamination efficacy study, and procedures that do not set how long cleaned equipment may stay exposed.",
-    "implication": "Cleaning validation that did not reflect real post-cleaning hold times and maximum lot size is a typical way inspectors probe cross-contamination controls on shared equipment. Firms may want to check that their own cleaning validation covers hard-to-clean areas, worst-case lot size and actual hold times.",
+    "title_issue": "Process control and cleaning validation gaps",
+    "summary": "FDA issued a Form 483 to Genlbet Biopbarmaceuticals SA, a drug substance and drug product manufacturer in Portugal, after an inspection ending 01/31/2023. Four legible observations cover process control data that did not support the maximum target batch size, hold times or operating ranges, cleaning validation that did not represent hard-to-clean areas, maximum lot size or hold times, no decontamination efficacy study, and procedures that do not set how long cleaned equipment may stay exposed.",
+    "implication": "Process performance qualification batches that did not represent the approved maximum target batch size, and cleaning validation that did not reflect real post-cleaning hold times and maximum lot size, are a typical way inspectors probe process and cross-contamination controls on shared equipment. Firms may want to check that their own validation batches cover worst-case conditions: maximum batch size, hard-to-clean areas and actual hold times.",
     "key_facts": [
      "Facility: Genlbet Biopbarmaceuticals SA, FEI 3011160795",
      "Establishment type: Drug Substance/Drug Product Manufacturer",
-     "Observations legible: 2 (equipment cleaning), 3 (decontamination), 4 (cleaning and maintenance procedures)"
+     "Observations legible: 1 (process control), 2 (equipment cleaning), 3 (decontamination), 4 (cleaning and maintenance procedures)"
     ],
     "checks": [
-     "Hard-to-clean areas and maximum lot size in cleaning validation",
-     "Basis for clean hold time limits",
+     "Whether PPQ batch sizes represent the maximum target batch size",
+     "Hard-to-clean areas, maximum lot size and hold times in cleaning validation",
      "Decontaminant efficacy studies"
     ]
    },
    "deterministic_detail": {
     "type": "fda_483_observations",
-    "count": 3,
+    "count": 4,
     "observations": [
+     {
+      "number": "1",
+      "deficiency": "There are no written procedures for production and process controls designed to assure that the| __,,, have the identity, strength, quality, and purity they purport or are represented to possess.",
+      "detail": "Specifically, there is insufficient data to support the maximum target batch size, - _ hold time, and process control parameters for the manufacture of ww . a.The|~ executed batch sizes for the process performance qualification an | sw ~~) do not represent the maximum. target batch size of vom as per the current approved master batch record, wo : b. There is insufficient data to ensure that the uniformity of the formulated _,,, containing _,,, - within the is maintained throughout the hold time and during the c. The operating ranges specified during -— manufacturing are not optimized. For example, an the manufacturing batch record, Curent operatingrangesfof ats respectively. d. There is no| detection device toensure thatthe = +~—==—————_jis freeof|.. _ contamination. e. The supplier for ene respectively), used for the = steps during the manufacturing of __,, , allows the presence ofparticles __... . A toxicological assessment was not performed to evaluate the safety of the) . - hile using which are not particulate-free.",
+      "deficiency_ko": "(비공개)가 갖추어야 한다고 표방하거나 표시한 확인·함량·품질·순도를 보장하도록 설계된 생산 및 공정관리 서면 절차가 없다.",
+      "detail_ko": "구체적으로, (비공개) 제조의 최대 목표 배치 크기, (비공개) 보류시간, 공정관리 변수를 뒷받침하는 데이터가 충분하지 않다. a. 공정 성능 적격성평가 및 (판독 불가)에 실행된 배치 크기가 현재 승인된 마스터 배치 기록서상의 최대 목표 배치 크기를 대표하지 않는다. b. 보류시간 동안과 (판독 불가) 동안 (비공개)를 함유한 제형(비공개) 내에서 균일성이 유지되는지 보장할 데이터가 충분하지 않다. c. (비공개) 제조 중 규정된 운전 범위가 최적화되어 있지 않다. 예를 들어 제조 배치 기록서의 현재 운전 범위는 (판독 불가)이다. d. (비공개)에 (판독 불가) 오염이 없음을 보장하는 검출 장치가 없다. e. (비공개) 제조의 (비공개) 단계에 사용되는 (비공개) 공급업체는 입자의 존재를 허용하며, 입자가 없지 않은 (비공개)를 사용하면서 (비공개)의 안전성을 평가하는 독성학적 평가를 수행하지 않았다."
+     },
      {
       "number": "2",
       "deficiency": "Equipment cleaning processes are inadequate.",
@@ -10207,7 +9838,7 @@
   },
   {
    "id": "fda483-195627",
-   "render_order": 72,
+   "render_order": 69,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10362,7 +9993,7 @@
   },
   {
    "id": "fda483-195673",
-   "render_order": 73,
+   "render_order": 70,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10540,7 +10171,7 @@
   },
   {
    "id": "2bfc7f4cc17f",
-   "render_order": 74,
+   "render_order": 71,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10662,7 +10293,7 @@
   },
   {
    "id": "7eb14a246e9e",
-   "render_order": 75,
+   "render_order": 72,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10777,7 +10408,7 @@
   },
   {
    "id": "8b9b6af44436",
-   "render_order": 76,
+   "render_order": 73,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -10923,7 +10554,7 @@
   },
   {
    "id": "9995c30e33c0",
-   "render_order": 77,
+   "render_order": 74,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11069,7 +10700,7 @@
   },
   {
    "id": "e68818062d22",
-   "render_order": 78,
+   "render_order": 75,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11209,7 +10840,7 @@
   },
   {
    "id": "fda483-195241",
-   "render_order": 79,
+   "render_order": 76,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11369,7 +11000,7 @@
   },
   {
    "id": "fda483-195242",
-   "render_order": 80,
+   "render_order": 77,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11505,7 +11136,7 @@
   },
   {
    "id": "fda483-195243",
-   "render_order": 81,
+   "render_order": 78,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11661,7 +11292,7 @@
   },
   {
    "id": "fda483-195244",
-   "render_order": 82,
+   "render_order": 79,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11797,7 +11428,7 @@
   },
   {
    "id": "fda483-195245",
-   "render_order": 83,
+   "render_order": 80,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -11932,7 +11563,7 @@
   },
   {
    "id": "fda483-195249",
-   "render_order": 84,
+   "render_order": 81,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12074,7 +11705,7 @@
   },
   {
    "id": "fda483-195251",
-   "render_order": 85,
+   "render_order": 82,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12216,7 +11847,7 @@
   },
   {
    "id": "fda483-195252",
-   "render_order": 86,
+   "render_order": 83,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12411,7 +12042,7 @@
   },
   {
    "id": "fda483-195253",
-   "render_order": 87,
+   "render_order": 84,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12524,7 +12155,7 @@
   },
   {
    "id": "fda483-195634",
-   "render_order": 88,
+   "render_order": 85,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12681,7 +12312,7 @@
   },
   {
    "id": "fda483-195638",
-   "render_order": 89,
+   "render_order": 86,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12832,7 +12463,7 @@
   },
   {
    "id": "fda483-195640",
-   "render_order": 90,
+   "render_order": 87,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -12922,7 +12553,7 @@
   },
   {
    "id": "fda483-195646",
-   "render_order": 91,
+   "render_order": 88,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13012,7 +12643,7 @@
   },
   {
    "id": "fda483-195655",
-   "render_order": 92,
+   "render_order": 89,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13131,7 +12762,7 @@
   },
   {
    "id": "fda483-195665",
-   "render_order": 93,
+   "render_order": 90,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13315,7 +12946,7 @@
   },
   {
    "id": "fda483-195666",
-   "render_order": 94,
+   "render_order": 91,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -13367,8 +12998,15 @@
    ],
    "deterministic_detail": {
     "type": "fda_483_observations",
-    "count": 6,
+    "count": 7,
     "observations": [
+     {
+      "number": "1",
+      "deficiency": "The Master Batch Record for®® does not reflect the manufacturing process.",
+      "detail": "Specifically, You failed to record process control activities during the manufacturing of DS Batchew The changes made for the process parameters for the preparation of ») (4) used for theme were not properly documented in the Master Batch Kecord for the specified batches. Batches o@ were released. Quality assurance of the batch release process is deficient.",
+      "deficiency_ko": "(비공개)의 마스터 배치 기록서가 제조 공정을 반영하지 않는다.",
+      "detail_ko": "구체적으로, 원료의약품(DS) 배치 (비공개) 제조 중 공정관리 활동을 기록하지 않았다. (비공개) 제조에 사용된 (비공개) 조제의 공정 변수에 대한 변경이 해당 배치의 마스터 배치 기록서에 제대로 문서화되지 않았다. 배치 (비공개)는 출하되었다. 배치 출하 과정의 품질보증이 미흡하다."
+     },
      {
       "number": "2",
       "deficiency": "You failed to take adequate corrective action preventative action (CAPA) for a manufacturing system, resolution of an aberrant condition in a timely manner.",
@@ -13475,7 +13113,7 @@
   },
   {
    "id": "9e8a6f534dc5",
-   "render_order": 95,
+   "render_order": 92,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "EMA",
@@ -13550,7 +13188,7 @@
   },
   {
    "id": "who-whopir-96b76d34d79b",
-   "render_order": 96,
+   "render_order": 93,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -13733,7 +13371,7 @@
   },
   {
    "id": "who-whopir-8bac486f0f4c",
-   "render_order": 97,
+   "render_order": 94,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -13923,7 +13561,7 @@
   },
   {
    "id": "who-whopir-af4a56516228",
-   "render_order": 98,
+   "render_order": 95,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "WHO",
@@ -14113,7 +13751,7 @@
   },
   {
    "id": "gmpinspect-1Q5NxQxCVnP",
-   "render_order": 99,
+   "render_order": 96,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -14239,7 +13877,7 @@
   },
   {
    "id": "gmpinspect-1Q5Nv9G4oko",
-   "render_order": 100,
+   "render_order": 97,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -14319,7 +13957,7 @@
   },
   {
    "id": "admin-2026007579",
-   "render_order": 101,
+   "render_order": 98,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14421,7 +14059,7 @@
   },
   {
    "id": "admin-2026007497",
-   "render_order": 102,
+   "render_order": 99,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14525,7 +14163,7 @@
   },
   {
    "id": "admin-2026007515",
-   "render_order": 103,
+   "render_order": 100,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14633,7 +14271,7 @@
   },
   {
    "id": "admin-2026007516",
-   "render_order": 104,
+   "render_order": 101,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14737,7 +14375,7 @@
   },
   {
    "id": "admin-2026007495",
-   "render_order": 105,
+   "render_order": 102,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14843,7 +14481,7 @@
   },
   {
    "id": "admin-2026007595",
-   "render_order": 106,
+   "render_order": 103,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -14952,7 +14590,7 @@
   },
   {
    "id": "admin-2026007596",
-   "render_order": 107,
+   "render_order": 104,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15061,7 +14699,7 @@
   },
   {
    "id": "admin-2026007597",
-   "render_order": 108,
+   "render_order": 105,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15170,7 +14808,7 @@
   },
   {
    "id": "admin-2026007598",
-   "render_order": 109,
+   "render_order": 106,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15277,7 +14915,7 @@
   },
   {
    "id": "admin-2026007599",
-   "render_order": 110,
+   "render_order": 107,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15382,7 +15020,7 @@
   },
   {
    "id": "admin-2026007600",
-   "render_order": 111,
+   "render_order": 108,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15483,7 +15121,7 @@
   },
   {
    "id": "admin-2026007601",
-   "render_order": 112,
+   "render_order": 109,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15592,7 +15230,7 @@
   },
   {
    "id": "admin-2026007602",
-   "render_order": 113,
+   "render_order": 110,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15700,7 +15338,7 @@
   },
   {
    "id": "admin-2026007615",
-   "render_order": 114,
+   "render_order": 111,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15806,7 +15444,7 @@
   },
   {
    "id": "admin-2026007603",
-   "render_order": 115,
+   "render_order": 112,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -15915,7 +15553,7 @@
   },
   {
    "id": "recall-00b44c39f0ef",
-   "render_order": 116,
+   "render_order": 113,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16001,7 +15639,7 @@
   },
   {
    "id": "recall-076361226898",
-   "render_order": 117,
+   "render_order": 114,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16086,7 +15724,7 @@
   },
   {
    "id": "recall-5b9a6ba180fb",
-   "render_order": 118,
+   "render_order": 115,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16174,7 +15812,7 @@
   },
   {
    "id": "recall-5d277daeab3d",
-   "render_order": 119,
+   "render_order": 116,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16260,7 +15898,7 @@
   },
   {
    "id": "recall-64e592fa696e",
-   "render_order": 120,
+   "render_order": 117,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16345,7 +15983,7 @@
   },
   {
    "id": "recall-6e6ea956ba8b",
-   "render_order": 121,
+   "render_order": 118,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16430,7 +16068,7 @@
   },
   {
    "id": "recall-86aedfb4b757",
-   "render_order": 122,
+   "render_order": 119,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16515,7 +16153,7 @@
   },
   {
    "id": "recall-9c61534d3fcd",
-   "render_order": 123,
+   "render_order": 120,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16600,7 +16238,7 @@
   },
   {
    "id": "recall-a3321198dd9f",
-   "render_order": 124,
+   "render_order": 121,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16685,7 +16323,7 @@
   },
   {
    "id": "recall-ac0329439ba5",
-   "render_order": 125,
+   "render_order": 122,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16770,7 +16408,7 @@
   },
   {
    "id": "recall-f03bf31e9833",
-   "render_order": 126,
+   "render_order": 123,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16857,7 +16495,7 @@
   },
   {
    "id": "recall-bb7341be805b",
-   "render_order": 127,
+   "render_order": 124,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -16944,7 +16582,7 @@
   },
   {
    "id": "hc-82808",
-   "render_order": 128,
+   "render_order": 125,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -17036,7 +16674,7 @@
   },
   {
    "id": "recall-4691559975d0",
-   "render_order": 129,
+   "render_order": 126,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -17121,7 +16759,7 @@
   },
   {
    "id": "recall-7ce217fb8ea2",
-   "render_order": 130,
+   "render_order": 127,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -17206,7 +16844,7 @@
   },
   {
    "id": "hc-82831",
-   "render_order": 131,
+   "render_order": 128,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -17296,7 +16934,7 @@
   },
   {
    "id": "D-0002-2027",
-   "render_order": 132,
+   "render_order": 129,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17440,7 +17078,7 @@
   },
   {
    "id": "D-0012-2027",
-   "render_order": 133,
+   "render_order": 130,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17553,7 +17191,7 @@
   },
   {
    "id": "D-0013-2027",
-   "render_order": 134,
+   "render_order": 131,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17663,7 +17301,7 @@
   },
   {
    "id": "D-0014-2027",
-   "render_order": 135,
+   "render_order": 132,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17793,7 +17431,7 @@
   },
   {
    "id": "D-0016-2027",
-   "render_order": 136,
+   "render_order": 133,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -17928,7 +17566,7 @@
   },
   {
    "id": "D-0017-2027",
-   "render_order": 137,
+   "render_order": 134,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -18058,7 +17696,7 @@
   },
   {
    "id": "D-0036-2027",
-   "render_order": 138,
+   "render_order": 135,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

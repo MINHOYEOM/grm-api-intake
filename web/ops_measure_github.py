@@ -55,6 +55,11 @@ ONTIME_GRACE_STRICT_MIN = 60    # 엄격 창(분)
 #   newsletter-send    월요일 뉴스레터 발송 창
 #   db-backup          주 1회 암호화 DB 백업(일요일 밤)
 # 6시간 주기 점검(stranded-batch-pr)·일일 번역·색인 같은 배치는 한 회차 밀려도 다음 회차가 이어받아 일반 창.
+# 엄격 대상은 '주기(cycle)' 단위로 센다 — 여러 cron 슬롯이 서로 이어받는 구조(delta-bridge 일 22–23·월 0–4시 UTC 30분마다,
+# publish-watchdog 월 0·2·4시, newsletter-send 월 5·6·7시)라 슬롯마다 재면 첫 슬롯이 밀려도 다음 슬롯이 일을 해낸 것을
+# 놓친 것으로 센다. 앞 슬롯과 CYCLE_GAP_MIN 이하 간격이면 같은 주기이고, 한 주기는 첫 슬롯 +1시간 안에
+# 성공(진행 중 포함) 실행이 하나라도 시작되면 제때다. 하루 1회(intake)·주 1회(db-backup)는 슬롯 1개 = 주기 1개.
+CYCLE_GAP_MIN = 120
 ONTIME_STRICT_WORKFLOWS = frozenset({
     "grm-delta-bridge.yml", "grm-intake.yml", "grm-publish-watchdog.yml",
     "grm-newsletter-send.yml", "grm-db-backup.yml",
@@ -208,6 +213,18 @@ def fires_per_day(expr: str) -> int:
     return len(_cron_field(mi, 0, 59)) * len(_cron_field(ho, 0, 23))
 
 
+def cycles(fires: list[dt.datetime]) -> list[tuple[dt.datetime, dt.datetime]]:
+    """정렬된 예정 시각을 주기로 묶는다: 앞 슬롯과 CYCLE_GAP_MIN(분) 이하로 이어지면 같은 주기(서로 이어받는 반복 슬롯).
+    하루 1회·주 1회 cron 은 슬롯 1개 = 주기 1개. 반환: (첫 슬롯, 마지막 슬롯) 목록."""
+    out: list[tuple[dt.datetime, dt.datetime]] = []
+    for f in fires:
+        if out and f - out[-1][1] <= dt.timedelta(minutes=CYCLE_GAP_MIN):
+            out[-1] = (out[-1][0], f)
+        else:
+            out.append((f, f))
+    return out
+
+
 def ontime(schedules: dict[str, list[str]], runs_by_wf: dict[str, list[dict[str, Any]]],
            starts: dict[str, dt.datetime], now: dt.datetime,
            strict: Iterable[str] | None = None) -> tuple[float, str]:
@@ -226,6 +243,22 @@ def ontime(schedules: dict[str, list[str]], runs_by_wf: dict[str, list[dict[str,
         fires = sorted({f for c in crons for f in cron_fires(c, start, end)})
         created = sorted(t for t in (parse_ts(r.get("created_at")) for r in runs_by_wf.get(wf, [])
                                      if r.get("event") == "schedule") if t)
+        if is_strict:  # 주기 단위: 한 주기의 첫 슬롯 +창 안에 성공(진행 중 포함) 실행이 하나라도 시작됐으면 제때
+            ok = sorted(t for t in (parse_ts(r.get("created_at")) for r in runs_by_wf.get(wf, [])
+                                    if r.get("event") == "schedule"
+                                    and (r.get("conclusion") == "success" or r.get("status") != "completed")) if t)
+            anyrun = created
+            for first, last in cycles(fires):
+                n[k][0] += 1
+                if any(first - dt.timedelta(minutes=2) <= t <= first + dt.timedelta(minutes=grace) for t in ok):
+                    n[k][1] += 1
+                    continue
+                bad[wf] = bad.get(wf, 0) + 1
+                if any(first < t <= last + dt.timedelta(hours=ONTIME_LATE_MAX_H) for t in anyrun):
+                    late += 1
+                else:
+                    gone += 1
+            continue
         used: set[int] = set()
         missed: list[dt.datetime] = []
         for f in fires:

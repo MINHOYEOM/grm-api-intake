@@ -283,6 +283,44 @@ class GithubMeasureTest(unittest.TestCase):
         self.assertIn("지각 1·누락 0", note)
         self.assertIn("엄격 지연: s.yml".replace("s.yml", "s"), note)   # grm- 접두·.yml 은 떼고 적는다
 
+    def _cycle(self, run_offsets, cron="17 18,19 * * *", conclusion="success", wf="s.yml"):
+        """엄격 대상 하루 2슬롯(18:17·19:17 UTC = 한 주기). run_offsets: 첫 슬롯 기준 실행 시작(분)."""
+        now = dt.datetime(2026, 11, 8, 6, 0, tzinfo=UTC)
+        start = dt.datetime(2026, 11, 7, 0, 0, tzinfo=UTC)   # 주기 1개: 11-07 18:17(첫)~19:17(끝)
+        base = dt.datetime(2026, 11, 7, 18, 17, tzinfo=UTC)
+        runs = [{"event": "schedule", "conclusion": conclusion, "status": "completed",
+                 "created_at": (base + dt.timedelta(minutes=m)).strftime("%Y-%m-%dT%H:%M:%SZ")} for m in run_offsets]
+        return gm.ontime({wf: [cron]}, {wf: runs}, {wf: start}, now, strict=(wf,))
+
+    def test_ontime_strict_cycle_unit(self):
+        # 같은 주기의 두 슬롯은 1건으로 센다(슬롯 2건이 아니다)
+        v, note = self._cycle([59])
+        self.assertEqual(v, 100.0)
+        self.assertIn("엄격 1/1", note)
+        # 첫 슬롯 +61분: 둘째 슬롯 시각(+60) 직후라도 주기는 첫 슬롯 기준이라 지각
+        v, note = self._cycle([61])
+        self.assertEqual(v, 0.0)
+        self.assertIn("엄격 0/1", note)
+        self.assertIn("지각 1·누락 0", note)
+        # 첫 슬롯은 지각이어도 둘째 슬롯 실행(첫 슬롯 +59분 이내)이 있으면 제때 — 이어받는 구조
+        v, _ = self._cycle([200, 59])
+        self.assertEqual(v, 100.0)
+        # 실패 실행은 제때로 세지 않는다
+        v, note = self._cycle([30], conclusion="failure")
+        self.assertEqual(v, 0.0)
+        self.assertIn("엄격 지연: s", note)
+        # 실행이 없으면 누락
+        v, note = self._cycle([])
+        self.assertIn("지각 0·누락 1", note)
+
+    def test_ontime_cycles_split_by_gap(self):
+        t0 = dt.datetime(2026, 11, 7, 18, 17, tzinfo=UTC)
+        h = dt.timedelta(minutes=30)
+        # 30분 간격 4슬롯 = 1주기, 3시간 넘게 벌어지면 새 주기
+        fires = [t0, t0 + h, t0 + 2 * h, t0 + 3 * h, t0 + 10 * h]
+        self.assertEqual(gm.cycles(fires), [(t0, t0 + 3 * h), (t0 + 10 * h, t0 + 10 * h)])
+        self.assertEqual(gm.CYCLE_GAP_MIN, 120)
+
     def test_ontime_strict_set_membership(self):
         # 같은 61분 지연이라도 엄격 대상이 아니면 일반 창이라 정시
         self.assertEqual(self._one_fire(61, wf="a.yml", strict=("other.yml",))[0], 100.0)

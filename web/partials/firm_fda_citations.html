@@ -1,0 +1,23 @@
+{#- [FDA 지적 조항 × 업체 2026-11-10] 업체 페이지 블록 — fda_cit = clause_firms_page.firm_view().
+    매칭된 제조소가 없거나 스냅샷이 없으면 아무것도 내지 않는다. 사실(조항·실사 수·실사일)만 —
+    해석·평가 문구 없음. 숫자는 뷰에서만 파생. clause_slugs = 그 언어 트리의 조항 페이지 슬러그. -#}
+{%- if fda_cit %}
+{% include "partials/clause_citation_style.html" %}
+<section class="cc-sec ff-fc">
+  <h2 class="ff-sec-h">{{ _('FDA 실사에서 지적받은 21 CFR 조항') }}</h2>
+  <p class="cc-note">{{ _("FDA 실사 지적 데이터에서 이 업체명으로 올라 있는 제조소의 실사 {n}건({period})에 인용된 조항입니다.", n=fda_cit.inspections, period=fda_cit.period) }}</p>
+  <div class="cc-wrapx"><table class="cc-tbl">
+    <thead><tr><th>{{ _('FDA 표기') }}</th><th class="cc-hide"></th><th class="n">{{ _('실사') }}</th><th class="n">{{ _('최근 실사일') }}</th></tr></thead>
+    <tbody>
+    {%- for c in fda_cit.codes %}
+    <tr><td class="cc-code">{% if c.section and (c.section | replace('.', '-')) in clause_slugs %}<a href="{{ rel_root }}findings/clause/{{ c.section | replace('.', '-') }}/">{{ c.code }}</a>{% else %}{{ c.code }}{% endif %}</td><td class="cc-t cc-hide">{{ c.title }}</td><td class="n">{{ c.inspections }}</td><td class="n">{{ c.last }}</td></tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  {%- if fda_cit.more %}
+  <p class="cc-note">{{ _('실사 수 순으로 상위 {k}개만 실었습니다(전체 {n}개).', k=fda_cit.codes | length, n=fda_cit.n_codes) }}</p>
+  {%- endif %}
+  <p class="cc-note">{{ _('제조소 {n}곳', n=fda_cit.sites | length) }}: {% for s in fda_cit.sites %}{{ s.name }}{% if s.place %} ({{ s.place }}){% endif %} · {{ _('실사 {n}건', n=s.inspections) }}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+  <p class="cc-note">{{ _("출처: {src}, {asof} 기준. 지적이 1건 이상 나온 실사만 들어 있고, 한 실사에서 같은 조항을 여러 번 인용해도 1건으로 셉니다. 업체명과 법인격이 이 페이지 문서의 표기와 같고 한 나라에만 있는 제조소만 이었습니다.", src=fda_cit.source, asof=fda_cit.as_of) }}</p>
+</section>
+{%- endif %}

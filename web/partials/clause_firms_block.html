@@ -1,0 +1,20 @@
+{#- [FDA 지적 조항 × 업체 2026-11-10] 조항 페이지 블록 — firm_cit = clause_firms_page.clause_view().
+    스냅샷이 없거나 이 섹션을 인용한 제조소가 없으면 아무것도 내지 않는다. 사실만(이름·소재지·
+    실사 수·최근 실사일). 업체 페이지 링크는 뷰가 매칭해 넘긴 슬러그가 있을 때만. -#}
+{%- if firm_cit %}
+{#- 같은 페이지의 인용 빈도 블록(cit)이 이미 .cc-* 스타일을 냈으면 다시 싣지 않는다. -#}
+{% if not cit %}{% include "partials/clause_citation_style.html" %}{% endif %}
+<section class="fx-sec cc-sec">
+  <h2 class="fx-sec-h">{{ _('이 조항으로 FDA 실사 지적을 받은 업체') }}</h2>
+  <p class="cc-note">{{ _("이 조항을 인용받은 제조소 {n}곳 중 실사 수, 최근 실사일 순으로 {k}곳입니다.", n="{:,}".format(firm_cit.total), k=firm_cit.rows | length) }}</p>
+  <div class="cc-wrapx"><table class="cc-tbl">
+    <thead><tr><th>{{ _('업체') }}</th><th class="cc-hide">{{ _('소재지') }}</th><th class="n">{{ _('실사') }}</th><th class="n">{{ _('최근 실사일') }}</th></tr></thead>
+    <tbody>
+    {%- for r in firm_cit.rows %}
+    <tr><td class="cc-code">{% if r.slug %}<a href="{{ rel_root }}findings/firm/{{ r.slug }}/">{{ r.name }}</a>{% else %}{{ r.name }}{% endif %}</td><td class="cc-t cc-hide">{{ r.place }}</td><td class="n">{{ r.inspections }}</td><td class="n">{{ r.last }}</td></tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  <p class="cc-note">{{ _("출처: {src}, {asof} 기준. 지적이 1건 이상 나온 실사만 들어 있고, 하위항까지 합쳐 이 조항을 인용한 실사를 셉니다. 업체 페이지 링크는 업체명과 법인격이 일치하는 곳에만 겁니다.", src=firm_cit.source, asof=firm_cit.as_of) }}</p>
+</section>
+{%- endif %}

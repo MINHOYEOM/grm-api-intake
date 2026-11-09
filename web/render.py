@@ -122,6 +122,8 @@ from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
 import graph_export  # noqa: E402
 import clause_citations  # noqa: E402
+# [FDA 지적 조항 × 업체 2026-11-10] 업체 페이지·조항 페이지 블록(로더·매칭·뷰).
+import clause_firms_page  # noqa: E402
 # [수입경보 1단계 2026-11-10] 이름 정규화·경보 URL 상수의 단일 정의(수집기 모듈 — stdlib 만 import).
 import collect_fda_import_alert as _ia  # noqa: E402
 # [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
@@ -6430,8 +6432,23 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 검색 실측(2026-09-03): `21 CFR 211.192` 류 쿼리는 결과가 전부 영문 법령 사이트라
     # 국문 해설이 공백이다. 데이터는 커밋 정본 셋(findings_docs·library/cfr·glossary)에서만
     # 나오므로 facets 유무와 무관하게 만들어진다.
-    def emit_clause_tree(views, mkpage, emit_page, tr, lang_key, agency_labels):
-        """조항 색인 + 조항 N장 — 구현을 두 벌 두지 않는다(두 벌이면 언젠가 갈라진다)."""
+    def register_clause_paths(views):
+        """조항 색인 + 조항 N장의 sitemap 경로(한국어 트리). [2026-11-10] 렌더(emit_clause_tree)는
+        업체 페이지 슬러그가 정해진 뒤로 옮겼고, sitemap 순서는 바뀌지 않게 등록만 여기 남긴다."""
+        if not views:
+            return
+        facet_paths.append((page("findings/clause/").site_path,
+                            max((s.get("published_date") or ""
+                                 for c in views for s in c["samples"]), default="")))
+        for clause in views:
+            facet_paths.append((page(f"findings/clause/{clause['slug']}/").site_path,
+                                max((s.get("published_date") or ""
+                                     for s in clause["samples"]), default="")))
+
+    def emit_clause_tree(views, mkpage, emit_page, tr, lang_key, agency_labels,
+                         firm_cit_by_section=None):
+        """조항 색인 + 조항 N장 — 구현을 두 벌 두지 않는다(두 벌이면 언젠가 갈라진다).
+        sitemap 등록은 register_clause_paths 가 한다(lang_key 는 호출 쪽 구분용으로 남긴다)."""
         if not views:
             return
         clause_views = views
@@ -6448,10 +6465,6 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
             citations_ready=bool(citations_data),
         )
-        index_mod = max((s.get("published_date") or ""
-                         for c in clause_views for s in c["samples"]), default="")
-        if lang_key == DEFAULT_LANG:
-            facet_paths.append((clause_index.site_path, index_mod))
 
         # 형제 목록은 전 조항 공통(같은 값 재사용 — 페이지마다 다시 만들지 않는다).
         sibs = [{"slug": c["slug"], "code": c["code"]} for c in clause_views]
@@ -6466,11 +6479,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     (tr("조항별"), "findings/clause/"), (clause["code"], "")]),
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
                 cit=clause_citations.section_view(citations_data, clause["section"]),
+                firm_cit=(firm_cit_by_section or {}).get(clause["section"]),
             )
-            clause_mod = max((s.get("published_date") or ""
-                              for s in clause["samples"]), default="")
-            if lang_key == DEFAULT_LANG:
-                facet_paths.append((clause_page.site_path, clause_mod))
 
     _clause_agency_labels = (docs_data or {}).get("agency_labels") or (
         facets.get("agency_labels") if facets else {}) or {}
@@ -6492,9 +6502,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if citations_data:
         emit_citations(page, emit, tr, {c["slug"] for c in clause_views}, DEFAULT_LANG)
         emit_citations(en_page, en_emit, en_tr, {c["slug"] for c in clause_views_en}, "en")
-    emit_clause_tree(clause_views, page, emit, tr, DEFAULT_LANG, _clause_agency_labels)
-    emit_clause_tree(clause_views_en, en_page, en_emit, en_tr, "en",
-                     {k: en_tr(v) for k, v in _clause_agency_labels.items()})
+    # [2026-11-10] 렌더는 업체 페이지 슬러그가 정해진 뒤(아래 docs_data 블록)로 옮겼다 —
+    # 조항 페이지의 "이 조항으로 지적받은 업체" 목록이 업체 페이지로 링크한다. 경로 등록만 여기.
+    register_clause_paths(clause_views)
 
     # [지적 사례 화면] 주제별 규제기관(PMDA·MHRA) 지적 사례 — 한 장. 한국어 화면은 참고용 번역 + 원문, 영어 화면은 원문만.
     if example_data:
@@ -6653,6 +6663,29 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             if not slug:
                 return None
             return slug if (lg == DEFAULT_LANG or slug in en_firm_slugs) else None
+
+        # [FDA 지적 조항 × 업체 2026-11-10] 업체 페이지 ↔ 원장 제조소 매칭(규칙은
+        # clause_firms_page 모듈 docstring). 업체 페이지와 같은 스위치 — 문서 페이지를 끈 빌드엔
+        # 업체 페이지가 없어 링크가 고아가 된다. 스냅샷이 없으면 빈 값 → 두 블록 다 없음.
+        _cf_snapshot = clause_firms_page.load_snapshot() if render_doc_pages else None
+        firm_cit_sites = clause_firms_page.link_firm_pages(
+            _cf_snapshot,
+            {fp["key"]: [d.get("firm_name") or "" for d in by_firm.get(fp["key"], [])]
+             for fp in firm_pages},
+            lambda n: _canonical_firm_key(_normalize_firm_name(n)))
+        _cf_slug_by_site = {clause_firms_page.firm_id(s): firm_page_slug_by_key[k]
+                            for k, ss in firm_cit_sites.items() for s in ss}
+        for _lg, _views, _mk, _em, _t, _labels in (
+                (DEFAULT_LANG, clause_views, page, emit, tr, _clause_agency_labels),
+                ("en", clause_views_en, en_page, en_emit, en_tr,
+                 {k: en_tr(v) for k, v in _clause_agency_labels.items()})):
+            _ok_slugs = None if _lg == DEFAULT_LANG else en_firm_slugs
+            emit_clause_tree(_views, _mk, _em, _t, _lg, _labels, firm_cit_by_section={
+                c["section"]: clause_firms_page.clause_view(
+                    _cf_snapshot, c["section"],
+                    lambda f, _o=_ok_slugs: clause_firms_page.slug_if(
+                        _cf_slug_by_site.get(clause_firms_page.firm_id(f)), _o))
+                for c in _views} if _cf_snapshot else None)
 
         # 기관×연도 그룹. 정렬은 전부 결정론(연도 내림차순·같은 연도 안은 날짜 내림차순).
         by_ay: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -6974,6 +7007,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              if _lg == DEFAULT_LANG
                              or not _HANGUL_RE.search(a["firm_name"] + a["place"])],
                          import_alerts_on=import_alerts_on,
+                         # [FDA 지적 조항 × 업체 2026-11-10] 원천(FDA)이 영문이라 두 트리 같은 값.
+                         fda_cit=clause_firms_page.firm_view(
+                             firm_cit_sites.get(fp["key"], []), _cf_snapshot or {}),
+                         clause_slugs={c["slug"] for c in (
+                             clause_views if _lg == DEFAULT_LANG else clause_views_en)},
                          measured_on=docs_data.get("measured_on", ""),
                          min_findings=docs_data.get("min_findings"))
 

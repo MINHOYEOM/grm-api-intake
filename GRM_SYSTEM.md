@@ -605,6 +605,7 @@ grm-api-intake/
 ├─ collect_newsletter_subscribers.py  # [성장·유입] Brevo 리스트 구독자 수 일별 스냅샷(077 `newsletter_subscribers_daily`). uniqueSubscribers → totalSubscribers → contacts.count 순으로 읽고, 지원 중단 필드가 0 을 줘도 "전원 이탈"로 저장하지 않는다
 ├─ collect_newsletter_campaigns.py  # [성장·유입 2026-09-23] Brevo 캠페인 지표(발송·클릭·해지·링크별 클릭) 일별 적재(090 `newsletter_campaign_stats`). 1클릭 피드백은 #fb-up/#fb-down 링크 클릭 수로 판독(새 수집 경로 없음)
 ├─ collect_search_console.py      # [성장·유입] Google Search Console → Supabase(078 `gsc_daily`/`gsc_query_daily`/`gsc_page_daily`). RUM 은 "google.com 에서 왔다"까지만 알고 **무엇을 검색했는지**는 여기서만 온다. dataState=final(확정 데이터가 2~3일 늦게 도착) · CTR 은 저장하지 않고 파생(평균의 평균 방지) · 위치 병합은 노출수 가중 · 경로에서 스킴/호스트/쿼리스트링 제거. 서비스 계정 키(GSC_SERVICE_ACCOUNT_JSON) 미설정이면 클린 skip
+├─ gsc_index_sample.py          # [성장·유입] 구글 색인 표본 점검(주 1회, grm-gsc-index-sample.yml) — 문서 페이지를 render.is_thin_doc_page 로 얇음/두꺼움으로 나눠 주차 고정 표본을 URL Inspection API 로 확인. Job Summary·아티팩트만, DB 쓰기 없음
 ├─ requirements-embed.txt          # S2 전용 의존성(sentence-transformers/torch) -- requirements.txt 와 분리
 ├─ web/
 │  ├─ partials/mfds_inspector.html · assets/mfds-doc-inspectors.js # MFDS 보기·동적 코호트 링크

@@ -1,0 +1,41 @@
+name: GRM Google Index Sample (weekly)
+
+# 구글 색인 표본 점검(2026-11-09) — 얇은 문서(#1429 googlebot noindex) vs 두꺼운 문서가 구글에 실제로
+# 색인됐는지 URL Inspection API 로 매주 같은 방식의 표본(묶음당 15건, 총 60건 ≤ 하루 쿼터 2,000)을 본다.
+# 결과는 Job Summary 표 + 아티팩트. DB·저장소 쓰기 없음. 화요일 검색 개선 리포트 전에 돈다.
+on:
+  schedule:
+    - cron: "40 19 * * 1"   # 월 19:40 UTC = 화 04:40 KST
+  workflow_dispatch:
+    inputs:
+      per_bucket:
+        description: "묶음당 표본 수(기본 15)"
+        required: false
+        default: "15"
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -q -r requirements.txt
+      - name: Inspect sample URLs
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ vars.GSC_SITE_URL }}
+        run: python gsc_index_sample.py --per-bucket "${{ inputs.per_bucket || '15' }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ !cancelled() }}
+        with:
+          name: gsc-index-sample
+          path: gsc_index_sample.json
+          if-no-files-found: warn
+          retention-days: 90

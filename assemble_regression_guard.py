@@ -31,6 +31,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from assemble_publish_brief import _is_out_of_scope_483_card
+
 # 카드 하나가 이만큼 넘게 줄면 '내용 소실'로 본다. 파서 개선으로 인한 문장 재분할 정도는
 # 수 %~십수 % 수준이고, 실측된 회귀(WHO 11장)는 −70~90% 였다. 30%는 그 사이의 여유 있는 선.
 DEFAULT_MAX_SHRINK_PCT = 30.0
@@ -93,6 +95,7 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
     missing: list[str] = []
     shrunk: list[dict[str, Any]] = []
     unbundled: list[dict[str, Any]] = []
+    out_of_scope_removed: list[str] = []
     for key, old_text in old.items():
         succ = _successor(key)
         new_text = new.get(succ or key)
@@ -110,6 +113,12 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
                 # 이 id 는 대표 카드의 `inspection.statements` 에 남아 있다(내용 소실 아님).
                 unbundled.append({"id": key, "now": folded_ncr[key], "before_items": 1,
                                   "after_items": 1})
+                continue
+            if _is_out_of_scope_483_card(old_cards.get(key) or {}):
+                # [범위 밖 재판정 2026-11-09] 이미 발행된 483 이 조립기와 **같은 판정**으로 범위 밖
+                # (기기·식품 등)이 돼 빠졌다 — 11-09 호 기기 483 4장. 발행본 카드 자체로 판정하므로
+                # 의약품 카드가 이 길로 빠질 수는 없다. 묶음 해소(a48509b6)와 같은 이유로 소실이 아니다.
+                out_of_scope_removed.append(key)
                 continue
             missing.append(key)
             continue
@@ -141,6 +150,7 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
         "missing_cards": missing,
         "shrunk_cards": shrunk,
         "unbundled_cards": unbundled,
+        "out_of_scope_removed": sorted(out_of_scope_removed),
         "total_before": total_before,
         "total_after": total_after,
         "total_delta": total_after - total_before,
@@ -165,6 +175,10 @@ def render_markdown(result: dict[str, Any], out_path: str) -> str:
             moved = f" (대표 → `{row['now']}`)" if row["now"] != row["id"] else ""
             lines.append(f"- 묶음 축소 `{row['id']}`: {row['before_items']}건 → "
                          f"{row['after_items']}건{moved} — 빠진 항목은 정식 카드로 풀렸거나 범위 밖 제외")
+        oos = result.get("out_of_scope_removed") or []
+        if oos:
+            lines.append(f"- 범위 밖 483 제외 {len(oos)}장(기기·식품 등, 조립기와 같은 판정): "
+                         + ", ".join(f"`{c}`" for c in oos[:10]) + (" …" if len(oos) > 10 else ""))
         return "\n".join(lines)
 
     lines.append("### 발행 회귀 가드 — 차단")

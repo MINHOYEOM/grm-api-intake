@@ -3509,6 +3509,139 @@ def is_thin_firm_page(firm: dict[str, Any], lang: str = DEFAULT_LANG) -> bool:
     return len(docs) <= THIN_FIRM_MAX_DOCS and excerpt <= THIN_FIRM_MAX_EXCERPT_BYTES
 
 
+# ── [SEO 2단계 2026-11-09] 문서·업체 페이지의 GRM 고유 맥락 ─────────────────────────
+# 1단계(googlebot noindex)는 얇은 페이지를 빼는 것이었고, 이 단계는 **원문에 없는 정보**를
+# 더한다. 문서 페이지는 공개 문서를 옮긴 것이라 그대로는 사본이다. 우리만 가진 연결 두 가지를
+# 붙인다 — 둘 다 데이터가 있을 때만 블록이 생긴다(빈 제목 금지):
+#   ① 다른 업체의 비슷한 지적 — 지식그래프 엣지(finding_similar, 점수 0.40 이상·같은 문서 유형).
+#      정본 web/data/findings_similar.json(findings_docs_refresh.py · findings_similar_edges RPC).
+#   ② 이 문서가 인용한 조항 — 조항 페이지가 실제로 있는 21 CFR 섹션만, 다른 문서 수와 함께.
+# 업체 페이지에는 ①을 업체 단위로 모은 "비슷한 지적을 받은 다른 업체"를 붙인다.
+FINDINGS_SIMILAR_FILE = WEB_DIR / "data" / "findings_similar.json"
+SIMILAR_SHOW_PER_DOC = 5
+SIMILAR_EXCERPT_CHARS = 160
+FIRM_SIMILAR_SHOW = 6
+
+
+def load_findings_similar(path: Path = FINDINGS_SIMILAR_FILE) -> dict[str, list[list[Any]]]:
+    """문서 id → [[이 문서 지적 id, 대상 문서 id, 대상 지적 id, 점수], ...]. 없거나 모양이
+    다르면 빈 dict — 부가 정보라 블록만 꺼지고 빌드는 계속된다."""
+    if not path.is_file():
+        return {}
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return {}
+    if obj.get("schema_version") != "grm-findings-similar/v1":
+        return {}
+    by_doc = obj.get("by_document")
+    return by_doc if isinstance(by_doc, dict) else {}
+
+
+def _excerpt(text: str, limit: int = SIMILAR_EXCERPT_CHARS) -> str:
+    text = " ".join((text or "").split())
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    sp = cut.rfind(" ")
+    if sp >= limit * 0.6:
+        cut = cut[:sp]
+    return cut.rstrip(" ,.;:·") + "…"
+
+
+def doc_similar_view(doc: dict[str, Any], entries: "list[list[Any]] | None",
+                     docs_by_id: dict[str, dict[str, Any]], lang: str = DEFAULT_LANG,
+                     allowed_slugs: "set[str] | None" = None,
+                     canonical=lambda k: k,
+                     limit: int = SIMILAR_SHOW_PER_DOC) -> list[dict[str, Any]]:
+    """문서 페이지 "다른 업체의 비슷한 지적" 행. 대상 문서가 그 언어 트리에 **실제로 있는**
+    것만, 같은 업체(정규화 키)는 빼고, 업체당 1건. 데이터 순서(점수순)를 그대로 따른다."""
+    if not entries:
+        return []
+    numbers = {f.get("finding_id"): i for i, f in enumerate(doc.get("findings") or [], 1)}
+    own = canonical(doc.get("firm_key") or "")
+    seen: set[str] = set()
+    out: list[dict[str, Any]] = []
+    for row in entries:
+        if not isinstance(row, list) or len(row) != 4:
+            continue
+        src_fid, tdoc_id, tfid, _score = row
+        target = docs_by_id.get(tdoc_id)
+        if target is None or src_fid not in numbers or target is doc:
+            continue
+        if allowed_slugs is not None and target["slug"] not in allowed_slugs:
+            continue
+        tkey = canonical(target.get("firm_key") or "") or target["slug"]
+        if (own and tkey == own) or tkey in seen:
+            continue
+        tf = next((f for f in target.get("findings") or [] if f.get("finding_id") == tfid), None)
+        if tf is None:
+            continue
+        body = finding_body(tf, lang).strip()
+        if not body or (lang != DEFAULT_LANG and _HANGUL_RE.search(body)):
+            continue
+        seen.add(tkey)
+        out.append({
+            "slug": target["slug"], "finding_id": tfid, "document_id": tdoc_id,
+            "firm_name": target.get("firm_name") or "",
+            "agency": target.get("agency") or "",
+            "date": doc_display_date(target),
+            "excerpt": _excerpt(body), "no": numbers[src_fid],
+        })
+        if len(out) >= limit:
+            break
+    return out
+
+
+def doc_clause_view(doc: dict[str, Any], clause_by_section: dict[str, dict[str, Any]],
+                    lang: str = DEFAULT_LANG) -> list[dict[str, Any]]:
+    """이 문서가 인용한 21 CFR 섹션 중 **조항 페이지가 있는 것**만. `others` 는 그 조항으로
+    지적된 공개 문서 수에서 이 문서를 뺀 값(조항 뷰와 같은 집계 — 같은 언어 기준)."""
+    nos: dict[str, list[int]] = {}
+    for i, f in enumerate(doc.get("findings") or [], 1):
+        for sec in sorted({_cfr_section_of(r) for r in (f.get("cfr_refs") or [])} - {""}):
+            if sec in clause_by_section:
+                nos.setdefault(sec, []).append(i)
+    out = []
+    for sec in sorted(nos, key=lambda s: tuple(int(p) for p in s.split("."))):
+        c = clause_by_section[sec]
+        text_ok = any(finding_body(doc["findings"][i - 1], lang).strip() and not (
+            lang != DEFAULT_LANG and _HANGUL_RE.search(finding_body(doc["findings"][i - 1], lang)))
+            for i in nos[sec])
+        others = c["documents"] - (1 if text_ok else 0)
+        if others < 1:
+            continue
+        out.append({"code": c["code"], "slug": c["slug"], "title_en": c.get("title_en") or "",
+                    "others": others, "nos": nos[sec]})
+    return out
+
+
+def firm_similar_view(firm_docs: list[dict[str, Any]],
+                      similar: dict[str, list[list[Any]]],
+                      docs_by_id: dict[str, dict[str, Any]], lang: str,
+                      allowed_slugs: "set[str] | None", canonical,
+                      firm_slug_of, limit: int = FIRM_SIMILAR_SHOW) -> list[dict[str, Any]]:
+    """업체 페이지 "비슷한 지적을 받은 다른 업체" — 이 업체 문서들의 행을 업체 단위로 모은다.
+    `count` = 이 업체 문서 중 그 업체와 이어진 문서 수. 목적지는 그 업체 페이지(그 트리에
+    있을 때) 아니면 가장 비슷한 문서 페이지."""
+    agg: dict[str, dict[str, Any]] = {}
+    for d in firm_docs:
+        for row in doc_similar_view(d, similar.get(d.get("document_id") or ""), docs_by_id,
+                                    lang, allowed_slugs, canonical, limit=SIMILAR_SHOW_PER_DOC):
+            target = docs_by_id[row["document_id"]]
+            key = canonical(target.get("firm_key") or "") or target["slug"]
+            a = agg.setdefault(key, {"name": row["firm_name"], "count": 0, "docs": set(),
+                                     "slug": row["slug"], "finding_id": row["finding_id"],
+                                     "firm_slug": firm_slug_of(target)})
+            if d["slug"] not in a["docs"]:
+                a["docs"].add(d["slug"])
+                a["count"] += 1
+    own = {canonical(d.get("firm_key") or "") for d in firm_docs} - {""}
+    rows = sorted((a for k, a in agg.items() if k not in own),
+                  key=lambda a: (-a["count"], a["name"].lower(), a["slug"]))
+    return [{k: v for k, v in a.items() if k != "docs"} for a in rows[:limit]]
+
+
 def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
                         link) -> "dict[str, Any] | None":
     """경고서한 지적 1건을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈 표시용 뷰.
@@ -6559,6 +6692,15 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          agency_label=g["label_ko"], year=y["year"],
                          sibling_years=g["years"])
 
+        # [SEO 2단계 2026-11-09] GRM 고유 맥락 입력 — 비슷한 지적(정본 파일)·조항(뷰 재사용).
+        similar_by_doc = load_findings_similar() if render_doc_pages else {}
+        docs_by_id = {d["document_id"]: d for d in documents}
+        clause_by_section_by_lang = {
+            DEFAULT_LANG: {c["section"]: c for c in clause_views},
+            "en": {c["section"]: c for c in clause_views_en},
+        }
+        _doc_slugs_by_lang = {DEFAULT_LANG: {d["slug"] for d in documents}, "en": en_doc_slugs}
+
         for doc in documents:
             # sitemap 은 **데이터에서** 파생한다 — 렌더를 껐다고 URL 이 빠지면 테스트가 보는
             # sitemap 과 프로덕션 sitemap 이 달라져 골든 대조가 의미를 잃는다.
@@ -6652,6 +6794,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     # 없으면 종전대로 조회 화면으로(nofollow) — 템플릿이 가른다.
                     # [다국어] 그 언어 트리에 있는 것만 잇는다(_firm_slug_for).
                     firm_page_slug=_firm_slug_for(doc, _lg),
+                    similar_cases=doc_similar_view(
+                        doc, similar_by_doc.get(doc["document_id"]), docs_by_id, _lg,
+                        _doc_slugs_by_lang.get(_lg), _canonical_firm_key),
+                    cited_clauses=doc_clause_view(
+                        doc, clause_by_section_by_lang.get(_lg, {}), _lg),
                     backlinks=build_backlink_panel(
                         "doc", doc.get("document_id", ""), index=card_issue_index,
                         lang=_lg,
@@ -6699,6 +6846,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              (_tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
                          thin_page=is_thin_firm_page(fp, _lg),
+                         similar_firms=firm_similar_view(
+                             fp["documents"], similar_by_doc, docs_by_id, _lg,
+                             _doc_slugs_by_lang.get(_lg), _canonical_firm_key,
+                             lambda t, _l=_lg: _firm_slug_for(t, _l)),
                          measured_on=docs_data.get("measured_on", ""),
                          min_findings=docs_data.get("min_findings"))
 

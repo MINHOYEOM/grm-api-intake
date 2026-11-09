@@ -48,6 +48,8 @@ jobs:
       BRANCH: automation/findings-docs-auto-${{ github.run_id }}
       GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
       DATA_PATH: web/data/findings_docs.json
+      # [SEO 2단계 2026-11-09] 다른 업체의 비슷한 지적(findings_similar_edges RPC · anon). 실패하면 스크립트가 지난 파일을 둔다.
+      SIMILAR_PATH: web/data/findings_similar.json
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -87,7 +89,7 @@ jobs:
       - name: Detect meaningful changes
         id: changes
         run: |
-          if git diff --quiet -- "$DATA_PATH"; then
+          if git diff --quiet -- "$DATA_PATH" "$SIMILAR_PATH"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "문서 페이지 데이터 변경 없음 — PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
           else
@@ -127,7 +129,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$DATA_PATH" web/tests/golden
+          git add -- "$DATA_PATH" "$SIMILAR_PATH" web/tests/golden
           git commit -m "chore: refresh findings document pages"
           git push -u origin "$BRANCH"
           TOTALS=$(jq -r '.totals | "문서 \(.documents)건 · 지적 \(.findings)건"' "$DATA_PATH")

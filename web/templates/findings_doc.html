@@ -66,6 +66,23 @@
   .fd-req{border-left-color:var(--ink)}
   .fd-term{color:inherit;text-decoration:none;border-bottom:1px dotted var(--line-2)}
   .fd-term:hover{color:var(--coral);border-bottom-color:var(--coral)}
+  /* [SEO 2단계 2026-11-09] GRM 고유 맥락 — 비슷한 지적·인용 조항. */
+  .fd-ctx{display:flex;flex-direction:column;gap:10px}
+  .fd-ctx-note{font-family:var(--sans);font-size:13.5px;line-height:1.7;color:var(--muted);margin:0;word-break:keep-all}
+  .fd-sim,.fd-cl{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column}
+  .fd-sim li,.fd-cl li{border-top:1px solid var(--line);padding:12px 4px}
+  .fd-sim li:last-child,.fd-cl li:last-child{border-bottom:1px solid var(--line)}
+  .fd-sim a{display:block;text-decoration:none}
+  .fd-sim-h{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-family:var(--sans);font-size:13px;color:var(--muted)}
+  .fd-sim-h b{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .fd-sim-no{color:var(--coral-2)}
+  .fd-sim-ex{display:block;margin-top:5px;font-family:var(--sans);font-size:14px;line-height:1.75;color:var(--body);word-break:keep-all;overflow-wrap:anywhere}
+  .fd-sim a:hover b,.fd-cl a:hover b{color:var(--coral)}
+  .fd-cl li{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+  .fd-cl a{font-family:var(--sans);font-size:14px;color:var(--body);text-decoration:none}
+  .fd-cl a b{font-weight:600;color:var(--ink)}
+  .fd-cl a span{color:var(--muted)}
+  .fd-cl-n{font-family:var(--sans);font-size:13px;color:var(--coral-2)}
   .fd-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
   .fd-about p{font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--muted);margin:0;max-width:780px;word-break:keep-all}
   .fd-about b{color:var(--body);font-weight:500}
@@ -186,6 +203,34 @@
       </div>
     </section>
 
+    {#- [SEO 2단계 2026-11-09] GRM 이 더하는 연결 — 원문에 없는 정보. 데이터가 있을 때만
+        블록이 선다(빈 제목 금지). 비슷한 지적 = 지식그래프 엣지(같은 문서 유형·점수 0.40 이상)
+        에서 업체당 1건, 조항 = 조항 페이지가 실제로 있는 21 CFR 섹션만. 우리 판단·논평은
+        여기도 없다 — 무엇이 이어졌는지와 그 근거(문장 유사도)만 밝힌다. -#}
+    {%- if similar_cases %}
+    <section class="fd-ctx" id="similar">
+      <h2 class="fd-sec-h">{{ _('다른 업체의 비슷한 지적') }}</h2>
+      <p class="fd-ctx-note">{{ _('같은 종류의 공개 문서에서 이 문서의 지적과 문장이 비슷한 지적을 GRM이 골랐습니다. 업체마다 한 건씩입니다.') }}</p>
+      <ul class="fd-sim">
+        {%- for s in similar_cases %}
+        <li><a href="{{ rel_root }}findings/doc/{{ s.slug }}/#{{ s.finding_id }}">
+          <span class="fd-sim-h"><b>{{ s.firm_name }}</b><span>{{ s.date }} · {{ agency_labels.get(s.agency, s.agency) }}</span><span class="fd-sim-no">{{ _('{n}번 지적과 비슷', n=s.no) }}</span></span>
+          <span class="fd-sim-ex">{{ s.excerpt }}</span>
+        </a></li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    {%- if cited_clauses %}
+    <section class="fd-ctx" id="clauses">
+      <h2 class="fd-sec-h">{{ _('이 문서가 인용한 조항') }}</h2>
+      <ul class="fd-cl">
+        {%- for c in cited_clauses %}
+        <li><a href="{{ rel_root }}findings/clause/{{ c.slug }}/"><b>{{ c.code }}</b>{% if c.title_en %} <span>{{ c.title_en }}</span>{% endif %}</a><span class="fd-cl-n">{{ _('같은 조항으로 지적된 다른 공개 문서 {n}건', n=c.others) }}</span></li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
     <section class="fd-about">
       <h2 class="fd-sec-h">{{ _('이 기록에 대하여') }}</h2>
       {#- 캐나다 실사는 published_date 가 실사 시작일이라(수집기가 inspectionStartDate 를

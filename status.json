@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T02:50:30Z",
+ "generated_at": "2026-11-09T03:02:00Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 42553957175,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-09T03:00:19Z",
+    "updatedAt": "2026-11-09T03:01:50Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Publish (assemble)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553957175"
+   },
+   {
     "databaseId": 42552973746,
     "status": "completed",
     "conclusion": "failure",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락) (#1284)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389307185"
-   },
-   {
-    "databaseId": 41375124348,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T01:57:19Z",
-    "updatedAt": "2026-11-02T01:58:36Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1277 from MINHOYEOM/claude/dazzling-hopper-lygh07",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41375124348"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42552964831,
+    "databaseId": 42554102225,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-09T03:01:50Z",
+    "updatedAt": "2026-11-09T03:01:54Z",
+    "headBranch": "publish/brief-2026-11-09",
+    "displayTitle": "publish(web): 2026-11-09 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42554102225"
+   },
+   {
+    "databaseId": 42554098106,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T02:48:44Z",
-    "updatedAt": "2026-11-09T02:48:48Z",
+    "createdAt": "2026-11-09T03:01:47Z",
+    "updatedAt": "2026-11-09T03:01:50Z",
+    "headBranch": "publish/brief-2026-11-09",
+    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42554098106"
+   },
+   {
+    "databaseId": 42553946491,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-09T03:00:13Z",
+    "updatedAt": "2026-11-09T03:00:17Z",
     "headBranch": "main",
-    "displayTitle": "fix(i18n): 카드 유형 4종 영문 번역 — 11-09 발행 조립 복구 (#1393)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42552964831"
+    "displayTitle": "fix(i18n): 카드 태그 3종 영문 번역 추가 — 11-09 조립이 '규정' 에서 다시 멈춤 (#1394)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553946491"
    },
    {
-    "databaseId": 42552214239,
+    "databaseId": 42553245026,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T02:40:22Z",
-    "updatedAt": "2026-11-09T02:45:29Z",
-    "headBranch": "fix/en-card-type-labels-1109",
-    "displayTitle": "fix(i18n): 카드 유형 4종 영문 번역 — 11-09 발행 조립 복구",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42552214239"
+    "createdAt": "2026-11-09T02:52:00Z",
+    "updatedAt": "2026-11-09T02:57:21Z",
+    "headBranch": "fix/en-type-tag-labels-1109",
+    "displayTitle": "fix(i18n): 카드 태그 3종 영문 번역 — 11-09 조립 복구 2차",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553245026"
    },
    {
-    "databaseId": 42552210120,
+    "databaseId": 42553239624,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T02:40:19Z",
-    "updatedAt": "2026-11-09T02:45:55Z",
-    "headBranch": "fix/en-card-type-labels-1109",
-    "displayTitle": "test(golden): en.json 키 4개 추가에 따른 영문 골든 5장 해시 재동결",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42552210120"
-   },
-   {
-    "databaseId": 42551305023,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T02:30:20Z",
-    "updatedAt": "2026-11-09T02:36:15Z",
-    "headBranch": "fix/en-card-type-labels-1109",
-    "displayTitle": "fix(i18n): 카드 유형 4종 영문 번역 — 11-09 발행 조립 복구",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42551305023"
-   },
-   {
-    "databaseId": 42551298103,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T02:30:16Z",
-    "updatedAt": "2026-11-09T02:36:27Z",
-    "headBranch": "fix/en-card-type-labels-1109",
-    "displayTitle": "fix(i18n): 카드 유형 4종 영문 번역 추가 — 11-09 발행 조립이 '고시·개정법령' 에서 멈춤",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42551298103"
+    "createdAt": "2026-11-09T02:51:56Z",
+    "updatedAt": "2026-11-09T02:57:34Z",
+    "headBranch": "fix/en-type-tag-labels-1109",
+    "displayTitle": "fix(i18n): 카드 태그 3종 영문 번역 추가 — 11-09 조립이 '규정' 에서 다시 멈춤",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553239624"
    }
   ],
   "grm-scaffold-mirror.yml": [

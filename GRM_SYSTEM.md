@@ -646,6 +646,7 @@ grm-api-intake/
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
 │  ├─ clause_citations_guard.py   # [지적 조항 월간 갱신 가드 2026-11-09] 급감 20%·스냅샷 검증·as_of 만 변경 시 무PR 판정(테스트 `web/tests/test_clause_citations_guard.py`)
 │  ├─ clause_firms_page.py        # [지적 조항 × 업체 2026-11-10] 업체 페이지 "FDA 실사에서 지적받은 21 CFR 조항"(조항별 실사 수·최근 실사일)·조항 페이지 "이 조항으로 FDA 실사 지적을 받은 업체"(상위 10곳+전체 수) 로더·매칭·뷰. 매칭 = 업체 정본 키(정규화+별칭) 일치 + 법인격 일치 + 같은 이름 두 나라 이상 제외. 스냅샷 없으면 두 블록 생략(테스트 `web/tests/test_clause_firms_page.py`)
+│  ├─ citation_firms_page.py      # [지적 조항 제조소 전체 목록 2026-11-10] `/findings/citations/firms/`(ko·en) — `data/fda_citation_firms.json` 전 제조소(FEI) 한 장 서버 렌더(제조소·도시·국가·실사 수·최근 실사일·지적 조항+횟수, 조항 코드 제목 범례). 국가·업체명·조항 필터는 인라인 스크립트. 업체 링크 = `clause_firms_page` 매칭 결과(그 언어 트리에 선 페이지만), 조항 링크 = 선 조항 페이지만. 템플릿 `findings_citation_firms.html`(테스트 `web/tests/test_citation_firms_page.py`)
 │  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 또는 월간 `grm-fda-citations-snapshot.yml`)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)

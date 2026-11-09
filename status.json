@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T05:43:01Z",
+ "generated_at": "2026-11-09T07:54:59Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -60,6 +60,17 @@
   ],
   "grm-delta-bridge.yml": [
    {
+    "databaseId": 42570416355,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T05:59:51Z",
+    "updatedAt": "2026-11-09T06:00:08Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Delta Bridge (Notion → git)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42570416355"
+   },
+   {
     "databaseId": 42546730258,
     "status": "completed",
     "conclusion": "success",
@@ -102,17 +113,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Delta Bridge (Notion → git)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41373833201"
-   },
-   {
-    "databaseId": 41372996394,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-02T01:32:19Z",
-    "updatedAt": "2026-11-02T01:32:37Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Delta Bridge (Notion → git)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41372996394"
    }
   ],
   "grm-web-publish.yml": [
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42568873334,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 42581599310,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T05:42:52Z",
-    "updatedAt": "2026-11-09T05:42:55Z",
-    "headBranch": "publish/brief-2026-11-09",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568873334"
+    "createdAt": "2026-11-09T07:48:03Z",
+    "updatedAt": "2026-11-09T07:53:08Z",
+    "headBranch": "fix/ops-ontime-window-3h",
+    "displayTitle": "fix(ops): 정기 작업 '제때' 기준을 예정+6시간으로 완화 (결재 #8)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581599310"
    },
    {
-    "databaseId": 42568868449,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 42581594666,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T05:42:48Z",
-    "updatedAt": "2026-11-09T05:42:52Z",
-    "headBranch": "publish/brief-2026-11-09",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568868449"
+    "createdAt": "2026-11-09T07:48:01Z",
+    "updatedAt": "2026-11-09T07:53:29Z",
+    "headBranch": "fix/ops-ontime-window-3h",
+    "displayTitle": "fix(ops): 제때 기준을 단일 예정+6시간으로 단순화, 가장 늦은 작업 이름 표시 (결재 #8)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581594666"
    },
    {
-    "databaseId": 42568741671,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T05:41:24Z",
-    "updatedAt": "2026-11-09T05:41:27Z",
-    "headBranch": "publish/brief-2026-10-26",
-    "displayTitle": "publish(web): 2026-10-26 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568741671"
-   },
-   {
-    "databaseId": 42568741290,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 42581495074,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T05:41:24Z",
-    "updatedAt": "2026-11-09T05:41:27Z",
-    "headBranch": "publish/brief-2026-10-26",
-    "displayTitle": "publish(web): 2026-10-26 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568741290"
-   },
-   {
-    "databaseId": 42568688493,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-09T05:40:49Z",
-    "updatedAt": "2026-11-09T05:41:08Z",
+    "createdAt": "2026-11-09T07:47:03Z",
+    "updatedAt": "2026-11-09T07:52:33Z",
     "headBranch": "main",
-    "displayTitle": "fix(brief): 11-09 경고서한 카드의 가림 표시 노출 정리 + 본문 슬롯 가드 (#1410)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568688493"
+    "displayTitle": "feat(web): 지적 사례 한국어 번역 + 사례 확대(42→100건) (#1421)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581495074"
+   },
+   {
+    "databaseId": 42581328093,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-09T07:45:29Z",
+    "updatedAt": "2026-11-09T07:47:20Z",
+    "headBranch": "main",
+    "displayTitle": "fix(rpc): 간헐 500 줄이기 — 체크리스트 매칭 해시 조인(136) + 링크드인 유사 사례 저장본 우선 (#1423)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581328093"
+   },
+   {
+    "databaseId": 42581307919,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-09T07:45:18Z",
+    "updatedAt": "2026-11-09T07:45:34Z",
+    "headBranch": "main",
+    "displayTitle": "feat(web): 구독 가입 페이지 경로를 Brevo 연락처에 기록 (결재 #2 B안) (#1422)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581307919"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 42575031678,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-09T06:45:37Z",
+    "updatedAt": "2026-11-09T06:45:41Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42575031678"
+   },
+   {
     "databaseId": 42485603695,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42345581097"
-   },
-   {
-    "databaseId": 42279948581,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-06T19:28:38Z",
-    "updatedAt": "2026-11-06T22:52:41Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42279948581"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -539,6 +539,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 42577625325,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T07:10:30Z",
+    "updatedAt": "2026-11-09T07:10:44Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42577625325"
+   },
    {
     "databaseId": 42530400358,
     "status": "completed",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42419901545"
-   },
-   {
-    "databaseId": 42377433312,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-07T13:32:32Z",
-    "updatedAt": "2026-11-07T13:32:44Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42377433312"
    }
   ],
   "grm-cloud-request.yml": [

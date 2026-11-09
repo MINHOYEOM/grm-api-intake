@@ -4989,6 +4989,10 @@ NEWSLETTER_FORM_ACTION = os.environ.get("GRM_NEWSLETTER_FORM_ACTION", "").strip(
 # 들어간다. 비어 있으면 영어 페이지에는 구독 문을 내지 않는다(한국어 리스트로 받지 않는다 —
 # 한국어 메일을 영어 독자에게 보내는 일이 된다).
 NEWSLETTER_FORM_ACTION_EN = os.environ.get("GRM_NEWSLETTER_FORM_ACTION_EN", "").strip()
+# [가입 페이지 경로 2026-11-09] "1" 이면 구독 폼이 가입 페이지 경로·언어(SIGNUP_PATH·SIGNUP_LANG)를
+# hidden 으로 함께 보낸다. Brevo 에 연락처 속성과 폼 필드를 만든 **뒤에** 켠다 — 기본 꺼짐이라
+# 이 PR 만 머지해서는 라이브 폼이 바뀌지 않는다(docs/ops_brevo_signup_path_attributes.md).
+SIGNUP_PATH_FIELDS = os.environ.get("GRM_SIGNUP_PATH_FIELDS", "").strip() == "1"
 
 # 웹 카드 반응 계층(하트·스크랩·회원, S1) — env-param(공개값). SUPABASE_URL·SUPABASE_ANON_KEY
 # 둘 다 설정돼야 활성(reactions_enabled). 미설정(기본·테스트)이면 반응 블록 전체 미출력 →
@@ -5250,6 +5254,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 구독 폼 action — 스킴 화이트리스트(_safe_url) 통과분만(비http(s) 오설정은 ""→폼 미출력
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
+    env.globals["signup_path_fields"] = SIGNUP_PATH_FIELDS
     # 용어사전 구역의 "구독하면 용어집 PDF" 제안과 실물 링크(이번 주 소식) — 한국어 리스트의
     # 확인 메일·도착 페이지(/welcome/)와 짝이라 한국어 환경에서만 켠다. 영어 환경은 아래에서 끈다.
     env.globals["sub_offer_glossary_pdf"] = True

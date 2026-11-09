@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T22:23:32Z",
+ "generated_at": "2026-11-09T00:50:22Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,12 +174,23 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 42530328725,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-08T22:27:31Z",
+    "updatedAt": "2026-11-08T22:33:05Z",
+    "headBranch": "main",
+    "displayTitle": "chore: refresh live regulatory library (#1392)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42530328725"
+   },
+   {
     "databaseId": 42529637200,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
     "createdAt": "2026-11-08T22:19:12Z",
-    "updatedAt": "2026-11-08T22:19:16Z",
+    "updatedAt": "2026-11-08T22:24:57Z",
     "headBranch": "automation/library-auto-42529288349",
     "displayTitle": "chore: refresh live regulatory library",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42529637200"
@@ -216,27 +227,16 @@
     "headBranch": "main",
     "displayTitle": "Merge pull request #1358 from MINHOYEOM/claude/glossary-fig-daily-202…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42508136055"
-   },
-   {
-    "databaseId": 42473404445,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-08T10:54:35Z",
-    "updatedAt": "2026-11-08T11:01:46Z",
-    "headBranch": "main",
-    "displayTitle": "feat(growth): 성장 일보 v2 — 방문→검색→구독→메일 클릭 한 장 + 주간 검색 개선 리포트 (135) (#1388)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42473404445"
    }
   ],
   "grm-scaffold-mirror.yml": [
    {
     "databaseId": 42530000049,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "workflow_run",
     "createdAt": "2026-11-08T22:23:25Z",
-    "updatedAt": "2026-11-08T22:23:29Z",
+    "updatedAt": "2026-11-08T22:23:35Z",
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42530000049"
@@ -540,6 +540,17 @@
   ],
   "grm-stranded-batch-pr.yml": [
    {
+    "databaseId": 42530400358,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-08T22:28:25Z",
+    "updatedAt": "2026-11-08T22:28:35Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42530400358"
+   },
+   {
     "databaseId": 42508120898,
     "status": "completed",
     "conclusion": "success",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42377433312"
-   },
-   {
-    "databaseId": 42347686431,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-07T06:35:23Z",
-    "updatedAt": "2026-11-07T06:35:34Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42347686431"
    }
   ],
   "grm-cloud-request.yml": [

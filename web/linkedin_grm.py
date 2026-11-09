@@ -476,6 +476,29 @@ def fetch_similar(slots: dict, *, url: str, key: str, rpc=_rpc) -> dict | None:
                 targets=targets, rules=rules, items=items, failed_findings=failed)
 
 
+def load_similar(slots: dict, pub: str, *, url: str, key: str, fetch=fetch_similar,
+                 slots_dir: Path | None = None) -> dict | None:
+    """유사 사례 묶음을 고른다 — **저장된 <발행일>.similar.json 이 있으면 그것을 쓰고 RPC 를 부르지 않는다.**
+
+    ★2026-11-09 실측: 이 스텝은 web/** push·PR 마다(하루 수십 번) 돌며 지적마다 findings_similar 를
+      limit 50·최대 3회 재시도로 불렀다. 서한 증거 문장은 길고 흔한 낱말('귀사'·'b'·'4'·'또는')이 섞여
+      OR 질의가 지적 DB 의 절반(13,055/28,491행)에 맞는다 — 한 번에 평시 3~4.5초로 anon
+      statement_timeout(3초)을 넘는다. 24시간 250회 중 55회가 500 이었고, 같은 시각 방문자 검색·
+      체크리스트 500 과 겹쳤다. 그 주 묶음이 이미 저장소에 있으면(사람이 검수해 커밋한 정본) 다시
+      부를 이유가 없다 — 결과도 배포마다 흔들리지 않는다.
+    저장본이 없을 때만(새 호, 키가 있을 때) 엔진을 부른다. 키도 없으면 None(그 카드만 빠진다)."""
+    snap = (slots_dir or SLOTS_DIR) / f"{pub}.similar.json"
+    try:
+        saved = json.loads(snap.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        saved = None
+    if isinstance(saved, dict) and saved.get("items"):
+        return saved
+    if url and key:
+        return fetch(slots, url=url, key=key) or {}
+    return None
+
+
 def site_lines(rows: list[dict]) -> list[str]:
     return [f"{r['alias']}({r['year']}년 {r['agency']}, {r['label']}) ‘{r['target']}’ ← {r['fact']} grm-solutions.com/findings/doc/{r['slug']}/"
             for r in rows if r["slug"]]
@@ -723,9 +746,7 @@ def main(argv: list[str] | None = None) -> int:
     slots = json.loads(sp.read_text(encoding="utf-8"))
     findings = json.loads(FINDINGS.read_text(encoding="utf-8"))
     url, key = os.environ.get("SUPABASE_URL", "").strip(), os.environ.get("SUPABASE_ANON_KEY", "").strip()
-    similar = None  # 키가 없으면(로컬·테스트) 저장된 <발행일>.similar.json 이 있을 때만 쓴다
-    if url and key:
-        similar = fetch_similar(slots, url=url, key=key) or {}
+    similar = load_similar(slots, pub, url=url, key=key)
     try:
         deck = build_grm_deck(doc, slots, findings, similar=similar)
     except la.AnatomyError as exc:

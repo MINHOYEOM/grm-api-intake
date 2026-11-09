@@ -226,6 +226,31 @@ class FetchSimilarTest(unittest.TestCase):
         self.assertEqual({it["q"] for it in sim["items"]}, {1, 2, 3})
         self.assertEqual(sim["failed_findings"], 1)
 
+    def test_saved_capture_wins_and_rpc_is_not_called(self):
+        """[2026-11-09] 배포마다 findings_similar 를 다시 부르던 것이 anon 3초 타임아웃 500 의
+        주 발생원이었다 — 저장본이 있으면 엔진을 부르지 않는다."""
+        calls = []
+        sim = lg.load_similar(_slots(), "2026-11-02", url="https://x", key="k",
+                              fetch=lambda *a, **k: calls.append(1) or {"items": [1]})
+        self.assertEqual(calls, [])
+        self.assertEqual(sim["source"][:8], "supabase")  # 커밋된 2026-11-02.similar.json
+        self.assertTrue(sim["items"])
+
+    def test_no_saved_capture_calls_rpc_only_with_keys(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            calls = []
+            fetch = lambda *a, **k: calls.append(1) or {"items": [{"q": 1}]}  # noqa: E731
+            got = lg.load_similar(_slots(), "2099-01-05", url="u", key="k", fetch=fetch, slots_dir=Path(d))
+            self.assertEqual(calls, [1])
+            self.assertEqual(got, {"items": [{"q": 1}]})
+            self.assertIsNone(lg.load_similar(_slots(), "2099-01-05", url="", key="", fetch=fetch,
+                                              slots_dir=Path(d)))
+            self.assertEqual(calls, [1])
+            (Path(d) / "2099-01-05.similar.json").write_text('{"items": []}', encoding="utf-8")
+            lg.load_similar(_slots(), "2099-01-05", url="u", key="k", fetch=fetch, slots_dir=Path(d))
+            self.assertEqual(calls, [1, 1], "빈 저장본은 저장본이 아니다 — 엔진을 부른다")
+
     def test_deck_without_similar_drops_only_that_card(self):
         deck = lg.build_grm_deck(_doc(), _slots(), FINDINGS, similar={})
         kinds = [s["kind"] for s in deck["slides"]]

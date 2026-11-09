@@ -13,7 +13,7 @@ service_role 키로 `ops_goal_set`(125) RPC 를 부른다. 값마다 표본 수�
                     (failure·timed_out·startup_failure. 취소는 동시 실행 정리라 세지 않는다)
   sr-ontime         정기 작업 정시율 — 보수적 정의: 최근 7일 동안 '하루 4회 이하' 예약(cron) 워크플로의 예정 시각마다
                     예정 +창 안에 시작한 schedule 실행이 있으면 정시. 실행이 없으면(누락) 지각과 같이 센다.
-                    창은 둘: 엄격 대상(ONTIME_STRICT_WORKFLOWS) +1시간, 그 외 +6시간.
+                    창은 하나: 예정 +6시간(ONTIME_GRACE_MIN). 6시간을 넘겨 늦었거나 안 돈 작업 이름을 노트에 적는다.
                     분모는 예정 횟수(꺼진 워크플로 제외 · 지금부터 각 창만큼 전까지의 예정만).
                     노트에는 지각(3시간 넘게 늦게 시작)과 누락(실행 자체 없음)을 나눠 적는다.
   edu-terms-week    이번 주(KST 월요일 00:00 이후) 용어 사전(web/data/glossary.json) 항목 증가 수
@@ -44,27 +44,10 @@ UTC = dt.timezone.utc
 NOTE_MAX = 120
 CI_SAMPLE = 10
 PR_OLD_HOURS = 72
-# 결재 #8(2026-11-09, 대표 수정): GitHub 예약 실행이 몇 시간씩 늦게 시작해(일은 끝까지 돈다) +60분 일률 기준으로는
-# 7~9% 로 빨갛게 보였다. 기준을 둘로 나눈다 — 시각이 중요한 작업은 엄격(+1시간), 그 외는 일반(+6시간).
-ONTIME_GRACE_MIN = 360          # 일반 창(분)
-ONTIME_GRACE_STRICT_MIN = 60    # 엄격 창(분)
-# 엄격 대상(최소 핵심만) — 월요일 브리프 발행 체인과 시각이 의미인 작업:
-#   delta-bridge       월요일 델타 이관(발행 체인 앞단, 일요일 밤~월 새벽 예약)
-#   intake             매일 03:17 KST 수집(브리프의 원료)
-#   publish-watchdog   월요일 발행 감시
-#   newsletter-send    월요일 뉴스레터 발송 창
-#   db-backup          주 1회 암호화 DB 백업(일요일 밤)
-# 6시간 주기 점검(stranded-batch-pr)·일일 번역·색인 같은 배치는 한 회차 밀려도 다음 회차가 이어받아 일반 창.
-# 엄격 대상은 '주기(cycle)' 단위로 센다 — 여러 cron 슬롯이 서로 이어받는 구조(delta-bridge 일 22–23·월 0–4시 UTC 30분마다,
-# publish-watchdog 월 0·2·4시, newsletter-send 월 5·6·7시)라 슬롯마다 재면 첫 슬롯이 밀려도 다음 슬롯이 일을 해낸 것을
-# 놓친 것으로 센다. 앞 슬롯과 CYCLE_GAP_MIN 이하 간격이면 같은 주기이고, 한 주기는 첫 슬롯 +1시간 안에
-# 성공(진행 중 포함) 실행이 하나라도 시작되면 제때다. 하루 1회(intake)·주 1회(db-backup)는 슬롯 1개 = 주기 1개.
-CYCLE_GAP_MIN = 120
-ONTIME_STRICT_WORKFLOWS = frozenset({
-    "grm-delta-bridge.yml", "grm-intake.yml", "grm-publish-watchdog.yml",
-    "grm-newsletter-send.yml", "grm-db-backup.yml",
-})
-# 예정 +3시간을 넘겨 시작한 실행도 이 시간 안이면 '지각', 그 밖이거나 없으면 '누락'.
+# 결재 #8(2026-11-09, 대표 최종): GitHub 예약 실행이 몇 시간씩 늦게 시작해(일은 끝까지 돈다) +60분 기준으로는
+# 7~9% 로 빨갛게 보였다. '제때' 창을 예정 +6시간(360분) 하나로 둔다. 월요일 정시성은 '월요일 정시 발행' 지표가 따로 본다.
+ONTIME_GRACE_MIN = 360
+# 창을 넘겨 시작한 실행도 이 시간 안이면 '지각', 그 밖이거나 없으면 '누락'.
 ONTIME_LATE_MAX_H = 24
 ONTIME_WINDOW_DAYS = 7
 ONTIME_MAX_PER_DAY = 4
@@ -213,68 +196,32 @@ def fires_per_day(expr: str) -> int:
     return len(_cron_field(mi, 0, 59)) * len(_cron_field(ho, 0, 23))
 
 
-def cycles(fires: list[dt.datetime]) -> list[tuple[dt.datetime, dt.datetime]]:
-    """정렬된 예정 시각을 주기로 묶는다: 앞 슬롯과 CYCLE_GAP_MIN(분) 이하로 이어지면 같은 주기(서로 이어받는 반복 슬롯).
-    하루 1회·주 1회 cron 은 슬롯 1개 = 주기 1개. 반환: (첫 슬롯, 마지막 슬롯) 목록."""
-    out: list[tuple[dt.datetime, dt.datetime]] = []
-    for f in fires:
-        if out and f - out[-1][1] <= dt.timedelta(minutes=CYCLE_GAP_MIN):
-            out[-1] = (out[-1][0], f)
-        else:
-            out.append((f, f))
-    return out
-
-
 def ontime(schedules: dict[str, list[str]], runs_by_wf: dict[str, list[dict[str, Any]]],
-           starts: dict[str, dt.datetime], now: dt.datetime,
-           strict: Iterable[str] | None = None) -> tuple[float, str]:
-    """schedules: 워크플로 → cron 목록(하루 4회 이하만). starts: 워크플로별 창 시작(만든 시각 반영).
-    strict: 엄격 창(ONTIME_GRACE_STRICT_MIN)을 쓰는 워크플로 이름(기본 ONTIME_STRICT_WORKFLOWS). 나머지는 일반 창."""
-    strict_set = set(ONTIME_STRICT_WORKFLOWS if strict is None else strict)
-    n = {"s": [0, 0], "g": [0, 0]}      # [예정, 제때]
-    late = gone = 0
-    bad: dict[str, int] = {}            # 엄격 대상 중 지각·누락이 있는 워크플로 → 건수
+           starts: dict[str, dt.datetime], now: dt.datetime) -> tuple[float, str]:
+    """schedules: 워크플로 → cron 목록(하루 4회 이하만). starts: 워크플로별 창 시작(만든 시각 반영)."""
+    end = now - dt.timedelta(minutes=ONTIME_GRACE_MIN)
+    due = hit = late = gone = 0
+    bad: dict[str, int] = {}            # 창을 넘겨 늦었거나 안 돈 워크플로 → 건수
     for wf, crons in schedules.items():
-        is_strict = wf in strict_set
-        grace = ONTIME_GRACE_STRICT_MIN if is_strict else ONTIME_GRACE_MIN
-        k = "s" if is_strict else "g"
-        end = now - dt.timedelta(minutes=grace)
         start = starts.get(wf, now - dt.timedelta(days=ONTIME_WINDOW_DAYS))
         fires = sorted({f for c in crons for f in cron_fires(c, start, end)})
         created = sorted(t for t in (parse_ts(r.get("created_at")) for r in runs_by_wf.get(wf, [])
                                      if r.get("event") == "schedule") if t)
-        if is_strict:  # 주기 단위: 한 주기의 첫 슬롯 +창 안에 성공(진행 중 포함) 실행이 하나라도 시작됐으면 제때
-            ok = sorted(t for t in (parse_ts(r.get("created_at")) for r in runs_by_wf.get(wf, [])
-                                    if r.get("event") == "schedule"
-                                    and (r.get("conclusion") == "success" or r.get("status") != "completed")) if t)
-            anyrun = created
-            for first, last in cycles(fires):
-                n[k][0] += 1
-                if any(first - dt.timedelta(minutes=2) <= t <= first + dt.timedelta(minutes=grace) for t in ok):
-                    n[k][1] += 1
-                    continue
-                bad[wf] = bad.get(wf, 0) + 1
-                if any(first < t <= last + dt.timedelta(hours=ONTIME_LATE_MAX_H) for t in anyrun):
-                    late += 1
-                else:
-                    gone += 1
-            continue
         used: set[int] = set()
         missed: list[dt.datetime] = []
         for f in fires:
-            n[k][0] += 1
+            due += 1
             for i, t in enumerate(created):
                 if i in used:
                     continue
-                if f - dt.timedelta(minutes=2) <= t <= f + dt.timedelta(minutes=grace):
+                if f - dt.timedelta(minutes=2) <= t <= f + dt.timedelta(minutes=ONTIME_GRACE_MIN):
                     used.add(i)
-                    n[k][1] += 1
+                    hit += 1
                     break
             else:
                 missed.append(f)
         for f in missed:  # 정시로 쓰이지 않은 실행이 뒤늦게라도 있으면 지각, 없으면 누락
-            if is_strict:
-                bad[wf] = bad.get(wf, 0) + 1
+            bad[wf] = bad.get(wf, 0) + 1
             for i, t in enumerate(created):
                 if i not in used and f < t <= f + dt.timedelta(hours=ONTIME_LATE_MAX_H):
                     used.add(i)
@@ -282,16 +229,15 @@ def ontime(schedules: dict[str, list[str]], runs_by_wf: dict[str, list[dict[str,
                     break
             else:
                 gone += 1
-    due, hit = n["s"][0] + n["g"][0], n["s"][1] + n["g"][1]
     if due == 0:
         raise Hold("최근 7일 예정 0회")
     pct = round(100.0 * hit / due, 1)
-    note = (f"7일 예약 {due}회 중 {hit}회 제때(엄격 {n['s'][1]}/{n['s'][0]}·일반 {n['g'][1]}/{n['g'][0]})"
-            f" · 지각 {late}·누락 {gone}")
+    note = f"7일 예약 {due}회 중 {hit}회 제때(+{ONTIME_GRACE_MIN // 60}시간) · 지각 {late}·누락 {gone}"
     if bad:
-        names = [w.removeprefix("grm-").removesuffix(".yml") for w, _ in sorted(bad.items(), key=lambda x: -x[1])]
-        note += " · 엄격 지연: " + ", ".join(names[:3]) + (f" 외 {len(names) - 3}" if len(names) > 3 else "")
+        names = [w.removeprefix("grm-").removesuffix(".yml") for w, _ in sorted(bad.items(), key=lambda x: (-x[1], x[0]))]
+        note += " · 가장 늦은 작업: " + ", ".join(names[:3]) + (f" 외 {len(names) - 3}" if len(names) > 3 else "")
     return pct, note
+
 
 
 def glossary_week(now_count: int, base_count: int | None, base_day: str | None) -> tuple[int, str]:

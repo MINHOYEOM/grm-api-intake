@@ -254,7 +254,10 @@ _FDA483_DEVICE_TEXT_RE = re.compile(
 #   있는 문서 12건 중 강한 의약품 어휘(drug product·API·211 등)가 같이 있는 문서 0건.
 _FDA483_DEVICE_STRONG_RE = re.compile(
     r"unique\s+device\s+identif|\budi\b|medical\s+device\s+reports?|banned\s+(?:medical\s+)?devices?"
-    r"|product\s+realization|\b(?:803|806|807|830)\.\d+", re.I)
+    r"|product\s+realization|\b(?:803|806|807|830)\.\d+"
+    # [2026-11-09 대표 결정] ISO 13485 7.5.6(QMSR) "production and service provision" — Rogers Foam
+    #   (196239) 실측. DB 실측: 이 문구 문서 2건(Rogers Foam·Ventana IVD), 강한 의약품 어휘 0.
+    r"|production\s+and\s+service\s+provision", re.I)
 # 식품 483(21 CFR 117 예방관리) 전용 어휘 — 시설 유형이 그냥 "Manufacturer" 인 식품 업체를
 # 본문으로 가른다(10-26 OCR 복구분 Krispy Kreme). 의약품 어휘가 같이 있으면 남기는 조건은
 # 기기와 같다.

@@ -50,7 +50,7 @@ AMERICAN_CONTRACT_SYSTEMS_196243 = (
     "contracted to submit electronic Medical Device Reports to the FDA. Kits contained Powdered Surgical "
     "Gloves, a banned medical device, and a report was not submitted in writing to the FDA.")
 
-# ── 대표 판단 대기(이 PR 은 제외하지 않는다) ───────────────────────────────────
+# ── 대표 결정(11-09): 기기로 제외 — ISO 13485 7.5.6(QMSR) 문구, 의약품 어휘 0 ─────
 ROGERS_FOAM_196239 = (
     "Processes for production and service provision where the resulting output cannot be, or is not, "
     "verified by subsequent monitoring or measurement were not adequately validated. Additionally, an "
@@ -81,6 +81,7 @@ DEVICE_CASES = [
     ("fda483-196241 Immuno-Mycologics", "Manufacturer", IMMUNO_MYCOLOGICS_196241),
     ("fda483-196242 Radiation Products Design", "Manufacturer", RADIATION_PRODUCTS_196242),
     ("fda483-196243 American Contract Systems", "Contract Sterilizer", AMERICAN_CONTRACT_SYSTEMS_196243),
+    ("fda483-196239 Rogers Foam (대표 결정)", "Manufacturer", ROGERS_FOAM_196239),
 ]
 DRUG_CONTROLS = [
     ("fda483-196250 Novo (유형)", "Biopharmaceutical Manufacturer", NOVO_196250),
@@ -89,6 +90,13 @@ DRUG_CONTROLS = [
     ("fda483-196220 API", "Manufacturer", API_196220),
     ("복합제품 UDI+drug product", "Manufacturer", COMBINATION_PRODUCT),
     ("MDR+aseptic/media fill", "Manufacturer", ASEPTIC_WITH_MDR),
+    # 대표 결정(11-09): GLP 비임상시험기관은 남긴다.
+    ("fda483-196247 Charles River GLP", "Nonclinical Laboratory",
+     "The study director failed to assure that all raw data, documentation, protocols, specimens, "
+     "and final reports were transferred to the archives during or at the close of the study."),
+    ("fda483-196248 Comparative Biosciences GLP", "Good Laboratory Practice (Nonclinical Laboratories)",
+     "The study director failed to assure that unforeseen circumstances that might affect the quality "
+     "and integrity of the nonclinical laboratory study were noted when they occurred."),
 ]
 
 
@@ -101,7 +109,8 @@ class DeviceExcludedTest(unittest.TestCase):
     def test_strong_markers_each_suffice(self):
         for phrase in ("unique device identifier", "UDI", "Medical Device Reports",
                        "a banned medical device", "risk management in product realization",
-                       "21 CFR 803.50", "21 CFR 806.10", "21 CFR 807.85", "21 CFR 830.300"):
+                       "21 CFR 803.50", "21 CFR 806.10", "21 CFR 807.85", "21 CFR 830.300",
+                       "Processes for production and service provision were not validated"):
             with self.subTest(phrase):
                 # 약한 의약품 어휘가 같이 있어도 기기로 본다.
                 self.assertTrue(t.is_out_of_scope_483(
@@ -122,9 +131,10 @@ class DrugKeptTest(unittest.TestCase):
     def test_pharma_establishment_wins_over_device_text(self):
         self.assertFalse(t.is_out_of_scope_483("Drug Manufacturer", CARDIONXT_196231))
 
-    def test_rogers_foam_left_for_owner_decision(self):
-        # ISO 13485 7.5.6 문구라 기기 쪽 근거가 있지만, 대표 판단 전에는 제외하지 않는다(PR 본문).
-        self.assertFalse(t.is_out_of_scope_483("Manufacturer", ROGERS_FOAM_196239))
+    def test_production_service_provision_with_drug_text_stays(self):
+        # ISO 문구가 있어도 강한 의약품 어휘가 있으면 남긴다.
+        self.assertFalse(t.is_out_of_scope_483(
+            "Manufacturer", ROGERS_FOAM_196239 + " The drug product batches were released."))
 
 
 class MutationTest(unittest.TestCase):

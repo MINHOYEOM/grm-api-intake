@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T04:50:43Z",
+ "generated_at": "2026-11-09T05:21:09Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 42566688275,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-09T05:20:01Z",
+    "updatedAt": "2026-11-09T05:20:59Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Publish (assemble)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566688275"
+   },
+   {
     "databaseId": 42563902178,
     "status": "completed",
     "conclusion": "success",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "GRM Web Publish (assemble)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42552973746"
-   },
-   {
-    "databaseId": 42546767176,
-    "status": "completed",
-    "conclusion": "failure",
-    "event": "push",
-    "createdAt": "2026-11-09T01:40:04Z",
-    "updatedAt": "2026-11-09T01:41:21Z",
-    "headBranch": "main",
-    "displayTitle": "bridge(web): 2026-11-09 라우틴 델타 커밋 (자동)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42546767176"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42563985739,
+    "databaseId": 42566790479,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-09T04:50:32Z",
-    "updatedAt": "2026-11-09T04:50:36Z",
-    "headBranch": "publish/brief-2026-11-09",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563985739"
+    "createdAt": "2026-11-09T05:21:00Z",
+    "updatedAt": "2026-11-09T05:21:04Z",
+    "headBranch": "publish/brief-2026-11-02",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566790479"
    },
    {
-    "databaseId": 42563980592,
+    "databaseId": 42566785283,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T04:50:29Z",
-    "updatedAt": "2026-11-09T04:50:33Z",
-    "headBranch": "publish/brief-2026-11-09",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563980592"
+    "createdAt": "2026-11-09T05:20:57Z",
+    "updatedAt": "2026-11-09T05:21:01Z",
+    "headBranch": "publish/brief-2026-11-02",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566785283"
    },
    {
-    "databaseId": 42563513500,
+    "databaseId": 42566675154,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-09T05:19:53Z",
+    "updatedAt": "2026-11-09T05:19:57Z",
+    "headBranch": "main",
+    "displayTitle": "fix(publish): 재발행이 발행 뒤 정정한 facts 값을 되돌리지 않게 + 11-02 정정값 복구 (#1400)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566675154"
+   },
+   {
+    "databaseId": 42566335014,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-09T04:45:10Z",
-    "updatedAt": "2026-11-09T04:45:29Z",
-    "headBranch": "feat/fda-citations-screen",
-    "displayTitle": "feat(web): FDA 지적 조항 화면 — 조항별 인용 빈도",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563513500"
+    "createdAt": "2026-11-09T05:16:24Z",
+    "updatedAt": "2026-11-09T05:16:28Z",
+    "headBranch": "fix/brief-1026-extraction-gap",
+    "displayTitle": "brief(10-26): FDA 483 관찰 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extraction-gap)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566335014"
    },
    {
-    "databaseId": 42563510614,
+    "databaseId": 42566282807,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T04:45:08Z",
-    "updatedAt": "2026-11-09T04:50:41Z",
-    "headBranch": "feat/fda-citations-screen",
-    "displayTitle": "test(web): 영어 면 선언 집합에 지적 조항 면 포함",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563510614"
-   },
-   {
-    "databaseId": 42563316122,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T04:42:53Z",
-    "updatedAt": "2026-11-09T04:45:26Z",
-    "headBranch": "feat/fda-citations-screen",
-    "displayTitle": "feat(web): FDA 지적 조항 화면 — 조항별 인용 빈도",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563316122"
+    "createdAt": "2026-11-09T05:15:53Z",
+    "updatedAt": "2026-11-09T05:20:55Z",
+    "headBranch": "fix/brief-1026-extraction-gap",
+    "displayTitle": "brief(10-26): FDA 483 관찰 #1 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extractio…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566282807"
    }
   ],
   "grm-scaffold-mirror.yml": [

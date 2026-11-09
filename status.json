@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T08:21:10Z",
+ "generated_at": "2026-11-09T12:35:07Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42582465417,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T07:56:24Z",
-    "updatedAt": "2026-11-09T08:01:53Z",
-    "headBranch": "main",
-    "displayTitle": "docs(privacy): 처리방침 — 구독 시 가입 페이지 경로·언어 수집 항목 추가 (시행 2026-11-16) (#1424)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42582465417"
-   },
-   {
-    "databaseId": 42582417173,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-09T07:55:57Z",
-    "updatedAt": "2026-11-09T07:56:39Z",
-    "headBranch": "main",
-    "displayTitle": "fix(ops): 정기 작업 '제때' 기준을 예정+6시간으로 완화 (결재 #8) (#1420)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42582417173"
-   },
-   {
-    "databaseId": 42581599310,
+    "databaseId": 42615114099,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T07:48:03Z",
-    "updatedAt": "2026-11-09T07:53:08Z",
-    "headBranch": "fix/ops-ontime-window-3h",
-    "displayTitle": "fix(ops): 정기 작업 '제때' 기준을 예정+6시간으로 완화 (결재 #8)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581599310"
+    "createdAt": "2026-11-09T12:12:46Z",
+    "updatedAt": "2026-11-09T12:17:37Z",
+    "headBranch": "claude/glossary-fig-daily-20261109-2110",
+    "displayTitle": "glossary(fig): 2026-11-09 새 그림 0 · 다시 그림 0 · 보류 5 — 직선성·분석절차 밸리데이션·설비 적격성평가·제품 품질불만·메타데이터",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42615114099"
    },
    {
-    "databaseId": 42581594666,
+    "databaseId": 42615092828,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T07:48:01Z",
-    "updatedAt": "2026-11-09T07:53:29Z",
-    "headBranch": "fix/ops-ontime-window-3h",
-    "displayTitle": "fix(ops): 제때 기준을 단일 예정+6시간으로 단순화, 가장 늦은 작업 이름 표시 (결재 #8)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581594666"
+    "createdAt": "2026-11-09T12:12:37Z",
+    "updatedAt": "2026-11-09T12:18:29Z",
+    "headBranch": "claude/glossary-fig-daily-20261109-2110",
+    "displayTitle": "glossary(fig): 2026-11-09 새 그림 0 · 다시 그림 0 · 보류 5 — 직선성·분석절차 밸리데이션·설비…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42615092828"
    },
    {
-    "databaseId": 42581495074,
+    "databaseId": 42586883311,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T07:47:03Z",
-    "updatedAt": "2026-11-09T07:52:33Z",
+    "createdAt": "2026-11-09T08:34:06Z",
+    "updatedAt": "2026-11-09T08:39:11Z",
     "headBranch": "main",
-    "displayTitle": "feat(web): 지적 사례 한국어 번역 + 사례 확대(42→100건) (#1421)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581495074"
+    "displayTitle": "feat(web): 로그인 회원 1회 구독 안내 — 이미 구독 중이면 건너뛰는 상태 확인 (꺼짐 기본) (#1425)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42586883311"
+   },
+   {
+    "databaseId": 42585843367,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "createdAt": "2026-11-09T08:25:30Z",
+    "updatedAt": "2026-11-09T08:31:40Z",
+    "headBranch": "feat/member-subscribe-nudge-popup",
+    "displayTitle": "feat(web): 로그인 회원 1회 구독 안내 팝업 (꺼짐 기본, 결재 #1 대체)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42585843367"
+   },
+   {
+    "databaseId": 42585832043,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T08:25:25Z",
+    "updatedAt": "2026-11-09T08:31:22Z",
+    "headBranch": "feat/member-subscribe-nudge-popup",
+    "displayTitle": "feat(web): 로그인 회원 1회 구독 안내 — 이미 구독 중이면 건너뛰는 상태 확인 (꺼짐 기본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42585832043"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 42618085057,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-09T12:34:04Z",
+    "updatedAt": "2026-11-09T12:34:54Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42618085057"
+   },
+   {
     "databaseId": 41454533632,
     "status": "completed",
     "conclusion": "success",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40284508276"
-   },
-   {
-    "databaseId": 39240577089,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-19T10:52:38Z",
-    "updatedAt": "2026-10-19T10:53:05Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39240577089"
    }
   ],
   "grm-findings-translate-apply.yml": [
@@ -460,11 +460,11 @@
   "grm-findings-backfill-fetch.yml": [
    {
     "databaseId": 42575031678,
-    "status": "in_progress",
-    "conclusion": "",
+    "status": "completed",
+    "conclusion": "success",
     "event": "schedule",
     "createdAt": "2026-11-09T06:45:37Z",
-    "updatedAt": "2026-11-09T06:45:41Z",
+    "updatedAt": "2026-11-09T10:02:07Z",
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42575031678"

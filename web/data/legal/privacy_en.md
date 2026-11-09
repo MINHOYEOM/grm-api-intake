@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: November 3, 2026
+Effective date: November 16, 2026
 
 GRM (grm-solutions.com) handles only the minimum information needed to run the service. This is an English translation of the Korean Privacy Policy; if the two differ, the Korean version prevails.
 
@@ -11,7 +11,7 @@ Required and optional items are listed separately.
 - Sign-up (required): email address, password (stored only as a hash that cannot be decrypted), email confirmation code, confirmation that you are 14 or older, and a record of your agreement to the Terms and this Policy (time of agreement and version). The purpose is identity verification and login.
 - Features after login (created while you use the service): saved cards and reactions, followed firms, areas of interest, saved glossary terms, and learning and quiz records (Gurumi). The purpose is to let you continue across devices.
 - Inquiries and suggestions (optional): the message, the page path you were viewing, browser information (User-Agent) and screen size. If you want a reply, we receive your email address and store it only if you agree.
-- Newsletter (optional): email address, how you subscribed, time of consent, and version of the consent wording. The purpose is to send the weekly brief and announcements of new features.
+- Newsletter (optional): email address, the page path and language you subscribed from, time of consent, and version of the consent wording. The purpose is to send the weekly brief and announcements of new features.
 - Visit statistics: Cloudflare Web Analytics counts pages, referrers, countries and device types. It sets no cookies and stores no information that identifies an individual; Cloudflare may process IP addresses and similar data temporarily while it produces the statistics.
 - Our own anonymous counts: we count, only as daily totals, which kind of visit a subscription prompt started from (a source marker kept in your browser for 7 days), clicks, scrolls and card expansions inside the brief, and the channel a visit arrived from (UTM and referrer host). We do not store email addresses, IP addresses, identifiers or URLs for this.
 
@@ -30,7 +30,7 @@ The service sets no cookies. It keeps your login, learning records and display s
 We do not sell or provide your information to third parties. To run the service we entrust processing to the providers below. All are overseas companies, so your information is transferred abroad.
 
 - Supabase: member authentication and data storage. Country: Australia (Sydney). Items transferred: email address, hashed password, feature records, inquiry content.
-- Brevo: sending email and managing subscribers. Country: France and other EU countries. Items transferred: email address, time of subscription consent.
+- Brevo: sending email and managing subscribers. Country: France and other EU countries. Items transferred: email address, the page path and language you subscribed from, time of subscription consent.
 - Cloudflare: delivering the site and visit statistics. Country: United States and others. Items transferred: connection information (IP address and similar).
 - GitHub: storing encrypted backups. Country: United States. Items transferred: all of the above information contained in the backups (in encrypted form).
 
@@ -61,3 +61,7 @@ Children under 14 cannot sign up as members. The sign-up screen asks you to conf
 ## Changes to this Policy
 
 If this Policy changes, we will announce it on the site 7 days before it takes effect (30 days before for significant changes).
+
+Revision history
+
+- November 16, 2026: Added the page path and language you subscribed from to the items collected when you subscribe

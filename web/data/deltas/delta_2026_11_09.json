@@ -558,7 +558,7 @@
    "summary": "FDA 가 치약 등 OTC 의약품 수탁제조소 Pritam International Private Limited 에 미생물 평판 결과 위조, 소르비톨 용액의 DEG·EG 확인시험 미흡, 취소된 색소 사용을 들어 Warning Letter 를 발부했다.",
    "key_facts": [
     "지적: 배양기에서 균 성장이 보이던 평판이 다음 날 판독 시 성장 없는 평판으로 바뀌는 등 미생물 시험 결과 위조·변경",
-    "지적: 소르비톨 용액 약 (b)(4) 회 입고분 중 DEG·EG 포함 독립 확인시험 결과가 있는 COA 는 1건",
+    "지적: 소르비톨 용액 입고분(횟수는 FDA 비공개) 중 DEG·EG 포함 독립 확인시험 결과가 있는 COA 는 1건",
     "지적: 아동·성인용 치약에 1966년 인증 취소된 색소 CI 14720(Ext. D&C Red No. 10) 사용",
     "조치: 2026-09-03 Import Alert 66-40 등재, 2026-09-10 유효기간 내 치약 제품 자진회수"
    ],
@@ -573,7 +573,7 @@
     "summary": "FDA issued a Warning Letter to Pritam International Private Limited, a contract manufacturer of OTC drugs including toothpaste, citing falsified microbiological plate results, inadequate DEG/EG identity testing of sorbitol solution and use of a cancelled color additive.",
     "key_facts": [
      "Finding: plates showing microbial growth in the incubator were replaced the next day by plates with no growth, falsifying and altering test results",
-     "Finding: only 1 COA with independent identity testing, including DEG and EG, out of approximately (b)(4) sorbitol solution shipments",
+     "Finding: only 1 COA with independent identity testing, including DEG and EG, out of the sorbitol solution shipments received (number not disclosed by FDA)",
      "Finding: toothpaste for children and adults contained CI 14720 (Ext. D&C Red No. 10), delisted in 1966",
      "Action: Import Alert 66-40 on 2026-09-03; voluntary recall of in-expiry toothpaste on 2026-09-10"
     ],
@@ -589,7 +589,7 @@
    "title_issue": "취소 색소 FD&C Red No. 2 사용",
    "summary": "FDA 가 OTC 의약품 수탁제조소 Guangzhou Jiugong Research And Development Biotechnology Co., Ltd. 에 인증 취소된 색소 FD&C Red No. 2 사용과 품질부서 감독 실패를 들어 Warning Letter 를 발부했다.",
    "key_facts": [
-    "근거: 2026-05-01 704(a)(4) 기록 요청에 대해 (b)(4) 가 대리 제출한 기록 검토",
+    "근거: 2026-05-01 704(a)(4) 기록 요청에 대해 업체를 대신해 제출된 기록 검토(제출 주체는 FDA 비공개)",
     "지적: 제품 라벨에 1976년 인증 취소된 색소 CI 16185(FD&C Red No. 2) 기재",
     "지적: 라벨·배치 처방표·COA 에 기재된 색소가 서로 다름",
     "미회신: 2026-07-28 추가 정보 요청과 2026-08-05 후속 요청에 응답 없음"
@@ -604,7 +604,7 @@
     "title_issue": "Use of delisted FD&C Red No. 2",
     "summary": "FDA issued a Warning Letter to Guangzhou Jiugong Research And Development Biotechnology Co., Ltd., an OTC drug contract manufacturer, for using the cancelled color additive FD&C Red No. 2 and for failed quality unit oversight.",
     "key_facts": [
-     "Basis: review of records submitted on the firm's behalf by (b)(4) in response to a 704(a)(4) request of 2026-05-01",
+     "Basis: review of records submitted on the firm's behalf (submitter not disclosed by FDA) in response to a 704(a)(4) request of 2026-05-01",
      "Finding: product label lists CI 16185 (FD&C Red No. 2), whose certification was cancelled in 1976",
      "Finding: the label, batch formulation sheet and COA each named a different color additive",
      "No response: FDA's request of 2026-07-28 and follow-up of 2026-08-05 went unanswered"
@@ -622,7 +622,7 @@
    "summary": "FDA 가 의료용 가스 제조업체 Conroe Welding Supply, Inc. 에 의료용 산소(Oxygen, USP) 출하시험을 하지 않고 적합으로 기록한 사실, 입고 가스 확인시험 미실시, 혼입 불만 조사 부실을 들어 Warning Letter 를 발부했다.",
    "key_facts": [
     "지적: 충전 기술자가 시험을 수행하지 않고 Oxygen, USP 배치의 적합 결과를 기록",
-    "사례: 병원의 제3자 시험에서 산소 용기 내 (b)(4) 최대 99% 검출(산소 1% 미만)",
+    "사례: 병원의 제3자 시험에서 산소 용기 내 물질(명칭은 FDA 비공개)이 최대 99% 검출(산소 1% 미만)",
     "지적: 2025년 10월 병원 불만을 문서화·조사하지 않다가 2025-11-20 계약 해지 통지 후에야 조사 착수",
     "기준: 2025-12-18 시행 의료용 가스 CGMP(21 CFR part 213) 적용"
    ],
@@ -637,7 +637,7 @@
     "summary": "FDA issued a Warning Letter to Conroe Welding Supply, Inc., a medical gas manufacturer, after finding that Oxygen, USP batches were recorded as passing release tests that were never performed, incoming gases were not identity-tested, and mix-up complaints were poorly investigated.",
     "key_facts": [
      "Finding: a filling technician recorded passing results for Oxygen, USP batches without performing the tests",
-     "Case: third-party testing by a hospital found (b)(4) as high as 99% in oxygen containers (less than 1% oxygen)",
+     "Case: third-party testing by a hospital found a substance (name not disclosed by FDA) at levels as high as 99% in oxygen containers (less than 1% oxygen)",
      "Finding: a hospital complaint from October 2025 was not documented or investigated until a termination letter on 2025-11-20",
      "Standard: medical gas CGMP under 21 CFR part 213, effective 2025-12-18"
     ],

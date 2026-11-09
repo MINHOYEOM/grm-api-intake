@@ -766,6 +766,13 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # 검사가 안전하고, 배포 단계 `web/render.validate_whopir_ko` 가 한 번 더 fail-closed.
     report.errors.extend(_lint_whopir_ko(out.get("cards") or []))
 
+    # 게이트 8: 본문 슬롯에 FDA 가림 표기 `(b)(4)` 노출 — 발행 차단(2026-11-09 이후 호).
+    # 과거 호는 재조립이 막히지 않게 날짜 컷으로 제외한다(소급 수정 대상 아님).
+    _pub = str((scaffold.get("brief") or {}).get("publish_date")
+               or (scaffold.get("brief") or {}).get("run_date_kst") or "")
+    if not _pub or _pub >= _MASKED_MARK_GATE_FROM:
+        report.errors.extend(lint_masked_marks_in_body(out.get("cards") or []))
+
     # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
     # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
     agencies = _distinct_in_order(
@@ -949,6 +956,41 @@ def lint_false_absence_claims(cards: list[dict[str, Any]]) -> list[str]:
                 errs.append(
                     f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — "
                     f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+    return errs
+
+
+_MASKED_MARK_GATE_FROM = "2026-11-09"
+_MASKED_MARK_RE = re.compile(r"\(b\)\(\d\)")
+_MASKED_MARK_SLOTS = ("title_issue", "summary", "implication")
+_MASKED_MARK_LIST_SLOTS = ("key_facts", "checks")
+
+
+def lint_masked_marks_in_body(cards: list[dict[str, Any]]) -> list[str]:
+    """카드 본문 슬롯(한·영)에 FDA 가림 표기 `(b)(4)` 등이 남았으면 사유 목록을 돌려준다.
+
+    [게이트 8, 2026-11-09] 11-09 호 WL 카드 3장의 key_facts 에 "소르비톨 용액 약 (b)(4) 회
+    입고분" 같은 가림 기호가 그대로 발행됐다 — 독자에게 의미 없는 기호다. 원문 인용·위반 본문
+    (`deterministic_detail`·`quotes`·`source_text`)에는 원문 그대로 남는 게 맞으므로 검사하지
+    않는다. 산문 슬롯만 본다. 고치는 방법: "(비공개)" 로 옮기거나 수치·대상 단정 없이 다시 쓴다.
+    """
+    errs: list[str] = []
+
+    def _scan(cid: Any, prefix: str, node: Any) -> None:
+        if not isinstance(node, dict):
+            return
+        for slot in _MASKED_MARK_SLOTS:
+            v = node.get(slot)
+            if isinstance(v, str) and _MASKED_MARK_RE.search(v):
+                errs.append(f"카드 {cid!r}: {prefix}{slot} 에 가림 표기 노출 — {v[:60]!r}")
+        for slot in _MASKED_MARK_LIST_SLOTS:
+            for i, v in enumerate(node.get(slot) or []):
+                if isinstance(v, str) and _MASKED_MARK_RE.search(v):
+                    errs.append(
+                        f"카드 {cid!r}: {prefix}{slot}[{i}] 에 가림 표기 노출 — {v[:60]!r}")
+
+    for c in cards:
+        _scan(c.get("id"), "", c)
+        _scan(c.get("id"), "en.", c.get("en"))
     return errs
 
 

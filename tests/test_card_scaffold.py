@@ -2445,5 +2445,58 @@ class CardFactsFixTest(unittest.TestCase):
         self.assertEqual(pi["issue_or_reason"], "Feed summary")
 
 
+class LegislativePromotionTest(unittest.TestCase):
+    """입법·행정예고(data0009) — GMP 관련만 본 카드(domestic), 그 외 watch(웹 비카드). 2026-11-09 누락 사건."""
+
+    _PROMOTE = [
+        "「의약품 제조 및 품질관리에 관한 규정」 일부개정고시(안) 행정예고(식품의약품안전처 공고 제2026-500호)",
+        "「임상시험용의약품 표시 등에 관한 규정」 제정고시(안) 행정예고(식품의약품안전처 공고 제2026-540호)",
+        "의약품 등의 안전에 관한 규칙 일부개정령(안)(제조 및 품질관리 기준 관련)",
+        "「무균의약품 제조 및 품질관리 가이드」 행정예고",
+        "의약품 교차오염 방지 기준 개정(안)",
+    ]
+    _WATCH = [
+        "「의약품 등의 허가 등에 관한 수수료 규정」 일부고시개정(안)(공고 제2026-544호, 2026.11.6.)",
+        "첨단바이오의약품 안전 및 지원에 관한 규칙 일부개정령(안) 입법예고 알림(공고 제2026-533호)",
+        "「희귀의약품 지정에 관한 규정」 일부개정고시(안)(공고 제2026-522호, 2026.10.29.)",
+        "‘의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정’제정안 행정예고(식품의약품안전처 공고 제2026-507호)",
+        "의약품 등의 안전에 관한 규칙 일부개정령(안)",       # 제목만으로 제조·품질 조항인지 모름
+        "「화장품 제조 및 품질관리에 관한 규정」 일부개정(안)",
+        "「의료기기 제조 및 품질관리기준」 일부개정고시(안)",
+        "식품 제조업 영업등록 기준 개정(안) 입법예고",
+    ]
+
+    @staticmethod
+    def _row(title: str, n: int = 1) -> dict:
+        return {"date": "2026-11-05", "document_id": f"data0009-{44300 + n}",
+                "headline": title, "language": "KO", "modality": "",
+                "raw_fetch_ok": True, "signal_tier": "Tier 1", "source": "MFDS",
+                "type_or_class": "legislative-notice"}
+
+    def test_section_rule(self) -> None:
+        for t in self._PROMOTE:
+            with self.subTest(title=t):
+                self.assertEqual(cs.resolve_section("legislative", self._row(t)), "domestic")
+        for t in self._WATCH:
+            with self.subTest(title=t):
+                self.assertEqual(cs.resolve_section("legislative", self._row(t)), "watch")
+
+    def test_promoted_card_in_web_brief_watch_excluded(self) -> None:
+        rows = [self._row(t, i) for i, t in enumerate(self._PROMOTE + self._WATCH)]
+        cards = [cs.build_card_scaffold(r, {"title": r["headline"]}) for r in rows]
+        brief = cs.assemble_web_brief(cards, {**WEB_BRIEF_META, "intake_total": len(rows)})
+        ids = {c["id"] for c in brief["cards"]}
+        self.assertEqual(ids, {r["document_id"] for r in rows[:len(self._PROMOTE)]})
+        for c in brief["cards"]:
+            self.assertEqual(c["group"], "국내")
+
+    def test_facts_rows_have_notice_number(self) -> None:
+        r = self._row(self._PROMOTE[0])
+        card = cs.build_card_scaffold(r, {"title": r["headline"]})
+        self.assertIn("**공고번호**", card.markdown)
+        self.assertIn("<td>2026-500</td>", card.markdown)
+        self.assertEqual(card.section, "domestic")
+
+
 if __name__ == "__main__":
     unittest.main()

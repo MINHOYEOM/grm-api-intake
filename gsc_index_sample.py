@@ -83,6 +83,11 @@ def inspect(token: str, site_url: str, url: str) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-bucket", type=int, default=DEFAULT_PER_BUCKET)
     ap.add_argument("--docs", default=str(ROOT / "web" / "data" / "findings_docs.json"))

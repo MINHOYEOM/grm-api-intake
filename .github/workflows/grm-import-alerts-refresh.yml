@@ -1,0 +1,109 @@
+name: GRM Import Alerts Snapshot Refresh
+
+# [수입경보 1단계 2026-11-10] 업체 페이지 "FDA 수입경보 대상" 표시의 정본 `web/data/import_alerts.json`
+# 을 다시 뽑는다(import_alerts_refresh.py -> 게이트 -> 변경 있을 때만 PR). 사람이 머지한다(자동 머지 없음).
+#
+# ★dispatch 전용 — 원장(import_alert_listing) 적재가 아직 PC 중계(grm-fda-import-alert.yml source=ops)
+#   라 갱신 주기가 정해지지 않았다. 주기가 정해지면 schedule 을 붙인다.
+# ★service-role 키를 쓴다 - import_alert_listing(132)은 RLS 로 닫혀 있다(anon 회수, 그대로 둔다).
+#   스냅샷에는 공개 필드만(업체명·국가·도시·경보 번호·등재일·품목 코드·active·first_seen +
+#   이름 정규화 키). 주소는 싣지 않는다. 새 secret 없음(기존 재사용).
+# ★findings-docs 갱신(grm-findings-docs.yml)에 합류하지 않은 이유: 그 워크플로는 anon 키만 쓰도록
+#   못박혀 있다(service-role 로 뽑으면 비공개 findings 행이 실명 페이지로 나간다). 키가 다른 잡을
+#   한 워크플로에 섞지 않는다 — fda_citations 집계본(grm-fda-citations-snapshot.yml)과 같은 모양.
+# ★게이트: 0행·형식 위반·현재 등재 수 직전 대비 max_drop_pct 이상 감소면 PR 없이 실패.
+#   내용이 같으면(measured_on 만 다름) PR 도 없다.
+# ★업체 페이지는 테스트 빌드에서 꺼지고 sitemap 에도 영향이 없어 골든 재동결이 필요 없다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_drop_pct:
+        description: '현재 등재 업체 수가 직전 대비 이 비율(%) 이상 줄면 실패(PR 없음)'
+        required: true
+        default: '20'
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: grm-import-alerts-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MAX_DROP_PCT: ${{ inputs.max_drop_pct || '20' }}
+      BRANCH: automation/import-alerts-snapshot-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/import_alerts.json
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      # 스크립트가 게이트를 판정한다: 0 = 썼다 · 10 = 변경 없음 · 그 밖 = 실패(파일 무변경).
+      - name: Build snapshot (service-role read)
+        id: snap
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set +e
+          python import_alerts_refresh.py --out "$DATA_PATH" --max-drop-pct "$MAX_DROP_PCT"
+          RC=$?
+          set -e
+          if [ "$RC" -eq 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$RC" -eq 10 ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "수입경보 스냅샷 변경 없음 - PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "스냅샷 실패(rc=$RC) - PR 없이 실패합니다. 위 로그 참조." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: Create candidate branch and open PR
+        if: steps.snap.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git switch -c "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$DATA_PATH"
+          git commit -m "chore: refresh FDA import alerts snapshot"
+          git push -u origin "$BRANCH"
+          TOTALS=$(jq -r '"기준일 \(.measured_on) · 행 \(.totals.listings) · 현재 등재 \(.totals.active) · 한국 \(.totals.active_korea)"' "$DATA_PATH")
+          BYAL=$(jq -r '.totals.active_by_alert | map("- \(.alert_no): \(.n)곳") | join("\n")' "$DATA_PATH")
+          cat > "$RUNNER_TEMP/pr-body.md" <<EOF
+          업체 페이지 "FDA 수입경보 대상" 표시 정본 갱신(\`import_alerts_refresh.py\`, 원장 \`import_alert_listing\`).
+
+          ## 실측
+          $TOTALS
+
+          $BYAL
+
+          ## 게이트
+          - 0행·형식 위반·현재 등재 수 ${MAX_DROP_PCT}% 이상 감소 시 이 PR 은 만들어지지 않는다
+          - 공개 필드만(주소 없음) · 내용이 같으면 PR 없음
+
+          자동 머지 없음 - CI 초록 확인 후 사람이 머지한다.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh FDA import alerts snapshot" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+
+      # GITHUB_TOKEN 이 연 PR 은 CI 를 깨우지 않는다 -> 수동 dispatch 로 체크런을 붙인다(대기·머지 없음).
+      - name: Dispatch CI for the candidate
+        if: steps.snap.outputs.changed == 'true'
+        run: gh workflow run grm-ci.yml --ref "$BRANCH"

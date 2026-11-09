@@ -122,6 +122,8 @@ from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
 import graph_export  # noqa: E402
 import clause_citations  # noqa: E402
+# [수입경보 1단계 2026-11-10] 이름 정규화·경보 URL 상수의 단일 정의(수집기 모듈 — stdlib 만 import).
+import collect_fda_import_alert as _ia  # noqa: E402
 # [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
 # 걸러도, 게이트 이전에 발행된 브리프 JSON(`web/data/briefs/*.json`)은 여전히 파일에
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
@@ -3642,6 +3644,112 @@ def firm_similar_view(firm_docs: list[dict[str, Any]],
     return [{k: v for k, v in a.items() if k != "docs"} for a in rows[:limit]]
 
 
+# ── [수입경보 1단계 2026-11-10] 업체 페이지 상단 "FDA 수입경보 대상" ─────────────────────
+# 원천 표 import_alert_listing(132)은 RLS 로 닫혀 있다(service_role 전용) → 공개 필드만 뽑은
+# 스냅샷(web/data/import_alerts.json, import_alerts_refresh.py)을 커밋하고 정적으로 렌더한다.
+# 파일이 없거나 모양이 다르면 표시만 꺼진다(빌드는 계속).
+#
+# ★매칭 규칙(오매칭 금지 — 애매하면 매칭하지 않는다). 업체 페이지는 **회사명 단위**(findings
+#   firm_key + 별칭)이고 수입경보는 **제조소 단위**(경보·국가·이름)라, 문서 표기명 하나가 아래
+#   두 키를 **모두** 같게 가질 때만 잇는다:
+#   ① 수집기 정규화(collect_fda_import_alert.normalize_firm_name, 공백 제거) == 스냅샷 name_norm
+#      (공백 제거) — 즉 import_alert_listing.firm_key 의 이름 부분.
+#   ② 법인격 접미어까지 같다(LIMITED=LTD·PRIVATE=PVT·CORPORATION=CORP·INCORPORATED=INC·
+#      COMPANY=CO 만 동의어). ①만 쓰면 "Baxter Healthcare Corporation"(미국) ↔ "Baxter
+#      Healthcare"(캐나다), "Procter & Gamble Inc"(캐나다) ↔ "Procter & Gamble Co"(인도),
+#      "The Wellness Pharmacy, LLC"(미국) ↔ "Wellness Pharmacy"(캐나다)가 붙는다(2026-11-09 원문 실측).
+#   ③ 같은 이름(②의 키)이 수입경보에서 **두 나라 이상**에 있으면 그 이름은 매칭하지 않는다
+#      (GlaxoSmithKline 영국·사우디 등 실측 10개 키 — findings 문서에는 국가가 없어 가를 수 없다).
+#   그리고 화면에는 등재 제조소의 도시·국가를 함께 적는다(어느 사업장인지 독자가 본다).
+IMPORT_ALERTS_FILE = WEB_DIR / "data" / "import_alerts.json"
+IMPORT_ALERTS_SCHEMA = "grm-import-alerts/v1"
+_IA_SUFFIX_SYNONYMS = {"LIMITED": "LTD", "PRIVATE": "PVT", "CORPORATION": "CORP",
+                       "INCORPORATED": "INC", "COMPANY": "CO"}
+_IA_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_IA_ALERT_RE = re.compile(r"^\d{2}-\d{2}$")
+
+
+def load_import_alerts(path: Path) -> "dict[str, Any] | None":
+    """수입경보 스냅샷. 없거나 깨졌거나 스키마가 다르면 None(표시 생략, 빌드 계속)."""
+    if not path.is_file():
+        return None
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return None
+    if not isinstance(obj, dict) or obj.get("schema_version") != IMPORT_ALERTS_SCHEMA:
+        return None
+    if not _IA_DATE_RE.match(str(obj.get("measured_on") or "")):
+        return None
+    if not isinstance(obj.get("listings"), list):
+        return None
+    return obj
+
+
+def import_alert_strict_key(name: str) -> str:
+    """법인격 접미어를 **남긴** 비교 키(동의어만 접는다). 선행 THE 만 뗀다."""
+    s = unicodedata.normalize("NFKC", _html.unescape(name or "")).upper().replace("&", " AND ")
+    s = "".join(ch if ch.isalnum() else " " for ch in s)
+    toks = [_IA_SUFFIX_SYNONYMS.get(t, t) for t in s.split()]
+    if toks and toks[0] == "THE":
+        toks = toks[1:]
+    return "".join(toks)
+
+
+def import_alert_loose_key(name: str) -> str:
+    """수집기 정규화(firm_key 의 이름 부분과 같은 규칙)."""
+    return _ia.normalize_firm_name(_html.unescape(name or "")).replace(" ", "")
+
+
+def build_import_alert_index(snapshot: "dict[str, Any] | None") -> dict[str, list[dict[str, Any]]]:
+    """strict 키 → 현재 등재(active) 행들. 필드가 깨진 행은 버리고, 두 나라 이상에 걸친
+    이름(규칙 ③)은 통째로 뺀다."""
+    if not snapshot:
+        return {}
+    idx: dict[str, list[dict[str, Any]]] = {}
+    for r in snapshot.get("listings") or []:
+        if not isinstance(r, dict) or r.get("active") is not True:
+            continue
+        name, norm = r.get("firm_name"), r.get("name_norm")
+        if not (isinstance(name, str) and name.strip() and isinstance(norm, str) and norm.strip()):
+            continue
+        if not _IA_ALERT_RE.match(str(r.get("alert_no") or "")) or not r.get("country"):
+            continue
+        key = import_alert_strict_key(name)
+        if key:
+            idx.setdefault(key, []).append(r)
+    return {k: v for k, v in idx.items()
+            if len({_ia.normalize_country(r["country"]) for r in v}) == 1}
+
+
+def firm_import_alerts(names, index: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    """업체 표기명들 → 화면 행(경보 번호순). 규칙 ①②를 모두 통과한 행만."""
+    seen: set[tuple[str, str]] = set()
+    out: list[dict[str, Any]] = []
+    for name in sorted({n for n in names if n}):
+        loose = import_alert_loose_key(name)
+        for r in index.get(import_alert_strict_key(name), []):
+            if not loose or r["name_norm"].replace(" ", "") != loose:
+                continue
+            ident = (r["alert_no"], r.get("firm_key") or r["firm_name"])
+            if ident in seen:
+                continue
+            seen.add(ident)
+            alert = _ia.ALERTS.get(r["alert_no"])
+            published = str(r.get("firm_published") or "")
+            out.append({
+                "alert_no": r["alert_no"],
+                "firm_name": r["firm_name"].strip(),
+                "place": ", ".join(x for x in (str(r.get("city") or "").strip(),
+                                               str(r.get("country") or "").strip()) if x),
+                "firm_published": published if _IA_DATE_RE.match(published) else "",
+                "n_products": len(r.get("product_codes") or []),
+                "url": _ia.URL_TMPL.format(page_id=alert["page_id"]) if alert else "",
+            })
+    out.sort(key=lambda a: (a["alert_no"], a["firm_name"]))
+    return out
+
+
 def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
                         link) -> "dict[str, Any] | None":
     """경고서한 지적 1건을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈 표시용 뷰.
@@ -6812,6 +6920,16 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for fp in firm_pages:
             facet_paths.append((page(f"findings/firm/{fp['slug']}/").site_path,
                                 fp["last_seen"]))
+        # [수입경보 1단계 2026-11-10] 업체 페이지 상단 표시. 매칭은 **업체 정본 키의 전체 문서
+        # 표기명**으로 한 번만 한다(영어판도 같은 결과 — 언어 트리가 매칭을 바꾸면 안 된다).
+        # 스냅샷이 없으면 빈 dict → 표시 없음(빌드 계속).
+        _ia_snapshot = load_import_alerts(IMPORT_ALERTS_FILE) if render_doc_pages else None
+        _ia_index = build_import_alert_index(_ia_snapshot)
+        import_alerts_by_key = {
+            fp["key"]: firm_import_alerts((d.get("firm_name") for d in by_firm.get(fp["key"], [])),
+                                          _ia_index)
+            for fp in firm_pages} if _ia_index else {}
+        import_alerts_on = (_ia_snapshot or {}).get("measured_on", "")
         if render_doc_pages:
             # [다국어 2026-09-04] 언어 트리마다 한 장씩. 뷰모델 구조는 같고 **집계는 그
             # 트리의 문서 집합에서** 나온다(firm_page_view). 분류 칩은 데이터에 한국어로
@@ -6850,6 +6968,12 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              fp["documents"], similar_by_doc, docs_by_id, _lg,
                              _doc_slugs_by_lang.get(_lg), _canonical_firm_key,
                              lambda t, _l=_lg: _firm_slug_for(t, _l)),
+                         # 원천(FDA)은 영문이다. 그래도 영어 트리에는 한글이 섞인 행을 싣지 않는다.
+                         import_alerts=[
+                             a for a in import_alerts_by_key.get(fp["key"], [])
+                             if _lg == DEFAULT_LANG
+                             or not _HANGUL_RE.search(a["firm_name"] + a["place"])],
+                         import_alerts_on=import_alerts_on,
                          measured_on=docs_data.get("measured_on", ""),
                          min_findings=docs_data.get("min_findings"))
 

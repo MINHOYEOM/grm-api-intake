@@ -70,6 +70,15 @@
   .ff-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
   .ff-about p{font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--muted);margin:0;max-width:780px;word-break:keep-all}
   .ff-about b{color:var(--body);font-weight:500}
+  /* [수입경보 1단계 2026-11-10] 업체 페이지 맨 위 — FDA 공개 목록 등재 사실만(사유·해석 없음). */
+  .ff-ia{margin:14px 0 0;border:1px solid var(--line-2);border-left:3px solid var(--coral);border-radius:var(--rad-s);background:var(--soft);padding:12px 16px;display:flex;flex-direction:column;gap:10px;max-width:780px}
+  .ff-ia-row{display:flex;flex-direction:column;gap:4px}
+  .ff-ia-badge{align-self:flex-start;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--on-coral);background:var(--coral);border-radius:var(--pill);padding:3px 12px}
+  .ff-ia-firm{font-family:var(--sans);font-size:14px;color:var(--ink);margin:0;overflow-wrap:anywhere}
+  .ff-ia-meta{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:0;word-break:keep-all}
+  .ff-ia-meta a{color:var(--coral-2);text-decoration:none;white-space:nowrap}
+  .ff-ia-meta a:hover,.ff-ia-meta a:focus-visible{color:var(--coral);text-decoration:underline}
+  .ff-ia-note{font-family:var(--sans);font-size:12.5px;line-height:1.7;color:var(--muted);margin:0;word-break:keep-all}
   .ff-rel{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-wrap:wrap;gap:8px}
   .ff-rel a{font-family:var(--sans);font-size:13.5px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 13px;text-decoration:none}
   .ff-rel a:hover{border-color:var(--coral);color:var(--coral)}
@@ -79,6 +88,21 @@
     <nav class="ff-crumb" aria-label="{{ _('현재 위치') }}">
       <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/docs/">{{ _('문서로 찾기') }}</a><i>&rsaquo;</i><span>{{ firm.name }}</span>
     </nav>
+    {#- [수입경보 1단계 2026-11-10] FDA 수입경보(66-40·66-41) 현재 등재 제조소 — 뷰가 매칭해 넘긴
+        행이 있을 때만 선다(render.firm_import_alerts: 표기명·법인격까지 일치, 두 나라 이상 이름 제외).
+        원천에 위반 사유 서술이 없으므로 해석·사유 문구를 쓰지 않는다 — 번호·등재일·출처·원문 링크만. -#}
+    {%- if import_alerts %}
+    <section class="ff-ia" aria-label="{{ _('FDA 수입경보') }}">
+      {%- for a in import_alerts %}
+      <div class="ff-ia-row">
+        <span class="ff-ia-badge">{{ _('FDA 수입경보 대상 · {no}', no=a.alert_no) }}</span>
+        <p class="ff-ia-firm">{{ a.firm_name }}{% if a.place %} · {{ a.place }}{% endif %}</p>
+        <p class="ff-ia-meta">{% if a.firm_published %}{{ _('등재일 {date}', date=a.firm_published) }} · {% endif %}{% if a.n_products %}{{ _('품목 코드 {n}개', n=a.n_products) }} · {% endif %}{{ _('출처: FDA Import Alert {no}', no=a.alert_no) }}{% if a.url %} · <a href="{{ a.url }}" target="_blank" rel="noopener">{{ _('FDA 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}</p>
+      </div>
+      {%- endfor %}
+      <p class="ff-ia-note">{{ _('{date}에 확인한 FDA 수입경보 목록에 같은 업체명으로 올라 있는 제조소입니다. 등재 주소와 품목은 FDA 원문에서 확인하세요.', date=import_alerts_on) }}</p>
+    </section>
+    {%- endif %}
     <p class="kick">Firm Record</p>
     <h1 class="ff-h1">{{ _("{name} 지적사항 이력", name=firm.name) }}</h1>
     {#- [2026-08-28] 종전 문구는 "아래 날짜는 실사한 날이 아니라 문서가 공개된 날"이었다.

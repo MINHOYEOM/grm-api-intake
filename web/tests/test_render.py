@@ -16057,6 +16057,89 @@ class WebDiscoveryHubTest(unittest.TestCase):
         self.assertNotIn("searchSection.scrollIntoView()", src)
 
 
+# ── [지적 사례 번역·진입점 2026-11-09] 한국어 번역 병기 + 조항·사례 화면 입구 ─────
+class WebDeficiencyExamplesEntryTest(unittest.TestCase):
+    """지적 사례(/findings/examples/)는 한국어 화면에서 참고용 번역을 먼저, 원문을 바로
+    아래에 함께 싣는다(번역 단독 노출 금지). 영어 화면은 원문만. 그리고 지적 조항·지적
+    사례 두 화면은 둘러보기 카드 안 링크 하나뿐이라 대표가 못 찾았다 — 홈 #records 카드·
+    지적사항 세그·푸터 도구 열에 입구를 낸다(ko·en 공통, 면이 선 빌드에서만)."""
+
+    ROUTES = (("findings/citations/", "FDA 지적 조항", "FDA citations"),
+              ("findings/examples/", "지적 사례", "Deficiency examples"))
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_examples_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        rd = lambda *p: (cls.single.joinpath(*p)).read_text(encoding="utf-8")
+        cls.ex_ko = rd("findings", "examples", "index.html")
+        cls.ex_en = rd("en", "findings", "examples", "index.html")
+        cls.landing = rd("index.html")
+        cls.en_landing = rd("en", "index.html")
+        cls.search = rd("findings", "index.html")
+        cls.en_search = rd("en", "findings", "index.html")
+        cls.data = render.example_page.load_examples()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    def test_ko_page_shows_translation_then_original(self):
+        n = 0
+        for e in self.data["examples"]:
+            ko = str(_esc(" ".join(e["ko"].split())))
+            en = str(_esc(" ".join(e["text"].split())))
+            i_ko = self.ex_ko.find(f'<p class="ex-ko">{ko}</p>')
+            i_en = self.ex_ko.find(f'<blockquote class="ex-q" lang="en">{en}</blockquote>')
+            self.assertGreater(i_ko, 0, e["id"])
+            self.assertGreater(i_en, i_ko, f"{e['id']}: 원문이 번역 바로 뒤에 있어야")
+            n += 1
+        self.assertEqual(self.ex_ko.count('class="ex-ko"'), n)
+        self.assertEqual(self.ex_ko.count('class="ex-q"'), n, "번역마다 원문이 짝으로 있어야")
+        self.assertIn("한국어는 참고용 번역입니다. 원문 기준은 영어입니다.", self.ex_ko)
+
+    def test_en_page_is_original_only(self):
+        self.assertNotIn('class="ex-ko"', self.ex_en)
+        self.assertNotIn('class="ex-tr"', self.ex_en)
+        self.assertIsNone(re.search(r"[가-힣]", self.ex_en.split("<main>", 1)[1].split("</main>", 1)[0]),
+                          "영어 지적 사례 본문에 한글이 남으면 안 된다")
+        self.assertEqual(self.ex_en.count('class="ex-q"'), len(self.data["examples"]))
+
+    def test_landing_records_has_six_question_cards(self):
+        for html, lang in ((self.landing, "ko"), (self.en_landing, "en")):
+            with self.subTest(lang=lang):
+                sec = html[html.index('id="records"'):html.index('id="engage"')]
+                self.assertEqual(sec.count('class="records-card"'), 6)
+                for path, _, _ in self.ROUTES:
+                    self.assertIn(f'href="{path}index.html"', sec, path)
+        self.assertIn("이 조항, FDA 는 얼마나 자주 지적했나요?", self.landing)
+        self.assertIn("우리 업무 영역에서는 실제로 어떤 지적이 나왔나요?", self.landing)
+        self.assertIn("How often has FDA cited this clause?", self.en_landing)
+
+    def test_records_grid_lays_six_cards_evenly(self):
+        """6장이 4+2 로 갈리지 않게 3열 → 2열 → 1열."""
+        src = (WEB_DIR / "templates" / "landing.html").read_text(encoding="utf-8")
+        self.assertIn(".records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}", src)
+        self.assertIn("@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}", src)
+        self.assertIn("@media(max-width:520px){.records-grid{grid-template-columns:1fr}}", src)
+
+    def test_footer_tools_column_links_both(self):
+        for html, lang in ((self.landing, "ko"), (self.en_landing, "en"), (self.search, "ko")):
+            foot = html[html.index('<div class="foot">'):html.index('<div class="foot-legal">')]
+            tools = foot[foot.index("<h5>" + ("도구" if lang == "ko" else "Tools")):]
+            tools = tools[:tools.index("</div>")]
+            for path, ko, en in self.ROUTES:
+                with self.subTest(lang=lang, path=path):
+                    self.assertRegex(tools, rf'findings/{path[9:]}index.html">{re.escape(ko if lang == "ko" else en)}</a>')
+
+    def test_en_findings_seg_has_shortcuts(self):
+        seg = self.en_search[self.en_search.index('<nav class="fnd-seg"'):]
+        seg = seg[:seg.index("</nav>")]
+        for path, _, en in self.ROUTES:
+            self.assertIn(f'{path}index.html">{en}</a>', seg)
+
+
 # ── [진입점 3종 2026-08-31] 실사관 프로파일까지 가는 길 ─────────────────────────
 class WebInspectorEntryPointsTest(unittest.TestCase):
     """실사관 프로파일(#862)은 이미 라이브였지만 실측상 닿는 길이 없었다 — 상단 nav
@@ -16084,13 +16167,22 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
         return html[start:html.index("</nav>", start)]
 
     def test_all_three_pages_carry_the_same_three_tabs(self):
+        # [진입점 2026-11-09] 면 탭 3개 뒤에 지적 조항·지적 사례 바로가기 — 페이지가 선
+        # 빌드에서만 붙는다(없는 페이지로 보내지 않는다).
+        extra = [(p, t) for p, t in (("findings/citations/", "FDA 지적 조항"),
+                                     ("findings/examples/", "지적 사례"))
+                 if (self.single / p / "index.html").is_file()]
+        self.assertEqual(len(extra), 2, "커밋 정본이 있으면 두 화면이 모두 선다")
         for label, html in (("search", self.search), ("browse", self.browse),
                              ("inspector", self.inspector)):
             with self.subTest(page=label):
                 seg = self._seg_block(html)
-                self.assertEqual(seg.count("<a "), 3, f"{label} 페이지 세그먼트 탭이 3개가 아니다")
+                self.assertEqual(seg.count("<a "), 3 + len(extra), f"{label} 페이지 세그먼트 탭 수")
                 for text in ("검색", "둘러보기", "실사관"):
                     self.assertIn(f">{text}</a>", seg, f"{label} 페이지에 '{text}' 탭 없음")
+                for path, text in extra:
+                    self.assertIn(f'findings/{path[len("findings/"):]}index.html">{text}</a>', seg,
+                                  f"{label} 페이지에 '{text}' 바로가기 없음")
 
     def test_each_page_marks_only_itself_active(self):
         cases = (

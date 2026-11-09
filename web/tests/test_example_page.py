@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -24,11 +25,11 @@ def _data():
             "s2": {"agency": "PMDA", "year": 2025, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://x/b.xlsx"},
         },
         "examples": [
-            {"id": f"s1#{i}", "category": "data_integrity", "source": "s1", "locator": "", "agency_category": "Annex 11", "text": f"Text {i}."}
-            for i in range(5)
+            {"id": f"s1#{i}", "category": "data_integrity", "source": "s1", "locator": "", "agency_category": "Annex 11", "text": f"Text {i}.", "ko": f"번역 {i}."}
+            for i in range(8)
         ] + [
             {"id": "s2#1", "category": "aseptic_sterility_assurance", "source": "s2", "locator": "R1",
-             "agency_category": "Sterility  assurance", "text": "A  b\nc."},
+             "agency_category": "Sterility  assurance", "text": "A  b\nc.", "ko": "가  나\n다."},
         ],
     }
 
@@ -42,7 +43,8 @@ class BuildTopicsTest(unittest.TestCase):
         self.assertEqual([t["code"] for t in topics], ["data_integrity", "aseptic_sterility_assurance"])
         self.assertEqual(len(topics[0]["examples"]), ep.MAX_PER_TOPIC)
         # 정본 순서 유지(앞에서부터 자른다)
-        self.assertEqual([e["text"] for e in topics[0]["examples"]], ["Text 0.", "Text 1.", "Text 2."])
+        self.assertEqual([e["text"] for e in topics[0]["examples"]],
+                         [f"Text {i}." for i in range(ep.MAX_PER_TOPIC)])
 
     def test_whitespace_normalised_and_year_basis_carried(self):
         e = ep.build_topics(_data(), LABELS)[1]["examples"][0]
@@ -68,6 +70,18 @@ class BuildTopicsTest(unittest.TestCase):
         d["examples"][0]["text"] = "x" * (ep.MAX_TEXT + 1)
         with self.assertRaises(ValueError):
             ep.build_topics(d, LABELS)
+
+    def test_ko_carried_normalised_and_required(self):
+        e = ep.build_topics(_data(), LABELS)[1]["examples"][0]
+        self.assertEqual(e["ko"], "가 나 다.")
+        for bad in (None, "", "   ", "가" * (ep.MAX_KO + 1)):
+            d = _data()
+            if bad is None:
+                del d["examples"][0]["ko"]
+            else:
+                d["examples"][0]["ko"] = bad
+            with self.subTest(ko=bad), self.assertRaises(ValueError):
+                ep.build_topics(d, LABELS)
 
     def test_schema_mismatch_rejected(self):
         import json, tempfile
@@ -104,6 +118,41 @@ class CommittedDataTest(unittest.TestCase):
             per[e["category"]] = per.get(e["category"], 0) + 1
         # 정본이 상한보다 많이 쌓이면 뒤쪽은 말없이 잘린다 — 일부러 그런 거면 이 값을 올려라.
         self.assertLessEqual(max(per.values()), ep.MAX_PER_TOPIC)
+
+    def test_every_example_has_korean_translation(self):
+        hangul = re.compile(r"[가-힣]")
+        for e in self.data["examples"]:
+            ko = (e.get("ko") or "").strip()
+            self.assertTrue(ko, e["id"])
+            self.assertRegex(ko, hangul, e["id"])
+            self.assertNotIn("●", ko, e["id"])
+            self.assertNotEqual(ko, e["text"], e["id"])
+
+    def test_acronyms_and_numbers_survive_translation(self):
+        """약어·고유명은 번역에서 바뀌지 않고, 원문의 숫자는 번역에도 그대로 있다."""
+        for e in self.data["examples"]:
+            for tok in re.findall(r"\b(?:HPLC|QPs?|MHRA|PMDA|OOS|CAPA|SOP|COA|IPC|KPI|PQS|EU GMP|DMRC|Annex \d+)\b", e["text"]):
+                self.assertIn(tok.rstrip("s") if tok == "QPs" else tok, e["ko"], f"{e['id']}: {tok}")
+            for num in re.findall(r"\d+", e["text"]):
+                self.assertIn(num, e["ko"], f"{e['id']}: 숫자 {num}")
+
+    def test_coverage_floor_per_topic_and_total(self):
+        """확대 계약 — 전체 70건 이상, 화면의 모든 영역이 3건 이상. 낮추려면 이유를 적어라."""
+        topics = ep.build_topics(self.data, LABELS)
+        self.assertEqual([t["code"] for t in topics], list(ep.TOPIC_ORDER))
+        shown = sum(len(t["examples"]) for t in topics)
+        self.assertGreaterEqual(shown, 70)
+        for t in topics:
+            self.assertGreaterEqual(len(t["examples"]), 3, t["code"])
+
+    def test_categories_are_on_screen_and_texts_not_fragments(self):
+        texts = set()
+        for e in self.data["examples"]:
+            self.assertIn(e["category"], ep.TOPIC_ORDER, e["id"])   # 화면 밖 영역에 둔 사례 금지
+            self.assertGreaterEqual(len(e["text"].split()), 5, e["id"])
+            norm = re.sub(r"\W+", " ", e["text"].lower()).strip()
+            self.assertNotIn(norm, texts, f"{e['id']}: 같은 문장 중복")
+            texts.add(norm)
 
     def test_pmda_year_is_fiscal(self):
         for key, s in self.data["sources"].items():

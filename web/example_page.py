@@ -1,7 +1,9 @@
 """지적 사례 화면(/findings/examples/) — 주제별 규제기관 지적 문장 대표 사례.
 
 데이터: web/data/deficiency_examples.json (사람이 고른 대표 사례. 출처 행 id 보존).
-순수 함수만 둔다 — 네트워크·DB 0(render.py 순수성 가드). 번역은 하지 않는다(DB 에 없다).
+순수 함수만 둔다 — 네트워크·DB 0(render.py 순수성 가드).
+번역(ko)은 DB 에 없어 정본 JSON 에 사람이 붙인 참고용 한 줄이다. 원문 기준은 영어(text) —
+한국어 화면도 원문을 함께 싣는다(번역 단독 노출 금지). 영어 화면은 원문만.
 """
 from __future__ import annotations
 
@@ -22,8 +24,9 @@ TOPIC_ORDER: tuple[str, ...] = (
     "training_personnel", "stability_storage", "equipment_facility",
     "quality_unit_oversight", "process_validation",
 )
-MAX_PER_TOPIC = 3
-MAX_TEXT = 260
+MAX_PER_TOPIC = 6
+MAX_TEXT = 300
+MAX_KO = 200
 
 
 def load_examples(path: Path = EXAMPLES_FILE) -> "dict[str, Any] | None":
@@ -55,10 +58,13 @@ def build_topics(data: "dict[str, Any] | None",
         text = " ".join(ex["text"].split())
         if not text or len(text) > MAX_TEXT:
             raise ValueError(f"사례 {ex['id']}: 본문 길이 {len(text)} (1..{MAX_TEXT})")
+        ko = " ".join((ex.get("ko") or "").split())
+        if not ko or len(ko) > MAX_KO:
+            raise ValueError(f"사례 {ex['id']}: 번역(ko) 길이 {len(ko)} (1..{MAX_KO})")
         if ex["category"] not in labels:
             raise ValueError(f"사례 {ex['id']}: 모르는 주제 {ex['category']}")
         by_topic.setdefault(ex["category"], []).append({
-            "id": ex["id"], "text": text,
+            "id": ex["id"], "text": text, "ko": ko,
             "agency": src["agency"], "year": src["year"],
             "year_basis": src.get("year_basis", "calendar"),
             "agency_category": " ".join((ex.get("agency_category") or "").split()),

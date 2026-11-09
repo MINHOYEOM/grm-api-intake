@@ -563,6 +563,23 @@ def diagnose_ghost_ids(ghost: list[str], scaffold_ids: "set[Any]") -> str:
     return f"델타 카드 id {len(ghost)}건이 스캐폴드에 없음(스캐폴드가 다른 intake run?)"
 
 
+# [새 실사 카드 틀 적용 시작일 2026-11-09] #1385 로 FDA 483·EU/UK GMP 비준수 등에 앞면 블록
+# (`card["inspection"]`)이 붙는다. 대표 결정: "새 틀은 11-16호부터" 였고 11-09 호가 첫 적용
+# 호가 됐다(#1405 로 라이브). 조립은 옛 호 재조립에도 돌므로 날짜로 막지 않으면 10-26·11-02
+# 같은 옛 호가 소급으로 새 틀이 된다(11-02 재조립 PR #1409 에서 483 약 100장 실측).
+INSPECTION_FRAME_FROM = "2026-11-09"
+
+
+def inspection_frame_applies(brief_meta: dict[str, Any]) -> bool:
+    """이 호에 새 실사 카드 틀(합치기+앞면 블록)을 적용하는가. 발행일 < 기준일이면 False.
+
+    날짜를 못 구하거나 형식이 이상하면 True(현행 유지 — 안전 기본값)."""
+    d = str((brief_meta or {}).get("publish_date") or (brief_meta or {}).get("run_date_kst") or "")[:10]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+        return True
+    return d >= INSPECTION_FRAME_FROM
+
+
 def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                            *, strict: bool = True,
                            deep_deltas: dict[str, dict[str, Any]] | None = None
@@ -673,12 +690,15 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     #    `inspection`(등급 칩·지적 목록·조치)을 결정론으로 붙인다. 렌더는 이 블록이 있는
     #    카드만 새 틀로 그린다 — 블록이 없는 과거 호는 다시 렌더해도 화면이 바뀌지 않는다.
     #    심층분석·번역 주입 **뒤**여야 국문(`*_ko`·`findings_ko`)을 쓸 수 있다.
-    n_before = len(adopted_cards)
-    adopted_cards = inspection_card.merge_same_inspection_ncr(adopted_cards)
-    if len(adopted_cards) < n_before:
-        report.warnings.append(
-            f"같은 실사 비준수 판정서 {n_before - len(adopted_cards)}장을 대표 카드로 묶음")
-    inspection_card.attach_inspection_blocks(adopted_cards)
+    #    [소급 방지 2026-11-09] 새 틀은 INSPECTION_FRAME_FROM 이후 호에만 — 옛 호를 재조립해도
+    #    합치기·블록이 붙지 않는다(`inspection_frame_applies`).
+    if inspection_frame_applies((scaffold.get("brief") or {})):
+        n_before = len(adopted_cards)
+        adopted_cards = inspection_card.merge_same_inspection_ncr(adopted_cards)
+        if len(adopted_cards) < n_before:
+            report.warnings.append(
+                f"같은 실사 비준수 판정서 {n_before - len(adopted_cards)}장을 대표 카드로 묶음")
+        inspection_card.attach_inspection_blocks(adopted_cards)
     for c in adopted_cards:
         blk = c.get("inspection") or {}
         dd = c.get("deterministic_detail") or {}

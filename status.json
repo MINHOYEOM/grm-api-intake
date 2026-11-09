@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T05:38:46Z",
+ "generated_at": "2026-11-09T05:41:33Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,28 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 42568688495,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-09T05:40:49Z",
+    "updatedAt": "2026-11-09T05:41:26Z",
+    "headBranch": "main",
+    "displayTitle": "fix(brief): 11-09 경고서한 카드의 가림 표시 노출 정리 + 본문 슬롯 가드 (#1410)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568688495"
+   },
+   {
+    "databaseId": 42568599030,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T05:39:53Z",
+    "updatedAt": "2026-11-09T05:41:23Z",
+    "headBranch": "main",
+    "displayTitle": "brief(10-26): FDA 483 관찰 #1 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extractio…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568599030"
+   },
+   {
     "databaseId": 42568356278,
     "status": "completed",
     "conclusion": "success",
@@ -148,85 +170,63 @@
     "headBranch": "main",
     "displayTitle": "GRM Web Publish (assemble)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563902178"
-   },
-   {
-    "databaseId": 42558262411,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T03:47:03Z",
-    "updatedAt": "2026-11-09T03:48:27Z",
-    "headBranch": "main",
-    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원 (#1368)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558262411"
-   },
-   {
-    "databaseId": 42553957175,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-09T03:00:19Z",
-    "updatedAt": "2026-11-09T03:01:50Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Publish (assemble)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553957175"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42568356373,
+    "databaseId": 42568741671,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-09T05:41:24Z",
+    "updatedAt": "2026-11-09T05:41:27Z",
+    "headBranch": "publish/brief-2026-10-26",
+    "displayTitle": "publish(web): 2026-10-26 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568741671"
+   },
+   {
+    "databaseId": 42568741290,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T05:37:15Z",
-    "updatedAt": "2026-11-09T05:37:36Z",
-    "headBranch": "main",
-    "displayTitle": "fix(brief): 새 실사 카드 틀은 11-09 이후 호에만 — 옛 호 재조립 소급 방지 (#1412)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568356373"
+    "createdAt": "2026-11-09T05:41:24Z",
+    "updatedAt": "2026-11-09T05:41:27Z",
+    "headBranch": "publish/brief-2026-10-26",
+    "displayTitle": "publish(web): 2026-10-26 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568741290"
    },
    {
-    "databaseId": 42568001659,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T05:33:33Z",
-    "updatedAt": "2026-11-09T05:38:31Z",
-    "headBranch": "fix/legislative-card-adoption",
-    "displayTitle": "feat(brief): GMP 관련 입법·행정예고를 본 카드로 승격 (watch 유지는 그 외)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568001659"
-   },
-   {
-    "databaseId": 42567993112,
-    "status": "completed",
-    "conclusion": "success",
+    "databaseId": 42568688493,
+    "status": "in_progress",
+    "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T05:33:27Z",
-    "updatedAt": "2026-11-09T05:38:44Z",
-    "headBranch": "fix/legislative-card-adoption",
-    "displayTitle": "feat(brief): GMP 관련 입법·행정예고를 본 카드로 승격 (watch 유지는 그 외)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42567993112"
+    "createdAt": "2026-11-09T05:40:49Z",
+    "updatedAt": "2026-11-09T05:41:08Z",
+    "headBranch": "main",
+    "displayTitle": "fix(brief): 11-09 경고서한 카드의 가림 표시 노출 정리 + 본문 슬롯 가드 (#1410)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568688493"
    },
    {
-    "databaseId": 42567954391,
+    "databaseId": 42568599098,
     "status": "completed",
     "conclusion": "cancelled",
     "event": "push",
-    "createdAt": "2026-11-09T05:33:04Z",
-    "updatedAt": "2026-11-09T05:37:32Z",
+    "createdAt": "2026-11-09T05:39:53Z",
+    "updatedAt": "2026-11-09T05:41:05Z",
     "headBranch": "main",
-    "displayTitle": "feat(ops): 지적 조항 집계 월간 자동 갱신 워크플로 (#1411)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42567954391"
+    "displayTitle": "brief(10-26): FDA 483 관찰 #1 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extractio…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568599098"
    },
    {
-    "databaseId": 42567896377,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T05:32:26Z",
-    "updatedAt": "2026-11-09T05:32:31Z",
-    "headBranch": "feat/deficiency-examples-screen",
-    "displayTitle": "feat(web): 지적 사례 화면 — 분류별 규제기관 지적 사례",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42567896377"
+    "databaseId": 42568356373,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-09T05:37:15Z",
+    "updatedAt": "2026-11-09T05:40:11Z",
+    "headBranch": "main",
+    "displayTitle": "fix(brief): 새 실사 카드 틀은 11-09 이후 호에만 — 옛 호 재조립 소급 방지 (#1412)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568356373"
    }
   ],
   "grm-scaffold-mirror.yml": [

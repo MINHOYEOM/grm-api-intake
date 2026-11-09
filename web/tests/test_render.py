@@ -6173,10 +6173,17 @@ class WebChecklistRenderTest(unittest.TestCase):
         cls.sitemap = (cls.single / "sitemap.xml").read_text(encoding="utf-8")
         cls.js_src = (WEB_DIR / "assets" / "checklist.js").read_text(encoding="utf-8")
         cls.html_src = (WEB_DIR / "templates" / "checklist.html").read_text(encoding="utf-8")
-        # 043 은 080 으로 대체됐다 — **현행 정의가 있는 파일**을 읽는다(옛 파일을 계속
-        # 읽으면 이미 갈아엎은 계약을 검사하며 초록이 뜬다).
-        cls.sql_src = (WEB_DIR / "migrations"
-                       / "080_findings_checklist_excerpt.sql").read_text(encoding="utf-8")
+        # 043 → 080 → 136 으로 대체됐다 — **현행 정의가 있는 파일**을 읽는다(옛 파일을 계속
+        # 읽으면 이미 갈아엎은 계약을 검사하며 초록이 뜬다). 파일명을 손으로 적지 않고
+        # findings_checklist 를 정의하는 **가장 최신** 마이그레이션을 고른다.
+        import re as _re
+        defs = [p for p in sorted((WEB_DIR / "migrations").glob("[0-9][0-9][0-9]_*.sql"))
+                if _re.search(r"create\s+or\s+replace\s+function\s+public\.findings_checklist\(",
+                              p.read_text(encoding="utf-8"), _re.I)]
+        cls.sql_src = defs[-1].read_text(encoding="utf-8")
+        # 발췌 함수(findings_clause_excerpt)의 정본은 080 그대로다.
+        cls.sql_excerpt = (WEB_DIR / "migrations"
+                           / "080_findings_checklist_excerpt.sql").read_text(encoding="utf-8")
 
     @classmethod
     def tearDownClass(cls):
@@ -6284,9 +6291,22 @@ class WebChecklistRenderTest(unittest.TestCase):
     def test_sql_section_match_does_not_swallow_neighbours(self):
         """접두 매치면 211.22 질의가 211.25·211.28 을 삼킨다 — 정확일치 또는 하위 항
         괄호까지만 허용한다."""
-        self.assertIn("cr.ref_txt = '21 CFR ' || sec.section", self.sql_src)
-        self.assertIn("cr.ref_txt like '21 CFR ' || sec.section || '(%'", self.sql_src)
+        # 136: exists 상관 서브질의(조항 × 지적 중첩 루프) 대신 원소마다 조항 키를 한 번 뽑아
+        # 등식 조인한다. 키는 '21 CFR ' 뒤에서 첫 '(' 앞까지 — 정확일치·하위 항 괄호만 잡는
+        # 080 계약과 동치(헤더 증명). 접두 like 로 퇴행하지 않았는지 본다.
+        self.assertIn("substring(cr.ref_txt from '^21 CFR ([^(]*)') as ref_key", self.sql_src)
+        self.assertIn("join sec on sec.section = r.ref_key", self.sql_src)
+        self.assertIn("select distinct sec.section, r.finding_id", self.sql_src)
+        self.assertNotIn("like '21 CFR ' || sec.section || '%'", self.sql_src)
         self.assertIn("삼킨다", self.sql_src)
+        self.assertIn("동치 증명", self.sql_src)
+
+    def test_sql_section_match_is_not_a_correlated_exists(self):
+        """[136] 080 의 `on exists(… jsonb_array_elements_text …)` 는 조항 20개에 SubPlan
+        569,820회였다(실측 993ms, anon 3초 상한). 매칭이 다시 상관 서브질의가 되면 안 된다."""
+        body = self.sql_src[self.sql_src.index("create or replace function public.findings_checklist("):]
+        body = body[:body.index("$$;")]
+        self.assertNotIn("on exists (", body)
 
     def test_sql_input_is_validated_and_capped(self):
         """클라이언트를 신뢰하지 않는다 — 조항 형식만 통과, 배열은 009 관례로 슬라이스."""
@@ -6304,7 +6324,7 @@ class WebChecklistRenderTest(unittest.TestCase):
         발췌는 늘 앞머리라, 조항이 본문 중간에서 인용됐으면 **다른 조항의 문장**이 뜨고
         통짜 finding 이면 **편지 서두**가 떴다. 080 은 그 조항이 인용된 자리에서 발췌한다."""
         self.assertIn("create or replace function public.findings_clause_excerpt(",
-                      self.sql_src)
+                      self.sql_excerpt)
         self.assertIn("public.findings_clause_excerpt(f.finding_text_ko, k.section)",
                       self.sql_src)
         self.assertIn("public.findings_clause_excerpt(f.finding_text,    k.section)",
@@ -6313,7 +6333,7 @@ class WebChecklistRenderTest(unittest.TestCase):
         # ★두 수를 손으로 적어 비교하면 기본값에서만 참인 보장이 된다(호출자가 p_max=120·
         #   p_lead=400 을 주면 깨진다). SQL 이 **관계를 강제**하는지 본다.
         self.assertIn("least(greatest(coalesce(p_lead, 300), 0), 400, maxlen - 40)",
-                      self.sql_src, "되짚기 상한이 발췌 길이에 묶여 있지 않다")
+                      self.sql_excerpt, "되짚기 상한이 발췌 길이에 묶여 있지 않다")
 
     def test_sql_drops_rows_whose_text_does_not_cite_the_clause(self):
         """화면이 증명할 수 없는 문장을 "실제 지적 사례"라고 싣지 않는다 — 없으면 없다고

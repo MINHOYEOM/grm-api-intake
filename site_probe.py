@@ -461,9 +461,16 @@ def run_probe(*, base_url: str, supabase_url: str, anon_key: str, today: dt.date
         "RPC fda_inspection_stats", base_norm, anon_key, "fda_inspection_stats", {}, timeout))
     checks.append(check_rpc(
         "RPC findings_stats", base_norm, anon_key, "findings_stats", {}, timeout))
-    checks.append(check_rpc(
+    # [2026-11-09 #1365] FIXED_FINDING_ID 는 092 캐시 대상(검색 화면에 뜨는 약 2,260건) 밖이라 늘
+    # 원 계산(079) 경로를 잰다. 실측: 데운 상태 평균 0.6s·최대 1.6s, 콜드 첫 호출만 3s 를 넘는다
+    # (6.6s 관측). 지난 24h 실제 방문자의 캐시 밖 호출은 0건이었다. 결과를 바꾸지 않는 속도 개선은
+    # 4% 뿐(079 결론과 같음)이고, 캐시를 전 지적으로 넓히는 것은 cron 예산상 불가능하다.
+    # 그래서 이 점검은 fail 이 아니라 warn 으로 남긴다 — 숨기지 않고 요약에 계속 보인다.
+    # 방문자 경로(캐시)는 아래 `findings_similar_cache_status` 신선도 점검이 fail 로 지킨다.
+    checks.append(_downgrade_fail_to_warn(check_rpc(
         "RPC findings_similar_to", base_norm, anon_key, "findings_similar_to",
-        {"p_finding_id": finding_id, "p_limit": 5}, timeout))
+        {"p_finding_id": finding_id, "p_limit": 5}, timeout),
+        "캐시 밖 원 계산 경로 — 콜드 첫 호출 지연, 방문자 경로는 캐시 신선도 점검이 본다"))
 
     # 4) [085] 스냅샷 신선도 — 폴백이 가리는 cron 사망을 밖으로 낸다
     checks.append(check_rpc_snapshot_fresh(

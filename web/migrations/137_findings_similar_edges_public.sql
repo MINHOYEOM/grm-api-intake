@@ -20,12 +20,20 @@ stable
 security definer
 set search_path = public
 as $$
-  select s.finding_id, s.similar_id, s.score
-    from public.finding_similar s
-    join public.findings a on a.finding_id = s.finding_id
-    join public.findings b on b.finding_id = s.similar_id
+  -- [11-09 dry-run] 양방향을 OR 한 식은 두 색인을 못 타 300개에 3.2초(anon 3초 초과)였다.
+  -- 같은 집합을 UNION 두 갈래(각자 색인)로 받으면 0.8초, OR 식 대비 빠진 엣지 0.
+  with e as (
+    select s.finding_id, s.similar_id, s.score from public.finding_similar s
+     where s.finding_id = any (p_finding_ids)
+    union
+    select s.finding_id, s.similar_id, s.score from public.finding_similar s
+     where s.similar_id = any (p_finding_ids)
+  )
+  select e.finding_id, e.similar_id, e.score
+    from e
+    join public.findings a on a.finding_id = e.finding_id
+    join public.findings b on b.finding_id = e.similar_id
    where coalesce(cardinality(p_finding_ids), 0) between 1 and 1000
-     and (s.finding_id = any (p_finding_ids) or s.similar_id = any (p_finding_ids))
      and (a.finding_text_ko <> '' or a.finding_language = 'KO')
      and a.scope_status = 'ok' and a.review_status <> 'rejected'
      and (b.finding_text_ko <> '' or b.finding_language = 'KO')

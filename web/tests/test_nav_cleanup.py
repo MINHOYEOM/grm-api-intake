@@ -119,9 +119,11 @@ class NavCleanupRenderedTest(unittest.TestCase):
             on = re.findall(r'class="on" aria-current="page">([^<]+)</a>', seg)
             self.assertEqual(on, [active] if active else [], rel)
             hrefs = re.findall(r'href="([^"]+)"', seg)
+            # 면마다 깊이가 달라(../ vs ../../) 상대 경로 문자열은 다르다 — 해석한 목적지로 비교한다.
+            dests = [(self.out / rel).parent.joinpath(h).resolve() for h in hrefs]
             if seen is None:
-                seen = hrefs
-            self.assertEqual(hrefs, seen, f"{rel} 의 탭 링크가 다른 면과 다르다")
+                seen = dests
+            self.assertEqual(dests, seen, f"{rel} 의 탭 링크가 다른 면과 다르다")
             self.assertNotIn('class="tr-seg"', self._read(rel), rel)
             for h in hrefs:
                 self.assertTrue((self.out / rel).parent.joinpath(h).resolve().is_file(), f"{rel} → {h}")
@@ -130,10 +132,12 @@ class NavCleanupRenderedTest(unittest.TestCase):
         segs = {rel: _seg(self._read("en/" + rel)) for rel, _ in ZONE_PAGES
                 if (self.out / "en" / rel).is_file()}
         self.assertIn("findings/trends/index.html", segs)
-        first = next(iter(segs.values()))
+        def dests(rel, seg):
+            return [(self.out / "en" / rel).parent.joinpath(h).resolve()
+                    for h in re.findall(r'href="([^"]+)"', seg)]
+        first_rel, first = next(iter(segs.items()))
         for rel, seg in segs.items():
-            self.assertEqual(re.findall(r'href="([^"]+)"', seg),
-                             re.findall(r'href="([^"]+)"', first), rel)
+            self.assertEqual(dests(rel, seg), dests(first_rel, first), rel)
 
     # ── 푸터 도구 열 ──────────────────────────────────────────────────────
     def test_footer_tools_follow_tab_names_and_order(self):

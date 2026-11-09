@@ -2237,7 +2237,7 @@
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
     "지적: 배양기에서 균 성장이 보이던 평판이 다음 날 판독 시 성장 없는 평판으로 바뀌는 등 미생물 시험 결과 위조·변경",
-    "지적: 소르비톨 용액 약 (b)(4) 회 입고분 중 DEG·EG 포함 독립 확인시험 결과가 있는 COA 는 1건",
+    "지적: 소르비톨 용액 입고분(횟수는 FDA 비공개) 중 DEG·EG 포함 독립 확인시험 결과가 있는 COA 는 1건",
     "지적: 아동·성인용 치약에 1966년 인증 취소된 색소 CI 14720(Ext. D&C Red No. 10) 사용",
     "조치: 2026-09-03 Import Alert 66-40 등재, 2026-09-10 유효기간 내 치약 제품 자진회수"
    ],
@@ -2328,7 +2328,7 @@
     "implication": "FDA rejected the firm's response, which treated the plate swapping as a deliberate but isolated act by a microbiologist and relied on retraining, seals and dual reading, because it reduced evidence of a breakdown in quality unit oversight to a procedural gap. Our microbiology labs should check whether plate readings can be verified afterwards through time-stamped photos and custody records, and whether data-falsification investigations extend beyond the individual analyst to the system level.",
     "key_facts": [
      "Finding: plates showing microbial growth in the incubator were replaced the next day by plates with no growth, falsifying and altering test results",
-     "Finding: only 1 COA with independent identity testing, including DEG and EG, out of approximately (b)(4) sorbitol solution shipments",
+     "Finding: only 1 COA with independent identity testing, including DEG and EG, out of the sorbitol solution shipments received (number not disclosed by FDA)",
      "Finding: toothpaste for children and adults contained CI 14720 (Ext. D&C Red No. 10), delisted in 1966",
      "Action: Import Alert 66-40 on 2026-09-03; voluntary recall of in-expiry toothpaste on 2026-09-10"
     ],
@@ -2409,7 +2409,7 @@
    "quotes": [],
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
-    "근거: 2026-05-01 704(a)(4) 기록 요청에 대해 (b)(4) 가 대리 제출한 기록 검토",
+    "근거: 2026-05-01 704(a)(4) 기록 요청에 대해 업체를 대신해 제출된 기록 검토(제출 주체는 FDA 비공개)",
     "지적: 제품 라벨에 1976년 인증 취소된 색소 CI 16185(FD&C Red No. 2) 기재",
     "지적: 라벨·배치 처방표·COA 에 기재된 색소가 서로 다름",
     "미회신: 2026-07-28 추가 정보 요청과 2026-08-05 후속 요청에 응답 없음"
@@ -2464,7 +2464,7 @@
     "summary": "FDA issued a Warning Letter to Guangzhou Jiugong Research And Development Biotechnology Co., Ltd., an OTC drug contract manufacturer, for using the cancelled color additive FD&C Red No. 2 and for failed quality unit oversight.",
     "implication": "FDA judged that the quality unit had not properly performed raw material qualification and formulation review, since the label, formulation sheet and COA named different colorants and two requests for clarification went unanswered. Even for contract products, our quality unit should be checking that formulation ingredients match across label, batch record and COA, and that colorants are permitted in the destination market.",
     "key_facts": [
-     "Basis: review of records submitted on the firm's behalf by (b)(4) in response to a 704(a)(4) request of 2026-05-01",
+     "Basis: review of records submitted on the firm's behalf (submitter not disclosed by FDA) in response to a 704(a)(4) request of 2026-05-01",
      "Finding: product label lists CI 16185 (FD&C Red No. 2), whose certification was cancelled in 1976",
      "Finding: the label, batch formulation sheet and COA each named a different color additive",
      "No response: FDA's request of 2026-07-28 and follow-up of 2026-08-05 went unanswered"
@@ -2514,7 +2514,7 @@
    "evidence_basis": "공식 인덱스 + 보조 출처",
    "key_facts": [
     "지적: 충전 기술자가 시험을 수행하지 않고 Oxygen, USP 배치의 적합 결과를 기록",
-    "사례: 병원의 제3자 시험에서 산소 용기 내 (b)(4) 최대 99% 검출(산소 1% 미만)",
+    "사례: 병원의 제3자 시험에서 산소 용기 내 물질(명칭은 FDA 비공개)이 최대 99% 검출(산소 1% 미만)",
     "지적: 2025년 10월 병원 불만을 문서화·조사하지 않다가 2025-11-20 계약 해지 통지 후에야 조사 착수",
     "기준: 2025-12-18 시행 의료용 가스 CGMP(21 CFR part 213) 적용"
    ],
@@ -2611,7 +2611,7 @@
     "implication": "FDA found the firm's response, which promised new SOPs with its facility move and second-person verification in fill logs, inadequate because it provided no finished-product specifications, test procedures, calibration evidence or test results. Our sites should check that release decisions trace back to actual raw test data and that complaint investigations extend to other containers and batches exposed to the same cause.",
     "key_facts": [
      "Finding: a filling technician recorded passing results for Oxygen, USP batches without performing the tests",
-     "Case: third-party testing by a hospital found (b)(4) as high as 99% in oxygen containers (less than 1% oxygen)",
+     "Case: third-party testing by a hospital found a substance (name not disclosed by FDA) at levels as high as 99% in oxygen containers (less than 1% oxygen)",
      "Finding: a hospital complaint from October 2025 was not documented or investigated until a termination letter on 2025-11-20",
      "Standard: medical gas CGMP under 21 CFR part 213, effective 2025-12-18"
     ],

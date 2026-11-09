@@ -2293,5 +2293,101 @@
       "Control of the whole path by which labelling and packaging materials are received, stored, issued, and used, with the records kept"
     ],
     "explanation_en": "Line clearance is the procedure confirming, before new work starts, that no previous product, material, or document remains in the working area or on the equipment (EU GMP Part I Chapter 5 §§5.40, 5.50; 21 CFR 211.130(e)). The others describe reconciliation, an equipment use and cleaning log, and labelling control."
+  },
+  {
+    "id": "q-202646-01",
+    "question_ko": "FDA가 TSP Solutions Pte. Ltd.에 2026년 10월 22일 발행한 Warning Letter에서, 원료 성분별 확인시험 미실시와 함께 원료 관련 위반으로 지적한 것은?",
+    "choices": [
+      "출하 전 완제품의 불쾌미생물 시험을 하지 않은 것",
+      "원료 공급업체의 시험성적 신뢰성을 검증하지 않은 것",
+      "품질부서가 맡은 책임을 제대로 이행하지 않은 것",
+      "배치별 출하 전 확인·함량 시험을 하지 않은 것"
+    ],
+    "answer_index": 1,
+    "explanation_ko": "Warning Letter의 위반 2는 원료 성분별 확인시험 미실시와 공급업체 시험성적 신뢰성 미검증이며 21 CFR 211.84(d)(1)·(d)(2)가 인용됐습니다. 나머지는 출하 전 시험(211.165)과 품질부서 책임(211.22) 위반 항목입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-11-02/#3a5a9d3e0689",
+    "difficulty": "normal",
+    "week": "202646",
+    "question_en": "In its October 22, 2026 Warning Letter to TSP Solutions Pte. Ltd., which finding did FDA cite alongside the failure to run identity tests on each component?",
+    "choices_en": [
+      "Not running objectionable-microorganism testing on finished product before release",
+      "Not verifying the reliability of the raw-material supplier's test results",
+      "The quality unit not fulfilling its responsibilities",
+      "Not running batch-by-batch identity and strength testing before release"
+    ],
+    "explanation_en": "Violation 2 in the Warning Letter was the failure to run component identity tests together with not verifying the reliability of supplier test results, citing 21 CFR 211.84(d)(1) and (d)(2). The others are the pre-release testing (211.165) and quality unit responsibility (211.22) findings."
+  },
+  {
+    "id": "q-202646-02",
+    "question_ko": "Houston Rx LLC가 Tirzepatide/Niacinamide 주사 바이알 등 2품목을 Class II로 일괄 회수한 사유로 FDA 자료에 기재된 것은?",
+    "choices": [
+      "불순물·분해산물 규격 부적합",
+      "이물 입자 혼입 가능성",
+      "표시량 대비 함량 미달",
+      "무균성 보증 결여"
+    ],
+    "answer_index": 3,
+    "explanation_ko": "FDA 회수 자료에 Houston Rx LLC의 회수 사유가 ‘Lack of assurance of sterility(무균성 보증 결여)’로 기재됐고 Class II로 분류됐습니다. 나머지는 같은 주 다른 회수 건의 사유입니다.",
+    "source_type": "brief",
+    "source_ref": "https://grm-solutions.com/briefs/2026-11-02/#D-0040-2027",
+    "difficulty": "easy",
+    "week": "202646",
+    "question_en": "What recall reason did FDA record for Houston Rx LLC's Class II recall of two injectable vial products, including Tirzepatide/Niacinamide?",
+    "choices_en": [
+      "Impurity or degradation product out of specification",
+      "Possible foreign particulate contamination",
+      "Potency below the labeled amount",
+      "Lack of assurance of sterility"
+    ],
+    "explanation_en": "FDA's recall record lists the reason for Houston Rx LLC's recall as \"Lack of assurance of sterility\" and classifies it as Class II. The other options are reasons given for other recalls that week."
+  },
+  {
+    "id": "q-202646-03",
+    "question_ko": "의약품 GMP에서 말하는 ‘자율점검(Self-Inspection)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "제조소가 자체적으로 GMP 준수와 품질시스템의 효과를 정기적으로 평가하는 점검",
+      "경영진이 품질시스템이 잘 작동하는지 정기적으로 검토하고 필요한 조치를 결정하는 절차",
+      "발생한 문제의 재발과 잠재적 문제의 발생을 막기 위해 원인을 조사하고 조치를 실행·확인하는 체계",
+      "제품 전 생애주기에서 품질목표를 달성하도록 조직, 책임, 절차, 공정과 자원을 연결한 관리체계"
+    ],
+    "answer_index": 0,
+    "explanation_ko": "자율점검은 제조소가 자체적으로 GMP 준수와 품질시스템의 효과를 정기적으로 평가하는 점검입니다(EU GMP Part I Chapter 9; ICH Q10 §4.1). 나머지는 각각 경영검토, 시정 및 예방조치(CAPA), 의약품 품질시스템에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "self-inspection",
+    "difficulty": "easy",
+    "week": "202646",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes self-inspection?",
+    "choices_en": [
+      "The site's own periodic assessment of GMP compliance and of the effectiveness of the quality system",
+      "The procedure in which management periodically reviews whether the quality system works well and decides on needed actions",
+      "The system for investigating causes and carrying out and verifying actions to prevent recurrence of problems and occurrence of potential ones",
+      "The management system that links organization, responsibilities, procedures, processes, and resources to achieve quality objectives across the product lifecycle"
+    ],
+    "explanation_en": "Self-inspection is the site's own periodic assessment of GMP compliance and of the effectiveness of the quality system (EU GMP Part I Chapter 9; ICH Q10 §4.1). The others describe management review, CAPA, and the pharmaceutical quality system."
+  },
+  {
+    "id": "q-202646-04",
+    "question_ko": "의약품 GMP에서 말하는 ‘제품품질평가(Product Quality Review)’에 대한 설명으로 옳은 것은?",
+    "choices": [
+      "요구사항을 충족하는 능력을 높이기 위해 반복적으로 수행하는 개선 활동",
+      "관리수단을 적용한 결과 공정 성능과 제품 품질이 계속 적절하다고 보장되는 상태",
+      "공정과 제품의 일관성, 규격의 적절성, 추세와 개선 필요성을 확인하기 위해 정기적으로 수행하는 품질 검토",
+      "시판 후에도 제품이 유효기간 동안 규격 안에 머무는지 확인하기 위해 매년 배치를 넣어 계속 시험하는 프로그램"
+    ],
+    "answer_index": 2,
+    "explanation_ko": "제품품질평가는 공정과 제품의 일관성, 규격의 적절성, 추세와 개선 필요성을 확인하기 위해 정기적으로 수행하는 품질 검토입니다(EU GMP Part I Chapter 1; ICH Q10 §2.7). 나머지는 각각 지속적 개선, 관리상태, 지속적 안정성 시험에 대한 설명입니다.",
+    "source_type": "glossary",
+    "source_ref": "product-quality-review",
+    "difficulty": "normal",
+    "week": "202646",
+    "question_en": "In pharmaceutical GMP, which statement correctly describes the product quality review?",
+    "choices_en": [
+      "Improvement activity carried out repeatedly to enhance the ability to meet requirements",
+      "The state in which applied controls keep process performance and product quality continuously adequate",
+      "A periodic quality review to confirm process and product consistency, suitability of specifications, trends, and need for improvement",
+      "A program that keeps testing batches placed on stability each year to confirm the marketed product stays within specification through its shelf life"
+    ],
+    "explanation_en": "The product quality review is a periodic quality review to confirm process and product consistency, suitability of specifications, trends, and need for improvement (EU GMP Part I Chapter 1; ICH Q10 §2.7). The others describe continual improvement, state of control, and the ongoing stability programme."
   }
 ]

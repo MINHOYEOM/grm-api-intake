@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [해외 지적 사례 전체 2026-11-10] /findings/examples/mhra-data/ — MHRA 2018·2019 GMP 실사 지적 원자료(xlsx)
+    집계. 원자료에는 지적 문장이 없고 익명 실사 ID·등급·EU GMP 조항만 있다 → 행 전부를 조항·문단별로 센다.
+    데이터 = web/data/deficiency_cases.json → deficiency_cases_page.clause_counts_view. 해석 문구 없음. -#}
+{% include "partials/deficiency_cases_style.html" %}
+<main>
+  <div class="wrap">
+    <nav class="dc-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i>{% if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/">{{ _('지적 사례') }}</a><i>&rsaquo;</i>{% endif %}<span>{{ _('MHRA 조항별 집계') }}</span>
+    </nav>
+    <p class="kick">MHRA &middot; EU GMP</p>
+    <h1 class="dc-h1">{{ _('영국 MHRA 실사에서 인용된 EU GMP 조항') }}</h1>
+    <p class="dc-sum">{{ _('MHRA 가 공개한 {years}년 GMP 실사 {insp}건의 지적 원자료에서, 지적에 인용된 EU GMP 조항 {n}회를 조항·문단별로 셌습니다.', years=cc.years | join('·'), insp="{:,}".format(cc.inspections), n="{:,}".format(cc.rows_total)) }}</p>
+    <p class="dc-note">{{ _('원자료에는 지적 문장이 없고 익명 실사 번호·등급(Critical·Major·Other)·조항만 있습니다. 지적 하나가 여러 조항을 인용하면 조항마다 한 번씩 셉니다. 실사 수는 그 문단을 인용한 실사의 수입니다.') }}{% if cc.no_clause %} {{ _('조항이나 등급을 읽지 못한 {n}행은 표에 넣지 않았습니다.', n="{:,}".format(cc.no_clause)) }}{% endif %} {{ _('{date} 기준.', date=cc.measured_on) }}</p>
+    {% with credit_agency = 'MHRA', credit_kind = 'counts' %}{% include "partials/deficiency_cases_credit.html" %}{% endwith %}
+    <ul class="dc-src">
+      {%- for f in cc.files %}
+      <li><a href="{{ f.url }}" target="_blank" rel="noopener">{{ _('원문 파일 {year}', year=f.year) }}</a></li>
+      {%- endfor %}
+    </ul>
+    {% include "partials/deficiency_cases_tabs.html" %}
+    <ul class="dc-jump">
+      {%- for g in cc.groups %}
+      <li><a href="#{{ g.anchor }}">{{ g.label }} <span>{{ "{:,}".format(g.total) }}</span></a></li>
+      {%- endfor %}
+    </ul>
+
+    {%- for g in cc.groups %}
+    <h2 class="dc-h2" id="{{ g.anchor }}" lang="en">EU GMP {{ g.label }}<small>Critical {{ "{:,}".format(g.critical) }} &middot; Major {{ "{:,}".format(g.major) }} &middot; Other {{ "{:,}".format(g.other) }}</small></h2>
+    <div class="dc-wrapx"><table class="dc-tbl">
+      <thead><tr><th>{{ _('문단') }}</th><th>Critical</th><th>Major</th><th>Other</th><th>{{ _('합계') }}</th><th>{{ _('실사 수') }}</th></tr></thead>
+      <tbody>
+      {%- for r in g.rows %}
+      <tr><td>{{ r.para or _('(장 전체)') }}</td><td>{{ r.critical }}</td><td>{{ r.major }}</td><td>{{ r.other }}</td><td>{{ r.total }}</td><td>{{ r.insp }}</td></tr>
+      {%- endfor %}
+      </tbody>
+    </table></div>
+    {%- endfor %}
+  </div>
+</main>
+{% endblock %}

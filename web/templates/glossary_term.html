@@ -178,6 +178,7 @@
     </section>
     {% endif %}
 
+    {% if intl_cases is defined %}{% with xc = intl_cases('term', term.id, lang), xc_sec = 'gt-sec', xc_h = 'gt-sec-h' %}{% include "partials/intl_cases_block.html" %}{% endwith %}{% endif %}
     <section class="gt-sec gt-src">
       <h2 class="gt-sec-h">{{ _('출처') }}</h2>
       {%- if term.source_url %}

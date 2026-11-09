@@ -19530,6 +19530,9 @@ class WebEnTreeTest(unittest.TestCase):
         # [FDA 지적 조항 화면] 집계본이 있으면 영어 면이 선다(렌더와 같은 로더).
         if render.clause_citations.load_snapshot():
             cls.expected.add("findings/citations/")
+        # [수입경보 2단계] 스냅샷이 있으면 영어 목록 면이 선다(렌더와 같은 로더).
+        if render.load_import_alerts(render.IMPORT_ALERTS_FILE):
+            cls.expected.add(render.import_alerts_page.ROUTE)
 
     @classmethod
     def tearDownClass(cls):

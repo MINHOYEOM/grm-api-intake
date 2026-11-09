@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [수입경보 2단계 2026-11-10] /findings/import-alerts/ — FDA 수입경보 66-40·66-41 전체 목록.
+    데이터 = web/data/import_alerts.json(1단계 스냅샷) → import_alerts_page.list_view. 네트워크 0.
+    ★전 행을 서버가 HTML 로 낸다(검색엔진이 읽는다). 필터·검색은 아래 인라인 스크립트가 행에
+      hidden 을 붙였다 뗄 뿐이고, 스크립트가 없으면 필터 막대는 숨은 채 전체 목록이 그대로 보인다.
+    ★등재 사실만 — 원천에 위반 사유 서술이 없어 해석·사유 문구를 쓰지 않는다. 주소·품목은 FDA 원문.
+    ★업체 링크는 1단계 업체 페이지 블록과 같은 매칭 결과로, 그 언어 트리에 선 페이지만. -#}
+<style>
+  .ia-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ia-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .ia-crumb a:hover{color:var(--coral)}
+  .ia-crumb i{font-style:normal;color:var(--line-2)}
+  .ia-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .ia-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:780px;word-break:keep-all}
+  .ia-sum b{font-weight:600}
+  .ia-note{font-family:var(--sans);font-size:13px;line-height:1.7;color:var(--muted);margin:8px 0 0;max-width:780px;word-break:keep-all}
+  .ia-src{font-family:var(--sans);font-size:13px;line-height:1.7;color:var(--muted);margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+  .ia-src a{color:var(--coral-2);text-decoration:none;white-space:nowrap}
+  .ia-src a:hover,.ia-src a:focus-visible{color:var(--coral);text-decoration:underline}
+  .ia-src span[lang="en"]{overflow-wrap:anywhere}
+  .ia-quick{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+  .ia-quick a{font-family:var(--sans);font-size:13.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:999px;padding:5px 13px;background:var(--soft)}
+  .ia-quick a:hover,.ia-quick a:focus-visible{border-color:var(--coral);color:var(--coral)}
+  .ia-bar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin:22px 0 0}
+  .ia-bar[hidden]{display:none}
+  .ia-bar select,.ia-bar input{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:7px 10px;min-width:0;max-width:100%}
+  .ia-bar input{flex:1 1 200px}
+  .ia-shown{font-family:var(--sans);font-size:13px;color:var(--muted);margin:12px 0 0}
+  .ia-shown b{color:var(--ink);font-weight:600}
+  .ia-wrapx{overflow-x:auto;margin:10px 0 0;border:1px solid var(--line-2);border-radius:var(--rad-s)}
+  .ia-tbl{border-collapse:collapse;width:100%;min-width:640px;font-family:var(--sans);font-size:13.5px}
+  .ia-tbl th,.ia-tbl td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .ia-tbl th{color:var(--muted);font-weight:500;font-size:12.5px;white-space:nowrap}
+  .ia-tbl td{color:var(--body)}
+  .ia-tbl td:first-child{color:var(--ink);overflow-wrap:anywhere}
+  .ia-tbl td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--coral)}
+  .ia-tbl td a:hover{color:var(--coral)}
+  .ia-tbl .n{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .ia-tbl tr[hidden]{display:none}
+  .ia-off td{color:var(--muted)}
+  .ia-empty{font-family:var(--sans);font-size:14px;color:var(--muted);margin:14px 0 0}
+  .ia-empty[hidden]{display:none}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="ia-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><span>{{ _('FDA 수입경보') }}</span>
+    </nav>
+    <p class="kick">FDA &middot; Import Alert</p>
+    <h1 class="ia-h1">{{ _('FDA 수입경보 대상 업체') }}</h1>
+    <p class="ia-sum">{{ _('{date} 확인 기준 · 전체 {n}곳 · 현재 등재 {a}곳 · 한국 {k}곳', date=ia.measured_on, n="{:,}".format(ia.total), a="{:,}".format(ia.active), k="{:,}".format(ia.korea)) }}</p>
+    <p class="ia-note">{{ _('FDA 공개 목록에 올라 있다는 사실만 옮겼습니다. 등재 사유의 해석이나 위반 판단은 싣지 않습니다. 주소와 품목은 FDA 원문에서 확인하세요.') }}</p>
+    <p class="ia-note">{{ _("'등재 해제'는 GRM 이 수집을 시작한 뒤 FDA 목록에서 빠진 것을 확인한 경우입니다. 업체 하나가 두 경보에 모두 올라 있으면 두 줄로 나옵니다.") }}</p>
+    <ul class="ia-src">
+      {%- for al in ia.alerts %}
+      <li>{{ _('출처: FDA Import Alert {no}', no=al.alert_no) }}{% if al.title %} &middot; <span lang="en">{{ al.title }}</span>{% endif %}{% if al.url %} &middot; <a href="{{ al.url }}" target="_blank" rel="noopener">{{ _('FDA 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}</li>
+      {%- endfor %}
+    </ul>
+    {%- if ia.korea %}
+    <div class="ia-quick">
+      <a href="index.html?country=KR#ia-list" data-ia-country="KR">{{ _('한국 업체만 보기 ({n}곳)', n="{:,}".format(ia.korea)) }}</a>
+      <a href="index.html#ia-list" data-ia-country="">{{ _('전체 보기') }}</a>
+    </div>
+    {%- endif %}
+
+    <form class="ia-bar" id="ia-bar" role="search" hidden>
+      <label class="sr-only" for="ia-q">{{ _('업체명') }}</label>
+      <input id="ia-q" type="search" placeholder="{{ _('업체명으로 찾기') }}" autocomplete="off" spellcheck="false" />
+      <label class="sr-only" for="ia-c">{{ _('국가') }}</label>
+      <select id="ia-c">
+        <option value="">{{ _('모든 국가') }}</option>
+        {%- for c in ia.countries %}
+        <option value="{{ c.key }}">{{ c.label }} ({{ "{:,}".format(c.n) }})</option>
+        {%- endfor %}
+      </select>
+      <label class="sr-only" for="ia-a">{{ _('경보 번호') }}</label>
+      <select id="ia-a">
+        <option value="">{{ _('모든 경보') }}</option>
+        {%- for al in ia.alerts %}
+        <option value="{{ al.alert_no }}">{{ al.alert_no }} ({{ "{:,}".format(al.n) }})</option>
+        {%- endfor %}
+      </select>
+      <label class="sr-only" for="ia-s">{{ _('상태') }}</label>
+      <select id="ia-s">
+        <option value="">{{ _('모든 상태') }}</option>
+        <option value="on">{{ _('등재 중') }}</option>
+        <option value="off">{{ _('등재 해제') }}</option>
+      </select>
+    </form>
+    <p class="ia-shown" id="ia-list">{{ _('조건에 맞는 곳') }} <b id="ia-shown">{{ "{:,}".format(ia.total) }}</b></p>
+    <div class="ia-wrapx"><table class="ia-tbl">
+      <thead><tr>
+        <th>{{ _('업체') }}</th><th>{{ _('국가') }}</th><th>{{ _('도시') }}</th><th>{{ _('경보') }}</th><th>{{ _('등재일') }}</th><th class="n">{{ _('품목 코드') }}</th><th>{{ _('상태') }}</th>
+      </tr></thead>
+      <tbody id="ia-rows">
+      {%- for r in ia.rows %}
+      <tr data-c="{{ r.country_key }}" data-a="{{ r.alert_no }}" data-s="{{ 'on' if r.active else 'off' }}"{% if not r.active %} class="ia-off"{% endif %}><td>{% if r.firm_slug %}<a href="{{ rel_root }}findings/firm/{{ r.firm_slug }}/">{{ r.firm_name }}</a>{% else %}{{ r.firm_name }}{% endif %}</td><td>{{ r.country_label }}</td><td>{{ r.city }}</td><td class="n">{{ r.alert_no }}</td><td class="n">{{ r.firm_published }}</td><td class="n">{{ r.n_products }}</td><td>{{ _('등재 중') if r.active else _('등재 해제') }}</td></tr>
+      {%- endfor %}
+      </tbody>
+    </table></div>
+    <p class="ia-empty" id="ia-empty" hidden>{{ _('조건에 맞는 업체가 없습니다.') }}</p>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}<script>
+(function () {
+  var bar = document.getElementById("ia-bar");
+  var body = document.getElementById("ia-rows");
+  if (!bar || !body) return;
+  var q = document.getElementById("ia-q"), c = document.getElementById("ia-c");
+  var a = document.getElementById("ia-a"), s = document.getElementById("ia-s");
+  var shown = document.getElementById("ia-shown"), empty = document.getElementById("ia-empty");
+  var rows = Array.prototype.map.call(body.rows, function (tr) {
+    return { tr: tr, name: (tr.cells[0].textContent || "").toLowerCase(),
+             c: tr.getAttribute("data-c"), a: tr.getAttribute("data-a"), s: tr.getAttribute("data-s") };
+  });
+  function hasOpt(sel, v) {
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === v) return true;
+    return false;
+  }
+  function apply() {
+    var term = (q.value || "").trim().toLowerCase(), n = 0;
+    rows.forEach(function (r) {
+      var ok = (!c.value || r.c === c.value) && (!a.value || r.a === a.value) &&
+               (!s.value || r.s === s.value) && (!term || r.name.indexOf(term) >= 0);
+      r.tr.hidden = !ok;
+      if (ok) n++;
+    });
+    shown.textContent = n.toLocaleString("en-US");
+    empty.hidden = n > 0;
+  }
+  function setCountry(v) {
+    c.value = hasOpt(c, v) ? v : "";
+    apply();
+  }
+  var params = new URLSearchParams(location.search);
+  var pc = params.get("country") || "", pa = params.get("alert") || "", ps = params.get("status") || "";
+  if (hasOpt(c, pc)) c.value = pc;
+  if (hasOpt(a, pa)) a.value = pa;
+  if (hasOpt(s, ps)) s.value = ps;
+  [q, c, a, s].forEach(function (el) { el.addEventListener(el === q ? "input" : "change", apply); });
+  bar.addEventListener("submit", function (e) { e.preventDefault(); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ia-country]"), function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      setCountry(el.getAttribute("data-ia-country"));
+      var u = new URL(location.href);
+      if (c.value) u.searchParams.set("country", c.value); else u.searchParams.delete("country");
+      history.replaceState(null, "", u.pathname + u.search + "#ia-list");
+      document.getElementById("ia-list").scrollIntoView();
+    });
+  });
+  bar.hidden = false;
+  apply();
+})();
+</script>{% endblock %}

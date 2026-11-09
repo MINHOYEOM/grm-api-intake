@@ -12,6 +12,9 @@
   </div>
   <div class="wrap cc-sec">
     {% with seg_active = "citations" %}{% include "partials/findings_seg.html" %}{% endwith %}
+    {%- if citation_firms_link %}
+    <p class="cc-note"><a href="{{ rel_root }}findings/citations/firms/index.html">{{ _("제조소별로 보기: 지적받은 조항 전체 목록") }}</a></p>
+    {%- endif %}
     <p class="cc-big"><b>{{ "{:,}".format(cit.total) }}</b><span>{{ _("지적이 나온 실사 (FY{a}~FY{b})", a=cit.years[0], b=cit.years[-1]) }}</span></p>
     <div class="cc-wrapx"><table class="cc-tbl">
       <thead><tr>

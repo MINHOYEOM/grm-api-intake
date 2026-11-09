@@ -6543,6 +6543,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
                 (tr("FDA 지적 조항"), "")]),
             cit=clause_citations.ranking_view(citations_data), clause_slugs=slugs,
+            # [제조소 전체 목록 2026-11-10] 홈→지적사항→FDA 지적 조항→제조소 목록 도달 경로
+            citation_firms_link=bool(citation_firms_data),
         )
         if lang_key == DEFAULT_LANG:
             facet_paths.append((cp.site_path, citations_data["as_of"]))

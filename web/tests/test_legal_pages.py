@@ -18,7 +18,8 @@ import render        # noqa: E402
 import test_render   # noqa: E402
 
 STEMS = ("privacy_ko", "terms_ko")
-EFFECTIVE = "시행일: 2026년 11월 3일"
+EFFECTIVE = {"privacy_ko": "시행일: 2026년 11월 16일", "terms_ko": "시행일: 2026년 11월 3일"}
+EFFECTIVE_EN = {"privacy": "November 16, 2026", "terms": "November 3, 2026"}
 
 
 class LegalPagesPublishedTest(unittest.TestCase):
@@ -38,7 +39,7 @@ class LegalPagesPublishedTest(unittest.TestCase):
             self.assertNotIn("noindex", html)
             self.assertNotIn("확인 필요", html)
             self.assertNotIn("초안", html)
-            self.assertIn("2026년 11월 3일", html)
+            self.assertIn("2026년 11월 16일" if sub == "privacy" else "2026년 11월 3일", html)
             self.assertIn("data-legal-doc", html)
             self.assertIn(".legal-doc", html)
         self.assertFalse((self.out / "privacy-draft").exists())
@@ -59,7 +60,7 @@ class LegalPagesPublishedTest(unittest.TestCase):
         for sub in ("privacy", "terms"):
             html = (self.out / "en" / sub / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("noindex", html)
-            self.assertIn("November 3, 2026", html)
+            self.assertIn(EFFECTIVE_EN[sub], html)
 
 
 class LegalContentTest(unittest.TestCase):
@@ -69,7 +70,7 @@ class LegalContentTest(unittest.TestCase):
             title, _lead, secs = render.render_about_html(md)
             self.assertNotIn("초안", title)
             self.assertNotIn("확인 필요", md)
-            self.assertIn(EFFECTIVE, md)
+            self.assertIn(EFFECTIVE[stem], md)
             self.assertGreaterEqual(len(secs), 4)
 
     def test_under_14_sentence(self):
@@ -104,9 +105,21 @@ class LegalContentTest(unittest.TestCase):
             self.assertEqual(len(ko), len(en), stem)
             md_en = (render.LEGAL_DIR / f"{stem_en}.md").read_text(encoding="utf-8")
             self.assertIn("Korean version prevails", md_en)
-            self.assertIn("November 3, 2026", md_en)
+            self.assertIn(EFFECTIVE_EN[stem_en.split("_")[0]], md_en)
             real = json.loads((WEB_DIR / "data" / "contact.json").read_text(encoding="utf-8"))["email"]
             self.assertIn(real, md_en)
+
+    def test_newsletter_signup_path_items_disclosed(self):
+        """구독 폼이 가입 페이지 경로·언어를 Brevo 연락처에 기록한다(GRM_SIGNUP_PATH_FIELDS) —
+        처리방침이 수집 항목과 국외 이전 항목 양쪽에 같은 말을 해야 한다. 시행일·개정 이력도 함께 고정."""
+        ko = (render.LEGAL_DIR / "privacy_ko.md").read_text(encoding="utf-8")
+        en = (render.LEGAL_DIR / "privacy_en.md").read_text(encoding="utf-8")
+        self.assertIn("이메일, 구독한 페이지 경로와 언어, 동의 시각, 동의 문안 버전", ko)
+        self.assertIn("이전 항목: 이메일, 구독한 페이지 경로·언어, 구독 동의 시각", ko)
+        self.assertIn("2026년 11월 16일: 구독 시 가입 페이지 경로·언어 수집 항목 추가", ko)
+        self.assertIn("the page path and language you subscribed from, time of consent", en)
+        self.assertIn("the page path and language you subscribed from, time of subscription consent", en)
+        self.assertIn("November 16, 2026: Added", en)
 
     def test_english_privacy_has_under_14_clause(self):
         md = (render.LEGAL_DIR / "privacy_en.md").read_text(encoding="utf-8")

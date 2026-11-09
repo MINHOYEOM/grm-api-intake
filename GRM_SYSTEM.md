@@ -6,8 +6,8 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.296` |
-| 최종 수정일 | 2026-11-08 |
+| 문서 버전 | `v1.297` |
+| 최종 수정일 | 2026-11-09 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
 | 웹사이트 | https://grm-solutions.com (브리프 `/`·`/archive/`, 지적사항 검색 `/findings/`) |
@@ -285,6 +285,16 @@ flowchart TD
 
 > **입법·행정예고 카드 승격(2026-11-09):** 식약처 입법·행정예고(data0009)는 전부 웹 비카드 `watch` 였고, 그래서 11-09 호에 「의약품 제조 및 품질관리에 관한 규정」 개정(안)·「임상시험용의약품 표시 등에 관한 규정」 제정(안)이 카드 0장이었다. 이제 제목이 GMP 관련(제조 및 품질관리·의약품 제조·무균·교차오염·임상시험용의약품 제조/표시 등, 화장품·의료기기·식품·수수료 등은 제외)이면 국내 섹션 본 카드, 그 외는 종전처럼 `watch`(`card_scaffold._section_legislative`, 판정 근거는 `docs/GRM_card_spec_v16.md` §6). 카드 사실 행은 발행기관·공고번호·(있을 때)의견기한.
 
+> **11-09 발행 조립 안정화(2026-11-09 머지분):**
+> - **영문 번역 누락 가드:** 카드 유형 4종·태그 3종 영문 번역 7키를 `web/render.py` 에 추가했고(#1393·#1394 — 번역이 없으면 조립이 멈췄다), `web/tests/test_render.py::test_card_registry_labels_have_english_and_are_registered` 가 레지스트리 라벨의 영문 번역·등록 누락을 사전에 잡는다(#1397).
+> - **483 파서·범위 밖 판정:** 관찰이 0건으로 남던 양식 3종(표제 줄바꿈·제품 코드·절 제목 선행)을 회수 경로에서 읽고, 계란·농장 483 은 식품 어휘로 범위 밖 처리한다(#1399, `collect_fda_483.py`·`backfill_483_ocr_recovery.py`·`grm_taxonomy.py`, 테스트 `tests/test_fda483_parser_variants.py`). 기기 어휘 보강: 강한 기기 표지(UDI·MDR·product realization·803/806/807/830 조항 등)가 있고 강한 의약품 어휘가 없으면 범위 밖(`grm_taxonomy.is_out_of_scope_483`, #1402, 회귀 가드도 같은 판정이면 소실로 세지 않음). 발행 대조(`verify_published_sources.py`)도 범위 밖 483 을 격차로 세지 않는다(#1401).
+> - **프롬프트↔조립기 계약:** 조립기(`inject_slots`)가 `hook_line`·`en.hook_line` 선택 슬롯을 받는다(형식·길이 검사). 문서가 안내하는 슬롯 필드를 조립기가 받아 싣는지 `tests/test_prompt_assembler_contract.py` 가 검사한다(#1403, 백업 Routine 역할은 `company/ROUTINES.md`).
+> - **재발행 facts 보존:** 재조립이 발행 뒤 정정한 facts 값을 옛 스캐폴드 값으로 되돌리지 않게 `assemble_regression_guard.py --carry-published-facts`(발행 워크플로는 `--carry-only`)를 쓴다(#1400).
+> - **본문 슬롯 가림 표기 게이트:** 조립 게이트 8 `assemble_publish_brief.lint_masked_marks_in_body` — FDA 가림 표기 `(b)(4)` 가 본문 슬롯에 노출되면 2026-11-09 이후 호의 발행을 차단한다(#1410; 10-26 호 483 한국어 결손 보강 #1408 과 11-09 WL 카드 3장 정정 포함).
+> - **새 실사 카드 틀의 시작일:** `INSPECTION_FRAME_FROM="2026-11-09"` — 앞면 새 틀(`inspection_card.py`)은 이 날짜 이후 호에만 붙여, 옛 호를 재조립해도 소급되지 않는다(#1412).
+> - **ICH 사본 보충:** 게시일이 없는 항목(ICH 스냅샷)은 Supabase 사본 보충에서 건너뛴다(#1407, `collect_intake.py` — 매일 WARN 31건 소음 제거).
+> - **새 화면:** 지적 조항 `/findings/citations/`(#1404, 데이터 `web/data/fda_citations.json`, 월간 갱신 #1411)·지적 사례 `/findings/examples/`(#1406, 데이터 `web/data/deficiency_examples.json`) — §5.1 `web/` 항목 참조.
+
 > **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용 — 자료실로 완결).
 
 ### 3.5 운영 모니터링 (health check)
@@ -559,7 +569,8 @@ grm-api-intake/
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ fda_body_coverage.py             # 발행 전 FDA 카드 본문 결손 점검(483·WL·회수 건수·비율·임계 → ok/recover/alert) + handoff 상태 조회 — 판정 순수 함수
-├─ verify_published_sources.py     # 발행 카드 ↔ 원문 대조(네트워크 검증층 — 수집 실패로 인한 누락 탐지)
+├─ verify_published_sources.py     # 발행 카드 ↔ 원문 대조(네트워크 검증층 — 수집 실패로 인한 누락 탐지; 범위 밖으로 뺀 483 은 발행 격차로 세지 않음, 11-09)
+├─ assemble_regression_guard.py    # 재조립 회귀 가드(발행본 대비 카드 소실·값 되돌림 판정) — `--carry-published-facts` 로 발행 뒤 정정한 facts 를 재조립이 되돌리지 않게 유지, grm-web-publish 는 `--carry-only` 로 호출(11-09)
 ├─ verify_gmp_redaction_guard.py   # GMP 지적 표 가림막 가드 회귀 코퍼스 실측(가드 on/off 산출 지문 대조 — §6.2 GMP-REDACTION)
 ├─ verify_checklist_examples.py    # 자가점검 체크리스트 사례 전수 가드(조항 앵커·비지적 문장·하한·업체 중복 — §4.6, grm-checklist-examples-verify.yml)
 ├─ grm_findings.py                 # [FIND-1] 스키마 계약·taxonomy·validator·SQLite DDL
@@ -611,7 +622,7 @@ grm-api-intake/
 │  ├─ migrations/132_fda_import_alert.sql # FDA 수입경보 스냅샷·등재 이력 표 3개
 │  ├─ migrations/133_fda_inspection_citations.sql # FDA 실사 지적 조항 표
 │  ├─ migrations/134_deficiency_examples.sql # PMDA·MHRA 지적 사례 표
-│  ├─ migrations/135_growth_daily_v2.sql # 성장 일보 v2 집계(파일 있음·운영 DB 적용 대기)
+│  ├─ migrations/135_growth_daily_v2.sql # 성장 일보 v2 집계(적용 완료 2026-11-09 운영 DB·service_role 전용)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -622,7 +633,8 @@ grm-api-intake/
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
 │  ├─ example_page.py             # [지적 사례 2026-11-09] `/findings/examples/`(ko·en) — `data/deficiency_examples.json`(PMDA·MHRA 영문 원문에서 사람이 고른 주제별 대표 사례·출처 행 id 보존, 번역 없음) 로드·검증·주제 뷰(테스트 `web/tests/test_example_page.py`)
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
-│  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 갱신)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
+│  ├─ clause_citations_guard.py   # [지적 조항 월간 갱신 가드 2026-11-09] 급감 20%·스냅샷 검증·as_of 만 변경 시 무PR 판정(테스트 `web/tests/test_clause_citations_guard.py`)
+│  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 또는 월간 `grm-fda-citations-snapshot.yml`)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)
 │  ├─ ops_decision_mail.py        # [결정 알림] 운영 센터 대기 결정(pending·mail_sent_at null) → 대표 메일 1건 1통·하루 3통·넘치면 다음 날 아침 묶음·KST 22~08 조용한 시간. 발송·수신자 검사는 approval_mail 재사용
@@ -682,6 +694,7 @@ grm-api-intake/
    ├─ grm-findings-review-queue.yml      # [검토 대기] needs_review 큐 나이 감시 — 데이터품질팀 업무
    ├─ grm-fda-import-alert.yml           # [수입경보] 66-40·66-41 스냅샷(현재 수집 꺼짐)
    ├─ grm-fda-citations.yml              # [FDA 지적 조항] collect_fda_citations.py 실행(ENABLE_FDA_CITATIONS)
+   ├─ grm-fda-citations-snapshot.yml     # [지적 조항 집계 월간 2026-11-09] 매월 2일 16:47 UTC web/clause_citations.py 재집계 → 가드(web/clause_citations_guard.py: 급감 20%·검증·as_of 만 바뀌면 PR 없음) → 변경 시에만 PR(자동 머지 없음)
    ├─ grm-deficiency-examples.yml        # [지적 사례] collect_deficiency_examples.py 실행(ENABLE_DEFICIENCY_EXAMPLES)
    ├─ grm-site-error-watch.yml           # [사이트 오류] site_error_watch.py 일일 점검, 기본 꺼짐
    ├─ grm-ops-center-sql-check.yml       # [운영 센터] 122·123·124·127(시드)·125(결정 쓰기)·126(업무 지시)·128(자동 측정) 를 격리 PostgreSQL 에서 실행 + 뮤테이션 — PR 경로 필터, 비밀값 없음

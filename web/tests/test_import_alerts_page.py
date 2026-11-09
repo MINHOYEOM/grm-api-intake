@@ -160,7 +160,14 @@ class RenderedListPageTest(unittest.TestCase):
         self.assertIn("한국 업체만 보기 (2곳)", body)
         self.assertIn('<option value="KR">대한민국 (2)</option>', body)
         self.assertIn(">등재 해제</td>", body)
-        self.assertIn('data-c="KR" data-a="66-41" data-s="on"', body)
+        self.assertIn('<tr data-c="KR"><td>Alpha Pharma Co., Ltd.</td><td>대한민국</td><td>Cheonan</td>'
+                      '<td>66-40</td><td>2024-04-10</td><td>2</td><td>등재 중</td></tr>', body)
+        self.assertIn('<tr data-c="JP" class="ia-off"><td>Delta Bio Inc.</td>', body)
+
+    def test_page_weight_per_row(self):
+        """2,218행 실데이터에서 페이지가 무거워지지 않게 — 행 마크업은 필요한 것만(행당 상한)."""
+        rows = self.ko.split('id="ia-rows">', 1)[1].split("</tbody>", 1)[0]
+        self.assertLess(len(rows.encode("utf-8")) / 6, 200)
 
     def test_en_has_no_korean(self):
         body = self._main(self.en)

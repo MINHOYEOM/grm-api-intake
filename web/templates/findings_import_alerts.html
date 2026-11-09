@@ -36,7 +36,7 @@
   .ia-tbl td:first-child{color:var(--ink);overflow-wrap:anywhere}
   .ia-tbl td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--coral)}
   .ia-tbl td a:hover{color:var(--coral)}
-  .ia-tbl .n{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .ia-tbl .n,.ia-tbl td:nth-child(n+4):nth-child(-n+6){font-variant-numeric:tabular-nums;white-space:nowrap}
   .ia-tbl tr[hidden]{display:none}
   .ia-off td{color:var(--muted)}
   .ia-empty{font-family:var(--sans);font-size:14px;color:var(--muted);margin:14px 0 0}
@@ -95,7 +95,7 @@
       </tr></thead>
       <tbody id="ia-rows">
       {%- for r in ia.rows %}
-      <tr data-c="{{ r.country_key }}" data-a="{{ r.alert_no }}" data-s="{{ 'on' if r.active else 'off' }}"{% if not r.active %} class="ia-off"{% endif %}><td>{% if r.firm_slug %}<a href="{{ rel_root }}findings/firm/{{ r.firm_slug }}/">{{ r.firm_name }}</a>{% else %}{{ r.firm_name }}{% endif %}</td><td>{{ r.country_label }}</td><td>{{ r.city }}</td><td class="n">{{ r.alert_no }}</td><td class="n">{{ r.firm_published }}</td><td class="n">{{ r.n_products }}</td><td>{{ _('등재 중') if r.active else _('등재 해제') }}</td></tr>
+      <tr data-c="{{ r.country_key }}"{% if not r.active %} class="ia-off"{% endif %}><td>{% if r.firm_slug %}<a href="{{ rel_root }}findings/firm/{{ r.firm_slug }}/">{{ r.firm_name }}</a>{% else %}{{ r.firm_name }}{% endif %}</td><td>{{ r.country_label }}</td><td>{{ r.city }}</td><td>{{ r.alert_no }}</td><td>{{ r.firm_published }}</td><td>{{ r.n_products }}</td><td>{{ _('등재 중') if r.active else _('등재 해제') }}</td></tr>
       {%- endfor %}
       </tbody>
     </table></div>
@@ -113,7 +113,8 @@
   var shown = document.getElementById("ia-shown"), empty = document.getElementById("ia-empty");
   var rows = Array.prototype.map.call(body.rows, function (tr) {
     return { tr: tr, name: (tr.cells[0].textContent || "").toLowerCase(),
-             c: tr.getAttribute("data-c"), a: tr.getAttribute("data-a"), s: tr.getAttribute("data-s") };
+             c: tr.getAttribute("data-c"), a: (tr.cells[3].textContent || "").trim(),
+             s: tr.classList.contains("ia-off") ? "off" : "on" };
   });
   function hasOpt(sel, v) {
     for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === v) return true;

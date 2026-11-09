@@ -34,7 +34,7 @@
 <link rel="alternate" hreflang="ko" href="https://grm-solutions.com/" />
 <link rel="alternate" hreflang="en" href="https://grm-solutions.com/en/" />
 <link rel="alternate" hreflang="x-default" href="https://grm-solutions.com/" />
-<script src="/assets/i18n-en.js?v=db5fc994" defer></script>
+<script src="/assets/i18n-en.js?v=410d19af" defer></script>
 <style>
   .grm-lang{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s);padding:6px 11px;text-decoration:none;white-space:nowrap}
   .grm-lang:hover{border-color:var(--coral);color:var(--coral)}
@@ -115,6 +115,8 @@
       <a class="records-card" href="findings/inspector/index.html"><b>What was in the documents this inspector signed?</b><span>Published documents by inspector name</span></a>
       <a class="records-card" href="findings/checklist/index.html"><b>Preparing for an inspection — where to start?</b><span>A self-inspection checklist backed by real findings</span></a>
       <a class="records-card" href="findings/trends/index.html"><b>Which findings are on the rise?</b><span>Trends of the last 12 months</span></a>
+      <a class="records-card" href="findings/citations/index.html"><b>How often has FDA cited this clause?</b><span>FDA citation frequency by clause</span></a>
+      <a class="records-card" href="findings/examples/index.html"><b>What has actually been cited in our area of work?</b><span>PMDA and MHRA deficiency statements by area</span></a>
     </div>
     <a class="records-all" href="findings/index.html">Open the full findings view →</a>
   </div></section>
@@ -151,7 +153,9 @@
 <style>
 /* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
 .records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
-.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.records-grid{grid-template-columns:1fr}}
 .records-card{display:flex;flex-direction:column;gap:6px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
 .records-card:hover{border-color:var(--coral)}
 .records-card b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.45;word-break:keep-all}
@@ -254,7 +258,7 @@
       <a class="foot-srclink" href="findings/coverage/index.html">Where the information comes from <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
     <div data-feedback-slot><h5>About</h5><a href="about/index.html">About the service</a><a href="guide/index.html">Guide</a><a href="#notice">How AI is used</a><a href="findings/coverage/index.html">Data coverage</a></div>
     <div><h5>Content</h5><a href="findings/index.html">Inspection findings</a><a href="findings/trends/index.html">Regulatory trends</a><a href="library/index.html">Library</a><a href="glossary/index.html">Glossary</a><a href="quiz/index.html">Weekly quiz</a></div>
-    <div><h5>Tools</h5><a href="findings/checklist/index.html">Self-inspection checklist</a><a href="findings/firm/index.html">Company lookup</a><a href="findings/inspector/index.html">Inspector lookup</a><a href="findings/inspections/index.html">FDA inspection outcomes</a><a href="findings/docs/index.html">Browse by document</a></div>
+    <div><h5>Tools</h5><a href="findings/checklist/index.html">Self-inspection checklist</a><a href="findings/firm/index.html">Company lookup</a><a href="findings/inspector/index.html">Inspector lookup</a><a href="findings/inspections/index.html">FDA inspection outcomes</a><a href="findings/citations/index.html">FDA citations</a><a href="findings/examples/index.html">Deficiency examples</a><a href="findings/docs/index.html">Browse by document</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">

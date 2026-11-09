@@ -107,7 +107,9 @@
       한 문장으로 말하고, 기능명이 아니라 **사용자의 질문**으로 진입로를 놓는다. 수치는
       render 가 findings_facets.json 에서 계산해 넘긴다(자료실 카드와 같은 계약 — 손으로
       적은 수치는 반드시 낡는다). 데이터 없으면 섹션 미렌더. 실사관 문안은 037 정책
-      (순위·비교 금지) 준수 — "서명한 문서" 어휘만 쓴다. -#}
+      (순위·비교 금지) 준수 — "서명한 문서" 어휘만 쓴다.
+      [진입점 2026-11-09] 지적 조항·지적 사례 카드 2장 추가 — 면(en_paths)이 선 빌드에서만
+      (없는 페이지로 보내지 않는다). 6장이 4+2 로 갈리지 않게 그리드를 3열→2열→1열로 고정. -#}
   {% if findings_zone %}
   <section class="section" id="records"><div class="wrap">
     <span class="kick">Findings Database</span>
@@ -118,6 +120,10 @@
       <a class="records-card" href="{{ rel_root }}findings/inspector/index.html"><b>{{ _("이 실사관이 서명한 문서에는 무엇이 있었나요?") }}</b><span>{{ _("실사관 이름으로 공개 문서 조회") }}</span></a>
       <a class="records-card" href="{{ rel_root }}findings/checklist/index.html"><b>{{ _("실사 준비, 무엇부터 점검할까요?") }}</b><span>{{ _("실제 지적 문장이 붙은 자가점검표") }}</span></a>
       <a class="records-card" href="{{ rel_root }}findings/trends/index.html"><b>{{ _("요즘 어떤 지적이 늘고 있나요?") }}</b><span>{{ _("최근 12개월 지적 경향") }}</span></a>
+{% if 'findings/citations/' in en_paths %}      <a class="records-card" href="{{ rel_root }}findings/citations/index.html"><b>{{ _("이 조항, FDA 는 얼마나 자주 지적했나요?") }}</b><span>{{ _("조항별 FDA 인용 빈도 순위") }}</span></a>
+{% endif %}
+{% if 'findings/examples/' in en_paths %}      <a class="records-card" href="{{ rel_root }}findings/examples/index.html"><b>{{ _("우리 업무 영역에서는 실제로 어떤 지적이 나왔나요?") }}</b><span>{{ _("영역별 PMDA·MHRA 지적 문장") }}</span></a>
+{% endif %}
     </div>
     <a class="records-all" href="{{ rel_root }}findings/index.html">{{ _("규제 지적사항 전체 화면 →") }}</a>
   </div></section>
@@ -199,7 +205,9 @@
 <style>
 /* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
 .records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
-.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.records-grid{grid-template-columns:1fr}}
 .records-card{display:flex;flex-direction:column;gap:6px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
 .records-card:hover{border-color:var(--coral)}
 .records-card b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.45;word-break:keep-all}

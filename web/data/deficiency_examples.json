@@ -1,72 +1,944 @@
 {
   "schema": "grm-deficiency-examples/v1",
   "curated_on": "2026-11-09",
-  "provenance": "Supabase deficiency_examples(migration 134) 의 영문 원문 행에서 사람이 고른 대표 사례. id = source_key#row_no 로 원 행을 다시 찾을 수 있다. text 는 DB 에 있는 원문 문장 그대로(길면 첫 문장), 번역은 DB 에 없어 싣지 않는다. 주제(category)는 DB 의 grm_category 를 그대로 쓰고 내용이 그 주제인 행만 골랐다.",
+  "provenance": "Supabase deficiency_examples(migration 134) 의 영문 원문 행에서 사람이 직접 읽고 고른 대표 사례. id = source_key#row_no 로 원 행을 다시 찾을 수 있다. text 는 DB 에 있는 원문 문장 그대로(길면 첫 문장 — 첫 문장이 절차 설명뿐이면 지적이 담긴 문장, PMDA 항목 번호 '1.' 등은 뺐다). 주제(category)는 문장을 읽고 사람이 정했다 — DB 의 grm_category(자동 분류)와 다를 수 있다. ko 는 GRM 이 붙인 참고용 번역이며 원문 기준은 영어(text)다.",
   "sources": {
-    "mhra:trend_2015": {"agency": "MHRA", "year": 2015, "year_basis": "calendar", "kind": "pdf", "url": "https://assets.publishing.service.gov.uk/media/5a80be59e5274a2e87dbb912/MHRA_GMP_Inspection_Deficiency_Data_Trending_2015.pdf"},
-    "mhra:trend_2016": {"agency": "MHRA", "year": 2016, "year_basis": "calendar", "kind": "pdf", "url": "https://assets.publishing.service.gov.uk/media/5a82003de5274a2e8ab56f94/MHRA_GMP_Inspection_Deficiency_Data_Trend_2016.pdf"},
-    "pmda:000273638": {"agency": "PMDA", "year": 2023, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://www.pmda.go.jp/files/000273638.xlsx"},
-    "pmda:000276920": {"agency": "PMDA", "year": 2024, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://www.pmda.go.jp/files/000276920.xlsx"},
-    "pmda:000283020": {"agency": "PMDA", "year": 2025, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://www.pmda.go.jp/files/000283020.xlsx"}
+    "mhra:trend_2015": {
+      "agency": "MHRA",
+      "year": 2015,
+      "year_basis": "calendar",
+      "kind": "pdf",
+      "url": "https://assets.publishing.service.gov.uk/media/5a80be59e5274a2e87dbb912/MHRA_GMP_Inspection_Deficiency_Data_Trending_2015.pdf"
+    },
+    "mhra:trend_2016": {
+      "agency": "MHRA",
+      "year": 2016,
+      "year_basis": "calendar",
+      "kind": "pdf",
+      "url": "https://assets.publishing.service.gov.uk/media/5a82003de5274a2e8ab56f94/MHRA_GMP_Inspection_Deficiency_Data_Trend_2016.pdf"
+    },
+    "pmda:000273638": {
+      "agency": "PMDA",
+      "year": 2023,
+      "year_basis": "jp_fiscal",
+      "kind": "xlsx",
+      "url": "https://www.pmda.go.jp/files/000273638.xlsx"
+    },
+    "pmda:000276920": {
+      "agency": "PMDA",
+      "year": 2024,
+      "year_basis": "jp_fiscal",
+      "kind": "xlsx",
+      "url": "https://www.pmda.go.jp/files/000276920.xlsx"
+    },
+    "pmda:000283020": {
+      "agency": "PMDA",
+      "year": 2025,
+      "year_basis": "jp_fiscal",
+      "kind": "xlsx",
+      "url": "https://www.pmda.go.jp/files/000283020.xlsx"
+    }
   },
   "examples": [
-    {"id": "mhra:trend_2015#92", "category": "aseptic_sterility_assurance", "source": "mhra:trend_2015", "locator": "p.49 #1", "agency_category": "Annex 1", "text": "There were no settle plates located close to the point of fill to provide adequate assurance during exposure periods that EU GMP Annex 1 grade A limits were being met"},
-    {"id": "mhra:trend_2015#94", "category": "aseptic_sterility_assurance", "source": "mhra:trend_2015", "locator": "p.49 #3", "agency_category": "Annex 1", "text": "The continuous particle monitoring sample points were located too high in relation to the relevant work zones to provide meaningful data to demonstrate that EU GMP Annex 1 requirements were being met"},
-    {"id": "mhra:trend_2016#159", "category": "aseptic_sterility_assurance", "source": "mhra:trend_2016", "locator": "p.61 #3", "agency_category": "Annex 1", "text": "The wipes used for sanitisation did not appear to be wetted sufficiently as only the area in the centre appeared to be wet rather than the whole area to ensure effective surface coverage."},
-
-    {"id": "mhra:trend_2016#78", "category": "data_integrity", "source": "mhra:trend_2016", "locator": "p.32 #1", "agency_category": "Chapter 4", "text": "Data integrity assessments were focused on system compliance and failed to consider the impact of business processes on the integrity of data, for example manual transfer of data between electronic systems."},
-    {"id": "mhra:trend_2016#79", "category": "data_integrity", "source": "mhra:trend_2016", "locator": "p.32 #2", "agency_category": "Chapter 4", "text": "The investigation relating to a data integrity failure, whereby fictitious utility monitoring data was recorded, lacked sufficient detail to demonstrate whether willful intent was suspected."},
-    {"id": "mhra:trend_2015#115", "category": "data_integrity", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 11", "text": "Setting within HPLC software not fully enabled e.g. audit trail"},
-
-    {"id": "pmda:000276920#29", "category": "regulatory_reporting", "source": "pmda:000276920", "locator": "R29", "agency_category": "Change control", "text": "The inspected site did not have a procedure for informing marketing authorization holder when a change having impact to the product quality is implemented."},
-    {"id": "mhra:trend_2016#28", "category": "regulatory_reporting", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "Changes were implemented outside of the company’s Change Control procedure."},
-    {"id": "mhra:trend_2016#26", "category": "regulatory_reporting", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "There is no definition of which moderate level change controls would require a risk assessment and regulatory affairs review and which would not."},
-
-    {"id": "mhra:trend_2016#200", "category": "computer_system_validation", "source": "mhra:trend_2016", "locator": "p.83 #1", "agency_category": "Annex 11", "text": "Access to files and the system clock on the hard drive were available to all users."},
-    {"id": "mhra:trend_2016#201", "category": "computer_system_validation", "source": "mhra:trend_2016", "locator": "p.83 #2", "agency_category": "Annex 11", "text": "The lock screen used a shared password. If a user had logged into the software behind the lock screen and another user opened the computer, they could perform actions under the initial user’s login."},
-    {"id": "mhra:trend_2016#202", "category": "computer_system_validation", "source": "mhra:trend_2016", "locator": "p.83 #3", "agency_category": "Annex 11", "text": "Users had more authorisation on the chromatography data system than was permitted according to the SOP."},
-
-    {"id": "mhra:trend_2016#1", "category": "deviation_capa", "source": "mhra:trend_2016", "locator": "p.8 #1", "agency_category": "Chapter 1", "text": "Deviation reports did not contain sufficient information to describe the investigations conducted or demonstrate the evidence that supported the proposed root cause."},
-    {"id": "mhra:trend_2016#7", "category": "deviation_capa", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "There was no requirement to ensure that process, procedural or systems based errors had not been overlooked prior to identifying ‘Personnel Error’ as a root cause."},
-    {"id": "mhra:trend_2016#10", "category": "deviation_capa", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "At least 8 overdue CAPA (ranging from 59 days to 242 days overdue) were observed to have been closed the day before the inspection."},
-
-    {"id": "mhra:trend_2016#76", "category": "documentation_records", "source": "mhra:trend_2016", "locator": "p.31 #2", "agency_category": "Chapter 4", "text": "There were no log books in place for each compounding workstation to ensure traceability of operations."},
-    {"id": "pmda:000273638#10", "category": "documentation_records", "source": "pmda:000273638", "locator": "R10", "agency_category": "Document management", "text": "The document retention and management procedures required the production batch records of products for the Japanese market (records of X, X, X, and X) to be retained for the longer of the product shelf life plus 1 year or 5 years."},
-
-    {"id": "pmda:000276920#21", "category": "qc_lab_controls", "source": "pmda:000276920", "locator": "R21", "agency_category": "Control of laboratory error, OOS/OOT", "text": "The procedure for handling OOS events does not necessarily require root cause analysis nor implementation of CAPA, even no laboratory error or sampling error was identified in the initial phase investigation."},
-    {"id": "pmda:000276920#14", "category": "qc_lab_controls", "source": "pmda:000276920", "locator": "R14", "agency_category": "Test instruction, record, laboratory procedures", "text": "Reconciliation and related records of working standards used for product release test, including use date, used amount are not recorded."},
-    {"id": "mhra:trend_2016#110", "category": "qc_lab_controls", "source": "mhra:trend_2016", "locator": "p.43 #1", "agency_category": "Chapter 6", "text": "There was no justification for the twelve month expiry assigned to reagents."},
-
-    {"id": "mhra:trend_2015#129", "category": "cleaning_validation", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 15", "text": "Permitted limits for carryover of organic molecules have not been set or adequately risk assessed"},
-    {"id": "mhra:trend_2015#130", "category": "cleaning_validation", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 15", "text": "Swab samples have not been taken, in particular no swabs have been taken from difficult to clean areas where other methods or determining residues may not be effective"},
-    {"id": "mhra:trend_2016#90", "category": "cleaning_validation", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 5", "text": "No cleaning validation had been performed on the dispensing isolator."},
-
-    {"id": "mhra:trend_2015#55", "category": "contamination_control", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 5", "text": "A jug of cleaning liquid with a used cloth was found sitting on the capsule polishing unit that had been signed off as clean."},
-    {"id": "mhra:trend_2015#58", "category": "contamination_control", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 5", "text": "The automated tablet counter and tablet counting trays, which were used for multiple products, had not been considered as part of the cross contamination risk assessment"},
-    {"id": "mhra:trend_2016#169", "category": "contamination_control", "source": "mhra:trend_2016", "locator": "", "agency_category": "Annex 2", "text": "Sanitisation contact times were not being monitored and the five minutes contact time for the sporicide was not as defined by the sanitising agent manufacturer or validated by the Company."},
-
-    {"id": "mhra:trend_2015#97", "category": "environmental_monitoring", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 2", "text": "The clean room was only monitored after cleaning. There was no periodic monitoring before cleaning to monitor for potential microbial changes or for the continuing effectiveness of cleaning"},
-
-    {"id": "mhra:trend_2016#128", "category": "material_supplier_control", "source": "mhra:trend_2016", "locator": "p.50 #4", "agency_category": "Chapter 7", "text": "Procedures did not describe the basis for accepting an audit report prepared by a third party."},
-
-    {"id": "mhra:trend_2016#138", "category": "complaint_recall", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 8", "text": "Inadequate investigation was performed on site. For example, not reviewing manufacturing and other data available and also not considering the wider implications of the complaint on other batches."},
-    {"id": "mhra:trend_2016#141", "category": "complaint_recall", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 8", "text": "The recall procedure did not define maximum timelines for key steps to ensure the recall process was completed in a timely fashion."},
-    {"id": "mhra:trend_2016#143", "category": "complaint_recall", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 8", "text": "The mock recall challenge was not completed in a timely manner and no final formal assessment report was generated."},
-
-    {"id": "mhra:trend_2015#27", "category": "training_personnel", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 2", "text": "Personnel had no documented training in the procedures or systems"},
-    {"id": "mhra:trend_2015#29", "category": "training_personnel", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 2", "text": "Although comprehension questions were asked at the end of each module, there was no clearly defined pass mark therefore it could not be confirmed that the personnel understood the training"},
-    {"id": "mhra:trend_2016#44", "category": "training_personnel", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 2", "text": "There was no system for confirming that all personnel that required training had been trained."},
-
-    {"id": "mhra:trend_2016#33", "category": "stability_storage", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "There was no confirmation that the ongoing stability studies showed no adverse trends and would be expected to remain within specification for the proposed shelf life."},
-    {"id": "mhra:trend_2016#123", "category": "stability_storage", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 6", "text": "There had been numerous stability failures (including pre- shelf life expiry) identified but these had not been formally assessed by the QPs or the impact on continued certification considered."},
-    {"id": "mhra:trend_2016#124", "category": "stability_storage", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 6", "text": "The contract manufacturer did not notify the stability failures to the Marketing Authorisation Holders."},
-
-    {"id": "pmda:000273638#17", "category": "equipment_facility", "source": "pmda:000273638", "locator": "R17", "agency_category": "Control of facilities and equipment", "text": "Multiple scratches resulting from abrasion were found on the internal part of the mill."},
-    {"id": "mhra:trend_2016#60", "category": "equipment_facility", "source": "mhra:trend_2016", "locator": "p.25 #3", "agency_category": "Chapter 3", "text": "There was no demarcation between clean and dirty sides of the change room entering the formulation area."},
-
-    {"id": "mhra:trend_2016#15", "category": "quality_unit_oversight", "source": "mhra:trend_2016", "locator": "p.11 #1", "agency_category": "Chapter 1", "text": "There was no formal Management review process."},
-    {"id": "pmda:000283020#40", "category": "quality_unit_oversight", "source": "pmda:000283020", "locator": "R40", "agency_category": "Quality management", "text": "Though the executive management mention lack of human resources in the report of management review, and continuously took actions to retain personnel, those actions did not result in resolution of lack of resources."},
-
-    {"id": "mhra:trend_2016#223", "category": "process_validation", "source": "mhra:trend_2016", "locator": "p.93 #5", "agency_category": "Annex 15", "text": "Batch processing parameter ranges were not always supported by process validation data, for example the coating flow rate and the granulation chopper speed."}
+    {
+      "id": "mhra:trend_2016#78",
+      "category": "data_integrity",
+      "source": "mhra:trend_2016",
+      "locator": "p.32 #1",
+      "agency_category": "Chapter 4",
+      "text": "Data integrity assessments were focused on system compliance and failed to consider the impact of business processes on the integrity of data, for example manual transfer of data between electronic systems.",
+      "ko": "데이터 완전성 평가가 시스템 적합성에만 맞춰져 있어, 전자 시스템 간 데이터 수기 이전 등 업무 절차가 데이터 완전성에 미치는 영향을 고려하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#79",
+      "category": "data_integrity",
+      "source": "mhra:trend_2016",
+      "locator": "p.32 #2",
+      "agency_category": "Chapter 4",
+      "text": "The investigation relating to a data integrity failure, whereby fictitious utility monitoring data was recorded, lacked sufficient detail to demonstrate whether willful intent was suspected.",
+      "ko": "유틸리티 모니터링 데이터를 허위로 기록한 데이터 완전성 위반 건의 조사가 고의가 의심되는지를 입증할 만큼 상세하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#115",
+      "category": "data_integrity",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Annex 11",
+      "text": "Setting within HPLC software not fully enabled e.g. audit trail",
+      "ko": "HPLC 소프트웨어의 설정(예: 감사추적)이 모두 활성화되어 있지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#116",
+      "category": "data_integrity",
+      "source": "mhra:trend_2015",
+      "locator": "p.64 #5",
+      "agency_category": "Annex 11",
+      "text": "Analyst had access to delete data",
+      "ko": "분석자에게 데이터 삭제 권한이 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#205",
+      "category": "data_integrity",
+      "source": "mhra:trend_2016",
+      "locator": "p.84 #2",
+      "agency_category": "Annex 11",
+      "text": "Users were permitted to change the default audit trail.",
+      "ko": "사용자가 기본 감사추적 설정을 변경할 수 있었다."
+    },
+    {
+      "id": "mhra:trend_2015#113",
+      "category": "data_integrity",
+      "source": "mhra:trend_2015",
+      "locator": "p.64 #2",
+      "agency_category": "Annex 11",
+      "text": "Electronic data not used to check analytical results",
+      "ko": "분석 결과를 확인하는 데 전자 데이터를 사용하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#92",
+      "category": "aseptic_sterility_assurance",
+      "source": "mhra:trend_2015",
+      "locator": "p.49 #1",
+      "agency_category": "Annex 1",
+      "text": "There were no settle plates located close to the point of fill to provide adequate assurance during exposure periods that EU GMP Annex 1 grade A limits were being met",
+      "ko": "충전 지점 가까이에 낙하균 배지가 없어, 노출 시간 동안 EU GMP Annex 1(무균의약품)의 A등급 청정구역 기준을 충족한다는 충분한 보증이 없었다."
+    },
+    {
+      "id": "mhra:trend_2015#94",
+      "category": "aseptic_sterility_assurance",
+      "source": "mhra:trend_2015",
+      "locator": "p.49 #3",
+      "agency_category": "Annex 1",
+      "text": "The continuous particle monitoring sample points were located too high in relation to the relevant work zones to provide meaningful data to demonstrate that EU GMP Annex 1 requirements were being met",
+      "ko": "연속 입자 모니터링 채취 지점이 해당 작업 구역보다 너무 높게 있어, EU GMP Annex 1(무균의약품) 요건 충족을 보여 줄 의미 있는 데이터를 얻을 수 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#159",
+      "category": "aseptic_sterility_assurance",
+      "source": "mhra:trend_2016",
+      "locator": "p.61 #3",
+      "agency_category": "Annex 1",
+      "text": "The wipes used for sanitisation did not appear to be wetted sufficiently as only the area in the centre appeared to be wet rather than the whole area to ensure effective surface coverage.",
+      "ko": "소독용 와이프가 전체가 아니라 가운데만 젖어 있는 것으로 보여, 표면을 효과적으로 덮을 만큼 충분히 적셔지지 않은 것으로 보였다."
+    },
+    {
+      "id": "mhra:trend_2016#152",
+      "category": "aseptic_sterility_assurance",
+      "source": "mhra:trend_2016",
+      "locator": "p.60 #1",
+      "agency_category": "Annex 1",
+      "text": "Operators wore outdoor clothes under aseptic gowns in the Grade B zone.",
+      "ko": "작업자가 B등급 구역에서 무균복 안에 외출복을 입고 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#156",
+      "category": "aseptic_sterility_assurance",
+      "source": "mhra:trend_2016",
+      "locator": "p.60 #5",
+      "agency_category": "Annex 1",
+      "text": "While donning sterile gloves prior to entering a grade B area an operator was observed touching the outside of sterile gloves on several occasions.",
+      "ko": "B등급 구역에 들어가기 전 멸균 장갑을 끼면서 작업자가 멸균 장갑 바깥면을 여러 차례 만지는 것이 관찰되었다."
+    },
+    {
+      "id": "mhra:trend_2016#168",
+      "category": "aseptic_sterility_assurance",
+      "source": "mhra:trend_2016",
+      "locator": "p.63 #4",
+      "agency_category": "Annex 1",
+      "text": "The media fill and process validation studies did not capture the full complexity of the aseptic manufacturing processes used and therefore did not closely imitate the production process and were not representative of worst case.",
+      "ko": "배지충전시험(media fill)과 공정 밸리데이션이 실제 무균 제조공정의 복잡성을 모두 담지 못해, 생산공정을 충실히 모사하지 못했고 최악 조건을 대표하지 못했다."
+    },
+    {
+      "id": "pmda:000276920#29",
+      "category": "regulatory_reporting",
+      "source": "pmda:000276920",
+      "locator": "R29",
+      "agency_category": "Change control",
+      "text": "The inspected site did not have a procedure for informing marketing authorization holder when a change having impact to the product quality is implemented.",
+      "ko": "피실사 제조소에는 제품 품질에 영향을 주는 변경을 시행할 때 제조판매승인 보유자에게 알리는 절차가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#28",
+      "category": "regulatory_reporting",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 1",
+      "text": "Changes were implemented outside of the company’s Change Control procedure.",
+      "ko": "회사의 변경관리 절차를 거치지 않고 변경이 시행되었다."
+    },
+    {
+      "id": "mhra:trend_2016#26",
+      "category": "regulatory_reporting",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 1",
+      "text": "There is no definition of which moderate level change controls would require a risk assessment and regulatory affairs review and which would not.",
+      "ko": "중간 등급 변경 가운데 어떤 것에 위험평가와 규제업무(RA) 부서 검토가 필요하고 어떤 것은 필요 없는지 정의되어 있지 않다."
+    },
+    {
+      "id": "mhra:trend_2016#27",
+      "category": "regulatory_reporting",
+      "source": "mhra:trend_2016",
+      "locator": "p.14 #3",
+      "agency_category": "Chapter 1",
+      "text": "There is no post implementation review of the effectiveness of change control actions.",
+      "ko": "변경관리 조치의 효과성에 대한 시행 후 검토가 없다."
+    },
+    {
+      "id": "mhra:trend_2015#9",
+      "category": "regulatory_reporting",
+      "source": "mhra:trend_2015",
+      "locator": "p.9 #3",
+      "agency_category": "Chapter 1",
+      "text": "Change controls were raised after projects were initiated",
+      "ko": "프로젝트가 시작된 뒤에야 변경관리가 제기되었다."
+    },
+    {
+      "id": "mhra:trend_2016#185",
+      "category": "regulatory_reporting",
+      "source": "mhra:trend_2016",
+      "locator": "p.73 #3",
+      "agency_category": "Annex 6",
+      "text": "No consideration was given to informing the competent authority (via the Defective Medicines Reporting Centre) of the potential risk of defective product being on the market.",
+      "ko": "결함 제품이 시장에 있을 수 있는 위험을 (결함의약품 보고센터(DMRC)를 통해) 규제당국에 알리는 것을 검토하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#200",
+      "category": "computer_system_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.83 #1",
+      "agency_category": "Annex 11",
+      "text": "Access to files and the system clock on the hard drive were available to all users.",
+      "ko": "하드 드라이브의 파일과 시스템 시계에 모든 사용자가 접근할 수 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#201",
+      "category": "computer_system_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.83 #2",
+      "agency_category": "Annex 11",
+      "text": "The lock screen used a shared password. If a user had logged into the software behind the lock screen and another user opened the computer, they could perform actions under the initial user’s login.",
+      "ko": "잠금 화면에 공용 비밀번호를 썼다. 한 사용자가 잠금 화면 뒤에서 소프트웨어에 로그인한 상태에서 다른 사용자가 컴퓨터를 열면 처음 사용자의 로그인으로 작업할 수 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#202",
+      "category": "computer_system_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.83 #3",
+      "agency_category": "Annex 11",
+      "text": "Users had more authorisation on the chromatography data system than was permitted according to the SOP.",
+      "ko": "사용자에게 크로마토그래피 데이터 시스템에서 SOP가 허용하는 것보다 많은 권한이 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#195",
+      "category": "computer_system_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.82 #1",
+      "agency_category": "Annex 11",
+      "text": "Following a software update, data was lost from an autoclave control system. The system backup was unable to recover lost data as the backup was only performed on a 3 monthly basis.",
+      "ko": "소프트웨어 업데이트 후 고압멸균기 제어 시스템의 데이터가 유실되었다. 백업이 3개월마다만 수행되어 유실된 데이터를 백업으로 복구할 수 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#199",
+      "category": "computer_system_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.82 #5",
+      "agency_category": "Annex 11",
+      "text": "Backups were permitted to be made on the same computer drive which failed to ensure that a separate copy was available following drive failure or corruption.",
+      "ko": "같은 컴퓨터 드라이브에 백업을 만들 수 있게 되어 있어, 드라이브 고장이나 손상 시 별도 사본이 남아 있음을 보장하지 못했다."
+    },
+    {
+      "id": "mhra:trend_2015#118",
+      "category": "computer_system_validation",
+      "source": "mhra:trend_2015",
+      "locator": "p.65 #2",
+      "agency_category": "Annex 11",
+      "text": "The clock used for determining time/date for the HPLC software could be adjusted therefore allowing the option to alter the true time and date in the printed paper records",
+      "ko": "HPLC 소프트웨어의 날짜·시간을 정하는 시계를 조정할 수 있어, 출력된 종이 기록의 실제 날짜와 시간을 바꿀 수 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#1",
+      "category": "deviation_capa",
+      "source": "mhra:trend_2016",
+      "locator": "p.8 #1",
+      "agency_category": "Chapter 1",
+      "text": "Deviation reports did not contain sufficient information to describe the investigations conducted or demonstrate the evidence that supported the proposed root cause.",
+      "ko": "일탈 보고서에 수행한 조사를 설명하거나 제시된 근본 원인을 뒷받침하는 증거를 보여 줄 정보가 충분하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#7",
+      "category": "deviation_capa",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 1",
+      "text": "There was no requirement to ensure that process, procedural or systems based errors had not been overlooked prior to identifying ‘Personnel Error’ as a root cause.",
+      "ko": "근본 원인을 '작업자 오류'로 정하기 전에 공정·절차·시스템상의 오류를 놓치지 않았는지 확인하라는 요건이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#10",
+      "category": "deviation_capa",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 1",
+      "text": "At least 8 overdue CAPA (ranging from 59 days to 242 days overdue) were observed to have been closed the day before the inspection.",
+      "ko": "기한이 지난 CAPA 최소 8건(59일~242일 초과)이 실사 전날 종결된 것이 확인되었다."
+    },
+    {
+      "id": "mhra:trend_2016#6",
+      "category": "deviation_capa",
+      "source": "mhra:trend_2016",
+      "locator": "p.9 #3",
+      "agency_category": "Chapter 1",
+      "text": "There was no procedural requirement to consider if the deviation had occurred previously.",
+      "ko": "같은 일탈이 이전에도 발생했는지 검토하라는 절차상 요건이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#4",
+      "category": "deviation_capa",
+      "source": "mhra:trend_2016",
+      "locator": "p.9 #1",
+      "agency_category": "Chapter 1",
+      "text": "There was no requirement to identify the impact of the deviation on the batch.",
+      "ko": "일탈이 해당 배치에 미치는 영향을 파악하라는 요건이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#99",
+      "category": "deviation_capa",
+      "source": "mhra:trend_2016",
+      "locator": "p.38 #2",
+      "agency_category": "Chapter 5",
+      "text": "Cleaning failures identified at visual inspection by the second production inspector were not logged as deviations or similar to allow trending.",
+      "ko": "두 번째 생산 검사자가 육안 검사에서 발견한 세척 불량이 일탈 등으로 기록되지 않아 경향 분석을 할 수 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#76",
+      "category": "documentation_records",
+      "source": "mhra:trend_2016",
+      "locator": "p.31 #2",
+      "agency_category": "Chapter 4",
+      "text": "There were no log books in place for each compounding workstation to ensure traceability of operations.",
+      "ko": "작업 추적성을 보장하기 위한 조제 작업대별 로그북이 없었다."
+    },
+    {
+      "id": "pmda:000273638#10",
+      "category": "documentation_records",
+      "source": "pmda:000273638",
+      "locator": "R10",
+      "agency_category": "Document management",
+      "text": "However, the inspection found that a wide range of records had been discarded, including X records of QC, X records of X of X, and usage records of X and X.",
+      "ko": "그러나 실사에서 QC의 X 기록, X의 X에 관한 X 기록, X와 X의 사용 기록 등 광범위한 기록이 폐기된 것이 확인되었다."
+    },
+    {
+      "id": "mhra:trend_2016#73",
+      "category": "documentation_records",
+      "source": "mhra:trend_2016",
+      "locator": "p.30 #2",
+      "agency_category": "Chapter 4",
+      "text": "Non-contemporaneous recording was noted during placebo manufacture as the date completed for the process step on the batch production record had already been entered before that process step had actually been completed.",
+      "ko": "위약 제조 중 공정 단계가 실제로 끝나기 전에 배치 제조 기록에 완료 날짜가 이미 기입되어 있어, 작업과 동시에 기록하지 않은 것이 확인되었다."
+    },
+    {
+      "id": "mhra:trend_2015#40",
+      "category": "documentation_records",
+      "source": "mhra:trend_2015",
+      "locator": "p.24 #2",
+      "agency_category": "Chapter 4",
+      "text": "Overwriting of hand recorded data and lack of adequate explanation for changes",
+      "ko": "수기 기록 데이터를 덧썼고 변경에 대한 충분한 설명이 없었다."
+    },
+    {
+      "id": "mhra:trend_2015#42",
+      "category": "documentation_records",
+      "source": "mhra:trend_2015",
+      "locator": "p.24 #4",
+      "agency_category": "Chapter 4",
+      "text": "Inappropriate changes made by obscuring data via fixing stickers over entries to amend the data recorded",
+      "ko": "기록된 데이터를 고치려고 기재 내용 위에 스티커를 붙여 데이터를 가리는 부적절한 수정이 있었다."
+    },
+    {
+      "id": "mhra:trend_2015#44",
+      "category": "documentation_records",
+      "source": "mhra:trend_2015",
+      "locator": "p.25 #1",
+      "agency_category": "Chapter 4",
+      "text": "Records were partially burnt or in waste bags awaiting destruction at the rear of the site",
+      "ko": "사업장 뒤편에 기록이 일부 불탄 채로, 또는 폐기를 기다리는 쓰레기봉투에 담긴 채로 있었다."
+    },
+    {
+      "id": "pmda:000276920#21",
+      "category": "qc_lab_controls",
+      "source": "pmda:000276920",
+      "locator": "R21",
+      "agency_category": "Control of laboratory error, OOS/OOT",
+      "text": "The procedure for handling OOS events does not necessarily require root cause analysis nor implementation of CAPA, even no laboratory error or sampling error was identified in the initial phase investigation.",
+      "ko": "OOS 처리 절차는 초기 단계 조사에서 시험실 오류나 검체 채취 오류가 확인되지 않은 경우에도 근본 원인 분석이나 CAPA 시행을 반드시 요구하지는 않는다."
+    },
+    {
+      "id": "pmda:000276920#14",
+      "category": "qc_lab_controls",
+      "source": "pmda:000276920",
+      "locator": "R14",
+      "agency_category": "Test instruction, record, laboratory procedures",
+      "text": "Reconciliation and related records of working standards used for product release test, including use date, used amount are not recorded.",
+      "ko": "출하 시험에 쓰인 작업 표준품의 수불과 사용일·사용량 등 관련 사항이 기록되지 않는다."
+    },
+    {
+      "id": "mhra:trend_2016#110",
+      "category": "qc_lab_controls",
+      "source": "mhra:trend_2016",
+      "locator": "p.43 #1",
+      "agency_category": "Chapter 6",
+      "text": "There was no justification for the twelve month expiry assigned to reagents.",
+      "ko": "시약에 부여한 12개월 사용기한의 근거가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#117",
+      "category": "qc_lab_controls",
+      "source": "mhra:trend_2016",
+      "locator": "p.46 #1",
+      "agency_category": "Chapter 6",
+      "text": "An OOS result was averaged with two in-spec results to generate a passing result.",
+      "ko": "OOS 결과 하나를 규격 이내 결과 두 개와 평균 내어 적합 결과를 만들었다."
+    },
+    {
+      "id": "pmda:000276920#42",
+      "category": "qc_lab_controls",
+      "source": "pmda:000276920",
+      "locator": "Sheet1!R42",
+      "agency_category": "Sampling and sample control",
+      "text": "Sampling records of samples for product release test were not prepared.",
+      "ko": "출하 시험용 검체의 채취 기록이 작성되지 않았다."
+    },
+    {
+      "id": "pmda:000273638#29",
+      "category": "qc_lab_controls",
+      "source": "pmda:000273638",
+      "locator": "Sheet1!R29",
+      "agency_category": "Reserve samples/retention samples",
+      "text": "The critical raw materials and packaging/labeling materials to be kept as reference samples were not evaluated.",
+      "ko": "참고품으로 보관해야 할 중요 원료와 포장·표시 자재가 평가되지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#129",
+      "category": "cleaning_validation",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Annex 15",
+      "text": "Permitted limits for carryover of organic molecules have not been set or adequately risk assessed",
+      "ko": "유기 분자의 잔류 이월 허용 한도가 설정되지 않았거나 위험평가가 충분하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#130",
+      "category": "cleaning_validation",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Annex 15",
+      "text": "Swab samples have not been taken, in particular no swabs have been taken from difficult to clean areas where other methods or determining residues may not be effective",
+      "ko": "스왑 시료를 채취하지 않았다. 특히 다른 방법으로는 잔류물 확인이 효과적이지 않을 수 있는, 세척하기 어려운 부위에서 스왑을 채취하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#90",
+      "category": "cleaning_validation",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 5",
+      "text": "No cleaning validation had been performed on the dispensing isolator.",
+      "ko": "칭량 아이솔레이터에 대한 세척 밸리데이션이 수행되지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#221",
+      "category": "cleaning_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.93 #3",
+      "agency_category": "Annex 15",
+      "text": "There was no cleaning validation for the non-dedicated sampling tools.",
+      "ko": "전용이 아닌 검체 채취 도구에 대한 세척 밸리데이션이 없었다."
+    },
+    {
+      "id": "mhra:trend_2015#59",
+      "category": "cleaning_validation",
+      "source": "mhra:trend_2015",
+      "locator": "p.30 #3",
+      "agency_category": "Chapter 5",
+      "text": "There was no confirmation that the cleaning methods would remove detergent residues",
+      "ko": "세척 방법이 세제 잔류물을 제거하는지 확인하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#128",
+      "category": "cleaning_validation",
+      "source": "mhra:trend_2015",
+      "locator": "p.72 #2",
+      "agency_category": "Annex 15",
+      "text": "The effectiveness of sprayballs used for vessel cleaning have not been demonstrated or adequately controlled",
+      "ko": "용기 세척에 쓰는 스프레이볼의 효과가 입증되지 않았거나 적절히 관리되지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#55",
+      "category": "contamination_control",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Chapter 5",
+      "text": "A jug of cleaning liquid with a used cloth was found sitting on the capsule polishing unit that had been signed off as clean.",
+      "ko": "세척 완료로 서명된 캡슐 연마기 위에 세척액이 든 주전자와 사용한 천이 놓여 있었다."
+    },
+    {
+      "id": "mhra:trend_2015#58",
+      "category": "contamination_control",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Chapter 5",
+      "text": "The automated tablet counter and tablet counting trays, which were used for multiple products, had not been considered as part of the cross contamination risk assessment",
+      "ko": "여러 제품에 쓰는 자동 정제 계수기와 정제 계수 트레이가 교차오염 위험평가에 포함되지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#169",
+      "category": "contamination_control",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Annex 2",
+      "text": "Sanitisation contact times were not being monitored and the five minutes contact time for the sporicide was not as defined by the sanitising agent manufacturer or validated by the Company.",
+      "ko": "소독 접촉 시간을 모니터링하지 않았고, 포자 살균제의 접촉 시간 5분은 소독제 제조사가 정한 것도, 회사가 밸리데이션한 것도 아니었다."
+    },
+    {
+      "id": "mhra:trend_2016#92",
+      "category": "contamination_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.36 #3",
+      "agency_category": "Chapter 5",
+      "text": "There was no data to show that the cleaning of the mist shower was effective in removing any residual contamination.",
+      "ko": "미스트 샤워 세척이 잔류 오염 제거에 효과적임을 보여 주는 데이터가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#95",
+      "category": "contamination_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.37 #2",
+      "agency_category": "Chapter 5",
+      "text": "There were cracks in the vinyl around the mist shower drain. This would create a trap point which could cause the accumulation of chemical and microbial contamination.",
+      "ko": "미스트 샤워 배수구 주변 비닐 바닥재에 균열이 있었다. 이 균열은 화학적·미생물 오염이 쌓일 수 있는 지점이 된다."
+    },
+    {
+      "id": "mhra:trend_2016#100",
+      "category": "contamination_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.38 #3",
+      "agency_category": "Chapter 5",
+      "text": "There was no written instruction on rules of use of cleaning bays to ensure the risk of cross contamination between cleaned and un-cleaned items was controlled.",
+      "ko": "세척 구역 사용 규칙에 대한 서면 지침이 없어, 세척된 물품과 세척되지 않은 물품 사이의 교차오염 위험이 관리됨을 보장하지 못했다."
+    },
+    {
+      "id": "mhra:trend_2015#97",
+      "category": "environmental_monitoring",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Annex 2",
+      "text": "The clean room was only monitored after cleaning. There was no periodic monitoring before cleaning to monitor for potential microbial changes or for the continuing effectiveness of cleaning",
+      "ko": "청정실을 세척 후에만 모니터링했다. 미생물 변화나 세척의 지속적 효과를 확인하기 위한 세척 전 정기 모니터링이 없었다."
+    },
+    {
+      "id": "mhra:trend_2015#95",
+      "category": "environmental_monitoring",
+      "source": "mhra:trend_2015",
+      "locator": "p.51 #1",
+      "agency_category": "Annex 2",
+      "text": "Not all phases of production were subject to microbial monitoring, e.g. activities with no cellular product present such as preparation of equipment, which has a similar potential for contamination of product",
+      "ko": "생산의 모든 단계가 미생물 모니터링 대상이 되지는 않았다. 예: 장비 준비처럼 세포 제품이 없는 작업도 제품 오염 가능성은 비슷하다."
+    },
+    {
+      "id": "mhra:trend_2016#23",
+      "category": "environmental_monitoring",
+      "source": "mhra:trend_2016",
+      "locator": "p.13 #1",
+      "agency_category": "Chapter 1",
+      "text": "The management review process was deficient, for example, the meeting minutes stated that all environmental monitoring results were satisfactory; despite there being an obvious adverse trend increase in clean room environmental monitoring results.",
+      "ko": "경영 검토에 결함이 있었다. 예를 들어 청정실 환경모니터링 결과에 뚜렷한 악화 경향이 있었는데도 회의록에는 모든 환경모니터링 결과가 적합하다고 적혀 있었다."
+    },
+    {
+      "id": "mhra:trend_2015#85",
+      "category": "environmental_monitoring",
+      "source": "mhra:trend_2015",
+      "locator": "p.47 #1",
+      "agency_category": "Annex 1",
+      "text": "Organisms associated with the continued environmental failures were only identified to genus level and not to species level with Staphylococcus and Bacillus commonly reported",
+      "ko": "계속된 환경 기준 이탈과 관련된 미생물을 종(species)이 아닌 속(genus) 수준까지만 동정했으며, Staphylococcus와 Bacillus가 흔히 보고되었다."
+    },
+    {
+      "id": "mhra:trend_2015#93",
+      "category": "environmental_monitoring",
+      "source": "mhra:trend_2015",
+      "locator": "p.49 #2",
+      "agency_category": "Annex 1",
+      "text": "There were no settle plates located in the zone where samples were taken for IPC weight checks",
+      "ko": "IPC 중량 검사용 시료를 채취하는 구역에 낙하균 배지가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#128",
+      "category": "material_supplier_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.50 #4",
+      "agency_category": "Chapter 7",
+      "text": "Procedures did not describe the basis for accepting an audit report prepared by a third party.",
+      "ko": "제3자가 작성한 감사 보고서를 받아들이는 근거가 절차에 기술되어 있지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#86",
+      "category": "material_supplier_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.35 #2",
+      "agency_category": "Chapter 5",
+      "text": "The approved supplier list does not include the address of the manufacturer. The site is therefore unable to confirm that the material is received from both the correct supplier and manufacturer.",
+      "ko": "승인 공급업체 목록에 제조원 주소가 없다. 따라서 사업장은 자재를 올바른 공급업체와 제조원 양쪽에서 받았는지 확인할 수 없다."
+    },
+    {
+      "id": "mhra:trend_2016#84",
+      "category": "material_supplier_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.34 #4",
+      "agency_category": "Chapter 5",
+      "text": "Only the top layer of large dry powder chemical drums was being sampled so this material was not representative of the bulk material.",
+      "ko": "대형 분말 화학물질 드럼의 맨 윗층에서만 검체를 채취해, 채취한 검체가 전체 자재를 대표하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#125",
+      "category": "material_supplier_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.50 #1",
+      "agency_category": "Chapter 7",
+      "text": "There was no procedure in place for the management of critical service suppliers and there was no mechanism in place to enable the qualification and monitoring of supplier performance.",
+      "ko": "중요 서비스 공급업체 관리 절차가 없었고, 공급업체의 적격성 평가와 성과 모니터링을 위한 체계가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#129",
+      "category": "material_supplier_control",
+      "source": "mhra:trend_2016",
+      "locator": "p.51 #1",
+      "agency_category": "Chapter 7",
+      "text": "The technical agreement between Company A and Company B was insufficiently detailed. It only contained a series of bullet points covering Company B’s activities, and did not describe the responsibilities of Company A.",
+      "ko": "A사와 B사 간 기술 협약서가 충분히 상세하지 않았다. B사의 활동을 글머리표 항목으로 나열했을 뿐 A사의 책임은 기술하지 않았다."
+    },
+    {
+      "id": "pmda:000273638#24",
+      "category": "material_supplier_control",
+      "source": "pmda:000273638",
+      "locator": "Sheet1!R24",
+      "agency_category": "Test records, test procedures",
+      "text": "During the acceptance of the drug substance, the manufacturing site only checked the COA issued by the manufacturing site of the drug substance for each lot and did not judge whether it was acceptable or not.",
+      "ko": "원료의약품 입고 시 제조소는 원료의약품 제조소가 로트마다 발행한 COA만 확인하고 적합 여부를 판정하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#138",
+      "category": "complaint_recall",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 8",
+      "text": "Inadequate investigation was performed on site. For example, not reviewing manufacturing and other data available and also not considering the wider implications of the complaint on other batches.",
+      "ko": "현장 조사가 불충분했다. 예를 들어 제조 데이터 등 확인할 수 있는 자료를 검토하지 않았고, 불만이 다른 배치에 미치는 더 넓은 영향도 고려하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#141",
+      "category": "complaint_recall",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 8",
+      "text": "The recall procedure did not define maximum timelines for key steps to ensure the recall process was completed in a timely fashion.",
+      "ko": "회수 절차에 주요 단계별 최대 소요 기한이 정의되어 있지 않아, 회수가 적시에 완료됨을 보장하지 못했다."
+    },
+    {
+      "id": "mhra:trend_2016#143",
+      "category": "complaint_recall",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 8",
+      "text": "The mock recall challenge was not completed in a timely manner and no final formal assessment report was generated.",
+      "ko": "모의 회수가 적시에 완료되지 않았고 최종 공식 평가 보고서도 작성되지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#133",
+      "category": "complaint_recall",
+      "source": "mhra:trend_2016",
+      "locator": "p.53 #1",
+      "agency_category": "Chapter 8",
+      "text": "There was no consideration of whether the complaint referred to a falsified medicine.",
+      "ko": "불만이 위조 의약품에 관한 것인지 검토하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#144",
+      "category": "complaint_recall",
+      "source": "mhra:trend_2016",
+      "locator": "p.55 #4",
+      "agency_category": "Chapter 8",
+      "text": "There is no procedural instruction to ensure that any in-house stocks of product potentially affected by a recall are quarantined.",
+      "ko": "회수 영향을 받을 수 있는 제품의 사내 재고를 격리하도록 하는 절차상 지침이 없다."
+    },
+    {
+      "id": "mhra:trend_2015#79",
+      "category": "complaint_recall",
+      "source": "mhra:trend_2015",
+      "locator": "p.42 #4",
+      "agency_category": "Chapter 8",
+      "text": "No written recall correspondence with customers",
+      "ko": "고객과 주고받은 서면 회수 연락이 없었다."
+    },
+    {
+      "id": "mhra:trend_2015#27",
+      "category": "training_personnel",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Chapter 2",
+      "text": "Personnel had no documented training in the procedures or systems",
+      "ko": "직원이 절차나 시스템에 대해 교육받은 기록이 없었다."
+    },
+    {
+      "id": "mhra:trend_2015#29",
+      "category": "training_personnel",
+      "source": "mhra:trend_2015",
+      "locator": "",
+      "agency_category": "Chapter 2",
+      "text": "Although comprehension questions were asked at the end of each module, there was no clearly defined pass mark therefore it could not be confirmed that the personnel understood the training",
+      "ko": "각 단원 끝에 이해도 확인 질문은 있었지만 합격 기준이 명확히 정해져 있지 않아, 직원이 교육 내용을 이해했는지 확인할 수 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#44",
+      "category": "training_personnel",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 2",
+      "text": "There was no system for confirming that all personnel that required training had been trained.",
+      "ko": "교육이 필요한 모든 직원이 교육을 받았는지 확인하는 체계가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#46",
+      "category": "training_personnel",
+      "source": "mhra:trend_2016",
+      "locator": "p.21 #2",
+      "agency_category": "Chapter 2",
+      "text": "The training record of production operator did not show they were trained in the operation of the isolator despite being signed off for aseptic manufacturing.",
+      "ko": "생산 작업자가 무균 제조 업무를 승인받았는데도 교육 기록에는 아이솔레이터 운전 교육을 받은 내용이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#41",
+      "category": "training_personnel",
+      "source": "mhra:trend_2016",
+      "locator": "p.20 #1",
+      "agency_category": "Chapter 2",
+      "text": "The production operative was signed off as trained in raw material assessment based on read and understand questionnaire with no practical assessment.",
+      "ko": "생산 작업자가 실기 평가 없이 '읽고 이해함' 설문만으로 원료 평가 교육을 이수한 것으로 승인되었다."
+    },
+    {
+      "id": "mhra:trend_2016#127",
+      "category": "training_personnel",
+      "source": "mhra:trend_2016",
+      "locator": "p.50 #3",
+      "agency_category": "Chapter 7",
+      "text": "There was no procedures that describe the training and competency assessment required for company auditors.",
+      "ko": "회사 감사자에게 필요한 교육과 역량 평가를 기술한 절차가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#33",
+      "category": "stability_storage",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 1",
+      "text": "There was no confirmation that the ongoing stability studies showed no adverse trends and would be expected to remain within specification for the proposed shelf life.",
+      "ko": "진행 중인 안정성 시험에 불리한 경향이 없고 제안된 유효기간 동안 규격 안에 머물 것으로 예상된다는 확인이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#123",
+      "category": "stability_storage",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 6",
+      "text": "There had been numerous stability failures (including pre- shelf life expiry) identified but these had not been formally assessed by the QPs or the impact on continued certification considered.",
+      "ko": "안정성 시험 부적합(유효기간 만료 전 포함)이 여러 건 확인되었지만 적격인정자(QP)가 이를 공식 평가하지 않았고, 계속 출하승인하는 데 미치는 영향도 검토하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#124",
+      "category": "stability_storage",
+      "source": "mhra:trend_2016",
+      "locator": "",
+      "agency_category": "Chapter 6",
+      "text": "The contract manufacturer did not notify the stability failures to the Marketing Authorisation Holders.",
+      "ko": "위탁 제조업체가 안정성 시험 부적합을 판매허가 보유자에게 알리지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#64",
+      "category": "stability_storage",
+      "source": "mhra:trend_2015",
+      "locator": "p.33 #2",
+      "agency_category": "Chapter 6",
+      "text": "An OOS result on appearance was reported at 30 month time point. No action was taken while there were products potentially available in the market",
+      "ko": "30개월 시점에 성상 OOS 결과가 보고되었다. 시장에 제품이 있을 수 있는데도 아무 조치를 하지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#104",
+      "category": "stability_storage",
+      "source": "mhra:trend_2016",
+      "locator": "p.40 #2",
+      "agency_category": "Chapter 5",
+      "text": "Capsule shells are not stored at the manufacturer’s recommended humidity conditions (35 - 65%RH) in the warehouse.",
+      "ko": "창고에서 캡슐 껍질을 제조사 권장 습도 조건(35~65%RH)으로 보관하지 않는다."
+    },
+    {
+      "id": "mhra:trend_2016#226",
+      "category": "stability_storage",
+      "source": "mhra:trend_2016",
+      "locator": "p.95 #2",
+      "agency_category": "Annex 16",
+      "text": "Arrangements for temperature monitoring of air shipments did not justify why data loggers were not required in every pallet.",
+      "ko": "항공 운송 온도 모니터링 방식에서 모든 팔레트에 데이터 로거를 두지 않는 이유를 정당화하지 않았다."
+    },
+    {
+      "id": "pmda:000273638#17",
+      "category": "equipment_facility",
+      "source": "pmda:000273638",
+      "locator": "R17",
+      "agency_category": "Control of facilities and equipment",
+      "text": "Multiple scratches resulting from abrasion were found on the internal part of the mill.",
+      "ko": "분쇄기 내부에서 마모로 생긴 긁힘이 여러 군데 발견되었다."
+    },
+    {
+      "id": "mhra:trend_2016#60",
+      "category": "equipment_facility",
+      "source": "mhra:trend_2016",
+      "locator": "p.25 #3",
+      "agency_category": "Chapter 3",
+      "text": "There was no demarcation between clean and dirty sides of the change room entering the formulation area.",
+      "ko": "제제 구역으로 들어가는 탈의실에 청결 쪽과 비청결 쪽의 경계 표시가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#64",
+      "category": "equipment_facility",
+      "source": "mhra:trend_2016",
+      "locator": "p.26 #3",
+      "agency_category": "Chapter 3",
+      "text": "The door seal on the coating machine was not intact and had sections missing.",
+      "ko": "코팅기 도어 씰이 온전하지 않았고 일부가 떨어져 나가 있었다."
+    },
+    {
+      "id": "mhra:trend_2016#55",
+      "category": "equipment_facility",
+      "source": "mhra:trend_2016",
+      "locator": "p.24 #2",
+      "agency_category": "Chapter 3",
+      "text": "There was no drawing showing the pressure cascades within the facilities available.",
+      "ko": "시설 내 차압 단계를 보여 주는 도면이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#70",
+      "category": "equipment_facility",
+      "source": "mhra:trend_2016",
+      "locator": "p.28 #2",
+      "agency_category": "Chapter 3",
+      "text": "There were no predetermined acceptance criteria documented for the external calibration activities including the warehouse temperature and humidity probes and the purified water flow meter.",
+      "ko": "창고 온습도 프로브와 정제수 유량계를 포함한 외부 교정 작업에 대해 사전에 정한 허용 기준이 문서화되어 있지 않았다."
+    },
+    {
+      "id": "mhra:trend_2015#37",
+      "category": "equipment_facility",
+      "source": "mhra:trend_2015",
+      "locator": "p.22 #3",
+      "agency_category": "Chapter 3",
+      "text": "Areas of the facility and equipment were in a poor state of repair, e.g. damaged filter panel covers in the drying tunnel and damaged vents",
+      "ko": "시설과 설비 일부의 유지보수 상태가 나빴다. 예: 건조 터널의 필터 패널 덮개 파손, 통풍구 파손."
+    },
+    {
+      "id": "mhra:trend_2016#15",
+      "category": "quality_unit_oversight",
+      "source": "mhra:trend_2016",
+      "locator": "p.11 #1",
+      "agency_category": "Chapter 1",
+      "text": "There was no formal Management review process.",
+      "ko": "공식 경영 검토 절차가 없었다."
+    },
+    {
+      "id": "pmda:000283020#40",
+      "category": "quality_unit_oversight",
+      "source": "pmda:000283020",
+      "locator": "R40",
+      "agency_category": "Quality management",
+      "text": "Though the executive management mention lack of human resources in the report of management review, and continuously took actions to retain personnel, those actions did not result in resolution of lack of resources.",
+      "ko": "경영진이 경영 검토 보고서에서 인력 부족을 언급하고 인력 유지 조치를 계속했지만, 그 조치로 인력 부족이 해소되지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#17",
+      "category": "quality_unit_oversight",
+      "source": "mhra:trend_2016",
+      "locator": "p.11 #3",
+      "agency_category": "Chapter 1",
+      "text": "The management team was not seen to be reacting effectively to poor key performance indicators.",
+      "ko": "경영진이 나쁜 핵심성과지표(KPI)에 효과적으로 대응하는 것으로 보이지 않았다."
+    },
+    {
+      "id": "mhra:trend_2016#38",
+      "category": "quality_unit_oversight",
+      "source": "mhra:trend_2016",
+      "locator": "p.17 #2",
+      "agency_category": "Chapter 1",
+      "text": "There was no formal system for the review, assessment and where appropriate, implementation of EU GMP updates.",
+      "ko": "EU GMP 개정 사항을 검토·평가하고 필요하면 반영하는 공식 체계가 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#235",
+      "category": "quality_unit_oversight",
+      "source": "mhra:trend_2016",
+      "locator": "p.97 #6",
+      "agency_category": "Annex 16",
+      "text": "The QP did not ensure that he had current knowledge of the company PQS.",
+      "ko": "적격인정자(QP)가 회사 의약품 품질 시스템(PQS)에 대한 최신 지식을 갖추도록 하지 않았다."
+    },
+    {
+      "id": "pmda:000283020#22",
+      "category": "quality_unit_oversight",
+      "source": "pmda:000283020",
+      "locator": "sheet1!R22",
+      "agency_category": "Batch release",
+      "text": "The release procedure of this site permit distribution of the inspected API product from this site before completion of necessary steps of batch release (under quarantine), and actually the API was distributed from this site before completion of batch record review.",
+      "ko": "이 제조소의 출하 절차는 출하 판정에 필요한 단계가 끝나기 전(격리 상태)에 원료의약품을 제조소 밖으로 내보내는 것을 허용했고, 실제로 배치 기록 검토가 끝나기 전에 원료의약품이 출고되었다."
+    },
+    {
+      "id": "mhra:trend_2016#223",
+      "category": "process_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.93 #5",
+      "agency_category": "Annex 15",
+      "text": "Batch processing parameter ranges were not always supported by process validation data, for example the coating flow rate and the granulation chopper speed.",
+      "ko": "배치 공정 변수 범위가 공정 밸리데이션 데이터로 늘 뒷받침되지는 않았다. 예: 코팅 유량, 과립기 쵸퍼 속도."
+    },
+    {
+      "id": "mhra:trend_2016#224",
+      "category": "process_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.93 #6",
+      "agency_category": "Annex 15",
+      "text": "There is no clear indication in the process validation protocol that validation batches are predefined as potentially releasable for commercial sale.",
+      "ko": "공정 밸리데이션 계획서에 밸리데이션 배치를 상업 판매용으로 출하할 수 있는 배치로 미리 정했다는 명확한 표시가 없다."
+    },
+    {
+      "id": "mhra:trend_2016#220",
+      "category": "process_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.93 #2",
+      "agency_category": "Annex 15",
+      "text": "There was no routine re-validation of manufacturing processes.",
+      "ko": "제조공정의 정기 재밸리데이션이 없었다."
+    },
+    {
+      "id": "mhra:trend_2016#194",
+      "category": "process_validation",
+      "source": "mhra:trend_2016",
+      "locator": "p.79 #1",
+      "agency_category": "Annex 9",
+      "text": "It could not be confirmed that the validated manufacturing process was routinely achieved, as the mixer in manufacturing room 5 was not calibrated and the speed was not routinely verified.",
+      "ko": "5번 제조실의 혼합기가 교정되지 않았고 속도도 정기적으로 확인하지 않아, 밸리데이션된 제조공정이 일상적으로 구현되는지 확인할 수 없었다."
+    },
+    {
+      "id": "pmda:000273638#21",
+      "category": "process_validation",
+      "source": "pmda:000273638",
+      "locator": "Sheet1!R21",
+      "agency_category": "Validations",
+      "text": "Production of an additional lot X was started in spite of the cause of the deviation (X was out of control value) in the third lot X occurred during the manufacturing process validation of X, which is one of the drug substances used in X Injection, had not been fully investigated.",
+      "ko": "X 주사제에 쓰이는 원료의약품 중 하나인 X의 제조공정 밸리데이션 중 세 번째 로트 X에서 발생한 일탈(X가 관리값을 벗어남)의 원인이 충분히 조사되지 않았는데도 추가 로트 X의 생산을 시작했다."
+    }
   ]
 }

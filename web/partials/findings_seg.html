@@ -22,6 +22,13 @@
 {% if lang == 'ko' or 'findings/browse/' in en_paths %}  <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>{{ _("둘러보기") }}</a>
 {% endif %}
   <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>
+{# [진입점 2026-11-09] 지적 조항·지적 사례 화면은 둘러보기 카드 안 링크 하나뿐이라 대표가
+   메뉴에서 못 찾았다 — 지적사항 존의 하위 진입(이 세그)에 같은 줄로 둔다. 면 집합(en_paths)
+   에 있을 때만 — 정본이 없는 빌드에서 없는 페이지로 보내지 않는다(ko·en 공통 선언). #}
+{% if 'findings/citations/' in en_paths %}  <a href="{{ rel_root }}findings/citations/index.html">{{ _("FDA 지적 조항") }}</a>
+{% endif %}
+{% if 'findings/examples/' in en_paths %}  <a href="{{ rel_root }}findings/examples/index.html">{{ _("지적 사례") }}</a>
+{% endif %}
 </nav>
 {#- 시각 언어는 트렌드 존 세그(.tr-seg)와 동형 — 같은 사이트에서 "면 전환"이 두 가지
     모양이면 사용자가 같은 장치임을 알아보지 못한다. 셀렉터만 존 스코프로 다르다. -#}

@@ -5023,7 +5023,7 @@ TRENDS_DESCRIPTION = N_("식약처·FDA 중 기관을 골라 최근 12개월에 
                         "FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계.")
 INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
                              "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
-EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어 그대로, 출처 링크 포함.")
+EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어와 참고용 한국어 번역, 출처 링크 포함.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
 COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
@@ -6215,7 +6215,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     emit_clause_tree(clause_views_en, en_page, en_emit, en_tr, "en",
                      {k: en_tr(v) for k, v in _clause_agency_labels.items()})
 
-    # [지적 사례 화면] 주제별 규제기관(PMDA·MHRA) 지적 사례 — 한 장. 원문 영어 그대로, 번역 없음.
+    # [지적 사례 화면] 주제별 규제기관(PMDA·MHRA) 지적 사례 — 한 장. 한국어 화면은 참고용 번역 + 원문, 영어 화면은 원문만.
     if example_data:
         import grm_findings as _gf
         _ex_labels = {c.code: (c.label_ko, c.label_en) for c in _gf.FINDING_TAXONOMY}

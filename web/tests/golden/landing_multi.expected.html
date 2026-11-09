@@ -149,6 +149,8 @@
       <a class="records-card" href="findings/inspector/index.html"><b>이 실사관이 서명한 문서에는 무엇이 있었나요?</b><span>실사관 이름으로 공개 문서 조회</span></a>
       <a class="records-card" href="findings/checklist/index.html"><b>실사 준비, 무엇부터 점검할까요?</b><span>실제 지적 문장이 붙은 자가점검표</span></a>
       <a class="records-card" href="findings/trends/index.html"><b>요즘 어떤 지적이 늘고 있나요?</b><span>최근 12개월 지적 경향</span></a>
+      <a class="records-card" href="findings/citations/index.html"><b>이 조항, FDA 는 얼마나 자주 지적했나요?</b><span>조항별 FDA 인용 빈도 순위</span></a>
+      <a class="records-card" href="findings/examples/index.html"><b>우리 업무 영역에서는 실제로 어떤 지적이 나왔나요?</b><span>영역별 PMDA·MHRA 지적 문장</span></a>
     </div>
     <a class="records-all" href="findings/index.html">규제 지적사항 전체 화면 →</a>
   </div></section>
@@ -185,7 +187,9 @@
 <style>
 /* [발견 허브] 데이터 존 진입(#records) — grm.css 토큰만, 스코프 한정. 질문형 카드. */
 .records-sub{font-family:var(--sans);font-size:14.5px;line-height:1.7;color:var(--muted);margin:10px 0 0;max-width:760px;word-break:keep-all}
-.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.records-grid{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.records-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.records-grid{grid-template-columns:1fr}}
 .records-card{display:flex;flex-direction:column;gap:6px;background:var(--canvas);border:1px solid var(--line-2);border-radius:var(--rad);padding:18px 20px;text-decoration:none}
 .records-card:hover{border-color:var(--coral)}
 .records-card b{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);line-height:1.45;word-break:keep-all}
@@ -288,7 +292,7 @@
       <a class="foot-srclink" href="findings/coverage/index.html">정보 출처 <i class="ti ti-arrow-right" aria-hidden="true"></i></a></div>
     <div data-feedback-slot><h5>서비스 안내</h5><a href="about/index.html">서비스 소개</a><a href="guide/index.html">이용안내</a><a href="#notice">AI 활용 안내</a><a href="findings/coverage/index.html">데이터 현황</a><a href="rss.xml">RSS 피드</a></div>
     <div><h5>콘텐츠</h5><a href="archive/index.html">주간 브리프</a><a href="findings/index.html">실사 지적사항</a><a href="findings/trends/index.html">규제 동향</a><a href="library/index.html">자료실</a><a href="glossary/index.html">용어사전</a><a href="quiz/index.html">주간 퀴즈</a></div>
-    <div><h5>도구</h5><a href="findings/checklist/index.html">자가점검 체크리스트</a><a href="findings/firm/index.html">업체 조회</a><a href="findings/inspector/index.html">실사관 조회</a><a href="findings/inspections/index.html">FDA 실사 결과</a><a href="findings/docs/index.html">문서로 찾기</a></div>
+    <div><h5>도구</h5><a href="findings/checklist/index.html">자가점검 체크리스트</a><a href="findings/firm/index.html">업체 조회</a><a href="findings/inspector/index.html">실사관 조회</a><a href="findings/inspections/index.html">FDA 실사 결과</a><a href="findings/citations/index.html">FDA 지적 조항</a><a href="findings/examples/index.html">지적 사례</a><a href="findings/docs/index.html">문서로 찾기</a></div>
   </div>
   <div class="foot-legal">
     <div class="foot-copy">

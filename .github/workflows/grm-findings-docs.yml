@@ -32,6 +32,7 @@ permissions:
   actions: write
   contents: write
   pull-requests: write
+  issues: write   # refresh 실패 알림 이슈 전용
 
 concurrency:
   group: grm-findings-docs-auto-refresh
@@ -70,9 +71,10 @@ jobs:
             echo "docs=0" >> "$GITHUB_OUTPUT"
           fi
 
-      # 스크립트가 0건 가드·발행일/원문링크 필수·표본 미달·페이지 실패율 상한을 스스로
-      # 판정하고, 위반이면 아무것도 쓰지 않은 채 exit 1 한다.
+      # 스크립트가 0건 가드·발행일/원문링크 필수·표본 미달·페이지 조회 실패(재시도 후
+      # 1장이라도)를 스스로 판정하고, 위반이면 아무것도 쓰지 않은 채 exit 1 한다.
       - name: Refresh document data (findings_search RPC, anon)
+        id: refresh
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
@@ -143,7 +145,7 @@ jobs:
           $EXCL
 
           ## 게이트
-          - 0건 가드 · 발행일/원문 링크 필수 · 지적 ${MIN_FINDINGS}건 미만 제외 · 페이지 실패율 20% 초과 시 전면 중단
+          - 0건 가드 · 발행일/원문 링크 필수 · 지적 ${MIN_FINDINGS}건 미만 제외 · 페이지 조회 실패(재시도 후 1장이라도) 시 전면 중단
           - 문서 수 ${SHRINK_PCT}% 이상 축소 시 자동 머지 대신 사람 검토
 
           정본과 sitemap 골든을 함께 커밋합니다. 자동 머지는 GRM CI 디스패치가 green 일 때만.
@@ -180,6 +182,73 @@ jobs:
       - name: Merge only after green CI
         if: steps.changes.outputs.changed == 'true' && steps.gate.outputs.allowed == 'true'
         run: gh pr merge "${{ steps.pr.outputs.number }}" --squash --delete-branch
+
+      # refresh 가 죽으면 이후 스텝(커밋·PR·CI)은 전부 스킵된다 — 불완전 스냅샷으로 PR 을
+      # 열지 않는다(11-07 사례). 한 주를 조용히 넘기지 않도록 이슈로 알린다.
+      - name: Open or update docs-refresh issue
+        if: failure() && steps.refresh.outcome == 'failure'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-docs] 주간 문서 페이지 갱신이 실패했습니다';
+            const label = 'findings-docs';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              '문서 페이지 정본 갱신(`grm-findings-docs.yml`)이 실패해 이번 주 PR 을 만들지 않았습니다.',
+              '',
+              '대개 `findings_search` RPC 일시 오류로 일부 페이지를 재시도 후에도 못 읽은 경우입니다 ' +
+                '(불완전한 스냅샷은 확정하지 않습니다). 로그의 사유를 확인하고 workflow_dispatch 로 재실행하세요.',
+              '',
+              `실행: ${runUrl}`,
+              '',
+              '_갱신이 성공하면 자동으로 닫힙니다._',
+            ].join('\n');
+            async function ensureLabel(name, color, description) {
+              try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
+              catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color, description });
+              }
+            }
+            await ensureLabel(label, 'd93f0b', '주간 findings 문서 페이지 갱신 실패');
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: label, per_page: 20,
+            });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `다시 실패했습니다 — 실행 ${context.runId}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner],
+              });
+            }
+
+      - name: Close docs-refresh issue on recovery
+        if: always() && steps.refresh.outcome == 'success'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = '[findings-docs] 주간 문서 페이지 갱신이 실패했습니다';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'findings-docs', per_page: 20,
+            });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `갱신이 정상 복귀해 자동으로 닫습니다 (실행 ${context.runId}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+            }
 
       - name: Summary
         if: always()

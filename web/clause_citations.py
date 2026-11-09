@@ -237,6 +237,13 @@ def fetch_rows(base_url: str, key: str, *, timeout: int = 60) -> list[dict[str, 
 
 
 def main(argv: "list[str] | None" = None) -> int:
+    # ★stdout 인코딩 가드 -- Windows cp949 콘솔에서 한글이 깨지거나 죽지 않게.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8")
+            except (ValueError, OSError):
+                pass
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--out", default=str(DATA_FILE))
     p.add_argument("--min-inspections", type=int, default=MIN_INSPECTIONS)

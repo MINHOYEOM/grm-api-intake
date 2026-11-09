@@ -105,7 +105,7 @@
   "FDA 가 자주 지적하는 조항": "Clauses FDA cites most often",
   "FDA 가 자주 지적하는 조항 · GRM": "Clauses FDA cites most often · GRM",
   "FDA 가 자주 지적하는 조항 순위 보기": "See the most-cited clauses",
-  "FDA 가 지적을 낸 실사 {n}건 중 {k}건이 이 조항을 인용했습니다.": "Of {n} inspections where FDA issued citations, {k} cited this clause.",
+  "FDA 가 지적을 낸 실사 {n}건 중 {k}건이 이 조항을 인용했습니다.": "Of {n} inspection{s} where FDA issued citations, {k} cited this clause.",
   "FDA 가 지적을 낸 실사 가운데 어느 조항이 몇 번 인용됐는지 봅니다. 한 실사가 같은 조항을 여러 번 적어도 1건으로 셉니다.": "Which clauses were cited, among inspections where FDA issued citations. An inspection that cites the same clause several times counts once.",
   "FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — 조항별 인용 실사 수·비율과 회계연도별 추이.": "How often each 21 CFR clause was cited in FDA drug inspections that ended with citations: inspections, share, and trend by fiscal year.",
   "FDA 가이던스 문서": "FDA guidance documents",

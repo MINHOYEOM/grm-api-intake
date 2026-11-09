@@ -62,6 +62,11 @@
   /* 분류 구성 — 알약 나열(막대는 조회 화면이 그린다·여긴 정적 요약). */
   .ff-cats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
   .ff-cat{font-family:var(--sans);font-size:13px;color:var(--body);background:var(--soft);border:1px solid var(--line-2);border-radius:var(--pill);padding:5px 13px}
+  /* [SEO 2단계 2026-11-09] 비슷한 지적을 받은 다른 업체 — 알약 링크. */
+  .ff-sim-note{font-family:var(--sans);font-size:13.5px;line-height:1.7;color:var(--muted);margin:8px 0 0;word-break:keep-all}
+  a.ff-sim{text-decoration:none}
+  a.ff-sim span{color:var(--muted);font-size:12px}
+  a.ff-sim:hover{border-color:var(--coral);color:var(--coral)}
   .ff-about{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:10px}
   .ff-about p{font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--muted);margin:0;max-width:780px;word-break:keep-all}
   .ff-about b{color:var(--body);font-weight:500}
@@ -126,6 +131,18 @@
         {%- endfor %}
       </div>
     </section>
+
+    {#- [SEO 2단계 2026-11-09] 이 업체 문서들의 "다른 업체의 비슷한 지적"을 업체 단위로 모은 것.
+        원문에 없는 GRM 연결이다. 데이터가 없으면 블록 자체를 내지 않는다. -#}
+    {%- if similar_firms %}
+    <section>
+      <h2 class="ff-sec-h">{{ _('비슷한 지적을 받은 다른 업체') }}</h2>
+      <p class="ff-sim-note">{{ _('이 업체 문서의 지적과 문장이 비슷한 지적이 나온 다른 업체입니다. 같은 종류의 공개 문서끼리만 비교했습니다.') }}</p>
+      <div class="ff-cats">
+        {%- for s in similar_firms %}<a class="ff-cat ff-sim" href="{% if s.firm_slug %}{{ rel_root }}findings/firm/{{ s.firm_slug }}/{% else %}{{ rel_root }}findings/doc/{{ s.slug }}/#{{ s.finding_id }}{% endif %}">{{ s.name }} <span>{{ _('문서 {n}건과 연결', n=s.count) }}</span></a>{% endfor %}
+      </div>
+    </section>
+    {%- endif %}
 
     <section class="ff-about">
       <h2 class="ff-sec-h">{{ _('이 페이지에 대하여') }}</h2>

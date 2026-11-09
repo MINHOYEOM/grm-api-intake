@@ -422,6 +422,115 @@ def enrich_mfds_attendees(base_url: str, anon_key: str, docs: list[dict[str, Any
     return enriched
 
 
+# ── [SEO 2단계 2026-11-09] 다른 업체의 비슷한 지적 — 문서 페이지에 붙는 GRM 고유 맥락 ──
+# 원천은 지식그래프 엣지 `finding_similar`(114·116·117, 점수 0.40 이상·같은 문서 유형 안에서만)다.
+# 표 자체는 anon 에 닫혀 있어, **양 끝이 모두 공개 행**인 엣지만 돌려주는 RPC
+# `findings_similar_edges`(137)로 읽는다. 문서 페이지는 원문을 옮긴 것이라 그대로는 "공개 문서의
+# 사본"이지만, 다른 업체의 같은 종류 지적으로 잇는 것은 원문 어디에도 없는 우리 쪽 정보다.
+# 별도 파일(findings_similar.json)로 쓴다 — RPC 가 아직 없거나 실패하면 **파일을 건드리지 않고**
+# 지난 값을 둔다. 렌더러는 현재 문서 집합에 없는 대상을 버리므로 낡은 값이 깨진 링크가 되지 않는다.
+SIMILAR_SCHEMA_VERSION = "grm-findings-similar/v1"
+SIMILAR_RPC_NAME = "findings_similar_edges"
+DEFAULT_SIMILAR_OUT = DEFAULT_OUT.parent / "findings_similar.json"
+SIMILAR_PER_DOC = 5          # 문서당 대상 문서 수(업체당 1건)
+SIMILAR_MIN_SCORE = 0.40     # 114 의 저장 하한과 같은 값(수동 대조 적합 약 98%)
+SIMILAR_BATCH = 300          # RPC 한 번에 넘기는 지적 id 수(anon statement_timeout 3초 안)
+
+
+def fetch_similar_edges(base_url: str, anon_key: str, finding_ids: list[str], *,
+                        post=None, batch: int = SIMILAR_BATCH,
+                        pacing: float = PAGE_PACING_SEC) -> list[tuple[str, str, float]]:
+    """주어진 지적 id 들에 닿는 공개 엣지(양방향)를 모은다. 실패는 예외로 올린다."""
+    ids = sorted(set(finding_ids))
+    out: set[tuple[str, str, float]] = set()
+    for start in range(0, len(ids), batch):
+        chunk = ids[start:start + batch]
+        if post is None:
+            response = requests.post(
+                f"{base_url}/rest/v1/rpc/{SIMILAR_RPC_NAME}",
+                headers={"apikey": anon_key, "Authorization": f"Bearer {anon_key}",
+                         "Content-Type": "application/json"},
+                json={"p_finding_ids": chunk}, timeout=60,
+            )
+            response.raise_for_status()
+            rows = response.json()
+        else:
+            rows = post(chunk)
+        if not isinstance(rows, list):
+            raise RuntimeError("invalid findings_similar_edges response")
+        for row in rows:
+            a, b, s = row.get("finding_id"), row.get("similar_id"), row.get("score")
+            if not isinstance(a, str) or not isinstance(b, str) or not a or not b or a == b:
+                raise RuntimeError("invalid findings_similar_edges row")
+            out.add((a, b, round(float(s), 4)))
+        if pacing and start + batch < len(ids):
+            time.sleep(pacing)
+    return sorted(out)
+
+
+def select_similar_by_document(docs: list[dict[str, Any]],
+                               edges: "list[tuple[str, str, float]]", *,
+                               per_doc: int = SIMILAR_PER_DOC,
+                               min_score: float = SIMILAR_MIN_SCORE) -> dict[str, list[list[Any]]]:
+    """문서마다 **다른 업체**의 비슷한 지적을 업체당 1건, 점수순 최대 `per_doc` 건 고른다.
+
+    엣지는 방향이 있으므로(새 지적 → 옛 지적) 양쪽으로 읽는다. 양 끝이 모두 이 문서 집합에
+    있는 것만 쓴다(문서 페이지가 없는 대상으로는 잇지 않는다). 같은 문서·같은 업체는 뺀다.
+    결과: {document_id: [[이 문서의 finding_id, 대상 document_id, 대상 finding_id, score], ...]}.
+    정렬은 점수 내림차순 → 대상 문서 id → 지적 id 로 결정론이다."""
+    where: dict[str, dict[str, Any]] = {}
+    for d in docs:
+        for f in d.get("findings") or []:
+            fid = f.get("finding_id")
+            if fid:
+                where[fid] = d
+    best: dict[tuple[str, str], tuple] = {}
+    for a, b, score in edges:
+        if score < min_score:
+            continue
+        for x, y in ((a, b), (b, a)):
+            dx, dy = where.get(x), where.get(y)
+            if dx is None or dy is None or dx is dy:
+                continue
+            fx, fy = (dx.get("firm_key") or ""), (dy.get("firm_key") or "")
+            if fx and fx == fy:
+                continue
+            group = fy or dy["document_id"]
+            key = (dx["document_id"], group)
+            cand = (-score, dy["document_id"], y, x)
+            if key not in best or cand < best[key]:
+                best[key] = cand
+    by_doc: dict[str, list[tuple]] = {}
+    for (src, _g), cand in best.items():
+        by_doc.setdefault(src, []).append(cand)
+    out: dict[str, list[list[Any]]] = {}
+    for src in sorted(by_doc):
+        rows = sorted(by_doc[src])[:per_doc]
+        out[src] = [[x, tdoc, y, -neg] for neg, tdoc, y, x in rows]
+    return out
+
+
+def write_similar(path: Path, docs: list[dict[str, Any]],
+                  edges: "list[tuple[str, str, float]]", measured_on: str) -> int:
+    by_doc = select_similar_by_document(docs, edges)
+    head = {
+        "schema_version": SIMILAR_SCHEMA_VERSION,
+        "measured_on": measured_on,
+        "min_score": SIMILAR_MIN_SCORE,
+        "per_doc": SIMILAR_PER_DOC,
+    }
+    # 문서 한 줄 = diff 한 줄(주간 재생성의 실제 변경분만 보이게).
+    lines = [json.dumps(head, ensure_ascii=False)[:-1] + ', "by_document": {']
+    items = list(by_doc.items())
+    for i, (k, v) in enumerate(items):
+        lines.append(json.dumps(k) + ": " + json.dumps(v, separators=(",", ":"))
+                     + ("," if i < len(items) - 1 else ""))
+    lines.append("}}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    return len(by_doc)
+
+
 def main(argv: "list[str] | None" = None) -> int:
     # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — 아래 요약의 em-dash
     # 한 글자가 cp949 에서 UnicodeEncodeError 를 낸다. findings_facets_refresh.py 와 동형.
@@ -439,6 +548,8 @@ def main(argv: "list[str] | None" = None) -> int:
     ap.add_argument("--page-size", type=int, default=DEFAULT_PAGE_SIZE)
     ap.add_argument("--measured-on", default="")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--similar-out", type=Path, default=DEFAULT_SIMILAR_OUT)
+    ap.add_argument("--skip-similar", action="store_true")
     args = ap.parse_args(argv)
 
     if not args.supabase_url or not args.supabase_anon_key:
@@ -477,6 +588,17 @@ def main(argv: "list[str] | None" = None) -> int:
         args.out.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n",
                             encoding="utf-8")
         wrote = args.out
+
+    # 비슷한 지적은 부가 정보다 — 실패해도 문서 정본은 이미 썼고, 지난 파일을 그대로 둔다.
+    if not args.dry_run and not args.skip_similar:
+        try:
+            edges = fetch_similar_edges(
+                base_url, args.supabase_anon_key,
+                [f["finding_id"] for d in docs for f in d["findings"] if f.get("finding_id")])
+            n_sim = write_similar(args.similar_out, docs, edges, payload["measured_on"])
+            log(f"비슷한 지적: 엣지 {len(edges):,}개 → 문서 {n_sim:,}건에 연결 ({args.similar_out})")
+        except Exception as exc:  # noqa: BLE001 — 부가 정보라 본 정본을 실패시키지 않는다
+            log(f"비슷한 지적 갱신 건너뜀(지난 파일 유지): {type(exc).__name__}: {exc}")
 
     log(f"문서 {len(docs):,}건 · 지적 {payload['totals']['findings']:,}건")
     log(f"MFDS 실사자 표 보강 문서 {mfds_enriched:,}건")

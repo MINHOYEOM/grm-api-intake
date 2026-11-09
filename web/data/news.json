@@ -1,0 +1,2866 @@
+{
+ "schema": "grm-news/v1",
+ "measured_on": "2026-11-10",
+ "window_days": 60,
+ "totals": {
+  "items": 402
+ },
+ "by_source": [
+  {
+   "v": "OpenFDA Recall",
+   "c": 106
+  },
+  {
+   "v": "ECA Academy",
+   "c": 75
+  },
+  {
+   "v": "Federal Register",
+   "c": 74
+  },
+  {
+   "v": "EMA",
+   "c": 51
+  },
+  {
+   "v": "MFDS",
+   "c": 44
+  },
+  {
+   "v": "Health Canada",
+   "c": 21
+  },
+  {
+   "v": "ISPE",
+   "c": 17
+  },
+  {
+   "v": "MHRA Inspectorate",
+   "c": 11
+  },
+  {
+   "v": "PIC/S",
+   "c": 2
+  },
+  {
+   "v": "WHO",
+   "c": 1
+  }
+ ],
+ "items": [
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-11-06",
+   "title": "Food Additive Petitions; Change of Address",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/06/2026-22663/food-additive-petitions-change-of-address"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-06",
+   "title": "Quality Unites: Building Community Beyond Compliance: Why Quality Needs Communities More Than Ever",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/quality-unites-building-community-beyond-compliance-why-quality"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-06",
+   "title": "연조직고정용장치 허가·심사 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15994"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-11-06",
+   "title": "「의약품 등의 허가 등에 관한 수수료 규정」 일부고시개정(안)(공고 제2026-544호, 2026.11.6.)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44314"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-11-06",
+   "title": "첨단바이오의약품 안전 및 지원에 관한 규칙 일부개정령(안) 입법예고 알림(공고 제2026-533호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44316"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-05",
+   "title": "Eurachem Publishes Webinar Recording on the Fitness for Purpose of Analytical Methods Guide",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/eurachem-publishes-webinar-recording-on-the-fitness-for-purpose-of-analytical-methods-guide"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-05",
+   "title": "Meet the AQCG Board Members at PharmaLab 2026",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/meet-the-aqcg-board-members-at-pharmalab-2026"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-05",
+   "title": "Recent Publications Highlighting Topics to be Discussed at PharmaLab 2026",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/recent-publications-highlighting-topics-to-be-discussed-at-pharmalab-2026"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-05",
+   "title": "매개변수기반 출하 적용 의약품 품질심사 질의응답집",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15993"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-11-05",
+   "title": "「임상시험용의약품 표시 등에 관한 규정」 제정고시(안) 행정예고(식품의약품안전처 공고 제2026-540호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44313"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 3 Medicines Recall",
+   "published_date": "2026-11-05",
+   "title": "Class 3 Medicines Recall: Aspire Pharma Limited, Tropicamide 1% Eye Drops, solution in single dose containers 20 x 0.5ml , EL(26)A/47",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-3-medicines-recall-aspire-pharma-limited-tropicamide-1-percent-eye-drops-solution-in-single-dose-containers-20-x-0-dot-5ml-el-26-a-slash-47"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-11-05",
+   "title": "Class 4 Medicines Defect Notification: Sandoz Limited, Co-Amoxiclav powder for oral suspension 250/62.5 mg/5mL, EL(26)A/46",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-sandoz-limited-co-amoxiclav-powder-for-oral-suspension-250-slash-62-dot-5-mg-slash-ml-el-26-a-slash-46"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-04",
+   "title": "Beyond Human-in-the-Loop: Can Machine-in-the-Loop Address Coverage Failure in GxP Validation?",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/beyond-human-loop-can-machine-loop-address-coverage-failure-gxp"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-11-03",
+   "title": "QRD Appendix V - Adverse-drug-reaction reporting details",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/template-form/qrd-appendix-v-adverse-drug-reaction-reporting-details-en.docx"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-03",
+   "title": "Potency Assurance for Cellular and Gene Therapy Products; Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/03/2026-22427/potency-assurance-for-cellular-and-gene-therapy-products-guidance-for-industry-availability"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-11-03",
+   "title": "Recommendations for Reducing the Risk of Transfusion-Transmitted Hepatitis B Virus; Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/03/2026-22369/recommendations-for-reducing-the-risk-of-transfusion-transmitted-hepatitis-b-virus-guidance-for"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-03",
+   "title": "[HC] ANTICOAGULANT SODIUM CITRATE SOLUTION, USP 4g/100mL and Potential Bag Leaks",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/anticoagulant-sodium-citrate-solution-usp-4g100ml-and-potential-bag-leaks"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-03",
+   "title": "How Hepalink's FOYA-Winning Pingshan Facility Uses Artificial Intelligence (AI), 5G, and Automation to Improve Sterile Manufacturing",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/how-hepalinks-foya-winning-pingshan-facility-uses-artificial"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-02",
+   "title": "FDA Warning Letter: When Test Procedures Allow Retesting Until an Acceptable Result is Obtained",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-when-test-procedures-allow-retesting-until-an-acceptable-result-is-obtained"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-02",
+   "title": "Failed GMP Training in 2026: Further GMP Training Deficiencies in FDA Warning Letters",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/failed-gmp-training-in-2026-further-gmp-training-deficiencies-in-fda-warning-letters"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-02",
+   "title": "New Version of VDI Guideline 2083 Sheet 15",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/new-version-of-vdi-guideline-2083-sheet-15"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-02",
+   "title": "PIC/S publishes a Q&A document to assist with Annex 1",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/pic-s-publishes-a-q-a-document-to-assist-with-annex-1"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-02",
+   "title": "Reprotoxic and Persistent: ECHA Committee Recommends New Classification for TFA",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/reprotoxic-and-persistent-echa-committee-recommends-new-classification-for-tfa"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-11-02",
+   "title": "Singapore Added to the List of Recognised third Countries for Importation of APIs",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/singapore-added-to-the-list-of-recognised-third-countries-for-importation-of-apis"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-11-02",
+   "title": "Infant Formula Nutrient Requirements",
+   "official_url": "https://www.federalregister.gov/documents/2026/11/02/2026-22273/infant-formula-nutrient-requirements"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-11-02",
+   "title": "[HC] Cyclophosphamide for Injection USP: Presence of particulate matter",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/cyclophosphamide-injection-usp-presence-particulate-matter"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-11-02",
+   "title": "제네릭의약품 품질심사 주요 보완사례집",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15992"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-30",
+   "title": "Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC) 26 - 29 October 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-pharmacovigilance-risk-assessment-committee-prac-26-29-october-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-30",
+   "title": "List of centrally authorised products with safety-related changes to the product information",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/list-centrally-authorised-products-safety-related-changes-product-information_en.xlsx"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-30",
+   "title": "Drugs for Human Use; Drug Efficacy Study Implementation: Estrogen-Androgen Fixed-Combination Drug Products; Third Extension of Effective Date of Final Resolution of Drug Efficacy Study Implementation 7661",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/30/2026-22175/drugs-for-human-use-drug-efficacy-study-implementation-estrogen-androgen-fixed-combination-drug"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-30",
+   "title": "Essential Drug Delivery Performance Characteristics for Devices Intended To Deliver Drugs and Biological Products; Revised Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/30/2026-22203/essential-drug-delivery-performance-characteristics-for-devices-intended-to-deliver-drugs-and"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-30",
+   "title": "[HC] Equate Ultra Strength Antacid Chewable Tablet: may contain foreign matter (metal fragments)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/equate-ultra-strength-antacid-chewable-tablet-may-contain-foreign-matter-metal"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-30",
+   "title": "Beyond the Dashboard: Bringing Visual Intelligence to Pharma Operations",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/beyond-dashboard-bringing-visual-intelligence-pharma-operations"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "바이오 무균의약품 제조 규정 적용 사례집",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15985"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "오가노이드 기반 세포치료제의 임상시험 시 품질 및 비임상 평가 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15989"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "의약품의 점자표시 등에 대한 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15979"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "일본뇌염 백신 품질평가 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15981"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "한약(생약)제제 GMP 질의응답집(민원인 안내서)",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15982"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "환자경험자료에 기반한 의약품 허가심사 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15980"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-30",
+   "title": "희귀질환 대상 유전자치료제 개발 시 품질, 비임상 및 임상 평가 고려사항",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15988"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-30",
+   "title": "디지털융합의약품 심사 업무절차서",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15312"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-30",
+   "title": "의약품등 회수·폐기 처리 운영 지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15313"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-10-30",
+   "title": "「의약품의 품목허가·신고·심사 규정」 일부개정 고시 알림",
+   "official_url": "https://www.mfds.go.kr/brd/m_207/view.do?seq=15203"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-10-30",
+   "title": "「한약(생약)제제 등의 품목허가·신고에 관한 규정」 일부개정고시(식품의약품안전처 고시 제2026-73호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_207/view.do?seq=15202"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-29",
+   "title": "EMA closed on All Souls' Day, 2 November",
+   "official_url": "https://www.ema.europa.eu/en/news/ema-closed-all-souls-day-2-november"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-29",
+   "title": "From Concept to Production: Lessons from Productionizing AI in Pharmaceutical Manufacturing",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/concept-production-lessons-productionizing-ai-pharmaceutical"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-29",
+   "title": "동등생물의약품 평가 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15974"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-29",
+   "title": "박테리오파지 치료제의 임상시험 시 품질 및 비임상 평가 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15978"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-29",
+   "title": "한약(생약)제제 벤조피렌 안전성 평가 및 자료작성 방법",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15977"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-29",
+   "title": "의약품등 품목별 사전 GMP 평가 운영지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15310"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-10-29",
+   "title": "「희귀의약품 지정에 관한 규정」 일부개정고시(안)(공고 제2026-522호, 2026.10.29.)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44307"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "regulation-final",
+   "published_date": "2026-10-29",
+   "title": "'의약외품 품목허가·신고·심사 규정' 일부개정고시",
+   "official_url": "https://www.mfds.go.kr/brd/m_207/view.do?seq=15200"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 2 Medicines Recall",
+   "published_date": "2026-10-29",
+   "title": "Class 2 Medicines Recall: Accord-UK Ltd, Lercanidipine Hydrochloride 10mg Film-Coated Tablets, EL(26)A/45",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-accord-uk-ltd-lercanidipine-hydrochloride-10mg-film-coated-tablets-el-26-a-slash-45"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 2 Medicines Recall",
+   "published_date": "2026-10-29",
+   "title": "Class 2 Medicines Recall: Advanz Pharma Limited, Mynzepli 40 mg/mL solution for injection in pre-filled syringe, EL(26)A/44",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-advanz-pharma-limited-mynzepli-40-mg-slash-ml-solution-for-injection-in-pre-filled-syringe-el-26-a-slash-44"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-10-28",
+   "title": "Notice to sponsors on validation and qualification of computerised systems used in clinical trials",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/regulatory-procedural-guideline/notice-sponsors_computerised-systems-clinical-trials_rev1-en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-28",
+   "title": "Notice to sponsors on validation and qualification of computerised systems used in clinical trials",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/notice-sponsors-validation-qualification-computerised-systems-used-clinical-trials_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-28",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Application for Participation in Food and Drug Administration Fellowship and Traineeship Programs",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/28/2026-21914/agency-information-collection-activities-proposed-collection-comment-request-application-for"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-28",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Electronic Records; Electronic Signatures",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/28/2026-21908/agency-information-collection-activities-proposed-collection-comment-request-electronic-records"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-28",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Food and Drug Administration Rapid Response Surveys",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/28/2026-21912/agency-information-collection-activities-proposed-collection-comment-request-food-and-drug"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-28",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Color Additive Certification",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/28/2026-21913/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-28",
+   "title": "Electronic Submission Template for Investigational Device Exemption (IDE) Applications; Draft Guidance for Sponsors and Food and Drug Administration Staff; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/28/2026-21953/electronic-submission-template-for-investigational-device-exemption-ide-applications-draft-guidance"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-28",
+   "title": "Individualized Human Genome Editing Products: Considerations for BLA Submission and Postapproval Management; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/28/2026-21954/individualized-human-genome-editing-products-considerations-for-bla-submission-and-postapproval"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-28",
+   "title": "의약품 허가·심사 세부업무방안 등의 관리 매뉴얼",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15308"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Clinical Trials",
+   "published_date": "2026-10-28",
+   "title": "Six months of progress under the UK’s new clinical trials regulations",
+   "official_url": "https://mhrainspectorate.blog.gov.uk/2026/10/28/six-months-of-progress-under-the-uks-new-clinical-trials-regulations/"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-10-28",
+   "title": "Argatroban Injection, USP, 250 mg/2.5mL (100 mg/mL), 2.5 mL x 1 Single Dose Vial, Rx only, Manufactured for: Endo USA, Malvern,PA 19355/ Argatroban Injection, 250 mg/2.5mL (100 mg/mL), 2.5 mL x 1 Single Dose Vial, Rx only, Distributed by: Par Pharmaceutical, Cranbury, NJ 08512, NDC 42023-182-89.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-10-28",
+   "title": "Argatroban Injection, USP, 250 mg/2.5mL (100 mg/mL), 2.5 mL x 1 Single Dose Vial, Rx only, Manufactured for: Endo USA, Malvern,PA 19355/Argatroban Injection, 250 mg/2.5mL (100 mg/mL), 2.5 mL x 1 Single Dose Vial, Rx only, Distributed by: Par Pharmaceutical, Chestnut Ridge, NY 10977, NDC 42023-182-01.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-10-28",
+   "title": "Glutathione Injection (Glutathione-L, Ascorbic Acid, Sodium Hydroxide, Bacteriostatic Water), 200 mg/mL, 10 mL multi-dose vial, Rx only, Subcutaneous Only, Greenwich Rx.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "ARU, Toothpaste, Cavity Protection, 9 Ingredients, Cool Mint, (sodium fluoride 0.243%) Net Wt 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-785-35, Item # 88785, UPC 8 10147 88785",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "ARU, Toothpaste, Gum Health, 9 Ingredients, Soothing Mint, (stannous fluoride 0.45%) Net Wt 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-786-35, Item # 88786 UPC 8 10147 88786 6",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Abirtega (abiraterone acetate) USP, 250 mg, 120-count bottles, Rx only, Rx only, Mfd for: Hikma Pharmaceuticals USA Inc., Berkley Heights, NJ 07922 USA by: Arab Pharmaceuticals Manufacturing PSC PO Box 41, Sahab-Jordon, NDC 82249-011-12.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Amitriptyline Hydrochloride, Tablets, USP, 10 mg, 5 x 10 Unit dose cards in paper cartons, Rx only, Manufactured for AvKARE, Pulaski, TN 38478, NDC 50268-037-15.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Amlodipine and Olmesartan Medoxomil Tablets, 10mg/40mg, 30 Tablets, Rx only, Manufactured by: Alkem Laboratories Ltd., INDIA, Distributed by: Ascend Laboratories, LLC, Parsippany, NJ 07054, NDC 67877-502-30.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "BB (Brush Buddies) Advanced Whitening, Anti-Cavity Fluoride Toothpaste, (sodium fluoride 0,24%) Peppermint, Net Wt 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-885-42, Item # 88542, UPC 8 10147 88542 8",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "BB (Brush Buddies) Cavity Protection, Anti-Cavity Fluoride Toothpaste, (sodium monofluorophosphate 0.76%) Cool Mint, 2 Value Pack, Two 3.5 oz (99g) tubes, Total Net Wt 7 oz (198g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-035-10, Item # 88543, UPC 8 10147 88543 5",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Barbie, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Bubble Gum Flavor, Net Wt. 4.0 oz (113g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-001-40, Item# 88022, UPC 8 10147 88022 5",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Chocolate Ice Cream Flavored Toothpaste, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-518-35, Item # 88518, UPC 8 10147 88518 3",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Cookies 'n Cream Ice Cream Flavored Toothpaste, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-519-35, Item # 88519, UPC 8 10147 88519 0",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Crayola Silly Scents, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Strawberry Flavor, Net Wt. 4.0 oz (113g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-005-40, Item # 32732, UPC 8 50048 32732 0",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Crayola, Silly Scents, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Bubble Gum Flavor, Net Wt. 4.0 oz (113g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-003-40, Item # 32731, UPC 8 50048 32731 3",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Crayola, Silly Scents, Anticavity Fluoride Toothpaste, (sodium fluoride0.243%) Watermelon Flavor, Net Wt. 4.0 oz (113g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-004-40, Item # Product code: 32730, UPC 8 50048 32730 6.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Hot Wheels, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Strawberry Flavor, Net Wt. 4.0 oz (113g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-002-40, Item # 88047, UPC 8 10147 88047 8",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Mint Chocolate Chip Ice Cream Flavored Toothpaste, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-520-35, Item # 88520, UPC 8 10147 88520 6",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, My Little Pony Scents Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Bubble Gum Flavor, Net Wt. 4.0 oz (113g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-008-40, Item# 88270, UPC 8 10147 88270 0.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Vanilla Ice Cream Flavored Toothpaste, Anticavity Fluoride Toothpaste, (sodium fluoride 0.243%) Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-517-35, Item # 88517, UPC 8 10147 88517 6",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Brush Buddies, Whitening Anti-cavity Fluoride Toothpaste, with Baking Soda, (sodium monofluorophosphate 0.76%) Cool Mint, Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-007-07, ITEM # 999131, 8 50010 84249 3",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Cinacalcet Tablets, 30 mg, 30-count bottle, Rx only, Manufactured by: Strides Pharma Science Ltd. Puducherry, 605 014, India; Distributed by: Strides Pharma Inc. Bridgewater, NJ 08807, NDC 64380-883-04",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Heparin Sodium Injection, USP, 5,000 USP Units/mL, 1mL Multi dose vial x 25 vials per carton, Distributed by: Hepalink USA Inc., Langhome, PA 19047-1885. Carton NDC: NDC 81952-111-06, Vial NDC: 81942-111-01",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Levoxyl (levothyroxine sodium tablets, USP), tablets, 175 mcg, 100 tablet bottle, Rx only, Distributed by Pfizer Inc., New York, NY 10017, Made in Austria. NDC 60793-859-01.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Levoxyl (levothyroxine sodium tablets, USP), tablets, 175 mcg, 1000-count bottle, Rx only, Distributed by Pfizer Inc., New York, NY 10017, Made in Austria. NDC 60793-859-10",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "Testosterone Cypionate, 200 mg/mL, packaged in a) 5 mL vials (NDC 73271-1225-1) and b) 30 m vials ( NDC 73271-1226-2) This Is A Compounded Dug, Intramuscular Use, Office Use Only, 8400 Esters Blvd, STE 190, Irving, TX 75063.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "evo, Advanced Whitening, Anticavity Fluoride Toothpaste, (sodium fluoride 0.24%) Peppermint, Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-886-19, Item# 88619, UPC 8 10147 88619 7",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-28",
+   "title": "evo, Sensitive, Anticavity Fluoride Toothpaste, (potassium nitrate 5%, sodium fluoride 0.24%) Sweet Mint, Net Wt. 3.5 oz (99g), Distributed by Ashtel Studios Inc., Ontario, California 91761, NDC 84140-620-35, Item # 88620 UPC8 10147 88620 3",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-10-28",
+   "title": "Telmisartan and Amlodipine, Tablets, USP, 40mg/5 mg, 30-count Bottle, Rx only, Manufactured for: Mylan Pharmaceuticals Inc., Morgantown, WV 26505 USA, Made in India, NDC 0378-1075-93.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "PIC/S",
+   "source_kind": "PIC/S",
+   "published_date": "2026-10-28",
+   "title": "Adoption and Entry into force of PIC/S Recommendation (PI 058-1) - Interpretation of the most important changes in the Annex 1 on the Manufacture of Sterile Products (2022)",
+   "official_url": "http://www.picscheme.org/en/news/150/adoption-and-entry-into-force-of-pics-recommendation-pi-058"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-27",
+   "title": "Draft Reflection Paper on Drug Interactions of Herbal Medicinal Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/draft-reflection-paper-on-drug-interactions-of-herbal-medicinal-products"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-27",
+   "title": "EMA Updates User Manual for XEVMPDweb",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-updates-user-manual-for-xevmpdweb"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-27",
+   "title": "FDA Warning Letter for a microbially contaminated Sterile Solution",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-for-a-microbially-contaminated-sterile-solution"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-27",
+   "title": "Determination That PEPCID RPD (Famotidine) Orally Disintegrating Tablets, 20 Milligrams and 40 Milligrams Were Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/27/2026-21897/determination-that-pepcid-rpd-famotidine-orally-disintegrating-tablets-20-milligrams-and-40"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-27",
+   "title": "U.S.-Origin Statements on Seafood; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/27/2026-21838/us-origin-statements-on-seafood-draft-guidance-for-industry-availability"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-27",
+   "title": "From Documents to Records to Intelligence: The Next Digital Frontier in Life Sciences",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/documents-records-intelligence-next-digital-frontier-life"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-27",
+   "title": "의약품동등성시험 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15973"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-26",
+   "title": "EMA and CMDh Expand List of Nitrosamine Limits",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-and-cmdh-expand-list-of-nitrosamine-limits"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-26",
+   "title": "Inadequate Supplier Oversight and missing Tests: Lessons from an FDA Warning Letter",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/inadequate-supplier-oversight-and-missing-tests-lessons-from-an-fda-warning-letter"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-26",
+   "title": "Survey Results on the Use of AI in Equipment Qualification",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/survey-results-on-the-use-of-ai-in-equipment-qualification"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 2 Medicines Recall",
+   "published_date": "2026-10-26",
+   "title": "Class 2 Medicines Recall: Xeal Pharma, Clopidogrel Oral Liquids (all strengths), EL(26)A/43",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-xeal-pharma-clopidogrel-oral-liquids-all-strengths-el-26-a-slash-43"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-23",
+   "title": "AMA and EMA issue joint guidance on Ebola vaccine development",
+   "official_url": "https://www.ema.europa.eu/en/news/ama-ema-issue-joint-guidance-ebola-vaccine-development"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-23",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Export Certificates for FDA Regulated Products",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/23/2026-21714/agency-information-collection-activities-proposed-collection-comment-request-export-certificates-for"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-23",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Product Jurisdiction and Combination Products",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/23/2026-21713/agency-information-collection-activities-proposed-collection-comment-request-product-jurisdiction"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-23",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Accreditation Scheme for Conformity Assessment Program",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/23/2026-21712/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-23",
+   "title": "Determination of Regulatory Review Period for Purposes of Patent Extension; Correction of Notices-ANDEMBRY; ANZUPGO; ANKTIVA; BIZENGRI; BRINSUPRI; DAYVIGO",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/23/2026-21711/determination-of-regulatory-review-period-for-purposes-of-patent-extension-correction-of"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-10-23",
+   "title": "Action Levels for Cadmium in Processed Food Intended for Babies and Young Children; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/23/2026-21670/action-levels-for-cadmium-in-processed-food-intended-for-babies-and-young-children-draft-guidance"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-10-23",
+   "title": "Hazard Analysis and Risk-Based Preventive Controls for Human Food; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/23/2026-21669/hazard-analysis-and-risk-based-preventive-controls-for-human-food-draft-guidance-for-industry"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-10-23",
+   "title": "‘의약외품 범위 지정 검토위원회 구성 및 운영에 관한 규정’제정안 행정예고(식품의약품안전처 공고 제2026-507호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44302"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-10-21",
+   "title": "Guidance on good manufacturing practice and good distribution practice: Questions and answers",
+   "official_url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/guidance-good-manufacturing-practice-good-distribution-practice-questions-answers"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-21",
+   "title": "Regulatory Considerations for Prescription Drug Use-Related Software; Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/21/2026-21516/regulatory-considerations-for-prescription-drug-use-related-software-guidance-for-industry"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-21",
+   "title": "[HC] Femyso: Affected lot may contain two green Mifepristone cartons or two pink Misoprostol cartons instead of one of each.",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/femyso-affected-lot-may-contain-two-green-mifepristone-cartons-or-two-pink-0"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-21",
+   "title": "의약외품 반창고의 기준 및 시험방법 작성을 위한 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15969"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-21",
+   "title": "Hydrocortisone Sodium Succinate for Injection, USP 100 mg/vial, 1 Vial, Rx Only, Manufactured by: Zydus Lifesciences Ltd., Vadodara - 391510 India, Distributed by: Zydus Pharmaceuticals (USA) Inc., Pennington, NJ 08534, NDC 70710-1907-1.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-21",
+   "title": "Metoclopramide Tablets, USP, 5 mg, 100 Tablets (10 x 10), Rx Only, Distributed by: American Health Packaging, Columbus, Ohio 43217. NDC Carton: 60687-620-01; NDC Unit Dose: 60687-620-11",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-21",
+   "title": "Metoclopramide Tablets, USP, 5 mg, [100 or 500] Tablets per bottle, Rx Only, Manufactured for: Teva Pharmaceuticals, Parsippany, NJ 07054. NDC 100 Tablets: 0093-2204-01; NDC 500 Tablets: 0093-2204-05",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-21",
+   "title": "Sermorelin, 1 mg/mL, 10 ml vial, Sterile injectable solution, RX Only, Houston RX LLC, 15430 Vantage Parkway E STE 220, Houston, TX 77032.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-21",
+   "title": "Tirzepatide/Niacinamide 2mL vial (40 MG per Vial) Inj 20mg/2mg/mL, RX Only, Houston RX LLC, 15430 Vantage Parkway E STE 220, Houston, TX 77032.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-20",
+   "title": "ICH publishes Online Training Materials for ICH E6(R3) Good Clinical Practice",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ich-publishes-online-training-materials-for-ich-e6r3-good-clinical-practice"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-20",
+   "title": "New Dietary Ingredient (NDI) Notifications and Related Issues; Identity and Safety Information About the NDI: Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/20/2026-21453/new-dietary-ingredient-ndi-notifications-and-related-issues-identity-and-safety-information-about"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "Aseptic Manufacturing with significant Deficiencies - FDA criticises Monitoring, RABS and Media Fills",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/aseptic-manufacturing-with-significant-deficiencies-fda-criticises-monitoring-rabs-and-media-fills"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "BP Publishes new Draft Texts",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/bp-publishes-new-draft-texts"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "Differing Assessments within a Company are a poor Basis for an FDA Inspection",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/differing-assessments-within-a-company-are-a-poor-basis-for-an-fda-inspection"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "EMA Clarifies ESMP Reporting for Critical Medicine Shortages",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-clarifies-esmp-reporting-for-critical-medicine-shortages"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "EMA Updates Information Page on Bioequivalence Guidelines",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-updates-information-page-on-bioequivalence-guidelines"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "FDA Cites Serious CGMP Deficiencies at Stream2Sea",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-cites-serious-cgmp-deficiencies-at-stream2sea"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "FDA Identifies Critical Deficiencies in Analytical Testing and CGMP Oversight",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-identifies-critical-deficiencies-in-analytical-testing-and-cgmp-oversight"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "IPEC Publishes Version 3 of the Excipient Composition Guide",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ipec-publishes-version-3-of-the-excipient-composition-guide"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "Sterile means Sterile",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/sterile-means-sterile"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-19",
+   "title": "Switzerland: GMP Compliance by Foreign Manufacturers",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/switzerland-gmp-compliance-by-foreign-manufacturers"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-19",
+   "title": "Draft Data Quality Framework (DQF) for EU medicines regulation: application to collection, management and submission of Adverse Drug Reaction reports",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/draft-data-quality-framework-dqf-eu-medicines-regulation-application-collection-management-submission-adverse-drug-reaction-reports_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-19",
+   "title": "Methodological Principles for the Assessment of Section 5.1 of the Summary of Product Characteristics",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/methodological-principles-assessment-section-51-summary-product-characteristics_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-10-19",
+   "title": "Concept paper on the need for revision of the guideline on clinical investigation of medicinal products in the treatment of hypertension (EMA/CHMP/29947/2013/Rev.4)",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-need-revision-guideline-clinical-investigation-medicinal-products-treatment-hypertension-ema-chmp-29947-2013-rev4_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-10-19",
+   "title": "Reflection paper on methodological aspects in confirmatory platform trials",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/reflection-paper-methodological-aspects-confirmatory-platform-trials_en.pdf"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-19",
+   "title": "[HC] Dantrium Intravenous (Dantrolene sodium for injection): Presence of particulate matter",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/dantrium-intravenous-dantrolene-sodium-injection-presence-particulate-matter"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-16",
+   "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 12-15 October 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-10-16",
+   "title": "Concept paper on clinical trials in recipients of kidney transplantation",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-clinical-trials-recipients-kidney-transplantation_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-16",
+   "title": "Electronic Common Technical Document (eCTD); Data Standards; Supporting Forward Compatibility for eCTD 4.0",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/16/2026-21197/electronic-common-technical-document-ectd-data-standards-supporting-forward-compatibility-for-ectd"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-16",
+   "title": "Electronic Common Technical Document; Data Standards; Center for Drug Evaluation and Research and Center for Biologics Evaluation and Research Supporting Electronic Common Technical Document Version 3.2.2 and Version 4.0",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/16/2026-21195/electronic-common-technical-document-data-standards-center-for-drug-evaluation-and-research-and"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-16",
+   "title": "Fit-for-Purpose Rare Disease Framework Initiative; Public Meeting; Request for Information and Comments",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/16/2026-21142/fit-for-purpose-rare-disease-framework-initiative-public-meeting-request-for-information-and"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-16",
+   "title": "From Ownership to Automation: The Operating Model Driving Pharma 4.0™",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/ownership-automation-operating-model-driving-pharma-40tm"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "legislative-notice",
+   "published_date": "2026-10-16",
+   "title": "「의약품 제조 및 품질관리에 관한 규정」 일부개정고시(안) 행정예고(식품의약품안전처 공고 제2026-500호)",
+   "official_url": "https://www.mfds.go.kr/brd/m_209/view.do?seq=44301"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-15",
+   "title": "EMA recommends authorisation of Rasonque for metastatic pancreatic cancer",
+   "official_url": "https://www.ema.europa.eu/en/news/ema-recommends-authorisation-rasonque-metastatic-pancreatic-cancer"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-10-15",
+   "title": "Draft reflection paper on the investigation of drug interactions of herbal medicinal products",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-reflection-paper-investigation-drug-interactions-herbal-medicinal-products_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-15",
+   "title": "Request for Nominations for Voting Members on a Public Advisory Committee; Tobacco Products Scientific Advisory Committee (TPSAC)",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/15/2026-21027/request-for-nominations-for-voting-members-on-a-public-advisory-committee-tobacco-products"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-15",
+   "title": "[HC] Aleve 200 mg caplets: Recalled from wholesale (Distribution Error)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/aleve-200-mg-caplets-recalled-wholesale-distribution-error"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-15",
+   "title": "[HC] Claritin Allergy Tablets 10 mg: Recalled from wholesalers (Distribution Error)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/claritin-allergy-tablets-10-mg-recalled-wholesalers-distribution-error"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-15",
+   "title": "[HC] Flintstones Complete Multivitamins and Minerals: Recalled from wholesalers (Distribution Error)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/flintstones-complete-multivitamins-and-minerals-recalled-wholesalers-distribution"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-14",
+   "title": "Advisory Committee; Cellular, Tissue, and Gene Therapies Advisory Committee; Renewal",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/14/2026-20989/advisory-committee-cellular-tissue-and-gene-therapies-advisory-committee-renewal"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-14",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Infant Formula Requirements",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/14/2026-20980/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-14",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Voluntary National Retail Food Regulatory Program Standards",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/14/2026-20981/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-10-14",
+   "title": "Food Additives Permitted in Feed and Drinking Water of Animals; Chromium Propionate",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/14/2026-20979/food-additives-permitted-in-feed-and-drinking-water-of-animals-chromium-propionate"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Apothecary NAD+ Injection 200 mg/mL, 6 mL Sterile Multi-Dose Vial, Rx Only, Apothecary Pharma, LLC, 1913 Evans Road, Cary, NC, 27513, NDC 85091-011-06.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Artificial Tears Sterile Lubricant Eye Drops (polyvinyl alcohol 0.5%, povidone 0.6%), 0.5 FL OZ (15 mL) bottles; a) Best Choice, PROUDLY DISTRIBUTED BY: VALU MERCHANDISERS, CO., 5000 KANSAS CITY, KS 66106, UPC 0 70038 47008 3; b) LEADER, DISTRIBUTED BY CARDINAL HEALTH, DUBLIN, OHIO 43017, www.myleader.com, NDC 70000-0011-1; c) Good Neighbor Pharmacy, Distributed By AmerisourceBergen, 1 West First Avenue, Conshohocken, PA 19428, NDC 24385-006-05; d) Good Sense, Distributed By: Geiss, Destin& Dunn, Inc., A Perrigo Company, Peachtree City, GA 30269, NDC 50804-110-01; e) Medic'c Choice, Sterile 0.5 fl. oz. (15 mL), Manufactured by KC Pharmaceuticals, Inc., Pomona, CA 91768, NDC 55651-008-01; f) P, DISTRIBUTED BY PUBLIX SUPER MARKETS, INC, LAKELAND, FL 33811, UPC 0 41415 00976 9; g) Quality Choice, Distributed by CDMA Inc, Novi, MI NDC 83324-189-14; h) TopCare health, DISTRIBUTED BY TOPCO ASSOCIATES LLC, ELKGROVE VILLAGE, IL 60007, UPC 0 36800 09331 7; I) Walgreens, DISTRIBUTED BY: WALGREEN CO. DEERFIELD, IL 60015, UPC 3 11917 06503 8; J) Kroger, DISTRIBUTED BY THE KROGER CO., CINCINNATI, OHIO 45202, UPC 0 11110 38600 7.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Biospectra Tris/Tromethamine, USP, GMP, API Grade, Manufactured at 100 Majestic Way, Bangor, PA 18013, NDC 64173-101-25",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Eye Drops MAXIMUM, REDNESS RELIEF, Sterile, 1/2 FL OZ (0.5 ML); a) exchange select, Manufactured for your Military Exchange By: K.C Pharmaceuticals, Inc., Pomona, CA 9176, UPC: 6 14299 89636 9; b) Harris Teeter, PROUDLY DISTRIBUTED BY: HARRIS TEETER, LLC, MATTHEWS, NC 28105, UPC: 0 72036 73589 8; c) TYSON, MIKE RED EYE DROPS, Distributed by: JBRANDS Distribution, Miami, FL 33009, UPC: 7 84847 57549 4; d) up & up, Distributed by: Target Corporation, Minneapolis, MN 55403, NDC 11673-100-01; e) TopCare health, DISTRIBUTED BY TOPCO ASSOCIATES LLC, ELKGROVE VILLAGE, IL 60007, UPC 0 36800 21123 0; f) Walgreens, DISTRIBUTED BY: WALGREEN CO. 200 WILMOT RD, DEERFIELD, IL 60015, UPC 3 11917 20075 0.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Fosfomycin Tromethamine Granules for Oral Solution, (Equivalent to 3 Grams of Fosfomycin), 1 Single-Dose Sachet, Rx only, Manufactured by: Cipla Ltd., Kurkumbh-413802, Maharashtra, India, Manufactured for: Cipla USA, Inc., 10 Independence Boulevard, Suite 300, Warren, NJ 07059, NDC 69097-579-67.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "IMAAVY (nipocalimab-aahu) Injection, 300 mg /1.62 mL (185 mg/mL) per single-dose vial, For Intravenous Infusion After Dilution, Rx only, Manufactured by: Janssen Biotech, Inc., Horsham, PA 19044. NDC: 57894-800-01",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Lidocaine Ointment USP, 5% (Generic for Xylocaine), packaged in a 50 g jar, Rx only, Mfg: Taro Pharmaceuticals U.S.A., Inc., Prod# (NDC): 68788-7865-05",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "QUAD-MIX( PAPAV/PHENTO/ALPROS/TROP) INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "SEMAGLUTIDE 3 MG/ML INJECTABLE, 8 x 0.1 mL syringes, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "SEMAGLUTIDE/CYANOCOBALAMIN 3/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "SEMAGLUTIDE/CYANOCOBALAMIN 9/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "SERMORELIN ACETATE 1 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Sterile EYE DROPS AC (tetrahydrozoline HCl 0.05%, zinc sulfate 0.25%), 0.5 fl. oz. (15 mL) bottles; a) Equaline, DISTRIBUTED BY: UNFI, PROVIDENCE, RI 02908 UPC 0 41163 25114 4; b) Good Sense Sterile Eye Drops, Distributed By: Geiss, Destin & Dunn, Inc., A Perrigo Company, Peachtree City, GA 30269, NDC 50804-121-01; c) H.E.B A.C. Eye Drops, MADE WITH PRIDE & CARE FOR H-E-B, SAN ANTONIO, TX 78204, UPC 0 41220 43746 7; d) QC-Quality Choice, Sterile Eye drops Irritation Relief, Distributed by: CDMA, Inc., Novi, MI 48375, NDC 83324-190-14; e) TopCare health TM, DISTRIBUTED BY: TOPCO ASSOCIATES LLC, ELK GROVE VILLAGE, IL 60007, UPC 0 36800 03640 6.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Sterile EYE DROPS Advanced Relief, (dextran 70, 0.1%, polyethylene glycol 400 1% and tetrahydrozoline HCl 0.05%), 0.5 FL OZ (15 mL) bottles, Sterile; a) LEADER, DISTRIBUTED BY CARDINAL HEALTH, DUBLIN, OHIO 43017, www.myleader.com, NDC 70000-0456-1; b) Equaline, DISTRIBUTED BY: UNFI, PROVIDENCE, RI 02908 UPC 0 41163 25392 6; c) GoodSense, Distributed By: Geiss, Destin& Dunn, Inc., A Perrigo Company, Peachtree City, GA 30269, www.PerrigoDirect.com, NDC 50804-130-01; d) H.E.B A.C. Eye Drops, MADE WITH PRIDE & CARE FOR H-E-B, SAN ANTONIO, TX 78204, UPC 0 41220 43745 0; e) Medic'c Choice, Manufactured by KC Pharmaceuticals, Inc., Pomona, CA 91768, NDC 55651-025-01; f) Foster & Thrive, Distributed by: McKesson Corp., via Strategic Sourcing Services LLC, Memphis, TN 38141, NDC 70677-1158-1; g) Colirio Manzanill A+, Distributed by: PRO-MEX, P.O Box 63-0716, Miami , FL 33163, UPC: 1 84125 00018 0; h) P, DISTRIBUTED BY PUBLIX SUPER MARKETS, INC, 3300 PUBLIX CORPORATE PARKWAY, LAKELAND, FL 33811, UPC 0 41415 06776 9; I) QC-Quality Choice, Distributed by: CDMA, Inc., Novi, MI 48375, NDC 83324-191-14; J) TopCare health, DISTRIBUTED BY TOPCO ASSOCIATES LLC, ELKGROVE VILLAGE, IL 60007, UPC 0 36800 03641 3.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Sterile Eye Drops Redness Relief (Glycerin 0.25%, Naphazoline HCl 0.02% Lubricant | Redness Reliever) (Relieves Dryness, Burning and Irritations), 0.5 fl oz (15 mL); a) LEADER, DISTRIBUTED BY CARDINAL HEALTH, DUBLIN, OHIO 43017, www.myleader.com, NDC 70000-0010-1; b) Discount drug mart, Distributed by: Discount Drug Mart, 211 Commerce Drive, Medina, OH 44256, UPC: 0 93351 03411 4; c) EQUALINE, DISTRIBUTED BY: UNFI, PROVIDENCE, RI 02908 UPC 0 41163 46151 2; d) Colirio Ojo de Aguila, Distributed by Grandall Distributing Co., Inc., Glendale, CA 91204, UPC: 3 48201 01615 5; e) Clear Eyes Redness Relief, ¿ 2025 Dist. by Medtech Products Inc., Tarrytown, NY 10591, UPC 6 78112 25415 6; f) Equate\", DISTRIBUTED BY WALMART INC., Bentonville, AR 72716, NDC 79903-012-01; g) Walgreens, DISTRIBUTED BY: WALGREEN CO., 200 WILMOT RD, DEERFIELD, IL 60015, UPC 3 11917 17741 0; h) Xpect Industrial Eye Relief, Distributed by: Cintas Corp., Mason, OH 45040, UPC: 130209.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Sterile Eye Drops, ORIGINAL, Tetrahydrozoline HCl 0.05% Redness Reliever ¿ Fast Acting Formula) Product size: 0.5 fl oz (15 mL); a) Best Choice, PROUDLY DISTRIBUTED BY: VALU MERCHANDISERS, CO., 5000 KANSAS CITY, KS 66106, UPC 0 70038 47011 3; b) Discount drug mart, Discount Drug Mart Food Fair, Medina, OH 44256, UPC: 0 93351 01157 3; c) Good Sense Sterile Eye Drops, Distributed By: Geiss, Destin & Dunn, Inc., A Perrigo Company, Peachtree City, GA 30269, NDC 50804-141-01; d) H.E.B Dry Eye, Eye Drops, MADE WITH PRIDE & CARE FOR H-E-B, SAN ANTONIO, TX 78204, UPC 0 41220 43747 4; e) Harris Teeter, PROUDLY DISTRIBUTED BY: HARRIS TEETER, LLC, MATTHEWS, NC 28105, UPC: 0 72036 71302 5; f) Circle K, Product manufactured for: Lil' Drug Store Products, Inc., Cedar Rapids, IA 52404, Proudly distributed: by Circle K Stores Inc., UPC: 1 94283 65135 8; g) Lil' DrugStore, Product manufactured for: Lil' Drug Store Products, Inc., 9300 Earhart Lane SW, Cedar Rapids, IA 52404, UPC: 3 66715 68324 3; h) QC, Quality Choice, Distributed by CDMA Inc, Novi, MI NDC 83324-340-15; i) TopCare health, DISTRIBUTED BY TOPCO ASSOCIATES LLC, ELKGROVE VILLAGE, IL 60007, UPC 0 36800 03639 0; j) Equate\", DISTRIBUTED BY WALMART INC., Bentonville, AR 72716, NDC 79903-158-05; k) Walgreens, DISTRIBUTED BY: WALGREEN CO., 200 WILMOT RD, DEERFIELD, IL 60015, UPC 3 11917 20073 6; l) Kroger, DISTRIBUTED BY THE KROGER CO., CINCINNATI, OHIO 45202, UPC 0 11110 38597 0.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Sterile High Performance Ultra Lubricating Eye Drops (Polyethylene Glycol 400, 0.4% Relieves Dry and Irritated Eyes) Product size: 0.5 fl oz (15 mL); a) LEADER, DISTRIBUTED BY CARDINAL HEALTH, DUBLIN, OHIO 43017, www.myleader.com, NDC 70000-0457-1; b) exchange select, Manufactured for your Military Exchange By: K.C Pharmaceuticals, Inc., Pomona, CA 9176, UPC: 6 1429905619 0; c) Good Sense, Distributed By: Perrigo Direct Inc., Peachtree City, GA 30269, NDC 50804-160-01; d) Walgreens, DISTRIBUTED BY: WALGREEN CO., 200 WILMOT RD, DEERFIELD, IL 60015, UPC 3 11917 20167 2.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Sterile Lubricant Dry Eye Relief Eye Drops, 0.5 FL OZ (15 mL); a) LEADER, DISTRIBUTED BY CARDINAL HEALTH, DUBLIN, OHIO 43017, www.myleader.com, NDC 70000-0502-1; b) Crocodile Tears, Distributed by: Crocodile Tears, Palm Beach Gardens, FL 33410, UPC: 8 67166 00000 4; c) Discount drug mart, Discount Drug Mart Food Fair, Medina, OH 44256, UPC: 0 93351 01156 6; d) exchange select, Manufactured for your Military Exchange By: K.C Pharmaceuticals, Inc., Pomona, CA 9176, UPC: 6 14299 05620 6; e) GERI CARE, Distributed by: Gericare Pharmaceuticals Corp., 1295 Towbin Ave., Lakewood, NJ 08701, NDC 57896-181-05; f) H.E.B Dry Eye, Eye Drops, MADE WITH PRIDE & CARE FOR H-E-B, SAN ANTONIO, TX 78204, UPC 0 41220 43741 2; g) Harris Teeter, PROUDLY DISTRIBUTED BY: HARRIS TEETER, LLC, MATTHEWS, NC 28105, UPC: 0 72036 71303 2; h) Foster & Thrive, Distributed by: McKesson Corp. Via Strategic Sourcing Servies LLC., Memphis, TN 38141, NDC 70677-1157-1; I) TopCare health, DISTRIBUTED BY TOPCO ASSOCIATES LLC, ELKGROVE VILLAGE, IL 60007, UPC 0 36800 36100 3.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "TIRZEPATIDE 26 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936;",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "TIRZEPATIDE/CYANOCOBALAMIN 26/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "TIRZEPATIDE/CYANOCOBALAMIN 64/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "TIRZEPATIDE/CYANOCOBALAMIN 76/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "TIRZEPATIDE/CYANOCOBALAMIN 85/2 MG/ML INJECTABLE, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936;",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tirzepatide Injection, 18mg/mL, 4 mL Sterile Multi-Dose Vial, Rx only, Apothecary Pharma, LLC, 1913 Evans Road, Cary, NC 27513, NDC 85091-001-18.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tri-MIX (PAPAV/PHENTO/ALPROS), 30/1/40, injectable, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tri-MIX (PAPAV/PHENTO/ALPROS),30/1/10, injectable, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936,",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tri-MIX (PAPAV/PHENTO/ALPROS),30/1/20, injectable, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936,",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tri-MIX (PAPAV/PHENTO/ALPROS),30/1/60, injectable, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tri-MIX (PAPAV/PHENTO/ALPROS),30/2/20, injectable, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-14",
+   "title": "Tri-MIX (PAPAV/PHENTO/ALPROS),30/2/40, Packaged in single-use dosage syringes, total mL dispensed based on dosage per specific patient prescription, Carolina Infusion LLC, 95 Bees Creek Road, Ridgeland, SC 29936",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-10-14",
+   "title": "Tretinoin Cream UPS, 0.05%, 20g, Rx only, Mfd. by: Taro Pharmaceuticals Inc., Brampton, Ontario, Canada L6T 1C1, Dist. by: Taro Pharmaceuticals USA Inc., Hawthorne, NY 10532, NDC 51672-1394-0.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-10-14",
+   "title": "Tretinoin Cream USP, 0.05%, 45 g tube, Manufactured for: Northstar Rx LLC, Memphis, TN 38141, Manufactured by: Taro Pharmaceuticals Inc., Brampton, Ontario, Canada L6T 1C1, Product of Canada, NDC 16714-249-02.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-10-14",
+   "title": "Tretinoin Cream USP, 0.05%, 45g tube, Rx only, Mfd by: Taro Pharmaceuticals Inc., Brampton, Ontario, Canada L6T 1C1, Dist. by: Taro Pharmaceuticals USA Inc., Hawthorne, NY 10532, NDC 51672-1394-9.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Not Yet Classified",
+   "published_date": "2026-10-14",
+   "title": "Tri-Immune Boost (Glutathione: 200 mg, Ascorbic Acid: 200 mg, Zinc: 2.5 mg), 30 mL vial, Rx only, Centric Compounding, 7447 Harwin Dr. Suite 111, Houston, TX 77036",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-13",
+   "title": "Postapproval Manufacturing Changes to Biosimilar and Interchangeable Biosimilar Products: Questions and Answers; Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/13/2026-20817/postapproval-manufacturing-changes-to-biosimilar-and-interchangeable-biosimilar-products-questions"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-10-13",
+   "title": "Use of Salt Substitutes To Reduce the Sodium Content in Standardized Foods",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/13/2026-20848/use-of-salt-substitutes-to-reduce-the-sodium-content-in-standardized-foods"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-13",
+   "title": "(GRP-MaPP-심사기준-03) 의약품 안전성·유효성 검토서 작성기준",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15307"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-13",
+   "title": "CTD에 의한 품질평가자료 검토서 작성기준",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15306"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "Aseptic Process Simulation/Media Fill also under Scrutiny during European GMP Inspections",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/aseptic-process-simulation-media-fill-also-under-scrutiny-during-european-gmp-inspections"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "Bioassays in the United States Pharmacopoeia - Two Chapters come into Force in Spring",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/bioassays-in-the-united-states-pharmacopoeia-two-chapters-come-into-force-in-spring"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "ECA ATMP Interest Group - Activities May-August 2026",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/eca-atmp-interest-group-activities-may-august-2026"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "EDQM Revises Guidance on Electronic Submissions for CEP Applications",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/edqm-revises-guidance-on-electronic-submissions-for-cep-applications"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "EMA Reports inconsistent Progress in International API Inspection Cooperation",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-reports-inconsistent-progress-in-international-api-inspection-cooperation"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "EU Pharma Package: Council Adopts New Rules",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/eu-pharma-package-council-adopts-new-rules"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "ICH Publishes New Training Material for Quality Guidelines",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ich-publishes-new-training-material-for-quality-guidelines"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "Sterility – just on the Label? FDA Warning Letter after Death Cases",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/sterility-just-on-the-label-fda-warning-letter-after-death-cases"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "WHO issues Draft Guidance on Quality Risk Management",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/who-issues-draft-guidance-on-quality-risk-management"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-12",
+   "title": "From Checklist to Culture: Uniting Quality Risk Management (QRM) and Knowledge Management (KM) for Supply Reliability: A Joint Discussion on QRM and KM",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/checklist-culture-uniting-quality-risk-management-qrm-and"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 2 Medicines Recall",
+   "published_date": "2026-10-12",
+   "title": "Class 2 Medicines Recall: Norgine Pharmaceuticals Limited, Pedmarqsi 80 mg/mL solution for infusion, EL(26)A/42",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-2-medicines-recall-norgine-pharmaceuticals-limited-pedmarqsi-80-mg-slash-ml-solution-for-infusion-el-26-a-slash-42"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-10-09",
+   "title": "Annual report of the Pharmacovigilance Inspectors Working Group for 2025",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/annual-report/annual-report-pharmacovigilance-inspectors-working-group-2025-en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-10-09",
+   "title": "Questions and answers on the PIP compliance verification procedure at EMA, and on paediatric rewards",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/regulatory-procedural-guideline/questions-answers-procedure-pip-compliance-verification-en_0.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-09",
+   "title": "Questions and answers on the PIP compliance verification procedure at EMA, and on paediatric rewards",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/questions-answers-pip-compliance-verification-procedure-ema-paediatric-rewards_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Biologics License Applications, Procedures and Requirements",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20768/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Expanded Access to Investigational Drugs for Treatment Use",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20765/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Amneal Pharmaceuticals of New York, LLC; Withdrawal of Approval of Abbreviated New Drug Application for Celecoxib Capsules, 50 Milligrams, 100 Milligrams, 200 Milligrams, and 400 Milligrams",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20758/amneal-pharmaceuticals-of-new-york-llc-withdrawal-of-approval-of-abbreviated-new-drug-application"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Challenges and Solutions in Lot-Level Food Traceability; Public Meeting",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20720/challenges-and-solutions-in-lot-level-food-traceability-public-meeting"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Determination That LASIX (Furosemide) Oral Solution, 10 Milligrams/Milliliter, Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20764/determination-that-lasix-furosemide-oral-solution-10-milligramsmilliliter-was-not-withdrawn-from"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Determination of Regulatory Review Period for Purposes of Patent Extension; MONOFERRIC",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20766/determination-of-regulatory-review-period-for-purposes-of-patent-extension-monoferric"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Elite Laboratories, Inc. et al.; Withdrawal of Approval of 16 Abbreviated New Drug Applications; Correction",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20730/elite-laboratories-inc-et-al-withdrawal-of-approval-of-16-abbreviated-new-drug-applications"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-09",
+   "title": "Par Health USA LLC, U.S. Agent for PH Health Limited, et al.; Withdrawal of Approval of 37 Abbreviated New Drug Applications",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20762/par-health-usa-llc-us-agent-for-ph-health-limited-et-al-withdrawal-of-approval-of-37-abbreviated-new"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-10-09",
+   "title": "Requirements for Additional Traceability Records for Certain Foods: Enforcement Policy for Certain Retail Food Establishments and Restaurants; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/09/2026-20721/requirements-for-additional-traceability-records-for-certain-foods-enforcement-policy-for-certain"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-08",
+   "title": "Clinical trial applications advice pilot becomes permanent",
+   "official_url": "https://www.ema.europa.eu/en/news/clinical-trial-applications-advice-pilot-becomes-permanent"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-10-08",
+   "title": "Draft guideline on the requirements for demonstrating therapeutic equivalence for nasal products",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-requirements-demonstrating-therapeutic-equivalence-nasal-products_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-08",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Channels of Trade Policy for Commodities With Residues of Pesticide Chemicals, for Which Tolerances Have Been Revoked, Suspended, or Modified by the Environmental Protection Agency Pursuant to Dietary Risk Considerations",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/08/2026-20663/agency-information-collection-activities-proposed-collection-comment-request-channels-of-trade"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-08",
+   "title": "Antibody-Drug Conjugate (ADC) Cleaning Validation: How to Evaluate Degradation, Select Analytical Methods, and Reduce Validation Risk",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/antibody-drug-conjugate-adc-cleaning-validation-how-evaluate"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-07",
+   "title": "Analytical Quality Group Developments May through August 2026",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/analytical-quality-group-developments-may-through-august-2026"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-07",
+   "title": "Validation Group Update May-August 2026",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/validation-group-update-may-august-2026"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-07",
+   "title": "Determination That Oxandrin (Oxandrolone) Tablets, 2.5 Milligrams and 10 Milligrams, Were Withdrawn From Sale for Reasons of Safety or Effectiveness; Correction",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/07/2026-20503/determination-that-oxandrin-oxandrolone-tablets-25-milligrams-and-10-milligrams-were-withdrawn-from"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Benzoyl Peroxide Wash, USP, 10%, packaged in a)5 FL OZ (148mL) bottles (NDC 0536-1261-63), and b) 8.5 FL OZ (237 mL) bottles (NDC 0536-1351-42), Distributed by: Rugby Laboratories, 17177 N. Laurel Park Drive, Suite 233, Livonia, MI 48152.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Benzoyl Peroxide Wash, USP, 5%, 5 FL OZ (148 mL), Distributed by: Rugby Laboratories, 17177 N. Laurel Park Drive, Suite 233, Livonia, MI 48152. NDC: 0536-1259-63",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Buprenorphine Hydrochloride, Injection 0.3 mg/mL, Rx Only, 5 x 1 mL Single Dose Vials, Manufactured for: Endo USA, Malvern, PA, NDC 42023-179-05",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Estradiol Gel, 0.1%, 0.25 mg, 30-packets per carton, Rx only, Distributed by: Amneal Pharmaceuticals LLC, Bridgewater, NJ 08907, NDC 69238-2452-3.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "FOCUS PI Hypromellose 0.7% Formula, 0.3 FL O (10 mL) per vial, STERILE, Manufactured for: Covalent Management, Inc., Manassas, VA 20109. NDC: 82724-007-19",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Paroxetine Extended-Release Tablets, 37.5mg, 30-count bottle, Rx only, Manufactured by: Apotex Inc., Toronto, Ontario, Canada M9L 1T9, Manufactured for: Apotex Corp., Weston, Florida 33326, NDC 60505-1318-3",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Ranolazine Extended-Release Tablets, 1000 mg, 60-count bottle, Rx Only, Marketed by: Ajanta Pharma USA Inc., Bridgewater, NJ 08807. NDC: 27241-126-02",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-10-07",
+   "title": "Zoladex (goserelin) implant, 3.6 mg, One single-Use Syringe packaged in a carton, Rx only, Manufactured for: TerSera therapeutics LLC, Deerfield, IL 60015, BY: AstraZeneca UK Limited, Macclesfield, England, Product of Switzerland, website at www.zoladex.com, NDC 70720-950-36.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-06",
+   "title": "European Medicines Agency post-authorisation procedural advice for users of the centralised procedure",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-post-authorisation-procedural-advice-users-centralised-procedure_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-06",
+   "title": "European Medicines Agency post-authorisation procedural advice for users of the centralised procedure: document with tracked changes",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-post-authorisation-procedural-advice-users-centralised-procedure-document-tracked-changes_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-06",
+   "title": "European Medicines Agency pre-authorisation procedural advice for users of the centralised procedure",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-pre-authorisation-procedural-advice-users-centralised-procedure_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-10-06",
+   "title": "European Medicines Agency pre-authorisation procedural advice for users of the centralised procedure: document with tracked changes",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/european-medicines-agency-pre-authorisation-procedural-advice-users-centralised-procedure-document-tracked-changes_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-10-06",
+   "title": "Concept paper on the guideline revision on good pharmacogenomic practice",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-guideline-revision-good-pharmacogenomic-practice_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-06",
+   "title": "Design and Safety Considerations for Clinical Trials Involving Ibogaine Drug Products; Request for Information",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/06/2026-20427/design-and-safety-considerations-for-clinical-trials-involving-ibogaine-drug-products-request-for"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-06",
+   "title": "Determination PRALIDOXIME CHLORIDE (Autoinjector) (Pralidoxime Chloride) Solution, 600 Milligrams/2 Milliliters (300 Milligrams/Milliliter), Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/06/2026-20442/determination-pralidoxime-chloride-autoinjector-pralidoxime-chloride-solution-600-milligrams2"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-06",
+   "title": "Teva Pharmaceuticals USA, Inc., et al.; Withdrawal of Approval of 15 Abbreviated New Drug Applications; Correction",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/06/2026-20460/teva-pharmaceuticals-usa-inc-et-al-withdrawal-of-approval-of-15-abbreviated-new-drug-applications"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-06",
+   "title": "[HC] Carvedilol 25 mg Tablets: Out-of-specification (Impurity)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/carvedilol-25-mg-tablets-out-specification-impurity-0"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-06",
+   "title": "[HC] PMS-Carvedilol 25 mg Tablets: Out-of-specification (Impurity)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/pms-carvedilol-25-mg-tablets-out-specification-impurity"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-06",
+   "title": "From Digital Transformation to Human-Centric Manufacturing: Designing Collaborative Workspaces for the Future of Pharma",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/digital-transformation-human-centric-manufacturing-designing"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "CEP 2.0: EDQM Updates Guidance on the Use of Certificates of Suitability",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/cep-2-0-edqm-updates-guidance-on-the-use-of-certificates-of-suitability"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "EDQM Updates Guidance on CEP Sister File Applications",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/edqm-updates-guidance-on-cep-sister-file-applications"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "FDA: Next Step to Reduce Animal Based Testing Methods",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-next-step-to-reduce-animal-based-testing-methods"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "Pharmeuropa: Revision Proposed for Chapter 2.5.32 on Coulometric Karl Fischer Water Determination",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/pharmeuropa-revision-proposed-for-chapter-2-5-32-on-coulometric-karl-fischer-water-determination"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "Two New FDA Warning Letters Put OOS Investigations in Focus",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/two-new-fda-warning-letters-put-oos-investigations-in-focus"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "USP Revises the Pharmaceutical Water Monographs",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/usp-revises-the-pharmaceutical-water-monographs"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-05",
+   "title": "[HC] Carvedilol 25 mg Tablets: Out-of-specification (Impurity)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/carvedilol-25-mg-tablets-out-specification-impurity"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-10-05",
+   "title": "[HC] PDP-DIPHENHYDRAMINE 25 MG CAPSULE: Out-of-specification (Impurity)",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/pdp-diphenhydramine-25-mg-capsule-out-specification-impurity"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "From Science to Systems to Patients: Key Insights from the 2026 ISPE Annual Meeting & Expo Chairs",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/science-systems-patients-key-insights-2026-ispe-annual-meeting"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-05",
+   "title": "The Second Question",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/second-question"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 3 Medicines Recall",
+   "published_date": "2026-10-05",
+   "title": "Class 3 Medicines Recall: Norgine Limited, MOVICOL Plain 13.7g powder for oral solution, EL(26)A/41",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-3-medicines-recall-norgine-limited-movicol-plain-13-dot-7g-powder-for-oral-solution-el-26-a-slash-41"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-02",
+   "title": "Meeting highlights from the Pharmacovigilance Risk Assessment Committee (PRAC) 28 September - 1 October",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-pharmacovigilance-risk-assessment-committee-prac-28-september-1-october"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-10-02",
+   "title": "동등생물의약품 심사 검토서 작성 요령",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15302"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-01",
+   "title": "Advice on ‘end-of-year’ submission dates for type I variations in 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/advice-end-year-submission-dates-type-i-variations-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-01",
+   "title": "EMA Management Board: highlights of September 2026 meeting",
+   "official_url": "https://www.ema.europa.eu/en/news/ema-management-board-highlights-september-2026-meeting"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-01",
+   "title": "Executive Director speech at EMA women’s health multi-stakeholder workshop",
+   "official_url": "https://www.ema.europa.eu/en/news/executive-director-speech-ema-womens-health-multi-stakeholder-workshop"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-10-01",
+   "title": "Global regulators call for advancing alternatives to animal testing across the medicine lifecycle",
+   "official_url": "https://www.ema.europa.eu/en/news/global-regulators-call-advancing-alternatives-animal-testing-across-medicine-lifecycle"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-01",
+   "title": "Advisory Committee; Antimicrobial Drugs Advisory Committee; Renewal",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/01/2026-20142/advisory-committee-antimicrobial-drugs-advisory-committee-renewal"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-01",
+   "title": "Advisory Committee; Dermatologic and Ophthalmic Drugs Advisory Committee; Renewal",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/01/2026-20141/advisory-committee-dermatologic-and-ophthalmic-drugs-advisory-committee-renewal"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-01",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Voluntary Improvement Program",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/01/2026-20085/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-01",
+   "title": "Request for Nominations for Individuals and Consumer Organizations for Advisory Committees",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/01/2026-20065/request-for-nominations-for-individuals-and-consumer-organizations-for-advisory-committees"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-10-01",
+   "title": "Request for Nominations for Voting Members of Food and Drug Administration Advisory Committees",
+   "official_url": "https://www.federalregister.gov/documents/2026/10/01/2026-20063/request-for-nominations-for-voting-members-of-food-and-drug-administration-advisory-committees"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-01",
+   "title": "How Pharma 4.0™ Supports Inspection-Ready Compliance at the 2026 ISPE Pharma 4.0™ and Biopharma Conference",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/how-pharma-40tm-supports-inspection-ready-compliance-2026-ispe"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-10-01",
+   "title": "Will EU GMP Annex 22 Include Grandfathering for Legacy Artificial Intelligence Systems? Lessons from 21 CFR Part 11",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/will-eu-gmp-annex-22-include-grandfathering-legacy-artificial"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-10-01",
+   "title": "의약품 시판 후 개별 사례 보고 관리 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15967"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-10-01",
+   "title": "Class 4 Medicines Defect Notification: Neuraxpharm UK Limited, Levetiracetam Neuraxpharm granules for oral solution in sachet, EL(26)A/40",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-neuraxpharm-uk-limited-levetiracetam-neuraxpharm-granules-for-oral-solution-in-sachet-el-26-a-slash-40"
+  },
+  {
+   "source": "WHO",
+   "source_kind": "who-news",
+   "published_date": "2026-10-01",
+   "title": "WHO PQT launches eCTD submissions through the ePQS Portal",
+   "official_url": "https://extranet.who.int/prequal/news/who-pqt-launches-ectd-submissions-through-epqs-portal"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-30",
+   "title": "GDP Non-Compliance Report: CAPA Measures must not only be Promised but also Implemented",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/gdp-non-compliance-report-capa-measures-must-not-only-be-promised-but-also-implemented"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-30",
+   "title": "USA: Court Stops Warehouse Activities Following Persistent Insanitary Warehouse Conditions",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/usa-court-stops-warehouse-activities-following-persistent-insanitary-warehouse-conditions"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-30",
+   "title": "Version 4.0 of the Swissmedic Document on Notifications of Changes Published",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/version-4-0-of-the-swissmedic-document-on-notifications-of-changes-published"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-30",
+   "title": "Warehouse Temperature Excursions: What Does the FDA Expect?",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/warehouse-temperature-excursions-what-does-the-fda-expect"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-09-30",
+   "title": "Women are missing from medicines development: EMA’s roadmap for change",
+   "official_url": "https://www.ema.europa.eu/en/news/women-are-missing-medicines-development-emas-roadmap-change"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-30",
+   "title": "Determination That ISTURISA (Osilodrostat) Tablets, 10 Milligrams, Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/30/2026-19968/determination-that-isturisa-osilodrostat-tablets-10-milligrams-was-not-withdrawn-from-sale-for"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-30",
+   "title": "Annex 1 and Global Harmonization on Aseptic Filling: Insights from the 2026 ISPE Aseptic Conference Regulatory Panel",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/annex-1-and-global-harmonization-aseptic-filling-insights-2026"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-30",
+   "title": "바이러스 표적 단클론항체의약품 및 기타 치료용 단백질의 역가시험법 개발 시 고려사항",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15957"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-30",
+   "title": "소기업·연구개발자를 위한 알기 쉬운 제품화 가이드(의약품, 의료기기, 임상통계 분야)",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15963"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-30",
+   "title": "의약외품 표시 광고 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15966"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-30",
+   "title": "의약품 품목 갱신 업무 민원인을 위한 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15962"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-30",
+   "title": "의약품의 위해성 관리 계획 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15960"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-30",
+   "title": "한약(생약)제제 품질심사 주요 보완사례집",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15958"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "AvKare Carboxymethylcellulose Sodium Ophthalmic Solution 0.5%, Lubricant Eye Drops, Sterile, 0.5 FL OZ (15 mL) EACH, 1.0 FL OZ (30 mL) TOTAL, 2 count Twin Pack, Distributed by: AVKARE, Pulaski, TN, 38478, NDC 50268-068-02 (carton)",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "AvKare Carboxymethylcellulose Sodium Ophthalmic Solution 0.5%, Lubricant Eye Drops, Sterile, 0.5 FL OZ (15 mL) bottle, Distributed by: AVKARE, Pulaski, TN, 38478, NDC 50268-068-15",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Clear Eyes Redness Relief, Lubricant/Redness Reliever Eye Drops (glycerin 0.25%, naphazoline hydrochloride 0.012%) , 0.5 fl oz (15mL) per dropper bottle, STERILE, Dist. by Medtech Products Inc., Tarrytown, NY 10591. NDC: 67172-797-15",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Clear Eyes Redness Relief, Lubricant/Redness Reliever Eye Drops (glycerin 0.25%, naphazoline hydrochloride 0.012%) with Hang Tag, 0.5 fl oz (15mL) per dropper bottle, STERILE, Dist. by Medtech Products Inc., Tarrytown, NY 10591. NDC: 67172-797-15",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Exenatide Injection, USP, 250 mcg/mL, 1.2 mL per prefilled pen, Rx Only, Subcutaneous Use Only, For Single Patient Use Only, Manufactured by: Amneal Pharmaceuticals Pvt. Ltd., Ahmedabad 382213, India; Distributed by: Amneal Pharmaceuticals LLC, Bridgewater, NJ 08807, NDC 70121-1685-1",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Lubricant Eye Drops-Cameron Pharmaceuticals, Carboxymethylcellulose Sodium 0.5%, Eye Lubricant, 0.5 FL OZ (15 mL) bottles, Distributed by Cameron Pharmaceuticals, LLC, Louisville, KY, 40245, NDC 42494-448-05",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "MENOW SUNSCREEN PRESSED POWDER SPF35 PA+++, Net content, 9g/0.32 oz, Manufactured by: Shantzu Qiwei Industry Co. Ltd, Add: Quiwei Building, Yingloinguan, Xiashan, Chaonan district, Shantou City, Guangdong Province, China",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Major LubriFresh P.M. Nighttime Ointment, Net wt. 0.125 oz. (3.5 g) tubes, Distributed by: Major Pharmaceuticals, 17177 N Laurel Park Drive, Suite 233, Livonia, MI 48152, NDC 0904-6488-38",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Reliable -1 Laboratories, Sodium Chloride Hypertonicity Ophthalmic Solution, 5%, Sterile, 0.5 FL OZ (15 mL) bottles, Distributed by: Reliable-1 Laboratories LLC, Valley Stream, NY, 11580, NDC 69618-077-55.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Reliable-1 Laboratories Lubricating Tears, Sterile, 0.5 FL OZ (15 mL) bottles, Distributed by: Reliable-1 Laboratories LLC, Valley Stream, NY, 11580, www.reliable1labs.com, NDC 69618-076-55.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "TRP The Relief Products* Gentle Eyes Lubricant Eye Drops, Carboxymethylcellulose sodium 0.5%, Sterile Eye Drops, 0.5 FL OZ (15 mL) bottles, Manufactured exclusively for TRP Company, Inc. 1575 Delucci Ln, Reno, NV 89502, NDC 17312-430-15.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Walgreens Lubricant Eye Drops, 0.5 FL OZ (15 mL) 1.0 FL OZ (30 mL) TOTAL, 2 count Twin Pack, Distributed by Walgreens Co., 200 Wilmot Road, Deerfield, IL 60015, NDC 0363-8833-15.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-30",
+   "title": "Walgreens Lubricant Eye Drops, Carboxymethylcellulose sodium 0.5%, Lubricant Eye Drops, Sterile, 0.5 OZ (15 mL) bottles, Distributed by Walgreen Co., 200 Wilmot Rd., Deerfield, IL 60015, NDC 0363-8833-15.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-09-30",
+   "title": "Olanzapine Tablets, USP 5 mg, 30-count bottle, Rx Only, Manufactured For: Macleods Pharma USA, Inc. Princeton, NJ, 08540; Manufactured by: Macleods Pharmaceuticals, Ltd, Baddi, Himachal Pradesh, INDIA, NDC 33342-068-07.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-29",
+   "title": "Can Cannabis Flowers be pre-dried in Accordance with GACP?",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/can-cannabis-flowers-be-pre-dried-in-accordance-with-gacp"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-29",
+   "title": "FDA wants to Advance the Development of Herbal Medicinal Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-wants-to-advance-the-development-of-herbal-medicinal-products"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-29",
+   "title": "Ph. Eur. Draft for Comment: 2.8.18. Determination of Aflatoxin B1 in Herbal Drugs",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ph-eur-draft-for-comment-2-8-18-determination-of-aflatoxin-b1-in-herbal-drugs"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-29",
+   "title": "Water Determination in Herbal Drugs",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/water-determination-in-herbal-drugs"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-29",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Submission of Petitions: Food Additive, Color Additive (Including Labeling), Submission of Information to a Master File in Support of Petitions; and Electronic Submission Using Food and Drug Administration Form 3503",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/29/2026-19850/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-29",
+   "title": "Determination That SULFADIAZINE (Sulfadiazine) Tablet, 500 Milligrams, Was Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/29/2026-19921/determination-that-sulfadiazine-sulfadiazine-tablet-500-milligrams-was-not-withdrawn-from-sale-for"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-29",
+   "title": "FHTA LLC; Withdrawal of Approval of New Drug Application for MYSOLINE (Primidone) Suspension, 250 Milligrams/5 Milliliters",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/29/2026-19912/fhta-llc-withdrawal-of-approval-of-new-drug-application-for-mysoline-primidone-suspension-250"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-09-29",
+   "title": "생균치료제 제조시설 운영 관리 지침",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15297"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-28",
+   "title": "Cleaning Validation in the Manufacture of non-sterile Medicinal Products: new Information from the EMA",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/cleaning-validation-in-the-manufacture-of-non-sterile-medicinal-products-new-information-from-the-ema"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-28",
+   "title": "EMA publishes final ICH M13B Guideline and Q&A on Bioequivalence",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-publishes-final-ich-m13b-guideline-and-q-a-on-bioequivalence"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-28",
+   "title": "FDA Warning Letter: Deficiencies in Impurity Testing, Stability, OOS Investigations and Temperature Control",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-deficiencies-in-impurity-testing-stability-oos-investigations-and-temperature-control"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-28",
+   "title": "New Japanese Pharmacopoeia Drafts (September 2026) Open for Public Comment",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/new-japanese-pharmacopoeia-drafts-september-2026-open-for-public-comment"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-28",
+   "title": "The Relationship between the BP and the Ph. Eur.",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/the-relationship-between-the-bp-and-the-ph-eur"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-28",
+   "title": "[HC] PMS-FAMPRIDINE 10 mg Tablet: Affected lot may contain foreign material particles.",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/pms-fampridine-10-mg-tablet-affected-lot-may-contain-foreign-material-particles"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-internal",
+   "published_date": "2026-09-28",
+   "title": "변경관리 계획서 자료 검토에 관한 업무",
+   "official_url": "https://www.mfds.go.kr/brd/m_1059/view.do?seq=15296"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-25",
+   "title": "Dermatologic and Ophthalmic Drugs Advisory Committee; Notice of Meeting; Establishment of a Public Docket; Request for Comments-New Drug Application (NDA) 219694 for Atropine Sulfate Ophthalmic Solution, 0.01%",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19700/dermatologic-and-ophthalmic-drugs-advisory-committee-notice-of-meeting-establishment-of-a-public"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-25",
+   "title": "Robotically-Assisted Surgical Devices-Premarket Submissions; Draft Guidance for Industry and Food and Drug Administration Staff; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19704/robotically-assisted-surgical-devices-premarket-submissions-draft-guidance-for-industry-and-food-and"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-09-25",
+   "title": "Filing of Color Additive Petition From Doehler GmbH; Request To Amend the Color Additive Regulations To Provide for the Safe Use of Calcium Sulfate in Various Foods at Levels Consistent With Good Manufacturing Practice",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19658/filing-of-color-additive-petition-from-doehler-gmbh-request-to-amend-the-color-additive-regulations"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Rule",
+   "published_date": "2026-09-25",
+   "title": "Food Additives Permitted for Direct Addition to Food for Human Consumption; Vitamin D2 Inactive Bakers Yeast",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/25/2026-19656/food-additives-permitted-for-direct-addition-to-food-for-human-consumption-vitamin-d2-inactive"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-25",
+   "title": "[HC] Limited number of Sarclisa single use vials may have been frozen during shipment",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/limited-number-sarclisa-single-use-vials-may-have-been-frozen-during-shipment"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-25",
+   "title": "[HC] Sanofi-Aventis Canada Inc. recalling certain insulin pens and cartridges",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/sanofi-aventis-canada-inc-recalling-certain-insulin-pens-and-cartridges"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-09-24",
+   "title": "INS-GCP-1 procedure for coordinating good-clinical-practice inspections requested by the CHMP",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/regulatory-procedural-guideline/procedure-coordinating-gcp-inspections-requested-chmp-rev1-en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-09-24",
+   "title": "INS-GCP-1 procedure for coordinating good-clinical-practice inspections requested by the CHMP",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/ins-gcp-1-procedure-coordinating-good-clinical-practice-inspections-requested-chmp_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-24",
+   "title": "Draft guideline on the clinical requirements for medicines intended for the treatment of sickle cell disease",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-clinical-requirements-medicines-intended-treatment-sickle-cell-disease_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-24",
+   "title": "Draft guideline on the clinical requirements for medicines intended for the treatment of thalassaemia",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-clinical-requirements-medicines-intended-treatment-thalassaemia_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-24",
+   "title": "Improving Patient Access to Deceased Donor Islet Cells and Cell Products; Request for Information",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/24/2026-19563/improving-patient-access-to-deceased-donor-islet-cells-and-cell-products-request-for-information"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-24",
+   "title": "[HC] Apo-Semaglutide Injection : Incorrect dose display",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/apo-semaglutide-injection-incorrect-dose-display-0"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-23",
+   "title": "의료제품 개발 상담 사례집(의약품, 바이오의약품, 의료기기)",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15955"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-09-23",
+   "title": "Class 4 Medicines Defect Notification: B. Braun Melsungen AG, Meropenem 1000 mg powder and solvent for solution for infusion, EL(26)A/39",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-b-braun-melsungen-ag-meropenem-1000-mg-powder-and-solvent-for-solution-for-infusion-el-26-a-slash-39"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-09-23",
+   "title": "Thyroid Tablets, USP, 1/2 Grain (30 mg), Each tablet contains: levothyroxine (T4) 19 mcg, liothyronine (T3) 4.5 mcg, 100 Tablets, Rx only, Distributed by: Vitruvias Therapeutics, Auburn, AL 36830, Product of USA, NDC 69680-166-00.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Chlorthalidone Tablets, USP, 25 mg, 100 Tablets per bottle, Rx only, Manufactured by: Inventia Healthcare Limited. NDC: 64980-599-01",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Dopamine HCl Inj., USP, 200 mg/5 mL (40 mg/mL), 5 mL Single-dose, 25 vials per tray, Rx only, Distributed by Hospira, Inc., Lake Forest, IL 60045 USA, Vial NDC 0409-5820-11, Carton NDC 0409-5820-01.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Fluphenazine HCl Elixir, USP, 10 mg per 2 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Fluphenazine HCl Elixir, USP, 15 mg per 3 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Fluphenazine HCl Elixir, USP, 2.5 mg per 5 mL, Delivers: 5 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0654-16",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Fluphenazine HCl Elixir, USP, 20 mg per 4 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Fluphenazine HCl Elixir, USP, 5 mg per 1 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0653-04",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Fluphenazine HCl Elixir, USP, 5 mg per 10 mL, Delivers: 10 mL, Oral Elixir, PAI, Alcohol 14% by volume, For Oral Use Only, Rx Only, Pkg by: Safecor Health, Woburn, MA 01801. NDC: 00121-0654-16",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-23",
+   "title": "Lidocaine Ointment USP, 5%, Speermint Flavor, 50 g Jar, Rx only, Mfd. by: Taro Pharmaceuticals Inc., Brampton, Ontario, L6T1C, Canada, Dist By: Taro Pharmaceuticals U.S.A. Inc. Hawthorne NY 70532 NDC: 51672-3008-5",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "PIC/S",
+   "source_kind": "PIC/S",
+   "published_date": "2026-09-23",
+   "title": "Revision of PIC/S GMP Guide (PE 009-18)",
+   "official_url": "http://www.picscheme.org/en/news/149/revision-of-pics-gmp-guide-pe-009-18"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-22",
+   "title": "Scope 3 Sustainability in the Pharmaceutical Industry: Reality or Aspiration?",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/scope-3-sustainability-pharmaceutical-industry-reality-or"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "FDA Inspection as GMP Evidence? Swissmedic Opens Up a New Option",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-inspection-as-gmp-evidence-swissmedic-opens-up-a-new-option"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "FDA Publishes Draft Guidance on Potency Testing of Active Immunotherapy Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-publishes-draft-guidance-on-potency-testing-of-active-immunotherapy-products"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "FDA Warning Letter: Deficiencies in Stability Testing, Supplier Qualification, Validation and CGMP Oversight",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-deficiencies-in-stability-testing-supplier-qualification-validation-and-cgmp-oversight"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "FDA Warning Letter: serious GMP Deficiencies at a Chinese API Manufacturer",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-warning-letter-serious-gmp-deficiencies-at-a-chinese-api-manufacturer"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "FDA criticises Visual Inspection",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/fda-criticises-visual-inspection"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "How is GMP-compliant Calibration of Equipment and Devices carried out in the pharmaceutical Industry?",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/how-is-gmp-compliant-calibration-of-equipment-and-devices-carried-out-in-the-pharmaceutical-industry"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "IRIS Portal: EMA expands digital Procedure Management",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/iris-portal-ema-expands-digital-procedure-management"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "New Version of PDA Technical Report No. 60 on Process Validation Published",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/new-version-of-pda-technical-report-no-60-on-process-validation-published"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "New: Coordination of GMP Inspections for Centrally Authorised Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/new-coordination-of-gmp-inspections-for-centrally-authorised-products"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "USP Draft Chapter on Leachables in Oral Drug Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/usp-draft-chapter-on-leachables-in-oral-drug-products"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-09-21",
+   "title": "Report on the International Active Pharmaceutical Ingredient Inspection Programme 2017 – 2024",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/report/report-international-active-pharmaceutical-ingredient-inspection-programme-2017-2024_en_0.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-21",
+   "title": "ICH M13B guideline on bioequivalence for immediate-release solid oral dosage forms - additional strengths biowaiver - Step 5",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/ich-m13b-guideline-bioequivalence-immediate-release-solid-oral-dosage-forms-additional-strengths-biowaiver-step-5_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-21",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Prior Notice of Imported Food Under the Public Health Security and Bioterrorism Preparedness and Response Act of 2002",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19281/agency-information-collection-activities-proposed-collection-comment-request-prior-notice-of"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-21",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; State Petitions for Exemption From Preemption",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19282/agency-information-collection-activities-proposed-collection-comment-request-state-petitions-for"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-21",
+   "title": "Agency Information Collection Activities; Proposed Collection; Comment Request; Temporary Marketing Permit Applications",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19283/agency-information-collection-activities-proposed-collection-comment-request-temporary-marketing"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-21",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Orphan Drugs",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19284/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-21",
+   "title": "Chemistry, Manufacturing, and Controls Development and Readiness Pilot Program; Program Announcement",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/21/2026-19277/chemistry-manufacturing-and-controls-development-and-readiness-pilot-program-program-announcement"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-21",
+   "title": "[HC] IMAAVY: Affected lots may contain glass particles",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/imaavy-affected-lots-may-contain-glass-particles"
+  },
+  {
+   "source": "ISPE",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-21",
+   "title": "Automated Cross-Grade Material Transfer – A Perspective – Part II",
+   "official_url": "https://ispe.org/pharmaceutical-engineering/ispeak/automated-cross-grade-material-transfer-perspective-part-ii"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-09-18",
+   "title": "Meeting highlights from the Committee for Medicinal Products for Human Use (CHMP) 14-17 September 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-14-17-september-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Draft guideline on veterinary good pharmacovigilance practices (VGVP) Module: Signal Management - Revision 1",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/draft-guideline-veterinary-good-pharmacovigilance-practices-vgvp-module-signal-management-revision-1_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "regulatory-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Pharmacovigilance-related regulatory recommendations for centrally authorised veterinary medicinal products during 2026",
+   "official_url": "https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/pharmacovigilance-related-regulatory-recommendations-centrally-authorised-veterinary-medicinal-products-during-2026_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Concept paper on the revision of the CVMP guideline on the summary of product characteristics (SPC) for veterinary medicinal products containing antimicrobial substances (EMA/CVMP/383441/2005-Rev.1 Corr.1)",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/concept-paper-revision-cvmp-guideline-summary-product-characteristics-spc-veterinary-medicinal-products-containing-antimicrobial-substances-ema-cvmp-383441-2005-rev1-corr1_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Draft guideline on user safety for pharmaceutical veterinary medicinal products - Revision 2",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-user-safety-pharmaceutical-veterinary-medicinal-products-revision-2_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Draft guideline on user safety of topically administered veterinary medicinal products - Revision 1",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-user-safety-topically-administered-veterinary-medicinal-products-revision-1_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Draft reflection paper on the clinical investigation of medicinal products for the treatment of systemic sclerosis",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-reflection-paper-clinical-investigation-medicinal-products-treatment-systemic-sclerosis_en.pdf"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-18",
+   "title": "Questions and answers on post approval change management protocols for veterinary medicinal products",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/questions-answers-post-approval-change-management-protocols-veterinary-medicinal-products_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-18",
+   "title": "Biosimilar User Fee Act III Future Needs in the Development of Interchangeable Products Post-Workshop; Draft Strategy Document",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19166/biosimilar-user-fee-act-iii-future-needs-in-the-development-of-interchangeable-products"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-18",
+   "title": "Electronic Submission Template for Medical Device Premarket Approval Applications (PMAs); Draft Guidance for Industry and Food and Drug Administration Staff; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19181/electronic-submission-template-for-medical-device-premarket-approval-applications-pmas-draft"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-18",
+   "title": "Target Animal Safety Evaluation for Veterinary Monoclonal Antibody Products; Draft Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19141/target-animal-safety-evaluation-for-veterinary-monoclonal-antibody-products-draft-guidance-for"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-17",
+   "title": "Recommendations for the Development of Blood Collection, Processing, and Storage Systems for the Manufacture of Blood Components Using the Buffy Coat Method; Guidance for Industry; Availability",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/17/2026-19080/recommendations-for-the-development-of-blood-collection-processing-and-storage-systems-for-the"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-17",
+   "title": "의약품 임상시험 계획(변경) 승인 보완사례집",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15953"
+  },
+  {
+   "source": "MHRA Inspectorate",
+   "source_kind": "Class 4 Medicines Defect Notification",
+   "published_date": "2026-09-17",
+   "title": "Class 4 Medicines Defect Notification: Martindale Pharmaceuticals Ltd, Clobazam Martindale Pharma 5 mg/5 mL and 10 mg/5 mL Oral Suspension 150ml, EL(26)A/38",
+   "official_url": "https://www.gov.uk/drug-device-alerts/class-4-medicines-defect-notification-martindale-pharmaceuticals-ltd-clobazam-martindale-pharma-5-mg-slash-5-ml-and-10-mg-slash-5-ml-oral-suspension-150ml-el-26-a-slash-38"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-16",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Biological Products: Reporting of Biological Product Deviations and Human Cells, Tissues, and Cellular and Tissue-Based Product Deviations in Manufacturing",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/16/2026-18946/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-16",
+   "title": "[HC] Platinum Naturals Easymulti Stress (men): Affected lots incorrectly labelled for Vitamin B6 quantity",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/platinum-naturals-easymulti-stress-men-affected-lots-incorrectly-labelled-vitamin-b6"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-09-16",
+   "title": "0.9% Sodium Chloride Injection, USP, 100 mL Partial Fill in 150 mL PAB Container, Sterile, Rx only, B. Braun Medical Inc., Bethlehem, PA 18018 USA, NDC 0264-1800-32.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-09-16",
+   "title": "Dextrose Injection, USP, 70 %, 2000 mL bags, Rx Only, Baxter Healthcare Corporation Deerfield, IL, 60016, Made in USA, NDC 00338-0719-06",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class I",
+   "published_date": "2026-09-16",
+   "title": "Epinephrine Injection, USP, 30 mg/30 mL (1mg/mL), 30 mL-Multiple-Dose Vial, Rx Only, For Intravenous Infusion, intramuscular and Subcutaneous Use, AMERICAN REGENT INC., SHIRLEY, NY 11967. NDC 0517-3030-01",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class II",
+   "published_date": "2026-09-16",
+   "title": "fentaNYL Citrate, 1,000 mcg/100 mL (10mcg/mL) Injection solution in 100 mL, 0.9% NaCl Bag, OurPharma LLC, 2512 S. City Lake, Fayetteville, AR, NDC 73013-1013-01.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-09-16",
+   "title": "Fluphenazine Hydrochloride Tablets, USP, 1mg, 100-count bottles, Rx Only, Marketed by: Ajanta Pharma USA Inc., Bridgewater, NJ 08807, Made in India, NDC 27241-255-01.",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "OpenFDA Recall",
+   "source_kind": "Class III",
+   "published_date": "2026-09-16",
+   "title": "Povidone Iodine 1.25% / Proparacaine HCl 0.5% Ophthalmic Solution, 10 mL per dropper bottle, For Office Use Only, Imprimis NJOF, LLC, 1705 Route 46 West, Unit 6B, Ledgewood, NJ 07852, NDC 71384-732-10",
+   "official_url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-15",
+   "title": "Statistical Considerations for the Design of Rare Disease Clinical Investigations; Establishment of a Public Docket; Request for Information and Comments",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/15/2026-18805/statistical-considerations-for-the-design-of-rare-disease-clinical-investigations-establishment-of-a"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-15",
+   "title": "[HC] Organika® Gummies: Foreign site not listed on site licence",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/organikar-gummies-foreign-site-not-listed-site-licence"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "EMA updates Procedural Guidance for Application Preparation",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ema-updates-procedural-guidance-for-application-preparation"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "Equipment Design in the FDA&#39;s Focus",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/equipment-design-in-the-fdas-focus"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "GMP Requirements for Blood Components and Plasma-derived Medicinal Products",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/gmp-requirements-for-blood-components-and-plasma-derived-medicinal-products"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "How GMP Non-Compliance can stop a Marketing Authorisation Application",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/how-gmp-non-compliance-can-stop-a-marketing-authorisation-application"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "IPEC: Updated Qualification-Guide published",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/ipec-updated-qualification-guide-published"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "PFAS restriction: Commission highlights Importance of critical Medical Applications",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/pfas-restriction-commission-highlights-importance-of-critical-medical-applications"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "USP-NF Publishes Responses to Comments on Stimuli Article on Apex Vessel Geometries",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/usp-nf-publishes-responses-to-comments-on-stimuli-article-on-apex-vessel-geometries"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-14",
+   "title": "What is meant by Operational and Personnel Hygiene in a GMP Environment?",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/what-is-meant-by-operational-and-personnel-hygiene-in-a-gmp-environment"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-09-14",
+   "title": "International collaboration on GMP inspections",
+   "official_url": "https://www.ema.europa.eu/en/human-regulatory-overview/research-development/compliance-research-development/good-manufacturing-practice/international-collaboration-gmp-inspections"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "inspections",
+   "published_date": "2026-09-14",
+   "title": "Report on the International Active Pharmaceutical Ingredient Inspection Programme 2017 – 2024",
+   "official_url": "https://www.ema.europa.eu/system/files/documents/report/report-international-active-pharmaceutical-ingredient-inspection-programme-2017-2024_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-14",
+   "title": "Agency Information Collection Activities; Submission for Office of Management and Budget Review; Comment Request; Customer/Partner Customer Service Satisfaction Surveys",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/14/2026-18691/agency-information-collection-activities-submission-for-office-of-management-and-budget-review"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-14",
+   "title": "[HC] TZIELD (teplizumab) and the Risk of Viral Reactivation",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/tzield-teplizumab-and-risk-viral-reactivation"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "news",
+   "published_date": "2026-09-11",
+   "title": "Meeting highlights from the Committee for Veterinary Medicinal Products (CVMP) 8-10 September 2026",
+   "official_url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-veterinary-medicinal-products-cvmp-8-10-september-2026"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-11",
+   "title": "Draft guideline on the investigation of interactions in the gastrointestinal tract",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-investigation-interactions-gastrointestinal-tract_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Notice",
+   "published_date": "2026-09-11",
+   "title": "Amending Over-the-Counter Monograph M020: Sunscreen Drug Products for Over-the-Counter Human Use, and Related Information; Aminobenzoic Acid (PABA) and Trolamine Salicylate",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/11/2026-18551/amending-over-the-counter-monograph-m020-sunscreen-drug-products-for-over-the-counter-human-use-and"
+  },
+  {
+   "source": "ECA Academy",
+   "source_kind": "GMP News",
+   "published_date": "2026-09-10",
+   "title": "Herbal Drugs: USP introduces Acceptance Criteria for PAHs",
+   "official_url": "https://www.gmp-compliance.org/gmp-news/herbal-drugs-usp-introduces-acceptance-criteria-for-pahs"
+  },
+  {
+   "source": "EMA",
+   "source_kind": "scientific-guidelines",
+   "published_date": "2026-09-10",
+   "title": "Draft guideline on clinical investigation of medicinal products for the treatment of migraine and cluster headache - Revision 2",
+   "official_url": "https://www.ema.europa.eu/en/documents/scientific-guideline/draft-guideline-clinical-investigation-medicinal-products-treatment-migraine-cluster-headache-revision-2_en.pdf"
+  },
+  {
+   "source": "Federal Register",
+   "source_kind": "Proposed Rule",
+   "published_date": "2026-09-10",
+   "title": "Green Innovation GmbH; Withdrawal of Food Additive Petition (Animal Use)",
+   "official_url": "https://www.federalregister.gov/documents/2026/09/10/2026-18469/green-innovation-gmbh-withdrawal-of-food-additive-petition-animal-use"
+  },
+  {
+   "source": "Health Canada",
+   "source_kind": "hc-recall",
+   "published_date": "2026-09-10",
+   "title": "[HC] Generic acetaminophen by Teva recalled because it may contain foreign material",
+   "official_url": "https://recalls-rappels.canada.ca/en/alert-recall/generic-acetaminophen-teva-recalled-because-it-may-contain-foreign-material"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-10",
+   "title": "디지털의료기기 제조 및 품질관리 기준 질의·응답집",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15950"
+  },
+  {
+   "source": "MFDS",
+   "source_kind": "guidance-industry",
+   "published_date": "2026-09-10",
+   "title": "첨단바이오의약품 제조에 사용되는 사람 및 동물 유래 원료물질 관리 가이드라인",
+   "official_url": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15949"
+  }
+ ]
+}

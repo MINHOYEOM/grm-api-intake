@@ -12992,6 +12992,92 @@ def freeze() -> None:
     print(f"골든 동결 완료 → {GOLDEN_DIR}")
 
 
+# ── [최근 규제 소식 2026-11-10] /news/ 정적 면 ───────────────────────────────────
+class WebRecentNewsPageTest(unittest.TestCase):
+    """정본(news.json)이 주 단위 목록으로 선다: 날짜 내림차순·원문 링크 noopener·영어 화면 무한글·
+    sitemap/아카이브 링크. 정본이 없으면 한국어 면은 빈 상태 문구로 서고 링크·sitemap 은 빠진다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = pathlib.Path(tempfile.mkdtemp(prefix="grmweb_news_"))
+        cls.single = cls._tmp / "single"
+        _build_single(cls.single)
+        rd = lambda *p: (cls.single.joinpath(*p)).read_text(encoding="utf-8")
+        cls.ko = rd("news", "index.html")
+        cls.en = rd("en", "news", "index.html")
+        cls.archive = rd("archive", "index.html")
+        # 영어 아카이브는 영문 브리프가 있는 빌드에서만 선다(단일 픽스처엔 없다).
+        cls.en_archive = (rd("en", "archive", "index.html")
+                          if (cls.single / "en" / "archive" / "index.html").exists() else "")
+        cls.sitemap = rd("sitemap.xml")
+        cls.data = render.news_page.load_news()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._tmp, ignore_errors=True)
+
+    @staticmethod
+    def _main(html):
+        return html.split("<main>", 1)[1].split("</main>", 1)[0]
+
+    def test_ko_lists_every_item_newest_first_with_safe_links(self):
+        main = self._main(self.ko)
+        self.assertEqual(main.count('class="nw-item"'), len(self.data["items"]))
+        self.assertEqual(main.count('target="_blank" rel="noopener"'), len(self.data["items"]))
+        dates = re.findall(r'<span class="nw-date">(\d{4}-\d{2}-\d{2})</span>', main)
+        self.assertEqual(dates, sorted(dates, reverse=True))
+        weeks = re.findall(r"nw-h2\">(\d{4}-\d{2}-\d{2}) 주</h2>", main)
+        self.assertEqual(weeks, sorted(weeks, reverse=True))
+        for it in self.data["items"][:5]:
+            self.assertIn(f'href="{_esc(it["official_url"])}"', main)
+
+    def test_no_non_public_fields_leak(self):
+        for html in (self.ko, self.en):
+            self.assertNotIn("raw_json", html)
+            self.assertNotIn("row_json", html)
+
+    def test_en_page_has_no_hangul_and_counts_hidden(self):
+        main = self._main(self.en)
+        self.assertIsNone(re.search(r"[가-힣]", main), "영어 소식 면에 한글이 남으면 안 된다")
+        ko_titles = sum(1 for i in self.data["items"] if re.search(r"[가-힣]", i["title"]))
+        self.assertEqual(main.count('class="nw-item"'), len(self.data["items"]) - ko_titles)
+        if ko_titles:
+            self.assertIn(f"{ko_titles} items whose original titles are in Korean", main)
+
+    def test_chips_cover_groups(self):
+        for html in (self.ko, self.en):
+            main = self._main(html)
+            for code in {render.news_page.group_of(i) for i in self.data["items"]}:
+                if code in main:
+                    self.assertIn(f'data-g="{code}"', main)
+
+    def test_reachable_from_archive_and_in_sitemap(self):
+        self.assertIn('href="../news/index.html"', self.archive)
+        if self.en_archive:
+            self.assertIn('href="../../news/index.html"', self.en_archive)
+        self.assertIn("<loc>https://grm-solutions.com/news/</loc>", self.sitemap)
+        self.assertIn("<loc>https://grm-solutions.com/en/news/</loc>", self.sitemap)
+        self.assertIn('href="../briefs/', self.ko)   # 이번 주 브리프 링크
+
+    def test_missing_data_renders_ko_empty_state_without_links(self):
+        orig = render.news_page.NEWS_FILE
+        render.news_page.NEWS_FILE = self._tmp / "absent.json"
+        orig_load = render.news_page.load_news
+        render.news_page.load_news = lambda path=render.news_page.NEWS_FILE: orig_load(path)
+        out = self._tmp / "nodata"
+        try:
+            _build_single(out)
+        finally:
+            render.news_page.NEWS_FILE = orig
+            render.news_page.load_news = orig_load
+        ko = (out / "news" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("표시할 소식이 아직 없습니다", ko)
+        self.assertNotIn('class="nw-item"', ko)
+        self.assertFalse((out / "en" / "news" / "index.html").exists())
+        self.assertNotIn("/news/", (out / "sitemap.xml").read_text(encoding="utf-8"))
+        self.assertNotIn("news/index.html", (out / "archive" / "index.html").read_text(encoding="utf-8"))
+
+
 # ── [백링크 패널 2026-11-04] 문서 페이지 → 실린 브리프 호 역색인 ──────────────────────
 class WebBacklinkPanelTest(unittest.TestCase):
     """카드 id → 호 역색인과 패널 칸. 없는 페이지·없는 앵커로 보내지 않는다."""

@@ -28,6 +28,7 @@ from typing import Any
 #   발행·브리프 계열(발행 전 점검 · 발행 감시 · 체크리스트 · 뉴스레터)은 수집 계열 라벨(automation-*)과 함께 붙어도 브리프편집팀.
 LABEL_TEAM: tuple[tuple[str, str], ...] = (
     ("reconcile-monitor", "dev"),
+    ("site-errors", "dev"),               # 사이트 오류 징후(Cloudflare 실측 · grm-site-error-watch.yml)
     ("grm-fda-coverage", "brief"),
     ("grm-publish-watchdog", "brief"),
     ("checklist-verify", "brief"),
@@ -35,6 +36,7 @@ LABEL_TEAM: tuple[tuple[str, str], ...] = (
     ("quiz-freshness", "education"),
     ("growth-weekly", "growth"),
     ("findings-backlog", "translation"),
+    ("findings-review-queue", "quality"),
     ("taxonomy-drift", "quality"),
     ("classification-audit", "quality"),
     ("findings-facets", "quality"),

@@ -49,10 +49,23 @@ concurrency:
 permissions:
   contents: read
 
+# 2026-11-08: unittest 를 4 샤드(matrix)로 병렬화했다 — 직렬 29분 -> 샤드당 약 8~10분.
+#   나누기는 `ci_shard.py`(TestCase 클래스 단위, tests/ci_shard_timings.json 실측으로 탐욕 균형).
+#   샤드 잡 이름은 `unittest (shard N)`, 이전 체크 이름 `test` 는 아래 집계 잡이 이어받는다
+#   (하나라도 실패·취소면 실패). 병합 게이트(admin-github)는 head sha 의 모든 check-run 을
+#   읽고, 다른 워크플로의 workflow_run 은 워크플로 전체 결론을 보므로 이름 변경에 영향이 없다.
+#   timeout 은 샤드당 25분(직렬 때 45분은 29분 + 러너 흔들림 여유였다).
+#   타이밍 갱신: 각 샤드가 업로드하는 `shard-timings-N` 아티팩트를
+#   `python ci_shard.py --merge ... --into tests/ci_shard_timings.json` 로 합쳐 커밋한다.
 jobs:
-  test:
+  unittest:
+    name: unittest (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -71,6 +84,7 @@ jobs:
       # 루트 평면 배치(CLAUDE.md §구조 원칙)를 그대로 신뢰해 *.py 전수 컴파일한다.
       # 수동 열거는 새 모듈이 조용히 게이트를 빠져나가므로 금지 — 목록을 늘리지 말 것.
       - name: py_compile all root modules
+        if: matrix.shard == 0
         run: |
           shopt -s nullglob
           files=(*.py)
@@ -81,5 +95,25 @@ jobs:
           echo "compiling ${#files[@]} root modules:"
           printf '  %s\n' "${files[@]}"
           python -m py_compile "${files[@]}"
-      - name: unittest
-        run: python -m unittest discover -s tests -v
+      - name: unittest (shard ${{ matrix.shard }}/4)
+        run: python ci_shard.py --index ${{ matrix.shard }} --total 4 --record shard-timings-${{ matrix.shard }}.json
+      - name: Upload shard timings
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: shard-timings-${{ matrix.shard }}
+          path: shard-timings-${{ matrix.shard }}.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # 이전 단일 잡 이름(`test`)을 유지하는 집계 잡 — 샤드 전부 success 여야 success.
+  test:
+    needs: unittest
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: All shards must succeed
+        run: |
+          echo "unittest shards: ${{ needs.unittest.result }}"
+          [ "${{ needs.unittest.result }}" = "success" ]

@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import urllib.parse
 
+import intake_exclusion as _xl
 from grm_mfds_item_class import enrich_raw_payload
 from datetime import date
 from typing import Any
@@ -272,13 +273,34 @@ def _body(raw: dict[str, Any]) -> str:
     return "\n".join(part for part in parts if part)
 
 
+_RULE_VERSION_CACHE: list[str] = []
+
+
+def _exclusion_rule_version() -> str:
+    """행정처분 수집 판정(`_is_collectable`)의 AST 지문 - 저가치·약 신호 어휘가 바뀌면 달라진다."""
+    if not _RULE_VERSION_CACHE:
+        _RULE_VERSION_CACHE.append(_xl.rule_fingerprint(
+            ("_is_collectable",), ("collect_mfds_admin_action", "grm_taxonomy")))
+    return _RULE_VERSION_CACHE[0]
+
+
+def _record_exclusion(raw: dict[str, Any], title: str, date_iso: str, reason: str,
+                      rule_version: str) -> None:
+    """제외 장부에 행정처분 한 건(원천 대조 감시가 '의도적 제외'로 센다). 키는 수집됐다면 쓸 키와 같다."""
+    _xl.record(source=SOURCE_MFDS, document_id=_document_id(raw), official_url=DATASET_URL,
+               title=title or _text(raw, "ENTP_NAME"), published_date=date_iso,
+               reason_code=reason, rule_version=rule_version, basis=_xl.BASIS_METADATA)
+
+
 def _to_item(raw: dict[str, Any], api_query_url: str) -> IntakeItem | None:
     firm = _text(raw, "ENTP_NAME")
     subject = _text(raw, "ITEM_NAME") or _text(raw, "ADM_DISPS_NAME")
     date_iso = _item_date(raw)
     if not subject or not date_iso:
+        _record_exclusion(raw, subject, date_iso, "missing_required_field", "static-1")
         return None
     if not _is_collectable(raw):
+        _record_exclusion(raw, subject, date_iso, "not_collectable", _exclusion_rule_version())
         return None
 
     headline = f"[행정처분] {subject}"

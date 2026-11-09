@@ -34,6 +34,7 @@ from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import urljoin, urlsplit
 
+import intake_exclusion as _xl
 from grm_common import env_flag, http_get_bytes, http_get_html, log
 from collect_intake import (
     IntakeItem,
@@ -148,6 +149,16 @@ class _LinkParser(HTMLParser):
 
 def _clean(text: str) -> str:
     return re.sub(r"\s+", " ", text or "").strip()
+
+
+_RULE_VERSION_CACHE: list[str] = []
+
+
+def _exclusion_rule_version() -> str:
+    """WHO RSS 범위 규칙(`_excluded`·`_WHO_EXCLUDE`)의 AST 지문."""
+    if not _RULE_VERSION_CACHE:
+        _RULE_VERSION_CACHE.append(_xl.rule_fingerprint(("_excluded",), ("collect_who",)))
+    return _RULE_VERSION_CACHE[0]
 
 
 def _excluded(blob: str) -> bool:
@@ -371,6 +382,11 @@ def _collect_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
             continue
         blob = f"{title} {desc}"
         if _excluded(blob):
+            # 제외 장부: 범위 밖 PQ 프로그램(살충제·IVD 등). 키는 수집됐다면 쓸 키와 같다.
+            _xl.record(source=SOURCE_WHO, document_id=_stable_doc_id(SOURCE_WHO, title, link, date_iso),
+                       official_url=link, title=title, published_date=date_iso,
+                       reason_code="out_of_scope_program", rule_version=_exclusion_rule_version(),
+                       basis=_xl.BASIS_METADATA)
             continue
         relevance = compute_relevance(title, desc)
         if relevance == "Pending":

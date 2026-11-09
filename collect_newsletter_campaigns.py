@@ -136,6 +136,40 @@ def extract_global_stats(campaign: "dict[str, Any]") -> "dict[str, Any]":
     }
 
 
+LIST_STAT_KEYS = ("list_delivered", "list_unique_views", "list_unique_clicks", "list_clickers")
+
+
+def extract_list_stats(campaign: "dict[str, Any]") -> "dict[str, Any]":
+    """[135] `statistics.campaignStats`(목록별 통계)를 목록마다 더한다.
+
+    ★왜 globalStats 와 따로 받나 — 2026-11-08 MCP 실측(11-02 호, 수신 29명): globalStats 는
+    uniqueClicks 72 인데 campaignStats[목록 3] 은 6 이고, 링크별 클릭(linksStats) 합은 8 로
+    목록 집계(clickers 8)와 맞았다. globalStats 클릭은 사람 수로 읽을 수 없다. 판독(135
+    growth_daily_v2)은 이 목록 기준 값을 쓴다.
+    campaignStats 가 없거나 비면 네 값 모두 None(0 을 지어내지 않는다)."""
+    top = campaign.get("statistics")
+    entries = top.get("campaignStats") if isinstance(top, dict) else None
+    if not isinstance(entries, list):
+        entries = campaign.get("campaignStats") if isinstance(campaign.get("campaignStats"), list) else []
+    sums: "dict[str, int | None]" = {k: None for k in LIST_STAT_KEYS}
+    src = {"list_delivered": "delivered", "list_unique_views": "uniqueViews",
+           "list_unique_clicks": "uniqueClicks", "list_clickers": "clickers"}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        stats = entry.get("stats") if isinstance(entry.get("stats"), dict) else entry
+        for col, key in src.items():
+            n = _int_or_none(stats.get(key))
+            if n is not None:
+                sums[col] = (sums[col] or 0) + n
+    return sums
+
+
+def strip_list_stats(rows: "list[dict[str, Any]]") -> "list[dict[str, Any]]":
+    """135 열이 아직 없는 DB(마이그레이션 적용 전)용 — 목록 기준 열을 뺀 사본."""
+    return [{k: v for k, v in r.items() if k not in LIST_STAT_KEYS} for r in rows]
+
+
 def has_any_global_stats(stats: "dict[str, Any]") -> bool:
     return any(v is not None for v in stats.values())
 
@@ -237,7 +271,41 @@ def upsert_rows(url: str, key: str, rows: "list[dict[str, Any]]", *,
                                "Prefer": "resolution=merge-duplicates,return=minimal"})
     if r.status_code >= 300:
         # PUBLIC 저장소 — 응답 본문(캠페인명·수치가 섞일 수 있다)은 찍지 않는다.
-        raise SystemExit(f"{TABLE} 적재 실패: HTTP {r.status_code}")
+        raise UpsertError(r.status_code, _missing_column(r))
+
+
+class UpsertError(SystemExit):
+    """적재 실패 — 상태 코드와 '열 없음(PGRST204)' 여부만 담는다(본문은 담지 않는다)."""
+
+    def __init__(self, status: int, missing_column: bool = False) -> None:
+        super().__init__(f"{TABLE} 적재 실패: HTTP {status}")
+        self.status = status
+        self.missing_column = missing_column
+
+
+def _missing_column(resp: Any) -> bool:
+    """PostgREST 가 '그런 열 없음'(PGRST204)으로 거부했는가. 본문은 판정에만 쓰고 출력하지 않는다."""
+    try:
+        return resp.status_code == 400 and "PGRST204" in (resp.text or "")
+    except Exception:
+        return False
+
+
+def upsert_with_fallback(url: str, key: str, rows: "list[dict[str, Any]]",
+                         upsert=None) -> bool:
+    """적재. 135 열이 아직 없는 DB 면 목록 기준 열을 빼고 한 번 더 — 코드가 마이그레이션보다
+    먼저 배포돼도 090 적재가 멈추지 않는다(RPC 계약 변경 = 장애 창 교훈). 반환: 열 포함 적재 여부."""
+    upsert = upsert or upsert_rows
+    try:
+        upsert(url, key, rows)
+        return True
+    except UpsertError as exc:
+        if not exc.missing_column:
+            raise
+    print("newsletter_campaign_stats 에 135 목록 기준 열이 아직 없음 — 그 열을 빼고 적재(마이그레이션 135 적용 필요)",
+          file=sys.stderr)
+    upsert(url, key, strip_list_stats(rows))
+    return False
 
 
 def _http_status(exc: Exception) -> "int | None":
@@ -328,8 +396,10 @@ def main(argv=None) -> int:
                   f"포함) 없이 계속: {type(exc).__name__}" + (f" (HTTP {status})" if status else ""),
                   file=sys.stderr)
 
-        rows.append(build_row(campaign_id=campaign_id, name=name, sent_at=sent_at,
-                              stats=stats, links=links, captured_at=captured_at))
+        row = build_row(campaign_id=campaign_id, name=name, sent_at=sent_at,
+                        stats=stats, links=links, captured_at=captured_at)
+        row.update(extract_list_stats(c))
+        rows.append(row)
 
     if not rows:
         print("적재 대상 0(id 없는 항목만 있었음) — 종료")
@@ -337,7 +407,7 @@ def main(argv=None) -> int:
 
     url, key = creds
     try:
-        upsert_rows(url, key, rows)
+        upsert_with_fallback(url, key, rows)
     except SystemExit:
         raise
     except Exception as exc:

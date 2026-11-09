@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T14:00:12Z",
+ "generated_at": "2026-11-09T18:43:59Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42629116063,
+    "databaseId": 42676355388,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-09T18:42:18Z",
+    "updatedAt": "2026-11-09T18:42:22Z",
+    "headBranch": "automation/fda-citation-firms-snapshot-42676259501",
+    "displayTitle": "chore: refresh FDA citation firms snapshot",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42676355388"
+   },
+   {
+    "databaseId": 42676255327,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-09T18:41:38Z",
+    "updatedAt": "2026-11-09T18:41:42Z",
+    "headBranch": "main",
+    "displayTitle": "feat(findings): 업체·조항 페이지에 FDA 실사 지적 조항 노출 (미노출 데이터 2/3) (#1438)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42676255327"
+   },
+   {
+    "databaseId": 42674290974,
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "pull_request",
+    "createdAt": "2026-11-09T18:28:10Z",
+    "updatedAt": "2026-11-09T18:29:00Z",
+    "headBranch": "feat/deficiency-cases-full",
+    "displayTitle": "feat(findings): PMDA·MHRA 지적 사례 전체 화면 + 조항·용어 블록 (미노출 데이터 3/3)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42674290974"
+   },
+   {
+    "databaseId": 42674286373,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T13:51:13Z",
-    "updatedAt": "2026-11-09T13:56:25Z",
-    "headBranch": "main",
-    "displayTitle": "seo: 얇은 문서·업체 페이지에 googlebot 전용 noindex (네이버 색인 유지) (#1429)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42629116063"
+    "createdAt": "2026-11-09T18:28:08Z",
+    "updatedAt": "2026-11-09T18:35:38Z",
+    "headBranch": "feat/deficiency-cases-full",
+    "displayTitle": "feat(findings): PMDA·MHRA 사례 화면에 출처·이용 조건·가공 고지 (PDL1.0 · OGL v3.0)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42674286373"
    },
    {
-    "databaseId": 42627731522,
+    "databaseId": 42673281004,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T13:41:49Z",
-    "updatedAt": "2026-11-09T13:47:04Z",
-    "headBranch": "seo/googlebot-noindex-thin-pages",
-    "displayTitle": "seo: 얇은 문서·업체 페이지에 googlebot 전용 noindex (네이버 색인 유지)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42627731522"
-   },
-   {
-    "databaseId": 42627717967,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T13:41:43Z",
-    "updatedAt": "2026-11-09T13:47:15Z",
-    "headBranch": "seo/googlebot-noindex-thin-pages",
-    "displayTitle": "seo: 얇은 문서·업체 페이지에 googlebot 전용 noindex (네이버 색인 유지)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42627717967"
-   },
-   {
-    "databaseId": 42623050529,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T13:09:52Z",
-    "updatedAt": "2026-11-09T13:15:55Z",
-    "headBranch": "main",
-    "displayTitle": "glossary(fig): 2026-11-09 새 그림 0 · 다시 그림 0 · 보류 5 — 직선성·분석절차 밸리데이션·설비…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42623050529"
-   },
-   {
-    "databaseId": 42622310062,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-09T13:04:49Z",
-    "updatedAt": "2026-11-09T13:09:56Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Deploy",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42622310062"
+    "createdAt": "2026-11-09T18:21:12Z",
+    "updatedAt": "2026-11-09T18:26:41Z",
+    "headBranch": "feat/deficiency-cases-full",
+    "displayTitle": "feat(findings): PMDA·MHRA 지적 사례 전체 화면 + 조항·용어 블록 (미노출 데이터 3/3)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42673281004"
    }
   ],
   "grm-scaffold-mirror.yml": [

@@ -1,7 +1,7 @@
 {
   "schema": "grm-deficiency-examples/v1",
   "curated_on": "2026-11-09",
-  "provenance": "Supabase deficiency_examples(migration 134) 의 영문 원문 행에서 사람이 직접 읽고 고른 대표 사례. id = source_key#row_no 로 원 행을 다시 찾을 수 있다. text 는 DB 에 있는 원문 문장 그대로(길면 첫 문장, PMDA 항목 번호 '1.' 등은 뺐다). 주제(category)는 문장을 읽고 사람이 정했다 — DB 의 grm_category(자동 분류)와 다를 수 있다. ko 는 GRM 이 붙인 참고용 번역이며 원문 기준은 영어(text)다.",
+  "provenance": "Supabase deficiency_examples(migration 134) 의 영문 원문 행에서 사람이 직접 읽고 고른 대표 사례. id = source_key#row_no 로 원 행을 다시 찾을 수 있다. text 는 DB 에 있는 원문 문장 그대로(길면 첫 문장 — 첫 문장이 절차 설명뿐이면 지적이 담긴 문장, PMDA 항목 번호 '1.' 등은 뺐다). 주제(category)는 문장을 읽고 사람이 정했다 — DB 의 grm_category(자동 분류)와 다를 수 있다. ko 는 GRM 이 붙인 참고용 번역이며 원문 기준은 영어(text)다.",
   "sources": {
     "mhra:trend_2015": {
       "agency": "MHRA",
@@ -86,13 +86,13 @@
       "ko": "사용자가 기본 감사추적 설정을 변경할 수 있었다."
     },
     {
-      "id": "mhra:trend_2015#119",
+      "id": "mhra:trend_2015#113",
       "category": "data_integrity",
       "source": "mhra:trend_2015",
-      "locator": "p.65 #3",
+      "locator": "p.64 #2",
       "agency_category": "Annex 11",
-      "text": "There were no audits to address the data integrity controls within the laboratory, data integrity was not included within the scope of audits of contact laboratories",
-      "ko": "시험실 안의 데이터 완전성 관리를 다루는 감사가 없었고, 위탁 시험실 감사 범위에도 데이터 완전성이 포함되지 않았다."
+      "text": "Electronic data not used to check analytical results",
+      "ko": "분석 결과를 확인하는 데 전자 데이터를 사용하지 않았다."
     },
     {
       "id": "mhra:trend_2015#92",
@@ -173,7 +173,7 @@
       "locator": "",
       "agency_category": "Chapter 1",
       "text": "There is no definition of which moderate level change controls would require a risk assessment and regulatory affairs review and which would not.",
-      "ko": "중간 등급 변경 가운데 어떤 것에 위험평가와 허가 부서 검토가 필요하고 어떤 것은 필요 없는지 정의되어 있지 않다."
+      "ko": "중간 등급 변경 가운데 어떤 것에 위험평가와 규제업무(RA) 부서 검토가 필요하고 어떤 것은 필요 없는지 정의되어 있지 않다."
     },
     {
       "id": "mhra:trend_2016#27",
@@ -325,8 +325,8 @@
       "source": "pmda:000273638",
       "locator": "R10",
       "agency_category": "Document management",
-      "text": "The document retention and management procedures required the production batch records of products for the Japanese market (records of X, X, X, and X) to be retained for the longer of the product shelf life plus 1 year or 5 years.",
-      "ko": "문서 보존·관리 절차는 일본 시장용 제품의 제조 배치 기록(X, X, X, X의 기록)을 제품 유효기간 + 1년과 5년 중 긴 기간 동안 보존하도록 정하고 있었다."
+      "text": "However, the inspection found that a wide range of records had been discarded, including X records of QC, X records of X of X, and usage records of X and X.",
+      "ko": "그러나 실사에서 QC의 X 기록, X의 X에 관한 X 기록, X와 X의 사용 기록 등 광범위한 기록이 폐기된 것이 확인되었다."
     },
     {
       "id": "mhra:trend_2016#73",
@@ -380,7 +380,7 @@
       "locator": "R14",
       "agency_category": "Test instruction, record, laboratory procedures",
       "text": "Reconciliation and related records of working standards used for product release test, including use date, used amount are not recorded.",
-      "ko": "출하 시험에 쓰인 작업 표준품의 사용일·사용량 등 수불 및 관련 기록이 남아 있지 않다."
+      "ko": "출하 시험에 쓰인 작업 표준품의 수불과 사용일·사용량 등 관련 사항이 기록되지 않는다."
     },
     {
       "id": "mhra:trend_2016#110",

@@ -26,23 +26,28 @@ stable
 security definer
 set search_path = public
 as $$
-  select rs.source, rs.source_kind, rs.published_date, btrim(rs.title), rs.official_url
-    from public.raw_signals rs
-   where p_days between 1 and 400
-     and rs.published_date ~ '^\d{4}-\d{2}-\d{2}$'
-     and rs.published_date >= to_char(current_date - p_days, 'YYYY-MM-DD')
-     and rs.published_date <= to_char(current_date + 1, 'YYYY-MM-DD')
-     and btrim(rs.title) <> ''
-     and rs.official_url ~* '^https?://'
-     and (
-           rs.source in ('ECA Academy', 'ISPE', 'EMA', 'Federal Register', 'OpenFDA Recall',
-                         'Health Canada', 'MHRA Inspectorate', 'PIC/S', 'WHO')
-        or (rs.source = 'MFDS' and rs.source_kind in
-              ('guidance-industry', 'guidance-internal', 'legislative-notice', 'regulation-final'))
-     )
-     and coalesce((rs.row_json::jsonb) ->> 'qa_relevance', '') <> 'Unrelated'
-     and not exists (select 1 from public.findings f where f.raw_signal_id = rs.raw_signal_id)
-   order by rs.published_date desc, rs.source, rs.source_kind, rs.title
+  -- [11-10 dry-run] 전 행에 정규식·jsonb 캐스트를 먼저 걸면 2.0s(anon 3초 근접). 소스·날짜로 먼저 좁힌 뒤
+  -- 나머지 조건을 거는 materialized CTE 로 72ms, 결과 403행 동일.
+  with c as materialized (
+    select rs.raw_signal_id, rs.source, rs.source_kind, rs.published_date, btrim(rs.title) as title,
+           rs.official_url, rs.row_json
+      from public.raw_signals rs
+     where p_days between 1 and 400
+       and (rs.source in ('ECA Academy', 'ISPE', 'EMA', 'Federal Register', 'OpenFDA Recall',
+                          'Health Canada', 'MHRA Inspectorate', 'PIC/S', 'WHO')
+            or (rs.source = 'MFDS' and rs.source_kind in
+                  ('guidance-industry', 'guidance-internal', 'legislative-notice', 'regulation-final')))
+       and rs.published_date >= to_char(current_date - p_days, 'YYYY-MM-DD')
+       and rs.published_date <= to_char(current_date + 1, 'YYYY-MM-DD')
+  )
+  select c.source, c.source_kind, c.published_date, c.title, c.official_url
+    from c
+   where c.published_date ~ '^\d{4}-\d{2}-\d{2}$'
+     and c.title <> ''
+     and c.official_url ~* '^https?://'
+     and coalesce((c.row_json::jsonb) ->> 'qa_relevance', '') <> 'Unrelated'
+     and not exists (select 1 from public.findings f where f.raw_signal_id = c.raw_signal_id)
+   order by c.published_date desc, c.source, c.source_kind, c.title
    limit 3000
 $$;
 

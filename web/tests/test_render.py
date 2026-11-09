@@ -1670,11 +1670,13 @@ class WebFindingsRenderTest(unittest.TestCase):
         tabs, sep, more = nav_m.group(1).partition('<span class="navmore">')
         self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
         self.assertNotIn(">이번 주<", tabs)
-        self.assertEqual(tabs.count("<a "), 6, "nav 탭은 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내 6개여야 함")
+        self.assertEqual(tabs.count("<a "), 5, "nav 탭은 주간 브리프·지적사항·자료실·용어사전·이용안내 5개여야 함(1안: 트렌드는 지적사항 탭)")
         self.assertIn("이번 주 소식", self.html)  # CTA 버튼은 유지
         # 서랍에는 헤더 한 줄에서 밀려난 것들이 들어간다 — 휴대폰에서 유일한 도달 경로다.
-        for label in ("주간 퀴즈", "이번 주 소식"):
-            self.assertIn(label, more, f"서랍에 '{label}' 이 없다(휴대폰에서 도달 불가)")
+        self.assertIn("주간 퀴즈", more, "서랍에 '주간 퀴즈' 가 없다(휴대폰에서 도달 불가)")
+        # [1안 2026-11-10] 서랍의 '이번 주 소식'은 주간 브리프 탭과 중복이라 뺐다 —
+        # 이번 주 호는 아카이브 맨 위 블록이 연다.
+        self.assertNotIn("이번 주 소식", more)
 
     def test_footer_link_present(self):
         # [푸터 확정 2026-09-06] 푸터 라벨은 헤더보다 한 겹 더 설명적이다 — 헤더는 이미 그
@@ -4004,11 +4006,8 @@ class WebTrendsRenderTest(unittest.TestCase):
         self.assertIn(f"<loc>{render.SITE_BASE_URL}/findings/trends/</loc>", self.sitemap)
 
     def test_nav_link_present_and_active_state(self):
-        self.assertIn('href="../../findings/trends/index.html" class="on">트렌드</a>', self.html)
-        self.assertIn('href="findings/trends/index.html">트렌드</a>', self.landing)
-        self.assertIn('href="../findings/trends/index.html">트렌드</a>', self.archive)
-        self.assertIn('href="../findings/trends/index.html">트렌드</a>', self.findings_html)
-        # 트렌드 페이지 자체에서만 '지적사항'은 on 이 아니고, '트렌드'만 on.
+        # [1안 메뉴 정리 2026-11-10] '트렌드'는 상단 nav 탭이 아니라 지적사항 세그의 탭이다 —
+        # 트렌드 화면에서는 nav 의 '지적사항'이 켜지고, 세그의 '트렌드'가 aria-current.
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.html, _re.S)
         self.assertIsNotNone(nav_m)
@@ -4016,12 +4015,17 @@ class WebTrendsRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs = nav_m.group(1).partition('<span class="navmore">')[0]
-        self.assertNotIn('class="on">지적사항', tabs)
-        self.assertEqual(tabs.count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
+        self.assertIn('class="on">지적사항', tabs)
+        self.assertNotIn("findings/trends/", tabs)
+        self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
+        seg = self.html[self.html.index('<nav class="fnd-seg"'):]
+        seg = seg[:seg.index("</nav>")]
+        self.assertIn('href="../../findings/trends/index.html" class="on" aria-current="page">트렌드</a>', seg)
 
     def test_footer_link_present(self):
-        # [푸터 확정 2026-09-06] 헤더 탭은 '트렌드', 푸터는 '규제 동향'(위 findings 동류).
-        self.assertIn('<a href="../../findings/trends/index.html">규제 동향</a>', self.html)
+        # [1안 2026-11-10] 푸터 도구 열은 지적사항 탭과 같은 이름 '트렌드'(종전 콘텐츠 열의 '규제 동향'은 중복이라 뺐다).
+        self.assertIn('<a href="../../findings/trends/index.html">트렌드</a>', self.html)
+        self.assertNotIn("규제 동향</a>", self.html)
 
     def test_findings_zone_links_to_trends(self):
         """[2면 분리 2026-08-27] 검색 면의 히어로 링크 행("전체 트렌드 보기")은 세그와
@@ -5902,7 +5906,7 @@ class WebTrendsRecentWindowTest(unittest.TestCase):
         # [존 재편] 스코프 CSS 는 세 면이 함께 include 하는 파셜로 옮겼다. 재는 것은
         # 그대로다 — 동결된 grm.css 에 들어가지 않았는가.
         for rule in (".tr-rc-row{", ".tr-mv-row{", ".tr-ex{",
-                     ".tr-agency-btn{", ".tr-rank-sub{", ".tr-seg a{"):
+                     ".tr-agency-btn{", ".tr-rank-sub{"):
             self.assertIn(rule, self.style_src)
         # 업체 찾기 CSS 는 firm/inspector 전용 파셜로 이사했다(그 폼이 그리로 갔다).
         lookup_src = (WEB_DIR / "partials" / "lookup_style.html").read_text(encoding="utf-8")
@@ -6758,7 +6762,7 @@ class WebFirmRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs, _sep, more = nav_m.group(1).partition('<span class="navmore">')
-        self.assertEqual(tabs.count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
+        self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
         # 서랍의 언어 전환 링크는 **같은 페이지의 영어판**을 가리키므로 경로가 통째로
         # 겹친다(en/{route}/) — 그 하나 때문에 부분일치가 오탐한다. 탭 승격 여부를
         # 묻는 가드이므로 탭 행을 보고, 서랍은 언어 링크만 뺀 나머지로 본다(서랍에
@@ -7016,7 +7020,7 @@ class WebInspectorRenderTest(unittest.TestCase):
         # 에서만 펼쳐지는 서랍 전용 묶음(.navmore). "탭 과밀 금지"가 지키려는 것은
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs, _sep, more = nav_m.group(1).partition('<span class="navmore">')
-        self.assertEqual(tabs.count("<a "), 6)  # 주간 브리프·지적사항·트렌드·자료실·용어사전·이용안내
+        self.assertEqual(tabs.count("<a "), 5)  # 주간 브리프·지적사항·자료실·용어사전·이용안내
         # 서랍의 언어 전환 링크는 **같은 페이지의 영어판**을 가리키므로 경로가 통째로
         # 겹친다(en/{route}/) — 그 하나 때문에 부분일치가 오탐한다. 탭 승격 여부를
         # 묻는 가드이므로 탭 행을 보고, 서랍은 언어 링크만 뺀 나머지로 본다(서랍에
@@ -8032,7 +8036,7 @@ class WebMePageTest(unittest.TestCase):
         self.assertTrue(sep0, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
         self.assertIn('me/index.html">마이페이지</a>', drawer)   # 헤더 서랍(정적)
         self.assertIn("me/index.html", self.reactions_js)        # 계정 메뉴(런타임)
-        # nav 탭 수는 그대로 6개(과밀 금지).
+        # nav 탭 수는 5개(과밀 금지 · 1안에서 트렌드가 지적사항 탭으로).
         import re as _re
         nav_m = _re.search(r'<nav id="navmenu">(.*?)</nav>', self.landing_on, _re.S)
         # [모바일 헤더 2026-09-06] nav 안은 두 묶음이다 — 데스크톱 탭 행과, 좁은 폭
@@ -8040,7 +8044,7 @@ class WebMePageTest(unittest.TestCase):
         # **탭 행**이므로 세는 대상도 탭 행이어야 한다(서랍은 아래에서 따로 본다).
         tabs, sep, more = nav_m.group(1).partition('<span class="navmore">')
         self.assertTrue(sep)
-        self.assertEqual(tabs.count("<a "), 6)
+        self.assertEqual(tabs.count("<a "), 5)
         self.assertNotIn("마이페이지", tabs)
         # [모바일 헤더 2026-09-06] 세 번째 진입점 — 햄버거 서랍. 휴대폰에는 헤더 계정
         # 메뉴가 뜰 자리가 없고 footer 는 스크롤 끝이라, 같은 env-gate 로 서랍에도 둔다.
@@ -15092,7 +15096,7 @@ class WebAboutTest(unittest.TestCase):
         # 대상도 탭 행이다(서랍은 헤더 한 줄에서 밀려난 것들의 유일한 도달 경로).
         tabs, sep, more = nav.partition('<span class="navmore">')
         self.assertTrue(sep, "서랍 전용 묶음(.navmore)이 nav 에서 사라졌다")
-        self.assertEqual(tabs.count("<a "), 6)
+        self.assertEqual(tabs.count("<a "), 5)
         self.assertNotIn('class="on"', nav)
         # 소개는 탭에도 서랍에도 올리지 않는다 — 진입은 푸터 '서비스' 열 하나로 유지한다.
         # 단 서랍의 언어 전환 링크는 **이 페이지의 영어판**(`../en/about/`)을 가리켜
@@ -15665,7 +15669,8 @@ class WebZoneIaTest(unittest.TestCase):
             self.assertIn(rel, self.pages, f"{rel} 미산출")
         # 데이터 현황은 세그먼트에 자기 탭이 없다(활성 표시도 없다).
         cov = self.pages["findings/coverage/index.html"]
-        self.assertIn('class="tr-seg"', cov)
+        # [1안 2026-11-10] 트렌드 존 세그는 지적사항 세그(fnd-seg)로 합쳤다.
+        self.assertIn('class="fnd-seg"', cov)
         self.assertNotIn('aria-current="page"', cov)
         # 대신 두 면의 꼬리 각주가 이 페이지를 연다.
         for face in ("findings/trends/index.html", "findings/inspections/index.html"):
@@ -15674,7 +15679,7 @@ class WebZoneIaTest(unittest.TestCase):
     def test_segment_nav_links_all_faces_and_marks_active(self):
         for rel, seg in self.ZONE_FACES.items():
             html = self.pages[rel]
-            self.assertIn('class="tr-seg"', html, f"{rel} 에 면 전환 세그먼트가 없다")
+            self.assertIn('class="fnd-seg"', html, f"{rel} 에 면 전환 세그먼트가 없다")
             for other in self.ZONE_FACES:
                 href = "../../" + other.rsplit("/index.html", 1)[0] + "/index.html"
                 self.assertIn(f'href="{href}"', html, f"{rel} → {other} 링크 없음")
@@ -16197,8 +16202,9 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
                              ("inspector", self.inspector)):
             with self.subTest(page=label):
                 seg = self._seg_block(html)
-                self.assertEqual(seg.count("<a "), 3 + len(extra), f"{label} 페이지 세그먼트 탭 수")
-                for text in ("검색", "둘러보기", "실사관"):
+                # [1안 2026-11-10] 트렌드·실사 결과 탭이 합류 — 5 + 바로가기.
+                self.assertEqual(seg.count("<a "), 5 + len(extra), f"{label} 페이지 세그먼트 탭 수")
+                for text in ("검색", "둘러보기", "트렌드", "실사 결과", "실사관"):
                     self.assertIn(f">{text}</a>", seg, f"{label} 페이지에 '{text}' 탭 없음")
                 for path, text in extra:
                     self.assertIn(f'findings/{path[len("findings/"):]}index.html">{text}</a>', seg,

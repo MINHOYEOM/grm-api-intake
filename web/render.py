@@ -3474,6 +3474,41 @@ def finding_body(f: dict[str, Any], lang: str = DEFAULT_LANG) -> str:
     return (f.get("text_orig") or "").strip() or ko
 
 
+# [SEO 2026-11-09] 얇은 문서·업체 페이지는 **구글봇에만** noindex 를 건다.
+# 왜: 11-09 Search Console 에서 구글이 사이트를 알고리즘적으로 강등했고, "발견됨/크롤링됨 -
+# 현재 색인 안 됨" 2,793장이 대부분 본문이 얇은 문서·업체 페이지(한국어·영어 모두)였다.
+# 네이버가 우리 주 검색 유입이므로 `name="robots"` 는 쓰면 안 된다(네이버까지 빠진다) —
+# `name="googlebot"` 만 쓴다. 판정은 렌더 입력(지적 수·본문 바이트)만으로 결정론이다.
+# 임계 근거(11-09 실측, findings_docs.json): 문서 지적 본문 바이트 중앙값 ko 881 · en 872,
+# 상위 10% 2.1KB. 보수적으로 "지적 4건 이하 **그리고** 본문 2KB 이하"만 얇다고 본다
+# (ko 1,176 / 3,565 · en 1,177 / 3,415). 업체는 "문서 2건 **그리고** 대표 발췌 합 2KB 이하".
+# 경계에 걸리면 색인 가능 쪽으로 둔다.
+THIN_DOC_MAX_FINDINGS = 4
+THIN_DOC_MAX_BYTES = 2048
+THIN_FIRM_MAX_DOCS = 2
+THIN_FIRM_MAX_EXCERPT_BYTES = 2048
+
+
+def _utf8_len(text: str) -> int:
+    return len(text.encode("utf-8"))
+
+
+def is_thin_doc_page(doc: dict[str, Any], lang: str = DEFAULT_LANG) -> bool:
+    """문서 페이지(findings_doc.html)가 얇은가 — 지적 수·그 언어 본문 바이트로만 판정."""
+    findings = doc.get("findings") or []
+    total = sum(_utf8_len(finding_body(f, lang)) for f in findings)
+    return len(findings) <= THIN_DOC_MAX_FINDINGS and total <= THIN_DOC_MAX_BYTES
+
+
+def is_thin_firm_page(firm: dict[str, Any], lang: str = DEFAULT_LANG) -> bool:
+    """업체 페이지(findings_firm_page.html)가 얇은가 — 그 언어 트리의 문서 수와, 페이지에
+    실제로 실리는 문서별 대표 발췌(첫 지적) 바이트 합으로만 판정."""
+    docs = firm.get("documents") or []
+    excerpt = sum(_utf8_len(finding_body(d["findings"][0], lang))
+                  for d in docs if d.get("findings"))
+    return len(docs) <= THIN_FIRM_MAX_DOCS and excerpt <= THIN_FIRM_MAX_EXCERPT_BYTES
+
+
 def doc_finding_anatomy(doc: dict[str, Any], f: dict[str, Any], lang: str,
                         link) -> "dict[str, Any] | None":
     """경고서한 지적 1건을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈 표시용 뷰.
@@ -6597,6 +6632,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                          (_tr("문서로 찾기"), "findings/docs/")),
                         (doc["firm_name"], "")]),
                     doc=_doc, agency_labels=_labels,
+                    thin_page=is_thin_doc_page(doc, _lg),
                     source_label=doc_source_label(doc),
                     # [실사관 표기 · 정적 문서 페이지 2026-08-31] 최대 3명 + "외 N명"
                     # 조립된 표시 문자열(빈 값이면 템플릿이 행 자체를 렌더하지 않는다).
@@ -6662,6 +6698,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                              (_tr("홈"), "/"), (_tr("지적사항"), "findings/"),
                              (_tr("문서로 찾기"), "findings/docs/"), (fp["name"], "")]),
                          firm=_fp, agency_labels=agency_labels_by_lang[_lg],
+                         thin_page=is_thin_firm_page(fp, _lg),
                          measured_on=docs_data.get("measured_on", ""),
                          min_findings=docs_data.get("min_findings"))
 

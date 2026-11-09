@@ -1,4 +1,5 @@
-{#- [지적사항 존 면 전환 2026-08-27, 2026-08-31 3면 확장] 검색 · 둘러보기 · 실사관.
+{#- [지적사항 존 면 전환 2026-08-27 · 2026-11-10 1안] 검색 · 둘러보기 · 트렌드 · 실사 결과 ·
+    FDA 지적 조항 · 지적 사례 · 실사관.
 
     ★왜 갈랐나(사용자 피드백): 발견 허브(#811)가 목적 카드·최근 문서·축 탐색·상세 검색을
     한 페이지에 쌓아 "너무 많은 정보가 한 페이지에 담겨 잘 못 쓰겠다"는 피드백을 받았다.
@@ -21,17 +22,19 @@
    들여쓰기는 조건 안에 둔다(참일 때 원래 바이트 보존 · 거짓일 때 빈 줄 0). #}
 {% if lang == 'ko' or 'findings/browse/' in en_paths %}  <a href="{{ rel_root }}findings/browse/index.html"{% if seg_active == 'browse' %} class="on" aria-current="page"{% endif %}>{{ _("둘러보기") }}</a>
 {% endif %}
-  <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>
+{# [1안 메뉴 정리 2026-11-10] 트렌드 존(지적 경향·실사 결과)을 이 세그로 합쳤다 — 상단 nav 의
+   '트렌드' 탭과 존 전용 세그(trends_seg)는 없앴다. 지적사항 안 어느 화면에서든 같은 탭 한 줄. #}
+  <a href="{{ rel_root }}findings/trends/index.html"{% if seg_active == 'trends' %} class="on" aria-current="page"{% endif %}>{{ _("트렌드") }}</a>
+  <a href="{{ rel_root }}findings/inspections/index.html"{% if seg_active == 'inspections' %} class="on" aria-current="page"{% endif %}>{{ _("실사 결과") }}</a>
 {# [진입점 2026-11-09] 지적 조항·지적 사례 화면은 둘러보기 카드 안 링크 하나뿐이라 대표가
    메뉴에서 못 찾았다 — 지적사항 존의 하위 진입(이 세그)에 같은 줄로 둔다. 면 집합(en_paths)
    에 있을 때만 — 정본이 없는 빌드에서 없는 페이지로 보내지 않는다(ko·en 공통 선언). #}
-{% if 'findings/citations/' in en_paths %}  <a href="{{ rel_root }}findings/citations/index.html">{{ _("FDA 지적 조항") }}</a>
+{% if 'findings/citations/' in en_paths %}  <a href="{{ rel_root }}findings/citations/index.html"{% if seg_active == 'citations' %} class="on" aria-current="page"{% endif %}>{{ _("FDA 지적 조항") }}</a>
 {% endif %}
-{% if 'findings/examples/' in en_paths %}  <a href="{{ rel_root }}findings/examples/index.html">{{ _("지적 사례") }}</a>
+{% if 'findings/examples/' in en_paths %}  <a href="{{ rel_root }}findings/examples/index.html"{% if seg_active == 'examples' %} class="on" aria-current="page"{% endif %}>{{ _("지적 사례") }}</a>
 {% endif %}
+  <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>
 </nav>
-{#- 시각 언어는 트렌드 존 세그(.tr-seg)와 동형 — 같은 사이트에서 "면 전환"이 두 가지
-    모양이면 사용자가 같은 장치임을 알아보지 못한다. 셀렉터만 존 스코프로 다르다. -#}
 <style>
 .fnd-seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 34px;padding-bottom:0;border-bottom:1px solid var(--line)}
 .fnd-seg a{display:inline-block;padding:9px 16px 11px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color var(--tr),border-color var(--tr)}

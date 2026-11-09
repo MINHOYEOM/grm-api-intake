@@ -6066,14 +6066,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 트렌드 대시보드(FIND-1 F3b) — findings 와 동일 이유로 라이브 데이터는 빌드시 고정할
     # 수 없다(집계는 Supabase RPC findings_stats/findings_firm_stats 를 trends.js 가 직접
     # fetch). 서버는 셸(로딩 상태)만 렌더.
-    # [존 재편 2026-08-26] 트렌드 존은 이제 세 면이다(지적 경향 / 실사 결과 / 데이터 현황).
-    # nav 탭은 '트렌드' 하나로 유지하고(저장소 'nav 과밀 금지' 원칙) 면 전환은
-    # partials/trends_seg.html 이 맡는다 — seg_active 가 그 파셜의 활성 탭을 정한다.
+    # [1안 메뉴 정리 2026-11-10] 트렌드·실사 결과는 지적사항 존의 탭이다 — 상단 nav 의
+    # '트렌드' 탭은 없앴고(nav_active="findings"), 면 전환은 partials/findings_seg.html
+    # 하나가 맡는다(seg_active 가 활성 탭). 데이터 현황·체크리스트는 탭이 아니다(seg_active="").
     # 세 면 모두 trends.html 계열 셸이라 nav_active 는 동일하고, 셸의
     # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
     emit("trends.html", page("findings/trends/"),
         page_title=tr("규제 지적사항 트렌드 · GRM"),
-        nav_active="trends",
+        nav_active="findings",
         seg_active="trends",
         description=tr(TRENDS_DESCRIPTION),
     )
@@ -6084,7 +6084,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 필요 없어진다 — 분모가 다른 것을 같은 페이지에 두지 않는 것이 이 재편의 핵심이다.
     emit("inspections.html", page("findings/inspections/"),
         page_title=tr("FDA 실사 결과 · GRM"),
-        nav_active="trends",
+        nav_active="findings",
         seg_active="inspections",
         description=tr(INSPECTIONS_DESCRIPTION),
     )
@@ -6098,7 +6098,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   두고, 두 면의 꼬리 각주가 이 페이지를 연다(숫자를 의심하는 사람만 마주친다).
     emit("coverage.html", page("findings/coverage/"),
         page_title=tr("데이터 현황 · GRM"),
-        nav_active="trends",
+        nav_active="findings",
         seg_active="",
         description=tr(COVERAGE_DESCRIPTION),
     )
@@ -6117,7 +6117,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # checklist.js 가 조립). 서버는 셸(설정 바 + 로딩 상태)만 렌더한다.
     emit("checklist.html", page("findings/checklist/"),
         page_title=tr("자가점검 체크리스트 · GRM"),
-        nav_active="trends",
+        nav_active="findings",
         description=tr(CHECKLIST_DESCRIPTION),
     )
 
@@ -6256,6 +6256,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for group in glossary_en_view["groups"]:
                 for term in group["terms"]:
                     en_emit("glossary_term.html", en_page(f"glossary/{term['id']}/"),
+                        next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
                         page_title=glossary_term_page_title(term, en_tr),
                         nav_active="glossary",
                         description=glossary_term_description(term, en_tr),
@@ -6279,6 +6280,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         for group in glossary_view["groups"]:
             for term in group["terms"]:
                 emit("glossary_term.html", page(f"glossary/{term['id']}/"),
+                    next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
                     page_title=glossary_term_page_title(term, tr),
                     nav_active="glossary",
                     description=glossary_term_description(term, tr),
@@ -6942,6 +6944,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     _views.append(_a if _a is not None else {"body": _link(finding_body(f, _lg))})
                 _anat = _views if any("lead" in v for v in _views) else None
                 _emit("findings_doc.html", _pp,
+                    next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
                     page_title=_tr("{title} · GRM",
                                    title=doc_titles_by_lang[_lg][doc["slug"]]),
                     nav_active="findings",
@@ -7033,6 +7036,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                         "categories": [_tr(c) for c in fp["categories"]]}
                     firm_page = _mkpage(f"findings/firm/{fp['slug']}/")
                     _emit("findings_firm_page.html", firm_page,
+                         next_strip=True,  # [1안 2026-11-10] 본문 끝 '다음으로 볼 것'(base.html)
                          page_title=_tr("{name} 지적사항 이력 · GRM", name=fp["name"]),
                          nav_active="findings",
                          description=_tr(
@@ -7378,22 +7382,22 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     )
     en_emit("trends.html", en_page("findings/trends/"),
         page_title=en_tr("규제 지적사항 트렌드 · GRM"),
-        nav_active="trends", seg_active="trends",
+        nav_active="findings", seg_active="trends",
         description=en_tr(TRENDS_DESCRIPTION),
     )
     en_emit("inspections.html", en_page("findings/inspections/"),
         page_title=en_tr("FDA 실사 결과 · GRM"),
-        nav_active="trends", seg_active="inspections",
+        nav_active="findings", seg_active="inspections",
         description=en_tr(INSPECTIONS_DESCRIPTION),
     )
     en_emit("coverage.html", en_page("findings/coverage/"),
         page_title=en_tr("데이터 현황 · GRM"),
-        nav_active="trends", seg_active="",
+        nav_active="findings", seg_active="",
         description=en_tr(COVERAGE_DESCRIPTION),
     )
     en_emit("checklist.html", en_page("findings/checklist/"),
         page_title=en_tr("자가점검 체크리스트 · GRM"),
-        nav_active="trends",
+        nav_active="findings",
         description=en_tr(CHECKLIST_DESCRIPTION),
     )
     en_emit("firm.html", en_page("findings/firm/"),

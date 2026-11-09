@@ -38,7 +38,7 @@
     <p class="reveal" style="animation-delay:.14s"><span class="ln">{{ _("트렌드 수치를 어디까지 믿어도 되는지 판단하는 데 필요한 것들입니다.") }}</span> <span class="ln">{{ _("무엇을 어느 기관에서 얼마나 모았고, 연도마다 확보량이 얼마나 다른지를 그대로 보여줍니다.") }}</span></p>
   </div>
   <div class="wrap">
-    {% include "partials/trends_seg.html" %}
+    {% include "partials/findings_seg.html" %}
     <div id="grm-findings-cfg" data-url="{{ supabase_url }}" data-key="{{ supabase_anon_key }}" data-root="{{ rel_root }}" data-page="coverage" hidden></div>
 
     <div class="tr-state" id="tr-loading" role="status" aria-live="polite">

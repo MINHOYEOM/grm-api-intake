@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [해외 지적 사례 전체 2026-11-10] /findings/examples/pmda/ · /findings/examples/mhra/ — 기관 하나의 지적 문장 전부.
+    데이터 = web/data/deficiency_cases.json → deficiency_cases_page.cases_view. 네트워크 0.
+    ★전 행을 서버가 HTML 로 낸다(검색엔진이 읽는다). 필터·검색은 아래 인라인 스크립트가 행에 hidden 을
+      붙였다 뗄 뿐이고, 스크립트가 없으면 필터 막대는 숨은 채 전체 목록이 그대로 보인다.
+    ★본문은 원문(영어) 그대로 — 번역·요약·해석을 만들지 않는다. 긴 문장은 잘리고 원문 파일로 잇는다. -#}
+{% include "partials/deficiency_cases_style.html" %}
+<main>
+  <div class="wrap">
+    <nav class="dc-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i>{% if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/">{{ _('지적 사례') }}</a><i>&rsaquo;</i>{% endif %}<span>{{ dc.agency }}</span>
+    </nav>
+    {%- if dc.agency == 'PMDA' %}
+    <p class="kick">PMDA &middot; Japan</p>
+    <h1 class="dc-h1">{{ _('일본 PMDA 실사 지적 사례 전체') }}</h1>
+    <p class="dc-sum">{{ _('PMDA 가 GMP 실사 연차보고서 별첨으로 공개한 지적 {n}건을 원문(영문판) 그대로 모았습니다. {years}.', n="{:,}".format(dc.total), years=dc.years | join(' · ')) }}</p>
+    <p class="dc-note">{{ _('업체명은 원문에서 이미 지워져 있고 수치·로트는 ● 로 가려져 있습니다. 연도는 일본 회계연도(FY2025 = 2025년 4월~2026년 3월)입니다. 같은 지적의 일본어 원문은 아래 연도별 원문 파일에 있습니다.') }}</p>
+    {%- else %}
+    <p class="kick">MHRA &middot; UK</p>
+    <h1 class="dc-h1">{{ _('영국 MHRA 실사 지적 사례 전체') }}</h1>
+    <p class="dc-sum">{{ _('MHRA 가 GMP 실사 지적 경향 보고서에 예시로 실은 지적 문장 {n}건을 원문 그대로 모았습니다. {years}.', n="{:,}".format(dc.total), years=dc.years | join(' · ')) }}</p>
+    <p class="dc-note">{{ _('업체명은 없습니다. 기관 분류(EU GMP 장·부속서)는 보고서의 쪽 제목을 따랐습니다.') }}</p>
+    {%- endif %}
+    <p class="dc-note">{{ _('번역하지 않았습니다. 영역 분류는 기관 분류나 문장 낱말을 GRM 분류에 맞춘 것이어서 기관의 판단과 다를 수 있습니다. 긴 문장은 중간에서 자르고(…) 원문 파일로 잇습니다. {date} 기준.', date=dc.measured_on) }}</p>
+    <ul class="dc-src">
+      {%- for f in dc.files %}
+      <li><a href="{{ f.url }}" target="_blank" rel="noopener">{{ _('원문 파일 {year}', year=f.year) }}{% if dc.agency == 'PMDA' %} ({{ _('일본어') if f.lang == 'ja' else _('영문판') }}){% endif %}</a></li>
+      {%- endfor %}
+    </ul>
+    {% include "partials/deficiency_cases_tabs.html" %}
+
+    <form class="dc-bar" id="dc-bar" role="search" hidden>
+      <label class="sr-only" for="dc-q">{{ _('낱말') }}</label>
+      <input id="dc-q" type="search" placeholder="{{ _('영어 낱말로 찾기 (예: audit trail)') }}" autocomplete="off" spellcheck="false" />
+      <label class="sr-only" for="dc-c">{{ _('영역') }}</label>
+      <select id="dc-c">
+        <option value="">{{ _('모든 영역') }}</option>
+        {%- for c in dc.cats %}
+        <option value="{{ c.code }}">{{ c.label }} ({{ c.n }})</option>
+        {%- endfor %}
+      </select>
+      <label class="sr-only" for="dc-y">{{ _('연도') }}</label>
+      <select id="dc-y">
+        <option value="">{{ _('모든 연도') }}</option>
+        {%- for y in dc.years %}
+        <option value="{{ y }}">{{ y }}</option>
+        {%- endfor %}
+      </select>
+    </form>
+    <p class="dc-shown" id="dc-top">{{ _('조건에 맞는 사례') }} <b id="dc-shown">{{ "{:,}".format(dc.total) }}</b></p>
+    <div class="dc-list" id="dc-rows">
+      {%- for r in dc.rows %}
+      <article class="dc-i" data-c="{{ r.cat }}" data-y="{{ r.year }}"><blockquote lang="en">{{ r.text }}</blockquote><p class="dc-m"><span>{{ r.year }}{% if r.ref %} &middot; {{ r.ref }}{% endif %}</span>{% if r.cat_label %}<span>{{ r.cat_label }}</span>{% endif %}{% if r.acat %}<span lang="en">{{ r.acat }}</span>{% endif %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ _('원문 파일') }}</a></p></article>
+      {%- endfor %}
+    </div>
+    <p class="dc-empty" id="dc-empty" hidden>{{ _('조건에 맞는 사례가 없습니다.') }}</p>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}<script>
+(function () {
+  var bar = document.getElementById("dc-bar"), box = document.getElementById("dc-rows");
+  if (!bar || !box) return;
+  var q = document.getElementById("dc-q"), c = document.getElementById("dc-c"), y = document.getElementById("dc-y");
+  var shown = document.getElementById("dc-shown"), empty = document.getElementById("dc-empty");
+  var rows = Array.prototype.map.call(box.children, function (el) {
+    return { el: el, t: (el.textContent || "").toLowerCase(), c: el.getAttribute("data-c"), y: el.getAttribute("data-y") };
+  });
+  function hasOpt(sel, v) {
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === v) return true;
+    return false;
+  }
+  function apply() {
+    var words = (q.value || "").toLowerCase().split(/\s+/).filter(Boolean), n = 0;
+    rows.forEach(function (r) {
+      var ok = (!c.value || r.c === c.value) && (!y.value || r.y === y.value) &&
+               words.every(function (w) { return r.t.indexOf(w) >= 0; });
+      r.el.hidden = !ok;
+      if (ok) n++;
+    });
+    shown.textContent = n.toLocaleString("en-US");
+    empty.hidden = n > 0;
+  }
+  var p = new URLSearchParams(location.search);
+  q.value = (p.get("q") || "").slice(0, 80);
+  if (hasOpt(c, p.get("c") || "")) c.value = p.get("c") || "";
+  if (hasOpt(y, p.get("y") || "")) y.value = p.get("y") || "";
+  [q, c, y].forEach(function (el) { el.addEventListener(el === q ? "input" : "change", apply); });
+  bar.addEventListener("submit", function (e) { e.preventDefault(); });
+  bar.hidden = false;
+  apply();
+})();
+</script>{% endblock %}

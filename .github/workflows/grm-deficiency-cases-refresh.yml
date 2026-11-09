@@ -1,0 +1,103 @@
+name: GRM Deficiency Cases Snapshot Refresh
+
+# [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 지적 사례 전체 화면(/findings/examples/pmda·mhra·mhra-data/)
+# 과 조항·용어 페이지 블록의 정본 `web/data/deficiency_cases.json` 을 다시 뽑는다
+# (deficiency_cases_refresh.py -> 게이트 -> 변경 있을 때만 PR). 사람이 머지한다(자동 머지 없음).
+#
+# ★dispatch 전용 — 원천(PMDA 연차보고서 별첨·MHRA 지적 원자료)은 연 1회 바뀐다. 수집(grm-deficiency-examples.yml)
+#   이 새 파일을 적재한 뒤 사람이 돌린다. schedule 은 붙이지 않는다.
+# ★service-role 키를 쓴다 - deficiency_examples(134)는 RLS 로 닫혀 있다(anon 회수, 그대로 둔다).
+#   스냅샷에는 공개 필드만(영어 지적 문장·기관·연도·기관 분류·우리 분류·조항 키 + MHRA 조항 집계).
+#   PMDA 배경 설명(context)·익명 실사 ID·국가는 싣지 않는다. 새 secret 없음(기존 재사용).
+# ★게이트: 0행·형식 위반·전체 행 수 직전 대비 max_drop_pct 이상 감소면 PR 없이 실패.
+#   내용이 같으면(measured_on 만 다름) PR 도 없다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_drop_pct:
+        description: '전체 행 수가 직전 대비 이 비율(%) 이상 줄면 실패(PR 없음)'
+        required: true
+        default: '20'
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: grm-deficiency-cases-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MAX_DROP_PCT: ${{ inputs.max_drop_pct || '20' }}
+      BRANCH: automation/deficiency-cases-snapshot-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/deficiency_cases.json
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      # 스크립트가 게이트를 판정한다: 0 = 썼다 · 10 = 변경 없음 · 그 밖 = 실패(파일 무변경).
+      - name: Build snapshot (service-role read)
+        id: snap
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set +e
+          python deficiency_cases_refresh.py --out "$DATA_PATH" --max-drop-pct "$MAX_DROP_PCT"
+          RC=$?
+          set -e
+          if [ "$RC" -eq 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$RC" -eq 10 ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "지적 사례 스냅샷 변경 없음 - PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "스냅샷 실패(rc=$RC) - PR 없이 실패합니다. 위 로그 참조." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: Create candidate branch and open PR
+        if: steps.snap.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git switch -c "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$DATA_PATH"
+          git commit -m "chore: refresh PMDA·MHRA deficiency cases snapshot"
+          git push -u origin "$BRANCH"
+          TOTALS=$(jq -r '"기준일 \(.measured_on) · 원천 행 \(.totals.rows) · 문장 사례 \(.totals.cases) · PMDA 영문 \(.totals.by_kind.pmda_en) · PMDA 일본어 \(.totals.by_kind.pmda_ja) · MHRA 예시 \(.totals.by_kind.mhra_trend_pdf) · MHRA 조항 행 \(.totals.by_kind.mhra_xlsx) · 조항 문단 \(.clause_counts | length)"' "$DATA_PATH")
+          cat > "$RUNNER_TEMP/pr-body.md" <<EOF
+          PMDA·MHRA 지적 사례 화면 정본 갱신(\`deficiency_cases_refresh.py\`, 원천 \`deficiency_examples\`).
+
+          ## 실측
+          $TOTALS
+
+          ## 게이트
+          - 0행·형식 위반·전체 행 수 ${MAX_DROP_PCT}% 이상 감소 시 이 PR 은 만들어지지 않는다
+          - 공개 필드만(PMDA 배경 설명·익명 실사 ID·국가 없음) · 내용이 같으면 PR 없음
+
+          자동 머지 없음 - CI 초록 확인 후 사람이 머지한다.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh PMDA·MHRA deficiency cases snapshot" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+
+      # GITHUB_TOKEN 이 연 PR 은 CI 를 깨우지 않는다 -> 수동 dispatch 로 체크런을 붙인다(대기·머지 없음).
+      - name: Dispatch CI for the candidate
+        if: steps.snap.outputs.changed == 'true'
+        run: gh workflow run grm-ci.yml --ref "$BRANCH"

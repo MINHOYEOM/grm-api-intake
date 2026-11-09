@@ -1942,5 +1942,17 @@
   "💊 합성의약품": "💊 Small molecule",
   "🦉 아쉬워요 — 해설로 근거를 확인해 보세요.": "🦉 Not quite — check the explanation for the source.",
   "🦉 정답이에요!": "🦉 Correct!",
-  "🧬 바이오의약품": "🧬 Biologics"
+  "🧬 바이오의약품": "🧬 Biologics",
+  "FDA 지적 조항 제조소 전체 목록 · GRM": "All Facilities Cited Under FDA CFR Sections · GRM",
+  "FDA 실사에서 21 CFR 조항 지적을 받은 제조소 {n}곳 전부 — 국가·실사 수·최근 실사일·지적된 조항을 필터로 찾기.": "All {n} facilities cited under 21 CFR sections in FDA inspections, with country, inspection count, latest inspection date and cited sections; filter by country, firm or section.",
+  "조항별 지적 제조소": "Cited facilities",
+  "FDA 실사에서 조항 지적을 받은 제조소": "Facilities Cited Under CFR Sections in FDA Inspections",
+  "{date} 확인 기준 · 제조소 {n}곳 · {c}개국": "As of {date} · {n} facilities · {c} countries",
+  "FDA Data Dashboard 의 실사 지적(Inspections Citations)을 제조소별로 모았습니다. 조항 옆 작은 숫자는 그 조항이 지적된 실사 수입니다. 사실만 옮겼으며 평가나 해석은 싣지 않습니다.": "Citations from the FDA Data Dashboard (Inspections Citations), grouped by facility. The small number next to a section is the number of inspections that cited it. Facts only, with no evaluation or interpretation.",
+  "GRM 업체 페이지와 확실히 같은 곳으로 확인된 제조소만 이름에 링크가 있습니다. 조항 코드의 짧은 제목은 표 아래에서 볼 수 있고, 조항 페이지가 있는 코드는 눌러서 이동할 수 있습니다.": "Only facilities confirmed to match a GRM company page are linked. FDA's short titles for the section codes are listed below the table; codes with a section page are clickable.",
+  "조항으로 찾기 (예: 211.192)": "Search by section (e.g. 211.192)",
+  "최근 실사": "Latest inspection",
+  "지적된 조항": "Cited sections",
+  "조건에 맞는 제조소가 없습니다.": "No facilities match.",
+  "조항 코드 제목 ({n}개)": "Section code titles ({n})"
 }

@@ -148,6 +148,7 @@ from grm_i18n import (  # noqa: E402
 from wl_anatomy import split_wl_finding  # noqa: E402
 import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
 import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전체 목록 화면 뷰
+import citation_firms_page  # noqa: E402  [FDA 지적 조항 × 업체 전체 목록 2026-11-10]
 import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
@@ -5327,6 +5328,7 @@ DEFICIENCY_CASES_DESCRIPTION = {
     "MHRA": N_("영국 MHRA 가 GMP 실사 지적 경향 보고서에 실은 지적 예시 {n}건 전부 — 원문 그대로, 영역·연도·낱말로 찾기."),
     "MHRA_DATA": N_("영국 MHRA 2018·2019 GMP 실사 지적 원자료에서 EU GMP 장·문단별로 센 인용 횟수 {n}회 — Critical·Major·Other 등급별."),
 }
+CITATION_FIRMS_DESCRIPTION = N_("FDA 실사에서 21 CFR 조항 지적을 받은 제조소 {n}곳 전부 — 국가·실사 수·최근 실사일·지적된 조항을 필터로 찾기.")
 IMPORT_ALERTS_DESCRIPTION = N_("FDA 수입경보 66-40·66-41 에 오른 의약품 제조소 {n}곳(한국 {k}곳) — "
                                "국가·경보 번호·등재일·상태와 FDA 원문 링크.")
 COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
@@ -5819,6 +5821,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     en_paths |= clause_tree_paths(clause_views_en)
     if citations_data:
         en_paths.add("findings/citations/")
+    # [FDA 지적 조항 × 업체 전체 목록 2026-11-10] 스냅샷(web/data/fda_citation_firms.json)이 있고
+    # 양 트리에 선다. 업체 링크는 문서 페이지 매칭이 있을 때만 붙는다(없으면 이름만).
+    citation_firms_data = clause_firms_page.load_snapshot()
+    if citation_firms_data:
+        en_paths.add(citation_firms_page.ROUTE)
     en_paths |= glossary_tree_paths(load_glossary())
     # [지적 사례 화면] 정본(web/data/deficiency_examples.json)이 있을 때만 양 트리에 선언한다.
     example_data = example_page.load_examples()
@@ -6573,6 +6580,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # [수입경보 2단계] 목록 행(스냅샷 firm_key) → 그 언어 트리에 실제로 선 업체 페이지 slug.
     # 업체 페이지 블록(1단계)과 **같은 매칭 결과**에서만 채운다(목록이 따로 매칭하지 않는다).
     ia_firm_slugs: dict[str, dict[str, str]] = {DEFAULT_LANG: {}, "en": {}}
+    # [FDA 지적 조항 × 업체 전체 목록] 제조소 firm_id → 업체 페이지 slug(조항 페이지 블록과 같은 매칭 결과).
+    cf_site_slugs: dict[str, str] = {}
+    cf_en_ok_slugs: set[str] = set()
     if docs_data:
         doc_agency_labels = docs_data.get("agency_labels") or (
             facets.get("agency_labels") if facets else {}) or {}
@@ -6717,6 +6727,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             lambda n: _canonical_firm_key(_normalize_firm_name(n)))
         _cf_slug_by_site = {clause_firms_page.firm_id(s): firm_page_slug_by_key[k]
                             for k, ss in firm_cit_sites.items() for s in ss}
+        cf_site_slugs = _cf_slug_by_site
+        cf_en_ok_slugs = en_firm_slugs
         for _lg, _views, _mk, _em, _t, _labels in (
                 (DEFAULT_LANG, clause_views, page, emit, tr, _clause_agency_labels),
                 ("en", clause_views_en, en_page, en_emit, en_tr,
@@ -7108,6 +7120,30 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 ia=_iav,
             )
         facet_paths.append((import_alerts_page.ROUTE, import_alerts_data["measured_on"]))
+
+    # [FDA 지적 조항 × 업체 전체 목록 2026-11-10] 전 제조소 서버 렌더. 업체 링크 = 조항 페이지 블록과 같은
+    # 매칭(그 언어 트리에 선 페이지만), 조항 링크 = 그 언어 트리에 선 조항 페이지만.
+    if citation_firms_data:
+        for _lg, _pg, _em, _tr in trees:
+            _cfv = citation_firms_page.list_view(
+                citation_firms_data, tr=_tr, lang=_lg,
+                site_slugs={k: v for k, v in cf_site_slugs.items()
+                            if _lg == DEFAULT_LANG or v in cf_en_ok_slugs},
+                clause_slugs=(clause_slugs if _lg == DEFAULT_LANG
+                              else {c["slug"] for c in clause_views_en}),
+                clause_slug=clause_slug)
+            _cfp = _pg(citation_firms_page.ROUTE)
+            _em("findings_citation_firms.html", _cfp,
+                page_title=_tr("FDA 지적 조항 제조소 전체 목록 · GRM"),
+                nav_active="findings",
+                description=_tr(CITATION_FIRMS_DESCRIPTION, n=f"{_cfv['total']:,}"),
+                json_ld=_cfp.breadcrumb_json_ld([
+                    (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                    (_tr("FDA 지적 조항"), "findings/citations/"),
+                    (_tr("조항별 지적 제조소"), "")]),
+                cf=_cfv,
+            )
+        facet_paths.append((citation_firms_page.ROUTE, citation_firms_data["as_of"]))
 
     # [해외 지적 사례 전체 2026-11-10] 기관별 전체 목록(전 행 서버 렌더 — 필터는 인라인 스크립트가 숨길 뿐)
     # + MHRA 조항 집계표. ko·en 같은 함수, 본문은 원문(영어) 그대로.

@@ -7091,7 +7091,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     json_ld=_dcp.breadcrumb_json_ld([
                         (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
                         (_tr("지적 사례"), "findings/examples/"), (_ag, "")]),
-                    dc=_dcv, dc_tabs=_dc_tabs, dc_on=_ag,
+                    dc=_dcv, dc_tabs=_dc_tabs, dc_on=_ag, dc_credit=deficiency_cases_page.CREDIT,
                 )
                 if _lg == DEFAULT_LANG:
                     facet_paths.append((_dcp.site_path, _dcv["measured_on"]))
@@ -7105,7 +7105,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     json_ld=_dcp.breadcrumb_json_ld([
                         (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
                         (_tr("지적 사례"), "findings/examples/"), (_tr("MHRA 조항별 집계"), "")]),
-                    cc=_dc_cc, dc_tabs=_dc_tabs, dc_on="MHRA_DATA",
+                    cc=_dc_cc, dc_tabs=_dc_tabs, dc_on="MHRA_DATA", dc_credit=deficiency_cases_page.CREDIT,
                 )
                 if _lg == DEFAULT_LANG:
                     facet_paths.append((_dcp.site_path, _dc_cc["measured_on"]))

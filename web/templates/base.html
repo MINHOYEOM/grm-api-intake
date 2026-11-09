@@ -230,6 +230,7 @@
          더블 옵트인 확인 메일의 언어는 이 필드가 아니라 **Brevo 대시보드의 폼·DOI 템플릿 설정**
          에서 정해진다. 한국어 확인 메일이 필요하면 거기서 바꾸고, 그 뒤 이 값을 맞춘다. #}
       <input type="hidden" name="locale" value="en" />
+      {% if signup_path_fields %}<input type="hidden" name="SIGNUP_PATH" value="" /><input type="hidden" name="SIGNUP_LANG" value="" />{% endif %}
       <button class="btn coral" type="submit">{{ _("구독") }}</button>
     </form>
     <p class="note">{{ _("매주 월요일 발송 · 구독 신청 시 확인 메일이 발송됩니다 · 수신거부는 모든 메일 하단에서 가능합니다.") }}</p>
@@ -717,6 +718,35 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
    영문 메일은 `web/newsletter_en.py`(그 주 새 지적 기록 중심)다.
    ※이 갈래는 env-param 으로 켜지므로 **로컬·CI 빌드에서는 양쪽 다 꺼져 있다.** 구조
    파리티 가드가 원리적으로 못 보는 자리라, 바꿀 때는 라이브를 직접 봐야 한다. #}
+{# [가입 페이지 경로 2026-11-09 · 결재 #2 B안] 구독 폼(밴드·배너)이 **어느 페이지에서 제출됐는지**를 Brevo 연락처 속성(SIGNUP_PATH·SIGNUP_LANG)으로 남긴다. 확인 메일 링크는 Brevo 가 만든 doubleoptin 한 개라 URL 에 출처를 붙일 수 없어서, 제출 본문에 같이 싣는 방식이다.
+   · 값은 location.pathname 만(쿼리·해시·이메일 미참조) — 허용 문자 [a-z0-9-_./] · 최대 80자, 위반하면 빈 값(제출은 막지 않는다). 언어는 경로 첫 조각이 en 이면 en, 아니면 ko.
+   · 제출 직전 document 캡처 리스너가 hidden 두 칸을 채운다 — 밴드·배너의 기존 제출 핸들러(FormData 를 읽는 쪽)보다 항상 먼저 돈다. JS 가 꺼져 네이티브 POST 로 폴백해도 값만 빌 뿐 제출은 그대로다.
+   · **env 게이트**: `signup_path_fields`(repo var GRM_SIGNUP_PATH_FIELDS=1)일 때만 hidden·이 스크립트가 나간다. Brevo 쪽 속성·폼 필드를 만든 뒤에 켠다(docs/ops_brevo_signup_path_attributes.md). 꺼져 있으면 폼 본문은 종전과 바이트 동일.
+   · 구독 경로 익명 카운터(funnel_path_bump, 084)는 별개 경로로 그대로 — 이 스크립트가 건드리지 않는다. #}
+{% if newsletter_form_action and not hide_subscribe and signup_path_fields %}
+<script>
+(function(){
+  function signupPath(pn){
+    var p=String(pn==null?'/':pn).toLowerCase().replace(/index\.html?$/,'');
+    if(p.charAt(0)!=='/')p='/'+p;
+    p=p.slice(0,80);
+    return /^\/[a-z0-9\-_.\/]*$/.test(p)?p:'';
+  }
+  function signupLang(pn){
+    return /^\/en(\/|$)/i.test(String(pn||''))?'en':'ko';
+  }
+  document.addEventListener('submit',function(e){
+    var f=e.target;
+    if(!f||(f.id!=='grm-sub-form'&&f.id!=='grm-cta-form'))return;
+    try{
+      var a=f.elements['SIGNUP_PATH'],b=f.elements['SIGNUP_LANG'];
+      if(a)a.value=signupPath(location.pathname);
+      if(b)b.value=signupLang(location.pathname);
+    }catch(_){}
+  },true);
+})();
+</script>
+{% endif %}
 {% if newsletter_form_action and not hide_subscribe %}
 <style>
 .grm-cta{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .28s ease;background:var(--ink,#1A1815);color:#fff;box-shadow:0 -8px 28px rgba(0,0,0,.18)}
@@ -777,6 +807,7 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
       <input id="grm-cta-email" type="email" name="EMAIL" required autocomplete="email" aria-label="{{ _('이메일 주소') }}" placeholder="you@company.com" />
       <input type="text" name="email_address_check" value="" class="grm-cta-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <input type="hidden" name="locale" value="en" />
+      {% if signup_path_fields %}<input type="hidden" name="SIGNUP_PATH" value="" /><input type="hidden" name="SIGNUP_LANG" value="" />{% endif %}
       <button type="submit">{{ _("구독") }}</button>
     </form>
     <div class="grm-cta-side">

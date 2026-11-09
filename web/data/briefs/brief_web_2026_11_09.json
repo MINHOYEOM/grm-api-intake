@@ -24,10 +24,10 @@
   ],
   "coverage": {
    "intake_total": 115,
-   "rendered": 56,
+   "rendered": 51,
    "evidence": {
     "A": 31,
-    "B": 25,
+    "B": 20,
     "C": 0
    },
    "resources": 6
@@ -147,697 +147,8 @@
  },
  "cards": [
   {
-   "id": "fda483-196231",
-   "render_order": 0,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "Cardionxt",
-   "title_issue": "소프트웨어 크래시 불만 조사·CAPA 미흡",
-   "summary": "FDA 가 Cardionxt 제조소 실사(실사일 12/15/2025)에서 iMap System 소프트웨어 크래시 불만에 대한 조사·CAPA·부적합 관리 미흡과 UDI 미이행 등 6개 관찰사항을 담은 483 을 발부했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-11-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-196231"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "Cardionxt · FEI 3020036682"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "12/15/2025"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "지적: 불만 0016·0017·0018 의 소프트웨어 리셋에 공식 근본원인 조사 미실시",
-    "부적합: 소프트웨어 크래시 발생 장치에 부적합 보고 미개시(0016 은 전신마취 환자 시술 중 지연 발생)",
-    "기타: 위험분석의 발생도 평가 부적절, GUDID 미등록·라벨 UDI 미표시",
-    "대상: Class II iMap Systems(K201094)"
-   ],
-   "implication": "FDA 는 내부 소프트웨어 안정성 연구로 원인을 파악했다는 사실이 개별 불만 건의 공식 조사와 부적합 보고를 대신한다고 보지 않았다. 우리 현장도 불만 건이 기존 조사·개선과 연관된다는 이유로 건별 조사 기록과 부적합 보고를 생략하고 있지 않은지 점검할 차례다.",
-   "checks": [
-    "동일 원인으로 추정되는 불만도 건별로 공식 조사 기록을 남기는가?",
-    "제품 성능 이상 불만이 접수되면 부적합 보고 개시 여부를 함께 판단하는가?",
-    "위험분석의 발생도 평가가 실제 불만·고장 데이터를 반영하는가?"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 6,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "Procedures for corrective and preventive action have not been adequately established.",
-      "detail": "Specifically, your firm's procedures, QOP-85-03, Corrective And Preventive Action (CAPA), Rev A, under section 4, states (D) (4) (b) (4) Your firm's procedures require you to conduct an investigation to determine the cause of an issue. Your firm did not follow the procedures when evaluating complaint numbers 0016, 0017, and 0018, where a formal investigation was not conducted to determine the root cause of a software reset. Furthermore, your firm conducted a software stability study, QA-0008, iMap Software Stability Analysis, Rev A, noting issues of the software restarting” ® percent of the time. The study found that the root cause was due to the iMap(b) (4) These (b) (4) in combination with copy, initialization, and deletion pointer operations lead to memory leaks and unexpected termination. This study stated the following, (b) (4) (b) (4) Software updates were implemented to solve the root cause mechanism in release candidate Essex 0.5.4b, iMap Controller version 1.0.3.0. Further testing was performed, resulting in no failures after the software ran for more than (b) (4) cycles. The implementation is sufficient for software release after",
-      "deficiency_ko": "시정 및 예방조치(CAPA) 절차가 적절히 수립되지 않았다.",
-      "detail_ko": "구체적으로, 귀사의 절차 QOP-85-03, Corrective And Preventive Action (CAPA), Rev A 의 섹션 4 는 (b) (4) 를 규정한다. 귀사의 절차는 문제의 원인을 규명하기 위한 조사를 수행하도록 요구한다. 귀사는 불만 번호 0016, 0017, 0018 을 평가할 때 이 절차를 따르지 않았으며, 소프트웨어 리셋의 근본원인을 규명하기 위한 공식 조사를 수행하지 않았다. 또한 귀사는 소프트웨어 안정성 연구 QA-0008, iMap Software Stability Analysis, Rev A 를 수행하여 소프트웨어가 일정 비율로 재시작되는 문제를 확인했다. 이 연구는 근본원인이 iMap (b) (4) 때문이며, 이 (b) (4) 가 복사·초기화·삭제 포인터 연산과 결합해 메모리 누수와 예기치 않은 종료를 일으킨다고 결론지었다. 이 연구는 다음과 같이 기술했다: (b) (4) 근본원인 메커니즘을 해결하기 위한 소프트웨어 업데이트가 릴리스 후보 Essex 0.5.4b, iMap Controller 버전 1.0.3.0 에 적용되었다. 추가 시험을 수행한 결과 소프트웨어를 (b) (4) 사이클 이상 구동한 후에도 고장이 없었다. 이 조치는 소프트웨어 릴리스에 충분하다."
-     },
-     {
-      "number": "2",
-      "deficiency": "Complaints involving the possible failure of a device to meet any of its specifications were not investigated where necessary.",
-      "detail": "Specifically, a review of 5 complaints revealed that your firm did not investigate for software crash incidents in 3 complaints, complaint numbers 0016, 0017, and 0018. Your firm’s procedure QOP-85-02, rev D titled Complaints states in 4.4(b): According to your complaint descriptions, the following events occurred as a result from use of your iMap System, with no formal investigation as to the cause: 1) 0016: The complaint stated, “A crash occurred during the first case after the pre-mapping procedures",
-      "deficiency_ko": "장치가 규격을 충족하지 못했을 가능성과 관련된 불만이 필요한 경우에도 조사되지 않았다.",
-      "detail_ko": "구체적으로, 불만 5건을 검토한 결과 귀사는 3건의 불만(불만 번호 0016, 0017, 0018)에서 소프트웨어 크래시 사건을 조사하지 않았다. 귀사의 절차 QOP-85-02, rev D, Complaints 의 4.4(b) 는 다음과 같이 규정한다. 귀사의 불만 기술 내용에 따르면 iMap System 사용 결과 다음 사건들이 발생했으나 원인에 대한 공식 조사는 없었다: 1) 0016: 불만에는 \"사전 매핑 절차 후 첫 번째 증례 중 크래시가 발생했다\"고 기재되어 있다."
-     },
-     {
-      "number": "3",
-      "deficiency": "Risk analysis is inadequate.",
-      "detail": "Specifically, Ranking of occurrence was inadequate in risk assessment. Risk Assessment Record for",
-      "deficiency_ko": "위험분석이 부적절하다.",
-      "detail_ko": "구체적으로, 위험평가에서 발생도 등급 산정이 부적절했다. 위험평가 기록:"
-     },
-     {
-      "number": "4",
-      "deficiency": "Procedures have not been adequately established to control product that does not conform to specified requirements.",
-      "detail": "Specifically, your procedures, QOP-83-01, Control ofNon-conforming Product, Rev D require you to initiate a non-conformance for products when equipment failures could impact product safety, efficacy, or quality characteristics. In complaint numbers 0016, 0017, and 0018, your firm failed to initiate a non-conformance for a unit that experienced a software crash. In complaint number 0016 specifically, the software crash occurred while being used ona patient resulting in a significant procedural delay while the patent was under general anesthesia. ms Since (b)(4) , your firm has manufactured Class II iMap Systems, K201094, which is intended for the display of compatible electrophysiology catheter position and cardiac electrical activity when used with the MultiLink CS Catheter during conventional electrophysiological procedures. Firm plans to begin commercial distribution in 2026.",
-      "deficiency_ko": "규정된 요구사항에 적합하지 않은 제품을 관리하기 위한 절차가 적절히 수립되지 않았다.",
-      "detail_ko": "구체적으로, 귀사의 절차 QOP-83-01, Control of Non-conforming Product, Rev D 는 장비 고장이 제품의 안전성·유효성·품질 특성에 영향을 줄 수 있는 경우 제품에 대해 부적합을 개시하도록 요구한다. 불만 번호 0016, 0017, 0018 에서 귀사는 소프트웨어 크래시가 발생한 장치에 대해 부적합을 개시하지 않았다. 특히 불만 번호 0016 에서는 환자에게 사용 중 소프트웨어 크래시가 발생해 환자가 전신마취 상태인 동안 시술이 크게 지연되었다. (b)(4) 이후 귀사는 Class II iMap Systems(K201094)를 제조해 왔으며, 이 장치는 기존 전기생리학 시술 중 MultiLink CS Catheter 와 함께 사용될 때 호환 전기생리 카테터 위치와 심장 전기 활동을 표시하기 위한 것이다. 귀사는 2026년에 상업 유통을 시작할 계획이다."
-     },
-     {
-      "number": "5",
-      "deficiency": "The information required by the Global Unique Device Identification Database for each medical device version or model required to bear a unique device identifier (UDI) was not provided.",
-      "detail": "Specifically, your firm has not registered with Global Unique Device Identification Database for your medical device. (b) (4) Since (6) (4) , your firm has manufactured Class II iMap Systems, K201094, which is intended for the display of compatible electrophysiology catheter position and cardiac electrical activity when used with the MultiLink CS Catheter during conventional electrophysiological procedures. Firm plans to begin commercial distribution in 2026.",
-      "deficiency_ko": "고유기기식별자(UDI)를 표시해야 하는 각 의료기기 버전 또는 모델에 대해 Global Unique Device Identification Database(GUDID)가 요구하는 정보를 제공하지 않았다.",
-      "detail_ko": "구체적으로, 귀사는 의료기기에 대해 Global Unique Device Identification Database 에 등록하지 않았다. (b) (4) (b) (4) 이후 귀사는 Class II iMap Systems(K201094)를 제조해 왔으며, 이 장치는 기존 전기생리학 시술 중 MultiLink CS Catheter 와 함께 사용될 때 호환 전기생리 카테터 위치와 심장 전기 활동을 표시하기 위한 것이다. 귀사는 2026년에 상업 유통을 시작할 계획이다."
-     },
-     {
-      "number": "6",
-      "deficiency": "The labels of the medical device(s) do not bear a unique device identifier (UDI) that meet the requirements of 801 Subpart B and 21 CFR 830.",
-      "detail": "Specifically, your firm does not obtain labels that bear a unique device identifier. (b) (4) Since (6) (4) , your firm has manufactured Class II iMap Systems, K201094, which is intended for the display of compatible electrophysiology catheter position and cardiac electrical activity when used with the MultiLink CS Catheter during conventional electrophysiological procedures. Firm plans to begin commercial distribution in 2026.",
-      "deficiency_ko": "의료기기 라벨에 801 Subpart B 및 21 CFR 830 요건을 충족하는 고유기기식별자(UDI)가 표시되어 있지 않다.",
-      "detail_ko": "구체적으로, 귀사는 고유기기식별자가 표시된 라벨을 확보하지 않는다. (b) (4) (b) (4) 이후 귀사는 Class II iMap Systems(K201094)를 제조해 왔으며, 이 장치는 기존 전기생리학 시술 중 MultiLink CS Catheter 와 함께 사용될 때 호환 전기생리 카테터 위치와 심장 전기 활동을 표시하기 위한 것이다. 귀사는 2026년에 상업 유통을 시작할 계획이다."
-     }
-    ],
-    "inspectors": [
-     "Hammam A Abdallah"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "CAPA 절차(QOP-85-03)가 문제 원인 조사를 요구함에도, 소프트웨어 리셋이 보고된 불만 0016·0017·0018 에 대해 공식 근본원인 조사를 수행하지 않았다.",
-      "citation": "21 CFR 820.100",
-      "risk": "반복되는 소프트웨어 결함의 원인이 공식 기록 없이 남아 동일 고장이 재발할 수 있다."
-     },
-     {
-      "observation": "5건의 불만 검토 결과 3건(0016·0017·0018)의 소프트웨어 크래시 사건을 조사하지 않았다.",
-      "citation": "21 CFR 820.198",
-      "risk": "시술 중 장치 고장이 환자 안전에 미치는 영향이 평가되지 않는다."
-     },
-     {
-      "observation": "부적합품 관리 절차(QOP-83-01)가 장비 고장 시 부적합 개시를 요구하나, 소프트웨어 크래시가 발생한 장치에 부적합을 개시하지 않았고 0016 은 전신마취 상태 환자의 시술을 크게 지연시켰다.",
-      "citation": "21 CFR 820.90",
-      "risk": "부적합 장치가 격리·평가 없이 계속 사용될 수 있다."
-     },
-     {
-      "observation": "위험평가에서 발생도 등급 산정이 부적절했고, GUDID 미등록 및 라벨 UDI 미표시가 확인됐다.",
-      "risk": "위험 통제 우선순위가 왜곡되고 시판 후 추적성이 확보되지 않는다."
-     }
-    ],
-    "inspectional_significance": "불만 처리·CAPA·부적합 관리·위험분석이 동일한 소프트웨어 크래시 사안에서 함께 실패해, 단발성이 아니라 품질시스템 전반의 연계 부족을 보여 준다. 환자 시술 지연 사례가 포함돼 있어 미시정 시 Warning Letter 로 이어질 가능성이 있으며, UDI 미이행은 상업 유통 개시 전 시정이 필요한 규제 요건이다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "불만 0016·0017·0018 에 대한 공식 근본원인 조사를 수행하고 문서화한다.",
-      "소프트웨어 크래시 장치에 대한 부적합 보고를 개시하고 처리 결과를 기록한다.",
-      "위험평가의 발생도 등급을 실제 불만·고장 데이터로 재산정한다.",
-      "GUDID 등록과 라벨 UDI 표시를 완료한다."
-     ]
-    },
-    "administrative_risks": "불충분한 회신 시 OAI 분류, Warning Letter, 후속 재실사로 이어질 수 있으며, UDI 요건 미충족은 상업 유통 개시에 제약이 될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/196231/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Software crash complaints not investigated",
-    "summary": "FDA issued a 483 to Cardionxt (inspection date 12/15/2025) with six observations, citing inadequate investigation, CAPA and nonconformance control for iMap System software crash complaints, plus UDI deficiencies.",
-    "implication": "FDA did not accept an internal software stability study as a substitute for formal investigation and nonconformance reporting of individual complaints. Our sites should check whether complaints linked to a known issue are still investigated and recorded case by case.",
-    "key_facts": [
-     "Finding: no formal root-cause investigation of software resets in complaints 0016, 0017 and 0018",
-     "Nonconformance: no nonconformance initiated for units with software crashes (0016 involved a procedural delay while the patient was under general anesthesia)",
-     "Other: inadequate occurrence ranking in risk analysis; no GUDID registration and no UDI on labels",
-     "Product: Class II iMap Systems (K201094)"
-    ],
-    "checks": [
-     "Is each complaint formally investigated and documented even when a known root cause is suspected?",
-     "Does a product performance complaint trigger an assessment of whether to open a nonconformance?",
-     "Does the risk analysis occurrence ranking reflect actual complaint and failure data?"
-    ]
-   }
-  },
-  {
-   "id": "fda483-196239",
-   "render_order": 1,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "Rogers Foam Corporation",
-   "title_issue": "공정 밸리데이션·샘플 크기 근거 미흡",
-   "summary": "FDA 가 Rogers Foam Corporation 제조소 실사(실사일 02/25/2026)에서 공정 밸리데이션 미흡과 통계적 샘플 크기 근거 부재 2개 관찰사항을 담은 483 을 발부했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-11-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-196239"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "Rogers Foam Corporation · FEI 3004082002"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "02/25/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "지적 1: 후속 검증이 불가한 공정의 밸리데이션 문서화 미흡, 자동 폼 절단 공정 초기 밸리데이션 미실시",
-    "지적 2: 공정 중 QA 검사의 샘플 크기 근거 미문서화",
-    "시설 유형: Manufacturer"
-   ],
-   "implication": "FDA 는 생산에 쓰이는 자동화 절단 공정을 초기 밸리데이션 없이 운용한 점과 검사 샘플 수의 통계적 근거가 없는 점을 함께 지적했다. 우리 현장도 설비 자동화·공정 변경 시 밸리데이션이 선행됐는지, 공정 중 검사 샘플 수에 문서화된 근거가 있는지 확인할 필요가 있다.",
-   "checks": [
-    "결과를 후속 검사로 완전히 검증할 수 없는 공정에 밸리데이션 기록이 있는가?",
-    "공정 중 검사 샘플 크기에 통계적 근거가 문서화돼 있는가?"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 2,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "Processes for production and service provision where the resulting output cannot be, or is not, verified by subsequent monitoring or measurement were not adequately validated.",
-      "detail": "Specifically, validation of the (b) (4) application process used in production of (b) (4 ) has not been adequately documented. Additionally, an initial validation of the foam cutting process performed by the automated (b) (4) (b) (4) and used in production of the (b) (4) line of products, has not been performed.",
-      "deficiency_ko": "후속 모니터링 또는 측정으로 결과를 검증할 수 없거나 검증하지 않는 생산 및 서비스 제공 공정이 적절히 밸리데이션되지 않았다.",
-      "detail_ko": "구체적으로, (b) (4) 생산에 사용되는 (b) (4) 적용 공정의 밸리데이션이 적절히 문서화되지 않았다. 또한 자동화된 (b) (4) 가 수행하며 (b) (4) 제품 라인 생산에 사용되는 폼 절단 공정의 초기 밸리데이션이 수행되지 않았다."
-     },
-     {
-      "number": "2",
-      "deficiency": "Procedures for validation of processes did not adequately include statistical techniques with rationale for sample sizes.",
-      "detail": "Specifically, rationale for sample sizes used for in-process, quality assurance inspections has not been adequately documented.",
-      "deficiency_ko": "공정 밸리데이션 절차에 샘플 크기 근거를 갖춘 통계적 기법이 적절히 포함되지 않았다.",
-      "detail_ko": "구체적으로, 공정 중 품질보증 검사에 사용되는 샘플 크기의 근거가 적절히 문서화되지 않았다."
-     }
-    ],
-    "inspectors": [
-     "Shannon A Gregory"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "후속 모니터링·측정으로 결과를 검증할 수 없는 (b) (4) 적용 공정의 밸리데이션이 적절히 문서화되지 않았고, 자동화된 폼 절단 공정은 초기 밸리데이션이 수행되지 않았다.",
-      "citation": "21 CFR 820.75",
-      "risk": "검증되지 않은 공정에서 생산된 제품의 품질 일관성을 보증할 수 없다."
-     },
-     {
-      "observation": "공정 밸리데이션 절차에 통계적 기법과 샘플 크기 근거가 포함되지 않았고, 공정 중 QA 검사의 샘플 크기 근거가 문서화되지 않았다.",
-      "citation": "21 CFR 820.250",
-      "risk": "검사 결과가 로트 전체의 품질을 대표하는지 판단할 수 없다."
-     }
-    ],
-    "inspectional_significance": "관찰은 공정 밸리데이션과 검사 샘플링이라는 두 영역에 한정되어 있으며 데이터 무결성 문제는 언급되지 않았다. 다만 생산 중인 자동화 공정의 초기 밸리데이션 부재는 기본 요건 미충족이어서, 회신이 불충분하면 후속 조치 대상이 될 가능성이 있다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "자동화 폼 절단 공정에 대한 초기 밸리데이션을 수행하고 문서화한다.",
-      "(b) (4) 적용 공정의 밸리데이션 문서를 보완한다.",
-      "공정 중 QA 검사의 샘플 크기에 대한 통계적 근거를 수립·문서화한다."
-     ]
-    },
-    "administrative_risks": "시정이 불충분하면 Warning Letter 또는 후속 재실사로 이어질 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/196239/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Weak process validation and sampling basis",
-    "summary": "FDA issued a 483 to Rogers Foam Corporation (inspection date 02/25/2026) with two observations on inadequate process validation and missing statistical rationale for sample sizes.",
-    "implication": "FDA cited both an automated cutting process run in production without initial validation and inspection sampling without a statistical basis. Our sites should confirm that automation or process changes are validated first and that in-process sample sizes have a documented rationale.",
-    "key_facts": [
-     "Finding 1: validation of a process whose output cannot be fully verified was not adequately documented; no initial validation of the automated foam cutting process",
-     "Finding 2: rationale for sample sizes in in-process QA inspections not documented",
-     "Facility type: Manufacturer"
-    ],
-    "checks": [
-     "Do processes whose output cannot be fully verified by later inspection have validation records?",
-     "Is there a documented statistical rationale for in-process inspection sample sizes?"
-    ]
-   }
-  },
-  {
-   "id": "fda483-196241",
-   "render_order": 2,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "Immuno-Mycologics, Inc",
-   "title_issue": "위험관리 파일·설계변경 검증 미흡",
-   "summary": "FDA 가 Immuno-Mycologics, Inc 제조소 실사(실사일 03/05/2026)에서 진단 면역분석 제품의 위험관리 기록 미흡과 설계변경 검증·밸리데이션 미흡 2개 관찰사항을 담은 483 을 발부했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-11-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-196241"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "Immuno-Mycologics, Inc · FEI 1627497"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "03/05/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "지적 1: Coccidioides Ab EIA(CAB102) 위험관리 파일이 시판 후 감시에서 확인된 동결·해동, 민감도·특이도·안정성 저하 위해를 반영하지 않음",
-    "지적 1: Candida ID Antigen(C50110)의 위험분석·평가·통제 기록 제시 불가",
-    "지적 2: Histoplasma Galactomannan EIA(HGM201) 컨쥬게이트 안정제 교체 설계변경의 가속안정성 시험에서 실패 발생, 대체 가능성 미입증"
-   ],
-   "implication": "FDA 는 시판 후 감시에서 확인된 위해가 위험관리 파일에 반영되지 않은 점과 안정성 실패가 남은 상태에서 원료 대체를 설계변경으로 진행한 점을 받아들이지 않았다. 우리 현장도 원료·부원료 변경 시 안정성 실패 결과가 해소된 뒤 승인하는지, 시판 후 품질 정보가 위험평가 갱신으로 이어지는지 확인할 차례다.",
-   "checks": [
-    "시판 후 불만·감시 정보가 위험평가 문서 갱신으로 연결되는가?",
-    "원료 대체 변경 승인 전에 안정성 시험 실패가 조사·해소되는가?"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 2,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "Records of risk management activities in product realization were not adequately maintained.",
-      "detail": "Specifically, your firm’s Risk Management SOP, SOP-00038, Rev. 6, effective 05/02/2023, states the risk management file shall provide traceability for risk analysis, evaluation, implementation and verification of risk control measures, and the acceptability of any residual risk with each identified hazard associated with the product. The Risk Management Process SOP, SOP-00038, Rev. 3, effective 10/07/2019, requires the risk management file to be continuously revised as ongoing risk management activities are carried out. The Risk Management File for the Class II Coccidioides Ab Enzyme Immunoassay (CAB102), Rev. 1, effective 01/14/2020, fails to adequately address potential hazards and risk control measures identified in post market surveillance, such as effects of freeze/thaw cycles, reduced sensitivity, reduced specificity, and reduced stability. Additionally, your firm was unable to provide evidence of risk analysis documentation, risk evaluation records, or implementation of risk control measure for the Class II Candida Immunodiffusion (ID) Antigen (C50110).",
-      "deficiency_ko": "제품 실현 과정의 위험관리 활동 기록이 적절히 유지되지 않았다.",
-      "detail_ko": "구체적으로, 귀사의 위험관리 SOP, SOP-00038, Rev. 6(시행 05/02/2023)은 위험관리 파일이 제품과 관련해 확인된 각 위해에 대해 위험분석, 평가, 위험통제 조치의 이행 및 검증, 잔여 위험의 수용 가능성에 대한 추적성을 제공해야 한다고 규정한다. 위험관리 프로세스 SOP, SOP-00038, Rev. 3(시행 10/07/2019)은 진행 중인 위험관리 활동이 수행됨에 따라 위험관리 파일을 지속적으로 개정하도록 요구한다. Class II Coccidioides Ab Enzyme Immunoassay(CAB102)의 위험관리 파일 Rev. 1(시행 01/14/2020)은 동결/해동 주기의 영향, 민감도 저하, 특이도 저하, 안정성 저하 등 시판 후 감시에서 확인된 잠재적 위해와 위험통제 조치를 적절히 다루지 않는다. 또한 귀사는 Class II Candida Immunodiffusion(ID) Antigen(C50110)에 대한 위험분석 문서, 위험평가 기록, 위험통제 조치 이행의 증거를 제시하지 못했다."
-     },
-     {
-      "number": "2",
-      "deficiency": "Design and development changes were not adequately reviewed, verified, validated, and approved before implementation.",
-      "detail": "",
-      "deficiency_ko": "설계 및 개발 변경이 시행 전에 적절히 검토, 검증, 밸리데이션 및 승인되지 않았다."
-     }
-    ],
-    "inspectors": [
-     "Yuliana Hernandez-Magana"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "위험관리 SOP(SOP-00038)가 위해별 위험분석·통제 추적성을 요구하지만, Coccidioides Ab EIA(CAB102) 위험관리 파일은 시판 후 감시에서 확인된 동결·해동 영향, 민감도·특이도·안정성 저하를 다루지 않았고, Candida ID Antigen(C50110)은 위험분석·평가·통제 기록을 제시하지 못했다.",
-      "citation": "21 CFR 820.30(g)",
-      "risk": "알려진 성능 저하 위해가 통제되지 않아 진단 결과의 신뢰성이 떨어질 수 있다."
-     },
-     {
-      "observation": "Histoplasma Galactomannan EIA(HGM201)의 컨쥬게이트 안정제 교체 설계변경에서, 가속안정성 검증 시험의 대조군·표준곡선 및 소변 결과 실패가 있었음에도 새 안정제의 대체 가능성을 입증하지 못했다.",
-      "citation": "21 CFR 820.30(i)",
-      "risk": "검증되지 않은 변경 제품이 출하되어 유효기간 내 성능이 보장되지 않을 수 있다."
-     }
-    ],
-    "inspectional_significance": "두 관찰 모두 설계관리(위험관리·설계변경) 영역에 집중되어 있으며, 시판 후 정보와 안정성 실패라는 객관적 데이터를 품질 판단에 반영하지 못했다는 점에서 체계적 문제의 가능성이 있다. 회신 주석에는 두 관찰 모두 시정 약속(Promised to correct)으로 기재되어 있어, 이행이 확인되지 않으면 후속 조치로 이어질 가능성이 있다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "CAB102 위험관리 파일에 시판 후 감시에서 확인된 위해와 통제 조치를 반영한다.",
-      "C50110 에 대한 위험분석·평가·통제 기록을 수립한다.",
-      "HGM201 안정제 교체 변경의 안정성 실패를 조사하고 대체 가능성을 재검증한다."
-     ]
-    },
-    "administrative_risks": "약속한 시정이 이행되지 않거나 불충분하면 Warning Letter 또는 후속 재실사로 이어질 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/196241/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "Risk file and design change gaps",
-    "summary": "FDA issued a 483 to Immuno-Mycologics, Inc (inspection date 03/05/2026) with two observations on inadequate risk management records and inadequate verification and validation of design changes for diagnostic immunoassay products.",
-    "implication": "FDA rejected a risk file that ignored hazards seen in post-market surveillance and a material substitution approved while stability failures remained. Our sites should confirm that material changes are approved only after stability failures are resolved and that post-market quality data updates the risk assessment.",
-    "key_facts": [
-     "Finding 1: the Coccidioides Ab EIA (CAB102) risk file did not address hazards from post-market surveillance such as freeze/thaw effects and reduced sensitivity, specificity and stability",
-     "Finding 1: no risk analysis, evaluation or control records could be provided for the Candida ID Antigen (C50110)",
-     "Finding 2: a conjugate stabilizer replacement for the Histoplasma Galactomannan EIA (HGM201) was not shown to be adequate, with failures in the accelerated stability study"
-    ],
-    "checks": [
-     "Does post-market complaint and surveillance information lead to updates of the risk assessment?",
-     "Are stability test failures investigated and resolved before a material substitution change is approved?"
-    ]
-   }
-  },
-  {
-   "id": "fda483-196242",
-   "render_order": 3,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "Radiation Products Design, Inc",
-   "title_issue": "제품 실현 위험관리 체계 부재",
-   "summary": "FDA 가 Radiation Products Design, Inc 제조소 실사(실사일 03/04/2026)에서 제품 실현 과정의 위험관리 프로세스가 수립·문서화되지 않았다는 1개 관찰사항을 담은 483 을 발부했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-11-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-196242"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "Radiation Products Design, Inc · FEI 2182762"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Manufacturer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "03/04/2026"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "지적: 제품 실현 위험관리 프로세스 미수립·미이행",
-    "사례: 텅스텐 안구 차폐(PN 936-583~936-627)에 위험평가 기록 없음",
-    "절차: 위험 평가 방법을 정한 확정 절차 없음"
-   ],
-   "implication": "FDA 는 개별 제품의 위험평가 기록뿐 아니라 위험 평가 방법을 정한 절차 자체가 없다는 점을 지적했다. 우리 현장도 신규·기존 제품 모두에 대해 위험평가가 절차에 근거해 문서화돼 있는지 확인할 필요가 있다.",
-   "checks": [
-    "제품별 위험평가 기록이 실제로 존재하는가?",
-    "위험을 평가하는 방법을 정한 승인된 절차가 있는가?"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 1,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "One or more processes for risk management in product realization have not been adequately documented.",
-      "detail": "Specifically, Your firm has not established, implemented or maintained a process for risk management in product realization. For example, I reviewed records pertaining to your tungsten eye shields (PN 936-583 through 936-627. You do not have a risk assessment or other record to formally document risks and risk management during product realization. Additionally, none of your finalized procedures establish how to assess risk. . . . . . . .",
-      "deficiency_ko": "제품 실현 과정의 위험관리를 위한 하나 이상의 프로세스가 적절히 문서화되지 않았다.",
-      "detail_ko": "구체적으로, 귀사는 제품 실현 과정의 위험관리 프로세스를 수립, 이행 또는 유지하지 않았다. 예를 들어, 본인은 귀사의 텅스텐 안구 차폐(PN 936-583 ~ 936-627) 관련 기록을 검토했다. 귀사에는 제품 실현 과정의 위험과 위험관리를 공식적으로 문서화한 위험평가나 기타 기록이 없다. 또한 귀사의 확정된 절차 중 어느 것도 위험을 평가하는 방법을 규정하지 않는다."
-     }
-    ],
-    "inspectors": [
-     "Christina L Bigham"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "제품 실현 과정의 위험관리 프로세스를 수립·이행·유지하지 않았으며, 텅스텐 안구 차폐(PN 936-583~936-627)에 대해 위험과 위험관리를 공식 문서화한 위험평가나 기타 기록이 없었다. 확정된 절차 중 위험 평가 방법을 정한 것도 없었다.",
-      "risk": "제품 위해가 체계적으로 식별·통제되지 않아 설계·생산 결정이 근거 없이 이루어질 수 있다."
-     }
-    ],
-    "inspectional_significance": "관찰은 1건이지만 특정 기록 누락이 아니라 위험관리 프로세스 자체의 부재를 지적한 것이어서 체계적 결함에 해당한다. 데이터 무결성 문제는 언급되지 않았으며, 절차 수립과 소급 위험평가가 회신으로 확인되지 않으면 후속 조치로 이어질 가능성이 있다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "제품 실현 과정의 위험관리 절차를 수립·승인한다.",
-      "텅스텐 안구 차폐 제품군에 대한 위험평가를 수행하고 기록한다.",
-      "기존 제품 전반에 대해 위험평가 기록 보유 여부를 소급 점검한다."
-     ]
-    },
-    "administrative_risks": "시정이 불충분하면 Warning Letter 또는 후속 재실사로 이어질 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/196242/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "No risk management process for product realization",
-    "summary": "FDA issued a 483 to Radiation Products Design, Inc (inspection date 03/04/2026) with one observation that a risk management process for product realization had not been established or documented.",
-    "implication": "FDA cited not only missing product risk assessments but the absence of any procedure defining how risk is assessed. Our sites should confirm that risk assessments for both new and existing products are documented under an approved procedure.",
-    "key_facts": [
-     "Finding: no risk management process for product realization established or implemented",
-     "Example: no risk assessment record for tungsten eye shields (PN 936-583 through 936-627)",
-     "Procedures: no finalized procedure establishes how to assess risk"
-    ],
-    "checks": [
-     "Does a documented risk assessment exist for each product?",
-     "Is there an approved procedure that defines how risk is assessed?"
-    ]
-   }
-  },
-  {
-   "id": "fda483-196243",
-   "render_order": 4,
-   "group": "글로벌",
-   "group_label": "▫️ 기타",
-   "agency": "FDA",
-   "card_type": "FDA 483 실사 관찰",
-   "category": "Other",
-   "modality": null,
-   "evidence_level": "B",
-   "signal_tier": 3,
-   "signal_label": "High",
-   "type_tag": "483",
-   "headline_target": "American Contract Systems, Inc",
-   "title_issue": "EO 멸균 부적합 관리·보고 미흡",
-   "summary": "FDA 가 위탁 멸균업체 American Contract Systems, Inc 실사(실사일 05/24/2018)에서 EO 멸균 공정의 부적합품 관리 미흡, 공정 중 제품 승인 권한 위반, 금지 의료기기 회수 미보고 등 6개 관찰사항을 담은 483 을 발부했다.",
-   "facts": [
-    {
-     "label": "발행일",
-     "value": "2026-11-06"
-    },
-    {
-     "label": "문서번호",
-     "value": "fda483-196243"
-    },
-    {
-     "label": "제조소/업체",
-     "value": "American Contract Systems, Inc · FEI 3003419114"
-    },
-    {
-     "label": "시설 · 유형",
-     "value": "Contract Sterilizer · 483"
-    },
-    {
-     "label": "실사일",
-     "value": "05/24/2018"
-    }
-   ],
-   "quotes": [],
-   "evidence_basis": "공식 인덱스 + 보조 출처",
-   "key_facts": [
-    "부적합: EO 가스 주입 후 백 밀봉 문제·통기실 온도 이탈에 부적합 보고서(NCPR) 미발행",
-    "승인: 작업지시 체크리스트를 공장장·부공장장 외 직원이 승인",
-    "감사: MDR 제출을 맡은 컨설팅사가 품질시스템 내부감사도 수행",
-    "보고: 금지 기기인 분말 수술장갑 포함 키트 회수를 FDA 에 서면 미보고"
-   ],
-   "implication": "FDA 는 절차가 EO 멸균 조건 이탈을 부적합으로 다루도록 정해 두었는데도 실제 이탈에 보고서가 발행되지 않은 점을 지적했다. 우리 현장도 위탁 멸균 공정의 온도·밀봉 이탈이 부적합 기록으로 연결되는지, 회수 시 규제기관 보고가 이행되는지 확인할 차례다.",
-   "checks": [
-    "멸균 공정 온도 이탈·밀봉 결함 발생 시 부적합 보고서가 발행되는가?",
-    "공정 기록 승인이 절차에 지정된 권한자에 의해서만 이루어지는가?",
-    "내부감사자가 감사 대상 업무에 직접 책임이 없는가?"
-   ],
-   "deterministic_detail": {
-    "type": "fda_483_observations",
-    "count": 6,
-    "observations": [
-     {
-      "number": "1",
-      "deficiency": "Procedures have not been adequately established to control product that does not conform to specified requirements.",
-      "detail": "Specifically, Non-Conforming Product SOP, CP-04, Rev. 16, 10/20/2017, states under section 6.1.2.1, \"An NCPR is required for any non-conforming material or assembly provided to, or subject to, the EO gas injection process. This includes any defect or deficiency involving the tray wrap, sterilization bag, EO gas delivery, bag sealing process, or aeration or sterility test conditions or results. The latter includes out-of-specification temperature conditions as shown on the recorder chart.\" Non-Conforming Product Reports have not been generated for bag sealing issues post gas injection or aeration chamber temperature excursions outside the specification range of (ID) (4) degrees F.",
-      "deficiency_ko": "규정된 요구사항에 적합하지 않은 제품을 관리하기 위한 절차가 적절히 수립되지 않았다.",
-      "detail_ko": "구체적으로, 부적합품 SOP, CP-04, Rev. 16(10/20/2017)의 섹션 6.1.2.1 은 \"EO 가스 주입 공정에 제공되거나 그 대상이 되는 모든 부적합 자재 또는 조립품에 대해 NCPR 이 필요하다. 여기에는 트레이 포장, 멸균 백, EO 가스 공급, 백 밀봉 공정, 통기 또는 무균시험 조건이나 결과와 관련된 모든 결함 또는 결손이 포함된다. 후자에는 기록계 차트에 나타난 규격 외 온도 조건이 포함된다\"고 규정한다. 가스 주입 후 백 밀봉 문제나 규격 범위 (b) (4) °F 를 벗어난 통기실 온도 이탈에 대해 부적합품 보고서(NCPR)가 발행되지 않았다."
-     },
-     {
-      "number": "2",
-      "deficiency": "Acceptance activities were not adequately documented.",
-      "detail": "",
-      "deficiency_ko": "인수 활동이 적절히 문서화되지 않았다."
-     },
-     {
-      "number": "3",
-      "deficiency": "Procedures for the acceptance of in-process product have not been adequately established.",
-      "detail": "Specifically, Assembly SOP, AS-01, Rev. 12, 06/05/2017, states under section 6.4.5, \"Plant Manager or Assistant reviews the entire production work order record packet and, if complete and correct, approves the Production Work Order Checklist\". The approval of the Production Work Order Checklist, F-AS- 01-3, is being performed by employees other than the Plant Manager and Assistant Plant Manager.",
-      "deficiency_ko": "공정 중 제품의 인수 절차가 적절히 수립되지 않았다.",
-      "detail_ko": "구체적으로, 조립 SOP, AS-01, Rev. 12(06/05/2017)의 섹션 6.4.5 는 \"공장장 또는 부공장장이 생산 작업지시 기록 패킷 전체를 검토하고, 완전하고 정확하면 생산 작업지시 체크리스트를 승인한다\"고 규정한다. 생산 작업지시 체크리스트(F-AS-01-3)의 승인이 공장장 및 부공장장이 아닌 직원에 의해 수행되고 있다."
-     },
-     {
-      "number": "4",
-      "deficiency": "Individuals who conduct quality audits have direct responsibility for the matters being audited.",
-      "detail": "Specifically, a consulting firm was contracted to submit electronic Medical Device Reports to the FDA on behalf of American Contract Systems, Inc. The consulting firm has performed an Internal Quality Audit of American Contract Systems, Inc.'s entire quality system.",
-      "deficiency_ko": "품질감사를 수행하는 인원이 감사 대상 사안에 직접적인 책임을 지고 있다.",
-      "detail_ko": "구체적으로, American Contract Systems, Inc. 를 대신해 FDA 에 전자 의료기기 보고(MDR)를 제출하도록 한 컨설팅사와 계약했다. 이 컨설팅사가 American Contract Systems, Inc. 의 품질시스템 전체에 대한 내부 품질감사를 수행했다."
-     },
-     {
-      "number": "5",
-      "deficiency": "The organizational structure has not been adequately established and maintained to ensure that devices are produced in accordance with 21 CFR 820.",
-      "detail": "",
-      "deficiency_ko": "기기가 21 CFR 820 에 따라 생산되도록 보장하는 조직 구조가 적절히 수립·유지되지 않았다."
-     },
-     {
-      "number": "6",
-      "deficiency": "A correction or removal, conducted to reducea risk to health posed by a device, was not reported in writing to FDA.",
-      "detail": "Specifically, a recall was conducted for all surgical convenience kits which contained Powdered Surgical Gloves, a banned medical device, and a report was not submitted in writing to the FDA.",
-      "deficiency_ko": "기기로 인한 건강 위험을 줄이기 위해 수행한 시정 또는 제거 조치를 FDA 에 서면으로 보고하지 않았다.",
-      "detail_ko": "구체적으로, 금지 의료기기인 분말 수술장갑(Powdered Surgical Gloves)이 포함된 모든 수술용 편의 키트에 대해 회수를 실시했으나 FDA 에 서면 보고를 제출하지 않았다."
-     }
-    ],
-    "inspectors": [
-     "Eric C Fox"
-    ]
-   },
-   "deep_analysis": {
-    "key_violations": [
-     {
-      "observation": "부적합품 SOP(CP-04)는 EO 가스 주입 공정의 백 밀봉·통기·온도 조건 결함에 NCPR 을 요구하지만, 가스 주입 후 백 밀봉 문제와 규격 범위를 벗어난 통기실 온도 이탈에 대해 NCPR 이 발행되지 않았다.",
-      "citation": "21 CFR 820.90",
-      "risk": "멸균 조건이 이탈된 제품이 평가 없이 출하되어 무균 보증이 훼손될 수 있다."
-     },
-     {
-      "observation": "조립 SOP(AS-01)는 공장장 또는 부공장장이 작업지시 기록을 검토·승인하도록 규정하지만, 체크리스트(F-AS-01-3) 승인을 다른 직원이 수행했다.",
-      "citation": "21 CFR 820.80",
-      "risk": "멸균 배치 기록이 권한 없는 인원에 의해 승인되어 출하 판정의 신뢰성이 떨어진다."
-     },
-     {
-      "observation": "MDR 전자 제출을 위탁받은 컨설팅사가 품질시스템 전체에 대한 내부감사를 수행해, 감사자가 감사 대상 업무에 직접 책임을 지는 구조였다.",
-      "citation": "21 CFR 820.22",
-      "risk": "내부감사의 독립성이 확보되지 않아 결함이 발견되지 않을 수 있다."
-     },
-     {
-      "observation": "금지 의료기기인 분말 수술장갑이 포함된 모든 수술용 키트를 회수했으나 FDA 에 서면 보고를 제출하지 않았다.",
-      "citation": "21 CFR 806",
-      "risk": "규제기관이 회수의 범위와 효과를 확인할 수 없다."
-     }
-    ],
-    "inspectional_significance": "부적합 관리·공정 승인·감사 독립성·회수 보고 등 여러 품질시스템 요소에 걸친 지적으로 단발성보다는 체계적 문제의 가능성이 있다. 특히 멸균 조건 이탈의 미기록은 무균 보증과 직결되어 미시정 시 Warning Letter 로 승격될 가능성이 있다. 다만 실사일이 05/24/2018 로 오래된 기록이므로 현재 상태는 별도 확인이 필요하다.",
-    "required_remediation": {
-     "deadline": "483 수령 후 15영업일 이내 FDA 에 서면 회신",
-     "items": [
-      "백 밀봉 문제와 통기실 온도 이탈 사례에 대해 소급 NCPR 을 발행하고 영향 평가를 수행한다.",
-      "작업지시 체크리스트 승인 권한을 절차대로 재정립한다.",
-      "감사 대상 업무와 독립된 내부감사자를 지정한다.",
-      "분말 수술장갑 키트 회수에 대한 서면 보고를 FDA 에 제출한다."
-     ]
-    },
-    "administrative_risks": "미시정 시 OAI 분류, Warning Letter, 후속 재실사로 이어질 수 있으며, 회수 미보고는 별도의 규제 조치 대상이 될 수 있다."
-   },
-   "source_body_captured": true,
-   "merged_count": 1,
-   "merged_items": [],
-   "sources": {
-    "info_url": "https://www.fda.gov/about-fda/office-inspections-and-investigations/oii-foia-electronic-reading-room",
-    "official_url": "https://www.fda.gov/media/196243/download",
-    "official_is_pdf": true,
-    "link_check": {
-     "info": "pending",
-     "official": "pending"
-    }
-   },
-   "en": {
-    "title_issue": "EO sterilization nonconformance and reporting gaps",
-    "summary": "FDA issued a 483 to contract sterilizer American Contract Systems, Inc (inspection date 05/24/2018) with six observations, including inadequate nonconformance control in EO sterilization, unauthorized in-process approvals, and an unreported recall of a banned device.",
-    "implication": "FDA found that EO process deviations the firm's own procedure defined as nonconforming were never written up. Our sites should confirm that temperature and sealing deviations at contract sterilizers become nonconformance records and that recalls are reported to regulators.",
-    "key_facts": [
-     "Nonconformance: no NCPRs for bag sealing issues after gas injection or aeration chamber temperature excursions",
-     "Approval: production work order checklists approved by staff other than the Plant Manager or Assistant",
-     "Audit: the consulting firm that submits MDRs also performed the internal quality audit",
-     "Reporting: recall of kits containing banned Powdered Surgical Gloves not reported to FDA in writing"
-    ],
-    "checks": [
-     "Are nonconformance reports raised when sterilization temperature excursions or sealing defects occur?",
-     "Are process records approved only by the personnel the procedure designates?",
-     "Are internal auditors free of direct responsibility for the work they audit?"
-    ]
-   }
-  },
-  {
    "id": "fda483-196246",
-   "render_order": 5,
+   "render_order": 0,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -960,11 +271,35 @@
      "Is validity of adverse event cases from social media decided by individual medical review?",
      "Are there written procedures for receiving, evaluating and reporting adverse events found through social media monitoring?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 2
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Not all adverse drug experiences that are both serious and unexpected have been reported to FDA within 15 calendar days of initial receipt of the information.",
+      "text": "중대하고 예상하지 못한 이상약물경험 중 일부가 최초 정보 접수 후 15일 이내에 FDA 에 보고되지 않았다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "There are no written procedures for the surveillance, receipt, evaluation and reporting of post-marketing adverse experiences to FDA.",
+      "text": "시판 후 이상경험의 감시, 접수, 평가 및 FDA 보고를 위한 서면 절차가 없다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196247",
-   "render_order": 6,
+   "render_order": 1,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1076,11 +411,29 @@
      "Is there a reconciliation step confirming all specimens and raw data are archived at study close?",
      "When specimens cannot be retained, is that exception recorded in the final report's compliance statement?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 1
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "The study director failed to assure that all raw data, documentation, protocols, specimens, and final reports were transferred to the archives during or at the close of the study.",
+      "text": "시험책임자가 시험 진행 중 또는 종료 시 모든 원자료, 문서, 시험계획서, 표본 및 최종보고서가 자료보관실로 이관되도록 보장하지 못했다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196248",
-   "render_order": 7,
+   "render_order": 2,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1201,11 +554,29 @@
      "Does QA check open deviations and corrective actions before signing a study compliance statement?",
      "Is a root-cause investigation opened when the same sample-handling error recurs?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 1
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "The study director failed to assure that unforeseen circumstances that might affect the quality and integrity of the nonclinical laboratory study were noted when they occurred and corrective action was taken and documented.",
+      "text": "시험책임자가 비임상시험의 품질과 무결성에 영향을 줄 수 있는 예기치 못한 상황이 발생 시점에 기록되고 시정조치가 취해져 문서화되도록 보장하지 못했다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196250",
-   "render_order": 8,
+   "render_order": 3,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1328,11 +699,35 @@
      "Are P&A runs accepted or rejected only on the SOP's calculated average %RE criteria?",
      "Is the QC set included in confirmatory runs limited as the SOP requires?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 2
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Not all method validation activities were documented in source records from studyPe.",
+      "text": "모든 분석법 밸리데이션 활동이 시험의 원자료(source records)에 기록되지는 않았다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Existing standard operating procedures (SOPs) were not always followed during the conduct ofmethod validation experiments.",
+      "text": "분석법 밸리데이션 실험 수행 중 기존 표준작업절차(SOP)가 항상 준수되지는 않았다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196144",
-   "render_order": 9,
+   "render_order": 4,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1513,11 +908,77 @@
      "Do cleaning procedures for aseptic vestibules and equipment define when a sporicidal agent is used?",
      "Are BUDs for repackaged or compounded products supported by stability data meeting the manufacturer's specifications?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 9
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Equipment and utensils are not cleaned and maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, quality or purity of the drug product.",
+      "text": "의약품의 안전성, 확인, 함량, 품질 또는 순도를 변화시킬 수 있는 오염을 방지하기 위해 장비와 기구를 적절한 주기로 세척·유지관리하지 않는다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Procedures designed to prevent microbiological contamination of drug products purporting to be sterile are not established, written, and followed.",
+      "text": "무균으로 표시된 의약품의 미생물 오염을 방지하기 위한 절차가 수립·문서화·준수되지 않는다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+      "text": "품질관리부서에 적용되는 책임과 절차가 문서화되어 있지 않고 충실히 준수되지 않는다."
+     },
+     {
+      "no": "4",
+      "sev": "observation",
+      "orig": "Drug products do not bear an expiration date determined by appropriate stability data to assure they meet applicable standards of identity, strength, quality and purity at the time of use.",
+      "text": "의약품에 사용 시점의 확인, 함량, 품질 및 순도 기준 충족을 보증하기 위한 적절한 안정성 자료로 결정된 유효기간이 표시되어 있지 않다."
+     },
+     {
+      "no": "5",
+      "sev": "observation",
+      "orig": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications designed to assure that drug products conform to appropriate standards of identity, strength, quality and purity.",
+      "text": "시험실 관리에 의약품이 적절한 확인, 함량, 품질 및 순도 기준에 적합함을 보증하도록 설계된 과학적으로 타당하고 적절한 규격의 설정이 포함되어 있지 않다."
+     },
+     {
+      "no": "6",
+      "sev": "observation",
+      "orig": "The accuracy, sensitivity, specificity, reproducibility of test methods have not been established and documented.",
+      "text": "시험방법의 정확성, 감도, 특이성, 재현성이 확립·문서화되지 않았다."
+     },
+     {
+      "no": "7",
+      "sev": "observation",
+      "orig": "Written procedures are not established or followed for the cleaning and maintenance of equipment, including utensils, used in the manufacture, processing, packing or holding of a drug product.",
+      "text": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 장비의 세척 및 유지관리에 관한 서면 절차가 수립되어 있지 않거나 준수되지 않는다."
+     },
+     {
+      "no": "8",
+      "sev": "observation",
+      "orig": "The persons double-checking the cleaning and maintenance are not dating, signing or initialing the equipment cleaning and use log.",
+      "text": "세척 및 유지관리를 재확인하는 사람이 장비 세척·사용 일지에 날짜와 서명 또는 이니셜을 기재하지 않는다."
+     },
+     {
+      "no": "9",
+      "sev": "observation",
+      "orig": "Samples of representative units were not visually examined for correct labeling at the completion of finishing operations.",
+      "text": "완제 공정 완료 시 대표 단위 시료를 육안으로 검사해 표시사항이 올바른지 확인하지 않았다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196220",
-   "render_order": 10,
+   "render_order": 5,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1631,11 +1092,29 @@
      "Does the API supplier's stability program include microbial testing?",
      "Do we hold the supplier's data supporting the API retest date?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 1
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Stability studies do not support the labeled retest date.",
+      "text": "안정성시험이 표시된 재시험일(retest date)을 뒷받침하지 못한다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196221",
-   "render_order": 11,
+   "render_order": 6,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1767,11 +1246,41 @@
      "Is every major shared API and intermediate unit on the cleaning validation list?",
      "Are equipment requalification intervals and procedures defined in writing?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 3
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Your firm failed to establish adequate written procedures for cleaning and maintenance of equipment used in the manufacture, processing, or holding of drug substances, and failed to validate cleaning procedures to ensure that equipment is routinely cleaned to prevent contamination.",
+      "text": "귀사는 원료의약품의 제조·가공·보관에 사용되는 설비의 세척 및 유지관리에 관한 적절한 서면 절차를 수립하지 않았으며, 오염 방지를 위해 설비가 일상적으로 세척되도록 보장하는 세척 절차를 밸리데이션하지 않았다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Your firm failed to establish and follow appropriate written procedures for equipment qualification.",
+      "text": "귀사는 설비 적격성 평가에 관한 적절한 서면 절차를 수립·준수하지 않았다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "Your process validations are inadequate.",
+      "text": "귀사의 공정 밸리데이션이 부적절하다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196222",
-   "render_order": 12,
+   "render_order": 7,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -1904,11 +1413,41 @@
      "Is there a written procedure for objectionable organism testing of process water?",
      "Does the procedure require retain sample testing and a risk assessment in complaint investigations?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 3
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch or any of its components to meet any of its specifications whether or not the batch has been already distributed.",
+      "text": "설명되지 않은 불일치와 배치 또는 그 구성성분의 규격 부적합에 대해, 해당 배치의 기출하 여부와 관계없이 철저히 검토하지 않았다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Procedures designed to prevent objectionable microorganisms in drug substance not required to be sterile are not effective.",
+      "text": "무균일 필요가 없는 원료의약품에서 유해 미생물(objectionable microorganisms)을 방지하기 위한 절차가 효과적이지 않다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "Your supplier qualifications are deficient.",
+      "text": "귀사의 공급업체 적격성 평가가 미흡하다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196223",
-   "render_order": 13,
+   "render_order": 8,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2057,11 +1596,53 @@
      "Is CAPA mandatory when confirmed OOS results recur for the same test?",
      "Is scientific justification, such as comparison with historical standard responses, required before attributing an OOS to analyst error?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 5
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Cleaning Validation Program is deficient, Specifically The firm manufactured and shipped 8 ari products for the US market in the past three years each with a different particle size as listed below: Product Name Product Type | == NDC The firm performed three cleaning validations to establish successful product change over cleaning as detailed below for and product changeovers: i a completion A washing amount of or more is required.",
+      "text": "세척 밸리데이션 프로그램이 미흡하다. 구체적으로, 귀사는 지난 3년간 미국 시장용으로 입자 크기가 각기 다른 [비공개] 제품 8종을 제조·출하했다(제품명·제품 유형·NDC 목록). 귀사는 [비공개] 및 [비공개] 제품 전환에 대해 성공적인 제품 전환 세척을 확립하기 위해 아래와 같이 세척 밸리데이션 3건을 수행했다: [비공개] 이상의 세척량이 요구된다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Out of Specification investigation (OOS) is deficient and further no CAPA is initiated to prevent recurrence.",
+      "text": "규격외(OOS) 조사가 미흡하고, 재발 방지를 위한 CAPA 도 개시되지 않았다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "Reports of analysis from component suppliers are accepted without establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at appropriate intervals.",
+      "text": "구성성분 공급업체의 시험성적서를, 적절한 주기로 공급업체 시험 결과를 검증하여 그 분석의 신뢰성을 확립하지 않은 채 수용하고 있다."
+     },
+     {
+      "no": "4",
+      "sev": "observation",
+      "orig": "The roles and responsibilities ofthe quality unit is not fully followed.",
+      "text": "품질부서의 역할과 책임이 완전히 준수되지 않고 있다."
+     },
+     {
+      "no": "5",
+      "sev": "observation",
+      "orig": "Review of audit trail for analytical data generated by your firm is inadequate.",
+      "text": "귀사가 생성한 분석 데이터에 대한 감사추적 검토가 부적절하다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196224",
-   "render_order": 14,
+   "render_order": 9,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2219,11 +1800,59 @@
      "Do specifications for process and cleaning water include testing for absence of objectionable organisms such as B. cepacia?",
      "Is growth promotion testing performed on environmental monitoring media?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 6
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Laboratory Controls are inadequate.",
+      "text": "시험실 관리가 부적절하다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Specifications of Water used in the manufacture of APIs do not demonstrate the water is suitable for its intended use.",
+      "text": "API 제조에 사용되는 물의 규격이 그 물이 의도한 용도에 적합함을 입증하지 못한다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "Your cleaning procedures are not validated.",
+      "text": "귀사의 세척 절차가 밸리데이션되지 않았다."
+     },
+     {
+      "no": "4",
+      "sev": "observation",
+      "orig": "Changes that could affect the production and control of the intermediate or API are not always handled using the formal change control system.",
+      "text": "중간체 또는 API 의 생산·관리에 영향을 줄 수 있는 변경이 항상 공식 변경관리 시스템으로 처리되지는 않는다."
+     },
+     {
+      "no": "5",
+      "sev": "observation",
+      "orig": "Your validation protocols for the execution ofrevalidation studies do not specify critical process steps.",
+      "text": "재밸리데이션 연구 수행을 위한 귀사의 밸리데이션 프로토콜에 핵심 공정 단계가 명시되어 있지 않다."
+     },
+     {
+      "no": "6",
+      "sev": "observation",
+      "orig": "Your receiving procedures for raw materials are inadequate.",
+      "text": "원료 입고 절차가 부적절하다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-196225",
-   "render_order": 15,
+   "render_order": 10,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2365,11 +1994,47 @@
      "Is the stability assay method proven stability-indicating, able to detect degradants and impurities?",
      "Does supplier COA verification periodically confirm every analysis listed on the COA?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 4
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "The firm's Production Unit utilizes critical raw materials within the manufacturing process prior to the completion of identification testing and release of the raw materials by the firm's Quality Control Unit.",
+      "text": "귀사 생산부서는 품질관리부서의 확인시험 완료 및 원료 출하승인 전에 제조 공정에서 핵심 원료를 사용한다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "The firm’s stability program was inadequate in that the firm’s QC Laboratory failed to utilize a stability indicating method for assay testing of(b) (4) The QC Laboratory utilizes a titration method for assay testing of (b) (4) for all stability testing that the firm has conducted on their(B) (4) API products including the following US marketed API:(B) (4) For example, the firm utilized the titration assay method for the accelerated stability studies of(D) (4) API (lot#s(b) (4) The data from the accelerated stability studies was later utilized to determine the shelf life of the product.",
+      "text": "귀사의 안정성 프로그램이 부적절한데, QC 시험실이 [비공개]의 함량 시험에 안정성 지시성 시험법을 사용하지 않았다. QC 시험실은 미국 시판 API [비공개]를 포함해 귀사가 수행한 [비공개] API 제품의 모든 안정성 시험에서 [비공개] 함량 시험에 적정법을 사용한다. 예를 들어, 귀사는 [비공개] API(로트# [비공개])의 가속 안정성 연구에 적정 함량 시험법을 사용했다. 이 가속 안정성 연구 데이터는 이후 제품의 유효기간을 결정하는 데 사용됐다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "Verification testing of the raw material supplier COA is inadequate as the firm has failed to conduct all of the analyses listed on the respective supplier COA.",
+      "text": "원료 공급업체 COA 의 확인시험이 부적절한데, 귀사가 각 공급업체 COA 에 기재된 분석을 모두 수행하지 않았다."
+     },
+     {
+      "no": "4",
+      "sev": "observation",
+      "orig": "Equipment and utensils utilized in the production of API for the US Market are not cleaned or maintained at appropriate intervals to prevent contamination that would alter the safety, identity, strength, purity and quality of the drug substance.",
+      "text": "미국 시장용 API 생산에 사용되는 설비와 기구가, 원료의약품의 안전성·확인·함량·순도·품질을 변질시킬 수 있는 오염을 방지하도록 적절한 주기로 세척되거나 유지관리되지 않는다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "13ca327def9d",
-   "render_order": 16,
+   "render_order": 11,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2499,11 +2164,44 @@
      "Do we keep periodic re-verification results for every attribute where we accept the supplier COA?",
      "Does release testing include batch-wise microbial testing for products that require it?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "violation",
+      "n": 3
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "violation",
+      "orig": "Your firm failed to test samples of each component for identity and conformity with all appropriate written specifications for purity, strength, and quality (21 CFR 211.84(d)(1) and 211.84(d)(2)).",
+      "text": "귀사는 각 원료의 시료에 대해 확인(identity) 시험과 순도(purity)·함량(strength)·품질(quality)에 관한 모든 적절한 서면 규격에의 적합성 시험을 실시하지 않았다 (21 CFR 211.84(d)(1) 및 211.84(d)(2)).",
+      "clause": "21 CFR 211.84(d)(1)"
+     },
+     {
+      "no": "2",
+      "sev": "violation",
+      "orig": "Your firm failed to have, for each batch of drug product, appropriate laboratory determination of satisfactory conformance to final specifications for the drug product, including the identity and strength of each active ingredient, prior to release. Your firm also failed to conduct appropriate laboratory testing, as necessary, for each batch of drug product required to be free of objectionable microorganisms (21 CFR 211.165(a) and 211.165(b)).",
+      "text": "귀사는 각 의약품 배치에 대해 출하 전에 각 유효성분의 확인(identity)과 함량(strength)을 포함하여 완제품 최종 규격에 대한 적합성을 적절한 시험으로 확인하지 않았다. 또한 유해 미생물(objectionable microorganisms)이 없어야 하는 각 의약품 배치에 대해 필요한 적절한 시험을 실시하지 않았다 (21 CFR 211.165(a) 및 211.165(b)).",
+      "clause": "21 CFR 211.165(a)"
+     },
+     {
+      "no": "3",
+      "sev": "violation",
+      "orig": "Your firm’s quality unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22).",
+      "text": "귀사의 품질부서는 제조된 의약품이 CGMP 를 준수하고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 관한 설정 규격을 충족하도록 보장할 책임을 이행하지 않았다 (21 CFR 211.22).",
+      "clause": "21 CFR 211.22"
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "142f18a0ab47",
-   "render_order": 17,
+   "render_order": 12,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2639,11 +2337,44 @@
      "Is every lot of DEG/EG high-risk components such as sorbitol and glycerin identity-tested on receipt?",
      "Have formulation colorants been checked against the US list of permitted color additives, including alternate names such as CI numbers?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "violation",
+      "n": 3
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "violation",
+      "orig": "Your firm failed to ensure that laboratory records included complete data derived from all tests necessary to ensure compliance with established specifications and standards (21 CFR 211.194(a)).",
+      "text": "귀사는 시험실 기록에 설정된 규격과 기준에 대한 적합성을 보장하는 데 필요한 모든 시험에서 얻은 완전한 데이터가 포함되도록 하지 않았다 (21 CFR 211.194(a)).",
+      "clause": "21 CFR 211.194(a)"
+     },
+     {
+      "no": "2",
+      "sev": "violation",
+      "orig": "Your firm failed to conduct at least one test to verify the identity of each component of a drug product. Your firm also failed to validate and establish the reliability of your component supplier’s test analyses at appropriate intervals (21 CFR 211.84(d)(1) and 211.84(d)(2)).",
+      "text": "귀사는 의약품 각 원료의 확인(identity)을 검증하기 위한 시험을 최소 1개도 실시하지 않았다. 또한 원료 공급업체 시험분석의 신뢰성을 적절한 주기로 검증·확립하지 않았다 (21 CFR 211.84(d)(1) 및 211.84(d)(2)).",
+      "clause": "21 CFR 211.84(d)(1)"
+     },
+     {
+      "no": "3",
+      "sev": "violation",
+      "orig": "Your firm’s quality control unit failed to exercise its responsibility to ensure drug products manufactured are in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 211.22).",
+      "text": "귀사의 품질관리부서는 제조된 의약품이 CGMP 를 준수하고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 관한 설정 규격을 충족하도록 보장할 책임을 이행하지 않았다 (21 CFR 211.22).",
+      "clause": "21 CFR 211.22"
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "630b3e9f64ec",
-   "render_order": 18,
+   "render_order": 13,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2747,7 +2478,7 @@
   },
   {
    "id": "8632153aa053",
-   "render_order": 19,
+   "render_order": 14,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -2889,11 +2620,51 @@
      "Are containers or equipment returned from outside repair tested before use?",
      "Do complaint investigations assess other batches and containers exposed to the same cause?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "violation",
+      "n": 4
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "violation",
+      "orig": "Your firm failed to have, for each batch of medical gas, appropriate laboratory determination of satisfactory conformance to final specifications for the medical gas, including the identity and strength of each active ingredient, prior to release (21 CFR 213.165(a)).",
+      "text": "귀사는 각 의료용 가스 배치에 대해 출하 전에 각 유효성분의 확인(identity)과 함량(strength)을 포함하여 의료용 가스 최종 규격에 대한 적합성을 적절한 시험으로 확인하지 않았다 (21 CFR 213.165(a)).",
+      "clause": "21 CFR 213.165(a)"
+     },
+     {
+      "no": "2",
+      "sev": "violation",
+      "orig": "Your firm failed to test samples of each incoming designated medical gas for identity and conformity with all appropriate written specifications for purity, strength, and quality. Your firm also failed to validate and establish the reliability of your incoming designated medical gas supplier’s test analyses at appropriate intervals (21 CFR 213.82(a) and 213.82(b)).",
+      "text": "귀사는 입고되는 각 지정 의료용 가스의 시료에 대해 확인(identity) 시험과 순도(purity)·함량(strength)·품질(quality)에 관한 모든 적절한 서면 규격에의 적합성 시험을 하지 않았다. 또한 입고 지정 의료용 가스 공급업체 시험분석의 신뢰성을 적절한 주기로 검증·확립하지 않았다 (21 CFR 213.82(a) 및 213.82(b)).",
+      "clause": "21 CFR 213.82(a)"
+     },
+     {
+      "no": "3",
+      "sev": "violation",
+      "orig": "Your firm failed to establish and follow adequate written procedures describing the handling of all written and oral complaints regarding a medical gas, including provisions for review by the quality control unit of any complaint involving the possible failure of a medical gas to meet any of its specifications and, for such medical gas, a determination as to the need for an investigation in accordance with 21 CFR 213.192 (21 CFR 213.198(a)).",
+      "text": "귀사는 의료용 가스에 관한 모든 서면·구두 불만의 처리를 기술한 적절한 서면 절차를 수립·준수하지 않았다. 여기에는 의료용 가스가 규격을 충족하지 못했을 가능성이 있는 불만에 대한 품질관리부서의 검토와, 해당 가스에 대해 21 CFR 213.192 에 따른 조사 필요성 판단 규정이 포함된다 (21 CFR 213.198(a)).",
+      "clause": "21 CFR 213.192 · 21 CFR 213.198(a)"
+     },
+     {
+      "no": "4",
+      "sev": "violation",
+      "orig": "Your firm’s quality unit failed to exercise its responsibility to ensure medical gases are manufactured in compliance with CGMP, and meet established specifications for identity, strength, quality, and purity (21 CFR 213.22).",
+      "text": "귀사의 품질부서는 의료용 가스가 CGMP 에 따라 제조되고 확인(identity)·함량(strength)·품질(quality)·순도(purity)에 관한 설정 규격을 충족하도록 보장할 책임을 이행하지 않았다 (21 CFR 213.22).",
+      "clause": "21 CFR 213.22"
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "fda483-195283",
-   "render_order": 20,
+   "render_order": 15,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3048,11 +2819,53 @@
      "Do out-of-criteria interim stability results trigger an OOS investigation?",
      "Is there a written procedure controlling issuance, use and reconciliation of logbooks and worksheets?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "observation",
+      "n": 5
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "observation",
+      "orig": "Results of stability testing are not used in determining expiration dates.",
+      "text": "안정성 시험 결과가 유효기간 결정에 사용되지 않는다."
+     },
+     {
+      "no": "2",
+      "sev": "observation",
+      "orig": "Laboratory records do not include complete data derived from all tests, examinations and assay necessary to assure compliance with established specifications and standards.",
+      "text": "시험실 기록이 설정된 규격 및 기준 적합성을 보증하는 데 필요한 모든 시험, 검사 및 정량으로부터 얻은 완전한 데이터를 포함하지 않는다."
+     },
+     {
+      "no": "3",
+      "sev": "observation",
+      "orig": "The responsibilities and procedures applicable to the quality control unit are not in writing and fully followed.",
+      "text": "품질관리부서에 적용되는 책임과 절차가 서면화되어 있지 않고 완전히 준수되지 않는다."
+     },
+     {
+      "no": "4",
+      "sev": "observation",
+      "orig": "Established sampling plans are not followed and documented at the time of performance.",
+      "text": "설정된 검체채취 계획이 수행 시점에 준수·문서화되지 않는다."
+     },
+     {
+      "no": "5",
+      "sev": "observation",
+      "orig": "Written procedures are not established and followed for the cleaning and maintenance ofequipment, including utensils, used in the manufacture, processing, packing or holding ofa drug product.",
+      "text": "의약품의 제조, 가공, 포장 또는 보관에 사용되는 기구를 포함한 설비의 세척 및 유지관리에 관한 서면 절차가 수립·준수되지 않는다."
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "91bceac3ffe8",
-   "render_order": 21,
+   "render_order": 16,
    "group": "글로벌",
    "group_label": "▫️ 기타",
    "agency": "FDA",
@@ -3162,7 +2975,7 @@
   },
   {
    "id": "gmpinspect-1Q6fJiSER3Z",
-   "render_order": 22,
+   "render_order": 17,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -3298,11 +3111,72 @@
      "Are in-process test steps recorded and reviewed under data integrity procedures?",
      "Are hold times for intermediates defined and controlled?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "other",
+      "n": 7
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "other",
+      "text": "기기 적격성평가 항목을 적절히 설정하고, 데이터를 보관할 것",
+      "area": "시설장비",
+      "clause": "[별표 1] 2.1",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "2",
+      "sev": "other",
+      "text": "모든 시험기록은 원본 데이터를 포함하여 Audit trail을 실시할 것",
+      "area": "시험실",
+      "clause": "[별표 1] 7.1 [별표 1의2] 11.1",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "3",
+      "sev": "other",
+      "text": "시험 행위의 재구성을 위한 모든 메타데이터를 보관할 것",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "4",
+      "sev": "other",
+      "text": "원료 투입량을 확인할 수 있는 근거자료를 첨부할 것",
+      "area": "제조",
+      "clause": "[별표 1] 8.1 [별표 1의2] 8.1",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "5",
+      "sev": "other",
+      "text": "공정검사의 시험과정을 기록하고 데이터완전성 절차에 따라 검토할 것",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "6",
+      "sev": "other",
+      "text": "반제품 보관기간을 설정하여 관리할 것",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "7",
+      "sev": "other",
+      "text": "세척밸리데이션 수행방법을 적절하게 설정할 것",
+      "clause": "[별표 1] 6.4 [별표 1의2] 12.4",
+      "note": "이행계획서 타당성 인정"
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "gmpinspect-1Q6VfHVal_H",
-   "render_order": 23,
+   "render_order": 18,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -3380,7 +3254,7 @@
   },
   {
    "id": "gmpinspect-1Q6VfHVao4W",
-   "render_order": 24,
+   "render_order": 19,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -3509,11 +3383,64 @@
      "Do we have cleaning validation evidence that reflects campaign production?",
      "Are weighing tool cleaning records kept under our area hygiene standard?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "other",
+      "n": 6
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "other",
+      "text": "품질(보증)부서 책임자의 이행 결과(백업 절차 등)의 추가 설명자료를 제출할 것",
+      "area": "품질 경영",
+      "clause": "[별표 1] 제3.2호"
+     },
+     {
+      "no": "2",
+      "sev": "other",
+      "text": "제조라인 정지 및 재가동 시 공기 흐름 평가의 추가 설명자료를 제출할 것",
+      "area": "시설 장비",
+      "clause": "[별표 1] 제2.1호 아목"
+     },
+     {
+      "no": "3",
+      "sev": "other",
+      "text": "작업소의 위생관리(칭량도구 세척기록 등) 의 추가 설명자료를 제출할 것",
+      "clause": "[별표 1] 제9.2호"
+     },
+     {
+      "no": "4",
+      "sev": "other",
+      "text": "세척밸리데이션(캠페인 생산 등)의 추가 설명자료를 제출할 것",
+      "area": "제조",
+      "clause": "[별표 1] 제6.4호"
+     },
+     {
+      "no": "5",
+      "sev": "other",
+      "text": "제조지시 및 기록서 작성 방법의 추가 설명자료를 제출할 것",
+      "clause": "[별표 1] 제8.1호 가목"
+     },
+     {
+      "no": "6",
+      "sev": "other",
+      "text": "미생물한도시험 적합성 평가의 추가 설명 자료를 제출할 것",
+      "area": "시험실",
+      "clause": "[별표 1] 제6.3호",
+      "note": "보완 완료"
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "gmpinspect-1Q6VfHVap_U",
-   "render_order": 25,
+   "render_order": 20,
    "group": "국내",
    "group_label": "GMP실사",
    "agency": "MFDS",
@@ -3656,11 +3583,83 @@
      "Is the purified water system free of unused piping (dead legs)?",
      "Is there a defined backup procedure for test data with restore checks?"
     ]
+   },
+   "inspection": {
+    "v": 1,
+    "counts": [
+     {
+      "sev": "other",
+      "n": 8
+     }
+    ],
+    "items": [
+     {
+      "no": "1",
+      "sev": "other",
+      "text": "백업에 대한 추가 설명 자료를 제출할 것",
+      "area": "품질경영",
+      "clause": "[별표 1] 제5.2호 나목",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "2",
+      "sev": "other",
+      "text": "정제수 시스템의 미사용 배관에 대한 추가 설명 자료를 제출할 것",
+      "area": "시설장비",
+      "clause": "[별표 1] 제2.1호 다목",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "3",
+      "sev": "other",
+      "text": "계산 시 사용하는 스프레드시트의 검증에 대한 추가 설명 자료를 제출할 것",
+      "clause": "[별표 1] 제6.6호",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "4",
+      "sev": "other",
+      "text": "시험방법 밸리데이션에 대한 추가 설명 자료를 제출할 것",
+      "area": "시험실",
+      "clause": "[별표 1] 제6.3호",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "5",
+      "sev": "other",
+      "text": "출발물질 시험에 대한 추가 설명 자료를 제출할 것",
+      "clause": "[별표 1] 제7.1호 다목",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "6",
+      "sev": "other",
+      "text": "미생물한도 시험에 대한 추가 설명 자료를 제출할 것",
+      "area": "시험실",
+      "clause": "[별표 1] 제7.1호",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "7",
+      "sev": "other",
+      "text": "시험 행위의 재구성에 대한 추가 설명 자료를 제출할 것",
+      "clause": "[별표 1] 제7.1호 라목",
+      "note": "이행계획서 타당성 인정"
+     },
+     {
+      "no": "8",
+      "sev": "other",
+      "text": "잔류 유기용매 시험에 대한 추가 설명자료를 제출할 것",
+      "clause": "[별표 1] 제7.1호",
+      "note": "이행계획서 타당성 인정"
+     }
+    ],
+    "actions": []
    }
   },
   {
    "id": "admin-2026007815",
-   "render_order": 26,
+   "render_order": 21,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3765,7 +3764,7 @@
   },
   {
    "id": "admin-2026007895",
-   "render_order": 27,
+   "render_order": 22,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3869,7 +3868,7 @@
   },
   {
    "id": "admin-2026007836",
-   "render_order": 28,
+   "render_order": 23,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -3968,7 +3967,7 @@
   },
   {
    "id": "admin-2026007737",
-   "render_order": 29,
+   "render_order": 24,
    "group": "국내",
    "group_label": "행정처분",
    "agency": "MFDS",
@@ -4073,7 +4072,7 @@
   },
   {
    "id": "data0008-15202",
-   "render_order": 30,
+   "render_order": 25,
    "group": "국내",
    "group_label": "고시·개정법령",
    "agency": "MFDS",
@@ -4147,7 +4146,7 @@
   },
   {
    "id": "data0008-15203",
-   "render_order": 31,
+   "render_order": 26,
    "group": "국내",
    "group_label": "고시·개정법령",
    "agency": "MFDS",
@@ -4221,7 +4220,7 @@
   },
   {
    "id": "data0008-15200",
-   "render_order": 32,
+   "render_order": 27,
    "group": "국내",
    "group_label": "고시·개정법령",
    "agency": "MFDS",
@@ -4295,7 +4294,7 @@
   },
   {
    "id": "recall-393b7e02ee72",
-   "render_order": 33,
+   "render_order": 28,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4382,7 +4381,7 @@
   },
   {
    "id": "recall-48c360d4b6d1",
-   "render_order": 34,
+   "render_order": 29,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4472,7 +4471,7 @@
   },
   {
    "id": "recall-5a12ea50b80b",
-   "render_order": 35,
+   "render_order": 30,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4559,7 +4558,7 @@
   },
   {
    "id": "recall-7621d6b9981d",
-   "render_order": 36,
+   "render_order": 31,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4646,7 +4645,7 @@
   },
   {
    "id": "recall-b250b08c23d5",
-   "render_order": 37,
+   "render_order": 32,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4733,7 +4732,7 @@
   },
   {
    "id": "recall-f9cb26370283",
-   "render_order": 38,
+   "render_order": 33,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4820,7 +4819,7 @@
   },
   {
    "id": "recall-af6b42c8c4df",
-   "render_order": 39,
+   "render_order": 34,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4910,7 +4909,7 @@
   },
   {
    "id": "recall-168496d79d9a",
-   "render_order": 40,
+   "render_order": 35,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -4997,7 +4996,7 @@
   },
   {
    "id": "hc-82896",
-   "render_order": 41,
+   "render_order": 36,
    "group": "Recall",
    "group_label": null,
    "agency": "Health Canada",
@@ -5087,7 +5086,7 @@
   },
   {
    "id": "recall-01f0f654c3cd",
-   "render_order": 42,
+   "render_order": 37,
    "group": "Recall",
    "group_label": null,
    "agency": "MFDS",
@@ -5174,7 +5173,7 @@
   },
   {
    "id": "D-0070-2027",
-   "render_order": 43,
+   "render_order": 38,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5283,7 +5282,7 @@
   },
   {
    "id": "D-0082-2027",
-   "render_order": 44,
+   "render_order": 39,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5415,7 +5414,7 @@
   },
   {
    "id": "D-0084-2027",
-   "render_order": 45,
+   "render_order": 40,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5524,7 +5523,7 @@
   },
   {
    "id": "8b6bc62e550c",
-   "render_order": 46,
+   "render_order": 41,
    "group": "Recall",
    "group_label": null,
    "agency": "MHRA",
@@ -5608,7 +5607,7 @@
   },
   {
    "id": "91ccd273fe30",
-   "render_order": 47,
+   "render_order": 42,
    "group": "Recall",
    "group_label": null,
    "agency": "MHRA",
@@ -5696,7 +5695,7 @@
   },
   {
    "id": "D-0045-2027",
-   "render_order": 48,
+   "render_order": 43,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5827,7 +5826,7 @@
   },
   {
    "id": "D-0050-2027",
-   "render_order": 49,
+   "render_order": 44,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -5954,7 +5953,7 @@
   },
   {
    "id": "D-0051-2027",
-   "render_order": 50,
+   "render_order": 45,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -6084,7 +6083,7 @@
   },
   {
    "id": "D-0053-2027",
-   "render_order": 51,
+   "render_order": 46,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -6213,7 +6212,7 @@
   },
   {
    "id": "D-0076-2027",
-   "render_order": 52,
+   "render_order": 47,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -6340,7 +6339,7 @@
   },
   {
    "id": "D-0079-2027",
-   "render_order": 53,
+   "render_order": 48,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -6471,7 +6470,7 @@
   },
   {
    "id": "recall-fb-ad0646134a334095",
-   "render_order": 54,
+   "render_order": 49,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",
@@ -6598,7 +6597,7 @@
   },
   {
    "id": "recall-fb-d2089da0cb841a55",
-   "render_order": 55,
+   "render_order": 50,
    "group": "Recall",
    "group_label": null,
    "agency": "FDA",

@@ -121,6 +121,7 @@ from grm_findings import normalize_firm_name as _normalize_firm_name  # noqa: E4
 from grm_findings import canonical_firm_key as _canonical_firm_key  # noqa: E402
 from grm_findings import FIRM_KEY_ALIASES  # noqa: E402
 import graph_export  # noqa: E402
+import clause_citations  # noqa: E402
 # [정보출처 링크 품질 게이트 2026-09-10] card_scaffold._dual_links 가 이미 신규 발행분을
 # 걸러도, 게이트 이전에 발행된 브리프 JSON(`web/data/briefs/*.json`)은 여전히 파일에
 # serviceKey= API 원주소를 담고 있다 — 브리프는 매 빌드마다 이 JSON 에서 다시 렌더되므로
@@ -4676,6 +4677,8 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "{docs:,} inspection documents whose source text is English"),
     ("findings/clause/", "Findings by 21 CFR section",
      "{clause} sections, each with the findings that cite it"),
+    ("findings/citations/", "Most-cited FDA clauses",
+     "How often FDA cited each 21 CFR clause, by inspections and fiscal year"),
     ("findings/trends/", "Findings trends",
      "Ranked deficiency areas over the last 12 months and the most-cited sections"),
     ("findings/inspections/", "FDA inspection classifications",
@@ -5017,6 +5020,8 @@ TRENDS_DESCRIPTION = N_("식약처·FDA 중 기관을 골라 최근 12개월에 
 INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
                              "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
 EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어 그대로, 출처 링크 포함.")
+CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
+                           "조항별 인용 실사 수·비율과 회계연도별 추이.")
 COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
                           "연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다.")
 FIRM_DESCRIPTION = N_("특정 업체의 FDA 483·Warning Letter·캐나다 실사·식약처·EU/영국 GMP 비준수 지적사항 "
@@ -5461,6 +5466,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     glossary_terms = load_glossary()
     clause_views = build_clause_views(docs_data, load_cfr_catalog(), glossary_terms)
     clause_slugs = {c["slug"] for c in clause_views}
+    # [FDA 지적 조항 화면] 커밋 집계본(web/data/fda_citations.json). 없으면 None → 화면 없음.
+    citations_data = clause_citations.load_snapshot()
     # [다국어 2026-09-04] 영어판 조항 — **원문이 영어인 지적만** 다시 세어 만든다.
     # 문서 임계(CLAUSE_MIN_DOCUMENTS)를 그대로 다시 적용하므로 영어 모집단에서 얇아진
     # 조항은 페이지를 만들지 않는다(얇은 페이지는 색인에 해롭다 — 한국어판과 같은 규율).
@@ -5501,6 +5508,8 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 넣으면 먼저 그려진 한국어 페이지가 짝을 몰라 hreflang·언어 전환이 한쪽에만 붙는다
     # (모음 페이지에서 같은 실수를 CI 가 잡았다).
     en_paths |= clause_tree_paths(clause_views_en)
+    if citations_data:
+        en_paths.add("findings/citations/")
     en_paths |= glossary_tree_paths(load_glossary())
     # [지적 사례 화면] 정본(web/data/deficiency_examples.json)이 있을 때만 양 트리에 선언한다.
     example_data = example_page.load_examples()
@@ -6151,6 +6160,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             json_ld=clause_index.breadcrumb_json_ld([
                 (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"), (tr("조항별"), "")]),
             clauses=clause_views, min_documents=CLAUSE_MIN_DOCUMENTS,
+            citations_ready=bool(citations_data),
         )
         index_mod = max((s.get("published_date") or ""
                          for c in clause_views for s in c["samples"]), default="")
@@ -6169,6 +6179,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                     (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
                     (tr("조항별"), "findings/clause/"), (clause["code"], "")]),
                 clause=clause, siblings=sibs, agency_labels=clause_agency_labels,
+                cit=clause_citations.section_view(citations_data, clause["section"]),
             )
             clause_mod = max((s.get("published_date") or ""
                               for s in clause["samples"]), default="")
@@ -6177,6 +6188,24 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
 
     _clause_agency_labels = (docs_data or {}).get("agency_labels") or (
         facets.get("agency_labels") if facets else {}) or {}
+    def emit_citations(mkpage, emit_page, tr, slugs, lang_key):
+        """[FDA 지적 조항 화면] 조항별 인용 빈도 순위 — ko·en 같은 함수(두 벌 금지)."""
+        cp = mkpage("findings/citations/")
+        emit_page("clause_citations.html", cp,
+            page_title=tr("FDA 가 자주 지적하는 조항 · GRM"),
+            nav_active="findings",
+            description=tr(CITATIONS_DESCRIPTION),
+            json_ld=cp.breadcrumb_json_ld([
+                (tr("홈"), "/"), (tr("지적사항 검색"), "findings/"),
+                (tr("FDA 지적 조항"), "")]),
+            cit=clause_citations.ranking_view(citations_data), clause_slugs=slugs,
+        )
+        if lang_key == DEFAULT_LANG:
+            facet_paths.append((cp.site_path, citations_data["as_of"]))
+
+    if citations_data:
+        emit_citations(page, emit, tr, {c["slug"] for c in clause_views}, DEFAULT_LANG)
+        emit_citations(en_page, en_emit, en_tr, {c["slug"] for c in clause_views_en}, "en")
     emit_clause_tree(clause_views, page, emit, tr, DEFAULT_LANG, _clause_agency_labels)
     emit_clause_tree(clause_views_en, en_page, en_emit, en_tr, "en",
                      {k: en_tr(v) for k, v in _clause_agency_labels.items()})

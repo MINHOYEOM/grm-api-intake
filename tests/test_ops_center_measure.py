@@ -239,17 +239,42 @@ class GithubMeasureTest(unittest.TestCase):
         start = now - dt.timedelta(days=7)
         runs = {"a.yml": [
             {"event": "schedule", "created_at": "2026-11-07T18:30:00Z"},   # 13분 지각 → 정시
-            {"event": "schedule", "created_at": "2026-11-06T20:00:00Z"},   # 103분 지각 → 지각
-            {"event": "workflow_dispatch", "created_at": "2026-11-05T18:17:00Z"},  # 수동 실행은 안 셈
+            {"event": "schedule", "created_at": "2026-11-06T20:00:00Z"},   # 103분 지각 → 3시간 창 안이라 정시
+            {"event": "schedule", "created_at": "2026-11-05T22:30:00Z"},   # 253분 지각 → 지각
+            {"event": "workflow_dispatch", "created_at": "2026-11-04T18:17:00Z"},  # 수동 실행은 안 셈
         ]}
         v, note = gm.ontime({"a.yml": ["17 18 * * *"]}, runs, {"a.yml": start}, now)
-        self.assertEqual(v, round(100 / 7, 1))
-        self.assertIn("7일 예약 7회 중 1회", note)
+        self.assertEqual(v, round(200 / 7, 1))
+        self.assertIn("7일 예약 7회 중 2회", note)
+        self.assertIn("지각 1·누락 4", note)
         with self.assertRaises(gm.Hold):
             gm.ontime({}, {}, {}, now)
 
+    def _one_fire(self, delay_min):
+        now = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
+        start = dt.datetime(2026, 11, 7, 0, 0, tzinfo=UTC)   # 예정 1회: 11-07 18:17
+        runs = []
+        if delay_min is not None:
+            t = dt.datetime(2026, 11, 7, 18, 17, tzinfo=UTC) + dt.timedelta(minutes=delay_min)
+            runs = [{"event": "schedule", "created_at": t.strftime("%Y-%m-%dT%H:%M:%SZ")}]
+        return gm.ontime({"a.yml": ["17 18 * * *"]}, {"a.yml": runs}, {"a.yml": start}, now)
+
+    def test_ontime_window_is_three_hours(self):
+        self.assertEqual(gm.ONTIME_GRACE_MIN, 180)
+        v, note = self._one_fire(179)
+        self.assertEqual(v, 100.0)
+        self.assertIn("예정+3시간", note)
+        v, note = self._one_fire(181)
+        self.assertEqual(v, 0.0)
+        self.assertIn("지각 1·누락 0", note)
+
+    def test_ontime_missing_run(self):
+        v, note = self._one_fire(None)
+        self.assertEqual(v, 0.0)
+        self.assertIn("지각 0·누락 1", note)
+
     def test_ontime_skips_fires_inside_grace(self):
-        now = dt.datetime(2026, 11, 8, 18, 40, tzinfo=UTC)   # 18:17 예정이 23분 전 — 아직 판정하지 않는다
+        now = dt.datetime(2026, 11, 8, 20, 40, tzinfo=UTC)   # 18:17 예정이 143분 전 — 아직 판정하지 않는다
         start = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
         with self.assertRaises(gm.Hold):
             gm.ontime({"a.yml": ["17 18 * * *"]}, {"a.yml": []}, {"a.yml": start}, now)

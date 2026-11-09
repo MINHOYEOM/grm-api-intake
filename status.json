@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T05:21:09Z",
+ "generated_at": "2026-11-09T05:38:46Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 42568356278,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T05:37:15Z",
+    "updatedAt": "2026-11-09T05:38:38Z",
+    "headBranch": "main",
+    "displayTitle": "fix(brief): 새 실사 카드 틀은 11-09 이후 호에만 — 옛 호 재조립 소급 방지 (#1412)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568356278"
+   },
+   {
     "databaseId": 42566688275,
     "status": "completed",
     "conclusion": "success",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "GRM Web Publish (assemble)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553957175"
-   },
-   {
-    "databaseId": 42552973746,
-    "status": "completed",
-    "conclusion": "failure",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-11-09T02:48:50Z",
-    "updatedAt": "2026-11-09T02:50:20Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Web Publish (assemble)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42552973746"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42566790479,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T05:21:00Z",
-    "updatedAt": "2026-11-09T05:21:04Z",
-    "headBranch": "publish/brief-2026-11-02",
-    "displayTitle": "publish(web): 2026-11-02 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566790479"
-   },
-   {
-    "databaseId": 42566785283,
+    "databaseId": 42568356373,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T05:20:57Z",
-    "updatedAt": "2026-11-09T05:21:01Z",
-    "headBranch": "publish/brief-2026-11-02",
-    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566785283"
-   },
-   {
-    "databaseId": 42566675154,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-09T05:19:53Z",
-    "updatedAt": "2026-11-09T05:19:57Z",
+    "createdAt": "2026-11-09T05:37:15Z",
+    "updatedAt": "2026-11-09T05:37:36Z",
     "headBranch": "main",
-    "displayTitle": "fix(publish): 재발행이 발행 뒤 정정한 facts 값을 되돌리지 않게 + 11-02 정정값 복구 (#1400)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566675154"
+    "displayTitle": "fix(brief): 새 실사 카드 틀은 11-09 이후 호에만 — 옛 호 재조립 소급 방지 (#1412)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568356373"
    },
    {
-    "databaseId": 42566335014,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 42568001659,
+    "status": "completed",
+    "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T05:16:24Z",
-    "updatedAt": "2026-11-09T05:16:28Z",
-    "headBranch": "fix/brief-1026-extraction-gap",
-    "displayTitle": "brief(10-26): FDA 483 관찰 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extraction-gap)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566335014"
+    "createdAt": "2026-11-09T05:33:33Z",
+    "updatedAt": "2026-11-09T05:38:31Z",
+    "headBranch": "fix/legislative-card-adoption",
+    "displayTitle": "feat(brief): GMP 관련 입법·행정예고를 본 카드로 승격 (watch 유지는 그 외)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42568001659"
    },
    {
-    "databaseId": 42566282807,
+    "databaseId": 42567993112,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T05:15:53Z",
-    "updatedAt": "2026-11-09T05:20:55Z",
-    "headBranch": "fix/brief-1026-extraction-gap",
-    "displayTitle": "brief(10-26): FDA 483 관찰 #1 한국어 결손 4건 보강 — 재조립 거부 해소 (#1214 extractio…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42566282807"
+    "createdAt": "2026-11-09T05:33:27Z",
+    "updatedAt": "2026-11-09T05:38:44Z",
+    "headBranch": "fix/legislative-card-adoption",
+    "displayTitle": "feat(brief): GMP 관련 입법·행정예고를 본 카드로 승격 (watch 유지는 그 외)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42567993112"
+   },
+   {
+    "databaseId": 42567954391,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-09T05:33:04Z",
+    "updatedAt": "2026-11-09T05:37:32Z",
+    "headBranch": "main",
+    "displayTitle": "feat(ops): 지적 조항 집계 월간 자동 갱신 워크플로 (#1411)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42567954391"
+   },
+   {
+    "databaseId": 42567896377,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "pull_request",
+    "createdAt": "2026-11-09T05:32:26Z",
+    "updatedAt": "2026-11-09T05:32:31Z",
+    "headBranch": "feat/deficiency-examples-screen",
+    "displayTitle": "feat(web): 지적 사례 화면 — 분류별 규제기관 지적 사례",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42567896377"
    }
   ],
   "grm-scaffold-mirror.yml": [

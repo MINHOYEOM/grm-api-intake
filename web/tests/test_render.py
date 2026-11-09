@@ -17427,6 +17427,23 @@ class WebI18nTest(unittest.TestCase):
         raw = json.loads(grm_i18n.catalog_path("en").read_text(encoding="utf-8"))
         self.assertEqual(list(raw), sorted(raw), "en.json 키는 정렬 상태로 유지한다")
 
+    def test_card_registry_labels_have_english_and_are_registered(self):
+        """카드 레지스트리(card_scaffold._REGISTRY)의 card_type·type_tag 가 전부 영문 사전에 있고
+        소스 추출 키 또는 BRIEF_LABEL_KEYS 로 등록돼 있어야 한다(고아 키 lint). 새 kind 를 레지스트리에 넣었는데 번역을 빠뜨리면
+        그 kind 의 첫 카드가 들어오는 월요일 영어 조립이 MissingTranslation 으로 멈춘다
+        (2026-11-09: '고시·개정법령'·'규정' 이 처음 들어와 발행이 3시간 늦어졌다)."""
+        import card_scaffold
+        catalog = json.loads(grm_i18n.catalog_path("en").read_text(encoding="utf-8"))
+        registered = set(render.BRIEF_LABEL_KEYS) | set(grm_i18n.collect_keys())
+        labels = set()
+        for spec in card_scaffold._REGISTRY.values():
+            labels.update((spec.label, spec.core_tag))
+        labels.discard("")
+        no_en = sorted(x for x in labels if x not in catalog)
+        no_reg = sorted(x for x in labels if x not in registered)
+        self.assertEqual(no_en, [], f"en.json 에 영문이 없는 카드 라벨: {no_en}")
+        self.assertEqual(no_reg, [], f"BRIEF_LABEL_KEYS 에 미등록 카드 라벨: {no_reg}")
+
     def test_korean_translator_is_identity(self):
         tr = grm_i18n.Translator("ko")
         self.assertEqual(tr("문서 {n}건", n=3), "문서 3건")
@@ -17691,7 +17708,7 @@ class WebEnBriefTest(unittest.TestCase):
           초록인데 빌드가 죽는 자리라서, 언어와 무관하게 실제로 `tr()` 을 타는 필드
           전부를 대조한다(`group` 은 섹션 묶기용 데이터 값이라 번역 대상이 아니다).
         """
-        registered = set(render.BRIEF_LABEL_KEYS)
+        registered = set(render.BRIEF_LABEL_KEYS) | set(grm_i18n.collect_keys())
         seen: set[str] = set()
         for b in render.load_briefs(render.DATA_DIR):
             for c in b.get("cards") or []:

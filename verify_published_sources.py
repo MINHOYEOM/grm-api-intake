@@ -94,13 +94,51 @@ def _card_kind(card: dict[str, Any]) -> str:
     return ""
 
 
-def _found_483(card_id: str) -> "tuple[int, str]":
+def _fetch_483(card_id: str) -> "tuple[int, str, str]":
+    """(원문 관찰 수, 상태, 원문 텍스트). 범위 재판정이 같은 텍스트를 쓰도록 함께 돌려준다."""
     import collect_fda_483 as f
     media_id = card_id.split("-", 1)[1]
     text, status = f._fetch_fda483_pdf_text(f._pdf_url(media_id))
     if not text:
-        return 0, status
-    return len(f._extract_483_observations_from_text(text)), status
+        return 0, status, ""
+    return len(f._extract_483_observations_from_text(text)), status, text
+
+
+def _found_483(card_id: str) -> "tuple[int, str]":
+    found, status, _ = _fetch_483(card_id)
+    return found, status
+
+
+_EST_TYPES: "dict[str, str] | None" = None
+
+
+def _establishment_type(card_id: str) -> str:
+    """483 의 시설 유형(Establishment Type). 못 구하면 "" — 호출자는 '모름'으로 다룬다.
+
+    유형은 PDF 에도 findings 에도 없고 FDA 리딩룸 목록에만 있다(조립기는 스캐폴드 facts 에서
+    읽는다). 그래서 목록 JSON 을 한 번만 받아 media_id 로 맞춘다. 실패하면 빈 값 — 이 경우
+    범위 판정은 본문만으로 하고, 판정이 안 되면 결함으로 센다(숨기지 않는다)."""
+    global _EST_TYPES
+    if _EST_TYPES is None:
+        _EST_TYPES = {}
+        try:
+            import collect_fda_483 as f
+            rows, _ = f._fetch_legacy_json_rows()
+            _EST_TYPES = {str(r.get("media_id") or ""): str(r.get("establishment_type") or "")
+                          for r in rows}
+        except Exception:                                     # noqa: BLE001 — 베스트에포트
+            _EST_TYPES = {}
+    return _EST_TYPES.get(card_id.split("-", 1)[1], "")
+
+
+def _is_out_of_scope_483(est: str, text: str) -> bool:
+    """조립기와 **같은 함수**(`grm_taxonomy.is_out_of_scope_483`)로 범위 밖인가. 규칙 복제 금지.
+
+    유형·본문 둘 다 비어 있으면 판정할 근거가 없으므로 False(= 결함으로 센다)."""
+    if not (est or text):
+        return False
+    from grm_taxonomy import is_out_of_scope_483
+    return bool(is_out_of_scope_483(est, text))
 
 
 def _found_wl(url: str) -> "tuple[int, str]":
@@ -183,6 +221,10 @@ def classify(row: dict[str, Any]) -> str:
     if found > total:
         return "extraction-gap"     # 원문에 있는데 우리가 뽑지 못했다
     if ok > shown:
+        if row.get("oos_483"):
+            # DB scope 는 'ok' 지만 조립기 범위 판정(is_out_of_scope_483)이 기기·생식 시설 등으로
+            # 의도대로 뺀 483 — 카드가 적게 보인 게 맞다(이슈 #1214 오탐 4건).
+            return "scope-excluded"
         return "publish-gap"        # 뽑았고 공개 대상인데 카드가 덜 보여줬다
     return "scope-excluded"         # 뽑았으나 scope 로 정상 제외 — 결함 아님
 
@@ -202,14 +244,20 @@ def verify(weeks: int) -> "tuple[list[dict[str, Any]], list[dict[str, Any]]]":
               "진행(허위경보 가능)", flush=True)
     rows: list[dict[str, Any]] = []
     for i, (cid, info) in enumerate(sorted(state.items()), 1):
+        text = ""
         if info["kind"] == "483":
-            found, status = _found_483(cid)
+            found, status, text = _fetch_483(cid)
         else:
             found, status = _found_wl(info["url"])
         counts = (scope or {}).get(cid)
         row = {**info, "id": cid, "found": found, "status": status,
                "db_total": counts["total"] if counts else None,
                "db_ok": counts["ok"] if counts else None}
+        # 조립기가 범위 밖으로 뺀 483 은 발행 격차가 아니다. 격차 후보일 때만 판정한다
+        # (목록 조회 1회 비용을 격차 없는 카드에는 쓰지 않는다).
+        if (info["kind"] == "483" and found > info["shown"]
+                and (counts or {}).get("ok", 0) > info["shown"]):
+            row["oos_483"] = _is_out_of_scope_483(_establishment_type(cid), text)
         row["verdict"] = classify(row)
         rows.append(row)
         print(f"[{i:>3}/{len(state)}] {cid:<18} {info['date']:<18} "
@@ -244,8 +292,11 @@ def format_report(mismatches: list[dict[str, Any]],
     tail = ""
     if excluded:
         n_find = sum(r["found"] - r["shown"] for r in excluded)
+        why = ("`scope_status` 가 `ok` 가 아니거나 조립기 범위 판정(`is_out_of_scope_483`, 기기·"
+               "생식 시설 등)이 뺀 것이라" if any(r.get("oos_483") for r in excluded)
+               else "`scope_status` 가 `ok` 가 아니라")
         tail = (f"\n\n참고: {len(excluded)}개 카드({n_find}건)는 원문보다 적게 보이지만 "
-                f"`scope_status` 가 `ok` 가 아니라 **의도대로 제외된 것**이라 불일치로 "
+                f"{why} **의도대로 제외된 것**이라 불일치로 "
                 f"세지 않았습니다: " + ", ".join(f"`{r['id']}`" for r in excluded[:12])
                 + ("…" if len(excluded) > 12 else ""))
     if not mismatches:

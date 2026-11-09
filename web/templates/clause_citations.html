@@ -11,6 +11,7 @@
     <p>{{ _("FDA 가 지적을 낸 실사 가운데 어느 조항이 몇 번 인용됐는지 봅니다. 한 실사가 같은 조항을 여러 번 적어도 1건으로 셉니다.") }}</p>
   </div>
   <div class="wrap cc-sec">
+    {% with seg_active = "citations" %}{% include "partials/findings_seg.html" %}{% endwith %}
     <p class="cc-big"><b>{{ "{:,}".format(cit.total) }}</b><span>{{ _("지적이 나온 실사 (FY{a}~FY{b})", a=cit.years[0], b=cit.years[-1]) }}</span></p>
     <div class="cc-wrapx"><table class="cc-tbl">
       <thead><tr>

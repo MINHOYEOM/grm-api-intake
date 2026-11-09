@@ -1,0 +1,25 @@
+{#- [1안 메뉴 정리 2026-11-10] 다음으로 볼 것 — 검색으로 들어와 한 장만 보고 나가던
+    진입 페이지(용어 낱장 · 지적 문서 · 업체 페이지)의 본문 끝에 이어 갈 길 셋을 둔다.
+    켜는 쪽은 render.py 의 `next_strip=True` 하나다(템플릿이 페이지 종류를 스스로 고르지
+    않는다 — 문서·업체 템플릿은 손대지 않고 base.html 이 이 파셜을 부른다).
+    링크는 그 트리에 실제로 있는 곳만: 최신 브리프는 그 언어 판이 있을 때, 구독은 구독
+    밴드(#subscribe)가 이 페이지에 그려질 때만(밴드 조건과 같은 식). -#}
+<style>
+.grm-next{margin:8px auto 56px}
+.grm-next-in{border-top:1px solid var(--line);padding-top:18px}
+.grm-next h2{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--muted);margin:0 0 10px;word-break:keep-all}
+.grm-next ul{display:flex;flex-wrap:wrap;gap:8px 10px;margin:0;padding:0;list-style:none}
+.grm-next a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 14px;border:1px solid var(--line-2);border-radius:var(--rad-s);font-family:var(--sans);font-size:14px;color:var(--ink);text-decoration:none;word-break:keep-all}
+.grm-next a:hover{border-color:var(--coral);color:var(--coral-2)}
+.grm-next a .ti{font-size:14px}
+</style>
+<aside class="wrap grm-next" aria-labelledby="grm-next-h"><div class="grm-next-in">
+  <h2 id="grm-next-h">{{ _("다음으로 볼 것") }}</h2>
+  <ul>
+{% if lang == 'ko' or ('briefs/' ~ latest_slug ~ '/') in en_paths %}    <li><a href="{{ rel_root }}briefs/{{ latest_slug }}/index.html">{{ _("이번 주 브리프") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></li>
+{% endif %}
+    <li><a href="{{ rel_root }}findings/checklist/index.html">{{ _("실사 대비 체크리스트") }} <i class="ti ti-arrow-right" aria-hidden="true"></i></a></li>
+{% if newsletter_form_action and nav_active != 'about' and not hide_subscribe %}    <li><a href="#subscribe">{{ _("무료 구독") }} <i class="ti ti-arrow-down" aria-hidden="true"></i></a></li>
+{% endif %}
+  </ul>
+</div></aside>

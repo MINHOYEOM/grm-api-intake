@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{#- [SEO 2026-11-09] 얇은 업체 페이지는 구글봇만 noindex(네이버는 색인 유지) — 판정은 render.is_thin_firm_page. -#}
+{% block meta_robots %}{% if thin_page %}<meta name="googlebot" content="noindex, follow" />
+{% endif %}{% endblock %}
 {% block content %}
 {#- [B1 색인 표면] 업체 단위 정적 페이지 — /findings/firm/{slug}/.
 

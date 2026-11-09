@@ -72,6 +72,19 @@ Deno.serve(async (req: Request) => {
   if (!user.email_confirmed_at) return jsonResponse({ error: "email_not_confirmed" }, 403);
 
   const body = await readJsonBody(req);
+
+  // 읽기 전용 상태 조회 — 로그인 후 안내(login-nudge)를 띄울지 판단용. 쓰기 0.
+  // 응답은 본인 JWT 이메일에 대한 상태 문자열뿐(subscribed | blocked_unsubscribed | none).
+  if (String(body.action || "") === "status") {
+    const st = await brevo(`/contacts/${encodeURIComponent(email)}`);
+    if (st.status === 404) return jsonResponse({ ok: true, status: "none" });
+    if (!st.ok) return jsonResponse({ error: "brevo_request_failed" }, 502);
+    if (st.payload.emailBlacklisted === true) return jsonResponse({ ok: true, status: "blocked_unsubscribed" });
+    const ids = Array.isArray(st.payload.listIds) ? (st.payload.listIds as unknown[]).map(Number) : [];
+    const mine = [listKo, listEn].filter(Boolean).map(Number);
+    return jsonResponse({ ok: true, status: ids.some((i) => mine.includes(i)) ? "subscribed" : "none" });
+  }
+
   const source = String(body.source || "");
   const ver = String(body.consent_ver || "");
   const lang = String(body.lang || "ko") === "en" ? "en" : "ko";

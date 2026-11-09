@@ -87,6 +87,9 @@ jobs:
           GRM_NEWSLETTER_FORM_ACTION_EN: ${{ vars.GRM_NEWSLETTER_FORM_ACTION_EN }}
           # 구독 폼에 가입 페이지 경로·언어 hidden 추가 — Brevo 속성·폼 필드를 만든 뒤 '1' 로 켠다(기본 꺼짐).
           GRM_SIGNUP_PATH_FIELDS: ${{ vars.GRM_SIGNUP_PATH_FIELDS }}
+          # 회원 구독 안내(로그인 후 1회)가 뜨기 전 '이미 구독 중?'을 서버에 묻는다 — newsletter-optin 함수(status 동작)
+          # 배포 뒤에 '1' 로 켠다(기본 꺼짐 — 꺼진 채 머지하면 라이브 변화 0).
+          GRM_MEMBER_NUDGE_STATUS: ${{ vars.GRM_MEMBER_NUDGE_STATUS }}
           # 소유권 인증 토큰 — 배선해 두면 회전 시 repo var 만 바꾸면 됨(코드 수정 0). 미설정
           # var=빈 문자열 전달이지만 render._env_or_default 가 빈 값을 기본 토큰으로 흡수하므로
           # 미설정 시 메타가 사라지지 않는다(무회귀). 설정 시 그 값이 라이브 <head> 에 노출.

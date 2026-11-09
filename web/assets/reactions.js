@@ -43,6 +43,8 @@
   var SUPA_KEY = cfg.getAttribute("data-key") || "";
   // 뉴스레터 구독 폼 주소(Brevo 호스팅 폼 — 이 언어 판의 리스트). 비어 있으면 가입 칸·안내 카드 모두 꺼진다.
   var SUB_ACTION = cfg.getAttribute("data-sub") || "";
+  // "1" 이면 로그인 후 안내 전에 서버에 '이미 구독 중?'을 묻는다(꺼짐 기본 — 함수 배포 뒤 켠다).
+  var NUDGE_STATUS = cfg.getAttribute("data-nudge-status") === "1";
   if (!SUPA_URL || !SUPA_KEY) return;
 
   var sb;
@@ -561,6 +563,27 @@
     if (isAdminEmail(user.email)) return;
     var md = user.user_metadata || {};
     if (md.newsletter_prompted || lsGet(SUB_OK_KEY) || lsGet(NUDGE_KEY)) return;
+    if (!NUDGE_STATUS) { showNudge(user); return; }
+    // 상태 조회: 이미 구독 중이거나 수신거부한 회원에게는 띄우지 않는다. 조회 실패·알 수 없음은
+    // 기존 동작(띄움)으로 둔다. 이메일은 서버가 JWT 에서 읽으므로 요청 본문에 없다.
+    nudgeEl = true;   // 조회 중 중복 호출 방지(아래에서 해제)
+    var tok = session && session.access_token;
+    var lang = ((document.documentElement && document.documentElement.lang) || "ko").slice(0, 2) === "en" ? "en" : "ko";
+    (tok ? fetch(SUPA_URL + "/functions/v1/newsletter-optin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok, "apikey": SUPA_KEY },
+      body: JSON.stringify({ action: "status", lang: lang })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); }) : Promise.resolve({}))
+      .catch(function () { return {}; })
+      .then(function (b) {
+        nudgeEl = null;
+        var st = b && b.ok ? b.status : "";
+        if (st === "subscribed" || st === "blocked_unsubscribed") { lsSet(SUB_OK_KEY); return; }
+        showNudge(user);
+      });
+  }
+  function showNudge(user) {
+    if (nudgeEl) return;
     nudgeEl = document.createElement("div");
     nudgeEl.className = "grm-nudge";
     nudgeEl.setAttribute("role", "dialog");

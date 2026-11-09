@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.297` |
+| 문서 버전 | `v1.298` |
 | 최종 수정일 | 2026-11-09 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -293,7 +293,11 @@ flowchart TD
 > - **본문 슬롯 가림 표기 게이트:** 조립 게이트 8 `assemble_publish_brief.lint_masked_marks_in_body` — FDA 가림 표기 `(b)(4)` 가 본문 슬롯에 노출되면 2026-11-09 이후 호의 발행을 차단한다(#1410; 10-26 호 483 한국어 결손 보강 #1408 과 11-09 WL 카드 3장 정정 포함).
 > - **새 실사 카드 틀의 시작일:** `INSPECTION_FRAME_FROM="2026-11-09"` — 앞면 새 틀(`inspection_card.py`)은 이 날짜 이후 호에만 붙여, 옛 호를 재조립해도 소급되지 않는다(#1412).
 > - **ICH 사본 보충:** 게시일이 없는 항목(ICH 스냅샷)은 Supabase 사본 보충에서 건너뛴다(#1407, `collect_intake.py` — 매일 WARN 31건 소음 제거).
-> - **새 화면:** 지적 조항 `/findings/citations/`(#1404, 데이터 `web/data/fda_citations.json`, 월간 갱신 #1411)·지적 사례 `/findings/examples/`(#1406, 데이터 `web/data/deficiency_examples.json`) — §5.1 `web/` 항목 참조.
+> - **새 화면:** 지적 조항 `/findings/citations/`(#1404, 데이터 `web/data/fda_citations.json`, 월간 갱신 #1411)·지적 사례 `/findings/examples/`(#1406, 데이터 `web/data/deficiency_examples.json` — 100건, 영문 원문+참고용 한국어 한 줄 #1421) — §5.1 `web/` 항목 참조. 진입 링크: 홈 카드·푸터 '도구'·지적사항 둘러보기(영문판은 해당 경로가 있을 때만).
+> - **구독 가입 경로 기록(꺼짐 기본):** 구독 폼이 가입 페이지 경로·언어를 Brevo 연락처 속성 `SIGNUP_PATH`·`SIGNUP_LANG` 으로 보낸다(#1422, 게이트 `GRM_SIGNUP_PATH_FIELDS`, 운영 순서 `docs/ops_brevo_signup_path_attributes.md`). 켜는 조건: 처리방침 시행일(2026-11-16) 이후 + Brevo 속성 두 개가 만들어져 있을 것. 처리방침 수집 항목에는 이미 반영(#1424, 시행 2026-11-16).
+> - **로그인 회원 1회 구독 안내:** 안내는 라이브(#1275). `newsletter-optin` 에 읽기 전용 `action:"status"` 를 더해, 이미 구독 중·수신거부 회원에게는 띄우지 않는다(#1425, 게이트 `GRM_MEMBER_NUDGE_STATUS` 기본 꺼짐 — 함수 배포 뒤 켠다, 조회 실패는 기존 동작).
+> - **체크리스트 RPC 해시 조인:** 마이그레이션 136 이 조항 매칭을 중첩 루프에서 해시 조인으로 바꿨다(반환 shape·결과 동일, 함수 993→163ms, 적용 완료 2026-11-09, #1423). 링크드인 유사 사례는 커밋된 `<발행일>.similar.json` 을 우선 쓴다.
+> - **정기 작업 '제때' 기준 = 예정+6시간**(`ops_measure_github.ONTIME_GRACE_MIN=360`, #1420). **DB 백업 열쇠 보관·복원 시험 안내서**: `docs/ops_db_backup_key_custody.md`(#1419, 위치·절차만 — 열쇠 값 없음).
 
 > **검토 후 제외:** TGA(WAF 차단·PIC/S로 커버), PMDA(공개 per-event 결함 피드 없음·일본어 전용 — 자료실로 완결).
 
@@ -623,6 +627,7 @@ grm-api-intake/
 │  ├─ migrations/133_fda_inspection_citations.sql # FDA 실사 지적 조항 표
 │  ├─ migrations/134_deficiency_examples.sql # PMDA·MHRA 지적 사례 표
 │  ├─ migrations/135_growth_daily_v2.sql # 성장 일보 v2 집계(적용 완료 2026-11-09 운영 DB·service_role 전용)
+│  ├─ migrations/136_findings_checklist_ref_join.sql # 체크리스트 매칭 해시 조인(적용 완료 2026-11-09, 반환 shape 불변)
 │  ├─ render.py, linkcheck.py, newsletter.py, announce.py(서비스 업데이트 안내 — 주간 삽입 + 독립 공지)
 │  ├─ newsletter_en.py            # [영문 뉴스레터 2026-10-18] 영문 리스트 주간 메일 — 그 주 새 지적 기록(발행일 기준 창 스냅샷) + 영문 브리프 요약. 게이트·Brevo 어댑터는 newsletter.py 재사용
 │  ├─ linkedin_cards.py           # [성장·배포 2026-09-08 · 영문판 2026-09-15] 링크드인 카드뉴스 — 브리프 JSON+용어사전 → 캐러셀(HTML→헤드리스 Chrome print-to-pdf) + 게시 본문, 국문(`linkedin.*`)·영문(`linkedin_en.*`) 두 벌(`--lang`). 순수 빌더(결정론·테스트 대상)와 렌더러 분리 · Chrome 부재 시 txt/html 만 · `--anon` 가명 · 기관 로고 0(워드마크 칩) · 전 장 최하단 AI 생성 고지 · **무엇을 실을지는 한국어 정본으로 고르고 글자만 언어별**(두 덱이 같은 소식을 말한다)
@@ -631,14 +636,14 @@ grm-api-intake/
 │  ├─ utm.py                     # [성장 2026-09-23] UTM 부착 헬퍼 + 채널 사전 `CHANNELS`(링크드인·주간/영문/서비스 안내 메일 본문·전달·용어집 PDF·구독 확인 메일 — 내보내는 모든 링크의 단일 정본, 2026-11-04). RUM(Cloudflare)은 쿼리를 안 읽으므로 소비자는 base.html 의 first-touch 계측(087 가입 시·104 도착 시 정수 카운트)뿐
 │  ├─ wl_anatomy.py              # [WL 해부 2026-10-31] 경고서한 국문 지적을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈다(FDA 문장 무변형·이으면 원문·확신 없으면 None). 문서 페이지(findings_doc.html)와 브리프 카드 문서 링크 문구가 쓴다
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
-│  ├─ example_page.py             # [지적 사례 2026-11-09] `/findings/examples/`(ko·en) — `data/deficiency_examples.json`(PMDA·MHRA 영문 원문에서 사람이 고른 주제별 대표 사례·출처 행 id 보존, 번역 없음) 로드·검증·주제 뷰(테스트 `web/tests/test_example_page.py`)
+│  ├─ example_page.py             # [지적 사례 2026-11-09] `/findings/examples/`(ko·en) — `data/deficiency_examples.json`(PMDA·MHRA 영문 원문에서 사람이 고른 주제별 대표 사례 100건·출처 행 id 보존, 원문은 영어·한국어는 참고용 한 줄) 로드·검증·주제 뷰(테스트 `web/tests/test_example_page.py`)
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
 │  ├─ clause_citations_guard.py   # [지적 조항 월간 갱신 가드 2026-11-09] 급감 20%·스냅샷 검증·as_of 만 변경 시 무PR 판정(테스트 `web/tests/test_clause_citations_guard.py`)
 │  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 또는 월간 `grm-fda-citations-snapshot.yml`)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)
 │  ├─ ops_decision_mail.py        # [결정 알림] 운영 센터 대기 결정(pending·mail_sent_at null) → 대표 메일 1건 1통·하루 3통·넘치면 다음 날 아침 묶음·KST 22~08 조용한 시간. 발송·수신자 검사는 approval_mail 재사용
-│  ├─ ops_measure_github.py       # [자동 측정] 운영 센터 GitHub 갈래 — gh api 로 CI test 잡 중앙값·3일 넘은 PR·일일 연결 연속 성공일·24시간 배포 실패·정기 작업 정시율(7일·예정+60분·하루 4회 이하 예약)·이번 주 용어 사전 증가 → ops_goal_set, 코드 팀원(dq-kg-link·infra-intake) 마지막 성공 → ops_member_touch(더 새로울 때만). 기본 dry-run, 실패는 단계 요약에만
+│  ├─ ops_measure_github.py       # [자동 측정] 운영 센터 GitHub 갈래 — gh api 로 CI test 잡 중앙값·3일 넘은 PR·일일 연결 연속 성공일·24시간 배포 실패·정기 작업 정시율(7일·예정+6시간·하루 4회 이하 예약)·이번 주 용어 사전 증가 → ops_goal_set, 코드 팀원(dq-kg-link·infra-intake) 마지막 성공 → ops_member_touch(더 새로울 때만). 기본 dry-run, 실패는 단계 요약에만
 │  ├─ ops_alarm_sync.py           # [경보 담당] 경보 이슈 1건 = 담당 팀 업무 1건, 닫히면 완료·3일 방치 시 종합상황실 경보(131)
 │  ├─ growth_daily.py             # [성장 일보 v2] 방문→검색→구독→메일 클릭 판독 JSON → 한국어 마크다운, 주간 검색 개선 리포트(135)
 │  ├─ grm_i18n.py                 # [다국어 2026-09-03] 문구 사전·추출기·검사기 — 키=한국어 원문(템플릿 `_()`·JS `_t()`·py `tr()`/`N_()`), ko 항등·en 결손 시 빌드 실패. 지적 본문 언어별 선택 사본(JS_BODY_SHIM)도 여기가 정본
@@ -672,6 +677,8 @@ grm-api-intake/
 │  └─ run/                         # (claude/company-<날짜> 브랜치에만) 직무별 실행 결과
 ├─ docs/  (prompts/·specs/ 포함, 현행 설계·운영 문서만 유지)
 │  ├─ GRM_자동화지도_2026-07.md          # 전 자동화 인벤토리·데이터계약·실패모드·월요일 타임라인
+│  ├─ ops_db_backup_key_custody.md       # DB 백업 열쇠 보관·복원 시험 안내서(위치·절차만, 열쇠 값 없음)
+│  ├─ ops_brevo_signup_path_attributes.md # 구독 가입 경로 기록 — Brevo 속성 만들기·켜는 순서(GRM_SIGNUP_PATH_FIELDS)
 │  ├─ specs/FDA483_OCR_판독개선_벤치마크_2026-10-28.md     # 483 OCR 엔진·모델·전처리·psm·오픈소스 엔진 비교(판독 실패 44·대조군 60, 무료·로컬만)
 │  ├─ specs/GRM_규제인텔리전스_업그레이드_설계_2026-07-15.md  # 승인 대기 중인 다음 구현 설계
 │  ├─ specs/GRM_퀴즈_운영설계_2026-07-18.md               # 주간 퀴즈 v1 운영 설계(/quiz/ 라이브)

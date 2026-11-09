@@ -993,18 +993,34 @@
    }
   },
   "fda483-195435": {
-   "title_issue": "제조소 실사 483 관찰 공개",
-   "summary": "FDA가 Biomay AG(Manufacturer) 제조소 실사(07/27/2023)에 대한 483 문서를 공개했다. 관찰 상세는 공식원본 PDF 확인이 필요하다.",
+   "title_issue": "오염관리 절차 미준수·기류 시각화 미실시",
+   "summary": "FDA가 오스트리아 제조소 Biomay AG 실사(실사일 07/27/2023) 후 483을 발부했다. 판독된 관찰사항은 2건으로, 제조 중 설비 수리 상태·실 내 보관 규정 등 오염관리 절차 미준수와, 가동 상태 기류 시각화 연구 없이 청정 등급 구역을 적격성평가한 점이다.",
    "key_facts": [
-    "실사일: 07/27/2023",
-    "제조소/업체: Biomay AG · FEI 3004536648",
-    "시설 · 유형: Manufacturer · 483"
+    "관찰 수: 2건 판독(1번 오염관리 절차, 2번 설비 적격성평가)",
+    "지적: 오염관리 절차 미준수, 설비 적격성평가 미흡",
+    "구체 내용: 가동 상태(in-operation) 기류 시각화 연구 미수행",
+    "실사일: 07/27/2023"
    ],
-   "implication": "483은 실사관의 현장 관찰로, 문서 서두에도 최종 판단이 아니라고 밝히고 있어 후속 조치 여부와 함께 읽어야 하는 문서다. Biomay AG와 거래 관계가 있다면 공식원본 PDF의 관찰 항목을 확인해 공급자 평가 반영 여부를 판단해 둘 필요가 있다.",
+   "implication": "가동 상태 기류 시각화는 청정 등급 구역 적격성평가의 기본 근거인데, 이 연구 없이 구역을 운영한 점이 설비 적격성 결함으로 지적됐다. 판독본 일부가 깨져 해당 구역과 보관 물품은 원문 PDF 로 확인할 필요가 있다.",
    "checks": [
-    "공식원본 PDF의 관찰 항목 확인",
-    "Biomay AG 관련 공급자 평가 현황"
-   ]
+    "청정 등급 구역의 가동 상태 기류 시각화 연구 수행·기록 여부",
+    "제조 구역 설비 수리 상태와 실 내 보관 금지 규정의 준수 여부"
+   ],
+   "en": {
+    "title_issue": "Contamination control lapses, no airflow study",
+    "summary": "FDA issued a Form 483 to Biomay AG, a manufacturer in Austria, after an inspection ending 07/27/2023. Two observations were legible: contamination control procedures were not followed, including equipment repair and storage rules for a room, and a classified area was qualified without an in-operation airflow visualization study.",
+    "key_facts": [
+     "Observations legible: 2 (1 contamination control, 2 equipment qualification)",
+     "Citation: Contamination control procedures not followed; equipment not adequately qualified",
+     "Detail: No airflow visualization study under in-operation conditions",
+     "Inspection date: 07/27/2023"
+    ],
+    "implication": "An in-operation airflow visualization study is a basic part of qualifying a classified area, and running the area without one was cited as an equipment qualification gap. Parts of the scanned text are illegible, so the specific area and stored items need to be checked in the original PDF.",
+    "checks": [
+     "Whether in-operation airflow visualization studies exist for classified areas",
+     "Compliance with equipment repair and room storage rules in production areas"
+    ]
+   }
   },
   "fda483-195441": {
    "title_issue": "핵심 출발물질 재고관리 미흡",
@@ -1227,32 +1243,64 @@
    }
   },
   "fda483-195455": {
-   "title_issue": "2022년 실사 483 관찰 공개",
-   "summary": "FDA가 Protherics UK Ltd.(Manufacturer) 제조소의 06/23/2022 실사에 대한 483 문서를 공개했다. 관찰 상세는 공식원본 PDF 확인이 필요하다.",
+   "title_issue": "QC 시험법·기기 교정 확인 미흡",
+   "summary": "FDA가 영국 제조소 Protherics UK Ltd. 실사(실사일 06/23/2022) 후 483을 발부했다. 판독된 관찰사항은 1건(QC 시험 절차 미흡)으로, 엔도톡신 분석 근거 연구 부재, 배양균의 사용 전 적격성평가 미실시, 분석 종료 시점의 기기 교정 상태 점검 누락 등이 담겼다. 교정 실패로 CroFab·DigiFab 출하 시험 결과가 무효화·재시험된 사례가 기록됐다.",
    "key_facts": [
-    "실사일: 06/23/2022",
-    "제조소/업체: Protherics UK Ltd. · FEI 3001417487",
-    "발행일: 2026-10-26"
+    "관찰 수: 1건",
+    "지적: QC 시험 절차 미흡",
+    "구체 내용: 분석 종료 시점의 교정 상태 점검이 빠져, 교정 실패 후 출하 시험 무효화·재시험(품질 이벤트 55795)",
+    "실사일: 06/23/2022"
    ],
-   "implication": "실사일과 공개일 사이에 수년의 간격이 있다는 점은 과거 실사 기록도 공급망 평가 자료로 다시 활용될 수 있다는 신호다. 해당 FEI 제조소와 관련이 있다면 공식원본 PDF로 당시 관찰과 이후 개선 경과를 함께 확인해 둘 필요가 있다.",
+   "implication": "분석 시퀀스 끝에서 기기가 교정 상태였는지 확인하지 않으면, 교정 실패가 드러났을 때 그 사이 결과를 모두 무효화해야 한다는 점이 실제 사례로 지적됐다. 판독본 상당 부분이 깨져 있어 세부 항목은 원문 PDF 확인이 필요하다.",
    "checks": [
-    "공식원본 PDF의 2022년 관찰 항목 확인",
-    "해당 FEI 제조소의 이후 실사 이력"
-   ]
+    "분석 시퀀스 종료 시 시스템적합성·교정 확인 포함 여부",
+    "시험용 배양균·배지의 사용 전 적격성평가 절차"
+   ],
+   "en": {
+    "title_issue": "Weak QC test methods and calibration checks",
+    "summary": "FDA issued a Form 483 to Protherics UK Ltd., a manufacturer in the UK, after an inspection ending 06/23/2022. One observation (deficient QC testing procedures) was legible. It covers a lack of study support for endotoxin analysis, cultures not qualified before use, and no check that instruments were still calibrated at the end of an analysis. A calibration failure led to CroFab and DigiFab release test results being invalidated and retested.",
+    "key_facts": [
+     "Observations: 1",
+     "Citation: QC testing procedures are deficient",
+     "Detail: No calibration check at the end of analyses; release tests invalidated and retested after a calibration failure (Quality Event 55795)",
+     "Inspection date: 06/23/2022"
+    ],
+    "implication": "Without a calibration check at the end of an analytical sequence, a later calibration failure forces all results in between to be invalidated, and this case shows that happening. Much of the scanned text is illegible, so the details need to be checked in the original PDF.",
+    "checks": [
+     "Whether analytical sequences end with a system suitability or calibration check",
+     "Procedures for qualifying test cultures and media before use"
+    ]
+   }
   },
   "fda483-195457": {
-   "title_issue": "제조소 실사 관찰 문서 공개",
-   "summary": "FDA가 Replimune, lnc(Manufacturer) 실사(04/24/2025)에 대한 483 문서를 공개했다. 관찰 상세는 공식원본 PDF 확인이 필요하다.",
+   "title_issue": "일탈 조사 지연·품질계약서 미흡",
+   "summary": "FDA가 미국 제조소 Replimune, lnc 실사(실사일 04/24/2025) 후 483을 발부했다. 판독된 관찰사항은 2건으로, 일탈 660건 중 25%가 SOP 기한 안에 종결되지 않은 점과 위탁 보관시설·시험기관 품질계약서가 제공 서비스를 정확히 규정하지 않은 점이다.",
    "key_facts": [
-    "실사일: 04/24/2025",
-    "제조소/업체: Replimune, lnc · FEI 3022984544",
-    "시설 · 유형: Manufacturer · 483"
+    "관찰 수: 2건(1번 일탈 조사 기한, 2번 품질계약서)",
+    "지적: 일탈 조사 미종결, 품질계약서 미흡",
+    "구체 내용: 일탈 660건 중 25% 기한 내 미종결(중대 일탈 포함)",
+    "실사일: 04/24/2025"
    ],
-   "implication": "시설 유형이 Manufacturer로만 표시돼 있어 관찰이 어느 공정이나 품질시스템 영역에 걸리는지는 원본 확인 전에는 판단하기 어려운 카드다. 2025년 실사 건이므로 최근 FDA 실사 동향을 파악하는 자료로 공식원본 PDF를 확인해 둘 필요가 있다.",
+   "implication": "중대 일탈을 포함한 일탈의 4분의 1이 자체 SOP 기한을 넘긴 점이 조사 관리 결함으로 지적됐다. 위탁 보관·시험 업체와의 품질계약서에 실제 제공 서비스가 빠짐없이 들어 있는지도 함께 확인된 사례로 읽힌다.",
    "checks": [
-    "공식원본 PDF의 관찰 영역 확인",
-    "관찰 항목과 자사 유사 공정 해당 여부"
-   ]
+    "일탈 조사 기한 준수율과 기한 초과 사유 관리 여부",
+    "위탁 보관·시험기관 품질계약서의 서비스 범위 명시 여부"
+   ],
+   "en": {
+    "title_issue": "Late deviation closure, weak quality agreements",
+    "summary": "FDA issued a Form 483 to Replimune, lnc, a US manufacturer, after an inspection ending 04/24/2025. Two observations were legible: 25% of 660 deviations were not closed within the SOP deadline, and quality agreements with a contracted storage site and a testing laboratory did not accurately specify the services provided.",
+    "key_facts": [
+     "Observations: 2 (1 deviation closure timelines, 2 quality agreements)",
+     "Citation: Investigations not closed in time; deficient quality agreements",
+     "Detail: 25% of 660 deviations not closed on time, including some critical ones",
+     "Inspection date: 04/24/2025"
+    ],
+    "implication": "A quarter of deviations, some of them critical, ran past the firm's own SOP deadline, which was cited as a failure in managing investigations. The case also shows inspectors checking whether quality agreements with storage and testing contractors cover the services actually provided.",
+    "checks": [
+     "On-time closure rate for deviation investigations and tracking of overdue reasons",
+     "Whether quality agreements with storage and testing contractors define the full scope of services"
+    ]
+   }
   },
   "fda483-195459": {
    "title_issue": "위험분석 부적절",
@@ -1730,19 +1778,34 @@
    }
   },
   "fda483-195490": {
-   "title_issue": "OOS 조사 범위 불충분",
-   "summary": "FDA가 Dynavax GmbH 원료의약품 제조소(FEI 3010165220)를 02/03/2023 실사한 483이다. 발췌상 첫 관찰은 규격외(OOS) 시험 결과 조사와 이에 대응한 제조 조사가 검토 범위까지 확장되지 않아 부적절했다는 내용이며, 관찰 상세는 공식원본 PDF 확인이 필요하다.",
+   "title_issue": "엔도톡신 OOS 조사 범위 미흡",
+   "summary": "FDA가 원료의약품 제조소 Dynavax GmbH 실사(실사일 02/03/2023) 후 483을 발부했다. 판독된 관찰사항은 1건으로, 엔도톡신 OOS 결과의 근본원인을 시험법 간섭으로 지정하면서 설비 세척·소독 사이클과 그 주기적 재적격성평가를 제조 조사에서 검토하지 않은 점이다.",
    "key_facts": [
-    "실사일: 02/03/2023",
-    "시설 유형: Bulk Drug Substance Manufacturer",
-    "지적(발췌): OOS 시험 결과 조사 및 제조 조사 부적절",
-    "발행일: 2026-10-26"
+    "관찰 수: 1건",
+    "지적: OOS 시험 결과·제조 조사 부적절",
+    "구체 내용: 시험실 조사 #0202-001·일탈 DEV-00031, 세척·소독 사이클 미평가",
+    "실사일: 02/03/2023"
    ],
-   "implication": "OOS 조사와 제조 조사가 함께 부적절하다고 지적된 것은 조사 범위를 어디까지 넓혔는지가 원료 제조소 실사의 핵심 쟁점이 될 수 있다는 신호다. 관찰의 구체 대상은 공식원본 PDF로 확인해 둘 필요가 있다.",
+   "implication": "OOS 근본원인을 시험법 문제로 돌리면서 제조 쪽 원인(설비 세척·소독)을 배제할 근거를 남기지 않은 점이 조사 범위 결함으로 지적됐다. 엔도톡신 OOS 에서는 시험실 원인과 함께 설비 세척·소독 이력까지 조사 범위에 넣었는지가 확인 대상이 될 수 있다.",
    "checks": [
-    "OOS 조사의 제조 단계 확장 기준",
-    "실험실 조사와 제조 조사 결과의 연계 검토"
-   ]
+    "OOS 조사에서 시험실 원인 지정 시 제조 원인 배제 근거 기록 여부",
+    "설비 세척·소독 사이클 재적격성평가 이력의 조사 반영 여부"
+   ],
+   "en": {
+    "title_issue": "Narrow endotoxin OOS investigation",
+    "summary": "FDA issued a Form 483 to Dynavax GmbH, a bulk drug substance manufacturer, after an inspection ending 02/03/2023. One observation was legible: the root cause of an endotoxin OOS result was assigned to method interference, while the manufacturing investigation did not review the equipment sanitization cycle or its periodic requalification.",
+    "key_facts": [
+     "Observations: 1",
+     "Citation: Inadequate OOS and manufacturing investigation",
+     "Detail: Lab investigation #0202-001 and DEV-00031; sanitization cycle not evaluated",
+     "Inspection date: 02/03/2023"
+    ],
+    "implication": "Assigning the OOS root cause to the test method without recording why manufacturing causes such as sanitization were ruled out was cited as too narrow an investigation. For endotoxin OOS results, whether the investigation covered equipment sanitization history as well as the lab may be checked.",
+    "checks": [
+     "Whether OOS investigations that assign a lab cause record why manufacturing causes were ruled out",
+     "Whether sanitization cycle requalification history is reviewed in investigations"
+    ]
+   }
   },
   "fda483-195491": {
    "title_issue": "조사 부적절·불만기록 미흡 등 5건",
@@ -2479,19 +2542,36 @@
    }
   },
   "fda483-195561": {
-   "title_issue": "입고 원료의약품 확인시험 미실시",
-   "summary": "FDA가 Catalent Maryland, Inc 유전자치료제 제조소(FEI 3015434301)를 04/28/2025 실사한 483이다. 발췌상 첫 관찰은 완제 제조에 사용되는 입고 원료의약품(drug substance)에 대해 확인시험을 실시하지 않았다는 내용이며, 관찰 상세는 공식원본 PDF 확인이 필요하다.",
+   "title_issue": "PPQ 펌프 교정 부재·환경모니터링 누락",
+   "summary": "FDA가 유전자치료제 제조소 Catalent Maryland, Inc 실사(실사일 04/28/2025) 후 483을 발부했다. 판독된 관찰사항은 3건(3·4·6번)으로, 중요 공정 변수 판독에 쓰는 연동 펌프의 유지관리·교정 프로그램 부재, 양손 방식으로 쓰는 충전 시스템 부품의 생균 표면 채취 누락, PPQ 배치 실물 기록 대장 미제시다.",
    "key_facts": [
-    "실사일: 04/28/2025",
-    "시설 유형: Gene Therapy Manufacturer",
-    "지적(발췌): 입고 원료의약품 확인시험 미실시",
-    "발행일: 2026-10-27"
+    "관찰 수: 3건 판독(3번 설비 적격성, 4번 환경 모니터링, 6번 기록 보존)",
+    "지적: 제조 설비 적격성평가 미흡, 환경 모니터링 미흡, 기록 보존 절차 미준수",
+    "구체 내용: PPQ 배치용 연동 펌프에 정기 유지관리·교정·재인증 프로그램 없음",
+    "실사일: 04/28/2025"
    ],
-   "implication": "입고 원료의약품 확인시험 미실시 지적은 완제 제조 투입 전 자재 동일성 확인이 기본 요건으로 다뤄진다는 신호다. 일반적으로 이런 지적은 공급처 시험성적서에 대한 의존과 연관될 수 있어 입고 시험 범위를 점검해 둘 필요가 있다.",
+   "implication": "중요 공정 변수를 연동 펌프 표시값으로만 판독하면서 그 펌프의 교정 체계를 두지 않은 점이 설비 적격성 결함으로 지적됐다. PPQ 단계에서도 공정 변수 측정 장비의 교정과 실물 배치기록 대장이 갖춰져 있는지가 확인 대상이 됨을 보여 준다.",
    "checks": [
-    "입고 원료의약품별 확인시험 실시",
-    "공급처 성적서 활용 시 자체 확인 범위"
-   ]
+    "중요 공정 변수 측정 장비의 교정·독립 검증 체계",
+    "양손 방식 사용 부품의 생균 표면 모니터링 포함 여부",
+    "실물 배치기록 보관 대장 관리 여부"
+   ],
+   "en": {
+    "title_issue": "No pump calibration in PPQ, EM gaps",
+    "summary": "FDA issued a Form 483 to Catalent Maryland, Inc, a gene therapy manufacturer, after an inspection ending 04/28/2025. Three observations (3, 4 and 6) were legible: no maintenance or calibration program for the peristaltic pumps used to read a critical process parameter, no viable surface sampling of filling system parts handled in an ambidextrous manner, and no log of the physical PPQ batch records.",
+    "key_facts": [
+     "Observations legible: 3 (equipment qualification), 4 (environmental monitoring) and 6 (records retention)",
+     "Citation: Equipment not qualified; deficient environmental monitoring; records procedures not followed",
+     "Detail: No routine maintenance, calibration or recertification program for peristaltic pumps used in PPQ batches",
+     "Inspection date: 04/28/2025"
+    ],
+    "implication": "Reading a critical process parameter only from a peristaltic pump display, with no calibration program for that pump, was cited as an equipment qualification gap. The case shows that calibration of process measurement equipment and logs of physical batch records are checked even at the PPQ stage.",
+    "checks": [
+     "Calibration and independent verification of equipment that measures critical process parameters",
+     "Whether parts handled in an ambidextrous manner are covered by viable surface monitoring",
+     "Log of archived physical batch records"
+    ]
+   }
   },
   "fda483-195562": {
    "title_issue": "장비 접촉면 미확인 물질 영향 미평가",
@@ -2586,18 +2666,34 @@
    }
   },
   "fda483-195568": {
-   "title_issue": "전산 입출력 정확성 점검 지적",
-   "summary": "FDA가 허가 바이오의약품 제조소 Baxalta Belgium Manufacturing S.A.에 483을 발행했다. 발췌문에는 컴퓨터 또는 관련 시스템의 입력·출력 정확성 점검에 관한 지적이 포함돼 있다.",
+   "title_issue": "불량 재발 검토·BPDR 지연 보고",
+   "summary": "FDA가 허가 생물의약품 제조소 Baxalta Belgium Manufacturing S.A. 실사(실사일 05/31/2019) 후 483을 발부했다. 판독된 관찰사항은 3건(2·3·5번)으로, Gammagard Liquid·HyQvia 원자재 변경 후 재발한 육안검사 불량에 대한 검토 미흡, 바이알 파손 불만의 BPDR 지연 제출, 바이러스 전파·진균 감염 이상사례에 대한 품질 조사 미실시다.",
    "key_facts": [
-    "실사일: 05/31/2019",
-    "시설 · 유형: Licensed Biological Manufacturer · 483",
-    "발췌 지적: 컴퓨터 또는 관련 시스템의 처방·기록 데이터 입출력 정확성 점검"
+    "관찰 수: 3건 판독(2번 규격 부적합 검토, 3번 BPDR 지연, 5번 이상사례 품질 조사)",
+    "지적: 중요 원자재 변경관리 평가 불충분, BPDR 미제출, 품질 조사 미실시",
+    "구체 내용: 2017년 4~5월 바이알 파손 불만이 2018년 2월 13일에야 BPDR 로 제출",
+    "실사일: 05/31/2019"
    ],
-   "implication": "전산 시스템의 입출력 정확성 점검이 지적된 것은 시스템 자체보다 데이터가 들어가고 나오는 지점의 검증이 쟁점이라는 신호다. 관찰 상세는 공식원본 PDF 확인이 필요하며, 처방·제조기록 데이터를 전산으로 다루는 곳이라면 입출력 확인 방식을 점검해 둘 필요가 있다.",
+   "implication": "중요 원자재 공급원 변경 후 불량이 되풀이됐는데도 변경관리에서 충분히 평가하지 않은 점이 핵심으로 지적됐다. 혈장분획제제처럼 이상사례가 감염 전파와 연결될 수 있는 제품에서는 불만·이상사례가 품질 조사와 BPDR 로 제때 이어지는지가 함께 확인됐다.",
    "checks": [
-    "처방·제조기록 데이터 전산 입력 시 정확성 확인 방식",
-    "전산 출력물과 원 데이터 간 대조 절차"
-   ]
+    "중요 원자재 공급원 변경 시 제품 품질 영향 평가 범위",
+    "불만·이상사례의 BPDR 제출 기한 관리와 품질 조사 연계 여부"
+   ],
+   "en": {
+    "title_issue": "Recurring rejects and late BPDRs",
+    "summary": "FDA issued a Form 483 to Baxalta Belgium Manufacturing S.A., a licensed biological manufacturer, after an inspection ending 05/31/2019. Three observations (2, 3 and 5) were legible: an inadequate review of visual inspection rejects that recurred after a raw material change for Gammagard Liquid and HyQvia, late BPDR submission for broken vial complaints, and no quality investigation of reported viral transmission and fungal infection events.",
+    "key_facts": [
+     "Observations legible: 2 (failure review), 3 (late BPDRs) and 5 (adverse event quality investigations)",
+     "Citation: Insufficient change control assessment of a critical material; BPDRs not submitted; no quality investigation",
+     "Detail: Broken vial complaints from April and May 2017 were not submitted as BPDRs until 02/13/2018",
+     "Inspection date: 05/31/2019"
+    ],
+    "implication": "The central point is that rejects recurred after a change of source for a critical material, yet change control did not assess it adequately. For plasma-derived products, where adverse events can be linked to infection transmission, inspectors also checked whether complaints and adverse events led to timely quality investigations and BPDRs.",
+    "checks": [
+     "Scope of product quality assessment when changing the source of a critical material",
+     "BPDR deadline tracking for complaints and adverse events and their link to quality investigations"
+    ]
+   }
   },
   "fda483-195570": {
    "title_issue": "고객 불만 처리 절차 미흡",
@@ -2662,18 +2758,36 @@
    }
   },
   "fda483-195573": {
-   "title_issue": "비임상시험기관 483 발행",
-   "summary": "FDA가 비임상시험기관(Nonclinical Laboratory)인 Center for Translational Medicine에 483을 발행했다. 발췌문 문자 인코딩이 깨져 있어 관찰 상세는 공식원본 PDF 확인이 필요하다.",
+   "title_issue": "GLP 시험 보고·기록 보관 체계 결함",
+   "summary": "FDA가 비임상 시험시설 Center for Translational Medicine 실사(실사일 07/11/2025) 후 483을 발부했다. 관찰사항 5건은 최종 보고서의 데이터 영향 상황 누락, 원자료에 기록된 임상 관찰(탈모)의 보고서 누락, 시험계 관찰 SOP 부재, 마스터 스케줄 미유지, 원자료·시험계획서 변경의 보관소 미이관으로, 비임상시험관리기준(GLP) 운영 전반에 걸친다.",
    "key_facts": [
-    "실사일: 07/11/2025",
-    "시설 · 유형: Nonclinical Laboratory · 483",
-    "제조소/업체: Center for Translational Medicine · FEI 3029067611"
+    "관찰 수: 5건",
+    "지적: 시험책임자·품질보증부서 책임 미이행, SOP 미수립",
+    "구체 내용: 원자료의 탈모 관찰이 최종 보고서에서 누락, 마스터 스케줄 미유지",
+    "실사일: 07/11/2025"
    ],
-   "implication": "제조소가 아닌 비임상시험기관도 FDA 실사 후 483 대상이 된다는 점은 비임상 데이터를 허가자료로 쓰는 경우 위탁기관 관리 범위를 넓혀 볼 신호다. 구체 관찰 내용은 공식원본 PDF에서 확인한 뒤 자사 위탁 시험기관에 해당하는지 점검해 둘 필요가 있다.",
+   "implication": "원자료에는 남은 임상 관찰이 최종 보고서에서 빠지고 마스터 스케줄도 없었다는 점에서, 시험책임자와 품질보증부서의 감독이 함께 작동하지 않은 사례로 읽힌다. 비임상 시험을 위탁한 경우 수탁기관의 원자료–보고서 대조와 보관소 이관 체계를 확인할 만한 대목이다.",
    "checks": [
-    "위탁 비임상시험기관의 FDA 실사 이력 파악",
-    "비임상 시험 최종보고서 데이터 품질 검토 범위"
-   ]
+    "원자료 관찰 사항과 최종 보고서의 대조 검토 여부",
+    "품질보증부서의 마스터 스케줄 유지 여부",
+    "시험 종료 후 원자료·시험계획서 변경의 보관소 이관 기록"
+   ],
+   "en": {
+    "title_issue": "GLP reporting and archiving failures",
+    "summary": "FDA issued a Form 483 to Center for Translational Medicine, a nonclinical laboratory, after an inspection ending 07/11/2025. The five observations cover a final report that omitted circumstances affecting data, clinical observations (alopecia) recorded in source records but left out of the report, no SOP for test system observations, no master schedule, and raw data and protocol amendments not transferred to the archives, spanning GLP operations as a whole.",
+    "key_facts": [
+     "Observations: 5",
+     "Citation: Study director and quality assurance unit duties not met; SOPs not established",
+     "Detail: Alopecia observations in source records were missing from the final report; no master schedule kept",
+     "Inspection date: 07/11/2025"
+    ],
+    "implication": "Clinical observations kept in source records but missing from the final report, together with no master schedule, suggest that oversight by both the study director and the quality assurance unit broke down. Sponsors who outsource nonclinical studies may want to check how their contractor reconciles source records with reports and archives study materials.",
+    "checks": [
+     "Reconciliation of source record observations against the final report",
+     "Whether the quality assurance unit keeps a master schedule",
+     "Records of transfer of raw data and protocol amendments to the archives after study completion"
+    ]
+   }
   },
   "fda483-195574": {
    "title_issue": "로트별 유통경로 추적체계 미수립",

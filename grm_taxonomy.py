@@ -209,7 +209,11 @@ _FDA483_OUT_OF_SCOPE_EST_RE = re.compile(
     r"|clinical\s+investigator|\bsponsor\b|institutional\s+review\s+board|\birb\b"
     r"|contract\s+research\s+organi[sz]ation"
     r"|\bbakery\b|\bfood\b|dietary\s+supplement|\bbeverage|\bseafood\b|\bdairy\b"
-    r"|infant\s+formula",
+    r"|infant\s+formula"
+    # [2026-11-07] 계란 안전 규정(21 CFR 118) 483 — "Shell Egg Producer"·"Farm"·가금류가
+    # 식품인데 위 어휘에 없어 범위 안으로 남았다(옛 적재 9건, 전부 관찰 0건으로 감시에 섞임).
+    r"|\bshell\s+eggs?\b|\beggs?\s+(?:producer|farm|packer|processor)|\bfarms?\b"
+    r"|\bpoultry\b|\bhatchery\b|\bfeed\s+mill\b",
     re.I)
 _FDA483_DEVICE_EST_RE = re.compile(
     r"\bdevices?\b|\bivd\b|in\s+vitro\s+diagnostic|specification\s+developer", re.I)

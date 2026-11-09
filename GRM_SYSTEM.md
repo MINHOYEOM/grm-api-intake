@@ -220,6 +220,7 @@ flowchart TD
 - **Evidence Level(근거 등급):** A(1차 공식문서 직접 확인 — 원문 인용 허용) / B(공식 인덱스+보조) / C(보조 단독) / D(예정·Watch).
 - **듀얼 링크:** 모든 카드에 정보 출처(📰) + 공식 원본(📎). 모든 링크는 수집 근거(provenance)가 있어야 하며, 근거 없는 링크는 **발행 차단**(발행 전 게이트 + 발행 후 감사 이중 방어).
 - **Graceful degradation:** 수집기·Notion 장애로 handoff가 없어도 Routine은 WebSearch 단독 모드로 계속 동작.
+- **실사 결과 카드(2026-11-08~):** EU/UK GMP 비준수·FDA 483·경고서한·식약처 GMP실사 카드는 앞면에 **등급 칩(치명·주요·기타/관찰 n건/위반 n건) · 지적 목록(앞 5줄 + 펼치기, 번호·등급·한 줄·조항) · 당국 조치 칩**을 싣는다. 블록(`card.inspection`)은 발행 조립(`assemble_publish_brief` → `inspection_card.py`)이 결정론으로 붙이고, 렌더는 블록이 있는 카드만 새 틀로 그린다 — **이미 발행된 호는 블록이 없어 화면 불변(소급 없음)**. 목록이 실리면 요약·인용·핵심 사실·시사점은 앞면에서 빠진다(데이터는 유지 — 링크드인이 쓴다). 개수·조치는 판정서 원문 숫자·양식 제목에서만 읽고, 산문형 판정서의 목록은 Routine `ncr_ko.findings_ko`(결함당 한 줄 + 원문 구절)를 원문 대조·개수 대조로 걸러 받는다(어기면 목록 전체 버림). 같은 실사의 판정서 여러 건(범위·소재지별 분할)은 한 장으로 묶는다. EU 비준수의 기관 표기는 "EMA"가 아니라 실제 판정 회원국 당국(필터 키 `EU`).
 
 ### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3 + FDA 483 + ISPE + EU GMP NCR + MHRA GMP NCR + HC GMP 실사 + FDA 실사등급)
 
@@ -552,7 +553,7 @@ grm-api-intake/
 ├─ collect_deficiency_examples.py  # 실사 지적 사례(업체명 없음) 수집 — 일본 PMDA 연차보고서 별첨·영국 MHRA GMP 지적 원자료(134)
 ├─ site_error_watch.py             # 사이트 오류 징후 일일 감시 — Cloudflare 5xx·404 급증·배포 실패 → 경보 이슈(grm-site-error-watch, 기본 꺼짐)
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
-├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
+├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ fda_body_coverage.py             # 발행 전 FDA 카드 본문 결손 점검(483·WL·회수 건수·비율·임계 → ok/recover/alert) + handoff 상태 조회 — 판정 순수 함수

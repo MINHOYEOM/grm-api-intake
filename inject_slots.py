@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from typing import Any
@@ -532,6 +533,56 @@ def _merge_ncr_translations(card: dict[str, Any], ncr_ko: Any,
     if merged:
         report.warnings.append(
             f"ncr_ko[{doc_id!r}]: NCR 상세 국문 번역 {merged}필드 병합(원문+국문 병기)")
+    _merge_ncr_findings(dd, ncr_ko.get("findings_ko"), report, doc_id)
+
+
+# [실사 결과 카드 2026-11-08] Routine 이 산문형 판정서를 항목으로 나눈 한 줄 요약.
+_FINDING_SEVS = ("critical", "major", "other")
+_FINDING_KO_MAX = 90
+
+
+def _merge_ncr_findings(dd: dict[str, Any], findings: Any,
+                        report: InjectionReport, doc_id: str) -> None:
+    """`ncr_ko.findings_ko` = [{"sev": critical|major|other, "ko": 한 줄, "span": 원문 구절}].
+
+    받아들이는 조건(하나라도 어기면 **목록 전체**를 버린다 — 일부만 남기면 지적이 빠진 목록이
+    완전한 목록처럼 보인다):
+      · sev 가 세 값 중 하나, ko 가 비지 않고 90자 이하, 한글이 들어 있다.
+      · span(영문 원문 구절, 12자 이상)이 그 카드 `nature` 원문에 **글자 그대로** 있다
+        (공백만 접어서 비교) — 원문에 없는 지적을 지어낼 수 없게 하는 근거 대조.
+    등급별 개수가 원문 개수와 맞는지는 조립 단계(`inspection_card`)가 한 번 더 본다.
+    비차단 — 실패하면 카드는 개수·조치 칩과 접힌 원문으로 발행된다.
+    """
+    if findings is None:
+        return
+    nature = " ".join(str(dd.get("nature") or "").split())
+    ok: list[dict[str, str]] = []
+    reason = ""
+    if not isinstance(findings, list) or not findings:
+        reason = "목록이 아님"
+    else:
+        for i, f in enumerate(findings):
+            if not isinstance(f, dict):
+                reason = f"{i}번 항목이 객체가 아님"
+                break
+            sev = str(f.get("sev") or "").strip().lower()
+            ko = " ".join(str(f.get("ko") or "").split())
+            span = " ".join(str(f.get("span") or "").split())
+            if sev not in _FINDING_SEVS:
+                reason = f"{i}번 sev {sev!r}"
+                break
+            if not ko or len(ko) > _FINDING_KO_MAX or not re.search(r"[가-힣]", ko):
+                reason = f"{i}번 ko 길이·언어"
+                break
+            if len(span) < 12 or span not in nature:
+                reason = f"{i}번 span 이 원문에 없음"
+                break
+            ok.append({"sev": sev, "ko": ko, "span": span})
+    if reason:
+        report.warnings.append(f"ncr_ko[{doc_id!r}]: findings_ko 버림 — {reason}")
+        return
+    dd["findings_ko"] = ok
+    report.warnings.append(f"ncr_ko[{doc_id!r}]: 지적 한 줄 {len(ok)}건 병합")
 
 
 def _merge_whopir_translations(dd: dict[str, Any], ko: dict[str, Any],

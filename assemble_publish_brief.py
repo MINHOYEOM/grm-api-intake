@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import inject_slots
+import inspection_card
 from grm_taxonomy import is_out_of_scope_483
 
 # 발행 카드가 반드시 채워야 하는 LLM 슬롯(빈값이면 발행 불가).
@@ -660,6 +661,25 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
 
     # [무지적 실사 접기 2026-09-21] 지적 없는 GMP 실사 결과 다건 → 목록 카드 1장.
     adopted_cards = merge_no_finding_inspections(adopted_cards)
+
+    # [실사 결과 카드 2026-11-08] ① 같은 실사의 비준수 판정서(범위·소재지별 분할) → 1장.
+    # ② 실사 결과 카드(EU/MHRA 비준수·483·경고서한·식약처 GMP 실사)에 앞면 블록
+    #    `inspection`(등급 칩·지적 목록·조치)을 결정론으로 붙인다. 렌더는 이 블록이 있는
+    #    카드만 새 틀로 그린다 — 블록이 없는 과거 호는 다시 렌더해도 화면이 바뀌지 않는다.
+    #    심층분석·번역 주입 **뒤**여야 국문(`*_ko`·`findings_ko`)을 쓸 수 있다.
+    n_before = len(adopted_cards)
+    adopted_cards = inspection_card.merge_same_inspection_ncr(adopted_cards)
+    if len(adopted_cards) < n_before:
+        report.warnings.append(
+            f"같은 실사 비준수 판정서 {n_before - len(adopted_cards)}장을 대표 카드로 묶음")
+    inspection_card.attach_inspection_blocks(adopted_cards)
+    for c in adopted_cards:
+        blk = c.get("inspection") or {}
+        dd = c.get("deterministic_detail") or {}
+        if dd.get("type") in ("eu_gmp_ncr_statement", "mhra_gmp_ncr_statement") and not blk.get("items"):
+            report.warnings.append(
+                f"비준수 카드 {c.get('id')!r}: 지적 목록 없음(원문 구조 없음·findings_ko 없음 또는 "
+                "개수 불일치) — 등급·조치 칩과 접힌 원문으로 발행")
 
 
     # [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(ECA GMP News 등) → 이벤트 카드에서

@@ -87,6 +87,9 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
                 return k
         return None
 
+    folded_ncr = {str(s.get("id")): k for k, c in new_cards.items()
+                  for s in ((c.get("inspection") or {}).get("statements") or [])
+                  if isinstance(s, dict) and s.get("id") and str(s.get("id")) != k}
     missing: list[str] = []
     shrunk: list[dict[str, Any]] = []
     unbundled: list[dict[str, Any]] = []
@@ -101,6 +104,12 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
                 # 산출이라 수기 보정분이 없다 — 항목이 빠지는 축소와 같은 이유로 소실로 세지 않는다.
                 unbundled.append({"id": key, "now": None, "before_items": len(old_items),
                                   "after_items": 0})
+                continue
+            if key in folded_ncr:
+                # [실사 결과 카드 2026-11-08] 같은 실사의 비준수 판정서를 대표 1장으로 묶었다 —
+                # 이 id 는 대표 카드의 `inspection.statements` 에 남아 있다(내용 소실 아님).
+                unbundled.append({"id": key, "now": folded_ncr[key], "before_items": 1,
+                                  "after_items": 1})
                 continue
             missing.append(key)
             continue

@@ -457,6 +457,10 @@ MODALITY_BIOLOGIC_FALSE_FRIENDS = [
     "biological safety cabinet", "biosafety cabinet",
     "biological monitoring", "biological evaluation",
     "biological oxygen demand",
+    # [2026-11-08] 'Micro-biological' 안에 'biologic' 이 그대로 들어 있다. EU 비준수 판정서의
+    # 운영 범위 "1.6.2 Microbiological: non-sterility"(미생물 시험) 한 줄 때문에 비무균 펠릿
+    # 중간체 제조소(Glukem Biocare)가 바이오의약품으로 나갔다. 미생물 시험은 제품군과 무관하다.
+    "microbiological", "microbiologically",
     "생물학적 지표", "생물학적지표", "생물안전작업대", "생물학적 안전",
 ]
 

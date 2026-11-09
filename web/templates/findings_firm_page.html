@@ -100,7 +100,7 @@
         <p class="ff-ia-meta">{% if a.firm_published %}{{ _('등재일 {date}', date=a.firm_published) }} · {% endif %}{% if a.n_products %}{{ _('품목 코드 {n}개', n=a.n_products) }} · {% endif %}{{ _('출처: FDA Import Alert {no}', no=a.alert_no) }}{% if a.url %} · <a href="{{ a.url }}" target="_blank" rel="noopener">{{ _('FDA 원문 보기') }} <i class="ti ti-external-link" aria-hidden="true"></i></a>{% endif %}</p>
       </div>
       {%- endfor %}
-      <p class="ff-ia-note">{{ _('{date}에 확인한 FDA 수입경보 목록에 같은 업체명으로 올라 있는 제조소입니다. 등재 주소와 품목은 FDA 원문에서 확인하세요.', date=import_alerts_on) }}</p>
+      <p class="ff-ia-note">{{ _('{date}에 확인한 FDA 수입경보 목록에 같은 업체명으로 올라 있는 제조소입니다. 등재 주소와 품목은 FDA 원문에서 확인하세요.', date=import_alerts_on) }}{% if 'findings/import-alerts/' in en_paths %} <a href="{{ rel_root }}findings/import-alerts/">{{ _('수입경보 전체 목록') }}</a>{% endif %}</p>
     </section>
     {%- endif %}
     <p class="kick">Firm Record</p>

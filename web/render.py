@@ -145,6 +145,7 @@ from grm_i18n import (  # noqa: E402
 )
 from wl_anatomy import split_wl_finding  # noqa: E402
 import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
+import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전체 목록 화면 뷰
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -3745,6 +3746,8 @@ def firm_import_alerts(names, index: dict[str, list[dict[str, Any]]]) -> list[di
                 "firm_published": published if _IA_DATE_RE.match(published) else "",
                 "n_products": len(r.get("product_codes") or []),
                 "url": _ia.URL_TMPL.format(page_id=alert["page_id"]) if alert else "",
+                # [수입경보 2단계] 전체 목록 화면이 이 행을 업체 페이지로 잇는 키(화면 표시 안 함).
+                "listing_key": str(r.get("firm_key") or ""),
             })
     out.sort(key=lambda a: (a["alert_no"], a["firm_name"]))
     return out
@@ -4955,6 +4958,8 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "{clause} sections, each with the findings that cite it"),
     ("findings/citations/", "Most-cited FDA clauses",
      "How often FDA cited each 21 CFR clause, by inspections and fiscal year"),
+    ("findings/import-alerts/", "FDA Import Alert list",
+     "Facilities on FDA Import Alerts 66-40 and 66-41 with country, alert number, listing date and status"),
     ("findings/trends/", "Findings trends",
      "Ranked deficiency areas over the last 12 months and the most-cited sections"),
     ("findings/inspections/", "FDA inspection classifications",
@@ -5306,6 +5311,8 @@ INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 
 EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어와 참고용 한국어 번역, 출처 링크 포함.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
+IMPORT_ALERTS_DESCRIPTION = N_("FDA 수입경보 66-40·66-41 에 오른 의약품 제조소 {n}곳(한국 {k}곳) — "
+                               "국가·경보 번호·등재일·상태와 FDA 원문 링크.")
 COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
                           "연도별 지적 구성비로 트렌드 수치를 어디까지 믿을 수 있는지 밝힙니다.")
 FIRM_DESCRIPTION = N_("특정 업체의 FDA 483·Warning Letter·캐나다 실사·식약처·EU/영국 GMP 비준수 지적사항 "
@@ -5801,6 +5808,11 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     example_data = example_page.load_examples()
     if example_data:
         en_paths.add(example_page.ROUTE)
+    # [수입경보 2단계 2026-11-10] 전체 목록 화면 — 스냅샷(web/data/import_alerts.json)이 있을 때만
+    # 양 트리에 선다. 없으면 페이지도 진입 링크도 없다(빌드는 계속).
+    import_alerts_data = load_import_alerts(IMPORT_ALERTS_FILE)
+    if import_alerts_data:
+        en_paths.add(import_alerts_page.ROUTE)
     # ★모음(분류·국가·기관)도 여기서 넣는다 — 종전에는 그 트리를 그리기 직전(한참 아래)
     #   에 넣었는데, 그때는 이미 둘러보기 면이 그려진 뒤라 **영어 진입 카드가 자기
     #   트리에 난 면을 못 봤다**(실측: 영어 둘러보기 카드 1장 / 한국어 4장). 면 집합은
@@ -6521,6 +6533,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #     가 없거나 그 분류가 표본 미달로 페이지가 없으면 링크를 만들지 않는다 — 없는 페이지로
     #     보내는 링크가 무링크보다 나쁘다(자료실 조항 링크와 같은 판단).
     firm_alias_redirects: list[tuple[str, str]] = []
+    # [수입경보 2단계] 목록 행(스냅샷 firm_key) → 그 언어 트리에 실제로 선 업체 페이지 slug.
+    # 업체 페이지 블록(1단계)과 **같은 매칭 결과**에서만 채운다(목록이 따로 매칭하지 않는다).
+    ia_firm_slugs: dict[str, dict[str, str]] = {DEFAULT_LANG: {}, "en": {}}
     if docs_data:
         doc_agency_labels = docs_data.get("agency_labels") or (
             facets.get("agency_labels") if facets else {}) or {}
@@ -6931,6 +6946,14 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             for fp in firm_pages} if _ia_index else {}
         import_alerts_on = (_ia_snapshot or {}).get("measured_on", "")
         if render_doc_pages:
+            for _lg, _fps in ((DEFAULT_LANG, firm_pages), ("en", en_firm_pages)):
+                for fp in sorted(_fps, key=lambda f: f["slug"]):
+                    for a in import_alerts_by_key.get(fp["key"], []):
+                        if _lg != DEFAULT_LANG and _HANGUL_RE.search(a["firm_name"] + a["place"]):
+                            continue
+                        if a["listing_key"]:
+                            ia_firm_slugs[_lg].setdefault(a["listing_key"], fp["slug"])
+        if render_doc_pages:
             # [다국어 2026-09-04] 언어 트리마다 한 장씩. 뷰모델 구조는 같고 **집계는 그
             # 트리의 문서 집합에서** 나온다(firm_page_view). 분류 칩은 데이터에 한국어로
             # 실려 있어 뷰에서 번역한 사본을 넘긴다 — 정본 데이터는 무변형(문서 페이지와
@@ -7001,6 +7024,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             _g_built = max([docs_data.get("measured_on") or ""] + sorted(all_issue_slugs)[-1:])
             written.extend(graph_export.write_graph(
                 out_dir, graph_export.graph_files(_g_rows, built_at=_g_built)))
+
+    # [수입경보 2단계 2026-11-10] FDA 수입경보(66-40·66-41) 전체 목록 — ko·en 같은 함수.
+    # 서버가 전 행을 HTML 로 낸다(검색엔진이 읽는다). 필터·검색은 인라인 스크립트가 행을 숨길 뿐.
+    if import_alerts_data:
+        for _lg, _pg, _em, _tr in trees:
+            _iav = import_alerts_page.list_view(import_alerts_data, tr=_tr, lang=_lg,
+                                                firm_slugs=ia_firm_slugs.get(_lg))
+            _iap = _pg(import_alerts_page.ROUTE)
+            _em("findings_import_alerts.html", _iap,
+                page_title=_tr("FDA 수입경보 대상 업체 · GRM"),
+                nav_active="findings",
+                description=_tr(IMPORT_ALERTS_DESCRIPTION, n=f"{_iav['total']:,}",
+                                k=f"{_iav['korea']:,}"),
+                json_ld=_iap.breadcrumb_json_ld([
+                    (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                    (_tr("FDA 수입경보"), "")]),
+                ia=_iav,
+            )
+        facet_paths.append((import_alerts_page.ROUTE, import_alerts_data["measured_on"]))
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

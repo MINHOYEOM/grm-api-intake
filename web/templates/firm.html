@@ -58,6 +58,9 @@
         <button class="tr-look-btn" id="fp-look-btn" type="submit">{{ _('찾기') }}</button>
       </form>
       <div id="fp-look-res" class="tr-look-res" aria-live="polite"></div>
+      {% if 'findings/import-alerts/' in en_paths %}{# [수입경보 2단계] 목록이 선 빌드에서만 #}
+      <p class="tr-look-hint"><a href="{{ rel_root }}findings/import-alerts/">{{ _('FDA 수입경보 대상 업체 전체 목록 보기 →') }}</a></p>
+      {% endif %}
     </div>
 
     <div id="fp-content" hidden>

@@ -20,7 +20,8 @@
 블록 매칭(근거가 글자로 있는 것만, 애매하면 블록 없음):
   · 조항 페이지(21 CFR) — 지적 문장에 그 21 CFR 조항이 적혀 수집기가 clause_keys 로 뽑은 행만(완전 일치).
   · 용어 페이지 — 표제어(괄호 속 약어 포함)·별칭이 **낱말 단위로 그대로** 들어 있는 문장만.
-    너무 흔한 낱말(일치 > MAX_TERM_MATCHES)·짧은 소문자 낱말은 주제를 가르지 못해 블록을 만들지 않는다.
+    너무 흔한 낱말(일치 > MAX_TERM_MATCHES, 한 낱말 용어는 > MAX_SINGLE_MATCHES)·짧은 소문자 낱말·
+    일상 뜻이 따로 있는 낱말(AMBIGUOUS_WORDS)은 주제를 가르지 못해 블록을 만들지 않는다.
     그리고 용어의 관련 조항이 'EU GMP (Part I) Chapter N / Annex N' 이면 MHRA 집계표의 그 장 횟수 한 줄.
 """
 from __future__ import annotations
@@ -68,6 +69,13 @@ CAP = 2000            # 페이지 한 행 본문 상한(글자). 넘으면 낱�
 BLOCK_CAP = 300        # 조항·용어 블록 인용 상한
 BLOCK_MAX = 3          # 블록 인용 수
 MAX_TERM_MATCHES = 30  # 용어 일치가 이보다 많으면 너무 흔한 낱말 — 블록 없음
+MAX_SINGLE_MATCHES = 12  # 구절이 전부 한 낱말(약어 아님)인 용어는 더 엄격히 — production·specification 류
+# 일상 영어 뜻이 따로 있는 낱말 — 문장에 있어도 같은 주제라는 근거가 못 된다(실데이터 11-10 대조:
+# "accurate records", "within the range", "yield" 등). 이 낱말로만 일치하면 블록을 만들지 않는다.
+AMBIGUOUS_WORDS = frozenset({
+    "accuracy", "accurate", "precision", "range", "specificity", "robustness", "repeatability",
+    "backup", "documentation", "hazard", "qualification", "yield", "returns",
+})
 MIN_WORD = 5           # 소문자 한 낱말 구절의 최소 길이(Lot·Batch 류 배제는 MAX_TERM_MATCHES 가 맡는다)
 
 _HANGUL = re.compile(r"[ㄱ-ㆎ가-힣]")
@@ -335,7 +343,7 @@ def term_phrases(term: dict[str, Any]) -> list[tuple[str, bool]]:
         if not c or _HANGUL.search(c) or c.lower().startswith(("or ", "and ")):
             continue
         abbr = bool(_ABBR.match(c))
-        if not abbr and " " not in c and len(c) < MIN_WORD:
+        if not abbr and " " not in c and (len(c) < MIN_WORD or c.lower() in AMBIGUOUS_WORDS):
             continue
         k = c if abbr else c.lower()
         if k in seen:
@@ -371,7 +379,8 @@ def term_block(snap: "dict[str, Any] | None", term: dict[str, Any],
                 if rx.search(c["text"]):
                     hits.append(c)
                     break
-        if len(hits) > MAX_TERM_MATCHES:
+        single_only = all(" " not in p and not case for p, case in phrases)
+        if len(hits) > (MAX_SINGLE_MATCHES if single_only else MAX_TERM_MATCHES):
             hits = []
         if hits:
             # 페이지 검색어 = 일치 행이 가장 많은 구절(그 단어로 거르면 같은 행들이 나온다).

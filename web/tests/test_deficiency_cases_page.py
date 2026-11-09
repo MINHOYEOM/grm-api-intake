@@ -266,6 +266,26 @@ class ViewTest(unittest.TestCase):
         self.assertIsNone(dcp.term_block(self.snap, term, LABELS, "ko"),
                           "모든 행에 나오는 낱말은 주제를 가르지 못한다 — 블록 없음")
 
+    def test_ambiguous_single_word_never_matches(self):
+        """일상 뜻이 따로 있는 낱말(accurate·range·yield …)은 문장에 있어도 블록 근거가 아니다."""
+        snap = json.loads(json.dumps(self.snap))
+        snap["cases"][0]["text"] = "Records were not accurate and the yield was outside the range."
+        for word in ("Accurate", "Range", "Yield"):
+            term = {"id": word.lower(), "term_en": word, "aliases": [], "reg_refs": []}
+            self.assertEqual(dcp.term_phrases(term), [])
+            self.assertIsNone(dcp.term_block(snap, term, LABELS, "ko"), word)
+
+    def test_single_word_term_has_stricter_limit(self):
+        snap = json.loads(json.dumps(self.snap))
+        for c in snap["cases"][:dcp.MAX_SINGLE_MATCHES + 1]:
+            c["text"] = "The isolator glove was not tested."
+        term = {"id": "isolator", "term_en": "Isolator", "aliases": [], "reg_refs": []}
+        self.assertIsNone(dcp.term_block(snap, term, LABELS, "ko"))
+        for c in snap["cases"][dcp.MAX_SINGLE_MATCHES:dcp.MAX_SINGLE_MATCHES + 1]:
+            c["text"] = "No match here."
+        self.assertEqual(dcp.term_block(snap, term, LABELS, "ko")["by_agency"][0]["n"],
+                         dcp.MAX_SINGLE_MATCHES)
+
     def test_abbreviation_is_case_sensitive(self):
         term = {"id": "x", "term_en": "Out of Specification (OOS)", "aliases": [], "reg_refs": []}
         b = dcp.term_block(self.snap, term, LABELS, "ko")

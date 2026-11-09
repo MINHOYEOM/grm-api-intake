@@ -19533,6 +19533,10 @@ class WebEnTreeTest(unittest.TestCase):
         # [수입경보 2단계] 스냅샷이 있으면 영어 목록 면이 선다(렌더와 같은 로더).
         if render.load_import_alerts(render.IMPORT_ALERTS_FILE):
             cls.expected.add(render.import_alerts_page.ROUTE)
+        # [해외 지적 사례 전체 2026-11-10] 스냅샷이 있으면 기관별 목록·MHRA 조항 집계 면이 선다
+        # (렌더와 같은 로더·같은 함수 — routes_present 가 실제로 그릴 면만 돌려준다).
+        cls.expected |= set(render.deficiency_cases_page.routes_present(
+            render.deficiency_cases_page.load_snapshot(render.DEFICIENCY_CASES_FILE)))
 
     @classmethod
     def tearDownClass(cls):

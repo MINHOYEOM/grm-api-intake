@@ -240,7 +240,24 @@ _FDA483_DEVICE_TEXT_RE = re.compile(
     r"|quality\s+system\s+regulation|unique\s+device\s+identif"
     # [2026-10-27] 10-26 OCR 복구분 Gobiquity(기기·사이버보안)가 위 어휘를 하나도 안 써 통과했다
     #   — 설계관리 조항(820.30)의 다른 표현 "design and development"·"design changes".
-    r"|design\s+(?:and\s+development|changes?)\b", re.I)
+    r"|design\s+(?:and\s+development|changes?)\b"
+    # [2026-11-09] 강한 기기 표지(아래 _FDA483_DEVICE_STRONG_RE)를 기기 판정에도 넣는다 —
+    #   Radiation Products Design(196242)은 위 어휘 0, "risk management in product realization" 만 썼다.
+    r"|product\s+realization|\budi\b|banned\s+(?:medical\s+)?devices?"
+    r"|\b(?:803|806|807|830)\.\d+", re.I)
+# [2026-11-09] 기기 전용이 확실한 표지 — 이게 있으면 아래 '약한' 의약품 어휘(stability·
+# sterility·OOS)로는 기기 판정을 뒤집지 않는다. 11-09 호에서 Cardionxt(UDI·"software stability
+# study")·Immuno-Mycologics(진단 면역분석 "reduced stability")·American Contract Systems(EO 멸균
+# "sterility test"·"Medical Device Reports"·"banned medical device")가 이 약한 어휘 하나로 남았다.
+#   UDI(21 CFR 801·830)·의료기기 보고(803)·금지 기기(895)·ISO 13485 7장 "product realization"
+#   (2026-02 QMSR 시행 뒤 483 문구)·803/806/807/830 조항. DB 483 코퍼스 2,267건 실측: 이 표지가
+#   있는 문서 12건 중 강한 의약품 어휘(drug product·API·211 등)가 같이 있는 문서 0건.
+_FDA483_DEVICE_STRONG_RE = re.compile(
+    r"unique\s+device\s+identif|\budi\b|medical\s+device\s+reports?|banned\s+(?:medical\s+)?devices?"
+    r"|product\s+realization|\b(?:803|806|807|830)\.\d+"
+    # [2026-11-09 대표 결정] ISO 13485 7.5.6(QMSR) "production and service provision" — Rogers Foam
+    #   (196239) 실측. DB 실측: 이 문구 문서 2건(Rogers Foam·Ventana IVD), 강한 의약품 어휘 0.
+    r"|production\s+and\s+service\s+provision", re.I)
 # 식품 483(21 CFR 117 예방관리) 전용 어휘 — 시설 유형이 그냥 "Manufacturer" 인 식품 업체를
 # 본문으로 가른다(10-26 OCR 복구분 Krispy Kreme). 의약품 어휘가 같이 있으면 남기는 조건은
 # 기기와 같다.
@@ -253,6 +270,11 @@ _FDA483_DRUG_TEXT_RE = re.compile(
     r"\bdrug\s+(?:products?|substances?)\b|\bapis?\b|active\s+pharmaceutical|\baseptic"
     r"|\bsterility\b|\bstability\b|out[\s-]+of[\s-]+specification|\boos\b|\b211\.\d+"
     r"|\bmedia\s+fill", re.I)
+# 위 의약품 어휘 중 기기 483 에는 거의 안 나오는 것 — 강한 기기 표지가 있어도 이게 있으면 남긴다
+# (복합제품·의약품 포장업체 보호). stability·sterility·OOS 는 기기 483 에도 흔해 여기서 뺀다.
+_FDA483_DRUG_STRONG_TEXT_RE = re.compile(
+    r"\bdrug\s+(?:products?|substances?)\b|\bapis?\b|active\s+pharmaceutical|\baseptic"
+    r"|\b211\.\d+|\bmedia\s+fill", re.I)
 
 
 def is_pharma_establishment_483(establishment_type: str) -> bool:
@@ -271,6 +293,8 @@ def is_out_of_scope_483(establishment_type: str, text: str = "") -> bool:
     if is_pharma_establishment_483(establishment_type):
         return False
     body = text or ""
+    if _FDA483_DEVICE_STRONG_RE.search(body) and not _FDA483_DRUG_STRONG_TEXT_RE.search(body):
+        return True
     non_pharma = _FDA483_DEVICE_TEXT_RE.search(body) or _FDA483_FOOD_TEXT_RE.search(body)
     return bool(non_pharma and not _FDA483_DRUG_TEXT_RE.search(body))
 

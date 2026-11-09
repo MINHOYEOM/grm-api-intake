@@ -204,6 +204,8 @@ def merge_fda483_disclosures(cards: list[dict[str, Any]]) -> list[dict[str, Any]
     facilities = [_fda483_facility_line(cards[i]) for i in idxs]
     rep_fac = _fda483_facility_line(rep_src).split(" · 실사")[0]
     rep = dict(rep_src)
+    # [11-09] 대표 1건의 핵심 한 줄은 묶음 전체의 것이 아니다 — 싣지 않는다.
+    rep.pop("hook_line", None)
     rep["title_issue"] = "483 실사기록 다건 공개"
     # [문구 정확화 2026-07-20] 종전 "스캔·비공개로" 는 단정이 지나쳤다 — 전수 점검(70건) 결과
     # 텍스트층은 정상인데 관찰 상세가 수록되지 않은 PDF 도 다수였다. 사유를 단정하지 않는다.
@@ -336,6 +338,7 @@ def merge_admin_batch_dispositions(cards: list[dict[str, Any]]
         n = len(members)
         rep_product = _admin_single_product(rep_src)
         rep = dict(rep_src)
+        rep.pop("hook_line", None)  # 대표 1건의 핵심 한 줄 — 묶음 것이 아님
         for slot in ("title_issue", "summary", "implication", "key_facts", "checks"):
             if slot in rep:
                 rep[slot] = _sub_product(rep[slot], rep_product)
@@ -370,7 +373,8 @@ def merge_admin_batch_dispositions(cards: list[dict[str, Any]]
         rep["facts"] = facts_out
         en = rep_src.get("en")
         if isinstance(en, dict):
-            en_out = {k: _sub_product(v, rep_product) for k, v in en.items()}
+            en_out = {k: _sub_product(v, rep_product) for k, v in en.items()
+                      if k != "hook_line"}
             if en_out.get("title_issue"):
                 en_out["title_issue"] = f"{en_out['title_issue']} ({n} companies)"
             en_out["summary"] = (
@@ -442,6 +446,8 @@ def merge_no_finding_inspections(cards: list[dict[str, Any]]) -> list[dict[str, 
     rep_src = cards[idxs[0]]
     sites = [_inspection_site_line(cards[i]) for i in idxs]
     rep = dict(rep_src)
+    # [11-09] 대표 1건의 핵심 한 줄은 묶음 전체의 것이 아니다 — 싣지 않는다.
+    rep.pop("hook_line", None)
     rep["title_issue"] = f"지적 없는 GMP 실사 결과 {n}건"
     rep["headline_target"] = f"{rep_src.get('headline_target') or ''} 외 {n - 1}곳".strip()
     rep["summary"] = (
@@ -468,7 +474,7 @@ def merge_no_finding_inspections(cards: list[dict[str, Any]]) -> list[dict[str, 
     en = rep_src.get("en")
     if isinstance(en, dict):
         rep["en"] = {
-            **en,
+            **{k: v for k, v in en.items() if k != "hook_line"},
             "title_issue": f"GMP inspections with no findings ({n})",
             "summary": (f"MFDS published {n} GMP inspection results with no deficiencies "
                         f"raised. The sites and inspection dates are listed on this card."),

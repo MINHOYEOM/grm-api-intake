@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T03:48:36Z",
+ "generated_at": "2026-11-09T04:50:43Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 42563902178,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-09T04:49:35Z",
+    "updatedAt": "2026-11-09T04:50:33Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Publish (assemble)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563902178"
+   },
+   {
     "databaseId": 42558262411,
     "status": "completed",
     "conclusion": "success",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "bridge(web): 2026-11-09 라우틴 델타 커밋 (자동)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42546767176"
-   },
-   {
-    "databaseId": 41395061761,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T05:36:58Z",
-    "updatedAt": "2026-11-02T05:38:14Z",
-    "headBranch": "main",
-    "displayTitle": "brief(2026-11-02): 검증실 정정 3건 — Northland WL 위반 2건·MFDS 사전 GMP 지침 게시일·…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395061761"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42558395935,
-    "status": "queued",
-    "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-09T03:48:38Z",
-    "updatedAt": "2026-11-09T03:48:38Z",
-    "headBranch": "claude/issue-1209-analysis-p08pkx",
-    "displayTitle": "Merge origin/claude/issue-1209-analysis-p08pkx (squash-merged #1368 h…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558395935"
-   },
-   {
-    "databaseId": 42558380449,
+    "databaseId": 42563985739,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-09T03:48:26Z",
-    "updatedAt": "2026-11-09T03:48:30Z",
-    "headBranch": "publish/brief-2026-11-02",
-    "displayTitle": "publish(web): 2026-11-02 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558380449"
+    "createdAt": "2026-11-09T04:50:32Z",
+    "updatedAt": "2026-11-09T04:50:36Z",
+    "headBranch": "publish/brief-2026-11-09",
+    "displayTitle": "publish(web): 2026-11-09 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563985739"
    },
    {
-    "databaseId": 42558376580,
+    "databaseId": 42563980592,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T03:48:23Z",
-    "updatedAt": "2026-11-09T03:48:27Z",
-    "headBranch": "publish/brief-2026-11-02",
-    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558376580"
+    "createdAt": "2026-11-09T04:50:29Z",
+    "updatedAt": "2026-11-09T04:50:33Z",
+    "headBranch": "publish/brief-2026-11-09",
+    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563980592"
    },
    {
-    "databaseId": 42558262408,
+    "databaseId": 42563513500,
     "status": "in_progress",
     "conclusion": "",
-    "event": "push",
-    "createdAt": "2026-11-09T03:47:03Z",
-    "updatedAt": "2026-11-09T03:47:23Z",
-    "headBranch": "main",
-    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원 (#1368)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558262408"
+    "event": "pull_request",
+    "createdAt": "2026-11-09T04:45:10Z",
+    "updatedAt": "2026-11-09T04:45:29Z",
+    "headBranch": "feat/fda-citations-screen",
+    "displayTitle": "feat(web): FDA 지적 조항 화면 — 조항별 인용 빈도",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563513500"
    },
    {
-    "databaseId": 42558137118,
+    "databaseId": 42563510614,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T04:45:08Z",
+    "updatedAt": "2026-11-09T04:50:41Z",
+    "headBranch": "feat/fda-citations-screen",
+    "displayTitle": "test(web): 영어 면 선언 집합에 지적 조항 면 포함",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563510614"
+   },
+   {
+    "databaseId": 42563316122,
     "status": "completed",
     "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-09T03:45:38Z",
-    "updatedAt": "2026-11-09T03:47:20Z",
-    "headBranch": "main",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립) (#1395)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558137118"
+    "event": "pull_request",
+    "createdAt": "2026-11-09T04:42:53Z",
+    "updatedAt": "2026-11-09T04:45:26Z",
+    "headBranch": "feat/fda-citations-screen",
+    "displayTitle": "feat(web): FDA 지적 조항 화면 — 조항별 인용 빈도",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42563316122"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 42559659141,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T04:03:25Z",
+    "updatedAt": "2026-11-09T04:03:58Z",
+    "headBranch": "main",
+    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-09 - 10건 (#1391)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42559659141"
+   },
+   {
     "databaseId": 42462860881,
     "status": "completed",
     "conclusion": "success",
@@ -444,17 +455,6 @@
     "headBranch": "main",
     "displayTitle": "chore(findings): 일일 번역 배치 2026-11-04 - 2건 (#1318)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41832219219"
-   },
-   {
-    "databaseId": 41555324787,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-03T00:47:20Z",
-    "updatedAt": "2026-11-03T00:47:46Z",
-    "headBranch": "main",
-    "displayTitle": "Merge pull request #1303 from MINHOYEOM/chore/findings-restore-2026-1…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41555324787"
    }
   ],
   "grm-findings-backfill-fetch.yml": [

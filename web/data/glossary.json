@@ -5030,7 +5030,7 @@
     "term_ko": "회수 등급 (Class I·II·III)",
     "term_en": "Recall Classification (Class I, II, III)",
     "easy_ko": "FDA 가 회수 대상 제품의 위해 정도에 따라 매기는 등급입니다. Class I 은 심각한 건강 피해나 사망의 상당한 가능성이 있는 경우, Class II 는 일시적이거나 의학적으로 되돌릴 수 있는 건강 피해를 일으킬 수 있거나 심각한 피해 가능성이 희박한 경우, Class III 는 건강 피해를 일으킬 가능성이 낮은 경우입니다.",
-    "easy_en": "FDA's classification of a recall by the degree of hazard: Class I, a reasonable probability of serious adverse health consequences or death; Class II, temporary or medically reversible adverse health consequences, or a remote probability of serious ones; Class III, not likely to cause adverse health consequences.",
+    "easy_en": "FDA's grading of a recall by hazard: Class I, serious adverse health consequences or death are reasonably probable; Class II, temporary or reversible harm, or serious harm is remote; Class III, harm is not likely.",
     "definition_source": "21 CFR 7.3(m) Recall classification",
     "source_url": "https://www.ecfr.gov/current/title-21/section-7.3",
     "related": [

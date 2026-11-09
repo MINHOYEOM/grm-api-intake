@@ -235,21 +235,72 @@ class GithubMeasureTest(unittest.TestCase):
         self.assertEqual(gm.crons_in(text), ["17 18 * * *", "5 1 * * 2"])
 
     def test_ontime_counts_missing_and_late(self):
-        now = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
+        now = dt.datetime(2026, 11, 8, 6, 0, tzinfo=UTC)
         start = now - dt.timedelta(days=7)
         runs = {"a.yml": [
             {"event": "schedule", "created_at": "2026-11-07T18:30:00Z"},   # 13분 지각 → 정시
-            {"event": "schedule", "created_at": "2026-11-06T20:00:00Z"},   # 103분 지각 → 지각
-            {"event": "workflow_dispatch", "created_at": "2026-11-05T18:17:00Z"},  # 수동 실행은 안 셈
+            {"event": "schedule", "created_at": "2026-11-06T20:00:00Z"},   # 103분 지각 → 일반 6시간 창 안이라 정시
+            {"event": "schedule", "created_at": "2026-11-05T01:30:00Z"},   # 433분 지각 → 지각
+            {"event": "workflow_dispatch", "created_at": "2026-11-04T18:17:00Z"},  # 수동 실행은 안 셈
         ]}
         v, note = gm.ontime({"a.yml": ["17 18 * * *"]}, runs, {"a.yml": start}, now)
-        self.assertEqual(v, round(100 / 7, 1))
-        self.assertIn("7일 예약 7회 중 1회", note)
+        self.assertEqual(v, round(200 / 7, 1))
+        self.assertIn("7일 예약 7회 중 2회 제때(+6시간)", note)
+        self.assertIn("지각 1·누락 4", note)
+        self.assertIn("가장 늦은 작업: a", note)
         with self.assertRaises(gm.Hold):
             gm.ontime({}, {}, {}, now)
 
+    def _one_fire(self, delay_min, wf="a.yml"):
+        now = dt.datetime(2026, 11, 8, 6, 0, tzinfo=UTC)
+        start = dt.datetime(2026, 11, 7, 0, 0, tzinfo=UTC)   # 예정 1회: 11-07 18:17
+        runs = []
+        if delay_min is not None:
+            t = dt.datetime(2026, 11, 7, 18, 17, tzinfo=UTC) + dt.timedelta(minutes=delay_min)
+            runs = [{"event": "schedule", "created_at": t.strftime("%Y-%m-%dT%H:%M:%SZ")}]
+        return gm.ontime({wf: ["17 18 * * *"]}, {wf: runs}, {wf: start}, now)
+
+    def test_ontime_single_window_six_hours(self):
+        self.assertEqual(gm.ONTIME_GRACE_MIN, 360)
+        self.assertFalse(hasattr(gm, "ONTIME_GRACE_STRICT_MIN"))   # 엄격/일반 이원화는 폐기
+        self.assertFalse(hasattr(gm, "ONTIME_STRICT_WORKFLOWS"))
+        v, note = self._one_fire(359)
+        self.assertEqual(v, 100.0)
+        self.assertIn("1회 중 1회 제때(+6시간)", note)
+        self.assertNotIn("가장 늦은 작업", note)
+        v, note = self._one_fire(361)
+        self.assertEqual(v, 0.0)
+        self.assertIn("지각 1·누락 0", note)
+
+    def test_ontime_missing_run(self):
+        v, note = self._one_fire(None)
+        self.assertEqual(v, 0.0)
+        self.assertIn("지각 0·누락 1", note)
+
+    def test_ontime_names_late_workflows(self):
+        # 6시간을 넘겨 늦었거나 안 돈 작업의 이름(grm- 접두·.yml 제거)이 노트에 보인다
+        v, note = self._one_fire(361, wf="grm-db-backup.yml")
+        self.assertIn("가장 늦은 작업: db-backup", note)
+        v, note = self._one_fire(None, wf="grm-intake.yml")
+        self.assertIn("가장 늦은 작업: intake", note)
+        # 최대 3개 + 나머지 개수, 건수 많은 순
+        now = dt.datetime(2026, 11, 8, 6, 0, tzinfo=UTC)
+        start = dt.datetime(2026, 11, 7, 0, 0, tzinfo=UTC)
+        names = [f"grm-w{i}.yml" for i in range(5)]
+        v, note = gm.ontime({n: ["17 18 * * *"] for n in names}, {n: [] for n in names},
+                            {n: start for n in names}, now)
+        self.assertIn("누락 5", note)
+        self.assertIn("가장 늦은 작업: w0, w1, w2 외 2", note)
+        self.assertLessEqual(len(note), gm.NOTE_MAX)
+        # 건수가 많은 작업이 먼저(w9 는 하루 2회 예약 → 2건 누락)
+        sched = {n: ["17 18 * * *"] for n in names}
+        sched["grm-w9.yml"] = ["17 18,19 * * *"]
+        v, note = gm.ontime(sched, {n: [] for n in sched}, {n: start for n in sched}, now)
+        self.assertIn("가장 늦은 작업: w9, w0, w1 외 3", note)
+
+
     def test_ontime_skips_fires_inside_grace(self):
-        now = dt.datetime(2026, 11, 8, 18, 40, tzinfo=UTC)   # 18:17 예정이 23분 전 — 아직 판정하지 않는다
+        now = dt.datetime(2026, 11, 8, 20, 40, tzinfo=UTC)   # 18:17 예정이 143분 전 — 일반 창(6시간) 안이라 아직 판정하지 않는다
         start = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
         with self.assertRaises(gm.Hold):
             gm.ontime({"a.yml": ["17 18 * * *"]}, {"a.yml": []}, {"a.yml": start}, now)

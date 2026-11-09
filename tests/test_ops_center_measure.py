@@ -235,46 +235,76 @@ class GithubMeasureTest(unittest.TestCase):
         self.assertEqual(gm.crons_in(text), ["17 18 * * *", "5 1 * * 2"])
 
     def test_ontime_counts_missing_and_late(self):
-        now = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
+        now = dt.datetime(2026, 11, 8, 6, 0, tzinfo=UTC)
         start = now - dt.timedelta(days=7)
         runs = {"a.yml": [
             {"event": "schedule", "created_at": "2026-11-07T18:30:00Z"},   # 13분 지각 → 정시
-            {"event": "schedule", "created_at": "2026-11-06T20:00:00Z"},   # 103분 지각 → 3시간 창 안이라 정시
-            {"event": "schedule", "created_at": "2026-11-05T22:30:00Z"},   # 253분 지각 → 지각
+            {"event": "schedule", "created_at": "2026-11-06T20:00:00Z"},   # 103분 지각 → 일반 6시간 창 안이라 정시
+            {"event": "schedule", "created_at": "2026-11-05T01:30:00Z"},   # 433분 지각 → 지각
             {"event": "workflow_dispatch", "created_at": "2026-11-04T18:17:00Z"},  # 수동 실행은 안 셈
         ]}
         v, note = gm.ontime({"a.yml": ["17 18 * * *"]}, runs, {"a.yml": start}, now)
         self.assertEqual(v, round(200 / 7, 1))
-        self.assertIn("7일 예약 7회 중 2회", note)
+        self.assertIn("7일 예약 7회 중 2회 제때(엄격 0/0·일반 2/7)", note)
         self.assertIn("지각 1·누락 4", note)
+        self.assertNotIn("엄격 지연", note)
         with self.assertRaises(gm.Hold):
             gm.ontime({}, {}, {}, now)
 
-    def _one_fire(self, delay_min):
-        now = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
+    def _one_fire(self, delay_min, wf="a.yml", strict=()):
+        now = dt.datetime(2026, 11, 8, 6, 0, tzinfo=UTC)
         start = dt.datetime(2026, 11, 7, 0, 0, tzinfo=UTC)   # 예정 1회: 11-07 18:17
         runs = []
         if delay_min is not None:
             t = dt.datetime(2026, 11, 7, 18, 17, tzinfo=UTC) + dt.timedelta(minutes=delay_min)
             runs = [{"event": "schedule", "created_at": t.strftime("%Y-%m-%dT%H:%M:%SZ")}]
-        return gm.ontime({"a.yml": ["17 18 * * *"]}, {"a.yml": runs}, {"a.yml": start}, now)
+        return gm.ontime({wf: ["17 18 * * *"]}, {wf: runs}, {wf: start}, now, strict=strict)
 
-    def test_ontime_window_is_three_hours(self):
-        self.assertEqual(gm.ONTIME_GRACE_MIN, 180)
-        v, note = self._one_fire(179)
+    def test_ontime_windows_constants(self):
+        self.assertEqual(gm.ONTIME_GRACE_MIN, 360)
+        self.assertEqual(gm.ONTIME_GRACE_STRICT_MIN, 60)
+
+    def test_ontime_general_window_six_hours(self):
+        v, note = self._one_fire(359)
         self.assertEqual(v, 100.0)
-        self.assertIn("예정+3시간", note)
-        v, note = self._one_fire(181)
+        self.assertIn("일반 1/1", note)
+        v, note = self._one_fire(361)
         self.assertEqual(v, 0.0)
         self.assertIn("지각 1·누락 0", note)
+        self.assertIn("일반 0/1", note)
+
+    def test_ontime_strict_window_one_hour(self):
+        v, note = self._one_fire(59, wf="s.yml", strict=("s.yml",))
+        self.assertEqual(v, 100.0)
+        self.assertIn("엄격 1/1·일반 0/0", note)
+        v, note = self._one_fire(61, wf="s.yml", strict=("s.yml",))
+        self.assertEqual(v, 0.0)
+        self.assertIn("엄격 0/1", note)
+        self.assertIn("지각 1·누락 0", note)
+        self.assertIn("엄격 지연: s.yml".replace("s.yml", "s"), note)   # grm- 접두·.yml 은 떼고 적는다
+
+    def test_ontime_strict_set_membership(self):
+        # 같은 61분 지연이라도 엄격 대상이 아니면 일반 창이라 정시
+        self.assertEqual(self._one_fire(61, wf="a.yml", strict=("other.yml",))[0], 100.0)
+        # 기본 엄격 집합: 발행 체인·백업은 들어 있고, 6시간 주기 점검은 없다
+        self.assertIn("grm-delta-bridge.yml", gm.ONTIME_STRICT_WORKFLOWS)
+        self.assertIn("grm-db-backup.yml", gm.ONTIME_STRICT_WORKFLOWS)
+        self.assertNotIn("grm-stranded-batch-pr.yml", gm.ONTIME_STRICT_WORKFLOWS)
+        self.assertLessEqual(len(gm.ONTIME_STRICT_WORKFLOWS), 10)
+        v, note = self._one_fire(61, wf="grm-delta-bridge.yml", strict=None)
+        self.assertEqual(v, 0.0)
+        self.assertIn("엄격 지연: delta-bridge", note)
 
     def test_ontime_missing_run(self):
         v, note = self._one_fire(None)
         self.assertEqual(v, 0.0)
         self.assertIn("지각 0·누락 1", note)
+        v, note = self._one_fire(None, wf="s.yml", strict=("s.yml",))
+        self.assertIn("엄격 0/1", note)
+        self.assertIn("엄격 지연: s", note)
 
     def test_ontime_skips_fires_inside_grace(self):
-        now = dt.datetime(2026, 11, 8, 20, 40, tzinfo=UTC)   # 18:17 예정이 143분 전 — 아직 판정하지 않는다
+        now = dt.datetime(2026, 11, 8, 20, 40, tzinfo=UTC)   # 18:17 예정이 143분 전 — 일반 창(6시간) 안이라 아직 판정하지 않는다
         start = dt.datetime(2026, 11, 8, 0, 0, tzinfo=UTC)
         with self.assertRaises(gm.Hold):
             gm.ontime({"a.yml": ["17 18 * * *"]}, {"a.yml": []}, {"a.yml": start}, now)

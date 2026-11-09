@@ -30,6 +30,7 @@
 ### 판정 확정(Codex G3): F-1 = Tier 1 은 프롬프트에서 생략/Skipped(Python 사전 필터 안 함 —
 검색 발견 시 재검토 여지·Status 갱신 단위 보존·render_order gap 은 결정론 비훼손).
 F-2 = Intake watch scaffold 는 카드 렌더, 🔮 표는 비카드 Watch 전용(card_spec §6 문구 정정 동반).
+(2026-11-09 정정: 입법·행정예고 중 **코드가 GMP 관련으로 판정해 국내 섹션 본 카드로 올린 것**만 카드이며, 나머지 입법예고는 scaffold 에서도 `section=watch` — 아래 Watch 처리 참조.)
 
 ## B. v16 완성 프롬프트 (Routine 에 그대로 복사)
 
@@ -515,8 +516,11 @@ run-log 에 "신규 검색 이벤트 {N}건 · Watch {M}건 — v1.1 watch[] def
 브리프 JSON 산출 완료 후, 0단계에서 고정한 page_id 표의 **모든 row** 를 갱신한다:
 - 카드화 row(대표/단독·검색 보강 무관): Status → "Processed"
 - 병합 멤버(merged_into) row: **전원** Status → "Processed" (카드는 대표 1장이지만 멤버도 처리분)
-- Watch/🔮 성격 row(입법예고·진행 예정 등 — v1 비카드): Status → "Skipped" + run-log
+- Watch/🔮 성격 row(진행 예정 등 — v1 비카드): Status → "Skipped" + run-log
   "Watch v1.1 deferred"(다음 수집서 재유입해 v1.1 `watch[]` 로 표면화 — 은닉 누락 아님).
+  단 **입법·행정예고(legislative) 중 scaffold 에 카드(`section=domestic`)로 이미 올라온 것은 Watch 가 아니다** —
+  다른 카드와 똑같이 슬롯을 채우고 Status → "Processed". 코드가 `section=watch` 로 둔 입법예고만 위 Skipped 처리
+  (카드 여부는 scaffold 의 `cards[]` 존재가 기준 — 입법예고라는 이유로 LLM 이 카드를 빼거나 만들지 않는다).
 - Tier 1/카테고리 제외로 생략한 row: Status → "Skipped"
 - ⛔ 카드화도 안 됐고 Skipped/Error 도 아닌 row(용량 초과 보류 등): **Status 미변경**
   (Processed 금지 — 다음 주 handoff 재유입으로 재처리). run-log "보류 {N}건 — Status 미변경" 기록.
@@ -768,3 +772,4 @@ handoff 카드 중 `deep_analysis_ready=true`(+`deep_analysis_input.body_full`) 
 | 2026-09-21 | **저장소 사본 낡음 수리 — 클라우드 Routine 에만 있던 `en` 로마자 금지 규칙 역이관(§B [출력] 다국어 절 · 다른 절 무접촉)**: 이 파일은 2026-09-09 에 통째로 추가됐는데 그때 **2026-09-07 자 클라우드 규칙 한 덩어리가 빠졌다** — "한국 업체·제품·문서 이름을 로마자로 옮기지 않는다"(미래바이오제약(주)→"Mirae Bio Pharm" 금지 · 일반명사로 가리킨다 · 공식 영문 상호가 있을 때만 사용). `git log -S"로마자" -- docs/prompts/` 0건으로 확인. 이 규칙은 스스로 밝히듯 **어떤 가드도 검사하지 못한다**(2026-09-07 실측: 검사 17건 전부 초록인 채 14사·12품목이 지어내져 있었다) — 즉 저장소 사본을 정본으로 믿고 Routine 에 덮어쓰면 그 규칙이 **조용히 삭제되고 아무 경보도 없다**. 2026-09-21 에 실제 클라우드 프롬프트와 대조하다 발견했고, 대조 결과 diff 는 이 한 덩어리뿐이었다(나머지 647줄 완전 일치). 이제 §B 는 운영 중인 클라우드 프롬프트와 동일하다 — 다음부터 이 파일을 그대로 붙여넣어도 규칙이 사라지지 않는다. |
 | 2026-09-21 | **델타 예치 — Notion 블록 경계 공백 소실 검증·수리 절차 추가(§B `[산출물]` 델타 예치 절만 · 6슬롯 계약·[출력]·[2단계] 무접촉)**: Notion 은 긴 코드 블록을 ~1,800~1,900자에서 자동 분할하면서 **분할 경계의 앞뒤 공백 한 칸을 깎는다.** compact JSON 에는 구조용 공백이 없어 **JSON 파싱과 결정론 게이트를 전부 통과하고**, 문장 한가운데가 경계에 걸린 자리만 `biosimilars in the` → `biosimilars inthe` 로 **단어가 붙은 채 발행된다** — 2026-09-21 예치에서 슬롯 페이지 7곳·deep 페이지 3곳 실측. 지시 = ① 예치 직후 페이지를 **다시 읽어 원본과 글자 단위 대조**(읽기 뷰도 경계 공백을 깎지만 그건 '더 생긴 공백'만 가리고 '사라진 공백'은 못 가리므로 이 대조로 반드시 드러난다) ② 수리는 공백을 다시 넣는 게 아니라(또 경계라 또 깎인다) **경계 너머로 글자 하나를 옮겨** 공백을 블록 내부로 들인다 ③ 원본과 완전 일치할 때까지 반복. 2026-09-21 실측: 수리 후 브릿지 커밋본과 원본이 리프 974개(delta)·185개(deep) **전건 일치**. 사람 운영 routine 재-붙여넣기 후 적용(repo 편집만으론 클라우드 미반영) — 사본 `docs/prompts/GRM_Routine_델타예치_스니펫.md` 도 함께 갱신. |
 | 2026-11-08 | **실사 결과 카드 — EU/UK 비준수 `ncr_ko.findings_ko`(지적 한 줄) 신설 + 실사 결과 카드 `checks` 근거 번호(§B `[2단계]` checks · ③-④ 만)**: 대표 결정("483 처럼 한눈에") — 웹 앞면이 지적 목록·등급 칩·당국 조치 칩을 결정론으로 보여준다(`inspection_card.py`). 산문형 판정서는 원문 구조가 없어 Routine 이 결함 하나당 한 줄(`sev`·`ko`·`span`)을 내고, 코드가 span 원문 대조·등급별 개수 대조로 걸러 받는다(어기면 목록 전체 버림 — 비차단). 483·경고서한·식약처 GMP실사·EU/UK 비준수 카드의 checks 는 근거 번호를 괄호로 단다. summary·implication 은 계속 쓴다(링크드인·검색). **클라우드 브리프편집팀(company/editorial)은 저장소 v16 을 직접 읽어 자동 반영 · 09:30 백업 v16 Routine 은 재-붙여넣기 필요.** |
+| 2026-11-09 | **입법·행정예고 승격 반영(§B 최소 수정)**: GMP 관련 입법·행정예고(data0009)는 코드가 국내 섹션 본 카드로 올린다(`card_scaffold._section_legislative`). Watch 처리 문단에 "scaffold 에 카드로 올라온 입법예고는 Watch 아님 → 슬롯 채움·Status=Processed, `section=watch` 로 남은 것만 Skipped" 명시. **운영 Routine 재-붙여넣기 필요**(repo 편집만으론 운영 미반영). |

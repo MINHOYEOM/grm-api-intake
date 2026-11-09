@@ -441,6 +441,7 @@
 <tr><td>**발행일**</td><td>2026-05-04</td></tr>
 <tr><td>**문서번호**</td><td>`mfds-leg-2026-19`</td></tr>
 <tr><td>**발행기관**</td><td>MFDS</td></tr>
+<tr><td>**공고번호**</td><td>2026-19</td></tr>
 <tr><td>**의견기한**</td><td>2026-06-30</td></tr>
 </table>
 

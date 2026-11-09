@@ -1,0 +1,72 @@
+{
+  "schema": "grm-deficiency-examples/v1",
+  "curated_on": "2026-11-09",
+  "provenance": "Supabase deficiency_examples(migration 134) 의 영문 원문 행에서 사람이 고른 대표 사례. id = source_key#row_no 로 원 행을 다시 찾을 수 있다. text 는 DB 에 있는 원문 문장 그대로(길면 첫 문장), 번역은 DB 에 없어 싣지 않는다. 주제(category)는 DB 의 grm_category 를 그대로 쓰고 내용이 그 주제인 행만 골랐다.",
+  "sources": {
+    "mhra:trend_2015": {"agency": "MHRA", "year": 2015, "year_basis": "calendar", "kind": "pdf", "url": "https://assets.publishing.service.gov.uk/media/5a80be59e5274a2e87dbb912/MHRA_GMP_Inspection_Deficiency_Data_Trending_2015.pdf"},
+    "mhra:trend_2016": {"agency": "MHRA", "year": 2016, "year_basis": "calendar", "kind": "pdf", "url": "https://assets.publishing.service.gov.uk/media/5a82003de5274a2e8ab56f94/MHRA_GMP_Inspection_Deficiency_Data_Trend_2016.pdf"},
+    "pmda:000273638": {"agency": "PMDA", "year": 2023, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://www.pmda.go.jp/files/000273638.xlsx"},
+    "pmda:000276920": {"agency": "PMDA", "year": 2024, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://www.pmda.go.jp/files/000276920.xlsx"},
+    "pmda:000283020": {"agency": "PMDA", "year": 2025, "year_basis": "jp_fiscal", "kind": "xlsx", "url": "https://www.pmda.go.jp/files/000283020.xlsx"}
+  },
+  "examples": [
+    {"id": "mhra:trend_2015#92", "category": "aseptic_sterility_assurance", "source": "mhra:trend_2015", "locator": "p.49 #1", "agency_category": "Annex 1", "text": "There were no settle plates located close to the point of fill to provide adequate assurance during exposure periods that EU GMP Annex 1 grade A limits were being met"},
+    {"id": "mhra:trend_2015#94", "category": "aseptic_sterility_assurance", "source": "mhra:trend_2015", "locator": "p.49 #3", "agency_category": "Annex 1", "text": "The continuous particle monitoring sample points were located too high in relation to the relevant work zones to provide meaningful data to demonstrate that EU GMP Annex 1 requirements were being met"},
+    {"id": "mhra:trend_2016#159", "category": "aseptic_sterility_assurance", "source": "mhra:trend_2016", "locator": "p.61 #3", "agency_category": "Annex 1", "text": "The wipes used for sanitisation did not appear to be wetted sufficiently as only the area in the centre appeared to be wet rather than the whole area to ensure effective surface coverage."},
+
+    {"id": "mhra:trend_2016#78", "category": "data_integrity", "source": "mhra:trend_2016", "locator": "p.32 #1", "agency_category": "Chapter 4", "text": "Data integrity assessments were focused on system compliance and failed to consider the impact of business processes on the integrity of data, for example manual transfer of data between electronic systems."},
+    {"id": "mhra:trend_2016#79", "category": "data_integrity", "source": "mhra:trend_2016", "locator": "p.32 #2", "agency_category": "Chapter 4", "text": "The investigation relating to a data integrity failure, whereby fictitious utility monitoring data was recorded, lacked sufficient detail to demonstrate whether willful intent was suspected."},
+    {"id": "mhra:trend_2015#115", "category": "data_integrity", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 11", "text": "Setting within HPLC software not fully enabled e.g. audit trail"},
+
+    {"id": "pmda:000276920#29", "category": "regulatory_reporting", "source": "pmda:000276920", "locator": "R29", "agency_category": "Change control", "text": "The inspected site did not have a procedure for informing marketing authorization holder when a change having impact to the product quality is implemented."},
+    {"id": "mhra:trend_2016#28", "category": "regulatory_reporting", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "Changes were implemented outside of the company’s Change Control procedure."},
+    {"id": "mhra:trend_2016#26", "category": "regulatory_reporting", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "There is no definition of which moderate level change controls would require a risk assessment and regulatory affairs review and which would not."},
+
+    {"id": "mhra:trend_2016#200", "category": "computer_system_validation", "source": "mhra:trend_2016", "locator": "p.83 #1", "agency_category": "Annex 11", "text": "Access to files and the system clock on the hard drive were available to all users."},
+    {"id": "mhra:trend_2016#201", "category": "computer_system_validation", "source": "mhra:trend_2016", "locator": "p.83 #2", "agency_category": "Annex 11", "text": "The lock screen used a shared password. If a user had logged into the software behind the lock screen and another user opened the computer, they could perform actions under the initial user’s login."},
+    {"id": "mhra:trend_2016#202", "category": "computer_system_validation", "source": "mhra:trend_2016", "locator": "p.83 #3", "agency_category": "Annex 11", "text": "Users had more authorisation on the chromatography data system than was permitted according to the SOP."},
+
+    {"id": "mhra:trend_2016#1", "category": "deviation_capa", "source": "mhra:trend_2016", "locator": "p.8 #1", "agency_category": "Chapter 1", "text": "Deviation reports did not contain sufficient information to describe the investigations conducted or demonstrate the evidence that supported the proposed root cause."},
+    {"id": "mhra:trend_2016#7", "category": "deviation_capa", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "There was no requirement to ensure that process, procedural or systems based errors had not been overlooked prior to identifying ‘Personnel Error’ as a root cause."},
+    {"id": "mhra:trend_2016#10", "category": "deviation_capa", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "At least 8 overdue CAPA (ranging from 59 days to 242 days overdue) were observed to have been closed the day before the inspection."},
+
+    {"id": "mhra:trend_2016#76", "category": "documentation_records", "source": "mhra:trend_2016", "locator": "p.31 #2", "agency_category": "Chapter 4", "text": "There were no log books in place for each compounding workstation to ensure traceability of operations."},
+    {"id": "pmda:000273638#10", "category": "documentation_records", "source": "pmda:000273638", "locator": "R10", "agency_category": "Document management", "text": "The document retention and management procedures required the production batch records of products for the Japanese market (records of X, X, X, and X) to be retained for the longer of the product shelf life plus 1 year or 5 years."},
+
+    {"id": "pmda:000276920#21", "category": "qc_lab_controls", "source": "pmda:000276920", "locator": "R21", "agency_category": "Control of laboratory error, OOS/OOT", "text": "The procedure for handling OOS events does not necessarily require root cause analysis nor implementation of CAPA, even no laboratory error or sampling error was identified in the initial phase investigation."},
+    {"id": "pmda:000276920#14", "category": "qc_lab_controls", "source": "pmda:000276920", "locator": "R14", "agency_category": "Test instruction, record, laboratory procedures", "text": "Reconciliation and related records of working standards used for product release test, including use date, used amount are not recorded."},
+    {"id": "mhra:trend_2016#110", "category": "qc_lab_controls", "source": "mhra:trend_2016", "locator": "p.43 #1", "agency_category": "Chapter 6", "text": "There was no justification for the twelve month expiry assigned to reagents."},
+
+    {"id": "mhra:trend_2015#129", "category": "cleaning_validation", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 15", "text": "Permitted limits for carryover of organic molecules have not been set or adequately risk assessed"},
+    {"id": "mhra:trend_2015#130", "category": "cleaning_validation", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 15", "text": "Swab samples have not been taken, in particular no swabs have been taken from difficult to clean areas where other methods or determining residues may not be effective"},
+    {"id": "mhra:trend_2016#90", "category": "cleaning_validation", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 5", "text": "No cleaning validation had been performed on the dispensing isolator."},
+
+    {"id": "mhra:trend_2015#55", "category": "contamination_control", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 5", "text": "A jug of cleaning liquid with a used cloth was found sitting on the capsule polishing unit that had been signed off as clean."},
+    {"id": "mhra:trend_2015#58", "category": "contamination_control", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 5", "text": "The automated tablet counter and tablet counting trays, which were used for multiple products, had not been considered as part of the cross contamination risk assessment"},
+    {"id": "mhra:trend_2016#169", "category": "contamination_control", "source": "mhra:trend_2016", "locator": "", "agency_category": "Annex 2", "text": "Sanitisation contact times were not being monitored and the five minutes contact time for the sporicide was not as defined by the sanitising agent manufacturer or validated by the Company."},
+
+    {"id": "mhra:trend_2015#97", "category": "environmental_monitoring", "source": "mhra:trend_2015", "locator": "", "agency_category": "Annex 2", "text": "The clean room was only monitored after cleaning. There was no periodic monitoring before cleaning to monitor for potential microbial changes or for the continuing effectiveness of cleaning"},
+
+    {"id": "mhra:trend_2016#128", "category": "material_supplier_control", "source": "mhra:trend_2016", "locator": "p.50 #4", "agency_category": "Chapter 7", "text": "Procedures did not describe the basis for accepting an audit report prepared by a third party."},
+
+    {"id": "mhra:trend_2016#138", "category": "complaint_recall", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 8", "text": "Inadequate investigation was performed on site. For example, not reviewing manufacturing and other data available and also not considering the wider implications of the complaint on other batches."},
+    {"id": "mhra:trend_2016#141", "category": "complaint_recall", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 8", "text": "The recall procedure did not define maximum timelines for key steps to ensure the recall process was completed in a timely fashion."},
+    {"id": "mhra:trend_2016#143", "category": "complaint_recall", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 8", "text": "The mock recall challenge was not completed in a timely manner and no final formal assessment report was generated."},
+
+    {"id": "mhra:trend_2015#27", "category": "training_personnel", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 2", "text": "Personnel had no documented training in the procedures or systems"},
+    {"id": "mhra:trend_2015#29", "category": "training_personnel", "source": "mhra:trend_2015", "locator": "", "agency_category": "Chapter 2", "text": "Although comprehension questions were asked at the end of each module, there was no clearly defined pass mark therefore it could not be confirmed that the personnel understood the training"},
+    {"id": "mhra:trend_2016#44", "category": "training_personnel", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 2", "text": "There was no system for confirming that all personnel that required training had been trained."},
+
+    {"id": "mhra:trend_2016#33", "category": "stability_storage", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 1", "text": "There was no confirmation that the ongoing stability studies showed no adverse trends and would be expected to remain within specification for the proposed shelf life."},
+    {"id": "mhra:trend_2016#123", "category": "stability_storage", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 6", "text": "There had been numerous stability failures (including pre- shelf life expiry) identified but these had not been formally assessed by the QPs or the impact on continued certification considered."},
+    {"id": "mhra:trend_2016#124", "category": "stability_storage", "source": "mhra:trend_2016", "locator": "", "agency_category": "Chapter 6", "text": "The contract manufacturer did not notify the stability failures to the Marketing Authorisation Holders."},
+
+    {"id": "pmda:000273638#17", "category": "equipment_facility", "source": "pmda:000273638", "locator": "R17", "agency_category": "Control of facilities and equipment", "text": "Multiple scratches resulting from abrasion were found on the internal part of the mill."},
+    {"id": "mhra:trend_2016#60", "category": "equipment_facility", "source": "mhra:trend_2016", "locator": "p.25 #3", "agency_category": "Chapter 3", "text": "There was no demarcation between clean and dirty sides of the change room entering the formulation area."},
+
+    {"id": "mhra:trend_2016#15", "category": "quality_unit_oversight", "source": "mhra:trend_2016", "locator": "p.11 #1", "agency_category": "Chapter 1", "text": "There was no formal Management review process."},
+    {"id": "pmda:000283020#40", "category": "quality_unit_oversight", "source": "pmda:000283020", "locator": "R40", "agency_category": "Quality management", "text": "Though the executive management mention lack of human resources in the report of management review, and continuously took actions to retain personnel, those actions did not result in resolution of lack of resources."},
+
+    {"id": "mhra:trend_2016#223", "category": "process_validation", "source": "mhra:trend_2016", "locator": "p.93 #5", "agency_category": "Annex 15", "text": "Batch processing parameter ranges were not always supported by process validation data, for example the coating flow rate and the granulation chopper speed."}
+  ]
+}

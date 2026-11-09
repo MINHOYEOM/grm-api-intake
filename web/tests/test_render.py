@@ -19406,6 +19406,9 @@ class WebEnTreeTest(unittest.TestCase):
         cls.expected |= render.glossary_tree_paths(render.load_glossary())
         cls.expected |= render.clause_tree_paths(render.build_clause_views(
             docs, render.load_cfr_catalog(), render.load_glossary(), lang="en"))
+        # [지적 사례 2026-11-09] 정본(deficiency_examples.json)이 있을 때만 영어 면이 선다.
+        if render.example_page.load_examples():
+            cls.expected.add(render.example_page.ROUTE)
 
     @classmethod
     def tearDownClass(cls):

@@ -149,6 +149,7 @@
 {% endif %}
 </div></header>
 
+{% if auto_crumbs %}{% include "partials/crumbs.html" %}{% endif %}
 {% block content %}{% endblock %}
 {% if next_strip %}{% include "partials/next_strip.html" %}{% endif %}
 {# [영문 구독 2026-10-18] 구독 밴드·배너는 언어마다 **다른 폼**을 본다 — 한국어 페이지는

@@ -1,0 +1,170 @@
+name: GRM FDA Citations Snapshot Refresh
+
+# /findings/citations/ 화면의 정본 `web/data/fda_citations.json` 을 월 1회 다시 뽑는다
+# (web/clause_citations.py -> 가드 -> 변경 있을 때만 PR). 사람이 머지한다(자동 머지 없음).
+#
+# 시각: 매월 2일 16:47 UTC(= 3일 01:47 KST). 원장 적재(grm-fda-citations.yml, 1일 16:17 UTC)가
+#   끝난 뒤에 읽는다. 다른 갱신 크론(토 18:25·일 18:23·화 18:20·목 18:15)과 겹치지 않는다.
+#
+# ★service-role 키를 쓴다 - fda_inspection_citations 는 RLS 로 닫혀 있다(anon 회수).
+#   집계본에는 조항 코드·실사 수만 실린다(업체명·FEI 없음). 새 secret 없음(기존 재사용).
+# ★가드(web/clause_citations_guard.py): 실사·조항·섹션 수가 직전 대비 20% 이상 줄거나
+#   검증이 깨지면 PR 을 만들지 않고 잡을 실패시킨다(실패 이슈로 알림). 내용이 같으면(as_of 만
+#   다름) PR 도 없다.
+
+on:
+  schedule:
+    - cron: '47 16 2 * *'
+  workflow_dispatch:
+    inputs:
+      max_drop_pct:
+        description: '실사·조항·섹션 수가 직전 대비 이 비율(%) 이상 줄면 실패(PR 없음)'
+        required: true
+        default: '20'
+
+env:
+  FAILURE_ISSUE_TITLE: 'GRM FDA 지적 조항 집계본 갱신 실패'
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: grm-fda-citations-snapshot
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MAX_DROP_PCT: ${{ inputs.max_drop_pct || '20' }}
+      BRANCH: automation/fda-citations-snapshot-${{ github.run_id }}
+      GH_TOKEN: ${{ secrets.GRM_PUBLISH_TOKEN || secrets.ADMIN_GITHUB_ACTIONS_TOKEN || github.token }}
+      DATA_PATH: web/data/fda_citations.json
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      # 원본 파일은 건드리지 않는다 - 임시 경로에 뽑아 가드를 통과한 뒤에만 덮어쓴다.
+      - name: Build snapshot (service-role read, temp file)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python web/clause_citations.py --out "$RUNNER_TEMP/fda_citations.new.json"
+
+      - name: Guard (shrink / validity / no-op)
+        id: guard
+        run: |
+          set +e
+          python web/clause_citations_guard.py --old "$DATA_PATH" \
+            --new "$RUNNER_TEMP/fda_citations.new.json" --max-drop-pct "$MAX_DROP_PCT"
+          RC=$?
+          set -e
+          if [ "$RC" -eq 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$RC" -eq 10 ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "지적 조항 집계본 변경 없음 - PR 을 만들지 않습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "비정상 스냅샷(rc=$RC) - PR 없이 실패합니다. 위 guard 로그 참조." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: Create candidate branch and open PR
+        if: steps.guard.outputs.changed == 'true'
+        id: pr
+        run: |
+          set -euo pipefail
+          git switch -c "$BRANCH"
+          cp "$RUNNER_TEMP/fda_citations.new.json" "$DATA_PATH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$DATA_PATH"
+          git commit -m "chore: refresh FDA citations snapshot"
+          git push -u origin "$BRANCH"
+          TOTALS=$(jq -r '"기준일 \(.as_of) · 실사 \(.inspections.total)건 · 조항 \(.codes | length)개 · 섹션 \(.sections | length)개"' "$DATA_PATH")
+          cat > "$RUNNER_TEMP/pr-body.md" <<EOF
+          /findings/citations/ 정본 월간 재집계(\`web/clause_citations.py\`, 원장 \`fda_inspection_citations\`).
+
+          ## 실측
+          $TOTALS
+
+          ## 게이트
+          - 실사·조항·섹션 수가 직전 대비 ${MAX_DROP_PCT}% 이상 줄면 이 PR 은 만들어지지 않는다(실패 이슈로 알림)
+          - 스키마 검증·min_inspections·연도 창 역행 검사 통과
+          - 내용이 같고 기준일만 다르면 PR 을 만들지 않는다
+
+          자동 머지 없음 - CI 초록 확인 후 사람이 머지한다.
+          EOF
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: refresh FDA citations snapshot" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+          echo "number=$(gh pr view "$BRANCH" --json number -q .number)" >> "$GITHUB_OUTPUT"
+
+      # GITHUB_TOKEN 이 연 PR 은 CI 를 깨우지 않는다 -> 수동 dispatch 로 체크런을 붙인다(대기·머지 없음).
+      - name: Dispatch CI for the candidate
+        if: steps.guard.outputs.changed == 'true'
+        run: gh workflow run grm-ci.yml --ref "$BRANCH"
+
+      - name: Open or update the failure issue
+        if: (failure() || cancelled()) && github.event_name == 'schedule'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = process.env.FAILURE_ISSUE_TITLE;
+            const label = 'automation-failure';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+                         + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            try {
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label });
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo,
+                name: label, color: 'd93f0b', description: 'GRM 자동화 스케줄 실행 실패' });
+            }
+            const body = [
+              'FDA 지적 조항 집계본(**web/data/fda_citations.json**) 월간 갱신이 실패했습니다.',
+              '',
+              `- 실행: ${runUrl}`,
+              '- 원장 읽기 실패, 또는 가드가 급감/비정상 스냅샷을 막았을 수 있습니다(잡 로그의 guard 줄 참조).',
+              '- 화면은 기존 커밋 집계본 그대로 유지됩니다(파일을 건드리지 않았습니다).',
+              '- 다음 달 2일 정기 실행 또는 수동 dispatch 로 재시도합니다. 성공하면 이 이슈는 자동으로 닫힙니다.',
+            ].join('\n');
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: label, per_page: 100 });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body: `여전히 실패 중입니다 (${runUrl}).` });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: [label], assignees: [context.repo.owner] });
+            }
+
+      - name: Close the failure issue on success
+        if: success()
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const title = process.env.FAILURE_ISSUE_TITLE;
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}`
+                         + `/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open',
+              labels: 'automation-failure', per_page: 100 });
+            for (const issue of open.filter(i => i.title === title)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body: `복구 확인 - 갱신이 성공해 자동으로 닫습니다. (${runUrl})` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed' });
+            }

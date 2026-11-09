@@ -140,6 +140,20 @@ class HealSupabaseCopiesTest(unittest.TestCase):
         self.assertEqual(s["skipped_bare"], 1)
 
 
+class HealUndatedTest(unittest.TestCase):
+    def test_undated_item_is_not_attempted(self):
+        """ICH 토픽 스냅샷처럼 게시일이 없으면 published_date required 로 거부되므로 시도하지 않는다."""
+        undated = _item("u")
+        undated.date_iso = ""
+        dated = _item("d")
+        ok = fsa.SupabaseRawSignalAppendResult("inserted")
+        with patch.object(ci, "existing_raw_signal_ids", return_value=set()), \
+                patch.object(ci, "append_intake_item_to_supabase", return_value=ok) as app:
+            s = ci.heal_supabase_copies(URL, KEY, [undated, dated], ci.now_kst())
+        self.assertEqual([x.args[2].document_id for x in app.call_args_list], ["d"])
+        self.assertEqual((s["candidates"], s["skipped_undated"]), (1, 1))
+
+
 def _snap(doc_id: str, source: str = "WHO", page_id: str = "") -> dict:
     return {"page_id": page_id or f"pg-{doc_id}", "source": source, "document_id": doc_id,
             "date": "2026-06-01", "headline": f"Report {doc_id}", "official_url": "https://x",

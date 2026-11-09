@@ -44,6 +44,7 @@
           <span class="fnd-pp-d">{{ _("최근 지적 경향과 점검표로 준비 범위를 잡습니다.") }}</span>
           <a class="fnd-pp-link" href="{{ rel_root }}findings/checklist/index.html">{{ _("자가점검 체크리스트") }}<em>{{ _("실제 지적 문장이 근거로 붙는 점검표") }}</em></a>
           <a class="fnd-pp-link" href="{{ rel_root }}findings/trends/index.html">{{ _("많이 지적된 영역") }}<em>{{ _("최근 12개월 지적 경향") }}</em></a>
+          {% if 'findings/examples/' in en_paths %}<a class="fnd-pp-link" href="{{ rel_root }}findings/examples/index.html">{{ _("지적 사례") }}<em>{{ _("영역별 PMDA·MHRA 지적 문장") }}</em></a>{% endif %}
           <a class="fnd-pp-link" href="{{ rel_root }}findings/inspections/index.html">{{ _("FDA 실사 결과") }}<em>{{ _("NAI·VAI·OAI 등급 구성") }}</em></a>
         </div>
         <div class="fnd-pp-card">

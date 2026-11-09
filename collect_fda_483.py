@@ -465,6 +465,10 @@ _FORM_BOILERPLATE_RE = re.compile(
 # ("perfonned for th:1!!!!l!!!Isolators" 실측).
 _GARBLE_SYMBOL_RE = re.compile(r"[A-Za-z][~^|\\{}<>_!:;*#]|[~^|\\{}<>_!:;*#][A-Za-z]")
 _ALPHA_WITH_DIGIT_RE = re.compile(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z0-9]+$")
+# [2026-11-07] 대문자 접두 + 숫자 꼴은 OCR 깨짐이 아니라 **제품·문서 코드**다 — "V116(Capvaxive)"
+# "PR1257198" "QN201223715". OCR 오독은 소문자와 숫자가 섞인다("th1s" "experimentaf" "l0t").
+# 이 꼴까지 깨짐으로 세면 코드가 들어간 멀쩡한 표제가 통째로 기각된다(실측 fda483-195404).
+_PRODUCT_CODE_RE = re.compile(r"^[A-Z]{1,5}-?\d{2,}[A-Z]?$")
 # 실측 튜닝(49문서 표본): 0.10 이면 "Thl ttiliv director failed to ass~re"(1/12=0.083)가
 # 통과했다. 0.08 로 내리면 그 표제는 걸리고, 회수된 정상 표제 7건은 전부 0.0 이라 무영향이다.
 FDA483_DEFICIENCY_GARBLE_MAX = 0.08
@@ -1508,7 +1512,8 @@ def _deficiency_garble(text: str) -> tuple[int, float]:
         core = tok.strip(".,;:()[]\"'“”")
         if not core:
             continue
-        if _GARBLE_SYMBOL_RE.search(core) or _ALPHA_WITH_DIGIT_RE.match(core):
+        if _GARBLE_SYMBOL_RE.search(core) or (
+                _ALPHA_WITH_DIGIT_RE.match(core) and not _PRODUCT_CODE_RE.match(core)):
             symbols += 1
         elif len(core) == 1 and core.isalpha() and core.lower() not in ("a", "i"):
             fragments += 1
@@ -1955,6 +1960,11 @@ def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:
 # 줄 머리 표제가 `Observation 1. There is…` 처럼 번호 뒤 마침표로 끝나는 꼴(실측 116184).
 # 상호참조("…refer to Observation 3.")는 줄 중간에 오므로 줄 머리일 때만 마침표를 걷는다.
 _LINE_HEAD_DOT_RE = re.compile(r"\.[ \t]+(?-i:[A-Z])")
+# 구간 분해 전용 — 표제 번호 뒤 마침표 다음이 **줄바꿈**인 꼴(`OBSERVATION I.\nEstablished…`).
+# 위 정규식은 같은 줄 공백만 허용해, 이 꼴이면 첫 문장이 "." 가 되어 관찰이 버려졌다
+# (실측 fda483-195577 글리프 표제). 앵커 **선택**(_select_observation_anchors)에는 쓰지 않는다
+# — 그쪽은 상호참조 판정에 이 신호를 쓰고, 정상 경로 출력을 구조로 불변에 두기 위해서다.
+_LINE_HEAD_DOT_SEG_RE = re.compile(r"\.\s+(?-i:[A-Z])")
 
 
 def _at_line_start(body: str, pos: int) -> bool:
@@ -2129,8 +2139,8 @@ def _observations_from_anchors(
         start = obs.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
         seg = body[start:end]
-        if _LINE_HEAD_DOT_RE.match(seg) and _at_line_start(body, obs.start()):
-            seg = seg.lstrip(" .")                 # 줄 머리 `Observation 1. There is…` 꼴
+        if _LINE_HEAD_DOT_SEG_RE.match(seg) and _at_line_start(body, obs.start()):
+            seg = seg.lstrip(" .\t\r\n")          # 줄 머리 `Observation 1. There is…` 꼴
         chunk = _clean_observation_chunk(_skip_pagebreak_block(seg))
         chunk = gf.strip_fda483_page_header(chunk, **hints)
         deficiency, detail = _first_sentence(chunk)
@@ -2319,9 +2329,17 @@ _DEFICIENCY_CLAIM_RE = re.compile(
     r"|\bdeficien(?:t|cy|cies)\b|\bins?anitary\b|\bunsanitary\b|\block(?:ing|s|ed)?\b"
     r"|\black(?:ing|s|ed)?\b|\babsent\b|\bincomplete\b|\bimproper(?:ly)?\b|\bunable\b"
     r"|\bwithout\b|\bcontaminat\w*\b|\bdeviat\w*\b|\bexpired\b|\bunvalidated\b"
-    r"|\buncalibrated\b|\bfalls?\s+below\b|\bdiffers?\s+from\b|\bnon-\w+",
+    r"|\buncalibrated\b|\bfalls?\s+below\b|\bdiffers?\s+from\b|\bnon-\w+"
+    # [2026-11-07] 누출·유출을 서술하는 지적("allows for leaking/spilling" — 실측 fda483-195467)
+    r"|\bleak(?:s|ing|ed|age)?\b|\bspill(?:s|ing|ed|age)?\b",
     re.I,
 )
+# 시스템 기반 483 의 **절 제목**(`DRUG SUBSTANCE (COMPONENT)` · `QUALITY SYSTEM`)이 번호 없는
+# 단일 관찰 앞에 붙는 꼴. ⑤ 는 마커 바로 뒤를 표제로 삼으므로, 제목을 떼지 않으면 표제가
+# "DRUG SUBSTANCE (COMPONENT) The design …" 으로 저장된다(실측 fda483-195467). 대문자 단어만
+# 이어지고 바로 뒤에 일반 문장(대문자+소문자)이 올 때만 뗀다.
+_LEADING_SECTION_HEADING_RE = re.compile(
+    r"^\s*(?:[A-Z][A-Z&/\-]+(?:\s+\([A-Z][A-Z &/\-]*\))?\s+){1,6}(?=[A-Z][a-z])")
 
 
 def _single_unnumbered_observation(
@@ -2339,6 +2357,7 @@ def _single_unnumbered_observation(
     # ②③④ 와 **같은 조립 코드**를 쓴다(둘이 갈라지지 않게) — 앵커만 "본문 맨 앞"이다.
     chunk = _clean_observation_chunk(scoped or "")
     chunk = gf.strip_fda483_page_header(chunk, **hints)
+    chunk = _LEADING_SECTION_HEADING_RE.sub("", chunk, count=1)
     deficiency, detail = _first_sentence(chunk)
     deficiency = strip_leading_observation_noise(deficiency)
     if len(deficiency) < FDA483_SINGLE_OBS_MIN_CHARS:

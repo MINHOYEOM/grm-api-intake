@@ -608,7 +608,10 @@ def run(
         #   예약 회수가 매일 PDF 를 받아 OCR 한다(정리 회수 46건 중 18건이 이 경우). 수집기가
         #   같은 판정으로 PDF 를 받지 않는 것(`collect_fda_483` 의 시설 유형 사전 차단)과 맞춰,
         #   상한 표식 모드에서는 받지 않고 센다. 행은 남지만 비용은 0 이다.
-        if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE) and \
+        #   [2026-11-07] `missing-observations` 도 같은 원칙이다 — 시설 유형은 FDA 가 적은 확정값이라
+        #   본문을 다시 읽어도 판정이 뒤집히지 않는다. 이 모드로 정리 회수를 돌리면 옛 범위 밖 행
+        #   (계란 농장·혈액원 등, 발췌만 있고 관찰 0건)이 표식 없이 남아 감시에 계속 섞였다.
+        if mode in (MODE_COLLECTION_CAPPED, MODE_RECOVERABLE, MODE_MISSING_OBSERVATIONS) and \
                 is_out_of_scope_483_establishment(str(raw.get("establishment_type") or "")):
             report.skipped_out_of_scope_type += 1
             # ★[2026-10-28] 받지 않고 넘기기만 하면 상한 표식이 그대로 남아 추출 격차 감시

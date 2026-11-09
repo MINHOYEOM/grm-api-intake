@@ -180,10 +180,20 @@ class OutOfScopeEstablishmentSkipTest(unittest.TestCase):
         self.assertEqual(report.attempted, 0)
         upsert.assert_not_called()
 
-    def test_other_modes_still_fetch(self):
-        _report, fetched, _ = self._run(rec.MODE_MISSING_OBSERVATIONS)
+    def test_ocr_unavailable_mode_still_fetches(self):
+        _report, fetched, _ = self._run(rec.MODE_OCR_UNAVAILABLE,
+                                        status="scan-ocr-unavailable:no tessdata")
         self.assertEqual(len(fetched), 1)
         self.patch.assert_not_called()
+
+    def test_missing_observations_mode_marks_without_fetch(self):
+        """[2026-11-07] 정리 회수(missing-observations)도 시설 유형만으로 범위 밖이면 받지 않고
+        표식만 단다 — 발췌만 있는 옛 범위 밖 행이 감시에 계속 섞이던 결함."""
+        report, fetched, _ = self._run(rec.MODE_MISSING_OBSERVATIONS, status="")
+        self.assertEqual(fetched, [])
+        self.assertEqual(report.skipped_out_of_scope_type, 1)
+        self.patch.assert_called_once()
+        self.assertEqual(self.patch.call_args[0][3]["fda483_text_status"], rec.OUT_OF_SCOPE_STATUS)
 
     def test_skip_marks_out_of_scope_in_place(self):
         """[2026-10-28 실측] 넘기기만 하면 상한 표식이 남아 추출 격차 감시가 결손으로 센다

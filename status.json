@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T07:54:59Z",
+ "generated_at": "2026-11-09T08:21:10Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,6 +174,28 @@
   ],
   "grm-web-deploy.yml": [
    {
+    "databaseId": 42582465417,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T07:56:24Z",
+    "updatedAt": "2026-11-09T08:01:53Z",
+    "headBranch": "main",
+    "displayTitle": "docs(privacy): 처리방침 — 구독 시 가입 페이지 경로·언어 수집 항목 추가 (시행 2026-11-16) (#1424)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42582465417"
+   },
+   {
+    "databaseId": 42582417173,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "push",
+    "createdAt": "2026-11-09T07:55:57Z",
+    "updatedAt": "2026-11-09T07:56:39Z",
+    "headBranch": "main",
+    "displayTitle": "fix(ops): 정기 작업 '제때' 기준을 예정+6시간으로 완화 (결재 #8) (#1420)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42582417173"
+   },
+   {
     "databaseId": 42581599310,
     "status": "completed",
     "conclusion": "success",
@@ -205,28 +227,6 @@
     "headBranch": "main",
     "displayTitle": "feat(web): 지적 사례 한국어 번역 + 사례 확대(42→100건) (#1421)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581495074"
-   },
-   {
-    "databaseId": 42581328093,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-09T07:45:29Z",
-    "updatedAt": "2026-11-09T07:47:20Z",
-    "headBranch": "main",
-    "displayTitle": "fix(rpc): 간헐 500 줄이기 — 체크리스트 매칭 해시 조인(136) + 링크드인 유사 사례 저장본 우선 (#1423)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581328093"
-   },
-   {
-    "databaseId": 42581307919,
-    "status": "completed",
-    "conclusion": "cancelled",
-    "event": "push",
-    "createdAt": "2026-11-09T07:45:18Z",
-    "updatedAt": "2026-11-09T07:45:34Z",
-    "headBranch": "main",
-    "displayTitle": "feat(web): 구독 가입 페이지 경로를 Brevo 연락처에 기록 (결재 #2 B안) (#1422)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42581307919"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -288,6 +288,17 @@
   ],
   "grm-watchlist-notify.yml": [
    {
+    "databaseId": 42585254299,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T08:20:40Z",
+    "updatedAt": "2026-11-09T08:21:00Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Watchlist Notify",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42585254299"
+   },
+   {
     "databaseId": 41409324032,
     "status": "completed",
     "conclusion": "success",
@@ -330,17 +341,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Watchlist Notify",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/39210168705"
-   },
-   {
-    "databaseId": 38219073412,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-10-12T07:40:36Z",
-    "updatedAt": "2026-10-12T07:40:59Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Watchlist Notify",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/38219073412"
    }
   ],
   "grm-newsletter-send.yml": [

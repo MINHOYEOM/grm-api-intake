@@ -1,0 +1,1432 @@
+{
+ "schema": 1,
+ "source": "FDA Data Dashboard - Inspections Citations",
+ "as_of": "2026-11-08",
+ "min_inspections": 30,
+ "years": [
+  2021,
+  2022,
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "inspections": {
+  "total": 2709,
+  "by_year": [
+   200,
+   404,
+   416,
+   506,
+   737,
+   446
+  ]
+ },
+ "codes": [
+  {
+   "code": "21 CFR 211.22(d)",
+   "title": "Procedures not in writing, fully followed",
+   "citations": 819,
+   "inspections": 819,
+   "by_year": [
+    68,
+    123,
+    115,
+    171,
+    221,
+    121
+   ]
+  },
+  {
+   "code": "21 CFR 211.192",
+   "title": "Investigations of discrepancies, failures",
+   "citations": 814,
+   "inspections": 783,
+   "by_year": [
+    70,
+    118,
+    121,
+    136,
+    207,
+    131
+   ]
+  },
+  {
+   "code": "21 CFR 211.100(a)",
+   "title": "Absence of Written Procedures",
+   "citations": 552,
+   "inspections": 542,
+   "by_year": [
+    42,
+    83,
+    76,
+    116,
+    154,
+    71
+   ]
+  },
+  {
+   "code": "21 CFR 211.160(b)",
+   "title": "Scientifically sound laboratory controls",
+   "citations": 452,
+   "inspections": 452,
+   "by_year": [
+    38,
+    68,
+    63,
+    98,
+    112,
+    73
+   ]
+  },
+  {
+   "code": "21 CFR 211.68(b)",
+   "title": "Computer control of master formula records",
+   "citations": 374,
+   "inspections": 362,
+   "by_year": [
+    31,
+    57,
+    58,
+    61,
+    98,
+    57
+   ]
+  },
+  {
+   "code": "21 CFR 211.67(a)",
+   "title": "Cleaning / Sanitizing / Maintenance",
+   "citations": 315,
+   "inspections": 315,
+   "by_year": [
+    26,
+    40,
+    50,
+    57,
+    85,
+    57
+   ]
+  },
+  {
+   "code": "21 CFR 211.113(b)",
+   "title": "Procedures for sterile drug products",
+   "citations": 358,
+   "inspections": 303,
+   "by_year": [
+    26,
+    45,
+    52,
+    70,
+    63,
+    47
+   ]
+  },
+  {
+   "code": "21 CFR 211.63",
+   "title": "Equipment Design, Size and Location",
+   "citations": 276,
+   "inspections": 276,
+   "by_year": [
+    18,
+    43,
+    47,
+    71,
+    68,
+    29
+   ]
+  },
+  {
+   "code": "21 CFR 211.84(d)(2)",
+   "title": "Reports of Analysis (Components)",
+   "citations": 285,
+   "inspections": 275,
+   "by_year": [
+    21,
+    39,
+    41,
+    62,
+    79,
+    33
+   ]
+  },
+  {
+   "code": "21 CFR 211.67(b)",
+   "title": "Written procedures not established/followed",
+   "citations": 259,
+   "inspections": 259,
+   "by_year": [
+    18,
+    34,
+    34,
+    58,
+    67,
+    48
+   ]
+  },
+  {
+   "code": "21 CFR 211.166(a)",
+   "title": "Lack of written stability program",
+   "citations": 260,
+   "inspections": 258,
+   "by_year": [
+    29,
+    48,
+    33,
+    63,
+    55,
+    30
+   ]
+  },
+  {
+   "code": "21 CFR 211.25(a)",
+   "title": "Training--operations, GMPs, written procedures",
+   "citations": 246,
+   "inspections": 243,
+   "by_year": [
+    40,
+    33,
+    34,
+    50,
+    62,
+    24
+   ]
+  },
+  {
+   "code": "21 CFR 211.22(a)",
+   "title": "Lack of quality control unit",
+   "citations": 222,
+   "inspections": 220,
+   "by_year": [
+    17,
+    40,
+    35,
+    50,
+    51,
+    27
+   ]
+  },
+  {
+   "code": "21 CFR 211.110(a)",
+   "title": "Control procedures to monitor and validate performance",
+   "citations": 180,
+   "inspections": 179,
+   "by_year": [
+    20,
+    30,
+    35,
+    30,
+    44,
+    20
+   ]
+  },
+  {
+   "code": "21 CFR 211.165(a)",
+   "title": "Testing and release for distribution",
+   "citations": 173,
+   "inspections": 173,
+   "by_year": [
+    17,
+    37,
+    26,
+    39,
+    38,
+    16
+   ]
+  },
+  {
+   "code": "21 CFR 211.68(a)",
+   "title": "Calibration/Inspection/Checking not done",
+   "citations": 164,
+   "inspections": 163,
+   "by_year": [
+    21,
+    31,
+    28,
+    26,
+    37,
+    20
+   ]
+  },
+  {
+   "code": "21 CFR 211.84(d)(1)",
+   "title": "Identity Testing of Each Component",
+   "citations": 151,
+   "inspections": 151,
+   "by_year": [
+    3,
+    13,
+    26,
+    40,
+    41,
+    28
+   ]
+  },
+  {
+   "code": "21 CFR 211.42(c)(10)(iv)",
+   "title": "Environmental Monitoring System",
+   "citations": 148,
+   "inspections": 148,
+   "by_year": [
+    18,
+    25,
+    27,
+    34,
+    25,
+    19
+   ]
+  },
+  {
+   "code": "21 CFR 211.100(b)",
+   "title": "SOPs not followed / documented",
+   "citations": 149,
+   "inspections": 147,
+   "by_year": [
+    19,
+    30,
+    29,
+    16,
+    32,
+    21
+   ]
+  },
+  {
+   "code": "21 CFR 606.100(b)",
+   "title": "Establish, maintain and follow manufacturing SOPs",
+   "citations": 145,
+   "inspections": 141,
+   "by_year": [
+    7,
+    24,
+    13,
+    23,
+    42,
+    32
+   ]
+  },
+  {
+   "code": "21 CFR 211.160(a)",
+   "title": "Following/documenting laboratory controls",
+   "citations": 140,
+   "inspections": 135,
+   "by_year": [
+    15,
+    23,
+    27,
+    28,
+    24,
+    18
+   ]
+  },
+  {
+   "code": "21 CFR 211.198(a)",
+   "title": "Complaint Handling Procedure",
+   "citations": 118,
+   "inspections": 117,
+   "by_year": [
+    17,
+    21,
+    13,
+    32,
+    19,
+    15
+   ]
+  },
+  {
+   "code": "21 CFR 211.188",
+   "title": "Prepared for each batch, include complete information",
+   "citations": 106,
+   "inspections": 106,
+   "by_year": [
+    10,
+    21,
+    10,
+    28,
+    21,
+    16
+   ]
+  },
+  {
+   "code": "21 CFR 211.113(a)",
+   "title": "Procedures for non-sterile drug products",
+   "citations": 99,
+   "inspections": 99,
+   "by_year": [
+    10,
+    19,
+    16,
+    21,
+    19,
+    14
+   ]
+  },
+  {
+   "code": "21 CFR 211.142(b)",
+   "title": "Storage under appropriate conditions",
+   "citations": 94,
+   "inspections": 94,
+   "by_year": [
+    6,
+    11,
+    24,
+    18,
+    23,
+    12
+   ]
+  },
+  {
+   "code": "21 CFR 211.165(e)",
+   "title": "Test methods",
+   "citations": 94,
+   "inspections": 94,
+   "by_year": [
+    8,
+    17,
+    22,
+    18,
+    21,
+    8
+   ]
+  },
+  {
+   "code": "21 CFR 211.42(c)(10)(v)",
+   "title": "Cleaning System",
+   "citations": 94,
+   "inspections": 94,
+   "by_year": [
+    10,
+    20,
+    14,
+    21,
+    14,
+    15
+   ]
+  },
+  {
+   "code": "21 CFR 211.58",
+   "title": "Buildings not maintained in good state of repair",
+   "citations": 93,
+   "inspections": 93,
+   "by_year": [
+    10,
+    14,
+    12,
+    19,
+    21,
+    17
+   ]
+  },
+  {
+   "code": "21 CFR 211.170(b)",
+   "title": "Annual visual exams of drug products",
+   "citations": 88,
+   "inspections": 84,
+   "by_year": [
+    14,
+    13,
+    12,
+    15,
+    20,
+    10
+   ]
+  },
+  {
+   "code": "21 CFR 211.160(b)(4)",
+   "title": "Calibration - at intervals, written program, remedial action",
+   "citations": 82,
+   "inspections": 82,
+   "by_year": [
+    8,
+    12,
+    19,
+    17,
+    13,
+    13
+   ]
+  },
+  {
+   "code": "21 CFR 211.56(a)",
+   "title": "Sanitation--buildings not clean, free of infestation",
+   "citations": 79,
+   "inspections": 79,
+   "by_year": [
+    4,
+    16,
+    16,
+    14,
+    16,
+    13
+   ]
+  },
+  {
+   "code": "21 CFR 211.165(b)",
+   "title": "Microbiological testing",
+   "citations": 75,
+   "inspections": 75,
+   "by_year": [
+    5,
+    22,
+    10,
+    10,
+    20,
+    8
+   ]
+  },
+  {
+   "code": "21 CFR 211.194(a)",
+   "title": "Complete test data included in records",
+   "citations": 74,
+   "inspections": 74,
+   "by_year": [
+    11,
+    8,
+    12,
+    18,
+    14,
+    11
+   ]
+  },
+  {
+   "code": "21 CFR 211.166(a)(3)",
+   "title": "Valid stability test methods",
+   "citations": 66,
+   "inspections": 66,
+   "by_year": [
+    4,
+    10,
+    8,
+    11,
+    25,
+    8
+   ]
+  },
+  {
+   "code": "21 CFR 211.180(e)(2)",
+   "title": "Items to cover on annual reviews",
+   "citations": 65,
+   "inspections": 65,
+   "by_year": [
+    6,
+    9,
+    10,
+    10,
+    20,
+    10
+   ]
+  },
+  {
+   "code": "FDCA 501(a)(2)(A)",
+   "title": "Hazardous drugs, prevention of cross-contamination",
+   "citations": 227,
+   "inspections": 65,
+   "by_year": [
+    10,
+    19,
+    20,
+    4,
+    11,
+    1
+   ]
+  },
+  {
+   "code": "21 CFR 211.180(e)",
+   "title": "Records reviewed annually",
+   "citations": 64,
+   "inspections": 64,
+   "by_year": [
+    4,
+    13,
+    4,
+    14,
+    18,
+    11
+   ]
+  },
+  {
+   "code": "21 CFR 211.188(b)",
+   "title": "Batch production and Batch Control Record Requirements",
+   "citations": 62,
+   "inspections": 62,
+   "by_year": [
+    12,
+    11,
+    8,
+    9,
+    14,
+    8
+   ]
+  },
+  {
+   "code": "21 CFR 211.137(a)",
+   "title": "Expiration date lacking",
+   "citations": 61,
+   "inspections": 61,
+   "by_year": [
+    11,
+    8,
+    14,
+    16,
+    12,
+    0
+   ]
+  },
+  {
+   "code": "21 CFR 211.180(e)(1)",
+   "title": "Review of representative number of batches",
+   "citations": 58,
+   "inspections": 58,
+   "by_year": [
+    2,
+    9,
+    9,
+    18,
+    15,
+    5
+   ]
+  },
+  {
+   "code": "21 CFR 211.182",
+   "title": "Written records kept in individual logs",
+   "citations": 58,
+   "inspections": 57,
+   "by_year": [
+    5,
+    12,
+    10,
+    13,
+    13,
+    4
+   ]
+  },
+  {
+   "code": "21 CFR 211.67(b)(3)",
+   "title": "Cleaning SOPs/instructions",
+   "citations": 56,
+   "inspections": 56,
+   "by_year": [
+    6,
+    8,
+    7,
+    13,
+    17,
+    5
+   ]
+  },
+  {
+   "code": "21 CFR 606.160(a)(1)",
+   "title": "Concurrent documentation",
+   "citations": 56,
+   "inspections": 55,
+   "by_year": [
+    2,
+    6,
+    6,
+    15,
+    20,
+    6
+   ]
+  },
+  {
+   "code": "21 CFR 606.160(b)",
+   "title": "Required records",
+   "citations": 55,
+   "inspections": 55,
+   "by_year": [
+    2,
+    9,
+    3,
+    10,
+    18,
+    13
+   ]
+  },
+  {
+   "code": "21 CFR 211.166(b)",
+   "title": "Adequate number of batches on stability",
+   "citations": 50,
+   "inspections": 50,
+   "by_year": [
+    4,
+    12,
+    6,
+    11,
+    12,
+    5
+   ]
+  },
+  {
+   "code": "21 CFR 211.80(a)",
+   "title": "Procedures To Be in Writing",
+   "citations": 48,
+   "inspections": 47,
+   "by_year": [
+    6,
+    13,
+    6,
+    7,
+    7,
+    8
+   ]
+  },
+  {
+   "code": "21 CFR 314.80(b)",
+   "title": "Failure to develop written procedures",
+   "citations": 49,
+   "inspections": 47,
+   "by_year": [
+    5,
+    6,
+    5,
+    13,
+    12,
+    6
+   ]
+  },
+  {
+   "code": "21 CFR 211.42(a)",
+   "title": "Buildings of Suitable Size, Construction, Location",
+   "citations": 46,
+   "inspections": 46,
+   "by_year": [
+    2,
+    12,
+    8,
+    10,
+    11,
+    3
+   ]
+  },
+  {
+   "code": "21 CFR 211.125(a)",
+   "title": "Strict control not exercised over labeling issued",
+   "citations": 45,
+   "inspections": 45,
+   "by_year": [
+    7,
+    14,
+    3,
+    10,
+    9,
+    2
+   ]
+  },
+  {
+   "code": "21 CFR 211.84(b)",
+   "title": "Representative Samples",
+   "citations": 45,
+   "inspections": 45,
+   "by_year": [
+    2,
+    4,
+    12,
+    7,
+    12,
+    8
+   ]
+  },
+  {
+   "code": "21 CFR 211.46(b)",
+   "title": "Equipment for Environmental Control",
+   "citations": 44,
+   "inspections": 44,
+   "by_year": [
+    6,
+    8,
+    7,
+    7,
+    9,
+    7
+   ]
+  },
+  {
+   "code": "21 CFR 606.100(c)",
+   "title": "Thorough investigations",
+   "citations": 48,
+   "inspections": 44,
+   "by_year": [
+    1,
+    10,
+    6,
+    5,
+    18,
+    4
+   ]
+  },
+  {
+   "code": "21 CFR 211.194(a)(8)",
+   "title": "Second person sign off",
+   "citations": 43,
+   "inspections": 43,
+   "by_year": [
+    5,
+    6,
+    8,
+    6,
+    9,
+    9
+   ]
+  },
+  {
+   "code": "21 CFR 606.60(a)",
+   "title": "Equipment observed, standardized, calibrated",
+   "citations": 44,
+   "inspections": 43,
+   "by_year": [
+    1,
+    6,
+    3,
+    6,
+    13,
+    14
+   ]
+  },
+  {
+   "code": "21 CFR 211.194(a)(2)",
+   "title": "Laboratory Test Method Verification",
+   "citations": 44,
+   "inspections": 42,
+   "by_year": [
+    9,
+    2,
+    9,
+    5,
+    10,
+    7
+   ]
+  },
+  {
+   "code": "21 CFR 211.194(a)(4)",
+   "title": "Complete Test Data",
+   "citations": 40,
+   "inspections": 40,
+   "by_year": [
+    1,
+    6,
+    8,
+    11,
+    11,
+    3
+   ]
+  },
+  {
+   "code": "21 CFR 211.22(c)",
+   "title": "Approve or reject procedures or specs",
+   "citations": 39,
+   "inspections": 39,
+   "by_year": [
+    5,
+    4,
+    6,
+    12,
+    11,
+    1
+   ]
+  },
+  {
+   "code": "21 CFR 211.198(b)(2)",
+   "title": "Complaint Investigation/Follow-Up Findings",
+   "citations": 36,
+   "inspections": 36,
+   "by_year": [
+    6,
+    11,
+    4,
+    5,
+    8,
+    2
+   ]
+  },
+  {
+   "code": "21 CFR 211.111",
+   "title": "Establishment of time limitations",
+   "citations": 34,
+   "inspections": 34,
+   "by_year": [
+    4,
+    7,
+    5,
+    11,
+    4,
+    3
+   ]
+  },
+  {
+   "code": "21 CFR 211.160(b)(3)",
+   "title": "Acceptance of drug products",
+   "citations": 33,
+   "inspections": 33,
+   "by_year": [
+    3,
+    7,
+    3,
+    11,
+    5,
+    4
+   ]
+  },
+  {
+   "code": "21 CFR 211.186(b)(9)",
+   "title": "Manufacturing Instructions and Specifications",
+   "citations": 33,
+   "inspections": 33,
+   "by_year": [
+    4,
+    7,
+    7,
+    8,
+    7,
+    0
+   ]
+  },
+  {
+   "code": "21 CFR 211.42(c)",
+   "title": "Defined areas of adequate size for operations",
+   "citations": 33,
+   "inspections": 33,
+   "by_year": [
+    1,
+    2,
+    8,
+    6,
+    7,
+    9
+   ]
+  },
+  {
+   "code": "21 CFR 211.103",
+   "title": "Actual vs. theoretical yields not determined",
+   "citations": 30,
+   "inspections": 30,
+   "by_year": [
+    2,
+    7,
+    3,
+    9,
+    7,
+    2
+   ]
+  },
+  {
+   "code": "21 CFR 211.165(f)",
+   "title": "Failing drug products not rejected",
+   "citations": 30,
+   "inspections": 30,
+   "by_year": [
+    2,
+    3,
+    7,
+    11,
+    5,
+    2
+   ]
+  }
+ ],
+ "sections": [
+  {
+   "section": "211.22",
+   "citations": 1081,
+   "inspections": 1026,
+   "by_year": [
+    85,
+    156,
+    148,
+    222,
+    270,
+    145
+   ]
+  },
+  {
+   "section": "211.192",
+   "citations": 814,
+   "inspections": 783,
+   "by_year": [
+    70,
+    118,
+    121,
+    136,
+    207,
+    131
+   ]
+  },
+  {
+   "section": "211.100",
+   "citations": 701,
+   "inspections": 656,
+   "by_year": [
+    56,
+    106,
+    98,
+    129,
+    179,
+    88
+   ]
+  },
+  {
+   "section": "211.160",
+   "citations": 732,
+   "inspections": 653,
+   "by_year": [
+    58,
+    104,
+    104,
+    137,
+    150,
+    100
+   ]
+  },
+  {
+   "section": "211.67",
+   "citations": 691,
+   "inspections": 643,
+   "by_year": [
+    50,
+    88,
+    93,
+    131,
+    169,
+    112
+   ]
+  },
+  {
+   "section": "211.68",
+   "citations": 538,
+   "inspections": 495,
+   "by_year": [
+    47,
+    80,
+    80,
+    84,
+    128,
+    76
+   ]
+  },
+  {
+   "section": "211.84",
+   "citations": 557,
+   "inspections": 493,
+   "by_year": [
+    33,
+    63,
+    78,
+    110,
+    140,
+    69
+   ]
+  },
+  {
+   "section": "211.166",
+   "citations": 425,
+   "inspections": 408,
+   "by_year": [
+    37,
+    71,
+    57,
+    91,
+    107,
+    45
+   ]
+  },
+  {
+   "section": "211.113",
+   "citations": 457,
+   "inspections": 402,
+   "by_year": [
+    36,
+    64,
+    68,
+    91,
+    82,
+    61
+   ]
+  },
+  {
+   "section": "211.165",
+   "citations": 408,
+   "inspections": 370,
+   "by_year": [
+    30,
+    76,
+    65,
+    79,
+    86,
+    34
+   ]
+  },
+  {
+   "section": "211.42",
+   "citations": 462,
+   "inspections": 325,
+   "by_year": [
+    31,
+    57,
+    52,
+    65,
+    67,
+    53
+   ]
+  },
+  {
+   "section": "211.63",
+   "citations": 276,
+   "inspections": 276,
+   "by_year": [
+    18,
+    43,
+    47,
+    71,
+    68,
+    29
+   ]
+  },
+  {
+   "section": "211.25",
+   "citations": 276,
+   "inspections": 266,
+   "by_year": [
+    44,
+    35,
+    38,
+    52,
+    73,
+    24
+   ]
+  },
+  {
+   "section": "211.188",
+   "citations": 260,
+   "inspections": 247,
+   "by_year": [
+    29,
+    47,
+    32,
+    55,
+    58,
+    26
+   ]
+  },
+  {
+   "section": "211.194",
+   "citations": 260,
+   "inspections": 230,
+   "by_year": [
+    27,
+    24,
+    42,
+    43,
+    57,
+    37
+   ]
+  },
+  {
+   "section": "211.180",
+   "citations": 222,
+   "inspections": 215,
+   "by_year": [
+    13,
+    35,
+    25,
+    54,
+    61,
+    27
+   ]
+  },
+  {
+   "section": "211.110",
+   "citations": 215,
+   "inspections": 210,
+   "by_year": [
+    21,
+    37,
+    41,
+    34,
+    49,
+    28
+   ]
+  },
+  {
+   "section": "606.100",
+   "citations": 212,
+   "inspections": 179,
+   "by_year": [
+    8,
+    32,
+    18,
+    26,
+    55,
+    40
+   ]
+  },
+  {
+   "section": "211.198",
+   "citations": 166,
+   "inspections": 159,
+   "by_year": [
+    22,
+    33,
+    18,
+    38,
+    29,
+    19
+   ]
+  },
+  {
+   "section": "211.142",
+   "citations": 112,
+   "inspections": 110,
+   "by_year": [
+    7,
+    12,
+    26,
+    21,
+    27,
+    17
+   ]
+  },
+  {
+   "section": "211.170",
+   "citations": 107,
+   "inspections": 103,
+   "by_year": [
+    19,
+    13,
+    17,
+    20,
+    23,
+    11
+   ]
+  },
+  {
+   "section": "606.160",
+   "citations": 118,
+   "inspections": 103,
+   "by_year": [
+    4,
+    16,
+    10,
+    20,
+    36,
+    17
+   ]
+  },
+  {
+   "section": "211.56",
+   "citations": 101,
+   "inspections": 99,
+   "by_year": [
+    4,
+    20,
+    18,
+    20,
+    21,
+    16
+   ]
+  },
+  {
+   "section": "211.58",
+   "citations": 93,
+   "inspections": 93,
+   "by_year": [
+    10,
+    14,
+    12,
+    19,
+    21,
+    17
+   ]
+  },
+  {
+   "section": "211.80",
+   "citations": 85,
+   "inspections": 81,
+   "by_year": [
+    9,
+    17,
+    14,
+    14,
+    15,
+    12
+   ]
+  },
+  {
+   "section": "211.186",
+   "citations": 74,
+   "inspections": 72,
+   "by_year": [
+    7,
+    19,
+    18,
+    15,
+    12,
+    1
+   ]
+  },
+  {
+   "section": "211.137",
+   "citations": 67,
+   "inspections": 66,
+   "by_year": [
+    12,
+    10,
+    14,
+    16,
+    13,
+    1
+   ]
+  },
+  {
+   "section": "314.80",
+   "citations": 123,
+   "inspections": 62,
+   "by_year": [
+    7,
+    6,
+    6,
+    18,
+    18,
+    7
+   ]
+  },
+  {
+   "section": "211.182",
+   "citations": 58,
+   "inspections": 57,
+   "by_year": [
+    5,
+    12,
+    10,
+    13,
+    13,
+    4
+   ]
+  },
+  {
+   "section": "211.125",
+   "citations": 57,
+   "inspections": 56,
+   "by_year": [
+    9,
+    17,
+    4,
+    11,
+    11,
+    4
+   ]
+  },
+  {
+   "section": "606.60",
+   "citations": 53,
+   "inspections": 51,
+   "by_year": [
+    3,
+    9,
+    3,
+    7,
+    13,
+    16
+   ]
+  },
+  {
+   "section": "211.122",
+   "citations": 50,
+   "inspections": 49,
+   "by_year": [
+    5,
+    7,
+    7,
+    11,
+    15,
+    4
+   ]
+  },
+  {
+   "section": "211.46",
+   "citations": 50,
+   "inspections": 49,
+   "by_year": [
+    6,
+    9,
+    9,
+    7,
+    10,
+    8
+   ]
+  },
+  {
+   "section": "211.130",
+   "citations": 49,
+   "inspections": 46,
+   "by_year": [
+    4,
+    16,
+    7,
+    9,
+    6,
+    4
+   ]
+  },
+  {
+   "section": "212.20",
+   "citations": 53,
+   "inspections": 46,
+   "by_year": [
+    3,
+    1,
+    2,
+    3,
+    15,
+    22
+   ]
+  },
+  {
+   "section": "212.30",
+   "citations": 54,
+   "inspections": 44,
+   "by_year": [
+    3,
+    1,
+    6,
+    3,
+    9,
+    22
+   ]
+  },
+  {
+   "section": "211.111",
+   "citations": 34,
+   "inspections": 34,
+   "by_year": [
+    4,
+    7,
+    5,
+    11,
+    4,
+    3
+   ]
+  },
+  {
+   "section": "212.50",
+   "citations": 37,
+   "inspections": 33,
+   "by_year": [
+    3,
+    1,
+    2,
+    2,
+    11,
+    14
+   ]
+  },
+  {
+   "section": "211.103",
+   "citations": 30,
+   "inspections": 30,
+   "by_year": [
+    2,
+    7,
+    3,
+    9,
+    7,
+    2
+   ]
+  }
+ ]
+}

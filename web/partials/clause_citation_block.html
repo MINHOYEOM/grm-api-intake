@@ -1,0 +1,25 @@
+{#- 조항 페이지(/findings/clause/{slug}/)에 얹는 'FDA 인용 빈도' 블록. cit = clause_citations.section_view().
+    cit 가 없으면(집계본에 없는 조항) 아무것도 내지 않는다. 숫자는 뷰에서만 파생. -#}
+{%- if cit %}
+{% include "partials/clause_citation_style.html" %}
+<section class="fx-sec cc-sec">
+  <h2 class="fx-sec-h">{{ _('FDA 가 이 조항을 인용한 빈도') }}</h2>
+  <p class="cc-big"><b>{{ cit.pct }}</b><span>{{ _("FDA 가 지적을 낸 실사 {n}건 중 {k}건이 이 조항을 인용했습니다.", n="{:,}".format(cit.total), k="{:,}".format(cit.inspections)) }}</span></p>
+  <div class="cc-yrs" aria-label="{{ _('회계연도별 비율') }}">
+    {%- for y in cit.years %}
+    <div class="cc-y"><b>{{ y.pct }}</b><i><u style="height:{{ y.h }}%"></u></i><span>FY{{ y.year }}</span></div>
+    {%- endfor %}
+  </div>
+  {%- if cit.subs %}
+  <div class="cc-wrapx"><table class="cc-tbl">
+    <thead><tr><th>{{ _('FDA 표기') }}</th><th></th><th class="n">{{ _('실사') }}</th><th class="n">{{ _('비율') }}</th></tr></thead>
+    <tbody>
+    {%- for s in cit.subs %}
+    <tr><td class="cc-code">{{ s.code }}</td><td class="cc-t">{{ s.title }}</td><td class="n">{{ s.inspections }}</td><td class="n">{{ s.pct }}</td></tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  {%- endif %}
+  <p class="cc-note">{{ _("출처: {src}, {asof} 기준. 비율은 지적이 1건 이상 나온 실사 중 이 조항이 인용된 실사의 몫이며, FDA 가 인용한 빈도일 뿐 위반 여부의 판단이 아닙니다.", src=cit.source, asof=cit.as_of) }} <a href="{{ rel_root }}findings/citations/">{{ _('전체 조항 순위 보기') }}</a></p>
+</section>
+{%- endif %}

@@ -45,6 +45,12 @@
       </div>
     </section>
 
+    {%- if citations_ready %}
+    <section class="fx-sec">
+      <p class="fx-note"><a href="{{ rel_root }}findings/citations/">{{ _('FDA 가 자주 지적하는 조항 순위 보기') }}</a></p>
+    </section>
+    {%- endif %}
+
     <section class="fx-sec">
       <p class="fx-note">{{ _('조항 제목은 미국 연방규정 원문(영문) 그대로입니다. 건수는 공개 문서에서 자동 집계한 값이고, 지적사항은 규제기관 공개 원문에서 자동 추출&middot;번역한 것입니다. 각 조항 페이지에서 공개 원문으로 바로 갈 수 있습니다.') }}</p>
     </section>

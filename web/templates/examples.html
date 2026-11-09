@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 지적 사례 — /findings/examples/. 주제(업무 영역) → 대표 사례 → 출처 링크.
+    번역은 DB 에 없어 원문(영어)만 싣고, 출처 파일로 바로 갈 수 있게 한다.
+    데이터: web/data/deficiency_examples.json (example_page.build_topics). -#}
+<style>
+  .ex-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ex-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .ex-crumb a:hover{color:var(--coral)}
+  .ex-crumb i{font-style:normal;color:var(--line-2)}
+  .ex-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .ex-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .ex-jump{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+  .ex-jump a{font-family:var(--sans);font-size:13.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:999px;padding:5px 13px;background:var(--paper)}
+  .ex-jump a:hover{border-color:var(--coral);color:var(--coral)}
+  .ex-body{margin-top:34px;display:flex;flex-direction:column;gap:38px}
+  .ex-h2{font-family:var(--serif);font-size:22px;line-height:1.3;color:var(--ink);margin:0 0 12px;scroll-margin-top:80px}
+  .ex-list{display:flex;flex-direction:column;gap:10px}
+  .ex-item{border:1px solid var(--line-2);border-radius:10px;padding:14px 16px;background:var(--paper);margin:0}
+  .ex-q{font-family:var(--sans);font-size:15px;line-height:1.65;color:var(--ink);margin:0;overflow-wrap:anywhere}
+  .ex-meta{font-family:var(--sans);font-size:12.5px;line-height:1.6;color:var(--muted);margin:8px 0 0;display:flex;flex-wrap:wrap;gap:4px 12px}
+  .ex-meta a{color:var(--muted);border-bottom:1px solid var(--line-2);text-decoration:none}
+  .ex-meta a:hover{color:var(--coral)}
+  .ex-next{display:flex;flex-wrap:wrap;gap:10px}
+  .ex-next a{font-family:var(--sans);font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:10px;padding:11px 16px;background:var(--paper)}
+  .ex-next a:hover{border-color:var(--coral)}
+  .ex-note{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="ex-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><span>{{ _('지적 사례') }}</span>
+    </nav>
+    <p class="kick">PMDA &middot; MHRA</p>
+    <h1 class="ex-h1">{{ _('지적 사례') }}</h1>
+    <p class="ex-sum">{{ _('내 업무 영역에서 규제기관이 실제로 어떤 점을 지적했는지 사례로 봅니다. 영역을 고르면 대표 문장과 출처가 나옵니다. 사례는 점검 체크리스트에 옮겨 적을 문장으로 쓰세요.') }}</p>
+    <ul class="ex-jump">
+      {%- for t in topics %}
+      <li><a href="#{{ t.code }}">{{ t.label_en if lang == 'en' else t.label_ko }}</a></li>
+      {%- endfor %}
+    </ul>
+  </div>
+
+  <div class="wrap ex-body">
+    {%- for t in topics %}
+    <section id="{{ t.code }}">
+      <h2 class="ex-h2">{{ t.label_en if lang == 'en' else t.label_ko }}</h2>
+      <div class="ex-list">
+        {%- for e in t.examples %}
+        <figure class="ex-item">
+          <blockquote class="ex-q" lang="en">{{ e.text }}</blockquote>
+          <figcaption class="ex-meta">
+            <span>{{ e.agency }} &middot; {{ ('FY' ~ e.year) if e.year_basis == 'jp_fiscal' else e.year }}{% if e.agency_category %} &middot; {{ e.agency_category }}{% endif %}</span>
+            <a href="{{ e.url }}" target="_blank" rel="noopener"{% if e.locator %} title="{{ e.locator }}"{% endif %}>{{ _('원문 파일 열기') }}</a>
+          </figcaption>
+        </figure>
+        {%- endfor %}
+      </div>
+    </section>
+    {%- endfor %}
+
+    <section>
+      <div class="ex-next">
+        <a href="{{ rel_root }}findings/checklist/">{{ _('자가점검 체크리스트') }}</a>
+        <a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a>
+      </div>
+    </section>
+
+    <section>
+      <p class="ex-note">{{ _('원문 문장은 규제기관이 공개한 영어 자료에서 가져왔고, 길면 첫 문장만 실었습니다. 번역은 하지 않았습니다. PMDA 자료의 연도는 일본 회계연도(FY2025 = 2025년 4월~2026년 3월)이며, 업체명은 원문에서 이미 지워져 있습니다. 영역 분류는 기관의 분류나 EU GMP 장 구분을 GRM 분류에 맞춘 것이어서 기관의 판단과 다를 수 있습니다. 사례는 법적 판단이 아니라 공개 자료의 인용입니다. 선별 {date} 기준.', date=curated_on) }}</p>
+    </section>
+  </div>
+</main>
+{% endblock %}

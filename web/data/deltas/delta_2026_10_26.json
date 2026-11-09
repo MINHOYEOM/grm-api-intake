@@ -3190,31 +3190,31 @@
    }
   },
   "fda483-195601": {
-   "title_issue": "세척 밸리데이션·제염 근거 미흡",
-   "summary": "FDA가 포르투갈 원료·완제의약품 제조소 Genlbet Biopbarmaceuticals SA 실사(실사일 01/31/2023) 후 483을 발부했다. 판독된 관찰사항 3건(2~4번)은 세척 밸리데이션이 세척 난해 부위·최대 로트 크기·보관시간을 대표하지 못한 점, 제염 유효성 연구 부재, 세척 후 노출 시간을 정하지 않은 절차서다.",
+   "title_issue": "공정관리·세척·제염 밸리데이션 근거 미흡",
+   "summary": "FDA가 포르투갈 원료·완제의약품 제조소 Genlbet Biopbarmaceuticals SA 실사(실사일 01/31/2023) 후 483을 발부했다. 판독된 관찰사항 4건은 최대 목표 배치 크기·보류시간·운전 범위를 뒷받침하는 공정관리 데이터 부족, 세척 밸리데이션이 세척 난해 부위·최대 로트 크기·보관시간을 대표하지 못한 점, 제염 유효성 연구 부재, 세척 후 노출 시간을 정하지 않은 절차서다.",
    "key_facts": [
     "제조소/업체: Genlbet Biopbarmaceuticals SA · FEI 3011160795",
     "시설 · 유형: Drug Substance/Drug Product Manufacturer · 483",
-    "관찰사항: 3건 판독(2번 설비 세척, 3번 제염, 4번 세척·유지관리 절차서)"
+    "관찰사항: 4건 판독(1번 공정관리, 2번 설비 세척, 3번 제염, 4번 세척·유지관리 절차서)"
    ],
-   "implication": "세척 밸리데이션이 실제 공정의 세척 후 보관시간과 최대 로트 크기를 반영하지 못했다는 지적은 다품목 공용 설비에서 교차오염 방지 근거를 묻는 전형적인 형태다. 자사 세척 밸리데이션이 세척 난해 부위, 최악 로트 크기, 실제 보관시간을 포함하는지 확인해 볼 만하다.",
+   "implication": "공정 성능 적격성평가 배치가 승인된 최대 목표 배치 크기를 대표하지 못한다는 지적과, 세척 밸리데이션이 실제 공정의 세척 후 보관시간과 최대 로트 크기를 반영하지 못했다는 지적은 다품목 공용 설비에서 공정·교차오염 관리의 근거를 묻는 전형적인 형태다. 자사 밸리데이션 배치가 최악 조건(최대 배치, 세척 난해 부위, 실제 보관시간)을 포함하는지 확인해 볼 만하다.",
    "checks": [
-    "세척 밸리데이션의 세척 난해 부위·최대 로트 크기 포함 여부",
-    "세척 후 보관시간(clean hold time) 설정 근거",
+    "공정 성능 적격성평가 배치 크기가 최대 목표 배치 크기를 대표하는지 여부",
+    "세척 밸리데이션의 세척 난해 부위·최대 로트 크기·보관시간 포함 여부",
     "제염제 유효성 연구 수행 여부"
    ],
    "en": {
-    "title_issue": "Weak cleaning validation and decontamination",
-    "summary": "FDA issued a Form 483 to Genlbet Biopbarmaceuticals SA, a drug substance and drug product manufacturer in Portugal, after an inspection ending 01/31/2023. Three legible observations (2 to 4) cover cleaning validation that did not represent hard-to-clean areas, maximum lot size or hold times, no decontamination efficacy study, and procedures that do not set how long cleaned equipment may stay exposed.",
+    "title_issue": "Process control and cleaning validation gaps",
+    "summary": "FDA issued a Form 483 to Genlbet Biopbarmaceuticals SA, a drug substance and drug product manufacturer in Portugal, after an inspection ending 01/31/2023. Four legible observations cover process control data that did not support the maximum target batch size, hold times or operating ranges, cleaning validation that did not represent hard-to-clean areas, maximum lot size or hold times, no decontamination efficacy study, and procedures that do not set how long cleaned equipment may stay exposed.",
     "key_facts": [
      "Facility: Genlbet Biopbarmaceuticals SA, FEI 3011160795",
      "Establishment type: Drug Substance/Drug Product Manufacturer",
-     "Observations legible: 2 (equipment cleaning), 3 (decontamination), 4 (cleaning and maintenance procedures)"
+     "Observations legible: 1 (process control), 2 (equipment cleaning), 3 (decontamination), 4 (cleaning and maintenance procedures)"
     ],
-    "implication": "Cleaning validation that did not reflect real post-cleaning hold times and maximum lot size is a typical way inspectors probe cross-contamination controls on shared equipment. Firms may want to check that their own cleaning validation covers hard-to-clean areas, worst-case lot size and actual hold times.",
+    "implication": "Process performance qualification batches that did not represent the approved maximum target batch size, and cleaning validation that did not reflect real post-cleaning hold times and maximum lot size, are a typical way inspectors probe process and cross-contamination controls on shared equipment. Firms may want to check that their own validation batches cover worst-case conditions: maximum batch size, hard-to-clean areas and actual hold times.",
     "checks": [
-     "Hard-to-clean areas and maximum lot size in cleaning validation",
-     "Basis for clean hold time limits",
+     "Whether PPQ batch sizes represent the maximum target batch size",
+     "Hard-to-clean areas, maximum lot size and hold times in cleaning validation",
      "Decontaminant efficacy studies"
     ]
    }

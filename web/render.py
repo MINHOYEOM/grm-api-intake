@@ -142,6 +142,7 @@ from grm_i18n import (  # noqa: E402
     noop as N_,
 )
 from wl_anatomy import split_wl_finding  # noqa: E402
+import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -3408,7 +3409,7 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
     # group · group_label · modality — 묶음/제형
     N_("국내"), N_("글로벌"), N_("💊 합성의약품"), N_("🧬 바이오의약품"), N_("▫️ 기타"),
     # facts[].label — 표 라벨
-    N_("문서번호"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
+    N_("문서번호"), N_("공고번호"), N_("의견기한"), N_("발행 부서/일자"), N_("발행기관"), N_("발행기관(NCA)"), N_("발행일"),
     N_("시설 · 유형"), N_("실사기간"), N_("실사일"), N_("업체/제조소"), N_("제조소"),
     N_("제조소/업체"), N_("제품"), N_("제품범위"), N_("제품유형"), N_("업체"), N_("Class"), N_("브랜드"), N_("정정일"),
     # evidence_basis — "핵심 사실 · 근거: …" 줄에 그대로 실린다. Evidence A 원본 토큰
@@ -5018,6 +5019,7 @@ TRENDS_DESCRIPTION = N_("식약처·FDA 중 기관을 골라 최근 12개월에 
                         "FDA 483·Warning Letter·식약처·캐나다 실사·EU/영국 GMP 비준수 집계.")
 INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 등급(NAI·VAI·OAI) 통계 — "
                              "연도별·국가별 중대 지적 비율로 보는 FDA GMP 실사 결과.")
+EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어 그대로, 출처 링크 포함.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
 COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
@@ -5509,6 +5511,10 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     if citations_data:
         en_paths.add("findings/citations/")
     en_paths |= glossary_tree_paths(load_glossary())
+    # [지적 사례 화면] 정본(web/data/deficiency_examples.json)이 있을 때만 양 트리에 선언한다.
+    example_data = example_page.load_examples()
+    if example_data:
+        en_paths.add(example_page.ROUTE)
     # ★모음(분류·국가·기관)도 여기서 넣는다 — 종전에는 그 트리를 그리기 직전(한참 아래)
     #   에 넣었는데, 그때는 이미 둘러보기 면이 그려진 뒤라 **영어 진입 카드가 자기
     #   트리에 난 면을 못 봤다**(실측: 영어 둘러보기 카드 1장 / 한국어 4장). 면 집합은
@@ -6203,6 +6209,24 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     emit_clause_tree(clause_views, page, emit, tr, DEFAULT_LANG, _clause_agency_labels)
     emit_clause_tree(clause_views_en, en_page, en_emit, en_tr, "en",
                      {k: en_tr(v) for k, v in _clause_agency_labels.items()})
+
+    # [지적 사례 화면] 주제별 규제기관(PMDA·MHRA) 지적 사례 — 한 장. 원문 영어 그대로, 번역 없음.
+    if example_data:
+        import grm_findings as _gf
+        _ex_labels = {c.code: (c.label_ko, c.label_en) for c in _gf.FINDING_TAXONOMY}
+        _ex_topics = example_page.build_topics(example_data, _ex_labels)
+        for _pg, _em, _tr in ((page, emit, tr), (en_page, en_emit, en_tr)):
+            _ep = _pg(example_page.ROUTE)
+            _em("examples.html", _ep,
+                page_title=_tr("지적 사례 · GRM"),
+                nav_active="findings",
+                description=_tr(EXAMPLES_DESCRIPTION),
+                json_ld=_ep.breadcrumb_json_ld([
+                    (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                    (_tr("지적 사례"), "")]),
+                topics=_ex_topics, curated_on=example_data.get("curated_on", ""),
+            )
+        facet_paths.append((example_page.ROUTE, ""))
 
     # [검색 유입] 문서 단위 페이지 — 실사 보고서 1건 = 1페이지(임계 3 + 소스 소거 면제).
     # 모음 페이지는 축마다 최근 6건만 싣기 때문에 나머지 본문은 여전히 정적으로 존재하지

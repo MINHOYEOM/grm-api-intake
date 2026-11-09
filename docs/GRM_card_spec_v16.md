@@ -114,8 +114,7 @@ LLM 이 채우는 칸은 단 6종: **제목 핵심이슈 · W1문장 · W4번역
 
 Evidence 판정(Python): Intake raw payload 보존 + 유형별 필수필드 충족 → A. 인덱스+보조 → B. 보조 단독 → C.
 예정·진행중 D 의 처리(정정 2026-06-05, Codex G3 P3·F-2): **검색/Fetch 신규 Watch item = 🔮 표(카드 아님)**,
-단 **Intake watch scaffold row(입법예고 등 §12 C-확장 legislative, section=watch)는 카드로 렌더 가능** —
-golden(legislative 카드)·v16 프롬프트와 정합. 🔮 표는 비카드 Watch 전용(카드로 렌더된 항목 중복 등재 금지).
+**Intake 입법·행정예고(MFDS data0009, §12 C-확장 legislative)는 제목이 GMP 관련일 때만 본 카드**(`section=domestic`, 2026-11-09 개정 — `card_scaffold._section_legislative`)이고, 그 외는 `section=watch`(웹 비카드, 카드 `cards[]` 미포함)다. GMP 관련 판정은 제목 키워드의 좁고 보수적인 규칙(포함: 제조 및 품질관리·의약품 제조·제조소·제조업·무균·교차오염·GMP, 임상시험용의약품+제조/표시/품질/관리, 의약품 등의 안전에 관한 규칙+제조/품질/무균/GMP / 제외: 화장품·의료기기·의약외품·식품·건강기능·수수료·마약·동물용·첨단바이오). 제목만으로 확신 못 하면 watch. 🔮 표는 비카드 Watch 전용(카드로 렌더된 항목 중복 등재 금지).
 
 ## 7. 섹션 배치 · 그룹핑 (Python)
 
@@ -232,7 +231,7 @@ W2·Modality 폴백)은 이 보강 후에만 결정론적이다.
 | rss-news | EMA/MHRA/PIC/S/ECA | 발행기관 · 주제 `title` | — (RSS 요약) | **B** |
 | mfds-notice | MFDS · guidance-industry/internal | 발행기관 MFDS · 주제 | — (RSS) | **B** |
 | safety-letter | MFDS · safety-letter | 발행기관 MFDS · 주제 | — (RSS) | **B** |
-| legislative | MFDS · legislative-notice | 발행기관 · 의견기한 | — | **B**(section=watch) |
+| legislative | MFDS · legislative-notice | 발행기관 · 공고번호 · 의견기한(있을 때) | — | **B**(GMP 관련=domestic 본 카드 · 그 외 section=watch) |
 | regulation | MFDS · regulation-final/notice-final | 발행기관 · 주제 | — | **B** |
 
 듀얼링크 보강: openfda-recall = 📰 API query + 📎 FDA Recalls 인덱스 L2(⚠️, 패턴 유추 금지).
@@ -666,3 +665,4 @@ official_url=HTML 페이지만 노출)·gmp-inspection `download_url` 폴백. fd
 | 2026-06-05 | **K3 착수 — §14 recall 다품목 병합 렌더 초안 신설**(결정 #6 "규칙+구현" 채택): MFDS recall 한정·`merge_recall_cards()` 순수함수(스캐폴드 1:1 불변)·대표 card_id 오름차순·W2 toggle 품목목록·멤버 row `merged_into` 마킹(Status 갱신 목록 유지). Codex 게이트 통과 시 동결 |
 | 2026-06-05 | **§6 D-처리 정정(Codex G3 P3·F-2)**: 검색/Fetch 신규 Watch = 🔮 표 전용, Intake watch scaffold(legislative)는 카드 렌더 — golden·v16 프롬프트 정합, 표/카드 중복 등재 금지 |
 | 2026-06-05 | **§14 동결** — Codex R1 반영: (E) 병합 `product` 300자 가드 최종 문자열 기준, (F) 멤버 row = v1 호환 필드 + `merged_into` 만(자체 `card_id` 포함 v2 additive 전부 생략). 구현 G1+R1 4커밋 Codex GO·사람 승인·main 머지. fork A안(`render_order`+`group_label`, `_ordered_cards_with_groups()` 단일 진실원) 동반 확정 |
+| 2026-11-09 | **입법·행정예고 승격(§6·§12)**: 11-09 호에 「의약품 제조 및 품질관리에 관한 규정」 개정(안)·「임상시험용의약품 표시 등에 관한 규정」 제정(안)이 카드 0장이던 누락 수리. `legislative` 의 section 을 callable(`_section_legislative`)로 바꿔 GMP 관련=domestic 본 카드·그 외=watch 유지. W2 에 공고번호 행 신설(제목 `공고 제YYYY-N호` 또는 ogLmPp `pntcNo`). |

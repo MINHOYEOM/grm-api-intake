@@ -19,6 +19,7 @@
 - 길이가 조금 늘거나 줄어드는 것(파서 개선 등)은 회귀가 아니다 — 임계 미만은 통과시킨다.
   임계를 두지 않으면 정상 재조립마다 붉게 뜨고, 그건 방금 고친 결함과 같은 종류의 오탐이다.
 - 발행본이 없으면(그 날짜 최초 발행) 대조 대상이 없으므로 통과.
+- [2026-11-09] 양쪽에 다 있는 카드의 `facts` 값이 바뀌면 회귀로 본다(아래 `facts_changed`).
 
 출력은 GitHub step summary 에 그대로 붙일 수 있는 마크다운이다.
 """
@@ -56,6 +57,53 @@ def _bundle_items(card: dict[str, Any] | None) -> list[str] | None:
     `merged_items: []` 기본값을 싣으므로 빈 목록은 묶음이 아니다."""
     items = (card or {}).get("merged_items")
     return [str(x) for x in items] if isinstance(items, list) and items else None
+
+
+def _facts_map(card: dict[str, Any] | None) -> dict[str, str]:
+    """카드 facts → {label: value}. 같은 label 이 여럿이면 첫 값."""
+    out: dict[str, str] = {}
+    for f in (card or {}).get("facts") or []:
+        if isinstance(f, dict) and "label" in f:
+            out.setdefault(str(f["label"]), str(f.get("value", "")))
+    return out
+
+
+def facts_changes(published: dict[str, Any], assembled: dict[str, Any]) -> list[dict[str, Any]]:
+    """양쪽에 다 있는 카드의 facts 값 변경 목록(순수 함수).
+
+    ★왜(2026-11-09 실측 #1398): 재발행은 **같은 날짜의 옛 스캐폴드**로 다시 조립한다. 발행 뒤
+    수집기 결함을 고치면서 발행본의 사실 값도 함께 정정한 경우(#1313 — HC 회수 업체가 브랜드명
+    "Equate" 로, 발행일이 정정일로 적혀 있던 것), 재조립은 옛 스캐폴드의 틀린 값을 되살린다.
+    값 하나가 바뀌는 것이라 길이는 거의 같아 길이 기준 판정에는 걸리지 않았다.
+    같은 스캐폴드에서 facts 가 달라지는 경우는 사실상 발행 뒤 수기 정정뿐이므로 회귀로 본다.
+    묶음 카드는 facts 가 대표 문서에서 오고 대표가 바뀔 수 있어 대상에서 뺀다."""
+    old_cards = {_card_key(c, i): c for i, c in enumerate(published.get("cards") or [])}
+    out: list[dict[str, Any]] = []
+    for i, card in enumerate(assembled.get("cards") or []):
+        key = _card_key(card, i)
+        old = old_cards.get(key)
+        if old is None or _bundle_items(old) is not None or _bundle_items(card) is not None:
+            continue
+        before, after = _facts_map(old), _facts_map(card)
+        for label, value in before.items():
+            if label in after and after[label] != value:
+                out.append({"id": key, "label": label, "published": value, "assembled": after[label]})
+    return out
+
+
+def carry_published_facts(published: dict[str, Any], assembled: dict[str, Any]) -> list[dict[str, Any]]:
+    """조립본의 facts 값을 발행본 값으로 되돌린다(조립본을 **제자리 수정**). 반환=되돌린 목록.
+
+    `facts_changes` 가 찾는 바로 그 변경을 고친다 — 발행된 사실은 재조립이 되돌리지 않는다.
+    바꾼 항목은 전부 반환해 요약에 남긴다(조용한 교정 금지)."""
+    changes = facts_changes(published, assembled)
+    wanted = {(c["id"], c["label"]): c["published"] for c in changes}
+    for i, card in enumerate(assembled.get("cards") or []):
+        key = _card_key(card, i)
+        for f in card.get("facts") or []:
+            if isinstance(f, dict) and (key, str(f.get("label"))) in wanted:
+                f["value"] = wanted[(key, str(f.get("label")))]
+    return changes
 
 
 def compare(published: dict[str, Any], assembled: dict[str, Any],
@@ -143,8 +191,10 @@ def compare(published: dict[str, Any], assembled: dict[str, Any],
 
     total_before = sum(len(v) for v in old.values())
     total_after = sum(len(v) for v in new.values())
+    changed_facts = facts_changes(published, assembled)
     return {
-        "ok": not missing and not shrunk,
+        "ok": not missing and not shrunk and not changed_facts,
+        "facts_changed": changed_facts,
         "published_cards": len(old),
         "assembled_cards": len(new),
         "missing_cards": missing,
@@ -167,6 +217,9 @@ def render_markdown(result: dict[str, Any], out_path: str) -> str:
             f"발행본 {result['published_cards']}장 → 조립본 {result['assembled_cards']}장 · "
             f"본문 총 길이 {result['total_delta']:+,}자. 되돌려진 내용 없음."
         )
+        for row in result.get("carried_facts") or []:
+            lines.append(f"- 발행 사실 유지 `{row['id']}` {row['label']}: 재조립 값 "
+                         f"{row['assembled']!r} 대신 발행본 값 {row['published']!r} — 발행 뒤 정정분")
         for row in result.get("unbundled_cards") or []:
             if row["now"] is None:
                 lines.append(f"- 묶음 해소 `{row['id']}`: {row['before_items']}건 → 0건 — "
@@ -196,6 +249,15 @@ def render_markdown(result: dict[str, Any], out_path: str) -> str:
         lines.append(f"- 사라진 카드 {len(result['missing_cards'])}장: "
                      + ", ".join(f"`{c}`" for c in result["missing_cards"][:10])
                      + (" …" if len(result["missing_cards"]) > 10 else ""))
+    if result.get("facts_changed"):
+        lines.append("")
+        lines.append(f"사실 값(facts)이 바뀐 카드 {len(result['facts_changed'])}건 — 발행 뒤 정정한 값이 "
+                     "옛 스캐폴드 값으로 되돌아갔을 가능성이 큽니다(`--carry-published-facts` 로 유지):")
+        lines.append("")
+        lines.append("| 카드 id | 항목 | 발행본 | 조립본 |")
+        lines.append("|---|---|---|---|")
+        for row in result["facts_changed"][:15]:
+            lines.append(f"| `{row['id']}` | {row['label']} | {row['published']} | {row['assembled']} |")
     if result["shrunk_cards"]:
         lines.append("")
         lines.append(f"내용이 {result['max_shrink_pct']:g}% 이상 줄어든 카드 "
@@ -231,7 +293,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--assembled", required=True, help="방금 조립한 브리프 JSON")
     ap.add_argument("--max-shrink-pct", type=float, default=DEFAULT_MAX_SHRINK_PCT)
     ap.add_argument("--summary", help="마크다운을 덧붙일 파일(GITHUB_STEP_SUMMARY)")
+    ap.add_argument("--carry-published-facts", action="store_true",
+                    help="조립본의 facts 값이 발행본과 다르면 발행본 값으로 되돌려 --assembled 에 다시 쓴다")
+    ap.add_argument("--carry-only", action="store_true",
+                    help="--carry-published-facts 만 하고 회귀 판정은 하지 않는다(항상 0). 발행 워크플로가 "
+                         "골든 재동결 **전에** 값을 맞추고, 판정은 뒤의 가드 스텝에 맡기기 위한 모드.")
     args = ap.parse_args(argv)
+    if args.carry_only:
+        args.carry_published_facts = True
 
     pub_path = Path(args.published)
     if not pub_path.exists() or pub_path.stat().st_size == 0:
@@ -239,8 +308,27 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     published = json.loads(pub_path.read_text(encoding="utf-8"))
-    assembled = json.loads(Path(args.assembled).read_text(encoding="utf-8"))
+    assembled_path = Path(args.assembled)
+    assembled = json.loads(assembled_path.read_text(encoding="utf-8"))
+    carried: list[dict[str, Any]] = []
+    if args.carry_published_facts:
+        carried = carry_published_facts(published, assembled)
+        if carried:
+            # assemble_publish_brief 와 같은 직렬화(indent=1 + 개행) — 발행 PR diff 를 그 값만으로 둔다.
+            assembled_path.write_text(
+                json.dumps(assembled, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    if args.carry_only:
+        lines = [f"### 발행 사실 유지 — {len(carried)}건"]
+        lines += [f"- `{c['id']}` {c['label']}: {c['assembled']!r} → 발행본 값 {c['published']!r}"
+                  for c in carried]
+        md = "\n".join(lines)
+        print(md)
+        if args.summary and carried:
+            with open(args.summary, "a", encoding="utf-8") as fh:
+                fh.write(md + "\n")
+        return 0
     result = compare(published, assembled, args.max_shrink_pct)
+    result["carried_facts"] = carried
     md = render_markdown(result, args.assembled)
 
     print(md)

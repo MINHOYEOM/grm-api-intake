@@ -163,6 +163,21 @@ jobs:
             --out      "web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json" \
             "${DEEP_ARGS[@]}"
 
+      # [2026-11-09] 재발행은 같은 날짜의 옛 스캐폴드로 다시 조립한다. 발행 뒤 사실 값(facts)을
+      # 정정한 경우(#1313 — HC 회수 업체·발행일) 재조립이 옛 값을 되살리므로, 발행본 값을 유지한다.
+      # 골든 재동결 **전에** 맞춰야 렌더 산출물과 브리프가 어긋나지 않는다. 판정은 뒤의 회귀 가드.
+      - name: 발행 사실 유지 — 발행 뒤 정정한 facts 값을 재조립이 되돌리지 않게
+        run: |
+          set -euo pipefail
+          OUT="web/data/briefs/brief_web_${{ steps.r.outputs.under }}.json"
+          mkdir -p _published
+          git show "HEAD:$OUT" > _published/prev.json 2>/dev/null || : > _published/prev.json
+          python assemble_regression_guard.py \
+            --published _published/prev.json \
+            --assembled "$OUT" \
+            --carry-only \
+            --summary "$GITHUB_STEP_SUMMARY"
+
       - name: 영문 슬롯 게이트 — 빠졌으면 PR 을 만들기 전에 실패
         # [2026-11-02] 영문 갈래가 빠진 채 PR 이 열려 CI test 3건이 뒤늦게 실패한 사고의 재발 방지.
         # 델타(영문 포함)가 아직 안 온 호는 여기서 멈추고 원인·빠진 목록을 한 줄로 낸다.

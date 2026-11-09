@@ -1032,3 +1032,58 @@ class FalseAbsenceGateBlindSpotTest(unittest.TestCase):
                 "summary": "FDA 가 원료의약품 제조소 실사에서 미생물시험 수탁기관의 적격성 "
                            "미확보와 품질부서 감독 미흡을 지적했다."}
         self.assertEqual(apb.lint_false_absence_claims([card]), [])
+
+
+class TestInspectionFrameDateGate(unittest.TestCase):
+    """새 실사 카드 틀은 INSPECTION_FRAME_FROM(2026-11-09) 이후 호에만 — 옛 호 재조립 소급 방지."""
+
+    def test_constant(self):
+        self.assertEqual(apb.INSPECTION_FRAME_FROM, "2026-11-09")
+
+    def test_applies_by_date(self):
+        f = apb.inspection_frame_applies
+        self.assertFalse(f({"publish_date": "2026-11-02"}))
+        self.assertFalse(f({"publish_date": "2026-10-26"}))
+        self.assertTrue(f({"publish_date": "2026-11-09"}))
+        self.assertTrue(f({"publish_date": "2026-11-16"}))
+        self.assertFalse(f({"run_date_kst": "2026-11-02"}))   # publish_date 없으면 run_date
+        self.assertTrue(f({}))                                # 날짜 없음 → 현행 유지
+        self.assertTrue(f({"publish_date": "garbage"}))
+
+    def _run(self, publish_date):
+        truth = json.loads(TRUTH_PATH.read_text(encoding="utf-8"))
+        delta = json.loads(DELTA_PATH.read_text(encoding="utf-8"))
+        scaffold = _blank_scaffold_from(truth)
+        if publish_date is None:
+            scaffold["brief"].pop("publish_date", None)
+            scaffold["brief"].pop("run_date_kst", None)
+        else:
+            scaffold["brief"]["publish_date"] = publish_date
+        calls = {"attach": 0, "merge": 0}
+        orig_a = apb.inspection_card.attach_inspection_blocks
+        orig_m = apb.inspection_card.merge_same_inspection_ncr
+
+        def _a(cards):
+            calls["attach"] += 1
+            return orig_a(cards)
+
+        def _m(cards):
+            calls["merge"] += 1
+            return orig_m(cards)
+        apb.inspection_card.attach_inspection_blocks = _a
+        apb.inspection_card.merge_same_inspection_ncr = _m
+        try:
+            apb.assemble_publish_brief(scaffold, delta, strict=True)
+        finally:
+            apb.inspection_card.attach_inspection_blocks = orig_a
+            apb.inspection_card.merge_same_inspection_ncr = orig_m
+        return calls
+
+    def test_old_issue_gets_no_block(self):
+        self.assertEqual(self._run("2026-11-02"), {"attach": 0, "merge": 0})
+
+    def test_first_frame_issue_gets_block(self):
+        self.assertEqual(self._run("2026-11-09"), {"attach": 1, "merge": 1})
+
+    def test_no_date_keeps_current_behaviour(self):
+        self.assertEqual(self._run(None), {"attach": 1, "merge": 1})

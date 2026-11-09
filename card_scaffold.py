@@ -1390,6 +1390,40 @@ def _section_ich(row: dict[str, Any]) -> str:
     return "watch" if "consultation" in (row.get("type_or_class", "") or "").lower() else "global"
 
 
+# [입법·행정예고 승격 2026-11-09] data0009 는 의약품 외(화장품·의료기기·식품·수수료 등)가 대부분이라
+# 전부 본 카드로 올리면 잡음이다. 제목(RSS 는 본문이 없다)에 GMP 어휘가 있을 때만 본 카드, 그 외 watch.
+# 좁고 보수적으로 — 제목만으로 GMP 관련을 확신 못 하면 watch(예: "의약품 등의 안전에 관한 규칙"
+# 단독 제목은 제조·품질 조항인지 알 수 없다). 제외어가 하나라도 있으면 포함어가 있어도 watch.
+_LEG_GMP_INCLUDE = (
+    "제조및품질관리", "우수의약품제조", "의약품제조", "의약품등제조", "제조소", "제조업",
+    "무균", "교차오염", "GMP",
+)
+# 임상시험용의약품·안전규칙은 제목에 제조·품질 계열 단어가 함께 있을 때만.
+_LEG_GMP_PAIRED = (
+    ("임상시험용의약품", ("제조", "표시", "품질", "관리")),
+    ("의약품등의안전에관한규칙", ("제조", "품질", "무균", "GMP")),
+)
+_LEG_NON_GMP = ("화장품", "의료기기", "의약외품", "건강기능", "식품", "수수료", "마약", "동물용", "첨단바이오")
+
+
+def _is_gmp_legislative(title: str) -> bool:
+    # '식품' 제외어가 기관명(식품의약품안전처)에 걸리지 않게 기관명을 먼저 지운다.
+    t = re.sub(r"\s+", "", title or "").replace("식품의약품안전처", "")
+    if not t or any(x in t for x in _LEG_NON_GMP):
+        return False
+    tu = t.upper()
+    if any(x.upper() in tu for x in _LEG_GMP_INCLUDE):
+        return True
+    return any(a in t and any(b in t for b in bs) for a, bs in _LEG_GMP_PAIRED)
+
+
+def _section_legislative(row: dict[str, Any]) -> str:
+    """입법·행정예고 섹션: GMP 관련(제목 규칙) → 본 카드(MFDS=domestic), 그 외 → watch(웹 비카드)."""
+    if _is_gmp_legislative(_first(row.get("headline"), row.get("title"))):
+        return "domestic" if row.get("source") == SOURCE_MFDS else "global"
+    return "watch"
+
+
 def resolve_section(kind: str, row: dict[str, Any]) -> str:
     """카드 섹션(§7). SourceSpec.section override → 없으면 source 기본(MFDS→domestic·else global)."""
     sec = _spec(kind).section
@@ -1420,7 +1454,7 @@ def _doc_number(kind: str, row: dict[str, Any]) -> str:
 
 # per-kind W2 유형별 사실 행(발행일·문서번호 이후) 생성기 — SourceSpec.extra_rows 로 배선.
 # 각기 (row, raw) → 추가 행 리스트. 미지정 kind(guidance/FR·rss-news·mfds-notice·
-# safety-letter·legislative·regulation)는 extra_rows=None → dispatcher 가 _w2_extra_default.
+# safety-letter·regulation)는 extra_rows=None → dispatcher 가 _w2_extra_default.
 def _w2_extra_wl(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
     # §12(B): Site Country·issue_date·CFR 조항 없음 → letter_date, 조항행 생략
     rows = [("업체/제조소", _first(raw.get("firm"), row.get("firm")) or VALUE_UNKNOWN)]
@@ -1579,7 +1613,7 @@ def _w2_extra_ich(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, s
 
 
 def _w2_extra_default(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
-    # guidance(FR)·rss-news·mfds-notice·safety-letter·legislative·regulation
+    # guidance(FR)·rss-news·mfds-notice·safety-letter·regulation
     rows = [("발행기관", _regulator(row.get("source", "")) or VALUE_UNKNOWN)]
     if row.get("comments_close"):
         rows.append(("의견기한", row["comments_close"]))
@@ -1587,6 +1621,26 @@ def _w2_extra_default(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[st
         topic = _first(raw.get("title"), row.get("headline"))
         if topic:
             rows.append(("주제", _truncate_at_sentence(topic, 80)))
+    return rows
+
+
+_LEG_NOTICE_NO = re.compile(r"공고\s*제\s*(\d{4}-\d+)\s*호")
+
+
+def _w2_extra_legislative(row: dict[str, Any], raw: dict[str, Any]) -> list[tuple[str, str]]:
+    """입법·행정예고 사실 행: 발행기관 · 공고번호(제목 또는 ogLmPp pntcNo) · 의견기한(있을 때만)."""
+    rows = [("발행기관", _regulator(row.get("source", "")) or VALUE_UNKNOWN)]
+    no = ""
+    m = _LEG_NOTICE_NO.search(_first(raw.get("title"), row.get("headline")))
+    if m:
+        no = m.group(1)
+    elif raw.get("pntcNo"):
+        no = str(raw["pntcNo"])
+    if no:
+        rows.append(("공고번호", no))
+    close = _first(row.get("comments_close"), raw.get("edYd"))
+    if close:
+        rows.append(("의견기한", close))
     return rows
 
 
@@ -1691,7 +1745,8 @@ _REGISTRY: dict[str, SourceSpec] = {
         category="Guidance", normative=True),
     "legislative": SourceSpec(
         "🟫", "입법예고", "입법예고",
-        category="Guidance", normative=True, section="watch"),
+        category="Guidance", normative=True, section=_section_legislative,
+        extra_rows=_w2_extra_legislative),
     "safety-letter": SourceSpec("🟦", "안전성서한", "안전성"),
     "rss-news": SourceSpec("🟫", "규제 소식", "GMP News", normative=True),
 }

@@ -563,6 +563,23 @@ def diagnose_ghost_ids(ghost: list[str], scaffold_ids: "set[Any]") -> str:
     return f"델타 카드 id {len(ghost)}건이 스캐폴드에 없음(스캐폴드가 다른 intake run?)"
 
 
+# [새 실사 카드 틀 적용 시작일 2026-11-09] #1385 로 FDA 483·EU/UK GMP 비준수 등에 앞면 블록
+# (`card["inspection"]`)이 붙는다. 대표 결정: "새 틀은 11-16호부터" 였고 11-09 호가 첫 적용
+# 호가 됐다(#1405 로 라이브). 조립은 옛 호 재조립에도 돌므로 날짜로 막지 않으면 10-26·11-02
+# 같은 옛 호가 소급으로 새 틀이 된다(11-02 재조립 PR #1409 에서 483 약 100장 실측).
+INSPECTION_FRAME_FROM = "2026-11-09"
+
+
+def inspection_frame_applies(brief_meta: dict[str, Any]) -> bool:
+    """이 호에 새 실사 카드 틀(합치기+앞면 블록)을 적용하는가. 발행일 < 기준일이면 False.
+
+    날짜를 못 구하거나 형식이 이상하면 True(현행 유지 — 안전 기본값)."""
+    d = str((brief_meta or {}).get("publish_date") or (brief_meta or {}).get("run_date_kst") or "")[:10]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+        return True
+    return d >= INSPECTION_FRAME_FROM
+
+
 def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
                            *, strict: bool = True,
                            deep_deltas: dict[str, dict[str, Any]] | None = None
@@ -673,12 +690,15 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     #    `inspection`(등급 칩·지적 목록·조치)을 결정론으로 붙인다. 렌더는 이 블록이 있는
     #    카드만 새 틀로 그린다 — 블록이 없는 과거 호는 다시 렌더해도 화면이 바뀌지 않는다.
     #    심층분석·번역 주입 **뒤**여야 국문(`*_ko`·`findings_ko`)을 쓸 수 있다.
-    n_before = len(adopted_cards)
-    adopted_cards = inspection_card.merge_same_inspection_ncr(adopted_cards)
-    if len(adopted_cards) < n_before:
-        report.warnings.append(
-            f"같은 실사 비준수 판정서 {n_before - len(adopted_cards)}장을 대표 카드로 묶음")
-    inspection_card.attach_inspection_blocks(adopted_cards)
+    #    [소급 방지 2026-11-09] 새 틀은 INSPECTION_FRAME_FROM 이후 호에만 — 옛 호를 재조립해도
+    #    합치기·블록이 붙지 않는다(`inspection_frame_applies`).
+    if inspection_frame_applies((scaffold.get("brief") or {})):
+        n_before = len(adopted_cards)
+        adopted_cards = inspection_card.merge_same_inspection_ncr(adopted_cards)
+        if len(adopted_cards) < n_before:
+            report.warnings.append(
+                f"같은 실사 비준수 판정서 {n_before - len(adopted_cards)}장을 대표 카드로 묶음")
+        inspection_card.attach_inspection_blocks(adopted_cards)
     for c in adopted_cards:
         blk = c.get("inspection") or {}
         dd = c.get("deterministic_detail") or {}
@@ -745,6 +765,13 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
     # 발행분(07-27 #475 · 08-03 #779 · 08-24 #778/#784)은 전건 병기 완료 실측이라 무조건
     # 검사가 안전하고, 배포 단계 `web/render.validate_whopir_ko` 가 한 번 더 fail-closed.
     report.errors.extend(_lint_whopir_ko(out.get("cards") or []))
+
+    # 게이트 8: 본문 슬롯에 FDA 가림 표기 `(b)(4)` 노출 — 발행 차단(2026-11-09 이후 호).
+    # 과거 호는 재조립이 막히지 않게 날짜 컷으로 제외한다(소급 수정 대상 아님).
+    _pub = str((scaffold.get("brief") or {}).get("publish_date")
+               or (scaffold.get("brief") or {}).get("run_date_kst") or "")
+    if not _pub or _pub >= _MASKED_MARK_GATE_FROM:
+        report.errors.extend(lint_masked_marks_in_body(out.get("cards") or []))
 
     # agencies = event 카드 + resource 노트의 agency 합집합(카드 순서 우선, 중복 제거) —
     # 리소스로 빠진 소스(예: ECA)가 헤더 기관 목록에서 사라지지 않게 한다.
@@ -929,6 +956,41 @@ def lint_false_absence_claims(cards: list[dict[str, Any]]) -> list[str]:
                 errs.append(
                     f"카드 {c.get('id')!r}: 원문을 확보했는데 key_facts[{i}] 가 부재를 주장 — "
                     f"{_FALSE_ABSENCE_RE.search(v).group(0)!r}")
+    return errs
+
+
+_MASKED_MARK_GATE_FROM = "2026-11-09"
+_MASKED_MARK_RE = re.compile(r"\(b\)\(\d\)")
+_MASKED_MARK_SLOTS = ("title_issue", "summary", "implication")
+_MASKED_MARK_LIST_SLOTS = ("key_facts", "checks")
+
+
+def lint_masked_marks_in_body(cards: list[dict[str, Any]]) -> list[str]:
+    """카드 본문 슬롯(한·영)에 FDA 가림 표기 `(b)(4)` 등이 남았으면 사유 목록을 돌려준다.
+
+    [게이트 8, 2026-11-09] 11-09 호 WL 카드 3장의 key_facts 에 "소르비톨 용액 약 (b)(4) 회
+    입고분" 같은 가림 기호가 그대로 발행됐다 — 독자에게 의미 없는 기호다. 원문 인용·위반 본문
+    (`deterministic_detail`·`quotes`·`source_text`)에는 원문 그대로 남는 게 맞으므로 검사하지
+    않는다. 산문 슬롯만 본다. 고치는 방법: "(비공개)" 로 옮기거나 수치·대상 단정 없이 다시 쓴다.
+    """
+    errs: list[str] = []
+
+    def _scan(cid: Any, prefix: str, node: Any) -> None:
+        if not isinstance(node, dict):
+            return
+        for slot in _MASKED_MARK_SLOTS:
+            v = node.get(slot)
+            if isinstance(v, str) and _MASKED_MARK_RE.search(v):
+                errs.append(f"카드 {cid!r}: {prefix}{slot} 에 가림 표기 노출 — {v[:60]!r}")
+        for slot in _MASKED_MARK_LIST_SLOTS:
+            for i, v in enumerate(node.get(slot) or []):
+                if isinstance(v, str) and _MASKED_MARK_RE.search(v):
+                    errs.append(
+                        f"카드 {cid!r}: {prefix}{slot}[{i}] 에 가림 표기 노출 — {v[:60]!r}")
+
+    for c in cards:
+        _scan(c.get("id"), "", c)
+        _scan(c.get("id"), "en.", c.get("en"))
     return errs
 
 

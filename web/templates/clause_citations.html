@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+{#- [FDA 지적 조항 화면] /findings/citations/ — 조항별 인용 빈도 순위.
+    데이터 = web/data/fda_citations.json(커밋 집계본, web/clause_citations.py). 네트워크 0.
+    분모 = 지적이 1건 이상 나온 실사(NAI 제외). 법적 판단 문구 없음. -#}
+{% include "partials/clause_citation_style.html" %}
+<main>
+  <div class="wrap page-head cc-sec">
+    <span class="kick">FDA &middot; Citations</span>
+    <h1>{{ _("FDA 가 자주 지적하는 조항") }}</h1>
+    <p>{{ _("FDA 가 지적을 낸 실사 가운데 어느 조항이 몇 번 인용됐는지 봅니다. 한 실사가 같은 조항을 여러 번 적어도 1건으로 셉니다.") }}</p>
+  </div>
+  <div class="wrap cc-sec">
+    <p class="cc-big"><b>{{ "{:,}".format(cit.total) }}</b><span>{{ _("지적이 나온 실사 (FY{a}~FY{b})", a=cit.years[0], b=cit.years[-1]) }}</span></p>
+    <div class="cc-wrapx"><table class="cc-tbl">
+      <thead><tr>
+        <th>#</th><th>{{ _('조항') }}</th><th class="cc-hide">{{ _('FDA 표기') }}</th>
+        <th class="n">{{ _('실사') }}</th><th class="n">{{ _('비율') }}</th><th class="cc-hide"></th>
+        <th class="cc-hide">{{ _('연도별') }}</th>
+      </tr></thead>
+      <tbody>
+      {%- for r in cit.rows %}
+      <tr>
+        <td class="n">{{ r.rank }}</td>
+        <td class="cc-code">{% if r.section in clause_slugs %}<a href="{{ rel_root }}findings/clause/{{ r.section | replace('.', '-') }}/">{{ r.code }}</a>{% else %}{{ r.code }}{% endif %}</td>
+        <td class="cc-t cc-hide">{{ r.title }}</td>
+        <td class="n">{{ "{:,}".format(r.inspections) }}</td>
+        <td class="n">{{ r.pct }}</td>
+        <td class="cc-hide"><div class="cc-bar"><u style="width:{{ r.bar }}%"></u></div></td>
+        <td class="cc-hide"><span class="cc-mini" title="{% for y in r.years %}FY{{ y.year }} {{ y.pct }}{% if not loop.last %} · {% endif %}{% endfor %}">{% for y in r.years %}<i><u style="height:{{ y.h }}%"></u></i>{% endfor %}</span></td>
+      </tr>
+      {%- endfor %}
+      </tbody>
+    </table></div>
+    <p class="cc-note">{{ _("비율은 지적이 나온 실사 중 그 조항이 인용된 실사의 몫입니다. 지적 없이 끝난 실사는 이 자료에 없어 분모에 들어 있지 않습니다. 연도별 막대는 그 해 비율(FY{a}~FY{b}, 조항마다 최고 해를 100 으로)이며, 최근 연도는 FDA 게시가 늦어 건수가 적을 수 있습니다.", a=cit.years[0], b=cit.years[-1]) }}</p>
+    <p class="cc-note">{{ _("조항 표기와 문구는 FDA 가 적은 그대로(영문)이고, 하위항이 다르면 따로 셉니다. FDA 가 인용한 빈도이며 위반 여부의 판단이 아닙니다.") }}</p>
+    <p class="cc-note">{{ _("출처: {src}, {asof} 기준.", src=cit.source, asof=cit.as_of) }}</p>
+  </div>
+</main>
+{% endblock %}

@@ -619,6 +619,7 @@ grm-api-intake/
 │  ├─ wl_anatomy.py              # [WL 해부 2026-10-31] 경고서한 국문 지적을 '지적 내용·회사 회신·FDA 판단·FDA 요구'로 나눈다(FDA 문장 무변형·이으면 원문·확신 없으면 None). 문서 페이지(findings_doc.html)와 브리프 카드 문서 링크 문구가 쓴다
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
+│  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 갱신)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
 │  ├─ growth_weekly.py            # [성장 2026-09-23] 주간 성장 리포트 — growth_weekly_report(089) JSON → 한국어 HTML → Brevo 트랜잭션 메일(운영자). 숫자는 로그에 안 찍는다(공개 저장소)
 │  ├─ approval_mail.py            # [결재 메일 11-02] 발행 PR(publish/brief-*) 체크 전부 success → 대표 메일함 1통(Brevo 트랜잭션·수신자 변수 1개·PR 표식 댓글로 중복 0)
 │  ├─ ops_decision_mail.py        # [결정 알림] 운영 센터 대기 결정(pending·mail_sent_at null) → 대표 메일 1건 1통·하루 3통·넘치면 다음 날 아침 묶음·KST 22~08 조용한 시간. 발송·수신자 검사는 approval_mail 재사용

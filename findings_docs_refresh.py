@@ -47,7 +47,8 @@ EMA(EU GMP NCR) 100% · MHRA 100% · MFDS 89% · FDA 28% · HC 16%. EU 비준수
 
   · 0건 가드 — 문서 0건이면 아무것도 쓰지 않는다(RPC 장애를 "문서가 없다"로 커밋하면
     다음 렌더가 페이지 수천 장을 지운다).
-  · 페이지 수집 실패율 20% 초과 시 전면 중단(부분 상태를 기준선으로 남기지 않는다).
+  · 페이지 조회가 재시도(PAGE_ATTEMPTS) 후에도 한 장이라도 실패하면 전면 중단(부분 상태를
+    기준선으로 남기지 않는다 — 11-07 사례).
   · 발행일·원문 링크·국문 본문이 없는 문서는 제외하고 사유별로 센다.
 """
 from __future__ import annotations
@@ -74,7 +75,7 @@ DEFAULT_OUT = Path(__file__).resolve().parent / "web" / "data" / "findings_docs.
 
 DEFAULT_MIN_FINDINGS = 3
 DEFAULT_PAGE_SIZE = 100
-MAX_FAILURE_RATIO = 0.20
+
 
 # 페이지 한 장을 몇 번까지 쳐 보는가. 실패 원인은 대개 statement timeout 이고 일시적이다
 # — 재시도가 없으면 한 번의 실패가 그 페이지의 문서 100건을 영구히 지운다.
@@ -368,9 +369,14 @@ def collect_documents(base_url: str, anon_key: str, *, min_findings: int,
 
     out = apply_thickness_gate(out, min_findings=min_findings, reject=reject, log=log)
 
-    if pages and failures / pages > MAX_FAILURE_RATIO:
+    # ★한 장이라도 끝내 못 읽었으면(재시도 PAGE_ATTEMPTS 회 뒤에도) 스냅샷을 확정하지
+    # 않는다. [2026-11-07] 한 장(문서 최대 100건)이 빠진 채 커밋됐는데 축소가 1.6% 라
+    # 10% 게이트를 통과해 PR #1370 이 열렸고, 그 값이 링크드인 슬롯 숫자와 어긋나 CI 가
+    # 3일간 빨갰다. 부분 스냅샷은 "덜 수집된 것"이지 "세상이 바뀐 것"이 아니다.
+    if failures:
         raise SystemExit(
-            f"페이지 수집 실패 {failures}/{pages} — 허용치 초과. 아무것도 쓰지 않습니다.")
+            f"페이지 수집 실패 {failures}/{pages} — 재시도({PAGE_ATTEMPTS}회) 후에도 조회하지 "
+            f"못한 페이지가 있어 불완전한 스냅샷입니다. 아무것도 쓰지 않습니다.")
     if not out:
         raise SystemExit("문서 0건 — 0건 가드. 아무것도 쓰지 않습니다.")
 

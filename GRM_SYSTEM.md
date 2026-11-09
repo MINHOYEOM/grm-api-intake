@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.301` |
+| 문서 버전 | `v1.302` |
 | 최종 수정일 | 2026-11-10 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -293,7 +293,7 @@ flowchart TD
 > - **본문 슬롯 가림 표기 게이트:** 조립 게이트 8 `assemble_publish_brief.lint_masked_marks_in_body` — FDA 가림 표기 `(b)(4)` 가 본문 슬롯에 노출되면 2026-11-09 이후 호의 발행을 차단한다(#1410; 10-26 호 483 한국어 결손 보강 #1408 과 11-09 WL 카드 3장 정정 포함).
 > - **새 실사 카드 틀의 시작일:** `INSPECTION_FRAME_FROM="2026-11-09"` — 앞면 새 틀(`inspection_card.py`)은 이 날짜 이후 호에만 붙여, 옛 호를 재조립해도 소급되지 않는다(#1412).
 > - **ICH 사본 보충:** 게시일이 없는 항목(ICH 스냅샷)은 Supabase 사본 보충에서 건너뛴다(#1407, `collect_intake.py` — 매일 WARN 31건 소음 제거).
-> - **새 화면:** 지적 조항 `/findings/citations/`(#1404, 데이터 `web/data/fda_citations.json`, 월간 갱신 #1411)·지적 사례 `/findings/examples/`(#1406, 데이터 `web/data/deficiency_examples.json` — 100건, 영문 원문+참고용 한국어 한 줄 #1421) — §5.1 `web/` 항목 참조. 진입 링크: 홈 카드·푸터 '도구'·지적사항 둘러보기(영문판은 해당 경로가 있을 때만).
+> - **새 화면:** 지적 조항 `/findings/citations/`(#1404, 데이터 `web/data/fda_citations.json`, 월간 갱신 #1411)·지적 사례 `/findings/examples/`(#1406, 데이터 `web/data/deficiency_examples.json` — 100건, 영문 원문+참고용 한국어 한 줄 #1421) + 원천 전체 `/findings/examples/pmda/`·`mhra/`·`mhra-data/`(데이터 `web/data/deficiency_cases.json`, dispatch 갱신 — 원천 12,093행: PMDA 영문 111·MHRA 예시 371 문장 전부, MHRA xlsx 11,501행은 조항 집계, PMDA 일본어 110행은 원문 파일 링크) · 조항·용어 페이지 '일본·영국 실사의 같은 주제 사례' 블록 — §5.1 `web/` 항목 참조. 진입 링크: 홈 카드·푸터 '도구'·지적사항 둘러보기(영문판은 해당 경로가 있을 때만).
 > - **구독 가입 경로 기록(꺼짐 기본):** 구독 폼이 가입 페이지 경로·언어를 Brevo 연락처 속성 `SIGNUP_PATH`·`SIGNUP_LANG` 으로 보낸다(#1422, 게이트 `GRM_SIGNUP_PATH_FIELDS`, 운영 순서 `docs/ops_brevo_signup_path_attributes.md`). 켜는 조건: 처리방침 시행일(2026-11-16) 이후 + Brevo 속성 두 개가 만들어져 있을 것. 처리방침 수집 항목에는 이미 반영(#1424, 시행 2026-11-16).
 > - **로그인 회원 1회 구독 안내:** 안내는 라이브(#1275). `newsletter-optin` 에 읽기 전용 `action:"status"` 를 더해, 이미 구독 중·수신거부 회원에게는 띄우지 않는다(#1425, 게이트 `GRM_MEMBER_NUDGE_STATUS` 기본 꺼짐 — 함수 배포 뒤 켠다, 조회 실패는 기존 동작).
 > - **체크리스트 RPC 해시 조인:** 마이그레이션 136 이 조항 매칭을 중첩 루프에서 해시 조인으로 바꿨다(반환 shape·결과 동일, 함수 993→163ms, 적용 완료 2026-11-09, #1423). 링크드인 유사 사례는 커밋된 `<발행일>.similar.json` 을 우선 쓴다.
@@ -600,6 +600,7 @@ grm-api-intake/
 ├─ glossary_cases_refresh.py       # [트랙 C] 용어사전 사례연결 건수 주간 재측정(findings_search RPC · q/excluded 무변형 · 0건은 종전 값 유지 · 20% 실패 시 중단)
 ├─ findings_facets_refresh.py      # [검색 유입] 분류·국가·기관 모음 페이지 정본 재측정(findings_search RPC · anon=공개 RLS · 표본 미달 제외·모르는 기관 코드는 실패)
 ├─ import_alerts_refresh.py        # [수입경보 1단계] 업체 페이지 "FDA 수입경보 대상" 정본 web/data/import_alerts.json 재생성(import_alert_listing 132 · service_role 읽기 · 공개 필드만, 주소 없음 · 0행/형식/등재 20% 급감 게이트 · 변경 없으면 exit 10)
+├─ deficiency_cases_refresh.py    # [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 지적 사례 화면·블록 정본 web/data/deficiency_cases.json 재생성(deficiency_examples 134 · service_role 읽기 · 공개 필드만: 영어 지적 문장·기관·연도·기관 분류·우리 분류·조항 키 + MHRA xlsx 조항·문단별 등급 집계, PMDA 배경 설명·익명 실사 ID·국가 없음, PMDA 일본어판은 건수만 · 0행/형식/전체 행 20% 급감 게이트 · 변경 없으면 exit 10)
 ├─ findings_docs_refresh.py        # [검색 유입] 문서 단위 페이지 정본 재측정(지적 3건 이상 · 발행일/원문링크 필수 · 본문 무절단 · 문서 id 정렬로 작은 diff)
 ├─ firm_history_stamp.py           # 브리프 카드 '이 업체 앞선 지적 기록' 사이드카(web/data/firm_history/<발행일>.json) 생성 — RPC findings_card_history(120) 조회 → 확실/참고용/숨김 판정(시범: 483 FEI 일치 + 식약처 3종)
 ├─ collect_rum_analytics.py        # [성장·유입] Cloudflare Web Analytics(RUM) → Supabase 일별 적재(072/073/075/077 · 그룹마다 별도 GraphQL 요청 · avg{sampleInterval} 동반 저장 · 정확값을 추정값으로 덮지 않음(계층 래칫 PRECISION_BAND=3.0) · 창은 upsert 아닌 삭제 후 삽입 · **질의를 CHUNK_DAYS=3 조각으로 자른다** — ★Cloudflare 의 전수(비표본) 데이터셋 보존이 약 7일이고 그 밖을 조금이라도 건드리는 질의는 통째로 표본으로 떨어진다(2026-09-05 통제 실측: 한 실행·같은 1일 창에서 8/28=간격 12.5 표본, 8/29=간격 1.07 전수). 놓친 날은 영구히 회수 불가라 어릴 때 짧은 창으로 받아 둔다 — 8/10~8/28 이 8일 창 단일 질의로만 물어와 그렇게 굳었다. 조각은 겹치지 않게 자른다(datetime_leq 라 자정에서 맞대면 앞 조각이 다음 날 한 순간을 삼켜 멀쩡한 하루를 ~0 으로 덮는다))
@@ -641,6 +642,7 @@ grm-api-intake/
 │  ├─ glossary_pdf.py             # [마케팅 2026-09-28] GMP 규제 용어집 PDF — 용어 뷰모델(render)·브랜드·Chrome 렌더러(linkedin_cards) 재사용, QR 은 segno. 구독자 자료(/files/ · 도착 페이지 /welcome/)
 │  ├─ example_page.py             # [지적 사례 2026-11-09] `/findings/examples/`(ko·en) — `data/deficiency_examples.json`(PMDA·MHRA 영문 원문에서 사람이 고른 주제별 대표 사례 100건·출처 행 id 보존, 원문은 영어·한국어는 참고용 한 줄) 로드·검증·주제 뷰(테스트 `web/tests/test_example_page.py`)
 │  ├─ import_alerts_page.py       # [수입경보 2단계 2026-11-10] `/findings/import-alerts/`(ko·en) 전체 목록 뷰 — `data/import_alerts.json`(1단계 스냅샷) → 요약(전체·현재 등재·한국·확인 기준일)·행(업체·국가·도시·경보·등재일·품목 코드 수·등재 중/등재 해제)·국가 필터(ISO2 → 한국어 이름, findings.js 표와 같은 계약·매핑 밖은 FDA 표기 그대로). 등재 사실만(해석·사유 없음). 업체 링크는 1단계 업체 페이지 매칭 결과에서만. 스냅샷 없으면 페이지·진입 링크·sitemap 모두 없음(테스트 `web/tests/test_import_alerts_page.py`)
+│  ├─ deficiency_cases_page.py    # [해외 지적 사례 전체 2026-11-10] `/findings/examples/pmda/`·`mhra/`(기관별 지적 문장 전부, 전 행 서버 렌더 + 영역·연도·낱말 필터, 원문 그대로·긴 문장 2,000자 절단)·`mhra-data/`(MHRA 2018·2019 xlsx 11,501행 → EU GMP 장·문단별 Critical·Major·Other 집계) + 조항 페이지(21 CFR 완전 일치)·용어 페이지(표제어·약어·별칭 낱말 일치, 일치 30건 초과는 생략 + 관련 조항 EU GMP 장 집계 한 줄) 블록 — 템플릿은 env 전역 `intl_cases` 로 묻는다(partials/intl_cases_block.html). 스냅샷 없으면 페이지·블록·링크 없음(테스트 `web/tests/test_deficiency_cases_page.py`)
 │  ├─ graph_export.py             # [지식 그래프 2026-11-04] 사이트 빌드 때 `graph/`(manifest·nodes-<유형>·edges-<rel> jsonl) 공개 정적 파일 생성 — 순수 함수·결정론, 개인정보 허용목록·끊긴 엣지/id 중복 가드(테스트 `web/tests/test_graph_export.py`)
 │  ├─ clause_citations_guard.py   # [지적 조항 월간 갱신 가드 2026-11-09] 급감 20%·스냅샷 검증·as_of 만 변경 시 무PR 판정(테스트 `web/tests/test_clause_citations_guard.py`)
 │  ├─ clause_citations.py         # [FDA 지적 조항 화면] 133 원장 집계(build_snapshot, 수동 CLI 또는 월간 `grm-fda-citations-snapshot.yml`)·조항 순위/섹션 뷰. 데이터 `data/fda_citations.json`, 화면 `/findings/citations/`(ko·en)+조항 페이지 블록(테스트 `web/tests/test_clause_citations.py`)
@@ -705,6 +707,7 @@ grm-api-intake/
    ├─ grm-findings-review-queue.yml      # [검토 대기] needs_review 큐 나이 감시 — 데이터품질팀 업무
    ├─ grm-fda-import-alert.yml           # [수입경보] 66-40·66-41 스냅샷(현재 수집 꺼짐)
    ├─ grm-import-alerts-refresh.yml      # [수입경보 1단계 2026-11-10] dispatch 전용 — import_alerts_refresh.py(service_role) → 변경 시에만 PR(자동 머지 없음)
+   ├─ grm-deficiency-cases-refresh.yml   # [해외 지적 사례 전체 2026-11-10] dispatch 전용 — deficiency_cases_refresh.py(service_role) → 변경 시에만 PR(자동 머지 없음)
    ├─ grm-fda-citations.yml              # [FDA 지적 조항] collect_fda_citations.py 실행(ENABLE_FDA_CITATIONS)
    ├─ grm-fda-citations-snapshot.yml     # [지적 조항 집계 월간 2026-11-09] 매월 2일 16:47 UTC web/clause_citations.py 재집계 → 가드(web/clause_citations_guard.py: 급감 20%·검증·as_of 만 바뀌면 PR 없음) → 변경 시에만 PR(자동 머지 없음)
    ├─ grm-deficiency-examples.yml        # [지적 사례] collect_deficiency_examples.py 실행(ENABLE_DEFICIENCY_EXAMPLES)

@@ -1,0 +1,5 @@
+{#- [해외 지적 사례 전체] 기관 축 = 페이지 축. 이 빌드에 실제로 선 화면만(tabs = 경로 목록). -#}
+<nav class="dc-tabs" aria-label="{{ _('지적 사례 화면') }}">
+  {%- if 'findings/examples/' in en_paths %}<a href="{{ rel_root }}findings/examples/">{{ _('대표 사례') }}</a>{% endif %}
+  {%- for t in dc_tabs %}<a href="{{ rel_root }}{{ t.route }}"{% if t.key == dc_on %} class="on" aria-current="page"{% endif %}>{% if t.key == 'PMDA' %}{{ _('일본 PMDA 사례') }}{% elif t.key == 'MHRA' %}{{ _('영국 MHRA 사례') }}{% else %}{{ _('MHRA 조항별 집계') }}{% endif %}</a>{% endfor %}
+</nav>

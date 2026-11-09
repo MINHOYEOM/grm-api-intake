@@ -148,6 +148,7 @@ from grm_i18n import (  # noqa: E402
 from wl_anatomy import split_wl_finding  # noqa: E402
 import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
 import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전체 목록 화면 뷰
+import deficiency_cases_page  # noqa: E402  [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 전체·조항/용어 블록
 
 # ── 언어 트리 상수 ────────────────────────────────────────────────────────────
 # ★첫 사용처(_library_item_view)보다 위에 있어야 한다 — 아래 PagePath 옆에 두었더니
@@ -3665,6 +3666,8 @@ def firm_similar_view(firm_docs: list[dict[str, Any]],
 #      (GlaxoSmithKline 영국·사우디 등 실측 10개 키 — findings 문서에는 국가가 없어 가를 수 없다).
 #   그리고 화면에는 등재 제조소의 도시·국가를 함께 적는다(어느 사업장인지 독자가 본다).
 IMPORT_ALERTS_FILE = WEB_DIR / "data" / "import_alerts.json"
+# [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 지적 사례 공개 스냅샷(deficiency_cases_refresh.py).
+DEFICIENCY_CASES_FILE = WEB_DIR / "data" / "deficiency_cases.json"
 IMPORT_ALERTS_SCHEMA = "grm-import-alerts/v1"
 _IA_SUFFIX_SYNONYMS = {"LIMITED": "LTD", "PRIVATE": "PVT", "CORPORATION": "CORP",
                        "INCORPORATED": "INC", "COMPANY": "CO"}
@@ -4962,6 +4965,12 @@ LLMS_EN_ROWS: tuple[tuple[str, str, str], ...] = (
      "How often FDA cited each 21 CFR clause, by inspections and fiscal year"),
     ("findings/import-alerts/", "FDA Import Alert list",
      "Facilities on FDA Import Alerts 66-40 and 66-41 with country, alert number, listing date and status"),
+    ("findings/examples/pmda/", "PMDA inspection deficiencies",
+     "Every deficiency in PMDA's GMP annual report attachments, in PMDA's English text"),
+    ("findings/examples/mhra/", "MHRA example deficiencies",
+     "Every example deficiency from MHRA's GMP inspection deficiency trend reports"),
+    ("findings/examples/mhra-data/", "EU GMP clauses cited by MHRA",
+     "Counts of EU GMP chapter and paragraph citations by grade in MHRA's 2018-2019 deficiency data"),
     ("findings/trends/", "Findings trends",
      "Ranked deficiency areas over the last 12 months and the most-cited sections"),
     ("findings/inspections/", "FDA inspection classifications",
@@ -5313,6 +5322,11 @@ INSPECTIONS_DESCRIPTION = N_("FDA가 의약품 제조소를 실사하고 매긴 
 EXAMPLES_DESCRIPTION = N_("업무 영역(무균·데이터 완전성·변경관리 등)별로 규제기관(PMDA·MHRA)이 실제 실사에서 지적한 문장을 모았습니다. 원문 영어와 참고용 한국어 번역, 출처 링크 포함.")
 CITATIONS_DESCRIPTION = N_("FDA 가 지적을 낸 의약품 실사에서 어느 21 CFR 조항이 얼마나 자주 인용됐는지 — "
                            "조항별 인용 실사 수·비율과 회계연도별 추이.")
+DEFICIENCY_CASES_DESCRIPTION = {
+    "PMDA": N_("일본 PMDA 가 GMP 실사 연차보고서 별첨으로 공개한 지적 {n}건 전부 — 원문(영문판) 그대로, 영역·연도·낱말로 찾기."),
+    "MHRA": N_("영국 MHRA 가 GMP 실사 지적 경향 보고서에 실은 지적 예시 {n}건 전부 — 원문 그대로, 영역·연도·낱말로 찾기."),
+    "MHRA_DATA": N_("영국 MHRA 2018·2019 GMP 실사 지적 원자료에서 EU GMP 장·문단별로 센 인용 횟수 {n}회 — Critical·Major·Other 등급별."),
+}
 IMPORT_ALERTS_DESCRIPTION = N_("FDA 수입경보 66-40·66-41 에 오른 의약품 제조소 {n}곳(한국 {k}곳) — "
                                "국가·경보 번호·등재일·상태와 FDA 원문 링크.")
 COVERAGE_DESCRIPTION = N_("GRM 규제 지적사항 데이터의 수집 현황 — 기관별 소스 구성, 연도별 확보량, "
@@ -5815,6 +5829,19 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     import_alerts_data = load_import_alerts(IMPORT_ALERTS_FILE)
     if import_alerts_data:
         en_paths.add(import_alerts_page.ROUTE)
+    # [해외 지적 사례 전체 2026-11-10] PMDA·MHRA 지적 사례 전체(기관별 2장 + MHRA 조항 집계 1장) —
+    # 스냅샷(web/data/deficiency_cases.json)이 있을 때만 양 트리에 선다. 조항·용어 페이지 블록과
+    # 지적 사례 허브의 진입 줄은 템플릿이 env 전역 `intl_cases` 로 묻는다(emit 호출을 늘리지 않는다).
+    deficiency_cases_data = deficiency_cases_page.load_snapshot(DEFICIENCY_CASES_FILE)
+    en_paths.update(deficiency_cases_page.routes_present(deficiency_cases_data))
+    _dc_labels: dict[str, tuple[str, str]] = {}
+    if deficiency_cases_data:
+        import grm_findings as _gf_dc
+        _dc_labels = {c.code: (c.label_ko, c.label_en) for c in _gf_dc.FINDING_TAXONOMY}
+        _dc_blocks = deficiency_cases_page.Blocks(deficiency_cases_data, _dc_labels,
+                                                   load_glossary() or [])
+        env.globals["intl_cases"] = _dc_blocks
+        en_env.globals["intl_cases"] = _dc_blocks
     # ★모음(분류·국가·기관)도 여기서 넣는다 — 종전에는 그 트리를 그리기 직전(한참 아래)
     #   에 넣었는데, 그때는 이미 둘러보기 면이 그려진 뒤라 **영어 진입 카드가 자기
     #   트리에 난 면을 못 봤다**(실측: 영어 둘러보기 카드 1장 / 한국어 4장). 면 집합은
@@ -7081,6 +7108,45 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 ia=_iav,
             )
         facet_paths.append((import_alerts_page.ROUTE, import_alerts_data["measured_on"]))
+
+    # [해외 지적 사례 전체 2026-11-10] 기관별 전체 목록(전 행 서버 렌더 — 필터는 인라인 스크립트가 숨길 뿐)
+    # + MHRA 조항 집계표. ko·en 같은 함수, 본문은 원문(영어) 그대로.
+    if deficiency_cases_data:
+        _dc_tabs = [{"key": k, "route": r} for k, r in deficiency_cases_page.ROUTES.items()
+                    if r in en_paths]
+        _dc_cc = deficiency_cases_page.clause_counts_view(deficiency_cases_data)
+        for _lg, _pg, _em, _tr in trees:
+            for _ag in ("PMDA", "MHRA"):
+                _dcv = deficiency_cases_page.cases_view(deficiency_cases_data, _ag, _dc_labels, _lg)
+                if not _dcv:
+                    continue
+                _dcp = _pg(deficiency_cases_page.ROUTES[_ag])
+                _em("findings_examples_cases.html", _dcp,
+                    page_title=(_tr("일본 PMDA 실사 지적 사례 전체 · GRM") if _ag == "PMDA"
+                                else _tr("영국 MHRA 실사 지적 사례 전체 · GRM")),
+                    nav_active="findings",
+                    description=_tr(DEFICIENCY_CASES_DESCRIPTION[_ag], n=f"{_dcv['total']:,}"),
+                    json_ld=_dcp.breadcrumb_json_ld([
+                        (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                        (_tr("지적 사례"), "findings/examples/"), (_ag, "")]),
+                    dc=_dcv, dc_tabs=_dc_tabs, dc_on=_ag,
+                )
+                if _lg == DEFAULT_LANG:
+                    facet_paths.append((_dcp.site_path, _dcv["measured_on"]))
+            if _dc_cc:
+                _dcp = _pg(deficiency_cases_page.ROUTES["MHRA_DATA"])
+                _em("findings_examples_mhra_data.html", _dcp,
+                    page_title=_tr("MHRA 실사에서 인용된 EU GMP 조항 · GRM"),
+                    nav_active="findings",
+                    description=_tr(DEFICIENCY_CASES_DESCRIPTION["MHRA_DATA"],
+                                    n=f"{_dc_cc['rows_total']:,}"),
+                    json_ld=_dcp.breadcrumb_json_ld([
+                        (_tr("홈"), "/"), (_tr("지적사항 검색"), "findings/"),
+                        (_tr("지적 사례"), "findings/examples/"), (_tr("MHRA 조항별 집계"), "")]),
+                    cc=_dc_cc, dc_tabs=_dc_tabs, dc_on="MHRA_DATA",
+                )
+                if _lg == DEFAULT_LANG:
+                    facet_paths.append((_dcp.site_path, _dc_cc["measured_on"]))
 
     # 주간 퀴즈(트랙 C) — quiz_bank.json(정본)의 전 문항을 결정론 embed. "이번 주" 선택은
     # 렌더러가 하지 않고(now() 금지) 클라이언트 assets/quiz.js 가 ISO 주차 키로 결정론 회전

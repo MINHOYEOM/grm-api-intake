@@ -80,6 +80,8 @@
     </section>
     {% endif %}
 
+    {% if intl_cases is defined %}{% with xc = intl_cases('clause', clause.code, lang), xc_sec = 'fx-sec', xc_h = 'fx-sec-h' %}{% include "partials/intl_cases_block.html" %}{% endwith %}{% endif %}
+
     {#- 국문 맥락 — 이 조항을 인용하는 용어사전 표제어. 조항 원문은 영문뿐이라, 무슨
         말인지는 우리 용어 설명이 채운다(상호 진입 간선이기도 하다). -#}
     {% if clause.terms %}

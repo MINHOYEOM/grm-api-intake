@@ -1,0 +1,35 @@
+{#- [해외 지적 사례 전체 2026-11-10] 조항·용어 페이지의 "일본·영국 실사 사례" 블록.
+    xc = intl_cases(kind, key, lang) (render 가 env 전역으로 건 deficiency_cases_page.Blocks).
+    매칭 근거가 글자로 있는 것만 — 조항: 지적 문장에 그 조항이 적힌 행 / 용어: 표제어·별칭이 문장에
+    그대로 있는 행 · 용어의 관련 조항이 EU GMP 장이면 MHRA 집계 한 줄. 해석 문구 없음, 원문(영어) 그대로.
+    스냅샷이 없거나 근거가 없으면 블록 자체가 없다. 클래스는 각 페이지(fx-·gt-)의 섹션 모양을 빌린다. -#}
+{%- if xc %}
+<section class="{{ xc_sec }}" id="intl-cases">
+  <h2 class="{{ xc_h }}">{{ _('일본·영국 실사의 같은 주제 사례') }}</h2>
+  {%- if xc.rows %}
+  <p class="dc-xl">{% if xc.kind == 'clause' %}{{ _('PMDA·MHRA 가 공개한 지적 문장 가운데 {code} 가 그대로 적힌 사례입니다. 원문(영어) 그대로입니다.', code=xc.code) }}{% else %}{{ _('PMDA·MHRA 가 공개한 지적 문장 가운데 이 용어가 그대로 나오는 사례입니다. 원문(영어) 그대로입니다.') }}{% endif %}</p>
+  <ul class="dc-xs">
+    {%- for r in xc.rows %}
+    <li><blockquote lang="en">{{ r.text }}</blockquote><span class="dc-xm">{{ r.agency }} &middot; {{ r.year }}{% if r.ref %} &middot; {{ r.ref }}{% endif %} &middot; <a href="{{ r.url }}" target="_blank" rel="noopener">{{ _('원문 파일') }}</a></span></li>
+    {%- endfor %}
+  </ul>
+  <p class="dc-xa">
+    {%- for a in xc.by_agency %}<a href="{{ rel_root }}{{ a.route }}{% if a.q %}?q={{ a.q | urlencode }}{% endif %}">{% if a.agency == 'PMDA' %}{{ _('일본 PMDA 사례 {n}건 보기', n=a.n) }}{% else %}{{ _('영국 MHRA 사례 {n}건 보기', n=a.n) }}{% endif %} &rarr;</a>{% endfor %}
+  </p>
+  {%- endif %}
+  {%- if xc.chapter %}
+  <p class="dc-xa"><a href="{{ rel_root }}{{ xc.chapter.route }}#{{ xc.chapter.anchor }}">{{ _('MHRA 2018·2019 실사 지적에서 EU GMP {ch} 인용 {n}회 보기', ch=xc.chapter.label, n="{:,}".format(xc.chapter.total)) }} &rarr;</a></p>
+  {%- endif %}
+  <style>
+    #intl-cases .dc-xl{font-family:var(--sans);font-size:13.5px;line-height:1.65;color:var(--muted);margin:0 0 10px;word-break:keep-all}
+    #intl-cases .dc-xs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+    #intl-cases .dc-xs li{border:1px solid var(--line-2);border-radius:10px;padding:12px 14px;background:var(--paper)}
+    #intl-cases blockquote{font-family:var(--sans);font-size:14px;line-height:1.6;color:var(--ink);margin:0;overflow-wrap:anywhere}
+    #intl-cases .dc-xm{display:block;font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:6px}
+    #intl-cases .dc-xm a{color:var(--muted);border-bottom:1px solid var(--line-2);text-decoration:none}
+    #intl-cases .dc-xa{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;font-family:var(--sans);font-size:14px}
+    #intl-cases .dc-xa a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--coral)}
+    #intl-cases .dc-xa a:hover{color:var(--coral)}
+  </style>
+</section>
+{%- endif %}

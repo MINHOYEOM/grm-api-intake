@@ -69,6 +69,17 @@
     </section>
     {%- endfor %}
 
+    {% if intl_cases is defined and intl_cases('hub', '', lang) %}{% set dch = intl_cases('hub', '', lang) %}
+    <section id="all">
+      <h2 class="ex-h2">{{ _('전체 사례 보기') }}</h2>
+      <p class="ex-note">{{ _('위는 영역별로 고른 대표 사례입니다. 기관이 공개한 원자료 {n}행 전부는 아래 화면에서 원문 그대로 찾아볼 수 있습니다.', n="{:,}".format(dch.rows)) }}</p>
+      <div class="ex-next" style="margin-top:12px">
+        {%- for c in dch.cards %}
+        <a href="{{ rel_root }}{{ c.route }}">{% if c.key == 'PMDA' %}{{ _('일본 PMDA 사례 {n}건', n="{:,}".format(c.n)) }}{% elif c.key == 'MHRA' %}{{ _('영국 MHRA 사례 {n}건', n="{:,}".format(c.n)) }}{% else %}{{ _('MHRA 조항별 집계 {n}회', n="{:,}".format(c.n)) }}{% endif %}</a>
+        {%- endfor %}
+      </div>
+    </section>
+    {% endif %}
     <section>
       <div class="ex-next">
         <a href="{{ rel_root }}findings/checklist/">{{ _('자가점검 체크리스트') }}</a>

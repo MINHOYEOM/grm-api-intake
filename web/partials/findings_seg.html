@@ -31,6 +31,10 @@
    에 있을 때만 — 정본이 없는 빌드에서 없는 페이지로 보내지 않는다(ko·en 공통 선언). #}
 {% if 'findings/citations/' in en_paths %}  <a href="{{ rel_root }}findings/citations/index.html"{% if seg_active == 'citations' %} class="on" aria-current="page"{% endif %}>{{ _("FDA 지적 조항") }}</a>
 {% endif %}
+{# [진입점 2026-11-10] 수입경보 전체 목록(#1436)도 같은 줄에. 사례 전체(PMDA·MHRA)는 '지적 사례' 탭이
+   켜진 채로 이 줄을 단다(사례 화면 안 dc-tabs 가 기관을 가른다). #}
+{% if 'findings/import-alerts/' in en_paths %}  <a href="{{ rel_root }}findings/import-alerts/index.html"{% if seg_active == 'import-alerts' %} class="on" aria-current="page"{% endif %}>{{ _("FDA 수입경보") }}</a>
+{% endif %}
 {% if 'findings/examples/' in en_paths %}  <a href="{{ rel_root }}findings/examples/index.html"{% if seg_active == 'examples' %} class="on" aria-current="page"{% endif %}>{{ _("지적 사례") }}</a>
 {% endif %}
   <a href="{{ rel_root }}findings/inspector/index.html"{% if seg_active == 'inspector' %} class="on" aria-current="page"{% endif %}>{{ _("실사관") }}</a>

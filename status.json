@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T12:35:07Z",
+ "generated_at": "2026-11-09T14:00:12Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42615114099,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T12:12:46Z",
-    "updatedAt": "2026-11-09T12:17:37Z",
-    "headBranch": "claude/glossary-fig-daily-20261109-2110",
-    "displayTitle": "glossary(fig): 2026-11-09 새 그림 0 · 다시 그림 0 · 보류 5 — 직선성·분석절차 밸리데이션·설비 적격성평가·제품 품질불만·메타데이터",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42615114099"
-   },
-   {
-    "databaseId": 42615092828,
+    "databaseId": 42629116063,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T12:12:37Z",
-    "updatedAt": "2026-11-09T12:18:29Z",
-    "headBranch": "claude/glossary-fig-daily-20261109-2110",
-    "displayTitle": "glossary(fig): 2026-11-09 새 그림 0 · 다시 그림 0 · 보류 5 — 직선성·분석절차 밸리데이션·설비…",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42615092828"
-   },
-   {
-    "databaseId": 42586883311,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-09T08:34:06Z",
-    "updatedAt": "2026-11-09T08:39:11Z",
+    "createdAt": "2026-11-09T13:51:13Z",
+    "updatedAt": "2026-11-09T13:56:25Z",
     "headBranch": "main",
-    "displayTitle": "feat(web): 로그인 회원 1회 구독 안내 — 이미 구독 중이면 건너뛰는 상태 확인 (꺼짐 기본) (#1425)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42586883311"
+    "displayTitle": "seo: 얇은 문서·업체 페이지에 googlebot 전용 noindex (네이버 색인 유지) (#1429)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42629116063"
    },
    {
-    "databaseId": 42585843367,
+    "databaseId": 42627731522,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T08:25:30Z",
-    "updatedAt": "2026-11-09T08:31:40Z",
-    "headBranch": "feat/member-subscribe-nudge-popup",
-    "displayTitle": "feat(web): 로그인 회원 1회 구독 안내 팝업 (꺼짐 기본, 결재 #1 대체)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42585843367"
+    "createdAt": "2026-11-09T13:41:49Z",
+    "updatedAt": "2026-11-09T13:47:04Z",
+    "headBranch": "seo/googlebot-noindex-thin-pages",
+    "displayTitle": "seo: 얇은 문서·업체 페이지에 googlebot 전용 noindex (네이버 색인 유지)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42627731522"
    },
    {
-    "databaseId": 42585832043,
+    "databaseId": 42627717967,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T08:25:25Z",
-    "updatedAt": "2026-11-09T08:31:22Z",
-    "headBranch": "feat/member-subscribe-nudge-popup",
-    "displayTitle": "feat(web): 로그인 회원 1회 구독 안내 — 이미 구독 중이면 건너뛰는 상태 확인 (꺼짐 기본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42585832043"
+    "createdAt": "2026-11-09T13:41:43Z",
+    "updatedAt": "2026-11-09T13:47:15Z",
+    "headBranch": "seo/googlebot-noindex-thin-pages",
+    "displayTitle": "seo: 얇은 문서·업체 페이지에 googlebot 전용 noindex (네이버 색인 유지)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42627717967"
+   },
+   {
+    "databaseId": 42623050529,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T13:09:52Z",
+    "updatedAt": "2026-11-09T13:15:55Z",
+    "headBranch": "main",
+    "displayTitle": "glossary(fig): 2026-11-09 새 그림 0 · 다시 그림 0 · 보류 5 — 직선성·분석절차 밸리데이션·설비…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42623050529"
+   },
+   {
+    "databaseId": 42622310062,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-09T13:04:49Z",
+    "updatedAt": "2026-11-09T13:09:56Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Web Deploy",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42622310062"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -345,6 +345,17 @@
   ],
   "grm-newsletter-send.yml": [
    {
+    "databaseId": 42630329807,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T13:59:29Z",
+    "updatedAt": "2026-11-09T14:00:02Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Newsletter Send",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42630329807"
+   },
+   {
     "databaseId": 42618085057,
     "status": "completed",
     "conclusion": "success",
@@ -387,17 +398,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Newsletter Send",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40313383130"
-   },
-   {
-    "databaseId": 40284508276,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_dispatch",
-    "createdAt": "2026-10-26T07:13:47Z",
-    "updatedAt": "2026-10-26T07:15:27Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Newsletter Send",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/40284508276"
    }
   ],
   "grm-findings-translate-apply.yml": [

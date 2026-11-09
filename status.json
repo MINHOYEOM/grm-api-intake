@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T03:02:00Z",
+ "generated_at": "2026-11-09T03:48:36Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -117,6 +117,17 @@
   ],
   "grm-web-publish.yml": [
    {
+    "databaseId": 42558262411,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-09T03:47:03Z",
+    "updatedAt": "2026-11-09T03:48:27Z",
+    "headBranch": "main",
+    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원 (#1368)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558262411"
+   },
+   {
     "databaseId": 42553957175,
     "status": "completed",
     "conclusion": "success",
@@ -159,74 +170,63 @@
     "headBranch": "main",
     "displayTitle": "brief(2026-11-02): 검증실 정정 3건 — Northland WL 위반 2건·MFDS 사전 GMP 지침 게시일·…",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41395061761"
-   },
-   {
-    "databaseId": 41389307185,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-02T04:35:19Z",
-    "updatedAt": "2026-11-02T04:36:38Z",
-    "headBranch": "main",
-    "displayTitle": "brief(2026-11-02): 영문 슬롯 126카드 + tldr_en 보충 (#1277 델타에 en 누락) (#1284)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41389307185"
    }
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42554102225,
+    "databaseId": 42558395935,
+    "status": "queued",
+    "conclusion": "",
+    "event": "push",
+    "createdAt": "2026-11-09T03:48:38Z",
+    "updatedAt": "2026-11-09T03:48:38Z",
+    "headBranch": "claude/issue-1209-analysis-p08pkx",
+    "displayTitle": "Merge origin/claude/issue-1209-analysis-p08pkx (squash-merged #1368 h…",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558395935"
+   },
+   {
+    "databaseId": 42558380449,
     "status": "in_progress",
     "conclusion": "",
     "event": "pull_request",
-    "createdAt": "2026-11-09T03:01:50Z",
-    "updatedAt": "2026-11-09T03:01:54Z",
-    "headBranch": "publish/brief-2026-11-09",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42554102225"
+    "createdAt": "2026-11-09T03:48:26Z",
+    "updatedAt": "2026-11-09T03:48:30Z",
+    "headBranch": "publish/brief-2026-11-02",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558380449"
    },
    {
-    "databaseId": 42554098106,
+    "databaseId": 42558376580,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T03:01:47Z",
-    "updatedAt": "2026-11-09T03:01:50Z",
-    "headBranch": "publish/brief-2026-11-09",
-    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42554098106"
+    "createdAt": "2026-11-09T03:48:23Z",
+    "updatedAt": "2026-11-09T03:48:27Z",
+    "headBranch": "publish/brief-2026-11-02",
+    "displayTitle": "publish(web): 2026-11-02 주간 브리프 (자동 조립)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558376580"
    },
    {
-    "databaseId": 42553946491,
+    "databaseId": 42558262408,
     "status": "in_progress",
     "conclusion": "",
     "event": "push",
-    "createdAt": "2026-11-09T03:00:13Z",
-    "updatedAt": "2026-11-09T03:00:17Z",
+    "createdAt": "2026-11-09T03:47:03Z",
+    "updatedAt": "2026-11-09T03:47:23Z",
     "headBranch": "main",
-    "displayTitle": "fix(i18n): 카드 태그 3종 영문 번역 추가 — 11-09 조립이 '규정' 에서 다시 멈춤 (#1394)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553946491"
+    "displayTitle": "brief(11-02): FDA 483 묶음 카드에서 관찰 회수 7건을 정상 카드로 복원 (#1368)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558262408"
    },
    {
-    "databaseId": 42553245026,
+    "databaseId": 42558137118,
     "status": "completed",
-    "conclusion": "success",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T02:52:00Z",
-    "updatedAt": "2026-11-09T02:57:21Z",
-    "headBranch": "fix/en-type-tag-labels-1109",
-    "displayTitle": "fix(i18n): 카드 태그 3종 영문 번역 — 11-09 조립 복구 2차",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553245026"
-   },
-   {
-    "databaseId": 42553239624,
-    "status": "completed",
-    "conclusion": "success",
+    "conclusion": "cancelled",
     "event": "push",
-    "createdAt": "2026-11-09T02:51:56Z",
-    "updatedAt": "2026-11-09T02:57:34Z",
-    "headBranch": "fix/en-type-tag-labels-1109",
-    "displayTitle": "fix(i18n): 카드 태그 3종 영문 번역 추가 — 11-09 조립이 '규정' 에서 다시 멈춤",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42553239624"
+    "createdAt": "2026-11-09T03:45:38Z",
+    "updatedAt": "2026-11-09T03:47:20Z",
+    "headBranch": "main",
+    "displayTitle": "publish(web): 2026-11-09 주간 브리프 (자동 조립) (#1395)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42558137118"
    }
   ],
   "grm-scaffold-mirror.yml": [

@@ -4993,6 +4993,10 @@ NEWSLETTER_FORM_ACTION_EN = os.environ.get("GRM_NEWSLETTER_FORM_ACTION_EN", "").
 # hidden 으로 함께 보낸다. Brevo 에 연락처 속성과 폼 필드를 만든 **뒤에** 켠다 — 기본 꺼짐이라
 # 이 PR 만 머지해서는 라이브 폼이 바뀌지 않는다(docs/ops_brevo_signup_path_attributes.md).
 SIGNUP_PATH_FIELDS = os.environ.get("GRM_SIGNUP_PATH_FIELDS", "").strip() == "1"
+# [회원 구독 안내 상태 확인 2026-11-09] "1" 이면 로그인 후 1회 안내(#1275)가 뜨기 전에 서버(newsletter-optin
+# 의 status 동작)에 '이미 구독 중·수신거부'인지 묻고, 그렇다면 안내를 띄우지 않는다. 함수 배포 **뒤에**
+# 켠다 — 기본 꺼짐이라 이 PR 만 머지해서는 라이브 변화 0(꺼진 빌드는 페이지 바이트도 동일).
+MEMBER_NUDGE_STATUS = os.environ.get("GRM_MEMBER_NUDGE_STATUS", "").strip() == "1"
 
 # 웹 카드 반응 계층(하트·스크랩·회원, S1) — env-param(공개값). SUPABASE_URL·SUPABASE_ANON_KEY
 # 둘 다 설정돼야 활성(reactions_enabled). 미설정(기본·테스트)이면 반응 블록 전체 미출력 →
@@ -5255,6 +5259,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # fail-safe). 빈 값이면 base.html 의 {% if %} 가 폼 블록 전체를 생략(골든 영향 0).
     env.globals["newsletter_form_action"] = _safe_url(NEWSLETTER_FORM_ACTION)
     env.globals["signup_path_fields"] = SIGNUP_PATH_FIELDS
+    env.globals["member_nudge_status"] = MEMBER_NUDGE_STATUS
     # 용어사전 구역의 "구독하면 용어집 PDF" 제안과 실물 링크(이번 주 소식) — 한국어 리스트의
     # 확인 메일·도착 페이지(/welcome/)와 짝이라 한국어 환경에서만 켠다. 영어 환경은 아래에서 끈다.
     env.globals["sub_offer_glossary_pdf"] = True

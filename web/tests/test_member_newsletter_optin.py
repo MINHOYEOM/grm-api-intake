@@ -162,5 +162,31 @@ class ServerContract(unittest.TestCase):
         self.assertIn("GRM_NEWSLETTER_LIST_ID_EN", WF)
 
 
+class NudgeStatusGate(unittest.TestCase):
+    """안내 전 '이미 구독 중?' 상태 확인 — 꺼짐 기본, 켜도 실패는 기존 동작."""
+
+    def test_gate_off_adds_no_bytes_and_default_env_off(self):
+        # 꺼진 빌드는 속성 자체가 없다(조건부 출력) — 골든 불변의 근거.
+        self.assertIn('{% if member_nudge_status %} data-nudge-status="1"{% endif %}', BASE)
+        RENDER = (ROOT / "web/render.py").read_text(encoding="utf-8")
+        self.assertIn('os.environ.get("GRM_MEMBER_NUDGE_STATUS", "").strip() == "1"', RENDER)
+        WFD = (ROOT / ".github/workflows/grm-web-deploy.yml").read_text(encoding="utf-8")
+        self.assertIn("GRM_MEMBER_NUDGE_STATUS: ${{ vars.GRM_MEMBER_NUDGE_STATUS }}", WFD)
+
+    def test_client_skips_nudge_for_subscribed_and_fails_open(self):
+        fn = JS[JS.index("function maybeNudge"):JS.index("function showNudge")]
+        self.assertIn("if (!NUDGE_STATUS) { showNudge(user); return; }", fn)
+        self.assertIn('"subscribed" || st === "blocked_unsubscribed"', fn)
+        # 네트워크 실패 → 빈 결과 → 안내 띄움(fail-open): 체인 끝의 catch 가 then 바로 앞에 있어야 한다
+        self.assertRegex(fn, r"\.catch\(function \(\) \{ return \{\}; \}\)\s*\.then\(function \(b\)")
+        self.assertNotIn("email", fn.split("JSON.stringify")[1].split("}")[0])  # 본문에 이메일 없음
+
+    def test_server_status_is_read_only(self):
+        blk = FN[FN.index('"status"'):FN.index("const source")]
+        self.assertNotIn('method: "POST"', blk)
+        self.assertNotIn("updateUserById", blk)
+        self.assertIn("emailBlacklisted", blk)
+
+
 if __name__ == "__main__":
     unittest.main()

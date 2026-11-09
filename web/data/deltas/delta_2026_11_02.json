@@ -3547,7 +3547,7 @@
     "제품: PMS-FAMPRIDINE 10 mg Tablet",
     "사유: Contamination(이물 입자 함유 가능)",
     "Class: Type II",
-    "발행일: 2026-10-06"
+    "발행일: 2026-09-28"
    ],
    "implication": "정제 제품에서 이물 입자 혼입 가능성으로 회수가 이뤄진 사례로, 고형제 공정의 이물 관리가 회수 리스크로 직결된다는 신호다. 이물 입자는 일반적으로 설비 마모나 원료 유래와 연관될 수 있어 공정 중 이물 검출 체계를 점검해 둘 필요가 있다.",
    "checks": [
@@ -3564,7 +3564,7 @@
      "Product: PMS-FAMPRIDINE 10 mg Tablet",
      "Reason: Contamination (possible foreign particles)",
      "Class: Type II",
-     "Issue date: 2026-10-06"
+     "Issue date: 2026-09-28"
     ],
     "implication": "A tablet product recalled for possible foreign particles shows that foreign matter control in solid dose processes is tied directly to recall risk. Foreign particles can generally relate to equipment wear or the raw material, so check the in-process foreign matter detection system.",
     "checks": [

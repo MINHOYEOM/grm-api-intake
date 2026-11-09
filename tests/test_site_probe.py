@@ -556,5 +556,24 @@ class RpcRetryTest(unittest.TestCase):
         self.assertEqual(post.call_count, 1)
         self.assertEqual(res.status, "warn")
 
+class SimilarToUncachedIsWarnTest(unittest.TestCase):
+    """[#1365] 캐시 밖 findings_similar_to 지연은 warn 이다(fail 아님) — 다른 RPC 는 그대로 fail."""
+
+    def test_similar_to_500_twice_is_warn_not_fail(self):
+        bad = FakeResponse(500, elapsed_s=3.4)
+        with mock.patch.object(site_probe, "RETRY_SLEEP_S", 0), \
+             mock.patch("site_probe.requests.post", return_value=bad):
+            r = site_probe._downgrade_fail_to_warn(site_probe.check_rpc(
+                "RPC findings_similar_to", SUPABASE, "anon-key", "findings_similar_to",
+                {"p_finding_id": "x", "p_limit": 5}, 5.0), "캐시 밖")
+        self.assertEqual(r.status, "warn")
+        self.assertIn("HTTP 500", r.detail)
+
+    def test_run_probe_wraps_only_similar_to(self):
+        src = open(site_probe.__file__, encoding="utf-8").read()
+        self.assertIn('_downgrade_fail_to_warn(check_rpc(\n        "RPC findings_similar_to"', src)
+        self.assertNotIn('_downgrade_fail_to_warn(check_rpc(\n        "RPC findings_stats"', src)
+
+
 if __name__ == "__main__":
     unittest.main()

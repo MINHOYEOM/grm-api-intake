@@ -219,11 +219,15 @@ class MainDryRunTest(unittest.TestCase):
         cnc.upsert_rows = self._orig_upsert
 
     def test_dry_run_prints_structure_only_and_writes_nothing(self):
+        # 발송일은 오늘 기준 상대값 — 고정 날짜는 WINDOW_DAYS(60일) 창을 벗어나는 날 깨진다(2026-11-09).
+        now = dt.datetime.now(dt.timezone.utc)
+        sent1 = (now - dt.timedelta(days=5)).strftime("%Y-%m-%dT09:00:00Z")
+        sent2 = (now - dt.timedelta(days=9)).strftime("%Y-%m-%dT09:00:00Z")
         fixture = [
             {"id": 1, "name": "GRM Weekly Brief — 2026-09-14 (No.10)",
-             "sentDate": "2026-09-14T09:00:00Z",
+             "sentDate": sent1,
              "statistics": {"globalStats": {"sent": 9999, "delivered": 9990, "clickers": 1234}}},
-            {"id": 2, "name": "GRM Update — figures", "sentDate": "2026-09-10T09:00:00Z",
+            {"id": 2, "name": "GRM Update — figures", "sentDate": sent2,
              "statistics": {"globalStats": {"sent": 500}}},
         ]
         cnc.fetch_campaign_list = lambda *a, **kw: fixture

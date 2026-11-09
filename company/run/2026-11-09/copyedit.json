@@ -1,0 +1,8 @@
+{
+  "status": "보류",
+  "published": false,
+  "code_gate": {"ran": true, "exit": 2, "message": "조립 거부: LLM 슬롯 주입 검증 실패 — 47장의 en 에 모르는 필드 ['hook_line'] (assemble_publish_brief.py 가 en.hook_line 을 허용하지 않음)"},
+  "cards": [],
+  "counts": {"cards": 63, "pass": 0, "reject": 0, "fails_total": 0},
+  "note": "코드 검사 미통과로 의미 점검 생략. Notion 쓰기 없음 — handoff OPEN 유지, 09:30 백업이 발행."
+}

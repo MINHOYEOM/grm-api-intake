@@ -434,7 +434,7 @@ SIMILAR_RPC_NAME = "findings_similar_edges"
 DEFAULT_SIMILAR_OUT = DEFAULT_OUT.parent / "findings_similar.json"
 SIMILAR_PER_DOC = 5          # 문서당 대상 문서 수(업체당 1건)
 SIMILAR_MIN_SCORE = 0.40     # 114 의 저장 하한과 같은 값(수동 대조 적합 약 98%)
-SIMILAR_BATCH = 300          # RPC 한 번에 넘기는 지적 id 수(anon statement_timeout 3초 안)
+SIMILAR_BATCH = 150          # RPC 한 번에 넘기는 지적 id 수 — 11-10 실측 300개 콜드 1.6~2.6s(anon 3초에 근접) → 절반
 
 
 def fetch_similar_edges(base_url: str, anon_key: str, finding_ids: list[str], *,

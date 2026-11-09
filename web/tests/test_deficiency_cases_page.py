@@ -282,6 +282,11 @@ class ViewTest(unittest.TestCase):
         self.assertIsNone(dcp.clause_block(self.snap, "21 CFR 211.19", LABELS, "en"))
         self.assertIsNone(dcp.clause_block(None, "21 CFR 211.192", LABELS, "en"))
 
+    def test_credit_pages_match_collector_index(self):
+        import collect_deficiency_examples as cde
+        self.assertEqual({p["url"] for p in dcp.CREDIT["PMDA"]["pages"]}, set(cde.PMDA_INDEX.values()))
+        self.assertEqual([p["url"] for p in dcp.CREDIT["MHRA"]["pages"]], [cde.MHRA_INDEX])
+
     def test_validate_rejects_broken(self):
         bad = json.loads(json.dumps(self.snap))
         bad["cases"][0]["src"] = "pmda:nope"
@@ -400,6 +405,45 @@ class RenderedPagesTest(unittest.TestCase):
         self.assertIn("EU GMP Annex 11 인용", ko)
         en = self.page("en", "glossary", "audit-trail", "index.html")
         self.assertIn("whose wording uses this term", en)
+
+    def test_source_credit_and_edit_notice_on_every_page(self):
+        """이용 조건 고정 — PMDA PDL1.0: 출처(기관명+원문 페이지 URL)·가공 명시·PMDA 제작 아님 /
+        MHRA OGL v3.0: 출처 표기. ko·en 여섯 장 모두 원문 페이지 링크와 가공 고지가 있어야 한다."""
+        pm = dcp.CREDIT["PMDA"]["pages"]
+        mh = dcp.CREDIT["MHRA"]["pages"][0]["url"]
+        want = {
+            ("ko", "pmda"): ["출처: 독립행정법인 의약품의료기기종합기구(PMDA) 웹사이트",
+                             "공공데이터 이용 약관(PDL1.0)에 따라 이용합니다.",
+                             "GRM 이 원문을 발췌·정리했습니다", "원문과 다를 수 있으니 반드시 원문 파일로 확인하세요.",
+                             "이 화면은 PMDA 가 만들거나 검토한 것이 아닙니다."],
+            ("en", "pmda"): ["Source: Pharmaceuticals and Medical Devices Agency (PMDA) website",
+                             "Used under the Public Data License (PDL1.0).", "GRM excerpted and arranged",
+                             "always check the source file", "This page was not made or reviewed by PMDA."],
+            ("ko", "mhra"): ["출처: 영국 의약품·의료제품규제청(MHRA), GOV.UK",
+                             "Open Government Licence v3.0 에 따라 이용합니다.", "GRM 이 원문을 발췌·정리했습니다",
+                             "이 화면은 MHRA 가 만들거나 검토한 것이 아닙니다."],
+            ("en", "mhra"): ["Source: Medicines and Healthcare products Regulatory Agency (MHRA), GOV.UK",
+                             "Used under the Open Government Licence v3.0.", "GRM excerpted and arranged",
+                             "This page was not made or reviewed by MHRA."],
+            ("ko", "mhra-data"): ["출처: 영국 의약품·의료제품규제청(MHRA), GOV.UK",
+                                  "GRM 이 원자료의 행을 조항·문단별로 세어 표로 정리했습니다.",
+                                  "원문과 다를 수 있으니 반드시 원문 파일로 확인하세요."],
+            ("en", "mhra-data"): ["Source: Medicines and Healthcare products Regulatory Agency (MHRA), GOV.UK",
+                                  "GRM counted the rows of the source data", "always check the source file"],
+        }
+        for (lg, route), phrases in want.items():
+            with self.subTest(lang=lg, route=route):
+                pre = ("en",) if lg == "en" else ()
+                body = self._main(self.page(*pre, "findings", "examples", route, "index.html"))
+                self.assertEqual(body.count('id="source-credit"'), 1)
+                for ph in phrases:
+                    self.assertIn(ph, body)
+                urls = [p["url"] for p in pm] if route == "pmda" else [mh]
+                for u in urls:
+                    self.assertIn(f'href="{u}"', body)
+                    self.assertIn(f"({u})", body, "URL 자체도 글자로 보여야 한다(출처 표기)")
+                lic = dcp.CREDIT["PMDA" if route == "pmda" else "MHRA"]["license_url"]
+                self.assertIn(f'href="{lic}"', body)
 
     def test_absent_snapshot_no_pages_no_links(self):
         self.assertFalse((self.none / "findings" / "examples" / "pmda").exists())

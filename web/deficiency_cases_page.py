@@ -40,7 +40,31 @@ ROUTES = {
     "MHRA_DATA": "findings/examples/mhra-data/",
 }
 
-CAP = 2000             # 페이지 한 행 본문 상한(글자). 넘으면 낱말 경계에서 자르고 원문 파일 링크.
+# 출처·이용 조건 고지(partials/deficiency_cases_credit.html). 원문 목록 페이지는 수집기
+# collect_deficiency_examples.PMDA_INDEX·MHRA_INDEX 와 같은 값이어야 한다(테스트가 대조).
+CREDIT: dict[str, dict[str, Any]] = {
+    "PMDA": {
+        "pages": [
+            {"title": "PMDA GMP (English)", "lang": "en",
+             "url": "https://www.pmda.go.jp/english/review-services/gmp-qms-gctp/0007.html"},
+            {"title": "PMDA GMP (日本語)", "lang": "ja",
+             "url": "https://www.pmda.go.jp/review-services/gmp-qms-gctp/gmp/0011.html"},
+        ],
+        "license": "PDL1.0",
+        "license_url": "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
+    },
+    "MHRA": {
+        "pages": [
+            {"title": "Good manufacturing practice inspection deficiencies", "lang": "en",
+             "url": "https://www.gov.uk/government/statistics/"
+                    "good-manufacturing-practice-inspection-deficiencies"},
+        ],
+        "license": "Open Government Licence v3.0",
+        "license_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    },
+}
+
+CAP = 2000            # 페이지 한 행 본문 상한(글자). 넘으면 낱말 경계에서 자르고 원문 파일 링크.
 BLOCK_CAP = 300        # 조항·용어 블록 인용 상한
 BLOCK_MAX = 3          # 블록 인용 수
 MAX_TERM_MATCHES = 30  # 용어 일치가 이보다 많으면 너무 흔한 낱말 — 블록 없음

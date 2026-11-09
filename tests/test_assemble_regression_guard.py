@@ -194,5 +194,102 @@ class CliTest(unittest.TestCase):
         self.assertIn("`a`", text)
 
 
+class FactsRevertTest(unittest.TestCase):
+    """[2026-11-09 #1398 실측] 재발행이 발행 뒤 정정한 사실 값을 옛 스캐폴드 값으로 되돌린다.
+
+    hc-82891 업체 "Guardian Drug Company Inc." → "Equate"(브랜드명), hc-82684 발행일
+    2026-09-28 → 2026-10-06(정정일). 값 하나라 길이 기준으로는 안 걸렸다."""
+
+    @staticmethod
+    def _hc(cid, firm, date, body="b" * 400):
+        return {"id": cid, "render_order": 0, "body": body,
+                "facts": [{"label": "발행일", "value": date}, {"label": "업체", "value": firm}]}
+
+    def _pair(self):
+        pub = _doc([self._hc("hc-82891", "Guardian Drug Company Inc.", "2026-10-30"),
+                    self._hc("hc-82684", "PHARMASCIENCE INC.", "2026-09-28")])
+        asm = _doc([self._hc("hc-82891", "Equate", "2026-10-30"),
+                    self._hc("hc-82684", "PHARMASCIENCE INC.", "2026-10-06")])
+        return pub, asm
+
+    def test_fact_value_revert_is_blocked(self):
+        pub, asm = self._pair()
+        r = g.compare(pub, asm)
+        self.assertFalse(r["ok"])
+        self.assertEqual({(c["id"], c["label"]) for c in r["facts_changed"]},
+                         {("hc-82891", "업체"), ("hc-82684", "발행일")})
+        self.assertEqual(r["shrunk_cards"], [])              # 길이 기준으로는 안 잡히는 회귀
+
+    def test_carry_restores_published_values(self):
+        pub, asm = self._pair()
+        carried = g.carry_published_facts(pub, asm)
+        self.assertEqual(len(carried), 2)
+        self.assertTrue(g.compare(pub, asm)["ok"])
+        firm = {f["label"]: f["value"] for f in asm["cards"][0]["facts"]}["업체"]
+        self.assertEqual(firm, "Guardian Drug Company Inc.")
+
+    def test_new_cards_and_new_labels_are_not_reverts(self):
+        pub = _doc([self._hc("a", "X", "2026-01-01")])
+        asm = _doc([self._hc("a", "X", "2026-01-01"), self._hc("b", "Y", "2026-01-02")])
+        asm["cards"][0]["facts"].append({"label": "Class", "value": "Type II"})
+        self.assertTrue(g.compare(pub, asm)["ok"])
+
+    def test_bundle_cards_are_skipped(self):
+        pub_card = self._hc("fda483-1", "Rep A", "2026-01-01")
+        pub_card["merged_items"] = ["A · 실사 1", "B · 실사 2"]
+        asm_card = self._hc("fda483-1", "Rep B", "2026-01-01")
+        asm_card["merged_items"] = ["B · 실사 2"]
+        self.assertEqual(g.facts_changes(_doc([pub_card]), _doc([asm_card])), [])
+
+    def test_cli_carry_rewrites_assembled_and_passes(self):
+        pub, asm = self._pair()
+        paths = []
+        for doc in (pub, asm):
+            fh = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+            json.dump(doc, fh, ensure_ascii=False)
+            fh.close()
+            self.addCleanup(os.unlink, fh.name)
+            paths.append(fh.name)
+        self.assertEqual(g.main(["--published", paths[0], "--assembled", paths[1]]), 1)
+        self.assertEqual(g.main(["--published", paths[0], "--assembled", paths[1],
+                                 "--carry-published-facts"]), 0)
+        written = json.load(open(paths[1], encoding="utf-8"))
+        dates = {c["id"]: {f["label"]: f["value"] for f in c["facts"]}["발행일"] for c in written["cards"]}
+        self.assertEqual(dates["hc-82684"], "2026-09-28")
+
+
+class CarryOnlyCliTest(unittest.TestCase):
+    def test_carry_only_rewrites_and_always_returns_0(self):
+        pub = _doc([FactsRevertTest._hc("a", "Right Inc.", "2026-01-01", body="x" * 1000)])
+        asm = _doc([FactsRevertTest._hc("a", "Wrong", "2026-01-01", body="x")])   # 축소 회귀도 있음
+        paths = []
+        for doc in (pub, asm):
+            fh = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+            json.dump(doc, fh, ensure_ascii=False)
+            fh.close()
+            self.addCleanup(os.unlink, fh.name)
+            paths.append(fh.name)
+        self.assertEqual(g.main(["--published", paths[0], "--assembled", paths[1], "--carry-only"]), 0)
+        written = json.load(open(paths[1], encoding="utf-8"))
+        self.assertEqual({f["label"]: f["value"] for f in written["cards"][0]["facts"]}["업체"],
+                         "Right Inc.")
+        # 판정은 뒤 스텝 몫 — 축소 회귀는 여전히 잡힌다.
+        self.assertEqual(g.main(["--published", paths[0], "--assembled", paths[1]]), 1)
+
+
+class PublishWorkflowWiringTest(unittest.TestCase):
+    """발행 사실 유지는 골든 재동결 **전에**, 회귀 가드는 그 뒤에 돈다."""
+
+    def test_carry_step_precedes_golden_and_guard(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        wf = open(os.path.join(root, ".github", "workflows", "grm-web-publish.yml"),
+                  encoding="utf-8").read()
+        carry = wf.index("--carry-only")
+        golden = wf.index("python web/tests/test_render.py --freeze")
+        guard = wf.index("발행 회귀 가드 — 이미 발행된 내용을 되돌리지 않는지 확인")
+        self.assertLess(carry, golden)
+        self.assertLess(golden, guard)
+
+
 if __name__ == "__main__":
     unittest.main()

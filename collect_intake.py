@@ -3567,6 +3567,11 @@ def heal_supabase_copies(supabase_url: str, service_key: str, items: list[Intake
         if item.source == SOURCE_WHO and _bare(item.raw_payload):
             summary["skipped_bare"] += 1
             continue
+        # 게시일이 없는 항목(ICH 토픽 스냅샷 — 날짜를 단언하지 않는다)은 raw_signals.published_date
+        # required 로 매번 거부된다 → 시도하지 않는다(매일 WARN 31건 소음). 날짜를 지어 넣지도 않는다.
+        if not str(getattr(item, "date_iso", "") or "").strip():
+            summary["skipped_undated"] = summary.get("skipped_undated", 0) + 1
+            continue
         record = raw_signal_from_intake_item(item, collected_at=collected_at)
         rid = str(record.get("raw_signal_id") or "")
         if rid:
@@ -3604,7 +3609,8 @@ def heal_supabase_copies(supabase_url: str, service_key: str, items: list[Intake
                         f"status={result.status} errors={list(result.errors)[:2]}")
     log("INFO", f"Supabase 사본 보충: 후보 {summary['candidates']} · 이미 있음 {summary['present']} · "
                 f"없음 {summary['missing']} · 채움 {summary['healed']} · 실패 {summary['failed']} · "
-                f"다음 실행으로 미룸 {summary['deferred']} · WHO 보강 전 건너뜀 {summary['skipped_bare']}")
+                f"다음 실행으로 미룸 {summary['deferred']} · WHO 보강 전 건너뜀 {summary['skipped_bare']} · "
+                f"게시일 없음 건너뜀 {summary.get('skipped_undated', 0)}")
     return summary
 
 

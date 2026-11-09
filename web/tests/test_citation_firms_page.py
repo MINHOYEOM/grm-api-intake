@@ -123,7 +123,7 @@ class RenderedPageTest(unittest.TestCase):
     def test_en_no_korean_and_labels(self):
         body = self._main(self.en)
         self.assertIsNone(HANGUL.search(body))
-        self.assertIn("As of 2026-11-08 · 3 facilities · 3 countries", body)
+        self.assertIn("As of 2026-11-08 · Facilities: 3 · Countries: 3", body)
         self.assertIn('<option value="US">United States (1)</option>', body)
 
     def test_links_point_only_to_existing_routes(self):

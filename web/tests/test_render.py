@@ -19613,6 +19613,9 @@ class WebEnTreeTest(unittest.TestCase):
         # [지적 사례 2026-11-09] 정본(deficiency_examples.json)이 있을 때만 영어 면이 선다.
         if render.example_page.load_examples():
             cls.expected.add(render.example_page.ROUTE)
+        # [최근 규제 소식 2026-11-10] 정본(news.json)이 있을 때만 영어 면이 선다.
+        if render.news_page.load_news():
+            cls.expected.add(render.news_page.ROUTE)
         # [FDA 지적 조항 화면] 집계본이 있으면 영어 면이 선다(렌더와 같은 로더).
         if render.clause_citations.load_snapshot():
             cls.expected.add("findings/citations/")

@@ -1773,7 +1773,10 @@ _REGULATOR_LABEL = {
     SOURCE_ECA: "ECA", SOURCE_MFDS: "MFDS", SOURCE_ICH: "ICH",
     SOURCE_WHO: "WHO", SOURCE_HC: "Health Canada", SOURCE_FDA_483: "FDA",
     SOURCE_ISPE: "ISPE",   # [전문지 브리핑 소스확장 2026-07-13]
-    SOURCE_EU_GMP_NCR: "EMA",   # EudraGMDP(EMA 운영 DB) — 발행 NCA 는 W2 발행기관 행에
+    # [실사 결과 카드 2026-11-08] "EMA" → "EU". 비준수 판정서는 EMA 가 아니라 회원국 당국(NCA)이
+    # 낸다 — EudraGMDP 는 EMA 가 운영하는 등재 DB 일 뿐이다(대표 지적). 실제 판정 당국(예: Malta)은
+    # W2 발행기관 행과 앞면 블록(`inspection.authority`)이 싣고, 여기 값은 필터·집계 키다.
+    SOURCE_EU_GMP_NCR: "EU",
     SOURCE_MHRA_GMP_NCR: "MHRA",   # MHRA GMDP 등록부 — 발행기관은 항상 MHRA(영국)
 }
 

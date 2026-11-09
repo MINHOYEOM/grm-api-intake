@@ -34,9 +34,13 @@
     {%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
+{#- [실사 결과 카드 2026-11-08] 지적 목록 한 줄 — 번호 · 등급 · (분야) 한 줄 · 조항 · 보조 줄. -#}
+{%- macro insp_row(r) -%}
+<li style="display:flex;gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line)"><span class="mono" style="flex:none;min-width:2.4em;font-size:12px;color:var(--muted)">{{ r.no }}</span>{% if r.sev %}<span class="dt-badge" style="flex:none{% if r.sev_cls != 'critical' %};color:var(--body-s);background:var(--strong){% endif %}">{{ r.sev }}</span>{% endif %}<span style="flex:1;min-width:0;font-size:14.5px;line-height:1.5;color:var(--ink)">{% if r.area %}<span class="dt-law">{{ r.area }}</span> · {% endif %}{{ r.text }}{% if r.clause %} <span class="dt-law">{{ r.clause }}</span>{% endif %}{% if r.more %}<span style="display:block;font-size:13px;color:var(--muted)">{{ r.more }}</span>{% endif %}{% if r.note %}<span style="display:block;font-size:12.5px;color:var(--muted)">→ {{ r.note }}</span>{% endif %}</span></li>
+{%- endmacro -%}
 <article class="card{% if card.is_evA %} evA{% endif %}" id="{{ card.anchor }}" data-card-type="{{ card.card_type }}" data-signal-tier="{{ card.signal_tier }}" data-evidence="{{ card.evidence_level }}"{% if card.firm_key %} data-firm-key="{{ card.firm_key }}"{% endif %}>
-  <div class="c-title"><span class="pre">[{{ card.card_type }} · {{ card.agency }}]</span>{{ card.headline_target }}{% if card.title_issue %} — <b>{{ card.title_issue }}</b>{% endif %}</div>
-  <div class="badges">{% if not card.tidy_meta %}<span class="b code {% if card.is_evA %}ev{% else %}evB{% endif %}">Evidence {{ card.evidence_level }}</span>{% endif %}<span class="b ag">{{ card.agency }}</span>{% if not card.tidy_meta %}<span class="b sig code"><span class="d" style="background:{{ card.sig_color }}"></span>Signal {{ card.signal_label }} · T{{ card.signal_tier }}</span>{% endif %}{% if card.modality %}<span class="b mod">{{ card.modality }}</span>{% endif %}{% if card.type_tag %}<span class="b typ">{{ card.type_tag }}</span>{% endif %}</div>
+  <div class="c-title"><span class="pre">[{{ card.card_type }} · {{ card.agency_label }}]</span>{{ card.headline_target }}{% if card.title_issue %} — <b>{{ card.title_issue }}</b>{% endif %}</div>
+  <div class="badges">{% if not card.tidy_meta %}<span class="b code {% if card.is_evA %}ev{% else %}evB{% endif %}">Evidence {{ card.evidence_level }}</span>{% endif %}<span class="b ag">{{ card.agency_label }}</span>{% if not card.tidy_meta %}<span class="b sig code"><span class="d" style="background:{{ card.sig_color }}"></span>Signal {{ card.signal_label }} · T{{ card.signal_tier }}</span>{% endif %}{% if card.modality %}<span class="b mod">{{ card.modality }}</span>{% endif %}{% if card.type_tag %}<span class="b typ">{{ card.type_tag }}</span>{% endif %}</div>
   {%- if card.hook_line %}
   {#- [카드 훅1 2026-11-03] 핵심 한 줄 헤드라인 — 검증 통과분만(render._valid_hook_line). grm.css 프리즈 — 인라인. -#}
   <p class="hook-line" style="margin:16px 0 0;padding:11px 14px;border-radius:var(--rad-s);background:var(--coral-tint);color:var(--ink);font-size:16.5px;font-weight:600;line-height:1.45;display:flex;gap:9px;align-items:baseline"><i class="ti ti-bolt" aria-hidden="true" style="color:var(--coral-2);flex:none"></i><span>{{ card.hook_line }}</span></p>
@@ -75,6 +79,29 @@
       <li>{{ item }}</li>
       {%- endfor %}
     </ul></details>
+  {%- endif %}
+  {%- if card.inspection %}
+  {#- [실사 결과 카드 2026-11-08] 앞면 블록 — 등급 칩 · 지적 목록(앞 5줄 + 펼치기) · 당국 조치.
+      값은 전부 render._inspection_view 가 표시 언어로 골라 넘긴다(템플릿은 언어를 고르지 않는다).
+      블록이 없는 카드(이미 발행된 호)는 이 분기를 타지 않아 바이트 불변. grm.css 프리즈 — 인라인. -#}
+  {%- set ins = card.inspection %}
+  <div class="block insp">
+    {%- if ins.chips or ins.statements %}
+    <div class="dt-sev" style="margin-top:0">{% for c in ins.chips %}<span class="dt-chip"{% if c.cls == 'critical' %} style="color:var(--coral-2);background:var(--coral-tint)"{% endif %}>{{ c.text }}</span>{% endfor %}{% if ins.statements %}<span class="dt-chip">{{ ins.statements }}</span>{% endif %}</div>
+    {%- endif %}
+    {%- if ins.items_head %}
+    <div class="lab" style="margin-top:12px"><i class="ti ti-list-numbers"></i>{{ _("지적사항") }}</div>
+    <ol class="insp-list" style="list-style:none;margin:4px 0 0;padding:0">{% for r in ins.items_head %}{{ insp_row(r) }}{% endfor %}</ol>
+    {%- if ins.items_rest %}
+    <details class="insp-more"><summary class="lab" style="cursor:pointer;margin-top:6px">{{ _("나머지 {n}건 보기", n=ins.items_rest | length) }}</summary>
+    <ol class="insp-list" style="list-style:none;margin:4px 0 0;padding:0">{% for r in ins.items_rest %}{{ insp_row(r) }}{% endfor %}</ol></details>
+    {%- endif %}
+    {%- endif %}
+    {%- if ins.actions %}
+    <div class="lab" style="margin-top:12px"><i class="ti ti-gavel"></i>{{ _("당국 조치") }}</div>
+    <div class="dt-sev" style="margin-top:6px">{% for a in ins.actions %}<span class="dt-chip" style="color:var(--ink);border:1px solid var(--line)">{{ a }}</span>{% endfor %}</div>
+    {%- endif %}
+  </div>
   {%- endif %}
   {%- if card.quotes %}
   <div class="block"><div class="lab"><i class="ti ti-quote"></i>{{ card.quote_label }}{% if card.merged %} <span class="sub">· {{ _("대표 1건 기준") }}</span>{% endif %}</div>

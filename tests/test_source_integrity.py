@@ -266,6 +266,43 @@ class VerifyPublishedSourcesTest(unittest.TestCase):
         self.assertIn("fda483-193695", out)
         self.assertIn("의도대로 제외", out)
 
+    # ── 조립기 범위 판정 재적용(이슈 #1214 오탐 4건) ───────────────────────────────
+    _DEVICE_TEXT = "Design controls were not established per 820.30 for the medical device."
+    _DRUG_TEXT = "Aseptic processing: media fill failures for the drug product were not investigated."
+
+    def test_oos_483_with_ok_scope_is_scope_excluded(self):
+        # DB scope 는 전부 ok 인데 조립기가 기기·생식 시설로 뺀 483 → 발행 격차 아님.
+        row = {"shown": 0, "found": 3, "db_total": 3, "db_ok": 3, "oos_483": True}
+        self.assertEqual(vps.classify(row), "scope-excluded")
+
+    def test_in_scope_483_with_ok_scope_stays_publish_gap(self):
+        # 과도 제외 방지: 범위 안 의약품 483 은 그대로 발행 격차로 남는다.
+        row = {"shown": 0, "found": 3, "db_total": 3, "db_ok": 3, "oos_483": False}
+        self.assertEqual(vps.classify(row), "publish-gap")
+        self.assertEqual(vps.classify({"shown": 0, "found": 3, "db_total": 3, "db_ok": 3}),
+                         "publish-gap")
+
+    def test_oos_flag_does_not_hide_extraction_gap(self):
+        row = {"shown": 0, "found": 3, "db_total": 0, "db_ok": 0, "oos_483": True}
+        self.assertEqual(vps.classify(row), "extraction-gap")
+
+    def test_scope_judgement_matches_assembler(self):
+        # 시설 유형(생식)·본문(기기)은 범위 밖, 의약품 본문·유형 불명+빈 본문은 판정 불가=안 숨김.
+        self.assertTrue(vps._is_out_of_scope_483("Reproductive Tissue Bank", ""))
+        self.assertTrue(vps._is_out_of_scope_483("Manufacturer", self._DEVICE_TEXT))
+        self.assertFalse(vps._is_out_of_scope_483("Manufacturer", self._DRUG_TEXT))
+        self.assertFalse(vps._is_out_of_scope_483("Drug Manufacturer", self._DEVICE_TEXT))
+        self.assertFalse(vps._is_out_of_scope_483("", ""))
+
+    def test_oos_excluded_row_reported_with_reason(self):
+        rows = [{"date": "d", "id": "fda483-195246", "shown": 0, "found": 3,
+                 "status": "pdf-ok", "db_total": 3, "db_ok": 3, "oos_483": True,
+                 "verdict": "scope-excluded"}]
+        out = vps.format_report([], rows)
+        self.assertIn("불일치 0", out)
+        self.assertIn("is_out_of_scope_483", out)
+        self.assertIn("fda483-195246", out)
+
     def test_report_groups_by_verdict(self):
         rows = [
             {"date": "d", "id": "a", "shown": 0, "found": 2, "status": "s",

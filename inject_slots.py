@@ -10,7 +10,8 @@
   - **코드 verbatim 필드 불가침**: `facts`·`quotes[].original`·`sources`·`headline_target`·
     배지(agency·card_type·category·modality·evidence_*·signal_*·type_tag)·render_order/
     group/group_label·id·merged_* 는 절대 변경 안 함. 주입은 LLM 슬롯에만:
-    title_issue·summary·key_facts·implication·checks·비KO quotes[].translation + brief.tldr.
+    title_issue·summary·key_facts·implication·checks·비KO quotes[].translation + brief.tldr
+    (+ 선택 hook_line·en.hook_line).
   - **평문 가드**: 주입 값에 표현 틀 마크업(`{{`·`<callout`·`<table`·`###`·`> `·선행 `- `·`**`)
     이 있으면 거부(LLM 마크업 유출 방어 — 값은 평문이어야 렌더 안전).
   - **positional 번역**: `quotes_translation[j]` ↔ `card.quotes[j]`. 비KO("") 자리만 채우고
@@ -24,6 +25,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from typing import Any
@@ -33,6 +35,12 @@ from typing import Any
 # 주입 대상 슬롯(코드 필드 아님) — 이 키만 델타에서 카드로 옮긴다.
 _STR_SLOTS = ("title_issue", "summary", "implication")
 _LIST_SLOTS = ("key_facts", "checks")
+# [11-09] 선택 슬롯 `hook_line` — 카드 제목 아래 핵심 한 줄(STYLE.md §12). 없어도 통과한다.
+# 한국어는 카드 최상위 `hook_line`, 영문은 `en.hook_line`. 길이 상한은 web/render.py 의
+# HOOK_LINE_MAX_CHARS 와 같은 값(tests 가 일치를 확인). 금칙어·숫자 근거 대조는 렌더가
+# 박스를 숨기는 방식으로 판정하므로 여기서는 형식(문자열·평문·길이)만 막는다.
+_OPTIONAL_STR_SLOTS = ("hook_line",)
+_HOOK_LINE_MAX = {"ko": 40, "en": 90}
 
 # 평문 가드(§3·불변식 #6) — 슬롯 값에 들어가면 안 되는 표현 틀 마크업 부분문자열.
 # `> `(인용)·`- `(불릿)은 선행/줄머리 형태만 마크업으로 본다(문장 중간의 하이픈/부등호 허용).
@@ -124,6 +132,8 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
         for key in _STR_SLOTS:
             if key in d:
                 _check_str_slot(report, cid, key, d[key])
+        if "hook_line" in d:
+            _check_hook_line(report, cid, d["hook_line"], "ko")
         if "title_issue" in d and isinstance(d["title_issue"], str):
             if len(d["title_issue"]) > _MAX_TITLE_ISSUE:
                 report.errors.append(
@@ -183,7 +193,26 @@ def validate_injection(brief: dict[str, Any], delta: dict[str, Any]) -> Injectio
     return report
 
 
-_EN_FIELDS = ("title_issue", "summary", "implication", "key_facts", "checks")
+# 영문 갈래의 필수 다섯(전부 채우거나 전부 비운다) — web/render.py CARD_NARRATIVE_FIELDS 와 같다.
+_EN_REQUIRED = ("title_issue", "summary", "implication", "key_facts", "checks")
+# `en` 이 받는 모든 필드 = 필수 다섯 + 선택 `hook_line`. 여기 없는 키는 "모르는 필드" 로 거부된다.
+_EN_FIELDS = _EN_REQUIRED + ("hook_line",)
+
+
+def _check_hook_line(report: InjectionReport, cid: str, value: Any, lang: str) -> None:
+    """선택 필드 hook_line 형식 검사 — 문자열·평문·길이. 빈 문자열은 '없음' 으로 통과."""
+    label = f"{cid}.hook_line" if lang == "ko" else f"{cid}.en.hook_line"
+    if not isinstance(value, str):
+        report.errors.append(f"{label}: 문자열이어야 함 (got {type(value).__name__})")
+        return
+    text = " ".join(value.split())
+    if not text:
+        return
+    tok = _markup_violation(value)
+    if tok is not None:
+        report.errors.append(f"{label}: 마크업 토큰 {tok!r} — 평문만 허용")
+    if len(text) > _HOOK_LINE_MAX[lang]:
+        report.errors.append(f"{label}: {len(text)}자 — ≤{_HOOK_LINE_MAX[lang]} 초과")
 
 
 def _validate_en_block(report: InjectionReport, cid: str, en: Any) -> None:
@@ -199,8 +228,10 @@ def _validate_en_block(report: InjectionReport, cid: str, en: Any) -> None:
     unknown = sorted(set(en) - set(_EN_FIELDS))
     if unknown:
         report.errors.append(f"{cid}.en: 모르는 필드 {unknown}")
+    if "hook_line" in en:
+        _check_hook_line(report, cid, en["hook_line"], "en")
     filled = []
-    for key in _EN_FIELDS:
+    for key in _EN_REQUIRED:
         value = en.get(key)
         if isinstance(value, list):
             ok = bool([v for v in value if isinstance(v, str) and v.strip()])
@@ -208,8 +239,8 @@ def _validate_en_block(report: InjectionReport, cid: str, en: Any) -> None:
             ok = isinstance(value, str) and bool(value.strip())
         if ok:
             filled.append(key)
-    if filled and len(filled) != len(_EN_FIELDS):
-        missing = [k for k in _EN_FIELDS if k not in filled]
+    if filled and len(filled) != len(_EN_REQUIRED):
+        missing = [k for k in _EN_REQUIRED if k not in filled]
         report.errors.append(
             f"{cid}.en: 부분 제공 — 빠진 슬롯 {missing}. 다섯을 전부 채우거나 en 을 생략하라")
         return
@@ -293,6 +324,9 @@ def inject_llm_slots(brief: dict[str, Any], delta: dict[str, Any], *,
         for key in _LIST_SLOTS:
             if key in d and isinstance(d[key], list):
                 card[key] = list(d[key])
+        hook = d.get("hook_line")
+        if isinstance(hook, str) and hook.strip():
+            card["hook_line"] = " ".join(hook.split())
         _inject_quotes(card, d.get("quotes_translation"))
         # [다국어 5단계] 영문 갈래 — **다섯이 전부 있을 때만** 싣는다(validate 가 부분
         # 제공을 이미 막지만, 주입도 같은 판정을 해야 검증을 건너뛴 경로에서도 안전하다).
@@ -302,10 +336,13 @@ def inject_llm_slots(brief: dict[str, Any], delta: dict[str, Any], *,
                 bool([v for v in en.get(k) or [] if str(v).strip()])
                 if isinstance(en.get(k), list)
                 else bool(str(en.get(k) or "").strip())
-                for k in _EN_FIELDS)
+                for k in _EN_REQUIRED)
             if complete:
                 card["en"] = {k: (list(en[k]) if isinstance(en[k], list) else en[k])
-                              for k in _EN_FIELDS}
+                              for k in _EN_REQUIRED}
+                en_hook = en.get("hook_line")
+                if isinstance(en_hook, str) and en_hook.strip():
+                    card["en"]["hook_line"] = " ".join(en_hook.split())
 
     if "tldr" in delta and isinstance(delta["tldr"], list):
         out.setdefault("brief", {})["tldr"] = list(delta["tldr"])
@@ -532,6 +569,56 @@ def _merge_ncr_translations(card: dict[str, Any], ncr_ko: Any,
     if merged:
         report.warnings.append(
             f"ncr_ko[{doc_id!r}]: NCR 상세 국문 번역 {merged}필드 병합(원문+국문 병기)")
+    _merge_ncr_findings(dd, ncr_ko.get("findings_ko"), report, doc_id)
+
+
+# [실사 결과 카드 2026-11-08] Routine 이 산문형 판정서를 항목으로 나눈 한 줄 요약.
+_FINDING_SEVS = ("critical", "major", "other")
+_FINDING_KO_MAX = 90
+
+
+def _merge_ncr_findings(dd: dict[str, Any], findings: Any,
+                        report: InjectionReport, doc_id: str) -> None:
+    """`ncr_ko.findings_ko` = [{"sev": critical|major|other, "ko": 한 줄, "span": 원문 구절}].
+
+    받아들이는 조건(하나라도 어기면 **목록 전체**를 버린다 — 일부만 남기면 지적이 빠진 목록이
+    완전한 목록처럼 보인다):
+      · sev 가 세 값 중 하나, ko 가 비지 않고 90자 이하, 한글이 들어 있다.
+      · span(영문 원문 구절, 12자 이상)이 그 카드 `nature` 원문에 **글자 그대로** 있다
+        (공백만 접어서 비교) — 원문에 없는 지적을 지어낼 수 없게 하는 근거 대조.
+    등급별 개수가 원문 개수와 맞는지는 조립 단계(`inspection_card`)가 한 번 더 본다.
+    비차단 — 실패하면 카드는 개수·조치 칩과 접힌 원문으로 발행된다.
+    """
+    if findings is None:
+        return
+    nature = " ".join(str(dd.get("nature") or "").split())
+    ok: list[dict[str, str]] = []
+    reason = ""
+    if not isinstance(findings, list) or not findings:
+        reason = "목록이 아님"
+    else:
+        for i, f in enumerate(findings):
+            if not isinstance(f, dict):
+                reason = f"{i}번 항목이 객체가 아님"
+                break
+            sev = str(f.get("sev") or "").strip().lower()
+            ko = " ".join(str(f.get("ko") or "").split())
+            span = " ".join(str(f.get("span") or "").split())
+            if sev not in _FINDING_SEVS:
+                reason = f"{i}번 sev {sev!r}"
+                break
+            if not ko or len(ko) > _FINDING_KO_MAX or not re.search(r"[가-힣]", ko):
+                reason = f"{i}번 ko 길이·언어"
+                break
+            if len(span) < 12 or span not in nature:
+                reason = f"{i}번 span 이 원문에 없음"
+                break
+            ok.append({"sev": sev, "ko": ko, "span": span})
+    if reason:
+        report.warnings.append(f"ncr_ko[{doc_id!r}]: findings_ko 버림 — {reason}")
+        return
+    dd["findings_ko"] = ok
+    report.warnings.append(f"ncr_ko[{doc_id!r}]: 지적 한 줄 {len(ok)}건 병합")
 
 
 def _merge_whopir_translations(dd: dict[str, Any], ko: dict[str, Any],

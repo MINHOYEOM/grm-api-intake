@@ -137,7 +137,9 @@ FDA483_OCR_PAGE_BUDGET = _env_int("FDA483_OCR_PAGE_BUDGET", 200)
 FDA483_BURST_PDF_MAX_ITEMS = _env_int("FDA483_BURST_PDF_MAX_ITEMS", 0)
 FDA483_BURST_OCR_PAGE_BUDGET = _env_int("FDA483_BURST_OCR_PAGE_BUDGET", 0)
 FDA483_BURST_DEADLINE_EPOCH = _env_int("FDA483_BURST_DEADLINE_EPOCH", 0)
-FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200
+# [2026-11-10] 1200 → 8000. 1200 에서 저장 상세 2,034건(19%)이 문장 중간에 잘렸다. 상한을 넘으면
+# 마지막 문장 끝에서 자른다(`_cap_detail`) — 문장 중간 절단은 더 이상 만들지 않는다.
+FDA483_OBSERVATION_DETAIL_MAX_CHARS = 8000
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
 FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
 
@@ -1934,6 +1936,187 @@ def _extract_483_inspectors(text: str) -> list[str]:
         return []
 
 
+# ── [483 상세 쪽 넘김 이어붙이기 2026-11-10] ──────────────────────────────────────────
+# 관찰 하나가 여러 쪽에 걸치면 종전 `_clean_observation_chunk` 는 **첫 쪽 바닥의 서명란에서**
+# 잘랐다 — 다음 쪽에 이어지는 본문이 통째로 사라졌다(실측 11-10: 저장된 상세 10,585건 중
+# 문장이 온전히 끝나는 것은 48%뿐, fda483-195241 obs#4 는 "For example," 뒤가 없다).
+# 서명란 이름은 마커보다 **앞** 줄에 찍히는 일이 많아(`Pratik S. Upadhyay, DDC Investigator`
+# → 그 뒤에 SEE REVERSE) 이름까지 상세 꼬리에 남았다.
+#
+# 수리: 쪽 바닥(서명란·양식 줄·`Page N of M`)부터 다음 쪽 머리말(… `TYPE ESTABLISHMENT
+# INSPECTED` + 주소·시설 유형 값 줄)까지를 걷어내고 본문을 이어 붙인다.
+# ★표제(deficiency)는 종전 경로 그대로 만든다 — 이 수리는 **상세만** 늘린다. 이어 붙인 상세가
+#   종전 상세로 시작하지 않으면(경계 판정이 어긋난 것) 종전 상세를 그대로 쓴다(회귀 0 방향).
+# ★쪽 경계를 확신할 수 없으면(서명란 마커가 없거나 다음 쪽 본문 재개 줄을 못 찾으면) 그 자리에서
+#   종전처럼 자른다 — 지어내지 않는다.
+_PAGE_END_RE = re.compile(r"\bPage\s*\d{1,3}\s*of\s*\d{1,3}(?:\s*Pages?)?\b", re.I)
+_PAGE_FOOTER_WINDOW = 900        # 쪽 번호 앞 이 범위 안에서 서명란 시작을 찾는다
+_PAGE_HEADER_WINDOW = 2400       # 쪽 번호 뒤 이 범위 안에서 머리말 끝을 찾는다
+_PAGE_HEADER_END_RE = re.compile(r"TYPE\s+(?:OF\s+)?ESTABLISHMENT\s+INSPECTED", re.I)
+# 서명란 이름줄 — `<이름>, [약칭] <직함>`. 약칭(DDC·ORA 등 대문자 2~5자)이 끼면 종전 푸터
+# 정규식(`,\s*Investigator`)이 못 잡았다. 직함 뒤에 사람 이름이 오면 산문(`…, Investigator
+# Smith noted`)이므로 제외한다(종전 푸터 정규식과 같은 조건).
+_SIGNER_TITLE_RE = re.compile(
+    r",[ \t]*(?:[A-Z]{2,5}[ \t]+)?(?:" + "|".join(re.escape(t) for t in _INSPECTOR_TITLES)
+    + r")\b(?![ \t]+[A-Z][a-z])")
+_SIGNER_NAME_BEFORE_RE = re.compile(r"(?:[A-Z][A-Za-z'.\-]*[ \t]+){0,3}[A-Z][A-Za-z'.\-]*[ \t]*$")
+_CITY_ZIP_LINE_RE = re.compile(r",.*\b\d{5}(?:-\d{4})?\b|,\s*(?:India|China|USA|United States)\b")
+
+
+def _signer_cut(text: str, start: int = 0, end: int | None = None) -> int | None:
+    """[start, end) 안 첫 서명란 이름줄의 시작 위치(이름 토큰까지 포함). 없으면 None."""
+    m = _SIGNER_TITLE_RE.search(text, start, len(text) if end is None else end)
+    if not m:
+        return None
+    line_start = text.rfind("\n", 0, m.start()) + 1
+    nm = _SIGNER_NAME_BEFORE_RE.search(text, max(line_start, start), m.start())
+    return nm.start() if nm else m.start()
+
+
+def _footer_start(text: str, lo: int, hi: int) -> int | None:
+    """쪽 번호(hi) 앞 서명란 블록의 시작. 마커가 하나도 없으면 None(쪽 경계로 보지 않는다)."""
+    cands: list[int] = []
+    m = _FDA483_FOOTER_RE.search(text, lo, hi)
+    if m:
+        cands.append(m.start())
+    s = _signer_cut(text, lo, hi)
+    if s is not None:
+        cands.append(s)
+    return min(cands) if cands else None
+
+
+def _is_resume_line(line: str, est_hint: str) -> bool:
+    """다음 쪽 머리말 뒤 본문이 다시 시작하는 줄인가(머리말 값 줄·표 조각이 아닌가)."""
+    s = line.strip()
+    if re.match(r"(?:Specifically|For example|In addition|Additionally)\b", s):
+        return True                          # 관찰 본문의 전형적 첫 낱말 — 짧아도 재개다
+    if len(s) < 25:
+        return False
+    letters = [c for c in s if c.isalpha()]
+    if not letters or sum(c.islower() for c in letters) < 0.5 * len(letters):
+        return False
+    if gf._FDA483_LABEL_RE.search(s) or _CITY_ZIP_LINE_RE.search(s):
+        return False
+    if est_hint and re.sub(r"\s+", "", est_hint).lower() in re.sub(r"\s+", "", s).lower():
+        return False
+    return True
+
+
+def _join_483_pages(seg: str, est_hint: str = "") -> str:
+    """관찰 구간에서 쪽 경계 블록(서명란~다음 쪽 머리말)을 걷어내고 본문을 잇는다(순수 함수).
+
+    경계를 확신할 수 없으면 그 쪽 서명란에서 잘라 끝낸다(= 종전 동작)."""
+    out: list[str] = []
+    cursor = 0
+    pos = 0
+    while True:
+        pe = _PAGE_END_RE.search(seg, pos)
+        if not pe:
+            out.append(seg[cursor:])
+            break
+        fs = _footer_start(seg, max(cursor, pe.start() - _PAGE_FOOTER_WINDOW), pe.start())
+        if fs is None:                       # 산문 속 "page 2 of 5" — 쪽 경계 아님
+            pos = pe.end()
+            continue
+        out.append(seg[cursor:fs])
+        hdr = _PAGE_HEADER_END_RE.search(seg, pe.end(), pe.end() + _PAGE_HEADER_WINDOW)
+        if not hdr:
+            return "".join(out)              # 머리말 끝 미확정 — 여기서 자른다
+        off = hdr.end()
+        nl = seg.find("\n", off)
+        resume = None
+        while nl != -1 and nl < hdr.end() + _PAGE_HEADER_WINDOW:
+            nxt = seg.find("\n", nl + 1)
+            line = seg[nl + 1: nxt if nxt != -1 else len(seg)]
+            if _is_resume_line(line, est_hint):
+                resume = nl + 1
+                break
+            nl = nxt
+        if resume is None:
+            return "".join(out)              # 이 관찰은 이 쪽에서 끝났다(뒤는 머리말뿐)
+        out.append("\n")
+        cursor = pos = resume
+    return "".join(out)
+
+
+# FDA 가 가린 자리(`(b)(4)`)를 스캔 판독이 `m@`·`O©`·`(©)@)`·`@@` 같은 깨진 글자로 읽는다.
+# 깨진 표시와 정상 표시를 모두 `[redacted]` 하나로 통일한다 — 가려진 내용을 추측하지 않는다.
+# 기호 앞 한 글자는 가림 상자의 판독 잔재다(`Tabletsa@ mg` = "Tablets (b)(4) mg").
+_REDACTION_GLYPH_RE = re.compile(
+    r"\(?[A-Za-z]?[@©®]+\)?(?:[@©®]+\)?)*(?![A-Za-z0-9.\-]*\.[A-Za-z]{2,})")
+_REDACTION_CANON_RE = re.compile(r"\(\s*[b6]\s*\)\s*\(\s*\d\s*\)(?:\s*,\s*\(\s*[b6]\s*\)\s*\(\s*\d\s*\))*"
+                                 r"|<\s*Redacted[^<>]{0,20}>", re.I)
+_EMAIL_RE = re.compile(r"\S+@\S+\.[A-Za-z]{2,}")
+REDACTED_TOKEN = "[redacted]"
+
+
+def normalize_483_redactions(text: str) -> str:
+    """가림 표시(정상·깨짐)를 `[redacted]` 로 통일하고 연달아 나오면 하나로 합친다(순수 함수)."""
+    if not text:
+        return text
+    emails: list[str] = []
+
+    def _keep(m: re.Match[str]) -> str:
+        emails.append(m.group(0))
+        return f"\x00{len(emails) - 1}\x00"
+
+    t = _EMAIL_RE.sub(_keep, text)
+    t = _REDACTION_CANON_RE.sub(f" {REDACTED_TOKEN} ", t)
+    def _glyph(m: re.Match[str]) -> str:
+        # 낱개 `@` 뒤에 숫자가 오면 "at" 의 약기(`incubated @ 30°C`)다 — 가림이 아니다.
+        if m.group(0) == "@" and re.match(r"\s*\d", t[m.end():m.end() + 3]):
+            return m.group(0)
+        return f" {REDACTED_TOKEN} "
+
+    t = _REDACTION_GLYPH_RE.sub(_glyph, t)
+    # 가림 상자·표 괘선이 기호 낱말(`*`·`=`·`|`·`!`)로 판독된 잔재는 지운다(뜻 없는 기호).
+    t = re.sub(r"(?<!\S)[*=|!~^_<>»«°•™]+(?!\S)", " ", t)
+    t = re.sub(r"(?:\[redacted\]\s*){2,}", f"{REDACTED_TOKEN} ", t)
+    t = re.sub(r"\x00(\d+)\x00", lambda m: emails[int(m.group(1))], t)
+    t = re.sub(r"[ \t]{2,}", " ", t)
+    t = re.sub(r"[ \t]+\n|\n[ \t]+", "\n", t)
+    t = re.sub(r"\s+([.,;:)])", r"\1", t)
+    return t.strip()
+
+
+def _cap_detail(text: str, limit: int) -> str:
+    """상한을 넘으면 마지막 문장 끝에서 자른다(문장 중간 절단 금지). 문장 끝이 없으면 상한에서."""
+    if len(text) <= limit:
+        return text
+    head = text[:limit]
+    m = None
+    for m in re.finditer(r"[.!?](?=\s)", head):
+        pass
+    return head[:m.end()].strip() if m and m.end() > limit // 2 else head.strip()
+
+
+def _full_observation_detail(seg: str, deficiency: str, old_detail: str,
+                             hints: dict[str, str]) -> str:
+    """쪽 넘김을 이은 상세. 표제가 종전과 다르거나 종전 상세로 시작하지 않으면 종전 상세를
+    돌려준다(종전 상세 꼬리의 서명란 이름만 지운다)."""
+    joined = _join_483_pages(_skip_pagebreak_block(seg), hints.get("establishment_type", ""))
+    chunk = _clean_observation_chunk(joined)
+    chunk = gf.strip_fda483_page_header(chunk, **hints)
+    head, detail = _first_sentence(chunk)
+    detail = _clean_observation_detail(detail)
+    cut = _signer_cut(detail)
+    if cut is not None:
+        detail = detail[:cut].rstrip(" :-\t")
+    detail = gf.strip_fda483_page_header(detail, **hints)
+    norm_old = re.sub(r"\s+", " ", old_detail or "").strip()
+    norm_new = re.sub(r"\s+", " ", detail or "").strip()
+    same_head = strip_leading_observation_noise(head) == deficiency
+    probe = norm_old[:min(len(norm_old), 80)]
+    if not same_head or not norm_new.startswith(probe) or len(norm_new) < len(norm_old):
+        old_cut = _signer_cut(norm_old)               # 종전 상세 꼬리의 서명란 이름은 지운다
+        return norm_old[:old_cut].rstrip(" :-\t") if old_cut is not None else old_detail
+    return detail
+
+
+def _finalize_detail(detail: str) -> str:
+    return _cap_detail(normalize_483_redactions(detail), FDA483_OBSERVATION_DETAIL_MAX_CHARS)
+
+
 def _first_sentence(text: str) -> tuple[str, str]:
     """첫 문장(deficiency)과 나머지(detail). 문장부호가 없으면 안전 길이로 잘라낸다."""
     t = re.sub(r"\s+", " ", text or "").strip()
@@ -2153,11 +2336,12 @@ def _observations_from_anchors(
             continue
         clean_detail = _clean_observation_detail(detail)
         clean_detail = gf.strip_fda483_page_header(clean_detail, **hints)
+        clean_detail = _full_observation_detail(seg, deficiency, clean_detail, hints)
         row = {
             # 글리프 표제(`OBSERVATION |`)는 언제나 1번이다(_OBS_GLYPH_NUM_RE 주석).
             "number": obs.group(1) if obs.group(1).isdigit() else "1",
             "deficiency": deficiency,
-            "detail": clean_detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),
+            "detail": _finalize_detail(clean_detail),
         }
         out.append(row)
     return out
@@ -2371,7 +2555,7 @@ def _single_unnumbered_observation(
     return [{
         "number": "1",
         "deficiency": deficiency,
-        "detail": clean_detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),
+        "detail": _finalize_detail(clean_detail),
     }]
 
 

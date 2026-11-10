@@ -1,0 +1,102 @@
+"""483 관찰 상세 수집 품질 (2026-11-10 지식 그래프 방향 전환 0단계).
+
+저장된 상세 10,585건의 결함 셋을 고친다:
+  ① 여러 쪽에 걸친 관찰이 첫 쪽 서명란에서 잘림(다음 쪽 본문 유실)
+  ② 서명란 이름줄(`<이름>, DDC Investigator`)이 상세 꼬리에 남음
+  ③ 가림 표시 `(b)(4)` 가 스캔 판독으로 `m@`·`O©` 같은 깨진 글자로 남음
+그리고 상한(종전 1200자)에서 문장 중간 절단을 만들지 않는다.
+
+고정 자료는 실제 문서(fda483-195241·195434·195639)의 저장 원문에서 쪽 경계 부분만 줄인 것이다.
+"""
+from __future__ import annotations
+
+import os
+import sys
+import unittest
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import collect_fda_483 as c  # noqa: E402
+
+FIX = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+
+
+def _obs(doc: str, est: str) -> list[dict[str, str]]:
+    with open(os.path.join(FIX, f"fda483_{doc}_pagebreak.txt"), encoding="utf-8") as fh:
+        text = fh.read()
+    return c._extract_483_observations_from_text(text, {"establishment_type": est})
+
+
+class PageJoinTest(unittest.TestCase):
+    def test_continuation_on_next_page_is_kept(self):
+        obs = _obs("195434", "Plasmapheresis Center")
+        self.assertEqual(len(obs), 1)
+        d = obs[0]["detail"]
+        self.assertTrue(d.endswith("were not shipped to the testing laboratory."), d[-120:])
+        for junk in ("Carmelita", "EMPLOYEE", "Page ", "Coronado", "objectionable"):
+            self.assertNotIn(junk, d)
+
+    def test_signer_name_line_before_marker_is_removed(self):
+        obs = _obs("195241", "Finished Drug Product Manufacturer")
+        d = obs[0]["detail"]
+        self.assertIn("audit trail history log", d)           # 2쪽에서 이어진 본문
+        for junk in ("Upadhyay", "Ranjan", "Investigator", "Maharashtra", "Parklawn"):
+            self.assertNotIn(junk, d)
+        self.assertEqual(obs[0]["deficiency"],
+                         "The responsibilities and procedures applicable to the quality "
+                         "control unit are not fully followed.")
+
+    def test_detail_starting_on_next_page_is_recovered(self):
+        obs = _obs("195639", "Tissue Processor")
+        self.assertEqual([o["number"] for o in obs], ["1", "2", "3"])
+        self.assertTrue(obs[1]["detail"].startswith(
+            "Specifically, Your firm does not conduct environmental monitoring"), obs[1]["detail"])
+        self.assertNotIn("Mcgann", " ".join(o["detail"] for o in obs))
+        self.assertNotIn("objectionable", obs[2]["detail"])
+
+    def test_page_word_in_prose_is_not_a_page_break(self):
+        seg = ("Specifically, step 4 on page 2 of 5 of the batch record was blank.\n"
+               "The deviation was not investigated.")
+        self.assertEqual(c._join_483_pages(seg), seg)
+
+    def test_unresolvable_boundary_cuts_like_before(self):
+        seg = ("Specifically, the line was not cleaned.\nEMPLOYEE(S) SIGNATURE\n"
+               "Page 1 of 3\nrandom tail without header")
+        self.assertEqual(c._join_483_pages(seg).strip(), "Specifically, the line was not cleaned.")
+
+
+class RedactionTest(unittest.TestCase):
+    def test_garbled_and_canonical_marks_become_one_token(self):
+        n = c.normalize_483_redactions
+        self.assertEqual(n("for O© Tablets @@ mg, Batch: w@ ."),
+                         "for [redacted] Tablets [redacted] mg, Batch: [redacted].")
+        self.assertEqual(n("relating to m@\nstages"), "relating to [redacted]\nstages")
+        self.assertEqual(n("Tabletsa@ mg"), "Tablets [redacted] mg")
+        self.assertEqual(n("(©)@) plates"), "[redacted] plates")
+        self.assertEqual(n("the (b) (4) and (b)(4), (b)(6) records"), "the [redacted] and [redacted] records")
+
+    def test_non_redaction_at_signs_are_kept(self):
+        n = c.normalize_483_redactions
+        self.assertEqual(n("incubated @ 30-35C"), "incubated @ 30-35C")
+        self.assertEqual(n("write to Response@fda.hhs.gov today"), "write to Response@fda.hhs.gov today")
+
+    def test_symbol_only_tokens_are_dropped(self):
+        self.assertEqual(c.normalize_483_redactions("collected on) * ! were not"), "collected on) were not")
+
+
+class CapTest(unittest.TestCase):
+    def test_cap_cuts_at_sentence_end(self):
+        text = "First sentence here. " * 10 + "Unfinished tail that goes on"
+        out = c._cap_detail(text, 120)
+        self.assertTrue(out.endswith("."), out)
+        self.assertLessEqual(len(out), 120)
+
+    def test_short_text_untouched(self):
+        self.assertEqual(c._cap_detail("Short.", 8000), "Short.")
+
+    def test_cap_is_raised(self):
+        self.assertGreaterEqual(c.FDA483_OBSERVATION_DETAIL_MAX_CHARS, 8000)
+
+
+if __name__ == "__main__":
+    unittest.main()

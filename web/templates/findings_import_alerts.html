@@ -47,6 +47,7 @@
     <nav class="ia-crumb" aria-label="{{ _('현재 위치') }}">
       <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><a href="{{ rel_root }}findings/">{{ _('지적사항 검색') }}</a><i>&rsaquo;</i><span>{{ _('FDA 수입경보') }}</span>
     </nav>
+    <div style="margin-top:16px">{% with seg_active = "import-alerts" %}{% include "partials/findings_seg.html" %}{% endwith %}</div>
     <p class="kick">FDA &middot; Import Alert</p>
     <h1 class="ia-h1">{{ _('FDA 수입경보 대상 업체') }}</h1>
     <p class="ia-sum">{{ _('{date} 확인 기준 · 전체 {n}곳 · 현재 등재 {a}곳 · 한국 {k}곳', date=ia.measured_on, n="{:,}".format(ia.total), a="{:,}".format(ia.active), k="{:,}".format(ia.korea)) }}</p>

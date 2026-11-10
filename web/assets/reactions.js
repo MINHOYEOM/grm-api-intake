@@ -555,6 +555,28 @@
     }).catch(function () { return {}; });
   }
 
+  // [2026-11-10] 하단 구독 띠(base.html #grm-cta)는 '이 브라우저가 구독 폼을 낸 적 있나'(grm-sub-ok)만
+  // 본다 — 다른 기기·메일로 구독한 회원에게도 떴다(대표 신고). 로그인 회원이면 세션당 한 번 상태를
+  // 묻고, 구독 중·수신거부면 같은 키를 세워 띠를 내린다. 관리자 포함(안내 팝업과 달리 띄우는 것 없음).
+  var SUB_CHECK_KEY = "grm-sub-chk";
+  function syncSubscribed() {
+    if (!NUDGE_STATUS || !SUB_ACTION || !window.fetch || lsGet(SUB_OK_KEY)) return;
+    var tok = session && session.access_token;
+    if (!tok) return;
+    try { if (sessionStorage.getItem(SUB_CHECK_KEY)) return; sessionStorage.setItem(SUB_CHECK_KEY, "1"); } catch (e) { return; }
+    fetch(SUPA_URL + "/functions/v1/newsletter-optin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok, "apikey": SUPA_KEY },
+      body: JSON.stringify({ action: "status" })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
+      var st = b && b.ok ? b.status : "";
+      if (st !== "subscribed" && st !== "blocked_unsubscribed") return;
+      lsSet(SUB_OK_KEY);
+      var band = document.getElementById("grm-cta");
+      if (band) band.classList.remove("on");
+    }).catch(function () {});
+  }
+
   // 기존 회원 안내 — 로그인 후 한 번만, 일괄 등록 없이 묻는다. 이미 구독 요청한 브라우저·이미 보인
   // 브라우저·가입 때 선택을 마친 회원(user_metadata.newsletter_prompted)에게는 뜨지 않는다.
   var nudgeEl = null;
@@ -1333,6 +1355,7 @@
   sb.auth.getSession().then(function (res) {
     session = (res && res.data) ? res.data.session : null;
     renderAuth(); if (rows.length) loadMine(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();
+    syncSubscribed();
   }).catch(function () { renderAuth(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent(); });
   sb.auth.onAuthStateChange(function (_evt, s) {
     session = s; renderAuth(); if (rows.length) loadMine(); renderMyTerms(); renderMyScraps(); renderMyFirms(); renderMyInterests(); renderMineRecent();

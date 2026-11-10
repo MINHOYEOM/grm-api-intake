@@ -741,6 +741,7 @@ grm-api-intake/
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
+   ├─ grm-raw-signals-notion-backfill.yml # Notion 에만 있는 행(예: WHO WHOPIR)을 raw_signals 로 채움(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 raw-signals-notion-backfill-report(30일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지 · decide 게이트가 주간 결손도 복구(2026-08-11)
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검(status 4값: ok·broken·needs_review·blocked)

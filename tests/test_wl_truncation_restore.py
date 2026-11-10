@@ -100,6 +100,24 @@ class PlanDocumentTest(unittest.TestCase):
         items, _ = plan_mod.plan_document([self._row(text=old)], [{"finding_text": block}])
         self.assertTrue(items[0]["legacy_match"])
 
+    def test_fda483_profile_restores_280_heading(self):
+        full = ("There is a failure to thoroughly review any unexplained discrepancy " * 6).strip()
+        old = full[:280].rstrip() + "..."
+        rows = [{"finding_id": "f-483", "raw_signal_id": "rs-9", "published_date": "2024-01-17",
+                 "finding_text": old},
+                {"finding_id": "f-short", "raw_signal_id": "rs-9", "published_date": "2024-01-17",
+                 "finding_text": "Short heading ends with..."}]   # 270자 미만 — 범위 밖
+        plan, report = plan_mod.build_plan(rows, {"rs-9": {"raw_signal_id": "rs-9"}},
+                                           max_old_chars=290, profile="fda483",
+                                           extract=lambda rs: [{"finding_text": full}])
+        self.assertEqual(report.candidates, 1)
+        self.assertEqual(report.mapped, 1)
+        item = plan["items"][0]
+        self.assertEqual(item["finding_text"], full)
+        self.assertTrue(item["legacy_match"])
+        self.assertEqual(item["finding_text_old_md5"], plan_mod.md5_text(old))
+        self.assertEqual(plan["schema_version"], translate.RESTORE_PLAN_SCHEMA_VERSION)
+
     def test_md5_matches_postgres_utf8_md5(self):
         # Postgres md5(text) 는 UTF-8 바이트 기준이다 — 비 ASCII("…") 포함 문자열로 고정.
         import hashlib

@@ -12,6 +12,11 @@ name: GRM WL Truncation Restore Plan
 on:
   workflow_dispatch:
     inputs:
+      source:
+        description: 'wl(기본) = 경고서한 "…" 절단 · fda483 = 483 표제 280자+"..." 절단(2026-11-10). 아티팩트 이름이 소스별로 갈린다.'
+        type: choice
+        options: ['wl', 'fda483']
+        default: 'wl'
       max_old_chars:
         description: '후보 상한(이 길이 이하이고 "…" 로 끝나는 행). 기본 500 = 옛 480자 절단분. 6100 = 6,000자 문장 경계 절단분(2026-11-10 상한 제거 #1467)까지 포함'
         type: string
@@ -49,18 +54,21 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           IN_MAX_OLD: ${{ inputs.max_old_chars }}
+          IN_SOURCE: ${{ inputs.source }}
         run: |
-          max_old=500
-          if printf '%s' "${IN_MAX_OLD:-}" | grep -qE '^[0-9]{3,5}$'; then max_old="$IN_MAX_OLD"; fi
-          python backfill_wl_truncation_restore.py \
-            --output wl_truncation_restore_plan.json \
-            --report-path wl_truncation_restore_report.json \
-            --max-old-chars "$max_old"
+          src=wl
+          if [ "${IN_SOURCE:-}" = "fda483" ]; then src=fda483; fi
+          ARGS=(--source "$src" --output wl_truncation_restore_plan.json --report-path wl_truncation_restore_report.json)
+          # fda483 은 소스 기본 상한(290)을 쓴다 — 입력 기본값 500 은 WL 용이다.
+          if [ "$src" = "wl" ] && printf '%s' "${IN_MAX_OLD:-}" | grep -qE '^[0-9]{3,5}$'; then
+            ARGS+=(--max-old-chars "$IN_MAX_OLD")
+          fi
+          python backfill_wl_truncation_restore.py "${ARGS[@]}"
 
       - name: Upload restore plan artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: wl-truncation-restore-plan
+          name: ${{ inputs.source == 'fda483' && 'fda483-truncation-restore-plan' || 'wl-truncation-restore-plan' }}
           path: |
             wl_truncation_restore_plan.json
             wl_truncation_restore_report.json
@@ -72,8 +80,9 @@ jobs:
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
+          OPS_DIR: ${{ inputs.source == 'fda483' && 'fda483-restore' || 'wl-restore' }}
         run: |
-          bash company/ops/ops_branch.sh "wl restore plan" sh -c 'rm -rf wl-restore && mkdir wl-restore && cp ../wl_truncation_restore_report.json wl-restore/ && if [ "$(wc -c < ../wl_truncation_restore_plan.json)" -lt 8000000 ]; then cp ../wl_truncation_restore_plan.json wl-restore/; else echo "계획 8MB 초과 — 사본 생략" >&2; fi'
+          bash company/ops/ops_branch.sh "${OPS_DIR} plan" sh -c 'rm -rf "$OPS_DIR" && mkdir "$OPS_DIR" && cp ../wl_truncation_restore_report.json "$OPS_DIR"/ && if [ "$(wc -c < ../wl_truncation_restore_plan.json)" -lt 8000000 ]; then cp ../wl_truncation_restore_plan.json "$OPS_DIR"/; else echo "계획 8MB 초과 — 사본 생략" >&2; fi'
 
       - name: Write step summary
         if: always()

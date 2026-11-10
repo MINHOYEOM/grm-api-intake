@@ -8,8 +8,12 @@
 ★`backfill_483_ocr_recovery.py` 를 쓰지 않는 이유: 그쪽은 행 전체를 재구성하며
   `fda483_body_full`(심층 분석 원문)·`fda483_inspectors` 를 비운다(그 스크립트의 대상은 본문이
   없던 행이라 문제가 없었다). 여기서는 **detail 칸 외에는 아무것도 바꾸지 않는다.**
-★표제(deficiency)·번호·관찰 수는 바꾸지 않는다. 다시 읽은 관찰을 (번호, 표제)가 **같은** 기존 관찰에만
-  대응시키고, 짝이 없는 관찰은 기존 상세를 그대로 두되 서명란 이름·가림 표시만 정리한다.
+★번호·관찰 수는 바꾸지 않는다. 다시 읽은 관찰을 (번호, 표제)가 같은 기존 관찰에 대응시킨다. 옛 저장 상한에
+  잘린 관찰(표제 280자+"..."·상세 1,200자)은 번호가 같고 새 판이 옛 앞부분으로 시작할 때만 대응시켜 표제·상세를
+  잘리지 않은 판으로 바꾼다(`--truncated-only` 는 그런 문서만 고른다). 짝이 없는 관찰은 기존 상세를 그대로 두되
+  서명란 이름·가림 표시만 정리한다.
+★표제가 바뀐 관찰의 findings 행(finding_text = 표제)은 여기서 바꾸지 않는다 — finding_id 가 본문 해시라
+  `backfill_wl_truncation_restore.py --source fda483` 계획 → 번역 outbox restore 경로로 영문·국문을 함께 바꾼다.
 ★원문: 저장된 `fda483_body_full` 이 있으면 그것을 쓴다(PDF 요청·OCR 없음). 없으면 PDF 를 다시 받는다.
 ★기본은 dry-run — 바뀔 관찰 수와 품질 지표(문장 온전·서명란 흔적·깨진 가림 표시)의 전후를 보고만 한다.
 """
@@ -30,6 +34,7 @@ from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
 from grm_common import SOURCE_FDA_483
 
 DEFAULT_SINCE = "2026-08-10"
+_ALL_TIME = "1900-01-01"
 _OBS_KEY = "fda_483_observations"
 _COMPLETE_END_RE = re.compile(r"[.!?][)\"'”’]?$|\)$")
 _GARBLED_MARK_RE = re.compile(r"[@©®]")
@@ -56,6 +61,10 @@ class DetailRefreshReport:
     observations_changed: int = 0
     observations_matched: int = 0
     observations_unmatched: int = 0
+    deficiency_restored: int = 0
+    truncated_only: bool = False
+    truncated_before: int = 0
+    truncated_after: int = 0
     patched: int = 0
     failed: int = 0
     before: QualityStats = field(default_factory=QualityStats)
@@ -99,25 +108,87 @@ def tidy_old_detail(detail: str) -> str:
     return c.normalize_483_redactions(d) if d else (detail or "")
 
 
+TRUNC_DEFICIENCY_SUFFIX = "..."
+# 옛 저장 상한(상세 1,200자·표제 280자+"...")에 걸린 관찰을 찾는 탐지 띠(판정 전용 — 저장은 원문 그대로).
+TRUNC_DETAIL_BAND = (1150, 1205)
+TRUNC_DEFICIENCY_BAND = (270, 290)
+_PREFIX_PROBE = 200
+
+
+def _norm(text: str) -> str:
+    """비교용 정규화 — 가림 표시 통일 + 공백 접기."""
+    c = _collector()
+    return re.sub(r"\s+", " ", c.normalize_483_redactions(text or "")).strip()
+
+
+def is_truncated_deficiency(deficiency: str) -> bool:
+    d = deficiency or ""
+    return d.endswith(TRUNC_DEFICIENCY_SUFFIX) and TRUNC_DEFICIENCY_BAND[0] <= len(d) <= TRUNC_DEFICIENCY_BAND[1]
+
+
+def is_truncated_detail(detail: str) -> bool:
+    return TRUNC_DETAIL_BAND[0] <= len(detail or "") <= TRUNC_DETAIL_BAND[1]
+
+
+def has_truncated_observation(observations: list[dict[str, Any]]) -> bool:
+    return any(is_truncated_deficiency(str(o.get("deficiency") or ""))
+               or is_truncated_detail(str(o.get("detail") or "")) for o in observations)
+
+
+def _restored_deficiency(old_def: str, new_def: str) -> bool:
+    """옛 표제가 280자+"..." 절단이고 새 표제가 그 앞부분으로 시작하며 더 길다."""
+    if not is_truncated_deficiency(old_def):
+        return False
+    head = _norm(old_def[:-len(TRUNC_DEFICIENCY_SUFFIX)])
+    nd = _norm(new_def)
+    return bool(head) and nd.startswith(head) and len(nd) > len(head)
+
+
+def _extends_detail(old_detail: str, new_detail: str) -> bool:
+    """새 상세가 옛 상세의 앞부분(정규화 200자)으로 시작하고 더 길다 — 같은 관찰의 잘리지 않은 판."""
+    od, nd = _norm(old_detail), _norm(new_detail)
+    probe = od[:_PREFIX_PROBE]
+    return bool(probe) and nd.startswith(probe) and len(nd) > len(od)
+
+
 def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
                            ) -> tuple[list[dict[str, Any]], int, int]:
-    """기존 관찰 목록의 detail 만 바꾼 새 목록 + (짝 맞은 수, 짝 없는 수). 순수 함수.
+    """기존 관찰 목록의 detail(과 잘린 표제)을 바꾼 새 목록 + (짝 맞은 수, 짝 없는 수). 순수 함수.
 
-    짝 = (number, deficiency) 가 같음. 다시 읽은 상세가 비면 기존 상세(정리본)를 둔다."""
+    짝 ① (number, deficiency) 가 같음.
+       ② 번호가 같고 옛 표제가 280자+"..." 절단, 새 표제가 그 앞부분으로 시작 → 표제도 새 것으로.
+          (그때 옛 상세가 표제 문장의 나머지였다면 새 상세가 빈 값일 수 있다 — 새 것을 그대로 쓴다.)
+       ③ 번호가 같고 새 상세가 옛 상세의 앞부분으로 시작하며 더 김(옛 1,200자 절단) → 상세만.
+    다시 읽은 상세가 비면(①·③) 기존 상세(정리본)를 둔다."""
     by_key = {(str(o.get("number")), str(o.get("deficiency") or "")): o for o in new}
+    by_num: dict[str, list[dict[str, Any]]] = {}
+    for o in new:
+        by_num.setdefault(str(o.get("number")), []).append(o)
     out: list[dict[str, Any]] = []
     matched = unmatched = 0
     for o in old:
-        key = (str(o.get("number")), str(o.get("deficiency") or ""))
-        hit = by_key.get(key)
+        num = str(o.get("number"))
+        old_def = str(o.get("deficiency") or "")
         old_detail = str(o.get("detail") or "")
+        hit = by_key.get((num, old_def))
         if hit is not None and str(hit.get("detail") or "").strip():
             matched += 1
-            detail = str(hit["detail"])
-        else:
-            unmatched += 1
-            detail = tidy_old_detail(old_detail)
-        out.append({**o, "detail": detail})
+            out.append({**o, "detail": str(hit["detail"])})
+            continue
+        same_num = by_num.get(num, [])
+        restored = [n for n in same_num if _restored_deficiency(old_def, str(n.get("deficiency") or ""))]
+        if len(restored) == 1:
+            matched += 1
+            n = restored[0]
+            out.append({**o, "deficiency": str(n["deficiency"]), "detail": str(n.get("detail") or "")})
+            continue
+        extended = [n for n in same_num if _extends_detail(old_detail, str(n.get("detail") or ""))]
+        if len(extended) == 1:
+            matched += 1
+            out.append({**o, "detail": str(extended[0]["detail"])})
+            continue
+        unmatched += 1
+        out.append({**o, "detail": tidy_old_detail(old_detail)})
     return out, matched, unmatched
 
 
@@ -133,13 +204,17 @@ def _fetch_text(pdf_url: str) -> tuple[str, str]:
     return _collector()._fetch_fda483_pdf_text(pdf_url)
 
 
-def _fetch_rows(base_url: str, service_key: str, since: str) -> list[dict[str, Any]]:
+def _fetch_rows(base_url: str, service_key: str, since: str, until: str | None = None
+                ) -> list[dict[str, Any]]:
+    params = {"source": f"eq.{SOURCE_FDA_483}", "raw_json": f"like.*{_OBS_KEY}*"}
+    if until:   # 게시일 [since, until) — 옛 문서 전체를 기간으로 나눠 돌린다(PDF·OCR 시간)
+        params["and"] = f"(published_date.gte.{since},published_date.lt.{until})"
+    else:
+        params["published_date"] = f"gte.{since}"
     return fsb._fetch_all_pages(
         base_url, service_key, "raw_signals",
         select="raw_signal_id,document_id,raw_json", page_size=500,
-        order="raw_signal_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "published_date": f"gte.{since}",
-                      "raw_json": f"like.*{_OBS_KEY}*"},
+        order="raw_signal_id.asc", extra_params=params,
     )
 
 
@@ -164,13 +239,14 @@ def run(
     since: str = DEFAULT_SINCE,
     limit: int | None = None,
     doc_ids: set[str] | None = None,
+    truncated_only: bool = False,
     delay_seconds: float = 0.5,
     text_fn: Callable[[str], tuple[str, str]] = _fetch_text,
     patch_fn: Callable[[str, dict[str, Any]], None] | None = None,
     sleep_fn: Callable[[float], None] = time.sleep,
 ) -> DetailRefreshReport:
     c = _collector()
-    report = DetailRefreshReport(dry_run=dry_run, since=since)
+    report = DetailRefreshReport(dry_run=dry_run, since=since, truncated_only=truncated_only)
     for r in rows:
         if limit and report.candidates >= limit:
             break
@@ -182,6 +258,8 @@ def run(
         raw = json.loads(raw) if isinstance(raw, str) else dict(raw or {})
         old = [o for o in (raw.get(_OBS_KEY) or []) if isinstance(o, dict)]
         if not old:
+            continue
+        if truncated_only and not has_truncated_observation(old):
             continue
         report.candidates += 1
         text = str(raw.get("fda483_body_full") or "")
@@ -213,7 +291,11 @@ def run(
         report.observations_matched += matched
         report.observations_unmatched += unmatched
         changed = 0
+        report.truncated_before += sum(has_truncated_observation([o]) for o in old)
+        report.truncated_after += sum(has_truncated_observation([o]) for o in refreshed)
         for o_old, o_new in zip(old, refreshed):
+            if str(o_old.get("deficiency") or "") != str(o_new.get("deficiency") or ""):
+                report.deficiency_restored += 1
             _add(report.before, str(o_old.get("detail") or ""))
             _add(report.after, str(o_new.get("detail") or ""))
             nd = str(o_new.get("detail") or "").strip()
@@ -222,7 +304,8 @@ def run(
                     "doc": doc, "number": o_old.get("number"), "len": len(nd),
                     "source": "body_full" if raw.get("fda483_body_full") else "pdf",
                     "tail": nd[-200:]})
-            if str(o_old.get("detail") or "") != o_new["detail"]:
+            if (str(o_old.get("detail") or "") != o_new["detail"]
+                    or str(o_old.get("deficiency") or "") != str(o_new.get("deficiency") or "")):
                 changed += 1
                 if len(report.samples) < 12:
                     report.samples.append({
@@ -251,7 +334,11 @@ def run(
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="저장된 FDA 483 관찰 상세만 다시 읽어 제자리 교체(기본 dry-run).")
     p.add_argument("--apply", action="store_true", default=False, help="실제 PATCH. 기본 dry-run.")
-    p.add_argument("--since", default=DEFAULT_SINCE, help="게시일 하한(YYYY-MM-DD).")
+    p.add_argument("--since", default=None,
+                   help=f"게시일 하한(YYYY-MM-DD). 기본 {DEFAULT_SINCE}, --truncated-only 면 기본 전체 기간.")
+    p.add_argument("--until", default=None, help="게시일 상한(미포함, YYYY-MM-DD). 기간을 나눠 돌릴 때.")
+    p.add_argument("--truncated-only", action="store_true", default=False,
+                   help="옛 저장 상한(상세 1,200자·표제 280자+'...')에 걸린 관찰이 있는 문서만.")
     p.add_argument("--limit", type=int, default=None, help="처리 문서 수 상한.")
     p.add_argument("--doc-ids", default="", help="선택: document_id/raw_signal_id 목록(공백·쉼표).")
     p.add_argument("--delay-seconds", type=float, default=0.5, help="PDF 요청 간 대기(초).")
@@ -271,10 +358,12 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     base_url, service_key = creds
     base_url = _normalize_base_url(base_url)
-    rows = _fetch_rows(base_url, service_key, args.since)
+    since = args.since or (_ALL_TIME if args.truncated_only else DEFAULT_SINCE)
+    rows = _fetch_rows(base_url, service_key, since, args.until)
     ids = {x for x in re.split(r"[\s,]+", args.doc_ids or "") if x}
     report = run(
-        rows, dry_run=not args.apply, since=args.since, limit=args.limit, doc_ids=ids or None,
+        rows, dry_run=not args.apply, since=since, limit=args.limit, doc_ids=ids or None,
+        truncated_only=args.truncated_only,
         delay_seconds=args.delay_seconds,
         patch_fn=lambda rid, raw: _patch(base_url, service_key, rid, raw),
     )

@@ -177,6 +177,12 @@ jobs:
             echo "::warning::Cloudflare 시크릿 미등록 — 배포 스킵(빌드/아티팩트만). 사람이 CLOUDFLARE_API_TOKEN·CLOUDFLARE_ACCOUNT_ID 등록 후 자동 활성."
           fi
 
+      # IndexNow — 배포 '전' 라이브 sitemap 을 받아 둔다(배포 후 새/변경 URL 비교용). 비차단.
+      - name: Fetch live sitemap before deploy (non-blocking)
+        if: steps.creds.outputs.have == 'true' && github.event_name == 'push' && github.ref_name == 'main'
+        continue-on-error: true
+        run: curl -fsSL --max-time 60 https://grm-solutions.com/sitemap.xml -o "${{ runner.temp }}/prev_sitemap.xml"
+
       # ── C3: 배포(Cloudflare Pages) — prod/preview 분류는 Cloudflare 가 브랜치명으로 판정. ──
       #   production 브랜치(vars.CF_PAGES_PROD_BRANCH, Cloudflare 설정과 일치)로의 머지만 라이브.
       #   그 외 브랜치/PR = preview. 자동 라이브 경로 없음(D5).
@@ -190,3 +196,14 @@ jobs:
             pages deploy web/dist
             --project-name=${{ env.CF_PAGES_PROJECT }}
             --branch=${{ github.head_ref || github.ref_name }}
+
+      # IndexNow — 프로덕션(main push) 배포 후 새/변경 URL 을 네이버·빙에 제출. 실패해도 배포 무영향.
+      - name: Submit changed URLs to IndexNow (non-blocking)
+        if: steps.creds.outputs.have == 'true' && github.event_name == 'push' && github.ref_name == 'main'
+        continue-on-error: true
+        run: |
+          if [ -s "${{ runner.temp }}/prev_sitemap.xml" ]; then
+            python indexnow_submit.py --sitemap web/dist/sitemap.xml --previous "${{ runner.temp }}/prev_sitemap.xml"
+          else
+            echo "::warning::이전 sitemap 없음 — IndexNow 제출 건너뜀(전수는 grm-indexnow-full.yml)"
+          fi

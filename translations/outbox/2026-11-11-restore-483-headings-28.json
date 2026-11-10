@@ -1,0 +1,226 @@
+[
+  {
+    "finding_id": "finding-c4067c84b9d0a3273caa3d16",
+    "finding_text": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods of disassembly and reassembling equipment as necessary to assure proper cleaning and maintenance.",
+    "finding_text_ko": "설비의 세척 및 유지보수 절차에 세척 및 유지보수 작업에 사용되는 방법, 설비, 물질에 대한 상세 기술과, 적절한 세척 및 유지보수를 보장하는 데 필요한 설비의 분해 및 재조립 방법에 대한 상세 기술이 충분하지 않다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "75c90850eff8ada086c4dea308a660d5"
+  },
+  {
+    "finding_id": "finding-b232a56b13b5008509f49a0f",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, sampling plans and test procedures designed to assure that components, drug product containers, closures, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 원료, 의약품 용기, 마개, 공정 중 물질 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격, 시료채취 계획 및 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "0045adecb84ca59cc81c440cd2b89064"
+  },
+  {
+    "finding_id": "finding-b4511c47c0e2f8f000639773",
+    "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate standards designed to assure that components and in-process materials confonn to appropriate standards of identity, strength, quality, and purity: e),f)LO'fEE1S) s,:;;N,\\ Tl.RE ~j -1/J, };pv~L­",
+    "finding_text_ko": "시험실 관리에 원료 및 공정 중 물질이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합함을 보장하도록 설계된 과학적으로 타당하고 적절한 기준의 수립이 포함되어 있지 않다: e),f)LO'fEE1S) s,:;;N,\\ Tl.RE ~j -1/J, };pv~L��",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "dd40b14841e3272384bf79bcbaaf260b"
+  },
+  {
+    "finding_id": "finding-c84c083ad97ceaf3042d5a78",
+    "finding_text": "Reports of analysis from component suppliers are accepted in lieu of testing each component for conformity with all appropriate written specifications, without performing at least one specific identity test on each component and establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at appropriate intervals.",
+    "finding_text_ko": "각 원료가 모든 적절한 서면 규격에 부합하는지 시험하는 대신 원료 공급업체의 시험성적서를 인정하면서, 각 원료에 대해 최소 한 가지의 특정 확인시험을 수행하지 않았고 공급업체 시험 결과에 대한 적절한 주기의 적절한 밸리데이션을 통해 공급업체 분석의 신뢰성을 확립하지 않았다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "ece1f61244d129f3243ff3648699fbf6"
+  },
+  {
+    "finding_id": "finding-fdc607edce252418e90dc96f",
+    "finding_text": "Container closure systems do not provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination ofthe drug product Specifically, On 7/2/2014 I observed the sterile human drug product Acety!cysteine (Preservative Free) 20% Inhalation Solution lot 07022014@43 filled at 3ml into a 7 ml vial with air :in the beadspac e even though the Formula Worksheet for the product states that \"Acetylcysteine is not compatible with oxygen\".",
+    "finding_text_ko": "용기 마개 시스템이 보관 및 사용 중 의약품의 변질 또는 오염을 일으킬 수 있는 예측 가능한 외부 요인으로부터 충분한 보호를 제공하지 못한다. 구체적으로, 2014년 7월 2일(7/2/2014) 본 조사관은 무균 인체 의약품 Acety!cysteine (Preservative Free) 20% Inhalation Solution 로트 07022014@43이 7 ml 바이알에 3ml로 충전되어 헤드스페이스(beadspac e)에 공기가 있는 것을 확인했다. 해당 제품의 제형 작업지시서(Formula Worksheet)에는 \"Acetylcysteine is not compatible with oxygen\"이라고 명시되어 있다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "645e9812436651cac3620ea625227010"
+  },
+  {
+    "finding_id": "finding-f99a434673df7d7549da11d0",
+    "finding_text": "The responsibilities and procedures applicable .to the quality control unit are not in writing and fully followed For example: A.You are not complying with your procedure No: 11.a.05.797, Version 3, effective 2/11/2014, in that signature approvals for verifying equip ment cleaning logs are missing on all your records dating back to at least 2/2014",
+    "finding_text_ko": "품질관리 부서에 적용되는 책임과 절차가 서면화되어 있지 않고 완전히 이행되지 않는다. 예를 들어: A.귀사는 절차 No: 11.a.05.797, Version 3(2/11/2014 시행)을 준수하지 않았다. 설비 세척 로그를 확인하는 서명 승인이 적어도 2/2014까지 거슬러 올라가는 모든 기록에서 누락되어 있다",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "814427a5aa0dd8dd78153a32e856f92b"
+  },
+  {
+    "finding_id": "finding-eae4c8631b00c7f3db978e13",
+    "finding_text": "There is no quality control unit Specifically, Your firm does not have an established quality control unit which has the responsibility and authority to approve or reject all components, in-process materials, labeling, or procedures or specifications which could impact the identity, strength, quality, and purity of the autologous SVF product.",
+    "finding_text_ko": "품질관리 부서가 없다. 구체적으로, 귀사는 자가 SVF 제품의 확인, 함량, 품질 및 순도에 영향을 줄 수 있는 모든 원료, 공정 중 물질, 표시사항, 절차 또는 규격을 승인하거나 불합격 처리할 책임과 권한을 가진 품질관리 부서를 수립하지 않았다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "bd5dcbdb345c7bfcff773787ab0acd59"
+  },
+  {
+    "finding_id": "finding-e5eefc76a97ad321aeae8a68",
+    "finding_text": "There is no assurance that the firm always challenges the validity of all testing results provided in container supplier's certificates of analysis as part of supplier qualification procedures REDACTED (b)(4) bulk bags, used as the container closure system of Tysabri API, are received with certificate of analyses indicating that the bags are sterile and endotoxin free; however, these results have never been challenged and/or verified by the firm.",
+    "finding_text_ko": "공급업체 적격성 평가 절차의 일환으로 용기 공급업체의 시험성적서에 제시된 모든 시험 결과의 타당성을 업체가 항상 검증한다는 보증이 없다. Tysabri 원료의약품의 용기 마개 시스템으로 사용되는 REDACTED (b)(4) 벌크 백이 해당 백이 무균이며 엔도톡신이 없다고 기재된 시험성적서와 함께 입고되나, 이 결과들은 업체에서 한 번도 검증되거나 확인된 적이 없다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "2d06ff56c001bca8300e8f67bd991a4b"
+  },
+  {
+    "finding_id": "finding-e2ef27a4aa2b20be5c42a137",
+    "finding_text": "The floors throughout your processing facility are pitted, cracked, and otherwise damaged causing pooled water in areas were food is exposed including where open cans of in-process COOKED CHICKEN LOAF and HAND PACKED CHICKEN dog food are staged on a wooden pallet immediately upon the damaged floor.",
+    "finding_text_ko": "귀사 가공 시설 전반의 바닥이 움푹 패이고 갈라지는 등 손상되어 식품이 노출되는 구역에 물이 고여 있으며, 여기에는 공정 중 COOKED CHICKEN LOAF 및 HAND PACKED CHICKEN 개 사료의 개봉된 캔이 손상된 바닥 바로 위의 나무 팔레트에 놓여 있는 곳도 포함된다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "6b4bdf422fd4602071d37928e62ac2d7"
+  },
+  {
+    "finding_id": "finding-b946323155899f7e9a042b29",
+    "finding_text": "There is no assurance that the wet/dry vacuum used for cleaning the floors ofclassified production areas prevents addition of bioburden inshethBdustion areas ifi that the HEPA filters on the unit are not routinely integrity tested and the interior drum where dirty solution is collected is not sanitized.",
+    "finding_text_ko": "등급 생산 구역의 바닥 청소에 사용하는 습식/건식 진공청소기가 inshethBdustion areas ifi 바이오버든 유입을 막는다는 보증이 없다. 해당 장비의 HEPA 필터는 정기적으로 완전성 시험을 하지 않으며, 오염된 세척액이 모이는 내부 드럼은 소독하지 않는다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "4c5fccb0fac1c607cfa0b7476fa5fcc9"
+  },
+  {
+    "finding_id": "finding-b7de9c23e8a400e5ab629ed1",
+    "finding_text": "BHQ does not monitor the corrective action plan implemented by the regions when unsuitable products can mot be located, yet BHQ monitors the corrective action plans when the regions exceed the ARC’s established upper control limit (UCL), formerly known as the acceptable quality limit (AQL).",
+    "finding_text_ko": "BHQ는 부적합 제품을 찾을 수 없을 때 지역 조직이 시행한 시정조치 계획은 모니터링하지 않으면서, 지역 조직이 이전에 허용 품질 한계(AQL)로 불리던 ARC��s 설정 관리 상한(UCL)을 초과할 때는 시정조치 계획을 모니터링한다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "7cf5c64e442e76cf36857803a111b6ad"
+  },
+  {
+    "finding_id": "finding-b6e2684fa2325d9b080b6d98",
+    "finding_text": "Time limits are not established when appropriate for the completion ofeach production phase to assure the quality ofthe drug product Specifically, the firm does not have any hold time data to support the completion of each production phase for any of yo ur injectable drug products (when not being held under regrigerated or light resistant conditions) including but not limited to preparation of the orginal batch of product redacted b4 and multiple transfer of the product into unit does vial from redacted b4 containers, to assure the qualiyt of all injectable durg products at your firm .",
+    "finding_text_ko": "의약품의 품질을 보장하기 위해 필요한 경우 각 생산 단계의 완료에 대한 시간 제한이 설정되어 있지 않다. 구체적으로, 귀사는 냉장 또는 차광 조건에서 보관하지 않는 경우, 원래 제품 배치의 조제(redacted b4)와 redacted b4 용기에서 단위 용량 바이알로의 반복 이송을 포함하되 이에 국한되지 않는 귀사의 모든 주사제 의약품에 대해 각 생산 단계의 완료를 뒷받침하는 보관 시간 데이터가 전혀 없다. 따라서 귀사의 모든 주사제 의약품의 품질(qualiyt)을 보장할 수 없다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "b74e7d24eed3c067265f66fd3178d2bb"
+  },
+  {
+    "finding_id": "finding-ae29f126d46391a28ce4bb61",
+    "finding_text": "Approved components are not retested or reexamined as appropriate for identity, strength, quality and purity after storage for long periods with subsequent approval or rejection by the quality control unit Specifically, There is no data to support the three month expiration date assigned used in the production of sterile drug products, including products intended for intrathecal administration.",
+    "finding_text_ko": "승인된 원료를 장기간 보관한 후 확인, 함량, 품질 및 순도에 대해 적절히 재시험 또는 재검사하고 품질관리 부서가 이후 승인 또는 불합격 처리하지 않았다. 구체적으로, 척수강내 투여용 제품을 포함한 무균 의약품 생산에 사용되는 원료에 부여된 3개월 사용기한을 뒷받침하는 데이터가 없다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "64c8cb99646e4a9bf3bbedcfe4500db1"
+  },
+  {
+    "finding_id": "finding-a73ba379a2a917faeade450e",
+    "finding_text": "During a field examination of drug products at your facility the following was observed: Specifically, On 8/ 14/ 15, I observed a vial ofsterile human finished drug product Chlorpromazine HCL 25mg/ml, production lot # 05-070815, prepared on 7/8/15 and expires 10/8/ 15, with what looked like particles floating in the drug product.",
+    "finding_text_ko": "귀사 시설에서 의약품 현장 점검 중 다음이 관찰되었다. 구체적으로, 8/ 14/ 15 본 조사관은 무균 인체 완제의약품 Chlorpromazine HCL 25mg/ml, 생산 로트 # 05-070815(7/8/15 제조, 10/8/ 15 만료)의 바이알에서 입자처럼 보이는 것이 떠다니는 것을 관찰했다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "9721461b62b432b492942dfae245dfa4"
+  },
+  {
+    "finding_id": "finding-8bb13761078ce2e134a8a001",
+    "finding_text": "Reports of analysis from component suppliers are accepted in lieu of testing each component for conformity with all appropriate written specifications, without performing at least one specific identity test on each component or establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at",
+    "finding_text_ko": "각 원료가 모든 적절한 서면 규격에 부합하는지 시험하는 대신 원료 공급업체의 시험성적서를 인정하면서, 각 원료에 대해 최소 한 가지의 특정 확인시험을 수행하지 않았거나 공급업체 시험 결과에 대한 적절한 주기의 적절한 밸리데이션을 통해 공급업체 분석의 신뢰성을 확립하지 않았다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "e8737032c15ee25e3837a3adebd93179"
+  },
+  {
+    "finding_id": "finding-7fda87cddfb3413aa4bdc0f0",
+    "finding_text": "Bulk drug substances used by your outsourcing facility to compound drug products are not each manufactured by an establishment that is registered under section 510 as required by section 503B(a)(2)(C): Specifically, On 01/22/2014, the following bulk drug substance manufacturers were identified as not being registered with the F DA",
+    "finding_text_ko": "귀사 아웃소싱 시설이 의약품 조제에 사용하는 벌크 의약품 원료가 각각 503B(a)(2)(C)항에서 요구하는 대로 510조에 따라 등록된 시설에서 제조되지 않았다. 구체적으로, 01/22/2014에 다음 벌크 의약품 원료 제조업체가 F DA에 등록되어 있지 않은 것으로 확인되었다",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "461894c15e32b3aac1feb1ce5b1fc81d"
+  },
+  {
+    "finding_id": "finding-7e08de61f74e84eb8c0a837b",
+    "finding_text": "DEP ART!\\fi:NT OF HEALTH AND HUMAi'l SERVICES DISTRICT ADDRESS AND PHONE NUMBER 555 Winder ly Place , Suite 200 3/14/2016- 3/25/2016* Maitland, FL 32751 FEJNUMBER (407) 475-4700 Fax: (407) 475-4768 1811396 NAME AND TITLE OF INDM OUAL TO WHOM REPORT ISSUED Dina Kostakis ' General Manager - 1016 Drug Manufacturer",
+    "finding_text_ko": "DEP ART!\\fi:NT OF HEALTH AND HUMAi'l SERVICES 관할청 주소 및 전화번호 555 Winder ly Place , Suite 200 3/14/2016- 3/25/2016* Maitland, FL 32751 FEJNUMBER (407) 475-4700 Fax: (407) 475-4768 1811396 보고서 수신 개인의 성명 및 직위 INDM OUAL TO WHOM REPORT ISSUED Dina Kostakis ' General Manager - 1016 의약품 제조업체",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "e98e0c7b28f38f913fdfc84af0c6d61b"
+  },
+  {
+    "finding_id": "finding-76a2dceec08b70f480c93c7f",
+    "finding_text": "The firm has no program for the periodic retesting of intermediate, active coated stock pellets (such as nitroglycerin stock pellets, chlorpheniramine maleate stock pellets, pheniramine maleate stock pellets etc.), and there is no established time limit for use of active pellets in finished drug products.",
+    "finding_text_ko": "귀사에는 중간체인 활성 코팅 스톡 펠릿(nitroglycerin 스톡 펠릿, chlorpheniramine maleate 스톡 펠릿, pheniramine maleate 스톡 펠릿 등)의 정기 재시험 프로그램이 없으며, 완제의약품에 사용하는 활성 펠릿의 사용 기한도 설정되어 있지 않다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "33ddcda44409b115c0aa09395267adb4"
+  },
+  {
+    "finding_id": "finding-39c8892a07ee6a2fb0467a6f",
+    "finding_text": "BHQ’s investigation into the problem and the various corrective actions implemented between 6/15/00 hrough 4/16/02 did not address why the regional users were not following the procedures and whether the established employee training was adequate to prevent this problem from recurring.",
+    "finding_text_ko": "6/15/00부터 4/16/02까지 BHQ��s가 수행한 문제 조사와 여러 시정조치는 지역 사용자들이 왜 절차를 따르지 않았는지, 그리고 이 문제의 재발을 막기에 기존 직원 교육이 적절했는지를 다루지 않았다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "c7ea53b0954872e354ec758ab93e1fb3"
+  },
+  {
+    "finding_id": "finding-1e44263c716c6288119304ae",
+    "finding_text": "Specifically, you do not note the time on all of your SE prevention records to include: Environmental Sampling Log, All required records do not include the location of your farm.and Disinfection Inspection Form, Footwear Station Service Report, Visual Rodent Evaluation Form, and Rodent Specifically, you do not note the location of your farm on all of your SE prevention records to include: Cleaning and Disinfection Inspection Form, Visual Rodent Evaluation Form, Rodent Indexing Record, and Rodent Control Inspection Log.Employee(s) Signature Christian L.",
+    "finding_text_ko": "구체적으로, 귀사는 Environmental Sampling Log, All required records do not include the location of your farm.and Disinfection Inspection Form, Footwear Station Service Report, Visual Rodent Evaluation Form, and Rodent 를 포함한 모든 SE 예방 기록에 시간을 기재하지 않는다. 구체적으로, 귀사는 Cleaning and Disinfection Inspection Form, Visual Rodent Evaluation Form, Rodent Indexing Record, Rodent Control Inspection Log를 포함한 모든 SE 예방 기록에 농장 위치를 기재하지 않는다.Employee(s) Signature Christian L.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "29999e13eee083e92a4509c29cb2e506"
+  },
+  {
+    "finding_id": "finding-18be532042afedf13ac03d7c",
+    "finding_text": "A special audit was conducted in August 2001 when the region’s management notified regional QA ofa ‘possible falsification of records.” The report states “The fact that only the cumulative loss records were altered would have an affect on donor safety and not product quality.” All staff interviewed “verified they found documents which were Jf in br “agnt ST LYden, ncemgen ne af Ol",
+    "finding_text_ko": "2001년 8월 지역 경영진이 지역 QA에 ��possible falsification of records.��를 통보하자 특별 감사가 실시되었다. 보고서는 \"��The fact that only the cumulative loss records were altered would have an affect on donor safety and not product quality.��\"라고 기술한다. 면담한 모든 직원은 ��verified they found documents which were Jf in br ��agnt ST LYden, ncemgen ne af Ol",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "0e07ff572113c8f25f0afdcb018a2c11"
+  },
+  {
+    "finding_id": "finding-0bad31a5c2a43da25a8f5d90",
+    "finding_text": "On 05/27/14 and 05/29/14, we observed cracked, damaged and chipped food contact surfaces on sprouting vats that contained growing sprouts, storage bins that contained finished broccoli and alfalfa sprouts , and mung bean growing cabins, with mung beans present These broccoli and alfalfa sprouts were observed with a use by date of 06/13/14, these mung bean sprouts were observed with a use by date of06/09/ 14.",
+    "finding_text_ko": "05/27/14 및 05/29/14에 우리는 새싹이 자라고 있는 발아 용기, 완제품 브로콜리 및 알팔파 새싹이 담긴 보관 용기, 숙주(mung bean)가 들어 있는 재배실의 식품 접촉 표면이 갈라지고 손상되고 깨진 것을 확인했다. 이 브로콜리 및 알팔파 새싹의 소비기한은 06/13/14, 숙주 새싹의 소비기한은 06/09/ 14로 확인되었다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "fe17a6c28241569e3fadf197fe5c820b"
+  },
+  {
+    "finding_id": "finding-04f2d25265be109f3f187256",
+    "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions, in that: Smoke studies have not been conducted under dynamic conditions and mimicking the most challenging preparations produced by personnel on a regular basis to verify that operators, processing equipment or activities of the ISO 7 clean rooms do not alter or impede the unidirectional flow of air from the HEPA filters and for the RE DACTED (b)(4) ISO 5 laminar flow hoods where drug products are aseptically processed.",
+    "finding_text_ko": "무균 공정 구역에서 무균 상태를 관리하는 데 사용되는 설비를 유지관리하는 시스템이 미흡하다. 즉, ISO 7 청정실의 작업자, 공정 설비 또는 작업이 HEPA 필터에서 나오는 단방향 기류를 변화시키거나 방해하지 않는지, 그리고 의약품을 무균 처리하는 RE DACTED (b)(4) ISO 5 층류 후드에서도 그러한지 확인하기 위한 연기 시험(smoke study)이 동적 조건에서, 그리고 작업자가 정기적으로 수행하는 가장 어려운 조제 작업을 모사하여 실시되지 않았다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "c23b1e324d383566aaeda6805907d1ca"
+  },
+  {
+    "finding_id": "finding-3b95225f38556c9c4e3a7e90",
+    "finding_text": "Written procedmes for cleaning and maintenance fail to include assignment of responsibility, description in sufficient detail of methods, equipment and materials used, description in sufficient detail of the methods of disassembling and reassembling equipment as necessary to assure proper cleaning and maintenance and instructions for protection of clean equipment from contamination prior to use.",
+    "finding_text_ko": "세척 및 유지보수에 관한 서면 절차에 책임 배정, 사용되는 방법, 설비 및 물질에 대한 충분히 상세한 기술, 적절한 세척 및 유지보수를 보장하는 데 필요한 설비의 분해 및 재조립 방법에 대한 충분히 상세한 기술, 그리고 사용 전 세척된 설비를 오염으로부터 보호하는 지침이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "57ea22924525fff15f6d82a48aad5b86"
+  },
+  {
+    "finding_id": "finding-9d66b1e0661772892fe8390d",
+    "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards, sampling plans and test procedures designed to assure that components, in- process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+    "finding_text_ko": "시험실 관리에 원료, 공정 중 물질 및 의약품이 확인, 함량, 품질 및 순도에 관한 적절한 기준에 부합함을 보장하도록 설계된 과학적으로 타당하고 적절한 규격, 기준, 시료채취 계획 및 시험 절차의 수립이 포함되어 있지 않다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "599ad0bf48f9a11a843ec708625cf69a"
+  },
+  {
+    "finding_id": "finding-b2ca3ff6c84c2d0759ff996e",
+    "finding_text": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods ofdisassembly and reassembling equipment as necessary to assure proper cleaning and maintenance.",
+    "finding_text_ko": "설비의 세척 및 유지보수 절차에 세척 및 유지보수 작업에 사용되는 방법, 설비, 물질에 대한 상세 기술과, 적절한 세척 및 유지보수를 보장하는 데 필요한 설비의 분해 및 재조립 방법에 대한 상세 기술이 충분하지 않다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "58ae469f8caeda44867cce8ac723aadb"
+  },
+  {
+    "finding_id": "finding-8fc4d2f4f994ef99ea80bb85",
+    "finding_text": "The “Continued Process Verification Program” (CPVP) document #CF/QA/028 establishes an “ongoing assurance that the process remains ina state of control (the validated state) during commercial manufac- ture.” “The purpose ofthis procedure is to identify and summarize the current systems within Claris Injectables Limited which are implemented to evaluate the performance process, identify potential prob- lems and determine whether action must be taken to correct, anticipate, and prevent problems so that the process remains in a state of control throughout the lifecycle.” The implementation of the CPVP “will ensure adherence to the CGMP requirements (specifically, the collection and evaluation of information and data about the performance ofthe process) and will promote detection and remediation of undesired process variability.” The list of objectionable conditions document a number of instances where the Quality Unit has not effectively “evaluate the performance process, identify potential problems and de- termine whether action must be taken to correct, anticipate, and prevent problems so that the process remains in a state of control throughout the lifecycle.”",
+    "finding_text_ko": "��Continued Process Verification Program�� (CPVP) 문서 #CF/QA/028은 ��ongoing assurance that the process remains ina state of control (the validated state) during commercial manufac- ture.��을 수립한다. ��The purpose ofthis procedure is to identify and summarize the current systems within Claris Injectables Limited which are implemented to evaluate the performance process, identify potential prob- lems and determine whether action must be taken to correct, anticipate, and prevent problems so that the process remains in a state of control throughout the lifecycle.�� CPVP는 ��will ensure adherence to the CGMP requirements (specifically, the collection and evaluation of information and data about the performance ofthe process) and will promote detection and remediation of undesired process variability.��라고 한다. 지적 사항 목록은 품질 부서가 ��evaluate the performance process, identify potential problems and de- termine whether action must be taken to correct, anticipate, and prevent problems so that the process remains in a state of control throughout the lifecycle.��를 효과적으로 수행하지 못한 여러 사례를 기록하고 있다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "0435af4b427e687f1c4c993265851e4d"
+  },
+  {
+    "finding_id": "finding-a2e84dc1c7499e1a555c6222",
+    "finding_text": "Written records of investigation into unexplained discrepancies or the failure ofa batch or its components to meet specification do not always include Conclusion and follow up Specifically, the following lab events were not investigated to assess the Root Cause, also no Corrective and Preventative Action (CAPA) was initiated.",
+    "finding_text_ko": "설명되지 않은 불일치 또는 배치나 그 원료가 규격에 부합하지 못한 데 대한 조사의 서면 기록에 결론 및 후속 조치가 항상 포함되어 있지는 않다. 구체적으로, 다음 시험실 이벤트들은 근본 원인을 평가하기 위한 조사가 이루어지지 않았고, 시정 및 예방 조치(CAPA)도 개시되지 않았다.",
+    "translation_method": "llm_assisted",
+    "kind": "restore",
+    "finding_text_old_md5": "ae15ccabffd7a509bec2e80ebe55468e"
+  }
+]

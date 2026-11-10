@@ -16281,9 +16281,10 @@ class WebInspectorEntryPointsTest(unittest.TestCase):
         # [진입점 2026-11-09] 면 탭 3개 뒤에 지적 조항·지적 사례 바로가기 — 페이지가 선
         # 빌드에서만 붙는다(없는 페이지로 보내지 않는다).
         extra = [(p, t) for p, t in (("findings/citations/", "FDA 지적 조항"),
+                                     ("findings/import-alerts/", "FDA 수입경보"),
                                      ("findings/examples/", "지적 사례"))
                  if (self.single / p / "index.html").is_file()]
-        self.assertEqual(len(extra), 2, "커밋 정본이 있으면 두 화면이 모두 선다")
+        self.assertEqual(len(extra), 3, "커밋 정본이 있으면 세 화면이 모두 선다")
         for label, html in (("search", self.search), ("browse", self.browse),
                              ("inspector", self.inspector)):
             with self.subTest(page=label):

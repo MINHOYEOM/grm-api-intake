@@ -45,6 +45,29 @@ COUNTRY_LABELS_KO: dict[str, str] = {
     "AE": "아랍에미리트",
 }
 
+# [2026-11-10] 위 68코드 표 밖의 나라(수입경보에만 나온다) — 한국어 화면 전용 보충 표.
+# 위 표는 grm_findings._COUNTRY_CODE_MAP·마이그레이션 055 와 파리티로 묶여 있어 여기서 넓히지 않는다.
+# 키 = country_key 의 'x-' 키(FDA 표기 정규화). 영어 화면은 FDA 표기 그대로(en.json 키를 늘리지 않는다).
+# 새 나라가 스냅샷에 들어오면 FDA 표기로 보이다가 이 표에 한 줄 더하면 바뀐다.
+EXTRA_COUNTRY_LABELS_KO: dict[str, str] = {
+    "x-nigeria": "나이지리아", "x-pakistan": "파키스탄", "x-ghana": "가나",
+    "x-ivory-coast": "코트디부아르", "x-el-salvador": "엘살바도르", "x-russia": "러시아",
+    "x-ukraine": "우크라이나", "x-bahamas": "바하마", "x-peru": "페루",
+    "x-saudi-arabia": "사우디아라비아", "x-vanuatu": "바누아투", "x-panama": "파나마",
+    "x-jamaica": "자메이카", "x-trinidad-tobago": "트리니다드토바고", "x-saint-lucia": "세인트루시아",
+    "x-dominica": "도미니카연방", "x-guyana": "가이아나", "x-nepal": "네팔", "x-togo": "토고",
+    "x-armenia": "아르메니아", "x-honduras": "온두라스", "x-tunisia": "튀니지",
+    "x-venezuela": "베네수엘라", "x-azerbaijan": "아제르바이잔", "x-belize": "벨리즈",
+    "x-british-virgin-islands": "영국령 버진아일랜드", "x-cameroon": "카메룬",
+    "x-ecuador": "에콰도르", "x-georgia": "조지아", "x-yemen": "예멘", "x-zimbabwe": "짐바브웨",
+    "x-guatemala": "과테말라", "x-barbados": "바베이도스", "x-bermuda": "버뮤다",
+    "x-congo-dem-rep-of-kinshasa": "콩고민주공화국", "x-curacao": "퀴라소", "x-fiji": "피지",
+    "x-gambia-the": "감비아", "x-grenada": "그레나다", "x-haiti": "아이티", "x-kenya": "케냐",
+    "x-nicaragua": "니카라과", "x-paraguay": "파라과이", "x-senegal": "세네갈",
+    "x-serbia": "세르비아", "x-seychelles": "세이셸", "x-sierra-leone": "시에라리온",
+    "x-syrian-arab-republic": "시리아",
+}
+
 # FDA 가 붙인 경보 제목(원문 그대로 — 번역하지 않는다).
 ALERT_TITLES: dict[str, str] = {
     "66-40": "Detention Without Physical Examination of Drugs From Firms Which Have Not Met Drug GMPs",
@@ -93,13 +116,14 @@ def list_view(snapshot: "dict[str, Any] | None", *, tr: Callable[..., str], lang
             continue
         ckey = country_key(country)
         label_ko = COUNTRY_LABELS_KO.get(ckey)
+        extra_ko = EXTRA_COUNTRY_LABELS_KO.get(ckey) if lang == "ko" else None
         published = str(r.get("firm_published") or "")
         rows.append({
             "alert_no": alert_no,
             "firm_name": name,
             "city": city,
             "country_key": ckey,
-            "country_label": tr(label_ko) if label_ko else country,
+            "country_label": tr(label_ko) if label_ko else (extra_ko or country),
             "firm_published": published if _DATE_RE.match(published) else "",
             "n_products": len(r.get("product_codes") or []),
             "active": r.get("active") is True,

@@ -32,11 +32,14 @@ ZONE_PAGES = [
     ("findings/trends/index.html", "트렌드"),
     ("findings/inspections/index.html", "실사 결과"),
     ("findings/citations/index.html", "FDA 지적 조항"),
+    ("findings/import-alerts/index.html", "FDA 수입경보"),
     ("findings/examples/index.html", "지적 사례"),
+    ("findings/examples/pmda/index.html", "지적 사례"),
+    ("findings/examples/mhra/index.html", "지적 사례"),
     ("findings/inspector/index.html", "실사관"),
     ("findings/coverage/index.html", None),
 ]
-TAB_ORDER = ["검색", "둘러보기", "트렌드", "실사 결과", "FDA 지적 조항", "지적 사례", "실사관"]
+TAB_ORDER = ["검색", "둘러보기", "트렌드", "실사 결과", "FDA 지적 조항", "FDA 수입경보", "지적 사례", "실사관"]
 TOOLS_AFTER_TABS = ["자가점검 체크리스트", "업체 조회", "문서로 찾기"]
 STRIP_H = "다음으로 볼 것"
 

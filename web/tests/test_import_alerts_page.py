@@ -70,14 +70,40 @@ class ListViewTest(unittest.TestCase):
         self.assertEqual(en_alpha["country_label"], "South Korea")
         self.assertEqual(self.ko["countries"][0], {"key": "KR", "label": "대한민국", "n": 2})
 
-    def test_unmapped_country_kept_verbatim(self):
-        snap = {"measured_on": "2026-11-09", "listings": [
+    @staticmethod
+    def _one(country):
+        return {"measured_on": "2026-11-09", "listings": [
             {"alert_no": "66-41", "firm_key": "k", "firm_name": "Zeta Ltd", "name_norm": "ZETA",
-             "country": "PAKISTAN", "city": "Lahore", "firm_published": "2020-01-01",
+             "country": country, "city": "Lahore", "firm_published": "2020-01-01",
              "product_codes": [], "active": True}]}
-        v = iap.list_view(snap, tr=render.Translator("ko"), lang="ko")
+
+    def test_unmapped_country_kept_verbatim(self):
+        v = iap.list_view(self._one("ATLANTIS"), tr=render.Translator("ko"), lang="ko")
         self.assertEqual((v["rows"][0]["country_key"], v["rows"][0]["country_label"]),
-                         ("x-pakistan", "PAKISTAN"))
+                         ("x-atlantis", "ATLANTIS"))
+
+    def test_extra_country_korean_only_on_ko(self):
+        # [2026-11-10] 68코드 표 밖 나라는 한국어 화면에서만 보충 표로 — 영어 화면은 FDA 표기 그대로.
+        ko = iap.list_view(self._one("PAKISTAN"), tr=render.Translator("ko"), lang="ko")
+        en = iap.list_view(self._one("PAKISTAN"), tr=render.Translator("en"), lang="en")
+        self.assertEqual((ko["rows"][0]["country_key"], ko["rows"][0]["country_label"]),
+                         ("x-pakistan", "파키스탄"))
+        self.assertEqual(en["rows"][0]["country_label"], "PAKISTAN")
+        self.assertEqual(ko["countries"][0]["label"], "파키스탄")
+
+    def test_extra_table_never_shadows_iso_table(self):
+        # 보충 표 키는 전부 'x-' — ISO2 표와 겹치지 않고, 이름도 겹치지 않는다(도미니카공화국≠도미니카연방).
+        self.assertTrue(all(k.startswith("x-") for k in iap.EXTRA_COUNTRY_LABELS_KO))
+        self.assertFalse(set(iap.EXTRA_COUNTRY_LABELS_KO.values()) & set(iap.COUNTRY_LABELS_KO.values()))
+
+    def test_committed_snapshot_ko_labels_all_korean(self):
+        # 커밋 스냅샷 기준 한국어 화면의 나라 이름은 전부 한글(11-10: 48개국이 FDA 대문자였다).
+        snap = render.load_import_alerts(render.IMPORT_ALERTS_FILE)
+        if not snap:
+            self.skipTest("스냅샷 없음")
+        v = iap.list_view(snap, tr=render.Translator("ko"), lang="ko")
+        latin = sorted({c["label"] for c in v["countries"] if not iap._HANGUL_RE.search(c["label"])})
+        self.assertEqual(latin, [], "보충 표(EXTRA_COUNTRY_LABELS_KO)에 한 줄 더하라")
 
     def test_firm_link_only_when_slug_given(self):
         v = iap.list_view(self.snap, tr=render.Translator("ko"), lang="ko",

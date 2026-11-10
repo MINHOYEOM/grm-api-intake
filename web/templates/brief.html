@@ -78,7 +78,22 @@
       {%- if card.group_head %}
       <div class="grp-h">{{ card.group_head }}</div>
       {%- endif %}
+      {%- if card.weight == 'row' %}
+      {#- [카드 무게 2026-11-10 · 결정 B] 표 한 줄 — 업체·제품·사유·등급(구분)·날짜·원문 링크.
+          누르면 그 자리에서 지금 카드처럼 펼친다(시사점·점검 없음 — render._card_view). -#}
+      {%- if card.row_open %}
+      <div class="rowtbl"><div class="rowtbl-h">{{ _("한 줄로 보기") }} <span class="n">{{ _("{n}건", n=card.row_head.n) }}</span>{% if card.row_head.agencies %} <span class="n">· {{ card.row_head.agencies }}</span>{% endif %}</div>
+        <div class="rowtbl-cols" aria-hidden="true"><span>{{ _("업체") }}</span><span>{{ _("제품") }}</span><span>{{ _("사유") }}</span><span>{{ _("등급·구분") }}</span><span>{{ _("발행일") }}</span><span></span></div>
+      {%- endif %}
+        <details class="rowc"><summary class="rowc-s"><span class="rc-firm">{{ card.row.firm or '—' }}</span><span class="rc-product">{{ card.row.product or '—' }}</span><span class="rc-reason">{{ card.row.reason or '—' }}</span><span class="rc-grade">{{ card.row.grade or '—' }}</span><span class="rc-date mono">{{ card.row.date or '—' }}</span><span class="rc-src">{% if card.row.url %}<a href="{{ card.row.url }}" target="_blank" rel="noopener" aria-label="{{ _('원문') }}"><i class="ti ti-external-link"></i></a>{% endif %}</span></summary>
+        {% include "partials/card.html" %}
+        </details>
+      {%- if card.row_close %}
+      </div>
+      {%- endif %}
+      {%- else %}
       {% include "partials/card.html" %}
+      {%- endif %}
       {%- endfor %}
       </div>
       {%- endfor %}
@@ -216,6 +231,34 @@
 .c-doclink .ti{font-size:14px;transition:transform .16s var(--ease)}
 .c-doclink:hover .ti{transform:translateX(3px)}
 @media(prefers-reduced-motion:reduce){.c-doclink .ti{transition:none}}
+{% if card_weighted %}
+/* [카드 무게 2026-11-10 · 결정 B] 표 한 줄 묶음. 새 짜임 호에만 낸다(앞 호 바이트 불변).
+   grm.css 무접촉 — 토큰만 재사용. 줄을 누르면 그 아래로 지금 카드가 펼쳐진다. */
+.rowtbl{margin-top:22px;border:1px solid var(--line);border-radius:var(--rad);background:var(--canvas);overflow:hidden}
+.rowtbl-h{padding:12px 16px;font-family:var(--sans);font-size:14.5px;font-weight:600;color:var(--ink)}
+.rowtbl-h .n{font-weight:400;color:var(--muted)}
+.rowtbl-cols,.rowc-s{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.6fr) minmax(0,1.7fr) minmax(0,.9fr) 6.2em 1.6em;gap:12px;padding:9px 16px;align-items:baseline}
+.rowtbl-cols{font-family:var(--sans);font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
+.rowc{border-top:1px solid var(--line)}
+.rowc-s{cursor:pointer;list-style:none;font-family:var(--sans);font-size:13.5px;line-height:1.45;color:var(--ink)}
+.rowc-s::-webkit-details-marker{display:none}
+.rowc-s>span{min-width:0;overflow-wrap:anywhere;word-break:keep-all}
+.rowc-s:hover,.rowc[open]>.rowc-s{background:var(--soft)}
+.rowc-s .rc-grade,.rowc-s .rc-date{color:var(--body-s);font-size:12.5px}
+.rowc-s .rc-src a{color:var(--coral-2)}
+.rowc>article.card{margin:0;border:0;border-top:1px dashed var(--line);border-radius:0}
+body.brief-summary #cards .rowc[open]>article.card{display:block}
+@media(max-width:720px){
+  .rowtbl-cols{display:none}
+  .rowc-s{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"firm src" "product product" "reason reason" "grade date";row-gap:2px}
+  .rowc-s .rc-firm{grid-area:firm;font-weight:600}
+  .rowc-s .rc-src{grid-area:src}
+  .rowc-s .rc-product{grid-area:product}
+  .rowc-s .rc-reason{grid-area:reason}
+  .rowc-s .rc-grade{grid-area:grade}
+  .rowc-s .rc-date{grid-area:date;text-align:right}
+}
+{% endif %}
 {% if lang != 'ko' %}
 /* [영문 상호참조 줄 2026-09-07] 규제기관이 한국어로 낸 지적사항 상세가 영어판에서 빠진
    자리. 형제 토글(details.detail 의 "지적사항 상세 · N건")과 같은 라벨 모양에 한국어판으로
@@ -337,6 +380,7 @@
   /* 요약행 — 각 카드에서 파생, 카드 뒤 형제로 1회 주입 */
   var issueNo=cards.getAttribute('data-issue-no')||'', date=cards.getAttribute('data-date')||'';
   [].forEach.call(cards.querySelectorAll('article.card'), function(card){
+    if(card.closest && card.closest('.rowtbl')) return;   /* 표 한 줄은 표 자체가 요약이다 */
     var a=document.createElement('a');
     a.className='cresult card-summary'; a.href='#'+card.id;
     var badges=card.querySelector('.badges');
@@ -348,6 +392,10 @@
     var tier=card.getAttribute('data-signal-tier')||'', ev=card.getAttribute('data-evidence')||'';
     var meta='<span class="mono">Vol.'+issueNo+' · '+date+'</span> · '+ct+' · Signal T'+tier+' · Evidence '+ev;
     a.innerHTML='<div>'+bhtml+'<h4>'+thtml+'</h4><div class="meta">'+meta+'</div></div><i class="ti ti-arrow-right go" aria-hidden="true"></i>';
+    /* [카드 무게 2026-11-10] 새 짜임 호는 꼬리표가 그 건의 사실 하나(사유·등급·지적 건수)다.
+       값은 속성에서 읽어 textContent 로만 넣는다(HTML 삽입 금지). */
+    var tag=card.getAttribute('data-tag');
+    if(tag){ var m=a.querySelector('.meta'); if(m) m.textContent=tag; }
     a.addEventListener('click', function(e){
       e.preventDefault(); setView('full', true);   /* 카드 하나 펼침 — 독자의 보기 선택으로 저장하지 않는다 */
       var t=document.getElementById(card.id);
@@ -373,6 +421,14 @@
     : (saved==='full' || saved==='summary') ? saved : 'summary';
   setView(initial, true);
   if(initial==='full' && hashCard) hashCard.scrollIntoView({block:'start'});
+  /* 표 한 줄 카드로 바로 온 링크(목차·공유) — 접힌 줄을 펼치고 그 카드로 간다. */
+  function openRowTarget(){
+    var t=location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    var d=t && t.closest && t.closest('details.rowc');
+    if(d){ d.open=true; t.scrollIntoView({block:'start'}); }
+  }
+  window.addEventListener('hashchange', openRowTarget);
+  openRowTarget();
 })();
 /* [브리프→업체 프로파일 브릿지] 카드 data-firm-key(render.py 빌드시 스탬프) → 013
    findings_firm_counts RPC 1회 호출(카드 수만큼 개별 호출 금지) → 지적 건수>0 인

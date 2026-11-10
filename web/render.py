@@ -134,6 +134,7 @@ from grm_findings import evidence_url_quality_error as _evidence_url_quality_err
 # [WHOPIR 결론 한 줄 2026-11-03] 결론은 접힌 상세(`deterministic_detail.outcome`)에만 있었다.
 # 매 빌드가 브리프 JSON 을 다시 렌더하므로(재수집 없음) 과거 호도 이 판정으로 첫 화면에 오른다.
 from card_scaffold import whopir_outcome_parts as _whopir_outcome_parts  # noqa: E402
+import card_weight as _cw  # noqa: E402  [카드 무게 2026-11-10] 지적 건수·무지적 판정 공유
 
 # [다국어 2단계 2026-09-03] 문구 사전 — 키는 한국어 원문, 한국어 빌드는 항등(바이트 불변).
 # `tr("…")` 은 render_site 가 언어별로 만드는 번역기, `N_("…")` 은 모듈 상수를 키로
@@ -859,6 +860,142 @@ def _inspection_view(card: dict[str, Any], tr: Translator, lang: str) -> "dict[s
     }
 
 
+# ── [카드 무게 2026-11-10 · 대표 결정 A·B·C] 깊이·표준·표 한 줄 ─────────────────────
+# 값(`card["card_weight"]`)은 조립 단계(`card_weight.py`)가 코드로 정해 넣는다. 여기서는
+# 그 값대로 그릴 재료만 만든다. ★값이 없는 카드(11-16호 앞의 모든 호)는 weight="" →
+# 순서·꼬리표·라벨·표 묶음이 전부 종전 그대로(바이트 불변, 소급 없음).
+CARD_WEIGHTS = ("deep", "standard", "row")
+_WEIGHT_RANK = {"deep": 0, "standard": 1, "row": 2}
+LIST_TAG_MAX_CHARS = 48
+ROW_CELL_MAX_CHARS = 60
+# 깊이 카드 앞면에 지적 목록 아래로 올리는 핵심 사실 줄(머리말은 v16 고정 머리말 — 두 언어).
+_DEEP_FRONT_PREFIXES = ("당국 조치:", "회신과 FDA 판단:", "Agency action:",
+                        "Response and FDA's assessment:")
+# 목록 줄 꼬리표로 쓸 핵심 사실 머리말(앞의 것이 먼저) — 회수·실사 외 유형.
+_TAG_KF_PREFIXES = ("처분:", "Sanction:", "시행일:", "Effective date:", "바뀌는 것:",
+                    "What changes:", "결론:", "Outcome:", "사유:", "Reason:")
+_RECALL_CARD_TYPES = ("회수·판매중지", "Recall", "Recall(UK)", "Recall(HC)")
+# 식약처 회수 구분(`ENFRC_YN` 파생 — 값 집합이 닫혀 있다).
+_MFDS_ENFORCEMENT_LABEL = {"회수명령 (강제)": N_("회수명령 (강제)"), "자진회수": N_("자진회수")}
+
+
+def lang_is_ko(tr: Translator) -> bool:
+    return getattr(tr, "lang", DEFAULT_LANG) == DEFAULT_LANG
+
+
+def _clip(text: str, n: int) -> str:
+    t = " ".join(str(text or "").split())
+    return t if len(t) <= n else t[: n - 1].rstrip() + "…"
+
+
+def _fact_of(card: dict[str, Any], *labels: str) -> str:
+    for f in card.get("facts") or []:
+        if (f.get("label") or "").strip() in labels:
+            return str(f.get("value") or "").strip()
+    return ""
+
+
+def _kf_value(key_facts: list[Any], prefixes: "tuple[str, ...]") -> str:
+    for p in prefixes:
+        for k in key_facts or []:
+            s = str(k).strip()
+            if s.startswith(p):
+                return s[len(p):].strip()
+    return ""
+
+
+def _recall_reason_for_lang(card: dict[str, Any], lang: str) -> str:
+    """회수 사유 — 원문 사유어(첫 인용). 영어 트리에서 원문이 한국어면 영문 핵심 사실 `Reason:`."""
+    qs = card.get("quotes") or []
+    reason = " ".join(str((qs[0] or {}).get("original") or "").split()) if qs else ""
+    if lang != DEFAULT_LANG and _HANGUL_RE.search(reason):
+        reason = _kf_value(card.get("key_facts") or [], ("Reason:",))
+    return reason
+
+
+def _short_reason(card: dict[str, Any], lang: str, limit: int) -> str:
+    """짧은 회수 사유 — 원문 사유어가 `limit` 자 이하면 그대로, 길면(MHRA 알림 문장 등) 핵심 사실
+    `사유:`/`Reason:` 값, 그것도 길면 카드 제목 쟁점(`title_issue`). 원문을 자르지 않고 고른다."""
+    reason = _recall_reason_for_lang(card, lang)
+    if reason and len(reason) <= limit:
+        return reason
+    kf = _kf_value(card.get("key_facts") or [], ("사유:", "Reason:"))
+    if kf and len(kf) <= limit:
+        return kf
+    return card.get("title_issue") or reason or kf
+
+
+def _recall_grade(card: dict[str, Any], tr: Translator) -> str:
+    """등급(FDA·HC·MHRA `Class`) 또는 식약처 구분(강제·영업자)."""
+    klass = _fact_of(card, "Class")
+    if klass:
+        return klass
+    dd = card.get("deterministic_detail") or {}
+    enf = str(dd.get("enforcement") or "").strip() if dd.get("type") == "mfds_recall_detail" else ""
+    if enf in _MFDS_ENFORCEMENT_LABEL:
+        return tr(_MFDS_ENFORCEMENT_LABEL[enf])
+    # 모르는 값은 한국어 트리에만 원문 그대로(영어 트리에 지어 옮기지 않는다).
+    return enf if lang_is_ko(tr) else ""
+
+
+def _finding_tag(card: dict[str, Any], tr: Translator,
+                 insp: "dict[str, Any] | None") -> str:
+    """실사 결과 카드의 지적 건수 꼬리표. 셀 수 없으면 ""."""
+    if _cw.is_no_finding_inspection(card):
+        return tr("지적 없음")
+    n = _cw.finding_count(card)
+    if card.get("type_tag") == "483" and n:
+        return tr("Observation {n}건", n=n)
+    if card.get("card_type") == "Warning Letter" and n:
+        return tr("위반 {n}건", n=n)
+    if card.get("card_type") == "GMP실사" and n:
+        return tr("지적 {n}건", n=n)
+    if insp and insp.get("chips"):
+        return " · ".join(c["text"] for c in insp["chips"])
+    return ""
+
+
+def _list_tag(card: dict[str, Any], tr: Translator, lang: str,
+              insp: "dict[str, Any] | None") -> str:
+    """목록 줄 꼬리표 — 그 건의 사실 하나(등급·사유·지적 건수). `card` 는 표시 언어 서사 적용본."""
+    if card.get("card_type") in _RECALL_CARD_TYPES:
+        bits = [b for b in (_recall_grade(card, tr), _short_reason(card, lang, 36)) if b]
+        return _clip(" · ".join(bits), LIST_TAG_MAX_CHARS)
+    tag = _finding_tag(card, tr, insp)
+    if tag:
+        return _clip(tag, LIST_TAG_MAX_CHARS)
+    return _clip(_kf_value(card.get("key_facts") or [], _TAG_KF_PREFIXES), LIST_TAG_MAX_CHARS)
+
+
+def _row_view(card: dict[str, Any], tr: Translator, lang: str,
+              sources: dict[str, Any]) -> dict[str, Any]:
+    """표 한 줄 칸 — 업체 · 제품 · 사유 · 등급(구분) · 날짜 · 원문 링크. 전부 사실값에서 파생."""
+    is_recall = card.get("card_type") in _RECALL_CARD_TYPES
+    firm = _fact_of(card, "업체", "제조소", "제조소/업체", "업체/제조소") or card.get("agency", "")
+    product = _fact_of(card, "제품")
+    if not product:
+        head = (card.get("headline_target") or "").strip()
+        product = head if head and head != firm else ""
+    reason = _short_reason(card, lang, ROW_CELL_MAX_CHARS) if is_recall else ""
+    if not reason:
+        reason = card.get("title_issue") or ""
+    if is_recall:
+        grade = _recall_grade(card, tr)
+    elif card.get("card_type") == "GMP실사":
+        grade = tr("지적 없음") if _finding_tag(card, tr, None) == tr("지적 없음") else ""
+    else:
+        grade = tr(card["card_type"]) if card.get("card_type") else ""
+    link = sources["official"] if sources["official"]["url"] else sources["info"]
+    return {
+        "firm": _clip(firm, ROW_CELL_MAX_CHARS),
+        "product": _clip(product, ROW_CELL_MAX_CHARS),
+        "reason": _clip(reason, ROW_CELL_MAX_CHARS),
+        "grade": grade,
+        "date": _fact_of(card, "발행일"),
+        "url": link["url"] if link.get("state") != "broken" else "",
+    }
+
+
 def _card_view(card: dict[str, Any], tr: Translator = _KO,
                lang: str = DEFAULT_LANG,
                doc_url_index: "dict[str, tuple[str, int]] | None" = None,
@@ -989,7 +1126,40 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
     insp = _inspection_view(card, tr, lang)
     insp_list = bool(insp and (insp["items_head"] or insp["items_rest"]))
 
+    # [카드 무게 2026-11-10] 값이 있는 카드만 새 짜임. 없으면 아래 값이 전부 비어 종전 그대로.
+    weight = card.get("card_weight") if card.get("card_weight") in CARD_WEIGHTS else ""
+    implication = "" if insp_list else card.get("implication", "")
+    checks = card.get("checks") or []
+    imp_label, imp_sub = tr("시사점"), tr("편집 해석")
+    front_facts: list[str] = []
+    if weight:
+        # 시사점 칸은 v16(11-10)부터 원문에 있는 추가 정보만 싣는다 — 이름을 맞춘다.
+        imp_label, imp_sub = tr("더 알아둘 사실"), tr("원문 기준")
+        if weight == "deep" and insp_list:
+            # 결정 C: 지적 목록 아래에 `당국 조치:`(경고서한은 `회신과 FDA 판단:` 도) 줄을 앞면에.
+            front_facts = [str(k) for k in key_facts
+                           if str(k).strip().startswith(_DEEP_FRONT_PREFIXES)]
+            if card.get("card_type") == "Warning Letter":
+                implication = card.get("implication", "")
+                if implication:   # 회신·판단은 아래 칸이 원문대로 싣는다 — 같은 말을 두 번 두지 않는다
+                    front_facts = [k for k in front_facts
+                                   if not k.strip().startswith(_DEEP_FRONT_PREFIXES[1::2])]
+        if card.get("card_type") == "Warning Letter":
+            imp_label, imp_sub = tr("회신과 FDA 판단"), tr("원문 기준")
+        if weight == "row":
+            # 결정 B: 표 한 줄에는 해석 칸이 없다(펼쳐도 시사점·점검 없음).
+            implication, checks = "", []
+
     return {
+        "weight": weight,
+        "list_tag": _list_tag(card, tr, lang, insp) if weight else "",
+        "row": _row_view(card, tr, lang, sources) if weight == "row" else None,
+        "row_open": False,                  # 표 묶음 시작·끝 — 섹션 조립 시 결정
+        "row_close": False,
+        "row_head": None,
+        "front_facts": front_facts,
+        "imp_label": imp_label,
+        "imp_sub": imp_sub,
         "render_order": card.get("render_order"),
         "anchor": _card_anchor(card),
         # ★`group` 은 **데이터 값**이다(섹션 묶기·정렬 키) — 번역하면 묶임이 깨진다.
@@ -1052,8 +1222,8 @@ def _card_view(card: dict[str, Any], tr: Translator = _KO,
         #   손대지 않는다.
         "evidence_basis": (tr(EVIDENCE_BASIS_LABELS.get(card["evidence_basis"], card["evidence_basis"]))
                            if card.get("evidence_basis") else card.get("evidence_basis", "")),
-        "implication": "" if insp_list else card.get("implication", ""),
-        "checks": card.get("checks") or [],
+        "implication": implication,
+        "checks": checks,
         # [WL 심층분석 fan-out 2026-07-01] 7번째·선택 슬롯 그대로 통과(사실/URL 무변형 원칙과
         # 동형 — 표시 플래그 미가공, 값 자체는 raw). 대다수 카드는 키 부재/None → card.html
         # `{% if card.deep_analysis %}` 가 False 라 기존 golden 출력 바이트 불변(additive).
@@ -1197,7 +1367,7 @@ def _build_sections(card_views: list[dict[str, Any]],
     sections: list[dict[str, Any]] = []
     cur: dict[str, Any] | None = None
     cur_grp: Any = object()                            # sentinel
-    for cv in card_views:
+    for cv in _order_by_weight(card_views):
         if cur is None or cv["group"] != cur["slug"]:
             cur = {
                 # [다국어 5단계] 화면에 보이는 이름만 번역한다. `slug` 는 앵커 id 이자
@@ -1219,7 +1389,54 @@ def _build_sections(card_views: list[dict[str, Any]],
         cur["cards"].append(cv)
     for s in sections:
         s["count"] = len(s["cards"])
+        _mark_row_runs(s["cards"], tr)
     return sections
+
+
+def _order_by_weight(card_views: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """[카드 무게 2026-11-10 · 재정비안 §2-2] 각 묶음 안에서 깊이 → 표준 → 표 한 줄.
+
+    묶음 = 연속한 (group, group_label) 구간(섹션 · 국내 소제목). 구간 안에서만 안정 정렬하므로
+    섹션·소제목 순서와 같은 무게 안의 원래 순서는 그대로다. 무게 값이 하나도 없는 호(11-16 앞)는
+    입력 그대로 돌려준다(바이트 불변)."""
+    if not any(cv.get("weight") for cv in card_views):
+        return card_views
+    out: list[dict[str, Any]] = []
+    run: list[dict[str, Any]] = []
+    key: Any = object()
+    for cv in card_views + [None]:                     # type: ignore[list-item]
+        k = None if cv is None else (cv.get("group"), cv.get("group_label"))
+        if cv is None or k != key:
+            out.extend(sorted(run, key=lambda v: _WEIGHT_RANK.get(v.get("weight"), 1)))
+            run, key = [], k
+        if cv is not None:
+            run.append(cv)
+    return out
+
+
+def _mark_row_runs(cards: list[dict[str, Any]], tr: Translator) -> None:
+    """연속한 표 한 줄 카드(같은 소제목 안)를 표 묶음 하나로 — 시작·끝 표시와 묶음 제목."""
+    i = 0
+    while i < len(cards):
+        if cards[i].get("weight") != "row":
+            i += 1
+            continue
+        j = i
+        while (j + 1 < len(cards) and cards[j + 1].get("weight") == "row"
+               and cards[j + 1].get("group_label") == cards[i].get("group_label")):
+            j += 1
+        run = cards[i:j + 1]
+        by_agency: dict[str, int] = {}
+        for cv in run:
+            a = cv.get("agency") or ""
+            by_agency[a] = by_agency.get(a, 0) + 1
+        cards[i]["row_open"] = True
+        cards[i]["row_head"] = {
+            "n": len(run),
+            "agencies": " · ".join(f"{a} {n}" for a, n in by_agency.items() if a),
+        }
+        cards[j]["row_close"] = True
+        i = j + 1
 
 
 def _norm_coverage(cov: dict[str, Any]) -> dict[str, Any]:
@@ -7384,6 +7601,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
             description=_brief_description(b["brief"], tr),
             brief=ctx,
             sections=sections,
+            card_weighted=any(cv.get("weight") for cv in card_views),
             lib_update_week=lib_update_week,
             json_ld=build_brief_article_json_ld(
                 _brief_page_title, brief_page.canonical, pub, lang=lang),
@@ -7423,6 +7641,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
                 description=_brief_description(b["brief"], en_tr, "en"),
                 brief=en_ctx,
                 sections=_build_sections(en_card_views, en_tr),
+                card_weighted=any(cv.get("weight") for cv in en_card_views),
                 ko_only_names=count_ko_only_names(en_card_views),
                 # [다국어 2026-09-05] 한국어판과 **같은 창(window)** 을 영어 카탈로그로
                 # 다시 조인한다 — 창은 브리프가 정하는 값이라 언어와 무관해야 한다.

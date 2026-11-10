@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import inject_slots
+import card_weight
 import inspection_card
 from grm_taxonomy import is_out_of_scope_483
 
@@ -716,6 +717,15 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
             report.warnings.append(
                 f"비준수 카드 {c.get('id')!r}: 지적 목록 없음(원문 구조 없음·findings_ko 없음 또는 "
                 "개수 불일치) — 등급·조치 칩과 접힌 원문으로 발행")
+
+    # [카드 무게 2026-11-10 · 대표 결정 A·B] 카드마다 깊이·표준·표 한 줄을 코드가 정해 넣는다
+    # (`card_weight.py` — 유형·등급·지적 건수·사유 원문 길이만 센다). 렌더는 이 값이 있는 호만
+    # 묶음 안 순서·표 묶음·꼬리표를 새 짜임으로 그린다. 앞 호는 붙이지 않는다(소급 없음).
+    # 실사 앞면 블록·합치기 **뒤**여야 묶인 카드·지적 건수가 최종값이다.
+    if card_weight.card_weight_applies(scaffold.get("brief") or {}):
+        _w = card_weight.assign_card_weights(adopted_cards)
+        report.warnings.append(
+            f"카드 무게: 깊이 {_w['deep']} · 표준 {_w['standard']} · 표 한 줄 {_w['row']}")
 
 
     # [업계 브리핑 노트 2026-07-13] 해설·교육성 2차 소스(ECA GMP News 등) → 이벤트 카드에서

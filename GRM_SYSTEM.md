@@ -6,7 +6,7 @@
 
 | 문서 메타 | 값 |
 |---|---|
-| 문서 버전 | `v1.310` |
+| 문서 버전 | `v1.311` |
 | 최종 수정일 | 2026-11-10 |
 | 현재 상태 | 매일 자동 수집·주간 자동 발행 가동 중 — **2026-07-13 자동화 전수 정비 완료: 매주 사람 개입 = Admin 승인 1클릭 유일**(심층분석 클라우드 생성 **배선 완료 2026-07-27 — 첫 실전은 08-03**[2026-07-13~07-27 은 handoff 에 deep 입력이 실리지 않아 Routine 이 매주 "대상 0건"으로 판단, 사람이 백필해 왔다]·발송 2종 무승인 자동·**월요일 크론 지각 대응 = 비정각+브릿지 14회+워치독 자가 복구**(2026-07-20), 상세 = `docs/GRM_자동화지도_2026-07.md`). 웹사이트(`grm-solutions.com`)가 주 발행 채널. **Findings 인텔리전스(FIND-1) M1~M14 완료·라이브**에 이어 전략 로드맵 F2(볼륨)~F4a(에이전트 자산)까지 진행: 외부 백필 자동 파이프라인 가동 중(**공개 findings 24,797건·문서 6,116건·업체 3,726곳·2016~2026년**(2026-08-12 실측 — 캐나다 실사 백필 9,505건 편입 + 번역 완주로 07-31 대비 2배), 매일 증가), 트렌드 대시보드(`/findings/trends/`) 라이브, Copilot Studio 커넥터 자산 완료(파일럿 대기). "유사 문구 검색"(S1, 렉시컬)에 이어 **의미 유사도 임베딩 저장층(S2, `findings_embed_service.py`+019 마이그레이션) 구현은 완료됐으나 A/B 평가(2026-07-15)에서 S1 대비 유의한 개선을 입증하지 못해 웹 공개는 중단** — "이 지적과 유사한 사례" 버튼은 021(S1 렉시컬, `findings_similar_to` RPC)이 서빙한다(라이브 적용 완료). **2026-07-19 트랙 C 완성형 — 자료실 11카탈로그 502건(주 1회 원문 자동 갱신·변경 알림 — ICH PDF 직링크·식약처 번역본 7토픽·PMDA ORANGE Letter)·용어사전 226어(실무 맥락·조항 — 2026-08-04 미국 FDA 법문 표현 중심 26어 증설)·주간 퀴즈 45문항+월 13:00 자동 출제 파이프라인(2026-08-04 **세트 구성 규율 v2** — 브리프 사건 2 + 용어사전 개념 1~2 로 섞고 세트 단위 lint 게이트 5종 신설)·구름이 펫/성장 시스템(전 페이지)·랜딩 확정 재배치 라이브**(§1.2). |
 | 코드 저장소 | https://github.com/MINHOYEOM/grm-api-intake |
@@ -221,6 +221,7 @@ flowchart TD
 - **듀얼 링크:** 모든 카드에 정보 출처(📰) + 공식 원본(📎). 모든 링크는 수집 근거(provenance)가 있어야 하며, 근거 없는 링크는 **발행 차단**(발행 전 게이트 + 발행 후 감사 이중 방어).
 - **Graceful degradation:** 수집기·Notion 장애로 handoff가 없어도 Routine은 WebSearch 단독 모드로 계속 동작.
 - **실사 결과 카드(2026-11-08~):** EU/UK GMP 비준수·FDA 483·경고서한·식약처 GMP실사 카드는 앞면에 **등급 칩(치명·주요·기타/관찰 n건/위반 n건) · 지적 목록(앞 5줄 + 펼치기, 번호·등급·한 줄·조항) · 당국 조치 칩**을 싣는다. 블록(`card.inspection`)은 발행 조립(`assemble_publish_brief` → `inspection_card.py`)이 결정론으로 붙이고, 렌더는 블록이 있는 카드만 새 틀로 그린다 — **이미 발행된 호는 블록이 없어 화면 불변(소급 없음)**. 목록이 실리면 요약·인용·핵심 사실·시사점은 앞면에서 빠진다(데이터는 유지 — 링크드인이 쓴다). 개수·조치는 판정서 원문 숫자·양식 제목에서만 읽고, 산문형 판정서의 목록은 Routine `ncr_ko.findings_ko`(결함당 한 줄 + 원문 구절)를 원문 대조·개수 대조로 걸러 받는다(어기면 목록 전체 버림). 같은 실사의 판정서 여러 건(범위·소재지별 분할)은 한 장으로 묶는다. EU 비준수의 기관 표기는 "EMA"가 아니라 실제 판정 회원국 당국(필터 키 `EU`).
+- **카드 무게(2026-11-16호~):** 조립이 카드마다 `card_weight`(`deep`·`standard`·`row`)를 코드로 정한다(`card_weight.py` — 깊이: 경고서한·EU/UK 비준수·Class I·Type I 회수·지적 7건↑ 483 / 표 한 줄: 식약처 회수 사유 20자↓·FDA Class II 사유 84자 미만·MHRA 회수·지적 없는 실사·본문 미확보 고시·지침 / 나머지 표준). 렌더는 값이 있는 호만 각 묶음(섹션·소제목) 안을 깊이→표준→표 순으로 놓고, 표 한 줄은 업체·제품·사유·등급·발행일·원문 표 묶음(누르면 카드 펼침, 시사점·점검 없음)으로, 목록 줄 꼬리표는 그 건의 사실 하나(등급·사유·지적 건수)로 그린다. 깊이 실사 카드는 지적 목록 아래 `당국 조치:` 줄, 경고서한은 회신과 FDA 판단을 앞면에 싣는다. 시사점 라벨은 "더 알아둘 사실 · 원문 기준". 값이 없는 앞 호는 화면 불변.
 
 ### 3.4 수집 대상 소스 (기본 8 + 글로벌 확장 3 + FDA 483 + ISPE + EU GMP NCR + MHRA GMP NCR + HC GMP 실사 + FDA 실사등급)
 
@@ -569,7 +570,7 @@ grm-api-intake/
 ├─ collect_deficiency_examples.py  # 실사 지적 사례(업체명 없음) 수집 — 일본 PMDA 연차보고서 별첨·영국 MHRA GMP 지적 원자료(134)
 ├─ site_error_watch.py             # 사이트 오류 징후 일일 감시 — Cloudflare 5xx·404 급증·배포 실패 → 경보 이슈(grm-site-error-watch, 기본 꺼짐)
 ├─ grm_notion.py, grm_handoff.py   # Notion 적재 · handoff 멱등성
-├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
+├─ card_scaffold.py, inject_slots.py, assemble_publish_brief.py, inspection_card.py(실사 결과 카드 앞면 블록 — 등급·지적 목록·당국 조치 결정론, 11-08), card_weight.py(카드 무게 — 깊이·표준·표 한 줄을 유형·등급·지적 건수·사유 길이로 판정, 11-16호부터, 11-10), check_en_slots.py(영문 슬롯 게이트 — 발행 PR 전, 11-02), delta_bridge.py
 ├─ brief_lint.py, verify_published_brief.py, verify_deep_analysis.py, deep_analysis_fanout.py
 ├─ publish_watchdog.py              # 워치독 자가 복구 판정(기동 멱등·상한 / 경보 조건) — 순수 함수
 ├─ fda_body_coverage.py             # 발행 전 FDA 카드 본문 결손 점검(483·WL·회수 건수·비율·임계 → ok/recover/alert) + handoff 상태 조회 — 판정 순수 함수

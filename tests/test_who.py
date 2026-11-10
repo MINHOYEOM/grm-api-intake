@@ -434,16 +434,70 @@ class WhopirReportStructureTest(unittest.TestCase):
         self.assertEqual(titles,
                          ["Section Title 1", "Section Title 2", "Section Title 3"])
 
-    def test_section_text_is_capped_with_ellipsis(self) -> None:
-        # 상한이 없으면 브리프 JSON 이 카드 1장당 수만 자씩 불어난다(실측 68,520자).
+    def test_section_text_is_stored_whole_and_trimmed_only_on_card(self) -> None:
+        # 2026-11-10: 저장은 전문, 줄이기는 표시(card_scaffold) 단계. 카드 길이는 종전과 같다.
+        import card_scaffold as cs
         long_body = ("Part 2\n\n1. Long Section\n"
                      + ("The team reviewed the system. " * 200)
                      + "\n\nPart 3\nOutcome text.\n")
         rep = w.extract_whopir_report(long_body)
         assert rep is not None
-        self.assertLessEqual(len(rep["sections"][0]["text"]),
-                             w.WHOPIR_SECTION_MAX_CHARS + 2)
-        self.assertTrue(rep["sections"][0]["text"].endswith("…"))
+        stored = rep["sections"][0]["text"]
+        self.assertGreater(len(stored), 5000)
+        self.assertFalse(stored.endswith("…"))
+        detail = cs._detail_whopir_report({}, {"whopir_report": rep})
+        shown = detail["sections"][0]["text"]
+        self.assertLessEqual(len(shown), cs.WHOPIR_SECTION_MAX_CHARS + 2)
+        self.assertTrue(shown.endswith("…"))
+
+    def test_outcome_stored_whole_and_trimmed_only_on_card(self) -> None:
+        import card_scaffold as cs
+        long_outcome = "Part 3\nInspection outcome " + ("The site was assessed. " * 200)
+        rep = w.extract_whopir_report("Part 2\n\n1. Sec One\nBody text here.\n\n" + long_outcome)
+        assert rep is not None
+        self.assertGreater(len(rep["outcome"]), 1202)
+        shown = cs._detail_whopir_report({}, {"whopir_report": rep})["outcome"]
+        self.assertLessEqual(len(shown), cs.WHOPIR_OUTCOME_MAX_CHARS + 2)
+        self.assertTrue(shown.endswith("…"))
+
+    def test_card_trim_matches_legacy_cut_exactly(self) -> None:
+        # 카드 표시 절단은 종전 수집기 _whopir_cut 과 동일 결과여야 한다(브리프 출력 불변).
+        import card_scaffold as cs
+        text = ("Alpha beta gamma. " * 120) + "tail without period " * 10
+        sq = " ".join(text.split())
+        for limit in (600, 1200):
+            cut = sq[:limit]
+            p = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
+            legacy = (cut[:p + 1] if p > limit * 0.5 else cut.rstrip()) + " …"
+            self.assertEqual(cs._whopir_cut(text, limit), legacy)
+        self.assertEqual(cs._whopir_cut("short  text", 600), "short text")
+
+
+class StorageNotTruncatedTest(unittest.TestCase):
+    def test_rss_body_title_not_cut_and_description_in_raw(self) -> None:
+        import xml.etree.ElementTree as ET
+        long_desc = "Sentence about GMP inspection. " * 120      # > 1500자
+        long_title = "Inspection update " + ("X" * 300)
+        rss = ('<rss version="2.0"><channel><title>t</title><item><title>%s</title>'
+               '<link>https://extranet.who.int/prequal/news/x</link>'
+               '<pubDate>Thu, 04 Jun 2026 09:00:00 GMT</pubDate>'
+               '<description>%s</description></item></channel></rss>') % (long_title, long_desc)
+        orig = w.http_get_xml
+        w.http_get_xml = lambda url, **kw: ET.fromstring(rss)
+        try:
+            items, err = w._collect_rss(date(2026, 6, 1), date(2026, 6, 8))
+        finally:
+            w.http_get_xml = orig
+        self.assertIsNone(err)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0].headline, long_title)
+        self.assertGreater(len(items[0].body), 3000)
+        self.assertTrue(items[0].body.rstrip().endswith("inspection."))
+        self.assertEqual(items[0].raw_payload["description"], long_desc.strip())
+
+    def test_pdf_read_range_has_no_limit(self) -> None:
+        self.assertFalse(hasattr(w, "WHOPIR_TEXT_MAX_CHARS"))
+        self.assertEqual(w.WHOPIR_EXCERPT_MAX_CHARS, 1500)   # 의도된 excerpt 상한은 유지
 
     def test_page_footer_block_is_stripped_from_section_text(self) -> None:
         """실측 회귀: PDF 평탄화가 매 쪽 하단을 본문 한가운데로 밀어 넣는다.

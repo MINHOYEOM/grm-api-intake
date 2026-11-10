@@ -38,8 +38,7 @@ REGION_MFDS = "Korea (MFDS)"
 PAGE_SIZE = 100
 MAX_PAGES = 10
 ATTACHMENT_REQUEST_DELAY_SECONDS = 1.0
-MAX_ATTACHMENT_TEXT_CHARS = 12000
-MAX_ATTACHMENT_BODY_CHARS = 6000
+# 2026-11-10 저장 단계 절단 제거(대표 지시: 저장은 원문 그대로, 줄이기는 표시 단계에서만).
 HTTP_RETRIES = 3
 
 LAST_HEALTH: dict[str, Any] = {}
@@ -392,7 +391,7 @@ def _extract_deficiency_excerpt(text: str) -> str:
     for pat in _DEFICIENCY_EXCERPT_PATTERNS:
         m = re.search(pat, compact)
         if m:
-            return compact[m.start():][:MAX_ATTACHMENT_BODY_CHARS].strip()
+            return compact[m.start():].strip()
     return ""
 
 
@@ -779,7 +778,7 @@ def _pdf_page_count(data: bytes) -> int:
         return 0
 
 
-def _extract_pdf_text(data: bytes, max_chars: int = MAX_ATTACHMENT_TEXT_CHARS) -> tuple[str, str]:
+def _extract_pdf_text(data: bytes, max_chars: int | None = None) -> tuple[str, str]:
     try:
         import fitz  # type: ignore[import-not-found]
     except ImportError:
@@ -816,7 +815,7 @@ def _extract_pdf_text(data: bytes, max_chars: int = MAX_ATTACHMENT_TEXT_CHARS) -
     # 그래서 이번에는 **판정의 재료만 남긴다** — 페이지 수를 payload 에 싣고(아래
     # `attachment_pages`), 다음 수집분의 실측 분포로 임계를 정한다. 근거 없는 임계보다
     # 근거를 모으는 게 먼저다.
-    return text[:max_chars], "pdf-ok"
+    return (text if max_chars is None else text[:max_chars]), "pdf-ok"
 
 
 def _extract_hwpx_text(data: bytes) -> tuple[str, str]:
@@ -843,7 +842,7 @@ def _extract_hwpx_text(data: bytes) -> tuple[str, str]:
             text = _normalize_extracted_text(" ".join(parts))
             if not text:
                 return "", "hwpx-no-text"
-            return text[:MAX_ATTACHMENT_TEXT_CHARS], "hwpx-ok"
+            return text, "hwpx-ok"
     except zipfile.BadZipFile:
         return "", "zip-bad"
     except Exception as e:
@@ -1033,13 +1032,13 @@ def _body(raw: dict[str, str], attachment: _AttachmentParse,
         parts.extend([
             "",
             "주요 지적/결론:",
-            attachment.deficiency_excerpt[:600],
+            attachment.deficiency_excerpt,
         ])
     if attachment.text:
         parts.extend([
             "",
             "실사 결과/지적(보완)사항 원문:",
-            attachment.text[:MAX_ATTACHMENT_BODY_CHARS],
+            attachment.text,
         ])
     elif attachment.error:
         parts.append(f"첨부 본문 추출 오류: {attachment.error}")

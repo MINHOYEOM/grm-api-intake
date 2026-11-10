@@ -71,7 +71,6 @@ NOC_MED_URL = ("https://extranet.who.int/prequal/inspection-services/"
 HTTP_RETRIES = 3
 REQUEST_DELAY_SECONDS = 1.0
 WHOPIR_MAX_PAGES = 8
-MAX_TITLE_CHARS = 240
 
 # WHY-1 #1: WHOPIR PDF 결함 excerpt (flag 게이트 ENABLE_WHOPIR_EXCERPT, 기본 off).
 # P6(MFDS GMP)의 검증된 PDF 텍스트 엔진(_extract_pdf_text)을 재사용하고, WHOPIR 영문
@@ -80,10 +79,8 @@ WHOPIR_EXCERPT_MAX_CHARS = 1500
 WHOPIR_EXCERPT_FETCH_TIMEOUT = 20
 WHOPIR_EXCERPT_DELAY_SECONDS = 0.5
 WHOPIR_EXCERPT_MAX_ITEMS = 40          # fetch 비용 상한(목록 newest-first → 최신 N건 우선)
-# WHOPIR 본문은 15~40쪽(실측 29K~90K자)이라 P6 기본 상한 12,000자로는 결함 구간에
-# 닿기도 전에 잘린다. 텍스트 추출 상한만 WHOPIR 전용으로 올린다(발행물 길이는 아래
-# SECTION/OUTCOME cap 이 따로 잡는다 — 이 값은 "읽는 범위"이지 "싣는 범위"가 아니다).
-WHOPIR_TEXT_MAX_CHARS = 120_000
+# WHOPIR 본문은 15~40쪽(실측 29K~90K자)이라 읽는 범위에 상한을 두지 않는다
+# (2026-11-10 저장 단계 절단 제거 — _extract_pdf_text 는 max_chars=None 이면 전문).
 # 표지/개요를 건너뛰고 결함·결론 구간부터 잘라내기 위한 영문 앵커(우선순위 순).
 # WHOPIR PDF는 [표지 → general info → summary of the inspection → outcome/conclusion →
 # (non-)compliance/GMP deficiencies] 구조라, 인용보다 LLM 컨텍스트("왜")용으로 결함 구간을 우선.
@@ -396,16 +393,17 @@ def _collect_rss(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
             source=SOURCE_WHO,
             document_id=_stable_doc_id(SOURCE_WHO, title, link, date_iso),
             date_iso=date_iso,
-            headline=title[:MAX_TITLE_CHARS],
+            headline=title,
             official_url=link or WHO_RSS_URL,
             type_or_class=TYPE_WHO_NEWS,
-            body=_clean(desc)[:1500],
+            body=_clean(desc),
             api_query=WHO_RSS_URL,
             qa_relevance=relevance,
             osd_relevance="N/A",
             source_type=SRC_TYPE_OFFICIAL_API,
             signal_tier=tier,
-            raw_payload={"channel": "rss", "title": title, "link": link, "pubDate": pub},
+            raw_payload={"channel": "rss", "title": title, "link": link, "pubDate": pub,
+                         "description": desc},
             language=LANGUAGE_EN,
             region_jurisdiction=REGION_WHO,
         ))
@@ -586,10 +584,9 @@ _WHOPIR_CONCL_LEAD_RE = re.compile(
     r"^\s*(?:Final\s+|Initial\s+)?Conclusion\b"
     r"(?:\s*[-–—]?\s*(?:Desk\s+assessment|Inspection))?"
     r"(?:\s+outcome)?\s*(?-i:(?=[A-Z]))", re.I)
-# 항목 본문 상한 — 카드는 근거를 보여주는 자리이고 전문은 공식 PDF 링크가 담당한다.
-# (상한이 없으면 브리프 JSON 이 카드 1장당 2~7만자씩 불어난다 — 실측 Kaygee 68,520자.)
-WHOPIR_SECTION_MAX_CHARS = 600
-WHOPIR_OUTCOME_MAX_CHARS = 1200
+# 항목 본문·결론은 **전문 그대로** 저장한다(2026-11-10 저장 단계 절단 제거). 브리프 JSON 이
+# 카드 1장당 2~7만자씩 불어나는 것(실측 Kaygee 68,520자)은 표시 단계에서 막는다 —
+# card_scaffold 의 WHOPIR_SECTION_MAX_CHARS(600)/WHOPIR_OUTCOME_MAX_CHARS(1200).
 # 표제로 인정할 최소 본문 길이. 항목 본문 안의 **중첩 번호 목록**이 표제로 오인되던 것을
 # 막는다(실측 Tianjin: 문서 목록의 "4. WMS Validation PQ Report" 가 진짜 항목
 # "4. Laboratory Control System" 을 밀어냈다). 진짜 항목은 뒤에 본문이 길게 따라온다.
@@ -607,16 +604,6 @@ def _normalize_ligatures(text: str) -> str:
 
 def _whopir_squeeze(text: str) -> str:
     return re.sub(r"\s+", " ", text or "").strip()
-
-
-def _whopir_cut(text: str, limit: int) -> str:
-    """상한 절단 — 문장 경계 우선(문장 중간에서 끊기지 않게), 절단 시 말줄임 표기."""
-    s = _whopir_squeeze(text)
-    if len(s) <= limit:
-        return s
-    cut = s[:limit]
-    p = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
-    return (cut[:p + 1] if p > limit * 0.5 else cut.rstrip()) + " …"
 
 
 # 페이지 푸터 블록 — PDF 평탄화가 매 쪽 하단을 본문 한가운데로 밀어 넣는다(실측 Zhejiang
@@ -809,7 +796,7 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
             expect, start_at = (expect if renumber else n) + 1, idx + 1
         for i, (n, title, _s, e) in enumerate(kept):
             end = kept[i + 1][2] if i + 1 < len(kept) else len(body)
-            seg = _whopir_cut(body[e:end], WHOPIR_SECTION_MAX_CHARS)
+            seg = _whopir_squeeze(body[e:end])
             if seg:
                 sections.append({"no": str(n), "title": title, "text": seg})
     else:
@@ -826,7 +813,7 @@ def extract_whopir_report(text: str) -> "dict[str, Any] | None":
     out: dict[str, Any] = {
         "type": "whopir_report",
         "report_kind": kind,
-        "outcome": _whopir_cut(outcome, WHOPIR_OUTCOME_MAX_CHARS),
+        "outcome": _whopir_squeeze(outcome),
     }
     if sections:
         out["sections"] = sections
@@ -855,7 +842,7 @@ def _fetch_whopir_excerpt(pdf_url: str) -> tuple[str, str]:
         )
     except RuntimeError as e:
         return "", f"fetch-fail:{str(e)[:120]}"
-    text, status = _extract_pdf_text(data, max_chars=WHOPIR_TEXT_MAX_CHARS)
+    text, status = _extract_pdf_text(data)
     if not text:
         return "", status
     excerpt = _extract_whopir_excerpt(text)
@@ -882,7 +869,7 @@ def _fetch_whopir_detail(pdf_url: str) -> tuple[str, "dict[str, Any] | None", st
         )
     except RuntimeError as e:
         return "", None, f"fetch-fail:{str(e)[:120]}"
-    text, status = _extract_pdf_text(data, max_chars=WHOPIR_TEXT_MAX_CHARS)
+    text, status = _extract_pdf_text(data)
     if not text:
         return "", None, status
     report = extract_whopir_report(text)
@@ -1021,10 +1008,10 @@ def _collect_whopir(run_date: date) -> tuple[list[IntakeItem], str | None]:
                 source=SOURCE_WHO,
                 document_id="who-whopir-" + hashlib.sha1(abs_url.encode()).hexdigest()[:12],
                 date_iso=date_iso,                 # = 실사 시작일(WHO 는 게시일을 싣지 않는다)
-                headline=f"[WHOPIR] {manuf}"[:MAX_TITLE_CHARS],
+                headline=f"[WHOPIR] {manuf}",
                 official_url=abs_url,              # WHO 공식 PDF (per-item, 절대 URL)
                 type_or_class=TYPE_WHO_INSPECTION,
-                firm=manuf[:200],
+                firm=manuf,
                 body=("WHO 공개 실사보고서(WHOPIR) — 제조소/CRO/QCL GMP 실사. "
                       f"제조소: {manuf}\n출처: {WHOPIR_MED_URL}"),
                 api_query=url,
@@ -1101,10 +1088,10 @@ def _collect_noc(run_date: date) -> tuple[list[IntakeItem], str | None]:
             source=SOURCE_WHO,
             document_id="who-noc-" + hashlib.sha1((abs_url + "|" + t).encode()).hexdigest()[:12],
             date_iso=_parse_text_date(t),
-            headline=f"[WHO NOC] {t}"[:MAX_TITLE_CHARS],
+            headline=f"[WHO NOC] {t}",
             official_url=abs_url,
             type_or_class=TYPE_WHO_NOC,
-            firm=t[:200],
+            firm=t,
             body=("WHO Notice of Concern — 제조소/CRO/QCL 의 중대 GMP 비순응 미해결 공지. "
                   f"대상: {t}\n출처: {NOC_MED_URL}"),
             api_query=NOC_MED_URL,

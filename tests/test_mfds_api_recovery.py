@@ -302,5 +302,17 @@ class MfdsGmpCertCollectorTest(unittest.TestCase):
         self.assertIn("GMP적합판정", card.markdown)
 
 
+class MfdsLawBodyNotTruncatedTest(unittest.TestCase):
+    def test_long_article_body_is_kept_whole(self) -> None:
+        # 2026-11-10: 저장 단계 절단 제거 — 4000자를 넘는 조문도 전문 보존(말줄임 없음).
+        lines = [f"제{n}조 조문 내용 " + ("가" * 300) for n in range(1, 31)]
+        xml = "<law>" + "".join(f"<조문내용>{t}</조문내용>" for t in lines) + "</law>"
+        body = law._extract_body_excerpt(ET.fromstring(xml))
+        self.assertGreater(len(body), 4000)
+        self.assertNotIn("...", body)
+        for t in lines:
+            self.assertIn(t, body)
+
+
 if __name__ == "__main__":
     unittest.main()

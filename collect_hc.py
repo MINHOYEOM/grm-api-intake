@@ -395,7 +395,7 @@ def _to_item(
         source=SOURCE_HC,
         document_id=f"hc-{nid}",
         date_iso=date_iso,
-        headline=f"[HC] {title}"[:240],
+        headline=f"[HC] {title}",
         official_url=url,                       # 항목별 공식 URL(절대)
         type_or_class=TYPE_HC_RECALL,
         firm=firm,                              # 회수 업체("Companies" 칸 우선); 없으면 "" → 카드에서 값 부재로 표기

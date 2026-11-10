@@ -875,11 +875,11 @@ class ObservationTruncationTest(unittest.TestCase):
 
     def test_483_reads_beyond_gmp_cap(self):
         # 483 경로는 GMP 12000 이 아닌 200000 으로 PDF 를 읽어 뒤 Observation 을 보존.
-        self.assertGreater(f.FDA483_TEXT_MAX_CHARS, g.MAX_ATTACHMENT_TEXT_CHARS)
+        self.assertGreater(f.FDA483_TEXT_MAX_CHARS, 12000)
         full = self._long_483_text()
         captured = {}
 
-        def fake_extract(data, max_chars=g.MAX_ATTACHMENT_TEXT_CHARS):
+        def fake_extract(data, max_chars=None):
             captured["max_chars"] = max_chars
             return full[:max_chars], "pdf-ok"   # 실 엔진과 동일하게 max_chars 로 절단
 
@@ -888,19 +888,19 @@ class ObservationTruncationTest(unittest.TestCase):
         self.assertEqual(captured["max_chars"], f.FDA483_TEXT_MAX_CHARS)
         self.assertEqual([r["number"] for r in rows], ["1", "2", "3", "4", "5", "6"])
 
-    def test_gmp_default_cap_unchanged(self):
-        # GMP(및 WHO·483 excerpt) 경로는 기본값 12000 그대로 — 회귀 방지.
+    def test_gmp_default_has_no_cap(self):
+        # 2026-11-10: 저장 단계 절단 제거 — GMP/WHO 기본 경로는 상한 없이 전문(None).
         import inspect
-        self.assertEqual(g.MAX_ATTACHMENT_TEXT_CHARS, 12000)
+        self.assertFalse(hasattr(g, "MAX_ATTACHMENT_TEXT_CHARS"))
         default = inspect.signature(g._extract_pdf_text).parameters["max_chars"].default
-        self.assertEqual(default, g.MAX_ATTACHMENT_TEXT_CHARS)
+        self.assertIsNone(default)
 
     def test_cap_reached_logs_warning(self):
         # 상한 도달 시 조용한 유실 대신 WARN(수동 확인 신호) — silent loss 방지.
         at_cap = "OBSERVATION 1 Deficiency one is noted. " + "x" * f.FDA483_TEXT_MAX_CHARS
         logged: list[tuple[str, str]] = []
 
-        def fake_extract(data, max_chars=g.MAX_ATTACHMENT_TEXT_CHARS):
+        def fake_extract(data, max_chars=None):
             return at_cap[:max_chars], "pdf-ok"
 
         with patch.object(g, "_extract_pdf_text", fake_extract), \

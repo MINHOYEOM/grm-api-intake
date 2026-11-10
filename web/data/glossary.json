@@ -2201,7 +2201,8 @@
     "term_ko": "규격이탈 결과",
     "term_en": "Out-of-Specification (OOS) Result",
     "aliases": [
-      "out of specification"
+      "out of specification",
+      "기준일탈"
     ],
     "easy_ko": "허가자료, 약전 또는 제조자가 정한 규격이나 허용기준을 벗어난 시험결과입니다.",
     "definition_source": "WHO TRS 1052, Annex 4, WHO good practices for pharmaceutical quality control laboratories, Glossary, Out-of-specification result",
@@ -3194,7 +3195,8 @@
     "term_ko": "필터 완전성시험",
     "term_en": "Filter Integrity Test",
     "aliases": [
-      "filter integrity testing"
+      "filter integrity testing",
+      "완결성시험"
     ],
     "easy_ko": "필터가 손상되지 않고 요구된 보유 성능을 유지하는지 확인하는 비파괴 시험입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §11 Glossary: Filter integrity test",
@@ -3319,7 +3321,8 @@
     "term_en": "Container Closure Integrity (CCI)",
     "aliases": [
       "container closure integrity testing",
-      "CCIT"
+      "CCIT",
+      "용기밀폐완전성"
     ],
     "easy_ko": "용기와 마개 체계가 제품 수명주기 동안 미생물·가스·수분 등 외부 유입을 막는 능력입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§8.21–8.25",
@@ -4166,6 +4169,9 @@
     "id": "visual-inspection",
     "term_ko": "외관검사",
     "term_en": "Visual Inspection",
+    "aliases": [
+      "육안검사"
+    ],
     "easy_ko": "충전을 마친 용기를 한 개씩 살펴 이물이나 결함이 있는지 가려내는 검사입니다.",
     "definition_source": "EudraLex Volume 4, Annex 1 (2022), §§8.30–8.32",
     "source_url": "https://health.ec.europa.eu/document/download/e05af55b-38e9-42bf-8495-194bbf0b9262_en?filename=20220825_gmp-an1_en_0.pdf",

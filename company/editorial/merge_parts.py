@@ -42,18 +42,27 @@ def _diff(name, got, planned, problems):
 
 # 카드 영문 갈래 필수 다섯 — web/render.py CARD_NARRATIVE_FIELDS 와 같다(tests 가 일치를 확인한다).
 EN_FIELDS = ("title_issue", "summary", "implication", "key_facts", "checks")
+# 한국어가 비어 있으면 영어도 비어도 되는 둘 — render.CARD_NARRATIVE_OPTIONAL 과 같다(2026-11-10:
+# 쓸 원문 정보가 없는 카드는 시사점·점검을 비운다. 한국어가 채운 칸만 영어가 짝으로 채운다).
+EN_OPTIONAL = ("implication", "checks")
+
+
+def _filled(v):
+    return bool([x for x in v if str(x).strip()]) if isinstance(v, list) else bool(str(v or "").strip())
 
 
 def _en_gaps(card):
     """카드 영문 갈래에서 비었거나 빠진 필드 목록. 완결이면 []."""
-    en = card.get("en") if isinstance(card, dict) else None
+    card = card if isinstance(card, dict) else {}
+    en = card.get("en")
     en = en if isinstance(en, dict) else {}
     gaps = []
     for f in EN_FIELDS:
-        v = en.get(f)
-        ok = bool([x for x in v if str(x).strip()]) if isinstance(v, list) else bool(str(v or "").strip())
-        if not ok:
-            gaps.append(f)
+        if _filled(en.get(f)):
+            continue
+        if f in EN_OPTIONAL and not _filled(card.get(f)):
+            continue
+        gaps.append(f)
     return gaps
 
 

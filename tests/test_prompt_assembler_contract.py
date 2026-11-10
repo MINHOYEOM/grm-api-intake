@@ -247,7 +247,9 @@ class HookLineSlotTest(unittest.TestCase):
     def test_partial_five_still_rejected_with_hook_line(self) -> None:
         en = self._en_full(hook_line="Retest allowed")
         del en["checks"]
-        rep = inj.validate_injection(self.brief, self._delta(en=en))
+        # 한국어가 checks 를 채웠는데 영문만 빠졌다 = 반쪽 영어(한국어도 비었으면 2026-11-10 부터 정상).
+        rep = inj.validate_injection(
+            self.brief, self._delta(checks=["확인 하나?", "확인 둘?"], en=en))
         self.assertTrue(any("부분 제공" in e for e in rep.errors), rep.errors)
 
     def test_empty_string_means_absent(self) -> None:

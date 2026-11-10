@@ -524,17 +524,32 @@ def card_has_english(card: dict[str, Any]) -> bool:
     ★부분 충족은 실패로 친다. 다섯 중 넷만 영어면 화면에 한국어 한 문단이 섞이는데,
       그건 번역 누락처럼 보이고 실제로도 그렇다. 반쪽짜리 영어 카드는 만들지 않는다.
     """
+    return isinstance(card.get("en"), dict) and not card_english_gaps(card)
+
+
+def _narrative_filled(value: Any) -> bool:
+    if isinstance(value, list):
+        return bool([v for v in value if str(v).strip()])
+    return bool(str(value or "").strip())
+
+
+def card_english_gaps(card: dict[str, Any]) -> list[str]:
+    """영어 갈래에서 비어 있으면 안 되는데 빈 서사 필드 목록(완결이면 []).
+
+    [2026-11-10 브리프 재정비 — 결정 2·9] `implication`·`checks` 는 **쓸 원문 정보가 없으면
+    한국어도 비운다**(사유 한 단어 회수·지적 없는 실사). 그런 칸은 영어도 비어 있는 것이 맞다 —
+    한국어가 채워진 칸만 영어가 반드시 채운다(짝). 나머지 셋은 늘 필수.
+    """
     en = card.get("en")
-    if not isinstance(en, dict):
-        return False
+    en = en if isinstance(en, dict) else {}
+    gaps: list[str] = []
     for field in CARD_NARRATIVE_FIELDS:
-        value = en.get(field)
-        if isinstance(value, list):
-            if not [v for v in value if str(v).strip()]:
-                return False
-        elif not str(value or "").strip():
-            return False
-    return True
+        if _narrative_filled(en.get(field)):
+            continue
+        if field in CARD_NARRATIVE_OPTIONAL and not _narrative_filled(card.get(field)):
+            continue
+        gaps.append(field)
+    return gaps
 
 
 def brief_has_english(brief: dict[str, Any]) -> bool:
@@ -558,7 +573,9 @@ def _card_with_english_narrative(card: dict[str, Any], lang: str) -> dict[str, A
     이 같은 식을 세 번 따로 두지 않도록 뽑아냈다(의미 동일 — 골든이 증명한다).
     """
     if lang != DEFAULT_LANG and card_has_english(card):
-        return {**card, **{f: card["en"][f] for f in CARD_NARRATIVE_FIELDS}}
+        en = card["en"]
+        return {**card, **{f: en.get(f, [] if f in ("key_facts", "checks") else "")
+                           for f in CARD_NARRATIVE_FIELDS}}
     return card
 
 
@@ -3444,6 +3461,8 @@ BRIEF_LABEL_KEYS: tuple[str, ...] = (
 CARD_NARRATIVE_FIELDS: tuple[str, ...] = (
     "title_issue", "summary", "implication", "key_facts", "checks",
 )
+# 그중 한국어가 비어 있으면 영어도 비어도 되는 둘(쓸 원문 정보가 없는 카드 — 2026-11-10).
+CARD_NARRATIVE_OPTIONAL: tuple[str, ...] = ("implication", "checks")
 
 # [다국어 6단계 2026-09-04] 404 의 되돌림 카드 — **그 트리에 실제로 있는 면만** 싣는다.
 # ★영어 트리에는 아카이브(영문 브리프가 있어야 선다)와 용어사전이 없다. 손으로 적은

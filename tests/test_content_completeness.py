@@ -196,8 +196,10 @@ class UsageTest(unittest.TestCase):
 
     def test_repo_code_caps_include_known_constants(self):
         names = {c["name"]: c["value"] for c in cc.scan_code_caps()}
-        self.assertEqual(names.get("FDA483_OBSERVATION_DETAIL_MAX_CHARS"), 1200)
-        self.assertEqual(names.get("WL_BODY_FULL_MAX_CHARS"), 30000)
+        # 값은 다른 세션이 바꿀 수 있으니(483 상세 1,200→8,000) 이름만 잡는다
+        self.assertIn("FDA483_OBSERVATION_DETAIL_MAX_CHARS", names)
+        self.assertIn("WL_BODY_FULL_MAX_CHARS", names)
+        self.assertTrue(all(v >= cc.MIN_LEN for v in names.values()))
 
 
 class ReportTest(unittest.TestCase):

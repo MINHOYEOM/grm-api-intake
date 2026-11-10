@@ -34,9 +34,13 @@ SCOPE_GLOBS = ("collect_*.py", "backfill_*.py", "findings_store.py", "findings_e
                "eudragmdp_client.py", "mhra_gmdp_client.py", "import_alerts_refresh.py", "deficiency_cases_refresh.py",
                "fda_citation_firms_refresh.py", "findings_translate*.py")
 
-_CONST = re.compile(r"^\s*_?[A-Z][A-Z0-9_]*(?:CHARS|CHAR_CAP|EXCERPT_LIMIT|BODY_LIMIT|TEXT_LIMIT|MAX_LEN)\s*(?::\s*int)?\s*=")
+_CONST = re.compile(r"^\s*(?![A-Z0-9_]*MIN_)_?[A-Z][A-Z0-9_]*(?:CHARS|CHAR_CAP|EXCERPT_LIMIT|BODY_LIMIT|TEXT_LIMIT|MAX_LEN)\s*(?::\s*int)?\s*=")
 _TRUNC_CALL = re.compile(r"\btruncate\(")
 _SLICE = re.compile(r"\[\s*(?:0\s*)?:\s*(?:(\d{3,})|(_?[A-Z][A-Z0-9_]*(?:CHARS|CAP|LIMIT|LEN)[A-Z0-9_]*))\s*\]")
+# 상한 상수를 함수에 넘기는 줄(예: `_cap_detail(text, FOO_MAX_CHARS)` — 문장 끝에서 자르면 데이터 감시가 못 본다)
+_CAP_REF = re.compile(r"\b(?![A-Z0-9_]*MIN_)_?[A-Z][A-Z0-9_]*(?:CHARS|CHAR_CAP|EXCERPT_LIMIT|BODY_LIMIT|TEXT_LIMIT|MAX_LEN)\b")
+# 자르기 함수에 숫자를 바로 넘기는 줄(예: `clip(body, 1200)`)
+_CAP_FN = re.compile(r"\b\w*(?:cap|trunc|clip|shorten|squeeze)\w*\([^()]*,\s*\d{3,}\s*\)", re.I)
 # 로그·오류·진단 문구 안의 자르기는 저장이 아니다
 _NOT_STORAGE = re.compile(r"\b(log|print|logger\.\w+|warn\w*|_emit|raise|RuntimeError|ValueError|SystemExit)\s*\(|"
                           r"\bstr\((e|exc|err)\)|\.text\[|\berror\b|\berr\b|f\"[^\"]*(실패|fail|error|HTTP)")
@@ -61,7 +65,9 @@ def scan(root: Path = ROOT) -> Counter:
                 hits[(p.name, line)] += 1
                 continue
             m = _SLICE.search(line)
-            if m and (m.group(2) or int(m.group(1)) >= 100):
+            if line.startswith("def "):   # 함수 머리의 기본값은 상수 정의 줄이 이미 잡는다
+                continue
+            if (m and (m.group(2) or int(m.group(1)) >= 100)) or _CAP_REF.search(code) or _CAP_FN.search(line):
                 hits[(p.name, line)] += 1
     return hits
 
@@ -74,16 +80,17 @@ def scan(root: Path = ROOT) -> Counter:
 #   display    = 사이트용 파생 스냅샷(원본은 DB 에 그대로)
 ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('collect_eu_gmp_ncr.py', 'headline=headline[:240],'): ('debt', '#26 EU NCR 제목 240'),
-    ('collect_fda_483.py', '"detail": clean_detail[:FDA483_OBSERVATION_DETAIL_MAX_CHARS].strip(),'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'FDA483_EXCERPT_MAX_CHARS = 1500'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'FDA483_OBSERVATION_DETAIL_MAX_CHARS = 1200'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'FDA483_SINGLE_OBS_MIN_CHARS = 40'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'FDA483_SUBSTANTIVE_MIN_CHARS = 24'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'FDA483_TEXT_MAX_CHARS = 200000'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'firm=company[:200],'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'headline=f"[{label}] {company or media_id}"[:240],'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'return compact[m.start():][:FDA483_EXCERPT_MAX_CHARS].strip()'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
-    ('collect_fda_483.py', 'return t[:280].rstrip() + "...", t[280:].strip()'): ('debt', '#5~9 FDA 483 (483 세션 담당)'),
+    ('collect_fda_483.py', 'FDA483_EXCERPT_MAX_CHARS = 1500'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'FDA483_OBSERVATION_DETAIL_MAX_CHARS = 8000'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'FDA483_TEXT_MAX_CHARS = 200000'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'firm=company[:200],'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'headline=f"[{label}] {company or media_id}"[:240],'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'if len(text) >= FDA483_TEXT_MAX_CHARS:'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'return _cap_detail(normalize_483_redactions(detail), FDA483_OBSERVATION_DETAIL_MAX_CHARS)'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'return compact[m.start():][:FDA483_EXCERPT_MAX_CHARS].strip()'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'return t[:280].rstrip() + "...", t[280:].strip()'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', 'text, _status = _extract_pdf_text(pdf_bytes, max_chars=FDA483_TEXT_MAX_CHARS)'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
+    ('collect_fda_483.py', '★상한은 483 전용 FDA483_TEXT_MAX_CHARS(200000·≈74쪽)를 **기본**으로 쓴다 — 공유 PDF 엔진의'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
     ('collect_hc.py', 'headline=f"[HC] {title}"[:240],'): ('debt', '#27 HC 제목 240'),
     ('collect_hc_inspection_backfill.py', 'headline=f"{establishment} — Health Canada GMP inspection ({rating_desc})"[:240],'): ('debt', '#27 HC 실사 제목 240'),
     ('collect_ich.py', 'MAX_TITLE_CHARS = 240'): ('debt', '#25 ICH 제목 240'),
@@ -93,6 +100,8 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('collect_intake.py', 'MHRA_ALERT_BODY_MAX_CHARS = WL_BODY_FULL_MAX_CHARS'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
     ('collect_intake.py', 'WL_BODY_FULL_MAX_CHARS = 30000'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
     ('collect_intake.py', 'WL_BODY_MAX_CHARS = 1500'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
+    ('collect_intake.py', 'return _extract_wl_body_span(html_text, WL_BODY_FULL_MAX_CHARS)'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
+    ('collect_intake.py', 'return _extract_wl_body_span(html_text, WL_BODY_MAX_CHARS)'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
     ('collect_intake.py', 'return fallback[:800].strip()'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
     ('collect_intake.py', 'return inner[:800].strip()'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
     ('collect_intake.py', 'return joined[:ECA_ARTICLE_EXCERPT_MAX_CHARS].strip()'): ('debt', '#10·11·13·14·15 WL 본문 1,500/30,000 · MHRA 30,000 · ECA/ISPE 1,200 · ISPE 800'),
@@ -103,9 +112,12 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('collect_mfds_gmp_inspection.py', 'return compact[m.start():][:MAX_ATTACHMENT_BODY_CHARS].strip()'): ('debt', '#21~23 식약처 GMP 실사 첨부 12,000 · 지적 원문 6,000 · 본문 600'),
     ('collect_mfds_gmp_inspection.py', 'return text[:MAX_ATTACHMENT_TEXT_CHARS], "hwpx-ok"'): ('debt', '#21~23 식약처 GMP 실사 첨부 12,000 · 지적 원문 6,000 · 본문 600'),
     ('collect_mfds_law.py', 'BODY_EXCERPT_LIMIT = 4000'): ('debt', '#24 식약처 법령 본문 4,000'),
+    ('collect_mfds_law.py', 'if total_len + len(line) + 1 > BODY_EXCERPT_LIMIT:'): ('debt', '#24 식약처 법령 본문 4,000'),
+    ('collect_mfds_law.py', 'remaining = max(BODY_EXCERPT_LIMIT - total_len - 4, 0)'): ('debt', '#24 식약처 법령 본문 4,000'),
     ('collect_mhra_gmp_ncr.py', 'headline=headline[:240],'): ('debt', '#26 MHRA NCR 제목 240'),
     ('collect_search.py', 'return truncate(best.strip(), 200)'): ('debt', '#4 Brave 검색 요약 200'),
     ('collect_search.py', 'return truncate(desc.strip(), 200)'): ('debt', '#4 Brave 검색 요약 200'),
+    ('collect_who.py', '"outcome": _whopir_cut(outcome, WHOPIR_OUTCOME_MAX_CHARS),'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
     ('collect_who.py', 'MAX_TITLE_CHARS = 240'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
     ('collect_who.py', 'WHOPIR_EXCERPT_MAX_CHARS = 1500'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
     ('collect_who.py', 'WHOPIR_OUTCOME_MAX_CHARS = 1200'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
@@ -119,9 +131,11 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('collect_who.py', 'headline=title[:MAX_TITLE_CHARS],'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
     ('collect_who.py', 'return _whopir_squeeze(t[i:])[:WHOPIR_EXCERPT_MAX_CHARS].strip()'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
     ('collect_who.py', 'return compact[start:][:WHOPIR_EXCERPT_MAX_CHARS].strip()'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
-    ('findings_extractors.py', '_GMP_MIN_SUBSTANTIVE_CHARS = 12'): ('debt', '#12 WL 위반 조각 6,000자'),
+    ('collect_who.py', 'seg = _whopir_cut(body[e:end], WHOPIR_SECTION_MAX_CHARS)'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
+    ('collect_who.py', 'text, status = _extract_pdf_text(data, max_chars=WHOPIR_TEXT_MAX_CHARS)'): ('debt', '#16~20 WHO 본문 1,500 · 제목 240 · 업체 200 · WHOPIR 600/1,200/1,500 · 읽기 범위 120,000'),
     ('findings_extractors.py', '_WL_BLOCK_CHAR_CAP = 6000'): ('debt', '#12 WL 위반 조각 6,000자'),
-    ('findings_extractors.py', '_WL_FRAGMENT_MIN_CHARS = 40'): ('debt', '#12 WL 위반 조각 6,000자'),
+    ('findings_extractors.py', 'if len(block) <= _WL_BLOCK_CHAR_CAP:'): ('debt', '#12 WL 위반 조각 6,000자'),
+    ('findings_extractors.py', 'sentence_cut = _truncate_at_sentence(block, _WL_BLOCK_CHAR_CAP)'): ('debt', '#12 WL 위반 조각 6,000자'),
     ('findings_extractors.py', 'truncated = block[:_WL_BLOCK_CHAR_CAP]'): ('debt', '#12 WL 위반 조각 6,000자'),
     ('grm_notion.py', '"rich_text": _rich_text(truncate(item.raw_excerpt, 200))'): ('debt', '#1 Notion 칸 1,900자 일괄 절단(_rich_text 가 이미 나눠 담는다) — truncate 제거'),
     ('grm_notion.py', '"rich_text": _rich_text(truncate(item.search_query, NOTION_RICH_TEXT_CHUNK))'): ('debt', '#1 Notion 칸 1,900자 일괄 절단(_rich_text 가 이미 나눠 담는다) — truncate 제거'),
@@ -133,18 +147,25 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('grm_notion.py', 'props[PROP_FIRM] = {"rich_text": _rich_text(truncate(item.firm, NOTION_RICH_TEXT_CHUNK))}'): ('debt', '#1 Notion 칸 1,900자 일괄 절단(_rich_text 가 이미 나눠 담는다) — truncate 제거'),
     ('grm_notion.py', 'props[PROP_SITE_COUNTRY] = {"rich_text": _rich_text(truncate(item.site_country, NOTION_RICH_TEXT_CHUNK))}'): ('debt', '#1 Notion 칸 1,900자 일괄 절단(_rich_text 가 이미 나눠 담는다) — truncate 제거'),
     ('backfill_wl_truncation_restore.py', 'DEFAULT_MAX_OLD_CHARS = 500'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
+    ('backfill_wl_truncation_restore.py', 'help=f"후보 상한 — 이 길이 이하이고 \'…\' 로 끝나는 행(기본 {DEFAULT_MAX_OLD_CHARS}).")'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
+    ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
+    ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
+    ('backfill_wl_truncation_restore.py', 'p.add_argument("--max-old-chars", type=int, default=DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('collect_deficiency_examples.py', 'ent["sample"] = [{"locator": r.locator, "statement": r.statement[:160], "clauses": r.clauses[:3],'): ('diagnostic', '실행 리포트 표본'),
     ('collect_deficiency_examples.py', 'found.append({"agency": agency, "lang": lang, "url": href, "label": label[:200]})'): ('diagnostic', '자료 목록 탐색 결과 라벨(리포트용)'),
     ('collect_fda_inspections.py', 'snippet = json.dumps(payload, ensure_ascii=False)[:300]'): ('diagnostic', '오류 진단 표본'),
     ('collect_ich.py', 'MAX_LINE_CHARS = 140'): ('decision', '140자 넘는 줄은 제목 후보가 아니라고 거르는 판정'),
+    ('collect_ich.py', 'if len(line) > MAX_LINE_CHARS:'): ('decision', '140자 넘는 줄은 제목 후보가 아니라고 거르는 판정'),
     ('collect_intake.py', 'listing_health["detail"] = truncate(f"{type(e).__name__}: {e}", 160)'): ('diagnostic', '건강 점검 오류 문구'),
     ('collect_intake.py', 'self.near_miss_samples.append((source, label, (blob or "")[:110]))'): ('diagnostic', '근접 탈락 표본(리포트)'),
     ('collect_rum_analytics.py', 'lines.append(json.dumps(errors, ensure_ascii=False, indent=2)[:2000])'): ('diagnostic', '오류 리포트'),
     ('collect_who.py', '_WHOPIR_AUTH_MAX_CHARS = 80'): ('decision', '80자 넘으면 기관명이 아니라고 거르는 판정'),
     ('collect_who.py', 'kind = ("reliance" if (_WHOPIR_RELIANCE_RE.search(body[:400])'): ('decision', '보고서 종류 정규식 검사 범위'),
+    ('collect_who.py', 'return auth if 0 < len(auth) <= _WHOPIR_AUTH_MAX_CHARS else ""'): ('decision', '80자 넘으면 기관명이 아니라고 거르는 판정'),
     ('deficiency_cases_refresh.py', '"acat": " ".join(_text(r.get("agency_category")).split())[:300],'): ('display', '사이트용 공개 JSON 스냅샷 — 원본은 deficiency_examples 에 그대로'),
     ('deficiency_cases_refresh.py', '"no": _text(r.get("item_no"))[:40], "loc": _text(r.get("locator"))[:120],'): ('display', '사이트용 공개 JSON 스냅샷 — 원본은 deficiency_examples 에 그대로'),
     ('findings_extractors.py', '_WL_CLASSIFY_CHAR_CAP = 480'): ('decision', '분류기 입력 전용(저장은 원문)'),
+    ('findings_extractors.py', 'if len(block) <= _WL_CLASSIFY_CHAR_CAP:'): ('decision', '분류기 입력 전용(저장은 원문)'),
     ('findings_extractors.py', 'truncated = block[:_WL_CLASSIFY_CHAR_CAP]'): ('decision', '분류기 입력 전용(저장은 원문)'),
     ('grm_notion.py', 'props[PROP_TYPE_CLASS] = _select(item.type_or_class[:100])'): ('genuine', 'Notion select 옵션 이름 100자 한도'),
 }
@@ -180,10 +201,16 @@ class StorageTruncationGuardTest(unittest.TestCase):
                 "body = truncate(desc, 1900)\n"
                 "log('WARN', f'fetch 실패 {str(e)[:120]}')\n"
                 "raise RuntimeError(r.text[:300])\n"
-                "items = rows[:20]\n", encoding="utf-8")
+                "items = rows[:20]\n"
+                "return _cap_detail(clean(d), FOO_MAX_CHARS)\n"
+                "body = clip_text(desc, 1200)\n"
+                "BAR_MIN_CHARS = 24\n"
+                "if len(x) < BAR_MIN_CHARS:\n"
+                "def f(t, max_chars=FOO_MAX_CHARS):\n", encoding="utf-8")
             got = sorted(l for _, l in scan(Path(d)))
-        self.assertEqual(got, ["FOO_MAX_CHARS = 1200", "body = truncate(desc, 1900)",
-                               "detail = text[:FOO_MAX_CHARS]", "headline = title[:240]"])
+        self.assertEqual(got, ["FOO_MAX_CHARS = 1200", "body = clip_text(desc, 1200)", "body = truncate(desc, 1900)",
+                               "detail = text[:FOO_MAX_CHARS]", "headline = title[:240]",
+                               "return _cap_detail(clean(d), FOO_MAX_CHARS)"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,423 @@
+{
+ "items": [
+  {
+   "finding_id": "finding-c4067c84b9d0a3273caa3d16",
+   "finding_text": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods of disassembly and reassembling equipment as necessary to assure proper cleaning and maintenance.",
+   "finding_text_old_md5": "75c90850eff8ada086c4dea308a660d5",
+   "legacy_match": true,
+   "new_chars": 301,
+   "old_chars": 283,
+   "published_date": "2026-10-20",
+   "raw_signal_id": "rawsig-d922583a4e5b777c36d1f51e"
+  },
+  {
+   "finding_id": "finding-b232a56b13b5008509f49a0f",
+   "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, sampling plans and test procedures designed to assure that components, drug product containers, closures, in-process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+   "finding_text_old_md5": "0045adecb84ca59cc81c440cd2b89064",
+   "legacy_match": true,
+   "new_chars": 329,
+   "old_chars": 283,
+   "published_date": "2026-08-05",
+   "raw_signal_id": "rawsig-8f1353c0d4fbbd9c6a459257"
+  },
+  {
+   "finding_id": "finding-b4511c47c0e2f8f000639773",
+   "finding_text": "Laboratory controls do not include the establishment ofscientifically sound and appropriate standards designed to assure that components and in-process materials confonn to appropriate standards of identity, strength, quality, and purity: e),f)LO'fEE1S) s,:;;N,\\ Tl.RE ~j -1/J, };pv~L­",
+   "finding_text_old_md5": "dd40b14841e3272384bf79bcbaaf260b",
+   "legacy_match": true,
+   "new_chars": 285,
+   "old_chars": 283,
+   "published_date": "2026-05-06",
+   "raw_signal_id": "rawsig-fb9f27c27d88725665139d34"
+  },
+  {
+   "finding_id": "finding-c84c083ad97ceaf3042d5a78",
+   "finding_text": "Reports of analysis from component suppliers are accepted in lieu of testing each component for conformity with all appropriate written specifications, without performing at least one specific identity test on each component and establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at appropriate intervals.",
+   "finding_text_old_md5": "ece1f61244d129f3243ff3648699fbf6",
+   "legacy_match": true,
+   "new_chars": 372,
+   "old_chars": 283,
+   "published_date": "2024-09-26",
+   "raw_signal_id": "rawsig-ef0e44ad2f843292b2f988cc"
+  },
+  {
+   "finding_id": "finding-fdc607edce252418e90dc96f",
+   "finding_text": "Container closure systems do not provide adequate protection against foreseeable external factors in storage and use that can cause deterioration or contamination ofthe drug product Specifically, On 7/2/2014 I observed the sterile human drug product Acety!cysteine (Preservative Free) 20% Inhalation Solution lot 07022014@43 filled at 3ml into a 7 ml vial with air :in the beadspac e even though the Formula Worksheet for the product states that \"Acetylcysteine is not compatible with oxygen\".",
+   "finding_text_old_md5": "645e9812436651cac3620ea625227010",
+   "legacy_match": true,
+   "new_chars": 493,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-04936fe88b90d79acd22e491"
+  },
+  {
+   "finding_id": "finding-f99a434673df7d7549da11d0",
+   "finding_text": "The responsibilities and procedures applicable .to the quality control unit are not in writing and fully followed For example: A.You are not complying with your procedure No: 11.a.05.797, Version 3, effective 2/11/2014, in that signature approvals for verifying equip ment cleaning logs are missing on all your records dating back to at least 2/2014",
+   "finding_text_old_md5": "814427a5aa0dd8dd78153a32e856f92b",
+   "legacy_match": true,
+   "new_chars": 349,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-b51e1b078f4f552d48ee0eb9"
+  },
+  {
+   "finding_id": "finding-eae4c8631b00c7f3db978e13",
+   "finding_text": "There is no quality control unit Specifically, Your firm does not have an established quality control unit which has the responsibility and authority to approve or reject all components, in-process materials, labeling, or procedures or specifications which could impact the identity, strength, quality, and purity of the autologous SVF product.",
+   "finding_text_old_md5": "bd5dcbdb345c7bfcff773787ab0acd59",
+   "legacy_match": true,
+   "new_chars": 344,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-c3c1888ae65d076bff03680f"
+  },
+  {
+   "finding_id": "finding-e5eefc76a97ad321aeae8a68",
+   "finding_text": "There is no assurance that the firm always challenges the validity of all testing results provided in container supplier's certificates of analysis as part of supplier qualification procedures REDACTED (b)(4) bulk bags, used as the container closure system of Tysabri API, are received with certificate of analyses indicating that the bags are sterile and endotoxin free; however, these results have never been challenged and/or verified by the firm.",
+   "finding_text_old_md5": "2d06ff56c001bca8300e8f67bd991a4b",
+   "legacy_match": true,
+   "new_chars": 450,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-3bfd7a0af8125cdca7eddc8f"
+  },
+  {
+   "finding_id": "finding-e2ef27a4aa2b20be5c42a137",
+   "finding_text": "The floors throughout your processing facility are pitted, cracked, and otherwise damaged causing pooled water in areas were food is exposed including where open cans of in-process COOKED CHICKEN LOAF and HAND PACKED CHICKEN dog food are staged on a wooden pallet immediately upon the damaged floor.",
+   "finding_text_old_md5": "6b4bdf422fd4602071d37928e62ac2d7",
+   "legacy_match": true,
+   "new_chars": 299,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-6e3b1906fd56ccd88624e30e"
+  },
+  {
+   "finding_id": "finding-b946323155899f7e9a042b29",
+   "finding_text": "There is no assurance that the wet/dry vacuum used for cleaning the floors ofclassified production areas prevents addition of bioburden inshethBdustion areas ifi that the HEPA filters on the unit are not routinely integrity tested and the interior drum where dirty solution is collected is not sanitized.",
+   "finding_text_old_md5": "4c5fccb0fac1c607cfa0b7476fa5fcc9",
+   "legacy_match": true,
+   "new_chars": 304,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-a6e53d12636df5e55d4f4d6e"
+  },
+  {
+   "finding_id": "finding-b7de9c23e8a400e5ab629ed1",
+   "finding_text": "BHQ does not monitor the corrective action plan implemented by the regions when unsuitable products can mot be located, yet BHQ monitors the corrective action plans when the regions exceed the ARC’s established upper control limit (UCL), formerly known as the acceptable quality limit (AQL).",
+   "finding_text_old_md5": "7cf5c64e442e76cf36857803a111b6ad",
+   "legacy_match": true,
+   "new_chars": 291,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-7848b7b4ba37002f0dd8064a"
+  },
+  {
+   "finding_id": "finding-b6e2684fa2325d9b080b6d98",
+   "finding_text": "Time limits are not established when appropriate for the completion ofeach production phase to assure the quality ofthe drug product Specifically, the firm does not have any hold time data to support the completion of each production phase for any of yo ur injectable drug products (when not being held under regrigerated or light resistant conditions) including but not limited to preparation of the orginal batch of product redacted b4 and multiple transfer of the product into unit does vial from redacted b4 containers, to assure the qualiyt of all injectable durg products at your firm .",
+   "finding_text_old_md5": "b74e7d24eed3c067265f66fd3178d2bb",
+   "legacy_match": true,
+   "new_chars": 592,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-a1f913d2a86d83f5642cfe39"
+  },
+  {
+   "finding_id": "finding-ae29f126d46391a28ce4bb61",
+   "finding_text": "Approved components are not retested or reexamined as appropriate for identity, strength, quality and purity after storage for long periods with subsequent approval or rejection by the quality control unit Specifically, There is no data to support the three month expiration date assigned used in the production of sterile drug products, including products intended for intrathecal administration.",
+   "finding_text_old_md5": "64c8cb99646e4a9bf3bbedcfe4500db1",
+   "legacy_match": true,
+   "new_chars": 397,
+   "old_chars": 282,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-2fab886f0fc19648c2aa1a12"
+  },
+  {
+   "finding_id": "finding-a73ba379a2a917faeade450e",
+   "finding_text": "During a field examination of drug products at your facility the following was observed: Specifically, On 8/ 14/ 15, I observed a vial ofsterile human finished drug product Chlorpromazine HCL 25mg/ml, production lot # 05-070815, prepared on 7/8/15 and expires 10/8/ 15, with what looked like particles floating in the drug product.",
+   "finding_text_old_md5": "9721461b62b432b492942dfae245dfa4",
+   "legacy_match": true,
+   "new_chars": 331,
+   "old_chars": 282,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-2bd4057ed3115d1284d7406f"
+  },
+  {
+   "finding_id": "finding-8bb13761078ce2e134a8a001",
+   "finding_text": "Reports of analysis from component suppliers are accepted in lieu of testing each component for conformity with all appropriate written specifications, without performing at least one specific identity test on each component or establishing the reliability of the supplier's analyses through appropriate validation of the supplier's test results at",
+   "finding_text_old_md5": "e8737032c15ee25e3837a3adebd93179",
+   "legacy_match": true,
+   "new_chars": 348,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-9b243ec0367fd33c60e52f90"
+  },
+  {
+   "finding_id": "finding-7fda87cddfb3413aa4bdc0f0",
+   "finding_text": "Bulk drug substances used by your outsourcing facility to compound drug products are not each manufactured by an establishment that is registered under section 510 as required by section 503B(a)(2)(C): Specifically, On 01/22/2014, the following bulk drug substance manufacturers were identified as not being registered with the F DA",
+   "finding_text_old_md5": "461894c15e32b3aac1feb1ce5b1fc81d",
+   "legacy_match": true,
+   "new_chars": 332,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-e42ca08553da117de4c9a8ca"
+  },
+  {
+   "finding_id": "finding-7e08de61f74e84eb8c0a837b",
+   "finding_text": "DEP ART!\\fi:NT OF HEALTH AND HUMAi'l SERVICES DISTRICT ADDRESS AND PHONE NUMBER 555 Winder ly Place , Suite 200 3/14/2016- 3/25/2016* Maitland, FL 32751 FEJNUMBER (407) 475-4700 Fax: (407) 475-4768 1811396 NAME AND TITLE OF INDM OUAL TO WHOM REPORT ISSUED Dina Kostakis ' General Manager - 1016 Drug Manufacturer",
+   "finding_text_old_md5": "e98e0c7b28f38f913fdfc84af0c6d61b",
+   "legacy_match": true,
+   "new_chars": 312,
+   "old_chars": 282,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-adb64f039c9b2e7c38d9beb2"
+  },
+  {
+   "finding_id": "finding-76a2dceec08b70f480c93c7f",
+   "finding_text": "The firm has no program for the periodic retesting of intermediate, active coated stock pellets (such as nitroglycerin stock pellets, chlorpheniramine maleate stock pellets, pheniramine maleate stock pellets etc.), and there is no established time limit for use of active pellets in finished drug products.",
+   "finding_text_old_md5": "33ddcda44409b115c0aa09395267adb4",
+   "legacy_match": true,
+   "new_chars": 306,
+   "old_chars": 282,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-38d3676c889dc2bad91fd269"
+  },
+  {
+   "finding_id": "finding-39c8892a07ee6a2fb0467a6f",
+   "finding_text": "BHQ’s investigation into the problem and the various corrective actions implemented between 6/15/00 hrough 4/16/02 did not address why the regional users were not following the procedures and whether the established employee training was adequate to prevent this problem from recurring.",
+   "finding_text_old_md5": "c7ea53b0954872e354ec758ab93e1fb3",
+   "legacy_match": true,
+   "new_chars": 286,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-7848b7b4ba37002f0dd8064a"
+  },
+  {
+   "finding_id": "finding-1e44263c716c6288119304ae",
+   "finding_text": "Specifically, you do not note the time on all of your SE prevention records to include: Environmental Sampling Log, All required records do not include the location of your farm.and Disinfection Inspection Form, Footwear Station Service Report, Visual Rodent Evaluation Form, and Rodent Specifically, you do not note the location of your farm on all of your SE prevention records to include: Cleaning and Disinfection Inspection Form, Visual Rodent Evaluation Form, Rodent Indexing Record, and Rodent Control Inspection Log.Employee(s) Signature Christian L.",
+   "finding_text_old_md5": "29999e13eee083e92a4509c29cb2e506",
+   "legacy_match": true,
+   "new_chars": 558,
+   "old_chars": 282,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-37709ea4482e4640731bc2d5"
+  },
+  {
+   "finding_id": "finding-18be532042afedf13ac03d7c",
+   "finding_text": "A special audit was conducted in August 2001 when the region’s management notified regional QA ofa ‘possible falsification of records.” The report states “The fact that only the cumulative loss records were altered would have an affect on donor safety and not product quality.” All staff interviewed “verified they found documents which were Jf in br “agnt ST LYden, ncemgen ne af Ol",
+   "finding_text_old_md5": "0e07ff572113c8f25f0afdcb018a2c11",
+   "legacy_match": true,
+   "new_chars": 383,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-7848b7b4ba37002f0dd8064a"
+  },
+  {
+   "finding_id": "finding-0bad31a5c2a43da25a8f5d90",
+   "finding_text": "On 05/27/14 and 05/29/14, we observed cracked, damaged and chipped food contact surfaces on sprouting vats that contained growing sprouts, storage bins that contained finished broccoli and alfalfa sprouts , and mung bean growing cabins, with mung beans present These broccoli and alfalfa sprouts were observed with a use by date of 06/13/14, these mung bean sprouts were observed with a use by date of06/09/ 14.",
+   "finding_text_old_md5": "fe17a6c28241569e3fadf197fe5c820b",
+   "legacy_match": true,
+   "new_chars": 411,
+   "old_chars": 282,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-7bd67630523c399467d672c3"
+  },
+  {
+   "finding_id": "finding-04f2d25265be109f3f187256",
+   "finding_text": "Aseptic processing areas are deficient regarding systems for maintaining any equipment used to control the aseptic conditions, in that: Smoke studies have not been conducted under dynamic conditions and mimicking the most challenging preparations produced by personnel on a regular basis to verify that operators, processing equipment or activities of the ISO 7 clean rooms do not alter or impede the unidirectional flow of air from the HEPA filters and for the RE DACTED (b)(4) ISO 5 laminar flow hoods where drug products are aseptically processed.",
+   "finding_text_old_md5": "c23b1e324d383566aaeda6805907d1ca",
+   "legacy_match": true,
+   "new_chars": 550,
+   "old_chars": 283,
+   "published_date": "2024-01-17",
+   "raw_signal_id": "rawsig-94952aacd9ed9bd2d45bfb50"
+  },
+  {
+   "finding_id": "finding-3b95225f38556c9c4e3a7e90",
+   "finding_text": "Written procedmes for cleaning and maintenance fail to include assignment of responsibility, description in sufficient detail of methods, equipment and materials used, description in sufficient detail of the methods of disassembling and reassembling equipment as necessary to assure proper cleaning and maintenance and instructions for protection of clean equipment from contamination prior to use.",
+   "finding_text_old_md5": "57ea22924525fff15f6d82a48aad5b86",
+   "legacy_match": true,
+   "new_chars": 398,
+   "old_chars": 283,
+   "published_date": "2019-09-16",
+   "raw_signal_id": "rawsig-7aebb215d490d850b60be143"
+  },
+  {
+   "finding_id": "finding-9d66b1e0661772892fe8390d",
+   "finding_text": "Laboratory controls do not include the establishment of scientifically sound and appropriate specifications, standards, sampling plans and test procedures designed to assure that components, in- process materials and drug products conform to appropriate standards of identity, strength, quality and purity.",
+   "finding_text_old_md5": "599ad0bf48f9a11a843ec708625cf69a",
+   "legacy_match": true,
+   "new_chars": 306,
+   "old_chars": 283,
+   "published_date": "2019-05-22",
+   "raw_signal_id": "rawsig-c3a907efb24362207ec42616"
+  },
+  {
+   "finding_id": "finding-b2ca3ff6c84c2d0759ff996e",
+   "finding_text": "Procedures for the cleaning and maintenance of equipment are deficient regarding sufficient detail of the methods, equipment, and materials used in the cleaning and maintenance operation, and the methods ofdisassembly and reassembling equipment as necessary to assure proper cleaning and maintenance.",
+   "finding_text_old_md5": "58ae469f8caeda44867cce8ac723aadb",
+   "legacy_match": true,
+   "new_chars": 300,
+   "old_chars": 283,
+   "published_date": "2017-12-08",
+   "raw_signal_id": "rawsig-2cf5849a8964848fd376a23d"
+  },
+  {
+   "finding_id": "finding-8fc4d2f4f994ef99ea80bb85",
+   "finding_text": "The “Continued Process Verification Program” (CPVP) document #CF/QA/028 establishes an “ongoing assurance that the process remains ina state of control (the validated state) during commercial manufac- ture.” “The purpose ofthis procedure is to identify and summarize the current systems within Claris Injectables Limited which are implemented to evaluate the performance process, identify potential prob- lems and determine whether action must be taken to correct, anticipate, and prevent problems so that the process remains in a state of control throughout the lifecycle.” The implementation of the CPVP “will ensure adherence to the CGMP requirements (specifically, the collection and evaluation of information and data about the performance ofthe process) and will promote detection and remediation of undesired process variability.” The list of objectionable conditions document a number of instances where the Quality Unit has not effectively “evaluate the performance process, identify potential problems and de- termine whether action must be taken to correct, anticipate, and prevent problems so that the process remains in a state of control throughout the lifecycle.”",
+   "finding_text_old_md5": "0435af4b427e687f1c4c993265851e4d",
+   "legacy_match": true,
+   "new_chars": 1178,
+   "old_chars": 283,
+   "published_date": "2017-10-19",
+   "raw_signal_id": "rawsig-f85b43404e58cb069c78aff4"
+  },
+  {
+   "finding_id": "finding-a2e84dc1c7499e1a555c6222",
+   "finding_text": "Written records of investigation into unexplained discrepancies or the failure ofa batch or its components to meet specification do not always include Conclusion and follow up Specifically, the following lab events were not investigated to assess the Root Cause, also no Corrective and Preventative Action (CAPA) was initiated.",
+   "finding_text_old_md5": "ae15ccabffd7a509bec2e80ebe55468e",
+   "legacy_match": true,
+   "new_chars": 327,
+   "old_chars": 283,
+   "published_date": "2017-04-21",
+   "raw_signal_id": "rawsig-bb65b406169f26a542b16d7c"
+  }
+ ],
+ "report": {
+  "ambiguous": 0,
+  "candidates": 33,
+  "documents": 31,
+  "errors": [],
+  "generated_at": "2026-11-10T19:00:22.017941+00:00",
+  "legacy_match": 28,
+  "mapped": 28,
+  "max_old_chars": 290,
+  "missing_raw_signal": 0,
+  "new_chars_total": 11132,
+  "old_chars_total": 7918,
+  "samples": [
+   {
+    "finding_id": "finding-c4067c84b9d0a3273caa3d16",
+    "legacy_match": true,
+    "new_chars": 301,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-b232a56b13b5008509f49a0f",
+    "legacy_match": true,
+    "new_chars": 329,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-b4511c47c0e2f8f000639773",
+    "legacy_match": true,
+    "new_chars": 285,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-c84c083ad97ceaf3042d5a78",
+    "legacy_match": true,
+    "new_chars": 372,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-fdc607edce252418e90dc96f",
+    "legacy_match": true,
+    "new_chars": 493,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-f99a434673df7d7549da11d0",
+    "legacy_match": true,
+    "new_chars": 349,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-eae4c8631b00c7f3db978e13",
+    "legacy_match": true,
+    "new_chars": 344,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-e5eefc76a97ad321aeae8a68",
+    "legacy_match": true,
+    "new_chars": 450,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-e2ef27a4aa2b20be5c42a137",
+    "legacy_match": true,
+    "new_chars": 299,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-b946323155899f7e9a042b29",
+    "legacy_match": true,
+    "new_chars": 304,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-b7de9c23e8a400e5ab629ed1",
+    "legacy_match": true,
+    "new_chars": 291,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-b6e2684fa2325d9b080b6d98",
+    "legacy_match": true,
+    "new_chars": 592,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-ae29f126d46391a28ce4bb61",
+    "legacy_match": true,
+    "new_chars": 397,
+    "old_chars": 282
+   },
+   {
+    "finding_id": "finding-a73ba379a2a917faeade450e",
+    "legacy_match": true,
+    "new_chars": 331,
+    "old_chars": 282
+   },
+   {
+    "finding_id": "finding-8bb13761078ce2e134a8a001",
+    "legacy_match": true,
+    "new_chars": 348,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-7fda87cddfb3413aa4bdc0f0",
+    "legacy_match": true,
+    "new_chars": 332,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-7e08de61f74e84eb8c0a837b",
+    "legacy_match": true,
+    "new_chars": 312,
+    "old_chars": 282
+   },
+   {
+    "finding_id": "finding-76a2dceec08b70f480c93c7f",
+    "legacy_match": true,
+    "new_chars": 306,
+    "old_chars": 282
+   },
+   {
+    "finding_id": "finding-39c8892a07ee6a2fb0467a6f",
+    "legacy_match": true,
+    "new_chars": 286,
+    "old_chars": 283
+   },
+   {
+    "finding_id": "finding-1e44263c716c6288119304ae",
+    "legacy_match": true,
+    "new_chars": 558,
+    "old_chars": 282
+   }
+  ],
+  "schema_version": "grm-wl-truncation-restore-plan/v1",
+  "unchanged": 4,
+  "unmatched": 1
+ },
+ "schema_version": "grm-wl-truncation-restore-plan/v1"
+}

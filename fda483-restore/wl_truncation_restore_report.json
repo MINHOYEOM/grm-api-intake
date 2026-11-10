@@ -1,0 +1,138 @@
+{
+  "ambiguous": 0,
+  "candidates": 33,
+  "documents": 31,
+  "errors": [],
+  "generated_at": "2026-11-10T19:00:22.017941+00:00",
+  "legacy_match": 28,
+  "mapped": 28,
+  "max_old_chars": 290,
+  "missing_raw_signal": 0,
+  "new_chars_total": 11132,
+  "old_chars_total": 7918,
+  "samples": [
+    {
+      "finding_id": "finding-c4067c84b9d0a3273caa3d16",
+      "legacy_match": true,
+      "new_chars": 301,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-b232a56b13b5008509f49a0f",
+      "legacy_match": true,
+      "new_chars": 329,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-b4511c47c0e2f8f000639773",
+      "legacy_match": true,
+      "new_chars": 285,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-c84c083ad97ceaf3042d5a78",
+      "legacy_match": true,
+      "new_chars": 372,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-fdc607edce252418e90dc96f",
+      "legacy_match": true,
+      "new_chars": 493,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-f99a434673df7d7549da11d0",
+      "legacy_match": true,
+      "new_chars": 349,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-eae4c8631b00c7f3db978e13",
+      "legacy_match": true,
+      "new_chars": 344,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-e5eefc76a97ad321aeae8a68",
+      "legacy_match": true,
+      "new_chars": 450,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-e2ef27a4aa2b20be5c42a137",
+      "legacy_match": true,
+      "new_chars": 299,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-b946323155899f7e9a042b29",
+      "legacy_match": true,
+      "new_chars": 304,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-b7de9c23e8a400e5ab629ed1",
+      "legacy_match": true,
+      "new_chars": 291,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-b6e2684fa2325d9b080b6d98",
+      "legacy_match": true,
+      "new_chars": 592,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-ae29f126d46391a28ce4bb61",
+      "legacy_match": true,
+      "new_chars": 397,
+      "old_chars": 282
+    },
+    {
+      "finding_id": "finding-a73ba379a2a917faeade450e",
+      "legacy_match": true,
+      "new_chars": 331,
+      "old_chars": 282
+    },
+    {
+      "finding_id": "finding-8bb13761078ce2e134a8a001",
+      "legacy_match": true,
+      "new_chars": 348,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-7fda87cddfb3413aa4bdc0f0",
+      "legacy_match": true,
+      "new_chars": 332,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-7e08de61f74e84eb8c0a837b",
+      "legacy_match": true,
+      "new_chars": 312,
+      "old_chars": 282
+    },
+    {
+      "finding_id": "finding-76a2dceec08b70f480c93c7f",
+      "legacy_match": true,
+      "new_chars": 306,
+      "old_chars": 282
+    },
+    {
+      "finding_id": "finding-39c8892a07ee6a2fb0467a6f",
+      "legacy_match": true,
+      "new_chars": 286,
+      "old_chars": 283
+    },
+    {
+      "finding_id": "finding-1e44263c716c6288119304ae",
+      "legacy_match": true,
+      "new_chars": 558,
+      "old_chars": 282
+    }
+  ],
+  "schema_version": "grm-wl-truncation-restore-plan/v1",
+  "unchanged": 4,
+  "unmatched": 1
+}

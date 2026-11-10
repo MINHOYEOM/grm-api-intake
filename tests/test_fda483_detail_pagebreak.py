@@ -62,7 +62,34 @@ class PageJoinTest(unittest.TestCase):
     def test_unresolvable_boundary_cuts_like_before(self):
         seg = ("Specifically, the line was not cleaned.\nEMPLOYEE(S) SIGNATURE\n"
                "Page 1 of 3\nrandom tail without header")
-        self.assertEqual(c._join_483_pages(seg).strip(), "Specifically, the line was not cleaned.")
+        self.assertEqual(c._clean_observation_chunk(c._join_483_pages(seg)),
+                         "Specifically, the line was not cleaned.")
+
+    def test_garbled_page_number_still_joins(self):
+        # 11-10 실측 fda483-195384: 쪽 번호가 `Page lof5` 로 판독됐다.
+        seg = ("Specifically, you did not perform PQ studies for the following packaging machines\n"
+               "DATE ISSUED\nOF THIS PAGE\nYvins Dezan, Investigator\nFORM FDA 483 (09/08)\n"
+               "Page lof5\n\nFOOD AND DRUG ADMINISTRATION\nDISTRICT ADDRESS AND PHONE NUMBER\n"
+               "CITY, STATE, ZIP CODE, COUNTRY\nTYPE ESTABLISHMENT INSPECTED\n"
+               "Parsippany, NJ 07054-4212\nContract Packager\n"
+               "used to package the commercial drug products (b) (4) and others.\n")
+        out = c._clean_observation_chunk(c._join_483_pages(seg, "Contract Packager"))
+        self.assertTrue(out.endswith("used to package the commercial drug products (b) (4) and others."), out)
+        self.assertNotIn("Dezan", out)
+
+    def test_extra_signer_titles_and_tail_junk(self):
+        seg = "Specifically, the media fill failed. Susan S. Butler, Staff Fellow"
+        self.assertEqual(c._signer_cut(seg), seg.index("Susan"))
+        self.assertIsNotNone(c._DETAIL_TAIL_JUNK_RE.search("pipe coupling. aeGNATURE"))
+
+    def test_trim_tail(self):
+        t = c.trim_detail_tail
+        self.assertEqual(t("limits are exceeded. OF THIS PAGE Burnell M Henry, Investigator Invest ogo"),
+                         "limits are exceeded.")
+        self.assertEqual(t("operations. 'NATURE,"), "operations.")
+        # 본문 중간의 "…, Investigator Smith noted" 는 산문이라 남긴다.
+        mid = "Specifically, Investigator Smith noted the gap, Investigator Jones agreed. " + "x" * 120 + "."
+        self.assertEqual(t(mid), mid)
 
 
 class RedactionTest(unittest.TestCase):
@@ -74,6 +101,8 @@ class RedactionTest(unittest.TestCase):
         self.assertEqual(n("Tabletsa@ mg"), "Tablets [redacted] mg")
         self.assertEqual(n("(©)@) plates"), "[redacted] plates")
         self.assertEqual(n("the (b) (4) and (b)(4), (b)(6) records"), "the [redacted] and [redacted] records")
+        for v in ("(1) (4)", "(D)(4)", "(9) (4)", "(Bb) (4)", "(1D) (4)", "(6) (4~", "(®)(4)"):
+            self.assertEqual(n(f"label {v} units"), "label [redacted] units", v)
 
     def test_non_redaction_at_signs_are_kept(self):
         n = c.normalize_483_redactions

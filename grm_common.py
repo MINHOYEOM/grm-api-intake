@@ -741,9 +741,11 @@ INTAKE_SOURCE_SPECS: tuple[IntakeSourceSpec, ...] = (
     # EU GMP NCR 60일: 러너 프로브 2026-09-14 기준 20일 무음이 **정상**(EudraGMDP 폼 표식 확인).
     IntakeSourceSpec("eu_gmp_ncr", "EU GMP NCR (EudraGMDP)", warn_only=True,
                      notion_source=SOURCE_EU_GMP_NCR, silence_days=60),
-    # MHRA GMP NCR 90일: 러너 프로브 2026-09-14 기준 35일 무음이 **정상**(Drupal 목록 표식 확인).
+    # MHRA GMP NCR 180일: 러너 프로브 2026-09-14 기준 35일 무음이 정상이었고, 2026-11-10 원천 직접 대조(cms.mhra.gov.uk
+    # 비준수 목록 최신 2026-06-23)로 **140일 무음도 정상**(영국이 새 성명을 안 냄)임을 확인했다(#1457). 연 몇 건뿐인
+    # 소스라 90일이면 정상 공백에 경보가 울린다 → 180일. 고장은 수집 오류·구조 표식 검사가 따로 잡는다.
     IntakeSourceSpec("mhra_gmp_ncr", "MHRA GMP NCR", warn_only=True,
-                     notion_source=SOURCE_MHRA_GMP_NCR, silence_days=90),
+                     notion_source=SOURCE_MHRA_GMP_NCR, silence_days=180),
 )
 
 

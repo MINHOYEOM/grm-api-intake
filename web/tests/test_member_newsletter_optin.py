@@ -188,5 +188,28 @@ class NudgeStatusGate(unittest.TestCase):
         self.assertIn("emailBlacklisted", blk)
 
 
+class SubscriberBandHidden(unittest.TestCase):
+    """[2026-11-10] 하단 구독 띠가 구독자에게도 떴다 — 로그인 회원은 상태로, 메일 링크 방문은 utm 으로 숨긴다."""
+
+    def test_logged_in_member_status_sets_band_key_once_per_session(self):
+        i = JS.index("function syncSubscribed()")
+        blk = JS[i:JS.index("\n  }\n", i)]
+        self.assertIn("NUDGE_STATUS", blk)                     # 게이트 꺼지면 요청 0
+        self.assertIn("lsGet(SUB_OK_KEY)", blk)                # 이미 표시된 브라우저는 요청 0
+        self.assertIn("SUB_CHECK_KEY", blk)                    # 세션당 한 번
+        self.assertIn('action: "status"', blk)                 # 읽기 전용 조회만
+        self.assertNotIn("isAdminEmail", blk)                  # 관리자도 띠는 내린다
+        self.assertIn("lsSet(SUB_OK_KEY)", blk)
+        self.assertIn('getElementById("grm-cta")', blk)
+        self.assertIn("syncSubscribed();", JS[JS.index("sb.auth.getSession().then"):])
+
+    def test_email_link_visit_marks_subscriber_but_not_forward(self):
+        i = BASE.index("var KEY='grm-cta-until'")
+        blk = BASE[i:i + 600]
+        self.assertIn("utm_medium=email(&|$)", blk)
+        self.assertIn("localStorage.setItem(DONE,'1')", blk)
+        self.assertNotIn("forward(", blk)
+
+
 if __name__ == "__main__":
     unittest.main()

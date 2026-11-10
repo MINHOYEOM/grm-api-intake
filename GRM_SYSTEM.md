@@ -584,6 +584,7 @@ grm-api-intake/
 ├─ findings_store.py, findings_views.py
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
+├─ findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
@@ -668,6 +669,7 @@ grm-api-intake/
 │  ├─ partials/  (card·resource_notes·**glossary_fig/**(용어 그림 SVG 43장 — **한 벌뿐**: 낱개 용어 페이지·링크드인 카드 '이번 주 용어' 장·용어집 PDF 가 모두 이 partial 을 렌더해 쓴다(`linkedin_cards.mini` 가 사이트와 같은 번역기로 렌더 + 색 변수만 카드 팔레트로). 2026-09-29 전엔 카드에 사본이 따로 있어 9장이 갈라져 있었다 — `test_card_figure_is_the_site_figure` 가 글자·도형 일치를 잰다)·**findings_seg**(지적사항 존 면 전환 — 검색·둘러보기·트렌드·실사 결과·지적 조항·지적 사례·실사관)·**next_strip**(본문 끝 '다음으로 볼 것')·**trends_style**(세 면 공용 스코프 CSS)·**lookup_style**(firm/inspector 조회 랜딩 CSS))
 │  ├─ data/  (briefs·deltas·library/ 11카탈로그 502건 + library_updates.json 변경 이력·glossary.json 226어 + glossary_cases.json 사례연결 정본(items 177·excluded 49) + **glossary_fig_review.json 용어 그림 검토 장부**(redo 다시 그릴 그림·skip 그리지 않기로 한 용어, 사유 — 일일 그림 배치가 읽는다)·guide_content.md + **guide_content_en.md(영문 이용안내 정본 — 번역 파일이 아니라 같은 h2 구조의 다른 정본)**·**about_content.md + about_content_en.md(소개 페이지 /about/ 정본 — 같은 규율)**·**contact.json(이메일 — 빈 값이면 푸터·소개의 링크 미출력. LinkedIn 은 2026-10-11 사이트에서 걷었다)**·quiz_bank.json 61문항(전량 영문 3필드 가산)·announcements/ 서비스 업데이트 안내·**findings_facets.json 분류·국가·기관 모음 페이지 정본**·**findings_similar.json 문서별 다른 업체의 비슷한 지적(문서당 업체 5곳, findings_docs_refresh.py 가 137 RPC 로 갱신·실패 시 지난 파일 유지 — 문서·업체 페이지 GRM 맥락 블록의 정본) + findings_docs.json 문서 단위 페이지 정본(3,202문서·지적 21,344건·8MB)**·**i18n/en.json 영어 문구 카탈로그(키=한국어 원문, 정렬 유지·`grm_i18n.py lint` 가 결손/고아 검사)** — 전 링크 실검증 커밋 데이터)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함) · **import_alerts.json(FDA 수입경보 공개 스냅샷 — import_alerts_refresh.py, 없으면 업체 페이지 표시·`/findings/import-alerts/` 목록 생략)** · **fda_citation_firms.json(FDA 지적 조항 × 제조소 집계 — fda_citation_firms_refresh.py, 없으면 업체·조항 페이지 블록 생략)**
 ├─ translations/
+│  ├─ detail_outbox/               # [483 구체 내용] 관찰 상세 원문·국문 배치 → findings.detail_text·detail_text_ko(140). findings_detail_apply.py·grm-findings-detail-apply.yml
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)

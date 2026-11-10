@@ -136,6 +136,29 @@ def week_visits(trend: "list[dict[str, Any]]", end: str, spikes: "set[str]") -> 
     return {"total": total, "clean": clean, "days": len(rows), "excluded": excluded, "all_exact": exact}
 
 
+def anomaly_lines(anom: "dict[str, Any] | None", d: str) -> "list[str]":
+    """139 판정(rum_anomalies) → 경고 줄. 판정이 없거나 비면 빈 목록.
+
+    DB 가 이미 제외일·급증 경로를 모든 합계에서 뺐다(_clean 보기). 여기서는 무엇을 뺐는지만 알린다.
+    """
+    if not isinstance(anom, dict):
+        return []
+    out: "list[str]" = []
+    days = [x for x in anom.get("excluded_days") or [] if isinstance(x, dict)]
+    for x in days:
+        if str(x.get("date")) == d:
+            out.append(f"⚠ {d} 자동 접속 급증 — 이날 방문 {n(x.get('visits'))}건(평소 {n(x.get('baseline'))})을 "
+                       "통계에서 뺐다. 아래 방문·경로 숫자는 이날을 뺀 값")
+    others = sorted(str(x.get("date")) for x in days if str(x.get("date")) != d)
+    if others:
+        out.append(f"ℹ 최근 14일 중 자동 접속 급증일 {', '.join(others)} 은 모든 방문 합계에서 뺐다")
+    for x in anom.get("capped_paths") or []:
+        if isinstance(x, dict):
+            out.append(f"ℹ {x.get('date')} `{x.get('path')}` 급증 {n(x.get('visits'))}건 → 평소 값 "
+                       f"{n(x.get('baseline'))}으로 깎음(자동 접속 의심)")
+    return out
+
+
 def foreign_skew(countries_day: "list[dict[str, Any]]", day_visits: Any) -> "dict[str, Any] | None":
     """한국 외 한 나라가 하루 방문의 FOREIGN_SHARE 이상이면 그 나라를 돌려준다."""
     try:
@@ -189,7 +212,7 @@ def render_daily(p: "dict[str, Any]") -> str:
     skew = foreign_skew((g.get("countries") or {}).get("day"), best)
     dq = g.get("data_quality") or {}
 
-    warn = []
+    warn = anomaly_lines(p.get("rum_anomalies"), d)
     if d in spikes:
         warn.append(f"⚠ {d} 방문 급증(평소의 {SPIKE_RATIO}배 이상) — 봇·스크래핑 의심, 성장으로 읽지 않음")
     if skew:

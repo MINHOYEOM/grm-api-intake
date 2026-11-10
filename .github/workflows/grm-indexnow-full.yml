@@ -1,0 +1,31 @@
+name: GRM IndexNow Full Submit
+
+# 수동 전용 — 라이브 sitemap.xml 의 모든 URL 을 네이버·빙(IndexNow)에 한 번에 제출한다.
+# 첫 전수 제출용. 평시 증분 제출은 grm-web-deploy.yml 이 배포 직후 자동으로 한다.
+# 키 파일(/{key}.txt)이 라이브에 먼저 올라가 있어야 한다(이 PR 배포 후 실행).
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests==2.34.2
+
+      - name: Fetch live sitemap
+        run: curl -fsSL --max-time 60 https://grm-solutions.com/sitemap.xml -o "${{ runner.temp }}/live_sitemap.xml"
+
+      - name: Submit all URLs to IndexNow
+        run: python indexnow_submit.py --sitemap "${{ runner.temp }}/live_sitemap.xml" --all

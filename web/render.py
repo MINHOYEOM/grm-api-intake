@@ -147,6 +147,7 @@ from grm_i18n import (  # noqa: E402
     noop as N_,
 )
 from wl_anatomy import split_wl_finding  # noqa: E402
+from indexnow_submit import INDEXNOW_KEY as _INDEXNOW_KEY  # noqa: E402  [IndexNow]
 import example_page  # noqa: E402  [지적 사례 화면 2026-11-09]
 import import_alerts_page  # noqa: E402  [수입경보 2단계 2026-11-10] 전체 목록 화면 뷰
 import citation_firms_page  # noqa: E402  [FDA 지적 조항 × 업체 전체 목록 2026-11-10]
@@ -7858,6 +7859,9 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     _write(out_dir / "robots.txt", build_robots_txt(
         disallow_admin=bool(env.globals.get("admin_enabled"))))
     written.append("robots.txt")
+    # IndexNow 키 파일 — 네이버·빙 자동 URL 제출용(공개값). 내용은 키 그대로.
+    _write(out_dir / f"{_INDEXNOW_KEY}.txt", _INDEXNOW_KEY)
+    written.append(f"{_INDEXNOW_KEY}.txt")
     # _headers — Cloudflare Pages 보안 응답 헤더(정적·결정론, 입력 없음). 배포 루트에
     # robots.txt 와 나란히 둔다(Pages 관례).
     _write(out_dir / "_headers", build_headers_txt())

@@ -1,7 +1,18 @@
 {
- "generated_at": "2026-11-09T18:43:59Z",
+ "generated_at": "2026-11-10T01:50:55Z",
  "workflows": {
   "grm-intake.yml": [
+   {
+    "databaseId": 42736880680,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-10T01:35:39Z",
+    "updatedAt": "2026-11-10T01:50:45Z",
+    "headBranch": "main",
+    "displayTitle": "GRM API Intake (Daily)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42736880680"
+   },
    {
     "databaseId": 42528904181,
     "status": "completed",
@@ -45,17 +56,6 @@
     "headBranch": "main",
     "displayTitle": "GRM API Intake (Daily)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42371546985"
-   },
-   {
-    "databaseId": 42310330247,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-06T23:12:46Z",
-    "updatedAt": "2026-11-06T23:26:29Z",
-    "headBranch": "main",
-    "displayTitle": "GRM API Intake (Daily)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42310330247"
    }
   ],
   "grm-delta-bridge.yml": [
@@ -174,62 +174,73 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42676355388,
-    "status": "in_progress",
-    "conclusion": "",
-    "event": "pull_request",
-    "createdAt": "2026-11-09T18:42:18Z",
-    "updatedAt": "2026-11-09T18:42:22Z",
-    "headBranch": "automation/fda-citation-firms-snapshot-42676259501",
-    "displayTitle": "chore: refresh FDA citation firms snapshot",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42676355388"
-   },
-   {
-    "databaseId": 42676255327,
-    "status": "in_progress",
-    "conclusion": "",
+    "databaseId": 42736302842,
+    "status": "completed",
+    "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T18:41:38Z",
-    "updatedAt": "2026-11-09T18:41:42Z",
+    "createdAt": "2026-11-10T01:30:51Z",
+    "updatedAt": "2026-11-10T01:35:43Z",
     "headBranch": "main",
-    "displayTitle": "feat(findings): 업체·조항 페이지에 FDA 실사 지적 조항 노출 (미노출 데이터 2/3) (#1438)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42676255327"
+    "displayTitle": "feat: 새 화면 두 곳 메뉴 연결 — 제조소 목록에 지적사항 탭 줄, 푸터에 최근 규제 소식 (#1455)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42736302842"
    },
    {
-    "databaseId": 42674290974,
+    "databaseId": 42734428804,
     "status": "completed",
-    "conclusion": "failure",
+    "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T18:28:10Z",
-    "updatedAt": "2026-11-09T18:29:00Z",
-    "headBranch": "feat/deficiency-cases-full",
-    "displayTitle": "feat(findings): PMDA·MHRA 지적 사례 전체 화면 + 조항·용어 블록 (미노출 데이터 3/3)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42674290974"
+    "createdAt": "2026-11-10T01:15:04Z",
+    "updatedAt": "2026-11-10T01:20:39Z",
+    "headBranch": "feat/nav-news-firms",
+    "displayTitle": "feat: 제조소 목록 탭 줄 + 푸터 '최근 규제 소식' 링크",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42734428804"
    },
    {
-    "databaseId": 42674286373,
+    "databaseId": 42734423549,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-09T18:28:08Z",
-    "updatedAt": "2026-11-09T18:35:38Z",
-    "headBranch": "feat/deficiency-cases-full",
-    "displayTitle": "feat(findings): PMDA·MHRA 사례 화면에 출처·이용 조건·가공 고지 (PDL1.0 · OGL v3.0)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42674286373"
+    "createdAt": "2026-11-10T01:15:02Z",
+    "updatedAt": "2026-11-10T01:20:58Z",
+    "headBranch": "feat/nav-news-firms",
+    "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/nav-news-firms",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42734423549"
    },
    {
-    "databaseId": 42673281004,
+    "databaseId": 42733937196,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-10T01:11:14Z",
+    "updatedAt": "2026-11-10T01:17:07Z",
+    "headBranch": "main",
+    "displayTitle": "web: 지적사항 하위 면 7곳에 위치 표시 — 홈 › 지적사항 › 면 (#1452)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42733937196"
+   },
+   {
+    "databaseId": 42732733598,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-09T18:21:12Z",
-    "updatedAt": "2026-11-09T18:26:41Z",
-    "headBranch": "feat/deficiency-cases-full",
-    "displayTitle": "feat(findings): PMDA·MHRA 지적 사례 전체 화면 + 조항·용어 블록 (미노출 데이터 3/3)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42673281004"
+    "createdAt": "2026-11-10T01:01:41Z",
+    "updatedAt": "2026-11-10T01:07:47Z",
+    "headBranch": "feat/nav-news-firms",
+    "displayTitle": "feat: 제조소 목록 탭 줄 + 푸터 '최근 규제 소식' 링크",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42732733598"
    }
   ],
   "grm-scaffold-mirror.yml": [
+   {
+    "databaseId": 42738637692,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "workflow_run",
+    "createdAt": "2026-11-10T01:50:48Z",
+    "updatedAt": "2026-11-10T01:50:52Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42738637692"
+   },
    {
     "databaseId": 42530000049,
     "status": "completed",
@@ -273,17 +284,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42372661268"
-   },
-   {
-    "databaseId": 42311923072,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "workflow_run",
-    "createdAt": "2026-11-06T23:26:31Z",
-    "updatedAt": "2026-11-06T23:26:40Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Scaffold Mirror (브리프 스캐폴드 → 브랜치 사본)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42311923072"
    }
   ],
   "grm-watchlist-notify.yml": [
@@ -459,6 +459,17 @@
   ],
   "grm-findings-backfill-fetch.yml": [
    {
+    "databaseId": 42712037284,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T22:27:25Z",
+    "updatedAt": "2026-11-10T01:48:50Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42712037284"
+   },
+   {
     "databaseId": 42575031678,
     "status": "completed",
     "conclusion": "success",
@@ -501,17 +512,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42375898094"
-   },
-   {
-    "databaseId": 42345581097,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-07T06:07:15Z",
-    "updatedAt": "2026-11-07T09:25:32Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42345581097"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
@@ -539,6 +539,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 42714135761,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-09T22:41:37Z",
+    "updatedAt": "2026-11-09T22:41:47Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42714135761"
+   },
    {
     "databaseId": 42577625325,
     "status": "completed",
@@ -582,17 +593,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42455808023"
-   },
-   {
-    "databaseId": 42419901545,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-07T22:17:23Z",
-    "updatedAt": "2026-11-07T22:17:37Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42419901545"
    }
   ],
   "grm-cloud-request.yml": [
@@ -622,6 +622,11 @@
  },
  "intake_artifacts": [
   {
+   "run_id": 42736880680,
+   "created_at": "2026-11-10T01:35:39Z",
+   "has_web_brief": true
+  },
+  {
    "run_id": 42528904181,
    "created_at": "2026-11-08T22:10:37Z",
    "has_web_brief": true
@@ -640,11 +645,6 @@
    "run_id": 42371546985,
    "created_at": "2026-11-07T12:13:54Z",
    "has_web_brief": false
-  },
-  {
-   "run_id": 42310330247,
-   "created_at": "2026-11-06T23:12:46Z",
-   "has_web_brief": true
   }
  ]
 }

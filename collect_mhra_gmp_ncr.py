@@ -109,7 +109,7 @@ def _to_item(rec: MHRARecord) -> IntakeItem:
         source=SOURCE_MHRA_GMP_NCR,
         document_id=document_id,
         date_iso=date_iso,
-        headline=headline[:240],
+        headline=headline,
         official_url=rec.detail_url,                  # 세션 독립 상세 페이지 = 영속 원문
         type_or_class=TYPE_MHRA_GMP_NCR,
         firm=firm,

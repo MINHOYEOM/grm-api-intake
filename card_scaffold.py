@@ -982,6 +982,24 @@ def _detail_mhra_gmp_ncr(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, 
     return detail
 
 
+# ── WHOPIR 표시 단계 상한(2026-11-10: 저장은 전문, 줄이기는 여기서) ───────────────────
+# 수집기(collect_who.extract_whopir_report)는 결론·항목 요약을 전문으로 저장한다. 상한이 없으면
+# 브리프 JSON 이 카드 1장당 2~7만자씩 불어나므로(실측 Kaygee 68,520자) 카드를 만들 때 종전과
+# 같은 길이(항목 600 / 결론 1,200, 문장 경계 우선)로 줄인다. 전문은 raw_payload 에 남는다.
+WHOPIR_SECTION_MAX_CHARS = 600
+WHOPIR_OUTCOME_MAX_CHARS = 1200
+
+
+def _whopir_cut(text: Any, limit: int) -> str:
+    """표시용 절단 — 문장 경계 우선(문장 중간에서 끊기지 않게), 절단 시 말줄임 표기."""
+    s = re.sub(r"\s+", " ", str(text or "")).strip()
+    if len(s) <= limit:
+        return s
+    cut = s[:limit]
+    p = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
+    return (cut[:p + 1] if p > limit * 0.5 else cut.rstrip()) + " …"
+
+
 def _detail_whopir_report(row: dict[str, Any], raw: dict[str, Any]) -> dict[str, Any] | None:
     """WHOPIR 공개 실사보고서 구조(`raw.whopir_report`) — 결정론 상세슬롯.
 
@@ -995,11 +1013,11 @@ def _detail_whopir_report(row: dict[str, Any], raw: dict[str, Any]) -> dict[str,
     report = raw.get("whopir_report")
     if not isinstance(report, dict):
         return None
-    outcome = str(report.get("outcome") or "").strip()
+    outcome = _whopir_cut(report.get("outcome"), WHOPIR_OUTCOME_MAX_CHARS)
     sections = [
         {"no": int(s.get("no") or 0),
          "title": str(s.get("title") or "").strip(),
-         "text": str(s.get("text") or "").strip()}
+         "text": _whopir_cut(s.get("text"), WHOPIR_SECTION_MAX_CHARS)}
         for s in (report.get("sections") or [])
         if isinstance(s, dict) and str(s.get("text") or "").strip()
     ]
@@ -1974,7 +1992,7 @@ def whopir_outcome_parts(report: Any) -> dict[str, Any] | None:
     "desk": bool}. 결론 문장이 정형 어구가 아니면 None."""
     if not isinstance(report, dict):
         return None
-    outcome = str(report.get("outcome") or "")
+    outcome = _whopir_cut(report.get("outcome"), WHOPIR_OUTCOME_MAX_CHARS)
     if not outcome:
         return None
     if _WHOPIR_NEGATED_RE.search(outcome):
@@ -2011,7 +2029,7 @@ def _whopir_outcome_for_prose(raw: dict[str, Any]) -> str:
     report = raw.get("whopir_report")
     if not isinstance(report, dict):
         return ""
-    outcome = re.sub(r"\s+", " ", str(report.get("outcome") or "")).strip()
+    outcome = _whopir_cut(report.get("outcome"), WHOPIR_OUTCOME_MAX_CHARS)
     if not outcome:
         return ""
     m = re.search(r"\b(?:is|was|are|were)\s+considered\b.*", outcome)

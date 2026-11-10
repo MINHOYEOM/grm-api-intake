@@ -157,7 +157,7 @@ def _to_item(rec: NCRRecord, pdf_url: str, pdf_error: str | None) -> IntakeItem:
         source=SOURCE_EU_GMP_NCR,
         document_id=rec.doc_ref,
         date_iso=rec.issue_date,
-        headline=headline[:240],
+        headline=headline,
         official_url=pdf_url,                     # 아카이브 PDF(폴백은 card_scaffold 가 처리)
         type_or_class=TYPE_EU_GMP_NCR,
         firm=firm,

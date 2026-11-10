@@ -61,7 +61,6 @@ ICH_PAGES: list[tuple[str, str, bool]] = [
 
 HTTP_RETRIES = 3
 PAGE_REQUEST_DELAY_SECONDS = 1.0
-MAX_TITLE_CHARS = 240
 MAX_LINE_CHARS = 140   # 이보다 길면 본문 문단으로 보고 제외(제목만 캡처)
 
 # ICH 토픽 코드 토큰 (Q1.., M1..). 제목은 코드로 시작하거나 코드를 포함한다.
@@ -114,7 +113,7 @@ def _candidate_titles(blocks: list[str]) -> list[str]:
         if key in seen:
             continue
         seen.add(key)
-        out.append(line[:MAX_TITLE_CHARS])
+        out.append(line)
     return out
 
 
@@ -176,7 +175,7 @@ def _collect_page(slug: str, type_or_class: str, required: bool,
             source=SOURCE_ICH,
             document_id=_document_id(slug, title),
             date_iso="",                       # 날짜 미단언 → Run Date만 사용
-            headline=headline[:MAX_TITLE_CHARS],
+            headline=headline,
             official_url=public_url,            # 사람이 보는 공식 공개 페이지
             type_or_class=type_or_class,
             body=(f"ICH 공식 페이지 '{slug}' 에서 감지된 섹션/토픽 후보.\n"

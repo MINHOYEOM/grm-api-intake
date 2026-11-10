@@ -58,10 +58,33 @@ class TestDeficiencyExcerpt(unittest.TestCase):
     def test_excerpt_empty_on_empty_text(self):
         self.assertEqual(g._extract_deficiency_excerpt(""), "")
 
-    def test_excerpt_capped_at_body_limit(self):
-        big = "평가 결과 지적(보완)사항 " + ("가" * (g.MAX_ATTACHMENT_BODY_CHARS + 500))
-        self.assertLessEqual(len(g._extract_deficiency_excerpt(big)),
-                             g.MAX_ATTACHMENT_BODY_CHARS)
+    def test_excerpt_is_not_truncated(self):
+        # 2026-11-10: 저장 단계 절단 제거 — 6000자를 넘어도 전문 보존.
+        big = "평가 결과 지적(보완)사항 " + ("가" * 6500)
+        self.assertGreater(len(g._extract_deficiency_excerpt(big)), 6500)
+
+    def test_long_attachment_text_and_excerpt_kept_whole_in_body(self):
+        att = g._AttachmentParse(status="pdf-ok", text="가" * 13000,
+                                 deficiency="present",
+                                 deficiency_excerpt="나" * 700)
+        body = g._body({"manufacturer": "m"}, att)
+        self.assertIn("가" * 13000, body)
+        self.assertIn("나" * 700, body)
+
+    def test_pdf_text_not_capped(self):
+        import types
+        pages = [types.SimpleNamespace(get_text=lambda m: "가" * 20000)]
+
+        class _Doc(list):
+            needs_pass = False
+            is_encrypted = False
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+        fake = types.SimpleNamespace(open=lambda **kw: _Doc(pages))
+        with mock.patch.dict("sys.modules", {"fitz": fake}):
+            text, status = g._extract_pdf_text(b"x")
+        self.assertEqual(status, "pdf-ok")
+        self.assertEqual(len(text), 20000)
 
     def test_assess_deficiency_still_present(self):
         # 추출이 판정을 바꾸지 않는다(회귀).

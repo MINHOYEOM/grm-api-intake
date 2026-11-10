@@ -40,7 +40,6 @@ MFDS_ORG_CODE = "1471000"
 
 PAGE_SIZE = 100
 MAX_PAGES_PER_QUERY = 5
-BODY_EXCERPT_LIMIT = 4000
 
 LAW_QUERY_TERMS = [
     "식품의약품안전처",
@@ -269,16 +268,7 @@ def _extract_body_excerpt(root: ET.Element) -> str:
         elif not list(el) and name not in _BODY_FALLBACK_EXCLUDE:
             fallback.append(text)
 
-    out: list[str] = []
-    total_len = 0
-    for line in hinted or fallback:
-        if total_len + len(line) + 1 > BODY_EXCERPT_LIMIT:
-            remaining = max(BODY_EXCERPT_LIMIT - total_len - 4, 0)
-            if remaining:
-                out.append(line[:remaining].rstrip() + "...")
-            break
-        out.append(line)
-        total_len += len(line) + 1
+    out = list(hinted or fallback)   # 2026-11-10: 저장 단계 절단 제거(전문 보존)
     return "\n".join(out).strip()
 
 

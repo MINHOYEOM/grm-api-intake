@@ -340,7 +340,7 @@ def build_item(row: dict[str, Any], card: dict[str, Any], published_date: str) -
         source=SOURCE_HC_INSPECTION,
         document_id=f"hc-insp-{ins_number}",
         date_iso=published_date,
-        headline=f"{establishment} — Health Canada GMP inspection ({rating_desc})"[:240],
+        headline=f"{establishment} — Health Canada GMP inspection ({rating_desc})",
         official_url=url,
         type_or_class=TYPE_HC_INSPECTION,
         firm=establishment,

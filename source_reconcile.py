@@ -815,7 +815,7 @@ def fetch_ich(start: date, end: date) -> FetchOutcome:
         for title in titles:
             headline = title if type_or_class == ich.TYPE_ICH_GUIDELINE else f"[Public Consultation] {title}"
             docs.append(SourceDoc(document_id=ich._document_id(slug, title), url=ich.PUBLIC_BASE + slug,
-                                  title=headline[:ich.MAX_TITLE_CHARS], published=""))
+                                  title=headline, published=""))
     if len(failed_required) == sum(1 for _s, _t, r in ich.ICH_PAGES if r):
         raise SourceFetchError("; ".join(notes)[:300] or "ICH 핵심 페이지 전부 실패")
     return FetchOutcome(docs=_dedupe(docs), partial=bool(failed_required), notes=notes)

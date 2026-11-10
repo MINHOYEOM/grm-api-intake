@@ -104,6 +104,16 @@ class OldStorageCapTest(unittest.TestCase):
         self.assertEqual(out[0]["detail"], full.strip())
         self.assertEqual(out[0]["deficiency"], "Old heading.")
 
+    def test_1200_detail_with_different_head_matches_on_middle_and_tail(self):
+        body = " ".join(f"Lot {i} record was not reviewed by the quality unit before release." for i in range(60))
+        old_detail = ("SEE REVERSE page junk " + body)[:1200]
+        new_detail = "Specifically, " + body
+        old = [{"number": "4", "deficiency": "A.", "detail": old_detail}]
+        new = [{"number": "4", "deficiency": "A (rescrubbed).", "detail": new_detail}]
+        out, matched, _ = b.refreshed_observations(old, new)
+        self.assertEqual(matched, 1)
+        self.assertEqual(out[0]["detail"], new_detail)
+
     def test_different_text_with_same_number_is_not_matched(self):
         old = [{"number": "1", "deficiency": "A.", "detail": "Specifically, " + "x " * 600}]
         new = [{"number": "1", "deficiency": "B.", "detail": "Something else entirely. " * 60}]

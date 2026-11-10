@@ -148,7 +148,15 @@ def _extends_detail(old_detail: str, new_detail: str) -> bool:
     """새 상세가 옛 상세의 앞부분(정규화 200자)으로 시작하고 더 길다 — 같은 관찰의 잘리지 않은 판."""
     od, nd = _norm(old_detail), _norm(new_detail)
     probe = od[:_PREFIX_PROBE]
-    return bool(probe) and nd.startswith(probe) and len(nd) > len(od)
+    if probe and nd.startswith(probe) and len(nd) > len(od):
+        return True
+    # [11-11] 옛 1,200자 절단 상세는 앞머리(머리말 조각·옛 가림 표기)가 새 판과 조금 달라 위 조건에
+    # 걸리지 않았다(다시 읽기 뒤 42건 잔존). 옛 상세가 절단 띠 안이고, 그 **가운데 구간**(정규화
+    # 300~600자)과 **끝 구간**(마지막 120자)이 새 상세에 그대로 있으며 새 판이 더 길면 같은 관찰로 본다.
+    if not is_truncated_detail(old_detail) or len(nd) <= len(od):
+        return False
+    mid, tail = od[300:600], od[-120:]
+    return len(mid) >= 200 and mid in nd and tail in nd
 
 
 def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]

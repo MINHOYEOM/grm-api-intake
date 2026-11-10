@@ -64,6 +64,9 @@ MIN_HITS = 10            # 몰린 서로 다른 값의 최소 개수
 MIN_RATIO = 5.0          # 바로 아래 같은 폭 대비 배수
 MAX_CAPS_PER_FIELD = 3   # 한 칸에 상한이 여러 개일 수 있다(옛 상한·새 상한)
 RECENT_DAYS = 30         # 이 기간 안에 수집된 행이 잘렸으면 "지금도 잘리는 중"
+TAIL_LEN = 20            # 끝 꼬리 길이
+TEMPLATE_TAIL_MIN = 20   # 서로 다른 값 이만큼이 같은 꼬리로 끝나면 정형 끝(꼬리말)이지 잘림이 아니다
+                         # (WL 전문 상당수가 "…1-888-INFO-FDA (1-888-463-6332) Back to Top" 으로 끝난다)
 
 PROSE_MIN_LEN = 80
 PROSE_MIN_VALUES = 10
@@ -155,8 +158,8 @@ class FieldStats:
     source: str
     path: str
     total: int = 0
-    long_cut: dict[int, set[str]] = field(default_factory=lambda: defaultdict(set))   # 길이 → 잘린 값 해시
-    long_rows: dict[int, list[tuple[str, str]]] = field(default_factory=lambda: defaultdict(list))  # 길이 → (ref, 수집일)
+    long_cut: dict[int, dict[str, str]] = field(default_factory=lambda: defaultdict(dict))   # 길이 → {값 해시: 끝 꼬리}
+    long_rows: dict[int, list[tuple[str, str, str]]] = field(default_factory=lambda: defaultdict(list))  # 길이 → (ref, 수집일, 끝 꼬리)
     prose_lens: list[int] = field(default_factory=list)
     url_like: int = 0
     reach_pairs: list[tuple[str, str]] = field(default_factory=list)   # (raw_signal_id, 조각)
@@ -168,8 +171,9 @@ class FieldStats:
         self.total += 1
         n = len(v)
         if n >= MIN_LEN and is_cut(v):
-            self.long_cut[n].add(hashlib.md5(v.encode("utf-8")).hexdigest())
-            self.long_rows[n].append((ref, collected))
+            tail = v[-TAIL_LEN:]
+            self.long_cut[n][hashlib.md5(v.encode("utf-8")).hexdigest()] = tail
+            self.long_rows[n].append((ref, collected, tail))
         if n >= PROSE_MIN_LEN:
             self.prose_lens.append(n)
             if _URL.match(v):
@@ -177,6 +181,18 @@ class FieldStats:
             if raw_signal_id:
                 nv = norm(v)
                 self.reach_pairs.append((raw_signal_id, nv[SNIPPET_FROM:SNIPPET_FROM + SNIPPET_LEN]))
+
+    def template_tails(self) -> set[str]:
+        """서로 다른 값 여럿이 똑같이 끝나는 꼬리 — 페이지 꼬리말("… Back to Top") 같은 정형 끝이지 잘림이 아니다."""
+        cnt: dict[str, int] = defaultdict(int)
+        for by_hash in self.long_cut.values():
+            for tail in by_hash.values():
+                cnt[tail] += 1
+        return {t for t, c in cnt.items() if c >= TEMPLATE_TAIL_MIN}
+
+    def cut_counts(self) -> dict[int, int]:
+        tmpl = self.template_tails()
+        return {l: sum(1 for t in by_hash.values() if t not in tmpl) for l, by_hash in self.long_cut.items()}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -242,9 +258,11 @@ def detect_truncation(stats: Iterable[FieldStats], code_caps: list[dict[str, Any
     out = []
     recent_from = (today - timedelta(days=RECENT_DAYS)).isoformat()
     for fs in stats:
-        caps = find_caps({l: len(h) for l, h in fs.long_cut.items()})
+        caps = find_caps(fs.cut_counts())
+        tmpl = fs.template_tails() if caps else set()
         for c in caps:
-            rows = [r for l in range(c["band_from"], c["cap"] + 1) for r in fs.long_rows.get(l, [])]
+            rows = [(r, d) for l in range(c["band_from"], c["cap"] + 1) for r, d, t in fs.long_rows.get(l, [])
+                    if t not in tmpl]
             dates = sorted(d for _, d in rows if d)
             key = (fs.source, fs.path)
             out.append({

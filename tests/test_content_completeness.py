@@ -91,6 +91,15 @@ class FindCapsTest(unittest.TestCase):
         vals = [same] * 500 + [natural(rng) for _ in range(300)]
         self.assertEqual(cc.detect_truncation([self._fs(vals)], [], TODAY), [])
 
+    def test_page_footer_tail_is_not_a_cut(self):
+        """WL 전문처럼 서로 다른 본문이 같은 꼬리말로 끝나면(부호 없음) 잘림으로 세지 않는다."""
+        rng = random.Random(10)
+        footer = " Contact Number 1-888-INFO-FDA (1-888-463-6332) Back to Top"
+        vals = [words(rng, 19500 + rng.randint(0, 500)).strip() + footer for _ in range(80)] \
+            + [natural(rng) for _ in range(100)]
+        # 길이를 한 대역에 몰아도(19.5k~20k) 꼬리가 같으면 몰림이 아니다
+        self.assertEqual(cc.detect_truncation([self._fs(vals)], [], TODAY), [])
+
     def test_natural_lengths_no_alarm(self):
         rng = random.Random(5)
         vals = [words(rng, rng.randint(200, 3000)).strip() for _ in range(2000)]   # 끝 부호 없음 + 고른 길이

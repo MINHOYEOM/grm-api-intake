@@ -137,9 +137,8 @@ FDA483_OCR_PAGE_BUDGET = _env_int("FDA483_OCR_PAGE_BUDGET", 200)
 FDA483_BURST_PDF_MAX_ITEMS = _env_int("FDA483_BURST_PDF_MAX_ITEMS", 0)
 FDA483_BURST_OCR_PAGE_BUDGET = _env_int("FDA483_BURST_OCR_PAGE_BUDGET", 0)
 FDA483_BURST_DEADLINE_EPOCH = _env_int("FDA483_BURST_DEADLINE_EPOCH", 0)
-# [2026-11-10] 1200 → 8000. 1200 에서 저장 상세 2,034건(19%)이 문장 중간에 잘렸다. 상한을 넘으면
-# 마지막 문장 끝에서 자른다(`_cap_detail`) — 문장 중간 절단은 더 이상 만들지 않는다.
-FDA483_OBSERVATION_DETAIL_MAX_CHARS = 8000
+# [2026-11-10] 관찰 상세(detail)에는 글자 상한이 없다 — "저장할 때는 자르지 않는다, 줄이는 건 화면에서만".
+# (종전 1,200자에서 2,034건이 문장 중간에 잘렸다.) 길이는 관찰 구간(다음 번호 앞·문서 끝)이 정한다.
 FDA483_TEXT_CORRUPTION_RATIO_MAX = 0.08
 FDA483_TEXT_MAX_CHARS = 200000   # ≈74쪽 — 현실 483 절대 초과 안 함
 
@@ -2089,15 +2088,6 @@ def normalize_483_redactions(text: str) -> str:
     return t.strip()
 
 
-def _cap_detail(text: str, limit: int) -> str:
-    """상한을 넘으면 마지막 문장 끝에서 자른다(문장 중간 절단 금지). 문장 끝이 없으면 상한에서."""
-    if len(text) <= limit:
-        return text
-    head = text[:limit]
-    m = None
-    for m in re.finditer(r"[.!?](?=\s)", head):
-        pass
-    return head[:m.end()].strip() if m and m.end() > limit // 2 else head.strip()
 
 
 # 상세 **끝 80자 안**의 `<이름>, <직함>` 은 뒤에 대문자 낱말이 와도 서명란이다(`Burnell M Henry,
@@ -2146,7 +2136,7 @@ def _full_observation_detail(seg: str, deficiency: str, old_detail: str,
 
 
 def _finalize_detail(detail: str) -> str:
-    return _cap_detail(normalize_483_redactions(detail), FDA483_OBSERVATION_DETAIL_MAX_CHARS)
+    return normalize_483_redactions(detail)
 
 
 def _first_sentence(text: str) -> tuple[str, str]:

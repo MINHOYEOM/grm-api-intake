@@ -113,18 +113,16 @@ class RedactionTest(unittest.TestCase):
         self.assertEqual(c.normalize_483_redactions("collected on) * ! were not"), "collected on) were not")
 
 
-class CapTest(unittest.TestCase):
-    def test_cap_cuts_at_sentence_end(self):
-        text = "First sentence here. " * 10 + "Unfinished tail that goes on"
-        out = c._cap_detail(text, 120)
-        self.assertTrue(out.endswith("."), out)
-        self.assertLessEqual(len(out), 120)
+class NoStorageCapTest(unittest.TestCase):
+    """저장 단계에서는 자르지 않는다(대표 원칙 2026-11-10) — 상세 길이에 상한이 없다."""
 
-    def test_short_text_untouched(self):
-        self.assertEqual(c._cap_detail("Short.", 8000), "Short.")
+    def test_long_detail_is_stored_whole(self):
+        text = "Specifically, the record was incomplete. " * 600 + "Unfinished tail that goes on"
+        self.assertEqual(c._finalize_detail(text), text.strip())
 
-    def test_cap_is_raised(self):
-        self.assertGreaterEqual(c.FDA483_OBSERVATION_DETAIL_MAX_CHARS, 8000)
+    def test_no_cap_constant(self):
+        self.assertFalse(hasattr(c, "FDA483_OBSERVATION_DETAIL_MAX_CHARS"))
+        self.assertFalse(hasattr(c, "_cap_detail"))
 
 
 if __name__ == "__main__":

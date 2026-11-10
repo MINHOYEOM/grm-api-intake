@@ -2088,8 +2088,6 @@ def normalize_483_redactions(text: str) -> str:
     return t.strip()
 
 
-
-
 # 상세 **끝 80자 안**의 `<이름>, <직함>` 은 뒤에 대문자 낱말이 와도 서명란이다(`Burnell M Henry,
 # Investigator Invest ogo` — 서명 스탬프 판독 잔재). 본문 중간에서는 종전 조건(뒤에 사람 이름이면 산문)을 지킨다.
 _SIGNER_TITLE_TAIL_RE = re.compile(

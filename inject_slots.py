@@ -27,6 +27,7 @@ import copy
 import json
 import re
 import sys
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -654,6 +655,156 @@ def _merge_whopir_translations(dd: dict[str, Any], ko: dict[str, Any],
     if merged:
         report.warnings.append(
             f"ncr_ko[{doc_id!r}]: WHOPIR 상세 국문 번역 {merged}필드 병합(원문+국문 병기)")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# [2026-11-10 브리프 재정비 — 결정 4] 산문 표현 검사 — **경고만**(발행을 막지 않는다).
+# 근거: `GRM_브리프구조표현_심층분석_2026-11-10.md` §5-2 ②. 11개 호에서 시사점의 맺음이 호마다
+# 통째로 바뀌었다("필요가 있다"→"볼 만하다"→"신호다"→"차례다"). 금지어를 넣을 때마다 새 상투어가
+# 그 자리를 채웠으므로, 금지어 목록과 별개로 **같은 맺음의 비율**을 센다(새 상투어도 잡힌다).
+# 대표 결정: 11-16·11-23 두 호는 경고로 실측 → 기준을 맞춘 뒤 차단으로 바꾼다(STYLE_LINT_BLOCKING).
+# 검사 대상 = LLM 산문(한국어 슬롯 + tldr). 원문 인용(quotes)·코드 facts 는 보지 않는다.
+# ─────────────────────────────────────────────────────────────────────────────
+STYLE_LINT_BLOCKING = False      # True 로 바꾸는 것은 2개 호 실측 뒤 사람 결정
+_ENDING_CHARS = 6
+_ENDING_RATIO = 0.30
+_ENDING_MIN_CARDS = 5            # 시사점이 이보다 적은 호는 비율이 흔들려 세지 않는다
+
+# 맺음·해석·추정·원자료 금지어(심층분석 4-1 가·나·마). (라벨, 정규식)
+_BANNED_PHRASES: tuple[tuple[str, str], ...] = (
+    ("~신호다", r"신호(다|로 읽|로 볼|이다)"),
+    ("~필요가 있다", r"필요가 있다"),
+    ("~볼 만하다", r"볼 만하다"),
+    ("~확인할 차례다", r"차례다"),
+    ("~지점·쟁점·관건이 된다", r"(지점|쟁점|관건)이 된다"),
+    ("~를 보여 준다", r"보여\s?준다"),
+    ("~로 읽힌다·해석된다", r"(읽힌다|해석된다)"),
+    ("시사·주목·우려", r"(시사한다|주목된다|우려된다)"),
+    ("일반적으로 …연관", r"일반적으로[^.]{0,40}연관"),
+    ("~될 수 있다·가능성", r"(될 수 있다|가능성이 있다)"),
+    ("원문 확인이 필요", r"원문\s?확인이?\s?필요"),
+    ("최고 위해 등급 설명", r"(최고|가장 높은)\s?(위해|위험)"),
+    ("8자리 날짜", r"(?<!\d)20\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(?!\d)"),
+    ("미국식 날짜", r"(?<!\d)\d{2}/\d{2}/20\d{2}(?!\d)"),
+    ("강제여부 Y/N", r"강제\s?여부"),
+)
+
+# 용어 표기(심층분석 4-1 라 — 왼쪽 표기). (쓴 표기 정규식, 맞출 표기)
+_TERM_VARIANTS: tuple[tuple[str, str], ...] = (
+    (r"규격\s?이탈|규격\s?외 결과", "기준일탈(OOS)"),
+    (r"데이터 무결성", "데이터 완전성"),
+    (r"배지충진|media fill|미디어필", "배지충전(무균공정 모의시험)"),
+    (r"완결성\s?시험", "필터 완전성시험"),
+    (r"용기\s?밀폐\s?완전성|CCIT", "용기밀봉 완전성"),
+    (r"세균 내독소", "엔도톡신"),
+    (r"환경모니터링", "환경 모니터링"),
+    (r"클린룸", "청정실"),
+    (r"Quality Unit|(?<![A-Za-z])QU(?![A-Za-z])", "품질부서"),
+    (r"공급처", "공급업체"),
+    (r"세척 검증|공정 검증|(?<!재)재검증", "밸리데이션"),
+    (r"Audit trail|Alert Limit", "감사추적기록·경고한계"),
+    (r"Warning Letter|경고장", "경고서한"),
+    (r"조사관", "실사관"),
+    (r"캐나다 보건부", "Health Canada"),
+    (r"(FDA|CAPA|OOS|EMA|MHRA) (가|는|를|은|이)(?![가-힣])", "조사는 붙여 쓴다(FDA가)"),
+)
+# 약어 첫 등장 — 같은 카드 안에 한글 표기가 함께 없으면 경고.
+_ABBR_NEEDS_KO: tuple[tuple[str, str], ...] = (
+    ("OOS", "기준일탈"), ("CAPA", "시정 및 예방조치"), ("COA", "시험성적서"),
+)
+
+_BANNED_RE = tuple((lab, re.compile(p)) for lab, p in _BANNED_PHRASES)
+_TERM_RE = tuple((re.compile(p), fix) for p, fix in _TERM_VARIANTS)
+
+
+@dataclass
+class StyleReport:
+    """표현 검사 결과 — 숫자 네 개(평가 지표)와 사람이 읽을 줄."""
+    ending_top: str = ""
+    ending_ratio: float = 0.0
+    ending_cards: int = 0
+    banned: dict[str, list[str]] = field(default_factory=dict)     # 라벨 → 카드 id
+    terms: dict[str, list[str]] = field(default_factory=dict)      # "쓴→맞출" → 카드 id
+
+    @property
+    def ending_over(self) -> bool:
+        return self.ending_cards >= _ENDING_MIN_CARDS and self.ending_ratio > _ENDING_RATIO
+
+    @property
+    def counts(self) -> dict[str, Any]:
+        return {"ending_ratio": round(self.ending_ratio, 3),
+                "banned": sum(len(v) for v in self.banned.values()),
+                "terms": sum(len(v) for v in self.terms.values())}
+
+    def lines(self) -> list[str]:
+        out: list[str] = []
+        if self.ending_over:
+            out.append(f"시사점 맺음 반복 {self.ending_ratio:.0%} — 끝 {_ENDING_CHARS}글자 "
+                       f"'{self.ending_top}' (기준 {_ENDING_RATIO:.0%} 이하, 시사점 {self.ending_cards}장)")
+        for lab, ids in sorted(self.banned.items(), key=lambda kv: -len(kv[1])):
+            out.append(f"금지 표현 '{lab}' {len(ids)}장 (예: {', '.join(ids[:3])})")
+        for lab, ids in sorted(self.terms.items(), key=lambda kv: -len(kv[1])):
+            out.append(f"용어 표기 {lab} {len(ids)}장 (예: {', '.join(ids[:3])})")
+        return out
+
+
+def _ko_prose_texts(d: dict[str, Any]) -> list[str]:
+    out: list[str] = []
+    for key in ("title_issue", "hook_line", "summary", "implication"):
+        v = d.get(key)
+        if isinstance(v, str) and v.strip():
+            out.append(v)
+    for key in _LIST_SLOTS:
+        v = d.get(key)
+        if isinstance(v, list):
+            out.extend(x for x in v if isinstance(x, str))
+    return out
+
+
+def _ending(text: str) -> str:
+    t = re.sub(r"[\s.。!?…\"'”’)]+$", "", text)
+    t = re.sub(r"\s+", "", t)
+    return t[-_ENDING_CHARS:] if len(t) >= _ENDING_CHARS else ""
+
+
+def lint_prose_style(delta: dict[str, Any]) -> StyleReport:
+    """델타 한국어 산문의 표현 검사(순수). 경고 재료만 만든다 — 차단 판단은 호출자 몫."""
+    rep = StyleReport()
+    cards = delta.get("cards") or {}
+    if not isinstance(cards, dict):
+        return rep
+    endings: list[str] = []
+    for cid, d in cards.items():
+        if not isinstance(d, dict):
+            continue
+        impl = d.get("implication")
+        if isinstance(impl, str) and impl.strip():
+            e = _ending(impl)
+            if e:
+                endings.append(e)
+        texts = _ko_prose_texts(d)
+        blob = "\n".join(texts)
+        for lab, rx in _BANNED_RE:
+            if rx.search(blob):
+                rep.banned.setdefault(lab, []).append(str(cid))
+        for rx, fix in _TERM_RE:
+            m = rx.search(blob)
+            if m:
+                rep.terms.setdefault(f"'{m.group(0)}'→{fix}", []).append(str(cid))
+        for abbr, ko in _ABBR_NEEDS_KO:
+            if re.search(rf"(?<![A-Za-z]){abbr}(?![A-Za-z])", blob) and ko not in blob:
+                rep.terms.setdefault(f"'{abbr}' 단독→{ko}({abbr})", []).append(str(cid))
+    tldr = delta.get("tldr")
+    if isinstance(tldr, list):
+        blob = "\n".join(t for t in tldr if isinstance(t, str))
+        for lab, rx in _BANNED_RE:
+            if rx.search(blob):
+                rep.banned.setdefault(lab, []).append("tldr")
+    if endings:
+        top, n = Counter(endings).most_common(1)[0]
+        rep.ending_top, rep.ending_cards = top, len(endings)
+        rep.ending_ratio = n / len(endings)
+    return rep
 
 
 # ─────────────────────────────────────────────────────────────────────────────

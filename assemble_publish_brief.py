@@ -119,6 +119,7 @@ class AssembleReport:
     """조립 결과 보고. errors 가 비어야 발행 가능(strict)."""
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    style: Any = None   # inject_slots.StyleReport — 표현 검사 결과(경고 재료·평가 숫자)
     adopted: int = 0
     dropped: int = 0
     dropped_ids: list[str] = field(default_factory=list)
@@ -611,6 +612,11 @@ def assemble_publish_brief(scaffold: dict[str, Any], delta: dict[str, Any],
 
     # 슬롯 주입(코드 가드는 inject_slots 가 수행). strict 는 상위로 위임.
     injected = inject_slots.inject_llm_slots(scaffold, delta, strict=strict)
+
+    # [2026-11-10 결정 4] 산문 표현 검사 — 지금은 경고만(STYLE_LINT_BLOCKING=False).
+    report.style = inject_slots.lint_prose_style(delta)
+    for line in report.style.lines():
+        (report.errors if inject_slots.STYLE_LINT_BLOCKING else report.warnings).append(f"[표현] {line}")
 
     # 채택 필터 + render_order 정렬 보존.
     all_cards = injected.get("cards") or []
@@ -1197,6 +1203,18 @@ def _load_json(path: str) -> Any:
         return json.load(f)
 
 
+def _write_style_report(path: str, style: Any) -> None:
+    """표현 검사 결과를 발행 PR 본문용 마크다운으로(경고 0이면 숫자 한 줄만)."""
+    lines = style.lines() if style is not None else []
+    counts = style.counts if style is not None else {}
+    head = (f"[style-lint] 맺음 반복 {counts.get('ending_ratio', 0):.0%} · 금지 표현 "
+            f"{counts.get('banned', 0)}장 · 용어 표기 {counts.get('terms', 0)}장 (경고만 — 발행 차단 아님)")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(head + "\n")
+        for line in lines:
+            fh.write(f"- {line}\n")
+
+
 def main(argv: list[str] | None = None) -> int:
     # 좁은 콘솔 인코딩(Windows cp949 등)에서 출력이 죽지 않게 한다 — cp949 는 한글은
     # 찍어도 em-dash/불릿 같은 글자를 못 찍어 UnicodeEncodeError 로 죽는다. ubuntu CI 는
@@ -1218,6 +1236,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--deep", default=None,
                     help="[선택] 심층분석 델타 JSON 경로 "
                          "({document_id:{deep_analysis,source_text}}). 미지정 시 기존 동작과 완전 동일.")
+    ap.add_argument("--style-report", default=None,
+                    help="[선택] 표현 검사 결과를 마크다운으로 쓸 경로(발행 PR 본문·요약에 붙인다)")
     args = ap.parse_args(argv)
 
     scaffold = _load_json(args.scaffold)
@@ -1231,6 +1251,8 @@ def main(argv: list[str] | None = None) -> int:
 
     for w in report.warnings:
         print(f"WARN {w}", file=sys.stderr)
+    if args.style_report:
+        _write_style_report(args.style_report, report.style)
     _write_json(args.out, out)
     cov = out["brief"]["coverage"]
     deep_merged = sum(1 for c in out["cards"] if c.get("deep_analysis"))

@@ -124,7 +124,14 @@ jobs:
               const failedRuns = checkRuns.filter((c) =>
                 ['failure', 'timed_out', 'cancelled'].includes(c.conclusion));
 
-              const { data: fresh } = await github.rest.pulls.get({ owner, repo, pull_number: pr.number });
+              // mergeable 은 GitHub 가 요청을 받은 뒤에야 계산한다 — 첫 조회는 null 이 흔하다. 한 번만 읽고
+              // "미확정 → 다음 실행"으로 미루면, 크론이 하루 두 번꼴로만 도는 탓에 초록 PR 이 하루 넘게
+              // 방치된다(2026-11-09 #1443: 19:18 초록, 22:41·07:44 두 번 모두 null 로 미룸). 5초 간격으로 최대 4번 다시 읽는다.
+              let { data: fresh } = await github.rest.pulls.get({ owner, repo, pull_number: pr.number });
+              for (let i = 0; i < 4 && fresh.mergeable === null; i++) {
+                await new Promise((r) => setTimeout(r, 5000));
+                ({ data: fresh } = await github.rest.pulls.get({ owner, repo, pull_number: pr.number }));
+              }
               const mergeableFalse = fresh.mergeable === false;
               const mergeableTrue = fresh.mergeable === true;
 

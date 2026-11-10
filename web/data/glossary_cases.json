@@ -1451,6 +1451,11 @@
       "id": "advanced-therapy-medicinal-product",
       "term_ko": "첨단치료의약품",
       "reason": "지적사항 본문 검색 'ATMP'·'advanced therapy' 4건이 모두 같은 병원약국 1곳의 EU NCR 이고, 문장은 실사 개요(제조 품목 범위 소개)라 ATMP 관련 지적 사례가 아님(2026-10-27)"
+    },
+    {
+      "id": "recall-classification",
+      "term_ko": "회수 등급 (Class I·II·III)",
+      "reason": "본문 검색(Class II 5건)에 UK·EU 회수 등급과 마약류 Class III 등 다른 뜻이 섞여 링크가 오해를 부름."
     }
   ],
   "corpus_note": "건수는 2026-08-04 단일 시점 실측(같은 배치 호출) — 시점이 섞이면 카드끼리 비교가 안 된다."

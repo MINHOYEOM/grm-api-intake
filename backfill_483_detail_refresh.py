@@ -62,6 +62,7 @@ class DetailRefreshReport:
     after: QualityStats = field(default_factory=QualityStats)
     errors: list[str] = field(default_factory=list)
     samples: list[dict[str, Any]] = field(default_factory=list)
+    incomplete_samples: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _collector():
@@ -218,6 +219,12 @@ def run(
         for o_old, o_new in zip(old, refreshed):
             _add(report.before, str(o_old.get("detail") or ""))
             _add(report.after, str(o_new.get("detail") or ""))
+            nd = str(o_new.get("detail") or "").strip()
+            if nd and not detail_quality(nd)["complete"] and len(report.incomplete_samples) < 60:
+                report.incomplete_samples.append({
+                    "doc": doc, "number": o_old.get("number"), "len": len(nd),
+                    "source": "body_full" if raw.get("fda483_body_full") else "pdf",
+                    "tail": nd[-200:]})
             if str(o_old.get("detail") or "") != o_new["detail"]:
                 changed += 1
                 if len(report.samples) < 12:

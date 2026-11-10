@@ -38,8 +38,12 @@ def _compact(text: str) -> str:
     return re.sub(r"\s+", " ", str(text or "")).strip()
 
 
-def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict]:
-    """(대기열 — 최신 먼저, 집계). 순수 함수."""
+def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]], *, stale_only: bool = False
+                ) -> tuple[list[dict[str, Any]], dict]:
+    """(대기열 — 최신 먼저, 집계). 순수 함수.
+
+    stale_only: 이미 국문이 있는 행 중 **지금 원문 상세가 저장된 detail_text 와 다른 행**만(다시 읽기로 원문이
+    바뀐 것 — 2026-11-11 실측 73%). 아니면 국문이 아직 없는 행."""
     by_key: dict[tuple[str, str], list[str]] = defaultdict(list)
     for r in raws:
         raw = r.get("raw_json")
@@ -47,7 +51,7 @@ def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]]) -> t
         for o in raw.get("fda_483_observations") or []:
             if isinstance(o, dict) and str(o.get("detail") or "").strip():
                 by_key[(str(r.get("raw_signal_id")), _compact(o.get("deficiency")))].append(str(o["detail"]))
-    queue, stats = [], {"findings": len(findings), "queued": 0, "no_detail": 0, "ambiguous": 0}
+    queue, stats = [], {"findings": len(findings), "queued": 0, "no_detail": 0, "ambiguous": 0, "unchanged": 0}
     for f in findings:
         hits = by_key.get((str(f.get("raw_signal_id")), _compact(f.get("finding_text"))), [])
         if not hits:
@@ -55,6 +59,9 @@ def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]]) -> t
             continue
         if len(set(hits)) > 1:
             stats["ambiguous"] += 1
+            continue
+        if stale_only and hits[0] == str(f.get("detail_text") or ""):
+            stats["unchanged"] += 1
             continue
         queue.append({"finding_id": str(f["finding_id"]), "finding_text_md5": _md5(f.get("finding_text") or ""),
                       "published_date": str(f.get("published_date") or ""), "detail_text": hits[0]})
@@ -64,11 +71,12 @@ def build_queue(findings: list[dict[str, Any]], raws: list[dict[str, Any]]) -> t
     return queue, stats
 
 
-def write_shards(queue: list[dict[str, Any]], out: Path) -> dict[str, dict[str, int]]:
-    summary = {s: {"files": 0, "items": 0, "chars": 0} for s in SHARDS}
+def write_shards(queue: list[dict[str, Any]], out: Path, shards: tuple[str, ...] = SHARDS
+                 ) -> dict[str, dict[str, int]]:
+    summary = {s: {"files": 0, "items": 0, "chars": 0} for s in shards}
     for i in range(0, len(queue), PER_FILE):
         chunk = queue[i:i + PER_FILE]
-        shard = SHARDS[(i // PER_FILE) % len(SHARDS)]
+        shard = shards[(i // PER_FILE) % len(shards)]
         n = summary[shard]["files"] + 1
         d = out / shard
         d.mkdir(parents=True, exist_ok=True)
@@ -85,6 +93,9 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(description="483 상세 번역 대기열을 A·B·C 묶음 파일로(읽기 전용).")
     p.add_argument("--out", required=True)
+    p.add_argument("--mode", choices=("pending", "stale"), default="pending",
+                   help="pending = 국문 없는 행 · stale = 국문 있으나 원문이 바뀐 행(재번역).")
+    p.add_argument("--prefix", default="", help="묶음 이름(쉼표). 기본 pending=A,B,C · stale=R.")
     p.add_argument("--supabase-url")
     p.add_argument("--service-role-key")
     args = p.parse_args(argv)
@@ -94,18 +105,21 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     base = _normalize_base_url(creds[0])
     findings = fsb._fetch_all_pages(
-        base, creds[1], "findings", select="finding_id,raw_signal_id,published_date,finding_text",
+        base, creds[1], "findings", select="finding_id,raw_signal_id,published_date,finding_text,detail_text",
         page_size=1000, order="finding_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_483}", "scope_status": "eq.ok", "detail_text_ko": "is.null"})
+        extra_params={"source": f"eq.{SOURCE_FDA_483}", "scope_status": "eq.ok",
+                      "detail_text_ko": "not.is.null" if args.mode == "stale" else "is.null"})
     raws = fsb._fetch_all_pages(
         base, creds[1], "raw_signals", select="raw_signal_id,raw_json", page_size=200,
         order="raw_signal_id.asc",
         extra_params={"source": f"eq.{SOURCE_FDA_483}", "raw_json": "like.*fda_483_observations*"})
-    queue, stats = build_queue(findings, raws)
+    queue, stats = build_queue(findings, raws, stale_only=args.mode == "stale")
     out = Path(args.out)
-    summary = write_shards(queue, out)
-    report = {"stats": stats, "shards": summary}
-    (out / "summary.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    shards = tuple(x for x in args.prefix.split(",") if x) or (("R",) if args.mode == "stale" else SHARDS)
+    summary = write_shards(queue, out, shards)
+    report = {"mode": args.mode, "stats": stats, "shards": summary}
+    out.mkdir(parents=True, exist_ok=True)
+    (out / f"summary-{'-'.join(shards)}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 

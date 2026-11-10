@@ -36,8 +36,17 @@ jobs:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          rm -rf translations/detail_shards/queue
-          python findings_detail_export.py --out translations/detail_shards/queue
+          # REFRESH 파일의 각 줄 = "<mode> <prefix,...>" (예: "stale R", "pending N"). 줄이 없으면 종전(A·B·C 전체 재생성).
+          spec=$(grep -E '^(pending|stale) ' translations/detail_shards/REFRESH || true)
+          if [ -z "$spec" ]; then
+            rm -rf translations/detail_shards/queue
+            python findings_detail_export.py --out translations/detail_shards/queue
+          else
+            while read -r mode prefix; do
+              for x in ${prefix//,/ }; do rm -rf "translations/detail_shards/queue/$x"; done
+              python findings_detail_export.py --out translations/detail_shards/queue --mode "$mode" --prefix "$prefix"
+            done <<< "$spec"
+          fi
       - name: Commit shard files to this branch
         run: |
           git config user.name "github-actions[bot]"
@@ -49,4 +58,4 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          { echo '### 483 상세 번역 묶음'; echo '```json'; cat translations/detail_shards/queue/summary.json 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo '### 483 상세 번역 묶음'; echo '```json'; cat translations/detail_shards/queue/summary*.json 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

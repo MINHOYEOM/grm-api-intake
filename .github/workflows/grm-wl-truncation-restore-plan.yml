@@ -10,7 +10,12 @@ name: GRM WL Truncation Restore Plan
 # grm-findings-translate-apply.yml 이 옛 본문 md5 대조 뒤 영문·국문을 한 PATCH 로 바꾼다.
 # 계획은 다시 돌려도 안전하다 — 이미 복원된 행은 "…" 로 끝나지 않아 후보에서 빠진다.
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      max_old_chars:
+        description: '후보 상한(이 길이 이하이고 "…" 로 끝나는 행). 기본 500 = 옛 480자 절단분. 6100 = 6,000자 문장 경계 절단분(2026-11-10 상한 제거 #1467)까지 포함'
+        type: string
+        default: '500'
 
 permissions:
   contents: write   # 계획 사본을 claude/ops-status 브랜치에 쓴다(아래 "사본" 스텝). 코드·main 은 건드리지 않는다.
@@ -43,10 +48,14 @@ jobs:
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          IN_MAX_OLD: ${{ inputs.max_old_chars }}
         run: |
+          max_old=500
+          if printf '%s' "${IN_MAX_OLD:-}" | grep -qE '^[0-9]{3,5}$'; then max_old="$IN_MAX_OLD"; fi
           python backfill_wl_truncation_restore.py \
             --output wl_truncation_restore_plan.json \
-            --report-path wl_truncation_restore_report.json
+            --report-path wl_truncation_restore_report.json \
+            --max-old-chars "$max_old"
 
       - name: Upload restore plan artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

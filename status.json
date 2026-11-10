@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-10T02:03:28Z",
+ "generated_at": "2026-11-10T09:44:38Z",
  "workflows": {
   "grm-intake.yml": [
    {
@@ -174,59 +174,59 @@
   ],
   "grm-web-deploy.yml": [
    {
-    "databaseId": 42736302842,
+    "databaseId": 42778160206,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-10T01:30:51Z",
-    "updatedAt": "2026-11-10T01:35:43Z",
+    "createdAt": "2026-11-10T07:50:55Z",
+    "updatedAt": "2026-11-10T07:55:59Z",
     "headBranch": "main",
-    "displayTitle": "feat: 새 화면 두 곳 메뉴 연결 — 제조소 목록에 지적사항 탭 줄, 푸터에 최근 규제 소식 (#1455)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42736302842"
+    "displayTitle": "feat(monitor): 내용 완전성 감시 — 잘린 내용·모아 놓고 안 쓰는 칸 (#1464)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42778160206"
    },
    {
-    "databaseId": 42734428804,
+    "databaseId": 42776296839,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-10T01:15:04Z",
-    "updatedAt": "2026-11-10T01:20:39Z",
-    "headBranch": "feat/nav-news-firms",
-    "displayTitle": "feat: 제조소 목록 탭 줄 + 푸터 '최근 규제 소식' 링크",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42734428804"
+    "createdAt": "2026-11-10T07:35:01Z",
+    "updatedAt": "2026-11-10T07:40:15Z",
+    "headBranch": "feat/content-completeness-1110",
+    "displayTitle": "feat(monitor): 내용 완전성 감시 — 잘린 내용·모아 놓고 안 쓰는 칸",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42776296839"
    },
    {
-    "databaseId": 42734423549,
+    "databaseId": 42776292504,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-10T01:15:02Z",
-    "updatedAt": "2026-11-10T01:20:58Z",
-    "headBranch": "feat/nav-news-firms",
-    "displayTitle": "Merge remote-tracking branch 'origin/main' into feat/nav-news-firms",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42734423549"
+    "createdAt": "2026-11-10T07:34:59Z",
+    "updatedAt": "2026-11-10T07:39:54Z",
+    "headBranch": "feat/content-completeness-1110",
+    "displayTitle": "test(guard): 상한 상수를 함수에 넘기는 줄도 잡는다 · main 의 483 상세 8,000 반영",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42776292504"
    },
    {
-    "databaseId": 42733937196,
+    "databaseId": 42776043299,
     "status": "completed",
     "conclusion": "success",
     "event": "push",
-    "createdAt": "2026-11-10T01:11:14Z",
-    "updatedAt": "2026-11-10T01:17:07Z",
+    "createdAt": "2026-11-10T07:32:53Z",
+    "updatedAt": "2026-11-10T07:38:13Z",
     "headBranch": "main",
-    "displayTitle": "web: 지적사항 하위 면 7곳에 위치 표시 — 홈 › 지적사항 › 면 (#1452)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42733937196"
+    "displayTitle": "feat(brief): 카드 무게 3단 — 깊이·표준·표 한 줄 (재정비 4단계, 11-16호부터) (#1465)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42776043299"
    },
    {
-    "databaseId": 42732733598,
+    "databaseId": 42774101513,
     "status": "completed",
     "conclusion": "success",
     "event": "pull_request",
-    "createdAt": "2026-11-10T01:01:41Z",
-    "updatedAt": "2026-11-10T01:07:47Z",
-    "headBranch": "feat/nav-news-firms",
-    "displayTitle": "feat: 제조소 목록 탭 줄 + 푸터 '최근 규제 소식' 링크",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42732733598"
+    "createdAt": "2026-11-10T07:16:11Z",
+    "updatedAt": "2026-11-10T07:21:58Z",
+    "headBranch": "feat/content-completeness-1110",
+    "displayTitle": "feat(monitor): 내용 완전성 감시 — 잘린 내용·모아 놓고 안 쓰는 칸",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42774101513"
    }
   ],
   "grm-scaffold-mirror.yml": [
@@ -402,6 +402,17 @@
   ],
   "grm-findings-translate-apply.yml": [
    {
+    "databaseId": 42778775996,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "createdAt": "2026-11-10T07:56:04Z",
+    "updatedAt": "2026-11-10T07:56:29Z",
+    "headBranch": "main",
+    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-10 - 7건 (#1443)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42778775996"
+   },
+   {
     "databaseId": 42559659141,
     "status": "completed",
     "conclusion": "success",
@@ -444,20 +455,20 @@
     "headBranch": "main",
     "displayTitle": "chore(findings): 일일 번역 배치 2026-11-05 - 20건 (#1332)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41986364232"
-   },
-   {
-    "databaseId": 41832219219,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "push",
-    "createdAt": "2026-11-04T12:46:48Z",
-    "updatedAt": "2026-11-04T12:47:12Z",
-    "headBranch": "main",
-    "displayTitle": "chore(findings): 일일 번역 배치 2026-11-04 - 2건 (#1318)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/41832219219"
    }
   ],
   "grm-findings-backfill-fetch.yml": [
+   {
+    "databaseId": 42775271596,
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "schedule",
+    "createdAt": "2026-11-10T07:26:11Z",
+    "updatedAt": "2026-11-10T07:26:14Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42775271596"
+   },
    {
     "databaseId": 42712037284,
     "status": "completed",
@@ -501,20 +512,31 @@
     "headBranch": "main",
     "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42453763074"
-   },
-   {
-    "databaseId": 42375898094,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-07T13:12:27Z",
-    "updatedAt": "2026-11-07T16:33:36Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Findings Backfill Fetch (F2b/F2c)",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42375898094"
    }
   ],
   "grm-wl-truncation-restore-plan.yml": [
+   {
+    "databaseId": 42786593899,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-10T08:56:43Z",
+    "updatedAt": "2026-11-10T08:57:50Z",
+    "headBranch": "main",
+    "displayTitle": "GRM WL Truncation Restore Plan",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42786593899"
+   },
+   {
+    "databaseId": 42781437318,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "createdAt": "2026-11-10T08:17:11Z",
+    "updatedAt": "2026-11-10T08:18:08Z",
+    "headBranch": "main",
+    "displayTitle": "GRM WL Truncation Restore Plan",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42781437318"
+   },
    {
     "databaseId": 41700675594,
     "status": "completed",
@@ -539,6 +561,17 @@
    }
   ],
   "grm-stranded-batch-pr.yml": [
+   {
+    "databaseId": 42777374486,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "schedule",
+    "createdAt": "2026-11-10T07:44:16Z",
+    "updatedAt": "2026-11-10T07:44:27Z",
+    "headBranch": "main",
+    "displayTitle": "GRM Stranded Batch PR Watchdog",
+    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42777374486"
+   },
    {
     "databaseId": 42714135761,
     "status": "completed",
@@ -582,17 +615,6 @@
     "headBranch": "main",
     "displayTitle": "GRM Stranded Batch PR Watchdog",
     "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42508120898"
-   },
-   {
-    "databaseId": 42455808023,
-    "status": "completed",
-    "conclusion": "success",
-    "event": "schedule",
-    "createdAt": "2026-11-08T06:41:56Z",
-    "updatedAt": "2026-11-08T06:42:05Z",
-    "headBranch": "main",
-    "displayTitle": "GRM Stranded Batch PR Watchdog",
-    "url": "https://github.com/MINHOYEOM/grm-api-intake/actions/runs/42455808023"
    }
   ],
   "grm-cloud-request.yml": [

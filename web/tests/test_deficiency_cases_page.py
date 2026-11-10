@@ -80,7 +80,7 @@ def raw_data(*, scale: bool = True):
                      "statement": _text(i, n_chars, lead), "agency_category": "Documents and records",
                      "grade": "", "site_group": "", "clause_keys": keys, "clauses": [],
                      "grm_category": cat, "context": "BACKGROUND MUST NOT LEAK",
-                     # 140 한국어 칸: 1번 = 유효한 번역, 2번 = 원문이 바뀐 낡은 번역(싣지 않는다)
+                     # 141 한국어 칸: 1번 = 유효한 번역, 2번 = 원문이 바뀐 낡은 번역(싣지 않는다)
                      "content_hash": "c" * 64, "agency_category_ko": "문서 및 기록",
                      "statement_ko": KO_FRESH if i == 1 else (KO_STALE if i == 2 else ""),
                      "ko_source_hash": "c" * 64 if i == 1 else ("d" * 64 if i == 2 else "")})

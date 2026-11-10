@@ -147,7 +147,7 @@ def _cat_labels(labels: "dict[str, tuple[str, str]]", code: str, lang: str) -> s
 
 def _case_row(c: dict[str, Any], src: dict[str, Any], labels, lang: str, cap: int) -> dict[str, Any]:
     text, cut = clip(c["text"], cap)
-    # 한국어(140 statement_ko → 스냅샷 text_ko)는 ko 트리에만 싣는다. 원문은 그대로 함께 낸다.
+    # 한국어(141 statement_ko → 스냅샷 text_ko)는 ko 트리에만 싣는다. 원문은 그대로 함께 낸다.
     text_ko, cut_ko = clip(str(c.get("text_ko") or ""), cap) if lang == "ko" else ("", False)
     loc = str(c.get("loc") or "")
     if c["agency"] == "PMDA":

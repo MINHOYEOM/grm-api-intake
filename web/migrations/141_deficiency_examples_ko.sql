@@ -1,6 +1,7 @@
 -- ============================================================================
--- 140_deficiency_examples_ko.sql — PMDA·MHRA 지적 사례(134)에 한국어 칸 3개를 더한다(가산만)
+-- 141_deficiency_examples_ko.sql — PMDA·MHRA 지적 사례(134)에 한국어 칸 3개를 더한다(가산만)
 --
+-- ★운영 적용 2026-11-11(작업 번호 140 으로 적용 — 140 은 #1493 이 먼저 머지해 141 로 바꿈. 칸 주석의 "140" 은 그때 값).
 -- 계기(2026-11-11): 대표 결정 "한국어로 있어야 볼 수 있다". 원문(영어·일본어)은 그대로 두고
 --   한국어를 옆에 붙인다. 화면은 deficiency_cases_refresh.py 스냅샷을 거쳐 한국어를 읽는다.
 --
@@ -28,8 +29,8 @@ alter table public.deficiency_examples
     check (ko_source_hash = '' or ko_source_hash ~ '^[0-9a-f]{64}$');
 
 comment on column public.deficiency_examples.statement_ko is
-  '지적 문장 한국어 번역(원문은 statement). 140';
+  '지적 문장 한국어 번역(원문은 statement). 141';
 comment on column public.deficiency_examples.agency_category_ko is
-  '기관 분류 한국어(원문은 agency_category). 140';
+  '기관 분류 한국어(원문은 agency_category). 141';
 comment on column public.deficiency_examples.ko_source_hash is
-  '번역 당시 content_hash — 다르면 번역이 낡았다. 140';
+  '번역 당시 content_hash — 다르면 번역이 낡았다. 141';

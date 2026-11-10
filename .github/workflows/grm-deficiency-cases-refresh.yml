@@ -13,7 +13,7 @@ name: GRM Deficiency Cases Snapshot Refresh
 #   내용이 같으면(measured_on 만 다름) PR 도 없다.
 
 on:
-  # [지적 사례 한국어 2026-11-11] 번역 정본이 main 에 들어오면 한국어 칸(140)을 채우고 스냅샷을 다시 뽑는다.
+  # [지적 사례 한국어 2026-11-11] 번역 정본이 main 에 들어오면 한국어 칸(141)을 채우고 스냅샷을 다시 뽑는다.
   push:
     branches: [main]
     paths:
@@ -54,7 +54,7 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
 
-      # 한국어 칸(140) 채우기 — 번역 정본 translations/deficiency_examples_ko.json. 같은 값은 보내지 않는다.
+      # 한국어 칸(141) 채우기 — 번역 정본 translations/deficiency_examples_ko.json. 같은 값은 보내지 않는다.
       # exit 3(남은 행 있음)은 요약에 적고 계속 간다(있는 번역은 화면에 싣는다). 2 = 실패.
       - name: Apply Korean translations (service-role write)
         env:

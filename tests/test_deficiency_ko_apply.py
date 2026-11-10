@@ -1,4 +1,4 @@
-"""deficiency_ko_apply.py — 지적 사례 한국어 칸(140) 채우기."""
+"""deficiency_ko_apply.py — 지적 사례 한국어 칸(141) 채우기."""
 from __future__ import annotations
 
 import json

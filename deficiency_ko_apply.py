@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""[지적 사례 한국어 2026-11-11] PMDA·MHRA 지적 사례(134 deficiency_examples)에 한국어 칸(140)을 채운다.
+"""[지적 사례 한국어 2026-11-11] PMDA·MHRA 지적 사례(134 deficiency_examples)에 한국어 칸(141)을 채운다.
 
 원천: translations/deficiency_examples_ko.json(저장소에 커밋된 번역 정본)
   rows    [{id: 'source_key#row_no', chash: 번역할 때의 content_hash, ko: 한국어}]  — 지적 문장 번역

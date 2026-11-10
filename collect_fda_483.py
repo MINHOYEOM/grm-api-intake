@@ -1965,7 +1965,7 @@ _SIGNER_TITLE_RE = re.compile(
     r",[ \t]*(?:[A-Z]{2,5}[ \t]+)?(?:" + "|".join(re.escape(t) for t in _SIGNER_TITLES)
     + r")\b(?![ \t]+[A-Z][a-z])")
 # 깨진 서명란 꼬리 — `SIGNATURE` 가 `aeGNATURE`·`'NATURE,` 로, 머리말 첫 낱말 `DISTRICT` 가 끝에 남는다.
-_DETAIL_TAIL_JUNK_RE = re.compile(r"(?-i:[A-Za-z']{0,4}NATURE\b|\bDISTRICT\b)")
+_DETAIL_TAIL_JUNK_RE = re.compile(r"(?-i:[A-Za-z']{0,4}NATURE\b|\bDISTRICT\b|\bOF THIS PAGE\b)")
 _SIGNER_NAME_BEFORE_RE = re.compile(r"(?:[A-Z][A-Za-z'.\-]*[ \t]+){0,3}[A-Z][A-Za-z'.\-]*[ \t]*$")
 _CITY_ZIP_LINE_RE = re.compile(r",.*\b\d{5}(?:-\d{4})?\b|,\s*(?:India|China|USA|United States)\b")
 
@@ -2100,29 +2100,48 @@ def _cap_detail(text: str, limit: int) -> str:
     return head[:m.end()].strip() if m and m.end() > limit // 2 else head.strip()
 
 
+# 상세 **끝 80자 안**의 `<이름>, <직함>` 은 뒤에 대문자 낱말이 와도 서명란이다(`Burnell M Henry,
+# Investigator Invest ogo` — 서명 스탬프 판독 잔재). 본문 중간에서는 종전 조건(뒤에 사람 이름이면 산문)을 지킨다.
+_SIGNER_TITLE_TAIL_RE = re.compile(
+    r",[ \t]*(?:[A-Z]{2,5}[ \t]+)?(?:" + "|".join(re.escape(t) for t in _SIGNER_TITLES) + r")\b")
+_DETAIL_TAIL_SPAN = 80
+
+
+def trim_detail_tail(detail: str) -> str:
+    """상세 꼬리의 서명란 이름·깨진 양식 낱말을 걷어낸다(순수 함수). 공백은 한 칸으로 정규화."""
+    d = re.sub(r"\s+", " ", detail or "").strip()
+    # 양식 낱말이 먼저(이름 토큰이 그것을 삼키지 않게). 꼬리 구간에서만 찾는다 — 본문 중간의
+    # 대문자 `DISTRICT` 같은 낱말에서 뒤를 통째로 자르지 않게.
+    junk = _DETAIL_TAIL_JUNK_RE.search(d, max(0, len(d) - _DETAIL_TAIL_SPAN))
+    if junk:
+        d = d[:junk.start()].rstrip(" :-\t'\"")
+    cut = _signer_cut(d)
+    if cut is not None:
+        d = d[:cut].rstrip(" :-\t")
+    tail_from = max(0, len(d) - _DETAIL_TAIL_SPAN)
+    m = _SIGNER_TITLE_TAIL_RE.search(d, tail_from)
+    if m:
+        nm = _SIGNER_NAME_BEFORE_RE.search(d, max(0, m.start() - 60), m.start())
+        d = d[:nm.start() if nm else m.start()].rstrip(" :-\t")
+    return d
+
+
 def _full_observation_detail(seg: str, deficiency: str, old_detail: str,
                              hints: dict[str, str]) -> str:
     """쪽 넘김을 이은 상세. 표제가 종전과 다르거나 종전 상세로 시작하지 않으면 종전 상세를
-    돌려준다(종전 상세 꼬리의 서명란 이름만 지운다)."""
+    돌려준다(종전 상세 꼬리의 서명란 이름·양식 낱말만 지운다)."""
     joined = _join_483_pages(_skip_pagebreak_block(seg), hints.get("establishment_type", ""))
     chunk = _clean_observation_chunk(joined)
     chunk = gf.strip_fda483_page_header(chunk, **hints)
     head, detail = _first_sentence(chunk)
-    detail = _clean_observation_detail(detail)
-    cut = _signer_cut(detail)
-    if cut is not None:
-        detail = detail[:cut].rstrip(" :-\t")
-    junk = _DETAIL_TAIL_JUNK_RE.search(detail)
-    if junk:
-        detail = detail[:junk.start()].rstrip(" :-\t'\"")
+    detail = trim_detail_tail(_clean_observation_detail(detail))
     detail = gf.strip_fda483_page_header(detail, **hints)
-    norm_old = re.sub(r"\s+", " ", old_detail or "").strip()
+    norm_old = trim_detail_tail(old_detail)
     norm_new = re.sub(r"\s+", " ", detail or "").strip()
     same_head = strip_leading_observation_noise(head) == deficiency
     probe = norm_old[:min(len(norm_old), 80)]
     if not same_head or not norm_new.startswith(probe) or len(norm_new) < len(norm_old):
-        old_cut = _signer_cut(norm_old)               # 종전 상세 꼬리의 서명란 이름은 지운다
-        return norm_old[:old_cut].rstrip(" :-\t") if old_cut is not None else old_detail
+        return norm_old if (old_detail or "").strip() else old_detail
     return detail
 
 

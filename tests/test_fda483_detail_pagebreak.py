@@ -82,6 +82,15 @@ class PageJoinTest(unittest.TestCase):
         self.assertEqual(c._signer_cut(seg), seg.index("Susan"))
         self.assertIsNotNone(c._DETAIL_TAIL_JUNK_RE.search("pipe coupling. aeGNATURE"))
 
+    def test_trim_tail(self):
+        t = c.trim_detail_tail
+        self.assertEqual(t("limits are exceeded. OF THIS PAGE Burnell M Henry, Investigator Invest ogo"),
+                         "limits are exceeded.")
+        self.assertEqual(t("operations. 'NATURE,"), "operations.")
+        # 본문 중간의 "…, Investigator Smith noted" 는 산문이라 남긴다.
+        mid = "Specifically, Investigator Smith noted the gap, Investigator Jones agreed. " + "x" * 120 + "."
+        self.assertEqual(t(mid), mid)
+
 
 class RedactionTest(unittest.TestCase):
     def test_garbled_and_canonical_marks_become_one_token(self):

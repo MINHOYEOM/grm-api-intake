@@ -54,7 +54,7 @@ import findings_extractors as fe
 import findings_supabase_backfill as fsb
 from grm_cli import normalize_supabase_url as _normalize_base_url
 from grm_cli import resolve_supabase_service_credentials as _resolve_credentials
-from grm_common import SOURCE_FDA_WL
+from grm_common import SOURCE_FDA_483, SOURCE_FDA_WL
 
 PLAN_SCHEMA_VERSION = "grm-wl-truncation-restore-plan/v1"
 ELLIPSIS = "…"
@@ -70,15 +70,32 @@ def md5_text(text: str) -> str:
     return hashlib.md5(str(text).encode("utf-8")).hexdigest()
 
 
-def is_truncated_candidate(finding_text: str, *, max_old_chars: int = DEFAULT_MAX_OLD_CHARS) -> bool:
+def is_truncated_candidate(finding_text: str, *, max_old_chars: int = DEFAULT_MAX_OLD_CHARS,
+                           ellipsis: str = ELLIPSIS, min_old_chars: int = 2) -> bool:
     text = str(finding_text or "")
-    return text.endswith(ELLIPSIS) and len(text) <= max_old_chars and len(text) > 1
+    return text.endswith(ellipsis) and min_old_chars <= len(text) <= max_old_chars
 
 
 def legacy_display_text(new_text: str) -> str:
     """새 블록에 옛 480자 표시 절단을 다시 적용한 결과(진단용 — 대응 판정에는 쓰지 않는다)."""
     core = new_text[:-1] if new_text.endswith(ELLIPSIS) else new_text
     return fe._legacy_cap_for_classify(core, bool(core) and core[-1] in ".?!\"")
+
+
+def legacy_483_text(new_text: str) -> str:
+    """[483] 옛 표제 절단(`t[:280].rstrip() + "..."`, 2026-11-10 제거)을 다시 적용한 결과(진단용)."""
+    return new_text[:280].rstrip() + "..."
+
+
+# [2026-11-10] 483 표제(finding_text = 관찰 표제)도 같은 복원 경로를 쓴다. 옛 수집기는 문장 경계가 없는
+# 표제를 280자에서 자르고 "..." 를 붙였다. 표제는 raw_signals 쪽을 backfill_483_detail_refresh.py
+# (--truncated-only)가 먼저 잘리지 않은 판으로 고친 뒤에 이 계획을 만든다.
+SOURCE_PROFILES: dict[str, dict[str, Any]] = {
+    "wl": {"source": SOURCE_FDA_WL, "ellipsis": ELLIPSIS, "max_old_chars": DEFAULT_MAX_OLD_CHARS,
+           "min_old_chars": 2, "legacy": legacy_display_text},
+    "fda483": {"source": SOURCE_FDA_483, "ellipsis": "...", "max_old_chars": 290,
+               "min_old_chars": 270, "legacy": legacy_483_text},
+}
 
 
 @dataclass
@@ -103,6 +120,9 @@ class RestorePlanReport:
 def plan_document(
     candidates: list[dict[str, Any]],
     new_findings: list[dict[str, Any]],
+    *,
+    ellipsis: str = ELLIPSIS,
+    legacy: Callable[[str], str] = legacy_display_text,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """한 문서 안에서 잘린 행 → 새 블록 대응(순수 함수). (계획 항목, 사유별 건수)."""
     counts = {"unchanged": 0, "ambiguous": 0, "unmatched": 0}
@@ -110,7 +130,7 @@ def plan_document(
     proposals: list[tuple[dict[str, Any], int]] = []
     for row in candidates:
         old = str(row.get("finding_text") or "")
-        prefix = old[:-1]
+        prefix = old[:-len(ellipsis)]
         if old in new_texts:
             counts["unchanged"] += 1
             continue
@@ -141,7 +161,7 @@ def plan_document(
             "finding_text": new,
             "old_chars": len(old),
             "new_chars": len(new),
-            "legacy_match": legacy_display_text(new) == old,
+            "legacy_match": legacy(new) == old,
         })
     return items, counts
 
@@ -153,14 +173,17 @@ def build_plan(
     max_old_chars: int = DEFAULT_MAX_OLD_CHARS,
     extract: Callable[[dict[str, Any]], list[dict[str, Any]]] | None = None,
     now: datetime | None = None,
+    profile: str = "wl",
 ) -> tuple[dict[str, Any], RestorePlanReport]:
     """후보 행 + raw_signal → 계획(순수 조립 — 네트워크 없음)."""
     extract_fn = extract or fe.findings_from_raw_signal
+    prof = SOURCE_PROFILES[profile]
     report = RestorePlanReport(max_old_chars=max_old_chars,
                                generated_at=(now or datetime.now(timezone.utc)).isoformat())
     by_doc: dict[str, list[dict[str, Any]]] = {}
     for row in candidate_rows:
-        if not is_truncated_candidate(row.get("finding_text"), max_old_chars=max_old_chars):
+        if not is_truncated_candidate(row.get("finding_text"), max_old_chars=max_old_chars,
+                                      ellipsis=prof["ellipsis"], min_old_chars=prof["min_old_chars"]):
             continue
         by_doc.setdefault(str(row.get("raw_signal_id") or ""), []).append(row)
     report.candidates = sum(len(v) for v in by_doc.values())
@@ -179,7 +202,8 @@ def build_plan(
             report.unmatched += len(rows)
             report.errors.append(f"{raw_signal_id}: extract_raised:{type(exc).__name__}")
             continue
-        doc_items, counts = plan_document(rows, new_findings)
+        doc_items, counts = plan_document(rows, new_findings, ellipsis=prof["ellipsis"],
+                                          legacy=prof["legacy"])
         report.unchanged += counts["unchanged"]
         report.ambiguous += counts["ambiguous"]
         report.unmatched += counts["unmatched"]
@@ -205,13 +229,14 @@ def build_plan(
 # ---------------------------------------------------------------------------
 
 
-def fetch_candidate_rows(base: str, service_key: str) -> list[dict[str, Any]]:
-    """WL findings 중 finding_text 가 "…" 로 끝나는 행(길이 필터는 build_plan 이 건다)."""
+def fetch_candidate_rows(base: str, service_key: str, profile: str = "wl") -> list[dict[str, Any]]:
+    """그 소스 findings 중 finding_text 가 말줄임표로 끝나는 행(길이 필터는 build_plan 이 건다)."""
+    prof = SOURCE_PROFILES[profile]
     return fsb._fetch_all_pages(
         base, service_key, "findings",
         select="finding_id,raw_signal_id,published_date,finding_text",
         page_size=_PAGE_SIZE, order="finding_id.asc",
-        extra_params={"source": f"eq.{SOURCE_FDA_WL}", "finding_text": f"like.*{ELLIPSIS}"},
+        extra_params={"source": f"eq.{prof['source']}", "finding_text": f"like.*{prof['ellipsis']}"},
     )
 
 
@@ -229,21 +254,25 @@ def fetch_raw_signals_by_id(base: str, service_key: str, ids: list[str]) -> dict
     return out
 
 
-def run(base_url: str, service_key: str, *, max_old_chars: int = DEFAULT_MAX_OLD_CHARS,
+def run(base_url: str, service_key: str, *, max_old_chars: int | None = None, profile: str = "wl",
         ) -> tuple[dict[str, Any] | None, RestorePlanReport, int]:
+    prof = SOURCE_PROFILES[profile]
+    if max_old_chars is None:
+        max_old_chars = prof["max_old_chars"]
     base = _normalize_base_url(base_url)
     if base is None:
         report = RestorePlanReport(errors=["SUPABASE_URL must start with https://"])
         return None, report, 2
     try:
-        rows = fetch_candidate_rows(base, service_key)
+        rows = fetch_candidate_rows(base, service_key, profile)
         rows = [r for r in rows
-                if is_truncated_candidate(r.get("finding_text"), max_old_chars=max_old_chars)]
+                if is_truncated_candidate(r.get("finding_text"), max_old_chars=max_old_chars,
+                                          ellipsis=prof["ellipsis"], min_old_chars=prof["min_old_chars"])]
         ids = sorted({str(r.get("raw_signal_id") or "") for r in rows if r.get("raw_signal_id")})
         raw_signals = fetch_raw_signals_by_id(base, service_key, ids)
     except (RuntimeError, ValueError) as exc:
         return None, RestorePlanReport(errors=[str(exc)]), 2
-    plan, report = build_plan(rows, raw_signals, max_old_chars=max_old_chars)
+    plan, report = build_plan(rows, raw_signals, max_old_chars=max_old_chars, profile=profile)
     return plan, report, 0
 
 
@@ -254,8 +283,10 @@ def main(argv: list[str] | None = None) -> int:
         description="옛 480자 상한으로 잘린 FDA WL findings 의 복원 계획 JSON 생성(읽기 전용).")
     p.add_argument("--output", required=True, help="계획 JSON 경로(Actions 아티팩트로 올린다).")
     p.add_argument("--report-path", help="요약 리포트 JSON 경로(항목 본문 제외).")
-    p.add_argument("--max-old-chars", type=int, default=DEFAULT_MAX_OLD_CHARS,
-                   help=f"후보 상한 — 이 길이 이하이고 '…' 로 끝나는 행(기본 {DEFAULT_MAX_OLD_CHARS}).")
+    p.add_argument("--source", choices=sorted(SOURCE_PROFILES), default="wl",
+                   help="wl(기본) = 경고서한 '…' 절단 · fda483 = 483 표제 280자+'...' 절단.")
+    p.add_argument("--max-old-chars", type=int, default=None,
+                   help="후보 상한 — 이 길이 이하이고 말줄임표로 끝나는 행(기본: 소스별 — wl 500·fda483 290).")
     p.add_argument("--supabase-url", help="미지정 시 $SUPABASE_URL")
     p.add_argument("--service-role-key", help="미지정 시 $SUPABASE_SERVICE_ROLE_KEY")
     args = p.parse_args(argv)
@@ -264,7 +295,7 @@ def main(argv: list[str] | None = None) -> int:
         print("backfill_wl_truncation_restore: --supabase-url/--service-role-key 또는 "
               "$SUPABASE_URL/$SUPABASE_SERVICE_ROLE_KEY 필요.", file=sys.stderr)
         return 2
-    plan, report, code = run(*creds, max_old_chars=args.max_old_chars)
+    plan, report, code = run(*creds, max_old_chars=args.max_old_chars, profile=args.source)
     summary = json.dumps(asdict(report), ensure_ascii=False, sort_keys=True, indent=2)
     print(summary)
     if args.report_path:

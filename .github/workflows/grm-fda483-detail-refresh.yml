@@ -1,7 +1,8 @@
 name: GRM FDA 483 Detail Refresh
 
 # [2026-11-10] 지식 그래프 방향 전환 0단계 — 이미 저장된 FDA 483 관찰 **상세(detail)만** 다시 읽어
-# 제자리 교체한다(backfill_483_detail_refresh.py). 표제·번호·원문 전문·실사관 목록은 건드리지 않는다.
+# 제자리 교체한다(backfill_483_detail_refresh.py). 번호·원문 전문·실사관 목록은 건드리지 않는다. 표제는
+# 옛 280자+"..." 절단분만 잘리지 않은 표제로 바꾼다.
 # 수동 실행 전용. 기본 dry-run — 바뀔 관찰 수와 품질 지표 전후를 실행 요약에서 먼저 본다.
 # 저장된 원문 전문이 있는 문서는 PDF 를 받지 않는다. 없는 문서만 PDF 를 받아 OCR 한다.
 
@@ -12,10 +13,14 @@ on:
         description: 'true = 실제 raw_signals PATCH(대표 확인 후). false(기본) = dry-run.'
         type: boolean
         default: false
+      truncated_only:
+        description: 'true = 옛 저장 상한(상세 1,200자·표제 280자+"...")에 걸린 관찰이 있는 문서만(기간 기본 전체). 재실행 안전 — 고쳐진 문서는 빠진다.'
+        type: boolean
+        default: false
       since:
-        description: '게시일 하한(YYYY-MM-DD).'
+        description: '게시일 하한(YYYY-MM-DD). 비우면 2026-08-10(truncated_only 면 전체 기간).'
         type: string
-        default: '2026-08-10'
+        default: ''
       limit:
         description: '처리 문서 수 상한. 비우면 전건.'
         type: string
@@ -40,7 +45,7 @@ jobs:
   refresh:
     name: 483 상세 다시 읽기 → raw_signals detail PATCH
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 350   # 옛 문서 PDF·OCR 은 느리다 — limit 로 나눠 돌린다
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -67,12 +72,19 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           IN_APPLY: ${{ inputs.apply }}
           IN_SINCE: ${{ inputs.since }}
+          IN_TRUNC: ${{ inputs.truncated_only }}
           IN_LIMIT: ${{ inputs.limit }}
           IN_DOC_IDS: ${{ inputs.doc_ids }}
           FDA483_OCR_PAGE_BUDGET: ${{ inputs.ocr_page_budget }}
         run: |
           set -euo pipefail
-          ARGS=(--report-path detail_refresh_report.json --since "${IN_SINCE}")
+          ARGS=(--report-path detail_refresh_report.json)
+          if [ -n "${IN_SINCE}" ]; then
+            ARGS+=(--since "${IN_SINCE}")
+          fi
+          if [ "${IN_TRUNC}" = "true" ]; then
+            ARGS+=(--truncated-only)
+          fi
           if [ "${IN_APPLY}" = "true" ]; then
             ARGS+=(--apply)
           fi
@@ -94,6 +106,7 @@ jobs:
           print(f"### 483 상세 다시 읽기 (dry_run={r['dry_run']}, since={r['since']})\n")
           print(f"후보 {r['candidates']} · 원문 전문 {r['from_body_full']} · PDF {r['from_pdf']} · 본문 없음 {r['no_text']} · 실패 {r['failed']}")
           print(f"바뀐 문서 {r['docs_changed']} · 바뀐 관찰 {r['observations_changed']} (짝 맞음 {r['observations_matched']} / 짝 없음 {r['observations_unmatched']}) · PATCH {r['patched']}\n")
+          print(f"옛 상한 잘림 의심 관찰 {r['truncated_before']} → {r['truncated_after']} · 표제 복원 {r['deficiency_restored']} (truncated_only={r['truncated_only']})\n")
           print("| 지표 | 전 | 후 |\n|---|---|---|")
           b, a = r["before"], r["after"]
           for k, label in (("observations", "상세 있는 관찰"), ("complete_sentence", "문장 온전"),

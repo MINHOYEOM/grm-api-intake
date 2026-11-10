@@ -71,5 +71,66 @@ class RefreshTest(unittest.TestCase):
         self.assertEqual(rep.observations_changed, 1)
 
 
+_LONG_DEF = ("There is a failure to thoroughly review any unexplained discrepancy and the failure of a batch "
+             "or any of its components to meet any of its specifications whether or not the batch has been "
+             "already distributed including the investigation records for the lots listed in the table that "
+             "follows which were never closed by the quality unit")
+
+
+class OldStorageCapTest(unittest.TestCase):
+    """옛 저장 상한(표제 280자+"..."·상세 1,200자)에 잘린 관찰을 잘리지 않은 판으로 되살린다."""
+
+    def test_truncated_deficiency_is_restored_with_number_and_prefix(self):
+        old = [{"number": "3", "deficiency": _LONG_DEF[:280].rstrip() + "...", "detail": _LONG_DEF[280:]}]
+        new = [{"number": "3", "deficiency": _LONG_DEF, "detail": ""}]
+        out, matched, unmatched = b.refreshed_observations(old, new)
+        self.assertEqual((matched, unmatched), (1, 0))
+        self.assertEqual(out[0]["deficiency"], _LONG_DEF)
+        self.assertEqual(out[0]["detail"], "")
+
+    def test_truncated_deficiency_needs_same_number(self):
+        old = [{"number": "3", "deficiency": _LONG_DEF[:280].rstrip() + "...", "detail": "x"}]
+        new = [{"number": "4", "deficiency": _LONG_DEF, "detail": ""}]
+        out, matched, _ = b.refreshed_observations(old, new)
+        self.assertEqual(matched, 0)
+        self.assertTrue(out[0]["deficiency"].endswith("..."))
+
+    def test_1200_detail_is_extended_even_if_deficiency_differs(self):
+        full = "Specifically, " + "the batch record was not reviewed for lot A. " * 60
+        old = [{"number": "1", "deficiency": "Old heading.", "detail": full[:1200]}]
+        new = [{"number": "1", "deficiency": "Old heading (rescrubbed).", "detail": full.strip()}]
+        out, matched, _ = b.refreshed_observations(old, new)
+        self.assertEqual(matched, 1)
+        self.assertEqual(out[0]["detail"], full.strip())
+        self.assertEqual(out[0]["deficiency"], "Old heading.")
+
+    def test_different_text_with_same_number_is_not_matched(self):
+        old = [{"number": "1", "deficiency": "A.", "detail": "Specifically, " + "x " * 600}]
+        new = [{"number": "1", "deficiency": "B.", "detail": "Something else entirely. " * 60}]
+        _, matched, unmatched = b.refreshed_observations(old, new)
+        self.assertEqual((matched, unmatched), (0, 1))
+
+    def test_truncated_only_selects_capped_docs(self):
+        capped = {b._OBS_KEY: [{"number": "1", "deficiency": "A.", "detail": "y" * 1200}], "pdf_url": ""}
+        fine = {b._OBS_KEY: [{"number": "1", "deficiency": "A.", "detail": "short."}], "pdf_url": ""}
+        rep = b.run([_row(capped), _row(fine)], dry_run=True, truncated_only=True)
+        self.assertEqual(rep.candidates, 1)
+        self.assertTrue(rep.truncated_only)
+
+    def test_band_helpers(self):
+        self.assertTrue(b.is_truncated_deficiency("x" * 280 + "..."))
+        self.assertFalse(b.is_truncated_deficiency("Short heading..."))
+        self.assertTrue(b.is_truncated_detail("y" * 1200))
+        self.assertFalse(b.is_truncated_detail("y" * 3000))
+
+
+class FirstSentenceNoCapTest(unittest.TestCase):
+    def test_long_heading_without_boundary_is_kept_whole(self):
+        import collect_fda_483 as c
+        head, rest = c._first_sentence(_LONG_DEF)
+        self.assertEqual((head, rest), (_LONG_DEF, ""))
+        self.assertFalse(head.endswith("..."))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -81,10 +81,10 @@ def scan(root: Path = ROOT) -> Counter:
 #   excerpt    = 의도된 짧은 발췌 — 같은 문서의 전문이 다른 칸에 무절단으로 저장된다(전문 칸 이름을 이유에 적는다)
 ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('backfill_wl_truncation_restore.py', 'DEFAULT_MAX_OLD_CHARS = 500'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
-    ('backfill_wl_truncation_restore.py', 'help=f"후보 상한 — 이 길이 이하이고 \'…\' 로 끝나는 행(기본 {DEFAULT_MAX_OLD_CHARS}).")'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
     ('backfill_wl_truncation_restore.py', 'max_old_chars: int = DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
-    ('backfill_wl_truncation_restore.py', 'p.add_argument("--max-old-chars", type=int, default=DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
+    ('backfill_wl_truncation_restore.py', '"wl": {"source": SOURCE_FDA_WL, "ellipsis": ELLIPSIS, "max_old_chars": DEFAULT_MAX_OLD_CHARS,'): ('decision', '옛 480자 절단 행을 찾는 탐지 임계'),
+    ('backfill_wl_truncation_restore.py', 'return new_text[:280].rstrip() + "..."'): ('decision', '옛 483 표제 280자 절단 재현(진단용 legacy_match — 저장 아님)'),
     ('collect_deficiency_examples.py', 'ent["sample"] = [{"locator": r.locator, "statement": r.statement[:160], "clauses": r.clauses[:3],'): ('diagnostic', '실행 리포트 표본'),
     ('collect_deficiency_examples.py', 'found.append({"agency": agency, "lang": lang, "url": href, "label": label[:200]})'): ('diagnostic', '자료 목록 탐색 결과 라벨(리포트용)'),
     ('collect_fda_483.py', 'FDA483_EXCERPT_MAX_CHARS = 1500'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
@@ -93,7 +93,6 @@ ALLOWED: dict[tuple[str, str], tuple[str, str]] = {
     ('collect_fda_483.py', 'headline=f"[{label}] {company or media_id}"[:240],'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
     ('collect_fda_483.py', 'if len(text) >= FDA483_TEXT_MAX_CHARS:'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
     ('collect_fda_483.py', 'return compact[m.start():][:FDA483_EXCERPT_MAX_CHARS].strip()'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
-    ('collect_fda_483.py', 'return t[:280].rstrip() + "...", t[280:].strip()'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
     ('collect_fda_483.py', 'text, _status = _extract_pdf_text(pdf_bytes, max_chars=FDA483_TEXT_MAX_CHARS)'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
     ('collect_fda_483.py', '★상한은 483 전용 FDA483_TEXT_MAX_CHARS(200000·≈74쪽)를 **기본**으로 쓴다 — 공유 PDF 엔진의'): ('debt', '#5~9 FDA 483 (483 세션 담당 — 11-10 상세 1,200→8,000 상향·문장 끝 자르기, 상한 자체는 남음)'),
     ('collect_fda_inspections.py', 'snippet = json.dumps(payload, ensure_ascii=False)[:300]'): ('diagnostic', '오류 진단 표본'),

@@ -2138,16 +2138,17 @@ def _finalize_detail(detail: str) -> str:
 
 
 def _first_sentence(text: str) -> tuple[str, str]:
-    """첫 문장(deficiency)과 나머지(detail). 문장부호가 없으면 안전 길이로 잘라낸다."""
+    """첫 문장(deficiency)과 나머지(detail). 문장 경계가 없으면 전체가 한 문장(표제)이다.
+
+    [2026-11-10] 종전엔 280자에서 자르고 "..." 를 붙였다(표제 35건이 문장 중간에서 끊김).
+    저장 단계에서는 자르지 않는다 — 긴 표제를 줄이는 건 화면의 일이다."""
     t = re.sub(r"\s+", " ", text or "").strip()
     if not t:
         return "", ""
     m = re.search(r"(?<=[.!?])\s+", t)
     if m:
         return t[:m.start()].strip(), t[m.end():].strip()
-    if len(t) <= 280:
-        return t, ""
-    return t[:280].rstrip() + "...", t[280:].strip()
+    return t, ""
 
 
 def _header_hint_kwargs(header_hints: dict[str, str] | None) -> dict[str, str]:

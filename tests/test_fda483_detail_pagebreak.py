@@ -77,6 +77,39 @@ class PageJoinTest(unittest.TestCase):
         self.assertTrue(out.endswith("used to package the commercial drug products (b) (4) and others."), out)
         self.assertNotIn("Dezan", out)
 
+    def test_header_without_establishment_label_ends_at_est_value(self):
+        # 11-10 표본 대조 실측 fda483-195665: 머리말에 `TYPE ESTABLISHMENT INSPECTED` 가 판독되지 않았다.
+        seg = ("Specifically, the operator's arms were observed reaching over the line, blocking laminar airflow. The\n"
+               "EMPLOYEE(S) SIGNATURE\nDATE ISSUED\nSEE\nLisa Flores, OGPS Investigator\nREVERSE\n"
+               "FORM FDA 483 (09/08)\nPREVIOUS EDITION OBSOLETE\nPage 2 OF 14\n\n"
+               "DEPARTMENT OF HEALTH AND HUMAN SERVICES\nFOOD AND DRUG ADMINISTRATION\n"
+               "DISTRICT ADDRESS AND PHONE NUMBER\n12420 Parklawn Drive, Room 2032 Rockville, MD 20857\n"
+               "11/03/2025-1 1/14/2025\n3009883410\nNAME AND TITLE OF INDIVIDUAL TO WHOM REPORT ISSUED\n"
+               "Mr. Atul Shastri, President-Operations\nFIRM NAME\nSTREET ADDRESS\n"
+               "Unit - 2, A - 1128 & B - 1127 Bhiwadi\nRiico Industrial Area, Rajasthan, 301019, India\n"
+               "Sterile Drug Product Manufacturer\n"
+               "operator's gowning is sampled for environmental monitoring at the end of setup.\n")
+        out = c._clean_observation_chunk(c._join_483_pages(seg, "Sterile Drug Product Manufacturer"))
+        self.assertTrue(out.endswith("blocking laminar airflow. The operator's gowning is sampled for "
+                                     "environmental monitoring at the end of setup."), out)
+        for junk in ("Flores", "Bhiwadi", "Shastri", "Manufacturer"):
+            self.assertNotIn(junk, out)
+
+    def test_header_without_establishment_label_ends_at_email(self):
+        # 11-10 실측 fda483-195637: 머리말이 주소·이메일까지만 판독됐다.
+        seg = ("Additionally, your firm has not established a Design Risk Analysis for your firm's BGRs, AHG, and\n"
+               "EMPLOYEE(S) SIGNATURE\nDATE ISSUED\nSEE REVERSE | Creighton T Tuzon,\nInvestigator\n"
+               "4/19/2024\nOF THIS PAGE| Richard T Riggie,\nInvestigator\nx\n\n"
+               "FOOD AND DRUG ADMINISTRATION\nDISTRICT ADDRESS AND PHONE NUMBER\n"
+               "10903 New Hampshire Ave,\nSilver Spring,\nMD 20993-0002\n(240) 402-9160\n"
+               "orabioinspectionalcorrespondence@fda.hhs.gov\n"
+               "Reagent Red Blood Cell reagents.\nFor example, your firm received a complaint.\n")
+        out = c._clean_observation_chunk(c._join_483_pages(seg, "Biologics IVD Manufacturer"))
+        self.assertIn("BGRs, AHG, and Reagent Red Blood Cell reagents.", out)
+        self.assertTrue(out.endswith("your firm received a complaint."), out)
+        self.assertNotIn("fda.hhs.gov", out)
+        self.assertNotIn("Tuzon", out)
+
     def test_extra_signer_titles_and_tail_junk(self):
         seg = "Specifically, the media fill failed. Susan S. Butler, Staff Fellow"
         self.assertEqual(c._signer_cut(seg), seg.index("Susan"))

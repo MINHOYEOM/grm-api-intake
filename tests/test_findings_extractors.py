@@ -210,6 +210,50 @@ class FindingsExtractorsTest(unittest.TestCase):
             [x["finding_id"] for x in again],
         )
 
+    def test_eu_gmp_ncr_additional_appended_after_action(self) -> None:
+        fx = _load_input("eu_gmp_ncr")
+        additional = " ".join(str(fx["raw"]["ncr_additional"]).split())
+        self.assertTrue(additional)
+        f = extractors.findings_from_raw_signal(
+            gf.raw_signal_from_row(fx["row"], fx["raw"]))[0]
+        self.assertTrue(f["finding_text"].endswith("\n\nAdditional information: " + additional))
+        self.assertLess(f["finding_text"].index("Action taken/proposed by the NCA"),
+                        f["finding_text"].index("Additional information:"))
+
+    def test_eu_gmp_ncr_without_additional_is_unchanged(self) -> None:
+        fx = _load_input("eu_gmp_ncr")
+        for empty in ("", None, "   "):
+            raw = dict(fx["raw"], ncr_additional=empty)
+            f = extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], raw))[0]
+            self.assertNotIn("Additional information", f["finding_text"])
+            self.assertTrue(f["finding_text"].startswith(" ".join(str(raw["ncr_nature"]).split())))
+        raw = dict(fx["raw"]); raw.pop("ncr_additional")
+        self.assertEqual(
+            extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], raw))[0]["finding_text"],
+            extractors.findings_from_raw_signal(
+                gf.raw_signal_from_row(fx["row"], dict(fx["raw"], ncr_additional="")))[0]["finding_text"])
+
+    def test_eu_gmp_ncr_additional_does_not_change_category(self) -> None:
+        fx = _load_input("eu_gmp_ncr")
+        base = dict(fx["raw"], ncr_additional="")
+        long_add = dict(fx["raw"], ncr_additional="Sterility assurance failure; data integrity; contamination. " * 20)
+        a = extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], base))[0]
+        b = extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], long_add))[0]
+        self.assertEqual(a["category_code"], b["category_code"])
+        self.assertNotEqual(a["finding_id"], b["finding_id"])
+
+    def test_mhra_gmp_ncr_ignores_additional_key(self) -> None:
+        fx = _load_input("mhra_gmp_ncr")
+        a = extractors.findings_from_raw_signal(gf.raw_signal_from_row(fx["row"], fx["raw"]))[0]
+        b = extractors.findings_from_raw_signal(
+            gf.raw_signal_from_row(fx["row"], dict(fx["raw"], ncr_additional="x extra")))[0]
+        self.assertNotIn("Additional information", b["finding_text"])
+        self.assertEqual(a["finding_text"], b["finding_text"])
+
+    def test_eu_source_constant_matches_grm_common(self) -> None:
+        import grm_common
+        self.assertEqual(extractors.SOURCE_EU_GMP_NCR, grm_common.SOURCE_EU_GMP_NCR)
+
     def test_eu_gmp_ncr_without_nature_extracts_nothing(self) -> None:
         # 게이트 = ncr_nature. 없으면(수집 실패·구조변경) finding 0건(침묵 아님 — 상위에서 error).
         fx = _load_input("eu_gmp_ncr")

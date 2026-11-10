@@ -1,0 +1,74 @@
+name: GRM Findings Detail Apply (483 구체 내용)
+
+# [2026-11-10 지식 그래프 1단계] translations/detail_outbox/ 에 배치가 main 에 병합되면
+# findings_detail_apply.py 가 findings.detail_text·detail_text_ko(migration 140)를 한 PATCH 로 쓴다.
+# 번역은 세션(구독 경로)에서 이미 끝나 JSON 으로 고정돼 온다 — 이 워크플로에 LLM 은 없다.
+# git 쓰기 없음. 이번 push 로 추가·변경된 배치 파일만 적용한다(쌓인 배치를 매번 다시 쓰지 않게).
+# 수동 실행(workflow_dispatch)은 폴더 전체를 다시 적용한다(멱등).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'translations/detail_outbox/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: findings-detail-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Apply 483 detail outbox → Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Apply detail outbox (read + PATCH only)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "${EVENT_NAME}" = "push" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            mapfile -t FILES < <(git diff --name-only --diff-filter=AM "${BEFORE_SHA}" "${AFTER_SHA}" -- 'translations/detail_outbox/*.json')
+            echo "이번 push 의 배치 ${#FILES[@]}개"
+            if [ "${#FILES[@]}" -eq 0 ]; then echo "적용할 배치 없음"; exit 0; fi
+            python findings_detail_apply.py --output detail_apply_report.json --files "${FILES[@]}"
+          else
+            python findings_detail_apply.py --output detail_apply_report.json
+          fi
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM Findings Detail Apply"
+            if [ -f detail_apply_report.json ]; then
+              echo '```json'
+              head -c 6000 detail_apply_report.json
+              echo '```'
+            else
+              echo "리포트 없음 — 자격 증명 또는 실행 실패를 확인하세요."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

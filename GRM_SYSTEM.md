@@ -550,6 +550,7 @@ grm-api-intake/
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
+├─ backfill_eu_ncr_additional_plan.py # EU NCR ncr_additional(후속 설명) 소급 계획(같은 계획 스키마·기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
 ├─ fda483_notion_raw_sync.py       # 미소비(New) Notion 483(`--source wl` = WL) 행 중 관찰(WL=전문) 없는 raw 를 Supabase 의 raw 로 교체 · 483 범위 밖 확정 행은 Skipped 마감(주간 브리프 입력) — 회수 예약 실행의 마지막 단계
 ├─ backfill_deep_483_past_weeks.py  # 483 심층분석 과거주차(07-12~07-27, 69장) 소급 — 과거 델타 → fan-out 작업 생성 / 응답 병합(placeholder 표지 삽입 + 운영 병합 경로 호출)
 ├─ backfill_deep_original_truncation.py  # D5b(원문 병기 절단)로 병합 보류된 483 심층분석 소급 병합 — 운영 병합 경로(inject_slots) 그대로 호출
@@ -587,6 +588,7 @@ grm-api-intake/
 ├─ findings_store.py, findings_views.py
 ├─ findings_supabase.py, findings_supabase_append.py   # Postgres DDL/로드 · 직행 append
 ├─ findings_translate.py, findings_translate_apply_service.py  # 번역 export/apply · CI 반영
+├─ findings_detail_apply.py, findings_detail_qa.py  # 483 관찰 상세 국문 배치 반영·결정론 번역 검증(수치·코드·가림 표시·한자·길이)
 ├─ findings_search_export.py, findings_search_page.py  # 검색 export · 오프라인 뷰어
 ├─ findings_backfill*.py, findings_notion_export.py    # 백필 도구(M12, 내부 소급 적재)
 ├─ findings_taxonomy_migrate_sqlite.py, findings_translation_migrate_sqlite.py  # sidecar 마이그레이터
@@ -671,6 +673,7 @@ grm-api-intake/
 │  ├─ partials/  (card·resource_notes·**glossary_fig/**(용어 그림 SVG 43장 — **한 벌뿐**: 낱개 용어 페이지·링크드인 카드 '이번 주 용어' 장·용어집 PDF 가 모두 이 partial 을 렌더해 쓴다(`linkedin_cards.mini` 가 사이트와 같은 번역기로 렌더 + 색 변수만 카드 팔레트로). 2026-09-29 전엔 카드에 사본이 따로 있어 9장이 갈라져 있었다 — `test_card_figure_is_the_site_figure` 가 글자·도형 일치를 잰다)·**findings_seg**(지적사항 존 면 전환 — 검색·둘러보기·트렌드·실사 결과·지적 조항·지적 사례·실사관)·**next_strip**(본문 끝 '다음으로 볼 것')·**trends_style**(세 면 공용 스코프 CSS)·**lookup_style**(firm/inspector 조회 랜딩 CSS))
 │  ├─ data/  (briefs·deltas·library/ 11카탈로그 502건 + library_updates.json 변경 이력·glossary.json 226어 + glossary_cases.json 사례연결 정본(items 177·excluded 49) + **glossary_fig_review.json 용어 그림 검토 장부**(redo 다시 그릴 그림·skip 그리지 않기로 한 용어, 사유 — 일일 그림 배치가 읽는다)·guide_content.md + **guide_content_en.md(영문 이용안내 정본 — 번역 파일이 아니라 같은 h2 구조의 다른 정본)**·**about_content.md + about_content_en.md(소개 페이지 /about/ 정본 — 같은 규율)**·**contact.json(이메일 — 빈 값이면 푸터·소개의 링크 미출력. LinkedIn 은 2026-10-11 사이트에서 걷었다)**·quiz_bank.json 61문항(전량 영문 3필드 가산)·announcements/ 서비스 업데이트 안내·**findings_facets.json 분류·국가·기관 모음 페이지 정본**·**findings_similar.json 문서별 다른 업체의 비슷한 지적(문서당 업체 5곳, findings_docs_refresh.py 가 137 RPC 로 갱신·실패 시 지난 파일 유지 — 문서·업체 페이지 GRM 맥락 블록의 정본) + findings_docs.json 문서 단위 페이지 정본(3,202문서·지적 21,344건·8MB)**·**i18n/en.json 영어 문구 카탈로그(키=한국어 원문, 정렬 유지·`grm_i18n.py lint` 가 결손/고아 검사)** — 전 링크 실검증 커밋 데이터)  ·  partials/  ·  tests/  (render 골든, trends.expected.html 포함) · **import_alerts.json(FDA 수입경보 공개 스냅샷 — import_alerts_refresh.py, 없으면 업체 페이지 표시·`/findings/import-alerts/` 목록 생략)** · **fda_citation_firms.json(FDA 지적 조항 × 제조소 집계 — fda_citation_firms_refresh.py, 없으면 업체·조항 페이지 블록 생략)**
 ├─ translations/
+│  ├─ detail_outbox/               # [483 구체 내용] 관찰 상세 원문·국문 배치 → findings.detail_text·detail_text_ko(140). findings_detail_apply.py·grm-findings-detail-apply.yml
 │  ├─ outbox/                      # [FIND-1 M9] 번역 배치 큐(CI가 읽어 Supabase 반영·최신 우선). 미반영 배치만 유지
 │  └─ applied/                     # 반영 완료 배치 아카이브(누적 시 apply 10분 timeout 기아 → 번역 세션이 apply green 확인 후 이동)
 ├─ tests/                          # unittest + pytest (golden·fixtures 포함)
@@ -741,6 +744,8 @@ grm-api-intake/
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
+   ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)
+   ├─ grm-raw-signals-notion-backfill.yml # Notion 에만 있는 행(예: WHO WHOPIR)을 raw_signals 로 채움(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 raw-signals-notion-backfill-report(30일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지 · decide 게이트가 주간 결손도 복구(2026-08-11)
    ├─ grm-library-linkcheck.yml          # [트랙 C] 자료실 링크 상태 점검(status 4값: ok·broken·needs_review·blocked)

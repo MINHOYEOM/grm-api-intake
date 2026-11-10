@@ -831,6 +831,9 @@ body.grm-reactions-on .grm-auth{display:inline-flex}
   var el=document.getElementById('grm-cta');
   if(!el||!window.localStorage)return;
   var KEY='grm-cta-until', DONE='grm-sub-ok', SESS='grm-cta-off';
+  // [2026-11-10] 구독자에게 나간 메일 링크(utm_medium=email — 브리프·환영·공지)로 온 방문은 구독자다.
+  // 전달(utm_medium=forward)은 받은 사람이 구독자가 아니라 제외. 로그인 회원은 reactions.js 가 상태로 맞춘다.
+  try{ if(/[?&]utm_medium=email(&|$)/.test(location.search))localStorage.setItem(DONE,'1'); }catch(e){}
   function hidden(){
     try{
       if(localStorage.getItem(DONE))return true;                 // 이미 구독한 방문자

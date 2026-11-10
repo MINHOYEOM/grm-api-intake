@@ -72,6 +72,8 @@ class DetailRefreshReport:
     errors: list[str] = field(default_factory=list)
     samples: list[dict[str, Any]] = field(default_factory=list)
     incomplete_samples: list[dict[str, Any]] = field(default_factory=list)
+    # [11-11] 다시 읽은 뒤에도 잘림 띠에 남은 관찰의 원인 진단 — 원문에서 옛 상세 끝 바로 뒤에 무엇이 오나
+    diagnostics: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _collector():
@@ -200,6 +202,35 @@ def refreshed_observations(old: list[dict[str, Any]], new: list[dict[str, Any]]
     return out, matched, unmatched
 
 
+_DIAG_MAX = 150
+
+
+def diagnose_residual(doc: str, refreshed: list[dict[str, Any]], new: list[dict[str, Any]], text: str
+                      ) -> list[dict[str, Any]]:
+    """다시 읽은 뒤에도 잘림 띠(표제 280자+'...'·상세 1,200자 언저리 문장 중간 끝)에 남은 관찰마다:
+    원문(공백 접음)에서 그 끝 60자가 어디 있고 **바로 뒤 300자**가 무엇인지, 같은 번호의 새 관찰이 무엇인지.
+    뒤가 다음 관찰·서명란·문서 끝이면 원문 자체가 거기서 끝난 것이고, 본문이 이어지면 추출이 놓친 것이다."""
+    flat = re.sub(r"\s+", " ", text or "")
+    out: list[dict[str, Any]] = []
+    for o in refreshed:
+        d, t = str(o.get("deficiency") or ""), str(o.get("detail") or "").strip()
+        kind = ("deficiency" if is_truncated_deficiency(d)
+                else "detail" if is_truncated_detail(t) and not _COMPLETE_END_RE.search(t) else "")
+        if not kind:
+            continue
+        probe = re.sub(r"\s+", " ", (d[:-3] if kind == "deficiency" else t))[-60:]
+        at = flat.find(probe)
+        same = [n for n in new if str(n.get("number")) == str(o.get("number"))]
+        out.append({
+            "doc": doc, "number": o.get("number"), "kind": kind, "len": len(d if kind == "deficiency" else t),
+            "tail": probe, "found_in_text": at >= 0,
+            "text_after": flat[at + len(probe): at + len(probe) + 300] if at >= 0 else "",
+            "new_same_number": [{"deficiency_head": str(n.get("deficiency") or "")[:80],
+                                 "detail_len": len(str(n.get("detail") or ""))} for n in same][:3],
+        })
+    return out[:_DIAG_MAX]
+
+
 def _hints(raw: dict[str, Any]) -> dict[str, str]:
     return {
         "establishment_type": str(raw.get("establishment_type") or ""),
@@ -296,6 +327,8 @@ def run(
             report.errors.append(f"{doc}: extract_raised:{type(exc).__name__}")
             continue
         refreshed, matched, unmatched = refreshed_observations(old, new)
+        if doc_ids:
+            report.diagnostics.extend(diagnose_residual(doc, refreshed, new, text))
         report.observations_matched += matched
         report.observations_unmatched += unmatched
         changed = 0

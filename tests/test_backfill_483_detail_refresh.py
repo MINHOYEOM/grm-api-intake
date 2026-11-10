@@ -127,6 +127,15 @@ class OldStorageCapTest(unittest.TestCase):
         self.assertEqual(rep.candidates, 1)
         self.assertTrue(rep.truncated_only)
 
+    def test_residual_diagnostics_show_what_follows_in_source(self):
+        cut = ("Specifically, " + " ".join(f"record {i} was not reviewed." for i in range(80)))[:1200]
+        text = cut + " and continues here on the next page.\nOBSERVATION 2\nNext."
+        rows = [{"number": "1", "deficiency": "A.", "detail": cut}]
+        diag = b.diagnose_residual("fda483-1", rows, [{"number": "1", "deficiency": "A.", "detail": cut}], text)
+        self.assertEqual(len(diag), 1)
+        self.assertTrue(diag[0]["found_in_text"])
+        self.assertIn("and continues here", diag[0]["text_after"][:30])
+
     def test_band_helpers(self):
         self.assertTrue(b.is_truncated_deficiency("x" * 280 + "..."))
         self.assertFalse(b.is_truncated_deficiency("Short heading..."))

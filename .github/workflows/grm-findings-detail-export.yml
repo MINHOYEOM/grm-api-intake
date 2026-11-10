@@ -1,0 +1,52 @@
+name: GRM Findings Detail Export (483 번역 묶음)
+
+# [2026-11-11] 483 상세 번역 대기열을 A·B·C 묶음 파일로 뽑아 이 브랜치(ops/483-detail-shards)에 올린다.
+# DB 는 읽기만 한다. 묶음 파일은 세 번역자(세션·티로·Codex)가 같은 곳에서 받는다.
+# 다시 뽑으려면 translations/detail_shards/REFRESH 를 바꿔 push 한다(이미 국문이 있는 행은 빠진다).
+on:
+  push:
+    branches: ['ops/483-detail-shards']
+    paths:
+      - 'findings_detail_export.py'
+      - 'translations/detail_shards/REFRESH'
+      - '.github/workflows/grm-findings-detail-export.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: findings-detail-export
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Export queue (read only)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          rm -rf translations/detail_shards/queue
+          python findings_detail_export.py --out translations/detail_shards/queue
+      - name: Commit shard files to this branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add translations/detail_shards/queue
+          if git diff --cached --quiet; then echo "변경 없음"; exit 0; fi
+          git commit -q -m "data(483 상세 번역): 묶음 A·B·C 대기열 내보내기"
+          git push origin HEAD:ops/483-detail-shards
+      - name: Summary
+        if: always()
+        run: |
+          { echo '### 483 상세 번역 묶음'; echo '```json'; cat translations/detail_shards/queue/summary.json 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

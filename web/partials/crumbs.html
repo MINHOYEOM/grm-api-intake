@@ -1,0 +1,15 @@
+{#- [위치 표시 2026-11-10] 지적사항 하위 면·브리프처럼 자기 빵부스러기가 없던 2단 면에 공통으로 단다.
+    render.py 가 `auto_crumbs` = [(이름, 언어 트리 루트 기준 경로 | None)] 를 넘길 때만 그린다.
+    마지막 마디는 현재 페이지라 링크하지 않는다. 상세 페이지들은 자기 템플릿의 .fd-crumb 를 그대로 쓴다. -#}
+<style>
+  .grm-crumbs{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:14px}
+  .grm-crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .grm-crumbs a:hover{color:var(--coral)}
+  .grm-crumbs i{font-style:normal;color:var(--line-2)}
+</style>
+<div class="wrap"><nav class="grm-crumbs" aria-label="{{ _('현재 위치') }}">
+{%- for name, path in auto_crumbs -%}
+{%- if not loop.first %}<i>&rsaquo;</i>{% endif -%}
+{%- if path is not none and not loop.last %}<a href="{{ rel_root }}{{ path }}">{{ name }}</a>{% else %}<span>{{ name }}</span>{% endif -%}
+{%- endfor -%}
+</nav></div>

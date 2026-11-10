@@ -6065,6 +6065,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         _axes = browse_axes if _lg == DEFAULT_LANG else en_browse_axes
         _recent = recent_docs if _lg == DEFAULT_LANG else en_recent_docs
         _emit("findings_browse.html", _mkpage("findings/browse/"),
+            auto_crumbs=[(_tr("홈"), ""), (_tr("지적사항"), "findings/"), (_tr("둘러보기"), None)],
             browse_axes=_axes,
             zone_totals=(findings_zone if _lg == DEFAULT_LANG else findings_zone_en),
             recent_docs=_recent,
@@ -6087,6 +6088,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 세 면 모두 trends.html 계열 셸이라 nav_active 는 동일하고, 셸의
     # cfg data-page 로 trends.js 가 "이 면이 그릴 수 있는 것"만 fetch 한다.
     emit("trends.html", page("findings/trends/"),
+        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("트렌드"), None)],
         page_title=tr("규제 지적사항 트렌드 · GRM"),
         nav_active="findings",
         seg_active="trends",
@@ -6098,6 +6100,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # "두 수치를 서로 나누지 마세요"라는 경고문이 필요했는데, 면을 가르면 그 경고가
     # 필요 없어진다 — 분모가 다른 것을 같은 페이지에 두지 않는 것이 이 재편의 핵심이다.
     emit("inspections.html", page("findings/inspections/"),
+        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("실사 결과"), None)],
         page_title=tr("FDA 실사 결과 · GRM"),
         nav_active="findings",
         seg_active="inspections",
@@ -6112,6 +6115,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     #   nav 여섯 탭 어느 job 에도 속하지 않는다. 라우트·sitemap·footer 도구 열은 그대로
     #   두고, 두 면의 꼬리 각주가 이 페이지를 연다(숫자를 의심하는 사람만 마주친다).
     emit("coverage.html", page("findings/coverage/"),
+        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("데이터 현황"), None)],
         page_title=tr("데이터 현황 · GRM"),
         nav_active="findings",
         seg_active="",
@@ -6131,6 +6135,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 없다(042 findings_cfr_ranking 로 조항 순위 + 043 findings_checklist 로 사례를 받아
     # checklist.js 가 조립). 서버는 셸(설정 바 + 로딩 상태)만 렌더한다.
     emit("checklist.html", page("findings/checklist/"),
+        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("자가점검 체크리스트"), None)],
         page_title=tr("자가점검 체크리스트 · GRM"),
         nav_active="findings",
         description=tr(CHECKLIST_DESCRIPTION),
@@ -6143,6 +6148,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
     # 넣지 않는다. noindex 는 inspector.html 자체 <head> 오버라이드(meta_robots 블록)로
     # 배선하고, canonical 은 중복 URL 정리 목적으로 그대로 둔다.
     emit("inspector.html", page("findings/inspector/"),
+        auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("실사관"), None)],
         page_title=tr("실사관 프로파일 · GRM"),
         nav_active="findings",
         description=tr(INSPECTOR_DESCRIPTION),
@@ -6544,6 +6550,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         """[FDA 지적 조항 화면] 조항별 인용 빈도 순위 — ko·en 같은 함수(두 벌 금지)."""
         cp = mkpage("findings/citations/")
         emit_page("clause_citations.html", cp,
+            auto_crumbs=[(tr("홈"), ""), (tr("지적사항"), "findings/"), (tr("FDA 지적 조항"), None)],
             page_title=tr("FDA 가 자주 지적하는 조항 · GRM"),
             nav_active="findings",
             description=tr(CITATIONS_DESCRIPTION),
@@ -7448,21 +7455,25 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         description=en_tr(FINDINGS_DESCRIPTION),
     )
     en_emit("trends.html", en_page("findings/trends/"),
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("트렌드"), None)],
         page_title=en_tr("규제 지적사항 트렌드 · GRM"),
         nav_active="findings", seg_active="trends",
         description=en_tr(TRENDS_DESCRIPTION),
     )
     en_emit("inspections.html", en_page("findings/inspections/"),
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("실사 결과"), None)],
         page_title=en_tr("FDA 실사 결과 · GRM"),
         nav_active="findings", seg_active="inspections",
         description=en_tr(INSPECTIONS_DESCRIPTION),
     )
     en_emit("coverage.html", en_page("findings/coverage/"),
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("데이터 현황"), None)],
         page_title=en_tr("데이터 현황 · GRM"),
         nav_active="findings", seg_active="",
         description=en_tr(COVERAGE_DESCRIPTION),
     )
     en_emit("checklist.html", en_page("findings/checklist/"),
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("자가점검 체크리스트"), None)],
         page_title=en_tr("자가점검 체크리스트 · GRM"),
         nav_active="findings",
         description=en_tr(CHECKLIST_DESCRIPTION),
@@ -7473,6 +7484,7 @@ def render_site(data_dir: Path = DATA_DIR, out_dir: Path = DIST_DIR,
         description=en_tr(FIRM_DESCRIPTION),
     )
     en_emit("inspector.html", en_page("findings/inspector/"),
+        auto_crumbs=[(en_tr("홈"), ""), (en_tr("지적사항"), "findings/"), (en_tr("실사관"), None)],
         page_title=en_tr("실사관 프로파일 · GRM"),
         nav_active="findings",
         description=en_tr(INSPECTOR_DESCRIPTION),

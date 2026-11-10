@@ -218,5 +218,105 @@ class BackfillFromNotionTest(unittest.TestCase):
             self.assertEqual(bf.main(["--source", "WHO"]), 2)
 
 
+
+# ── WHOPIR 실사일 결손: 원천 목록에서 읽어 채움 ──────────────────────────────────
+import hashlib  # noqa: E402
+from urllib.parse import urljoin  # noqa: E402
+
+import collect_who as cw  # noqa: E402
+
+_PDF_A = "/prequal/sites/default/files/whopir_files/A-WHOPIR.pdf"
+_PDF_B = "/prequal/sites/default/files/whopir_files/B-WHOPIR.pdf"
+
+
+def _wid(href: str) -> str:
+    return "who-whopir-" + hashlib.sha1(urljoin(cw.WHOPIR_MED_URL, href).encode()).hexdigest()[:12]
+
+
+def _row(href: str, iso: str) -> str:
+    return (f'<article><a href="{href}"><span>Firm</span></a>'
+            '<div class="field field--name-field-whopir-inspection-dates field__item">'
+            f'<time datetime="{iso}T12:00:00Z">x</time></div></article>')
+
+
+_LIST_P0 = "<html>" + _row(_PDF_A, "2024-03-18") + _row(_PDF_B, "2023-05-02") + "</html>"
+
+
+def _fake_html(pages: dict[int, str], calls: list[str] | None = None):
+    def get(url: str) -> str:
+        if calls is not None:
+            calls.append(url)
+        page = int(url.rsplit("page=", 1)[1]) if "page=" in url else 0
+        if page not in pages:
+            raise RuntimeError("down")
+        return pages[page]
+    return get
+
+
+def _wsnap(href: str | None, doc_id: str, date_: str = "", source: str = "WHO") -> dict:
+    s = _snap(doc_id, source=source)
+    s["date"] = date_
+    s["official_url"] = urljoin(cw.WHOPIR_MED_URL, href) if href else ""
+    return s
+
+
+class WhopirDateFillTest(unittest.TestCase):
+    def test_fills_by_official_url_and_by_document_id(self):
+        a = _wsnap(_PDF_A, _wid(_PDF_A))
+        b = _wsnap(None, _wid(_PDF_B))               # official_url 없음 → document_id 로 역조회
+        filled, unresolved = bf.fill_whopir_dates([a, b], _fake_html({0: _LIST_P0, 1: ""}))
+        self.assertEqual((filled, unresolved), (2, []))
+        self.assertEqual((a["date"], b["date"]), ("2024-03-18", "2023-05-02"))
+
+    def test_unknown_row_stays_blank_and_is_reported(self):
+        c = _wsnap("/prequal/x/C-WHOPIR.pdf", "who-whopir-ffffffffffff")
+        filled, unresolved = bf.fill_whopir_dates([c], _fake_html({0: _LIST_P0}))
+        self.assertEqual((filled, unresolved, c["date"]), (0, ["who-whopir-ffffffffffff"], ""))
+
+    def test_other_source_and_already_dated_rows_untouched_and_no_fetch(self):
+        calls: list[str] = []
+        ich = _wsnap(_PDF_A, _wid(_PDF_A), source="ICH")
+        dated = _wsnap(_PDF_B, _wid(_PDF_B), date_="2020-01-01")
+        other = _wsnap(None, "WHO-RSS-1")             # who-whopir- 접두 아님
+        out = bf.fill_whopir_dates([ich, dated, other], _fake_html({0: _LIST_P0}, calls))
+        self.assertEqual(out, (0, []))
+        self.assertEqual((ich["date"], dated["date"], other["date"]), ("", "2020-01-01", ""))
+        self.assertEqual(calls, [])
+
+    def test_pagination_stops_when_no_new_rows(self):
+        calls: list[str] = []
+        bf.fill_whopir_dates([_wsnap(_PDF_A, _wid(_PDF_A))],
+                             _fake_html({0: _LIST_P0, 1: _LIST_P0}, calls))
+        self.assertEqual(len(calls), 2)               # page=1 이 새 행 없음 → 멈춤
+
+    def test_network_failure_keeps_old_behavior_invalid(self):
+        snap = _wsnap(_PDF_A, _wid(_PDF_A))
+        snap["type_or_class"] = "who-inspection"
+        post = MagicMock()
+        with patch.object(bf, "notion_rows_for_source", return_value=[snap]), \
+                patch.object(bf, "supabase_doc_ids", return_value=set()), \
+                patch.object(bf.fsa, "_append_raw_signal", post):
+            rep = bf.run(["WHO"], notion_token="t", notion_db="d", supabase_url=URL,
+                         service_key=KEY, apply=True, fetch_raw=lambda _t, _p: {"id": 1},
+                         sleep_s=0, get_html=_fake_html({}))
+        post.assert_not_called()
+        self.assertEqual((rep.date_filled_from_source, rep.date_unresolved),
+                         (0, [snap["document_id"]]))
+        self.assertEqual(len(rep.invalid), 1)
+        self.assertIn("published_date", rep.invalid[0])
+
+    def test_run_fills_then_inserts(self):
+        snap = _wsnap(_PDF_A, _wid(_PDF_A))
+        post = MagicMock(return_value=fsa.SupabaseRawSignalAppendResult("inserted"))
+        with patch.object(bf, "notion_rows_for_source", return_value=[snap]), \
+                patch.object(bf, "supabase_doc_ids", return_value=set()), \
+                patch.object(bf.fsa, "_append_raw_signal", post):
+            rep = bf.run(["WHO"], notion_token="t", notion_db="d", supabase_url=URL,
+                         service_key=KEY, apply=True, fetch_raw=lambda _t, _p: {"id": 1},
+                         sleep_s=0, get_html=_fake_html({0: _LIST_P0}))
+        self.assertEqual((rep.date_filled_from_source, rep.inserted, rep.invalid), (1, 1, []))
+        self.assertEqual(post.call_args.args[2]["published_date"], "2024-03-18")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,352 @@
+[
+ {
+  "finding_id": "finding-db3ee96bf281296d601bddde",
+  "finding_text_md5": "828bd271ef4cba6aa5a45ccdede6ede5",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, Your firm does not initiate change controls when necessaiy and in a timely manner. For example, according to your Quality Assurance Director, you did not initiate a change control for the installation of your new ISO 5 Hoods <Redacted B4> with EQ ID: 2022-17913 1 & 2021-1 66295 respectively. These hoods per your Quality Director were installed on May 8th, 2022, in the Clean Room and has been used in the packaging of <Redacted B4> and <Redacted B4> per your Production log from January to August 2022.",
+  "detail_text_ko": "구체적으로, 귀사는 필요한 때에 적시에 변경 관리를 개시하지 않는다. 예를 들어 귀사 품질보증 책임자(Quality Assurance Director)에 따르면, 신규 ISO 5 후드 <Redacted B4> (EQ ID: 2022-17913 1 & 2021-1 66295)의 설치에 대해 변경 관리를 개시하지 않았다. 품질 책임자(Quality Director)에 따르면 이 후드들은 2022년 5월 8일 클린룸에 설치되었고, 귀사 생산 일지에 따라 2022년 1월부터 8월까지 <Redacted B4> 및 <Redacted B4> 포장에 사용되었다."
+ },
+ {
+  "finding_id": "finding-b0098439310ec3b7e940dfda",
+  "finding_text_md5": "72e8fab32e0129fc0034c72d000e2362",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, your firm did not submit a serious and unexpected adverse event report to FDA within 15 calendar days after first receiving information about the adverse event. Examples include: •FDA !CSR ID 2081606, received 2/7/2020, submitted to FDA 3/13/2020 • FDA !CSR ID 2129150, received 4/12/2022, submitted to FDA 5/25/2022 •FDA !CSR ID 2112196, received 4/15/2021, submitted to FDA 6/1/2021 • FDA !CSR ID 2112195, received 4/15/2021, submitted to FDA 6/1/2021 • FDA !CSR ID 2100701, received 10/15/2020, submitted to FDA 12/7/2020 • FDA !CSR ID 2087366, received 6/3/2020, submitted to FDA 7/14/2020 • FDA !CSR ID 2087365, received 6/3/2020, submitted to FDA 7/14/2020 *DATES OF INSPECTION 8/31/2022 (Wed), 9/01/2022 (Thu), 9/06/2022 (Tue), 9/08/2022 (Thu), 9/12/2022 (Mon), 9/13/2022 (Tue), 9/16/2022 (Fri), 9/23/2022 (Fri)",
+  "detail_text_ko": "구체적으로, 귀사는 중대하고 예상하지 못한 이상 사례에 대한 정보를 처음 접수한 날부터 15일(역일) 이내에 해당 이상 사례 보고서를 FDA에 제출하지 않았다. 예시는 다음과 같다. •FDA !CSR ID 2081606, 접수 2/7/2020, FDA 제출 3/13/2020 • FDA !CSR ID 2129150, 접수 4/12/2022, FDA 제출 5/25/2022 •FDA !CSR ID 2112196, 접수 4/15/2021, FDA 제출 6/1/2021 • FDA !CSR ID 2112195, 접수 4/15/2021, FDA 제출 6/1/2021 • FDA !CSR ID 2100701, 접수 10/15/2020, FDA 제출 12/7/2020 • FDA !CSR ID 2087366, 접수 6/3/2020, FDA 제출 7/14/2020 • FDA !CSR ID 2087365, 접수 6/3/2020, FDA 제출 7/14/2020 *DATES OF INSPECTION 8/31/2022 (Wed), 9/01/2022 (Thu), 9/06/2022 (Tue), 9/08/2022 (Thu), 9/12/2022 (Mon), 9/13/2022 (Tue), 9/16/2022 (Fri), 9/23/2022 (Fri)"
+ },
+ {
+  "finding_id": "finding-9465f34c76d858e753669d5e",
+  "finding_text_md5": "629b48094fdf15e49a97104645e20754",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, A You did not investigate Pressure differential discrepancies in ISO 7 Clean room and the incorrect dating for the logged data between 11/15/2021 to 01/03/2022. The following lots of <Redacted B4>, but not limited to were produced, approved, and distributed to your customers <Redacted B4> <Redacted B4> & <Redacted B4> B. In addition, your Cleanroom pressure log, dated 8/31/2022, shows at least 29 instances where your pressure differentials were observed to be from O to negative O .11 ranging in duration from 10 min to 30 min.",
+  "detail_text_ko": "구체적으로, A 귀사는 ISO 7 클린룸의 차압 불일치와 11/15/2021부터 01/03/2022까지 기록된 데이터의 잘못된 일자 표기를 조사하지 않았다. <Redacted B4>의 다음 로트들은 이에 국한되지 않고 생산·승인되어 귀사 고객에게 유통되었다. <Redacted B4> <Redacted B4> & <Redacted B4> B. 또한 8/31/2022자 클린룸 압력 기록에는 차압이 O에서 음의 O .11로 관찰된 사례가 최소 29건 있으며, 지속 시간은 10분에서 30분이었다."
+ },
+ {
+  "finding_id": "finding-550f753d46749f20ec64d70a",
+  "finding_text_md5": "d47bd56426b335537b2f7d38562853ce",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, A. You pool and commingle different lots of finished re~packaged <Redacted B4> products for sterility and endotoxin testing by your Control testing Lab <REdacted B4> data base does not capture the individual product lots tested for repackaged <Redacted B4>. For example the following but not limited <Redacted B4> syringes lots <Redacted B4> were pooled together and sent for sterility, endotoxin ana particulate testing as Lot <Redacted B4> on 02/10/2022. The Certificate of Analysis (COA) did not have specifics on these <Redacted B4> lots tested. The COA only captured the commingled Lot number. Your QA approved the production batch records without any notation that the two (2 ) <Redacted B4> lots were commingled. The QA accepted the COA from <Redacted B4> failing to verify if the lot numbers were explicitly written on the COA. These 2 <Redacted B4> lots were released without sterility and endotoxin test results of the separate lots and distributed to your customers. B. Your procedure, SOP P3.9.l.3,\"QUALITY MANAGEMENT SYSTEM-SUPPLIER AUDIT-ALL OPERATIONS\", dated Nov 16,2022 for auditing your suppliers, had specifics that your suppliers to include third party testing labor",
+  "detail_text_ko": "구체적으로, A. 귀사는 재포장한 완제품 <Redacted B4>의 여러 로트를 합쳐(pool) 섞은 상태로 무균 및 엔도톡신 시험을 위해 품질관리 시험실 <REdacted B4>에 보내며, 데이터베이스에는 재포장 <Redacted B4>에 대해 시험된 개별 제품 로트가 기록되지 않는다. 예를 들어, 이에 국한되지 않고 <Redacted B4> 주사기 로트 <Redacted B4>를 합쳐서 02/10/2022에 로트 <Redacted B4>로 무균, 엔도톡신 및 입자 시험에 보냈다. 시험성적서(COA)에는 시험된 이들 <Redacted B4> 로트에 대한 구체적 내용이 없었다. COA에는 섞은 로트 번호만 기재되어 있었다. 귀사 QA는 두(2) 개의 <Redacted B4> 로트가 섞였다는 표기 없이 생산 배치 기록서를 승인했다. QA는 <Redacted B4>의 COA를 수용하면서 로트 번호가 COA에 명시되어 있는지 확인하지 않았다. 이 2개의 <Redacted B4> 로트는 각 로트별 무균 및 엔도톡신 시험 결과 없이 출하되어 귀사 고객에게 유통되었다. B. 공급업체 감사를 위한 귀사 절차서 SOP P3.9.l.3,\"QUALITY MANAGEMENT SYSTEM-SUPPLIER AUDIT-ALL OPERATIONS\"(Nov 16,2022자)에는 공급업체가 제3자 시험 labor"
+ },
+ {
+  "finding_id": "finding-44a8f58664ebaecc8e135b4d",
+  "finding_text_md5": "0536b299d7c77a5ea8290c074cfe9e2b",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, your firm's procedures, <Redacted B4>, HOU-QA-050 and Temperature, Humidity and Pressure Monitoring of Classified Areas, HOU-QC-002 used to document your firm's building monitoring systems environment conditions controls and monitoring requirements (differential pressure, temperature, and relative humidity) are inadequate. Your firm's procedure fails to adequately define and document differential pressure specifications, alert, and action limits for your firm's ISO 8 Anteroom, ISO 8 Gowning Room, and ISO 7 Cleanroom, which contain your firm's <Redacted B4> LAF units used in processing of aseptic sterile to sterile finished drug transfers along with sterile drug repackaging. *DATES OF INSPECTION 11/16/2022 (Wed), 11/17/2022 (Thu), 11/18/2022 (Fri), 11/29/2022 (Tue ), 11/30/2022 (Wed), 12/01/2022 (Thu), 12/02/2022 (Fri), 12/05/2022 (Mon), 12/06/2022 (Tue), 12/07/2022 (Wed), 12/08/2022 (Thu), 12/09/2022 (Fri), 12/14/2022 (Wed)",
+  "detail_text_ko": "구체적으로, 귀사의 건물 모니터링 시스템의 환경 조건 관리 및 모니터링 요건(차압, 온도, 상대습도)을 문서화하는 데 쓰는 귀사의 절차서 <Redacted B4>, HOU-QA-050 및 Temperature, Humidity and Pressure Monitoring of Classified Areas, HOU-QC-002는 부적절하다. 귀사 절차서는 무균 상태의 완제 의약품을 옮겨 담는 작업(sterile to sterile)과 무균 의약품 재포장 작업에 쓰는 귀사의 <Redacted B4> LAF 장치가 들어 있는 ISO 8 전실, ISO 8 무균복 착의실, ISO 7 클린룸의 차압 규격, 경보 및 조치 한도를 적절히 정의하고 문서화하지 않았다. *DATES OF INSPECTION 11/16/2022 (Wed), 11/17/2022 (Thu), 11/18/2022 (Fri), 11/29/2022 (Tue ), 11/30/2022 (Wed), 12/01/2022 (Thu), 12/02/2022 (Fri), 12/05/2022 (Mon), 12/06/2022 (Tue), 12/07/2022 (Wed), 12/08/2022 (Thu), 12/09/2022 (Fri), 12/14/2022 (Wed)"
+ },
+ {
+  "finding_id": "finding-31c6d40417b8526345b4e7ad",
+  "finding_text_md5": "2c1d69e7df0f8aaf28deb700c20f4bb8",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically your firm failed to adequately validate the electronic building monitoring system, <Redacted B4> <Redacted B4> prior to use. Your firm uses the system to control, monitor, and record differential pressure, temperature, and relative humidity for the ISO classified along with non-classified areas used in the production of sterile and non-sterile drug products. For example, your firm initially validated the <Redacted B4> on 3/10/2020 with the revalidation not being approved until 12/15/2021. Your firm's VP of Quality reported following a review of the validation report by your firm's quality unit, a re-validation was required. In my review of the initial documented <Redacted B4> Validation Report, I found it failed to it failed to include documented differential pressure measuring, monitoring, and recording as pait of the system's qualifications, IQ, OQ, and PQ along with providing adequate data in support of the system qualification. your firm's quality unit continued to review and approved differential pressure <Redacted B4> reports, while the software underwent revalidation for the selected and reviewed months: July 2021, September 2021, and November 2021 resulting in",
+  "detail_text_ko": "구체적으로, 귀사는 전자 건물 모니터링 시스템 <Redacted B4> <Redacted B4>를 사용하기 전에 적절히 밸리데이션하지 않았다. 귀사는 이 시스템으로 무균 및 비무균 의약품 생산에 쓰이는 ISO 등급 구역과 비등급 구역의 차압, 온도, 상대습도를 관리, 모니터링 및 기록한다. 예를 들어 귀사는 3/10/2020에 <Redacted B4>를 최초로 밸리데이션했으나 재밸리데이션은 12/15/2021에야 승인되었다. 귀사 품질 부사장(VP of Quality)은 품질 부서가 밸리데이션 보고서를 검토한 뒤 재밸리데이션이 필요했다고 진술했다. 실사관이 최초 <Redacted B4> 밸리데이션 보고서를 검토한 결과, 이 보고서는 it failed to 시스템 적격성평가인 IQ, OQ, PQ의 일부로서 차압의 측정, 모니터링 및 기록을 문서화한 내용을 포함하지 않았고, 시스템 적격성평가를 뒷받침하는 적절한 데이터도 제시하지 않았다. 귀사 품질 부서는 소프트웨어가 재밸리데이션을 거치는 동안에도 선택해 검토한 2021년 7월, 2021년 9월, 2021년 11월의 차압 <Redacted B4> 보고서를 계속 검토하고 승인했으며 그 결과"
+ },
+ {
+  "finding_id": "finding-1faac595a4c0ff020d19a91a",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, A. Your firm's cleaning logs, from January 2022 -August 2022, do not document a contact time for the sporicidal <Redacted B4> used in the cleaning of your ISO 5 and ISO 7 areas. All sterile drug products, including <Redacted B4> and <Redacted B4> are repackaged in ISO 5 hoods <Redacted B4> located in your ISO 7 clean room. B. Your firm use <Redacted B4> located in the ISO 7 area approximately 6 inches from the opening of the ISO 5 Hood. Per your firm's pharmacist, the <Redacted B4> is covered with a water-resistant case. This <Redacted B4> does not appear to be easily cleanable. You do not have a cleaning specification for the <Redacted B4>. In addition, on 08/31/2022, I observed your aseptic operator touch the <Redacted B4> their gloved hand and and immediately proceed with the aseptic repackaging operations of <Redacted B4> lots <Redacted B4> without appropriately sanitizing their hands prior to entering the ISO 5 Hood.",
+  "detail_text_ko": "구체적으로, A. 귀사의 1월 2022 -8월 2022 세척 일지에는 ISO 5 및 ISO 7 구역 세척에 사용한 포자 사멸제 <Redacted B4>의 접촉 시간이 기록되어 있지 않다. <Redacted B4> 및 <Redacted B4>를 포함한 모든 무균 의약품은 ISO 7 클린룸에 위치한 ISO 5 후드 <Redacted B4>에서 재포장된다. B. 귀사는 ISO 7 구역에서 ISO 5 후드 개구부로부터 약 6인치 떨어진 곳에 위치한 <Redacted B4>를 사용한다. 귀사 약사에 따르면 이 <Redacted B4>는 방수 케이스로 덮여 있다. 이 <Redacted B4>는 쉽게 세척할 수 있어 보이지 않는다. 귀사는 이 <Redacted B4>에 대한 세척 규격이 없다. 또한 08/31/2022에 실사관은 귀사의 무균 작업자가 장갑 낀 손으로 <Redacted B4>를 만진 뒤, ISO 5 후드에 들어가기 전에 손을 적절히 소독하지 않은 채 곧바로 <Redacted B4> 로트 <Redacted B4>의 무균 재포장 작업을 진행하는 것을 관찰했다."
+ },
+ {
+  "finding_id": "finding-046293262e68a4836bf02c8f",
+  "finding_text_md5": "2aa4debe1a2068897e6793029a73336d",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, I observed your aseptic technicians not wearing protective goggles during aseptic operations in ISO 5 Hoods. Parts of the skin around the eyes were exposed in the ISO 5 hoods and I saw aseptic operator <Redacted B4> leaning on <Redacted B4> elbow inside the ISO 5 during aseptic operations and repackaging of <Redacted B4> lots <Redacted B4> and Lot <Redacted B4>.",
+  "detail_text_ko": "구체적으로, 실사관은 귀사의 무균 작업자들이 ISO 5 후드에서 무균 작업을 하는 동안 보호 고글을 착용하지 않은 것을 관찰했다. ISO 5 후드 안에서 눈 주위 피부 일부가 노출되어 있었고, 실사관은 무균 작업자 <Redacted B4>가 <Redacted B4> 로트 <Redacted B4> 및 로트 <Redacted B4>의 무균 작업과 재포장 중 ISO 5 내부에서 <Redacted B4> 팔꿈치를 기대고 있는 것을 보았다."
+ },
+ {
+  "finding_id": "finding-01ac1040b2b30790b6a46363",
+  "finding_text_md5": "af3c19e24abad2d36912d48f78fbc4e0",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, 1. Pressure gauges monitoring the pressure differential of the processing rooms are not continuously or periodically calibrated.",
+  "detail_text_ko": "구체적으로, 1. 공정실의 차압을 모니터링하는 압력계가 연속적으로도 주기적으로도 교정되지 않는다."
+ },
+ {
+  "finding_id": "finding-0191a480c602cf13a03db382",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2023-02-03",
+  "detail_text": "Specifically, 1. You do not perform environmental monitoring which includes active viable air monitoring, surface, non-viable particle and PM for each lot of repackaged <Redacted B4> product since the installation of ISO 5 Hoods <Redacted B4> on May 9th, 2022. Your firm failed to conduct viable air sampling, during aseptic operations for each lot of repackaged <Redacted B4> (Bevacizumab) produced for sterile intraocular injections. I observed that you did not perform active viable air and non-viable articulating at the beginning I and middle while repackaging of <Redacted B4> lots, <Redacted B4> and Lot <Redacted B4> on 08/31/2022. These lots have been released and distribute to your customers. ** THIS IS A REPEAT OBSERVATION** 2 You failed to investigate the 1 CFU recovery from your Active Air <Redacted B4> sample in ISO 5 Hood active air sample which was obtained on 01/11/2022. Per your sample media lot number <Redacted B4> day 6 and 7 samples yielded I CFU and this was not properly investigated. Your action limit is not appropriate per your Procedure which stated that <Redacted B4> CFU is your action limit.",
+  "detail_text_ko": "구체적으로, 1. 귀사는 2022년 5월 9일 ISO 5 후드 <Redacted B4>를 설치한 이후 재포장한 <Redacted B4> 제품의 각 로트에 대해 부유균 능동 채취, 표면, 비생균 입자 및 PM을 포함하는 환경 모니터링을 수행하지 않는다. 귀사는 무균 정안구 내 주사용으로 생산한 재포장 <Redacted B4>(Bevacizumab)의 각 로트에 대해 무균 작업 중 부유균 채취를 수행하지 않았다. 실사관은 08/31/2022에 <Redacted B4> 로트 <Redacted B4> 및 로트 <Redacted B4>를 재포장하는 동안 시작 I 및 중간 시점에 부유균 능동 채취와 비생균 입자 측정(articulating)을 하지 않은 것을 관찰했다. 이 로트들은 출하되어 귀사 고객에게 유통되었다. ** THIS IS A REPEAT OBSERVATION** 2 귀사는 01/11/2022에 채취한 ISO 5 후드의 능동 공기 <Redacted B4> 시료에서 회수된 1 CFU를 조사하지 않았다. 시료 배지 로트 번호 <Redacted B4> 기준 6일차와 7일차 시료에서 I CFU가 나왔으나 적절히 조사되지 않았다. 귀사 절차서에는 <Redacted B4> CFU가 조치 한도라고 되어 있어 귀사의 조치 한도는 적절하지 않다."
+ },
+ {
+  "finding_id": "finding-e3b8d73a84b9bda3a03caa30",
+  "finding_text_md5": "6b2ee0a6e00213c23ba4bb5c24d072c3",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the beyond use date (BUD) for mitomycin (1mg/1ml) 40mg/40 ml in 50 ml syringe for bladder irrigation was changed < Redacte d B4> on <Redacted B4>, < Redacted B4>, <Redacted B 4>, on <Re dacted B4> and from <Redacted B4> for lot <Redacted B4> . This BUD was e xtended based on the stability bat ch contrac t lab test results for lot <Redacted B4>. This stability ba tch was not te sted using a con tract test l ab val idat ed test met hod for assa y until after the valid ati on of the test method which according to documentation occurred on <Redacted B4>.",
+  "detail_text_ko": "구체적으로, 방광 세척용 50 ml 주사기에 담은 mitomycin (1mg/1ml) 40mg/40 ml의 사용 기한(BUD)이 로트 <Redacted B4>에 대해 <Redacted B4> 에 <Redacted B4>, < Redacted B4>, <Redacted B 4>, <Re dacted B4>에, 그리고 <Redacted B4>에서 변경되었다. 이 BUD는 로트 <Redacted B4>의 안정성 배치 위탁시험소 시험 결과를 근거로 연장되었다. 이 안정성 배치는 문서상 <Redacted B4>에 이루어진 시험법 밸리데이션 이후에야 위탁시험소에서 밸리데이션된 함량 시험법으로 시험되었다."
+ },
+ {
+  "finding_id": "finding-a9b30296eaa9527b690e3c9b",
+  "finding_text_md5": "f5d65bc8f810236f390169e6db0c3193",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the smoke studies performed to demonstrate the <Redacted B4> laminar air flow in the <Redacted B4> ISO 5 laminar air flow workbench used to produce drug products intended to be sterile do not have enough smoke to visualize the air flow at critical production areas, do not illustrate unidirectional airflow, and do not reflect all types of operations performed in the areas. Additionally, the <Redacted B4> airflow from the ISO 5 LAFW was observed bouncing back from the wall along the workbench and exiting at the point where the Plexiglas stopped causing first pass air to not appropriately sweep over and away from drug products intended to be sterile.",
+  "detail_text_ko": "구체적으로, 무균 의약품으로 의도된 의약품을 생산하는 <Redacted B4> ISO 5 층류 작업대의 <Redacted B4> 층류를 입증하기 위해 수행한 연기 시험은 핵심 생산 구역의 공기 흐름을 눈으로 확인할 만큼 연기가 충분하지 않고, 단방향 기류를 보여주지 못하며, 해당 구역에서 수행하는 모든 유형의 작업을 반영하지 않는다. 또한 ISO 5 LAFW의 <Redacted B4> 기류가 작업대를 따라 벽에서 튕겨 나오고 플렉시글라스가 끝나는 지점에서 빠져나가는 것이 관찰되었으며, 이로 인해 제1통과 공기(first pass air)가 무균 의약품으로 의도된 의약품 위를 적절히 쓸고 지나가 멀어지지 못했다."
+ },
+ {
+  "finding_id": "finding-a583c61fc8ddf5a2fdcec944",
+  "finding_text_md5": "03716cca8551f6a32aa2762acb543f45",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. On 11/04/2022, during the preparation of Prostaglandin EI 30CC/ML, Lot: t2022 I I 03@ <Redacted B4> we observed your employee's gloved hand directly over an open syringe in <Redacted B4> orientation that blocked first pass air in the <Redacted B4> ISO 5 LAWF. 2. On 11/07/2022, during the preparation of Papaverine/Phentolarnine 30MG/3MG/ML injectable Lot· t20221103@ <Redacted B4> we observed your employee holding the <Redacted B4> drug product filled syringe in <Redacted B4> position that blocked first pass air in the ISO 5 LAFW. Your employee was also observed removing drug product from the synnge to be placed into a vial in <Redacted B4> orientation that blocked the critical areas from receiving first pass air flow from the <Redacted B4> ISO 5 LAWF bench area.",
+  "detail_text_ko": "구체적으로, 1. 11/04/2022에 Prostaglandin EI 30CC/ML, 로트: t2022 I I 03@ <Redacted B4>를 조제하는 동안, 실사팀은 귀사 직원의 장갑 낀 손이 <Redacted B4> ISO 5 LAWF 안에서 <Redacted B4> 방향으로 열린 주사기 바로 위에 있어 제1통과 공기를 차단하는 것을 관찰했다. 2. 11/07/2022에 Papaverine/Phentolarnine 30MG/3MG/ML 주사제 로트· t20221103@ <Redacted B4>를 조제하는 동안, 실사팀은 귀사 직원이 <Redacted B4> 의약품이 채워진 주사기를 <Redacted B4> 위치로 들고 있어 ISO 5 LAFW에서 제1통과 공기를 차단하는 것을 관찰했다. 또한 이 직원이 주사기에서 의약품을 빼내 <Redacted B4> 방향으로 바이알에 옮기는 것이 관찰되었는데, 이 방향은 <Redacted B4> ISO 5 LAWF 작업대 구역에서 핵심 구역으로 가는 제1통과 기류를 차단했다."
+ },
+ {
+  "finding_id": "finding-952862720cd0de443436873d",
+  "finding_text_md5": "d5d663c36773a88aaadb8a39bd935626",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the following products were compounded during the reporting period 2022-1 according to your production log batch record, but were not identified on your report dated May 31, 2022 (2022-1 ): 1. Prednisolone Sodium Phosphate/ Moxifloxacin HCL/Bromfenac 1 %/0.5%/0.09% Ophth Solution produced March 3, 2022, in 5 mL volume was not reported for 2022-1 2. Prednisolone Sodium Phosphate/Moxifloxacin 1 %/0.05% Ophth Solution produced May 26, 2022, in 5 mL volume was not reported for 2022-1 3. Prednisolone Sodium Phosphate/Moxifloxacin 1 %/0.05% Ophth Solution produced May 26, 2022, in 8 mL volume was not reported for 2022-1.",
+  "detail_text_ko": "구체적으로, 귀사 생산 일지 배치 기록서에 따르면 보고 기간 2022-1 중에 다음 제품들이 조제되었으나 2022년 5월 31일자 귀사 보고서(2022-1 )에는 확인되지 않았다. 1. 2022년 3월 3일에 5 mL 용량으로 생산된 Prednisolone Sodium Phosphate/ Moxifloxacin HCL/Bromfenac 1 %/0.5%/0.09% 점안액은 2022-1 에 보고되지 않았다. 2. 2022년 5월 26일에 5 mL 용량으로 생산된 Prednisolone Sodium Phosphate/Moxifloxacin 1 %/0.05% 점안액은 2022-1 에 보고되지 않았다. 3. 2022년 5월 26일에 8 mL 용량으로 생산된 Prednisolone Sodium Phosphate/Moxifloxacin 1 %/0.05% 점안액은 2022-1 에 보고되지 않았다."
+ },
+ {
+  "finding_id": "finding-924a70198a968a96eb375cfa",
+  "finding_text_md5": "2ea6d5e59e1a5290126a97082e93c3ef",
+  "published_date": "2023-01-30",
+  "detail_text": "The quality control unit (QCU) did not fully investigate laboratory test results before releasing finished drug products. Specifically, A. Your firm did not have a validated test method for assay testing of your drug products, Prednisolone Sodium Phosphate/Moxifloxacin HCL/Bromfenac 1 %/0.5%/0.09% and Prednisolone Sodium Phosphate/Moxifloxacin HCL 1 %/0.5% ophthalmic solutions before release and distribution of final product. Lot l, <Redacted B4> assigned no beyond use date (BUD) was used for your <Redacted B4> test method validation for both ophthalmic solutions that was completed on <Redacted B4>. Prior to 10/27/2022, the following lots were distributed to customers with final assay results using an unvalidated test method: • <Redacted B4> 8.6mL starting on 05/16/2022 <Redacted B4> units • <Redacted B4> 5.6mL starting on 07/06/2022 <Redacted B4> units • <Redacted B4> 5.6mL starting on 08/10/2022 <Redacted B4> units",
+  "detail_text_ko": "품질관리 부서(QCU)는 완제 의약품을 출하하기 전에 시험실 시험 결과를 충분히 조사하지 않았다. 구체적으로, A. 귀사는 최종 제품을 출하·유통하기 전에 자사 의약품인 Prednisolone Sodium Phosphate/Moxifloxacin HCL/Bromfenac 1 %/0.5%/0.09% 및 Prednisolone Sodium Phosphate/Moxifloxacin HCL 1 %/0.5% 점안액의 함량 시험에 대해 밸리데이션된 시험법을 갖고 있지 않았다. 두 점안액 모두 <Redacted B4>에 완료된 <Redacted B4> 시험법 밸리데이션에는 사용 기한(BUD)이 지정되지 않은 로트 l, <Redacted B4>가 사용되었다. 10/27/2022 이전에 다음 로트들이 밸리데이션되지 않은 시험법으로 얻은 최종 함량 결과와 함께 고객에게 유통되었다. • <Redacted B4> 8.6mL, 05/16/2022부터 <Redacted B4> 단위 • <Redacted B4> 5.6mL, 07/06/2022부터 <Redacted B4> 단위 • <Redacted B4> 5.6mL, 08/10/2022부터 <Redacted B4> 단위"
+ },
+ {
+  "finding_id": "finding-90ea8384908ff5b9faca0037",
+  "finding_text_md5": "934544b583370e1a1aa5f719d6c02d40",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. Your aseptic employee changed their sterile gloves used during the sterile drug production of Prostaglandin El 30CC/ML, Lot: t2022l 103@ <Redacted B4> , with a new pair of sterile gloves outside of the ISO S LAF, enter the ISO 5 LAF, sprayed their hands and performed one task prior to completing their <Redacted B4> ,monitoring samples. This is not representative of actual processing conditions in the ISO 5 LAFW, an may not provide meaningful results. 2. Your aseptic employee lightly < Redacted B4> pla te rather than roll them side to side whe n performing personnel monitoring after the sterile drug production of Papaverine/Phentolamine 30MG/3MG/ ML injectable, Lot: t2022 I l 03@ <Red ac te d B4>",
+  "detail_text_ko": "구체적으로, 1. 귀사 무균 직원은 Prostaglandin El 30CC/ML, 로트: t2022l 103@ <Redacted B4>의 무균 의약품 생산 중 사용한 멸균 장갑을, ISO S LAF 밖에서 새 멸균 장갑으로 교체하고 ISO 5 LAF에 들어가 손에 분사한 뒤 <Redacted B4> 모니터링 시료를 마치기 전에 작업 하나를 수행했다. 이는 ISO 5 LAFW의 실제 공정 조건을 대표하지 않으며 의미 있는 결과를 제공하지 못할 수 있다. 2. 귀사 무균 직원은 Papaverine/Phentolamine 30MG/3MG/ ML 주사제, 로트: t2022 I l 03@ <Red ac te d B4>의 무균 의약품 생산 후 작업자 모니터링을 수행할 때 <Redacted B4> pla te를 좌우로 굴리지 않고 가볍게 < Redacted B4> 했다."
+ },
+ {
+  "finding_id": "finding-8f8262ef44dbc847709763de",
+  "finding_text_md5": "0ac81e3f87cb419543f72a9666d041b6",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the stability batch <Redacted B4> was tested at the time points <Redacted B4> using an un-validated contract test lab test method for assay.",
+  "detail_text_ko": "구체적으로, 안정성 배치 <Redacted B4>는 밸리데이션되지 않은 위탁시험소의 함량 시험법으로 시점 <Redacted B4>에 시험되었다."
+ },
+ {
+  "finding_id": "finding-8df23948232bef690a839ae1",
+  "finding_text_md5": "b4e28383ba1db65d8dddeef1eb688a53",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, your written procedure titled Cleanroom Equipment Cleaning, SOP <Redacted B4>, version one, dated 03/18/22 does not include a deactivation agent when cleaning equipment and utensils used to produce hazardous sterile drug products. The equipment and utensils are non-dedicated and are used to produce both hazardous and non­hazardous sterile drug products. Since approximately 05/31/22, your firm has produced and dispensed approximately <Redacted B4> lots of sterile drug products which include approximately, <Redacted B4> lots of hazardous sterile drug products. *Date(s) of Inspection: 08/29/22 (MON), 08/30/22 (TUE), 08/31/22 (WED), 09/01/22 (THU), 09/06/22 (TUE), 09/12/22 (MON) Add Continuation Page",
+  "detail_text_ko": "구체적으로, 귀사의 Cleanroom Equipment Cleaning, SOP <Redacted B4>, 버전 1(03/18/22자) 절차서는 위해 무균 의약품 생산에 쓰는 설비와 기구를 세척할 때 불활성화제를 포함하지 않는다. 이 설비와 기구는 전용이 아니며 위해 무균 의약품과 비위해 무균 의약품 생산 모두에 쓰인다. 약 05/31/22 이후 귀사는 약 <Redacted B4> 로트의 무균 의약품을 생산해 조제·공급했으며, 이 가운데 약 <Redacted B4> 로트가 위해 무균 의약품이다. *실사일: 08/29/22 (MON), 08/30/22 (TUE), 08/31/22 (WED), 09/01/22 (THU), 09/06/22 (TUE), 09/12/22 (MON) Add Continuation Page"
+ },
+ {
+  "finding_id": "finding-8c6e3fd2be290ec77bc89a6e",
+  "finding_text_md5": "ffbedc7b4ed22b071a594e3b75e42b2c",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. Your firm failed to use biological indicators (8.1.s) to ensure cycle effectiveness in <Redacted B4> cycles intended to sterilize <Redacted B4> drug products produced from March 2022 to July 2022. For example, your firm produced the following drug products without any biological indicators: a. Ph enol lnJection, Lot #s: t20220406@ <Redacted B4>, t2022062 l@ <Redacted B4>, t20220505@ <Redacted B4> , b. Vitamin D3. Lot #s: t20220303@ <Re dacted B4> t202 20 304@ <Redacted B4> t20220322@ < Redacted B4>,t202204 19@ <Redacted B4>, t20220504@ <Redacted B4, t20220506@ <Redacted B4>, t20220517@<Redacted B4>, t20220613@ <Redacted B4> c. Glycerin, Lot #s:t20220303@ <Redacted B4>, t20220309@ <Redacted B4>, t2022042l@<Redacted B4>, t20220603@<Redacted B4 > d. Prednisolone, Lot #s:t202205l9@<R edacted B4> Your firm failed to use B.I.s to ensure the cycle effectiveness in <Redacted B4> of the <Redacted B4> cycles used to sterilize <Redacted B4> that is added to sterile drug products and also used to <Redacted B4> glassware used in drug products intended to be sterile from January 2022 to September of 2022. Additionally, you carry the <Redacted B4> that is intended to be sterilize",
+  "detail_text_ko": "구체적으로, 1. 귀사는 2022년 3월부터 2022년 7월까지 생산한 <Redacted B4> 의약품을 멸균하기 위한 <Redacted B4> 사이클에서 사이클의 유효성을 확인하는 생물학적 지표(8.1.s)를 사용하지 않았다. 예를 들어 귀사는 생물학적 지표 없이 다음 의약품을 생산했다. a. Ph enol lnJection, 로트 번호: t20220406@ <Redacted B4>, t2022062 l@ <Redacted B4>, t20220505@ <Redacted B4> , b. Vitamin D3. 로트 번호: t20220303@ <Re dacted B4> t202 20 304@ <Redacted B4> t20220322@ < Redacted B4>,t202204 19@ <Redacted B4>, t20220504@ <Redacted B4, t20220506@ <Redacted B4>, t20220517@<Redacted B4>, t20220613@ <Redacted B4> c. Glycerin, 로트 번호:t20220303@ <Redacted B4>, t20220309@ <Redacted B4>, t2022042l@<Redacted B4>, t20220603@<Redacted B4 > d. Prednisolone, 로트 번호:t202205l9@<R edacted B4> 귀사는 2022년 1월부터 2022년 9월까지 무균 의약품에 첨가되는 <Redacted B4>을 멸균하고 무균 의약품으로 의도된 의약품에 쓰는 유리 기구를 <Redacted B4>하는 데 사용한 <Redacted B4> 사이클의 <Redacted B4>에서 B.I.를 사용해 사이클의 유효성을 확인하지 않았다. 또한 귀사는 멸균하도록 의도된 <Redacted B4>을 운반한다"
+ },
+ {
+  "finding_id": "finding-8ab7cbf5dd14fb7a6ed137e3",
+  "finding_text_md5": "c58a00cd1de1587e7aa7b628658a5b45",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, 1. On 11/09/2022, I observed employees clean the ISO 5 area while wearing non-sterile lab coats.",
+  "detail_text_ko": "구체적으로, 1. 11/09/2022에 실사관은 직원들이 멸균되지 않은 실험복을 착용한 채 ISO 5 구역을 청소하는 것을 관찰했다."
+ },
+ {
+  "finding_id": "finding-836b4b424961738a4bb81eac",
+  "finding_text_md5": "f0a5e6c50892d9e00df73a4c3b54fa66",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, I observed <Redacted B4> back panel of your <Redacted B4> ISO Class 5 LAFW (laminar airflow workstation), model number <Redacted B4>, serial number <Redacted B4> , which is used to produce all hazardous (hormone) sterile drug products since approximately April 2022. On 09/01/22, your Lead Sterile Technician stated the <Redacted B4> is used to cover the mounting holes for <Redacted B4> lamps. ISO class 5 equipment surfaces should be completely smooth and easy to clean. Add Continuation Page",
+  "detail_text_ko": "구체적으로, 실사관은 약 2022년 4월 이후 모든 위해(호르몬) 무균 의약품을 생산하는 데 쓰이는, 귀사의 <Redacted B4> ISO Class 5 LAFW(층류 작업대), 모델 번호 <Redacted B4>, 일련번호 <Redacted B4> 의 <Redacted B4> 뒷면 패널을 관찰했다. 09/01/22에 귀사 수석 무균 기술자(Lead Sterile Technician)는 <Redacted B4>가 <Redacted B4> 램프의 장착 구멍을 덮는 데 쓰인다고 진술했다. ISO Class 5 설비의 표면은 완전히 매끄럽고 세척하기 쉬워야 한다. Add Continuation Page"
+ },
+ {
+  "finding_id": "finding-642830cce77805c36f7c05fa",
+  "finding_text_md5": "2987e8f9d00e1d3f42ed209573f65e0d",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, uni-directional airflow was not verified under operational conditions. You never performed any dynamic smoke studies for your <Redacted B4> ISO Class 5 LAFW (laminar airflow workstation), model number <Redacted B4> serial number <Redacted B4>, which is used to produce all hazardous (hormonee) stterile drug products since approximately April 2022. In addition, on 09/01/22, your Lead Sterile Technician stated <Redacted B4> sealed the approximate <Redacted B4> inch circular opening on the back panel of the <Redacted B4> ISO Class 5 LAFW with <Redacted B4> when it was installed around April 2022. No studies have been performed to ensure the sealed opening does not leak or disrupt laminar airflow. Since approximately 05/31/22, your firm has produced and dispensed approximately <Redacted B4> lots of hazardous sterile drug products using this ISO Class 5 LAWF.",
+  "detail_text_ko": "구체적으로, 단방향 기류가 작동 조건에서 확인되지 않았다. 귀사는 약 2022년 4월 이후 모든 위해(hormonee) 무균(stterile) 의약품을 생산하는 데 쓰이는 <Redacted B4> ISO Class 5 LAFW(층류 작업대), 모델 번호 <Redacted B4> 일련번호 <Redacted B4>에 대해 동적 연기 시험을 한 번도 수행하지 않았다. 또한 09/01/22에 귀사 수석 무균 기술자는 2022년 4월경 설치 당시 <Redacted B4>가 <Redacted B4> ISO Class 5 LAFW 뒷면 패널의 약 <Redacted B4> 인치 원형 개구부를 <Redacted B4>로 밀봉했다고 진술했다. 밀봉된 개구부가 새지 않고 층류를 교란하지 않음을 보증하기 위한 시험은 수행된 바 없다. 약 05/31/22 이후 귀사는 이 ISO Class 5 LAWF를 사용해 약 <Redacted B4> 로트의 위해 무균 의약품을 생산해 조제·공급했다."
+ },
+ {
+  "finding_id": "finding-507f28cf8e4f504416837fc6",
+  "finding_text_md5": "4f96f5c5d7b0a2adfd92aad9a795544e",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, the <Redacted B4> contact time listed in you SOP S110108 Deactivation, Decontamination, Cleaning, and Disinfection Program (DDCD) for Receiving, Storage, and Manufacturing Areas Sections 7.1.1.1 and 7.2.4 and SOP S302002 Facility Cleaning and Maintenance Section 7.1.5.4.1 was not in keeping with the <Redacted B4> manufacturer's recommended <Redacted B4> contact time. lJ!~.ti±LJ Food, Drug, and Cosmetic Act",
+  "detail_text_ko": "구체적으로, 귀사의 SOP S110108 Deactivation, Decontamination, Cleaning, and Disinfection Program (DDCD) for Receiving, Storage, and Manufacturing Areas의 7.1.1.1항과 7.2.4항 및 SOP S302002 Facility Cleaning and Maintenance의 7.1.5.4.1항에 기재된 <Redacted B4> 접촉 시간은 <Redacted B4> 제조업체가 권장하는 <Redacted B4> 접촉 시간과 일치하지 않았다. lJ!~.ti±LJ Food, Drug, and Cosmetic Act"
+ },
+ {
+  "finding_id": "finding-47a7c5841535d0f8af209bb1",
+  "finding_text_md5": "5fdf0e0894934284be7c6e894c4e0403",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, A. While watching sterile cleanroom activities on 11/07/2022, we observed <Redacted B4>, <Redacted B4> remam open simultaneously for <Redacted B4> to the unclassified non-sterile non-hazardous laboratory area as an employee was leaving the non-hazardous sterile cleanroom suite. Additionally, this occurred while another employee was preparing to enter the ISO 5 LAF workbench for sterile drug production. B. During the walkthrough on 11/02/2022, we observed a rust-like discoloration on the diffuser of one HEPA filter in your ISO 7 anteroom of your non-hazardous sterile suite, where we observed employees prepare and mix drug products.",
+  "detail_text_ko": "구체적으로, A. 11/07/2022에 무균 클린룸 활동을 지켜보던 중, 실사팀은 직원이 비위해 무균 클린룸 구역을 나서는 동안 <Redacted B4>, <Redacted B4>가 비등급 비무균 비위해 시험실 구역으로 통하는 <Redacted B4>에 대해 동시에 열려(remam open) 있는 것을 관찰했다. 또한 이는 다른 직원이 무균 의약품 생산을 위해 ISO 5 LAF 작업대에 들어가려 준비하던 중에 발생했다. B. 11/02/2022 현장 순회 중, 실사팀은 직원들이 의약품을 준비하고 혼합하는 비위해 무균 구역의 ISO 7 전실에서 HEPA 필터 하나의 디퓨저에 녹과 같은 변색이 있는 것을 관찰했다."
+ },
+ {
+  "finding_id": "finding-4475dbcea821d3e8f7edeb67",
+  "finding_text_md5": "da93faed9746255884978e375b208765",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, on l l/04/2?22 and 11/07/2022, we observed employees use <Redacted B4> to clean and sanitize materials entering into the ISO 5 LAFW areas. Your employee was observed spraying a <Redacted B4> and then cleaning the work surfaces and equipment inside of the ISO 5 LAFW bench area. Additionally, the <Redacted B4> was observed moving from the ISO 8 Anteroom/Gown <Redacted B4> to the ISO 8 <Redacted B4> cleanroom to be used and placed in the ISO 5 LAFW bench area without being sanitized. EIIAPLOYEE(S) SIGNATURE",
+  "detail_text_ko": "구체적으로, l l/04/2?22 및 11/07/2022에 실사팀은 직원들이 ISO 5 LAFW 구역으로 반입되는 물품을 세척하고 소독하는 데 <Redacted B4>를 사용하는 것을 관찰했다. 귀사 직원이 <Redacted B4>를 분사한 뒤 ISO 5 LAFW 작업대 구역 안의 작업 표면과 설비를 닦는 것이 관찰되었다. 또한 <Redacted B4>가 소독되지 않은 채 ISO 8 전실/무균복 <Redacted B4>에서 ISO 8 <Redacted B4> 클린룸으로 옮겨져 ISO 5 LAFW 작업대 구역에서 사용되고 놓이는 것이 관찰되었다. EIIAPLOYEE(S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-361cb8646a37e7733a9ad0df",
+  "finding_text_md5": "8aeb34d4c000be95fe69e7ad26119a35",
+  "published_date": "2023-01-30",
+  "detail_text": "Specifically, A. Your media fill program is deficient in that your media fills are not representative of batch sizes and container types. Your media fills are performed in <Redacted B4>. However, your firm prepares <Redacted B4> using other container types that yield the following: up to <Redacted B4> filled at <Redacted B4>, up to <Redacted B4> syringes filled at <Redacted B4>, up to <Redacted B4> eye-drop-containers (filled at <Redacted B4>, and <Redacted B4> inhalation tubes (filled a <Redacted B4>. B. Your media fill program is deficient in that media fills do not include all equipment used in the preparation of drug products intended to be sterile. For instance, a <Redacted B4> is used to fill an IV bag to dose liquid drug product intended to be sterile into syringes for bladder irrigation prescriptions hM.uN_ EMPLOYEE!S) SIGNATURE",
+  "detail_text_ko": "구체적으로, A. 귀사의 배지충전 프로그램은 배지충전이 배치 크기와 용기 유형을 대표하지 못한다는 점에서 미흡하다. 귀사의 배지충전은 <Redacted B4>에서 수행된다. 그러나 귀사는 다른 용기 유형을 사용해 <Redacted B4>를 준비하며, 그 결과는 다음과 같다. <Redacted B4>에서 충전하는 최대 <Redacted B4>, <Redacted B4>에서 충전하는 최대 <Redacted B4> 주사기, <Redacted B4>에서 충전하는 최대 <Redacted B4> 점안 용기, 그리고 <Redacted B4>에서 충전하는 <Redacted B4> 흡입 튜브. B. 귀사의 배지충전 프로그램은 배지충전이 무균 의약품으로 의도된 의약품의 조제에 쓰는 모든 설비를 포함하지 않는다는 점에서 미흡하다. 예를 들어 방광 세척 처방용 주사기에 무균 액상 의약품을 소분하기 위해 IV 백을 채우는 데 <Redacted B4>가 사용된다. hM.uN_ EMPLOYEE!S) SIGNATURE"
+ },
+ {
+  "finding_id": "finding-ecd4ec62f96bd5ab4308b790",
+  "finding_text_md5": "c98c46d99a6082c6aba6d9233030a90d",
+  "published_date": "2023-01-18",
+  "detail_text": "1. The summaiy of closed laborato1y OOS investigations conducted by the fnm during the period beginning from Janua1y 2020 to November 22, 2022, is as follows: Samples OOS investi2ations i\\Talid Invalid % Invalid Raw materials/in­ ~79 l215 l264 55 process materials/finished products/ Review of the fnm's OOS investigation reports found that the original failed results were invalidated without a scientifically sound root cause, and results of passing re-test results were repo1ied as the result of record. For example,",
+  "detail_text_ko": "1. 2020년 1월부터 2022년 11월 22일까지의 기간 동안 해당 업체가 수행한 종결된 시험실 OOS 조사의 요약은 다음과 같다. Samples OOS investi2ations i\\Talid Invalid % Invalid Raw materials/in­ ~79 l215 l264 55 process materials/finished products/ 업체의 OOS 조사 보고서를 검토한 결과, 최초의 부적합 결과가 과학적으로 타당한 근본 원인 없이 무효화되었고 적합한 재시험 결과가 기록 결과로 보고되었다. 예를 들어,"
+ },
+ {
+  "finding_id": "finding-d5844022033eb424f7250b47",
+  "finding_text_md5": "854af6150ba11144ba9103329ab6f85f",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically, 1. Your drug product stability program for commercial drug products labeled with a <Redacted B4> does not include data from direct testing of those products produced in your facility. To -ate you ave not placed any drng products/lots produced in your facility on a stability testing program . Your stability program and current <Redacted B4> for all drug products is based on data derived from testing of stability products/lots produced for this purpose in other facilities.",
+  "detail_text_ko": "구체적으로, 1. <Redacted B4>이 표시된 상업용 의약품에 대한 귀사의 의약품 안정성 프로그램은 귀사 시설에서 생산된 제품을 직접 시험한 데이터를 포함하지 않는다. To -ate you ave not 귀사 시설에서 생산한 어떤 drng products/lots 도 안정성 시험 program 에 올리지 않았다. 모든 의약품에 대한 귀사의 안정성 프로그램과 현재 <Redacted B4>는 이 목적으로 다른 시설에서 생산된 안정성 제품/로트의 시험에서 얻은 데이터에 근거한다."
+ },
+ {
+  "finding_id": "finding-bcb12dae2273e664475e5710",
+  "finding_text_md5": "eb25f00bbc0eafd84e76e6ab2a0720f9",
+  "published_date": "2023-01-18",
+  "detail_text": "I .Your air flow pattern study conducted on your Mobile Air Flow Unit (i.e., Mobile(bl (~) I; Equipment ID SR1047); Protocol MQP-SR000S-00; approved on 30 November 2019 and used to ensure unidirectional airflow during the commercial filling process for USA products is inadequate. The airflow pattern study video demonstrates how airflow from the mobile unit enters Zone ~I> through the l(b) <4) ] during the process ofmanually transfeITing sterilized equipment 4 paiis/components to the filling line. This process takes (b) <) Ito complete. During all this time, the (b) <4) j remains open. In addition, the routine operators' intervention \"loading offbl <4) Istoppers during filling\" is perfo1m ed by opening thefbl <4)",
+  "detail_text_ko": "I .귀사의 이동식 공기 흐름 장치(즉, Mobile(bl (~) I; Equipment ID SR1047)에 대해 수행되어 2019년 11월 30일(30 November 2019)에 승인된 공기 흐름 패턴 시험(Protocol MQP-SR000S-00)은 USA 제품의 상업적 충전 공정 중 단방향 기류를 보증하는 데 쓰이지만 부적절하다. 공기 흐름 패턴 시험 영상은 멸균된 설비 4 부품/구성품을 충전 라인으로 수작업 이송하는 동안 이동식 장치의 기류가 l(b) <4) ]를 통해 Zone ~I>으로 들어오는 모습을 보여준다. 이 작업은 완료하는 데 (b) <) I가 걸린다. 그 시간 내내 (b) <4) j는 열려 있다. 또한 일상적 작업자 개입인 \"충전 중 offbl <4) I 마개 장입(loading)\"은 thefbl <4)를 열어서 수행된다."
+ },
+ {
+  "finding_id": "finding-ac1cb949ca441c519b6aedb9",
+  "finding_text_md5": "dfde1d4fb81a9b2c1d3e22d738a55b24",
+  "published_date": "2023-01-18",
+  "detail_text": "I.Environmental monitoring samples were not counted accurately. On November 22, 2022, review ofplates from QCl that had been counted by one analyst and checked by a second analyst, found the reported result to be less than the number of colonies on the plate. For example: a.Point (b) <4> , swab from the (b) <4> J.stopper chute parenteral line i (Block f ), associated with aseptically filled batch (b) <4>~ ·-·7 odb) <4> IInjection (US market) on November 16, 2022. The repo1ted result was \"Nil\", but the plate was observed to have~ CFU. This sample was collected from a Grade A area with an action limit of~ CFU. b.Point (b) <4> settle plate in the Grade C area of Manufacturing { , associated with batch fb) <4> 1offb) <4> IInjection on November 16, 20 2. The rep01ted result wast CFU, but the plate was observed to havel CFU. c.Point tb) <4>Left Hand, personnel monitoring sa~le from Grade C associated with the manufacturing of aseptically filled batch tb) <4> offb) <4> IInjection on November 16, 2022. The repo1ted result was1~ CFU, but the plate was observed to havet CFU.",
+  "detail_text_ko": "I.환경 모니터링 시료가 정확하게 계수되지 않았다. 2022년 11월 22일 한 분석자가 계수하고 두 번째 분석자가 확인한 QCl의 평판을 검토한 결과, 보고된 결과가 평판의 실제 집락 수보다 적었다. 예를 들어: a.지점 (b) <4> , 2022년 11월 16일 무균 충전된 배치 (b) <4>~ ·-·7 odb) <4> IInjection (US market)와 관련된 (b) <4> J.마개 슈트 주사제 라인 (Block f )의 스왑. 보고된 결과는 \"Nil\"이었으나 평판에서는 ~ CFU가 관찰되었다. 이 시료는 조치 한도가 ~ CFU인 Grade A 구역에서 채취되었다. b.지점 (b) <4> 제조 구역(Manufacturing { )의 Grade C 구역 낙하균 평판. 2022년 11월 16일 배치 fb) <4> 1offb) <4> IInjection과 관련되며 (20 2). 보고된 결과(rep01ted)는 t CFU였으나 평판에서는 l CFU가 관찰되었다. c.지점 tb) <4>Left Hand, 2022년 11월 16일 무균 충전된 배치 tb) <4> offb) <4> IInjection의 제조와 관련된 Grade C의 작업자 모니터링 시료. 보고된 결과는 1~ CFU였으나 평판에서는 t CFU가 관찰되었다."
+ },
+ {
+  "finding_id": "finding-a461d19efa0857a5091d8ae7",
+  "finding_text_md5": "bc44f99bf5326e5281c3e08d829cd0ce",
+  "published_date": "2023-01-18",
+  "detail_text": "There is no assurance that your process simulation studies (media fill ~ perfo1med onl(b) <4) JBlockt Line< (Equipment ID PP 049) and General Parenterals Block ~ 15 Line 1b (Equipment ID SR 1031) are representative of the cmTent commercial manufacturing operations. This is evidenced in that, although coITective and non-coITective operator's interventions are simulated during the media fills, the historical data of the previous commercial filled batches is not evaluated prior to cany out the~b)<4) Iprocess simulation activities. Your cmTent practice is to simulate operator's interventions that have been identified in previous media fills without considering those that were caITied out during the commercial fill process. Based on that, the duration at which the interventions are also simulated in the process simulations are not accurately established. In addition, Protocol No. RAPSSP/02-SR000l -03 entitled \"Requalification Protocol [Aseptic Process Simulation Study/Media Fill For Vial Filling Line~~~]; approved on 31 May 2022, states that a single non-routine intervention identified as \"maintenance ofmachine by engineeringperson\" should be simulated Not Less Thanfbl <4~ times. Howeve",
+  "detail_text_ko": "onl(b) <4) JBlockt Line< (Equipment ID PP 049) 및 General Parenterals Block ~ 15 Line 1b (Equipment ID SR 1031)에서 수행된 귀사의 공정 시뮬레이션 시험(배지충전)이 현재의 상업 생산 작업을 대표한다는 보증이 없다. 배지충전 중 교정 개입과 비교정 개입을 모의하기는 하지만, ~b)<4) I 공정 시뮬레이션을 수행하기 전에 이전 상업 충전 배치의 과거 데이터를 평가하지 않는다는 점에서 이를 알 수 있다. 귀사의 현재 관행은 이전 배지충전에서 확인된 작업자 개입을 모의하는 것이며, 상업 충전 공정 중에 수행된 개입은 고려하지 않는다. 이에 따라 공정 시뮬레이션에서 모의하는 개입의 지속 시간도 정확하게 설정되지 않았다. 또한 2022년 5월 31일(31 May 2022) 승인된 Protocol No. RAPSSP/02-SR000l -03 \"Requalification Protocol [Aseptic Process Simulation Study/Media Fill For Vial Filling Line~~~]\"는 \"maintenance ofmachine by engineeringperson\"으로 확인된 단일 비일상 개입을 Not Less Thanfbl <4~ 회 모의해야 한다고 규정한다. 그러나"
+ },
+ {
+  "finding_id": "finding-886a9fc4807542c9d7a9d969",
+  "finding_text_md5": "3340e2b1757b88b402da128fef8ed4b3",
+  "published_date": "2023-01-18",
+  "detail_text": "Your fom has not perfo1med analytical method validation of inhouse tests methods and verification of compendia! test methods for the approved and pending dmg applications. The number of raw materials pending for validation and verification is tabulated below: US Market Dmg Products StatusRaw Materials Pending for Validation of Inhouse Analytical MethodRaw Materials Pending for",
+  "detail_text_ko": "귀사는 승인된 의약품 허가신청 및 계류 중인 의약품 허가신청에 대해 자체 시험법의 분석법 밸리데이션(perfo1med)과 공정서 시험법의 베리피케이션을 수행하지 않았다. 밸리데이션 및 베리피케이션이 계류 중인 원료물질 수는 아래 표와 같다. US Market Dmg Products StatusRaw Materials Pending for Validation of Inhouse Analytical MethodRaw Materials Pending for"
+ },
+ {
+  "finding_id": "finding-842e3d0729a8e1c3ce92d87d",
+  "finding_text_md5": "735f2c5aca8a06c1ce5f7a88159a29a8",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically: You have not evaluated the airflow pattern in all your ISO 5 <Redacted B4> Laminar Flow Hoods under <Redacted B4> conditions stimulating <Redacted B4> aseptic operation performed in each hood during sterile-to-sterile compounding and aseptic filling of your drug products intended to be sterile. Inspectional evaluation of your ISO 5 area airflow pattern studies; Document No: <Redacted B4> Risk Assessment Regarding the Equivalency of the LFH through the process of <Redacted B4> smoke studies, Approved Date: 05/26/2022; and List of Commercial Batches Compounded related with hood smoke studies in <Redacted B4> revealed that <Redacted B4> products/lots were roduced during the period 02/22/2022 to the present through ase tic operations performed in ISO 5 <Redacted B4> Laminar Flow Hoods for which there was no direct <Redacted B4> airflow pattern evaluation. For example Fentanyl Citrate 50 me /ml (100 mcg per 2 ml) in 0.9% Sodium Chloride Injection, NDC <Redacted B4> Lot No: <Redacted B4> Expiry: 07/15/2022 was produced in cleanroom suite <Redacted B4> and filled in ISO 5 <Redacted B4> .Laminar Flow Hood No.: <Redacted B4> which was not directly assessed in an airflow patter",
+  "detail_text_ko": "구체적으로: 귀사는 무균 의약품으로 의도된 의약품의 무균 조제 및 무균 충전(sterile-to-sterile compounding and aseptic filling) 중 각 후드에서 수행하는 <Redacted B4> 무균 작업을 모의하는 <Redacted B4> 조건에서 모든 ISO 5 <Redacted B4> 층류 후드의 기류 패턴을 평가하지 않았다. 귀사의 ISO 5 구역 기류 패턴 시험, Document No: <Redacted B4> Risk Assessment Regarding the Equivalency of the LFH through the process of <Redacted B4> smoke studies(Approved Date: 05/26/2022), 그리고 List of Commercial Batches Compounded related with hood smoke studies in <Redacted B4>를 실사 검토한 결과, 02/22/2022부터 현재까지 직접적인 <Redacted B4> 기류 패턴 평가가 없는 ISO 5 <Redacted B4> 층류 후드에서 수행된 무균 작업을 통해 <Redacted B4> 제품/로트가 생산되었다. 예를 들어 Fentanyl Citrate 50 me /ml (100 mcg per 2 ml) in 0.9% Sodium Chloride Injection, NDC <Redacted B4> Lot No: <Redacted B4> Expiry: 07/15/2022는 클린룸 구역 <Redacted B4>에서 생산되어 ISO 5 <Redacted B4> .층류 후드 No.: <Redacted B4>에서 충전되었으며, 이 후드는 직접 평가되지 않았다"
+ },
+ {
+  "finding_id": "finding-77af4315272f60d646131ef6",
+  "finding_text_md5": "4ffd69476efaa6eeb38320166daee081",
+  "published_date": "2023-01-18",
+  "detail_text": "I .Process validation studies do not include complete data to demonstrate the manufacturing process is in a state ofcontrol and there is no establishment of criteria to evaluate intra-batch or inter- batch variability. Failure to establish criteria to evaluate intra-batch and inter-batch variability during process validation is a common approach that has been used for all products distributed to the US market. For example: 4 a.During the (b) <> j Injection~~~ mg/vial process validation, batch tb) <4>~J was not ,evaluated for intra-batch variability. Samples collected from different{b) <4> on the 4 4 (b) <> Iranged from ~b) % to1<b) % for the1<b) <> I impurity, compared to a limit of ~o ~ W (4) 1/o. There was no evaluation of inter-batch vai·iability. Process validation data showed the",
+  "detail_text_ko": "I .공정 밸리데이션 시험에 제조 공정이 관리 상태에 있음을 입증하는 완전한 데이터가 포함되어 있지 않으며, 배치 내 또는 배치 간 변동성을 평가하는 기준이 설정되어 있지 않다. 공정 밸리데이션 중 배치 내 및 배치 간 변동성을 평가하는 기준을 설정하지 않은 것은 미국(US) 시장에 유통되는 모든 제품에 사용된 일반적인 접근 방식이다. 예를 들어: 4 a.(b) <> j Injection~~~ mg/vial 공정 밸리데이션 중 배치 tb) <4>~J는 배치 내 변동성이 평가되지 않았다. 4 4 (b) <> I의 서로 다른 {b) <4>에서 채취한 시료는 1<b) <> I 불순물에 대해 ~b) % 내지 1<b) % 범위였으며, 한도는 ~o ~ W (4) 1/o였다. 배치 간 변동성(vai·iability)은 평가되지 않았다. 공정 밸리데이션 데이터는"
+ },
+ {
+  "finding_id": "finding-75f324620d9e70c920acccff",
+  "finding_text_md5": "87d1db91c09b78e6cc4f12c386b64678",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically: I. a. On 05/24/2022 during the aseptic filling of Ketamine HCL 50 mg per ml Injection, NDC <Redacted B4>, Lot No: <Redacted B4> in cleanroom 142-6 within ISO 5 <Redacted B4> Laminar Flow Hood: <Redacted B4>, we observed that airborne particulate monitoring was performed <Redacted B4> for approximately <Redacted B4> during the operation. You do not provide scientific justification for the frequency and duration of airborne particulate monitoring performed during aseptic operations in the critical zone of the ISO 5 <Redacted B4> Laminar Flow Hood. Your airborne particulate monitoring program for aseptic operations is not designed and conducted to provide meaningful data to support the quality of your drug products intended to be sterile. You do not monitor airborne particulates to ISO 5 air classifications throughout aseptic operations and the orientation of the particle counter <Redacted B4> is not directed into the flow of air during monitoring. For example: b. On 05/24/2022 during the aseptic filling of Ketamine HCL 50 mg per ml Injection, NDC <Redacted B4>, Lot No: <Redacted B4> in cleanroom 142-6 within ISO 5 <Redacted B4> Laminar Flow Hood No: <Redacted B4> we obs",
+  "detail_text_ko": "구체적으로: I. a. 05/24/2022에 클린룸 142-6 안의 ISO 5 <Redacted B4> 층류 후드 <Redacted B4>에서 Ketamine HCL 50 mg per ml Injection, NDC <Redacted B4>, Lot No: <Redacted B4>를 무균 충전하는 동안, 실사팀은 작업 중 약 <Redacted B4> 동안 <Redacted B4> 부유 입자 모니터링이 수행되는 것을 관찰했다. 귀사는 ISO 5 <Redacted B4> 층류 후드의 핵심 구역에서 무균 작업 중 수행하는 부유 입자 모니터링의 빈도와 지속 시간에 대한 과학적 근거를 제시하지 않는다. 귀사의 무균 작업용 부유 입자 모니터링 프로그램은 무균 의약품으로 의도된 의약품의 품질을 뒷받침하는 의미 있는 데이터를 제공하도록 설계·수행되지 않았다. 귀사는 무균 작업 전반에 걸쳐 ISO 5 공기 등급 기준으로 부유 입자를 모니터링하지 않으며, 입자 계수기 <Redacted B4>의 방향이 모니터링 중 공기 흐름 쪽으로 향하지 않는다. 예를 들어: b. 05/24/2022에 클린룸 142-6 안의 ISO 5 <Redacted B4> 층류 후드 No: <Redacted B4>에서 Ketamine HCL 50 mg per ml Injection, NDC <Redacted B4>, Lot No: <Redacted B4>를 무균 충전하는 동안 실사팀은"
+ },
+ {
+  "finding_id": "finding-3ba90692ae8028549b9fa34c",
+  "finding_text_md5": "54f1cc7af4874e6ead4a851a28a6ee18",
+  "published_date": "2023-01-18",
+  "detail_text": "There is no procedure describing the use ofmanually entered integration events, including baseline points, tailing sensitivity, fronting sensitivity, and peak slice for processing chromatography data. The analysts are pennitted to manually enter these and other integration events and reprocess the chromatograms. The reviewers only review the final chromatogram and do not review the originally processed chromatogram to ensure the manually entered integration events are justified. Procedure SE/BQC/00165 \"Interpretation of Chromatograms\" requires manual integration be documented clearly stating the reason the manual integration was perfo1med and the initials of the section head for approval. But when analysts manually enter integration events to force the software to integrate in a specific way, there is no siinilar documented justification and approval process. The reviewers approved chromatograms integrated with manually entered integration events that were not consistent with procedure SE/BQC/00165. For example: 4 I.Stability analysis offb) <4> IInjection ~! mg/ml lotfb> < ~ at the 36-month 25°/60%RH condition was originally processed by the software with an area that fiave a resul",
+  "detail_text_ko": "수동으로 입력하는 적분 이벤트(기준선 지점, tailing sensitivity, fronting sensitivity, peak slice 포함)를 크로마토그래피 데이터 처리에 사용하는 방법을 기술한 절차서가 없다. 분석자는 이러한 적분 이벤트와 그 밖의 적분 이벤트를 수동으로 입력하고 크로마토그램을 재처리할 수 있다. 검토자는 최종 크로마토그램만 검토하고, 수동 입력 적분 이벤트가 타당한지 확인하기 위해 최초로 처리된 크로마토그램은 검토하지 않는다. 절차서 SE/BQC/00165 \"Interpretation of Chromatograms\"는 수동 적분을 수행한 이유를 명확히 기재하고 부서장(section head)의 이니셜로 승인받아 문서화할 것을 요구한다. 그러나 분석자가 소프트웨어가 특정 방식으로 적분하도록 강제하기 위해 적분 이벤트를 수동으로 입력할 때는 이와 유사한 문서화된 근거와 승인 절차가 없다. 검토자는 절차서 SE/BQC/00165에 부합하지 않는, 수동 입력 적분 이벤트로 적분된 크로마토그램을 승인했다. 예를 들어: 4 I.36개월 25°/60%RH 조건의 offb) <4> IInjection ~! mg/ml lotfb> < ~ 안정성 분석은 처음에 소프트웨어가 처리한 면적에서 fiave a resul"
+ },
+ {
+  "finding_id": "finding-3249716dac0cca760b9221f2",
+  "finding_text_md5": "ccb77f8376a7221663cdde8408dd38ce",
+  "published_date": "2023-01-18",
+  "detail_text": "I .Assessments to evaluate data integrity conti·ols were conducted for 183 manufacturing equipment and systems as pa1t of PQ160193. The assessment repo1t approved Mru.·ch 5, 2018, found there were 149 equipment that required upgraded individual access conti·ols and privileges; 76 that required resti·ictions for changing the clocks; 113 that needed upgrading for saving elecu-onic data; and 119 that needed upgrading for audit ti-ails. There was no documentation in the quality system to ensure proper conti·ols were implemented through upgrading of the softwai·e or",
+  "detail_text_ko": "I .PQ160193의 일환으로 제조 설비 및 시스템 183개에 대해 데이터 완전성 관리를 평가하는 평가가 수행되었다. 2018년 3월 5일(March 5, 2018) 승인된 평가 보고서는 개별 접근 관리와 권한의 개선이 필요한 설비가 149개, 시계 변경 제한이 필요한 설비가 76개, 전자 데이터 저장 개선이 필요한 설비가 113개, 감사 추적 개선이 필요한 설비가 119개임을 확인했다. 소프트웨어 업그레이드를 통해 적절한 관리가 구현되었음을 보증하는 문서가 품질 시스템에 없었다"
+ },
+ {
+  "finding_id": "finding-16899fe44332565a50dac192",
+  "finding_text_md5": "102ac90b9b647e2b08c7e8e72d9d6606",
+  "published_date": "2023-01-18",
+  "detail_text": "Specifically, There is a cascade of failure in your Quality Unit's lack of oversight on the control and management of GMP documents that are critical in ensuring the drng products manufactured and tested at your site are safe and effective. For example, I.On 22-Nov-2022, we observed your Quality Control (QC) Laborato1y, Production and Engineering department employees destroyed GMP documents pe1iaining to original records and raw data by tearing it into pieces and disposed inside your QC laborato1y and General Parenteral Scrap areas. These areas suppo1i the manufacturing and testing activities for the drng products sold in the USA market. Additionally, we found a trnck full of transparent plastic bags containing shredded documents and black plastic bags mostly containing documents tom randomly into pieces by hand mixed with other scrap materials. This tiuck was found about 150 meters away from your facility as it was waiting for the clearance to remove scrap materials from Specialized Economic Zone (SEZ). Upon interviewing the tiuck driver and verifying shredded and tom pieces of documents, we were told that the plastic bags containing disposed documents belonged to your facility th",
+  "detail_text_ko": "구체적으로, 귀사 사이트에서 제조·시험되는 의약품이 안전하고 유효하도록 보장하는 데 핵심적인 GMP 문서의 관리와 운영에 대한 귀사 품질 부서의 감독 부재로 연쇄적인 실패가 있다. 예를 들어, I.22-Nov-2022에 실사팀은 귀사 품질관리(QC) 시험실, 생산 및 엔지니어링 부서 직원들이 원본 기록과 원시 데이터에 해당하는 GMP 문서를 조각조각 찢어 귀사 QC 시험실과 General Parenteral 폐기물 구역에 버리는 것을 관찰했다. 이 구역들은 미국(USA) 시장에서 판매되는 의약품의 제조 및 시험 활동을 지원한다. 또한 파쇄된 문서가 든 투명 비닐봉지와, 손으로 무작위로 조각조각 찢은 문서가 다른 폐기물과 섞여 든 검은 비닐봉지가 가득 실린 트럭을 발견했다. 이 트럭은 특별경제구역(SEZ)에서 폐기물을 반출하기 위한 통관을 기다리며 귀사 시설에서 약 150미터 떨어진 곳에 있었다. 트럭 운전사와의 면담 및 파쇄·찢긴 문서 조각의 확인 과정에서, 폐기 문서가 든 비닐봉지는 귀사 시설의 것이라는 말을 들었다"
+ },
+ {
+  "finding_id": "finding-03cc3955d7f125a1d481d7fe",
+  "finding_text_md5": "289dbb3e09f807d3d08106bb9c29f2a6",
+  "published_date": "2023-01-18",
+  "detail_text": "On November 14E2022, a US market complaint w.as received for a caiion labeled as ~b)l4) Jmg that contained a b) <4> 1mg vial, lot (b) <4) 1- Accord Healthcare, the Intas US subsidiaiy, received the complaint sample and provided pictures on November 16, 2022, confnming the incon ect ca1ion was used. The ca1ion and vial were received on site on November 21, 2022, fmi her confnming the mix-up.",
+  "detail_text_ko": "2022년 11월 14일(November 14E2022)에 (b)l4) Jmg로 표시된 카톤에 b) <4> 1mg 바이알, 로트 (b) <4) 1이 들어 있었다는 미국(US) 시장 불만이 접수되었다. Intas의 미국 자회사인 Accord Healthcare는 불만 시료를 접수해 2022년 11월 16일 사진을 제공했으며, 잘못된 카톤이 사용되었음을 확인했다. 카톤과 바이알은 2022년 11월 21일 현장에 도착했으며, 혼입(mix-up)이 다시 확인되었다."
+ },
+ {
+  "finding_id": "finding-0277491799eaef8c6f841272",
+  "finding_text_md5": "92aa70d516a863c91472538121376c24",
+  "published_date": "2023-01-18",
+  "detail_text": "I.Change control SE/CRF/2O21/1O86 approved the chan~ of the expiration date for (b)(4) 4 ~ jection ~~! m ml {~~I ml from (b) (,J) to lb) < > __J. Stability data showed th-e\"\"'i_m_p_w\"\"'·i_ty_ 4 lb) < > increased during the shelf life and for the three stability 4 batches ((b) < > r­--,---. r­~..,....,.----,--.-.,) used to sueport the change, the value for this impurity wasmo/~~~) %, andl~l % (reportab e value of~~ ~ % ), compared to a specification of not more than m]%. There was no thorough evaluation ofwhether all commercial batches, including 4 batches released with a higher initial amount oflb) < > .------------' such as lot 4 4 lb) < > , would meet this specification until (b) < >---­ 2.Change control SE/CRF/2O21/1O86 approved the change of the expiration date for (b)(4) 4 4 Injection mmg/vial from tb) (4) to (b) < > . Stability batch (b) < > was u-s-e\"\"'d-to- su_p_p_O_Ii 4 the change. This batch had a repo1ied value of1~l % for the Slllll ofCb) < > Impurities at the 36-month time point, compared to a specification ofnot more than}~! %. The~·e was no thorough 4 evaluation of whether commercial batches would meet this specification until (b) < > if they have similar increases i",
+  "detail_text_ko": "I.변경 관리 SE/CRF/2O21/1O86은 (b)(4) 4 ~ jection ~~! m ml {~~I ml의 유효기간을 (b) (,J)에서 lb) < >로 변경하는 것을 승인했다. 안정성 데이터는 불순물(impurity) 4 lb) < >가 유통기한 동안 증가했음을 보였고, 변경을 뒷받침하는 데 쓰인 안정성 배치 3개 4 ((b) < > r­--,---. r­~..,....,.----,--.-.,)에서 이 불순물의 값은 mo/~~~) %, l~l %였으며(보고 값 reportab e ~~ ~ %), 규격은 m]% 이하였다. 초기 함량이 더 높게 출시된 4개 배치(예: 로트 4 4 lb) < >)를 포함한 모든 상업 배치가 이 규격을 충족할지에 대한 철저한 평가가 (b) < >까지 없었다. 2.변경 관리 SE/CRF/2O21/1O86은 (b)(4) 4 4 Injection mmg/vial의 유효기간을 tb) (4)에서 (b) < >로 변경하는 것을 승인했다. 안정성 배치 (b) < >가 변경을 뒷받침하는 데 사용되었다. 이 배치는 36개월 시점에서 Cb) < > 불순물 합계가 1~l %로 보고되었으며 규격은 {~! % 이하였다. 상업 배치가 유사한 증가를 보일 경우 이 규격을 충족할지에 대한 철저한 평가는 (b) < >까지 없었다."
+ },
+ {
+  "finding_id": "finding-e986f2692a5b4987b5a59dae",
+  "finding_text_md5": "08c181633a47896c0a4a535033b88062",
+  "published_date": "2023-01-11",
+  "detail_text": "Specifically, there is no deactivating agent used to clean work surfaces, utensils and <Redacted B4> in between production of different hazardous drug products. Hazardous drug products produced include but are not limited to, BI-EST 50:50 (Estriol/Estradiol) in Moisturizing Lotion 5% (50mg/ml) Cream, BI-EST 50:50 (Estriol/ Estradiol)/Pregnenolone 1.5mg/60mg per ml Cream, and BI-EST 50:50 (Estriol/Estradiol)/Progest/Testo/7-K-DHEA/Pregnen 0.25mg/35mg/0. 75mg/10mg/3mg per 0.5ml Cream.",
+  "detail_text_ko": "구체적으로, 서로 다른 위해 의약품을 생산하는 사이사이에 작업 표면, 기구 및 <Redacted B4>를 세척하는 데 불활성화제를 사용하지 않는다. 생산되는 위해 의약품에는 BI-EST 50:50 (Estriol/Estradiol) in Moisturizing Lotion 5% (50mg/ml) Cream, BI-EST 50:50 (Estriol/ Estradiol)/Pregnenolone 1.5mg/60mg per ml Cream, BI-EST 50:50 (Estriol/Estradiol)/Progest/Testo/7-K-DHEA/Pregnen 0.25mg/35mg/0. 75mg/10mg/3mg per 0.5ml Cream이 포함되나 이에 국한되지 않는다."
+ },
+ {
+  "finding_id": "finding-e933ef46865f893411a04e9e",
+  "finding_text_md5": "08c181633a47896c0a4a535033b88062",
+  "published_date": "2023-01-11",
+  "detail_text": "Specifically, a) Your firm does not use a strong oxidizer capable of deactivating hazardous drug products to prevent cross-contamination of work surfaces and non-dedicated, shared equipment used in the production of hazardous drug products containing testosterone, progesterone, estriol and/or estradiol. b) Your firm has not established the use of <Redacted B4> is adequate to remove drug product residues to prevent contamination from shared equipment used in the production of hazardous drug products containing testosterone, progesterone, estriol and/or estradiol.",
+  "detail_text_ko": "구체적으로, a) 귀사는 testosterone, progesterone, estriol 및/또는 estradiol을 함유한 위해 의약품 생산에 쓰이는 작업 표면과 전용이 아닌 공용 설비의 교차오염을 방지하기 위해 위해 의약품을 불활성화할 수 있는 강력한 산화제를 사용하지 않는다. b) 귀사는 testosterone, progesterone, estriol 및/또는 estradiol을 함유한 위해 의약품 생산에 쓰이는 공용 설비에서 오염을 방지하기 위해 의약품 잔류물을 제거하는 데 <Redacted B4>의 사용이 적절하다는 것을 확립하지 않았다."
+ },
+ {
+  "finding_id": "finding-cab4dc28959c2c905450984a",
+  "finding_text_md5": "a6d0ed5c25ef7c1fc541045fac0710ad",
+  "published_date": "2023-01-11",
+  "detail_text": "Specifically, a) On 12/1/2022 during the initial walk through of the facility, I observed an unknown white powder-like substance on two separate <Redacted B4> capsule machines. According to your non-sterile technician <Reddacted B4> production of capsules occurred that day and the last time the machines were used to produce capsules were on 11/7/2022 to produce <Redacted B4> 25mg capsules and on 11/29/2022 to produce Ivermectin 18mg capsules. Your <Redacted B4> capsules machines are not dedicated equipment and are used to produce hazardous drug products containing progesterone.",
+  "detail_text_ko": "구체적으로, a) 12/1/2022 시설 최초 순회 중, 실사관은 두 대의 별도 <Redacted B4> 캡슐 기계에서 정체를 알 수 없는 흰색 분말 같은 물질을 관찰했다. 귀사 비무균 기술자 <Reddacted B4>에 따르면 그날 캡슐 생산이 이루어졌으며, 이 기계들을 마지막으로 캡슐 생산에 사용한 것은 11/7/2022에 <Redacted B4> 25mg 캡슐을, 11/29/2022에 Ivermectin 18mg 캡슐을 생산할 때였다. 귀사의 <Redacted B4> 캡슐 기계는 전용 설비가 아니며 progesterone을 함유한 위해 의약품 생산에 쓰인다."
+ },
+ {
+  "finding_id": "finding-7e248e90a695314ee8e61f44",
+  "finding_text_md5": "e048a9d10837fb973c3366f315919f44",
+  "published_date": "2022-12-28",
+  "detail_text": "Procedures to ensure accurate and consistent integration of chromatographic peaks have not been established. 1. Procedure CM/QC013 requires the use of the Apex Track Algorithm to be used for integrating all chromatograms. The procedure lists timed integration events that can be manually entered to modify the processing, but does not provide detail on when they should be used, how these events should be used, or how they are reviewed. For example, during the processing of{bH4> _I Tablets~~ mg batch fb><4>1 . The analyst manually entered events for percent fiftoff and percent touchdown that apphed to a single ~own~ urity peak in the chromatogram. These parameters generated results of~b) <4> 1% and (b) <4> %, reported as tl % for this peak. This is a passing result compared to a specification of NMT ~~~ %. If the percent liftoff and percent touchdown had b~en applied the same as all other impunty peaks and standard peaks the results would have been {b) <4>·7% and 4> fb) < 7 %,which would not have met specification. Even though the analyst is manually setting where the integration lines will be placed with the percent liftoff and percent touchdown, the practice is not captured in the r",
+  "detail_text_ko": "크로마토그래피 피크의 정확하고 일관된 적분을 보장하는 절차가 확립되어 있지 않다. 1. 절차서 CM/QC013은 모든 크로마토그램을 적분하는 데 Apex Track Algorithm을 사용하도록 요구한다. 이 절차서는 처리 방식을 변경하기 위해 수동으로 입력할 수 있는 시간 지정 적분 이벤트를 열거하지만, 그것을 언제 어떻게 사용해야 하는지 또는 어떻게 검토하는지에 대한 세부 사항은 제공하지 않는다. 예를 들어 {bH4> _I Tablets~~ mg 배치 fb><4>1 의 처리 중, 분석자는 크로마토그램의 알려지지 않은 불순물 피크 하나에만 적용되는 percent fiftoff 및 percent touchdown 이벤트를 수동으로 입력했다. 이 파라미터로 산출된 결과는 ~b) <4> 1%와 (b) <4> %였으며, 이 피크에 대해 tl %로 보고되었다. 이는 규격 NMT ~~~ %에 대해 적합한 결과이다. percent liftoff와 percent touchdown을 다른 모든 불순물 피크와 표준 피크에 적용한 것과 동일하게 적용했다면 결과는 {b) <4>·7%와 4> fb) < 7 %였을 것이며 규격을 충족하지 못했을 것이다. 분석자가 percent liftoff와 percent touchdown으로 적분선이 놓이는 위치를 수동으로 설정하고 있음에도, 이 관행은 r"
+ },
+ {
+  "finding_id": "finding-3f173568944e98cced8225b0",
+  "finding_text_md5": "b43ebeefcae066586af21aa7ca3fe861",
+  "published_date": "2022-12-28",
+  "detail_text": "of fbl (if) 1. fuvestigations that confomed leakage near the lb) <4) j dosage products were not thorf u~hJ7 investigated to identify a root cause and extended to all relevant products packaged into (b) 4) tubes that are distributed to the US market. For example: a. ,fuvestigation INI103211322 dated November 23j ~ was opened when a tube of 4 (b) < ) _J Gel ~% ff·om exhibit batch ~b) (if) for the European market was found to be leaking near the fbl <4)7 prior to testing for the six-month accelerated study timepoint. The product, tubes, equipment, and manufacturing process are the same as the aheady commercialized product for the US market. The investigation was closed without thoroughly investigating and did not identify a root cause for the leakage near thefbl <4)7 of the tube. Further, the il;?-vestigation stated there were no related market complaints for commercialized~6)l 4) ( Gel ~% product. However, US market complaints for 4 leaking tubes were received for fbl < ) IGel and other products manufactured on the same (b) <4) filling machine.",
+  "detail_text_ko": "of fbl (if) 1. lb) <4) j 투여 제형 근처의 누출을 확인한 조사(fuvestigations)가 근본 원인을 규명하도록 충분히 조사되지 않았고, 미국(US) 시장에 유통되는 (b) 4) 튜브에 포장된 모든 관련 제품으로 확대되지 않았다. 예를 들어: a. 조사 INI103211322(November 23j ~ 일자)는 유럽 시장용 exhibit 배치 ~b) (if)의 4 (b) < ) _J Gel ~% 튜브가 6개월 가속 시험 시점 시험 전에 fbl <4)7 근처에서 누출되는 것이 발견되면서 개시되었다. 이 제품, 튜브, 설비 및 제조 공정은 이미 상업화된 미국 시장 제품과 동일하다. 이 조사는 충분한 조사 없이 종결되었고 튜브 thefbl <4)7 근처 누출의 근본 원인을 규명하지 못했다. 또한 조사에는 상업화된 ~6)l 4) ( Gel ~% 제품과 관련된 시장 불만이 없다고 기재되어 있었다. 그러나 4 fbl < ) IGel 및 동일한 (b) <4) 충전기에서 제조된 다른 제품에 대해 튜브 누출에 관한 미국 시장 불만이 접수되었다."
+ },
+ {
+  "finding_id": "finding-3d8f7dafb8b6741095640543",
+  "finding_text_md5": "aa9c1801abb1162d7ee97f1ecfb7206c",
+  "published_date": "2022-12-28",
+  "detail_text": "Specifically, three (3) dead legs with 3D values of (b) (.J) Iwere observed in theE <;) system that supplies ~6>l 4) ~ for the (bl (.J) and b) <4) [ of(b) <4) dosage diugs ( e.~., lUJ l'+J TabletLl01 ,..i 4 Tablets, l'u' 1\" ' Tablets, {bl <) ITablets, {bl 4) I Tablets, and~b) <4) ~ Tablets). *DATES OF INSPECTION 5/12/2022(Thu), 5/13/2022(Fri), 5/16/2022(Mon), 5/17/2022(Tue), 5/18/2022(Wed), 5/19/2022(Thu), 5/20/2022(Fri)",
+  "detail_text_ko": "구체적으로, 3D 값이 (b) (.J) I인 데드 레그(dead leg) 세 곳(3)이 ~6>l 4) ~을 (b) <4) 투여 제형 의약품(예: lUJ l\\'+J TabletLl01 ,..i 4 Tablets, l\\'u\\' 1\" \\' Tablets, {bl <) ITablets, {bl 4) I Tablets, ~b) <4) ~ Tablets)의 (bl (.J) 및 b) <4) [에 공급하는 E <;) 시스템에서 관찰되었다. *DATES OF INSPECTION 5/12/2022(Thu), 5/13/2022(Fri), 5/16/2022(Mon), 5/17/2022(Tue), 5/18/2022(Wed), 5/19/2022(Thu), 5/20/2022(Fri)"
+ },
+ {
+  "finding_id": "finding-19e85993f512a177b57cb25f",
+  "finding_text_md5": "a950003533f7d9041ef090d124a533ad",
+  "published_date": "2022-12-28",
+  "detail_text": "Procedure 19PD672 requires compression machine operators to calculate the tablet reject limits based on batch specific data from machine set-up. However, operators are using preset values without calculating the batch specific limits. If changes are made to the reject limits, these calculations are not documented in the batch record or reviewed to dete1mine if the parameters were set conectly to reject",
+  "detail_text_ko": "절차서 19PD672는 압축기 작업자가 기계 셋업 시의 배치별 데이터를 근거로 정제 불량 한도를 계산하도록 요구한다. 그러나 작업자들은 배치별 한도를 계산하지 않고 사전 설정 값을 사용하고 있다. 불량 한도가 변경되더라도 이 계산은 배치 기록서에 문서화되지 않으며, 불량품을 걸러내도록 파라미터가 올바르게 설정되었는지 판단하기 위해 검토되지도 않는다."
+ },
+ {
+  "finding_id": "finding-7299cbdfee97927fd3c9e522",
+  "finding_text_md5": "b35a748abf64c26ea2f946f65c65d456",
+  "published_date": "2022-12-23",
+  "detail_text": "Specifically, a) You have not the labeling and packaging line or performed any qualification for the labeling and packaging o njection. b) You did not adequately perform installation qualification of theMYO S rlling line for TS. specified in the qualification protocol.",
+  "detail_text_ko": "구체적으로, a) 귀사는 라벨링 및 포장 라인을 하지 않았고 라벨링 및 포장 njection에 대한 어떤 적격성평가도 수행하지 않았다. b) 귀사는 적격성평가 프로토콜에 명시된 대로 TS용 MYO S rlling line의 설치 적격성평가를 적절히 수행하지 않았다."
+ },
+ {
+  "finding_id": "finding-fc7cb69a26cb839562e3993d",
+  "finding_text_md5": "5c22610fd8d19a9102f0865082151300",
+  "published_date": "2022-12-20",
+  "detail_text": "Specifically, Dead insects were observed behind the <Redacted B4> front facing of the <Redacted B4> biological safety cabinet <Redacted B4>. In addition, several live flying insects were observed within the production area.",
+  "detail_text_ko": "구체적으로, <Redacted B4> 생물안전작업대 <Redacted B4>의 <Redacted B4> 전면 뒤에서 죽은 곤충이 관찰되었다. 또한 생산 구역 안에서 살아 있는 날벌레 여러 마리가 관찰되었다."
+ },
+ {
+  "finding_id": "finding-e63ec73696846a6f837a6e2b",
+  "finding_text_md5": "ad509081977118ce2fb75813c3f65e1a",
+  "published_date": "2022-12-20",
+  "detail_text": "Specifically, D Your firm uses <Redacted B4> for use in production of non-sterile drug products. For example, the firm utilized <Redacted B4> instead of <Redacted B4> the production of <Redacted B4> lot# <Redacted B4>. The aforementioned lot of <Redacted B4> was used in the production of Ketaniine Nasal Spray lot# 0602202~ and lot# 08232022@ <Redacted B4>. D Your firm released multiple lots of non-sterile drug products that were produced from expired components. There is no assurance that the expired components continue to meet pharmaceutical grade specifications. For example",
+  "detail_text_ko": "구체적으로, D 귀사는 비무균 의약품 생산에 사용하기 위해 <Redacted B4>를 사용한다. 예를 들어 귀사는 <Redacted B4> 로트# <Redacted B4>의 생산에 <Redacted B4> 대신 <Redacted B4>를 사용했다. 위 <Redacted B4> 로트는 Ketaniine Nasal Spray 로트# 0602202~ 및 로트# 08232022@ <Redacted B4>의 생산에 사용되었다. D 귀사는 사용 기한이 지난 구성 성분으로 생산한 비무균 의약품 여러 로트를 출하했다. 기한이 지난 구성 성분이 의약품 등급 규격을 계속 충족한다는 보증이 없다. 예를 들어"
+ }
+]

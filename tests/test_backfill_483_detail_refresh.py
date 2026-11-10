@@ -128,7 +128,7 @@ class OldStorageCapTest(unittest.TestCase):
         self.assertTrue(rep.truncated_only)
 
     def test_residual_diagnostics_show_what_follows_in_source(self):
-        cut = ("Specifically, " + "the line clearance record was not reviewed. " * 30)[:1200]
+        cut = ("Specifically, " + " ".join(f"record {i} was not reviewed." for i in range(80)))[:1200]
         text = cut + " and continues here on the next page.\nOBSERVATION 2\nNext."
         rows = [{"number": "1", "deficiency": "A.", "detail": cut}]
         diag = b.diagnose_residual("fda483-1", rows, [{"number": "1", "deficiency": "A.", "detail": cut}], text)

@@ -378,7 +378,7 @@ FDA_WL_SEARCH_API = (
 # WHY-1 #2: FDA Warning Letter 본문 위반 excerpt (flag 게이트 ENABLE_WL_BODY, 기본 off).
 # 목록 메타(subject)만 잡던 것을 편지 본문의 위반 서술 구간까지 추출해 카드 "왜"를 살린다.
 # in-window WL 은 부서 게이트 후 소수(주 한 줌) → fetch 부담 낮음. 실패는 graceful(키 미기록).
-WL_BODY_MAX_CHARS = 1500
+WL_BODY_MAX_CHARS = 1500   # 표시용 파생 발췌(카드 '왜'). 전문은 wl_body_full 에 저장
 WL_BODY_FETCH_TIMEOUT = 20
 # [WL 심층분석 fan-out 2026-07-01] 본문 전문(全文) 확보 (flag 게이트 ENABLE_WL_BODY_FULL,
 # 기본 off). 기존 WL_BODY_MAX_CHARS(1500자) excerpt 는 카드 "왜"용 짧은 발췌를 그대로 유지하고,
@@ -386,10 +386,10 @@ WL_BODY_FETCH_TIMEOUT = 20
 # docs/prompts/GRM_Prompt_DeepWL_v1.md)의 입력 컨텍스트용 전문을 담는다. 수집(Python·GitHub
 # Actions) 단계 비용은 HTTP GET 1회뿐이라 상한을 넉넉히 잡아도 부담이 없다(LLM 비용은 fan-out
 # 단계에서 카드별로 격리 — collect_intake 는 저장만 한다). 실패는 graceful(키 미기록).
-# [상한 상향 2026-07-20] 20000 → 30000. 실측(2026-07-20 WL 2건) 앵커~편지끝 21.4k·24.1k 로
+# [2026-11-10] 상한 제거 — 저장 단계에선 절단하지 않는다(wl_body_full 은 전문).
+# [상한 상향 2026-07-20, 폐기] 20000 → 30000. 실측(2026-07-20 WL 2건) 앵커~편지끝 21.4k·24.1k 로
 # 종전 상한이 **회신 기한·시정요구 문단(편지 뒷부분)을 잘라내고 있었다** — fan-out 의
 # `required_remediation.deadline` 이 근거를 잃는 자리다. 비용은 여전히 HTTP GET 1회.
-WL_BODY_FULL_MAX_CHARS = 30000
 
 # [전문지 브리핑 v2 2026-07-13] ECA 기사(gmp-compliance.org) 본문 흡수 — Routine summary 가
 # 실기사 본문을 근거로 작성되도록 prose_input 을 풍부화(flag 게이트 ENABLE_ECA_ARTICLE_EXCERPT,
@@ -2365,7 +2365,6 @@ def collect_mhra_rss(start: date, end: date) -> tuple[list[IntakeItem], str | No
 # **4장이 잘렸고 그중 2장은 단어 중간**에서 끊겼다(환자 조치 안내 문장이 소실). 상세 블록은
 # details 로 접혀 있어 길이가 화면을 밀지 않으므로 렌더상의 이유도 없었다. 30000 은 관측
 # 최대치의 약 6배로, 자르기 위한 값이 아니라 폭주 방어용 상한이다.
-MHRA_ALERT_BODY_MAX_CHARS = WL_BODY_FULL_MAX_CHARS   # 30000 — 전문 계열 상한(형제와 동일)
 MHRA_ALERT_BODY_CAP = 10               # 실행당 fetch 상한(월 2건 수준이라 여유 있음)
 MHRA_ALERT_BODY_DELAY_SECONDS = 1.0
 MHRA_ALERT_BODY_TIMEOUT = 15
@@ -2406,7 +2405,7 @@ def _fetch_mhra_alert_body(page_url: str) -> str:
     text = " ".join(text.split())
     if not text:
         log("INFO", f"MHRA 알림 본문 비어 있음 — 카드 그대로: {truncate(page_url, 80)}")
-    return text[:MHRA_ALERT_BODY_MAX_CHARS]
+    return text  # [2026-11-10] 저장 단계 무절단 — 표시 단계에서만 줄인다
 
 
 def collect_mhra_alerts(start: date, end: date) -> tuple[list[IntakeItem], str | None]:
@@ -2655,7 +2654,7 @@ def _earliest_anchor(text: str, patterns: tuple[str, ...]) -> int | None:
     return best
 
 
-def _extract_wl_body_span(html_text: str, max_chars: int) -> str:
+def _extract_wl_body_span(html_text: str, max_chars: int | None) -> str:
     """WL 본문 위반 서술 구간 추출 공통 코어(앵커 탐색 + max_chars 절단).
 
     1차 앵커(위반 서술 직접 지시)가 있으면 그 가장 이른 위치, 없으면 폴백 앵커(일반 머리말),
@@ -2681,13 +2680,13 @@ def _extract_wl_body_span(html_text: str, max_chars: int) -> str:
     head = _wl_sentence_start(text, start, opening or 0)
     moved = _skip_wl_leadin(text, start)
     if moved == start:
-        return text[head:head + max_chars].strip()
+        return text[head:(head + max_chars) if max_chars is not None else None].strip()
     # [도입구만 잘라 내기 2026-10-28] 앵커 문장과 도입구 문장 사이의 실질 문장("We note that you
     # continue to ship …"·등록 취소·회신 미수신)은 남기고 도입구 문장만 뺀다. 종전엔 앵커부터
     # 도입구 끝까지 통째로 버려 06fdb805·568589dc 가 실질 문장을 잃었다(라이브 수집도 같음).
     kept = text[head:_wl_leadin_sentence_start(text, start, head)].strip()
     rest = text[moved:]
-    return ((kept + " " + rest) if kept else rest)[:max_chars].strip()
+    return ((kept + " " + rest) if kept else rest)[:max_chars].strip()  # max_chars=None → 전문
 
 
 # [본문 시작점 2026-10-28] 앵커는 **문장 안의 낱말**을 찾는다. 그 위치에서 자르면 본문이 문장
@@ -2765,13 +2764,13 @@ def _extract_wl_body_excerpt(html_text: str) -> str:
 
 
 def _extract_wl_body_full(html_text: str) -> str:
-    """[WL 심층분석 fan-out] WL 본문 전문(全文, 최대 WL_BODY_FULL_MAX_CHARS) — 신규·additive.
+    """[WL 심층분석 fan-out] WL 본문 전문(全文, 상한 없음) — 신규·additive.
 
     excerpt 와 동일 앵커(위반 서술 시작점)에서 시작해 훨씬 더 긴 구간을 담는다 — 위반 서술
     이후 이어지는 구제조치 기한·행정 리스크 문단까지 포함하도록(편지 뒷부분). 카드별 fan-out
     심층분석(docs/prompts/GRM_Prompt_DeepWL_v1.md)의 유일한 입력 컨텍스트가 된다.
     """
-    return _extract_wl_body_span(html_text, WL_BODY_FULL_MAX_CHARS)
+    return _extract_wl_body_span(html_text, None)  # [2026-11-10] 저장 단계 무절단 — 표시 단계에서만 줄인다
 
 
 # ── [WL 위반항목 결정론 추출 2026-07-20] ────────────────────────────────────────

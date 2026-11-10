@@ -19,7 +19,6 @@ import grm_findings as gf
 # 않는다 -- collect_intake.py 가 grm_health 의 언더스코어 프리픽스 헬퍼(`_evaluate_health`
 # 등)를 그대로 재수출해 쓰는 선례가 이미 이 저장소에 있어, 모듈 간 프라이빗 헬퍼 재사용은
 # 낯선 패턴이 아니다.
-from card_scaffold import _truncate_at_sentence
 
 
 MFDS_GMP_LIST_URL = "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100"
@@ -690,7 +689,7 @@ _WL_HEADING_RE = re.compile(r"((?:[A-Z][A-Za-z]*\s+){2,5}Violations)(?=\s+[A-Z])
 # _split_wl_violation_blocks 가 여러 위반을 하나로 묶어 넘긴 경우). 그래서 캡을 아예 없애지
 # 않는다 -- 없애면 그런 미분해 덩어리가 "조각인 척" 그대로 들어온다. 이제 이 상한은
 # "벽텍스트 방지"가 아니라 "한 위반으로 보기엔 너무 길다"는 신호다.
-_WL_BLOCK_CHAR_CAP = 6000
+_WL_BLOCK_UNSPLIT_THRESHOLD = 6000   # [2026-11-10] 절단 상한 아님 -- '미분해 블록' 신호 임계값(_wl_block_looks_unsplit)
 # [WL 절단 수리 · A-3 재설계] 분류기 전용 상한 -- **표시 상한과 일부러 분리한다.**
 # 480 은 옛 표시 상한값 그대로다(_legacy_cap_for_classify 주석에 이유를 길게 적었다):
 # 경고서한은 앞부분이 위반 서술·뒷부분이 FDA 표준 시정권고 정형문이라, 분류 입력을 넓히면
@@ -923,40 +922,18 @@ def _legacy_cap_for_classify(block: str, ends_with_terminal: bool) -> str:
     return truncated.rstrip(" .,;:") + "…"
 
 
+def _wl_block_looks_unsplit(block: str) -> bool:
+    """신호 전용: 6,000자를 넘으면 한 위반이 아니라 미분해 블록일 가능성이 크다. 저장엔 영향 없음."""
+    return len(block) > _WL_BLOCK_UNSPLIT_THRESHOLD
+
+
 def _cap_wl_block_text(block: str, ends_with_terminal: bool) -> str:
-    """표시용 상한(6000자) -- 483 은 첫 문장만 쓰지만 WL 위반은 한 문단이 한 위반이라 문단
-    전체를 유지하는 게 자연스럽다. 다만 미분해 초장문 블록에 대한 안전 절단으로 상한 근방에서
-    자른다. 문장부호 없이 끝나는(미완결) 블록은 짧아도 길어도 "…" 로 표시해 절단됐음을
-    드러낸다(§A-2 기존 동작 유지).
+    """finding_text 로 저장할 블록 본문 -- [2026-11-10] 저장 단계 무절단(표시 단계에서만 줄인다).
 
-    [WL 절단 수리 · A-2] 실제로 자를 때는 글자 수가 아니라 **문장 경계**에서 자른다 --
-    card_scaffold._truncate_at_sentence(§12C admin EXPOSE_CONT 규칙)를 그대로 재사용해
-    상한 이내 마지막 [.。!?] 까지 되돌린다. 재사용 못 한 부분 둘, 사유를 각각 적는다:
-      1) 종결부호 바로 뒤에 닫는 따옴표/괄호가 붙어 있으면(인용문 말미 `."` 등) 그것까지
-         포함해야 하는데, _truncate_at_sentence 는 그 확장을 하지 않는다(admin 필드는 인용을
-         다루지 않아 필요 없었다) -- 그래서 여기서 한 글자씩 앞으로 늘려 닫는 기호를 흡수한다.
-      2) 상한 이내에 문장 종결이 하나도 없을 때 _truncate_at_sentence 는 limit 에서 그냥
-         잘라 "…" 를 붙인다(단어 경계 무시) -- WL 은 이 안전망에서 기존 단어 경계 되돌림을
-         유지해야 하므로(스펙 요구), 그 한 갈래만 원래 rfind(" ") 로직을 직접 구현했다.
+    종전엔 6000자 초과 블록을 문장 경계에서 잘라 "…" 를 붙였다. 이제 전문을 그대로 싣는다.
+    문장부호 없이 끝나는(미완결) 블록만 기존처럼 꼬리 구두점을 떼고 "…" 로 표시한다(§A-2 유지).
     """
-    if len(block) <= _WL_BLOCK_CHAR_CAP:
-        return block if ends_with_terminal else block.rstrip(" .,;:") + "…"
-
-    sentence_cut = _truncate_at_sentence(block, _WL_BLOCK_CHAR_CAP)
-    if sentence_cut and sentence_cut[-1] in ".。!?":
-        # 문장 종결을 찾았다 -- 종결부호 바로 뒤에 닫는 따옴표/괄호류가 이어지면 그것도
-        # 경계에 포함시킨다(인용문이 자연스럽게 닫히도록).
-        end = len(sentence_cut)
-        while end < len(block) and block[end] in "\"'”’)]":
-            end += 1
-        return block[:end] + "…"
-
-    # 상한 이내에 문장 종결이 전혀 없는 극단적 경우 -- 기존처럼 단어 경계로 되돌린다(안전망).
-    truncated = block[:_WL_BLOCK_CHAR_CAP]
-    cut = truncated.rfind(" ")
-    if cut > 0:
-        truncated = truncated[:cut]
-    return truncated.rstrip(" .,;:") + "…"
+    return block if ends_with_terminal else block.rstrip(" .,;:") + "…"
 
 
 # ── WHOPIR 추출기(`_from_whopir`) 제거 2026-08-10 ────────────────────────────

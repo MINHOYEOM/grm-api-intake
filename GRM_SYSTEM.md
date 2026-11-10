@@ -542,6 +542,7 @@ grm-api-intake/
 ├─ backfill_483_inspectors.py      # [FIND-483-SIGNER] 483 실사관 소급 백필(PDF 재fetch→서명블록 파서→findings.inspector_names 만 UPDATE·raw_signals 불변)
 ├─ mfds_inspection_attendees.py · mfds_inspection_attendees_store.py  # MFDS 실사자 표 순수 파서·격리 적재
 ├─ backfill_mfds_inspection_attendees.py # 저장 텍스트 백필(dry-run 기본, 원문 재수집 없음)
+├─ backfill_483_detail_refresh.py  # 저장된 483 관찰 상세(detail)만 다시 읽어 제자리 교체(쪽 넘김·서명란·가림 표시 수리 소급 — 표제·원문 전문·실사관 불변, dry-run 기본)
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
@@ -731,6 +732,7 @@ grm-api-intake/
    ├─ grm-hc-inspection-backfill.yml     # [FIND-1] Health Canada GMP 실사 리포트카드 딥백필(workflow_dispatch 1회성, dry_run 기본 true)
    ├─ grm-fda-inspections-backfill.yml   # FDA 실사 등급(NAI/VAI/OAI) DDAPI 적재(월 1일 15:47 UTC 크론 = 항상 --apply · 8/15/22일은 실패 이슈가 열렸을 때만 복구 재시도 · workflow_dispatch 는 dry_run 기본 true)
    ├─ grm-fda483-inspector-backfill.yml  # [FIND-483-SIGNER] 483 실사관 소급 백필(workflow_dispatch 1회성·apply 기본 false·OCR 필수·concurrency 는 OCR 백필과 동일 그룹)
+   ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)

@@ -170,7 +170,7 @@ def build_snapshot(sources: list[dict[str, Any]], rows: list[dict[str, Any]], *,
         text_ko = _text(r.get("statement_ko"))
         if text_ko and _text(r.get("ko_source_hash")) == _text(r.get("content_hash")):
             case["text_ko"] = text_ko
-        acat_ko = " ".join(_text(r.get("agency_category_ko")).split())[:300]
+        acat_ko = " ".join(_text(r.get("agency_category_ko")).split())  # 140 check 가 300자 상한
         if acat_ko:
             case["acat_ko"] = acat_ko
         cases.append(case)

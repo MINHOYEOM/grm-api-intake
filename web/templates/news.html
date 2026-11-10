@@ -42,7 +42,9 @@
       {%- if news_brief_slug %}
       <a href="{{ rel_root }}briefs/{{ news_brief_slug }}/index.html">{{ _('이번 주 브리프 보기') }}</a>
       {%- endif %}
+      {%- if lang == 'ko' or 'archive/' in en_paths %}
       <a href="{{ rel_root }}archive/index.html">{{ _('주간 브리프 아카이브') }}</a>
+      {%- endif %}
     </div>
     {%- if news %}
     <ul class="nw-chips" id="nw-chips" aria-label="{{ _('소식 종류') }}">

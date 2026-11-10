@@ -151,9 +151,11 @@ class MigrationContractTest(unittest.TestCase):
         m = re.search(r"returns table \(([^)]*)\)", self.sql)
         cols = [c.strip().split()[0] for c in m.group(1).split(",")]
         self.assertEqual(cols, list(nr.PUBLIC_FIELDS))
-        head = self.body.split("from public.raw_signals", 1)[0]
+        # 바깥 select(함수가 실제로 돌려주는 열)만 본다 — 안쪽 CTE 는 필터용으로 row_json·raw_signal_id 를
+        # 읽지만(11-10 성능 수리: 2.0s→72ms) 반환 열에는 나오지 않는다.
+        outer = self.body.rsplit("select ", 1)[1].split(" from ", 1)[0]
         for secret in ("raw_json", "row_json", "firm_name", "site_name", "collected_at", "raw_signal_id"):
-            self.assertNotIn(secret, head)
+            self.assertNotIn(secret, outer)
 
     def test_filters(self):
         for needle in ("'Unrelated'", "public.findings", "official_url ~* '^https?://'", "limit 3000"):

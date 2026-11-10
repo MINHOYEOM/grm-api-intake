@@ -21,6 +21,7 @@ import grm_findings as gf
 # 낯선 패턴이 아니다.
 
 
+SOURCE_EU_GMP_NCR = "EU GMP NCR (EudraGMDP)"   # grm_common.SOURCE_EU_GMP_NCR 와 같은 값(순수 모듈 유지용 복제 -- 테스트가 대조)
 MFDS_GMP_LIST_URL = "https://nedrug.mfds.go.kr/pbp/CCBBD03/getList?page=1&limit=100"
 FDA_483_LIST_URL = (
     "https://www.fda.gov/about-fda/office-inspections-and-investigations/"
@@ -172,7 +173,10 @@ def findings_from_raw_signal_with_report(
     # WHOPIR(WHO 공개 실사보고서)은 여기에 없다 — 지적을 싣지 않는 문서다(근거는 아래
     # `_from_whopir` 제거 주석). 다시 배선하기 전에 그 주석을 먼저 읽을 것.
     findings.extend(_from_eu_gmp_ncr(signal, raw, row))
-    findings.extend(_from_mhra_gmp_ncr(signal, raw, row))
+    # EU NCR 행은 MHRA 추출기를 건너뛴다 -- EU 쪽이 ncr_additional 을 덧붙이므로 두 추출기 결과가
+    # 더는 같은 본문이 아니고, 건너뛰지 않으면 한 NCR 이 finding 2건이 된다(MHRA 로직은 불변).
+    if _compact(signal.get("source")) != SOURCE_EU_GMP_NCR:
+        findings.extend(_from_mhra_gmp_ncr(signal, raw, row))
     findings.extend(_from_hc_inspection(signal, raw, row))
     return _dedupe_valid_findings_with_report(findings)
 
@@ -256,12 +260,22 @@ def _from_eu_gmp_ncr(
     finding_text = nature
     if action:
         finding_text = f"{nature}\n\nAction taken/proposed by the NCA: {action}"
+    # [EU NCR additional] 후속 설명(ncr_additional)은 본문 끝에 덧붙여 findings/사이트에 닿게 한다.
+    # 분류는 **덧붙이기 전 텍스트**로 고정한다(category_code 를 직접 넘김) -- 본문이 길어져도
+    # 기존 분류가 바뀌지 않는다. additional 이 없으면 finding_text·finding_id 모두 종전 그대로.
+    category_code = gf.classify_finding_category(finding_text)
+    # MHRA 행도 이 추출기를 거치지만(ncr_additional = 제한사항) MHRA 본문은 불변이어야 하므로
+    # 출처가 EU NCR 일 때만 덧붙인다.
+    additional = _compact(raw.get("ncr_additional"))
+    if additional and _compact(raw_signal.get("source")) == SOURCE_EU_GMP_NCR:
+        finding_text = f"{finding_text}\n\nAdditional information: {additional}"
     evidence_url = _evidence_url(
         raw_signal, raw, "pdf_archived_url", "eudragmdp_search_url",
         fallback=EU_GMP_NCR_SEARCH_URL)
     return [gf.finding_from_raw_signal(
         raw_signal,
         finding_text=finding_text,
+        category_code=category_code,
         ordinal=1,
         evidence_level="A",
         evidence_url=evidence_url,

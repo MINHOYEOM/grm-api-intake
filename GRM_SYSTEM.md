@@ -550,6 +550,7 @@ grm-api-intake/
 ├─ backfill_483_ocr_recovery.py    # 본문 없이 적재된 483 복구(PDF 재fetch→라이브 함수로 행 재구성→raw_signals upsert) — 매일 수집 상한 결손 회수 + 1회성 모드
 ├─ backfill_wl_body_recovery.py   # 본문(wl_body_full) 없이 적재된 FDA WL 복구(편지 재fetch→라이브 build_wl_item 으로 행 재구성→raw_signals upsert) — 매일 예약 · 영구 403(14일) 확정 · 수동 --rebuild-body-start
 ├─ backfill_wl_truncation_restore.py # 옛 480자 상한으로 잘린 WL findings 복원 계획(지금 추출기로 재추출→기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
+├─ backfill_eu_ncr_additional_plan.py # EU NCR ncr_additional(후속 설명) 소급 계획(같은 계획 스키마·기존 finding_id 대응·옛 md5) — 읽기 전용, 아티팩트로만 내보냄
 ├─ fda483_notion_raw_sync.py       # 미소비(New) Notion 483(`--source wl` = WL) 행 중 관찰(WL=전문) 없는 raw 를 Supabase 의 raw 로 교체 · 483 범위 밖 확정 행은 Skipped 마감(주간 브리프 입력) — 회수 예약 실행의 마지막 단계
 ├─ backfill_deep_483_past_weeks.py  # 483 심층분석 과거주차(07-12~07-27, 69장) 소급 — 과거 델타 → fan-out 작업 생성 / 응답 병합(placeholder 표지 삽입 + 운영 병합 경로 호출)
 ├─ backfill_deep_original_truncation.py  # D5b(원문 병기 절단)로 병합 보류된 483 심층분석 소급 병합 — 운영 병합 경로(inject_slots) 그대로 호출
@@ -743,6 +744,7 @@ grm-api-intake/
    ├─ grm-fda483-detail-refresh.yml      # 483 관찰 상세 다시 읽기(dispatch 전용·apply 기본 false·`since` 게시일 하한·원문 전문 있으면 PDF 미요청)
    ├─ grm-fda483-ocr-recovery.yml        # 본문 없이 적재된 483·WL 복구(cron 매일 23:37 UTC=483 recoverable apply → WL 잡 직렬 / dispatch 1회성·apply 기본 false·`target`=fda483(기본)|wl|all·483 은 OCR 필수·M12 체인·Notion New 행 raw 동기화·잡별 예약 실패 경보)
    ├─ grm-wl-truncation-restore-plan.yml # WL 절단 복원 계획 생성(workflow_dispatch·GET 만) → 아티팩트 wl-truncation-restore-plan(90일)
+   ├─ grm-eu-ncr-additional-plan.yml # EU NCR additional 소급 계획 생성(workflow_dispatch·GET 만) → 아티팩트 eu-ncr-additional-plan(90일)
    ├─ grm-raw-signals-notion-backfill.yml # Notion 에만 있는 행(예: WHO WHOPIR)을 raw_signals 로 채움(workflow_dispatch·apply 기본 false=dry-run) → 아티팩트 raw-signals-notion-backfill-report(30일)
    ├─ grm-fda-coverage-gate.yml          # 발행 전 FDA 본문 결손 점검(월요일 정기 수집 완료 workflow_run → 결손 483 회수 → handoff·스캐폴드 재생성 → 남으면 automation-warning 이슈)
    ├─ grm-library-staging.yml            # [트랙 C] 자료실 주간 자동 갱신(월 03:23 KST) — 수집→게이트→PR→CI green→자동 머지 · decide 게이트가 주간 결손도 복구(2026-08-11)

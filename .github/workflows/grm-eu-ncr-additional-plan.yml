@@ -1,0 +1,71 @@
+name: GRM EU NCR Additional Plan
+
+# [EU NCR additional] 추출기가 ncr_additional(후속 설명)을 finding_text 끝에 덧붙이도록 바뀐 뒤,
+# 이미 적재된 EU GMP NCR findings(약 44행)를 새 본문으로 바꾸는 소급 계획을 만든다. 같은 raw_signal 의
+# 기존 finding 중 현재 본문이 새 본문의 앞부분과 정확히 같은 것만 기존 finding_id 에 대응시킨다.
+#
+# ★이 워크플로는 아무것도 쓰지 않는다(service-role GET 만 · DB/git 쓰기 없음). 계획은 WL 복원 계획과
+# 같은 스키마라 일일 번역 세션이 `gh run download` -> `findings_translate.py --export-restore` 로
+# 읽고, 국문을 채운 restore 항목이 outbox -> grm-findings-translate-apply.yml 의 옛 md5 대조 PATCH 로
+# 반영된다. 재실행해도 안전하다(이미 반영된 행은 후보에서 빠진다).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eu-ncr-additional-plan
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Build EU NCR additional plan (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build plan (GET only - no DB/git writes)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python backfill_eu_ncr_additional_plan.py             --output eu_ncr_additional_plan.json             --report-path eu_ncr_additional_report.json
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: eu-ncr-additional-plan
+          path: |
+            eu_ncr_additional_plan.json
+            eu_ncr_additional_report.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Write step summary
+        if: always()
+        run: |
+          {
+            echo "### GRM EU NCR Additional Plan"
+            echo ""
+            if [ -f eu_ncr_additional_report.json ]; then
+              echo '```json'
+              cat eu_ncr_additional_report.json
+              echo '```'
+            else
+              echo "no report - check SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY or fetch failure."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,138 +1,138 @@
 {
   "ambiguous": 0,
-  "candidates": 1785,
-  "documents": 595,
+  "candidates": 1879,
+  "documents": 625,
   "errors": [],
-  "generated_at": "2026-11-10T08:17:53.536127+00:00",
+  "generated_at": "2026-11-10T08:57:33.531644+00:00",
   "legacy_match": 1748,
-  "mapped": 1748,
-  "max_old_chars": 500,
+  "mapped": 1786,
+  "max_old_chars": 6100,
   "missing_raw_signal": 0,
-  "new_chars_total": 6799215,
-  "old_chars_total": 832365,
+  "new_chars_total": 7117977,
+  "old_chars_total": 1055391,
   "samples": [
     {
-      "finding_id": "finding-1b7a071a08b8697b8297871f",
-      "legacy_match": true,
-      "new_chars": 9979,
-      "old_chars": 479
+      "finding_id": "finding-a31feecd38653a4f5eb2e857",
+      "legacy_match": false,
+      "new_chars": 9047,
+      "old_chars": 5974
     },
     {
-      "finding_id": "finding-196ea92377576b8ddc09d9dc",
-      "legacy_match": true,
-      "new_chars": 11065,
-      "old_chars": 479
+      "finding_id": "finding-3fa91ed8b5e0e99b67321bd3",
+      "legacy_match": false,
+      "new_chars": 8507,
+      "old_chars": 5943
     },
     {
-      "finding_id": "finding-09e5c818f219a069a254cb99",
-      "legacy_match": true,
-      "new_chars": 7523,
-      "old_chars": 477
+      "finding_id": "finding-8d28fbd8d5f95de5eafac5fc",
+      "legacy_match": false,
+      "new_chars": 6452,
+      "old_chars": 5889
     },
     {
-      "finding_id": "finding-ed239206c606d81641eb8167",
-      "legacy_match": true,
-      "new_chars": 6152,
-      "old_chars": 472
+      "finding_id": "finding-620902a6c793b7e0694e4e78",
+      "legacy_match": false,
+      "new_chars": 12091,
+      "old_chars": 5975
     },
     {
-      "finding_id": "finding-c72d36eeb1a9bbf8e4c16536",
-      "legacy_match": true,
-      "new_chars": 5506,
-      "old_chars": 471
+      "finding_id": "finding-2f42b3a63c15b5e5acd9047a",
+      "legacy_match": false,
+      "new_chars": 7187,
+      "old_chars": 5747
     },
     {
-      "finding_id": "finding-a3a36976aebfa2e3c88ec2b4",
-      "legacy_match": true,
-      "new_chars": 6152,
-      "old_chars": 480
+      "finding_id": "finding-093ba1a4baca3e14af4a3ef8",
+      "legacy_match": false,
+      "new_chars": 8349,
+      "old_chars": 5544
     },
     {
-      "finding_id": "finding-a191cafde8b981bebe767678",
-      "legacy_match": true,
-      "new_chars": 2013,
-      "old_chars": 476
+      "finding_id": "finding-0410c3dccb7ee14795b9b1e3",
+      "legacy_match": false,
+      "new_chars": 10575,
+      "old_chars": 5986
     },
     {
-      "finding_id": "finding-841112ab517237103a5e1d51",
-      "legacy_match": true,
-      "new_chars": 3139,
-      "old_chars": 480
+      "finding_id": "finding-004093dc2b71a9dab6cad3f9",
+      "legacy_match": false,
+      "new_chars": 7196,
+      "old_chars": 5884
     },
     {
-      "finding_id": "finding-7754518397278fbb8a7f022d",
-      "legacy_match": true,
-      "new_chars": 5520,
-      "old_chars": 480
+      "finding_id": "finding-fc36eda699b59283a3c2fea2",
+      "legacy_match": false,
+      "new_chars": 6479,
+      "old_chars": 5856
     },
     {
-      "finding_id": "finding-41d4551da8242bf323c19329",
-      "legacy_match": true,
-      "new_chars": 6079,
-      "old_chars": 473
+      "finding_id": "finding-bc114ba5be3e670fe4c107a5",
+      "legacy_match": false,
+      "new_chars": 7455,
+      "old_chars": 5573
     },
     {
-      "finding_id": "finding-407ca4a0a1932fd52a009f44",
-      "legacy_match": true,
-      "new_chars": 3043,
-      "old_chars": 479
+      "finding_id": "finding-03479cf0507fe9f6370e9bce",
+      "legacy_match": false,
+      "new_chars": 8441,
+      "old_chars": 5832
     },
     {
-      "finding_id": "finding-f2f11782acc9afbfd8294752",
-      "legacy_match": true,
-      "new_chars": 2292,
-      "old_chars": 470
+      "finding_id": "finding-fd609fd03948cb2ecdee0190",
+      "legacy_match": false,
+      "new_chars": 9991,
+      "old_chars": 5926
     },
     {
-      "finding_id": "finding-dc6c773a864a9a98184d9535",
-      "legacy_match": true,
-      "new_chars": 1841,
-      "old_chars": 477
+      "finding_id": "finding-f0d60bd076622ae6ffce6dd9",
+      "legacy_match": false,
+      "new_chars": 17089,
+      "old_chars": 5886
     },
     {
-      "finding_id": "finding-d7c47e2b99156168a8baecf3",
-      "legacy_match": true,
-      "new_chars": 1742,
-      "old_chars": 470
+      "finding_id": "finding-b5ea9fca9dce65e54a6660e9",
+      "legacy_match": false,
+      "new_chars": 8469,
+      "old_chars": 5960
     },
     {
-      "finding_id": "finding-c6397dcd46180ff964777323",
-      "legacy_match": true,
-      "new_chars": 3867,
-      "old_chars": 480
+      "finding_id": "finding-9a4a3d9bd9511e5212c7eed5",
+      "legacy_match": false,
+      "new_chars": 6018,
+      "old_chars": 5958
     },
     {
-      "finding_id": "finding-bd39fd13e3c95063a99104d3",
-      "legacy_match": true,
-      "new_chars": 1717,
-      "old_chars": 470
+      "finding_id": "finding-9099f460f44723bfebed1fb3",
+      "legacy_match": false,
+      "new_chars": 8111,
+      "old_chars": 5854
     },
     {
-      "finding_id": "finding-bcc5a4ffbf5046aec288fcb4",
-      "legacy_match": true,
-      "new_chars": 2476,
-      "old_chars": 470
+      "finding_id": "finding-7686828def68f3bd162b2e9e",
+      "legacy_match": false,
+      "new_chars": 6263,
+      "old_chars": 5984
     },
     {
-      "finding_id": "finding-bc0512991011e5f5fa014050",
-      "legacy_match": true,
-      "new_chars": 8163,
-      "old_chars": 479
+      "finding_id": "finding-38aaec0c8852131cb0e6a666",
+      "legacy_match": false,
+      "new_chars": 17089,
+      "old_chars": 5886
     },
     {
-      "finding_id": "finding-ac70100eb3351084f061776f",
-      "legacy_match": true,
-      "new_chars": 4088,
-      "old_chars": 477
+      "finding_id": "finding-139d3cbaab824f45414a97e9",
+      "legacy_match": false,
+      "new_chars": 8469,
+      "old_chars": 5960
     },
     {
-      "finding_id": "finding-a0bbcc1ab0f7bcbbd49e5bc8",
-      "legacy_match": true,
-      "new_chars": 4441,
-      "old_chars": 476
+      "finding_id": "finding-ce091b26177b0200be360963",
+      "legacy_match": false,
+      "new_chars": 7208,
+      "old_chars": 5865
     }
   ],
   "schema_version": "grm-wl-truncation-restore-plan/v1",
-  "unchanged": 32,
-  "unmatched": 5
+  "unchanged": 83,
+  "unmatched": 10
 }

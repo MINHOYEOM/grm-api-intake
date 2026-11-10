@@ -17032,8 +17032,8 @@ class WebAdminRumPanelTest(unittest.TestCase):
     def test_panel_wired(self):
         self.assertIn('id="grm-rum-daily"', self.admin_html)
         self.assertIn("방문 · 유입 경로", self.admin_html)
-        for needle in ("loadRum", "renderRum", 'from("rum_daily")',
-                       'from("rum_referrer_daily")'):
+        for needle in ("loadRum", "renderRum", 'from("rum_daily_clean")',
+                       'from("rum_referrer_daily_clean")'):
             self.assertIn(needle, self.admin_js)
         refresh_all = self.admin_js.split("function refreshAll", 1)[1].split("}", 1)[0]
         self.assertIn("loadRum()", refresh_all)
@@ -17115,7 +17115,7 @@ class WebAdminRumPanelTest(unittest.TestCase):
         # 저장·노출 경로가 072 와 같은 규칙인지.
         self.assertIn("grant select on public.rum_path_daily to authenticated", mig)
         self.assertNotIn("to anon", mig.split("grant select", 1)[1].split(";", 1)[0])
-        self.assertIn('from("rum_path_daily")', self.admin_js)
+        self.assertIn('from("rum_path_daily_clean")', self.admin_js)
         self.assertIn('id="grm-rum-paths"', self.admin_html)
         self.assertIn("조회어는 저장하지 않습니다", self.admin_html)
         # ★경로별 수치는 10단위 반올림이라 하루 5건 미만이 0 으로 사라진다.

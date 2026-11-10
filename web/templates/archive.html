@@ -17,6 +17,9 @@
     {% if now_issue %}
     <a class="arc-now reveal" style="animation-delay:.16s" href="{{ rel_root }}briefs/{{ now_issue.slug }}/index.html"><span class="arc-now-k">{{ _("이번 주 브리프") }}</span><span class="arc-now-t">Vol.{{ now_issue.issue_no }} · {{ now_issue.title }}</span><i class="ti ti-arrow-right" aria-hidden="true"></i></a>
     {% endif %}
+    {%- if news_link %}
+    <p class="arc-news reveal" style="animation-delay:.16s"><a href="{{ rel_root }}news/index.html">{{ _("주중 소식은 최근 규제 소식에서 볼 수 있습니다.") }}</a></p>
+    {%- endif %}
     {#- 자료실 업데이트 스트립(2026-07-25) — 주간 자동 갱신이 반영한 자료를 짧게 알린다.
         뷰모델은 render.load_library_updates()["compact"](제목 상한 3건). 변경이 없거나
         이력이 아직 없으면 lib_update 가 None → 스트립 자체를 렌더하지 않는다(빈 상자 금지).
@@ -92,6 +95,9 @@
 /* [자료실 업데이트 스트립] — grm.css 토큰만 사용(프리즈 보존·스코프 style 은 base 선례).
    머리글 한 줄(날짜·소스별 건수·자료실 링크) + 제목 인라인 한 줄. 검색·필터 위에 오므로
    높이를 최소로 유지한다 — 쌓아 올리면 정작 규제뉴스 목록이 화면 밖으로 밀린다. */
+.arc-news{font-family:var(--sans);font-size:14px;margin:10px 0 0}
+.arc-news a{color:var(--coral-2);text-decoration:none}
+.arc-news a:hover{text-decoration:underline}
 .arc-lib{margin:22px 0 0;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
 .arc-lib-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
 .arc-lib-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+{#- 최근 규제 소식 — /news/. 월요일 브리프 사이의 공백을 메운다. 정본: web/data/news.json (news_page.build_view).
+    그룹 칩은 JS 가 붙인 뒤에만 보인다(JS 없이도 전 항목이 주 단위로 열람된다). 원문 링크는 규제기관·단체 공개 페이지. -#}
+<style>
+  .nw-crumb{font-family:var(--sans);font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .nw-crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  .nw-crumb a:hover{color:var(--coral)}
+  .nw-crumb i{font-style:normal;color:var(--line-2)}
+  .nw-h1{font-family:var(--serif);font-size:clamp(27px,4vw,40px);line-height:1.24;color:var(--ink);margin:12px 0 0;word-break:keep-all}
+  .nw-sum{font-family:var(--sans);font-size:15px;line-height:1.7;color:var(--ink);margin:14px 0 0;max-width:760px;word-break:keep-all}
+  .nw-links{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+  .nw-links a{font-family:var(--sans);font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);border-radius:10px;padding:9px 14px;background:var(--paper)}
+  .nw-links a:hover{border-color:var(--coral)}
+  .nw-chips{display:none;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+  .nw-chips.on{display:flex}
+  .nw-chips button{font-family:var(--sans);font-size:13.5px;color:var(--ink);border:1px solid var(--line-2);border-radius:999px;padding:5px 13px;background:var(--paper);cursor:pointer}
+  .nw-chips button[aria-pressed="true"]{border-color:var(--coral);color:var(--coral)}
+  .nw-body{margin-top:30px;display:flex;flex-direction:column;gap:30px}
+  .nw-week{margin:0}
+  .nw-h2{font-family:var(--serif);font-size:19px;line-height:1.3;color:var(--ink);margin:0 0 10px}
+  .nw-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  .nw-item{display:grid;grid-template-columns:86px 1fr;gap:4px 14px;padding:10px 0;border-top:1px solid var(--line-2)}
+  .nw-item[hidden]{display:none}
+  .nw-item.nw-off{display:none}
+  .nw-date{font-family:var(--sans);font-size:13px;color:var(--muted)}
+  .nw-t{font-family:var(--sans);font-size:15px;line-height:1.55;color:var(--ink);overflow-wrap:anywhere;text-decoration:none}
+  .nw-t:hover{color:var(--coral)}
+  .nw-src{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:2px}
+  .nw-note,.nw-empty{font-family:var(--sans);font-size:13px;line-height:1.65;color:var(--muted);margin:0;word-break:keep-all;max-width:760px}
+  .nw-empty{font-size:15px;margin-top:26px}
+  @media (max-width:560px){.nw-item{grid-template-columns:1fr}}
+</style>
+<main>
+  <div class="wrap">
+    <nav class="nw-crumb" aria-label="{{ _('현재 위치') }}">
+      <a href="{{ rel_root }}">{{ _('홈') }}</a><i>&rsaquo;</i><span>{{ _('최근 규제 소식') }}</span>
+    </nav>
+    <h1 class="nw-h1">{{ _('최근 규제 소식') }}</h1>
+    <p class="nw-sum">{{ _('주간 브리프에 싣지 않은 규제기관·업계 단체의 최근 소식을 날짜순으로 모았습니다.') }}</p>
+    <div class="nw-links">
+      {%- if news_brief_slug %}
+      <a href="{{ rel_root }}briefs/{{ news_brief_slug }}/index.html">{{ _('이번 주 브리프 보기') }}</a>
+      {%- endif %}
+      {%- if lang == 'ko' or 'archive/' in en_paths %}
+      <a href="{{ rel_root }}archive/index.html">{{ _('주간 브리프 아카이브') }}</a>
+      {%- endif %}
+    </div>
+    {%- if news %}
+    <ul class="nw-chips" id="nw-chips" aria-label="{{ _('소식 종류') }}">
+      <li><button type="button" data-g="" aria-pressed="true">{{ _('전체') }} {{ news.total }}</button></li>
+      {%- for g in news.groups %}
+      <li><button type="button" data-g="{{ g.code }}" aria-pressed="false">{{ g.label }} {{ g.count }}</button></li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </div>
+
+  <div class="wrap nw-body">
+    {%- if news %}
+    {%- for w in news.weeks %}
+    <section class="nw-week">
+      <h2 class="nw-h2">{{ _('{date} 주', date=w.start) }}</h2>
+      <ul class="nw-list">
+        {%- for it in w['items'] %}
+        <li class="nw-item" data-g="{{ it.group }}">
+          <span class="nw-date">{{ it.date }}</span>
+          <div>
+            <a class="nw-t" href="{{ it.url }}" target="_blank" rel="noopener">{{ it.title }}</a>
+            <div class="nw-src">{{ it.source }}</div>
+          </div>
+        </li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endfor %}
+    <p class="nw-note">{{ _('최근 {days}일 · {n}건 · {date} 기준. 제목은 각 기관·단체가 공개한 원제이며, 링크는 원문 페이지로 연결됩니다. 브리프 선별과 별개로 수집된 소식이라 업무 관련성은 직접 판단하세요.', days=news.window_days, n=news.total, date=news.as_of) }}</p>
+    {%- if news.hidden_ko %}
+    <p class="nw-note">{{ _('원제가 한국어인 {n}건은 영어 화면에 싣지 않았습니다. 한국어 화면에서 볼 수 있습니다.', n=news.hidden_ko) }}</p>
+    {%- endif %}
+    {%- else %}
+    <p class="nw-empty">{{ _('표시할 소식이 아직 없습니다. 주간 브리프를 먼저 확인해 주세요.') }}</p>
+    {%- endif %}
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+{%- if news %}
+<script>
+(function(){var c=document.getElementById('nw-chips');if(!c)return;c.className+=' on';
+var items=document.querySelectorAll('.nw-item'),btns=c.querySelectorAll('button');
+for(var i=0;i<btns.length;i++){btns[i].addEventListener('click',function(){var g=this.getAttribute('data-g');
+for(var j=0;j<btns.length;j++)btns[j].setAttribute('aria-pressed',btns[j]===this?'true':'false');
+for(var k=0;k<items.length;k++){var on=!g||items[k].getAttribute('data-g')===g;items[k].classList.toggle('nw-off',!on);}
+var w=document.querySelectorAll('.nw-week');for(var m=0;m<w.length;m++){w[m].style.display=w[m].querySelector('.nw-item:not(.nw-off)')?'':'none';}});}})();
+</script>
+{%- endif %}
+{% endblock %}

@@ -46,7 +46,7 @@
     <span class="kick reveal" style="animation-delay:.02s">Weekly News · Archive</span>
     <h1 class="reveal" style="animation-delay:.08s">주간 브리프 아카이브</h1>
     <p class="reveal" style="animation-delay:.14s">매주 월요일, 한 주간의 글로벌·국내 규제 소식을 모아 전해드립니다. 지금까지 쌓인 카드를 업체·기관·주제로 한 번에 검색하고, 기관·카테고리·제품군·기간으로 좁혀 볼 수 있습니다.</p>    <a class="arc-now reveal" style="animation-delay:.16s" href="../briefs/2026-07-06/index.html"><span class="arc-now-k">이번 주 브리프</span><span class="arc-now-t">Vol.3 · 케이보은제약, 금속이물 혼입으로 치약 40개 브랜드 일괄 회수</span><i class="ti ti-arrow-right" aria-hidden="true"></i></a>
-    <aside class="arc-lib reveal" style="animation-delay:.18s" aria-label="자료실 업데이트">
+    <p class="arc-news reveal" style="animation-delay:.16s"><a href="../news/index.html">주중 소식은 최근 규제 소식에서 볼 수 있습니다.</a></p>    <aside class="arc-lib reveal" style="animation-delay:.18s" aria-label="자료실 업데이트">
       <div class="arc-lib-h">
         <span class="arc-lib-k"><i class="ti ti-refresh" aria-hidden="true"></i>자료실 업데이트</span>
         <span class="arc-lib-sum"><b>2026-11-08</b> · 식약처 2건</span>
@@ -100,6 +100,9 @@
 /* [자료실 업데이트 스트립] — grm.css 토큰만 사용(프리즈 보존·스코프 style 은 base 선례).
    머리글 한 줄(날짜·소스별 건수·자료실 링크) + 제목 인라인 한 줄. 검색·필터 위에 오므로
    높이를 최소로 유지한다 — 쌓아 올리면 정작 규제뉴스 목록이 화면 밖으로 밀린다. */
+.arc-news{font-family:var(--sans);font-size:14px;margin:10px 0 0}
+.arc-news a{color:var(--coral-2);text-decoration:none}
+.arc-news a:hover{text-decoration:underline}
 .arc-lib{margin:22px 0 0;padding:13px 18px 12px;background:var(--soft);border:1px solid var(--line-2);border-radius:var(--rad-s)}
 .arc-lib-h{display:flex;align-items:center;gap:8px 13px;flex-wrap:wrap}
 .arc-lib-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
